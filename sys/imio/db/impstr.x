@@ -20,7 +20,7 @@ char	value[ARB]		# new parameter value
 
 int	ch, i
 bool	string_valued
-pointer	rp, ip, op, sp, val
+pointer	rp, ip, op, sp, val, start
 int	idb_putstring(), idb_findrecord()
 errchk	syserrs
 
@@ -71,9 +71,31 @@ begin
 
 	# Update the parameter value.
 	op = rp + IDB_STARTVALUE - 1
+	start = op
 	for (ip=val;  Memc[ip] != EOS && Memc[op] != '\n';  ip=ip+1) {
 	    Memc[op] = Memc[ip]
 	    op = op + 1
+	}
+
+	# If writing a string make sure the closing quote is written and
+	# blank fill any leftover data from the old string value.  Don't
+	# overwrite data with the closing quote, omit the closing quote if
+	# it would overwrite a data (nonblank) character.
+
+	if (string_valued) {
+	    while (op > start && Memc[op-1] == ' ')
+		op = op - 1
+	    if (Memc[op-1] != '\'' && Memc[op] == ' ') {
+		Memc[op] = '\''
+		op = op + 1
+	    }
+	    for (ch=Memc[op];  ch != EOS && ch != '\n';  ch=Memc[op])
+		if (ch == '/')		# comment field
+		    break
+		else {
+		    Memc[op] = ' '
+		    op = op + 1
+		}
 	}
 
 	call sfree (sp)

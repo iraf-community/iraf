@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<syserr.h>
+include	<error.h>
 include	<imhdr.h>
 include	<imio.h>
 
@@ -47,10 +48,13 @@ begin
 
 	if (IM_SECTUSED(o_im) == YES)
 	    if (!envgetb ("nomwcs")) {
-		mw = mw_open (NULL, IM_NPHYSDIM(o_im))
-		call mw_loadim (mw, o_im)
-		call mw_saveim (mw, im)
-		call mw_close (mw)
+		iferr (mw = mw_open (NULL, IM_NPHYSDIM(o_im)))
+		    call erract (EA_WARN)
+		else {
+		    call mw_loadim (mw, o_im)
+		    call mw_saveim (mw, im)
+		    call mw_close (mw)
+		}
 	    }
 
 	# If the pixels of the old image were stored in byte stream mode,

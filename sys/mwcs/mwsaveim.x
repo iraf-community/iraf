@@ -273,7 +273,7 @@ ewcs_
 
 	    # Output successive WAXMAPj FITS cards.
 	    call seek (fd, BOFL)
-	    call iw_putstr (fd, iw, axis, TY_WAXMAP, "WAXMAP%02d")
+	    call iw_putstr (fd, iw, axis, TY_WAXMAP, "WAXMAP%02d", "", 0)
 	    call close (fd)
 	}
 
@@ -290,15 +290,16 @@ ewcs_
 		if (AT_AXIS(at) != axis)
 		    next
 
+		if (npts > 0)
+		    call putline (fd, " ")
 		call putline (fd, S(mw,AT_NAME(at)))
 		if (stridxs (" \t", S(mw,(AT_VALUE(at)))) > 0) {
 		    call putline (fd, " = \"")
 		    call putline (fd, S(mw,AT_VALUE(at)))
-		    call putline (fd, "\" ")
+		    call putline (fd, "\"")
 		} else {
 		    call putline (fd, "=")
 		    call putline (fd, S(mw,AT_VALUE(at)))
-		    call putline (fd, " ")
 		}
 
 		npts = npts + 1
@@ -307,7 +308,8 @@ ewcs_
 	    # Output successive WATi_jjj FITS cards.
 	    call seek (fd, BOFL)
 	    if (npts > 0)
-		call iw_putstr (fd, iw, axis, TY_WATDATA, "WAT%d_%03d")
+		call iw_putstr (fd, iw, axis, TY_WATDATA, "WAT%d_%03d",
+		    "WAT%d%04d", 999)
 	    call close (fd)
 	}
 
@@ -344,7 +346,8 @@ ewcs_
 
 	    # Output successive WSVi_jjj FITS cards.
 	    call seek (fd, BOFL)
-	    call iw_putstr (fd, iw, axis, TY_WSVDATA, "WSV%d_%03d")
+	    call iw_putstr (fd, iw, axis, TY_WSVDATA, "WSV%d_%03d",
+		"WSV%d%04d", 999)
 	    call close (fd)
 	}
 

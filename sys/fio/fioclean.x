@@ -65,9 +65,17 @@ begin
 		    next
 
 		# Do not try to flush the output of a string file, or it
-		# will cause error recursion.
+		# will cause error recursion.   The mode of the string file
+		# is reset to READ_ONLY to avoid writing the EOS at the end
+		# of the string buffer, as if the file is being closed during
+		# cleanup following task termination (which should not
+		# normally be the case) the buffer may no longer exist.
 
-		if (FTYPE(fp) == STRING_FILE || FTYPE(fp) == SPOOL_FILE) {
+		if (FTYPE(fp) == STRING_FILE) {
+		    call strsetmode (fd, READ_ONLY)
+		    call close (fd)
+		    next
+		} else if (FTYPE(fp) == SPOOL_FILE) {
 		    call close (fd)
 		    next
 		}

@@ -31,8 +31,8 @@ begin
 	start = i
 	match = 0
 	ip    = 2
-	len   = strlen (in_str)
-	fch   = in_str[i]
+	len   = strlen (in_str[start])
+	fch   = in_str[start]
 
 	# Search the dictionary string.  If the input string matches a
 	# dictionary entry it is either an exact match (len = dictionary

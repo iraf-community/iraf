@@ -41,6 +41,9 @@ begin
 	    if (AP_INDEX(sky) != NULL)
 		call mfree (AP_INDEX(sky), TY_INT)
 	    call malloc (AP_INDEX(sky), lenbuf, TY_INT)
+	    if (AP_SWGT(sky) != NULL)
+		call mfree (AP_SWGT(sky), TY_REAL)
+	    call malloc (AP_SWGT(sky), lenbuf, TY_REAL)
 	    AP_LENSKYBUF(sky) = lenbuf
 	}
 
@@ -65,9 +68,12 @@ begin
 		AP_SNY(sky), AP_NBADSKYPIX(sky))
 	}
 
-	if (AP_NSKYPIX(sky) <= 0)
-	    return (AP_SKY_OUTOFBOUNDS)
-	else
+	if (AP_NSKYPIX(sky) <= 0) {
+	    if (AP_NBADSKYPIX(sky) <= 0)
+	        return (AP_SKY_OUTOFBOUNDS)
+	    else
+	        return (AP_NSKY_TOO_SMALL)
+	} else
 	    return (AP_OK)
 end
 

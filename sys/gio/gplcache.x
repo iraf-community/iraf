@@ -15,6 +15,9 @@ pointer	w
 real	wx1, wx2, wy1, wy2
 bool	fp_nondegenr()
 real	elogr()
+
+int	wcsord
+data	wcsord /0/
 include	"gpl.com"
 
 begin
@@ -31,6 +34,8 @@ begin
 	    call gki_setwcs (GP_FD(gp), Memi[GP_WCSPTR(gp,1)],
 		LEN_WCS * MAX_WCS)
 	    GP_WCSSTATE(gp) = FIXED
+	    wcsord = wcsord + 1
+	    GP_WCSORD(gp) = wcsord
 	}
 
 	mx1 = WCS_SX1(w) * GKI_MAXNDC
@@ -87,7 +92,7 @@ begin
 	# If clipping is disabled move the clipping viewport out to the
 	# boundary of the device.
 
-	if (WCS_CLIP(w) == NO) {
+	if (and (WCS_FLAGS(w), WF_CLIP) == 0) {
 	    mx1 = 0
 	    mx2 = GKI_MAXNDC
 	    my1 = 0

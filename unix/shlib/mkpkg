@@ -17,7 +17,7 @@ Relink:
 relink_:
 	$set	ADDR = 0a000000
 	$set	VV = "$$(@S.ver.$(MACH))"
-	$set	SI = bin$$S$(VV).e
+	$set	SI = bin$$S$(VV)_$(OSRELEASE).e
 
 	$set	L1 = <libos.a>
 	$set	L2 = <libex.a>
@@ -31,7 +31,7 @@ relink_:
 	$end
 
 	$ifeq (rebuild, yes)
-	    !mkshlib.csh -a $(ADDR)
+	    !./mkshlib.csh -a $(ADDR)
 	    $call libshare
 	$else
 	    $echo "shared library is up to date"
@@ -40,7 +40,7 @@ relink_:
 
 install:
 	$set	VV = "$$(@S.ver.$(MACH))"
-	$set	SI = S$(VV).e
+	$set	SI = S$(VV)_$(OSRELEASE).e
 
 	$iffile (S.e)
 	    $iffile (bin$$$(SI).2) $move bin$$$(SI).2 bin$$$(SI).3 $endif
@@ -59,7 +59,11 @@ libshare.a:
 	$set	SYSF = onentry.o
 	$omake	S.s
 	!ar xv $(iraf)lib/libsys.a $(SYSF)
-	!ar rv libshare.a S.o $(SYSF); ranlib libshare.a; rm $(SYSF)
+	$ifeq (MACH, ssun, sf2c)
+	    !ar rv libshare.a S.o $(SYSF); rm $(SYSF)
+	$else
+	    !ar rv libshare.a S.o $(SYSF); ranlib libshare.a; rm $(SYSF)
+	$endif
 	;
 
 coff:
@@ -71,9 +75,9 @@ coff.e:
 edsym:
 edsym.e:
 	$omake	edsym.c
-	!cc edsym.o -o edsym.e
+	!cc edsym.o -lelf -o edsym.e
 	;
 
 clean:
-	!mkshlib.csh -c
+	!./mkshlib.csh -c
 	;

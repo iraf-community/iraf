@@ -20,33 +20,29 @@ int	wcs_a			# input WCS
 int	wcs_b			# output WCS
 
 int	w, a
-int	tran[2,2], wcs[2]
+int	wcsord, tran[2,2], wcs[2]
 real	morigin[2,2], worigin[2,2], scale[2,2], ds
 real	w1[2,2], w2[2,2], s1[2,2], s2[2,2], p1[2], p2[2]
-pointer	old_gp, wp
+pointer	wp
 
 bool	fp_nondegenr()
 real	elogr(), aelogr()
-data	old_gp /NULL/
 
 begin
-	# Any modifications to the WCS, including initialization by GOPEN,
-	# invalidates the cached transformation parameters.  This avoids
-	# a pitfall of the old, new gp pointer comparision, where a GOPEN,
-	# GCLOSE is followed by a GOPEN returning the same pointer value
-	# for the new GP as for the old.  Even if this happens the new
-	# GOPEN will set the WCSSTATE to UNSET, so we are safe.
+	# Verify that the WCS has not changed since we were last called.
+	# WCSORD is a unique integer (ordinal) assigned by GIO each time a
+	# WCS is fixed.
 
-	if (GP_WCSSTATE(gp) != FIXED)
-	    old_gp = NULL
+	if (GP_WCSSTATE(gp) != FIXED || GP_WCSORD(gp) != wcsord)
+	    wcs[1] = -1
 
 	# Verify that cached transformation parameters are up to date, and if
 	# not, recompute them.
 
-	if (gp != old_gp || wcs[1] != wcs_a || wcs[2] != wcs_b) {
+	if (wcs[1] != wcs_a || wcs[2] != wcs_b) {
+	    wcsord = GP_WCSORD(gp)
 	    wcs[1] = wcs_a
 	    wcs[2] = wcs_b
-	    old_gp = gp
 
 	    # Copy the WCS parameters into 2-dim arrays so that we can use the
 	    # same code for both axes.

@@ -6,7 +6,8 @@ include <math.h>
 include <math/gsurfit.h>
 include "geotran.h"
 
-# T_GEOTRAN -- Procedure to geometrically transform a set of images.
+# T_GEOTRAN -- Geometrically transform a list of images either linearly or
+# using a transformation computed by the GEOMPA task.
 
 procedure t_geotran ()
 
@@ -25,9 +26,9 @@ real	xmag, ymag			# input picture scale
 real	xrotation, yrotation		# rotation angle
 int	nxblock, nyblock		# block size of image to be used
 
-char	image1[SZ_FNAME]			# input image
-char	image2[SZ_FNAME]			# output image
-char	imtemp[SZ_FNAME]			# temporary file
+char	image1[SZ_FNAME]		# input image
+char	image2[SZ_FNAME]		# output image
+char	imtemp[SZ_FNAME]		# temporary file
 
 char	str[SZ_LINE]
 int	list1, list2, tflist
@@ -124,34 +125,34 @@ begin
 	    out = immap (image2, NEW_COPY, in)
 
 	    # Set the parameters.
-	    call geoset (geo, xmin, xmax, ymin, ymax, xscale, yscale, ncols,
+	    call geo_set (geo, xmin, xmax, ymin, ymax, xscale, yscale, ncols,
 		nlines, xin, yin, xshift, yshift, xout, yout, xmag, ymag,
 		xrotation, yrotation)
 
 	    # Get the coordinate surfaces.
 	    if (GT_GEOMODE(geo) == GT_NONE)
-		call geoformat (in, out, geo, sx1, sy1, sx2, sy2)
+		call geo_format (in, out, geo, sx1, sy1, sx2, sy2)
 	    else { 
 		if (fntgfnb (tflist, record, SZ_FNAME) != EOF)
 		    ;
-	        call geodformat (in, out, geo, database, record, sx1, sy1,
+	        call geo_dformat (in, out, geo, database, record, sx1, sy1,
 		    sx2, sy2)
 	    }
 
 	    # Transform the image.
 	    if (IM_LEN(out,1) <= nxblock && IM_LEN(out,2) <= nyblock) {
 	        if (GT_XSAMPLE(geo) > 1.0 || GT_YSAMPLE(geo) > 1.0)
-		    call geosimtran (in, out, geo, sx1, sy1, sx2, sy2,
+		    call geo_simtran (in, out, geo, sx1, sy1, sx2, sy2,
 		        int (IM_LEN(out,1)), int (IM_LEN(out,2)))
 	        else
-	            call geoimtran (in, out, geo, sx1, sy1, sx2, sy2,
+	            call geo_imtran (in, out, geo, sx1, sy1, sx2, sy2,
 		        int (IM_LEN(out,1)), int (IM_LEN(out,2)))
 	    } else {
 	        if (GT_XSAMPLE(geo) > 1.0 || GT_YSAMPLE(geo) > 1.0)
-		    call geostran (in, out, geo, sx1, sy1, sx2, sy2, nxblock,
+		    call geo_stran (in, out, geo, sx1, sy1, sx2, sy2, nxblock,
 		        nyblock)
 	        else
-	            call geotran (in, out, geo, sx1, sy1, sx2, sy2, nxblock,
+	            call geo_tran (in, out, geo, sx1, sy1, sx2, sy2, nxblock,
 		        nyblock)
 	    }
 
@@ -190,21 +191,22 @@ begin
 end
 
 
-# GEOSET -- Set picture dependent task parameters.
+# GEO_SET -- Set the image dependent task parameters individually for each
+# image.
 
-procedure geoset (geo, xmin, xmax, ymin, ymax, xscale, yscale, ncols, nlines,
+procedure geo_set (geo, xmin, xmax, ymin, ymax, xscale, yscale, ncols, nlines,
     xin, yin, xshift, yshift, xout, yout, xmag, ymag, xrotation, yrotation)
 
-pointer	geo			# pointer to geotran structure
-real	xmin, xmax		# minimum and maximum reference values
-real	ymin, ymax		# minimum and maximum reference values
-real	xscale, yscale		# output picture scale
-int	ncols, nlines		# output picture size
-real	xin, yin		# input picture pixel coordinates
-real	xshift, yshift		# shift of origin
-real	xout, yout		# corresponding output picture coords
-real	xmag, ymag		# input picture scale
-real	xrotation, yrotation	# scale angle
+pointer	geo			#I pointer to geotran structure
+real	xmin, xmax		#I minimum and maximum reference values
+real	ymin, ymax		#I minimum and maximum reference values
+real	xscale, yscale		#I output picture scale
+int	ncols, nlines		#I output picture size
+real	xin, yin		#I input picture pixel coordinates
+real	xshift, yshift		#I shift of origin
+real	xout, yout		#I corresponding output picture coords
+real	xmag, ymag		#I input picture scale
+real	xrotation, yrotation	#I scale angle
 
 begin
 	# output picture format parameters
@@ -231,15 +233,15 @@ begin
 end
 
 
-# GEOFORMAT -- Format the output picture when there is no database file.
+# GEO_FORMAT -- Format the output picture when there is no database file.
 
-procedure geoformat (in, out, geo, sx1, sy1, sx2, sy2)
+procedure geo_format (in, out, geo, sx1, sy1, sx2, sy2)
 
-pointer	in		# pointer to the input image
-pointer	out		# pointer to the ouput image
-pointer	geo		# pointer to the geotran structure
-pointer sx1, sy1	# pointer to linear surfaces
-pointer	sx2, sy2	# pointer to distortion surfaces
+pointer	in		#I pointer to the input image
+pointer	out		#I pointer to the ouput image
+pointer	geo		#I pointer to the geotran structure
+pointer sx1, sy1	#O pointer to linear surfaces
+pointer	sx2, sy2	#O pointer to distortion surfaces
 
 real	xmax, ymax
 
@@ -258,35 +260,37 @@ begin
 	else
 	    GT_YROTATION(geo) =  DEGTORAD(GT_YROTATION(geo))
 
-	# Compute the maximum extent of the image.
-	xmax = abs (cos (GT_XROTATION(geo)) * IM_LEN(in, 1) / GT_XMAG(geo)) +
-	    abs (sin (GT_XROTATION(geo)) * IM_LEN(in,2) / GT_YMAG(geo))
-	ymax = abs (sin (GT_YROTATION(geo)) * IM_LEN(in, 1) / GT_XMAG(geo)) +
-	    abs (cos (GT_YROTATION(geo)) * IM_LEN(in,2) / GT_YMAG(geo))
+	# Automatically compute the maximum extent of the image.
+	if (GT_XMAX(geo) <= 0.0 || GT_YMAX(geo) <= 0.0) {
+
+	    # Compute the size of the output image.
+	    xmax = abs (cos(GT_XROTATION(geo)) * IM_LEN(in,1) /
+	        GT_XMAG(geo)) + abs(sin(GT_XROTATION(geo)) * IM_LEN(in,2) /
+		GT_YMAG(geo))
+	    ymax = abs (sin(GT_YROTATION(geo)) * IM_LEN(in, 1) /
+	        GT_XMAG(geo)) + abs (cos(GT_YROTATION(geo)) * IM_LEN(in,2) /
+		GT_YMAG(geo))
+	}
 
 	# Set up the x reference coordinate limits.
 	if (IS_INDEF(GT_XMIN(geo)))
 	    GT_XMIN(geo) = 1.
 	else
-	    GT_XMIN(geo) = max (1., min (GT_XMIN(geo), xmax))
+	    GT_XMIN(geo) = max (1.0, GT_XMIN(geo))
 	if (IS_INDEF(GT_XMAX(geo)))
 	    GT_XMAX(geo) = IM_LEN(in,1)
 	else if (GT_XMAX(geo) <= 0.0)
 	    GT_XMAX(geo) = xmax
-	else
-	    GT_XMAX(geo) = min (xmax, max (1., GT_XMAX(geo)))
 
-	# Set up y reference coordinate limits.
+	# Set up the y reference coordinate limits.
 	if (IS_INDEF(GT_YMIN(geo)))
 	    GT_YMIN(geo) = 1.
 	else
-	    GT_YMIN(geo) = max (1., min (GT_YMIN(geo), ymax))
+	    GT_YMIN(geo) = max (1.0, GT_YMIN(geo))
 	if (IS_INDEF(GT_YMAX(geo)))
 	    GT_YMAX(geo) = IM_LEN(in, 2)
 	else if (GT_YMAX(geo) <= 0.0)
-	    GT_YMAX(geo) = ymax
-	else
-	    GT_YMAX(geo) = min (ymax, max (1., GT_YMAX(geo)))
+	    GT_YMAX(geo) = ymax 
 
 	# Set the number of columns and rows.
 	if (IS_INDEFI(GT_NCOLS(geo)))
@@ -294,7 +298,7 @@ begin
 	if (IS_INDEFI(GT_NLINES(geo)))
 	    GT_NLINES(geo) = IM_LEN(in, 2)
 
-	# Set scale, overide number of columns and rows if necessary. 
+	# Set scale, overiding number of columns and rows if necessary. 
 	if (IS_INDEFR(GT_XSCALE(geo)))
 	    GT_XSCALE(geo) = (GT_XMAX(geo) - GT_XMIN(geo)) / (GT_NCOLS(geo) - 1)
 	else
@@ -316,24 +320,24 @@ begin
 	sy2 = NULL
 
 	# Adjust rotation, x and y scale, scale angle, and flip.
-	call geogscoeff (sx1, sy1, GT_XMAG(geo), GT_YMAG(geo),
+	call geo_gscoeff (sx1, sy1, GT_XMAG(geo), GT_YMAG(geo),
 	    GT_XROTATION(geo), GT_YROTATION(geo))
 
 	# Adjust the shift.
-	call geoshift (in, out, geo, sx1, sy1)
+	call geo_shift (in, out, geo, sx1, sy1)
 end
 
 
-# GEODFORMAT -- Get the coordinate transformation from a database file.
+# GEO_DFORMAT -- Get the coordinate transformation from a database file.
 
-procedure geodformat (in, out, geo, database, transform, sx1, sy1, sx2, sy2)
+procedure geo_dformat (in, out, geo, database, transform, sx1, sy1, sx2, sy2)
 
-pointer	in, out			# pointers to input and output images
-pointer	geo			# pointer to geotran structure
-char	database[ARB]		# name of database file
-char	transform[ARB]		# name of transform
-pointer	sx1, sy1		# pointer to linear part of surface fit
-pointer	sx2, sy2		# pointer to higher order surface
+pointer	in, out			#I pointers to input and output images
+pointer	geo			#I pointer to geotran structure
+char	database[ARB]		#I name of database file
+char	transform[ARB]		#I name of transform
+pointer	sx1, sy1		#O pointer to linear part of surface fit
+pointer	sx2, sy2		#O pointer to higher order surface
 
 int	i, dt, rec, ncoeff, junk
 pointer	xcoeff, ycoeff, newsx1, newsy1
@@ -358,17 +362,17 @@ begin
 	call gsrestore (sy1, Memr[ycoeff])
 
 	# Set the output image format parameters.
-	call geodout (in, out, geo, sx1, sy1)
+	call geo_dout (in, out, geo, sx1, sy1)
 
 	# Adjust the linear part of the fit.
 	call gscopy (sx1, newsx1)
 	call gscopy (sy1, newsy1)
 	if (GT_GEOMODE(geo) == GT_DISTORT)
-	    call geogscoeff (newsx1, newsy1, 1.0, 1.0, 0.0, 0.0)
+	    call geo_gscoeff (newsx1, newsy1, 1.0, 1.0, 0.0, 0.0)
 	else if (! IS_INDEFR(GT_XMAG(geo)) || ! IS_INDEFR(GT_YMAG(geo)) ||
 	    ! IS_INDEFR(GT_XROTATION(geo)) || ! IS_INDEFR(GT_YROTATION(geo)))
-	    call geodcoeff (geo, dt, rec, newsx1, newsy1)
-	call geodshift (in, out, dt, rec, geo, newsx1, newsy1)
+	    call geo_dcoeff (geo, dt, rec, newsx1, newsy1)
+	call geo_dshift (in, out, dt, rec, geo, newsx1, newsy1)
 
 	# Get the higher order part of the fit.
 	ncoeff = dtgeti (dt, rec, "surface2")
@@ -417,13 +421,14 @@ begin
 end
 
 
-# GEODBOUT --  Set the output image format.
+# GEO_DOUT --  Set the output image format using information in the database
+# file.
 
-procedure geodout (in, out, geo, sx1, sy1)
+procedure geo_dout (in, out, geo, sx1, sy1)
 
-pointer	in, out		# pointers to input and output image
-pointer	geo		# pointer to geotran sturcture
-pointer	sx1, sy1	# pointer to linear image
+pointer	in, out		#I pointers to input and output image
+pointer	geo		#I pointer to geotran sturcture
+pointer	sx1, sy1	#I pointers to linear surface descriptors
 
 real	gsgetr ()
 
@@ -461,15 +466,15 @@ begin
 end
 
 
-# GEODSHIFT -- Adjust the shifts.
+# GEO_DSHIFT -- Adjust the shifts using information in the database file.
 
-procedure geodshift (in, out, dt, rec, geo, sx1, sy1)
+procedure geo_dshift (in, out, dt, rec, geo, sx1, sy1)
 
-pointer	in, out		# pointer to input and output images
-pointer	dt		# pointer to database
-int	rec		# pointer to database record
-pointer	geo		# pointer to geotran structure
-pointer	sx1, sy1	# pointers to linear surfaces
+pointer	in, out		#I pointer to input and output images
+pointer	dt		#I pointer to database
+int	rec		#I pointer to database record
+pointer	geo		#I pointer to geotran structure
+pointer	sx1, sy1	#U pointers to linear surfaces
 
 real	gseval()
 
@@ -495,17 +500,17 @@ begin
 	        GT_YOUT(geo))
 	
 	# Correct the coefficients.
-	call geogsshift (sx1, sy1, GT_XSHIFT(geo), GT_YSHIFT(geo))
+	call geo_gsshift (sx1, sy1, GT_XSHIFT(geo), GT_YSHIFT(geo))
 end
 
 
-# GEOSHIFT -- Compute the shift.
+# GEO_SHIFT -- Compute the shift.
 
-procedure geoshift (in, out, geo, sx1, sy1)
+procedure geo_shift (in, out, geo, sx1, sy1)
 
-pointer	in, out		# pointer to input and output images
-pointer	geo		# pointer to geotran structure
-pointer	sx1, sy1	# pointers to linear surfaces
+pointer	in, out		#I pointer to input and output images
+pointer	geo		#I pointer to geotran structure
+pointer	sx1, sy1	#I pointers to linear surfaces
 
 real	gseval()
 
@@ -516,43 +521,33 @@ begin
 	if (IS_INDEFR(GT_YOUT(geo)))
 	    GT_YOUT(geo) =  (GT_YMAX(geo) + GT_YMIN(geo)) / 2.0
 
-	# Determine the final xshift.
-	if (IS_INDEFR(GT_XSHIFT(geo))) {
-	    if (IS_INDEFR(GT_XIN(geo)))
-	        GT_XIN(geo) = (real (IM_LEN (in, 1)) + 1.) / 2.
-	    GT_XSHIFT(geo) = GT_XIN(geo) - gseval (sx1, GT_XOUT(geo),
-	        GT_YOUT(geo))
-	} else {
-	    GT_XIN(geo) = (GT_XOUT(geo) - GT_XMIN(geo)) / GT_XSCALE(geo) -
-		GT_XSHIFT(geo) + 1.0
-	    GT_XSHIFT(geo) = GT_XIN(geo) - gseval (sx1, GT_XOUT(geo),
-	        GT_YOUT(geo))
-	}
+	# Determine the input origin.
+	if (IS_INDEFR(GT_XIN(geo)))
+	    GT_XIN(geo) = (real (IM_LEN (in, 1)) + 1.) / 2.
+	if (IS_INDEFR(GT_YIN(geo)))
+	    GT_YIN(geo) = (real (IM_LEN (in, 2)) + 1.) / 2.
 
-	# Determine the final y shift.
-	if (IS_INDEFR(GT_YSHIFT(geo))) {
-	    if (IS_INDEFR(GT_YIN(geo)))
-	        GT_YIN(geo) = (real (IM_LEN (in, 2)) + 1.) / 2.
-	    GT_YSHIFT(geo) = GT_YIN(geo) - gseval (sy1, GT_XOUT(geo),
+	# Determine the final x and y shifts.
+	if (! IS_INDEFR(GT_XSHIFT(geo)))
+	    GT_XOUT(geo) = GT_XIN(geo) + GT_XSHIFT(geo)
+	if (! IS_INDEFR(GT_YSHIFT(geo)))
+	    GT_YOUT(geo) = GT_YIN(geo) + GT_YSHIFT(geo)
+	GT_XSHIFT(geo) = GT_XIN(geo) - gseval (sx1, GT_XOUT(geo),
 	        GT_YOUT(geo))
-	} else {
-	    GT_YIN(geo) = (GT_YOUT(geo) - GT_YMIN(geo)) / GT_YSCALE(geo) -
-		GT_YSHIFT(geo) + 1.0
-	    GT_YSHIFT(geo) = GT_YIN(geo) - gseval (sy1, GT_XOUT(geo),
-	        GT_YOUT(geo))
-	}
+	GT_YSHIFT(geo) = GT_YIN(geo) - gseval (sy1, GT_XOUT(geo),
+	    GT_YOUT(geo))
 
 	# Alter coefficients.
-	call geogsshift (sx1, sy1, GT_XSHIFT(geo), GT_YSHIFT(geo))
+	call geo_gsshift (sx1, sy1, GT_XSHIFT(geo), GT_YSHIFT(geo))
 end
 
 
-# GEOGSSHIFT -- Shift the coefficients.
+# GEO_GSSHIFT -- Shift the coefficients.
 
-procedure geogsshift (sx1, sy1, xshift, yshift)
+procedure geo_gsshift (sx1, sy1, xshift, yshift)
 
-pointer	sx1, sy1	# pointers to linear surface
-real	xshift, yshift	# shifts
+pointer	sx1, sy1		#U pointers to linear surface
+real	xshift, yshift		#I shifts
 
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
@@ -586,14 +581,15 @@ begin
 end
 
 
-# GEODCOEFF -- Transform the coefficients.
+# GEO_DCOEFF -- Alter the coefficients using information in the database
+# file.
 
-procedure geodcoeff (geo, dt, rec, sx1, sy1)
+procedure geo_dcoeff (geo, dt, rec, sx1, sy1)
 
-pointer	geo		# pointer to geotran structure
-pointer	dt		# pointer to database record
-int	rec		# database record
-pointer	sx1, sy1	# pointers to the linear surface
+pointer	geo		#I pointer to geotran structure
+pointer	dt		#I pointer to database record
+int	rec		#I database record
+pointer	sx1, sy1	#U pointers to the linear surface
 
 real	dtgetr()
 errchk	dtgetr()
@@ -617,23 +613,22 @@ begin
 	else
 	    GT_YROTATION(geo) = DEGTORAD(GT_YROTATION(geo))
 
-	call geogscoeff (sx1, sy1, GT_XMAG(geo), GT_YMAG(geo),
+	call geo_gscoeff (sx1, sy1, GT_XMAG(geo), GT_YMAG(geo),
 	    GT_XROTATION(geo), GT_YROTATION(geo))
 end
 
 
-# GEOGSCOEFF -- Procedure to alter the coefficients of the surface
+# GEO_GSCOEFF -- Alter the coefficients of the surface.
 
-procedure geogscoeff (sx1, sy1, xscale, yscale, xrotation, yrotation)
+procedure geo_gscoeff (sx1, sy1, xscale, yscale, xrotation, yrotation)
 
-pointer	sx1, sy1		# pointer to the linear surface
-real	xscale, yscale		# x and y scales
-real	xrotation,yrotation	# rotation angle radians
+pointer	sx1, sy1		#U pointer to the linear surface
+real	xscale, yscale		#I x and y scales
+real	xrotation,yrotation	#I rotation angle radians
 
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
 real	cosx, sinx, cosy, siny, xrange, yrange
-
 int	gsgeti()
 real	gsgetr()
 
@@ -753,6 +748,7 @@ begin
 	call sfree (sp)
 end
 
+
 define	LTM	Memd[ltm+(($2)-1)*pdim+($1)-1]
 
 # GEO_SWCS -- Set the new wcs in the image header.
@@ -775,7 +771,7 @@ begin
 	    return
 
 	# Initialize the parameters.
-	pdim = mw_stati (mw, MW_NPHYSDIM) 
+	pdim = mw_stati (mw, MW_NDIM) 
 	nelem = pdim * pdim
 	axmap = mw_stati (mw, MW_USEAXMAP)
 	call mw_seti (mw, MW_USEAXMAP, NO)
@@ -783,8 +779,8 @@ begin
 	# Allocate working space.
 	call smark (sp)
 	call salloc (ltm, nelem, TY_DOUBLE)
-	call salloc (ltv_1, nelem, TY_DOUBLE)
-	call salloc (ltv_2, nelem, TY_DOUBLE)
+	call salloc (ltv_1, pdim, TY_DOUBLE)
+	call salloc (ltv_2, pdim, TY_DOUBLE)
 
 	# Initialize the vectors and matrices.
 	call mw_mkidmd (Memd[ltm], pdim)

@@ -18,8 +18,9 @@ pointer	iw			#I pointer to IMWCS descriptor
 int	ctype			#I card type
 int	axis			#I axis to which card refers
 
-int	ncards, i, j
-pointer	cp, bp, op, rp
+int	ncards, i, j, ch
+pointer	cp, bp, ip, op, rp
+define	put_ 10
 
 begin
 	# How much space do we need?
@@ -53,8 +54,27 @@ begin
 
 	    # Append to the string buffer.
 	    if (rp != NULL) {
-		call amovc (Memc[rp+IDB_STARTVALUE+1], Memc[op], MAX_FITSCOLS)
-		op = op + MAX_FITSCOLS
+		#call amovc (Memc[rp+IDB_STARTVALUE+1], Memc[op], MAX_FITSCOLS)
+		#op = op + MAX_FITSCOLS
+
+		do i = 1, MAX_FITSCOLS {
+		    ip = rp + IDB_STARTVALUE + i
+		    ch = Memc[ip]
+
+		    if (ch == EOS || ch == '\n') {
+			break
+		    } else if (ch == '\'') {
+			if (Memc[ip+1] == '\'')
+			    goto put_
+			else if (Memc[ip-1] == '\'')
+			    ;
+			else
+			    break
+		    } else {
+put_			Memc[op] = ch
+			op = op + 1
+		    }
+		}
 	    }
 	}
 

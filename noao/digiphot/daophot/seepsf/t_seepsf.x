@@ -1,5 +1,4 @@
 include	<fset.h>
-include	<imhdr.h>
 
 # T_SEEPSF  -- Produce the PSF in image scale coordinates.
 
@@ -32,6 +31,8 @@ begin
 	call clgstr ("psfimage", Memc[psfimage], SZ_FNAME)
 	call clgstr ("image", Memc[image], SZ_FNAME)
 	dimen = clgeti ("dimension")
+	if (mod (dimen, 2) == 0)
+	    dimen = dimen + 1
 	xpsf = clgetr ("xpsf")
 	ypsf = clgetr ("ypsf")
 	magnitude = clgetr ("magnitude")
@@ -69,7 +70,7 @@ begin
 	    call dp_readpsf (dao, psffd)
 
 	    # Make PSF image.
-	    call dp_mkimage (dao, im, dimen, xpsf, ypsf, magnitude)
+	    call dp_mkimage (dao, psffd, im, dimen, xpsf, ypsf, magnitude)
 
 	    # Close the PSF image and the output image.
 	    call imunmap (psffd)

@@ -21,7 +21,7 @@ int	ndim			#I system dimension
 double	theta
 char	ctype[8]
 bool	have_ltm, have_ltv, have_wattr
-int	axes[2], axis, npts, ch, ip, decax, ax1, ax2, i, j
+int	axes[2], axis, npts, ch, ip, raax, decax, ax1, ax2, i, j
 pointer	sp, r, o_r, cd, ltm, cp, rp, bufp, pv, wv, o_cd, o_ltm
 
 pointer	iw_gbigfits(), iw_findcard()
@@ -38,6 +38,7 @@ begin
 	call salloc (o_cd, ndim*ndim, TY_DOUBLE)
 	call salloc (o_ltm, ndim*ndim, TY_DOUBLE)
 
+	raax = 1
 	decax = 2
 
 	# Set any nonlinear functions on the axes.
@@ -97,6 +98,8 @@ samperr_		call eprintf (
 		# The projections are restricted to two axes and are indicated
 		# by CTYPEi values such as, e.g., "RA---TAN" and "DEC--TAN"
 		# for the TAN projection.
+
+		raax = axis
 
 		# Locate the DEC axis.
 		decax = 0
@@ -166,8 +169,8 @@ samperr_		call eprintf (
 	    # Convert CDELT/CROTA to CD matrix.
 	    if (iw_findcard (iw, TY_CDELT, ERR, 0) != NULL) {
 		theta = DEGTORAD(IW_CROTA(iw))
+		ax1 = raax
 		ax2 = decax
-		ax1 = 3 - decax
 		IW_CD(iw,ax1,ax1) = IW_CDELT(iw,ax1) * cos(theta)
 		IW_CD(iw,ax1,ax2) = abs(IW_CDELT(iw,ax2)) * sin(theta)
 		IW_CD(iw,ax2,ax1) = -abs(IW_CDELT(iw,ax1)) * sin(theta)
@@ -205,9 +208,12 @@ samperr_		call eprintf (
 
 	# Compute R = inv(LTM) * (R' - LTV).
 	if (have_ltm || have_ltv) {
-	    call mw_invertd (Memd[o_ltm], Memd[ltm], ndim)
 	    call asubd (IW_CRPIX(iw,1), IW_LTV(iw,1), Memd[o_r], ndim)
-	    call mw_vmuld (Memd[ltm], Memd[o_r], Memd[r], ndim)
+	    if (have_ltm) {
+		call mw_invertd (Memd[o_ltm], Memd[ltm], ndim)
+		call mw_vmuld (Memd[ltm], Memd[o_r], Memd[r], ndim)
+	    } else
+		call amovd (Memd[o_r], Memd[r], ndim)
 	} else
 	    call amovd (IW_CRPIX(iw,1), Memd[r], ndim)
 

@@ -7,81 +7,80 @@ include <math/gsurfit.h>
 include <math/iminterp.h>
 include "geotran.h"
 
-define	NMARGIN	3		# number of boundary pixels
+define	NMARGIN		3	# number of boundary pixels
+define	NMARGIN_SPLINE3	16	# number of spline boundary pixels
 
-# GEOTRAN -- Procedure to correct an image for geometric distortion
-# Output image blocks nxblock by nyblock pixels are calculated by interpolating
-# in the input image.
+# GEO_TRAN -- Correct an image for geometric distortion using fitted
+# coordinates and image interpolation.
 
-procedure geotran (input, output, geo, sx1, sy1, sx2, sy2, nxblock, nyblock)
+procedure geo_tran (input, output, geo, sx1, sy1, sx2, sy2, nxblock, nyblock)
 
-pointer	input			# pointer to input image
-pointer	output			# pointer to output image
-pointer	geo			# pointer to geotran structure
-pointer	sx1, sy1		# pointer to linear surface
-pointer	sx2, sy2		# pointer to higher order surface
-int	nxblock, nyblock	# working block size
+pointer	input			#I pointer to input image
+pointer	output			#I pointer to output image
+pointer	geo			#I pointer to geotran structure
+pointer	sx1, sy1		#I pointers to linear surfaces
+pointer	sx2, sy2		#I pointers to higher order surfaces
+int	nxblock, nyblock	#I working block size
 
 int	ncols, nlines, l1, l2, c1, c2
 pointer	sp, xref, yref, msi
-
 real	gsgetr()
 
 begin
-	# allocate working space
+	# Allocate working space.
 	call smark (sp)
 	call salloc (xref, GT_NCOLS(geo), TY_REAL)
 	call salloc (yref, GT_NLINES(geo), TY_REAL)
 
-	# initialize the interpolant
+	# Initialize the interpolant.
 	call msiinit (msi, GT_INTERPOLANT(geo))
 
-	# calculate the reference coordinates of the output image pixels
-	call georef (geo, Memr[xref], GT_NCOLS(geo), Memr[yref],
+	# Calculate the reference coordinates of the output image pixels.
+	call geo_ref (geo, Memr[xref], GT_NCOLS(geo), Memr[yref],
 	    GT_NLINES(geo), gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
 	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX))
 
-	# setup input image boundary extension parameters
-	call geoimset (input, geo, sx1, sy1, sx2, sy2, Memr[xref],
+	# Setup input image boundary extension parameters.
+	call geo_imset (input, geo, sx1, sy1, sx2, sy2, Memr[xref],
 	    GT_NCOLS(geo), Memr[yref], GT_NLINES(geo))
 
-	# loop over the line blocks
+	# Loop over the line blocks.
 	for (l1 = 1; l1 <= GT_NLINES(geo); l1 = l1 + nyblock) {
 
-	    # l1 and l2 are the line limits in the output image
+	    # Set line limits in the output image.
 	    l2 = min (l1 + nyblock - 1, GT_NLINES(geo)) 
 	    nlines = l2 - l1 + 1
 
-	    # loop over the column blocks
+	    # Loop over the column blocks
 	    for (c1 = 1; c1 <= GT_NCOLS(geo); c1 = c1 + nxblock) {
 
-		# c1 and c2 are the column limits in the output image
+		# Set column limits in the output image.
 		c2 = min (c1 + nxblock - 1, GT_NCOLS(geo))
 		ncols = c2 - c1 + 1
 
-		# interpolate
-		call geogsvector (input, output, geo, msi, Memr[xref],
+		# Interpolate
+		call geo_gsvector (input, output, geo, msi, Memr[xref],
 		    Memr[yref], c1, c2, l1, l2, sx1, sy1, sx2, sy2)
 	    }
 	}
 
-	# clean up
+	# Clean up.
 	call msifree (msi)
 	call sfree (sp)
 end
 
-# GEOSTRAN -- Procedure to correct an image for geometric distortion
-# Output image blocks nxblock by nyblock pixels are calculated by interpolating
-# in the input image.
 
-procedure geostran (input, output, geo, sx1, sy1, sx2, sy2, nxblock, nyblock)
+# GEO_STRAN -- Correct an image for geometric distortion using interpolated
+# coordinates and image interpolation.
 
-pointer	input		# pointer to input image
-pointer	output		# pointer to output image
-pointer	geo		# pointer to geotran structure
-pointer	sx1, sy1	# pointer to linear surface
-pointer	sx2, sy2	# pointer to higher order surface
-int	nxblock, nyblock# working block size
+procedure geo_stran (input, output, geo, sx1, sy1, sx2, sy2, nxblock, nyblock)
+
+pointer	input			#I pointer to input image
+pointer	output			#I pointer to output image
+pointer	geo			#I pointer to geotran structure
+pointer	sx1, sy1		#I pointers to linear surfaces
+pointer	sx2, sy2		#I pointers to higher order surfaces
+int	nxblock, nyblock	#I working block size
 
 int	nxsample, nysample, ncols, nlines, l1, l2, c1, c2
 int	line1, line2, llast1, llast2
@@ -91,85 +90,84 @@ pointer	xmsi, ymsi, jmsi, msi, xbuf, ybuf, jbuf
 real	gsgetr()
 
 begin
-	# allocate working space and intialize the interpolant
+	# Allocate working space and intialize the interpolant.
 	call smark (sp)
 	call salloc (xsample, GT_NCOLS(geo), TY_REAL)
 	call salloc (ysample, GT_NLINES(geo), TY_REAL)
 	call salloc (xinterp, GT_NCOLS(geo), TY_REAL)
 	call salloc (yinterp, GT_NLINES(geo), TY_REAL)
 
-	# compute the sample size
+	# Compute the sample size.
 	nxsample = GT_NCOLS(geo) / GT_XSAMPLE(geo)
 	nysample = GT_NLINES(geo) / GT_YSAMPLE(geo)
 
-	# intialize interpolants
+	# Initialize interpolants.
 	call msiinit (xmsi, II_BILINEAR)
 	call msiinit (ymsi, II_BILINEAR)
 	call msiinit (msi, GT_INTERPOLANT(geo))
 	if (GT_FLUXCONSERVE(geo) == YES)
 	    call msiinit (jmsi, II_BILINEAR)
 
-	# setup input image boundary extension parameters
-	call georef (geo, Memr[xsample], GT_NCOLS(geo), Memr[ysample],
+	# Setup input image boundary extension parameters.
+	call geo_ref (geo, Memr[xsample], GT_NCOLS(geo), Memr[ysample],
 	    GT_NLINES(geo), gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
 	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX))
-	call geoimset (input, geo, sx1, sy1, sx2, sy2, Memr[xsample],
+	call geo_imset (input, geo, sx1, sy1, sx2, sy2, Memr[xsample],
 	    GT_NCOLS(geo), Memr[ysample], GT_NLINES(geo))
 
-	# calculate the sampled reference coordinates and the interpolated
-	# reference coordinates
-	call georef (geo, Memr[xsample], nxsample, Memr[ysample],
+	# Calculate the sampled reference coordinates and the interpolated
+	# reference coordinates.
+	call geo_ref (geo, Memr[xsample], nxsample, Memr[ysample],
 	    nysample, gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
 	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX))
-	call geosample (geo, Memr[xinterp], Memr[yinterp], nxsample, nysample)
+	call geo_sample (geo, Memr[xinterp], Memr[yinterp], nxsample, nysample)
 
-	# initialize the buffers
+	# Initialize the buffers.
 	xbuf = NULL
 	ybuf = NULL
 	jbuf = NULL
 
-	# loop over the line blocks
+	# Loop over the line blocks.
 	for (l1 = 1; l1 <= GT_NLINES(geo); l1 = l1 + nyblock) {
 
-	    # l1 and l2 are the line limits in the output image
+	    # Set line limits in the output image.
 	    l2 = min (l1 + nyblock - 1, GT_NLINES(geo)) 
 	    nlines = l2 - l1 + 1
 
-	    # line1 and line2 are the coordinates in the interpolation surface
+	    # Line1 and line2 are the coordinates in the interpolation surface
 	    line1 = max (1, min (nysample - 1, int (Memr[yinterp+l1-1])))
 	    line2 = min (nysample, int (Memr[yinterp+l2-1] + 1.0))
 
 	    if ((xbuf == NULL) || (ybuf == NULL) || (jbuf == NULL) ||
 	        (line1 < llast1) || (line2 > llast2)) {
-		call geobuffer (sx1, sx2, xmsi, Memr[xsample], Memr[ysample], 1,
-		    nxsample, line1, line2, llast1, llast2, xbuf)
-		call geobuffer (sy1, sy2, ymsi, Memr[xsample], Memr[ysample], 1,
-		    nxsample, line1, line2, llast1, llast2, ybuf)
+		call geo_xbuffer (sx1, sx2, xmsi, Memr[xsample], Memr[ysample],
+		    1, nxsample, line1, line2, xbuf)
+		call geo_ybuffer (sy1, sy2, ymsi, Memr[xsample], Memr[ysample],
+		    1, nxsample, line1, line2, ybuf)
 	        if (GT_FLUXCONSERVE(geo) == YES)
-		    call geojbuffer (sx1, sy1, sx2, sy2, jmsi, Memr[xsample],
-		        Memr[ysample], 1, nxsample, line1, line2, llast1,
-			llast2, jbuf)
+		    call geo_jbuffer (sx1, sy1, sx2, sy2, jmsi, Memr[xsample],
+		        Memr[ysample], 1, nxsample, line1, line2, jbuf)
 		llast1 = line1
 		llast2 = line2
 	    }
 
 
-	    # loop over the column blocks
+	    # Loop over the column blocks.
 	    for (c1 = 1; c1 <= GT_NCOLS(geo); c1 = c1 + nxblock) {
 
-		# c1 and c2 are the column limits in the output image
+		# C1 and c2 are the column limits in the output image.
 		c2 = min (c1 + nxblock - 1, GT_NCOLS(geo))
 		ncols = c2 - c1 + 1
 
-		# calculate the coordinates of the output pixels in the input
-		# image
-		call geomsivector (input, output, geo, xmsi, ymsi, jmsi, msi, 
+		# Calculate the coordinates of the output pixels in the input
+		# image.
+		call geo_msivector (input, output, geo, xmsi, ymsi, jmsi, msi, 
 		    sx1, sy1, sx2, sy2, Memr[xinterp], Memr[yinterp], c1, c2,
 		    l1, l2, 1, line1)
 	    }
 	}
 
-	# free space
+	# Free space.
 	call msifree (xmsi)
 	call msifree (ymsi)
 	call msifree (msi)
@@ -182,18 +180,19 @@ begin
 	call sfree (sp)
 end
 
-# GEOREF -- Procedure to determine the x and y coordinates at which
-# the coordinate surface will be subsampled
 
-procedure georef (geo, x, nx, y, ny, xmin, xmax, ymin, ymax)
+# GEO_REF -- Determine the x and y coordinates at which the coordinate
+# surface will be subsampled.
 
-pointer	geo		# pointer to the geotran structure
-real	x[nx]		# output x sample coordinates
-int	nx		# size of sampled x array
-real	y[ny]		# output y sample coordinates
-int	ny		# number of output y coordinates
-real	xmin, xmax	# limits on x coordinates
-real	ymin, ymax	# limits on y coordinates
+procedure geo_ref (geo, x, nx, y, ny, xmin, xmax, ymin, ymax)
+
+pointer	geo		#I pointer to the geotran structure
+real	x[nx]		#O output x sample coordinates
+int	nx		#I size of sampled x array
+real	y[ny]		#O output y sample coordinates
+int	ny		#O number of output y coordinates
+real	xmin, xmax	#I limits on x coordinates
+real	ymin, ymax	#I limits on y coordinates
 
 int	i
 real	dx, dy
@@ -209,15 +208,16 @@ begin
 	    y[i] = min (ymax, max (ymin, GT_YMIN(geo) + (i - 1) * dy))
 end
 
-# GEOSAMPLE -- Procedure to calculate the sampled reference points
 
-procedure geosample (geo, xref, yref, nxsample, nysample)
+# GEO_SAMPLE -- Calculate the sampled reference points.
 
-pointer	geo		# pointer to geotran structure
-real	xref[ARB]	# x reference values
-real	yref[ARB]	# y reference values
-int	nxsample	# number of sample points in x
-int	nysample	# number of sample points in y
+procedure geo_sample (geo, xref, yref, nxsample, nysample)
+
+pointer	geo		#I pointer to geotran structure
+real	xref[ARB]	#O x reference values
+real	yref[ARB]	#O y reference values
+int	nxsample	#I number of sample points in x
+int	nysample	#I number of sample points in y
 
 int	i
 
@@ -231,19 +231,18 @@ begin
 	        (GT_NLINES(geo) - nysample)) / (GT_NLINES(geo) - 1)))
 end
 
-# GEOBUFFER -- Procedure to fit the surface interpolants
 
-procedure geobuffer (s1, s2,  msi, xsample, ysample, c1, c2, l1, l2,
-	last1, last2, buf)
+# GEO_XBUFFER -- Compute the x interpolant and coordinates.
 
-pointer	s1, s2		# pointers to the linear surface
-pointer	msi		# interpolant
-real	xsample[ARB]	# sampled x reference coordinates
-real	ysample[ARB]	# sampled y reference coordinates
-int	c1, c2		# columns of interest in sampled image
-int	l1, l2		# lines of interest in the sampled image
-int	last1, last2	# pointer to previous lines
-pointer	buf		# pointer to output buffer
+procedure geo_xbuffer (s1, s2,  msi, xsample, ysample, c1, c2, l1, l2, buf)
+
+pointer	s1, s2		#I pointers to the x surface
+pointer	msi		#I interpolant
+real	xsample[ARB]	#I sampled x reference coordinates
+real	ysample[ARB]	#I sampled y reference coordinates
+int	c1, c2		#I columns of interest in sampled image
+int	l1, l2		#I lines of interest in the sampled image
+pointer	buf		#I pointer to output buffer
 
 int	i, ncols, nlines, llast1, llast2, nclast, nllast
 pointer	sp, sf, y, z, buf1, buf2
@@ -252,18 +251,18 @@ begin
 	ncols = c2 - c1 + 1
 	nlines = l2 - l1 + 1
 
-	# combine surfaces
+	# Combine surfaces.
 	if (s2 == NULL)
 	    call gscopy (s1, sf)
 	else
 	    call gsadd (s1, s2, sf)
 
-	# allocate workin space
+	# Allocate working space.
 	call smark (sp)
 	call salloc (y, ncols, TY_REAL)
 	call salloc (z, ncols, TY_REAL)
 
-	# if buffer undefined then allocate memory for the buffer. Reallocate
+	# If buffer undefined then allocate memory for the buffer. Reallocate
 	# the buffer if the number of lines or columns changes.
 	if (buf ==  NULL) {
 	    call malloc (buf, ncols * nlines, TY_REAL)
@@ -273,11 +272,9 @@ begin
 	    call realloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
-	} else {
-	    llast1 = last1
-	    llast2 = last2
 	}
 
+	# Compute the coordinates.
 	if (l1 < llast1) {
 	    do i = l2, l1, -1 {
 		if (i > llast1)
@@ -309,27 +306,109 @@ begin
 	nclast = ncols
 	nllast = nlines
 
-	# fit the interpolant
+	# Fit the interpolant.
 	call msifit (msi, Memr[buf], ncols, nlines, ncols)
 
 	call gsfree (sf)
 	call sfree (sp)
 end
 
-# GEOJBUFFER -- Procedure to fit the surface interpolants
 
-procedure geojbuffer (sx1, sy1, sx2, sy2, jmsi, xsample, ysample, c1, c2, l1,
-    l2, last1, last2, jbuf)
+# GEO_YBUFFER -- Compute the y interpolant and coordinates.
 
-pointer	sx1, sy1	# pointer to the linear surface
-pointer	sx2, sy2	# pointer to the distortion surface
-pointer	jmsi		# interpolant
-real	xsample[ARB]	# sampled x reference coordinates
-real	ysample[ARB]	# sampled y reference coordinates
-int	c1, c2		# columns of interest in sampled image
-int	l1, l2		# lines of interest in the sampled image
-int	last1, last2	# previous line numbers
-pointer	jbuf		# pointer to output buffer
+procedure geo_ybuffer (s1, s2,  msi, xsample, ysample, c1, c2, l1, l2, buf)
+
+pointer	s1, s2		#I pointers to the y surface
+pointer	msi		#I interpolant
+real	xsample[ARB]	#I sampled x reference coordinates
+real	ysample[ARB]	#I sampled y reference coordinates
+int	c1, c2		#I columns of interest in sampled image
+int	l1, l2		#I lines of interest in the sampled image
+pointer	buf		#I pointer to output buffer
+
+int	i, ncols, nlines, llast1, llast2, nclast, nllast
+pointer	sp, sf, y, z, buf1, buf2
+
+begin
+	ncols = c2 - c1 + 1
+	nlines = l2 - l1 + 1
+
+	# Combine surfaces.
+	if (s2 == NULL)
+	    call gscopy (s1, sf)
+	else
+	    call gsadd (s1, s2, sf)
+
+	# Allocate working space.
+	call smark (sp)
+	call salloc (y, ncols, TY_REAL)
+	call salloc (z, ncols, TY_REAL)
+
+	# If buffer undefined then allocate memory for the buffer. Reallocate
+	# the buffer if the number of lines or columns changes.
+	if (buf ==  NULL) {
+	    call malloc (buf, ncols * nlines, TY_REAL)
+	    llast1 = l1 - nlines
+	    llast2 = l2 - nlines
+	} else if ((nlines != nllast) || (ncols != nclast)) {
+	    call realloc (buf, ncols * nlines, TY_REAL)
+	    llast1 = l1 - nlines
+	    llast2 = l2 - nlines
+	}
+
+	# Compute the coordinates.
+	if (l1 < llast1) {
+	    do i = l2, l1, -1 {
+		if (i > llast1)
+		    buf1 = buf + (i - llast1) * ncols
+		else {
+		    buf1 = z
+		    call amovkr (ysample[i], Memr[y], ncols)
+		    call gsvector (sf, xsample[c1], Memr[y], Memr[buf1], ncols)
+		}
+		buf2 = buf + (i - l1) * ncols
+		call amovr (Memr[buf1], Memr[buf2], ncols)
+	    }
+	} else if (l2 > llast2) {
+	    do i = l1, l2 {
+		if (i < llast2)
+		    buf1 = buf + (i - llast1) * ncols
+		else {
+		    buf1 = z
+		    call amovkr (ysample[i], Memr[y], ncols)
+		    call gsvector (sf, xsample[c1], Memr[y], Memr[buf1], ncols)
+		}
+		buf2 = buf + (i - l1) * ncols
+		call amovr (Memr[buf1], Memr[buf2], ncols)
+	    }
+	}
+
+	llast1 = l1
+	llast2 = l2
+	nclast = ncols
+	nllast = nlines
+
+	# Fit the interpolant.
+	call msifit (msi, Memr[buf], ncols, nlines, ncols)
+
+	call gsfree (sf)
+	call sfree (sp)
+end
+
+
+# GEO_JBUFFER -- Fit the jacobian surface.
+
+procedure geo_jbuffer (sx1, sy1, sx2, sy2, jmsi, xsample, ysample, c1, c2, l1,
+        l2, jbuf)
+
+pointer	sx1, sy1	#I pointers to the linear surfaces
+pointer	sx2, sy2	#I pointers to the distortion surfaces
+pointer	jmsi		#I interpolant
+real	xsample[ARB]	#I sampled x reference coordinates
+real	ysample[ARB]	#I sampled y reference coordinates
+int	c1, c2		#I columns of interest in sampled image
+int	l1, l2		#I lines of interest in the sampled image
+pointer	jbuf		#I pointer to output buffer
 
 int	i, ncols, nlines, llast1, llast2, nclast, nllast
 pointer	sp, sx, sy, y, z, buf1, buf2
@@ -338,7 +417,7 @@ begin
 	ncols = c2 - c1 + 1
 	nlines = l2 - l1 + 1
 
-	# combine surfaces
+	# Combine surfaces.
 	if (sx2 == NULL)
 	    call gscopy (sx1, sx)
 	else
@@ -352,7 +431,7 @@ begin
 	call salloc (y, ncols, TY_REAL)
 	call salloc (z, ncols, TY_REAL)
 
-	# if buffer undefined then allocate memory for the buffer. Reallocate
+	# If buffer undefined then allocate memory for the buffer. Reallocate
 	# the buffer if the number of lines or columns changes.
 	if (jbuf ==  NULL) {
 	    call malloc (jbuf, ncols * nlines, TY_REAL)
@@ -362,11 +441,9 @@ begin
 	    call realloc (jbuf, ncols * nlines, TY_REAL)
 	    llast1 = l1 - nlines
 	    llast2 = l2 - nlines
-	} else {
-	    llast1 = last1
-	    llast2 = last2
 	}
 
+	# Compute surface.
 	if (l1 < llast1) {
 	    do i = l2, l1, -1 {
 		if (i > llast1)
@@ -395,13 +472,13 @@ begin
 	    }
 	}
 
-	# update buffer pointers
+	# Update buffer pointers.
 	llast1 = l1
 	llast2 = l2
 	nclast = ncols
 	nllast = nlines
 
-	# fit the interpolant
+	# Fit the interpolant.
 	call msifit (jmsi, Memr[jbuf], ncols, nlines, ncols)
 
 	call gsfree (sx)
@@ -409,15 +486,16 @@ begin
 	call sfree (sp)
 end
 
-# JGSVECTOR -- Procedure to compute the Jacobian of the transformation
+
+# JGSVECTOR -- Procedure to compute the Jacobian of the transformation.
 
 procedure jgsvector (sx, sy, x, y, out, ncols)
 
-pointer	sx, sy		# surface descriptors
-real	x[ARB]		# x values
-real	y[ARB]		# y values
-real	out[ARB]	# output values
-int	ncols		# number of points
+pointer	sx, sy			#I surface descriptors
+real	x[ARB]			#I x values
+real	y[ARB]			#I y values
+real	out[ARB]		#O output values
+int	ncols			#I number of points
 
 pointer	sp, der1, der2
 
@@ -437,29 +515,29 @@ begin
 	call sfree (sp)
 end
 
-# GEOMSIVECTOR -- Procedure to interpolate the surface coordinates
 
-procedure geomsivector (in, out, geo, xmsi, ymsi, jmsi, msi, sx1, sy1, sx2,
-    sy2, xref, yref, c1, c2, l1, l2, x0, y0)
+# GEO_MSIVECTOR -- Procedure to interpolate the surface coordinates
 
-pointer	in		# pointer to input image
-pointer	out		# pointer to output image
-pointer	geo		# pointer to geotran structure
-pointer	xmsi, ymsi	# pointer to the interpolation cord surfaces
-pointer	jmsi		# pointer to Jacobian surface
-pointer	msi		# pointer to interpolation surface
-pointer	sx1, sy1	# pointers to linear surfaces
-pointer	sx2, sy2	# pointer to higher order surfaces
-real	xref[ARB]	# x reference coordinates
-real	yref[ARB]	# y reference coordinates
-int	c1, c2		# column limits in output image
-int	l1, l2		# line limits in output image
-int	x0, y0		# zero points of interpolation coordinates
+procedure geo_msivector (in, out, geo, xmsi, ymsi, jmsi, msi, sx1, sy1, sx2,
+        sy2, xref, yref, c1, c2, l1, l2, x0, y0)
 
-int	j, ncols, nlines, imc1, imc2, iml1, iml2, nicols
+pointer	in		#I pointer to input image
+pointer	out		#I pointer to output image
+pointer	geo		#I pointer to geotran structure
+pointer	xmsi, ymsi	#I pointer to the interpolation cord surfaces
+pointer	jmsi		#I pointer to Jacobian surface
+pointer	msi		#I pointer to interpolation surface
+pointer	sx1, sy1	#I pointers to linear surfaces
+pointer	sx2, sy2	#I pointer to higher order surfaces
+real	xref[ARB]	#I x reference coordinates
+real	yref[ARB]	#I y reference coordinates
+int	c1, c2		#I column limits in output image
+int	l1, l2		#I line limits in output image
+int	x0, y0		#I zero points of interpolation coordinates
+
+int	j, ncols, nlines, imc1, imc2, iml1, iml2, nicols, nxymargin
 pointer	sp, x, y, xin, yin, inbuf, outbuf 
 real	xmin, xmax, ymin, ymax, factor
-
 pointer	imgs2r(), imps2r()
 real	jfactor()
 
@@ -473,33 +551,37 @@ begin
 	call salloc (xin, ncols, TY_REAL)
 	call salloc (yin, ncols, TY_REAL)
 
-	# find min max of interpolation coords
-	call geoiminmax (xref, yref, c1, c2, l1, l2, x0, y0, xmsi, ymsi, xmin,
+	# Find min max of interpolation coords.
+	call geo_iminmax (xref, yref, c1, c2, l1, l2, x0, y0, xmsi, ymsi, xmin,
 	    xmax, ymin, ymax)
 
-	# get the appropriate image section
-	imc1 = xmin - NMARGIN
+	# Get the appropriate image section.
+	if (GT_INTERPOLANT(geo) == II_SPLINE3)
+	    nxymargin = NMARGIN_SPLINE3
+	else
+	    nxymargin = NMARGIN
+	imc1 = xmin - nxymargin
 	if (imc1 < 0)
 	    imc1 = imc1 - 1
-	imc2 = int (xmax) + NMARGIN + 1
+	imc2 = int (xmax) + nxymargin + 1
 	nicols = imc2 - imc1 + 1
-	iml1 = ymin - NMARGIN
+	iml1 = ymin - nxymargin
 	if (iml1 < 0)
 	    iml1 = iml1 - 1
-	iml2 = int (ymax) + NMARGIN + 1
+	iml2 = int (ymax) + nxymargin + 1
 
-	# fit the interpolant
+	# Fit the interpolant.
 	inbuf = imgs2r (in, imc1, imc2, iml1, iml2)
 	if (inbuf == EOF)
 	    call error (0, "Error reading image")
 	call msifit (msi, Memr[inbuf], (imc2 - imc1 + 1), (iml2 - iml1 + 1),
 	    (imc2 - imc1 + 1))
 
-	# compute the output buffer
+	# Compute the output buffer.
 	call aaddkr (xref[c1], real (-x0 + 1), Memr[x], ncols)
 	do j = l1, l2 {
 
-	    # compute coordinates
+	    # Compute coordinates.
 	    call amovkr (yref[j] + real (-y0 + 1), Memr[y], ncols)
 	    call msivector (xmsi, Memr[x], Memr[y], Memr[xin], ncols)
 	    if (imc1 != 1)
@@ -508,13 +590,13 @@ begin
 	    if (iml1 != 1)
 		call aaddkr (Memr[yin], real (-iml1 + 1), Memr[yin], ncols)
 
-	    # write to output image
+	    # Write the output image.
 	    outbuf = imps2r (out, c1, c2, j, j)
 	    if (outbuf == EOF)
 		call error (0, "Error writing output image")
 	    call msivector (msi, Memr[xin], Memr[yin], Memr[outbuf], ncols)
 
-	    # preserve flux in image
+	    # Preserve flux in image.
 	    if (GT_FLUXCONSERVE(geo) == YES) {
 		factor = GT_XSCALE(geo) * GT_YSCALE(geo)
 		if (GT_GEOMODE(geo) == GT_LINEAR || (sx2 == NULL && sy2 ==
@@ -522,7 +604,7 @@ begin
 		    call amulkr (Memr[outbuf], factor * jfactor (sx1, sy1),
 		        Memr[outbuf], ncols)
 		else {
-		    call geomsiflux (jmsi, xref, yref, Memr[outbuf], c1, c2,
+		    call geo_msiflux (jmsi, xref, yref, Memr[outbuf], c1, c2,
 		        j, x0, y0)
 		    call amulkr (Memr[outbuf], factor, Memr[outbuf], ncols)
 		}
@@ -532,26 +614,27 @@ begin
 	call sfree (sp)
 end
 
-# GEOGSVECTOR -- Procedure to evaluate the surface without sampling
 
-procedure geogsvector (input, output, geo, msi, xref, yref, c1, c2, l1, l2,
-    sx1, sy1, sx2, sy2)
+# GEO_GSVECTOR -- Evaluate the output image pixels using fitted coordinate
+# values and image interpolation.
 
-pointer	input		# pointer to input image
-pointer	output		# pointer to output image
-pointer	geo		# pointer to geotran structure
-pointer	msi		# pointer to interpolant
-real	xref[ARB]	# x reference array
-real	yref[ARB]	# y reference array
-int	c1, c2		# columns of interest in output image
-int	l1, l2		# lines of interest in the output image
-pointer	sx1, sy1	# pointer to linear surface
-pointer	sx2, sy2	# pointer to distortion surface
+procedure geo_gsvector (input, output, geo, msi, xref, yref, c1, c2, l1, l2,
+        sx1, sy1, sx2, sy2)
 
-int	j, ncols, nicols, nlines, imc1, imc2, iml1, iml2
+pointer	input			#I pointer to input image
+pointer	output			#I pointer to output image
+pointer	geo			#I pointer to geotran structure
+pointer	msi			#I pointer to interpolant
+real	xref[ARB]		#I x reference array
+real	yref[ARB]		#I y reference array
+int	c1, c2			#I columns of interest in output image
+int	l1, l2			#I lines of interest in the output image
+pointer	sx1, sy1		#I linear surface descriptors
+pointer	sx2, sy2		#I distortion surface descriptors
+
+int	j, ncols, nicols, nlines, imc1, imc2, iml1, iml2, nxymargin
 pointer	sp, y, xin, yin, temp, inbuf, outbuf
 real	xmin, xmax, ymin, ymax, factor
-
 pointer	imgs2r(), imps2r()
 real	jfactor()
 
@@ -559,46 +642,52 @@ begin
 	ncols = c2 - c1 + 1
 	nlines = l2 - l1 + 1
 
+	# Allocate working space.
 	call smark (sp)
 	call salloc (y, ncols, TY_REAL)
 	call salloc (xin, ncols, TY_REAL)
 	call salloc (yin, ncols, TY_REAL)
 	call salloc (temp, ncols, TY_REAL)
 
-	# compute the maximum and minimum
-	call geominmax (xref, yref, c1, c2, l1, l2, sx1, sy1, sx2, sy2, xmin,
+	# Compute the maximum and minimum coordinates.
+	call geo_minmax (xref, yref, c1, c2, l1, l2, sx1, sy1, sx2, sy2, xmin,
 	    xmax, ymin, ymax)
 
-	# get the appropriate image section
-	imc1 = xmin - NMARGIN
+	# Get the appropriate image section.
+	if (GT_INTERPOLANT(geo) == II_SPLINE3)
+	    nxymargin = NMARGIN_SPLINE3
+	else
+	    nxymargin = NMARGIN
+	imc1 = xmin - nxymargin
 	if (imc1 < 0)
 	    imc1 = imc1 - 1
-	imc2 = int (xmax) + NMARGIN + 1
-	iml1 = ymin - NMARGIN
+	imc2 = int (xmax) + nxymargin + 1
+	iml1 = ymin - nxymargin
 	if (iml1 < 0)
 	    iml1 = iml1 - 1
-	iml2 = int (ymax) + NMARGIN + 1
+	iml2 = int (ymax) + nxymargin + 1
 	nicols = imc2 - imc1 + 1
 
-	# fill buffer
+	# Fill the buffer.
 	inbuf = imgs2r (input, imc1, imc2, iml1, iml2)
 	if (inbuf == EOF)
 	    call error (0, "Error reading image")
 
-	# fit the interpolant
+	# Fit the interpolant.
 	call msifit (msi, Memr[inbuf], (imc2 - imc1 + 1), (iml2 - iml1 + 1),
 	    (imc2 - imc1 + 1))
 
-	# calculate the  x and y input image coordinates
+	# Compute the pixels.
 	do j = l1, l2 {
 
-	    # get output image buffer
+	    # Get output image buffer.
 	    outbuf = imps2r (output, c1, c2, j, j)
 	    if (output == EOF)
 		call error (0, "Error writing output image")
 
 	    call amovkr (yref[j], Memr[y], ncols)
-	    # fit x coords
+
+	    # Fit x coords.
 	    call gsvector (sx1, xref[c1], Memr[y], Memr[xin], ncols)
 	    if (sx2 != NULL) {
 		call gsvector (sx2, xref[c1], Memr[y], Memr[temp], ncols)
@@ -607,7 +696,7 @@ begin
 	    if (imc1 != 1)
 		call aaddkr (Memr[xin], real (-imc1 + 1), Memr[xin], ncols)
 
-	    # fit ycoords
+	    # Fit y coords.
 	    call gsvector (sy1, xref[c1], Memr[y], Memr[yin], ncols)
 	    if (sy2 != NULL) {
 		call gsvector (sy2, xref[c1], Memr[y], Memr[temp], ncols)
@@ -616,10 +705,10 @@ begin
 	    if (iml1 != 1)
 		call aaddkr (Memr[yin], real (-iml1 + 1), Memr[yin], ncols)
 
-	    # interpolate in input image
+	    # Interpolate in input image.
 	    call msivector (msi, Memr[xin], Memr[yin], Memr[outbuf], ncols)
 
-	    # preserve flux in image
+	    # Preserve flux in image.
 	    if (GT_FLUXCONSERVE(geo) == YES) {
 		factor = GT_XSCALE(geo) * GT_YSCALE(geo)
 		if (GT_GEOMODE(geo) == GT_LINEAR || (sx2 == NULL && sy2 ==
@@ -627,7 +716,7 @@ begin
 		    call amulkr (Memr[outbuf], factor * jfactor (sx1, sy1),
 		        Memr[outbuf], ncols)
 		else {
-		    call geogsflux (xref, yref, Memr[outbuf], c1, c2, j,
+		    call geo_gsflux (xref, yref, Memr[outbuf], c1, c2, j,
 		        sx1, sy1, sx2, sy2)
 		    call amulkr (Memr[outbuf], factor, Memr[outbuf], ncols)
 		}
@@ -638,24 +727,23 @@ begin
 end
 
 
-# GEOIMINMAX -- Procedure to find minmax interpolation coords
+# GEO_IMINMAX -- Find minimum and maximum interpolation coordinates.
 
-procedure geoiminmax (xref, yref, c1, c2, l1, l2, x0, y0, xmsi, ymsi, xmin,
-    xmax, ymin, ymax)
+procedure geo_iminmax (xref, yref, c1, c2, l1, l2, x0, y0, xmsi, ymsi, xmin,
+        xmax, ymin, ymax)
 
-real	xref[ARB]		# x reference coords
-real	yref[ARB]		# y reference coords
-int	c1, c2			# columns limits
-int	l1, l2			# line limits
-int	x0, y0			# interpolation coord zero points
-pointer	xmsi, ymsi		# coord surfaces
-real	xmin, xmax		# output xmin and xmax
-real	ymin, ymax		# output ymin and ymax
+real	xref[ARB]		#I x reference coords
+real	yref[ARB]		#I y reference coords
+int	c1, c2			#I columns limits
+int	l1, l2			#I line limits
+int	x0, y0			#I interpolation coord zero points
+pointer	xmsi, ymsi		#I coord surfaces
+real	xmin, xmax		#O output xmin and xmax
+real	ymin, ymax		#O output ymin and ymax
 
 int	j, ncols
 pointer	sp, x, y, xin, yin
 real	mintemp, maxtemp, x1, x2, y1, y2
-
 real	msieval()
 
 begin
@@ -706,24 +794,24 @@ begin
 
 end
 
-# GEOMINMAX -- Procedure to compute the min and max
 
-procedure geominmax (xref, yref, c1, c2, l1, l2, sx1, sy1, sx2, sy2, xmin, xmax,
-    ymin, ymax)
+# GEO_MINMAX -- Compute the minimum and maximum fitted coordinates.
 
-real	xref[ARB]		# x reference coords
-real	yref[ARB]		# y reference coords
-int	c1, c2			# columns limits
-int	l1, l2			# line limits
-pointer	sx1, sy1		# linear surface
-pointer	sx2, sy2		# distortion surface
-real	xmin, xmax		# output xmin and xmax
-real	ymin, ymax		# output ymin and ymax
+procedure geo_minmax (xref, yref, c1, c2, l1, l2, sx1, sy1, sx2, sy2,
+	xmin, xmax, ymin, ymax)
+
+real	xref[ARB]		#I x reference coords
+real	yref[ARB]		#I y reference coords
+int	c1, c2			#I columns limits
+int	l1, l2			#I line limits
+pointer	sx1, sy1		#I linear surface descriptors
+pointer	sx2, sy2		#I distortion surface descriptors
+real	xmin, xmax		#O output xmin and xmax
+real	ymin, ymax		#O output ymin and ymax
 
 int	j, ncols
 pointer	sp, y, xin, yin, temp
 real	x1, x2, y1, y2, mintemp, maxtemp
-
 real	gseval()
 
 begin
@@ -739,7 +827,7 @@ begin
 	ymin = MAX_REAL
 	ymax = -MAX_REAL
 
-	# find the maximum and minimum
+	# Find the maximum and minimum coordinates.
 	do j = l1, l2 {
 
 	    if (j == l1 || j == l2) {
@@ -789,20 +877,21 @@ begin
 	call sfree (sp)
 end
 
-# GEOIMSET -- Procedure to set up input image boundary conditions
 
-procedure geoimset (im, geo, sx1, sy1, sx2, sy2, xref, nx, yref, ny)
+# GEO_IMSET -- Set up input image boundary conditions
 
-pointer	im		# pointer to image
-pointer	geo		# pointer to geotran structure
-pointer	sx1, sy1	# pointer to linear surface
-pointer	sx2, sy2	# pointer to distortion surface
-real	xref[ARB]	# x reference coordinates
-int	nx		# number of x reference coordinates
-real	yref[ARB]	# y reference coordinates
-int	ny		# number of y reference coordinates
+procedure geo_imset (im, geo, sx1, sy1, sx2, sy2, xref, nx, yref, ny)
 
-int	bndry, npts
+pointer	im			#I pointer to image
+pointer	geo			#I pointer to geotran structure
+pointer	sx1, sy1		#I linear surface descriptors
+pointer	sx2, sy2		#I distortion surface descriptors
+real	xref[ARB]		#I x reference coordinates
+int	nx			#I number of x reference coordinates
+real	yref[ARB]		#I y reference coordinates
+int	ny			#I number of y reference coordinates
+
+int	bndry, npts, nxymargin
 pointer	sp, x1, x2, y1, y2, xtemp, ytemp
 real	xn1, xn2, xn3, xn4, yn1, yn2, yn3, yn4, xmin, xmax, ymin, ymax
 real	gseval()
@@ -907,22 +996,27 @@ begin
 	else
 	    bndry = 1
 
-	call imseti (im, IM_NBNDRYPIX, bndry + NMARGIN)
+	if (GT_INTERPOLANT(geo) == II_SPLINE3)
+	    nxymargin = NMARGIN_SPLINE3
+	else
+	    nxymargin = NMARGIN
+	call imseti (im, IM_NBNDRYPIX, bndry + nxymargin)
 	call imseti (im, IM_TYBNDRY, GT_BOUNDARY(geo))
 	call imsetr (im, IM_BNDRYPIXVAL, GT_CONSTANT(geo))
 end
 
-# GEOGSFLUX -- Procedure to preserve flux after a transformation
 
-procedure geogsflux (xref, yref, buf, c1, c2, line, sx1, sy1, sx2, sy2)
+# GEO_GSFLUX -- Preserve the image flux after a transformation.
 
-real	xref[ARB]	# pointer to x reference coordinates
-real	yref[ARB]	# pointer to y reference coordinates
-real	buf[ARB]	# output image buffer
-int	c1, c2		# column limits in the output image
-int	line		# line limits in the output image
-pointer	sx1, sy1	# pointer to linear surface
-pointer	sx2, sy2	# pointer to distortion surface
+procedure geo_gsflux (xref, yref, buf, c1, c2, line, sx1, sy1, sx2, sy2)
+
+real	xref[ARB]		#I x reference coordinates
+real	yref[ARB]		#I y reference coordinates
+real	buf[ARB]		#O output image buffer
+int	c1, c2			#I column limits in the output image
+int	line			#I line in the output image
+pointer	sx1, sy1		#I linear surface descriptors
+pointer	sx2, sy2		#I distortion surface descriptors
 
 int	ncols
 pointer	sp, y, der1, der2, jacob, sx, sy
@@ -930,14 +1024,14 @@ pointer	sp, y, der1, der2, jacob, sx, sy
 begin
 	ncols = c2 - c1 + 1
 
-	# get the reference coordinates
+	# Get the reference coordinates.
 	call smark (sp)
 	call salloc (y, ncols, TY_REAL)
 	call salloc (der1, ncols, TY_REAL)
 	call salloc (der2, ncols, TY_REAL)
 	call salloc (jacob, ncols, TY_REAL)
 
-	# add the two surfaces together for efficiency
+	# Add the two surfaces together for efficiency.
 	if (sx2 != NULL)
 	    call gsadd (sx1, sx2, sx)
 	else
@@ -947,7 +1041,7 @@ begin
 	else
 	    call gscopy (sy1, sy)
 
-	# multiply the output buffer by the Jacobian
+	# Multiply the output buffer by the Jacobian.
 	call amovkr (yref[line], Memr[y], ncols)
 	call gsder (sx, xref[c1], Memr[y], Memr[der1], ncols, 1, 0)
 	call gsder (sy, xref[c1], Memr[y], Memr[der2], ncols, 0, 1)
@@ -959,42 +1053,43 @@ begin
 	call aabsr (Memr[jacob], Memr[jacob], ncols)
 	call amulr (buf, Memr[jacob], buf, ncols)
 
-	# clean up
+	# Clean up.
 	call gsfree (sx)
 	call gsfree (sy)
 	call sfree (sp)
 end
 
-# GEOMSIFLUX -- Procedure to interpolate the surface coordinates
 
-procedure geomsiflux (jmsi, xinterp, yinterp, outdata, c1, c2, line, x0, y0)
+# GEO_MSIFLUX -- Procedure to interpolate the surface coordinates
 
-pointer	jmsi	        # pointer to the jacobian interpolant
-real	xinterp[ARB]	# x reference coordinates
-real	yinterp[ARB]	# y reference coordinates
-real	outdata[ARB]	# output data
-int	c1, c2		# column limits in output image
-int	line		# line to be flux corrected
-int	x0, y0		# zero points of interpolation coordinates
+procedure geo_msiflux (jmsi, xinterp, yinterp, outdata, c1, c2, line, x0, y0)
+
+pointer	jmsi	        	#I pointer to the jacobian interpolant
+real	xinterp[ARB]		#I x reference coordinates
+real	yinterp[ARB]		#I y reference coordinates
+real	outdata[ARB]		#O output data
+int	c1, c2			#I column limits in output image
+int	line			#I line to be flux corrected
+int	x0, y0			#I zero points of interpolation coordinates
 
 int	ncols
 pointer	sp, x, y, jacob
 
 begin
-	# allocate tempoaray sapce
+	# Allocate tempoaray space.
 	call smark (sp)
 	ncols = c2 - c1 + 1
 	call salloc (x, ncols, TY_REAL)
 	call salloc (y, ncols, TY_REAL)
 	call salloc (jacob, ncols, TY_REAL)
 
-	# calculate the x points
+	# Calculate the x points.
 	if (x0 == 1)
 	    call amovr (xinterp[c1], Memr[x], ncols)
 	else
 	    call aaddkr (xinterp[c1], real (-x0 + 1), Memr[x], ncols)
 
-	# multiply the data by the Jacobian
+	# Multiply the data by the Jacobian.
 	call amovkr ((yinterp[line] + real (-y0 + 1)), Memr[y], ncols)
 	call msivector (jmsi, Memr[x], Memr[y], Memr[jacob], ncols)
 	call aabsr (Memr[jacob], Memr[jacob], ncols)
@@ -1003,15 +1098,15 @@ begin
 	call sfree (sp)
 end
 
-# JFACTOR -- Jacobian of a linear transformation
+
+# JFACTOR -- Compute the Jacobian of a linear transformation.
 
 real procedure jfactor (sx1, sy1)
 
-pointer	sx1		# pointer to x surface
-pointer	sy1		# pointer to y surface
+pointer	sx1			#I pointer to x surface
+pointer	sy1			#I pointer to y surface
 
 real	xval, yval, xx, xy, yx, yy
-
 real	gsgetr()
 
 begin

@@ -40,10 +40,11 @@ define	GF_WSACTIVE	4		# workstation is activated
 # attributes and the GLABAX parameters for the X and Y axes are stored
 # in the descriptor as substructures.
 
-define	LEN_GDES	337
+define	LEN_GDES	452
 define	LEN_WCS		11
 define	LEN_WCSARRAY	(LEN_WCS*MAX_WCS)
 define	SZ_DEVNAME	29
+define	SZ_UIFNAME	99
 define	SZ_TICKFORMAT	9
 
 define	GP_FD		Memi[$1]		# graphics stream
@@ -52,9 +53,10 @@ define	GP_GFLAGS	Memi[$1+2]		# GIO flag bits
 define	GP_ACMODE	Memi[$1+3]		# gopen access mode
 define	GP_WCS		Memi[$1+4]		# current WCS
 define	GP_WCSSTATE	Memi[$1+5]		# unset, modifed, or fixed
-define	GP_CURSOR	Memi[$1+6]		# current cursor number
-define	GP_DEVASPECT	Memr[$1+7]		# device aspect ratio
-define	GP_SZMARKER	Memr[$1+8+$2-1]		# standard marker sizes
+define	GP_WCSORD	Memi[$1+6]		# unique WCS ordinal
+define	GP_CURSOR	Memi[$1+7]		# current cursor number
+define	GP_DEVASPECT	Memr[$1+8]		# device aspect ratio
+define	GP_SZMARKER	Memr[$1+9+$2-1]		# standard marker sizes
 			# (extra space)
 define	GP_PLAP		($1+20)			# polyline attributes
 define	GP_PMAP		($1+24)			# polymarker attributes
@@ -63,15 +65,19 @@ define	GP_TXAP		($1+31)			# default text attributes
 define	GP_TXAPCUR	($1+41)			# text drawing attributes
 define	GP_DRAWTITLE	Memi[$1+55]		# draw title on graph
 define	GP_TITLESIZE	Memr[$1+56]		# character size of title
-define	GP_TITLEJUST	Memi[$1+57]		# title justification
-define	GP_NTITLELINES	Memi[$1+58]		# number of lines in title
-define	GP_ASPECT	Memr[$1+59]		# aspect ratio of viewport
-define	GP_XAP		($1+60)			# glabax parameters for X axis
-define	GP_YAP		($1+90)			# glabax parameters for Y axis
-define	GP_DEVNAME	Memc[P2C($1+120)]	# gopen device name
-define	GP_WCSPTR	(($2)*LEN_WCS+$1+150)	# pointer to WCS substructure
-			# (150:336 wcs storage, 17*11=187 units)
-			# (next=337)
+define	GP_TITLECOLOR	Memi[$1+57]		# color of title
+define	GP_TITLEJUST	Memi[$1+58]		# title justification
+define	GP_NTITLELINES	Memi[$1+59]		# number of lines in title
+define	GP_FRAMECOLOR	Memi[$1+60]		# color of viewport frame
+define	GP_FRAMEDRAWN	Memi[$1+61]		# set when frame first drawn
+define	GP_ASPECT	Memr[$1+62]		# aspect ratio of viewport
+define	GP_XAP		($1+65)			# glabax parameters for X axis
+define	GP_YAP		($1+100)		# glabax parameters for Y axis
+define	GP_DEVNAME	Memc[P2C($1+135)]	# gopen device name
+define	GP_UIFNAME	Memc[P2C($1+165)]	# UI file name
+define	GP_WCSPTR	(($2)*LEN_WCS+$1+265)	# pointer to WCS substructure
+			# (265:451 wcs storage, 17*11=187 units)
+			# (next=452)
 
 # Substructure definitions.
 
@@ -106,26 +112,31 @@ define	TX_COLOR	Memi[$1+9]
 
 # GLABAX parameters for either axis.
 
-define	LEN_GL		28
+define	LEN_GL		33
 define	GL_DRAWAXES	Memi[$1]		# 0=none,1=first,2=second,3=both
 define	GL_SETAXISPOS	Memi[$1+1]		# X axes to be drawn
 define	GL_AXISPOS1	Memr[$1+2]		# WCS coord of axis 1
 define	GL_AXISPOS2	Memr[$1+3]		# WCS coord of axis 2
 define	GL_DRAWGRID	Memi[$1+4]		# draw grid between ticks
-define	GL_ROUND	Memi[$1+5]		# extend WCS to next tick
-define	GL_LABELAXIS	Memi[$1+6]		# draw the axis label
-define	GL_AXISLABELSIZE Memr[$1+7]		# char size of axis labels
-define	GL_DRAWTICKS	Memi[$1+8]		# draw ticks
-define	GL_LABELTICKS	Memi[$1+9]		# draw tick labels
-define	GL_NMAJOR	Memi[$1+10]		# number of major ticks
-define	GL_NMINOR	Memi[$1+11]		# number of minor ticks (if!log)
-define	GL_MAJORLENGTH	Memr[$1+12]		# NDC length of major ticks
-define	GL_MINORLENGTH	Memr[$1+13]		# NDC length of minor ticks
-define	GL_MAJORWIDTH	Memr[$1+14]		# linewidth of major ticks
-define	GL_MINORWIDTH	Memr[$1+15]		# linewidth of minor ticks
-define	GL_AXISWIDTH	Memr[$1+16]		# linewidth of axis
-define	GL_TICKLABELSIZE Memr[$1+17]		# char size of tick labels
-define	GL_TICKFORMAT	Memc[P2C($1+18)]	# printf format of ticks
+define	GL_GRIDCOLOR	Memi[$1+5]		# grid color
+define	GL_ROUND	Memi[$1+6]		# extend WCS to next tick
+define	GL_LABELAXIS	Memi[$1+7]		# draw the axis label
+define	GL_AXISLABELSIZE Memr[$1+8]		# char size of axis labels
+define	GL_AXISLABELCOLOR Memi[$1+9]		# char size of axis labels
+define	GL_DRAWTICKS	Memi[$1+10]		# draw ticks
+define	GL_LABELTICKS	Memi[$1+11]		# draw tick labels
+define	GL_NMAJOR	Memi[$1+12]		# number of major ticks
+define	GL_NMINOR	Memi[$1+13]		# number of minor ticks (if!log)
+define	GL_MAJORLENGTH	Memr[$1+14]		# NDC length of major ticks
+define	GL_MINORLENGTH	Memr[$1+15]		# NDC length of minor ticks
+define	GL_MAJORWIDTH	Memr[$1+16]		# linewidth of major ticks
+define	GL_MINORWIDTH	Memr[$1+17]		# linewidth of minor ticks
+define	GL_AXISWIDTH	Memr[$1+18]		# linewidth of axis
+define	GL_AXISCOLOR	Memi[$1+19]		# axis color
+define	GL_TICKLABELSIZE Memr[$1+20]		# char size of tick labels
+define	GL_TICKLABELCOLOR Memi[$1+21]		# char size of tick labels
+define	GL_TICKCOLOR	Memi[$1+22]		# axis color
+define	GL_TICKFORMAT	Memc[P2C($1+23)]	# printf format of ticks
 
 # WCS substructure.
 define	WCS_WX1		Memr[$1]		# window coordinates
@@ -138,4 +149,13 @@ define	WCS_SY1		Memr[$1+6]
 define	WCS_SY2		Memr[$1+7]
 define	WCS_XTRAN	Memi[$1+8]		# type of scaling (linear,log)
 define	WCS_YTRAN	Memi[$1+9]
-define	WCS_CLIP	Memi[$1+10]		# clip at viewport boundary?
+define	WCS_FLAGS	Memi[$1+10]		# assorted flags
+define	WCS_CLIP	WCS_FLAGS		# for backwards compatibility
+
+# WCS_FLAGS bitfields.
+define	WF_DEFINED	00001B			# WCS has been defined
+define	WF_CLIP		00002B			# clip at viewport boundary
+define	WF_NEWFORMAT	00004B			# new format WCS
+	# (reserved)				# remaining bits reserved
+define	WF_RASTER	(and(($1)/512,0777B))	# get raster number
+define	WF_SETRASTER	(or(($1),($2)*512))	# set raster number

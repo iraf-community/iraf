@@ -39,12 +39,12 @@ begin
 	call aclri (MI_PHYSAX(mw,1), MAX_DIM)
 
 	# Compress the main header to save space.
-	call salloc (oo, MI_LEN(mw) * 2, TY_INT)
-	olen = pl_p2li (Memi[mw], 1, Memi[oo], MI_LEN(mw))
+	call salloc (oo, MI_LEN(mw) * 2, TY_SHORT)
+	olen = pl_p2li (Memi[mw], 1, Mems[oo], MI_LEN(mw))
 
 	# Determine how much space will be needed.
-	nchars = LEN_SVHDR * SZ_STRUCT + olen * SZ_INT +
-	    MI_DBUFUSED(mw) * SZ_DOUBLE +
+	nchars = LEN_SVHDR * SZ_STRUCT + olen * SZ_SHORT +
+	    (MI_DBUFUSED(mw) + 1) * SZ_DOUBLE +
 	    (MI_SBUFUSED(mw) + SZB_CHAR-1) / SZB_CHAR
 
 	# Get the space.
@@ -62,7 +62,8 @@ begin
 	SV_DBUFLEN(sv) = MI_DBUFUSED(mw)
 	SV_SBUFLEN(sv) = MI_SBUFUSED(mw)
 	SV_MWSVOFF(sv) = LEN_SVHDR * SZ_STRUCT
-	SV_DBUFOFF(sv) = SV_MWSVOFF(sv) + olen * SZ_INT
+	SV_DBUFOFF(sv) = (SV_MWSVOFF(sv) + olen * SZ_SHORT + SZ_DOUBLE-1) /
+			    SZ_DOUBLE * SZ_DOUBLE
 	SV_SBUFOFF(sv) = SV_DBUFOFF(sv) + MI_DBUFUSED(mw) * SZ_DOUBLE
 	SV_VERSION(sv) = MWSV_VERSION
 	SV_NWCS(sv)    = MI_NWCS(mw)
@@ -75,13 +76,15 @@ begin
 	# Store the three segments of the MWCS, i.e., the main descriptor
 	# and the data and string buffers.
 
-	op = coerce (bp + SV_MWSVOFF(sv), TY_CHAR, TY_STRUCT)
-	call miipak32 (Memi[oo], Memi[op], olen, TY_INT)
+	op = coerce (bp + SV_MWSVOFF(sv), TY_CHAR, TY_SHORT)
+	call miipak16 (Mems[oo], Mems[op], olen, TY_SHORT)
 	op = coerce (bp + SV_DBUFOFF(sv), TY_CHAR, TY_DOUBLE)
 	call miipakd (D(mw,1), Memd[op], SV_DBUFLEN(sv), TY_DOUBLE)
 	op = coerce (bp + SV_SBUFOFF(sv), TY_CHAR, TY_CHAR)
 	call miipak8 (S(mw,1), Memc[op], SV_SBUFLEN(sv), TY_CHAR)
 
 	call mw_close (mw)
+	call sfree (sp)
+
 	return (nchars)
 end

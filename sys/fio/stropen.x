@@ -21,9 +21,9 @@ include	<fio.h>
 
 int procedure stropen (str, maxch, mode)
 
-char	str[ARB]		# string buffer for i/o
-int	maxch			# capacity of buffer
-int	mode			# FIO access mode
+char	str[ARB]			#I string buffer for i/o
+int	maxch				#I capacity of buffer
+int	mode				#I FIO access mode
 
 pointer	bp
 int	fd, ip, loc_str, loc_Mem
@@ -42,15 +42,12 @@ begin
 	call zlocva (Memc, loc_Mem)
 	bp = loc_str - loc_Mem + 1
 
-	# Get file descriptor and init the buffer pointers.  The access mode
-	# is saved in BOFFSET (arbitrarily) for CLOSE, which needs to know the
-	# access mode in order to append an EOS.
-
+	# Get file descriptor and init the buffer pointers.
 	call fstrfp (fiodes[fd])
-	bufptr[fd]  = bp
-	buftop[fd]  = bp + maxch + 1
-	boffset[fd] = mode
-	fflags[fd]  = 0
+	call strsetmode (fd, mode)
+	bufptr[fd] = bp
+	buftop[fd] = bp + maxch
+	fflags[fd] = 0
 
 	# If string is being opened in any of the following modes, it
 	# must be an initialized (written into) string with an EOS.
@@ -67,7 +64,7 @@ begin
 
 	iop[fd]  = bp
 	itop[fd] = bp
-	otop[fd] = bp + maxch + 1
+	otop[fd] = bp + maxch
 
 	switch (mode) {
 	case READ_ONLY, READ_WRITE:
@@ -82,12 +79,16 @@ end
 
 
 # STRCLOSE -- Close a string file previously opened by STROPEN.  If writing
-# to a new string, append an EOS to the end of the string.  We are automatically
-# called by CLOSE if the string was opened as a file with STROPEN.
+# to a new string, append an EOS to the end of the string.  This routine is
+# automatically called by CLOSE if the string was opened as a file with
+# STROPEN.  Applications should call CLOSE, instead of calling STRCLOSE
+# directly, to ensure that the file descriptor allocated by STROPEN and FIO
+# is fully closed.
 
 procedure strclose (fd)
 
-int	fd
+int	fd				#I file descriptor
+int	strgetmode()
 errchk	syserr
 include	<fio.com>
 
@@ -95,12 +96,14 @@ begin
 	if (fd < 0 || fiodes[fd] == NULL)
 	    call syserr (SYS_FILENOTOPEN)
 
-	# Stropen saves the access mode in "boffset" (which is not otherwise
-	# used for strings).  If string was opened for writing, append EOS.
-	# NOTE that if the string was opened with length N, the EOS will go
-	# into location N+1 if the string is completely full.
+	# Free any file pushback.
+	call mfree (FPBBUF(fiodes[fd]), TY_CHAR)
 
-	switch (boffset[fd]) {
+	# If string was opened for writing, append EOS.  NOTE that if the
+	# string was opened with length N, the EOS will go into location N+1
+	# if the string is completely full.
+
+	switch (strgetmode(fd)) {
 	case WRITE_ONLY, APPEND, NEW_FILE, TEMP_FILE:
 	    Memc[iop[fd]] = EOS
 	default:
@@ -110,4 +113,39 @@ begin
 	# Free the file descriptor.
 	bufptr[fd] = NULL
 	fiodes[fd] = NULL
+end
+
+
+# STRSETMODE -- Set the access mode for a string file.  This is an internal
+# routine normally called only by STROPEN above.  It may also called during
+# task termination and cleanup to change the string file access mode to avoid
+# an attempt to EOS terminate the string buffer, before closing off any still
+# open string files
+
+procedure strsetmode (fd, mode)
+
+int	fd				#I file descriptor
+int	mode				#I file access mode
+include	<fio.com>
+
+begin
+	# For a string file the access mode is arbitrarily saved in BOFFSET
+	# for CLOSE (strclose), which needs to know the access mode in order
+	# to append an EOS.  BOFFSET is not otherwise used for string files
+	# since the string buffer has no associated file offset.
+
+	boffset[fd] = mode
+end
+
+
+# STRGETMODE -- Get the access mode for a string file.  This is an internal
+# routine normally called only by STRCLOSE.
+
+int procedure strgetmode (fd)
+
+int	fd				#I file descriptor
+include	<fio.com>
+
+begin
+	return (boffset[fd])
 end

@@ -2,21 +2,23 @@ include	<error.h>
 include	<imhdr.h>
 include	<gset.h>
 include	<pkg/gtools.h>
-include "../shdr.h"
-include	"../units.h"
+include <smw.h>
+include	<units.h>
 
 define	KEY		"noao$onedspec/splot/splot.key"
 define	HELP		"noao$onedspec/splot/stshelp.key"
 define	PROMPT		"splot options"
 
-define	OPTIONS		",auto,zero,xydraw,histogram,nosysid,wreset,"
-define	NOPTIONS	6
+define	OPTIONS	",auto,zero,xydraw,histogram,nosysid,wreset,flip,overplot,"
+define	NOPTIONS	8
 define	AUTO		1	# Option number for auto graph
 define	ZERO		2	# Option number of zero y minimum
 define	XYDRAW		3	# Draw connection X,Y pairs
 define	HIST		4	# Draw histogram style lines
 define	NOSYSID		5	# Don't include system id
 define	WRESET		6	# Reset window for each new spectrum
+define	FLIP		7	# Flip spectra
+define	OVERPLOT	8	# Overplot toggle
 
 
 # SPLOT -- Plot an image line and play with it - Most appropriate for spectra
@@ -24,22 +26,23 @@ define	WRESET		6	# Reset window for each new spectrum
 procedure splot ()
 
 int	list
-int	i, j, npts, nline, nband
-int	wc, key
+int	i, j, npts, nline, nband, nap
+int	wc, key, keyu
 real	wx, wy
+double	w1, u1, w2, u2, w0, wpc
 real	avg_pix, sigma_pix
 
 int	fd1, fd2, ng, hline, hlines
 int	newgraph, newimage, overplot, options[NOPTIONS]
-pointer	sp, image, units, units1, cmd, save1, save2
+pointer	sp, image, units, units1, units2, units3, cmd, save1, save2
 pointer	gp, gt, im, mw, x, y, sh, xg, yg, sg, hptr
 bool	wave_scl, fnu
 
 pointer	gopen(), gt_init()
-int	clgcur(), imtopen(), imtgetim(), imaccess(), gt_geti()
+int	clgcur(), imtopen(), imtgetim(), imaccess(), gt_geti(), nowhite()
 real	clgetr(), gt_getr()
-double	shdr_wl()
-bool	streq()
+double	clgetd(), shdr_wl()
+bool	streq(), fp_equald()
 errchk	getimage, fun_do, ans_hdr, un_changer
 
 begin
@@ -47,6 +50,8 @@ begin
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (units, SZ_FNAME, TY_CHAR)
 	call salloc (units1, SZ_FNAME, TY_CHAR)
+	call salloc (units2, SZ_FNAME, TY_CHAR)
+	call salloc (units3, SZ_FNAME, TY_CHAR)
 	call salloc (cmd, SZ_FNAME, TY_CHAR)
 	call salloc (save1, SZ_FNAME, TY_CHAR)
 	call salloc (save2, SZ_FNAME, TY_CHAR)
@@ -75,7 +80,12 @@ begin
 	hline = 1
 	nline = 0
 	nband = 0
+	if (nowhite (Memc[units], Memc[units], SZ_FNAME) == 0)
+	    call strcpy ("display", Memc[units], SZ_FNAME)
 	call strcpy (Memc[units], Memc[units1], SZ_FNAME)
+	call strcpy (Memc[units], Memc[units2], SZ_FNAME)
+	w0 = INDEFD
+	wpc = INDEFD
 
 	call clgstr ("graphics", Memc[cmd], SZ_FNAME)
 	gp = gopen (Memc[cmd], NEW_FILE+AW_DEFER, STDGRAPH)
@@ -93,6 +103,7 @@ begin
 	    call gt_sets (gt, GTTYPE, "histogram")
 	else
 	    call gt_sets (gt, GTTYPE, "line")
+	call gt_seti (gt, GTXFLIP, options[FLIP])
 	if (options[NOSYSID] == YES)
 	    call gt_seti (gt, GTSYSID, NO)
 
@@ -107,13 +118,13 @@ begin
 		    call pargstr (Memc[image])
 		next
 	    }
-	    call getimage (Memc[image], nline, nband, wave_scl, Memc[units],
-		im, mw, sh, gt)
+	    call getimage (Memc[image], nline, nband, nap, wave_scl,
+		w0, wpc, Memc[units], im, mw, sh, gt)
 	    x = SX(sh)
 	    y = SY(sh)
 	    npts = SN(sh)
 	    newimage = YES
-	    overplot = NO
+	    overplot = options[OVERPLOT]
 
 	    # Enter cursor loop with 'r' redraw.
 	    key = 'r'
@@ -126,9 +137,10 @@ begin
 			call splot_colon (Memc[cmd], options, gp, gt, sh,
 			    Memc[units], Memc[save1], Memc[save2],
 			    fd1, fd2,  newgraph)
+			overplot = options[OVERPLOT]
 			if (sh == NULL) {
-			    call getimage (Memc[image], nline, nband, wave_scl,
-				Memc[units], im, mw, sh, gt)
+			    call getimage (Memc[image], nline, nband, nap,
+				wave_scl, w0, wpc, Memc[units], im, mw, sh, gt)
 			    x = SX(sh)
 			    y = SY(sh)
 			    npts = SN(sh)
@@ -149,6 +161,7 @@ begin
 			options[ZERO] = NO
 		    }
 		    newgraph = options[AUTO]
+		    overplot = NO
 
 	        case 'c':
 		    call gt_setr (gt, GTXMIN, INDEF)
@@ -158,23 +171,24 @@ begin
 		    if (options[ZERO] == YES)
 			call gt_setr (gt, GTYMIN, 0.)
 		    newgraph = YES
+		    overplot = NO
 		    
 	        case 'd': # De-blend a group of lines
-		    call ans_hdr (sh, newimage, Memc[save1], Memc[save2],
+		    call ans_hdr (sh, newimage, key, Memc[save1], Memc[save2],
 			fd1, fd2)
-		    call deblend (sh, gp, wx, wy, Memr[x], Memr[y], npts,
+		    call sp_deblend (sh, gp, wx, wy, Memr[x], Memr[y], npts,
 			fd1, fd2, xg, yg, sg, ng)
 		    newimage = NO
     
 	        case 'k': # Fit gaussian
-		    call ans_hdr (sh, newimage, Memc[save1], Memc[save2],
+		    call ans_hdr (sh, newimage, key, Memc[save1], Memc[save2],
 			fd1, fd2)
 		    call gfit (sh, gp, wx, wy, Memr[x], Memr[y], npts,
 			fd1, fd2, xg, yg, sg, ng)
 		    newimage = NO
 
 	        case 'e': # Equivalent width
-		    call ans_hdr (sh, newimage, Memc[save1], Memc[save2],
+		    call ans_hdr (sh, newimage, key, Memc[save1], Memc[save2],
 			fd1, fd2)
 		    call eqwidth (sh, gp, wx, wy, Memr[x], Memr[y], npts,
 			fd1, fd2)
@@ -182,35 +196,39 @@ begin
 
 	        case 'v':
 		    iferr {
-			if (UN_CLASS(UN(sh)) == UN_VEL)
+			if (UN_CLASS(UN(sh)) == UN_VEL) {
 			    call strcpy (Memc[units1], Memc[units], SZ_FNAME)
-			else {
+			    call strcpy (Memc[units2], Memc[units3], SZ_FNAME)
+			} else {
 			    call strcpy (Memc[units], Memc[units1], SZ_FNAME)
+			    call strcpy (UNITS(sh), Memc[units2], SZ_FNAME)
 			    call un_changer (UN(sh), "angstroms", wx, 1, NO)
 			    call sprintf (Memc[units], SZ_FNAME,
 				"km/s %g angstroms")
 				call pargr (wx)
+			    call strcpy (Memc[units], Memc[units3], SZ_FNAME)
 			}
 			wx = gt_getr (gt, GTXMIN)
 			if (!IS_INDEF(wx)) {
-			    call un_changer (UN(sh), Memc[units], wx, 1, NO)
+			    call un_changer (UN(sh), Memc[units3], wx, 1, NO)
 			    call gt_setr (gt, GTXMIN, wx)
 			}
 			wx = gt_getr (gt, GTXMAX)
 			if (!IS_INDEF(wx)) {
-			    call un_changer (UN(sh), Memc[units], wx, 1, NO)
+			    call un_changer (UN(sh), Memc[units3], wx, 1, NO)
 			    call gt_setr (gt, GTXMAX, wx)
 			}
-			call un_changer (UN(sh), Memc[units], Memr[x], npts,
+			call un_changer (UN(sh), Memc[units3], Memr[x], npts,
 			    YES)
 			call gt_sets (gt, GTXLABEL, UN_LABEL(UN(sh)))
 			call gt_sets (gt, GTXUNITS, UN_UNITS(UN(sh)))
 			newgraph = YES
+			overplot = NO
 		    } then
 			call erract (EA_WARN)
 
 	        case 'h': # Equivalent widths -- C. Pilachowski style
-		    call ans_hdr (sh, newimage, Memc[save1], Memc[save2],
+		    call ans_hdr (sh, newimage, key, Memc[save1], Memc[save2],
 			fd1, fd2)
 		    repeat {
 			switch (key) {
@@ -239,9 +257,19 @@ begin
 
 		    switch (key) {
 		    case '(':
-			nline = max (1, min (IM_LEN(im,2), nline-1))
+			if (IM_LEN(im,2) > 1) {
+			    nline = max (1, min (IM_LEN(im,2), nline-1))
+			    nap = INDEFI
+			} else if (IM_LEN(im,3) > 1) {
+			    nband = max (1, min (IM_LEN(im,3), nband-1))
+			}
 		    case ')':
-			nline = max (1, min (IM_LEN(im,2), nline+1))
+			if (IM_LEN(im,2) > 1) {
+			    nline = max (1, min (IM_LEN(im,2), nline+1))
+			    nap = INDEFI
+			} else if (IM_LEN(im,3) > 1) {
+			    nband = max (1, min (IM_LEN(im,3), nband+1))
+			}
 		    case '#':
 			nline = 0
 		    case '%':
@@ -249,10 +277,11 @@ begin
 		    default:
 			call clgstr ("next_image", Memc[cmd], SZ_FNAME)
 			if (streq (Memc[image], Memc[cmd])) {
-			    ;
+			    call shdr_close (sh)
 			} else if (imaccess (Memc[cmd], READ_ONLY) == YES) {
+			    call shdr_close(sh)
+			    call smw_close (mw)
 			    call imunmap (im)
-			    call mw_close (mw)
 			    newimage = YES
 			} else {
 			    call eprintf ("Can't get %s\n")
@@ -264,8 +293,8 @@ begin
 			nband = 0
 		    }
 
-		    call getimage (Memc[image], nline, nband, wave_scl,
-			Memc[units], im, mw, sh, gt)
+		    call getimage (Memc[image], nline, nband, nap, wave_scl,
+			w0, wpc, Memc[units], im, mw, sh, gt)
 		    x = SX(sh)
 		    y = SY(sh)
 		    npts = SN(sh)
@@ -285,8 +314,10 @@ begin
 
 	        case 'w': # Window the graph
 		    call gt_window (gt, gp, "cursor", newgraph)
-		    if (newgraph == YES)
+		    if (newgraph == YES) {
 			newgraph = options[AUTO]
+			overplot = NO
+		    }
 		
 	        case 'l': # Convert to f-lambda - issue warning if not a
 			  # calibrated image
@@ -300,6 +331,7 @@ begin
 		    if (options[ZERO] == YES)
 			call gt_setr (gt, GTYMIN, 0.)
 		    newgraph = options[AUTO]
+		    overplot = NO
 
 	        case 'f': # Function operators
 		    call fun_help ()
@@ -314,7 +346,7 @@ begin
 			    call fatal (0, "Interrupt")
 			default:
 			    iferr {
-		                call fun_do (key, sh, Memr[y], npts)
+		                call fun_do (key, sh, Memr[y], npts, w0, wpc)
 				call gt_setr (gt, GTYMIN, INDEF)
 				call gt_setr (gt, GTYMAX, INDEF)
 				if (options[ZERO] == YES)
@@ -324,14 +356,20 @@ begin
 					npts, YES)
 				overplot = NO
 		                call fun_help ()
-			    } then
+			    } then {
 			        call erract (EA_WARN)
+				call tsleep (2)
+				call fun_help ()
+			    }
 			}
 		    }
 		    call printf ("\n")
 
 	        case 'm': # Signal-to-noise
-		    call avgsnr (sh, wx, wy, Memr[y], npts)
+		    call ans_hdr (sh, newimage, key, Memc[save1], Memc[save2],
+			fd1, fd2)
+		    call avgsnr (sh, wx, wy, Memr[y], npts, fd1, fd2)
+		    newimage = NO
 
 	        case 'n': # Convert to f-nu
 		    if (FC(sh) == FCNO)
@@ -344,6 +382,7 @@ begin
 		    if (options[ZERO] == YES)
 			call gt_setr (gt, GTYMIN, 0.)
 		    newgraph = options[AUTO]
+		    overplot = NO
 
 		case 'q':
 		    if (options[WRESET] == YES) {
@@ -360,14 +399,9 @@ begin
 		    newgraph = YES
 		    break
 
-	        case 'p': # Convert to wavelength x-scale
-		    call user_coord (sh, wave_scl, Memr[x], npts, INDEF)
-		    call gt_setr (gt, GTXMIN, INDEF)
-		    call gt_setr (gt, GTXMAX, INDEF)
-		    newgraph = options[AUTO]
-
 	        case 'r': # Replot
 		    newgraph = YES
+		    overplot = NO
 
 	        case 's': # Smooth
 		    call smooth (Memr[y], npts)
@@ -380,16 +414,66 @@ begin
 		    if (options[ZERO] == YES)
 			call gt_setr (gt, GTYMIN, 0.)
 		    newgraph = options[AUTO]
+		    overplot = NO
 
-	        case 'u': # Set User coordinates - mark 2 lines
-		    call user_coord (sh, wave_scl, Memr[x], npts, wx)
+	        case 'p', 'u': # Set user coordinates
+		    if (!wave_scl) {
+			call shdr_system (sh, "world")
+			wave_scl = true
+			call gt_sets (gt, GTXLABEL, UN_LABEL(UN(sh)))
+			call gt_sets (gt, GTXUNITS, UN_UNITS(UN(sh)))
+		    }
+		    switch (key) {
+		    case 'p':
+			keyu = 'l'
+			w1 = Memr[x]
+			u1 = clgetd ("wstart")
+			w2 = Memr[x+npts-1]
+			u2 = clgetd ("wend")
+			if (IS_INDEFD(u1)) {
+			    u1 = clgetd ("dw")
+			    u1 = u2 - (npts - 1) * u1
+			} else if (IS_INDEFD(u2)) {
+			    u2 = clgetd ("dw")
+			    u2 = u1 + (npts - 1) * u2
+			}
+		    case 'u':
+			call printf (
+	"Set cursor and select correction: d(oppler), z(eropoint), l(inear)\n")
+			call flush (STDOUT)
+			i = clgcur ("cursor", wx, wy, wc, keyu, Memc[cmd],
+			    SZ_FNAME)
+			w1 = wx
+			u1 = clgetd ("wavelength")
+			if (keyu == 'l') {
+			    repeat {
+				call printf ("Set cursor to second position:")
+				call flush (STDOUT)
+				i = clgcur ("cursor", wx, wy, wc, key,
+				    Memc[cmd], SZ_FNAME)
+				w2 = wx
+				if (!fp_equald (w1, w2)) {
+				    u2 = clgetd ("wavelength")
+				    break
+				}
+				call printf ("Cursor not moved: ")
+			    }
+			}
+		    }
+		    call usercoord (sh, keyu, w1, u1, w2, u2)
+		    w0 = Memr[x]
+		    wpc = Memr[x+1] - w0
 		    call gt_setr (gt, GTXMIN, INDEF)
 		    call gt_setr (gt, GTXMAX, INDEF)
+		    call gt_sets (gt, GTXLABEL, UN_LABEL(UN(sh)))
+		    call gt_sets (gt, GTXUNITS, UN_UNITS(UN(sh)))
 		    newgraph = options[AUTO]
+		    overplot = NO
 
 	        case 'i': # Write image spectrum out
-		    call wrspect (sh)
+		    call sp_wrspect (sh)
 		    im = IM(sh)
+		    mw = MW(sh)
 
 	        case 'j': # Fudge (fix) a data point
 		    call fudgept (sh, gp, Memr[x], Memr[y], npts, wx, wy)
@@ -439,6 +523,7 @@ begin
 		    if (options[ZERO] == YES)
 			call gt_setr (gt, GTYMIN, 0.)
 		    newgraph = options[AUTO]
+		    overplot = NO
 
 	        case '/': # Help on status line
 		    call sts_help (hline, hlines, HELP, hptr)
@@ -459,7 +544,7 @@ begin
 	        }
 
 	        if (newgraph == YES) {
-		    if (OVERPLOT == YES) {
+		    if (overplot == YES) {
 		        call printf ("Overplotting: %s")
 			    call pargstr (Memc[image])
 			if (nline > 0) {
@@ -474,18 +559,24 @@ begin
 			}
 		        call flush (STDOUT)
 			i = gt_geti (gt, GTLINE)
-			call gt_seti (gt, GTLINE, i+1)
+			j = gt_geti (gt, GTCOLOR)
+			if (options[OVERPLOT] == NO) {
+			    call gt_seti (gt, GTLINE, i+1)
+			    call gt_seti (gt, GTCOLOR, j+1)
+			}
 			call replot (gp, gt, Memr[x], Memr[y], npts, NO)
 			call gt_seti (gt, GTLINE, i)
-			overplot = NO
+			call gt_seti (gt, GTCOLOR, j)
 		    } else
 			call replot (gp, gt, Memr[x], Memr[y], npts, YES)
 		    newgraph = NO
+		    overplot = options[OVERPLOT]
 	        }
 	    } until (clgcur ("cursor",wx,wy,wc,key,Memc[cmd],SZ_FNAME) == EOF)
 	    if (im != ERR) {
+		call shdr_close (sh)
+		call smw_close (mw)
 	        call imunmap (im)
-		call mw_close (mw)
 	    }
 	}
 
@@ -503,8 +594,7 @@ begin
 	    call mfree (yg, TY_REAL)
 	    call mfree (sg, TY_REAL)
 	}
-	call shdr_close (sh)
-	call shdr_2d (NULL, 0, 0)
+	call smw_daxis (NULL, NULL, 0, 0, 0)
 	call gt_free (gt)
 	call imtclose (list)
 end

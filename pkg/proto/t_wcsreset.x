@@ -1,3 +1,4 @@
+include <error.h>
 include <imhdr.h>
 include <mwset.h>
 
@@ -17,6 +18,7 @@ pointer	imlist, im, mwim, mw
 bool    clgetb(), streq()
 int	imtgetim(), mw_stati()
 pointer	imtopen(), immap(), mw_openim(), mw_open()
+errchk	mw_openim()
 
 begin
 	# Allocate working space.
@@ -40,16 +42,21 @@ begin
 
 	    # Open the image.
 	    im = immap (Memc[image], READ_WRITE, 0)
-	    mwim = mw_openim (im)
-	    call mw_gsystem (mwim, Memc[system], SZ_FNAME)
-	    if (verbose) {
-	        call printf ("Initializing wcs %s for image %s\n")
-		    call pargstr (Memc[wcs])
-		    call pargstr (Memc[image])
+	    iferr {
+	        if (verbose) {
+	            call printf ("Initializing wcs %s for image %s\n")
+		        call pargstr (Memc[wcs])
+		        call pargstr (Memc[image])
+	        }
+	        mwim = mw_openim (im)
+	    } then {
+		mwim = NULL
+	    } else {
+	        call mw_gsystem (mwim, Memc[system], SZ_FNAME)
 	    }
 
 	    # Reset the lterm only if the wcs is "physical".
-	    if (streq (Memc[wcs], "physical")) {
+	    if (streq (Memc[wcs], "physical") && mwim != NULL) {
 
 	        # Allocate space for the transforms.
 	        ndim = mw_stati (mwim, MW_NPHYSDIM)
@@ -83,7 +90,13 @@ begin
 	        call mfree (ltv, TY_DOUBLE)
 	        call mfree (iltm, TY_DOUBLE)
 
-	    # Initialize the default wcs.  
+	    # Cannot replace physical system for unknown world system.
+	    } else if (streq (Memc[wcs], "physical") && mwim == NULL) {
+	        if (verbose) {
+	            call printf ("\tCannot initialize wcs %s for image %s\n")
+		        call pargstr (Memc[wcs])
+		        call pargstr (Memc[image])
+	        }
 	    } else if (streq (Memc[wcs], "world") || streq (Memc[wcs],
 	        Memc[system])) {
 
@@ -98,7 +111,8 @@ begin
 		    call pargstr (Memc[wcs])
 	    }
 
-	    call mw_close (mwim)
+	    if (mwim != NULL)
+	        call mw_close (mwim)
 
 	    call imunmap (im)
 

@@ -1,5 +1,5 @@
-    NOAO Ultrix/IRAF Revision 2.10EXPORT Mon Aug  3 21:57:20 MST 1992
-    This is the EXPORT version of Sun/IRAF V2.10.1 for Decstation Ultrix V4.2
+    NOAO SUN/IRAF Revision 2.10.4-p1 Wed Aug 30 22:08:07 MST 1995
+    This is the EXPORT version of Sun/IRAF V2.10.4 for Solaris 2.4.
 
     Welcome to IRAF.  To list the available commands, type ? or ??.  To get
     detailed information about a command, type `help command'.   To  run  a

@@ -5,6 +5,7 @@ $curfit	= "math$curfit/"
 cvaccum		hlp = cvaccum.hlp,	src = curfit$cvaccum.x
 cvacpts		hlp = cvacpts.hlp,	src = curfit$cvacpts.x
 cvcoeff		hlp = cvcoeff.hlp,	src = curfit$cvcoeff.x
+cvepower	hlp = cvepower.hlp,	src = curfit$cvepower.x
 cverrors	hlp = cverrors.hlp,	src = curfit$cverrors.x
 cveval		hlp = cveval.hlp,	src = curfit$cveval.x
 cvinit		hlp = cvinit.hlp,	src = curfit$cvinit.x
