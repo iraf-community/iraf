@@ -30,7 +30,7 @@ begin
 	# allocate space for curve descriptor
 	call malloc (cv, LEN_CVSTRUCT, TY_STRUCT)
 
-	order = int (CV_SAVEORDER(fit))
+	order = nint (CV_SAVEORDER(fit))
 	if (order < 1)
 	    call error (0, "CVRESTORE: Illegal order.")
 
@@ -38,7 +38,7 @@ begin
 	    call  error (0, "CVRESTORE: xmax <= xmin.")
 
 	# set curve_type dependent curve descriptor parameters
-	curve_type = int (CV_SAVETYPE(fit))
+	curve_type = nint (CV_SAVETYPE(fit))
 	switch (curve_type) {
 	case CHEBYSHEV, LEGENDRE:
 	    CV_ORDER(cv) = order
@@ -80,13 +80,8 @@ begin
 	# allocate space for xbasis and coefficient arrays, set remaining
 	# pointers to NULL
 
-	$if (datatype == r)
-	call calloc (CV_XBASIS(cv), CV_ORDER(cv), TY_REAL)
-	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_REAL)
-	$else
-	call calloc (CV_XBASIS(cv), CV_ORDER(cv), TY_DOUBLE)
-	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_DOUBLE)
-	$endif
+	call calloc (CV_XBASIS(cv), CV_ORDER(cv), TY_PIXEL)
+	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_PIXEL)
 
 	CV_MATRIX(cv) = NULL
 	CV_CHOFAC(cv) = NULL

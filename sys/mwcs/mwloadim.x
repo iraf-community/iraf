@@ -16,12 +16,15 @@ pointer	im			#I pointer to image header
 
 bool	have_wcs
 int	ndim, i, j
-pointer	sp, sysname, iw, ct, wp, cp
+int	axno[MAX_DIM], axval[MAX_DIM]
+pointer	sp, sysname, iw, ct, wp, cp, bufp, ip
 
-int	mw_allocd(), mw_refstr()
-pointer	iw_rfits(), iw_findcard()
-errchk	iw_rfits, mw_allocd, mw_newsystem, mw_swtype, iw_enterwcs
+int	mw_allocd(), mw_refstr(), ctoi()
+pointer	iw_rfits(), iw_findcard(), iw_gbigfits()
+errchk	iw_rfits, mw_allocd, mw_newsystem, mw_swtype, iw_enterwcs, mw_saxmap
 string	s_physical "physical"
+define	axerr_ 91
+define	axinit_ 92
 
 begin
 	call smark (sp)
@@ -54,7 +57,6 @@ begin
 	MI_MAGIC(mw) = MWCS_MAGIC
 	MI_REFIM(mw) = im
 	MI_NDIM(mw) = ndim
-	MI_NLOGDIM(mw) = ndim
 	MI_LTV(mw) = mw_allocd (mw, ndim)
 	MI_LTM(mw) = mw_allocd (mw, ndim * ndim)
 
@@ -113,8 +115,36 @@ begin
 		WCS_SYSTEM(MI_WCS(mw)) = mw_refstr (mw, Memc[sysname])
 	}
 
+	# Restore the saved WCS axis map if any.
+	if (iw_findcard (iw, TY_WAXMAP, ERR, 0) != NULL) {
+	    bufp = iw_gbigfits (iw, TY_WAXMAP, ERR)
+
+	    ip = bufp
+	    do i = 1, ndim {
+		if (ctoi (Memc, ip, axno[i]) <= 0)
+		    goto axerr_
+		if (ctoi (Memc, ip, axval[i]) <= 0) {
+axerr_		    call eprintf ("Image %s: cannot decode WAXMAP\n")
+			call pargstr (IM_NAME(IW_IM(iw)))
+		    goto axinit_
+		}
+	    }
+
+	    call mfree (bufp, TY_CHAR)
+	    call mw_saxmap (mw, axno, axval, ndim)
+
+	} else {
+axinit_	    do i = 1, ndim {
+		MI_AXNO(mw,i) = i
+		MI_AXVAL(mw,i) = 0
+	    }
+	    MI_USEAXMAP(mw) = NO
+	    MI_NLOGDIM(mw) = ndim
+	}
+
 	# Apply the section transform, if the image was opened with an image
-	# section.
+	# section.  This edits the axis map restored above, if any, and must
+	# be done after restoring the original WCS axis map.
 
 	call iw_setaxmap (mw, im)
 

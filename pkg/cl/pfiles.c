@@ -27,6 +27,7 @@ extern	char *indefstr, *indeflc;
 extern	FILE *yyin;
 char	*uparmdir = UPARM;
 long	filetime();
+static	mapname();
 
 
 /* NEWPFILE -- Allocate a new pfile on the dictionary and link in at parhead.
@@ -175,7 +176,10 @@ register struct ltask *ltp;		/* ltask descriptor */
 	 * indirection.
 	 */
 	if (ltp->lt_flags & LT_PSET) {
-	    for (tp = newtask;  tp != firstask;  tp = next_task(tp)) {
+            /* Don't use newtask if it is pointing beyond end of stack. */
+            tp = (newtask < (struct task *)&stack[topcs]) ? currentask:newtask;
+
+            for (  ;  tp != firstask;  tp = next_task(tp)) {
 		pfp = tp->t_pfp;
 		if (!pfp || !(pfp->pf_flags & PF_PSETREF))
 		    continue;
@@ -645,8 +649,10 @@ struct	ltask *ltp;
 	struct	task *tp;
 	struct	pfile *pfp;
 	char	pfilename[SZ_FNAME];	/* user pfile			*/
+	char	pkgdir[SZ_FNAME+1];
 	char	*ltname;		/* name of the new pfile	*/
 	char	*pkname;		/* name of its package		*/
+	int	running;
 
 	if (cldebug)
 	    eprintf ("unlearn pfile for task %s\n", ltp->lt_lname);
@@ -654,29 +660,41 @@ struct	ltask *ltp;
 	ltname = ltp->lt_lname;
 	pkname = ltp->lt_pkp->pk_name;
 
-	/* Do nothing if pfile belongs to a task which is currently running,
-	 * or to a currently loaded package script task.
+	/* Determine if the pfile belongs to a loaded package or to a task
+	 * which is currently executing.
 	 */
+	running = 0;
 	if (ltp->lt_flags & LT_DEFPCK)
-	    return (OK);			/* package pfile	*/
-	for (tp=currentask;  tp <= firstask;  tp = next_task(tp))
-	    if (tp->t_ltp == ltp)
-		return (ERR);
+	    running++;
+	else {
+	    for (tp=currentask;  tp <= firstask;  tp = next_task(tp))
+		if (tp->t_ltp == ltp) {
+		    running++;
+		    break;
+		}
+	}
 
-	/* Has a "learned" copy of the pfile been written into the user's
-	 * uparm directory?  Doesn't matter, make name and delete it if it
-	 * exists.  Delete does nothing if the file does not exist.
-	 */
+	/* Delete any "learned" copy of the pfile in uparm. */
 	mkpfilename (pfilename, uparmdir, pkname, ltname, ".par");
 	c_delete (pfilename);
 
 	/* Clear the flag that says we have a valid user param file. */
 	ltp->lt_flags &= ~(LT_UPFOK);
 
-	/* See if the pfile is in core; if so, unlink all copies.
+	/* See if the pfile is in core; if so, unlink all copies.  If the
+	 * pfile belongs to a currently executing task we can't unlink it,
+	 * so reset the parameter values to the system defaults instead.
 	 */
 	while ((pfp = pfilefind (ltp)) != NULL)
-	    pfileunlink (pfp);
+	    if (running) {
+		c_fnldir (ltp->lt_pname, pkgdir, SZ_FNAME);
+		mkpfilename (pfilename, pkgdir, pkname, ltname, ".par");
+		pfilemerge (pfp, pfilename);
+		pfp->pf_flags &= ~PF_UPDATE;
+		if (ltp->lt_flags & LT_DEFPCK)
+		    break;
+	    } else
+		pfileunlink (pfp);
 
 	return (OK);
 }
@@ -739,7 +757,8 @@ char	*extn;			/* filename extension		*/
  * to generate a name no longer than N characters.  Returns the number of
  * characters generated.
  */
-static mapname (in, out, maxlen)
+static
+mapname (in, out, maxlen)
 char	*in;
 char	*out;
 int	maxlen;

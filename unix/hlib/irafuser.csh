@@ -1,8 +1,8 @@
 # IRAF definitions for the UNIX/csh user.  The additional variables iraf$ and
 # home$ should be defined in the user's .login file.
 
-setenv	MACH	`mach`
-#setenv	MACH	vax
+#setenv	MACH	`mach`
+setenv	MACH	dsux
 
 setenv	hostid	unix
 setenv	host	${iraf}unix/
@@ -10,23 +10,31 @@ setenv	hlib	${iraf}unix/hlib/
 setenv	hbin	${iraf}unix/bin.$MACH/
 setenv	tmp	/tmp/
 
+# Identify the C and Fortran compilers to be used.
+#setenv	GCC_DEFS  "-DNOSTDHDRS -DSYSV -DANSI"
+#setenv	GCC_WARN  "-W -Wunused -Wcomment"
+#setenv	GCC_COMP  "-fstrength-reduce -fpcc-struct-return"
+#setenv	HOS_DEFS  ""
+#setenv	CC	"gcc $GCC_DEFS $HOS_DEFS $GCC_WARN $GCC_COMP"
+#setenv	RANLIB	"echo ranlib"
+
+setenv	CC	cc
+setenv	F77	f77
+setenv	RANLIB	ranlib
+
 # HSI cc, f77, and xc compile/link flags [MACHDEP].
 switch ($MACH)
-case i386:
-case sparc:
+case dsux:
 	setenv	HSI_CF	"-O"
-	setenv	HSI_FF	"-O"
-	setenv	HSI_XF	"-O -z"
-	breaksw
-case mc68020:
-	setenv	HSI_CF	"-O -fsoft"
-	setenv	HSI_FF	"-O -fsoft"
-	setenv	HSI_XF	"-O -/fsoft -z"
+	setenv	HSI_FF	"-O -G 0"
+	setenv	HSI_XF	"-O"
+	setenv	HSI_F77LIBS ""
 	breaksw
 default:
 	setenv	HSI_CF	"-O"
 	setenv	HSI_FF	"-O"
 	setenv	HSI_XF	"-O"
+	setenv	HSI_F77LIBS ""
 	breaksw
 endsw
 
@@ -41,10 +49,9 @@ endif
 
 alias	mkiraf	${hlib}mkiraf.csh
 alias	mkmlist	${hlib}mkmlist.csh
-alias	mkv	${hbin}mkpkg.e lflags="-/Bstatic"	# include tv syms
-alias	mkz	${hbin}mkpkg.e lflags=-z		# no shared lib
+alias	mkz	${hbin}mkpkg.e "'lflags=-z'"
 
-alias	edsym	${hbin}edsym.e
+#alias	edsym	${hbin}edsym.e
 alias	generic	${hbin}generic.e
 alias	mkpkg	${hbin}mkpkg.e
 alias	rmbin	${hbin}rmbin.e

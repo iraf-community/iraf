@@ -23,8 +23,8 @@ int	unp1, unp2, i, sz_buffer
 
 bool	clgetb(), is_in_range()
 char	clgetc()
-int	clgeti(), mtopen(), decode_ranges(), strlen(), read()
-int	get_data_type(), btoi(), mtfile()
+int	clgeti(), mtopen(), decode_ranges(), read()
+int	get_data_type(), btoi(), mtfile(), mtneedfileno()
 
 include	"lut.com"
 include	"powersof2.com"
@@ -52,10 +52,11 @@ begin
 	# the input file is a general tape device, append the file_number suffix
 
 	call clgstr ("ids_file", ids_file, SZ_FNAME)
-	if (mtfile(ids_file) == YES && ids_file[strlen(ids_file)]!=']'){
-	    file_number = clgeti ("file_number")
-	    call sprintf (ids_file[strlen(ids_file)+1], SZ_PATHNAME, "[%d]")
-		call pargi (file_number)
+	if (mtfile(ids_file) == YES) {
+	    if (mtneedfileno (ids_file) == YES) {
+	        file_number = clgeti ("file_number")
+		call mtfname (ids_file, file_number, ids_file, SZ_FNAME)
+	    }
 	}
 
 	IS_REDUCED(cp) = btoi (clgetb ("reduced_data"))

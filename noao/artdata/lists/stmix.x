@@ -43,7 +43,7 @@ real	alpha			# absorption coefficent
 long	seed			# seed for the random number generator
 
 int	i
-real	dr, urand()
+real	dr, s, urand()
 
 begin
 	dr = (1. - ar)
@@ -51,9 +51,9 @@ begin
 	    if (egal[i] == ST_DEVAUC)
 	        round[i] = ar + dr * urand (seed)
 	    else {
-		dr = sin (HALFPI * urand (seed))
-		round[i] = sqrt (dr**2 * .99 + .01)
-		mag[i] = mag[i] + alpha * (1 / max (1., dr) - 1) / 9.
+		s = sin (HALFPI * urand (seed))
+		round[i] = sqrt (s**2 * .99 + .01)
+		mag[i] = mag[i] + alpha * (1 / max (1., s) - 1) / 9.
 	    }
 	}
 
@@ -104,7 +104,7 @@ begin
 	        axis[i] = eradius * 10.0 ** ((minmag - mag[i]) / 6.)
 	    else
 	        axis[i] = sradius * eradius * 10.0 ** ((minmag - mag[i]) / 6.)
-	    axis[i] = axis[i] * (0.2 + 0.4 * urand (seed))
+	    axis[i] = axis[i] * (0.8 + 0.4 * urand (seed))
 	}
 end
 

@@ -1,7 +1,7 @@
 include "../lib/apphotdef.h"
 include "../lib/polyphotdef.h"
 
-# AP_YINIT - Procedure to initialize the polyphot structure.
+# AP_YINIT - Initialize the polyphot structure.
 
 procedure ap_yinit (ap, cfunction, cbox, sfunction, annulus, dannulus, fwhmpsf,
     noise)
@@ -18,19 +18,8 @@ int	noise		# Noise function
 begin
 	call malloc (ap, LEN_APSTRUCT, TY_STRUCT)
 
-	# Set the data dependent parameters.
-	AP_IMNAME(ap) = EOS
-	AP_CWX(ap) = INDEFR
-	AP_CWY(ap) = INDEFR
-	AP_WX(ap) = INDEFR
-	AP_WY(ap) = INDEFR
-	AP_SCALE(ap) = DEF_SCALE
-	AP_FWHMPSF(ap) = fwhmpsf
-	AP_POSITIVE(ap) = DEF_POSITIVE
-	AP_DATAMIN(ap) = INDEFR
-	AP_DATAMAX(ap) = INDEFR
-	AP_EXPOSURE(ap) = EOS
-	AP_ITIME(ap) = DEF_ITIME
+	# Set the global apphot package parameters.
+	call ap_defsetup (ap, fwhmpsf)
 
 	# Setup noise parameters.
 	call ap_noisesetup (ap, noise)

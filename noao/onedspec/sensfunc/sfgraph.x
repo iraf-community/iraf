@@ -82,13 +82,17 @@ begin
 	    call gseti (gio, G_WCS, i)
 	    switch (GP_GRAPHS(gp,i)) {
 	    case 'a', 's', 'r':
-		call sf_data (stds, nstds, cv, GP_GRAPHS(gp,i))
+		call sf_data (stds, nstds, GP_GRAPHS(gp,i))
 		call sf_graph1 (gp, stds, nstds, GP_GRAPHS(gp,i))
 	    case 'e':
 		call sf_egraph (gp, wextn, extn, nextn, ecv)
 	    case 'c':
 		call sf_cgraph (gp, stds, nstds, cv)
-	    case 'i':
+	    case 'i', 'l':
+		if (GP_GRAPHS(gp,i) == 'i')
+		    GP_LOG(gp) = NO
+		else
+		    GP_LOG(gp) = YES
 		image = image + 1
 		iferr (call sf_image (gp, image, stds, nstds, cv, wextn, extn,
 		    nextn, ecv))

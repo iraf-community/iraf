@@ -1,4 +1,4 @@
-.help implot Feb90 plot
+.help implot Aug91 plot
 .ih
 NAME
 implot -- plot lines and columns of images
@@ -14,13 +14,42 @@ Name of (first) image to be plotted.
 If given, the number of the image line to be plotted, otherwise the central
 line is plotted.
 .le
+.ls wcs = "logical"
+The world coordinate system (\fIwcs\fR) to be used for axis labeling.
+The following standard world systems are predefined.
+.ls logical
+Logical coordinates are image pixel coordinates relative to the image currently
+being displayed.
+.le
+.ls physical
+The physical coordinate system is invariant with respect to linear
+transformations of the physical image matrix.  For example, if the reference
+image was created by extracting a section of another image, the physical
+coordinates of an object in the reference image will be the pixel coordinates
+of the same object in the original image.  The physical coordinate system
+thus provides a consistent coordinate system (a given object always has the
+same coordinates) for all images, regardless of whether any user world
+coordinate systems have been defined.
+.le
+.ls world
+The "world" coordinate system is the \fIcurrent default WCS\fR.
+The default world system is the system named by the environment variable
+\fIdefwcs\fR if defined in the user environment and present in the reference
+image WCS description, else it is the first user WCS defined for the image
+(if any), else physical coordinates are returned.
+.le
+
+In addition to these three reserved WCS names, the name of any user WCS
+defined for the reference image may be given.  A user world coordinate system
+may be any linear or nonlinear world system.
+.le
 .ih
 DESCRIPTION
 Implot is an interactive, cursor driven task for examining images by plotting
 the lines and columns or the averages of lines and columns.  A single image
 line is plotted when the task is first run, then cursor mode is entered and
-keystrokes may be used to generate additional line and column plots.  Carriage
-return is typed to exit cursor mode and Implot.
+keystrokes may be used to generate additional line and column plots.  'q'
+is typed to exit cursor mode and Implot.
 
 The following single character keystrokes are recognized by Implot.  Note that
 numerous additional keystrokes are provided by "cursor mode" itself, i.e.,
@@ -42,6 +71,8 @@ documented elsewhere.
 	o		overplot next vector
 	q		quit
 	s		print statistics on a region
+	w		change world coordinate system
+	<space>		print coordinates and pixel value
 .fi
 .ke
 
@@ -76,6 +107,15 @@ upward (k) or downward (j) directions, relative to the current line or
 column plot.  Each new vector is plotted in place of the previous one
 without clearing the screen, making it easy to compare successive vectors.
 
+The space bar key will read the cursor position, find the nearest pixel,
+and report the image line and column, the coordinate along the current
+axis, and the pixel value.  The line and column are in logical pixels
+(that is the coordinates in the current image section) and the
+coordinates are in the selected world coordinate system and printed
+in the current coordinate format.  If the selected world coordinate
+system is "logical" then the coordinate will be the same as the line
+or column.
+
 In addition to the single keystroke commands, the following : escape
 commands are provided:
 
@@ -84,6 +124,7 @@ commands are provided:
 .nf
 	:a N		set number of lines or columns to average
 	:c N [M]	plot column N [average of columns N to M]
+	:f format	set the x coordinate numerical format
 	:i imagename	open a new image for input
 	:l N [M]	plot line N [average of lines N to M]
 	:o		overplot
@@ -91,6 +132,7 @@ commands are provided:
 	:log-		turn off log scale in Y
 	:step N		set step size for j,k
 	:solid		overplot with solid, not dashed, lines
+	:w wcsname	change world coordinate systems
 	:x x1 x2	fix range in X (call with no args to unfix)
 	:y y1 y2	fix range in Y (call with no args to unfix)
 .fi
@@ -116,6 +158,15 @@ the fixed scale to be lost).  Plotting different lines or columns or even
 changing images does not cause loss of fixed scaling.  If the X scale is
 fixed to a range less than an entire line or column Y autoscaling, if enabled,
 will only pertain to the displayed range in X.
+
+The numerical format for the coordinate labels are set with the 'f'
+command.  The values may be "" (an empty string), %f for decimal format, %h
+and %H for xx:xx:xx format, and %m and %M for xx:xx.x format.  The upper
+case %H and %M convert degrees to hours.  Some images have a recommended x
+coordinate format defined as a WCS attribute.  If the format value is ""
+(the default) the WCS attribute format will be used.  Any other value will
+override the image attribute.
+.le
 .ih
 EXAMPLES
 1. Enter cursor mode, plotting line 240 of the 300x480 image 'crab':

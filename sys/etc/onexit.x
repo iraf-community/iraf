@@ -9,7 +9,7 @@ include	<error.h>
 
 procedure onexit (user_proc)
 
-extern	user_proc()			# procedure to be posted
+extern	user_proc()			#I procedure to be posted
 bool	first_time
 int	epa, i
 int	proc_list[MAX_ONEXIT], nprocs
@@ -44,6 +44,24 @@ begin
 end
 
 
+# ONEXIT_REMOVE -- Remove a previously posted ONEXIT procedure.
+
+procedure onexit_remote (user_proc)
+
+extern	user_proc()			#I procedure to be posted
+
+int	epa, i
+int	proc_list[MAX_ONERROR], nprocs
+common	/onexcm/ nprocs, proc_list
+
+begin
+	call zlocpr (user_proc, epa)
+	for (i=1;  i <= nprocs;  i=i+1)
+	    if (proc_list[i] == epa)
+		proc_list[i] = 0
+end
+
+
 # XONEXIT -- Called at process shutdown time by the IRAF main to execute
 # each posted user exit procedure.  Exit procedures are called in the order
 # in which they were posted.  Try to survive errors so that all exit
@@ -53,7 +71,7 @@ end
 
 procedure xonexit (exit_code)
 
-int	exit_code			# passed to exit handlers
+int	exit_code			#I passed to exit handlers
 int	nprocs_to_execute, i
 int	proc_list[MAX_ONEXIT], nprocs
 common	/onexcm/ nprocs, proc_list
@@ -64,6 +82,7 @@ begin
 	nprocs = 0
 
 	for (i=1; i <= nprocs_to_execute;  i=i+1)
-	    iferr (call zcall1 (proc_list[i], exit_code))
-		;
+	    if (proc_list[i] != 0)
+		iferr (call zcall1 (proc_list[i], exit_code))
+		    ;
 end

@@ -1,4 +1,4 @@
-.help phot Jan90 noao.digiphot.apphot
+.help phot Jul91 noao.digiphot.apphot
 .ih
 NAME
 phot -- perform aperture photometry on a list of stars
@@ -141,57 +141,80 @@ The following list of cursor commands are currently available.
 
 ?	Print help for PHOT commands
 :	PHOT colon escape commands (see below)
-e	Print PHOT error messages
-d	Plot a centered stellar radial profile
-i	Setup PHOT parameters using a stellar radial profile plot
 v	Verify the critical PHOT parameters
 w	Store current PHOT parameters in the pset files
-l	Compute magnitudes for remainder of the stars in the
-	coordinate list, output results
-r	Rewind the coordinate list
+q	Exit
+
+d	Plot the radial profile of current star (cursor or list)
+i	Set PHOT parameters interactively using current star
+	(cursor or list)
+
+spbar	Fit center, sky, compute magnitudes of current star
+	(cursor or list), and output results
+f	Fit center, sky and compute magnitudes of current star
+	(cursor or list)
+e	Print PHOT error messages
+
 c	Fit center around the current star (cursor or list)
 t	Fit sky around the current star (cursor or list)
 s	Fit sky around the current centered star
 p	Compute magnitudes around current star (cursor or list),
 	using current sky
-f	Fit center, sky and compute magnitudes of current star
-	(cursor or list)
-spbar	Fit center, sky, compute magnitudes of current star
-	(cursor or list), output results
-q	Exit
 
 :m [n]	Move to next [nth] star in the coordinate list
-:n [n]	Measure next [nth] star in the coordinate list, output results
+:n [n]	Measure next [nth] star in the coordinate list, and
+	output results
+l	Compute magnitudes for remainder of the stars in the
+	coordinate list, and output results
+r	Rewind the coordinate list
+
 
 Photometry parameters are listed or set with the following commands.
+
+# commands
+
+:show	[data/center/sky/phot]	List the parameters
+
+# file names
 
 :image		[string]	Image name
 :coords		[string]	Coordinate file name
 :output		[string]	Output file name
-:show	[data/center/sky/phot]	List the parameters
 
-:scale		[value]		Image scale in units per pixel
+# data dependent parameters
+
+:scale		[value]		Image scale (units per pixel)
 :fwhmpsf	[value]		Full width half maximum of PSF (scale units)
 :emission	[y/n]		Emission feature (y), absorption (n)
-:noise		[string]	Noise model (constant|poisson)
+:sigma	        [value]		Standard deviation of sky (counts)
+:datamin	[value]		Minimum good data value (counts)
+:datamax	[value]		Maximum good data value (counts)
 :threshold	[value]		Detection intensity threshold (counts)
 :cthreshold	[value]		Centering intensity threshold (counts)
-:sigma	        [value]		Standard deviation of sky (counts)
-:gain		[string]	Gain image header keyword
-:epadu		[value]		Gain (electrons  per adu)
-:ccdread	[string]	Readout noise image header keyword
-:readnoise	[value]		Readout noise (electrons)
-:exposure	[string]	Exposure time image header keyword
-:itime 		[value]		Integration time (time units)
-:airmass	[string]	Airmass image header keyword
-:xairmass	[value]		Airmass value (number)
-:filter		[string]	Filter image header keyword
-:ifilter	[string]	Filter id string
-:datamin	[value]		Minimum good pixel value (counts)
-:datamax	[value]		Maximum good pixel value (counts)
 
-:calgorithm	[string]	Centering algorithm (centroid|gauss|
-				none|ofilt)
+# noise parameters
+
+:noise		[string]	Noise model (constant|poisson)
+:gain		[string]	Gain image header keyword
+:ccdread	[string]	Readout noise image header keyword
+:epadu		[value]		Gain (electrons  per adu)
+:readnoise	[value]		Readout noise (electrons)
+
+# observing parameters
+
+:exposure	[string]	Exposure time image header keyword
+:airmass	[string]	Airmass image header keyword
+:filter		[string]	Filter image header keyword
+:obstime	[string]	Time of observation image header keyword
+:itime 		[value]		Integration time (time units)
+:xairmass	[value]		Airmass value (number)
+:ifilter	[string]	Filter id string
+:otime		[string]	Time of observation (time units)
+
+# centering algorithm parameters
+
+:calgorithm	[string]	Centering algorithm
+				(centroid|gauss| none|ofilt)
 :cbox		[value]		Width of the centering box (scale units)
 :cmaxiter	[value]		Maximum number of iterations
 :maxshift	[value]		Maximum center shift (scale units)
@@ -201,7 +224,8 @@ Photometry parameters are listed or set with the following commands.
 :rclean		[value]		Cleaning radius (scale units)
 :rclip		[value]		Clipping radius (scale units)
 :kclean		[value]		Clean K-sigma rejection limit (sigma)
-:mkcenter	[y/n]		Mark computed centers on display
+
+# sky fitting algorithm parameters
 
 :salgorithm	[string]	Sky fitting algorithm (constant|file|
 				median|mode|centroid|gauss|crosscor|
@@ -216,10 +240,16 @@ Photometry parameters are listed or set with the following commands.
 :skreject	[value]		Pixel rejection limits (sky sigma)
 :snreject	[value]		Maximum number of rejection cycles
 :rgrow		[value]		Region growing radius (scale units)
-:mksky		[y/n]		Mark the sky annuli on the display
+
+# photometry parameters
 
 :apertures	[string]	List of aperture radii (scale units)
 :zmag		[value]		Zero point of magnitude scale
+
+# plotting and marking parameters
+
+:mkcenter	[y/n]		Mark computed centers on display
+:mksky		[y/n]		Mark the sky annuli on the display
 :mkapert	[y/n]		Mark apertures on the display
 :radplot	[y/n]		Plot radial profile of object
 
@@ -282,7 +312,7 @@ following record is written
 	image  xinit  yinit  id  coords  lid
 	   xcenter  ycenter  xshift  yshift  xerr  yerr  cier error
 	   msky  stdev  sskew  nsky  nsrej  sier  serror
-	   itime  airmass filter
+	   itime  xairmass  ifilter  otime
 	   rapert  sum  area  mag  merr  pier  perr
 .fi
 
@@ -303,8 +333,10 @@ Msky, stdev and sskew are the sky value,
 standard deviation and skew respectively. Nsky and nsrej are the number of
 sky pixels and the number of sky pixels rejected respectively.
 
-Itime is the exposure time, airmass is self-evident and filter is an
-id string identifying the filter used in the observations.
+Itime is the exposure time, xairmass is self-evident, ifilter is an
+id string identifying the filter used in the observations, and otime is
+a string containing the time of the observation in whatever units the
+user has set up.
 
 Rapert, sum, and area are the radius of the aperture in scale units, the total
 number of counts including sky in the aperture and the area of the aperture
@@ -320,44 +352,44 @@ Non-zero values of cier flag the following error conditions.
 
 .nf
 	0       # No error
-	21      # The centering box is off image
-	22      # The centering box is partially off the image
-	23      # The S/N ratio is low in the centering box
-	24      # There are two few points for a good fit
-	25      # The x or y center fit is singular
-	26      # The x or y center fit did not converge
-	27      # The x or y center shift is greater than maxshift
-	28      # There is bad data in the centering box
+	101      # The centering box is off image
+	102      # The centering box is partially off the image
+	103      # The S/N ratio is low in the centering box
+	104      # There are two few points for a good fit
+	105      # The x or y center fit is singular
+	106      # The x or y center fit did not converge
+	107      # The x or y center shift is greater than maxshift
+	108      # There is bad data in the centering box
 .fi
 
 If all goes well during the sky fitting process then the error code sier
 will be 0. Non-zero values of sier flag the following error conditions.
 
 .nf
-	0       # No error
-	1       # There are no sky pixels in the sky annulus
-	2       # Sky annulus is partially off the image
-	3       # The histogram of sky pixels has no width
-	4       # The histogram of sky pixels is flat or concave
-	5       # There are too few points for a good sky fit
-	6       # The sky fit is singular
-	7       # The sky fit did not converge
-	8       # The graphics stream is undefined
-	9       # The file of sky values does not exist
-	10      # The sky file is at EOF
-	11      # Cannot read the sky value correctly
-	12      # The best fit parameter are non-physical
+	0         # No error
+	201       # There are no sky pixels in the sky annulus
+	202       # Sky annulus is partially off the image
+	203       # The histogram of sky pixels has no width
+	204       # The histogram of sky pixels is flat or concave
+	205       # There are too few points for a good sky fit
+	206       # The sky fit is singular
+	207       # The sky fit did not converge
+	208       # The graphics stream is undefined
+	209       # The file of sky values does not exist
+	210       # The sky file is at EOF
+	211       # Cannot read the sky value correctly
+	212       # The best fit parameter are non-physical
 .fi
 
 If no error occursor during the measurment of the magnitudes then pier is
 0. Non-zero values of pier flag the following error conditins.
 
 .nf
-	0       # No error
-	41      # The aperture is off the image
-	42      # The aperture is partially off the image
-	43      # The sky value is undefined
-	45      # There is bad data in the aperture
+	0         # No error
+	301       # The aperture is off the image
+	302       # The aperture is partially off the image
+	303       # The sky value is undefined
+	305       # There is bad data in the aperture
 .fi
 
 .ih

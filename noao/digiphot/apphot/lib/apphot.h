@@ -1,26 +1,28 @@
 # APPHOT header file
 
-# APPHOT parameters (# 1 - 20)
+# APPHOT parameters (# 1 - 100)
 
 define	FWHMPSF		1	# Full width half maximum of the PSF
-define	WX		3	# Previous X cursor position
-define	WY		4	# Previous Y cursor position
-define	IMNAME		5	# Image name
-define	CWX		6	# Current X cursor position
-define	CWY		7	# Current Y cursor position
-define	CLNAME		8	# Coordinates file name
-define	PLOTFILE	9	# Name of the plotfile
-define	POSITIVE	10	# Emission or absorption feature
-define	ITIME		11	# Exposure time
-define	EXPOSURE	12	# Exposure time keyword
-define	DATAMIN		13	# Minimum good data value
-define	DATAMAX		14	# Maximum good data value
-define	OUTNAME		15	# Output file name
-define	SCALE		16	# Scale in pixels / unit
-define	AIRMASS		17	# Airmass keyword
-define	XAIRMASS	18	# Airmass value
-define	FILTER		19	# Filter keyword
-define	FILTERID	20	# Filter id
+define	WX		2	# Previous X cursor position
+define	WY		3	# Previous Y cursor position
+define	IMNAME		4	# Image name
+define	CWX		5	# Current X cursor position
+define	CWY		6	# Current Y cursor position
+define	CLNAME		7	# Coordinates file name
+define	PLOTFILE	8	# Name of the plotfile
+define	POSITIVE	9	# Emission or absorption feature
+define	ITIME		10	# Exposure time
+define	EXPOSURE	11	# Exposure time keyword
+define	DATAMIN		12	# Minimum good data value
+define	DATAMAX		13	# Maximum good data value
+define	OUTNAME		14	# Output file name
+define	SCALE		15	# Scale in pixels / unit
+define	AIRMASS		16	# Airmass keyword
+define	XAIRMASS	17	# Airmass value
+define	FILTER		18	# Filter keyword
+define	FILTERID	19	# Filter id
+define	OBSTIME		20	# Time of observation keyword
+define	OTIME		21	# Time stamp
 
 # define APPHOT keywords
 
@@ -38,6 +40,8 @@ define	KY_AIRMASS	"airmass"
 define	KY_XAIRMASS	"xairmass"
 define	KY_FILTER	"filter"
 define	KY_FILTERID	"ifilter"
+define	KY_OBSTIME	"obstime"
+define	KY_OTIME	"otime"
 
 # define APPHOT units strings
 
@@ -52,10 +56,12 @@ define	UN_AIRMASS	"keyword"
 define	UN_XAIRMASS	"number"
 define	UN_FILTER	"keyword"
 define	UN_FILTERID	"name"
+define	UN_OBSTIME	"keyword"
+define	UN_OTIME	"timeunit"
 
 # APPHOT string commands
 
-define	APCMDS	"|fwhmpsf|emission|exposure|itime|datamin|datamax|image|coords|output|scale|airmass|xairmass|filter|ifilter|"
+define	APCMDS	"|fwhmpsf|emission|exposure|itime|datamin|datamax|image|coords|output|scale|airmass|xairmass|filter|ifilter|obstime|otime|"
 
 define	APCMD_FWHMPSF	1
 define	APCMD_EMISSION	2
@@ -71,6 +77,8 @@ define	APCMD_AIRMASS	11
 define	APCMD_XAIRMASS	12
 define	APCMD_FILTER	13
 define	APCMD_FILTERID	14
+define	APCMD_OBSTIME	15
+define	APCMD_OTIME	16
 
 # Miscellaneous commands
 

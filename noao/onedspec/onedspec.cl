@@ -2,49 +2,42 @@
 
 # Define necessary paths
 
-set	onedstds	= "noao$lib/onedstds/"
-
 package onedspec
 
-task	addsets,
-	bswitch,
-	calibrate,
-	coincor,
-	combine,
+task	calibrate,
+	continuum,
+	deredden,
 	dispcor,
-	flatfit,
-	flatdiv,
+	dopcor,
+	fitprofs,
 	identify,
 	lcalib,
 	mkspec,
 	names,
-	rebin,
 	refspectra,
 	reidentify,
+	sapertures,
+	sarith,
+	scombine,
 	sensfunc,
-	setdisp,
-	sflip,
-	shedit,
+	sfit,
 	sinterp,
 	slist,
 	specplot,
 	splot,
-	standard,
-	subsets,
-	sums		= onedspec$x_onedspec.e
+	standard	= onedspec$x_onedspec.e
 
-# Scripts
+task	setairmass,
+	setjd		= astutil$x_astutil.e
 
-task	batchred	= onedspec$batchred.cl
-task	continuum	= onedspec$continuum.cl
-task	powercor	= onedspec$powercor.cl
-task	observatory	= imred$observatory.cl
+# Scripts and Psets
+
 task	bplot		= onedspec$bplot.cl
-task	sextract	= onedspec$sextract.cl
+task	ndprep		= onedspec$ndprep.cl
+task	scopy		= onedspec$scopy.cl
 
 task	$process	= process.cl		# Used by BATCHRED
 task	dispcor1	= onedspec$dispcor1.par	# Used by DISPCOR
-task	shparams	= onedspec$shparams.par # Used by SHEDIT
-hidetask shparams,dispcor1,process
+hidetask dispcor1,process
 
-clbye()
+clbye

@@ -34,7 +34,7 @@ libimfort.a:
 	imgstr.x	idb.h <ctype.h>
 	impstr.x	idb.h
 	imputb.x	
-	imputd.x	
+	imputd.x	<mach.h>
 	imputi.x	
 	imputl.x	
 	imputr.x	

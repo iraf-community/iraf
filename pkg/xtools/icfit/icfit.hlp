@@ -1,4 +1,4 @@
-.help icfit Jul86 xtools.icfit
+.help icfit Sep91 xtools.icfit
 .ih
 NAME
 icfit -- Interactive curve fitting
@@ -14,6 +14,12 @@ These are described below.
 CURSOR MODE
 .ls ?
 The terminal is cleared and a menu of cursor keys and colon commands is printed.
+.le
+.ls a
+Add points to contrain the fit.  When adding points a query is made to set
+the weights.  A large weight will force the fit to go near the added point.
+The added points are  internal to the fitting routine and are not returned
+or otherwise available to the particular task using the ICFIT capability.
 .le
 .ls c
 The coordinates of the data point nearest the cursor and the fitted value
@@ -78,6 +84,9 @@ Change the x value of the point nearest the cursor.
 .ls y
 Change the y value of the point nearest the cursor.
 .le
+.ls z
+Delete the nearest sample region to the cursor.
+.le
 .ih
 COLON COMMANDS
 Colon commands are show or set the values of parameters.  The parameter names
@@ -93,9 +102,11 @@ named file.
 A verbose version of "show" which includes the fitted coefficients and their
 errors.
 .le
+.ls :xyshow [file]
+A version of "show" which lists the input independent (X), fitted (Y fit), and
+input dependent (Y) data values.
+.le
 .ls :errors [file]
-The terminal is cleared and a description of the fitted function, the
-chi square of the fit and the function coefficients and errors is printed.
 Show the fitted function and square root of the chi square of the fit.
 The default output
 is the terminal (STDOUT) and the screen is cleared before the information
@@ -110,6 +121,10 @@ polynomial or linear or cubic spline.
 .ls :grow [value]
 Show the current value or set the rejection growing radius.  Any points within
 this distance of rejected points are also rejected.
+.le
+.ls :markrej [value]
+Mark rejected points?  If there are many rejected points then it might be
+desired not to mark the points.
 .le
 .ls :naverage [value]
 Show the current value or set the number of points to average or median to form
@@ -136,8 +151,9 @@ interations.
 .ls :sample [value]
 Show the current value or set the sample points to use in the fits.  This
 parameter is a string consisting of single points, colon separated ranges,
-or "*" to indicate all points.  The sample ranges may also be set with
-the cursor mode key 's'.
+or "*" to indicate all points.  A file containing sample strings may also
+be specified by prefixing the file name with the character '@'.
+Note that sample ranges may also be set with the cursor mode key 's'.
 .le
 .ih
 DESCRIPTION
@@ -159,6 +175,8 @@ a distance of \fIgrow\fR pixels of a rejected pixel are also excluded from
 the fit.  The function is then refit without the rejected points.
 The rejection can be iterated the number of times specified by the parameter
 \fIniterate\fR.  Note a rejection value of zero is the same as no rejection.
+The rejected points may be marked with diamonds.  The marking of rejected
+points is controlled by the :markrej command.
 
 There are five types or formats of graphs selected by the keys 'h', 'i', 'j',
 'k', and 'l'.  The graphs are defined by what is plotted on each axis of the
@@ -173,6 +191,15 @@ keys using the 'g' key.  This gives a choice of 36 different graph types.
 
 It is important to remember that changing the value of a fitting
 parameter does not change the fit until 'f' is typed.
+.ih
+NOTES
+The sample region is stored internally as a string of length 1024 characters.
+This is greatly increased over versions prior to V2.10.  However, due
+to the fixed default size of string parameters in parameter files (160
+characters), initial sample regions input with a CL parameter are limited
+to this smaller length string.  The limitation may be escaped by using
+the new capability of specifying a file containing ranges.  Also sample
+regions initialize by a task parameter may be extended interactively.
 .ih
 SEE ALSO
 gtools

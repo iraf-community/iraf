@@ -1,5 +1,0 @@
-input,s,a,,,,List of input spectra
-output,s,a,,,,List of output spectra
-apertures,s,a,,,,Apertures to select
-verbose,b,h,no,,,Print selected apertures?
-

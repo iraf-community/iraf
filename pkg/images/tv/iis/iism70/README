@@ -1,0 +1,5 @@
+IISM70 -- Device dependent interface subroutines for the IIS Model 70 image
+display device.  This package uses the ZFIOGD device driver, which is
+responsible for physical i/o to the device.  The source for the ZFIOGD driver
+is in host$gdev; this driver must be compiled and installed in a system library
+(libsys.a) before i/o to the IIS will work correctly.

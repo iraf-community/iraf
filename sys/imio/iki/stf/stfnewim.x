@@ -74,11 +74,10 @@ begin
 	IM_MAX(im) = 0.
 	IM_LIMTIME(im) = 0
 
-	# For a new copy image(of an already-existing file), DO NOT add 
-	# group parameters to the GPB, unless the original image is not an STF
-	# image.  The following are the "standard"
-	# set of datamin/max and the FITS coordinate parms which SDAS files
-	# are supposed to have.
+	# For a new copy image(of an already-existing file), DO NOT add group
+	# parameters to the GPB, unless the original image is not an STF
+	# image.  The following are the "standard" set of datamin/max and the
+	# FITS coordinate parms which SDAS files are supposed to have.
 
 	if (IM_ACMODE(im) == NEW_FILE || 
 	   ((IM_ACMODE(im) == NEW_COPY) &&
@@ -86,9 +85,12 @@ begin
 
 	    # Set up the standard STF group parameter block parameters.
 	    STF_GROUPS(stf) = YES
-	    STF_PCOUNT(stf) = 2 + ndim * (3 + ndim)
-	    STF_PSIZE(stf)  = 2 * SZ_REAL*NBITS_CHAR + ndim * 
-	        ((ndim+1) * SZ_REAL*NBITS_CHAR + 2 * SZ_DOUBLE*NBITS_CHAR)
+	    STF_PCOUNT(stf) = 2 + (ndim * 3) + (ndim * ndim)
+	    STF_PSIZE(stf) = 2 * (SZ_REAL * NBITS_CHAR) +	# DATAMIN/MAX
+		ndim * (SZ_DOUBLE * NBITS_CHAR) +		# CRVALn
+		ndim * (SZ_REAL * NBITS_CHAR) +			# CRPIXn
+		ndim * (8 * NBITS_BYTE) +			# CTYPEn
+		(ndim * ndim) * (SZ_REAL * NBITS_CHAR)		# CD matrix
 
 	    # Free any unneeded space in the STF descriptor.
 	    if (STF_PCOUNT(stf) > 0) {

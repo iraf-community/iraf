@@ -28,7 +28,7 @@ already exist.
 	cl> mkdir sub1/sub2
 
 3. Make a directory "blue" at the same level in the directory hierarchy as
-the current directory (".." is a synonym for the current directory).
+the current directory (".." is a synonym for the previous directory).
 
 	cl> mkdir ../blue
 .endhelp

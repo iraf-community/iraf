@@ -4,12 +4,11 @@ include "sensfunc.h"
 # SF_DELETE -- Delete point, star, or wavelength identified by the
 # star index and index within the array of values.
 
-procedure sf_delete (gp, stds, nstds, cv, key, istd, ipt)
+procedure sf_delete (gp, stds, nstds, key, istd, ipt)
 
 pointer	gp			# GIO pointer
 pointer	stds[nstds]		# Standard star data
 int	nstds			# Number of standard stars
-pointer	cv			# Sensitivity function pointer
 int	key			# Delete point, star, or wavelength
 int	istd			# Index of standard star
 int	ipt			# Index of point
@@ -31,7 +30,7 @@ begin
 	        next
 
 	    call gseti (gio, G_WCS, wcs)
-	    call sf_data (stds, nstds, cv, GP_GRAPHS(gp,wcs))
+	    call sf_data (stds, nstds, GP_GRAPHS(gp,wcs))
 	    switch (key) {
 	    case 'p':
 		if (istd != nstds-1)

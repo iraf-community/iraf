@@ -72,7 +72,6 @@ begin
 	call calloc (CV_VECTOR(cv), CV_NCOEFF(cv), TY_REAL)
 	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_REAL)
 
-
 	# initialize pointer to basis functions to null
 	CV_BASIS(cv) = NULL
 	CV_WY(cv) = NULL

@@ -52,7 +52,9 @@ The minimum separation, in pixels, allowed between feature positions
 when defining a new feature.
 .le
 
-The following parameters are used to fit a function to the user coordinates.
+The following default parameters are used when fitting a function to
+the user coordinates.  If a previous solution is read from the database
+then the parameters from that solution override the defaults below.
 .ls function = "chebyshev"
 The function to be fit to the user coordinates as a function of the pixel
 coordinate and aperture number.  The choices are bi-dimensional
@@ -67,6 +69,10 @@ function.
 Order of the fitting function with respect to the aperture number.
 The order is the number of polynomial terms; i.e. yorder = 2 is a linear
 function.
+.le
+.ls niterate = 0, lowreject = 3, highreject = 3.
+Default number of rejection iterations and the sigma clipping thresholds.  If
+\fIniterate\fR is zero then no rejection is done.
 .le
 
 The following parameters control the graphics input and output.
@@ -109,9 +115,10 @@ f  Fit dispersion   o  Fit with fixed order offset   q  Quit
 r  Redraw graph     u  Undelete point                w  Window graph
 x  Set ordinate     y  Set abscissa                  I  Interrupt
 
-:function [value]   :show      :xorder [value]      :yorder [value]
-.fi
+:show               :function [value]   :highreject [value]   :lowreject [value]
+:niterate [value]   :xorder [value]     :yorder [value]
 
+.fi
 
             ECIDENTIFY CURSOR KEYS AND COLON COMMANDS
 .ls ?
@@ -334,6 +341,9 @@ Print or set the function type (chebyshev|legendre).
 .le
 .ls :show
 Print current function and orders.
+.le
+.ls :niterate [value], :lowreject [value], :highreject [value]
+Print or set the iterative rejection parameters.
 .le
 .ls :xorder [value]
 Print or set the order for the dispersion dependence.

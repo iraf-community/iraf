@@ -107,7 +107,7 @@ d,u	Delete or undelete the data point nearest the cursor
 o	Overplot the next graph
 c	Toggle the constant x, y plotting option
 t       Plot a line of constant x, y through the nearest data point	
-l	Print xshift, yshift, xscale, yscale, xrotate, yrotate
+l	Print xshift, yshift, xmag, ymag, xrotate, yrotate
 q	Exit the interactive curve fitting
 .fi
 
@@ -140,12 +140,12 @@ The coefficients can be interpreted as follows. Xref0, yref0, xin0, yin0
 are the origins in the reference and input frames respectively.
 
 .nf
-	b = xscale * cos (xrot)
-	c = yscale * sin (xrot)
-	e = -xscale * sin (yrot)
-	f = yscale * cos (yrot)
-	a = xoin - b * xrefo - c * yref0
-	d = yoin - e * xref0 - f * yref0
+	b = xmag * cos (xrotation)
+	c = ymag * sin (xrotation)
+	e = -xmag * sin (yrotation)
+	f = ymag * cos (yrotation)
+	a = xoin - b * xref0 - c * yref0 = xshift
+	d = yoin - e * xref0 - f * yref0 = yshift
 .fi
 
 

@@ -1,0 +1,4 @@
+input,s,a,,,,List of spectra
+apertures,s,h,"",,,List of apertures
+apidtable,s,h,,,,Table of aperture identifications
+verbose,b,h,no,,,Print verbose information?

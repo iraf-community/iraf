@@ -5,7 +5,7 @@ IF NEW IMAGE"
 title,s,h,"",,,"Title of image"
 ncols,i,h,512,1,,"Number of columns"
 nlines,i,h,512,1,,"Number of lines"
-header,f,h,"artdata$stdheader.dat",,,"Header keyword file"
+header,f,h,"artdata$stdheader.dat",,,"Image or header keyword file"
 background,r,h,0.,0.,,"Default background and Poisson background
 
 NOISE PARAMETERS"
@@ -20,4 +20,6 @@ ncosrays,i,h,0,0,,"Number of random events (if none in file)"
 energy,r,h,30000.,0.,,"Maximum random energy (electroms)"
 radius,r,h,0.5,0.,,"Radius of cosmic ray (pixels)"
 ar,r,h,1.,0.,1.,"Axial ratio (minor/major)"
-pa,r,h,0.,,,"Position angle (degrees)"
+pa,r,h,0.,,,"Position angle (degrees)
+"
+comments,b,h,yes,,,"Add comments to image?"

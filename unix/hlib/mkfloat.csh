@@ -15,6 +15,10 @@ set TFL  = _TFL.mkfloat
 unalias	ls rm cat grep tar cmp diff echo ln mv zcat
 unset noclobber
 
+# Set the following to -xpf for BSD Tar and to -xof for SYSV Tar.
+set TARXFLGS = -xpf
+#set TARXFLGS = -xof
+
 # set echo
 
 set float = `ls -l bin | sed -e 's+^.*bin\.++'`
@@ -68,11 +72,11 @@ rm -f `cat $DFL` $DFL
 
 echo "restore archived $ARCH objects"
 if (-e bin.$ARCH/OBJS.arc.Z) then
-    if ({ (zcat bin.$ARCH/OBJS.arc.Z | tar -xpf -) }) then
+    if ({ (zcat bin.$ARCH/OBJS.arc.Z | tar $TARXFLGS -) }) then
 	rm -f bin.$ARCH/OBJS.arc.Z
     endif
 else if (-e bin.$ARCH/OBJS.arc) then
-    if ({ (cat bin.$ARCH/OBJS.arc | tar -xpf -) }) then
+    if ({ (cat bin.$ARCH/OBJS.arc | tar $TARXFLGS -) }) then
 	rm -f bin.$ARCH/OBJS.arc
     endif
 else

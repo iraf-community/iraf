@@ -21,6 +21,7 @@ install:
 	;
 
 libsys.a:
+	# Do not put irafks.x in this list.
 	kbzard.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	kbzawr.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	kbzawt.x	ki.h kichan.com <config.h>
@@ -59,7 +60,7 @@ libsys.a:
 	kiencode.x	
 	kienvreset.x	ki.h kii.com kinode.com <config.h> <mach.h>
 	kierror.x	kinode.com ki.h <config.h>
-	kiextnode.x	ki.h <chars.h>
+	kiextnode.x	ki.h kinode.com <chars.h>
 	kifchan.x	kichan.com kinode.com ki.h <config.h>
 	kifmapfn.x	ki.h kii.com <mach.h>
 	kifndnode.x	kinode.com ki.h
@@ -75,11 +76,12 @@ libsys.a:
 	kisend.x	ki.h kii.com <mach.h>
 	kisendrcv.x	
 	kishownet.x	ki.h kinode.com <config.h> <mach.h>
+	kixnode.x	
 	kopcpr.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	kopdir.x	ki.h kichan.com kii.com <config.h> <diropen.h> <mach.h>
 	kopdpr.x	ki.h kii.com <mach.h>
-	koscmd.x	ki.h kii.com kinode.com <chars.h> <config.h> <ctype.h>\
-			<mach.h>
+	koscmd.x	ki.h kii.com kinode.com <chars.h> <config.h>\
+			<ctype.h> <mach.h>
 	ksaread.x	ki.h kinode.com
 	ksawait.x	ki.h kinode.com
 	ksawrite.x	ki.h kinode.com
@@ -91,10 +93,11 @@ libsys.a:
 	ktzput.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	ktzsek.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	ktzstt.x	ki.h kichan.com kii.com <config.h> <mach.h>
-	kzclmt.x	ki.h kichan.com kii.com <config.h> <mach.h>
-	kzopmt.x	ki.h kii.com <mach.h>
-	kzrdmt.x	ki.h kichan.com kii.com <config.h> <mach.h>
-	kzrwmt.x	ki.h kii.com <config.h> <mach.h>
+	kzclmt.x	ki.h kichan.com kii.com <config.h> <fio.h> <mach.h>
+	kzopmt.x	ki.h kichan.com kii.com <config.h> <fio.h> <mach.h>
+	kzrdmt.x	ki.h kichan.com kii.com <config.h> <fio.h> <mach.h>
+	kzrwmt.x	ki.h kii.com <config.h> <fio.h> <mach.h>
+	kzstmt.x	ki.h kichan.com <config.h>
 	kzwrmt.x	ki.h kichan.com kii.com <config.h> <mach.h>
-	kzwtmt.x	ki.h kichan.com <config.h>
+	kzwtmt.x	ki.h kichan.com <config.h> <fio.h>
 	;

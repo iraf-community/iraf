@@ -47,6 +47,10 @@ begin
 	MI_LTV(mw) = mw_allocd (mw, ndim)
 	MI_LTM(mw) = mw_allocd (mw, ndim * ndim)
 	call mw_mkidmd (D(mw,MI_LTM(mw)), ndim)
+	do i = 1, ndim {
+	    MI_AXNO(mw,i) = i
+	    MI_PHYSAX(mw,i) = i
+	}
 
 	# Set up the builtin world systems "physical" and "logical".
 	# Both are linear systems.  The physical system is a unitary

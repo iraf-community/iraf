@@ -93,19 +93,16 @@ begin
         }
 
 	# Return appropriate error code.
-	if (ier == AP_CTR_BADDATA) {
+	if (fier != AP_OK) {
+	    AP_XCENTER(cen) = AP_CXCUR(cen)
+	    AP_YCENTER(cen) = AP_CYCUR(cen)
+	    AP_XSHIFT(cen) = 0.0
+	    AP_YSHIFT(cen) = 0.0
+	    AP_XERR(cen) = INDEFR
+	    AP_YERR(cen) = INDEFR
+	    return (fier)
+	} else if (ier == AP_CTR_BADDATA) {
 	    return (AP_CTR_BADDATA)
-	} else if (fier != AP_OK) {
-	    if (fier == AP_CTR_NTOO_SMALL) {
-	        AP_XCENTER(cen) = AP_CXCUR(cen)
-	        AP_YCENTER(cen) = AP_CYCUR(cen)
-	        AP_XSHIFT(cen) = 0.0
-	        AP_YSHIFT(cen) = 0.0
-	        AP_XERR(cen) = INDEFR
-	        AP_YERR(cen) = INDEFR
-	        return (AP_CTR_NTOO_SMALL)
-	    } else
-		return (fier)
 	} else if (ier == YES) {
 	    return (AP_CTR_LOWSNRATIO)
 	} else if (abs (AP_XSHIFT(cen)) > (AP_MAXSHIFT(cen) * AP_SCALE(ap))) {

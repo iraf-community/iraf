@@ -1,5 +1,52 @@
 .help revisions Jun88 pkg.xtools.icfit
 .nf
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icggraph.gx
+pkg$xtools/icfit/icparams.x
+pkg$xtools/icfit/icfit.h
+pkg$xtools/icfit/icfit.hlp
+noao$lib/src/icgfit.key
+noao$lib/src/idicgfit.key
+    Added a new user parameter called "markrej" to toggle whether to mark
+    rejected points or not.  (1/21/92, Valdes)
+
+pkg$xtools/icfit/icfit.hlp
+pkg$xtools/icfit/icgsample.gx
+pkg$xtools/icfit/icgfit.gx
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icparams.x
+pkg$xtools/icfit/icfit.h
+pkg$xtools/icfit/icfit.hlp
+    1.  Added 'z' key to delete individual sample regions.
+    2.  Increased the internal sample string to 1024 characters.
+    (9/4/91, Valdes)
+
+pkg$xtools/icfit/icfit.hlp
+pkg$xtools/icfit/icgfit.gx
+pkg$xtools/icfit/icgadd.gx
+pkg$xtools/icfit/ mkpkg
+    Added 'a' key to allow adding points for constraining the fit.
+    (9/3/91, Valdes)
+
+pkg$xtools/icfit/icfit.hlp
+    Fixed typo for :errors description.  (11/20/90, Valdes)
+
+pkg$xtools/icfit/icgcolon.gx
+    1. Unrecognized or ambiguous colon commands are now noted.
+    (10/2/90, Valdes)
+
+pkg$xtools/icfit/icvshow.gx
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icfit.hlp
+noaolib$scr/icgfit.key
+    1. The :vshow command now does not print the (x, y fit, y) values.
+    2. A new user command, :xyshow, prints the (x, y fit, y) values.
+    (5/16/90, Valdes)
+
+====
+V2.9
+====
+
 pkg$xtools/icfit/icparams.x
 pkg$xtools/icfit/icgcolon.x
     1. ic_puti uses max (1, order) for setting the order.

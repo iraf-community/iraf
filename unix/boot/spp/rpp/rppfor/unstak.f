@@ -1,58 +1,58 @@
-      SUBROUTINE UNSTAK (SP, LEXTYP, LABVAL, TOKEN)
-      INTEGER LABVAL(100), LEXTYP(100)
-      INTEGER SP, TOKEN, TYPE
-23000 IF (.NOT.(SP .GT. 1))GOTO 23002
-      TYPE = LEXTYP(SP)
-      IF (.NOT.((TYPE .EQ. -98 .OR. TYPE .EQ. -97) .AND. TOKEN .EQ. -86)
-     *)GOTO 23003
-      GOTO 23002
-23003 CONTINUE
-      IF (.NOT.(TYPE .EQ. -99 .OR. TYPE .EQ. -98 .OR. TYPE .EQ. -97))GOT
-     *O 23005
-      TYPE = 999
-23005 CONTINUE
-      IF (.NOT.(TYPE .EQ. 123 .OR. TYPE .EQ. -92))GOTO 23007
-      GOTO 23002
-23007 CONTINUE
-      IF (.NOT.(TYPE .EQ. 999 .AND. TOKEN .EQ. -87))GOTO 23009
-      GOTO 23002
-23009 CONTINUE
-      IF (.NOT.(TYPE .EQ. 999))GOTO 23011
-      CALL INDENT (-1)
-      CALL OUTCON (LABVAL(SP))
-      GOTO 23012
-23011 CONTINUE
-      IF (.NOT.(TYPE .EQ. -87 .OR. TYPE .EQ. -72))GOTO 23013
-      IF (.NOT.(SP .GT. 2))GOTO 23015
-      SP = SP - 1
-23015 CONTINUE
-      IF (.NOT.(TYPE .NE. -72))GOTO 23017
-      CALL INDENT (-1)
-23017 CONTINUE
-      CALL OUTCON (LABVAL(SP) + 1)
-      GOTO 23014
-23013 CONTINUE
-      IF (.NOT.(TYPE .EQ. -96))GOTO 23019
-      CALL DOSTAT (LABVAL(SP))
-      GOTO 23020
-23019 CONTINUE
-      IF (.NOT.(TYPE .EQ. -95))GOTO 23021
-      CALL WHILES (LABVAL(SP))
-      GOTO 23022
-23021 CONTINUE
-      IF (.NOT.(TYPE .EQ. -94))GOTO 23023
-      CALL FORS (LABVAL(SP))
-      GOTO 23024
-23023 CONTINUE
-      IF (.NOT.(TYPE .EQ. -93))GOTO 23025
-      CALL UNTILS (LABVAL(SP), TOKEN)
-23025 CONTINUE
-23024 CONTINUE
-23022 CONTINUE
-23020 CONTINUE
-23014 CONTINUE
-23012 CONTINUE
-23001 SP=SP-1
-      GOTO 23000
-23002 CONTINUE
-      END
+      subroutine unstak (sp, lextyp, labval, token)
+      integer labval(100), lextyp(100)
+      integer sp, token, type
+23000 if (.not.(sp .gt. 1))goto 23002
+      type = lextyp(sp)
+      if (.not.((type .eq. -98 .or. type .eq. -97) .and. token .eq. -86)
+     *)goto 23003
+      goto 23002
+23003 continue
+      if (.not.(type .eq. -99 .or. type .eq. -98 .or. type .eq. -97))got
+     *o 23005
+      type = 999
+23005 continue
+      if (.not.(type .eq. 123 .or. type .eq. -92))goto 23007
+      goto 23002
+23007 continue
+      if (.not.(type .eq. 999 .and. token .eq. -87))goto 23009
+      goto 23002
+23009 continue
+      if (.not.(type .eq. 999))goto 23011
+      call indent (-1)
+      call outcon (labval(sp))
+      goto 23012
+23011 continue
+      if (.not.(type .eq. -87 .or. type .eq. -72))goto 23013
+      if (.not.(sp .gt. 2))goto 23015
+      sp = sp - 1
+23015 continue
+      if (.not.(type .ne. -72))goto 23017
+      call indent (-1)
+23017 continue
+      call outcon (labval(sp) + 1)
+      goto 23014
+23013 continue
+      if (.not.(type .eq. -96))goto 23019
+      call dostat (labval(sp))
+      goto 23020
+23019 continue
+      if (.not.(type .eq. -95))goto 23021
+      call whiles (labval(sp))
+      goto 23022
+23021 continue
+      if (.not.(type .eq. -94))goto 23023
+      call fors (labval(sp))
+      goto 23024
+23023 continue
+      if (.not.(type .eq. -93))goto 23025
+      call untils (labval(sp), token)
+23025 continue
+23024 continue
+23022 continue
+23020 continue
+23014 continue
+23012 continue
+23001 sp=sp-1
+      goto 23000
+23002 continue
+      end

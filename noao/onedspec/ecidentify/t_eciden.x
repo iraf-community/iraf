@@ -13,6 +13,7 @@ int	images
 pointer	ec, gopen(), gt_init()
 int	clgeti(), clgwrd(), imtopenp(), ec_getim()
 real	clgetr()
+double	clgetd()
 
 begin
 	# Allocate the basic data structure.
@@ -39,6 +40,9 @@ begin
 	call ecf_sets ("function", Memc[EC_IMAGE(ec)])
 	call ecf_seti ("xorder", clgeti ("xorder"))
 	call ecf_seti ("yorder", clgeti ("yorder"))
+	call ecf_seti ("niterate", clgeti ("niterate"))
+	call ecf_setd ("low", clgetd ("lowreject"))
+	call ecf_setd ("high", clgetd ("highreject"))
 	call ecf_seti ("xtype", 'p')
 	call ecf_seti ("ytype", 'r')
 	call clgstr ("graphics", Memc[EC_IMAGE(ec)], SZ_FNAME)

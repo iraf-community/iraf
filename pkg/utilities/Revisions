@@ -1,5 +1,20 @@
 .help revisions Jun88 pkg.utilities
 .nf
+utilities$curfit/t_curfit.x,curfit.gx
+    Curfit was failing if the input file list contained more than one
+    file or image. The problem was that ic_open was being called
+    before the file loop but ic_close(rd) was being called after every
+    fit leaving a null pointer in place for the second file.
+    (7/30/90 LED)
+
+utilities$doc/polyfit.hlp
+    Added the missing "statistical" heading under the weighting section.
+    (7/23/90 LED)
+    
+utilities$lcase.x
+    Changed the default output file name extension from ".uc" to ".lc".
+    (3/7/90 LED)
+
 utilities$t_curfit.x
     For list input only, curfit now sorts the input array before fitting.
     Sorted data is required by the rg_ranges procedure (even in the

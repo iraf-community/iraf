@@ -1,0 +1,46 @@
+.help txrenumber Aug91 noao.digiphot.ptools
+.ih
+NAME
+txrenumber -- renumber a list of APPHOT/DAOPHOT text database
+.ih
+USAGE
+txrenumber textfiles
+.ih
+PARAMETERS
+.ls textfiles
+The APPHOT/DAOPHOT text database to be renumbered.
+.le
+.ls id = "ID"
+The name of the keyword whose value is the sequence number of the object in
+the list. After renumbering the original values of the \fIid\fR are replaced
+by numbers 1 through N, where N is the total number of objects in the list.
+The id keyword must denote an integer quantity.
+.le
+.ih
+DESCRIPTION
+TXRENUMBER is a simple task which accepts an APPHOT/DAOPHOT text
+database file and renumbers all the objects in the file beginning
+with 1 and ending with the number of objects in the file.
+The renumber operation is performed in place. The original
+values of the  \fIid\fR field are replaced by numbers 1 through N
+where N is the total number of objects in the list.
+A renumber operation is typically performed after another
+list operation such as TXAPPEND or TXSORT.
+
+.ih
+EXAMPLES
+
+1. Renumber the stars in a concatenated file produced by TXAPPEND.
+
+.nf
+   pt> txrenumber m92rall.mag.1
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.tbrenumber,ptools.prenumber,tables.tcalc
+.endhelp

@@ -1,0 +1,2 @@
+dispaxis,i,q,2,,,"Dispersion axis for 2D images"
+nsum,i,q,1,1,,"Aperture sum for 2D images"

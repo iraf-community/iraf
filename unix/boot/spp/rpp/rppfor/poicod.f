@@ -1,145 +1,145 @@
-      SUBROUTINE POICOD (DECLA0)
-      INTEGER DECLA0
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER SPOIN0(9)
-      INTEGER P1(16)
-      INTEGER P2(18)
-      INTEGER P3(18)
-      INTEGER P4(16)
-      INTEGER P5(18)
-      INTEGER P6(13)
-      INTEGER P7(25)
-      INTEGER P8(16)
-      INTEGER P9(61)
-      INTEGER PA(18)
-      DATA SPOIN0(1)/105/,SPOIN0(2)/110/,SPOIN0(3)/116/,SPOIN0(4)/101/,S
-     *POIN0(5)/103/,SPOIN0(6)/101/,SPOIN0(7)/114/,SPOIN0(8)/32/,SPOIN0(9
+      subroutine poicod (decla0)
+      integer decla0
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer spoin0(9)
+      integer p1(16)
+      integer p2(18)
+      integer p3(18)
+      integer p4(16)
+      integer p5(18)
+      integer p6(13)
+      integer p7(25)
+      integer p8(16)
+      integer p9(61)
+      integer pa(18)
+      data spoin0(1)/105/,spoin0(2)/110/,spoin0(3)/116/,spoin0(4)/101/,s
+     *poin0(5)/103/,spoin0(6)/101/,spoin0(7)/114/,spoin0(8)/32/,spoin0(9
      *)/-2/
-      DATA P1(1)/108/,P1(2)/111/,P1(3)/103/,P1(4)/105/,P1(5)/99/,P1(6)/9
-     *7/,P1(7)/108/,P1(8)/32/,P1(9)/77/,P1(10)/101/,P1(11)/109/,P1(12)/9
-     *8/,P1(13)/40/,P1(14)/49/,P1(15)/41/,P1(16)/-2/
-      DATA P2(1)/105/,P2(2)/110/,P2(3)/116/,P2(4)/101/,P2(5)/103/,P2(6)/
-     *101/,P2(7)/114/,P2(8)/42/,P2(9)/50/,P2(10)/32/,P2(11)/77/,P2(12)/1
-     *01/,P2(13)/109/,P2(14)/99/,P2(15)/40/,P2(16)/49/,P2(17)/41/,P2(18)
+      data p1(1)/108/,p1(2)/111/,p1(3)/103/,p1(4)/105/,p1(5)/99/,p1(6)/9
+     *7/,p1(7)/108/,p1(8)/32/,p1(9)/77/,p1(10)/101/,p1(11)/109/,p1(12)/9
+     *8/,p1(13)/40/,p1(14)/49/,p1(15)/41/,p1(16)/-2/
+      data p2(1)/105/,p2(2)/110/,p2(3)/116/,p2(4)/101/,p2(5)/103/,p2(6)/
+     *101/,p2(7)/114/,p2(8)/42/,p2(9)/50/,p2(10)/32/,p2(11)/77/,p2(12)/1
+     *01/,p2(13)/109/,p2(14)/99/,p2(15)/40/,p2(16)/49/,p2(17)/41/,p2(18)
      */-2/
-      DATA P3(1)/105/,P3(2)/110/,P3(3)/116/,P3(4)/101/,P3(5)/103/,P3(6)/
-     *101/,P3(7)/114/,P3(8)/42/,P3(9)/50/,P3(10)/32/,P3(11)/77/,P3(12)/1
-     *01/,P3(13)/109/,P3(14)/115/,P3(15)/40/,P3(16)/49/,P3(17)/41/,P3(18
+      data p3(1)/105/,p3(2)/110/,p3(3)/116/,p3(4)/101/,p3(5)/103/,p3(6)/
+     *101/,p3(7)/114/,p3(8)/42/,p3(9)/50/,p3(10)/32/,p3(11)/77/,p3(12)/1
+     *01/,p3(13)/109/,p3(14)/115/,p3(15)/40/,p3(16)/49/,p3(17)/41/,p3(18
      *)/-2/
-      DATA P4(1)/105/,P4(2)/110/,P4(3)/116/,P4(4)/101/,P4(5)/103/,P4(6)/
-     *101/,P4(7)/114/,P4(8)/32/,P4(9)/77/,P4(10)/101/,P4(11)/109/,P4(12)
-     */105/,P4(13)/40/,P4(14)/49/,P4(15)/41/,P4(16)/-2/
-      DATA P5(1)/105/,P5(2)/110/,P5(3)/116/,P5(4)/101/,P5(5)/103/,P5(6)/
-     *101/,P5(7)/114/,P5(8)/42/,P5(9)/52/,P5(10)/32/,P5(11)/77/,P5(12)/1
-     *01/,P5(13)/109/,P5(14)/108/,P5(15)/40/,P5(16)/49/,P5(17)/41/,P5(18
+      data p4(1)/105/,p4(2)/110/,p4(3)/116/,p4(4)/101/,p4(5)/103/,p4(6)/
+     *101/,p4(7)/114/,p4(8)/32/,p4(9)/77/,p4(10)/101/,p4(11)/109/,p4(12)
+     */105/,p4(13)/40/,p4(14)/49/,p4(15)/41/,p4(16)/-2/
+      data p5(1)/105/,p5(2)/110/,p5(3)/116/,p5(4)/101/,p5(5)/103/,p5(6)/
+     *101/,p5(7)/114/,p5(8)/42/,p5(9)/52/,p5(10)/32/,p5(11)/77/,p5(12)/1
+     *01/,p5(13)/109/,p5(14)/108/,p5(15)/40/,p5(16)/49/,p5(17)/41/,p5(18
      *)/-2/
-      DATA P6(1)/114/,P6(2)/101/,P6(3)/97/,P6(4)/108/,P6(5)/32/,P6(6)/77
-     */,P6(7)/101/,P6(8)/109/,P6(9)/114/,P6(10)/40/,P6(11)/49/,P6(12)/41
-     */,P6(13)/-2/
-      DATA P7(1)/100/,P7(2)/111/,P7(3)/117/,P7(4)/98/,P7(5)/108/,P7(6)/1
-     *01/,P7(7)/32/,P7(8)/112/,P7(9)/114/,P7(10)/101/,P7(11)/99/,P7(12)/
-     *105/,P7(13)/115/,P7(14)/105/,P7(15)/111/,P7(16)/110/,P7(17)/32/,P7
-     *(18)/77/,P7(19)/101/,P7(20)/109/,P7(21)/100/,P7(22)/40/,P7(23)/49/
-     *,P7(24)/41/,P7(25)/-2/
-      DATA P8(1)/99/,P8(2)/111/,P8(3)/109/,P8(4)/112/,P8(5)/108/,P8(6)/1
-     *01/,P8(7)/120/,P8(8)/32/,P8(9)/77/,P8(10)/101/,P8(11)/109/,P8(12)/
-     *120/,P8(13)/40/,P8(14)/49/,P8(15)/41/,P8(16)/-2/
-      DATA P9(1)/101/,P9(2)/113/,P9(3)/117/,P9(4)/105/,P9(5)/118/,P9(6)/
-     *97/,P9(7)/108/,P9(8)/101/,P9(9)/110/,P9(10)/99/,P9(11)/101/,P9(12)
-     */32/,P9(13)/40/,P9(14)/77/,P9(15)/101/,P9(16)/109/,P9(17)/98/,P9(1
-     *8)/44/,P9(19)/32/,P9(20)/77/,P9(21)/101/,P9(22)/109/,P9(23)/99/,P9
-     *(24)/44/,P9(25)/32/,P9(26)/77/,P9(27)/101/,P9(28)/109/,P9(29)/115/
-     *,P9(30)/44/,P9(31)/32/,P9(32)/77/,P9(33)/101/,P9(34)/109/,P9(35)/1
-     *05/,P9(36)/44/,P9(37)/32/,P9(38)/77/,P9(39)/101/,P9(40)/109/,P9(41
-     *)/108/,P9(42)/44/,P9(43)/32/,P9(44)/77/,P9(45)/101/,P9(46)/109/,P9
-     *(47)/114/,P9(48)/44/,P9(49)/32/,P9(50)/77/,P9(51)/101/,P9(52)/109/
-     *,P9(53)/100/,P9(54)/44/,P9(55)/32/,P9(56)/77/,P9(57)/101/,P9(58)/1
-     *09/,P9(59)/120/,P9(60)/41/,P9(61)/-2/
-      DATA PA(1)/99/,PA(2)/111/,PA(3)/109/,PA(4)/109/,PA(5)/111/,PA(6)/1
-     *10/,PA(7)/32/,PA(8)/47/,PA(9)/77/,PA(10)/101/,PA(11)/109/,PA(12)/4
-     *7/,PA(13)/32/,PA(14)/77/,PA(15)/101/,PA(16)/109/,PA(17)/100/,PA(18
+      data p6(1)/114/,p6(2)/101/,p6(3)/97/,p6(4)/108/,p6(5)/32/,p6(6)/77
+     */,p6(7)/101/,p6(8)/109/,p6(9)/114/,p6(10)/40/,p6(11)/49/,p6(12)/41
+     */,p6(13)/-2/
+      data p7(1)/100/,p7(2)/111/,p7(3)/117/,p7(4)/98/,p7(5)/108/,p7(6)/1
+     *01/,p7(7)/32/,p7(8)/112/,p7(9)/114/,p7(10)/101/,p7(11)/99/,p7(12)/
+     *105/,p7(13)/115/,p7(14)/105/,p7(15)/111/,p7(16)/110/,p7(17)/32/,p7
+     *(18)/77/,p7(19)/101/,p7(20)/109/,p7(21)/100/,p7(22)/40/,p7(23)/49/
+     *,p7(24)/41/,p7(25)/-2/
+      data p8(1)/99/,p8(2)/111/,p8(3)/109/,p8(4)/112/,p8(5)/108/,p8(6)/1
+     *01/,p8(7)/120/,p8(8)/32/,p8(9)/77/,p8(10)/101/,p8(11)/109/,p8(12)/
+     *120/,p8(13)/40/,p8(14)/49/,p8(15)/41/,p8(16)/-2/
+      data p9(1)/101/,p9(2)/113/,p9(3)/117/,p9(4)/105/,p9(5)/118/,p9(6)/
+     *97/,p9(7)/108/,p9(8)/101/,p9(9)/110/,p9(10)/99/,p9(11)/101/,p9(12)
+     */32/,p9(13)/40/,p9(14)/77/,p9(15)/101/,p9(16)/109/,p9(17)/98/,p9(1
+     *8)/44/,p9(19)/32/,p9(20)/77/,p9(21)/101/,p9(22)/109/,p9(23)/99/,p9
+     *(24)/44/,p9(25)/32/,p9(26)/77/,p9(27)/101/,p9(28)/109/,p9(29)/115/
+     *,p9(30)/44/,p9(31)/32/,p9(32)/77/,p9(33)/101/,p9(34)/109/,p9(35)/1
+     *05/,p9(36)/44/,p9(37)/32/,p9(38)/77/,p9(39)/101/,p9(40)/109/,p9(41
+     *)/108/,p9(42)/44/,p9(43)/32/,p9(44)/77/,p9(45)/101/,p9(46)/109/,p9
+     *(47)/114/,p9(48)/44/,p9(49)/32/,p9(50)/77/,p9(51)/101/,p9(52)/109/
+     *,p9(53)/100/,p9(54)/44/,p9(55)/32/,p9(56)/77/,p9(57)/101/,p9(58)/1
+     *09/,p9(59)/120/,p9(60)/41/,p9(61)/-2/
+      data pa(1)/99/,pa(2)/111/,pa(3)/109/,pa(4)/109/,pa(5)/111/,pa(6)/1
+     *10/,pa(7)/32/,pa(8)/47/,pa(9)/77/,pa(10)/101/,pa(11)/109/,pa(12)/4
+     *7/,pa(13)/32/,pa(14)/77/,pa(15)/101/,pa(16)/109/,pa(17)/100/,pa(18
      *)/-2/
-      IF (.NOT.(MEMFLG .EQ. 0))GOTO 23000
-      CALL POIDEC (P1)
-      CALL POIDEC (P2)
-      CALL POIDEC (P3)
-      CALL POIDEC (P4)
-      CALL POIDEC (P5)
-      CALL POIDEC (P6)
-      CALL POIDEC (P7)
-      CALL POIDEC (P8)
-      CALL POIDEC (P9)
-      CALL POIDEC (PA)
-      MEMFLG = 1
-23000 CONTINUE
-      IF (.NOT.(DECLA0 .EQ. 1))GOTO 23002
-      CALL OUTTAB
-      CALL OUTSTR (SPOIN0)
-23002 CONTINUE
-      END
-      SUBROUTINE POIDEC (STR)
-      INTEGER STR
-      CALL OUTTAB
-      CALL OUTSTR (STR)
-      CALL OUTDON
-      END
-C     LOGIC0  LOGICAL_COLUMN
-C     DECLA0  DECLARE_VARIABLE
-C     SPOIN0  SPOINTER
+      if (.not.(memflg .eq. 0))goto 23000
+      call poidec (p1)
+      call poidec (p2)
+      call poidec (p3)
+      call poidec (p4)
+      call poidec (p5)
+      call poidec (p6)
+      call poidec (p7)
+      call poidec (p8)
+      call poidec (p9)
+      call poidec (pa)
+      memflg = 1
+23000 continue
+      if (.not.(decla0 .eq. 1))goto 23002
+      call outtab
+      call outstr (spoin0)
+23002 continue
+      end
+      subroutine poidec (str)
+      integer str
+      call outtab
+      call outstr (str)
+      call outdon
+      end
+c     logic0  logical_column
+c     decla0  declare_variable
+c     spoin0  spointer

@@ -1,0 +1,14 @@
+# CONTINPARS - Continuum flattening of data parameter set
+
+c_interactive,b,h,no,,,"Fit continuum interactively?"
+c_sample,s,h,"*",,,"Sample of points to use in fit"
+c_function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,"Fitting function
+      (spline3|legendre|chebyshev|spline1)"
+naverage,i,h,1,,,"Number of points in sample averaging"
+order,i,h,1,1,,"Order of fitting function"
+replace,b,h,no,,,"Replace rejected spectrum w/ fit?"
+low_reject,r,h,2.,0.,,"Low rejection in sigma of fit"
+high_reject,r,h,2.,0.,,"High rejection in sigma of fit"
+niterate,i,h,10,0,,"Number of rejection iterations"
+grow,r,h,1.,0.,,"Rejection growing radius"
+mode,s,h,"ql"

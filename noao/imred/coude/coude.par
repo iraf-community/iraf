@@ -1,8 +1,0 @@
-# PARAMETERS FOR KPNO IRS SPECTRAL REDUCTION PACKAGE
-
-extinction,s,h,,,,Extinction file
-caldir,s,h,,,,Directory containing calibration data
-coincor,b,h,no,,,Apply coincidence correction to flats
-ccmode,s,h,"",,,Correction mode (photo|iids|user)
-deadtime,r,h,,0,,Deadtime in seconds
-version,s,h,"Oct 1985"

@@ -1,5 +1,0 @@
-SCR --	Runtime files used to draw or display text or graphics on a terminal
-	screen.
-
-igsfit.key -- Interactive general surface fitting package used in
-	twodspec.longslit.fitcoords

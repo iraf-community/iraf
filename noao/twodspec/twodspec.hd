@@ -15,8 +15,8 @@ longslit	men=longslit$longslit.men,
 		pkg=longslit$longslit.hd,
 		src=longslit$longslit.cl
 
-multispec	men=multispec$multispec.men,
-		hlp=..,
-		sys=multispec$multispec.hlp,
-		pkg=multispec$multispec.hd,
-		src=multispec$multispec.cl
+#multispec	men=multispec$multispec.men,
+#		hlp=..,
+#		sys=multispec$multispec.hlp,
+#		pkg=multispec$multispec.hd,
+#		src=multispec$multispec.cl

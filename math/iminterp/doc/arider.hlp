@@ -33,11 +33,12 @@ first derivative and so on.
 .le
 .ls nder
 Number of derivatives. ARIDER checks that the requested number of derivatives
-is sensible.
+is sensible.  The SINC interpolation type only returns the function value
+and the first two derivatives.
 .le
 .ls interp_type
-Interpolant type. The options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5
-and II_SPLINE3.
+Interpolant type. The options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5,
+II_SPLINE3 and II_SINC.
 The interpolant type definitions are found in the package header file
 math/iminterp.h.
 .le

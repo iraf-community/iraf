@@ -17,10 +17,10 @@ int	mkcenter	# mark the computed center
 int	mksky		# mark the sky annulus
 int	mkapert		# mark the aperture(s)
 
-int	i
+int	i, marktype
 pointer	sp, temp
 real	inner_sky, outer_sky, apert
-int	apstati()
+int	apstati(), gstati()
 real	apstatr()
 errchk	greactivate, gdeactivate, gamove, gadraw, gmark
 
@@ -35,9 +35,12 @@ begin
 	    return
 	}
 
+	marktype = gstati (id, G_PMLTYPE)
+
 	# Mark the center and shift on the display.
 	if (mkcenter == YES) {
 	    iferr {
+	        call gseti (id, G_PMLTYPE, GL_SOLID)
 	        call gamove (id, (apstatr (ap, XCENTER) - apstatr (ap, XSHIFT)),
 		    (apstatr (ap, YCENTER) - apstatr (ap, YSHIFT)))
 	        call gadraw (id, apstatr (ap, XCENTER), apstatr (ap, YCENTER))
@@ -60,7 +63,6 @@ begin
 		    ANNULUS) + apstatr (ap, DANNULUS))
 	        call gmark (id, apstatr (ap, SXCUR), apstatr (ap, SYCUR),
 		    GM_CIRCLE, -outer_sky, -outer_sky)
-	        call gseti (id, G_PMLTYPE, GL_SOLID)
 	    } then
 		;
 	}
@@ -79,11 +81,13 @@ begin
 		    call gmark (id, apstatr (ap, PXCUR), apstatr (ap, PYCUR),
 		        GM_CIRCLE, -apert, -apert)
 	        }
-	        call gseti (id, G_PMLTYPE, GL_SOLID)
 	        call sfree (sp)
 	    } then 
 		call sfree (sp)
 	}
+
+	# Restore the mark type.
+	call gseti (id, G_PMLTYPE, marktype)
 
 	iferr {
 	    call gdeactivate (id, 0)
@@ -106,7 +110,9 @@ int	mkcenter	# mark the computed center
 int	mksky		# mark the sky annulus
 int	mkpolygon	# mark the aperture(s)
 
+int	marktype, linetype
 real	inner_sky, outer_sky
+int	gstati()
 real	apstatr()
 errchk	greactivate, gdeactivate, gamove, gadraw, gmark, gline
 
@@ -120,15 +126,19 @@ begin
 	} then
 	    return
 
+	marktype = gstati (id, G_PMLTYPE)
+	linetype = gstati (id, G_PLTYPE)
+
 	if (mkcenter == YES) {
 	    iferr {
+	        call gseti (id, G_PMLTYPE, GL_SOLID)
 	        call gamove (id, (apstatr (ap, XCENTER) - apstatr (ap, XSHIFT)),
 		    (apstatr (ap, YCENTER) - apstatr (ap, YSHIFT)))
 	        call gadraw (id, apstatr (ap, XCENTER), apstatr (ap, YCENTER))
 	        call gmark (id, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
 		    GM_PLUS, -2.0, -2.0)
 	    } then
-		return
+		;
 	}
 
 	if (mksky == YES) {
@@ -143,9 +153,8 @@ begin
 		    ANNULUS) + apstatr (ap, DANNULUS))
 	        call gmark (id, apstatr (ap, SXCUR), apstatr (ap, SYCUR),
 		    GM_CIRCLE, -outer_sky, -outer_sky)
-	        call gseti (id, G_PMLTYPE, GL_SOLID)
 	    } then
-		return
+		;
 	}
 
 	if (mkpolygon == YES) {
@@ -154,10 +163,12 @@ begin
 	        call gmark (id, apstatr (ap, PYCX), apstatr (ap, PYCY),
 		    GM_PLUS, -2.0, -2.0)
 	        call gpline (id, x, y, nver)
-	        call gseti (id, G_PLTYPE, GL_SOLID)
 	    } then
-		return
+		;
 	}
+
+	call gseti (id, G_PMLTYPE, marktype) 
+	call gseti (id, G_PLTYPE, linetype) 
 
 	iferr (call gdeactivate (id, 0))
 	    return
@@ -175,10 +186,10 @@ int	mkcenter	# mark the computed center
 int	mksky		# mark the sky annulus
 int	mkapert		# mark the aperture(s)
 
-int	i
+int	i, marktype
 pointer	sp, temp
 real	inner_sky, outer_sky, apert, radius, xc, yc
-int	apstati()
+int	apstati(), gstati()
 real	apstatr()
 errchk	greactivate, gdeactivate, gamove, gadraw, gmark
 
@@ -193,9 +204,12 @@ begin
 	} then
 	    return
 
+	marktype = gstati (id, G_PMLTYPE)
+
 	# Mark the center and shift on the display.
 	if (mkcenter == YES) {
 	    iferr {
+	        call gseti (id, G_PMLTYPE, GL_SOLID)
 	        call gamove (id, (apstatr (ap, XCENTER) - apstatr (ap, XSHIFT)),
 		    (apstatr (ap, YCENTER) - apstatr (ap, YSHIFT)))
 	        call gadraw (id, apstatr (ap, XCENTER), apstatr (ap, YCENTER))
@@ -203,7 +217,7 @@ begin
 		    GM_PLUS, -2.0, -2.0)
 		call gflush (id)
 	    } then
-		return
+		;
 	}
 
 	# Draw the sky annuli on the display.
@@ -219,17 +233,14 @@ begin
 		    ANNULUS) + apstatr (ap, DANNULUS))
 	        call gmark (id, apstatr (ap, SXCUR), apstatr (ap, SYCUR),
 		    GM_CIRCLE, -outer_sky, -outer_sky)
-	        call gseti (id, G_PMLTYPE, GL_SOLID)
 		call gflush (id)
 	    } then
-		return
+		;
 	}
 
 	# Draw the apertures on the display.
 	if (mkapert == YES) {
-
 	    iferr {
-
 	        call smark (sp)
 	        call salloc (temp, apstati (ap, NAPERTS), TY_REAL)
 	        call gseti (id, G_PMLTYPE, GL_DASHED)
@@ -249,12 +260,12 @@ begin
 	        call gadraw (id, xc + radius, yc + radius)
 	        call gadraw (id, xc - radius, yc + radius)
 	        call gadraw (id, xc - radius, yc - radius)
-	        call gseti (id, G_PMLTYPE, GL_SOLID)
 	        call sfree (sp)
-
 	    } then
-		return
+		call sfree (sp)
 	}
+
+	call gseti (id, G_PMLTYPE, marktype) 
 
 	iferr (call gdeactivate (id, 0))
 	    return
@@ -269,7 +280,9 @@ pointer	ap		# pointer to the apphot procedure
 pointer	id		# pointer to the display stream
 int	mkbox		# mark the psf fitting box
 
+int	marktype
 real	radius, xc, yc
+int	gstati()
 real	apstatr()
 errchk	greactivate, gdeactivate, gamove, gadraw
 
@@ -278,9 +291,11 @@ begin
 	    return
 	if (mkbox == NO)
 	    return
+
 	iferr (call greactivate (id, 0))
 	    return
 
+	marktype = gstati (id,G_PMLTYPE)
 	iferr {
             call gseti (id, G_PMLTYPE, GL_DASHED)
             xc = apstatr (ap, PFXCUR)
@@ -291,9 +306,9 @@ begin
 	    call gadraw (id, xc + radius, yc + radius)
 	    call gadraw (id, xc - radius, yc + radius)
 	    call gadraw (id, xc - radius, yc - radius)
-	    call gseti (id, G_PMLTYPE, GL_SOLID)
 	} then
-	    return
+	    ;
+        call gseti (id, G_PMLTYPE, marktype)
 
 	iferr (call gdeactivate (id, 0))
 	    return

@@ -83,5 +83,5 @@ values.
 	cl> mkimage name[10:20,30:40] replace 10
 .ih
 SEE ALSO
-observe, subsection
+artobs, subsection
 .endhelp

@@ -19,6 +19,7 @@ int	maxch			#I max chars out
 int	op
 pointer	sp, buf, bp
 int	gstrcpy(), qpex_getfilter()
+define	ovfl_ 91
 
 begin
 	call smark (sp)
@@ -32,23 +33,31 @@ begin
 	call sprintf (Memc[buf], SZ_TEXTBUF, "param=%s,")
 	    call pargstr (Memc[IO_PARAM(io)])
 	op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
+	if (op > maxch)
+	    goto ovfl_
 
 	# Coordinate system.
 	call sprintf (Memc[buf], SZ_TEXTBUF, "key=(s%d,s%d),")
 	    call pargi (IO_EVXOFF(io) * SZ_SHORT * SZB_CHAR)
 	    call pargi (IO_EVYOFF(io) * SZ_SHORT * SZB_CHAR)
 	op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
+	if (op > maxch)
+	    goto ovfl_
 
 	# Blocking factor for generating pixels.
 	call sprintf (Memc[buf], SZ_TEXTBUF, "block=%d,")
 	    call pargi (IO_BLOCK(io))
 	op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
+	if (op > maxch)
+	    goto ovfl_
 
 	# Region mask, if any.
 	if (Memc[IO_MASK(io)] != EOS) {
 	    call sprintf (Memc[buf], SZ_TEXTBUF, "mask=%s,")
 		call pargstr (Memc[IO_MASK(io)])
 	    op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
+	    if (op > maxch)
+		goto ovfl_
 	}
 
 	# Debug level, if debug messages enabled.
@@ -56,6 +65,8 @@ begin
 	    call sprintf (Memc[buf], SZ_TEXTBUF, "debug=%d,")
 		call pargi (IO_DEBUG(io))
 	    op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
+	    if (op > maxch)
+		goto ovfl_
 	}
 
 	# Noindex flag, if enabled.
@@ -63,6 +74,8 @@ begin
 	    call sprintf (Memc[buf], SZ_TEXTBUF, "noindex=%b,")
 		call pargi (IO_NOINDEX(io))
 	    op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
+	    if (op > maxch)
+		goto ovfl_
 	}
 
 	# Event attribute filter.
@@ -72,8 +85,18 @@ begin
 	    Memc[bp] = ')';  bp = bp + 1
 	    Memc[bp] = EOS
 	    op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
+	    if (op > maxch)
+		goto ovfl_
+	} else if (op > 1) {
+	    # Clobber trailing comma.
+	    op = op - 1
+	    outstr[op] = EOS
 	}
 
 	call sfree (sp)
 	return (op - 1)
+ovfl_
+	call sfree (sp)
+	outstr[maxch+1] = EOS
+	return (maxch)
 end

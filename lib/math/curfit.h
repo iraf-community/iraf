@@ -2,6 +2,7 @@
 
 # define the permitted types of curves
 
+define	CV_FUNCTIONS	"|chebyshev|legendre|spline3|spline1|"
 define	CHEBYSHEV	1
 define	LEGENDRE	2
 define	SPLINE3		3
@@ -11,6 +12,7 @@ define	NTYPES		5
 
 # define the weighting flags
 
+define	CV_WEIGHTS	"|user|uniform|spacing|chisq|"
 define	WTS_USER	1	# user enters weights
 define	WTS_UNIFORM	2	# equal weights
 define	WTS_SPACING	3	# weight proportional to spacing of data points

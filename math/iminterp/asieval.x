@@ -38,6 +38,12 @@ begin
 	    call ii_spline3 (x, value, 1,
 	    		    COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
 	    return (value)
+
+	case II_SINC:
+	    call ii_sinc (x, value, 1,
+		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
+		NSINC, NTAPER, STAPER, DX)
+	    return (value)
 	
 	default:
 	    call error (0, "ASIEVAL: Unknown interpolator type.")

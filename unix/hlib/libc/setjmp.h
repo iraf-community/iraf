@@ -9,8 +9,8 @@ static	int	u_jmpstat;
 
 /* The following is necessary to prevent to prevent the optimizer from
  * doing unwise things with setjmp on a Sun-4.
- */
 extern	zsvjmp_();
 #pragma unknown_control_flow(zsvjmp_)
+ */
 
 #define	D_setjmp

@@ -31,7 +31,7 @@ bool	clgetb()
 real	clgetr()
 int	imtopenp(), imtgetim(), imtlen()
 pointer	sp, input, output, str, in, out, ccd
-errchk	set_input, set_output, ccddelete
+errchk	set_input, set_output, ccddelete, cal_open
 errchk	set_zero, set_dark, set_flat, set_illum, set_fringe
 
 begin
@@ -90,7 +90,7 @@ begin
 	        call set_zero (ccd)
 	        call set_dark (ccd)
 	        call set_flat (ccd)
-	    case OBJECT:
+	    case OBJECT, COMP:
 	        call set_zero (ccd)
 	        call set_dark (ccd)
 	        call set_flat (ccd)
@@ -139,8 +139,8 @@ begin
 	    case ZERO:
 		call readcor (Memc[input])
 	    case FLAT:
-		call ccdmean (Memc[input])
 		call scancor (Memc[input])
+		call ccdmean (Memc[input])
 	    }
 	}
 

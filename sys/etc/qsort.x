@@ -15,6 +15,7 @@ define	LOGPTR 	32			# log2(maxpts)  (4e9)
 # 	 1	obj[x1]  > obj[x2]
 # 
 # QSORT reorders the elements of the X array, which must be of type integer.
+# **NOTE** - See also gqsort.x, a more recent version of this routine.
 
 procedure qsort (x, nelem, compare)
 

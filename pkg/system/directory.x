@@ -159,7 +159,7 @@ begin
 	# possible type of of directory listing, and is particularly useful
 	# for listing very large directories.
 
-	if (!sort_list && !long_format && !is_template) {
+	if (is_dir && !sort_list && !long_format && !is_template) {
 	    fd = diropen (Memc[dirname], dirmode)
 	    call dir_quicklist (STDOUT, fd, Memc[patp], is_pattern, ncols)
 	    call close (fd)
@@ -385,7 +385,7 @@ begin
 				break
 			    ep = ep - 1
 			}
-			if (Memc[ip] != '.' || Memc[ep] != '.')
+			if (pat[ip] != '.' || Memc[ep] != '.')
 			    next
 		    } else if (patmatch (Memc[fname], Memc[patbuf]) <= 0)
 			next

@@ -1,20 +1,20 @@
-      SUBROUTINE PUTDEC(N,W)
-      INTEGER N, W
-      INTEGER CHARS (20)
-      INTEGER I, ND
-      INTEGER ITOC
-      ND = ITOC (N, CHARS, 20)
-      I = ND + 1
-23000 IF (.NOT.(I .LE. W))GOTO 23002
-      CALL PUTC (32)
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      I = 1
-23003 IF (.NOT.(I .LE. ND))GOTO 23005
-      CALL PUTC (CHARS (I))
-23004 I = I + 1
-      GOTO 23003
-23005 CONTINUE
-      RETURN
-      END
+      subroutine putdec(n,w)
+      integer n, w
+      integer chars (20)
+      integer i, nd
+      integer itoc
+      nd = itoc (n, chars, 20)
+      i = nd + 1
+23000 if (.not.(i .le. w))goto 23002
+      call putc (32)
+23001 i = i + 1
+      goto 23000
+23002 continue
+      i = 1
+23003 if (.not.(i .le. nd))goto 23005
+      call putc (chars (i))
+23004 i = i + 1
+      goto 23003
+23005 continue
+      return
+      end

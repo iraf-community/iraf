@@ -370,7 +370,12 @@ FILE	*out;
 	 */
 	if (!omit_logo) {
 	    fprintf (out, "/Times-Roman findfont 24 scalefont setfont\n");
-	    fprintf (out, "[-1 0 0 -1 2350 3180] setmatrix\n");
+
+	    /* fprintf (out, "[-1 0 0 -1 2350 3180] setmatrix\n"); */
+	    fprintf (out, "initmatrix\n");
+	    fprintf (out, "-1 72 mul 300 div 1 72 mul 300 div scale\n");
+	    fprintf (out, "-2409 88 translate\n");
+
 	    fprintf (out, "%d %d moveto\n", 1600, 3150);
 	    fprintf (out, "[1 0 0 -1 0 0] concat\n");
 	    fprintf (out, "(%s) show\n", make_label());

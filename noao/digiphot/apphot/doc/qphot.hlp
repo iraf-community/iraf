@@ -1,4 +1,4 @@
-.help qphot Jan90 noao.digiphot.apphot
+.help qphot Jul91 noao.digiphot.apphot
 .ih
 NAME
 qphot -- quick aperture photometer
@@ -34,6 +34,9 @@ The image header keyword containing the airmass of the observation.
 .le
 .ls filter = ""
 The image header keyword containing the filter id of the observation.
+.le
+.ls obstime = ""
+The image header keyword containing the time of the observation.
 .le
 .ls epadu = 1.0
 The gain in photons per adu. This is used to compute the magnitude errors.
@@ -118,51 +121,67 @@ Magnitudes are computed using pixels inside the apertures defined by
 The user should set the gain \fIepadu\fR to ensure that the magnitude errors
 are correctly computed and \fIexposure\fR to normalize the computed magnitudes
 to an exposure time of 1 time unit. The zero point of the magnitude scale
-can be adjusted by setting \fIzmag\fR. \fIAirmass\fR and
-\fIfilter\fR are pure book-keeping parameters which may be useful to
+can be adjusted by setting \fIzmag\fR. \fIAirmass\fR,
+\fIfilter\fR, and \fIobstime\fR are pure book-keeping parameters which may
+be useful to
 preserve for future reductions such as calibration. 
 The noise statistics are assumed to be Poisson.
 
 .ih
 CURSOR COMMANDS
+
 The following list of cursor commands are currently available.
 
 .nf
-	Interactive Quick Photometry Commands
+	Interactive Photometry Commands
 
 ?	Print help for QPHOT commands
 :	QPHOT colon escape commands (see below)
-e	Print QPHOT error messages
-d	Plot a centered stellar radial profile
-i	Setup QPHOT parameters using a stellar radial profile plot
-w	Store current QPHOT parameters in the parameter file
+w	Store current QPHOT parameters
+q	Exit
+
+d	Plot the radial profile of current star (cursor or list)
+i	Setup QPHOT parameters interactively using current star
+	(cursor or list)
+
+spbar	Fit center, sky, compute magnitudes of current star
+	(cursor or list), and output results
+f	Fit center, sky and compute magnitudes of current star
+	(cursor or list)
+e	Print current QPHOT error message
+
 c	Fit center around the current star (cursor or list)
 t	Fit sky around the current star (cursor or list)
 s	Fit sky around the current centered star
 p	Compute magnitudes around current star (cursor or list),
 	using current sky
-f	Fit center, sky and compute magnitudes of current star
-	(cursor or list)
-spbar	Fit center, sky, compute magnitudes of current star
-	(cursor or list), output results
-q	Exit
+
+:m [n]	Move to next [nth] star in the coordinate list
+:n [n]	Measure next [nth] star in the coordinate list,
+	and output results
+l	Compute magnitudes for remainder of the stars in the
+	coordinate list, and output results
+r	Rewind the coordinate list
 
 Photometry parameters are listed or set with the following commands.
 
 :image		[string]	Image name
-:coords		[string]	Coordinate file name
 :output		[string]	Output file name
+:coords		[string]	Coords file name
 :show				List the parameters
 
 :cbox		[value]		Width of the centering box (pixels)
 :annulus	[value]		Inner radius of sky annulus (pixels)
 :dannulus	[value]		Width of sky annulus (pixels)
 :apertures	[string]	List of aperture radii (pixels)
+:zmag		[value]		Zero point of magnitude scale (magnitudes)
 :epadu		[value]		Gain (electrons  per adu)
+
 :exposure	[string]	Exposure time image header keyword
 :airmass	[string]	Airmass image header keyword
 :filter		[string]	Filter image header keyword
-:zmag		[value]		Zero point of magnitude scale
+:obstime	[string]	Time of observation image header keyword
+
 :radplot	[y/n]		Plot radial profile of object
 
 
@@ -204,7 +223,7 @@ following record is written.
 	image  xinit  yinit  id  coords  lid
 	   xcenter  ycenter  xshift  yshift  xerr  yerr  cier cerror
 	   msky  stdev  sskew  nsky  nsrej  sier  serror
-	   itime  airmass  filter
+	   itime  xairmass  ifilter  otime
 	   rapert  sum  area  mag  merr  pier  perror
 .fi
 
@@ -225,8 +244,10 @@ sky computation.  Msky, stdev and sskew are the sky value,
 standard deviation and skew respectively. Nsky and nsrej are the number of
 sky pixels used and the number of sky pixels rejected respectively.
 
-Itime is the eposure time, airmass is self-evident, and filter is an
-id string used to identify the filter used during the observation.
+Itime is the eposure time, xairmass is self-evident, ifilter is an
+id string used to identify the filter used during the observation, and
+otime is a string containing the time stamp in whatever units the
+user has written into the image header or the otime parameter.
 
 Rapert, sum, and area are the radius of the aperture in pixels, the total
 number of counts including sky in the aperture and the area of the aperture
@@ -241,36 +262,37 @@ If the object centering was error free then the field cier will be zero.
 Non-zero values of cier flag the following error conditions.
 
 .nf
-0       # No error
-21      # The centering box is off image
-22      # The centering box is partially off the image
-23      # The S/N ratio is low in the centering box
-27      # The x or y center shift is greater than centerpars.maxshift
-28      # There is bad data in the centering box
+0        # No error
+101      # The centering box is off image
+102      # The centering box is partially off the image
+103      # The S/N ratio is low in the centering box
+107      # The x or y center shift is greater than centerpars.maxshift
+108      # There is bad data in the centering box
 .fi
 
 If all goes well during the sky fitting process then the error code sier
 will be 0. Non-zero values of sier flag the following error conditions.
 
 .nf
-0       # No error
-1       # There are no sky pixels in the sky annulus
-2       # Sky annulus is partially off the image
+0         # No error
+201       # There are no sky pixels in the sky annulus
+202       # Sky annulus is partially off the image
 .fi
 
 If no error occurs during the measurment of the magnitudes then pier is
 0. Non-zero values of pier flag the following error conditins.
 
 .nf
-0       # No error
-41      # The aperture is off the image
-42      # The aperture is partially off the image
-43      # The sky value is undefined
-45      # There is bad data in the aperture
+0        # No error
+301      # The aperture is off the image
+302      # The aperture is partially off the image
+303      # The sky value is undefined
+305      # There is bad data in the aperture
 .fi
 
 .ih
 EXAMPLES
+
 1. Perform aperture photometry interactively for a few stars in n4147 using
 the display and the image cursor.
 
@@ -405,6 +427,19 @@ TIME REQUIREMENTS
 
 .ih
 BUGS
+
+It is currently the responsibility of the user to make sure that the
+image displayed in the frame is the same as that specified by the image
+parameter.
+
+Commands which draw to the image display are currently disabled.
+The TVMARK task in the proto package  can be used to draw simple marks
+on the display. All the APPHOT marking commands will however function
+if a contour plot is used in lieu of the image display.
+
+Users should not be confused by the normally enabled markcur option in the
+SUN/IMTOOL setup window. This feature is under the control of the
+IMTOOL window and the APPHOT package has no control over it.
 
 .ih
 SEE ALSO

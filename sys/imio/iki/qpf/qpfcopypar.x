@@ -17,9 +17,9 @@ pointer	qp			#I QPOE descriptor
 int	nelem, dtype, maxelem, flags
 pointer	sp, param, text, comment, datatype, fl, qpf, mw, io
 
+pointer	qp_ofnlu(), qpio_loadwcs()
 int	qp_gnfn(), qp_queryf(), stridx(), strdic()
 errchk	qp_ofnlu, qp_gnfn, qp_queryf, imaddi, qp_geti, mw_saveim
-pointer	qp_ofnlu(), qpio_loadwcs()
 
 bool	qp_getb()
 short	qp_gets()
@@ -43,7 +43,12 @@ begin
 	call imaddi (im, "BLOCKFACTOR", QPF_BLOCK(qpf))
 
 	# Output the QPOE filter.
-	call qpf_wfilter (qpf, im)
+	iferr (call qpf_wfilter (qpf, im))
+	    call erract (EA_WARN)
+
+	# Compute and output any filter attributes.
+	iferr (call qpf_wattr (qpf, im))
+	    call erract (EA_WARN)
 
 	# Copy the WCS, if any.
 	io = QPF_IO(qpf)

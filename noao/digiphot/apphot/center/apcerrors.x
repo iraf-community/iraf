@@ -4,8 +4,8 @@ include "../lib/center.h"
 
 procedure ap_cerrrors (ap, ier)
 
-pointer	ap		# apphot pointer
-int	ier		# error code
+pointer	ap		# apphot pointer (unused)
+int	ier		# centering error code
 
 begin
 	switch (ier) {

@@ -1,0 +1,14 @@
+# Parameters for the ALLSTAR task
+
+image,f,a,,,,"Image corresponding to photometry"
+photfile,f,a,default,,,"Input photometry file (default: image.mag.?)"
+psfimage,f,a,default,,,"PSF image (default: image.psf.?)"
+allstarfile,f,a,"default",,,"Output photometry file (default: image.als.?)"
+subimage,f,a,"default",,,"Subtracted image (default: image.sub.?)" 
+cache,b,h,yes,,,Cache the data in memory ?
+datapars,pset,h,"",,, Data dependent parameters
+daopars,pset,h,"",,,DAOPHOT parameters
+verbose,b,h,no,,,Print messages
+verify,b,h,yes,,,Verify critical ALLSTAR parameters
+update,b,h,no,,,Update critical ALLSTAR parameters
+mode,s,h,'ql'

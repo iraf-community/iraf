@@ -1,4 +1,4 @@
-.help rtar Nov86 softools
+.help rtar Jun90 softools
 .IH
 NAME
 rtar -- read TAR format archive file
@@ -38,6 +38,9 @@ file B to A.  This is valid providing file B was present in the archive and
 has already been extracted.  If the \fBl\fR flag is present linked files
 will not be extracted.
 .le
+.ls 4 -m
+Do not restore the file modify time.
+.le
 .ls 4 -n
 Do not strip trailing blank lines from text files read from the tape.
 The default is to strip any blank lines at the ends of files.
@@ -67,6 +70,9 @@ The extracted file replaces any existing file of the same name, i.e.,
 The names of the specified files are listed each time they occur on
 the tape.  If no \fIfiles\fR argument is given, all of the names on the tape
 are listed.
+.le
+.ls 4 -u
+Do not attempt to restore the owner and group identification of each file.
 .le
 .ls 4 -v
 Print more information about the tape entries than just their names.

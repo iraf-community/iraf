@@ -75,8 +75,8 @@
 #define	ERRCODE		errcoe_
 #define	ERRGET		errget_
 #define	FALLOC		falloc_
-#define	FATAL		fatal_
-#define	FCHDIR		fchdir_
+#define	FATAL		xfatal_
+#define	FCHDIR		xfchdr_
 #define	FCOPY		fcopy_
 #define	FCOPYO		fcopyo_
 #define	FDEBUG		fdebug_
@@ -103,12 +103,12 @@
 #define	FSTATI		fstati_
 #define	FSTATL		fstatl_
 #define	FSTATS		fstats_
-#define	GETPID		getpid_
+#define	GETPID		xgtpid_
 #define	GCTOD		gctod_
 #define	GCTOL		gctol_
 #define	GCTOX		gctox_
 #define	GETLINE		getlie_
-#define	GETUID		getuid_
+#define	GETUID		xgtuid_
 #define	GLTOC		gltoc_
 #define	GPATMAKE	gpatme_
 #define	GPATMATCH	gpatmh_
@@ -158,7 +158,7 @@
 #define	PUTLINE		putlie_
 #define	RCURSOR		rcursr_
 #define	RDUKEY		rdukey_
-#define	RENAME		rename_
+#define	RENAME		xfrnam_
 #define	REOPEN		reopen_
 #define	SALLOC		salloc_
 #define	SFREE		sfree_

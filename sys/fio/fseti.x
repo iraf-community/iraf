@@ -25,7 +25,7 @@ int	value			# value of parameter
 
 pointer	bp, ffp
 long	file_offset
-int	i, junk, outfd
+int	i, junk, outfd, flags
 bool	blocked_file, setraw, ndelay
 char	set_redraw[LEN_SETREDRAW]
 char	rawcmd[LEN_RAWCMD+1]
@@ -132,6 +132,7 @@ begin
 	    # next read to refill the buffer, or to cause the next write to
 	    # start filling the buffer.
 
+	    call fcanpb (fd)
 	    blocked_file = (FBLKSIZE(ffp) > 0)
 	    if (blocked_file)
 		file_offset = LNOTE(fd)
@@ -270,8 +271,8 @@ begin
 		FBLKSIZE(ffp) = 0
 	    }
 
-	case F_RAW:
-	    # Enable raw i/o when reading from a text device.  In raw mode,
+	case F_IOMODE, F_RAW:
+	    # Set the i/o mode for reading from a text device.  In raw mode,
 	    # if the text device is a terminal, each character is returned as
 	    # it is typed and most control characters are passed through on
 	    # reads.  If nonblocking raw mode is selected, each read will
@@ -279,15 +280,16 @@ begin
 	    # If no data could be read EOF is returned, but in RAWNB mode
 	    # this indicates merely that no input data was available.
 
-	    setraw = (and (value, 1) != 0)
-	    ndelay = (and (value, F_NDELAY) != 0)
+	    setraw = (and (value, IO_RAW) != 0)
+	    ndelay = (and (value, IO_NDELAY) != 0)
 
+	    fflags[fd] = and (not(FF_RAW+FF_NDELAY), fflags[fd])
 	    if (setraw) {
-		fflags[fd] = or (FF_RAW, fflags[fd])
+		flags = FF_RAW
 		if (ndelay)
-		    fflags[fd] = or (FF_NDELAY, fflags[fd])
-	    } else
-		fflags[fd] = and (not(FF_RAW+FF_NDELAY), fflags[fd])
+		    flags = flags + FF_NDELAY
+		fflags[fd] = or (fflags[fd], flags)
+	    }
 
 	    # Send a special control sequence to the IRAF tty driver to
 	    # physically turn raw mode on or off.  If this were not done then

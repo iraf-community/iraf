@@ -1,0 +1,5 @@
+# Parameter file for WCSRESET
+
+image,f,a,,,,"List of input images"
+wcs,s,a,physical,,,"Name of wcs to be initialized"
+verbose,b,h,yes,,,"Print messages about actions taken ?"

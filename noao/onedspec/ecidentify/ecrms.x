@@ -13,7 +13,7 @@ begin
 	rms = 0.
 	nrms = 0
 	for (i=1; i<=EC_NFEATURES(ec); i=i+1) {
-	    if (!IS_INDEFD (USER(ec,i))) {
+	    if (!IS_INDEFD (USER(ec,i)) && FTYPE(ec,i) > 0) {
 		rms = rms + (FIT(ec,i) - USER(ec,i)) ** 2
 		nrms = nrms + 1
 	    }

@@ -1,0 +1,4 @@
+# DAOPHOT package parameter file
+
+version,s,h,"Aug91"
+text,b,h,yes,,,Text file on output?

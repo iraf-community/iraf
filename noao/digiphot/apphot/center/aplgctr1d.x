@@ -29,10 +29,12 @@ int	aptopt()
 real	asumr()
 
 begin
-	# Compute the marginal distributions.
+	# Allocate working space.
 	call smark (sp)
 	call salloc (xm, nx, TY_REAL)
 	call salloc (ym, ny, TY_REAL)
+
+	# Compute the marginal distributions.
 	call ap_mkmarg (ctrpix, Memr[xm], Memr[ym], nx, ny)
 	xerr = asumr (Memr[xm], nx)
 	yerr = asumr (Memr[ym], ny)
@@ -72,6 +74,8 @@ begin
 	# Return appropriate error code.
 	call sfree (sp)
 	if (nxiter < 0 || nyiter < 0)
+	    return (AP_CTR_SINGULAR)
+	else if (nxiter > maxiter || nyiter > maxiter)
 	    return (AP_CTR_NOCONVERGE)
 	else
 	    return (AP_OK)

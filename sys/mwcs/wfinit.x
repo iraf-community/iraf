@@ -3,14 +3,20 @@
 include	<syserr.h>
 include	"mwcs.h"
 
-# WF_INIT -- Initialize the WCS function table.  Everything having to do
-# with a world function is contained either in this file or in the driver
-# source file.
+# WF_INIT -- Initialize the WCS function table.  Everything MWCS related
+# having to do with a world function is contained either in this file or
+# in the driver source file.  If the WCS must also be translated to/from
+# a FITS image header representation, the image header translation routine
+# iwewcs.x must also be modified.
 
 procedure wf_init()
 
 extern	wf_smp_init(), wf_smp_tran()
 extern	wf_tan_init(), wf_tan_fwd(), wf_tan_inv()
+extern	wf_arc_init(), wf_arc_fwd(), wf_arc_inv()
+extern	wf_gls_init(), wf_gls_fwd(), wf_gls_inv()
+extern	wf_sin_init(), wf_sin_fwd(), wf_sin_inv()
+extern	wf_msp_init(), wf_msp_fwd(), wf_msp_inv(), wf_msp_destroy()
 
 bool	first_time
 data	first_time /true/
@@ -29,8 +35,21 @@ begin
 	# Load the function drivers.
 	call wf_fnload ("sampled", 0,
 	    locpr(wf_smp_init), NULL, locpr(wf_smp_tran), locpr(wf_smp_tran))
+
+	# For compatibility reasons (FN index codes) new functions should
+	# be added at the end of the following list.
+
 	call wf_fnload ("tan", F_RADEC,
 	    locpr(wf_tan_init), NULL, locpr(wf_tan_fwd), locpr(wf_tan_inv))
+	call wf_fnload ("arc", F_RADEC,
+	    locpr(wf_arc_init), NULL, locpr(wf_arc_fwd), locpr(wf_arc_inv))
+	call wf_fnload ("gls", F_RADEC,
+	    locpr(wf_gls_init), NULL, locpr(wf_gls_fwd), locpr(wf_gls_inv))
+	call wf_fnload ("sin", F_RADEC,
+	    locpr(wf_sin_init), NULL, locpr(wf_sin_fwd), locpr(wf_sin_inv))
+
+	call wf_fnload ("multispec", F_RADEC, locpr(wf_msp_init),
+	    locpr(wf_msp_destroy), locpr(wf_msp_fwd), locpr(wf_msp_inv))
 end
 
 

@@ -203,6 +203,7 @@
 907 Attempt to position magtape to record beyond EOF
 908 Cannot rewind device
 909 Magtape device not found
+910 Bad tapecap entry for magtape device
 
 920 PLIO: range list overflow
 921 PLIO: bad mask save file

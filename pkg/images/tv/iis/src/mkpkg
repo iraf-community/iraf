@@ -1,0 +1,39 @@
+# Make the CV display load and control package.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	blink.x		../lib/ids.h <ctotok.h> <ctype.h> <gki.h> cv.com
+	clear.x		../lib/ids.h <ctotok.h> <ctype.h> cv.com
+	cv.x		cv.com cv.h ../lib/ids.h <ctotok.h> <error.h> <fio.h>\
+			<fset.h> <gki.h>
+	cvparse.x	cv.com ../lib/ids.h <ctype.h>
+	cvulut.x	cv.h <ctype.h> <error.h>
+	cvutil.x	cv.com cv.h ../lib/ids.h <gki.h> <gset.h> <imhdr.h>\
+			cv.com
+	display.x	../lib/ids.h <ctotok.h> <ctype.h> cv.com
+	load1.x		cv.com cv.h ../lib/ids.h <error.h> <gki.h> gwindow.h\
+			<fio.h> <fset.h> <imhdr.h> <imset.h> <mach.h>
+	load2.x		cv.com cv.h ../lib/ids.h <error.h> <gki.h> gwindow.h\
+			cv.com <fio.h> <fset.h> <imhdr.h> <imset.h> <mach.h>
+	map.x		../lib/ids.h <ctotok.h> <ctype.h> <gki.h> cv.com
+	match.x		../lib/ids.h <ctotok.h> cv.com
+	maxmin.x	<imhdr.h> <mach.h>
+	offset.x	../lib/ids.h <ctotok.h> <ctype.h> cv.com
+	pan.x		cv.com ../lib/ids.h <ctotok.h> <ctype.h> <gki.h>
+	range.x		../lib/ids.h <ctotok.h> <ctype.h> cv.com
+	rdcur.x		../lib/ids.h <ctotok.h> <ctype.h> cv.com <gki.h>
+	reset.x		../lib/ids.h <ctotok.h> <ctype.h> cv.com
+	sigl2.x		<error.h> <imhdr.h>
+	snap.x		../lib/ids.h <ctotok.h> <ctype.h> cv.com <gki.h>\
+			<imhdr.h>
+	split.x		../lib/ids.h <ctotok.h> <ctype.h> cv.com
+	tell.x		../lib/ids.h cv.com
+	text.x		../lib/ids.h <ctotok.h> <ctype.h>
+	window.x	../lib/ids.h <ctotok.h> <ctype.h> <gki.h> cv.com
+	zoom.x		../lib/ids.h <ctotok.h> <ctype.h> <gki.h> cv.com
+	zscale.x	<imhdr.h>
+	;

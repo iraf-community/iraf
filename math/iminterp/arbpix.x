@@ -3,14 +3,16 @@
 include <math/iminterp.h>
 include "im1interpdef.h"
 
-# ARBPIX -- Procedure to replace INDEF valued pixels with interpolated
-# values. In order to replace bad points the spline interpolator uses
-# a limited data array whose maximum total length is given by SPLPTS.
+define MIN_BDX	0.05	# minimum distance from interpolation point for sinc
+
+# ARBPIX -- Replace INDEF valued pixels with interpolated values. In order to
+# replace bad points the spline interpolator uses a limited data array whose
+# maximum total length is given by SPLPTS.
 
 procedure arbpix (datain, dataout, npts, interp_type, boundary_type)
 
-real	datain[ARB]		# inpupt data array
-real	dataout[ARB]		# outpupt data array - cannot be same as datain
+real	datain[ARB]		# input data array
+real	dataout[ARB]		# output data array - cannot be same as datain
 int	npts			# no. of data points
 int	interp_type		# interpolator type
 int	boundary_type		# boundary type, at present must be BOUNDARY_EXT
@@ -25,41 +27,48 @@ begin
 	if (boundary_type < 1 || boundary_type > II_NBOUND)
 	    call error (0, "ARBPIX: Unknown boundary type.")
 
-	# count bad points
+	# Count bad points.
 	badnc = 0
 	do i = 1, npts
 	    if (IS_INDEF(datain[i]))
 		badnc = badnc + 1
 
-	# return an array of INDEFS if all points bad
+	# Return an array of INDEFS if all points bad.
 	if (badnc == npts) {
 	    call amovkr (INDEFR, dataout, npts)
 	    return
 	}
 
-	# copy input array to output array if all points good
+	# Copy input array to output array if all points good.
 	if (badnc == 0) {
 	    call amovr (datain, dataout, npts)
 	    return
 	}
+
+	# If sinc interpolator use a special routine.
+	if (interp_type == II_SINC) {
+	    call ii_badsinc (datain, dataout, npts, NSINC, NTAPER, STAPER,
+	        MIN_BDX)
+	    return
+	}
 	
-	# find first good point
+	# Find the first good point.
 	for (ka = 1; datain[ka] == INDEFR; ka = ka + 1)
 	    ;
 
-	# bad points below first good point are set at first good value
+	# Bad points below first good point are set at first good value.
 	do k = 1, ka - 1
 	    dataout[k] = datain[ka]
 	
-	# find last good point
+	# Find last good point.
 	for (kb = npts; datain[kb] == INDEFR; kb = kb - 1)
 	    ;
 
-	# bad points beyond last good point get set at good last value
+	# Bad points beyond last good point get set at good last value.
 	do k = npts, kb + 1, -1
 	    dataout[k] = datain[kb]
 
-	# load the other points interpolating the bad points as needed
+	# Load the other points interpolating the bad points as needed.
 	do k = ka, kb {
 
 	    if (IS_INDEF(datain[k]))
@@ -87,15 +96,15 @@ real	tempdata[SPLPTS], tempx[SPLPTS]
 real	ii_newpix()
 
 begin
+	# This code will work only if subroutines are implemented using
+	# static storage - i.e. the old internal values survive. This avoids
+	# reloading of temporary arrays if there are consequetive bad points.
+
 	# The following test is done to improve speed.
-	# This code will work only if subroutines are implemented
-	# using static storage - i.e. the old internal values survive.
-	# This avoids reloading of temporary arrays if
-	# there are consequetive bad points.
 
 	if (! IS_INDEF(datain[index-1])) { 
 
-	    # set number of good points needed on each side of bad point
+	    # Set number of good points needed on each side of bad point.
 	    switch (interp_type) {
 	    case II_NEAREST:
 		ngood = 1
@@ -109,13 +118,13 @@ begin
 		ngood = SPLPTS / 2
 	    }
 
-	    # search down
+	    # Search down.
 	    pdown = 0
 	    for (j = index - 1; j >= 1 && pdown < ngood; j = j - 1)
 		if (! IS_INDEF(datain[j]))
 		    pdown = pdown + 1
 
-	    # load temporary arrays for values below our INDEF
+	    # Load temporary arrays for values below our INDEF.
 	    npts = 0
 	    for(jj = j + 1; jj < index; jj = jj + 1)
 		if (! IS_INDEF(datain[jj])) {
@@ -124,7 +133,7 @@ begin
 		    tempx[npts] = jj
 		}
 
-	     # search and load up from INDEF
+	     # Search and load up from INDEF.
 	     pup = 0
 	     for (j = index + 1; j <= npix && pup < ngood; j = j + 1)
 		if (! IS_INDEF(datain[j])) {
@@ -135,7 +144,7 @@ begin
 		 }
 	 }
 
-	 # return value interpolated from these arrays
+	 # Return value interpolated from these arrays.
 	 return (ii_newpix (real(index), tempx, tempdata,
 	 	npts, pdown, interp_type))
 
@@ -143,7 +152,7 @@ end
 
 
 # II_NEWPIX -- This procedure interpolates the temporary arrays.
-# Iirbint does not represent a general puprpose routine because the
+# Ii_newpix does not represent a general puprpose routine because the
 # previous routine has determined the proper indices.
 
 real procedure ii_newpix (x, xarray, data, npts, index, interp_type)
@@ -179,18 +188,19 @@ begin
 	    cc[2,1] = 0.
 	    cc[2,npts] = 0.
 
-	     # use spline routine from C. de Boor's book
-	     # A Practical Guide to Splines
+	     # Use spline routine from C. de Boor's book "A Practical Guide
+	     # to Splines
+
 	     call iicbsp (xarray, cc, npts, 2, 2)
 	     h = x - xarray[index]
 
 	     return (cc[1,index] + h * (cc[2,index] + h *
 			       (cc[3,index] + h * cc[4,index]/3.)/2.))
 
-	# one of the polynomial types
+	# One of the polynomial types.
 	default:
 
-	    # allow lower order if not enough points on one side
+	    # Allow lower order if not enough points on one side.
 	    right = npts
 	    left = 1
 
@@ -202,7 +212,109 @@ begin
 	    if (npts - index > index)
 		right = 2 * index
 
-	    # finally polynomial interpolate
+	    # Finally polynomial interpolate.
 	    return (ii_polterp (xarray[left], data[left], right, x))
+	}
+end
+
+
+# II_BADSINC -- Procedure to evaluate bad pixels with a sinc interpolant
+# This is the average of interpolation to points +-0.05 from the bad pixel.
+# Sinc interpolation exactly at a pixel is undefined.
+
+procedure ii_badsinc (datain, dataout, npts, nsinc, ntaper, staper, min_bdx)
+
+real	datain[ARB]	# input data including bad pixels with INDEF values
+real	dataout[ARB]	# output data 
+int	npts		# number of data values
+int	nsinc		# sinc truncation length
+int	ntaper		# start of triangular taper
+real	staper		# slope of triangular taper
+real	min_bdx		# minimum  distance from interpolation point
+
+int	i, j, k, xc
+real	w, d, z
+real	w1, u1, v1, u1a, v1a
+
+begin
+	do i = 1, npts {
+
+	    if (! IS_INDEF(datain[i])) {
+		dataout[i] = datain[i]
+		next
+	    }
+
+	    # Initialize.
+	    xc = i
+	    w = 1.
+	    u1 = 0.0; v1 = 0.0
+
+	    do j = 1, nsinc {
+
+		# Get the taper.
+		w = -w
+		if (j > ntaper) {
+		    if (w < 0.0)
+			w = min (0.0, w + staper)
+		    else
+			w = max (0.0, w - staper)
+		    if (w == 0.0)
+			break
+		}
+
+		# Store the previous value.
+		u1a = u1; v1a = v1
+
+		# Sum the low side.
+		k = xc - j
+		if (k >= 1) {
+		    d = datain[k]
+		    if (! IS_INDEF(d)) {
+			z = 1. / (min_bdx + j)
+			w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
+			z = 1. / (-min_bdx + j)
+			w1 = -w * z; u1 = u1 + d * w1; v1 = v1 + w1
+		    }
+		}
+
+		# Sum the high side.
+		k = xc + j
+		if (k <= npts) {
+		    d = datain[k]
+		    if (! IS_INDEF(d)) {
+			z = 1. / (min_bdx - j)
+			w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
+			z = 1. / (-min_bdx - j)
+			w1 = -w * z; u1 = u1 + d * w1; v1 = v1 + w1
+		    }
+		}
+	    }
+
+	    # Compute the result.
+	    if (v1 != 0.) {
+		if (v1a != 0.)
+		    dataout[i] = (u1 / v1 + u1a / v1a) / 2.
+		else
+		    dataout[i] = u1 / v1
+	    } else {
+		do j = 1, npts {
+		    k = xc - j
+		    if (k >= 1) {
+			d = datain[k]
+			if (!IS_INDEF(d)) {
+			    dataout[i] = d
+			    break
+			}
+		    }
+		    k = xc + j
+		    if (k <= npts) {
+			d = datain[k]
+			if (!IS_INDEF(d)) {
+			    dataout[i] = d
+			    break
+			}
+		    }
+		}
+	    }
 	}
 end

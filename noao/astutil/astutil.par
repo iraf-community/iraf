@@ -1,3 +1,4 @@
 # Package parameter file for the ASTUTIL package.
 
-version,s,h,"OCT87"
+observatory,s,h,"observatory",,,Observatory
+version,s,h,"January 1992"

@@ -1,0 +1,6 @@
+	MENU of KPNOCOUDE Demonstrations
+
+       doslit - Quick test of DOSLIT (no comments, no delays)
+     do3fiber - Quick test of DO3FIBER (small images, no comments, no delays)
+     mkdoslit - Make DOSLIT test data
+   mkdo3fiber - Make DO3FIBER test data (50x256)

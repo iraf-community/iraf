@@ -147,6 +147,13 @@ begin
 		break
 	}
 
+	switch (datatype) {
+	case TY_REAL:
+	    call ic_closer (ic)
+	case TY_DOUBLE:
+	    call ic_closed (ic)
+	}
+
 	if (!redir)
 	    call imtclose (fd)
 	call gt_free (gt)

@@ -1,4 +1,4 @@
-.help asttimes Oct87 astutil
+.help asttimes Nov90 astutil
 .ih
 NAME
 asttimes -- Compute UT, Julian day, epoch, and siderial time
@@ -15,15 +15,15 @@ parameters are used.
 .ls header = yes
 Print header to output information?
 .le
-.ls zone = 0
-Local time zone from Greenwich specified as the number of hours different
-from the Greenwich time zone.  The local times specified are for
-this time zone.  If 0 then the specified times are equivalently universal
-time.
-.le
-.ls longitude = ")observatory.longitude"
-Longitude of observation in degrees west of the Greenwich meridian.
-The default is the parameter \fIobservatory.longitude\fR.
+.ls observatory = ")_.observatory"
+Observatory for  which times are to be computed.  The default is a
+redirection to look in the parameters for the parent package for a value.
+The final value of this parameter may be one of the
+observatories in the observatory database, "observatory" to select the
+observatory defined by the environment variable "observatory" or the
+parameter \fBobservatory.observatory\fR, or "obspars" to select the
+current parameters set in the \fBobservatory\fR task.  See help for
+\fBobservatory\fR for additional information.
 .le
 .ls year, month, day, time
 If no input files are specified then the date and time for which the
@@ -41,17 +41,20 @@ variables.  This is in addition to the usual printed output.
 .le
 .ih
 DESCRIPTION
-The astronomical quantities of universal time, epoch, Julian day, and
-local mean sideral time at a specified longitude are computed and
-printed for the given dates and times.  The input dates and times may
-be taken from files containing the year, month (as an integer between 1
-and 12), day, and local time (sexigesimal notation is acceptable) in
-the specifed time zone.  If no files are specified then task parameters
-are used.  The output consists of a printed table with optional header
-and the input data and derived astronomical data.  In addition, if the
-input date and time is from the task parameters then the astronomical
-times are recorded in the user's parameter file (provided the task is
-not run as a background job).  These parameters may then be used as CL
+The astronomical quantities of universal time, epoch, Julian day, and local
+mean sideral time at the specified observatory are computed and printed for
+the given dates and times.  To compute parameters for a location not
+specified in the observatory database use the observatory name "obspars"
+which will use the values defined by the parameters
+\fIobservatory.longitude\fR and \fIobservatory.timezone\fR.  The input
+dates and times may be taken from files containing the year, month (as an
+integer between 1 and 12), day, and local time (sexigesimal notation is
+acceptable) in the specifed time zone.  If no files are specified then task
+parameters are used.  The output consists of a printed table with optional
+header and the input data and derived astronomical data.  In addition, if
+the input date and time is from the task parameters then the astronomical
+times are recorded in the user's parameter file (provided the task is not
+run as a background job).  These parameters may then be used as CL
 parameters.
 .ih
 EXAMPLES
@@ -59,7 +62,6 @@ EXAMPLES
 the parameter editor, with explicit assignments, or on the command line:
 
 .nf
-  cl> asttimes.zone=7
   cl> asttimes year=1987 month=10 day=28 time=15:30
   ##YR MON   DAY          ZT         UT      EPOCH           JD       LMST
   1987  10 28 WED 15:30:00.0 22:30:00.0 1987.82392 2447097.4375 17:30:33.0

@@ -40,7 +40,7 @@ int	op, jumpbuf[LEN_JUMPBUF]
 char	wmsg[SZ_LINE]
 int	gstrcpy()
 include	"error.com"
-common	/zjucom/ jumpbuf
+common	/JUMPCOM/ jumpbuf
 
 begin
 	# Clear error restart condition.  Called by the IRAF Main

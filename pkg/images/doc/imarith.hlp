@@ -11,7 +11,7 @@ PARAMETERS
 Lists of images and constants to be used as operands.
 Image templates and image sections are allowed.
 .le
-.ls op
+.ls op    
 Operator to be applied to the operands.  The allowed operators
 are "+", "-", "*", "/", "min", and "max".
 .le
@@ -25,6 +25,7 @@ from operand1 if operand1 is an image or from operand2 otherwise.
 .ls divzero = 0.
 Replacement value for division by zero.  When the denominator is zero
 or nearly zero the result is replaced by this value.
+.le
 .ls hparams = ""
 List of header parameters to be operated upon.  This is primarily
 used for adding exposure times when adding images.
@@ -32,8 +33,7 @@ used for adding exposure times when adding images.
 .ls pixtype = "", calctype = ""
 Pixel datatype for the resultant image and the internal calculation datatype.
 The choices are given below.  They may be abbreviated to one character.
-.le
-.ls ""
+.ls ""    
 \fICalctype\fR defaults to the highest precedence operand datatype.
 If the highest precedence operator is type "ushort", \fIcalctype\fR
 will default to "long".

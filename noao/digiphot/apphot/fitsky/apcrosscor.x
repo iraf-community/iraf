@@ -6,26 +6,26 @@ include "../lib/fitsky.h"
 # The peak of the cross-correlation function is found by parabolic
 # interpolation.
 
-int procedure ap_crosscor (skypix, coords, nskypix, snx, sny,
-    k1, hwidth, binsize, smooth, k2, rgrow, maxiter, sky_mode, sky_sigma,
-    sky_skew, nsky, nsky_reject)
+int procedure ap_crosscor (skypix, coords, nskypix, snx, sny, k1, hwidth,
+	binsize, smooth, k2, rgrow, maxiter, sky_mode, sky_sigma, sky_skew,
+	nsky, nsky_reject)
 
-real	skypix[ARB]			# array of sky pixels
-int	coords[ARB]			# array of coordinates
-int	nskypix				# the number of sky pixels
-int	snx, sny			# the maximum dimensions of sky raster
-real	k1				# extent of the histogram in skysigma
-real	hwidth				# sigma of histogram
-real	binsize				# the size of the histogram in sky sigma
-int	smooth				# smooth the histogram before fitting
-real	k2				# rejection criterion for histogram
-real	rgrow				# region growing radius in pixels
-int	maxiter				# maximum number of rejection cycles
-real	sky_mode			# computed sky value
-real	sky_sigma			# computed sigma of the sky pixels
-real	sky_skew			# skew of sky pixels
-int	nsky				# number of sky pixels used in fit
-int	nsky_reject			# number of sky pixels rejected
+real	skypix[ARB]		# array of sky pixels
+int	coords[ARB]		# array of sky coordinates
+int	nskypix			# the number of sky pixels
+int	snx, sny		# the maximum dimensions of sky raster
+real	k1			# half-width of the histogram in sky sigma
+real	hwidth			# the input sky sigma
+real	binsize			# the size of the histogram in sky sigma
+int	smooth			# smooth the histogram before fitting (not used)
+real	k2			# rejection limit in skysigma
+real	rgrow			# region growing radius in pixels
+int	maxiter			# maximum number of rejection cycles
+real	sky_mode		# computed sky value
+real	sky_sigma		# computed standard deviation of the sky pixels
+real	sky_skew		# computed skew of sky pixels
+int	nsky			# number of sky pixels used in fit
+int	nsky_reject		# number of sky pixels rejected
 
 double 	sumpx, sumsqpx, sumcbpx
 int	nreject, nbins, nker, nsmooth, ier, i, j
@@ -58,7 +58,7 @@ begin
 	    dh = binsize * sky_sigma
 	} 
 
-	# Compute the number of bins and the width of the kernel.
+	# Compute the number of bins in and the width of the kernel.
 	if (dh <= 0.0) {
 	    nbins = 1
 	    nker = 1

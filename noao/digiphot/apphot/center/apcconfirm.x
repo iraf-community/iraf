@@ -11,9 +11,10 @@ int	out		# output file descriptor
 int	stid		# output file sequence number
 
 pointer	sp, str
-real	fwhmpsf, capert, cthreshold, skysigma
+real	fwhmpsf, capert, cthreshold, skysigma, datamin, datamax
 int	apstati()
 real	apstatr(), ap_vfwhmpsf(), ap_vcapert(), ap_vcthreshold(), ap_vsigma()
+real	ap_vdatamin(), ap_vdatamax()
 
 begin
 	call smark (sp)
@@ -49,6 +50,10 @@ begin
 	# Confirm the sky sigma parameter.
 	skysigma = ap_vsigma (ap)
 
+	# Confirm the minimum and maximum good data values.
+	datamin = ap_vdatamin (ap)
+	datamax = ap_vdatamax (ap)
+
 	call printf ("\n")
 
 	# Update the database file.
@@ -63,6 +68,10 @@ begin
 	        "threshold for centering ")
 	    call ap_rparam (out, KY_SKYSIGMA, skysigma, UN_SKYSIGMA,
 	        "standard deviation of 1 sky pixel")
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	        "minimum good data value")
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	        "maximum good data value")
 	}
 
 	call sfree (sp)

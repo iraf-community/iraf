@@ -6,13 +6,13 @@ $checkin libpkg.a ../
 $exit
 
 libpkg.a:
-	t_starlist.x	starlist.h  <fset.h>
-	stspatial.x	<math.h>    <math/curfit.h>  <math/iminterp.h>
-	stlum.x		<mach.h>    <math.h> <math/curfit.h> <math/iminterp.h>
-	stplot.x	starlist.h  <pkg/gtools.h>  <gset.h>  <mach.h>  <math.h>
+	stcolon.x	starlist.h <error.h>
+	stdbio.x	starlist.h <pkg/dttext.h>
+	stlum.x		<mach.h> <math.h> <math/curfit.h> <math/iminterp.h>
+	stmix.x		<math.h> starlist.h
+	stplot.x	starlist.h <gset.h> <mach.h> <math.h> <pkg/gtools.h>
 	stshow.x	starlist.h
-	stcolon.x	starlist.h  <error.h>
-	stdbio.x	starlist.h  <pkg/dttext.h>  
-	t_gallist.x	starlist.h  <fset.h>
-	stmix.x		starlist.h
+	stspatial.x	<math.h> <math/curfit.h> <math/iminterp.h>
+	t_gallist.x	starlist.h <fset.h>
+	t_starlist.x	starlist.h <fset.h>
 	;

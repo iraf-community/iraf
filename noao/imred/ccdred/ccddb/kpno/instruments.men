@@ -9,4 +9,3 @@ echelle         Current headers for Sun plus CCDPROC setup for Echelle
 kpnoheaders     Current headers with no changes to CCDPROC parameters
 fits	        Mountain FITS header prior to Aug. 87 (?)
 camera		Mountain CAMERA header for IRAF Version 2.6 and earlier
-sunlink		Generic link to SUN

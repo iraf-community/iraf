@@ -45,8 +45,14 @@ begin
 	case PIX_SRC:
 	    if (src_maxval != 1)
 		call amovi (px_src[xs], px_dst[ds], npix)
-	    else
-		call argti (px_src[xs], px_dst[ds], ceil, src_value, npix)
+	    else {
+		do i = 1, npix
+		    if (px_src[xs+i-1] > 0)
+			px_dst[ds+i-1] = src_value
+		    else
+			px_dst[ds+i-1] = 0
+	    }
+
 	    goto out_
 	case PIX_DST:
 	    return	# no-op
@@ -105,7 +111,11 @@ begin
 	    call smark (sp)
 	    call salloc (src, npix, TY_INT)
 
-	    call argti (px_src[xs], Memi[src], ceil, src_value, npix)
+	    do i = 1, npix
+		if (px_src[xs+i-1] > 0)
+		    Memi[src+i-1] = src_value
+		else
+		    Memi[src+i-1] = 0
 
 	    switch (opcode) {
 	    case PIX_NOTSRC:
@@ -159,7 +169,7 @@ out_
 
 	if (dst_maxval == 1) {
 	    data = 1
-	    call argti (px_dst[ds], px_dst[ds], ceil, data, npix)
+	    call argti (px_dst[ds], npix, ceil, data)
 	} else if (dst_maxval > 1) {
 	    data = dst_maxval
 	    call aandki (px_dst[ds], data, px_dst[ds], npix)

@@ -1,3 +1,5 @@
 # LONGSLIT package parameter file.
 
-version,s,h,Oct85
+dispaxis,i,q,1,,,"Dispersion axis (1=along rows, 2=along columns)"
+observatory,s,h,"observatory",,,Observatory for data
+version,s,h,"January 1992"

@@ -44,7 +44,7 @@ begin
 	    call pargr (apstatr (ap, BINSIZE))
 	    call pargstr (UN_BINSIZE)
 	    call pargstr (KY_SMOOTH)
-	    call pargi (itob (apstati (ap, SMOOTH)))
+	    call pargb (itob (apstati (ap, SMOOTH)))
 
 	call printf ("    %s = %g %s    %s = %d\n")
 	    call pargstr (KY_K2)

@@ -144,7 +144,7 @@ char	cmd[SZ_CMDBUF], taskname[SZ_TASKNAME], bkgfname[SZ_FNAME]
 int	arglist_offset, timeit, junk, interactive, builtin_task, cmdin
 int	jumpbuf[LEN_JUMPBUF], status, state, interpret, i
 long	save_time[2]
-pointer	sp, clc_marker
+pointer	sp
 
 bool	streq()
 extern	DUMMY()
@@ -204,7 +204,6 @@ begin
 	call clopen (inchan, outchan, errchan, driver, devtype)
 	call clseti (CL_PRTYPE, prtype)
 	call clc_init()					# init param cache
-	call clc_mark (clc_marker)
 	call strupk (bkgfile, bkgfname, SZ_FNAME)
 
 	# If we are running as a host process (no IRAF parent process) look
@@ -286,14 +285,14 @@ begin
 	# IRAF CL).
 
 	if (state == STARTUP) {
-	    # Redirecty stderr and stdout to the null file.
+	    # Redirect stderr and stdout to the null file.
 	    if (prtype == PR_CONNECTED) {
 		call fredir (STDOUT, nullfile, WRITE_ONLY, TEXT_FILE)
 		call fredir (STDERR, nullfile, WRITE_ONLY, TEXT_FILE)
 	    }
 
 	    # Call the custom or default ONENTRY procedure.
-	    if (onentry (prtype, bkgfname) == PR_EXIT) {
+	    if (onentry (prtype, bkgfname, a_cmd) == PR_EXIT) {
 		interpret = NO
 		goto shutdown_
 	    } else
@@ -350,8 +349,7 @@ begin
 		    call sys_mtime (save_time)
 
 		# Clear the parameter cache.
-		call clc_free (clc_marker)
-		call clc_mark (clc_marker)
+		call clc_init()
 
 		# Set the name of the root pset.
 		call clc_newtask (taskname)
@@ -698,9 +696,9 @@ procedure sys_redirect (args, ip)
 char	args[ARB]		# argument list
 int	ip			# pointer to first char of redir arg
 
-int	fd, mode, type, junk
 pointer	sp, fname
-int	ctoi(), fredir()
+int	fd, mode, type
+int	ctoi()
 define	badredir_ 91
 errchk	fredir, fseti
 
@@ -795,7 +793,7 @@ begin
 	# recovery.
 
 	if (Memc[fname] != EOS)
-	    junk = fredir (fd, Memc[fname], mode, type)
+	    call fredir (fd, Memc[fname], mode, type)
 	else
 	    call fseti (fd, F_REDIR, YES)
 

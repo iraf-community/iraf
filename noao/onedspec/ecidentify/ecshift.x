@@ -1,3 +1,4 @@
+include	"../shdr.h"
 include	"ecidentify.h"
 
 define	NBIN	10	# Bin parameter for mode determination
@@ -12,12 +13,13 @@ pointer	ec			# EC pointer
 int	i, j, k, ap, order, nx, ndiff, find_peaks()
 real	d, dmin
 double	pix, ec_center(), ec_fitpt()
-pointer	x, diff
+pointer	x, y, diff
 errchk	malloc, realloc, find_peaks
 
 begin
 	ndiff = 0
-	call malloc (x, EC_NPTS(ec), TY_DOUBLE)
+	call malloc (x, EC_NCOLS(ec), TY_REAL)
+	call malloc (y, EC_NCOLS(ec), TY_DOUBLE)
 	do k = 1, EC_NLINES(ec) {
 	    call ec_gline (ec, k)
 	    ap = APS(ec,k)
@@ -25,16 +27,16 @@ begin
 
 	    # Find the peaks in the image data.
 	    i = max (5, EC_MAXFEATURES(ec) / EC_NLINES(ec))
-	    nx = find_peaks (IMDATA(ec,1), Memd[x], EC_NPTS(ec), 0.,
+	    nx = find_peaks (IMDATA(ec,1), Memr[x], EC_NPTS(ec), 0.,
 	        int (EC_MINSEP(ec)), 0, i, 0., false)
 
 	    # Center the peaks and convert to user coordinates.
 	    j = 0
 	    do i = 1, nx {
-		pix = Memd[x+i-1]
+		pix = Memr[x+i-1]
 	        pix = ec_center (ec, pix, EC_FWIDTH(ec), EC_FTYPE(ec))
 	        if (!IS_INDEFD (pix)) {
-	            Memd[x+j] = ec_fitpt (ec, ap, pix)
+	            Memd[y+j] = ec_fitpt (ec, ap, pix)
 		    j = j + 1
 	        }
 	    }
@@ -42,7 +44,7 @@ begin
 
 	    # Compute differences with feature list.
 	    do i = 1, EC_NFEATURES(ec) {
-		if (AP(ec,i) != ap)
+		if (APN(ec,i) != ap)
 		    next
 		if (ndiff == 0)
 		    call malloc (diff, nx, TY_REAL)
@@ -54,7 +56,8 @@ begin
 		}
 	    }
 	}
-	call mfree (x, TY_DOUBLE)
+	call mfree (x, TY_REAL)
+	call mfree (y, TY_DOUBLE)
 
 	# Sort the differences and find the mode.
 	call asrtr (Memr[diff], Memr[diff], ndiff)

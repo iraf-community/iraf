@@ -1,4 +1,4 @@
-.help mkttydata Feb86 softools
+.help mkttydata Jun90 softools
 .ih
 NAME
 mkttydata -- build a cache for graphcap/termcap device entries
@@ -28,12 +28,18 @@ Causes a message to be printed for each device entry compiled.
 DESCRIPTION
 The \fImkttydata\fR task is used by the IRAF system manager to precompile
 the \fItermcap\fR or \fIgraphcap\fR entries for commonly used video or
-graphics terminals.  This is desirable since otherwise the termcap or
-graphcap file must be searched at runtime every time the screen is cleared
-or a graph is plotted, reducing the performance and interactive response
-of the system.  Since each IRAF site will commonly use a different set of
-devices, entries can only be cached by the local system manager after the
-system is installed.
+graphics terminals.  This can be advantageous on slow systems since otherwise
+the termcap or graphcap file must be searched at runtime every time the
+screen is cleared or a graph is plotted, reducing the performance and
+interactive response of the system.  Since each IRAF site will commonly use
+a different set of devices, entries can only be cached by the local system
+manager after the system is installed.  [NOTE, Jun 1990: the above is
+still true, but with the addition of features such as shared libraries and
+multiple architecture support to some versions of IRAF, relinking IRAF is
+more difficult and it is easier to make mistakes.  Furthermore, modern
+systems are getting very fast.  For most sites it will be easier, and safer,
+to merely copy frequently referenced device entries to the head of the
+termcap or graphcap file and skip the sysgen.]
 
 The input to \fImkttydata\fR consists of a list of devices and a reference
 to either the termcap or graphcap file.  The output is an SPP include file
@@ -59,18 +65,18 @@ be in the dev directory.
 .ke
 
 
-After updating these files, enter the following commands to update the
+After updating these files, perform a sysgen-relink to update the
 system libraries and relink all executables (this takes a while, and
-requires IRAF permissions and full sources).  This does more than is
-really necessary, since all executables do not use termcap and graphcap,
-but many or most do, and this is safer than relinking the individual
-packages.
-
-.nf
-	cl> cd iraf
-	cl> mkpkg			# Rebuild IRAF!
-.fi
-
+requires IRAF permissions and full sources).  Instructions for performing
+the sysgen-relink are given in the \fISite Manager's Guide\fR for your
+IRAF system.  The exact procedure for performing a sysgen-relink depends
+upon the host system.  In particular, if the system support multiple
+architectures, each architecture must be restored and relinked separately.
+Note that systems configured for multiple architecture support are
+shipped configured "generic", and you must restore an architecture before
+relinking or the entire IRAF system will be recompiled (which is time
+consuming, and inadvisable due to the possibilty of system or compiler
+differences introducing bugs into IRAF).
 
 After this finishes, log out and back in and you should notice the
 difference when running tasks like \fIpage\fR, \fIclear\fR, and \fIimplot\fR.
@@ -100,4 +106,4 @@ There is a fixed limit on the amount of data that can be cached.
 If the limit is exceeded the affected TTY modules will fail to compile.
 .ih
 SEE ALSO
-showcap
+showcap, IRAF Site Manager's Guide

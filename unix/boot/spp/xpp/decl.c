@@ -128,7 +128,7 @@ int	dtype;			/* procedure type (0 if subr)	*/
 d_declaration (dtype)
 int	dtype;			/* data type			*/
 {
-	register struct	symbol *sp;
+	register struct	symbol *sp = NULL;
 	register char	ch;
 	int	token, ndim;
 	char	tokstr[SZ_TOKEN+1];
@@ -312,7 +312,11 @@ register FILE	*fp;
 
 	/* Declare local variables and externals. */
 	for (sp=sym;  sp <= top;  sp++)
-	    if (!(sp->s_flags & S_ARGUMENT))
+	    if (sp->s_flags & S_ARGUMENT)
+	        continue;
+	    else if (sp->s_flags & S_FUNCTION)
+	        d_declfunc (sp, fp);
+	    else
 		d_makedecl (sp, fp);
 }
 
@@ -487,4 +491,16 @@ int	maxch;			/* max chars to token string	*/
 	    error (XPP_SYNTAX, "unexpected EOF");
 
 	return (tokstr[0]);
+}
+
+
+/* D_DECLFUNC -- Declare a function.  This module is provided to allow
+ * for any special treatment required for certain types of function
+ * declarations.
+ */
+d_declfunc (sp, fp)
+register struct symbol *sp;
+FILE  *fp;
+{
+	d_makedecl (sp, fp);
 }

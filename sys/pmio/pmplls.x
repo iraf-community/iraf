@@ -88,7 +88,7 @@ begin
 
 	# Copy to or combine with destination.
 	if (ll_stn == NULL)
-	    call pl_plls (pl, v1, Mems[ll_src], np, rop)
+	    call pl_plls (pl, v1, Mems[ll_src], ll_depth, np, rop)
 	else {
 	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 	    ll_dst = Ref (pl, pl_access (pl, v1))

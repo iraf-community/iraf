@@ -42,11 +42,16 @@ begin
 	    # Allocate temporary space.
 	    call malloc (tempbuf, npix, TY_REAL)
 
-	    # Scale the line, deal with the blanks, and write the output
-	    # record. At the moment blanks are ignored.
+	    # Initialize the pixel write.
+	    call wft_init_write_pixels (npix_record, TY_REAL,
+	        FITS_BITPIX(fits), blkfac)
 
-	    call wft_init_write_pixels (npix_record, TY_REAL, FITS_BITPIX(fits),
-	        blkfac)
+	    # For the time being explicitly turn off ieee NaN mapping.
+	    call ieemapr (NO, NO)
+
+	    # Scale the lines, deal with the blanks via the ieee code which
+	    # is currently turned off, and write the output records.
+
 	    do i = 1, nlines {
 	        iferr (stat =  wft_get_image_line (im, buf, v, PIXTYPE(im))) {
 		    call erract (EA_WARN)
@@ -72,11 +77,16 @@ begin
 	    # Allocate temporary space.
 	    call malloc (tempbuf, npix, TY_DOUBLE)
 
-	    # Scale the line, deal with the blanks, and write the output
-	    # record. At the moment blanks are ignored.
-
+	    # Initialize the pixel write.
 	    call wft_init_write_pixels (npix_record, TY_DOUBLE,
 	        FITS_BITPIX(fits), blkfac)
+
+	    # For the time being explicitly turn off ieee NaN mapping.
+	    call ieemapd (NO, NO)
+
+	    # Scale the lines, deal with the blanks via the ieee code which
+	    # is currently turned off, and write the output records.
+
 	    do i = 1, nlines {
 	        iferr (stat =  wft_get_image_line (im, buf, v, PIXTYPE(im))) {
 		    call erract (EA_WARN)
@@ -254,8 +264,9 @@ begin
 	    call altal (Meml[buf], Meml[buf], npix, bzero, bscale)
 	    call amovl (Meml[buf], outbuffer, npix)
 	case TY_REAL:
-	    call altadr (Memr[buf], Memr[buf], npix, bzero, bscale)
-	    call achtrl (Memr[buf], outbuffer, npix)
+	    call altarl (Memr[buf], outbuffer, npix, bzero, bscale)
+	    #call altadr (Memr[buf], Memr[buf], npix, bzero, bscale)
+	    #call achtrl (Memr[buf], outbuffer, npix)
 	case TY_DOUBLE:
 	    call altad (Memd[buf], Memd[buf], npix, bzero, bscale)
 	    call achtdl (Memd[buf], outbuffer, npix)
@@ -349,6 +360,24 @@ begin
 	default:
 	    call error (13, "WFT_LONG_LINE: Unknown IRAF data type.")
 	}
+end
+
+
+# ALTARL -- Procedure to linearly scale a real vector into a long vector
+# using double precision constants to preserve precision.
+
+procedure altarl (a, b, npix, k1, k2)
+
+real	a[ARB]		# input vector
+long	b[ARB]		# output vector
+int	npix		# number of pixels
+double	k1, k2		# scaling factors
+
+int	i
+
+begin
+	do i = 1, npix
+	    b[i] = (a[i] + k1) * k2
 end
 
 

@@ -1,7 +1,7 @@
-      SUBROUTINE DOSTAT (LAB)
-      INTEGER LAB
-      CALL INDENT (-1)
-      CALL OUTCON (LAB)
-      CALL OUTCON (LAB + 1)
-      RETURN
-      END
+      subroutine dostat (lab)
+      integer lab
+      call indent (-1)
+      call outcon (lab)
+      call outcon (lab + 1)
+      return
+      end

@@ -107,7 +107,7 @@ begin
 
 	# get coefficients
 	call smark (sp)
-	call salloc (coeff, GS_COEFF(sf1), TY_DOUBLE)
+	call salloc (coeff, GS_NCOEFF(sf1), TY_DOUBLE)
 	call dgscoeff (sf1, Memd[coeff], ncoeff)
 
 	# compute the new coefficients

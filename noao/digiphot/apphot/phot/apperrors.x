@@ -26,7 +26,7 @@ end
 
 procedure ap_merrors (ap, pier)
 
-pointer	ap			# pointer to the apphot structure
+pointer	ap			# pointer to the apphot structure (unused)
 int	pier			# photometry error
 
 begin

@@ -9,33 +9,22 @@ include	"mtio.h"
 
 procedure zawtmt (mtchan, status)
 
-int	mtchan
-int	status
-int	nrecords, nfiles
+int	mtchan			#I i/o channel
+int	status			#O status (nbytes transferred or ERR)
+
 include	"mtio.com"
 
 begin
-	# Keep returning nbytes=0 after hitting EOF or EOT on a read.
-	if ((MT_ACMODE(mtchan) == READ_ONLY) &&
-	    (MT_ATEOF(mtchan) == YES || MT_ATEOT(mtchan) == YES)) {
+	# The "sticky" EOF should not be necessary but is needed due to the
+	# way FIO behaves when it hits EOF on a blocked file.  In some
+	# circumstances (depends upon the file length) two reads are made and
+	# if the second read does not return zero EOF will not be detected.
+
+	if (MT_ATEOF(mtchan) == YES)
 	    status = 0
-	    return
+	else {
+	    call zzwtmt (MT_OSCHAN(mtchan), MT_DEVPOS(mtchan), status)
+	    if (status == 0)
+		MT_ATEOF(mtchan) = YES
 	}
-
-	call zzwtmt (MT_OSCHAN(mtchan), nrecords, nfiles, status)
-
-	if (status == 0) {
-	    MT_ATEOF(mtchan) = YES
-	    if (MT_RECORD(mtchan) == 1)
-		MT_ATEOT(mtchan) = YES
-	}
-	if (nfiles > 0)
-	    MT_RECORD(mtchan) = 1
-
-	# Keep track of position on tape and within file.  Note that "nrecords"
-	# should be zero if we pass a filemark (nfiles > 0).
-
-	MT_FILE(mtchan) = MT_FILE(mtchan) + nfiles
-	MT_RECORD(mtchan) = MT_RECORD(mtchan) + nrecords
-	MT_NRECORDS(mtchan) = MT_NRECORDS(mtchan) + nrecords
 end

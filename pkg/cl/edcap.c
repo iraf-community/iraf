@@ -37,6 +37,7 @@
  */
 
 static	char ed_editorcmd[SZ_LINE+1];
+static	map_escapes();
 
 
 /* EDTINIT -- Initialize the editor.

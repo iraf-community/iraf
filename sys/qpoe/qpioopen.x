@@ -145,7 +145,7 @@ iferr {
 	    call syserrs (SYS_QPBADVAL, Memc[name])
 
 	if (qp_parsefl (qp, Memc[flist], IO_DD(io)) <= 0)
-	    call syserr (SYS_QPINVDD, Memc[name])
+	    call syserrs (SYS_QPINVDD, Memc[name])
 	else if (IO_EVXOFF(io) == NULL && IO_EVYOFF(io) == NULL) {
 	    i = DD_XFIELD(dd)
 	    j = DD_YFIELD(dd)

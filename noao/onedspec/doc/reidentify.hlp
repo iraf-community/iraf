@@ -1,4 +1,4 @@
-.help reidentify Nov87 noao.onedspec
+.help reidentify Mar92 noao.onedspec
 .ih
 NAME
 reidentify -- Reidentify features
@@ -8,369 +8,357 @@ reidentify reference images
 .ih
 PARAMETERS
 .ls reference
-Image with previously identified features.
+Image with previously identified features to be used as features reference for
+other images.  If there are multiple apertures, lines, or columns in the
+image a master reference is defined by the \fIsection\fR parameter.
+The other apertures, lines, or columns selected by \fIstep\fR are
+reidentified if needed.
 .le
 .ls images
-Images in which the features in the reference image are to be reidentified.
-The image may be the same as the reference image to reidentify features
-in other lines or columns.
+List of images in which the features in the reference image are to be
+reidentified.  In two dimensional images the reidentifications are
+done by matching apertures, lines, or columns with those in the reference
+image.
+.le
+.ls interactive = no
+Examine and fit features interactively?  If the task is run interactively a
+query (which may be turned off during execution) will be given for each
+vector reidentified after printing the results of the automatic fit and the
+user may chose to enter the interactive \fBidentify\fR task.
 .le
 .ls section = "middle line"
-If the reference image to be reidentified is not one
-dimensional or given as a one dimensional image section then the image
-section given by this parameter is appended to the image name.
-The section may be specified directly as an image section or in one of the
-following forms: "line #", "column #", "# line", or "# column" where # may
-be a line or column number or one of the special strings "middle" or "last".
-Abbreviations are allowed.
+If the reference image is not one dimensional or given as a one dimensional
+image section then this this parameter selects a master reference.  The
+master reference is used when reidentifying other vectors in the reference
+image or when other images contain apertures not present in the reference
+image.  For two dimensional images this parameter also sets the direction
+(columns or lines) of the image vectors to be reidentified.
+
+The section parameter may be specified directly as an image section or in
+one of the following forms: "line #", "column #", "# line", or "# column"
+where # may be a line or column number or one of the special strings
+"middle" or "last".  Abbreviations are allowed though beware that 'l' is
+not a sufficient abbreviation.
 .le
+.ls newaps = yes
+Reidentify new apertures in the images which are not in the reference
+image?  If no, only apertures found in the reference image will be
+reidentified in the other images.  If yes, the master reference spectrum
+is used to reidentify features in the new aperture and then the
+new aperture solution will be added to the reference apertures.  All
+further identifications of the new aperture will then use this solution.
+.le
+.ls override = no
+Override previous solutions?  If there are previous solutions for a
+particular image vector being identified, because of a previous
+\fBidentify\fR or \fBreidentify\fR, this parameter selects whether
+to simply skip the reidentification or do a reidentification and
+overwrite the solution in the database.
+.le
+.ls refit = yes
+Refit the coordinate function?  If yes and there is more than one feature
+and a coordinate function was defined in the reference image database then a new
+coordinate function of the same type as in the reference is fit
+using the new pixel positions.  Otherwise only a zero point shift is
+determined for the revised coordinates without changing the
+form of the coordinate function.
+.le
+
+The following parameters are used for selecting and reidentifying additional
+lines, columns, or apertures in two dimensional formats.
+.ls trace = no
+There are two methods for defining additional reference lines or columns in
+two dimensional format images as selected by the \fIstep\fR parameter.
+When \fItrace\fR is no the master reference line or column is used for each
+new reference vector.  When this parameter is yes then as the
+reidentifications step across the image the last reidentified features are
+used as the reference.  This "tracing" is useful if there is a coherent
+shift in the features such as with long slit spectra.  However, any
+features lost during the tracing will be lost for all subsequent lines or
+columns while not using tracing always starts with the initial set of
+reference features.
+.le
+.ls step = 10
+The step from the reference line or column used for selecting and/or
+reidentifying additional lines or columns in a two dimensional reference
+image.  For multiaperture images the step is typically 1 while for long
+slit images the step is large enough to map any significant changes in the
+feature positions.  If the step is zero then only the reference line or
+column is used.
+.le
+.ls nsum = 10
+The number of lines or columns to be summed in two dimensional images
+before reidentifying the features.  This parameter does not apply to
+multiaperture images.
+.le
+.ls shift = 0
+Shift in user coordinates to be added to the reference features before
+centering when stepping to other lines or columns in the reference
+image.  Generally no shift is used by setting the value to zero.
+The shift is used as a slope with positive values increasing towards
+larger line or column numbers.  This parameter is not used for
+reidentifications from the reference image to other images.
+.le
+.ls nlost = 0
+When reidentifying features by tracing, if the number of features not found
+in the new image vector exceeds this number then the reidentification
+record is not written to the database and the trace is terminated.  A
+warning is printed in the log and in the verbose output.
+.le
+
+The following parameters define the finding and recentering of features.
+See also \fBcenter1d\fR.
+.ls cradius = 5.
+Centering radius in pixels.  If a reidentified feature falls further
+than this distance from the previous line or column when tracing or
+from the reference feature position when reidentifying a new image
+then the feature is not reidentified.
+.le
+.ls threshold = 10.
+In order for a feature center to be determined, the range of pixel
+intensities around the feature must exceed this threshold.  This parameter
+is used to exclude noise peaks and terminate tracing when the signal
+disappears.  However, failure to properly set this parameter, particularly
+when the data values are very small due to normalization or flux
+calibration, is a common error leading to failure of the task.
+.le
+
+The following parameters select and control the automatic addition of
+new features during reidentification.
+.ls addfeatures = no
+Add new features from a line list during each reidentification?  If
+yes then the following parameters are used.  This function can be used
+to compensate for lost features from the reference solution, particularly
+when tracing.  Care should be exercised that misidentified features
+are not introduced.
+.le
+.ls coordlist = "linelists$idhenear.dat"
+User coordinate list consisting of an ordered list of line coordinates.
+Some standard line lists are available in the directory "linelists$":
+
+.nf
+	cl> dir linelists
+	cl> page linelists$README
+.fi
+.le
+.ls match = 10.
+The maximum difference for a match between the feature coordinate function
+value and a coordinate in the coordinate list.  The unit of this parameter
+is that of the user coordinates.
+.le
+.ls maxfeatures = 50
+Maximum number of the strongest features to be selected automatically from
+the coordinate list.
+.le
+.ls minsep = 2.
+The minimum separation, in pixels, allowed between feature positions
+when defining a new feature.
+.le
+
+The following parameters determine the input and output of the task.
 .ls database = "database"
 Database containing the feature data for the reference image and in which
 the features for the reidentified images are recorded.
 .le
-.ls step = 10
-The step between lines or columns when reidentifying features in the
-same two dimensional image (i.e. tracing features).  If the step is
-zero then no tracing is done.
-.le
-.ls nsum = 10
-The number of lines or columns to be summed in two dimensional images
-before reidentifying the features.
-.le
-.ls cradius = 5.
-Centering radius in pixels.  If a reidentified feature falls further
-than this distance from the previous line or column when tracing or
-from the reference image when reidentifying a new image then the feature
-is not reidentified.
-.le
-.ls threshold = 10.
-In order for a feature center to be determined the range of pixel intensities
-around the feature must exceed this threshold.
-.le
-.ls shift = 0
-Shift in user coordinates to be added to the reference features before
-centering.  If INDEF then a shift is determined by correlating the reference
-features to features automatically identified in the image to be reidentified.
-.le
-.ls nlost = 0
-When reidentifying features if the number of features not found in the
-new image or new line or column exceeds this number then the reidentification
-record is not written to the database.  When tracing a two dimensional
-image the trace is also terminated.
-.le
-.ls refit = yes
-Refit the coordinate function?  If yes and there is more than 1 feature
-and a coordinate function was defined in the reference image then a new
-coordinate function of the same type as in the reference image is fit
-using the new pixel positions.  Otherwise only a zero point shift is
-determined from the revised fitted coordinates without changing the
-form of the coordinate function.
-.le
-.ls logfiles = "STDOUT,logfile"
+.ls logfiles = "logfile"
 List of file in which to keep a processing log.  If a null file, "",
-is given then no log is kept.  If the log file is "STDOUT" then the log
-is written to the terminal.
+is given then no log is kept.
+.le
+.ls plotfile = ""
+Optional file to contain metacode plots of the residuals.
 .le
 .ls verbose = no
-Print a verbose log?
+Print reidentification information on the standard output?
+.le
+.ls graphics = "stdgraph"
+Graphics device.  The default is the standard graphics device which is
+generally a graphics terminal.
+.le
+.ls cursor = ""
+Cursor input file.  If a cursor file is not given then the standard graphics
+cursor is read.
 .le
 .ih
 DESCRIPTION
-Features identified in a reference image are reidentified in other lines or
-columns of two dimensional images and in other images.  The features
-for the reference image and those determined for reidentified images
-are recorded in the database.  Features are reidentified in the following
-order.
+Features identified in vectors from a reference image are reidentified in
+other images and the results recorded in the database.  If the images are
+two dimensional or multiaperture format and a \fIstep\fR greater than zero
+is specified then additional vectors (lines/columns/apertures) in the
+reference image will be reidentified from the initial master reference
+vector (as defined by an image section or \fIsection\fR parameter) provided
+they have not been reidentified previously or the \fIoverride\fR flag is
+set.  For multiple aperture spectra images, called multiaperture, the step
+size is typically 1; i.e. reidentify features in all spectra.  For two
+dimensional images, such as long slit spectra, the step should be large
+enough to minimize execution time and storage requirements but small enough
+to follow shifts in the features (see the discussion below on tracing).
+The set of references identification is applied to other images in the same
+lines, columns, or apertures.  In multiaperture images the same apertures
+are matched in the reference image regardless of actual line order; i.e.
+the apertures need not be in the same order or even have all apertures
+present.
 
-.ls (1)
-Reidentify features in the next image using features from the reference
-image.  For two dimensional images this is done at the same line or column
-as the reference image (the first line if the reference image is one
-dimensional).
-.le
-.ls (2)
-If the image is two dimensional and the step size is not zero then
-the features are reidentified at the other lines or columns by tracing
-from the starting line or column in the specified step size.
-.le
+The reidentification of other features in other reference image vectors
+may be done in two ways selected by the parameter \fItrace\fR.  If not
+tracing, the initial reference vector is applied to the other selected
+vectors.  If tracing, the reidentifications are made with respect to the
+last set of identifications as successive steps away from the reference
+vector are made.  The tracing method is appropriate for two dimensional
+images, such as long slit spectra, in which the positions of features
+traced vary smoothly.  This allows following large displacements from
+the initial reference by using suitably small steps.  It has the
+disadvantage that features lost during the reidentifications will not
+propagate (unless the \fIaddfeatures\fR option is used).  By not
+tracing, the original set of features is used for every other vector in
+the reference image.
 
-For transfering identifications from the reference image to another image,
-step (1) above, a shift is first added to each feature in the reference image
-and then the features are recentered in the new image.  If the shift is
-INDEF then the reference features are correlated against the peaks
-in the new image to determine a shift.  Note this only works for emission
-features currently.  The centering algorithm is described for the task
-\fBidentify\fR.  If a feature positions shifts by more than the amount
-set by the parameter \fIcradius\fR from the shifted reference position
-or the feature strength is less than the detection \fIthreshold\fR
-then the new feature is discarded.  If more features than that given by
-the parameter \fInlost\fR are discarded then the reidentification fails
-and the task moves on to the next image.
+When reidentifying other vectors in the reference image the parameter
+\fBshift\fR may be used to add a shift to the features positions
+before recentering.  The shift is added to lines or columns greater
+than the current line or column and subtracted if less.  If tracing
+the shift is same from step to step while if not tracing the
+shift is added to the shift from the previous step.  Thus, in both
+cases an approximation of a slope is used.  This allows large
+slopes in the features to be followed even when not tracing but the 
+shift value must be predetermined.
 
-For tracing identifications in two dimensional images, step (2), the
-features are recentered starting from the previously reidentified line
-or column.  This tracing proceeds in steps given by the parameter
-\fIstep\fR in both directions from the reference line or column.
-The tracing stops at the edges of the image or when the number of features
-lost exceeds the allowed number.  This tracing algorithm similar to that
-used in the task \fBextract\fR.
+When tracing, the parameter \fInlost\fR is used to terminate the
+tracing whenever this number of features has been lost.  This parameter,
+in conjunction with the other centering parameters which define
+when a feature is not found, may be useful for tracing features
+which disappear before reaching the limits of the image.
 
-In two dimensional images a number of lines or columns given by the parameter
-\fInsum\fR are summed to form the one dimensional image vector in which the
-features identified.  This increases the accuracy for weak features.
+When reidentifying features in other images, the reference
+features are those from the same aperture, line, or column of the
+reference image.  However, if the \fInewaps\fR parameter is set
+apertures in multiaperture spectra which are not in the reference
+image may be reidentified against the master reference aperture and
+added to the list of aperture to be reidentified in other images.
+This is useful when specta with different aperture numbers are
+stored as one dimensional images.
 
-If a fitting function is defined for the features in the reference image
-then the function is refit at each reidentified line or column if the
-parameter \fIrefit\fR is yes.  If refitting is not specified then
-a zero point shift in the user coordinates is determined without
-changing the form of the fitting function.
+The centering algorithm is described under the topic \fIcenter1d\fR and
+also in \fBidentify\fR.  If a feature positions shifts by more than the
+amount set by the parameter \fIcradius\fR from the starting position
+(possibly after adding a shift) or the feature strength (peak to valley) is
+less than the detection \fIthreshold\fR then the new feature is discarded.
+The \fIcradius\fR parameter should be set large enough to find the correct
+peak in the presence of any shifts but small enough to minimize incorrect
+identifications.  The \fIthreshold\fR parameter is used to eliminate
+identifications with noise.  Failure to set this parameter properly for the
+data (say if data values are very small due to a calibration or
+normalization operation) is the most common source of problems in using
+this task.
 
-Log information is written to the specified log files.
-The log information includes the image being
-reidentified and the reference image, and the initial shift.  When
-\fIverbose = no\fR only records in which the number of features
-found differs from the number of reference features is printed.  Otherwise
-a record is printed for each reidentification.  The records consist of
-the image being reidentified (which for two dimensional images includes
-the image section), the number of features found relative to the number
-of features in the reference, and the initial shift applied relative to
-the final mean shift after centering each feature.
+In two dimensional images, though not multiaperture images, the
+number of lines or columns given by the parameter \fInsum\fR are summed
+to form the one dimensional image vector in which the features are
+identified.  This increases the accuracy for reidentifying weak
+features.
 
-If a accessible file name is given for the plot file then a residual plot
+If a fitting function is defined for the features in the reference image,
+say a dispersion function in arc lamp spectra, then the function is refit
+at each reidentified line or column if the parameter \fIrefit\fR is yes.
+If refitting is not selected then a zero point shift in the user
+coordinates is determined without changing the form of the fitting
+function.  The latter may be desirable for tracking detector shifts through
+a sequence of observation using low quality calibration spectra.  When
+refitting, the fitting parameters from the reference are used including
+iterative rejection parameters to eliminate misidentifications.
+
+If the parameter \fIaddfeatures\fR is set additional features may be
+added after the initial reidentification and function fit using a
+line list.  A maximum number of added features, a matching distance
+in user coordinates, and a minimum separation from other features
+are additional parameters.  This option is similar to that available
+in \fBidentify\fR and is described more fully in the help for that task.
+
+A statistics line is generated for each reidentified vector.  The line
+contains the name of the image being reidentified (which for two
+dimensional images includes the image section and for multiaperture
+spectra includes the aperture number), the number of features found
+relative to the number of features in the reference, the number of
+features used in the function fit relative to the number found,  the
+mean pixel, user coordinate, and fractional user coordinate shifts
+relative to the reference coordinates, and the RMS relative to the
+final coordinate system (whether refit or simply shifted) excluding any
+iteratively rejected features from the calculation.
+
+If the task is run with the \fIinteractive\fR flag the statistics line
+is printed to the standard output (the terminal) and a query is
+made whether to examine and/or refit the features.  A response
+of yes or YES will put the user in the interactive graphical mode
+of \fBidentify\fR.  See the description of this task for more
+information.  The idea is that one can monitor the statistics information,
+particularly the RMS if refitting, and select only those which may be
+questionable to examine interactively.  A response of no or NO will
+continue on to the next reidentification.  The capitalized responses
+turn off the query and act as permanent response for all other
+reidentifications.
+
+This statistics line, including headers, is written to any specified
+log files.  The log information includes the image being
+reidentified and the reference image, and the initial shift.
+
+If an accessible file name is given for the plot file then a residual plot
 of the reidentified lines is recorded in this file.  The plot file can
-be viewed with \fBgkimosaic, stdgraph\fI or reading the file
+be viewed with \fBgkimosaic, stdgraph\fR or reading the file
 with ".read" when in cursor mode (for example with "=gcur").
 .ih
 EXAMPLES
-The features in image rog022 were identified perviously in column 140
-with the task \fBidentify\fR.  The features positions in the other columns
-of images rog022 and in the columns of image rog023 are reidentified
-as follows.  The abbreviated log is shown.
+1.  Arc lines and a dispersion solution were defined for the middle
+aperture in the multispec for arc spectrum a042.ms.  To reidentify the
+other apertures in the reference image and then another arc image:
 
 .nf
-    cl> reidentify rog022[135,*],rog023 rog022,rog023 ver+
-
-NOAO/IRAF V2.2 user@lyra Tue 18:07:47 21-Jan-86
-  Task REIDENTIFY
-  Reference image = rog022[135,*], New image = rog022, Shift = 0.
-         rog022[125,*]  25/25    0.000/-0.066 
-         rog022[115,*]  25/25    0.000/-0.113 
-------
+  cl> reiden a042.ms a045.ms inter+ step=1 ver+
+  REIDENTIFY: NOAO/IRAF V2.9 valdes@puppis Fri 29-Jun-90
+    Reference image = a042.ms.imh, New image = a042.ms, Refit = yes
+     Image Data    Found     Fit Pix Shift  User Shift     RMS
+  a042.ms - Ap 24  48/48   47/48   -2.38E-4    -3.75E-6  0.699
+  Fit dispersion function interactively? (no|yes|NO|YES) (yes): y
+  a042.ms - Ap 24  48/48   47/48   -2.38E-4    -3.75E-6  0.699
+  a042.ms - Ap 23  48/48   47/48      0.216        1.32  0.754
+  Fit dispersion function interactively? (no|yes|NO|YES) (yes): n
+  a042.ms - Ap 22  48/48   47/48     0.0627       0.383  0.749
+  Fit dispersion function interactively? (no|yes|NO|YES) (yes): n
+  a042.ms - Ap 21  48/48   47/48      0.337        2.06  0.815
+  <etc>
+    Reference image = a042.ms.imh, New image = a045.ms, Refit = yes
+     Image Data    Found     Fit Pix Shift  User Shift     RMS
+  a045.ms - Ap 24  48/48   47/48   -2.38E-4    -3.75E-6  0.699
+  Fit dispersion function interactively? (no|yes|NO|YES) (yes): y
+  a045.ms - Ap 24  48/48   47/48   -2.38E-4    -3.75E-6  0.699
+  a045.ms - Ap 23  48/48   47/48      0.216        1.32  0.754
+  Fit dispersion function interactively? (no|yes|NO|YES) (yes): N
+  a045.ms - Ap 22  48/48   47/48     0.0627       0.383  0.749
+  a042.ms - Ap 21  48/48   47/48      0.337        2.06  0.815
+  a042.ms - Ap 20  48/48   47/48     -0.293       -1.79  0.726
+  a042.ms - Ap 19  48/48   48/48      0.472        2.88  0.912
 .fi
-This continues to column 5 of rog022 and then tracing continues in the
-other direction.
-.nf
-------
-         rog022[145,*]  24/25    0.000/-0.025 
-         rog022[155,*]  24/24    0.000/-0.050 
-------
-.fi
-This continues to the edge of the image and then the next image is begun.
-.nf
-------
-  Reference image = rog023[*,398], New image = rog023, Shift = 0.
-         rog023[*,388]  1/1    0.000/-0.066 
-------
-etc.
-______
-.fi
 
-The data in the log consists of the image, the number of features found
-relative to the number of features from the reference, and the initial
-shift relative to the final average shift.
-.ih
-NOTES
-The coordinates and image data are double precision and all arithmetic
-is double precisions.  In particular the double precision curve fitting
-procedures are used.
-.ih
-SEE ALSO
-center1d, identify
-.endhelp
-.help reidentify Nov87 noao.onedspec
-.ih
-NAME
-reidentify -- Reidentify features
-.ih
-USAGE
-reidentify reference images
-.ih
-PARAMETERS
-.ls reference
-Image with previously identified features.
-.le
-.ls images
-Images in which the features in the reference image are to be reidentified.
-The image may be the same as the reference image to reidentify features
-in other lines or columns.
-.le
-.ls section = "middle line"
-If the reference image to be reidentified is not one
-dimensional or given as a one dimensional image section then the image
-section given by this parameter is appended to the image name.
-The section may be specified directly as an image section or in one of the
-following forms: "line #", "column #", "# line", or "# column" where # may
-be a line or column number or one of the special strings "middle" or "last".
-Abbreviations are allowed.
-.le
-.ls database = "database"
-Database containing the feature data for the reference image and in which
-the features for the reidentified images are recorded.
-.le
-.ls step = 10
-The step between lines or columns when reidentifying features in the
-same two dimensional image (i.e. tracing features).  If the step is
-zero then no tracing is done.
-.le
-.ls nsum = 10
-The number of lines or columns to be summed in two dimensional images
-before reidentifying the features.
-.le
-.ls cradius = 5.
-Centering radius in pixels.  If a reidentified feature falls further
-than this distance from the previous line or column when tracing or
-from the reference image when reidentifying a new image then the feature
-is not reidentified.
-.le
-.ls threshold = 10.
-In order for a feature center to be determined the range of pixel intensities
-around the feature must exceed this threshold.
-.le
-.ls shift = 0
-Shift in user coordinates to be added to the reference features before
-centering.  If INDEF then a shift is determined by correlating the reference
-features to features automatically identified in the image to be reidentified.
-.le
-.ls nlost = 0
-When reidentifying features if the number of features not found in the
-new image or new line or column exceeds this number then the reidentification
-record is not written to the database.  When tracing a two dimensional
-image the trace is also terminated.
-.le
-.ls refit = yes
-Refit the coordinate function?  If yes and there is more than 1 feature
-and a coordinate function was defined in the reference image then a new
-coordinate function of the same type as in the reference image is fit
-using the new pixel positions.  Otherwise only a zero point shift is
-determined from the revised fitted coordinates without changing the
-form of the coordinate function.
-.le
-.ls plotfile = ""
-File to contain residual plots of the reidentified features.  This is
-optional.
-.le
-.ls logfiles = "STDOUT,logfile"
-List of file in which to keep a processing log.  If a null file, "",
-is given then no log is kept.  If the log file is "STDOUT" then the log
-is written to the terminal.
-.le
-.ls verbose = no
-Print a verbose log?
-.le
-.ih
-DESCRIPTION
-Features identified in a reference image are reidentified in other lines or
-columns of two dimensional images and in other images.  The features
-for the reference image and those determined for reidentified images
-are recorded in the database.  Features are reidentified in the following
-order.
+This example is verbose and includes interactive review of reidentifications.
+The statistics lines have been shortened.
 
-.ls (1)
-Reidentify features in the next image using features from the reference
-image.  For two dimensional images this is done at the same line or column
-as the reference image (the first line if the reference image is one
-dimensional).
-.le
-.ls (2)
-If the image is two dimensional and the step size is not zero then
-the features are reidentified at the other lines or columns by tracing
-from the starting line or column in the specified step size.
-.le
-
-For transfering identifications from the reference image to another image,
-step (1) above, a shift is first added to each feature in the reference image
-and then the features are recentered in the new image.  If the shift is
-INDEF then the reference features are correlated against the peaks
-in the new image to determine a shift.  Note this only works for emission
-features currently.  The centering algorithm is described for the task
-\fBidentify\fR.  If a feature positions shifts by more than the amount
-set by the parameter \fIcradius\fR from the shifted reference position
-or the feature strength is less than the detection \fIthreshold\fR
-then the new feature is discarded.  If more features than that given by
-the parameter \fInlost\fR are discarded then the reidentification fails
-and the task moves on to the next image.
-
-For tracing identifications in two dimensional images, step (2), the
-features are recentered starting from the previously reidentified line
-or column.  This tracing proceeds in steps given by the parameter
-\fIstep\fR in both directions from the reference line or column.
-The tracing stops at the edges of the image or when the number of features
-lost exceeds the allowed number.  This tracing algorithm similar to that
-used in the task \fBextract\fR.
-
-In two dimensional images a number of lines or columns given by the parameter
-\fInsum\fR are summed to form the one dimensional image vector in which the
-features identified.  This increases the accuracy for weak features.
-
-If a fitting function is defined for the features in the reference image
-then the function is refit at each reidentified line or column if the
-parameter \fIrefit\fR is yes.  If refitting is not specified then
-a zero point shift in the user coordinates is determined without
-changing the form of the fitting function.
-
-Log information is written to the specified log files.
-The log information includes the image being
-reidentified and the reference image, and the initial shift.  When
-\fIverbose = no\fR only records in which the number of features
-found differs from the number of reference features is printed.  Otherwise
-a record is printed for each reidentification.  The records consist of
-the image being reidentified (which for two dimensional images includes
-the image section), the number of features found relative to the number
-of features in the reference, and the initial shift applied relative to
-the final mean shift after centering each feature.
-.ih
-EXAMPLES
-The features in image rog022 were identified perviously in column 140
-with the task \fBidentify\fR.  The features positions in the other columns
-of images rog022 and in the columns of image rog023 are reidentified
-as follows.  The abbreviated log is shown.
+2.  To trace a stellar profile and arc lines in long slit images for the
+purpose of making a distortion correction:
 
 .nf
-    cl> reidentify rog022[135,*],rog023 rog022,rog023 ver+
-
-NOAO/IRAF V2.2 user@lyra Tue 18:07:47 21-Jan-86
-  Task REIDENTIFY
-  Reference image = rog022[135,*], New image = rog022, Shift = 0.
-         rog022[125,*]  25/25    0.000/-0.066 
-         rog022[115,*]  25/25    0.000/-0.113 
-------
+  cl> reiden rog022[135,*] "" trace+
+  cl> reiden rog023 "" sec="mid line" trace+
 .fi
-This continues to column 5 of rog022 and then tracing continues in the
-other direction.
-.nf
-------
-         rog022[145,*]  24/25    0.000/-0.025 
-         rog022[155,*]  24/24    0.000/-0.050 
-------
-.fi
-This continues to the edge of the image and then the next image is begun.
-.nf
-------
-  Reference image = rog023[*,398], New image = rog023, Shift = 0.
-         rog023[*,388]  1/1    0.000/-0.066 
-------
-etc.
-______
-.fi
-
-The data in the log consists of the image, the number of features found
-relative to the number of features from the reference, and the initial
-shift relative to the final average shift.
 .ih
-NOTES
-The coordinates and image data are double precision and all arithmetic
-is double precisions.  In particular the double precision curve fitting
-procedures are used.
+REVISIONS
+.ls REIDENTIFY V2.10
+This task is a new version with many new features.  The new features
+include an interactive options for reviewing identifications, iterative
+rejection of features during fitting, automatic addition of new features
+from a line list, and the choice of tracing or using a single master
+reference when reidentifying features in other vectors of a reference
+spectrum.  Reidentifications from a reference image to another image is
+done by matching apertures rather than tracing.  New apertures not present
+in the reference image may be added.
+.le
 .ih
 SEE ALSO
 center1d, identify

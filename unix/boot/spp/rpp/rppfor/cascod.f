@@ -1,143 +1,143 @@
-      SUBROUTINE CASCOD (LAB, TOKEN)
-      INTEGER LAB, TOKEN
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER T, L, LB, UB, I, J, JUNK
-      INTEGER CASLAB, LABGEN, GNBTOK
-      INTEGER TOK (100)
-      IF (.NOT.(SWTOP .LE. 0))GOTO 23000
-      CALL SYNERR (24Hillegal case or default.)
-      RETURN
-23000 CONTINUE
-      CALL INDENT (-1)
-      CALL OUTGO (LAB + 1)
-      XFER = 1
-      L = LABGEN (1)
-      IF (.NOT.(TOKEN .EQ. -91))GOTO 23002
-23004 IF (.NOT.(CASLAB (LB, T) .NE. -1))GOTO 23005
-      UB = LB
-      IF (.NOT.(T .EQ. 45))GOTO 23006
-      JUNK = CASLAB (UB, T)
-23006 CONTINUE
-      IF (.NOT.(LB .GT. UB))GOTO 23008
-      CALL SYNERR (28Hillegal range in case label.)
-      UB = LB
-23008 CONTINUE
-      IF (.NOT.(SWLAST + 3 .GT. 1000))GOTO 23010
-      CALL BADERR (22Hswitch table overflow.)
-23010 CONTINUE
-      I = SWTOP + 3
-23012 IF (.NOT.(I .LT. SWLAST))GOTO 23014
-      IF (.NOT.(LB .LE. SWSTAK (I)))GOTO 23015
-      GOTO 23014
-23015 CONTINUE
-      IF (.NOT.(LB .LE. SWSTAK (I+1)))GOTO 23017
-      CALL SYNERR (21Hduplicate case label.)
-23017 CONTINUE
-23016 CONTINUE
-23013 I = I + 3
-      GOTO 23012
-23014 CONTINUE
-      IF (.NOT.(I .LT. SWLAST .AND. UB .GE. SWSTAK (I)))GOTO 23019
-      CALL SYNERR (21Hduplicate case label.)
-23019 CONTINUE
-      J = SWLAST
-23021 IF (.NOT.(J .GT. I))GOTO 23023
-      SWSTAK (J+2) = SWSTAK (J-1)
-23022 J = J - 1
-      GOTO 23021
-23023 CONTINUE
-      SWSTAK (I) = LB
-      SWSTAK (I + 1) = UB
-      SWSTAK (I + 2) = L
-      SWSTAK (SWTOP + 1) = SWSTAK (SWTOP + 1) + 1
-      SWLAST = SWLAST + 3
-      IF (.NOT.(T .EQ. 58))GOTO 23024
-      GOTO 23005
-23024 CONTINUE
-      IF (.NOT.(T .NE. 44))GOTO 23026
-      CALL SYNERR (20Hillegal case syntax.)
-23026 CONTINUE
-23025 CONTINUE
-      GOTO 23004
-23005 CONTINUE
-      GOTO 23003
-23002 CONTINUE
-      T = GNBTOK (TOK, 100)
-      IF (.NOT.(SWSTAK (SWTOP + 2) .NE. 0))GOTO 23028
-      CALL ERROR (38Hmultiple defaults in switch statement.)
-      GOTO 23029
-23028 CONTINUE
-      SWSTAK (SWTOP + 2) = L
-23029 CONTINUE
-23003 CONTINUE
-      IF (.NOT.(T .EQ. -1))GOTO 23030
-      CALL SYNERR (15Hunexpected EOF.)
-      GOTO 23031
-23030 CONTINUE
-      IF (.NOT.(T .NE. 58))GOTO 23032
-      CALL ERROR (39Hmissing colon in case or default label.)
-23032 CONTINUE
-23031 CONTINUE
-      XFER = 0
-      CALL OUTCON (L)
-      CALL INDENT (1)
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      subroutine cascod (lab, token)
+      integer lab, token
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer t, l, lb, ub, i, j, junk
+      integer caslab, labgen, gnbtok
+      integer tok (100)
+      if (.not.(swtop .le. 0))goto 23000
+      call synerr (24Hillegal case or default.)
+      return
+23000 continue
+      call indent (-1)
+      call outgo (lab + 1)
+      xfer = 1
+      l = labgen (1)
+      if (.not.(token .eq. -91))goto 23002
+23004 if (.not.(caslab (lb, t) .ne. -1))goto 23005
+      ub = lb
+      if (.not.(t .eq. 45))goto 23006
+      junk = caslab (ub, t)
+23006 continue
+      if (.not.(lb .gt. ub))goto 23008
+      call synerr (28Hillegal range in case label.)
+      ub = lb
+23008 continue
+      if (.not.(swlast + 3 .gt. 1000))goto 23010
+      call baderr (22Hswitch table overflow.)
+23010 continue
+      i = swtop + 3
+23012 if (.not.(i .lt. swlast))goto 23014
+      if (.not.(lb .le. swstak (i)))goto 23015
+      goto 23014
+23015 continue
+      if (.not.(lb .le. swstak (i+1)))goto 23017
+      call synerr (21Hduplicate case label.)
+23017 continue
+23016 continue
+23013 i = i + 3
+      goto 23012
+23014 continue
+      if (.not.(i .lt. swlast .and. ub .ge. swstak (i)))goto 23019
+      call synerr (21Hduplicate case label.)
+23019 continue
+      j = swlast
+23021 if (.not.(j .gt. i))goto 23023
+      swstak (j+2) = swstak (j-1)
+23022 j = j - 1
+      goto 23021
+23023 continue
+      swstak (i) = lb
+      swstak (i + 1) = ub
+      swstak (i + 2) = l
+      swstak (swtop + 1) = swstak (swtop + 1) + 1
+      swlast = swlast + 3
+      if (.not.(t .eq. 58))goto 23024
+      goto 23005
+23024 continue
+      if (.not.(t .ne. 44))goto 23026
+      call synerr (20Hillegal case syntax.)
+23026 continue
+23025 continue
+      goto 23004
+23005 continue
+      goto 23003
+23002 continue
+      t = gnbtok (tok, 100)
+      if (.not.(swstak (swtop + 2) .ne. 0))goto 23028
+      call error (38Hmultiple defaults in switch statement.)
+      goto 23029
+23028 continue
+      swstak (swtop + 2) = l
+23029 continue
+23003 continue
+      if (.not.(t .eq. -1))goto 23030
+      call synerr (15Hunexpected EOF.)
+      goto 23031
+23030 continue
+      if (.not.(t .ne. 58))goto 23032
+      call error (39Hmissing colon in case or default label.)
+23032 continue
+23031 continue
+      xfer = 0
+      call outcon (l)
+      call indent (1)
+      return
+      end
+c     logic0  logical_column

@@ -1,7 +1,7 @@
 include	<error.h>
 include	<imhdr.h>
 
-define	MAX_HDR		20000			# Maximum user header
+define	LEN_UA		20000			# Maximum user header
 define	LEN_COMMENT	70			# Maximum comment length
 
 # Cosmic ray data structure
@@ -31,8 +31,9 @@ bool	poisson				# Add Poisson noise?
 long	seed				# Random number seed
 int	nobjects			# Number of random cosmic rays
 real	energy				# Maximum random energy (electrons)
+bool	cmmts				# Add comments?
 
-bool	new
+bool	new, fcmmts
 real	x, y, z
 int	i, j, k, l, nx, ny, nlines, c1, c2, c3, c4, l1, l2, l3, l4, irbuf, ipbuf
 pointer	sp, input, output, fname, comment, rbuf, pbuf
@@ -76,9 +77,10 @@ begin
 	if (poisson && ranbuf > 0)
 	    call salloc (pbuf, ranbuf, TY_REAL)
 	seed = clgetl ("seed")
+	cmmts = clgetb ("comments")
 
-	if (max (1, imtlen (olist)) != imtlen (ilist))
-	    call error (1, "Output image list does not match input image list")
+	if (imtlen (ilist) == 0)
+	    call error (1, "No input image list")
 
 	# Loop through input, output, and cosmic ray lists.
 	# Missing output images take the input image name.
@@ -93,28 +95,32 @@ begin
 	    # Map images.  Check for new, existing, and in-place images.
 	    if (streq (Memc[input], Memc[output])) {
 		if (imaccess (Memc[input], 0) == YES) {
-		    iferr (in = immap (Memc[input], READ_WRITE, MAX_HDR)) {
+		    iferr (in = immap (Memc[input], READ_WRITE, LEN_UA)) {
 			call erract (EA_WARN)
 			next
 		    }
 		    out = in
 		    new = false
 		} else {
-		    iferr (in = immap (Memc[input], NEW_IMAGE, MAX_HDR)) {
+		    iferr (out = immap (Memc[output], NEW_IMAGE, LEN_UA)) {
 			call erract (EA_WARN)
 			next
 		    }
-		    out = in
+		    in = out
+
+		    call clgstr ("header", Memc[comment], LEN_COMMENT)
+		    iferr (call mkh_header (out, Memc[comment], true, false))
+			call erract (EA_WARN)
+
 		    IM_NDIM(in) = 2
 		    IM_LEN(in,1) = clgeti ("ncols")
 		    IM_LEN(in,2) = clgeti ("nlines")
 		    IM_PIXTYPE(in) = TY_REAL
 		    call clgstr ("title", IM_TITLE(out), SZ_IMTITLE)
-		    call mko_header (out)
 		    new = true
 		}
 	    } else {
-		iferr (in = immap (Memc[input], READ_ONLY, MAX_HDR)) {
+		iferr (in = immap (Memc[input], READ_ONLY, LEN_UA)) {
 		    call erract (EA_WARN)
 		    next
 		}
@@ -143,6 +149,7 @@ begin
 	    # If a nonexistent object list is given then write the random
 	    # events out.
 
+	    fcmmts = false
 	    energy = INDEF
 	    nobjects = 0
 	    i = nowhite (Memc[fname], Memc[fname], SZ_FNAME)
@@ -153,9 +160,7 @@ begin
 		    call gargr (y)
 		    call gargr (z)
 		    if (nscan() < 3) {
-			call reset_scan ()
-			call gargstr (Memc[comment], LEN_COMMENT)
-			call mko_comment (out, Memc[comment])
+			fcmmts = true
 			next
 		    }
 		    if (x < 1 || x > nc || y < 1 || y > nl)
@@ -208,29 +213,6 @@ begin
 		}
 	    }
 
-	    # Add comment history of task parameters.
-	    call strcpy ("# ", Memc[comment], LEN_COMMENT)
-	    call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
-	    call mko_comment (out, Memc[comment])
-	    call mko_comment (out, "begin\tmknoise")
-	    call mko_comment1 (out, "background", 'r', Memc[comment])
-	    call mko_comment1 (out, "gain", 'r', Memc[comment])
-	    call mko_comment1 (out, "rdnoise", 'r', Memc[comment])
-	    call mko_comment1 (out, "poisson", 'b', Memc[comment])
-	    call mko_comment1 (out, "seed", 'i', Memc[comment])
-	    if (nobjects > 0) {
-		if (Memc[fname] != EOS)
-	            call mko_comment1 (out, "cosrays", 's', Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tncosrays%24t%d")
-		    call pargi (nobjects)
-		call mko_comment (out, Memc[comment])
-		if (!IS_INDEF (energy))
-	            call mko_comment1 (out, "energy", 'r', Memc[comment])
-	        call mko_comment1 (out, "radius", 'r', Memc[comment])
-	        call mko_comment1 (out, "ar", 'r', Memc[comment])
-	        call mko_comment1 (out, "pa", 'r', Memc[comment])
-	    }
-
 	    # If no objects are requested then do the image I/O
 	    # line by line to add requested background and noise
 	    # and then go on to the next image.
@@ -249,8 +231,8 @@ begin
 			else
 			    call amovkr (background, Memr[ptr2], nc)
 			if (poisson)
-			    call mkpnoise (Memr[ptr2], Memr[ptr2], nc, 0., gain,
-				pbuf, ranbuf, ipbuf, seed)
+			    call mkpnoise (Memr[ptr2], Memr[ptr2], nc, 0.,
+				gain, pbuf, ranbuf, ipbuf, seed)
 			if (rdnoise > 0.)
 			    call mkrnoise (Memr[ptr2], nc, rdnoise,
 				rbuf, ranbuf, irbuf, seed)
@@ -262,14 +244,28 @@ begin
 			if (background == 0.)
 			    call amovr (Memr[ptr1], Memr[ptr2], nc)
 			else
-			    call aaddkr (Memr[ptr1], background, Memr[ptr2], nc)
+			    call aaddkr (Memr[ptr1], background,
+				Memr[ptr2], nc)
 			if (poisson)
-			    call mkpnoise (Memr[ptr2], Memr[ptr2], nc, 0., gain,
-				pbuf, ranbuf, ipbuf, seed)
+			    call mkpnoise (Memr[ptr2], Memr[ptr2], nc, 0.,
+				gain, pbuf, ranbuf, ipbuf, seed)
 			if (rdnoise > 0.)
 			    call mkrnoise (Memr[ptr2], nc, rdnoise,
 				rbuf, ranbuf, irbuf, seed)
 		    }
+		}
+
+		# Add comment history of task parameters.
+		if (cmmts) {
+		    call strcpy ("# ", Memc[comment], LEN_COMMENT)
+		    call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
+		    call mkh_comment (out, Memc[comment])
+		    call mkh_comment (out, "begin\tmknoise")
+		    call mkh_comment1 (out, "background", 'r')
+		    call mkh_comment1 (out, "gain", 'r')
+		    call mkh_comment1 (out, "rdnoise", 'r')
+		    call mkh_comment1 (out, "poisson", 'b')
+		    call mkh_comment1 (out, "seed", 'i')
 		}
 
 		if (in != out)
@@ -407,6 +403,43 @@ begin
 	    call mfree (MKO_Z(mko), TY_REAL)
 	    call mfree (MKO_SORT(mko), TY_INT)
 	    call mfree (mko, TY_STRUCT)
+
+	    # Add comment history of task parameters.
+	    if (cmmts) {
+		call strcpy ("# ", Memc[comment], LEN_COMMENT)
+		call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
+		call mkh_comment (out, Memc[comment])
+		call mkh_comment (out, "begin\tmknoise")
+		call mkh_comment1 (out, "background", 'r')
+		call mkh_comment1 (out, "gain", 'r')
+		call mkh_comment1 (out, "rdnoise", 'r')
+		call mkh_comment1 (out, "poisson", 'b')
+		call mkh_comment1 (out, "seed", 'i')
+		if (fcmmts && Memc[fname] != EOS) {
+		    call mkh_comment1 (out, "cosrays", 's')
+		    i = open (Memc[fname], READ_ONLY, TEXT_FILE)
+		    while (fscan (i) != EOF) {
+			call gargr (x)
+			call gargr (y)
+			call gargr (z)
+			if (nscan() < 3) {
+			    call reset_scan ()
+			    call gargstr (Memc[comment], LEN_COMMENT)
+			    call mkh_comment (out, Memc[comment])
+			}
+		    }
+		    call close (i)
+		}
+		call sprintf (Memc[comment], LEN_COMMENT,
+		    "\tncosrays%24t%d")
+		    call pargi (nobjects)
+		call mkh_comment (out, Memc[comment])
+		if (!IS_INDEF (energy))
+		    call mkh_comment1 (out, "energy", 'r')
+		call mkh_comment1 (out, "radius", 'r')
+		call mkh_comment1 (out, "ar", 'r')
+		call mkh_comment1 (out, "pa", 'r')
+	    }
 
 	    if (in != out)
 		call imunmap (in)

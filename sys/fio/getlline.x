@@ -3,7 +3,8 @@
 # GETLLINE -- Get a logical line of text, i.e., an arbitrarily long line
 # possibly broken up into multiple segments of size SZ_LINE.  Accumulation
 # stops when the indicated number of chars have been read, or newline is
-# detected.  MAXCH must be at least SZ_LINE.
+# detected.  MAXCH must be at least SZ_LINE characters greater than the
+# longest line to be read.
 
 int procedure getlline (fd, obuf, maxch)
 

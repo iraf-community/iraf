@@ -21,7 +21,7 @@ int	width			# ncols on screen (out)
 int	height			# nlines on screen (out)
 
 pointer	sp, patbuf, buf, qs, wh, ip, op
-int	index, len_qs, len_wh, w_index, h_index, sv_raw, nchars, junk
+int	index, len_qs, len_wh, w_index, h_index, sv_iomode, nchars, junk
 
 int	patmake(), patindex(), gstrcpy(), ctoi()
 int	ttygets(), ttyread(), ttystati(), ttstati(), fstati()
@@ -77,9 +77,9 @@ begin
 	# encoded screen size string.
 
 	if (len_qs > 0 && len_wh > 0) {
-	    sv_raw = fstati (in, F_RAW)
-	    if (sv_raw == NO)
-		call fseti (in, F_RAW, YES)
+	    sv_iomode = fstati (in, F_IOMODE)
+	    if (sv_iomode != IO_RAW)
+		call fseti (in, F_IOMODE, IO_RAW)
 
 	    call ttywrite (out, tty, Memc[qs], len_qs, 0)
 	    call flush (out)
@@ -92,8 +92,8 @@ begin
 		    height = 0
 	    }
 
-	    if (sv_raw == NO)
-		call fseti (in, F_RAW, sv_raw)
+	    if (sv_iomode != IO_RAW)
+		call fseti (in, F_IOMODE, sv_iomode)
 
 	    if (width == 0 && nchars == 0) {
 		call eprintf ("timeout - terminal type set wrong? ")

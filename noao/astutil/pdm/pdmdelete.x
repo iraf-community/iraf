@@ -4,7 +4,7 @@ include <error.h>
 include <gset.h>
 include "pdm.h"
 
-define	MSIZE		2.		# Mark size
+define	MSIZE		2		# Mark size
 
 # PDM_DELETE -- Delete the point from the plot and set it's inuse array
 # entry to zero.

@@ -16,7 +16,7 @@ libpkg.a:
 			../lib/fitpsf.h
 	apppfpars.x	../lib/apphot.h
 	apgpfpars.x	../lib/display.h	../lib/fitpsf.h         \
-			../lib/noise.h		../lib/apphot.h
+			../lib/noise.h
 	appfconfirm.x	../lib/apphot.h		../lib/noise.h          \
 			../lib/fitpsf.h
 	appferrors.x	../lib/fitpsf.h
@@ -27,7 +27,7 @@ libpkg.a:
 	apsfcolon.x	../lib/display.h	../lib/fitpsf.h         \
 			../lib/apphot.h		 ../lib/noise.h
 	apsfelgauss.x	<math.h>		../lib/apphot.h         \
-			../lib/nlfit.h		../lib/noise.h
+			<math/nlfit.h>		../lib/noise.h
 	apsffree.x	../lib/apphotdef.h	../lib/fitpsfdef.h
 	apsfinit.x	../lib/apphotdef.h	../lib/fitpsfdef.h	\
 			../lib/fitpsf.h
@@ -35,7 +35,7 @@ libpkg.a:
 			../lib/noisedef.h	../lib/fitpsf.h         \
 			<mach.h>
 	apsfmoments.x	<math.h>		../lib/fitpsf.h
-	apsfradgauss.x  ../lib/fitpsf.h		../lib/nlfit.h   	\
+	apsfradgauss.x  ../lib/fitpsf.h		<math/nlfit.h>   	\
 			../lib/noise.h
 	apsfrefit.x	../lib/apphotdef.h	../lib/fitpsfdef.h	\
 			../lib/fitpsf.h		../lib/noisedef.h       \

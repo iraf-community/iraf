@@ -23,8 +23,8 @@ define	AP_PYMAGERR	Memr[$1+12]	# Magnitude error
 
 # polyphot parameters
 
-define	AP_PYZMAG	Memr[$1+15]		# Zero point of mag scale
-define	AP_PYNAME	Memc[P2C($1+21)]	# Polygons file name
+define	AP_PYZMAG	Memr[$1+15]	# Zero point of mag scale
+define	AP_PYNAME	Memc[P2C($1+21)]# Polygons file name
 
 # polyphot defaults
 

@@ -125,9 +125,6 @@ begin
 	 	call pargd (Memd[errors+i-1])
 	}
 
-	# Print x,y pairs
-	call ic_listxyd (fd, cv, x, y, npts)
-
 	# Free allocated memory.
 
 	call sfree (sp)
@@ -135,21 +132,24 @@ begin
 end
 
 
-# IC_LISTXY -- List data as x,y pairs on output.  Used for verbose
-# show procedure.
+# IC_XYSHOW -- List data as x,fit,y triplets on output.
 
-procedure ic_listxyd (fd, cv, xvals, yvals, nvalues)
+procedure ic_xyshowd (file, cv, xvals, yvals, nvalues)
 
-int	fd			# File descriptor of output file
+char	file[ARB]		# Output file
 pointer	cv			# Pointer to curfit structure
 int	nvalues			# Number of data values
 double	xvals[nvalues]		# Array of x data values
 double	yvals[nvalues]		# Array of y data values
 
-int	i
+int	i, fd, open()
 double	dcveval()
+errchk	open
 
 begin
+	# Open the output file.
+	fd = open (file, APPEND, TEXT_FILE)
+
 	call fprintf (fd, "\n\t         X     \t   Yc   \t    Y    \n")
 
 	do i = 1, nvalues {
@@ -158,4 +158,6 @@ begin
 		call pargd (dcveval (cv, xvals[i]))
 		call pargd (yvals[i])
 	}
+
+	call close (fd)
 end

@@ -1,4 +1,5 @@
 include	<math/gsurfit.h>
+include	"../shdr.h"
 include	"ecidentify.h"
 
 # EC_DBREAD -- Read features data from the database.
@@ -10,27 +11,30 @@ char	name[SZ_LINE]
 int	verbose
 
 pointer	dt
-int	i, j, ncoeffs, rec, slope, offset
-double	shift
-pointer	sp, coeffs, line
+int	i, j, k, ncoeffs, rec, slope, offset, niterate
+double	shift, low, high
+pointer	sp, coeffs, line, cluster
 
-int	dtgeti(), dgsgeti(), dtlocate(), dtscan()
+int	ec_line()
+int	dtgeti(), dgsgeti(), dtlocate(), dtscan(), nscan()
 real	dtgetr()
-double	dgsgetd()
+double	dgsgetd(), mw_c1trand()
 pointer	dtmap1()
 
 errchk	dtmap1(), dtlocate(), dtgeti(), dtgad()
 
 begin
 	call smark (sp)
+	call salloc (cluster, SZ_LINE, TY_CHAR)
 	call salloc (line, SZ_LINE, TY_CHAR)
 
-	call strcpy ("ec", Memc[line], SZ_LINE)
-	call imgcluster (name, Memc[line+2], SZ_LINE)
+	call imgcluster (name, Memc[cluster], SZ_LINE)
+	call sprintf (Memc[line], SZ_LINE, "ec%s")
+	    call pargstr (Memc[cluster])
 	dt = dtmap1 (Memc[EC_DATABASE(ec)], Memc[line], READ_ONLY)
 
 	call sprintf (Memc[line], SZ_LINE, "ecidentify %s")
-	    call pargstr (name)
+	    call pargstr (Memc[cluster])
 
 	rec = dtlocate (dt, Memc[line])
 	if (rec == EOF)
@@ -39,8 +43,6 @@ begin
 	i = dtgeti (dt, rec, "features")
 
 	EC_NALLOC(ec) = i
-	EC_NFEATURES(ec) = i
-	EC_CURRENT(ec) = 0
 	call realloc (EC_APNUM(ec), i, TY_INT)
 	call realloc (EC_LINENUM(ec), i, TY_INT)
 	call realloc (EC_ORD(ec), i, TY_INT)
@@ -50,16 +52,29 @@ begin
 	call realloc (EC_FWIDTHS(ec), i, TY_REAL)
 	call realloc (EC_FTYPES(ec), i, TY_INT)
 
-	do i = 1, EC_NFEATURES(ec) {
-	    j = dtscan (dt)
-	    call gargi (AP(ec,i))
-	    call gargi (ORDER(ec,i))
-	    call gargd (PIX(ec,i))
-	    call gargd (FIT(ec,i))
-	    call gargd (USER(ec,i))
-	    call gargr (FWIDTH(ec,i))
-	    call gargi (FTYPE(ec,i))
+	j = 1
+	do i = 1, EC_NALLOC(ec) {
+	    k = dtscan (dt)
+	    call gargi (APN(ec,j))
+	    call gargi (ORDER(ec,j))
+	    call gargd (PIX(ec,j))
+	    call gargd (FIT(ec,j))
+	    call gargd (USER(ec,j))
+	    call gargr (FWIDTH(ec,j))
+	    call gargi (FTYPE(ec,j))
+	    call gargi (k)
+	    if (nscan() == 8 && k == 0)
+		FTYPE(ec,j) = -FTYPE(ec,j)
+	    iferr (LINE(ec,j) = ec_line (ec, APN(ec,j)))
+		next
+	    shift = mw_c1trand (EC_PL(ec), PIX(ec,j))
+	    low = 0.5
+	    high = SN(SH(ec,LINE(ec,j))) + 0.5
+	    if (shift < low || shift > high)
+		next
+	    j = j + 1
 	}
+	EC_NFEATURES(ec) = j - 1
 
 	iferr (shift = dtgetr (dt, rec, "shift"))
 	    shift = 0.
@@ -94,6 +109,13 @@ begin
 	        call ecf_sets ("function", "chebyshev")
 	    }
 
+	    ifnoerr (niterate = dtgeti (dt, rec, "niterate"))
+		call ecf_seti ("niterate", niterate)
+	    ifnoerr (low = dtgetr (dt, rec, "lowreject"))
+		call ecf_setd ("low", low)
+	    ifnoerr (high = dtgeti (dt, rec, "highreject"))
+		call ecf_setd ("high", high)
+
 	    EC_NEWECF(ec) = YES
 	    EC_CURRENT(ec) = min (1, EC_NFEATURES(ec))
 	} then
@@ -111,7 +133,7 @@ begin
 
 	if (verbose == YES) {
 	    call printf ("ecidentify %s\n")
-		call pargstr (name)
+		call pargstr (Memc[cluster])
 	}
 end
 
@@ -125,7 +147,7 @@ char	name[ARB]
 int	verbose
 
 int	i, ncoeffs
-pointer	dt, sp, coeffs, root
+pointer	dt, sp, coeffs, root, cluster
 
 int	dgsgeti(), ecf_geti()
 double	ecf_getd()
@@ -135,17 +157,19 @@ errchk	dtmap1, immap
 
 begin
 	call smark (sp)
+	call salloc (cluster, SZ_FNAME, TY_CHAR)
 	call salloc (root, SZ_FNAME, TY_CHAR)
 
-	call strcpy ("ec", Memc[root], SZ_FNAME)
-	call imgcluster (name, Memc[root+2], SZ_FNAME)
+	call imgcluster (name, Memc[cluster], SZ_FNAME)
+	call sprintf (Memc[root], SZ_FNAME, "ec%s")
+	    call pargstr (Memc[cluster])
 	dt = dtmap1 (Memc[EC_DATABASE(ec)], Memc[root], APPEND)
 
 	call dtptime (dt)
 	call dtput (dt, "begin\tecidentify %s\n")
-	    call pargstr (name)
+	    call pargstr (Memc[cluster])
 	call dtput (dt, "\tid\t%s\n")
-	    call pargstr (name)
+	    call pargstr (Memc[cluster])
 	call dtput (dt, "\ttask\tecidentify\n")
 	call dtput (dt, "\timage\t%s\n")
 	    call pargstr (Memc[EC_IMAGE(ec)])
@@ -153,14 +177,19 @@ begin
 	call dtput (dt, "\tfeatures\t%d\n")
 	    call pargi (EC_NFEATURES(ec))
 	do i = 1, EC_NFEATURES(ec) {
-	    call dtput (dt, "\t\t%3d  %3d  %7.2f  %10.8g  %10.8g  %4.1f  %d\n")
-		call pargi (AP(ec,i))
+	    call dtput (dt,
+		"\t\t%3d  %3d  %7.2f  %10.8g  %10.8g  %4.1f  %d  %d\n")
+		call pargi (APN(ec,i))
 		call pargi (ORDER(ec,i))
 		call pargd (PIX(ec,i))
 		call pargd (FIT(ec,i))
 		call pargd (USER(ec,i))
 		call pargr (FWIDTH(ec,i))
-		call pargi (FTYPE(ec,i))
+		call pargi (abs (FTYPE(ec,i)))
+		if (FTYPE(ec,i) > 0)
+		    call pargi (1)
+		else
+		    call pargi (0)
 	}
 
 	if (ecf_getd ("shift") != 0.) {
@@ -177,6 +206,13 @@ begin
 	}
 
 	if (EC_ECF(ec) != NULL) {
+	    call dtput (dt, "\tniterate %d\n")
+		call  pargi (ecf_geti ("niterate"))
+	    call dtput (dt, "\tlowreject %g\n")
+		call  pargd (ecf_getd ("low"))
+	    call dtput (dt, "\thighreject %g\n")
+		call  pargd (ecf_getd ("high"))
+
 	    ncoeffs = dgsgeti (EC_ECF(ec), GSNSAVE)
 	    call salloc (coeffs, ncoeffs, TY_DOUBLE)
 	    call dgssave (EC_ECF(ec), Memd[coeffs])
@@ -197,15 +233,16 @@ begin
 
 	if (verbose == YES) {
 	    call printf ("ecidentify %s\n")
-		call pargstr (name)
+		call pargstr (Memc[cluster])
 	}
 
-	call sfree (sp)
-
 	# Enter reference spectrum name in image header.
-	dt = immap (Memc[EC_IMAGE(ec)], READ_WRITE, 0)
-	call imastr (dt, "REFSPEC1", Memc[EC_IMAGE(ec)])
+	call imgcluster (Memc[EC_IMAGE(ec)], Memc[root], SZ_FNAME)
+	dt = immap (Memc[root], READ_WRITE, 0)
+	call imastr (dt, "REFSPEC1", Memc[cluster])
 	iferr (call imdelf (dt, "REFSPEC2"))
 	    ;
 	call imunmap (dt)
+
+	call sfree (sp)
 end

@@ -47,6 +47,13 @@ begin
 	# Process the reserved keywords (set in the STF descriptor) into the
 	# corresponding fields of the IMIO descriptor.
 
+        # Set group keywords if STF_GROUPS is NO (BPS 12.06.91).
+        if (STF_GROUPS(stf) == NO) {
+            STF_GCOUNT(stf) = 1
+            STF_PCOUNT(stf) = 0
+            STF_PSIZE(stf) = 0
+        }
+
 	if (acmode != NEW_COPY) {
 	    IM_NDIM(im) = STF_NAXIS(stf)		# IM_NDIM
 	    do ival = 1, IM_MAXDIM			# IM_LEN

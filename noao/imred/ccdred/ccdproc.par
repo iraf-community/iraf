@@ -23,6 +23,7 @@ dark,s,h,"",,,Dark count calibration image
 flat,s,h,"",,,Flat field images
 illum,s,h,"",,,Illumination correction images
 fringe,s,h,"",,,Fringe correction images
+minreplace,r,h,1.,,,Minimum flat field value
 scantype,s,h,"shortscan","shortscan|longscan",,Scan type (shortscan|longscan)
 nscan,i,h,1,1,,"Number of short scan lines
 "

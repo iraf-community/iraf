@@ -5,6 +5,6 @@ update:
 	$call update@apextract
 	$echo "---------------- TWODSPEC.LONGSLIT ----------------"
 	$call update@longslit
-	$echo "---------------- TWODSPEC.MULTISPEC ---------------"
-	$call update@multispec
+	#$echo "---------------- TWODSPEC.MULTISPEC ---------------"
+	#$call update@multispec
 	;

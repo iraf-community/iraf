@@ -24,12 +24,13 @@
 # Indefinite points are ignored.  The peak positions are returned in the
 # array x.
 
+
 int procedure find_peaks (data, x, npoints, contrast, separation, edge, nmax,
     threshold, debug)
 
 # Procedure parameters:
-double	data[npoints]		# Input data array
-double	x[npoints]		# Output peak position array
+real	data[npoints]		# Input data array
+real	x[npoints]		# Output peak position array
 int	npoints			# Number of data points
 real	contrast		# Maximum contrast between strongest and weakest
 int	separation		# Minimum separation between peaks
@@ -67,11 +68,11 @@ begin
 
 	# Allocate a working array y.
 	call smark (sp)
-	call salloc (y, npoints, TY_DOUBLE)
+	call salloc (y, npoints, TY_REAL)
 
 	# Reject the local maxima which do not satisfy the thresholds.
 	# The array y is set to the peak values of the remaining peaks.
-	nthreshold = find_threshold (data, x, Memd[y], nlmax,
+	nthreshold = find_threshold (data, x, Memr[y], nlmax,
 	    contrast, threshold, debug)
 
 	# Rank the peaks by peak value.
@@ -99,8 +100,8 @@ end
 
 int procedure find_local_maxima (data, x, npoints, debug)
 
-double	data[npoints]			# Input data array
-double	x[npoints]			# Output local maxima positions array
+real	data[npoints]			# Input data array
+real	x[npoints]			# Output local maxima positions array
 int	npoints				# Number of input points
 bool	debug				# Print debugging information?
 
@@ -134,21 +135,21 @@ bool procedure is_local_max (index, data, npoints)
 
 # Procedure parameters:
 int	index			# Index to test for local maximum
-double	data[npoints]		# Data values
+real	data[npoints]		# Data values
 int	npoints			# Number of points in the data vector
 
 int	i, j, nright, nleft
 
 begin
-	# INDEFD points cannot be local maxima.
-	if (IS_INDEFD (data[index]))
+	# INDEF points cannot be local maxima.
+	if (IS_INDEFR (data[index]))
 	    return (FALSE)
 
 	# Find the left and right indices where data values change and the
-	# number of points with the same value.  Ignore INDEFD points.
+	# number of points with the same value.  Ignore INDEF points.
 	nleft = 0
 	for (i = index - 1; i >= 1; i = i - 1) {
-	    if (!IS_INDEFD (data[i])) {
+	    if (!IS_INDEFR (data[i])) {
 		if (data[i] != data[index])
 		    break
 		nleft = nleft + 1
@@ -156,7 +157,7 @@ begin
 	}
 	nright = 0
 	for (j = index + 1; i <= npoints; j = j + 1) {
-	    if (!IS_INDEFD (data[j])) {
+	    if (!IS_INDEFR (data[j])) {
 		if (data[j] != data[index])
 		    break
 		nright = nright + 1
@@ -193,16 +194,16 @@ end
 
 int procedure find_threshold (data, x, y, npoints, contrast, threshold, debug)
 
-double	data[ARB]			# Input data values
-double	x[npoints]			# Input/Output peak positions
-double	y[npoints]			# Output peak data values
+real	data[ARB]			# Input data values
+real	x[npoints]			# Input/Output peak positions
+real	y[npoints]			# Output peak data values
 int	npoints				# Number of peaks input
 real	contrast			# Contrast constraint
 real	threshold			# Threshold constraint
 bool	debug				# Print debugging information?
 
 int	i, j, nthreshold
-double	minval, maxval, lcut
+real	minval, maxval, lcut
 
 begin
 	# Set the y array to be the values at the peak positions.
@@ -212,25 +213,25 @@ begin
 	}
 
 	# Determine the min and max values of the peaks.
-	call alimd (y, npoints, minval, maxval)
+	call alimr (y, npoints, minval, maxval)
 
 	# Set the threshold based on the max of the absolute threshold and the
-	# contrast.  Use arltd to set peaks below threshold to INDEFD.
-	lcut = max (double (threshold), double (contrast * maxval))
-	call arltd (y, npoints, lcut, INDEFD)
+	# contrast.  Use arlt to set peaks below threshold to INDEF.
+	lcut = max (real (threshold), real (contrast * maxval))
+	call arltr (y, npoints, lcut, INDEFR)
 
 	if (debug) {
 	    call printf ("  Highest peak value = %g.\n")
-		call pargd (maxval)
+		call pargr (maxval)
 	    call printf ("  Peak cutoff threshold = %g.\n")
-		call pargd (lcut)
+		call pargr (lcut)
 	    do i = 1, npoints {
-		if (IS_INDEFD (y[i])) {
+		if (IS_INDEFR (y[i])) {
 		    j = x[i]
 		    call printf (
 			"  Peak at column %d with value %g below threshold.\n")
 			call pargi (j)
-			call pargd (data[j])
+			call pargr (data[j])
 		}
 	    }
 	}
@@ -238,7 +239,7 @@ begin
 	# Determine the number of acceptable peaks & resort the x and y arrays.
 	nthreshold = 0
 	do i = 1, npoints {
-	    if (IS_INDEFD (y[i]))
+	    if (IS_INDEFR (y[i]))
 		next
 	    nthreshold = nthreshold + 1
 	    x[nthreshold] = x[i]
@@ -260,13 +261,13 @@ end
 # The rank array contains the indices of the peak positions in order from
 # the highest peak value to the lowest peak value.  Starting with
 # highest rank (rank[1]) all peaks of lower rank within separation
-# are marked by setting their positions to INDEFD.  The number of
+# are marked by setting their positions to INDEF.  The number of
 # unflaged peaks is returned.
 
 int procedure find_isolated (x, rank, npoints, separation, debug)
 
 # Procedure parameters:
-double	x[npoints]		# Positions of points
+real	x[npoints]		# Positions of points
 int	rank[npoints]		# Rank of peaks
 int	npoints			# Number of peaks
 int	separation		# Minimum allowed separation
@@ -277,14 +278,14 @@ int	nisolated
 
 begin
 	# Eliminate close neighbors.  The eliminated
-	# peaks are marked by setting their positions to INDEFD.
+	# peaks are marked by setting their positions to INDEF.
 	nisolated = 0
 	do i = 1, npoints {
-	    if (IS_INDEFD (x[rank[i]]))
+	    if (IS_INDEFR (x[rank[i]]))
 		next
 	    nisolated = nisolated + 1
 	    do j = i + 1, npoints {
-		if (IS_INDEFD (x[rank[j]]))
+		if (IS_INDEFR (x[rank[j]]))
 		    next
 		if (abs (x[rank[i]] - x[rank[j]]) < separation) {
 		    if (debug) {
@@ -293,7 +294,7 @@ begin
 			    call pargi (int (x[rank[j]]))
 			    call pargi (int (x[rank[i]]))
 		    }
-		    x[rank[j]] = INDEFD
+		    x[rank[j]] = INDEFR
 		}
 	    }
 	}
@@ -313,18 +314,18 @@ end
 #
 # The data values, data, peak positions, x, and their ranks, rank, are input.
 # The data values are used only in printing debugging information.
-# Peak positions previously eliminated are flaged by the value INDEFD.
+# Peak positions previously eliminated are flaged by the value INDEF.
 # The rank array contains the indices to the peak positions in order from
 # the highest peak value to the lowest peak value.
 # First all but the nmax highest ranked peaks (which have not been previously
-# eliminated) are eliminated by marking their positions with the value INDEFD.
+# eliminated) are eliminated by marking their positions with the value INDEF.
 # Then the remaining peaks are resorted to contain only the unflaged
 # peaks and the number of such peaks is returned.
 
 int procedure find_nmax (data, x, rank, npoints, nmax, debug)
 
-double	data[ARB]			# Input data values
-double	x[npoints]			# Peak positions
+real	data[ARB]			# Input data values
+real	x[npoints]			# Peak positions
 int	rank[npoints]			# Ranks of peaks
 int	npoints				# Number of input peaks
 int	nmax				# Max number of peaks to be selected
@@ -337,7 +338,7 @@ begin
 	if (nmax < npoints) {
 	    npeaks = 0
 	    do i = 1, npoints {
-	        if (IS_INDEFD (x[rank[i]]))
+	        if (IS_INDEFR (x[rank[i]]))
 		    next
 	        npeaks = npeaks + 1
 	        if (npeaks > nmax) {
@@ -347,17 +348,17 @@ begin
 		    "  Reject peak at column %d with rank %d and value %g.\n")
 			    call pargi (j)
 			    call pargi (i)
-			    call pargd (data[j])
+			    call pargr (data[j])
 		    }
-	            x[rank[i]] = INDEFD
+	            x[rank[i]] = INDEFR
 	        }
 	    }
 	}
 
-	# Eliminate INDEFD points and determine the number of spectra found.
+	# Eliminate INDEF points and determine the number of spectra found.
 	npeaks = 0
 	do i = 1, npoints {
-	    if (IS_INDEFD (x[i]))
+	    if (IS_INDEFR (x[i]))
 		next
 	    npeaks = npeaks + 1
 	    x[npeaks] = x[i]
@@ -368,7 +369,7 @@ end
 
 
 # COMPARE -- Compare procedure for sort used in FIND_PEAKS.
-# Larger values are indexed first.  INDEFD values are indexed last.
+# Larger values are indexed first.  INDEF values are indexed last.
 
 int procedure compare (index1, index2)
 
@@ -381,14 +382,14 @@ pointer	y
 common	/sort/ y
 
 begin
-	# INDEFD points are considered to be smallest possible values.
-	if (IS_INDEFD (Memd[y - 1 + index1]))
+	# INDEF points are considered to be smallest possible values.
+	if (IS_INDEFR (Memr[y - 1 + index1]))
 	    return (1)
-	else if (IS_INDEFD (Memd[y - 1 + index2]))
+	else if (IS_INDEFR (Memr[y - 1 + index2]))
 	    return (-1)
-	else if (Memd[y - 1 + index1] < Memd[y - 1 + index2])
+	else if (Memr[y - 1 + index1] < Memr[y - 1 + index2])
 	    return (1)
-	else if (Memd[y - 1 + index1] > Memd[y - 1 + index2])
+	else if (Memr[y - 1 + index1] > Memr[y - 1 + index2])
 	    return (-1)
 	else
 	    return (0)

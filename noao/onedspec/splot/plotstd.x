@@ -1,22 +1,22 @@
 include	<error.h>
 include	<gset.h>
+include	"../shdr.h"
 
 define	VLIGHT	2.997925e18
 
 # PLOT_STD -- Plot the flux values for a standard star on current screen
 
-procedure plot_std (gfd, w0, wpc, npts, fnu)
+procedure plot_std (sh, gfd, fnu)
 
+pointer	sh
 int	gfd
-real	w0
-real	wpc
-int	npts
 bool	fnu
 
 pointer	waves, bands, mags
 int	i, nwaves
-real	wend
+real	w1, w2
 real	fnuzero, clgetr()
+double	shdr_lw()
 
 begin
 	# Get calibration data.
@@ -34,10 +34,11 @@ begin
 	}
 
 	# Overplot boxes on current plot
-	wend = w0 + (npts - 1) * wpc
+	w1 = shdr_lw (sh, double(1))
+	w2 = shdr_lw (sh, double(SN(sh)))
 
 	do i = 1, nwaves
-	    if (Memr[waves+i-1] > w0 && Memr[waves+i-1] < wend)
+	    if (Memr[waves+i-1] > w1 && Memr[waves+i-1] < w2)
 		call plbox2 (gfd, Memr[waves+i-1]-Memr[bands+i-1]/2,
 		    Memr[mags+i-1], Memr[waves+i-1]+Memr[bands+i-1]/2, .015)
 

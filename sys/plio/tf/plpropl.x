@@ -45,8 +45,14 @@ begin
 	case PIX_SRC:
 	    if (src_maxval != 1)
 		call amovl (px_src[xs], px_dst[ds], npix)
-	    else
-		call argtl (px_src[xs], px_dst[ds], ceil, src_value, npix)
+	    else {
+		do i = 1, npix
+		    if (px_src[xs+i-1] > 0)
+			px_dst[ds+i-1] = src_value
+		    else
+			px_dst[ds+i-1] = 0
+	    }
+
 	    goto out_
 	case PIX_DST:
 	    return	# no-op
@@ -105,7 +111,11 @@ begin
 	    call smark (sp)
 	    call salloc (src, npix, TY_LONG)
 
-	    call argtl (px_src[xs], Meml[src], ceil, src_value, npix)
+	    do i = 1, npix
+		if (px_src[xs+i-1] > 0)
+		    Meml[src+i-1] = src_value
+		else
+		    Meml[src+i-1] = 0
 
 	    switch (opcode) {
 	    case PIX_NOTSRC:
@@ -159,7 +169,7 @@ out_
 
 	if (dst_maxval == 1) {
 	    data = 1
-	    call argtl (px_dst[ds], px_dst[ds], ceil, data, npix)
+	    call argtl (px_dst[ds], npix, ceil, data)
 	} else if (dst_maxval > 1) {
 	    data = dst_maxval
 	    call aandkl (px_dst[ds], data, px_dst[ds], npix)

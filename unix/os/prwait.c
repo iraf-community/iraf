@@ -110,7 +110,6 @@ int	pid;
 int	*inchan, *outchan;
 {
 	register struct proctable *pr;
-	int	waitpid, exit_status, error_code;
 	struct	proctable *pr_findpid();
 
 	/* Lookup process in table.  Return ERR if there is no entry.

@@ -1,4 +1,4 @@
-.help ccdproc Feb88 noao.imred.ccdred
+.help ccdproc Oct90 noao.imred.ccdred
 .ih
 NAME
 ccdproc -- Process CCD images
@@ -112,6 +112,13 @@ Fringe correction images.  The CCD image type is not checked for these
 images and they take precedence over any fringe correction images given
 in the input list.  The fringe image with the same subset as the
 input image being processed is selected.
+.le
+.ls minreplace = 1.
+When processing flat fields, pixel values below this value (after
+all other processing such as overscan, zero, and dark corrections) are
+replaced by this value.  This allows flat fields processed by \fBccdproc\fR
+to be certain to avoid divide by zero problems when applied to object
+images.
 .le
 .ls scantype = "shortscan"
 Type of scan format used in creating the CCD images.  The modes are:
@@ -389,7 +396,10 @@ part is included in computing the mean which will affect the level
 of images processed with this flat field.  Note that there is no check for
 division by zero in the interest of efficiency.  If division by zero
 does occur a fatal error will occur.  The flat field can be fixed by
-replacing small values using a task such as \fBimreplace\fR.
+replacing small values using a task such as \fBimreplace\fR or
+during processing using the \fIminreplace\fR parameter.  Note that the
+\fIminreplace\fR parameter only applies to flat fields processed by
+\fBccdproc\fR.
 .sh
 7. Illumcor
 CCD images processed through the flat field calibration may not be
@@ -587,7 +597,10 @@ efficiency and accessing a line at a time does not mean that image
 lines are read from disk a line at a time.  Given the input line, the
 calibration images, the overscan vector, and the various scale factors
 a special data path for each combination of corrections is used to
-perform all the processing in the most efficient manner.
+perform all the processing in the most efficient manner.  If the
+image is a flat field any pixels less than the \fIminreplace\fR
+parameter are replaced by that minimum value.  Also a mean is
+computed for the flat field and stored as the CCDMEAN keyword.
 .le
 .ls (13)
 The input image is deleted or renamed to a backup image.  The temporary

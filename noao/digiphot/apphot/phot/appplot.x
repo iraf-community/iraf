@@ -18,7 +18,7 @@ int	cier		# centering error
 int	sier		# sky fitting error
 int	pier		# photometry error
 pointer	gd		# graphics stream
-int	makeplot	# make a plot
+int	makeplot	# make a plot ?
 
 int	apert, nx, ny
 pointer	buf, sp, str, r, gt
@@ -74,7 +74,7 @@ begin
 
 	# Label and annotate the plot.
 	call ap_ppset (gd, gt, ap, cier, sier, pier, rmin, rmax, imin, imax)
-	call ap_ppannotate (gd, gt, ap, rmin, rmax, imin, imax)
+	call ap_ppannotate (gd, ap, rmin, rmax, imin, imax)
 
 	# Plot the coordinates.
 	call ap_plotrad (gd, gt, Memr[r], Memr[buf], nx * ny, "plus")
@@ -94,14 +94,14 @@ end
 
 procedure ap_ppset (gd, gt, ap, cier, sier, pier, xmin, xmax, ymin, ymax)
 
-pointer	gd		# graphics stream
-pointer	gt		# gtools pointer
-pointer	ap		# apphot pointer
-int	cier		# centering error
-int	sier		# sky fitting error
-int	pier		# photometry error
-real	xmin, xmax	# minimum and maximum radial distance
-real	ymin, ymax	# min and max of x axis
+pointer	gd		# the graphics stream
+pointer	gt		# the gtools pointer
+pointer	ap		# the apphot pointer
+int	cier		# the centering error (unused)
+int	sier		# the sky fitting error (unused)
+int	pier		# the photometry error (unused)
+real	xmin, xmax	# the minimum and maximum radial distance
+real	ymin, ymax	# the minimum and maximum of the y axes
 
 int	fd, naperts
 pointer	sp, str, title, temp
@@ -190,17 +190,16 @@ end
 
 # AP_PPANNOTATE -- Procedure to annotate the radial plot in phot.
 
-procedure ap_ppannotate (gd, gt, ap, xmin, xmax, ymin, ymax)
+procedure ap_ppannotate (gd, ap, xmin, xmax, ymin, ymax)
 
 pointer	gd		# graphics stream
-pointer	gt		# gtools stream
 pointer	ap		# apphot structure
-real	xmin, xmax	# min and max of x axis
-real	ymin, ymax	# min and max of y axis
+real	xmin, xmax	# minimum and maximum of the x axis
+real	ymin, ymax	# minimum and maximum of the y axis
 
 int	i, naperts
 pointer	sp, str, temp
-real	sigma, annulus, dannulus, skyval, skysigma
+real	annulus, dannulus, skyval, skysigma
 int	apstati()
 real	apstatr ()
 
@@ -211,7 +210,6 @@ begin
 	call salloc (temp, naperts, TY_REAL)
 
 	# Define some temporary variables
-	sigma = apstatr (ap, SKYSIGMA)
 	annulus = apstatr (ap, SCALE) * apstatr (ap, ANNULUS)
 	dannulus = annulus + apstatr (ap, SCALE) * apstatr (ap, DANNULUS)
 

@@ -67,7 +67,9 @@ begin
 		call ttyclear (STDOUT, tty)
 		call ttycdes (tty)
 	    }
-	    call cf_errors$t (ic, gt, cv, x, y, wts, nvalues)
+
+	    call ic_show (ic, "STDOUT", gt)
+	    call ic_vshow$t (ic, "STDOUT", cv, x, y, wts, nvalues, gt)
 
 	    if (ofmt == VERBOSE_OUTPUT) {
 		call printf ("\n\t    X     \t     Yc   \t     Y    \t     W\n")
@@ -98,7 +100,7 @@ $if (datatype == r)
 $else
 	call $tcvfree (cv)
 $endif
-	call ic_close$t (ic)
+	#call ic_close$t (ic)
 end
 
 
@@ -124,56 +126,6 @@ begin
 		call parg$t (wts[i])
 	}
 end
-
-
-# CF_ERRORS -- Calculate and print errors of fit.
-
-procedure cf_errors$t (ic, gt, cv, x, y, wts, npts)
-
-pointer	ic		# ICFIT pointer
-pointer	gt		# Graphics tools pointer
-pointer	cv		# Curfit pointer
-PIXEL	x[ARB]		# X data values
-PIXEL	y[ARB]		# Y data values
-PIXEL	wts[ARB]	# Weights
-int	npts		# Number of data points
-
-int	i, ncoeffs
-PIXEL	chisqr
-pointer	sp, fit, coeffs, errors, str
-
-int	$tcvstati()
-
-begin
-	# Determine the number of coefficients and allocate memory.
-	ncoeffs = $tcvstati (cv, CVNCOEFF)
-	call smark (sp)
-	call salloc (coeffs, ncoeffs, TY_PIXEL)
-	call salloc (errors, ncoeffs, TY_PIXEL)
-	call salloc (fit, npts, TY_PIXEL)
-	call salloc (str, SZ_LINE, TY_CHAR)
-
-	# Use icfit output routines first
-	call ic_show   (ic, "STDOUT", gt)
-	call ic_errors$t (ic, "STDOUT", cv, x, y, wts, npts)
-
-	# Get some more information
-	call $tcvcoeff (cv, Mem$t[coeffs], ncoeffs)
-	call $tcvvector (cv, x, Mem$t[fit], npts)
-	call $tcverrors (cv, y, wts, Mem$t[fit], chisqr, Mem$t[errors])
-
-	call printf ("\tcoefficent\t  error\n")
-	do i = 1, ncoeffs {
-	    call printf (" %d\t%14.7e\t%14.7e\n")
-		call pargi (i)
-		call parg$t (Mem$t[coeffs+i-1])
-		call parg$t (Mem$t[errors+i-1])
-	}
-
-	# Free allocated memory.
-	call sfree (sp)
-end
-
 
 # IM_PROJECTION -- Given an image section of arbitrary dimension, compute
 # the projection along a single axis by taking the average over the other

@@ -1,0 +1,16 @@
+images,s,a,,,,"Images"
+observatory,s,h,)_.observatory,,,"Observatory of observation"
+date,s,h,"date-obs",,,"Date of observation keyword"
+time,s,h,"ut",,,"Time of observation keyword"
+exposure,s,h,"exptime",,,"Exposure time keyword"
+ra,s,h,"ra",,,"Right ascension (hours) keyword"
+dec,s,h,"dec",,,"Declination (degrees) keyword"
+epoch,s,h,"epoch",,,"Epoch (years) keyword
+"
+jd,s,h,"jd",,,"Output Julian date keyword"
+hjd,s,h,"hjd",,,"Output Helocentric Julian date keyword"
+ljd,s,h,"ljd",,,"Output local Julian date keyword
+"
+utdate,b,h,yes,,,"Is observation date UT?"
+uttime,b,h,yes,,,"Is observation time UT?"
+listonly,b,h,no,,,"List only without modifying images?"

@@ -11,11 +11,12 @@
 
 text|output device has no capabilities:co#80:li#24:
 textw|wide format text device:co#132:li#60:
+xirafhelp|X11 iraf help client:co#80:li#0:so=\020:se=\021:
 vt640|vt100 with Retrographics:\
 	:gd:cl=50^]\E^L^X:is=^]^X\E[1;24r\E[24;1H:tc=vt100:
 vt35|vt100 with 35 lines (apollo DM):li#35:tc=vt100:
 
-imagena|i240|imagen|	:tc=simga:
+#imagena|i240|imagen|	:tc=simga:
 imagend|i300|		:tc=simgd:
 versatec|ver|vup|	:tc=sver:
 apple|lw|lw1|		:tc=sapple1:
@@ -23,8 +24,13 @@ apple2|lw2|		:tc=sapple2:
 apple3|lw3|		:tc=sapple3:
 apple4|lw4|		:tc=sapple4:
 nlw|lw5|		:tc=sapple5:
+apple6|lw6|		:tc=sapple6:
 apple7|lw7|tops|	:tc=sapple7:
+apple8|lw8|		:tc=sapple8:
+lw9|			:tc=sapple9:
+lw10|			:tc=sapple10:
 vmsprint|vmslp|		:tc=svprint:
+hplj|			:tc=uhplj:
 lpr|			:tc=glpr:
 enscript|		:tc=genscript:
 
@@ -73,12 +79,29 @@ uapple5|Apple laser writer NT on ORION running Transcript Software:\
 uapple7|Apple laser writer in the Solar office:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=apple,/tmp/asfXXXXXX,!{ lpr -Plw7 $F; rm $F; }:
+uhplj|HP LaserJet printer on default device:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=apple,/tmp/asfXXXXXX,!{ lpr -Plw $F; rm $F; }:
 lw1p2|two landscape pages via enscript to lw1:co#80:li#66:os:pt:ta^I:\
         :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw1 $F; rm $F; }:
 lw2p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
         :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw2 $F; rm $F; }:
+lw3p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw3 $F; rm $F; }:
+lw4p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw4 $F; rm $F; }:
 lw5p2|two landscape pages via enscript to lw5:co#80:li#66:os:pt:ta^I:\
         :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw5 $F; rm $F; }:
+lw6p2|two landscape pages via enscript to lw5:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw6 $F; rm $F; }:
+lw7p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw7 $F; rm $F; }:
+lw9p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw9 $F; rm $F; }:
+lw10p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw10 $F; rm $F; }:
+
+
 
 # The following 2 entries were submitted by Joe Harrington, MIT Planetary
 # Science Group.  <jh@athena.mit.edu> 7 March 1989.  The first sends the
@@ -118,9 +141,20 @@ sapple4|Apple laser writer on the SUN Octans w/ TransScript:\
 sapple5|sapple|Apple laser writer NT on the SUN Orion w/ TransScript:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw5 $F; rm $F; }:
+sapple6|laser writer NT on the SUN Argo w/ TransScript:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw6 $F; rm $F; }:
 sapple7|Apple laser writer in the Solar office:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw7 $F; rm $F; }:
+sapple8|Apple laser writer on the SUN Octans w/ TransScript:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw8 $F; rm $F; }:
+sapple9|Apple laser writer on Aquila:co#80:li#66:os:pt:ta^I:\
+        :DD=lpnode!apple,/tmp/asfXXXXXX,!{ imprintlw9 -n $F; rm $F; }:
+sapple10|SPARCprinter on Solitaire:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw10 $F; rm $F; }:
 svprint|standard VMS host printer from a UNIX node:co#128:li#60:\
 	:DD=vmsprint,/tmp/vsfXXXXXX,!{ lpr -Pvmslp $F; rm $F; }:
 
@@ -310,7 +344,7 @@ vi102|Visual 102 in ANSI emulation mode:\
 	:gd:li#24:cl=^_^[^L^X\E[;H\E[2J:tc=vt100-am:
 vi501|Visual 500 Plus in vt100 mode:\
 	:ku=\E[A:kd=\E[B:kr=\E[C:kl=\E[D:\
-	:gd:li#33:cl=^_^[^L^X\E[;H\E[2J:tc=vt100-am:
+	:gd:xn@:li#33:cl=^_^[^L^X\E[;H\E[2J:tc=vt100-am:
 
 # Steward Observatory, University of Arizona, 1/20/87 Skip Schaller
 V5|vi500|Visual 500:tc=vi500dg:
@@ -360,11 +394,15 @@ perigs2|peri4014|Pericom Monterey MG200 Graphics State 2:\
 peri4014|peri4014|Pericom Monterey MG200 4014 mode:\
 	:cl=50\E[H\E[2J^]\E^L^X:gd:tc=vt100:
 
+# Pericom Monterey MG200 terminal with DG Dasher 200 emulation for text. 
+# Submitted by Skip Schaller, 4-91.
+pericomdg|Pericom Monterey MG200 with DG Dasher 200 emulation for text:\
+	:cl=50^L^^\072^]\E^L^X\E.:gd:tc=d200:
 
 414a|cit414a|CIT-414a graphics terminal:\
 	:gd:tc=vt100:
 
-wyse75|wyse 75|wyse:\
+wyse75|wyse|wyse 75|wyse (cleveland codonics?):\
 	:gd=wyse:al=\E[L:am@:dl=\E[M:dc=7\E[P:ei=\E[4l:im=\E[4h:ip=7:\
 	:vb=\E[?5h\200\200\200\200\200\200\200\200\200\200\200\E[?5l:\
 	:tc=vt100:

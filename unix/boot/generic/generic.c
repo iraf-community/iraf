@@ -159,10 +159,14 @@ char	*argv[];
 		    strcat (fname, extension);
 		}
 
-		if (clobber == NO && access(fname,0) == 0) {
-		    fprintf (stderr, "File `%s' already exists\n", fname);
-		    continue;
-		} else if ((fp = fopen (fname, "w")) == NULL) {
+		if (access(fname,0) == 0) {
+		    if (clobber == NO) {
+			fprintf (stderr, "File `%s' already exists\n", fname);
+			continue;
+		    } else
+			unlink (fname);
+		}
+		if ((fp = fopen (fname, "w")) == NULL) {
 		    fprintf (stderr, "Cannot open file `%s'\n", fname);
 		    continue;
 		}
@@ -322,7 +326,7 @@ copy_string()
 copy_comment()
 {
 	char	ch;
-	int	flag;
+	int	flag = 0;
 
 	outstr (yytext);
 
@@ -607,7 +611,7 @@ do_endif()		/* $endif statement */
  */
 evaluate_expr()
 {
-	char	ch, *p, *index(); 
+	char	ch=NULL, *p, *index(); 
 	int	lpar, size1, size2, op;
 	int	relop(), strncmp(), nextch();
 
@@ -622,7 +626,7 @@ evaluate_expr()
 	nextch();
 
 	for (p=expr_buf, lpar=1;  lpar > 0 && (*p = input()) != EOF;  p++)
-	    switch (*p) {
+	    switch (ch = *p) {
 	    case '(':
 		lpar++;
 		break;
@@ -631,7 +635,6 @@ evaluate_expr()
 		    *p = EOS;
 		break;
 	    case '\n':
-		ch = '\n';
 		goto err;
 	    }
 		
@@ -677,8 +680,9 @@ err:	    fprintf (stderr, "Syntax error in $if statement\n");
 		    ;
 		unput(ch);
 	    }
-	    return (ERR);
 	}
+
+	return (ERR);
 }
 
 

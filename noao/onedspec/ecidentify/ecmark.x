@@ -11,6 +11,7 @@ int	pix
 real	x, y
 real	mx, my, x1, x2, y1, y2, tick, gap
 pointer	sp, format, label
+double	mw_c1trand()
 
 define	TICK	.03	# Tick size in NDC
 define	GAP	.02	# Gap size in NDC
@@ -23,18 +24,19 @@ begin
 	if ((x < min (x1, x2)) || (x > max (x1, x2)))
 	    return
 
+	pix = mw_c1trand (EC_PL(ec), PIX(ec,feature))
+	pix = max (1, min (pix, EC_NPTS(ec) - 1))
+
 	call smark (sp)
 	call salloc (format, SZ_LINE, TY_CHAR)
 	call salloc (label, SZ_LINE, TY_CHAR)
 	switch (EC_FTYPE(ec)) {
 	case EMISSION:
-	    pix = min (int (PIX(ec,feature)), EC_NPTS(ec) - 1)
 	    y = max (IMDATA(ec,pix), IMDATA(ec,pix+1))
 	    tick = TICK
 	    gap = GAP
 	    call strcpy ("u=180;h=c;v=b;s=0.5", Memc[format], SZ_LINE)
 	case ABSORPTION:
-	    pix = min (int (PIX(ec,feature)), EC_NPTS(ec) - 1)
 	    y = min (IMDATA(ec,pix), IMDATA(ec,pix+1))
 	    tick = -TICK
 	    gap = -GAP

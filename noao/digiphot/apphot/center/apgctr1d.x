@@ -1,8 +1,9 @@
-include "../lib/nlfit.h"
+include <math/nlfit.h>
 include "../lib/center.h"
 
-define	NPARS	4
-define	TOL	0.001
+define	NPARS	4		# the total number of parameters
+define	NAPARS	3		# the total number of active parameters
+define	TOL	0.001		# the tolerance for convergence
 
 # AP_GCTR1D -- Procedure to compute the x and y centers from the 1D marginal
 # distributions using 1D Gaussian fits. Three parameters are fit for each
@@ -21,21 +22,23 @@ real	xerr, yerr		# estimate of centering error
 
 extern	cgauss1d, cdgauss1d
 int	i, minel, maxel, xier, yier, npar, npts
-pointer	sp, x, xm, ym, w, list, nl
-real	chisqr, p[NPARS], dp[NPARS]
+pointer	sp, x, xm, ym, w, fit, list, nl
+real	chisqr, variance, p[NPARS], dp[NPARS]
+int	locpr()
 
 begin
 	# Check the number of points.
-	if (nx < NPARS || ny < NPARS)
+	if (nx < NAPARS || ny < NAPARS)
 	    return (AP_CTR_NTOO_SMALL)
 	npts = max (nx, ny)
 
 	call smark (sp)
-	call salloc (list, NPARS, TY_INT)
+	call salloc (list, NAPARS, TY_INT)
 	call salloc (xm, nx, TY_REAL)
 	call salloc (ym, ny, TY_REAL)
 	call salloc (x, npts, TY_REAL)
 	call salloc (w, npts, TY_REAL)
+	call salloc (fit, npts, TY_REAL)
 	do i = 1, npts
 	    Memr[x+i-1] = i
 
@@ -56,15 +59,16 @@ begin
 	p[3] = sigma ** 2
 
 	# Compute the x center and error.
-	call nlinit (nl, cgauss1d, cdgauss1d, p, dp, NPARS, Memi[list],
-	    NPARS - 1, TOL, maxiter)
-	call nlfit (nl, Memr[x], Memr[x], Memr[xm], Memr[w], nx, nx, 1,
-	    WTS_UNIFORM, xier)
-	call nlpget (nl, p, npar)
-	call nlerrors (nl, WTS_UNIFORM, chisqr, dp)
-	call nlfree (nl)
+	call nlinitr (nl, locpr (cgauss1d), locpr (cdgauss1d), p, dp, NPARS,
+	    Memi[list], NAPARS, TOL, maxiter)
+	call nlfitr (nl, Memr[x], Memr[xm], Memr[w], nx, 1, WTS_UNIFORM, xier)
+	call nlvectorr (nl, Memr[x], Memr[fit], nx, 1)
+	call nlpgetr (nl, p, npar)
+	call nlerrorsr (nl, Memr[xm], Memr[fit], Memr[w], nx, variance,
+	    chisqr, dp)
+	call nlfreer (nl)
 	xc = p[2]
-	xerr = dp[2]
+	xerr = dp[2] / sqrt (real (nx))
 
 	# Initialize the y fit parameters.
 	call ap_alimr (Memr[ym], ny, p[4], p[1], minel, maxel)
@@ -73,15 +77,16 @@ begin
 	p[3] = sigma ** 2
 
 	# Fit the y marginal.
-	call nlinit (nl, cgauss1d, cdgauss1d, p, dp, NPARS, Memi[list],
-	    NPARS - 1, TOL, maxiter)
-	call nlfit (nl, Memr[x], Memr[x], Memr[ym], Memr[w], ny, ny, 1,
-	    WTS_UNIFORM, yier)
-	call nlpget (nl, p, npar)
-	call nlerrors (nl, WTS_UNIFORM, chisqr, dp)
-	call nlfree (nl)
+	call nlinitr (nl, locpr (cgauss1d), locpr (cdgauss1d), p, dp, NPARS,
+	    Memi[list], NAPARS, TOL, maxiter)
+	call nlfitr (nl, Memr[x], Memr[ym], Memr[w], ny, 1, WTS_UNIFORM, yier)
+	call nlvectorr (nl, Memr[x], Memr[fit], ny, 1)
+	call nlpgetr (nl, p, npar)
+	call nlerrorsr (nl, Memr[ym], Memr[fit], Memr[w], ny, variance,
+	    chisqr, dp)
+	call nlfreer (nl)
 	yc = p[2]
-	yerr = dp[2]
+	yerr = dp[2] / sqrt (real (ny))
 
 	# Return the appropriate error code.
 	call sfree (sp)

@@ -54,8 +54,7 @@ begin
 	    call ap_nscolon (ap, im, out, stid, cmdstr, newcenterbuf,
 	        newcenter, newskybuf, newsky, newbuf, newfit)
 	else
-	    call ap_rpimcolon (ap, out, stid, cmdstr, newcenterbuf, newcenter,
-	        newskybuf, newsky, newbuf, newfit)
+	    call ap_rpimcolon (ap, cmdstr)
 
 	call sfree (sp)
 end
@@ -63,16 +62,10 @@ end
 
 # AP_RPIMCOLON -- Show/set quantities which are not radprof parameters.
 
-procedure ap_rpimcolon (ap, out, stid, cmdstr, newcenterbuf, newcenter,
-	newskybuf, newsky, newbuf, newfit)
+procedure ap_rpimcolon (ap, cmdstr)
 
 pointer	ap			# pointer to the apphot structure
-int	out			# output file descriptor
-int	stid			# stellar id of output file
 char	cmdstr[ARB]		# command string
-int	newcenterbuf, newcenter	# centering parameters
-int	newskybuf, newsky	# skyfitting parameters
-int	newbuf, newfit		# magnitude parameters
 
 bool	bval
 int	ncmd

@@ -47,47 +47,49 @@ extern int (*opcodetbl[])();
 #define	EXEC		20
 
 #define FSCAN		21
-#define	GE		22
-#define	GOTO		23
-#define	GETPIPE		24
-#define	GT		25
+#define FSCANF		22
+#define	GE		23
+#define	GOTO		24
+#define	GETPIPE		25
 
-#define	IMMED		26
-#define	INDIRABSSET	27
-#define	INDIRPOSSET	28
-#define INDXINCR	29
-#define	INSPECT		30
+#define	GT		26
+#define	IMMED		27
+#define	INDIRABSSET	28
+#define	INDIRPOSSET	29
+#define INDXINCR	30
 
-#define	INTRINSIC	31
-#define	LE		32
-#define	LT		33
-#define	MUL		34
-#define	MULASSIGN	35
+#define	INSPECT		31
+#define	INTRINSIC	32
+#define	LE		33
+#define	LT		34
+#define	MUL		35
 
-#define	NE		36
-#define	NOT		37
-#define	OR		38
-#define	OSESC		39
-#define	POSARGSET	40
+#define	MULASSIGN	36
+#define	NE		37
+#define	NOT		38
+#define	OR		39
+#define	OSESC		40
 
-#define	POW		41
-#define	PRINT		42
-#define	PUSHCONST	43
-#define	PUSHINDEX	44
-#define	PUSHPARAM	45
+#define	POSARGSET	41
+#define	POW		42
+#define	PRINT		43
+#define	PUSHCONST	44
+#define	PUSHINDEX	45
 
-#define	REDIR		46
-#define	REDIRIN		47
-#define	RMPIPES		48
-#define	RETURN		49
-#define	SCAN		50
+#define	PUSHPARAM	46
+#define	REDIR		47
+#define	REDIRIN		48
+#define	RMPIPES		49
+#define	RETURN		50
 
-#define	SUB		51
-#define	SUBASSIGN	52
-#define	SWITCH		53
-#define	SWOFF		54
-#define	SWON		55
+#define	SCAN		51
+#define	SCANF		52
+#define	SUB		53
+#define	SUBASSIGN	54
+#define	SWITCH		55
 
-#define	FIXLANGUAGE	56
-#define	GSREDIR		57
-#define	CATASSIGN	58
+#define	SWOFF		56
+#define	SWON		57
+#define	FIXLANGUAGE	58
+#define	GSREDIR		59
+#define	CATASSIGN	60

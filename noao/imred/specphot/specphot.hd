@@ -1,6 +1,0 @@
-# Help directory for the SPECPHOT package.
-
-$doc	=	"./doc/"
-
-revisions	sys=Revisions
-#Tutorial	hlp=doc$Tutorial.hlp

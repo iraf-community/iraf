@@ -1,5 +1,9 @@
 .help revisions Jun88 pkg.xtools.ranges
 .nf
+xtools$ranges/rgranges.x
+xtools$ranges/rgxranges.gx
+    Added @file capability.  Rewrote the parsing logic.  (10/9/91, Valdes)
+
 xtools$ranges/rgwtbin.gx
     At least one point from each sample region must be included regardless
     of the size of average.  (6/14/89, Valdes)

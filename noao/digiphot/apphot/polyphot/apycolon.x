@@ -56,7 +56,7 @@ begin
 	    call ap_yycolon (ap, pl, out, stid, ptid, ltid, cmdstr, newmagbuf,
 	        newmag)
 	else
-	    call ap_yimcolon (ap, out, stid, cmdstr)
+	    call ap_yimcolon (ap, cmdstr)
 
 	call sfree (sp)
 end
@@ -64,11 +64,9 @@ end
 
 # AP_YIMCOLON -- Procedure to process remaining polyphot commands which 
 
-procedure ap_yimcolon (ap, out, stid, cmdstr)
+procedure ap_yimcolon (ap, cmdstr)
 
 pointer	ap			# pointer to the apphot structure
-int	out			# output file descriptor
-int	stid			# file sequence number
 char	cmdstr[ARB]		# command string
 
 int	ncmd
@@ -132,7 +130,7 @@ int	stid		# output file sequence number
 int	ptid		# polygon file sequence number
 int	ltid		# coords file sequence number
 char	cmdstr[ARB]	# command string
-int	newmagbuf	# new aperture buffers
+int	newmagbuf	# new aperture buffers (unused)
 int	newmag		# compute new magnitudes
 
 bool	bval

@@ -3,6 +3,8 @@
 set	pkglibs		= "noao$lib/"
 set	noaobin		= "noao$bin(arch)/"
 set	noaolib		= "noao$lib/"
+set	onedstds	= "noaolib$onedstds/"
+set	linelists	= "noaolib$linelists/"
 
 set	artdata		= noao$artdata/
 set	astrometry	= noao$astrometry/
@@ -11,11 +13,11 @@ set	digiphot	= noao$digiphot/
 set	focas		= noao$focas/
 set	imred		= noao$imred/
 set	mtlocal		= noao$mtlocal/
+set	nobsolete	= noao$nobsolete/
+set	nproto		= noao$nproto/
 set	onedspec	= noao$onedspec/
-set	proto		= noao$proto/
+set	rv		= noao$rv/
 set	surfphot	= noao$surfphot/
 set	twodspec	= noao$twodspec/
-
-set	apphot		= digiphot$apphot/
 
 keep

@@ -413,7 +413,7 @@ begin
 	call gscur (gd, apstatr (ap, SCALE) * (apstatr (ap, ANNULUS) +
 	    apstatr (ap, DANNULUS)), (imin + imax) / 2.0)
 	stat = clgcur ("cursor", xjunk, yjunk, wcs, key, Memc[cmd], SZ_LINE)
-	if (stat == EOF || (xjunk / scale < annulus))
+	if (stat == EOF || (xjunk / scale < annulus) || xjunk > rmax)
 	    dannulus = apstatr (ap, DANNULUS)
 	else
 	    dannulus = (xjunk / scale - annulus)

@@ -1,0 +1,81 @@
+# Observatory Parameters.  Taken from the Almanac.
+#
+# Observatories wishing to be added or make changes in the default
+# distributed database should send information to iraf@noao.edu.
+
+observatory = "kpno"
+	name = "Kitt Peak National Observatory"
+	longitude = 111:36.0
+	latitude = 31:58.8
+	altitude = 2120.
+	timezone = 7
+
+observatory = "ctio"
+	name = "Cerro Tololo Interamerican Observatory"
+	longitude = 70.815
+	latitude = -30.16527778
+	altitude = 2215.
+	timezone = 4
+
+observatory = "eso"
+	name = "European Southern Observatory"
+	longitude = 70:43.8
+	latitude = -29:15.4
+	altitude = 2347
+	timezone = 4
+
+observatory = "lick"
+	name = "Lick Observatory"
+	longitude = 121:38.2
+	latitude = 37:20.6
+	altitude = 1290
+	timezone = 6
+
+observatory = "mmto"
+	name = "Multiple Mirror Telescope Observatory"
+	longitude = 110:53.1
+	latitude = 31:41.3
+	altitude = 2600
+	timezone = 7
+
+observatory = "mmt"
+	name = "Whipple Observatory"
+	longitude = 110:53.1
+	latitude = 31.41.3
+	altitude = 2608
+	timezone = 7
+
+observatory = "cfht"
+	name = "Canada-France-Hawaii Telescope"
+	longitude = 155:28.3
+	latitude = 19:49.6
+	altitude = 4215
+	timezone = 10
+
+observatory = "lapalma"
+	name = "Roque de los Mucachos, La Palma"
+	longitude = 17:52.8
+	latitude = 28:45.5
+	altitude = 2327
+
+observatory = "mso"
+        name = "Mt. Stromlo Observatory"
+        longitude = 210:58:32.4
+        latitude = -35:19:14.34
+        altitude = 767
+        timezone = -10
+
+observatory = "sso"
+        name = "Siding Spring Observatory"
+        longitude = 210:56:19.70
+        latitude = -31:16:24.10
+        altitude = 1149
+        timezone = -10
+
+observatory = "aat"
+        name = "Anglo-Australian Observatory"
+        longitude = 210:56:2.09
+        latitude = -31:16:37.34
+        altitude = 1164
+        timezone = -10
+

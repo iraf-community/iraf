@@ -11,6 +11,8 @@
 #define	SZ_VALUE	SZ_COMMAND
 #define	MAXLEV		8
 #define	PKGLIBS		"pkglibs"
+#define	IRAFARCH	"IRAFARCH"
+#define	ARCH		"arch"
 
 extern	char *_os_getenv();
 extern	char *os_getenv();
@@ -29,7 +31,6 @@ extern	int bdebug;
 loadpkgenv (pkg)
 char	*pkg;
 {
-	char	osfn[SZ_PATHNAME+1];
 	char	vfn[SZ_PATHNAME+1];
 	char	pkglibs[SZ_COMMAND+1];
 	char	newlibs[SZ_COMMAND+1];
@@ -94,6 +95,7 @@ _envinit()
 {
 	static	int initialized = 0;
 	char	osfn[SZ_PATHNAME+1], *hlib;
+	char	irafarch[SZ_PATHNAME+1];
 
 	if (initialized++)
 	    return;
@@ -108,6 +110,22 @@ _envinit()
 
 	ENVINIT();
 	loadenv (osfn);
+
+	/* If the variable "IRAFARCH" is defined and "arch" is not, add
+	 * a definition for the latter.  "arch" is used to construct
+	 * pathnames but the HSI architecture support requires only that
+	 * IRAFARCH be predefined.
+	 */
+	if (_os_getenv (IRAFARCH, irafarch, SZ_PATHNAME))
+	    if (!_os_getenv (ARCH, osfn, SZ_PATHNAME)) {
+		XCHAR   x_name[SZ_PATHNAME+1];
+		XCHAR   x_value[SZ_PATHNAME+1];
+
+		sprintf (osfn, ".%s", irafarch);
+		os_strupk (ARCH, x_name, SZ_PATHNAME);
+		os_strupk (osfn, x_value, SZ_PATHNAME);
+		ENVRESET (x_name, x_value);
+	    }
 }
 
 

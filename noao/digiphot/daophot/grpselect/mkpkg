@@ -1,0 +1,14 @@
+# GRPSELECT task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	dpsgroup.x	<tbset.h>		../lib/daophotdef.h       \
+			../lib/apsel.h
+	dpwrtselect.x	../lib/apsel.h		../lib/daophot.h          \
+			../lib/daophotdef.h
+	t_grpselect.x	<fset.h> 		../lib/daophot.h
+	;

@@ -25,8 +25,10 @@
  * all write to stderr.
  */
 
-extern char *nullstr;
-extern int cldebug;
+extern	char *nullstr;
+extern	int cldebug;
+static	dd_f();
+
 
 /* D_STACK -- Go through the instruction stack, starting at locpc, printing
  * what is found until END opcode discovered.  If ss > 0, just go through ss
@@ -76,7 +78,9 @@ op:
 			    if ((op->o_type & OT_BASIC) == OT_STRING)
 				eprintf ("`");
 			    fprop (stderr, op);
-			    eprintf ("'\n");
+			    if ((op->o_type & OT_BASIC) == OT_STRING)
+				eprintf ("'");
+			    eprintf ("\n");
 			}
 			break;
 
@@ -94,6 +98,7 @@ op:
 		case EQ:	 eprintf ("eq\n"); break;
 		case EXEC:	 eprintf ("exec\n"); break;
 		case FSCAN:	 eprintf ("fscan\n"); break;
+		case FSCANF:	 eprintf ("fscanf\n"); break;
 		case GE:	 eprintf ("ge\n"); break;
 		case GETPIPE:	 eprintf ("getpipe\n"); break;
 		case GT:	 eprintf ("gt\n"); break;
@@ -110,6 +115,7 @@ op:
 		case REDIRIN:	 eprintf ("redirin\n"); break;
 		case RETURN:	 eprintf ("return\n"); break;
 		case SCAN:	 eprintf ("scan\n"); break;
+		case SCANF:	 eprintf ("scanf\n"); break;
 		case SUB:	 eprintf ("sub\n"); break;
 		case SWITCH:     eprintf ("switch\n"); break;
 

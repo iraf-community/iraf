@@ -6,50 +6,53 @@ lists		# List package for table
 
 # Define necessary paths
 
-set	onedstds	= "noao$lib/onedstds/"
 set	irscal		= "onedstds$irscal/"
+set	irsiids		= "onedspec$irsiids/"
 
 package irs
 
+# Standard ONEDSPEC tasks
+task	continuum,
+	deredden,
+	dopcor,
+	mkspec,
+	names,
+	scombine,
+	sinterp,
+	splot,
+	specplot	= onedspec$x_onedspec.e
+task	dispcor1	= onedspec$dispcor1.par
+hidetask dispcor1
+
+# Special  IRS/IIDS tasks
 task	addsets,
 	bswitch,
-	calibrate,
+	coefs,
+	flatdiv,
+	slist1d,
+	subsets,
+	sums		= irsiids$x_onedspec.e
+task	batchred	= irsiids$batchred.cl
+task	bplot		= irsiids$bplot.cl
+task	extinct		= irsiids$extinct.cl
+
+# Different default parameters
+task	calibrate,
 	dispcor,
 	flatfit,
-	flatdiv,
 	identify,
-	names,
+	lcalib,
 	reidentify,
 	refspectra,
 	sensfunc,
-	splot,
-	shedit,
-	slist,
-	specplot,
-	standard,
-	subsets		= irs$x_onedspec.e
+	standard	= irs$x_onedspec.e
 
-task	coefs,
-	combine,
-	lcalib,
-	mkspec,
-	rebin,
-	sflip,
-	sinterp,
-	sums		= onedspec$x_onedspec.e
-
-# Scripts
-
-task	batchred	= irs$batchred.cl
-task	continuum	= irs$continuum.cl
-task	shparams	= onedspec$shparams.par
-task	dispcor1	= onedspec$dispcor1.par
-task	bplot		= onedspec$bplot.cl
-task	sextract	= onedspec$sextract.cl
+# Astutil tasks
+task	setairmass,
+	setjd		= "astutil$x_astutil.e"
 
 # Define a task living in the users directory - it is created by BATCHRED
 
 task	$process	= process.cl
-hidetask shparams,dispcor1
 
 clbye()

@@ -7,10 +7,10 @@ USAGE
 photpars
 .ih
 PARAMETERS
-.ls weighting = "none"
+.ls weighting = "constant"
 The type of weighting for the WPHOT task. The weighting parameter is
-ignored by the PHOT and QPHOT tasks. The options are:
-.ls none
+ignored by the PHOT task. The options are:
+.ls constant
 Uniform weights of 1 for each pixel are used.
 .le
 .ls cone

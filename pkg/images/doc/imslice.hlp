@@ -39,8 +39,8 @@ images called plane001, plane002, plane003 ... will be created.
 .fi
 
 2. Slice the list of 2-D images "nite1,nite2,nite3" into a list of 1-D images.
-A new list of images nite1001,nite1002,...,nite2001,nite2002,...,nite3001,
-nite3002 will be created.
+A new list of images nite1001, nite1002, ..., nite2001, nite2002, ...,
+nite3001, nite3002 will be created.
 
 .nf
 	im> imslice nite1,nite2,nite3 nite1,nite2,nite3 2
@@ -52,9 +52,6 @@ TIME REQUIREMENTS
 BUGS
 If the image to be sliced is an image section, the images slices will
 refer to the section not the original image.
-
-IMSLICE does not currently update the world coordinate system of the image
-after a slice operation.
 .ih
 SEE ALSO
 imstack, imcopy

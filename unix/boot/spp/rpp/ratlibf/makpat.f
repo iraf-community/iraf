@@ -1,90 +1,90 @@
-      INTEGER FUNCTION MAKPAT (ARG, FROM, DELIM, PAT)
-      INTEGER ARG (128), DELIM, PAT (128)
-      INTEGER FROM
-      INTEGER ESC
-      INTEGER I, J, JUNK, LASTCL, LASTJ, LJ, TAGNST, TAGNUM, TAGSTK (9)
-      INTEGER ADDSET, GETCCL, STCLOS
-      J = 1
-      LASTJ = 1
-      LASTCL = 0
-      TAGNUM = 0
-      TAGNST = 0
-      I = FROM
-23000 IF (.NOT.(ARG (I) .NE. DELIM .AND. ARG (I) .NE. -2))GOTO 23002
-      LJ = J
-      IF (.NOT.(ARG (I) .EQ. 63))GOTO 23003
-      JUNK = ADDSET (63, PAT, J, 128)
-      GOTO 23004
-23003 CONTINUE
-      IF (.NOT.(ARG (I) .EQ. 37 .AND. I .EQ. FROM))GOTO 23005
-      JUNK = ADDSET (37, PAT, J, 128)
-      GOTO 23006
-23005 CONTINUE
-      IF (.NOT.(ARG (I) .EQ. 36 .AND. ARG (I + 1) .EQ. DELIM))GOTO 23007
-      JUNK = ADDSET (36, PAT, J, 128)
-      GOTO 23008
-23007 CONTINUE
-      IF (.NOT.(ARG (I) .EQ. 91))GOTO 23009
-      IF (.NOT.(GETCCL (ARG, I, PAT, J) .EQ. -3))GOTO 23011
-      MAKPAT = -3
-      RETURN
-23011 CONTINUE
-      GOTO 23010
-23009 CONTINUE
-      IF (.NOT.(ARG (I) .EQ. 42 .AND. I .GT. FROM))GOTO 23013
-      LJ = LASTJ
-      IF (.NOT.(PAT (LJ) .EQ. 37 .OR. PAT (LJ) .EQ. 36 .OR. PAT (LJ) .EQ
-     *. 42 .OR. PAT (LJ) .EQ. 123 .OR. PAT (LJ) .EQ. 125))GOTO 23015
-      GOTO 23002
-23015 CONTINUE
-      LASTCL = STCLOS (PAT, J, LASTJ, LASTCL)
-      GOTO 23014
-23013 CONTINUE
-      IF (.NOT.(ARG (I) .EQ. 123))GOTO 23017
-      IF (.NOT.(TAGNUM .GE. 9))GOTO 23019
-      GOTO 23002
-23019 CONTINUE
-      TAGNUM = TAGNUM + 1
-      TAGNST = TAGNST + 1
-      TAGSTK (TAGNST) = TAGNUM
-      JUNK = ADDSET (123, PAT, J, 128)
-      JUNK = ADDSET (TAGNUM, PAT, J, 128)
-      GOTO 23018
-23017 CONTINUE
-      IF (.NOT.(ARG (I) .EQ. 125 .AND. TAGNST .GT. 0))GOTO 23021
-      JUNK = ADDSET (125, PAT, J, 128)
-      JUNK = ADDSET (TAGSTK (TAGNST), PAT, J, 128)
-      TAGNST = TAGNST - 1
-      GOTO 23022
-23021 CONTINUE
-      JUNK = ADDSET (97, PAT, J, 128)
-      JUNK = ADDSET (ESC (ARG, I), PAT, J, 128)
-23022 CONTINUE
-23018 CONTINUE
-23014 CONTINUE
-23010 CONTINUE
-23008 CONTINUE
-23006 CONTINUE
-23004 CONTINUE
-      LASTJ = LJ
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      IF (.NOT.(ARG (I) .NE. DELIM))GOTO 23023
-      MAKPAT = -3
-      GOTO 23024
-23023 CONTINUE
-      IF (.NOT.(ADDSET (-2, PAT, J, 128) .EQ. 0))GOTO 23025
-      MAKPAT = -3
-      GOTO 23026
-23025 CONTINUE
-      IF (.NOT.(TAGNST .NE. 0))GOTO 23027
-      MAKPAT = -3
-      GOTO 23028
-23027 CONTINUE
-      MAKPAT = I
-23028 CONTINUE
-23026 CONTINUE
-23024 CONTINUE
-      RETURN
-      END
+      integer function makpat (arg, from, delim, pat)
+      integer arg (128), delim, pat (128)
+      integer from
+      integer esc
+      integer i, j, junk, lastcl, lastj, lj, tagnst, tagnum, tagstk (9)
+      integer addset, getccl, stclos
+      j = 1
+      lastj = 1
+      lastcl = 0
+      tagnum = 0
+      tagnst = 0
+      i = from
+23000 if (.not.(arg (i) .ne. delim .and. arg (i) .ne. -2))goto 23002
+      lj = j
+      if (.not.(arg (i) .eq. 63))goto 23003
+      junk = addset (63, pat, j, 128)
+      goto 23004
+23003 continue
+      if (.not.(arg (i) .eq. 37 .and. i .eq. from))goto 23005
+      junk = addset (37, pat, j, 128)
+      goto 23006
+23005 continue
+      if (.not.(arg (i) .eq. 36 .and. arg (i + 1) .eq. delim))goto 23007
+      junk = addset (36, pat, j, 128)
+      goto 23008
+23007 continue
+      if (.not.(arg (i) .eq. 91))goto 23009
+      if (.not.(getccl (arg, i, pat, j) .eq. -3))goto 23011
+      makpat = -3
+      return
+23011 continue
+      goto 23010
+23009 continue
+      if (.not.(arg (i) .eq. 42 .and. i .gt. from))goto 23013
+      lj = lastj
+      if (.not.(pat (lj) .eq. 37 .or. pat (lj) .eq. 36 .or. pat (lj) .eq
+     *. 42 .or. pat (lj) .eq. 123 .or. pat (lj) .eq. 125))goto 23015
+      goto 23002
+23015 continue
+      lastcl = stclos (pat, j, lastj, lastcl)
+      goto 23014
+23013 continue
+      if (.not.(arg (i) .eq. 123))goto 23017
+      if (.not.(tagnum .ge. 9))goto 23019
+      goto 23002
+23019 continue
+      tagnum = tagnum + 1
+      tagnst = tagnst + 1
+      tagstk (tagnst) = tagnum
+      junk = addset (123, pat, j, 128)
+      junk = addset (tagnum, pat, j, 128)
+      goto 23018
+23017 continue
+      if (.not.(arg (i) .eq. 125 .and. tagnst .gt. 0))goto 23021
+      junk = addset (125, pat, j, 128)
+      junk = addset (tagstk (tagnst), pat, j, 128)
+      tagnst = tagnst - 1
+      goto 23022
+23021 continue
+      junk = addset (97, pat, j, 128)
+      junk = addset (esc (arg, i), pat, j, 128)
+23022 continue
+23018 continue
+23014 continue
+23010 continue
+23008 continue
+23006 continue
+23004 continue
+      lastj = lj
+23001 i = i + 1
+      goto 23000
+23002 continue
+      if (.not.(arg (i) .ne. delim))goto 23023
+      makpat = -3
+      goto 23024
+23023 continue
+      if (.not.(addset (-2, pat, j, 128) .eq. 0))goto 23025
+      makpat = -3
+      goto 23026
+23025 continue
+      if (.not.(tagnst .ne. 0))goto 23027
+      makpat = -3
+      goto 23028
+23027 continue
+      makpat = i
+23028 continue
+23026 continue
+23024 continue
+      return
+      end

@@ -177,12 +177,12 @@ greyscale levels.  When \fIztrans\fR = user, parameters \fIzscale\fR,
 \fIzrange\fR and \fIzmap\fR are ignored.
 
 If the zscale algorithm is not selected the \fIzrange\fR parameter is
-examined.  If \fIzrange\fR is yes then \fIz1\fR and \fIz1\fR are set to
-the minimum and maximum image pixels values, respectively.  This insures
-that the full range of the image is displayed but is generally slower
-than the zscale algorithm (because all the image pixels must be examined)
-and, for images with a large dynamic range, will generally show only the
-brightest parts of the image.
+examined.  If \fIzrange\fR is yes then the minimum and maximum pixel values
+in the image are estimated and \fIz1\fR and \fIz1\fR are set to those
+values, respectively.  This insures that the full range of the image is
+displayed but is generally slower than the zscale algorithm (because all the
+image pixels must be examined) and, for images with a large dynamic range,
+will generally show only the brightest parts of the image.
 
 Finally, if the zrange algorithm is not selected the user specifies the
 values of \fIz1\fR and \fIz2\fR directly.

@@ -1,81 +1,81 @@
-      SUBROUTINE ERRGO
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER SERRC0(13)
-      DATA SERRC0(1)/105/,SERRC0(2)/102/,SERRC0(3)/32/,SERRC0(4)/40/,SER
-     *RC0(5)/120/,SERRC0(6)/101/,SERRC0(7)/114/,SERRC0(8)/102/,SERRC0(9)
-     */108/,SERRC0(10)/103/,SERRC0(11)/41/,SERRC0(12)/32/,SERRC0(13)/-2/
-      IF (.NOT.(ERNAME .EQ. 1))GOTO 23000
-      CALL OUTTAB
-      IF (.NOT.(ESP .GT. 0))GOTO 23002
-      IF (.NOT.(ERRSTK(ESP) .GT. 0))GOTO 23004
-      CALL OUTSTR (SERRC0)
-      CALL OGOTOS (ERRSTK(ESP)+2, 0)
-23004 CONTINUE
-      GOTO 23003
-23002 CONTINUE
-      CALL OUTSTR (SERRC0)
-      CALL OGOTOS (RETLAB, 0)
-      CALL OUTDON
-23003 CONTINUE
-      ERNAME = 0
-23000 CONTINUE
-      END
-C     LOGIC0  LOGICAL_COLUMN
-C     SERRC0  SERRCHK
+      subroutine errgo
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer serrc0(13)
+      data serrc0(1)/105/,serrc0(2)/102/,serrc0(3)/32/,serrc0(4)/40/,ser
+     *rc0(5)/120/,serrc0(6)/101/,serrc0(7)/114/,serrc0(8)/102/,serrc0(9)
+     */108/,serrc0(10)/103/,serrc0(11)/41/,serrc0(12)/32/,serrc0(13)/-2/
+      if (.not.(ername .eq. 1))goto 23000
+      call outtab
+      if (.not.(esp .gt. 0))goto 23002
+      if (.not.(errstk(esp) .gt. 0))goto 23004
+      call outstr (serrc0)
+      call ogotos (errstk(esp)+2, 0)
+23004 continue
+      goto 23003
+23002 continue
+      call outstr (serrc0)
+      call ogotos (retlab, 0)
+      call outdon
+23003 continue
+      ername = 0
+23000 continue
+      end
+c     logic0  logical_column
+c     serrc0  serrchk

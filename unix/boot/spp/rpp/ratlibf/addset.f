@@ -1,13 +1,13 @@
-      INTEGER FUNCTION ADDSET (C, STR, J, MAXSIZ)
-      INTEGER J, MAXSIZ
-      INTEGER C, STR (MAXSIZ)
-      IF (.NOT.(J .GT. MAXSIZ))GOTO 23000
-      ADDSET = 0
-      GOTO 23001
-23000 CONTINUE
-      STR(J) = C
-      J = J + 1
-      ADDSET = 1
-23001 CONTINUE
-      RETURN
-      END
+      integer function addset (c, str, j, maxsiz)
+      integer j, maxsiz
+      integer c, str (maxsiz)
+      if (.not.(j .gt. maxsiz))goto 23000
+      addset = 0
+      goto 23001
+23000 continue
+      str(j) = c
+      j = j + 1
+      addset = 1
+23001 continue
+      return
+      end

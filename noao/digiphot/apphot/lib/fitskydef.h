@@ -4,17 +4,17 @@ define LEN_SKYSTRUCT		(30 + SZ_FNAME + 1)
 
 # sky fitting parameters
 
-define	AP_ANNULUS	Memr[$1]	# Annulus inner radius in scale
-define	AP_DANNULUS	Memr[$1+1]	# Annulus width in scale
-define	AP_SKYFUNCTION	Memi[$1+2]	# Sky fitting algorithm
-define	AP_K1		Memr[$1+3]	# K-sigma histogram rejection
-define	AP_K2		Memr[$1+4]	# K-sigma rejection pixels
-define	AP_SMAXITER	Memi[$1+5]	# Maximum number of iterations
-define	AP_BINSIZE	Memr[$1+6]	# Histogram binsize in sky sigma
-define	AP_SMOOTH	Memi[$1+7]	# Smooth histogram ?
-define	AP_RGROW	Memr[$1+8]	# Regions growing radius in scale
+define	AP_ANNULUS	  Memr[$1]	# Annulus inner radius in scale
+define	AP_DANNULUS	  Memr[$1+1]	# Annulus width in scale
+define	AP_SKYFUNCTION	  Memi[$1+2]	# Sky fitting algorithm
+define	AP_K1		  Memr[$1+3]	# K-sigma histogram rejection
+define	AP_K2		  Memr[$1+4]	# K-sigma rejection pixels
+define	AP_SMAXITER	  Memi[$1+5]	# Maximum number of iterations
+define	AP_BINSIZE	  Memr[$1+6]	# Histogram binsize in sky sigma
+define	AP_SMOOTH	  Memi[$1+7]	# Smooth histogram ?
+define	AP_RGROW	  Memr[$1+8]	# Regions growing radius in scale
 define	AP_SKYBACKGROUND  Memr[$1+9]	# User defined sky value
-define	AP_SNREJECT	Memi[$1+10]	# Maximum number of rejection cycles
+define	AP_SNREJECT	  Memi[$1+10]	# Maximum number of rejection cycles
 
 # sky buffer definitions
 
@@ -33,13 +33,13 @@ define	AP_SNY		Memi[$1+22]	# Y dimension of sky subraster
 
 # fitsky output
 
-define	AP_SKY_MODE		Memr[$1+23]	# computed sky value
-define	AP_SKY_SIG		Memr[$1+24]	# computed sky sigma
-define	AP_SKY_SKEW		Memr[$1+25]	# skew of sky pixels
-define	AP_NSKY			Memi[$1+26]	# number of sky pix
-define	AP_NSKY_REJECT		Memi[$1+27]	# number of pixels
+define	AP_SKY_MODE		Memr[$1+23]	  # computed sky value
+define	AP_SKY_SIG		Memr[$1+24]	  # computed sky sigma
+define	AP_SKY_SKEW		Memr[$1+25]	  # computed sky skew
+define	AP_NSKY			Memi[$1+26]	  # number of sky pix
+define	AP_NSKY_REJECT		Memi[$1+27]	  # number of rejected sky pix
 
-define	AP_SSTRING		Memc[P2C($1+28)]# salgorithm string
+define	AP_SSTRING		Memc[P2C($1+28)]  # salgorithm string
 
 # default setup values for sky fitting
 

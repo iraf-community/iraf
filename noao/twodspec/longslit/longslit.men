@@ -6,4 +6,6 @@
    illumination - Determine illumination calibration
      reidentify - Reidentify features
        response - Determine response calibration
+     setairmass - Compute effective airmass and middle UT for an exposure
+          setjd - Compute and set Julian dates in images
       transform - Transform longslit images to user coordinates

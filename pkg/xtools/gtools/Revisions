@@ -1,5 +1,21 @@
 .help revisions Jun88 pkg.xtools.gtools
 .nf
+pkg$xtools/gtools/gtcolon.x
+    The :/parameters case was resetting the subtitle string.
+    (12/28/90, Valdes, diagnosed by Jeff Munn)
+
+pkg$xtools/gtools/gtget.x
+    When the sysid option was added the gtgets routine was not modified
+    to return the setting.  This has been added.  (7/12/90, Valdes)
+
+pkg$xtools/gtools/gtget.x
+    When the histogram type was added the gtgets routine was not modified
+    to return this type.  This has been added.  (6/28/90, Valdes)
+
+====
+V2.9
+====
+
 pkg$xtools/gtools
     1.  Added new colon command :/sysid to turn off system ID banner.
     2.  Added new colon command :/type hist to plot histogram type lines.

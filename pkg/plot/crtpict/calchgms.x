@@ -117,8 +117,8 @@ int	inten_hgram[NBINS]	# Output array of intensity hgram values
 int	greys_hgram[NBINS]	# Output array of greyscale hgram values
 
 pointer buf, ibuf, sp, rlut
-short	short_min, short_max, dz1, dz2
-int	npix, min_val, max_val
+short	min_val, max_val, short_min, short_max, dz1, dz2
+int	npix
 long	v[IM_MAXDIM]
 int	high_zi, low_zi
 real	high_z, low_z

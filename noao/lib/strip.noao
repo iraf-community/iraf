@@ -9,8 +9,10 @@ filterphot	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 focas		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 imred		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 mtlocal		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+nobsolete	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+nproto		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 onedspec	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
-proto		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+rv		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 surfphot	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 twodspec	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 

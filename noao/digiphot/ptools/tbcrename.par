@@ -1,0 +1,6 @@
+# TBCRENAME Parameters
+
+tables,s,a,,,,Input apphot/daophot tables databases
+columns,s,a,"",,,List of column names to be changed
+names,s,a,"",,,List of new column names
+mode,s,h,"ql",,,Mode of task

@@ -13,7 +13,8 @@ define	GR_45		6		#
 define	GR_225		7		#
 define	GR_315		8		#
 
-# T_GRADIENT -- Convolve a list of IRAF images with a gradient filter
+# T_GRADIENT -- Convolve a list of IRAF images with the specified gradient
+# filter
 
 procedure t_gradient()
 
@@ -38,40 +39,41 @@ real	clgetr()
 errchk	cnv_convolve
 
 begin
-	# Get task parameters
+	# Get task parameters.
 	call clgstr ("input", imtlist1, SZ_FNAME)
 	call clgstr ("output", imtlist2, SZ_FNAME)
 
-	# Get boundary extension parameters
+	# Get boundary extension parameters.
 	filter = clgwrd ("gradient", str, SZ_LINE,
 	    ",180,0,90,270,135,45,225,315,")
 	boundary = clgwrd ("boundary", str, SZ_LINE,
 	    ",constant,nearest,reflect,wrap,")
 	constant = clgetr ("constant")
 
-	# Check list lengths
+	# Check list lengths.
 	list1 = imtopen (imtlist1)
 	list2 = imtopen (imtlist2)
 	if (imtlen (list1) != imtlen (list2)) {
 	    call imtclose (list1)
 	    call imtclose (list2)
-	    call error (0, "Number of input and output images not the same.")
+	    call error (0,
+	        "The numbers of input and output images are not equal.")
 	}
 
-	# Convolve the images with gradient kernel
+	# Convolve the images with gradient kernel.
 	while ((imtgetim (list1, image1, SZ_FNAME) != EOF) &&
 	      (imtgetim (list2, image2, SZ_FNAME) != EOF)) {
 	    
-	    # Make temporary image
+	    # Make temporary image.
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
-	    # Open images
+	    # Open images.
 	    im1 = immap (image1, READ_ONLY, 0)
 	    im2 = immap (image2, NEW_COPY, im1)
 
 	    kernel = NULL
 
-	    # Convolve an image with gradient kernel
+	    # Convolve an image with gradient kernel.
 	    iferr {
 
 		switch (IM_NDIM(im1)) {
@@ -82,15 +84,16 @@ begin
 		    nxk = 3
 		    nyk = 3
 		default:
-		    call error (0, "T_LAPLACE: Too many image dimensions.")
+		    call error (0,
+		        "T_GRADIENT: The image has more than 2 dimensions.")
 		}
 
-		# make the kernel
+		# Make the kernel.
 		call smark (sp)
 		call salloc (kernel, nxk * nyk, TY_REAL)
 		call cnv_gradient_kernel (Memr[kernel], nxk, nyk, filter)
 
-		# gradient filter image
+		# Gradient filter the image.
 		call cnv_convolve (im1, im2, Memr[kernel], nxk, nyk, boundary,
 		    constant, NO)
 
@@ -112,12 +115,12 @@ begin
 	    kernel = NULL
 	}
 
-	# close images
+	# Close images.
 	call imtclose (list1)
 	call imtclose (list2)
 end
 
-# CNV_GRADIENT_KERNEL -- Make the Laplacian kernel
+# CNV_GRADIENT_KERNEL -- Make the gradient kernel.
 
 procedure cnv_gradient_kernel (kernel, nx, ny, filter)
 
@@ -140,7 +143,8 @@ begin
 	        kernel[2,1] = 0.
 	        kernel[3,1] = -1. / 2.
 	    default:
-		call error (0, "CNV_GRADIENT_KERNEL: Cannot compute 2D gradient")
+		call error (0,
+		    "CNV_GRADIENT_KERNEL: Cannot compute 2D gradient")
 	    }
 
 	} else {
@@ -235,7 +239,7 @@ begin
 		kernel[2,3] = -1. / norm
 		kernel[3,3] = 0.
 	    default:
-		call error (0, "CNV_LAPLACE_KERNEL: Unknown filter.")
+		call error (0, "CNV_GRADIENT_KERNEL: Unknown filter.")
 	    }
 	}
 end

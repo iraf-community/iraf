@@ -1,9 +1,10 @@
-DATE-OBS	s 01/01/90
-RA		s 00:00:00
-DEC		s 00:00:00
-EPOCH		r 1990.0 
-UT		s 00:00:00
-ST		s 00:00:00
-ZT		r 0.
-AIRMASS		r 1.
-INSTRUME	s IRAF/ARTDATA
+DATE-OBS= '01/01/90'
+RA      = '00:00:00'
+DEC     = '00:00:00'
+EPOCH   =                1990.
+UT      = '00:00:00'
+ST      = '00:00:00'
+ZT      =                   0.
+AIRMASS =                   1.
+EXPTIME =                   1.
+INSTRUME= 'IRAF/ARTDATA'

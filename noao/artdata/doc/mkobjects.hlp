@@ -1,4 +1,4 @@
-.help mkobjects Aug90 noao.artdata
+.help mkobjects Jan92 noao.artdata
 .ih
 NAME
 mkobjects - Make/add artificial stars and galaxies to 2D images
@@ -25,11 +25,14 @@ Image title to be given to the images.  Maximum of 79 characters.
 Number of columns and lines.
 .le
 .ls header = "artdata$stdheader.dat"
-Header keyword data file.  Header keywords are added from this file, if
-defined, to new images created.  Note this applies only to new images.
-The file consists of lines with a keyword, a datatype (one of
-"integer", "real", or "string", usually abbreviated to one character),
-and the parameter value.
+Image or header keyword data file.  If an image is given then the image header
+is copied.  If a file is given then the FITS format cards are copied.
+This only applies to new images.   The data file consists of lines
+in FITS format with leading whitespace ignored.  A FITS card must begin
+with an uppercase/numeric keyword.  Lines not beginning with a FITS
+keyword such as comments or lower case are ignored.  The user keyword
+output of \fBimheader\fR is an acceptible data file.  See \fBmkheader\fR
+for further information.
 .le
 .ls background = 1000.
 Default background and poisson noise background.
@@ -67,12 +70,14 @@ parameter.  The axial ratio and position angle define an
 ellipical sampling of the template.
 .le
 .ls <profile file>
-If not one of the above, a text file is sought giving the cumulative flux
-profile from the center to the edge.  If found the profile defines
-an ellipical star/psf with the major axis radius to the last
-profile point given by the parameter \fIradius\fR,
-axial ratio given by the parameter \fIar\fR, and position angle
-given by the parameter \fIpa\fR.
+If not one of the above, a text file is sought giving either an intensity
+per unit area profile or a cumulative flux profile from the center to the
+edge.  The two are differentiated by whether the first profile point is 0
+for a cumulative profile or nonzero for an intensity profile.  An intensity
+profile is recommended.  If found the profile defines an ellipical star/psf
+with the major axis radius to the last profile point given by the parameter
+\fIradius\fR, axial ratio given by the parameter \fIar\fR, and position
+angle given by the parameter \fIpa\fR.
 .le
 .le
 .ls radius = 1.
@@ -129,6 +134,10 @@ computing the new value and then subtracted again.
 .le
 .ls seed = 1
 Random number seed.
+.le
+
+.ls comments = yes
+Include comments recording task parameters in the image header?
 .le
 
 PACKAGE PARAMETERS
@@ -198,12 +207,14 @@ templates.  The profiles and templates are given elliptical shapes by
 specifying a scale radius for the major axis, a minor axis to major
 axis axial ratio, and a position angle.
 
-For new images a set of header keywords may be added by specifying a
-data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
-This file contains lines with keyword names, datatype ("integer",
-"real", or "string"), and values.  In addition to these optional
+For new images a set of header keywords may be added by specifying an
+image or data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
+If a data file is specified lines beginning with FITS keywords are
+entered in the image header.  Leading whitespace is ignored and any
+lines beginning with words having lowercase and nonvalid FITS keyword
+characters are ignored.  In addition to this optional header,
 keywords, parameters for the gain, read noise, and exposure time are
-defined.  Finally, comments are added to the image header recording the task
+defined.  Finally, comments may be added to the image header recording the task
 parameters and any information from the objects file which are not
 object definitions; in particular, the \fBstarlist\fR and
 \fBgallist\fR parameters are recorded.
@@ -243,15 +254,19 @@ positions and magnitudes are specified in the object lists.
 
 There is a great deal of flexibility in defining the object models.
 The models are defined either in terms of a one dimensional radial
-cumulative flux profile or an image template.  The flux profiles may be
+intensity or cumulative flux profile
+or an image template.  The flux profiles may be
 analytic functions or a user defined profile given as an equally spaced
 set of values in a text file.  The first point is zero at the center
-and increases monotonically to the edge.  Cumulative flux profiles are
-used rather than intensity profiles for more precise computation of the
-flux per pixel as described below.
+for a cumulative profile
+and increases monotonically to the edge.  Note that intensity profiles
+are to be prefered to avoid artifacts in the convertion from cumulative
+flux.  In particular, cumulative flux profiles may give a spike at the
+center.  In either case, the profile should be specified fairly finely,
+many points, to avoid interpolation effects.
 
-The functional form of the analytic profiles (shown as the more
-traditional intensity profiles), the user flux profile, and
+The functional form of the analytic profiles
+the user profiles, and
 image template are given below.
 
 .nf
@@ -259,6 +274,7 @@ image template are given below.
         moffat:  I = (1 + (2**(1/beta)-1) * (R/radius)**2) ** -beta
        expdisk:  I = exp (-1.6783 * R/radius)
         devauc:  I = exp (-7.67 * (R/radius)**1/4)
+  flux profile:  I = intensity (nprofile * R/radius)
   flux profile:  F = flux (nprofile * R/radius)
 image template:  I = image (nc/2+nc/2*dX/radius, nl/2+nc/2*dY/radius)
 .fi
@@ -310,7 +326,7 @@ profiles it is the radius of the last profile point.  And for the image
 templates it is the radius of the image along the first or x axis given
 by one-half of the image dimension; i.e. nc/2.
 
-The flux profiles of the analytic functions extend to infinity so a
+The profiles of the analytic functions extend to infinity so a
 dynamic range, the ratio of the peak intensity to the cutoff intensity,
 is imposed to cutoff the profiles.  The \fIdynrange\fR package
 parameter applies to the stellar and galaxy analytic profiles.  The
@@ -322,37 +338,25 @@ signal-to-noise objects will the cutoff be noticeable.  A correction is
 made to account for lost light so that an aperture magnitude will give
 the correct value for an object of the specified total magnitude.
 
-The object models are integrated over the size of the image pixels.
-This is done by subsampling, dividing up a pixel into smaller pieces
-called subpixels.  For the image templates a bilinear surface
-interpolation function is used and integrated analytically over the
-extent of the subpixels.  For the flux profiles the square pixels
-are approximated as a segment of a ring having central radius
-equal to the radius of the center of the subpixel from the profile
-center, radial width equal to the subpixel width, and area equal to
-the subpixel area.  The flux values within a subpixel width of the
-profile center are approximated by the average flux within a radius
-given by the outer edge of the subpixel normalized by the area of the
-subpixel.  These approximations are easy to calculate from the
-cumulative flux profiles and is one reason the modeling can be done
-relatively quickly.  This method is also more accurate at a given
-subpixel size than using the intensity at the subpixel center given
-by an intensity profile.  The approximation is poorest at the center.
-The approximations may be made as accurate as desired by using smaller
-and smaller subpixels but at the cost of rapidly increasing execution
-time.
+The object models are integrated over the size of the image pixels.  This
+is done by subsampling, dividing up a pixel into smaller pieces called
+subpixels.  For the image templates a bilinear surface interpolation
+function is used and integrated analytically over the extent of the
+subpixels.  The user cumulative one dimensional profiles are first
+converted to intensity profiles.  The various intensity profiles are then
+binned into pixel fluxes per subpixel on a grid much finer than the
+subpixel spacing.  Then for any particular radius and object center the
+appropriate subpixel flux can be determined quickly and accurately.
 
-The number of subpixels per image pixel is determined by the
-package parameters
-\fInxsub\fR, \fInysub\fR, \fInxgsub\fR, and \fInygsub\fR.  The first
-two apply to the stars and the PSF and the latter two apply to the
-galaxies.  Typically the subsampling will be the same in each
-dimension.  The galaxies are generally  subsampled less since they will
-have less rapidly changing profiles and are convolved by the PSF.
-Also, the stars are computed only a few times and
-then scaled and moved, as described below, while each galaxy needs
-to be computed separately.  Therefore, one can afford greater
-precision in the stars than in the galaxies.
+The number of subpixels per image pixel is determined by the package
+parameters \fInxsub\fR, \fInysub\fR, \fInxgsub\fR, and \fInygsub\fR.  The
+first two apply to the stars and the PSF and the latter two apply to the
+galaxies.  Typically the subsampling will be the same in each dimension.
+The galaxies are generally  subsampled less since they will have less
+rapidly changing profiles and are convolved by the PSF.  Also, the stars
+are computed only a few times and then scaled and moved, as described
+below, while each galaxy needs to be computed separately.  Therefore, one
+can afford greater precision in the stars than in the galaxies.
 
 Given an image of several hundred pixels subsampled by a factor of 100
 (10 x 10) this will be a very large number of computations.  A
@@ -392,17 +396,16 @@ This technique allows generating images with many stars, such as a
 globular cluster or a low galactic latitude field, quite
 efficiently.
 
-Unlike the stars, the galaxies will each have different profiles, ellipticities,
-and position angles and so templates cannot be used (except for special
-test cases as mentioned later).  Another difference is that the
-galaxy models need to be convolved by the PSF; i.e. the shapes
-are defined prior to seeing.  The PSF convolution must also be
-subsampled and the convolution operation requires as many operations
-as the number of pixels in the PSF for each galaxy subpixel.  Thus,
-computing seeing convolved, well subsampled, large galaxy images is
-the most demanding task of all, requiring all the shortcuts described
-above (larger and variable subsampling and the subpixel flux approximation)
-as well as further ones.
+Unlike the stars, the galaxies will each have different profiles,
+ellipticities, and position angles and so templates cannot be used (except
+for special test cases as mentioned later).  Another difference is that the
+galaxy models need to be convolved by the PSF; i.e. the shapes are defined
+prior to seeing.  The PSF convolution must also be subsampled and the
+convolution operation requires as many operations as the number of pixels
+in the PSF for each galaxy subpixel.  Thus, computing seeing convolved,
+well subsampled, large galaxy images is the most demanding task of all,
+requiring all the shortcuts described above (larger and variable
+subsampling and the subpixel flux approximation) as well as further ones.
 
 The PSF used for convolving galaxies is truncated at a lower dynamic
 range than the stars according to the package parameter

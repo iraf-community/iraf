@@ -1,35 +1,35 @@
-      INTEGER FUNCTION ITOC (INT, STR, SIZE)
-      INTEGER INT, SIZE
-      INTEGER STR (100)
-      INTEGER MOD
-      INTEGER D, I, INTVAL, J, K
-      INTEGER DIGITS (11)
-      DATA DIGITS (1) /48/, DIGITS (2) /49/, DIGITS (3) /50/, DIGITS (4)
-     * /51/, DIGITS (5) /52/, DIGITS (6) /53/, DIGITS (7) /54/, DIGITS (
-     *8) /55/, DIGITS (9) /56/, DIGITS (10) /57/, DIGITS (11) /-2/
-      INTVAL = IABS (INT)
-      STR (1) = -2
-      I = 1
-23000 CONTINUE
-      I = I + 1
-      D = MOD (INTVAL, 10)
-      STR (I) = DIGITS (D+1)
-      INTVAL = INTVAL / 10
-23001 IF (.NOT.(INTVAL .EQ. 0 .OR. I .GE. SIZE))GOTO 23000
-23002 CONTINUE
-      IF (.NOT.(INT .LT. 0 .AND. I .LT. SIZE))GOTO 23003
-      I = I + 1
-      STR (I) = 45
-23003 CONTINUE
-      ITOC = I - 1
-      J = 1
-23005 IF (.NOT.(J .LT. I))GOTO 23007
-      K = STR (I)
-      STR (I) = STR (J)
-      STR (J) = K
-      I = I - 1
-23006 J = J + 1
-      GOTO 23005
-23007 CONTINUE
-      RETURN
-      END
+      integer function itoc (int, str, size)
+      integer int, size
+      integer str (100)
+      integer mod
+      integer d, i, intval, j, k
+      integer digits (11)
+      data digits (1) /48/, digits (2) /49/, digits (3) /50/, digits (4)
+     * /51/, digits (5) /52/, digits (6) /53/, digits (7) /54/, digits (
+     *8) /55/, digits (9) /56/, digits (10) /57/, digits (11) /-2/
+      intval = iabs (int)
+      str (1) = -2
+      i = 1
+23000 continue
+      i = i + 1
+      d = mod (intval, 10)
+      str (i) = digits (d+1)
+      intval = intval / 10
+23001 if (.not.(intval .eq. 0 .or. i .ge. size))goto 23000
+23002 continue
+      if (.not.(int .lt. 0 .and. i .lt. size))goto 23003
+      i = i + 1
+      str (i) = 45
+23003 continue
+      itoc = i - 1
+      j = 1
+23005 if (.not.(j .lt. i))goto 23007
+      k = str (i)
+      str (i) = str (j)
+      str (j) = k
+      i = i - 1
+23006 j = j + 1
+      goto 23005
+23007 continue
+      return
+      end

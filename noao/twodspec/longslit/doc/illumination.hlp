@@ -112,6 +112,11 @@ between the dispersion points.  The fitted data is formed by dividing the
 dispersion points into a set of bins and averaging the slit profiles within
 each bin.  The interpolation type is a user parameter.
 
+The image header keyword DISPAXIS must be present with a value of 1 for
+dispersion parallel to the lines (varying with the column coordinate) or 2
+for dispersion parallel to the columns (varying with line coordinate).
+This parameter may be added using \fBhedit\fR.
+
 If the output image does not exist it is first created with unit illumination
 everywhere.  Subsequently the illumination is only modified in those regions
 occupied by the input image.  Thus, an image section in the input image may
@@ -177,20 +182,33 @@ then be given until the last dispersion bin has been fit.  The illumination
 calibration image is then created.
 .ih
 EXAMPLES
-To create an illumination image non-interactively:
+1. To create an illumination image non-interactively:
 
+.nf
 	cl> illumination sky illum nbins=8 order=20 interactive=no
+.fi
 
-To determine independent illuminations for a multislit image determine the
+2. To determine independent illuminations for a multislit image determine the
 image sections defining each slit.  Then the illumination functions are
 computed as follows:
 
+.nf
 	cl> illlumination sky[10:20,*],sky[35:45,*] illum,illum
+.fi
 
-Generally the slit image sections are prepared in a file which is then
+3. Generally the slit image sections are prepared in a file which is then
 used to define the lists of input images and illuminations.
 
+.nf
 	cl> illumination @slits @illums
+.fi
+
+3.  If the DISPAXIS keyword is missing and the dispersion is running
+vertically (varying with the image lines):
+
+.nf
+	cl> hedit *.imh dispaxis 2 add+
+.fi
 .ih
 SEE ALSO
 icfit, response

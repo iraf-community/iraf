@@ -1,0 +1,15 @@
+# Make the NOBSOLETE package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	;
+
+install:
+	;

@@ -3,14 +3,14 @@ include	<gset.h>
 include	<mach.h>
 include	"sensfunc.h"
 
-define	KEY		"noao$lib/scr/sensfunc.key"
+define	KEY		"noao$onedspec/sensfunc/sensfunc.key"
 define	PROMPT		"sensfunc options"
 
 
 # SF_SENSFUNC -- Interactive sensitivity function determination.
 
 procedure sf_sensfunc (gp, stds, nstds, wextn, extn, nextn, sensimage, logfile,
-    ecv, function, order, interactive)
+    ecv, function, order, ignoreaps, interactive)
 
 pointer	gp			# Graphics structure
 pointer	stds[nstds]		# Pointer to standard observations
@@ -23,6 +23,7 @@ char	logfile[ARB]		# Statistics filename
 pointer	ecv			# Residual extinction curve
 char	function[ARB]		# Fitting function type
 int	order			# Function order
+bool	ignoreaps		# Ignore apertures?
 int	interactive		# Interactive?
 
 char	cmd[SZ_FNAME]
@@ -53,7 +54,7 @@ begin
 	}
 	cv = NULL
 	call sf_fit (stds, nstds, cv, function, order, xmin, xmax)
-	call sf_rms (stds, nstds, cv, rms, npts)
+	call sf_rms (stds, nstds, rms, npts)
 
 	# If not interactive go to the output.
 	if (interactive == 3)
@@ -114,7 +115,7 @@ begin
 		newfit = YES
 		newgraph = YES
 	    case 'd':
-		call sf_data (stds, nstds, cv, GP_GRAPHS(gp,wc))
+		call sf_data (stds, nstds, GP_GRAPHS(gp,wc))
 		call sf_nearest (gp, stds, nstds, wx, wy, wc, 0, i, j)
 		if (i > 0) {
 		    call printf (
@@ -123,7 +124,7 @@ begin
 		    if (clgcur ("cursor", wx, wy, wc, key, cmd, SZ_FNAME)==EOF)
 		        break
 		    call printf ("\n")
-		    call sf_delete (gp, stds, nstds, cv, key, i, j)
+		    call sf_delete (gp, stds, nstds, key, i, j)
 		}
 	    case 'e':
 		call sf_extinct (gp, stds, nstds, cv, ecv, function, order)
@@ -135,7 +136,7 @@ begin
 		newgraph = YES
 		newfit = YES
 	    case 'i':
-		call sf_data (stds, nstds, cv, GP_GRAPHS(gp,wc))
+		call sf_data (stds, nstds, GP_GRAPHS(gp,wc))
 		call sf_nearest (gp, stds, nstds, wx, wy, wc, 2, i, j)
 		if (i > 0) {
 		    call printf (
@@ -148,7 +149,7 @@ begin
 		        call pargr (Memr[STD_WTS(stds[i])+j-1])
 		}
 	    case 'm':
-		call sf_data (stds, nstds, cv, GP_GRAPHS(gp,wc))
+		call sf_data (stds, nstds, GP_GRAPHS(gp,wc))
 		call sf_nearest (gp, stds, nstds, wx, wy, wc, 2, i, j)
 		if (i > 0) {
 		    call printf (
@@ -158,7 +159,7 @@ begin
 		        break
 		    call printf ("\n")
 		    delta = wy - Memr[STD_Y(stds[i])+j-1]
-		    call sf_move (gp, stds, nstds, cv, key, i, j, delta)
+		    call sf_move (gp, stds, nstds, key, i, j, delta)
 		}
 	    case 'o':
 		call sf_reset (stds, nstds, wextn, extn, nextn, ecv, shift)
@@ -171,11 +172,11 @@ begin
 	    case 'r':
 		newgraph = YES
 	    case 's':
-		call sf_shift (stds, nstds, cv, shift)
+		call sf_shift (stds, nstds, shift)
 		newfit=YES
 		newgraph=YES
 	    case 'u':
-		call sf_data (stds, nstds, cv, GP_GRAPHS(gp,wc))
+		call sf_data (stds, nstds, GP_GRAPHS(gp,wc))
 		call sf_nearest (gp, stds, nstds, wx, wy, wc, 1, i, j)
 		if (i > 0) {
 		    call printf (
@@ -184,10 +185,10 @@ begin
 		    if (clgcur ("cursor", wx, wy, wc, key, cmd, SZ_FNAME)==EOF)
 		        break
 		    call printf ("\n")
-		    call sf_undelete (gp, stds, nstds, cv, key, i, j)
+		    call sf_undelete (gp, stds, nstds, key, i, j)
 		}
 	    case 'w':
-		call sf_data (stds, nstds, cv, GP_GRAPHS(gp,wc))
+		call sf_data (stds, nstds, GP_GRAPHS(gp,wc))
 		call sf_nearest (gp, stds, nstds, wx, wy, wc, 0, i, j)
 		if (i > 0) {
 		    call printf (
@@ -212,11 +213,11 @@ begin
 	    # Do a new fit and recompute the RMS, and title string.
 	    if (newfit == YES) {
 		call sf_fit (stds, nstds, cv, function, order, xmin, xmax)
-		call sf_rms (stds, nstds, cv, rms, npts)
+		call sf_rms (stds, nstds, rms, npts)
 		call sf_title (gp, aperture, function, order, npts, rms)
 		do i = 1, SF_NGRAPHS
-		    if (GP_IMIO(gp,i) != NULL)
-			call imunmap (GP_IMIO(gp,i))
+		    if (GP_SHDR(gp,i) != NULL)
+			call shdr_close (GP_SHDR(gp,i))
 	    }
 
 	    # Draw new graphs.
@@ -235,12 +236,12 @@ begin
 
 	# Close any open images.
 	do i = 1, SF_NGRAPHS
-	    if (GP_IMIO(gp,i) != NULL)
-	        call imunmap (GP_IMIO(gp,i))
+	    if (GP_SHDR(gp,i) != NULL)
+	        call shdr_close (GP_SHDR(gp,i))
 
 output_
 	# Output the sensitivity function and logfile statistics.
-	call sf_output (stds, nstds, cv, sensimage)
+	call sf_output (stds, nstds, cv, sensimage, ignoreaps)
 	if (logfile[1] != EOS) {
 	    iferr {
 	        fd = open (logfile, APPEND, TEXT_FILE)

@@ -1,5 +1,6 @@
 include	<gset.h>
 include	<pkg/gtools.h>
+include	"../shdr.h"
 include	"identify.h"
 
 # ID_GRAPH -- Graph image vector in which features are to be identified.
@@ -25,31 +26,30 @@ procedure id_graph1 (id)
 
 pointer	id				# ID pointer
 
-int	i
+int	i, n
 real	xmin, xmax, ymin, ymax, dy
-pointer	sp, x, y
+pointer	sh, x, y
 
 begin
-	call smark (sp)
-	call salloc (x, ID_NPTS(id), TY_REAL)
-	call salloc (y, ID_NPTS(id), TY_REAL)
-	call achtdr (FITDATA(id,1), Memr[x], ID_NPTS(id))
-	call achtdr (IMDATA(id,1), Memr[y], ID_NPTS(id))
+	sh = ID_SH(id)
+	x = SX(sh)
+	y = SY(sh)
+	n = SN(sh)
+
+	call achtdr (FITDATA(id,1), Memr[x], n)
 
 	call gclear (ID_GP(id))
-	xmin = min (Memr[x], Memr[x+ID_NPTS(id)-1])
-	xmax = max (Memr[x], Memr[x+ID_NPTS(id)-1])
-	call alimr (Memr[y], ID_NPTS(id), ymin, ymax)
+	xmin = min (Memr[x], Memr[x+n-1])
+	xmax = max (Memr[x], Memr[x+n-1])
+	call alimr (Memr[y], n, ymin, ymax)
 	dy = ymax - ymin
 	call gswind (ID_GP(id), xmin, xmax, ymin - .2 * dy, ymax + .2 * dy)
 	call gt_swind (ID_GP(id), ID_GT(id))
 	call gt_labax (ID_GP(id), ID_GT(id))
-	call gt_plot (ID_GP(id), ID_GT(id), Memr[x], Memr[y], ID_NPTS(id))
+	call gt_plot (ID_GP(id), ID_GT(id), Memr[x], Memr[y], n)
 
 	do i = 1, ID_NFEATURES(id)
 	    call id_mark (id, i)
-
-	call sfree (sp)
 end
 
 
@@ -59,22 +59,23 @@ procedure id_graph2 (id)
 
 pointer	id				# ID pointer
 
-int	i, j, k
+int	i, j, k, n
 real	xmin, xmax, ymin, ymax, dy
-pointer	sp, x, y
+pointer	sh, x, y
 
 begin
-	call smark (sp)
-	call salloc (x, ID_NPTS(id), TY_REAL)
-	call salloc (y, ID_NPTS(id), TY_REAL)
-	call achtdr (FITDATA(id,1), Memr[x], ID_NPTS(id))
-	call achtdr (IMDATA(id,1), Memr[y], ID_NPTS(id))
+	sh = ID_SH(id)
+	x = SX(sh)
+	y = SY(sh)
+	n = SN(sh)
+
+	call achtdr (FITDATA(id,1), Memr[x], n)
 
 	xmin = real (FIT(id,ID_CURRENT(id))) - ID_ZWIDTH(id) / 2.
 	xmax = real (FIT(id,ID_CURRENT(id))) + ID_ZWIDTH(id) / 2.
 
 	i = 0
-	do k = 1, ID_NPTS(id) {
+	do k = 1, n {
 	    if ((Memr[x+k-1] < xmin) || (Memr[x+k-1] > xmax))
 		next
 	    if (i == 0)
@@ -93,10 +94,8 @@ begin
 	    call gseti (ID_GP(id), G_YTRAN, GT_YTRAN(ID_GT(id)))
 	}
 	call gt_labax (ID_GP(id), ID_GT(id))
-	call gt_plot (ID_GP(id), ID_GT(id), Memr[x], Memr[y], ID_NPTS(id))
+	call gt_plot (ID_GP(id), ID_GT(id), Memr[x], Memr[y], n)
 
 	do i = 1, ID_NFEATURES(id)
 	    call id_mark (id, i)
-
-	call sfree (sp)
 end

@@ -59,7 +59,7 @@ begin
 	    threshold, Memi[x], Memr[y], nx)
 
 	# Eliminate points not satisfying the contrast constraint.
-	call find_contrast (data, Memr[x], Memr[y], nx, contrast)
+	call find_contrast (data, Memi[x], Memr[y], nx, contrast)
 
 	# Rank the peaks by peak value.
 	call salloc (rank, nx, TY_INT)

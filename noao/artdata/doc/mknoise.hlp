@@ -22,11 +22,14 @@ Image title to be given to the images.  Maximum of 79 characters.
 Number of columns and lines.
 .le
 .ls header = "artdata$stdheader.dat"
-Header keyword data file.  Header keywords are added from this file, if
-defined, to new images created.  Note this applies only to new images.
-The file consists of lines with a keyword, a datatype (one of
-"integer", "real", or "string", usually abbreviated to one character),
-and the parameter value.
+Image or header keyword data file.  If an image is given then the image header
+is copied.  If a file is given then the FITS format cards are copied.
+This only applies to new images.   The data file consists of lines
+in FITS format with leading whitespace ignored.  A FITS card must begin
+with an uppercase/numeric keyword.  Lines not beginning with a FITS
+keyword such as comments or lower case are ignored.  The user keyword
+output of \fBimheader\fR is an acceptible data file.  See \fBmkheader\fR
+for further information.
 .le
 .ls background = 0.
 Default background and poisson background.
@@ -81,6 +84,10 @@ Position angle in degrees measured counterclockwise from the X axis for
 cosmic rays.
 .le
 
+.ls comments = yes
+Include comments recording task parameters in the image header?
+.le
+
 PACKAGE PARAMETERS
 
 These parameters define certain computational shortcuts which greatly
@@ -124,12 +131,14 @@ If a new image is created it is has the mean level given by the parameter
 \fIbackground\fR.  With no noise and no cosmic rays this task can be used to
 create images of constant background value.
 
-For new images a set of header keywords may be added by specifying a
-data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
-This file contains lines with keyword names, datatype ("integer",
-"real", or "string"), and values.  In addition to these optional
+For new images a set of header keywords may be added by specifying an
+image or data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
+If a data file is specified lines beginning with FITS keywords are
+entered in the image header.  Leading whitespace is ignored and any
+lines beginning with words having lowercase and nonvalid FITS keyword
+characters are ignored.  In addition to this optional header,
 keywords, parameters for the gain and read noise are defined.
-Finally, comments are added to the image header recording the task
+Finally, comments may be added to the image header recording the task
 parameters and any information from the cosmic ray file which are not
 cosmic ray definitions.
 

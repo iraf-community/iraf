@@ -1,6 +1,0 @@
-# IMSLICE
-
-input,f,a,,,,Input images
-output,f,a,,,,Output images
-verbose,b,h,y,,,Verbose mode
-mode,s,h,'ql'

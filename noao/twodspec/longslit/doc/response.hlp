@@ -65,15 +65,19 @@ to the average calibration spectrum.  Help for this package is found
 under the name "icfit".
 .ih
 DESCRIPTION
-A response calibration, in the form of an image, is created for each
-input image, normally a quartz spectrum.  The response calibration is
-formed by dividing the calibration image by a normalization spectrum which
-is the same at all points along the spatial axis.  The normalization
-spectrum is obtained by averaging the normalization image across the
-dispersion to form a one dimensional spectrum and smoothing the
-spectrum by fitting a function.  When normalizing only values in the
-normalization spectrum and the data above a threshold are used.  Pixels
-falling below the threshold are set to unit response.
+A response calibration, in the form of an image, is created for each input
+image, normally a quartz spectrum.  The response calibration is formed by
+dividing the calibration image by a normalization spectrum which is the
+same at all points along the spatial axis.  The normalization spectrum is
+obtained by averaging the normalization image across the dispersion to form
+a one dimensional spectrum and smoothing the spectrum by fitting a
+function.  The image header keyword DISPAXIS must be present with a value
+of 1 for dispersion parallel to the lines (varying with the column
+coordinate) or 2 for dispersion parallel to the columns (varying with line
+coordinate).  This parameter may be added using \fBhedit\fR.  When
+normalizing only values in the normalization spectrum and the data above a
+threshold are used.  Pixels falling below the threshold are set to unit
+response.
 
 If the output image does not exist it is first created with unit response
 everywhere.  Subsequently the response is only modified in those regions
@@ -129,11 +133,11 @@ the fitted parameters are remembered from image to image within the
 task but not outside the task.
 .ih
 EXAMPLES
-To create a response image non-interactively:
+1. To create a response image non-interactively:
 
 	cl> response quartz quartz response order=20 interactive=no
 
-To determine independent responses for a multislit image determine the
+2. To determine independent responses for a multislit image determine the
 image sections defining each slit.  Then the responses are computed as
 follows:
 
@@ -145,7 +149,16 @@ follows:
 Generally the slit image sections are prepared in a file which is then
 used to define the lists of input images and response.
 
+.nf
 	cl> response @slits @slits @responses
+.fi
+
+3.  If the DISPAXIS keyword is missing and the dispersion is running
+vertically (varying with the image lines):
+
+.nf
+	cl> hedit *.imh dispaxis 2 add+
+.fi
 .ih
 SEE ALSO
 icfit, illumination

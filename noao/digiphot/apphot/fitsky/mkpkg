@@ -13,9 +13,11 @@ libpkg.a:
 	apfitsky.x	../lib/apphotdef.h	../lib/noisedef.h	\
 			../lib/fitskydef.h	../lib/fitsky.h
 	apgauss.x	<mach.h>		../lib/fitsky.h         \
-			../lib/nlfit.h
+			<math/nlfit.h>
+	apgrowhist.x
 	apgspars.x	../lib/display.h	../lib/fitsky.h         \
-			../lib/noise.h		../lib/apphot.h
+			../lib/noise.h
+	aphgmsub.x
 	aphistplot.x	<gset.h>		<pkg/gtools.h>		\
 			../lib/fitsky.h
 	aplgsky.x	../lib/fitsky.h
@@ -27,7 +29,9 @@ libpkg.a:
 	apreadsky.x
 	aprefitsky.x	../lib/apphotdef.h	../lib/noisedef.h	\
 			../lib/fitskydef.h	../lib/fitsky.h
-	apsconfirm.x	../lib/noise.h		../lib/fitsky.h
+	aprgrow.x
+	apsconfirm.x	../lib/apphot.h		../lib/noise.h          \
+			../lib/fitsky.h
 	apserrors.x	../lib/fitsky.h
 	apsfree.x	../lib/apphotdef.h	../lib/fitskydef.h
 	apsinit.x	../lib/apphotdef.h	../lib/fitskydef.h

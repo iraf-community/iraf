@@ -1,5 +1,745 @@
 .help revisions Jun88 noao.onedspec
 .nf
+=======
+V2.10.0
+=======
+
+shdr.x
+    The resampling in shdr_linear and shdr_rebin is now an average rather
+    than a sum.  (6/23/92, Valdes)
+
+splot/wrspect.x
+    New output spectra are created type real.  (6/22/92, Valdes)
+
+scombine/icscale.x
+scombine/t_scombine.x
+    The exposure time is only required now if scaling or weighting by
+    the exposure time.  (6/22/92, Valdes)
+    
+mwcs$wfmspec.x
+    The inverse coordinate transform could fail in some cases.  An extra
+    check was added to avoid this.  (6/17/92, Valdes)
+
+smw.x
+    Added special case to convert a 2D image which has a second dimension
+    length of 1 to a 1D image.  Note this is different than a 1D section
+    of a 2D image.  (6/17/92, Valdes)
+
+shdr.x
+    Added additional check for a 2D image with the dispersion axis
+    along a dimension of length 1; for example [800,1] with dispaxis=2.
+    This will also give an warning and then choose the appropriate
+    axis.  (6/17/92, Valdes)
+
+t_sarith.x
+t_fitprofs.x
+splot/wrspect.x
+    The doppler correction was not properly handled when creating a new
+    output spectrum.  (6/17/92, Valdes)
+
+shdr.x
+    The change to catch an inappropriate dispersion axis for TWODSPEC
+    images was not complete.  I'm not fully sure anymore what should be
+    done but I made the checking better. (6/3/92, Valdes)
+
+t_sinterp.x
+    Change the roundoff when computing the number of pixels to nearest
+    integer.  (6/3/92, Valdes)
+
+scombine/t_scombine:
+    There was a bug in which the j loop index was redefined in the loop
+    when checkin the MINMAX rejection limits.  (6/1/92, Valdes)
+
+t_sarith.hlp
+    Needed to allocate the coeff pointer in sa_1d.  Attempting to copy
+    a long slit spectrum to onedspec format caused a segmentation violation.
+    (5/27/92, Valdes)
+
+doc/scopy.hlp
+doc/sarith.hlp
+    The examples incorrectly showed nsum to be a task parameter.
+    (5/21/92, Valdes)
+
+bplot.cl
+    The error when a nonexistent image was specified was not properly
+    handled.  (5/18/92, Valdes)
+
+splot/splot.key
+    Clarified 'o' key description.  (5/14/92, Valdes)
+
+smw.x
+scombine/t_scombine.x
+    1. Added additional commands to delete keywords which should not be
+       present.
+    2. When mapping the output image a copy of the input image header is
+       made.  This header may contain WCS keywords which are invalid.
+       A call is now made to smw_openim() which has the effect of cleaning
+       up the header.
+    (5/14/92, Valdes)
+
+=====
+V2.10
+=====
+
+doc/*.hlp
+doc/sys/onedv210.ms +
+    Make documentation changes to allow all revisions to be obtained with
+    "help onedspec.* sec=rev".  The package revisions summary was prepared
+    and installed.  (5/6/92, Valdes)
+
+splot/splot.x
+splot/splotcolon.x
+splot/splot.key
+splot.par
+doc/splot.hlp
+    1.	Added the option "wreset" to have the graph limits automatically
+	restored to the initial values for each new spectrum.
+    2.  Added colon commands to change the options interactively.
+    (5/6/92, Valdes)
+
+shdr.x
+    A 1D image section of a 2D (not multispec) image which is not along
+    the specified dispersion axis will now print a warning and use the
+    specified axis rather than aborting.  (5/6/92, Valdes)
+
+smw.x
+shdr.x
+    Added checks in the case of log-linear dispersion (DC-FLAG=1) that
+    the coordinates make sense.  Otherwise a linear dispersion is used.
+    This comes up when DC-FLAG is set to 1 but the other coordinate
+    information is incorrect or missing resulting in pixel coordinates.
+    Without this check there would be an attempt to take the dex of
+    a pixel coordinate causing a floating overflow error.
+    (5/5/92, Valdes)
+
+identify/t_reidentify.x
+    Added call to strip whitespace from the reference image name
+    accidentally entered by the user.  Extra whitespace  caused a
+    mysterious behavior in finding a database entry which was hard
+    to track down.
+    (5/1/92, Valdes)
+
+identify/idinit.x
+    Added check to not unmap the database if it was never openned.
+    This would cause a segmentation error if a database was never
+    accessed.
+    (5/1/92, Valdes)
+
+identify/iddb.x
+identify/t_reidentify.x
+identify/identify.h
+    The database interaction was poorly done resulting in repeatedly
+    opening and reading the database file.  If there are many entries this
+    becomes very slow.  The DTTEXT routines were modified to add a remap
+    routine allowing a database file to remain open but automatically
+    closing and opening a new database if the database name changes.  It
+    also allows changing access modes by closing and opening the file but
+    leaving the rest of the data structure alone. This avoids the need to
+    rescan the file each time the access mode changes and allows existence
+    checks for entries (from the original scan) while still in APPEND mode
+    without having to switch file access modes.  The identify structure was
+    extended to include the database pointer so that id_dbread and
+    id_dbwrite could use the remap routine without closing the database
+    between calls.  Thus, repeated calls to id_dbread and id_dbwrite for
+    the same image are much more efficient and the database is only scanned
+    once in the first read.  There is still a slight inefficiency in that
+    switching between reading and writing requires reopening the file.  For
+    the purposes of simple checking for existing entries without needing to
+    read the entry and change modes a new routine id_dbcheck was added.
+    Finally, the logic in REIDENTIFY was modified so that repeated mode
+    switches between reading and writing are avoided.  The id_dbcheck
+    routine is used when override checking is enabled.  REIDENTIFY
+    is now much faster when dealing with large numbers of spectra in
+    images (long slit with a fine step size or multifiber spectra with
+    many fibers).  (4/30/92, Valdes)
+
+smw.x
+    An axis map is set for 1D multispec images.  (4/27/92, Valdes)
+
+shdr.x
+    Shdr_system was changing the wrong pointers causing later calls to
+    shdr_open to produce an invalid coordinate system.  (2/18/92, Valdes)
+
+scombine/t_scombine.x
+scombine/iclog.x
+scombine/icscale.x
+scombine/icombine.x
+scombine.par
+doc/scombine.hlp
+    1.  The gain and read noise must be read when the image is open and
+    	are stored in the RA and DEC spectrum structure parameters.
+    2.  NCOMBINE is not used on input.
+    3.  The exposure time is taken from the spectrum structure and the
+        keyword name is no longer a parameter.
+    (2/12/92, Valdes)
+
+scombine/icscale.x
+    Changed action for negative scaling, etc. to a warning.
+    (2/10/92, Valdes)
+
+calibrate.par
+sensfunc.par
+standard.par
+onedspec.par
+doc/calibrate.hlp
+doc/sensfunc.hlp
+doc/standard.hlp
+doc/package.hlp
+    1. Redirected observatory parameter to package parameter
+    2. Added observatory package parameter
+    (2/6/92, Valdes)
+
+ecidentify/ecdofit.x
+ecidentify/ecffit/ecfcolon.x
+    1.  The rejected points were not being reset between fits resulting in
+	misleading RMS values.
+    2.  Expanded the :show in fit mode.
+    (2/6/92, Valdes)
+
+t_standard.x
+standard.key
+    1.  The abbreviation of N or Y for NO or YES is now allowed.
+    2.  The key file was moved from noaolib$scr to onedspec$
+    (2/6/92, Valdes)
+
+t_calibrate.x
+t_standard.x
+irsiids/t_bswitch.x
+    Converted from obsimcheck to obsimopen.  (2/4/92, Valdes)
+
+identify/*
+doc/identify.hlp
+    Added feature labels.  (1/30/92, Valdes)
+
+refspectra.par
+doc/refspectra.hlp
+dispcor/ref*
+    1.  Added group parameter
+    2.  Sort parameter is now used as a double
+    3.  If group or sort keywords are specified but not found it is a fatal
+	error.
+    (1/29/92, Valdes)
+
+t_sfit.x
+sfit.par
+continuum.par
+eccontinuum.par
+doc/sfit.hlp
+doc/continuum.hlp
+    Added the new "markrej" parameter used in ICFIT to control whether
+    rejected points are marked.  (1/21/92, Valdes)
+
+getcalib.x
+    The standard star parameter query will now print the file "standards.men"
+    in the calibration directory if the user supplied name does not match an
+    available file. (1/20/92, Valdes)
+
+irsiids/t_widstape.x
+    Modified the widstape task to support the new mag tape name syntax.
+    (1/7/92, Davis)
+
+identify/t_reidentify.x
+    If there is no dispersion function then no shift will now be computed.
+    (11/18/91, Valdes)
+
+ecidentify/ecffit/ecffit.x
+    Removed the progress print statements because they mess up the screen
+    clear on XTERM.  Someday it might be desirable to put them back again.
+    (11/11/91, Valdes)
+
+doc/bswitch.hlp
+    Fixed minor typo where the keyword BEAM-NUM was refered to as BEAM.
+    (6/19/91, Valdes)
+
+t_combine.x
+    1. The final coord scale must have WPC > 0.  Needed to add an abs(WPC)
+       in case an input spectrum had negative WPC.  (5/3/91, Valdes)
+
+getnimage.x
+t_bswitch.x
+    Moved procedure add_spec from getnimage.x to t_bswitch.x (4/25/91, Valdes)
+
+t_calibrate.x
+    MWCS modifications.  Aperture selection option removed.  (4/24/91, Valdes)
+
+splot/getimage.x
+splot/splotfun.x
+splot/splot.x
+splot/replot.x
+splot/autoexp.x
+    Modified to use separate coordinate array. (3/29/91, Valdes)
+
+iwewcs.x
+gmwcs.x
+wfinit.x
+wfmspec.x
+mwopenim1.x
+mkpkg
+idsm_keywrds.x
+load_hdr.x
+    Initial WCS modifications (3/28/91, Valdes)
+
+====
+V3.1
+====
+
+t_calibrate.x
+    Moved calibration messages outside of loop over bands.
+    (3/26/91, Valdes)
+
+ecidentify/ecidentify.x
+ecidentify.par
+    Added autowrite parameter which is similar to that of IDENTIFY.
+    (3/21/91, Valdes)
+
+ecidentify/ecffit/ecfsolve.x
+    The residual vector was not correctly set by ecf_solve.  (3/18/91, Valdes)
+
+t_scopy.x
+    1.  If no beam number is found for ONEDSPEC images it defaults to 1.
+    2.  The image titles are converted to APID for ONEDSPEC images
+	going to MULTISPEC if the title differs from the main MULTISPEC
+	title.
+    3.  Added checking for repeated aperture numbers in ONEDSPEC to
+	MULTISPEC.
+    (3/13/91, Valdes)
+
+identify/t_reidentify.x
+reidentify.par
+    Interactive parameter is now four valued to allow better control
+    of reidentification queries such as in the IMRED scripts.
+
+dispcor/ecio.x
+dispcor/ecdispcor.x
+    1. Fixed datatype error when reading the low and high values from the
+       APNUM keywords.
+    2. Added REFSHFT capability for use with the FOE package.
+    3. Added support for third dimension produced by APEXTRACT.
+    (1/31/91, Valdes)
+
+t_scopy.x
+    Fixed bugs in renumber option.  It was renumbering before checking the
+    aperture list rather than after.
+    (1/31/91, Valdes)
+
+ecdispcor.par
+    The parameter override needed to be changed to the parameter rebin.
+    (1/16/91, Valdes)
+
+identify/iddb.x
+    REIDENTIFY checked if an entry in the database was absent by checking for
+    an error return from id_dbread.  The error return was made without
+    first closing the database file.  When reidentifying a large number
+    of images/apertures the task would run out of file descriptors.
+    The fix was to put a database close statement before the error
+    call.  (1/7/91, Valdes)
+
+splot/getimage.x
+load_hdr.x
+    1.  Added error checking for aperture out of bounds in multispec format.
+    2.  Added automatic limit on band specification in multispec format.
+    3.  Added missing nband=0 for case of 1D image section.
+    (1/7/91, Valdes)
+
+identify/idlinelist.x
+    The 'l' did not find lines because the first pass to finding MAXFEATURES
+    did not discriminate against finding the same line with different
+    user coordinates.  This locked out weaker features during the finding.
+    Then when the features were added to the feature least the MINSEP
+    parameter eliminated the duplicates resulting in fewer than MAXFEATURES
+    features.  (12/19/90, Valdes)
+
+splot/stshelp.key
+splot/getimage.x
+splot/anshdr.x
+splot/mktitle.x
+splot/mkpkg
+splot/splotfun.x
+splot/splot.x
+splot/splot.key
+splot.par
+    1.  Added support for bands in 3D images.  This involved adding a
+	band task parameter and a '%' key.
+    2.  The 'o' overplot key is now a toggle for the next graph.  It
+	does not query for the image.  The user follows 'o' with 'g',
+	'#', or '%'.
+    (12/19/90, Valdes)
+
+splot/deblend.x
+splot/gfit.x +
+splot/stsfit.x
+splot/stsfit.key +
+splot/splot.x
+splot/mkpkg
+noao$lib/scr/splot.key -
+splot/splot.key +
+    1.  The background was not subtracted in the initial amplitude estimate.
+    2.  The tau parameter in the call the hfti was too large.  Changed
+	from .001 to 1E-10.
+    3.  Added new gaussian fitting function, key 'G'.
+    4.  Changed line help to use a file rather than coding the print
+	statements.
+    5.  Moved key file to source directory.
+    (12/19/90, Valdes)
+
+t_scopy.x
+    1.  Added a renumber option.
+    2.  For an input list of 1D images without onedspec extensions one can
+	uses a null aperture list to pack them into a single multispec
+	image.
+	(12/13/90, Valdes)
+
+splot/deblend.x
+    1.  Fixed bug that was scaling twice in computing the initial peak values.
+        This was also fixed in NEWIMRED.
+    2.  Last deblending prompt was not erased.  Replaced with exiting
+	deblending message.
+    (12/4/90, Valdes)
+
+t_sfit.x
+    Fixed logfile prefix string from STFONTINUUM to SFIT.
+    (11/20/90, Valdes and Seaman)
+
+t_bswitch.x
+t_calibrate.x
+t_standard.x
+sensfunc/sfimage.x
+bswitch.par
+calibrate.par
+standard.par
+sensfunc.par
+doc/bswitch.hlp
+doc/calibrate.hlp
+doc/standard.hlp
+doc/sensfunc.hlp
+    Converted to using observatory database.  (11/19/90, Valdes)
+
+t_fitprofs.x
+onedspec.hd
+doc/fitprofs.hlp +
+    1. Modified to write output model even if there is a fitting error to
+       avoid output images with not pixel file.
+    2. The image title was not dereferenced when generating the log title
+       string with onedspec format.
+    3. Added help page.
+    (11/2/90, Valdes)
+
+identify/iddoshift.x
+    Added image label shift info.
+    (10/29/90, Valdes)
+
+indentify/t_reidentify.x
+    1. The entrance into the interactive mode was not initializing such things
+    as the feature type and width.  It now initializes using parameters from
+    IDENTIFY if needed.
+    2. When not in verbose mode but when entering the interactive IDENTIFY
+    it did not print the revised statistics line.  This has been fixed.
+    (10/22/90, Valdes)
+
+ecidentify.par
+noao$imred/echelle/doc/ecidentify.hlp
+ecidentify/ ecidentify/ecffit
+noao$lib/scr/ecidentify.key --> ecidentify/ecidentify.key
+noao$lib/scr/ecffit.key --> ecidentify/ecffit/ecffit.key
+    1.  Moved key files to source directory.
+    2.  Made changes allowing iterative rejection in the echelle dispersion
+	tasks.  This adds three parameters to the ECIDENTIFY parameter
+	file, the database files (backwards compatible), and colon
+	commands in fitting mode.  The feature lists printed and in the
+	database now include an additional column to indicated rejected
+	lines. (10/15/90, Valdes)
+
+splot/splot.x
+    Changed the temporary spool file to be in tmp$.  (10/3/90, Valdes)
+
+doc/dispcor.hlp
+    Added notes warning that flux conservation will change the units of the
+    flux.  (10/3/90, Valdes)
+
+splot/splot.x
+doc/splot.hlp
+noao$lib/scr/splot.key
+    Added :log and :nolog commands to toggle logging of measurements.
+    (10/3/90, Valdes)
+
+load_hdr.x
+    Header keyword datatype conversion errors are now a warning.
+    (10/3/90, Valdes)
+
+identify/idcolon.x
+    Unrecognized or ambiguous colon commands are now noted.  (10/2/90, Valdes)
+
+dispcor.par (also in imred.iids and imred.irs)
+dispcor/dispcor.x
+dispcor/dcio.x
+dispcor/ranges.x
+doc/dispcor.hlp
+    1.  is_in_range not considers INDEF to be equivalent to MAX_INT.  This
+	has the effect that if no range is specified, "", then INDEF is in
+	the range while is some specific range which is not open ended will
+	not include INDEF in the list.
+    2.  Added new verbose parameter and modified program to print messages
+	when spectra are skipped.
+    3.  Ignoreaps now only applies to the global wavelength determination.
+    (10/2/90, Valdes)
+
+ecidentify/ecffit/ecfgraph.x
+    Put a check to avoid trying to plot points outside the defined window.
+    Plotting very deviant points outside the rescaled window causes a
+    gio floating overflow error.  This fix is a workaround before the
+    real bug gets fixed.  (9/20/90, Valdes)
+
+identify/idgdata.x
+identify/idmap.x
+    Make changes to allow working with 3D multispec images.
+    (9/14/90, Valdes)
+
+calibrate.x
+sensfunc/sfgimage.x
+    Make simple changes to allow working with 3D multispec images.
+    (9/12/90, Valdes)
+
+splot/splot.x
+splot/fudgex.x
+doc/splot.hlp
+    1.  Changed the 'x' key to use only the x cursor values and connect the
+	nearest pixels.  (8/31/90, Valdes)
+    2.  Added a new option, xydraw, to select drawing between x-y points
+	instead of using nearest pixel values.  (9/5/90, Valdes)
+
+bplot.cl
+doc/bplot.hlp
+    BPLOT revised to use new SLIST.  This is a much simpler and better
+    script.  It selects on aperture numbers.
+    (8/24/90, Valdes)
+
+t_slist.x
+doc/slist.hlp
+    SLIST now has a format parameter.  In multispec mode more approriate
+    output is obtained.  The multispec mode allows selection by aperture.
+    The short header listing is good for making lists for scripts to scan.
+    (8/24/90, Valdes)
+
+================================
+V3 of ONEDSPEC installed 8/23/90
+================================
+
+fortran/polft1.f
+    Fixed bug in which reference was made to a part of some work arrays
+    not used by the program.  This caused an arithmetic error on the MIPS.
+    (7/20/90, Valdes)
+
+onedspec.cl
+onedspec.men
+onedspec.cl
+bplot.cl
+doc/msdispcor.hlp +
+doc/bplot.hlp
+    1.  Added MSDISPCOR to the package.
+    2.  Replaced the old BPLOT with the code from MSBPLOT.  This program
+	also uses change to SPLOT which selects by aperture number.
+
+load_hdr.x
+splot/splot.x
+splot/mktitle.x
+splot/deblend.x
+splot/eqwidth.x
+splot/eqwidthcp.x
+splot/anshdr.x +
+splot/anssave.x -
+splot/mkpkg
+doc/splot.hlp
+noao$lib/scr/splot.key
+t_standard.x
+    1.  Added mapping of APID keyword, if present, to the iids structure
+	LABEL field.
+    2.  SPLOT, STANDARD  modified to use LABEL field instead of IM_TITLE.
+    3.  SPLOT modified to use different line type during overplotting.
+    4.  Removed maximum number limit for deblending.
+    5.  SPLOT now uses aperture number if the image is multispec/echelle.
+    6.  Added a new key, "#", to get new aperture without query about
+	image.
+
+t_specplot.x
+load_hdr.x
+idsm_keywrds.x
+dispcor/dcio.x
+dispcor/dispcor.x
+dispcor/msdispcor.x
+dispcor/ecdispcor.x
+sensfunc/sfoutput.x
+    Added CD1_1 as allowed substitute for WPC and CDELT1
+
+onedspec.hd
+    The revisions help is now a sys option.
+
+t_scopy.x +
+t_sapertures.x +
+scopy.par +
+sapertures.par +
+doc/scopy.hlp +
+doc/sapertures.hlp +
+mkpkg
+x_onedspec.x
+t_msselect.x -
+    1.  New task SCOPY added to handle copying and extraction apertures
+	between different formats
+    2.  New task SAPERTURES added to modify APNUM and APID info using
+	a text file.
+    3.	Removed MSSELECT/ECSELECT as they are replaced by SCOPY.
+
+onedspec.cl
+onedspec.hd
+onedspec.men
+x_onedspec.x
+t_sfit.x +
+sfit.par +
+continuum.par
+t_ecctm.x -
+continuum.cl -
+mkpkg
+doc/sfit.hlp
+doc/continuum.hlp
+    1.	New task SFIT added.  This is a modification of Rob Seamans ECCONTINUUM
+	task.
+    2.  A new output option was added to output the data with any rejected
+	points replaced by fitting values.  This replacement also may be used
+	with the difference and ratio output types.
+    3. 	ECCONTINUUM is just a different name for SFIT.
+    4. 	CONTINUUM is just a different name for SFIT.  The script version
+	based on FIT1D has been removed.
+
+onedspec.par
+    Incremented version number to V3.
+
+t_specplot.x
+specplot.par
+specplot.key +
+doc/specplot.hlp
+noao$lib/scr/specplot.key -
+    1.  Added apertures and logfile parameters.
+    2.	Moved key file to source directory
+    3.  Added to save sp_vshow parameters in logfile.
+    4.  Added option to undelete last deleted spectrum.
+    5.  Extended to also plot anything in third dimension.
+    6.  Added sysid parameter.
+    7.  Added ability to set line type to histogram
+
+dispcor/dispcor.x
+    1.	Added aperture position information to APNUM keyword.
+
+msdispcor.par +
+dispcor/msdispcor.x
+dispcor/msio.x
+dispcor/msdispcor.com
+dispcor/mkpkg
+    1.  Added logfile.  This is particularly for logging reference
+	shift interpolation information.
+    2.  Added support for 3D format
+    3.  Added aperture position info for spatial interpolation.  The positions
+	are read for the object from the APNUM keyword, propagated as
+	needed, and read from the database for the dispersion functions.
+    3a.	A reference shift spectrum may be specified.
+    4.  Communicate aperture number through ms_seteval call and then do a
+	lookup for all other parameters.
+    5.  Propagate independent beam number.
+    6.  The number of apertures in the reference spectrum need not be
+	the same as the object spectrum though all object spectra must
+	have a reference dispersion function.
+    7.  Everything is now done by aperture number.  This allows line
+	numbers to change, particularly between the dispersion reference
+	image and the data image.
+    8.  Dependence of msdispcor.x on msdispcor.com removed.
+    9.  Fixed rounding problem in wavelengths.
+
+dispcor/ecdispcor.x
+dispcor/ecio.x
+dispcor/ecdispcor.com
+dispcor/mkpkg
+    1.  Everything is done by aperture number using a call to ec_seteval.
+	This removes dependence on ecdispcor.com
+    2.  Aperture limit info is propagated
+
+identify/identify.x --> identify/t_identify.x
+identify/identify.h
+identify/linelist.x + *.x
+identify/iddoshift.x
+identify/iddb.x
+identify.par
+mkpkg
+    1.	Added an autowrite parameter to IDENTIFY.
+    2.  Simplified linelist package by passing id pointer.  This affects
+	calling sequence of a number of procedures.
+    3.  Zero weight points are ignored and the number of valid features
+	used in the shift is printed.
+    4.  New id structure made some minor changes in main task.
+    5.  Dependence on center1d.h removed by including emmission/absorption
+	definitions in identify.h and new field in id structure.
+
+identify/iddb.x
+identify/identify.h
+identify/idgdata.x
+identify/ididentify.x
+identify/idinit.x
+identify/identify.key +
+identify/idmap.x +
+identify/idnoextn.x +
+identify/idgetim.x -
+idreplot.x -
+mkpkg
+    Added support for multispec format.
+    1.  The database name string includes aperture number.
+    2.  Image remains open for efficient movement through 2D image.
+    3.  A number of new fields are part of the id structure including
+	the image pointer, spectrum format, image axis, line number,
+	aperture info, and structure for saving copies of id structure.
+    4.  Added j, k, o keys to scroll through apertures.
+    5.  Changes are saved internally for multiple apertures until done
+	with the image.
+
+identify/idreidentify.x --> identify/t_reidentify.x
+reidentify.par
+reidentify.x -
+    1.  REIDENTIFY completely rewritten for efficiency, support for
+	multiaperture data, and for additional features and algorithms.
+    2.  The same number or order of apertures is not required.
+    3.  REIDENTIFY parameters changed to include interactive, track,
+	override, addfeatures, coordlist, match, maxfeatures, minsep,
+	graphics, cursor, and answer.
+
+------------------------------------------------------------------------------
+
+load_hdr.x
+splot/getimage.x
+    1.	Fixed bug that was setting NP1 to 1 instead of zero.
+    2.  Now load_hdr adjusts W0 to first good pixel.
+    3.  SPLOT no longer adjust W0 to first good pixel since it is done
+	by load_hdr.
+    (7/11/90, Valdes)
+
+onedspec$ecidentify/ecidentify.x
+onedspec$ecidentify/t_ecreid.x
+onedspec$ecidentify/ecdofit.x
+onedspec$ecidentify/ecffit/ecffit.x
+onedspec$ecidentify/ecffit/ecfsolve.x
+    1.	Added a fixed order fitting option so that ECREIDENTIFY will refit
+	with order fixed.  This is mostly just passing a parameter down
+	to ecf_solve.  (6/12/90, Valdes)
+
+onedspec$dispcor/msio.x
+    If an aperture identify entry was missing from the database the task
+    would quit with not error message.  This is fixed now though the
+    new version to be installed soon will not have this approach to
+    mapping the dispersion solutions anyway.  (6/4/90, Valdes)
+
+onedspec$doc/splot.hlp
+    Included query parameters since a user was asking about them.
+    (6/1/90, Valdes)
+
+====
+V2.9
+====
+
 onedspec$t_sums.x
 onedspec$sums.par
     If an image already exists a new query parameter will be used to get
@@ -75,6 +815,18 @@ onedspec$sensfunc/sfstds.x
     The data for apertures which are in the aperture list when the ignoreaps
     flag is set was not being read unless the aperture list included
     aperture 1.  This has been fixed. (11/8/89, Valdes)
+
+onedspec$load_hdr.x
+onedspec$t_specplot.x
+onedspec$splot/splot.x
+onedspec$splot/mktitle.x
+	1. The new APID titles for multispec format spectra is now mapped into
+	the unused LABEL element of the IDS structure.  For other formats
+	or if the keyword is missing then the image title is substituted.
+	2. SPLOT now labels with the LABEL string rather the the image
+	title to allow individual titles for multispec spectra.
+	3. SPECPLOT uses the APID titles if present.
+	(10/27/89, Valdes)
 
 onedspec$identify/iddofit.x
     The order of evaluation in complex if statements is not necessarily

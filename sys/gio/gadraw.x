@@ -57,8 +57,10 @@ begin
 
 	if (xtran == LINEAR && ytran == LINEAR) {
 	    # Optimize the case linear.
-	    x = ((wx - wxorigin) * xscale) + mxorigin
-	    y = ((wy - wyorigin) * yscale) + myorigin
+            x = max (0.0, min (real(GKI_MAXNDC),
+                ((wx - wxorigin) * xscale) + mxorigin))
+            y = max (0.0, min (real(GKI_MAXNDC),
+                ((wy - wyorigin) * yscale) + myorigin))
 	} else {
 	    # General case.
 	    call gpl_wcstogki (gp, wx, wy, x, y)

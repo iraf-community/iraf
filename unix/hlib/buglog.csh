@@ -39,8 +39,8 @@ set	number	= 1
 set	module	= "$1"
 set	from	= "`whoami`"
 set	date	= "`date`"
-set	system	= "V2.8"
-set	irafmail = "iraf@lyra"
+set	system	= "V2.9"
+set	irafmail = "iraf@tucana.noao.edu"
 
 # Get exclusive access to the bugfile.
 

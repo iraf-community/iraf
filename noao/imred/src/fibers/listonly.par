@@ -1,0 +1,13 @@
+objects,s,a,"",,,"List of object spectra"
+apref,f,a,"",,,"Aperture reference spectrum"
+flat,f,a,"",,,"Flat field spectrum"
+throughput,f,a,"",,,"Throughput file or image"
+arcs1,s,a,"",,,"List of arc spectra"
+arcs2,s,a,"",,,"List of shift arc spectra"
+dispcor,b,a,yes,,,"Dispersion correct spectra?"
+skysubtract,b,a,yes,,,"Subtract sky?"
+redo,b,a,no,,,"Redo operations if previously done?"
+update,b,a,yes,,,"Update spectra if cal data changes?"
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+mode,s,h,"ql",,,

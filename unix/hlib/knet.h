@@ -86,5 +86,6 @@ define	zzclmt	kzclmt
 define	zzopmt	kzopmt
 define	zzrdmt	kzrdmt
 define	zzrwmt	kzrwmt
+define	zzstmt	kzstmt
 define	zzwrmt	kzwrmt
 define	zzwtmt	kzwtmt

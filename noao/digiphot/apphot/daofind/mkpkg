@@ -18,8 +18,8 @@ libpkg.a:
 	apfdfind.x	"../lib/apphot.h"	"../lib/display.h"	\
 			"../lib/find.h"		"../lib/noise.h"
 	apfdfree.x	"../lib/apphotdef.h"
-	apfdgpars.x	"../lib/apphot.h"	"../lib/noise.h"	\
-			"../lib/find.h"         "../lib/display.h"
+	apfdgpars.x	"../lib/noise.h"	"../lib/find.h"         \
+			"../lib/display.h"
 	apfdinit.x	"../lib/apphotdef.h"	"../lib/finddef.h"
 	apfdpars.x	"../lib/find.h"		"../lib/display.h"
 	apfdradsetup.x	

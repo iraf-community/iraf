@@ -1,7 +1,7 @@
 include	<error.h>
 include	<pkg/gtools.h>
 
-define	HELP	"noao$lib/scr/ecffit.key"
+define	HELP	"noao$onedspec/ecidentify/ecffit/ecffit.key"
 define	PROMPT	"fitcoords surface fitting options"
 
 # EC_FIT -- Echelle dispersion fitting.
@@ -10,7 +10,7 @@ define	PROMPT	"fitcoords surface fitting options"
 #	Y - Relative order number
 #	Z - Wavelength
 
-procedure ecf_fit (ecf, gp, gt, xd, yd, zd, wd, npts)
+procedure ecf_fit (ecf, gp, gt, xd, yd, zd, wd, npts, fixedorder)
 
 pointer	ecf			# GSURFIT pointer
 pointer	gp			# GIO pointer
@@ -20,31 +20,42 @@ double	yd[npts]		# Order number
 double	zd[npts]		# Wavelength
 double	wd[npts]		# Weights
 int	npts			# Number of points
+int	fixedorder		# Fixed order?
 
 real	wx, wy
 int	wcs, key
 int	i, newgraph
-pointer	sp, xr, yr, wr
+pointer	sp, wd1, rd, xr, yr
 char	cmd[SZ_LINE]
 
 int	ecf_nearest()
 int	clgcur(), scan(), nscan()
-errchk	ecf_solve(), ecf_solve1()
+errchk	ecf_solve()
 include	"ecffit.com"
 
 begin
+	# Allocate residuals and weights with rejected points arrays
+	call smark (sp)
+	call salloc (wd1, npts, TY_DOUBLE)
+	call salloc (rd, npts, TY_DOUBLE)
+	call amovd (wd, Memd[wd1], npts)
+
 	# Compute a solution and return if not interactive.
 	if (gp == NULL) {
-	    call ecf_solve (ecf, xd, yd, zd, wd, npts)
+	    call ecf_solve (ecf, xd, yd, zd, Memd[wd1], Memd[rd], npts,
+		fixedorder)
+	    call ecf_reject (ecf, xd, yd, zd, Memd[wd1], Memd[rd], npts,
+		fixedorder)
+	    do i = 1, npts
+		if (Memd[wd1+i-1] != wd[i])
+		    wd[i] = -1.
+	    call sfree (sp)
 	    return
 	}
 
 	# Allocate real graph vectors.
-	call smark (sp)
 	call salloc (xr, npts, TY_REAL)
 	call salloc (yr, npts, TY_REAL)
-	call salloc (wr, npts, TY_REAL)
-	call achtdr (wd, Memr[wr], npts)
 
 	# Read cursor commands.
 	key = 'f'
@@ -58,12 +69,15 @@ begin
 		    call gargi (i)
 		    if (nscan() == 1)
 			offset = i
-		    call printf ("Fitting with order offset %d ...")
-			call pargi (offset)
-		    call flush (STDOUT)
-		    call ecf_solve1 (ecf, xd, yd, zd, wd, npts)
-		    call ecf_gdata (ecf, xtype, xd, yd, zd, Memr[xr], npts)
-		    call ecf_gdata (ecf, ytype, xd, yd, zd, Memr[yr], npts)
+		    call amovd (wd, Memd[wd1], npts)
+		    call ecf_solve (ecf, xd, yd, zd, Memd[wd1], Memd[rd], npts,
+			YES)
+		    call ecf_reject (ecf, xd, yd, zd, Memd[wd1], Memd[rd], npts,
+			YES)
+		    call ecf_gdata (ecf, xtype, xd, yd, zd, Memd[rd],
+			Memr[xr], npts)
+		    call ecf_gdata (ecf, ytype, xd, yd, zd, Memd[rd],
+			Memr[yr], npts)
 		    call ecf_title (gt)
 		    newgraph = YES
 		}
@@ -75,7 +89,7 @@ begin
 		if (cmd[1] == '/')
 		    call gt_colon (cmd, gp, gt, newgraph)
 		else
-		    call ecf_colon (cmd, gp, ecf)
+		    call ecf_colon (cmd, gp)
 
 	    case 'x': # Set ordinate
 		call printf ("Ordinate - ")
@@ -89,7 +103,8 @@ begin
 			xtype = key
 		        call gt_setr (gt, GTXMIN, INDEF)
 		        call gt_setr (gt, GTXMAX, INDEF)
-		        call ecf_gdata (ecf, xtype, xd, yd, zd, Memr[xr], npts)
+		        call ecf_gdata (ecf, xtype, xd, yd, zd, Memd[rd],
+			    Memr[xr], npts)
 		        call ecf_title (gt)
 			newgraph = YES
 		    } else
@@ -108,7 +123,8 @@ begin
 			ytype = key
 		        call gt_setr (gt, GTYMIN, INDEF)
 		        call gt_setr (gt, GTYMAX, INDEF)
-		        call ecf_gdata (ecf, ytype, xd, yd, zd, Memr[yr], npts)
+		        call ecf_gdata (ecf, ytype, xd, yd, zd, Memd[rd],
+			    Memr[yr], npts)
 		        call ecf_title (gt)
 			newgraph = YES
 		    } else
@@ -120,7 +136,7 @@ begin
 
 	    case 'c': # Cursor coordinates
 		i = ecf_nearest (gp, gt, wx, wy, wcs, key, Memr[xr], Memr[yr],
-		    Memr[wr], npts)
+		    wd, npts)
 		call printf ("%10.2g %d %10.8g\n")
 		    call pargd (xd[i])
 		    call pargd (yd[i])
@@ -128,22 +144,26 @@ begin
 
 	    case 'd': # Delete
 		i = ecf_nearest (gp, gt, wx, wy, wcs, key, Memr[xr], Memr[yr],
-		    Memr[wr], npts)
+		    wd, npts)
 		if (i > 0)
-		    wd[i] = Memr[wr+i-1]
+		    Memd[wd1+i-1] = wd[i]
 
 	    case 'u': # Undelete
 		i = ecf_nearest (gp, gt, wx, wy, wcs, key, Memr[xr], Memr[yr],
-		    Memr[wr], npts)
+		    wd, npts)
 		if (i > 0)
-		    wd[i] = Memr[wr+i-1]
+		    Memd[wd1+i-1] = wd[i]
 
 	    case 'f': # Fit
-		call printf ("Fitting ...")
-		call flush (STDOUT)
-		call ecf_solve (ecf, xd, yd, zd, wd, npts)
-		call ecf_gdata (ecf, xtype, xd, yd, zd, Memr[xr], npts)
-		call ecf_gdata (ecf, ytype, xd, yd, zd, Memr[yr], npts)
+		call amovd (wd, Memd[wd1], npts)
+		call ecf_solve (ecf, xd, yd, zd, Memd[wd1], Memd[rd], npts,
+		    fixedorder)
+		call ecf_reject (ecf, xd, yd, zd, Memd[wd1], Memd[rd], npts,
+		    fixedorder)
+		call ecf_gdata (ecf, xtype, xd, yd, zd, Memd[rd],
+		    Memr[xr], npts)
+		call ecf_gdata (ecf, ytype, xd, yd, zd, Memd[rd],
+		    Memr[yr], npts)
 		call ecf_title (gt)
 		newgraph = YES
 
@@ -161,10 +181,13 @@ begin
 	    }
 
 	    if (newgraph == YES) {
-		call ecf_graph (gp, gt, Memr[xr], Memr[yr], Memr[wr], npts)
+		call ecf_graph (gp, gt, Memr[xr], Memr[yr], wd, Memd[wd1], npts)
 		newgraph = NO
 	    }
 	} until (clgcur ("cursor", wx, wy, wcs, key, cmd, SZ_LINE) == EOF)
 
+	do i = 1, npts
+	    if (Memd[wd1+i-1] != wd[i])
+		wd[i] = -1.
 	call sfree (sp)
 end

@@ -1,13 +1,13 @@
-      INTEGER FUNCTION INDEX (STR, C)
-      INTEGER STR (100), C
-      INDEX = 1
-23000 IF (.NOT.(STR (INDEX) .NE. -2))GOTO 23002
-      IF (.NOT.(STR (INDEX) .EQ. C))GOTO 23003
-      RETURN
-23003 CONTINUE
-23001 INDEX = INDEX + 1
-      GOTO 23000
-23002 CONTINUE
-      INDEX = 0
-      RETURN
-      END
+      integer function index (str, c)
+      integer str (100), c
+      index = 1
+23000 if (.not.(str (index) .ne. -2))goto 23002
+      if (.not.(str (index) .eq. c))goto 23003
+      return
+23003 continue
+23001 index = index + 1
+      goto 23000
+23002 continue
+      index = 0
+      return
+      end

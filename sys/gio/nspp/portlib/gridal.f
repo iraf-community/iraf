@@ -31,7 +31,7 @@ c
 c
 c     ray bovet ishft changed to ishfta patch
       equivalence     (xxa,zza(1))   ,(xxb,zzb(1))   ,(xxc,zzc(1))   ,
-     1                (xxd,zzd(1))   ,(mfmtx(1),ifmt(1))     ,
+     1                (xxd,zzd(1))   ,(mfmtx(1),ifmt(1,1)),
      2                (mx,iz(1))     ,(mxa,iza(1))   ,(mxb,izb(1))   ,
      3                (majx,nmaj(1)) ,(minx,nmin(1)) ,(mumx,num(1))  ,
      4                (mxdec,izdec(1))       ,(msizx,isiz(1)),

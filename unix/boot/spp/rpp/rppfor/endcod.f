@@ -1,86 +1,86 @@
-      SUBROUTINE ENDCOD (ENDSTR)
-      INTEGER ENDSTR(1)
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER SRET(7)
-      DATA SRET(1)/114/,SRET(2)/101/,SRET(3)/116/,SRET(4)/117/,SRET(5)/1
-     *14/,SRET(6)/110/,SRET(7)/-2/
-      IF (.NOT.(ESP .NE. 0))GOTO 23000
-      CALL SYNERR (36HUnmatched 'iferr' or 'then' keyword.)
-23000 CONTINUE
-      ESP = 0
-      BODY = 0
-      ERNAME = 0
-      IF (.NOT.(ERRTBL .NE. 0))GOTO 23002
-      CALL RMTABL (ERRTBL)
-23002 CONTINUE
-      ERRTBL = 0
-      MEMFLG = 0
-      IF (.NOT.(RETLAB .NE. 0))GOTO 23004
-      CALL OUTNUM (RETLAB)
-23004 CONTINUE
-      CALL OUTTAB
-      CALL OUTSTR (SRET)
-      CALL OUTDON
-      COL = 6
-      CALL OUTTAB
-      CALL OUTSTR (ENDSTR)
-      CALL OUTDON
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      subroutine endcod (endstr)
+      integer endstr(1)
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer sret(7)
+      data sret(1)/114/,sret(2)/101/,sret(3)/116/,sret(4)/117/,sret(5)/1
+     *14/,sret(6)/110/,sret(7)/-2/
+      if (.not.(esp .ne. 0))goto 23000
+      call synerr (36HUnmatched 'iferr' or 'then' keyword.)
+23000 continue
+      esp = 0
+      body = 0
+      ername = 0
+      if (.not.(errtbl .ne. 0))goto 23002
+      call rmtabl (errtbl)
+23002 continue
+      errtbl = 0
+      memflg = 0
+      if (.not.(retlab .ne. 0))goto 23004
+      call outnum (retlab)
+23004 continue
+      call outtab
+      call outstr (sret)
+      call outdon
+      col = 6
+      call outtab
+      call outstr (endstr)
+      call outdon
+      end
+c     logic0  logical_column

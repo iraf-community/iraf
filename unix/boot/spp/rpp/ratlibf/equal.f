@@ -1,15 +1,15 @@
-      INTEGER FUNCTION EQUAL (STR1, STR2)
-      INTEGER STR1(100), STR2(100)
-      INTEGER I
-      I = 1
-23000 IF (.NOT.(STR1 (I) .EQ. STR2 (I)))GOTO 23002
-      IF (.NOT.(STR1 (I) .EQ. -2))GOTO 23003
-      EQUAL=(1)
-      RETURN
-23003 CONTINUE
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      EQUAL=(0)
-      RETURN
-      END
+      integer function equal (str1, str2)
+      integer str1(100), str2(100)
+      integer i
+      i = 1
+23000 if (.not.(str1 (i) .eq. str2 (i)))goto 23002
+      if (.not.(str1 (i) .eq. -2))goto 23003
+      equal=(1)
+      return
+23003 continue
+23001 i = i + 1
+      goto 23000
+23002 continue
+      equal=(0)
+      return
+      end

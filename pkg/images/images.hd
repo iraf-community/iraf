@@ -2,12 +2,12 @@
 
 $doc		= "./doc/"
 $tv		= "./tv/"
-$filters	= "pkg$images/filters/"
-$geometry	= "pkg$images/geometry/"
-$imfit		= "pkg$images/imfit/"
-$imarith	= "pkg$images/imarith/"
-$iminfo		= "pkg$images/iminfo/"
-$imutil		= "pkg$images/imutil/"
+$filters	= "images$filters/"
+$geometry	= "images$geometry/"
+$imfit		= "images$imfit/"
+$imarith	= "images$imarith/"
+$iminfo		= "images$iminfo/"
+$imutil		= "images$imutil/"
 
 blkavg		hlp=doc$blkavg.hlp,	src=geometry$t_blkavg.x
 blkrep		hlp=doc$blkrep.hlp,	src=geometry$t_blkrep.x
@@ -31,7 +31,7 @@ imdivide	hlp=doc$imdivide.hlp,	src=imarith$t_imdivide.x
 imgets		hlp=doc$imgets.hlp,	src=iminfo$imgets.x
 imheader	hlp=doc$imheader.hlp,	src=iminfo$imheader.x
 imhistogram	hlp=doc$imhistogram.hlp,src=iminfo$imhistogram.x
-imlintran	hlp=doc$imlintran.hlp
+imlintran	hlp=doc$imlintran.hlp,  src=images$imlintran.cl
 imrename	hlp=doc$imrename.hlp,	src=imutil$t_imrename.x
 imshift		hlp=doc$imshift.hlp,	src=geometry$t_imshift.x
 imslice		hlp=doc$imslice.hlp,	src=imutil$t_imslice.x
@@ -47,9 +47,9 @@ magnify		hlp=doc$magnify.hlp,	src=geometry$t_magnify.x
 median		hlp=doc$median.hlp,	src=filters$t_median.x
 minmax		hlp=doc$minmax.hlp,	src=imutil$t_minmax.x
 mode		hlp=doc$mode.hlp,	src=filters$t_mode.x
-register	hlp=doc$register.hlp
+register	hlp=doc$register.hlp,	src=images$register.cl
 revisions	sys=Revisions
-rotate		hlp=doc$rotate.hlp
+rotate		hlp=doc$rotate.hlp,	src=images$rotate.cl
 sections	hlp=doc$sections.hlp,	src=iminfo$t_sections.x
 shiftlines	hlp=doc$shiftlines.hlp,	src=geometry$t_shiftlines.x
 cvl		hlp=cvl.hlp

@@ -1,3 +1,4 @@
+include	<error.h>
 include	<imset.h>
 include	"ccdtypes.h"
 
@@ -149,6 +150,8 @@ pointer	images		# Pointer to array of calibration image names
 int	nimages		# Number of images
 common	/calib/ ccdtypes, subsets, images, nimages
 
+errchk	cal_list
+
 begin
 	# Add calibration images to list.
 	nimages = 0
@@ -230,9 +233,14 @@ begin
 	call salloc (image, SZ_FNAME, TY_CHAR)
 
 	while (imtgetim (list, Memc[image], SZ_FNAME) != EOF) {
-	    # Open the image and ignore errors.
-	    iferr (im = immap (Memc[image], READ_ONLY, 0))
-		next
+	    # Open the image.  If an explicit type is given it is an
+	    # error if the image can't be opened.
+	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
+		if (listtype == UNKNOWN)
+		    next
+		else
+		    call erract (EA_ERROR)
+	    }
 
 	    # Override image header CCD type if a list type is given.
 	    if (listtype == UNKNOWN)

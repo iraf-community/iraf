@@ -80,7 +80,7 @@ begin
 	call amovkd (1.0d0, Memd[pnm2], npts)
 	call altad (x, Memd[sx], npts, k1, k2)
 	call amovd (Memd[sx], Memd[pnm1], npts)
-	call amulkd (Memd[sx], 2., Memd[sx], npts)
+	call amulkd (Memd[sx], 2.0D0, Memd[sx], npts)
 	do i = 3, order {
 	    call amuld (Memd[sx], Memd[pnm1], Memd[pn], npts)
 	    call asubd (Memd[pn], Memd[pnm2], Memd[pn], npts)

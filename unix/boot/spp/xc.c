@@ -16,6 +16,13 @@
 /*
  * XC -- Main entry point of the SPP compiler for the IRAF subset preprocessor
  * language).
+ *
+ * DSUX version.  This version of XC supports both the MIPS  and DEC Fortran
+ * compilers.  The compiler to be used is the first "f77" command found in the
+ * user's search patch.  The "f77" should be a symbolic link to the installed
+ * compiler, for example /usr/lib/cmplrs/fort/fort for the DEC compiler, or
+ * /usr/lib/cmplrs/cc2.1/driver for Version 2.1 of the MIPS compiler.  XC uses
+ * this link to determine which compiler is being used.
  */
 
 #define	ERR		(-1)
@@ -30,8 +37,8 @@
 #define	SZ_PATHNAME	127
 #define	SZ_PKGENV	256
 
-#define	DEBUGFLAG	'g'		/* what to use when -x is seen */
-#define	SYSBINDIR	"/usr/lang/"		/* special system BIN */
+#define	DEBUGFLAG	'g'			/* host version of -x */
+#define	SYSBINDIR	"/usr/lib/cmplrs/"	/* special system BIN */
 #define	LOCALBINDIR	"/usr/local/bin/"	/* standard local BIN */
 
 #define	XPP		"xpp.e"
@@ -44,11 +51,20 @@
 #define IRAFLIB2	"libsys.a"
 #define IRAFLIB3	"libvops.a"
 #define IRAFLIB4	"libos.a"
-#define FORTLIB0	"-lU77"
-#define FORTLIB1	"-lm"
-#define FORTLIB2	"-lF77"
-#define FORTLIB3	"-lI77"
-#define FORTLIB4	"-lm"
+
+/* MIPS fortran compiler */
+#define M_FORTLIB1	"-lF77"
+#define M_FORTLIB2	"-lI77"
+#define M_FORTLIB3	"-lU77"
+#define M_FORTLIB4	"-lm"
+
+/* DEC fortran compiler */
+#define D_FORTLIB1	"-lUfor"
+#define D_FORTLIB2	"-lfor"
+#define D_FORTLIB3	"-lutil"
+#define D_FORTLIB4	"-li"
+#define D_FORTLIB5	"-lots"
+#define D_FORTLIB6	"-lm"
 
 #ifdef SUNOS4
 int	usesharelib = YES;
@@ -72,6 +88,7 @@ char	outfile[SZ_FNAME] = "";
 char	tempfile[SZ_FNAME] = "";
 char	*lflags[MAXFLAG+1];
 char	*lfiles[MAXFILE+1];			/* all files		*/
+char	*hlibs[MAXFILE+1];			/* host libraries	*/
 char	*lxfiles[MAXFILE+1];			/* .x files		*/
 char	*lffiles[MAXFILE+1];			/* .f files		*/
 char	buffer[SZ_BUFFER+1];
@@ -80,7 +97,7 @@ char	*bp = buffer;
 char	*libp = libbuf;
 char	*pkgenv = NULL;
 char	v_pkgenv[SZ_PKGENV+1];
-int	nflags, nfiles, nxfiles, nffiles;
+int	nflags, nfiles, nhlibs, nxfiles, nffiles;
 int	sig_int, sig_quit, sig_hup, sig_term;
 char	*shellname = "/bin/sh";
 int	pid;
@@ -113,16 +130,15 @@ int	argc;
 char	*argv[];
 {
 	int	i, j, interrupt(), nargs, ncomp;
-	char	cmdbuf[100];
 	char	*arglist[MAXFILE+MAXFLAG+10];
 	char	*arg, *ip, *iraflib(), *mkfname();
 	int	status, noperands;
 
 	/* Initialization. */
 	ZZSTRT();
-	isv13();
+	isdec();
 
-	nflags = nfiles = nxfiles = nffiles = 0;
+	nflags = nfiles = nhlibs = nxfiles = nffiles = 0;
 
 	sig_int  = (int) signal (SIGINT, SIG_IGN) & 01;
 	sig_quit = (int) signal (SIGQUIT,SIG_IGN) & 01;
@@ -164,14 +180,22 @@ char	*argv[];
 		switch (arg[1]) {
 		case '/':
 		    /* Pass flag on without further interpretation.
-		     *     -/hostflag
+		     *     "-/foo"    ->  "-foo"
+		     *     "-//foo"   ->  "foo"
 		     */
 		    lflags[nflags] = bp;
-		    *bp++ = '-';
-		    for (ip = &arg[2];  (*bp++ = *ip++);  )
+		    ip = &arg[2];
+		    if (*ip == '/')
+			ip++;
+		    else
+			*bp++ = '-';
+
+		    while (*bp++ = *ip++)
 			;
+
 		    if (nflags++ >= MAXFLAG)
 			fatal ("Too many compiler options");
+		    break;
 #ifdef sun
 		    /* Check for an explicit architecture setting.  If given
 		     * this will override IRAFARCH.
@@ -182,11 +206,14 @@ char	*argv[];
 		    break;
 
 		case 'l':
-		    if ((lfiles[nfiles] = iraflib (&arg[2])) == NULL)
-		        lfiles[nfiles] = arg;
-		    nfiles++;
-		    if (nxfiles > MAXFILE)
+		    if ((lfiles[nfiles] = iraflib (&arg[2])) == NULL) {
+			hlibs[nhlibs] = arg;
+		        nhlibs++;
+		    } else
+			nfiles++;
+		    if (nfiles > MAXFILE || nhlibs > MAXFILE)
 			fatal ("Too many files");
+
 		    objflags = YES;
 		    mkobject = YES;
 		    mktask = YES;
@@ -463,9 +490,10 @@ passflag:		    mkobject = YES;
 	 */
 	nargs = 0;
 	arglist[nargs++] = "cc";
+	arglist[nargs++] = "-nocount";		/* DSUX */
 	arglist[nargs++] = "-o";
 
-	sprintf (tempfile, "T_%s", outfile);
+	sprintf (tempfile, "T_%s.E", outfile);	/* DSUX doesn't like .e */
 	arglist[nargs++] = tempfile;
 
 	ncomp = 0;
@@ -541,14 +569,21 @@ passflag:		    mkobject = YES;
 	}
 #endif
 
+	/* [DSUX] - Search the library directory appropriate for the compiler
+	 * we are using.
+	 */
+	if (isdec())
+	    arglist[nargs++] = "-L/usr/lib/cmplrs/fort";
+	else
+	    arglist[nargs++] = "-L/usr/lib/cmplrs/cc";
+
 	/* File to link. */
 	for (i=0;  i < nfiles;  i++)
 	    arglist[nargs++] = lfiles[i];
 
 	/* Libraries to link against. */
 	if (hostprog) {
-	    if (!isv13())
-		arglist[nargs++] = mkfname (FORTLIB0);
+	    ;
 	} else {
 	    arglist[nargs++] = mkfname (LIBMAIN);
 	    if (usesharelib) {
@@ -562,18 +597,25 @@ passflag:		    mkobject = YES;
 	    }
 	}
 
-	/* The remaining system libraries depend upon which vversion of
-	 * the SunOS compiler we are using.  The V1.3 compilers use only
-	 * -lF77 and -lm.
+	/* Host libraries, searched after iraf libraries. */
+	for (i=0;  i < nhlibs;  i++)
+	    arglist[nargs++] = hlibs[i];
+
+	/* The remaining system libraries depend upon which version of
+	 * the DSUX compiler we are using.
 	 */
-	if (isv13()) {
-	    arglist[nargs++] = mkfname (FORTLIB2);
-	    arglist[nargs++] = mkfname (FORTLIB4);
+	if (isdec()) {
+	    arglist[nargs++] = mkfname (D_FORTLIB1);
+	    arglist[nargs++] = mkfname (D_FORTLIB2);
+	    arglist[nargs++] = mkfname (D_FORTLIB3);
+	    arglist[nargs++] = mkfname (D_FORTLIB4);
+	    arglist[nargs++] = mkfname (D_FORTLIB5);
+	    arglist[nargs++] = mkfname (D_FORTLIB6);
 	} else {
-	    arglist[nargs++] = mkfname (FORTLIB1);
-	    arglist[nargs++] = mkfname (FORTLIB2);
-	    arglist[nargs++] = mkfname (FORTLIB3);
-	    arglist[nargs++] = mkfname (FORTLIB4);
+	    arglist[nargs++] = mkfname (M_FORTLIB1);
+	    arglist[nargs++] = mkfname (M_FORTLIB2);
+	    arglist[nargs++] = mkfname (M_FORTLIB3);
+	    arglist[nargs++] = mkfname (M_FORTLIB4);
 	}
 	arglist[nargs] = NULL;
 
@@ -690,7 +732,7 @@ int	nargs;
 	int	i;
 
 	fputs (cmd, stderr);
-	for (i=1;  i <= nargs;  i++)
+	for (i=1;  i < nargs;  i++)
 	    fprintf (stderr, " %s", arglist[i]);
 	putc ('\n', stderr);
 	fflush (stderr);
@@ -835,7 +877,7 @@ char	*argv[];
 	    strcat (path, task);
 	    execv  (path, argv);	/* look in SYSBINDIR */
 	    strcpy (path, LOCALBINDIR);
-	    strcat (path, path);
+	    strcat (path, task);
 	    execv  (path, argv);	/* look in LOCALBINDIR */
 
 	    fatalstr ("Cannot execute %s", task);
@@ -872,6 +914,7 @@ char	*cmd;
 
 	inname  = NULL;
 	outname = NULL;
+	append = NO;
 	argc = 0;
 
 	/* Parse command string into argv array, inname, and outname.
@@ -1070,6 +1113,35 @@ isv13()
 	}
 
 	return (v13 = 0);
+}
+
+
+/* ISDEC -- [DSUX] Test if we are using the DEC Fortran compiler, as
+ * opposed to the MIPS RISC Fortran compiler.
+ */
+isdec()
+{
+	static	int dec = -1;
+	static	char buf[256];
+	char	*path;
+	char	*ip;
+
+	if (dec != -1)
+	    return (dec);
+
+	dec = 1;
+	if (path = findexe ("f77", NULL))
+	    if (readlink (path, buf, 256) > 0) {
+		for (ip = buf;  *ip;  ip++)
+		    if (!strncmp (ip, "/fort", 5)) {
+			dec = 1;
+			goto done;
+		    }
+		dec = 0;
+	    }
+done:
+	os_putenv ("IRAFARCH", dec ? "ddec" : "dmip");
+	return (dec);
 }
 
 

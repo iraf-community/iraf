@@ -3,8 +3,6 @@ include <fset.h>
 include "../lib/apphot.h"
 include "../lib/polyphot.h"
 
-define	MAX_NVERTICES	100
-
 # T_POLYPHOT -- Measure the total magnitudes inside a list of polygons.
 
 procedure t_polyphot()
@@ -87,6 +85,14 @@ begin
 	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
+	# Get polygon fitting parameters.
+	call ap_gypars (py)
+	if (verify == YES && interactive == NO) {
+	    call ap_yconfirm (py, NULL, 1)
+	    if (update == YES)
+		call ap_pypars (py)
+	}
+
 	# Open the plot files.
 	if (interactive == YES) {
 	    call clgstr ("graphics", Memc[graphics], SZ_FNAME)
@@ -120,14 +126,6 @@ begin
 	    id = NULL
 	}
 
-	# Get polygon fitting parameters.
-	call ap_gypars (py)
-	if (verify == YES && interactive == NO) {
-	    call ap_yconfirm (py, NULL, 1)
-	    if (update == YES)
-		call ap_pypars (py)
-	}
-
 	# Measure flux in a polygon.
 	sid = 1
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
@@ -138,20 +136,22 @@ begin
 	    call ap_padu (im, py)
 	    call ap_rdnoise (im, py)
 	    call ap_itime (im, py)
+	    call ap_otime (im, py)
 	    call ap_airmass (im, py)
 	    call ap_filter (im, py)
 
 	    # Open the polygons file.
 	    if (lplist <= 0) {
 		pl = NULL
-		call strcpy ("", Memc[polygon], SZ_FNAME)
+		call strcpy ("", Memc[outfname], SZ_FNAME)
 	    } else if (clgfil (plist, Memc[polygon], SZ_FNAME) != EOF) {
 		root = fnldir (Memc[polygon], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[polygon+root], 7) == 0 || root ==
-		    strlen (Memc[polygon]))
+		    strlen (Memc[polygon])) {
 		    call ap_inname (Memc[image], "", "ply", Memc[outfname],
 			SZ_FNAME)
-		else
+		    lplist = limlist
+		} else
 		    call strcpy (Memc[polygon], Memc[outfname], SZ_FNAME)
 		pl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    } else {
@@ -175,10 +175,11 @@ begin
 	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
 		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
-		    strlen (Memc[coords]))
+		    strlen (Memc[coords])) {
 		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
 			SZ_FNAME)
-		else
+		    lclist = limlist
+		} else
 		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
 	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    } else {

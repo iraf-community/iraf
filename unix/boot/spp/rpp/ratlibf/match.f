@@ -1,16 +1,16 @@
-      INTEGER FUNCTION MATCH (LIN, PAT)
-      INTEGER LIN (128), PAT (128)
-      INTEGER I, JUNK (9)
-      INTEGER AMATCH
-      I = 1
-23000 IF (.NOT.(LIN (I) .NE. -2))GOTO 23002
-      IF (.NOT.(AMATCH (LIN, I, PAT, JUNK, JUNK) .GT. 0))GOTO 23003
-      MATCH = 1
-      RETURN
-23003 CONTINUE
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      MATCH = 0
-      RETURN
-      END
+      integer function match (lin, pat)
+      integer lin (128), pat (128)
+      integer i, junk (9)
+      integer amatch
+      i = 1
+23000 if (.not.(lin (i) .ne. -2))goto 23002
+      if (.not.(amatch (lin, i, pat, junk, junk) .gt. 0))goto 23003
+      match = 1
+      return
+23003 continue
+23001 i = i + 1
+      goto 23000
+23002 continue
+      match = 0
+      return
+      end

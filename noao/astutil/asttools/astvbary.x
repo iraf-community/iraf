@@ -25,14 +25,16 @@ begin
 	# EM is the eccentricity of the lunar orbit (dimensionless)
 	# All quantities except the eccentricity are in degrees.
 
-	oblq = 23.452294 - t * (0.0130125 + t * (0.00000164 - t * 0.000000503))
-	omega = 259.183275 - t * (1934.142008 + t * (0.002078 + t * 0.000002))
-	llong = 270.434164 +
-	    t * (481267.88315 + t * (-0.001133 + t * 0.0000019)) - omega
-	lperi = 334.329556 +
-	    t * (4069.034029 - t * (0.010325 + t * 0.000012)) - omega
-	em = 0.054900489
-	inclin = 5.1453964
+	oblq = 23.452294d0 -
+	    t * (0.0130125d0 + t * (0.00000164d0 - t * 0.000000503d0))
+	omega = 259.183275d0 -
+	    t * (1934.142008d0 + t * (0.002078d0 + t * 0.000002d0))
+	llong = 270.434164d0 +
+	    t * (481267.88315d0 + t * (-0.001133d0 + t * 0.0000019d0)) - omega
+	lperi = 334.329556d0 +
+	    t * (4069.034029d0 - t * (0.010325d0 + t * 0.000012d0)) - omega
+	em = 0.054900489d0
+	inclin = 5.1453964d0
 
 	# Determine true longitude.  Compute mean anomaly, convert to true
 	# anomaly (approximate formula), and convert back to longitude.
@@ -67,7 +69,8 @@ begin
 	# the Earth-Moon barycenter.  The 81.53 is the ratio of the Earth's
 	# mass to the Moon's mass.
 
-	vmoon = (TWOPI / 27.321661) * 384403.12040 / sqrt (1. - em**2) / 86400.
+	vmoon = (TWOPI / 27.321661d0) *
+	    384403.12040d0 / sqrt (1. - em**2) / 86400.
 	v = vmoon * cos (bm) * (sin (llong - lm) - em * sin (lperi - lm))
 	v = v / 81.53
 end

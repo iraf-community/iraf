@@ -1,4 +1,0 @@
-# SHEDIT parameter file
-
-input,s,a,,,,Input image root file name
-records,s,a,,,,Range of spectral records

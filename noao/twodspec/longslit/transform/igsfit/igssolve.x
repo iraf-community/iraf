@@ -153,7 +153,7 @@ begin
 	}
 
 	call xgsfree (sf)
-	call xgsinit (sf, nfunc, 2, yorder, NO, xmin, xmax, ymin, ymax)
+	call xgsinit (sf, nfunc, xorder, 2, NO, xmin, xmax, ymin, ymax)
 	a = xgsgcoeff (sf1, 1, 1)
 
 	a = a + (ymin + ymax) / 2

@@ -7,6 +7,7 @@ include	"qpoe.h"
 
 define	NLUTPERLINE	15
 define	SZ_TEXT		4
+define	SZ_FILTERBUF	32768
 
 # QPEX_DEBUG -- Output text describing the state and contents of the QPEX
 # descriptor (compiled event attribute filter).
@@ -68,10 +69,10 @@ begin
 
 	# Regenerate and print the compiled expression.
 	if (and (what, QPEXD_SHOWEXPR) != 0) {
-	    call salloc (text, SZ_TEXTBUF, TY_CHAR)
+	    call salloc (text, SZ_FILTERBUF, TY_CHAR)
 	    call fprintf (out,
 		"==================== expr ========================\n")
-	    if (qpex_getfilter (ex, Memc[text], SZ_TEXTBUF) > 0) {
+	    if (qpex_getfilter (ex, Memc[text], SZ_FILTERBUF) > 0) {
 		call putline (out, Memc[text])
 		call fprintf (out, "\n")
 	    }
@@ -337,7 +338,7 @@ lut_		    call fprintf (out, "lutx%c\t(%d), %xX, L%d")
 		for (et=EX_ETHEAD(ex);  et != NULL;  et=ET_NEXT(et)) {
 		    neterms = neterms + 1
 		    call fprintf (out,
-			"%2d %4d %3d %3d %4d %3d %9.9s %2s %s\n")
+			"%2d %4d %3d %3d %4d %3d %9.9s %2s ")
 			call pargi (neterms)
 			call pargi (ET_ATTTYPE(et))
 			call pargi (ET_ATTOFF(et))
@@ -346,7 +347,8 @@ lut_		    call fprintf (out, "lutx%c\t(%d), %xX, L%d")
 			call pargi (ET_DELETED(et))
 			call pargstr (Memc[ET_ATNAME(et)])
 			call pargstr (Memc[ET_ASSIGNOP(et)])
-			call pargstr (Memc[ET_EXPRTEXT(et)])
+		    call putline (out, Memc[ET_EXPRTEXT(et)])
+		    call putline (out, "\n")
 		}
 	    }
 	}

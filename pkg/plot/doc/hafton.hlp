@@ -26,7 +26,7 @@ choices, see the description section below.
 .ls contrast = 0.25
 Positive or negative contrast.  Negative constrast is indicated by setting
 \fBcontrast\fR to a negative number.  The magnitude of \fBcontrast\fR is
-not important unless \mapping_function = crtpict\fR.
+not important unless \fBmapping_function = crtpict\fR.
 .le
 .ls perimeter = yes
 Should a \fBcrtpict\fR perimeter with labelled tickmarks be drawn around 

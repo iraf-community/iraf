@@ -18,6 +18,8 @@ libsys.a:
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 	@gen
 
+	#$set XFLAGS = "$(XFLAGS) -f -/g"
+
 	brktime.x	<time.h>
 	btoi.x	
 	clktime.x	
@@ -43,6 +45,7 @@ libsys.a:
 	gethost.x	
 	getpid.x	
 	getuid.x	
+	gqsort.x	
 	intr.x		<xwhen.h>
 	itob.x	
 	lineoff.x	
@@ -101,7 +104,7 @@ libsys.a:
 	xerreset.x	error.com <error.h>
 	xerstmt.x	error.com <error.h>
 	xerverify.x	error.com <error.h>
-	xgdevlist.x	<ctype.h> <xalloc.h>
+	xgdevlist.x	<xalloc.h>
 	xisatty.x	<clset.h> <fset.h>
 	xmjbuf.x	<config.h>
 	xttysize.x	<clset.h>

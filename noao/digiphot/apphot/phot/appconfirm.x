@@ -14,9 +14,10 @@ int	stid		# output file sequence number
 
 pointer	sp, cstr, sstr, aperts
 real	fwhmpsf, capert, cthreshold, annulus, dannulus, skysigma
+real	datamin, datamax
 int	apstati()
 real	apstatr(), ap_vcapert(), ap_vannulus(), ap_vdannulus(), ap_vsigma()
-real	ap_vfwhmpsf(), ap_vcthreshold()
+real	ap_vfwhmpsf(), ap_vcthreshold(), ap_vdatamin(), ap_vdatamax
 
 begin
 	call smark (sp)
@@ -72,6 +73,10 @@ begin
 	# Confirm the aperture radii parameter.
 	call ap_vaperts (ap, Memc[aperts], SZ_LINE)
 
+	# Confirm the datamin and datamax parameters.
+	datamin = ap_vdatamin (ap)
+	datamax = ap_vdatamax (ap)
+
 	call printf ("\n")
 
 	# Update the database file.
@@ -94,6 +99,10 @@ begin
 	        "standard deviation of 1 sky pixel")
 	    call ap_sparam (out, KY_APERTS, Memc[aperts], UN_APERTS,
 		"list of apertures")
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	        "minimum good data value")
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	        "maximum good data value")
 	}
 
 	call sfree (sp)

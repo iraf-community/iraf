@@ -69,6 +69,10 @@ begin
 	    call strcpy (str, AP_FILTER(ap), SZ_FNAME)
 	case FILTERID:
 	    call strcpy (str, AP_FILTERID(ap), SZ_FNAME)
+	case OBSTIME:
+	    call strcpy (str, AP_OBSTIME(ap), SZ_FNAME)
+	case OTIME:
+	    call strcpy (str, AP_OTIME(ap), SZ_FNAME)
 	default:
 	    call error (0, "APSETS: Unknown apphot parameter")
 	}

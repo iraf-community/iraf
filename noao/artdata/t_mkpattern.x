@@ -1,6 +1,8 @@
 include	<error.h>
 include	<imhdr.h>
 
+define	LEN_UA		20000
+
 # Editing  options
 define	OPTIONS		"|replace|add|multiply|"
 define	REPLACE		1	# Replace pixels
@@ -40,7 +42,7 @@ int	nc				# Number of columns
 bool	new
 int	i
 long	vin[IM_MAXDIM], vout[IM_MAXDIM]
-pointer	sp, input, output, in, out, indata, outdata, pat1, pat2
+pointer	sp, input, output, header, in, out, indata, outdata, pat1, pat2
 
 char	clgetc()
 bool	streq()
@@ -54,6 +56,7 @@ begin
 	call smark (sp)
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (header, SZ_FNAME, TY_CHAR)
 
 	# Set the task parameters which apply to all images.
 	ilist = imtopenp ("input")
@@ -84,10 +87,15 @@ begin
 		    in = out
 	            new = false
 	        } else {
-	            iferr (out = immap (Memc[output], NEW_IMAGE, 0)) {
+		    iferr (out = immap (Memc[output], NEW_IMAGE, LEN_UA)) {
 			call erract (EA_WARN)
 			next
 		    }
+
+		    call clgstr ("header", Memc[header], SZ_FNAME)
+		    iferr (call mkh_header (out, Memc[header], false, false))
+			call erract (EA_WARN)
+
 	            IM_NDIM(out) = clgeti ("ndim")
 		    IM_LEN(out,1) = clgeti ("ncols")
 		    IM_LEN(out,2) = clgeti ("nlines")
@@ -280,7 +288,7 @@ int	nl		# Number of lines
 int	i
 
 begin
-	i = (line - 1) / size
+	i = max (1, line) / size
 
 	switch (pat) {
 	case CONST:

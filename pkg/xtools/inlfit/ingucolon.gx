@@ -1,0 +1,19 @@
+# ING_UCOLON -- User default colon commands
+
+procedure ing_ucolon$t (in, gp, gt, nl, x, y, wts, npts, nvars, newgraph)
+
+pointer	in			# INLFIT pointer
+pointer	gp			# GIO pointer
+pointer	gt			# GTOOLS pointer
+pointer	nl			# NLFIT pointer
+PIXEL	x[ARB]			# Independent variables
+PIXEL	y[npts]			# Dependent variables
+PIXEL	wts[npts]		# Weights
+int	npts			# Number of points
+int	nvars			# Number of variables
+int	newgraph		# New graph ? (output)
+
+begin
+	# Ring bell
+	call printf ("\07\n")
+end

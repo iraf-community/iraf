@@ -13,7 +13,9 @@ update:
 	$call dataio
 	$call images
 	$call lists
+	$call obsolete
 	$call plot
+	$call proto
 	$call utilities
 
 	$ifeq (HOSTID, vms) $purge [...] $endif
@@ -45,9 +47,17 @@ lists:
 	$echo "--------------------- LISTS -----------------------"
 	$call update@lists
 	;
+obsolete:
+	$echo "--------------------- OBSOLETE --------------------"
+	$call update@obsolete
+	;
 plot:
 	$echo "--------------------- PLOT ------------------------"
 	$call update@plot
+	;
+proto:
+	$echo "--------------------- PROTO -----------------------"
+	$call update@proto
 	;
 utilities:
 	$echo "--------------------- UTILITIES -------------------"

@@ -1,0 +1,33 @@
+.help rgb Jan86 images.tv.iis
+.ih
+NAME
+rgb - select true color mode (red, green, and blue frames)
+.ih
+USAGE
+rgb red_frame green_frame blue_frame
+.ih
+PARAMETERS
+.ls red_frame
+Frame to use for the red component.
+.le
+.ls green_frame
+Frame to use for the green component.
+.le
+.ls blue_frame
+Frame to use for the blue component.
+.le
+.ls window = no
+Window the rgb lookup tables?
+.le
+.ih
+DESCRIPTION
+Set the display monitor to display rgb colors by using three frames to
+drive the red, green, and blue guns of the color display monitor.
+Optionally, window the rgb lookup tables.
+.ih
+EXAMPLES
+	cl> rgb 1 2 3
+.ih
+SEE ALSO
+cv
+.endhelp

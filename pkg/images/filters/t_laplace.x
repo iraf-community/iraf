@@ -35,18 +35,18 @@ real	clgetr()
 errchk	cnv_convolve
 
 begin
-	# Get task parameters
+	# Get the task parameters.
 	call clgstr ("input", imtlist1, SZ_FNAME)
 	call clgstr ("output", imtlist2, SZ_FNAME)
 
-	# Get boundary extension parameters
+	# Get the boundary extension parameters.
 	filter = clgwrd ("laplace", str, SZ_LINE,
 	    ",xycentral,diagonals,xyall,xydiagonals,")
 	boundary = clgwrd ("boundary", str, SZ_LINE,
 	    ",constant,nearest,reflect,wrap,")
 	constant = clgetr ("constant")
 
-	# Check list lengths
+	# Check the input and output image list lengths.
 	list1 = imtopen (imtlist1)
 	list2 = imtopen (imtlist2)
 	if (imtlen (list1) != imtlen (list2)) {
@@ -55,19 +55,19 @@ begin
 	    call error (0, "Number of input and output images not the same.")
 	}
 
-	# Convolve the images with a Laplacian
+	# Convolve the images with a Laplacian kernel.
 	while ((imtgetim (list1, image1, SZ_FNAME) != EOF) &&
 	      (imtgetim (list2, image2, SZ_FNAME) != EOF)) {
 	    
-	    # Make temporary image
+	    # Make a temporary image.
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
-	    # Open images
+	    # Open the input and output images.
 	    im1 = immap (image1, READ_ONLY, 0)
 	    im2 = immap (image2, NEW_COPY, im1)
 	    kernel = NULL
 
-	    # Convolve an image with a Laplacian
+	    # Do the convolution.
 	    iferr {
 
 		switch (IM_NDIM(im1)) {
@@ -85,7 +85,6 @@ begin
 		call salloc (kernel, nxk * nyk, TY_REAL)
 		call cnv_laplace_kernel (Memr[kernel], nxk, nyk, filter)
 
-		# convolve image
 		call cnv_convolve (im1, im2, Memr[kernel], nxk, nyk, boundary,
 		    constant, YES)
 
@@ -107,12 +106,13 @@ begin
 	    kernel = NULL
 	}
 
-	# close images
+	# Close the list of images.
 	call imtclose (list1)
 	call imtclose (list2)
 end
 
-# CNV_LAPLACE_KERNEL -- Make the Laplacian kernel
+
+# CNV_LAPLACE_KERNEL -- Compute the Laplacian kernel.
 
 procedure cnv_laplace_kernel (kernel, nx, ny, filter)
 

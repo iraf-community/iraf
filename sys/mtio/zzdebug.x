@@ -6,11 +6,12 @@ include	<fset.h>
 
 task	alloc		= t_allocate,
 	dealloc		= t_deallocate,
-	owner		= t_owner,
+	status		= t_status,
 	mtpos		= t_mtposition,
 	wtestfile	= t_wtestfile,
 	mtexamine	= t_mtexamine,
-	mtcopy		= t_mtcopy
+	mtcopy		= t_mtcopy,
+	rew		= t_rewind
 
 
 .help testmtio
@@ -21,7 +22,7 @@ MTIO test routines.  Assorted routines for verification of MTIO.
 
 	dealloc		Deallocate a drive.
 
-	owner		Print drive status
+	status		Print drive status
 
 	mtpos		Position to the indicated file and record.
 
@@ -113,9 +114,9 @@ begin
 end
 
 
-# OWNER -- Print drive status.
+# STATUS -- Print drive status.
 
-procedure t_owner()
+procedure t_status()
 
 int	status
 char	drive[SZ_FNAME]
@@ -168,36 +169,35 @@ end
 
 procedure t_wtestfile()
 
-char	tapefile[SZ_FNAME]
+char	mtname[SZ_FNAME]
 int	nrecords
 int	min_recsize, max_recsize
 
-int	fd, i, recsize, oschan, status
-long	seed
 pointer	buf
+long	seed
+int	fd, i, recsize, oschan, status
 int	clgeti(), mtopen(), fstati()
 real	urand()
 data	seed /123/
 
 begin
 	# Get tapefile name and open file for writing.
-	call clgstr ("tapefile", tapefile, SZ_FNAME)
-	fd = mtopen (tapefile, WRITE_ONLY, 1)
+	call clgstr ("mtname", mtname, SZ_FNAME)
+	fd = mtopen (mtname, WRITE_ONLY, 1)
 	oschan = fstati (fd, F_CHANNEL)
 
 	nrecords = max (0, clgeti ("nrecords"))
 	min_recsize = max (1, clgeti ("min_recsize"))
 	max_recsize = max (min_recsize, clgeti ("max_recsize"))
 
-	call malloc (buf, max_recsize, TY_CHAR)
+	call calloc (buf, max_recsize, TY_CHAR)
 
 	# Records are written by directly calling ZAWRMT, so that we can
 	# write odd size records.
+
 	do i = 1, nrecords {
 	    recsize = int ((max_recsize - min_recsize) * urand (seed)) +
 		min_recsize
-	    call amovkc (char(recsize), Memc[buf], recsize)
-	    call chrpak (Memc[buf], 1, Memc[buf], 1, recsize)
 	    call zawrmt (oschan, Memc[buf], recsize, 0)
 	    call zawtmt (oschan, status)
 	    if (status == ERR)
@@ -214,26 +214,26 @@ end
 
 procedure t_mtexamine()
 
-char	infile[SZ_FNAME], tapefile[SZ_FNAME]
 int	fileno, nrecords
+char	mtname[SZ_FNAME], mtfile[SZ_FNAME]
 int	strlen(), mt_examine()
 
 begin
-	call clgstr ("infile", infile, SZ_FNAME)
+	call clgstr ("mtname", mtname, SZ_FNAME)
 	call fseti (STDOUT, F_FLUSHNL, YES)
 
-	if (infile[strlen(infile)] == ']') {
-	    call strcpy (infile, tapefile, SZ_FNAME)
-	    nrecords = mt_examine (STDOUT, tapefile)
+	if (mtname[strlen(mtname)] == ']') {
+	    call strcpy (mtname, mtfile, SZ_FNAME)
+	    nrecords = mt_examine (STDOUT, mtname)
 
 	} else {
 	    fileno = 1
 	    repeat {
-		call sprintf (tapefile, SZ_FNAME, "%s[%d]")
-		    call pargstr (infile)
+		call sprintf (mtfile, SZ_FNAME, "%s[%d]")
+		    call pargstr (mtname)
 		    call pargi (fileno)
 		fileno = fileno + 1
-	    } until (mt_examine (STDOUT, tapefile) == 0)
+	    } until (mt_examine (STDOUT, mtfile) == 0)
 	}
 end
 
@@ -248,10 +248,10 @@ int procedure mt_examine (out, mtfile)
 int	out				# output stream
 char	mtfile[ARB]			# magtape file to be examined
 
-int	in, nrecords, totrecords, totbytes, bufsize, recsize, last_recsize
 pointer	buf
-int	mtopen(), read(), fstati()
+int	in, nrecords, totrecords, totbytes, bufsize, recsize, last_recsize
 errchk	mtopen, read, fstati, printf, pargi
+int	mtopen(), read(), fstati()
 
 begin
 	in = mtopen (mtfile, READ_ONLY, 0)
@@ -312,10 +312,10 @@ end
 
 procedure t_mtcopy()
 
-char	infile[ARB], outfile[ARB]
-int	in, out, bufsize, acmode
 pointer	buf
-int	mtopen(), fstati(), read(), strncmp()
+int	in, out, bufsize, acmode
+char	infile[SZ_FNAME], outfile[SZ_FNAME]
+int	mtopen(), fstati(), read(),  mtfile()
 
 begin
 	call clgstr ("infile", infile, SZ_FNAME)
@@ -325,8 +325,9 @@ begin
 
 	# If output file is a disk file, create a new file, but do not
 	# create a new tape if writing to tape.
+
 	acmode = NEW_FILE
-	if (strncmp (outfile, "mt", 2) == 0)
+	if (mtfile(outfile) == YES)
 	    acmode = WRITE_ONLY
 	out = mtopen (outfile, acmode, 0)
 
@@ -339,4 +340,18 @@ begin
 	call mfree (buf, TY_CHAR)
 	call close (in)
 	call close (out)
+end
+
+
+# REWIND -- Rewind the tape.
+
+procedure t_rewind()
+
+char	mtname[SZ_FNAME]
+bool	clgetb()
+int	btoi()
+
+begin
+	call clgstr ("mtname", mtname, SZ_FNAME)
+	call mtrewind (mtname, btoi(clgetb("initialize")))
 end

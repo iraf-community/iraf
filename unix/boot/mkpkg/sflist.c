@@ -125,7 +125,7 @@ struct	context *cx;		/* current mkpkg context */
 		fatals ("too many special file list directories: %s", dirname);
 	    tail = NULL;
 	} else {
-	    for (sfp=head;  sfp;  sfp=sfp->sf_next)
+	    for (tail=sfp=head;  sfp;  sfp=sfp->sf_next)
 		tail = sfp;
 	}
 

@@ -73,8 +73,8 @@ begin
 end
 
 
-# AP_QPRPROF -- Procedure to print short version of the radprof results on
-# the standard output.
+# AP_QPRPROF -- Procedure to print a short version of the radprof results
+# on the standard output.
 
 procedure ap_qprprof (ap, cier, sier, pier, rier)
 
@@ -88,18 +88,18 @@ pointer	sp, imname, phot
 real	apstatr()
 
 begin
-	# Print quick summary of radprof results on the standard output.
 	call smark (sp)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
 	phot = AP_PPHOT(ap)
 
+	# Print quick summary of radprof results on the standard output.
 	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
 	call printf ("%s x: %0.2f y: %0.2f s: %0.2f fwhm: %0.2f ")
 	    call pargstr (Memc[imname])
 	    call pargr (apstatr (ap, RPXCUR))
 	    call pargr (apstatr (ap, RPYCUR))
 	    call pargr (apstatr (ap, SKY_MODE))
-	    call pargr (apstatr (ap, RPFWHM))
+	    call pargr (apstatr (ap, RPFWHM) / apstatr (ap, SCALE))
 
 	call printf ("mag: %0.2f err: %s\n")
 	    call pargr (Memr[AP_MAGS(phot)+AP_NAPERTS(phot)-1])

@@ -402,12 +402,13 @@ begin
 	call agboxcar (Memr[sum], Memr[avg], ncols, xbmin, xbmax, scale)
 	if (inverse == YES)
 	    call arczr (1., Memr[avg], Memr[output], ncols, divzero)
+	ybox2 = nlines - lineout
 	while (lineout < nlines) {
 	    lineout = lineout + 1
 	    data = impl2r (out, lineout)
 	    call amovr (Memr[output], Memr[data], ncols)
 	}
-	ccdmean = ccdmean + (nlines - lineout) * asumr (Memr[output], ncols)
+	ccdmean = ccdmean + ybox2 * asumr (Memr[output], ncols)
 
 	# Write scale factor out.
 	ccdmean = ccdmean / (ncols * nlines)
@@ -541,12 +542,13 @@ begin
 	call agboxcar (Memr[sum], Memr[output], ncols, xbmin, xbmax, scale)
 	if (inverse == YES)
 	    call arczr (1., Memr[output], Memr[output], ncols, divzero)
+	ybox1 = nlines - lineout
 	while (lineout < nlines) {
 	    lineout = lineout + 1
 	    data = impl2r (out, lineout)
 	    call amovr (Memr[output], Memr[data], ncols)
 	}
-	ccdmean = ccdmean + (nlines - lineout) * asumr (Memr[output], ncols)
+	ccdmean = ccdmean + ybox1 * asumr (Memr[output], ncols)
 
 	# Write scale factor out.
 	ccdmean = ccdmean / (ncols * nlines)

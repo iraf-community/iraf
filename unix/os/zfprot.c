@@ -58,12 +58,12 @@ XINT	*action, *status;
 	    return;
 
 	case SET_PROTECTION:
-	    if (chk_prot ((char *)fname, link_name) == XYES)
-		*status = XOK;
-	    else if (link ((char *)fname, link_name) == ERR)
-		*status = XERR;
-	    else 
-		*status = XOK;
+	    *status = XOK;
+	    if (chk_prot ((char *)fname, link_name) == XNO) {
+		unlink (link_name);
+		if (link ((char *)fname, link_name) == ERR)
+		    *status = XERR;
+	    }
 	    return;
 
 	default:

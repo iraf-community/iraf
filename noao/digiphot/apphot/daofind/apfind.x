@@ -1,13 +1,13 @@
+include <gset.h>
 include <mach.h>
 include <imhdr.h>
-include <gset.h>
 
 # AP_FIND -- Detect images in the convolved image and then compute image
 # characteristics using the original image.
 
 int procedure ap_find (im, cnv, out, id, ker1x, ker1y, skip, nxk, nyk,
-	threshold, emission, sharplo, sharphi, roundlo, roundhi, interactive,
-	stid, mkdetections)
+	threshold, relerr, emission, sharplo, sharphi, roundlo, roundhi,
+	interactive, stid, mkdetections)
 
 pointer	im			# pointer to the input image
 pointer	cnv			# pointer to the output image
@@ -18,6 +18,7 @@ real	ker1y[ARB]		# 1D Y Gaussian kernel
 int	skip[nxk,ARB]		# 2D Gaussian kernel
 int	nxk, nyk		# dimensions of the kernel
 real	threshold		# threshold for image detection
+real	relerr			# the relative error of the convolution kernel
 int	emission		# emission features
 real	sharplo, sharphi	# sharpness limits
 real	roundlo,roundhi		# roundness parameter limits
@@ -121,7 +122,7 @@ begin
 		pos = pos + 1
 
 	    nobjs = ap_detect (Memr[cnvbuf], Memi[bufptrs], ncols, skip, nxk,
-	        nyk, threshold, Memi[cols])
+	        nyk, relerr * threshold, Memi[cols])
 	    if (nobjs <= 0)
 		next
 
@@ -159,6 +160,7 @@ begin
 		do j = 1, nstars
 		    call gmark (id, Memr[x+j-1], Memr[y+j-1], GM_PLUS, 1.0, 1.0)
 		call gdeactivate (id, 0)
+		    
 	    }
 
 	    ntotal = ntotal + nstars

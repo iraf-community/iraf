@@ -1,254 +1,254 @@
-      SUBROUTINE PARSE
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER LEXSTR(100)
-      INTEGER LAB, LABVAL(100), LEXTYP(100), SP, TOKEN, I, T
-      INTEGER LEX
-      LOGICAL PUSHS0
-      SP = 1
-      LEXTYP(1) = -1
-      TOKEN = LEX(LEXSTR)
-23000 IF (.NOT.(TOKEN .NE. -1))GOTO 23002
-      PUSHS0 = .FALSE.
-      I23003=(TOKEN)
-      GOTO 23003
-23005 CONTINUE
-      CALL IFCODE (LAB)
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23006 CONTINUE
-      CALL IFERRC (LAB, 1)
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23007 CONTINUE
-      CALL IFERRC (LAB, 0)
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23008 CONTINUE
-      CALL DOCODE (LAB)
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23009 CONTINUE
-      CALL WHILEC (LAB)
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23010 CONTINUE
-      CALL FORCOD (LAB)
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23011 CONTINUE
-      CALL REPCOD (LAB)
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23012 CONTINUE
-      CALL SWCODE (LAB)
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23013 CONTINUE
-      I=SP
-23014 IF (.NOT.(I .GT. 0))GOTO 23016
-      IF (.NOT.(LEXTYP(I) .EQ. -92))GOTO 23017
-      GOTO 23016
-23017 CONTINUE
-23015 I=I-1
-      GOTO 23014
-23016 CONTINUE
-      IF (.NOT.(I .EQ. 0))GOTO 23019
-      CALL SYNERR (24Hillegal case or default.)
-      GOTO 23020
-23019 CONTINUE
-      CALL CASCOD (LABVAL (I), TOKEN)
-23020 CONTINUE
-      GOTO 23004
-23021 CONTINUE
-      CALL LABELC (LEXSTR)
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23022 CONTINUE
-      T = LEXTYP(SP)
-      IF (.NOT.(T .EQ. -99 .OR. T .EQ. -98 .OR. T .EQ. -97))GOTO 23023
-      CALL ELSEIF (LABVAL(SP))
-      GOTO 23024
-23023 CONTINUE
-      CALL SYNERR (13HIllegal else.)
-23024 CONTINUE
-      T = LEX (LEXSTR)
-      CALL PBSTR (LEXSTR)
-      IF (.NOT.(T .EQ. -99 .OR. T .EQ. -98 .OR. T .EQ. -97))GOTO 23025
-      CALL INDENT (-1)
-      TOKEN = -72
-23025 CONTINUE
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23027 CONTINUE
-      IF (.NOT.(LEXTYP(SP) .EQ. -98 .OR. LEXTYP(SP) .EQ. -97))GOTO 23028
-      CALL THENCO (LEXTYP(SP), LABVAL(SP))
-      LAB = LABVAL(SP)
-      TOKEN = LEXTYP(SP)
-      SP = SP - 1
-      GOTO 23029
-23028 CONTINUE
-      CALL SYNERR (41HIllegal 'then' clause in iferr statement.)
-23029 CONTINUE
-      PUSHS0 = .TRUE.
-      GOTO 23004
-23030 CONTINUE
-      CALL LITRAL
-      GOTO 23004
-23031 CONTINUE
-      CALL ERRCHK
-      GOTO 23004
-23032 CONTINUE
-      CALL BEGINC
-      GOTO 23004
-23033 CONTINUE
-      CALL ENDCOD (LEXSTR)
-      IF (.NOT.(SP .NE. 1))GOTO 23034
-      CALL SYNERR (31HMissing right brace or 'begin'.)
-      SP = 1
-23034 CONTINUE
-      GOTO 23004
-23036 CONTINUE
-      IF (.NOT.(TOKEN .EQ. 123))GOTO 23037
-      PUSHS0 = .TRUE.
-      GOTO 23038
-23037 CONTINUE
-      IF (.NOT.(TOKEN .EQ. -67))GOTO 23039
-      CALL DECLCO (LEXSTR)
-23039 CONTINUE
-23038 CONTINUE
-      GOTO 23004
-23003 CONTINUE
+      subroutine parse
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer lexstr(100)
+      integer lab, labval(100), lextyp(100), sp, token, i, t
+      integer lex
+      logical pushs0
+      sp = 1
+      lextyp(1) = -1
+      token = lex(lexstr)
+23000 if (.not.(token .ne. -1))goto 23002
+      pushs0 = .false.
+      I23003=(token)
+      goto 23003
+23005 continue
+      call ifcode (lab)
+      pushs0 = .true.
+      goto 23004
+23006 continue
+      call iferrc (lab, 1)
+      pushs0 = .true.
+      goto 23004
+23007 continue
+      call iferrc (lab, 0)
+      pushs0 = .true.
+      goto 23004
+23008 continue
+      call docode (lab)
+      pushs0 = .true.
+      goto 23004
+23009 continue
+      call whilec (lab)
+      pushs0 = .true.
+      goto 23004
+23010 continue
+      call forcod (lab)
+      pushs0 = .true.
+      goto 23004
+23011 continue
+      call repcod (lab)
+      pushs0 = .true.
+      goto 23004
+23012 continue
+      call swcode (lab)
+      pushs0 = .true.
+      goto 23004
+23013 continue
+      i=sp
+23014 if (.not.(i .gt. 0))goto 23016
+      if (.not.(lextyp(i) .eq. -92))goto 23017
+      goto 23016
+23017 continue
+23015 i=i-1
+      goto 23014
+23016 continue
+      if (.not.(i .eq. 0))goto 23019
+      call synerr (24Hillegal case or default.)
+      goto 23020
+23019 continue
+      call cascod (labval (i), token)
+23020 continue
+      goto 23004
+23021 continue
+      call labelc (lexstr)
+      pushs0 = .true.
+      goto 23004
+23022 continue
+      t = lextyp(sp)
+      if (.not.(t .eq. -99 .or. t .eq. -98 .or. t .eq. -97))goto 23023
+      call elseif (labval(sp))
+      goto 23024
+23023 continue
+      call synerr (13HIllegal else.)
+23024 continue
+      t = lex (lexstr)
+      call pbstr (lexstr)
+      if (.not.(t .eq. -99 .or. t .eq. -98 .or. t .eq. -97))goto 23025
+      call indent (-1)
+      token = -72
+23025 continue
+      pushs0 = .true.
+      goto 23004
+23027 continue
+      if (.not.(lextyp(sp) .eq. -98 .or. lextyp(sp) .eq. -97))goto 23028
+      call thenco (lextyp(sp), labval(sp))
+      lab = labval(sp)
+      token = lextyp(sp)
+      sp = sp - 1
+      goto 23029
+23028 continue
+      call synerr (41HIllegal 'then' clause in iferr statement.)
+23029 continue
+      pushs0 = .true.
+      goto 23004
+23030 continue
+      call litral
+      goto 23004
+23031 continue
+      call errchk
+      goto 23004
+23032 continue
+      call beginc
+      goto 23004
+23033 continue
+      call endcod (lexstr)
+      if (.not.(sp .ne. 1))goto 23034
+      call synerr (31HMissing right brace or 'begin'.)
+      sp = 1
+23034 continue
+      goto 23004
+23036 continue
+      if (.not.(token .eq. 123))goto 23037
+      pushs0 = .true.
+      goto 23038
+23037 continue
+      if (.not.(token .eq. -67))goto 23039
+      call declco (lexstr)
+23039 continue
+23038 continue
+      goto 23004
+23003 continue
       I23003=I23003+100
-      IF (I23003.LT.1.OR.I23003.GT.18)GOTO 23036
-      GOTO (23005,23006,23007,23008,23009,23010,23011,23012,23013,23013,
+      if (I23003.lt.1.or.I23003.gt.18)goto 23036
+      goto (23005,23006,23007,23008,23009,23010,23011,23012,23013,23013,
      *23021,23036,23022,23027,23030,23031,23032,23033),I23003
-23004 CONTINUE
-      IF (.NOT.(PUSHS0))GOTO 23041
-      IF (.NOT.(BODY .EQ. 0))GOTO 23043
-      CALL SYNERR (24HMissing 'begin' keyword.)
-      CALL BEGINC
-23043 CONTINUE
-      SP = SP + 1
-      IF (.NOT.(SP .GT. 100))GOTO 23045
-      CALL BADERR (25HStack overflow in parser.)
-23045 CONTINUE
-      LEXTYP(SP) = TOKEN
-      LABVAL(SP) = LAB
-      GOTO 23042
-23041 CONTINUE
-      IF (.NOT.(TOKEN .NE. -91 .AND. TOKEN .NE. -90))GOTO 23047
-      IF (.NOT.(TOKEN .EQ. 125))GOTO 23049
-      TOKEN = -74
-23049 CONTINUE
-      I23051=(TOKEN)
-      GOTO 23051
-23053 CONTINUE
-      CALL OTHERC (LEXSTR)
-      GOTO 23052
-23054 CONTINUE
-      CALL BRKNXT (SP, LEXTYP, LABVAL, TOKEN)
-      GOTO 23052
-23055 CONTINUE
-      CALL RETCOD
-      GOTO 23052
-23056 CONTINUE
-      CALL GOCODE
-      GOTO 23052
-23057 CONTINUE
-      IF (.NOT.(BODY .EQ. 0))GOTO 23058
-      CALL STRDCL
-      GOTO 23059
-23058 CONTINUE
-      CALL OTHERC (LEXSTR)
-23059 CONTINUE
-      GOTO 23052
-23060 CONTINUE
-      IF (.NOT.(LEXTYP(SP) .EQ. 123))GOTO 23061
-      SP = SP - 1
-      GOTO 23062
-23061 CONTINUE
-      IF (.NOT.(LEXTYP(SP) .EQ. -92))GOTO 23063
-      CALL SWEND (LABVAL(SP))
-      SP = SP - 1
-      GOTO 23064
-23063 CONTINUE
-      CALL SYNERR (20HIllegal right brace.)
-23064 CONTINUE
-23062 CONTINUE
-      GOTO 23052
-23051 CONTINUE
+23004 continue
+      if (.not.(pushs0))goto 23041
+      if (.not.(body .eq. 0))goto 23043
+      call synerr (24HMissing 'begin' keyword.)
+      call beginc
+23043 continue
+      sp = sp + 1
+      if (.not.(sp .gt. 100))goto 23045
+      call baderr (25HStack overflow in parser.)
+23045 continue
+      lextyp(sp) = token
+      labval(sp) = lab
+      goto 23042
+23041 continue
+      if (.not.(token .ne. -91 .and. token .ne. -90))goto 23047
+      if (.not.(token .eq. 125))goto 23049
+      token = -74
+23049 continue
+      I23051=(token)
+      goto 23051
+23053 continue
+      call otherc (lexstr)
+      goto 23052
+23054 continue
+      call brknxt (sp, lextyp, labval, token)
+      goto 23052
+23055 continue
+      call retcod
+      goto 23052
+23056 continue
+      call gocode
+      goto 23052
+23057 continue
+      if (.not.(body .eq. 0))goto 23058
+      call strdcl
+      goto 23059
+23058 continue
+      call otherc (lexstr)
+23059 continue
+      goto 23052
+23060 continue
+      if (.not.(lextyp(sp) .eq. 123))goto 23061
+      sp = sp - 1
+      goto 23062
+23061 continue
+      if (.not.(lextyp(sp) .eq. -92))goto 23063
+      call swend (labval(sp))
+      sp = sp - 1
+      goto 23064
+23063 continue
+      call synerr (20HIllegal right brace.)
+23064 continue
+23062 continue
+      goto 23052
+23051 continue
       I23051=I23051+81
-      IF (I23051.LT.1.OR.I23051.GT.7)GOTO 23052
-      GOTO (23053,23054,23054,23055,23056,23057,23060),I23051
-23052 CONTINUE
-      TOKEN = LEX (LEXSTR)
-      CALL PBSTR (LEXSTR)
-      CALL UNSTAK (SP, LEXTYP, LABVAL, TOKEN)
-23047 CONTINUE
-23042 CONTINUE
-23001 TOKEN = LEX(LEXSTR)
-      GOTO 23000
-23002 CONTINUE
-      IF (.NOT.(SP .NE. 1))GOTO 23065
-      CALL SYNERR (15Hunexpected EOF.)
-23065 CONTINUE
-      END
-C     PUSHS0  PUSH_STACK
-C     LOGIC0  LOGICAL_COLUMN
+      if (I23051.lt.1.or.I23051.gt.7)goto 23052
+      goto (23053,23054,23054,23055,23056,23057,23060),I23051
+23052 continue
+      token = lex (lexstr)
+      call pbstr (lexstr)
+      call unstak (sp, lextyp, labval, token)
+23047 continue
+23042 continue
+23001 token = lex(lexstr)
+      goto 23000
+23002 continue
+      if (.not.(sp .ne. 1))goto 23065
+      call synerr (15Hunexpected EOF.)
+23065 continue
+      end
+c     pushs0  push_stack
+c     logic0  logical_column

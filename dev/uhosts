@@ -1,233 +1,300 @@
 #
-# 21Feb90, SAG
+# 28 August 90, SAG
 #
 #  Loopback 
 #
 127.0.0.1		localhost loghost
 #
-# NOAO-TUCSON net (192.31.165) (with gateway through gateway to UNIV-ARIZ)
-# NOAO-ORION net (192.33.11) (with Orion as gateway to NOAO-TUCSON)
-# NOAO-GEMINI net (192.55.96) (with Gemini as gateway to NOAO-TUCSON)
-# NOAO-KPNO net (192.33.10)
-# NOAO-SLIP net (192.18.83) SLIP link from Tucson to Kitt Peak
+# NOAO-ARIZONA net (140.252) (with gateway through gateway to UNIV-ARIZ)
+# NOAO-SUNSPOT net (192.35.200)
+# CTIO net (139.229)
 #
 # Tucson Network Gateway Box
-192.31.165.4	gateway gateway.tuc.noao.edu
+140.252.1.4	gateway gateway.tuc.noao.edu
 128.196.128.247	gateway.noao.edu gateway.noao.arizona.edu
-192.18.83.1	tuc-slip.tuc.noao.edu
-192.55.96.1	gate-x.tuc.noao.edu
-# Kitt Peak Network Gateway Box
-192.18.83.2	kpno-slip.kpno.noao.edu
 # news/mail machine (gemini in disguise)
 128.196.128.98	noao noao.edu noao.arizona.edu 
 # Scientist Workstation Server (4/370) and news/mail machine
-192.31.165.54	gemini-gw gemini-gw.tuc.noao.edu
-192.55.96.54	gemini gemini.tuc.noao.edu
+140.252.1.54	gemini-gw gemini.tuc.noao.edu carina carina.tuc.noao.edu
+140.252.3.54	gemini
 #
 # VAX-11/750 Unix (CCS)
-192.31.165.2	carina carina.tuc.noao.edu vax5 kpnoc c class5 5 
-192.31.165.6	aquila aquila.tuc.noao.edu vax1 kpnoa a class1 1
+140.252.1.6	aquila aquila.tuc.noao.edu vax1 kpnoa a class1 1
 # VAX-11/750 VMS (CCS)
-192.31.165.3	testvax testvax.tuc.noao.edu
-192.31.165.7	vela vela.tuc.noao.edu vax3 v class3 3
+140.252.1.3	testvax testvax.tuc.noao.edu
+140.252.1.7	vela vela.tuc.noao.edu vax3 v class3 3
 # VAX 8600 VMS (CCS)
-192.31.165.5	draco draco.tuc.noao.edu vax6 d class6 6 noao-draco draco.noao.arizona.edu noao-draco.arpa
+140.252.1.5	draco draco.tuc.noao.edu vax6 d class6 6 noao-draco draco.noao.arizona.edu noao-draco.arpa
 # Sun 3/160 (CCS--IRAF)
-192.31.165.1	tucana tucana.tuc.noao.edu sun1 t lyra
+140.252.1.1	tucana tucana.tuc.noao.edu sun1 t lyra
 # VAXstation-3100 (Charles Harmer)
-192.31.165.8	hydra hydra.tuc.noao.edu
+140.252.1.8	hydra hydra.tuc.noao.edu
 # Compaq 286 (Jacoby's office)
-192.31.165.9 	mensa mensa.tuc.noao.edu
+140.252.1.9 	mensa mensa.tuc.noao.edu
+# Future VAX running VMS
+140.252.1.10	robur robur.tuc.noao.edu
 # Sun 3/160 (NSO-GONG)
-192.31.165.11	octans octans.tuc.noao.edu o 
+140.252.1.11	octans octans.tuc.noao.edu
 # LSI-11/73 Forth-11 (IR array R&D)
-192.31.165.12	nutus nutus.tuc.noao.edu
+140.252.1.12	nutus nutus.tuc.noao.edu
 # LSI-11/23 Forth-11 (PDS machine)
-192.31.165.13	fornax fornax.tuc.noao.edu
+140.252.1.13	fornax fornax.tuc.noao.edu
 # dummy machine name used for testing
-192.31.165.14	suntest suntest.tuc.noao.edu
-# Sun 3/110 (IRAF Programmers) using Tucana
-192.31.165.15	pavo pavo.tuc.noao.edu
-# Generic Clone PC (public closet)
-192.31.165.16	sextans sextans.tuc.noao.edu 
+140.252.1.14	suntest suntest.tuc.noao.edu
+# Sun 3/110 (IRAF Programmers; Dyer Lytle) using Tucana
+140.252.1.15	pavo pavo.tuc.noao.edu
+# Generic Clone PC (Rm. 117)
+140.252.1.16	sextans sextans.tuc.noao.edu 
 # MicroVAX II/GPX (Galileo project)
-192.31.165.17	gll1 gll1.tuc.noao.edu
-# Sun 3/160 (NNTT)
-192.31.165.18	scorpius scorpius.tuc.noao.edu s
+140.252.1.17	gll1 gll1.tuc.noao.edu
+# Sun 3/160 (NTT/Frank Bull)
+140.252.1.18	scorpius scorpius.tuc.noao.edu s
 # Compaq-286 (Barden's Fiber lab)
-192.31.165.19	leo leo.tuc.noao.edu
+140.252.1.19	leo leo.tuc.noao.edu
 # Sun 3/260 (Jones' Vacuum Telescope lab)
-#192.31.165.20	taurus taurus.tuc.noao.edu
+#140.252.1.20	taurus taurus.tuc.noao.edu
 # NSO/CCS downtown Sun-3/260
-192.31.165.21	argo argo.tuc.noao.edu
-# CCS Sun-4/280 File Server (plus!)
-192.33.11.22	orion orion.tuc.noao.edu loghost
-192.31.165.22	orion-gw orion-gw.tuc.noao.edu
+140.252.1.21	argo argo.tuc.noao.edu
+# CCS Sun-4/280
+140.252.2.22	orion o orion-local orion-local.tuc.noao.edu
+140.252.1.22	orion-gw orion.tuc.noao.edu
 #
 # CCS Sun-3/60 diskless image processing workstations (the P machines)
 #
 # IRAF development diskless 3/60s using Tucana
 #
-# Jeannette Barnes
-192.31.165.24	pisces pisces.tuc.noao.edu
+# Mike Fitzpatrick
+140.252.1.24	pisces pisces.tuc.noao.edu
 # Lindsey Davis
-192.31.165.26	perseus perseus.tuc.noao.edu
+140.252.1.26	perseus perseus.tuc.noao.edu
 # Frank Valdes
-192.31.165.30	puppis puppis.tuc.noao.edu
+140.252.1.30	puppis puppis.tuc.noao.edu
 #
-# IRAF Sun 386i on Doug Tody's desk
-192.31.165.25	pegasus pegasus.tuc.noao.edu
+# IRAF Sun 386i; Jeannette Barnes
+140.252.1.25	pegasus pegasus.tuc.noao.edu
 #
 # Data Reduction/Analysis 4/60 using Orion
-192.33.11.23	pictor pictor.tuc.noao.edu
+140.252.2.23	pictor pictor.tuc.noao.edu
 # Data Reduction/Analysis 4/110 using Orion
-192.33.11.29	phoenix phoenix.tuc.noao.edu
-# dummy machine name used for testing
-192.33.11.30	bootes bootes.tuc.noao.edu
+140.252.2.29	phoenix phoenix.tuc.noao.edu
 # Data Reduction/Analysis 3/60s using Orion
-192.33.11.31	pyxis pyxis.tuc.noao.edu
+140.252.2.31	pyxis pyxis.tuc.noao.edu
 # Mountain Programmer's Compaq 286
-192.31.165.27	lynx lynx.tuc.noao.edu
+140.252.1.27	lynx lynx.tuc.noao.edu
 # Apollo DN-3500 on Steve Rooke's desk
-192.31.165.28	auriga auriga.tuc.noao.edu
+140.252.1.28	auriga auriga.tuc.noao.edu
 # 3/60 (Steve Grandi's Office)
-192.31.165.32	apus apus.tuc.noao.edu
+140.252.1.32	apus apus.tuc.noao.edu
 # Mountain Programmer's VME box
-192.31.165.33	aries aries.tuc.noao.edu
+140.252.1.33	aries aries.tuc.noao.edu
 # AT Clone (Jim Brault's Office)
-192.31.165.34	antlia antlia.tuc.noao.edu
+140.252.1.34	antlia antlia.tuc.noao.edu
 # Monet machine VMS MicroVAX
-192.31.165.35	crux crux.tuc.noao.edu
+140.252.1.35	crux crux.tuc.noao.edu
 # GONG 3/60 (diskfull) in a GONG lab
-192.31.165.36	dorado dorado.tuc.noao.edu
+140.252.1.36	dorado dorado.tuc.noao.edu
 # GONG 3/60 (diskfull) in Ed Anderson's office
-192.31.165.37	lacerta lacerta.tuc.noao.edu
+140.252.1.37	lacerta lacerta.tuc.noao.edu
 # Heurikon board in Octans (the world should not have to know about this guy)
-192.31.165.38	vxworks vxworks.tuc.noao.edu
+140.252.1.38	vxworks vxworks.tuc.noao.edu
 # Ditsler's TV lab Compaq
-192.31.165.39	lupus lupus.tuc.noao.edu
+140.252.1.39	lupus lupus.tuc.noao.edu
 # Richard Wolff's 4/60
-192.31.165.40	daikon daikon.tuc.noao.edu
+140.252.1.40	daikon daikon.tuc.noao.edu
 # Tom Duvall's office Sun 3/60
-192.31.165.41	grus grus.tuc.noao.edu
+140.252.1.41	grus grus.tuc.noao.edu
 # GONG 3/160C
-192.31.165.42	serpens serpens.tuc.noao.edu
+140.252.1.42	serpens serpens.tuc.noao.edu
 # CMC Transerver terminal server
-192.31.165.43	trans01 trans01.tuc.noao.edu
+140.252.1.43	trans01 trans01.tuc.noao.edu
 # Sun 386i on Sidney Wolff's desk
-192.31.165.44	mytoy mytoy.tuc.noao.edu
+140.252.1.44	mytoy mytoy.tuc.noao.edu
 # Sun 386i in B18 destined for Solar FTS
-192.31.165.45	corona corona.tuc.noao.edu
+140.252.1.45	corona corona.tuc.noao.edu
 #
 # Mountain Programming Group 3/50s, 3/60s, and 3/80s
 #
 #  Chuck Mahaffey's 3/60
-192.31.165.46	hercules hercules.tuc.noao.edu
-# D'Anne Thompson's 3/80
-192.31.165.47	indus indus.tuc.noao.edu
+140.252.1.46	hercules hercules.tuc.noao.edu
+# D'Anne Thompson's Lab 3/80
+140.252.1.47	indus indus.tuc.noao.edu
 # Kim Gillies' 3/80
-192.31.165.48	radish radish.tuc.noao.edu
+140.252.1.48	radish radish.tuc.noao.edu
 # Nick Buchholz's 3/50
-192.31.165.49	yogi yogi.tuc.noao.edu
+140.252.1.49	yogi yogi.tuc.noao.edu
 #
 # IR Group Sun3/260
-192.31.165.50	omega omega.tuc.noao.edu
+140.252.1.50	omega omega.tuc.noao.edu
 # Heurikon board hosted by Dorado 
-192.31.165.51	vxworks2 vxworks2.tuc.noao.edu
+140.252.1.51	vxworks2 vxworks2.tuc.noao.edu
 # CMC Transerver terminal server
-192.31.165.52	trans02 trans02.tuc.noao.edu
+140.252.1.52	trans02 trans02.tuc.noao.edu
 # AT clone in Mahaffey's office
-192.31.165.53	iris iris.tuc.noao.edu
+140.252.1.53	iris iris.tuc.noao.edu
 # O/UV lab Sun 3/160
-192.31.165.65	libra libra.tuc.noao.edu
+140.252.1.65	libra libra.tuc.noao.edu
 # Winifred Williams' DECstation 3100 (GONG)
-192.31.165.66	virgo virgo.tuc.noao.edu
+140.252.1.66	virgo virgo.tuc.noao.edu
 # Earl O'Neil's DECstation 3100 (WFPC)
-192.31.165.67	wfpct3 wfpct3.tuc.noao.edu
+140.252.1.67	wfpct3 wfpct3.tuc.noao.edu
 # NSO Macintosh in B65 (Rabin)
-192.31.165.68	czerny czerny.tuc.noao.edu
+140.252.1.68	czerny czerny.tuc.noao.edu
 # NSO PC/AT clone in B62 (Harvey)
-192.31.165.69	ara ara.tuc.noao.edu
-# IRAF workstations: DECstation 3100
-192.31.165.70	cephus cephus.tuc.noao.edu
-# IRAF workstations: Sun 4/60GX
-192.31.165.71	coma coma.tuc.noao.edu
+140.252.1.69	ara ara.tuc.noao.edu
+# IRAF workstations: DECstation 3100 (Chris Biemesderfer)
+140.252.1.70	cephus cephus.tuc.noao.edu
+# IRAF workstations: Sun 4/60GX; Doug Tody
+140.252.1.71	coma coma.tuc.noao.edu
 # IRAF workstations: Doug Tody's Apple Mac II (A/UX)
-192.31.165.72	lepus lepus.tuc.noao.edu
+140.252.1.72	lepus lepus.tuc.noao.edu
 # IRAF VAXstation 3100s on loan from DEC
-192.31.165.74	canis canis.tuc.noao.edu
-192.31.165.75	crater crater.tuc.noao.edu
+140.252.1.74	canis canis.tuc.noao.edu
+140.252.1.75	crater crater.tuc.noao.edu
+# Carl Danielson's T-1000 "net-tester"
+140.252.1.76	t1000 t1000.tuc.noao.edu
+140.252.2.76	t1000-o
+140.252.3.76	t1000-g
+# Steve Grandi's PC "net-tester"
+140.252.1.77	pc pc.tuc.noao.edu
+140.252.2.77	pc-o
+140.252.3.77	pc-g
+# Al Fowler's 4/65
+140.252.1.79	pantera pantera.tuc.noao.edu
+# IRAF MIPS machine (Suzanne Jacoby)
+140.252.1.80	columba columba.tuc.noao.edu
+# IRAF SGI 4D25/GTX
+140.252.1.81	noctua noctua.tuc.noao.edu
+#
+# Mirror-lab HP 9000/370 and friends (John Fox)
+#
+140.252.1.82	adonis adonis.tuc.noao.edu
+140.252.5.1	adonis.tuc.noao.edu
+140.252.5.2	lucifer lucifer.tuc.noao.edu
+140.252.5.3	grecker grecker.tuc.noao.edu
+# GONG DS 3100 (Roberta Touissant)
+140.252.1.83	equuleus equuleus.tuc.noao.edu
+# GONG DS 5000 (Mark Trueblood))
+140.252.1.90	sol sol.tuc.noao.edu
+# CCS/ETS maintenance/spare parts 3/160
+140.252.1.91	musca musca.tuc.noao.edu
+# IRAF IBM RS/6000 machine
+140.252.1.92	felis felis.tuc.noao.edu
+# CCS staff workstation (Jan Schwitters)
+140.252.1.93	cygnus cygnus.tuc.noao.edu
+# MPG ??? (Lee Groves)
+140.252.1.94	yam yam.tuc.noao.edu
+# MPG 4/25 (D'Anne Thompson)
+140.252.1.95	plum plum.tuc.noao.edu
+# CCS Sun 4/470
+140.252.1.96	ursa ursa.tuc.noao.edu
+# CCS X-terminal
+140.252.1.98	pleiades pleiades.tuc.noao.edu
+# Kinetics Box for Appletalk Net
+140.252.1.200	kinetics.tuc.noao.edu
+#
 #
 # Scientist Workstations
 #
-# Phil Massey
-192.55.96.55	tofu tofu.tuc.noao.edu
-# Nigel Sharp
-192.55.96.56	corvus corvus.tuc.noao.edu
-# Todd Boroson
-192.55.96.57	bokchoy bokchoy.tuc.noao.edu
-# Harry Jones
-192.55.96.58	norma norma.tuc.noao.edu
-# Taft Armandroff
-192.55.96.59	jalapeno jalapeno.tuc.noao.edu
-# Mark Giampapa
-192.55.96.60	msgsun msgsun.tuc.noao.edu
-# Pat Osmer
-192.55.96.61	sagittarius sagittarius.tuc.noao.edu
-# Caty Pilachowski
-192.55.96.62	mintchip mintchip.tuc.noao.edu
-# Tod Lauer (temporarily in room 36)
-192.55.96.63	cygnus cygnus.tuc.noao.edu
+# Phil Massey 4/60
+140.252.3.55	tofu tofu.tuc.noao.edu
+# Nigel Sharp 4/60
+140.252.3.56	corvus corvus.tuc.noao.edu
+# Todd Boroson 4/60
+140.252.3.57	bokchoy bokchoy.tuc.noao.edu
+# Harry Jones 4/60
+140.252.3.58	norma norma.tuc.noao.edu
+# Taft Armandroff 4/60
+140.252.3.59	jalapeno jalapeno.tuc.noao.edu
+# Mark Giampapa 4/60
+140.252.3.60	msgsun msgsun.tuc.noao.edu
+# Pat Osmer 4/60
+140.252.3.61	sagittarius sagittarius.tuc.noao.edu
+# Caty Pilachowski 4/60
+140.252.3.62	mintchip mintchip.tuc.noao.edu
+# Tod Lauer  4/60
+140.252.3.63	seurat seurat.tuc.noao.edu
 # NSO 4/60 in B65
-192.55.96.64	hummel hummel.tuc.noao.edu
-# Mike Belton
-192.55.96.73	jupiter jupiter.tuc.noao.edu
-# Steve Ridgway (X-terminal)
-#192.55.96.76	ridgway ridgway.tuc.noao.edu
+140.252.3.64	hummel hummel.tuc.noao.edu
+# Mike Belton 4/60
+140.252.3.73	jupiter jupiter.tuc.noao.edu
+# "Spare" number on SWN
+140.252.3.78	bootes bootes-g bootes.tuc.noao.edu
+# Rob Seaman's X-terminal
+140.252.1.84	centaurus centaurus.tuc.noao.edu
+# Mike Merrill 4/65
+140.252.3.85	mira mira.tuc.noao.edu
+# George Jacoby 4/65
+140.252.3.86	madrona madrona.tuc.noao.edu
+# Dave DeYoung 4/65
+140.252.3.87	aspen aspen.tuc.noao.edu
+# Sam Barden 4/65
+140.252.3.88	spud spud.tuc.noao.edu
+# Richard Green 4/65
+140.252.3.89	radix radix.tuc.noao.edu
+# Doug Rabin 4/65
+140.252.3.97	mozart mozart.tuc.noao.edu
+# John Salzer 4/40
+140.252.3.99	salzer salzer.tuc.noao.edu
+# Jack Harvey 4/65
+140.252.3.100	harvey harvey.tuc.noao.edu
+# Daryl Willmarth's X-terminal on blue cable
+140.252.3.101	willmarth willmarth.tuc.noao.edu
+# Ian Gatley's Mac-II on blue cable
+140.252.3.102	gatley gatley.tuc.noao.edu
 #
-# Kinetics Box for Appletalk Net
-192.31.165.200	kinetics.tuc.noao.edu
 #
-# NOAO-KPNO net (192.33.10)
+# NOAO-KPNO net (140.252.51)
 #
+# Cisco box
+140.252.51.250	gateway.kpno.noao.edu
 # Sun 3/260 (4 Meter)
-192.33.10.1	khaki khaki.kpno.noao.edu
+140.252.51.1	khaki khaki.kpno.noao.edu
 #
 # Sun 3/280 (2.1 Meter)
-192.33.10.2	lapis lapis.kpno.noao.edu
+140.252.51.2	lapis lapis.kpno.noao.edu
+#
+# Sun 4/65  (Coude-Feed)
+140.252.51.3	cobalt cobalt.kpno.noao.edu
 #
 # Sun 3/260 (1.3 Meter)
-192.33.10.4	scarlet scarlet.kpno.noao.edu
+140.252.51.4	scarlet scarlet.kpno.noao.edu
 #
 # Sun 3/260 (0.9 Meter)
-192.33.10.5	taupe taupe.kpno.noao.edu
+140.252.51.5	taupe taupe.kpno.noao.edu
 #
 # Sun 3/260 (McMath)
-192.33.10.7	elsol elsol.kpno.noao.edu
+140.252.51.7	elsol elsol.kpno.noao.edu
 #
 # Sun 3/260 (Solar Vacuum)
-192.33.10.71    taurus taurus.kpno.noao.edu
+140.252.51.71    taurus taurus.kpno.noao.edu
 #
 # IBM PC/XT (Electronic Maintenance)
-192.33.10.72    godzilla godzilla.kpno.noao.edu
+140.252.51.72    godzilla godzilla.kpno.noao.edu
 #
 # CMC Transerver (TA office)
-192.33.10.8	crystal crystal.kpno.noao.edu
+140.252.51.8	crystal crystal.kpno.noao.edu
 #
 # Sun 3/50 (Goodrich)
-192.33.10.40	burgundy burgundy.kpno.noao.edu
+140.252.51.40	burgundy burgundy.kpno.noao.edu
 #
 # Compaq PC/XT (Africano)
-192.33.10.41	cardinal cardinal.kpno.noao.edu
+140.252.51.41	cardinal cardinal.kpno.noao.edu
 #
 # MIT PC/AT (Programmers' Office)
-192.33.10.20	iris iris.kpno.noao.edu
+140.252.51.20	iris iris.kpno.noao.edu
 #
 # Heurikon 68030 in VME crate; TCP computer in 2.1m
-192.33.10.21	cyan cyan.kpno.noao.edu
+140.252.51.21	cyan cyan.kpno.noao.edu
 #
 # Sun 3/50; LTO terminal in 2.1m
-192.33.10.22	teal teal.kpno.noao.edu
+140.252.51.22	teal teal.kpno.noao.edu
+#
+#  KP Tenant's networks 140.252.81
+#
+140.252.81.10	bok.as.arizona.edu
+140.252.81.11	bokpc1.as.arizona.edu
+# Cisco box
+140.252.81.250	gateway.kpno.noao.edu
 #
 #  Sunspot machines (NOAO-SUNSPOT 192.35.200, APO-GALILEO 192.41.211)
 #
@@ -239,63 +306,142 @@
 192.35.200.16	plage.sunspot.noao.edu
 192.35.200.17	ra.sunspot.noao.edu
 192.35.200.18	flare.sunspot.noao.edu
-192.35.200.20	umbra.sunspot.noao.edu
 192.35.200.21	vector.sunspot.noao.edu
 192.35.200.24	corona.sunspot.noao.edu
-192.35.200.129	prominence.sunspot.noao.edu
 192.41.211.40	galileo.apo.nmsu.edu galileo
+###
+# CTIO SERENA-TOLOLO TCP/IP NETWORK (139.229)
+##
 #
-#  U.A. Ethernet  (128.196) (Selected Pieces!)
+# Cerro Tololo main nodes
+#
+139.229.1.1	ctio4m.ctio.noao.edu
+139.229.1.2	ctio1m.ctio.noao.edu
+139.229.1.3	ctio60.ctio.noao.edu
+139.229.1.4	ctio36.ctio.noao.edu
+#
+# Cerro Tololo cisco AGS 
+#
+139.229.1.20	ctiog2.ctio.noao.edu
+#
+# Cerro Tololo misc
+#
+139.229.1.30	ctiot1.ctio.noao.edu
+139.229.1.31	ctiot2.ctio.noao.edu
+#
+# Cerro Tololo pc's
+#
+139.229.1.40	ctioc1.ctio.noao.edu
+139.229.1.41	ctioc2.ctio.noao.edu
+#
+# Cerro Tololo - Proteon gateway to Internet
+#
+139.229.1.50	ctiog3.ctio.noao.edu
+#
+# La Serena main nodes 
+#
+139.229.2.1	ctios1.ctio.noao.edu
+139.229.2.3	ctios2.ctio.noao.edu ctio.noao.edu
+139.229.2.4	ctios3.ctio.noao.edu
+139.229.2.5	ctiov1.ctio.noao.edu
+139.229.2.6	ctiov2.ctio.noao.edu
+#
+# La Serena lab nodes 
+#
+139.229.2.7	ctiol1.ctio.noao.edu
+139.229.2.15	ctiol2.ctio.noao.edu
+139.229.2.9	ctiol3.ctio.noao.edu
+139.229.2.8	ctiol4.ctio.noao.edu
+139.229.2.40	ctiol5.ctio.noao.edu
+#
+# La Serena SPARC-1 workstations
+#
+139.229.2.10	ctios4.ctio.noao.edu
+139.229.2.11	ctiow1.ctio.noao.edu
+139.229.2.12	ctiow2.ctio.noao.edu
+139.229.2.13	ctiow3.ctio.noao.edu
+139.229.2.14	ctiow4.ctio.noao.edu
+139.229.2.16	ctiow5.ctio.noao.edu
+139.229.2.17	ctiow6.ctio.noao.edu
+139.229.2.18	ctiow7.ctio.noao.edu
+139.229.2.19	ctiow8.ctio.noao.edu
+#
+# La Serena computer room pc
+#
+139.229.2.30	ctiop1.ctio.noao.edu
+139.229.2.31	ctiop2.ctio.noao.edu
+139.229.2.32	ctiop3.ctio.noao.edu
+139.229.2.33	ctiop4.ctio.noao.edu
+#
+# La Serena cisco AGS 
+#
+139.229.2.20	ctiog1.ctio.noao.edu
+#
+# Serena-Tololo SLIP links
+#
+139.229.3.1	link4m.ctio.noao.edu
+139.229.3.2	links1.ctio.noao.edu
+139.229.3.3	links2.ctio.noao.edu
+139.229.3.4	links3.ctio.noao.edu
+#
+139.229.4.1	dinkpc.ctio.noao.edu
+139.229.4.2	dinks1.ctio.noao.edu
+139.229.4.3	dinks2.ctio.noao.edu
+#
+# Serena-Tololo t1 link
+#
+139.229.5.4	linkg1.ctio.noao.edu
+139.229.5.6 	linkg2.ctio.noao.edu
 #
 #
-#128.196.128.nnn  Main Subnet (gateways only)
+#	Other random machines
+#
+129.219.30.5	asuvax.asu.edu
+128.117.16.4	hao.ucar.edu
+128.171.80.1	cfht.cfht.hawaii.edu
+128.171.80.50	uwila.cfht.hawaii.edu
+128.171.2.6	hale.ifa.hawaii.edu
+128.171.2.3	newton.ifa.hawaii.edu
+131.215.139.161	ikaros.caltech.edu
+132.249.10.1	y1.sdsc.edu
+128.119.50.11	hanksville.phast.umass.edu
+36.10.0.4	solar.stanford.edu
+#
+#  U of A Ethernet  (128.196) (Selected Pieces!)
+#
+#
+#128.196.128.nnn  Main Subnet (mostly gateways)
 128.196.128.1	lpl-gw.lpl.arizona.edu
-128.196.128.11	flwo-gw.sao.arizona.edu
-128.196.128.12	cadsns-gw.ece.arizona.edu
+128.196.128.7	helios.ece.arizona.edu ece.arizona.edu
 128.196.128.13	looney.lpl.arizona.edu
 128.196.128.14	bari.lpl.arizona.edu
-128.196.128.16  unix1.ccit.arizona.edu
-128.196.128.23  penzance.math.arizona.edu
+128.196.128.19	organpipe.uug.arizona.edu
+128.196.128.23  penzance.math.arizona.edu		#gateway to math
 128.196.128.30  asgard.lpl.arizona.edu
 128.196.128.31  atlas.lpl.arizona.edu
 128.196.128.40  floyd.lpl.arizona.edu
 128.196.128.41  antenor.lpl.arizona.edu
+128.196.128.43  as-gw-el.as.arizona.edu
 128.196.128.53	abraxas.lpl.arizona.edu
 128.196.128.70	appletalk.mis.arizona.edu		#gateway to 128.196.80
-128.196.128.79	pythia.itpp.arizona.edu 		#itpp Kinetics gateway
-128.196.128.82	rvax.ccit.arizona.edu
-128.196.128.80	jvax.ccit.arizona.edu arizona.csc.org	#jvnc gatewy
 128.196.128.85	zippy.telcom.arizona.edu
 128.196.128.86	nsigate.telcom.arizona.edu 		#nsi proteon gateway
 128.196.128.87	westgate.telcom.arizona.edu 		#westnet cisco gateway
-128.196.128.93	gamma.sao.arizona.edu
-128.196.128.94	galileo.sao.arizona.edu sao.arizona.edu
-128.196.128.95	as-gw.as.arizona.edu
 128.196.128.96 	mis.arizona.edu misvax.mis.arizona.edu
 128.196.128.97	router.bpatr.arizona.edu
 128.196.128.98	noao.edu noao.arizona.edu 
-128.196.128.99	math.arizona.edu amethyst.math.arizona.edu
-128.196.128.112	turquoise.math.arizona.edu turx25.math.arizona.edu
 128.196.128.118 megaron.cs.arizona.edu cs.arizona.edu
-128.196.128.119	jupiter.ame.arizona.edu
-128.196.128.128	cmifp.mis.arizona.edu
+128.196.128.147	pancho.telcom.arizona.edu
 128.196.128.163	rsconvex.geo.arizona.edu
-128.196.128.199 ece475.ece.arizona.edu
+128.196.128.192	idx.telcom.arizona.edu
+128.196.128.195	klingon.physics.arizona.edu
 128.196.128.206 titanium.physics.arizona.edu
 128.196.128.210 rincon.sie.arizona.edu
 128.196.128.223 catalina.opt-sci.arizona.edu
 128.196.128.233 maggie.telcom.arizona.edu telcom.arizona.edu arizona.edu
+128.196.128.235 penny.telcom.arizona.edu
 128.196.128.247 gateway.tuc.noao.edu
 128.196.128.249 river.hwr.arizona.edu
-#
-# 128.196.8.		MIS Macintosh net via fastpath in Econ building
-#
-# 128.196.16.    Joel Snyder's BPA Token ring gateway (bpa-token-ring)
-#   gateway: 128.196.128.97 router.bpatr.arizona.edu
-#
-128.196.16.97	router.bpatr.arizona.edu
-#
-# 128.196.24.	tfo Net (???)
 #
 # 128.196.32.   Skip Schaller's Mirror lab subnet (mirror-lab)
 #   gateway: 128.196.160.2 dorado.as.arizona.edu
@@ -316,19 +462,10 @@
 128.196.32.48	mlpc8.as.arizona.edu
 128.196.32.49	mlpc9.as.arizona.edu
 #
-# 128.196.40	MIS/Joel Snyder's CARAT-net 
-#   gateway: 128.196.152.2 carat0.mis.arizona.edu
-128.196.40.100 	carat0.mis.arizona.edu
-#
-# 128.196.48.  ECE subnet for Dr. Grubb's communication lab
-# Gateway machine for this subnet: 128.196.128.199  ece475.ece.arizona.edu
-#
-128.196.48.199	hp350.ece.arizona.edu
-#
 #128.196.64.0  Joe Gotobed's LPL subnet in Space Sciences) lpl-net
 #   gateway: 128.196.128.1 lpl-gw.lpl.arizona.edu
 #
-128.196.64.1   hindmost.lpl.arizona.edu
+128.196.64.1   hindmost.lpl.arizona.edu lpl.arizona.edu
 128.196.64.2   proton.lpl.arizona.edu
 128.196.64.3   deuteron.lpl.arizona.edu
 128.196.64.4   phobos.lpl.arizona.edu
@@ -340,10 +477,10 @@
 128.196.64.10  linda.lpl.arizona.edu
 128.196.64.11  deimos.lpl.arizona.edu
 128.196.64.12  lpl315a.lpl.arizona.edu
-128.196.64.13  saraki.lpl.arizona.edu
-128.196.64.14  voyager.lpl.arizona.edu
+128.196.64.13  guest.lpl.arizona.edu
+128.196.64.14  curly.lpl.arizona.edu
 128.196.64.15  moon.lpl.arizona.edu
-128.196.64.16  grinch.lpl.arizona.edu
+128.196.64.16  gaia.lpl.arizona.edu
 128.196.64.17  comet.lpl.arizona.edu
 128.196.64.18  chaos.lpl.arizona.edu
 128.196.64.19  cookie.lpl.arizona.edu
@@ -370,9 +507,26 @@
 128.196.64.43  akebar.lpl.arizona.edu
 128.196.64.44  jeff.lpl.arizona.edu
 128.196.64.45  gammal.lpl.arizona.edu
+128.196.64.47  thrasymedes.lpl.arizona.edu
+128.196.64.48  hermes.lpl.arizona.edu
+128.196.64.49  jonathan.lpl.arizona.edu
 128.196.64.50  bashar.lpl.arizona.edu
 128.196.64.51  ph4137a.lpl.arizona.edu
 128.196.64.52  gaea.lpl.arizona.edu
+128.196.64.53  titan.lpl.arizona.edu
+128.196.64.54  pc315.lpl.arizona.edu
+128.196.64.55  jkota.lpl.arizona.edu
+128.196.64.56  erzi.lpl.arizona.edu
+128.196.64.57  larry.lpl.arizona.edu
+128.196.64.58  gwebb.lpl.arizona.edu
+128.196.64.59  jburns.lpl.arizona.edu
+128.196.64.60  marley.lpl.arizona.edu
+128.196.64.61  mnelson.lpl.arizona.edu
+128.196.64.62  joeb.lpl.arizona.edu
+128.196.64.63  ehlevy.lpl.arizona.edu
+128.196.64.64  charon.lpl.arizona.edu
+128.196.64.67  scanner.lpl.arizona.edu
+128.196.64.68  picard.lpl.arizona.edu
 #
 #Steward Obs machines in the Planetarium on the LPL cable
 #
@@ -383,68 +537,35 @@
 128.196.64.65	sl1.as.arizona.edu
 128.196.64.66	sl2.as.arizona.edu
 #                
-# 128.196.72.		Hydrology Water Research
-#   gateway: 128.196.128.249  river.hwr.arizona.edu
-128.196.72.1	river.hwr.arizona.edu
-#
-# 128.196.80.	MIS appletalk network (mis-appletalk)
-#   gateway: 128.196.128.70 appletalk.mis.arizona.edu
-#
-128.196.80.1	appletalk.mis.arizona.edu
-#
 # 128.196.92 Point to point link for MMT
 #   gateway: 128.196.176.129 as-gw-s0.as.arizona.edu
 #
 128.196.92.1	as-gw-s0.as.arizona.edu
 128.196.92.2	mmt-gw-s0.as.arizona.edu
 #
-#128.196.96.    Face's ITPP Kinetics Gateway and Subnet (itpp-appletalk)
-#   gateway: 128.196.128.79 pythia.itpp.arizona.edu
-#
-128.196.96.1    pythia.itpp.arizona.edu
-#
 # 128.196.100.  MMT network
 #   gateway: 128.196.92.2 mmt-gw-s0.as.arizona.edu
 
-128.196.104.0	mmt-gw-e0.as.arizona.edu
+128.196.100.1	mmt-gw-e0.as.arizona.edu
 #
-#  128.196.104  CC-IP over Decnet net to Cancer Center
-#     gateway: 128.196.128.233 (maggie.telcom.arizona.edu)
-128.196.104.1	maggie.telcom.arizona.edu
-#
-# 128.196.112.  Radiology net
-#                              
 # 128.196.120.	CCIT-net
-#     gateway: 128.196.128.87 (westgate.telcom.arizona.edu)
+#     gateway: 128.196.128.147 (pancho.telcom.arizona.edu)
 128.196.120.1	ccit-router.telcom.arizona.edu
 128.196.120.2	convx0.ccit.arizona.edu
+128.196.120.19  dopey.rc.arizona.edu rc.arizona.edu
+128.196.120.25  ivax.ccit.arizona.edu
+128.196.120.79	pythia.itpp.arizona.edu 		#itpp Kinetics gateway
+128.196.120.82	rvax.ccit.arizona.edu
+128.196.120.85	aqua.ccit.arizona.edu
+128.196.120.89	bashful.rc.arizona.edu
 128.196.120.210	chemvx.chem.arizona.edu
 #
-# 128.196.128	physics cold-fusion-net
-#  Gateway 128.196.128.206 titanium.physics.arizona.edu 
-128.196.168.1 titanium.physics.arizona.edu
-#
-# 128.196.136.		SIE Algorithmics Lab Subnet
-#
-# 128.196.144.	 AME's IPC network  ua-cfml-net
-#   gateway: 128.196.128.119 jupiter.ame.arizona.edu
-#
-128.196.144.1	jupiter-gw.ame.arizona.edu
-#
-# 128.196.152	MIS/Joel Snyder's CARAT-net (via IP over DECnet)
-#
-#   gateway: maggie.telcom.arizona.edu (128.196.128.233)
-128.196.152.1	maggie.telcom.arizona.edu
-128.196.152.2 	carat0.mis.arizona.edu
-#
 # 128.196.160.  Skip Schaller's slip subnet to mirror lab (mirror-slip)
-#   gateway: 128.196.128.95 as-gw.as.arizona.edu
 #                                                         
 128.196.160.1   astro-slip.as.arizona.edu
 128.196.160.2   dorado.as.arizona.edu
 # 
 # 128.196.176.  ua-as-net
-#   gateway: 128.196.128.95 as-gw.as.arizona.edu
 #
 128.196.176.1	astro.as.arizona.edu as.arizona.edu
 128.196.176.2	aquarius.as.arizona.edu
@@ -459,6 +580,8 @@
 128.196.176.11	delphinus.as.arizona.edu
 128.196.176.12	ross.as.arizona.edu
 128.196.176.13	strato.as.arizona.edu
+128.196.176.14	afone.as.arizona.edu
+128.196.176.15	aftwo.as.arizona.edu
 128.196.176.110	aspc10.as.arizona.edu
 128.196.176.111	aspc11.as.arizona.edu
 128.196.176.112	aspc12.as.arizona.edu
@@ -469,7 +592,7 @@
 128.196.176.117	aspc17.as.arizona.edu
 128.196.176.118	aspc18.as.arizona.edu
 128.196.176.119	aspc19.as.arizona.edu
-#128.196.176.129   hercules.as.arizona.edu
+128.196.176.129   as-ge-e0.as.arizona.edu
 128.196.176.130   taurus.as.arizona.edu
 128.196.176.131   oz.as.arizona.edu
 128.196.176.132   solpl.as.arizona.edu solpl
@@ -525,16 +648,6 @@
 128.196.176.72    tuborg.tuc.nrao.edu
 128.196.176.73    heineken.tuc.nrao.edu
 128.196.176.74    urquell.tuc.nrao.edu
-# 128.196.184   Susan Yamamura's Chemistry Subnet
-#   gateway: 128.196.216.2 (cgf2.chem.ariaona.edu)
-128.196.184.16	bernath.chem.arizona.edu
-#
-# 128.196.192.  Tom Bortone's ECE Subnet   (cad-ece-net)
-#   gateway: 128.196.128.12 cadsns-gw.ece.arizona.edu
-#
-128.196.192.1	cadsns.ece.arizona.edu
-#
-# 128.196.200		Artificial Intelligence in Chemistry (Marvel Labs)
 #
 # 128.196.208.	Telcom net (telcom-net)
 #   gateway: 128.196.128.85 zippy.telcom.arizona.edu
@@ -545,23 +658,12 @@
 128.196.208.4	lippy.telcom.arizona.edu
 128.196.208.5	dragoon.telcom.arizona.edu
 128.196.208.6	argent.telcom.arizona.edu
-# 128.196.216   cc to chem
-#   gateway: maggie 128.196.128.233
-#
-128.196.216.1	chem-router.telcom.arizona.edu
-128.196.216.2	cgf2.chem.arizona.edu
-
 #
 # 128.196.224.   Bob Condon's Kinetics Gateway and Subnet (math-appletalk)
 #   gateway: 128.196.128.23 penzance.math.arizona.edu
 #
 128.196.224.1    penzance.math.arizona.edu
-128.196.224.2    amethyst.math.arizona.edu
-#
-#128.196.238.	ame-net Main AME subnet
-#  gateway: 128.196.128.87 westgate.telcom.arizona.edu
-#
-128.296.238.1	westgate.telcom.arizona.edu
+128.196.224.2    amethyst.math.arizona.edu math.arizona.edu
 #
 #128.196.240.		opt-sci-net
 # gateway: 128.196.128.223 catalina.opt-sci.arizona.edu
@@ -573,6 +675,8 @@
 # Smithsonian Astrophysical Observatory	192.33.141	sao1-net
 #  gateway: flwo-gw.sao.arizona.edu 128.196.128.11
 #
+128.196.176.93	gamma.sao.arizona.edu
+128.196.176.94	galileo.sao.arizona.edu sao.arizona.edu
 192.33.140.1    flwo-gw.sao.arizona.edu
 192.33.140.2    tucson-gw.sao.arizona.edu
 #
@@ -585,51 +689,10 @@
 192.12.69.1	megaron.cs.arizona.edu cs.arizona.edu
 192.12.69.2	bocklin.cs.arizona.edu
 192.12.69.3	lectura.cs.arizona.edu
-192.12.69.4	megaron.cs.arizona.edu
+192.12.69.4	london.cs.arizona.edu
 192.12.69.5	courier.cs.arizona.edu
+192.12.69.6	hackberry.cs.arizona.edu
 192.12.69.7	gothic.cs.arizona.edu
-192.12.69.11	auriga.cs.arizona.edu
-192.12.69.12	raffia.cs.arizona.edu
-192.12.69.13	saguaro.cs.arizona.edu
-192.12.69.14	organpipe.cs.arizona.edu
-192.12.69.15	yucca.cs.arizona.edu
-192.12.69.16	paloverde.cs.arizona.edu
-192.12.69.17	boojum.cs.arizona.edu
-192.12.69.18	ocotillo.cs.arizona.edu
-192.12.69.19	cholla.cs.arizona.edu
-192.12.69.20	creosote.cs.arizona.edu
-192.12.69.21	zephyr.cs.arizona.edu
-192.12.69.22	bodoni.cs.arizona.edu
-192.12.69.23	clarendon.cs.arizona.edu
-192.12.69.24	gacham.cs.arizona.edu
-192.12.69.25	garamond.cs.arizona.edu
-192.12.69.27	granjon.cs.arizona.edu
-192.12.69.28	hershey.cs.arizona.edu
-192.12.69.29	agave.cs.arizona.edu
-192.12.69.30	barrel.cs.arizona.edu
-192.12.69.31	nomi.cs.arizona.edu
-192.12.69.32	jenson.cs.arizona.edu
-192.12.69.33	morris.cs.arizona.edu
-192.12.69.34	plantin.cs.arizona.edu
-192.12.69.35	baskerville.cs.arizona.edu
-192.12.69.36	franklin.cs.arizona.edu
-192.12.69.37	bembo.cs.arizona.edu
-192.12.69.38	friz.cs.arizona.edu
-192.12.69.39	zapf.cs.arizona.edu
-192.12.69.40	trump.cs.arizona.edu
-192.12.69.41	nestle.cs.arizona.edu
-192.12.69.42	orator.cs.arizona.edu
-192.12.69.43	droste.cs.arizona.edu
-192.12.69.51	compaq.cs.arizona.edu
-192.12.69.55	imagen-300.cs.arizona.edu
-192.12.69.193	gothic.cs.arizona.edu
-192.12.69.194	mac4.cs.arizona.edu
-192.12.69.195	mac3.cs.arizona.edu
-192.12.69.196	mac2.cs.arizona.edu
-192.12.69.197	mac1.cs.arizona.edu
-192.12.69.198	macralph.cs.arizona.edu
-192.12.69.199	macscott.cs.arizona.edu
-192.12.63.12	courier.cs.arizona.edu
 #
 #  STScI hosts (130.167)
 #
@@ -656,18 +719,41 @@
 192.43.204.2    cholla.aoc.nrao.edu
 192.43.204.4    yucca.aoc.nrao.edu
 #
-#
-129.219.30.5	asuvax.asu.edu asuvax
-128.117.16.4	hao.ucar.edu
-128.171.80.1	cfht.cfht.hawaii.edu
-128.171.80.50	uwila.cfht.hawaii.edu
-128.171.2.6	hale.ifa.hawaii.edu
-128.171.2.3	newton.ifa.hawaii.edu
-131.215.139.161	ikaros.caltech.edu
-132.249.10.1	y1.sdsc.edu
-#
 # The rest of the arpa sites
 #
 # DoD Internet Host Table
-#  15-Feb-90
-#  Version number 929
+#  23-Aug-90
+#  Version number 981
+
+128.103.40.1    cfa1.harvard.edu
+128.103.40.2    cfa2.harvard.edu
+128.103.40.3    cfa3.harvard.edu
+128.103.40.100  cfassp.harvard.edu
+128.103.40.170  cfa.harvard.edu
+128.103.40.171  cfabond.harvard.edu
+128.103.40.172  cfahub.harvard.edu
+128.103.40.173  cfapick.harvard.edu
+128.103.40.174  cfashap.harvard.edu
+128.103.40.175  cfatycho.harvard.edu
+128.103.40.176  cfazwicky.harvard.edu
+128.103.40.178  cfabok.harvard.edu
+128.103.40.200  cfa200.harvard.edu
+128.103.40.201  cfa201.harvard.edu
+128.103.40.202  cfa202.harvard.edu
+128.103.40.203  cfa203.harvard.edu
+128.103.40.204  cfa204.harvard.edu
+128.103.40.205  cfa205.harvard.edu
+128.103.40.206  cfa206.harvard.edu
+128.103.40.207  cfa207.harvard.edu
+128.103.40.208  cfa208.harvard.edu
+128.103.40.209  cfa209.harvard.edu
+128.103.40.210  cfa210.harvard.edu
+128.103.40.220  cfa220.harvard.edu
+128.103.40.221  cfa221.harvard.edu
+128.103.40.222  cfa222.harvard.edu
+128.103.40.225  cfaros.harvard.edu
+128.103.40.226  cfaexite.harvard.edu
+128.103.40.227  cfamhd.harvard.edu
+128.103.40.228  cfa228.harvard.edu
+128.103.40.229  cfa229.harvard.edu
+128.103.40.230  cfa230.harvard.edu

@@ -15,6 +15,7 @@ real	skyval		# sky value
 real	skysig		# sigma of sky
 int	nsky		# number of sky pixels
 
+int	nap
 pointer	nse, phot
 real	zmag
 
@@ -30,22 +31,23 @@ begin
 	if (IS_INDEFR(skyval))
 	    return (AP_APERT_NOSKYMODE)
 
+	nap = min (AP_NMINAP(phot) - 1, AP_NMAXAP(phot))
+
 	# Compute the magnitudes and errors.
 	if (positive == YES)
 	    call apcopmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
-	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], AP_NMAXAP(phot),
+	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], nap,
 	        skyval, skysig, nsky, AP_ZMAG(phot), AP_NOISEFUNCTION(nse),
 		AP_EPADU(nse))
 	else
 	    call apconmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
-	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], AP_NMAXAP(phot),
+	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], nap,
 	        skyval, skysig, nsky, AP_ZMAG(phot), AP_NOISEFUNCTION(nse),
 		AP_EPADU(nse), AP_READNOISE(nse))
 
 	# Correct for itime.
 	zmag = 2.5 * log10 (AP_ITIME(ap))
-	call aaddkr (Memr[AP_MAGS(phot)], zmag, Memr[AP_MAGS(phot)],
-	    AP_NAPERTS(phot)]
+	call aaddkr (Memr[AP_MAGS(phot)], zmag, Memr[AP_MAGS(phot)], nap)
 
 	if (AP_NMINAP(phot) <= AP_NMAXAP(phot))
 	    return (AP_APERT_BADDATA)

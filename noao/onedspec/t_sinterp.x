@@ -1,8 +1,5 @@
-include	<fset.h>
 include	<imhdr.h>
 include	<math/curfit.h>
-include	"oned.h"
-include	"idsmtn.h"
 
 # Interpolation mode
 define	SI_LINEAR		1
@@ -108,7 +105,7 @@ begin
 	    else if (dx == 0.0)
 		dx = (x2 - x1) / (imlen - 1)
 
-	    imlen = int ((x2 - x1) / dx + 0.5) + 1
+	    imlen = nint ((x2 - x1) / dx + 1)
 
 	    # Verify that dx will not cause an infinite loop
 	    if (dx == 0.0 || dx * (x2-x1) < 0.0)
@@ -144,6 +141,7 @@ begin
 		        call pargr (x)
 		        call pargr (y)
 		}
+		call flush (STDOUT)
 	    }
 
 	# No, just one point at a time
@@ -153,7 +151,6 @@ begin
 	    filelist = clpopni ("input")
 
 	    while (clgfil (filelist, fname, SZ_FNAME) != EOF) {
-		call fseti (STDOUT, F_FLUSHNL, YES)
 		in = open (fname, READ_ONLY, TEXT_FILE)
 
 		# Process input requests
@@ -165,6 +162,7 @@ begin
 		    call printf ("%12.5g  %12.5g\n")
 			call pargr (x)
 			call pargr (y)
+		    call flush (STDOUT)
 		}
 
 		call close (in)

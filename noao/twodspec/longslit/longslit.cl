@@ -7,7 +7,6 @@ images		# Used in setimhdr
 package longslit
 
 set	generic		= "noao$imred/generic/"
-set	onedstds	= "noao$lib/onedstds/"
 
 # Tasks.
 
@@ -22,5 +21,8 @@ task	identify,
 	reidentify	= longslit$x_onedspec.e
 
 task	background	= generic$background.cl
+
+task	setairmass,
+	setjd		= astutil$x_astutil.e
 
 clbye

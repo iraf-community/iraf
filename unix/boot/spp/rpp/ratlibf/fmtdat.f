@@ -1,23 +1,23 @@
-      SUBROUTINE FMTDAT(DATE, TIME, NOW, FORM)
-      INTEGER DATE(100), TIME(100)
-      INTEGER NOW(7), FORM
-      DATE(1) = NOW(2) / 10 + 48
-      DATE(2) = MOD(NOW(2), 10) + 48
-      DATE(3) = 47
-      DATE(4) = NOW(3) / 10 + 48
-      DATE(5) = MOD(NOW(3), 10) + 48
-      DATE(6) = 47
-      DATE(7) = MOD(NOW(1), 100) / 10 + 48
-      DATE(8) = MOD(NOW(1), 10) + 48
-      DATE(9) = -2
-      TIME(1) = NOW(4) / 10 + 48
-      TIME(2) = MOD(NOW(4), 10) + 48
-      TIME(3) = 58
-      TIME(4) = NOW(5) / 10 + 48
-      TIME(5) = MOD(NOW(5), 10) + 48
-      TIME(6) = 58
-      TIME(7) = NOW(6) / 10 + 48
-      TIME(8) = MOD(NOW(6), 10) + 48
-      TIME(9) = -2
-      RETURN
-      END
+      subroutine fmtdat(date, time, now, form)
+      integer date(100), time(100)
+      integer now(7), form
+      date(1) = now(2) / 10 + 48
+      date(2) = mod(now(2), 10) + 48
+      date(3) = 47
+      date(4) = now(3) / 10 + 48
+      date(5) = mod(now(3), 10) + 48
+      date(6) = 47
+      date(7) = mod(now(1), 100) / 10 + 48
+      date(8) = mod(now(1), 10) + 48
+      date(9) = -2
+      time(1) = now(4) / 10 + 48
+      time(2) = mod(now(4), 10) + 48
+      time(3) = 58
+      time(4) = now(5) / 10 + 48
+      time(5) = mod(now(5), 10) + 48
+      time(6) = 58
+      time(7) = now(6) / 10 + 48
+      time(8) = mod(now(6), 10) + 48
+      time(9) = -2
+      return
+      end

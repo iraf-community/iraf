@@ -9,8 +9,8 @@ include	"qpio.h"
 procedure qpio_setrange (io, vs, ve, ndim)
 
 pointer	io			#I QPIO descriptor
-int	vs[ndim]		#I start vector (lower left corner)
-int	ve[ndim]		#I end vector (upper right corner)
+int	vs[ARB]			#I start vector (lower left corner)
+int	ve[ARB]			#I end vector (upper right corner)
 int	ndim			#I vector length (ndim=2 at present)
 
 int	i

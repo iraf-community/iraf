@@ -13,11 +13,13 @@ begin
 	# Check that the user truly wants to proceed.
 	s1 = ""
 	print ("")
-	print ("WARNING: APTEST INITIALIZES THE APPHOT TASK PARAMETERS")
+	print ("APTEST INITIALIZES THE APPHOT TASK PARAMETERS")
 	print ("TYPE q or Q TO QUIT, ANY OTHER KEY TO PROCEED")
 	if (scan (s1) != EOF) {
-	    if (s1 == "q" || s1 == "Q")
-		error (0, "TERMINATING THE APTEST TASK")
+	    if (s1 == "q" || s1 == "Q") {
+		print ("TERMINATING THE APTEST TASK")
+		bye
+	    }
 	}
 	print ("")
 
@@ -50,10 +52,11 @@ begin
 
 	# Initialize the APPHOT package.
 	print ("INITIALIZE THE APPHOT PACKAGE", >> aplog)
+	print ("")
 	print ("INITIALIZE THE APPHOT PACKAGE")
 	print ("", >> aplog)
-	print ("")
-	unlearn ("apselect")
+
+	unlearn ("txdump")
 	unlearn ("center")
 	unlearn ("centerpars")
 	unlearn ("daofind")
@@ -194,7 +197,7 @@ begin
 
 	# Clean up.
 	delete (apcoords, ver-, >& "dev$null")
-	unlearn ("apselect")
+	unlearn ("txdump")
 	unlearn ("center")
 	unlearn ("centerpars")
 	unlearn ("daofind")

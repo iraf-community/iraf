@@ -11,7 +11,6 @@ char	*newfile;
 {
 	XCHAR	buf[SZ_FBUF];
 	int	mode = 0;
-	int	binary_file = BINARY_FILE;
 	int	status, junk, maxch = SZ_FBUF;
 	int	in, out;
 	int	n;
@@ -71,4 +70,6 @@ char	*newfile;
 	    if (n < 0)
 		return (ERR);
 	}
+
+	return (ERR);
 }

@@ -1,30 +1,14 @@
-# Make the DISPLAY package.
+# Make the DISPLAY libraries.
 
-$call	relink
+$checkout libds.a lib$
+$update   libds.a
+$checkin  libds.a lib$
 $exit
-
-update:
-	$call	relink
-	$call	install
-	;
-
-relink:
-	$checkout libds.a lib$
-	$update   libds.a
-	$checkin  libds.a lib$
-	$omake	  x_display.x
-	$omake	  imdopen.x
-	$link	  x_display.o imdopen.o -lds -o xx_display.e
-	;
-
-install:
-	$move	xx_display.e bin$x_display.e
-	;
 
 zzdebug:
 zzdebug.e:
-	$omake	zzdebug.x <imhdr.h>
-	$link	zzdebug.o -lds -lstg -o zzdebug.e
+	$omake  zzdebug.x <imhdr.h>
+	$link   zzdebug.o -lds -lstg -o zzdebug.e
 	;
 
 libds.a:
@@ -52,20 +36,20 @@ libds.a:
 	iiswr.x		iis.com iis.h zdisplay.h <mach.h>
 	iiswt.x		iis.com <mach.h> iis.h zdisplay.h <knet.h>
 	iiszm.x		iis.h zdisplay.h <mach.h>
-	imdgcur.x	iis.com iis.h imd.com
+	imdgcur.x	iis.com iis.h imd.com <knet.h>
 	imdgetwcs.x	iis.h zdisplay.h <ctype.h>
-	imdmapfr.x	display.h iis.com iis.h <fset.h> <imhdr.h>\
-			<imset.h> <mach.h>
+	imdmapfr.x	display.h iis.com iis.h <fset.h> <imhdr.h> <imset.h>\
+			<mach.h>
 	imdopen.x	<knet.h>
 	imdrcur.x	<ctype.h>
 	imdrcuro.x	iis.com iis.h zdisplay.h <chars.h> <ctype.h> <mach.h>
 	imdsetwcs.x	iis.com iis.h <knet.h> <mach.h>
 	imdwcs.x	<imhdr.h>
 	maxmin.x	iis.com iis.h <imhdr.h> <mach.h>
-	sigl2.x	<error.h> <imhdr.h>
+	sigl2.x		<error.h> <imhdr.h>
 	t_dcontrol.x	iis.com display.h iis.h zdisplay.h <fset.h>
-	t_display.x	display.h gwindow.h iis.com iis.h <error.h>\
-			<imhdr.h> <imset.h> <mach.h>
+	t_display.x	display.h gwindow.h iis.com iis.h <error.h> <imhdr.h>\
+			<imset.h> <mach.h>
 	zardim.x	zdisplay.h
 	zawrim.x	zdisplay.h
 	zawtim.x	zdisplay.h

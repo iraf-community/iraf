@@ -58,7 +58,7 @@ Only the quantities selected by the fields parameter are actually computed.
 .nf
           mean = sum (x1,...,xN) / N
 	     y = x - mean
-      variance = sum (y1,...,yN) / (N-1)
+      variance = sum (y1 ** 2,...,yN ** 2) / (N-1)
         stddev = sqrt (variance)
           skew = sum ((y1 / stddev) ** 3,...,(yN / stddev) ** 3) / (N-1)
       kurtosis = sum ((y1 / stddev) ** 4,...,(yN / stddev) ** 4) / (N-1) - 3
@@ -92,9 +92,9 @@ word flat.  The string "[*,1]" is an image section selecting row 1.
 distribution.
 
 .nf
-    cl> imstat m51 fields="image,mean,midpoint,mode,stddev"
+    cl> imstat m51 fields="image,mean,midpt,mode,stddev"
     #      IMAGE    PIXELS      MEAN     MIDPT     MODE     STDDEV
-	     M51    262144     108.3     88.75    40.51      131.3
+	     M51    262144     108.3     88.75    49.4       131.3
 .fi
 
 .ih

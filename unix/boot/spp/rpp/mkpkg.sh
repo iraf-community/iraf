@@ -7,7 +7,7 @@ echo "----------------------- RATLIBF ------------------------"
 echo "----------------------- RATLIBC ------------------------"
 (cd ratlibc;	sh -x mkpkg.sh)
 
-cc -c $HSI_CF	rpp.c
-cc $HSI_CF	rpp.o librpp.a libf.a libc.a -o rpp.e
-mv -f		rpp.e ../../../hlib
+$CC -c $HSI_CF	rpp.c
+$CC $HSI_CF	rpp.o librpp.a libf.a libc.a $HSI_F77LIBS -o rpp.E
+mv -f		rpp.E ../../../hlib
 rm		*.[ao]

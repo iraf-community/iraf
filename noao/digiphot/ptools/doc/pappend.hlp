@@ -1,0 +1,50 @@
+.help pappend Aug91 noao.digiphot.ptools
+.ih
+NAME
+pappend -- concatenate a list of APPHOT/DAOPHOT databases
+.ih
+USAGE
+pappend infiles outfile
+.ih
+PARAMETERS
+.ls infiles
+The list of APPHOT/DAOPHOT databases to be concatenated.
+.le
+.ls outfile
+The name of the output APPHOT/DAOPHOT database.
+.le
+.ls task = "TASK"
+The name of the keywords whose value is the name of the task which wrote
+the database.
+.le
+.ih
+DESCRIPTION
+PAPPEND is a simple task which accepts a list of APPHOT/DAOPHOT
+database files and concatenates them into one resultant output file.
+PAPPEND checks that all the file are indeed APPHOT/DAOPHOT
+database files and that they were all written by the same task before
+performing the concatenation.
+
+PAPPEND is a simple script which call TXAPPEND in the PTOOLS package
+if the input files are text database files or TBAPPEND in the PTOOLS package
+if the input files are STSDAS database files. TBAPPEND is itself a script
+which call the TABLES package task TMERGE to do the actual work.
+
+.ih
+EXAMPLES
+
+1. Concatenate a list of DAOPHOT package task GROUP output database files
+into a single output file.
+
+.nf
+   pt> pappend m92r.grp.1,m92r.grp.2,m92r.grp.3 m92rall.grp.1
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.txappend,ptools.tbappend,tables.tmerge,concatenate
+.endhelp

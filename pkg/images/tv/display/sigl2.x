@@ -364,11 +364,10 @@ int	x1, x2			# range of x blocks to be read
 int	y			# y block to be read
 int	xbavg, ybavg		# X and Y block averaging factors
 
-short	temp_s
-int	nblks_x, nblks_y, ncols, nlines, xoff, i, j
-int	first_line, nlines_in_sum, npix, nfull_blks, count
 real	sum
 pointer	sp, a, b
+int	nblks_x, nblks_y, ncols, nlines, xoff, i, j
+int	first_line, nlines_in_sum, npix, nfull_blks, count
 pointer	imgs2s()
 errchk	imgs2s
 
@@ -393,10 +392,9 @@ begin
 	if (y < 1 || y > nblks_y)
 	    call error (2, "si_blkavg: block number out of range")
 
-	call salloc (b, nblks_x, TY_SHORT)
-
 	if (ybavg > 1) {
-	    call aclrs (Mems[b], nblks_x)
+	    call salloc (b, nblks_x, TY_LONG)
+	    call aclrl (Meml[b], nblks_x)
 	    nlines_in_sum = 0
 	}
 
@@ -427,8 +425,10 @@ begin
 
 	    # Add line into block sum.  Keep track of number of lines in sum
 	    # so that we can compute block average later.
+
 	    if (ybavg > 1) {
-		call aadds (Mems[a], Mems[b], Mems[b], nblks_x)
+		do j = 0, nblks_x-1
+		    Meml[b+j] = Meml[b+j] + Mems[a+j]
 		nlines_in_sum = nlines_in_sum + 1
 	    }
 	}
@@ -439,8 +439,8 @@ begin
 	# than an input line.
 
 	if (ybavg > 1) {
-	    temp_s = nlines_in_sum
-	    call adivks (Mems[b], temp_s, Mems[a], nblks_x)
+	    do i = 0, nblks_x-1
+		Mems[a+i] = Meml[b+i] / real(nlines_in_sum)
 	}
 
 	call sfree (sp)

@@ -62,6 +62,7 @@ libc.a:
 	cprcon.c	<libc/libc.h> <libc/prstat.h> <libc/stdio.h>\
 			<libc/xnames.h> <libc/spp.h>
 	cprdet.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
+	cprintf.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
 	crcursor.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
 	crdukey.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
 	cread.c		<libc/libc.h> <libc/xnames.h> <libc/error.h>\

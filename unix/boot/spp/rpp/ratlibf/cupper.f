@@ -1,10 +1,10 @@
-      INTEGER FUNCTION CUPPER (C)
-      INTEGER C
-      IF (.NOT.(C .GE. 97 .AND. C .LE. 122))GOTO 23000
-      CUPPER = C + (65 - 97)
-      GOTO 23001
-23000 CONTINUE
-      CUPPER = C
-23001 CONTINUE
-      RETURN
-      END
+      integer function cupper (c)
+      integer c
+      if (.not.(c .ge. 97 .and. c .le. 122))goto 23000
+      cupper = c + (65 - 97)
+      goto 23001
+23000 continue
+      cupper = c
+23001 continue
+      return
+      end

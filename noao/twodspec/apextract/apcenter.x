@@ -15,12 +15,12 @@ real	width		# Centering width
 real	radius		# Centering radius
 real	threshold	# Detection threshold
 
-real	clgetr(), center1d()
+real	apgetr(), center1d()
 
 begin
-	width = clgetr ("apedit.width")
-	radius = clgetr ("apedit.radius")
-	threshold = clgetr ("apedit.threshold")
+	width = apgetr ("width")
+	radius = apgetr ("radius")
+	threshold = apgetr ("threshold")
 
 	return (center1d (x, data, npts, width, EMISSION, radius, threshold))
 end

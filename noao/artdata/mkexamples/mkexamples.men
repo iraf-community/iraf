@@ -1,5 +1,11 @@
 	    		MKEXAMPLE Menu
 
+        ecarc1d - Echelle thorium extracted arc spectrum
+        ecarc2d - Echelle thorium arc slit spectrum
+        ecarcdc - Echelle thorium dispersion corrected arc spectrum
+	ecobj2d - Echelle object slit spectrum
+       henear1d - 1D helium-neon-argon arc spectrum
+       henear2d - 2D long slit helium-neon-argon arc spectrum
        longslit - Long slit spectrum
      multifiber - Multifiber spectrum
      galcluster - Galaxy cluster

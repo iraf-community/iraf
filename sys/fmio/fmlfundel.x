@@ -14,8 +14,8 @@ pointer	lf
 errchk	syserrs, fmio_bind, fmio_errchk
 
 begin
-	call fmio_bind()
-	call fmio_errchk()
+	call fmio_bind (fm)
+	call fmio_errchk (fm)
 
         # Verify input.
         if (lfile < 0 || lfile > FM_NLFILES(fm))

@@ -97,7 +97,7 @@ begin
 	    # Back up to start of last field in entry.
 	    caplist = coerce (tty + T_OFFCAP, TY_STRUCT, TY_CHAR)
 	    ip = caplist + T_OP(tty)-1 - 2
-	    while (Memc[ip] != ':')
+	    while (ip > caplist && Memc[ip] != ':')
 		ip = ip - 1
 
 	    # If last field is "tc", backup op so that the tc field gets
@@ -117,7 +117,7 @@ begin
 		# Get device name from tc field, and loop again to fetch new
 		# entry.
 		ip = ip + strlen (":tc=")
-		for (op=device;  Memc[ip] != ':';  ip=ip+1) {
+		for (op=device;  Memc[ip] != EOS && Memc[ip] != ':';  ip=ip+1) {
 		    Memc[op] = Memc[ip]
 		    op = op + 1
 		}

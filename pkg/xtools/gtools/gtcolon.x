@@ -10,6 +10,7 @@ define	PROMPT	"graph format options"
 define	COMMANDS "|/xwindow|/ywindow|/xtransform|/ytransform|/title|/xlabel|\
 	|/ylabel|/xunits|/yunits|/comments|/help|/redraw|/subtitle|/xsize|\
 	|/ysize|/parameters|/type|/mark|/line|/transpose|/sysid|"
+
 define	XWINDOW		1	# Set X window limits
 define	YWINDOW		2	# Set Y window limits
 define	XTRANSFORM	3	# Set X transformation function
@@ -160,7 +161,8 @@ begin
 
 	case PARAMETERS: # /parameters: Set parameters string
 	    call gargstr (cmd, SZ_LINE)
-	    call gt_sets (gt, GTSUBTITLE, cmd)
+####	    call gt_sets (gt, GTPARAMETERS, cmd)
+	    call gt_sets (gt, GTPARAMS, cmd)
 
 	case TYPE: # /type: Graph type
 	    call gargwrd (cmd, SZ_LINE)
@@ -183,7 +185,7 @@ begin
 	    }
 
 	case LINE: # /line: Line type
-	    call gargr (ival)
+	    call gargi (ival)
 	    if (nscan() == 2)
 		call gt_seti (gt, GTLINE, ival)
 	    else {

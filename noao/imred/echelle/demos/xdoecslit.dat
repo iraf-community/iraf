@@ -1,0 +1,99 @@
+\O=NOAO/IRAF V2.10BETA valdes@puppis Fri 13:25:21 17-Jan-92
+\T=xtermjh
+\G=xtermjh
+epar\sechel\n
+\r
+onedstds$spechayescal/\r
+\r
+\r
+\r
+\r
+\r
+y\r
+demologfile\r
+demoplotfile\r
+^Z
+epar\sdoecslit\n
+demoobj\r
+demostd\r
+demoarc\r
+\r
+demostd\r
+rdnoise\r
+gain\r
+\r
+3\r
+\r
+\r
+y\r
+y\r
+y\r
+\r
+\r
+scat\r
+y\r
+^Z
+doecslit\sredo+\n
+\n
+\n
+b2/&!
+q2/&!
+q2/&!
+\r
+\r
+q2/&!
+N\r
+\n
+q2/&!
+\r
+N\r
+n\n
+n\n
+\n
+\n
+s''$/
+s8.#:
+f8.#:
+q8.#:
+q\r
+q8.#:
+q\r
+i8.#:
+m2%3. 4965\r
+m2=&< 4966\r
+k2=&<
+m)730 5002\r
+m+0'? 5003.6\r
+m2",; 5009.3\r
+k2",;
+m&=3. 5044.7\r
+m)2)) 5047\r
+m,6*= 5049.8\r
+m8)(/ 5059.8\r
+m3"' 55055.3\r
+f3"'5
+:3"'5 xo\s4\r
+o3"'5 114\r
+q3"'5
+l3"'5
+f3"'5
+o3"'5 114\r
+q3"'5
+q3"'5
+hz14\n
+y\n
+q8.#:
+NO!\r
+\n
+q8.#:
+N\r
+\n
+\n
+q8.#:
+\n
+2\n
+q8.#:
+imdel\sdemoobj.ec\n
+del\sdatabase/apdemoobj\n
+doecslit\squick+\n
+\n

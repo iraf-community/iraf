@@ -1,4 +1,4 @@
-.help standard Jun88 noao.onedspec
+.help standard Mar92 noao.onedspec
 .ih
 NAME
 standard -- Add standard stars to sensitivity file
@@ -13,7 +13,7 @@ extension format.  All spectra of the same aperture must be of the same
 standard star.  In beam switch mode or when the same star parameter is set
 all spectra must be of the same standard star regardless of aperture number.
 .le
-.ls records
+.ls records (imred.irs and imred.iids only)
 List of records or ranges of records to be appended to the input spectra
 names when using record number extension format.  The
 syntax of this list is comma separated record numbers or ranges of record
@@ -28,11 +28,6 @@ Each execution of \fBstandard\fR appends to this file information about the
 standard stars, the calibration bandpasses, and observed counts (see the
 DESCRIPTION section for more details).  The output must be explicitly
 deleted by the user if the filename is to be reused.
-.le
-.ls recformat = yes
-Use record number extension format?  If \fIyes\fR the record numbers
-specified by the parameter \fIrecords\fR will be appended to each input
-root name.
 .le
 .ls samestar = yes
 Is the same star in all apertures?  If set to no then each aperture may
@@ -76,7 +71,7 @@ The default value is based on a calibration of Vega at 5556 Angstroms of
 is that used in earlier versions of this task which did not allow the
 user to change this calibration.
 .le
-.ls extinction = ")_.extinction"
+.ls extinction = <no default>
 Extinction file used to make second order extinction corrections across
 the bandpasses.  The default value is  redirected to the package
 parameter of the same name.  See \fBlcalib\fR for a list of standard
@@ -93,10 +88,15 @@ standard calibration directories may be obtained by listing the file
 The user may copy or create their own calibration files and specify
 the directory.  The directory "" refers to the current working directory.
 .le
-.ls latitude = )observatory.latitude
-This is the observatory latitude. If the airmass of the observation
-must be calculated, this information is required.  The default
-value is obtained from the parameter for the task \fBobservatory\fR.
+.ls observatory = ")_.observatory"
+Observatory at which the spectra were obtained if not specified in the
+image header by the keyword OBSERVAT.  The default is a redirection to look
+in the parameters for the parent package for a value.  The observatory may
+be one of the observatories in the observatory database, "observatory" to
+select the observatory defined by the environment variable "observatory" or
+the parameter \fBobservatory.observatory\fR, or "obspars" to select the
+current parameters set in the \fBobservatory\fR task.  See help for
+\fBobservatory\fR for additional information.
 .le
 .ls interact = no
 If set to no, then the default wavelength set (either that from the star
@@ -139,7 +139,7 @@ I  Interrupt task immediately
 DESCRIPTION
 Observations of standard stars are integrated over calibration
 bandpasses and written to an output file along with the associated
-calibration fluxes from tablulated calibration data.  The output data
+calibration fluxes from tabulated calibration data.  The output data
 is used by the task \fBsensfunc\fR to determine the detector
 sensitivity function and possibly the extinction.  The spectra are
 required to be dispersion corrected.  The input spectra may be in
@@ -163,6 +163,11 @@ is made once.  If the parameter is no then a query is made for each
 aperture.  This allows each aperture to contain a different standard
 star.  Note however that multiple observations with the same aperture
 number must be of the same standard star.
+
+If the standard star name is not recognized a menu of the available
+standard stars in the calibration directory, the file "standards.men",
+is printed and then the query is repeated.  Thus, to get a list you can type
+? or help.
 
 The standard star names must map to a file containing tabulated
 calibration data.  The calibration filename is formed from the star
@@ -203,7 +208,8 @@ If the spectra have been extinction corrected (EX-FLAG = 0) the
 extinction correction is removed.  The specified extinction file is
 used for this operation and so must be the same as that used when the
 extinction correction was made.  The airmass is also required in this step
-and, if needed to compute the airmass, the latitude parameter is used.  The
+and, if needed to compute the airmass, the observatory specified in the
+image or observatory parameter is used.  The
 treatment of extinction in this task is subtle.  The aim of this task
 is to produce observed integrated instrumental intensities without
 extinction correction.  Thus, the extinction correction is removed from
@@ -312,6 +318,13 @@ bandpasses are used.
 	[ech001.ec][2]: Edit bandpasses? (no|yes|NO|YES|NO!|YES!): NO!
 .fi
 
+.ih
+REVISIONS
+.ls STANDARD V2.10
+Giving an unrecognized standard star name will page a list of standard
+stars available in the calibration directory and then repeat the
+query.
+.le
 .ih
 SEE ALSO
 observatory, lcalib, sensfunc

@@ -74,11 +74,12 @@ begin
 
 	    if (!envgetb ("nomwcs")) {
 		mw = mw_openim (im1)
-		call achtir (Memi[blkfac], mags, IM_NDIM(im1))
-		call mw_scale (mw, mags, 0)
-		call anegr (mags, shifts, IM_NDIM(im1))
-		call aaddkr (shifts, 1.0, shifts, IM_NDIM(im1))
-		call mw_shift (mw, shifts, 0)
+		do i = 1, IM_NDIM(im1)
+		    mags[i] = double (Memi[blkfac+i-1])
+		call mw_scale (mw, mags, (2 ** IM_NDIM(im1) - 1))
+		do i = 1, IM_NDIM(im1)
+		    shifts[i] = 0.5d0 - double (Memi[blkfac+i-1]) / 2.0d0
+		call mw_shift (mw, shifts, (2 ** IM_NDIM(im1) - 1))
 		call mw_saveim (mw, im2)
 		call mw_close (mw)
 	    }

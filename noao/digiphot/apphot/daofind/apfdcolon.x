@@ -11,8 +11,8 @@ pointer	im		# pointer to the iraf image
 int	out		# output file descriptor
 int	stid		# output file sequence number
 char	cmdstr		# command string
-int	newbuf		# new center buffer
-int	newfit		# new center fit
+int	newbuf		# new center buffer ?
+int	newfit		# new center fit ?
 
 int	cl, junk
 pointer	sp, incmd, outcmd
@@ -48,7 +48,7 @@ begin
 	} else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, FCMDS) != 0) {
 	    call ap_fcolon (ap, out, stid, cmdstr, newbuf, newfit)
 	} else {
-	    call ap_fimcolon (ap, out, stid, cmdstr, newbuf, newfit)
+	    call ap_fimcolon (ap, cmdstr)
 	}
 
 	call sfree (sp)
@@ -58,13 +58,10 @@ end
 # AP_FIMCOLON --  Process colon commands for the daofind task that do
 # not affect the data dependent or find parameters.
 
-procedure ap_fimcolon (ap, out, stid, cmdstr, newbuf, newfit)
+procedure ap_fimcolon (ap, cmdstr)
 
 pointer	ap			# pointer to the apphot structure
-int	out			# output file descriptor
-int	stid			# output sequence number
 char	cmdstr[ARB]		# command string
-int	newbuf, newfit		# finding parameters
 
 int	ncmd
 pointer	sp, cmd

@@ -1,28 +1,28 @@
-      INTEGER FUNCTION PATSIZ (PAT, N)
-      INTEGER PAT (128)
-      INTEGER N
-      IF (.NOT.(PAT (N) .EQ. 97 .OR. PAT (N) .EQ. 123 .OR. PAT (N) .EQ. 
-     *125))GOTO 23000
-      PATSIZ = 2
-      GOTO 23001
-23000 CONTINUE
-      IF (.NOT.(PAT (N) .EQ. 37 .OR. PAT (N) .EQ. 36 .OR. PAT (N) .EQ. 6
-     *3))GOTO 23002
-      PATSIZ = 1
-      GOTO 23003
-23002 CONTINUE
-      IF (.NOT.(PAT (N) .EQ. 91 .OR. PAT (N) .EQ. 110))GOTO 23004
-      PATSIZ = PAT (N + 1) + 2
-      GOTO 23005
-23004 CONTINUE
-      IF (.NOT.(PAT (N) .EQ. 42))GOTO 23006
-      PATSIZ = 4
-      GOTO 23007
-23006 CONTINUE
-      CALL ERROR (24Hin patsiz: can't happen.)
-23007 CONTINUE
-23005 CONTINUE
-23003 CONTINUE
-23001 CONTINUE
-      RETURN
-      END
+      integer function patsiz (pat, n)
+      integer pat (128)
+      integer n
+      if (.not.(pat (n) .eq. 97 .or. pat (n) .eq. 123 .or. pat (n) .eq. 
+     *125))goto 23000
+      patsiz = 2
+      goto 23001
+23000 continue
+      if (.not.(pat (n) .eq. 37 .or. pat (n) .eq. 36 .or. pat (n) .eq. 6
+     *3))goto 23002
+      patsiz = 1
+      goto 23003
+23002 continue
+      if (.not.(pat (n) .eq. 91 .or. pat (n) .eq. 110))goto 23004
+      patsiz = pat (n + 1) + 2
+      goto 23005
+23004 continue
+      if (.not.(pat (n) .eq. 42))goto 23006
+      patsiz = 4
+      goto 23007
+23006 continue
+      call error (24Hin patsiz: can't happen.)
+23007 continue
+23005 continue
+23003 continue
+23001 continue
+      return
+      end

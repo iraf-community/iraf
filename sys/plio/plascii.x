@@ -17,7 +17,6 @@ int	outfd			#I output file
 pointer	sp, pv, cv
 int	npix, ch, i
 long	v[PL_MAXDIM]
-int	pl_glpi()
 errchk	pl_valid
 
 begin
@@ -33,7 +32,7 @@ begin
 	v[2] = ve[2]
 
 	while (v[2] >= vs[2]) {
-	    npix = pl_glpi (pl, v, Memi[pv], 0, npix, PIX_SRC)
+	    call pl_glpi (pl, v, Memi[pv], 0, npix, PIX_SRC)
 	    do i = 1, npix {
 		ch = mod (Memi[pv+i-1], 128)
 		if (ch < 32)

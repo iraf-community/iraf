@@ -3,42 +3,34 @@
 include	<chars.h>
 include	"lroff.h"
 
-.help textout
-.nf __________________________________________________________________________
-TEXTOUT -- Process a line of text.  Move words from the text buffer into
-the word buffer WBUF, maintaining an array of pointers to the words, until
-an output line has been filled.  Leading whitespace is part of the word,
-if it is the first word on a line (thus we get paragraph indents).
-Thereafter only trailing whitespace is included in the word.  The last word
-on a line gets one trailing space, unless the last char is a period, in which
-case it gets two.  Otherwise whitespace at the end of the input text line is
-stripped.  BREAKLINE is subsequently called to reassemble the words to form
-an output line.
-
-WBUF is the word buffer (a set of strings separated by EOS markers).  WP is
-a pointer to the next available char in WBUF.  NWORDS is the number of words
-in the buffer.  WORDS is a pointer to the array of word pointers.  We do not
-check for word buffer overflow because the word buffer is allocated large
-enough to accommodate the worst case (the buffer is flushed when an output
-line is filled, which always happens before the buffer overflows).  WCOLS is
-the number of printable characters in the word buffer.  The word buffer
-variables are all stored in the "words" common for use by TEXTOUT and
-BREAKLINE.  Set_wordbuf() must be called upon startup and shutdown to
-allocate/deallocate the word buffer.
-.endhelp ______________________________________________________________________
+# TEXTOUT -- Process a line of text.  Move words from the text buffer into
+# the word buffer WBUF, maintaining an array of pointers to the words, until
+# an output line has been filled.  Leading whitespace is part of the word,
+# if it is the first word on a line (thus we get paragraph indents).
+# Thereafter only trailing whitespace is included in the word.  The last word
+# on a line gets one trailing space, unless the last char is a period, in which
+# case it gets two.  Otherwise whitespace at the end of the input text line is
+# stripped.  BREAKLINE is subsequently called to reassemble the words to form
+# an output line.
+# 
+# WBUF is the word buffer (a set of strings separated by EOS markers).  WP is
+# a pointer to the next available char in WBUF.  NWORDS is the number of words
+# in the buffer.  WORDS is a pointer to the array of word pointers.  We do not
+# check for word buffer overflow because the word buffer is allocated large
+# enough to accommodate the worst case (the buffer is flushed when an output
+# line is filled, which always happens before the buffer overflows).  WCOLS is
+# the number of printable characters in the word buffer.  The word buffer
+# variables are all stored in the "words" common for use by TEXTOUT and
+# BREAKLINE.  Set_wordbuf() must be called upon startup and shutdown to
+# allocate/deallocate the word buffer.
 
 procedure set_wordbuf (max_words)
 
-int	max_words
+int	max_words		#I output word buffer size
 
-# entry	textout (out, text)
-extern	out()
-char	text[1]
-
-char	ch
 int	word_buffer_size
-int	ip_save, wcols_save, ip
-errchk	malloc, breakline
+errchk	malloc
+
 include	"lroff.com"
 include	"words.com"
 
@@ -54,10 +46,23 @@ begin
 	    nwords = 0
 	    wcols = 0
 	}
-	return
+end
 
 
-entry	textout (out, text)
+# TEXTOUT -- Output a newline delimited line of text.
+
+procedure textout (out, text)
+
+extern	out()
+char	text[1]
+
+char	ch
+int	ip_save, wcols_save, ip
+errchk	breakline
+include	"lroff.com"
+include	"words.com"
+
+begin
 	if (wbuf == NULL || words == NULL)
 	    call error (1, "No Lroff word buffer allocated")
 

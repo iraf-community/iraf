@@ -146,6 +146,7 @@
 #define	ZZRWMT		zzrwmt_
 #define	ZZSETK		zzsetk_
 #define	ZZSTOP		zzstop_
+#define	ZZSTMT		zzstmt_
 #define	ZZSTRT		zzstrt_
 #define	ZZWRMT		zzwrmt_
 #define	ZZWTMT		zzwtmt_

@@ -393,7 +393,12 @@ next_
 			Memc[op] = ch
 			op = min (otop, op + 1)
 		    } else if (ch == '\n') {
-			goto next_
+			if (op == mname)
+			    goto next_
+			else {
+			    call ungetci (fd, ch)
+			    break
+			}
 		    } else if (IS_WHITE(ch) && op == mname) {
 			next
 		    } else

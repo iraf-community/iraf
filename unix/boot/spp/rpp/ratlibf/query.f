@@ -1,12 +1,12 @@
-      SUBROUTINE QUERY (MESG)
-      INTEGER MESG (100)
-      INTEGER GETARG
-      INTEGER ARG1 (3), ARG2 (1)
-      IF (.NOT.(GETARG (1, ARG1, 3) .NE. -1 .AND. GETARG (2, ARG2, 1) .E
-     *Q. -1))GOTO 23000
-      IF (.NOT.(ARG1 (1) .EQ. 63 .AND. ARG1 (2) .EQ. -2))GOTO 23002
-      CALL ERROR (MESG)
-23002 CONTINUE
-23000 CONTINUE
-      RETURN
-      END
+      subroutine query (mesg)
+      integer mesg (100)
+      integer getarg
+      integer arg1 (3), arg2 (1)
+      if (.not.(getarg (1, arg1, 3) .ne. -1 .and. getarg (2, arg2, 1) .e
+     *q. -1))goto 23000
+      if (.not.(arg1 (1) .eq. 63 .and. arg1 (2) .eq. -2))goto 23002
+      call error (mesg)
+23002 continue
+23000 continue
+      return
+      end

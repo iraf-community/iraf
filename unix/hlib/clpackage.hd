@@ -5,7 +5,9 @@ $dbms		= "pkg$dbms/"
 $images		= "pkg$images/"
 $language	= "pkg$language/"
 $lists		= "pkg$lists/"
+$obsolete	= "pkg$obsolete/"
 $plot		= "pkg$plot/"
+$proto		= "pkg$proto/"
 $softools	= "pkg$softools/"
 $system		= "pkg$system/"
 $utilities	= "pkg$utilities/"
@@ -43,11 +45,23 @@ lists		men = lists$lists.men,
 		pkg = lists$lists.hd,
 		src = lists$lists.cl
 
+obsolete	men = obsolete$obsolete.men,
+		hlp = ..,
+		sys = obsolete$obsolete.hlp,
+		pkg = obsolete$obsolete.hd,
+		src = obsolete$obsolete.cl
+
 plot		men = plot$plot.men,
 		hlp = ..,
 		sys = plot$plot.hlp,
 		pkg = plot$plot.hd,
 		src = plot$plot.cl
+
+proto		men = proto$proto.men,
+		hlp = ..,
+		sys = proto$proto.hlp,
+		pkg = proto$proto.hd,
+		src = proto$proto.cl
 
 softools	men = softools$softools.men,
 		hlp = ..,

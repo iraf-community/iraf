@@ -1,4 +1,4 @@
-.help daofind Jan90 noao.digiphot.apphot
+.help daofind Jul91 noao.digiphot.apphot
 .ih
 NAME
 daofind -- automatically detect objects in an image
@@ -115,6 +115,7 @@ Print out information about the progress of the task in non interactive mode.
 
 .ih
 DESCRIPTION
+
 DAOFIND searches the IRAF images \fIimage\fR for local density maxima,
 with a full width half maximum \fIdatapars.fwhmpsf\fR,
 greater than \fIdatapars.threshold\fR above the local background and produces a
@@ -136,57 +137,79 @@ when running with \fIinteractive\fR = "no".
 CURSOR COMMANDS
 
 .nf
-	Interactive Daofind Commands
+	Interactive DAOFIND Commands
 
 ?	Print help for DAOFIND commands
 :	DAOFIND colon escape commands (see below)
-d	Plot a centered stellar radial profile
-i	Set up DAOFIND parameters using a stellar radial profile plot
 v	Verify the critical DAOFIND parameters
 w	Store the current DAOFIND parameters in the pset files
-f	Find the stars in the image
-spbar	Find the stars in the image and output the results
 q	Exit
 
+d	Plot the radial profile of current star (cursor)
+i	Setup DAOFIND parameters interactively using current star
+	(cursor)
 
-DAOFIND parameters are listed or set with the following commands.
+spbar	Find the stars in the image and output the results
+f	Find the stars in the image
+
+
+# DAOFIND parameters are listed or set with the following commands.
+
+# commands
+
+:show		[data/center]	List the parameters
+
+# file names
 
 :image		[string]	Image name
 :output		[string]	Output file name
-:show		[data/center]	List the parameters
 
-:scale		[value]		Scale in units per pixel
+# data dependent parameters
+
+:scale		[value]		Image scale (units per pixel)
 :fwhmpsf	[value]		Full width half maximum of PSF (scale units)
 :emission	[y/n]		Emission feature (y), absorption (n)
-:noise 		[string]	Noise model (constant|poisson)
-:threshold	[value]		Detection intensity threshold (counts)
-:cthreshold	[value]		Centering intensity threshold (counts)
 :sigma		[value]		Standard deviation of sky (counts)
-:gain		[string]	Gain image header keyword
-:epadu		[value]		Gain (electrons per adu)
-:ccdread	[string]	Readout noise image header keyword
-:readnoise	[value]		Readout noise (electrons)
-:exposure	[string]	Exposure time image header keyword
-:itime		[value]		Exposure time (time units)
-:airmass	[string]	Airmass image header keyword
-:xairmass	[value]		Airmass value (number)
-:filter		[string]	Filter image header keyword
-:ifilter	[string]	Filter id string
 :datamin	[value]		Minimum good data value (counts)
 :datamax	[value]		Maximum good data value (counts)
+:threshold	[value]		Detection intensity threshold (counts)
+:cthreshold	[value]		Centering intensity threshold (counts)
 
-:nsigma		[value]		Size of Gaussian kernel 
+# noise parameters
+
+:noise 		[string]	Noise model (constant|poisson)
+:gain		[string]	Gain image header keyword
+:ccdread	[string]	Readout noise image header keyword
+:epadu		[value]		Gain (electrons per adu)
+:readnoise	[value]		Readout noise (electrons)
+
+# observing parameters
+
+:exposure	[string]	Exposure time image header keyword
+:airmass	[string]	Airmass image header keyword
+:filter		[string]	Filter image header keyword
+:obstime	[string]	Time of observation image header keyword
+:itime		[value]		Exposure time (time units)
+:xairmass	[value]		Airmass value (number)
+:ifilter	[string]	Filter id string
+:otime		[string]	Time of observation (time units)
+
+# daofind convolution kernel parameters
+
+:nsigma		[value]		Size of Gaussian kernel (sigma) 
 :ratio		[value]		Sigmay / sigmax of Gaussian kernel
 :theta		[value]		Position angle of Gaussian kernel
 :sharplo	[value]		Lower bound on sharpness
 :sharphi	[value]		Upper bound on sharpness
 :roundlo	[value]		Lower bound on roundness
 :roundhi	[value]		Upper bound on roundness
-:mkdetections	[y/n]		Mark detections on the image display
+
+# plotting and marking commands
+
+:mkdetections	[y/n]		Mark detections on the display
 
 
-The following commands are available for inside the interactive setup menu.	
-
+The following command are available from the interactive setup menu.
 
                     Interactive DAOFIND Setup Menu
 
@@ -283,8 +306,8 @@ setup key i.
 
 	... type the space bar to detect stars in the image
 
-	... a 1 line summary of the answers will appear on the standard output
-	    for each star measured
+	... a 1 line summary of the answers will appear on the standard
+	    output for each star measured
 
 	... full output will appear in the text file n4147.coo.1
 
@@ -323,8 +346,8 @@ key i.
 
 	... type the space bar to detect stars in the image
 
-	... a 1 line summary of the answers will appear on the standard output
-	    for each star measured
+	... a 1 line summary of the answers will appear on the standard
+	    output for each star measured
 
 	... full output will appear in the text file m92.coo.1
 
@@ -393,8 +416,8 @@ cursor can be aliased to text.
 
 	... type the space bar to detect stars in the image
 
-	... a 1 line summary of the answers will appear on the standard output
-	    for each star measured
+	... a 1 line summary of the answers will appear on the standard
+    	    output for each star measured
 
 	... full output will appear in the text file m92.coo.2
 .fi

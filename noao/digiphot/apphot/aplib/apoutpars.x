@@ -24,11 +24,12 @@ begin
 	# Open the parameter sets.
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
+
 	np = clopset ("datapars")
 
 	# Set the noise model.
 	call apstats (ap, NSTRING, Memc[str], SZ_FNAME)
-	call clppset (np, "noise", Memc[str], SZ_FNAME)
+	call clppset (np, "noise", Memc[str])
 
 	# Get the rest of the data dependent parameters.
 	call clppsetr (np, "fwhmpsf", apstatr (ap, FWHMPSF))
@@ -36,25 +37,34 @@ begin
 	call clppsetb (np, "emission", itob (apstati (ap, POSITIVE)))
 	call clppsetr (np, "datamin", apstatr (ap, DATAMIN))
 	call clppsetr (np, "datamax", apstatr (ap, DATAMAX))
+
 	call clppsetr (np, "threshold", apstatr (ap, THRESHOLD))
 	call clppsetr (np, "cthreshold", apstatr (ap, CTHRESHOLD))
 	call clppsetr (np, "sigma", apstatr (ap, SKYSIGMA))
 	call apstats (ap, GAIN, Memc[str], SZ_LINE)
-	call clppset (np, "gain", Memc[str], SZ_LINE)
+	call clppset (np, "gain", Memc[str])
 	call clppsetr (np, "epadu", apstatr (ap, EPADU))
 	call apstats (ap, CCDREAD, Memc[str], SZ_LINE)
-	call clppset (np, "ccdread", Memc[str], SZ_LINE)
+	call clppset (np, "ccdread", Memc[str])
 	call clppsetr (np, "readnoise", apstatr (ap, READNOISE))
+
 	call apstats (ap, EXPOSURE, Memc[str], SZ_LINE)
-	call clppset (np, "exposure", Memc[str], SZ_LINE)
+	call clppset (np, "exposure", Memc[str])
 	call clppsetr (np, "itime", apstatr (ap, ITIME))
+
 	call apstats (ap, AIRMASS, Memc[str], SZ_LINE)
-	call clppset (np, "airmass", Memc[str], SZ_LINE)
+	call clppset (np, "airmass", Memc[str])
 	call clppsetr (np, "xairmass", apstatr (ap, XAIRMASS))
+
 	call apstats (ap, FILTER, Memc[str], SZ_LINE)
-	call clppset (np, "filter", Memc[str], SZ_LINE)
+	call clppset (np, "filter", Memc[str])
 	call apstats (ap, FILTERID, Memc[str], SZ_LINE)
-	call clppset (np, "ifilter", Memc[str], SZ_LINE)
+	call clppset (np, "ifilter", Memc[str])
+
+	call apstats (ap, OBSTIME, Memc[str], SZ_LINE)
+	call clppset (np, "obstime", Memc[str])
+	call apstats (ap, OTIME, Memc[str], SZ_LINE)
+	call clppset (np, "otime", Memc[str])
 
 	# Close the pset files.
 	call clcpset (np)
@@ -83,7 +93,7 @@ begin
 
 	# Write the centering parameters.
 	call apstats (ap, CSTRING, Memc[str], SZ_FNAME)
-	call clppset (cp, "calgorithm", Memc[str], SZ_FNAME)
+	call clppset (cp, "calgorithm", Memc[str])
 	call clppsetr (cp, "cbox", 2.0 * apstatr (ap, CAPERT))
 	call clppsetr (cp, "maxshift", apstatr (ap, MAXSHIFT))
 	call clppsetr (cp, "minsnratio", apstatr (ap, MINSNRATIO))
@@ -121,7 +131,7 @@ begin
 
 	# Set the sky fitting parameters.
 	call apstats (ap, SSTRING, Memc[str], SZ_FNAME)
-	call clppset (sp, "salgorithm", Memc[str], SZ_LINE)
+	call clppset (sp, "salgorithm", Memc[str])
 	call clppsetr (sp, "annulus", apstatr (ap, ANNULUS))
 	call clppsetr (sp, "dannulus", apstatr (ap, DANNULUS))
 	call clppsetr (sp, "skyvalue", apstatr (ap, SKY_BACKGROUND))
@@ -161,10 +171,10 @@ begin
 
 	# Set the photometry parameters.
 	call apstats (ap, APERTS, Memc[str], SZ_LINE)
-	call clppset (pp, "apertures", Memc[str], SZ_LINE)
+	call clppset (pp, "apertures", Memc[str])
 	call clppsetr (pp, "zmag", apstatr (ap, ZMAG))
 	call apstats (ap, PWSTRING, Memc[str], SZ_FNAME)
-	call clppset (pp, "weighting", Memc[str], SZ_LINE)
+	call clppset (pp, "weighting", Memc[str])
 	call clppsetb (pp, "mkapert", itob (apstati (ap, MKAPERT)))
 
 	# Close the pset file.

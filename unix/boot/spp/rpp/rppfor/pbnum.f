@@ -1,17 +1,17 @@
-      SUBROUTINE PBNUM (N)
-      INTEGER N
-      INTEGER M, NUM
-      INTEGER MOD
-      INTEGER DIGITS(11)
-      DATA DIGITS(1)/48/,DIGITS(2)/49/,DIGITS(3)/50/,DIGITS(4)/51/,DIGIT
-     *S(5)/52/,DIGITS(6)/53/,DIGITS(7)/54/,DIGITS(8)/55/,DIGITS(9)/56/,D
-     *IGITS(10)/57/,DIGITS(11)/-2/
-      NUM = N
-23000 CONTINUE
-      M = MOD (NUM, 10)
-      CALL PUTBAK (DIGITS (M + 1))
-      NUM = NUM / 10
-23001 IF (.NOT.(NUM .EQ. 0))GOTO 23000
-23002 CONTINUE
-      RETURN
-      END
+      subroutine pbnum (n)
+      integer n
+      integer m, num
+      integer mod
+      integer digits(11)
+      data digits(1)/48/,digits(2)/49/,digits(3)/50/,digits(4)/51/,digit
+     *s(5)/52/,digits(6)/53/,digits(7)/54/,digits(8)/55/,digits(9)/56/,d
+     *igits(10)/57/,digits(11)/-2/
+      num = n
+23000 continue
+      m = mod (num, 10)
+      call putbak (digits (m + 1))
+      num = num / 10
+23001 if (.not.(num .eq. 0))goto 23000
+23002 continue
+      return
+      end

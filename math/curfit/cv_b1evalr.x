@@ -14,7 +14,7 @@ int	i
 real	ri, xnorm
 
 begin
-	basis[1] = 1.0
+	basis[1] = real(1.0)
 	if (order == 1)
 	    return
 
@@ -25,8 +25,8 @@ begin
 
 	do i = 3, order {
 	    ri = i
-	    basis[i] = ((2.0 * ri - 3.0) * xnorm * basis[i-1] -
-		       (ri - 2.0) * basis[i-2]) / (ri - 1.0)	
+	    basis[i] = ((real(2.0) * ri - real(3.0)) * xnorm * basis[i-1] -
+		(ri - real(2.0)) * basis[i-2]) / (ri - real(1.0))	
 	}
 end
 
@@ -45,8 +45,7 @@ int	i
 real	xnorm
 
 begin
-	basis[1] = 1.0
-
+	basis[1] = real(1.0)
 	if (order == 1)
 	    return
 
@@ -56,7 +55,7 @@ begin
 	    return
 
 	do i = 3, order
-	    basis[i] = 2.0 * xnorm * basis[i-1] - basis[i-2]
+	    basis[i] = real(2.0) * xnorm * basis[i-1] - basis[i-2]
 end
 
 
@@ -77,8 +76,8 @@ begin
 	xnorm = (x + k1) * k2
 	left = min (int (xnorm), npieces)
 
-	basis[2] = xnorm - left
-	basis[1] = 1.0 - basis[2]
+	basis[2] = max (real(0.0), min (real(1.0), xnorm - left))
+	basis[1] = max (real(0.0), min (real(1.0), real(1.0) - basis[2]))
 end
 
 
@@ -99,11 +98,13 @@ begin
 	sx = (x + k1) * k2
 	left = min (int (sx), npieces)
 
-	sx = sx - left
-	tx = 1.0 - sx
+	sx = max (real(0.0), min (real(1.0), sx - left))
+	tx = max (real(0.0), min (real(1.0), real(1.0) - sx))
 
 	basis[1] = tx * tx * tx
-	basis[2] = 1.0 + tx * (3.0 + tx * (3.0 - 3.0 * tx))
-	basis[3] = 1.0 + sx * (3.0 + sx * (3.0 - 3.0 * sx))
+	basis[2] = real(1.0) + tx * (real(3.0) + tx * (real(3.0) -
+	    real(3.0) * tx))
+	basis[3] = real(1.0) + sx * (real(3.0) + sx * (real(3.0) -
+	    real(3.0) * sx))
 	basis[4] = sx * sx * sx
 end

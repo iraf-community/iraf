@@ -14,18 +14,18 @@ pointer	ap
 real	cveval()
 
 begin
+	if (index < 1)
+	    return
+
 	if (all == YES)
 	    call printf ("ALL: ")
 	else
 	    call printf ("     ")
 
-	if (index < 1)
-	    return
-
 	ap = aps[index]
 	apaxis = AP_AXIS(ap)
 	call printf (
-"aperture = %d  beam = %d  center = %7.2f  low = %7.2f  upper = %7.2f\n")
+"aperture = %d  beam = %d  center = %.2f  low = %.2f  upper = %.2f\n")
 	    call pargi (AP_ID(ap))
 	    call pargi (AP_BEAM(ap))
 	    call pargr (AP_CEN(ap, apaxis)+cveval (AP_CV(ap), real (line)))

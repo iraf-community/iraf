@@ -2,31 +2,37 @@ include	<error.h>
 include	<mach.h>
 include	<gset.h>
 
-define	HELP	"noao$lib/scr/deblend.key"
-define	OP  "Option (a=0p1s, b=1p1s, c=np1s, d=0pns, e=1pns, f=npns, q=quit):"
 define	SQ2PI	2.5066283
 
-# DEBLEND -- Deblend up to 4 lines in a spectral region.
+# DEBLEND -- Deblend lines in a spectral region.
 
-procedure deblend (gfd, x1, x2, dx, wx1, wy1, pix, ans, nans)
+procedure deblend (sh, gfd, wx1, wy1, wcs, pix, n, fd1, fd2, xg, yg, sg, ng)
 
+pointer	sh			# SHDR pointer
 pointer	gfd			# GIO file descriptor
-real	x1, x2, dx		# Coordinate scale
 real	wx1, wy1		# Cursor position
-real	pix[ARB]		# Spectrum data
-char	ans[2*SZ_LINE,4]	# Answer strings
-int	nans			# Number of answer strings
+real	wcs[n]			# Coordinates
+real	pix[n]			# Spectrum data
+int	n			# Number of points
+int	fd1, fd2		# Output file descriptors
+pointer	xg, yg, sg		# Pointers to fit parameters
+int	ng			# Number of components
 
-int	i, j, i1, npts, nlines, maxlines, wc, key, op
-real	w, wxc, wyc, wx, wy, wx2, wy2, a[14], waves[4]
+int	bkgfit, posfit, sigfit
+int	i, j, i1, npts, nlines, maxlines, wc, key
+real	w, wyc, wx, wy, wx2, wy2
 real	slope, height, flux, cont, sigma, eqw, scale, chisq
 bool	fit
-pointer	sp, cmd, x, y, z
+pointer	sp, cmd, x, y, z, waves
 
-int	clgcur(), clgkey()
+int	clgcur(), open(), fscan(), nscan()
 real	clgetr(), model()
+double	shdr_wl()
 errchk	dofit
 
+define	posfit_	95
+define	sigfit_	96
+define	bkgfit_	97
 define	done_	99
 
 begin
@@ -41,9 +47,8 @@ begin
 	}
 
 	# Set pixel indices and determine number of points to fit.
-	call fixx (wx1, wx2, wy1, wy2, x1, x2)
-	call pixind (x1, x2, dx, wx1, i1)
-	call pixind (x1, x2, dx, wx2, j)
+	call fixx (sh, wx1, wx2, wy1, wy2, i1, j)
+	    
 	npts = j - i1 + 1
 	if (npts < 3) {
 	    call eprintf ("At least 3 points are required\n")
@@ -56,25 +61,52 @@ begin
 	call salloc (y, npts, TY_REAL)
 	call salloc (z, npts, TY_REAL)
 
-	# Subtract the continuum and scale the data.
-	wxc = wx1
-	wyc = wy1
-	slope = (wy2-wy1) / (wx2-wx1)
+	# Scale the data.
 	scale = 0.
 	do i = 1, npts {
-	    w = x1 + (i1+i-2) * dx
-	    Memr[y+i-1] = pix[i1+i-1] - (wyc + slope * (w-wxc))
+	    Memr[x+i-1] = wcs[i1+i-1]
+	    Memr[y+i-1] = pix[i1+i-1]
 	    scale = max (scale, abs (Memr[y+i-1]))
-	    Memr[x+i-1] = w
 	}
 	call adivkr (Memr[y], scale, Memr[y], npts)
 
 	# Select the lines to be fit.  If no lines return.
-	maxlines = 4
+	fit = false
+	maxlines = 5
+	call malloc (waves, maxlines, TY_REAL)
 	nlines = 0
-	call printf ("Lines ('m' to mark, 't' to type, 'q' to quit):")
+	call printf (
+	    "Lines ('f' for file, 'm' to mark, 't' to type, 'q' to quit):")
 	while (clgcur ("cursor", wx, wy, wc, key, Memc[cmd], SZ_FNAME) != EOF) {
 	    switch (key) {
+	    case 'f':
+		call clgstr ("linelist", Memc[cmd], SZ_FNAME)
+		call printf (
+		"Lines ('f' for file, 'm' to mark, 't' to type, 'q' to quit):")
+		iferr (j = open (Memc[cmd], READ_ONLY, TEXT_FILE)) {
+		    call erract (EA_WARN)
+		    next
+		}
+		while (fscan (j) != EOF) {
+		    call gargr (wx)
+		    if (nscan() < 1)
+			next
+		    if (wx < min (wcs[1], wcs[n]) || wx > max (wcs[1], wcs[n]))
+			next
+		    for (i = 0; i < nlines && wx != Memr[waves+i]; i = i + 1)
+			;
+		    if (i == nlines) {
+			if (nlines == maxlines) {
+			    maxlines = maxlines + 5
+			    call realloc (waves, maxlines, TY_REAL)
+			}
+			Memr[waves+i] = wx
+			nlines = nlines + 1
+			call gmark (gfd, wx, wy, GM_VLINE, 3., 3.)
+		    }
+		}
+		call close (j)
+		next
 	    case 'm':
 	    case 't':
 		wx = clgetr ("wavelength")
@@ -87,120 +119,114 @@ begin
 		call fatal (0, "Interrupt")
 	    default:
 		call printf (
-		    "Lines ('m' to mark, 't' to type, 'q' to quit):\007")
+	    "Lines ('f' for file, 'm' to mark, 't' to type, 'q' to quit):\007")
 		next
 	    }
-	    for (i = 1; i <= nlines && wx != waves[i]; i = i + 1)
+	    for (i = 0; i < nlines && wx != Memr[waves+i]; i = i + 1)
 		;
-	    if (i > nlines) {
-	        nlines = nlines + 1
-		waves[nlines] = wx
+	    if (i == nlines) {
+		if (nlines == maxlines) {
+		    maxlines = maxlines + 5
+		    call realloc (waves, maxlines, TY_REAL)
+		}
+		Memr[waves+i] = wx
+		nlines = nlines + 1
 		call gmark (gfd, wx, wy, GM_VLINE, 3., 3.)
-	    }
-	    if (nlines == maxlines) {
-	        call printf ("\n")
-		break
 	    }
 	}
 	if (nlines == 0)
 	    goto done_
 
+	# Allocate memory.
+	if (ng == 0) {
+	    call malloc (xg, nlines, TY_REAL)
+	    call malloc (yg, nlines, TY_REAL)
+	    call malloc (sg, nlines, TY_REAL)
+	} else if (ng != nlines) {
+	    call realloc (xg, nlines, TY_REAL)
+	    call realloc (yg, nlines, TY_REAL)
+	    call realloc (sg, nlines, TY_REAL)
+	}
+	ng = nlines
+
 	# Do fits.
-	fit = false
-	call printf (OP)
-	while (clgcur ("cursor", wx, wy, wc, op, Memc[cmd], SZ_FNAME) != EOF) {
-	    switch (op) {
-	    case '?':
-		    call gpagefile (gfd, HELP, "Splot Deblending Options")
-		    call printf (OP)
-		    next
-	    case 'a', 'b', 'c', 'd', 'e', 'f':
-	    case 'q':
-		call printf ("\n")
+	repeat {
+posfit_     call printf ("Fit positions (fixed, single, all, quit) ")
+	    if (clgcur ("cursor", wx, wy, wc, key, Memc[cmd], SZ_FNAME) == EOF)
 		break
-	    case 'I':
-		call fatal (0, "Interrupt")
+	    switch (key) {
+	    case 'f':
+		posfit = 1
+	    case 's':
+		posfit = 2
+	    case 'a':
+		posfit = 3
+	    case 'q':
+		break
 	    default:
-		call printf ("%s\007")
-		    call pargstr (OP)
+		goto posfit_
+	    }
+sigfit_     call printf ("Fit sigmas (single, all, quit) ")
+	    if (clgcur ("cursor", wx, wy, wc, key, Memc[cmd], SZ_FNAME) == EOF)
+		break
+	    switch (key) {
+	    case 's':
+		sigfit = 2
+	    case 'a':
+		sigfit = 3
+	    case 'q':
+		break
+	    default:
+		goto sigfit_
+	    }
+bkgfit_     call printf ("Fit background (no, yes, quit) ")
+	    if (clgcur ("cursor", wx, wy, wc, key, Memc[cmd], SZ_FNAME) == EOF)
+		break
+	    switch (key) {
+	    case 'n':
+		bkgfit = 0
+	    case 'y':
+		bkgfit = 1
+	    case 'q':
+		break
+	    default:
+		goto bkgfit_
+	    }
+
+	    # Setup initial estimates.
+	    slope = (wy2-wy1) / (wx2-wx1) / scale
+	    wyc = wy1 / scale - slope * wx1
+	    sigma = 0.1 * abs (Memr[x+npts-1] - Memr[x]) / nlines
+	    do i = 0, nlines-1 {
+		w = Memr[waves+i]
+		j = max (1, min (n, nint (shdr_wl (sh, double(w)))))
+	        Memr[yg+i] = pix[j] / scale - wyc - slope * w
+		Memr[xg+i] = w
+		Memr[sg+i] = sigma
+	    }
+
+	    iferr (call dofit (bkgfit, posfit, sigfit, Memr[x], Memr[y], npts,
+		wyc, slope, Memr[xg], Memr[yg], Memr[sg], ng, chisq)) {
+		call erract (EA_WARN)
 		next
 	    }
-
-	    # Convert line postions to relative to first line.
-	    a[1] = waves[1]
-	    a[2] = 0.25 * abs (Memr[x+npts-1] - Memr[x]) / nlines
-	    do i = 1, nlines {
-	        call pixind (x1, x2, dx, waves[i], j)
-	        a[3*i] = (pix[j] - (wyc + slope * (waves[i]-wxc))) / scale
-	        a[3*i+1] = waves[i] - waves[1]
-	        a[3*i+2] = 1.
-	    }
-
-	    switch (op) {
-	    case 'a':
-		iferr {
-	            call dofit ('a', Memr[x], Memr[y], npts, a, nlines, chisq)
-	            call dofit ('a', Memr[x], Memr[y], npts, a, nlines, chisq)
-		} then {
-	            call erract (EA_WARN)
-	            next
-		}
-	    case 'b':
-		iferr {
-	            call dofit ('a', Memr[x], Memr[y], npts, a, nlines, chisq)
-	            call dofit ('b', Memr[x], Memr[y], npts, a, nlines, chisq)
-		} then {
-	            call erract (EA_WARN)
-	            next
-		}
-	    case 'c':
-		iferr {
-	            call dofit ('a', Memr[x], Memr[y], npts, a, nlines, chisq)
-	            call dofit ('b', Memr[x], Memr[y], npts, a, nlines, chisq)
-	            call dofit ('c', Memr[x], Memr[y], npts, a, nlines, chisq)
-		} then {
-	            call erract (EA_WARN)
-	            next
-		}
-	    case 'd':
-		iferr {
-	            call dofit ('a', Memr[x], Memr[y], npts, a, nlines, chisq)
-	            call dofit ('d', Memr[x], Memr[y], npts, a, nlines, chisq)
-		} then {
-	            call erract (EA_WARN)
-	            next
-		}
-	    case 'e':
-		iferr {
-	            call dofit ('a', Memr[x], Memr[y], npts, a, nlines, chisq)
-	            call dofit ('b', Memr[x], Memr[y], npts, a, nlines, chisq)
-	            call dofit ('e', Memr[x], Memr[y], npts, a, nlines, chisq)
-		} then {
-	            call erract (EA_WARN)
-	            next
-		}
-	    case 'f':
-		iferr {
-		    call dofit ('a', Memr[x], Memr[y], npts, a, nlines, chisq)
-		    call dofit ('b', Memr[x], Memr[y], npts, a, nlines, chisq)
-		    call dofit ('c', Memr[x], Memr[y], npts, a, nlines, chisq)
-		    call dofit ('f', Memr[x], Memr[y], npts, a, nlines, chisq)
-		} then {
-	            call erract (EA_WARN)
-	            next
-		}
-	    }
+	    call amulkr (Memr[yg], scale, Memr[yg], ng)
+	    wyc = (wyc + slope * wx1) * scale
+	    slope = slope * scale
 
 	    # Compute model spectrum with continuum and plot.
 	    fit = true
 	    do i = 1, npts {
-	        w = x1 + (i1+i-2) * dx
-	        Memr[z+i-1] = model (w, a, 3*nlines+2)
-	        Memr[z+i-1] = scale*Memr[z+i-1] + (wyc+slope*(w-wxc))
+		w = Memr[x+i-1]
+	        Memr[z+i-1] = model (w, Memr[xg], Memr[yg], Memr[sg], ng)
+	        Memr[z+i-1] = Memr[z+i-1] + wyc + slope * (w - wx1)
 	    }
 
-	    call gvline (gfd, Memr[z], npts, wx1, wx2)
-	    call gline (gfd, wx1, wy1, wx2, wy2)
+	    call gseti (gfd, G_PLTYPE, 2)
+	    call gpline (gfd, Memr[x], Memr[z], npts)
+	    call gseti (gfd, G_PLTYPE, 3)
+	    call gline (gfd, wx1, wyc, wx2, wyc + slope * (wx2 - wx1))
+	    call gseti (gfd, G_PLTYPE, 1)
 	    call gflush (gfd)
 
 	    # Print computed values on status line.
@@ -221,13 +247,13 @@ begin
 		    break
 	        }
 
-	        height = scale * a[3*i]
-	        w = a[1] + a[3*i+1]
-	        sigma = abs (a[2]*a[3*i+2])
+	        height = Memr[yg+i-1]
+	        w = Memr[xg+i-1]
+	        sigma = Memr[sg+i-1]
 	        flux = sigma * height * SQ2PI
-	        cont = wyc + slope * (w - wxc)
+	        cont = wyc + slope * (w - wx1)
 	        if (cont > 0.)
-		    eqw = abs (flux) / cont
+		    eqw = -flux / cont
 	        else
 		    eqw = INDEF
 
@@ -246,51 +272,85 @@ begin
 
 	        call printf ("  (+,-,r,q):")
 	        call flush (STDOUT)
-	    } until (clgkey ("ukey", key, Memc[cmd], SZ_FNAME) == EOF)
-
-	    # Log computed values
-	    nans = nlines
-	    do i = 1, nlines {
-	        w = a[1] + a[3*i+1]
-	        cont = wyc + slope * (w - wxc)
-	        height = scale * a[3*i]
-	        sigma = abs (a[2]*a[3*i+2])
-	        flux = sigma * height * SQ2PI
-	        if (cont > 0.)
-		    eqw = abs (flux) / cont
-	        else
-		    eqw = INDEF
-
-		call sprintf (ans[1,i], 2*SZ_LINE,
-		    " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
-		    call pargr (w)
-		    call pargr (cont)
-		    call pargr (flux)
-		    call pargr (eqw)
-		    call pargr (height)
-		    call pargr (sigma)
-		    call pargr (2.355 * sigma)
-	    }
-	    call printf (OP)
+	    } until (clgcur ("cursor",
+		wx, wy, wc, key, Memc[cmd], SZ_FNAME) == EOF)
 	}
 
+done_
+	call printf ("Deblending done\n")
+	# Log computed values
+	if (fit) {
+	    do i = 1, nlines {
+		w = Memr[xg+i-1]
+		cont = wyc + slope * (w - wx1)
+		height = Memr[yg+i-1]
+		sigma = Memr[sg+i-1]
+		flux = sigma * height * SQ2PI
+		if (cont > 0.)
+		    eqw = -flux / cont
+		else
+		    eqw = INDEF
+		if (fd1 != NULL) {
+		    call fprintf (fd1,
+			" %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
+			call pargr (w)
+			call pargr (cont)
+			call pargr (flux)
+			call pargr (eqw)
+			call pargr (height)
+			call pargr (sigma)
+			call pargr (2.355 * sigma)
+		}
+		if (fd2 != NULL) {
+		    call fprintf (fd2,
+			" %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
+			call pargr (w)
+			call pargr (cont)
+			call pargr (flux)
+			call pargr (eqw)
+			call pargr (height)
+			call pargr (sigma)
+			call pargr (2.355 * sigma)
+		}
+	    }
+	} else {
+	    call mfree (xg, TY_REAL)
+	    call mfree (yg, TY_REAL)
+	    call mfree (sg, TY_REAL)
+	    ng = 0
+	}
 
-done_	call sfree (sp)
-	return
+	call mfree (waves, TY_REAL)
+	call sfree (sp)
+end
 
 
 # SUBBLEND -- Subtract last fit.
 
-entry subblend (gfd, pix, x1, x2, dx, wx1, wy1)
+procedure subblend (sh, gfd, x, y, n, wx1, wy1, xg, yg, sg, ng)
+
+pointer	sh			# SHDR pointer
+pointer	gfd			# GIO file descriptor
+real	wx1, wy1		# Cursor position
+real	x[n]			# Spectrum data
+real	y[n]			# Spectrum data
+int	n			# Number of points
+pointer	xg, yg, sg		# Pointers to fit parameters
+int	ng			# Number of components
+
+int	i, j, i1, npts, wc, key
+real	wx2, wy2
+pointer	sp, cmd
+
+int	clgcur()
+real	model()
+
+begin
+	if (ng == 0)
+	    return
 
 	call smark (sp)
 	call salloc (cmd, SZ_FNAME, TY_CHAR)
-
-	# Subtract continuum subtracted curve from spectrum
-	if (!fit) {
-	    call sfree (sp)
-	    return
-	}
 
 	# Determine fit range
 	call printf ("- again:")
@@ -300,32 +360,150 @@ entry subblend (gfd, pix, x1, x2, dx, wx1, wy1)
 	    return
 	}
 
-	call fixx (wx1, wx2, wy1, wy2, x1, x2)
-	call pixind (x1, x2, dx, wx1, i1)
-	call pixind (x1, x2, dx, wx2, j)
+	call fixx (sh, wx1, wx2, wy1, wy2, i1, j)
 	npts = j - i1 + 1
 
 	do i = 1, npts {
-	    w = x1 + (i1+i-2) * dx
-	    pix[i1+i-1] = pix[i1+i-1] - scale * model (w, a, 3*nlines+2)
+	    y[i1+i-1] = y[i1+i-1] -
+		model (x[i1+i-1], Memr[xg], Memr[yg], Memr[sg], ng)
 	}
 
 	# Plot subtracted curve
-	call gvline (gfd, pix[i1], npts, wx1, wx2)
+	call gpline (gfd, x[i1], y[i1], npts)
 	call gflush (gfd)
 
-	fit = false
+	call mfree (xg, TY_REAL)
+	call mfree (yg, TY_REAL)
+	call mfree (sg, TY_REAL)
+	ng = 0
 	call sfree (sp)
 end
 
 
+# DOFIT -- Fit gaussian components.  This is an interface to DOFIT1
+# which puts parameters into the form required by DOFIT1 and vice-versa.
+# It also implements a constrained approach to the solution.
 
-# DOFIT -- Perform nonlinear iterative fit for the specified parameters.
+procedure dofit (bkgfit, posfit, sigfit, x, y, npts, y1, dy, xg, yg, sg, ng,
+	chisq)
+
+int	bkgfit		# Fit background (0=no, 1=yes)
+int	posfit		# Position fitting flag (1=fixed, 2=single, 3=all)
+int	sigfit		# Sigma fitting flag (1=fixed, 2=single, 3=all)
+real	x[npts]		# X data
+real	y[npts]		# Y data
+int	npts		# Number of points
+real	y1		# Continuum offset
+real	dy		# Continuum slope
+real	xg[ng]		# Initial and final x coordinates of gaussians
+real	yg[ng]		# Initial and final y coordinates of gaussians
+real	sg[ng]		# Initial and final sigmas of gaussians
+int	ng		# Number of gaussians
+real	chisq		# Chi squared
+
+int	i
+pointer	sp, a, j
+errchk	dofit1
+
+begin
+	call smark (sp)
+	call salloc (a, 4 + 3 * ng, TY_REAL)
+
+	# Convert positions and widths relative to first component.
+	Memr[a] = y1
+	Memr[a+1] = dy
+	Memr[a+2] = xg[1]
+	Memr[a+3] = sg[1]
+	do i = 1, ng {
+	    j = a + 3 * i + 1
+	    Memr[j] = yg[i]
+	    Memr[j+1] = xg[i] - Memr[a+2]
+	    Memr[j+2] = sg[i] / Memr[a+3]
+	}
+
+	# Do fit.
+	do i = 0, bkgfit {
+	    switch (10*posfit+sigfit) {
+	    case 11:
+		call dofit1 (i, 1, 1, x, y, npts, Memr[a], ng, chisq)
+	    case 12:
+		call dofit1 (i, 1, 2, x, y, npts, Memr[a], ng, chisq)
+	    case 13:
+		call dofit1 (i, 1, 2, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 1, 3, x, y, npts, Memr[a], ng, chisq)
+	    case 21:
+		call dofit1 (i, 2, 1, x, y, npts, Memr[a], ng, chisq)
+	    case 22:
+		call dofit1 (i, 1, 2, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 2, 2, x, y, npts, Memr[a], ng, chisq)
+	    case 23:
+		call dofit1 (i, 1, 2, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 2, 2, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 2, 3, x, y, npts, Memr[a], ng, chisq)
+	    case 31:
+		call dofit1 (i, 2, 1, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 3, 1, x, y, npts, Memr[a], ng, chisq)
+	    case 32:
+		call dofit1 (i, 1, 2, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 2, 2, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 3, 2, x, y, npts, Memr[a], ng, chisq)
+	    case 33:
+		call dofit1 (i, 1, 2, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 2, 2, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 3, 2, x, y, npts, Memr[a], ng, chisq)
+		call dofit1 (i, 3, 3, x, y, npts, Memr[a], ng, chisq)
+	    }
+	}
+
+	y1 = Memr[a]
+	dy = Memr[a+1]
+	do i = 1, ng {
+	    j = a + 3 * i + 1
+	    yg[i] = Memr[j]
+	    xg[i] = Memr[j+1] + Memr[a+2]
+	    sg[i] = abs (Memr[j+2] * Memr[a+3])
+	}
+
+	call sfree (sp)
+end
+
+
+# MODEL -- Compute model.
+#
+#	I(x) = I(i) exp {-[(x-xg(i)) / sg(i)]**2 / 2.}
+#
+# where the params are I1, I2, xg, yg, and sg.
+
+real procedure model (x, xg, yg, sg, ng)
+
+real	x		# X value to be evaluated
+real	xg[ng]		# X coordinates of gaussians
+real	yg[ng]		# Y coordinates of gaussians
+real	sg[ng]		# Sigmas of gaussians
+int	ng		# Number of gaussians
+
+int	i
+real	y, arg
+
+begin
+	y = 0.
+	do i = 1, ng {
+	    arg = (x - xg[i]) / sg[i]
+	    if (abs (arg) < 7.)
+		y = y + yg[i] * exp (-arg**2 / 2.)
+	}
+	return (y)
+end
+
+
+# DOFIT1 -- Perform nonlinear iterative fit for the specified parameters.
 # This uses the Levenberg-Marquardt method from NUMERICAL RECIPES.
 
-procedure dofit (key, x, y, npts, a, nlines, chisq)
+procedure dofit1 (bkgfit, posfit, sigfit, x, y, npts, a, nlines, chisq)
 
-int	key		# Fitting option
+int	bkgfit		# Background fit (0=no, 1=yes)
+int	posfit		# Position fitting flag (1=fixed, 2=one, 3=all)
+int	sigfit		# Sigma fitting flag (1=fixed, 2=one, 3=all)
 real	x[npts]		# X data
 real	y[npts]		# Y data
 int	npts		# Number of points
@@ -335,56 +513,61 @@ real	chisq		# Chi squared
 
 int	i, np, nfit
 real	mr, chi2
-pointer	sp, flags
+pointer	sp, flags, ptr
 errchk	mr_solve
 
 begin
-	# Number of terms is 3 for each line plus common center and sigma.
-	np = 3 * nlines + 2
+	# Number of terms is 3 for each line plus common background, center
+	# and sigma.
+
+	np = 3 * nlines + 4
 
 	call smark (sp)
 	call salloc (flags, np, TY_INT)
+	ptr = flags
 
-	# Peaks are always fit.
-	switch (key) {
-	case 'a': # Solve one sigma.
-	    nfit = 1 + nlines
-	    Memi[flags] = 2
-	    do i = 1, nlines
-	        Memi[flags+i] = 3 * i
-	case 'b': # Solve one position and one sigma.
-	    nfit = 2 + nlines
-	    Memi[flags] = 1
-	    Memi[flags+1] = 2
-	    do i = 1, nlines
-	        Memi[flags+1+i] = 3 * i
-	case 'c': # Solve independent positions and one sigma.
-	    nfit = 1 + 2 * nlines
-	    Memi[flags] = 2
-	    do i = 1, nlines {
-	        Memi[flags+2*i-1] = 3 * i
-	        Memi[flags+2*i] = 3 * i + 1
-	    }
-	case 'd': # Solve for sigmas.
-	    nfit = 2 * nlines
-	    do i = 1, nlines {
-	        Memi[flags+2*i-2] = 3 * i
-	        Memi[flags+2*i-1] = 3 * i + 2
-	    }
-	case 'e': # Solve for one position and sigmas.
-	    nfit = 1 + 2 * nlines
-	    Memi[flags] = 1
-	    do i = 1, nlines {
-	        Memi[flags+2*i-1] = 3 * i
-	        Memi[flags+2*i] = 3 * i + 2
-	    }
-	case 'f': # Solve for positions and sigmas.
-	    nfit = 3 * nlines
-	    do i = 1, nfit
-	        Memi[flags+i-1] = i + 2
+	# Background.
+	if (bkgfit == 1) {
+	    Memi[ptr] = 1
+	    Memi[ptr+1] = 2
+	    ptr = ptr + 2
 	}
 
+	# Peaks are always fit.
+	do i = 1, nlines {
+	    Memi[ptr] = 3 * i + 2
+	    ptr = ptr + 1
+	}
 
+	# Positions.
+	switch (posfit) {
+	case 2:
+	    Memi[ptr] = 3
+	    ptr = ptr + 1
+	case 3:
+	    Memi[ptr] = 3
+	    ptr = ptr + 1
+	    do i = 1, nlines {
+	        Memi[ptr] = 3 * i + 3
+		ptr = ptr + 1
+	    }
+	}
+
+	# Sigmas.
+	switch (sigfit) {
+	case 2:
+	    Memi[ptr] = 4
+	    ptr = ptr + 1
+	case 3:
+	    Memi[ptr] = 4
+	    ptr = ptr + 1
+	    do i = 1, nlines {
+	        Memi[ptr] = 3 * i + 4
+		ptr = ptr + 1
+	    }
+	}
+
+	nfit = ptr - flags
 	mr = -1.
 	i = 0
 	chi2 = MAX_REAL
@@ -404,37 +587,11 @@ begin
 end
 
 
-# MODEL -- Compute model from fitted parameters.
-#
-#	I(x) = I(i) exp {[(x - xc - dx(i)) / (sig sig(i))] ** 2 / 2.}
-#
-# where the parameters are xc, sig, I(i), dx(i), and sig(i) (i=1,nlines).
-
-real procedure model (x, a, na)
-
-real	x		# X value to be evaluated
-real	a[na]		# Parameters
-int	na		# Number of parameters
-
-int	i
-real	y, arg
-
-begin
-	y = 0.
-	do i = 3, na, 3 {
-	    arg = (x - a[1] - a[i+1]) / (a[2] * a[i+2])
-	    if (abs (arg) < 7.)
-		y = y + a[i] * exp (-arg**2 / 2.)
-	}
-	return (y)
-end
-
-
 # DERIVS -- Compute model and derivatives for MR_SOLVE procedure.
 #
-#	I(x) = I(i) exp {[(x - xc - dx(i)) / (sig sig(i))] ** 2 / 2.}
+#	I(x) = I1 + I2 * x + I(i) exp {-[(x-xc-dx(i)) / (sig * sig(i))]**2 / 2.}
 #
-# where the parameters are xc, sig, I(i), dx(i), and sig(i) (i=1,nlines).
+# where the params are I1, I2, xc, sig, I(i), dx(i), and sig(i) (i=1,nlines).
 
 procedure derivs (x, a, y, dyda, na)
 
@@ -448,12 +605,14 @@ int	i
 real	sig, arg, ex, fac
 
 begin
-	y = 0.
-	dyda[1] = 0.
-	dyda[2] = 0.
-	do i = 3, na, 3 {
-	    sig = a[2] * a[i+2]
-	    arg = (x - a[1] - a[i+1]) / sig
+	y = a[1] + a[2] * x
+	dyda[1] = 1.
+	dyda[2] = x
+	dyda[3] = 0.
+	dyda[4] = 0.
+	do i = 5, na, 3 {
+	    sig = a[4] * a[i+2]
+	    arg = (x - a[3] - a[i+1]) / sig
 	    if (abs (arg) < 7.)
 	        ex = exp (-arg**2 / 2.)
 	    else
@@ -461,8 +620,8 @@ begin
 	    fac = a[i] * ex * arg
 
 	    y = y + a[i] * ex
-	    dyda[1] = dyda[1] + fac / sig
-	    dyda[2] = dyda[2] + fac * arg / a[2]
+	    dyda[3] = dyda[3] + fac / sig
+	    dyda[4] = dyda[4] + fac * arg / a[4]
 	    dyda[i] = ex
 	    dyda[i+1] = fac / sig
 	    dyda[i+2] = fac * arg / a[i+2]
@@ -538,7 +697,7 @@ begin
 
 	# Check if chisq has improved.
 	if (chisq1 < chisq) {
-	    mr = 0.1 * mr
+	    mr = max (EPSILONR, 0.1 * mr)
 	    chisq = chisq1
 	    call amovr (Memr[a1], Memr[a2], nfit * nfit)
 	    call amovr (Memr[delta1], Memr[delta2], nfit)
@@ -626,7 +785,7 @@ begin
 	call salloc (g, n, TY_REAL)
 	call salloc (ip, n, TY_INT)
 
-	call hfti (a, n, n, n, b, n, 1, 0.001, krank, rnorm,
+	call hfti (a, n, n, n, b, n, 1, 1E-10, krank, rnorm,
 	    Memr[h], Memr[g], Memi[ip])
 
 	call sfree (sp)

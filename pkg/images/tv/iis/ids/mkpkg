@@ -1,0 +1,43 @@
+# Make the CV package library.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	idscancel.x	../lib/ids.com ../lib/ids.h <fset.h>
+	idschars.x	../lib/ids.com ../lib/ids.h
+	idsclear.x	../lib/ids.com ../lib/ids.h
+	idsclose.x	../lib/ids.com ../lib/ids.h
+	idsclosews.x	../lib/ids.h   ../lib/ids.com
+	idscround.x	../lib/ids.h <gki.h>
+	idsdrawch.x	font.com font.h <gki.h> <gset.h> <math.h>
+	idsescape.x	../lib/ids.com ../lib/ids.h <gki.h>
+	idsfa.x		../lib/ids.com ../lib/ids.h
+	idsfaset.x	../lib/ids.com ../lib/ids.h <gki.h>
+	idsflush.x	../lib/ids.com ../lib/ids.h
+	idsfont.x	../lib/ids.com ../lib/ids.h <gki.h> <gset.h>
+	idsgcell.x	<mach.h> ../lib/ids.com ../lib/ids.h <gki.h> <gset.h>
+	idsgcur.x	../lib/ids.com ../lib/ids.h
+	idsinit.x	../lib/ids.com ../lib/ids.h <ctype.h> <gki.h> <mach.h>
+	idsline.x	../lib/ids.com ../lib/ids.h <gset.h>
+	idslutfill.x	<gki.h>
+	idsopen.x	../lib/ids.com ../lib/ids.h <gki.h>
+	idsopenws.x	../lib/ids.com ../lib/ids.h <error.h> <gki.h>\
+			<fset.h> <mach.h>
+	idspcell.x	../lib/ids.com ../lib/ids.h <gki.h> <gset.h>
+	idspl.x		../lib/ids.com ../lib/ids.h <gki.h>
+	idsplset.x	../lib/ids.com ../lib/ids.h <gki.h>
+	idspm.x		../lib/ids.com ../lib/ids.h <gki.h>
+	idspmset.x	../lib/ids.com ../lib/ids.h <gki.h>
+	idspoint.x	../lib/ids.com ../lib/ids.h <fset.h> <gki.h>
+	idsreset.x	../lib/ids.com ../lib/ids.h <gset.h> <gki.h>
+	idsrestore.x	../lib/ids.com ../lib/ids.h
+	idssave.x	../lib/ids.com ../lib/ids.h
+	idsscur.x	
+	idsstream.x	../lib/ids.com ../lib/ids.h
+	idstx.x		../lib/ids.com ../lib/ids.h <gki.h> <gset.h> <math.h>
+	idstxset.x	../lib/ids.com ../lib/ids.h <gki.h> <gset.h>
+	idsvector.x	../lib/ids.com ../lib/ids.h <fset.h> <gki.h>
+	;

@@ -1,4 +1,5 @@
 include <imhdr.h>
+include <imio.h>
 include "../lib/apphot.h"
 include "../lib/noise.h"
 include "../lib/find.h"
@@ -42,10 +43,11 @@ begin
 
 	# Compute the 1 and 2 D kernels.
 	relerr = ap_egkernel (Memr[ker2d], Memi[skip], nxk, nyk, a, b, c, f)
+
 	call ap_gkernel (Memr[ker1x], nxk, apstatr (ap, FWHMPSF) * apstatr (ap,
-	    SCALE), apstatr (ap, NSIGMA))
+	    SCALE))
 	call ap_gkernel (Memr[ker1y], nyk, apstatr (ap, FWHMPSF) * apstatr (ap,
-	    SCALE), apstatr (ap, NSIGMA))
+	    SCALE))
 
 	# Set up the image boundary extension characteristics.
 	call ap_imset (im, boundary, max (1 + nxk / 2, 1 + nyk / 2),
@@ -58,7 +60,8 @@ begin
 	# function centered in the subarray which best represents the data
 	# within a circle of nsigma * sigma of the Gaussian.
 
-	call ap_convolve (im, cnv, Memr[ker2d], nxk, nyk)
+	if (IM_ACMODE(cnv) != READ_ONLY)
+	    call ap_convolve (im, cnv, Memr[ker2d], nxk, nyk)
 
 	# Save the task parameters in the database file if the savepars
 	# switch is enabled, otherwise a simple list of detected objects
@@ -80,7 +83,7 @@ begin
 	}
 
 	nstars = apfind (im, cnv, out, NULL, Memr[ker1x], Memr[ker1y],
-	    Memi[skip], nxk, nyk, apstatr (ap, THRESHOLD), apstati (ap,
+	    Memi[skip], nxk, nyk, apstatr (ap, THRESHOLD), relerr, apstati (ap,
 	    POSITIVE), apstatr (ap, SHARPLO), apstatr (ap, SHARPHI),
 	    apstatr (ap, ROUNDLO), apstatr (ap, ROUNDHI), verbose, stid, NO)
 

@@ -23,7 +23,7 @@ define	SZ_TITLE	512		# plot title buffer
 procedure t_imhistogram()
 
 long	v[IM_MAXDIM]
-real	z1, z2, dz, z1temp, z2temp
+real	z1, z2, dz, z1temp, z2temp, zstart
 int	npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, maxch, histtype
 pointer gp, im, sp, hgm, hgmr, buf, image, device, str, title, op
 
@@ -42,9 +42,6 @@ begin
 	call clgstr ("image", Memc[image], SZ_LINE)
 	im = immap (Memc[image], READ_ONLY, 0)
 	npix = IM_LEN(im,1)
-
-	# Get default histogram resolution.
-	nbins = clgeti ("nbins")
 
 	# Get histogram range.
 	z1 = clgetr ("z1")
@@ -67,6 +64,15 @@ begin
 
 	if (z1 > z2) {
 	    dz = z1;  z1 = z2;  z2 = dz
+	}
+
+	# Get default histogram resolution.
+	dz = clgetr ("binwidth")
+	if (IS_INDEFR(dz))
+	    nbins = clgeti ("nbins")
+	else {
+	    nbins = nint ((z2 - z1) / dz)
+	    z2 = z1 + nbins * dz
 	}
 
 	z1i = nint (z1)
@@ -161,13 +167,15 @@ begin
 	# List or plot the histogram.  In list format, the bin value is the
 	# z value of the left side (start) of the bin.
 
-	if (clgetb ("listout"))
+	if (clgetb ("listout")) {
+	    zstart = z1 + dz / 2.0
 	    do i = 1, nbins {
 		call printf ("%g %d\n")
-		    call pargr (z1 + (i-1) * dz)
+		    call pargr (zstart)
 		    call pargi (Memi[hgm+i-1])
+		zstart = zstart + dz
 	    }
-	else {
+	} else {
 	    call salloc (device, SZ_FNAME, TY_CHAR)
 	    call salloc (title, SZ_TITLE, TY_CHAR)
 	    call salloc (hgmr, nbins, TY_REAL)

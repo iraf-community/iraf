@@ -105,10 +105,14 @@ begin
  
 	    skyframe = out // ".sky"
 
-	    imcombine ("@"//tmptmp, skyframe, sigma="", logfile=logfile,
-	        outtype="", option="median", expname=expname, exposure+,
-	        sca-, off-, wei+, modesec="", low=3., high=3., blank=-1)
-
+	    imcombine ("@"//tmptmp, skyframe, plfile="", sigma="",
+	        logfile=logfile, combine="median", reject="none", project=no,
+		outtype="", offsets="none", masktype="none", maskvalue=0.0,
+		blank=-1.0, scale="exposure", zero="none", weight="exposure",
+		statsec="", expname=expname, lthreshold=INDEF,
+		hthreshold=INDEF, nlow=1, nhigh=1, mclip=yes, lsigma=3.0,
+		hsigma=3.0, rdnoise="0.0", gain="1.0", sigscale=0.1,
+    		pclip=-0.5, grow=0)
 	    print ("\n", >> logfile)
 	    imarith ("@"//tmpimg, "-", skyframe, "@"//tmpred, title="",
 	        divzero=0., hparams="", pixtype="", calctype="", verbose+,
@@ -129,8 +133,9 @@ begin
 	        print ("\n", >> logfile)
 		normframe = out // ".norm"
 		imcopy (skyframe, normframe, verbose-)
-		bscale (normframe, bzero="0.0", bscale="mode", section="",
-		    step=10, logfile=logfile, noact-)
+		bscale (normframe, normframe, bzero="0.0", bscale="mode",
+		    section="", step=10, lower=INDEF, upper=INDEF,
+		    verbose+, >>logfile)
 	        print ("\n", >> logfile)
 	        flatten ("@"//tmpred, normframe, minflat=INDEF, pixtype="",
 		    keeplog=yes, logfile=logfile)

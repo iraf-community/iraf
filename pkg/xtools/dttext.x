@@ -3,6 +3,8 @@
 include	<time.h>
 include	<ctype.h>
 include	<ctotok.h>
+include	<error.h>
+include	<fset.h>
 include	<pkg/dttext.h>
 
 .help dttext May85 "Simple Text Database Tools"
@@ -84,6 +86,7 @@ time command puts a comment line with the time.
 .nf
 	   dt = dtmap (database, mode)		# NEW_FILE, READ_ONLY or APPEND
 	   dt = dtmap1 (database, name, mode)	# Use a directory as a database
+		dtremap (dt, database, name,mode) # Remap a database
 		dtunmap (dt)
 
        record = dtlocate (dt, recname)
@@ -195,13 +198,14 @@ long	note()
 errchk	delete, open
 
 begin
-	call calloc (dt, DT_LEN, TY_STRUCT)
-
 	if (mode == NEW_FILE)
 	    iferr (call delete (database))
 		;
 
-	DT(dt) = open (database, mode, TEXT_FILE)
+	i = open (database, mode, TEXT_FILE)
+
+	call calloc (dt, DT_LEN, TY_STRUCT)
+	DT(dt) = i
 
 	if (mode != READ_ONLY)
 	    return (dt)
@@ -597,6 +601,58 @@ begin
 	    call strcpy (database, Memc[dbfile], SZ_PATHNAME + SZ_FNAME)
 
 	dt = dtmap (Memc[dbfile], mode)
+	call strcpy (database, DT_DNAME(dt), DT_SZFNAME)
+	call strcpy (key, DT_FNAME(dt), DT_SZFNAME)
+	DT_MODE(dt) = mode
+
 	call sfree (sp)
 	return (dt)
+end
+
+
+# DTREMAP -- Check if database needs to be remapped.
+#
+# If the pointer is null simply map the database.
+# If the pointer is not null check if the requested database is the same
+# as the current one and if not close the current database and map the
+# new one.  Note that remapping between read and append will not update
+# the entry data structure to include any information written.
+
+procedure dtremap (dt, dname, fname, mode)
+
+pointer	dt			# Database pointer
+char	dname[ARB]		# Directory name
+char	fname[ARB]		# File name
+int	mode			# Mode
+
+int	i, open()
+bool	strne()
+pointer	dbfile, dtmap1()
+errchk	dtmap1, dtunmap
+
+begin
+	if (dt != NULL) {
+	    if (strne (dname, DT_DNAME(dt)) || strne (fname, DT_FNAME(dt))) {
+		call dtunmap (dt)
+	    } else if (mode != DT_MODE(dt)) {
+		i = SZ_PATHNAME + SZ_FNAME
+		call malloc (dbfile, i, TY_CHAR)
+		call fstats (DT(dt), F_FILENAME, Memc[dbfile], i)
+		call close (DT(dt))
+		iferr (i = open (Memc[dbfile], mode, TEXT_FILE)) {
+		    DT(dt) = NULL
+		    call dtunmap (dt)
+		    call mfree (dbfile, TY_CHAR)
+		    call erract (EA_ERROR)
+		}
+		DT(dt) = i
+		DT_MODE(dt) = mode
+		call mfree (dbfile, TY_CHAR)
+	    }
+	}
+
+	if (dt == NULL) {
+	    i = dtmap1 (dname, fname, mode)
+	    dt = i
+	}
 end

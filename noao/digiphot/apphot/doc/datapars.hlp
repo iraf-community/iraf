@@ -1,4 +1,4 @@
-.help datapars Oct89 noao.digiphot.apphot 
+.help datapars Jul91 noao.digiphot.apphot
 .ih
 NAME
 datapars -- edit the data dependent parameters
@@ -7,6 +7,12 @@ USAGE
 datapars
 .ih
 PARAMETERS
+.ls scale = 1.0
+The scale of the image in user units, for example seconds of arc per pixel.
+If \fIscale\fR = 1 all these scale dependent parameters are in units of
+pixels. APPHOT users should typically leave scale set to 1.0 unless they
+wish to compare their aperture photometry with that in the literature.
+.le
 .ls fwhmpsf = 1.0 (scale units)
 The full width half maximum of the point spread function in scale units
 for example arc-seconds.
@@ -25,6 +31,46 @@ The feature to be measured is above sky. By default the APPHOT package
 considers all features to be emission features. However
 all the package tasks will operate on absorption features if the
 \fIemission\fR parameter is set to no.
+.le
+.ls sigma = INDEF
+The estimate of the standard deviation of the sky pixels.
+Although this parameter is not critical and leaving it at INDEF
+does little harm, APPHOT users should set it to some value
+representative of the noise in the sky background.
+.le
+.ls datamin = INDEF
+The minimum good pixel value, which defaults to -MAX_REAL, the minimum
+floating point number supported by the host computer.
+APPHOT users should set this if they wish to remove bad data from the
+sky fit before the actual fit or they wish to detect stars
+with bad data in the measurements.
+They should also realize that
+exercising this option will cost them in execution time.
+.le
+.ls datamax = INDEF
+The maximum good pixel value, which defaults to MAX_REAL, the maximum
+floating point number supported by the host computer.
+APPHOT users should set this if they are interested in detecting
+saturated stars or bad data automatically.
+They should also realize that
+exercising this option will cost them in execution time.
+.le
+.ls threshold = 0
+The threshold in counts above (emission features) or  below (absorption
+features) local sky used for image detection in the
+DAOFIND task and moments computation in the FITPSF task.
+A good starting value is 5 times the standard deviation
+of the image background level.
+APPHOT users can either determine threshold using an external task such
+as IMEXAMINE in the PROTO package or make use of the interactive
+capabilities of the APPHOT tasks to compute
+and store it.
+.le
+.ls cthreshold = 0
+The threshold in counts above (emission features) or below (absorption)
+features the data minimum (maximum) in the
+centering subraster below (above) which pixels are not used for centering.
+APPHOT users are recommended to leave this value at 0.0.
 .le
 .ls noise = "poisson"
 The noise model used to estimate the uncertainties in the computed APPHOT
@@ -48,47 +94,18 @@ APPHOT users should also be aware that gain parameter \fIepadu\fR
 must be set correctly in order to put the mangitude errors on the
 correct scale.
 .le
-.ls threshold = 0
-The threshold in counts above (emission features) or  below (absorption
-features) local sky used for image detection in the
-DAOFIND task and moments computation in the FITPSF task.
-A good starting value is 5 times the standard deviation
-of the image background level.
-APPHOT users can either determine threshold using an external task such
-as IMEXAMINE in the PROTO package or make use of the interactive
-capabilities of the APPHOT tasks to compute
-and store it.
-.le
-.ls cthreshold = 0
-The threshold in counts above (emission features) or below (absorption)
-features the data minimum (maximum) in the
-centering subraster below (above) which pixels are not used for centering.
-APPHOT users are recommended to leave this value at 0.0.
-.le
-.ls sigma = INDEF
-The estimate of the standard deviation of the sky pixels.
-Although this parameter is not critical and leaving it at INDEF
-does little harm, APPHOT users should set it to some value
-representative of the noise in the sky background.
-.le
-.ls scale = 1.0
-The scale of the image in user units, for example seconds of arc per pixel.
-If \fIscale\fR = 1 all these scale dependent parameters are in units of
-pixels. APPHOT users should typically leave scale set to 1.0 unless they
-wish to compare their aperture photometry with that in the literature.
-.le
 .ls ccdread = ""
 The image header keyword defining the readout noise parameter whose
 units are assumed to be electrons.
+.le
+.ls gain = ""
+The image header keyword defining the gain parameter whose
+units are assumed to be electrons per adu.
 .le
 .ls readnoise = INDEF
 The readout noise of the ccd in electrons.
 This parameter is not critical for APPHOT users but should be set for
 bookkeeping purposes.
-.le
-.ls gain = ""
-The image header keyword defining the gain parameter whose
-units are assumed to be electrons per adu.
 .le
 .ls epadu = 1.0
 The gain in electrons per adu.
@@ -104,15 +121,25 @@ The magnitudes are normalized to 1 timeunit.
 Setting this parameter can save APPHOT users a lot of unnecessry zero 
 point corrections in future reduction steps.
 .le
-.ls itime = INDEF
-The exposure time for the image in arbitrary units.
-The magnitudes are normalized to 1 timeunit  using the value of \fIexposure\fR
-in the image header if present or the value of \fIitime\fR.
-.le
 .ls airmass = ""
 The image header airmass keyword. This parameter is information only
 and does not affect the computations in any way. The value of \fIairmass\fR
 is recorded in the PHOT output file.
+.le
+.ls filter = ""
+The image header filter id keyword. This parameter is information only
+and does not affect the computations in any way. The value of \fIfilter\fR
+is recorded in the PHOT header.
+.le
+.ls obstime = ""
+The image header time of observation keyword. This parameter is information
+only and does not affect the computations in any way. The value of
+\fIobstime\fR is recorded in the PHOT header.
+.le
+.ls itime = INDEF
+The exposure time for the image in arbitrary units.
+The magnitudes are normalized to 1 timeunit  using the value of \fIexposure\fR
+in the image header if present or the value of \fIitime\fR.
 .le
 .ls xairmass = INDEF
 The value of the airmass which by default is undefined.
@@ -121,34 +148,19 @@ in the image header if present or the value of \fIxairmass\fR.
 The value of \fIxairmass\fR does not affect the computations in any way but is
 stored in the PHOT output file.
 .le
-.ls filter = ""
-The image header filter id keyword. This parameter is information only
-and does not affect the computations in any way. The value of \fIfilter\fR
-is recorded in the PHOT header.
-.le
 .ls ifilter = "INDEF"
 The value of the filter id string which by default is undefined.
 The filter id is set using the value of \fIfilter\fR
 in the image header if present or the value of \fIifilter\fR.
-The value of \fIifilter\fR does not affect the computations in any but is
+The value of \fIifilter\fR does not affect the computations in any way but is
 stored in the PHOT output file.
 .le
-.ls datamin = INDEF
-The minimum good pixel value, which defaults to -MAX_REAL, the minimum
-floating point number supported by the host computer.
-APPHOT users should set this if they wish to remove bad data from the
-sky fit before the actual fit or they wish to detect stars
-with bad data in the measurements.
-They should also realize that
-exercising this option will cost them in execution time.
-.le
-.ls datamax = INDEF
-The maximum good pixel value, which defaults to MAX_REAL, the maximum
-floating point number supported by the host computer.
-APPHOT users should set this if they are interested in detecting
-saturated stars or bad data automatically.
-They should also realize that
-exercising this option will cost them in execution time.
+.ls otime = "INDEF"
+The value of the time of observation string which by default is undefined.
+The time of observation is set using the values of \fIobstime\fR in
+the image header if present of the value of \fIotime\fR.
+The value of \fIotime\fR does not affect the computations in any way but is
+stored in the PHOT output file.
 .le
 .ih
 DESCRIPTION
@@ -196,11 +208,6 @@ In this situation, once an optimum set of algorithm parameters is
 chosen, the user rarely needs to alter anything but the DATAPARS
 parameter scale before executing any APPHOT task.
 
-Two noise models are available. If \fInoise\fR = constant, the total noise
-is assumed to be due to noise in the background alone. If \fInoise\fR =
-poisson, the total noise includes Poisson noise from the object and the 
-sky noise.
-
 The parameter \fIsigma\fR estimates the standard deviation of
 the sky background pixels. The centering algorithm uses this parameter
 to define deviant pixels through the kclean parameter  if \fIclean\fR is
@@ -215,6 +222,23 @@ local sky.
 Although this parameter is not critical and leaving it at INDEF
 does no harm in the case of a typical default setup, APPHOT users should
 set it to some value representative of the noise in the sky background.
+
+The \fIdatamin\fR and \fIdatamax\fR parameters define the range of good
+data. For example datamin and datamax can be used to define the range
+of intensity over which the detector is linear. Bad pixels in the 
+centering subraster and in the photometry apertures are noted and the
+measurment tagged with an error code. In the case of sky fitting,
+psf modelling in the FITPSF task, and radial profile modelling in the
+RADPROF task bad data is removed before the fit is performed.
+APPHOT users should set datamin and datamax to appropriate values before
+running any APPHOT tasks if they are interested in for example
+saturation information. APPHOT users should also be aware that setting
+data limits will cost them something in execution time.
+
+Two noise models are available. If \fInoise\fR = constant, the total noise
+is assumed to be due to noise in the background alone. If \fInoise\fR =
+poisson, the total noise includes Poisson noise from the object and the 
+sky noise.
 
 The two parameters \fIgain\fR and \fIepadu\fR define the signal gain
 characteristics. The gain parameter specifies which keyword in the
@@ -254,17 +278,12 @@ not present in the image header the value of ifilter is used.
 The filter is an information only quantity and is not used in any APPHOT
 computations.
 
-The \fIdatamin\fR and \fIdatamax\fR parameters define the range of good
-data. For example datamin and datamax can be used to define the range
-of intensity over which the detector is linear. Bad pixels in the 
-centering subraster and in the photometry apertures are noted and the
-measurment tagged with an error code. In the case of sky fitting,
-psf modelling in the FITPSF task, and radial profile modelling in the
-RADPROF task bad data is removed before the fit is performed.
-APPHOT users should set datamin and datamax to appropriate values before
-running any APPHOT tasks if they are interested in for example
-saturation information. APPHOT users should also be aware that setting
-data limits will cost them something in execution time.
+The two parameters \fIobstime\fR and \fIotime\fR define the time 
+of the observation (e.g. UT). The obstime parameter specifies which keyword
+in the image header contains the time stamp of the observation. If obstime is
+undefined or not present in the image header the value of otime is used.
+The obstime is an information only quantity and is not used in any APPHOT
+computations.
 
 .ih
 EXAMPLES

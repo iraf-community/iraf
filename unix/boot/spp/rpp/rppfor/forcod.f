@@ -1,180 +1,180 @@
-      SUBROUTINE FORCOD (LAB)
-      INTEGER LAB
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER T, TOKEN (100)
-      INTEGER GETTOK, GNBTOK
-      INTEGER I, J, NLPAR
-      INTEGER LENGTH, LABGEN
-      INTEGER IFNOT(10)
-      INTEGER SERRC0(22)
-      DATA IFNOT(1)/105/,IFNOT(2)/102/,IFNOT(3)/32/,IFNOT(4)/40/,IFNOT(5
-     *)/46/,IFNOT(6)/110/,IFNOT(7)/111/,IFNOT(8)/116/,IFNOT(9)/46/,IFNOT
+      subroutine forcod (lab)
+      integer lab
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer t, token (100)
+      integer gettok, gnbtok
+      integer i, j, nlpar
+      integer length, labgen
+      integer ifnot(10)
+      integer serrc0(22)
+      data ifnot(1)/105/,ifnot(2)/102/,ifnot(3)/32/,ifnot(4)/40/,ifnot(5
+     *)/46/,ifnot(6)/110/,ifnot(7)/111/,ifnot(8)/116/,ifnot(9)/46/,ifnot
      *(10)/-2/
-      DATA SERRC0(1)/46/,SERRC0(2)/97/,SERRC0(3)/110/,SERRC0(4)/100/,SER
-     *RC0(5)/46/,SERRC0(6)/40/,SERRC0(7)/46/,SERRC0(8)/110/,SERRC0(9)/11
-     *1/,SERRC0(10)/116/,SERRC0(11)/46/,SERRC0(12)/120/,SERRC0(13)/101/,
-     *SERRC0(14)/114/,SERRC0(15)/102/,SERRC0(16)/108/,SERRC0(17)/103/,SE
-     *RRC0(18)/41/,SERRC0(19)/41/,SERRC0(20)/41/,SERRC0(21)/32/,SERRC0(2
+      data serrc0(1)/46/,serrc0(2)/97/,serrc0(3)/110/,serrc0(4)/100/,ser
+     *rc0(5)/46/,serrc0(6)/40/,serrc0(7)/46/,serrc0(8)/110/,serrc0(9)/11
+     *1/,serrc0(10)/116/,serrc0(11)/46/,serrc0(12)/120/,serrc0(13)/101/,
+     *serrc0(14)/114/,serrc0(15)/102/,serrc0(16)/108/,serrc0(17)/103/,se
+     *rrc0(18)/41/,serrc0(19)/41/,serrc0(20)/41/,serrc0(21)/32/,serrc0(2
      *2)/-2/
-      LAB = LABGEN (3)
-      CALL OUTCON (0)
-      IF (.NOT.(GNBTOK (TOKEN, 100) .NE. 40))GOTO 23000
-      CALL SYNERR (19Hmissing left paren.)
-      RETURN
-23000 CONTINUE
-      IF (.NOT.(GNBTOK (TOKEN, 100) .NE. 59))GOTO 23002
-      CALL PBSTR (TOKEN)
-      CALL OUTTAB
-      CALL EATUP
-      CALL OUTDWE
-23002 CONTINUE
-      IF (.NOT.(GNBTOK (TOKEN, 100) .EQ. 59))GOTO 23004
-      CALL OUTCON (LAB)
-      GOTO 23005
-23004 CONTINUE
-      CALL PBSTR (TOKEN)
-      CALL OUTNUM (LAB)
-      CALL OUTTAB
-      CALL OUTSTR (IFNOT)
-      CALL OUTCH (40)
-      NLPAR = 0
-23006 IF (.NOT.(NLPAR .GE. 0))GOTO 23007
-      T = GETTOK (TOKEN, 100)
-      IF (.NOT.(T .EQ. 59))GOTO 23008
-      GOTO 23007
-23008 CONTINUE
-      IF (.NOT.(T .EQ. 40))GOTO 23010
-      NLPAR = NLPAR + 1
-      GOTO 23011
-23010 CONTINUE
-      IF (.NOT.(T .EQ. 41))GOTO 23012
-      NLPAR = NLPAR - 1
-23012 CONTINUE
-23011 CONTINUE
-      IF (.NOT.(T .EQ. -1))GOTO 23014
-      CALL PBSTR (TOKEN)
-      RETURN
-23014 CONTINUE
-      IF (.NOT.(T .EQ. -9))GOTO 23016
-      CALL SQUASH (TOKEN)
-23016 CONTINUE
-      IF (.NOT.(T .NE. 10 .AND. T .NE. 95))GOTO 23018
-      CALL OUTSTR (TOKEN)
-23018 CONTINUE
-      GOTO 23006
-23007 CONTINUE
-      IF (.NOT.(ERNAME .EQ. 1))GOTO 23020
-      CALL OUTSTR (SERRC0)
-      GOTO 23021
-23020 CONTINUE
-      CALL OUTCH (41)
-      CALL OUTCH (41)
-      CALL OUTCH (32)
-23021 CONTINUE
-      CALL OUTGO (LAB+2)
-      IF (.NOT.(NLPAR .LT. 0))GOTO 23022
-      CALL SYNERR (19Hinvalid for clause.)
-23022 CONTINUE
-23005 CONTINUE
-      FORDEP = FORDEP + 1
-      J = 1
-      I = 1
-23024 IF (.NOT.(I .LT. FORDEP))GOTO 23026
-      J = J + LENGTH (FORSTK (J)) + 1
-23025 I = I + 1
-      GOTO 23024
-23026 CONTINUE
-      FORSTK (J) = -2
-      NLPAR = 0
-      T = GNBTOK (TOKEN, 100)
-      CALL PBSTR (TOKEN)
-23027 IF (.NOT.(NLPAR .GE. 0))GOTO 23028
-      T = GETTOK (TOKEN, 100)
-      IF (.NOT.(T .EQ. 40))GOTO 23029
-      NLPAR = NLPAR + 1
-      GOTO 23030
-23029 CONTINUE
-      IF (.NOT.(T .EQ. 41))GOTO 23031
-      NLPAR = NLPAR - 1
-23031 CONTINUE
-23030 CONTINUE
-      IF (.NOT.(T .EQ. -1))GOTO 23033
-      CALL PBSTR (TOKEN)
-      GOTO 23028
-23033 CONTINUE
-      IF (.NOT.(NLPAR .GE. 0 .AND. T .NE. 10 .AND. T .NE. 95))GOTO 23035
-      IF (.NOT.(T .EQ. -9))GOTO 23037
-      CALL SQUASH (TOKEN)
-23037 CONTINUE
-      IF (.NOT.(J + LENGTH (TOKEN) .GE. 200))GOTO 23039
-      CALL BADERR (20Hfor clause too long.)
-23039 CONTINUE
-      CALL SCOPY (TOKEN, 1, FORSTK, J)
-      J = J + LENGTH (TOKEN)
-23035 CONTINUE
-      GOTO 23027
-23028 CONTINUE
-      LAB = LAB + 1
-      CALL INDENT (1)
-      CALL ERRGO
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
-C     SERRC0  SERRCHK
+      lab = labgen (3)
+      call outcon (0)
+      if (.not.(gnbtok (token, 100) .ne. 40))goto 23000
+      call synerr (19Hmissing left paren.)
+      return
+23000 continue
+      if (.not.(gnbtok (token, 100) .ne. 59))goto 23002
+      call pbstr (token)
+      call outtab
+      call eatup
+      call outdwe
+23002 continue
+      if (.not.(gnbtok (token, 100) .eq. 59))goto 23004
+      call outcon (lab)
+      goto 23005
+23004 continue
+      call pbstr (token)
+      call outnum (lab)
+      call outtab
+      call outstr (ifnot)
+      call outch (40)
+      nlpar = 0
+23006 if (.not.(nlpar .ge. 0))goto 23007
+      t = gettok (token, 100)
+      if (.not.(t .eq. 59))goto 23008
+      goto 23007
+23008 continue
+      if (.not.(t .eq. 40))goto 23010
+      nlpar = nlpar + 1
+      goto 23011
+23010 continue
+      if (.not.(t .eq. 41))goto 23012
+      nlpar = nlpar - 1
+23012 continue
+23011 continue
+      if (.not.(t .eq. -1))goto 23014
+      call pbstr (token)
+      return
+23014 continue
+      if (.not.(t .eq. -9))goto 23016
+      call squash (token)
+23016 continue
+      if (.not.(t .ne. 10 .and. t .ne. 95))goto 23018
+      call outstr (token)
+23018 continue
+      goto 23006
+23007 continue
+      if (.not.(ername .eq. 1))goto 23020
+      call outstr (serrc0)
+      goto 23021
+23020 continue
+      call outch (41)
+      call outch (41)
+      call outch (32)
+23021 continue
+      call outgo (lab+2)
+      if (.not.(nlpar .lt. 0))goto 23022
+      call synerr (19Hinvalid for clause.)
+23022 continue
+23005 continue
+      fordep = fordep + 1
+      j = 1
+      i = 1
+23024 if (.not.(i .lt. fordep))goto 23026
+      j = j + length (forstk (j)) + 1
+23025 i = i + 1
+      goto 23024
+23026 continue
+      forstk (j) = -2
+      nlpar = 0
+      t = gnbtok (token, 100)
+      call pbstr (token)
+23027 if (.not.(nlpar .ge. 0))goto 23028
+      t = gettok (token, 100)
+      if (.not.(t .eq. 40))goto 23029
+      nlpar = nlpar + 1
+      goto 23030
+23029 continue
+      if (.not.(t .eq. 41))goto 23031
+      nlpar = nlpar - 1
+23031 continue
+23030 continue
+      if (.not.(t .eq. -1))goto 23033
+      call pbstr (token)
+      goto 23028
+23033 continue
+      if (.not.(nlpar .ge. 0 .and. t .ne. 10 .and. t .ne. 95))goto 23035
+      if (.not.(t .eq. -9))goto 23037
+      call squash (token)
+23037 continue
+      if (.not.(j + length (token) .ge. 200))goto 23039
+      call baderr (20Hfor clause too long.)
+23039 continue
+      call scopy (token, 1, forstk, j)
+      j = j + length (token)
+23035 continue
+      goto 23027
+23028 continue
+      lab = lab + 1
+      call indent (1)
+      call errgo
+      return
+      end
+c     logic0  logical_column
+c     serrc0  serrchk

@@ -1,117 +1,117 @@
-      SUBROUTINE OUTCH (C)
-      INTEGER C, SPLBUF(8+1)
-      INTEGER I, IP, OP, INDEX
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      EXTERNAL INDEX
-      INTEGER BREAK0(10)
-      DATA BREAK0(1)/32/,BREAK0(2)/41/,BREAK0(3)/44/,BREAK0(4)/46/,BREAK
-     *0(5)/43/,BREAK0(6)/45/,BREAK0(7)/42/,BREAK0(8)/47/,BREAK0(9)/40/,B
-     *REAK0(10)/-2/
-      IF (.NOT.(OUTP .GE. 72))GOTO 23000
-      IF (.NOT.(INDEX (BREAK0, C) .GT. 0))GOTO 23002
-      IP = OUTP
-      GOTO 23003
-23002 CONTINUE
-      IP=OUTP
-23004 IF (.NOT.(IP .GE. 1))GOTO 23006
-      IF (.NOT.(INDEX (BREAK0, OUTBUF(IP)) .GT. 0))GOTO 23007
-      GOTO 23006
-23007 CONTINUE
-23005 IP=IP-1
-      GOTO 23004
-23006 CONTINUE
-23003 CONTINUE
-      IF (.NOT.(IP .NE. OUTP .AND. (OUTP-IP) .LT. 8))GOTO 23009
-      OP = 1
-      I=IP+1
-23011 IF (.NOT.(I .LE. OUTP))GOTO 23013
-      SPLBUF(OP) = OUTBUF(I)
-      OP = OP + 1
-23012 I=I+1
-      GOTO 23011
-23013 CONTINUE
-      SPLBUF(OP) = -2
-      OUTP = IP
-      GOTO 23010
-23009 CONTINUE
-      SPLBUF(1) = -2
-23010 CONTINUE
-      CALL OUTDON
-      OP=1
-23014 IF (.NOT.(OP .LT. COL))GOTO 23016
-      OUTBUF(OP) = 32
-23015 OP=OP+1
-      GOTO 23014
-23016 CONTINUE
-      OUTBUF(6) = 42
-      OUTP = COL
-      IP=1
-23017 IF (.NOT.(SPLBUF(IP) .NE. -2))GOTO 23019
-      OUTP = OUTP + 1
-      OUTBUF(OUTP) = SPLBUF(IP)
-23018 IP=IP+1
-      GOTO 23017
-23019 CONTINUE
-23000 CONTINUE
-      OUTP = OUTP + 1
-      OUTBUF(OUTP) = C
-      END
-C     LOGIC0  LOGICAL_COLUMN
-C     BREAK0  BREAK_CHARS
+      subroutine outch (c)
+      integer c, splbuf(8+1)
+      integer i, ip, op, index
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      external index
+      integer break0(10)
+      data break0(1)/32/,break0(2)/41/,break0(3)/44/,break0(4)/46/,break
+     *0(5)/43/,break0(6)/45/,break0(7)/42/,break0(8)/47/,break0(9)/40/,b
+     *reak0(10)/-2/
+      if (.not.(outp .ge. 72))goto 23000
+      if (.not.(index (break0, c) .gt. 0))goto 23002
+      ip = outp
+      goto 23003
+23002 continue
+      ip=outp
+23004 if (.not.(ip .ge. 1))goto 23006
+      if (.not.(index (break0, outbuf(ip)) .gt. 0))goto 23007
+      goto 23006
+23007 continue
+23005 ip=ip-1
+      goto 23004
+23006 continue
+23003 continue
+      if (.not.(ip .ne. outp .and. (outp-ip) .lt. 8))goto 23009
+      op = 1
+      i=ip+1
+23011 if (.not.(i .le. outp))goto 23013
+      splbuf(op) = outbuf(i)
+      op = op + 1
+23012 i=i+1
+      goto 23011
+23013 continue
+      splbuf(op) = -2
+      outp = ip
+      goto 23010
+23009 continue
+      splbuf(1) = -2
+23010 continue
+      call outdon
+      op=1
+23014 if (.not.(op .lt. col))goto 23016
+      outbuf(op) = 32
+23015 op=op+1
+      goto 23014
+23016 continue
+      outbuf(6) = 42
+      outp = col
+      ip=1
+23017 if (.not.(splbuf(ip) .ne. -2))goto 23019
+      outp = outp + 1
+      outbuf(outp) = splbuf(ip)
+23018 ip=ip+1
+      goto 23017
+23019 continue
+23000 continue
+      outp = outp + 1
+      outbuf(outp) = c
+      end
+c     logic0  logical_column
+c     break0  break_chars

@@ -6,7 +6,6 @@
 #include <iraf.h>
 
 #define	SZ_FBUF		512		/* File i/o buffer size		*/
-/* #define	NOVOS			/* Do not use VOS for vfn2osfn	*/
 
 # ifdef VMS
 #define	rindex	strrchr 

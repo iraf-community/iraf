@@ -22,6 +22,7 @@ int	cl_size			# number of images in cl_index
 int	acmode			# access mode
 pointer	o_im			# existing image descriptor, if new_copy
 
+bool	can_inherit_type
 pointer	sp, root, extn
 int	status, cluster_mode, k
 int	envfind()
@@ -53,7 +54,13 @@ begin
 	# image type is defined by the filename extension if given.
 
 	repeat {
-	    if (acmode == NEW_COPY && Memc[extn] == EOS) {
+	    if (acmode == NEW_COPY) {
+		k = IM_KERNEL(o_im)
+		can_inherit_type = (and (IKI_FLAGS(k), IKF_NOCREATE) == 0)
+	    } else
+		can_inherit_type = true
+
+	    if (acmode == NEW_COPY && Memc[extn] == EOS && can_inherit_type) {
 		k = IM_KERNEL(o_im)
 		break
 	    } else {

@@ -35,7 +35,7 @@ libex.a:
 
 	iwcfits.x	imwcs.h
 	iwctype.x	imwcs.h <ctype.h>
-	iwewcs.x	imwcs.h mwcs.h <imhdr.h> <imio.h> <math.h>
+	iwewcs.x	imwcs.h mwcs.h <ctype.h> <imhdr.h> <imio.h> <math.h>
 	iwfind.x	imwcs.h
 	iwgbfits.x	imwcs.h
 	iwparray.x	imwcs.h
@@ -60,24 +60,26 @@ libex.a:
 	mwgwtermr.x	mwcs.h
 	mwinvertd.x	
 	mwinvertr.x	
-	mwload.x	mwcs.h <error.h> <mach.h>
+	mwload.x	mwcs.h mwsv.h <error.h> <mach.h>
 	mwloadim.x	imwcs.h mwcs.h <error.h> <imhdr.h> <imio.h>
 	mwlu.x		<mach.h>
 	mwmkidmd.x	
+	mwmkidmr.x	
 	mwnewcopy.x	mwcs.h
 	mwnewsys.x	mwcs.h
 	mwopen.x	mwcs.h <error.h>
-	mwopenim.x	<imhdr.h>
+	mwopenim.x	<imhdr.h> <imio.h>
 	mwrefstr.x	mwcs.h
 	mwrotate.x	mwcs.h
-	mwsave.x	mwcs.h <mach.h>
-	mwsaveim.x	imwcs.h mwcs.h <imhdr.h> <imio.h>
+	mwsave.x	mwcs.h mwsv.h <mach.h>
+	mwsaveim.x	imwcs.h mwcs.com mwcs.h <imhdr.h> <imio.h> <mach.h>
 	mwsaxmap.x	mwcs.h
 	mwscale.x	mwcs.h
-	mwsctran.x	mwcs.com mwcs.h <mach.h>
+	mwsctran.x	mwcs.com mwcs.h <error.h> <mach.h>
 	mwsdefwcs.x	mwcs.h <mwset.h>
 	mwseti.x	mwcs.h <mwset.h>
 	mwshift.x	mwcs.h
+	mwshow.x	mwcs.h <imio.h>
 	mwsltermd.x	mwcs.h
 	mwsltermr.x	mwcs.h
 	mwssys.x	mwcs.h
@@ -90,8 +92,12 @@ libex.a:
 	mwswtype.x	mwcs.h <ctype.h>
 	mwtransd.x	mwcs.h
 	mwtransr.x	
+	wfarc.x		mwcs.h <math.h>
 	wfdecaxis.x	mwcs.h
+	wfgls.x		mwcs.h <math.h>
 	wfinit.x	mwcs.com mwcs.h
+	wfmspec.x	mwcs.h <imhdr.h>
 	wfsamp.x	mwcs.h
+	wfsin.x		mwcs.h <math.h>
 	wftan.x		mwcs.h <math.h>
 	;

@@ -6,29 +6,29 @@ define	AP_RADGAUSS		1	# Radial Gaussian
 define  AP_ELLGAUSS		2	# Elliptical Gaussian
 define	AP_MOMENTS		3	# Moment analysis
 
-# fitpsf errors (# 121 - 140)
+# fitpsf errors (# 401 - 500)
 
 define	AP_OK			0	# no error
-define	AP_NOPSFAREA		121	# No pixels for PSF
-define	AP_PSF_OUTOFBOUNDS	122	# PSF aperture extends oob
-define	AP_NPSF_TOO_SMALL	123	# Too few PSF points
-define	AP_PSF_SINGULAR		124	# Fit is singular
-define	AP_PSF_NOCONVERGE	125	# Solution does not converge
+define	AP_NOPSFAREA		401	# No pixels for PSF
+define	AP_PSF_OUTOFBOUNDS	402	# PSF aperture extends oob
+define	AP_NPSF_TOO_SMALL	403	# Too few PSF points
+define	AP_PSF_SINGULAR		404	# Fit is singular
+define	AP_PSF_NOCONVERGE	405	# Solution does not converge
 
-# fitpsf parameters (# 81 - 100)
+# fitpsf parameters (# 401 - 500)
 
-define	PSFUNCTION	81
-define	MAXNPARS	82
-define	PK2		83
-define	PMAXITER	84
-define	PSFAPERT	85
-define	NPARS		86
-define	PARS		87
-define	PERRS		88
-define	PNREJECT	89
-define	PFXCUR		90
-define	PFYCUR		91
-define	PSFSTRING	92
+define	PSFUNCTION	401
+define	MAXNPARS	402
+define	PK2		403
+define	PMAXITER	404
+define	PSFAPERT	405
+define	NPARS		406
+define	PARS		407
+define	PERRS		408
+define	PNREJECT	409
+define	PFXCUR		410
+define	PFYCUR		411
+define	PSFSTRING	412
 
 # define fitpsf keywords
 

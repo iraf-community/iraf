@@ -1,14 +1,14 @@
 # APPHOT display parameters
 
-# display parameters (# 101 - 120)
+# display parameters (# 501 - 600)
 
-define	MKSKY		101
-define	MKCENTER	102
-define	MKAPERT		103
-define	MKPOLYGON	104
-define	MKPSFBOX	105
-define	RADPLOTS	106
-define	MKDETECTIONS	107
+define	MKSKY		501
+define	MKCENTER	502
+define	MKAPERT		503
+define	MKPOLYGON	504
+define	MKPSFBOX	505
+define	RADPLOTS	506
+define	MKDETECTIONS	507
 
 # display parameters
 

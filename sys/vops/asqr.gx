@@ -14,7 +14,7 @@ errchk	errfcn
 begin
 	do i = 1, npix {
 	    $if (datatype != x)
-		if (a[i] <= 0)
+		if (a[i] < 0)
 		    b[i] = errfcn (a[i])
 		else
 	    $endif

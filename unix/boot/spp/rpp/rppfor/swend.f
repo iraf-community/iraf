@@ -1,184 +1,184 @@
-      SUBROUTINE SWEND (LAB)
-      INTEGER LAB
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER LB, UB, N, I, J, SWN
-      INTEGER SIF(5)
-      INTEGER SLT(10)
-      INTEGER SGT(5)
-      INTEGER SGOTO(7)
-      INTEGER SEQ(5)
-      INTEGER SGE(5)
-      INTEGER SLE(5)
-      INTEGER SAND(6)
-      DATA SIF(1)/105/,SIF(2)/102/,SIF(3)/32/,SIF(4)/40/,SIF(5)/-2/
-      DATA SLT(1)/46/,SLT(2)/108/,SLT(3)/116/,SLT(4)/46/,SLT(5)/49/,SLT(
-     *6)/46/,SLT(7)/111/,SLT(8)/114/,SLT(9)/46/,SLT(10)/-2/
-      DATA SGT(1)/46/,SGT(2)/103/,SGT(3)/116/,SGT(4)/46/,SGT(5)/-2/
-      DATA SGOTO(1)/103/,SGOTO(2)/111/,SGOTO(3)/116/,SGOTO(4)/111/,SGOTO
-     *(5)/32/,SGOTO(6)/40/,SGOTO(7)/-2/
-      DATA SEQ(1)/46/,SEQ(2)/101/,SEQ(3)/113/,SEQ(4)/46/,SEQ(5)/-2/
-      DATA SGE(1)/46/,SGE(2)/103/,SGE(3)/101/,SGE(4)/46/,SGE(5)/-2/
-      DATA SLE(1)/46/,SLE(2)/108/,SLE(3)/101/,SLE(4)/46/,SLE(5)/-2/
-      DATA SAND(1)/46/,SAND(2)/97/,SAND(3)/110/,SAND(4)/100/,SAND(5)/46/
-     *,SAND(6)/-2/
-      SWN = SWVSTK(SWVLEV)
-      SWVLEV = MAX0(0, SWVLEV - 1)
-      LB = SWSTAK (SWTOP + 3)
-      UB = SWSTAK (SWLAST - 2)
-      N = SWSTAK (SWTOP + 1)
-      CALL OUTGO (LAB + 1)
-      IF (.NOT.(SWSTAK (SWTOP + 2) .EQ. 0))GOTO 23000
-      SWSTAK (SWTOP + 2) = LAB + 1
-23000 CONTINUE
-      XFER = 0
-      CALL INDENT (-1)
-      CALL OUTCON (LAB)
-      CALL INDENT (1)
-      IF (.NOT.(N .GE. 3 .AND. UB - LB + 1 .LT. 2 * N))GOTO 23002
-      IF (.NOT.(LB .NE. 1))GOTO 23004
-      CALL OUTTAB
-      CALL SWVAR (SWN)
-      CALL OUTCH (61)
-      CALL SWVAR (SWN)
-      IF (.NOT.(LB .LT. 1))GOTO 23006
-      CALL OUTCH (43)
-23006 CONTINUE
-      CALL OUTNUM (-LB + 1)
-      CALL OUTDON
-23004 CONTINUE
-      IF (.NOT.(SWINRG .EQ. 0))GOTO 23008
-      CALL OUTTAB
-      CALL OUTSTR (SIF)
-      CALL SWVAR (SWN)
-      CALL OUTSTR (SLT)
-      CALL SWVAR (SWN)
-      CALL OUTSTR (SGT)
-      CALL OUTNUM (UB - LB + 1)
-      CALL OUTCH (41)
-      CALL OUTCH (32)
-      CALL OUTGO (SWSTAK (SWTOP + 2))
-23008 CONTINUE
-      CALL OUTTAB
-      CALL OUTSTR (SGOTO)
-      J = LB
-      I = SWTOP + 3
-23010 IF (.NOT.(I .LT. SWLAST))GOTO 23012
-23013 IF (.NOT.(J .LT. SWSTAK (I)))GOTO 23015
-      CALL OUTNUM (SWSTAK (SWTOP + 2))
-      CALL OUTCH (44)
-23014 J = J + 1
-      GOTO 23013
-23015 CONTINUE
-      J = SWSTAK (I + 1) - SWSTAK (I)
-23016 IF (.NOT.(J .GE. 0))GOTO 23018
-      CALL OUTNUM (SWSTAK (I + 2))
-23017 J = J - 1
-      GOTO 23016
-23018 CONTINUE
-      J = SWSTAK (I + 1) + 1
-      IF (.NOT.(I .LT. SWLAST - 3))GOTO 23019
-      CALL OUTCH (44)
-23019 CONTINUE
-23011 I = I + 3
-      GOTO 23010
-23012 CONTINUE
-      CALL OUTCH (41)
-      CALL OUTCH (44)
-      CALL SWVAR (SWN)
-      CALL OUTDON
-      GOTO 23003
-23002 CONTINUE
-      IF (.NOT.(N .GT. 0))GOTO 23021
-      I = SWTOP + 3
-23023 IF (.NOT.(I .LT. SWLAST))GOTO 23025
-      CALL OUTTAB
-      CALL OUTSTR (SIF)
-      CALL SWVAR (SWN)
-      IF (.NOT.(SWSTAK (I) .EQ. SWSTAK (I+1)))GOTO 23026
-      CALL OUTSTR (SEQ)
-      CALL OUTNUM (SWSTAK (I))
-      GOTO 23027
-23026 CONTINUE
-      CALL OUTSTR (SGE)
-      CALL OUTNUM (SWSTAK (I))
-      CALL OUTSTR (SAND)
-      CALL SWVAR (SWN)
-      CALL OUTSTR (SLE)
-      CALL OUTNUM (SWSTAK (I + 1))
-23027 CONTINUE
-      CALL OUTCH (41)
-      CALL OUTCH (32)
-      CALL OUTGO (SWSTAK (I + 2))
-23024 I = I + 3
-      GOTO 23023
-23025 CONTINUE
-      IF (.NOT.(LAB + 1 .NE. SWSTAK (SWTOP + 2)))GOTO 23028
-      CALL OUTGO (SWSTAK (SWTOP + 2))
-23028 CONTINUE
-23021 CONTINUE
-23003 CONTINUE
-      CALL INDENT (-1)
-      CALL OUTCON (LAB + 1)
-      SWLAST = SWTOP
-      SWTOP = SWSTAK (SWTOP)
-      SWINRG = 0
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      subroutine swend (lab)
+      integer lab
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer lb, ub, n, i, j, swn
+      integer sif(5)
+      integer slt(10)
+      integer sgt(5)
+      integer sgoto(7)
+      integer seq(5)
+      integer sge(5)
+      integer sle(5)
+      integer sand(6)
+      data sif(1)/105/,sif(2)/102/,sif(3)/32/,sif(4)/40/,sif(5)/-2/
+      data slt(1)/46/,slt(2)/108/,slt(3)/116/,slt(4)/46/,slt(5)/49/,slt(
+     *6)/46/,slt(7)/111/,slt(8)/114/,slt(9)/46/,slt(10)/-2/
+      data sgt(1)/46/,sgt(2)/103/,sgt(3)/116/,sgt(4)/46/,sgt(5)/-2/
+      data sgoto(1)/103/,sgoto(2)/111/,sgoto(3)/116/,sgoto(4)/111/,sgoto
+     *(5)/32/,sgoto(6)/40/,sgoto(7)/-2/
+      data seq(1)/46/,seq(2)/101/,seq(3)/113/,seq(4)/46/,seq(5)/-2/
+      data sge(1)/46/,sge(2)/103/,sge(3)/101/,sge(4)/46/,sge(5)/-2/
+      data sle(1)/46/,sle(2)/108/,sle(3)/101/,sle(4)/46/,sle(5)/-2/
+      data sand(1)/46/,sand(2)/97/,sand(3)/110/,sand(4)/100/,sand(5)/46/
+     *,sand(6)/-2/
+      swn = swvstk(swvlev)
+      swvlev = max0(0, swvlev - 1)
+      lb = swstak (swtop + 3)
+      ub = swstak (swlast - 2)
+      n = swstak (swtop + 1)
+      call outgo (lab + 1)
+      if (.not.(swstak (swtop + 2) .eq. 0))goto 23000
+      swstak (swtop + 2) = lab + 1
+23000 continue
+      xfer = 0
+      call indent (-1)
+      call outcon (lab)
+      call indent (1)
+      if (.not.(n .ge. 3 .and. ub - lb + 1 .lt. 2 * n))goto 23002
+      if (.not.(lb .ne. 1))goto 23004
+      call outtab
+      call swvar (swn)
+      call outch (61)
+      call swvar (swn)
+      if (.not.(lb .lt. 1))goto 23006
+      call outch (43)
+23006 continue
+      call outnum (-lb + 1)
+      call outdon
+23004 continue
+      if (.not.(swinrg .eq. 0))goto 23008
+      call outtab
+      call outstr (sif)
+      call swvar (swn)
+      call outstr (slt)
+      call swvar (swn)
+      call outstr (sgt)
+      call outnum (ub - lb + 1)
+      call outch (41)
+      call outch (32)
+      call outgo (swstak (swtop + 2))
+23008 continue
+      call outtab
+      call outstr (sgoto)
+      j = lb
+      i = swtop + 3
+23010 if (.not.(i .lt. swlast))goto 23012
+23013 if (.not.(j .lt. swstak (i)))goto 23015
+      call outnum (swstak (swtop + 2))
+      call outch (44)
+23014 j = j + 1
+      goto 23013
+23015 continue
+      j = swstak (i + 1) - swstak (i)
+23016 if (.not.(j .ge. 0))goto 23018
+      call outnum (swstak (i + 2))
+23017 j = j - 1
+      goto 23016
+23018 continue
+      j = swstak (i + 1) + 1
+      if (.not.(i .lt. swlast - 3))goto 23019
+      call outch (44)
+23019 continue
+23011 i = i + 3
+      goto 23010
+23012 continue
+      call outch (41)
+      call outch (44)
+      call swvar (swn)
+      call outdon
+      goto 23003
+23002 continue
+      if (.not.(n .gt. 0))goto 23021
+      i = swtop + 3
+23023 if (.not.(i .lt. swlast))goto 23025
+      call outtab
+      call outstr (sif)
+      call swvar (swn)
+      if (.not.(swstak (i) .eq. swstak (i+1)))goto 23026
+      call outstr (seq)
+      call outnum (swstak (i))
+      goto 23027
+23026 continue
+      call outstr (sge)
+      call outnum (swstak (i))
+      call outstr (sand)
+      call swvar (swn)
+      call outstr (sle)
+      call outnum (swstak (i + 1))
+23027 continue
+      call outch (41)
+      call outch (32)
+      call outgo (swstak (i + 2))
+23024 i = i + 3
+      goto 23023
+23025 continue
+      if (.not.(lab + 1 .ne. swstak (swtop + 2)))goto 23028
+      call outgo (swstak (swtop + 2))
+23028 continue
+23021 continue
+23003 continue
+      call indent (-1)
+      call outcon (lab + 1)
+      swlast = swtop
+      swtop = swstak (swtop)
+      swinrg = 0
+      return
+      end
+c     logic0  logical_column

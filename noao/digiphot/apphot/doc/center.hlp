@@ -1,4 +1,4 @@
-.help center Jan90 noao.digiphot.apphot
+.help center Jul91 noao.digiphot.apphot
 .ih
 NAME
 center -- compute accurate centers for a list of objects
@@ -116,64 +116,86 @@ CURSOR COMMANDS
 The following cursor commands are currently available.
 
 .nf
-	Interactive Centering Keystroke Commands
+	Interactive Centering Commands
 
 ?	Print help for CENTER commands
 :	CENTER colon escape commands (see below)
 v	Verify critical CENTER parameters
-e	Print CENTER error messages
-d	Plot a centered stellar radial profile
-i	Set up CENTER parameters using a stellar radial profile plot
 w	Store the current CENTER parameters in the pset files
-l	Center remainder of the stars in the list, output results
-r	Rewind the coordinate list
-f	Fit center at position of current star (cursor or list)
-spbar	Fit center at position of current star (cursor or list),
-	output results
 q	Exit
 
+d	Plot the radial profile of current star (cursor or list)
+i	Setup CENTER parameters interactively using current star
+	(cursor or list)
+
+spbar	Fit center of current star (cursor or list), and output results
+f	Fit center of current star (cursor or list)
+e	Print CENTER error messages
 
 :m [n]	Move to next [nth] star in the coordinate list
-:n [n]	Fit center of next [nth]  object in the coordinate list,
+:n [n]	Fit center of next [nth]  object in the coordinate list, and
 	output results
+l	Center remainder of the stars in the list, and output results
+r	Rewind the coordinate list
+
 
 Centering parameters are listed or set with the following commands.
 
-:image		[string]	Image name
-:coords		[string]	Coordinate file name
-:output		[string]	Output file name
+# commands
+
 :show		[data/center]	List the parameters
+
+# file names
+
+:image		[string]	Image name
+:coords		[string]	Cordinate file name
+:output 	[string]	Output file name
+
+# data dependent parameters
 
 :scale		[value]		Image scale (units per pixel)
 :fwhmpsf	[value]		Full width half maximum of PSF (scale units)
 :emission	[y/n]		Emission feature (y), absorption (n)
-:noise 		[string]	Noise model (constant|poisson)
+:sigma		[value]		Standard deviation of sky (counts)
+:datamin	[value]		Minimum good data value (counts)
+:datamax	[value]		Maximum good data value (counts)
 :threshold	[value]		Detection intensity threshold (counts)
 :cthreshold	[value]		Centering intensity threshold (counts)
-:sigma		[value]		Standard deviation of sky (counts)
-:gain		[string]	Gain image header keyword
-:epadu		[value]		Gain (electrons per adu)
-:ccdread	[string]	Readout noise image header keyword
-:readnoise	[value]		Readout noise (electrons)
-:exposure	[string]	Exposure time image header keyword
-:itime		[value]		Exposure time (time units)
-:airmass	[string]	Airmass image header keyword
-:xairmass	[value]		Airmass value (number)
-:filter		[string]	Filter image header keyword
-:ifilter	[string]	Filter id string
-:datamin	[value]		Minimum good pixel value (counts)
-:datamax	[value]		Maximum good pixel value (counts)
 
-:calgorithm	[string]	Centering algorithm (centroid|
-				gauss|none|ofilt)
+# noise parameters
+
+:noise 		[string]	Noise model (constant|poisson)
+:gain		[string]	Gain image header keyword
+:ccdread	[string]	Readout noise image header keyword
+:epadu		[value]		Gain (electrons per adu)
+:readnoise	[value]		Readout noise (electrons)
+
+# observing parameters
+
+:exposure	[string]	Exposure time image header keyword
+:airmass	[string]	Airmass image header keyword
+:filter		[string]	Filter image header keyword
+:obstime	[string]	Time of observation image header keyword
+:itime		[value]		Exposure time (time units)
+:xairmass	[value]		Airmass value (number)
+:ifilter	[string]	Filter id string
+:otime		[string]	Time of observation (time units)
+
+# centering parameters 
+
+:calgorithm	[string]	Centering algorithm
+				(centroid| gauss|none|ofilt)
 :cbox		[value]		Width of centering box (scale units)
 :cmaxiter	[value]		Maximum number of iterations
 :maxshift	[value]		Maximum center shift (scale units)
-:minsnratio	[value]		Minimum signal to noise for centering
+:minsnratio	[value]		Minimum signalto noise for centering
 :clean		[y/n]		Clean subraster before centering
 :rclean		[value]		Cleaning radius (scale units)
 :rclip		[value]		Clipping radius (scale units)
 :kclean		[value]		Clean K-sigma rejection limit (sigma)
+
+# plotting and marking parameters
+
 :mkcenter	[y/n]		Mark computed centers on the display
 :radplot	[y/n]		Plot radial profile of object
 
@@ -247,15 +269,15 @@ If the object centering was error free then the field cier will be zero.
 Non-zero values of cier flag the following error conditions.
 
 .nf
-	0       # No error
-	21      # The centering box is off image
-	22      # The centering box is partially off the image
-	23      # The S/N ratio is low in the centering box
-	24      # There are two few points for a good fit
-	25      # The x or y center fit is singular
-	26      # The x or y center fit did not converge
-	27      # The x or y center shift is greater than maxshift
-	28      # There is bad data in the centering box
+	0        # No error
+	101      # The centering box is off image
+	102      # The centering box is partially off the image
+	103      # The S/N ratio is low in the centering box
+	104      # There are two few points for a good fit
+	105      # The x or y center fit is singular
+	106      # The x or y center fit did not converge
+	107      # The x or y center shift is greater than maxshift
+	108      # There is bad data in the centering box
 .fi
 
 .ih

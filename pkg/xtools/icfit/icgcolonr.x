@@ -6,8 +6,8 @@ include	"icfit.h"
 include	"names.h"
 
 # List of colon commands.
-define	CMDS "|show|sample|naverage|function|order|low_reject|high_reject|\
-	|niterate|grow|errors|vshow|"
+define	CMDS "|show|sample|naverage|function|order|low_reject|high_reject\
+	|niterate|grow|markrej|errors|vshow|xyshow|"
 
 define	SHOW		1	# Show values of parameters
 define	SAMPLE		2	# Set or show sample ranges
@@ -16,11 +16,12 @@ define	FUNCTION	4	# Set or show function type
 define	ORDER		5	# Set or show function order
 define	LOW_REJECT	6	# Set or show lower rejection factor
 define	HIGH_REJECT	7	# Set or show upper rejection factor
-# newline		8
-define	NITERATE	9	# Set or show rejection iterations
-define	GROW		10	# Set or show rejection growing radius
+define	NITERATE	8	# Set or show rejection iterations
+define	GROW		9	# Set or show rejection growing radius
+define	MARKREJ		10	# Mark rejected points
 define	ERRORS		11	# Show errors of fit
 define	VSHOW		12	# Show verbose information
+define	XYSHOW		13	# Show x-y-fit values
 
 # ICG_COLON -- Processes colon commands.  The common flags and newgraph
 # signal changes in fitting parameters or the need to redraw the graph.
@@ -36,11 +37,12 @@ pointer	cv				# CURFIT pointer for error listing
 real	x[npts], y[npts], wts[npts]	# Data arrays for error listing
 int	npts				# Number of data points
 
-char	cmd[SZ_LINE]
+bool	bval
 int	ncmd, ival
 real	rval
+pointer	sp, cmd
 
-int	nscan(), strdic()
+int	nscan(), strdic(), btoi()
 
 string	funcs "|chebyshev|legendre|spline1|spline3|power|"
 
@@ -49,29 +51,32 @@ begin
 	# The first word is the command and it may be minimum match
 	# abbreviated with the list of commands.
 
+	call smark (sp)
+	call salloc (cmd, IC_SZSAMPLE, TY_CHAR)
+
 	call sscan (cmdstr)
-	call gargwrd (cmd, SZ_LINE)
-	ncmd = strdic (cmd, cmd, SZ_LINE, CMDS)
+	call gargwrd (Memc[cmd], IC_SZSAMPLE)
+	ncmd = strdic (Memc[cmd], Memc[cmd], IC_SZSAMPLE, CMDS)
 
 	switch (ncmd) {
 	case SHOW: # :show - Show the values of the fitting parameters.
-	    call gargwrd (cmd, SZ_LINE)
+	    call gargwrd (Memc[cmd], IC_SZSAMPLE)
 	    if (nscan() == 1) {
 		call gdeactivate (gp, AW_CLEAR)
 		call ic_show (ic, "STDOUT", gt)
 		call greactivate (gp, AW_PAUSE)
 	    } else {
-		iferr (call ic_show (ic, cmd, gt))
+		iferr (call ic_show (ic, Memc[cmd], gt))
 		    call erract (EA_WARN)
 	    }
 
 	case SAMPLE: # :sample - List or set the sample points.
-	    call gargstr (cmd, SZ_LINE)
-	    if (cmd[1] == EOS) {
+	    call gargstr (Memc[cmd], IC_SZSAMPLE)
+	    if (Memc[cmd] == EOS) {
 	        call printf ("sample = %s\n")
 		    call pargstr (Memc[IC_SAMPLE(ic)])
 	    } else {
-		call strcpy (cmd, Memc[IC_SAMPLE(ic)], SZ_LINE)
+		call strcpy (Memc[cmd], Memc[IC_SAMPLE(ic)], IC_SZSAMPLE)
 		IC_NEWX(ic) = YES
 	    }
 
@@ -86,14 +91,14 @@ begin
 	    }
 
 	case FUNCTION: # :function - List or set the fitting function.
-	    call gargwrd (cmd, SZ_LINE)
+	    call gargwrd (Memc[cmd], IC_SZSAMPLE)
 	    if (nscan() == 1) {
 		call printf ("function = %s\n")
-		    call ic_gstr (ic, "function", cmd, SZ_LINE)
-		    call pargstr (cmd)
+		    call ic_gstr (ic, "function", Memc[cmd], IC_SZSAMPLE)
+		    call pargstr (Memc[cmd])
 	    } else {
-		if (strdic (cmd, cmd, SZ_LINE, funcs) > 0) {
-		    call ic_pstr (ic, "function", cmd)
+		if (strdic (Memc[cmd], Memc[cmd], IC_SZSAMPLE, funcs) > 0) {
+		    call ic_pstr (ic, "function", Memc[cmd])
 		    IC_NEWFUNCTION(ic) = YES
 		} else
 		    call printf ("Unknown or ambiguous function\n")
@@ -143,8 +148,17 @@ begin
 	    } else
 		IC_GROW(ic) = rval
 
+	case MARKREJ: # :markrej - Mark rejected points
+	    call gargb (bval)
+	    if (nscan() == 1) {
+		call printf ("markrej = %b\n")
+		    call pargi (IC_MARKREJ(ic))
+	    } else {
+		IC_MARKREJ(ic) = btoi (bval)
+	    }
+
 	case ERRORS: # :errors - print errors analysis of fit
-	    call gargwrd (cmd, SZ_LINE)
+	    call gargwrd (Memc[cmd], IC_SZSAMPLE)
 	    if (nscan() == 1) {
 		call gdeactivate (gp, AW_CLEAR)
 		call ic_show (ic, "STDOUT", gt)
@@ -152,22 +166,38 @@ begin
 		call greactivate (gp, AW_PAUSE)
 	    } else {
 		iferr {
-		    call ic_show (ic, cmd, gt)
-		    call ic_errorsr (ic, cmd, cv, x, y, wts, npts)
+		    call ic_show (ic, Memc[cmd], gt)
+		    call ic_errorsr (ic, Memc[cmd], cv, x, y, wts, npts)
 		} then
 		    call erract (EA_WARN)
 	    }
 	case VSHOW: # :vshow - Verbose list of the fitting parameters. 
-	    call gargwrd (cmd, SZ_LINE)
+	    call gargwrd (Memc[cmd], IC_SZSAMPLE)
 	    if (nscan() == 1) {
 		call gdeactivate (gp, AW_CLEAR)
 		call ic_vshowr (ic, "STDOUT", cv, x, y, wts, npts, gt)
 		call greactivate (gp, AW_PAUSE)
 	    } else {
 		iferr {
-		    call ic_vshowr (ic, cmd, cv, x, y, wts, npts, gt)
+		    call ic_vshowr (ic, Memc[cmd], cv, x, y, wts, npts, gt)
 		} then 
 		    call erract (EA_WARN)
 	    }
+	case XYSHOW: # :xyshow - Show data points and fit.
+	    call gargwrd (Memc[cmd], IC_SZSAMPLE)
+	    if (nscan() == 1) {
+		call gdeactivate (gp, AW_CLEAR)
+		call ic_xyshowr ("STDOUT", cv, x, y, npts)
+		call greactivate (gp, AW_PAUSE)
+	    } else {
+		iferr {
+		    call ic_xyshowr (Memc[cmd], cv, x, y, npts)
+		} then 
+		    call erract (EA_WARN)
+	    }
+	default: # Unrecognized command.
+	    call printf ("Unrecognized command or abiguous abbreviation\007")
 	}
+
+	call sfree (sp)
 end

@@ -1,5 +1,5 @@
-define	MAXERR1		100
-define	MAXERR2		200
+define	MAXERR1		500
+define	MAXERR2		1000
 
 
 # APSETS -- Procedure to set an apphot string parameter.

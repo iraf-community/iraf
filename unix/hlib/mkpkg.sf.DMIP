@@ -1,0 +1,43 @@
+# Mkpkg special file list for the DECstation/Ultrix MIPS Fortran compiler.
+
+# All files needing special processing for the local host operating system,
+# e.g., to permit host dependent optimization or to work around compiler bugs,
+# should be listed here.
+
+$special "sys$osb/":		aclrb.c		as$aclrb.c
+				bytmov.c	as$bytmov.c
+				ieeer.x		as$ieeer.x
+				ieeed.x		as$ieeed.x
+				;
+
+$special "sys$vops/ak/":	aclrc.x		as$aclrc.c
+				aclrs.x		as$aclrs.c
+				aclri.x		as$aclri.c
+				aclrl.x		as$aclrl.c
+				aclrr.x		as$aclrr.c
+				aclrd.x		as$aclrd.c
+				;
+
+$special "sys$vops/lz/":	amovc.x		as$amovc.c
+				amovs.x		as$amovs.c
+				amovi.x		as$amovi.c
+				amovl.x		as$amovl.c
+				amovr.x		as$amovr.c
+				amovd.x		as$amovd.c
+				;
+
+# The following had to be hacked to work around a problem with atan2(y,x),
+# which would result in a floating device by zero SIGFPE for x==0.
+
+$special "pkg$images/tv/wcslab/":
+	wlgrid.x	as$wlgrid.x
+	wlsetup.x	as$wlsetup.x
+	;
+
+# All files needing special processing for the local host operating system,
+# e.g., to permit host dependent optimization or to work around compiler bugs,
+# should be listed here.
+
+$special "pkg$cl/":
+	ytab.c		&  "$xc -c -/G -//0 -/Olimit -//1500 &"
+	;

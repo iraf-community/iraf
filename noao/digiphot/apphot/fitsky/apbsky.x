@@ -47,7 +47,8 @@ begin
 	    call gargr (wy)
 	    if (nscan () != 2) {
 		if (stdin == YES) {
-	    	    call printf ("Type object x and y coordinates (^D or ^Z to end): ")
+	    	    call printf (
+		        "Type object x and y coordinates (^D or ^Z to end): ")
 	    	    call flush (STDOUT)
 		} 
 		next

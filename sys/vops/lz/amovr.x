@@ -7,7 +7,7 @@
 procedure amovr (a, b, npix)
 
 real	a[ARB], b[ARB]
-int	npix, i, a_first, a_last, b_first
+int	npix, i, a_first, b_first
 
 begin
 	call zlocva (a, a_first)
@@ -16,8 +16,7 @@ begin
 	if (a_first == b_first)
 	    return
 
-	call zlocva (a[ARB], a_last)
-	if (b_first > a_first && b_first <= a_last) {
+	if (a_first < b_first) {
 	    do i = npix, 1, -1
 		b[i] = a[i]
 	} else {

@@ -16,11 +16,12 @@ bool	verbose					# verbose flag
 
 int	obsdate
 int	x1, y1, subraster, outfd
-int	strsize, one
+int	one
 pointer	table
 pointer	srp, im, hs, sp
 
-int	strlen(), strldxs(), strncmp(), imgeti(), mtopen()
+int	imgeti(), mtopen()
+int	mtfile(), mtneedfileno()
 bool	clgetb()
 pointer	imgs2s(), immap()
 errchk	immap, imgs2s, mtopen
@@ -38,25 +39,18 @@ begin
 	call clgstr ("outputfile", outputfile, SZ_FNAME)
 
 	# See if the outputfile is mag tape, if not, error.
-	if (strncmp (outputfile, "mt", 2) != 0)
+        if (mtfile (outputfile) == NO)
 	    call error (1, "Outputfile should be magnetic tape.")
-
-	# Get the size of the output file name.
-	strsize = strlen (outputfile)
 
 	# If no tape file number is given, then ask whether the tape
 	# is blank or contains data.  If blank then start at [1], else
 	# start at [EOT].
 
-	if (strldxs ("]", outputfile) != strsize) {
-	    if (!clgetb ("new_tape")) {
-		call sprintf (outputfile[strsize+1], SZ_FNAME, "%s")
-		    call pargstr ("[EOT]")
-	    } else {
-		call sprintf (outputfile[strsize+1], SZ_FNAME, "%s")
-		    call pargstr ("[1]")
-	    }
-	}
+	if (mtneedfileno(outputfile) == YES)
+	    if (!clgetb ("new_tape"))
+		call mtfname (outputfile, EOT, outputfile, SZ_FNAME)
+	    else
+		call mtfname (outputfile, 1, outputfile, SZ_FNAME)
 
 	if (verbose) {
 	    call printf ("outputfile name = %s\n")

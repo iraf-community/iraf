@@ -11,6 +11,7 @@ libxtools.a:
 	@ranges		# Range tools "1:10,5:20,30"
 	@gtools		# Graphics tools
 	@icfit		# Interactive curfit package
+	@inlfit		# Interactive non-linear least-squares package
 
 	center1d.x	<math/iminterp.h> <pkg/center1d.h>
 	clgcurfit.x	<math/curfit.h>
@@ -28,12 +29,14 @@ libxtools.a:
 	isdir.x		<ctype.h> <finfo.h>
 	peaks.x	
 	ranges.x	<ctype.h> <mach.h>
+	obsdb.x
 	strdetab.x	
 	strentab.x	
 	xt21imsum.x	<imhdr.h>
 	xtanswer.x	<pkg/xtanswer.h>
 	xtgids.x	<ctotok.h>
 	xtimleneq.x	<imhdr.h>
+	xtimnames.x
 	xtimtgetim.x	
 	xtlogfiles.x
 	xtmksection.x	<imhdr.h>

@@ -13,9 +13,10 @@ char	root[ARB]		# root filename
 char	extn[ARB]		# extension
 int	status
 
+int	junk
 pointer	sp, fname, pixfile
+int	access(), protect()
 pointer	im, immapz()
-int	access()
 
 begin
 	call smark (sp)
@@ -40,7 +41,7 @@ begin
 	    call imunmap (im)
 
 	    # Do not complain if the file is not protected.
-	    iferr (call protect (Memc[fname], REMOVE_PROTECTION))
+	    iferr (junk = protect (Memc[fname], REMOVE_PROTECTION))
 		;
 	    iferr (call delete (Memc[fname]))
 		call erract (EA_WARN)

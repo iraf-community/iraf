@@ -33,20 +33,20 @@ before being printed.
 
 # DTOC3 --- Convert double precision real to string.
 
-int procedure dtoc3 (val, out, maxch, decpl, fmt, width)
+int procedure dtoc3 (val, out, maxch, decpl, a_fmt, width)
 
 double	val			# value to be encoded
 char	out[ARB]		# output string
 int	maxch			# max chars out
 int	decpl			# precision
-int	fmt			# type of encoding ('f', 'e', etc.)
+int	a_fmt			# type of encoding ('f', 'e', etc.)
 int	width			# field width
 
 double	v
-int	i, w, d, e, j, len, no_digits, max_size, e_size, f_size
-int	itoc(), gstrcpy()
-bool	neg, small, exp_format, squeeze
 char	digits[MAX_DIGITS]
+bool	neg, small, exp_format, squeeze
+int	i, w, d, e, j, len, no_digits, max_size, e_size, f_size, fmt
+int	itoc(), gstrcpy()
 
 begin
 	# Set flags indicating whether the number is greater or less that zero,
@@ -55,8 +55,9 @@ begin
 	v = abs (val)
 	w = abs (width)
 
-	if (IS_UPPER(fmt))
-	    fmt = TO_LOWER(fmt)
+	fmt = a_fmt
+	if (IS_UPPER(a_fmt))
+	    fmt = TO_LOWER(a_fmt)
 	squeeze = (fmt == FMT_GENERAL)
 	neg = (val < 0.0)
 	small = (v < 0.1)
@@ -158,12 +159,30 @@ begin
 	    return (w)
 	}
 
-	# Extract the first <no_digits> digits
+	# Extract the first <no_digits> digits.  At the start V is normalized
+	# to a value less than 1.0.  The algorithm is to multiply by ten and
+	# take the integer part to get each digit.  
+
 	do i = 1, no_digits {
 	    v = v * 10.0d0
-	    j = v				# truncate to integer
+	    j = int (v + EPSILOND)		# truncate to integer
 	    v = v - j				# lop off the integral part
-	    digits[i] = TO_DIGIT (j)
+
+	    # Make sure the next iteration will produce a decimal J in the
+	    # range 1-9.  On some systems, due to precision problems J=int(V)
+	    # can be off by one compared to V-J and this will result in a J
+	    # of 10 in the next iteration.  The expression below attempts to
+	    # look ahead for J>=10 and adjusts the J for the current iteration
+	    # up by one if this will occur.
+
+	    if (int (v * 10.0d0 + EPSILOND) >= 10) {
+		j = j + 1
+		v = v - 1
+		if (v < 0)
+		    v = 0
+	    }
+
+	    digits[i] = TO_DIGIT(j)
 	}
 
 	# Take digit string and exponent and arrange into desired format.

@@ -1,0 +1,89 @@
+.help sapertures Mar92 noao.onedspec
+.ih
+NAME
+sapertures -- Set or change aperture header information
+.ih
+USAGE
+sapertures input
+.ih
+PARAMETERS
+.ls input
+List of spectra to be modified.
+.le
+.ls apertures = ""
+List of apertures to be modified.  The null list
+selects all apertures.  A list consists of comma separated
+numbers and ranges of numbers.  A range is specified by a hyphen.  An
+optional step size may be given by using the 'x' followed by a number.
+See \fBxtools.ranges\fR for more information.
+.le
+.ls apidtable = ""
+Aperture identification table.  This file consists of lines having
+an aperture number, a beam number, and an (optional) aperture title or label.
+This file is the same as that used by the \fBapextract\fR package.
+The beam numbers and aperture titles for the specified apertures are
+used to update the image headers.  
+.le
+.ls verbose = no
+Print a record of each aperture modified?  Only those apertures 
+in which the beam number of label change are printed.
+.le
+.ih
+DESCRIPTION
+This task sets or changes the beam number and aperture titles for
+the selected apertures to that given in the specified aperture
+identification table.  Normally, the aperture information is set
+during extraction by the \fBapextract\fR package.  However, there
+are times when it is desireable to change this information in the
+extracted one dimensional spectra.  Since the aperture and beamn
+number information is stored in world coordinate attributes
+it is difficult to change this information using the general image
+header editor \fBhedit\fR.  This task provides a easy way to modify
+the header information.
+
+The content of the aperture identification table is the same as that
+used by the \fBapextract\fR package.  It consists of lines containing
+the aperture number, the beam number, and an optional aperture
+title or label.
+.ih
+EXAMPLES
+1.  To add titles to a multifiber extraction and change one of the
+beam numbers:
+
+.nf
+	cl> type m33aps
+	36 2 Henear
+	37 0 Sky
+	38 1 New title
+	39 1 Another title
+	41 0 Sky
+	42 1 Yet another title
+	43 1 YAT
+	44 1 Was a sky but actually has an object
+	45 1 Wow
+	46 1 Important new discovery
+	47 0 Sky
+	48 2 Henear
+	cl> saper m33.ms apid=m33aps v+
+	demoobj1.ms:
+	  Aperture 37:  --> Sky
+	  Aperture 38:  --> New title
+	  Aperture 39:  --> Another title
+	  Aperture 41:  --> Sky
+	  Aperture 42:  --> Yet another title
+	  Aperture 43:  --> YAT
+	  Aperture 44: beam 0 --> beam 1
+	  Aperture 44:  --> Was a sky but actually has an object
+	  Aperture 45:  --> Wow
+	  Aperture 46:  --> Important new discovery
+	  Aperture 47:  --> Sky
+.fi
+.ih
+REVISIONS
+.ls SAPERTURES V2.10
+This task is new.
+.le
+.ih
+SEE ALSO
+ranges, package
+.endhelp

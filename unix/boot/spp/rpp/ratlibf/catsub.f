@@ -1,28 +1,28 @@
-      SUBROUTINE CATSUB (LIN, FROM, TO, SUB, NEW, K, MAXNEW)
-      INTEGER LIN(128)
-      INTEGER FROM(10), TO(10)
-      INTEGER MAXNEW
-      INTEGER SUB(MAXNEW), NEW(128)
-      INTEGER K
-      INTEGER I, J, JUNK, RI
-      INTEGER ADDSET
-      I = 1
-23000 IF (.NOT.(SUB (I) .NE. -2))GOTO 23002
-      IF (.NOT.(SUB (I) .EQ. -3))GOTO 23003
-      I = I + 1
-      RI = SUB (I) + 1
-      J = FROM (RI)
-23005 IF (.NOT.(J .LT. TO (RI)))GOTO 23007
-      JUNK = ADDSET (LIN (J), NEW, K, MAXNEW)
-23006 J = J + 1
-      GOTO 23005
-23007 CONTINUE
-      GOTO 23004
-23003 CONTINUE
-      JUNK = ADDSET (SUB (I), NEW, K, MAXNEW)
-23004 CONTINUE
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      RETURN
-      END
+      subroutine catsub (lin, from, to, sub, new, k, maxnew)
+      integer lin(128)
+      integer from(10), to(10)
+      integer maxnew
+      integer sub(maxnew), new(128)
+      integer k
+      integer i, j, junk, ri
+      integer addset
+      i = 1
+23000 if (.not.(sub (i) .ne. -2))goto 23002
+      if (.not.(sub (i) .eq. -3))goto 23003
+      i = i + 1
+      ri = sub (i) + 1
+      j = from (ri)
+23005 if (.not.(j .lt. to (ri)))goto 23007
+      junk = addset (lin (j), new, k, maxnew)
+23006 j = j + 1
+      goto 23005
+23007 continue
+      goto 23004
+23003 continue
+      junk = addset (sub (i), new, k, maxnew)
+23004 continue
+23001 i = i + 1
+      goto 23000
+23002 continue
+      return
+      end

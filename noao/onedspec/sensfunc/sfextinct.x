@@ -161,7 +161,7 @@ begin
 	# Determine significance of the fit.
 	call sf_fit (stds, nstds, cv, function, order,
 	    GP_WSTART(gp), GP_WEND(gp))
-	call sf_rms (stds, nstds, cv, rms1, npts)
+	call sf_rms (stds, nstds, rms1, npts)
 	do i = 1, nstds - 2 {
 	    if (STD_FLAG(stds[i]) != SF_INCLUDE)
 		next
@@ -175,10 +175,10 @@ begin
 	}
 	call sf_fit (stds, nstds, cv, function, order,
 	    GP_WSTART(gp), GP_WEND(gp))
-	call sf_rms (stds, nstds, cv, rms, npts)
+	call sf_rms (stds, nstds, rms, npts)
 	do i = 1, SF_NGRAPHS
-	    if (GP_IMIO(gp,i) != NULL)
-		call imunmap (GP_IMIO(gp,i))
+	    if (GP_SHDR(gp,i) != NULL)
+		call shdr_close (GP_SHDR(gp,i))
 
 	r2 = 1 - rms ** 2 / rms1 ** 2
 	sig = r2 * (nwaves - 2) / max (0.01, 1. - r2)

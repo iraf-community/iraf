@@ -80,7 +80,7 @@ begin
 		    STD_FLAG(Memi[stds+i-1]) = SF_EXCLUDE
 	    call sf_sensfunc (gp, Memi[stds], nstds, Memr[wextn], Memr[extn],
 		nextn, Memc[sensitivity], Memc[logfile], Memi[ecvs+j-1],
-		Memc[function], order, interactive)
+		Memc[function], order, ignoreaps, interactive)
 	}
 	call sf_gfree (gp)
 

@@ -1,0 +1,196 @@
+.help peak Aug91 noao.digiphot.daophot
+.ih
+NAME
+peak -- fit the PSF to single stars
+.ih
+USAGE
+peak image photfile psfimage peakfile
+.ih
+PARAMETERS
+.ls image
+The list of images containing the stars to be fit.
+.le
+.ls photfile
+The list of input files, or the directory, containing initial estimates of
+the positions and magnitudes of the stars to be fit.
+If photfile is "default", "dir$default", or a directory specification,
+then PEAK will look for a file with the name image.mag.?, 
+where ? is the highest existing version number. 
+Otherwise \fIphotfile\fR must specify one photometry file for each input
+image in \fIimage\fR.
+\fIPhotfile\fR is usually
+the output of the DAOPHOT PHOT task, but may also be the output of PEAK
+itself, or the DAOPHOT package GROUP, NSTAR,  ALLSTAR or PSF tasks.
+\fIPhotfile\fR may be an APPHOT/DAOPHOT text database or an STSDAS table.
+.le
+.ls psfimage
+The list of images, or the directory, containing the PSF computed by
+the DAOPHOT PSF task.
+If psfimage is "default", "dir$default", or a directory specification,
+then PEAK will look for an image with the name image.psf.?, where
+? is the highest existing version number. Otherwise \fIpsfimage\fR
+must specify one PSF image for each image in \fIimage\fR.
+.le
+.ls peakfile
+The list of output photometry files.
+If peakfile is "default", "dir$default", or a directory specification,
+then PEAK will write an output file with the name image.pk.?
+where ? is the next available version number. Otherwise \fIpeakfile\fR
+must specify one output file for each image in \fIimage\fR.
+\fIPeakfile\fR is a text database if the DAOPHOT package parameter
+\fItext\fR is "yes", an STSDAS table database if it is "no".
+.le
+.ls datapars = ""
+The name of the file containing the DAOPHOT data dependent parameters.
+If \fIdatapars\fR is null ("") then the default parameter set in the user's
+uparm directory is used.
+.le
+.ls daopars = ""
+The name of the file containing the DAPHOT fitting parameters.
+If \fIdaopars\fR is null ("") then the default parameter set in the user's
+uparm directory is used.
+.le
+.ls verbose = no
+Print messages about the progress of the task?
+.le
+.ls verify = yes
+Verify critical PEAK task parameters?
+.le
+.ls update = no
+Update critical PEAK task parameters if \fIverify\fR = "yes"?
+.le
+.ih
+DESCRIPTION
+PEAK computes x and y centers and magnitudes for all the stars in
+\fIphotfile\fR by fitting the PSF in \fIpsfimage\fR to single stars in
+\fIimage\fR. PEAK reads initial estimates of the centers and magnitudes
+along with the sky values from the photometry file \fIphotfile\fR.
+\fIPhotfile\fR is usually the output of the DAOPHOT PHOT task but
+may also be the output of PEAK itself, NSTAR, ALLSTAR, GROUP or
+PSF. The computed centers and magnitudes are written to \fIpeakfile\fR
+along with the sky values, the number of iterations it took to fit the
+star, the goodness of fit statistic chi, and the image sharpness statistic
+sharp.
+\fIPeakfile\fR is a text database if the DAOPHOT package parameter \fItext\fR
+is "yes", an STSDAS table database if it is "no".
+
+Only pixels within the good data range delimited by the DATAPARS task
+parameters \fIdatamin\fR and \fIdatamax\fR are included in the fit.
+Most users set \fIdatamin\fR and \fIdatamax\fR  so as to 
+exclude pixels outside the linearity
+regime of the detector. By default all the data is fit.
+Users are advised to determine the values of these parameters
+for their detector and set the values in DATAPARS before beginning any DAOPHOT
+reductions.
+
+Only pixels within the fitting radius set by the DAOPARS task
+parameter \fIfitrad\fR divided by the DATAPARS parameter \fIscale\fR
+are included in the fit. Since the non-linear least-squares
+fits determine three unknowns, the x and y position of the star's centroid
+and its brightness, the value of \fIfitrad\fR must be sufficiently
+large to include at least three pixels in the fit.
+To accelerate the convergence of the non-linear least-squares fitting
+algorithm, pixels within \fIfitrad\fR are assigned weights which
+are  inversely proportional to the radial distance of the pixel from the x and
+y centroid of the star, falling from a maximum at the centroid
+to zero at the fitting radius. \fIFitrad\fR must be sufficiently large
+to include at least three pixels with non-zero weights in the fit.
+Values of \fIfitrad\fR close to the full-width at half-maxima of the
+PSF are recommended.
+
+PEAK performs a weighted fit to the PSF. The weight of each pixel
+is computed by combining the radial weighting function described above
+with weights derived from the expected random errors computed using the
+values of the DATAPARS parameters \fIreadnoise\fR and \fIepadu\fR
+specified by the user. Both to obtain optimal fits, and
+because PEAK employs a conservative formula,
+dependent on \fIreadnoise\fR and \fIepadu\fR,
+for reducing the weights
+of deviant pixels which do not approach the model as the fit proceeds,
+users are strongly advised to determine the values of these parameters
+accurately, 
+and to enter these values in DATAPARS before beginning any DAOPHOT
+reductions.
+
+For each star to be fit, PEAK extracts a subraster
+from \fIimage\fR which is N by N pixels square
+where N is approximately 2 * \fIpsfrad\fR / \fIscale\fR  + 1 pixels wide.
+\fIPsfrad\fR is the PSF radius specified in the DAOPARS task and \fIscale\fR
+is the scale factor specified in the DATAPARS task. \fIPsfrad\fR may
+be less than or equal to, but can never exceed the value of the image header
+parameter "PSFRAD" in \fIpsfimage\fR.
+\fIPsfrad\fR should be set to a value several pixels larger
+than \fIfitrad\fR in order to permit the x and y centroids to wander during the
+fitting process.
+
+Along with the computed x and y centers and magnitudes, PEAK outputs
+the number of times the PSF fit had to be iterated to reach convergence
+for each star. The
+minimum number of iterations is three. The maximum
+number of iteration permitted is specified by the 
+\fImaxiter\fR parameter in the DAOPARS task.
+Obviously the results for stars which
+have reached the maximum iteration count should be viewed with 
+suspicion. However since the convergenge criteria are quite strict,
+(the computed magnitude must change  by less than .001 magnitudes or
+0.05 sigma whichever is larger and the x and y centroids must change
+by less than 0.01 pixels from one iteration to the next), even
+these stars may be reasonably well measured.
+
+PEAK computes a goodness of fit statistic chi which is essentially the
+ratio of the observed pixel-to-pixel scatter in the fit residuals
+to the expected scatter. Since the expected scatter is dependent
+on the DATAPARS task parameters \fIreadnoise\fR and \fIepadu\fR,
+it is important for these values to be set correctly.
+A plot of chi versus magnitude should scatter around
+unity with little or no trend in chi with magnitude, except at the
+bright end where saturation effects may be present.
+
+Finally PEAK computes the statistic sharp which estimates the intrinsic
+angular size of the measured object outside the atmosphere.
+Sharp is roughly defined as the difference between the square of the
+width of the object and the square of the width of PSF.
+Sharp has values close to zero for single stars, large positive values
+for blended doubles and partially resolved galaxies, and large
+negative values for cosmic rays and blemishes.
+
+Because PEAK cannot fit stars in crowded fields with overlapped images
+like NSTAR task does, and for sparsely populated frames aperture photometry
+produced by PHOT is often just
+as good and faster to compute, PEAK has few unique functions.
+PEAK is often useful however for fitting and removing single stars in images
+where the stars are interfering with the real object of interest
+such as a galaxy. In that case the PEAK results can be input to SUBSTAR
+which will then remove the interfering stars. Another potential use of PEAK
+is the removal of stars from sparsely populated sky flats in preparation
+for smoothing.
+
+.ih
+EXAMPLES
+
+1. Fit the PSF to a list of single stars which are interfering with the
+image of the galaxy M87. After the fit subtract the fitted stars from
+the image.
+
+.nf
+    da> peak m87 m87.mag.1 m87.psf.1 default verb+ veri+
+    da> substar m87 m87.pk.1 m87.psf.1 default veri-
+.fi
+
+2. Run peak exactly as in example 1 but submit the task to the background
+saving all the verbose output in a file called peak.out. Remember to turn
+off the verify switch.
+
+.nf
+    da> peak m87 m87.mag.1 m87.psf.1 default verb+ veri- > peak.out & 
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+.ih
+SEE ALSO
+datapars,daopars,nstar,allstar
+.endhelp

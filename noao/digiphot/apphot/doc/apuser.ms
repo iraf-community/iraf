@@ -8,6 +8,7 @@ Lindsey Elspeth Davis
 .AI
 
 .K2 "" "" "*"
+Revised May 1989
 
 .AB
 .PP
@@ -28,8 +29,8 @@ and how to selectively examine the results. Detailed descriptions of the
 algorithms can be found in the document \fISpecifications for the
 APPHOT Package\fR by the author.
 .PP
-This document applies to APPHOT under IRAF version 2.7 and later. APPHOT
-can be run under IRAF versions 2.5 and 2.6  with only minor changes in
+This document applies to APPHOT under IRAF version 2.8.  APPHOT
+can be run under IRAF versions 2.5, 2.6 and 2.7  with only minor changes in
 the task setup. These differences are documented
 where appropriate in the text.
 .AE
@@ -71,10 +72,8 @@ modifying APPHOT coordinate lists files are described in section 6.
 Sections 7 and 8 describe how to run the APPHOT tasks interactively without
 and with a coordinate list respectively. Batch mode reductions in APPHOT are
 described in section 9.  Section 10 describes the format of the APPHOT output
-catalogue and plot files. Sections 12 lists various APPHOT recipes for reducing
+catalogue and plot files. Section 12 lists various APPHOT recipes for reducing
 common types of astronomical data with APPHOT.
-Copies of the help pages for all the
-tasks are included at the end of this document.
 
 .NH
 Data Preparation and Requirements
@@ -100,7 +99,7 @@ produced by divide by zero, and floating point underflows and overflows.
 Floating point operations involving such numbers may crash
 with arithmetic exception errors. For efficiency and portability reasons
 the APPHOT package and most IRAF routines do not test for these numbers.
-The \fBimreplace\fR task in the PROTO  package can be used to replace extreme
+The \fBimreplace\fR and \fBimedit\fP tasks in the PROTO  package can be used to replace extreme
 valued pixels.  More general system facilities for handling bad pixels
 inside IRAF are planned for the near future.
 .PP
@@ -120,7 +119,7 @@ commands will enter the gain, readout noise and exposure time information
 into the headers of a list of images.
 
 .nf
-	\fLcl> hedit *.imh gain 14.0 add+ ver-
+	\f(CWcl> hedit *.imh gain 14.0 add+ ver-
 	cl> hedit *.imh readout 20.0 add+ ver-
 	cl> hedit *.imh exptime add+ ver+\fR
 .fi
@@ -132,7 +131,7 @@ which small apertures which minimize the effects of crowding and sky noise in
 the aperture are used. The wings of the object will almost certainly extend
 beyond the aperture and good results will only be obtained if objects
 are consistently well centered and the shape and diameter of an object is
-constant thoughout the object and invariant to magnitude.
+constant throughout the object and invariant to magnitude.
 .PP
 The centering routines built into the APPHOT package  assume that
 the images are close to circularly symmetric over the region to be used
@@ -160,7 +159,7 @@ In order to distinguish one type of task from another, APPHOT users should
 set the cl parameter \fBshowtype\fR to yes as shown below.
 
 .nf
-	\fLcl> cl.showtype=yes\fR
+	\f(CWcl> cl.showtype=yes\fR
 .fi
 
 The cl command \fB?\fR or \fB?\fR \fIpackage\fR identifies script
@@ -169,7 +168,6 @@ No trailing characters are added to the compiled task names. Pset tasks are
 important to the APPHOT package and will be discussed further in
 section 5.
 
-.NH
 .NH 2
 Other IRAF Packages
 .PP
@@ -188,8 +186,8 @@ metacode files produced by the APPHOT tasks.
 .PP
 Various useful tasks for manipulating and displaying the data produced by
 APPHOT can be found in the PROTO package under the NOAO package. In
-particular the user should be aware of the \fBfields\fR and \fBmkhistogram\fR
-tasks.
+particular the user should be aware of the \fBfields\fR, \fBmkhistogram\fR
+and \fBtvmark\fP tasks.
 
 .NH 2
 The Image Cursor and Display Device
@@ -201,7 +199,7 @@ device defined by the environment variable \fBstdimage\fR. To check the
 value of the default display device, type the following command.
 
 .nf
-	\fLcl> show stdimage
+	\f(CWcl> show stdimage
 	imt512\fR
 .fi
 
@@ -216,25 +214,30 @@ the hardware cursor from this device.
 In response to the user command
 
 .nf
-	\fLcl> =imcur
+	\f(CWcl> =imcur
 	or
 	cl> show imcur\fR
 .fi
 
 the cursor would come up on the image display ready to accept a
-keystroke command.
+keystroke command.  At this point the user should check that the display
+is reading the correct image coordinates by moving the image cursor to
+the lower left hand corner of the display image and tapping any key.
+The coordinates should read x,y = (1,1) if the whole image was
+displayed.
+.PP
 Cursor readback is currently implemented under IRAF version 2.7 for the
 SUN workstations and the IIS model 70. Users with older versions of IRAF
 or other devices cannot run APPHOT tasks directly from the image display
 device and must redirect the image cursor.
 Two choices are available.
-.IP 1
+.IP [1]
 The image cursor can be directed to accept commands from
 the standard input. This is the default setup under IRAF version 2.6.
 This setup can be checked by typing the following command.
 
 .nf
-	\fLcl> show stdimcur
+	\f(CWcl> show stdimcur
 	text\fR
 .fi
 
@@ -242,53 +245,61 @@ If the value of \fBstdimcur\fR is not "text" the user can set this value by
 typing the following.
 
 .nf
-	\fLcl> set stdimcur = text\fR
+	\f(CWcl> set stdimcur = text\fR
 .fi
 
 Each time the cursor is to be read the user will be prompted for image
 cursor mode text input. The form and syntax of this command are
 described in detail in section 7.3.
-.IP 2
+.IP [2]
 Alternatively a contour plot of the image can be used in place of the
 image display and APPHOT tasks can be directed to read the graphics cursor.
-To direct the image cursor to the graphics device the user types.
+To direct the image cursor to the graphics device the user types
 
 .nf
-	\fLcl> set stdimcur = stdgraph\fR
+	\f(CWcl> set stdimcur = stdgraph\fR
 .fi
 
 This usage permits interactive use of the APPHOT package for users with graphics
 terminals but no image display. This setup is most suitable for terminals
 which permit the text and graphics planes to be displayed simultaneously.
+.RS
+.LP
+It is currently the responsibility of the user to ensure that the image
+displayed on the image display is the same as the image operated on by
+the APPHOT tasks.
+.RE
 
+.NH
 Loading the Apphot Package
 .PP
 At this point the user has the local environment set up and is ready to
-load the APPHOT package. Eventually APPHOT will reside in the DIGIPHOT
-package under the NOAO suite of packages. In this situation assuming
+load the APPHOT package.  APPHOT resides in the DIGIPHOT package (IRAF
+version 2.8 and later) under the NOAO suite of packages.
+Assuming
 that the NOAO package is already loaded the user types the following.
 
 .nf
-	\fLcl> digiphot
+	\f(CWcl> digiphot
 	cl> apphot\fR
 .fi
 
-At present APPHOT is an add-on package currently installed under the
+APPHOT can also be an add-on package (IRAF version 2.7 and earlier) 
+installed under the
 LOCAL package. In this case the user types.
 
 .nf
-	\fLcl> local
+	\f(CWcl> local
 	cl> apphot\fR
 .fi
 
 The following menu of tasks is displayed.
 
 .nf
-\fL
-      apselect      datapars@     lintran       polypars@     wphot
-      center        fitpsf        phot          polyphot      
-      centerpars@   fitsky        photpars@     qphot         
-      daofind       fitskypars@   polymark      radprof       
+\f(CW
+  apselect      daofind     fitsky        photpars@   polyphot   wphot
+  center        datapars@   fitskypars@   polymark    qphot    
+  centerpars@   fitpsf      phot          polypars@   radprof
 \fR
 .fi
 
@@ -297,48 +308,53 @@ A quick one line description of each APPHOT task can be obtained by typing
 the following command.
 
 .nf
-	\fLap> help apphot\fR
+	\f(CWap> help apphot\fR
 .fi
 
 The following text appears.
-
+.KS
 .nf
-\fL
-local.apphot:
+\f(CW
+digiphot.apphot:
        apselect - Extract select fields from apphot output files
          center - Compute accurate centers for a list of objects
      centerpars - Edit the centering parameters
         daofind - Find stars in an image using the DAO algorithm
        datapars - Edit the data dependent parameters
          fitpsf - Model the stellar psf with an analytic function
-         fitsky - Compute sky values in a list of annular or circular regions
+         fitsky - Compute sky values in a list of annular or circular
+                  regions
      fitskypars - Edit the sky fitting parameters
-	lintran - Linearly transform a coordinate list
-	  qphot - Measure quick magnitudes for a list of stars
            phot - Measure magnitudes for a list of stars
        photpars - Edit the photometry parameters
        polymark - Create polygon and coordinate lists for polyphot
        polyphot - Measure magnitudes inside a list of polygonal regions
        polypars - Edit the polyphot parameters
+          qphot - Measure quick magnitudes for a list of stars
         radprof - Compute the stellar radial profile of a list of stars
           wphot - Measure magnitudes with weighting
 \fR
 .fi
-
+.KE
 For the remainder of this document
 we will use the principal APPHOT task \fBphot\fR as an example of how to
 setup the parameters in both interactive and batch mode.
 To get detailed help  on the phot task the user types the following.
 
 .nf
-	\fLcl> help phot | lprint\fR
+	\f(CWcl> help phot | lprint\fR
 .fi
 
 The help page(s) for the \fBphot\fR task will appear on the local default
 printer.
 
 .NH
-Setting the APPHOT Phot Task Parameters
+Setting the APPHOT Photometry Task Parameters
+.PP
+The principal APPHOT task PHOT is described in sections 5.1 to 5.6.  The
+quick photometry task QPHOT is described in section 5.7 and the
+polygonal aperture photometry task POLYPHOT is described in section
+5.8.
 .NH 2
 The Task Parameters
 .PP
@@ -349,14 +365,14 @@ and edit the parameter set for the \fBphot\fR task the user types the
 following.
 
 .nf
-	\fLcl> epar phot\fR
+	\f(CWcl> epar phot\fR
 .fi
 
 The parameter set for the \fBphot\fR task will appear on the terminal ready
 for editing as follows.
 
 .nf
-\fL
+\f(CW
                              IRAF
              Image Reduction and Analysis Facility
 
@@ -370,7 +386,7 @@ for editing as follows.
    (photpar=                     ) Photometry parameters
    (coords =                     ) Coordinate list
    skyfile =                       Sky file
-   (output =              default) Results
+   (output =              default) Results file
    (plotfil=                     ) File of plot metacode
    (graphic=             stdgraph) Graphics device
    (display=             stdimage) Display device
@@ -378,6 +394,9 @@ for editing as follows.
    (cursor =                     ) Graphics cursor: [x y wcs] key [cmd]
    (radplot=                   no) Plot the radial profiles
    (interac=                  yes) Mode of use
+   (verify =                  yes) Verify critical parameters in non
+                                   interactive mode
+   (verbose=                   no) Print messages in non interactive mode
    (mode   =                   ql)
 \fR
 .fi
@@ -390,7 +409,7 @@ followed by a carriage return, and finally typing a ^Z to exit the
 Some general points about the task
 parameter sets are summarized below. For more detailed descriptions of each
 parameter see the help pages for each task.
-.IP 1
+.IP [1]
 \fBImage\fR specifies the list of input image(s) containing the 
 stars to be measured. \fBImage\fR may be a list of images, an image
 template or a file containing a list of images.
@@ -398,7 +417,7 @@ For example if we wish to measure stars in three images: m31U, m31B and
 m31V we could specify the \fBimage\fR parameter in the following three ways.
 
 .nf
-\fL
+\f(CW
    image   =       m31B,m31U,m31V  Input image
 	or
    image   =             m31*.imh  Input image
@@ -410,11 +429,11 @@ m31V we could specify the \fBimage\fR parameter in the following three ways.
 "Imlist" is the name of a text file containing the list of images
 one image name per line. The image list file can easily be created with the cl
 package \fBfiles\fR task or the editor.
-.IP 2
+.IP [2]
 Four parameter sets, henceforth psets, \fBdatapars\fR, \fBcenterpars\fR,
 \fBfitskypars\fR and \fBphotpars\fR specify the algorithm parameters.
 They are described in detail in later sections. 
-.IP 3
+.IP [3]
 \fBCoords\fR specifies the name of the coordinate file(s) containing the
 initial positions of the stars to be measured. If \fBcoords\fR = "",
 the current image cursor position is read and used as the initial position.
@@ -430,7 +449,7 @@ For example if we have three coordinate files "m31B.coo", "m31U.coo" and
 parameter in the following three ways.
 
 .nf
-\fL
+\f(CW
    (coords = m31B.coo,m31U.coo,m31V.coo) Coordinate list
 	or
    (coords =             m31*.coo) Coordinate list
@@ -441,7 +460,7 @@ parameter in the following three ways.
 
 "Coordlist" is the name of a text file containing the names of the coordinate
 files in the desired order one per line.
-.IP 4
+.IP [4]
 \fBOutput\fR specifies the name of the results file(s). If \fBoutput\fR =
 "default" then a single output file is created for
 each input image and the root of the output file name is the name of the
@@ -453,7 +472,7 @@ must be either one or equal to the number of input images. For example the
 user could set \fBoutput\fR to either
 
 .nf
-\fL
+\f(CW
    (output =              m31.out) Results
    or
    (output = m31b.out,m31u.out,m31v.out) Results
@@ -461,7 +480,7 @@ user could set \fBoutput\fR to either
 .fi
 
 If the user sets \fBoutput\fR = "" then no output file is written.
-.IP 5
+.IP [5]
 The parameters \fBgraphics\fR and \fBdisplay\fR specify the graphics and
 image display devices. In IRAF version 2.6 and later the APPHOT tasks
 which reference these parameters will in interactive mode issue a warning
@@ -470,7 +489,7 @@ and continue execution. In IRAF version 2.5 the \fBdisplay\fR parameter must
 be set to "stdgraph" as listed below
 
 .nf
-\fL
+\f(CW
    (display=             stdgraph) Display device
 \fR
 .fi
@@ -478,7 +497,7 @@ be set to "stdgraph" as listed below
 or the following system error will be generated.
 
 .nf
-\fL
+\f(CW
     "cannot execute connected subprocess x_stdimage.e"
 \fR
 .fi
@@ -488,11 +507,10 @@ profile plots. The \fBgraphics\fR specifies which graphics device these plots
 will be written to. Similarly most IRAF tasks permit the user to optionally
 mark the star positions, apertures and sky annuli on the display device.
 The parameter \fBdisplay\fR specifies which image display device this
-information will be written to. Currently does not support an image display
+information will be written to. Currently IRAF does not support an image display
 kernel so the display marking features of APPHOT are not available unless
 the user chooses to run APPHOT interactively from a contour plot.
-
-.IP 6
+.IP [6]
 If \fBplotfile\fR is not equal to "", then for each star written to
 \fBoutput\fR
 a radial profile plot is written to the plot metacode file \fBplotfile\fR.
@@ -504,12 +522,19 @@ to \fBplotfile\fI can significantly slow the execution of \fBphot\fR.
 The variable \fBradplots\fR enables radial profile plotting in interactive mode.
 For each star measured a radial profile plot displaying the answers is
 plotted on the screen.
-.IP 7
+.IP [7]
 The \fBinteractive\fR parameter switches the task between interactive
 and batch mode.
 In interactive mode plots and text are written to the terminal as well as the
 output file and the user can show and set the parameters. In batch mode
 \fBphot\fR executes silently.
+.IP [8]
+The \fBverify\fP parameter allows the user to verify the critical task
+parameters in non interactive mode.  It is normally set to yes but
+should be turned off when submitting jobs to background.
+.IP [9]
+The \fBverbose\fP switch permits the printing of results to the standard
+output in non interactive mode.  It is normally turned off.
 
 .NH 2
 APPHOT Psets
@@ -534,9 +559,9 @@ files in the uparm directory.  For example to edit the
 \fBdatapars\fR parameter set, the user types either
 
 .nf
-	\fLcl> epar datapars\fR
+	\f(CWcl> epar datapars\fR
 	or
-	\fLcl> datapars\fR
+	\f(CWcl> datapars\fR
 .fi
 
 and edits the file as usual. All the top level tasks which reference this
@@ -547,7 +572,7 @@ Alternatively the user can edit the \fBphot\fR
 task and its psets all at once as follows using \fBepar\fR.
 
 .nf
-	\fLcl> epar phot\fR
+	\f(CWcl> epar phot\fR
 .fi
 
 Move the cursor to the \fBdatapars\fR parameter line and type \fB:e\fR.
@@ -562,25 +587,25 @@ in the usual manner.
 Sometimes it is desirable to store a given pset along with the data.
 This provides a facility for keeping many different copies of say the
 \fBdatapars\fR pset with the data.
-The example below shows how write a  pset out to a file in same directory
+The example below shows how to write a pset out to a file in the same directory
 as the data. The user types
 
 .nf
-	\fLcl> epar phot\fR
+	\f(CWcl> epar phot\fR
 .fi
 
-as before, enters the datapars menu with \fL:e\fR and edits the parameters.
+as before, enters the datapars menu with \f(CW:e\fR and edits the parameters.
 The command
 
 .nf
-	\fL:w data1.par\fR
+	\f(CW:w data1.par\fR
 .fi
 
 writes the parameter set to a file called "data1.par" and a \fB:q\fR
 returns to the main task menu.
 A file called "data1.par" containing the new \fBdatapars\fR parameters
 will be written in the current directory. At this point the user is in the
-\fBphot\fR parameter set at the line opposite \fBdatapars\fR and.
+\fBphot\fR parameter set at the line opposite \fBdatapars\fR and
 enters "data1.par" on the line opposite this parameter.
 The next time \fBphot\fR is run the parameters will
 be read from "data1.par" not from the pset in the uparm directory.
@@ -590,7 +615,7 @@ as in for example data taken on separate nights.
 .NH 2
 Datapars
 .PP
-All the data dependent parameter sets have been gathered together in one
+All the data dependent parameters have been gathered together in one
 pset \fBdatapars\fR. The idea behind this organization is to facilitate
 setting up the algorithm
 psets for data taken under different conditions. For example the
@@ -598,41 +623,45 @@ user may have determined the optimal centering box size, sky annulus radius
 and width and aperture radii in terms of the current \fBfwhmpsf\fR and the
 rejection criteria in terms of the current background standard deviation
 \fBsigma\fR.  In order to use the same setup on
-the next image the user need only reset the \fBfwhmpsf\fR and background
+the next image the user need only reset the \fBscale\fR and background
 \fBsigma\fR parameters to the new values.
 The only pset which need be edited is \fBdatapars\fR.
 .PP
 To examine and edit the \fBdatapars\fR pset type
 
 .nf
-	\fLap> datapars\fR
+	\f(CWap> datapars\fR
 .fi
 
 and the following menu will appear on the screen.
 
 .nf
-\fL
+\f(CW
                                 IRAF
                   Image Reduction and Analysis Facility
 
    PACKAGE = apphot
    TASK = datapars
-   
-   (fwhmpsf=                   1.) FWHM of the PSF
-   (emissio=                  yes) Emission features
+
+   (fwhmpsf=                   1.) FWHM of the PSF in scale units
+   (emissio=                  yes) Features are positive
    (noise  =              poisson) Noise model
-   (thresho=                   0.) Detection threshold for daofind
-   (cthresh=                   0.) Threshold intensity for centering
-   (sigma  =                INDEF) Standard deviation in ADU of background level
-   (ccdread=                     ) CCD read noise keyword
+   (thresho=                   0.) Detection threshold in counts above
+                                   background
+   (cthresh=                   0.) Centering threshold in counts above
+                                   background
+   (sigma  =                INDEF) Standard deviation of background in counts 
+   (scale  =                   1.) Image scale in units per pixel
+   (ccdread=                     ) CCD readout noise image header keyword
    (readnoi=                INDEF) CCD readout noise in electrons
-   (gain   =                     ) CCD gain keyword
-   (epadu  =                   1.) Electrons per ADU
+   (gain   =                     ) CCD gain image header keyword
+   (epadu  =                   1.) Gain in electrons per count
    (exposur=                     ) Exposure time image header keyword
    (itime  =                INDEF) Integration time
    (datamin=                INDEF) Minimum good data pixel
    (datamax=                INDEF) Maximum good data pixel
    (mode   =                   ql)
+   ($nargs =                    0)
 \fR
 .fi
 
@@ -641,25 +670,34 @@ The following is a brief description of the parameters and their function
 as well as some initial setup recommendations.
 
 .PP
-\fBFwhmpsf\fR is both a distance scale parameter and in some cases an
-algorithm parameter.  All distance dependent parameters in the APPHOT package
-including the centering box width \fBcbox\fR in \fBcenterpars\fR,
-the inner radius and width of the sky annulus, \fBannulus\fR and
-\fBdannulus\fR in \fBfitskypars\fR, and the radii of the concentric circular
-apertures \fBapertures\fR in \fBphotpars\fR scale with \fBfwhmpsf\fR.
-Some other algorithm parameters such as \fBmaxshift\fR
-in \fBcenterpars\fR and the region growing radius \fBrgrow\fR in
-\fBfitskypars\fR scale with \fBfwhmpsf\fR.
-The default parameters for the APPHOT package do
-not depend on the value of \fBfwhmpsf\fR and in this case the user may
-elect to leave \fBfwhmpsf\fR at the value of one pixel
-in which case all the distance parameters will be in units of pixels.
-\fBFwhmpsf\fR is used as a first guess for modelling the psf in the
-\fBfitpsf\fR task, is important for the optimal use of the \fBdaofind\fR
+\fBScale\fP is the image scale parameter in units per pixel, for example
+arc-seconds per pixel.  All distance dependent parameters in the APPHOT package
+including the centering box width \fBcbox\fP in \fBcenterpars\fP, the 
+inner radius and width of the sky annulus, \fBannulus\fP and 
+\fBdannulus\fP in \fBfitskypars\fP, and the radii of the concentric
+circular apertures \fBapertures\fP in \fBphotpars\fP are defined
+in scale units, for example arc seconds.  This permits easy comparison
+with apertures published in the literature.  Some other algorithm
+parameters such as \fBmaxshift\fP in \fBcenterpars\fP and the region
+growing radius \fBrgrow\fP in
+\fBfitskypars\fP are also defined in scale units.  By default all
+distance parameters are defined in pixels.
+.PP
+\fBFwhmpsf\fP is used as a first guess for modelling the psf in the 
+\fBfitpsf\fP task, is important for the optimal use of the \fBdaofind\fP
 algorithm, and critical for the centering algorithms "gauss" and
-"ofilter" as well as the \fBwphot\fR task.
+"ofilter" as well as the \fBwphot\fP task.
 \fBFwhmpsf\fR as well as the other distance dependent parameters
 can be set interactively from inside most of the APPHOT tasks.
+.PP
+\fBFwhmpsf\fP and \fBscale\fP can be combined in an interesting way.
+\fBScale\fP can be defined in units of half width half maximum of the psf per
+pixel in which case the value of \fBfwhmpsf\fP should be set to
+\fB2.0\fP by definition.  By trial and error and use of the interactive
+setup menu optimal values of the remaining distance dependent parameters
+can be determined in units of \fBscale\fP.  Once determined the same
+setup can be reused on another image by simply reseting the \fBscale\fP
+parameter.
 .PP
 APPHOT photometry routines permit measurement of both emission and absorption
 features.  For the majority of applications including photometry of
@@ -675,8 +713,8 @@ the magnitude errors are computed on the basis of the Poisson noise in the
 constant sky background, Poisson noise in the object and readout noise.
 Most users
 with CCD data will wish to leave \fBnoise\fR = "poisson".
-\fBThreshold\fR is a parameter required by the centering algorithms.
-If \fBthreshold\fR > 0.0, pixels below the data minimum plus
+\fBCthreshold\fR is a parameter required by the centering algorithms.
+If \fBcthreshold\fR > 0.0, pixels below the data minimum plus
 threshold in the centering subraster are not used by the centering algorithm.
 For difficult centering problems the user may wish to adjust
 this parameter.
@@ -684,7 +722,7 @@ The \fBsigma\fR parameter specifies the standard deviation of the background
 in a single pixel. \fBSigma\fR is used
 to estimate the signal to noise ratio in the centering subraster and to set
 the width and bin size of the histogram of sky pixels, the \fBkhist\fR and
-\fBbinsize\fR parameters in the pset \fBfitskypars\fR. Both \fBthreshold\fR and
+\fBbinsize\fR parameters in the pset \fBfitskypars\fR. Both \fBcthreshold\fR and
 \fBsigma\fR can be set interactively from inside the \fBphot\fR task.
 .PP
 APPHOT currently recognizes three image header keywords \fBccdread\fR,
@@ -695,7 +733,7 @@ the gain and readout noise are assumed to be electrons per adu
 and electrons respectively.
 Exposure time information is required to normalize the magnitudes computed
 for a series of images to a common exposure time.
-The time unita arbitrary but must be consistent for a set of images.
+The time units are arbitrary but must be consistent for a set of images.
 If this information is already in the
 image header the user can enter the appropriate header keywords.
 Otherwise the instrument constants gain and readout noise can be entered
@@ -706,35 +744,44 @@ parameter for each image reduced. If both image header keywords and
 default parameter values are defined the image header keywords take
 precedence.
 .PP
+The two parameters \fBdatamin\fP and \fBdatamax\fP which define the upper
+and lower good data limits respectively are not currently implemented by
+the APPHOT tasks.  They will be used in future versions of the package 
+to, for example, set the limits over which a detector is linear.
+.PP
 After editing, the new \fBdatapars\fR pset might look like the following.
 This user has chosen to wait and set \fBfwhmpsf\fR, \fBthreshold\fR,
 \fBcthreshold\fR, and \fBsigma\fR interactively from inside \fBphot\fR but
-has decide to set the
+has decided to set the
 image header parameters \fBccdread\fR, \fBgain\fR and \fBexposure\fR.
 
 .nf
-\fL
+\f(CW
                            IRAF
              Image Reduction and Analysis Facility
 
    PACKAGE = apphot
    TASK = datapars
    
-   (fwhmpsf=                   1.) FWHM of the PSF
-   (emissio=                  yes) Emission features
+   (fwhmpsf=                   1.) FWHM of the PSF in scale units
+   (emissio=                  yes) Features are positive
    (noise  =              poisson) Noise model
-   (thresho=                   0.) Detection threshold for find
-   (cthresh=                   0.) Threshold intensity for centering
-   (sigma  =                INDEF) Standard deviation in ADU of background level
-   (ccdread=              readout) CCD read noise keyword
+   (thresho=                   0.) Detection threshold in counts above 
+                                   background
+   (cthresh=                   0.) Centering threshold in counts above
+                                   background
+   (sigma  =                INDEF) Standard deviation of background in counts
+   (scale  =                   1.) Image scale in units per pixel
+   (ccdread=              readout) CCD readout noise image header keyword
    (readnoi=                INDEF) CCD readout noise in electrons
-   (gain   =                 gain) CCD gain keyword
-   (epadu  =                   1.) Electrons per ADU
+   (gain   =                 gain) CCD gain image header keyword
+   (epadu  =                   1.) Gain in electrons per count
    (exposur=              exptime) Exposure time image header keyword
    (itime  =                INDEF) Integration time
    (datamin=                INDEF) Minimum good data pixel
    (datamax=                INDEF) Maximum good data pixel
    (mode   =                   ql)
+   ($nargs =                    0)
 \fR
 .fi
 
@@ -746,13 +793,13 @@ parameter set \fBcenterpars\fR. To display and edit these parameters type
 the command.
 
 .nf
-	\fLap> centerpars\fR
+	\f(CWap> centerpars\fR
 .fi
 
 The following menu will appear on the terminal.
 
 .nf
-\fL
+\f(CW
                               IRAF
                Image Reduction and Analysis Facility
 
@@ -760,16 +807,17 @@ The following menu will appear on the terminal.
    TASK = centerpars
    
    (calgori=             centroid) Centering algorithm
-   (cbox   =                   5.) Centering box width in fwhmpsf
-   (maxshif=                   1.) Maximum center shift in fwhmpsf
+   (cbox   =                   5.) Centering box width in scale units 
+   (maxshif=                   1.) Maximum center shift in scale units
    (minsnra=                   1.) Minimum SNR ratio for centering
-   (cmaxite=                   10) Maximum iterations for centering
+   (cmaxite=                   10) Maximum iterations for centering algorithm
    (clean  =                   no) Symmetry clean before centering
-   (rclean =                   1.) Cleaning radius in fwhmpsf
-   (rclip  =                   2.) Clipping radius in fwhmpsf
+   (rclean =                   1.) Cleaning radius in scale units
+   (rclip  =                   2.) Clipping radius in scale units
    (kclean =                   3.) K-sigma rejection criterion in skysigma
    (mkcente=                   no) Mark the computed center
    (mode   =                   ql)
+   ($nargs =                    0)
 \fR   
 .fi
 
@@ -787,13 +835,13 @@ tasks. More detailed information on the APPHOT centering algorithms
 can be found in the document,  \fISpecifications for the Apphot Package\fR
 by Lindsey Davis.
 .PP
-The centering box \fBcbox\fR is defined in units of \fBfwhmpsf\fR.
+The centering box \fBcbox\fR is defined in units of \fBscale\fR.
 Users  should try to set \fBcbox\fR as small as possible to avoid
 adding noisy pixels to the centering subraster.
 \fBCbox\fR can also be set interactively from inside the APPHOT \fBphot\fR
 task.
 .PP
-If the computed centers are more than \fBmaxshift\fR * \fBfwhmpsf\fR pixels
+If the computed centers are more than \fBmaxshift\fR / \fBscale\fR pixels
 from the initial centers or the signal-to-noise ratio in the centering
 subraster is less than \fBminsnratio\fR the new center will be computed but
 flagged with a warning message.
@@ -820,13 +868,13 @@ parameter set \fBfitskypars\fR. To display and edit these parameters type
 the following command.
 
 .nf
-	\fLap> fitskypars\fR
+	\f(CWap> fitskypars\fR
 .fi
 
 The following menu will appear on the terminal.
 
 .nf
-\fL
+\f(CW
                               IRAF
                Image Reduction and Analysis Facility
 
@@ -834,18 +882,20 @@ The following menu will appear on the terminal.
    TASK = fitskypars
    
    (salgori=                 mode) Sky fitting algorithm
-   (annulus=                  10.) Inner radius of sky annulus in fwhmpsf
-   (dannulu=                  10.) Width of sky annulus in fwhmpsf
+   (annulus=                  10.) Inner radius of sky annulus in scale units
+   (dannulu=                  10.) Width of sky annulus in scale units
    (skyvalu=                   0.) User sky value
-   (smaxite=                   10) Maximum number of iterations
-   (snrejec=                   50) Maximum number of rejection cycles
+   (smaxite=                   10) Maximum number of sky fitting iterations
+   (snrejec=                   50) Maximum number of sky fitting rejection
+                                   iterations
    (skrejec=                   3.) K-sigma rejection limit in sky sigma
    (khist  =                   3.) Half width of histogram in sky sigma
    (binsize=                  0.1) Binsize of histogram in sky sigma
    (smooth =                   no) Lucy smooth the histogram
-   (rgrow  =                   0.) Region growing radius in fwhmpsf
+   (rgrow  =                   0.) Region growing radius in scale units
    (mksky  =                   no) Mark sky annuli on the display
    (mode   =                   ql)
+   ($nargs =                    0)
 \fR
 .fi
 
@@ -859,7 +909,7 @@ and "histplot".
 The definitions of the mode used by APPHOT is the following.
 
 .nf
-\fL	mode = 3.0 * median - 2.0 * mean
+\f(CW	mode = 3.0 * median - 2.0 * mean\fP
 .fi
 
 Detailed descriptions of the algorithms can be found in the document,
@@ -867,7 +917,7 @@ Detailed descriptions of the algorithms can be found in the document,
 "mode" the default, and one of the two histogram algorithms "centroid" and
 "crosscor".
 .PP
-The inner radius and width of the sky annulus in terms of \fBfwhmpsf\fR
+The inner radius and width of the sky annulus in terms of \fBscale\fR
 are set by the parameters \fBannulus\fR and \fBdannulus\fR. These can
 easily be set interactively from within the \fBphot\fR task.
 Good statistics require several hundred sky pixels.
@@ -899,13 +949,13 @@ The photometry algorithm parameters have been grouped together in a single
 parameter set \fBphotpars\fR. To display and edit these parameters type.
 
 .nf
-	\fLap> photpars\fR
+	\f(CWap> photpars\fR
 .fi
 
 The following menu will appear on the terminal.
 
 .nf
-\fL
+\f(CW
                               IRAF
                Image Reduction and Analysis Facility
 
@@ -913,10 +963,11 @@ The following menu will appear on the terminal.
    TASK = photpars
    
    (weighti=             constant) Photometric weighting scheme for wphot
-   (apertur=                   3.) List of aperture radii in fwhmpsf
+   (apertur=                   3.) List of aperture radii in scale units
    (zmag   =                  26.) Zero point of magnitude scale
    (mkapert=                   no) Draw apertures on the display
    (mode   =                   ql)
+   ($nargs =                    0)
 \fR
 .fi
 
@@ -927,7 +978,7 @@ weighting is used. Two other weighting schemes are available for the
 experimental \fBwphot\fR task, "gauss" and "cone". "Gauss" is the more
 highly recommended.
 .PP
-The aperture list is specified by \fBapert\fR in terms of \fBfwhmpsf\fR.
+The aperture list is specified by \fBapert\fR in terms of \fBscale\fR.
 The apertures can be entered in any order but are sorted on output.
 \fBApert\fR can be string or the name of a text file containing the
 list of apertures. Apertures can either be listed individually and
@@ -938,7 +989,7 @@ These can be set interactively from within the \fBphot\fR task.
 Examples of valid aperture strings are listed below.
 
 .nf
-\fL
+\f(CW
 	1 2 3
 	1.0,2.0,3.0
 	1:10:1
@@ -949,11 +1000,56 @@ Examples of valid aperture strings are listed below.
 An arbitrary zero point is applied to the magnitude scale with \fBzmag\fR.
 The user can accept the default or experiment with his/her data until
 a suitable value is found. The computation of the magnitude errors
-does no depend on the zero point.
+does not depend on the zero point.
 .PP
 If \fBmkapert\fR = yes, the \fBphot\fR task will draw the concentric
 apertures on the display.  At present this option
 works only if \fBdisplay\fR = "stdgraph".
+
+.NH 2
+The QPHOT Task
+.PP
+\fBQphot\fP computes accurate centers, sky values and magnitudes for a list
+of objects using a restricted subset of the full \fBphot\fP parameter set.
+It is intended to be a quick look photometer suitable for use when 
+observing on the mountain or in well behaved uncrowded stellar fields.
+.PP
+The user is automatically queried for the critical parameters \fBcbox\fP,
+\fBannulus\fP, \fBdannulus\fP and \fBapertures\fP which are defined in
+terms of pixels.  The noise characteristics of the detector are assumed
+to obey Poisson statistics.  \fBQphot\fP computes centers for each
+object using the "centroid" centering algorithm.  Sky values are
+calculated using the "mode" algorithm.  The user can set the zero point
+of the magnitude scale, \fBzmag\fP, the gain of the detector, \fBepadu\fP,
+and exposure time image header keyword, \fBexposure\fP, but all the
+remaining parameters are set to their default values.
+.PP
+\fBQphot\fP can be driven by the image cursor or a coordinate list in
+interactive mode or by a coordinate list in batch mode in exactly 
+the same manner as the \fBphot\fP task.
+
+.NH 2
+The \fBPOLYPHOT\fP Task
+.PP
+\fBPolyphot\fP computes accurate centers, sky values and magnitudes for
+a list of objects using polygonal shaped apertures.  It is most suitable
+for measuring the magnitudes of large extended irregularly shaped objects.
+.PP
+\fBPolyphot\fP uses \fBdatapars\fP, \fBcenterpars\fP, and
+\fBfitskypars\fP in exactly the same manner as the \fBphot\fP task.  In
+general users should set the task parameters in the same way as they
+set them in \fBphot\fP.  However users who have defined their polygonal
+apertures interactively may wish to set the centering algorithm
+parameter \fBcalgorithm =\fP "none", to avoid the task trying to center
+on the brightest feature in the aperture.
+.PP
+The apertures are defined either interactively with the image or graphics
+cursor or by two files \fBpolygons\fP and \fBcoords\fP.
+Polygons defines the shape of the polygonal aperture and coords defines the
+initial positions of the apertures.  The polygons file may contain
+more than one aperture and the flux through each aperture may be measured
+at more than one position.  A detailed description of the file formats
+is given in section 6.4
 
 .NH
 Creating A Coordinate List
@@ -971,7 +1067,7 @@ are described below. Comments preceded by a # character and blank lines
 are ignored.
 
 .nf
-\fL
+\f(CW
                      #Sample Coordinate List
                         53.6    83.25
                         100.0   35.8
@@ -996,7 +1092,7 @@ is 4.0 pixels and the sigma of the sky background is 10 we might run
 \fBdaofind\fR as follows,
 
 .nf
-	\fLcl> daofind image 4.0 30.0\fR
+	\f(CWcl> daofind image fwhmpsf=4.0 threshold=30.0\fR
 .fi
 
 where we have set our detection threshold at 3.0 * sigma.
@@ -1040,7 +1136,7 @@ list can be created interactively using the display cursor and
 the image display.
 
 .nf
-\fL
+\f(CW
 	cl> display image
 
 	... image appears on the display ...
@@ -1053,12 +1149,12 @@ the image display.
 \fR
 .fi
 
-Similarly example a coordinate list
+Similarly a coordinate list
 can be created using the graphics cursor and a contour
 plot as shown below.
 
 .nf
-\fL
+\f(CW
 	cl> contour image
 
 	... contour plot appears on the terminal ...
@@ -1088,7 +1184,7 @@ A line containing the single character ';' terminates the lists of vertices.
 There can be more than one polygon in a single polygon file.
 
 .nf
-\fL
+\f(CW
             Sample Polygon File
 
                 1.0   1.0
@@ -1113,7 +1209,7 @@ position in the coordinate file. Each polygonal aperture may be moved
 to several positions.
 
 .nf
-\fL
+\f(CW
        Sample Polyphot Coords File
 
                50. 30.
@@ -1176,7 +1272,7 @@ to "stdgraph".
 The user creates a contour plot of the image on the graphics terminal
 with the \fBcontour\fR task, types \fBphot\fR and answers the image name query.
 The graphics cursor appears on the contour plot ready for input.
-The user can move around the plot with the cursor sucessively marking stars.
+The user can move around the plot with the cursor successively marking stars.
 
 .NH 2
 Redirecting the Image Cursor to the Standard Input
@@ -1187,7 +1283,7 @@ When the user types the task name \fBphot\fR and enters the image
 name, the following prompt appears.
 
 .nf
-	\fLImage cursor [xcoord ycoord wcs] key [cmd]:\fR
+	\f(CWImage cursor [xcoord ycoord wcs] key [cmd]:\fR
 .fi
 
 \fIXcoord\fR and \fIycoord\fR are the coordinates of the object of
@@ -1198,7 +1294,7 @@ To perform the default action of
 the \fBphot\fR task the user responds as follows.
 
 .nf
-	\fLImage cursor [xcoord ycoord wcs] key [cmd]: 36. 42. 1\fR
+	\f(CWImage cursor [xcoord ycoord wcs] key [cmd]: 36. 42. 1\fR
 .fi
 
 \fBPhot\fR measures the magnitude of the star near pixel coordinates
@@ -1218,50 +1314,56 @@ A conscious effort has been made to keep the definitions of all the
 keystroke commands within the APPHOT package as similar as possible.
 The following are the most commonly used  keystrokes in the APPHOT package.
 
-.IP [1] The ? (Help) Keystroke Command
+.NH 3
+The ? (Help) Keystroke Command
+.PP
 The ? key prints the help page describing the cursor keystroke and colon
-show commnds for the specific APPHOT task. An abbreviated help page
+show commands for the specific APPHOT task. An abbreviated help page
 is typed by default when a user enters a task in interactive mode.
 The ? key can be typed at any point in the APPHOT task.
 
-.IP [2] The :show (Set and Print parameter)  Commands
+.NH 3
+The :show (Set and Print parameter)  Commands
+.PP
 Any APPHOT parameter can be displayed by typing :\fIparameter\fR command
 in interactive mode.
 For example to show the current value of the \fBfwhmpsf\fR parameter
 type the following command.
 
 .nf
-	\fL:fwhmpsf\fR
+	\f(CW:fwhmpsf\fR
 .fi
 
 To set any APPHOT parameter type :\fIparameter\fR "value". For example
 to set the \fBfwhmpsf\fR to 2.0 type.
 
 .nf
-	\fL:fwhmpsf 2.0\fR
+	\f(CW:fwhmpsf 2.0\fR
 .fi
 
 To display all the centering parameters type.
 
 .nf
-	\fL:show center\fR
+	\f(CW:show center\fR
 .fi
 
-Similarly the sky fitting and photometry parameters can be displyed by
+Similarly the sky fitting and photometry parameters can be displayed by
 typing. 
 
 .nf
-	\fL:show sky\fR
-	\fL:show phot\fR
+	\f(CW:show sky\fR
+	\f(CW:show phot\fR
 .fi
 
 All the parameters can be displayed with the following command.
 
 .nf
-	\fL:show\fR
+	\f(CW:show\fR
 .fi
 
-.IP [3] The i (Interactive Setup) Keystroke Command
+.NH 3
+The i (Interactive Setup) Keystroke Command
+.PP
 This extremely useful key allows one to set up the principal APPHOT
 parameters interactively. To use this feature move the image cursor to a star on
 the display, or move the graphics cursor to a star on the contour plot
@@ -1274,19 +1376,42 @@ aperture \fBcbox\fR, the inner sky annulus \fBannulus\fR and \fBdannulus\fR,
 the list of apertures \fBaperts\fR and the data \fBsigma\fR,
 \fBthreshold\fR and \fBcthreshold\fR using the graphics cursor and the
 radial profile plot.
-The cursor comes up on the plot at the position of appropriate parameter.
+The cursor comes up on the plot at the position of the appropriate parameter.
+Typing return will preserve the old value.
 If the cursor is outside the range of values on the plot the old value
 is kept.
+.PP
+Setting \fBsigma\fP, \fBcthreshold\fP, and \fBthreshold\fP 
+interactively requires two keystrokes.  In each case the measured parameter
+is the difference between the two y coordinates of the graphics
+cursor. It is recommended in general that the user leave \fBcthreshold\fP
+at zero.
 
-.IP [4] The w (Write to Psets) Keystroke Command
+.NH 3
+The v (Verify) Keystroke Command
+.PP
+The v key verifies that the values of the critical task parameters 
+currently in memory are the ones that the user wants.  To each verify query
+the user either types CR to verify the current value or enters a new
+value.
+
+.NH 3
+The w (Write to Psets) Keystroke Command
+.PP
 The w key writes the current values of the parameters in memory to the
 appropriate psets.
 This feature is useful for saving values marked with the
 i key. On exiting APPHOT a prompt will remind the user that the current
 parameters in memory must be stored in the psets or lost.
 
+.NH 3
+The d (Radial Profile Plot) Keystroke Command
+.PP
+The d key plots a centered radial profile of a star on the graphics device.
 
-.IP [5] The f (Fit) Keystroke Command
+.NH 3
+The f (Fit) Keystroke Command
+.PP
 This key performs the default action of each APPHOT task without writing
 any results
 to the output file. In the \fBphot\fR task the f key will center, fit the
@@ -1294,7 +1419,9 @@ local sky and compute the magnitudes for a star. This key allows the user to
 experiment interactively with the data, changing the default parameters,
 remeasuring magnitudes and so on before actually writing out any data.
 
-.IP [6] The Space Bar (Fit and Write out Results) Keystroke Command
+.NH 3
+The Space Bar (Fit and Write out Results) Keystroke Command
+.PP
 This key performs the default action of the task and writes the results
 to the output catalog.
 
@@ -1304,11 +1431,14 @@ Running Apphot In Interactive Mode From A Coordinate List
 This is currently the best method for running APPHOT interactively for users
 without image cursor readback facilities. APPHOT tasks
 can pick stars out of the list sequentially or by number,  measure stars
-seqentially or by number, rewind the coordinate lists and remeasure all
+sequentially or by number, rewind the coordinate lists and remeasure all
 the stars. Stars which are not in the coordinate list can still be
 measured and added to the output catalog.
 
-.IP [1] The :m (Move) Keystroke Command
+.IP [1] 
+The :m (Move) Keystroke Command
+.RS
+.LP
 This command moves the cursor to the next or a specified star in the
 coordinate list.  If the hardware cursor on the
 device being read from is enabled the actual physical cursor will move
@@ -1316,24 +1446,37 @@ to the requested star. For
 example a user might decide that star # 10 in the coordinate list is the best
 setup star. He/she simply types a :m 10 to move to the star in
 question followed by the i key to setup the parameters interactively.
+.RE
 
-.IP [2] The :n (Next)  Keystroke Command
+.IP [2]
+The :n (Next)  Keystroke Command
+.RS
+.LP
 This command moves to the next or specified star in the list, performs the
 default action of the task and writes the results to the output file.
 This key is particularly useful in examining the results of a large batch
 run.
 For example, a user measures the magnitudes of 500 stars using APPHOT in
-batch mode He/she is suspicious about the results for twenty of the most
+batch mode.  He/she is suspicious about the results for twenty of the most
 crowded stars. By rerunning APPHOT in interactive mode using the original
 coordinate list, the user can selectively call up the stars in question,
 plot their radial profiles, and examine the results interactively.
+.RE
 
-.IP [3] The l (List) Keystroke Command
+.IP [3]
+The l (List) Keystroke Command
+.RS
+.LP
 This command measures all the stars in the coordinate list sequentially from
 the current position in the file.
+.RE
 
-.IP [4] The r (Rewind) Keystroke Command
+.IP [4]
+The r (Rewind) Keystroke Command
+.RS
+.LP
 This command rewinds the coordinate list.
+.RE
 
 .NH
 Running Apphot in Batch Mode
@@ -1354,10 +1497,10 @@ standard output and graphics terminals.
 Text Files
 .PP
 All APPHOT records are written to text files.
-The parameters for the task are listed at the beggining of each APPHOT
+The parameters for the task are listed at the beginning of each APPHOT
 output text file and identified with a #K string.
 The header record is not written until the record
-for the first star is to be written to the database. Parameters changes  will
+for the first star is to be written to the database. Parameter changes  will
 generate a one line entry in the output text file.
 The data records follow the header record in the order in which they
 were computed.
@@ -1387,7 +1530,7 @@ magnitudes from the APPHOT \fBphot\fR catalog. Using apselect they
 would type.
 
 .nf
-	\fLcl> apselect output xc,yc,msky,mag yes > magsfile\fR
+	\f(CWcl> apselect output xc,yc,msky,mag yes > magsfile\fR
 .fi
 
 The selected fields would appear in the textfile "magsfile".
@@ -1429,11 +1572,11 @@ should be 3.0
 pixels and that the standard deviation of the background should be 10.0
 counts.
 The user decides to include all stars with a peak intensity greater
-than three standard deviations above local background in the coordinate list.
+than five standard deviations above local background in the coordinate list.
 The user runs \fBdaofind\fR as follows.
 
 .nf
-	\fLap> daofind orion 3.0 30.0\fR
+	\f(CWap> daofind orion fwhmpsf=3.0 threshold=50.0\fR
 .fi
 
 The x and y coordinates, a magnitude estimate and some statistics on image
@@ -1442,7 +1585,7 @@ The user can obtain a printout of the coordinate
 list by typing.
 
 .nf
-	\fLap> lprint orion.coo.1\fR
+	\f(CWap> lprint orion.coo.1\fR
 .fi
 
 .PP
@@ -1463,12 +1606,12 @@ example below assumes that the image cursor has been directed to the
 standard input. The image cursor comes up on the screen in the form of
 a prompt. This example could equally well be run from the image hardware
 cursor in which case the cursor would appear on the displayed image. The
-keystroke commands are indentical in the two cases.
+keystroke commands are identical in the two cases.
 
 .br
 
 .nf
-\fL
+\f(CW
 	ap> phot orion
 
 	... \fIload the phot task\fR ...
@@ -1491,23 +1634,29 @@ keystroke commands are indentical in the two cases.
 
 	... \fImark fwhmpsf, cbox, sky annulus, apertures on the plot\fR ...
 
+        ... \fIleave sigma and cthreshold at their default values\fR ...
+
 	... \fIcheck answers on radial profile plot of the results\fR ...
+
+	Image cursor [xcoord ycoord wcs] key [cmd]: v
+
+        ... \fIverify the critical parameters\fR ...
 
 	Image cursor [xcoord ycoord wcs] key [cmd]: :radplots no
 
-	... \fIDisable radial profile plotting\fR ...
+	... \fIdisable radial profile plotting\fR ...
 
 	Image cursor [xcoord ycoord wcs] key [cmd]: w
 
-	... \fIStore new parameters in the psets\fR ...
+	... \fIstore new parameters in the psets\fR ...
 
 	Image cursor [xcoord ycoord wcs] key [cmd]: q
 
-	... \fIQuit interactive cursor loop\fR ...
+	... \fIquit interactive cursor loop\fR ...
 
 	q
 
-	... \fIQuit the phot task\fR ...
+	... \fIquit the phot task\fR ...
 
 \fR
 .fi
@@ -1516,7 +1665,7 @@ The user decides he is happy with the current parameter set and decides
 to run the \fBphot\fR task in batch and submit it as a background task.
 
 .nf
-	\fLap> phot orion inter- &\fR
+	\f(CWap> phot orion inter- verify- &\fR
 .fi
 
 The results will appear in the text file "orion.mag.1".
@@ -1531,30 +1680,39 @@ The user wishes to process all this data
 in batch mode with the output records going to a single file.
 .PP
 The observer decides to run the \fBdaofind\fR task to create a coordinate
-list for each image, to run \fBphot\fR on a represntative image
+list for each image, to run \fBphot\fR on a representative image
 in interactive mode with the image cursor
 directed to the standard input to set up and store the \fBphot\fR task
 parameters, and finally to run \fBphot\fR in batch mode on all the images
 to do the photometry.
 .PP
+Note that the example below assumes that the image cursor has been redirected
+to the standard input.  The image cursor comes up on the screen in the
+form of a prompt.  This example could equally well be run from the image 
+hardware cursor in which case the cursor would appear on the displayed
+image.  The keystroke commands are identical in the two cases.
+.PP
 To create the coordinate list the user needs to supply the full width half
 maximum of the point spread function and an intensity threshold above
 local background to the
 \fBdaofind\fR task. Using the PLOT package task \fBimplot\fR the user
-examines the Landolt standard in several images and decides that the
+examines the Landolt standards in several images and decides that the
 average \fBfwhmpsf\fR is 4.3
 pixels and that the standard deviation of the background is 15.0 counts.
+Note that if the user has access to an image display \fBfwhmpsf\fP and
+\fBthreshold\fP can be determined interactively from inside the
+daofind task itself.
 The user decides to include all stars with a peak intensity greater
 than five standard deviations above local background in the coordinate list,
 which should include weak and spurious objects.
 The user runs \fBdaofind\fR as follows.
 
 .nf
-	ap> daofind lan*.imh 4.3 75.0
+	\f(CWap> daofind lan*.imh fwhmpsf=4.3 threshold=75.0 verify- &\fP
 .fi
 
 The x and y coordinates, an initial guess at the magnitude and some
-sharpness and roundness output to the files "lan*.coo.1".
+sharpness and roundness characteristics are output to the files "lan*.coo.1".
 For example the image lan100350.imh will now have a corresponding 
 coordinate file lan100350.coo;1. The user may wish at this point
 to quickly check the coordinate files for spurious objects.
@@ -1565,7 +1723,10 @@ enters "lan100350b" opposite the \fBimage\fR parameter and "lan100350b.coo.1"
 opposite the \fBcoords\fR parameter. Next he moves the cursor opposite
 the \fBdatapars\fR parameter and types \fB:e\fR to enter the \fBdatapars\fR
 menu. He sets the gain parameter \fBepadu\fR to 10 electrons per adu
-and the readout noise \fBreadnoise\fR to 50.0 electrons. He types \fB:q\fR to
+and the readout noise \fBreadnoise\fR to 50.0 electrons. 
+Finally in order to normalize all the magnitudes the user enters
+the image header exposure time keyword "itime" opposite the
+\fBexposure\fP parameter.  He types \fB:q\fR to
 quit and save the \fBdatapars\fR parameters and \fB^Z\fR to quit and save the
 \fBphot\fR parameters.
 .PP
@@ -1574,7 +1735,7 @@ up the remaining data dependent parameters. The user types  the following
 sequence of commands in response to the cursor prompt.
 
 .nf
-\fL
+\f(CW
 	ap> phot lan100350.imh
 
 	... \fIload the phot task\fR ...
@@ -1593,27 +1754,33 @@ sequence of commands in response to the cursor prompt.
 
 	Image cursor [xcoord ycoord wcs] key [cmd]: i
 
-	... \fIenter interactive setup mode using star 10\fR ...
+	... \fIenter interactive setup mode using star n\fR ...
 
 	... \fImark fwhmpsf, cbox, sky annulus, apertures on the plot\fR ...
 
+        ... \fIleave sigma and cthreshold at their default values\fR ...
+
 	... \fIcheck answers on radial profile plot of the results\fR ...
+
+	Image cursor [xcoord ycoord wcs] key [cmd]: v
+
+        ... \fIverify the critical parameters\fR ...
 
 	Image cursor [xcoord ycoord wcs] key [cmd]: :radplots no
 
-	... \fIDisable radial profile plotting\fR ...
+	... \fIdisable radial profile plotting\fR ...
 
 	Image cursor [xcoord ycoord wcs] key [cmd]: w
 
-	... \fIStore new parameters in the psets\fR ...
+	... \fIstore new parameters in the psets\fR ...
 
 	Image cursor [xcoord ycoord wcs] key [cmd]: q
 
-	... \fIQuit interactive cursor loop\fR ...
+	... \fIquit interactive cursor loop\fR ...
 
 	q
 
-	... \fIQuit the phot task\fR ...
+	... \fIquit the phot task\fR ...
 
 \fR
 .fi
@@ -1623,7 +1790,7 @@ with their corresponding parameter sets and dumps the output to a single
 text file named "output".
 
 .nf
-	\fLap> phot lan*.imh coords="lan*.coo.*" output=output inter- &\fR
+	\f(CWap> phot lan*.imh coords="lan*.coo.*" output=output veri- inter- &\fR
 .fi
 
 The results will appear in the text file "output".
@@ -1636,16 +1803,16 @@ wishes to measure the magnitude of this galaxy through a list of apertures
 equal to those published in a well known catalogue of photoelectric photometry.
 Her data has been sky subtracted to give an average background value of 0.0
 and the standard deviation of the sky background is 20.0 counts.
-From the published apertures
+From the published aperture photometry
 and the scale of her telescope she knows that she wishes to measure
-the galaxy through aperture radii of 10.5, 15.2, 20.8, and 25.6 pixels.
+the galaxy through aperture radii of 10.5, 15.2, 20.8, and 25.6 arc seconds.
 .PP
 The user wishes to work in interactive mode using a contour plot
 of the image and the graphics cursor to enter commands to the \fBphot\fR
 task. She therefore sets the image cursor to "stdgraph" as follows.
 
 .nf
-	\fLap> set stdimcur = stdgraph\fR
+	\f(CWap> set stdimcur = stdgraph\fR
 .fi
 
 .PP
@@ -1653,7 +1820,7 @@ Next she makes a contour plot of the image and  writes it to
 a plot metacode file as follows.
 
 .nf
-\fL
+\f(CW
 	ap> contour N315 
 
 	... \fIcontour plot appears on the terminal\fR ...
@@ -1678,20 +1845,22 @@ Since she already knows the values of the parameters she wishes to use
 she types
 
 .nf
-	\fLap> epar phot\fR
+	\f(CWap> epar phot\fR
 .fi
 
 to enter the phot task menu. She positions the cursor opposite
 \fBimage\fR parameter and types "N315", opposite \fBdispay\fR and
-types "stdgraph"
+types "stdgraph".
 Next she moves the cursor opposite
 the \fBdatapars\fR parameter and types \fB:e\fR to enter the \fBdatapars\fR
-menu. She makes sure that \fBfwhmpsf\fR = 1.0, sets the standard deviation
+menu. She makes sure that \fBscale =\fP 0.75 arc-seconds per pixel the scale
+of the telescope, sets the standard deviation
 of the sky background \fBsigma\fR to 20.0, sets the gain
 parameter \fBepadu\fR to 5 electrons per adu
 and the readout noise \fBreadnoise\fR to 5.0 electrons. She types \fB:q\fR to
 quit and save the \fBdatapars\fR parameters. She decides to leave the
-centering parameters in \fBcenterpars\fR at their default values. The user
+centering parameters in \fBcenterpars\fR at their default values.
+\fBCbox\fP in particular will be 5.0 arcseconds wide.  The user
 has already removed a low order polynomial sky background from this image.
 She wishes to fix the sky value at 0.0. She moves the cursor opposite
 the \fBfitskypars\fR parameter and types \fB:e\fR to enter the sky fitting menu.
@@ -1704,14 +1873,9 @@ the \fBapert\fR parameter.
 To measure the galaxy she types
 
 .nf
-	\fLap> phot N315\fR
+	\f(CWap> phot N315\fR
 .fi
 
 to enter the phot task, positions the cursor on the center of the
 galaxy in the contour plot and taps the space bar to make the measurement.
 The results are  written to the file "N315.mag.1".
-
-.NH
-Help Pages
-.PP
-The help pages for the current apphot tasks are appended.

@@ -53,7 +53,7 @@ begin
 	# calculate weights
 	switch (wtflag) {
 	case WTS_UNIFORM:
-	    call amovkr (1.0, w, npts)
+	    call amovkr (real(1.0), w, npts)
 	case WTS_SPACING:
 	    if (npts == 1)
 		w[1] = 1.
@@ -69,9 +69,9 @@ begin
 	    # user supplied weights
 	case WTS_CHISQ:
 	    # data assumed to be scaled to photons with Poisson statistics
-	    call arcpr (1.0, y, w, npts)
+	    call arcpr (real(1.0), y, w, npts)
 	default:
-	    call amovkr (1.0, w, npts)
+	    call amovkr (real(1.0), w, npts)
 	}
 
 

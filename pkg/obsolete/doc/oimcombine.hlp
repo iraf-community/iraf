@@ -1,0 +1,325 @@
+.help oimcombine Sep87 obsolete
+.ih
+NAME
+oimcombine -- Combine images pixel-by-pixel using various algorithms
+.ih
+USAGE	
+oimcombine input output
+.ih
+PARAMETERS
+.ls input
+List of input images to combine.  All images must be the same size.
+.le
+.ls output
+Output combined image.
+.le
+.ls sigma = ""
+Output sigma image.  This is optional and depends on having at least
+two images to combine.  If "" then no sigma image is
+created.
+.le
+.ls logfile = "STDOUT"
+Log file.  If "" then no log information produced.  The
+special file "STDOUT" prints log information to the terminal.
+.le
+.ls option = "average"
+Type of combining algorithm.  The choices are:
+
+.nf
+      sum - Sum the input images
+  average - Average the input images
+   median - Median the input images
+minreject - Reject the minimum value at each pixel
+maxreject - Reject the maximum value at each pixel
+minmaxrej - Reject the min and max values at each pixel
+threshold - Reject pixels above and below thresholds
+  sigclip - Apply a sigma clipping algorithm to each pixel
+avsigclip - Apply a sigma clipping algorithm to each pixel
+.fi
+.le
+.ls outtype = ""
+Output image pixel datatype.  The pixel datatypes are "complex", "double",
+"real", "long", "integer", and "short" with highest precedence first.
+If none is specified then the highest precedence datatype of the input
+images is used.  The datatypes may be abbreviated to a single character.
+.le
+.ls expname = ""
+Image header exposure time keyword.  For images containing a keyword giving
+an exposure time this information may be used for scaling and an output
+time based on the input image times is recorded.
+.le
+.ls exposure = no
+Scale by the exposure times?
+.le
+.ls scale = no
+Scale the input images by the mode within the mode image section?
+If yes this overrides any offset correction.
+.le
+.ls offset = no
+Add an offset determined from the mode?  If yes then offsets are determined
+to shift the modes of the input images to the same value.
+.le
+.ls weight = no
+Use a weighted average?  The weights are based on the number of images
+previously combined, the exposure time, and any scaling or offset.
+.le
+.ls modesec = ""
+Image section for computing the mode for scaling or offset corrections.
+If no image section is given then the entire image is sampled.
+.le
+.ls lowreject = 3., highreject = 3.
+Lower and upper sigma clipping factors used by the sigma clipping algorithms
+or the actual rejection threshold for the threshold algorithm.
+.le
+.ls blank = 0.
+Value of output pixels when all input pixels are rejected by the "threshold"
+algorithm.
+.le
+.ih
+DESCRIPTION
+The input images are combined by averaging or summing pixel by pixel
+to produce the output image.  The input images may first be scaled
+to a common exposure time or mode or offset to a common mode before combining.
+The average may be weighted by statistical weights based on the
+exposure time or mode and the number of images previously combined.
+Deviant pixels may be detected and excluded from the average using one of
+a number of algorithms.
+
+The input images are specified by a list.  The images must all be the same
+size but may be of any dimension and pixel datatypes.  If scaling by an
+exposure time it is given in the image headers with the name specified by
+the parameter \fIexpname\fR.
+
+The specified output image is created.  Its header information is copied
+from the first image in the input image list.  The pixel datatype may be
+specified by the parameter \fIouttype\fR.  If no pixel datatype is specified
+then the maximum precedence datatype of the input images is used.  The
+datatype precedences are short, integer, long, real, double, and complex
+in increasing order.  Thus, mixed integer and real images default to a
+real output image.  The internal arithmetic is real for all datatypes
+except double and complex which are done in the appropriate mode
+(the sigma clipping algorithms are not available for complex images).
+The output image header will also contain the parameter
+NCOMBINE giving the number of images combined.  This may be used if
+the output image is later combined with other images.  The exposure
+time, if specified, will be updated as the weighted average (or sum for the
+summing option) of the input images.
+
+A sigma image is produced if a sigma image name is given.  It is the
+standard deviation of the input images about the output image.  Two or
+more images are required.  The pixel datatype will be at least type real.
+A log is produced if a log file is specified.  To print information on
+the standard output stream (normally the terminal) the name STDOUT is used.
+The log contains a time, the combining options and relevant parameters,
+a list of the input images, and weight parameters if used, and the name
+of the output image.
+
+Except for summing the images may be scaled.  There are currently three
+ways to scale the images.  The images may be scaled to the same
+exposure time.  If the background level or sensitivity is variable then
+the images may be either scaled or offset (by a constant) to the same
+mode.  The mode is determined by sampling up to 100 points per
+dimension within the specified mode image section.  A scaling
+correction is used when the overall brightness or sensitivity is
+varying.  The offset correction is used when the background brightness
+is varying independently of the object brightness.  When scaling by the
+mode, the exposure time (and setting of the exposure and offset
+parameters) is ignored.  Except for medianing and summing, the images
+are combined by averaging.  Combining with weighting and/or scaling
+is slower than if not weighting and scaling.
+
+The relationships between the exposure time and modes determining the
+scaling, offsets, and weights used and printed in the log output are
+given below.
+
+    if scale = yes:
+	scale = <M> / M
+	offset = 0.
+	weight = (N*M)**1/2 / sum {(N*M)**1/2}
+
+    if exposure = yes and offset = no:
+	scale = <T> / T
+	offset = 0.
+	weight = (N*T)**1/2 / sum {(N*T)**1/2}
+
+    if exposure = no and offset = yes:
+	scale = 1
+	offset = <M> - M
+	weight = (N/M)**1/2 / sum {(N/M)**1/2}
+
+    if exposure = yes and offset = yes:
+	scale = <T> / T
+	offset = <T> * (<M/T> - M/T)
+	weight = (N*T/(M/T))**1/2 / sum {(N*T/(M/T))**1/2}
+
+where M is the mode of an image, <M> is the average mode over all
+images, N is the number of images previously combined (using the image
+header parameter NCOMBINE), T is the exposure time (with a minimum of
+0.001 imposed), and <T> is the average exposure time over all images.
+The operation **1/2 is the square root.  Note that the scales average
+to 1, the offsets sum to zero, and the weights sum to 1.
+
+The \fIoption\fR parameter is the heart of the task.  It selects from
+one of a number of algorithms for combining the images.  The list
+below summarizes the algorithms.
+
+.nf
+	    sum - Sum the input images
+	average - Average the input images
+	 median - Median the input images
+      minreject - Reject the minimum value at each pixel
+      maxreject - Reject the maximum value at each pixel
+      minmaxrej - Reject both the min. and max. values at each pixel
+      threshold - Reject pixels above and below specified thresholds
+	sigclip - Apply a sigma clipping algorithm to each pixel
+      avsigclip - Apply a sigma clipping algorithm to each pixel
+.fi
+
+These algorithms are described in detail in the following sections.
+The choice of algorithm depends on the data, the number of images,
+and the importance of rejecting deviant pixels.  The more complex the
+algorithm the more time consuming the operation.
+
+The rejection parameters \fIlowreject\fR, \fIhighreject\fR, and \fIblank\fR
+are used by the "threshold", "sigclip", and "avsigclip" algorithms for rejecting
+deviant pixels.
+.ih
+SUM
+The input images are combined by summing.  Care must be taken
+not to exceed the range of the short datatype when summing if the
+output datatype is "short".  Summing is the only algorithm in which
+scaling and weighting are not used.  Also no sigma image is produced.
+.ih
+AVERAGE
+The input images are combined by averaging.  The images may be scaled
+and weighted.  There is no pixel rejection.  A sigma image is produced
+if there is more than one input image.
+.ih
+MEDIAN
+The input images are combined by medianing each pixel.  Unless the images
+are at the same exposure level they should be scaled.  The sigma image
+is based on all the input images and is only an approximation to the
+uncertainty in the median estimates.  The median of N images
+is defined to be the (N+1)/2 th value of the sorted pixel values at each
+point in the images.  Note that this is lower of the two middle values for
+an even number of images.
+.ih
+MINREJECT, MAXREJECT, MINMAXREJ
+At each pixel the minimum, maximum, or both are excluded from the
+average.  The images should be scaled and the average may be
+weighted.  The sigma image requires at least two pixels after rejection
+of the extreme values.  These are relatively fast algorithms and are
+a good choice if there are many images (>15).
+.ih
+THRESHOLD
+The input images are combined with pixels above and below specified
+threshold values (before scaling) excluded.  The images may scaled
+and the average weighted.  If all pixels are rejected the specified
+\fIblank\fR value is output.  The sigma image also has the rejected
+pixels excluded.
+.ih
+SIGCLIP
+The input images are combined by applying a sigma clipping algorithm
+at each pixel.  The images should be scaled.  This only rejects highly
+deviant points and so
+includes more of the data than the median or minimum and maximum 
+algorithms.  It requires many images (>10-15) to work effectively.
+Otherwise the bad pixels bias the sigma significantly.  The mean
+used to determine the sigmas is based on the "minmaxrej" algorithm
+to eliminate the effects of bad pixels on the mean.  Only one
+iteration is performed and at most one pixel is rejected at each
+point in the image.  After the deviant pixels are rejected the final
+mean is computed from all the data.  The sigma image excludes the
+rejected pixels.
+.ih
+AVSIGCLIP
+The input images are combined with a variant of the sigma clipping
+algorithm which works well with only a few images.  The images should
+be scaled.  For each line the mean is first estimated using the
+"minmaxrej" algorithm.  The sigmas at each point in the line are scaled
+by the square root of the mean, that is a Poisson scaling of the noise
+is assumed.  These sigmas are averaged to get a line estimate of the
+sigma.  Then the sigma at each point in the line is estimated by
+muliplying the line sigma by the square root of the mean at that point.  As
+with the sigma clipping algorithm only one iteration is performed and
+at most one pixel is rejected at each point.  After the deviant pixels
+are rejected the file mean is computed from all the data.  The sigma
+image excludes the rejected pixels.
+
+The "avsigclip" algorithm is the best algorithm for rejecting cosmic
+rays, especially with a small number of images, but it is also the most
+time consuming.  With many images (>10-15) it might be advisable to use
+one of the other algorithms ("maxreject", "median", "minmaxrej") because
+of their greater speed.
+.ih
+EXAMPLES
+
+1. Simple combining with default values:
+
+.nf
+    cl> oimcombine im* imsum option=sum		# Sum images
+    cl> oimcombine im* imave			# Average images
+    cl> oimcombine im* immed option=median	# Median images
+    cl> oimcombine im* immmr option=minmax	# Reject extreme values
+    cl> oimcombine im* imsig option=sigclip	# Sigma clipping
+.fi
+
+2. To scale and weight by the exposure time given in the header by EXPTIME:
+
+    cl> oimcombine im* imave expname=exptime weight=yes
+    
+.ih
+REVISIONS
+.ls V2.10
+This obsolete task is the V2.9 version of IMCOMBINE.  The V2.10 IMCOMBINE
+does everything this version does and much more.
+.le
+.ih
+TIME REQUIREMENTS
+.nf
+o Vax 11/750 with FPA
+o Size of images = 500 x 500 for 3-7 images
+o Size of images = 500 x 50 for 50 and 100 images
+  Times scaled to 500 x 500
+o Input and output datatypes the same
+o No sigma image output
+o CPU time in seconds
+
+			Short			 Real
+Combine option	   3     5     7       3     5     7    50   100
+--------------  ----- ----- -----   ----- ----- ----- ----- -----
+
+			No weighting or scaling
+sum		 15.6  22.0  28.3     8.9  13.1  18.6   270   520
+average		 19.2  26.6  31.7    13.2  17.3  23.2   313   585
+median		 16.9  56.2 106.0    13.0  49.3 100.6   779  1573
+minreject	 30.0  39.3  51.0    22.3  33.2  43.6   449   886
+maxreject	 29.0  39.6  51.3    22.6  33.6  44.7   462   885
+minmaxreject	 30.6  41.1  53.4    24.7  35.8  46.3   456   891
+threshold	 35.1  50.6  65.9    30.5  44.3  58.7   560  1093
+sigclip		108.1 142.0 178.5    97.0 127.3 156.5  1012  1892
+avsigclip	146.7 179.5 214.8   131.2 162.3 191.4  1053  1935
+
+			Weighting and scaling
+average		 33.2  49.2  66.7    28.3  43.9  61.6 
+median		 42.9  95.1 161.9    35.2  85.3 151.9 
+minreject	 52.6  78.2 103.4    50.0  80.4 100.8 
+maxreject	 51.3  77.5 106.1    45.1  69.4  96.1 
+minmaxreject	 54.2  81.1 109.2    48.6  78.5 106.4 
+threshold	 56.0  86.1 116.5    53.0  80.2 111.0 
+sigclip		161.7 218.3 284.8   141.0 198.3 259.6 
+avsigclip	191.4 255.6 324.8   177.9 241.7 309.4 
+.fi
+.ih
+LIMITATIONS
+Though this task is essentially not limited by the physical limits of the
+host (number of open files, amount of memory) there is a software limit
+in the IRAF virtual operating system of about 120 images which may be
+combined.
+.ih
+USE INSTEAD
+images.imcombine
+.ih
+SEE ALSO
+imsum, ccdred.combine
+.endhelp

@@ -17,27 +17,22 @@ real	deltaxa, deltaxb, accum, xa, xb, pcoeff[MAX_NDERIVS]
 pointer	c0ptr, n0ptr
 
 begin
+	# Flip order and sign at end.
 	xa = a
 	xb = b
-
-	# flip order and sign at end
 	if (a > b) {
 	    xa = b
 	    xb = a
 	}
 
-	# one index pointer
+	# Initialize.
 	c0ptr = ASI_COEFF(asi) - 1 + ASI_OFFSET(asi)
-
 	neara = xa
 	nearb = xb
-
-	# zero accumulator
 	accum = 0.
 
-	# set number of terms
 	switch (ASI_TYPE(asi)) {
-	case II_NEAREST:
+	case II_NEAREST, II_SINC:
 	    nterms = 0
 	case II_LINEAR:
 	    nterms = 1
@@ -49,55 +44,57 @@ begin
 	    nterms = 4
 	}
 
-	# NEAREST_NEIGHBOR and LINEAR are handled differently because of
-	# storage.  Also probably good for speed.
+	# NEAREST_NEIGHBOR, LINEAR and SINC are handled differently because of
+	# storage.  Also probably good for speed in the case of LINEAR and
+	# NEAREST_NEIGHBOUR.
 
 	# NEAREST_NEIGHBOR
-	if (nterms == 0) {
+	switch (ASI_TYPE(asi)) {
+	case II_NEAREST:
 
-	    # reset segment to center values
+	    # Reset segment to center values.
 	    neara = xa + 0.5
 	    nearb = xb + 0.5
 
-	    # set up for first segment
+	    # Set up for first segment.
 	    deltaxa = xa - neara
 
-	    # for clarity one segment case is handled separately
+	    # For clarity one segment case is handled separately.
 
-	    # only one segment involved
+	    # Only one segment involved.
 	    if (nearb == neara) {
 		deltaxb = xb - nearb
 		n0ptr = c0ptr + neara
 		accum = accum + (deltaxb - deltaxa) * COEFF(n0ptr)
 
-	    # more than one segment
+	    # More than one segment.
 	    } else {
 
-		# first segment
+		# First segment.
 		n0ptr = c0ptr + neara
 		accum = accum + (0.5 - deltaxa) * COEFF(n0ptr)
 
-		# middle segment
+		# Middle segment.
 		do j = neara + 1, nearb - 1 {
 		    n0ptr = c0ptr + j
 		    accum = accum + COEFF(n0ptr)
 		}
 
-		# last segment
+		# Last segment.
 		n0ptr = c0ptr + nearb
 		deltaxb = xb - nearb
 		accum = accum + (deltaxb + 0.5) * COEFF(n0ptr)
 	    }
 
 	# LINEAR
-	} else if (nterms == 1) {
+	case II_LINEAR:
 
-	    # set up for first segment
+	    # Set up for first segment.
 	    deltaxa = xa - neara
 
-	    # for clarity one segment case is handled separately
+	    # For clarity one segment case is handled separately.
 
-	    # only one segment involved
+	    # Only one segment is involved.
 	    if (nearb == neara) {
 		deltaxb = xb - nearb
 		n0ptr = c0ptr + neara
@@ -105,37 +102,43 @@ begin
 		     0.5 * (COEFF(n0ptr+1) - COEFF(n0ptr)) *
 		     (deltaxb * deltaxb - deltaxa * deltaxa)
 
-	    # more than one segment
+	    # More than one segment.
 	    } else {
 
-		# first segment
+		# First segment.
 		n0ptr = c0ptr + neara
 		accum = accum + (1. - deltaxa) * COEFF(n0ptr) +
 		     0.5 * (COEFF(n0ptr+1) - COEFF(n0ptr)) *
 		     (1. - deltaxa * deltaxa)
 
-		# middle segment
+		# Middle segment.
 		do j = neara + 1, nearb - 1 {
 		    n0ptr = c0ptr + j
 		    accum = accum + 0.5 * (COEFF(n0ptr+1) + COEFF(n0ptr))
 		}
 
-		# last segment
+		# Last segment.
 		n0ptr = c0ptr + nearb
 		deltaxb = xb - nearb
 		accum = accum + COEFF(n0ptr) * deltaxb + 0.5 *
 			(COEFF(n0ptr+1) - COEFF(n0ptr)) * deltaxb * deltaxb
 	    }
 
-	# A higher order interpolant
-	} else {
+	# SINC
+	case II_SINC:
+	    call ii_sincigrl (xa, xb, accum,
+		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
+		NSINC, NTAPER, STAPER, DX)
 
-	    # set up for first segment
+	# A higher order interpolant.
+	default:
+
+	    # Set up for first segment.
 	    deltaxa = xa - neara
 
-	    # for clarity one segment case is handled separately
+	    # For clarity one segment case is handled separately.
 
-	    # only one segment involved
+	    # Only one segment involved.
 	    if (nearb == neara) {
 
 		deltaxb = xb - nearb
@@ -147,17 +150,17 @@ begin
 		    accum = accum + (1./i) * pcoeff[i] *
 		    	    (deltaxb ** i - deltaxa ** i)
 
-	    # more than one segment
+	    # More than one segment.
 	    } else {
 
-		# first segment
+		# First segment.
 		index = ASI_OFFSET(asi) + neara
 		call ii_getpcoeff (COEFF(ASI_COEFF(asi)), index, pcoeff,
 				  ASI_TYPE(asi))
 		do i = 1, nterms
 		    accum = accum + (1./i) * pcoeff[i] * (1. - deltaxa ** i)
 
-		# middle segment
+		# Middle segment.
 		do j = neara + 1, nearb - 1 {
 		    index = ASI_OFFSET(asi) + j
 		    call ii_getpcoeff (COEFF(ASI_COEFF(asi)),
@@ -166,7 +169,7 @@ begin
 			accum = accum + (1./i) * pcoeff[i]
 		}
 
-		# last segment
+		# Last segment.
 		index = ASI_OFFSET(asi) + nearb
 		deltaxb = xb - nearb
 		call ii_getpcoeff (COEFF(ASI_COEFF(asi)), index, pcoeff,

@@ -1,101 +1,101 @@
-      INTEGER FUNCTION GETTOK (TOKEN, TOKSIZ)
-      INTEGER TOKEN (100)
-      INTEGER TOKSIZ
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER EQUAL
-      INTEGER T, DEFTOK
-      INTEGER SSUBR(7)
-      INTEGER SFUNC(7)
-      DATA SSUBR(1)/120/,SSUBR(2)/36/,SSUBR(3)/115/,SSUBR(4)/117/,SSUBR(
-     *5)/98/,SSUBR(6)/114/,SSUBR(7)/-2/
-      DATA SFUNC(1)/120/,SFUNC(2)/36/,SFUNC(3)/102/,SFUNC(4)/117/,SFUNC(
-     *5)/110/,SFUNC(6)/99/,SFUNC(7)/-2/
-      GETTOK = DEFTOK (TOKEN, TOKSIZ)
-      IF (.NOT.(GETTOK .NE. -1))GOTO 23000
-      IF (.NOT.(GETTOK .EQ.  -166))GOTO 23002
-      IF (.NOT.(EQUAL (TOKEN, SFUNC) .EQ. 1))GOTO 23004
-      CALL SKPBLK
-      T = DEFTOK (FCNAME, 30)
-      CALL PBSTR (FCNAME)
-      IF (.NOT.(T .NE. -9))GOTO 23006
-      CALL SYNERR (22HMissing function name.)
-23006 CONTINUE
-      CALL PUTBAK (32)
-      SWVNUM = 0
-      SWVLEV = 0
-      RETURN
-23004 CONTINUE
-      IF (.NOT.(EQUAL (TOKEN, SSUBR) .EQ. 1))GOTO 23008
-      SWVNUM = 0
-      SWVLEV = 0
-      RETURN
-23008 CONTINUE
-      RETURN
-23009 CONTINUE
-23005 CONTINUE
-23002 CONTINUE
-      RETURN
-23000 CONTINUE
-      TOKEN (1) = -1
-      TOKEN (2) = -2
-      GETTOK = -1
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      integer function gettok (token, toksiz)
+      integer token (100)
+      integer toksiz
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer equal
+      integer t, deftok
+      integer ssubr(7)
+      integer sfunc(7)
+      data ssubr(1)/120/,ssubr(2)/36/,ssubr(3)/115/,ssubr(4)/117/,ssubr(
+     *5)/98/,ssubr(6)/114/,ssubr(7)/-2/
+      data sfunc(1)/120/,sfunc(2)/36/,sfunc(3)/102/,sfunc(4)/117/,sfunc(
+     *5)/110/,sfunc(6)/99/,sfunc(7)/-2/
+      gettok = deftok (token, toksiz)
+      if (.not.(gettok .ne. -1))goto 23000
+      if (.not.(gettok .eq.  -166))goto 23002
+      if (.not.(equal (token, sfunc) .eq. 1))goto 23004
+      call skpblk
+      t = deftok (fcname, 30)
+      call pbstr (fcname)
+      if (.not.(t .ne. -9))goto 23006
+      call synerr (22HMissing function name.)
+23006 continue
+      call putbak (32)
+      swvnum = 0
+      swvlev = 0
+      return
+23004 continue
+      if (.not.(equal (token, ssubr) .eq. 1))goto 23008
+      swvnum = 0
+      swvlev = 0
+      return
+23008 continue
+      return
+23009 continue
+23005 continue
+23002 continue
+      return
+23000 continue
+      token (1) = -1
+      token (2) = -2
+      gettok = -1
+      return
+      end
+c     logic0  logical_column

@@ -1,0 +1,21 @@
+# The PEXAMINE task contour plotting parameters
+
+ncolumns,i,h,21,2,,Number of columns
+nlines,i,h,21,2,,Number of lines
+floor,r,h,INDEF,,,"Minimum value to be contoured (INDEF if none)"
+ceiling,r,h,INDEF,,,"Maximum value to be contoured (INDEF if none)"
+zero,r,h,0.,,,"Greyscale value of zero contour"
+ncontours,i,h,5,,,"Number of contours to be drawn (0 for default)"
+interval,r,h,0.,,,"Contour interval (0 for default)"
+nhi,i,h,-1,,,"Hi/low marking option: -1=omit, 0=mark h/l, 1=mark each pix"
+dashpat,i,h,528,,,"Bit pattern for generating dashed lines"
+label,b,h,no,,,"Label major contours with their values ?"
+box,b,h,yes,,,Draw box around periphery of window ?
+ticklabels,b,h,Yes,,,Label tick marks ?
+majrx,i,h,5,,,Number of major divisions along x grid
+minrx,i,h,5,,,Number of minor divisions along x grid
+majry,i,h,5,,,Number of major divisions along y grid
+minry,i,h,5,,,Number of minor divisions along y grid
+round,b,h,no,,,Round axes to nice values ?
+fill,b,h,no,,,Fill viewport vs enforce unity aspect ratio ?
+banner,b,h,yes,,,Standard banner?

@@ -3,7 +3,7 @@ include "../lib/display.h"
 include "../lib/fitsky.h"
 include "../lib/polyphot.h"
 
-# AP_YBPHOT -- Procedure to measure the flux in a list of polygons.
+# AP_YBPHOT -- Measure the flux inside a list of polygons.
 
 procedure ap_ybphot (py, im, cl, pl, out, id, ld, pd, gid, interactive)
 
@@ -36,6 +36,7 @@ begin
 	if (cl != NULL)
 	    call seek (cl, BOF)
 
+	# Get the first polygon.
 	pd = 0
 	prev_num = 0
 	req_num = ld + 1
@@ -53,13 +54,15 @@ begin
 		nvertices + 1, apstatr (py, SKY_MODE), apstatr (py,
 		SKY_SIGMA), apstati (py, NSKY))
 
-	    # Write the output.
+	    # Write the output to the standard output.
 	    if (interactive == YES) {
 	        call ap_qyprint (py, cier, sier, pier)
 		if (gid != NULL)
 		    call appymark (py, gid, Memr[x], Memr[y], nvertices + 1,
 		        YES, apstati (py, MKSKY), apstati (py, MKPOLYGON))
 	    }
+
+	    # Write the output to a file.
 	    if (id == 1)
 	        call ap_param (py, out, "polyphot")
 	    call ap_yprint (py, out, Memr[x], Memr[y], nvertices, id, ld,

@@ -24,7 +24,7 @@ libiminterp.a:
 	ii_cubspl.f
 	ii_eval.x	
 	ii_greval.x	
-	ii_pc1deval.x	im1interpdef.h
+	ii_pc1deval.x	<math.h> im1interpdef.h
 	ii_pc2deval.x	
 	ii_polterp.x	im1interpdef.h
 	ii_spline.x	

@@ -1,11 +1,11 @@
-      INTEGER FUNCTION INSUB (ARG, FILE)
-      INTEGER ARG (100), FILE (100)
-      IF (.NOT.(ARG (1) .EQ. 60 .AND. ARG (2) .NE. -2))GOTO 23000
-      INSUB = 1
-      CALL SCOPY (ARG, 2, FILE, 1)
-      GOTO 23001
-23000 CONTINUE
-      INSUB = 0
-23001 CONTINUE
-      RETURN
-      END
+      integer function insub (arg, file)
+      integer arg (100), file (100)
+      if (.not.(arg (1) .eq. 60 .and. arg (2) .ne. -2))goto 23000
+      insub = 1
+      call scopy (arg, 2, file, 1)
+      goto 23001
+23000 continue
+      insub = 0
+23001 continue
+      return
+      end

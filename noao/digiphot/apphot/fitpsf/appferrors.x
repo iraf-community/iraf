@@ -4,17 +4,20 @@ include "../lib/fitpsf.h"
 
 procedure ap_pferrors (ap, ier)
 
-pointer	ap		# pointer to apphot structure
+pointer	ap		# pointer to apphot structure (unused)
 int	ier		# integer error code
 
 begin
 	switch (ier) {
 	case AP_NOPSFAREA:
-	    call printf ("The psf fitting aperture is outside the image.\n")
+	    call printf (
+	        "The psf fitting aperture is outside the image.\n")
 	case AP_PSF_OUTOFBOUNDS:
-	    call printf ("The psf fitting aperture is partially outside the image.\n")
+	    call printf (
+	        "The psf fitting aperture is partially outside the image.\n")
 	case AP_NPSF_TOO_SMALL:
-	    call printf ("The number of data points is too few for psf fitting.\n")
+	    call printf (
+	        "The number of data points is too few for psf fitting.\n")
 	case AP_PSF_SINGULAR:
 	    call printf ("The psf fitting solution is singular.\n")
 	case AP_PSF_NOCONVERGE:

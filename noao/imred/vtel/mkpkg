@@ -25,7 +25,7 @@ libpkg.a:
 	destreak.x	"vt.h" <imhdr.h> <imset.h> <mach.h>
 	dicoplot.x	"gryscl.inc" "dicoplot.h" "vt.h" <gset.h> <imhdr.h>\
 			<imset.h> <mach.h> <math/curfit.h>
-	ephem.x	
+	dephem.x	
 	gauss.x
 	getsqib.x	"vt.h" <imhdr.h> <mach.h>
 	imfglexr.x	"vt.h" <imhdr.h> <mach.h>

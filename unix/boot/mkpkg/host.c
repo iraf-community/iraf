@@ -188,12 +188,15 @@ char	*irafdir;		/* iraf root directory		*/
 h_rebuildlibrary (library)
 char	*library;		/* filename of library	*/
 {
-	char	cmd[SZ_LINE+1];
-
+#ifdef SYSV
+	/* Skip the library rebuild if COFF format library. */
+	return (OK);
+#else
 #ifdef i386
 	/* Skip the library rebuild if COFF format library. */
 	return (OK);
 #else
+	char	cmd[SZ_LINE+1];
 
 	sprintf (cmd, "%s %s", REBUILD, vfn2osfn(library,0));
 	if (verbose) {
@@ -205,6 +208,7 @@ char	*library;		/* filename of library	*/
 	    return (os_cmd (cmd));
 	else
 	    return (OK);
+#endif
 #endif
 }
 
@@ -392,7 +396,6 @@ char	*newfile;		/* new file, not a directory name */
 {
 	char	old[SZ_PATHNAME+1];
 	char	new[SZ_PATHNAME+1];
-	int	exit_status;
 
 	strcpy (old, vfn2osfn (oldfile, 0));
 	strcpy (new, vfn2osfn (newfile, 1));
@@ -493,7 +496,6 @@ char	*new;		/* new pathname of file		*/
 {
 	char	old_osfn[SZ_PATHNAME+1];
 	char	new_osfn[SZ_PATHNAME+1];
-	int	exit_status;
 
 	strcpy (old_osfn, vfn2osfn (old, 0));
 	strcpy (new_osfn, vfn2osfn (new, 0));
@@ -701,16 +703,12 @@ char	*dir1, *dir2;
 	 */
 	for (ip1=dir1;  *ip1;  ip1++)
 	    if (*ip1 == '/' && *(ip1+1) == 'i')
-		if (strncmp (ip1+1, "iraf/", 5) == 0) {
+		if (strncmp (ip1+1, "iraf/", 5) == 0)
 		    dir1 = ip1 + 6;
-		    break;
-		}
 	for (ip2=dir2;  *ip2;  ip2++)
 	    if (*ip2 == '/' && *(ip2+1) == 'i')
-		if (strncmp (ip2+1, "iraf/", 5) == 0) {
+		if (strncmp (ip2+1, "iraf/", 5) == 0)
 		    dir2 = ip2 + 6;
-		    break;
-		}
 
 	return (strcmp (dir1, dir2) == 0);
 }

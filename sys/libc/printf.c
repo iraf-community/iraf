@@ -131,7 +131,9 @@ FILE	*fp;				/* output file			*/
 
 		    case 'z':			/* nonstandard UNIX	*/
 		    case 'h':			/* nonstandard UNIX	*/
+		    case 'H':			/* nonstandard UNIX	*/
 		    case 'm':			/* nonstandard UNIX	*/
+		    case 'M':			/* nonstandard UNIX	*/
 		    case 'e':
 		    case 'f':
 		    case 'g':
@@ -140,9 +142,10 @@ FILE	*fp;				/* output file			*/
 			 */
 			if (!dotseen) {
 			    *(fsp-1) = '.';
-			    if (ch == 'h' || ch == 'm')
+			    if (ch == 'h' || ch == 'm' ||
+				ch == 'H' || ch == 'M') {
 				*fsp++ = '3';
-			    else {
+			    } else {
 				*fsp++ = '1';
 				*fsp++ = '4';
 			    }

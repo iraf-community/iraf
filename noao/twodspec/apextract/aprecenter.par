@@ -1,0 +1,16 @@
+# APRECENTER
+
+input,s,a,,,,List of input images
+references,s,h,"",,,"Reference images
+"
+interactive,b,h,no,,,Run task interactively?
+find,b,h,yes,,,Find apertures?
+recenter,b,h,yes,,,Recenter apertures?
+resize,b,h,no,,,Resize apertures?
+edit,b,h,yes,,,"Edit apertures?
+"
+line,i,h,INDEF,1,,Dispersion line
+nsum,i,h,1,1,,Number of dispersion lines to sum
+apertures,s,h,"",,,Select apertures
+npeaks,r,h,INDEF,0.,,Select brightest peaks
+shift,b,h,yes,,,Use average shift instead of recentering?

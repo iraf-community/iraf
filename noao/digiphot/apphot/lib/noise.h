@@ -1,16 +1,16 @@
 # Noise model header file
 
-# noise parameters (# 121 - 140)
+# noise parameters (# 601 - 700)
 
-define	SKYSIGMA	121
-define	THRESHOLD	122
-define	EPADU		123
-define	NOISEFUNCTION	124
-define	GAIN		125
-define	NSTRING		126
-define	CCDREAD		127
-define	READNOISE	128
-define	CTHRESHOLD	129
+define	SKYSIGMA	601
+define	THRESHOLD	602
+define	EPADU		603
+define	NOISEFUNCTION	604
+define	GAIN		605
+define	NSTRING		606
+define	CCDREAD		607
+define	READNOISE	608
+define	CTHRESHOLD	609
 
 # noise keywords
 

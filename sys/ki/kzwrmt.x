@@ -6,11 +6,12 @@ include	"ki.h"
 
 # KZWRMT -- Asynchronous write to a magtape file.
 
-procedure kzwrmt (chan, buf, nbytes)
+procedure kzwrmt (chan, buf, nbytes, offset)
 
-int	chan			# magtape channel
-char	buf[ARB]		# buffer containing data
-int	nbytes			# nbytes to write
+int	chan			#I magtape channel
+char	buf[ARB]		#I buffer containing data
+int	nbytes			#I nbytes to write
+long	offset			#I file offset
 
 int	server
 int	ki_send()
@@ -21,7 +22,7 @@ begin
 	server = k_node[chan]
 
 	if (server == NULL) {
-	    call zzwrmt (k_oschan[chan], buf, nbytes)
+	    call zzwrmt (k_oschan[chan], buf, nbytes, offset)
 	    return
 	}
 
@@ -37,12 +38,12 @@ begin
 
 	p_arg[1] = k_oschan[chan]
 	p_arg[2] = nbytes
+	p_arg[3] = offset
 
 	if (ki_send (server, KI_ZFIOMT, MT_WR) == ERR)
 	    k_status[chan] = ERR
 	else {
 	    call ks_awrite (server, buf, nbytes)
 	    call ks_await  (server, k_status[chan])
-	    k_bufp[chan] = 1	# 1 = ((nfiles=0) * 10 + (nrecords=1))
 	}
 end

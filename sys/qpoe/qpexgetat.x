@@ -20,8 +20,8 @@ char	attribute[ARB]		#I attribute name
 char	outstr[maxch]		#O receives the filter string
 int	maxch			#I max chars out
 
-int	nchars, op
 pointer	sp, atname, et
+int	nchars, op, otop
 int	gstrcpy(), qp_expandtext()
 bool	strne()
 
@@ -34,6 +34,7 @@ begin
 
 	# Construct filter expression for named attribute.
 	op = 1
+	otop = maxch + 1
 	for (et=EX_ETHEAD(ex);  et != NULL;  et=ET_NEXT(et)) {
 	    if (ET_DELETED(et) == YES)
 		next
@@ -44,13 +45,13 @@ begin
 
 	    # Add term delimiter if not first term.
 	    if (op > 1) {
-		outstr[op] = ';';  op = op + 1
-		outstr[op] = ' ';  op = op + 1
+		outstr[op] = ';';  op = min(otop, op + 1)
+		outstr[op] = ' ';  op = min(otop, op + 1)
 	    }
 
 	    # The expression text (may be very large).
-	    op = min (maxch,
-		op + gstrcpy (Memc[ET_EXPRTEXT(et)], outstr[op], maxch-op+1))
+	    op = min (otop,
+		op + gstrcpy (Memc[ET_EXPRTEXT(et)], outstr[op], otop-op))
 	}
 	outstr[op] = EOS
 

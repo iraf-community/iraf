@@ -1,0 +1,14 @@
+1. Alter MKIMSETS, MKSTDOBS and MKOBS to work on tables after the text file
+case is worked out. This will not change any new code developed only the
+script level code (dump instead of txdump).
+
+2. Alter the APPHOT output to permit storage of longer file names. This
+causes no difference to the preprocessor but is very important for
+practical reasons.
+
+3. Keep the raw observations selected with MKSTDOBS? Useful for the user?
+(no not necessary)
+
+4. Question of APPHOT exposure time definition? add switch to obscatalog?
+(done, always set to no for MKSTDOBS and MKPROGOBS, but might be useful
+for user catalog)

@@ -1,0 +1,15 @@
+.help revisions Jan92 pkg.obsolete
+.nf
+obsolete$<imcombine>
+    The old imcombine task was added and renamed to oimcombine.
+    (1/30/92, Valdes)
+
+obsolete$* +
+    The obsolete package, PKG.OBSOLETE, was created.
+
+    The tasks MKHISTOGRAM, IMTITLE, and RADPLT were moved out of the old
+    NOAO.PROTO package into the OBSOLETE package as they have been
+    superseded by the PHISTOGRAM, HEDIT, and PRADPROF tasks respectively.
+
+    (1/23/92, Valdes Davis)
+.endhelp

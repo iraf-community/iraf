@@ -79,6 +79,14 @@ begin
 	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
+	# Get the parameters.
+	call ap_gpfpars (ap)
+	if (verify == YES && interactive == NO) {
+	    call ap_pfconfirm (ap, NULL, 1)
+	    if (update == YES)
+		call ap_ppfpars (ap)
+	}
+
 	# Open plot files.
 	if (interactive == YES) {
 	    call clgstr ("graphics", Memc[graphics], SZ_FNAME)
@@ -112,14 +120,6 @@ begin
 	    gd = NULL
 	}
 
-	# Get the parameters.
-	call ap_gpfpars (ap)
-	if (verify == YES && interactive == NO) {
-	    call ap_pfconfirm (ap, NULL, 1)
-	    if (update == YES)
-		call ap_ppfpars (ap)
-	}
-
 	# Begin looping over the image list.
 	sid = 1
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
@@ -132,6 +132,7 @@ begin
 	    call ap_itime (im, ap)
 	    call ap_airmass (im, ap)
 	    call ap_filter (im, ap)
+	    call ap_otime (im, ap)
 
 	    # Open coordinate file, where coords is assumed to be a simple text
 	    # file in which the x and y positions are in columns 1 and 2
@@ -143,10 +144,11 @@ begin
 	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
 		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
-		    strlen (Memc[coords]))
+		    strlen (Memc[coords])) {
 		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
 			SZ_FNAME)
-		else
+		    lclist = limlist
+		} else
 		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
 	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    } else {

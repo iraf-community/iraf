@@ -1,63 +1,63 @@
-      SUBROUTINE FILSET (DELIM, ARRAY, I, SET, J, MAXSET)
-      INTEGER I, J, MAXSET
-      INTEGER ARRAY (100), DELIM, SET (MAXSET)
-      INTEGER ESC
-      INTEGER JUNK
-      EXTERNAL INDEX
-      INTEGER ADDSET, INDEX
-      INTEGER DIGITS(11)
-      INTEGER LOWALF(27)
-      INTEGER UPALF(27)
-      DATA DIGITS(1)/48/,DIGITS(2)/49/,DIGITS(3)/50/,DIGITS(4)/51/,DIGIT
-     *S(5)/52/,DIGITS(6)/53/,DIGITS(7)/54/,DIGITS(8)/55/,DIGITS(9)/56/,D
-     *IGITS(10)/57/,DIGITS(11)/-2/
-      DATA LOWALF(1)/97/,LOWALF(2)/98/,LOWALF(3)/99/,LOWALF(4)/100/,LOWA
-     *LF(5)/101/,LOWALF(6)/102/,LOWALF(7)/103/,LOWALF(8)/104/,LOWALF(9)/
-     *105/,LOWALF(10)/106/,LOWALF(11)/107/,LOWALF(12)/108/,LOWALF(13)/10
-     *9/,LOWALF(14)/110/,LOWALF(15)/111/,LOWALF(16)/112/,LOWALF(17)/113/
-     *,LOWALF(18)/114/,LOWALF(19)/115/,LOWALF(20)/116/,LOWALF(21)/117/,L
-     *OWALF(22)/118/,LOWALF(23)/119/,LOWALF(24)/120/,LOWALF(25)/121/,LOW
-     *ALF(26)/122/,LOWALF(27)/-2/
-      DATA UPALF(1)/65/,UPALF(2)/66/,UPALF(3)/67/,UPALF(4)/68/,UPALF(5)/
-     *69/,UPALF(6)/70/,UPALF(7)/71/,UPALF(8)/72/,UPALF(9)/73/,UPALF(10)/
-     *74/,UPALF(11)/75/,UPALF(12)/76/,UPALF(13)/77/,UPALF(14)/78/,UPALF(
-     *15)/79/,UPALF(16)/80/,UPALF(17)/81/,UPALF(18)/82/,UPALF(19)/83/,UP
-     *ALF(20)/84/,UPALF(21)/85/,UPALF(22)/86/,UPALF(23)/87/,UPALF(24)/88
-     */,UPALF(25)/89/,UPALF(26)/90/,UPALF(27)/-2/
-23000 IF (.NOT.(ARRAY (I) .NE. DELIM .AND. ARRAY (I) .NE. -2))GOTO 23002
-      IF (.NOT.(ARRAY (I) .EQ. 64))GOTO 23003
-      JUNK = ADDSET (ESC (ARRAY, I), SET, J, MAXSET)
-      GOTO 23004
-23003 CONTINUE
-      IF (.NOT.(ARRAY (I) .NE. 45))GOTO 23005
-      JUNK = ADDSET (ARRAY (I), SET, J, MAXSET)
-      GOTO 23006
-23005 CONTINUE
-      IF (.NOT.(J .LE. 1 .OR. ARRAY (I + 1) .EQ. -2))GOTO 23007
-      JUNK = ADDSET (45, SET, J, MAXSET)
-      GOTO 23008
-23007 CONTINUE
-      IF (.NOT.(INDEX (DIGITS, SET (J - 1)) .GT. 0))GOTO 23009
-      CALL DODASH (DIGITS, ARRAY, I, SET, J, MAXSET)
-      GOTO 23010
-23009 CONTINUE
-      IF (.NOT.(INDEX (LOWALF, SET (J - 1)) .GT. 0))GOTO 23011
-      CALL DODASH (LOWALF, ARRAY, I, SET, J, MAXSET)
-      GOTO 23012
-23011 CONTINUE
-      IF (.NOT.(INDEX (UPALF, SET (J - 1)) .GT. 0))GOTO 23013
-      CALL DODASH (UPALF, ARRAY, I, SET, J, MAXSET)
-      GOTO 23014
-23013 CONTINUE
-      JUNK = ADDSET (45, SET, J, MAXSET)
-23014 CONTINUE
-23012 CONTINUE
-23010 CONTINUE
-23008 CONTINUE
-23006 CONTINUE
-23004 CONTINUE
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      RETURN
-      END
+      subroutine filset (delim, array, i, set, j, maxset)
+      integer i, j, maxset
+      integer array (100), delim, set (maxset)
+      integer esc
+      integer junk
+      external index
+      integer addset, index
+      integer digits(11)
+      integer lowalf(27)
+      integer upalf(27)
+      data digits(1)/48/,digits(2)/49/,digits(3)/50/,digits(4)/51/,digit
+     *s(5)/52/,digits(6)/53/,digits(7)/54/,digits(8)/55/,digits(9)/56/,d
+     *igits(10)/57/,digits(11)/-2/
+      data lowalf(1)/97/,lowalf(2)/98/,lowalf(3)/99/,lowalf(4)/100/,lowa
+     *lf(5)/101/,lowalf(6)/102/,lowalf(7)/103/,lowalf(8)/104/,lowalf(9)/
+     *105/,lowalf(10)/106/,lowalf(11)/107/,lowalf(12)/108/,lowalf(13)/10
+     *9/,lowalf(14)/110/,lowalf(15)/111/,lowalf(16)/112/,lowalf(17)/113/
+     *,lowalf(18)/114/,lowalf(19)/115/,lowalf(20)/116/,lowalf(21)/117/,l
+     *owalf(22)/118/,lowalf(23)/119/,lowalf(24)/120/,lowalf(25)/121/,low
+     *alf(26)/122/,lowalf(27)/-2/
+      data upalf(1)/65/,upalf(2)/66/,upalf(3)/67/,upalf(4)/68/,upalf(5)/
+     *69/,upalf(6)/70/,upalf(7)/71/,upalf(8)/72/,upalf(9)/73/,upalf(10)/
+     *74/,upalf(11)/75/,upalf(12)/76/,upalf(13)/77/,upalf(14)/78/,upalf(
+     *15)/79/,upalf(16)/80/,upalf(17)/81/,upalf(18)/82/,upalf(19)/83/,up
+     *alf(20)/84/,upalf(21)/85/,upalf(22)/86/,upalf(23)/87/,upalf(24)/88
+     */,upalf(25)/89/,upalf(26)/90/,upalf(27)/-2/
+23000 if (.not.(array (i) .ne. delim .and. array (i) .ne. -2))goto 23002
+      if (.not.(array (i) .eq. 64))goto 23003
+      junk = addset (esc (array, i), set, j, maxset)
+      goto 23004
+23003 continue
+      if (.not.(array (i) .ne. 45))goto 23005
+      junk = addset (array (i), set, j, maxset)
+      goto 23006
+23005 continue
+      if (.not.(j .le. 1 .or. array (i + 1) .eq. -2))goto 23007
+      junk = addset (45, set, j, maxset)
+      goto 23008
+23007 continue
+      if (.not.(index (digits, set (j - 1)) .gt. 0))goto 23009
+      call dodash (digits, array, i, set, j, maxset)
+      goto 23010
+23009 continue
+      if (.not.(index (lowalf, set (j - 1)) .gt. 0))goto 23011
+      call dodash (lowalf, array, i, set, j, maxset)
+      goto 23012
+23011 continue
+      if (.not.(index (upalf, set (j - 1)) .gt. 0))goto 23013
+      call dodash (upalf, array, i, set, j, maxset)
+      goto 23014
+23013 continue
+      junk = addset (45, set, j, maxset)
+23014 continue
+23012 continue
+23010 continue
+23008 continue
+23006 continue
+23004 continue
+23001 i = i + 1
+      goto 23000
+23002 continue
+      return
+      end

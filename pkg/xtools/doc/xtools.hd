@@ -26,5 +26,6 @@ strdetab	hlp = strdetab.hlp,		src = xtools$strdetab.x
 strentab	hlp = strentab.hlp,		src = xtools$strentab.x
 center1d	hlp = center1d.hlp,		src = xtools$center1d.x
 icfit		hlp = icfit$icfit.hlp
+inlfit		hlp = xtools$doc/inlfit.hlp
 #gtools		hlp = gtools$gtools.hlp,	pkg = gtools$gtools.hd
 gtools		hlp = gtools$gtools.hlp

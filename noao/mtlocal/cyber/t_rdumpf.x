@@ -63,15 +63,18 @@ begin
 	# Expand file_list and open dumpf_file
 	file_number = 0
 	while (get_next_number (files, file_number) != EOF) {
-	    call strcpy (dumpf_file, in_fname, SZ_FNAME)
-	    if (mtfile (dumpf_file) == YES) {
-		call sprintf (in_fname[strlen(in_fname)+1], SZ_FNAME, "[%d]")
-		    call pargi (file_number + 1)
-	    }
+
+	    # Get the file name and open file.
+	    if (mtfile (dumpf_file) == YES)
+		call mtfname (dumpf_file, file_number + 1, in_fname, SZ_FNAME)
+	    else
+	        call strcpy (dumpf_file, in_fname, SZ_FNAME)
 	    fd = mtopen (in_fname, READ_ONLY, SZ_TAPE_BUFFER)
+
+	    # Position to first IPPS raster in file, skipping Cyber PFT etc.
 	    stat = get_cyber_words_init()
 	    stat = read_dumpf_init()
-	    # Position to first IPPS raster in file, skipping Cyber PFT etc.
+
 	    if (get_cyber_words (fd, Memi[dummy], LEN_PFT) == EOF) {
 		call printf ("DUMPF Tape at EOF\n")
 		call close (fd)

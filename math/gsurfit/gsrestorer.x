@@ -27,10 +27,10 @@ begin
 	# allocate space for the surface descriptor
 	call calloc (sf, LEN_GSSTRUCT, TY_STRUCT)
 
-	xorder = int (GS_SAVEXORDER(fit))
+	xorder = nint (GS_SAVEXORDER(fit))
 	if (xorder < 1)
 	    call error (0, "GSRESTORE: Illegal x order.")
-	yorder = int (GS_SAVEYORDER(fit))
+	yorder = nint (GS_SAVEYORDER(fit))
 	if (yorder < 1)
 	    call error (0, "GSRESTORE: Illegal y order.")
 
@@ -44,7 +44,7 @@ begin
 	    call error (0, "GSRESTORE: Illegal y range.")
 
 	# set surface type dependent surface descriptor parameters
-	surface_type = int (GS_SAVETYPE(fit))
+	surface_type = nint (GS_SAVETYPE(fit))
 	switch (surface_type) {
 	case GS_LEGENDRE, GS_CHEBYSHEV, GS_POLYNOMIAL:
 	    GS_NXCOEFF(sf) = xorder

@@ -17,16 +17,16 @@ bool	force			# force recomputation of values
 bool	update			# update values in image header
 bool	verbose			# print values as they are computed
 
-int	list
 bool	section
+int	list, pixtype
 long	vmin[IM_MAXDIM], vmax[IM_MAXDIM]
-real	minval, maxval
 pointer	im, sp, pixmin, pixmax, imname, imsect
+double	minval, maxval, iminval, imaxval
 
-pointer	immap()
 bool	clgetb()
 long	clktime()
 int	imtopen(), imtgetim()
+pointer	immap()
 define	tryagain_ 91
 
 begin
@@ -58,11 +58,14 @@ begin
 	    call strcpy ("", Memc[pixmax], SZ_FNAME)
 
 	    if (update) {
+
 		iferr (im = immap (Memc[imname], READ_WRITE, 0))
 		    goto tryagain_
 
+		pixtype = IM_PIXTYPE(im)
 		if (force || (IM_LIMTIME(im) < IM_MTIME(im))) {
-		    call im_vminmax (im, minval, maxval, vmin, vmax)
+		    call im_vminmax (im, minval, maxval, iminval, imaxval,
+		        vmin, vmax)
 		    call mkoutstr (vmin, IM_NDIM(im), Memc[pixmin], SZ_FNAME)
 		    call mkoutstr (vmax, IM_NDIM(im), Memc[pixmax], SZ_FNAME)
 		    if (!section) {
@@ -83,8 +86,10 @@ tryagain_	iferr (im = immap (Memc[imname], READ_ONLY, 0)) {
 		    call erract (EA_WARN)
 		    next
 		} else {
+		    pixtype = IM_PIXTYPE(im)
 		    if (force || IM_LIMTIME(im) < IM_MTIME(im)) {
-			call im_vminmax (im, minval, maxval, vmin, vmax)
+			call im_vminmax (im, minval, maxval, iminval, imaxval,
+			    vmin, vmax)
 			call mkoutstr (vmin, IM_NDIM(im), Memc[pixmin],
 			    SZ_FNAME)
 			call mkoutstr (vmax, IM_NDIM(im), Memc[pixmax],
@@ -97,31 +102,44 @@ tryagain_	iferr (im = immap (Memc[imname], READ_ONLY, 0)) {
 		}
 	    }
 
-	    # make the section strings
+	    # Make the section strings.
 
 	    if (verbose) {
-		call printf ("    %s %s %g %s %g\n")
-		    call pargstr (Memc[imname])
-		    call pargstr (Memc[pixmin])
-		    call pargr (minval)
-		    call pargstr (Memc[pixmax])
-		    call pargr (maxval)
-		call flush (STDOUT)
+		if (pixtype == TY_COMPLEX) {
+		    call printf ("    %s %s %z %s %z\n")
+		        call pargstr (Memc[imname])
+		        call pargstr (Memc[pixmin])
+		        call pargx (complex (minval, iminval))
+		        call pargstr (Memc[pixmax])
+		        call pargx (complex (maxval, imaxval))
+		    call flush (STDOUT)
+		} else {
+		    call printf ("    %s %s %g %s %g\n")
+		        call pargstr (Memc[imname])
+		        call pargstr (Memc[pixmin])
+		        call pargd (minval)
+		        call pargstr (Memc[pixmax])
+		        call pargd (maxval)
+		    call flush (STDOUT)
+	        }
 	    }
 	}
 
 	# Return the computed values of the last image examined as CL
 	# parameters.
 
-	call clputr ("minval", minval)
-	call clputr ("maxval", maxval)
+	call clputd ("minval", minval)
+	call clputd ("maxval", maxval)
+	call clputd ("iminval", iminval)
+	call clputd ("imaxval", imaxval)
 	call clpstr ("minpix", Memc[pixmin], SZ_FNAME)
 	call clpstr ("maxpix", Memc[pixmax], SZ_FNAME)
 
 	call sfree (sp)
 end
 
-# MKOUTSTR --
+
+# MKOUTSTR -- Encode the output string.
 
 procedure mkoutstr (v, ndim, outstr, maxch)
 
@@ -131,14 +149,13 @@ char	outstr[ARB]	# output string
 int	maxch		# maximum length of string
 
 int	i, ip, nchars
-
 int	ltoc()
 
 begin
-	# encode opening brackett
+	# Encode opening brackett.
 	outstr[1] = '['
 
-	# encode v vector values
+	# Encode v vector values.
 	ip = 2
 	do i = 1, ndim {
 	    nchars = ltoc (v[i], outstr[ip], maxch)
@@ -147,7 +164,7 @@ begin
 	    ip = ip + 1
 	}
 
-	# encode closing bracketts and EOS
+	# Encode closing bracketts and EOS.
 	outstr[ip-1] = ']'
 	outstr[ip] = EOS
 end

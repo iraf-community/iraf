@@ -9,7 +9,8 @@ procedure ap_fshow (ap)
 pointer	ap	# pointer to the apphot strucuture
 
 pointer	sp, str
-int	apstati(), itob()
+bool	itob()
+int	apstati()
 real	apstatr()
 
 begin

@@ -1,5 +1,5 @@
 include <mach.h>
-include "../lib/nlfit.h"
+include <math/nlfit.h>
 include "../lib/fitsky.h"
 
 define	SFRACTION	.20		# Lucy smoothing length
@@ -8,9 +8,9 @@ define	TOL		.001		# Fitting tolerance
 # AP_GAUSS -- Procedure to compute the peak, width and skew of the histogram
 # by fitting a skewed Gaussian function to the histogram.
 
-int procedure ap_gauss (skypix, coords, nskypix, snx, sny, maxfit
-    k1, hwidth, binsize, smooth, k2, rgrow, maxiter, sky_mode, sky_sigma,
-    sky_skew, nsky, nsky_reject)
+int procedure ap_gauss (skypix, coords, nskypix, snx, sny, maxfit, k1, hwidth,
+	binsize, smooth, k2, rgrow, maxiter, sky_mode, sky_sigma, sky_skew,
+	nsky, nsky_reject)
 
 real	skypix[ARB]	# array of sky pixels
 int	coords[ARB]	# array of coordinates
@@ -208,30 +208,35 @@ int	ier		# error code
 
 extern  gausskew, dgausskew
 int	i, imin, imax, np, fier
-pointer	sp, list, nl
-real	p[4], dp[4], junk
+pointer	sp, list, fit, nl
+real	p[4], dp[4], dummy1
+int	locpr()
 
 begin
-	# Initialize.
+	# Allocate working memory.
 	call smark (sp)
 	call salloc (list, 4, TY_INT)
+	call salloc (fit, nbins, TY_REAL)
+
+	# Initialize.
 	do i = 1, 4
 	    Memi[list+i-1] = i
 
-	# Compute initial guesses for the parameters
-	call ap_alimr (hgm, nbins, junk, p[1], imin, imax)
+	# Compute initial guesses for the parameters.
+	call ap_alimr (hgm, nbins, dummy1, p[1], imin, imax)
 	p[2] = x[imax]
 	p[3] = max (sky_sigma ** 2, abs (x[2] - x[1]) ** 2)
 	p[4] = 0.0
 	np = 4
 
 	# Fit the histogram.
-	call nlinit (nl, gausskew, dgausskew, p, dp, np, Memi[list], 4, tol,
-	    maxiter)
-	call nlfit (nl, x, x, hgm, w, nbins, nbins, 1, WTS_UNIFORM, fier)
-	call nlpget (nl, p, np)
-	call nlerrors (nl, WTS_UNIFORM, junk, dp)
-	call nlfree (nl)
+	call nlinitr (nl, locpr (gausskew), locpr (dgausskew), p, dp, np,
+	    Memi[list], 4, tol, maxiter)
+	call nlfitr (nl, x, hgm, w, nbins, 1, WTS_UNIFORM, fier)
+	call nlvectorr (nl, x, Memr[fit], nbins, 1)
+	call nlpgetr (nl, p, np)
+	call nlfreer (nl)
+
 	call sfree (sp)
 
 	# Return the appropriate error code.

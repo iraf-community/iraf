@@ -1,21 +1,21 @@
-      SUBROUTINE SWVAR (LAB)
-      INTEGER LAB, I, LABNUM, NDIGI0
-      CALL OUTCH (115)
-      CALL OUTCH (119)
-      LABNUM = LAB
-      NDIGI0=0
-23000 IF (.NOT.(LABNUM .GT. 0))GOTO 23002
-      NDIGI0 = NDIGI0 + 1
-23001 LABNUM=LABNUM/10
-      GOTO 23000
-23002 CONTINUE
-      I=3
-23003 IF (.NOT.(I .LE. 6 - NDIGI0))GOTO 23005
-      CALL OUTCH (48)
-23004 I=I+1
-      GOTO 23003
-23005 CONTINUE
-      CALL OUTNUM (LAB)
-      RETURN
-      END
-C     NDIGI0  NDIGITS
+      subroutine swvar (lab)
+      integer lab, i, labnum, ndigi0
+      call outch (115)
+      call outch (119)
+      labnum = lab
+      ndigi0=0
+23000 if (.not.(labnum .gt. 0))goto 23002
+      ndigi0 = ndigi0 + 1
+23001 labnum=labnum/10
+      goto 23000
+23002 continue
+      i=3
+23003 if (.not.(i .le. 6 - ndigi0))goto 23005
+      call outch (48)
+23004 i=i+1
+      goto 23003
+23005 continue
+      call outnum (lab)
+      return
+      end
+c     ndigi0  ndigits

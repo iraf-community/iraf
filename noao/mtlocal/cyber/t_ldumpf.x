@@ -11,15 +11,16 @@ procedure t_ldumpf ()
 pointer	sp, dmp
 char	dumpf_file[SZ_FNAME], file_list[SZ_LINE], in_fname[SZ_FNAME]
 int	file_number, ranges[3, MAX_RANGES], nfiles
-int	read_pf_table(), get_next_number(), decode_ranges(), strlen()
+int	read_pf_table(), get_next_number(), decode_ranges()
 int	mtfile()
 
 begin
-	# Allocate space for program data structure
+	# Allocate space for program data structure.
 	call smark (sp)
 	call salloc (dmp, LEN_DMP, TY_STRUCT)
 
-	# Get parameters; get file_list only if dump_file is a general tape name
+	# Get parameters; get file_list only if dump_file is a general
+	# tape name.
 	call clgstr ("dumpf_file", dumpf_file, SZ_FNAME)
 	if (mtfile (dumpf_file) == YES)
 	    call clgstr ("file_list", file_list, SZ_LINE)
@@ -28,14 +29,13 @@ begin
 	if (decode_ranges (file_list, ranges, MAX_RANGES, nfiles) == ERR)
 	    call error (0, "Illegal file number list")
 
-	# For each file in file_list call read_pf_table
+	# For each file in file_list call read_pf_table.
 	file_number = 0
 	while (get_next_number (ranges, file_number) != EOF) {
-	    call strcpy (dumpf_file, in_fname, SZ_FNAME)
-	    if (mtfile (in_fname) == YES) {
-	        call sprintf (in_fname[strlen(in_fname)+1], SZ_FNAME, "[%d]")
-		    call pargi (file_number + 1)
-	    }
+	    if (mtfile (dumpf_file) == YES)
+		call mtfname (dumpf_file, file_number + 1, in_fname, SZ_FNAME)
+	    else
+	        call strcpy (dumpf_file, in_fname, SZ_FNAME)
 	    if (read_pf_table (in_fname, file_number, dmp) == EOF) {
 		call printf ("End of DUMPF tape\n")
 		call sfree (sp)
@@ -44,6 +44,7 @@ begin
 	}
 	call sfree (sp)
 end
+
 
 # READ_PF_TABLE -- reads and prints out the Cyber permanent file information.
 
@@ -92,6 +93,7 @@ begin
 	return (OK)
 end
 
+
 # DECIPHER_DC -- An ascii character string is decoded from an input
 # bit stream.  An offset into the bit stream and the number of characters
 # to unpack are input.
@@ -120,6 +122,7 @@ begin
 	}
 	outbuf[op] = EOS
 end
+
 
 # UNPK_PF_INFO -- unpacks words from the Permanent File Information Table
 # and fills program data structure dmp.  
@@ -188,8 +191,6 @@ begin
 	month = i 
 	day = ddd
 end
-
-
 
 
 # PRINT_PF_INFO -- information from the permanent file table is printed.

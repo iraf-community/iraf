@@ -860,6 +860,10 @@ register struct task *tp;
 		fclose (tp->t_stdplot);
 	}
 
+	/* If task i/o is redirected to a subprocess send the done message.
+	 */
+	if (flags & T_IPCIO)
+	    fputs (IPCDONEMSG, tp->t_out);
 	fflush (tp->t_out);
 
 	/* Close files only for script task, not for a cl, a builtin, or
@@ -1043,6 +1047,7 @@ struct task *tp;
 oneof()
 {
 	register struct pfile *pfp;
+	register struct package *pkp;
 	static	int	nerrs = 0;
 	int	flags;
 
@@ -1061,10 +1066,16 @@ oneof()
 	    fflush (currentask->t_out);
 	iofinish (currentask);
 
-	/* Copy back the main pfile and any pset-param files.
+	/* Copy back the main pfile and any pset-param files.  If the task
+	 * which has terminated is a package script task, fix up the pfile
+	 * pointer in the package descriptor to point to the updated pset.
 	 */
 	if (currentask->t_ltp->lt_flags & LT_PFILE) {
 	    pfcopyback (pfp = currentask->t_pfp);
+	    if (currentask->t_ltp->lt_flags & LT_DEFPCK)
+		if (pkp = pacfind(currentask->t_ltp->lt_lname))
+		    if (pkp->pk_pfp == pfp)
+			pkp->pk_pfp = pfp->pf_oldpfp;
 	    for (pfp = pfp->pf_npset;  pfp != NULL;  pfp = pfp->pf_npset)
 		pfcopyback (pfp);
 	}

@@ -1,0 +1,14 @@
+# The DAOPHOT fitting parameters
+
+varpsf,b,h,no,,,"Variable psf across image?"
+psfrad,r,h,11.0,0.0,,"Radius of psf in scale units"
+fitrad,r,h,2.5,0.0,,"Fitting radius in scale units"
+matchrad,r,h,1.5,0.0,,"Search radius for match with the PHOT results"
+critoverlap,r,h,0.2,0.1,50.0,"Critical overlap group membership"
+maxiter,i,h,50,1,100,"Maximum number of iterations"
+maxgroup,i,h,60,,100,"Maximum number of stars per group"
+maxnstar,i,h,3000,,50000,"Maximum number of stars to fit"
+recenter,b,h,yes,,,"Recenter stars during fit (allstar only)"
+cliprange,r,h,2.5,0.0,,"Clipping range in standard deviations (allstar only)"
+clipexp,i,h,6,0,8,"Clipping exponent (allstar only)"
+mode,s,h,"ql",,,

@@ -65,9 +65,10 @@ begin
 		}
 
 		nchars = p_arg[1]
-		if (nchars <= SZ_SBUF)
+		if (nchars <= SZ_SBUF) {
 		    call amovc (p_sbuf, Memc[bp], nchars)
-		else {
+		    p_sbuflen = nchars
+		} else {
 		    call ks_aread (server, Memc[bp], nchars)
 		    call ks_await (server, status)
 

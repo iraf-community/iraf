@@ -73,6 +73,9 @@ begin
 	    } else
 	        nread = nread + 1
 
+	    # Remove contaminating control characters and replace with blanks.
+	    call rft_control_to_blank (card, card, LEN_CARD)
+
 	    # Print FITS card images if long_header option specified.
 	    if (long_header == YES) {
 		call printf ("%-80.80s\n")
@@ -116,6 +119,27 @@ begin
 
 	call close (fd_usr)
 	return (OK)
+end
+
+
+# RFT_CONTROL_TO_BLANK -- Replace an ACSII control characters in the
+# FITS card image with blanks.
+
+procedure rft_control_to_blank (incard, outcard, len_card)
+
+char	incard[ARB]		# the input FITS card image
+char	outcard[ARB]		# the output FITS card image
+int	len_card		# the length of the FITS card image
+
+int	i
+
+begin
+	for (i = 1; i <= len_card; i = i + 1) {
+	    if (IS_PRINT(incard[i]))
+	        outcard[i] = incard[i]
+	    else
+		outcard[i] = ' '
+	}
 end
 
 
@@ -216,9 +240,9 @@ begin
 	} else if (strmatch (card, "^DATE    ") !=  0) {
 	    call rft_trim_card (card, card, LEN_CARD)
 	    call strcat (card[i], HISTORY(im), SZ_HISTORY)
-	} else if (strmatch (card, "^HISTORY ") != 0) {
-	    call rft_trim_card (card, card, LEN_CARD)
-	    call strcat (card[i - 2], HISTORY(im), SZ_HISTORY)
+	#} else if (strmatch (card, "^HISTORY ") != 0) {
+	    #call rft_trim_card (card, card, LEN_CARD)
+	    #call strcat (card[i - 2], HISTORY(im), SZ_HISTORY)
 	} else if (strmatch (card, "^UT      ") != 0) {
 	    len = rft_hms (card, str, Memc[comment], LEN_CARD)
 	    if (len > 0) {

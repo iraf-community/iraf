@@ -18,11 +18,13 @@ char	image1[SZ_FNAME]			# Input image
 char	image2[SZ_FNAME]			# Output image
 int	boundary				# Type of boundary extension
 real	constant				# Constant boundary extension
+int	bilinear				# Bilinear kernel
+int	radsym					# Radially symmetric kernel?
 int	delim					# record delimiter for files
 
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	list1, list2, kxdim, kydim, radsym
-pointer	sp, im1, im2, kername, kernel
+int	list1, list2, kxdim, kydim, dummy
+pointer	sp, im1, im2, kername, xkername, ykername, kernel, xkernel, ykernel
 
 bool	clgetb()
 char	clgetc()
@@ -32,20 +34,33 @@ real	clgetr()
 errchk	cnv_convolve
 
 begin
+	# Allocate temporary working space.
 	call smark (sp)
 	call salloc (kername, SZ_LINE, TY_CHAR)
+	call salloc (xkername, SZ_LINE, TY_CHAR)
+	call salloc (ykername, SZ_LINE, TY_CHAR)
 
-	# Get input and output image parameters
+	# Get the input and output image parameters.
 	call clgstr ("input", imtlist1, SZ_FNAME)
 	call clgstr ("output", imtlist2, SZ_FNAME)
-	call clgstr ("kernel", Memc[kername], SZ_LINE)
 
-	# Get boundary extension parameters
+	# Get the kernel characteristics.
+	bilinear = btoi (clgetb ("bilinear"))
+	if (bilinear == NO)
+	    call clgstr ("kernel", Memc[kername], SZ_LINE)
+	else {
+	    call clgstr ("xkernel", Memc[xkername], SZ_LINE)
+	    call clgstr ("ykernel", Memc[ykername], SZ_LINE)
+	}
+	radsym = btoi (clgetb ("radsym"))
+	delim = int (clgetc ("row_delimiter"))
+
+	# Get the boundary extension parameters.
 	boundary = clgwrd ("boundary", str, SZ_LINE,
 	    ",constant,nearest,reflect,wrap,")
 	constant = clgetr ("constant")
 
-	# Check list lengths
+	# Check the list lengths.
 	list1 = imtopen (imtlist1)
 	list2 = imtopen (imtlist2)
 	if (imtlen (list1) != imtlen (list2)) {
@@ -54,44 +69,62 @@ begin
 	    call error (0, "Number of input and output images not the same.")
 	}
 
-	# Get the kernel
-	delim = int (clgetc ("row_delimiter"))
-	iferr (call cnv_kernel (Memc[kername], SZ_LINE, delim,
-	    kernel, kxdim, kydim))
-	    call erract (EA_FATAL)
-	if (mod (kxdim, 2) != 0)
-	    radsym = btoi (clgetb ("radsym"))
-	else
-	    radsym = NO
+	# Fetch and decode the kernel.
+	kernel = NULL
+	xkernel = NULL
+	ykernel = NULL
+	if (bilinear == NO) {
+	    iferr (call cnv_kernel (Memc[kername], SZ_LINE, delim, kernel,
+	        kxdim, kydim))
+	        call erract (EA_FATAL)
+	} else {
+	    iferr (call cnv_kernel (Memc[xkername], SZ_LINE, delim, xkernel,
+	        kxdim, dummy))
+	        call erract (EA_FATAL)
+	    if (dummy != 1)
+		call error (0,
+		"T_CONVOLVE: Error decoding the bilinear x dimension kernel")
+	    iferr (call cnv_kernel (Memc[ykername], SZ_LINE, delim, ykernel,
+	        kydim, dummy))
+	        call erract (EA_FATAL)
+	    if (dummy != 1)
+	        call error (0,
+		"T_CONVOLVE: Error decoding the bilinear y dimension kernel")
+	}
 
 	call sfree (sp)
 
-	# Convolve the images with the kernel
+	# Convolve the images in the list with the kernel.
 	while ((imtgetim (list1, image1, SZ_FNAME) != EOF) &&
 	      (imtgetim (list2, image2, SZ_FNAME) != EOF)) {
 	    
-	    # Make temporary image name
+	    # Make a temporary image name.
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
-	    # Open images
+	    # Open the input and output images.
 	    im1 = immap (image1, READ_ONLY, 0)
 	    im2 = immap (image2, NEW_COPY, im1)
 
-	    # Convolve an image with the kernel
+	    # Convolve each image with the kernel.
 	    iferr {
 
 		switch (IM_NDIM(im1)) {
 		case 1:
-		    kydim = 1
+		    if (kydim > 1)
+		        call error (0,
+		   "T_CONVOLVE: Kernel dimension higher than image dimension.")
 		case 2:
 		    ;
 		default:
 		    call error (0, "T_CONVOLVE: Image dimension > 2.")
 		}
 
-		# Convolve image
-		call cnv_convolve (im1, im2, Memr[kernel], kxdim, kydim,
-		    boundary, constant, radsym)
+		if (bilinear == NO)
+		    call cnv_convolve (im1, im2, Memr[kernel], kxdim, kydim,
+		        boundary, constant, radsym)
+		else
+		    call cnv_xyconvolve (im1, im2, Memr[xkernel], kxdim,
+		        Memr[ykernel], kydim, boundary, constant, radsym)
 
 	    } then {
 		call eprintf ("Error convolving image: %s\n")
@@ -107,12 +140,17 @@ begin
 	    }
 	}
 
-	# Close image lists
+	# Close the image lists.
 	call imtclose (list1)
 	call imtclose (list2)
 
-	# Free kernel
-	call mfree (kernel, TY_REAL)
+	# Free the kernel space.
+	if (kernel != NULL)
+	    call mfree (kernel, TY_REAL)
+	if (xkernel != NULL)
+	    call mfree (xkernel, TY_REAL)
+	if (ykernel != NULL)
+	    call mfree (ykernel, TY_REAL)
 end
 
 
@@ -130,19 +168,18 @@ pointer	kernel			# Gaussian kernel
 int	nx, ny			# dimensions of the kernel
 
 int	fd
-int	stropen(), open()
+int	access(), stropen(), open()
 
 begin
-	if (IS_DIGIT(kername[1]) || kername[1] == '.' || kername[1] == '-' ||
-	    kername[1] == '+') {
-	    fd = stropen (kername, maxch, READ_ONLY)
-	    call cnv_decode_kernel (fd, kernel, nx, ny, delim)
-	    call strclose (fd)
-	} else {
+	if (access (kername, READ_ONLY, TEXT_FILE) == YES) {
 	    fd = open (kername, READ_ONLY, TEXT_FILE)
 	    call cnv_decode_kernel (fd, kernel, nx, ny, delim)
 	    call cnv_rowflip (Memr[kernel], nx, ny)
 	    call close (fd)
+	} else {
+	    fd = stropen (kername, maxch, READ_ONLY)
+	    call cnv_decode_kernel (fd, kernel, nx, ny, delim)
+	    call strclose (fd)
 	}
 end
 
@@ -185,27 +222,27 @@ int	sz_kernel, kp, lp, minnx, maxnx, nchars
 int	getline(), ctor()
 
 begin
-	# Line buffer
+	# Allocate space for the line buffer.
 	call smark (sp)
 	call salloc (line, SZ_LINE, TY_CHAR)
 
-	# Initialize row and column counters
+	# Initialize row and column counters and the kernel element counter.
+	kp = 0
 	nx = 0
 	ny = 0
 	minnx = MAX_INT
 	maxnx = -MAX_INT
+	kernel = NULL
 
-	kp = 0
-
-	# Decode kernel file
+	# Decode the kernel.
 	nchars = getline (fd, Memc[line])
 	while (nchars != EOF) {
 
-	    # Decode the kernel line
+	    # Decode each kernel line.
 	    for (lp = 1; lp <= nchars; ) {
 
-	        # Check to see that kernel is big enough
-	        if (kp == 0) {
+	        # Check to see that kernel is big enough.
+	        if (kernel == NULL) {
 		    sz_kernel = SZ_KERNEL
 		    call malloc (kernel, sz_kernel, TY_REAL)
 	        } else if (kp > sz_kernel) {
@@ -213,7 +250,7 @@ begin
 		    call realloc (kernel, sz_kernel, TY_REAL)
 	        }
 
-		# Decode the kernel elements
+		# Decode the kernel elements one by one.
 		if (Memc[line+lp-1] == delim) {
 		    minnx = min (minnx, nx)
 		    maxnx = max (maxnx, nx)
@@ -223,37 +260,42 @@ begin
 
 		} else if (Memc[line+lp-1] == '\n' ||
 		    IS_WHITE(Memc[line+lp-1]) || Memc[line+lp-1] == ',') {
-
 		    lp = lp + 1
 
 		} else {
-		    # Decode kernel element
 		    if (ctor (Memc[line], lp, Memr[kernel+kp]) == 0) {
 			call sfree (sp)
 			call error (0, "CNV_DECODE_KERNEL: Invalid kernel.")
 		    }
-
 		    kp = kp + 1
 		    nx = nx + 1
 		}
 	    }
 
+	    # Get next line.
 	    nchars = getline (fd, Memc[line])
 	}
 
-	# Last delimiter not necessary
-	if (nx != 0)
-	    ny = ny + 1
+	# Quit if there are no valid elements in the kernel.
+	if (kp <= 0)
+	    call error (0, "CNV_DECODE_KERNEL: Invalid kernel.")
 
-	# Free temporary space
+	# Last delimiter is not necessary.
+	if (nx != 0) {
+	    minnx = min (minnx, nx)
+	    maxnx = max (maxnx, nx)
+	    ny = ny + 1
+	}
+
+	# Free temporary space.
 	call sfree (sp)
 
-	# Test that the kernel is correct size
-	if (minnx != maxnx)
+	# Test that the kernel is the correct size.
+	if (minnx != maxnx) {
 	    call error (0, "CNV_KERNEL: Kernel rows are different lengths.")
-	else if ((kp != minnx * ny) || (kp != maxnx * ny))
-	    call error (0, "CNV_KERNEL: Incorrect kernel row number.")
-	else {
+	} else if ((kp != minnx * ny) || (kp != maxnx * ny)) {
+	    call error (0, "CNV_KERNEL: Incorrect number of kernel rows.")
+	} else {
 	    call realloc (kernel, kp, TY_REAL)
 	    nx = minnx
 	}

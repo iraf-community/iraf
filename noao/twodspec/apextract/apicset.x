@@ -17,8 +17,8 @@ int	i
 real	x, x1, x2
 pointer	ic, sp, str
 
-int	clgeti(), ctor()
-real	clgetr(), ic_getr()
+int	apgeti(), ctor()
+real	apgetr(), ic_getr()
 
 begin
 	if (AP_IC(apout) == NULL)
@@ -28,24 +28,24 @@ begin
 	if (apin == NULL) {
 	    call smark (sp)
 	    call salloc (str, SZ_LINE, TY_CHAR)
-	    call clgstr ("apdefault.function", Memc[str], SZ_LINE)
+	    call apgstr ("b_function", Memc[str], SZ_LINE)
 	    call ic_pstr (ic, "function", Memc[str])
-	    call ic_puti (ic, "order", clgeti ("apdefault.order"))
-	    call clgstr ("apdefault.sample", Memc[str], SZ_LINE)
+	    call ic_puti (ic, "order", apgeti ("b_order"))
+	    call apgstr ("b_sample", Memc[str], SZ_LINE)
 	    call ic_pstr (ic, "sample", Memc[str])
-	    call ic_puti (ic, "naverage", clgeti ("apdefault.naverage"))
-	    call ic_puti (ic, "niterate", clgeti ("apdefault.niterate"))
-	    call ic_putr (ic, "low", clgetr ("apdefault.low_reject"))
-	    call ic_putr (ic, "high", clgetr ("apdefault.high_reject"))
-	    call ic_putr (ic, "grow", clgetr ("apdefault.grow"))
+	    call ic_puti (ic, "naverage", apgeti ("b_naverage"))
+	    call ic_puti (ic, "niterate", apgeti ("b_niterate"))
+	    call ic_putr (ic, "low", apgetr ("b_low_reject"))
+	    call ic_putr (ic, "high", apgetr ("b_high_reject"))
+	    call ic_putr (ic, "grow", apgetr ("b_grow"))
 	    if (AP_AXIS(apout) == 1)
 		    call ic_pstr (ic, "xlabel", "Column")
 		else
 		    call ic_pstr (ic, "xlabel", "Line")
 
 	    # Set background min and max based on sample regions.
-	    x1 = xmin
-	    x2 = xmax
+	    x1 = min (xmin, xmax)
+	    x2 = max (xmin, xmax)
 	    for (i=str; Memc[i]!=EOS; i=i+1)
 		if (Memc[i] == ':')
 		    Memc[i] = ','
@@ -56,8 +56,8 @@ begin
 		    i = i - 1
 	        }
 	    if (x1 > x2) {
-		x1 = xmin
-		x2 = xmax
+		x1 = min (xmin, xmax)
+		x2 = max (xmin, xmax)
 	    }
 	    call ic_putr (ic, "xmin", x1)
 	    call ic_putr (ic, "xmax", x2)
@@ -72,10 +72,12 @@ begin
 	}
 
 	# Insure the background region passes under the aperture.
-	x1 = AP_LOW(apout, AP_AXIS(apout))
-	x2 = AP_HIGH(apout, AP_AXIS(apout))
-	call ic_putr (AP_IC(apout), "xmin",
-	    min (x1, x2, ic_getr (AP_IC(apout), "xmin")))
-	call ic_putr (AP_IC(apout), "xmax",
-	    max (x1, x2, ic_getr (AP_IC(apout), "xmax")))
+	if (AP_IC(apout) != NULL) {
+	    x1 = AP_LOW(apout, AP_AXIS(apout))
+	    x2 = AP_HIGH(apout, AP_AXIS(apout))
+	    call ic_putr (AP_IC(apout), "xmin",
+	        min (x1, x2, ic_getr (AP_IC(apout), "xmin")))
+	    call ic_putr (AP_IC(apout), "xmax",
+	        max (x1, x2, ic_getr (AP_IC(apout), "xmax")))
+	}
 end

@@ -9,7 +9,7 @@ libpkg.a:
 	imgets.x	<imhdr.h> <error.h> <ctype.h>
 	imheader.x	<imhdr.h> <imio.h> <time.h> <ctype.h> <error.h>
 	imhistogram.x	<mach.h> <imhdr.h> <gset.h>
-	listpixels.x	<imhdr.h>
+	listpixels.x	<error.h> <imhdr.h> <mwset.h>
 	t_imstat.x	<mach.h> <imhdr.h> "imstat.h"
 	t_sections.x
 	hselect.x	<error.h> <evexpr.h> <ctype.h>

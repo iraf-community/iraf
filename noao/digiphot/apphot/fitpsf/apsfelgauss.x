@@ -1,5 +1,5 @@
 include <math.h>
-include "../lib/nlfit.h"
+include <math/nlfit.h>
 include "../lib/noise.h"
 include "../lib/fitpsf.h"
 
@@ -9,11 +9,12 @@ define	TOL		0.001
 # APSFELGAUSS -- Procedure to fit an elliptical Gaussian function to the
 # stellar data.
 
-int procedure apsfelgauss (ctrpix, nx, ny, fwhmpsf, datamin, datamax, noise,
-	gain, sigma, maxiter, k2, nreject, par, perr, npar)
+int procedure apsfelgauss (ctrpix, nx, ny, emission, fwhmpsf, datamin,
+	datamax, noise, gain, sigma, maxiter, k2, nreject, par, perr, npar)
 
 real	ctrpix[nx,ny]		# object to be centered
 int	nx, ny			# dimensions of subarray
+int	emission		# emission or absorption object
 real	fwhmpsf			# full width half max of the psf
 real	datamin			# minimum good data value
 real	datamax			# maximum good data value
@@ -28,10 +29,10 @@ real	perr[ARB]		# errors in parameters
 int	npar			# number of parameters
 
 extern	elgauss, delgauss
-int	i, npts, fier
-pointer	sp, x, y, w, list, zfit, nl
-real	sumw, chisqr, locut, hicut, ptemp
-int	apreject()
+int	i, j, npts, fier, imin,imax
+pointer	sp, x, w, list, zfit, nl, ptr
+real	sumw, dummy, chisqr, locut, hicut, ptemp
+int	locpr(), apreject()
 real	asumr(), apwssqr()
 
 begin
@@ -42,20 +43,24 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (x, nx, TY_REAL)
-	call salloc (y, ny, TY_REAL)
+	call salloc (x, 2 * npts, TY_REAL)
 	call salloc (w, npts, TY_REAL)
+	call salloc (zfit, npts, TY_REAL)
 	call salloc (list, NPARAMETERS, TY_INT)
 
 	# Define the active parameters.
 	do i = 1, NPARAMETERS
 	    Memi[list+i-1] = i
 
-	# Set up the x and y arrays.
-	do i = 1, nx
-	    Memr[x+i-1] = i
-	do i = 1, ny
-	    Memr[y+i-1] = i
+	# Set up the varaibles array.
+	ptr = x
+	do j = 1, ny {
+	    do i = 1, nx {
+		Memr[ptr] = i
+		Memr[ptr+1] = j
+		ptr = ptr + 2
+	    }
+	}
 
 	# Set up the weight array.
 	switch (noise) {
@@ -73,26 +78,33 @@ begin
 	}
 
 	# Make an initial guess at the fitting parameters.
-	call ap_wlimr (ctrpix, Memr[w], nx * ny, datamin, datamax,
-	    par[7], par[1])
+	if (emission == YES)
+	    call ap_wlimr (ctrpix, Memr[w], nx * ny, datamin, datamax,
+	        par[7], par[1], imin, imax)
+	else
+	    call ap_wlimr (ctrpix, Memr[w], nx * ny, datamin, datamax,
+	        par[7], par[1], imax, imin)
 	par[1] = par[1] - par[7]
-	par[2] = (1. + nx) / 2.
-	par[3] = (1. + ny) / 2.
+	if (mod (imax, nx) == 0)
+	    imin = imax / nx
+	else
+	    imin = imax / nx + 1
+	par[3] = imin
+	imin = imax - (imin - 1) * nx
+	par[2] = imin
 	par[4] = (fwhmpsf ** 2 / 4.0)
 	par[5] = (fwhmpsf ** 2 / 4.0)
 	par[6] = 0.0
 
 	# Get the centers and errors.
-	call nlinit (nl, elgauss, delgauss, par, perr, NPARAMETERS,
-	    Memi[list], NPARAMETERS, TOL, maxiter)
-	call nlfit (nl, Memr[x], Memr[y], ctrpix, Memr[w], nx, ny, ny,
-	    WTS_USER, fier)
+	call nlinitr (nl, locpr (elgauss), locpr (delgauss), par, perr,
+	    NPARAMETERS, Memi[list], NPARAMETERS, TOL, maxiter)
+	call nlfitr (nl, Memr[x], ctrpix, Memr[w], npts, 2, WTS_USER, fier)
 
 	# Perform the rejection cycle.
 	if (nreject > 0 && k2 > 0.0) {
-	    call salloc (zfit, npts, TY_REAL)
 	    do i = 1, nreject {
-		call nlvector (nl, Memr[x], Memr[y], Memr[zfit], nx, ny, ny)
+		call nlvectorr (nl, Memr[x], Memr[zfit], npts, 2)
 		call asubr (ctrpix, Memr[zfit], Memr[zfit], npts)
 		chisqr = apwssqr (Memr[zfit], Memr[w], npts)
 		sumw = asumr (Memr[w], npts)
@@ -106,18 +118,36 @@ begin
 		hicut = k2 * chisqr
 		if (apreject (Memr[zfit], Memr[w], npts, locut, hicut) == 0)
 		    break
-		call nlpget (nl, par, npar)
-		call nlfree (nl)
-		call nlinit (nl, elgauss, delgauss, par, perr, NPARAMETERS,
-		    Memi[list], NPARAMETERS, TOL, maxiter)
-		call nlfit (nl, Memr[x], Memr[y], ctrpix, Memr[w], nx, ny, ny,
-	    	    WTS_USER, fier)
+		call nlpgetr (nl, par, npar)
+		call nlfreer (nl)
+		call nlinitr (nl, locpr (elgauss), locpr (delgauss), par,
+		    perr, NPARAMETERS, Memi[list], NPARAMETERS, TOL, maxiter)
+		call nlfitr (nl, Memr[x], ctrpix, Memr[w], npts, 2, WTS_USER,
+		    fier)
 	    }
 	}
 
-	# Fetch the final parameters and their errors.
-	call nlpget (nl, par, npar)
-	call nlerrors (nl, WTS_UNIFORM, chisqr, perr)
+	# Fetch the parameters.
+	call nlvectorr (nl, Memr[x], Memr[zfit], npts, 2)
+	call nlpgetr (nl, par, npar)
+	par[4] = sqrt (abs(par[4]))
+	par[5] = sqrt (abs(par[5]))
+
+	# Fetch the errors.
+	call nlerrorsr (nl, ctrpix, Memr[zfit], Memr[w], npts, dummy,
+	    chisqr, perr)
+	perr[4] = sqrt (perr[4])
+	perr[5] = sqrt (perr[5])
+
+	# Compute the mean errors.
+	dummy = 0.0
+	do i = 1, npts {
+	    if (Memr[w+i-1] > 0.0)
+		dummy = dummy + 1.0
+	}
+	dummy = sqrt (dummy)
+	if (dummy > 0.0)
+	    call adivkr (perr, dummy, perr, npar)
 
 	# Transform the parameters.
 	par[6] = mod (RADTODEG(par[6]), 360.0)
@@ -138,9 +168,11 @@ begin
 	}
 	perr[6] = mod (RADTODEG(perr[6]), 360.0)
 
-	# Return the appropriate error code.
-	call nlfree (nl)
+	call nlfreer (nl)
+
 	call sfree (sp)
+
+	# Return the appropriate error code.
 	if (fier == NO_DEG_FREEDOM) {
 	    return (AP_NPSF_TOO_SMALL)
 	} else if (fier == SINGULAR) {

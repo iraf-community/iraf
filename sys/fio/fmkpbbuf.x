@@ -16,6 +16,8 @@ include	<fio.com>
 
 begin
 	fp = fiodes[fd]
+	if (bufptr[fd] == NULL)
+	    call fmkbfs (fd)
 
 	buflen = FPBBUFSIZE(fp)
 	if (buflen <= 0) {

@@ -1,9 +1,35 @@
-# Make the TV package.
+# TV package.
 
-$call	update
+$call	relink
 $exit
 
 update:
+	$ifeq (USE_IIS, yes) @iis $endif
+	$call relink
+	$call install
+	;
+
+relink:
+	$set   LIBS = "-liminterp -lgsurfit -lcurfit -lllsq -lncar -lgks -lds"
+	$checkout libds.a lib$
+	$update libds.a
+	$checkin  libds.a lib$
+	$update libpkg.a
+	$omake	x_tv.x
+	$link	x_tv.o libpkg.a $(LIBS) -o xx_tv.e
+	;
+
+install:
+	$move xx_tv.e bin$x_tv.e
+	;
+
+libds.a:
 	@display
-	@cv
+	;
+
+libpkg.a:
+	@imedit
+	@imexamine
+	@tvmark
+	@wcslab
 	;

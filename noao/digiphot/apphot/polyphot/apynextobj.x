@@ -1,7 +1,8 @@
 include <fset.h>
 include "../lib/polyphot.h"
 
-# AP_YNEXTOBJ -- Procedure to fetch the next polygon from the list.
+# AP_YNEXTOBJ -- Read the next polygon from the list polygon and/or coordinate
+# list.
 
 int procedure ap_ynextobj (py, id, pl, cl, delim, x, y, maxnver, prev_num,
     req_num, ld, pd)
@@ -27,14 +28,15 @@ real	apstatr()
 errchk	greactivate, gdeactivate, gscur
 
 begin
-
+	# The coordinate list is undefined.
 	if (cl == NULL) {
 
+	    # Get the input file name.
 	    call smark (sp)
 	    call salloc (fname, SZ_FNAME, TY_CHAR)
+	    call fstats (pl, F_FILENAME, Memc[fname], SZ_FNAME)
 
 	    # Compute the number of polygons that must be skipped.
-	    call fstats (pl, F_FILENAME, Memc[fname], SZ_FNAME)
 	    if (strncmp ("STDIN", Memc[fname], 5) == 0) {
 		stdin = YES
 		nskip = 1
@@ -47,42 +49,51 @@ begin
 		    nskip = req_num - prev_num
 	    }
 
-	    # Find the correct polygon.
+	    # Initialize the polygon search.
 	    ncount = 0
 	    pd = prev_num
+
+	    # Find the correct polygon.
 	    repeat {
+
 		call apsetr (py, PYX, apstatr (py, PYCX))
 		call apsetr (py, PYY, apstatr (py, PYCY))
 		nver = ap_yget (py, pl, delim, x, y, maxnver)
-		if (nver == EOF)
+
+		if (nver == EOF) {
 		    ncount = EOF
-		else if (nver > 0) {
+		}  else if (nver > 0) {
 		    ncount = ncount + 1
 		    pd = pd + 1
 		}
+
 	    } until (ncount == EOF || ncount == nskip)
 
+	    # Return the polygon number.
 	    if (req_num <= prev_num)
 		pd = ncount 
 	    ld = pd
 
 	    call sfree (sp)
-	    if (ncount == EOF)
+
+	    if (ncount == EOF) {
 		return (EOF)
-	    else {
-	        if (id != NULL) {
-		    iferr {
-		        call greactivate (id, 0)
-		        call gscur (id, apstatr (py, PYCX), apstatr (py, PYCY))
-		        call gdeactivate (id, 0)
-		    } then
-		        ;
-	        }
+	    } else if (id != NULL) {
+		iferr {
+		    call greactivate (id, 0)
+		    call gscur (id, apstatr (py, PYCX), apstatr (py, PYCY))
+		    call gdeactivate (id, 0)
+		} then
+		    ;
+		return (nver)
+	     } else {
 		return (nver)
 	    }
 
+	# Both the polygon and coordinate file are defined.
 	} else {
 
+	    # Get the input file name.
 	    call smark (sp)
 	    call salloc (fname, SZ_FNAME, TY_CHAR)
 	    call fstats (cl, F_FILENAME, Memc[fname], SZ_FNAME)
@@ -102,14 +113,18 @@ begin
 		    nskip = req_num - prev_num
 	    }
 
-	    # Find the correct object and shift the coordinates.
+	    # Initialize the polygon id.
 	    ncount = 0
 	    ld = prev_num
+
+	    # Find the correct object and shift the coordinates.
 	    repeat {
+
+		# Read the coordinates and the polygon.
 		stat = ap_ycoords (cl, delim, xshift, yshift, stdin)
-		if (stat == EOF)
+		if (stat == EOF) {
 		    ncount = EOF
-		else if (stat == NEXT_POLYGON || pd == 0) {
+		} else if (stat == NEXT_POLYGON || pd == 0) {
 		    call apsetr (py, PYX, apstatr (py, PYCX))
 		    call apsetr (py, PYY, apstatr (py, PYCY))
 		    nver = ap_yget (py, pl, delim, x, y, maxnver)
@@ -118,6 +133,8 @@ begin
 		    else if (nver > 0)
 		        pd = pd + 1
 		}
+
+		# Shift the polygon coordinates.
 		if (stat == THIS_OBJECT && ncount != EOF && nver > 0) {
 		    call aaddkr (x, (xshift - apstatr (py, PYCX)), x, nver + 1)
 		    call aaddkr (y, (yshift - apstatr (py, PYCY)), y, nver + 1)
@@ -126,22 +143,26 @@ begin
 		    ncount = ncount + 1
 		    ld = ld + 1
 		}
+
 	    } until (ncount == EOF || ncount == nskip)
+
+	    # Get the correct id.
 	    if (req_num <= prev_num)
 		ld = ncount
 
 	    call sfree (sp)
-	    if (ncount == EOF)
+
+	    if (ncount == EOF) {
 		return (EOF)
-	    else {
-	        if (id != NULL) {
-		    iferr {
-		        call greactivate (id, 0)
-		        call gscur (id, apstatr (py, PYCX), apstatr (py, PYCY))
-		        call gdeactivate (id, 0)
-		    } then
-		        ;
-	        }
+	    } else if (id != NULL) {
+		iferr {
+		    call greactivate (id, 0)
+		    call gscur (id, apstatr (py, PYCX), apstatr (py, PYCY))
+		    call gdeactivate (id, 0)
+		} then
+		    ;
+		return (nver)
+	    } else {
 		return (nver)
 	    }
 	}

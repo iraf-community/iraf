@@ -22,48 +22,24 @@ begin
 	if (cv == NULL)
 	    return
 
-	$if (datatype == r)
 	if (CV_XBASIS(cv) != NULL)
-	    call mfree (CV_XBASIS(cv), TY_REAL)
+	    call mfree (CV_XBASIS(cv), TY_PIXEL)
 	if (CV_VECTOR(cv) != NULL)
-	    call mfree (CV_VECTOR(cv), TY_REAL)
+	    call mfree (CV_VECTOR(cv), TY_PIXEL)
 	if (CV_COEFF(cv) != NULL)
-	    call mfree (CV_COEFF(cv), TY_REAL)
+	    call mfree (CV_COEFF(cv), TY_PIXEL)
 
 	if (CV_BASIS(cv) != NULL)
-	    call mfree (CV_BASIS(cv), TY_REAL)
+	    call mfree (CV_BASIS(cv), TY_PIXEL)
 	if (CV_LEFT(cv) != NULL)
 	    call mfree (CV_LEFT(cv), TY_INT)
 	if (CV_WY(cv) != NULL)
-	    call mfree (CV_WY(cv), TY_REAL)
+	    call mfree (CV_WY(cv), TY_PIXEL)
 
 	if (CV_MATRIX(cv) != NULL)
-	    call mfree (CV_MATRIX(cv), TY_REAL)
+	    call mfree (CV_MATRIX(cv), TY_PIXEL)
 	if (CV_CHOFAC(cv) != NULL)
-	    call mfree (CV_CHOFAC(cv), TY_REAL)
-
-	$else
-
-	if (CV_XBASIS(cv) != NULL)
-	    call mfree (CV_XBASIS(cv), TY_DOUBLE)
-	if (CV_VECTOR(cv) != NULL)
-	    call mfree (CV_VECTOR(cv), TY_DOUBLE)
-	if (CV_COEFF(cv) != NULL)
-	    call mfree (CV_COEFF(cv), TY_DOUBLE)
-
-	if (CV_BASIS(cv) != NULL)
-	    call mfree (CV_BASIS(cv), TY_DOUBLE)
-	if (CV_LEFT(cv) != NULL)
-	    call mfree (CV_LEFT(cv), TY_INT)
-	if (CV_WY(cv) != NULL)
-	    call mfree (CV_WY(cv), TY_DOUBLE)
-
-	if (CV_MATRIX(cv) != NULL)
-	    call mfree (CV_MATRIX(cv), TY_DOUBLE)
-	if (CV_CHOFAC(cv) != NULL)
-	    call mfree (CV_CHOFAC(cv), TY_DOUBLE)
-
-	$endif
+	    call mfree (CV_CHOFAC(cv), TY_PIXEL)
 
 	call mfree (cv, TY_STRUCT)
 end

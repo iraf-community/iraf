@@ -34,6 +34,7 @@ intensities around the feature must exceed this threshold.
 Refit the dispersion function?  If yes and there are more than 4
 features in more than one order and a dispersion function was defined
 in the reference image then a new dispersion function of the same type
+and order offset
 as in the reference image is fit using the new pixel positions.
 Otherwise only a zero point shift is determined from the revised fitted
 coordinates without changing the form of the dispersion function.
@@ -76,7 +77,7 @@ in the feature positions is recorded as a zero point wavelength offset
 for the fundamental order without changing the shape of the dispersion
 function.  If the parameter has the value "yes" then the new feature
 positions are used to refit the dispersion function (of the same function
-type and orders).
+type and orders).  The order offset is also maintained.
 
 Log information is written to the specified log files.  To log this to
 the terminal, called the standard output, use STDOUT.  The log

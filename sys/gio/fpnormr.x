@@ -21,6 +21,11 @@ begin
 	    while (absx < (1.0E0 - tol)) {
 		absx = absx * 10.0E0
 		expon = expon - 1
+		if (absx == 0.0) {	# check for underflow to zero
+		    normx = 0
+		    expon = 0
+		    return
+		}
 	    }
 	    while (absx >= (10.0E0 + tol)) {
 		absx = absx / 10.0E0

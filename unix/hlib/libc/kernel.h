@@ -15,7 +15,7 @@ typedef	int  (*PFI)();		/* for signal handlers */
  * Buffer lengths are in units of whatever the buffer contains.
  */
 #define SZ_DISKBLOCK	512	/* used in zsttbf if dev block invar.	*/
-#define	FILE_MODEBITS	0644	/* protection bits for new files	*/
+#define	FILE_MODEBITS	0666	/* protection bits for new files	*/
 #define	MAXOFILES	64	/* maximum open files (see <stdio.h>)	*/
 #define	MAXPROCS	20	/* maximum subprocesses per process	*/
 #define	SZ_DEFWORKSET	512000	/* default working set size, bytes	*/
@@ -54,7 +54,17 @@ struct fiodes {
 	int	nbytes;			/* last nbytes r|w		*/
 	int	io_flags;		/* fcntl flags			*/
 	short	flags;			/* access mode flags		*/
+#ifdef SYSV
+#define MAXCC	8
+#define _STDF_INIT	0,0,0, 0,0,0,0,0,0,0,0
+	short	tc_iflag;		/* saved SysV tty state		*/
+	short	tc_oflag;
+	short	tc_lflag;
+	char	tc_cc[MAXCC];
+#else
+#define _STDF_INIT	0
 	short	sg_flags;		/* save space for stty flags	*/
+#endif
 };
 extern	struct fiodes zfd[];		/* array of descriptors		*/
 
@@ -69,11 +79,10 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define	LEN_SETREDRAW	6		/* nchars in setredraw string	*/
 #define SETREDRAW	"\033=rDw"	/* set/enable screenredraw code	*/
 
-
 #define	STDIO_FILES {			/* initialization of stdio	*/\
-	stdin,  0L, 0L, 0, 0, KF_NOSEEK, 0,\
-	stdout, 0L, 0L, 0, 0, KF_NOSEEK, 0,\
-	stderr, 0L, 0L, 0, 0, KF_NOSEEK, 0\
+	stdin,  0L, 0L, 0, 0, KF_NOSEEK, _STDF_INIT,\
+	stdout, 0L, 0L, 0, 0, KF_NOSEEK, _STDF_INIT,\
+	stderr, 0L, 0L, 0, 0, KF_NOSEEK, _STDF_INIT\
 }
 
 extern	char *irafpath();

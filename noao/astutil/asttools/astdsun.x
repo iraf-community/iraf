@@ -11,9 +11,9 @@ double	n, g, r
 double	ast_julday()
 
 begin
-	n = ast_julday (epoch) - 2451545
-	g = DEGTORAD (357.528 + 0.9856003 * n)
-	r = 1.00014 - 0.01671 * cos (g) - 0.00014 * cos (2 * g)
+	n = ast_julday (epoch) - 2451545d0
+	g = DEGTORAD (357.528d0 + 0.9856003d0 * n)
+	r = 1.00014d0 - 0.01671d0 * cos (g) - 0.00014d0 * cos (2 * g)
 
 	return (r)
 end

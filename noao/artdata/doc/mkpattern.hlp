@@ -78,6 +78,16 @@ Number of columns (first dimension) and lines (second dimension).
 .ls n3 = 1, n4 = 1, n5 = 1, n6 = 1, n7 = 1
 Number of pixels in 3rd-7th  dimensions
 .le
+.ls header = "artdata$stdheader.dat"
+Image or header keyword data file.  If an image is given then the image header
+is copied.  If a file is given then the FITS format cards are copied.
+This only applies to new images.   The data file consists of lines
+in FITS format with leading whitespace ignored.  A FITS card must begin
+with an uppercase/numeric keyword.  Lines not beginning with a FITS
+keyword such as comments or lower case are ignored.  The user keyword
+output of \fBimheader\fR is an acceptible data file.  See \fBmkheader\fR
+for further information.
+.le
 .ih
 DESCRIPTION
 This task creates or modifies images with a choice of patterns.  New images
@@ -85,6 +95,13 @@ are created with the specified dimensions, datatype, and pattern.
 Existing images may have the pattern replace, add, or multiply the
 pixel values.  Existing images may be modified in place or new images may be
 created and image sections are allowed.
+
+For new images a set of header keywords may be added by specifying an
+image or data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
+If a data file is specified lines beginning with FITS keywords are
+entered in the image header.  Leading whitespace is ignored and any
+lines beginning with words having lowercase and nonvalid FITS keyword
+characters are ignored.
 
 This task is the simplest one for creating empty images to be used for
 mosaicing with \fBimcopy\fR and making patterns for testing display and

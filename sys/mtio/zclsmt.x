@@ -4,27 +4,23 @@ include	<config.h>
 include	<knet.h>
 include	"mtio.h"
 
-define	SZ_NULLSTR	8		# "NULLFILE"
-
-
-# ZCLSMT -- Close a magtape file and device.  If file was opened for writing
-# but nothing was written, write out the "NULLFILE" record.  Update lockfile
-# so that we will know where the tape is positioned next time we open the
-# device.  Deallocate the mtio descriptor so that it may be reused again.
+# ZCLSMT -- Close a magtape file and device.  Update lockfile so that we
+# will know where the tape is positioned next time we open the device.
+# Deallocate the mtio descriptor so that it may be reused again.
 # 
 # We are being called during error recovery if "new_mtchan" is not null.
 # If MT_OSCHAN has also been set, then ZZOPMT was interrupted, probably while
 # trying to position the tape, and the position of the tape is indefinite.
 # Close the tape with acmode=read so that no tape marks are written, and write
-# the lockfile with file=0 to signify that the position is indefinite.
+# the lockfile with file = -1 to signify that the position is indefinite.
 
 procedure zclsmt (mtchan, status)
 
-int	mtchan				# index of mtio descriptor
-int	status
+int	mtchan				#I i/o channel
+int	status				#O close status
 
-char	nullstr[SZ_NULLSTR]
-int	mt, junk, nfiles, nrecords
+int	mt
+bool	error_recovery
 include	"mtio.com"
 
 begin
@@ -32,38 +28,27 @@ begin
 	if (new_mtchan != NULL) {
 	    mt = new_mtchan
 	    if (MT_OSCHAN(mt) != NULL)
-		call zzclmt (MT_OSCHAN(mt), READ_ONLY, nrecords, nfiles, status)
-	    MT_FILE(mt) = -1
+		call zzclmt (MT_OSCHAN(mt), MT_DEVPOS(mt), status)
+
 	    call mt_savepos (mt)
+	    call mt_sync (ERR)
 	    new_mtchan = NULL
 
 	} else {
 	    mt = mtchan
 
-	    # Write nullfile record if tape opened for writing but no data
-	    # was written.
+	    # If a task aborts while a tape file is open, mt_sync will
+	    # already have been called to update the position,
+	    # and the current file will have been set to undefined (-1).
 
-	    if (MT_ACMODE(mt) == WRITE_ONLY && MT_NRECORDS(mt) == 0) {
-		call chrpak ("NULLFILE", 1, nullstr, 1, SZ_NULLSTR)
-		call zawrmt (mt, nullstr, SZ_NULLSTR, 0)
-		call zawtmt (mt, junk)
-	    }
+	    error_recovery = (MT_FILNO(mt) == -1)
 
-	    # Close device.
-	    call zzclmt (MT_OSCHAN(mt), MT_ACMODE(mt), nrecords, nfiles, status)
+	    # Close device.  This clobbers MT_FILNO (see above).
+	    call zzclmt (MT_OSCHAN(mt), MT_DEVPOS(mt), status)
 
-	    # Update the position.  If a task aborts while a tape file is open,
-	    # mt_sync will already have been called to update the position, and
-	    # the current file will have been set to undefined (-1).
-
-	    if (MT_FILE(mt) != -1) {
-		if (nfiles > 0) {
-		    MT_FILE(mt) = MT_FILE(mt) + nfiles
-		    MT_RECORD(mt) = 1
-		} else
-		    MT_RECORD(mt) = MT_RECORD(mt) + nrecords
+	    # Update the tape position if not recovering from an abort.
+	    if (!error_recovery)
 		call mt_savepos (mt)
-	    }
 	}
 
 	MT_OSCHAN(mt) = NULL

@@ -80,7 +80,7 @@ begin
 	call amovkr (1., Memr[pnm2], npts)
 	call altar (x, Memr[sx], npts, k1, k2)
 	call amovr (Memr[sx], Memr[pnm1], npts)
-	call amulkr (Memr[sx], 2., Memr[sx], npts)
+	call amulkr (Memr[sx], 2.0, Memr[sx], npts)
 	do i = 3, order {
 	    call amulr (Memr[sx], Memr[pnm1], Memr[pn], npts)
 	    call asubr (Memr[pn], Memr[pnm2], Memr[pn], npts)

@@ -2,7 +2,7 @@
 
 include <error.h>
 include <imhdr.h>
-include <imset.h>
+include <fset.h>
 include	"rfits.h"
 
 # RFT_READ_FITZ -- Convert a FITS file. An EOT is signalled by returning EOF.
@@ -15,8 +15,8 @@ char	iraffile[ARB]		# IRAF file name
 int	fits_fd, stat, min_lenuserarea, ip
 pointer	im, sp, fits, envstr
 int	rft_read_header(), mtopen(), immap(), strlen(), envfind(), ctoi()
-errchk	smark, sfree, salloc, rft_read_header, rft_read_image, mtopen, immap
-errchk	imdelete, close, imunmap
+errchk	smark, sfree, salloc, rft_read_header, rft_read_image, rft_find_eof()
+errchk	rft_scan_file, mtopen, immap, imdelete, close, imunmap
 
 include	"rfits.com"
 
@@ -67,8 +67,12 @@ begin
 	    if (stat == EOF)
 	        call printf ("End of data\n")
 	    else {
-	        if (make_image == YES)
+	        if (make_image == YES) {
 	            call rft_read_image (fits_fd, fits, im)
+		    if (fe > 0.0)
+			call rft_find_eof (fits_fd)
+		} else if (fe > 0.0)
+		    call rft_scan_file (fits_fd, fits, im, fe)
 	    }
 	} then {
 	    call flush (STDOUT)
@@ -82,10 +86,20 @@ begin
 	if (stat == EOF || make_image == NO) {
 	    call imdelete (iraffile)
 	} else if (old_name == YES && strlen (IRAFNAME(fits)) != 0) {
-	    call imrename (iraffile, IRAFNAME(fits))
-	    call printf ("    File: %s restored to IRAF File: %s\n")
-		call pargstr (iraffile)
-		call pargstr (IRAFNAME(fits))
+	    iferr {
+		call imgimage (IRAFNAME(fits), IRAFNAME(fits), SZ_FNAME)
+	        call imrename (iraffile, IRAFNAME(fits))
+	    } then {
+		call printf ("   Cannot rename image %s to %s\n")
+		    call pargstr (iraffile)
+		    call pargstr (IRAFNAME(fits))
+	        call flush (STDOUT)
+	        call erract (EA_WARN)
+	    } else {
+	        call printf ("    File: %s restored to IRAF File: %s\n")
+		    call pargstr (iraffile)
+		    call pargstr (IRAFNAME(fits))
+	    }
 	}
 
 	if (long_header == YES)
@@ -95,4 +109,65 @@ begin
 	call sfree (sp)
 
 	return (stat)
+end
+
+
+# RFT_FIND_EOF -- Read the FITS data file until EOF is reached.
+
+procedure rft_find_eof (fd)
+
+int	fd			# the FITS file descriptor
+
+int	szbuf
+pointer	sp, buf
+int	fstati(), read()
+errchk	read
+
+begin
+	# Scan through the file.
+	szbuf = fstati (fd, F_BUFSIZE)
+	call smark (sp)
+	call salloc (buf, szbuf, TY_CHAR)
+	while (read (fd, Memc[buf], szbuf) != EOF)
+	    ;
+	call sfree (sp)
+end
+
+
+# RFT_SCAN_FILE -- Determine whether it is more efficient to read the
+# entire file or to skip forward to the next file if the parameter
+# make_image was set to no.
+
+procedure  rft_scan_file (fd, fits, im, fe)
+
+int	fd			# the FITS file descriptor
+pointer	fits			# pointer to the FITS descriptor
+pointer	im			# pointer to the output image
+real	fe			# maximum file size in MB fro scan mode
+
+int	i, szbuf
+pointer	sp, buf
+real	file_size
+int	fstati(), read()
+errchk	read
+
+begin
+	# Compute the file size in MB and return if it is bigger than fe.
+	file_size = 1.0
+	do i = 1, IM_NDIM(im)
+	    file_size = file_size * IM_LEN(im,i)
+	if (IM_NDIM(im) <= 0)
+	    file_size = 0.0
+	else
+	    file_size = file_size * abs (BITPIX(fits)) / FITS_BYTE / 1.0e3
+	if (file_size >= fe)
+	    return
+
+	# Scan through the file.
+	szbuf = fstati (fd, F_BUFSIZE)
+	call smark (sp)
+	call salloc (buf, szbuf, TY_CHAR)
+	while (read (fd, Memc[buf], szbuf) != EOF)
+	    ;
+	call sfree (sp)
 end

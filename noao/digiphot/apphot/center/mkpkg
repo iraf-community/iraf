@@ -17,6 +17,7 @@ libpkg.a:
 			<gset.h>
 	apcerrors.x	../lib/center.h
 	apcfree.x	../lib/apphotdef.h	../lib/centerdef.h
+	apictr.x
 	apcinit.x	../lib/apphotdef.h	../lib/center.h		\
 			../lib/centerdef.h
 	apclean.x	../lib/apphot.h		../lib/center.h		\
@@ -38,9 +39,9 @@ libpkg.a:
 	apfitcen.x	../lib/apphotdef.h	../lib/center.h         \
 			../lib/centerdef.h	../lib/noisedef.h	\
 			<mach.h>
-	apgcpars.x	../lib/apphot.h		../lib/center.h         \
-			../lib/display.h	../lib/noise.h
-	apgctr1d.x	../lib/center.h		../lib/nlfit.h
+	apgcpars.x	../lib/center.h		../lib/display.h        \
+			../lib/noise.h
+	apgctr1d.x	../lib/center.h		<math/nlfit.h>
 	aplgctr1d.x	../lib/center.h		<math.h>
 	appcenter.x	../lib/apphot.h		../lib/center.h
 	apcradsetup.x	../lib/display.h

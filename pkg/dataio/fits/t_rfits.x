@@ -25,8 +25,9 @@ bool	clgetb()
 char	clgetc()
 int	rft_get_image_type(), clgeti(), mtfile(), strlen(), btoi(), fntlenb()
 int	rft_read_fitz(), decode_ranges(), get_next_number(), fntgfnb(), fstati()
+int	mtneedfileno(), fntrfnb()
 pointer	fntopnb()
-real	clgetr()
+real	clgetr(), rft_fe()
 
 include	"rfits.com"
 
@@ -46,7 +47,7 @@ begin
 	# Open the input file list.
 	if (mtfile (infile) == YES) {
 	    inlist = NULL
-	    if (infile[strlen(infile)] != ']')
+	    if (mtneedfileno (infile) == YES)
 	        call clgstr ("file_list", file_list, SZ_LINE)
 	    else
 	        call strcpy ("1", file_list, SZ_LINE)
@@ -67,6 +68,12 @@ begin
 	# Open the output file list.
 	if (make_image == YES) {
 	    call clgstr ("iraf_file", outfile, SZ_FNAME)
+	    if (outfile[1] == EOS) {
+		if (old_name == YES)
+		    call mktemp ("tmp", outfile, SZ_FNAME) 
+		else
+		    call error (0, "T_RFITS: Undefined output file name")
+	    }
 	    outlist = fntopnb (outfile, NO)
 	    len_outlist = fntlenb (outlist)
 	    data_type = rft_get_image_type (clgetc ("datatype"))
@@ -82,6 +89,9 @@ begin
 	    call error (0,
 	        "T_RFITS: Output and input lists have different lengths")
 
+	# Get the scan size parameter.
+	fe = rft_fe (infile)
+
 	# Read successive FITS files, convert and write into a numbered
 	# succession of output IRAF files.
 
@@ -93,22 +103,21 @@ begin
 		if (fntgfnb (inlist, in_fname, SZ_FNAME) == EOF)
 		    call error (0, "T_RFITS: Error reading input file name")
 	    } else {
-	        call strcpy (infile, in_fname, SZ_FNAME)
-	        if (infile[strlen(infile)] != ']') {
-		    call sprintf (in_fname[strlen(in_fname)+1], SZ_FNAME,
-		        "[%d]")
-		        call pargi (file_number)
-		}
+		if (mtneedfileno (infile) == YES)
+		    call mtfname (infile, file_number, in_fname, SZ_FNAME)
+		else
+	            call strcpy (infile, in_fname, SZ_FNAME)
 	    }
 
 	    # Get the output file name.
 	    if (outlist == NULL) {
 		out_fname[1] = EOS
-	    } else if (len_outlist == 1) {
-	        call strcpy (outfile, out_fname, SZ_FNAME)
+	    } else if (len_inlist > len_outlist) {
+		if (fntrfnb (outlist, 1, out_fname, SZ_FNAME) == EOF)
+	            call strcpy (outfile, out_fname, SZ_FNAME)
 	        if (len_inlist > 1) {
 		    call sprintf (out_fname[strlen(out_fname)+1], SZ_FNAME,
-		        "%03d")
+		        "%04d")
 		        call pargi (file_number + offset)
 	        }
 	    } else if (fntgfnb (outlist, out_fname, SZ_FNAME) == EOF)
@@ -148,4 +157,28 @@ begin
 	    return (ERR)
 	else
 	    return (type_codes[stridx(c,types)])
+end
+
+
+# RFT_FE -- Fetch the maximum file size in MB for tape scanning mode.
+
+real procedure rft_fe (file)
+
+char	file[ARB]		# the input file name
+
+pointer	gty
+real	fe
+int	mtfile(), gtygeti()
+pointer	mtcap()
+errchk	gtygeti()
+
+begin
+	if (mtfile (file) == NO)
+	    return (0.0)
+	iferr (gty = mtcap (file))
+	    return (0.0)
+	iferr (fe = gtygeti (gty, "fe"))
+	    fe = 0.0
+	call gtyclose (gty)
+	return (fe)
 end

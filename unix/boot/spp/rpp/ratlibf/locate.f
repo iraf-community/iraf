@@ -1,16 +1,16 @@
-      INTEGER FUNCTION LOCATE (C, PAT, OFFSET)
-      INTEGER C, PAT (128)
-      INTEGER OFFSET
-      INTEGER I
-      I = OFFSET + PAT (OFFSET)
-23000 IF (.NOT.(I .GT. OFFSET))GOTO 23002
-      IF (.NOT.(C .EQ. PAT (I)))GOTO 23003
-      LOCATE=(1)
-      RETURN
-23003 CONTINUE
-23001 I = I - 1
-      GOTO 23000
-23002 CONTINUE
-      LOCATE=(0)
-      RETURN
-      END
+      integer function locate (c, pat, offset)
+      integer c, pat (128)
+      integer offset
+      integer i
+      i = offset + pat (offset)
+23000 if (.not.(i .gt. offset))goto 23002
+      if (.not.(c .eq. pat (i)))goto 23003
+      locate=(1)
+      return
+23003 continue
+23001 i = i - 1
+      goto 23000
+23002 continue
+      locate=(0)
+      return
+      end

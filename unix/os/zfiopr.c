@@ -14,6 +14,13 @@
 #include <iraf.h>
 
 extern	int errno;		/* error code returned by the kernel	*/
+#ifdef SYSV
+#define	vfork	fork
+#else
+#  ifdef sun
+#  include <vfork.h>
+#  endif
+#endif
 
 /* ZFIOPR -- File i/o to a subprocess.  A "connected" subprocess is connected
  * to the parent via two IPC channels (read and write), and is analogous to a
@@ -41,6 +48,8 @@ extern	int errno;		/* error code returned by the kernel	*/
 
 int	pr_ionbytes[MAXOFILES];		/* nbytes read|written on channel */
 int	debug_ipc = 0;			/* print debug info on stderr	  */
+int	ipc_in = 0;			/* logfile for IPC input	  */
+int	ipc_out = 0;			/* logfile for IPC output	  */
 int	ipc_isatty = 0;			/* set when debugging IPC at TTY  */
 
 
@@ -243,6 +252,9 @@ XLONG	*loffset;		/* not used */
 	    }
 	}
 
+	if (ipc_in > 0)
+	    write (ipc_in, (char *)&temp, 2);
+
 	/* Get byte count of record.
 	 */
 	if (read (fd, &temp, 2) != 2) {
@@ -252,6 +264,8 @@ XLONG	*loffset;		/* not used */
 	record_length = temp;
 	nbytes = min (record_length, *maxbytes);
 	pr_ionbytes[fd] = nbytes;
+	if (ipc_in > 0)
+	    write (ipc_in, (char *)&temp, 2);
 
 	/* Now read exactly nbytes of data from channel into user buffer.
 	 * Return actual byte count if EOF is seen.  If ERR is seen return
@@ -279,6 +293,9 @@ XLONG	*loffset;		/* not used */
 		getpid(), op - (char *)buf, fd);
 	    write (2, (char *)buf, op - (char *)buf);
 	}
+
+	if (ipc_in > 0)
+	    write (ipc_in, (char *)buf, op - (char *)buf);
 
 	/* If the record is larger than maxbytes, we must read and discard
 	 * the additional bytes.  The method used is inefficient but it is
@@ -330,12 +347,18 @@ XLONG	*loffset;
 
 	temp = IPC_MAGIC;
 	write (fd, &temp, 2);
+	if (ipc_out > 0)
+	    write (ipc_out, &temp, 2);
 	temp = *nbytes;
 	write (fd, &temp, 2);
+	if (ipc_out > 0)
+	    write (ipc_out, &temp, 2);
 
 	/* Write data block.
 	 */
 	pr_ionbytes[fd] = write (fd, (char *)buf, (int)*nbytes);
+	if (ipc_out > 0)
+	    write (ipc_out, (char *)buf, (int)*nbytes);
 
 	sigsetmask (sigmask_save);
 

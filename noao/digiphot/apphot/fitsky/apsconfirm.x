@@ -1,3 +1,4 @@
+include "../lib/apphot.h"
 include "../lib/noise.h"
 include "../lib/fitsky.h"
 
@@ -10,9 +11,10 @@ int	out		# output file descriptor
 int	stid		# output file sequence number
 
 pointer	sp, str
-real	annulus, dannulus, skysigma
+real	annulus, dannulus, skysigma, datamin, datamax
 int	apstati()
 real	apstatr(), ap_vannulus(), ap_vdannulus(), ap_vsigma()
+real	ap_vdatamin(), ap_vdatamax()
 
 begin
 	call smark (sp)
@@ -46,6 +48,10 @@ begin
 	else
 	    skysigma = apstatr (ap, SKYSIGMA)
 
+	# Confirm the minimum and maximum good data values.
+	datamin = ap_vdatamin (ap)
+	datamax = ap_vdatamax (ap)
+
 	call printf ("\n")
 
 	# Update the database file.
@@ -58,6 +64,10 @@ begin
 	        "width of the sky annulus")
 	    call ap_rparam (out, KY_SKYSIGMA, skysigma, UN_SKYSIGMA,
 	        "standard deviation of 1 sky pixel") 
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	        "minimum good data value") 
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	        "maximum good data value") 
 	}
 
 	call sfree (sp)

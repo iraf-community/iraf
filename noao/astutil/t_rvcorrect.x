@@ -19,11 +19,6 @@ double	clgetd()
 include	"rvcorrect.com"
 
 begin
-	# Location of observation.
-	latitude = clgetd ("latitude")
-	longitude = clgetd ("longitude")
-	altitude = clgetd ("altitude")
-
 	# Solar motion relative to desired standard of rest.
 	vs = clgetd ("vsun")
 	ras = clgetd ("ra_vsun")
@@ -72,10 +67,25 @@ double	vobs				# Observed velocity
 int	fd
 char	file[SZ_FNAME]
 double	hjd, vrot, vorb, vbary, vsol
+pointer	obs
 
 int	clgfil(), open(), fscan(), nscan()
+double	obsgetd()
+pointer	obsopen()
+errchk	obsopen
+
+include	"rvcorrect.com"
 
 begin
+	# Location of observation.
+	call clgstr ("observatory", file, SZ_FNAME)
+	obs = obsopen (file)
+	call obslog (obs, "RVCORRECT", "latitude longitude altitude", STDOUT)
+	latitude = obsgetd (obs, "latitude")
+	longitude = obsgetd (obs, "longitude")
+	altitude = obsgetd (obs, "altitude")
+	call obsclose (obs)
+
 	# Loop through files.
 	while (clgfil (list, file, SZ_FNAME) != EOF) {
 	    iferr (fd = open (file, READ_ONLY, TEXT_FILE)) {
@@ -124,35 +134,53 @@ double	ut				# Time of observation
 double	vobs				# Observed velocity
 
 int	ip
-char	image[SZ_FNAME], date[SZ_LINE]
+bool	newobs, obshead
 double	hjd, vrot, vorb, vbary, vsol
-pointer	im
+pointer	sp, observatory, image, date, im, obs
 
 int	imtgetim(), ctoi()
-double	imgetd()
+double	imgetd(), obsgetd()
 pointer	immap()
 
-errchk	imgetd, imgstr
+errchk	imgetd, imgstr, obsopen
+
 include	"rvcorrect.com"
 
 begin
+	call smark (sp)
+	call salloc (observatory, SZ_FNAME, TY_CHAR)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (date, SZ_LINE, TY_CHAR)
+
+	call clgstr ("observatory", Memc[observatory], TY_CHAR)
+	obs = NULL
+
 	# Loop through images.
-	while (imtgetim (list, image, SZ_FNAME) != EOF) {
-	    iferr (im = immap (image, READ_WRITE, 0)) {
+	while (imtgetim (list, Memc[image], SZ_FNAME) != EOF) {
+	    iferr (im = immap (Memc[image], READ_WRITE, 0)) {
 		call erract (EA_WARN)
 		next
 	    }
 
 	    iferr {
-	        call imgstr (im, "date-obs", date, SZ_LINE)
+		call obsimopen (obs, im, Memc[observatory], NO, newobs, obshead)
+		if (newobs) {
+		    call obslog (obs, "RVCORRECT",
+			"latitude longitude altitude", STDOUT)
+		    latitude = obsgetd (obs, "latitude")
+		    longitude = obsgetd (obs, "longitude")
+		    altitude = obsgetd (obs, "altitude")
+		}
+
+	        call imgstr (im, "date-obs", Memc[date], SZ_LINE)
 	        ip = 1
-	        if (ctoi (date, ip, day) == 0)
+	        if (ctoi (Memc[date], ip, day) == 0)
 		    next
 	        ip = ip + 1
-	        if (ctoi (date, ip, month) == 0)
+	        if (ctoi (Memc[date], ip, month) == 0)
 		    next
 	        ip = ip + 1
-	        if (ctoi (date, ip, year) == 0)
+	        if (ctoi (Memc[date], ip, year) == 0)
 		    next
 
 	        ut = imgetd (im, "ut")
@@ -173,12 +201,12 @@ begin
 		    call imaddd (im, "hjd", hjd)
 		    call imaddd (im, "vhelio", vobs+vrot+vbary+vorb)
 		    call imaddd (im, "vlsr", vobs+vrot+vbary+vorb+vsol)
-		    call sprintf (date, SZ_FNAME, "%6g %6g %6g %6g")
+		    call sprintf (Memc[date], SZ_LINE, "%6g %6g %6g %6g")
 		        call pargd (vs)
 		        call pargd (ras)
 		        call pargd (decs)
 		        call pargd (eps)
-		    call imastr (im, "vsun", date)
+		    call imastr (im, "vsun", Memc[date])
 		}
 
 	    } then
@@ -186,6 +214,9 @@ begin
 
 	    call imunmap (im)
 	}
+
+	call obsclose (obs)
+	call sfree (sp)
 end
 
 
@@ -202,11 +233,27 @@ double	ut				# Time of observation
 double	vobs				# Observed velocity
 
 double	hjd, vrot, vorb, vbary, vsol
+pointer	obs, file
 
 int	clgeti()
-double	clgetd()
+double	obsgetd(), clgetd()
+pointer	obsopen()
+errchk	obsopen
+
+include	"rvcorrect.com"
 
 begin
+	# Location of observation.
+	call malloc (file, SZ_FNAME, TY_CHAR)
+	call clgstr ("observatory", Memc[file], SZ_FNAME)
+	obs = obsopen (Memc[file])
+	call mfree (file, TY_CHAR)
+	call obslog (obs, "RVCORRECT", "latitude longitude altitude", STDOUT)
+	latitude = obsgetd (obs, "latitude")
+	longitude = obsgetd (obs, "longitude")
+	altitude = obsgetd (obs, "altitude")
+	call obsclose (obs)
+
 	# Date of observation.
 	year = clgeti ("year")
 	month = clgeti ("month")

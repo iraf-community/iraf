@@ -1,0 +1,889 @@
+# BUGS.V28 -- Known bugs in the frozen IRAF Version 2.8.  (start 1 July 1989)
+#
+# Record Format:
+#
+#	NUMBER:		record number, decimal, sequential.
+#	MODULE:		package.task or library.procedure or 'unknown' or ...
+#	SYSTEM:		versions of iraf in which bug was present
+#	DATE:		date bug logged, unix format date string
+#	FROM:		user login name
+#	BUG:		description of the bug
+#	STATUS:		'fixed in V2.X', 'unresolved', etc.
+#
+# New records are added to the tail of the bugfile.  Left justify field labels,
+# indent text to the first tab stop, one blank line between bug entries.
+# ----------------------------------------------------------------------------
+
+NUMBER:	76
+MODULE:	dispcor/ecdispcor/msdispcor
+SYSTEM:	V2.8
+DATE:	Mon Jul 10 13:26:08 MST 1989
+FROM:	valdes
+
+BUG:	The task DISPCOR does not produce the result one expects at the
+	endpoints of the input data.
+
+STATUS: The IRAF convention is that the pixel value refers to the center
+	of the pixel.  When considered as an aperture the pixel extends
+	between -0.5 and +0.5 of the pixel center.  The way the task is
+	written in V2.8, an interpolation function is fit to the values
+	at the pixel centers and the function is not defined beyond the
+	center of the first and last pixels.  When using the flux
+	conservation option (integration of the interpolation function
+	across the extent of the output pixel) the part of the output
+	pixel corresponding to the half pixel beyond the center of the
+	first and last pixel is not used.  For the simple case of an
+	output dispersion such that the size of an input and output
+	pixel are nearly the same and the endpoints are the same this
+	gives about a factor of 0.5 for the endpoint pixels.  When not
+	using flux conservation the interpolation function is evaluated
+	directly.  However, it is often the case that the center of the
+	last output pixel is computed to be just slightly beyond the
+	center of the last input pixel (due to rounding) and so the
+	last output pixel is often zero.
+
+	The task has been revised to extrapolate the interpolation function
+	by a half a pixel on either end of the input data.  The workarounds
+	are to avoid the endpoints when specifying the wavelength scale
+	during dispcor or by eliminating the endpoints after dispersion
+	correction using onedspec.sextract.
+
+NUMBER:	77
+MODULE:	dispcor/ecdispcor/msdispcor
+SYSTEM:	V2.8 (Sun4)
+DATE:	Mon Jul 10 13:46:09 MST 1989
+FROM:	valdes
+
+BUG:	Using a dispersion table with INDEF values for the number of pixels
+	causes a floating operand error.
+
+STATUS:	An attempt is made to convert the magic value for INDEF internally
+	in such a way that the floating operand exception is encountered.
+	Note that this is only a problem when the value is read from the
+	dispersion table file.  INDEF is fine as a task parameter.
+	There is no workaround for the INDEF feature though one can put
+	the number of pixels in explicitly in the dispersion table.
+
+NUMBER:	78
+MODULE:	apextract
+SYSTEM:	V2.7-V2.8
+DATE:	Mon Jul 31 15:54:05 MST 1989
+FROM:	valdes
+
+BUG:	The background fitting region is defined over the maximum extent
+	of the user defined background sample regions.  If this region
+	does not overlap the aperture (for example if the background
+	is selected to be only on one side of the aperture) then the
+	background graph in APEDIT does not show the background fit
+	under the aperture.
+
+STATUS:	The background fitting region has been extended to always overlap
+	the aperture even if the sample regions are only on one side of
+	the aperture.  There is no work around to get the fit displayed
+	in APEDIT other than to add sample regions on both sides of the
+	aperture.
+
+NUMBER:	79
+MODULE:	proto.imedit
+SYSTEM:	V2.8
+DATE:	Thu Aug  3 11:45:57 MST 1989
+FROM:	valdes
+
+BUG:	Using :eparam brings up eparam on the task EPIX instead of IMEDIT.
+
+STATUS:	The development name for this task was EPIX and so the command
+	issued in response to :eparam is "eparam epix" instead of
+	"eparam imedit".  There is no work around but most parameters
+	can be changed directly with colon commands.
+
+NUMBER:	80
+MODULE:	astutil.rvcorrect
+SYSTEM:	V2.8
+DATE:	Tue Aug  8 16:59:32 MST 1989
+FROM:	fitz
+
+BUG:	The RVCORRECT task would die with a floating operand error when
+	run with an fpa on a Sun-3/OS4, and would produce incorrect results
+	in the same situations under IRAF V2.7.
+
+STATUS:	This was traced to an optimizer bug and has been fixed in V2.9 by
+	placing the file astutil$asttools/astcoord.x on the special files list
+	so it is compiled without optimization.  By adding dummy statements
+	to the code it is also possible to get it working, but this is not
+	a desired solution.  The workaround is to recompile the astcoord.x
+	file without optimization and relink the astutil package.
+
+NUMBER:	81
+MODULE:	apextract.apsum, apextract.apstrip
+SYSTEM:	V2.7-V2.8
+DATE:	Wed Aug  9 09:53:39 MST 1989
+FROM:	valdes
+
+BUG:	The use of a profile image when the number of lines averaged is
+	greater than one and less than the full image for variance
+	weighting, cleaning, or extracting the fit as a strip does not
+	work correctly.
+
+STATUS:	There is no workaround other than to avoid this choice of
+	parameters.  A profile image can be used if the number of lines
+	averaged is one or the full image.  The first case is good if
+	the profile image has high S/N or has been smoothed.  The
+	latter case is appropriate if the profile does not change with
+	position along the dispersion.  The source code fix is one line
+	so, if desired and the system has not been stripped of object
+	libraries, the bug can be fixed and the task recompiled and
+	linked.
+
+NUMBER:	82
+MODULE:	proto.imedit
+SYSTEM:	V2.8
+DATE:	Thu Aug 17 09:51:14 MST 1989
+FROM:	valdes
+
+BUG:	If there are no background points (width = 0) then IMEDIT aborts.
+
+STATUS:	Attempting to fit a background with no background region is a
+	logical error and should be avoided.  The task now prints an
+	error message and continues.  An attempt is now made to trap
+	any errors in the cursor loop so as to avoid exiting the task
+	without the chance to save any changes.  Note that if an abort
+	occurs some changes may still exist in the image "epixbuf".
+	The last changes may be lost due to image I/O buffering (I'm
+	not sure what happens after an error abort).
+
+NUMBER:	83
+MODULE:	calibrate (onedspec and related imred packages)
+SYSTEM:	V2.8
+DATE:	Thu Aug 24 08:52:44 MST 1989
+FROM:	valdes
+
+BUG:	When data to be flux calibrated extends outside the range of the
+	sensitivity function produced by SENSFUNC and the standard
+	stars, a warning message is printed and that data outside the
+	range is improperly calibrated.  The usual symptom is that the
+	calibrated data is in flux units (numbers of order 10e-14)
+	while the improperly calibrated data is near the original data
+	units.  A plot of this data seems to be all zero on first
+	inspection because of autoscaling.
+
+STATUS:	The data WITHIN the calibration range is properly calibrated.
+	One solution is to trim the bad data with SEXTRACT either
+	before or after calibration.  Another solution is to use
+	TWODSPEC.LONGSLIT.FLUXCALIB which is applicable to 1D spectra.
+	The source fix is simple if one desires it.
+
+NUMBER:	84
+MODULE:	ccdred.cosmicrays (xtools$gtools/gtascale.x)
+SYSTEM:	V2.8 (Sun3/OS4/f68881 only)
+DATE:	Thu Sep 21 14:02:00 MST 1989
+FROM:	valdes
+
+BUG:	The task ccdred.cosmicrays aborts with the exception "branch or set on
+	unordered cond" if a plot is made either interactively or to the
+	plotfile on Sun3/OS4 using F68881 floating point processor.
+
+STATUS:	The cause is an optimizer bug for the above architecture
+	in xtools$gtools/gtascale.x.  The only workaround if one can't use
+	another architecture is to not make any plots interactively and set
+	ccdred.plotfile="".  One fix is to recompile the procedure without
+	optimization and relink ccdred.  The fix I used was to make a
+	minor change to the source which I could see from the optimizer
+	error would make the problem go away.
+
+NUMBER:	85
+MODULE:	ccdred.cosmicrays
+SYSTEM:	V2.8
+DATE:	Thu Sep 21 14:24:29 MST 1989
+FROM:	valdes
+
+BUG:	1. If no bad pixel output file is specified then the task does not
+	properly initialize and some random string may be used for this file.
+	Either a random file will be created or a warning will be issued.
+	2. If an incorrect input image is given a warning about transfering
+	out of an IFERR block is given.
+
+STATUS: 1. Usually everything will be fine.  If a odd file appears just
+	delete it.  If the random file is not writeable a warning is
+	given which can be ignored.  To be absolutely safe specify some
+	junk bad pixel file which you can delete later.
+	2. Don't worry about the IFERR block warning.
+
+NUMBER:	86
+MODULE:	extern.pkg - layered software
+SYSTEM:	V2.8
+DATE:	Tue Sep 26 16:46:35 MST 1989
+FROM:	tody
+
+BUG:	Given enough layered package definitions in hlib$extern.pkg,
+	the string value of the helpdb environment variable would exceed
+	SZ_LINE chars (160).  This would result in failure of the CL to
+	pass the "set helpdb = ..." statement on to the x_system.e process
+	while logging into the CL, causing CL startup to fail with a bogus
+	message such as "Cannot close file (STDERR)".
+
+STATUS:	The bug has been fixed in V2.9.  The only workaround for V2.8 is to
+	minimize the length of the helpdb string, e.g., by including only
+	needed packages, or consolidating packages so that they appear as
+	a single package in extern.pkg.
+
+NUMBER:	87
+MODULE:	onedspec
+SYSTEM:	V2.8 Sun3/80
+DATE:	Thu Sep 28 13:39:01 MST 1989
+FROM:	valdes
+
+BUG:	Many tasks will abort with a "floating overflow" error when
+	operating on onedspec format spectra which do not have the
+	header keyword W0.
+
+STATUS:	This problem only occurs on Sun3/80 and only with onedspec
+	format (i.e. not multispec or echelle format) which do
+	not have a wavelength scale (specifically the keyword
+	W0 is missing).  The workaround before the next release
+	is to add the the parameter W0 with a value of 1 using
+	HEDIT.  A value of 1 is the default anyway and that
+	means the coordinate of the first pixel is 1; i.e. pixel
+	coordinates.
+
+NUMBER:	88
+MODULE:	envgetd, impkden
+SYSTEM:	V2.8
+DATE:	Thu Oct 19 17:29:02 MST 1989
+FROM:	tody
+
+BUG:	This bug normally shows itself as a failure of the "impkden"
+	feature, added in V2.8, which allows an environment variable
+	"impkden" to be defined to specify the image packing density.
+	Due to a bug in the system procedure envgetd (the variable dval
+	is declared as int but should be double), the value of impkden
+	may not be read properly.  Normally this is harmless, but in some
+	cases a segmentation violation may occur if impkden is defined.
+
+STATUS:	The only workaround is to not use impkden, i.e., allow the
+	system to use the system default packing density.  Even if
+	impkden is defined and the program appears to execute normally,
+	the value of impkden is probably being ignored.
+
+NUMBER:	89
+MODULE:	imfort - setting image directories
+SYSTEM:	V2.8, Sun386i/IRAF only
+DATE:	Thu Oct 19 18:39:12 MST 1989
+FROM:	tody
+
+BUG:	Due to an error in the way the imfort library was built for
+	Sun386i/IRAF, the directory in which pixel files will be placed
+	cannot be specified, and pixel files will always be placed in
+	the same directory as the header file (the default).  Specifying
+	the pixel directory, e.g., with IMSDIR, is harmless, but the
+	request will be ignored.
+
+STATUS:	This bug affects only V2.8 Sun386i/IRAF.  The workaround is to
+	allow imfort to create pixel files in the header file directory,
+	and then use the IMRENAME task in V2.8 IRAF to move the pixel
+	file to a new directory.  The bug can be fixed by deleting the
+	imfort library (iraf$bin.i386/libimfort.a) and rebuilding it;
+	the imfort sources are correct, it is only the library which is
+	compromised.
+
+NUMBER:	90
+MODULE:	IMFORT
+SYSTEM:	V2.8 Convex/IRAF
+DATE:	Tue Oct 24 22:28:18 MST 1989
+FROM:	tody
+
+BUG:	IMFORT programs compiled with V2.8 Convex/IRAF (the beta release
+	system), under version 7.1 of the Convex operating system and
+	version 5.1.1.0 of the Fortran compiler, will fail immediately on
+	process startup with a segmentation violation.  V2.8 Convex/IRAF
+	was prepared and tested using version 7.0 of the OS, and version
+	5.0 of the Fortran compiler.  Something between these two versions
+	of the host operating system changed the layout of process memory
+	sufficiently to cause the scheme used to recover the IMFORT program
+	command line arguments to fail.
+
+STATUS:	The only real workaround is to delay the upgrade to the new Convex
+	operating system and compiler.  Barring that, it is necessary to
+	contact IRAF site support to obtain and install a patch to fix the
+	bug.  If the file os$zgcmdl.c is replaced with the version from
+	V2.9 IRAF, compiled, and installed in the library libos.a, then
+	the bug will go away.
+
+NUMBER:	91
+MODULE:	irred.center
+SYSTEM:	V2.8
+DATE:	Mon Oct 30 08:50:39 MST 1989
+FROM:	davis
+
+BUG:	The center.par file in imred$irred was not updated when the two
+	new parameters "verbose" and "verify" were added to the center task.
+	This was causing "parameter not found" errors for irred users.
+
+STATUS:	This bug has been fixed in 2.9. There is no workaround except to
+	use the center task directly from apphot or to copy the
+	digiphot$apphot/center.par file to imred$irred/center.par.
+	The datapars.par and centerpars.par files were also updated
+	for consistency although these files should not have caused any
+	errors.
+
+NUMBER:	92
+MODULE:	proto.imedit
+SYSTEM:	V2.8
+DATE:	Mon Oct 30 16:48:25 MST 1989
+FROM:	valdes
+
+BUG:	When using a previous logfile as cursor input a floating operand
+	error occurs.
+
+STATUS:	As a shorthand and for readability, the logfile leaves out
+	cursor coordinates for colon commands.  When reading the
+	logfile as cursor input the cursor reading code supplies the
+	special INDEF value for the missing coordinates.  IMEDIT fails
+	to check for this value and attempts an operation (adding 0.5)
+	to these values which causes the exception.  (Note when this
+	task was developed and tested these exceptions were not set so
+	this error was not seen).  The workaround is to edit the
+	logfile and supply dummy coordinates and coordinate codes to
+	those commands missing coordinates.  For example:
+
+		:aperture circular --> 1 1 1 :aperture circular
+
+NUMBER:	93
+MODULE:	identify, reidentify (onedspec, twodspec, etc.) on CONVEX
+SYSTEM:	V2.8
+DATE:	Tue Oct 31 13:24:32 MST 1989
+FROM:	valdes
+
+BUG:	Exiting the dispersion function fitting without any points rejected
+	by the iterative rejection algorithm causes a bus error on the CONVEX
+	(both IEEE and NATIVE architectures).
+
+STATUS:	This bug was due to an incorrect assumption about the order of
+	evalution in complex if statements and that the test is terminated
+	at the first point the result is known; i.e. at the first false in
+	a compound "and".  The CONVEX is the first FORTRAN compiler
+	encountered in which this is a problem.  The source code fix is
+	available.  The only workaround is to force a point to be
+	rejected by setting the rejection thresholds low enough or
+	marking one spurious line to be rejected.
+
+NUMBER:	94
+MODULE:	onedspec.sensfunc
+SYSTEM:	V2.8
+DATE:	Wed Nov  8 09:21:15 MST 1989
+FROM:	valdes
+
+BUG:	The combination of specifying an aperture list which does not
+	include aperture 1 (note a null list always includes aperture 1)
+	and the ignoreaps flag leads to the error "No degrees of freedom".
+
+STATUS:	What was happening is that when a header record is encountered it
+	is checked to see if it is in the aperture list.  If it is and
+	the ignore apertures flag is set then the aperture number is
+	interally set to 1; i.e. when ignoring the aperture numbers all
+	selected spectra are treated as aperture 1.  However, when reading
+	the following data lines the check was again made to see if the
+	current aperture number is in the aperture list.  The current
+	aperture number is now 1 but if this aperture is not in the
+	list then no data will be read.  The absence of data leads to
+	the "No degrees of freedom" message and the subsequent task abort.
+	This bug has been fixed.  The workaround is to avoid the situation
+	where you want to ignore the aperture numbers (i.e. combine data
+	from different apertures) but exclude aperture 1.  If this rare
+	situation is required editing the standard star data file to change
+	the aperture numbers is a workaround.
+
+NUMBER:	95
+MODULE:	apphot.qphot,apphot.phot,apphot.wphot,apphot.polyphot
+SYSTEM:	V2.8 and earlier
+DATE:	Thu Nov 16 14:06:54 MST 1989
+FROM:	davis
+
+BUG:	A bug has been found in the apphot interactive photometry tasks
+	wherein magnitudes were occasionally not being updated after
+	a new sky value was computed. This would occur only if the
+	sky fitting parameters were changed but the centering and photometry
+	parameters did not and the cursor was not moved since the previous
+	measurement.
+
+	The most common situtation where this occurs is when the user
+	is trying to explore the sky fitting parameter space by
+	sitting on a single star and altering the skyfitting parameters,
+	while leaving the cursor position and photometry apertures
+	unchanged.  The problem only exists for this setup star.
+	All subsequent stars will be measured correctly. Batch
+	mode operation of all the above tasks was not affected by this bug
+
+STATUS:	This bug has been fixed in IRAF version 2.9. The workaround
+	is to alter the cursor position slightly between measurements.
+
+NUMBER:	96
+MODULE:	images.imarith
+SYSTEM:	V2.8 and earlier
+DATE:	Fri Nov 17 10:45:45 MST 1989
+FROM:	davis
+
+BUG:	The images package task imarith was not correctly handling the
+	image data type ushort. If the first image in a pair was of
+	pixel type ushort imarith produced a junk image with no
+	pixel file and did not produce an image.
+
+STATUS:	The bug has been fixed in version 2.9. There is no workaround
+	but the datatype of ushort images can be changed with the
+	images task chpixtype.
+
+NUMBER:	97
+MODULE:	dataio.wfits
+SYSTEM:	V2.8
+DATE:	Mon Nov 20 14:16:22 MST 1989
+FROM:	davis
+
+BUG:	Wfits was not correctly mapping the pixel datatype ushort to
+	fits integers. The default bitpix was incorrectly set to 16
+	with bscale and bzero of 1.0 and 0.0 respectively.
+
+STATUS:	Wfits has been modified to default to a bitpix of 32 if the
+	input pixel type is ushort. Although this is not the most
+	efficient solution in terms of tape space it is the safest in terms
+	of avoiding type conversions on a subsequent execution of rfits. 
+	The policy of wfits is to try and avoid scaling integer data
+	in any way. Similarly rfits will create a real image by default
+	if it sees bscale and bzero values of other than 1.0 and 0.0
+	respectively.
+
+	The workaround is to run fits with autoscale=no, bscale=1.0 and
+	bzero=32768 and bitpix=16. Users concerned with tape space
+	may also use this workaround to force wfits to bitpix=16
+	while still maintaining dynamic range.
+
+NUMBER:	98
+MODULE:	images.geotran,images.register
+SYSTEM:	V2.8
+DATE:	Mon Nov 27 09:04:11 MST 1989
+FROM:	davis
+
+BUG:	Geotran and register can occasionally produce out of bounds
+	pixel errors when the coordinate transform was non-linear
+	and had a certain functional form. Geotran was incorrectly 
+	computing the distortion of the image boundaries in this case.
+
+STATUS:	There is no work around. Contact the IRAF group for a fix.
+
+NUMBER:	99
+MODULE:	IMFORT/imdir
+SYSTEM:	V2.8
+DATE:	Thu Nov 30 21:31:00 MST 1989
+FROM:	tody
+
+BUG:	When the IMFORT interface was originally written, the pixel file
+	was always created in the same directory as the image header.
+	With the recent addition of the "image directory" (imdir) feature
+	to IMFORT, however, it is possible for images in different directories
+	to share the same directory for pixel file storage.  The problem is
+	that no clobber checking is being performed on the pixel files,
+	hence if an image of the same name is created in two different
+	directories, and a common imdir is being used, THE PIXEL FILE OF
+	THE SECOND IMAGE WILL OVERWRITE THAT OF THE FIRST, resulting in
+	loss of data, and worse, substitution of an invalid pixel file
+	in the first image.  Note that this bug ONLY occurs if [1] a common
+	imdir is used with V2.8 IMFORT (not the default), and [2] two or
+	more images of the same name are created in different directories.
+
+STATUS:	The workaround for V2.8 IRAF is to avoid use of a common global
+	image storage directory with IMFORT.
+
+NUMBER:	100
+MODULE:	generic.normalize, generic.normflat
+SYSTEM:	V2.8
+DATE:	Fri Dec  1 09:13:11 MST 1989
+FROM:	valdes
+
+BUG:	If using the automatic normalization determination, the tasks
+	may normalize by something other than the mean.  This occurs
+	when the user has modified the parameters for IMSTATISTICS to
+	other than the default as explained below.
+
+STATUS:	These script tasks were originally written for V2.2 (a long
+	time ago).  They use the task IMSTATISTICS to compute the
+	mean of an image if the normalization is not explicitly
+	specified.  It uses the third field from the output of
+	IMSTATISTICS.  IMSTATISTICS was modified in V2.8 to allow
+	the user to select the fields printed with the default being
+	the same as earlier versions.  Thus, if the user changes the
+	default quantities printed so that the mean is not the third
+	field the tasks will use the wrong value.  The workaround
+	is to unlearn the parameters, or at least make the third
+	field be the mean, in IMSTATISTICS.  The tasks have been
+	modified in V2.9 to override the user's defaults for
+	IMSTATISTICS.
+
+NUMBER:	101
+MODULE:	proto.imexamine
+SYSTEM:	V2.8
+DATE:	Fri Dec  1 13:45:21 MST 1989
+FROM:	valdes
+
+BUG:	When no input list is specified the task queries the image display
+	for the image to be examined.  The display frame is determined
+	from the cursor readback.  When using a cursor input file of
+	x and y with no frame number the default value of frame 0 was
+	used causing a segmentation error.  Thus, a segmentation error
+	occurs with no input list and when not reading the standard
+	image display cursor (which always returns a valid frame) and
+	when the frame number is not part of the cursor input.
+
+STATUS:	The workaround is to either specify an image to be examined
+	on the command line or to specify the frame number in the
+	cursor input file for at least the first entry.  NOTE THAT
+	USING ":go" OR "menu mode" WILL IGNORE THE INPUT LIST EVEN IF YOU
+	SPECIFY ONE.  The task has been modified so that the initial
+	frame used if the cursor input does not specify a frame is 1.
+
+NUMBER:	102
+MODULE:	images.imslice
+SYSTEM:	V2.8
+DATE:	Mon Dec  4 14:03:15 MST 1989
+FROM:	davis
+
+BUG:	Imslice was not computing the number of lines in the output image
+	correctly in the case where the slice dimension was 1.
+
+STATUS:	The bug has been fixed in IRAF V2.9. There is no work-around.
+
+NUMBER:	103
+MODULE:	imtool,install
+SYSTEM:	V2.8
+DATE:	Mon Dec  4 21:06:45 MST 1989
+FROM:	tody
+
+BUG:	There is a bug in the V2.8 INSTALL script which can lead to the
+	loss of the "imtoolrc" file in some circumstances.  If this occurs
+	the symptom will be the inability to set imtool to any frame buffer
+	configuration other than #1, which is 2 512x512 frames.  The bug
+	occurs when install is run when [1] the imtoolrc file has already
+	been installed, and [2] the installed version is different than the
+	source version in iraf (as when upgrading to IRAF V2.8 from an
+	earlier version, since the imtoolrc file was modified for V2.8).
+	The first time the install script is run things are still ok, but
+	the second time the imtoolrc file will disappear (actually it is
+	merely renamed to .OLD, but it will become inaccessible to IMTOOL).
+
+STATUS: If this occurs the workaround is easy; copy the backup version of
+	the file, e.g, /usr/local/lib/imtoolrc.OLD, to /usr/local/lib/imtoolrc
+	and $iraf/sun/imtoolrc.  Since both versions of the file will then
+	be identical the bug will not recur no matter how many times the
+	install script is rerun.
+
+NUMBER:	104
+MODULE:	STF images
+SYSTEM:	V2.8, SPARC (Sun-4) systems only
+DATE:	Tue Dec  5 10:47:39 MST 1989
+FROM:	tody
+
+BUG:	On a Sun-4 running V2.8 IRAF, any attempt to create an STF format
+	image will result in a [floating overflow] error.  Note that only
+	Sun-4 (SPARC) systems are affected.  The bug is due to an unitialized
+	floating point function value.  The function value is not used by
+	IRAF if not initialized (in this case due to the function taking an
+	error exit), but will cause an IEEE exception if the unitialized
+	or garbage value happens to not be a legal floating point number.
+
+STATUS:	The workarounds are obvious: use the OIF image format instead of
+	STF where possible, or if the STF format must be used, do so on a
+	non-SPARC system.  A user installable bugfix is available from
+	IRAF site support if necessary.
+
+NUMBER:	105
+MODULE:	CL - background job termination
+SYSTEM:	V2.8
+DATE:	Sat Dec  9 14:53:36 MST 1989
+FROM:	tody
+
+BUG:	On certain UNIX/IRAF systems, background jobs submitted from IRAF
+	may die after the user logs out, if i/o has not been redirected.
+	The problem occurs when such a job attempts to write to the terminal
+	after the user has logged out.  The host system returns an error
+	on the write if the output terminal is no longer connected, and the
+	resultant file write error causes the IRAF job to terminate.  This
+	bug is present on all Sun systems and on the DECstation (Ultrix),
+	but not with standard BSD/VAX UNIX.  Note that on a workstation,
+	exiting a terminal emulator is equivalent to logging out (the
+	/dev/tty entry assigned to the terminal emulator is closed), and
+	any background jobs submitted from the terminal emulator are subject
+	to termination if this error occurs.
+
+STATUS:	There is a simple workaround, i.e., if you will be logging out before
+	the background job terminates, redirect the output with ">& <file>"
+	when the background job is submitted.  IRAF versions 2.9 and higher
+	will ignore this error, discarding the unredirected output.
+
+NUMBER:	106
+MODULE:	CL - i/o redirection and foreign tasks
+SYSTEM:	V2.8
+DATE:	Mon Dec 11 17:35:28 MST 1989
+FROM:	tody
+
+BUG:	Append mode i/o redirection is not working properly for foreign
+	tasks; the output file is clobbered (overwritten), rather than
+	appended to.  In other words, "foo >> output" will overwrite any
+	existing file "output" if FOO is a foreign task.  ONLY foreign
+	tasks are affected by this bug.
+
+STATUS:	Until this bug is fixed, the only workaround is to redirect the
+	output to a new file and concatenate the output files later, or
+	do something like pipe the output to "TYPE STDIN >> output", which
+	will work because TYPE is an ordinary IRAF task, not a foreign task.
+
+NUMBER:	107
+MODULE:	CCDRED - SETINSTRUMENT
+SYSTEM:	V2.8
+DATE:	Mon Jan  8 16:00:51 MST 1990
+FROM:	seaman
+
+BUG:	The file `intruments.men' in the directory `ccddb$ctio/new'
+	(i.e., noao$ccdred/ccddb/ctio/new/intruments.men) should be
+	named `instruments.men'.  The bug prevents `setinstrument ?'
+	from working.
+
+STATUS: Fixed in v2.9.  The fix is merely to rename the file.  Note
+	that the site ID in SETINSTRUMENT should be `ctio/new' for
+	the task to locate any of the files.
+
+NUMBER:	108
+MODULE:	noao.imred.echelle.ecdispcor
+SYSTEM:	V2.8
+DATE:	Mon Jan 15 13:47:23 MST 1990
+FROM:	valdes
+
+BUG:	The "sum" option of ECDISPCOR is really an average (the same as the
+	"average" option.
+
+STATUS:	The workaround is to dispersion correct to onedspec format and
+	then use onedspec.combine.
+
+NUMBER:	109
+MODULE:	proto.imedit
+SYSTEM:	V2.8
+DATE:	Wed Jan 17 13:13:30 MST 1990
+FROM:	valdes
+
+BUG:	Changing the background fitting order with colon commands results
+	in zero being put into the users parameter file.  Regions
+	outside the specified aperture are occasionally included as
+	part of the aperture for replacement.
+
+STATUS:	The workaround for the colon command problem is to reset the
+	parameter values before the next execution of imedit.  Note
+	that if you forget you are queried because a value of zero is
+	not allowed for these parameters resulting in a request for a
+	legal value.  The second problem is due to a error in
+	clearing the region mask from the previous aperture.  For
+	background replacement this problem will not be evident and is
+	most visible when replacing by a constant.  The problem goes
+	away if the buffer parameter is zero but this may not be
+	desired.
+
+NUMBER:	110
+MODULE:	images$imstatistics
+SYSTEM:	V2.8
+DATE:	Sat Jan 20 15:08:26 MST 1990
+FROM:	davis
+
+BUG:	The median was being incorrectly computed in the case where more
+	than half the image pixels were in the first bin of the integrated
+	histogram.
+
+	On occasion the output fields would overflow their alloted format
+	statements results in unreadable output in which the number ran
+	together.
+
+STATUS:	Both bugs have been fixed in version 2.9. The first problem
+	can be worked around by changing the binning parameter.
+
+NUMBER:	111
+MODULE:	images.geomap
+SYSTEM:	V2.8
+DATE:	Fri Jan 26 09:08:09 MST 1990
+FROM:	davis
+
+BUG:	The path name to the help file was being erroneously redefined
+	in the interactive portion of the geomap code. As a result
+	users selecting the double precision computation option were
+	unable to access the help page.
+
+STATUS:	This bug has been fixed in version 2.9.
+
+NUMBER:	112
+MODULE:	apphot package
+SYSTEM:	V2.8
+DATE:	Wed Feb  7 09:07:14 MST 1990
+FROM:	davis
+
+BUG:	The string defining the sky fitting algorithm was not getting
+	updated correctly when the chosen sky fitting algorithm was
+	"median" or "gauss", resulting in garbage being written into
+	the output file header . The correct algorithm however was being
+	used to compute the sky.
+
+	A floating point error would occur if the user selected the
+	sky fitting algorithm "constant", left the standard deviation
+	of the sky at INDEFR, and enabled radial profile plotting in
+	the phot task. The problem occured when the plotting program
+	tried to plot the 3 * sigma sky level by adding the sky value
+	to the standard deviation.
+
+STATUS:	Both bugs have been fixed in version 2.9. The first can be merely
+	annoying causing garbage to be written to the output filer or
+	serious causing a memory corruption error. Contact NOAO for a fix.
+	The workaround for the second is to set the sigma parameter to some
+	reasonable value.
+
+NUMBER:	113
+MODULE:	proto.imedit
+SYSTEM:	V2.8 SPARCstation
+DATE:	Fri Mar  9 15:05:09 MST 1990
+FROM:	valdes
+
+BUG:	On SPARCstation 1 cpus the 'a', and 'b' keys sometimes do nothing;
+	i.e. fail to replace the indicated area by background.
+
+STATUS:	This was due to declaring an integer argument as a real.  A later test
+	comparing the value to zero (an error condition) yields true
+	even with the integer value is not zero causing a return with
+	no action taken.  This was missed earlier because it is a
+	sporadic problem and does not appear on 68020 cpus or on a
+	Sun4.  Because it is sporadic I cannot be completely sure of my
+	machine dependence characterization but all confirmed reports
+	of this problem are on SPARCstations and I have a confirmed
+	report from someone with a SPARCstation who has never seen the
+	problem despite heavy usage.  There is no workaround if you see
+	it.
+
+NUMBER:	114
+MODULE:	dataio.rfits
+SYSTEM:	V2.8
+DATE:	Mon Mar 12 13:27:32 MST 1990
+FROM:	davis
+
+BUG:	Rfits was not updating the datamin and datamax parameters correctly
+	for stf images. The stf kernel intializes the datamin and datamax
+	parameters explicitly after the first pixel i/o is done by setting
+	them to zero. This was overwriting the initial values for datamin
+	and datamax, MAX_REAL and -MAX_REAL respectively set by rfits,
+	resulting in an incorrect value for datamin of zero for images with
+	positive data.
+
+	This problem can result in loss of precision or worse when wfits goes
+	to write out the image again.
+
+STATUS:	The bug has been fixed in IRAF 2.9. This problem is really the result
+	of a bug in the stf kernel but was easily avoided by making datamin
+	and datamax local variables instead of pointers to the appropriate
+	storage location in the header. The header is only updated after
+	the last image line is written.
+
+	There is no workaround. Users can update the datamin and datamax
+	values with the images task minmax.
+
+NUMBER:	115
+MODULE:	apphot.daofind
+SYSTEM:	V2.8
+DATE:	Mon Mar 12 13:38:31 MST 1990
+FROM:	davis
+
+BUG:	Daofind was failing to compute the convolved image when the output
+	image format was hhh. This resulted in an output convolved image full
+	of 0's and no object detections! The hhh format image was failing the
+	obsolete test [if (IM_PIXFILE(im)  == EOS) as the pixel file names
+	are set at different places in the oif and stf kernel.
+
+STATUS:	This bug has been fixed in IRAF 2.9. The test condition was both
+	obsolete and dangerous and has been removed. The workaround is to
+	use .imh format.
+
+NUMBER:	116
+MODULE:	proto.imedit
+SYSTEM:	V2.8
+DATE:	Thu Mar 15 16:58:46 MST 1990
+FROM:	valdes
+
+BUG:	Use of a cursor file of x,y pairs and a default key of a, c, d, l, f
+	or j would infinitely repeat the last cursor position.
+
+STATUS:	The test for end of file for the two keystroke keys listed above was
+	botched leading to the above behavior.  This is probably a rare
+	usage but acceptable usage.  The work around is to end
+	the cursor file with "1 1 1 q" to cause a quit.  Note that a simple
+	'q' encounters another bug logged previously dealing with a problem
+	defining the default coordinates.
+
+NUMBER:	117
+MODULE:	identify, ecidentify
+SYSTEM:	V2.8
+DATE:	Fri Mar 16 10:46:11 MST 1990
+FROM:	valdes
+
+BUG:	When INDEF user coordinates are in the feature list, segmentation and
+	floating overflow errors can occur.  In IDENTIFY problems only
+	arise if points are deleted during fitting.  In ECIDENTIFY the
+	presence of INDEF values will generally cause severe problems.
+
+STATUS:	INDEF values are allowed conceptually and may have a use in these
+	tasks.  However one should not use these values if possible and
+	it is necessary in ECIDENTIFY in order to avoid the bug above.
+	INDEF values sometimes creep in accidentally when using a line list.
+	If a line is marked and there is a line list but the marked position
+	does not correspond to a line in the list then the default prompt
+	value is INDEF.  If you type carriage return without specifying
+	a wavelength the line will be entered with the INDEF value.
+	Without a line list the default prompt is the fitted wavelength.
+	The bug has been fixed.
+
+NUMBER:	118
+MODULE:	apphot.phot,qphot,wphot,polyphot,center,radprof
+SYSTEM:	V2.8/386i only
+DATE:	Wed Mar 21 08:05:06 MST 1990
+FROM:	davis
+
+BUG:	Executing any of the apphot tasks which perform a centering
+	operation results in the message "floating stack fault"
+	and termination of the task on the 386i. This error occurred only
+	on the first execution of the task or when the task was submitted
+	to background.
+
+STATUS:	The problem was traced to an optimizer bug in the 386i fortran
+	compiler and has been fixed in version 2.9. Contact the IRAF
+	group for a fix.
+	
+
+NUMBER:	119
+MODULE:	noao.proto.imexamine
+SYSTEM:	V2.8
+DATE:	Thu Mar 22 12:01:20 MST 1990
+FROM:	valdes
+
+BUG:	The 'u' and 'v' vector graphs followed by any other graph can give
+	memory corruption errors.  This appears on VMS (750 and 8600)
+	but does not appear on Sun systems, though it is just chance that
+	there is no apparent problem there.
+
+STATUS:	There is no work around short of avoiding the 'u' and 'v' graphs.
+	The source fix is simple and may be requested if not updating
+	to V2.9 or V2.10.
+
+NUMBER:	120
+MODULE:	apphot.daofind
+SYSTEM:	V2.8
+DATE:	Fri Mar 30 08:02:12 MST 1990
+FROM:	davis
+
+BUG:	In rare circumstances daofind may abort with a "pixel file truncation
+        error" when trying to read back the convolved images it has just 
+	written. This only occurs on certain sized images and is due to
+	the interaction of the read, write and boundary extension in image
+	i/o. For example daofind works fine on a 640 by 1024 image but fails on
+	one that is 641 by 1025 pixels.
+
+STATUS:	The problem is fixed in 2.9. The solution was to add an imflush
+	statement to flush the image i/o buffers after the write was
+	complete and before initiating the read. There is no workaround.
+	Contact the IRAF group for a fix.

@@ -1,3 +1,5 @@
+# ROTATE -- Rotate an image by calling the GEOTRAN task with the appropriate
+# parameters.
 
 procedure rotate (input, output, rotation, xin, yin, xout, yout, ncols, nrows,
 	interpolant, boundary, constant, nxblock, nyblock)
@@ -28,6 +30,7 @@ begin
 	toutput = output
 	trotation = rotation
 
+	# Call GEOTRAN.
 	geotran (input=tinput, output=toutput, database="", xrotation=trotation,
 	    yrotation=trotation, xin=xin, yin=yin, xout=xout, yout=yout,
 	    xshift=INDEF, yshift=INDEF, xmin=1.0, xmax=ncols, ymin=1.0,

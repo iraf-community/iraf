@@ -16,7 +16,8 @@ char	task[ARB]	# task name
 
 int	nchars
 pointer	sp, outstr, date, time
-int	strmatch(), envfind(), gstrcpy(), apstati(), itob()
+bool	itob()
+int	strmatch(), envfind(), gstrcpy(), apstati()
 real	apstatr()
 
 begin
@@ -30,19 +31,25 @@ begin
 	call salloc (time, SZ_DATE, TY_CHAR)
 
 	# Write the id.
+
 	nchars = envfind ("version", Memc[outstr], SZ_LINE)
 	if (nchars <= 0)
 	    nchars = gstrcpy ("NOAO/IRAF", Memc[outstr], SZ_LINE)
+	call ap_rmwhite (Memc[outstr], Memc[outstr], SZ_LINE)
 	call ap_sparam (out, "IRAF", Memc[outstr], "version",
 	    "current version of IRAF")
+
 	nchars = envfind ("userid", Memc[outstr], SZ_LINE)
 	call ap_sparam (out, "USER", Memc[outstr], "name", "user id")
+
 	call gethost (Memc[outstr], SZ_LINE)
 	call ap_sparam (out, "HOST", Memc[outstr], "computer",
 	    "IRAF host machine")
+
 	call apdate (Memc[date], Memc[time], SZ_DATE)
 	call ap_sparam (out, "DATE", Memc[date], "mm-dd-yr", "date")
 	call ap_sparam (out, "TIME", Memc[time], "hh:mm:ss", "time")
+
 	call ap_sparam (out, "PACKAGE", "apphot", "name",
 	    "name of IRAF package")
 	call ap_sparam (out, "TASK", task, "name", "name of apphot task")
@@ -59,6 +66,8 @@ begin
 	    "minimum good data value")
 	call ap_rparam (out, KY_DATAMAX, apstatr (ap, DATAMAX), UN_DATAMAX,
 	    "maximum good data value")
+
+	# Write out the image header keyword parameters.
 	call apstats (ap, EXPOSURE, Memc[outstr], SZ_FNAME)
 	if (Memc[outstr] == EOS)
 	    call strcpy ("\"\"", Memc[outstr], SZ_FNAME)
@@ -74,6 +83,11 @@ begin
 	    call strcpy ("\"\"", Memc[outstr], SZ_FNAME)
 	call ap_sparam (out, KY_FILTER, Memc[outstr], UN_FILTER,
 	    "filter keyword")
+	call apstats (ap, OBSTIME, Memc[outstr], SZ_FNAME)
+	if (Memc[outstr] == EOS)
+	    call strcpy ("\"\"", Memc[outstr], SZ_FNAME)
+	call ap_sparam (out, KY_OBSTIME, Memc[outstr], UN_OBSTIME,
+	    "obstime keyword")
 	call fprintf (out, "#\n")
 
 	# Write the noise model parameters.
@@ -312,11 +326,11 @@ begin
 
 	call strupr (keyword)
         call fprintf (out,
-	    "#K%4t%-10.10s%14t = %17t%-15.7g%32t%-10.10s%42t%-10s\n")
+	    "#K%4t%-10.10s%14t = %17t%-23.7g%41t%-10.10s%52t%-10s\n")
 	    call pargstr (keyword)
 	    call pargr (value)
 	    call pargstr (units)
-	    call pargstr ("%-15.7g")
+	    call pargstr ("%-23.7g")
 	    call pargstr (comments)
 end
 
@@ -337,11 +351,11 @@ begin
 
 	call strupr (keyword)
         call fprintf (out,
-	    "#K%4t%-10.10s%14t = %17t%-15d%32t%-10.10s%42t%-10s\n")
+	    "#K%4t%-10.10s%14t = %17t%-23d%41t%-10.10s%52t%-10s\n")
 	    call pargstr (keyword)
 	    call pargi (value)
 	    call pargstr (units)
-	    call pargstr ("%-15d")
+	    call pargstr ("%-23d")
 	    call pargstr (comments)
 end
 
@@ -362,11 +376,11 @@ begin
 
 	call strupr (keyword)
         call fprintf (out,
-	    "#K%4t%-10.10s%14t = %17t%-15b%32t%-10.10s%42t%-10s\n")
+	    "#K%4t%-10.10s%14t = %17t%-23b%41t%-10.10s%52t%-10s\n")
 	    call pargstr (keyword)
 	    call pargb (value)
 	    call pargstr (units)
-	    call pargstr ("%-15b")
+	    call pargstr ("%-23b")
 	    call pargstr (comments)
 end
 
@@ -387,10 +401,10 @@ begin
 
 	call strupr (keyword)
         call fprintf (out,
-	    "#K%4t%-10.10s%14t = %17t%-15.15s%32t%-10.10s%42t%-10s\n")
+	    "#K%4t%-10.10s%14t = %17t%-23.23s%41t%-10.10s%52t%-10s\n")
 	    call pargstr (keyword)
 	    call pargstr (value)
 	    call pargstr (units)
-	    call pargstr ("%-15s")
+	    call pargstr ("%-23s")
 	    call pargstr (comments)
 end

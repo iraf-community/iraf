@@ -1119,10 +1119,12 @@ C       IRANMN-COLOR INDEX FOR LOW INTENSITY LINES
 C       IRANMJ-COLOR INDEX FOR TEXT (LABELS)
 C
 C +NOAO - Blockdata data conbdn rewritten as run time initialization
+C         Variable LNGTHS not used.
 C
 C     EXTERNAL        CONBDN
+C     DIMENSION       LNGTHS(4), HOLD(4)
+      DIMENSION       HOLD(4)
 C - NOAO
-      DIMENSION       LNGTHS(4)  ,HOLD(4)
         CHARACTER*110   IWORK
         CHARACTER*13    ENCSCR,  ENSCRY
         CHARACTER*1     ICHAR
@@ -1183,7 +1185,9 @@ C
         SAVE
 C
 C
-        DATA LNGTHS(1),LNGTHS(2),LNGTHS(3),LNGTHS(4)/13,4,21,6/
+C+NOAO - Variable LNGTHS not used.
+C       DATA LNGTHS(1),LNGTHS(2),LNGTHS(3),LNGTHS(4)/13,4,21,6/
+C-NOAO
 C
 C ICONV CONVERT FORM 0-32767 TO 1-1024
 C

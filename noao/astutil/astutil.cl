@@ -5,12 +5,12 @@ package astutil
 task	airmass,
 	precess,
 	galactic,
+	gratings,
 	pdm,
 	asttimes,
 	rvcorrect,
 	setairmass,
+	setjd,
 	ccdtime		= "astutil$x_astutil.e"
 
-task	observatory	= imred$observatory.cl
-
-clbye()
+clbye

@@ -1,7 +1,8 @@
 image,s,a,,,,Image name
-nbins,i,h,512,1,,Number of bins in histogram
 z1,r,h,INDEF,,,Minimum histogram intensity
 z2,r,h,INDEF,,,Maximum histogram intensity
+binwidth,r,h,INDEF,,,Resolution of histogram in intensity units
+nbins,i,h,512,1,,Number of bins in histogram
 autoscale,b,h,yes,,,Adjust nbins and z2 for integer data?
 top_closed,b,h,no,,,Include z2 in the top bin?
 hist_type,s,h,"normal","normal|cumulative|difference|second_difference",,"Type of histogram"

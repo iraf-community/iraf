@@ -1,0 +1,69 @@
+.help revisions Jun88 noao.imred.msred
+.nf
+imred$msred --> imred$specred
+    Renamed the package to a more generic name since it is for both
+    multiple aperture/fiber data as well as generic slit data.
+    (2/20/92, Valdes)
+
+imred$msred/msred.cl
+imred$msred/msred.hd
+    Added generic slit and fiber reduction tasks to make this a complete
+    generic package.  (2/19/92, Valdes)
+
+imred$msred/msresp1d.cl
+    Improved task to include throughput file (2/18/92, Valdes)
+
+imred$msred/msresp1d.cl +
+imred$msred/doc/msresp1d.hlp +
+imred$msred/msred.cl
+imred$msred/msred.hd
+    1.  Added new task MSRESP1D modeled after imred$src/fibers/response but
+	using APALL instead of APSCRIPT and all the connections to PARAMS.
+    2.  Added new task SKYSUB from imred$src/fibers.
+
+imred$msred/msbplot.cl -
+imred$msred/doc/msdispcor.hlp -
+imred$msred/doc/msbplot.hlp -
+imred$msred/msred.hd
+    1.  Moved help to ONEDSPEC.
+
+imred$msred/*
+    Updated to new APEXTRACT and ONEDSPEC packages.
+    (7/13/90, Valdes)
+
+====
+V2.9
+====
+
+imred$msred/msbplot.cl +
+imred$msred/doc/msbplot.hlp +
+imred$msred/msred.cl
+imred$msred/msred.men
+imred$msred/msred.hd
+    Added a version of ECBPLOT (written by Rob Seaman) to the package with
+    appropriate changes to refer to lines and apertures instead of
+    orders.  (10/27/89, Valdes)
+
+imred$msred/doc/msdispcor.hlp
+    Tried to make the description of the global parameter clearer.  Also
+    fixed an incorrect example.  (8/29/89, Valdes)
+
+====
+V2.8
+====
+
+imred$msred/apnormalize.par +
+imred$msred/msred.cl
+imred$msred/msred.men
+    Added APNORMALIZE to the package. (6/1/89, Valdes)
+
+imred$msred/standard.par
+    Removed ennumerated list.  (4/10/89, Valdes)
+
+imred$msred/* +
+imred$msred/doc/* +
+    New package specialized for reducing spectra in "multispec" format.
+    It includes new tasks for doing dispersion solutions in multispec
+    format spectra.  (3/29/89, Valdes)
+
+.endhelp

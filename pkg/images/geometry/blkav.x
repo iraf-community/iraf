@@ -6,6 +6,7 @@ include	<error.h>
 define	AVG		1	# operation = arithmetic average
 define	SUM		2	# operation = arithmetic sum
 
+# change to (lrdx) in future
 
 
 # BLKAVG -- Block average or sum on n-dimensional images.
@@ -25,7 +26,7 @@ int	num_oblks[IM_MAXDIM], i, count, ndim, dim, nlines_in_sum, nfull_blkx
 int	junk, num_ilines, num_olines, oline
 long	blkin_s[IM_MAXDIM], blkin_e[IM_MAXDIM]
 long	vin_s[IM_MAXDIM], vin_e[IM_MAXDIM], vout[IM_MAXDIM]
-long	sum
+real	sum
 pointer	sp, accum_ptr, iline_ptr, oline_ptr
 
 int	blkcomp(), imggsl(), impnll() 
@@ -259,7 +260,7 @@ int	num_oblks[IM_MAXDIM], i, count, ndim, dim, nlines_in_sum, nfull_blkx
 int	junk, num_ilines, num_olines, oline
 long	blkin_s[IM_MAXDIM], blkin_e[IM_MAXDIM]
 long	vin_s[IM_MAXDIM], vin_e[IM_MAXDIM], vout[IM_MAXDIM]
-real	sum
+double	sum
 pointer	sp, accum_ptr, iline_ptr, oline_ptr
 
 int	blkcomp(), imggsd(), impnld() 

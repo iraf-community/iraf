@@ -28,18 +28,19 @@ begin
 	call fprintf (fd, "Features identified in image %s.\n")
 	    call pargstr (Memc[ID_IMAGE(id)])
 
-	call fprintf (fd, "   %8s %10s %10s %10s %6s %2s\n")
+	call fprintf (fd, "   %8s %10s %10s %10s %6s %2s %s\n")
 	    call pargstr ("Pixel")
 	    call pargstr ("Fit")
 	    call pargstr ("User")
 	    call pargstr ("Residual")
 	    call pargstr ("Fwidth")
 	    call pargstr ("Wt")
+	    call pargstr ("Label")
 
 	rms = 0.
 	nrms = 0
 	do i = 1, ID_NFEATURES(id) {
-	    call fprintf (fd, "%2d %8.2f %10.8g %10.8g %10.8g %6.2f %2d\n")
+	    call fprintf (fd, "%2d %8.2f %10.8g %10.8g %10.8g %6.2f %2d %s\n")
 		call pargi (i)
 		call pargd (PIX(id,i))
 		call pargd (FIT(id,i))
@@ -56,6 +57,10 @@ begin
 		}
 		call pargr (FWIDTH(id,i))
 		call pargd (WTS(id,i))
+		if (Memi[ID_LABEL(id)+i-1] != NULL)
+		    call pargstr (Memc[Memi[ID_LABEL(id)+i-1]])
+		else
+		    call pargstr ("")
 	}
 
 	if (nrms > 1) {

@@ -14,7 +14,6 @@ begin
 	if (cv == NULL)
 	    return
 
-
 	if (CV_XBASIS(cv) != NULL)
 	    call mfree (CV_XBASIS(cv), TY_DOUBLE)
 	if (CV_VECTOR(cv) != NULL)
@@ -33,7 +32,6 @@ begin
 	    call mfree (CV_MATRIX(cv), TY_DOUBLE)
 	if (CV_CHOFAC(cv) != NULL)
 	    call mfree (CV_CHOFAC(cv), TY_DOUBLE)
-
 
 	call mfree (cv, TY_STRUCT)
 end

@@ -1,0 +1,6 @@
+input,s,a,,,,Input images
+output,s,a,,,,Output polarization image stack
+degrees,b,h,yes,,,Report the polarization angle in degrees?
+stokes,b,h,yes,,,Output the Stokes parameter images?
+normalize,b,h,no,,,Normalize the Q and U frames?
+keyword,s,h,"polangle",,,Header keyword for polarizer angle

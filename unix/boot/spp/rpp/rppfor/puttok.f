@@ -1,11 +1,11 @@
-      SUBROUTINE PUTTOK (STR)
-      INTEGER STR (100)
-      INTEGER I
-      I = 1
-23000 IF (.NOT.(STR (I) .NE. -2))GOTO 23002
-      CALL PUTCHR (STR (I))
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      RETURN
-      END
+      subroutine puttok (str)
+      integer str (100)
+      integer i
+      i = 1
+23000 if (.not.(str (i) .ne. -2))goto 23002
+      call putchr (str (i))
+23001 i = i + 1
+      goto 23000
+23002 continue
+      return
+      end

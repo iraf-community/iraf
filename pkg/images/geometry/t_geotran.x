@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <imhdr.h>
+include <mwset.h>
 include <math.h>
 include <math/gsurfit.h>
 include "geotran.h"
@@ -157,11 +158,12 @@ begin
 	    # Update the linear part of the wcs.
 	    if (!envgetb ("nomwcs")) {
 		mw = mw_openim (in)
-		call geowcs (geo, sx1, sy1, oltm, oltv)
+		call geo_gwcs (geo, sx1, sy1, oltm, oltv)
 		call mw_invertr (oltm, nltm, 2)
 		call mw_vmulr (nltm, oltv, nltv, 2)
 		call anegr (nltv, nltv, 2)
-		call mw_sltermr (mw, nltm, nltv, 2)
+		call geo_swcs (mw, nltm, nltv, 2) 
+		#call mw_sltermr (mw, nltm, nltv, 2)
 		call mw_saveim (mw, out)
 		call mw_close (mw)
 	    }
@@ -685,9 +687,9 @@ begin
 end
 
 
-# GEOWCS -- Compute the ltm and ltv vectors required by the wcs interface.
+# GEO_GWCS -- Compute the ltm and ltv vectors computed by GEOTRAN.
 
-procedure geowcs (geo, sx1, sy1, ltm, ltv)
+procedure geo_gwcs (geo, sx1, sy1, ltm, ltv)
 
 pointer	geo		# pointer to the geotran structure
 pointer	sx1		# pointer to the linear x coordinate surface
@@ -749,4 +751,59 @@ begin
 	ltm[2,2] = ltm[2,2] * GT_YSCALE(geo)
 
 	call sfree (sp)
+end
+
+define	LTM	Memd[ltm+(($2)-1)*pdim+($1)-1]
+
+# GEO_SWCS -- Set the new wcs in the image header.
+
+procedure geo_swcs (mw, gltm, gltv, ldim)
+
+pointer	mw			# the mwcs descriptor
+real	gltm[ldim,ldim]		# the input cd matrix from geotran
+real	gltv[ldim]		# the input shift vector from geotran
+int	ldim			# number of logical dimensions
+
+int	axes[IM_MAXDIM], naxes, pdim, nelem, axmap, ax1, ax2
+pointer	sp, ltm, ltv_1, ltv_2
+int	mw_stati()
+
+begin
+	# Convert axis bitflags to the axis lists.
+	call mw_gaxlist (mw, 03B, axes, naxes)
+	if (naxes < 2)
+	    return
+
+	# Initialize the parameters.
+	pdim = mw_stati (mw, MW_NPHYSDIM) 
+	nelem = pdim * pdim
+	axmap = mw_stati (mw, MW_USEAXMAP)
+	call mw_seti (mw, MW_USEAXMAP, NO)
+
+	# Allocate working space.
+	call smark (sp)
+	call salloc (ltm, nelem, TY_DOUBLE)
+	call salloc (ltv_1, nelem, TY_DOUBLE)
+	call salloc (ltv_2, nelem, TY_DOUBLE)
+
+	# Initialize the vectors and matrices.
+	call mw_mkidmd (Memd[ltm], pdim)
+	call aclrd (Memd[ltv_1], pdim)
+	call aclrd (Memd[ltv_2], pdim)
+
+	# Enter the linear operation.
+	ax1 = axes[1]
+	ax2 = axes[2]
+	Memd[ltv_2+ax1-1] = gltv[1]
+	Memd[ltv_2+ax2-1] = gltv[2]
+	LTM(ax1,ax1) = gltm[1,1]
+	LTM(ax2,ax1) = gltm[2,1]
+	LTM(ax1,ax2) = gltm[1,2]
+	LTM(ax2,ax2) = gltm[2,2]
+
+	# Perform the translation.
+	call mw_translated (mw, Memd[ltv_1], Memd[ltm], Memd[ltv_2], pdim)
+
+	call sfree (sp)
+	call mw_seti (mw, MW_USEAXMAP, axmap)
 end

@@ -1,6 +1,7 @@
 include <imhdr.h>
 include <error.h>
 include <ctotok.h>
+include	<math.h>
 
 # SETAIRMASS -- Compute the airmass for a series of images and optionally
 # store these in the image header.
@@ -29,15 +30,18 @@ define	UT_KEY		"UT"
 
 define	UT_DEF		0	# for precession if the keyword is missing
 
+define	SOLTOSID	(($1)*1.00273790935d0)
+
 
 # T_SETAIRMASS -- Read the parameters, loop over the images using
 # Stetson's rule, print out answers and update the header
 
 procedure t_setairmass()
 
-pointer	imlist, input, im, sp, date_key, exp_key, air_key, utm_key, ut_hms
+pointer	imlist, im, obs
+pointer	sp, input, observatory, date_key, exp_key, air_key, utm_key, ut_hms
 int	intype, outtype
-bool	show, update, override
+bool	show, update, override, newobs, obshead
 
 double	dec, latitude, exptime
 double	ha, ha_beg, ha_mid, ha_end, ut, ut_mid
@@ -46,11 +50,13 @@ double	airm_beg, airm_end, airm_mid, airm_eff
 bool	clgetb()
 int	imtgetim(), clgwrd(), imaccf()
 pointer	imtopenp(), immap()
-double	airmass(), clgetd()
+double	airmass(), obsgetd()
+errchk	obsobpen, obsgetd, sa_rheader, airmass, obsimopen
 
 begin
 	call smark (sp)
 	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (observatory, SZ_FNAME, TY_CHAR)
 	call salloc (date_key, SZ_FNAME, TY_CHAR)
 	call salloc (exp_key, SZ_FNAME, TY_CHAR)
 	call salloc (air_key, SZ_FNAME, TY_CHAR)
@@ -60,6 +66,7 @@ begin
 	# Get the parameters
 	imlist = imtopenp ("images")
 	intype = clgwrd ("intype", Memc[input], SZ_FNAME, AIR_TYPES)
+	call clgstr ("observatory", Memc[observatory], SZ_FNAME)
 
 	call clgstr ("date", Memc[date_key], SZ_FNAME)
 	call clgstr ("exposure", Memc[exp_key], SZ_FNAME)
@@ -72,10 +79,11 @@ begin
 	call strupr (Memc[air_key])
 	call strupr (Memc[utm_key])
 
-	latitude = clgetd ("latitude")
-
 	show = clgetb ("show")
 	update = clgetb ("update")
+
+	# Open observatory later.
+	obs = NULL
 
 	if (update) {
 	    outtype = clgwrd ("outtype", Memc[input], SZ_FNAME, AIR_TYPES)
@@ -85,8 +93,9 @@ begin
 	# Print a header line (the # should imply a comment to another task)
 	if (show) {
 	    call printf ("#              Image    UT middle  ")
-	    call printf ("effective  begin   middle     end\n")
-	}
+	    call printf ("effective  begin   middle     end   updated\n")
+	} else if (!update)
+	    call eprintf ("WARNING: Image headers are not updated\n")
 
 	# Loop over all images
 	while (imtgetim (imlist, Memc[input], SZ_FNAME) != EOF) {
@@ -108,8 +117,8 @@ begin
 		switch (intype) {
 		case BEGINNING:
 		    ha_beg = ha
-		    ha_mid = ha + exptime / 2.
-		    ha_end = ha + exptime
+		    ha_mid = ha + SOLTOSID(exptime) / 2.
+		    ha_end = ha + SOLTOSID(exptime)
 
 		    if (IS_INDEFD(ut))
 			ut_mid = INDEFD
@@ -117,9 +126,9 @@ begin
 			ut_mid = mod (ut + exptime / 2., 24.0D0)
 
 		case MIDDLE:
-		    ha_beg = ha - exptime / 2.
+		    ha_beg = ha - SOLTOSID(exptime) / 2.
 		    ha_mid = ha
-		    ha_end = ha + exptime / 2.
+		    ha_end = ha + SOLTOSID(exptime) / 2.
 
 		    if (IS_INDEFD(ut))
 			ut_mid = INDEFD
@@ -127,8 +136,8 @@ begin
 			ut_mid = mod (ut, 24.0D0)
 
 		case END:
-		    ha_beg = ha - exptime
-		    ha_mid = ha - exptime / 2.
+		    ha_beg = ha - SOLTOSID(exptime)
+		    ha_mid = ha - SOLTOSID(exptime) / 2.
 		    ha_end = ha
 
 		    if (IS_INDEFD(ut))
@@ -137,7 +146,7 @@ begin
 			ut_mid = mod (ut - exptime / 2., 24.0D0)
 
 		default:
-		    call error (1, "Bad switch in t_airmass")
+		    call error (1, "Bad switch in t_setairmass")
 		}
 
 		# Save the mid-UT as a sexigesimal string for output
@@ -145,6 +154,12 @@ begin
 		    call pargd (ut_mid)
 
 		# Compute the beginning, middle and ending airmasses
+		# First get the latitude from the observatory database.
+
+		call obsimopen (obs, im, Memc[observatory], NO, newobs, obshead)
+		if (newobs)
+		    call obslog (obs, "SETAIRMASS", "latitude", STDOUT)
+		latitude = obsgetd (obs, "latitude")
 		airm_beg = airmass (ha_beg, dec, latitude)
 		airm_mid = airmass (ha_mid, dec, latitude)
 		airm_end = airmass (ha_end, dec, latitude)
@@ -159,13 +174,14 @@ begin
 	    }
 
 	    if (show) {
-		call printf ("%20s  %11s  %7.4f  %7.4f  %7.4f  %7.4f\n")
+		call printf ("%20s  %11s  %7.4f  %7.4f  %7.4f  %7.4f  %b\n")
 		    call pargstr (Memc[input])
 		    call pargstr (Memc[ut_hms])
 		    call pargd (airm_eff)
 		    call pargd (airm_beg)
 		    call pargd (airm_mid)
 		    call pargd (airm_end)
+		    call pargb (update)
 		call flush (STDOUT)
 	    }
 
@@ -181,7 +197,7 @@ begin
 		    case EFFECTIVE:
 			call imaddr (im, Memc[air_key], real(airm_eff))
 		    default:
-			call error (1, "Bad switch in t_airmass")
+			call error (1, "Bad switch in t_setairmass")
 		    }
 
 		# Should probably update a date keyword as well
@@ -193,6 +209,7 @@ begin
 	    call imunmap (im)
 	}
 
+	call obsclose (obs)
 	call sfree (sp)
 end
 
@@ -206,15 +223,14 @@ double procedure airmass (ha, dec, lat)
 
 double	ha, dec, lat, cos_zd, x
 
-define	RADS	57.29577951		# Degrees per radian
-define	SCALE	750.0			# Atmospheric scale height
+define	SCALE	750.0d0			# Atmospheric scale height
 
 begin
 	if (IS_INDEFD (ha) || IS_INDEFD (dec) || IS_INDEFD (lat))
 	    call error (1, "Can't determine airmass")
 
-	cos_zd = sin (lat/RADS) * sin (dec/RADS) +
-		 cos (lat/RADS) * cos (dec/RADS) * cos (15*ha/RADS)
+	cos_zd = sin(DEGTORAD(lat)) * sin(DEGTORAD(dec)) +
+		 cos(DEGTORAD(lat)) * cos(DEGTORAD(dec)) * cos(DEGTORAD(ha*15.))
 
 	x  = SCALE * cos_zd
 
@@ -309,7 +325,7 @@ begin
 	    # don't use the output arguments internally
 	    ha		= st2 - ra2
 	    dec		= dec2
-	    exptime	= imgetd (im, ekey) / 3600.
+	    exptime	= imgetd (im, ekey) / 3600.d0
 
 	    if (ut_ok)
 		ut	= ut2

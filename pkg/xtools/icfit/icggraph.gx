@@ -158,7 +158,7 @@ begin
 
 	# Mark the rejected points.
 
-	if (IC_NREJECT(ic) > 0) {
+	if (IC_NREJECT(ic) > 0 && IC_MARKREJ(ic) == YES) {
 	    call gt_sets (gt1, GTMARK, "diamond")
 	    call gt_setr (gt1, GTXSIZE, MSIZE)
 	    call gt_setr (gt1, GTYSIZE, MSIZE)

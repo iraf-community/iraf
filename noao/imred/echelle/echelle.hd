@@ -2,10 +2,10 @@
 
 $doc	=	"./doc/"
 
-revisions	sys=Revisions
-ecbplot		hlp=doc$ecbplot.hlp
-eccontinuum	hlp=doc$eccontinuum.hlp
-ecdispcor	hlp=doc$ecdispcor.hlp
 ecidentify	hlp=doc$ecidentify.hlp
 ecreidentify	hlp=doc$ecreidentify.hlp
-ecselect	hlp=doc$ecselect.hlp
+
+doecslit	hlp=doc$doecslit.hlp
+dofoe		hlp=doc$dofoe.hlp
+
+revisions	sys=Revisions

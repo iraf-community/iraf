@@ -1,0 +1,5 @@
+.help revisions Jan92 noao.nobsolete
+.nf
+nobosolete$* +
+    The NOAO obsolete package, NOBSOLETE, was created.  (1/23/92, Valdes)
+.endhelp

@@ -157,14 +157,17 @@ real	crval, cdelt, crpix, airmass, wavelen, extval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	sp, ext, pix1, pix2
 
-int	imgeti(), imgnlr(), impnlr()
+int	imgeti(), clgeti(), imgnlr(), impnlr()
 real	imgetr(), img_airmass()
 errchk	imgeti(), imgetr(), img_airmass()
 
 begin
 	# Determine the dispersion axis and linear coordinates.
 
-	dispaxis = imgeti(im1, "dispaxis")
+	iferr (dispaxis = imgeti(im1, "dispaxis")) {
+	    dispaxis = clgeti ("dispaxis")
+	    call imaddi (im1, "dispaxis", dispaxis)
+	}
 
 	call sprintf (field, SZ_FIELD, "crval%d")
 	    call pargi (dispaxis)

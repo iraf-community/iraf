@@ -211,21 +211,27 @@ end
 
 
 # IS_IN_RANGE -- Test number to see if it is in range.
+# If the number is INDEFI then it is mapped to the maximum integer.
 
 bool procedure is_in_range (ranges, number)
 
 int	ranges[ARB]		# Range array
 int	number			# Number to be tested against ranges
 
-int	ip, first, last, step
+int	ip, first, last, step, num
 
 begin
+	if (IS_INDEFI (number))
+	    num = MAX_INT
+	else
+	    num = number
+
 	for (ip=1;  ranges[ip] != EOLIST;  ip=ip+3) {
 	    first = min (ranges[ip], ranges[ip+1])
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
-	    if (number >= first && number <= last)
-		if (mod (number - first, step) == 0)
+	    if (num >= first && num <= last)
+		if (mod (num - first, step) == 0)
 		    return (true)
 	}
 

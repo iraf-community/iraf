@@ -17,11 +17,13 @@ Output bias subtracted images.  An output images may be the same as its
 matching input image.
 .le
 .ls bias = "[]"
-Bias section applied to the input image to define the bias region.
+Bias section appended to the input image to define the bias region.
+The default section or an empty string will use the full image.
 .le
 .ls trim = "[]"
-Trim section applied to the input image to define the region to be
-bias subtracted and output.
+Trim section appended to the input image to define the region to be
+bias subtracted and output.  The default section or an empty string
+will use the full image.
 .le
 .ls median = no
 Take the median of the bias columns?  If no then the bias
@@ -57,15 +59,14 @@ Graphics cursor input
 .le
 .ih
 DESCRIPTION
-For each input image in the input image list 
-an average or median bias column is determined from the bias region.
-The bias region
-is defined by the bias section applied to the input image.  A function of
-the image lines is fit to the average bias column.  This function is subtracted
-from each image column in the trim region.  The trim region is defined by the
-trim section applied to the input image.  The bias subtracted and trimmed
-image is output to the output image.  The input and output images may not
-contain sections and the number of images in each list must be the same.
+For each input image in the input image list an average or median bias
+column is determined from the bias region.  The bias region is defined by
+the bias section applied to the input image.  A function of the image lines
+is fit to the average bias column.  This function is subtracted from each
+image column in the trim region.  The trim region is defined by the trim
+section applied to the input image.  The bias subtracted and trimmed image
+is output to the output image.  The input and output images may not contain
+sections and the number of images in each list must be the same.
 
 If the interactive flag is set then the user may interactively examine
 and fit the average bias column.  The interactive fitting is done using the

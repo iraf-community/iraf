@@ -26,7 +26,7 @@ int	timeout			# timeout interval, msec (0 for no timeout)
 
 bool	match
 pointer	sp, ip, op, buf
-int	sv_raw, flags, delay, first, last, nchars, ch
+int	sv_iomode, iomode, delay, first, last, nchars, ch
 int	fstati(), patmatch(), gpatmatch(), getci(), gstrcpy()
 errchk	getci, unread
 define	abort_ 91
@@ -38,13 +38,13 @@ begin
 	# Save raw mode state and set up for nonblocking raw mode reads
 	# if a timeout interval was specified.
 
-	flags = F_RAW
+	iomode = IO_RAW
 	if (timeout > 0)
-	    flags = flags + F_NDELAY
+	    iomode = iomode + IO_NDELAY
 
-	sv_raw = fstati (fd, F_RAW)
-	if (sv_raw != flags)
-	    call fseti (fd, F_RAW, flags)
+	sv_iomode = fstati (fd, F_IOMODE)
+	if (sv_iomode != iomode)
+	    call fseti (fd, F_IOMODE, iomode)
 
 	outbuf[1] = EOS
 	match = false
@@ -94,8 +94,8 @@ begin
 
 abort_
 	# Restore previous raw mode state.
-	if (sv_raw != flags)
-	    call fseti (fd, F_RAW, sv_raw)
+	if (sv_iomode != iomode)
+	    call fseti (fd, F_IOMODE, sv_iomode)
 
 	call sfree (sp)
 	return (nchars)

@@ -1,167 +1,167 @@
-      SUBROUTINE STRDCL
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER T, TOKEN (100), DCHAR (100)
-      INTEGER GNBTOK
-      INTEGER I, J, K, N, LEN
-      INTEGER LENGTH, CTOI, LEX
-      INTEGER CHAR(11)
-      INTEGER DAT(6)
-      INTEGER EOSS(3)
-      DATA CHAR(1)/105/,CHAR(2)/110/,CHAR(3)/116/,CHAR(4)/101/,CHAR(5)/1
-     *03/,CHAR(6)/101/,CHAR(7)/114/,CHAR(8)/42/,CHAR(9)/50/,CHAR(10)/47/
-     *,CHAR(11)/-2/
-      DATA DAT(1)/100/,DAT(2)/97/,DAT(3)/116/,DAT(4)/97/,DAT(5)/32/,DAT(
+      subroutine strdcl
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer t, token (100), dchar (100)
+      integer gnbtok
+      integer i, j, k, n, len
+      integer length, ctoi, lex
+      integer char(11)
+      integer dat(6)
+      integer eoss(3)
+      data char(1)/105/,char(2)/110/,char(3)/116/,char(4)/101/,char(5)/1
+     *03/,char(6)/101/,char(7)/114/,char(8)/42/,char(9)/50/,char(10)/47/
+     *,char(11)/-2/
+      data dat(1)/100/,dat(2)/97/,dat(3)/116/,dat(4)/97/,dat(5)/32/,dat(
      *6)/-2/
-      DATA EOSS(1)/48/,EOSS(2)/47/,EOSS(3)/-2/
-      T = GNBTOK (TOKEN, 100)
-      IF (.NOT.(T .NE. -9))GOTO 23000
-      CALL SYNERR (21Hmissing string token.)
-23000 CONTINUE
-      CALL SQUASH (TOKEN)
-      CALL OUTTAB
-      CALL PBSTR (CHAR)
-23002 CONTINUE
-      T = GNBTOK (DCHAR, 100)
-      IF (.NOT.(T .EQ. 47))GOTO 23005
-      GOTO 23004
-23005 CONTINUE
-      CALL OUTSTR (DCHAR)
-23003 GOTO 23002
-23004 CONTINUE
-      CALL OUTCH (32)
-      CALL OUTSTR (TOKEN)
-      CALL ADDSTR (TOKEN, SBUF, SBP, 2048)
-      CALL ADDCHR (-2, SBUF, SBP, 2048)
-      IF (.NOT.(GNBTOK (TOKEN, 100) .NE. 40))GOTO 23007
-      LEN = LENGTH (TOKEN) + 1
-      IF (.NOT.(TOKEN (1) .EQ. 39 .OR. TOKEN (1) .EQ. 34))GOTO 23009
-      LEN = LEN - 2
-23009 CONTINUE
-      GOTO 23008
-23007 CONTINUE
-      T = GNBTOK (TOKEN, 100)
-      I = 1
-      LEN = CTOI (TOKEN, I)
-      IF (.NOT.(TOKEN (I) .NE. -2))GOTO 23011
-      CALL SYNERR (20Hinvalid string size.)
-23011 CONTINUE
-      IF (.NOT.(GNBTOK (TOKEN, 100) .NE. 41))GOTO 23013
-      CALL SYNERR (20Hmissing right paren.)
-      GOTO 23014
-23013 CONTINUE
-      T = GNBTOK (TOKEN, 100)
-23014 CONTINUE
-23008 CONTINUE
-      CALL OUTCH (40)
-      CALL OUTNUM (LEN)
-      CALL OUTCH (41)
-      CALL OUTDON
-      IF (.NOT.(TOKEN (1) .EQ. 39 .OR. TOKEN (1) .EQ. 34))GOTO 23015
-      LEN = LENGTH (TOKEN)
-      TOKEN (LEN) = -2
-      CALL ADDSTR (TOKEN (2), SBUF, SBP, 2048)
-      GOTO 23016
-23015 CONTINUE
-      CALL ADDSTR (TOKEN, SBUF, SBP, 2048)
-23016 CONTINUE
-      CALL ADDCHR (-2, SBUF, SBP, 2048)
-      T = LEX (TOKEN)
-      CALL PBSTR (TOKEN)
-      IF (.NOT.(T .NE. -75))GOTO 23017
-      I = 1
-23019 IF (.NOT.(I .LT. SBP))GOTO 23021
-      CALL OUTTAB
-      CALL OUTSTR (DAT)
-      K = 1
-      J = I + LENGTH (SBUF (I)) + 1
-23022 CONTINUE
-      IF (.NOT.(K .GT. 1))GOTO 23025
-      CALL OUTCH (44)
-23025 CONTINUE
-      CALL OUTSTR (SBUF (I))
-      CALL OUTCH (40)
-      CALL OUTNUM (K)
-      CALL OUTCH (41)
-      CALL OUTCH (47)
-      IF (.NOT.(SBUF (J) .EQ. -2))GOTO 23027
-      GOTO 23024
-23027 CONTINUE
-      N = SBUF (J)
-      CALL OUTNUM (N)
-      CALL OUTCH (47)
-      K = K + 1
-23023 J = J + 1
-      GOTO 23022
-23024 CONTINUE
-      CALL PBSTR (EOSS)
-23029 CONTINUE
-      T = GNBTOK (TOKEN, 100)
-      CALL OUTSTR (TOKEN)
-23030 IF (.NOT.(T .EQ. 47))GOTO 23029
-23031 CONTINUE
-      CALL OUTDON
-23020 I = J + 1
-      GOTO 23019
-23021 CONTINUE
-      SBP = 1
-23017 CONTINUE
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      data eoss(1)/48/,eoss(2)/47/,eoss(3)/-2/
+      t = gnbtok (token, 100)
+      if (.not.(t .ne. -9))goto 23000
+      call synerr (21Hmissing string token.)
+23000 continue
+      call squash (token)
+      call outtab
+      call pbstr (char)
+23002 continue
+      t = gnbtok (dchar, 100)
+      if (.not.(t .eq. 47))goto 23005
+      goto 23004
+23005 continue
+      call outstr (dchar)
+23003 goto 23002
+23004 continue
+      call outch (32)
+      call outstr (token)
+      call addstr (token, sbuf, sbp, 2048)
+      call addchr (-2, sbuf, sbp, 2048)
+      if (.not.(gnbtok (token, 100) .ne. 40))goto 23007
+      len = length (token) + 1
+      if (.not.(token (1) .eq. 39 .or. token (1) .eq. 34))goto 23009
+      len = len - 2
+23009 continue
+      goto 23008
+23007 continue
+      t = gnbtok (token, 100)
+      i = 1
+      len = ctoi (token, i)
+      if (.not.(token (i) .ne. -2))goto 23011
+      call synerr (20Hinvalid string size.)
+23011 continue
+      if (.not.(gnbtok (token, 100) .ne. 41))goto 23013
+      call synerr (20Hmissing right paren.)
+      goto 23014
+23013 continue
+      t = gnbtok (token, 100)
+23014 continue
+23008 continue
+      call outch (40)
+      call outnum (len)
+      call outch (41)
+      call outdon
+      if (.not.(token (1) .eq. 39 .or. token (1) .eq. 34))goto 23015
+      len = length (token)
+      token (len) = -2
+      call addstr (token (2), sbuf, sbp, 2048)
+      goto 23016
+23015 continue
+      call addstr (token, sbuf, sbp, 2048)
+23016 continue
+      call addchr (-2, sbuf, sbp, 2048)
+      t = lex (token)
+      call pbstr (token)
+      if (.not.(t .ne. -75))goto 23017
+      i = 1
+23019 if (.not.(i .lt. sbp))goto 23021
+      call outtab
+      call outstr (dat)
+      k = 1
+      j = i + length (sbuf (i)) + 1
+23022 continue
+      if (.not.(k .gt. 1))goto 23025
+      call outch (44)
+23025 continue
+      call outstr (sbuf (i))
+      call outch (40)
+      call outnum (k)
+      call outch (41)
+      call outch (47)
+      if (.not.(sbuf (j) .eq. -2))goto 23027
+      goto 23024
+23027 continue
+      n = sbuf (j)
+      call outnum (n)
+      call outch (47)
+      k = k + 1
+23023 j = j + 1
+      goto 23022
+23024 continue
+      call pbstr (eoss)
+23029 continue
+      t = gnbtok (token, 100)
+      call outstr (token)
+23030 if (.not.(t .eq. 47))goto 23029
+23031 continue
+      call outdon
+23020 i = j + 1
+      goto 23019
+23021 continue
+      sbp = 1
+23017 continue
+      return
+      end
+c     logic0  logical_column

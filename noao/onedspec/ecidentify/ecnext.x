@@ -11,7 +11,7 @@ int	i
 
 begin
 	for (i=feature+1; i<=EC_NFEATURES(ec); i=i+1)
-	    if (AP(ec,i) == EC_AP(ec))
+	    if (APN(ec,i) == EC_AP(ec))
 		break
 
 	if (i <= EC_NFEATURES(ec))

@@ -7,7 +7,7 @@ $exit
 
 libpkg.a:
 	cyboow.x
-	ranges.x
+	ranges.x             <mach.h> <ctype.h>
 	getdatatype.x
 	addcards.x
 	;

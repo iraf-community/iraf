@@ -93,7 +93,7 @@ pointer	out		# Output image
 int	nscan		# Number of lines scanned before readout
 int	readaxis	# Readout axis
 
-real	nscanr, sum
+real	nscanr, sum, mean, asumr()
 int	i, j, k, l, len1, len2, nc, nl, nscani, c1, c2, cs, l1, l2, ls
 pointer	sp, str, bufs, datain, data, imgl2r(), impl2r()
 errchk	malloc, calloc
@@ -118,6 +118,11 @@ begin
 	nc = c2 - c1 + 1
 	nl = l2 - l1 + 1
 
+	# Copy initial lines.
+	do i = 1, l1 - 1
+	    call amovr (Memr[imgl2r(in,i)], Memr[impl2r(out,i)], len1)
+
+	mean = 0.
 	switch (readaxis) {
 	case 1:
 	    nscani = max (1, min (nscan, nl))
@@ -129,10 +134,6 @@ begin
 	    k = 1
 	    l = 1
 
-	    # Copy initial lines.
-	    do i = 1, l1 - 1
-		call amovr (Memr[imgl2r(in,i)], Memr[impl2r(out,i)], len1)
-
 	    # Ramp up
 	    while (j <= nscani) {
 		i = j + l1 - 1
@@ -143,8 +144,8 @@ begin
 	        call aaddr (Memr[data], Memr[datain], Memr[data], nc)
 	        j = j + 1
 	    }
-	    call adivkr (Memr[data], nscanr,
-		Memr[impl2r(out,l+l1-1)+c1-1], nc)
+	    call adivkr (Memr[data], nscanr, Memr[impl2r(out,l+l1-1)+c1-1], nc)
+	    mean = mean + asumr (Memr[data], nc) / nscanr
 	    l = l + 1
 
 	    # Moving average
@@ -159,6 +160,7 @@ begin
 	        call aaddr (Memr[data], Memr[datain], Memr[data], nc)
 	        call adivkr (Memr[data], nscanr,
 		    Memr[impl2r(out,l+l1-1)+c1-1], nc)
+	        mean = mean + asumr (Memr[data], nc) / nscanr
 	        j = j + 1
 	        k = k + 1
 	        l = l + 1
@@ -170,13 +172,10 @@ begin
 	        call asubr (Memr[data], Memr[datain], Memr[data], nc)
 	        call adivkr (Memr[data], nscanr,
 		    Memr[impl2r(out,l+l1-1)+c1-1], nc)
+	        mean = mean + asumr (Memr[data], nc) / nscanr
 	        k = k + 1
 	        l = l + 1
 	    }
-
-	    # Copy final lines.
-	    do i = l2+1, len2
-		call amovr (Memr[imgl2r(in,i)], Memr[impl2r(out,i)], len1)
 
 	    call mfree (bufs, TY_INT)
 	    call mfree (data, TY_REAL)
@@ -202,12 +201,14 @@ begin
 		    j = j + 1
 		}
 		Memr[data] = sum / nscani
+		mean = mean + sum
 		l = l + 1
 
 		# Moving average
 		while (j < nl) {
 		    sum = sum + Memr[datain+j] - Memr[datain+k]
 		    Memr[data+l] = sum / nscani
+		    mean = mean + sum
 		    j = j + 1
 		    k = k + 1
 		    l = l + 1
@@ -217,11 +218,19 @@ begin
 		while (l < nl) {
 		    sum = sum - Memr[datain+k]
 		    Memr[data+l] = sum / nscani
+		    mean = mean + sum
 		    k = k + 1
 		    l = l + 1
 		}
 	    }
 	}
+
+	# Copy final lines.
+	do i = l2+1, len2
+	    call amovr (Memr[imgl2r(in,i)], Memr[impl2r(out,i)], len1)
+
+	mean = mean / nc / nl
+	call hdmputr (out, "ccdmean", mean)
 
 	call sfree (sp)
 end
@@ -238,7 +247,7 @@ int	readaxis	# Readout axis
 
 int	i, nc, nl, c1, c2, cs, l1, l2, ls
 int	in_c1, in_c2, in_l1, in_l2, ccd_c1, ccd_c2, ccd_l1, ccd_l2
-real	asumr()
+real	mean, asumr()
 pointer	sp, str, data, imgl2r(), impl2r(), imps2r()
 
 begin
@@ -295,6 +304,7 @@ begin
 		call pargi (ccd_c1)
 		call pargi (ccd_c2)
 	    call hdmpstr (out, "ccdsec", Memc[str])
+	    mean = asumr (Memr[data], nc) / nl
 	case 2:
 	    IM_LEN(out,1) = 1
 	    data = imps2r (out, 1, 1, 1, nl)
@@ -311,7 +321,10 @@ begin
 		call pargi (ccd_l1)
 		call pargi (ccd_l2)
 	    call hdmpstr (out, "ccdsec", Memc[str])
+	    mean = asumr (Memr[data], nl) / nc
 	}
+
+	call hdmputr (out, "ccdmean", mean)
 
 	call sfree (sp)
 end

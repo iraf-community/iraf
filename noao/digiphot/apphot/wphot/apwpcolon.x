@@ -52,8 +52,7 @@ begin
 	    call ap_nscolon (ap, im, out, stid, cmdstr, newcenterbuf,
 	        newcenter, newskybuf, newsky, newmagbuf, newmag)
 	else
-	    call aphimcolon (ap, out, stid, cmdstr, newcenterbuf, newcenter,
-	        newskybuf, newsky, newmagbuf, newmag)
+	    call ap_himcolon (ap, cmdstr)
 
 	call sfree (sp)
 end

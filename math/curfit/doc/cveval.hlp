@@ -24,7 +24,7 @@ Evaluate the curve at the specified value of x. CVEVAL is a real
 function which returns the fitted y value.
 .ih
 NOTES
-It uses the coefficient array stored in the image descriptor structure.
+It uses the coefficient array stored in the curve descriptor structure.
 The x values are assumed to lie in the region xmin <= x <= xmax. Checking
 for out of bounds x values is the responsibility of the user.
 .ih

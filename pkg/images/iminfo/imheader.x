@@ -44,6 +44,8 @@ begin
 	}
 
 	call imtclose (list)
+
+	call sfree (sp)
 end
 
 

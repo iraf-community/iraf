@@ -3,9 +3,9 @@ include	<imhdr.h>
 include	<gset.h>
 include	<mach.h>
 include	<pkg/gtools.h>
-include "idsmtn.h"
+include "shdr.h"
 
-define	KEY	"noao$lib/scr/standard.key"
+define	KEY	"noao$onedspec/standard.key"
 define	PROMPT	"STANDARD options"
 
 define	VLIGHT		2.997925e18	# Velocity of light in Angstroms/sec
@@ -13,35 +13,36 @@ define	EXT_LOOKUP	1		# Interp entry ID for extinction table
 define	MAG_LOOKUP	2		# Interp entry ID for magnitude table
 define	NRANGES		100		# Maximum number of aperture ranges
 
-define	STD_LEN		19		# Length of standard structure
-define	STD_BEAM	Memi[$1]	# Beam number
-define	STD_OBJ		Memi[$1+1]	# Pointer to image name
-define	STD_SKY		Memi[$1+2]	# Pointer to sky name
-define	STD_IDS		Memi[$1+3]	# Pointer to header parameters
-define	STD_SPEC	Memi[$1+4]	# Pointer to spectrum data
-define	STD_BSFLAG	Memi[$1+5]	# Beam switch flag
-define	STD_IFLAG	Memi[$1+6]	# Interactive flag
-define	STD_NWAVES	Memi[$1+7]	# Number of calibration points
-define	STD_WAVES	Memi[$1+8]	# Pointer to standard star wavelengths
-define	STD_DWAVES	Memi[$1+9]	# Pointer to standard star bandpasses
-define	STD_MAGS	Memi[$1+10]	# Pointer to standard star magnitudes
-define	STD_FLUXES	Memi[$1+11]	# Pointer to standard star fluxes
-define	CAL_NWAVES	Memi[$1+12]	# Number of calibration points
-define	CAL_WAVES	Memi[$1+13]	# Pointer to calibration wavelengths
-define	CAL_DWAVES	Memi[$1+14]	# Pointer to calibration bandpasses
-define	CAL_MAGS	Memi[$1+15]	# Pointer to calibration magnitudes
-define	EXT_NWAVES	Memi[$1+16]	# Number of extinction points
-define	EXT_WAVES	Memi[$1+17]	# Extinction wavelength points
-define	EXT_EXTNS	Memi[$1+18]	# Pointer to extinctions points
+define	STD_LEN		13		# Length of standard structure
+define	STD_AP		Memi[$1]	# Aperture number
+define	STD_TYPE	Memi[$1+1]	# Spectrum type	
+define	STD_SH		Memi[$1+2]	# Pointer to spectrum parameters
+define	STD_IFLAG	Memi[$1+3]	# Interactive flag
+define	STD_NWAVES	Memi[$1+4]	# Number of calibration points
+define	STD_WAVES	Memi[$1+5]	# Pointer to standard star wavelengths
+define	STD_DWAVES	Memi[$1+6]	# Pointer to standard star bandpasses
+define	STD_MAGS	Memi[$1+7]	# Pointer to standard star magnitudes
+define	STD_FLUXES	Memi[$1+8]	# Pointer to standard star fluxes
+define	CAL_NWAVES	Memi[$1+9]	# Number of calibration points
+define	CAL_WAVES	Memi[$1+10]	# Pointer to calibration wavelengths
+define	CAL_DWAVES	Memi[$1+11]	# Pointer to calibration bandpasses
+define	CAL_MAGS	Memi[$1+12]	# Pointer to calibration magnitudes
+
+# Object flags
+define	NONE	-1	# No object flag
+define	SKY	0	# Sky
+define	OBJ	1	# Object
 
 # Interactive flags
-define	ANSWERS	"|no|yes|NO|YES|NO!|YES!|"
+define	ANSWERS	"|no|yes|N|Y|NO|YES|NO!|YES!|"
 define	NO1	1	# No for a single spectrum
 define	YES1	2	# Yes for a single spectrum
-define	NO2	3	# No for all spectra of the same aperture
-define	YES2	4	# Yes for all spectra of the same aperture
-define	NO3	5	# No for all spectra
-define	YES3	6	# Yes for all spectra
+define	N2	3	# No for all spectra of the same aperture
+define	Y2	4	# Yes for all spectra of the same aperture
+define	NO2	5	# No for all spectra of the same aperture
+define	YES2	6	# Yes for all spectra of the same aperture
+define	NO3	7	# No for all spectra
+define	YES3	8	# Yes for all spectra
 
 # T_STANDARD -- Read standard star spectrum and compare with tabulated
 #               fluxes for given star to ascertain the system sensitivity
@@ -56,50 +57,47 @@ define	YES3	6	# Yes for all spectra
 
 procedure t_standard()
 
-int	odr			# List of input spectra
+int	list			# List of input spectra
 pointer	output			# Output standard file
+pointer	observatory		# Observatory
 pointer	aps			# Aperture list
 real	bandwidth		# Width of bandpass
 real	bandsep			# Separation of bandpass
-real	latitude		# Observation latitude
-int	interactive		# Interactive bandpass definition
+bool	bswitch			# Beam switch?
 bool	samestar		# Same star in all apertures?
+int	interactive		# Interactive bandpass definition
 
-int	i, line, beam, nbeams
-real	wave, dwave
-pointer	sp, image, hdr, gp, im, data, stds, std
+bool	newobs, obshead
+int	i, j, line, enwaves, nstds
+real	wave, dwave, latitude
+pointer	sp, image, ewaves, emags, im, mw, sh, obj, sky, std, stds, obs, gp
 
-int	odr_getim(), decode_ranges()
-real	clgetr()
+int	imtgetim(), decode_ranges()
+real	clgetr(), obsgetr()
 bool	clgetb(), is_in_range()
-pointer	immap(), imgl1r(), imgl2r()
-errchk	gen_calib, get_airm, ext_load()
+pointer	imtopenp(), immap(), smw_openim()
+errchk	immap, smw_openim, shdr_open, std_calib, get_airm, ext_load, obsimopen
 
 begin
-	# If beam switching call a separate procedure.
-	if (clgetb ("beam_switch")) {
-	    call bs_standard ()
-	    return
-	}
-
 	call smark (sp)
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (hdr, LEN_IDS, TY_STRUCT)
-	call salloc (POINT(hdr), MAX_NCOEFF, TY_REAL)
+	call salloc (observatory, SZ_FNAME, TY_CHAR)
 	call salloc (aps, 3*NRANGES, TY_INT)
 
 	# Get task parameters.
-	if (clgetb ("recformat"))
-	    call odr_open1 ("input", "records", odr)
-	else
-	    call odr_open1 ("input", "", odr)
+	list = imtopenp ("input")
+	call clgstr ("records", Memc[image], SZ_FNAME)
+	call odr_openp (list, Memc[image])
 	call clgstr ("output", Memc[output], SZ_FNAME)
 	call clgstr ("apertures", Memc[image], SZ_FNAME)
 	bandwidth = clgetr ("bandwidth")
 	bandsep = clgetr ("bandsep")
-	latitude = clgetr ("latitude")
-	samestar = clgetb ("samestar")
+	bswitch = clgetb ("beam_switch")
+	if (bswitch)
+	    samestar = true
+	else
+	    samestar = clgetb ("samestar")
 	if (clgetb ("interact"))
 	    interactive = YES1
 	else
@@ -109,71 +107,81 @@ begin
 	if (decode_ranges (Memc[image], Memi[aps], NRANGES, i) == ERR)
 	    call error (0, "Bad aperture list")
 
+	call ext_load (ewaves, emags, enwaves)
+
+	sh = NULL
+	obj = NULL
+	sky = NULL
+	obs = NULL
 	gp = NULL
-	nbeams = 0
-	while (odr_getim (odr, Memc[image], SZ_FNAME) != EOF) {
+	nstds = 0
+	while (imtgetim (list, Memc[image], SZ_FNAME) != EOF) {
 	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
 		call erract (EA_WARN)
 		next
 	    }
+	    mw = smw_openim (im)
+	    call shdr_open (im, mw, 1, 1, INDEFI, SHDATA, sh)
 
-	    call load_ids_hdr (hdr, im, 1)
-	    if (DC_FLAG(hdr) == -1) {
-		call eprintf ("%s: Not dispersion corrected\n")
+	    if (DC(sh) == DCNO) {
+		call eprintf ("%s: No dispersion function\n")
 		    call pargstr (Memc[image])
+		call mw_close (mw)
 		call imunmap (im)
 		next
 	    }
-	    if (IS_INDEF (ITM(hdr))) {
+	    if (IS_INDEF (IT(sh))) {
 		call eprintf ("%s: Warning - exposure time missing\n")
 		    call pargstr (Memc[image])
 	    }
 
-
 	    do line = 1, IM_LEN(im,2) {
-		if (line > 1)
-	            call load_ids_hdr (hdr, im, line)
-		if (!is_in_range (Memi[aps], BEAM(hdr)))
+		call shdr_open (im, mw, line, 1, INDEFI, SHDATA, sh)
+		if (!is_in_range (Memi[aps], AP(sh)))
 		    next
 
-		call printf ("[%s][%d]: %s\n")
-		    call pargstr (Memc[image])
-		    call pargi (BEAM(hdr))
-		    call pargstr (IM_TITLE(im))
-		call flush (STDOUT)
+		if (!bswitch || TYPE(sh) == OBJ) {
+		    call printf ("%s[%d]: %s\n")
+			call pargstr (SPECTRUM(sh))
+			call pargi (AP(sh))
+			call pargstr (TITLE(sh))
+		    call flush (STDOUT)
+		}
 
-	        if (IS_INDEF (AIRMASS(hdr)))
-		    call get_airm (RA(hdr), DEC(hdr), HA(hdr), ST(hdr),
-			latitude, AIRMASS(hdr))
+	        if (IS_INDEF (AM(sh))) {
+		    call clgstr ("observatory", Memc[observatory], SZ_FNAME)
+		    call obsimopen (obs, im, Memc[observatory], NO, newobs,
+			obshead)
+		    if (newobs)
+			call obslog (obs, "STANDARD", "latitude", STDOUT)
+		    latitude = obsgetr (obs, "latitude")
+		    call get_airm (RA(sh), DEC(sh), HA(sh), ST(sh),
+			latitude, AM(sh))
+		}
 
-	        # Access pixels
-	        if (IM_NDIM(im) == 1)
-		    data = imgl1r (im, 1)
-	        else
-		    data = imgl2r (im, line)
-
-		for (beam=0; beam<nbeams; beam=beam+1) {
-		    std = Memi[stds+beam]
-		    if (STD_BEAM(std) == BEAM(hdr))
+		for (i=0; i<nstds; i=i+1) {
+		    std = Memi[stds+i]
+		    if (STD_AP(std) == AP(sh))
 			break
 		}
 
-		# Allocate space for this beam if not already done.
-		if (beam >= nbeams) {
-		    if (nbeams == 0)
+		# Allocate space for this aperture if not already done.
+		if (i >= nstds) {
+		    if (nstds == 0)
 			call malloc (stds, 10, TY_INT)
-		    else if (mod (nbeams, 10) == 0)
-			call realloc (stds, nbeams+10, TY_INT)
-
+		    else if (mod (nstds, 10) == 0)
+			call realloc (stds, nstds+10, TY_INT)
 		    call salloc (std, STD_LEN, TY_STRUCT)
-		    Memi[stds+beam] = std
-		    nbeams = nbeams + 1
+		    Memi[stds+i] = std
+		    nstds = nstds + 1
 
-		    STD_BEAM(std) = BEAM(hdr)
+		    STD_AP(std) = AP(sh)
+		    STD_TYPE(std) = NONE
+		    STD_SH(std) = NULL
 		    STD_IFLAG(std) = interactive
 		    STD_NWAVES(std) = 0
 
-		    if (!samestar || beam == 0) {
+		    if (!samestar || i == 0) {
 	 	        # Read calibration data
 		        repeat {
 		            iferr (call getcalib (CAL_WAVES(std),
@@ -182,8 +190,6 @@ begin
 		                call erract (EA_WARN)
 			        next
 			    }
-			    call ext_load (EXT_WAVES(std), EXT_EXTNS(std),
-				EXT_NWAVES(std))
 		            break
 			}
 		    } else {
@@ -191,57 +197,109 @@ begin
 			CAL_WAVES(std) = CAL_WAVES(Memi[stds])
 			CAL_DWAVES(std) = CAL_DWAVES(Memi[stds])
 			CAL_MAGS(std) = CAL_MAGS(Memi[stds])
-			EXT_NWAVES(std) = EXT_NWAVES(Memi[stds])
-			EXT_WAVES(std) = EXT_WAVES(Memi[stds])
-			EXT_EXTNS(std) = EXT_EXTNS(Memi[stds])
 		    }
 
 		    if (IS_INDEF (bandwidth)) {
-		        do i = 1, CAL_NWAVES(std) {
-		            wave = Memr[CAL_WAVES(std)+i-1]
-		            dwave = Memr[CAL_DWAVES(std)+i-1]
-		            call add_band (std, wave, dwave, 0.)
+		        do j = 1, CAL_NWAVES(std) {
+		            wave = Memr[CAL_WAVES(std)+j-1]
+		            dwave = Memr[CAL_DWAVES(std)+j-1]
+		            call std_addband (std, wave, dwave, 0.)
 		        }
 		    } else {
-			wave = W0(hdr) + bandwidth / 2
-			dwave = W0(hdr) + (NP2(hdr) - 1) * WPC(hdr) -
-			    bandwidth / 2
+			wave = W0(sh) + bandwidth / 2
+			dwave = W0(sh) + (SN(sh)-1) * WP(sh) - bandwidth / 2
 			while (wave <= dwave) {
-		            call add_band (std, wave, bandwidth, 0.)
+		            call std_addband (std, wave, bandwidth, 0.)
 			    wave = wave + bandsep
 			}
 		    }
 		}
-		std = Memi[stds+beam]
+
+		if (bswitch) {
+		    switch (STD_TYPE(std)) {
+		    case NONE:
+			STD_TYPE(std) = TYPE(sh)
+			call shdr_copy (sh, STD_SH(std), YES)
+			next
+		    case SKY:
+			obj = sh
+			sky = STD_SH(std)
+			if (TYPE(sh) == SKY) {
+			    call eprintf ("%s[%d]: Object spectrum not found\n")
+				call pargstr (SPECTRUM(sky))
+				call pargi (AP(sky))
+
+			    call mw_close (MW(sky))
+			    call shdr_copy (sh, STD_SH(std), YES)
+			    next
+			}
+		    case OBJ:
+			obj = STD_SH(std)
+			sky = sh
+			if (TYPE(sh) == OBJ) {
+			    obj = STD_SH(std)
+			    call eprintf ("%s[%d]: Sky spectrum not found\n")
+				call pargstr (SPECTRUM(obj))
+				call pargi (AP(obj))
+
+			    call mw_close (MW(obj))
+			    call shdr_copy (sh, STD_SH(std), YES)
+			    next
+			}
+		    }
+		} else {
+		    obj = sh
+		    sky = NULL
+		}
 
 		# Generate a calibration table
-		call gen_calib (gp, im, hdr, Memc[image], "", Memc[output],
-		    std, Memr[data])
+		call std_calib (obj, sky, std, gp, Memr[ewaves], Memr[emags],
+		    enwaves)
+		call std_output (obj, sky, std, Memc[output])
 
 		if (interactive == YES1) {
 		    if (STD_IFLAG(std) == NO3 || STD_IFLAG(std) == YES3) {
 		        interactive = STD_IFLAG(std)
-		        do beam = 0, nbeams-1
-			    STD_IFLAG(Memi[stds+beam]) = interactive
+		        do i = 0, nstds-1
+			    STD_IFLAG(Memi[stds+i]) = interactive
 		    }
 		    if (interactive == NO3 && gp != NULL)
 			call gclose (gp)
 		}
+
+		if (bswitch) {
+		    call mw_close (MW(STD_SH(std)))
+		    STD_TYPE(std) = NONE
+		}
 	    }
+
+	    call mw_close (mw)
 	    call imunmap (im)
 	}
 
+	if (obs != NULL)
+	    call obsclose (obs)
 	if (gp != NULL)
 	    call gclose (gp)
-	call odr_close (odr)
-	do beam = 0, nbeams-1 {
-	    std = Memi[stds+beam]
-	    if (!samestar || beam == 0) {
+	do i = 0, nstds-1 {
+	    std = Memi[stds+i]
+	    obj = STD_SH(std)
+	    switch (STD_TYPE(std)) {
+	    case SKY:
+		call eprintf ("%s[%d]: Object spectrum not found\n")
+		    call pargstr (SPECTRUM(obj))
+		    call pargi (AP(obj))
+	    case OBJ:
+		call eprintf ("%s[%d]: Sky spectrum not found\n")
+		    call pargstr (SPECTRUM(obj))
+		    call pargi (AP(obj))
+	    }
+	    if (obj != NULL)
+		call shdr_close (obj)
+	    if (!samestar || i == 0) {
 		call mfree (CAL_WAVES(std), TY_REAL)
 		call mfree (CAL_DWAVES(std), TY_REAL)
 		call mfree (CAL_MAGS(std), TY_REAL)
-		call mfree (EXT_WAVES(std), TY_REAL)
-		call mfree (EXT_EXTNS(std), TY_REAL)
 	    }
 	    call mfree (STD_WAVES(std), TY_REAL)
 	    call mfree (STD_DWAVES(std), TY_REAL)
@@ -249,271 +307,32 @@ begin
 	    call mfree (STD_FLUXES(std), TY_REAL)
 	}
 	call mfree (stds, TY_INT)
+	call mfree (ewaves, TY_REAL)
+	call mfree (emags, TY_REAL)
+	call shdr_close (sh)
+	call imtclose (list)
 	call sfree (sp)
 end
 
 
-# BS_STANDARD -- Special version for beam-switched data.
+# STD_CALIB -- Compute standard star calibrations
 
-procedure bs_standard()
+procedure std_calib (obj, sky, std, gp, ewaves, emags, enwaves)
 
-int	odr			# List of input spectra
-pointer	output			# Output standard file
-pointer	aps			# Aperture list
-real	bandwidth		# Width of bandpass
-real	bandsep			# Separation of bandpass
-real	latitude		# Observation latitude
-int	interactive		# Interactive bandpass definition
+pointer	obj			# Object pointer
+pointer	sky			# Sky pointer
+pointer	std			# Standard pointer
+pointer	gp			# Graphics pointer
+real	ewaves[enwaves]		# Extinction wavelengths
+real	emags[enwaves]		# Extinction magnitudes
+int	enwaves			# Extinction points
 
-int	i, line, ifile, nbeams, beam, flag
-real	wave, dwave
-pointer	sp, image, ids, gp, im, data, bands, stds, std
-pointer	obj, sky, hdr, spec
-
-pointer	immap(), imgl1r(), imgl2r()
-int	odr_getim(), decode_ranges()
-real	clgetr()
-bool	clgetb(), is_in_range()
-errchk	gen_calib, get_airm, ext_load()
-
-begin
-	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (hdr, LEN_IDS, TY_STRUCT)
-	call salloc (POINT(hdr), MAX_NCOEFF, TY_REAL)
-	call salloc (aps, 3*NRANGES, TY_INT)
-	call salloc (bands, STD_LEN, TY_STRUCT)
-	STD_NWAVES(bands) = 0
-	CAL_NWAVES(bands) = 0
-
-	# Get task parameters.
-	if (clgetb ("recformat"))
-	    call odr_open1 ("input", "records", odr)
-	else
-	    call odr_open1 ("input", "", odr)
-	call clgstr ("output", Memc[output], SZ_FNAME)
-	call clgstr ("apertures", Memc[image], SZ_FNAME)
-	bandwidth = clgetr ("bandwidth")
-	bandsep = clgetr ("bandsep")
-	latitude = clgetr ("latitude")
-	if (clgetb ("interact"))
-	    interactive = YES1
-	else
-	    interactive = NO3
-
-	# Expand the aperture list.
-	if (decode_ranges (Memc[image], Memi[aps], NRANGES, i) == ERR)
-	    call error (0, "Bad aperture list")
-
-	gp = NULL
-	ifile = 0
-	nbeams = 0
-	while (odr_getim (odr, Memc[image], SZ_FNAME) != EOF){
-	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
-		call erract (EA_WARN)
-		next
-	    }
-
-	    call load_ids_hdr (hdr, im, 1)
-	    if (DC_FLAG(hdr) == -1) {
-		call eprintf ("%s: Not dispersion corrected\n")
-		    call pargstr (Memc[image])
-		call imunmap (im)
-		next
-	    }
-	    if (IS_INDEF (ITM(hdr))) {
-		call eprintf ("%s: Warning - exposure time missing\n")
-		    call pargstr (Memc[image])
-	    }
-
-	    # Read in structure elements
-	    do line = 1, IM_LEN(im,2) {
-		if (line != 1)
-	            call load_ids_hdr (hdr, im, line)
-		if (!is_in_range (Memi[aps], BEAM(hdr)))
-		    next
-
-		if (OFLAG(hdr) == 1) {
-		    call printf ("[%s][%d]: %s\n")
-		        call pargstr (Memc[image])
-		        call pargi (BEAM(hdr))
-		        call pargstr (IM_TITLE(im))
-		    call flush (STDOUT)
-		}
-
-	        if (IS_INDEF (AIRMASS(hdr)))
-		    call get_airm (RA(hdr), DEC(hdr), HA(hdr), ST(hdr),
-			latitude, AIRMASS(hdr))
-
-	        # Access pixels
-	        if (IM_NDIM(im) == 1)
-		    data = imgl1r (im, 1)
-	        else
-		    data = imgl2r (im, line)
-
-	        # Beam-switch (i.e. accumulate object-sky sums)
-		for (beam=0; beam<nbeams; beam=beam+1) {
-		    std = Memi[stds+beam]
-		    if (STD_BEAM(std) == BEAM(hdr))
-			break
-		}
-
-		# Allocate space for this beam if not already done
-		if (beam >= nbeams) {
-		    if (nbeams == 0)
-			call malloc (stds, 10, TY_INT)
-		    else if (mod (nbeams, 10) == 0)
-			call realloc (stds, nbeams+10, TY_INT)
-
-		    call salloc (std, STD_LEN, TY_STRUCT)
-		    call salloc (obj, SZ_FNAME, TY_CHAR)
-		    call salloc (sky, SZ_FNAME, TY_CHAR)
-		    call salloc (ids, LEN_IDS, TY_STRUCT)
-		    call salloc (spec, IM_LEN(im,1), TY_REAL)
-
-		    STD_BEAM(std) = BEAM(hdr)
-		    STD_OBJ(std) = obj
-		    STD_SKY(std) = sky
-		    STD_IDS(std) = ids
-		    STD_SPEC(std) = spec
-		    STD_BSFLAG(std) = INDEFI
-
-		    Memi[stds+beam] = std
-		    nbeams = nbeams + 1
-
-		    if (CAL_NWAVES(bands) == 0) {
-		 	STD_IFLAG(bands) = interactive
-
-	 	        # Read calibration data
-		        repeat {
-		            iferr (call getcalib (CAL_WAVES(bands),
-			        CAL_DWAVES(bands), CAL_MAGS(bands),
-				CAL_NWAVES(bands))) {
-		                call erract (EA_WARN)
-			        next
-		            }
-			    call ext_load (EXT_WAVES(bands), EXT_EXTNS(bands),
-				EXT_NWAVES(bands))
-		            break
-		        }
-
-		        if (IS_INDEF (bandwidth)) {
-		            do i = 1, CAL_NWAVES(bands) {
-		                wave = Memr[CAL_WAVES(bands)+i-1]
-		                dwave = Memr[CAL_DWAVES(bands)+i-1]
-		                call add_band (bands, wave, dwave, 0.)
-		            }
-		        } else {
-			    wave = W0(hdr) + bandwidth / 2
-			    dwave = W0(hdr) + (NP2(hdr) - 1) * WPC(hdr) -
-			        bandwidth / 2
-			    while (wave <= dwave) {
-		                call add_band (bands, wave, bandwidth, 0.)
-			        wave = wave + bandsep
-			    }
-			}
-		    }
-		}
-
-		obj = STD_OBJ(std)
-		sky = STD_SKY(std)
-		ids = STD_IDS(std)
-		spec = STD_SPEC(std)
-		flag = STD_BSFLAG(std)
-		
-		# Save header elements and image name
-		if (OFLAG(hdr) == 1) {
-		    BEAM(ids) = BEAM(hdr)
-		    EX_FLAG(ids) = EX_FLAG(hdr)
-		    W0(ids) = W0(hdr)
-		    WPC(ids) = WPC(hdr)
-		    NP2(ids) = NP2(hdr)
-		    ITM(ids) = ITM(hdr)
-		    AIRMASS(ids) = AIRMASS(hdr)
-		    call strcpy (Memc[image], Memc[obj], SZ_FNAME)
-		} else
-		    call strcpy (Memc[image], Memc[sky], SZ_FNAME)
-
-		# Accumulate object or sky
-		call add_spec (Memr[data], Memr[spec], flag, OFLAG(hdr),
-		    NP2(hdr))
-		STD_BSFLAG(std) = flag
-
-		# Add to calibration table.
-	        if (flag == 0) {
-		    call gen_calib (gp, im, ids, Memc[obj], Memc[sky],
-			Memc[output], bands, Memr[spec])
-
-		    if (STD_IFLAG(bands)==NO2 || STD_IFLAG(bands)==NO3)
-			if (gp != NULL)
-			    call gclose (gp)
-		}
-
-	        # Check for unfulfilled sums
-	        ifile = ifile+1
-	        if (mod (ifile, nbeams*2) == 0) {
-		    do beam = 0, nbeams-1 {
-			std = Memi[stds+beam]
-		        if (STD_BSFLAG(std) != 0) {
-			    call eprintf (
-				"Warning: number of skys and objects ")
-			    call eprintf ("don't match for aperture: %2d\n")
-			        call pargi (STD_BEAM(std))
-		        }
-		    }
-		}
-	    }
-	    call imunmap (im)
-	}
-
-	if (gp != NULL)
-	    call gclose (gp)
-
-	# Final check for unfulfilled sums
-	do beam = 0, nbeams-1 {
-	    std = Memi[stds+beam]
-	    if (STD_BSFLAG(std) != 0) {
-		call eprintf ("Warning: number of skys and objects ")
-		call eprintf ("don't match for aperture: %2d\n")
-		    call pargi (STD_BEAM(std))
-	    }
-	}
-
-	call odr_close (odr)
-	call mfree (CAL_WAVES(bands), TY_REAL)
-	call mfree (CAL_DWAVES(bands), TY_REAL)
-	call mfree (CAL_MAGS(bands), TY_REAL)
-	call mfree (EXT_WAVES(bands), TY_REAL)
-	call mfree (EXT_EXTNS(bands), TY_REAL)
-	call mfree (STD_WAVES(bands), TY_REAL)
-	call mfree (STD_DWAVES(bands), TY_REAL)
-	call mfree (STD_MAGS(bands), TY_REAL)
-	call mfree (STD_FLUXES(bands), TY_REAL)
-	call mfree (stds, TY_INT)
-	call sfree (sp)
-end
-
-
-# GEN_CALIB -- Read spectrum and header values.
-#              Correct for extinction and generate a table of
-#              calibration values
-
-procedure gen_calib (gp, im, ids, image, sky, output, std, spec)
-
-pointer	gp				# GIO pointer
-pointer	im				# Image pointer
-pointer	ids				# Header pointer
-char	image[ARB]			# Image name
-char	sky[ARB]			# Sky name
-char	output[ARB]			# Output standard file name
-pointer	std				# Standard star data
-real	spec[ARB]			# Spectrum data
-
-int	i, j, npts, nwaves, wcs, key, newgraph
+int	i, j, n, nwaves, wcs, key, newgraph
 real	wave, dwave, flux, wx1, wx2, wy
-pointer	sp, cmd, gt, waves, dwaves, fluxes
+pointer	sp, cmd, gt, waves, dwaves, fluxes, x, y
 
+real	std_flux()
+double	shdr_wl()
 int	clgcur(), strdic(), clgwrd()
 pointer	gopen(), gt_init()
 errchk	gopen, std_output
@@ -524,15 +343,23 @@ begin
 	call smark (sp)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
 
-	# De-extinction correct if needed.
-	npts = NP2(ids)
-	if (EX_FLAG(ids) == 0) {
-	    do i = 1, npts {
-		wave = W0(ids) + (i-1) * WPC(ids)
-	        call intrp (EXT_LOOKUP, Memr[EXT_WAVES(std)],
-		    Memr[EXT_EXTNS(std)], EXT_NWAVES(std), wave, flux, j)
-	        spec[i] = spec[i] * 10.0 ** (-0.4 * flux * AIRMASS(ids))
+	# Sky subtract
+	if (sky != NULL) {
+	    call shdr_rebin (sky, obj)
+	    call asubr (Memr[SY(obj)], Memr[SY(sky)], Memr[SY(obj)], SN(obj))
+	}
 
+	# Remove extinction correction
+	if (EC(obj) == ECYES) {
+	    x = SX(obj)
+	    y = SY(obj)
+	    n = SN(obj)
+	    do i = 1, n {
+	        call intrp (EXT_LOOKUP, ewaves, emags, enwaves,
+		    Memr[x], flux, j)
+	        Memr[y] = Memr[y] * 10.0 ** (-0.4 * flux * AM(obj))
+		x = x + 1
+		y = y + 1
 	    }
 	}
 
@@ -543,28 +370,28 @@ begin
 	do i = 0, nwaves-1 {
 	    wave = Memr[waves+i]
 	    dwave = Memr[dwaves+i]
-	    call add_flux (wave, dwave, std, W0(ids), WPC(ids), AIRMASS(ids),
-		spec, npts, Memr[fluxes+i])
+	    Memr[fluxes+i] = std_flux (obj, wave, dwave, ewaves, emags, enwaves)
 	}
-
 
 	# Plot spectrum if user wants to see whats happening
 	if (STD_IFLAG(std) == NO1 || STD_IFLAG(std) == YES1) {
-	    call printf ("[%s][%d]: Edit bandpasses? ")
-		call pargstr (image)
-		call pargi (BEAM(ids))
+	    call printf ("%s[%d]: Edit bandpasses? ")
+		call pargstr (SPECTRUM(obj))
+		call pargi (AP(obj))
 	    STD_IFLAG(std) = clgwrd ("answer", Memc[cmd], SZ_FNAME, ANSWERS)
 	}
 
-	if (STD_IFLAG(std)==YES1||STD_IFLAG(std)==YES2||STD_IFLAG(std)==YES3) {
+	i = STD_IFLAG(std)
+	if (i==YES1||i==Y2||i==YES2||i==YES3) {
 	    if (gp == NULL) {
 	        call clgstr ("graphics", Memc[cmd], SZ_FNAME)
 	        gp = gopen (Memc[cmd], NEW_FILE, STDGRAPH)
 	    }
 	    gt = gt_init()
-	    call gt_sets (gt, GTTITLE, IM_TITLE(im))
-	    call gt_sets (gt, GTPARAMS, image)
-	    call gt_sets (gt, GTXLABEL, "wavelength")
+	    call gt_sets (gt, GTTITLE, TITLE(obj))
+	    call gt_sets (gt, GTPARAMS, SPECTRUM(obj))
+	    call gt_sets (gt, GTXLABEL, LABEL(obj))
+	    call gt_sets (gt, GTXUNITS, UNITS(obj))
 	    call gt_sets (gt, GTYLABEL, "instrumental flux")
 	    call gt_sets (gt, GTTYPE, "line")
 
@@ -580,8 +407,7 @@ begin
 			switch (strdic (Memc[cmd],Memc[cmd],SZ_LINE,"|show|")) {
 			case 1:
 			    call mktemp ("std", Memc[cmd], SZ_LINE)
-			    call std_output (Memc[cmd], image, sky, im, ids,
-				std)
+			    call std_output (obj, sky, std, Memc[cmd])
 		            call gpagefile (gp, Memc[cmd], "standard star data")
 			    call delete (Memc[cmd])
 			default:
@@ -600,10 +426,10 @@ begin
 		    # Create artificial standard wavelength and bandpass
 		    wave = (wx1 + wx2) / 2.0
 		    dwave = wx2 - wx1
-	    	    call add_flux (wave, dwave, std, W0(ids), WPC(ids),
-			AIRMASS(ids), spec, npts, flux)
-		    call add_band (std, wave, dwave, flux)
-		    flux = flux * WPC(ids) / dwave
+	    	    flux = std_flux (obj, wave, dwave, ewaves, emags, enwaves)
+		    call std_addband (std, wave, dwave, flux)
+		    flux = flux / abs (shdr_wl (obj, double(wx1)) -
+			shdr_wl (obj, double (wx2)))
 		    call gmark (gp, wave, flux, GM_BOX, -dwave, 3.)
 
 		    nwaves = STD_NWAVES(std)
@@ -621,12 +447,14 @@ begin
 		    }
 		    wave = Memr[waves+j]
 		    dwave = Memr[dwaves+j]
-		    flux = Memr[fluxes+j] * WPC(ids) / dwave
+		    flux = Memr[fluxes+j]
+		    flux = flux / abs (shdr_wl (obj, double(wave-dwave/2)) -
+			shdr_wl (obj, double (wave+dwave/2)))
 		    call gseti (gp, G_PMLTYPE, 0)
 		    call gmark (gp, wave, flux, GM_BOX, -dwave, 3.)
 		    call gseti (gp, G_PMLTYPE, 1)
 		    call gscur (gp, wave, flux)
-		    call del_band (std, j)
+		    call std_delband (std, j)
 		case 'q':
 		    break
 		case 'I':
@@ -640,49 +468,46 @@ beep_	            call printf ("\007")
 	        }
 
 		if (newgraph == YES) {
-		    call std_graph (gp, gt, YES, spec, npts, W0(ids),
-			WPC(ids), std)
+		    call std_graph (obj, std, gp, gt, YES)
 		    newgraph = NO
 		}
 	    } until (clgcur ("cursor",wx1,wy,wcs,key,Memc[cmd],SZ_LINE) == EOF)
 	    call gt_free (gt)
 	}
 
-	call std_output (output, image, sky, im, ids, std)
 	call sfree (sp)
 end
 
 
-procedure std_output (output, image, sky, im, ids, std)
+# STD_OUTPUT -- Output standard  star data
 
+procedure std_output (obj, sky, std, output)
+
+pointer	obj			# Object pointer
+pointer	sky			# Sky pointer
+pointer	std			# Standard pointer
 char	output[ARB]		# Output file name
-char	image[ARB]		# Spectrum image name
-char	sky[ARB]		# Sky image name
-pointer	im			# IMIO pointer
-pointer	ids			# Header parameters
-pointer	std			# Standard star data
 
 int	i, fd, open()
 real	wave, dwave, mag, flux, fnuzero, flambda, clgetr()
 errchk	open()
 
 begin
-	# Open output file and write standard star data.
 	fd = open (output, APPEND, TEXT_FILE)
 	call fprintf (fd, "[%s]")
-	    call pargstr (image)
-	if (sky[1] != EOS) {
+	    call pargstr (SPECTRUM(obj))
+	if (sky != NULL) {
 	    call fprintf (fd, "-[%s]")
-	        call pargstr (sky)
+	        call pargstr (SPECTRUM(sky))
 	}
 	call fprintf (fd, " %d %d %.2f %5.3f %9.3f %9.3f %s\n")
-	    call pargi (BEAM(ids))
-	    call pargi (NP2(ids))
-	    call pargr (ITM(ids))
-	    call pargr (AIRMASS(ids))
-	    call pargr (W0(ids))
-	    call pargr (W0(ids) + (NP2(ids)-1) * WPC(ids))
-	    call pargstr (IM_TITLE(im))
+	    call pargi (AP(obj))
+	    call pargi (SN(obj))
+	    call pargr (IT(obj))
+	    call pargr (AM(obj))
+	    call pargr (W0(obj))
+	    call pargr (W0(obj) + (SN(obj)-1) * WP(obj))
+	    call pargstr (TITLE(obj))
 
 	do i = 0, STD_NWAVES(std)-1 {
 	    wave = Memr[STD_WAVES(std)+i]
@@ -703,63 +528,73 @@ begin
 	call close (fd)
 end
 
-# ADD_FLUX -- Add up the flux in a given bandpass centered on a given
-# wavelength, correcting for extinction.
 
-procedure add_flux (wave, dwave, std, w0, wpc, airmass, spec, npts, flux)
+# STD_FLUX -- Add up the flux in a given bandpass centered on a given
+# wavelength.  The bandpass must be entirely within the data.
+# A correction for differential extinction across the bandpass is made
+# by applying the extinction correction and then removing the correction
+# at the bandpass center
 
-real	wave			# Wavelength at center of bandpass
+real procedure std_flux (sh, wave, dwave, ewaves, emags, enwaves)
+
+pointer	sh			# Spectrum
+real	wave			# Bandpass wavelength
 real	dwave			# Bandpass width
-pointer	std			# Calibration star data
-real	w0, wpc			# Wavelength coordinates
-real	airmass			# Observation airmass
-real	spec[npts]		# Spectrum data
-int	npts			# Number of points
-real	flux			# Returned bandpass flux
+real	ewaves[enwaves]		# Extinction wavelengths
+real	emags[enwaves]		# Extinction magnitudes
+int	enwaves			# Extinction points
 
-int	i1, i2, j, ierr
-real	wstart, w, x1, x2, extn
+real	flux			# Bandpass flux
+
+int	i, i1, i2, ierr
+real	a, e, ec, x1, x2
+double	shdr_wl()
+pointer	x, y
 
 begin
-	# Check that bandpass is entirely within data.
-	flux = 0.
-	x2 = w0 + (npts - 1) * wpc
-	if ((wave-dwave/2 < w0) || (wave+dwave/2 > x2))
-	    return
+	# Determine bandpass limits in pixel and return if out of bounds.
+	a = shdr_wl (sh, double(wave-dwave/2))
+	x2 = shdr_wl (sh, double(wave+dwave/2))
+	x1 = min (a, x2)
+	x2 = max (a, x2)
+	i1 = nint (x1)
+	i2 = nint (x2)
+	if (x1 == x2 || i1 < 1 || i2 > SN(sh))
+	    return (0.)
 
-	# Note that a pixel coordinate refers to the center of the pixel.
+	a = AM(sh)
+	x = SX(sh) + i1 - 1
+	y = SY(sh) + i1 - 1
 
-	wstart = w0 - wpc/2.0
-	x1 = ((wave - dwave/2.0) - wstart) / wpc
-	x2 = ((wave + dwave/2.0) - wstart) / wpc
-	i1  = aint(x1) + 1
-	i2  = aint(x2) + 1
+	call intrp (EXT_LOOKUP, ewaves, emags, enwaves, wave, ec, ierr)
+	call intrp (EXT_LOOKUP, ewaves, emags, enwaves, Memr[x], e, ierr)
 
-	# Correct for extinction when summing.
-	for (j = i1+1; j <= i2-1; j = j+1) {
-	    w = w0 + (j-1) * wpc
-	    call intrp (EXT_LOOKUP, Memr[EXT_WAVES(std)],
-		Memr[EXT_EXTNS(std)], EXT_NWAVES(std), w, extn, ierr)
-	    flux = flux + spec[j] * 10.0 ** (0.4 * extn * airmass)
+	if (i1 == i2) {
+	    flux = (x2-x1) * Memr[y] * 10.0 ** (0.4 * a * (e - ec))
+	    return (flux)
 	}
-	w = wstart + x1 * wpc
-	call intrp (EXT_LOOKUP, Memr[EXT_WAVES(std)], Memr[EXT_EXTNS(std)],
-	    EXT_NWAVES(std), w, extn, ierr)
-	flux = flux + (i1-x1) * spec[i1] * 10.0 ** (0.4 * extn * airmass)
 
-	w = wstart + x2 * wpc
-	call intrp (EXT_LOOKUP, Memr[EXT_WAVES(std)], Memr[EXT_EXTNS(std)],
-	    EXT_NWAVES(std), w, extn, ierr)
-	flux = flux + (1-(i2-x2)) * spec[i2] * 10.0 ** (0.4*extn*airmass)
+	flux = (i1+0.5-x1) * Memr[y] * 10.0 ** (0.4 * a * (e - ec))
+	x = x + 1
+	y = y + 1
 
-	# Uncorrect to center of bandpass.
-	call intrp (EXT_LOOKUP, Memr[EXT_WAVES(std)], Memr[EXT_EXTNS(std)],
-	    EXT_NWAVES(std), wave, extn, ierr)
-	flux = flux * 10.0 ** (-0.4 * extn * airmass)
+	for (i=i1+1; i<=i2-1; i=i+1) {
+	    call intrp (EXT_LOOKUP, ewaves, emags, enwaves, Memr[x], e, ierr)
+	    flux = flux + Memr[y] * 10.0 ** (0.4 * a * (e - ec))
+	    x = x + 1
+	    y = y + 1
+	}
+
+	call intrp (EXT_LOOKUP, ewaves, emags, enwaves, Memr[x], e, ierr)
+	flux = flux + (x2-i2+0.5) * Memr[y] * 10.0 ** (0.4 * a * (e - ec))
+
+	return (flux)
 end
 
 
-procedure add_band (std, wave, dwave, flux)
+# STD_ADDBAND -- Add a standard bandpass
+
+procedure std_addband (std, wave, dwave, flux)
 
 pointer	std		# Pointer to standard star data
 real	wave		# Wavelength to be added
@@ -805,7 +640,9 @@ begin
 end
 
 
-procedure del_band (std, band)
+# STD_DELBAND -- Delete a bandpass
+
+procedure std_delband (std, band)
 
 pointer	std		# Pointer to standard star data
 int	band		# Band to be deleted
@@ -839,38 +676,38 @@ end
 
 # STD_GRAPH -- Graph the spectrum and standard star calibration points.
 
-procedure std_graph (gp, gt, clear, spec, npts, w0, wpc, std)
+procedure std_graph (sh, std, gp, gt, clear)
 
+pointer	sh			# Spectrum pointer
+pointer	std			# Standard star data
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
 int	clear			# Clear flag
-real	spec[npts]		# Spectrum
-int	npts			# Number of points
-real	w0			# Starting wavelength
-real	wpc			# Wavelength interval per pixel
-pointer	std			# Standard star data
 
 int	i
-real	wn, wave, dwave, flux
+real	dw, wave, dwave, flux
+double	shdr_wl()
 
 begin
-	wn = w0 + (npts - 1) * wpc
 	if (clear == YES) {
 	    call gclear (gp)
-	    call gswind (gp, w0, wn, INDEF, INDEF)
-	    call gascale (gp, spec, npts, 2)
+	    call gascale (gp, Memr[SX(sh)], SN(sh), 1)
+	    call gascale (gp, Memr[SY(sh)], SN(sh), 2)
 	    call gt_swind (gp, gt)
 	    call gt_labax (gp, gt)
 	}
 
-	call gt_vplot (gp, gt, spec, npts, w0, wn)
+	call gt_plot (gp, gt, Memr[SX(sh)], Memr[SY(sh)], SN(sh))
 
 	do i = 0, STD_NWAVES(std)-1 {
 	    wave = Memr[STD_WAVES(std)+i]
 	    dwave = Memr[STD_DWAVES(std)+i]
-	    flux = Memr[STD_FLUXES(std)+i] * wpc / dwave
+	    flux = Memr[STD_FLUXES(std)+i]
 	    if (flux == 0.)
 		next
+	    dw = abs (shdr_wl (sh, double(wave-dwave/2)) -
+		shdr_wl (sh, double (wave+dwave/2)))
+	    flux = flux / dw
 	    call gmark (gp, wave, flux, GM_BOX, -dwave, 3.)
 	}
 end

@@ -1,8 +1,7 @@
 include "../lib/display.h"
 include "../lib/polyphot.h"
 
-# AP_YSHOW -- Procedure to print the polyphot parameters on the standard
-# output.
+# AP_YSHOW -- Print the all the polyphot parameters on the standard output.
 
 procedure ap_yshow (ap)
 
@@ -19,7 +18,7 @@ begin
 end
 
 
-# AP_YPSHOW -- Procedure to display the polyphot task parameters.
+# AP_YPSHOW -- Print the noise and polypars parameters on the standard output.
 
 procedure ap_ypshow (ap)
 
@@ -32,7 +31,7 @@ begin
 end
 
 
-# AP_YYSHOW -- Procedure to display the polyphot parameters.
+# AP_YYSHOW --  Print the polypars parameters on the standard output.
 
 procedure ap_yyshow (ap)
 

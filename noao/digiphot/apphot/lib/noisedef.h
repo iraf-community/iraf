@@ -11,9 +11,8 @@ define	AP_EPADU		Memr[$1+3]	# Photons per adu
 define	AP_READNOISE		Memr[$1+4]	# CCD readnoise in adu
 define	AP_CTHRESHOLD		Memr[$1+5]	# Threshold above data min
 define	AP_GAIN			Memc[P2C($1+6)]	# Gain keyword
-
-define	AP_NSTRING		Memc[P2C($1+6+SZ_FNAME+1)]
-define	AP_CCDREAD		Memc[P2C($1+6+2*SZ_FNAME+2)]
+define	AP_NSTRING		Memc[P2C($1+6+SZ_FNAME+1)] # Noise model
+define	AP_CCDREAD		Memc[P2C($1+6+2*SZ_FNAME+2)] # Readnoise
 
 # noise model defaults
 

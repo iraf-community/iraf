@@ -11,9 +11,10 @@ int	out		# the output file descriptor
 int	stid		# the output file sequence number
 
 pointer	sp, str
-real	fwhmpsf, psfapert, threshold
+real	fwhmpsf, psfapert, threshold, datamin, datamax
 int	apstati()
 real	apstatr(), ap_vfwhmpsf(), ap_vthreshold(), ap_vpsfapert()
+real	ap_vdatamin(), ap_vdatamax()
 
 begin
 	call smark (sp)
@@ -39,6 +40,10 @@ begin
 	else
 	    threshold = apstatr (ap, THRESHOLD)
 
+	# Confirm the good data minimum and maximum values.
+	datamin = ap_vdatamin (ap)
+	datamax = ap_vdatamax (ap)
+
 	call printf ("\n")
 
 	# Update the database file.
@@ -51,6 +56,10 @@ begin
 	        "width of fitting box")
 	    call ap_rparam (out, KY_THRESHOLD, threshold, UN_THRESHOLD,
 	        "threshold")
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	        "minimum good data value")
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	        "maximum good data value")
 	}
 
 	call sfree (sp)

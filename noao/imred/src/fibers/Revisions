@@ -1,0 +1,9 @@
+.help revisions Nov90 noao.imred.src.fibers
+.nf
+imred$src/fibers/*
+     Updated for new ONEDSPEC.  (7/24/91, Valdes)
+
+imred$src/fibers/*
+     All occurrences of latitude replaced by observatory as required by
+     recent changes to setairmass, etc.  (11/20/90, Valdes)
+.endhelp

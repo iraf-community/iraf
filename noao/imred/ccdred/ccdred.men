@@ -1,6 +1,7 @@
     badpiximage - Create a bad pixel mask image from a bad pixel file
       ccdgroups - Group CCD images into image lists
        ccdhedit - CCD image header editor
+  ccdinstrument - Review and edit instrument translation files
         ccdlist - List CCD processing information
         ccdproc - Process CCD images
         ccdtest - CCD test and demonstration package
@@ -16,12 +17,12 @@
   setinstrument - Set instrument parameters
     zerocombine - Combine and process zero level images
 
-          ADDITIONAL HELP TOPICS
+    	      ADDITIONAL HELP TOPICS
 
     ccdgeometry - Discussion of CCD coordinate/geometry keywords
-         ccdred - CCD image reduction package
        ccdtypes - Description of the CCD image types
      flatfields - Discussion of CCD flat field calibrations
           guide - Introductory guide to using the CCDRED package
     instruments - Instrument specific data files
+        package - CCD image reduction package
         subsets - Description of CCD subsets

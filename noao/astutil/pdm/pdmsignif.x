@@ -38,9 +38,9 @@ begin
 	# into it.
 
 	call salloc (pt, npt, TY_REAL)
-	call salloc (inuse, npt, TY_REAL)
-	call salloc (oinuse, npt, TY_REAL)
-	call amovr (PDM_INUSE(pdmp,1), Memr[inuse], npt)
+	call salloc (inuse, npt, TY_INT)
+	call salloc (oinuse, npt, TY_INT)
+	call amovi (PDM_INUSE(pdmp,1), Memi[inuse], npt)
 	lesscount = 0
 
 	# Calculate the ranges information from the sample string.
@@ -49,8 +49,8 @@ begin
 	seed = 1.0
 
 	do i = 1, NUMTRIES {
-	    call pdm_ranperm (PDM_DY(pdmp,1), Memr[inuse], Memr[pt],
-		Memr[oinuse], npt, seed)
+	    call pdm_ranperm (PDM_DY(pdmp,1), Memi[inuse], Memr[pt],
+		Memi[oinuse], npt, seed)
 	    theta = pdm_thetaran (pdmp, pt, oinuse, rg, period)
 	    if (theta < otheta)
 		lesscount = lesscount + 1

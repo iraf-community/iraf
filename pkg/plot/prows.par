@@ -1,6 +1,7 @@
 image,s,a,,,,image containing rows to be plotted
 row1,i,a,,1,,first row to average
 row2,i,a,,1,,last row to average
+wcs,s,h,"logical",,,world coordinate system
 wx1,r,h,0.,,,left user x-coord if not autoscaling
 wx2,r,h,0.,,,right user x-coord if not autoscaling
 wy1,r,h,0.,,,lower user y-coord if not autoscaling
@@ -10,9 +11,10 @@ marker,s,h,"box",,,point marker character
 szmarker,r,h,5E-3,,,marker size (0 for list input)
 logx,b,h,no,,,log scale x-axis
 logy,b,h,no,,,log scale y-axis
-xlabel,s,h,"",,,x-axis label
+xlabel,s,h,"wcslabel",,,x-axis label
 ylabel,s,h,"",,,y-axis label
 title,s,h,"imtitle",,,title for plot
+xformat,s,h,"wcsformat",,,x-axis coordinate format
 vx1,r,h,0.,,,left limit of device window (ndc coords)
 vx2,r,h,0.,,,right limit of device window (ndc coords)
 vy1,r,h,0.,,,bottom limit of device window (ndc coords)

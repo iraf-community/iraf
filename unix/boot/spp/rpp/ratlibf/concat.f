@@ -1,8 +1,8 @@
-      SUBROUTINE CONCAT (BUF1, BUF2, OUTSTR)
-      INTEGER BUF1(100), BUF2(100), OUTSTR(100)
-      INTEGER I
-      I = 1
-      CALL STCOPY (BUF1, 1, OUTSTR, I)
-      CALL SCOPY (BUF2, 1, OUTSTR, I)
-      RETURN
-      END
+      subroutine concat (buf1, buf2, outstr)
+      integer buf1(100), buf2(100), outstr(100)
+      integer i
+      i = 1
+      call stcopy (buf1, 1, outstr, i)
+      call scopy (buf2, 1, outstr, i)
+      return
+      end

@@ -27,6 +27,7 @@
 
 define (STDEFNS, string defns "")  # standard defns file
 #define (UPPERC,)	   # define if Fortran compiler wants upper case
+#define (IMPNONE,)	   # output IMPLICIT NONE in procedures
 define (NULL,0)
 define (INDENT,3)	   # number of spaces of indentation
 define (MAX_INDENT,30)	   # maximum column for indentation
@@ -92,15 +93,16 @@ define (SUBTYPE,-13)
 define (ARITHTYPE,-14)
 define (IFDEFTYPE,-15)
 define (IFNOTDEFTYPE,-16)
+define (PRAGMATYPE,-17)
 
 
 # Size-limiting definitions:
 
-define (MEMSIZE,20000)	   # space allotted to symbol tables and macro text
-define (BUFSIZE,400)	   # pushback buffer for ngetch and putbak
-define (PBPOINT,300)	   # point in buffer where pushback begins
-define (SBUFSIZE,500)	   # buffer for string statements
-define (MAXDEF,250)	  # max chars in a defn
+define (MEMSIZE,60000)	   # space allotted to symbol tables and macro text
+define (BUFSIZE,4096)	   # pushback buffer for ngetch and putbak
+define (PBPOINT,3192)	   # point in buffer where pushback begins
+define (SBUFSIZE,2048)	   # buffer for string statements
+define (MAXDEF,2048)	   # max chars in a defn
 define (MAXFORSTK,200)	   # max space for for reinit clauses
 define (MAXERRSTK,30)	   # max nesting of iferr statements
 define (MAXFNAMES, arith(NFILES,*,FILENAMESIZE))

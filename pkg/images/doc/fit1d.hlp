@@ -133,16 +133,16 @@ another line if the image is two dimensional.  When the fitting parameters
 are suitably set then respond with end-of-file or return to fit all the lines
 of the image and create the output image.
 
-2.  To subtract a linear function fit to lines 10 to 20 and 80 to 100 from
-lines 10 to 100 and to subtract another linear function fit to lines
-110 to 120 and 180 to 200 from lines 110 to 200:
+2.  To subtract a linear function fit to columns 10 to 20 and 80 to 100 from
+columns 10 to 100 and to subtract another linear function fit to lines
+110 to 120 and 180 to 200 from columns 110 to 200:
 
 .nf
     cl> fit1d image1[10:100,*] output diff axis=2 sample="1:11,71:91"
     cl> fit1d image1[110:200,*] output diff axis=2 sample="1:11,71:91"
 .fi
 
-Pixels outside lines 10 to 100 and 110 to 200 are not affected.  Note that the
+Pixels outside columns 10 to 100 and 110 to 200 are not affected.  Note that the
 sample points are specified relative to the image sections.  The script
 \fBbackground\fR is available in other packages for doing background
 subtractions.

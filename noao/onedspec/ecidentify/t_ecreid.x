@@ -1,4 +1,5 @@
 include	<error.h>
+include "../shdr.h"
 include	"ecidentify.h"
 
 # T_ECREIDENTIFY -- Reidentify echelle features starting from reference.
@@ -16,7 +17,7 @@ int	images			# List of images
 pointer	ref			# Reference image
 double	shift			# Initial shift
 
-int	i, j, fd, nfeatures1
+int	i, j, fd, nfeatures1, nfeatures2
 double	shift1, pix, fit, pix_shift, fit_shift, z_shift
 pointer	sp, log, ec
 
@@ -34,6 +35,11 @@ begin
 
 	# Allocate the basic data structure.
 	call ec_init (ec)
+
+	# Initialize fitting
+	call ecf_seti ("niterate", 0)
+	call ecf_setd ("low", 3.D0)
+	call ecf_setd ("high", 3.D0)
 
 	# Get task parameters.
 	images = imtopenp ("images")
@@ -58,9 +64,10 @@ begin
 		"  Reference image = %s, Refit = %b\n")
 		call pargstr (Memc[ref])
 		call pargb (EC_REFIT(ec) == YES)
-	    call fprintf (fd, "%20s  %7s  %9s  %10s  %7s  %7s\n")
+	    call fprintf (fd, "%20s  %7s %7s %9s  %10s  %7s  %7s\n")
 		call pargstr ("Image")
 		call pargstr ("Found")
+		call pargstr ("Fit")
 		call pargstr ("Pix Shift")
 		call pargstr ("User Shift")
 		call pargstr ("Z Shift")
@@ -70,14 +77,14 @@ begin
 
 	# Reidentify features in each spectrum.
 	while (ec_getim (images, Memc[EC_IMAGE(ec)], SZ_FNAME) != EOF) {
-	    call ec_dbread (ec, Memc[ref], NO)
 	    call ec_gdata (ec)
+	    call ec_dbread (ec, Memc[ref], NO)
 	    call ec_fitdata (ec)
 	    call ec_fitfeatures (ec)
 
 	    if (IS_INDEFD (shift)) {
 		EC_FWIDTH(ec) = FWIDTH(ec,1)
-		EC_FTYPE(ec) = FTYPE(ec,1)
+		EC_FTYPE(ec) = abs (FTYPE(ec,1))
 		EC_MINSEP(ec) = 1.
 		EC_MAXFEATURES(ec) = 20
 	        shift1 = ec_shift (ec)
@@ -97,7 +104,7 @@ begin
 	        pix = ec_center (ec, pix, FWIDTH(ec,i), FTYPE(ec,i))
 	        if (IS_INDEFD (pix))
 		    next
-	        fit = ec_fitpt (ec, AP(ec,i), pix)
+	        fit = ec_fitpt (ec, APN(ec,i), pix)
 
 	        pix_shift = pix_shift + pix - PIX(ec,i)
 		fit_shift = fit_shift + (fit - FIT(ec,i)) * ORDER(ec,i)
@@ -105,14 +112,14 @@ begin
 	            z_shift = z_shift + (fit - FIT(ec,i)) / FIT(ec,i)
 
 	        j = j + 1
-	        AP(ec,j) = AP(ec,i)
+	        APN(ec,j) = APN(ec,i)
 	        LINE(ec,j) = LINE(ec,i)
 	        ORDER(ec,j) = ORDER(ec,i)
 	        PIX(ec,j) = pix
 	        FIT(ec,j) = FIT(ec,i)
 	        USER(ec,j) = USER(ec,i)
 	        FWIDTH(ec,j) = FWIDTH(ec,i)
-	        FTYPE(ec,j) = FTYPE(ec,i)
+	        FTYPE(ec,j) = abs (FTYPE(ec,i))
 	    }
 	    EC_NFEATURES(ec) = j
 
@@ -122,7 +129,7 @@ begin
 	    # shift.
 
 	    if ((EC_REFIT(ec)==YES)&&(EC_NFEATURES(ec)>1)&&(EC_ECF(ec)!=NULL)) {
-	        iferr (call ec_dofit (ec, NO)) {
+	        iferr (call ec_dofit (ec, NO, YES)) {
 		    call erract (EA_WARN)
 		    next
 		}
@@ -130,6 +137,11 @@ begin
 	        call ec_doshift (ec, NO)
 	    if (EC_NEWECF(ec) == YES)
 	        call ec_fitfeatures (ec)
+
+	    nfeatures2 = 0
+	    do i = 1, EC_NFEATURES(ec)
+		if (FTYPE(ec,i) > 0)
+		    nfeatures2 = nfeatures2 + 1
 
 	    # Write a database entry for the reidentified image.
 	    if (EC_NFEATURES(ec) > 0)
@@ -143,16 +155,20 @@ begin
 		    next
 	        }
 	        call fprintf (fd,
-		    "%20s  %3d/%3d  %9.3g  %10.3g  %7.3g  %7.3g\n")
+		    "%20s  %3d/%-3d %3d/%-3d %9.3g  %10.3g  %7.3g  %7.3g\n")
 		    call pargstr (Memc[EC_IMAGE(ec)])
 		    call pargi (EC_NFEATURES(ec))
 		    call pargi (nfeatures1)
+		    call pargi (nfeatures2)
+		    call pargi (EC_NFEATURES(ec))
 		    call pargd (pix_shift / max (1, EC_NFEATURES(ec)))
 		    call pargd (fit_shift / max (1, EC_NFEATURES(ec)))
 		    call pargd (z_shift / max (1, EC_NFEATURES(ec)))
 		    call pargd (ec_rms(ec))
 	        call close (fd)
 	    }
+
+	    call mw_close (MW(EC_SH(ec)))
 	}
 
 	call dgsfree (EC_ECF(ec))

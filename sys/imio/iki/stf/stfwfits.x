@@ -74,13 +74,16 @@ begin
 
 	# Changed order of the following three cards to conform
 	# to SOGS expectations--dlb, 7/14/87
+	# Only write group keywords if STF_GROUPS is YES (BPS 12.06.91)
 
-	call fprintf (out, "GCOUNT  =%21d /%81t\n")
-	    call pargi (STF_GCOUNT(stf))
-	call fprintf (out, "PCOUNT  =%21d /%81t\n")
-	    call pargi (STF_PCOUNT(stf))
-	call fprintf (out, "PSIZE   =%21d /%81t\n")
-	    call pargi (STF_PSIZE(stf))
+	if (STF_GROUPS(stf) == YES) {
+	    call fprintf (out, "GCOUNT  =%21d /%81t\n")
+		call pargi (STF_GCOUNT(stf))
+	    call fprintf (out, "PCOUNT  =%21d /%81t\n")
+		call pargi (STF_PCOUNT(stf))
+	    call fprintf (out, "PSIZE   =%21d /%81t\n")
+		call pargi (STF_PSIZE(stf))
+	}
 
 	# Add cards defining the fields of the group parameter block.  Each
 	# field requires three cards.

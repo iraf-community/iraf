@@ -13,9 +13,10 @@ int	stid		# output file sequence number
 
 pointer	sp, cstr, sstr
 real	fwhmpsf, capert, cthreshold, annulus, dannulus, skysigma
+real	datamin, datamax
 int	apstati()
-real	apstatr(), ap_vfwhmpsf(), ap_vcapert(), ap_vcthreshold()
-real	ap_vsigma(), ap_vannulus(), ap_vdannulus()
+real	apstatr(), ap_vfwhmpsf(), ap_vcapert(), ap_vcthreshold(), ap_vsigma()
+real	ap_vannulus(), ap_vdannulus(), ap_vdatamin(), ap_vdatamax()
 
 begin
 	call smark (sp)
@@ -70,6 +71,10 @@ begin
 	else
 	    skysigma = apstatr (ap, SKYSIGMA)
 
+	# Confirm the datamin and datamax parameters.
+	datamin = ap_vdatamin (ap)
+	datamax = ap_vdatamax (ap)
+
 	call printf ("\n")
 
 	# Update the database file.
@@ -90,6 +95,10 @@ begin
 	        "centering threshold")
 	    call ap_rparam (out, KY_SKYSIGMA, skysigma, UN_SKYSIGMA,
 	        "standard deviation of 1 sky pixel")
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	        "minimum good data value")
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	        "maximum good data value")
 	}
 
 	call sfree (sp)

@@ -1,87 +1,87 @@
-      SUBROUTINE THENCO (TOK, LAB)
-      INTEGER LAB, TOK
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER SIFERR(20)
-      INTEGER SIFNO0(15)
-      DATA SIFERR(1)/105/,SIFERR(2)/102/,SIFERR(3)/32/,SIFERR(4)/40/,SIF
-     *ERR(5)/46/,SIFERR(6)/110/,SIFERR(7)/111/,SIFERR(8)/116/,SIFERR(9)/
-     *46/,SIFERR(10)/120/,SIFERR(11)/101/,SIFERR(12)/114/,SIFERR(13)/112
-     */,SIFERR(14)/111/,SIFERR(15)/112/,SIFERR(16)/40/,SIFERR(17)/41/,SI
-     *FERR(18)/41/,SIFERR(19)/32/,SIFERR(20)/-2/
-      DATA SIFNO0(1)/105/,SIFNO0(2)/102/,SIFNO0(3)/32/,SIFNO0(4)/40/,SIF
-     *NO0(5)/120/,SIFNO0(6)/101/,SIFNO0(7)/114/,SIFNO0(8)/112/,SIFNO0(9)
-     */111/,SIFNO0(10)/112/,SIFNO0(11)/40/,SIFNO0(12)/41/,SIFNO0(13)/41/
-     *,SIFNO0(14)/32/,SIFNO0(15)/-2/
-      XFER = 0
-      CALL OUTNUM (LAB+2)
-      CALL OUTTAB
-      IF (.NOT.(TOK .EQ. -98))GOTO 23000
-      CALL OUTSTR (SIFERR)
-      GOTO 23001
-23000 CONTINUE
-      CALL OUTSTR (SIFNO0)
-23001 CONTINUE
-      CALL OUTGO (LAB)
-      ESP = ESP - 1
-      CALL INDENT (1)
-      RETURN
-      END
-C     SIFNO0  SIFNOERR
-C     LOGIC0  LOGICAL_COLUMN
+      subroutine thenco (tok, lab)
+      integer lab, tok
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer siferr(20)
+      integer sifno0(15)
+      data siferr(1)/105/,siferr(2)/102/,siferr(3)/32/,siferr(4)/40/,sif
+     *err(5)/46/,siferr(6)/110/,siferr(7)/111/,siferr(8)/116/,siferr(9)/
+     *46/,siferr(10)/120/,siferr(11)/101/,siferr(12)/114/,siferr(13)/112
+     */,siferr(14)/111/,siferr(15)/112/,siferr(16)/40/,siferr(17)/41/,si
+     *ferr(18)/41/,siferr(19)/32/,siferr(20)/-2/
+      data sifno0(1)/105/,sifno0(2)/102/,sifno0(3)/32/,sifno0(4)/40/,sif
+     *no0(5)/120/,sifno0(6)/101/,sifno0(7)/114/,sifno0(8)/112/,sifno0(9)
+     */111/,sifno0(10)/112/,sifno0(11)/40/,sifno0(12)/41/,sifno0(13)/41/
+     *,sifno0(14)/32/,sifno0(15)/-2/
+      xfer = 0
+      call outnum (lab+2)
+      call outtab
+      if (.not.(tok .eq. -98))goto 23000
+      call outstr (siferr)
+      goto 23001
+23000 continue
+      call outstr (sifno0)
+23001 continue
+      call outgo (lab)
+      esp = esp - 1
+      call indent (1)
+      return
+      end
+c     sifno0  sifnoerr
+c     logic0  logical_column

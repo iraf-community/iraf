@@ -15,7 +15,7 @@ begin
 	rms = 0.
 	j = 0
 	for (i=1; i <= ID_NFEATURES(id); i = i + 1) {
-	    if (IS_INDEFD (USER(id,i)))
+	    if (IS_INDEFD (USER(id,i)) || WTS(id,i) == 0.)
 		next
 	    delta = USER(id,i) - id_fitpt (id, PIX(id,i))
 	    shft = shft + delta
@@ -27,9 +27,12 @@ begin
 	    shft = shft / j
 	    rms = rms / j
 	    if (interactive == YES) {
-	        call printf ("Coordinate shift=%5f, rms=%5f")
+	        call printf ("%s%s: Coordinate shift=%5f, rms=%5f, npts=%3d\n")
+		    call pargstr (Memc[ID_IMAGE(id)])
+		    call pargstr (Memc[ID_SECTION(id)])
 		    call pargd (shft)
 		    call pargd (sqrt (rms - shft ** 2))
+		    call pargi (j)
 	    }
 	    ID_SHIFT(id) = ID_SHIFT(id) + shft
 	    ID_NEWCV(id) = YES

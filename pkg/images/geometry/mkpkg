@@ -19,8 +19,10 @@ libpkg.a:
 
 	t_blkavg.x	<imhdr.h>
 	t_blkrep.x	<imhdr.h>
-	t_geomap.x	geomap.h <fset.h> <error.h> <mach.h> <math/gsurfit.h>
-	t_geotran.x	geotran.h <imhdr.h> <imset.h> <math.h> <math/gsurfit.h>
+	t_geomap.x	geomap.h <fset.h> <error.h> <mach.h> <math/gsurfit.h>\
+			<pkg/dttext.h>
+	t_geotran.x	geotran.h <imhdr.h> <imset.h> <math.h> \
+			<math/gsurfit.h> <mwset.h>
 	t_imshift.x	<error.h> <imhdr.h> <imset.h> <math/iminterp.h>
 	t_imtrans.x	<imhdr.h> <error.h>
 	t_magnify.x	<imhdr.h> <imset.h> <math/iminterp.h>

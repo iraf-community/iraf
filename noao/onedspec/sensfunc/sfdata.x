@@ -2,11 +2,10 @@ include	"sensfunc.h"
 
 # SF_DATA -- Compute the X and Y values for the particular graph.
 
-procedure sf_data (stds, nstds, cv, graph)
+procedure sf_data (stds, nstds, graph)
 
 pointer	stds[nstds]		# Standard star structures
 int	nstds			# Number of standard stars
-pointer	cv			# Sensitivity function curve
 char	graph			# Graph type
 
 real	a

@@ -1,4 +1,4 @@
-      SUBROUTINE OUTDWE
-      CALL OUTDON
-      CALL ERRGO
-      END
+      subroutine outdwe
+      call outdon
+      call errgo
+      end

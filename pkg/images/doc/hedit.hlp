@@ -1,4 +1,4 @@
-.help hedit May85 images
+.help hedit Feb91 images
 .ih
 NAME
 hedit - edit or view an image header or headers
@@ -102,9 +102,10 @@ desired.
 
 	cl> hedit n1.* exp .
 
-Note that field names may be abbreviated in the field template, and that case
-is ignored in field names, contrary to normal IRAF conventions (this will
-change).
+Abbreviations are not permitted for field names, i.e., the given template
+must match the full field name.  Currently, field name matches are case
+insensitive since image headers are often converted to and from FITS headers,
+which are case insensitive.
 
 
 2. Advanced Usage
@@ -158,18 +159,18 @@ usage of these fields will not change in the future.
 The standard header field names have an "i_" prefix to reduce the possibility
 of a name collision with a user field name, and to distinguish the two classes
 of parameters in templates.  The prefix may be omitted provided the simple
-name is unique.  Minimum match abbreviations are permitted.
+name is unique.
 
 
 2.2 Field name template
 
-    The form of the field name list or template parameter \fIfields\fR is 
+    The form of the field name list or template parameter \fIfields\fR is
 equivalent to that of a filename template except that "@listfile" is not
 supported, and of course the template is expanded upon the field name list
-of an image, rather than upon a directory.  Field names may be abbreviated
-and case is not significant.  Case is ignored in this context due to the
-present internal storage format for the user parameters (FITS), which also
-limits the length of a user field name to 8 characters.
+of an image, rather than upon a directory.  Abbreviations are not permitted
+in field names and case is not significant.  Case is ignored in this context
+due to the present internal storage format for the user parameters (FITS),
+which also limits the length of a user field name to 8 characters.
 
 
 2.3 Value expression
@@ -336,17 +337,17 @@ EXAMPLES
 1. Globally edit the database "n1", setting the value of the string parameter
 "obs" to "sky" if "s-flag" is 1, to "obj" otherwise.
 
-	cl> hedit n1.* obs '(@"s-flag" == 1 ? "sky" : "obj")'
+    cl> hedit n1.* obs '(@"s-flag" == 1 ? "sky" : "obj")'
 
 2. Globally edit the same database, replacing the value of the parameter
 "variance" by the square root of the original value.
 
-	cl> hedit n1.* var '(sqrt(var))'
+    cl> hedit n1.* var '(sqrt(var))'
 
 3. Replace the values of the fields A and B by the absolute value of the
 original value:
 
-	cl> hedit n1.* a,b '(abs($))'
+    cl> hedit n1.* a,b '(abs($))'
 
 .ih
 BUGS
@@ -361,5 +362,5 @@ A task is needed which would take the audit trail produced by the \fIshow\fR
 option and use it to undo an edit.
 .ih
 SEE ALSO
-hselect
+hselect, imgets, imheader
 .endhelp

@@ -51,8 +51,8 @@ begin
 	# Open the file and read the bad pixel regions.  Use dynamic memory.
 	iferr (fd = open (Memc[image], READ_ONLY, TEXT_FILE)) {
 	    call eprintf (
-	        "Warning: Bad pixel file not found.  No correction applied.\n")
-	        call pargi (Memc[image])
+	    "Warning: Bad pixel file %s not found.  No correction applied.\n")
+	        call pargstr (Memc[image])
 	    call sfree (sp)
 	    return
 	}

@@ -8,11 +8,13 @@ include	"iki.h"
 # kernel procedures.
 
 procedure iki_lddriver (ex_open, ex_close, ex_opix, ex_updhdr, ex_access,
-	ex_copy, ex_delete, ex_rename)
+	ex_copy, ex_delete, ex_rename, flags)
 
 int	locpr()
 extern	ex_open(), ex_close(), ex_opix(), ex_updhdr()
 extern	ex_access(), ex_copy(), ex_delete(), ex_rename()
+int	flags
+
 include	"iki.com"
 errchk	syserr
 
@@ -30,4 +32,5 @@ begin
 	IKI_COPY(k_nkernels)	= locpr (ex_copy)
 	IKI_DELETE(k_nkernels)	= locpr (ex_delete)
 	IKI_RENAME(k_nkernels)	= locpr (ex_rename)
+	IKI_FLAGS(k_nkernels)	= flags
 end

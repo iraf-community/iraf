@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <signal.h>
 
+#ifdef mips
+#include <mips/fpu.h>
+#endif
+
 #define import_spp
 #define	import_kernel
 #define	import_knames
@@ -72,7 +76,7 @@ struct osexc unix_exception[] = {
 	X_INT,		"interrupt",
 	NULL,		"quit",
 	X_ACV,		"illegal instruction",
-	NULL,		"trace trap",
+	X_ARITH,	"trace trap",
 	X_ACV,		"IOT",
 	X_ACV,		"EMT",
 	X_ARITH,	"FPE",
@@ -185,6 +189,18 @@ struct	_hwx hwx_exception[] = {
 	FPE_FPA_ENABLE,		"[FPA not enabled]",
 	FPE_FPA_ERROR,		"[FPA arithmetic exception]",
 #endif i386
+#ifdef mips
+	FPE_INTOVF_TRAP,	"integer overflow",
+	FPE_INTDIV_TRAP,	"integer divide by zero",
+	FPE_FLTOVF_TRAP,	"floating overflow",
+	FPE_FLTDIV_TRAP,	"floating/decimal divide by zero",
+	FPE_FLTUND_TRAP,	"floating underflow",
+	FPE_DECOVF_TRAP,	"decimal overflow",
+	FPE_SUBRNG_TRAP,	"subscript out of range",
+	FPE_FLTOVF_FAULT,	"floating overflow fault",
+	FPE_FLTDIV_FAULT,	"divide by zero floating fault",
+	FPE_FLTUND_FAULT,	"floating underflow fault",
+#endif
 #ifdef SUNOS4
 	BUS_HWERR,		"misc hardware error (e.g. timeout)",
 	BUS_ALIGN,		"hardware alignment error",
@@ -222,6 +238,7 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 	    vex = *sig_code - X_FIRST_EXCEPTION;
 	    break;
 	default:
+	    vex = NULL;
 	    kernel_panic ("zxwhen: bad exception code");
 	}
 	    
@@ -295,6 +312,10 @@ char	*addr;				/* added for SunOS 4.0 */
 
 	last_os_exception = unix_signal;
 	last_os_hwcode = hwcode;
+#ifdef mips
+	if (unix_signal == SIGFPE)
+	    last_os_hwcode = scp->sc_fpc_csr;
+#endif
 	x_vex = unix_exception[unix_signal].x_vex;
 	vex = x_vex - X_FIRST_EXCEPTION;	
 	epa = handler_epa[vex];
@@ -334,8 +355,38 @@ XINT	*maxch;
 
 	*os_exception = last_os_exception;
 
-	if (last_os_exception != XOK) {
+	if (last_os_exception == XOK)
+	    os_errmsg = "";
+	else {
 	    os_errmsg = unix_exception[last_os_exception].x_name;
+#ifdef mips
+	    if (last_os_exception == SIGFPE) {
+		union fpc_csr csr;
+		csr.fc_word = (unsigned long) last_os_hwcode;
+		if (csr.fc_struct.ex_divide0)
+		    os_errmsg = "floating divide by zero";
+		else if (csr.fc_struct.ex_overflow)
+		    os_errmsg = "floating overflow";
+		else if (csr.fc_struct.ex_underflow)
+		    os_errmsg = "floating underflow";
+		else if (csr.fc_struct.ex_invalid)
+		    os_errmsg = "invalid floating operand";
+		else if (csr.fc_struct.ex_inexact)
+		    os_errmsg = "inexact result";
+	    } else if (last_os_exception == SIGTRAP) {
+		switch (last_os_hwcode) {
+		case BRK_OVERFLOW:
+		    os_errmsg = "integer overflow";
+		    break;
+		case BRK_DIVZERO:
+		    os_errmsg = "integer divide by zero";
+		    break;
+		case BRK_RANGE:
+		    os_errmsg = "range error";
+		    break;
+		}
+	    }
+#else
 	    if (last_os_exception == SIGFPE) {
 		for (v=0;  hwx_exception[v].v_code != EOMAP;  v++)
 		    if (hwx_exception[v].v_code == last_os_hwcode) {
@@ -343,6 +394,7 @@ XINT	*maxch;
 			break;
 		    }
 	    }
+#endif
 	}
 
 	strncpy ((char *)errmsg, os_errmsg, (int)*maxch);

@@ -1,18 +1,18 @@
-      INTEGER FUNCTION ALLDIG (STR)
-      INTEGER STR (100)
-      INTEGER I
-      ALLDIG = 0
-      IF (.NOT.(STR (1) .EQ. -2))GOTO 23000
-      RETURN
-23000 CONTINUE
-      I = 1
-23002 IF (.NOT.(STR (I) .NE. -2))GOTO 23004
-      IF (.NOT.(.NOT.(48.LE.STR (I).AND.STR (I).LE.57)))GOTO 23005
-      RETURN
-23005 CONTINUE
-23003 I = I + 1
-      GOTO 23002
-23004 CONTINUE
-      ALLDIG = 1
-      RETURN
-      END
+      integer function alldig (str)
+      integer str (100)
+      integer i
+      alldig = 0
+      if (.not.(str (1) .eq. -2))goto 23000
+      return
+23000 continue
+      i = 1
+23002 if (.not.(str (i) .ne. -2))goto 23004
+      if (.not.(.not.(48.le.str (i).and.str (i).le.57)))goto 23005
+      return
+23005 continue
+23003 i = i + 1
+      goto 23002
+23004 continue
+      alldig = 1
+      return
+      end

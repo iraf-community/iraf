@@ -116,8 +116,6 @@ begin
 	DARKSCALE(ccd) = darktime1 / darktime2
 	CORS(ccd, DARKCOR) = D
 	COR(ccd) = YES
-	if (IM_PIXTYPE(im) == TY_REAL)
-	    CALCTYPE(ccd) = TY_REAL
 
 	# Record the operation in the output image and write a log record.
 	call sprintf (Memc[str], SZ_LINE,

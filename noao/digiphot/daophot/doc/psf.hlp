@@ -1,0 +1,607 @@
+.help psf Aug91 noao.digiphot.daophot
+.ih
+NAME
+psf -- build the point spread function
+.ih
+USAGE
+psf image photfile psfimage groupfile
+.ih
+PARAMETERS
+.ls image
+The image for which to build the PSF.
+.le
+.ls photfile
+The name of the input file or directory containing the input photometry.
+If \fIphotfile\fR is "default", "dir$default" or a directory specification
+then PSF looks for a file called image.mag.? where ? is
+the highest existing version number. \fIPhotfile\fR is usually the output
+of the DAOPHOT PHOT task but may also be the group output file of PSF itself,
+or the output of GROUP, NSTAR, PEAK or ALLSTAR.
+\fIPhotfile\fR may be an APPHOT/DAOPHOT text database or an STSDAS table.
+.le
+.ls psfimage
+The output image name or directory for the final PSF.
+If psfimage is "default", "dir$default" or a directory specification
+then PSF creates an image called image.psf.? where ? is the
+next available version number.
+.le
+.ls groupfile
+The output group file name or directory for storing the PSF stars and their
+neighbors.
+If groupfile is "default", "dir$default" or a directory specification
+then PSF creates a file called image.psg.? where ? is the
+next available version number. If the DAOPHOT package parameter
+\fItext\fR text is "yes" then a text database is written, otherwise
+an STSDAS table database is written.
+.le
+.ls datapars = ""
+The name of the text file containing the data dependent parameters.
+If \fIdatapars\fR is null ("") then the default parameter set in
+the user's uparm directory is used.
+.le
+.ls daopars = ""
+The name of the text file containing the DAOPHOT fitting parameters.
+If \fIdaopars\fR is null ("") then the default parameter set in
+the user uparm directory is used.
+.le
+.ls showplots = yes
+Show plots of selected stars and residuals? After each star is selected
+interactively by the user, a mesh or contour plot of a data subraster
+around the candidate star is displayed. At this point the user can accept
+or reject the star. If the user accepts the star a mesh or contour
+plot of the fit residuals is displayed and the user can again accept
+or reject the star.  In interactive mode when commands
+are being read from the image cursor parameter \fIcommands\fR the user can
+set showplots to "yes"
+or "no".  In batch mode when \fIcommands\fR is aliased to a file
+showplots is always "no".
+.le
+.ls plottype = "mesh"
+The default type of plot displayed when selecting PSF stars. The choices
+are "mesh" or "contour".
+.le
+.ls plotfile = ""
+The name of the output file containing either mesh or contour plots of the
+selected PSF stars. If plotfile is null ("") no plot file is created,
+otherwise a mesh or contour plot is written to this file for each PSF
+star selected. Plotfile is opened in append mode and can become very
+large.
+.le
+.ls graphics = "stdgraph"
+The default graphics device.
+.le
+.ls display = "stdimage"
+The default display device.
+.le
+.ls commands = ""
+The image display cursor
+.le
+.ls cursor = ""
+The graphics cursor
+.le
+.ls verify = yes
+Verify the critical PSF task parameters?
+.le
+.ls update = no
+Update the critical PSF task parameters if \fIverify\fR is "yes"? 
+.le
+.ih
+DESCRIPTION
+The PSF task builds the point spread function for the IRAF image
+\fIimage\fR using
+stars selected from the input photometry file \fIphotfile\fR
+and writes the PSF out to the IRAF image \fIpsfimage\fR and group
+information about the selected PSF stars to \fIgroupfile\fR.
+If the DAOPHOT package parameter
+\fItext\fR text is "yes" then \fIgroupfile\fR is a text database, otherwise
+it is an STSDAS table database.
+
+Suitable PSF stars are normally selected interactively using the
+image display and image cursor and matched with the stars in \fIphotfile\fR
+using the cursor position and a tolerance specified by the \fImatchrad\fR
+parameter in the DAOPARS task.
+A star must be in the photometry file before it can
+be used as a PSF star. If a match is found, PSF checks that the candidate
+star is not too close to the edge of the image and that it contains no
+bad pixels as defined by \fIdatamin\fR and \fIdatamax\fR in the datapars
+task.
+After selection and if \fIshowplots\fR = "yes",
+a mesh or contour plot of the data subraster
+around the candidate star is displayed in the graphics window, PSF
+enters graphics cursor command mode and the
+user has the option to accept or reject the star.
+If the user accepts the star a mesh or contour
+plot of the residuals of the star from the fit is displayed and the
+user is again asked to accept or reject the star.
+Commands in the the graphics cursor menu permit the user to
+manipulate the floor and ceiling levels of the contour plot
+and viewing angles for the mesh plot interactively.
+
+Candidate PSF stars may also be selected from the photometry file by
+id number.  Users without access to an image display 
+can redirect the image cursor to the standard input and select
+PSF stars by id number. If showplots = "yes" the mesh or contour plots
+will be displayed in the graphics window in the usual way.
+
+Finally if the user does not wish to see any plots of the PSF stars
+and their fits, the image cursor may be redirected to a text
+file containing cursor commands listing the PSF stars
+in which case the PSF fitting is done in batch.
+Plots of the resulting contour or mesh plots can be saved in a metacode
+plot file if a name is supplied for the \fIplotfile\fR parameter.
+
+The output PSF image \fIpsfimage\fR  is normally a 2D image containing the
+parameters "XPSF", "YPSF", "PSFMAG" and "PSFRAD"  which describe the
+position, magnitude and size of the PSF and parameters of the
+the Gaussian component of the PSF fit
+"HEIGHT", "XOFFSET", "YOFFSET", "SIGMAX" and "SIGMAY"
+in the image header, and a lookup table of residuals from the
+Gaussian fit in the image pixels. If \fIpsfimage\fR was written
+with the \fIvarpsf\fR parameter in DAOPARS set to "yes", then
+two additional lookup tables containing the first derivatives in x and
+y are also written. In ths case \fIpsfimage\fR is 3D. The ids, positions and 
+magnitudes of each of the stars contributing to the PSF are stored in the
+image header.
+
+\fIGroupfile\fR contains a list of all the PSF stars,
+their nearest neighbours,  and the friends of the neighbours.
+A neighbor is defined to be any star within a distance
+of \fIpsfrad\fR / \fIscale\fR + 2.0 * \fIfitrad\fR / \fIscale\fR +
+1 pixels of the PSF star.
+Friends of the neighbours are defined to be any stars within
+2.0 * \fIfitrad\fR / \fIscale\fR of a neighbour star.
+\fIFitrad\fR and \fIpsfrad\fR
+are respectively the fitting radius and psf radius parameters in
+the DAOPARS task. \fIScale\fR is the scale factor defined in the
+DATAPARS task.
+
+.ih 
+CURSOR COMMANDS
+
+The following cursor commands are available once the image cursor has
+been activated.
+
+.nf
+
+	PSF Task Interactive Image Display Commands
+
+?	Print HELP page
+a	Add star nearest the current cursor position to PSF
+p	Print the photometry results for star nearest the cursor
+w	Write out the PSF to the PSF image
+z	Rebuild the PSF from scratch
+q	Exit program 
+
+:p [n]	Print the photometry results for star n
+:a [n]	Add star n to PSF
+
+
+The following cursor commands are available once a star has been selected 
+and the graphics cursor has been activated.
+
+	PSF Task Interactive Graphics Commands
+
+?    	Print HELP page
+p	Print the photometry for this candidate PSF star
+o	Accept star and proceed
+x	Reject star and select another with image cursor
+s	Print plot type and parameters
+
+u	Increase vertical angle by 15 degrees (mesh plot only)
+d	Decrease vertical angle by 15 degrees (mesh plot only)
+l	Decrease horizontal angle by 15 degrees (mesh plot only)
+r	Increase horizontal angle by 15 degrees (mesh plot only)
+m	Set horizontal and vertical angles to default (mesh plot only)
+
+c	Set floor and ceiling values to default (contour plot only)
+
+:m [val] [val]	Set mesh plot and vertical and horizontal angles
+:v [val]        Set the mesh plot vertical viewing angle
+:h [val]        Set the mesh plot vertical viewing angle
+
+:c [val] [val]  Set contour plot and floor and ceiling levels
+:l [value]	Set the contour plot floor value
+:u [value]	Set the contour plot ceiling value
+.fi
+
+.ih
+ALGORITHMS
+The PSF is determined from the actual brightness values of x and y observed
+for one or more stars in the frame and stored as a two-component model.
+The first component is an analytic Gaussian which approximately
+matches the core of the PSF of the first PSF star. It is stored
+in the header parameters "PSFMAG", "PSFRAD",
+"XPSF", "YPSF", "HEIGHT", "XOFFSET", "YOFFSET", "SIGMAX" and "SIGMAY"
+of the PSF image. The residuals from this fit are stored as a lookup
+table with twice the sampling interval of the original image.
+This lookup table is used as additive corrections from the integrated
+analytic Gaussian function to actual observed empirical PSF.
+All additional stars are fit to the initial Gaussian and their residuals
+added to the lookup table. Since DAOPHOT assigns weights proportional to
+their brightnesses to all the PSF stars, the signal-to-noise ratio in
+the PSF does not deteriorate as fainter stars are added in. The more
+crowded the field the more PSF stars are required to lower the noise
+generated by neighbour subtraction.
+
+If the \fIvarpsf\fR parameter in the DAOPARS task is set to "yes", two
+additional lookup
+tables containing the first derivatives of the PSF in x and y are also written.
+This model
+permits the PSF fitting process to take account of smooth linear
+changes in the PSF accross the frame caused for example by a tilt in
+the detector with respect to the optical axis.
+This model cannot account for more complicated optical aberrations.
+Users of this option should ensure that the PSF varies in a systematic
+way accross the frame and that the chosen PSF stars span the entire
+region of interest in the frame. To avoid mistaking
+neighbour stars for variations in the PSF it is recommended that the
+first few iterations of PSF be run with a constant PSF. Only after
+neighbour stars have been subtracted reasonably cleanly should
+the variable PSF option be enabled.
+
+The brightness of any hypothetical pixel at any arbitrary point within
+the PSF is computed as follows. The bivariate Gaussian fit above
+is integrated over the area of the pixel, a correction is determined
+by double cubic interpolation within the lookup table and added to the
+integral. Since the values in the table of residuals differ by smaller
+amounts between adjacent grid points than the original brightness data
+would have, the errors in the interpolation are much less than they would
+have been if one  had tried to interpolate directly within the original
+data.
+
+.ih
+GUIDE TO COMPUTING A PSF IN A CROWDED FIELD
+
+The following is a rough guide to the methodology of computing the
+PSF in a crowded field. The procedure outlined below assumes
+that the user can either make use of the IRAF display facilities or
+has access to a local display program. At a minimum the display program
+should be able to display an image, read back the coordinates of objects in the
+image, and mark objects in the image.
+The crowded field PSF fitting procedure makes use of many of the
+DAOPHOT tasks. Details on the setup and operation of each task can be found
+in the appropriate manual pages.
+
+.ls [1]
+RUN THE DAOFIND and PHOT TASKS ON THE IMAGE OF INTEREST. Use SORT
+to sort the output of PHOT
+in order of increasing apparent magnitude. Use RENUMBER to renumber
+the sorted output. Note the id number of the first unsaturated star.
+.le
+.ls [2]
+EXAMINE THE IMAGE. Load the image on the display with the IRAF display task.
+Using the display itself or the IRAF IMEXAMINE task, estimate the radius
+at which
+the stellar light distribution disappears into the noise for the
+brightest candidate PSF star. Call this parameter \fIpsfrad\fR and record it.
+Mark the objects detected by DAOFIND with dots on the image display using the
+IRAF TVMARK
+task. Users at sites with display devices not currently supported by
+IRAF should substitute their local versions of DISPLAY and TVMARK.
+.le
+.ls [3]
+SELECT CANDIDATE PSF STARS.
+Good PSF stars should have no neighbours
+within the fitting radius stored in the DAOPARS task parameter \fIfitrad\fR.
+In addition all stars within 1.5 times the psf radius,
+(stored in the DAOPARS task parameter
+\fIpsfrad\fR), should be significantly fainter than the candidate star.
+There should be no bad columns, bad rows or blemishes
+near the candidate star. A sufficent number of stars should be
+selected in order to reduce the increased noise resulting from the
+neighbour subtraction process. Users of the variable PSF option should
+take care that the list of PSF stars span the area of interest on the
+image. Twenty-five to thirty stars is not unreasonable in this case.
+
+If IRAF supports the local display device run PSF in interactive mode
+selecting candidate stars by eye with the image cursor and display.
+If IRAF does not support the local display device but local display 
+facilities are available, generate a coordinate list of candidate PSF
+stars using
+the local program, match this list with the corresponding stars in the
+photometry list, run PSF in interactive mode with the image
+cursor aliased to the standard input, and select stars by id number.
+Finally if no display facilities at all are available run PSF in
+interactive mode with the image cursor aliased to the standard input,
+stepping systematically through the photometry list selecting
+candidate psf stars by id number beginning with the first unsaturated star.
+In all three cases use the showplots option in the PSF task
+to check for close neighbours,
+blemishes, and resolved objects near the candidate PSF stars.
+Reject any unsuitable stars.
+.le
+.ls [4]
+EXAMINE THE PSF STARS FOR NEIGHBOURS MISSED BY DAOFIND AND ADD THESE TO
+THE PHOT FILE.
+Examine the vicinity of the PSF stars on the display checking for neighbour
+stars which do not have dots on them indicating that they were
+missed by DAOFIND.
+If IRAF supports the local display device simply run PHOT interactively
+selecting the missing stars with the image cursor.
+Be sure to use the same set of PHOT parameters used in step [1] with
+the exception of the CENTERPARS
+task parameter \fIcalgorithm\fR which should be temporarily set to "centroid".
+If IRAF does not support the
+local display generate a list of the approximate coordinates of the
+missing stars.
+Run PHOT in batch mode with this coordinate list as input and with the
+parameters set as described above.
+Create a new PHOT file by using APPEND to add the new PHOT output to the
+PHOT output from [1] and renumber using RENUMBER. Do not resort.
+.le
+.ls [5]
+ESTIMATE OF THE PSF.
+Run PSF non-interactively using the combined PHOT output from [4] and
+the list of candidate stars from [3].
+Write out the PSF image (extension .psf.#) and the psf group file
+(extension .psg.#). The PSF image is the current estimate of the PSF.
+.le
+.ls [6]
+FIT ALL THE STARS IN EACH PSF STAR GROUP IN THE ORIGINAL IMAGE.
+Run NSTAR on the image using the output group file (extension .psg.#)
+of [5] as the input photometry list. To help prevent the bumps in the initial
+PSF from interfering with the profile fits in NSTAR, it may
+be necessary to temporariy set the psf radius,
+\fIpsfrad\fR in the DAOPARS task,
+to about one pixel greater than the separation of the nearest neighbour
+to a PSF star.
+The fitting radius, \fIfitrad\fR in the
+DAOPARS task, should be sufficiently large to include enough
+pixels for a good fit but not so large as to include any neighbours
+inside the fitting radius.
+.le
+.ls [7]
+SUBTRACT ALL THE FITTED STARS FROM THE ORIGINAL IMAGE.
+Run SUBSTAR to subtract the NSTAR results from the original image.
+Use the IRAF DISPLAY task or the local display program to display
+the subtracted image. If you deacreased the value of \fIpsfrad\fR
+in [6] use this smaller value when you subtract as well.
+.le
+.ls [8]
+CHECK FOR PREVIOUSLY INVISIBLE FAINT COMPANIONS.
+Check to see whether the PSF stars and neighbours subtracted
+cleanly or whether there are faint companions that were not previously
+visible before.
+.le
+.ls [9]
+APPEND THESE COMPANIONS TO THE PHOT FILE.
+Run PHOT on the faint companions in the subtracted image
+and append the results to the PHOT file created in [4] using APPEND.
+Renumber the stars using RENUMBER.
+.le
+.ls [10]
+SUBTRACT ALL THE PSF NEIGHBOR STARS FROM THE ORIGINAL IMAGE.
+Edit the nstar output file (extension .nst.#) removing all the PSF stars
+from the file. The PSF stars is the first one in each group. In the
+near future this will be done with the EXAMINE task but at the
+moment the text editor can be used for text databases and the TTOOLS
+package task TEDIT can be used for tables. SELECT can also be used
+to remove stars with specific id numbers. Run SUBSTAR using the edited
+nstar output file as input.
+.le
+.ls [11]
+RECOMPUTE THE PSF.
+Run PSF on the subtracted image from [10] using the PHOT file from [9]
+as the input stellar photometry file.
+Temporarily set the minimum good data value, the \fIdatamin\fR parameter
+in the DATAPARS task to a large negative number, to avoid the
+enhanced noise where the
+stars were subtracted from triggering the bad pixel detector in PSF.
+A new psf (extension .psf.#) and new psf group file (extension .psg.#)
+will be created. Be sure to increase the \fIpsfrad\fR value to the
+original large value found in [2].
+.le
+.ls [12]
+RERUN NSTAR.
+Rerun NSTAR on the original image with the newly created group file
+(extension .psg.#) as the input stellar photometry file and the newly
+computed PSF image (extension .psf.#).
+It should not be necessary to reduce the psf radius as in [6]
+but the fitting radius should be left at a generous number.
+.le
+.ls [13]
+REPEAT STEPS [7-12] UNTIL THE PSF FIT IS ACCEPTABLE.
+If any neighbours are still visible iterate on this process by repeating
+steps [7] to [12] until the neighbours completely disappear. The main
+point to remember is that each time through the loop the PSF is obtained
+from an image in which the neighbours but not the PSF stars have been 
+subtracted out while NSTAR and SUBSTAR should be run on the original
+picture with all the stars still in it.
+.le
+
+.ih
+EXAMPLES
+
+1. Compute the PSF for a field near the cluster ngc4147.
+Select stars using the display and the image cursor and show plots of the data
+and the residuals from the fit for each star.
+
+.nf
+	da> set stdimcur = stdimage
+
+	... define the image cursor
+
+	da> display n4147 1 fi+
+
+	... display the image
+
+	da> epar psf
+
+	... edit the psf parameters
+
+	... move to the datapars line and type :e
+            edit the data dependent parameters
+	    type :q to quit the datapars menu
+
+	... move to the daopars line and type :e
+            edit the daophot fitting parameters
+	    type :q to quit the daopars menu
+
+	... finish editing the psf parameters
+
+	da> psf n4147 n4147.mag.1 "default" "default"
+
+	... verify the critical parameters
+
+	... a short help page appears on the screen
+
+	... move the image cursor to a candidate star and hit the a key
+	    a plot of the stellar data appears
+
+	... type ? for a listing of the graphics cursor menu
+
+	... type o to accept the star, x to reject it
+
+	... if the star is accepted  a plot of the residuals appears
+
+	... type o to accept the star, x to reject it
+
+	... move to the next candidate star repeat the above steps
+
+	... type w to save the PSF
+
+	... type q to quit the program
+
+	... the output will appear in n4147.psf.1.imh and n4147.psg.1
+.fi
+
+2. Compute the PSF for a field near M92. Select stars using a contour
+plot and the graphics cursor as the image display and image cursor. Show plots
+of the data and the residuals from the fit for each star.
+
+.nf
+	da> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+	da> contour m92 >G m92.plot
+
+	... store the contour plot of m92 in the file m92.plot
+
+	da> epar psf
+
+	... edit the psf parameters
+
+	... move to the datapars line and type :e
+            edit the data dependent parameters
+	    type :q to quit the datapars menu
+
+	... move to the daopars line and type :e
+            edit the daophot fitting parameters
+	    type :q to quit the daopars menu
+
+	... finish editing the psf parameters
+
+	da> psf m92 m92.mag.1 "default" "default"
+
+	... verify the critical parameters
+
+	... a short help page appears on the screen
+
+	.... type :.read m92.plot to display the contour plot
+
+	... move the image cursor to a candidate star and hit the a key
+	    a plot of the stellar data appears
+
+	... type o to accept the star, x to reject it
+
+	... if the star is accepted  a plot of the residuals appears
+
+	... type o to accept the star, x to reject it
+
+	... type :.read m92.plot to redisplay the contour plot
+
+	... move the cursor to another candidate star and repeat
+	    the above steps
+
+	... type w to save the PSF
+
+	... type q to quit the program
+
+	... the output will appear in m92.psf.1.imh and m92.psg.1
+.fi
+
+3. Setup and run PSF interactively without an image display by
+aliasing the image cursor to the standard input. Before running PSF
+in this manner the user should have a list of the id numbers of candidate
+PSF stars.
+
+.nf
+	da> set stdimcur = text
+
+	... define the image cursor to be the standard input
+
+	da> epar psf
+
+	... edit the psf parameters
+
+	... move to the datapars line and type :e
+            edit the data dependent parameters
+	    type :q to quit the datapars menu
+
+	... move to the daopars line and type :e
+            edit the daophot fitting parameters
+	    type :q to quit the daopars menu
+
+	... finish editing the psf parameters
+
+	da> psf orionk orionk.mag.1 "default" "default"
+
+	... the user is asked to verify critical parameters
+
+	... verify the critical parameters
+
+	... type :a # where # stands for the id number of the star
+	    a plot of the stellar data appears
+
+	... type o to accept the star, x to reject it
+
+	... if the star is accepted  a plot of the residuals appears
+
+	... type o to accept the star, x to reject it
+
+	... repeat for all the PSF stars
+
+	... type w to save the PSF
+
+	... type q to quit the PSF
+
+	... the output will appear in orionk.psf.1.imh and orionk.psg.1
+.fi
+
+
+4. Run PSF in batch mode using a command file of cursor instructions called
+cmds.
+
+.nf
+	da> psf orionh orionh.mag.1 "default" "default" verify+\
+	    commands=cmds
+
+	... the file cmds contains the following lines of text
+
+	    :a 37
+	    :a 132
+	    :a 203
+	    :a 273
+	    :a 300
+	    :a 506
+	    q
+
+	... verify the critical parameters
+
+	... the PSF will be constructed from star 37, 132, 203, 273, 300
+	    and 506
+
+	... the output will appear in orionh.psf.1.imh and orionh.psg.1
+.fi
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+PSF currently does not permit the user to change the fitting parameters
+or the input and output file names dynamically. These features will
+become available in subsequent versions of the package.
+.ih
+SEE ALSO
+datapars,daopars
+.endhelp

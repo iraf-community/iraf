@@ -14,6 +14,10 @@ $else $ifeq (MACH, ffpa) then
 $include "noao$lib/mkpkg.sf.SUN3"
 $else $ifeq (MACH, vms) then
 $include "noao$lib/mkpkg.sf.VMS"
+$else $ifeq (MACH, dec) then
+$include "noao$lib/mkpkg.sf.DDEC"
+$else $ifeq (MACH, mip) then
+$include "noao$lib/mkpkg.sf.DMIP"
 $else $ifeq (MACH, mips) then
 $include "noao$lib/mkpkg.sf.MIPS"
 $end

@@ -1,5 +1,36 @@
 .help revisions Jun88 noao.imred.echelle
 .nf
+imred$echelle/*
+    Further updates for WCS version of ONEDSPEC. (7/24/91, Valdes)
+
+imred$echelle/echelle.cl
+imred$echelle/echelle.par
+imred$echelle/echelle.men
+imred$echelle/echelle.hd
+    The package was updated for V3 of APEXTRACT and ONEDSPEC.  All parameter
+    files are now part of those packages and now local copies are used.
+    Some tasks have disappeared such as APIO and ECSELECT and a number of
+    others have been added.
+
+imred$echelle/ecbplot.cl -
+imred$echelle/doc/ecbplot.hlp -
+imred$echelle/echelle.cl
+imred$echelle/echelle.hd
+imred$echelle/echelle.men
+    The generic task BPLOT replaces ECBPLOT.  (8/24/90, Valdes)
+
+============================
+V3 of APEXTRACT and ONEDSPEC
+============================
+
+imred$echelle/doc/ecreidentify.hlp
+    The refit option now maintains the order offset of the reference.
+    (6/12/90, Valdes)
+
+====
+V2.9
+====
+
 imred$echelle/ecbplot.cl
     Added a missing parameter declaration for "cur".  (10/27/89, Valdes)
 

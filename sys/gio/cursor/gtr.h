@@ -1,7 +1,7 @@
 # GIOTR.H -- Global definitions for the GIOTR graphics i/o workstation
 # transformation and i/o program unit.  Note: requires <gio.h>.
 
-define	DEF_MAXLENFRAMEBUF	64000
+define	DEF_MAXLENFRAMEBUF	128000
 define	DEF_LENFRAMEBUF		8192
 define	INC_LENFRAMEBUF		4096
 define	DEF_LENSCRATCHBUF	256

@@ -17,18 +17,19 @@ int	function
 int	cvstati()
 
 begin
-	call smark (sp)
-	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
-	call salloc (cf_coeff, ncoeff, TY_REAL)
 	function = cvstati (cv, CVTYPE)
-	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
 
 	if (function != LEGENDRE && function != CHEBYSHEV) {
 	    call eprintf ("Cannot convert coefficients - wrong function type\n")
 	    call amovkr (INDEFR, ps_coeff, ncoeff)
-	    call sfree (sp)
 	    return
 	}
+
+	call smark (sp)
+	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
+	call salloc (cf_coeff, ncoeff, TY_REAL)
+
+	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
 
 	# Get existing coefficients
 	call cvcoeff (cv, Memr[cf_coeff], ncoeff)

@@ -153,6 +153,7 @@ begin
 	    im = immap (Memc[image], READ_ONLY, 0)
 	    call apsets (ap, IMNAME, Memc[image])
 	    call ap_itime (im, ap)
+	    call ap_otime (im, ap)
 	    call ap_padu (im, ap)
 	    call ap_rdnoise (im, ap)
 	    call ap_filter (im, ap)
@@ -168,10 +169,11 @@ begin
 	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
 		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
-		    strlen (Memc[coords]))
+		    strlen (Memc[coords])) {
 		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
 			SZ_FNAME)
-		else
+		    lclist = limlist
+		} else
 		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
 	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    } else {

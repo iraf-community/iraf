@@ -36,7 +36,6 @@ begin
 	fd = open (Memc[bpfile], READ_ONLY, TEXT_FILE)
 	im1 = immap (Memc[template], READ_ONLY, 0)
 	im = immap (Memc[bpimage], NEW_COPY, im1)
-	call imunmap (im1)
 
 	# Set the output image.
 	IM_PIXTYPE(im) = TY_SHORT
@@ -110,5 +109,6 @@ begin
 
 	# Finish up.
 	call imunmap (im)
+	call imunmap (im1)
 	call close (fd)
 end

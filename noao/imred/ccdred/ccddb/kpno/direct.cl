@@ -1,9 +1,9 @@
 # Generic routine for setting parameters.
 
-ccdred.pixeltype = "real"
+ccdred.pixeltype = "real real"
 ccdred.verbose = yes
 ccdred.logfile = "logfile"
-ccdred.plotfile = "plotfile"
+ccdred.plotfile = ""
 ccdred.backup = ""
 ccdred.instrument = "ccddb$kpno/direct.dat"
 ccdred.ssfile = "subsets"
@@ -21,7 +21,7 @@ ccdproc.scancor = no
 ccdproc.readaxis = "line"
 ccdproc.biassec = "image"
 ccdproc.trimsec = "image"
-ccdproc.interactive = no
+ccdproc.interactive = yes
 ccdproc.function = "chebyshev"
 ccdproc.order = 1
 ccdproc.sample = "*"

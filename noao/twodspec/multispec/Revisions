@@ -1,5 +1,13 @@
 .help revisions Jun88 noao.twodspec.multispec
 .nf
+The multispec package is no longer compiled and defined.  The source code
+will someday be revised and the capabilities of tracing and deblending
+will be returned.  (8/23/90, Valdes)
+
+====
+V2.9
+====
+
 noao$twodspec/multispec/t_fitgauss5.x
     Valdes, Oct. 3, 1986
     1.  Missing third argument to msmap.  Found in the AOS port.

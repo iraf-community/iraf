@@ -6,20 +6,22 @@ $checkin  libpkg.a ../..
 $exit
 
 libpkg.a:
-	imcasigclip.x	<imhdr.h>
-	imcaverage.x	<imhdr.h>
-	imcombine.x	<imset.h> <error.h> <syserr.h>
-	imccopy.x	<imhdr.h>
-	imcmaxrej.x	<imhdr.h>
-	imcmedian.x	<imhdr.h>
-	imcminrej.x	<imhdr.h>
-	imcmmrej.x	<imhdr.h>
-	imcmode.x	
-	imcsigclip.x	<imhdr.h>
-	imcsum.x	<imhdr.h>
-	imcthresh.x	<imhdr.h>
 	cor.x		ccdred.h
 	corinput.x	ccdred.h <imhdr.h>
 	proc.x		ccdred.h <imhdr.h>
-	sigma.x	
+
+	icaclip.x	../icombine.com ../icombine.h
+	icaverage.x	../icombine.com <imhdr.h>
+	iccclip.x	../icombine.com ../icombine.h
+	icgdata.x	../icombine.com <imhdr.h> <mach.h>
+	icgrow.x	../icombine.com ../icombine.h
+	icmedian.x	../icombine.com
+	icmm.x		../icombine.com
+	icombine.x	../icombine.com ../icombine.h <error.h> <imhdr.h>\
+			<imset.h> <mach.h>
+	icpclip.x	../icombine.com ../icombine.h
+	icsclip.x	../icombine.com ../icombine.h
+	icsigma.x	../icombine.com <imhdr.h>
+	icsort.x	
+	icstat.x	../icombine.com <imhdr.h>
 	;

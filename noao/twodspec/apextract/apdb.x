@@ -1,16 +1,14 @@
 include	<math/curfit.h>
 include	<pkg/dttext.h>
-include	<pkg/xtanswer.h>
 include	"apertures.h"
 
 # AP_DBWRITE -- Write aperture data to the database.  The database is obtained
 # with a CL query.
 
-procedure ap_dbwrite (image, query, aps, naps)
+procedure ap_dbwrite (image, aps, naps)
 
 char	image[ARB]		# Image
-int	query			# Write query?
-pointer	aps[AP_MAXAPS]		# Apertures
+pointer	aps			# Apertures
 int	naps
 
 int	i, j, ncoeffs
@@ -35,20 +33,10 @@ begin
 
 	call smark (sp)
 	call salloc (database, SZ_FNAME, TY_CHAR)
-	call clgstr ("apio.database", Memc[database], SZ_FNAME)
-
-	if ((Memc[database] == EOS) || (image[1] == EOS)) {
-	    call sfree (sp)
-	    return
-	}
-
-	# Query the user.
 	call salloc (str, SZ_LINE, TY_CHAR)
-	call sprintf (Memc[str], SZ_LINE, "Write apertures for %s to %s")
-	    call pargstr (image)
-	    call pargstr (Memc[database])
-	call xt_answer (Memc[str], query)
-	if ((query == NO) || (query == ALWAYSNO)) {
+
+	call clgstr ("database", Memc[database], SZ_FNAME)
+	if ((Memc[database] == EOS) || (image[1] == EOS)) {
 	    call sfree (sp)
 	    return
 	}
@@ -64,8 +52,8 @@ begin
 	dt = dtmap1 (Memc[database], Memc[str], NEW_FILE)
 
 	# Write aperture entries for all apertures.
-	for (j = 1; j <= naps; j = j + 1) {
-	    ap = aps[j]
+	for (j = 0; j < naps; j = j + 1) {
+	    ap = Memi[aps+j]
 
 	    call dtptime (dt)
 	    call dtput (dt, "begin\taperture %s %d %g %g\n")
@@ -73,6 +61,10 @@ begin
 		call pargi (AP_ID(ap))
 	        call pargr (AP_CEN(ap, 1))
 	        call pargr (AP_CEN(ap, 2))
+	    if (AP_TITLE(ap) != NULL) {
+	        call dtput (dt, "\ttitle\t%s\n")
+		    call pargstr (Memc[AP_TITLE(ap)])
+	    }
 	    call dtput (dt, "\timage\t%s\n")
 	        call pargstr (image)
 	    call dtput (dt, "\taperture\t%d\n")
@@ -135,11 +127,12 @@ begin
 	# Log the write operation unless the output file is "last".
 	if (strne (image, "last")) {
 	    call sprintf (Memc[str], SZ_LINE,
-		"APWRITE - %d apertures for %s written to %s.")
+		"DATABASE - %d apertures for %s written to %s")
 	        call pargi (naps)
 	        call pargstr (image)
 	        call pargstr (Memc[database])
-	    call ap_log (Memc[str])
+	    call ap_log (Memc[str], YES, YES, NO)
+	    call appstr ("ansdbwrite1", "no")
 	}
 
 	call sfree (sp)
@@ -153,7 +146,7 @@ end
 procedure ap_dbread (image, aps, naps)
 
 char	image[ARB]		# Image
-pointer	aps[AP_MAXAPS]		# Apertures
+pointer	aps			# Apertures
 int	naps			# Number of apertures
 
 int	i, j, n, ncoeffs
@@ -170,7 +163,7 @@ begin
 	# Return if the database or image are undefined.
 	call smark (sp)
 	call salloc (database, SZ_FNAME, TY_CHAR)
-	call clgstr ("apio.database", Memc[database], SZ_FNAME)
+	call clgstr ("database", Memc[database], SZ_FNAME)
 
 	if ((Memc[database] == EOS) || (image[1] == EOS)) {
 	    call sfree (sp)
@@ -196,8 +189,6 @@ begin
 	n = naps
 	naps = 0
 	do i = 1, DT_NRECS(dt) {
-	    if (naps >= AP_MAXAPS)
-		call error (0, "Too many apertures")
 
 	    call dtgstr (dt, i, "image", Memc[str], SZ_LINE)
 	    if (strne (Memc[str], image))
@@ -205,10 +196,17 @@ begin
 
 	    # If an aperture is found delete any input apertures.
 	    if (naps == 0)
-		for (j = 1; j <= n; j = j + 1)
-		    call ap_free (aps[j])
+		for (j = 0; j < n; j = j + 1)
+		    call ap_free (Memi[aps+j])
+
+	    if (mod (naps, 100) == 0)
+		call realloc (aps, naps+100, TY_POINTER)
 
 	    call ap_alloc (ap)
+	    ifnoerr (call dtgstr (dt, i, "title", Memc[str], SZ_LINE)) {
+		call malloc (AP_TITLE(ap), SZ_APTITLE, TY_CHAR)
+		call strcpy (Memc[str], Memc[AP_TITLE(ap)], SZ_APTITLE)
+	    }
 	    AP_ID(ap) = dtgeti (dt, i, "aperture")
 	    iferr (AP_BEAM(ap) = dtgeti (dt, i, "beam"))
 		AP_BEAM(ap) = AP_ID(ap)
@@ -247,22 +245,70 @@ begin
 	    call cvrestore (AP_CV(ap), Memr[coeffs])
 	    call mfree (coeffs, TY_REAL)
 
+	    Memi[aps+naps] = ap
 	    naps = naps + 1
-	    aps[naps] = ap
 	}
 	call dtunmap (dt)
 
 	# Log the read operation.
 	call sprintf (Memc[str], SZ_LINE,
-	    "APREAD  - %d apertures read for %s from %s.")
+	    "DATABASE  - %d apertures read for %s from %s")
 	    call pargi (naps)
 	    call pargstr (image)
 	    call pargstr (Memc[database])
-	call ap_log (Memc[str])
+	call ap_log (Memc[str], YES, YES, NO)
 
 	# If no apertures were found then reset the number to the input value.
 	if (naps == 0)
 	    naps = n
+	else
+	    call appstr ("ansdbwrite1", "no")
 
 	call sfree (sp)
+end
+
+
+# AP_DBACCESS - Check if a database file can be accessed.
+# This does not check the contents of the file.
+# The database is obtained with a CL query.
+
+int procedure ap_dbaccess (image)
+
+char	image[ARB]		# Image
+int	access			# Database file access?
+
+int	i
+pointer	sp, database, str, dt
+pointer	dtmap1()
+errchk	dtmap1
+
+begin
+	call smark (sp)
+	call salloc (database, SZ_FNAME, TY_CHAR)
+	call clgstr ("database", Memc[database], SZ_FNAME)
+
+	if ((Memc[database] != EOS) && (image[1] != EOS)) {
+	    # Set the aperture database file name and map it.
+	    # The file name is "ap" appended with the image name with the
+	    # special image section characters replaced by '_'.
+	    call salloc (str, SZ_LINE, TY_CHAR)
+	    call sprintf (Memc[str], SZ_LINE, "ap%s")
+		call pargstr (image)
+	    for (i=str; Memc[i] != EOS; i = i + 1)
+		switch (Memc[i]) {
+		case '[', ':', ',',']','*',' ', '/':
+		    Memc[i] = '_'
+		}
+
+	    iferr {
+		dt = dtmap1 (Memc[database], Memc[str], READ_ONLY)
+		call dtunmap (dt)
+		access = YES
+	    } then
+		access = NO
+	} else
+	    access = NO
+
+	call sfree (sp)
+	return (access)
 end

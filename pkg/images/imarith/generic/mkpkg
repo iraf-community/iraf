@@ -6,6 +6,20 @@ $checkin  libpkg.a pkg$images/
 $exit
 
 libpkg.a:
+	icaclip.x	../icombine.com ../icombine.h
+	icaverage.x	../icombine.com ../icombine.h <imhdr.h>
+	iccclip.x	../icombine.com ../icombine.h
+	icgdata.x	../icombine.com ../icombine.h <imhdr.h> <mach.h>
+	icgrow.x	../icombine.com ../icombine.h
+	icmedian.x	../icombine.com ../icombine.h
+	icmm.x		../icombine.com ../icombine.h
+	icombine.x	../icombine.com ../icombine.h <error.h> <imhdr.h>\
+			<imset.h> <mach.h>
+	icpclip.x	../icombine.com ../icombine.h
+	icsclip.x	../icombine.com ../icombine.h
+	icsigma.x	../icombine.com ../icombine.h <imhdr.h>
+	icsort.x	
+	icstat.x	../icombine.com ../icombine.h <imhdr.h>
 	imaadd.x	<imhdr.h>
 	imadiv.x	<imhdr.h>
 	imamax.x	<imhdr.h>
@@ -13,18 +27,5 @@ libpkg.a:
 	imamul.x	<imhdr.h>
 	imanl.x		<imhdr.h>
 	imasub.x	<imhdr.h>
-	imcasigclip.x	<imhdr.h>
-	imcaverage.x	<imhdr.h>
-	imccopy.x	<imhdr.h>
-	imcmaxrej.x	<imhdr.h>
-	imcmedian.x	<imhdr.h>
-	imcminrej.x	<imhdr.h>
-	imcmmrej.x	<imhdr.h>
-	imcmode.x	<imhdr.h>
-	imcombine.x	<error.h> <imhdr.h> <imset.h>
-	imcsigclip.x	<imhdr.h>
-	imcsum.x	<imhdr.h>
-	imcthresh.x	<imhdr.h>
-	imsum.x		imsum.h <imhdr.h>
-	sigma.x	
+	imsum.x		../imsum.h <imhdr.h>
 	;

@@ -1,4 +1,4 @@
-.help identify Nov88 noao.onedspec
+.help identify Mar92 noao.onedspec
 .ih
 NAME
 identify -- Identify features in one dimensional image vectors
@@ -11,19 +11,30 @@ PARAMETERS
 List of images in which to identify features and fit coordinate functions.
 .le
 .ls section = "middle line"
-If an image is not one dimensional or given as a one dimensional image section
-then the image section given by this parameter is appended to the image name.
-The section may be specified directly as an image section or in one of the
-following forms: "line #", "column #", "# line", or "# column" where # may
-be a line or column number or one of the special strings "middle" or "last".
-Abbreviations are allowed.
+If an image is not one dimensional or given as a one dimensional image
+section then the image section given by this parameter is used.  The
+section is used to define the initial vector and the direction (columns
+or lines) of the image vectors to be fit.  The image is still considered
+to be two dimensional and it is possible to change columns or lines
+within the program.
+
+The section parameter may be specified directly as an image section or
+in one of the following forms: "line #", "column #", "# line", or "#
+column" where # may be a line or column number or one of the special
+strings "middle" or "last".  Abbreviations are allowed though beware
+that 'l' is not a sufficient abbreviation.
 .le
 .ls database = "database"
 Database in which the feature data and coordinate functions are recorded.
 .le
-.ls coordlist = "onedstds$henear.dat"
+.ls coordlist = "linelists$idhenear.dat"
 User coordinate list consisting of an ordered list of line coordinates.
-Some standard line lists are available in the directory "onedstds$".
+Some standard line lists are available in the directory "linelists$":
+
+.nf
+	cl> dir linelists
+	cl> page linelists$README
+.fi
 .le
 .ls nsum = 10
 Number of lines or columns to be summed when the image is two dimensional.
@@ -88,12 +99,17 @@ Distance from a rejected point in which additional points are automatically
 rejected regardless of their residuals.
 .le
 
-The following parameters control the graphics input and output.
+The following parameters control the input and output.
+.ls autowrite = no
+Automatically write or update the database.  If no then attempting to
+exit the program if the feature data and fit have been modified results
+in a query.  If yes exiting the program automatically updates the database.
+.le
 .ls graphics = "stdgraph"
 Graphics device.  The default is the standard graphics device which is
 generally a graphics terminal.
 .le
-.ls curosr = ""
+.ls cursor = ""
 Cursor input file.  If a cursor file is not given then the standard graphics
 cursor is read.
 .le
@@ -125,6 +141,12 @@ not changed.
 .ls i
 (I)nitialize (delete features and coordinate fit).
 .le
+.ls j
+Go to the preceding line or column in a 2D or multispec image.
+.le
+.ls k
+Go to the next line or column in a 2D or multispec image.
+.le
 .ls l
 (L)ocate features in the coordinate list.  A coordinate function must be
 defined or at least two features must have user coordinates from which a
@@ -136,6 +158,9 @@ estimate.
 .le
 .ls n
 Move the cursor or zoom window to the (n)ext feature (same as +).
+.le
+.ls o
+Go to the specified line or column in a 2D or multispec image.
 .le
 .ls p
 (P)an to the original window after (z)ooming on a feature.
@@ -226,7 +251,12 @@ Set or show the feature width in pixels.
 Set a new image or show the current image.
 .le
 .ls :labels value
-Set or show the feature label type (none, index, pixel, or user).
+Set or show the feature label type (none, index, pixel, coords, user, or both).
+None produces no labeling, index labels the features sequentially in order
+of pixel position, pixel labels the features by their pixel coordinates,
+coords labels the features by their user coordinates (such as wavelength),
+user labels the features by the user or line list supplied string, and
+both labels the features by both the user coordinates and user strings.
 .le
 .ls :match value
 Set or show the coordinate list matching distance.
@@ -237,11 +267,21 @@ Set or show the maximum number of features automatically found.
 .ls :minsep value
 Set or show the minimum separation allowed between features.
 .le
-.ls :read name
-Read a record from the database.  The record name defaults to the image name.
+.ls :read name ap
+Read a record from the database.  The record name defaults to the image name
+and, for 1D spectra, the aperture number defaults to aperture of
+the current image.
 .le
-.ls :write name
-Write a record to the database.  The record name defaults to the image name.
+.ls :write name ap
+Write a record to the database.  The record name defaults to the image name
+and, for 1D spectra, the aperture number defaults to aperture of
+the current image.
+.le
+.ls :add name ap
+Add features from a database record.  The record name defaults to the image name
+and, for 1D spectra, the aperture number defaults to aperture of
+the current image.  Only the features are added to any existing list
+of features.  The dispersion function is not read.
 .le
 .ls :zwidth value
 Set or show the zoom width in user units.
@@ -254,21 +294,23 @@ DESCRIPTION
 Features in the input images are identified interactively and assigned
 user coordinates.  A "coordinate function" mapping pixel coordinates to
 user coordinates may be determined from the identified features.  A
-user coordinate list is used to automatically identify additional
+user coordinate list may be defined to automatically identify additional
 features.  This task is used to measure positions of features,
 determine dispersion solutions for spectra, and to identify features in
-two dimensional images to be used to map a two dimensional coordinate
+two dimensional images for mapping a two dimensional coordinate
 transformation.
 
 Each image in the input list is considered in turn.  If the image is
-not one dimensional or a one dimensional section of an image then an
-image section is appended to the image name.  The image section is set
-by the parameter \fIsection\fR which may be specified in several ways
-as described in the parameter section.  If the image is not one
-dimensional then the number of lines or columns given by the parameter
-\fInsum\fR are summed.  The one dimensional image vector is graphed on
-the standard graphics device (stdgraph).  The initial feature list and
-coordinate function are read from the database if an entry exist.  The
+not one dimensional or a one dimensional section of an image
+then the image section given by the parameter
+\fIsection\fR is used.  This parameter may be specified in several ways
+as described in the parameter section.  The image section is used to
+select a starting vector and image axis.
+
+If the image is not one dimensional or in multispec format then the number
+of lines or columns given by the parameter \fInsum\fR are summed.
+The one dimensional image vector is graphed.  The initial feature list and
+coordinate function are read from the database if an entry exists.  The
 features are marked on the graph.  The image coordinates are in pixels
 unless a coordinate function is defined, in which case they are in user
 coordinate units.  The pixel coordinate, coordinate function value, and
@@ -360,11 +402,12 @@ Features may be delete with the key 'd'.  All features are deleted
 when the 'a' key immediately precedes the delete key.  Deleting the
 features does not delete the coordinate function.  Features deleted in the
 curve fitting package also are removed from the feature list upon
-exitting the curve fitting package.
+exiting the curve fitting package.
 
 It is common to transfer the feature identifications and coordinate function
 from one image to another.  When a new image without a database entry
-is examined, such as when going to the next image in the input list or selecting
+is examined, such as when going to the next image in the input list,
+changing image lines or columns with 'j', 'k' and 'o', or selecting
 a new image with the ":image" command, the current feature list and coordinate
 function are kept.  Alternatively, a database record from a different
 image may be read with the ":read" command.  When transfering feature
@@ -375,7 +418,9 @@ the cursor using the current position as the starting point.  When preceded
 with the 'a' key all the features are recentered (the user must refit
 the coordinate function if desired).  As an aside, the recentering
 function is also useful when the parameters governing the feature
-centering algorithm are changed.
+centering algorithm are changed.  An additional options is the ":add"
+command to add features from a database record.  This does not overwrite
+previous features (or the fitting functions) as does ":read".
 
 The (c)entering function is applicable when the shift between the
 current and true feature positions is small.  Larger shifts may be
@@ -404,12 +449,14 @@ and set the graph display format.
 
 The feature identification process for an image is completed by typing
 'q' to quit.  Attempting to quit an image without explicitly
-recording changes in the feature database produces a warning message and an
-opportunity to record the information in the database.  Also
+recording changes in the feature database produces a warning message
+unless the \fIautowrite\fR parameter is set.  If this parameter is
+not set a prompt is given asking whether to save the results otherwise
+the results are automatically saved.  Also
 the reference spectrum keyword REFSPEC is added to the image header at
 this time.  This is used by \fBrefspectra\fR and \fBdispcor\fR.
 As an immediate exit the 'I' interrupt key may be used.  This does not save
-the feature information.
+the feature information and may leave the graphics in a confused state.
 .ih
 DATABASE RECORDS
 The database specified by the parameter \fIdatabase\fR is a directory of
@@ -420,7 +467,11 @@ keyword "begin".  The rest of the line is the record identifier.  Records
 read and written by \fBecidentify\fR have "identify" as the first word of the
 identifier.  Following this is a name which may be specified following the
 ":read" or ":write" commands.  If no name is specified then the image name
-is used.  The lines following the record identifier contain
+is used.  For 1D spectra the database entry includes the aperture number
+and so to read a solution from a aperture different than the current image
+and aperture number must be specified.  For 2D images the entry name
+has the 1D image section which is what is specified to read the entry.
+The lines following the record identifier contain
 the feature information and dispersion function coefficients.
 .ih
 EXAMPLES
@@ -446,6 +497,19 @@ Deleting the features does not delete the coordinate function.
 a dispersion solution is determined at one slit position in an arc spectrum
 as in the previous example.  The features are then traced to other
 slit positions with the task \fBreidentify\fR.
+.ih
+REVISIONS
+.ls IDENTIFY V2.10
+The principle revision is to allow multiple aperture images and long slit
+spectra to be treated as a unit.  New keystrokes allow jumping or scrolling
+within multiple spectra in a single image.  For aperture spectra the
+database entries are referenced by image name and aperture number and not
+with image sections.  Thus, IDENTIFY solutions are not tied to specific
+image lines in this case.  There is a new autowrite parameter which may
+be set to eliminate the save to database query upon exiting.  The new
+colon command "add" may be used to add features based on some other
+spectrum or arc type and then apply the fit to the combined set of features.
+.le
 .ih
 NOTES
 The coordinates and image data are double precision.

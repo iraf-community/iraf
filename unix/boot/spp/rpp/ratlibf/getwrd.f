@@ -1,20 +1,20 @@
-      INTEGER FUNCTION GETWRD (IN, I, OUT)
-      INTEGER IN (100), OUT (100)
-      INTEGER I
-      INTEGER J
-23000 IF (.NOT.(IN (I) .EQ. 32 .OR. IN (I) .EQ. 9))GOTO 23001
-      I = I + 1
-      GOTO 23000
-23001 CONTINUE
-      J = 1
-23002 IF (.NOT.(IN (I) .NE. -2 .AND. IN (I) .NE. 32 .AND. IN (I) .NE. 9 
-     *.AND. IN (I) .NE. 10))GOTO 23003
-      OUT (J) = IN (I)
-      I = I + 1
-      J = J + 1
-      GOTO 23002
-23003 CONTINUE
-      OUT (J) = -2
-      GETWRD = J - 1
-      RETURN
-      END
+      integer function getwrd (in, i, out)
+      integer in (100), out (100)
+      integer i
+      integer j
+23000 if (.not.(in (i) .eq. 32 .or. in (i) .eq. 9))goto 23001
+      i = i + 1
+      goto 23000
+23001 continue
+      j = 1
+23002 if (.not.(in (i) .ne. -2 .and. in (i) .ne. 32 .and. in (i) .ne. 9 
+     *.and. in (i) .ne. 10))goto 23003
+      out (j) = in (i)
+      i = i + 1
+      j = j + 1
+      goto 23002
+23003 continue
+      out (j) = -2
+      getwrd = j - 1
+      return
+      end

@@ -14,7 +14,6 @@
 
 static	PKCHAR	pk_osfn[SZ_PATHNAME+1];
 static	char	*osfn = (char *)pk_osfn;
-static	int	first_time=1;
 extern	char	*os_getenv();
 
 

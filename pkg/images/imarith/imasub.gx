@@ -27,9 +27,11 @@ begin
 	if (im_a == NULL) {
 	    im[2] = im_b
 	    while (ima_nl$t (im, buf, v, 2) != EOF) {
-		if (a != 0$f)
+		if (a != 0$f) {
 		    call asubk$t (Mem$t[buf[2]], a, Mem$t[buf[1]], len)
-		call aneg$t (Mem$t[buf[1]], Mem$t[buf[1]], len)
+		    call aneg$t (Mem$t[buf[1]], Mem$t[buf[1]], len)
+		} else
+		    call aneg$t (Mem$t[buf[2]], Mem$t[buf[1]], len)
 	    }
 
 	# If imageb is constant then read imagea and do a vector/scalar

@@ -1,8 +1,8 @@
-      SUBROUTINE TERMIN (NAME)
-      INTEGER NAME (100)
-      INTEGER TNAME(9)
-      DATA TNAME(1)/47/,TNAME(2)/100/,TNAME(3)/101/,TNAME(4)/118/,TNAME(
-     *5)/47/,TNAME(6)/116/,TNAME(7)/116/,TNAME(8)/121/,TNAME(9)/-2/
-      CALL SCOPY (TNAME, 1, NAME, 1)
-      RETURN
-      END
+      subroutine termin (name)
+      integer name (100)
+      integer tname(9)
+      data tname(1)/47/,tname(2)/100/,tname(3)/101/,tname(4)/118/,tname(
+     *5)/47/,tname(6)/116/,tname(7)/116/,tname(8)/121/,tname(9)/-2/
+      call scopy (tname, 1, name, 1)
+      return
+      end

@@ -1,5 +1,4 @@
-       apselect - Select fields from the center output file
-         bscale - Brightness scale images 
+         txdump - Select fields from the center task output text file
 	 center - Compute accurate centers for a list of objects
      centerpars - Edit the centering parameters
        datapars - Edit the data dependent parameters

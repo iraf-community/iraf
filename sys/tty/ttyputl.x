@@ -191,7 +191,7 @@ begin
 		    switch (so_type) {
 		    case BSOS:
 			if (so_mode_in_effect) {
-			    call putci (fd, "_")
+			    call putci (fd, '_')
 			    if (T_BSOK(tty) == YES)
 				call putci (fd, BS)
 			    else

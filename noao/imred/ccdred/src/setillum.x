@@ -112,8 +112,6 @@ begin
 
 	CORS(ccd, ILLUMCOR) = I
 	COR(ccd) = YES
-	if (IM_PIXTYPE(im) == TY_REAL)
-	    CALCTYPE(ccd) = TY_REAL
 
 	# Log the operation.
 	call sprintf (Memc[str], SZ_LINE,

@@ -35,7 +35,7 @@ int	flux				# Flux conserve
 
 int	list1, list2, itype, btype, logfd
 pointer	sp, in, out, image1, image2, image3, time, mw
-real	a, b, c, d, ltv[2], ltm[2,2]
+real	a, b, c, d, shifts[2], scale[2]
 
 bool	clgetb(), envgetb(), fp_equalr()
 int	clgwrd(), imtopen(), imtgetim(), imtlen(), open(), btoi(), immap()
@@ -138,10 +138,10 @@ begin
 		    flux)
 		if (!envgetb ("nomwcs")) {
 		    mw = mw_openim (in)
-		    ltv[1] =  1. - xmag * x1; ltv[2] = 0.0
-		    ltm[1,1] = xmag; ltm[2,1] = 0.0
-		    ltm[1,2] = 0.0; ltm[2,2] = 1.0
-		    call mw_sltermr (mw, ltm, ltv, 1)
+		    scale[1] = xmag
+		    shifts[1] =  1. - xmag * x1
+		    call mw_scale (mw, scale, 01B)
+		    call mw_shift (mw, shifts, 01B)
 		    call mw_saveim (mw, out)
 		    call mw_close (mw)
 		}
@@ -150,10 +150,12 @@ begin
 	            y1, y2, dy, flux)
 		if (!envgetb ("nomwcs")) {
 		    mw = mw_openim (in)
-		    ltv[1] =  1. - xmag * x1; ltv[2] =  1. - ymag * y1
-		    ltm[1,1] = xmag; ltm[2,1] = 0.0
-		    ltm[1,2] = 0.0; ltm[2,2] = ymag
-		    call mw_sltermr (mw, ltm, ltv, 2)
+		    scale[1] = xmag
+		    scale[2] = ymag
+		    shifts[1] =  1. - xmag * x1
+		    shifts[2] =  1. - ymag * y1
+		    call mw_scale (mw, scale, 03B)
+		    call mw_shift (mw, shifts, 03B)
 		    call mw_saveim (mw, out)
 		    call mw_close (mw)
 		}

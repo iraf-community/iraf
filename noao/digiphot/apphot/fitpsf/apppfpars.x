@@ -20,7 +20,7 @@ begin
 	# Store the psf fitting parameters.
 	call clputr ("box", 2.0 * apstatr (ap, PSFAPERT))
 	call apstats (ap, PSFSTRING, Memc[str], SZ_FNAME)
-	call clpstr ("function", Memc[str], SZ_FNAME)
+	call clpstr ("function", Memc[str])
 	call clputi ("maxiter", apstati (ap, PMAXITER))
 	call clputr ("kreject", apstatr (ap, PK2))
 	call clputi ("nreject", apstati (ap, PNREJECT))

@@ -1,0 +1,156 @@
+Upgrade DSUX/IRAF to IRAF V2.10.  7/30/92.
+--------------------------------------------------------------------------
+
+Starting with V2.10 Sun/IRAF.  Ultrix 4.2a, DEC Fortran 3.2.
+
+Diffed old V2.9 DSUX and SunOS HSIs and merged changes into V2.10 Sun HSI
+to create V2.10 DSUX HSI.
+
+    o	Ultrix compilers won't create .e files, modified xc and mkpkg.sh files
+	to create .E files instead.  Script "fixnames" in hbin renames the HSI
+	executables to .e files.
+
+    o	Added ieee conversion routines to as.dsux.  Set up special file list
+	to use the as.dsux files.
+
+    o	XC was configured as necessary for the DEC compiler.
+
+    o	Checked and set up machine dependent stuff in hlib and hlib/libc.
+	mach.h, libc/setjmp.h, install script, irafuser.csh, cl.csh.
+
+A number of other minor changes as seen in a diff.
+
+----------------------------------
+NOVOS Bootrap went without incident.  DEC compiler issued several warnings.
+Core sysgen largely successful, turned up a number of minor compile time
+problems.  (7/31)
+
+pkg/images/tv/imexamine/iejimexam.x
+	Changed an "aint" to "int".  DEC fortran didn't like this, issuing a
+	warning about arguments not being compatible with the intrinsic
+	function.  There is no aint intrinsic function in SPP anyway.  (7/31)
+
+pkg/images/imarith/icaclip.gx
+pkg/images/imarith/iccclip.gx
+pkg/images/imarith/icsclip.gx
+	These files contained multiple cases (ten or so) of constructs such
+	as "max (1., ...)" or "max (0., ...)" where the ... could be either
+	real or double.   In the double cases the DEC compiler complained about
+	a type mismatch since 1. is real.  (7/31)
+
+pkg/images/imarith/icstat.gx
+	Contained the statement
+	    nv = max (1., (Memi[v2+i] - Memi[v1+i]) / Memi[dv+i] + 1)
+	which is max(real,int).  Changed the 1. to a 1.  (7/31)
+
+noao/digiphot/apphot/aplgsky.x
+	aplgsky.f, line 205: Variable IER is used before its value has been
+	defined.  (8/01)
+
+noao/digiphot/photcal/mkobsfile/t_obsfile.x
+	t_obsfile.f, line 1057: Variable ICOL is used before its value has
+	been defined: maxcol = max (icol, xcol, ycol, mcol, ecol)  (8/01)
+
+noao/onedspec/dispcor/refgspec.x
+	Arguments incompatible with intrinsic function:
+	    sortval = mod (sortval + 24. - timewrap, 24.)
+	Changed second 24. to 24.0D0.  (8/01)
+
+noao/onedspec/splot/fixx.x
+	Arguments incompatible with intrinsic function:
+	    z1 = max (0.5, min (double (SN(sh)+.499), shdr_wl(sh, z1)))
+	    z2 = max (0.5, min (double (SN(sh)+.499), shdr_wl(sh, z2)))
+	The 0.5 should be double.  (8/01)
+
+noao/onedspec/splot/shdr.x
+	Arguments incompatible with intrinsic function:  on lines 268-269,
+	319-320, need to nint or int APHIGH/APLOW.  (8/01)
+
+noao/rv/coloncmds.x
+	Procedure cmd_write is declared as a typed function but does not
+	return a value.  It looks like this procedure should not be a typed
+	function.  (8/01)
+
+noao/imred/ccdred/src/icstat.gx
+	Arguments incompatible with intrinsic function:
+	    nv = max (1.0, (Memi[v2+i] - Memi[v1+i]) / Memi[dv+i] + 1)
+	The first 1.0 should be a 1.  (8/01)
+
+unix/hlib/config.h
+unix/hlib/libc/spp.h
+	In early tests a process run standalone would have no environment,
+	and the CL printed "parameter file cl.par not found" and would not
+	start up.  This was traced to the setjmp/zdojmp save buffer being
+	too small.  Ultrix 4.2 requires a larger buffer than previously.
+	(8/01)
+
+unix/os/zgcmdl.c
+	In earlier versions of Ultrix there was a variable "f77argv" which
+	could be used to get a pointer to the process main argv.  Under
+	Ultrix 4.2 the symbol "__Argv" performs the same purpose.  (8/01)
+
+unix/os/zfioks.c
+	IRAF networking would hang up during a connect.  This was eventually
+	traced to the parameter MAXCONN to "listen".  Evidently under Ultrix
+	this needs to be set to 1 or larger.  On all the other systems to
+	which V2.10 was ported we have thus far been using 0.  (8/01)
+
+mkpkg
+unix/hlib/*.csh
+unix/hlib/mkpkg*
+unix/boot/spp/xc.c
+noao/mkpkg
+noao/lib/mkpkg*
+	Set up two architectures for DSUX, "ddec" and "dmip".  ddec is for
+	the DEC Fortran compiler and dmip is for the MIPS RISC-Fortran
+	compiler.  Did a full sysgen of the dmip architecture.
+
+	XC supports both architectures.  When XC runs it searches the user's
+	path for "f77", which is assumed to be a symbolic link to the actual
+	compiler.  If this link contains the substring "/fort" the DEC
+	compiler is assumed, otherwise the MIPS compiler is assumed.  XC
+	then sets IRAFARCH internally to "ddec" or "dmip" so that the
+	correct IRAF libraries get searched, and links against a different
+	set of host libraries for each compiler.  The user can create the
+	f77 link somewhere in their .login path to control which compiler
+	is to be used.  Either compiler or both compilers can be installed
+	at the system level.  (8/03)
+
+unix/os/zzstrt.c
+	Added support for enabling the IEEE exceptions.  (8/03)
+
+unix/os/zxwhen.c
+	1. Added support for mapping the SIGFPE IEEE floating exceptions from
+	the MIPS floating point unit to zxgmes error messages.
+	2. Added support for the SIGTRAP exceptions (integer overflow and
+	integer divide by zero, range check).  (8/03)
+
+unix/x11/saoimage
+	Current version installed.  (8/04)
+
+unix/bin.dsux/xterm.e		+
+unix/bin.dsux/saoimage.e	+
+	Installed current versions of the xterm and saoimage executables
+	in HBIN.  (8/16)
+
+unix/hlib/install
+	Modified the install script to make links in the local/bin directory 
+	for $hbin/saoimage.e and $hbin/xterm.e.  (8/16)
+
+unix/boot/spp/xc.c
+	FC had trouble linking dmip imfort programs with the ddec compiler
+	installed.  This was because the library -lF77.a, -lU77.a, etc. in
+	/usr/lib were set to point to the default installed compiler, the
+	DEC Fortran compiler.  XC was modified to add a -L/usr/lib/cmplrs/...
+	argument to the link command to cause the appropriate library
+	directory to be searched.  This is /usr/lib/cmplrs/fort for the
+	ddec compiler, and /usr/lib/cmplrs/cc (a link to, e.g., cc2.1) for
+	the dmip compiler.  (8/31)
+
+unix/as.dsux/ieee.gx
+unix/as.dsux/ieeer.x
+unix/as.dsux/ieeed.x
+	The decstation needs IOFF set to 2 in this code, i.e., the exponent
+	of a double precision floating value is in the second longword when
+	the number is viewed as two integer longwords for the purposes of NaN
+	detection.  (8/31)

@@ -1,0 +1,82 @@
+# Create test data if needed.
+
+procedure mkdoecslit ()
+begin
+
+	artdata
+
+	if (!(access ("Bdemoobj.imh") || access ("Bdemoobj.hhh"))) {
+	    print ("Creating example demoobj ...")
+	    mkechelle ("Bdemoobj", yes, ncols=100, nlines=256, norders=21,
+		title="Artificial Echelle Spectrum",
+		header="demos$demoobj.dat", list=no, make=yes,
+		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
+		profile="gaussian", width=4., scattered=25., f=590., gmm=31.6,
+		blaze=63., theta=69., order=112, wavelength=5007.49,
+		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
+		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
+		rv=0., z=no, continuum=500., temperature=7700., lines="",
+		nrandom=100, peak=-0.2, sigma=0.3, seed=1, >& "dev$null")
+	    mkechelle ("Bdemoobj", yes, ncols=100, nlines=256, norders=21,
+		title="Artificial Echelle Spectrum",
+		header="demos$demoobj.dat", list=no, make=yes,
+		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
+		profile="slit", width=20., scattered=10., f=590., gmm=31.6,
+		blaze=63., theta=69., order=112, wavelength=5007.49,
+		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
+		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
+		rv=0., z=no, continuum=200., temperature=5700., lines="",
+		nrandom=20, peak=5.0, sigma=0.1, seed=2, >& "dev$null")
+	    mknoise ("Bdemoobj", output="", ncols=512, nlines=512, title="",
+		header="", background=0., gain=1., rdnoise=10., poisson=yes,
+		seed=1, cosrays="", ncosrays=0, energy=30000., radius=0.5,
+		ar=1., pa=0., comments=no)
+	}
+
+	if (!(access ("Bdemostd.imh") || access ("Bdemostd.hhh"))) {
+	    print ("Creating example demostd ...")
+	    mkechelle ("Bdemostd", yes, ncols=100, nlines=256, norders=21,
+		title="Artificial Echelle Spectrum",
+		header="demos$demostd.dat", list=no, make=yes,
+		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
+		profile="gaussian", width=4., scattered=25., f=590., gmm=31.6,
+		blaze=63., theta=69., order=112, wavelength=5007.49,
+		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
+		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
+		rv=0., z=no, continuum=500., temperature=10000., lines="",
+		nrandom=0, peak=-0.5, sigma=0.5, seed=3, >& "dev$null")
+	    mkechelle ("Bdemostd", yes, ncols=100, nlines=256, norders=21,
+		title="Artificial Echelle Spectrum",
+		header="demos$demostd.dat", list=no, make=yes,
+		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
+		profile="slit", width=20., scattered=10., f=590., gmm=31.6,
+		blaze=63., theta=69., order=112, wavelength=5007.49,
+		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
+		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
+		rv=0., z=no, continuum=200., temperature=5700., lines="",
+		nrandom=20, peak=5.0, sigma=0.1, seed=2, >& "dev$null")
+	    mknoise ("Bdemostd", output="", ncols=512, nlines=512, title="",
+		header="", background=0., gain=1., rdnoise=10., poisson=yes,
+		seed=2, cosrays="", ncosrays=0, energy=30000., radius=0.5,
+		ar=1., pa=0., comments=no)
+	}
+
+	if (!(access ("Bdemoarc.imh") || access ("Bdemoarc.hhh"))) {
+	    print ("Creating example demoarc ...")
+	    mkechelle ("Bdemoarc", yes, ncols=100, nlines=256, norders=21,
+		title="Artificial Echelle Spectrum",
+		header="demos$demoarc.dat", list=no, make=yes,
+		comments=no, xc=INDEF, yc=INDEF, pixsize=0.027,
+		profile="slit", width=20., scattered=10., f=590., gmm=31.6,
+		blaze=63., theta=69., order=112, wavelength=5007.49,
+		dispersion=2.61, cf=590., cgmm=226., cblaze=4.53,
+		ctheta=-11.97, corder=1, cwavelength=6700., cdispersion=70.,
+		rv=0., z=no, continuum=20., temperature=0.,
+		lines="mkexamples$ecthorium.dat", nrandom=0, peak=-0.5,
+		sigma=0.05, seed=1, >& "dev$null")
+	    mknoise ("Bdemoarc", output="", ncols=512, nlines=512, title="",
+		header="", background=0., gain=1., rdnoise=10., poisson=yes,
+		seed=3, cosrays="", ncosrays=0, energy=30000., radius=0.5,
+		ar=1., pa=0., comments=no)
+	}
+end

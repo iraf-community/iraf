@@ -1,5 +1,13 @@
 .help revisions Jun88 noao.imred.generic
 .nf
+generic$darksub.cl
+    Included all parameters in IMARITH calls due to complaint about title
+    being changed.  (12/9/91)
+
+====
+V2.9
+====
+
 generic$normalize.cl
 generic$normflat.cl
 generic$normalize.par

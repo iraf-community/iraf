@@ -3,11 +3,14 @@
 package	plot
 
 task	implot,
+	gdevices,
 	graph,
 	prow,
 	prows,
 	pcol,
 	pcols,
+	phistogram,
+	pradprof,
 	pvector,
 	gkidir,
 	gkimosaic,

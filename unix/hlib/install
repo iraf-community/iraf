@@ -1,3 +1,5 @@
+#!/bin/csh
+#
 # INSTALL -- Install IRAF on a UNIX/IRAF host.  May also be run after the
 # initial installation as a consistency check to verify that all the necessary
 # links and file permissions are still in place (e.g., after updating UNIX
@@ -22,8 +24,9 @@
 # to see what it would do.
 # ----------------------------------------------------------------------------
 
-unset noclobber
+unset	noclobber
 unalias cd cp cmp echo ln mv rm sed set grep ls chmod chown pwd touch
+set	path	= (/bin /usr/bin /usr/ucb /etc /usr/etc)
 
 # set echo
 
@@ -31,9 +34,11 @@ set W		= '\([ 	"]\)'		# match a blank, tab, or "
 set TEMP	= "/tmp/I_temp"
 set exec	= yes
 set user	= iraf
-set mach	= `mach`
+#set mach	= `mach`
+set mach	= dsux
+set LS		= /bin/ls
 
-alias PUT	"mv -f \!*; /etc/chown $user \!$ "
+alias PUT	"mv -f \!*; chown $user \!$ "
 
 if ($?iraf == 1) then
     if (! -d $iraf) then
@@ -137,7 +142,9 @@ end
 if ("$iraf" == "") then
     # Make a guess at what the new root directory is.
     set d_iraf = ""
-    if (-d /iraf) then
+    if (-d /iraf/iraf) then
+	set d_iraf = /iraf/iraf
+    else if (-d /iraf) then
 	set d_iraf = /iraf
     else if (-d /usr/iraf) then
 	set d_iraf = /usr/iraf
@@ -159,12 +166,19 @@ if ("$iraf" == "") then
 	    end
 	endif
     endif
-    
+
     if ("$d_iraf" == "") then
 	set d_iraf = /usr/iraf
     endif
 else
     set d_iraf = $iraf
+endif
+
+# If the given directory doesn't exist, compute the root directory relative
+# to $iraf/unix/hlib (our current directory, presumably).
+
+if (! -d $d_iraf) then
+    set d_iraf = `(cd ../..;cwd)`
 endif
 
 set d_iraf = `echo $iraf | sed -e 's+/\(["]*\)$+\1+'`
@@ -228,10 +242,10 @@ endif
 
 if ("$lbin" == "") then
     # Look around and come up with a likely candidate directory.
-    if (-d /local/bin) then
-	set d_lbin = /local/bin
-    else if (-d /usr/local/bin) then
+    if (-d /usr/local/bin) then
 	set d_lbin = /usr/local/bin
+    else if (-d /local/bin) then
+	set d_lbin = /local/bin
     else
 	set d_lbin = /usr/bin
     endif
@@ -257,15 +271,19 @@ endif
 # The following is partially system dependent.
 # ------------------------------------------
 # Set the BINDIRS pathnames - directories where the HSI executables go.
+set host	= "$iraf/unix"
 set hbin	= "$iraf/unix/bin.$mach"	# "mach" is SUN specific!!
+set hlib	= "$iraf/unix/hlib"
 set fbin	= "$iraf/bin"
 
 # Replace any // by /.
+set host	= `echo $host | sed -e "s+//+/+g"`
 set hbin	= `echo $hbin | sed -e "s+//+/+g"`
 set fbin	= `echo $fbin | sed -e "s+//+/+g"`
 set hlib	= `echo $hlib | sed -e "s+//+/+g"`
 
 # Strip any trailing /.
+set host	= `echo $host | sed -e 's+/\(["]*\)$+\1+'`
 set hbin	= `echo $hbin | sed -e 's+/\(["]*\)$+\1+'`
 set fbin	= `echo $fbin | sed -e 's+/\(["]*\)$+\1+'`
 set hlib	= `echo $hlib | sed -e 's+/\(["]*\)$+\1+'`
@@ -273,8 +291,8 @@ set BINDIRS	= "$hbin $hlib $fbin"
 
 # The following file lists are partially system dependent.
 set PATHFILES	= "mkiraf.csh libc/iraf.h cl.csh"
-set MODEFILES	= "mkiraf.csh mkmlist.csh edsym.e generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e $hlib/sgi2*.e cl.csh mkfloat.csh fc.csh $host/reboot"
-set LINKFILES	= "cl.e generic.e mkiraf.csh mkmlist.csh edsym.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xc.e"
+set MODEFILES	= "mkiraf.csh mkmlist.csh generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e cl.csh mkfloat.csh fc.csh $host/reboot saoimage.e xterm.e"
+set LINKFILES	= "cl.e generic.e mkiraf.csh mkmlist.csh mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e saoimage.e xterm.e"
 # ------------------------------------------
 
 # Begin installation.
@@ -306,12 +324,12 @@ endif
 
 foreach i ($BINDIRS)
     if (-e $i/alloc.e) then
-	if ("`ls -l $i/alloc.e | grep 'rwsr-.*root'`" != "") then
+	if ("`$LS -l $i/alloc.e | grep 'rwsr-.*root'`" != "") then
 	    echo "device allocation task $i/alloc.e is ok"
 	else
 	    echo "chown $i/alloc.e to root, set uid modebit"
 	    if ($exec == yes) then
-		/etc/chown 0 $i/alloc.e
+		chown 0 $i/alloc.e
 		chmod u+s $i/alloc.e
 	    endif
 	endif
@@ -369,15 +387,17 @@ echo "--------------- Check File Permissions ----------------"
 
 foreach i ($MODEFILES)
     set file = $i
-    foreach j ($BINDIRS)
-	if (-e $j/$i) then
-	    set file = $j/$i
-	    break
-	endif
-    end
+    if (! -e $file) then
+	foreach j ($BINDIRS)
+	    if (-e $j/$i) then
+		set file = $j/$i
+		break
+	    endif
+	end
+    endif
 	
     if (-e $file) then
-	if ("`ls -l $file | grep '^.rwxr.xr.x'`" != "") then
+	if ("`$LS -l $file | grep '^.rwxr.xr.x'`" != "") then
 	    echo "file $file exists with the correct permissions"
 	else
 	    echo "set mode for $file to 0755"
@@ -398,7 +418,7 @@ set file1 = /usr/include/iraf.h
 set file2 = $iraf/unix/hlib/libc/iraf.h
 
 if (-e $file1) then
-    if ("`ls -l $file1 | grep $file2`" != "") then
+    if ("`$LS -l $file1 | grep $file2`" != "") then
 	echo "symbolic link $file1 is ok"
     else
 	echo "link $file1 exists but is invalid; unlink $file1"
@@ -407,12 +427,14 @@ if (-e $file1) then
 	endif
 	echo "make symbolic link $file1 -> $file2"
 	if ($exec == yes) then
+	    rm -f $file1
 	    ln -s $file2 $file1
 	endif
     endif
 else
     echo "make symbolic link $file1 -> $file2"
     if ($exec == yes) then
+	rm -f $file1
 	ln -s $file2 $file1
     endif
 endif
@@ -436,23 +458,25 @@ foreach i ($LINKFILES)
     end
 
     # Verify or set the link.
-    if ("`/bin/ls $file1`" == "$file1") then
-	if ("`/bin/ls -l $file1 | /bin/grep $file2`" != "") then
+    if ("`$LS $file1`" == "$file1") then
+	if ("`$LS -l $file1 | /bin/grep $file2`" != "") then
 	    echo "symbolic link $file1 is ok"
 	else
 	    echo "link $file1 exists but is invalid; unlink $file1"
 	    if ($exec == yes) then
-		/bin/rm -f $file1
+		rm -f $file1
 	    endif
 	    echo "make symbolic link $file1 -> $file2"
 	    if ($exec == yes) then
-		/bin/ln -s $file2 $file1
+		rm -f $file1
+		ln -s $file2 $file1
 	    endif
 	endif
     else
 	echo "make symbolic link $file1 -> $file2"
 	if ($exec == yes) then
-	    /bin/ln -s $file2 $file1
+	    rm -f $file1
+	    ln -s $file2 $file1
 	endif
     endif
 end
@@ -464,6 +488,7 @@ if ($exec == yes) then
 endif
 
 #exit 0					# COMMENT OUT FOR SUN/IRAF
+goto install_fifo			# Added for X11 version
 
 # SUN/IRAF specific stuff.
 # ------------------------------
@@ -668,7 +693,7 @@ else
 		endif
 	    endif
 	    if (-e $i) then
-		if ("`/bin/ls -l $i | /bin/grep $exe`" != "") then
+		if ("`$LS -l $i | /bin/grep $exe`" != "") then
 		    echo "symbolic link $i is ok"
 		else
 		    echo "link $i exists but is invalid; unlink it"
@@ -708,7 +733,7 @@ else
 		endif
 	    endif
 	    if (-e $i) then
-		if ("`ls -l $i | /bin/grep iraf`" != "") then
+		if ("`$LS -l $i | /bin/grep iraf`" != "") then
 		    echo "symbolic link $i is ok"
 		else
 		    echo "link $i exists but is invalid; unlink it"
@@ -729,6 +754,8 @@ else
 	end
     endif
 endif
+
+install_fifo:
 
 # Common code for GTERM/IMTOOL installation.
 # -------------------------------------------
@@ -751,7 +778,7 @@ end
 # The old /dev/imt1 entry is now just a link to /dev/imt1o.
 set file = /dev/imt1
 if (-e $file) then
-    if ("`ls -l $file | grep imt1o`" != "") then
+    if ("`$LS -l $file | grep imt1o`" != "") then
 	echo "imtool device entry $file is ok"
     else
 	echo "make device entry $file for imtool"
@@ -767,45 +794,42 @@ else
     endif
 endif
 
-# Install the default IMTOOLRC frame buffer configuration file.
-# The /usr/local/lib path is wired in to imtool and cannot easily be changed,
-# but if installation of the default imtoolrc in this directory is not possible,
+# Install the default IMTOOLRC frame buffer configuration file.  The path
+# /usr/local/lib path hardwired in to imtool and cannot easily be changed, but
+# if installation of the default imtoolrc in this directory is not possible,
 # the file can be installed in each imtool user's login directory as .imtoolrc,
-# or the environment variable IMTOOLRC can be defined in each imtool usr's
+# or the environment variable IMTOOLRC can be defined in each imtool user's
 # .login or .cshrc to define the path to the file.
 
-set lib = /usr/local/lib
-set src = $iraf/unix/sun/imtoolrc
-set dst = $lib/imtoolrc
+# Verify imtoolrc link.
+cd /usr/local/lib
+set file1 = imtoolrc
+set file2 = $iraf/dev/imtoolrc
 
-if (! -e $dst) then
-    if (-e /usr/local) then
-	if (! -e $lib) then
-	    echo "make directory $lib"
-	    if ($exec == yes) then
-		mkdir $lib
-	    endif
-	endif
-	echo "copy $src to $dst"
-	if ($exec == yes) then
-	    cp $src $dst
-	endif
+# Verify or set the link.
+if ("`$LS $file1`" == "$file1") then
+    if ("`$LS -l $file1 | /bin/grep $file2`" != "") then
+	echo "symbolic link $file1 is ok"
     else
-	echo "no /usr/local directory, cannot install imtoolrc"
+	echo "link $file1 exists but is invalid; unlink $file1"
+	if ($exec == yes) then
+	    rm -f $file1
+	endif
+	echo "make symbolic link $file1 -> $file2"
+	if ($exec == yes) then
+	    rm -f $file1
+	    ln -s $file2 $file1
+	endif
     endif
 else
-    # Update the file if it has changed.
-    cmp -s $src $dst
-    if ($status) then
-	echo "updating $dst"
-	if ($exec == yes) then
-	    mv -f $dst $dst.OLD
-	    cp $src $dst
-	endif
-    else
-	echo "$dst is ok"
+    echo "make symbolic link $file1 -> $file2"
+    if ($exec == yes) then
+	rm -f $file1
+	ln -s $file2 $file1
     endif
 endif
+
+exit 0					# Added for X11 version
 
 # Make sure there are entries in the the termcap and graphcap files for gterm
 # and imtool.

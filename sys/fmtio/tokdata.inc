@@ -1,5 +1,4 @@
-
-# GETTOK character classes (for the ASCII character set)
+# TOKDATA.INC -- Character classes for ctotok.x.
 # identifier=1, number=2, operator=3, punctuation=4, string=5, unknown=8
 
 #				  !   "   #   $   %   &   '   (   )   *
@@ -31,5 +30,3 @@ data	(class(i),i=81,90)	/ 1,  1,  1,  1,  1,  1,  1,  1,  1,  1/
 
 #				  {   |   }   ~  DEL
 data	(class(i),i=91,96)	/ 4,  3,  4,  3,  8, EOS/
-
-data	numch	/'.','-','+',':','x','X',EOS/

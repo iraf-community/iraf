@@ -2,11 +2,15 @@
  */
 
 #include <sys/types.h>
+#ifdef SYSV
+#include <time.h>
+#else
 #include <sys/time.h>
-#include <sys/times.h>
 #include <sys/timeb.h>
+#endif
 
 #define	SECONDS_1970_TO_1980	315532800L
+static	long get_timezone();
 
 /* GMT_TO_LST -- Convert gmt to local standard time, epoch 1980.
  */
@@ -14,14 +18,12 @@ time_t
 gmt_to_lst (gmt)
 time_t	gmt;
 {
-	struct	timeb time_info;
 	struct	tm *localtime();
 	time_t	time_var;
 	long	gmtl;
 	
 	/* Subtract minutes westward from GMT */
-	ftime (&time_info);
-	time_var = gmt - time_info.timezone * 60L;
+	time_var = gmt - get_timezone();
 
 	/* Correct for daylight savings time, if in effect */
 	gmtl = (long)gmt;
@@ -29,4 +31,21 @@ time_t	gmt;
 	    time_var += 60L * 60L;
 
 	return (time_var - SECONDS_1970_TO_1980);
+}
+
+
+/* _TIMEZONE -- Get the local timezone, measured in seconds westward
+ * from Greenwich, ignoring daylight savings time if in effect.
+ */
+static long
+get_timezone()
+{
+#ifdef SYSV
+	extern	long timezone;
+	return (timezone);
+#else
+	struct	timeb time_info;
+	ftime (&time_info);
+	return (time_info.timezone * 60);
+#endif
 }

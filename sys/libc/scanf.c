@@ -408,13 +408,14 @@ out_:
 	    float	rval;
 	    double	dval, atof();
 
-	    if (fmt->f_longword)
+	    if (fmt->f_longword) {
 		*(va_arg ((**argp), double *)) = atof (numbuf);
-	    else {
+	    } else if (fmt->f_halfword) {
 		dval = atof (numbuf);
 		rval = (dval == INDEFD) ? INDEFR : dval;
 		*(va_arg ((**argp), float  *)) = rval;
-	    }
+	    } else
+		*(va_arg ((**argp), double *)) = atof (numbuf);
 	} else {
 	    if (fmt->f_longword)
 		*(va_arg ((**argp), long  *)) = num;

@@ -1,4 +1,5 @@
 include	<mach.h>
+include	"../shdr.h"
 include	"ecidentify.h"
 
 # EC_NEWFEATURE -- Allocate and initialize memory for a new feature.
@@ -24,7 +25,7 @@ begin
 
 	delta = MAX_REAL
 	do i = 1, EC_NFEATURES(ec) {
-	    if (AP(ec,i) != ap)
+	    if (APN(ec,i) != ap)
 		next
 	    if (abs (pix - PIX(ec,i)) < delta) {
 		delta = abs (pix - PIX(ec,i))
@@ -45,8 +46,8 @@ begin
 	        call realloc (EC_FWIDTHS(ec), EC_NALLOC(ec), TY_REAL)
 	        call realloc (EC_FTYPES(ec), EC_NALLOC(ec), TY_INT)
 	    }
-	    for (j=EC_NFEATURES(ec); (j>1)&&(ap<AP(ec,j-1)); j=j-1) {
-		AP(ec,j) = AP(ec,j-1)
+	    for (j=EC_NFEATURES(ec); (j>1)&&(ap<APN(ec,j-1)); j=j-1) {
+		APN(ec,j) = APN(ec,j-1)
 		LINE(ec,j) = LINE(ec,j-1)
 	        ORDER(ec,j) = ORDER(ec,j-1)
 	        PIX(ec,j) = PIX(ec,j-1)
@@ -55,8 +56,8 @@ begin
 	        FWIDTH(ec,j) = FWIDTH(ec,j-1)
 	        FTYPE(ec,j) = FTYPE(ec,j-1)
 	    }
-	    for (; (j>1)&&(ap==AP(ec,j-1))&&(pix<PIX(ec,j-1)); j=j-1) {
-		AP(ec,j) = AP(ec,j-1)
+	    for (; (j>1)&&(ap==APN(ec,j-1))&&(pix<PIX(ec,j-1)); j=j-1) {
+		APN(ec,j) = APN(ec,j-1)
 		LINE(ec,j) = LINE(ec,j-1)
 	        ORDER(ec,j) = ORDER(ec,j-1)
 	        PIX(ec,j) = PIX(ec,j-1)
@@ -65,7 +66,7 @@ begin
 	        FWIDTH(ec,j) = FWIDTH(ec,j-1)
 	        FTYPE(ec,j) = FTYPE(ec,j-1)
 	    }
-	    AP(ec,j) = ap
+	    APN(ec,j) = ap
 	    LINE(ec,j) = ec_line (ec, ap)
 	    ORDER(ec,j) = ORDERS(ec,LINE(ec,j))
 	    PIX(ec,j) = pix
@@ -75,7 +76,7 @@ begin
 	    FTYPE(ec,j) = type
 	    EC_NEWFEATURES(ec) = YES
 	} else if (abs (fit-user) < abs (FIT(ec,j)-USER(ec,j))) {
-	    AP(ec,j) = ap
+	    APN(ec,j) = ap
 	    LINE(ec,j) = ec_line (ec, ap)
 	    ORDER(ec,j) = ORDERS(ec,LINE(ec,j))
 	    PIX(ec,j) = pix

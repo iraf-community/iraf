@@ -64,14 +64,15 @@ char	expr[ARB]		# expression to be evaluated
 int	getop_epa		# user supplied get operand procedure
 int	ufcn_epa		# user supplied function call procedure
 
+int	junk
+bool	debug
 pointer	sp, ip
-int	debug, junk
 extern	xev_gettok()
 int	strlen(), xev_parse()
 
 errchk	xev_parse, calloc
 include	"evexpr.com"
-data	debug /NO/
+data	debug /false/
 
 begin
 	call smark (sp)

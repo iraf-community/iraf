@@ -20,13 +20,14 @@ install:
 
 libpkg.a:
 	@help
+
 	cmdstr.x	<ctype.h>
 	concatenate.x	
 	copy.x		<error.h>
 	count.x		<chars.h> <ctype.h> <error.h>
 	delete.x	<error.h>
-	directory.x	<chars.h> <ctype.h> <diropen.h> <finfo.h> <protect.h>\
-			<time.h> <fset.h>
+	directory.x	<chars.h> <ctype.h> <diropen.h> <finfo.h>\
+			<fset.h> <protect.h> <time.h>
 	files.x	
 	head.x		<error.h>
 	isdir.x		<ctype.h> <finfo.h>
@@ -34,6 +35,7 @@ libpkg.a:
 	match.x		<ctype.h> <pattern.h>
 	mkdir.x	
 	movefiles.x	<error.h>
+	mtclean.x	
 	netstatus.x	
 	page.x		<fset.h>
 	pathnames.x	

@@ -4,6 +4,8 @@
 # several physical lines with the newlines escaped at the ends.  Skip
 # comment lines and .help sections.  Blank lines are not skipped.
 # Lines not terminated by newlines are joined to form a longer line.
+# MAXCH must be at least SZ_LINE characters greater than the size of the
+# longest line to be read.
 
 int procedure getlongline (fd, obuf, maxch, linenum)
 

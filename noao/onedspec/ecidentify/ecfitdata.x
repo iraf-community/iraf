@@ -1,3 +1,4 @@
+include	"../shdr.h"
 include	"ecidentify.h"
 
 # EC_FITDATA -- Compute fit coordinates from pixel coordinates.
@@ -10,13 +11,12 @@ int	i, ecf_oeval()
 
 begin
 	call mfree (EC_FITDATA(ec), TY_DOUBLE)
-	call malloc (EC_FITDATA(ec), EC_NPTS(ec)*EC_NLINES(ec), TY_DOUBLE)
+	call malloc (EC_FITDATA(ec), EC_NCOLS(ec)*EC_NLINES(ec), TY_DOUBLE)
 
 	do i = 1, EC_NLINES(ec) {
 	    call ec_gline (ec, i)
 	    if (EC_ECF(ec) == NULL)
-	        call altrd (PIXDATA(ec,1), FITDATA(ec,1), EC_NPTS(ec), -1.D0,
-		    CDELT(ec,i), CRVAL(ec,i))
+	       call achtrd (Memr[SX(EC_SH(ec))],  FITDATA(ec,1), EC_NPTS(ec))
 	    else {
 		ORDERS(ec,i) = ecf_oeval (EC_ECF(ec), APS(ec,i))
 	        call ecf_vector (EC_ECF(ec), APS(ec,i), PIXDATA(ec,1),
@@ -43,9 +43,9 @@ begin
 	    return
 
 	do i = 1, EC_NFEATURES(ec) {
-	    LINE(ec,i) = ec_line (ec, AP(ec,i))
+	    LINE(ec,i) = ec_line (ec, APN(ec,i))
 	    ORDER(ec,i) = ORDERS(ec,LINE(ec,i))
-	    FIT(ec,i) = ec_fitpt (ec, AP(ec,i), PIX(ec,i))
+	    FIT(ec,i) = ec_fitpt (ec, APN(ec,i), PIX(ec,i))
 	}
 end
 
@@ -55,19 +55,15 @@ end
 double procedure ec_fitpt (ec, order, pix)
 
 pointer	ec			# ID pointer
-double	order			# Order
+int	order			# Order
 double	pix			# Pixel coordinate
 
-int	i, j
-double	fit
-
-double	ecf_eval()
+double	fit, ecf_eval(), mw_c1trand(), shdr_lw()
 
 begin
 	if (EC_ECF(ec) == NULL) {
-	    i = pix
-	    j = i + 1
-	    fit = FITDATA(ec,j) * (pix - i) + FITDATA(ec,i) * (j - pix)
+	    fit = mw_c1trand (EC_LP(ec), pix)
+	    fit = shdr_lw (EC_SH(ec), fit)
 	} else
 	    fit = ecf_eval (EC_ECF(ec), order, pix)
 
@@ -88,7 +84,7 @@ double	pixcoord		# Pixel coordinate returned
 int	i, n
 double	dx
 
-double	ec_fitpt()
+double	ec_fitpt(), mw_c1trand()
 
 begin
 	n = EC_NPTS(ec)
@@ -102,8 +98,8 @@ begin
 	    if (FITDATA(ec,i) == fitcoord)
 	        return (double (i))
 
-	    pixcoord = i - .5
-	    dx = 0.5
+	    pixcoord = mw_c1trand (EC_LP(ec), double(i-.5))
+	    dx = mw_c1trand (EC_LP(ec), double(i+.5)) - pixcoord
 	    while (dx > DXMIN) {
 	        dx = dx / 2
 	        if (ec_fitpt (ec, EC_AP(ec), pixcoord) < fitcoord)
@@ -121,8 +117,8 @@ begin
 	    if (FITDATA(ec,i) == fitcoord)
 	        return (double (i))
 
-	    pixcoord = i - .5
-	    dx = 0.5
+	    pixcoord = mw_c1trand (EC_LP(ec), double(i-.5))
+	    dx = mw_c1trand (EC_LP(ec), double(i+.5)) - pixcoord
 	    while (dx > DXMIN) {
 	        dx = dx / 2
 	        if (ec_fitpt (ec, EC_AP(ec), pixcoord) < fitcoord)

@@ -1,4 +1,4 @@
-.help ccdred Jun87 noao.imred
+.help package Jun87 noao.imred
 .ih
 NAME
 ccdred -- CCD image reduction package
@@ -7,12 +7,14 @@ USAGE
 ccdred
 .ih
 PARAMETERS
-.ls pixeltype = "real"
-Output pixel datatype.  When images are processed or created the output pixel
-datatype is determined by this parameter.  The allowed types are "short" for
-short integer, and "real" for real floating point.  Note that if short
-input images are processed into real images the disk space required will
-generally increase.
+.ls pixeltype = "real real"
+Output pixel datatype and calculation datatype.  When images are processed
+or created the output pixel datatype is determined by this parameter.
+The allowed types are "short" for short integer, and "real" for real
+floating point.  Note that if short input images are processed into
+real images the disk space required will generally increase.
+The calculation datatypes are also short and real with a default of
+real if none is specified.
 .le
 .ls verbose = no
 Print log information to the standard output?

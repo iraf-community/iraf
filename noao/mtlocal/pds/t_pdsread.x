@@ -1,4 +1,3 @@
-
 include <error.h>
 include <fset.h>
 
@@ -9,31 +8,35 @@ define	MAX_RANGES	100
 
 procedure t_pdsread()
 
-char	infile[SZ_FNAME], outfile[SZ_FNAME]
+char	infile[SZ_FNAME]		# the input file name list
+char	outfile[SZ_FNAME]		# the output file name list
+char	file_list[SZ_FNAME]		# the input file number list
+int	offset				# the output file name offset
+
 char	in_fname[SZ_FNAME], out_fname[SZ_FNAME]
-char	file_list[SZ_LINE]
-int	range[MAX_RANGES*2+1], nfiles, file_number, stat, offset, junk
+int	range[MAX_RANGES*2+1], nfiles, file_number, stat, junk
 int	lenlist
 pointer	list
 
 bool	clgetb()
 char	clgetc()
-int	strlen(), btoi(), clgeti(), fntlenb(), fntgfnb(), mtfile()
+int	fstati(), btoi(), clgeti(), fntlenb(), fntgfnb(), mtfile()
+int	mtneedfileno()
 int	pds_read(), decode_ranges(), get_next_number(), pds_get_image_type()
 pointer	fntopnb()
 
 include	"rpds.com"
 
 begin
-	# set up the standard output to flush on a newline
-	call fseti (STDOUT, F_FLUSHNL, YES)
+	# Set up the standard output to flush on a newline.
+	if (fstati (STDOUT, F_REDIR) == NO)
+	    call fseti (STDOUT, F_FLUSHNL, YES)
 
-	# Get parameters.
+	# Get the input file name(s).
 	call clgstr ("pds_file", infile, SZ_FNAME)
-	# tape device.  Otherwise, convert only the first file.
 	if (mtfile (infile) == YES) {
 	    list = NULL
-	    if (infile[strlen(infile)] != ']')
+	    if (mtneedfileno (infile) == YES)
 	        call clgstr ("file_list", file_list, SZ_LINE)
 	    else
 	        call strcpy ("1", file_list, SZ_LINE)
@@ -44,11 +47,11 @@ begin
 		call pargi (lenlist)
 	}
 
-	# decode the ranges
+	# Decode the ranges.
 	if (decode_ranges (file_list, range, MAX_RANGES, nfiles) == ERR)
 	    call error (1, "Illegal file number list")
 
-	# Set options
+	# Setup the output options.
 	long_header = btoi (clgetb ("long_header"))
 	short_header = btoi (clgetb ("short_header"))
 	make_image = btoi (clgetb ("make_image"))
@@ -56,12 +59,12 @@ begin
 	ninetrack = btoi (clgetb ("ninetrack"))
 	offset = clgeti ("offset")
 
+	# Set the output image data type.
 	if (make_image == YES) {
 	    data_type = pds_get_image_type (clgetc ("datatype"))
 	    call clgstr ("iraf_file", outfile, SZ_FNAME)
 	} else
 	    outfile[1] = EOS
-
 
 	# Read successive PDS files, convert and write into a numbered
 	# succession of output IRAF files.
@@ -69,29 +72,27 @@ begin
 	file_number = 0
 	while (get_next_number (range, file_number) != EOF) {
 
-	    # get the input file name
+	    # Get the input file name.
 	    if (list != NULL)
 		junk = fntgfnb (list, in_fname, SZ_FNAME)
 	    else {
-	        call strcpy (infile, in_fname, SZ_FNAME)
-	        if (infile[strlen(infile)] != ']') {
-		    call sprintf (in_fname[strlen(in_fname)+1], SZ_FNAME,
-		        "[%d]")
-		        call pargi (file_number)
-		}
+	        if (mtneedfileno (infile) == YES)
+		    call mtfname (infile, file_number, in_fname, SZ_FNAME)
+		else
+	            call strcpy (infile, in_fname, SZ_FNAME)
 	    }
 
-	    # get the output file name
-	    call strcpy (outfile, out_fname, SZ_FNAME)
+	    # Get the output file name.
 	    if (nfiles > 1) {
-		call sprintf (out_fname[strlen(out_fname)+1], SZ_FNAME, "%03d")
+		call sprintf (out_fname[1], SZ_FNAME, "%s%03d")
+		    call pargstr (outfile)
 		    call pargi (file_number + offset)
-	    }
+	    } else
+	        call strcpy (outfile, out_fname, SZ_FNAME)
 
-	    # Convert PDS file to the output IRAF file.
-	    # If EOT is reached then exit.
-	    # If an error is detected then print a warning and continue with
-	    # the next file.
+	    # Convert PDS file to the output IRAF file. If EOT is reached
+	    # then exit. If an error is detected then print a warning and
+	    # continue with the next file.
 
 	    iferr (stat = pds_read (in_fname, out_fname))
 		call erract (EA_FATAL)

@@ -1,0 +1,54 @@
+# Make the PROTO package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_proto.x
+	$link	x_proto.o libpkg.a -lxtools -o xx_proto.e
+	;
+
+install:
+	$move	xx_proto.e bin$x_proto.e
+	;
+
+tfiles:
+	$set	GEN = "$$generic -k"
+
+	$ifolder (fixcol.x,  fixcol.gx)  $(GEN) fixcol.gx  -o fixcol.x	$endif
+	$ifolder (fixline.x, fixline.gx) $(GEN) fixline.gx -o fixline.x	$endif
+	$ifolder (imfuncs.x, imfuncs.gx) $(GEN) imfuncs.gx -o imfuncs.x	$endif
+	$ifolder (imrep.x,   imrep.gx)   $(GEN) imrep.gx   -o imrep.x	$endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	epix.x		<imhdr.h>
+	fields.x	<ctype.h>
+	fixcol.x	<imhdr.h> <imset.h>
+	fixline.x	<imhdr.h> <imset.h>
+	imfuncs.x	<imhdr.h> <mach.h>  <math.h>
+	imfunction.x	<imhdr.h>
+	imrep.x		<imhdr.h>
+	interp.x	<fset.h>
+	intrp.f
+	t_bscale.x	<imhdr.h> <error.h> <mach.h> <ctype.h>
+	t_binfil.x	<mach.h> <error.h> <imhdr.h>
+	t_fixpix.x	<fset.h> <imhdr.h>
+	t_hfix.x	<error.h> <imio.h> <imhdr.h> <ctype.h>
+	t_imctroid.x	<imhdr.h> <error.h>
+	t_imcntr.x	<imhdr.h>
+	t_imreplace.x	<imhdr.h>
+	t_imscale.x	<imhdr.h> <mach.h>
+	t_joinlines.x
+	t_suntoiraf.x	<imhdr.h> <error.h> <mach.h>
+	t_wcsedit.x	<fset.h>  <imhdr.h> <mwset.h>
+	t_wcsreset.x	<imhdr.h> <mwset.h>
+	;

@@ -10,25 +10,32 @@ define	ECFTYPES	"|chebyshev|legendre|"		# Fit types
 #
 # with offset minimizing the RMS.
 
-procedure ecf_solve (ecf, x, y, z, w, npts)
+procedure ecf_solve (ecf, x, y, z, w, r, npts, fixedorder)
 
 pointer	ecf			# GSURFIT pointer
 double	x[npts]			# X points
 double	y[npts]			# Y points
 double	z[npts]			# Z points
 double	w[npts]			# Weights
+double	r[npts]			# Residuals
 int	npts			# Number of points
+int	fixedorder		# Fixed order?
 
 int	i, j, k, err
 double	ya, yb, newrms, ecf_rms()
-pointer	sp, y1, z1, ecf1
+pointer	sp, y1, ecf1
+errchk	ecf_solve1
 include	"ecffit.com"
 define	fit_	99
 
 begin
+	if (fixedorder == YES) {
+	    call ecf_solve1 (ecf, x, y, z, w, r, npts)
+	    return
+	}
+
 	call smark (sp)
 	call salloc (y1, npts, TY_DOUBLE)
-	call salloc (z1, npts, TY_DOUBLE)
 
 	# Determine if the orders are reversed.
 	j = 1
@@ -66,10 +73,10 @@ begin
 		break
 
 	    call altmd (y, Memd[y1], npts, double(slope), double(i))
-	    call amuld (Memd[y1], z, Memd[z1], npts)
+	    call amuld (Memd[y1], z, r, npts)
 
 fit_	    call dgsinit (ecf1, gstype, xorder, yorder, YES, xmin, xmax, ya, yb)
-	    call dgsfit (ecf1, x, Memd[y1], Memd[z1], w, npts, WTS_USER, err)
+	    call dgsfit (ecf1, x, Memd[y1], r, w, npts, WTS_USER, err)
 
 	    if (err != OK) {
 	        if (xorder > 2 || yorder > 2) {
@@ -90,11 +97,11 @@ fit_	    call dgsinit (ecf1, gstype, xorder, yorder, YES, xmin, xmax, ya, yb)
 	        }
 	    }
 
-	    call dgsvector (ecf1, x, Memd[y1], Memd[z1], npts)
-	    call adivd (Memd[z1], Memd[y1], Memd[z1], npts)
-	    call asubd (z, Memd[z1], Memd[z1], npts)
+	    call dgsvector (ecf1, x, Memd[y1], r, npts)
+	    call adivd (r, Memd[y1], r, npts)
+	    call asubd (z, r, r, npts)
 
-	    newrms = ecf_rms (Memd[z1], w, npts)
+	    newrms = ecf_rms (r, w, npts)
 	    k = k + 1
 
 	    if (newrms / rms < 0.999) {
@@ -111,6 +118,11 @@ fit_	    call dgsinit (ecf1, gstype, xorder, yorder, YES, xmin, xmax, ya, yb)
 	    }
 	}
 
+	call altmd (y, Memd[y1], npts, double(slope), double(offset))
+	call dgsvector (ecf, x, Memd[y1], r, npts)
+	call adivd (r, Memd[y1], r, npts)
+	call asubd (z, r, r, npts)
+
 	call sfree (sp)
 
 end
@@ -118,17 +130,18 @@ end
 
 # ECF_SOLVE1 -- Fit f(x, y+offset) = (y+offset)*z with offset fixed.
 
-procedure ecf_solve1 (ecf, x, y, z, w, npts)
+procedure ecf_solve1 (ecf, x, y, z, w, r, npts)
 
 pointer	ecf			# GSURFIT pointer
 double	x[npts]			# X points
 double	y[npts]			# Y points
 double	z[npts]			# Z points
 double	w[npts]			# Weights
+double	r[npts]			# Residuals
 int	npts			# Number of points
 
 int	err
-pointer	sp, y1, z1
+pointer	sp, y1
 double	ya, yb, ecf_rms()
 include	"ecffit.com"
 define	fit_	99
@@ -136,7 +149,6 @@ define	fit_	99
 begin
 	call smark (sp)
 	call salloc (y1, npts, TY_DOUBLE)
-	call salloc (z1, npts, TY_DOUBLE)
 
 	call dgsfree (ecf)
 	shift = 0.
@@ -152,11 +164,11 @@ begin
 	}
 
 	call altmd (y, Memd[y1], npts, double (slope), double (offset))
-	call amuld (Memd[y1], z, Memd[z1], npts)
+	call amuld (Memd[y1], z, r, npts)
 
 fit_	call dgsinit (ecf, gstype, xorder, yorder, YES, xmin, xmax,
 	    min (ya, yb), max (ya, yb))
-	call dgsfit (ecf, x, Memd[y1], Memd[z1], w, npts, WTS_USER, err)
+	call dgsfit (ecf, x, Memd[y1], r, w, npts, WTS_USER, err)
 
 	if (err != OK) {
 	    if (xorder > 2 || yorder > 2) {
@@ -175,10 +187,10 @@ fit_	call dgsinit (ecf, gstype, xorder, yorder, YES, xmin, xmax,
 	    }
 	}
 
-	call dgsvector (ecf, x, Memd[y1], Memd[z1], npts)
-	call adivd (Memd[z1], Memd[y1], Memd[z1], npts)
-	call asubd (z, Memd[z1], Memd[z1], npts)
-	rms = ecf_rms (Memd[z1], w, npts)
+	call dgsvector (ecf, x, Memd[y1], r, npts)
+	call adivd (r, Memd[y1], r, npts)
+	call asubd (z, r, r, npts)
+	rms = ecf_rms (r, w, npts)
 
 	call sfree (sp)
 end

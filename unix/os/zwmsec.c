@@ -16,6 +16,28 @@
 
 static int ringring;
 
+#ifdef ultrix
+static void
+napmsx()
+{
+	ringring = 1;
+}
+#else
+#ifdef SUNOS4		/* must be a better way!  SRo */
+static void
+napmsx()
+{
+	ringring = 1;
+}
+#else
+static int
+napmsx()
+{
+	ringring = 1;
+}
+#endif
+#endif
+
 
 /* ZWMSEC -- Suspend task execution (sleep) for the specified number
  * of milliseconds.
@@ -26,11 +48,6 @@ XINT	*msec;
 	struct	itimerval itv, oitv;
 	register struct itimerval *itp = &itv;
 	struct	sigvec vec, ovec;
-#ifdef SUNOS4
-	void	napmsx();
-#else
-	int	napmsx();
-#endif
 	int	omask;
 
 	if (*msec == 0)
@@ -72,15 +89,4 @@ XINT	*msec;
 
 	(void) sigvec (SIGALRM, &ovec, (struct sigvec *)0);
 	(void) setitimer (ITIMER_REAL, &oitv, (struct itimerval *)0);
-}
-
-
-#ifdef SUNOS4
-static void
-#else
-static int
-#endif
-napmsx()
-{
-	ringring = 1;
 }

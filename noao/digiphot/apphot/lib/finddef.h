@@ -4,13 +4,13 @@ define	LEN_FIND		(10)
 
 # find model parameters
 
-define	AP_RATIO		Memr[$1]	# Gaussian axis ratio
-define	AP_THETA 		Memr[$1+1]	# Gaussian position angle
-define	AP_NSIGMA		memr[$1+2]	# Size of convolution kernel
-define	AP_SHARPLO		Memr[$1+3]	# Lower sharpness bound
-define	AP_SHARPHI		Memr[$1+4]	# Upper sharpness bound
-define	AP_ROUNDLO		Memr[$1+5]	# Lower roundness bound
-define	AP_ROUNDHI		Memr[$1+6]	# Higher roundness bound
+define	AP_RATIO	Memr[$1]	# Gaussian axis ratio
+define	AP_THETA 	Memr[$1+1]	# Gaussian position angle
+define	AP_NSIGMA	memr[$1+2]	# Size of convolution kernel
+define	AP_SHARPLO	Memr[$1+3]	# Lower sharpness bound
+define	AP_SHARPHI	Memr[$1+4]	# Upper sharpness bound
+define	AP_ROUNDLO	Memr[$1+5]	# Lower roundness bound
+define	AP_ROUNDHI	Memr[$1+6]	# Higher roundness bound
 
 
 # noise model defaults

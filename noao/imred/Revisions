@@ -1,15 +1,113 @@
 .help revisions Jun88 noao.imred
 .nf
-noao$imred/irred
+imred$imred.cl
+imred$imred.men
+imred$<spectroscopy packages>
+    Removed the SETAIRMASS task definition from IMRED and added it to
+    all the spectroscopy packages.  Also added the new SETJD task to
+    the spectroscopy packages.  (1/29/92, Valdes)
+
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$ctioslit/* +
+imred$kpnocoude/* +
+imred$kpnoslit/* +
+imred$msred --> imred$specred
+imred$kpcoude/* -
+imred$foe/* -
+imred$echelle/*
+imred$src/slits/*
+    Reorganized the slit reductions packages and merged the fiber and
+    slit processing tasks into the kpnocoude package and the
+    echelle slit and FOE tasks in the echelle package.  (1/15/92, Valdes)
+
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$nessie/* -
+imred$hydra/* +
+    Changed package from NESSIE to HYDRA.  (7/26/91, Valdes)
+
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$foe/*
+    Added new package for Fiber Optic Echelle reductions.
+    (3/22/91, Valdes)
+
+imred$echelle
+imred$src/ecslits/*
+    Added new echelle slit reduction scripts and documentation.
+    (3/22/91, Valdes)
+
+imred$argus
+imred$echelle
+imred$goldcam
+imred$msred
+imred$nessie
+imred$specred
+imred$src
+    Miscellaneous minor updates.  (3/22/91, Valdes)
+
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$observatory.par -
+imred$observatory.cl -
+    Removed observatory from here and replaced it with a new version in
+    noao.  (11/6/90, Valdes)
+
+imred$imred.cl
+    1.  Changed logical directory bias to biasdir to avoid incorrect
+	interpretation of the command:
+		cl> imrename foo bias
+	to be a move to the logical directory.  Bias is a likely name to
+	be used in CCDRED which will always have bias defined.
+	(10/2/90, Valdes)
+      
+imred$doc +
+imred$imred.hd
+imred$observatory.hlp -> noao$imred/doc
+imred$tutorial.hlp -> noao$imred/doc
+imred$demos.hlp +
+    1. Created doc directory and moved above help to it.
+    2. The help for the demos task which appear in a number of packages was
+	added to the IMRED help for lack of a more obvious place to put it.
+	(9/20/90, Valdes)
+
+imred$argus +
+imred$goldcam +
+imred$kpcoude +
+imred$nessie +
+imred$specred +
+imred$specphot -
+imred$coude -
+imred$echelle
+imred$msred
+imred$iids
+imred$irs
+imred$mkpkg
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
+imred$imred.par
+    A major update of the IMRED spectroscopy packages was made.  New packages
+    were added, one was removed, COUDE was renamed to KPCOUDE, new versions
+    of ECHELLE and MSRED based on major changes to APEXTRACT and ONEDSPEC
+    were installed, and minor changes made.
+    (8-9/90, Valdes)
+
+imred$irred
     Valdes, June 2, 1989
     Added the SETAIRMASS task.
 
-noao$imred/irred
+imred$irred
     Davis, April 1, 1989
     1. Installed the IRRED package. At present this is simply a collection
     of tasks useful for IR observers.
 
-noao$imred/cryomap -
+imred$cryomap -
 noao$mkpkg
 noao$imred.cl
 noao$imred.men
@@ -21,26 +119,26 @@ noao$imred.hd
 	APEXTRACT pacakge is better anyway.  The MULTISPEC package remains.
     2.  The IMRED package was modified to delete the CRYOMAP package.
 
-noao$imred/dtoi
+imred$dtoi
     Hammond, February 13. 1987
     1. Installed the DTOI package
 
-noao$imred/observatory.cl
+imred$observatory.cl
     Valdes, October 6, 1986
     1.  The OBSERVATORY task now calls EPARAM to edit the parameters.
     2.  The help page was modified.
 
-noao$imred/specphot/* +
+imred$specphot/* +
     Valdes/Barnes, October 6, 1986
     1.  New IMRED package called SPECPHOT added.  The focus of the package
 	is extraction of 1D spectra from 2D detectors and spectrophotometric
 	reduction of the spectra.
       
-noao$imred/tutor.cl +
-noao$imred/tutor.hlp +
-noao$imred/imred.cl
-noao$imred/imred.men
-noao$imred/imred.hd
+imred$tutor.cl +
+imred$tutor.hlp +
+imred$imred.cl
+imred$imred.men
+imred$imred.hd
     Valdes, August 18, 1986:
     1. Added experimental online TUTOR task.
 

@@ -27,7 +27,7 @@ int	ncols, nlines, epa, status, wkid
 int	nset, ncontours, dashpat, mode, nhi, old_onint
 real	interval, floor, ceiling, zero, finc, ybot
 real	vx1, vx2, vy1, vy2, wx1, wx2, wy1, wy2
-real	xs, xe, ys, ye
+real	xs, xe, ys, ye, dmin, dmax
 
 real	clgetr()
 pointer	gp, gopen()
@@ -69,16 +69,6 @@ begin
 	# parameter "ilab" to zero.
 
 	ilab = btoi (clgetb ("label"))
-
-	# The floor and ceiling are in absolute units, but the zero shift is
-	# applied first, so correct the numbers for the zero shift.  Zero is
-	# a special number for the floor and ceiling, so do not change value
-	# if set to zero.
-
-	if (abs (floor) > EPSILON)
-	    floor = floor - zero
-	if (abs (ceiling) > EPSILON)
-	    ceiling = ceiling - zero
 
 	# User can specify either the number of contours or the contour
 	# interval, or let conrec pick a nice number.  Get params and
@@ -128,6 +118,21 @@ begin
 	ny = 0
 	subras = plt_getdata (im, sub, pre, xres, yres, nx, ny)
 	call imunmap (im)
+
+	call alimr (Memr[subras], nx*ny, dmin, dmax)
+	if (fp_equalr (dmin, dmax))
+	    call error (1, "constant valued array, no plot drawn")
+
+	if (fp_equalr (floor, INDEF))
+	    floor = dmin
+	if (fp_equalr (ceiling, INDEF))
+	    ceiling = dmax
+
+	# The floor and ceiling are in absolute units, but the zero shift is
+	# applied first, so correct the numbers for the zero shift. 
+
+	floor = floor - zero
+	ceiling = ceiling - zero
 
 	# Apply the zero point shift.
 	if (abs (zero) > EPSILON)
@@ -223,6 +228,8 @@ begin
 	}
 
 	call gswind (gp, xs, xe, ys, ye)
+	call gamove (gp, xe, ye)
+
 	call gdawk (wkid)
 	call gclwk (wkid)
 	call gclks ()

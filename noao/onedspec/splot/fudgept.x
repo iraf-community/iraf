@@ -1,42 +1,38 @@
 # FUDGEPT -- Fudge a point
 
-procedure fudgept (gfd, pix, npts, x1, x2, dx, wx, wy)
+procedure fudgept (sh, gfd, x, y, n, wx, wy)
 
+pointer	sh
 int	gfd
-real	pix[ARB]
-real	x1, x2, dx, wx, wy
-int	npts
+real	x[n]
+real	y[n]
+int	n
+real	wx, wy
 
 int	i1, nplot, istart
-real	w1, w2
+double	shdr_wl()
 
 begin
 	# Get pixel number
-	call pixind (x1, x2, dx, wx, i1)
+	i1 = max (1, min (n, nint (shdr_wl (sh, double(wx)))))
 
 	# Replace with Y-value
-	if (i1 > 0 && i1 <= npts)
-	     pix[i1] = wy
+	if (i1 > 0 && i1 <= n)
+	     y[i1] = wy
 	else
 	    return
 
 	# Plot region around new point
-	if (i1 > 1 && i1 < npts) {
-	    w1 = x1 + (i1 - 2) * dx
-	    w2 = x1 + (i1    ) * dx
+	if (i1 > 1 && i1 < n) {
 	    nplot = 3
 	    istart = i1 - 1
 	} else if (i1 == 1) {
-	    w1 = x1
-	    w2 = x1 + dx
 	    nplot = 2
 	    istart = i1
-	} else if (i1 == npts) {
-	    w1 = x1 + (i1   - 1) * dx
-	    w2 = x1 + (npts - 1) * dx
+	} else if (i1 == n) {
 	    nplot = 2
-	    istart = npts - 1
+	    istart = n - 1
 	}
 
-	call gvline (gfd, pix[istart], nplot, w1, w2)
+	call gpline (gfd, x[istart], y[istart], nplot)
 end

@@ -1,4 +1,4 @@
-.help pvector Mar90 plot
+.help pvector Oct91 plot
 .ih
 NAME
 pvector -- plot an arbitrary vector in a 2D image
@@ -25,7 +25,10 @@ Number of pixels perpendicular to the vector to average.
 .le
 .ls theta = INDEF
 The postion angle of the vector to be plotted measured counter-clockwise
-from the positive x axis. Theta must be between 0.0 and 360.0 degrees
+from the positive x axis. Theta must be between 0.0 and 360.0 degrees.
+If theta is specified, the \fIxc\fR, and \fIyc\fR parameters
+must be specified instead of the starting and ending coordinates
+as in examples 3 and 4.
 .le
 .ls length = INDEF
 The length of the vector to be plotted if \fItheta\fR is defined. The
@@ -118,7 +121,10 @@ Optionally, the computed vector may be output to a named image or text file
 (as specified by the \fIvec_output\fR and \fIout_type\fR parameters).
 
 The vector is extracted as a straight line between the given
-coordinates.  It is possible to specify an averaging width
+coordinates, sampled at a spacing along that line equivalent to that
+between adjacent pixels in the x or y direction (e.g. the length of a
+diagonal endpoint vector from a square image is n*sqrt(2)).
+It is possible to specify an averaging width
 which determines how many pixels perpendicular to the vector are averaged.
 This averaging window is centered
 on the vector pixel.  When this window is greater than one pixel, it
@@ -157,11 +163,16 @@ EXAMPLES
 3. Plot a vector in same image with center position 256, 256, and a position
 angle of 45 degrees which extends from one edge of the frame to the other.
 
-    cl> pvector crab.5009 256. 256. theta=45.
+    cl> pvector crab.5009 0. 0. 0. 0. 256. 256. theta=45.
+			or
+    cl> pvector crab.5009 xc=256. xc=256. theta=45.
+
 
 4. Plot the above vector with a length of 100 pixels.
 
-    cl> pvector crab.5009 256. 256. theta=45. length=100.
+    cl> pvector crab.5009 0. 0. 0. 0. 256. 256. theta=45. length=100.
+			or
+    cl> pvector crab.5009 xc=256. xc=256. theta=45. length=100.
 .ih
 TIME REQUIREMENTS
 It takes approximately 6.7 cpu seconds to compute and plot the twenty

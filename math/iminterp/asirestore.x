@@ -24,10 +24,11 @@ begin
 
 	call malloc (asi, LEN_ASISTRUCT, TY_STRUCT)
 	ASI_TYPE(asi) = interp_type
-	ASI_NCOEFF(asi) = int (ASI_SAVENCOEFF(interpolant))
-	ASI_OFFSET(asi) = int (ASI_SAVEOFFSET(interpolant))
+	ASI_NCOEFF(asi) = nint (ASI_SAVENCOEFF(interpolant))
+	ASI_OFFSET(asi) = nint (ASI_SAVEOFFSET(interpolant))
 
-	# allocate space for and restore coefficients
+	# Allocate space for and restore coefficients.
+
 	call malloc (ASI_COEFF(asi), ASI_NCOEFF(asi), TY_REAL)
 	cptr = ASI_COEFF(asi) - 1
 	do i = 1, ASI_NCOEFF(asi)

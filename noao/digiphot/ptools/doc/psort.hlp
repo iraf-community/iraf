@@ -1,0 +1,64 @@
+.help psort Aug91 noao.digiphot.ptools
+.ih
+NAME
+psort -- sort an APPHOT/DAOPHOT database file
+.ih
+USAGE
+psort infiles field
+.ih
+PARAMETERS
+.ls infiles
+The input APPHOT/DAOPHOT databases to be sorted. The sort is performed in place.
+.le
+.ls field
+The field to be sorted on. If the input file is a text database,
+\fIfield\fR may be any quantity defined by
+the APPHOT/DAOPHOT #K and #N keywords. If the input file is an STSDAS
+table database \fIfield\fR may be any column name. \fIField\fR may be
+of type integer or real, in which case a numeric sort is performed,
+boolean, in which case the boolean constant "no" is assumed to have a
+smaller value than "yes", or character in which case an alphabetic sort
+is performed.
+.le
+.ls ascend = yes
+Sort in increasing value order.
+.le
+.ih
+DESCRIPTION
+PSORT is a simple task which accepts an APPHOT/DAOPHOT database file
+and sorts it in place based on the value of the selected quantity
+\fIfield\fR. By default the sort is in increasing order of the value
+of field, but a reverse sort can be performed by 
+setting \fIascend\fR = no.
+
+If \fIfield\fR is a real or integer the sort is numeric, if boolean
+the constant "no" is assumed to have a smaller value than "yes", if
+character the sort is alphabetic.
+
+PSORT is a simple CL script which call TXSORT if the input database is
+a text file and TSORT if the input database is a text file.
+.ih
+EXAMPLES
+
+1.  Sort the output of the APPHOT task PHOT in increasing order of
+the y coordinate.
+
+.nf
+    pt> psort m92.mag.1 YCENTER
+.fi
+
+2. Sort the output of the DAOPHOT task ALLSTAR in increasing order of
+magnitude.
+
+.nf
+    pt> psort m92.al.1 MAG
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.txsort,tables.tsort,ptools.tbsort
+.endhelp

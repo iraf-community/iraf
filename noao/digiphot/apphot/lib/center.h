@@ -7,39 +7,39 @@ define	AP_GAUSS1D	2	# 1D Gaussian
 define	AP_NONE		3	# No centering
 define	AP_OFILT1D	4	# 1-D optimal filtering
 
-# centering errors (# 21 - 40)
+# centering errors (# 101 - 200)
 
 define	AP_OK			0	# No error
-define	AP_CTR_NOAREA		21	# No pixels for centering
-define	AP_CTR_OUTOFBOUNDS	22	# Centering aperture extends oob
-define	AP_CTR_LOWSNRATIO	23	# S/N ratio too low for centering
-define	AP_CTR_NTOO_SMALL	24	# Too few histogram bins
-define	AP_CTR_SINGULAR		25	# Fit is singular
-define	AP_CTR_NOCONVERGE	26	# Solution does not converge
-define	AP_CTR_BADSHIFT		27	# Max shift parameter exceeded
-define	AP_CTR_BADDATA		28	# Bad data in centering subraster
+define	AP_CTR_NOAREA		101	# No pixels for centering
+define	AP_CTR_OUTOFBOUNDS	102	# Centering aperture extends oob
+define	AP_CTR_LOWSNRATIO	103	# S/N ratio too low for centering
+define	AP_CTR_NTOO_SMALL	104	# Too few histogram bins
+define	AP_CTR_SINGULAR		105	# Fit is singular
+define	AP_CTR_NOCONVERGE	106	# Solution does not converge
+define	AP_CTR_BADSHIFT		107	# Max shift parameter exceeded
+define	AP_CTR_BADDATA		108	# Bad data in centering subraster
 
-# centering parameters (# 41 - 60)
+# centering parameters (# 101 - 200)
 
-define	CAPERT		41
-define	CENTERFUNCTION	42
-define	MINSNRATIO	43
-define	MAXSHIFT	44
-define	CLEAN		45
-define	RCLEAN		46
-define	RCLIP		47
-define	SIGMACLEAN	48
-define	XCENTER		49
-define	YCENTER		50
-define	XERR		51
-define	YERR		52
-define	CMAXITER	53
-define	CXCUR		54
-define	CYCUR		55
-define	XSHIFT		56
-define	YSHIFT		57
-define	CSTRING		59
-define	CDATALIMIT	60
+define	CAPERT		101
+define	CENTERFUNCTION	102
+define	MINSNRATIO	103
+define	MAXSHIFT	104
+define	CLEAN		105
+define	RCLEAN		106
+define	RCLIP		107
+define	SIGMACLEAN	108
+define	XCENTER		109
+define	YCENTER		110
+define	XERR		111
+define	YERR		112
+define	CMAXITER	113
+define	CXCUR		114
+define	CYCUR		115
+define	XSHIFT		116
+define	YSHIFT		117
+define	CSTRING		118
+define	CDATALIMIT	119
 
 # center keywords
 

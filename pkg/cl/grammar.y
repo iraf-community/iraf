@@ -76,6 +76,7 @@ static	int tbrace = 0;		/* fake braces for declarations		*/
 static	int dobrace = 0;	/* handling braces.			*/
 static	int sawnl = 0;		/* set when EOST was \n, else 0		*/
 static	int printstmt = 0;	/* set when parsing FPRINT statement	*/
+static	int scanstmt = 0;	/* set when parsing SCAN statement	*/
 
 /* printf-format error messages.
  */
@@ -106,7 +107,7 @@ struct	label *getlabel(), *setlabel();
 
 %}
 
-%token	Y_SCAN Y_FSCAN Y_OSESC 
+%token	Y_SCAN Y_SCANF Y_FSCAN Y_FSCANF Y_OSESC 
 %token	Y_APPEND Y_ALLAPPEND Y_ALLREDIR Y_GSREDIR Y_ALLPIPE
 %token	D_D D_PEEK
 %token	Y_NEWLINE Y_CONSTANT Y_IDENT
@@ -815,30 +816,42 @@ expr1	:	LP expr RP
 		}
 
 	|	Y_SCAN LP {
-		    /* someday scan will be in with intrins.
-		     * it at least has the same syntax...
-		     */
+		    /* Free format scan. */
 		    if (!errcnt)
 			push (0);	/* use control stack to count args */
 		} scanarg RP {
-		    struct	operand o;
 		    if (!errcnt) {
+			struct	operand o;
 			o.o_type = OT_INT;
 		        o.o_val.v_i = pop();	/* get total number of args*/
 			compile (PUSHCONST, &o);
 			compile (SCAN);
 		    }
 		}
+	|	Y_SCANF LP {
+		    /* Formatted scan. */
+		    if (!errcnt)
+			push (0);	/* use control stack to count args */
+		} scanfmt DELIM scanarg RP {
+		    if (!errcnt) {
+			struct	operand o;
+
+			/* Compile number of arguments. */
+			o.o_type = OT_INT;
+		        o.o_val.v_i = pop();
+			compile (PUSHCONST, &o);
+
+			compile (SCANF);
+		    }
+		}
 
 	|	Y_FSCAN LP {
-		    /* someday fscan will be in with intrins.
-		     * it at least has the same syntax...
-		     */
+		    /* Free format scan from a parameter.  */
 		    if (!errcnt)
 			push (0);	/* use control stack to count args */
 		} scanarg RP {
-		    struct	operand o;
 		    if (!errcnt) {
+			struct	operand o;
 			o.o_type = OT_INT;
 			o.o_val.v_i = pop();	/* get total number of args*/
 			compile (PUSHCONST, &o);
@@ -846,12 +859,33 @@ expr1	:	LP expr RP
 		    }
 		}
 
+	|	Y_FSCANF LP Y_IDENT DELIM {
+		    /* Formatted scan from a parameter.
+		     * fscanf (param, format, arg1, ...)
+		     */
+		    if (!errcnt) {
+			compile (PUSHCONST, stkop ($3));
+		        push (1);	/* use control stack to count args */
+		    }
+		} scanfmt DELIM scanarg RP {
+		    if (!errcnt) {
+			struct	operand o;
+
+			/* Compile number of arguments. */
+			o.o_type = OT_INT;
+			o.o_val.v_i = pop();
+			compile (PUSHCONST, &o);
+
+			compile (FSCANF);
+		    }
+		}
+
 	|	intrinsx LP {
 		    if (!errcnt)
 			push (0);	/* use control stack to count args */
 		} intrarg RP {
-		    struct	operand o;
 		    if (!errcnt) {
+			struct	operand o;
 			o.o_type = OT_INT;
 			o.o_val.v_i = pop();
 			compile (PUSHCONST, &o);
@@ -878,6 +912,13 @@ intrinsx:	intrins
 		}
 	;
 
+scanfmt	:	expr {
+		    if (!errcnt) {
+		        push (pop() + 1);		/* inc num args	*/
+		    }
+		}
+	;
+
 scanarg	:	/* empty.  This is bad for scan but we don't want to
 		 * generate a cryptic syntax error.  See also intrarg.
 		 * This rule reduces the strings from right to left.
@@ -885,16 +926,16 @@ scanarg	:	/* empty.  This is bad for scan but we don't want to
 		 * after comma delimiters, so we don't need an opnl here.
 		 */
 	|	Y_IDENT {
-		    if (!errcnt) {
-			compile (PUSHCONST, stkop ($1));
-		        push (pop() + 1);		/* inc num args	*/
-		    }
+                    if (!errcnt) {
+                        compile (PUSHCONST, stkop ($1));
+                        push (pop() + 1);               /* inc num args */
+                    }
 		}
 	|	Y_IDENT DELIM scanarg {
-		    if (!errcnt) {
-			compile (PUSHCONST, stkop ($1));
-		        push (pop() + 1);		/* inc num args	*/
-		    }
+                    if (!errcnt) {
+                        compile (PUSHCONST, stkop ($1));
+                        push (pop() + 1);               /* inc num args */
+                    }
 		}
 	;
 
@@ -1076,6 +1117,12 @@ command	:	tasknam {
 		     */
 		    printstmt = (strcmp (ltname, "fprint") == 0);
 
+		    /* Ditto with SCAN; all the arguments are call by
+		     * reference and must be compiled as string constants.
+		     */
+		    scanstmt = (strcmp (ltname, "scan") == 0 ||
+				strcmp (ltname, "scanf") == 0);
+
 		    absmode = 0;
 		    posit = 0;
 		    newstdout = 0;
@@ -1085,6 +1132,7 @@ command	:	tasknam {
 		} args EARG {
 		    inarglist = 0;
 		    parenlevel = 0;
+		    scanstmt = 0;
 		}
 	;
 
@@ -1096,6 +1144,7 @@ args	:	DELIM {
 			compile (POSARGSET, -1);
 			posit++;
 			printstmt = 0;
+			scanstmt = 0;
 		    }
 		} arglist	
 	|	arglist
@@ -1111,6 +1160,7 @@ arg	:	/* nothing - compile a null posargset to bump nargs */
 			if (posit > 0) {		/* not first time */
 			    compile (POSARGSET, -posit);
 			    printstmt = 0;
+			    scanstmt = 0;
 			}
 			posit++;
 		    }
@@ -1128,12 +1178,41 @@ arg	:	/* nothing - compile a null posargset to bump nargs */
 			eprintf (posfirst);
 			EYYERROR;
 		    } else if (!errcnt) {
-			if (parenlevel == 0 || printstmt) {
+			if (scanstmt) {
+			    char    pname[SZ_FNAME];
+			    char    *pk, *t, *p, *f;
+			    struct  pfile *pfp;
+			    struct  operand o;
+
+			    /* If no task name specified check the pfile for
+			     * the task containing the scan statement for the
+			     * named parameter.
+			     */
+			    breakout (stkop($1)->o_val.v_s, &pk, &t, &p, &f);
+			    pfp = currentask->t_pfp;
+			    if (*pk == NULL && *t == NULL &&
+				pfp && paramfind(pfp,p,0,1)) {
+
+				sprintf (pname, "%s.%s",
+				    currentask->t_ltp->lt_lname, p);
+				if (*f) {
+				    strcat (pname, ".");
+				    strcat (pname, f);
+				}
+			    } else
+				strcpy (pname, stkop($1)->o_val.v_s);
+
+			    o = *(stkop($1));
+			    o.o_val.v_s = pname;
+			    compile (PUSHCONST, &o);
+			    compile (INDIRPOSSET, posit++);
+
+			} else if (parenlevel == 0 || printstmt) {
 			    compile (PUSHCONST, stkop($1));
 			    compile (INDIRPOSSET, posit++);
-			    /* only first arg of fprint stmt is special.
-			     */
+			    /* only first arg of fprint stmt is special. */
 			    printstmt = 0;
+
 			} else {
 			    compile (PUSHPARAM, stkop($1)->o_val.v_s);
 			    compile (POSARGSET, posit++);

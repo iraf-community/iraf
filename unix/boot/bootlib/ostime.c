@@ -2,11 +2,15 @@
  */
 
 #include <sys/types.h>
+#ifdef SYSV
+#include <time.h>
+#else
 #include <sys/time.h>
-#include <sys/times.h>
 #include <sys/timeb.h>
+#endif
 
 #define	SECONDS_1970_TO_1980	315532800L
+static	long os_timezone();
 
 
 /* OS_UTIME -- Convert IRAF time (local standard, epoch 1980) to UNIX time
@@ -21,7 +25,6 @@ long
 os_utime (iraf_time)
 long	iraf_time;
 {
-	struct	timeb time_info;
 	struct	tm *localtime();
 	time_t	time_var, lst;
 	long	lstl;
@@ -29,8 +32,7 @@ long	iraf_time;
 	lst = (time_t)iraf_time;
 	
 	/* Add minutes westward from GMT */
-	ftime (&time_info);
-	time_var = lst + time_info.timezone * 60L;
+	time_var = lst + os_timezone();
 
 	/* Correct for daylight savings time, if in effect */
 	lstl = (long)lst;
@@ -48,7 +50,6 @@ long
 os_itime (unix_time)
 long	unix_time;
 {
-	struct	timeb time_info;
 	struct	tm *localtime();
 	time_t	time_var, gmt;
 	long	gmtl;
@@ -56,8 +57,7 @@ long	unix_time;
 	gmt = (time_t)unix_time;
 	
 	/* Subtract minutes westward from GMT */
-	ftime (&time_info);
-	time_var = gmt - time_info.timezone * 60L;
+	time_var = gmt - os_timezone();
 
 	/* Correct for daylight savings time, if in effect */
 	gmtl = (long)gmt;
@@ -65,4 +65,21 @@ long	unix_time;
 	    time_var -= 60L * 60L;
 
 	return ((long)time_var - SECONDS_1970_TO_1980);
+}
+
+
+/* OS_GTIMEZONE -- Get the local timezone, measured in seconds westward
+ * from Greenwich, ignoring daylight savings time if in effect.
+ */
+static long
+os_timezone()
+{
+#ifdef SYSV
+	extern	long timezone;
+	return (timezone);
+#else
+	struct	timeb time_info;
+	ftime (&time_info);
+	return (time_info.timezone * 60);
+#endif
 }

@@ -4,13 +4,14 @@ include	<pkg/gtools.h>
 
 # ECF_GRAPH -- Graph the fitted data.
 
-procedure ecf_graph (gp, gt, x, y, w, npts)
+procedure ecf_graph (gp, gt, x, y, w, rej, npts)
 
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
 real	x[npts]			# X data
 real	y[npts]			# Y data
-real	w[npts]			# Weights
+double	w[npts]			# Weights
+double	rej[npts]		# Rejected points
 int	npts			# Number of pts points
 
 int	i
@@ -36,9 +37,14 @@ begin
 	call gt_labax (gp, gt)
 
 	do i = 1, npts {
-	    if (w[i] == 0.)
-		call gmark (gp, x[i], y[i], GM_CROSS, xsize, ysize)
-	    else
+	    if (rej[i] == 0.) {
+		if (y[i] >= ymin && y[i] <= ymax) {
+		    if (w[i] == 0.)
+		        call gmark (gp, x[i], y[i], GM_CROSS, xsize, ysize)
+		    else
+		        call gmark (gp, x[i], y[i], GM_DIAMOND, xsize, ysize)
+		}
+	    } else
 		call gmark (gp, x[i], y[i], GM_PLUS, xsize, ysize)
 	}
 end

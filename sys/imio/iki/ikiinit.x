@@ -29,15 +29,19 @@ begin
 
 	# Load the old IRAF format (OIF) kernel.
 	call iki_lddriver (oif_open, oif_close, oif_opix, oif_updhdr,
-	    oif_access, oif_copy, oif_delete, oif_rename)
+	    oif_access, oif_copy, oif_delete, oif_rename, 0)
 
 	# Load the SDAS GEIS format (STF) kernel.
 	call iki_lddriver (stf_open, stf_close, stf_opix, stf_updhdr,
-	    stf_access, stf_copy, stf_delete, stf_rname)
+	    stf_access, stf_copy, stf_delete, stf_rname, 0)
 
 	# Load the QPOE photon image kernel (QPF).
 	call iki_lddriver (qpf_open, qpf_close, qpf_opix, qpf_updhdr,
-	    qpf_access, qpf_copy, qpf_delete, qpf_rename)
+	    qpf_access, qpf_copy, qpf_delete, qpf_rename, IKF_NOCREATE)
+
+	# Load the PLIO mask image mini-kernel (PLF - not a full kernel).
+	call iki_lddriver (plf_open, plf_close, plf_null, plf_updhdr,
+	    plf_access, plf_copy, plf_delete, plf_rename, 0)
 
 	# Load the PLIO mask image mini-kernel (PLF - not a full kernel).
 	call iki_lddriver (plf_open, plf_close, plf_null, plf_updhdr,

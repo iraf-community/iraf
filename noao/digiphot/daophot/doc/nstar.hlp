@@ -1,0 +1,242 @@
+.help nstar Aug91 noao.digiphot.daophot
+.ih
+NAME
+nstar -- fit the PSF to groups of stars simultaneously
+.ih
+USAGE
+nstar image groupfile psfimage nstarfile
+.ih
+PARAMETERS
+.ls image
+The list of images containing the stellar groups to be fit.
+.le
+.ls groupfile
+The list of input files, or directory, containing the group membership
+information and initial estimates for the positions
+and magnitudes of the stars to be measured.
+If groupfile is "default", "dir$default", or a directory specification
+then NSTAR will look for a file with the name image.grp.?
+where ? is the highest existing version number. 
+Otherise \fIgroupfile\fR must specify one photometry file for each input
+image in \fIimage\fR.
+\fIGroupfile\fR is usually
+the output of the DAOPHOT GROUP task, but may also be the output of the
+NSTAR and PSF tasks. \fIGroupfile\fR may be an APPHOT/DAOPHOT text database
+or an STSDAS table.
+.le
+.ls psfimage
+The list of images, or directory, containing the PSF computed by
+the DAOPHOT PSF task.
+If psfimage is "default", "dir$default", or a directory specification,
+then NSTAR will look for an image with the name image.psf.? where
+? is the highest existing version number.
+Otherwise \fIpsfimage\fR must specify one PSF image for each input image.
+.le
+.ls nstarfile
+The list of output photometry files.
+If nstarfile is "default", "dir$default", or a directory specification,
+then NSTAR will write an output file with the name image.nst.?
+where ? is the next available version number.
+Otherwise \fInstarfile\fR must specify one output file for each image in
+\fIimage\fR.
+\fINstarfile\fR is text database if the DAOPHOT package parameter \fItext\fR
+is "yes", an STSDAS table database if it is "no".
+.le
+.ls datapars = ""
+The name of the file containing the DAOPHOT data dependent parameters.
+If \fIdatapars\fR is null ("") then the default parameter set in the user's
+uparm directory is used.
+.le
+.ls daopars = ""
+The name of the file containing the DAPHOT fitting parameters.
+If \fIdaopars\fR is null ("") then the default parameter set in the user's
+uparm directory is used.
+.le
+.ls verbose = no
+Print messages about the progress of the task?
+.le
+.ls verify = yes
+Verify critical NSTAR task parameters?
+.le
+.ls update = no
+Update critical NSTAR task parameters if \fIverify\fR is "yes"?
+.le
+.ih
+DESCRIPTION
+NSTAR computes x and y centers and magnitudes for all the stellar groups
+\fIgroupfile\fR, by fitting the PSF \fIpsfimage\fR
+to the data in \fIimage\fR. NSTAR reads the group membership information
+along with
+initial estimates of the centers and magnitudes,
+and the sky values from the photometry file \fIgroupfile\fR.
+\fIGroupfile\fR is usually the output of the DAOPHOT GROUP task but
+may also be the output of the PSF and NSTAR tasks.
+The computed centers and magnitudes are written to \fInstarfile\fR
+along with the sky values, the number of iterations it took to fit the
+star, the goodness of fit statistic chi and the image sharpness statistic
+sharp.
+\fINstarfile\fR is text database if the DAOPHOT package parameter \fItext\fR
+is "yes", an STSDAS table database if it is "no".
+
+Only pixels within the good data range delimited by the DATAPARS task
+parameters \fIdatamin\fR and \fIdatamax\fR are included in the fit.
+Most users set \fIdatamin\fR and \fIdatamax\fR so as
+to exclude pixels outside the linearity regime of the detector.
+By default all the data is fit.
+Users are advised to determine accurate values for these parameters
+and set the appropriate parameters in DATAPARS before beginning any DAOPHOT
+reductions.
+
+Only pixels within the fitting radius
+\fIfitrad\fR / \fIscale\fR are included in the fit for each star.
+\fIFitrad\fR is located in the DAOPARS task and \fIscale\fR is located
+in the DATAPARS task.
+Since the non-linear least-squares
+fitting algorithm determines three unknowns, the x and y position of the
+star's centroid
+and its brightness, the value of \fIfitrad\fR must be sufficiently
+large to include at least three pixels in the fit for each star.
+To accelerate the convergence of the non-linear least-squares fitting
+algorithm pixels within \fIfitrad\fR are assigned weights which
+are  inversely proportional to the radial distance of the pixel from the x and
+y centroid of the star, falling from a maximum at the centroid
+to zero at the fitting radius. \fIFitrad\fR must be sufficiently large
+to include at least three pixels with non-zero weights in the fit for each
+star.  Values of \fIfitrad\fR close to the full-width at half-maxima of the
+PSF are recommended. In actual fact NSTAR imposes a minimum number of pixel
+limit of four.
+
+NSTAR performs a weighted fit to the PSF. The weight of each pixel
+is computed by combining the radial weighting function described above
+with weights derived from the random errors NSTAR expects based on the
+values of the DATAPARS parameters \fIreadnoise\fR and \fIepadu\fR
+specified by the user. To obtain optimal fits,
+users are strongly advised to determine those parameters accurately 
+and to enter their values in DATAPARS before beginning any DAOPHOT
+reductions.
+
+For each group of stars to be fit, NSTAR extracts a subraster
+from \fIimage\fR which extends approximately
+\fIpsfrad\fR / \fIscale\fR + 1 pixels wide past the limiting values of the
+x and y coordinates
+of the stars in the group. \fIPsfrad\fR
+is the PSF radius specified in the DAOPARS task, and \fIscale\fR is the
+image scale specified by the DATAPARS task. \fIPsfrad\fR may
+be less than or equal to but can never exceed the value of the image header
+parameter "PSFRAD" in \fIpsfimage\fR.
+\fIPsfrad\fR should always be several pixels larger
+than \fIfitrad\fR to permit the x and y centroids to wander during the
+fitting process.
+
+As well as the computed x and y centers and magnitudes, NSTAR outputs
+the number of times the PSF fit had to be iterated before reaching
+convergence. The
+minimum number of iterations is four. The maximum
+number of iteration permitted is specified by the 
+\fImaxiter\fR parameter in the DAOPARS task.
+Obviously the results for stars which
+have reached the maximum iteration count should be viewed with 
+suspicion. However since the convergenge criteria are quite strict,
+(the computed magnitude must change  by less than .001 magnitudes or
+0.05 sigma whichever is larger, and the x and y centroids must change
+by less than 0.01 pixels from one iteration to the next), even
+these stars may be reasonably well measured. It must be emphasized
+that every star in the group must individually satisfy the convergence
+criteria in order for the group to be considered adequately reduced.
+
+NSTAR computes a goodnes of fit statistic chi which is essentially the
+ratio of the observed pixel-to-pixel scatter in the fitting residuals
+to the expected scatter. Since the expected scatter is dependent
+on the DATAPARS task parameters \fIreadnoise\fR and \fIepadu\fR,
+it is important for these values to be set correctly.
+A plot of chi versus magnitude should scatter around
+unity with little or no trend in chi with magnitude, except at the
+bright end where saturation effects may be present.
+
+Finally NSTAR computes the statistic sharp which estimates the intrinsic
+angular size of the measured object outside the atmosphere.
+Sharp is roughly defined as the difference between the square of the
+width of the object and the square of the width of PSF.
+Sharp has values close to zero for single stars, large positive values
+for blended doubles and partially resolved galaxies and large
+negative values for cosmic rays and blemishes.
+
+NSTAR contains a highly sophisticated star rejection algorithm. First of
+all, any group of stars which is more than a certain size
+is simply not fit. The maximum group size is sepcified by the
+\fImaxgroup\fR parameter in the DAOPARS task. Larger groups may run
+into numerical precision problems during the fits. Users should exercise
+care in experimenting with changing the \fImaxgroup\fR parameter.
+If two stars in a group
+have centroids separated by a crtical distance, currently set arbitrarily
+to 0.37 * the FWHM of the stellar core, their photocentric position
+and combined magnitude is assigned to the brighter of the two stars,  and the
+fainter is eliminated. Any star which converges to 12.5 magnitudes
+greater than the magnitude of the PSF is considered to be non-existent
+and eliminated from the group.
+
+After iterations 4 to 7, if the faintest star in the group has a 
+brightness less than one sigma above zero, it is eliminated.
+After iterations 8 to 11, if the faintest star in the group has a brightness
+less than 1.5 sigma above zero, it is eliminated. After iterations 12 to
+50 or whenever the solutions has converged whichever comes first,
+if the faintest star in the group has a brightness less than 2.0 sigma
+above zero, it is eliminated.
+Before iterations 4 to 7, 8 to 11 and 12 to 50, if two stars are separated
+by more than 0.37 * FWHM and less than 1.0 * FWHM and if the fainter
+of the two is more uncertain than 1.0, 1.5 or 2.0 sigma respectively
+the fainter one is eliminated.
+
+Whenever a star is eliminated the iteration counter is backed up by
+one and reduction proceeds with a smaller set of stars. Backing up
+the counter gives the second least certain star in the group 
+two iterations to settle into a new fit before its fate is decided.
+The star rejection algorithm depends upon the DATAPARS \fIreadnoise\fR
+and \fIgain\fR parameters. Therefore these parameters should be
+set to reasonable values before running NSTAR.
+
+NSTAR operates in a very similar manner to PEAK. However because it
+fits groups of stars simultaneously it is much more
+accurate than PEAK in crowded regions. The ALLSTAR task also
+fits groups of stars simultaneously, both  grouping the stars dynamically
+as well as producing a subtracted image. Essentially it replaces
+GROUP, GRPSELECT, NSTAR and SUBSTAR. However the user has little control
+over the grouping process and does not know at the end which stars were
+actually fit together. NSTAR is the task of choice when a user wants to
+maintain rigorous control over the composition of the stellar groups.
+
+.ih
+EXAMPLES
+
+1. Fit the PSF to a list stars in a crowded field near M92.
+After the fit subtract the fitted stars from the image.
+
+.nf
+    da> nstar m92 m92.grp.1 m92.psf.1 default verb+ veri+
+    da> substar m92 m92.nst.1 m92.psf.1 default veri-
+.fi
+
+2. Run NSTAR exactly as in example 1 but submit the task to the background
+saving all the verbose output in a file called nstar.out.
+
+.nf
+    da> nstar m92 m92.grp.1 m92.psf.1 default verb+ veri- > nstar.out & 
+.fi
+
+3. Run NSTAR exactly as in example 1, remove all the stars with INDEF
+valued magnitudes from the output and rerun NSTAR.
+
+.nf
+    da> nstar m92 m92.grp.1 m92.psf.1 default verb+ veri+
+    da> select m92.nst.1 m92.nst.2 "MAG != INDEF"
+    da> nstar m92 m92.nst.2 m92.psf.1 default verb+ veri+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+datapars,daopars,peak,allstar
+.endhelp

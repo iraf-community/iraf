@@ -2,6 +2,7 @@
 
 # Interpolator Types:
 
+define	IT_FUNCTIONS	"|nearest|linear|poly3|poly5|spline3|"
 define	IT_NEAREST	1
 define	IT_LINEAR	2
 define	IT_POLY3	3

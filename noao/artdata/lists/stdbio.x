@@ -163,8 +163,8 @@ begin
 	        call pargr (ST_MZERO(st))
 	    call dtput (dt, "\talpha\t\t%g\n")
 		call pargr (ST_ALPHA(st))
-	    call dtput (dt, "\tbeta\t\t%g\n")
-		call pargr (ST_BETA(st))
+	    call dtput (dt, "\tmstar\t\t%g\n")
+		call pargr (ST_MSTAR(st))
 	case ST_LFFILE:
 	    call pargstr (ST_LFILE(st))
 	}

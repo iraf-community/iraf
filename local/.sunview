@@ -1,6 +1,0 @@
-clock      -Wp  501   0 -Ws 210  47 -WP    0   1 -Wi -Wb   0   0   0                       -Wf 255 255   0 -r -f -s 
-cmdtool    -Wp  498   1 -Ws 651  64 -WP    0  72 -Wi -Wb 255 255   0                       -Wf   0   0 255 -Wg -Wg -Wn -C 
-perfmeter  -Wp    0 140 -Ws  64  64 -WP  728   1 -Wn -s 1 -v cpu 
-gterm      -Wp   74   0 -Ws 650 536 -WP    0 277 -Wf 0 0 255                               -I "source $home/.login;clear"                                               -G -Wb 0 0 128 -Wf 0 255 255 -Wp  74 543 -Ws 1070 350
-gterm      -Wp   74   0 -Ws 650 536 -WP    0 346 -Wf 255   0   0                           -I "source $home/.login;cl"                                                  -G -Wb 128 0 0 -Wf 0 255 255 -Wp  74 543 -Ws 1070 350
-imtool     -Wp  733   0 -Ws 413 536 -WP    0 208 -Wb 255   0 127                           -Wf 255 255   0 -fb 1 

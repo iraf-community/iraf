@@ -16,7 +16,7 @@ Macros $1-$9 are replaced by the substitution string.  The sequence $$ is
 replaced by a single $.  If any other character follows the $, both the $
 and the following character are passed to the output unchanged.  An error
 action is taken if there are insufficient arguments or if the output buffer
-overflows.  Bugs: null substitution strings are verboten.
+overflows.  Bugs: null substitution strings don't work.
 .endhelp ______________________________________________________________________
 
 int procedure strmac (macro, argstr, outstr, maxch)

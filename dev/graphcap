@@ -31,14 +31,14 @@ sgibi|SGI bitmap (raster) file:\
 # STDPLOT devices.  The following are pointer to host system dependent
 # entries given later.
 
-versatec|ver|vup|	:WS:tc=uver:
-imagen|i240|		:tc=ui240:
+versatec|ver|vup|	:tc=uver:
+#imagen|i240|		:tc=ui240:
 imagend|i300|		:tc=ui300:
 i240s|			:PW#1.2:tc=ui240:
 i300s|			:PW#1.2:tc=ui300:
 qms|			:tc=uqms:
 qmss|			:PW#1.2:tc=uqms:
-apple|apl|lw|lw1|	:tc=uapl1:
+apple|apl|lw1|		:tc=uapl1:
 apples|apls|lws|lw1s|	:PW#1.2:tc=uapl1:
 apple2|apl2|lw2|	:tc=uapl2:
 apple2s|apl2s|lw2s|	:PW#1.2:tc=uapl2:
@@ -48,18 +48,34 @@ apple4|apl4|lw4|	:tc=uapl4:
 apple4s|apl4s|lw4s|	:PW#1.2:tc=uapl4:
 nlw|lw5|		:tc=uapl5:
 nlws|lw5s|		:PW#1.2:tc=uapl5:
+apl6|lw6|		:tc=uapl6:
+apl6s|lw6s|		:PW#1.2:tc=uapl6:
 apl7|lw7|tops|		:tc=uapl7:
 apl7s|lw7s|topss|	:PW=#1.2:tc=uapl7:
+apple8|lw8|             :tc=uapl8:
+apple8s|lw8s|           :PW#1.2:tc=uapl8:
+lw9|                    :tc=uapl9:
+lw9s|                   :PW#1.2:tc=uapl9:
+lw10|                   :tc=uapl10:
+lw10s|                  :PW#1.2:tc=uapl10:
 printronix|ptx|		:tc=uptx:
+epsf|eps|               :tc=uepsf:
+epsfl|epsl|             :tc=uepsfl:
+epshalf|epsh|           :XO#300:YO#1650:tc=uepsf:
 
-lpr|			:tc=g-lpr:
+lpr|lp|lw|		:tc=g-lpr:
 psdump|			:tc=g-psdump:
 calcomp|ccp|		:tc=ccp_calcomp:
-dicomed|d47|		:tc=nspp_dicomed:
 trilog|tri|		:tc=vtri:
 hpplot|			:tc=vhpp:
 hplaser|		:tc=vhpl:
 ln03|			:tc=vln03:
+
+film_recorder|		:tc=solitaire:
+dicomed|d47|		:tc=nspp_dicomed:
+solitaire|solitaire2k|  :tc=nas_solitaire2k:
+solitaire4k|            :tc=nas_solitaire4k:
+solitaire8k|            :tc=nas_solitaire8k:
 
 laserup|		:HN=solpl!:tc=laser:
 laserdown|		:HN=cti!:tc=laser:
@@ -98,6 +114,18 @@ imt11|imt128|:cn#11:xr#128:yr#128:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,128,128:tc=iism70:
 imt12|imt256|:cn#12:xr#256:yr#256:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,256,256:tc=iism70:
+imt13|imttall128|tall and narrow for spectroscopy:cn#13:xr#128:yr#1056:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,128,1056:tc=iism70:
+imt14|imttall256|tall and wider for spectroscopy:cn#14:xr#256:yr#1056:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,256,1056:tc=iism70:
+imt15|imtwide128|wide and thin for spectroscopy:cn#15:xr#1056:yr#128:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1056,128:tc=iism70:
+imt16|imtwide256|wide and fatter for spectroscopy:cn#16:xr#1056:yr#256:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1056,256:tc=iism70:
+imt17|imtssy|:cn#17:xr#1008:yr#648:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1008,648:tc=iism70:
+imt18|imtssn|:cn#18:xr#1024:yr#680:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1024,680:tc=iism70:
 
 # NOAO specific display frame buffer formats.
 imt20|imtgec|GEC CCD detector format:cn#20:xr#388:yr#576:\
@@ -114,10 +142,26 @@ imt25|imt2df9|imt2df9x1|2D-Frutti detector format:cn#25:xr#960:yr#1520:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,960,1520:tc=iism70:
 imt26|imtcryo|Cryogenic camera:cn#26:xr#512:yr#800:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,512,800:tc=iism70:
-imt27|imtgcam|Gold camera:cn#27:xr#348:yr#800:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,348,800:tc=iism70:
+imt27|imtgcam|Gold camera - Ford:cn#27:xr#3104:yr#348:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,3104,348:tc=iism70:
 imt28|imt2df9x3|2D-Frutti detector format:cn#28:xr#976:yr#3040:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,976,3040:tc=iism70:
+imt29|imtgw|GONG Cache Monitor:cn#29:xr#800:yr#256:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,800,256:tc=iism70:
+imt30|imtgl|imtgong|GONG Cache Monitor:cn#30:xr#256:yr#800:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,256,800:tc=iism70:
+imt31|imtret|Reticon detector format:cn#31:xr#1240:yr#400:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1240,400:tc=iism70:
+imt32|imtti|imtti2|imtti3|imtti4|imtti5|KPNO TI 800x800:cn#32:xr#832:yr#800:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,832,800:tc=iism70:
+imt33|imtt5ha|KPNO Tek 512x512:cn#33:xr#544:yr#512:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,544,512:tc=iism70:
+imt34|imtt1ka|KPNO Tek 1K:cn#34:xr#1056:yr#1024:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,1056,1024:tc=iism70:
+imt35|imts2ka|imtt2ka|imtt2kb|KPNO Tek or STIS 2K:cn#35:xr#2080:yr#2048:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,2080,2048:tc=iism70:
+imt36|imtf3ka|imtfo3k|KPNO Ford 3072x1024:cn#36:xr#3104:yr#1024:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,3104,1024:tc=iism70:
 
 iism70d|iism70c|iism70l|NOAO Draco hosted IIS model 70:\
 	:BS:DD=draco!iism70,iia0:tc=iism70:
@@ -133,14 +177,30 @@ iism70|IIS model 70 image display:\
 
 # IMD kernel (IMDKERN).  Plots into graphics overlay of image display.
 
-imdw|	:CI#203:tc=imd:
-imdr|	:CI#204:tc=imd:
-imdg|	:CI#205:tc=imd:
-imdb|	:CI#206:tc=imd:
-imdy|	:CI#207:tc=imd:
+imdblack|imdbla|imdB|imdbl|:CI#202:tc=imd:
+imdwhite|imdwhi|imdW|imdw| :CI#203:tc=imd:
+
+imdred|imdr| 	           :CI#204:tc=imd:
+imdgreen|imdgre|imdg|      :CI#205:tc=imd:
+imdblue|imdblu|imdb|	   :CI#206:tc=imd:
+imdyellow|imdyel|imdy|     :CI#207:tc=imd:
+imdcyan|imdcya|imdc|       :CI#208:tc=imd:
+imdmagenta|imdmag|imdm|	   :CI#209:tc=imd:
+
+imdcoral|imdcor|	   :CI#210:tc=imd:
+imdmaroon|imdmar|	   :CI#211:tc=imd:
+imdorange|imdora|	   :CI#212:tc=imd:
+imdkhaki|imdkha|	   :CI#213:tc=imd:
+imdorchid|imdorc|	   :CI#214:tc=imd:
+imdturquoise|imdtur|	   :CI#215:tc=imd:
+imdviolet|imdvio|	   :CI#216:tc=imd:
+imdwheat|imdwhe|	   :CI#217:tc=imd:
+
+imddicomed|imddic|imdd|    :CI#202:LO#1:LS#2:tc=imd:
+
 imd|imdkern|Image device kernel:\
 	:kf=bin$x_imdkern.e:tn=imdkern:cw#.0125:ch#.0294:\
-	:ar#1.0:xs#0.263:ys#0.202:xr#2048:yr#2048:ip#4:gp#4:ca:in:nc#1:\
+	:ar#1.0:xs#0.263:ys#0.263:xr#2048:yr#2048:ip#4:gp#4:ca:in:nc#1:\
 	:z0#1:zr#200:LC:LO#1:LS#1:CI#205:FN#0:
 
 # SGI kernel (STDPLOT).
@@ -178,13 +238,42 @@ uapl5|UNIX generic interface to 300dpi Apple Laserwriter NT on Orion:\
 	:xs#0.269:ys#0.210:ar#0.781:\
 	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
 	-h$(YW) -p$(PW) | lpr -Plw5; rm $F; }&:tc=sgi_apl:
+uapl6|UNIX generic interface to 300dpi Apple Laserwriter NT on Argo, Rm 210:\
+	:xs#0.269:ys#0.210:ar#0.781:\
+	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+	-h$(YW) -p$(PW) | lpr -Plw6; rm $F; }&:tc=sgi_apl:
 uapl7|UNIX generic interface to 300dpi Apple Laserwriter in Solar office:\
-	:xs#0.0.267:ys#0.201:ar#0.753:\
+	:xs#0.267:ys#0.201:ar#0.753:\
 	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
 	-h$(YW) -p$(PW) | lpr -Plw7; rm $F; }&:tc=sgi_apl:
+uapl8|UNIX generic interface to 300dpi Apple Laserwriter on Argo:\
+	:xs#0.267:ys#0.201:ar#0.753:\
+	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+	-h$(YW) -p$(PW) | lpr -Plw8; rm $F; }&:tc=sgi_apl:
+uapl9|UNIX generic interface to 300dpi QMS LaserPrinter on Solitaire:\
+        :xs#0.267:ys#0.201:ar#0.753:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw9; rm $F; }&:tc=sgi_apl:
+uapl10|UNIX generic interface to 300dpi SPARCPrinter on Solitaire:\
+        :xs#0.267:ys#0.201:ar#0.753:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw10; rm $F; }&:tc=sgi_apl:
 uptx|UNIX generic printronix interface for UNIX/IRAF:\
 	:DD=uptx,tmp$sgk,!{ sgidispatch sgi2uptx $(PX) $(PY) $F.[1-8] | \
 	lpr -Plp -J IRAF; rm $F.[1-8]; }&:NF:tc=sgi_printronix:
+uhplj|UNIX generic interface to Hewlett-Packard LaserJet IIIsi:\
+        :BF:WS:XO#0:YO#0:LO#2:LS#2:\
+        :DD=uhplj,tmp$sgk,!{ sgidispatch sgi2uhplj $F \
+        -l$(XO) -b$(YO) -w$(PX) -h$(PY) $F | lpr ; rm $F; }&:\
+        :tc=sgi_hplaserjet3:
+uepsf|ueps|Encapsulated Postscript file (portrait) UNIX:\
+        :XO#300:XW#1950:YO#1000:YW#1300:PW#1.2:\
+        :DD=eps,tmp$sgk,!{ sgidispatch sgi2ueps $F -l$(XO) \
+        -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgi$$.eps; rm $F; }&:tc=sgi_apl:
+uepsfl|uepsl|Encapsulated Postscript file (landscape) UNIX:\
+        :XO#300:XW#1950:YO#300:YW#2700:RO:YF:\
+        :RO:YF:DD=eps,tmp$sgk,!{ sgidispatch sgi2ueps $F -l$(XO) \
+        -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgi$$.eps; rm $F; }&:tc=sgi_apl:
 
 # The following 2 entries submitted by Joe Harrington, MIT Planetary
 # Science Group <jh@athena.mit.edu>.  The first entry writes a PostScript
@@ -216,26 +305,52 @@ vqms|VMS generic interface to 300dpi QMS (Talaris) LaserWriter:\
 	\051 irafhlib\072sgiqueue.com:tc=sgi_qms:
 vapl|VMS generic interface to 300dpi Apple Laserwriter (Postscript):\
 	:DD=vapl,tmp$sgk,submit/que=fast/noprint/nolog \
-	/para=\050"vapl","$F","$(XO) $(XW) $(YO) $(YW) $(PW) none" \
+	/para=\050"vapl","$F","$(XO) $(XW) $(YO) $(YW) $(PW) 7 1 none" \
 	\051 irafhlib\072sgiqueue.com:tc=sgi_apl:
 vapl1|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+	:xs#0.265:ys#0.202:ar#0.760:\
 	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
 	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw; rm $F; }&:tc=sgi_apl:
 vapl2|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+	:xs#0.266:ys#0.201:ar#0.756:\
 	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
 	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw2; rm $F; }&:tc=sgi_apl:
 vapl3|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+	:xs#0.266:ys#0.201:ar#0.756:\
 	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
 	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw3; rm $F; }&:tc=sgi_apl:
 vapl4|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+	:xs#0.266:ys#0.202:ar#0.759:\
 	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
 	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw4; rm $F; }&:tc=sgi_apl:
 vapl5|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+	:xs#0.269:ys#0.210:ar#0.781:\
 	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
 	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw5; rm $F; }&:tc=sgi_apl:
 vapl7|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+	:xs#0.267:ys#0.201:ar#0.753:\
 	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
 	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw7; rm $F; }&:tc=sgi_apl:
+vapl8|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+	:xs#0.267:ys#0.201:ar#0.753:\
+	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
+	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw8; rm $F; }&:tc=sgi_apl:
+vapl9|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+        :DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
+        -b$(YO) -h$(YW) -p$(PW) | lpr  -Plw9; rm $F; }&:tc=sgi_apl:
+vapl10|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
+        :DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
+        -b$(YO) -h$(YW) -p$(PW) | lpr  -Plw10; rm $F; }&:tc=sgi_apl:
+vepsf|veps|Encapsulated Postscript file (portrait) VMS:\
+        :XO#300:XW#1950:YO#1000:YW#1300:PW#1.2:\
+        :DD=eps,tmp$sgk,submit/que=fast/noprint/nolog \
+        /para=\050"eps","$F","$(XO) $(XW) $(YO) $(YW) $(PW)" \
+        \051 irafhlib\072sgiqueue.com:tc=sgi_apl:
+vepsfl|vepsl|Encapsulated Postscript file (landscape) VMS:\
+        :XO#300:XW#1950:YO#300:YW#2700:RO:YF:\
+        :RO:YF:DD=eps,tmp$sgk,submit/que=fast/noprint/nolog \
+        /para=\050"eps","$F","$(XO) $(XW) $(YO) $(YW) $(PW)" \
+        \051 irafhlib\072sgiqueue.com:tc=sgi_apl:
 vccp|VMS generic interface to the calcomp:\
 	:DD=vccp,tmp$sgk,submit/que=fast/noprint/nolog/para=\050"vccp",\
 	"$F"\051 irafhlib\072sgiqueue.com:tc=sgi_calcomp:
@@ -257,7 +372,7 @@ vhpp|VMS generic interface to the HP 7550A pen plotter:\
 	irafhlib\072sgiqueue.com:tc=sgi_hp7550a:
 vhpl|VMS generic interface to the HP LaserJet laser printer:\
 	:DD=vhpl,tmp$sgk,submit/que=fast/noprint/nolog/para=\
-	\050"vhpl","$F","$(PX)","$(PY)","none"\051\
+	\050"vhpl","$F","$(PX)","$(PY)","none"\051 \
 	irafhlib\072sgiqueue.com:tc=sgi_hplaserjet2:
 
 # SGI/AOSVS devices
@@ -322,11 +437,6 @@ sgi_datasouth|Datasouth DS180 raster plotter:\
 	:kf=bin$x_sgikern.e:tn=sgikern:ar#1.1063:xs#.2032:ys#.2248:\
 	:ca:co#132:li#66:xr#608:yr#750:zr#1:cw#.0125:ch#.0294:\
 	:BI:MF#8:YF:NB#8:LO#1:LS#0:PX#608:PY#750:XO#0:YO#0:XW#608:YW#750:
-sgi_hplaserjet|Hewlett Packard LaserJet Plus at 150 dpi:\
-	:kf=bin$x_sgikern.e:tn=sgikern:cw#.0125:ch#.0294:\
-	:ar#1.325:xs#.2032:ys#.2692:xr#1200:yr#1590:\
-	:XO#8:YO#0:XW#1200:YW#1590:PX#1216:PY#1590:LO#1:LS#0:\
-	:BI:MF#8:RO:NB#8:
 sgi_ln03|VMS generic interfact to 300dpi LN03:\
         :kf=bin$x_sgikern.e:tn=sgikern:xs#.2564:ys#.193:ar#.7527:\
         :co#80:li#66:xr#4096:yr#3072:zr#1:cw#.0125:ch#.0294:\
@@ -336,11 +446,22 @@ sgi_hp7550a|HP 7550A pen plotter:\
         :ar#.6818:xs#.2794:ys#.2200:\
         :xr#11176:yr#8636:cw#.0125:ch#.0294:\
         :FE:
-sgi_hplaserjet2|HP LaserJet laser printer:\
+sgi_hplaserjet|Hewlett Packard LaserJet Plus at 150 dpi:\
+	:kf=bin$x_sgikern.e:tn=sgikern:cw#.0125:ch#.0294:\
+	:ar#1.325:xs#.2032:ys#.2692:xr#1200:yr#1590:\
+	:XO#8:YO#0:XW#1200:YW#1590:PX#1216:PY#1590:LO#1:LS#0:\
+	:BI:MF#8:RO:NB#8:
+sgi_hplaserjet2|HP LaserJet II laser printer:\
         :kf=bin$x_sgikern.e:tn=sgikern:cw#.0125:ch#.0294:\
         :ar#0.755:xs#.2692:ys#.2032:xr#1200:yr#1590:\
         :XO#8:YO#0:XW#1200:YW#1590:PX#1216:PY#1590:LO#1:LS#0: \
         :BI:BF:MF#8:RO:NB#8:
+sgi_hplaserjet3|HP LaserJet III laser printer:\
+        :kf=bin$x_sgikern.e:tn=sgikern:cw#.0125:ch#.0294:\
+        :ar#0.755:xs#.2692:ys#.2032:xr#2400:yr#3180:\
+        :XO#75:YO#75:XW#2400:YW#3180:PX#2400:PY#3180:LO#1:LS#0: \
+        :BI:BF:MF#8:RO:NB#8:
+
 
 # CCP kernel (STDPLOT devices).
 ccp_calcomp|calcomp pen plotter (library interface, no DD entry):\
@@ -369,6 +490,25 @@ nspp_tek|Tektronix driven via NSPP:\
 	:ar#.70:xs#.20:ys#.14:ch#.0294:cw#.0125:DD=tek,/tmp/gtkXXXXXX,\
 	!{ cd /tmp; /local/bin/plotX -T4014 -W=1 $F |\
 	/usr/bin/plot  -T4014 > /dev/tty; rm $F; }:
+
+# Nigel's test quick-and-dirty Solitaire stuff.
+nas_solitaire2k|Solitaire film recorder, 2k mode (2048x1536):\
+        :xr#2048:yr#2048:\
+        :DD=solitaire,tmp$slt,!{ /local/bin/qsoli -wid 2048 \
+         -hgt 1536 -res 2048 -bot 250 $F; 'rm' $F; }&:\
+        :tc=nas_solitaire:
+nas_solitaire4k|Solitaire film recorder, default (4096x3072):\
+        :xr#4096:yr#4096:\
+        :DD=solitaire,tmp$slt,!{ /local/bin/qsoli $F; 'rm' $F; }&:\
+        :tc=nas_solitaire:
+nas_solitaire8k|Solitaire film recorder, 8k mode (8192x6144):\
+	:xr#8192:yr#8192:\
+	:DD=solitaire,tmp$slt,!{ /local/bin/qsoli -wid 8192 \
+	 -hgt 6144 -res 8192 -bot 1000 $F; 'rm' $F; }&:\
+	:tc=nas_solitaire:
+nas_solitaire|Common parameters for above different resolutions:\
+        :kf=nlocal$bin(arch)/naskern.e:tn=naskern:xs#.310:ys#.310:\
+        :z1#0:z2#255:zr#256:ca:pr:cw#.0125:ch#.0294:BJ:RO:MF#1:
 
 # STDGRAPH devices.  The entries for these devices are used most often and
 # need to be as accessible as possible.  The entries for the most frequently
@@ -515,9 +655,11 @@ xtermr|X10R4, X11R3; status line in graphics window. (Rick McGonegal):\
 # xterm does not implement GIN terminator, so no delimiter & report is 5 chars.
 # xterm does not implement text height.
 # Line & column sizes are for smallest Tek window allowed, with #2 char set
+#
+# Changes ar to .7 (FV 9/14/90)
 
 xtermjh|X11R3 and X10R4 xterm status line reports in the text window:\
-	:co#81:li#38:ch#.0217:cw#.0156:XO#10:YO#0:ar#1.0:\
+	:co#81:li#38:ch#.0217:cw#.0156:XO#10:YO#0:ar#.7:\
 	:OW=\E[?38h\E^_:CW=\E^C:GE=^J^M\E[?38h\E^_:GD=\E^C:CL=^M\E^L:\
 	:CN#5:CD=:LT=\E(1_+.):TF=\E9:TH=:tc=4014:
 # End of XTERM submission from Joseph Harrington.
@@ -656,3 +798,8 @@ perigs3|Pericom Monterey MG200 Graphics State 3:\
 peri4014|Pericom Monterey MG200 4014 Graphics:\
 	:LT=\E(1$0)x($1)`($2-5)`\E(1_+.$D)`($$:tc=pericom:
 
+# Submitted by Skip Schaller 4-91
+pericomdg|Pericom Monterey MG200 with DG Dasher 200 emulation for text:\
+	:OW=50^^\072^]:GE=50^^\072^]:\
+	:CW=^X\E.^P\200\027^K:GD=^X\E.^P\200\027^K:\
+	:WC=^]%t\E/f:tc=pericom:

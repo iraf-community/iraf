@@ -33,6 +33,5 @@ begin
 	if (CV_CHOFAC(cv) != NULL)
 	    call mfree (CV_CHOFAC(cv), TY_REAL)
 
-
 	call mfree (cv, TY_STRUCT)
 end

@@ -1,6 +1,6 @@
-      INTEGER FUNCTION GETC (C)
-      INTEGER C
-      INTEGER GETCH
-      GETC = GETCH (C, 0)
-      RETURN
-      END
+      integer function getc (c)
+      integer c
+      integer getch
+      getc = getch (c, 0)
+      return
+      end

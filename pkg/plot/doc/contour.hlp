@@ -1,4 +1,4 @@
-.help contour Mar90 plot
+.help contour Aug91 plot
 .ih
 NAME
 contour -- draw a contour plot of an image
@@ -10,13 +10,13 @@ PARAMETERS
 .ls image
 Two dimensional image or image section to be contoured.
 .le
-.ls floor = 0
-Minimum value to be contoured.  If \fBfloor = 0\fR, a value rounded up 
-from the image minimum will be used.
+.ls floor = INDEF
+Minimum value to be contoured.  If \fBfloor = INDEF\fR, the data minimum is
+used for the floor.
 .le
-.ls ceiling = 0
-Maximum value to be contoured.  If \fBceiling = 0\fR, a value rounded down
-from the image maximum will be used.
+.ls ceiling = INDEF
+Maximum value to be contoured.  If \fBceiling = INDEF\fR, the data maximum
+is used for the ceiling.
 .le
 .ls zero = 0
 Greyscale value of the zero contour, i.e., the value of a zero point shift

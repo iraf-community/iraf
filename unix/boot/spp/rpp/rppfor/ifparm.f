@@ -1,26 +1,26 @@
-      INTEGER FUNCTION IFPARM (STRNG)
-      INTEGER STRNG (100)
-      INTEGER C
-      EXTERNAL INDEX
-      INTEGER I, INDEX, TYPE
-      C = STRNG (1)
-      IF (.NOT.(C .EQ. -12 .OR. C .EQ. -13 .OR. C .EQ. -11 .OR. C .EQ. -
-     *14 .OR. C .EQ. -10))GOTO 23000
-      IFPARM = 1
-      GOTO 23001
-23000 CONTINUE
-      IFPARM = 0
-      I = 1
-23002 IF (.NOT.(INDEX (STRNG (I), 36) .GT. 0))GOTO 23004
-      I = I + INDEX (STRNG (I), 36)
-      IF (.NOT.(TYPE (STRNG (I)) .EQ. 48))GOTO 23005
-      IF (.NOT.(TYPE (STRNG (I + 1)) .NE. 48))GOTO 23007
-      IFPARM = 1
-      GOTO 23004
-23007 CONTINUE
-23005 CONTINUE
-23003 GOTO 23002
-23004 CONTINUE
-23001 CONTINUE
-      RETURN
-      END
+      integer function ifparm (strng)
+      integer strng (100)
+      integer c
+      external index
+      integer i, index, type
+      c = strng (1)
+      if (.not.(c .eq. -12 .or. c .eq. -13 .or. c .eq. -11 .or. c .eq. -
+     *14 .or. c .eq. -10))goto 23000
+      ifparm = 1
+      goto 23001
+23000 continue
+      ifparm = 0
+      i = 1
+23002 if (.not.(index (strng (i), 36) .gt. 0))goto 23004
+      i = i + index (strng (i), 36)
+      if (.not.(type (strng (i)) .eq. 48))goto 23005
+      if (.not.(type (strng (i + 1)) .ne. 48))goto 23007
+      ifparm = 1
+      goto 23004
+23007 continue
+23005 continue
+23003 goto 23002
+23004 continue
+23001 continue
+      return
+      end

@@ -1,7 +1,7 @@
 .help gradient Nov85 images
 .ih
 NAME
-gradient -- convolve a list of images with a gradient filter
+gradient -- convolve a list of images with the gradient filter
 .ih
 USAGE
 gradient input output gradient
@@ -17,9 +17,10 @@ convolved image will replace the input image.
 .le
 .ls gradient
 The gradient filters are a set of 8 three by three kernels identified by the
-angle of maximum response which approximate the gradient
-operator. The gradient operator is defined as the slope of the 2D function
-in the specified direction. The eight gradient operators are listed below.
+angle of maximum response as measured counter-clockwise to the x axis. The
+kernels approximate the gradient operator, which is defined as the slope of
+the intensity distribution in an image.  The eight supported gradient
+operators are listed below.
 .ls "0", "180"
 Calculate the gradient image along a 0 or 180 degree angle.
 These options approximate the d/dx operator.
@@ -36,20 +37,24 @@ response for pixel values which decrease with increasing y.
 .le
 .ls "45", "225"
 Calculate the gradient image along a 45 or 225 degree angle.
-Option "45" will produce a maximum response for pixel values which increase
-along a line at 45 degrees to the x axis. Option "225" will produce
+Option "45" produces a maximum response for pixel values which increase
+along a line at 45 degrees counter-clockwise to the x axis.
+Option "225" produces
 a maximum response for pixel values which increase along a line at 225
 degrees to the x axis.
 .le
 .ls "135", "315" 
 Calculate the gradient image along a 135 or 315 degree angle.
-Option "135" will produce a maximum response for pixel values which increase
-along a line at 135 degrees to the x axis. Option "315" will produce
+Option "135" produces a maximum response for pixel values which increase
+along a line at 135 degrees counter-clockwise to the x axis.
+Option "315" produces
 a maximum response for pixel values which increase along a line at 315
 degrees to the x axis.
 .le
 .le
 .ls boundary = "nearest"
+The algorithm used to compute the values of out of bounds pixels. The 
+options are:
 .ls nearest
 Use the value of the nearest boundary pixel.
 .le
@@ -72,19 +77,22 @@ DESCRIPTION
 
 GRADIENT convolves the list of images specified by \fIinput\fR with one of
 eight three by three gradient kernels specified by \fIgradient\fR 
-and listed below. The convolved images are placed in \fIoutput\fR.
-The type of boundary extension is optional and set by the \fIboundary\fR
-parameter.
+and places the output images in \fIoutput\fR.
+If the image names in \fIoutput\fR equal the image names in \fIinput\fR the
+gradient operation is performed in place and the original images are
+overwritten. Out of bounds pixels are computed using the algorithm
+specified by \fIboundary\fR.
 
 GRADIENT acts like a simple edge detector or high pass filter which is sensitive
 to both the magnitude and direction of changes in intensity in an image.
-For example, if pixel values are specified by the sum of their x and y
-coordinates and boundary extension effects are ignored,
-the 0, 45, 90, 135, 180, 225, 270, and 315 gradient kernels will produce a
-constant image containing  1, sqrt (2), 1, 0, -1, -sqrt (2), -1,
-and 0 respectively. 
+For example, if an image's pixel values are specified by the sum of their
+x and y coordinates (z = x + y) and boundary extension effects are ignored,
+the "0", "45", "90", "135", "180", "225", "270", and "315" gradient kernels
+will each produce a constant image containing the numbers 1, sqrt (2), 1, 0,
+-1, -sqrt (2), -1, and 0 respectively. 
 
-The eight gradient filters are:
+The eight gradient filters are listed below. The I[*,*] are the elements of
+the input image and the O[*,*] are elements of the output image.
 
 .nf
                          0
@@ -150,8 +158,8 @@ EXAMPLES
 .ih
 TIME REQUIREMENTS
 
-GRADIENT requires approximately 40 cpu seconds to convolve a
-512 square real image with a 3 by 3 gradient kernel (VAX 11/750 with fpa).
+GRADIENT requires approximately 2.0 cpu seconds to convolve a
+512 square real image with a 3 by 3 gradient kernel on a Sparc Station 1.
 
 .ih
 BUGS

@@ -20,7 +20,7 @@ pointer	sp, cp
 char	in_fname[SZ_FNAME], dumpf_file[SZ_FNAME]
 int	file_ordinal
 
-int	clgeti(), strlen(), strncmp(), get_data_type(), btoi()
+int	mtfile(), clgeti(), get_data_type(), btoi()
 bool	clgetb()
 char	clgetc()
 
@@ -36,13 +36,11 @@ begin
 	# to skip over the DUMPF tape label.
 
 	call clgstr ("dumpf_file", dumpf_file, SZ_FNAME)
-	call strcpy (dumpf_file, in_fname, SZ_FNAME)
-	if (strncmp (dumpf_file, "mt", 2) == 0) {
+	if (mtfile (dumpf_file) == YES) {
 	    file_ordinal = clgeti ("file_ordinal")
-	    call sprintf (in_fname[strlen(in_fname)+1], SZ_FNAME, "[%d]")
-	        call pargi (file_ordinal + 1)
+	    call mtfname (dumpf_file, file_ordinal + 1, in_fname, SZ_FNAME)
 	} else
-	    call strcpy ("1", file_ordinal, SZ_LINE)
+	    call strcpy (dumpf_file, in_fname, SZ_FNAME)
 
 	LONG_HEADER(cp) = btoi (clgetb ("long_header"))
 	PRINT_PIXELS(cp) = btoi (clgetb ("print_pixels"))
@@ -457,7 +455,7 @@ begin
 	    # condition is a test for IDSOUT data, where the df coeffecients
 	    # have been applied but not stored in the header.
 
-	    if (DF_FLAG(ids) != -1 && Memd[COEFF(ids)] != 0.) {
+	    if (DF_FLAG(ids) != -1 && COEFF(ids) != 0) {
 		call printf (",\n")
 		do i = 1, DF_FLAG(ids) {
 		    call printf ("df[%d] = %10.8g")

@@ -1,20 +1,18 @@
 # Help directory for the APPHOT package
 
 $doc		= "noao$digiphot/apphot/doc/"
-$apselect	= "noao$digiphot/apphot/apselect/"
+
 $aptest		= "noao$digiphot/apphot/aptest/"
 $center		= "noao$digiphot/apphot/center/"
 $daofind	= "noao$digiphot/apphot/daofind/"
 $fitpsf		= "noao$digiphot/apphot/fitpsf/"
 $fitsky		= "noao$digiphot/apphot/fitsky/"
 $phot		= "noao$digiphot/apphot/phot/"
-$polymark	= "noao$digiphot/apphot/polymark/"
 $polyphot	= "noao$digiphot/apphot/polyphot/"
-$qphot		= "noao$digiphot/apphot/qphot/"
+$ptools		= "noao$digiphot/ptools/pexamine/"
 $radprof	= "noao$digiphot/apphot/radprof/"
 $wphot		= "noao$digiphot/apphot/wphot/"
 
-apselect	hlp=doc$apselect.hlp,		src=apselect$t_apselect.x
 aptest		hlp=doc$aptest.hlp
 center		hlp=doc$center.hlp,		src=center$t_center.x
 centerpars	hlp=doc$centerpars.hlp
@@ -23,12 +21,13 @@ datapars	hlp=doc$datapars.hlp
 fitpsf		hlp=doc$fitpsf.hlp,		src=fitpsf$t_fitpsf.x
 fitsky		hlp=doc$fitsky.hlp,		src=fitsky$t_fitsky.x
 fitskypars	hlp=doc$fitskypars.hlp
+pexamine	hlp=doc$pexamine.hlp,		src=ptools$t_pexamine.x
 phot		hlp=doc$phot.hlp,		src=phot$t_phot.x
 photpars	hlp=doc$photpars.hlp
-polymark	hlp=doc$polymark.hlp,		src=polymark$t_polymark.x
+polymark	hlp=doc$polymark.hlp,		src=polyphot$t_polymark.x
 polyphot	hlp=doc$polyphot.hlp,		src=polyphot$t_polyphot.x
 polypars	hlp=doc$polypars.hlp
-qphot		hlp=doc$qphot.hlp,		src=qphot$t_qphot.x
+qphot		hlp=doc$qphot.hlp,		src=phot$t_qphot.x
 radprof		hlp=doc$radprof.hlp,		src=radprof$t_radprof.x
 revisions	sys=Revisions
 wphot		hlp=doc$wphot.hlp,		src=wphot$t_wphot.x

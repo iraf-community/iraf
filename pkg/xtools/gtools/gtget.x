@@ -16,6 +16,8 @@ begin
 	    return (GT_LINE(gt))
 	case GTTRANSPOSE:
 	    return (GT_TRANSPOSE(gt))
+	case GTSYSID:
+	    return (GT_SYSID(gt))
 	}
 end
 
@@ -101,6 +103,8 @@ begin
 	        call strcpy ("mark", str, sz_str)
 	    case 2:
 	        call strcpy ("line", str, sz_str)
+	    case 3:
+		call strcpy ("histogram", str, sz_str)
 	    }
 	case GTMARK:
 	    switch (GT_MARK(gt)) {

@@ -3,16 +3,17 @@
 
 # Generic constants.
 define	ARB		999999999
-define	BOF		-3
-define	EOF		-2
-define	EOS		0
 define	ERR		-1
+define	EOF		-2
+define	BOF		-3
+define	EOT		-4
+define	BOFL		BOF
+define	EOFL		EOF
+define	EOS		0
 define	NO		0
 define	YES		1
 define	OK		0
 define	NULL		0
-define	BOFL		BOF
-define	EOFL		EOF
 
 # File I/O.
 define	READ_ONLY	1		# file access modes
@@ -134,3 +135,12 @@ define	strcpy	xstrcy
 define	strlen	xstrln
 define	ungetc	xfungc
 define	write	xfwrie
+define  fatal   xfatal
+define  fchdir  xfchdr
+define  fscan   xfscan
+define  getopt  xgtopt
+define  getpid  xgtpid
+define  getuid  xgtuid
+define  rename  xfrnam
+define  reset   xreset
+define  scan    xxscan

@@ -102,7 +102,7 @@ char	template[ARB]		# field name template
 int	sort			# sort flag
 
 bool	escape
-int	tp, nstr, ch, junk, first_string, nstrings
+int	tp, nstr, ch, junk, first_string, nstrings, nmatch
 pointer	sp, ip, op, fn, sbuf, pattern, patcode, nextch
 int	patmake(), patmatch(), strncmp()
 errchk	syserr
@@ -189,11 +189,16 @@ begin
 		# Now scan the user area.
 		for (ip=IM_USERAREA(im);  Memc[ip] != EOS;  ip=ip+1) {
 		    # Skip blank lines......12345678
-		    if (strncmp (Memc[ip], "        ", 8) != 0)
+		    if (strncmp (Memc[ip], "        ", 8) != 0) {
 			# Put key in list if it matches.
-			if (patmatch (Memc[ip], Memc[patcode]) > 0)
-			    call imfn_putkey (Memc[ip], FN_STRP(fn,1), nstr,
-				nextch, sbuf)
+			nmatch = patmatch (Memc[ip], Memc[patcode]) - 1
+			if (nmatch > 0) {
+			    ch = Memc[ip+nmatch]
+			    if (ch == ' ' || ch == '=')
+				call imfn_putkey (Memc[ip],
+				    FN_STRP(fn,1), nstr, nextch, sbuf)
+			}
+		    }
 
 		    # Advance to the next record.
 		    if (IM_UABLOCKED(im) == YES)

@@ -13,13 +13,6 @@ relink:
 	$call	ccdred
 	;
 
-debug:
-	$set	XFLAGS = "-cfqx"
-	$set	LFLAGS = "-qxz"
-	$update	libpkg.a
-	$call	ccdred
-	;
-
 install:
 	$move	xx_ccdred.e noaobin$x_ccdred.e
 	;

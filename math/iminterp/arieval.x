@@ -3,9 +3,11 @@
 include <math/iminterp.h>
 include "im1interpdef.h"
 
-# ARIEVAL -- procedure to evaluate the interpolant at a given value of x
-# Arival allows  the interpolation of a few interpolated points without
-# the computing time and storage required for the seuential version.
+# ARIEVAL -- Evaluate the interpolant at a given value of x. Arieval allows
+# the interpolation of a few isolated points without the storage required for
+# the sequential version. With the exception of the sinc function, the
+# interpolation code is expanded directly in this routine to avoid the
+# overhead of an aditional function call.
 
 real procedure arieval (x, datain, npts, interp_type)
 
@@ -26,23 +28,22 @@ begin
 
 	case II_LINEAR:
 	    nearx = x
-	    # protect against x = n case
+
+	    # Protect against x = n.
 	    if (nearx >= npts)
 		hold = 2. * datain[nearx] - datain[nearx - 1]
 	    else
 		hold = datain[nearx+1]
+
 	    return ((x - nearx) * hold + (nearx + 1 - x) * datain[nearx])
 
 	case II_POLY3:
 	    nearx = x
 
-	    # The major complication is that near the edge interior polynomial
-	    # must somehow be defined.
+	    # Protect against the x = 1 or x = n case.
 	    k = 0
 	    for (i = nearx - 1; i <= nearx + 2; i = i + 1) {
 		k = k + 1
-
-		# project data points into temporary array
 		if (i < 1)
 		    a[k] = 2. * datain[1] - datain[2-i]
 		else if (i > npts)
@@ -54,7 +55,7 @@ begin
 	    deltax = x - nearx
 	    deltay = 1. - deltax
 
-	    # second central differences
+	    # Second central differences.
 	    cd20 = 1./6. * (a[3] - 2. * a[2] + a[1])
 	    cd21 = 1./6. * (a[4] - 2. * a[3] + a[2])
 
@@ -64,13 +65,10 @@ begin
 	case II_POLY5:
 	    nearx = x
 
-	    # The major complication is that near the edge interior polynomial
-	    # must somehow be defined.
+	    # Protect against the x = 1 or x = n case.
 	    k = 0
 	    for (i = nearx - 2; i <= nearx + 3; i = i + 1) {
 		k = k + 1
-
-		# project data points into temporary array
 		if (i < 1)
 		    a[k] = 2. * datain[1] - datain[2-i]
 		else if (i > npts)
@@ -82,11 +80,11 @@ begin
 	    deltax = x - nearx
 	    deltay = 1. - deltax
 
-	    # second central differences
+	    # Second central differences.
 	    cd20 = 1./6. * (a[4] - 2. * a[3] + a[2])
 	    cd21 = 1./6. * (a[5] - 2. * a[4] + a[3])
 
-	    # fourth central differences
+	    # Fourth central differences.
 	    cd40 = 1./120. * (a[1] - 4. * a[2] + 6. * a[3] - 4. * a[4] + a[5])
 	    cd41 = 1./120. * (a[2] - 4. * a[3] + 6. * a[4] - 4. * a[5] + a[6])
 
@@ -101,7 +99,7 @@ begin
 	    deltax = x - nearx
 	    k = 0
 
-	    # maximum number of points used is SPLPTS
+	    # Get the data.
 	    for (i = nearx - SPLPTS/2 + 1; i <= nearx + SPLPTS/2; i = i + 1) {
 		if (i < 1 || i > npts)
 		    ;
@@ -112,11 +110,10 @@ begin
 		    bcoeff[k+1] = datain[i]
 		}
 	    }
-
 	    bcoeff[1] = 0.
 	    bcoeff[k+2] = 0.
 
-	    # Use special routine for cardinal splines.
+	    # Compute coefficients.
 	    call ii_spline (bcoeff, temp, k)
 
 	    pindex = pindex + 1
@@ -132,5 +129,10 @@ begin
 		    
 	    return (pcoeff[1] + deltax * (pcoeff[2] + deltax *
 	    	   (pcoeff[3] + deltax * pcoeff[4])))
+
+	case II_SINC:
+	    call ii_sinc (x, hold, 1, datain, npts, NSINC, NTAPER, STAPER,
+		DX)
+	    return (hold)
 	}
 end

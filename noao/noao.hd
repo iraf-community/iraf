@@ -7,8 +7,10 @@ $digiphot	= "./digiphot/"
 $focas		= "./focas/"
 $imred		= "./imred/"
 $mtlocal	= "./mtlocal/"
+$nobsolete	= "./nobsolete/"
+$nproto		= "./nproto/"
 $onedspec	= "./onedspec/"
-$proto		= "./proto/"
+$rv		= "./rv/"
 $surfphot	= "./surfphot/"
 $twodspec	= "./twodspec/"
 
@@ -44,20 +46,32 @@ mtlocal		men = mtlocal$mtlocal.men,
 		pkg = mtlocal$mtlocal.hd,
 		src = mtlocal$mtlocal.cl
 
+nobsolete	men = nobsolete$nobsolete.men,
+		hlp = ..,
+		sys = nobsolete$nobsolete.hlp,
+		pkg = nobsolete$nobsolete.hd,
+		src = nobsolete$nobsolete.cl
+
+nproto		men = nproto$nproto.men,
+		hlp = ..,
+		sys = nproto$nproto.hlp,
+		pkg = nproto$nproto.hd,
+		src = nproto$nproto.cl
+
 onedspec	men = onedspec$onedspec.men,
 		hlp = ..,
 		sys = onedspec$onedspec.hlp,
 		pkg = onedspec$onedspec.hd,
 		src = onedspec$onedspec.cl
 
-proto		men = proto$proto.men,
-		hlp = ..,
-		sys = proto$proto.hlp,
-		pkg = proto$proto.hd,
-		src = proto$proto.cl
-
 twodspec	men = twodspec$twodspec.men,
 		hlp = ..,
 		sys = twodspec$twodspec.hlp,
 		pkg = twodspec$twodspec.hd,
 		src = twodspec$twodspec.cl
+
+rv		men = rv$rv.men,
+		hlp = ..,
+		sys = rv$rv.hlp,
+		pkg = rv$rv.hd,
+		src = rv$rv.cl

@@ -23,7 +23,7 @@ begin
 
 	# Update the aperture.
 	AP_ID(ap) = apid
-	AP_ID(ap) = apbeam
+	AP_BEAM(ap) = apbeam
 	AP_CEN(ap, AP_AXIS(ap)) = center - cveval (AP_CV(ap), real (line))
         AP_LOW(ap, AP_AXIS(ap)) = min (low, high)
         AP_HIGH(ap, AP_AXIS(ap)) = max (low, high)

@@ -1,124 +1,124 @@
-      SUBROUTINE EATUP
-      INTEGER PTOKEN (100), T, TOKEN (100)
-      INTEGER GETTOK
-      INTEGER NLPAR, EQUAL
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER SERROR(6)
-      DATA SERROR(1)/101/,SERROR(2)/114/,SERROR(3)/114/,SERROR(4)/111/,S
-     *ERROR(5)/114/,SERROR(6)/-2/
-      NLPAR = 0
-      TOKEN(1) = -2
-23000 CONTINUE
-      CALL OUTSTR (TOKEN)
-      T = GETTOK (TOKEN, 100)
-23001 IF (.NOT.(T .NE. 32 .AND. T .NE. 9))GOTO 23000
-23002 CONTINUE
-      IF (.NOT.(T .EQ. -9))GOTO 23003
-      IF (.NOT.(EQUAL (TOKEN, SERROR) .EQ. 1))GOTO 23005
-      ERNAME = 1
-23005 CONTINUE
-23003 CONTINUE
-      GOTO 10
-23007 CONTINUE
-      T = GETTOK (TOKEN, 100)
-10    IF (.NOT.(T .EQ. 59 .OR. T .EQ. 10))GOTO 23010
-      GOTO 23009
-23010 CONTINUE
-      IF (.NOT.(T .EQ. 125 .OR. T .EQ. 123))GOTO 23012
-      CALL PBSTR (TOKEN)
-      GOTO 23009
-23012 CONTINUE
-      IF (.NOT.(T .EQ. -1))GOTO 23014
-      CALL SYNERR (15Hunexpected EOF.)
-      CALL PBSTR (TOKEN)
-      GOTO 23009
-23014 CONTINUE
-      IF (.NOT.(T .EQ. 44 .OR. T .EQ. 43 .OR. T .EQ. 45 .OR. T .EQ. 42 .
-     *OR. (T .EQ. 47 .AND. BODY .EQ. 1) .OR. T .EQ. 40 .OR. T .EQ. 38 .O
-     *R. T .EQ. 124 .OR. T .EQ. 33 .OR. T .EQ. 126 .OR. T .EQ. 126 .OR. 
-     *T .EQ. 94 .OR. T .EQ. 61 .OR. T .EQ. 95))GOTO 23016
-23018 IF (.NOT.(GETTOK (PTOKEN, 100) .EQ. 10))GOTO 23019
-      GOTO 23018
-23019 CONTINUE
-      CALL PBSTR (PTOKEN)
-      IF (.NOT.(T .EQ. 95))GOTO 23020
-      TOKEN (1) = -2
-23020 CONTINUE
-23016 CONTINUE
-      IF (.NOT.(T .EQ. 40))GOTO 23022
-      NLPAR = NLPAR + 1
-      GOTO 23023
-23022 CONTINUE
-      IF (.NOT.(T .EQ. 41))GOTO 23024
-      NLPAR = NLPAR - 1
-23024 CONTINUE
-23023 CONTINUE
-      IF (.NOT.(T .EQ. -9))GOTO 23026
-      CALL SQUASH (TOKEN)
-23026 CONTINUE
-      CALL OUTSTR (TOKEN)
-23008 IF (.NOT.(NLPAR .LT. 0))GOTO 23007
-23009 CONTINUE
-      IF (.NOT.(NLPAR .NE. 0))GOTO 23028
-      CALL SYNERR (23Hunbalanced parentheses.)
-23028 CONTINUE
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      subroutine eatup
+      integer ptoken (100), t, token (100)
+      integer gettok
+      integer nlpar, equal
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer serror(6)
+      data serror(1)/101/,serror(2)/114/,serror(3)/114/,serror(4)/111/,s
+     *error(5)/114/,serror(6)/-2/
+      nlpar = 0
+      token(1) = -2
+23000 continue
+      call outstr (token)
+      t = gettok (token, 100)
+23001 if (.not.(t .ne. 32 .and. t .ne. 9))goto 23000
+23002 continue
+      if (.not.(t .eq. -9))goto 23003
+      if (.not.(equal (token, serror) .eq. 1))goto 23005
+      ername = 1
+23005 continue
+23003 continue
+      goto 10
+23007 continue
+      t = gettok (token, 100)
+10    if (.not.(t .eq. 59 .or. t .eq. 10))goto 23010
+      goto 23009
+23010 continue
+      if (.not.(t .eq. 125 .or. t .eq. 123))goto 23012
+      call pbstr (token)
+      goto 23009
+23012 continue
+      if (.not.(t .eq. -1))goto 23014
+      call synerr (15Hunexpected EOF.)
+      call pbstr (token)
+      goto 23009
+23014 continue
+      if (.not.(t .eq. 44 .or. t .eq. 43 .or. t .eq. 45 .or. t .eq. 42 .
+     *or. (t .eq. 47 .and. body .eq. 1) .or. t .eq. 40 .or. t .eq. 38 .o
+     *r. t .eq. 124 .or. t .eq. 33 .or. t .eq. 126 .or. t .eq. 126 .or. 
+     *t .eq. 94 .or. t .eq. 61 .or. t .eq. 95))goto 23016
+23018 if (.not.(gettok (ptoken, 100) .eq. 10))goto 23019
+      goto 23018
+23019 continue
+      call pbstr (ptoken)
+      if (.not.(t .eq. 95))goto 23020
+      token (1) = -2
+23020 continue
+23016 continue
+      if (.not.(t .eq. 40))goto 23022
+      nlpar = nlpar + 1
+      goto 23023
+23022 continue
+      if (.not.(t .eq. 41))goto 23024
+      nlpar = nlpar - 1
+23024 continue
+23023 continue
+      if (.not.(t .eq. -9))goto 23026
+      call squash (token)
+23026 continue
+      call outstr (token)
+23008 if (.not.(nlpar .lt. 0))goto 23007
+23009 continue
+      if (.not.(nlpar .ne. 0))goto 23028
+      call synerr (23Hunbalanced parentheses.)
+23028 continue
+      return
+      end
+c     logic0  logical_column

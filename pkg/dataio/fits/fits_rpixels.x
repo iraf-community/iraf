@@ -120,7 +120,7 @@ int	bufsize		# buffer size in records
 int	recptr		# last successful FITS record read
 
 int	i, nchars
-int	read()
+int	read(), fstati()
 errchk	read
 
 begin
@@ -129,12 +129,12 @@ begin
 	    iferr {
 	        i = read (fd, buf[nchars+1], sz_rec - nchars)
 	    } then {
-	        call fseti (fd, F_VALIDATE, bufsize * i)
 	        call printf ("Error reading FITS record %d\n")
 	        if (mod (recptr + 1, bufsize) == 0)
 		    call pargi ((recptr + 1) / bufsize)
 	        else
 		    call pargi ((recptr + 1) / bufsize + 1)
+	        call fseti (fd, F_VALIDATE, fstati (fd, F_SZBBLK) / SZB_CHAR)
 	        i = read (fd, buf[nchars+1], sz_rec - nchars)
 	    }
 
@@ -145,7 +145,7 @@ begin
 
 	} until (nchars >= sz_rec)
 
-	if (i == EOF)
+	if ((i == EOF) && (nchars == 0))
 	    return (EOF)
 	else {
 	    recptr = recptr + 1

@@ -378,11 +378,11 @@ char	*keyword;
 
 	/* Execute the $IF statement.
 	 */
+	bval = 0;
 	if (strcmp (key, "def") == 0) {
 	    /* $IFDEF.  If the named symbol exists execute the true clause,
 	     * else go to the else clause.
 	     */
-	    bval = 0;
 	    if (argc > 0) {
 		bval = (getsym (argv[0]) != NULL);
 		if (!bval)
@@ -395,7 +395,6 @@ char	*keyword;
 	     */
 	    char   *valstr;
 
-	    bval = 0;
 	    if (argc > 0) {
 		if ((valstr = getsym (argv[0])) == NULL &&
 		    (valstr = os_getenv (argv[0])) == NULL) {
@@ -419,7 +418,6 @@ char	*keyword;
 	} else if (strcmp (key, "file") == 0) {
 	    /* $IFFILE.  Check for the existence of any of the named files.
 	     */
-	    bval = 0;
 	    for (i=0;  i < argc;  i++)
 		if (os_access (argv[i], 0,0) == YES) {
 		    bval = 1;
@@ -432,7 +430,6 @@ char	*keyword;
 	     * is true.  If any of the listed files do not exist a warning
 	     * is printed and they are ignored.
 	     */
-	    bval = 0;
 	    if ((fdate = os_fdate(argv[0])) <= 0) {
 		warns ("file `%s' not found", argv[0]);
 		bval = 1;
@@ -456,7 +453,6 @@ char	*keyword;
 	     * is false.  If any of the listed files do not exist a warning
 	     * is printed and they are ignored.
 	     */
-	    bval = 0;
 	    if ((fdate = os_fdate(argv[0])) <= 0)
 		warns ("file `%s' not found", argv[0]);
 	    else {
@@ -571,7 +567,6 @@ struct	context *cx;		/* current context		*/
 char	*program;		/* module to be called		*/
 int	islib;			/* module list for a library	*/
 {
-	register int	ch;
 	struct	context *ncx;
 	char	module[SZ_FNAME+1], subdir[SZ_FNAME+1], fname[SZ_FNAME+1];
 	char	symbol[SZ_FNAME+1], value[SZ_COMMAND+1];
@@ -705,6 +700,8 @@ char	*fname;			/* include file name	*/
 	cx->old_cp = cp;			/* keep symbols */
 	cx->old_nsymbols = nsymbols;
 	cx = pop_context (ncx);
+
+	return (OK);
 }
 
 

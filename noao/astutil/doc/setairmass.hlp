@@ -1,4 +1,4 @@
-.help setairmass Nov89 astutil
+.help setairmass Nov90 astutil
 .ih
 NAME
 setairmass -- update image headers with the effective airmass 
@@ -11,6 +11,18 @@ PARAMETERS
 The list of images for which to calculate the airmass.  The image
 headers may optionally be updated with the airmass and the mid-UT of
 the exposure.
+.le
+.ls observatory = ")_.observatory"
+Observatory for  which airmasses are to be computed if the observatory is
+not specified in the image header by the keyword OBSERVAT.  The default is
+a redirection to look in the parameters for the parent package for a
+value.  The observatory may be one of the observatories in the observatory
+database, "observatory" to select the observatory defined by the
+environment variable "observatory" or the parameter
+\fBobservatory.observatory\fR, or "obspars" to select the current
+parameters set in the \fBobservatory\fR task.  See help for
+\fBobservatory\fR for additional information.  If the input consists of
+images then the observatory is defined by the OBSERVAT keyword if present.
 .le
 .ls intype = "beginning"
 The time stamp of the observation as recorded at the telescope for the
@@ -37,14 +49,10 @@ The name of the output keyword that will receive the computed airmass.
 The name of the output keyword that will receive the universal time for
 the middle of the observation.
 .le
-.ls latitude = ")observatory.latitude"
-The latitude of the observatory.  The default value is for Kitt Peak
-and is obtained from the parameters of the observatory task.
-.le
 .ls show = yes
 Print the airmasses and mid-UT's for each image?
 .le
-.ls update = no
+.ls update = yes
 Update the image headers with the airmasses and the mid-UT's?
 .le
 .ls override = yes
@@ -57,9 +65,12 @@ SETAIRMASS will calculate the effective airmass of an astronomical
 image, as described below under "ALGORITHMS".  The task requires the
 instantaneous zenith distance at the beginning, middle and end of the
 exposure.  These are calculated using the right ascension, declination,
-and epoch as well as the sidereal time, exposure time, and date from
-the image header, in addition to the value of the \fBlatitude\fR
-parameter.  The RA and Dec will be precessed from the given epoch to
+and epoch as well as the sidereal time, exposure time, date, and
+observatory from the image header.  If the observatory is not available
+in the image header under the keyword OBSERVAT, the observatory is
+defined by the \fIobservatory\fR parameter (see help for \observatory\fR
+for further information).
+The RA and Dec will be precessed from the given epoch to
 the date of observation.  The RA, Dec, epoch, and ST keywords are
 assumed to have the names "RA", "DEC", "EPOCH", and "ST".  The name of
 the exposure time and date keywords can be specified as parameters.
@@ -113,7 +124,11 @@ The atmospheric scaling parameter is chosen to be 750 (see
 "Astrophysical Quantities" by Allen, 1973 p.125,133).
 .ih
 KEYWORDS
-The required input keywords are:
+The input keywords are:
+.ls OBSERVAT
+Observatory at which the data was taken.  If absent the observatory is
+determined using the \fIobservatory\fR parameter.
+.le
 .ls RA
 Right ascension in hours at the beginning, middle, or end of the observation.
 .le
@@ -163,5 +178,5 @@ default value of the update parameter is no, so that only a listing of
 the calculated airmasses is generated.
 .ih
 SEE ALSO
-airmass, hedit, refspectra
+airmass, hedit, refspectra, observatory
 .endhelp

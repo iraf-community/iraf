@@ -17,6 +17,7 @@ task	cmdstr,
 	match,
 	mkdir,
 	movefiles,
+	mtclean,
 	$netstatus,
 	page,
 	pathnames,
@@ -43,5 +44,7 @@ task	$spy		= "hlib$spy.cl"
 task	$devices	= "system$devices.cl"
 task	references	= "system$references.cl"
 task	phelp		= "system$phelp.cl"
+
+hidetask mtclean
 
 keep

@@ -1,8 +1,5 @@
 include	<error.h>
 include	<syserr.h>
-include <ctype.h>
-include	"oned.h"
-include	"idsmtn.h"
 
 define	EXTN_LOOKUP	10	# Interp index for de-extinction
 define	DEXTN_LOOKUP	11	# Interp index for differential extn table
@@ -67,31 +64,6 @@ begin
 
 	    spec[i] = spec[i] * 10.0 ** (0.4 * airm * ext)
 	}
-end
-
-# FLAG_CHK -- Check header flags prior to beam switching
-
-procedure flag_chk (ids, exflag)
-
-pointer	ids
-bool	exflag
-
-begin
-	# BS requires 
-	# 1. dispersion corrected spectra
-	# 2. non-beam switched
-	# 3. may be either extinction corrected or not
-
-	if (DC_FLAG(ids) != 0)
-	    call error (0, "Spectrum not dispersion corrected")
-
-	if (BS_FLAG(ids) == 1)
-	    call error (0, "Spectrum already beam-switched")
-
-	if (EX_FLAG(ids) == 0)
-	    exflag = true
-	else
-	    exflag = false
 end
 
 # SUM_SPEC -- Add up counts within a specified region of a spectrum

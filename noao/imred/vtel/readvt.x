@@ -27,7 +27,7 @@ pointer	bp, sp, tapename, dfilename, diskfile, root
 int	filerange[2 * MAX_RANGES + 1]
 
 bool	clgetb()
-int	get_next_number()
+int	get_next_number(), mtneedfileno()
 int	strlen(), decode_ranges()
 int	fntopnb(), imtopenp(), clgfil(), imtgetim(), clplen(), imtlen()
 int	mtfile()
@@ -109,7 +109,7 @@ begin
 	    if (!headeronly)
 	        call imtclose (listout)
 
-	} else if (Memc[infile+strlen(Memc[infile])-1] == ']') {
+	} else if (mtneedfileno(Memc[infile]) == NO) {
 
 	    # This is a tape file and the user specified which file.
 	    if (!headeronly)
@@ -135,10 +135,8 @@ begin
 
             while (get_next_number (filerange, filenumber) != EOF) {
 	        # Assemble the appropriate tape file name.
-	        call strcpy (Memc[infile], Memc[tapename], SZ_FNAME)
-	        call sprintf (Memc[tapename+strlen(Memc[tapename])],
-			SZ_FNAME, "[%d]")
-		    call pargi (filenumber)
+		call mtfname (Memc[infile], filenumber, Memc[tapename],
+		    SZ_FNAME)
 
 	        # Assemble the appropriate disk file name.
 	        if (!headeronly) {

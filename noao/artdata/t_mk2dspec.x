@@ -2,7 +2,7 @@ include	<error.h>
 include	<imhdr.h>
 include	<math/iminterp.h>
 
-define	MAX_HDR		20000		# Maximum user header
+define	LEN_UA		20000		# Maximum user header
 define	LEN_COMMENT	70		# Maximum comment length
 
 define	NALLOC		10		# Alloc block size
@@ -36,6 +36,7 @@ pointer	output				# Output image
 pointer	models				# Spectrum models (file)
 int	nc				# Number of columns
 int	nl				# Number of lines
+bool	cmmts				# Add comments?
 
 pointer	template			# Template spectrum name
 real	scale				# Intensity scale
@@ -51,7 +52,7 @@ int	i, j, k, k1, k2, fd, npts, nmods, nalloc
 real	pcen[2], fwhm[2], flux[2], peak, pstep, pstart, pend, x1, x2, dx
 pointer	sp, comment, mod, mods, asi, asis[2], data, in, out, temp, pname
 
-bool	streq()
+bool	streq(), clgetb()
 real	asigrl()
 int	clgeti(), access(),  open(), fscan(), nscan(), imaccess(), strdic()
 int	imtopenp(), imtlen(), imtgetim(), clktime()
@@ -77,6 +78,7 @@ begin
 	ilist = imtopenp ("input")
 	olist = imtopenp ("output")
 	mlist = imtopenp ("models")
+	cmmts = clgetb ("comments")
 
 	if (max (1, imtlen (olist)) != imtlen (ilist))
 	    call error (1, "Output image list does not match input image list")
@@ -102,12 +104,16 @@ begin
 		    out = in
 	            new = false
 	        } else {
-	            iferr (in = immap (Memc[input], NEW_IMAGE, 0)) {
+		    iferr (out = immap (Memc[output], NEW_IMAGE, LEN_UA)) {
 			call erract (EA_WARN)
 			next
 		    }
-		    out = in
+		    in = out
 	            new = true
+
+		    call clgstr ("header", Memc[comment], LEN_COMMENT)
+		    iferr (call mkh_header (out, Memc[comment], true, false))
+			call erract (EA_WARN)
 
 	            IM_NDIM(out) = 2
 	            IM_LEN(out,1) = clgeti ("ncols")
@@ -115,7 +121,6 @@ begin
 	            IM_PIXTYPE(out) = TY_REAL
 		    call clgstr ("title", IM_TITLE(out), SZ_IMTITLE)
 		    call imaddi (out, "dispaxis", 2)
-		    call mko_header (out)
 	        }
 	    } else {
 	        iferr (in = immap (Memc[input], READ_ONLY, 0)) {
@@ -132,21 +137,10 @@ begin
 	    nc = IM_LEN(out,1)
 	    nl = IM_LEN(out,2)
 
-	    # Add comment history of task parameters.
-	    call strcpy ("# ", Memc[comment], LEN_COMMENT)
-	    call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
-	    call mko_comment (out, Memc[comment])
-	    call mko_comment (out, "begin\tmk2dspec")
-	    call mko_comment1 (out, "models", 's', Memc[comment])
-
 	    # Read the models file.
 	    fd = open (Memc[models], READ_ONLY, TEXT_FILE)
 	    nmods = 0
 	    while (fscan (fd) != EOF) {
-		call gargstr (Memc[comment], LEN_COMMENT)
-		call mko_comment (out, Memc[comment])
-
-		call reset_scan ()
 	        call gargwrd (Memc[template], SZ_FNAME)
 	        call gargr (scale)
 	        call gargwrd (Memc[pname], SZ_FNAME)
@@ -228,6 +222,22 @@ begin
 		    x2 = (pend - pos) / pstep + pcen[ptype] + 1
 		    Memr[data+k2] = Memr[data+k2] + peak * asigrl (asi, x1, x2)
 	        }
+	    }
+
+	    # Add comment history of task parameters.
+	    if (cmmts) {
+		call strcpy ("# ", Memc[comment], LEN_COMMENT)
+		call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
+		call mkh_comment (out, Memc[comment])
+		call mkh_comment (out, "begin\tmk2dspec")
+		call mkh_comment1 (out, "models", 's')
+
+		fd = open (Memc[models], READ_ONLY, TEXT_FILE)
+		while (fscan (fd) != EOF) {
+		    call gargstr (Memc[comment], LEN_COMMENT)
+		    call mkh_comment (out, Memc[comment])
+		}
+		call close (fd)
 	    }
 
 	    if (in != out)

@@ -1,5 +1,135 @@
 .help revisions Jun88 math
 .nf
+math/nlfit/nlacpts.gx
+math/nlfit/nlerrors.gx
+	Fixed a bug in the routine nlacpts where the variable sum was
+	not being initialized properly for each iteration. This could
+	cause a slow drift in repeated fits. Also fixed a related problem
+	in the error computation. Note this was not a problem
+	with the version of nlfit in apphot in versions 2.9 or in 
+	testphot.
+
+	(1/9/92 Davis)
+
+math/nlfit/nlfit.gx
+math/nlfit/nlfitr.x
+math/nlfit/nlfitd.x
+	Added some code to force the nlfit package to do at least MINITER
+	iterations whether or not the solution actually converged; MINITER
+	+ 1 if the weighting type is WTS_SCATTER.
+	(1/3/91 Davis)
+
+math/nlfit/nliter.gx
+math/nlfit/nliterr.x
+math/nlfit/nliterd.x
+	Simplied the test for determining whether the lambda factor needs
+	to be increased or decreased.
+	(1/3/91 Davis)
+
+math/nlfit/nlzero.gx
+math/nlfit/nlfitdefr.h
+math/nlfit/nlfitdefd.h
+	Removed an extra argument from two aclr$t routines. Also these routines
+	were being called with the pointer instead of the array as the 
+	argument. (10/3/91 Davis)
+
+lib/math/iminterp.h
+math/iminterp/arbpix.x
+math/iminterp/arider.x
+math/iminterp/arieval.x
+math/iminterp/asider.x
+math/iminterp/asieval.x
+math/iminterp/asifit.x
+math/iminterp/asiffree.x
+math/iminterp/asigrl.x
+math/iminterp/asiinit.x
+math/iminterp/asirestore.x
+math/iminterp/asisave.x
+math/iminterp/asivector.x
+math/iminterp/ii_1dinteg.x
+math/iminterp/ii_eval.x
+math/iminterp/ii_pc1deval.x
+math/iminterp/im1interpdef.h
+math/iminterp/doc/arbpix.hlp
+math/iminterp/doc/arider.hlp
+math/iminterp/doc/arieval.hlp
+math/iminterp/doc/asider.hlp
+math/iminterp/doc/asieval.hlp
+math/iminterp/doc/asifit.hlp
+math/iminterp/doc/asigrl.hlp
+math/iminterp/doc/asiinit.hlp
+math/iminterp/doc/asivector.hlp
+	The 1D image interpolation routines were replaced with new versions
+	modified by Frank Valdes to support sinc interpolation. (7/26/91 Davis)
+
+lib/math/curfit.h
+lib/math/gsurfit.h
+lib/math/iminterp.h
+lib/math/interp.h
+lib/math/surfit.h
+	Added dictionary string definitions for the interpolator types and
+	weights.  Use of these strings insures that strdic/clgwrd will
+	return the correct type code.  Currently one has to assume the code
+	definitions will not change or put a lookup table with a data
+	statement containing the macro definitions.  The code would also
+	have to be modified to add new types.  The dates were restored to
+	their original values to avoid recompilation.  (5/9, Valdes)
+
+math$curfit/cverrors.gx: Davis, May 6, 1991
+math$curfit/cvpower.gx
+math$curfit/cvrefit.gx
+math$curfit/cvrestore.gx
+    Finished cleanup of curfit package .gx files.
+
+math$gsurfit/gs_f1deval.gx: Davis, May 6, 1991
+    Changed the line "call amulk$t (,,,2.,,,)" to "call amulk$t (,,,2$f,,,)
+    to remove a type dependence problem found by ftoc on the Mac.
+
+math$curfit/cvpower.gx: Davis, May 6, 1991
+    Changed the constant from INDEFR to INDEF in the amov$t call in cvpower.gx.
+    This was causing a problem for the Mac compiler.
+
+math$curfit/cv_b1eval.gx: Davis, April 23, 1991
+math$curfit/cv_beval.gx
+math$curfit/cv_feval.gx
+math$curfit/cvaccum.gx
+math$curfit/cvacpts.gx
+math$curfit/cvchomat.gx
+math$curfit/cvfree.gx
+math$curfit/cvinit.gx
+    Did some cleaning up in the following .gx files to make the code easier
+    to read.
+
+math$nlfit/: Davis, Jan 31, 1991
+    Added the nlfit package to the math package. 
+
+math$surfit/isreplace.x: Davis, September 18, 1990
+    1. Changed the int calls in isreplace.x to nint calls. This is a totally
+    safe way to do the conversion from floating point to integer
+    quantities in the surfit package and removes any potential precision
+    problems for task which must read the surfit structure back from a
+    text database file.
+
+math$gsurfit/gsrestore.gx,gsrestorer.x,gsrestored.x: Davis, September 18, 1990
+    1. Changed the int calls in gsrestore.gx to nint calls. This is a totally
+    safe way to do the conversion from floating point to integer
+    quantities in the gsurfit package and removes any potential precision
+    problems for task which must read the gsurfit structure back from a
+    text database file.
+
+math$curfit/cvrestore.gx,cvrestorer.x,cvrestored.x: Davis, September 18, 1990
+    1. Changed the int calls in cvrestore.gx to nint calls. This is a totally
+    safe way to do the conversion from floating point to integer
+    quantities in the curfit package and removes any potential precision
+    problems for task which must read the curfit structure back from a
+    text database file.
+
+math$gsurfit/gsder.gx,gsderd.x: Davis, August 1, 1990
+    1. Fixed a typo in the routine which computes the double precision
+    derivatives of a surface. Due to this type the salloc routine was being
+    passed a pointer instead of size. When the value of this pointer
+    got very large this could cause an out of memory allocation error.
+
 math$iminterp/msigrl.x: Davis, Feb 8, 1989
     1. There was a bug in the shift and wrap routines in the 2D routine
     which integrates in polygonal apertures. If the vertices of the

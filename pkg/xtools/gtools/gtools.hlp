@@ -49,6 +49,7 @@ COLON COMMANDS
 :/help			Print this menu
 :/mark string		Mark type (point, box, plus, cross, diamond,
 				   hline, vline, hebar, vebar, circle)
+:/sysid [yes|no]	Include the standard IRAF user/date banner?
 :/title	string		Title
 :/transpose		Transpose the graph axes
 :/type string		Type of graph (line, hist, or mark)

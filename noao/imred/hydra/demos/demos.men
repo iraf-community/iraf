@@ -1,0 +1,7 @@
+	MENU of HYDRA Demonstrations
+
+    mkdohdyra - Make Hydra test data (12 fibers, 100x256)
+      dohydra - Quick Hydra test (small images, no comments, no delays)
+
+   mkdonessie - Make Nessie test data (12 fibers, 100x256)
+     donessie - Quick Nessie test (small images, no comments, no delays)

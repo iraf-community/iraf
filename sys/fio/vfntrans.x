@@ -108,7 +108,10 @@ begin
 
 	repeat {
 	    call vfn_encode (Memc, ip, root, lenroot, extn, lenextn)
-	    if (Memc[ip] == '/' || root[1] == '.') {
+	    if (Memc[ip] == '/' ||
+		(root[1] == '.' && lenroot == 1) ||
+		(root[1] == '.' && root[2] == '.' && lenroot == 2)) {
+
 		if (lenroot > MAX_ROOTLEN) {
 		    call vfn_squeeze (root, Memc[sqroot], MAX_ROOTLEN)
 		    call zfsubd (osdir, SZ_OSDIR, Memc[sqroot], lenosdir)

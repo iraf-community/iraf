@@ -3,6 +3,7 @@
 include <error.h>
 include	<ctype.h>
 include <mach.h>
+include <fset.h>
 
 define	MAX_RANGES	100
 define  TABSIZE           8
@@ -12,30 +13,36 @@ define  TABSIZE           8
 
 procedure t_rcardimage()
 
-bool	join, verbose
-char	infile[SZ_FNAME], outfile[SZ_FNAME]
-char	file_list[SZ_LINE]
+char	infile[SZ_FNAME]		# the input file name list
+char	outfile[SZ_FNAME]		# the output file name list
+char	file_list[SZ_LINE]		# the file number list
+int	offset				# the file number offset
+bool	join				# join long lines ?
+bool	verbose				# verbose output ?
 
 char	in_fname[SZ_FNAME], out_fname[SZ_FNAME]
-int	offset, nlines, file_number, ncards, range[MAX_RANGES*2+1], nfiles
+int	nlines, file_number, ncards, range[MAX_RANGES*2+1], nfiles
 int	lenlist, junk
 pointer	list
 
 bool	clgetb()
+int	btoi(), clgeti(), mtfile(), mtneedfileno(), strlen(), decode_ranges()
+int	get_next_number(), fntlenb(), fntgfnb(), fstati()
 pointer	fntopnb()
-int	btoi(), clgeti(), mtfile(), strlen(), decode_ranges()
-int	get_next_number(), fntlenb(), fntgfnb()
 include "rcardimage.com"
 
 begin
+	if (fstati (STDOUT, F_REDIR) == NO)
+	    call fseti (STDOUT, F_FLUSHNL, YES)
+
 	# Get parameters.
 	call clgstr ("cardfile", infile, SZ_FNAME)
 	call clgstr ("textfile", outfile, SZ_FNAME)
 
-	# Make up a file list
+	# Make up a file list.
 	if (mtfile (infile) == YES) {
 	    list = NULL
-	    if (infile[strlen(infile)] != ']')
+	    if (mtneedfileno (infile) == YES)
 	        call clgstr ("file_list", file_list, SZ_LINE)
 	    else
 	        call strcpy ("1", file_list, SZ_LINE)
@@ -46,14 +53,14 @@ begin
 	        call pargi (lenlist)
 	}
 
-	# Decode ranges
+	# Decode the ranges.
 	if (decode_ranges (file_list, range, MAX_RANGES, nfiles) == ERR)
 	    call error (1, "Illegal file number list")
 	    
-	# Set up formatting parameters
+	# Set up the formatting parameters.
 	card_length = min (SZ_LINE, clgeti ("card_length"))
 	if (mod (card_length, SZB_CHAR) != 0)
-	    call error (2, "A card must fit in an integral number of chars")
+	    call error (2, "A card must contain an even number of characters")
 	max_line_length = min (SZ_LINE, clgeti ("max_line_length"))
 	join = clgetb ("join")
 	if (join)
@@ -76,19 +83,18 @@ begin
 	file_number = 0
 	while (get_next_number (range, file_number) != EOF) {
 
-	    # get input file name
+	    # Get the input file name.
 	    if (list != NULL)
 		junk = fntgfnb (list, in_fname, SZ_FNAME)
 	    else {
-	        call strcpy (infile, in_fname, SZ_FNAME)
-	        if (infile[strlen(infile)] != ']') {
-		    call sprintf (in_fname[strlen(in_fname)+1], SZ_FNAME,
-		        "[%d]")
-		        call pargi (file_number)
-		}
+		if (mtneedfileno (infile) == YES)
+		    call mtfname (infile, file_number, in_fname, SZ_FNAME)
+		else
+		    call strcpy (infile, in_fname, SZ_FNAME)
+
 	    }
 
-	    # get output file name
+	    # Get the output file name.
 	    call strcpy (outfile, out_fname, SZ_FNAME)
 	    if (nfiles > 1) {
 		call sprintf (out_fname[strlen(out_fname)+1], SZ_FNAME, "%03d")
@@ -105,7 +111,6 @@ begin
 		    call printf ("File: %s -> %s: ")
 			call pargstr (in_fname)
 			call pargstr (out_fname)
-		    call flush (STDOUT)
 		}
 
 	        call rc_cardfile_to_textfile (in_fname, out_fname, nlines,
@@ -115,16 +120,15 @@ begin
 		    call printf ("%d card images -> %d text lines\n")
 			call pargi (ncards)
 			call pargi (nlines)
-		    call flush (STDOUT)
 		}
 
 	    } then {
+		call flush (STDOUT)
 		call erract (EA_FATAL)
 	    } else if (nlines == 0) {			# EOT reached
 		if (verbose) {
 		    call printf ("EOT encountered at file %s\n")
 			call pargi (file_number + offset)
-		    call flush (STDOUT)
 		}
 		call delete (out_fname)
 		break
@@ -141,10 +145,13 @@ end
 
 procedure rc_cardfile_to_textfile (in_fname, out_fname, nlines, ncards)
 
-char	in_fname[ARB], out_fname[ARB]
-char	lbuf[SZ_LINE], tempbuf[SZ_LINE]
-int	in, out, nchars, nlines, ncards
+char	in_fname[ARB]				# the input file name
+char	out_fname[ARB]				# the output file name
+int	nlines					# the number of lines
+int	ncards					# the number of cards
 
+char	lbuf[SZ_LINE], tempbuf[SZ_LINE]
+int	in, out, nchars
 int	mtopen(), open(), rc_fetchcard()
 errchk	mtopen, open, rc_fetchcard, putline, strentab, close
 include "rcardimage.com"
@@ -178,8 +185,9 @@ end
 
 int procedure rc_fetchcard (fd, outline, cp)
 
-char	outline[ARB]
-int	fd, cp
+int	fd			# the input file descriptor
+char	outline[ARB]		# the output line
+int	cp			# the card counter
 
 bool	newfile
 char	instring[SZ_LINE * SZ_SHORT]
@@ -237,8 +245,8 @@ end
 
 int procedure rc_card_to_text (fd, card)
 
-char	card[ARB]
-int	fd
+int	fd				# input file descriptor
+char	card[ARB]			# the packed/unpacked cardimage image
 
 int	npacked_chars, nchars
 int	read()

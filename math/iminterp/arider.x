@@ -3,7 +3,7 @@
 include <math/iminterp.h>
 include "im1interpdef.h"
 
-# ARIDER -- procedure to return the derivatives
+# ARIDER -- Return the derivatives of the interpolant.
 
 procedure arider (x, datain, npix, derivs, nder, interp_type)
 
@@ -21,7 +21,7 @@ begin
 	if (nder <= 0)
 	    return
 
-	# zero out derivs array
+	# Zero out the derivatives array.
 	do i = 1, nder
 	    derivs[i] = 0.
 
@@ -42,7 +42,11 @@ begin
 		derivs[2] = temp - datain[nearx]
 	    return
 
-	# The other cases call subroutines to generate polynomial coeff.
+	case II_SINC:
+	    call ii_sincder (x, derivs, nder, datain, npix, NSINC, NTAPER,
+		STAPER, DX)
+	    return
+
 	case II_POLY3:
 	    call ia_pcpoly3 (x, datain, npix, pcoeff)
 	    nterms = 4
@@ -54,23 +58,27 @@ begin
 	case II_SPLINE3:
 	    call ia_pcspline3 (x, datain, npix, pcoeff)
 	    nterms = 4
+
 	}
+
+	# Evaluate the polynomial derivatives.
 
 	nearx = x
 	deltax = x - nearx
+
 	nd = nder
 	if (nder > nterms)
 	    nd = nterms
 
 	do k = 1, nd {	
 
-	    # evaluate using nested multiplication
+	    # Evaluate using nested multiplication
 	    accum = pcoeff[nterms - k + 1]
 	    do j = nterms - k, 1, -1
 		accum = pcoeff[j] + deltax * accum
 	    derivs[k] = accum
 
-	    # differentiate
+	    # Differentiate.
 	    do j = 1, nterms - k
 		pcoeff[j] = j * pcoeff[j + 1]
 	}

@@ -1,7 +1,7 @@
 # Parameter file for the CRTPICT task
 input,f,a,,,,input images
 output,f,h,"",,,output metacode file name
-device,s,h,"dicomed",,,output device
+device,s,h,"film_recorder",,,output device
 auto_fill,b,h,yes,,,fill output area?
 replicate,b,h,yes,,,block replicate to fill device area?
 xmag,r,h,1.0,,,x magnification factor

@@ -1,0 +1,24 @@
+# Help directory for the PROTO package.
+
+$doc		= "pkg$proto/doc/"
+
+binfil		hlp =doc$binfil.hlp,	src = x_binfil.x
+bscale		hlp =doc$bscale.hlp,	src = t_bscale.x
+epix		hlp =doc$epix.hlp,	src = epix.x
+fields		hlp =doc$fields.hlp,	src = fields.x
+hfix		hlp =doc$hfix.hlp,	src = t_hfix.x
+imalign		hlp =doc$imalign.hlp,   src = imalign.cl
+imcentroid	hlp =doc$imcentroid.hlp,src = t_imctroid.x
+imcntr		hlp =doc$imcntr.hlp,	src = t_imcntr.x
+fixpix		hlp =doc$fixpix.hlp,	src = t_fixpix.x
+imfunction	hlp =doc$imfunction.hlp,src = imfunction.x
+imreplace	hlp =doc$imreplace.hlp,	src = t_imreplace.x
+imscale		hlp =doc$imscale.hlp,	src = t_imscale.x
+interp		hlp =doc$interp.hlp,	src = interp.x
+irafil		hlp =doc$irafil.hlp,	src = x_binfil.x
+joinlines	hlp =doc$joinlines.hlp,	src = t_joinlines.x
+suntoiraf	hlp =doc$suntoiraf.hlp, src = t_suntoiraf.x
+wcsedit		hlp =doc$wcsedit.hlp,   src = t_wcsedit.x
+wcsreset	hlp =doc$wcsreset.hlp,  src = t_wcsreset.x
+
+revisions	sys =Revisions

@@ -41,7 +41,7 @@ char	title[SZ_LINE]
 int	logfd
 pointer	in, bias, out, ic, gt
 
-int	clgeti(), clpopnu(), clgfil(), open(), gt_init()
+int	clgeti(), clpopnu(), clgfil(), open(), gt_init(), nowhite()
 int	imtopen(), imtlen(), imtgetim(), btoi()
 bool	clgetb()
 long	clktime()
@@ -66,6 +66,10 @@ begin
 
 	call clgstr ("bias", biassec, SZ_FNAME)
 	call clgstr ("trim", trimsec, SZ_FNAME)
+	if (nowhite (biassec, biassec, SZ_FNAME) == 0)
+	    ;
+	if (nowhite (trimsec, trimsec, SZ_FNAME) == 0)
+	    ;
 	median = btoi (clgetb ("median"))
 
 	# Determine if the task is interactive.  If not set the interactive

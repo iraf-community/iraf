@@ -16,24 +16,20 @@ the polymark task shares some code with the polyphot task.
 The .h files are all in lib as many of them are shared by several tasks.
 
              |-aplib---------apphot routines used by several tasks
-             |-apselect------routines specific to the apselect task
              |-aputil--------miscellaneous useful routines
-             |-center--------routines specific to the fitsky task
+             |-center--------routines specific to centering, the center task
              |-daofind-------routines specific to the daofind task
              |-doc-----------apphot documentation
 |-apphot-----|-fitpsf--------routines specific to the fitpsf task
-             |-fitsky--------routines specific to the fitsky task
+             |-fitsky--------routines specific to sky fitting, the fitsky task
 	     |-lib-----------apphot definitions or .h files
-             |-nlfit---------non-linear least squares fitting routines
-             |-phot----------routines specific to the phot task
-	     |-polymark------routines specific to the polymark task
-             |-polyphot------routines specific to the polyphot task
-	     |-qphot---------routines specific to the qphot task
+             |-phot----------routines specific to the qphot/phot tasks
+             |-polyphot------routines specific to the polyphot/polymark tasks
              |-radprof-------routines specific to the radprof task
 	     |-wphot---------routines specific to the wphot task
-             |-test----------test data
+             |-test----------directory of test data
 
 
 Lindsey Davis
 NOAO IRAF GROUP
-November 1989
+November 1991

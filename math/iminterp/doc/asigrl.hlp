@@ -27,9 +27,13 @@ DESCRIPTION
 The integral is calculated assuming that the interior polynomial interpolants
 are stored as the data points. The spline interpolant is stored as an array
 of B-spline coefficients.
+
+The integral of the sinc interpolant
+is computed by dividing interval into a number of equal
+size subintervals which are at most one pixel wide.  The integral
+of each subinterval is the central value times the interval width.
 .ih
 NOTES
 ASIINIT and ASIFIT must be called before using ASIGRL.
 .ih
 SEE ALSO
-

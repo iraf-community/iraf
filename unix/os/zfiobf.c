@@ -82,7 +82,7 @@ XINT	*chan;			/* file number (output)		*/
 	case NEW_FILE:
 	    /* Create file and then reopen for read-write access.
 	     */
-	    if ((fd = creat ((char *)osfn, FILE_MODEBITS)) != ERR) {
+	    if ((fd = creat ((char *)osfn, _u_fmode(FILE_MODEBITS))) != ERR) {
 		close (fd);
 		fd = open ((char *)osfn, 2);
 	    }
@@ -96,7 +96,7 @@ XINT	*chan;			/* file number (output)		*/
 	     * append to it.
 	     */
 	    if (access ((char *)osfn, 0) == ERR)
-		close (creat ((char *)osfn, FILE_MODEBITS));
+		close (creat ((char *)osfn, _u_fmode(FILE_MODEBITS)));
 	    fd = open ((char *)osfn, 2);
 	    break;
 
@@ -299,4 +299,14 @@ XLONG	*lvalue;
 	    (*lvalue) = XERR;
 	    break;
 	}
+}
+
+
+/* _U_FMODE -- Compute the effective file mode, taking into account the
+ * current process umask.  (A no-op at present).
+ */
+_u_fmode (mode)
+int	mode;
+{
+	return (mode);
 }

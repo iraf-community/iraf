@@ -4,6 +4,9 @@
 
 task	implot		= t_implot,
 	crtpict		= t_crtpict,
+	gdevices	= t_gdevices,
+	phistogram	= t_phistogram,
+	pradprof 	= t_pradprof,
 	prows 		= t_prows,
 	prow  		= t_prow,
 	pcols 		= t_pcols,

@@ -2,8 +2,8 @@ include <time.h>
 
 define	CENTURY	1900
 
-# APDATE -- Procedure to produce the date and time strings for apphot
-# output files.
+# APDATE -- Fetch the date and time strings required for the apphot output
+# files.
 
 procedure apdate (date, time, maxch)
 

@@ -5,8 +5,8 @@
 
 # set	echo
 
-set	MACH = `mach`		# SUNOS specific.
-#set	MACH = convex		# other systems
+#set	MACH = `mach`		# SUNOS specific.
+set	MACH = dsux		# other systems
 set	args = ""
 
 # Scan the argument list and concatenate all arguments.
@@ -17,11 +17,11 @@ end
 
 # Determine the desired architecture.
 if (! $?IRAFARCH) then
-    if ("$MACH" == "convex") then
-	if (-e ${iraf}bin.ieee/cl.e) then
-	    setenv IRAFARCH "ieee"
+    if ("$MACH" == "dsux") then
+	if (-e $iraf/bin.ddec/cl.e) then
+	    setenv IRAFARCH "ddec"
 	else
-	    setenv IRAFARCH "native"
+	    setenv IRAFARCH "dmip"
 	endif
     else if ("$MACH" == "sparc") then
 	setenv IRAFARCH "sparc"

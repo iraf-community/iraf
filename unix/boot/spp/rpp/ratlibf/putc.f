@@ -1,5 +1,5 @@
-      SUBROUTINE PUTC (C)
-      INTEGER C
-      CALL PUTCH (C, 1)
-      RETURN
-      END
+      subroutine putc (c)
+      integer c
+      call putch (c, 1)
+      return
+      end

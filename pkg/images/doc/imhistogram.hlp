@@ -10,12 +10,17 @@ PARAMETERS
 .ls image
 The name of the image or image subsection whose histogram is to be calculated.
 .le
-.ls nbins = 512
-The number of bins in, or resolution of, the histogram.
-.le
 .ls z1 = INDEF, z2 = INDEF
 The minimum and maximum histogram intensity.  The image minimum and maximum
 pixel values are used by default.
+.le
+.ls binwidth = INDEF
+The resolution of the histogram in counts. If \fIbinwidth\fR is not defined,
+the parameter \fInbins\fR determines the histogram resolution.
+.le
+.ls nbins = 512
+The number of bins in, or resolution of, the histogram. 
+The \fInbins\fR parameter is overridden if \fIbinwidth\fR is defined.
 .le
 .ls autoscale = yes
 In the case of integer data, automatically adjust \fInbins\fR and

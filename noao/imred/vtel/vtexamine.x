@@ -21,8 +21,8 @@ int	filerange[2 * MAX_RANGES + 1]
 int	nfiles, filenumber, nrecords
 
 bool	clgetb()
-int	strncmp(), strlen(), decode_ranges(), get_next_number()
-int	vtexamine()
+int	decode_ranges(), get_next_number()
+int	vtexamine(), mtfile(), mtneedfileno()
 errchk	vtexamine
 
 begin
@@ -33,11 +33,11 @@ begin
 	
         # Get input file(s)
         call clgstr ("input", input, SZ_FNAME)
-        if (strncmp (input, "mt", 2) != 0 || input[strlen(input)]
-		   == ']') {
+	if (mtfile (input) == NO || mtneedfileno (input) == NO)
 	    call strcpy ("1", files, SZ_LINE)
-        } else
+        else
 	    call clgstr ("files", files, SZ_LINE)
+
         if (decode_ranges (files, filerange, MAX_RANGES, nfiles) == ERR)
 	    call error (0, "Illegal file number list.")
 	call printf ("\n")
@@ -48,12 +48,8 @@ begin
 
 	    # Assemble the appropriate tape file name.
 	    call strcpy (input, tapename, SZ_FNAME)
-	    if (strncmp (tapename, "mt", 2) == 0 &&
- 		    tapename[strlen(tapename)] != ']') {
-	        call sprintf (tapename[strlen(tapename) + 1], SZ_FNAME,
-		            "[%d]")
-		    call pargi (filenumber)
-	    }
+	    if (mtfile(input) == YES && mtneedfileno (input) == YES)
+		call mtfname (input, filenumber, tapename, SZ_FNAME)
 
 	    iferr {
 	        nrecords = vtexamine (tapename, headers)

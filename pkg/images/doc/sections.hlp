@@ -8,7 +8,13 @@ sections images
 .ih
 PARAMETERS
 .ls images
-Image template or list of images.
+Image template or list of images.  There is no check that the names are
+images and any name may be used.  The thing which distinguishes an image
+template from a file template is that the special characters '[' and
+']' are interpreted as image sections rather than a character class
+wildcard unless preceded by the escape character '!'.  To explictly
+limit a wildcard template to images one should use an appropriate
+extension such as ".imh".
 .le
 .ls option = "fullname"
 The options are:
@@ -50,13 +56,20 @@ image templates.
 To determine the number of images specified by the user in a command language
 script.
 .le
+
+There is no check that the names are images and any name may be used.
+The thing which distinguishes an \fIimage template\fR from a \fIfile
+template\fR is that the special characters '[' and ']' are interpreted
+as image sections rather than a character class wildcard unless
+preceded by the escape character '!'.  To explictly limit a wildcard
+template to images one should use an appropriate extension such as ".imh".
 .ih
 EXAMPLES
 
 1. Calculate and print the number of images in a template:
 
 .nf
-	cl> sections fits* opti=no
+	cl> sections fits*.imh opti=no
 	cl> = sections.nimages
 	cl> 7
 .fi
@@ -64,11 +77,14 @@ EXAMPLES
 2. Expand an image template:
 
 .nf
-	cl> sections fits*[1:10,*]
-	fits003[1:10,*]
-	fits004[1:10,*]
-	(etc.)
+	cl> sections fits*![3-9].imh[1:10,*]
+	fits003.imh[1:10,*]
+	fits004.imh[1:10,*]
+	<etc.>
 .fi
+
+Note the use of the character class escape, image section appending,
+and explicit use of the .imh extension.
 
 3. Create a new list of image names by adding the suffix "new":
 
@@ -76,17 +92,22 @@ EXAMPLES
 	cl> sections jan18???//new
 	jan18001new
 	jan18002new
-	(etc.)
+	<etc.>
 .fi
+
+Note the use of the append syntax.  Also there is no guarantee that the
+files are actually images.
 
 4. Subtract two sets of images:
 	
 .nf
-	cl> sections objs*[100:200,300:400] > objslist
-	cl> sections skys*[100:200,300:400] > skyslist
-	cl> sections objs*//bck > bcklist
+	cl> sections objs*.imh[100:200,300:400] > objslist
+	cl> sections skys*.imh[100:200,300:400] > skyslist
+	cl> sections %objs%bck%* > bcklist
 	cl> imarith @objslist - @skyslist @bcklist
 .fi
+
+Note the use of the substitution syntax.
 
 .ih
 TIME REQUIREMENTS

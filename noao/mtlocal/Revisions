@@ -1,5 +1,23 @@
 .help revisions Jun88 noao.mtlocal
 .nf
+noao$mtlocal/camera/t_rcamera.x
+noao$mtlocal/camera/cam_rheader.x.x
+noao$mtlocal/r2df/t_r2df.x
+noao$mtlocal/cyber/t_ldumpf.x
+noao$mtlocal/cyber/t_rdumpf.x
+noao$mtlocal/cyber/t_ridsfile.x
+noao$mtlocal/cyber/rrcopy/t_rrcopy.x
+    Davis, January 7, 1992
+    Modified the rcamera, r2df, rpds, ldumpsf, dumpf, ridsfile, and rrcopy
+    tasks to accept the new mag tape name syntax.
+
+noao$mtlocal/lib/mkpkg
+noao$pds/lib/mkpkg
+    Davis, December 3, 1991
+    Added some missing file dependencies for the ranges.x entry (ctype.h
+    and mach.h).
+    Added some missing file dependencies for the pds_rimage.x entry (mach.h).
+
 noao$mtlocal/camera/rcamera.h,cam_keywords.x
     Davis, October 11, 1988
     Some minor modifications were made to the camera header reader to

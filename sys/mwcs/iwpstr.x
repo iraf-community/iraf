@@ -41,6 +41,7 @@ begin
 		Memc[bigstr+nchars] = ' '
 		nchars = nchars + 1
 	    }
+	    Memc[bigstr+nchars] = EOS
 
 	    index = index + 1
 	    cp = iw_findcard (iw, ctype, axis, index)
@@ -52,10 +53,14 @@ begin
 		    update = false
 		}
 
-	    # Output the card.
+	    # Output the card.  The format string should contain two %d
+	    # fields, unless axis=ERR, in which case only the index value
+	    # is used.
+
 	    if (update) {
 		call sprintf (kwname, SZ_KWNAME, fmtstr)
-		    call pargi (axis)
+		    if (axis >= 0)
+			call pargi (axis)
 		    call pargi (index)
 		if (cp == NULL)
 		    call imaddf (im, kwname, "c")

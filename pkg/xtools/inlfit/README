@@ -1,0 +1,165 @@
+                      THE INLFIT PACKAGE
+
+This subdirectory contains the routines of the interactive non-linear
+least squares fitting package INLFIT. This package is layered on the NLFIT
+package in MATH. NLFIT uses the Levenberg-Marquardt method to solve for
+the parameters of a user specified non-linear equation. The user must supply
+two routines. The first routine evaluates the function in terms of its
+parameters. The second routine evaluates the function and its derivatives
+in terms of its parameters. The user must also supply initial guesses for
+the parameters and parameter increments, the list of parameters to be
+varied during the fitting process, a fitting tolerance, and the maximum
+number of iterations.
+
+The entry points into the INLFIT package are listed below.
+
+	  ininit - Initialize the fitting routines
+	   inget - Get the value of an INLFIT parameter
+	   input - Store the value of an INLFIT parameter
+	  ingkey - Get the value of an INLFIT graphics/axis parameter
+	  inpkey - Store the value of an INLFIT graphics/axis parameter
+	   infit - Fit the function non-interactively
+	  ingfit - Fit the function interactively
+	inerrors - Compute the errors of the fit
+	  infree - Free memory allocated by ininit
+
+The calling sequences for the above routines are listed below. The [iprd]
+stand for integer, pointer, real and double precision versions of each
+routine respectively. [str] stands for string.
+
+               in_init[rd] (in, address(func), address(dfunc), param, dparam,
+	               nparams, plist, nfparams)
+  [irdp]val = in_get[irdp] (in, param)
+                   in_gstr (in, params, str, maxch)
+              in_put[irdp] (in, param, val)
+                   in_pstr (in, param, str)
+                   in_gkey (in, key, axis, type, varnum)
+                   in_pkey (in, key, axis, type, varnum)
+               in_fit[rd]  (in, nl, x, y, wts, npts, nvars, wtflag, stat)
+               ing_fit[rd] (in, gp, cursor, gt, nl, x, y, wts, names, npts,
+	                     nvars, len_names, wtflag, stat)
+             in_errors[rd] (in, nl, x, y, wts, npts, nvars, variance,
+	                    chisqr, scatter, rms, errors)
+               in_free[rd] (in)
+
+
+The user supplied functions fnc and dfnc have the following calling
+sequences.
+
+	fnc (x, nvars, nparams, nparams, zfit)
+       dfnc (x, nvars, params, dparams, nparams, zfit, derivs)
+
+The addresses of the user supplied functions can be obtained with a call
+to locpr as follows.
+
+        address = locpr (fnc)
+
+The user definition for the INLFIT package can be found in the file 
+lib$pkg/inlfit.h and can be made available to user applications programs
+with the statement "include <pkg/inlfit.h>".
+
+The permitted values for the param argument are the following.
+
+# Integer valued parameters (in_geti, in_puti)
+
+define	INLFUNCTION		# Fitting function
+define	INLDERIVATIVE		# Fitting function derivatives
+define	INLNPARAMS		# Total number of parameters
+define	INLNFPARAMS		# Number of fitting parameters
+define	INLNVARS		# Number of variables
+define	INLNPTS			# Number of variables
+define	INLMAXITER		# Max. number of iterations
+define	INLNREJECT		# Number of rejection iterations
+define	INLNREJPTS		# Number of rejected points
+define	INLUAXES		# User plot function
+define	INLUCOLON		# User colon function
+define	INLUFIT			# User fit function
+define	INLOVERPLOT		# Overplot next plot ?
+define	INLPLOTFIT		# Overplot fit ?
+define	INLFITERROR		# Error fit code
+define	INLGKEY			# Graph key
+
+
+# Real/double valued parameters (in_get[rd], in_put[rd])
+
+define	INLTOLERANCE		# Tolerance of convergence
+define	INLLOW			# Low rejection value
+define	INLHIGH			# High rejection value
+define	INLGROW			# Rejection growing radius
+
+
+# Pointer valued parameters (in_getp, in_getp)
+
+define	INLNL			# NLFIT descriptor
+define	INLPARAM		# Parameter vector
+define	INLDPARAM		# Parameter change vector
+define	INLPLIST		# Parameter list
+define	INLREJPTS		# Rejected points
+define	INLXMIN			# Minimum value for curve
+define	INLXMAX			# Maximum value for curve
+define	INLSFLOAT		# Floating point substructure
+define	INLSGAXES		# Graphics substructure
+
+
+# String valued parameters (in_gstr, in_pstr)
+
+define	INLLABELS		# standard axis labels
+define	INLUNITS		# standard axis units
+define	INLFLABELS		# Function labels
+define	INLFUNITS		# Function units
+define	INLPLABELS		# Parameter labels
+define	INLPUNITS		# Parameter units
+define	INLVLABELS		# Variable labels
+define	INLVUNITS		# Variable units
+define	INLUSERLABELS		# User plot labels
+define	INLUSERUNITS		# User plot units
+define	INLHELP			# Help file name
+define	INLPROMPT		# Help prompt
+
+
+The permitted values for the key argument are the following.
+
+# in_gkey, in_pkey
+
+define	KEY_FUNCTION		# Function
+define	KEY_FIT			# Fit
+define	KEY_RESIDUALS		# Residuals
+define	KEY_RATIO		# Ratio
+define	KEY_NONLINEAR		# Non-linear part
+define	KEY_VARIABLE		# Variable (user or default)
+define	KEY_UAXIS		# User plot function
+define	KEY_MIN			# Min. key type
+define	KEY_MAX			# Max. key type
+
+The permitted values for the axis argument are the following.
+
+# in_gkey, in_pkey
+
+define	INLXAXIS		# X axis
+define	INLYAXIS		# Y axis
+
+
+The permitted values of the weights flag argument wtflag input to
+in_fit[rd] or in_gfit[rd], and the stat argument returned by in_fit[rd]
+or in_gfit[rd] are defined in lib$math/nlfit.h. They can be included in
+the user's application with the statement "include <math/nlfit.h>".
+The values are listed below.
+
+# Permitted values for wtflag
+
+define	WTS_USER		# User supplied weights
+define	WTS_UNIFORM		# Uniform weighting
+define	WTS_CHISQ		# Chi-squared weighting
+define	WTS_SCATTER		# Weights include computed scatter term
+
+# Permitted values for stat
+
+define	DONE			# Solution converged
+define	SINGULAR		# Singular solution
+define	NO_DEG_FREEDOM		# Too few points
+define	NOT_DONE		# Solution did not converge.
+
+Note the pointer to the NLFIT structure nl is returned by the in_fit[rd]
+and in_gfit[rd] routines and input to the in_errors[rd] routine. This
+pointer must be freed separately with a call to nl_free when the fitting
+process terminates.

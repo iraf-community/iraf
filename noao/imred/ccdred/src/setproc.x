@@ -9,7 +9,8 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 pointer	ccd			# CCD structure (returned)
 
-int	clgwrd()
+int	clgwrd(), clscan(), nscan()
+real	clgetr()
 pointer	sp, str
 
 begin
@@ -26,9 +27,21 @@ begin
 	CORS(ccd, OVERSCAN) = NO
 	CORS(ccd, TRIM) = NO
 	READAXIS(ccd) = clgwrd ("readaxis",Memc[str],SZ_LINE,"|line|columns|")
-	CALCTYPE(ccd) = IM_PIXTYPE(out)
-	if (IM_PIXTYPE(in) == TY_REAL)
-	    CALCTYPE(ccd) = TY_REAL
+	MINREPLACE(ccd) = clgetr ("minreplace")
+
+	CALCTYPE(ccd) = TY_REAL
+	if (clscan ("pixeltype") != EOF) {
+	    call gargwrd (Memc[str], SZ_LINE)
+	    call gargwrd (Memc[str], SZ_LINE)
+	    if (nscan() == 2) {
+	        if (Memc[str] == 'r')
+		    CALCTYPE(ccd) = TY_REAL
+		else if (Memc[str] == 's')
+		    CALCTYPE(ccd) = TY_SHORT
+		else
+		    call error (1, "Invalid calculation datatype")
+	    }
+	}
 
 	call sfree (sp)
 end

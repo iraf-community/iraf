@@ -13,7 +13,7 @@ errchk	errfcn
 
 begin
 	do i = 1, npix {
-		if (a[i] <= 0)
+		if (a[i] < 0)
 		    b[i] = errfcn (a[i])
 		else
 		{

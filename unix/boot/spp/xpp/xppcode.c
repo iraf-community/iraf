@@ -507,7 +507,6 @@ char	ch;
  */
 do_include()
 {
-	static	char irafdefs[SZ_FNAME] = "";
 	char    *p, delim, *rindex();
 	int	root_len;
 	int	strcmp();
@@ -922,6 +921,7 @@ err:	    error (XPP_COMPERR, "too many tasks in task statement");
 	 * the buffer.
 	 */
 	op = obuf;
+	return (OK);
 }
 
 
@@ -1643,7 +1643,7 @@ char	**strp;
 	    for (digit = *ip++;  isdigit (digit);  digit = *ip++)
 		sum = sum * base + (digit - '0');
 	    *strp = ip - 1;
-	    return (sum);
+	    break;
 	case HEX:
 	    while ((digit = *ip++) != EOF) {
 		if (isdigit (digit))
@@ -1654,12 +1654,16 @@ char	**strp;
 		   sum = sum * base + (digit - 'A' + 10);
 		else {
 		    *strp = ip;
-		    return (sum);
+		    break;
 		}
 	    }
+	    break;
 	default:
 	    error (XPP_COMPERR, "Accum: unknown numeric base");
+	    return (ERR);
 	}
+
+	return (sum);
 }
 
 
@@ -1671,8 +1675,8 @@ charcon (string)
 char	*string;
 {
 	register char *ip, ch;
-	char    digit, *nump;
 	char	*cc, *index();
+	char    *nump;
 
 	ip = string + 1;		/* skip leading apostrophe	*/
 	ch = *ip++;
@@ -1685,7 +1689,8 @@ char	*string;
 	    } else if (isdigit (*ip)) {
 		nump = ip;
 		return (accum (OCTAL, &nump));
-	    }
+	    } else
+		return (ch);
 	} else {
 	    /* Regular characters, i.e., 'c'; just return ASCII value of char.
 	     */
@@ -1703,8 +1708,8 @@ char	*string;
 int	base;
 {
 	char    decimal_constant[SZ_NUMBUF], *p;
-	int     i;
 	long    accum(), value;
+	int     i;
 
 	p = string;
 	i = strlen (string);
@@ -1741,6 +1746,7 @@ int	base;
 
 	default:
 	    error (XPP_COMPERR, "Unknown numeric base for integer conversion");
+	    value = ERR;
 	}
 
 	/* Output the decimal value of the integer constant.  We are simply

@@ -35,18 +35,18 @@ pixel areas between the output and input images).
 User coordinates of the first output column and line.  If INDEF then the
 smallest value corresponding to a pixel from the image used to create the
 coordinate map is used.  These values are in user units regardless of whether
-logrithmic intervals are specified or not.
+logarithmic intervals are specified or not.
 .le
 .ls x2 = INDEF, y2 = INDEF
 User coordinates of the last output column and line.  If INDEF then the
 largest value corresponding to a pixel from the image used to create the
 coordinate map is used.  These values are in user units regardless of whether
-logrithmic intervals are specified or not.
+logarithmic intervals are specified or not.
 .le
 .ls dx = INDEF, dy = INDEF
 Output pixel intervals.  If INDEF then the interval is set to yield the
-specified number of pixels.  Note that for logrithmic intervals the
-interval must be specified as a base 10 logrithm (base 10) and not in
+specified number of pixels.  Note that for logarithmic intervals the
+interval must be specified as a base 10 logarithm (base 10) and not in
 user units.
 .le
 .ls nx = INDEF, ny = INDEF
@@ -54,7 +54,7 @@ Number of output pixels.  If INDEF and if the pixel interval is also INDEF then
 the number of output pixels is equal to the number of input pixels.
 .le
 .ls xlog = no, ylog = no
-Logrithmic intervals?  If "yes" the output pixel intervals are logrithmic.
+logarithmic intervals?  If "yes" the output pixel intervals are logarithmic.
 .le
 .ls logfiles = "STDOUT,logfile"
 List of files in which to keep a log.  If null, "", then no log is kept.
@@ -97,10 +97,10 @@ yielding the specified number of pixels is used.  The default number of
 pixels is that of the input image.  Note that if a pixel interval is
 specified then it takes precedence over the number of pixels.
 
-The pixel intervals may also be logrithmic if the parameter \fIxlog\fR or
+The pixel intervals may also be logarithmic if the parameter \fIxlog\fR or
 \fIylog\fR is "yes".  Generally, the number of output pixels is specified
 in this case .  However, if the interval is specified it must be a base
-10 logrithmic interval and not in units of the x and y limits which are
+10 logarithmic interval and not in units of the x and y limits which are
 specified in user units.
 .ih
 EXAMPLES
@@ -116,7 +116,7 @@ of 3 Angstroms per pixel:
 	>>> y1=3800 y2=6400 dy=3
 .fi
 
-To use logrithmic intervals in the wavelength to yield the same number of
+To use logarithmic intervals in the wavelength to yield the same number of
 pixels in the output images as in the input images:
 
 .nf

@@ -1,37 +1,34 @@
+include	<error.h>
+
+
 # STS_HELP -- Issue a help line
 
-procedure sts_help ()
+procedure sts_help (line, nlines, fname, ptr)
 
-int	linenr, maxline
+int	line		# Line to print
+int	nlines		# Number of lines of help
+char	fname[ARB]	# Help file
+pointer	ptr		# Cache help
 
-data	linenr /1/
-data	maxline/5/
+int	fd, open(), getline()
 
 begin
-	switch (linenr) {
-	case 1:
-	    call printf (
-		"c=cursor pos  m=mean/snr  s=smooth  w=window  f=functions")
-
-	case 2:
-	    call printf ("n=>fnu  l=>flambda  p=>wavelth  $=>channels  ")
-	    call printf (".=upshift  ,=dnshift  z=xexpand")
-
-	case 3:
-	    call printf ("o=overplot  d=deblend  -=subtr blend  t=flatten   ")
-	    call printf ("a=autoexp  g=plot new sp")
-
-	case 4:
-	    call printf ("j=fix pt   x=fix line  b=zero base  r=replot  ")
-	    call printf ("q=quit  ?=help /=linehelp")
-
-	case 5:
-	    call printf (
-	"i=write sp  e,k,v=eq. width  h=eqw(1side)  y=plot_std  u=set_wave")
+	if (ptr == NULL) {
+	    iferr (fd = open (fname, READ_ONLY, TEXT_FILE)) {
+		call erract (EA_WARN)
+		return
+	    }
+	    nlines = 0
+	    call malloc (ptr, SZ_LINE, TY_CHAR)
+	    while (getline (fd, Memc[ptr+nlines*SZ_LINE]) != EOF) {
+		nlines = nlines + 1
+		call realloc (ptr, (nlines+1)*SZ_LINE, TY_CHAR)
+	    }
+	    call close (fd)
 	}
-	call flush (STDOUT)
 
-	linenr = linenr + 1
-	if (linenr > maxline)
-	    linenr = 1
+	if (line >= 1  && line <= nlines) {
+	    call putline (STDOUT, Memc[ptr+(line-1)*SZ_LINE])
+	    call flush (STDOUT)
+	}
 end

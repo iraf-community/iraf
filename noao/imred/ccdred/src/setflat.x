@@ -115,8 +115,6 @@ begin
 	    FLATSCALE(ccd) = 1.
 	CORS(ccd, FLATCOR) = F
 	COR(ccd) = YES
-	if (IM_PIXTYPE(im) == TY_REAL)
-	    CALCTYPE(ccd) = TY_REAL
 
 	# Log the operation.
 	call sprintf (Memc[str], SZ_LINE,

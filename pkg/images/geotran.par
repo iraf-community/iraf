@@ -24,8 +24,8 @@ xmin,r,h,INDEF,,,Minimum reference x value of output picture
 xmax,r,h,INDEF,,,Maximum reference x value of output picture
 ymin,r,h,INDEF,,,Minimum reference y value of output picture
 ymax,r,h,INDEF,,,Maximum reference y value of output picture
-xscale,r,h,INDEF,0.,,X scale of output picture in reference units per pixel
-yscale,r,h,INDEF,0.,,Y scale of output picture in reference units per pixel
+xscale,r,h,1.0,0.,,X scale of output picture in reference units per pixel
+yscale,r,h,1.0,0.,,Y scale of output picture in reference units per pixel
 ncols,i,h,INDEF,1,,Number of columns in the output picture
 nlines,i,h,INDEF,1,,Number of lines in the output picture
 

@@ -22,8 +22,8 @@ begin
 	# Reduction of geodetic latitude to geocentric latitude (radians).
 	# Dlat is in arcseconds.
 
-	dlat = -(11. * 60. + 32.743000) * sin (2 * lat) +
-		1.163300 * sin (4 * lat) -0.002600 * sin (6 * lat)
+	dlat = -(11. * 60. + 32.743000d0) * sin (2 * lat) +
+		1.163300d0 * sin (4 * lat) -0.002600d0 * sin (6 * lat)
 	lat = lat + DEGTORAD (dlat / 3600.)
 
 	# R is the radius vector from the Earth's center to the observer
@@ -31,9 +31,10 @@ begin
 	# (meters/sidereal day converted to km / sec).
 	# (sidereal day = 23.934469591229 hours (1986))
 
-	r = 6378160.0 * (0.998327073 + 0.00167643800 * cos (2 * lat) -
-	    0.00000351 * cos (4 * lat) + 0.000000008 * cos (6 * lat)) + altitude
-	vc = TWOPI * (r / 1000.)  / (23.934469591229 * 3600.)
+	r = 6378160.0d0 * (0.998327073d0 + 0.00167643800d0 * cos (2 * lat) -
+	    0.00000351d0 * cos (4 * lat) + 0.000000008d0 * cos (6 * lat)) +
+	    altitude
+	vc = TWOPI * (r / 1000.)  / (23.934469591229d0 * 3600.)
 
 	# Project the velocity onto the line of sight to the star.
 	lmst = ast_mst (epoch, longitude)

@@ -3,7 +3,8 @@ include	<gset.h>
 include	"sensfunc.h"
 
 # SENSFUNC colon commands
-define	CMDS	"|stats|vstats|function|order|graphs|images|skys|marks|"
+define	CMDS	"|stats|vstats|function|order|graphs|images|skys|marks\
+		 |fluxlimits|"
 define	STATS		1	# Show results
 define	VSTATS		2	# Show verbose results
 define	FUNCTION	3	# Sensitivity function type
@@ -12,6 +13,7 @@ define	GRAPHS		5	# Select graphs
 define	IMAGES		6	# Select images
 define	SKYS		7	# Select skys
 define	MARKS		8	# Set graph mark types
+define	FLIMITS		9	# Flux graph limits
 
 # SF_COLON -- Process SENSFUNC colon commands.
 # This procedure has so many arguments because of the STATS option.
@@ -35,7 +37,8 @@ real	rms			# RMS in fit
 int	newfit			# New function?
 int	newgraph		# New graphs?
 
-int	i, j, ncmd, ival, fd, nscan(), strdic(), open()
+int	i, j, ncmd, ival, fd, nscan(), strdic(), open(), stridx()
+real	rval1, rval2
 bool	streq()
 pointer	sp, str
 errchk	open
@@ -95,23 +98,25 @@ begin
 	    if (nscan() == 2) {
 	        call strcpy (Memc[str], function, SZ_FNAME)
 		newfit = NO
-	    } else
+	    } else {
 		call printf ("function %s")
 		    call pargstr (function)
+	    }
 	case ORDER:
 	    call gargi (ival)
 	    if (nscan() == 2) {
 		order = ival
 		newfit = NO
-	    } else
+	    } else {
 		call printf ("order %d")
 		    call pargi (order)
+	    }
 	case GRAPHS:
 	    call gargstr (Memc[str], SZ_LINE)
 	    j = str
 	    for (i=str; Memc[i] != EOS; i=i+1) {
 		switch (Memc[i]) {
-		case 'a','c','e','i','r','s':
+		case 'a','c','e','i','l','r','s':
 		    Memc[j] = Memc[i]
 		    j = j + 1
 		}
@@ -163,8 +168,21 @@ begin
 	case MARKS:
 	    call gargstr (Memc[str], SZ_LINE)
 	    call sf_marks (gp, Memc[str])
+	case FLIMITS:
+	    call gargr (rval1)
+	    call gargr (rval2)
+	    if (nscan() == 3) {
+		GP_FMIN(gp) = rval1
+		GP_FMAX(gp) = rval2
+		if (stridx (GP_GRAPHS(gp,1), "il") != 0)
+		    newgraph = YES
+	    } else {
+		call printf ("fluxlimits %g %g")
+		    call pargr (GP_FMIN(gp))
+		    call pargr (GP_FMAX(gp))
+	    }
 	default:
-	    call printf ("\007")
+	    call printf ("Unrecognized or ambiguous command\007")
 	}
 
 	call sfree (sp)

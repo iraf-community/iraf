@@ -67,12 +67,15 @@ Dates and times:
 	    character string is the three character abbreviation for the day
 	    of the week.  Note that the day of the week is for Greenwich
 	    if the standard UT is used.
-	JULDAY -- Convert epoch to Julian day.
+	AST_JULDAY -- Convert epoch to Julian day.
+	AST_DATE_TO_JULDAY -- Convert date to Julian day.
+	AST_JULDAY_TO_DATE -- Convert Julian day to date.
 	AST_MST -- Mean sidereal time of the epoch at the given longitude.
 	    This procedure may be used to optain Greenwich Mean Sidereal Time
 	    (GMST) by setting the longitude to 0.
     asthjd.x:
 	AST_HJD -- Helocentic Julian Day for a direction of observation.
+	AST_JD_TO_HJD -- Helocentic Julian Day for a direction of observation.
 
 Helocentric Parameters:
 

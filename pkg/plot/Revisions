@@ -1,5 +1,205 @@
-.help revisions Mar90 pkg.plot
+.help revisions Aug90 pkg.plot
 .nf
+pkg$plot/t_pradprof.x
+    The new pradprof task was using the file name template expansion routines
+    instead of the image name template expansion routines producing an error
+    if the input image name was an image section. (6/23/92, Davis)
+
+pkg$plot/t_implot.x
+    There was some ambiguity with the averaging option.  This has been defined
+    that if an averaging size is set then selecting a single line or
+    column with 'l', 'c', :l, :c will make the selected line be the center
+    of the averaging region instead of the lower limit.  (4/23/92, Valdes)
+
+pkg$plot/t_pcol.x
+pkg$plot/t_implot.x
+pkg$plot/t_graph.x
+pkg$plot/t_pcols.x
+pkg$plot/t_prows.x
+pkg$plot/pltwcs.x
+pkg$plot/graph.par
+pkg$plot/prow.par
+pkg$plot/prows.par
+pkg$plot/pcol.par
+pkg$plot/pcols.par
+pkg$plot/doc/graph.hlp
+pkg$plot/doc/implot.hlp
+pkg$plot/doc/prow.hlp
+pkg$plot/doc/prows.hlp
+pkg$plot/doc/pcol.hlp
+pkg$plot/doc/pcols.hlp
+    1. Modified GRAPH, IMPLOT, PROW(S), and PCOL(S) to define and set
+       a coordinate format in plots.  This allows graphs to be
+       made in DD:MM:SS and related formats.
+    2. Modified GRAPH, IMPLOT, PROW(S), and PCOL(S) to use any WCS attribute
+       coordinate format found in the images.
+    3. Added xformat and yformat parameters to GRAPH, PROW(S), and PCOL(S) to
+       define coordinate plot formats.  This allows having a format when a
+       format attribute in not found in the images, to override a format
+       attribute, and to allow setting the format in simple text input.
+       For example, GRAPH can plot formated RA and DEC from a list of
+       input RA and DEC coordinates.
+    4. Added a ":f format" to IMPLOT to allow specifying/overriding the
+       WCS attribute format.
+    5.  Added <space> as a key in IMPLOT to print coordinate and pixel
+       value information:
+	   line=256, column=142, coordinate=13:27:55.6, value=222.
+    (4/9/92, Valdes)
+
+pkg$plot/pltwcs.x
+pkg$plot/t_prows.x
+pkg$plot/t_pcols.x
+pkg$plot/t_graph.x
+	The logical coordinates used for coordinate evaluations when
+	using an image section were incorrectly set.  (3/9/92, Valdes)
+
+pkg$plot/pltwcs.x
+pkg$plot/t_graph.x
+	Modified plt_wcs to take as input the wcs name in order to
+	set an appropriate wcs label for the wcs instead of using
+	the world wcs in all cases.
+	(3/4/92, Valdes)
+
+pkg$plot/t_pvector.x
+	In image pixel buffer column limits were being incorrectly computed
+	in some cases result in glitches in the output vector.
+	(12/11/91 Davis)
+
+pkg/plot/t_graph.x
+pkg/plot/graph.par
+pkg/plot/doc/graph.hlp
+	An overplot parameter has been added to allow multiple plots with
+	different axes and viewports.  (10/23/91, Valdes)
+
+pkg/plot/doc/pvector.hlp
+	Corrected the examples showing usage the center/theta.  Also 
+	added a note to the theta parameter notes explaining that is
+	set the center must be specified with a certain syntax as shown
+	in the examples.  Reported by Tom Duvall  (10/8/91  MJF)
+
+pkg/plot/crtpict/calchgms.x
+	Changed the declarations for the variables min_val and max_val in
+	the procedure crt_user_hgram from int to short. (10/5/91, Davis)
+
+pkg/plot/phistogram.x
+	Corrected some type mismatch problems in calls to gset.
+	(10/3/91 Davis)
+
+pkg/plot/t_implot.x
+	The use of overlapping multiple graphics WCS, one for the user and
+	one for the image columns and rows, would result in erroneous
+	coordinates using the C key and later =gcur.  The task was modified
+	to have the same functional behaviour but work only with one
+	graphics WCS.  (9/12/91, Valdes)
+
+pkg/plot/t_prow.x
+pkg/plot/t_prows.x
+pkg/plot/t_pcol.x
+pkg/plot/t_pcols.x
+pkg/plot/prow.par
+pkg/plot/prows.par
+pkg/plot/pcol.par
+pkg/plot/pcols.par
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+	Modified to have a wcs parameter and plot using the specified
+	wcs.  The xlabel parameter includes a special word to select
+	the WCS label in the image.  (9/12/91, Valdes)
+
+pkg/plot/pradprof.par
+pkg/plot/t_pradprof.x
+pkg/plot/doc/pradprof.hlp
+        Pradprof was orignally installed on 8/16/91, but had to be
+	reinstalled on 8/26/91 after a major disk crash.  (8/26/91 LED)
+
+
+pkg/plot/phistogram.par
+pkg/plot/phistogram.x
+pkg/plot/phminmax.x
+pkg/plot/doc/phistogram.hlp
+	Phistogram was originally installed on 8/14/91, but had to be 
+	reinstalled on 8/26/91 after a major disk crash.  (8/26/91 LED)
+
+pkg/plot/pradprof.par
+pkg/plot/t_pradprof.x
+pkg/plot/doc/pradprof.hlp
+	Added a new task pradprof to the plot package. (8/16/91 LED)
+
+pkg/plot/phistogram.par
+pkg/plot/phistogram.x
+pkg/plot/phminmax.x
+pkg/plot/doc/phistogram.hlp
+	Added a new task phistogram to the plot package. Phistogram takes
+	input from either an image or a list and permits full control over
+	the plotting parameters. The histogram computation is done in
+	and identical manner to the imhistogram task.  (8/14/91 LED)
+
+pkg/plot/t_implot.x
+pkg/plot/t_graph.x
+pkg/plot/implot.par
+pkg/plot/graph.par
+pkg/plot/doc/implot.hlp
+pkg/plot/doc/graph.hlp
+	Added a "wcs" parameter to select using image WCS information for
+	coordinates and labels.  (FV 8/12/91)
+
+pkg/plot/t_implot.x
+	Corrected the comment on line 892 (ShJ 8/12/91):
+
+# IMP_SETPIXELCOORDS -- Set wcs 2 to the pixel coordinate system of the image.
+should read
+# IMP_SETPIXELCOORDS -- Set wcs 1 to the pixel coordinate system of the image.
+                                ^
+pkg/plot/t_surface.x
+	Default values for floor and ceiling were changed from 0.0 to INDEF.
+	The default task behavior is the same, plotting from i_datamin to
+	i_datamax, but the value of 0.0 is now interpreted as a valid data 
+	value rather than a flag to trigger CONREC's automatic limit algorithm.
+	At the same time, a coding error that forced you to set both floor
+	and ceiling (you couldn't set just one or the other) was removed.
+	(ShJ 8/5/91)
+
+pkg/plot/t_contour.x
+	Default values for floor and ceiling were changed from 0.0 to INDEF.
+	A test was added to detect a constant valued field.  A call to
+	gamove was added before the final gclose, to fix the WCS to the 
+	device.  All plotting in the NCAR code is done in NDC space (with 
+	conrec parameter nset = 1).  Without the additional call to
+	gamove, plots drawn with perim- would not report cursor positions 
+	in WCS units, since all plotting had been done in NDC space.  (ShJ 8/5)
+
+pkg/plot/surface.par
+pkg/plot/contour.par
+pkg/plot/doc/surface.hlp
+pkg/plot/doc/contour.hlp
+	These help and manual pages were modified to reflect the new default 
+	values of floor and ceiling.	(ShJ 8/5/91)
+
+pkg/plot/t_prow[s].x
+pkg/plot/t_pcol[s].x
+	Removed the call to clputi for defining upper limits for the input
+	row/col number.  This was done for two reasons:  [1] it duplicated
+	other code in the task that checks that the input limits are valid
+	and [2] these tasks could be used with epar when a larger image
+	is plotted after a smaller image; the smaller image limits remain
+	in the par file and prevent the user from setting a parameter outside
+	the range of the smaller image.	(ShJ 8/5/91)
+
+pkg$plot/t_pvector.x
+	Corrected line #45 which had the wrong number of arguments in a call
+	to error, resulting in a segmentation violation instead of the intended
+	error message if the condition being detected occurred.	(ShJ 1/25/91)
+
+pkg$plot/doc/pvector.hlp
+	Clarified documentation regarding the resampling spacing.  (SRo 8/31/90)
+
+pkg$plot/t_pvector.x
+	Added checks for wx1/wx2 and wy1/wy2 parameters allow plotting on
+	an inverse scale when not autoscaling.  Suggested by Tetsuo Aoki
+	at CRL.  (MJF 8/9/90)
+
 pkg$plot/t_surface.x
 	procedure surf_limits was modified to avoid an arithmetic exception
 	for images with values entirely above ceiling or below floor.  This

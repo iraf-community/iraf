@@ -77,23 +77,29 @@ begin
 
 	    # Perform the block operation.
 	    switch (IM_PIXTYPE (im1)) {
-	    case TY_SHORT, TY_INT, TY_LONG:
+	    case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
 		call blkavl (im1, im2, blkfac, option)
+	    case TY_REAL:
+		call blkavr (im1, im2, blkfac, option)
 	    case TY_DOUBLE:
 		call blkavd (im1, im2, blkfac, option)
+	    case TY_COMPLEX:
+		#call blkavx (im1, im2, blkfac, option)
+		call error (0,
+		"Blkavg does not currently support pixel data type complex.")
 	    default:
-		call blkavr (im1, im2, blkfac, option)
+		call error (0, "Unknown pixel data type")
 	    }
 
 	    # Update the world coordinate system.
 	    if (!envgetb ("nomwcs")) {
 		mw = mw_openim (im1)
-		call achtir (blkfac, mags, IM_NDIM(im1))
-		call arcpr (1.0, mags, mags, IM_NDIM(im1))
-		call mw_scale (mw, mags, 0)
 		do i = 1, IM_NDIM(im1)
-		    shifts[i] = 1.0 - mags[i] * (1. + real (blkfac[i])) / 2.0
-		call mw_shift (mw, shifts, 0)
+		    mags[i] = 1.0d0 / double (blkfac[i])
+		call mw_scale (mw, mags, (2 ** IM_NDIM(im1) - 1))
+		do i = 1, IM_NDIM(im1)
+		    shifts[i] = 0.5d0 - 1.0d0 / double (blkfac[i]) / 2.0d0
+		call mw_shift (mw, shifts, (2 ** IM_NDIM(im1) - 1))
 		call mw_saveim (mw, im2)
 		call mw_close (mw)
 	    }

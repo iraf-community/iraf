@@ -14,11 +14,7 @@ int	i
 PIXEL	ri, xnorm
 
 begin
-	$if (datatype == r)
-	basis[1] = 1.0
-	$else
-	basis[1] = 1.0d0
-	$endif
+	basis[1] = PIXEL(1.0)
 	if (order == 1)
 	    return
 
@@ -29,13 +25,8 @@ begin
 
 	do i = 3, order {
 	    ri = i
-	    $if (datatype == r)
-	    basis[i] = ((2.0 * ri - 3.0) * xnorm * basis[i-1] -
-		       (ri - 2.0) * basis[i-2]) / (ri - 1.0)	
-	    $else
-	    basis[i] = ((2.0d0 * ri - 3.0d0) * xnorm * basis[i-1] -
-		       (ri - 2.0d0) * basis[i-2]) / (ri - 1.0d0)	
-	    $endif
+	    basis[i] = ((PIXEL(2.0) * ri - PIXEL(3.0)) * xnorm * basis[i-1] -
+		(ri - PIXEL(2.0)) * basis[i-2]) / (ri - PIXEL(1.0))	
 	}
 end
 
@@ -54,12 +45,7 @@ int	i
 PIXEL	xnorm
 
 begin
-	$if (datatype == r)
-	basis[1] = 1.0
-	$else
-	basis[1] = 1.0d0
-	$endif
-
+	basis[1] = PIXEL(1.0)
 	if (order == 1)
 	    return
 
@@ -69,11 +55,7 @@ begin
 	    return
 
 	do i = 3, order
-	    $if (datatype == r)
-	    basis[i] = 2.0 * xnorm * basis[i-1] - basis[i-2]
-	    $else
-	    basis[i] = 2.0d0 * xnorm * basis[i-1] - basis[i-2]
-	    $endif
+	    basis[i] = PIXEL(2.0) * xnorm * basis[i-1] - basis[i-2]
 end
 
 
@@ -94,12 +76,8 @@ begin
 	xnorm = (x + k1) * k2
 	left = min (int (xnorm), npieces)
 
-	basis[2] = xnorm - left
-	$if (datatype == r)
-	basis[1] = 1.0 - basis[2]
-	$else
-	basis[1] = 1.0d0 - basis[2]
-	$endif
+	basis[2] = max (PIXEL(0.0), min (PIXEL(1.0), xnorm - left))
+	basis[1] = max (PIXEL(0.0), min (PIXEL(1.0), PIXEL(1.0) - basis[2]))
 end
 
 
@@ -120,20 +98,13 @@ begin
 	sx = (x + k1) * k2
 	left = min (int (sx), npieces)
 
-	sx = sx - left
-	$if (datatype == r)
-	tx = 1.0 - sx
-	$else
-	tx = 1.0d0 - sx
-	$endif
+	sx = max (PIXEL(0.0), min (PIXEL(1.0), sx - left))
+	tx = max (PIXEL(0.0), min (PIXEL(1.0), PIXEL(1.0) - sx))
 
 	basis[1] = tx * tx * tx
-	$if (datatype == r)
-	basis[2] = 1.0 + tx * (3.0 + tx * (3.0 - 3.0 * tx))
-	basis[3] = 1.0 + sx * (3.0 + sx * (3.0 - 3.0 * sx))
-	$else
-	basis[2] = 1.0d0 + tx * (3.0d0 + tx * (3.0d0 - 3.0d0 * tx))
-	basis[3] = 1.0d0 + sx * (3.0d0 + sx * (3.0d0 - 3.0d0 * sx))
-	$endif
+	basis[2] = PIXEL(1.0) + tx * (PIXEL(3.0) + tx * (PIXEL(3.0) -
+	    PIXEL(3.0) * tx))
+	basis[3] = PIXEL(1.0) + sx * (PIXEL(3.0) + sx * (PIXEL(3.0) -
+	    PIXEL(3.0) * sx))
 	basis[4] = sx * sx * sx
 end

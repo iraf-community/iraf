@@ -1,60 +1,60 @@
-      INTEGER FUNCTION OMATCH (LIN, I, PAT, J)
-      INTEGER LIN (128), PAT (128)
-      INTEGER I, J
-      INTEGER BUMP
-      INTEGER LOCATE
-      OMATCH = 0
-      IF (.NOT.(LIN (I) .EQ. -2))GOTO 23000
-      RETURN
-23000 CONTINUE
-      BUMP = -1
-      IF (.NOT.(PAT (J) .EQ. 97))GOTO 23002
-      IF (.NOT.(LIN (I) .EQ. PAT (J + 1)))GOTO 23004
-      BUMP = 1
-23004 CONTINUE
-      GOTO 23003
-23002 CONTINUE
-      IF (.NOT.(PAT (J) .EQ. 37))GOTO 23006
-      IF (.NOT.(I .EQ. 1))GOTO 23008
-      BUMP = 0
-23008 CONTINUE
-      GOTO 23007
-23006 CONTINUE
-      IF (.NOT.(PAT (J) .EQ. 63))GOTO 23010
-      IF (.NOT.(LIN (I) .NE. 10))GOTO 23012
-      BUMP = 1
-23012 CONTINUE
-      GOTO 23011
-23010 CONTINUE
-      IF (.NOT.(PAT (J) .EQ. 36))GOTO 23014
-      IF (.NOT.(LIN (I) .EQ. 10))GOTO 23016
-      BUMP = 0
-23016 CONTINUE
-      GOTO 23015
-23014 CONTINUE
-      IF (.NOT.(PAT (J) .EQ. 91))GOTO 23018
-      IF (.NOT.(LOCATE (LIN (I), PAT, J + 1) .EQ. 1))GOTO 23020
-      BUMP = 1
-23020 CONTINUE
-      GOTO 23019
-23018 CONTINUE
-      IF (.NOT.(PAT (J) .EQ. 110))GOTO 23022
-      IF (.NOT.(LIN (I) .NE. 10 .AND. LOCATE (LIN (I), PAT, J + 1) .EQ. 
-     *0))GOTO 23024
-      BUMP = 1
-23024 CONTINUE
-      GOTO 23023
-23022 CONTINUE
-      CALL ERROR (24Hin omatch: can't happen.)
-23023 CONTINUE
-23019 CONTINUE
-23015 CONTINUE
-23011 CONTINUE
-23007 CONTINUE
-23003 CONTINUE
-      IF (.NOT.(BUMP .GE. 0))GOTO 23026
-      I = I + BUMP
-      OMATCH = 1
-23026 CONTINUE
-      RETURN
-      END
+      integer function omatch (lin, i, pat, j)
+      integer lin (128), pat (128)
+      integer i, j
+      integer bump
+      integer locate
+      omatch = 0
+      if (.not.(lin (i) .eq. -2))goto 23000
+      return
+23000 continue
+      bump = -1
+      if (.not.(pat (j) .eq. 97))goto 23002
+      if (.not.(lin (i) .eq. pat (j + 1)))goto 23004
+      bump = 1
+23004 continue
+      goto 23003
+23002 continue
+      if (.not.(pat (j) .eq. 37))goto 23006
+      if (.not.(i .eq. 1))goto 23008
+      bump = 0
+23008 continue
+      goto 23007
+23006 continue
+      if (.not.(pat (j) .eq. 63))goto 23010
+      if (.not.(lin (i) .ne. 10))goto 23012
+      bump = 1
+23012 continue
+      goto 23011
+23010 continue
+      if (.not.(pat (j) .eq. 36))goto 23014
+      if (.not.(lin (i) .eq. 10))goto 23016
+      bump = 0
+23016 continue
+      goto 23015
+23014 continue
+      if (.not.(pat (j) .eq. 91))goto 23018
+      if (.not.(locate (lin (i), pat, j + 1) .eq. 1))goto 23020
+      bump = 1
+23020 continue
+      goto 23019
+23018 continue
+      if (.not.(pat (j) .eq. 110))goto 23022
+      if (.not.(lin (i) .ne. 10 .and. locate (lin (i), pat, j + 1) .eq. 
+     *0))goto 23024
+      bump = 1
+23024 continue
+      goto 23023
+23022 continue
+      call error (24Hin omatch: can't happen.)
+23023 continue
+23019 continue
+23015 continue
+23011 continue
+23007 continue
+23003 continue
+      if (.not.(bump .ge. 0))goto 23026
+      i = i + bump
+      omatch = 1
+23026 continue
+      return
+      end

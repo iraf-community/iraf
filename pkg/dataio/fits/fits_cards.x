@@ -119,14 +119,14 @@ begin
 	    if (NAXIS(im) <= 0)
 		stat = NO
 	    else
-	        call wft_encodei ("IRAF-B/P", DATA_BITPIX(fits), card,
+	        call wft_encodei ("IRAF-BPX", DATA_BITPIX(fits), card,
 	    	    "DATA BITS/PIXEL")
 	case KEY_IRAFTYPE:
 	    if (NAXIS(im) <= 0)
 		stat = NO
 	    else
 	        call wft_encodec ("IRAFTYPE", TYPE_STRING(fits), LEN_STRING,
-	    		    card, "")
+	    		    card, "PIXEL TYPE")
 	default:
 	    stat = NO
 	}
@@ -222,6 +222,8 @@ begin
 	        } else if (strmatch (card, "^IRAFTYPE") != 0) {
 		    stat = NO
 	        } else if (strmatch (card, "^IRAF-B/P") != 0) {
+		    stat = NO
+	        } else if (strmatch (card, "^IRAF-BPX") != 0) {
 		    stat = NO
 	        } else
                     stat = YES

@@ -1,8 +1,13 @@
 include	<error.h>
 include	<imhdr.h>
 
-define	MAX_HDR		20000			# Maximum user header
+define	LEN_UA		20000			# Maximum user header
 define	LEN_COMMENT	70			# Maximum comment length
+
+define	FORMATS		"|onedspec|multispec|echelle|"
+define	ONEDSPEC	1
+define	MULTISPEC	2
+define	ECHELLE		3
 
 # T_MK1DSPEC -- Make one dimensional spectra.  New images may be created
 # or existing images modified.  The continuum may be a slope and/or
@@ -15,6 +20,10 @@ procedure t_mk1dspec()
 int	ilist			# List of input spectra (input param)
 int	olist			# List of output spectra (output param)
 
+int	format			# Format
+int	line			# Line number
+int	ap			# Aperture
+int	beam			# Beam
 int	nw			# Number of pixels (ncols param or imlen)
 real	w0			# Starting wavelength (wstart param)
 real	wpc			# Wavelength per pix (wstart/wend params)
@@ -23,6 +32,7 @@ real	z			# Redshift
 real	cont			# Continuum at first pixel
 real	slope			# Continuum slope per pixel
 real	temp			# Blackbody temperture (Kelvin)
+int	fnu			# F-nu flux?
 
 int	llist			# List of files containing lines (lines param)
 real	sigma			# Sigma of lines (Angstroms)
@@ -35,14 +45,14 @@ long	seed			# Random number seed
 bool	new, ranlist
 int	i, j
 real	w, x, x1, x2
-pointer	sp, input, output, lines, comment
+pointer	sp, input, output, lines, comment, apnum
 pointer	in, out, waves, peaks, sigmas, spec, buf
 
 long	clgetl(), clktime()
-int	clgeti(), imtopenp(), imtlen(), imtgetim(), imaccess()
+int	clgeti(), clgwrd(), imtopenp(), imtgetim(), imaccess()
 int	nowhite(), access(), open(), fscan(), nscan()
 real	clgetr(), urand()
-pointer	immap(), imgl1r(), impl1r()
+pointer	immap(), imgl2r(), impl2r()
 bool	clgetb(), streq()
 errchk	open()
 
@@ -52,6 +62,7 @@ begin
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (lines, SZ_FNAME, TY_CHAR)
 	call salloc (comment, LEN_COMMENT, TY_CHAR)
+	call salloc (apnum, SZ_FNAME, TY_CHAR)
 
 	# Get file lists and fixed parameters.
 	ilist = imtopenp ("input")
@@ -67,8 +78,8 @@ begin
 	    z = sqrt ((1 + z) / (1 - z)) 
 	}
 
-	if (max (1, imtlen (olist)) != imtlen (ilist))
-	    call error (1, "Output image list does not match input image list")
+	#if (max (1, imtlen (olist)) != imtlen (ilist))
+	#    call error (1, "Output image list does not match input image list")
 
 	# Loop through input images.  Missing output images take input
 	# image name.  Line list files may be missing.
@@ -89,29 +100,46 @@ begin
 		    out = in
 	            new = false
 	        } else {
-	            iferr (in = immap (Memc[input], NEW_IMAGE, 0)) {
+		    iferr (out = immap (Memc[output], NEW_IMAGE, LEN_UA)) {
 			call erract (EA_WARN)
 			next
 		    }
-		    out = in
+		    in = out
 	            new = true
 
-	            IM_NDIM(out) = 1
-	            IM_LEN(out,1) = clgeti ("ncols")
+		    call clgstr ("header", Memc[comment], LEN_COMMENT)
+		    iferr (call mkh_header (out, Memc[comment], true, false))
+			call erract (EA_WARN)
+
+		    format = clgwrd ("format", Memc[comment], LEN_COMMENT,
+			FORMATS)
+		    switch (format) {
+		    case ONEDSPEC:
+			IM_NDIM(out) = 1
+			IM_LEN(out,1) = clgeti ("ncols")
+		    case MULTISPEC, ECHELLE:
+			IM_NDIM(out) = 2
+			IM_LEN(out,1) = clgeti ("ncols")
+			IM_LEN(out,2) = clgeti ("naps")
+		    }
+
 	            IM_PIXTYPE(out) = TY_REAL
 		    call clgstr ("title", IM_TITLE(out), SZ_IMTITLE)
 
 		    nw = IM_LEN(out,1)
 		    w0 = clgetr ("wstart")
 	    	    wpc = (clgetr ("wend") - w0) / (nw - 1)
-		    call imaddr (out, "W0", w0)
-		    call imaddr (out, "WPC", wpc)
-		    call imaddr (out, "CRPIX1", 1.)
-		    call imaddr (out, "CRVAL1", w0)
-		    call imaddr (out, "CDELT1", wpc)
-		    call imaddi (out, "DC-FLAG", 0)
-
-		    call mko_header (out)
+		    if (format == ONEDSPEC) {
+			call imaddr (out, "W0", w0)
+			call imaddr (out, "WPC", wpc)
+			call imaddr (out, "CRPIX1", 1.)
+			call imaddr (out, "CRVAL1", w0)
+			call imaddr (out, "CDELT1", wpc)
+			call imaddi (out, "DC-FLAG", 0)
+		    } else {
+			call imastr (out, "APFORMAT", "multispec")
+			call imaddi (out, "DC-FLAG", 0)
+		    }
 	        }
 	    } else {
 	        iferr (in = immap (Memc[input], READ_ONLY, 0)) {
@@ -125,7 +153,8 @@ begin
 		}
 	        new = false
 	    }
-	    call get_hdr (in, w0, wpc, nw)
+	    line = max (1, min (clgeti ("ap"), IM_LEN(out,2)))
+	    call get_hdr (in, line, ap, beam, w0, wpc, nw)
 
 	    # Get the line list if given or create random lines.
 	    ranlist = false
@@ -195,37 +224,12 @@ begin
 	        }
 	    }
 
-	    # Add comment history of task parameters.
-	    call strcpy ("# ", Memc[comment], LEN_COMMENT)
-	    call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
-	    call mko_comment (out, Memc[comment])
-	    call mko_comment (out, "begin\tmk1dspec")
-	    call mko_comment1 (out, "rv", 'r', Memc[comment])
-	    call mko_comment1 (out, "z", 'b', Memc[comment])
-	    call mko_comment1 (out, "wstart", 'r', Memc[comment])
-	    call mko_comment1 (out, "wend", 's', Memc[comment])
-	    call mko_comment1 (out, "continuum", 'r', Memc[comment])
-	    call mko_comment1 (out, "slope", 'r', Memc[comment])
-	    call mko_comment1 (out, "temperature", 'r', Memc[comment])
-	    if (nlines > 0) {
-		if (Memc[lines] != EOS)
-	            call mko_comment1 (out, "lines", 's', Memc[comment])
-		call sprintf (Memc[comment], LEN_COMMENT, "\tnlines%24t%d")
-		    call pargi (nlines)
-		call mko_comment (out, Memc[comment])
-		if (ranlist) {
-	            call mko_comment1 (out, "peak", 'r', Memc[comment])
-	            call mko_comment1 (out, "sigma", 'r', Memc[comment])
-		    call mko_comment1 (out, "seed", 'i', Memc[comment])
-		}
-	    }
-
 	    # Make the spectrum.
-	    spec = impl1r (out)
+	    spec = impl2r (out, line)
 	    if (new)
-	        call aclrr (Memr[spec], nw)
+	        call aclrr (Memr[spec], IM_LEN(in,1))
 	    else
-		call amovr (Memr[imgl1r(in)], Memr[spec], nw)
+		call amovr (Memr[imgl2r(in, line)], Memr[spec], IM_LEN(in,1))
 
 	    # Make the lines.
 	    call calloc (buf, nw, TY_REAL)
@@ -246,10 +250,14 @@ begin
 	    cont = clgetr ("continuum")
 	    slope = clgetr ("slope")
 	    temp = clgetr ("temperature")
+	    if (clgetb ("fnu"))
+		fnu = 3
+	    else
+		fnu = 5
 	    if (temp > 0.) {
 	        w  = w0 * 1.0e-8
 	        x1 = exp (1.4388 / (w * temp))
-	        x2 = w**5 * (x1-1.0)
+	        x2 = w**fnu * (x1-1.0)
 
 		w = w / z
 	        wpc = wpc * 1.0e-8 / z
@@ -258,7 +266,7 @@ begin
 	        x = cont + slope / wpc * ((w0 + wpc * i) / z - w0)
 	        if (temp > 0.) {
 		    x1 = exp (1.4388 / (w * temp))
-		    x = x * (x2 / w**5 / (x1-1.0))
+		    x = x * (x2 / w**fnu / (x1-1.0))
 		    w = w + wpc
 	        }
 		if (x > 0.)
@@ -272,6 +280,36 @@ begin
 	    call mfree (peaks, TY_REAL)
 	    call mfree (sigmas, TY_REAL)
 	    call mfree (buf, TY_REAL)
+
+	    # Add comment history of task parameters.
+	    if (clgetb ("comments")) {
+		call strcpy ("# ", Memc[comment], LEN_COMMENT)
+		call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
+		call mkh_comment (out, Memc[comment])
+		call mkh_comment (out, "begin\tmk1dspec")
+		call mkh_comment1 (out, "ap", 'i')
+		call mkh_comment1 (out, "rv", 'r')
+		call mkh_comment1 (out, "z", 'b')
+		call mkh_comment1 (out, "wstart", 'r')
+		call mkh_comment1 (out, "wend", 'r')
+		call mkh_comment1 (out, "continuum", 'r')
+		call mkh_comment1 (out, "slope", 'r')
+		call mkh_comment1 (out, "temperature", 'r')
+		call mkh_comment1 (out, "fnu", 'b')
+		if (nlines > 0) {
+		    if (Memc[lines] != EOS)
+			call mkh_comment1 (out, "lines", 's')
+		    call sprintf (Memc[comment], LEN_COMMENT, "\tnlines%24t%d")
+			call pargi (nlines)
+		    call mkh_comment (out, Memc[comment])
+		    if (ranlist) {
+			call mkh_comment1 (out, "peak", 'r')
+			call mkh_comment1 (out, "sigma", 'r')
+			call mkh_comment1 (out, "seed", 'i')
+		    }
+		}
+	    }
+
 	    if (in != out)
 	        call imunmap (in)
 	    call imunmap (out)
@@ -286,28 +324,76 @@ end
 
 # GET_HDR -- Get header parameters.
 
-procedure get_hdr (im, w0, wpc, nw)
+procedure get_hdr (im, line, ap, beam, w0, wpc, nw)
 
 pointer	im			# IMIO pointer
+int	line			# Image line
+int	ap			# Aperture number
+int	beam			# Beam number
 real	w0			# Starting wavelength
 real	wpc			# Wavelength per pixel
 int	nw			# Number of pixels
 
-real	crpix, imgetr()
+real	crpix, clgetr(), imgetr()
+int	clgeti(), strdic(), imgeti()
+pointer	sp, apnum, str
 
 begin
-	nw = IM_LEN(im, 1)
-	crpix = 1.
-	iferr (w0 = imgetr (im, "w0")) {
-	    iferr (crpix = imgetr (im, "crpix1"))
-		    crpix = 1.
-	    iferr (w0 = imgetr (im, "crval1"))
-		w0 = 1.
+	call smark (sp)
+	call salloc (apnum, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+
+	iferr (call imgstr (im, "APFORMAT", Memc[str], SZ_LINE))
+	    call strcpy ("onedspec", Memc[str], SZ_LINE)
+
+	switch (strdic (Memc[str], Memc[str], SZ_LINE, FORMATS)) {
+	case MULTISPEC, ECHELLE:
+	    call sprintf (Memc[apnum], SZ_FNAME, "APNUM%d")
+		call pargi (line)
+	    iferr (call imgstr (im, Memc[apnum], Memc[str], SZ_LINE)) {
+		ap = line
+		beam = line
+		nw = min (clgeti ("ncols"), IM_LEN(im,1))
+		w0 = clgetr ("wstart")
+		wpc = (clgetr ("wend") - w0) / (nw - 1)
+		call sprintf (Memc[str], SZ_LINE, "%d %d %g %g %d %.2f %.2f")
+		    call pargi (ap)
+		    call pargi (beam)
+		    call pargr (w0)
+		    call pargr (wpc)
+		    call pargi (nw)
+		    call pargr (INDEF)
+		    call pargr (INDEF)
+		call imastr (im, Memc[apnum], Memc[str])
+	    } else {
+		call sscan (Memc[str])
+		call gargi (ap)
+		call gargi (beam)
+		call gargr (w0)
+		call gargr (wpc)
+		call gargi (nw)
+	    }
+	    call sprintf (Memc[apnum], SZ_FNAME, "APID%d")
+		call pargi (line)
+	default:
+	    ap = line
+	    iferr (beam = imgeti (im, "BEAM-NUM")) {
+		beam = line
+		call imaddi (im, "BEAM-NUM", beam)
+	    }
+	    nw = IM_LEN(im,1)
+	    crpix = 1.
+	    iferr (w0 = imgetr (im, "w0")) {
+		iferr (crpix = imgetr (im, "crpix1"))
+			crpix = 1.
+		iferr (w0 = imgetr (im, "crval1"))
+		    w0 = 1.
+	    }
+	    iferr (wpc = imgetr (im, "wpc"))
+		iferr (wpc = imgetr (im, "cdelt1"))
+		    wpc = 1.
 	}
-	iferr (wpc = imgetr (im, "wpc"))
-	    iferr (wpc = imgetr (im, "cdelt1"))
-		wpc = 1.
-	    
+		
 	w0 = w0 - wpc * (crpix - 1.)
 	if (abs (w0) < 0.001) {
 	    w0 = w0 * 1e10

@@ -20,6 +20,8 @@ begin
 	    call ap_skycls (ap)
 	if (AP_PCENTER(ap) != NULL)
 	    call ap_ctrcls (ap)
+	if (AP_IMBUF(ap) != NULL)
+	    call mfree (AP_IMBUF(ap), TY_REAL)
 	call mfree (ap, TY_STRUCT)
 end
 

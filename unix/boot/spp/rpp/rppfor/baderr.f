@@ -1,5 +1,5 @@
-      SUBROUTINE BADERR (MSG)
-      INTEGER MSG (100)
-      CALL SYNERR (MSG)
-      CALL ENDST
-      END
+      subroutine baderr (msg)
+      integer msg (100)
+      call synerr (msg)
+      call endst
+      end

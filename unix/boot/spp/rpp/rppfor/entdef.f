@@ -1,12 +1,12 @@
-      SUBROUTINE ENTDEF (NAME, DEFN, TABLE)
-      INTEGER NAME (100), DEFN (100)
-      INTEGER TABLE
-      INTEGER LOOKUP
-      INTEGER TEXT
-      INTEGER SDUPL
-      IF (.NOT.(LOOKUP (NAME, TEXT, TABLE) .EQ. 1))GOTO 23000
-      CALL DSFREE (TEXT)
-23000 CONTINUE
-      CALL ENTER (NAME, SDUPL (DEFN), TABLE)
-      RETURN
-      END
+      subroutine entdef (name, defn, table)
+      integer name (100), defn (100)
+      integer table
+      integer lookup
+      integer text
+      integer sdupl
+      if (.not.(lookup (name, text, table) .eq. 1))goto 23000
+      call dsfree (text)
+23000 continue
+      call enter (name, sdupl (defn), table)
+      return
+      end

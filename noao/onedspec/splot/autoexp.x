@@ -1,19 +1,20 @@
+include	<gset.h>
 include	<pkg/gtools.h>
 
 # AUTO_EXP -- Auto expand around the marked region
 
-procedure auto_exp (gp, gt, key, wx1, pix, npix, w1, w2)
+procedure auto_exp (gp, gt, key, wx1, x, y, n)
 
 pointer	gp		# GIO pointer
 pointer	gt		# GTOOLS pointer
 int	key		# Key
 real	wx1		# Cursor position
-real	pix[npix]	# Pixel data for Y scaling
-int	npix		# Number of pixels
-real	w1, w2		# Wavelength of first and last pixels
+real	x[n]		# Pixel coordinates
+real	y[n]		# Pixel data for Y scaling
+int	n		# Number of pixels
 
 char	cmd[1]
-int	i1, i2, n, wcs
+int	i1, i2, npts, wcs
 real	wx2, wy, x1, x2, y1, y2, dx
 
 int	clgcur()
@@ -42,21 +43,22 @@ begin
 	}
 
 	# Determine the y limits for pixels between x1 and x2.
-	dx = (w2 - w1) / (npix - 1)
-	i1 = (x1 - w1) / dx + 1.5
-	i2 = (x2 - w1) / dx + 1.5
-	i1 = max (1, min (npix, i1))
-	i2 = max (1, min (npix, i2))
+	dx = (x[n] - x[1]) / (n - 1)
+	i1 = (x1 - x[1]) / dx + 1.5
+	i2 = (x2 - x[1]) / dx + 1.5
+	i1 = max (1, min (n, i1))
+	i2 = max (1, min (n, i2))
 	if (i1 < i2) {
-	    n = i2 - i1 + 1
-	    call alimr (pix[i1], n, y1, y2)
+	    npts = i2 - i1 + 1
+	    call alimr (y[i1], npts, y1, y2)
 	} else {
-	    n = i1 - i2 + 1
-	    call alimr (pix[i2], n, y1, y2)
+	    npts = i1 - i2 + 1
+	    call alimr (y[i2], npts, y1, y2)
 	}
 
-	call gclear (gp)
-	call gswind (gp, x1, x2, y1, y2)
-	call gt_labax (gp, gt)
-	call replot (gp, gt, pix, npix, w1, w2, NO)
+	call gt_setr (gt, GTXMIN, x1)
+	call gt_setr (gt, GTXMAX, x2)
+	call gt_setr (gt, GTYMIN, y1)
+	call gt_setr (gt, GTYMAX, y2)
+	call replot (gp, gt, x, y, n, YES)
 end

@@ -13,7 +13,7 @@ pointer	ic		# ICFIT pointer
 begin
 	# Allocate memory for the package parameter structure.
 	call malloc (ic, IC_LENSTRUCT, TY_STRUCT)
-	call malloc (IC_SAMPLE(ic), SZ_LINE, TY_CHAR)
+	call malloc (IC_SAMPLE(ic), IC_SZSAMPLE, TY_CHAR)
 	call malloc (IC_LABELS(ic,1), SZ_LINE, TY_CHAR)
 	call malloc (IC_LABELS(ic,2), SZ_LINE, TY_CHAR)
 	call malloc (IC_UNITS(ic,1), SZ_LINE, TY_CHAR)
@@ -29,6 +29,7 @@ begin
 	call ic_putr (ic, "low", 3.)
 	call ic_putr (ic, "high", 3.)
 	call ic_putr (ic, "grow", 0.)
+	call ic_puti (ic, "markrej", YES)
 	call ic_pstr (ic, "xlabel", "X")
 	call ic_pstr (ic, "ylabel", "Y")
 	call ic_pstr (ic, "xunits", "")
@@ -69,9 +70,10 @@ begin
 	IC_LOW(icout) = IC_LOW(icin)
 	IC_HIGH(icout) = IC_HIGH(icin)
 	IC_GROW(icout) = IC_GROW(icin)
+	IC_MARKREJ(icout) = IC_MARKREJ(icin)
 	IC_GKEY(icout) = IC_GKEY(icin)
 
-	call strcpy (Memc[IC_SAMPLE(icin)], Memc[IC_SAMPLE(icout)], SZ_LINE)
+	call strcpy (Memc[IC_SAMPLE(icin)], Memc[IC_SAMPLE(icout)], IC_SZSAMPLE)
 	call strcpy (Memc[IC_LABELS(icin,1)], Memc[IC_LABELS(icout,1)], SZ_LINE)
 	call strcpy (Memc[IC_LABELS(icin,2)], Memc[IC_LABELS(icout,2)], SZ_LINE)
 	call strcpy (Memc[IC_UNITS(icin,1)], Memc[IC_UNITS(icout,1)], SZ_LINE)
@@ -152,7 +154,7 @@ bool	streq()
 
 begin
 	if (streq (param, "sample"))
-	    call strcpy (str, Memc[IC_SAMPLE(ic)], SZ_LINE)
+	    call strcpy (str, Memc[IC_SAMPLE(ic)], IC_SZSAMPLE)
 	else if (streq (param, "function")) {
 	    call malloc (ptr, SZ_LINE, TY_CHAR)
 	    i = strdic (str, Memc[ptr], SZ_LINE, FUNCTIONS)
@@ -193,6 +195,8 @@ begin
 	    IC_NITERATE(ic) = ival
 	else if (streq (param, "key"))
 	    IC_GKEY(ic) = ival
+	else if (streq (param, "markrej"))
+	    IC_MARKREJ(ic) = ival
 	else
 	    call error (0, "ICFIT: Unknown parameter")
 end
@@ -321,6 +325,8 @@ begin
 	    return (IC_NREJECT(ic))
 	else if (streq (param, "rejpts"))
 	    return (IC_REJPTS(ic))
+	else if (streq (param, "markrej"))
+	    return (IC_MARKREJ(ic))
 
 	call error (0, "ICFIT: Unknown parameter")
 end

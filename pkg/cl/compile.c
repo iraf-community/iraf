@@ -114,6 +114,7 @@ int opcode, args, args2;
 	case EQ:
 	case EXEC:
 	case FSCAN:
+	case FSCANF:
 	case GE:
 	case GT:
 	case IMMED:
@@ -129,6 +130,7 @@ int opcode, args, args2;
 	case REDIRIN:
 	case RETURN:
 	case SCAN:
+	case SCANF:
 	case SUB:
 	case FIXLANGUAGE:
 		break;

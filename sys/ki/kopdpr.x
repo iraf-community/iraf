@@ -37,7 +37,7 @@ begin
 	    }
 
 	} else {
-	    # Spawning of detached processes on remote notes is onot really
+	    # Spawning of detached processes on remote notes is not really
 	    # supported as of yet.  Add support for passing the bkgmsg; use
 	    # node name in bkgmsg to submit bkg job to remote node.
 

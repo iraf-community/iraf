@@ -14,7 +14,7 @@ int	nxk, nyk	# dimensions of the kernel
 int	i, ncols, nlines, col1, col2, inline, outline
 pointer	sp, lineptrs, outbuf
 pointer	imgs2r(), impl2r()
-errchk	imgs2r, impl2r
+errchk	imgs2r, impl2r, imflush
 
 begin
 	# Set up an array of linepointers.
@@ -63,7 +63,7 @@ begin
 	    inline = inline + 1
 	}
 
-	# Flush the output image.
+	# Flush the output image
 	call imflush (im2)
 
 	# Free the image buffer pointers.

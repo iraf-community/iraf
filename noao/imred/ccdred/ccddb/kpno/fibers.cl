@@ -1,9 +1,9 @@
 # Generic routine for setting parameters.
 
-ccdred.pixeltype = "real"
+ccdred.pixeltype = "real real"
 ccdred.verbose = yes
 ccdred.logfile = "logfile"
-ccdred.plotfile = "plotfile"
+ccdred.plotfile = ""
 ccdred.backup = ""
 ccdred.instrument = "ccddb$kpno/fibers.dat"
 ccdred.ssfile = "subsets"
@@ -22,7 +22,7 @@ ccdproc.scancor = no
 ccdproc.readaxis = "line"
 ccdproc.biassec = "image"
 ccdproc.trimsec = "image"
-ccdproc.interactive = no
+ccdproc.interactive = yes
 ccdproc.function = "chebyshev"
 ccdproc.order = 1
 ccdproc.sample = "*"
@@ -31,3 +31,22 @@ ccdproc.niterate = 1
 ccdproc.low_reject = 3
 ccdproc.high_reject = 3
 ccdproc.grow = 0
+
+flatcombine.output = "Flat"
+flatcombine.combine = "average"
+flatcombine.reject = "ccdclip"
+flatcombine.ccdtype = "flat"
+flatcombine.process = yes
+flatcombine.subsets = no
+flatcombine.delete = no
+flatcombine.clobber = no
+flatcombine.scale = "none"
+flatcombine.statsec = ""
+flatcombine.nlow = 1
+flatcombine.nhigh = 1
+flatcombine.mclip = yes
+flatcombine.lsigma = 3.
+flatcombine.hsigma = 3.
+flatcombine.rdnoise = "RDNOISE"
+flatcombine.gain = "GAIN"
+flatcombine.pclip = -0.5

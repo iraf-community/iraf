@@ -1,5 +1,14 @@
 #{ IMAGES package -- General image processing.
 
+# Check that login.cl version matches IRAF version.  This has nothing to
+# do with IMAGES, this is just a convenient place to test for an old login.cl,
+# since IMAGES is virtually guaranteed to be loaded with IRAF.
+
+if (cl.logver != cl.version) {
+    print ("WARNING: login.cl version mismatch - rebuild with `mkiraf'")
+    beep; sleep(1); beep; sleep(1); beep
+}
+
 set	imdebug		= "images$imdebug/"
 set	tv		= "images$tv/"
 

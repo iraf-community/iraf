@@ -1,0 +1,41 @@
+.help pseudocolor Jan86 images.tv.iis
+.ih
+NAME
+pseudocolor -- select pseudocolor enhancement
+.ih
+USAGE
+pseudocolor
+.ih
+PARAMETERS
+.ls enhancement
+Type of pseudocolor enhancement.  The types are:
+.ls "random"
+A randomly chosen color is assigned to each display level.
+.le
+.ls "linear"
+The display levels are mapped into a spectrum.
+.le
+.ls "8color"
+Eight colors are chosen at random over the range of the display levels.
+.le
+.le
+.ls window = yes
+Window the lookup table for the frame after enabling the pseudocolor?
+.le
+.ih
+DESCRIPTION
+The display levels from the lookup table are mapped into various saturated
+colors to enhance an image.  There is a choice of three color mappings.
+After the pseudocolor enhancement is enabled on the display monitor the
+user may, optionally, adjust the frame lookup table.
+.ih
+EXAMPLES
+.nf
+	cl> pseudocolor random
+	cl> pseudocolor 8color
+	cl> pseudocolor linear
+.fi
+.ih
+SEE ALSO
+cv
+.endhelp

@@ -12,7 +12,7 @@ when necessary.  When multiple tape files are accessed by a single task the
 tape position is kept in the cache between successive MTOPEN - CLOSE file
 accesses.
 
-	 mt_getpos (mt, file, record)
+	 mt_getpos (mtname, mt)
 	mt_savepos (mt)
 	   mt_sync (status)
        mt_clrcache ()
@@ -42,14 +42,13 @@ valid while the task using it is executing.
 define	SZ_CACHE	MT_MAXTAPES
 
 
-# MT_GETPOS -- Return the position (file and record) of a drive given its
-# descriptor.  -1 is returned if the current position is undefined.
+# MT_GETPOS -- Return the device position descriptor of a drive given its
+# unit number.
 
-procedure mt_getpos (mt, file, record)
+procedure mt_getpos (mtname, mt)
 
-int	mt		# MTIO descriptor
-int	file		# receives current file number
-int	record		# receives current record number
+char	mtname[ARB]		#I device name
+int	mt			#I MTIO descriptor
 
 int	slot
 bool	streq()
@@ -59,26 +58,26 @@ include	"mtio.com"
 begin
 	# First look in the cache.
 	for (slot=1;  slot <= SZ_CACHE;  slot=slot+1)
-	    if (streq (MT_DRIVE(mt), c_drive[1,slot])) {
-		call amovi (c_mtdes[1,slot], MT_STRUCT(0), LEN_MTIODES)
-		call strcpy (c_drive[1,slot], MT_DRIVE(0), SZ_DRIVE)
-		file = MT_FILE(0)
-		record = MT_RECORD(0)
+	    if (streq (MT_LKNAME(mt), c_lkname[1,slot])) {
+		call amovi (c_mtdes[1,slot], MT_DEVPOS(mt), LEN_DEVPOS)
+		call strcpy (c_device[1,slot], MT_DEVICE(mt), SZ_DEVICE)
+		call strcpy (c_lkname[1,slot], MT_LKNAME(mt), SZ_LKNAME)
+		call strcpy (c_iodev[1,slot], MT_IODEV(mt), SZ_IODEV)
 		return
 	    }
 
 	# Get the current position from the lock file, if there is one.
-	call mt_read_lockfile (mt, file, record)
+	call mt_read_lockfile (mtname, mt)
 end
 
 
 # MT_SAVEPOS -- Save the current position in the cache.  The entire descriptor
 # is saved since most of the information therein is needed for SYNC, even
-# though only the file and record numbers will be used by GETPOS.
+# though only a portion of the information will be used by GETPOS.
 
 procedure mt_savepos (mt)
 
-int	mt		# MTIO descriptor
+int	mt			#I MTIO descriptor
 
 int	prev, slot
 bool	streq(), strne()
@@ -93,12 +92,12 @@ begin
 	call onerror (mt_sync)
 
 	# Do not update the cache if the file position is undefined.
-	if (MT_FILE(mt) <= 0)
+	if (MT_FILNO(mt) <= 0)
 	    return
 
-	# Are we updating a entry already in the cache?
+	# Are we updating an entry already in the cache?
 	for (slot=1;  slot <= SZ_CACHE;  slot=slot+1)
-	    if (streq (MT_DRIVE(mt), c_drive[1,slot]))
+	    if (streq (MT_LKNAME(mt), c_lkname[1,slot]))
 		goto cache_
 
 	# Add the entry to the cache.  Resync the contents of the old slot
@@ -110,15 +109,19 @@ begin
 	    slot = 1
 	prev = slot
 
-	if (c_modified[slot] == YES && strne (MT_DRIVE(mt), c_drive[1,slot])) {
-	    call amovi (c_mtdes[1,slot], MT_STRUCT(0), LEN_MTIODES)
-	    call strcpy (c_drive[1,slot], MT_DRIVE(0), SZ_DRIVE)
+	if (c_modified[slot] == YES && strne(MT_LKNAME(mt),c_lkname[1,slot])) {
+	    call amovi (c_mtdes[1,slot], MT_DEVPOS(0), LEN_DEVPOS)
+	    call strcpy (c_device[1,slot], MT_DEVICE(0), SZ_DEVICE)
+	    call strcpy (c_lkname[1,slot], MT_LKNAME(0), SZ_LKNAME)
+	    call strcpy (c_iodev[1,slot], MT_IODEV(0), SZ_IODEV)
 	    call mt_update_lockfile (0)
 	}
 
 cache_
-	call amovi (MT_STRUCT(mt), c_mtdes[1,slot], LEN_MTIODES)
-	call strcpy (MT_DRIVE(mt), c_drive[1,slot], SZ_DRIVE)
+	call amovi (MT_DEVPOS(mt), c_mtdes[1,slot], LEN_DEVPOS)
+	call strcpy (MT_DEVICE(mt), c_device[1,slot], SZ_DEVICE)
+	call strcpy (MT_LKNAME(mt), c_lkname[1,slot], SZ_LKNAME)
+	call strcpy (MT_IODEV(mt), c_iodev[1,slot], SZ_IODEV)
 	c_modified[slot] = YES
 end
 
@@ -129,7 +132,7 @@ end
 
 procedure mt_sync (status)
 
-int	status		# task termination status
+int	status			#I task termination status
 
 int	slot
 include	"mtcache.com"
@@ -137,12 +140,21 @@ include	"mtio.com"
 
 begin
 	# Update the .lok files of any active devices.
-	for (slot=1;  slot <= SZ_CACHE;  slot=slot+1)
+	for (slot=1;  slot <= SZ_CACHE;  slot=slot+1) {
 	    if (c_modified[slot] == YES) {
-		call amovi (c_mtdes[1,slot], MT_STRUCT(0), LEN_MTIODES)
-		call strcpy (c_drive[1,slot], MT_DRIVE(0), SZ_DRIVE)
-		if (status != OK)
-		    MT_FILE(0) = -1
+		# If called during error recovery mark the file position undef.
+		if (status != OK) {
+		    call amovi (c_mtdes[1,slot], MT_DEVPOS(0), LEN_DEVPOS)
+		    MT_FILNO(0) = -1
+		    MT_RECNO(0) = -1
+		    call amovi (MT_DEVPOS(0), c_mtdes[1,slot], LEN_DEVPOS)
+		}
+
+		# Update the lockfile.
+		call amovi (c_mtdes[1,slot], MT_DEVPOS(0), LEN_DEVPOS)
+		call strcpy (c_device[1,slot], MT_DEVICE(0), SZ_DEVICE)
+		call strcpy (c_lkname[1,slot], MT_LKNAME(0), SZ_LKNAME)
+		call strcpy (c_iodev[1,slot], MT_IODEV(0), SZ_IODEV)
 
 		# Ignore errors if we are called during error recovery.
 		iferr (call mt_update_lockfile (0))
@@ -150,8 +162,9 @@ begin
 			call erract (EA_ERROR)
 
 		c_modified[slot] = NO
-		c_drive[1,slot]  = EOS
+		c_device[1,slot] = EOS
 	    }
+	}
 
 	# Invalidate the cache when a task terminates.
 	call mt_clrcache()
@@ -162,8 +175,8 @@ begin
 
 	if (status != OK)
 	    do slot = 1, MT_MAXTAPES {
-		MT_FILE(slot) = -1
-		MT_RECORD(slot) = -1
+		MT_FILNO(slot) = -1
+		MT_RECNO(slot) = -1
 	    }
 end
 
@@ -178,6 +191,9 @@ include	"mtcache.com"
 begin
 	for (slot=1;  slot <= SZ_CACHE;  slot=slot+1) {
 	    c_modified[slot] = NO
-	    c_drive[1,slot]  = EOS
+	    c_device[1,slot] = EOS
+	    c_lkname[1,slot] = EOS
+	    c_iodev[1,slot] = EOS
+	    call aclri (c_mtdes[1,slot], LEN_DEVPOS)
 	}
 end

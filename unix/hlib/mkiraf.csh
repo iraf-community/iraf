@@ -4,15 +4,24 @@
 
 # The following definitions are site dependent. [SITEDEP]
 
-set	iraf	= "/local/iraf"
-set	imdir	= "/tmp4/iraf"
+set	iraf	= "/usr/iraf"
+set	imdir	= "/d0/iraftmp"
 set	ttymsg  =\
-"Terminal types: gterm=ttysw+graphics,vt640=(vt100+retrographics),etc."
+"Terminal types: xterm,gterm,vt640,vt100,etc."
 
 # ------------- (end of site dependent definitions) ------------------------
 # Make an empty "uparm" (user parameter) directory.
 
-unalias rm mkdir pwd echo mkdir sed whoami
+unalias rm mkdir pwd echo mkdir sed whoami pushd popd
+
+# Protect against running mkiraf in an iraf system directory.
+pushd $iraf >& /dev/null;  set irafdir = `pwd`;  popd >& /dev/null
+if ("`pwd | grep $irafdir`" != "") then
+    if ("`pwd | grep iraf/local`" == "") then
+	echo "Error: current directory is not an iraf user login directory"
+	exit 1
+    endif
+endif
 
 if (! -e uparm) then
     echo '-- creating a new uparm directory'

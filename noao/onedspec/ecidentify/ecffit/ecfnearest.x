@@ -13,7 +13,7 @@ int	wcs			# WCS
 int	key			# Nearest key
 real	x[npts]			# Data points
 real	y[npts]			# Data points
-real	w[npts]			# Weight
+double	w[npts]			# Weight
 int	npts			# Number of data points
 
 int	i, j

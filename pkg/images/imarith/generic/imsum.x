@@ -1,7 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<imhdr.h>
-include	"imsum.h"
+include	"../imsum.h"
 
 define	TMINSW		1.00	# Relative timings for nvecs = 5
 define	TMXMNSW		1.46

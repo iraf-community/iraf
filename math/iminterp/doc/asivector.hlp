@@ -33,6 +33,9 @@ actual computation is done by adding and multiplying terms
 according to Everett's central difference formula.
 The spline interpolant uses the B-spline
 coefficients calculated by the ASIFIT routine.
+
+The sinc interpolation is computed using a range of data points around
+the desired position.
 .ih
 NOTES
 Checking for out of bounds and INDEF valued pixels is the
@@ -42,4 +45,3 @@ ASIVECTOR.
 SEE ALSO
 asieval, arieval
 .endhelp
-

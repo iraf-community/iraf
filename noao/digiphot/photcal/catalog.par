@@ -1,0 +1,5 @@
+# Parameter file for CATALOG
+
+catalog,f,a,,,,The name of the output catalog
+review,b,h,no,,,Verify each existing catalog record
+verify,b,h,no,,,Verify each new catalog record

@@ -1,9 +1,9 @@
-      INTEGER FUNCTION CTOMN (C, REP)
-      INTEGER C, REP (4)
-      INTEGER I
-      INTEGER LENGTH
-      INTEGER MNTEXT (136)
-      DATA MNTEXT /  78, 85, 76, -2, 83, 79, 72, -2, 83, 84, 88, -2, 69,
+      integer function ctomn (c, rep)
+      integer c, rep (4)
+      integer i
+      integer length
+      integer mntext (136)
+      data mntext /  78, 85, 76, -2, 83, 79, 72, -2, 83, 84, 88, -2, 69,
      * 84, 88, -2, 69, 79, 84, -2, 69, 78, 81, -2, 65, 67, 75, -2, 66, 6
      *9, 76, -2, 66, 83, -2, -2, 72, 84, -2, -2, 76, 70, -2, -2, 86, 84,
      * -2, -2, 70, 70, -2, -2, 67, 82, -2, -2, 83, 79, -2, -2, 83, 73, -
@@ -12,19 +12,19 @@
      *2, 67, 65, 78, -2, 69, 77, -2, -2, 83, 85, 66, -2, 69, 83, 67, -2,
      * 70, 83, -2, -2, 71, 83, -2, -2, 82, 83, -2, -2, 85, 83, -2, -2, 8
      *3, 80, -2, -2, 68, 69, 76, -2/
-      I = MOD (MAX0(C,0), 128)
-      IF (.NOT.(0 .LE. I .AND. I .LE. 32))GOTO 23000
-      CALL SCOPY (MNTEXT, 4 * I + 1, REP, 1)
-      GOTO 23001
-23000 CONTINUE
-      IF (.NOT.(I .EQ. 127))GOTO 23002
-      CALL SCOPY (MNTEXT, 133, REP, 1)
-      GOTO 23003
-23002 CONTINUE
-      REP (1) = C
-      REP (2) = -2
-23003 CONTINUE
-23001 CONTINUE
-      CTOMN=(LENGTH (REP))
-      RETURN
-      END
+      i = mod (max0(c,0), 128)
+      if (.not.(0 .le. i .and. i .le. 32))goto 23000
+      call scopy (mntext, 4 * i + 1, rep, 1)
+      goto 23001
+23000 continue
+      if (.not.(i .eq. 127))goto 23002
+      call scopy (mntext, 133, rep, 1)
+      goto 23003
+23002 continue
+      rep (1) = c
+      rep (2) = -2
+23003 continue
+23001 continue
+      ctomn=(length (rep))
+      return
+      end

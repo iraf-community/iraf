@@ -38,7 +38,9 @@ to the list of output images specified by \fIoutput\fR.
 
 Conversion from one pixel type to another is direct and may involve both
 loss of precision and dynamic range. Mapping of floating point numbers
-to integer numbers is done by truncation.
+to integer numbers is done by truncation. Mapping of complex numbers
+to floating point or integer numbers will preserve the real part of the
+complex number only.
 
 .ih
 EXAMPLES

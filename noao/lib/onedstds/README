@@ -1,36 +1,7 @@
-This directory contains standard calibration data, such as line lists and
-sensitivity calibration, for use in the ONEDSPEC, TWODSPEC, and the various
+This directory contains standard calibration data for extinction and
+sensitivity calibration as used in the ONEDSPEC, TWODSPEC, and the various
 IMRED packages.
 
-		       	       LINE LISTS
-                  (ie coordlist = onedstds$henear.dat)
-
- ctiohenear.dat -  HENEAR list used at CTIO
-   ctiohear.dat -  HEAR list used at CTIO
-     henear.dat -  Selected list of HENEAR lines to be used for 
-		   KPNO IIDS/IRS reductions - this list is identical to 
-		   that in the KPNO mountain reduction software for these 
-		   instruments.  Source of wavelengths:  1982 MIT
-		   Wavelength Tables Vol. 2.  Multiplet numbers from
-		   Charlotte Moore's A Multiplet Table of Astrophysical
-		   Interest 1972.
-   idhenear.dat -  Extended list of HENEAR lines for general use.
-		   Source of wavelengths:  1982 MIT Wavelength Tables Vol. 2.
-		   Multiplet numbers from Charlotte Moore's A Multiplet Table
-		   of Astrophysical Interest 1972.
-vacidhenear.dat -  The idhenear.dat list converted to vacuum wavelengths
-                   using the equation: (n-1) x 10**8 = 8342.13 + 2406030
-                   (130 - sigma**2)**-1 + 15997(38.9 - sigma**2)**-1
-                   where sigma = 1/lambda(air). (See B. Edlen, 1966
-                   Metrologia, Vol. 2, p. 71).
-    thorium.dat -  List of thorium-argon lines (3180 - 9540),
-                   A CCD Atlas of Comparison Spectra: Thorium-Argon Hollow
-                   Cathode 3180 A - 9540 A, July 1987, Daryl Willmarth.
- vacthorium.dat -  The thorium.dat list converted to vacuum wavelengths
-                   using the equation: (n-1) x 10**8 = 8342.13 + 2406030
-                   (130 - sigma**2)**-1 + 15997(38.9 - sigma**2)**-1
-                   where sigma = 1/lambda(air). (See B. Edlen, 1966
-                   Metrologia, Vol. 2, p. 71).
 
 	        	    EXTINCTION TABLES
                 (ie extinction = onedstds$kpnoextinct.dat)
@@ -42,30 +13,53 @@ kpnoextinct.dat -  KPNO extinction table for ONEDSPEC (in Angstroms)
                         (ie caldir = onedstds$iidscal/)
 
        bstdscal -  Directory of the brighter KPNO IRS standards (i.e. those 
-		   with HR numbers) at 29 bandpasses
-        ctiocal -  Directory of CTIO standards
-        iidscal -  Directory of the KPNO IIDS standards (29 bandpasses)
-	 irscal -  Directory of the KPNO IRS standards at 78 bandpasses
-		   (note that in this directory the brighter standards
-		   have no values - the `bstdscal' directory must be 
-		   used for these standards at this time )
+		   with HR numbers) at 29 bandpasses, data from various
+                   sources transformed to the Hayes and Latham system,
+                   unpublished.
+        ctiocal -  Directory containing fluxes for the southern tertiary
+                   standards as published by Baldwin & Stone, 1984, MNRAS,
+                   206, 241 and Stone and Baldwin, 1983, MNRAS, 204, 347.
+     ctionewcal -  Directory containing fluxes at 50A steps in the range
+                   3300-7550 A for the tertiary standards of Baldwin and
+                   Stone derived from the revised calibration of Hamuy et al.,
+                   1992, PASP, submitted.  This new calibration represents
+                   a significant improvement over the original and the fluxes
+                   in this directory are in general to be preferred over those
+                   in ctiocal.
+        iidscal -  Directory of the KPNO IIDS standards at 29 bandpasses,
+                   data from various sources transformed to the Hayes and 
+                   Latham system, unpublished.
+	 irscal -  Directory of the KPNO IRS standards at 78 bandpasses,
+                   data from various sources transformed to the Hayes and  
+                   Latham system, unpublished (note that in this directory the 
+                   brighter standards have no values - the `bstdscal' directory
+                   must be used for these standards at this time).
          redcal -  Directory of standard stars with flux data beyond 8370A.
 		   These stars are from the IRS or the IIDS directory but
 		   have data extending as far out into the red as the
-		   literature permits.   
+		   literature permits.  Data from various sources.   
    spechayescal -  The KPNO spectrophotometric standards at the Hayes flux
                    points, Table IV, Spectrophotometric Standards, Massey
-                   et al., 1988, Ap. J., Vol. 328, p. 315.
-      spec50cal -  The KPNO spectrophotometric standards at 50 A intervals,
-                   Table V, Spectrophotometric Standards, Massey et al., 1988,
-                   Ap. J., Vol. 328, p. 315.
-   spec50redcal -  The KPNO spectrophotometric standards at 50 A intervals.
-                   These stars are a subset of the spec50cal stars extended out
-                   to 1 micron, Table 3, The Kitt Peak Spectrophotometric
-                   Standards: Extension to 1 micron, Massey and Gronwall,
-                   Ap. J., July 20, 1990.
+                   et al., 1988, ApJ 328, p. 315.
+  spec16bluecal -  Directory containing fluxes at 16A steps in the range
+                   3300-7550A for the bright secondary standards, published
+                   in Hamuy et al., 1992, PASP, submitted.
+   spec16redcal -  Directory containing fluxes at 16A steps in the range
+                   6050-10300A for the bright secondary standards.  These 
+                   values were obtained in the spectrophotometric system
+                   described by Hamuy et al, 1992, PASP, submitted, and
+                   are accurate to better than 2%, except in the range
+                   8400-9850A where the accuracy drops to 5% due to the lack
+                   of flux points in the calibrating spectrophotometric
+                   system.  Work is underway to illiminate this problem at
+                   which time these data will be superseded.
+      spec50cal -  The KPNO spectrophotometric standards at 50 A intervals.
+                   The data are from (1) Table V, Spectrophotometric Standards,
+                   Massey et al., 1988, ApJ 328, p. 315 and (2) Table 3, The
+                   Kitt Peak Spectrophotometric Standards: Extension to 1
+                   micron, Massey and Gronwall, 1990, ApJ 358, p. 344.
 
 			MISCELLANEOUS
 
 	   ctio -  Directory containing CTIO decker comb positions and
-		   neutral density filter curves (used with proto.ndprep).
+		   neutral density filter curves (used with NDPREP).

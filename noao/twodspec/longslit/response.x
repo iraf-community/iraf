@@ -160,13 +160,16 @@ char	graphics[SZ_FNAME]	# Graphics output device
 int	axis, npts
 pointer	cv, gp, sp, wavelengths, spectrum, wts
 
-int	imgeti()
+int	imgeti(), clgeti()
 pointer	gopen()
 
 begin
 	# Determine the dispersion axis and set the axis labels.
 
-	axis = imgeti (cal, "dispaxis")
+	iferr (axis = imgeti (cal, "dispaxis")) {
+	    axis = clgeti ("dispaxis")
+	    call imaddi (cal, "dispaxis", axis)
+	}
 	switch (axis) {
 	case 1:
 	    call ic_pstr (ic, "xlabel", "Column")

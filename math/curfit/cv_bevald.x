@@ -16,21 +16,20 @@ int	k, bptr
 begin
 	bptr = 1
 	do k = 1, order {
-
 	    if (k == 1)
-	        call amovkd (1.0d0, basis, npts)
+		call amovkd (double(1.0), basis, npts)
 	    else if (k == 2)
 		call altad (x, basis[bptr], npts, k1, k2)
 	    else {
 		call amuld (basis[1+npts], basis[bptr-npts], basis[bptr],
 				npts)
-		call amulkd (basis[bptr], 2.0d0, basis[bptr], npts)
+		call amulkd (basis[bptr], double(2.0), basis[bptr], npts)
 		call asubd (basis[bptr], basis[bptr-2*npts], basis[bptr], npts)
 	    }
-		
 	    bptr = bptr + npts
 	}
 end
+
 
 # CV_BLEG -- Procedure to evaluate all the non zero Legendre function
 # for a given order and set of points.
@@ -49,24 +48,23 @@ double	ri, ri1, ri2
 begin
 	bptr = 1
 	do k = 1, order {
-
 	    if (k == 1)
-		call amovkd (1.0d0, basis, npts)
+		call amovkd (double(1.0), basis, npts)
 	    else if (k == 2)
 		call altad (x, basis[bptr], npts, k1, k2)
 	    else {
 		ri = k
-		ri1 = (2.0d0 * ri - 3.0d0) / (ri - 1.0d0)
-		ri2 = - (ri - 2.0d0) / (ri - 1.0d0)
+		ri1 = (double(2.0) * ri - double(3.0)) / (ri - double(1.0))
+		ri2 = - (ri - double(2.0)) / (ri - double(1.0))
 		call amuld (basis[1+npts], basis[bptr-npts], basis[bptr],
-				npts)
+		    npts)
 		call awsud (basis[bptr], basis[bptr-2*npts],
-			basis[bptr], npts, ri1, ri2)
+		    basis[bptr], npts, ri1, ri2)
 	    }
-			
 	    bptr = bptr + npts
 	}
 end
+
 
 # CV_BSPLINE1 -- Evaluate all the non-zero spline1 functions for a set
 # of points.
@@ -88,10 +86,13 @@ begin
 	call aminki (left, npieces, left, npts)
 
 	do k = 1, npts {
-	    basis[npts+k] = basis[npts+k] - left[k]
-	    basis[k] = 1.0d0 - basis[npts+k]
+	    basis[npts+k] = max (double(0.0), min (double(1.0),
+	        basis[npts+k] - left[k]))
+	    basis[k] = max (double(0.0), min (double(1.0), double(1.0) -
+	        basis[npts+k]))
 	}
 end
+
 
 # CV_BSPLINE3 --  Procedure to evaluate all the non-zero basis functions
 # for a cubic spline.
@@ -107,12 +108,11 @@ int	left[ARB]	# array of indices for first non-zero spline
 
 int	i
 pointer	sp, sx, tx
+double	dsx, dtx
 
 begin
-
 	# allocate space
 	call smark (sp)
-
 	call salloc (sx, npts, TY_DOUBLE)
 	call salloc (tx, npts, TY_DOUBLE)
 
@@ -121,21 +121,26 @@ begin
 	call achtdi (Memd[sx], left, npts)
 	call aminki (left, npieces, left, npts)
 
-	# normalize x to 0 to 1
 	do i = 1, npts {
-	    Memd[sx+i-1] = Memd[sx+i-1] - left[i]
-	    Memd[tx+i-1] = 1.0d0 - Memd[sx+i-1]
+	    Memd[sx+i-1] = max (double(0.0), min (double(1.0),
+	        Memd[sx+i-1] - left[i]))
+	    Memd[tx+i-1] = max (double(0.0), min (double(1.0), double(1.0) -
+	        Memd[sx+i-1]))
 	}
 
 	# calculate the basis function
-	call apowkd (Memd[tx], 3, basis, npts)
+	#call apowk$t (Mem$t[tx], 3, basis, npts)
 	do i = 1, npts {
-	    basis[npts+i] = 1.0d0 + Memd[tx+i-1] * (3.0d0 + Memd[tx+i-1] *
-	        (3.0d0 - 3.0d0 * Memd[tx+i-1]))
-	    basis[2*npts+i] = 1.0d0 + Memd[sx+i-1] * (3.0d0 + Memd[sx+i-1] *
-	        (3.0d0 - 3.0d0 * Memd[sx+i-1]))
+	    dsx = Memd[sx+i-1]
+	    dtx = Memd[tx+i-1]
+	    basis[i] = dtx * dtx * dtx
+	    basis[npts+i] = double(1.0) + dtx * (double(3.0) + dtx *
+	        (double(3.0) - double(3.0) * dtx))
+	    basis[2*npts+i] = double(1.0) + dsx * (double(3.0) + dsx *
+	        (double(3.0) - double(3.0) * dsx))
+	    basis[3*npts+i] = dsx * dsx * dsx
 	}
-	call apowkd (Memd[sx], 3, basis[1+3*npts], npts)
+	#call apowk$t (Mem$t[sx], 3, basis[1+3*npts], npts)
 
 	# release space
 	call sfree (sp)

@@ -3,6 +3,6 @@
 package bias
 
 task	colbias,
-	linebias	= bias$x_bias.e
+	linebias	= biasdir$x_bias.e
 
 clbye

@@ -1,6 +1,6 @@
 image,s,a,,,,image or image section to be plotted
-floor,r,h,0,,,minimum value to be contoured (0 if none)
-ceiling,r,h,0,,,maximum value to be contoured (0 if none)
+floor,r,h,INDEF,,,minimum value to be contoured (INDEF for min)
+ceiling,r,h,INDEF,,,maximum value to be contoured (INDEF for max)
 zero,r,h,0,,,greyscale value of zero contour
 ncontours,i,h,0,,,number of contours to be drawn (0 for default)
 interval,r,h,0,,,contour interval (0 for default)

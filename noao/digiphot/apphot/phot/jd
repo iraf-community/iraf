@@ -1,0 +1,58 @@
+
+Jack,
+
+    Here are some suggestions that should help you resolve your daophot
+specific problems. Others will have additional comments with respect to the
+VXT 2000 which I don't know annything about and VXT3000.
+
+>1. Last week we were able to run PHOT in DAOPHOT, but for some reason it is
+>now not working. When the PHOT command is given it prompts for the image name,
+> once given it displays a message, "Warning, graphics overlay not available
+>for display device." We are running IRAF off of a digital VXT 2000, instead
+> of a SUN workstation. Could this be a factor? 
+
+Is the interactive parameter in phot switched on, i.e. set to yes? By
+default daophot.phot comes configured with interactive=no, in which
+case you should never see the warning messages quoted above. Simply
+set interactive to no, and phot should work as before. If this does not
+fix the problem then try an "unlearn phot" from with the daophot
+package and try things again.
+
+Another rather more obscure possibility is that you have loaded the
+testphot.apphotx or digiphot.apphot packages after you have loaded
+testphot.daophot.  Phot is set up differently in these packages, by
+default interactive is yes, and perhaps you inadvertantly overridden
+the phot setup.
+
+>2. We get the same message from PSF as well. I set stdimcur = text and was
+> able to do the PSF, but was wondering what it is IRAF wants to display.
+
+Actually this messages (and the one in phot) is harmless. It simply means
+that the task cannot draw graphics to the image display. It should however
+still be able to read the image cursor (assuming you have a display
+which iraf can talk to) and do normal graphics assuming
+that your environment is set up correctly. You should not have to
+set stdimcur = text if you were not doing so before. Simply ignore the
+message.
+
+>3. in an old sample version of login.cl I saw a setting for stdgraph = vt640
+>however there is no setting for this in our login.cl files. Is it imporant?
+
+>4. We were able to finish the psf on one image before the PHOT quit working,
+>and were wondering if IRAF supports any post-daophot reduction softwareap> phot
+>Sorry, for example, for matching up images, and for making c-m diagrams?
+
+IRAF 2.10 will have apphot, daophot and ptools installed in the digiphot
+package. There will also be a new photometric calibration package, photcal,
+which includeds two tasks, mknobsfile and mkobsfile, for combining
+standard star and program star data taken in different filters and
+reduced with apphot or daophot.
+
+>Also, We do have Silicon Graphics terminal and a VXT 3100, Are either of these 
+>better for running IRAF? And last, are there any new releases of IRAF upcoming?
+
+
+Someone else in the group will respond to your other questions.
+Hope this helps out.
+
+                                           Lindsey Davis

@@ -11,7 +11,6 @@ procedure stg_closews (devname, n)
 short	devname[ARB]		# device name (not used)
 int	n			# length of device name
 
-extern	stg_onerror()
 include "stdgraph.com"
 
 begin

@@ -73,8 +73,16 @@ shlib:
 
 summary:
 	$ifeq (HOSTID, unix)
-	    ! grep -v ':$$' spool | grep -v '^xc' | grep -v '^ar'\
-	    | grep -v '^check file'
+	    $ifndef (spool)
+		$set spool = spool
+	    $endif
+	    $ifeq (MACH, dmip)
+		! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
+		    | grep -v '^check file' | grep -v 'never used$'
+	    $else
+		! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
+		    | grep -v '^check file'
+	    $endif
 	$else
 	    $echo "mkpkg summary only available on a UNIX system"
 	$endif
@@ -97,6 +105,7 @@ srcarc:
 # UNIX/IRAF stuff (multiple architecture support).
 # ---------------------------------------------------
 
+arch:
 showfloat:				# show current float option
 	$verbose off
 	!$(hlib)/mkfloat.csh
@@ -104,7 +113,7 @@ showfloat:				# show current float option
 generic:				# make architecture indep. (no bins)
 	$verbose off
 	!$(hlib)/mkfloat.csh generic
-	!(cd ./unix; setenv MACH generic; sh -x setarch.sh)
+	#!(cd ./unix; setenv MACH generic; sh -x setarch.sh)
 	;
 f68881:					# install f68881 binaries
 	$verbose off
@@ -141,4 +150,19 @@ i386:					# install 386i binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh i386
 	!(cd ./unix; setenv MACH i386; sh -x setarch.sh)
+	;
+ddec:					# install DSUX DEC Fortran binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh ddec
+	#!(cd ./unix; setenv MACH ddec; sh -x setarch.sh)
+	;
+dmip:					# install DSUX MIPS Fortran binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh dmip
+	#!(cd ./unix; setenv MACH dmip; sh -x setarch.sh)
+	;
+mips:					# install mips binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh mips
+	!(cd ./unix; setenv MACH mips; sh -x setarch.sh)
 	;

@@ -110,9 +110,9 @@ begin
 	    # Open the image.
 	    iferr {
 		if (update == YES)
-		    im = immap (Memc[image], READ_WRITE, LEN_USERAREA)
+		    im = immap (Memc[image], READ_WRITE, min_lenuserarea)
 		else
-		    im = immap (Memc[image], READ_ONLY,  LEN_USERAREA)
+		    im = immap (Memc[image], READ_ONLY,  min_lenuserarea)
 	    } then {
 		call erract (EA_WARN)
 		next

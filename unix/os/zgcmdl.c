@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #define	import_kernel
 #define	import_knames
@@ -6,12 +9,20 @@
 
 extern	char *environ[];
 
+#ifdef mips
+#ifdef ultrix
+#define	xargv __Argv		/* Ultrix 4.2 */
+extern	char **__Argv;
+#else
+#endif
+#else
 #ifdef BSDUNIX
 extern	char **xargv;		/* defined in getarg(3f); requires libU77! */
 extern	int xargc;
 #else
 static	char **xargv = NULL;
 static	int xargc = 0;
+#endif
 #endif
 
 /* ZGCMDL -- Get the host system command line used to invoke this process.
@@ -26,7 +37,7 @@ XINT	*maxch;			/* maxch chars out		*/
 XINT	*status;
 {
 	register char	*ip, *op;
-	unsigned int	*ep, ev;
+	unsigned int	*ep;
 	register int	n;
 	char	**argv;
 

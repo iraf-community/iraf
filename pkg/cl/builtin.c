@@ -940,6 +940,90 @@ argerr:		cl_error (E_UERR, "Too few arguments to print or fprint");
 }
 
 
+/* CLPRINTF -- Formatted print command (interface to VOS printf).
+ */
+clprintf()
+{
+	struct	pfile *pfp;
+	struct	operand o;
+	int	arg, n;
+
+	pfp = newtask->t_pfp;
+	pushbpvals (pfp->pf_pp);
+	if ((n = nargs (pfp)) < 1)
+	    cl_error (E_UERR, "printf: insufficient arguments\n");
+
+	/* Output format. */
+	o = popop();
+	if ((o.o_type & OT_BASIC) != OT_STRING)
+	    cl_error (E_UERR, "printf: bad format string\n");
+	c_fprintf (fileno(currentask->t_stdout), o.o_val.v_s);
+
+	/* Pass the operand values. */
+	for (arg=2;  arg <= n;  arg++) {
+	    o = popop();
+	    switch (o.o_type & OT_BASIC) {
+	    case OT_BOOL:
+	    case OT_INT:
+		c_pargi (o.o_val.v_i);
+		break;
+	    case OT_REAL:
+		c_pargd (o.o_val.v_r);
+		break;
+	    case OT_STRING:
+		c_pargstr (o.o_val.v_s);
+		break;
+	    case OT_INDEF:
+		c_pargstr ("INDEF");
+		break;
+	    case OT_UNDEF:
+		cl_error (E_UERR, "printf: argument %d has undefined value\n",
+		    arg);
+		break;
+	    default:
+		cl_error (E_UERR, "printf: bad operand type\n");
+	    }
+	}
+}
+
+
+/* CLSCAN -- The scan function called as a task to scan from the standard
+ * input, e.g. a pipe.
+ */
+clscan()
+{
+	struct	pfile *pfp;
+
+	pfp = newtask->t_pfp;
+	pushbpvals (pfp->pf_pp);
+	cl_scan (nargs(pfp)-1, "stdin");
+	popop();
+}
+
+
+/* CLSCANF -- Formatted scan function.
+ */
+clscanf()
+{
+	struct	pfile *pfp;
+	struct	operand o;
+	int	n;
+
+	pfp = newtask->t_pfp;
+	pushbpvals (pfp->pf_pp);
+	if ((n = nargs (pfp)) < 1)
+	    cl_error (E_UERR, "scanf: insufficient arguments\n");
+
+	/* Get scan format. */
+	o = popop();
+	if ((o.o_type & OT_BASIC) != OT_STRING)
+	    cl_error (E_UERR, "scanf: bad format string\n");
+
+	cl_scanf (o.o_val.v_s, nargs(pfp)-2, "stdin");
+	popop();
+}
+
+
 /* PUTLOG user-msg 
  * Write a user message to the logfile.  The current pkg.task, bkg info, and
  * a time stamp are added by the putlog() function (in history.c).
@@ -1350,12 +1434,21 @@ clunlearn()
 	    opcast (OT_STRING);
 	    o = popop();		/* get ltask|package name	*/
 	    breakout (o.o_val.v_s, &x1, &pk, &t, &x2);
-	    ltp = cmdsrch (pk, t);
+	    if (!(ltp = cmdsrch (pk, t)))
+		continue;
 
+	    /* If package, unlearn each task. */
 	    if (ltp->lt_flags & LT_PACCL) {
+		/* Unlearn each task in the package. */
 		for (ltt=ltp->lt_pkp->pk_ltp;  ltt != NULL;  ltt=ltt->lt_nlt)
 		    if (pfileinit (ltt) == ERR)
 			eprintf (errfmt, ltt->lt_lname);
+
+		/* Unlearn the package parameters. */
+		if (ltt = ltasksrch (pk, t))
+		    if (pfileinit(ltt) == ERR)
+			eprintf (errfmt, ltt->lt_lname);
+
 	    } else if (pfileinit (ltp) == ERR)
 		eprintf (errfmt, ltp->lt_lname);
 	}
@@ -1747,9 +1840,8 @@ cldevstatus()
 	o = popop();
 	strcpy (device, o.o_val.v_s);
 
-	/* Print the device status.
-	 */
-	c_devstatus (STDOUT, device);
+	/* Print the device status.  */
+	c_devstatus (device, STDOUT);
 }
 
 
@@ -1802,6 +1894,7 @@ register struct package *pkp;
 	    "_curpack", clcurpack,
 		LT_INVIS,		/* name the current package	*/
 	    "print", clprint, 0,	/* formatted output to stdout	*/
+	    "printf", clprintf, 0,	/* formatted output to stdout	*/
 	    "fprint", clfprint, 0,	/* formatted output		*/
 	    "putlog", clputlog, 0, 	/* put a message to the logfile */
 	    "dparam", cldparam, 0,	/* dump params for tasks	*/
@@ -1827,8 +1920,9 @@ register struct package *pkp;
 	    "bye", clbye, 0,		/* restore previous state	*/
 	    "logout", cllogout, 0,	/* log out of the CL		*/
 
-	    "scan", clfunc, 0,		/* intrinsic function entries	*/
-	    "fscan", clfunc, 0,		/* 		"		*/
+	    "scan", clscan, 0,		/* scan from a pipe		*/
+	    "scanf", clscanf, 0,	/* formatted scan 		*/
+	    "fscan", clfunc, 0,		/* intrinsic function entries	*/
 	    "defpac", clfunc, 0,	/* 		"		*/
 	    "defpar", clfunc, 0,	/* 		"		*/
 	    "deftask", clfunc, 0,	/* 		"		*/
@@ -1978,6 +2072,24 @@ struct param *pp;
 	onam.o_type = OT_STRING;
 	onam.o_val.v_s = pp->p_name;
 	pushop (&onam);
+}
+
+
+/* PUSHBPVALS -- Like pushbparams, but only the parameter value is pushed.
+ */
+pushbpvals (pp)
+struct param *pp;
+{
+	struct operand onam;
+	struct param *npp;
+
+	if (pp == NULL)
+	    return;		/* just a guard	*/
+	npp = pp->p_np;
+	if (npp != NULL)
+	    pushbpvals (npp);
+
+	paramget (pp, 'V');
 }
 
 

@@ -15,7 +15,7 @@ pointer	cam_fd, im
 int	r2dfrhdr()
 pointer mtopen(), immap()
 errchk	salloc, r2dfrhdr, mtopen, close, immap, delete
-errchk	mt_skip_record, r2dfrim
+errchk	r2dfrim
 include	"r2df.com"
 
 begin

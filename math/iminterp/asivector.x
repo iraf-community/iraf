@@ -17,7 +17,7 @@ begin
 	switch (ASI_TYPE(asi))	{
 	case II_NEAREST:
 	    call ii_nearest (x, y, npix,
-	    		    COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
+	        COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
 	case II_LINEAR:
 	    call ii_linear (x, y, npix, COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
 	case II_POLY3:
@@ -25,8 +25,11 @@ begin
 	case II_POLY5:
 	    call ii_poly5 (x, y, npix, COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
 	case II_SPLINE3:
-	    call ii_spline3 (x, y, npix,
-	    		    COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)))
+	    call ii_spline3 (x, y, npix, COEFF(ASI_COEFF(asi)+ASI_OFFSET(asi)))
+	case II_SINC:
+	    call ii_sinc (x, y, npix,
+		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
+		NSINC, NTAPER, STAPER, DX)
 	default:
 	    call error (0, "ASIVECTOR: Unknown interpolator type.")
 	}

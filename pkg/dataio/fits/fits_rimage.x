@@ -13,10 +13,11 @@ int	fits_fd		# FITS file descriptor
 pointer	fits		# FITS data structure
 pointer	im		# IRAF image descriptor
 
-int	i, npix, npix_record, blksize
+int	i, npix, npix_record, blksize, ndummy
 long	v[IM_MAXDIM], nlines, il
 pointer	tempbuf, buf
 real	linemax, linemin, lirafmin, lirafmax
+double	dblank
 
 long	clktime()
 int	fstati(), rft_init_read_pixels(), rft_read_pixels()
@@ -65,11 +66,19 @@ begin
 	    # Allocate temporary space.
 	    call malloc (tempbuf, npix, TY_REAL)
 
+	    # Initialize the read.
+	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_REAL)
+
+	    # Turn on the ieee NaN mapping.
+	    call ieesnanr (blank)
+	    #call ieemapr (YES, NO)
+	    #call ieezstatr ()
+	    NBPIX(im) = 0
+
 	    # Allocate the space for the output line, read in the image
 	    # line, convert from the ieee to native format, and compute the
 	    # minimum and maximum.
 
-	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_REAL)
 	    do il = 1, nlines {
 	        call rft_put_image_line (im, buf, v, PIXTYPE(im))
 	        if (rft_read_pixels (fits_fd, Memr[tempbuf], npix,
@@ -85,6 +94,9 @@ begin
 	        lirafmin = min (lirafmin, linemin)
 	    }
 
+	    # Set the number of bad pixels.
+	    call ieestatr (NBPIX(im), ndummy)
+
 	    # Free space.
 	    call mfree (tempbuf, TY_REAL)
 
@@ -93,12 +105,21 @@ begin
 	    # Allocate temporary space.
 	    call malloc (tempbuf, npix, TY_DOUBLE)
 
+	    # Initialize the read.
+	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF,
+	        TY_DOUBLE)
+
+	    # Turn on the ieee NaN mapping.
+	    dblank = blank
+	    call ieesnand (dblank)
+	    #call ieemapd (YES, NO)
+	    #call ieezstatd ()
+	    NBPIX(im) = 0
+
 	    # Allocate the space for the output line, read in the image
 	    # line, convert from the ieee to native format, and compute the
 	    # minimum and maximum.
 
-	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF,
-	        TY_DOUBLE)
 	    do il = 1, nlines {
 	        call rft_put_image_line (im, buf, v, PIXTYPE(im))
 	        if (rft_read_pixels (fits_fd, Memd[tempbuf], npix,
@@ -110,9 +131,18 @@ begin
 		else
 		    call rft_dchange_pix (Memd[tempbuf], buf, npix, PIXTYPE(im))
 	        call rft_pix_limits (buf, npix, PIXTYPE(im), linemin, linemax)
-	        lirafmax = max (lirafmax, linemax)
-	        lirafmin = min (lirafmin, linemin)
+		if (IS_INDEFR(linemax))
+		    lirafmax = INDEFR
+		else
+	            lirafmax = max (lirafmax, linemax)
+		if (IS_INDEFR(linemin))
+		    lirafmin = INDEFR
+		else
+	            lirafmin = min (lirafmin, linemin)
 	    }
+
+	    # Set the number of bad pixels.
+	    call ieestatd (NBPIX(im), ndummy)
 
 	    # Free space.
 	    call mfree (tempbuf, TY_DOUBLE)
@@ -154,8 +184,16 @@ begin
 	LIMTIME(im) = clktime (long(0))
 
 	if (NBPIX (im) != 0) {
-	    call printf ("Warning: %d bad pixels in image\n")
+	    call printf ("Warning: %d bad pixels replaced in image\n")
 		call pargl (NBPIX (im))
+	}
+	if (IS_INDEFR(lirafmax) || lirafmax > MAX_REAL) {
+	    call printf ("Warning: image contains pixel values > %g\n")
+		call pargr (MAX_REAL)
+	}
+	if (IS_INDEFR(lirafmin) || lirafmin < -MAX_REAL) {
+	    call printf ("Warning: image contains pixel values < %g\n")
+		call pargr (-MAX_REAL)
 	}
 end
 
@@ -337,8 +375,9 @@ begin
 	    call achtll (inbuf, Meml[outbuf], npix)
 	    call altml (Meml[outbuf], Meml[outbuf], npix, bscale, bzero)
 	case TY_REAL:
-	    call achtlr (inbuf, Memr[outbuf], npix)
-	    call altmdr (Memr[outbuf], Memr[outbuf], npix, bscale, bzero)
+	    call altmlr (inbuf, Memr[outbuf], npix, bscale, bzero)
+	    #call achtlr (inbuf, Memr[outbuf], npix)
+	    #call altmdr (Memr[outbuf], Memr[outbuf], npix, bscale, bzero)
 	case TY_DOUBLE:
 	    call achtld (inbuf, Memd[outbuf], npix)
 	    call altmd (Memd[outbuf], Memd[outbuf], npix, bscale, bzero)
@@ -486,7 +525,8 @@ end
 
 
 # RFT_PIX_LIMITS -- Procedure to determine to maxmimum and minimum values in a
-# line.
+# line. Note that double precision is somewhat of a special case because
+# MAX_DOUBLE is a lot less than the maximum permitted ieee numbers for iraf.
 
 procedure rft_pix_limits (buf, npix, pixtype, linemin, linemax)
 
@@ -512,8 +552,14 @@ begin
 	    linemin = rmin
 	case TY_DOUBLE:
 	    call alimd (Memd[buf], npix, dmin, dmax)
-	    linemax = dmax
-	    linemin = dmin
+	    if (dmax > MAX_REAL)
+	        linemax = INDEFR
+	    else
+		linemax = dmax
+	    if (dmin < -MAX_REAL)
+		linemin = INDEFR
+	    else
+	        linemin = dmin
 	case TY_COMPLEX:
 	    call alimx (Memx[buf], npix, xmin, xmax)
 	    linemax = xmax
@@ -521,6 +567,24 @@ begin
 	default:
 	    call error (30, "RFT_PIX_LIMITS: Unknown IRAF type")
 	}
+end
+
+
+# ALTMDR -- procedure to scale a long vector into a real vector using
+# double precision constants to preserve accuracy
+
+procedure altmlr (a, b, npix, bscale, bzero)
+
+long	a[ARB]		# input array
+real	b[ARB]		# output array
+int	npix		# number of pixels
+double	bscale, bzero	# scaling parameters
+
+int	i
+
+begin
+	do i = 1, npix
+	    b[i] = a[i] * bscale + bzero
 end
 
 

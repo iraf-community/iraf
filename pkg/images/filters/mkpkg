@@ -17,6 +17,7 @@ libpkg.a:
 	t_mode.x	mode.com <error.h> <imhdr.h>
 	boxcar.x	<error.h> <imhdr.h> <imset.h>
 	convolve.x	<error.h> <imhdr.h> <imset.h>
+	xyconvolve.x	<error.h> <imhdr.h> <imset.h>
 	aboxcar.x
 	fmd_buf.x
 	med_buf.x

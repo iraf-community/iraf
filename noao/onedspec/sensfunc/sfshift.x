@@ -3,11 +3,10 @@ include	"sensfunc.h"
 
 # SF_SHIFT -- Shift or unshift all standard stars to have zero mean residual.
 
-procedure sf_shift (stds, nstds, cv, flag)
+procedure sf_shift (stds, nstds, flag)
 
 pointer	stds[nstds]		# Standard star data
 int	nstds			# Number of standard stars
-pointer	cv			# Sensitivity function curve
 int	flag			# Shift flag
 
 pointer	x, y, f

@@ -1,0 +1,42 @@
+.help chkconfig Aug91 noao.digiphot.photcal
+.ih
+NAME
+chkconfig -- Check the grammar and syntax of the configuration file
+.ih
+USAGE
+chkconfig config
+.ih
+PARAMETERS
+.ls config
+The name of the configuration file to be checked. \fIConfig\fR is the
+text file specifying both the format of the input files, and the form of
+transformation equations.
+.le
+.ls verbose = yes
+Print detailed diagnostic information on the standard output ?
+.le
+
+.ih
+DESCRIPTION
+
+CHKCONFIG parses the configuration file \fIconfig\fR line by line,
+searching for syntax and/or semantic errors.  Its primary function is to aid
+the user in setting up a complete and correct set of transformation
+equations to be fit.  CHKCONFIG is run automatically by the task MKCONFIG,
+but can also be run stand-alone at any time.
+
+.ih
+EXAMPLES
+
+Check the configuration file for grammar and syntax errors.
+
+.nf
+ph> chk config
+.fi
+
+.ih
+BUGS
+.ih
+SEE ALSO
+mkconfig,fitparams
+.endhelp

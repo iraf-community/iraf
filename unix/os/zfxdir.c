@@ -18,7 +18,7 @@ XCHAR	*osdir; 		/* receives osdir	[NOT PACKED]	*/
 XINT	*maxch, *nchars;
 {
 	register XCHAR	*ip, *op;
-	register int	ch, n = *maxch;
+	register int	n = *maxch;
 	XCHAR	*last_slash;
 
 	for (ip=osfn;  *ip == ' ';  ip++)

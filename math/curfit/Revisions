@@ -1,5 +1,38 @@
 .help revisions Jun89 math.curfit
 .nf
+From Davis, May, 6, 1990
+
+Finished cleaning up the .gx files in curfit.
+math/curfit/cverrors.gx
+math/curfit/cvpower.gx
+math/curfit/cvrefit.gx
+math/curfit/cvpower.gx
+
+From Davis, May 6, 1990
+
+Changed the constant from INDEFR to INDEF in the amov$t call in cvpower.gx.
+This was causing a problem for the Mac compiler.
+
+From Davis, April 23, 1991
+
+Did some cleaning up in the following .gx files to make the code easier to read.
+math/curfit/cv_b1eval.gx
+math/curfit/cv_beval.gx
+math/curfit/cv_feval.gx
+math/curfit/cvaccum.gx
+math/curfit/cvacpts.gx
+math/curfit/cvchomat.gx
+math/curfit/cvfree.gx
+math/curfit/cvinit.gx
+
+From Davis, September 18, 1990
+
+Changed the int calls in cvrestore.gx to nint calls. This is a totally
+safe way to do the conversion from double precision to integer
+quantities in the curfit package and removes any potential precision
+problems for task which must read the curfit structure back from a
+text database file.
+
 From Davis, July 14, 1988:
 
 The calling sequence for the cverrors routine as been changed to include

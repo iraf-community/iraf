@@ -49,7 +49,6 @@ XINT	*allflg;		/* allocate or deallocate device?	*/
 XINT	*status;		/* receives status word			*/
 {
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
-	XINT	x_status;
 
 	/* Syntax: $host/hlib/alloc.e -[ad] aliases
 	 */
@@ -70,6 +69,9 @@ XINT	*status;		/* receives status word			*/
  * merely printed for the user to tell them the status of the device.
  * Note that the device is not considered to be allocated if the owner
  * is not currently logged in.
+ *
+ * Device files may be specified by a full pathname, as a user directory
+ * relative pathname, or by the device name in /dev or /dev/rmt.
  */
 ZDVOWN (device, owner, maxch, status)
 PKCHAR	*device;		/* device name (not a list)	*/
@@ -78,14 +80,29 @@ XINT	*maxch;			/* max chars out		*/
 XINT	*status;		/* receives allocation status	*/
 {
 	register int	uid;
-	char	devname[SZ_FNAME+1];
+	char	*dev, devname[SZ_FNAME+1];
 	struct	passwd *pw, *getpwuid();
 	struct	stat fi;
 
-	if (*(char *)device == '/')
-	    strcpy (devname, (char *)device);
-	else
-	    sprintf (devname, "/dev/%s", (char *)device);
+	/* Get device pathname. */
+	dev = (char *)device;
+	if (dev[0] == '/') {
+	    strcpy (devname, dev);
+
+        } else if (dev[0] == '~' && dev[1] == '/') {
+            /* User home directory relative pathname. */
+            struct  passwd *pwd;
+            pwd = getpwuid (getuid());
+            if (pwd != NULL) {
+                strcpy (devname, pwd->pw_dir);
+                strcat (devname, &dev[1]);
+                endpwent();
+	    }
+	} else {
+	    sprintf (devname, "/dev/%s", dev);
+	    if (access (devname, 0) == ERR)
+		sprintf (devname, "/dev/rmt/%s", dev);
+	}
 
 	if (stat (devname, &fi) == ERR) {
 	    *status = XERR;
@@ -117,7 +134,6 @@ XINT	*status;		/* receives allocation status	*/
 loggedin (uid)
 int	uid;
 {
-	register int i;
 	struct	utmp ubuf;
 	struct	passwd *pw, *getpwuid();
 	FILE	*ufp;

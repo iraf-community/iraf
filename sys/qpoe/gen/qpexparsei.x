@@ -278,11 +278,12 @@ pop_
 	do j = 1, nrg {
 	    xmin = XV(j);  umin = UV(j)
 	    jval = j
-	    do i = j+1, nrg
-		if (XV(i) < xmin || (fp_equali(XV(i),xmin) && UV(i) < umin)) {
+	    do i = j+1, nrg {
+		if (XV(i) < xmin || (XV(i) == xmin && UV(i) < umin)) {
 		    xmin = XV(i);  umin = UV(i)
 		    jval = i
 		}
+	    }
 	    if (jval != j) {
 		temp  = XV(j);  XV(j) = XV(jval);  XV(jval) = temp
 		itemp = UV(j);  UV(j) = UV(jval);  UV(jval) = itemp
@@ -307,9 +308,10 @@ pop_
 
 	for (r1=1;  r1 <= nrg;	r1=r2+1) {
 	    # Get a range of breakpoint entries for a single XV position.
-	    for (r2=r1;  r2 <= nrg;  r2=r2+1)
+	    for (r2=r1;  r2 <= nrg;  r2=r2+1) {
 		    if (XV(r2) != XV(r1))
 			break
+	    }
 	    r2 = r2 - 1
 
 	    # Collapse into a single breakpoint.

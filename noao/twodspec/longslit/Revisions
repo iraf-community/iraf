@@ -1,5 +1,94 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
+
+=======
+V2.10.0
+=======
+
+transform/t_transform.x
+    It was possible to end up with too few lines for MSIFIT.  A minimum
+    buffer size is now enforced.  (6/18/92, Valdes)
+
+transform/t_transform.x
+    Modified to use MWCS.  (5/20/92, Valdes)
+
+=====
+V2.10
+=====
+
+longslit$fluxcalib.x
+longslit$doc/fluxcalib.hlp
+    The output pixel type is now of type real.  If the input image is
+    to be modified the calibration is done on a temporary image and
+    renamed to the input image upon completion rather than being done
+    in place.  Previously, flux calibrating a type short image would
+    produce an image of all zeros.  (3/19/92, Valdes)
+
+longslit$longslit.par
+    Added observatory to package parameters.
+    (2/6/92, Valdes)
+
+longslit$transform/fcgetcoords.x
+    In V2.10 IDENTIFY/REIDENTIFY measure feature positions in physical
+    coordinates while FITCOORDS and TRANSFORM require logical coordinates.
+    Therefore, the IDENTIFY database coordinates are transformed to
+    logical coordinates when they are read.  (12/20/91, Valdes)
+
+longslit$transform/igsfit/igsfit.x
+    Removed the print statement about fitting because this caused the graphics
+    to be overplotted on the previous graph for some unknown reason.
+    (12/12/91, Valdes)
+
+longslit$doc/extinction.hlp
+longslit$doc/fluxcalib.hlp
+longslit$doc/illumination.hlp
+longslit$doc/response.hlp
+    Added discussion and example about the DISPAXIS keyword.  (12/6/91, Valdes)
+
+longslit$t_transform.x
+    Fixed datatype declaration error for array tmp.  This was a harmless
+    error.  (11/21/91, Valdes)
+
+longslit$longslit.par
+longslit$response.x
+longslit$illumination.x
+longslit$fluxcalib.x
+longslit$extinction.x
+longslit$transform/t_transform.x
+    1.  Added dispaxis parameter to package parameters.
+    2.  Modified all routines to use package dispaxis if not found in image
+	all also write it to header.  (8/28/91, Valdes)
+
+longslit$transform/t_transform.x
+    Removed W0 and WPC from output image.  (8/28/91, Valdes)
+
+longslit$transform/igsfit/igssolve.x
+    The case of a single trace along x handled by igs_solve3 was using the
+    yorder instead of the xorder in one place.  (7/11/91, Valdes)
+
+longslit$transform/t_transform.x
+    The interative inversion was made more stable by using a fudge factor.
+    This was needed to make the LONGSLIT test procedure work on HPUX.
+    (9/17/90, Valdes)
+
+longslit$identify.par
+longslit$reidentify.par
+    Updated parameter files for the new version.  (8/23/90, Valdes)
+
+longslit$transform/t_transform.x
+    Changed the computation of the output grid from a cumulative addition of
+    the pixel increment to a direct calculation to avoid cumulative
+    round off errors in high resolution data. (7/19/90, Valdes)
+
+longslit$doc/lslit.ms +
+    Added copy of the SPIE paper on the LONGSLIT package.  It is in MS TROFF
+    format.  Postscript copies may be obtained from the FTP archive.
+    (7/4/90, Valdes)
+
+====
+V2.9
+====
+
 longslit$transform/igsfit
 longslit$transform/t_transform.x
 longslit$fluxcalib.x

@@ -1,0 +1,8 @@
+objects,s,a,,,,"List of object images"
+arcs,s,a,,,,"List of arc images"
+standards,s,a,,,,"List of standard images"
+obj,f,a,"",,,"File object images"
+arc,f,a,"",,,"File of arc images"
+std,f,a,"",,,"File of standard images"
+fd,*struct,h,"",,,
+mode,s,h,"ql",,,

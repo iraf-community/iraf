@@ -1,15 +1,15 @@
-      INTEGER FUNCTION SDROP (FROM, TO, CHARS)
-      INTEGER FROM (100), TO (100)
-      INTEGER CHARS
-      INTEGER LEN, START
-      INTEGER CTOC, LENGTH, MIN0
-      LEN = LENGTH (FROM)
-      IF (.NOT.(CHARS .LT. 0))GOTO 23000
-      SDROP=(CTOC (FROM, TO, LEN + CHARS + 1))
-      RETURN
-23000 CONTINUE
-      START = MIN0 (CHARS, LEN)
-      SDROP=(CTOC (FROM (START + 1), TO, LEN + 1))
-      RETURN
-23001 CONTINUE
-      END
+      integer function sdrop (from, to, chars)
+      integer from (100), to (100)
+      integer chars
+      integer len, start
+      integer ctoc, length, min0
+      len = length (from)
+      if (.not.(chars .lt. 0))goto 23000
+      sdrop=(ctoc (from, to, len + chars + 1))
+      return
+23000 continue
+      start = min0 (chars, len)
+      sdrop=(ctoc (from (start + 1), to, len + 1))
+      return
+23001 continue
+      end

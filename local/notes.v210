@@ -210,8 +210,8 @@ sys/imfort/imftrans.x			+
 
 dev/hosts	[tucana, orion, gemini]
 	Changed cmd field for draco, to use known object "241", which
-oke]irafks.com, but will shortly
-afext.kpnolocal.src.dni]irafks.com.  (7/12 SRo)
+	currently points at usr$0:[rooke]irafks.com, but will shortly
+	point to usr$3:[irafext.kpnolocal.src.dni]irafks.com.  (7/12 SRo)
 
 dev/graphcap	[tucana, orion, gemini]
 	Added iism70d field for draco-hosted iis, aliased to iism70c & iism70l
@@ -228,7 +228,7 @@ unix/os/zfiopr.c
 	task is run from the CL is difficult to reproduce when the task
 	is run standalone.
 
- LOGIPC is defined in the host environment
+	The facility is this: if LOGIPC is defined in the host environment
 	when an iraf process is started, the process will create two files
 	PID.in and PID.out, where PID is the process id.  Everything read
 	from the IPC input file is copied to the .in file, and everything
@@ -265,14 +265,14 @@ unix/os/zfiopr.c
 	To run the process under ADB or DBX, using the saved input:
 
 		% adb $iraf/bin/x_system.e
-PID.in -c
+		:r <PID.in -c
 	or
 		% dbx $iraf/bin/x_system.e
 		dbx> r -c < PID.in
 
 	Note that the redirection has to be given first for ADB, and last
-th ADB there should be no space
-	between the "<" and the file name]
+	for DBX.  [In recent versions of SunOS there must be no space after
+	the "<" in the :r command to adb.]
 
 	Running a task in this way is not identical to running the task
 	standalone, e.g. using a DPARAM file for parameter input, because
@@ -387,7 +387,7 @@ unix/boot/spp/xc.c
 	not even care if these are installed as user commands, anymore).
 
 	2. The technique used to locate host commands such as f77 and cc
-] first the directories
+	was changed to the following sequence: [1] first the directories
 	defined by the user's $PATH are searched (using execvp), [2] the
 	internally defined directory SYSBINDIR is searched (this defaults
 	to /usr/lang on a Sun), [3] the internally defined directory
@@ -1053,7 +1053,7 @@ sys/qpoe/qpexmodfil.x
 
 	For example,
 
-imes]"
+	    cl> countpoe "foo.qp[time:=@times]"
 
 	would replace the time term of the default filter with the time list
 	from the file "times", preserving any other terms of the default
@@ -1065,7 +1065,7 @@ imes]"
 
 	would modify the filter for the time attribute, passing only those
 	events which pass both the default time filter and the time filter
-must
+	given in the file "times".  The new assignment operator ":=" must
 	be used to override any existing filter term; if the usual "=" is
 	used, the default filter term, if any, remains in effect.
 
@@ -1167,14 +1167,14 @@ sys/qpoe/qpioopen.x
 	enable use of the default filter and mask).  (12/31)
 
 sys/qpoe/qpioparse.x
-xpr" syntax, which can only
+	As an alternative to the "attr := expr" syntax, which can only
 	override any earlier filter terms for the referenced attribute (such
 	as terms of the default filter) I added some new syntax which can
 	disable the entire default filter and mask for a particular filter
 	expression.  This is done by adding a "!" after the leading "[", and
 	before the new filter, e.g.:
 
-]"
+		display "foo[!time=@times.lst,pha=(3,8:11)]"
 
 	would temporarily disable both the default filter and mask.  This
 	does not affect the use of ! within expressions since an expression
@@ -1200,7 +1200,7 @@ sys/qpoe/qpiosetfil.x
 	and a user mask is also specified, the user mask is edited using the
 	default mask as a stencil (the new mask is the user mask, with only
 	those pixels set which were also set in the default mask).  Setting
-n a
+	nodefmask, QPOE_NODEFMASK, QPIO_NODEFMASK, or using ! or mask:= in a
 	filter expression disables the default mask.  If the mask is set
 	with an explicit qpio_seti() call the default mask is ignored.  (1/1)
 
@@ -1387,7 +1387,7 @@ unix/hlib/mkpkg.sf.SUN3
 	which contain equality comparisons of complex numbers, produced the
 	following message from the V1.3 compiler:
 
-expected parent of complex expression subtree
+	    warning: unexpected parent of complex expression subtree
 
 	Compiling the files without optimization avoids the problem.  The
 	floating point or complex equalities used in these routines are
@@ -1476,7 +1476,7 @@ unix/os/zzstrt.c
 unix/os/zshlib.c
 	It turned out that zmain/zzstrt were using the ushlib vector to pass
 	the sh_debug flag, used to map the shared image text writable so
-w in adb).  This was a
+	that debug breakpoints can be set (as in :r -w in adb).  This was a
 	bit of a trick and doesn't work any more since I moved ushlib to the
 	text segment, so I made sh_debug an explicit variable in data space.
 	It is defined in the shared library (libshare.a) or in zshlib.o if
@@ -1515,7 +1515,7 @@ sys/qpoe/qpioparse.x
 	event coordinate system to be used with the notation key=(xoff,yoff)
 	where xoff,yoff are event field specifiers, e.g., (s0,s2).  Fixed
 	two problems with the code in this routine which parses the KEY
- whitespace etc. was not being skipped properly, causing
+	keyword: 1) whitespace etc. was not being skipped properly, causing
 	the key= expression to be rejected, and 2) the offset values were
 	being used directly, which is incorrect, since at the user level
 	event struct offsets are specified in bytes, whereas in the QPIO
@@ -2227,7 +2227,7 @@ unix/gdev/sgidev/sgi2ueps.c
 	Installed new SGI to EPS (encapsulated postscript) graphics driver.
 	(8/16)
 
-dev/grapcap
+dev/graphcap
 	1. Installed a minor bug fix affecting the vhpl (VMS) entry.
 	2. Added entries for the EPS driver.  Device "eps" is the default
 	portrait mode output, "epsl" provides landscape mode.  (8/16)
@@ -2298,3 +2298,3161 @@ unix/shlib/mkshlib.csh		[not modified]
 	changed, it doesn't seem worthwhile to devise a more permanent
 	workaround.  It looks like the linker fails to align the data segment
 	properly if etext is close to a page boundary.  (9/07)
+
+unix/hlib/math.h
+	Changed the name of the define "E" to "BASE_E", to decrease the
+	chance of accidental name aliases.  (9/17)
+
+pkg/images/doc/magnify.hlp
+	Fixed a bug in the magnify task help page.
+	(9/18/91 LED)
+
+pkg/images/filters/t_gauss.x
+	The code which computes the gaussian kernel in the gauss task
+	was producing a divide by zero error if ratio=0.0 and bilinear=yes
+	(2.10 version only). (9/18/91 LED)
+
+sys/gio/gadraw.x
+	It was possible for integer overflow to occur for case linear in the
+	assignments mx=x,my=y.  Added 0:MAXNDC pre-clipping for case linear.
+	(9/20)
+
+pkg/system/help/helpdb.x
+	There were still problems with the code in helpdb which reorders
+	the package index help directory to depth-first order.  A bug
+	which would cause commands such as "help lists.*" to print each
+	module twice was traced to this code.  The help directory
+	reordering code was rewritten (inverting the two main loops) to
+	ensure that the reordered help directory does not have any holes
+	in it, and that the number of modules is correct.  (9/21)
+
+dev$hosts
+	Changed aliases in dev$hosts on tucana, orion, gemini, ursa,
+	and draco for downtown node "morrison" to "vegemite".  (CB, 9/21/91)
+
+-----------------------------------------------------------------------
+Merge changes (including many minor bug fixes) from A/UX IRAF port.
+This includes support for GCC and ANSI C, and limited SYSV support.  (9/21)
+
+unix/hlib/install
+	1. Added a #!/bin/csh at the top of the script.
+	2. Added a "set path" so that explicit paths to executables can be
+	avoided.  Changed "/etc/chown" to "chown" (this utility is in
+	different places on different systems).
+	3. I had trouble on A/UX with the $hbin/sgi2* $hlib/sgi2* stuff in
+	MODEFILES.  The second did not expand to anything and the string
+	"$hlib/sgi2*" was left in MODEFILES with the * unexpanded, causing
+	problems later when appended to a directory prefix.  Since there are
+	not supposed to be any executables in hlib anyhow I deleted the
+	second reference.
+	4. In the code which checks the MODEFILES, I added a test to see if
+	$file exists as named, before looking for it in each of the
+	directories.  Otherwise the $hbin/sgi2* entries, which are already
+	fully resolved pathnames, expand to pathnames referencing
+	nonexistent directories when a BINDIRS prefix is prepended.
+	This could cause the install script to bomb on A/UX.
+	5. Changed all occurrences of constructs like `ls ...` to `$LS ...`
+	with LS defined as /bin/ls at the top of the file.  The problem is
+	that a subshell is spawned to evaluate the command in the back
+	ticks, and if "ls" is defined as an alias in a .cshrc file, as is
+	typically necessary on SYSV systems (to get -C) the alias will be
+	used, causing the output to be different than expected by the script.
+	(9/21)
+
+unix/hlib/irafuser.csh
+	Generalized somewhat - added some commented out GCC definitions,
+	and new definitions for CC, F77, HSI_F77LIBS, and RANLIB.  These
+	are used in the mkpkg.sh files (used to bootstrap the HSI).  (9/22)
+
+unix/hlib/mkfloat.csh
+	Added a definition TARXFLGS, with BSD and SYSV versions.  (9/22)
+
+unix/boot/bootlib/mkpkg.sh
+unix/boot/generic/mkpkg.sh
+unix/boot/mkpkg/mkpkg.sh
+unix/boot/rmbin/mkpkg.sh
+unix/boot/rmfiles/mkpkg.sh
+unix/boot/rtar/mkpkg.sh
+unix/boot/spp/mkpkg.sh
+unix/boot/spp/mkxc.sh
+unix/boot/spp/rpp/mkpkg.sh
+unix/boot/spp/rpp/ratlibc/mkpkg.sh
+unix/boot/spp/rpp/ratlibf/mkpkg.sh
+unix/boot/spp/rpp/rppfor/mkpkg.sh
+unix/boot/spp/xpp/mkpkg.sh
+unix/boot/wtar/mkpkg.sh
+unix/boot/xyacc/mkpkg.sh
+unix/gdev/sgidev/mkpkg.sh
+unix/os/mkpkg.sh
+unix/shlib/mkpkg.sh
+	Changed all occurrences of "cc" to "$CC" and all occurrences of "f77"
+	to "$F77".  Changed all occurrences of "ranlib" to $RANLIB.  (9/22)
+
+unix/setarch.sh
+        The A/UX version of "test" does not have the -h flag to test for
+        symbolic links, so the existing script did not work.  Still trying
+        to find a portable way to do this, I changed the script to use the
+        construct:  if [ "`ls -d as`" = "as" ]; then ...  (9/22)
+
+unix/os/alloc.c
+        1. The file header comment section contained the sequence "for the
+        /dev/* entries...".  The "/*" would cause a warning from gcc that
+        there might be a comment buried in another comment, which can cause
+        a comment to terminate prematurely.  In this case it was harmless
+        and indeed there was no error, but I changed the text to eliminate
+        the warning.
+        2. Moved the #include <sys/types.h> to before the #include <utmp.h>,
+        as the A/UX version of the latter requires the former, and SunOS
+	doesn't care.  (9/22)
+
+unix/os/prwait.c
+        In pr_getipc(), deleted unused variables error_code, error_status,
+        waitpid.  (9/22)
+
+unix/os/zalloc.c
+        1. In ZDVALL, deleted unused variable x_status.
+        2. Deleted unused variable i in loggedin().  (9/22)
+
+unix/os/zfioks.c
+unix/hlib/irafuser.csh
+        1. Deleted the old, commented out code for rcmd(), as variables
+        defined for this were being reported as unused.  Added a comment
+        explaining that rcmd and friendly-host authentication cannot be
+        used without making the process suid root.
+        2. Added #ifdef SYSV support for SYSV termio.  Terminal driver ioctls
+	are used in this routine to set raw mode for the password prompts.
+        3. GCC was complaining that the setjmp/longjmp used in zardks,
+        zawrks could cause certain register variables to become undefined
+        (op and nbytes in zardks, ofd in zawrks), so I changed the storage
+        class from register to auto for these variables.
+	4. GCC would still warn that longjmp could clobber the values of
+	several local variables in zardks.  Evidently this is a feature of
+	ANSI C.  The values of automatic variables not declared "volatile"
+	are not guaranteed to be preserved in a longjmp.  Added a -DANSI to
+	irafuser.csh and some #ifdef ANSI code to zfioks.c to provide the
+	necessary (but not non-ANSI backwards compatible) definitions. (9/22)
+
+unix/os/zfiolp.c
+        I had to change the declaration
+
+            static PKCHAR xnullstr[1] = XEOS;
+        to
+            static PKCHAR xnullstr[1] = { XEOS };
+
+        (PKCHAR=short and XEOS=0) or GCC would complain about an invalid
+        initializer.  Must be a feature of the ANSI C syntax.  (9/22)
+
+unix/os/zfiotx.c
+unix/hlib/libc/kernel.h
+        1. Modified to add #ifdef SYSV support for SysV terminal i/o.
+        2. GCC complained about some functions which were used (default
+        storage class extern) and later declared static; added static
+        declarations for these functions to the file header to eliminate
+        these (harmless) warning messages.
+        3. Another longjmp warning, this time in zgettx.  Variable "op" might
+        not be saved over a longjmp.  In this case I was able to avoid the
+        problem merely by moving the op initialization statement to after
+        the setjmp.  (9/22)
+
+unix/os/zfxdir.c
+        Deleted unused local variable "ch".  (9/22)
+
+unix/os/zgcmdl.c
+        Deleted unused local variable "ev".  (9/22)
+
+unix/os/zgtime.c
+        Had to #ifndef SYSV the #include <sys/timeb.h> as this file does
+        not exist on SysV systems.  (9/22)
+
+unix/os/zmain.c
+        Deleted unused local variables "junk" and "wsetsize".  (9/22)
+
+unix/os/zwmsec.c
+        Added "static" to explicitly specify the storage class in the first
+        declarations of "napmsx", which is declared static in the source
+        given later in the file.  (9/22)
+
+unix/os/zxwhen.c
+        1. GCC did not realize that the call to kernel_panic in zxwhen was
+        an exit, and would warn that the value of variable "vex", used later
+        in the procedure, could be unitialized.  Added a statement to init
+        this to null to avoid the warning message.
+        2. In zxgmes, the char pointer to the returned error message was
+        not being initialized if no error had occurred.  Modified to return
+        the null string in this case.  (9/22)
+
+unix/os/zzstrt.c
+        Added #ifdef SUNOS4 conditionals around certain declarations which
+        are used only the #ifdef SUNOS4 code which follows, to avoid unused
+        variable warnings on non-Sun systems.  (9/22)
+
+unix/boot/bootlib/envinit.c
+        Deleted the unused variable "osfn" in loadpkgenv.  (9/22)
+
+unix/boot/bootlib/bootlib.h
+        Deleted the commented out #define NOVOS definition, which causes
+        a /* in comment warning and doesn't need to be in this file anyhow.
+        (9/22)
+
+unix/boot/bootlib/osfcopy.c
+        1. Deleted the unused variable "binary_file".
+        2. Added a return at the end of the function, to guarantee that
+        a function value was returned.  (9/22)
+
+unix/boot/bootlib/ostime.c
+        Modified with #ifdef SYSV for SysV.  This whole business needs to
+        be redone sometime to provide rigorously correct time primitives
+        for iraf.  (9/22)
+
+unix/boot/bootlib/vfn2osfn.c
+        Local variable "first_time" defined but never used.  (9/22)
+
+unix/boot/generic/generic.c
+        1. In copy_comment(), added an entry time initializer for the
+        local variable "flag".
+        2. GCC complained about the variable "ch" in evaluate_expr() possibly
+        being used before being initialized.  This looked harmless in this
+        case, but I added a global initializer to eliminate the warning
+        message.  (9/22)
+
+unix/boot/mkpkg/host.c
+        1. Deleted a couple of unused "exit_status" variables.  Changed some
+	"return(exit_status=N)" constructs to separate assignment and return
+	statements in cases where the function does not return a value.
+        2. Deleted unused variable "ip" in search_mkpkgfile().
+        3. Added a #ifdef SYSV to the code which calls RANLIB, since this is
+        not used on SYSV (COFF) systems.  (9/22)
+
+unix/boot/mkpkg/mkpkg
+unix/boot/mkpkg/mkpkg.h
+unix/boot/mkpkg/scanlib.c
+        1. Added a #include "mkpkg.h" to scanlib.c.  This file includes extern.h
+        which references a structure defined in mkpkg.h.
+        2. Deleted unused local variable "key" in h_scanlibrary().
+        3. Replaced the MAX_SYMBOLS definition in scanlib.c by MAX_LIBFILES,
+        as there is also a MAX_SYMBOLS in mkpkg.h which means something
+        quite different.  (9/22)
+
+unix/boot/mkpkg/sflist.c
+        In sf_scanlist, the GCC static analysis indicated that variable "tail"
+        could possibly be used without being initialized.  Added code to
+        initialize tail=head before scanning the list.  (9/22)
+
+unix/boot/mkpkg/tok.c
+        1. In do_if(), in the event of a syntax error the local variable "bval"
+        could be used without being initialized.  Once again probably harmless
+        but it makes GCC complain.
+        2. Unused variable "ch" in do_call().
+        3. Module do_include() was not returning an exit status in all
+        cases.  (9/22)
+
+unix/boot/rmfiles.c
+        1. Unused variable "i" in main().
+        2. Another warning from GCC static analysis suggesting that local
+        variable "fp" might be being used before being initialized (definitely
+        not in this case, but I added an initializer to avoid the message).
+        (9/22)
+
+unix/boot/wtar/wtar.c
+        Unused variable "op" in putheader().  (9/22)
+
+unix/boot/spp/xc.c
+        1. Unused variable "cmdbuf" in main().
+        2. Variable "append" in sys() could be used before being
+        initialized.  (9/22)
+
+unix/boot/spp/xpp/xppcode.c
+        1. Unused variable "irafdefs" in do_include().
+        2. parse_task_statement() did not return a function value in all cases.
+        3. accum() did not return a function value in all cases.
+        4. Unused variable "digit" in charcon().  Function did not return
+        a value in all cases.
+        5. Variable "value" not initialized in all cases (when an error
+        occurs, but it causes a warning message).  (9/22)
+
+unix/boot/spp/xpp/decl.c
+        1. Local variable "sp" was not being initialized in all cases (i.e.,
+        when an error occurred).
+	2. Added a new procedure d_declfunc which is called to output function
+	declarations.  Currently this doesn't do anything special, but it
+	provides a single point of modification should it be necessary to do
+	any special processing of function declarations in the future (for
+	example intrinsic functions).  (9/22)
+
+unix/boot/spp/rpp/ratlibc/getlin.c
+        The local variable "c" was not being initialized in all cases.  (9/22)
+
+unix/gdev/sgidev/sgidispatch.c
+        Deleted unused local variables "maxch" and "status".  (9/22)
+
+unix/os/gmttolst.c
+        Added #ifdef SYSV support.  SYSV uses a global variable "timezone"
+	(a questionable construct - see below) while BSD uses a time_info
+	structure returned in a function call.  (9/23)
+
+unix/os/zzstrt.c
+	This problem was indirect and hence difficult to track down.  The
+	time-task feature of iraf, e.g., "$imstat dev$pix", when run for the
+	first time in a new process, would return a clock time such as
+	"-416:+0" instead of "0:13" or whatever.  Thereafter it would be ok,
+	until the process was restarted.  This turned out to be due to the
+	clock time returned by the first call to ZGTIME being wrong.  The
+	eventual solution was to add a call to TZSET to zzstrt to initialize
+	the SysV time stuff before any time calculations take place.  What I
+	suspect was happening is that in gmt_to_lst I was accessing
+	"timezone", which is a global data variable in SysV, but the value
+	was being changed sometime later in an indirect call to TZSET.
+	Using a global variable for something like this that is evidently
+	not constant is a very questionable feature of SVID (unless this
+	was a bug in A/UX).  (9/23)
+
+unix/os/mkpkg.sh
+        Changed the "rm alloc.o" to "rm -f alloc.o", as the .o file is
+        not being left behind on this system, using GCC.  (9/23)
+
+unix/os/zfiopl.c
+        In zclspl, another case of an array aggregate initializer "= val;"
+        having to be changed to "= { val };" when initializing an array of
+        length 1.  (9/23)
+
+unix/os/zoscmd.c
+        1. Modified so that if SYSV is defined, "fork" is used instead of
+        the BSD-ism "vfork".
+	2. On Sun systems <vfork.h> is included (disables the global optimizer
+	on sparc systems due to nonstandard register usage).  (9/23)
+
+unix/boot/spp/rpp/ratlibr/defs
+	Replaced by the version rpprat/defs (they should be the same, although
+	in this case the differences did not affect the ratlib code).  (9/24)
+
+unix/boot/spp/rpp/ratlibr/Makefile
+unix/boot/spp/rpp/rpprat/Makefile
+	These makefiles now use a .r.f rule using /usr/local/bin/ratfor to
+	generate the .f files, rather than using f77 -F, which requires
+	replacing the host version of ratfor.  (9/24)
+
+unix/boot/spp/rpp/ratlibf/*.f
+unix/boot/spp/rpp/rppfor/*.f
+	Regenerated all the preprocessor Fortran sources.  The new files are
+	lower case.  Although upper case source is standard Fortran, all
+	modern compilers I am aware of accept lower case source (SPP outputs
+	lower case after all), and a case sensitive compiler may generate
+	upper case externals for upper case procedure names, causing a case
+	mismatch when linking with the C support library.  (9/24)
+
+unix/boot/spp/rpp/ratlibc/r4tocstr.c
+	Installed a minor bug fix which allows the routine to accept as
+	input character arrays consisting of either one char per integer, or
+	a char plus 3 blanks per integer.  The old F66 convention of
+	assigning one Hollerith character to a binary integer can generate
+	either type of integer value.  (9/24)
+
+sys/imfort/imemsg.x
+        This file contained four Fortran escapes (error message strings)
+        which ran over the 72 character line limit of Fortran.  (9/24)
+
+sys/gio/nspp/portlib/gridal.f
+        The equivalence on line 4 was incorrect (or at least ill-advised)
+        due to a dimension error.  The code "mfmtx(1),ifmt(1))" should
+        have been "mfmtx(1),ifmt(1,1))".  (9/24)
+
+sys/gio/nspp/portlib/z8zpbd.f
+sys/gio/nspp/portlib/z8zpii.f
+	The z8zpbd.f file was using DATA statements to initialize variables
+	in common (works on most systems but is technically illegal).  I
+	moved all the remaining DATA statements out of z8zpbd.f into run
+	time initialization statements in z8zpbd.f  (9/24)
+
+unix/boot/spp/xc.c
+        The routine printargs() was attempting to print one more argument
+	than it should, due to a <= that should have been a < in a FOR loop.
+	(9/24)
+
+pkg/system/help/lroff/textout.x
+        Modified to eliminate the ENTRY point.  (9/24)
+
+sys/fmtio/ctotok.x
+        Local variable numch never used (this is old code so I don't know
+        why no other compiler has found this).  (9/24)
+
+sys/fmtio/evexpr.y
+sys/fmtio/evexpr.x
+        The second argument (a debug flag) to yyparse (xev_parse) is a
+        boolean, but xev_parse was being called elsewhere with an integer
+        argument.  Changed to a boolean since the Y*cc code contains many
+        if (yydebug) constructs.  (9/24)
+
+sys/etc/main.x
+        FREDIR is a subroutine but was being called as a function in one
+        place in this file.  (9/24)
+
+sys/tty/ttyputl.x
+        This file contained a statement  call putci (fd, "_")  which was
+        incorrect, since the argument "_" is type char but is supposed to
+        be integer.  (9/24)
+
+sys/gio/gopen.x
+        1. The pointer array graphcap_file was not being used.
+        2. Local string variable graphcap never used.  (9/24)
+
+sys/pmio/pmplls.x
+        The second call to pl_plls was missing the ll_depth argument.  (9/24)
+
+sys/qpoe/qpppar.x
+        The second call to qp_sizeof was missing an argument.  (9/24)
+
+sys/imfort/bfio.x
+        There was an extra "status" argument to one of the calls to
+        zsttbf.  (9/24)
+
+sys/gio/ncarutil/conran.f
+        Local variable LNGTHS not used.  (9/24)
+
+pkg/plot/crtpict/t_crtpict.x
+        A call to gargwrd was missing the maxch argument. (9/24)
+
+pkg/plot/t_graph.x
+        Variable window declared but not used.  (9/24)
+
+pkg/plot/t_velvect.x
+        Variable nset declared but not used.  (9/24)
+
+sys/fmio/fmlfundel.x
+        The two calls to fmio_bind and fmio_errck were both lacking the
+        fm argument.  (9/24)
+
+sys/ki/kireceive.x
+        A call to strcpy was missing an argument.  (9/24)
+
+sys/imio/imopsf.x
+        The call to pl_ssize had an extra unused argument.  (9/24)
+
+sys/etc/pagefiles.x
+        ttyctrl, which is an integer function, was being called as a
+        subroutine.  (9/24)
+
+sys/imio/iki/oif/oifclose.x
+sys/imio/iki/oif/oifdelete.x
+        The integer function protect() was being called as a subroutine.
+	(9/24)
+
+sys/plio/plglr.gx
+        The routine pl_rangerop was being called incorrectly.  (9/24)
+
+sys/plio/plprop.gx
+        The VOPS routine argt (replace if greater than) was being
+        called incorrectly in three places.  (9/24)
+
+sys/plio/plascii.x
+        The subroutine pl_glpi() was being called as a function.  (9/24)
+
+sys/plio/pldebug.x
+        The integer function pl_l2ri() was being called as a subroutine.
+        (9/24)
+
+sys/pmio/pmglp.gx
+        The routine pl_pixrop was being called incorrectly.  (9/24)
+
+sys/qpoe/qpioopen.x
+        A call to syserr was being made where syserrs was intended.  (9/24)
+
+sys/gio/cursor/grccmd.x
+        External pr_psio() declared but never used.  (9/24)
+
+sys/gio/stdgraph/stgclws.x
+        External std_onerror() declared but never used.  (9/24)
+
+sys/libc/qsort.c
+        The static function qst() was being used before being declared,
+        resulting in an extern/static declaration inconsistency.  (9/24)
+
+sys/ki/irafks.x
+        The "task irafks = onentry" was incorrect since ONENTRY is an integer
+        function.  This was harmless since the purpose of the task statement
+        was merely to get an iraf main, but I set up a dummy t_irafks task
+        to avoid the type clash.  (9/24)
+
+pkg/cl/bkg.c
+        Static function bkg_close() used before being declared static.
+        Added a static function declaration to the file header.  (9/24)
+
+pkg/cl/debug.c
+        Same as above, function dd_f().  (9/24)
+
+pkg/cl/edcap.c
+        Same as above, function map_escapes().  (9/24)
+
+pkg/cl/pfiles.c
+        Same as above, function mapname().  (9/24)
+
+pkg/cl/cl.x
+        Same problem as in irafks, above.  ONENTRY is a function and should
+        not be referenced as a subroutine in the task statement.  Added a
+        dummy t_cl procedure to avoid the type clash.  (9/24)
+
+-------------------
+End of revisions merge from A/UX GCC/ANSI-C/F2C work.
+
+dev/graphcap
+dev/devices.hlp
+	Output can now be directed to the default UNIX `lpr' device using
+	any of the aliases "lpr", "lp", or "lw".  The actual device is
+	defined by the value of PRINTER if defined in the user's environment,
+	else is the "lp" device in /etc/printcap.  (9/23)
+
+	(lw is no longer an alias for the NOAO/Tucson device lw1)
+
+pkg/images/iminfo/t_imstat.x
+pkg/images/doc/imstat.hlp
+	Corrected a bug in the mode computation in imstatistics. The parabolic
+	interpolation correction for computing the histogram peak was being
+	applied in the wrong direction. Note that for dev$pix the wrong answer
+	is actually closer to the expected answer than the correct answer
+	due to binning effects.  (LED 9/24)
+
+unix/hlib/iraf.h
+unix/hlib/libc/xnames.h
+	Added the following name redefinitions.  On systems where Fortran and
+	C share the same name space these can cause name collisions.  (9/28)
+
+	define	fatal	xfatal
+	define	fchdir	xfchdr
+	define	fscan	xfscan
+	define	getopt	xgtopt
+	define	getpid	xgtpid
+	define	getuid	xgtuid
+	define	rename	xfrnam
+	define	reset	xreset
+	define	scan	xxscan
+
+-------------------------------------------
+Started a full bootstrap and recompile for the sparc architecture.  (9/28)
+
+sys/fmtio/tokdata.inc
+	Deleted the DATA statement for numch, which is no longer used by
+	ctotok.x, the routine which includes this file.  (9/29)
+
+lib/plset.h
+	Added PL$T_LEN defines for type long, required for the generic
+	expansion of plglr.gx in PLIO.  (9/29)
+
+unix/boot/mkpkg/host.c
+	Added a return(OK) to h_purge(), which is a no-op on unix systems.
+	(9/29)
+
+pkg/images/imarith/mkpkg
+pkg/images/imarith/imsum.gx
+pkg/images/imarith/generic/mkpkg
+pkg/images/imarith/generic/imsum.h	-
+	Images failed to link, with all the imsum externals reported as
+	undefined externals.
+	1. Edited imsum.gx and changed `include "imsum.h"' to `include
+	"../imsum.h"'.
+	2. Deleted generic/imsum.h and the code in imarith/mkpkg which
+	generates it.  There should not be multiple copies of global header
+	files.
+	3. Rebuilt the generic/mkpkg using mkmlist, to ensure that the
+	library list is correct (all the imsum entries were missing).  (9/29)
+
+noao/artdata/mkheader.x
+	1. Fixed a "local variable ua never used" warning, caused by some code
+	being commented out.
+	2. I was also surprised to see the construct `fd = immap (fname, ...)'
+	in this file.  FD means file descriptor whereas immap returns an
+	image descriptor.  FNAME means file name but an image name is not a
+	file name.  FD is declared pointer in this file but is used later in
+	the same routine to hold a file descriptor, which is an integer.
+	This code is illegally accessing the user area of the image header.
+	(9/29)
+
+noao/twodspec/longslit/illumination.x
+	This file failed to compile, with the following errors:
+	    local variable "clgeti" never used
+	    attempt to use undefined variable "im"
+	    attempt to use untyped function "clgetr"
+	1. Changed the call to clgetr to a call to clgeti, since the
+	parameter being fetched is integer.  Added a declaration for im.
+	2. In the process of doing this I noticed that in the call
+	    iferr (axis = imgeti (im, "dispaxis")) {
+	the variable IM was being used before being initialized (or declared).
+	I changed the "im" to "in" but couldn't be certain this was correct
+	since there are two input image pointers (I think; I couldn't be
+	certain they were both input since there are no #[IOU] markers in the
+	comments).  (9/29)
+
+noao/twodspec/longslit/response.x
+noao/twodspec/longslit/fluxcalib.x
+	Similar construct.  Changed calls to clgetr to clgeti in both
+	routines.  (9/29)
+
+unix/hlib/extern.pkg
+	All the digiphot packages failed to link, due to the cross link
+	against the V2.9 versions of the TABLES libraries (due to the
+	recent name changes in iraf.h all code has to be recompiled for
+	V2.10).  I temporarily created a local copy of TABLES in
+	/u3/extra/tables and compiled this with V2.10.  (9/29)
+
+bin.sparc/S5.e
+bin.sparc/S6.e			+
+	Installed the V2.9.3 version of S5.e (the V2.9 shared image) from ursa.
+	S6.e is the V2.10 shared image.  (9/29)
+
+unix/boot/xyacc/mkpkg.sh
+	Added a rm -f *.o to delete the xyacc objects after a bootstrap. (9/29)
+
+---------------------------------------------
+Begin f68881 bootstrap and full sysgen-recompile.  (9/29)
+
+sys/ki/koscmd.x
+	The output spool file on the local node was being opened with zopntx,
+	but written to with kputtx with an invalid channel descriptor, causing
+	the output to be lost when attempting to redirect the output.  The
+	fix was to change the call to kputtx to a call to zputtx.  (9/30)
+
+dev/imtoolrc			+
+unix/hlib/install
+	Copied imtoolrc into dev so that the frame buffer entries in graphcap
+	and imtoolrc can be more easily maintained together, and so that
+	the user does not have to modify a source directory (unix/sun) in
+	order to change a runtime configuration file (imtoolrc).  Modified
+	the install script to make /usr/local/lib/imtoolrc a link to the
+	file in DEV, instead of a copy of the file.  (9/30)
+
+noao$rv/			+
+noao$mkpkg
+noao$noao.hd
+noao$noao.cl
+noao$noao.men
+noao$lib/strip.noao
+noao$lib/zzsetenv.def
+noao$lib/scr/fxcor.key		+
+noao$lib/scr/specmode.key	+
+noao$lib/scr/fftmode.key	+
+	Installed the RV0 package as the NOAO.RV package and recompiled for 
+	the f68881.  A sparc executable was built separately and installed in
+	noao$bin.sparc.  The noao helpdb was also recompiled to include the
+	new rv help pages.	(9/30  MJF)
+
+hlib$extern.pkg
+	Removed the RV0 package definition from the V2.10 iraf.  (9/30  MJF)
+
+hlib$extern.pkg
+	Removed the testphot package definition from the V2.10 iraf. (9/30 LED)
+
+bin.f68881/S5.e
+	Replaced by the V2.9.3 version.   (9/30)
+
+unix/os/zfioks.c
+unix/os/zfiotx.c
+	Fixed minor typos in the #ifdef SYSV code.  (10/02)
+
+unix/boot/mkpkg.pkg.c
+	Deleted declarations for a couple of unused variables.  (10/02)
+
+unix/os/zawset.c
+	Added SYSV support.  (10/02)
+
+unix/os/zfiopr.c
+	Added SYSV support (vfork is defined as fork).  On Sun systems
+	<vfork.h> is conditionally included.  (10/02)
+
+unix/os/zgtenv.c
+	Replaced a comment within a comment construct (example from <iraf.h>)
+	by a version which substitutes @ for *, to avoid GCC warning messages
+	about a possible problem with nested comments.  (10/02)
+
+unix/os/zopdpr.c
+	Added SYSV support for vfork/fork as above, plus nice() is used
+	for SYSV instead of the BSD {get|set}priority.  (10/02)
+
+unix/boot/spp/rpp/rpprat/gtok.r
+unix/boot/spp/rpp/rppfor/gtok.f
+	Commented out the declaration for the unused variable "digits". (10/02)
+
+math/gsurfit/mkpkg
+	Contained a statement $ifeq (USE_GENERIC, YES) which was incorrect,
+	as a lower case "yes" is required since $ifeq uses a simple string
+	comparison.  I noticed this because a bug had been fixed in a .gx
+	file, but was still present in the real/double files, which had not
+	been modified since 1987.  (10/02)
+
+math/nlfit/nlfitdefr.h
+math/nlfit/nlfitdefd.h
+math/nlfit/nlzero.gx
+	Corrected several bugs in the way the aclr$t routines were being
+	called in the nlzero(rd) routine. (10/3/91 LED)
+
+pkg/plot/phistogram.x
+	Corrected some type mismatch problem in calls to gset. (10/3/91 LED)
+
+sys/gio/ncarutil/pwrity.f
+        Unused variable LEN on line 335.  (10/02)
+
+sys/gio/ncarutil/pwrzi.f
+sys/gio/ncarutil/pwrzs.f
+sys/gio/ncarutil/pwrzt.f
+        Variables HIGH,WIDE,WHITE, and LNGTH not used (same problem in
+        all three files).  (10/02)
+
+sys/ki/koscmd.x
+	In the call to zopntx to open the local spool file (when redirecting
+	the output), the unpacked version of the filename was being used
+	instead of the packed version required by the kernel routine.  (10/05)
+
+pkg/plot/crtpict/calchgms.x
+	Changed the declarations for the variables min_val and max_val in
+	the procedure crt_user_hgram from int to short. (10/5/91 LED) 
+		 
+dev$hosts
+	Added felis to dev$hosts for Shopbell. On tucana only since irafks.e
+	on felis seems quirky.  (10/5/91 MJF)
+
+pkg/dataio/fits/fits_rpixels.x
+        1. The rfits task has been modified to accept a short last record, i.e.
+        a last record that has not been padded out to 2880 bytes, without
+        generating any warning messages. Short last records were only a
+        problem for IRAF 2.9 when the blocking code was rewritten.
+	(10/8/91 LED)
+
+unix/boot/generic/generic.c
+	The -k (clobber) option would fail to clobber an existing file if
+	account executing generic did not own the file.  (10/09)
+
+pkg/images/iminfo/t_imstat.x
+	Corrected a bug in the kurtosis computation, wherein a 4.0 was
+	being subtracted from the sum instead of a 3.0 (10/11/91 LED)
+
+unix/boot/spp/xc.c
+	Minor typo in run() code.  (10/11)
+
+pkg/dataio/fits/fits_cards.x
+        Changed the name of the IRAF-B/P keyword to IRAF-BPX to conform to the
+        new FITS standard. (10/15/91 LED)
+
+unix/sun/README
+unix/sun/gterm.c
+unix/sun/halley.lut
+unix/sun/heat.lut
+unix/sun/imtool.c
+unix/sun/imtool.icon
+unix/sun/screendump.c
+	I have been holding off on installing this for a couple of weeks
+	in the hopes of finishing the planned work, but rather than delay
+	longer I have installed this version, to be updated later.  The
+	main changes or new features are as follows.
+
+	1. Screendump parameters (R_DISPOSE etc.) are now in the setup panel.
+	2. A number of new builtin lookup table options (e.g. HEAT) have
+	been added.
+	3. User defined lookup tables are now supported.
+	4. Updating of the global screen colortable is now a setup panel
+	option.  This allows it to be turned off, which makes imtool
+	better behaved under openwindows.
+
+	Features not yet in are EPS support, more flexibility in the use
+	of FIFOs, and maybe socket support.  (10/20)
+
+unix/os/zfiomt.c
+unix/os/zalloc.c
+unix/os/alloc.c
+sys/mkpkg
+sys/mtio/*
+sys/gty/*
+sys/libc/(some)
+sys/ki/(some)
+pkg/cl/builtin.c
+dev/tapecap
+	Installed the new magtape i/o subsystem.  I will document this more
+	fully later.  Usage is much as before.  The key file controlling the
+	configuration is dev$tapecap.  A description of the tapecap
+	parameters is given in os$zfiomt.c.  Testing and configuration of
+	the tapecap file is only rudimentary at this point.  I have
+	successfully tested thus far with the DC2000 cartridge tape and
+	floppy disk on lepus, the DAT drive on coma, and the 1/2inch 6250
+	bpi tape on tucana.  There is some confusion (dev$devices out of
+	date) regarding the device entries for the 1/4inch cartridge drive
+	on tucana so I did not complete the tapecap entry for this drive.
+	The driver is new and MTIO has been extensively revised.  The new
+	GTY interface provides a general termcap style database facility
+	which is used for tapecap.  (10/20)
+
+dev/termcap
+	Added a new entry for "xirafhelp".  (11/10)
+
+dev/hosts
+        Added sonoma to the hosts file on tucana and ursa.  (11/13 jb)
+
+pkg/plot/t_graph.x
+plt/plot/doc/graph.hlp
+	1. Local variables overplot,append in t_graph were declared int
+	but were used everywhere as bool.
+	2. Missing .le in help page entry for overplot.  (11/20)
+
+lib/fio.h
+	Added a comment for LEN_RAWCMD.  (11/20)
+
+lib/fset.h
+sys/fio/fseti.x
+sys/fio/fstati.x
+unix/hlib/libc/fset.h
+	Added a new fset option F_IOMODE.  The value field is a bit flag
+	consisting of either IO_NORMAL (normal line by line i/o with echo)
+	or some combination of, currently, IO_RAW and IO_NDELAY.  F_RAW is
+	also still defined and if used in a fseti call will set F_IOMODE
+	to IO_RAW with IO_NDELAY disabled.  On a fstati query, F_RAW checks
+	if IO_RAW mode is set, and F_IOMODE returns the i/o mode as a bit
+	flag integer word.  (11/20)
+
+	[Note - the fset integer codes were modified.  This will require
+	[that all layered software which uses fset/fstat be recompiled.]
+
+sys/etc/prpsio.x
+	Testing revealed that while both raw mode and NDELAY (nonblocking
+	i/o) worked from a stand alone process, and raw mode worked from
+	a subprocess, NDELAY would not work from a subprocess.  This was
+	due to the prpsio code, which must check for the i/o mode control
+	strings and make a local fseti call if these are seen.  The prpsio
+	code would set raw mode but was ignoring NDELAY, hence setting
+	IO_RAW+IO_NDELAY in a subprocess would result in only raw mode
+	being set in the pseudofile i/o control process (the CL).  (11/20)
+
+sys/tty/ttyread.x
+	Modified to set F_IOMODE rather than F_RAW.  Since this routine
+	uses NDELAY it it worth updating to use the new bit flags.  Most
+	of the old VOS code still uses F_RAW=(YES|NO), which is fine so
+	long as only raw mode is being set.  (11/20)
+
+pkg/cl/mkpkg
+	Added <libc/fset.h> to the header file dependency list for
+	history.c.  (11/20)
+
+sys/tty/mkpkg
+	Entry in library dependency list for ttygsize.x was incorrect;
+	rebuilt list with mkmlist.  (11/21)
+
+dev/graphcap
+dev/imtoolrc
+	Added imt13-16, imttall128 (128x1056), imttall256 (256x1056),
+	imtwide128 (1056x128), and imtwide256 (1056x256) for use in
+	spectroscopy at request of KPNO.  Also added aliases for the new
+	KPNO 1992 chip names to the six entries between imt32 and imt37.
+	(11/22/91 SRo)
+
+unix/sun/imtoolrc
+	Installed the above mentioned imtoolrc in the imtool source
+	directory.  (11/22)
+
+sys/fio/fstati.x
+	Fixed a bug which could cause fstati(fd,F_UNREAD) to return an
+	incorrect unread character count for pushed back data.  (11/27)
+
+mwcs.h
+mwswtype.x
+	Removed the compile time SZ_ATVAL restriction on the length of
+	a WCS attribute value.  The size of an attribute value string is
+	now determined dynamically at run time and the buffers sized
+	accordingly.  (11/27)
+
+mwsaveim.x
+	Deleted the call to mw_ssystem, which would force mw_saveim to
+	save the default world system.  mw_saveim will now save the current
+	world system instead; the application should call mw_ssystem first
+	if it wishes to save a particular system.  This applies only to
+	the use of mw_saveim with the current FITS-header images.  In future
+	image formats mw_saveim will save the entire MWCS and it will not
+	be necessary to specify which WCS to save.  (11/27)
+
+wfinit.x
+wfmspec.x			+
+wfsin.x				+
+wfgls.x				+
+wfarc.x				+
+iwewcs.x
+mkpkg
+	Installed four new MWCS function drivers:
+
+	    sin			sin projection
+	    arc			arc projection
+	    gls			global sinusoidal projection
+	    multispec		multispec image format (ONEDSPEC etc.)
+	(11/27)
+
+pkg/dataio/mtexamine/mkpkg
+	The mkpkg was missing an entry for fseti.h (among other things).
+	Rebuilt library module list with mkmlist.  (11/27)
+
+sys/mtio/mtio.h
+	Was getting truncation of tapecap entry string during tape testing
+	on orion.  This was traced to a buffer size being set too small in
+	zopnmt.x (SZ_DEVCAP).  Increased to 512 chars.  (11/27)
+
+unix/os/zfiomt.c
+	Fixed a bug in the new V2.10 zfiomt.c which affected appending to
+	a tape after a rewind.  (12/01)
+
+unix/os/zfiomt.c
+	1. RE now causes a read error to be ignored not only when positioning
+	to EOT, but on a file read if recno=1 (a read a the beginning of a
+	file is used by high level programs like mtexamine to detect EOT).
+	2. The tapeused counter was not being updated properly (the size of
+	a filemark was not being counted) when EOF was seen on a read.  (12/02)
+
+dev/tapecap
+	Installed a new, better organized and more complete version of the
+	tapecap file.  This now includes support for the HP 88780 and Exabyte
+	drives under SunOS.  (12/02)
+
+unix/os/zfiomt.c
+	1. When passed a tapecap device entry containing multiple entries for
+	the same capability, the driver was allowing later entries to
+	override the first entry, whereas the termcap convention is that
+	the first entry given overrides any later (tc=) entries.
+	2. Added support for negated entries, as in ":nb@:".  (12/02)
+
+pkg/dataio/cardimage/mkpkg
+	The mkpkg was missing several file dependencies including
+	fset.h. (LED 12/03)
+
+pkg/dataio/fits/mkpkg
+	The mkpkg was missing several some file dependencies.
+	(LED 12/03)
+
+pkg/dataio/imtext/mkpkg
+	The mkpkg was missing several some file dependencies.
+	(LED 12/03)
+
+vms/gdev/zfiovi.c
+	Installed a bug fix (actually workaround for an apparent VMS problem)
+	reported by STScI.  The lock enqueue code can receive the status
+	SS$_VALNOTVALID even though the value block is apparently valid.
+	The workaround is to issue a warning but otherwise ignore the
+	condition.  Hopefully this is correct.  (12/03)
+
+dev/tapecap
+	Replaced with new version with expanded support for QIC cartridge
+	drives.  Unfortunately not yet fully tested due to system problems
+	with the QIC-11/24 drive I was using for testing.  (12/05)
+
+sys/mwcs/wfsin.x
+	The forward transform now checks for a negative value before taking
+	a square root.  (12/06)
+
+unix/os/zfiomt.c
+	Installed a new version of the new magtape driver which adds
+	support for status output to a TCP/IP socket.  I also have a new
+	program XTAPEMON (not currently installed in IRAF) which listens
+	on a socket and accepts connections from the the new driver (or
+	any similar client) displaying tape status messages in a window
+	on any X server while the drive is being accessed.
+
+	Status output may be directed to either a file or a socket, using
+	the syntax ":so=foo:".  If foo is an absolute pathname beginning
+	with / then output is to a file (this field is interpreted by the
+	unix driver so we are talking about unix pathnames).  Otherwise, the
+	field is assumed to refer to a socket of the form ":so=[host][,port]",
+	e.g., ":so=lepus:", ":so=lepus,5138", ":so=,2345:", and so on.
+	If no host is specified localhost is assumed.  If no port is
+	specified the default port is used.
+
+	In practice, the minimal specification is ":so:".  This will cause
+	the drive to atempt to open a socket connection to the default port
+	on the local host.  If no server is registered the connection will
+	fail harmlessly.  If xtapemon is running on the local host it will
+	accept the connection.  Currently, xtapemon supports multiple
+	concurrent servers (using consecutive port numbers) but the driver
+	does not, unless the port number is given explicitly.  Multiple
+	clients are allowed to access the same server, e.g., multiple
+	processes in the same process tree.
+
+	Note that status output, if enabled, is output in an ascii text
+	stream to either a socket or a file (including things like
+	/dev/ttyX, /dev/tty, /dev/console etc. as well as disk files).
+	Hence the xtapemon utility, while useful for workstations running X,
+	is not required in any way to use the new magtape system or even to
+	view status output.  In the simplest case, "devstatus" may be used
+	to print the drive status.  (12/15)
+
+unix/os/zopdir.c
+	The zopdir routines were modified to read the UNIX directory into a
+	buffer and sort it, before returning filenames to the caller (some
+	VOS routine).  UNIX directories are not stored in sort order on
+	disk, and previously, IRAF routines which read directories to
+	produce file lists but which did not sort the list for some reason,
+	could produce what appeared to be randomly ordered lists (for
+	example, in image templates).
+
+	A practical result of this revision is that dir sort- will produce
+	a listing which is sorted across the columns rather than along the
+	columns.  This may be preferable when listing very large directories.
+	(12/15)
+
+sys/etc/main.x
+sys/etc/onentry.x		# INTERFACE CHANGE
+pkg/cl/cl.x
+sys/ki/irafks.x
+	The calling sequence for ONENTRY was modified to add a third
+	argument "command".  This is used to pass any optional arguments
+	given on the host command line when the process is executed at
+	the host level.  Since the purpose of the ONENTRY procedure is to
+	provide an alternative to the normal iraf process level command
+	interpreter, the procedure should get full access to the command line.
+	(12/26)
+
+dev/irafhosts           +
+unix/os/zfioks.c
+sys/ki/irafks.x
+        Totally new networking driver.  This version supports both RSH and
+        REXEC connection protocols.  The default RSH protocol avoids
+        password prompts.  In addition, a feature is provided to spawn a
+        daemon process in.irafksd which makes it much faster to fork a new
+        kernel server, once the first RSH connection to a server node has
+        been made.  The new kernel server is largely backwards compatible
+        (although due to magtape i/o changes V2.10 networking cannot be used
+        with older systems anyhow).  The new driver still uses a .irafhosts
+        file, but it need not contain passwords, and the file is automatically
+        created and read protected.  Details to follow.  (12/26)
+
+	Here is some more information on the new networking system (12/31).
+
+	The new driver support three different connection protocols.  The
+	default protocol uses rsh|remsh to spawn a networking daemon which
+	is used thereafter to start iraf kernel server processes on that
+	node (more on the this later).  This is the most efficient protocol,
+	and does not require any passwords.  A rsh only protocol is also
+	supported which requires a rsh connection every time a connection is
+	made.  This is slightly more secure than the rsh/daemon protocol but
+	considerably less efficient.  Finally, the old rexec protocol is
+	still supported.  This is what is used if a password is given for a
+	node in the .irafhosts file.  It is also now possible to use iraf
+	networking even if no rsh or rexec service is available, by manually
+	starting the iraf networking daemon on a server node.
+
+	The rsh/daemon protocol works as follows.  The client calls the
+	zfioks driver to open a connection.  zfioks reads the irafhosts file
+	and determines that the rsh/daemon protocol should be used for the
+	named host.  zfioks attempts to connect to the daemon process on the
+	remote host.  If the connection is made the client passes its port
+	number and an authorization code to the daemon, the daemon forks to
+	create a new irafks kernel server, which then connects to the client
+	via the client supplied port number, and the connection is made.  If
+	the client cannot connect to the daemon, the client forks and execs
+	the rsh task which is used to start up the daemon process on the
+	remote host.  The client can then connect to the daemon in the usual
+	way.
+
+	When the daemon is first started with rsh, the client passes a
+	unique long integer authorization code.  All subsequent connections
+	to the daemon must supply the same code or the connection will be
+	refused.  The authorization code is given in the irafhosts file.
+	Since this networking scheme avoids any suid root processes, the
+	daemon process runs with the uid of the user whose client issued
+	the original rsh request to start the daemon.  Each user has their
+	own daemon process on each server node.  The daemon is started
+	automatically when the first connection is made.  After a certain
+	period of inactivity (default 1 hour) the daemon process will exit.
+
+	Once a daemon has been started with rsh (this takes several seconds)
+	a network connection can be made very quickly, as all that is
+	required is a connect to a remote socket, a fork of the daemon
+	process, and a connect back to the client supplied socket.  The
+	irafks server and the client zfioks driver will then be directly
+	connected via a socket.  The daemon process is just the usual
+	irafks.e running as a daemon, which is why it only needs to fork to
+	spawn a new irafks server.  Only one daemon process is required per
+	user per server node, but there can be any number of irafks
+	servers.  Any number of client hosts can connect to a single server
+	host via a single daemon process, provided the user has set up a
+	.irafhosts with the same authorization code on each client node (if
+	this is not done the connection will still be made, but will require
+	an expensive rsh connect on each call).
+
+	The new driver still uses the .irafhosts file, although most of the
+	motivation for including passwords in the file is gone.  The
+	.irafhosts file is required and will be created automatically by the
+	system if not present.  If an old style .irafhosts file is present
+	it will be replaced by the new version of the file.  The system
+	automatically read protects the file.  The .irafhosts file contains
+	three regions:  some header comments, some keyword=value networking
+	parameters, and the user supplied host list.
+
+	The irafhosts keywords are as follows.
+
+	port		The TCP port number used by the daemon process.
+			Normally set to "default", which tells the driver
+			to assign a port for each user based on HIPORT
+			and the user uid code.  If PORT is set to "none"
+			use of the daemon is disabled and rsh will be used
+			for every connect (this is provided in case someone
+			doesn't feel the authorization code scheme is
+			secure enough).
+
+	auth		The user authorization code.  Set to "default" in
+			dev$irafhosts, but replaced by a unique authorization
+			code when the user uses networking for the first time
+			and the .irafhosts file is created.
+
+	hiport		Used to dynamically assign unique port numbers
+			(see "port" above).  hiport defines the top of the
+			reserved port region used for the irafks daemon.
+			Normally set to "default" (47000).
+
+	timeout		The idle time in seconds after which the daemon
+			will exit.  Normally set to "default".  The builtin
+			default timeout is 1 hour.
+
+	The format of a host-list entry is as follows.
+
+		host-name  ":" login-name password
+
+	The default host-list entry is the following.
+
+		*  : <user> <user>
+
+	This enables the rsh/daemon protocol for all server nodes.
+	The login-name field may be set to "none" to disable networking
+	for a node, or to the actual user login name to cause the
+	connection to a node to be made with different login name than
+	that of the user on the local host.  Setting the password field
+	to an explicit password causes the rexec connect protocol to
+	be used for that node.  Setting the password to "?" causes the
+	driver to prompt for the password, after which the rexec protocol
+	is used to make the connection.
+
+	In actual practice, all of this is automatic and the user never
+	needs to look at or modify the .irafhosts file, unless they want
+	to customize things.  Once the .irafhosts file has been created
+	by the system it should be copied to the user's login directory
+	on other nodes in the local network.  If this is not done iraf
+	networking will still work, but will be less efficient if iraf
+	clients running on different hosts try to connect to the same
+	server (they will have different authorization codes and the
+	driver will have to fall back on the rsh connect protocol for
+	every connection).
+
+	The system template irafhosts file is dev$irafhosts.  The iraf
+	system manager can set the default network parameters in this file
+	if they don't like the builtin defaults.  Note that the hostlogin
+	file is no longer used.  It was confusing for the files to have
+	different names so dev$hostlogin was replaced by dev$irafhosts.
+
+	COMPATIBILITY.  By default the system will try to use one of the
+	rsh protocols, hence the server as well as the client must be
+	running v2.10 iraf.  To connect to a pre-v2.10 server from a v2.10
+	client the rexec protocol must be enabled by setting the password
+	field in the irafhosts file.  A v2.9 client should be able to
+	transparently connect to a v2.10 server.  In all cases where v2.9
+	and v2.10 clients and servers are being mixed, remote magtape
+	access cannot be used since the protocols have changed in v2.10.
+
+sys/ki/kzopmt.x
+	The devcap string was not being passed at the correct offset.
+	(12/29)
+
+sys/ki/irafks.x
+        Fixed a couple of problem in the zfiomt server code which were
+        preventing magtape i/o from working over the network.  The server
+        was missing an entry for the new zzstmt routine.  (12/29)
+
+unix/os/zfioks.c
+	Fixed a bug that was causing remote device allocation/deallocation
+	to fail, when accessing a device over the network.  SIGCLD was
+	being received by the server when the alloc.e terminated and was
+	executing a longjmp to a stack frame that no longer existed (the
+	zfioks driver, with all its forks, has several parallel execution
+	paths all in the same code).
+
+	With this fix remote magtape access seems to be working again using
+	the new magtape and networking drivers.  (12/30)
+
+unix/os/zfiomt.c
+	For a read (zzrdmt), the recsize output to the status output was
+	changed from the requested read size to the actual read size, i.e.,
+	the actual size of the record read.  (1/02/92)
+
+unix/hlib/iraf.h
+sys/mtio/mtio.h
+	Moved the definition of EOT from mtio.h to iraf.h, so that applications
+	can use it (required for mtparse/mtname).  (1/02)
+
+sys/etc/xalloc.x
+	Changed mt_allocate/mt_deallocate to mtallocate/mtdeallocate, to be
+	consistent with the other extern MTIO routines.  (1/02)
+
+sys/mtio/README
+sys/mtio/mkpkg
+sys/mtio/mtalloc.x
+sys/mtio/mtcap.x
+sys/mtio/mtdealloc.x
+sys/mtio/mtglock.x
+sys/mtio/mtgtyopen.x		+
+sys/mtio/mtio.h
+sys/mtio/mtname.x		+
+sys/mtio/mtneedf.x		+
+sys/mtio/mtopen.x
+sys/mtio/mtparse.x
+sys/mtio/mtpos.x
+sys/mtio/mtrdlock.x
+sys/mtio/mtrewind.x
+sys/mtio/mtstatus.x
+	1. An interface summary was added to the README file.
+	2. Revised MTIO to add a number of new externally callable user
+	routines.  The following is excerpted from the README file.
+
+		yes|no = mtfile (fname)		# Is fname a magtape device?
+	  yes|no = mtneedfileno (mtname)	# No file number given?
+		    gty = mtcap (mtname)
+			mtfname (mtname, fileno, outstr, maxch)
+
+		        mtparse (mtname, device, fileno, recno, attrl, maxch)
+		       mtencode (mtname, maxch, device, fileno, recno, attrl)
+
+		    fd = mtopen (mtname, acmode, bufsize)
+		       mtrewind (mtname, initcache)
+		     mtposition (mtname, file, record)
+
+	Use CLOSE to close a file descriptor opened with mtopen.
+	Use GTYCLOSE to close a termcap descriptor opened with mtcap.
+	MTNAME is the full magtape device specification, i.e, "mt[...]".
+
+	The new routines are MTCAP, MTNEEDFILE, MTFNAME, MTPARSE, and
+	MTENCODE.  MTCAP opens the GTY descriptor for the device specified
+	in mtname.  MTNEEDFILE tells whether a file number is specified in
+	the given mtname.  MTFNAME constructs a magtape file name, given an
+	existing mtname and a file number.
+
+	The MTPARSE and MTENCODE routines are lower level and are provided in
+	case a mtname needs to be edited or constructed which the simpler
+	routines given above cannot deal with.  MTPARSE parses an mtname
+	into the device name, file and record numbers (set to ERR if not
+	given) and tapecap attribute list, if any.  MTNAME does the reverse,
+	building a mtname from these pieces.  (1/02)
+
+dev/tapecap
+unix/os/zfiomt.c
+	Added a new capability "fb" to tapecap.  This specifies the default
+	FITS block factor for each type of device.  (1/02)
+
+unix/os/zfioks.c
+	1. Tested the password prompting option (password = ?).  Fixed a
+	bug in the SysV version of the password prompting code.
+	2. Tested the in.irafksd idle-timeout feature, seems to work.
+	3. Added a timeout feature to the handshaking that goes on between
+	client and server during a connect.  The connect will now fail and
+	shutdown automatically if there is no response for 45 seconds during
+	a connect (e.g., because the guy on the other end is not what we
+	expect it to be).  (1/02)
+
+sys/qpoe/qpiosetrg.x
+	Changed the dimension of the VS, VE input array arguments from "ndim"
+	to "ARB".  (1/07)
+
+sys/etc/xgdevlist.x
+	Added a call to ki_xnode to propagate the network node prefix, if any,
+	to the output resource string.  (1/07)
+
+sys/ki/irafks.x
+	The devpos struct (position information) was not being passed back
+	properly when closing a magtape device opened for network access.
+	(1/07)
+
+sys/mtio/mtparse.x
+	When called with sz_attrl=0, could write to attrl[0] (write off the
+	beginning of the array).  Zero is of course not a legal index, but
+	the routine should be able to accept it as a size, indicating that
+	the attrl string is not desired.  In cases like this the application
+	must still allow space for 1 char of output, e.g., the EOS.  (1/08)
+
+sys/mtio/mtrewind.x
+sys/mtio/mtposition.x
+	These routines were constructing the magtape device name in order to
+	position to a specific file, but were discarding the attrl field,
+	preventing use of tapecap attributes on the command line in a rewind.
+	Changed to use mtfname to construct the device name.  (1/08)
+
+sys/ki/irafks.x
+	Modified the debug output logging code to print more of the ARG
+	array in the command packet.  Modified the zfiomt interface debug
+	logging code to include devcap in the diagnostic output.  (1/08)
+
+sys/ki/kzrwmt.x
+sys/ki/kzopmt.x
+sys/ki/kopdpr.x
+sys/ki/kgfdir.x
+	These routines were not computing the value of p_sbuflen correctly.
+	This can affect optional string arguments passed in the networking
+	packet header.  (1/08)
+
+unix/hlib/irafuser.csh
+	Changed the definition of mkz to link "-z -/Bstatic".  Omitting the
+	-Bstatic has caused too much trouble on SunOS, when linking on one
+	version of SunOS and executing on a different version.  (1/08)
+
+unix/hlib/login.cl
+	Added a definition for the convenience alias "cls" (unix clear;ls)
+	to the template login.cl.  (1/08)
+
+sys/mtio/mtopen.x
+sys/mtio/mtcache.x
+sys/mtio/mtrdlock.x
+	Modified to pass the mtname parameter though to mtallocate, which
+	can be called by mtrdlock.x in some circumstances.  (1/08)
+
+unix/os/zfiomt.c
+	1. Repeated calls to mtexamine on the same tape would result in the
+	tapeused value incrementing slightly in each iteration.  This was
+	due to the space for the last (EOT) filemark being counted in each
+	read of the tape.  The problem would only show up on some drives;
+	this was because the file mark size is only set to a nonzero value
+	for some devices in tapecap.
+	2. Modified the driver to record the checksum of the status output
+	device, and check to see if the device has changed when the driver
+	is opened repeatedly.  It will now automatically (witout flpr)
+	detect any changes and close and reopen the status device.
+	3. Status output to a file is now enabled if there is a / anywhere
+	in the filename, not just as the first character.  Hence, :so=./file
+	would write to a file in the current directory.  (1/08)
+
+sys/mtio/mtgtyopen.x
+	Modified to permit inclusion of device capabilities in the tapecap
+	definition.  The syntax of a tapecap environment definition is now
+	<tapecap-file><device-capabilities>, e.g., "home$tapecap:so".  Either
+	field can be omitted.  For example,  set tapecap = ":so=host"  would
+	cause MTIO to use the default tapecap (dev$tapecap) but enable
+	status output to the named host for all magtape operations.
+
+	Device capabilities can now be specified in the tapecap device
+	entries, in the tapecap environment variable, or on the command line
+	(as in "mta[:so=host]").  The precedence is the command line, which
+	overrides everything, the tapecap environment variable, which
+	overrides the tapecap file entries, and the tapecap file entry
+	(followed lastly by the builtin defaults where applicable).  (1/09)
+
+unix/os/zfioks.c
+	1. Modified the rsh based connect code to add a fallback to rexec
+	(with a password prompt) if the rsh fails for any reason.  If the
+	connect succeeds, the daemon process will still be started as with
+	rsh, hence all further connects will suceed by direct connection to
+	the daemon.  In practice, what this means is that if an attempt is
+	made to connect to a node to which rsh cannot connect (e.g., because
+	there is no entry in hosts.equiv on the server node), the system
+	will print "access denied", prompt for the user password, and then
+	connect normally.  Subsequent connects will succeed immediately,
+	without any further password prompts, until the daemon process times
+	out and shuts down.
+
+	2. If the integer variable "KSAUTH" is defined in the user
+	environment, the value of "auth" in the user .irafhosts file is
+	ignored and the environment value is used instead.  This makes it
+	possible to dynamically assign authorization codes in the user
+	environment at login time, if someone doesn't like having their
+	kernel server authorization code in the .irafhosts file.  (1/10)
+
+dev/termcap
+dev/graphcap
+        Modified and tested these entries for lw9 and lw10 on tucana,
+        ursa, and gemini.  (1/20 - jb)
+
+unix/hlib/zzsetenv.def
+unix/hlib/clpackage.men
+unix/hlib/clpackage.hd
+unix/hlib/clpackage.cl
+	Added entries for the new core system PROTO and OBSOLETE packages.
+	(1/23)
+
+sys/mwcs/mwcs.h
+	Increased MAX_WATTR from 64 to 256, and resized the main MWCS
+	descriptor accordingly.  (1/30)
+
+pkg/proto/*			+
+pkg/obsolete/*			+
+unix/hlib/clpackage.cl
+unix/hlib/clpackage.hd
+unix/hlib/clpackage.men
+unix/hlib/zzsetenv.def
+	Added the new core IRAF system packages PROTO and OBSOLETE (the old
+	NOAO package PROTO is renamed NPROTO for noao-proto). PROTO is for
+	prototype or adhoc (interim, not fully general) tasks.  OBSOLETE is
+	for obsoleted tasks that are one step away from disappearing. (Jan 92)
+
+pkg/images/tv/*
+	The TV package was extensively revised, adding the new tasks IMEDIT,
+	IMEXAMINE, TVMARK, and WCSLAB and moving all the IIS control tasks
+	(which don't work with display servers such as imtool or saoimage)
+	to a new subpackage IIS.  The new tasks are from the old NOAO PROTO
+	package, except for WCSLAB, which is contributed software from STScI
+	written by Jonathan Eisenhamer.  (Jan 92)
+
+unix/hlib/login.cl
+	1. All the major core system packages are now loaded automatically
+	at login time (dataio, images, lists, plot, proto, tv, utilities).
+	The NOAO package is present but is commented out.
+	2. The USER package was redone, adding many common unix tasks
+	as foreign task aliases.
+	3. The CL parameter showtype is now initialized to yes, causing
+	packages and psets to be marked in package lists.  (2/08)
+
+pkg/images/tv/mkpkg
+unix/hlib/mkpkg.inc
+	Added a USE_IIS conditional.  This can be set to "no" in mkpkg.inc
+	on systems where the IIS package will not be used, to avoid trying
+	to build the package.  (2/10)
+
+pkg/cl/cl.par
+	Updated the value of the version parameter to V2.10BETA (should have
+	done this a few months ago).  (2/10)
+
+unix/hlib/login.cl
+pkg/cl/cl.par
+pkg/images/images/cl
+	Set up a mechanism to automatically detect and warn about out of
+	date login.cl files.  A new parameter "logver", for login.cl file
+	version, was added to cl.par, with the default value being the null
+	string.  The real value is set by an assignment in the login.cl.
+	When the IMAGES package is loaded, images.cl compares the value of
+	cl.logver with cl.version and complains (harmlessly) if there is a
+	mismatch, suggesting that `mkiraf' be used.  It is a bit of a kludge
+	to use images.cl for this, but it is a simple technique and should
+	work fine, since it is unlikely that anyone using IRAF will not be
+	loading the IMAGES package at some point (clpackage.cl and system.cl
+	cannot be used as they are read too early in the load cycle, and
+	obviously login.cl cannot be used).  If there is any question about
+	the comparative dates of IRAF and the user's login.cl this can be
+	determined by executing "lpar cl" after the CL starts up.  (2/10)
+
+	It is very important with V2.10 that the new login.cl be used.
+	Magtape i/o depends upon this as does the new package loading scheme.
+
+imio/iki/oif/oifopix.x
+imio/iki/oif/oifupdhdr.x
+imio/iki/oif/oifopen.x
+	A couple of changes were made to improve error recovery for OIF
+	format images, in the event that a task aborts before an image
+	creation operation completes.  Previously this could leave a pixel
+	file behind with no associated header file.
+
+	1. The header of a new image is now updated at open time and at
+	pixel file create time, as well as when the image is closed.  A
+	legal image results even if the operation is aborted before the
+	pixel file is created, or before writing the pixel file completes.
+	2. The header file is now closed after the immap for new images
+	and read-write images, as has always been the case for read-only
+	images.  The header is reopened as necessary when updated.  In the
+	case of a new image, it is necessary to close the header or the
+	header file will be deleted by FIO if the task aborts before the
+	file is completed and closed.  Closing the header of a new image
+	also frees a file descriptor, and important consideration for
+	applications that open many images.  (2/11)
+
+unix/os/zfprot.c
+	The protection code will now silently clobber any existing ..foo
+	file entry when protecting file foo.  There is a slight risk in
+	this, but it should be miniscule as .. prefixed files are very
+	rarely encountered (other than for IRAF image header file protection).
+	Also, the clobber can only occur when a file is protected, a rare
+	operation in itself except for OIF format images.  (2/11)
+
+sys/gty/gtyopen.x
+	Modified to allow a device entry input as a character string to be
+	opened on a GTY descriptor.  The routine already permitted a caplist
+	to be input which would override selected fields of the named device
+	entry, so the change was to allow the termcap file and device entry
+	name to be omitted.  This routine is a useful corollary to GTYCAPS;
+	gtycaps takes an open GTY descriptor and returns the device
+	capability list (caplist) as a string, and gtyopen can now be used
+	to take the caplist and open another descriptor on it.  This makes
+	it possible to store device entries in any form, not just in termcap
+	file form.  (2/12)
+
+sys/mtio/mtcap.x
+	Fixed a bug in this routine.  MTCAP takes a magtape device
+	specification as input and returns as output the GTY tapecap
+	descriptor corresponding to the named magtape device.  The problem
+	was that it was calling mt_gtyopen and returning the gty descriptor
+	returned by this routine directly to the client.  The client
+	subsequently calls gtyclose to free the descriptor, but mt_gtyopen
+	is used within MTIO to cache the most recently referenced tapecap
+	device entry.  When the client closes the descriptor the cache is
+	left pointing to a nonexistent descriptor.  The routine was modified
+	to call GTYCAPS to get the caplist of the cached descriptor, then
+	open a new descriptor on this with GTYOPEN.  (2/12)
+
+sys/imio/iki/oif/oifrename.x
+	This routine calls immapz (what a kludge) to open the image header
+	and read/edit the pixel file name.  A minor modification was required
+	to preserve the header file name in the descriptor to allow the
+	subsequent header update to succeed, now that the header file is
+	closed and reopened for updating.  (2/13)
+
+
+pkg/dataio/wfits.par
+pkg/dataio/doc/wfits.hlp
+pkg/dataio/fits/wfits.h
+pkg/dataio/fits/t_wfits.x
+pkg/dataio/fits/fits_write.x
+pkg/dataio/fits/fits_wheader.x
+pkg/dataio/fits/fits_wimage.x
+pkg/dataio/fits/fits_wpixels.x
+	Modified wfits to fetch the default fits blocking factor for a device
+	from the dev$tapecap file. The user can still overrride this value
+	(which is usually set to 10) for variable blocked devices, but is no
+	longer required to know or set the block size for fixed block devices
+	like cartridge tapes. (2/13 LED)
+
+unix/as.sparc/ieee.gx		+
+unix/as.sparc/ieeer.x		+
+unix/as.sparc/ieeed.x		+
+unix/hlib/mkpkg.sf.SUN4
+unix/as.mc68020/ieee.gx		+
+unix/as.mc68020/ieeer.x		+
+unix/as.mc68020/ieeed.x		+
+unix/hlib/mkpkg.sf.SUN3
+	Installed a custom Sun version of the IEEE-floating to native-floating
+	conversion routines.  The code is actually fairly portable SPP code,
+	but includes Sun Fortran escapes used for NaN mapping.  The routines
+	iee[sg]nan[rd], used to set|get the reserved (native) magic value
+	used to replace or match NaNs, are now functional (formerly they
+	were stubbed out for SunOS).  On Sun-3s and Sun-4s, which are IEEE
+	and unswapped, the only function of the IEEE conversion routines
+	is to map NaNs to and from the reserved (ieesnan[rd]) value.
+
+		ieemap[rd] (YES|NO)		# enable/disable NaN mapping
+
+	A new routine IEEMAP[RD] (YES|NO) is used to explicitly enable or
+	disable NaN mapping.  Note that NaN mapping occurs on both input
+	and output, for both the scalar and vector conversion routines.
+	NaN mapping is automatically enabled if IEESNAN[RD] is called.
+	"call ieemap[rd](NO)" should be called before using the conversion
+	routines, if NaN mapping is not desired.  (2/14)
+
+pkg/dataio/fits/fits_rheader.x
+	Modified rfits to replace control characters decimal 0 (00X) to
+	31 (1FX) and decimal 127 (7FX) in fits card images with the blank
+	character. The new fits standard now explicitly defines these
+	as illegal in fits headers. (LED 14/2/92)
+
+unix/gdev/sgidev/sgi2uapl.c
+unix/sun/screencopy.c
+	The call to the Postscript "setmatrix" operator was replaced by a
+	functionally equivalent series of calls to the operators
+	"initmatrix", "scale", and "translate", in an attempt to make
+	the Postscript output of these routines more device independent.
+	(2/14)
+
+unix/as.sparc/ieee.gx
+unix/as.sparc/ieeed.x
+unix/as.sparc/ieeer.x
+unix/as.sparc/ieee.gx
+unix/as.sparc/ieeed.x
+unix/as.sparc/ieeer.x
+	The SunOS IEEE conversion package was modified to add support for
+	counting any NaN values encountered during input and output
+	conversions (the portable vops$ieee.gx still remains to be updated).
+
+	The new routines are as follows.
+
+		 ieestat[rd] (nin, nout)
+		ieezstat[rd] ()
+
+	IEEZSTAT zeros the counters (since there is no "open" procedure in
+	this package this must be done explicitly).  IEESTAT returns the
+	number of NaNs encountered in the IEEE input (nin) and the number of
+	NaN values output (nout).  (2/14)
+
+
+unix/as.sparc/ieee.gx
+unix/as.sparc/ieeed.x
+unix/as.sparc/ieeer.x
+unix/as.sparc/ieee.gx
+unix/as.sparc/ieeed.x
+unix/as.sparc/ieeer.x
+	I made one change to the IEEE interface - the calling sequence for
+	IEEMAP[RD] is now
+
+		ieemap[rd] (mapin, mapout)
+
+	i.e., mapping can be enabled independently for input and output.
+
+	The semantics of the IEESNAN routine were also changed slightly.
+	IEESNAN now has the side effect of enabling mapping for both input
+	and output (it did this before) and zeroing the statistics counters
+	(this is new).  Hence, setting the native pseudo-NaN value will
+	initialize the NaN mapping code.  (2/15)
+
+sys/osb/ieee.gx
+	Installed a new version of the "portable" IEEE conversions package.
+	This is identical to the version developed for SunOS, with the code
+	which initializes the IEEE NaN constant commented out (since the way
+	this is done is system dependent).  The new version of the portable
+	ieee.gx includes the new IEEMAP and IEESTAT/IEEZSTAT routines, and
+	if input mapping is enabled is capable of detecting and converting
+	input NaN values to the local pseudo-NaN value.  It will also
+	attempt to convert pseudo-NaN to IEEE-NaN upon output (if mapout is
+	enabled), but since the IEEE-NaN constant is not initialized the
+	output NaN value will be something else, usually zero.  An
+	as$ieee.gx version of the file is required to set the true IEEE-NaN
+	value.  In principle this can be done portably using an integer
+	equivalenced to a floating variable, but the current version does
+	not bother with that (for output; a similar technique is used to
+	recognize NaN values in the input).  (2/15)
+
+pkg/images/tv/display/t_display.x
+	Added a call to IMGIMAGE to strip any image section from the image
+	name stored in the WCS passed to the display server.  Since the WCS
+	output by display refers to the full image matrix ignoring any
+	section, defining the image as a section was incorrect.  The WCS
+	still does not deal correctly with dimensional reduction when
+	displaying images greater than 2 dimensions.
+
+	This was tested with both image raster and QPOE data using RIMCURSOR
+	to generate coordinates and seems to work correctly.  In particular,
+	the correct physical coordinates are generated for QPOE data
+	regardless of the QPOE block factor or image section.  (2/16)
+
+sys/qpoe/qpioparse.x
+	Fixed a bug that was preventing the key=(x,y) (alternate coordinate
+	system) feature of QPIO from working properly.  The code was setting
+	the IO_EVXOFF field twice but was not setting IO_EVYOFF; hence, given
+	a key such as key=(dx,dy), XOFF was being set to DY and YOFF would
+	retain its old value, probably Y.  A reasonable looking image would
+	result but it was the wrong image (we were seeing key=(dy,y)).  (2/16)
+
+sys/imio/iki/qpf/qpf.h
+sys/imio/iki/qpf/qpfwfilter.x
+	Fixed a bug in the code which writes the QPIO filter to the QPF image
+	header, which would cause it to omit all but the last card when
+	writing filters longer than will fits on a single QPFILTxx header
+	card.  (2/16)
+
+sys/imio/imparse.x
+	The routine was modified to make it a little more forgiving regarding
+	variations on the standard image section syntax, and to improve error
+	detection of invalid section specifications.  (2/16)
+
+pkg/dataio/fits/fits_rimage.x
+pkg/dataio/fits/fits_wimage.x
+	Modified rfits so that the ieee +/-NaNs, and +/-Infs are correctly
+	mapped to a user specified native floating point number. Underflow
+	values are automatically converted to 0.0. A warning message is
+	printed on the terminal if any bad pixels were replaced.  A warning
+	message is also printed if valid floating point pixel values >
+	MAX_REAL or < -MAX_REAL were detected which can happen for both fits
+	bitpix -32 and -64 images.  Imreplace can be used to replace these
+	explicitly. (LED 2/17/92)
+
+pkg/dataio/fits/fits_wheader.x
+	Modified the short_header=yes option in wfits so that the image
+	pixel type, fits bitpix, and the scaling parameters are printed on
+	the standard output, along with the image name, size, and number of
+	records written. (LED 2/17/92)
+
+pkg/dataio/fits/fits_params.x
+	Modified wfits so that string parameters that are 1) written
+	explictly by wfits, and 2) <= 20 characters long including quotes,
+	will have the / in column 33 instead of 2 spaces past the end of the
+	string. The affected keywords are OBJECT, ORIGIN, DATE, IRAFNAME,
+	IRAF-BPX, and IRAFTYPE. (LED 2/17/92)
+
+pkg/dataioo/fits/rfits.com
+pkg/dataio/fits/t_rfits.x
+pkg/dataio/fits/fits_read.x
+	Implemented a scan mode in rfits so that devices which have a slow
+	single-file file skip function (e.g. dat drives) can be used more
+	efficiently with the rfits make_image=no option. (LED 2/18/92)
+
+
+dataio$fits/t_rfits.x
+dataio$fits/t_wfits.x
+	Changed the maximum sequence number that can be appended to an output
+	root image of fits file name from 999 to 9999. This is actually
+	a format limitation %04d than a numerical limitation. (LED 2/18/92)
+
+sys/qpoe/qpiogetfil.x
+	Modified to remove an unneeded trailing comma which was being returned
+	in some circumstances in the reconstructed filter expression output
+	by the routine.  (2/18)
+
+sys/qpoe/zzdebug.x
+	The zzdebug would not link any more due to a routine being referred
+	to by a name which had since changed (qp_rlmerge).  (2/18)
+
+sys/imio/iki/qpf/mkpkg
+sys/imio/iki/qpf/qpfwattr.x		+
+	Added a new routine qpf_wattr to QPF.  This is called when an
+	image descriptor is set up for a QPOE image.  The routine checks
+	for the existence of a series of QPOE header paramters "defattr1",
+	"defattr2", etc.  If present, these are string value parameters,
+	the string value specifying the name of a parameter to be added
+	to the output image header, and how to compute the value of the
+	parameter.  For example, defattr1 might have the value
+
+		exptime = integral time:d
+
+	meaning add a parameter "exptime" to the output image header, giving
+	as the value of the parameter the integral of the range-list of
+	attribute "time", type double, of the event attribute expression
+	used to filter the event list used to create the output image.  (In
+	other words, compute EXPTIME, the total exposure time for the
+	filtered image).  Currently, the syntax of the DEFATTRn parameter is
+	very limited and must be similar to that shown in the example, but
+	the parameter and attribute names can be anything, and the datatype
+	can be int, real, or double.  Since the parameter is string valued
+	it will be easy to generalize in the future should we need to do
+	so.  (2/18)
+
+sys/imio/iki/qpf/qpfcopypar.x
+	Improved the error recovery.  (2/18)
+
+pkg/cl/gram.c
+	Constants such as 0:00:60 or even 0:00:59.999999999 could trigger
+	an "illegal constant" error abort in CL scripts, due to round off
+	errors in the CL code.  Technically there is no reason one cannot
+	have a number such as 0:00:60 (or 0:00:any-positive-number for
+	that matter), since the result is well defined, so I relaxed the
+	overly stringent error checking in the gram.c code.  (2/19)
+
+sys/gio/cursor/grcwcs.x
+	The code which computes the scale terms for an axis could die on
+	a divide by zero error when presented with an axis that has no
+	range.  It will now detect the condition and set the scale term to
+	1.0; the value is arbitrary, since there is no range on the axis
+	and deviations from the mean will always be zero.  (2/19)
+
+sys/imio/iki/stf/stfrdhdr.x
+sys/imio/iki/stf/stfwfits.x
+	The STF image kernel was modified slightly to support images with
+	GROUPS=F.  When the FITS image header is read, if GCOUNT=F the
+	parameters GCOUNT, PCOUNT, and PSIZE are initialized as for an image
+	with a single group and no GPB.  The header update code was modified
+	to omit these parameters when updating an image for which GROUPS=F,
+	since the parameters should not be present in the FITS image header
+	if the image unless GROUPS=T.  (2/19)
+
+sys/imio/iki/oif/oifrename.x
+	An image rename operation such as pix.0001.imh -> pix.imh would
+	succeed for the header file but would fail to rename the pixel
+	file.  This would often pass unnoticed using a hidden imdir, but
+	is very evident when using imdir=HDR$.  The problem was due to the
+	use of fnroot in oifrename, in a test to see if the root image
+	name is the same for the rename operation.  This would fails as
+	fnroot cannot descriminate between image extensions and file
+	extensions.  I replaced the calls to fnroot by calls to zfnbrk,
+	to get the root offset and hence strip off any logical directory
+	prefix, which was the point of the original call to fnroot.  (2/19)
+
+unix/os/zfiomt.c
+	It turns out there was still one case where the new magtape driver
+	did not emulate the simple unix model of open, write,write,write,
+	close, open, write,write,write, close, open, etc.  The exception was
+	minor, but caused a problem with the TIB SI driver for the HP drive
+	on a Sun (the only one of these we have seen so far is at STScI).
+	The result was a double EOT between each file on the tape, when
+	appending files with WFITS.
+
+	What was happening is that when the driver was opened to append a
+	file to the tape, it opened the drive read-only to position the
+	tape, then closed it and reopened write-only for writing.  This is
+	done to avoid clobbering the tape if an abort occurs during the
+	file positioning operation.  What was happening was that when already
+	positioned to EOT, the drive would be opened read-only, no positioning
+	would occur since the tape was already at EOT, the drive would be
+	closed, and reopened for writing.  Hence there was an unnecessary
+	open-read/close before writing each tape.  This should be harmless -
+	it does not move the tape or talk to the hardware - but it was
+	triggering a bug in the host driver.
+
+	Evidently (this is my theory at least), this host driver is pretty
+	clever and delays writing the double file mark marking end of tape.
+	So long as you just append files it never write the EOT, until the
+	tape is rewound.  A rewind or backspace should trigger writing of
+	the EOT.  What I think was happening was that the open-read would
+	trigger writing of the delayed-EOT.  The host driver would write
+	two tapemarks and backspace over the second one.  Only problem is,
+	it had already written one (one is always written after every file
+	even with delayed EOT), so you end up with a double file mark, or
+	EOT, between every file on the tape.  This is a blatant bug in the
+	host driver.  We were able to duplicate this using only using UNIX
+	TAR by writing a small C program which did  close(open(/dev/xxx,0));
+	and was called before using tar to append each file.
+
+	As a workaround I have revised the iraf driver to avoid opening the
+	tape read-only for positioning unless some positioning is actually
+	necessary.  If all one does is append files, the positioning open
+	is avoided and the simple unix semantics are exactly duplicated,
+	i.e., all the driver does is open for writing, write the file, and
+	close.  (2/19)
+
+pkg/dataio/fits/fits_write.x
+	Replace a call to imgimage with one to imgcluster since the
+	original purpose of the imgimage call was to extract the root
+	image name. (have not yet rebuilt dataio) (2/20/92 LED)
+
+------------------------
+Beta system cut and installed on URSA (2/20).
+
+unix/os/zfiomt.c
+	Fixed a bug having to do with error recovery in the event that the
+	device cannot be opened (as when attempting to rewind or deallocate
+	a device that is offline).  (2/22)
+
+unix/hlib/login.cl
+	Modified the template login.cl to allow V2.10 login.cl files to be
+	used with V2.9 IRAF (available as "irafo" on our systems).  It
+	was necessary to add conditional references for LOGVER and PROTO.
+	Also, the NOAO package is now loaded by default.  (2/22)
+
+pkg/plot/crtpict.par
+	Changed the default output device from "dicomed" to "film_recorder".
+	The latter is a generic device alias set in graphcap to point to
+	whatever the desired local device may be.  (2/22)
+
+local/login.cl
+	Updated to V2.10.  Edited so that it is fairly generic and has a
+	chance to work when the system is installed on a different host.
+	(2/22)
+
+dev/tapecap
+	1. Added local entries for node ursa.
+	2. Added a SCSI 5 entry for the Sun HP drive.  (2/22)
+
+dev/graphcap
+	Additions for Solitaire film recorder.  Set the default generic
+	"film_recorder" entry to point to the solitaire.  The Solitaire
+	is currently interfaced via a custom graphics kernel (modified
+	version of the SGI kernel) which resides outside the standard
+	IRAF system, in the NLOCAL package.   (2/22)
+
+pkg/system/rewind.par
+	Changed the default for the "initcache" parameter from yes to no.
+	initcache causes rewind to "forget" how many files there are on the
+	tape, forcing a rescan the next time one seeks to EOT.   It is
+	arguable whether it is safer to init the tape status cache on a
+	rewind or now, but it sure can be a lot faster on devices with
+	many files to retain this information.  (2/22)
+
+-------------------------
+Beta distribution files regenerated to pick up these changes. (2/22)
+
+unix/bin.mc68020/gterm.e.403
+unix/bin.mc68020/imtool.e.403
+	Added SunOS 4.0.3 versions of the GTERM and IMTOOL executables,
+	for the convenience of those who have not updated to 4.1.x (as is
+	the case with argo, locally).  (2/23)
+
+unix/as.sparc/ieee.gx
+unix/as.mc68020/ieee.gx
+sys/osb/ieee.gx
+	Fixed a typo in the generic code for ieevupk - an "amovr" should have
+	been a "amov$t".  This would cause type double vector unpack operations
+	to fail for large numbers.  (2/25)
+
+unix/os/zfiomt.c
+	Added a new capability "fe" to tapecap.  This stands for "file
+	equivalent" and is the amount of tape in Kb which, in a file read,
+	is equivalent to a file-skip-forward 1 file operation.  This
+	capability can be used by applications which scan large tapes
+	containing many files to decide whether to read the rest of the
+	file, or close the file immediately and open to the next file (which
+	implies a FSF).  On devices (like some DAT drives) where a FSF
+	operation can be slower than a file read, it is faster to read
+	small files than to FSF to the next file.  If the fe parameter is
+	missing the value is assumed to be zero, meaning that FSF is faster
+	than reading the file.  Note that "fe" is not used by the driver,
+	it is an optional parameter provided for use by tape applications
+	as a device-dependent optimization.  (2/27)
+
+pkg/dataio/fits/fits_read.x
+	Changed the interpreation of the fe parameter as read from
+	dev$tapecap from MB to KB. (2/27 LED)
+
+dev$hosts
+	Added spud and pantera to hosts file on tucana, orion, gemini and 
+	ursa (MJF 2/28)
+
+sys/etc/erract.x
+	Replaced an explicit reference to the common "zjucom" by the symbol
+	JUMPCOM defined in config.h.  (This was a historical oddity, harmless,
+	but would cause a problem if the name of the common was ever changed
+	in config.h).  (2/29)
+
+sys/etc/onexit.x
+sys/etc/onerror.x
+	A procedure was added to both of these small packages, for removing
+	previously posted onerror or onexit procedures.
+
+	    onerror_remove (procname)
+	     onexit_remove (procname)
+
+	Previously there was no way to deactivate such procedures, other than
+	during error recovery or task termination.  (2/29)
+
+sys/mtio/mtupdlock.x
+	This procedure calls FATAL if an error occurs while updating a lock
+	file.  This was causing problems with magtape error recovery,
+	because mt_sync, which causes the lock files to be updated, is
+	posted by MTIO as an ONERROR procedure.  If an error occurred and
+	the lock file could not be updated, FATAL would abort the task,
+	error recovery would call mt_sync, which would try again to update
+	the lock file, leading to error recursion or errors during error
+	recovery, and various nasty scenarios.  With this change magtape
+	error recovery appears to be working correctly again.  I tried
+	several mtexamine runs, aborting each with a ctrl/c (but omitting
+	the flpr) and the system recovered perfectly each time.  (2/29)
+
+sys/mtio/mtdealloc.x
+	Added calls to mtdeallocate to sync the MTIO cache (update the lock
+	files with the current tape position) and then clear the cache,
+	clearing the entry for the deallocated device as well as forcing all
+	devices to reload their lock files.  This was the source of the
+	problem where allocating and deallocating device A and then allocating
+	device B would cause devstatus B to fail.  Following this fix various
+	tests with two devices allocated and accessed together or alternately
+	were performed without seeing any problems.  (2/29)
+
+pkg/system/rewind.par
+	Changed the default for the initcache parameter back to yes.  It is
+	essential that the cache be initialized when a tape is removed and a
+	new tape mounted, and it more likely that the user will rewind the
+	tape (in software) than that they will deallocate/reallocate.  (3/01)
+
+	rewind init[+|-] appears to be working correctly now, probably as a
+	result of one of the bug fixes made during the period 2/29-3/01.
+
+unix/os/zfiomt.c
+	The tapeused counter is now cleared when opening a tape and the tape
+	position is undefined.  This condition forces a rewind and clears
+	all cached data.  (3/01)
+
+sys/ki/kzopmt.x
+sys/mtio/mtcache.x
+sys/mtio/zclsmt.x
+sys/mtio/zopnmt.x
+	A number of changes were made to these routines during two days of
+	beating on the system with ctrl/c interrupts to improve error
+	recovery.  With these improvements the magtape i/o system again
+	appears to be solid with respect to error recovery.  A tape task can
+	be interrupted either during positioning or during a read and the
+	system should recover completely, without need to do a flpr (I
+	didn't do any flprs during all this testing).  Interrupting a write
+	is ok too, but will leave a partial file on the tape.  Any kind of
+	interrupt will cause the tape position to be marked undefined,
+	forcing a rewind the next time the tape is accessed, and clearing
+	all cached information (clearing cached tape information when an
+	interrupt occurs during a read is not necessary in all
+	circumstances, but simplifies things and is probably safer).
+
+	1. The kzopmt routine (KI) had a serious bug in that it did not
+	allocate a KI channel descriptor until after the device open.  This
+	is ok for most devices, but not for tapes since the device open
+	implies a tape positioning operation which may take a very long
+	time, and hence is suspectible to interrupts.  FIO and MTIO error
+	recovery has to be able to close a tape device which is "partially
+	open", or open read-only for positioning, prior to the i/o operation.
+	The close operation would fail as the kzclmt routine would be
+	expecting a KI channel descriptor but would not get one, causing
+	a bogus file descriptor to be closed.  This would cause the tape
+	close to fail and could in some cases result in a segmentation
+	violation or process panic shutdown.
+
+	2. zopnmt was modified to update the cached file position after
+	the driver open.  This was necessary to mark the cached entry
+	for updating, to allow an undefined position to be written in the
+	event that an interrupt occurred during i/o.
+
+	3. zclsmt required minor changes for both the interrupt-while-
+	positioning and interrupt-during-i/o cases.  In the IWP case mt_sync
+	is now called with a status of ERR to cause an undefined position
+	to be written.  In the IDIO case MT_FILNO = -1 in the internal
+	MTIO descriptor is used to flag error recovery, but due to the
+	calling sequence of the driver open having changed with the new
+	driver, MT_FILNO was being overwritten with a valid tape position
+	during the device close.  This would cause a valid position to be
+	written to the .lok file when a tape operation was interrupted
+	while i/o was in progress.
+
+	4. The file position cache code underwent several subtle modifications.
+	Probably these were not necessary but they bullet-proof the code a
+	little bit.
+
+	The result of all these changes is that, following an interrupt of
+	a tape operation, 1) devstatus should always show file=-1, record=-1,
+	and 2) the next tape operation should cause an automatic rewind
+	followed by a space forward to the indicated file.  It should not be
+	necessary to flush the process cache.  Any other behavior, even if
+	harmless, is considered incorrect.  (3/01)
+
+sys/etc/xalloc.x
+sys/mtio/mtalloc.x
+sys/mtio/mtstatus.x
+	Modified the "devstatus" command to print the tape status file
+	(.lok file) even if the device is not allocated, provided the file
+	exists.  This is desirable since taping is now permitted even on
+	unallocated devices, and it is useful to be able to see the tape
+	status file to see what file the tape is positioned to, how much
+	tape has been used, etc.   If the device has not been allocated
+	devstatus will still issue a warning message to that effect, as it
+	has always done, followed by the contents of the .lok file (tape
+	status file), if such exists.  Since existence of the tape status
+	file no longer necessarily implies that the tape has been allocated,
+	the header message in the file was changed from "Magtape device X
+	allocated to ..." to "Magtape device X status ...".  (3/01)
+
+sys/mwcs/mwshow.x		+
+	Added a new routine MW_SHOW to MWCS.  This is used to print a
+	representation of a MWCS to an output file (usually, for debugging
+	purposes when writing an application).
+
+		call mw_show (mw, out, what)
+
+	The routine does not yet print all that it could about the MWCS.
+	The argument "what" is not yet used.  This routine was described
+	in the original interface but had never been implemented.  (2/25-3/01)
+
+sys/mwcs/mwcs.h
+sys/mwcs/mwsv.h			+
+sys/mwcs/wfinit.x
+sys/mwcs/mwload.x
+sys/mwcs/mkpkg
+	In IRAF v2.10 we increased the max number of WCS attributes, which
+	affected the size of the MWCS descriptor.  This caused the WCS stored
+	in old QPOE files to be unreadable, since it turns out that while
+	the MWCS interface (mw_save) encodes a MWCS descriptor in a machine
+	independent form for external storage, this form is essentially just
+	a copy of the internal MWCS binary descriptor.  When the internal
+	descriptor changed the old saved descriptors could not be read.
+	Since QPOE is a runtime binary format there is no requirement that
+	the files be readable from one version of iraf to the next, but it
+	is desirable to minimize such incompatibilities, or at least detect
+	them and issue an appropriate error message.
+
+	Really fixing this problem in a general way is not easy given the
+	complexity of the MWCS descriptor.  What I did was define a separate
+	MWSV save file descriptor in mwsv.h, deleting the old SV_ entries
+	from mwcs.h.  The old save structure had some extra space in it for
+	just this sort of emergency, which is zeroed out in the old MWCS
+	savefile descriptors.  Fields giving the MWSV version number, number
+	of WCS, and WCSLEN (WCS substructure length) were added to the save
+	descriptor.  Since these fields are zero in the old descriptors the
+	"version number" of these old descriptors is zero.  The mw_load code
+	was modified to use a builtin MWSV version zero value for WCSLEN,
+	and calculate NWCS, allowing it to read these old descriptors.  New
+	descriptors are written using the actual values for NWCS and WCSLEN
+	and a version number of 1.  Hence, the new mw_[save|load] code can
+	both read old descriptors and write and read the new descriptor with
+	its larger max number of WCS attributes.
+
+	I also discovered and fixed a minor problem in the save code.  The
+	SV header (integer) was being read and written directly without use
+	of the MII routines, hence the MWCS save/load code was not fully
+	machine independent.  The appropriate MII routines were added to
+	pack and unpack (byte swap) the save header.  This won't affect
+	existing saved MWCS written on big-endian machines like Sun, since
+	the MII routines merely copy the data on such machines.  (2/25-3/01)
+
+sys/mwcs/mwsctran.x
+	Fixed a typo in the error checking code.  There was a "mw_system"
+	reference which should have been "mw_ssystem".  (3/04)
+
+plot/pltwcs.x
+plot/t_graph.x
+	Modifications were made to produce a label appropriate for the
+	wcs type selected rather than always use the world system label
+	in the image; i.e. if plotting in logical wcs the label is
+	"Logical pixel" rather than something like "Wavelength (Angstroms)".
+	The change affects pcol(s), prow(s), and graph.  (3/04 FV)
+
+dev$hosts
+	Added solarium and taco to the hosts file on tucana and orion.  Nigel
+	added these to ursa and gemini.  He also notes that lyra, carina and
+	aquila can be deleted.  (3/4/92 MJF)
+
+unix/bin.mc68020.403		+
+unix/bin.mc68020/gterm.e.403	-
+unix/bin.mc68020/imtool.e.403	-
+	Added a complete bin.mc68020 directory compiled and linked for
+	SunOS 4.0.3.  Deleted the 4.0.3 versions of gterm.e and imtool.e
+	from the SunOS 4.1.1 version of bin.mc68020.
+
+	In case this problem occurs again here are the symptoms:
+
+	ld.so: warning: /usr/lib/libc.so.0.12 has older revision than expected
+	ld.so: call to undefined procedure _tolower from 0x20266
+
+	This occurs when executing any HSI executable on a 4.0.3 system.
+	If this occurs the solution will be to install bin.mc68020.403 as
+	bin.mc68020, i.e.,
+
+	% mv bin.mc68020 bin.mc68020.411; mv bin.mc68020.403 bin.mc68020
+
+	Currently there are no plans to ship V2.10 with the 4.0.3 binaries
+	installed by default.  Linking the HSI -Bstatic also avoids this
+	problem but the executables are quite a bit larger and there may
+	still be subtle problems which are dependent upon SunOS versions,
+	e.g., with alloc.e.  (3/05)
+
+sys/imio/iki/qpf/qpfwattr.x
+	Modified to deal with the case where there is no filter expression
+	and the QPEX descriptor is NULL.  (3/05)
+
+pkg/images/iminfo/listpixels.x
+	Modified the listpixels task to use the MWCS axis "format"
+	attributes if they are present in the image header, and added
+	support for dimensionally reduced images whose coordinate
+	transformations are dependent on the reduced axis. (3/6/92 LED)
+
+pkg/lists/rimcursor.par
+pkg/lists/rimcursor.x
+pkg/lists/doc/rimcursor.hlp 
+        Added two new parameters wxformat and wyformat to the rimcursor task. 
+        These formats if defined  take precedence over the formats stored in
+	the  WCS in the image header, and the internal default format for
+	all values of the wcs parameter. (Davis 9/3/92)
+
+sys/mio/mtupdlock.x
+	This, routine, which updates the magtape device status file (aka
+	lockfile) was a bit too zealous about error checking and could fail
+	to update the status file and cause a fatal exit of the task in
+	circumstances where this was not really necessary, for example when
+	the old status file did not exist or could not be read.  This could
+	result in the message "fatal error while closing magtape file".  I
+	modified the routine to recover if the old file could not be read
+	and to take an error exit only if the new status file could not be
+	written.  The error message was changed to "Fatal error writing
+	magtape device lockfile".  (3/10)
+
+sys/imio/iki/stf/stfaddpar.x
+	The stf_addpar routine is used for a new image or a new copy of a
+	non-STF image to add parameters to the GPB.  As each parameter is
+	added a parameter is also added to the open image descriptor (image
+	header).  The imaddX calls for the image header would initialize
+	the value of any existing header parameters, causing any existing
+	WCS to be lost (since the standard GPB parameters are for the WCS).
+	The fix was to omit the imaddX call if the named parameter already
+	exists in the image header.  (3/10)
+
+sys/imio/iki/stf/stfaddpar.x
+	The value of STF_PSIZE was being computed incorrectly.  There was
+	an implicit assumption that the CTYPEn field was the same size as
+	SZ_DOUBLE, evidently made in the original code to simplify the
+	expression.  Rewrote to use an explicit 8 bytes for the CTYPEn field,
+	and also reordered and commented the expression for clarity.  (3/10)
+
+pkg/images/iminfo/t_imstat.x
+	Precision was being lost unnecessarily in the computation of the
+	standard deviation, skew, and kurtosis because two of the
+	intermediate variables in the computation were real instead of
+	double precision. (3/10/92, Davis)
+
+dev$hosts
+	Added 'elric' to hosts file on tucana, orion, and ursa.  Previously 
+	added to gemini by Nigel.  (3/11 MJF)
+
+pkg/images/imutil/t_imslice.x
+pkg/images/doc/imslice.hlp
+	Added wcs support to the imslice task. (3/12 LED)
+
+unix/os/zfiomt.c
+	Discovered and fixed another error recovery problem.  During testing
+	using WFITS to write a number of very small images, the program was
+	spending most of the time doing the file close on the magtape device
+	(which writes a tape mark and takes a finite time for such a device).
+	An interrupt would therefore usually occur during the close, resulting
+	in a half-completed file close; error recovery closes open files, and
+	the driver was bombing as part of the descriptor had already been
+	deallocated.  The fix was to modify ZZCLMT to check for a partially
+	deallocated descriptor before proceeding to close the file.  (3/14)
+
+unix/os/zfiomt.c
+	When appending files to a tape, the space for the file mark was not
+	being counted, causing an incorrect tapeused value when writing to
+	DAT or Exabyte.  (3/14)
+
+unix/os/zfiomt.c
+	Added two new tapecap device parameters "ro" and "rr".  If "ro"
+	(rewind-on-open) is set the tape is rewound on every open to get to
+	a known position, after which the driver will space forward to the
+	desired file.  If "rr" (rewind-after-close-readonly) is set the tape
+	is rewound when closed following a readonly operation.  These
+	options are rather drastic, but are provided to deal with drives that
+	leave the tape in an unknown position after a file operation.  (3/15)
+
+	I also looked into the problem of fast techniques for finding the EOT
+	of large tapes containing hundreds of files.  This is important as
+	seeking to the end of tape file by file where are hundreds of files
+	can be very time consuming.
+
+	At least in the case of a DAT with the ApUNIX driver there is no
+	system and driver independent way to do this because the driver does
+	not report an error if one attempts a fsf N where N is greater than
+	the number of files on the tape.  However, such an operation *does*
+	leave the drive positioned to EOT, hence operations with large N can
+	be used to position to EOT or append to a tape.  This is perhaps
+	most easily explained with some examples.  Assume we have a tape mta
+	with 100 files on it.
+
+	    wfits dev$pix mta[999]	appends a file
+	    mtex mta[999]		positions to EOT
+	    mtex mta[998]		after the above, reads last file
+
+	After one of the above operations the driver will report that
+	there are 999 or 998 files on the tape.  A mtex of the full tape
+	would automatically correct this figure.
+
+	Of course if the user knows that there are 100 files on the tape
+	they could just write to mta[101] or read mta[100], and the driver
+	would immediately position to the indicated file using a multifile
+	space operation (if enabled in tapecap).
+
+	Further studies will be needed to determine if there is any way
+	to exploit this sort of drive behavior in the driver to make things
+	transparent to the user.
+
+sys/fmtio/dtoc.x
+sys/fmtio/fprfmt.x
+sys/fmtio/parg.x
+sys/libc/printf.c
+	Added two new format specifiers %H and %M to FMTIO.  These are
+	identical to %h and %m except that the value to be output is divided
+	by 15.0 (to convert degrees to hours) before being printed.  (3/15)
+
+pkg/lists/doc/rimcursor.hlp
+	Added an explanation of the %H format and example of its use to
+	the rimcursor help page. (3/16 LED)
+
+sys/fmtio/lexdata.inc
+sys/fmtio/doc/lexnum.hlp
+	The action for the character B in the DHR production was incorrect;
+	changed from d_d (reduce decimal) to HEX (go to the HEX production).
+	(3/16)
+
+sys/fmtio/dtoc3.x
+	The DTOC3 code had a very nasty problem which showed up on a specific
+	machine (lepus, mc68882 fp).  There is some code in this routine which
+	goes as follows:
+
+	do i = 1, no_digits {
+	    v = v * 10.0d0
+	    j = v
+	    v = v - j
+		(etc.)
+
+	where V is double and J is integer.  In the case where this failed
+	the number being printed was 6 and upon entry to the above loop V
+	was 0.6 (normalized to 0-1).  The int operation J=V was setting J to
+	5, but the V=V-J was returning 1.0.  In the next loop V was 1 and
+	V * 10 was 10, causing digit conversion to fail, since the value 
+	being digitized must be a single digit.
+
+	In mathematical terms the code was correct but evidently it was
+	failing due to some sort of roundoff problem.  I added some code
+	to try to detect this condition and correct it.  The statement
+	J=V was also replaced by J=INT(V+EPSILOND) to round up numbers
+	which are integral to within the machine epsilon (e.g., 5.99999999
+	with 16 or so 9s becomes 6).  (3/22)
+
+	This sounds similar to a problem which has been reported before,
+	it may fix the older problem.
+
+sys/etc/oscmd.x
+unix/as.sparc/oscmd.s
+	I encountered some sort of bizarre (i.e. very subtle) problem with
+	a minilanguage which would send an OS escape to the CL to be 
+	executed, while there were already parameter set statements buffered
+	in the CLOUT.  The CL (actually prpsio code) would get both in the
+	same read and it was causing some problem which I did not have time
+	to investigate.   Added a call to flush(CLOUT) to avoid the problem,
+	is safer anyway.  (3/22)
+
+	[need to add as.mc68020 version or remove from special file list]
+
+pkg/images/tv/wlutil.x
+	Wcslab was not working correctly if an image larger than the frame
+	buffer was displayed with fill=no. (3/25/92 LED)
+
+dataio$fits/t_rfits.x: Davis, Mar 25, 1992
+	Rfits was using the value of the iraf_file parameter instead of the
+	name of the first output image, if the value was an @file, e.g
+        "@outlist" and the number of output files was 1.
+
+dev$hosts
+	Added Rob Hubbard's machine 'deneb' to hosts file.  Added to gemini 
+	and ursa by Ed Anderson (3/31/92  MJF)
+
+qpiogetfil.x
+qpexpand.x
+qpexgetfil.x
+qpexgetat.x
+	These routines return the string length of the output string as the
+	function value.  If the output string overflows maxch characters are
+	returned, however the function value in this case could be maxch-1,
+	causing the calling routine to fail to detect string overflow.  The
+	code was modified to return maxch if string overflow occurs.  (3/31)
+
+qpmacro.x
+	Modified to permit QPDEFS statements such as "set nodeffilt", i.e.,
+	a SET statement with no value assignment.  (3/31)
+
+qpex.h
+	Doubled the default size of the program, data, and expression buffers.
+	(3/31)
+
+qpexparse.gx
+	Timing tests on filter expressions containing many floating range
+	list terms (e.g. large time filters) revealed that this routine was
+	very inefficient in its used of fp_equal[rd].  I optimized a couple
+	of inner loops slightly and was able to speed up expression
+	compilation by a factor of 10-15.  (3/31)
+
+qpexdebug.x
+	Modified to allow for output of the full expression string when
+	used with very long range lists.  (3/31)
+
+--------------------------
+TUCANA upgraded from a 3/160 to a Sparcstation 2.
+SunOS 4.1.2, Sun Fortran 1.4, Sun C compiler.  (4/03)
+
+unix/mkpkg				+
+	Added a mkpkg file providing a "mkpkg summary" facility for compressing
+	reboot output.  (4/04)
+
+unix/shlib/mkshlib.csh
+	Added support for Sun Fortran 1.4, for sparc only so far.  (4/04)
+
+unix/hlib/mkpkg.sf.SUN4
+	Commented out the special file list entry for oscmd.x, I doubt if
+	it is needed any more.  (4/04)
+
+--------------------------
+Completed a full sparc bootstrap and sysgen-compile for SunOS 4.1.2,
+Sun Fortran 1.4, and the unbundled C compiler.  (4/04)
+
+unix/hlib/irafuser.csh
+unix/bin.sparc
+	Set up the HSI to link the HSI executables -Bstatic.  I don't like
+	doing this as the resulting bin is 3.6 Mb, but the libc.a shared
+	library versions are too much of a headache.  HSI executables
+	linked shared under SunOS 4.1.2 will generate a shared library
+	warning message when run under 4.1.1, and this is just a micro
+	version difference.  The mc68020 executables (and local nodes) are
+	still at 4.1.1 so there is no problem there.  (4/05)
+
+unix/boot/mkpkg/host.c
+	The code used to check two iraf directory pathnames for equality
+	could fail for pathnames such as /u3/iraf/iraf, containing more than
+	one "iraf/".  This caused the special file list to be ignored in
+	the recent upgrades and full sysgen.  (4/06)
+
+	[all affected files recompiled]
+
+unix/hlib/install
+	Modified the install script to choose /usr/local/bin over /local/bin
+	if both are found.  (4/06)
+
+noao/mkpkg
+noao/nobsolete/mkpkg		+
+	Added a stubbed-out mkpkg to nobsolete.  Uncommented the commented-out
+	entries for nobsolete in noao/mkpkg.  Restore the original package
+	build order, which builds all the main packages first followed by
+	imred.  (4/06)
+
+sys/etc/prpsio.x
+	The code which intercepts raw mode control sequences would erroneously
+	match any terminal output string of the same length as a raw mode
+	control sequence and which begins with ESC (a full equality test was
+	not being performed).  (4/06)
+
+unix/os/zfiomt.c
+	Due to a data structure change, tapecap parameter negation as in
+	"mta[:xx@]" to negate parameter xx wasn't working.  (4/07)
+
+pkg/images/iminfo/listpixels.x
+	Added a formats parameter for formatting the output pixel
+	coordinates to the listpixels task. These formats take precedence
+	over the formats stored in the WCS in the image header and the
+	previous default format.  (4/7/92, Davis)
+
+unix/os/zfaloc.c
+unix/os/zfiobf.c
+unix/os/zoscmd.c
+	Modified these routines to use the user's UMASK to compute the file
+	mode for a new file.  zfiotx.c already does this, although it isn't
+	entirely correct (one can add more permissions with umask but one
+	always gets at least 0644 for new text files).  The other routines
+	make full use of umask now.  (4/07)
+
+unix/os/zfaloc.c
+	Since I was already working on zfaloc I also added a feature to
+	permit full preallocation of files on unix systems.  The default
+	behavior of zfaloc, for efficiency reasons, is to physically
+	preallocate only the last block of the file, leaving the remainder
+	of the file blocks to be allocated when data is written to the file.
+	Now, if "ZFALOC" is defined in the user's host environment, full
+	preallocation of the file is enabled.  If the variable is defined
+	but has no string value all zfaloc files are fully preallocated,
+	otherwise, the string value is a comma delimited list of substrings,
+	and a file will be fully preallocated only if one of those substrings
+	matches a substring of the file name in the zfaloc call.  This allows
+	files in certain directories or of certain types to be fully
+	preallocated while others are allocated in the normal fashion, so
+	that the behavior of the routine can be customized for a given
+	type of application.  (4/07)
+
+dev/hosts
+	Corrected the Loden entry on Gemini for Rich Reed.  We should
+	verify all these paths in the master system.  (4/07 RLS)
+
+dev/pix.imh
+dev/pix.pix
+	Replaced dev$pix by a version that has the header tweaked up a bit.
+	(4/08)
+
+dev/termcap
+	Added entries to allow two-up page printing on all printers.  Change
+	also made to gemini and ursa termcap files.  (4/8 MJF)
+
+pkg/plot/t_pcol.x
+pkg/plot/t_implot.x
+pkg/plot/t_graph.x
+pkg/plot/t_pcols.x
+pkg/plot/t_prows.x
+pkg/plot/pltwcs.x
+pkg/plot/graph.par
+pkg/plot/prow.par
+pkg/plot/prows.par
+pkg/plot/pcol.par
+pkg/plot/pcols.par
+pkg/plot/doc/graph.hlp
+pkg/plot/doc/implot.hlp
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+	1. Modified GRAPH, IMPLOT, PROW(S), and PCOL(S) to define and set a
+	coordinate format in plots.  This allows graphs to be made in
+	DD:MM:SS and related formats.
+	2. Modified GRAPH, IMPLOT, PROW(S), and PCOL(S) to use any WCS
+	attribute coordinate format found in the images.
+	3. Added xformat and yformat parameters to GRAPH, PROW(S), and
+	PCOL(S) to define coordinate plot formats.  This allows having a
+	format when a format attribute in not found in the images, to
+	override a format attribute, and to allow setting the format in
+	simple text input.  For example, GRAPH can plot formated RA and DEC
+	from a list of input RA and DEC coordinates.
+	4. Added a ":f format" to IMPLOT to allow specifying/overriding the
+	WCS attribute format.
+	5. Added <space> as a key in IMPLOT to print coordinate and pixel
+	value information:
+	       line=256, column=142, coordinate=13:27:55.6, value=222.
+	(4/9  Valdes)
+
+pkg/cl/exec.c
+	The symptom of this bug was that if a package which has package
+	parameters was loaded at login time and the package parameters were
+	later edited, the edited values would not be used.
+
+	This was traced to a problem with the pfile pointer in the package
+	descriptor pointing to a discarded copy of the package pset.  The
+	PACKAGE command, executed in the package script task when the package
+	was loaded, would quite correctly set up the package descriptor 
+	pointing to the runtime copy of the package pset for the package
+	script task.  When EOF of the login.cl was reached the package
+	script task would terminate and the runtime pset would be copied
+	back to the main package pset and the runtime pset freed - but the
+	package descriptor was left pointing to the old, no longer used pset.
+
+	The fix was to modify oneof() (that's "on-eof"), called when a task
+	terminates, to check if the task is a package script task and if
+	so fix the package descriptor to point to the main pset.  (4/09)
+
+pkg/cl/builtin.c
+pkg/cl/pfiles.c
+	"unlearn pkgname" will now unlearn the package parameters of package
+	pkgname, as well as the parameters of each task in the package (but
+	it does not descend into subpackages).  (4/09)
+
+sys/libc/cprintf.c		+
+sys/libc/scanf.c
+sys/libc/mkpkg
+	Added an interface of the VOS printf routines to LIBC.  These are
+	the routines c_printf, c_fprintf, c_parg[bcsilrd], and c_pargstr.
+	LIBC already has unix stdio-like print routines, but the VOS
+	routines avoid the varargs stuff, and do automatic type conversion.
+	(4/11)
+
+pkg/cl/gram.c
+pkg/cl/debug.c
+pkg/cl/y.output
+pkg/cl/ytab.c
+pkg/cl/ytab.h
+pkg/cl/grammar.y
+pkg/cl/opcodes.c
+pkg/cl/compile.c
+pkg/cl/opcodes.h
+pkg/cl/scan.c
+pkg/cl/builtin.c
+pkg/cl/mkpkg
+	Added the long-awaited ability to scan from a pipe (or whatever the
+	stdin is connected to).  Also added the new formatted scan and print
+	routines scanf, fscanf, and printf.  These are like the unix/stdio
+	versions but use FMTIO, supporting such FMTIO features as %h and
+	%*.*.  For example,
+
+	    cl> printf ("%d foo %g\n") | scanf ("%d foo %g", i, x)
+
+	or
+		while (fscanf (list, "%d %s", i, s1) != EOF)
+		    printf ("i=%d, s1=`%s'\n", i, s1)
+
+	Don't forget the [f]scan routines, which may still be more convenient
+	for simple unformatted scans.
+
+	The new printf routine uses the VOS PARG routines to pass argument
+	operands, hence provides automatic type conversion on output.  If an
+	incorrect number of arguments are passed an incomplete format error
+	will result.  The scanf routine is an interface to the LIBC scanf
+	routine (actually, u_doscan).  The CL scanf/fscanf routines call the
+	LIBC scanf which parses the format string and writes the output
+	values whose addresses are passed in a manually crafted varargs
+	argument list.  Since scanf writes directly into the value fields of
+	the output parameter descriptors, no automatic type conversion is
+	possible and there is no checking for string overflow when writing
+	to a string valued parameter.  Care should be taken to make sure the
+	scanf format matches the datatypes of the output parameters.  (4/11)
+	
+pkg/cl/debug.c
+	Fixed a minor problem with the uncompiled output, where non-string
+	values output for pushconst would contain a trailing '.  (4/11)
+
+unix/os/zfiobf.c
+unix/os/zfiotx.c
+unix/hlib/libc/kernel.h
+	Tested the recently added umask support and made a few changes.  The
+	umask semantics for text files are now identical to those for binary
+	files etc.   (4/11)
+
+unix/hlib/zzsetenv.def
+	Added an entry for the gty system source directory.  (4/17)
+
+pkg/plot/doc/gdevices.hlp	+
+pkg/plot/gdevices.par		+
+pkg/plot/gdevices.x		+
+pkg/plot/mkpkg
+pkg/plot/plot.cl
+pkg/plot/plot.hd
+pkg/plot/plot.men
+pkg/plot/x_plot.x
+	Added a new task GDEVICES to PLOT.  This task will scan the active
+	graphcap database and print a table of the available devices in the
+	given class of devices (by default the stdimage devices), giving for
+	each device a list of the device aliases, the device resolution in
+	X and Y, and a short descriptive string if one was given in the
+	graphcap entry for the device.  See the help file for examples.  (4/18)
+
+sys/mwcs/imwcs.h
+sys/mwcs/iwctype.x
+sys/mwcs/iwsaxmap.x
+sys/mwcs/mwloadim.x
+sys/mwcs/mwsaveim.x
+	Various changes were made to fix the MWCS "dimension mismatch"
+	problem.  This would happen during an image open (iw_saxmap) when
+	the dimension of the WCS was different than that of the image and 
+	an image section was in use.  The error was being detected in
+	mw_saxmap and was correct, i.e., the routine was being called
+	incorrectly by iw_saxmap, part of the image header interface code.
+
+	Evidently axis mapping was not fully implemented; it worked for
+	runtime read-only maps of an image, but failed when making a new
+	image which was a reduced-dimension section of another image
+	(e.g., imcopy dev$pix[*,10] pix1 would do it).  The new image would
+	retain the original WCSDIM which would not match the physical image
+	dimension when the new image was later opened with a section and
+	a new axis map created.
+
+	The fix was to preserve the axis map in an mw_saveim/mw_loadim
+	operation, and in iw_setaxmap, merge the new axis map for the
+	reduced-dimension image into the axis map associated with the stored
+	MWCS.  A new image header parameter WAXMAPnn was added to store the
+	axis map.  iwsaxmap.x now reads the old axis map of dimension
+	MI_NDIM, and merges it with the axis map for the new image of
+	dimension IM_NPHYSDIM.  (4/19)
+
+sys/mwcs/mwloadim.x
+sys/mwcs/mwopen.x
+	The axis map, even if unused, is initialized to the unitary
+	transformation when a new MWCS is created.  (4/19)
+
+sys/mwcs/iwctype.x
+sys/mwcs/mwsaveim.x
+	The FITS CD matrix as used in MWCS was transposed relative to what
+	the draft FITS standard requires.  Modified the iwctype.x code (input)
+	and mwsaveim.x (output) to swap the I,J axes in the CDi_j keyword,
+	in effect transposing the matrix as seen by MWCS.  (4/19)
+
+sys/mwcs/iwewcs.x
+	Deleted the comma in "axis 1: axtype=ra, axis 2: axtype=dec" (in the
+	"ra,").  The attribute list syntax does not permit a comma in this
+	context and it is included in the axtype string value.  (4/19)
+
+sys/mwcs/iwewcs.x
+	Modified the code which sets up the CD matrix in the case when no
+	CD matrix is given in the image header (in which case CDELT/CROTA2
+	is normally used instead) to use a double DO-loop to initialize the
+	CD matrix to the unitary matrix.  The old code had two bugs: 1) the
+	full WCSDIM dimensioned CD matrix was not being initialized when
+	CDELT/CROTA2 were used instead of the CDi_j notation, and 2) mk_idmd
+	was being used to initialize IW_CD to the unitary matrix of dimension
+	ndim, but this was no good as IW_CD has a fixed dimension of MAX_DIM.
+	It is necessary to use an explicit DO-loop instead.  (4/19)
+
+sys/mwcs/iwpstr.x
+	Added a statement "Memc[bigstr+nchars] = EOS" after the blank fill
+	loop - the string was not explicitly EOS terminated.  (4/19)
+
+sys/mwcs/mwgwtermr.x
+	Changed the aclrr in the code used to initialize the CD matrix, to a
+	call to mw_mkidmr, which makes the identity matrix.  Formerly a zero
+	matrix was being returned instead of the identity matrix.  (4/19)
+
+sys/mwcs/mwmkidmr.x			+
+sys/mwcs/mkpkg
+	Added a new routine mw_mkidmr, used to create an identity matrix of
+	type real.  (4/19)
+
+pkg/images/imutil/imdelete.x
+	A portion of the image title string is now included in the "delete
+	image..." message when the verify option is enabled.  (4/20)
+
+sys/gio/cursor/gtr.h
+	Increased the default max graphics frame buffer from 64K to 128K.
+	(4/20)
+
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+	Added a commented out entry for "imtype" to the template login.cl.
+	Added values for imtype, cmbuflen, and min_lenuserarea to zzsetenv.def.
+	The values for imtype and cmbuflen are the same as the builtin
+	defaults.  The value for min_lenuserarea is temporarily set to 20K,
+	until the real problem of image header truncation can be in the IMIO
+	code.  (4/20)
+
+pkg/proto/proto.cl
+pkg/proto/proto.men
+pkg/proto/proto.hd
+pkg/proto/x_proto.x
+pkg/proto/mkpkg
+pkg/proto/wcsreset.par
+pkg/proto/t_wcsreset.x
+pkg/proto/doc/wcsreset.hlp
+	A new task wcsreset has been added to the proto package.
+	(4/21 LED)
+
+sys/gio/glabax/glbfind.x
+	GLABAX now uses a different, hopefully better algorithm for determining
+	the spacing of the minor ticks (formerly the tick spacing algorithm
+	used was the same as used for the major ticks).  As before, NMINOR
+	is used as only a starting point for the automatic algorithm.  It
+	is now possible however to disable the automatic algorithm by giving
+	a negative NMINOR, in which case exactly abs(nminor) ticks will be
+	drawn.  (4/21)
+
+sys/fio/vfntrans.x
+	The code in the vfn_translate routine which recognizes subdirectories
+	was not sufficiently discriminating about "." and "..", and would
+	treat . prefixed files as subdirectories during translation.  (4/21)
+
+sys/fio/fntgfn.x
+	Modified the file template code to check for a leading "." in the
+	pattern string and automatically enable listing of the hidden files
+	in a directory in this case.  (4/21)
+
+pkg/proto/proto.cl
+pkg/proto/proto.men
+pkg/proto/proto.hd
+pkg/proto/x_proto.x
+pkg/proto/mkpkg
+pkg/proto/wcsedit.par
+pkg/proto/t_wcsedit.x
+pkg/proto/doc/wcsedit.hlp
+lib/scr/wcsedit.key
+	A new task wcsedit has been added to the proto package.
+	(4/22 LED)
+
+unix/os/zfiotx.c
+	In a normal raw mode read the terminal driver has interrupts
+	enabled, but catches any interrupt occuring during a read and maps
+	it into 003.  This approach doesn't work for nonblocking raw mode
+	reads because since reads don't block, the driver spends only a
+	miniscule amount of time in the ZGETTX read code.  This would cause
+	interrupts to abort a task doing nonblocking raw mode reads.  The
+	fix was to have the driver put the terminal into true raw mode, with
+	signals disabled, when nonblocking raw mode is in effect.  This
+	applies to suspend as well as interrupt.  (4/22)
+
+sys/imfort/db/imputd.x
+sys/imfort/db/mkpkg
+	The double precision value could be truncated in some cases when
+	copying the formatted string into the 20 char value field.  Modified
+	(like imio/db/imputd.x) to use a loop, decreasing the formatted
+	precision until the value fits.  (4/22)
+
+--------------------------
+"Final" V2.10.0 beta generated.  After this only minor bug fix type changes
+will be made.
+
+pkg/images/register.par
+pkg/images/geotran.par
+pkg/images/doc/register.hlp 
+pkg/images/doc/geotran.hlp
+	Changed the default values of the parameters xscale and yscale in
+	the register and geotran tasks from INDEF to 1.0 (4/23 Davis)
+
+pkg/images/geometry/t_imtrans.x
+	Modified the imtranspose task to pick up the axis map and copy
+	it to the wcs of the output image. (4/23 Davis)
+
+pkg/images/geometry/t_blkavg.x
+pkg/images/geometry/t_blkrep.x
+	Modified the blkrep and blkavg tasks to set axbits explicitly in
+	the calls to mw_shift and mw_scale. Axbits set to 0, meaning
+	all axes, was producing a "singular matrix" error from mwcs.
+	(4/23 Davis)
+
+unix/os/zgtenv.c
+	A link of an IMFORT program using V2.10 IRAF, compiled on a 4.1.1
+	system, would fail with an
+
+	    ld: Undefined symbol
+	       _tolower
+
+	on a 4.0.3 system.  This is actually the second time I have run
+	into this problem.  It is caused by SunOS changing tolower from
+	a macro to a library routine in 4.1.  The problem was avoided by
+	changing the iraf code to define a macro to_lower which is used
+	instead.  (4/23)
+
+dev/imtoolrc
+dev/graphcap
+	Added new imt entries for Nigel's Solitaire formats.  These are
+	named imt17|imtssy and imt18|imtssn for resolutions of 1008x648 and
+	1024x680 respectively. Also added to gemini, ursa and orion. (4/23 MJF)
+
+pkg/images/geometry/t_imslice.x
+	Modified the imslice task to read the old and write a new axis map.
+	(4/23 LED)
+
+pkg/images/geometry/t_imstack.x
+	Modified the imstack task to read the old and write a new axis map.
+	(4/23 LED)
+
+pkg/cl/grammar.y
+	When scan from a pipe was used in a procedure script the scan would
+	not write into a parameter belonging to the procedure calling scan.
+	This was happening because except for the call by reference arguments,
+	scan is implemented as a CL task.  The usual parameter search order
+	would apply, i.e., task (scan), package, cl, hence the parameters for
+	the task calling scan would not be seen.  This could be gotten around
+	by referencing the parameters as task.pname, but this should not be
+	necessary.  It was necessary to change the cl compiler to convert
+	names such as "param" to "task.param" when compiling scan statements
+	(scan as a task).  This is only done if no task or package name is
+	given and the current task's pset includes the named parameter.  (4/26)
+
+dev/hosts
+	Corrected the loden entry and updated the khaki entry (it's now
+	a sparc) for Rich Reed on tucana, gemini, and ursa.  I had fixed
+	the loden entry previously (4/7).  It must have been clobbered
+	somehow in the last three weeks.  (4/27 RLS)
+
+dev/termcap
+dev/graphcap
+	Added contributed entries for the HP LaserJet III series printers.
+	These entries are known to work but given the variety of PostScript
+	cartridges available may need some adjusting.  Included in 2.10
+	because the HP sgi translators are now distributed. (4/27  MJF)
+
+pkg/dataio/fits/fits_read.x
+	Modified rfits to use the tapecap fe parameter if present and
+	greater than 0 to skip to EOF. (4/27 LED)
+
+sys/mtio/mtio.h
+sys/mtio/mtcache.x
+sys/mtio/mtcache.com
+	The symptoms of the bug fixed here were as follows: when testing the
+	fixed block cartridge drive, mtexamine and rfits make+ would work fine,
+	but rfits make- would fail with a read error.  The failure would only
+	occur the second time the task was run, on the tenth file, and only
+	when diagnostic output was enabled.  The read error was occurring
+	because, for some reason, the read request being issued by IRAF was
+	not a multiple of the device block size for this fixed block device.
+
+	It took about 5 hours to track this one down as it took a while to
+	find a repeatable test case (I used LOGIPC), and the actual bug was
+	far removed from the read error seen during testing.  What was
+	happening was that the 1) the read error was due to a read request
+	not a multiple of the device block size, 2) the bad read request
+	was due to a device open with no tapecap information (the driver
+	actually works in this case, using all the builtin defaults which
+	are correct for most variable block UNIX devices), 3) the lack of
+	tapecap information was due to an invalid string pointer passed to
+	the zopnmt routine at open time, 4) the bad pointer was due to the
+	real GTY pointer being clobbered by a bug in the mtcache code.  The
+	entire MTIO descriptor was being cached, including the runtime fields
+	as well as the positional fields.  When a cached entry was recalled
+	the GTY pointer stored in the descriptor would be overwritten.  Since
+	the cache is updated in the first open following task invocation the
+	cached values for the runtime fields would normally be valid and no
+	error would be seen.  (4/29)
+
+pkg/proto/doc/suntoiraf.hlp
+	Replaced the suntoiraf help pages with an updated one. (4/30 LED)
+
+unix/boot/spp/xc.c
+	If a library specified as -lname does not resolve to an iraf library
+	(i.e. it is a host library) the library will now be searched after the 
+	iraf libraries are linked, rather than at the location of the -lname
+	in the link line.  This allows searching of special host libraries
+	after the iraf externals have been generated and before the standard
+	Sun libraries libc, libm, etc. are searched.  If the old behavior
+	is desired it can be achieved by using a reference of the form
+	libname.a in place of the -lname.  (4/30)
+
+unix/shlib/mkshlib.csh
+	Modified to link against -lresolv, if such exists, when building the
+	iraf shared image.  This allows the statically linked iraf executables
+	to use the name server.  By default only SunOS executables which are
+	dynamically linked use the name server.  The -lresolv code will fall
+	back on the /etc/hosts file if the name server does not respond, so
+	this should be safe.  (4/30)
+
+dev/hosts
+	Added kingfisher (aliased as 'kingfishe') to hosts file on tucana,
+	orion, gemini and ursa.  (4/30  MJF)
+
+unix/hlib/mkiraf.csh
+	Updated the terminal type prompt slightly.  (4/30)
+
+unix/hlib/irafuser.csh
+	Disabled the -Bstatic option for linking the HSI executables.  This
+	causes f68881_used undefined error messages from the linker on a
+	Sun-3 (but it is ok on a sparc).  (4/30)
+
+dev/wpix.imh		+
+	Added a second version of the test image dev$pix called dev$wpix.
+	This is dev$pix with a WCS in the image header.  To save space, both
+	image headers point to the same pixel file.  (4/30)
+
+unix/hlib/motd
+unix/hlib/login.cl
+unix/hlib/zzsetenv.def
+pkg/cl/cl.par
+	Changed IRAF version to V2.10EXPORT.  (4/30)
+
+--------------------------
+Built initial V2.10EXPORT distribution files and began testing of same.
+V2.10EXPORT was installed from the network archive on ursa, orion, and
+several mountain nodes to check with problems having to do with how the
+distribution was built.  (4/30)
+
+local/.login
+	1. Commented out the "setenv TERM sun".  This was getting pretty
+	annoying as I usually use an xterm.  Better to let the login inherit
+	the terminal type.
+	2. Added a set prompt statement for a "iraf@hostname% " type prompt.
+	3. Made the "setenv iraf" a bit smarter.  iraf is still set to a
+	constant value, but the file now checks to see if $iraf exists and
+	if not sets $iraf to `(cd ..;cwd)`/.  The constant value is still
+	desirable to allow use of symbolic directory links.
+	(5/02)
+
+unix/os/zzstrt.c
+	Modified this routine to map the data and bss sections of the iraf
+	shared image with execute permission.  There are cases where the Sun
+	compilers can generate executable code in the data segment.  Old Sun
+	hardware does not implement hardware checking for execute
+	permission, but some of the new hardware does.  This was causing a
+	routine (iraf networking using the name server library, which is
+	linked -pic) to fail on a new Sun multiprocessor system which would
+	execute fine on older hardware.  (5/02)
+
+unix/bin.sparc/gterm.e
+unix/bin.sparc/imtool.e
+	Rebuilt these executables under SunOS 4.1.1.  The versions built under
+	4.1.2 would cause shared library version older than expected warning
+	messages when run on a 4.1.1 system.  (5/02)
+
+	(It is not necessary to do this for the bin.mc68020 versions since
+	our Sun-3s are still all running 4.1.1).
+
+unix/hlib/install
+	1. Smartened up the code used to guess the iraf root directory.  It now
+	looks for /iraf/iraf before /iraf in the "pretty name" section (needed
+	to support symbolic links).  When all done, it checks to see if the
+	directory actually exists and if not sets the value to (cd ../..;cwd)
+	instead, assuming install is being run from $iraf/unix/hlib.  This
+	latter feature also has the effect of ignoring an incorrect value of
+	$iraf set before running the install script.
+	2. Added a "set hlib = " to the "Set the BINDIRS" section.  An old
+	value of hlib set when install was run would otherwise be inherited
+	ignoring the new value of $iraf set in the script.  (5/02)
+
+sys/imfort/imflsh.x
+	The integer function bfflsh was being called as a subroutine with the
+	wrong number of arguments.  (5/02)
+
+--------------------------
+Performed a sysgen to pick up the zzstrt.c change above, and rebuilt the
+distribution files.  (5/02)
+
+unix/hlib/install
+	Added a $iraf relative definition of $host, since this is used in the
+	MODEFILES definition but is not defined in the script, hence would be
+	inherited from outside, possibly with the wrong value.  (5/03)
+
+unix/os/zfioks.c
+	Fixed a minor bug in the new zfioks code.  If client authorization
+	fails (as when one has different authorization codes in .irafhosts
+	files on different nodes) the driver is supposed to shutdown the
+	old in.irafksd daemon and start another one via rsh for the new
+	authorization code.  This was failing as a status value was not being
+	cleared before doing the rsh.  The rsh would succeed but then the
+	client would see a bad status and give up (unnecessarily), falling
+	back on a password prompt and rexec call to make the connection.
+	It was actually working due to the redundancy in the driver, but
+	due to the bug one would get the unnecessary password prompt for the
+	rexec.  (5/04)
+
+dev/tapecap
+	Fixed a typo (wrong device entry) in the mtst1.qic-24 entry.  (5/05)
+
+unix/os/zfmkdr.c
+	This routine was missed a while back when the UMASK support was
+	redone.  (5/06)
+
+dev/tapecap
+	The entries for the QIC drives were modified to fix a problem where,
+	e.g., every other file on a tape would be read in an operation such
+	as rfits.  Currently the :se capability is only enabled for the QIC
+	drive on ursa, since this appears to be needed only for the ST
+	driver bug seen on this system.  The fb#2000 capability (which avoids
+	file skip operations which cause problems on the QIC drives due to
+	(I think) buffered data being lost) is more generic and harmless so
+	I moved that to the generic device entry.  (5/07)
+
+sys/imio/iki/ikiopen.x
+sys/imio/iki/ikiinit.x
+sys/imio/iki/ikildd.x
+sys/imio/iki/iki.h
+	IKI was modified to add a flag word for each driver which can be
+	used to note IKI level characteristics of the different image kernels.
+	This was used to flag that the QPF driver cannot write to or create
+	QPOE images.  In a new copy operation, iki_open will not automatically
+	preserve the image type if the read-only flag is set for the input
+	image type.  Hence, in a new copy of a QPOE image, the type of the
+	new image will be controlled by the imtype environment variable rather
+	than trying to make a .qp image.  For other images types a new-copy
+	operation will preserve the image type as before.  Explicitly giving
+	the image extension for a new image always forces that type of image
+	to attempt to be created, whether it can be created by the image
+	kernel or not.  (5/07)
+
+sys/imio/iki/stf/stfhextn.x
+	This bug was unrelated to the above change but was found during
+	testing (in fact it has been there for years).  In v2.10, "imtype"
+	is set by default, with value "imh".  In an imcopy operation such as
+
+	    imcopy foo.hhh foo2
+
+	the output image preserves the image type of the input image,
+	i.e., an STF image is created.  What was happening was that an STF
+	image was being created named "foo2.imh", since imtype was set to
+	"imh" and this is a legal STF image extension.  I hacked stfhextn.x
+	to ignore imtype if set to "imh".  (5/07)
+
+pkg/dataio/fits/fits_wheader.x
+pkg/dataio/fits/mkpkg
+	Modified the wfits file format message to include a "blkfac=xxx"
+	field.  The xxx is the blocking factor for variable blocked devices,
+	and the string "fixed" for fixed block devices.  (5/07)
+
+--------------------------
+Rebuilt distribution files.  (5/07)
+
+dev/hosts
+	Added 'dynamo' to orion, gemini, and ursa.  Primary name is
+	'dynamo.kpno.noao.edu' since this is all it responds to, but made an
+	alias named 'dynamo'.  Not added to Tucana while release being worked 
+	on, I'll do it later.  (5/8/92  MJF)
+
+dev/termcap
+	Made an entry for the machine in Pat Osmer's office, lw8, on gemini,
+	ursa, and orion.  Added to Tucana by JB.  (5/8/92  MJF)
+
+unix/os/zfiomt.c
+	1. Changed the builtin defaults for the maximum and optimum record
+	sizes to 64512.  This is a more conservative value, smaller than the
+	original defaults (maxrec was previously 65535), hence less likely
+	to cause a read error.  The builtin defaults are overridden in most
+	tapecap entries but will be used in user-written tapecap entries
+	which do not set maxrec/optrec explicitly and are likely to rely
+	heavily on the builtin defaults.  The value 64512 is the largest
+	multiple of 1024 less than 65536, and is the minphys value in SunOS.
+	On some devices a read request larger than this value cannot be
+	serviced and will result in an i/o error.
+
+	2. The maxrec value set in tapecap was not being used for file
+	positioning where the driver searches for EOT by skipping a file
+	and reading a record to check for EOT (a read after a fsf which
+	returns zero signals EOT).  On some devices the large read request
+	could cause the read operation to return an error.
+
+	3. If a nonzero maxrec value is set, the driver now guarantees that
+	optrec will not be greater than maxrec (this was not necessary since
+	MTIO does this anyway, but it seems advisable to apply the constraint).
+	(5/28)
+
+pkg/images/tv/wcslab.par
+pkg/images/tv/wcslab/doc/wcslab.hlp
+	Changed the default value of the fill parameter from no to yes.
+	(LED 5/29)
+
+pkg/xtools/doc/inlfit.hlp
+	The xtools inlfit help was not hooked up due to a bug in the inlfit
+	help page. (LED 5/29)
+
+pkg/images/doc/imstat.hlp
+	Fixed a bug in the definition of variance in the imstatistics
+	task help page. (LED 5/29)
+
+sys/mtio/mtio.h
+	Changed the magtape lock file directory from uparm$ to tmp$.  Storing
+	the lok (magtape position) files in uparm causes problems if the
+	user starts up two concurrent CLs with different uparms, and then
+	tries to command the same device from both CLs.  Since they would have
+	different uparms they would have different copies of the lok file for
+	the device, and MTIO could get confused about the tape position.
+	Years ago, in the early days of MTIO the lok files were moved to
+	uparm to avoid multi-user problems (see below), but the multi-user
+	problem is tractable and less of a problem than the concurrent-CL
+	problem dealt with here.  (5/29)
+
+pkg/system/x_system.x
+pkg/system/mkpkg
+pkg/system/system.cl
+pkg/system/mtclean.x		+
+pkg/system/mtclean.par		+
+sys/mtio/mkpkg
+sys/mtio/README
+sys/mtio/mtclean.x		+
+	Added a new (hidden) system task called MTCLEAN.  This is called at
+	CL startup time to delete old magtape lok files.  Previously the
+	login.cl file would delete these files using "delete
+	uparm$mt*.lok".  This approach is no longer discriminating enough
+	however, when the lok files are stored in tmp$ which is a public
+	directory.  The MTCLEAN task is like "delete uparm$mt*.lok" except
+	that it leaves a lok file alone if it belongs to a different user
+	who currently has the drive allocated.  If the lok file is for a
+	device which is not currently allocated it is unconditionally
+	deleted.  If the lok file belongs to the current user it is deleted
+	only if it is "stale", i.e., older than a certain interval
+	(currently one hour, and a parameter default).
+
+	It is harmless to delete lok files in the sense that MTIO will
+	automatically recover (by rewinding the tape) if the lok file is
+	lost, so it is safest to err on the side of occasionally deleting a
+	lok file which is current.  However, this will only happen if the
+	user has not allocated the drive and someone starts up a CL, or if
+	someone using an allocated drive starts up a second CL and the lok
+	file is older than the "stale" threshold.  (5/29)
+
+unix/hlib/motd
+unix/hlib/login.cl
+pkg/cl/cl.par
+	Changed the login.cl version string to force a mkiraf to pick up
+	the "mtclean" addition.  This was done by adding a "revision 1"
+	to the logver string.  (5/29)
+
+pkg/obsolete/doc/imtitle.hlp
+pkg/obsolete/doc/mkhistogram.hlp
+pkg/obsolete/doc/radplt.hlp
+pkg/obsolete/doc/oimcombine.hlp
+	Added a "USE INSTEAD" section to the help pages for the obsolete
+	tasks. (5/29 LED)
+
+pkg/system/doc/rewind.hlp
+	Added some comments on the "initcache" parameter to the help page
+	for the REWIND task.  (5/29)
+
+dev/tapecap
+	Added support for the HP DAT drive under the ApUNIX driver.  (6/03)
+
+unix/hlib/clpackage.men
+	At Bob Hanisch's request changed "obsoleted tasks" to "obsolete
+	tasks" so that stickers for obsoleted grammar won't cringe when
+	reading this menu.  (6/19)
+
+unix/hlib/login.cl
+	Several minor changes were made to the template login.cl over the
+	past couple of weeks.
+
+	1. The "stty xterm" statement in if(envget("TERM")=="xterm") was
+	changed to "stty xterm nl=44".  Since xterm does not have a screen
+	size sense query (like gterm) we can't set the screen size correctly,
+	but it is better to set a small wrong value than a large wrong value
+	like the termcap default of 65.
+	2. Added an if(deftask("mtclean")) to prevent mtclean from being
+	called if it isn't defined, i.e., when running irafo=v2.9.
+	3. Moved the cl<loginuser.cl to after the user package task
+	definitions, to allow the user to override these definitions in
+	their loginuser.cl file.  (6/20)
+
+pkg/plot/t_pradprof.x
+        The new pradprof task was using the file name template expansion
+	routines instead of the image name template expansion routines
+	producing an error if the input image name was an image section.
+	(6/23/92, Davis)
+
+pkg/images/imutil/imcopy.x
+	Modified imcopy to write its verbose output to STDOUT instead of
+	STDERR. (6/24/92, LED)
+
+sys/mwcs/wfmspec.x
+	Fixed a logical error affecting computation of the inverse
+	transformation.  This could cause DISPCOR (resampling to linear
+	coordinates) to fail in some cases.  (6/24)
+
+dev/imtoolrc
+	Updated the comments section slightly.  (6/24)
+
+sys/gty/README
+	Updated gtyopen entry.  (7/3)
+
+doc/newsfile
+	Added the V2.10 revisions summary to the newsfile.  (7/4)
+
+doc/v210revs.ms			+
+	Archived the V2.10 revisions summary document source.  (7/5)
+
+doc/suniraf.ms
+	Installed an updated version of the Sun/IRAF installation guide. (7/5)
+
+doc/sunsmg.ms
+	Installed an updated version of the Sun/IRAF site manager's guide.
+	(7/7)
+
+--------------------------------
+V2.10.0 (patch0) generated.  (7/07)
+
+dev/hosts
+	Added a new machine, piscis, to hosts file.  Also added on Gemini,
+	Ursa, and Orion.  (7/9  MJF)
+
+dev/tapecap
+	It was necessary to enable ":nf" in the tapecap entry for the tk50
+	device.  In testing it was found that if we write a file, append a
+	file, then backspace and read the second file (bsf 2), the drive or
+	driver would hang indefinitely requiring a device power cycling or
+	system bootstrap to clear the condition.  The same thing occurred
+	when two bsf 1s were done in sequence, or when writing 2 instead of
+	3 files (did not try more than 3).  Other cases of appending files
+	did not show the problem.  I tried enabling :ue to force a read at
+	EOT for each append but this made no difference either, only
+	rewinding and spacing forward cleared the problem.  (8/16)

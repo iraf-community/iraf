@@ -10,6 +10,7 @@
 #define	SZ_PKGENV	256	/* pkgenv package list buffer		*/
 #define	MAX_ARGS	50	/* max args to a $IF			*/
 #define	MAX_FILES	512	/* max files in a module list		*/
+#define MAX_LIBFILES    8192    /* max files in a library index         */
 #define	MAX_DEPFILES	100	/* max dependency files			*/
 #define	MAX_SYMBOLS	256	/* max macros				*/
 #define	MAX_SFDIRS	128	/* max dirs containing special 	files	*/

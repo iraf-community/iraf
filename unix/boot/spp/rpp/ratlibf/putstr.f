@@ -1,27 +1,27 @@
-      SUBROUTINE PUTSTR (STR, W, FD)
-      INTEGER STR (100)
-      INTEGER W
-      INTEGER FD
-      INTEGER LENGTH
-      INTEGER I, LEN
-      LEN = LENGTH (STR)
-      I = LEN + 1
-23000 IF (.NOT.(I .LE. W))GOTO 23002
-      CALL PUTCH (32, FD)
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      I = 1
-23003 IF (.NOT.(I .LE. LEN))GOTO 23005
-      CALL PUTCH (STR (I), FD)
-23004 I = I + 1
-      GOTO 23003
-23005 CONTINUE
-      I = (-W) - LEN
-23006 IF (.NOT.(I .GT. 0))GOTO 23008
-      CALL PUTCH (32, FD)
-23007 I = I - 1
-      GOTO 23006
-23008 CONTINUE
-      RETURN
-      END
+      subroutine putstr (str, w, fd)
+      integer str (100)
+      integer w
+      integer fd
+      integer length
+      integer i, len
+      len = length (str)
+      i = len + 1
+23000 if (.not.(i .le. w))goto 23002
+      call putch (32, fd)
+23001 i = i + 1
+      goto 23000
+23002 continue
+      i = 1
+23003 if (.not.(i .le. len))goto 23005
+      call putch (str (i), fd)
+23004 i = i + 1
+      goto 23003
+23005 continue
+      i = (-w) - len
+23006 if (.not.(i .gt. 0))goto 23008
+      call putch (32, fd)
+23007 i = i - 1
+      goto 23006
+23008 continue
+      return
+      end

@@ -8,7 +8,7 @@ define	SZ_NODENAME	9
 
 int procedure mtfile (fname)
 
-char	fname[ARB]			# filename to be tested
+char	fname[ARB]			#I filename to be tested
 
 int	ip, junk
 char	nodename[SZ_NODENAME]

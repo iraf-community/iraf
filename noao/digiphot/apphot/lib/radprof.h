@@ -1,31 +1,30 @@
 # RADPROF header file
 
-# radprof fit parameters and answers (# 161 - 180)
-
-define	RPXCUR			161
-define	RPYCUR			162
-define	RPRADIUS		163
-define	RPSTEP			164
-define	RPKSIGMA		165
-define	RPNREJECT		166
-define	RPORDER			167
-define	INORM			168
-define	TNORM			169
-define	DNORM			170
-define	RPFWHM			171
-define	RPNPTS			172
-define	RPNDATA			173
-define	RPNDATAREJ		174
-
-
-# radprof error codes (# 161 - 180)
+# radprof error codes (# 901 - 1000)
 
 define	AP_OK			0
-define	AP_RP_NOPROFILE		161
-define	AP_RP_OUTOFBOUNDS	162
-define	AP_RP_NPTS_TOO_SMALL	163
-define	AP_RP_SINGULAR		164
-define	AP_RP_NOSKYMODE		165
+define	AP_RP_NOPROFILE		901
+define	AP_RP_OUTOFBOUNDS	902
+define	AP_RP_NPTS_TOO_SMALL	903
+define	AP_RP_SINGULAR		904
+define	AP_RP_NOSKYMODE		905
+
+# radprof fit parameters and answers (# 901 - 1000)
+
+define	RPXCUR			901
+define	RPYCUR			902
+define	RPRADIUS		903
+define	RPSTEP			904
+define	RPKSIGMA		905
+define	RPNREJECT		906
+define	RPORDER			907
+define	INORM			908
+define	TNORM			909
+define	DNORM			910
+define	RPFWHM			911
+define	RPNPTS			912
+define	RPNDATA			913
+define	RPNDATAREJ		914
 
 # define radprof keywords
 

@@ -86,6 +86,10 @@ char *fname;			/* simple filename, no dirs */
 #else
 #ifdef vax
 	strcat (pathname, "vax");
+#else
+#ifdef ultrix
+	strcat (pathname, "dsux");
+#endif
 #endif
 #endif
 #endif

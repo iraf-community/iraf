@@ -22,7 +22,7 @@ include	"rrcopy.h"
 
 procedure t_rrcopy ()
 
-pointer	sp, rp, tp
+pointer	sp, rp
 bool	make_image, print_header, bad_header
 char 	rcopy_file[SZ_FNAME], iraf_file[SZ_FNAME]
 char 	out_fname[SZ_FNAME], raster_list[SZ_LINE]
@@ -44,10 +44,7 @@ begin
 	call clgstr ("rcopy_file", rcopy_file, SZ_FNAME)
 	if (mtfile (rcopy_file) == YES) {
 	    tapefile = clgeti ("datafile") + 1
-	    call salloc (tp, SZ_FNAME, TY_CHAR)
-	    call sprintf (Memc[tp], SZ_FNAME, "[%d]")
-		call pargi (tapefile)
-	    call strcat (Memc[tp], rcopy_file, SZ_FNAME)
+	    call mtfname (rcopy_file, tapefile, rcopy_file, SZ_FNAME)
 	}
 	rd = mtopen (rcopy_file, READ_ONLY, SZ_BUFFER)
 	init = rc_read_cyber_init()

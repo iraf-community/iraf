@@ -1,13 +1,13 @@
-      SUBROUTINE DELETE (SYMBOL, ST)
-      INTEGER SYMBOL (100)
-      INTEGER ST
-      INTEGER MEM( 1)
-      COMMON/CDSMEM/MEM
-      INTEGER STLU
-      INTEGER NODE, PRED
-      IF (.NOT.(STLU (SYMBOL, NODE, PRED, ST) .EQ. 1))GOTO 23000
-      MEM (PRED + 0) = MEM (NODE + 0)
-      CALL DSFREE (NODE)
-23000 CONTINUE
-      RETURN
-      END
+      subroutine delete (symbol, st)
+      integer symbol (100)
+      integer st
+      integer mem( 1)
+      common/cdsmem/mem
+      integer stlu
+      integer node, pred
+      if (.not.(stlu (symbol, node, pred, st) .eq. 1))goto 23000
+      mem (pred + 0) = mem (node + 0)
+      call dsfree (node)
+23000 continue
+      return
+      end

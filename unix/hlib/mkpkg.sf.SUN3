@@ -13,6 +13,8 @@ $special "sys$gio/ncarutil/sysint/":	ishift.x as$ishift.s ;
 
 $special "sys$osb/":		aclrb.c		as$aclrb.c
 				bytmov.c	as$bytmov.c
+				ieeer.x		as$ieeer.x
+				ieeed.x		as$ieeed.x
 				;
 
 $special "sys$vops/ak/":	aclrc.x		as$aclrc.c

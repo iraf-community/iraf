@@ -80,7 +80,6 @@ begin
 	call new_title ("title", im_out)
 	IM_PIXTYPE (im_out) = pixtype
 
-	call imunmap (im_in)
 	call imtrew (list)
 
 	# Print verbose info.
@@ -125,6 +124,7 @@ begin
 	    call imsumd (list, Memc[image], im_out, nlow, nhigh, Memc[option])
 	}
 	call imunmap (im_out)
+	call imunmap (im_in)
 
 	# Set the header parameters.
 	call imtrew (list)

@@ -1,95 +1,95 @@
-      SUBROUTINE SYNERR (MSG)
-      INTEGER MSG
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER LC (20)
-      INTEGER I, JUNK
-      INTEGER ITOC
-      INTEGER OF(5)
-      INTEGER ERRMSG(15)
-      DATA OF(1)/32/,OF(2)/111/,OF(3)/102/,OF(4)/32/,OF(5)/-2/
-      DATA ERRMSG(1)/69/,ERRMSG(2)/114/,ERRMSG(3)/114/,ERRMSG(4)/111/,ER
-     *RMSG(5)/114/,ERRMSG(6)/32/,ERRMSG(7)/111/,ERRMSG(8)/110/,ERRMSG(9)
-     */32/,ERRMSG(10)/108/,ERRMSG(11)/105/,ERRMSG(12)/110/,ERRMSG(13)/10
-     *1/,ERRMSG(14)/32/,ERRMSG(15)/-2/
-      CALL PUTLIN (ERRMSG, 2)
-      IF (.NOT.(LEVEL .GE. 1))GOTO 23000
-      I = LEVEL
-      GOTO 23001
-23000 CONTINUE
-      I = 1
-23001 CONTINUE
-      JUNK = ITOC (LINECT (I), LC, 20)
-      CALL PUTLIN (LC, 2)
-      I = FNAMP - 1
-23002 IF (.NOT.(I .GE. 1))GOTO 23004
-      IF (.NOT.(FNAMES (I - 1) .EQ. -2 .OR. I .EQ. 1))GOTO 23005
-      CALL PUTLIN (OF, 2)
-      CALL PUTLIN (FNAMES (I), 2)
-      GOTO 23004
-23005 CONTINUE
-23003 I = I - 1
-      GOTO 23002
-23004 CONTINUE
-      CALL PUTCH (58, 2)
-      CALL PUTCH (32, 2)
-      CALL REMARK (MSG)
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      subroutine synerr (msg)
+      integer msg
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer lc (20)
+      integer i, junk
+      integer itoc
+      integer of(5)
+      integer errmsg(15)
+      data of(1)/32/,of(2)/111/,of(3)/102/,of(4)/32/,of(5)/-2/
+      data errmsg(1)/69/,errmsg(2)/114/,errmsg(3)/114/,errmsg(4)/111/,er
+     *rmsg(5)/114/,errmsg(6)/32/,errmsg(7)/111/,errmsg(8)/110/,errmsg(9)
+     */32/,errmsg(10)/108/,errmsg(11)/105/,errmsg(12)/110/,errmsg(13)/10
+     *1/,errmsg(14)/32/,errmsg(15)/-2/
+      call putlin (errmsg, 2)
+      if (.not.(level .ge. 1))goto 23000
+      i = level
+      goto 23001
+23000 continue
+      i = 1
+23001 continue
+      junk = itoc (linect (i), lc, 20)
+      call putlin (lc, 2)
+      i = fnamp - 1
+23002 if (.not.(i .ge. 1))goto 23004
+      if (.not.(fnames (i - 1) .eq. -2 .or. i .eq. 1))goto 23005
+      call putlin (of, 2)
+      call putlin (fnames (i), 2)
+      goto 23004
+23005 continue
+23003 i = i - 1
+      goto 23002
+23004 continue
+      call putch (58, 2)
+      call putch (32, 2)
+      call remark (msg)
+      return
+      end
+c     logic0  logical_column

@@ -1,5 +1,150 @@
 .help revisions Jan90 noao.artdata
 .nf
+=======
+V2.10.0
+=======
+
+artdata$t_mkechelle.x
+    "min (tt" --> "min (tt[i]" and  "max (tt" --> "max (tt[i]"
+    (6/23/92, Valdes)
+
+=====
+V2.10
+=====
+
+artdata$mkexamples/*
+artdata$doc/mkexamples.hlp
+    Added parameter to control whether comments are generated in the
+    examples.  (1/31/92, Valdes)
+
+artdata$mktemplate.x
+    Made substantial changes to how the user and analytic profiles are
+    handled.  Primarily, the prefered form for both user supplied and
+    analytic profiles is as intensity profiles rather than cumulative
+    flux profiles.  Cumulative profiles may still be input and they are
+    identified by having a zero initial element.  (12/13/91, Valdes)
+
+artdata$mktemplates.x
+    Very large gaussians showed an dip in the center due to problems with
+    mkt_fixprof.  A better algorithm was instituted.  (12/11/91, Valdes)
+
+artdata$lists/stmix.x
+    1.  The random component of the size distribution for the Schecter function
+    was incorrect.  It was giving a 100% random factor and was reducing
+    the size by 40%.  The fix is 0.2 + 0.4 * urand() ==> 0.8 + 0.4 * urand().
+    2.  The roundness distribution for ellipical galaxies was done incorrectly.
+    (11/26/91, Valdes)
+
+artdata$lists/stdbio.x
+    Instead of putting out beta in the log for the schecter function changed
+    to put out mstar.  (11/26/91, Valdes)
+
+artdata$t_mk1dspec.x
+artdata$t_mkechelle.x
+    Fixed minor bugs found by SPPLINT.  (11/21/91, Valdes)
+
+artdata$mktemplates2.x
+artdata$lists/stlumold.x
+    Delete old versions.  (11/21/91, Valdes)
+
+artdata$doc/t_mkpattern.x
+    Fixed an error in mkpattern:
+	max (1, (line-1))  -->  max (1, line)
+    (10/15/91, Valdes)
+
+artdata$doc/mk1dspec.hlp
+    Need to indicate that the blackbody flux is per unit wavelength.
+    (10/9/91, Valdes)
+
+artdata$t_mkpattern.x
+    For 1D images the pattern made corresponded to line 0 instead of line 1.
+    (7/26/91, Valdes)
+
+artdata$mktemplates.x
+    The PSF position angle was not being converted to radians from degrees
+    with the result that the input was interpreted as radians.  The
+    conversion with DEGTORAD was added.  (6/10/91, Valdes)
+
+artdata$t_mkechelle.x
+artdata$mkechelle.par
+artdata$doc/mkechelle.hlp
+artdata$t_mk1dspec.x
+artdata$x_artdata.x
+artdata$artdata.cl
+artdata$artdata.men
+artdata$artdata.hd
+artdata$mkpkg
+artdata$mkexamples/ecarc2d.cl
+artdata$mkexamples/ecobj2d.cl
+artdata$mkexamples/ecarc1d.cl
+artdata$mkexamples/ecarcdc.cl
+artdata$mkexamples/ecthorium.dat
+artdata$mkexamples/mkexamples.men
+    1.  Added new artificial echelle task.
+    2.  Added echelle examples.
+    3.  Fixed minor bug in MK1DSPEC concerning header format of wend parameter.
+    (3/20/91, Valdes)
+
+artdata$
+  mkheader.x +
+  mkpkg
+  t_mkobjects.x, mkobjects.par, doc/mkobjects.hlp
+  t_mkpattern.x, mkpattern.par, doc/mkpattern.hlp
+  t_mknoise.x,   mknoise.par,   doc/mknoise.hlp
+  t_mk2dspec.x,  mk2dspec.par,  doc/mk2dspec.hlp
+  t_mk1dspec.x,  mk1dspec.par,  doc/mk1dspec.hlp
+  t_mkheader.x,  mkheader.par,  doc/mkheader.hlp
+  artdata.men
+  stdheader.dat
+    1.  Separated out header stuff into separate file.
+    2.  Changed format of header keyword file to be FITS-like including
+	understanding the output of IMHEADER.  The default file
+	stdheader.dat was changed appropriately.
+    3.  Added capability to copy an image header when creating a new
+	image.
+    4.  MKHEADER can append or replace a header from an image or
+	a header keyword file.  The clobber parameter was changed
+	to append.  The verbose parameter now lists only the image
+	and source of header changes rather than individual keywords.
+    (1/16/91, Valdes)
+
+artdata$mktemplates.x
+    Fixed bug preventing template memory stored in the symbol table
+    from being freed.  (12/4/90, Valdes)
+
+artdata$mktemplates.x
+    Changed seeing sampling from 40% to 80% for image template psfs.
+    (11/13/90, Valdes)
+
+artdata$t_mk1dspec.x
+artdata$t_mk2dspec.x
+artdata$t_mkobjects.x
+artdata$t_mknoise.x
+artdata$mk1dspec.par
+artdata$mk2dspec.par
+artdata$mkobjects.par
+artdata$mknoise.par
+artdata$doc/mk1dspec.hlp
+artdata$doc/mk2dspec.hlp
+artdata$doc/mkobjects.hlp
+artdata$doc/mknoise.hlp
+artdata$mkexamples/
+    1. MK1DSPEC now can create multispec/echelle format images.
+    2. Added switch to turn off comments.
+    (11/7/90, Valdes)
+
+artdata$t_mkobjects.x
+    1. Added object list file name to the header comments.
+    2. Fixed bug which caused objects which went off the edge and were
+       exactly at a half pixel boundry (i.e. 32.5) to end up off by one
+       pixel.
+    (10/23/90, Valdes)
+
+artdata$mktemplates.x
+    Replaced use of i as the function value returned by immap and open
+    with im and fd respectively.  For unknown reasons the HPUX compiler
+    left the value of i at 0 after the function call.  (10/10/90, Valdes)
+
 artdata$artdata.cl
 artdata$artdata.hd
 artdata$artdata.men

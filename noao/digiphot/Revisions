@@ -1,0 +1,19 @@
+.help revisions Aug91 noao.digiphot
+.nf
+digiphot/ptools/
+	The photometry tools package was installed in digiphot.
+	(8/26/91 LED)
+
+digiphot/photcal/
+	The photometric calibrations package was installed in digiphot.
+	(8/26/91 LED)
+
+digiphot/daophot/
+	The DAO crowded-field photometry package was installed in digiphot.
+	(8/26/91 LED)
+
+digiphot/apphot/
+	The aperture photometry package was installed in digiphot.
+	(10/27/87 LED)
+
+.endhelp

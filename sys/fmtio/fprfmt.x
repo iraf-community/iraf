@@ -148,11 +148,8 @@ begin
 	    ip = ip + 1
 	}
 
-	if (IS_UPPER (format_char))
-	    format_char = TO_LOWER (format_char)
-
 	ch = format_char
-	if (stridx (ch, "bcdefghmorstuwxz") <= 0) {
+	if (stridx (ch, "bcdefghHmMorstuwxz") <= 0) {
 	    call putline (STDERR, "Warning: Unknown format type char\n")
 	    call fmt_err ("", format, ip-1)
 	    format_char = USE_DEFAULT

@@ -7,19 +7,20 @@ include	<knet.h>
 # The IRAF device name must already have been translated to a host device
 # name before we are called.
 
-int procedure mt_devallocated (osdev)
+int procedure mt_devallocated (iodev)
 
-char	osdev[ARB]		# host name of device
+char	iodev[ARB]			#I host name of device
+pointer	sp, pk_iodev, pk_owner
 int	status
-pointer	sp, pk_osdev, pk_owner
 
 begin
 	call smark (sp)
-	call salloc (pk_osdev, SZ_FNAME, TY_CHAR)
+	call salloc (pk_iodev, SZ_FNAME, TY_CHAR)
 	call salloc (pk_owner, SZ_FNAME, TY_CHAR)
 
-	call strpak (osdev, Memc[pk_osdev], SZ_FNAME)
-	call zdvown (Memc[pk_osdev], Memc[pk_owner], SZ_FNAME, status)
+	# The following assumes that the node! prefix is in iodev.
+	call strpak (iodev, Memc[pk_iodev], SZ_FNAME)
+	call zdvown (Memc[pk_iodev], Memc[pk_owner], SZ_FNAME, status)
 
 	call sfree (sp)
 	if (status == DV_DEVALLOC)

@@ -2,9 +2,10 @@
 
 include <imhdr.h>
 include <mach.h>
+include <fset.h>
 include "wfits.h"
 
-# WFT_WRITE_HEADER -- Procedure to write FITS headers. The FITS header
+# WFT_WRITE_HEADER -- Write the FITS headers. The FITS header
 # parameters are encoded one by one until the FITS END keyword is detected.
 # If the long_header switch is set the full FITS header is printed on the
 # standard output. If the short header parameter is specified only the image
@@ -19,7 +20,7 @@ int	fits_fd		# the FITS file descriptor
 char	card[LEN_CARD+1], trim_card[LEN_CARD+1]
 int	nrecords, recntr, cardptr, cardcnt, stat, cards_per_rec, i
 int	wft_card_encode(), wft_set_bitpix(), sizeof(), strncmp()
-int	wft_init_card_encode()
+int	wft_init_card_encode(), fstati()
 
 errchk	wft_set_bitpix, wft_get_iraf_typestring, wft_set_scale, wft_set_blank
 errchk	wft_fits_set_scale, wft_init_card_encode, wft_card_encode
@@ -28,6 +29,8 @@ errchk	wft_init_write_pixels, wft_write_pixels, wft_write_last_record
 include "wfits.com"
 
 begin
+	# SET the data and FITS bits per pixel.
+
 	DATA_BITPIX(fits) = sizeof (PIXTYPE(im)) * SZB_CHAR * NBITS_BYTE
 	FITS_BITPIX(fits) = wft_set_bitpix (bitpix, PIXTYPE(im),
 	    DATA_BITPIX(fits))
@@ -38,19 +41,24 @@ begin
 	# checking the specifications.
 
 	if (FITS_BITPIX(fits) < 0) {
+
 	    IRAFMIN(fits) = IM_MIN(im)
 	    IRAFMAX(fits) = IM_MAX(im)
 	    SCALE(fits) = NO
 	    BZERO(fits) = 0.0d0
 	    BSCALE(fits) = 1.0d0
+
 	} else if (autoscale == YES) {
+
 	    call wft_get_tape_limits (FITS_BITPIX(fits), TAPEMIN(fits),
 	        TAPEMAX(fits))
 	    call wft_data_limits (im, IRAFMIN(fits), IRAFMAX(fits))
 	    call wft_fits_set_scale (im, DATA_BITPIX(fits), FITS_BITPIX(fits),
 	        IRAFMIN(fits), IRAFMAX(fits), TAPEMIN(fits), TAPEMAX(fits),
 		SCALE(fits), BSCALE(fits), BZERO(fits))
+
 	} else {
+
 	    IRAFMIN(fits) = IM_MIN(im)
 	    IRAFMAX(fits) = IM_MAX(im)
 	    SCALE(fits) = scale
@@ -58,8 +66,8 @@ begin
 	    BSCALE(fits) = bscale
 	}
 
-	# If blanks in image set the blank parameter. Currently information
-	# on blanks is not written out so this is effectively a nullop
+	# If blanks in the image set the blank parameter. Currently information
+	# on blanks is not written out so this is effectively a null operation
 	# in IRAF.
 
 	if (NBPIX(im) > 0)
@@ -77,13 +85,14 @@ begin
 	cardcnt = 1
 	cards_per_rec = len_record / LEN_CARD
 
-	# Get set up to write header. Initialize for an ASCII write.
+	# Get set up to write the FITS header. Initialize for an ASCII write.
 	stat = wft_init_card_encode (im, fits)
 	if (make_image == YES)
 	    call wft_init_wrt_pixels (len_record, TY_CHAR, FITS_BYTE, blkfac)
 
 	# Print short header.
 	if (short_header == YES && long_header == NO) {
+
 	    call printf ("%-20.20s  ")
 		call pargstr (OBJECT(im))
 	    do i = 1, NAXIS(im) {
@@ -96,6 +105,25 @@ begin
 		}
 	    }
 	    call printf ("\n")
+
+	    call strlwr (TYPE_STRING(fits))
+	    call printf ("\tpixtype=%s bitpix=%d")
+		call pargstr (TYPE_STRING(fits))
+		call pargi (FITS_BITPIX(fits))
+
+	    if (fstati (fits_fd, F_BLKSIZE) == 0) {
+		call printf (" blkfac=%d")
+		    call pargi (blkfac)
+	    } else
+		call printf (" blkfac=fixed")
+
+	    if (SCALE(fits) == YES) {
+	        call printf (" bscale=%.7g bzero=%.7g\n")
+		    call pargd (BSCALE(fits))
+		    call pargd (BZERO(fits))
+	    } else
+		call printf (" scaling=none\n")
+	    call strupr (TYPE_STRING(fits))
 	}
 
 	# Write the cards to the FITS header.
@@ -106,7 +134,7 @@ begin
 	    if (stat == NO)
 		next
 
-	    # Write the card to the output file is make_images is yes.
+	    # Write the card to the output file if make_image is yes.
 	    if (make_image == YES)
 	        call wft_write_pixels (fits_fd, card, LEN_CARD)
 
@@ -130,7 +158,15 @@ begin
 
 	} until (strncmp (card, "END     ", LEN_KEYWORD) == 0)
 
-	# Write last header records.
+	# Issue warning about possible precision loss. Comment this out
+	# for time being, since the short header was modified.
+	#if (SCALE(fits) == YES && bitpix != ERR) {
+	    #call printf (
+	    #"\tDefault bitpix overridden: maximum precision loss ~%.7g\n")
+		#call pargd (BSCALE(fits))
+	#}
+
+	# Write the last header records.
 	if (make_image == YES) {
 	    call wft_write_last_record (fits_fd, nrecords)
 	    if (short_header == YES || long_header == YES) {
@@ -166,19 +202,9 @@ begin
 	        } else
 		    return (FITS_LONG)
 	    case TY_REAL, TY_COMPLEX:
-		if (NDIGITS_RP <= BYTE_PREC)
-		    return (FITS_BYTE)
-		else if (NDIGITS_RP <= SHORT_PREC)
-		    return (FITS_SHORT)
-		else
-		    return (FITS_LONG)
+		return (FITS_REAL)
 	    case TY_DOUBLE:
-		if (NDIGITS_DP <= BYTE_PREC)
-		    return (FITS_BYTE)
-		else if (NDIGITS_DP <= SHORT_PREC)
-		    return (FITS_SHORT)
-		else
-		    return (FITS_LONG)
+		 return (FITS_DOUBLE)
 	    default:
 		call error (2, "SET_BITPIX: Unknown IRAF data type.")
 	    }
@@ -197,10 +223,18 @@ char	type_str[ARB]	# the output IRAF type string
 
 begin
 	switch (datatype) {
-	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
+	case TY_SHORT:
+	    call strcpy ("SHORT", type_str, LEN_STRING) 
+	case TY_USHORT:
+	    call strcpy ("USHORT", type_str, LEN_STRING) 
+	case TY_INT: 
 	    call strcpy ("INTEGER", type_str, LEN_STRING) 
-	case TY_REAL, TY_DOUBLE:
-	    call strcpy ("FLOATING", type_str, LEN_STRING)
+	case TY_LONG: 
+	    call strcpy ("LONG", type_str, LEN_STRING) 
+	case TY_REAL:
+	    call strcpy ("REAL", type_str, LEN_STRING)
+	case TY_DOUBLE:
+	    call strcpy ("DOUBLE", type_str, LEN_STRING)
 	case TY_COMPLEX:
 	    call strcpy ("COMPLEX", type_str, LEN_STRING)
 	default:

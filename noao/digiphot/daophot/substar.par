@@ -1,0 +1,12 @@
+# SUBSTAR Parameters
+
+image,f,a,,,,"Image corresponding to photometry file"
+photfile,f,a,default,,,"Photometry file (default: image.nst.?)"
+psfimage,f,a,default,,,"PSF image (default: image.psf.?)"
+subimage,f,a,"default",,,"Subtracted image (default: image.sub.?)"
+datapars,pset,h,"",,,Data dependent parameters
+daopars,pset,h,"",,,Daophot fitting parameters
+verbose,b,h,no,,,Print messages
+verify,b,h,yes,,,Verify critical parameters?
+update,b,h,no,,,Update critical parameters?
+mode,s,h,'ql'

@@ -196,11 +196,11 @@ end
 int procedure bffsiz (fp)
 
 pointer	fp			# BFIO file descriptor
-int	nbytes, status
+int	nbytes
 
 begin
-	call zsttbf (BF_CHAN(fp), FSTT_FILSIZE, nbytes, status)
-	if (status == ERR)
+	call zsttbf (BF_CHAN(fp), FSTT_FILSIZE, nbytes)
+	if (nbytes == ERR)
 	    return (ERR)
 	else
 	    return ((nbytes + SZB_CHAR-1) / SZB_CHAR)

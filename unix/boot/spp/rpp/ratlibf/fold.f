@@ -1,12 +1,12 @@
-      SUBROUTINE FOLD (TOKEN)
-      INTEGER TOKEN (100)
-      INTEGER CLOWER
-      INTEGER I
-      I = 1
-23000 IF (.NOT.(TOKEN (I) .NE. -2))GOTO 23002
-      TOKEN (I) = CLOWER (TOKEN (I))
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      RETURN
-      END
+      subroutine fold (token)
+      integer token (100)
+      integer clower
+      integer i
+      i = 1
+23000 if (.not.(token (i) .ne. -2))goto 23002
+      token (i) = clower (token (i))
+23001 i = i + 1
+      goto 23000
+23002 continue
+      return
+      end

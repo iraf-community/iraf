@@ -15,16 +15,16 @@ begin
 	dev = device
 	_devstatus (dev)
 
-	if (verbose) {
-	    # Print UNIX device status, too.
-
-	    devlist = "dev$devices"
-	    while (fscan (devlist, logname, hostname) != EOF) {
-		if (logname == dev) {
-		    print ("!ls -l /dev/", hostname) | cl
-		    break
-		}
-	    }
-	    devlist = ""
-	}
+#	if (verbose) {
+#	    # Print UNIX device status, too.
+#
+#	    devlist = "dev$devices"
+#	    while (fscan (devlist, logname, hostname) != EOF) {
+#		if (logname == dev) {
+#		    print ("!ls -l /dev/", hostname) | cl
+#		    break
+#		}
+#	    }
+#	    devlist = ""
+#	}
 end

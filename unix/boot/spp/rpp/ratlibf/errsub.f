@@ -1,22 +1,22 @@
-      INTEGER FUNCTION ERRSUB (ARG, FILE, ACCESS)
-      INTEGER ARG (100), FILE (100)
-      INTEGER ACCESS
-      IF (.NOT.(ARG (1) .EQ. 63 .AND. ARG (2) .NE. 63 .AND. ARG (2) .NE.
-     * -2))GOTO 23000
-      ERRSUB = 1
-      ACCESS = 2
-      CALL SCOPY (ARG, 2, FILE, 1)
-      GOTO 23001
-23000 CONTINUE
-      IF (.NOT.(ARG (1) .EQ. 63 .AND. ARG (2) .EQ. 63 .AND. ARG (3) .NE.
-     * -2))GOTO 23002
-      ERRSUB = 1
-      ACCESS = 4
-      CALL SCOPY (ARG, 3, FILE, 1)
-      GOTO 23003
-23002 CONTINUE
-      ERRSUB = 0
-23003 CONTINUE
-23001 CONTINUE
-      RETURN
-      END
+      integer function errsub (arg, file, access)
+      integer arg (100), file (100)
+      integer access
+      if (.not.(arg (1) .eq. 63 .and. arg (2) .ne. 63 .and. arg (2) .ne.
+     * -2))goto 23000
+      errsub = 1
+      access = 2
+      call scopy (arg, 2, file, 1)
+      goto 23001
+23000 continue
+      if (.not.(arg (1) .eq. 63 .and. arg (2) .eq. 63 .and. arg (3) .ne.
+     * -2))goto 23002
+      errsub = 1
+      access = 4
+      call scopy (arg, 3, file, 1)
+      goto 23003
+23002 continue
+      errsub = 0
+23003 continue
+23001 continue
+      return
+      end

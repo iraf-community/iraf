@@ -1,10 +1,10 @@
-      SUBROUTINE FCOPY (IN, OUT)
-      INTEGER IN, OUT
-      INTEGER LINE (128)
-      INTEGER GETLIN
-23000 IF (.NOT.(GETLIN (LINE, IN) .NE. -1))GOTO 23001
-      CALL PUTLIN (LINE, OUT)
-      GOTO 23000
-23001 CONTINUE
-      RETURN
-      END
+      subroutine fcopy (in, out)
+      integer in, out
+      integer line (128)
+      integer getlin
+23000 if (.not.(getlin (line, in) .ne. -1))goto 23001
+      call putlin (line, out)
+      goto 23000
+23001 continue
+      return
+      end

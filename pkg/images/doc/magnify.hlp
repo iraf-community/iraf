@@ -136,8 +136,8 @@ are then 2 and 0.5.  This means the output x pixels are at
 terms of the input pixel coordinates.  The last output x pixel is then
 at 99 in the input coordinates and the number of pixels is 50.  For the
 y axis the last output pixel is at 10 in the input coordinates and the
-number of pixels between 1 and 10 in intervals of 0.5 is 11!  Thus, the
-final image is 50 by 11 and not 50 by 10 which you would get if you
+number of pixels between 1 and 10 in intervals of 0.5 is 19!  Thus, the
+final image is 50 by 19 and not 50 by 20 which you would get if you
 multiplied the axis lengths by the magnification factors.
 
 A more complex example is given above in which x1=25.3,

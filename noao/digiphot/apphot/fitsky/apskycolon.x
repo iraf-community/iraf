@@ -3,6 +3,52 @@ include "../lib/noise.h"
 include "../lib/fitsky.h"
 include "../lib/display.h"
 
+
+# APSKYCOLON -- Procedure to process the fitsky colon commands.
+
+procedure apskycolon (ap, im, cl, out, stid, ltid, cmdstr, newskybuf, newsky)
+
+pointer	ap				# pointer to the apphot structure
+pointer	im				# pointer to the iraf image
+int	cl				# coordinate file descriptor
+int	out				# output file descriptor
+int	stid				# output file sequence number
+int	ltid				# coord list sequence number
+char	cmdstr[ARB]			# command string
+int	newskybuf, newsky		# new sky buffer
+
+int	junk
+pointer	sp, incmd, outcmd
+int	strdic()
+
+begin
+	# Get the command.
+	call smark (sp)
+	call salloc (incmd, SZ_LINE, TY_CHAR)
+	call salloc (outcmd, SZ_LINE, TY_CHAR)
+	call sscan (cmdstr)
+	call gargwrd (Memc[incmd], SZ_LINE)
+	if (Memc[incmd] == EOS) {
+	    call sfree (sp)
+	    return
+	}
+
+	# Process the command.
+	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, SCMDS) != 0)
+	    call apscolon (ap, out, stid, cmdstr, newskybuf, newsky)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, junk, junk,
+	        newskybuf, newsky, junk, junk)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
+	    call apnscolon (ap, im, out, stid, cmdstr, junk, junk,
+	        newskybuf, newsky, junk, junk)
+	else
+	    call ap_simcolon (ap, cmdstr)
+
+	call sfree (sp)
+end
+
+
 # APSCOLON --  Procedure to examine and edit the sky fitting parameters.
 
 procedure apscolon (ap, out, stid, cmdstr, newbuf, newfit)
@@ -213,61 +259,13 @@ begin
 end
 
 
-# APSKYCOLON -- Procedure to process the fitsky colon commands.
-
-procedure apskycolon (ap, im, cl, out, stid, ltid, cmdstr, newskybuf, newsky)
-
-pointer	ap				# pointer to the apphot structure
-pointer	im				# pointer to the iraf image
-int	cl				# coordinate file descriptor
-int	out				# output file descriptor
-int	stid				# output file sequence number
-int	ltid				# coord list sequence number
-char	cmdstr[ARB]			# command string
-int	newskybuf, newsky		# new sky buffer
-
-pointer	sp, incmd, outcmd
-real	junk
-int	strdic()
-
-begin
-	# Get the command.
-	call smark (sp)
-	call salloc (incmd, SZ_LINE, TY_CHAR)
-	call salloc (outcmd, SZ_LINE, TY_CHAR)
-	call sscan (cmdstr)
-	call gargwrd (Memc[incmd], SZ_LINE)
-	if (Memc[incmd] == EOS) {
-	    call sfree (sp)
-	    return
-	}
-
-	# Process the command.
-	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, SCMDS) != 0)
-	    call apscolon (ap, out, stid, cmdstr, newskybuf, newsky)
-	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
-	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, junk, junk,
-	        newskybuf, newsky, junk, junk)
-	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
-	    call apnscolon (ap, im, out, stid, cmdstr, junk, junk,
-	        newskybuf, newsky, junk, junk)
-	else
-	    call apsimcolon (ap, out, stid, cmdstr, newskybuf, newsky)
-
-	call sfree (sp)
-end
-
-
-# APSIMCOLON -- Procedure to process fitsky commands which alter parameters
+# AP_SIMCOLON -- Procedure to process fitsky commands which alter parameters
 # other than the sky fitting parameters themselves.
 
-procedure apsimcolon (ap, out, stid, cmdstr, newskybuf, newsky)
+procedure ap_simcolon (ap, cmdstr)
 
 pointer	ap			# pointer to the apphot structure
-int	out			# output file descriptor
-int	stid			# list id
 char	cmdstr[ARB]		# command string
-int	newskybuf, newsky	# skyfitting parameters
 
 bool	bval
 int	ncmd

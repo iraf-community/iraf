@@ -1,0 +1,24 @@
+.help frame Jan86 images.tv.iis
+.ih
+NAME
+frame -- select frame to be displayed on the image display
+.ih
+USAGE
+frame frame
+.ih
+PARAMETERS
+.ls frame
+Frame to be displayed.
+.le
+.ih
+DESCRIPTION
+The specified frame is displayed on the image display monitor ("stdimage").
+.ih
+EXAMPLES
+To display frame 3:
+
+	cl> frame 3
+.ih
+SEE ALSO
+cv
+.endhelp

@@ -1,0 +1,163 @@
+.help daopars Aug91 noao.digiphot.daophot
+.ih
+NAME
+daopars -- edit the daophot fitting parameters
+.ih
+USAGE
+daopars
+.ih
+PARAMETERS
+.ls varpsf = no
+Is the PSF constant or does it vary across the image? The \fIvarpsf\fR
+parameter is used by the PSF task to determine what type of PSF will
+be computed. The variable
+PSF option models small, smooth and linear changes of the PSF across the image.
+Large numbers of stars spanning the region of interest
+are necessary to compute an accurate model.
+Users should only select the variable psf option if they are certain their
+data conforms to the above model; they are prepared to spend considerable
+time computing a good PSF; they are willing to invest the extra
+computation time necessary to fit a variable PSF model to the stars.
+The value of \fIvarpsf\fR in DAOPARS will be overridden by the value
+stored in the PSF itself.
+.le
+.ls psfrad = 11.0 (scale units)
+The radius of the circle in scale units within which the PSF is defined.
+\fIPsfrad\fR should be somewhat larger than the radius at which the
+intensity of the brightest star of interest fades into the noise.
+\fIPsfrad\fR can never be larger than the value with which the
+PSF was computed but may be smaller, in which case the value stored in
+the PSF image header is overridden.
+If the subtracted images of bright stars are surrounded
+by bright halos \fIpsfrad\fR was too small. On the other hand a value of
+\fIpsfrad\fR which is too large will uselessly consume CPU time
+as the speed of the fitting process can be strong function of the psf
+radius.
+.le
+.ls fitrad = 2.5 (scale units)
+The fitting radius in scale units. Only pixels within the fitting radius of
+the center of a star will
+contribute to the fit computed by the PEAK, NSTAR and ALLSTAR tasks.
+For most images the fitting radius
+should be approximately equal to the FWHM of the PSF. Under severely
+crowded conditions a somewhat smaller value may be chosen in order to improve
+the fit. If the PSF is variable on the other hand,
+it may be necessary to increase the fitting radius to achieve a good fit.
+.le
+.ls matchrad = 1.5 (scale units)
+The tolerance in scale units for matching the stellar x and y centroids in the
+photometry file with the image cursor position. \fIMatchrad\fR is currently
+used by the PSF task to match stars shown on the image
+display with stars in the photometry list.
+.le
+.ls critoverlap = 1.0
+The ratio of the model intensity of a brighter star computed from
+the scaled PSF at a distance of one fitting radius from the center
+of the fainter star to the expected random error computed from the
+readout noise, gain and value of the PSF. The critical overlap
+parameter is used to group stars. In general if a small value such
+as .1 divides all the stars in an image into groups less than
+\fImaxgroup\fR, then the expected random errors will determine
+the accuracy of the photometry. On the other hand if a value of
+crtitcal overlap much greater than one is required to divide up the
+stars crowding errors will dominate random errors. If a value of 1
+is sufficient then crowding and random errors are roughly equivalent.
+.le
+.ls maxiter = 50
+The maximum number of times that the PSF fitting tasks PEAK, NSTAR
+and ALLSTAR will iterate on the fit before giving up.
+.le
+.ls maxgroup = 60
+The maximum numbers of stars that the multiple star fitting tasks
+NSTAR and ALLSTAR will fit simultaneously. NSTAR will simply refuse
+to fit any groups large than \fImaxgroup\fR and set all the
+output magnitudes of these stars to INDEF. ALLSTAR dynmacally regroups the stars
+until the group is either \fImaxgroup\fR or smaller in size or becomes too
+dense to
+fit, in which case the magnitudes of unfitted stars are also set to INDEF.
+.le
+.ls maxnstar = 3000
+The maximum number of stars which PEAK and ALLSTAR will process.
+This should be set to a value somewhat larger than the
+number of stars in the input photometry file.
+.le
+.ls recenter = yes (allstar only)
+Compute new positions as well as magnitudes for all the stars in the
+list.  PEAK and ALLSTAR always recompute new centers.
+.le
+.ls cliprange = 2.5, clipexp = 6.0 (allstar only)
+The parameters of the weighting scheme in ALLSTAR used to resist bad data
+by dynamically
+reweighting bad pixels. For \fIclipexp\fR greater than 1 a
+residual small compared to \fIcliprange\fR standard deviations
+does not have its weight materially altered, one with exactly \fIcliprange\fR
+standard deviations is given precisely half its normal weight, and
+for large residuals the weight falls off as the standard deviation
+to the minus \fIclipexp\fR power. For normal applications it is
+strongly recommended that the user leave these numbers alone.
+.le
+
+.ih
+DESCRIPTION
+
+DAOPARS is a simple parameter set which stores the DAOPHOT fitting parameters
+required by all the DAOPHOT tasks which compute or fit the PSF.
+Typing DAOPARS on the terminal will invoke the EPAR parameter editing
+task. The DAOPARS parameters may be edited from within an EPAR command
+to any task such as PSF which references them. These parameters may also
+be changed on the command line in the usual manner during invocation of any
+task which uses them.
+
+Any given set of DAOPARS parameters may stored in a text file along with
+the data being reduced by simply invoking the :w command from within the
+EPAR task. If the user then sets the value of the \fIdaopars\fR parameter
+in say the PSF task to the name of the file containing the stored
+parameter set, the stored parameters will be used instead of the
+default set in the user's uparam directory.
+
+.ih
+EXAMPLES
+
+1. Print the DAOPARS task parameters.
+
+.nf
+    da> lpar daopars
+.fi
+
+2. Edit the DAOPARS parameters.
+
+.nf
+    da> epar daopars
+.fi
+
+3. Edit the DAOPARS parameters from with the PSF task.
+
+.nf
+    da> epar psf
+
+	... edit a few psf parameters
+
+	... move to the daopars parameter and type :e
+
+	... edit the daopars parameters and type :q
+
+	... finish editing the psf parametera and type ^Z
+.fi
+
+4. Save the current DAOPARS parameter set in a text file daonite1.par.
+   This can also be done from inside a higher level task as in the
+   above example.
+
+.nf
+    da> epar daopars
+
+	... type ":w daonite1.par"  from within epar
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+.endhelp

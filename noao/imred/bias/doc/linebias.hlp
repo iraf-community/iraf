@@ -17,11 +17,13 @@ Output bias subtracted images.  An output images may be the same as its
 matching input image.
 .le
 .ls bias = "[]"
-Bias section applied to the input image to define the bias region.
+Bias section appended to the input image to define the bias region.
+The default section or an empty string will use the full image.
 .le
 .ls trim = "[]"
-Trim section applied to the input image to define the region to be
-bias subtracted and output.
+Trim section appended to the input image to define the region to be
+bias subtracted and output.  The default section or an empty string
+will use the full image.
 .le
 .ls median = no
 Take the median of the bias lines?  If no then the bias lines are averaged.

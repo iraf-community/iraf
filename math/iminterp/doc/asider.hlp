@@ -26,14 +26,16 @@ first derivative of the interpolant at x and so on.
 .le
 .ls nder
 Number of derivatives. Nder = 1 + order of the maximum desired derivative.
-ASIDER checks that nder is reasonable.
+ASIDER checks that nder is reasonable.  Only the function value and
+first two derivatives are provided for the SINC interpolant.
 .le
 .ih
 DESCRIPTION
 The polynomial coefficients are evaluated directly from the data  points
 in the case of the polynomial interpolants and from the B-spline coefficients
 in the case of the bicubic spline. The derivatives are evaluated from
-the polynomial coefficients using nested multiplication.
+the polynomial coefficients using nested multiplication.  The sinc
+derivatives are analytic but are defined only for the first two derivatives.
 .ih
 NOTES
 ASIDER checks that the number of derivatives requested is reasonable.

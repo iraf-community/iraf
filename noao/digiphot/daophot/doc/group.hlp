@@ -1,0 +1,136 @@
+.help group Aug91 noao.digiphot.daophot
+.ih
+NAME
+group -- group stars in a photometry file
+.ih
+USAGE
+group image photfile psfimage groupfile
+.ih
+PARAMETERS
+.ls image
+The list of images containing the stars to be grouped.
+.le
+.ls photfile
+The list of input files, or the directory, containing the photometry for
+the stars to be grouped together. If \fIphotfile\fR is "default",
+"dir$default" or a directory
+specification, GROUP looks for a file called image.mag.? where ?
+is the highest existing version number. Otherwise \fIphotfile\fR must
+specify one photometry file for each input image in \fIimage\fR.
+\fIPhotfile\fR is normally
+the output of the PHOT task but may also be the output of the PSF,
+PEAK, NSTAR and ALLSTAR tasks. \fIPhotfile\fR may be a text file or
+and STSDAS database file.
+.le
+.ls psfimage
+The list of images, or directory, containing the PSF computed
+by the DAOPHOT PSF task. If \fIpsfimage\fR is "default",
+"dir$default", or a directory specification, then GROUP looks for an
+image called image.psf.? where ? is the highest existing version number.
+Otherwise \fIpsfimage\fR must specify one PSF image for each image in
+\fIimage\fR.
+.le
+.ls groupfile = 
+The list of output files which will contain the grouped photometry list.
+If \fIgroupfile\fR is "default", "dir$default", or a directory specification
+then GROUP writes a file called image.grp.? where ? is the next available
+version number. Otherwise \fIgroupfile\fR must specify one output file
+for every input file.
+If the DAOPHOT package parameter \fItext\fR is "yes"
+then a text database is written, otherwise an STSDAS table is written.
+.le
+.ls datapars = ""
+The name of the text file containing the data dependent parameters.
+If \fIdatapars\fR is null ("") then the default parameter set in the
+user's uparm directory is used.
+.le
+.ls daopars = ""
+The name of the text file containing the daophot fitting parameters
+If \fIdaopars\fR is null ("") then the default parameter set in the
+user's uparm directory is used.
+.le
+.ls verbose = no
+Print messages about the progress of the task?
+.le
+.ls verify = yes
+Verify the critical task parameters?
+.le
+.ls update = no
+Update the critical task parameters if \fIverify\fR is "yes"?
+.le
+.ih
+DESCRIPTION
+GROUP takes the photometry file \fIphotfile\fR file containing the stellar
+coordinates and
+photometry and associates the stars into natural groups based upon proximity
+and the magnitude level at which they overlap. The results are
+written into \fIgroupfile\fR.
+If the DAOPHOT package parameter \fItext\fR is "yes"
+then \fIgroupfile\fR is a text database, otherwise it is an STSDAS table.
+
+The algorithm works in the
+following manner. If two stars are within a distance R pixels of one another,
+where R = \fIpsfrad\fR / \fIscale\fR + \fIfitrad\fR / \fIscale\fR + 1,
+the PSF of the brighter one is evaluated at a distance d pixels, where
+d = \fIfitrad\fR / \fIscale\fR + 1 away from the fainter.
+If this value is
+larger than \fIcritoverlap\fR times the expected noise per pixel then the
+two stars are put into the same group since the brighter star is
+capable of affecting the photometry of the fainter.
+\fIPsfrad\fR, \fIfitrad\fR and \fIcritoverlap\fR
+are the psf radius, the fitting radius, and the critical overlap
+respectively and are located
+in the DAOPARS task. \fIScale\fR is the image scale parameter and is
+located in the DATAPARS task. In order for this algorithm to work correctly
+it is imperative that the DATAPARS readnoise and gain parameters \fIreadnoise\fR
+and \fIgain\fR be set correctly as these values are used to compute
+the expected random noise per pixel.
+
+The correct value of \fIcritoverlap\fR must be determined by trial and
+error. For example if a critical overlap of 0.1 divides all the stars
+in the image into groups smaller than the \fImaxgroup\fR parameter
+in the DAOPARS
+task, then unavoidable random errors will dominate over crowding errors.
+If a critical overlap of 1.0 works, then crowding errors will be no worse than
+the random errors. If a critical overlap much greater than 1 is required
+then in most cases crowding will be the dominant source or error.
+
+If \fIverbose\fR is set to "yes", GROUP will write a table on the terminal
+showing the number of groups as a function of group size. If any group is
+larger than \fImaxgroup\fR then \fIcritoverlap\fR must be increased or
+the GRPSELECT task used to cut large groups out of the file. When
+crowding conditions vary across the frame,  GROUP and GRPSELECT
+can be used together to get the best possible photometry for stars in
+different crowding regimes.
+
+If any stars in \fIphotfile\fR have INDEF magnitudes, GROUP will attempt
+to estimate a magnitudes for them based on the weighted sum of the pixels
+within \fIfitrad\fR of the center of the star. The weight is the product
+of a radial weighting function and the value of the PSF at that point.
+
+
+.ih
+EXAMPLES
+
+1. Group the PHOT task output results for a field near n4147 using a
+critical overlap of 1 and printing the output summary on the terminal.
+
+.nf
+    da> group n4147 n4147.mag.1 n4147.psf.1 "default" crit=1.0 verb+
+.fi
+
+2. Run the same job in batch but save the output summary in the file
+group.lis. Remember to turn off the verify switch.
+ 
+.nf
+    da> group n4147 n4147.mag.1 n4147.psf.1 "default" crit=1.0 verb+ \
+	verify- > group.lis &
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+.endhelp

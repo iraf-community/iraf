@@ -2,22 +2,21 @@ include	<pkg/gtools.h>
 
 # ECF_GDATA -- Get graph data for the specified axis type from the fitting data.
 
-procedure ecf_gdata (ecf, type, x, y, z, data, npts)
+procedure ecf_gdata (ecf, type, x, y, z, r, data, npts)
 
 pointer	ecf			# GSURFIT pointer
 int	type			# Axis type
 double	x[npts]			# X fit data
 double	y[npts]			# Y fit data
 double	z[npts]			# Z fit data
+double	r[npts]			# Residuals
 real	data[npts]		# Graph data
 int	npts			# Number of points
 
-pointer	sp, y1, resid
+pointer	sp, v
 include	"ecffit.com"
 
 begin
-	call smark (sp)
-
 	switch (type) {
 	case 'p':
 	    call achtdr (x, data, npts)
@@ -26,24 +25,13 @@ begin
 	case 'w':
 	    call achtdr (z, data, npts)
 	case 'r':
-	    call salloc (y1, npts, TY_DOUBLE)
-	    call salloc (resid, npts, TY_DOUBLE)
-	    call altmd (y, Memd[y1], npts, double(slope), double(offset))
-	    call dgsvector (ecf, x, Memd[y1], Memd[resid], npts)
-	    call adivd (Memd[resid], Memd[y1], Memd[resid], npts)
-	    call asubd (z, Memd[resid], Memd[resid], npts)
-	    call achtdr (Memd[resid], data, npts)
+	    call achtdr (r, data, npts)
 	case 'v':
-	    call salloc (y1, npts, TY_DOUBLE)
-	    call salloc (resid, npts, TY_DOUBLE)
-	    call altmd (y, Memd[y1], npts, double(slope), double(offset))
-	    call dgsvector (ecf, x, Memd[y1], Memd[resid], npts)
-	    call adivd (Memd[resid], Memd[y1], Memd[resid], npts)
-	    call asubd (Memd[resid], z, Memd[resid], npts)
-	    call adivd (Memd[resid], z, Memd[resid], npts)
-	    call amulkd (Memd[resid], 300000.D0, Memd[resid], npts)
-	    call achtdr (Memd[resid], data, npts)
+	    call smark (sp)
+	    call salloc (v, npts, TY_DOUBLE)
+	    call adivd (r, z, Memd[v], npts)
+	    call amulkd (Memd[v], 300000.D0, Memd[v], npts)
+	    call achtdr (Memd[v], data, npts)
+	    call sfree (sp)
 	}
-
-	call sfree (sp)
 end

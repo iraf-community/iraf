@@ -1,49 +1,44 @@
 # EQWIDTH -- Compute equivalent width, flux and center
 
-procedure eqwidth (gfd, wx, wy, x1, x2, dx, pix, ans)
+procedure eqwidth (sh, gfd, wx1, wy1, x, y, n, fd1, fd2)
 
+pointer	sh
 int	gfd
-real	wx, wy, x1, x2, dx
-real	pix[ARB]
-char	ans[ARB]
+real	wx1, wy1
+real	x[ARB]
+real	y[ARB]
+int	n
+int	fd1, fd2
 
 char	command[SZ_FNAME]
-real	wc
-real	eqx1, eqx2, eqy1, eqy2
+real	wx2, wy2
 real	flux_diff, rsum, esum, sum, cont, eqw, ctr
-real	temp, hctr
-int	key, junk
+int	i, wc, key
 
 int	clgcur()
+double	shdr_wl()
 
 begin
-	eqx1 = wx
-	eqy1 = wy
-
 	# Get second position
 	call printf ("e again:")
-	junk = clgcur ("cursor", eqx2, eqy2, wc, key, command, SZ_FNAME)
+	i = clgcur ("cursor", wx2, wy2, wc, key, command, SZ_FNAME)
 
-	# Reverse cursor positions if necessary
-	call fixx (eqx1, eqx2, eqy1, eqy2, x1, x2)
-
-	if (eqx1 == eqx2) {
+	if (wx1 == wx2) {
 	    call printf ("Cannot get EQW - move cursor")
 	    return
 	}
 
 	# Derive the needed values
-	call sumflux (pix, x1, x2, dx, eqx1, eqx2, eqy1, eqy2,
-	    sum, rsum, esum, ctr)
+	call sumflux (sh, x, y, n, wx1, wx2, wy1, wy2, sum, rsum, esum, ctr)
 
 	# Compute difference in flux between ramp and spectrum
-	flux_diff = rsum - sum
+	flux_diff = sum - rsum
 	
 	# Compute eq. width of feature using ramp midpoint as
 	# continuum
-	cont = 0.5 * (eqy1 + eqy2)
+	cont = 0.5 * (wy1 + wy2)
 	if (cont != 0.0)
-	    eqw = abs (flux_diff / cont)
+	    eqw = -flux_diff / cont
 	else
 	    eqw = INDEFR
 
@@ -54,20 +49,27 @@ begin
 #	    call pargr (eqw)
 	    call pargr (esum)
 	    call pargr (cont)
-	    call pargr (-(flux_diff))
+	    call pargr (flux_diff)
 
-	call sprintf (ans, 2*SZ_LINE,
-	    " %9.7g %9.7g %9.6g %9.4g %9w %9w %9w (%7.4g)\n")
-	    call pargr (ctr)
-	    call pargr (cont)
-	    call pargr (-(flux_diff))
-	    call pargr (esum)
-	    call pargr (eqw)
+	if (fd1 != NULL) {
+	    call fprintf (fd1, " %9.7g %9.7g %9.6g %9.4g %9w %9w %9w (%7.4g)\n")
+		call pargr (ctr)
+		call pargr (cont)
+		call pargr (flux_diff)
+		call pargr (esum)
+		call pargr (eqw)
+	}
+	if (fd2 != NULL) {
+	    call fprintf (fd2, " %9.7g %9.7g %9.6g %9.4g %9w %9w %9w (%7.4g)\n")
+		call pargr (ctr)
+		call pargr (cont)
+		call pargr (flux_diff)
+		call pargr (esum)
+		call pargr (eqw)
+	}
 
 	# Draw cursor position
-	temp = (ctr - x1) / dx + 1.0
-	hctr = pix[int(temp)]
-
-	call gline (gfd, eqx1, eqy1, eqx2, eqy2)
-	call gline (gfd, ctr, cont, ctr, hctr)
+	i = max (1, min (n, nint (shdr_wl (sh, double(ctr)))))
+	call gline (gfd, wx1, wy1, wx2, wy2)
+	call gline (gfd, ctr, cont, ctr, y[i])
 end

@@ -1,8 +1,8 @@
-      SUBROUTINE ELSEIF (LAB)
-      INTEGER LAB
-      CALL OUTGO (LAB+1)
-      CALL INDENT (-1)
-      CALL OUTCON (LAB)
-      CALL INDENT (1)
-      RETURN
-      END
+      subroutine elseif (lab)
+      integer lab
+      call outgo (lab+1)
+      call indent (-1)
+      call outcon (lab)
+      call indent (1)
+      return
+      end

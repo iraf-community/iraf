@@ -1,9 +1,0 @@
-input,s,a,,,,List of input two dimensional images
-output,s,a,,,,List of output one dimensional root names
-startrec,i,h,1,0,,Starting output record number
-beamnum,i,h,INDEF,,,Beam number (if INDEF use col or line no.)
-first,i,h,1,1,,First column or line
-last,i,h,INDEF,1,,Last column or line
-step,i,h,1,1,,Step
-nsum,i,h,1,1,,Number of columns or lines to sum
-verbose,b,h,yes,,,Print record of each operation?

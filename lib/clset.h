@@ -2,6 +2,7 @@
 # is not necessarily the IRAF Command Language.
 
 define	CL_PRTYPE	1		# parent process type (see below)
+define	CL_PCACHE	2		# symtab descriptor of param cache
 
 # Process type codes.
 

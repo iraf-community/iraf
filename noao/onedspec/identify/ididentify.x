@@ -1,9 +1,10 @@
 include	<error.h>
 include	<imhdr.h>
 include	<gset.h>
+include	"../shdr.h"
 include	"identify.h"
 
-define	HELP		"noao$lib/scr/identify.key"
+define	HELP		"noao$onedspec/identify/identify.key"
 define	ICFITHELP	"noao$lib/scr/idicgfit.key"
 define	PROMPT		"identify options"
 
@@ -13,23 +14,23 @@ define	ZOOM		2	# Zoom graph
 # ID_IDENTIFY -- Identify features in an image.
 # This is the main interactive loop.
 
-procedure id_identify (id, id_ll)
+procedure id_identify (id)
 
 pointer	id			# ID pointer
-pointer	id_ll			# Line list pointer
 
 real	wx, wy
 int	wcs, key
 char	cmd[SZ_LINE]
 
 char	newimage[SZ_FNAME]
-int	i, j, last, all, prfeature, nfeatures1, npeaks
+int	i, j, last, all, prfeature, nfeatures1, npeaks, newline
 bool	answer
 double	pix, fit, user, shift, pix_shift, z_shift
-pointer	peaks
+pointer	peaks, label
 
+bool	clgetb()
 pointer	gopen()
-int	clgcur(), scan(), nscan(), find_peaks(), errcode()
+int	clgcur(), scan(), nscan(), find_peaks(), errcode(), id_gid()
 double	id_center(), fit_to_pix(), id_fitpt(), id_shift(), id_rms()
 errchk	id_gdata(), id_graph(), id_dbread(), xt_mk1d()
 
@@ -38,15 +39,12 @@ define	newkey_		20
 define	beep_		99
 
 begin
-newim_	 call xt_mk1d (Memc[ID_IMAGE(id)], Memc[ID_SECTION(id)], SZ_FNAME)
-
-	# Get the database entry for the image if it exists.
-	iferr {
-	    call id_dbread (id, Memc[ID_IMAGE(id)], YES)
-	    ID_NEWDBENTRY(id) = NO
-	} then
-	    if ((ID_NFEATURES(id) > 0) || (ID_CV(id) != NULL))
-	        ID_NEWDBENTRY(id) = YES
+newim_
+	# Open the image and return if there is an error.
+	iferr (call id_map (id)) {
+	    call erract (EA_WARN)
+	    return
+	}
 
 	# Get the image data and return if there is an error.
 	iferr (call id_gdata (id)) {
@@ -54,6 +52,13 @@ newim_	 call xt_mk1d (Memc[ID_IMAGE(id)], Memc[ID_SECTION(id)], SZ_FNAME)
 	    return
 	}
 
+	# Get the database entry for the image if it exists.
+	iferr {
+	    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id), NO, YES)
+	    ID_NEWDBENTRY(id) = NO
+	} then
+	    if ((ID_NFEATURES(id) > 0) || (ID_CV(id) != NULL))
+	        ID_NEWDBENTRY(id) = YES
 
 	# Set the coordinate information.
 	iferr (call id_fitdata (id))
@@ -73,9 +78,11 @@ newim_	 call xt_mk1d (Memc[ID_IMAGE(id)], Memc[ID_SECTION(id)], SZ_FNAME)
 	all = 0
 	last = ID_CURRENT(id)
 	newimage[1] = EOS
+	newline = ID_LINE(id)
 	ID_REFIT(id) = NO
 	ID_NEWFEATURES(id) = NO
 	ID_NEWCV(id) = NO
+	wy = INDEF
 	key = 'r'
 
 	repeat {
@@ -90,7 +97,7 @@ newim_	 call xt_mk1d (Memc[ID_IMAGE(id)], Memc[ID_SECTION(id)], SZ_FNAME)
 		if (cmd[1] == '/')
 		    call gt_colon (cmd, ID_GP(id), ID_GT(id), ID_NEWGRAPH(id))
 		else
-		    call id_colon (id, cmd, id_ll, newimage, prfeature)
+		    call id_colon (id, cmd, newimage, prfeature)
 	    case ' ':	# Go to current feature
 	    case '.':	# Go to nearest feature
 		if (ID_NFEATURES(id) == 0)
@@ -175,6 +182,14 @@ newim_	 call xt_mk1d (Memc[ID_IMAGE(id)], Memc[ID_SECTION(id)], SZ_FNAME)
 		ID_CURRENT(id) = 0
 		ID_NEWFEATURES(id) = YES
 		ID_NEWGRAPH(id) = YES
+	    case 'j':	# Go to previous line
+		newline = ID_LINE(id) - ID_NSUM(id)
+		if (newline < 1)
+		    newline = newline + ID_MAXLINE(id)
+	    case 'k':	# Go to next line
+		newline = ID_LINE(id) + ID_NSUM(id)
+		if (newline > ID_MAXLINE(id))
+		    newline = newline - ID_MAXLINE(id)
 	    case 'l':	# Find features from line list
 		if (ID_NFEATURES(id) >= 2)
 		    call id_dofit (id, NO)
@@ -184,7 +199,7 @@ newim_	 call xt_mk1d (Memc[ID_IMAGE(id)], Memc[ID_SECTION(id)], SZ_FNAME)
 		    call id_fitfeatures(id)
 		    ID_NEWCV(id) = NO
 		}
-		call id_linelist (id, id_ll)
+		call id_linelist (id)
 		if (ID_NEWFEATURES(id) == YES)
 		    ID_REFIT(id) = YES
 	    case 'm':	# Mark new feature
@@ -196,22 +211,48 @@ newim_	 call xt_mk1d (Memc[ID_IMAGE(id)], Memc[ID_SECTION(id)], SZ_FNAME)
 		fit = id_fitpt (id, pix)
 		user = fit
 		call id_newfeature (id, pix, fit, user, 1.0D0, ID_FWIDTH(id),
-		    ID_FTYPE(id))
+		    ID_FTYPE(id), NULL)
 		USER(id,ID_CURRENT(id)) = INDEFD
-		call id_match (id_ll, FIT(id,ID_CURRENT(id)),
-		    USER(id,ID_CURRENT(id)), ID_MATCH(id))
+		call id_match (id, FIT(id,ID_CURRENT(id)),
+		    USER(id,ID_CURRENT(id)),
+		    Memi[ID_LABEL(id)+ID_CURRENT(id)-1], ID_MATCH(id))
 		call id_mark (id, ID_CURRENT(id))
-		call printf ("%10.2f %10.8g (%10.8g): ")
+		call printf ("%10.2f %10.8g (%10.8g %s): ")
 		    call pargd (PIX(id,ID_CURRENT(id)))
 		    call pargd (FIT(id,ID_CURRENT(id)))
 		    call pargd (USER(id,ID_CURRENT(id)))
+		    label = Memi[ID_LABEL(id)+ID_CURRENT(id)-1]
+		    if (label != NULL)
+			call pargstr (Memc[label])
+		    else
+			call pargstr ("")
 		call flush (STDOUT)
 		if (scan() != EOF) {
 		    call gargd (user)
-		    if (nscan() == 1) {
+		    call gargwrd (cmd, SZ_LINE)
+		    i = nscan()
+		    if (i > 0) {
 			USER(id,ID_CURRENT(id)) = user
-			call id_match (id_ll, user, USER(id,ID_CURRENT(id)),
-			    ID_MATCH(id))
+			call id_match (id, user, USER(id,ID_CURRENT(id)),
+			    Memi[ID_LABEL(id)+ID_CURRENT(id)-1], ID_MATCH(id))
+		    }
+		    if (i > 1) {
+			call reset_scan ()
+			call gargd (user)
+			call gargstr (cmd, SZ_LINE)
+			call id_label (cmd, Memi[ID_LABEL(id)+ID_CURRENT(id)-1])
+		    }
+		}
+	    case 'o':	# Go to a specified line
+		call printf ("Line/Column (%d): ")
+		    call pargi (ID_LINE(id))
+		    call flush (STDOUT)
+		if (scan() != EOF) {
+		    call gargi (j)
+		    if (nscan() == 1) {
+			if (j < 1 || j > ID_MAXLINE(id))
+			    goto beep_
+			newline = j
 		    }
 		}
 	    case 'p':	# Switch to pan mode
@@ -327,47 +368,61 @@ newim_	 call xt_mk1d (Memc[ID_IMAGE(id)], Memc[ID_SECTION(id)], SZ_FNAME)
 	    case 'u':	# Set user coordinate
 		if (ID_NFEATURES(id) < 1)
 		    goto beep_
-		call printf ("%10.2f %10.8g (%10.8g): ")
+		call printf ("%10.2f %10.8g (%10.8g %s): ")
 		    call pargd (PIX(id,ID_CURRENT(id)))
 		    call pargd (FIT(id,ID_CURRENT(id)))
 		    call pargd (USER(id,ID_CURRENT(id)))
+		    label = Memi[ID_LABEL(id)+ID_CURRENT(id)-1]
+		    if (label != NULL)
+			call pargstr (Memc[label])
+		    else
+			call pargstr ("")
 		call flush (STDOUT)
 		if (scan() != EOF) {
 		    call gargd (user)
-		    if (nscan() == 1) {
+		    call gargwrd (cmd, SZ_LINE)
+		    i = nscan()
+		    if (i > 0) {
 			USER(id,ID_CURRENT(id)) = user
 			ID_NEWFEATURES(id) = YES
+		    }
+		    if (i > 1) {
+			call reset_scan ()
+			call gargd (user)
+			call gargstr (cmd, SZ_LINE)
+			call id_label (cmd, Memi[ID_LABEL(id)+ID_CURRENT(id)-1])
 		    }
 		}
 	    case 'w':	# Window graph
 		call gt_window (ID_GT(id), ID_GP(id), "cursor", ID_NEWGRAPH(id))
 	    case 'y':	# Find peaks
-		call malloc (peaks, ID_NPTS(id), TY_DOUBLE)
-		npeaks = find_peaks (IMDATA(id,1), Memd[peaks], ID_NPTS(id), 0.,
+		call malloc (peaks, ID_NPTS(id), TY_REAL)
+		npeaks = find_peaks (IMDATA(id,1), Memr[peaks], ID_NPTS(id), 0.,
 		    int (ID_MINSEP(id)), 0, ID_MAXFEATURES(id), 0., false)
 		for (j = 1; j <= ID_NFEATURES(id); j = j + 1) {
 		    for (i = 1; i <= npeaks; i = i + 1) {
-		        pix = Memd[peaks + i - 1]
-			if (!IS_INDEFD (pix))
+			if (!IS_INDEF (Memr[peaks+i-1])) {
+			    pix = Memr[peaks+i-1]
 			    if (abs (pix - PIX(id,j)) < ID_MINSEP(id))
-			        Memd[peaks + i - 1] = INDEFD
+			        Memr[peaks+i-1] = INDEF
+			}
 		    }
 		}
 		for (i = 1; i <= npeaks; i = i + 1) {
-		    pix = Memd[peaks+i-1]
-		    if (IS_INDEFD (pix))
+		    if (IS_INDEF(Memr[peaks+i-1]))
 			next
+		    pix = Memr[peaks+i-1]
 		    pix = id_center (id, pix, ID_FWIDTH(id), ID_FTYPE(id))
 		    if (IS_INDEFD (pix))
 			next
 		    fit = id_fitpt (id, pix)
 		    user = INDEFD
-		    call id_match (id_ll, fit, user, ID_MATCH(id))
+		    call id_match (id, fit, user, label, ID_MATCH(id))
 		    call id_newfeature (id, pix, fit, user, 1.0D0,
-			ID_FWIDTH(id), ID_FTYPE(id))
+			ID_FWIDTH(id), ID_FTYPE(id), label)
 		    call id_mark (id, ID_CURRENT(id))
 		}
-		call mfree (peaks, TY_DOUBLE)
+		call mfree (peaks, TY_REAL)
 	    case 'z':	# Go to zoom mode
 		if (ID_NFEATURES(id) < 1)
 		    goto beep_
@@ -389,6 +444,25 @@ newkey_
 	    # If a new image exit loop, update database, and start over.
 	    if (newimage[1] != EOS)
 		break
+
+	    # If a new line, save features and set new line.
+	    if (newline != ID_LINE(id)) {
+		call id_saveid (id, ID_LINE(id))
+		ID_LINE(id) = newline
+		call id_gdata (id)
+		if (id_gid (id, newline) == EOF) {
+		    iferr {
+		        call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id),NO,NO)
+		        ID_NEWDBENTRY(id) = NO
+			ID_NEWFEATURES(id) = NO
+		    } then
+		        if ((ID_NFEATURES(id) > 0) || (ID_CV(id) != NULL))
+		            ID_NEWDBENTRY(id) = YES
+		}
+		ID_NEWCV(id) = YES
+		ID_NEWGRAPH(id) = YES
+		wy = INDEF
+	    }
 
 	    # Refit dispersion function
 	    if (ID_REFIT(id) == YES) {
@@ -416,12 +490,22 @@ newkey_
 
 	    # Set cursor and print status of current feature (unless canceled).
 	    if (ID_CURRENT(id) > 0) {
+		if (IS_INDEF (wy)) {
+		    i = max (1, min (ID_NPTS(id), int (PIX(id,ID_CURRENT(id)))))
+		    wy = IMDATA(id,i)
+		}
+		    
 		call gscur (ID_GP(id), real (FIT(id,ID_CURRENT(id))), wy)
 		if (errcode() == OK && prfeature == YES) {
-	            call printf ("%10.2f %10.8g %10.8g")
+	            call printf ("%10.2f %10.8g %10.8g %s")
 		        call pargd (PIX(id,ID_CURRENT(id)))
 		        call pargd (FIT(id,ID_CURRENT(id)))
 		        call pargd (USER(id,ID_CURRENT(id)))
+			if (Memi[ID_LABEL(id)+ID_CURRENT(id)-1] != NULL)
+			    call pargstr (
+				Memc[Memi[ID_LABEL(id)+ID_CURRENT(id)-1]])
+			else
+			    call pargstr ("")
 		}
 	    }
 
@@ -434,24 +518,50 @@ newkey_
 	call gclose (ID_GP(id))
 
 	# Warn user that feature data is newer than database entry.
-	if (ID_NEWDBENTRY(id) == YES) {
+	if (ID_NEWDBENTRY(id) == YES)
 	    answer = true
-	    call printf ("Write feature data to the database (yes)? ")
-	    call flush (STDOUT)
-	    if (scan() != EOF)
-	        call gargb (answer)
-	    if (answer)
-	        call id_dbwrite (id, Memc[ID_IMAGE(id)], NO)
+	else {
+	    answer = false
+	    for (i = 0; i < ID_NID(id); i = i + 1) {
+	        if (ID_NEWDBENTRY(Memi[ID_ID(id)+i]) == YES) {
+		    answer = true
+		    break
+		}
+	    }
+	}
+	if (answer) {
+	    if (!clgetb ("autowrite")) {
+	        call printf ("Write feature data to the database (yes)? ")
+	        call flush (STDOUT)
+	        if (scan() != EOF)
+	            call gargb (answer)
+	    }
+	    if (answer) {
+		newline = ID_LINE(id)
+		if (ID_NEWDBENTRY(id) == YES)
+	            call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id), NO)
+		for (i = 0; i < ID_NID(id); i = i + 1) {
+	    	    j = Memi[ID_ID(id)+i]
+	    	    if (ID_NEWDBENTRY(j) == YES && ID_LINE(j) != newline) {
+			j =id_gid (id, ID_LINE(j))
+	            	call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id), NO)
+		    }
+		}
+	    }
 	}
 
 	call flush (STDOUT)
 
 	# Free image data.
 	call mfree (ID_PIXDATA(id), TY_DOUBLE)
-	call mfree (ID_IMDATA(id), TY_DOUBLE)
 	call mfree (ID_FITDATA(id), TY_DOUBLE)
+	call id_free1 (id)
 
-	# If a new image was request with colon command start over.
+	call mw_close (MW(ID_SH(id)))
+	call imunmap (IM(ID_SH(id)))
+	call shdr_close (ID_SH(id))
+
+	# If a new image was requested with colon command start over.
 	if (newimage[1] != EOS) {
 	    call strcpy (newimage, Memc[ID_IMAGE(id)], SZ_FNAME)
 	    goto newim_

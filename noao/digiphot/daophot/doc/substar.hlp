@@ -1,0 +1,108 @@
+.help substar Aug91 noao.digiphot.daophot
+.ih
+NAME
+substar -- subtract photometry results from an image using a shifted and
+scaled PSF
+.ih
+USAGE
+substar image photfile psfimage subimage
+.ih
+PARAMETERS
+.ls image
+The list of images from which to subtract the scaled and shifted PSF.
+.le
+.ls photfile
+The list of files, or directory, containing the input photometry.
+If photfile is "default", "dir$default", or a directory specification,
+SUBSTAR will look for a file called image.nst.? where the question
+mark stands for the highest existing version number.
+Otherwise \fIphotfile\fR must specify one photometry file for each
+image in \fIimage\fR.
+\fIPhotfile\fR is usually the output of the NSTAR task but may also
+be the output of the PEAK and ALLSTAR tasks or even the PHOT task.
+\fIphotfile\fR may be an APPHOT/DAOPHOT text database or an STSDAS table.
+.le
+.ls psfimage
+The list of images, or the directory, containing the PSF computed by the
+PSF task.
+If psfimage is "default", "dir$default", or a directory specification,
+then SUBSTAR will
+look for an image called image.psf.? where the question mark stands
+for the highest existing version number. Otherwise \fIpsfimage\fR must
+specify one PSF image for each image in \fIimage\fR.
+.le
+.ls subimage
+The list of output images, or directory where the output subtracted images are
+written.
+If subimage is "default", "dir$default", or a directory specification,
+then SUBSTAR will write an image called image.sub.? where question mark
+stands for the next available version number. Otherwise \fIsubimage\fR
+must specify one output image for every input image.
+.le
+.ls datapars = ""
+The name of the file containing the DAOPHOT data dependent parameters.
+If \fIdatapars\fR is null ("") then the default file in the user's
+uparm directory is used.
+.le
+.ls daopars = ""
+The name of the file containing the DAOPHOT fitting parameters.
+if \fIdaopars\fR is null ("") then the default file in the user's
+uparm directory is used.
+.le
+.ls verbose = no
+Print messages about the progress of the task?
+.le
+.ls verify = yes
+Verify critical SUBSTAR task algorithm parameters before task execution?
+.le
+.ls update = no
+Update critical SUBSTAR task algorithm parameters if \fIverify\fR is "yes"?
+.le
+.ih
+DESCRIPTION
+SUBSTAR task takes an input photometry list \fIphotfile\fR containing
+the fitted coordinates and magnitudes,
+and an input PSF \fIpsfimage\fR, and for each star
+in the photometry list scales and shifts the PSF and subtracts it from the
+input image \fIimage\fR. The final subtracted image is saved in the
+output image \fIsubimage\fR.
+
+The input photometry list can be the output from of the PEAK, NSTAR
+or ALLSTAR tasks or even the PHOT task although most people
+would not want to use the PHOT output for this purpose.
+
+The SUBSTAR task is most commonly used to check on the quality of the
+PSF fitting produced by PEAK and NSTAR, to search for non-stellar
+objects and close binary stars,
+to generate an improved PSF in crowded fields, and to remove
+neighbours from bright stars which are to be used to determine aperture
+corrections.
+
+.ih
+EXAMPLES
+
+1. Subtract the NSTAR photometry results in the file n4147.nst.1 from the
+image n4147 using the PSF stored in image n4147.psf.1. The subtracted image
+will be named n4147.sub.1.
+
+.nf
+	da> substar n4147 n4147.nst.1 n4147.psf.1 default verb+ verify+
+.fi
+
+2. Rerun the example above, submitting the task to the background and
+saving all the verbose results in a file called nstar.out. Remember to turn
+off the verify switch.
+
+.nf
+	da> substar n4147 n4147.nst.1 n4147.psf.1 default verb+ verify- \
+	    > nstar.out &
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+datapars,daopars
+.endhelp

@@ -1,5 +1,5 @@
-define	MAXERR1		100
-define	MAXERR2		200
+define	MAXERR1		500
+define	MAXERR2		1000
 
 # APSTATS -- Procedure to fetch an apphot string parameter.
 

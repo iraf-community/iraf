@@ -2,12 +2,15 @@
 #
 # IEEED.S -- IEEE double to VAX double floating conversions.
 #
-#	ieepakd (x)				# scalar, vax->ieee
-#	ieeupkd (x)				# scalar, ieee->vax
+#	 ieepakd (x)				# scalar, vax->ieee
+#	 ieeupkd (x)				# scalar, ieee->vax
 #	ieevpakd (native, ieee, nelem)		# vector, vax->ieee
 #	ieevupkd (ieee, native, nelem)		# vector, ieee->vax
 #	ieesnand (NaN)				# set VAX NaN value
 #	ieegnand (NaN)				# get VAX NaN value
+#        ieemapd (mapin, mapout)                # enable NaN mapping
+#       ieestatd (nin, nout)                    # get num NaN values mapped
+#      ieezstatd ()                             # zero NaN counters
 #
 # These routines convert between the VAX and IEEE double floating formats,
 # operating upon a single value or an array of values.  +/- zero is converted
@@ -19,6 +22,10 @@
 
 	.data
 vaxnan:	.quad	0
+nanin:  .long   0
+nanout: .long   0
+mapin:  .long   1       # enable input NaN mapping by default for VAX
+mapout: .long   0
 
 	.text
 	.align	1
@@ -28,6 +35,9 @@ vaxnan:	.quad	0
 	.globl	_ieevud_
 	.globl	_ieesnd_
 	.globl	_ieegnd_
+        .globl  _ieemad_
+        .globl  _ieestd_
+        .globl  _ieezsd_
 
 _ieepad_:	# IEEPAKD (X)
 	.word	0x3c
@@ -65,11 +75,40 @@ _ieegnd_:	# IEEGNAND (VAXNAN)
 	.word	0x0
 	movq	vaxnan, *4(ap)
 	ret
+_ieemad_:       # IEEMAPD (MAPIN, MAPOUT)
+        .word   0x0
+        movl    *4(ap), mapin
+        movl    *8(ap), mapout
+        ret
+_ieestd_:       # IEESTATD (NIN, NOUT)
+        .word   0x0
+        movl    nanin, *4(ap)
+        movl    nanout, *8(ap)
+        ret
+_ieezsd_:       # IEEZSTATD ()
+        .word   0x0
+        clrl    nanin
+        clrl    nanout
+        ret
 
 cvt_vax_ieee:					# R4=in, R5=out
-	rotl	$16, (r4)+, r1			# swap words -> r1
-	rotl	$16, (r4)+, r0			# swap words -> r0
+	movl	(r4)+, r1			# get vax double
+	movl	(r4)+, r0			# get vax double
 
+        tstl    mapout                          # map NaNs on output?
+        beql    L4                              # no, just output value
+        cmpl    r0, vaxnan                      # yes, check if reserved value
+        bneq    L4                              # no, just output value
+        cmpl    r1, vaxnan+4                    # yes, check if reserved value
+        bneq    L4                              # no, just output value
+        clrl    r0                              # generate IEEE NaN value
+        clrl    r1                              # generate IEEE NaN value
+        insv    $2047, $20, $11, r1             # insert NaN exponent (2047)
+        incl    nanout                          # increment counter
+        jbr     L5
+L4:
+	rotl	$16, r0, r0			# swap words -> r0
+	rotl	$16, r1, r1			# swap words -> r1
 	extzv	$23, $8, r1, r2			# 8 bit exponent -> r2
 	beql	L6				# branch if zero exponent 
 	extzv	$2, $1, r0, r3			# get round bit -> r3
@@ -112,6 +151,11 @@ cvt_ieee_vax:					# R4=in, R5=out
 	movl	(sp)+, r1			# pop high bits
 	extzv	$20, $11, r1, r2		# exponent -> r2
 	beql	L10				# zero exponent
+        tstl    mapin                           # map NaNs on input?
+        beql    L9                              # no, don't check value
+        cmpl    r2, $2047                       # NaN double has exponent 2047
+        beql    L11                             # yes, output vaxnan
+L9:
 	extzv	$31, $1, r1, r3			# save sign bit
 	ashq	$3, r0, r0			# shift 64 bits left 3 bits
 	subw2	$(1024-130), r2			# adjust exponent bias
@@ -132,4 +176,5 @@ L11:
 	moval	vaxnan, r3			# return VAX equiv. of NaN
 	movl	(r3)+, (r5)+
 	movl	(r3)+, (r5)+
+	incl	nanin
 	rsb

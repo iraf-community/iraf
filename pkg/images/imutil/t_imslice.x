@@ -3,6 +3,7 @@
 include <error.h>
 include <imhdr.h>
 include <ctype.h>
+include <mwset.h>
 
 # T_IMSLICE -- Slice an input image into a list of output images equal in
 # length  to the length of the dimension to be sliced. The remaining
@@ -70,14 +71,18 @@ char	image2[ARB]		# output image
 int	sdim			# slice dimension
 int	verbose			# verbose mode
 
-int	i, j, ndim, fdim, ncols, nlout, nimout
+int	i, j, ndim, fdim, ncols, nlout, nimout, pdim
+int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 pointer	sp, inname, outname, outsect, im1, im2, buf1, buf2, vim1, vim2
-pointer	vs, ve
+pointer	mw, vs, ve
+real	shifts[IM_MAXDIM]
 
-pointer	immap()
+pointer	immap(), mw_openim()
+int	mw_stati()
 int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
 int	imggss(), imggsi(), imggsl(), imggsr(), imggsd(), imggsx()
 int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+bool	envgetb()
 
 errchk	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
 errchk	imggss(), imggsi(), imggsl(), imggsr(), imggsd(), imggsx()
@@ -326,8 +331,37 @@ begin
 		}
 	    }
 
+	    # Update the wcs.
+	    if (! envgetb ("nowcs")) {
+
+		# Open and shift the wcs.
+	        mw = mw_openim (im1)
+	        call aclrr (shifts, ndim)
+		shifts[sdim] = -(i - 1)
+	        call mw_shift (mw, shifts, (2 ** ndim - 1))
+
+		# Get and reset the axis map.
+		pdim = mw_stati (mw, MW_NPHYSDIM)
+		call mw_gaxmap (mw, axno, axval, pdim)
+		do j = 1, pdim {
+		    if (axno[j] < sdim) {
+			next
+		    } else if (axno[j] > sdim) {
+			axno[j] = axno[j] - 1
+		    } else {
+		        axno[j] = 0
+		        axval[j] = i - 1
+		    }
+		}
+		call mw_saxmap (mw, axno, axval, pdim)
+
+	        call mw_savim (mw, im2)
+	        call mw_close (mw)
+	    }
+
 	    call imunmap (im2)
 	}
+
 
 	call imunmap (im1)
 	call sfree (sp)

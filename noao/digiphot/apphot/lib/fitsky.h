@@ -14,43 +14,43 @@ define	AP_OFILT	9	# Optimal filtering
 define	AP_CROSSCOR	10	# Cross correlation method
 define	AP_MEAN		11	# Compute the mean of the sky pixels
 
-# define sky fitting errors (# 1 - 20)
+# define sky fitting errors (# 201 - 300)
 
 define	AP_OK			0	# No error
-define	AP_NOSKYAREA		1	# Width of the annulus is <= 0.0 pixels
-define	AP_SKY_OUTOFBOUNDS	2	# Sky annulus out of bounds
-define	AP_NOHISTOGRAM		3	# Cannot make a histogram
-define	AP_FLAT_HIST		4	# Histogram is flat or concave
-define	AP_NSKY_TOO_SMALL	5	# Too few points for fit
-define	AP_SKY_SINGULAR		6	# Fit is singular
-define	AP_SKY_NOCONVERGE	7	# Solution does not converge
-define	AP_NOGRAPHICS		8	# NULL graphics pointer
-define	AP_NOSKYFILE		9	# NULL sky file descriptor
-define	AP_EOFSKYFILE		10	# End of sky file
-define	AP_BADSKYSCAN		11	# Incomplete scan of sky file
-define	AP_BADPARAMS		12	# Non-physical parameters
+define	AP_NOSKYAREA		201	# Width of the annulus is <= 0.0 pixels
+define	AP_SKY_OUTOFBOUNDS	202	# Sky annulus out of bounds
+define	AP_NOHISTOGRAM		203	# Cannot make a histogram
+define	AP_FLAT_HIST		204	# Histogram is flat or concave
+define	AP_NSKY_TOO_SMALL	205	# Too few points for fit
+define	AP_SKY_SINGULAR		206	# Fit is singular
+define	AP_SKY_NOCONVERGE	207	# Solution does not converge
+define	AP_NOGRAPHICS		208	# NULL graphics pointer
+define	AP_NOSKYFILE		209	# NULL sky file descriptor
+define	AP_EOFSKYFILE		210	# End of sky file
+define	AP_BADSKYSCAN		211	# Incomplete scan of sky file
+define	AP_BADPARAMS		212	# Non-physical parameters
 
-# sky fitting parameters (# 21 - 40)
+# sky fitting parameters (# 201 - 300)
 
-define	ANNULUS		21
-define	DANNULUS	22
-define	SKYFUNCTION	23
-define	K1		24
-define	K2		25
-define	SMAXITER	26
-define	BINSIZE		27
-define	SMOOTH		28
-define	RGROW		29
-define	SKY_BACKGROUND	30
-define	SKY_MODE	31
-define	SKY_SIGMA	32
-define	SKY_SKEW	33
-define	NSKY		34
-define	NSKY_REJECT	35
-define	SNREJECT	36
-define	SXCUR		37
-define	SYCUR		38
-define	SSTRING		39
+define	ANNULUS		201
+define	DANNULUS	202
+define	SKYFUNCTION	203
+define	K1		204
+define	K2		205
+define	SMAXITER	206
+define	BINSIZE		207
+define	SMOOTH		208
+define	RGROW		209
+define	SKY_BACKGROUND	210
+define	SKY_MODE	211
+define	SKY_SIGMA	212
+define	SKY_SKEW	213
+define	NSKY		214
+define	NSKY_REJECT	215
+define	SNREJECT	216
+define	SXCUR		217
+define	SYCUR		218
+define	SSTRING		219
 
 # define sky fitting keywords
 

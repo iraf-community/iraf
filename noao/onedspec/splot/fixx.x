@@ -1,22 +1,27 @@
-# FIXX - Check for bounds on x's
+include	"../shdr.h"
 
-procedure fixx (eqx1, eqx2, eqy1, eqy2, x1, x2)
+# FIXX - Adjust so that pixel indices are increasing.
 
-real	eqx1, eqx2, eqy1, eqy2, x1, x2
+procedure fixx (sh, x1, x2, y1, y2, i1, i2)
 
-real	temp
+pointer	sh
+real	x1, x2, y1, y2
+int	i1, i2
+
+double	z, z1, z2, shdr_wl(), shdr_lw()
 
 begin
-	if ((x1 - x2) * (eqx1 - eqx2) < 0.) {
-	    temp = eqx2
-	    eqx2 = eqx1
-	    eqx1 = temp
-	
-	    temp = eqy2
-	    eqy2 = eqy1
-	    eqy1 = temp
+	z1 = x1
+	z2 = x2
+	z1 = max (0.50D0, min (double (SN(sh)+.499), shdr_wl(sh, z1)))
+	z2 = max (0.50D0, min (double (SN(sh)+.499), shdr_wl(sh, z2)))
+	if (z1 > z2) {
+	    z = y1; y1 = y2; y2 = z
+	    z = z1; z1 = z2; z2 = z
 	}
 
-	eqx1 = max (min (x1, x2), min (max (x1, x2), eqx1))
-	eqx2 = max (min (x1, x2), min (max (x1, x2), eqx2))
+	x1 = shdr_lw (sh, z1)
+	x2 = shdr_lw (sh, z2)
+	i1 = nint (z1)
+	i2 = nint (z2)
 end

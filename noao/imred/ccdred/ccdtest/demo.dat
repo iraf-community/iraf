@@ -16,53 +16,53 @@ imdelete\sZero*.??h,Flat*.??h\n\{%V-\}
 delete\sDemo*\sv-\n\{%V-\}
 \n\{%V-\}
 setinstrument\sdemo\sreview-\n\{		# Set instrument parameters...\}
-lpar\sobserve\n\{			# List observing parameters...\}
-observe\sobs001\s0.\szero\n\{%15000		# Observe zero level images...\}
+lpar\sartobs\n\{				# List observing parameters...\}
+artobs\sobs001\s0.\szero\n\{%15000		# Observe zero level images...\}
 if\s(deftask\s("display")\s==\syes)\n\{%V-\}
 \s\s\s\sdisplay\sobs001\s1\szscale-\n\{%V-\}
 ;\n\{%V-\}
-observe\sobs002\s0.\szero\n\{%V-\}
-observe\sobs003\s0.\szero\n\{%V-\}
-observe\sobs004\s0.\szero\n\{%V-\}
-observe\sobs005\s0.\szero\n\{%V-\}
+artobs\sobs002\s0.\szero\n\{%V-\}
+artobs\sobs003\s0.\szero\n\{%V-\}
+artobs\sobs004\s0.\szero\n\{%V-\}
+artobs\sobs005\s0.\szero\n\{%V-\}
 \n\{%V-\}
-observe.skyrate=0\n\{			# Observe a long dark count...\}
-observe\sobs006\s1000.\sdark\n\{%V-\}
+artobs.skyrate=0\n\{			# Observe a long dark count...\}
+artobs\sobs006\s1000.\sdark\n\{%V-\}
 if\s(deftask\s("display")\s==\syes)\n\{%V-\}
 \s\s\s\sdisplay\sobs006\s1\szscale-\n\{%V-\}
 ;\n\{%V-\}
 \n\{%V-\}
-observe.filter="V"\n\{			# Observe V flat fields...\}
-observe.skyrate=2000\n\{%V-\}
-observe\sobs007\s1.\sflat\n\{%V-\}
+artobs.filter="V"\n\{			# Observe V flat fields...\}
+artobs.skyrate=2000\n\{%V-\}
+artobs\sobs007\s1.\sflat\n\{%V-\}
 if\s(deftask\s("display")\s==\syes)\n\{%V-\}
 \s\s\s\sdisplay\sobs007\s1\szscale-\n\{%V-\}
 ;\n\{%V-\}
-observe\sobs008\s1.\sflat\n\{%V-\}
-observe\sobs009\s1.\sflat\n\{%V-\}
-observe\sobs010\s1.\sflat\n\{%V-\}
-observe\sobs011\s2.\sflat\n\{%V-\}
-observe\sobs012\s2.\sflat\n\{%V-\}
+artobs\sobs008\s1.\sflat\n\{%V-\}
+artobs\sobs009\s1.\sflat\n\{%V-\}
+artobs\sobs010\s1.\sflat\n\{%V-\}
+artobs\sobs011\s2.\sflat\n\{%V-\}
+artobs\sobs012\s2.\sflat\n\{%V-\}
 \n\{%V-\}
-observe.filter="B"\n\{			# Observe B flat fields...\}
-observe.skyrate=1000\n\{%V-\}
-observe\sobs013\s1.\sflat\n\{%V-\}
-observe\sobs014\s2.\sflat\n\{%V-\}
-observe\sobs015\s3.\sflat\n\{%V-\}
-observe\sobs016\s3.\sflat\n\{%V-\}
-observe\sobs017\s3.\sflat\n\{%V-\}
-observe\sobs018\s3.\sflat\n\{%V-\}
+artobs.filter="B"\n\{			# Observe B flat fields...\}
+artobs.skyrate=1000\n\{%V-\}
+artobs\sobs013\s1.\sflat\n\{%V-\}
+artobs\sobs014\s2.\sflat\n\{%V-\}
+artobs\sobs015\s3.\sflat\n\{%V-\}
+artobs\sobs016\s3.\sflat\n\{%V-\}
+artobs\sobs017\s3.\sflat\n\{%V-\}
+artobs\sobs018\s3.\sflat\n\{%V-\}
 \n\{%V-\}
-observe.filter="V"\n\{			# Observe objects...\}
-observe.skyrate=100\n\{%V-\}
-observe\sobs019\s10.\sobject\simdata=dev$pix\n\{%V-\}
+artobs.filter="V"\n\{			# Observe objects...\}
+artobs.skyrate=100\n\{%V-\}
+artobs\sobs019\s10.\sobject\simdata=dev$pix\n\{%V-\}
 if\s(deftask\s("display")\s==\syes)\n\{%V-\}
 \s\s\s\sdisplay\sobs019\s1\szscale-\n\{%V-\}
 ;\n\{%V-\}
-observe\sobs020\s20.\sobject\simdata=dev$pix\n\{%V-\}
-observe.filter="B"\n\{%V-\}
-observe\sobs021\s30.\sobject\simdata=dev$pix\n\{%V-\}
-observe\sobs022\s40.\sobject\simdata=dev$pix\n\{%V-\}
+artobs\sobs020\s20.\sobject\simdata=dev$pix\n\{%V-\}
+artobs.filter="B"\n\{%V-\}
+artobs\sobs021\s30.\sobject\simdata=dev$pix\n\{%V-\}
+artobs\sobs022\s40.\sobject\simdata=dev$pix\n\{%V-\}
 \n\{%V-\}
 lpar\ssubsection\n\{			# Subsection readout parameters...\}
 subsection\sobs023\sobs019\n\{%5000		# Readout a subsection of the CCD...\}

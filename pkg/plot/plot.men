@@ -1,6 +1,7 @@
 	calcomp - Plot metacode on a Calcomp pen plotter
 	contour - Make a contour plot of an image
 	crtpict - Generate greyscale plots of IRAF images
+       gdevices - List available imaging or other graphics devices
       gkidecode - Decode metacode on the standard output
 	 gkidir - Directory listing of metacode file
      gkiextract - Extract individual frames from metacode file
@@ -12,6 +13,8 @@
        nsppkern - Plot metacode on a NSPP (NCAR) plotter device
 	   pcol - Plot a column of an image
 	  pcols - Plot the average of a range of image columns
+     phistogram - Plot or print the histogram of an image or list
+       pradprof - Plot or list the radial profile of a stellar object
 	   prow - Plot a line (row) of an image
 	  prows - Plot the average of a range of image lines
 	pvector - Plot an arbitrary vector in a 2D image

@@ -6,10 +6,11 @@ $checkin  libsys.a lib$
 $exit
 
 libsys.a:	
-	clcache.x	clio.com <clio.h>
+	clcache.x	clio.com <clio.h> <ctype.h>
 	clcmd.x		<clset.h>
 	clcmdw.x	<clset.h>
 	clcpset.x	
+	clepset.x	clpset.h <clio.h>
 	clgcur.x	<ctype.h>
 	clgetb.x	
 	clgetc.x	
@@ -31,6 +32,7 @@ libsys.a:
 	clglpx.x	
 	clglstr.x	
 	clgpset.x	clpset.h
+	clgpseta.x	clpset.h
 	clgpsetb.x	clpset.h
 	clgpsetc.x	clpset.h
 	clgpsetd.x	clpset.h
@@ -41,9 +43,11 @@ libsys.a:
 	clgpsetx.x	clpset.h
 	clgstr.x	
 	clgwrd.x	
+	cllpset.x	clpset.h
 	clopen.x	<config.h> <fset.h> <knet.h> <ttset.h>
 	clopset.x	clpset.h
 	clppset.x	clpset.h
+	clppseta.x	clpset.h
 	clppsetb.x	clpset.h
 	clppsetc.x	clpset.h
 	clppsetd.x	clpset.h

@@ -37,11 +37,11 @@ int	rewind;			/* rewind flag, if magtape	*/
 
 /* C_DEVSTATUS -- Print the current status of the named device.
  */
-c_devstatus (fd, device)
-int	fd;		/* output file		*/
+c_devstatus (device, out)
 char	*device;	/* device name		*/
+int	out;		/* output file		*/
 {
-	XDEVSTATUS (&fd, c_sppstr(device));
+	XDEVSTATUS (c_sppstr(device), &out);
 }
 
 

@@ -34,7 +34,7 @@ end
 
 real procedure ap_cratio (array, nx, ny, sky, noise)
 
-real	array[nx, ARB]		# centering buffer
+real	array[nx,ny]		# centering buffer
 int	nx, ny			# dimensions of the centering buffer
 real	sky			# mean sky value of the data in ADU
 real	noise			# estimate of sky noise in ADU
@@ -66,7 +66,7 @@ end
 
 real procedure ap_pratio (array, nx, ny, sky, noise, padu)
 
-real	array[nx, ARB]		# centering buffer
+real	array[nx,ny]		# centering buffer
 int	nx, ny			# dimensions of the centering buffer
 real	sky			# mean sky value of the data in ADU
 real	noise			# estimate of sky noise in ADU

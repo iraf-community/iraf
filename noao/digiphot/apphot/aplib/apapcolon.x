@@ -1,25 +1,25 @@
 include <error.h>
 include "../lib/apphot.h"
 
-# AP_APCOLON -- Procedure to process colon commands for setting
-# noise fitting parameters.
+# AP_APCOLON -- Process colon commands for setting the top level apphot package
+# parameters.
 
 procedure ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
-    newcenter, newskybuf, newsky, newbuf, newfit)
+	newcenter, newskybuf, newsky, newbuf, newfit)
 
 pointer	ap			# pointer to the apphot structure
 pointer	im			# pointer to the iraf image
 int	cl			# coordinate file descriptor
 pointer	out			# output file descriptor
 int	stid			# output file sequence number
-int	ltid			# coord file sequence number
+int	ltid			# coordinate file sequence number
 char	cmdstr[ARB]		# command string
-int	newcenterbuf, newcenter	# change centering parameters
-int	newskybuf, newsky	# change sky fitting parameters
-int	newbuf, newfit		# change magnitude parameters
+int	newcenterbuf, newcenter	# new centering parameters ?
+int	newskybuf, newsky	# new sky fitting parameters ?
+int	newbuf, newfit		# new photometry parameters ?
 
 bool	bval
-int	ncmd, ip, nchars
+int	ncmd, ip
 pointer	sp, cmd, str
 real	rval
 
@@ -27,10 +27,10 @@ bool	streq(), itob()
 int	strdic(), nscan(), btoi(), apstati(), ctowrd(), open()
 pointer	immap()
 real	apstatr()
-
 errchk	immmap, open
 
 begin
+	# Allocate working space.
 	call smark (sp)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
@@ -106,7 +106,8 @@ begin
 		    call pargstr (KY_FILTER)
 		    call pargstr (Memc[str])
 	    } else {
-	        nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE)
+	        if (ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE) <= 0)
+		    Memc[str] = EOS
 		call apsets (ap, FILTER, Memc[str])
 		if (im != NULL)
 		    call ap_filter (im, ap)
@@ -123,11 +124,40 @@ begin
 		    call pargstr (KY_FILTERID)
 		    call pargstr (Memc[str])
 	    } else {
-	        nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE)
+	        if (ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE) <= 0)
+		    Memc[str] = EOS
 		call apsets (ap, FILTERID, Memc[str])
-		#if (stid > 1)
-		    #call ap_sparam  (out, KY_FILTERID, Memc[str], UN_FILTERID,
-			#"filter")
+	    }
+
+	case APCMD_OBSTIME:
+	    call gargstr (Memc[cmd], SZ_LINE)
+	    if (Memc[cmd] == EOS) {
+		call apstats (ap, OBSTIME, Memc[str], SZ_LINE)
+		call printf ("%s = %s\n")
+		    call pargstr (KY_OBSTIME)
+		    call pargstr (Memc[str])
+	    } else {
+	        if (ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE) <= 0)
+		    Memc[str] = EOS
+		call apsets (ap, OBSTIME, Memc[str])
+		if (im != NULL)
+		    call ap_otime (im, ap)
+		if (stid > 1)
+		    call ap_sparam  (out, KY_OBSTIME, Memc[str], UN_OBSTIME,
+			"obstime keyword")
+	    }
+
+	case APCMD_OTIME:
+	    call gargstr (Memc[cmd], SZ_LINE)
+	    if (Memc[cmd] == EOS) {
+		call apstats (ap, OTIME, Memc[str], SZ_LINE)
+		call printf ("%s = %s\n")
+		    call pargstr (KY_OTIME)
+		    call pargstr (Memc[str])
+	    } else {
+	        if (ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE) <= 0)
+		    Memc[str] = EOS
+		call apsets (ap, OTIME, Memc[str])
 	    }
 
 	case APCMD_AIRMASS:
@@ -138,7 +168,8 @@ begin
 		    call pargstr (KY_AIRMASS)
 		    call pargstr (Memc[str])
 	    } else {
-	        nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE)
+	        if (ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE) <= 0)
+		    Memc[str] = EOS
 		call apsets (ap, AIRMASS, Memc[str])
 		if (im != NULL)
 		    call ap_airmass (im, ap)
@@ -169,7 +200,8 @@ begin
 		    call pargstr (KY_EXPOSURE)
 		    call pargstr (Memc[str])
 	    } else {
-	        nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE)
+	        if (ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE) <= 0)
+		    Memc[str] = EOS
 		call apsets (ap, EXPOSURE, Memc[str])
 		if (im != NULL)
 		    call ap_itime (im, ap)
@@ -252,6 +284,7 @@ begin
 		    call ap_rdnoise (im, ap)
 		    call ap_filter (im, ap)
 		    call ap_airmass (im, ap)
+		    call ap_otime (im, ap)
 		    newcenterbuf = YES; newcenter = YES
 		    newskybuf = YES; newsky = YES
 		    newbuf = YES; newfit = YES

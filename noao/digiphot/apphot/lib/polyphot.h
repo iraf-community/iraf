@@ -1,31 +1,31 @@
 # POLYPHOT header file
 
-# polyphot parameters and answers (# 141 - 160)
+# polyphot error codes (# 801 - 900)
 
-define	PYXMEAN			141
-define	PYYMEAN			142
-define	PYCX			143
-define	PYCY			144
-define	PYFLUX			145
-define	PYNPIX			146
-define	PYNVER			147
-define	PYMINRAD		148
-define	PYX			149
-define	PYY			150
-define	PYZMAG			151
-define	PYMAG			152
-define	PYMAGERR		153
-define	PYNAME			154
-define	PYBADPIX		155
-
-# polyphot error codes (# 141 - 160)
-
-define	PY_NOPOLYGON		141
-define	PY_OUTOFBOUNDS		142
-define	PY_NOPIX		143
-define	PY_NOSKYMODE		144
-define	PY_BADDATA		145
+define	PY_NOPOLYGON		801
+define	PY_OUTOFBOUNDS		802
+define	PY_NOPIX		803
+define	PY_NOSKYMODE		804
+define	PY_BADDATA		805
 define	PY_OK			0
+
+# polyphot parameters and answers (# 801 - 900)
+
+define	PYXMEAN			801
+define	PYYMEAN			802
+define	PYCX			803
+define	PYCY			804
+define	PYFLUX			805
+define	PYNPIX			806
+define	PYNVER			807
+define	PYMINRAD		808
+define	PYX			809
+define	PYY			810
+define	PYZMAG			811
+define	PYMAG			812
+define	PYMAGERR		813
+define	PYNAME			814
+define	PYBADPIX		815
 
 # polyphot keywords
 
@@ -38,7 +38,7 @@ define	UN_PYZMAG	"zeropoint"
 
 # miscellaneous polyphot definitions
 
-define	MAX_NVERTICES		100
+define	MAX_NVERTICES		900
 define	NEXT_POLYGON		0
 define	NEXT_OBJECT		1
 define	THIS_OBJECT		2

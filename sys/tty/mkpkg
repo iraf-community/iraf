@@ -34,7 +34,7 @@ libsys.a:
 	ttygetr.x	<mach.h>
 	ttygets.x	<chars.h>
 	ttygoto.x	tty.h <chars.h>
-	ttygsize.x	
+	ttygsize.x	<fset.h> <ttset.h> <ttyset.h>
 	ttyindex.x	tty.h <chars.h>
 	ttyinit.x	tty.h <chars.h> <error.h> <fset.h>
 	ttyload.x	dev$cachet.dat

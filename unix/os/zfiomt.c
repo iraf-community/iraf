@@ -1,236 +1,605 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/mtio.h>
 #include <sys/errno.h>
-#include <stdio.h>
+#include <ctype.h>
+#include <pwd.h>
+
+/* Define if status logging to sockets is desired. */
+#define TCPIP
+
+#ifdef TCPIP
+#include <signal.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#define	DEFPORT 5138
+#endif
 
 #define	import_kernel
 #define	import_knames
+#define	import_zfstat
 #define import_spp
 #include <iraf.h>
 
 /*
- * ----------------------------------------------------------------------------
- * Hacked version of old unix/iraf magtape driver, for Exabyte on SunOS.
- * This is a "minimum-modification" version of the driver, used to support
- * the Exabyte while the new magtape driver is undergoing burn-in testing.
- * Prepared for V2.9.1 (dct-12Aug90)
+ * ZFIOMT.C -- Programmable magtape kernel interface for UNIX/IRAF systems.
+ * This file contains only the lowest level i/o routines.  Most of the
+ * functionality of the iraf magtape i/o system is provided by the routines
+ * in the VOS interfaces MTIO and ETC.  The dev$tapecap file is used to
+ * describe the magtape devices present on the local host system, and to
+ * characterize the behavior of each device.
  *
- * Note - this driver supports the following devices:
- *	9 track tapes interfaced via drivers other than ST
- *	Exabyte under Sun ST driver on 4.0.3, Sun-3 and Sun-4
- *	Exabyte under Sun ST driver on 4.1, Sun3 and sparcstation
- *	    (probably Sun-4 too but not tested)
- *	Exabyte under Ciprico RT driver on 4.0.3 running on Sun-3.
+ * The behavior of this driver is controlled by parameters given in the
+ * entry for a magtape device in the tapecap file.  The following parameters
+ * are defined (not all of which are necessarily used by the driver).
  *
- * 1/4inch cartridge tape and 9 track via the SCSI driver are not supported
- * in this driver.
+ *	CODE  TYPE  DEFAULT	DESCRIPTION
  *
- * ----------------------------------------------------------------------------
- * Further changes to support Exabyte and HP88780 1/2inch tape drive on SCSI,
- * both under SunOS 4.1 on Sun 470 and 490.  490 fixes contributed by Skip
- * Schaller, Steward Obs.  All these "fixes" were required to work around
- * bugs in the Sun driver - our driver is getting to be quite a kludge as a
- * result.
- * ----------------------------------------------------------------------------
- * Further hacked for SunOS 4.1.1 (there were changes in the Sun magtape driver
- * between 4.1.0 and 4.1.1).  It is no longer known if this particular version
- * of the driver will work for other versions of SunOS, or other devices.
- * ----------------------------------------------------------------------------
- */
-
-/*
- * ZFIOMT.C -- MTIO zz-routines for 4.XBSD Berkeley UNIX.  On this system
- * we can skip records and files in either direction, making it easy to
- * position the tape.  When a file opened for writing is closed, UNIX always
- * writes a new EOT and leaves us positioned between the tapemarks.
- * I/O is not asynchronous.  The mapping of logical magtape names to UNIX
- * device names is defined by the entries in the table "dev$devices", which
- * is read by the VOS before we are called.
+ *	bs    i     0		device block size (0 if variable)
+ *	dn    s     0		density
+ *	dt    s     generic	drive type
+ *	fb    i     1           default FITS blocking factor (recsize=fb*2880)
+ *	fe    i     0		time to FSF equivalent in file Kb
+ *	fs    i     0		approximate filemark size (bytes)
+ *	mr    i     65535	maximum record size
+ *	or    i     63360	optimum record size
+ *	rs    i     0		approximate record gap size (bytes)
+ *	ts    i     0		tape capacity (Mb)
+ *	tt    s     unknown	tape type
+ *
+ *	al    s     none	device allocation info
+ *	dv    s     required	i/o (no-rewind) device file
+ *	lk    s     required    lock file root name (uparm$mt<lk>.lok)
+ *	rd    s     none	rewind device file
+ *	so    s     none	status output device file or socket
+ *
+ *	bo    b     no		BSF positions to BOF
+ *	fc    b     no		device does a FSF on CLRO
+ *	ir    b     no		treat all read errors as EOF
+ *	mf    b     no		enable multifile FSF for forward positioning
+ *	nb    b     no		device cannot backspace
+ *	nf    b     no		rewind and space forward to backspace file
+ *	np    b     no		disable all positioning ioctls
+ *	ow    b     no		backspace and overwrite EOT at append
+ *	re    b     no		read at EOT returns ERR
+ *	rf    b     no		use BSR,FSR to space over filemarks
+ *	ro    b     no		rewind on every open to define position
+ *	rr    b     no		rewind at close-readonly to define position
+ *	se    b     no		device will position past EOT in a read
+ *	sk    b     no		skip record forward after a read error
+ *	ue    b     no		force update of EOT (search for EOT)
+ *	wc    b     no		OPWR-CLWR at EOF writes null file
+ *
+ *	ct    i     builtin	MTIOCTOP code
+ *	bf    i     builtin	BSF ioctl code
+ *	br    i     builtin	BSR ioctl code
+ *	ff    i     builtin	FSF ioctl code
+ *	fr    i     builtin	FSR ioctl code
+ *	ri    i     builtin	REW ioctl code
+ *
+ *	
+ * Many of these parameters are optional.  Some are used by the high level MTIO
+ * code rather than the host level driver.
+ *
+ * The externally callable driver routines are the following.
+ *
+ *	ZZOPMT (device, acmode, devcap, devpos, newfile, chan)
+ *	ZZRDMT (chan, buf, maxbytes, offset)
+ *	ZZWRMT (chan, buf, nbytes, offset)
+ *	ZZWTMT (chan, devpos, status)
+ *	ZZSTMT (chan, param, value)
+ *	ZZCLMT (chan, devpos, status)
+ *	ZZRWMT (device, devcap, status)
+ *
+ * Here, "device" is the name by which the device is known to the driver,
+ * acmode is the access mode, devcap is the tapecap device entry, devpos is a
+ * structure giving the current tape position, amount of tape used, etc, and
+ * newfile is the requested file.  The driver will position to the indicated
+ * file at open time.  The devpos structure is passed in to the driver at open
+ * time and returned to the client at close time.  While i/o is in progress
+ * the driver is responsible for keeping track of the device position.  The
+ * client is responsible for maintaining the position information while the
+ * device is closed.  If the position is uncertain devpos should be passed in
+ * with a negative file number and the driver will rewind to reestablish a
+ * known position.
+ *
+ * The devpos structure (struct mtpos) has the following fields:
+ *
+ *	int	filno		file number
+ *	int	recno		record number
+ *	int	nfiles		number of files on tape
+ *	int	tapeused	total amount of storage used (Kb)
+ *	int	pflags		bitflags describing last i/o operation
+ *
+ * FILNO and RECNO are negative if the position is undefined (unknown).  File
+ * number 1 is the first file.  NFILES is the total number of files on the
+ * tape.  NFILES less than or equal to zero indicates that the number of files
+ * is unknown; the driver will set nfiles when EOT is seen.  The tape can be
+ * positioned to EOT by opening the device at file NFILES+1.  TAPEUSED refers
+ * to the total amount of tape used at EOT, regardless of the current tape
+ * position.  The driver will keep track of tape usage using the device
+ * attributes specified in the tapecap entry.  TAPEUSED less than or equal to
+ * zero indicates that the amount of tape used is unknown.  Both the tape
+ * capacity and TAPEUSED are given in Kb (1024 byte blocks).
+ *
+ *
+ * The following bitflags are defined:
+ *
+ *	MF_ERR		i/o error occurred in last operation
+ *	MF_EOF		a tape mark was seen in the last operation
+ *	MF_EOT		end of tape seen in the last operation
+ *	MF_EOR		a record advance occurred in the last operation
+ *
+ * The PFLAGS field is output only, and is cleared at the beginning of each
+ * i/o request.
  */
 
 extern	int errno;
-extern	char *getenv();
-static	int sunos_version = 0;
-static	int mtioctop, mtiocget;		/* need 4.0.3, 4.1 versions	*/
+typedef unsigned int U_int;
 
-#define	MTDEBUG		"MTDEBUG"	/* define in env. to get debug msgs */
-#define	MAX_ERRIGNORE	10		/* max errs before skiprec	*/
-#define	MAX_ERRCNT	20		/* max errs before EOF		*/
-#define	errcnt		io_flags	/* i/o error count		*/
-#define	KF_ISEXB	001		/* device is Exabyte		*/
-#define	KF_ISHPST	002		/* device is HP88780 on ST	*/
-#define	KF_ISRT		004		/* Ciprico Rimfire driver	*/
-#define	KF_ATEOT	010		/* positioned to EOT		*/
+#define	CONSOLE		"/dev/console"
+#define	MAX_ERRIGNORE	10		/* max errs before skiprec */
+#define	MAX_ERRCNT	20		/* max errs before EOF */
+#define	MAXDEV		8		/* max open magtape devices */
+#define	MAXREC		64512		/* default maximum record size */
+#define	OPTREC		64512		/* default optimum record size */
+#define	SHORTREC	20		/* short record for dummy files */
+#define	RDONLY		0		/* read only */
+#define	WRONLY		1		/* write only */
 
-/* The following are used to store/retrieve the current file number in the
- * flags word.
+/* Tape position information (must agree with client struct).  This is input
+ * by the client at open time and is only modified locally by the driver.
  */
-#define KF_FILENO(f)		((f)>>8)
-#define	KF_SETFILE(f,fileno)	f=(((f)&0377)|((fileno)<<8))
-
-#ifndef MTNBSF
-#define	MTNBSF		11
-#endif
-
-/* MTGET structure for SunOS 4.1 - same as the 4.0.3 structure except for
- * two additional fields at the end.
- */
-struct	x_mtget	{
-	short	mt_type;	/* type of magtape device */
-/* the following two registers are grossly device dependent */
-	short	mt_dsreg;	/* ``drive status'' register */
-	short	mt_erreg;	/* ``error'' register */
-/* optional error info. */
-	daddr_t	mt_resid;	/* residual count */
-	daddr_t	mt_fileno;	/* file number of current position */
-	daddr_t	mt_blkno;	/* block number of current position */
-	u_short	mt_flags;
-	short	mt_bf;		/* optimum blocking factor */
+struct mtpos {
+	int	filno;			/* current file (1=first) */
+	int	recno;			/* current record (1=first) */
+	int	nfiles;			/* number of files on tape */
+	int	tapeused;		/* total tape used (Kb) */
+	int	pflags;			/* i/o status bitflags (output) */
 };
 
+/* MTPOS bitflags. */
+#define	MF_ERR	0001	/* i/o error occurred in last operation */
+#define	MF_EOF	0002	/* a tape mark was seen in the last operation */
+#define	MF_EOT	0004	/* end of tape seen in the last operation */
+#define	MF_EOR	0010	/* a record advance occurred in the last operation */
 
-/* ZZOPMT -- Open the indicated magtape device at the given density.
+/* General magtape device information, for status output. */
+struct mtdev {
+	FILE	*statusout;		/* status out or NULL */
+	int	blksize;		/* device block size */
+	int	recsize;		/* last record size */
+	int	maxrec;			/* maximum record size */
+	int	optrec;			/* optimum record size */
+	int	tapesize;		/* tape capacity (Kb) */
+	int	eofsize;		/* filemark size, bytes */
+	int	gapsize;		/* interrecord gap size, bytes */
+	char	density[SZ_FNAME];	/* tape density, bpi */
+	char	devtype[SZ_FNAME];	/* drive type */
+	char	tapetype[SZ_FNAME];	/* tape type */
+	char	statusdev[SZ_FNAME];	/* status output device */
+};
+
+/* Magtape device descriptor. */
+#define	get_mtdesc(fd)		((struct mtdesc *)zfd[fd].fp)
+#define	set_mtdesc(fd,mp)	zfd[fd].fp = (FILE *)mp
+#define ateot(pp)  (pp->nfiles>0 && pp->filno==pp->nfiles+1 && pp->recno==1)
+#define spaceused(pp) ((pp->nfiles==0 || pp->filno>pp->nfiles) && !ateot(pp))
+
+struct mtdesc {
+	XINT	*chan;			/* file descriptor open device */
+	int	flags;			/* device characteristics */
+	int	acmode;			/* access mode */
+	int	errcnt;			/* i/o error count */
+	int	nbytes;			/* status of last i/o transfer */
+	int	tbytes;			/* byte portion of tapeused */
+	int	mtrew;			/* REW ioctl code */
+	int	mtbsr, mtfsr;		/* BSR,FSR ioctl codes */
+	int	mtbsf, mtfsf;		/* BSF,FSF ioctl codes */
+	U_int	mtioctop;		/* MTIOCTOP code */
+	struct	mtpos mtpos;		/* position information */
+	struct	mtdev mtdev;		/* drive type information */
+	char	iodev[SZ_FNAME];	/* i/o device */
+	char	nr_device[SZ_FNAME];	/* no-rewind-on-close device */
+	char	rw_device[SZ_FNAME];	/* rewind-on-close device */
+};
+
+/* Parameter codes. */
+#define	P_AL	 1		/* allocation stuff */
+#define	P_BF	 2		/* MTBSF */
+#define	P_BO	 3		/* BSF positions to BOF */
+#define	P_BR	 4		/* MTBSR */
+#define	P_BS	 5		/* block size */
+#define	P_CT	 6		/* MTIOCTOP */
+#define	P_DN	 7		/* density */
+#define	P_DT	 8		/* drive type id string */
+#define	P_DV	 9		/* no rewind device */
+#define	P_FC	10		/* device does FSF on close readonly */
+#define	P_FF	11		/* MTFSF */
+#define	P_FR	12		/* MTFSR */
+#define	P_FS	13		/* filemark size, Kb */
+#define	P_IR	14		/* map read errors to EOF */
+#define	P_MF	15		/* enable multifile FSF for fwd positioning */
+#define	P_MR	16		/* max record (i/o transfer) size */
+#define	P_NB	17		/* backspace not allowed */
+#define	P_NF	18		/* rewind and space forward to posn back */
+#define	P_NP	19		/* disable file positioning */
+#define	P_OR	20		/* optimum record size */
+#define	P_OW	21		/* optimize EOT (9tk drives) */
+#define	P_RD	22		/* rewind device */
+#define	P_RE	23		/* read at EOT returns ERR */
+#define	P_RF	24		/* use record skip ioctls to skip filemarks */
+#define	P_RI	25		/* MTREW */
+#define	P_RO	26		/* rewind on every open to define position */
+#define	P_RR	27		/* rewind after close-readonly */
+#define	P_RS	28		/* interrecord gap size, bytes */
+#define	P_SE	29		/* BSF needed after read at EOT */
+#define	P_SK	30		/* skip record forward after read error */
+#define	P_SO	31		/* status output device or socket */
+#define	P_TS	32		/* tape size, Mb */
+#define	P_TT	33		/* tape type id string */
+#define	P_UE	34		/* force update of EOT (search for EOT) */
+#define	P_WC	35		/* open-write/close creates dummy EOT */
+
+/* Tapecap device characteristic bitflags. */
+#define	BO	0000001		/* BSF positions to BOF */
+#define	FC	0000002		/* defines does a FSF on CLRO */
+#define	IR	0000004		/* treat all read errors as EOF */
+#define	MF	0000010		/* enable multifile FSF for fwd positioning */
+#define	NB	0000020		/* device cannot backspace */
+#define	NF	0000040		/* rewind and space forward to position back */
+#define	NP	0000100		/* disable file positioning */
+#define	OW	0000200		/* backspace and overwrite at append */
+#define	RD	0000400		/* rewind-on-close device specified */
+#define	RE	0001000		/* read at EOT can signal error */
+#define	RF	0002000		/* use BSR,FSR to space over filemarks */
+#define	RO	0004000		/* rewind on every open to define position */
+#define	RR	0010000		/* rewind after close-readonly */
+#define	SE	0020000		/* read at EOT leaves past tape mark */
+#define	SK	0040000		/* skip record forward after a read error */
+#define	UE	0100000		/* force update of EOT (search for EOT) */
+#define	WC	0200000		/* CLWR at EOF writes null file */
+
+/* Device characteristic codes. */
+#define	PNAME(a,b)	((((int)(a))<<8)+(int)(b))
+
+/* Device flag table. */
+static struct mtchar {
+	int	pname;		/* 2 byte parameter name code */
+	int	pcode;		/* parameter number */
+	int	bitflag;	/* flag bit */
+	int	isset;		/* value has been set */
+} devpar[] = {
+	{ PNAME('a','l'), P_AL, 0, 0 },
+	{ PNAME('b','f'), P_BF, 0, 0 },
+	{ PNAME('b','o'), P_BO, BO, 0 },
+	{ PNAME('b','r'), P_BR, 0, 0 },
+	{ PNAME('b','s'), P_BS, 0, 0 },
+	{ PNAME('c','t'), P_CT, 0, 0 },
+	{ PNAME('d','n'), P_DN, 0, 0 },
+	{ PNAME('d','t'), P_DT, 0, 0 },
+	{ PNAME('d','v'), P_DV, 0, 0 },
+	{ PNAME('f','c'), P_FC, FC, 0 },
+	{ PNAME('f','f'), P_FF, 0, 0 },
+	{ PNAME('f','r'), P_FR, 0, 0 },
+	{ PNAME('f','s'), P_FS, 0, 0 },
+	{ PNAME('i','r'), P_IR, IR, 0 },
+	{ PNAME('m','f'), P_MF, MF, 0 },
+	{ PNAME('m','r'), P_MR, 0, 0 },
+	{ PNAME('n','b'), P_NB, NB, 0 },
+	{ PNAME('n','f'), P_NF, NF, 0 },
+	{ PNAME('n','p'), P_NP, NP, 0 },
+	{ PNAME('o','r'), P_OR, 0, 0 },
+	{ PNAME('o','w'), P_OW, OW, 0 },
+	{ PNAME('r','d'), P_RD, 0, 0 },
+	{ PNAME('r','e'), P_RE, RE, 0 },
+	{ PNAME('r','f'), P_RF, RF, 0 },
+	{ PNAME('r','i'), P_RI, 0, 0 },
+	{ PNAME('r','o'), P_RO, RO, 0 },
+	{ PNAME('r','r'), P_RR, RR, 0 },
+	{ PNAME('r','s'), P_RS, 0, 0 },
+	{ PNAME('s','e'), P_SE, SE, 0 },
+	{ PNAME('s','k'), P_SK, SK, 0 },
+	{ PNAME('s','o'), P_SO, 0, 0 },
+	{ PNAME('t','s'), P_TS, 0, 0 },
+	{ PNAME('t','t'), P_TT, 0, 0 },
+	{ PNAME('u','e'), P_UE, UE, 0 },
+	{ PNAME('w','c'), P_WC, WC, 0 },
+	{ 0, 0, 0, 0 },
+};
+
+static	int zmtgetfd();
+static	struct mtdesc *zmtdesc();
+static	zmtbsr(), zmtbsf(), zmtfsr(), zmtfsf();
+static	zmtopen(), zmtclose(), zmtfree(), zmtfpos(), zmtrew();
+char	*malloc();
+
+
+/* ZZOPMT -- Open the named magtape device and position to the given file.
  * On output, "newfile" contains the number of the file actually opened,
- * which is less than what was requested if EOT is reached.  The density
- * parameter is ignored since the density was selected when the unix
- * device name was selected from the DEV$DEVICES table.
+ * which may be less than what was requested if EOT is reached.
  */
-ZZOPMT (dev, density, acmode, oldrec, oldfile, newfile, oschan)
-PKCHAR	*dev;		/* unix device name, minus the /dev	*/
-XINT	*density;	/* density; not used at this level	*/
-XINT	*acmode;	/* read_only or write_only for tapes	*/
-XINT	*oldrec;	/* record currently positioned to	*/
-XINT	*oldfile;	/* file currently positioned to		*/
-XINT	*newfile;	/* file to be opened or EOT		*/
-XINT	*oschan;	/* OS channel of opened file		*/
+ZZOPMT (device, acmode, devcap, devpos, newfile, chan)
+PKCHAR	*device;	/* device name */
+XINT	*acmode;	/* access mode: read_only or write_only for tapes */
+PKCHAR	*devcap;	/* tapecap entry for device */
+XINT	*devpos;	/* pointer to tape position info struct */
+XINT	*newfile;	/* file to be opened or EOT */
+XINT	*chan;		/* OS channel of opened file */
 {
-	int	read_only = 0, write_only = 1;
-	int	flags;
+	register int fd;
+	register struct	mtdesc *mp;
+	struct	mtpos *pp;
 
-	/* Get magic for ioctls. */
-	mtsunos();
-
-#ifdef sun
-	/* Discard any saved status if the tape has been rewound, or if it
-	 * has been repositioned to a different file than it was set to
-	 * when the status was last saved.
-	 */
-	if (*oldfile <= 1 || (KF_FILENO(mt_getstat((char *)dev)) != *oldfile))
-	    mt_savestat ((char *)dev, 0);
-
-	/* The following is a special case kludge for the HP88780 used with
-	 * the ST driver under SunOS 4.1.  This driver is brain-damaged when
-	 * it comes to appending files and basically all you can do is
-	 * open-write-close, open-write-close etc.  Any file positioning
-	 * operations other than rewind, or any extra opens will mess things
-	 * up, causing EOT to fail to be written or causing false EOTs to
-	 * be written between files.  To avoid these problems merely open
-	 * for writing and begin writing, if we are appending a file and
-	 * are already positioned to EOT.
-	 *
-	 * In SunOS 4.1.1, the ST driver will runaway when the EOM ioctl is
-	 * issued when the tape is opened already positoned to EOT, hence it
-	 * is necessary to avoid any file positioning for the Exabyte under
-	 * the ST driver as well.  (1/5/91)
-	 */
-	if ((flags = mt_getstat((char *)dev)) &&
-	    (flags & KF_ISHPST) || ((flags & KF_ISEXB) && !(flags & KF_ISRT))) {
-
-	    if (*acmode == WRITE_ONLY && *newfile < 0 && (flags & KF_ATEOT)) {
-		if (getenv (MTDEBUG))
-		    fprintf (stderr, "already at EOT\n");
-		*oschan = zzopenmt ((char *)dev, write_only);
-		if (*oschan == ERR)
-		    *oschan = XERR;
-		else {
-		    *newfile = *oldfile;
-		    zfd[*oschan].errcnt = 0;
-		}
-		KF_SETFILE(zfd[*oschan].flags,*newfile);
-		return;
-	    }
+	/* Open the main device descriptor. */
+	mp = zmtdesc ((char *)device, *acmode, (char *)devcap,
+	    (struct mtpos *)devpos);
+	if (mp == NULL) {
+	    *chan = XERR;
+	    return;
 	}
-#endif
 
-	/* Position to the desired file.  Open the tape read-only for
-	 * positioning, so that an interrupt occurring while seeking to EOT
-	 * for writing will not result in truncation of the tape!
+	zmtdbg1 (mp, "open device %s\n", (char *)device);
+
+	/* Save the channel pointer for the delayed open used for file
+	 * positioning.  If file positioning is needed the device will
+	 * be opened read-only, so that an interrupt occurring while seeking
+	 * to EOT for writing will not result in truncation of the tape!
 	 * BE SURE TO RETURN OSCHAN as soon as the device is physically
-	 * opened, so that the error recovery code can close the file if we
-	 * are interrupted.
+	 * opened, so that the error recovery code can close the file if
+	 * we are interrupted.
 	 */
-	(*oschan) = zzopenmt ((char *)dev, read_only);
-	if (*oschan == ERR) {
-	    *oschan = XERR;
-	    return;
-	} else if (*oschan >= MAXOFILES) {
-	    KF_SETFILE(zfd[*oschan].flags,0);
-	    zzclosemt ((int)*oschan);
-	    *oschan = XERR;
-	    return;
+	mp->chan = chan;
+	*chan = 0;
+
+	/* Initialize the descriptor. */
+	mp->errcnt = 0;
+	mp->tbytes = 0;
+	pp = &mp->mtpos;
+
+	/* Zero counters if position is undefined. */
+	if (pp->filno < 1 || pp->recno < 1) {
+	    pp->nfiles = 0;
+	    pp->tapeused = 0;
 	}
 
-	/* Physically position the tape. */
-	if (zzposmt_ (oschan, oldrec, oldfile, newfile) == XERR) {
-	    KF_SETFILE(zfd[*oschan].flags,0);
-	    zzclosemt ((int)*oschan);
-	    *oschan = XERR;
-	    return;
+	/* Zero counters if new tape? */
+	if (mp->acmode == WRITE_ONLY && (*newfile == 0 || *newfile == 1)) {
+	    pp->nfiles = 0;
+	    pp->tapeused = 0;
 	}
 
-	/* Open file with specified access mode and return OS channel.
+	/* Zero tapeused counter if rewinding and nfiles is still unknown. */
+	if (pp->nfiles == 0 && *newfile == 1)
+	    pp->tapeused = 0;
+
+	/* Status output. */
+	zmtdbg1 (mp, "devtype = %s", mp->mtdev.devtype);
+	zmtdbg1 (mp, "tapetype = %s", mp->mtdev.tapetype);
+	zmtdbg1 (mp, "tapesize = %d", mp->mtdev.tapesize);
+	zmtdbg1 (mp, "density = %s",
+	    mp->mtdev.density[0] ? mp->mtdev.density : "na");
+	zmtdbg1 (mp, "blksize = %d", mp->mtdev.blksize);
+	zmtdbg1 (mp, "acmode = %s", mp->acmode == READ_ONLY ? "read" :
+	    ((*newfile < 0) ? "append" : "write"));
+	zmtdbg2 (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
+	zmtdbg1 (mp, "record = %d", pp->recno);
+	zmtdbg1 (mp, "nfiles = %d", pp->nfiles);
+	zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
+	zmtfls (mp);
+
+	/* Position to the desired file.  Do not move the tape if newfile=0
+	 * or if NP (no-position) is specified for the device.  Rewind the tape
+	 * to get to a known position if current tape position is undefined.
 	 */
-	switch (*acmode) {
-	case READ_ONLY:
-#ifdef sun
-	    /* The following is a kludge for SunOS 4.1; evidently needed
-	     * to synchronize after a rewind.
+	if (*newfile == 0 || (mp->flags & NP)) {
+	    zmtdbg (mp, "file positioning is disabled\n");
+	    zmtfls (mp);
+	}
+	if (*newfile) {
+	    /* Rewind if current position uncertain. */
+	    if ((mp->flags & RO) || pp->filno < 1 || pp->recno < 1) {
+		if (!(mp->flags & NP))
+		    if ((fd = zmtgetfd (mp)) == ERR || zmtrew(fd) == ERR)
+			goto err;
+		pp->filno = pp->recno = 1;
+	    }
+
+	    /* Position to the desired file.  NP disables file positioning,
+	     * in which case we assume the user knows what they are doing
+	     * and we are already there.
 	     */
-	    KF_SETFILE(zfd[*oschan].flags,*newfile);
-	    zzclosemt ((int)*oschan);
-	    *oschan = zzopenmt ((char *)dev, read_only);
-#endif
-	    break;
-	case WRITE_ONLY:
-	    KF_SETFILE(zfd[*oschan].flags,*newfile);
-	    zzclosemt ((int)*oschan);
-	    *oschan = zzopenmt ((char *)dev, write_only);
-	    if (*oschan == ERR)
-		*oschan = XERR;
-	    break;
-	default:
-	    *oschan = XERR;
+	    if (mp->flags & NP)
+		*newfile = (*newfile < 0) ? pp->filno : *newfile;
+	    else if ((*newfile = zmtfpos (mp, *newfile)) == XERR)
+		goto err;
 	}
 
-	zfd[*oschan].errcnt = 0;
-	KF_SETFILE(zfd[*oschan].flags,*newfile);
+	/* Reopen file with write permission if necessary.  */
+	if (mp->acmode == WRITE_ONLY) {
+	    if (*chan) {
+		zmtclose (*chan);
+		zmtdbg (mp, "reopen for writing\n");
+	    }
+	    (*chan) = fd = zmtopen (mp->iodev, WRONLY);
+	    if (fd != ERR)
+		zmtdbg2 (mp,
+		    "device %s opened on descriptor %d\n", mp->iodev, fd);
+	} else
+	    fd = zmtgetfd (mp);
+
+	if (fd == ERR)
+	    goto err;
+	set_mtdesc(fd,mp);
+	mp->errcnt = 0;
+
+	zmtdbg2 (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
+	zmtdbg1 (mp, "record = %d", mp->mtpos.recno);
+	zmtfls (mp);
+
+	if (mp->acmode == WRITE_ONLY)
+	    zmtdbg (mp, "writing...\n");
+	else
+	    zmtdbg (mp, "reading...\n");
+
+	return;
+err:
+	/* Error exit. */
+	zmtfree (mp);
+	*chan = XERR;
 }
 
 
 /* ZZCLMT -- Close magtape.  Write a new EOT mark at the current position
- * if so indicated.
+ * if tape is open for writing, leaving tape positioned ready to write the
+ * next file.
  */
-ZZCLMT (oschan, access_mode, nrecords, nfiles, status)
-XINT	*oschan;
-XINT	*access_mode;
-XINT	*nrecords;
-XINT	*nfiles;
-XINT	*status;
+ZZCLMT (chan, devpos, o_status)
+XINT	*chan;
+XINT	*devpos;
+XINT	*o_status;
 {
-	int	fd = *oschan;
+	register int fd;
+	register struct mtdesc *mp;
+	register struct mtpos *pp;
+	int	status, eof_seen, eor_seen, eot_seen;
 
-	if (*access_mode == WRITE_ONLY) {
-	    zfd[fd].flags |= KF_ATEOT;
-	    KF_SETFILE(zfd[fd].flags,KF_FILENO(zfd[fd].flags)+1);
+	/* Since open files are closed during error recovery and an interrupt
+	 * can occur while closing a magtape file, it is possible that ZZCLMT
+	 * twice, after the host file has been closed and the MP descriptor
+	 * freed.  Watch out for a bad channel number or mp=NULL.
+	 */
+	*o_status = XERR;
+	if ((fd = *chan) <= 0)
+	    return;
+	if ((mp = get_mtdesc(fd)) == NULL)
+	    return;
+	pp = &mp->mtpos;
+
+	eof_seen = 0;
+	eor_seen = 0;
+	eot_seen = 0;
+	status = OK;
+
+	/* Close file and update tape position.
+	 */
+	if (mp->acmode == READ_ONLY) {
+	    /* Rewind if the rewind-after-read flag is set.  This is used on
+	     * devices that can leave the tape in an undefined position after
+	     * a file read.
+	     */
+	    if (mp->flags & RR) {
+		if (zmtrew(fd) == ERR)
+		    status = ERR;
+		else {
+		    pp->filno = pp->recno = 1;
+		    zmtdbg1 (mp, "file = %d", pp->filno);
+		    zmtdbg1 (mp, "record = %d", pp->recno);
+		}
+	    }
+
+	    /* Close device. */
+	    status = zmtclose (fd);
+
+	    /* On some SysV systems closing a tape opened RO causes a skip
+	     * forward to BOF of the next file on the tape.
+	     */
+	    if (mp->flags & FC)
+		eof_seen = 1;
+
+	} else if (pp->recno > 1) {
+	    /* Close WRONLY other than at BOF always writes EOT, advancing
+	     * the file position by one file.
+	     */
+	    status = zmtclose (fd);
+	    eof_seen = 1;
+	    eot_seen = 1;
+
+	} else if (mp->flags & WC) {
+	    /* If a tape is opened for writing and then closed without any
+	     * data being written, a tape mark is written resulting in a
+	     * dummy EOT in the middle of the tape if writing continues.
+	     * Backspace over the the extra tape mark if possible, otherwise
+	     * write a short record.  This will result in an extra dummy
+	     * file being written to the tape but the only alternative is to
+	     * rewind and space forward, or abort on an error.
+	     */
+	    register int flags = mp->flags;
+	    int     blksize = mp->mtdev.blksize;
+	    int     bufsize;
+	    char    *bufp;
+
+	    if ((flags & NB) || ((flags & BO) && !(flags & RF))) {
+		bufsize = blksize ? blksize : SHORTREC;
+		bufsize = max (bufsize, SHORTREC);
+		if ((bufp = malloc(bufsize)) == NULL) {
+		    zmtclose (fd);
+		    status = ERR;
+		} else {
+		    zmtdbg (mp, "no data - null file written\n");
+		    zmtfls (mp);
+		    strcpy (bufp, "[NULLFILE]");
+		    write (fd, bufp, bufsize);
+		    free (bufp);
+		    status = zmtclose (fd);
+		    eof_seen = 1;
+		}
+	    } else {
+		/* Close and write EOT, reopen RDONLY and backspace over it. */
+		status = (zmtclose(fd) == ERR);
+		if (status || (fd = zmtopen (mp->iodev, RDONLY)) == ERR)
+		    status = ERR;
+		else {
+		    status = ((flags & RF) ? zmtbsr : zmtbsf)(fd, 1);
+		    status = (zmtclose(fd) == ERR) ? ERR : status;
+		}
+		eof_seen = 1;
+	    }
+	    eot_seen = 1;
+	} else {
+	    status = zmtclose (fd);
+	    eof_seen = 0;
+	    eot_seen = 1;
 	}
 
-	*status = (zzclosemt(fd) == ERR) ? XERR : XOK;
-	*nfiles = (*access_mode == WRITE_ONLY) ? 1 : 0;
-	*nrecords = 0;
+	/* Update position information and write status output. */
+	pp->pflags = status ? MF_ERR : 0;
+	if (eot_seen) {
+	    pp->pflags |= MF_EOT;
+	}
+	if (eof_seen) {
+	    pp->pflags |= MF_EOF;
+	    pp->filno++;
+	    pp->recno = 1;
+	    if (mp->acmode == WRITE_ONLY) {
+		pp->nfiles = pp->filno - 1;
+		zmtdbg1 (mp, "nfiles = %d", pp->nfiles);
+	    }
+	    if (mp->acmode == WRITE_ONLY || spaceused(pp))
+		mp->tbytes += mp->mtdev.eofsize;
+	    zmtdbg1 (mp, "record = %d", pp->recno);
+	    zmtdbg2 (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
+	}
+	if (eor_seen) {
+	    pp->pflags |= MF_EOR;
+	    pp->recno++;
+	    if (mp->acmode == WRITE_ONLY || spaceused(pp))
+		mp->tbytes += mp->mtdev.gapsize;
+	    zmtdbg1 (mp, "record = %d", pp->recno);
+	}
+	
+	pp->tapeused += ((mp->tbytes + 512) / 1024);
+	zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
+	zmtfls (mp);
+
+	*((struct mtpos *)devpos) = *pp;
+	*o_status = status ? XERR : XOK;
+	zmtfree (mp);
 }
 
 
@@ -240,15 +609,59 @@ XINT	*status;
  * do nothing special in that case.  Tape is left positioned just past the
  * tape mark.
  */
-ZZRDMT (oschan, buf, maxbytes)
-XINT	*oschan;
+ZZRDMT (chan, buf, maxbytes, offset)
+XINT	*chan;
 XCHAR	*buf;
 XINT	*maxbytes;
+XLONG	*offset;		/* fixed block devices only */
 {
-	static	struct mtop mt_fwdskiprecord = { MTFSR, 1 };
-	register int fd, status;
+	register int fd = *chan, mb = (int)*maxbytes;
+	register struct mtdesc *mp = get_mtdesc(fd);
+	register struct mtpos *pp = &mp->mtpos;
+	int	status;
 
-	fd = *oschan;
+	if (mp->mtdev.blksize && (mb % mp->mtdev.blksize)) {
+	    zmtdbg1 (mp,
+		"read request %d not a multiple of device block size\n", mb);
+	    zmtfls (mp);
+	}
+
+	/* Position to the desired record (fixed block devices only). */
+/*
+	if (mp->mtdev.blksize && *offset > 0) {
+	    int    blkno, oldblk;
+	    blkno = *offset / mp->mtdev.blksize + 1;
+	    oldblk = mp->mtpos.recno;
+	    if (blkno != oldblk) {
+		zmtdbg1 (mp, "position to block %d\n", blkno);
+		if (blkno > oldblk) {
+		    if (zmtfsr (fd, blkno - oldblk) == ERR) {
+			status = ERR;
+			goto done;
+		    }
+		} else {
+		    if ((mp->flags & NB) || zmtbsr(fd,oldblk-blkno) == ERR) {
+			status = ERR;
+			goto done;
+		    }
+		}
+		mp->mtpos.recno = blkno;
+	    }
+	}
+ */
+
+	/* Map read error to EOF if RE is set and we are reading the first
+	 * record of a file (i.e. are positioned to EOT) or if IR is set.
+	 */
+	status = read (fd, (char *)buf, mb);
+	if (status == ERR)
+	    if ((mp->flags & RE) && pp->recno == 1) {
+		status = 0;
+	    } else if (mp->flags & IR) {
+		zmtdbg (mp, "read error converted to zero read (EOF)\n");
+		zmtfls (mp);
+		status = 0;
+	    }
 
 	/* If an error occurs on the read we assume that the tape has advanced
 	 * beyond the bad record, and that the next read will return the next
@@ -256,660 +669,1114 @@ XINT	*maxbytes;
 	 * occurs, we try skipping a record forward.  If we continue to get
 	 * read errors, we give up and return a premature EOF on the file.
 	 */
-	if ((status = read (fd, (char *)buf, (int)*maxbytes)) == ERR)
-	    if ((zfd[*oschan].errcnt)++ >= MAX_ERRCNT)
+	if (status == ERR) {
+	    zmtdbg1 (mp, "read error, errno = %d\n", errno);
+	    zmtfls (mp);
+	    if ((mp->errcnt)++ >= MAX_ERRCNT)
 		status = 0;			/* give up; return EOF */
-	    else if (zfd[*oschan].errcnt >= MAX_ERRIGNORE)
-		ioctl ((int)*oschan, mtioctop, (char *)&mt_fwdskiprecord);
-
-	zfd[fd].nbytes = status;
+	    else if ((mp->flags & SK) || mp->errcnt >= MAX_ERRIGNORE)
+		zmtfsr (fd, 1);
+	}
+done:
+	mp->nbytes = status;
+	if (status >= 0 && mp->mtdev.recsize != status)
+	    zmtdbg1 (mp, "recsize = %d", mp->mtdev.recsize = status);
+	zmtfls (mp);
 }
 
 
 /* ZZWRMT -- Write next tape record.  We are supposed to be asynchronous,
- * so save write status for return by next call to ZZWTMT.  It is an error
- * if fewer than the given number of bytes are written.
+ * so save write status for return by next call to ZZWTMT.
  */
-ZZWRMT (oschan, buf, nbytes)
-XINT	*oschan;
+ZZWRMT (chan, buf, nbytes, offset)
+XINT	*chan;
 XCHAR	*buf;
 XINT	*nbytes;
+XLONG	*offset;		/* ignored on a write */
 {
-	register int fd;
-	register int nb;
+	register int fd = *chan, nb = *nbytes;
+	register struct mtdesc *mp = get_mtdesc(fd);
+	int	blksize = mp->mtdev.blksize;
 
-	fd = *oschan;
-	nb = *nbytes;
-	if ((zfd[fd].nbytes = write (fd, (char *)buf, nb)) != nb)
-	    zfd[fd].nbytes = ERR;
+	/* If writing to a blocked device, promote partial blocks to a
+	 * full device block.
+	 */
+	if (blksize > 0 && (nb % blksize)) {
+	    nb += blksize - (nb % blksize);
+	    zmtdbg2 (mp, "partial record promoted from %d to %d bytes\n",
+		*nbytes, nb);
+	}
+
+	if (mp->mtdev.recsize != nb)
+	    zmtdbg1 (mp, "recsize = %d", mp->mtdev.recsize = nb);
+	if ((mp->nbytes = write (fd, (char *)buf, nb)) != nb) {
+	    zmtdbg2 (mp, "write error, status=%d, errno=%d\n",
+		mp->nbytes, errno);
+	    mp->nbytes = ERR;
+	}
+	zmtfls (mp);
 }
 
 
 /* ZZWTMT -- "Wait" for i/o transfer to complete, and return the number of
- * bytes transferred or XERR.  On UNIX, a read at EOF returns a byte count
- * of zero, as required by the interface, so we do not have to do anything
- * special in that case.
+ * bytes transferred or XERR.  A read at EOF returns a byte count of zero.
  */
-ZZWTMT (oschan, nrecords, nfiles, bytecount)
-register XINT	*oschan;
-XINT	*nrecords;
-XINT	*nfiles;
-register XINT	*bytecount;
+ZZWTMT (chan, devpos, o_status)
+XINT	*chan;
+XINT	*devpos;
+XINT	*o_status;
 {
-	register int nb, fd, flags;
-	XINT	status;
+	register int fd = *chan;
+	register struct mtdesc *mp = get_mtdesc(fd);
+	register struct mtpos *pp = &mp->mtpos;
+	register int flags = mp->flags;
+	int	status, eof_seen, eor_seen, eot_seen;
 
-	*nrecords = 0;
-	*nfiles = 0;
+	eof_seen = 0;
+	eor_seen = 0;
+	eot_seen = 0;
+	status = OK;
 
-	fd = *oschan;
-	nb = zfd[fd].nbytes;
-	flags = zfd[fd].flags;
+	if ((status = mp->nbytes) == ERR) {		/* i/o error */
+	    status = ERR;
+	} else if (status == 0) {			/* saw EOF */
+	    if (pp->recno <= 1) {
+		/* A read of zero (EOF) at the beginning of a file signals
+		 * EOT.  The file number does not change.
+		 */
+		pp->nfiles = pp->filno - 1;
+		zmtdbg1 (mp, "nfiles = %d", pp->nfiles);
+		zmtdbg2 (mp, "file = %d%s",
+		    pp->filno, ateot(pp) ? " (EOT)" : "");
+		zmtfls (mp);
+		eot_seen = 1;
 
-	if ((flags & KF_ISEXB) && !(flags & KF_ISRT)) {
-	    /* Sun ST driver for Exabyte won't position to past EOT,
-	     * so we don't need to backspace over the second filemark.
-	     */
-	    if (nb < 0) {
-		nb = XERR;
-	    } else if (nb == 0) {			/* saw EOF */
-		/* if fpos=0 we are at EOT. */
-		if (zfd[fd].fpos > 0)
-		    *nfiles = 1;
-		else
-		    zfd[fd].flags |= KF_ATEOT;
-	    } else {					/* record rd/wr	*/
-		*nrecords = 1;
-		zfd[fd].fpos += nb;
-	    }
-	} else {
-	    /* Backspace over filemark if we hit EOT on a read.
-	     */
-	    if (nb < 0) {
-		nb = XERR;
-	    } else if (nb == 0) {			/* saw EOF */
-		int      nf = 1;
-		if (zzfbmt_ (oschan, &nf, &status) == XERR)
-		    nb = XERR;
-		if (zfd[fd].fpos == 0)
-		    zfd[fd].flags |= KF_ATEOT;
-	    } else {					/* record rd/wr	*/
-		*nrecords = 1;
-		zfd[fd].fpos += nb;
-	    }
+		/* If the device allows us to read past the second filemark
+		 * (SE) we must backspace over the filemark or any further
+		 * reads could result in tape runaway.
+		 */
+		if (flags & SE) {
+		    if ((flags & NB) || (flags & FC) && !(flags & RF)) {
+			/* Cannot backspace; must rewind and space forward. */
+			if (zmtrew(fd) == ERR)
+			    status = ERR;
+			else if (zmtfsf(fd,pp->filno-1) == ERR)
+			    status = ERR;
+		    } else {
+			/* BSR is preferable if we can use it. */
+			if ((((flags & RF) ? zmtbsr : zmtbsf)(fd, 1)) < 0)
+			    status = ERR;
+		    }
+		}
+	    } else
+		eof_seen = 1;
+	} else
+	    eor_seen = 1;
+
+	/* Update position records and output status info. */
+	pp->pflags = (status < 0) ? MF_ERR : 0;
+	if (eot_seen)
+	    pp->pflags |= MF_EOT;
+	if (eof_seen) {
+	    pp->filno++;
+	    pp->recno = 1;
+	    pp->pflags |= MF_EOF;
+	    zmtdbg1 (mp, "record = 1");
+	    if (spaceused(pp))
+		mp->tbytes += mp->mtdev.eofsize;
+	    zmtdbg2 (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
+	}
+	if (eor_seen) {
+	    pp->pflags |= MF_EOR;
+	    if (mp->mtdev.blksize > 0)
+		pp->recno += (status / mp->mtdev.blksize);
+	    else
+		pp->recno++;
+	    if (spaceused(pp))
+		mp->tbytes += mp->mtdev.gapsize;
+	    zmtdbg1 (mp, "record = %d", pp->recno);
 	}
 
-	*bytecount = nb;
-	if (*nfiles)
-	    KF_SETFILE(zfd[fd].flags,KF_FILENO(zfd[fd].flags)+1);
+	if (status >= 0 && spaceused(pp)) {
+	    mp->tbytes += status;
+	    pp->tapeused += mp->tbytes / 1024;
+	    mp->tbytes %= 1024;
+	    zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
+	}
+
+	*((struct mtpos *)devpos) = *pp;
+	*o_status = (status < 0) ? XERR : status;
+	zmtfls (mp);
 }
 
 
-/* ZZRWMT -- Rewind the tape.  Return immediately if possible, i.e., do not
- * wait for the rewind to complete.  We assume that the OS driver will
- * provide synchronization if another tape operation is requested before the
- * rewind completes.
+/* ZZSTMT -- Query a device or device driver parameter.
  */
-ZZRWMT (dev, status)
-PKCHAR	*dev;
-XINT	*status;
+ZZSTMT (chan, param, lvalue)
+XINT    *chan;
+XINT    *param;
+XLONG   *lvalue;
 {
-	int	oschan, read_only=0;
+	register int fd = *chan;
+	register struct mtdesc *mp = get_mtdesc(fd);
+	register struct mtpos *pp = &mp->mtpos;
 
-	/* Get magic for ioctls. */
-	mtsunos();
+        switch (*param) {
+        case FSTT_BLKSIZE:
+	    /* Zero for variable size record devices, nonzero for fixed
+	     * block size devices.
+	     */
+	    (*lvalue) = mp->mtdev.blksize;
+	    break;
+        case FSTT_FILSIZE:
+	    /* When reading there is no way to know the file size, so set
+	     * it to the largest possible value to make all reads in bounds.
+	     * When appending a file the file starts out zero length, so
+	     * set the file size to zero for a write access.
+	     */
+            if (mp->acmode == READ_ONLY)
+		(*lvalue) = MAX_LONG;
+	    else
+		(*lvalue) = 0;
+            break;
+        case FSTT_OPTBUFSIZE:
+            (*lvalue) = mp->mtdev.optrec;
+            break;
+        case FSTT_MAXBUFSIZE:
+            (*lvalue) = mp->mtdev.maxrec;
+            break;
+        default:
+            (*lvalue) = XERR;
+        }
+}
 
-	if ((oschan = zzopenmt ((char *)dev, read_only)) == ERR)
-	    *status = XERR;
-	else if ((*status = zzrewindmt (oschan)) == ERR)
-	    *status = XERR;
-	else
-	    zzclosemt (oschan);
+
+/* ZZRWMT -- Rewind the tape.  This routine is in principle asynchronous but
+ * this is not the case for most unix systems (unless the host driver does
+ * asynchronous rewind with synchronization internally).
+ *
+ * This routine is not part of the normal binary file driver.
+ */
+ZZRWMT (device, devcap, o_status)
+PKCHAR	*device;	/* device name */
+PKCHAR	*devcap;	/* tapecap entry for device */
+XINT	*o_status;
+{
+	register struct	mtdesc *mp;
+	register int fd;
+	int	status;
+
+	/* Open the main device descriptor. */
+	mp = zmtdesc ((char *)device, READ_ONLY, (struct mtpos *)devcap, NULL);
+	if (mp == NULL) {
+	    *o_status = ERR;
+	    return;
+	}
+
+	/* If a rewind-on-close device is defined for this device use that
+	 * to do the rewind, otherwise open the no-rewind device RDONLY and do
+	 * an explicit rewind.  The RD device can also be used to avoid an
+	 * error condition if the device does not support the MTREW ioctl.
+	 */
+	if (mp->flags & RD) {
+	    if ((fd = zmtopen (mp->rw_device, RDONLY)) == ERR)
+		status = ERR;
+	    else
+		status = zmtclose (fd);
+	} else {
+	    if ((fd = zmtopen (mp->iodev, RDONLY)) == ERR) {
+		status = ERR;
+	    } else if (mp->flags & FC) {
+		/* Device does a FSF when closed read-only, making it
+		 * impossible to leave the tape rewound after the close.
+		 * Return ERR to cause MTIO to mark the position undefined,
+		 * forcing a rewind the next time the tape is opened for i/o.
+		 */
+		static FILE *tty = NULL;
+		if (!tty && (tty = fopen (CONSOLE, "a")) != NULL) {
+		    fprintf (tty, "cannot rewind device %s: ", device);
+		    fprintf (tty, "add RD capability to dev$devices entry\n");
+		    fclose (tty);
+		}
+		status = ERR;
+	    } else {
+		/* Normal rewind. */
+		status = zmtrew (fd);
+		status = zmtclose(fd) ? ERR : status;
+	    }
+	}
+
+	zmtdbg (mp, "file = 1");
+	zmtdbg (mp, "record = 1");
+	zmtfls (mp);
+	*o_status = status ? XERR : XOK;
+	zmtfree (mp);
 }
 
 
 /*
- * The remaining routines are used by ZZOPMT, but are
- * NOT FORMALLY PART OF THE INTERFACE.
- * The file and record skip primitives are particularly machine dependent.
+ * INTERNAL INTERFACE ROUTINES.
+ * ----------------------------
  */
 
-/* ZZOPENMT -- Convert the UNIX magtape device into a pathname and open
- * the drive.  Return OS channel to caller.  Do not move tape.
+/* ZMTGETFD -- Open tape read-only, if not already open, and return the
+ * file descriptor as the function value.  If the tape is already open
+ * the only action is to return the file descriptor.  This routine is used
+ * to delay the device open during file positioning operations, so that
+ * it can be skipped if it is not necessary to move the tape.
  */
-zzopenmt (dev, acmode)
-char	*dev;		/* device name or pathname		*/
-int	acmode;		/* read_only or write_only for tapes	*/
+static int
+zmtgetfd (mp)
+register struct	mtdesc *mp;
 {
-	register int fd, flags;
-	char	path[SZ_PATHNAME+1];
+	register int fd;
 
-	/* If the device name is already a pathname leave it alone, else
-	 * prepend the /dev/ prefix.
-	 */
-	strcpy (path, (*(char *)dev == '/') ? "" : "/dev/");
-	strcat (path, (char *)dev);
+	if (*mp->chan > 0)
+	    return (*mp->chan);
 
-	if ((fd = open (path, acmode)) < 0)
-	    return (fd);
-
-	zfd[fd].flags = 0;
-	zfd[fd].fpos = 0;
-	zfd[fd].fp = (FILE *) malloc (strlen(path)+1);
-	strcpy ((char *)zfd[fd].fp, path);
-
-	/* Determine the tape type.  This version of the driver supports
-	 * 1/2inch (Pertek style) drives, and Exabyte.  Sun/OS dependent.
-	 */
-#ifdef sun
-	{   struct    x_mtget mt;
-	    char      *dv, *ip;
-
-	    if ((ioctl(fd,mtiocget,&mt) != -1) && mt.mt_type == MT_ISEXABYTE)
-		zfd[fd].flags |= KF_ISEXB;
-	    else if (mt.mt_type == MT_ISHP)
-		zfd[fd].flags |= KF_ISHPST;
-
-	    /* Test for Ciprico driver (/dev/nrrtN) instead of Sun SCSI
-	     * driver (/dev/nrstN).  This kludge does not pretend to support
-	     * any other Exabyte interfaces...
-	     */
-	    for (dv=ip=path;  *ip;  ip++)
-		if (*ip == '/')
-		    dv = ip + 1;
-	    if (!strncmp (dv, "nrrt", 4) || !strncmp (dv, "nrt", 3))
-		zfd[fd].flags |= KF_ISRT;
+	*mp->chan = fd = zmtopen (mp->iodev, RDONLY);
+	if (fd >= MAXOFILES) {
+	    zmtclose (fd);
+	    fd = ERR;
 	}
-#endif
-	flags = mt_getstat ((char *)zfd[fd].fp);
-	if (flags & KF_ATEOT)
-	    zfd[fd].flags |= KF_ATEOT;
-	KF_SETFILE(zfd[fd].flags,KF_FILENO(flags));
+
+	if (fd == ERR)
+	    zmtdbg1 (mp, "failed to open device %s\n", mp->iodev);
+	else {
+	    zmtdbg2 (mp, "device %s opened on descriptor %d\n", mp->iodev, fd);
+	    set_mtdesc (fd, mp);
+	    mp->errcnt = 0;
+	    mp->tbytes = 0;
+	}
 
 	return (fd);
 }
 
 
-/* ZZCLOSEMT -- Close the magtape device.
- */
-zzclosemt (oschan)
-int	oschan;
-{
-	if (getenv (MTDEBUG))
-	    fprintf (stderr,
-		"close at file %d\n", KF_FILENO(zfd[oschan].flags));
-
-	mt_savestat ((char *)zfd[oschan].fp, zfd[oschan].flags);
-	free ((char *)zfd[oschan].fp);
-	return (close (oschan));
-}
-
-
-/* ZZREWINDMT -- Rewind primitive.  Unfortunately this is not asynchronous
- * on our UNIX system (it should be if possible).  A different driver would
- * fix the problem.
- */
-zzrewindmt (oschan)
-int	oschan;
-{
-	static	struct mtop mt_rewind = { MTREW, 1 };
-
-	if (getenv (MTDEBUG))
-	    fprintf (stderr, "rewind %s\n", (char *)zfd[oschan].fp);
-
-	/* Keep track of where we are. */
-	KF_SETFILE(zfd[oschan].flags,1);
-
-	/* NOSTRICT */
-	return (ioctl (oschan, mtioctop, (char *)&mt_rewind));
-}
-
-
-/* ZZPOSMT -- Position to the beginning of a file or to EOT.  Return the
- * actual file number in "newfile".
- */
-zzposmt_ (oschan, oldrec, oldfile, newfile)
-register XINT	*oschan;
-XINT	*oldrec;
-XINT	*oldfile;
-XINT	*newfile;
-{
-	register int new, old, rec;
-	int	flags = zfd[*oschan].flags;
-	XINT	status = XOK;
-
-	new = *newfile;
-	old = *oldfile;
-	rec = *oldrec;
-
-	if (getenv (MTDEBUG)) {
-	    if (new < 0)
-		fprintf (stderr, "position to EOT\n");
-	    else
-		fprintf (stderr, "position to file %d\n", new);
-	}
-
-	if (new == 0) {					/* do not move tape */
-	    status = XOK;
-
-	} else if (new == 1) {				/* rewind tape */
-	    status = (zzrewindmt ((int)*oschan) == ERR) ? XERR : XOK;
-	    zfd[*oschan].flags &= ~KF_ATEOT;
-
-	} else if (new > 1 && new <= old) {		/* backspace file */
-	    if (new < old || rec > 1)
-		zfd[*oschan].flags &= ~KF_ATEOT;
-#ifdef sun
-	    if ((flags & KF_ISEXB) && !(flags & KF_ISRT)) {
-		/* Under SunOS 4.0.3, the Exabyte (actually the st driver)
-		 * BSF positions to the the first record of a file, rather
-		 * than spacing back over the file mark, so BSF-0 rewinds
-		 * the current file, BSF-1 goes to the preceeding file, etc.
-		 */
-		if (sunos_version == 403) {
-		    struct  x_mtget mt;
-		    int     nf = old - new;
-
-		    /* The Sun 4.0.3 st driver has a hard time keeping track
-		     * of the number of files on the tape and the current tape
-		     * position and won't backspace to the desired file if it
-		     * thinks there aren't that many files on the tape.  The
-		     * workaround is to rewind and space forward.
-		     */
-		    if (ioctl (*oschan, mtiocget, &mt) != ERR)
-			if (mt.mt_fileno < nf || mt.mt_fileno == 1 && nf == 1) {
-			    zzrewindmt ((int)*oschan);
-			    old = rec = 1;
-			    goto fwd;
-			}
-
-		    /* Backspace to the desired file. */
-		    zzfbmt_ (oschan, &nf, &status);
-		} else {
-		    /* For SunOS 4.1 BSF reverts to its usual function, and the
-		     * nfiles bug is fixed.
-		     */
-		    struct  mtop mt;
-		    int     nf = old - new;
-
-		    mt.mt_op = MTNBSF;
-		    mt.mt_count = nf;
-		    status = ((ioctl(*oschan,mtioctop,&mt)) == -1) ? XERR:XOK;
-		}
-	    } else if ((flags & KF_ISHPST) && (flags & KF_ATEOT)) {
-		zzrewindmt (*oschan);
-		zfd[*oschan].flags &= ~KF_ATEOT;
-		old = rec = 1;
-		goto fwd;
-	    } else
-#endif
-	    {
-		int     nf = 1;
-		while (new <= old--)
-		    if (zzfbmt_ (oschan, &nf, &status) == XERR)
-			break;
-		if (status != XERR)
-		    zzrfmt_ (oschan, &status);
-	    }
-#ifdef sun
-#ifdef SUNOS403
-	} else if ((flags & (KF_ISEXB|KF_ISHPST)) && !(flags & KF_ISRT)
-	    && new < 0) {
-#else
-	} else if ((flags & KF_ISHPST) && new < 0) {
-#endif
-
-	    /* Position to EOT on Exabyte or SCSI/HP using MTEOM ioctl. */
-	    struct  x_mtget omt, nmt;
-	    struct  mtop mteom;
-
-	    ioctl (*oschan, mtiocget, &omt);
-	    mteom.mt_op = MTEOM;
-	    mteom.mt_count = 0;
-	    if (ioctl ((int)*oschan, mtioctop, (char *)&mteom) == ERR)
-		status = XERR;
-
-	    ioctl (*oschan, mtiocget, &nmt);
-	    *newfile = old + nmt.mt_fileno - omt.mt_fileno;
-	    rec = 1;
-#endif
-	} else {					/* forward, EOT */
-fwd:	    /* EOT is flagged as new < 0.
-	     */
-	    while (old < new || new < 0) {
-		/* Skip forward to the next tape mark.  This has to be done
-		 * carefully to prevent tape runaway.  We detect EOT by noting
-		 * that if oldrec=1 and zzrfmt_ immediately passes a tapemark,
-		 * we have a zero length file and have therefore passed the
-		 * second tapemark of the EOT marker.
-		 */
-		zzrfmt_ (oschan, &status);
-		if (status == XERR) {
-		    /* If we get an error on the forward skip record it is
-		     * probably harmless, since the next operation will likely
-		     * be a skip file anyhow.
-		     */
-		    fprintf (stderr, "Warning [file=%d, record=%d, errno=%d]: ",
-			old, rec, errno);
-		    fprintf (stderr, "possible tape positioning error\n");
-		    status = XOK;
-		}
-
-		if (status == XEOF && rec == 1) {
-		    /* At EOT. */
-		    if (flags & KF_ISEXB) {
-			if (flags & KF_ISRT) {
-			    /* The Ciprico Exabyte/RT driver uses two tape
-			     * marks to mark EOT, and leaves the tape
-			     * positioned to after the second tape mark.
-			     */
-			    zzrbmt_ (oschan, &status);
-			} else {
-			    /* Already at EOT, no need to do anything. */
-			}
-		    } else {
-			/* Skip back and then forward over the first tape
-			 * mark to cancel the inter record gap between the
-			 * two tape marks.
-			 */
-			zzrbmt_ (oschan, &status);
-			zzrbmt_ (oschan, &status);
-			zzrfmt_ (oschan, &status);
-		    }
-		    break;
-		} else if (status != XEOF) {
-		    /* File skip the remainder of the records to avoid loading
-		     * the system with skip record system calls.
-		     */
-		    zzffmt_ (oschan, &status);
-		}
-
-		if (status == XERR)
-		    break;
-
-		old++;
-		rec = 1;
-	    }
-	    *newfile = old;
-	}
-done:
-	if (status == XERR)
-	    *newfile = XERR;
-
-	return (*newfile);
-}
-
-
-/* ZZRFMT -- Skip record forward.  Advance one record forward.  Return XOK if
- * an ordinary record is successfully skipped, XEOF if a tape mark is skipped,
- * or XERR if there is any error.  READ rather than IOCTL is used to skip a
- * record because all unix device drivers do not return EOF when the record
- * is a tape mark.  READ should always return 0 when a tapemark is seen.
- * We assume that if we read part of a record the drive physically reads the
- * entire record.
+/* ZMTOPEN -- Convert the magtape device name into a unix pathname and open
+ * the drive.  Do not move the tape.
  *
- * NOTES - This routine has caused portability problems on various machines.
- * The mtio skip record function should not be used because it does not
- * reliably return -1 (EOF) when a tape mark is seen.  A read should always
- * return 0 at EOF since that is standard unix, but on some machines if the
- * buffer size requested is smaller than the tape block size, ERR is returned,
- * whereas on other machines the amount of data read is returned.  The current
- * solution is to use read() to read into a buffer larger than the maximum
- * tape block size; anything greater than 28800 (FITS blocked to 10) is a
- * nice number.  Unfortunately, this can also cause problems if we use automatic
- * storage for the buffer, but we want to use auto storage (rather than malloc)
- * for efficiency reasons.  The number 29184 (512 * 57) is used because the
- * more logical choice, 32768, causes a compile failure on at least one unix
- * host due to limitations on the internal compiler data structures.
+ * Devices can be specified as
+ *
+ *	devname		system device name in /dev or /dev/rmt
+ *	/devpath	full pathname of device
+ *	~/devpath	user home directory relative pathname
+ *
+ * Returns the unix file descriptor or ERR.
  */
-zzrfmt_ (oschan, status)
-XINT	*oschan;
-XINT	*status;
+static
+zmtopen (dev, u_acmode)
+char	*dev;		/* device name or pathname		*/
+int	u_acmode;	/* read only or write only for tapes	*/
 {
-	register int	nb;
-#ifdef sun
-	/* The 4/490 st driver complains about odd byte DMA, so let's super
-	 * align everything.  [fix contrib. by Skip Schaller, Steward Obs.]
+	char	path[SZ_PATHNAME+1];
+	int	fd = ERR;
+
+	/* If the device name is already a pathname leave it alone, else
+	 * prepend the /dev/ or /dev/rmt prefix.  The device file can be
+	 * in the user's home directory if ~/dev is specified.
 	 */
-	long	lbuf[65532/sizeof(long)];
-	char	*buf = (char *)lbuf;
-#else
-	char	buf[29184];
-#endif
+	if (dev[0] == '/') {
+	    /* Full pathname. */
+	    fd = open (dev, u_acmode);
 
-	/* The following subtlety was found to be necessary on the Sun-4.
-	 * The first time the process is run it is likely that the hardware
-	 * stack will not be large enough for the big buffer.  The first
-	 * reference to BUF will cause an access violation, which is supposed
-	 * to cause UNIX to quietly increase the stack size.  However, this
-	 * fault was occuring during the read from the tape, and due to a bug
-	 * in the tape driver would result in a read error returning errno 14,
-	 * EFAULT or bad address (fault during execution of system call).
-	 * The dummy assignment below causes this fault to occur during
-	 * user process execution to workaround the bug, and is harmless if
-	 * not needed.
-	 */
-	buf[0] = 0;
-
-#ifdef sun
-	nb = read ((int)*oschan, buf, 65532);
-#else
-	nb = read ((int)*oschan, buf, 29184);
-#endif
-	if (nb < 0)
-	    return (*status = (zfd[*oschan].flags&KF_ISEXB) ? XEOF :  XERR);
-	else if (nb == 0)
-	    return (*status = XEOF);
-	else
-	    return (*status = XOK);
-}
-
-
-/* ZZRBMT -- Skip record backward.
- */
-zzrbmt_ (oschan, status)
-XINT	*oschan;
-XINT	*status;
-{
-	static	struct mtop mt_backskiprec = { MTBSR, 1 };
-
-	/* Ignore i/o errors (errno=EIO); ERR may be returned when skipping
-	 * back over a filemark.
-	 */
-	if (ioctl ((int)*oschan, mtioctop, (char *)&mt_backskiprec) == ERR)
-	    *status = ((errno == EIO) ? XOK : XERR);
-	else
-	    *status = XOK;
-
-	return (*status);
-}
-
-
-/* ZZFBMT -- Skip file backward.
- */
-zzfbmt_ (oschan, nfiles, status)
-XINT	*oschan;
-XINT	*nfiles;		/* nfiles == 0 rewinds current file. */
-XINT	*status;
-{
-	struct	mtop mt_backskipfile;
-
-	mt_backskipfile.mt_op = MTBSF;
-	mt_backskipfile.mt_count = *nfiles;
-
-	if (ioctl ((int)*oschan, mtioctop, (char *)&mt_backskipfile) == ERR)
-	    *status = XERR;
-	else
-	    *status = XOK;
-
-	return (*status);
-}
-
-
-/* ZZFFMT -- Skip file forward.
- */
-zzffmt_ (oschan, status)
-XINT	*oschan;
-XINT	*status;
-{
-	static	struct mtop mt_fwdskipfile = { MTFSF, 1 };
-
-	if (ioctl ((int)*oschan, mtioctop, (char *)&mt_fwdskipfile) == ERR)
-	    *status = XERR;
-	else
-	    *status = XOK;
-
-	return (*status);
-}
-
-
-/* MTSUNOS -- Get magic for ioctls.  This nonsense is necessary in order to
- * compile a binary on 4.0.3 that can be used with 4.1.  The cases are
- * necessary because the mtget structure changed between 4.0.3 and 4.1,
- * and because it contains a hole which is aligned * differently on a Sun-3
- * and sparc.
- */
-mtsunos()
-{
-	switch (set_sunos_version()) {
-	case 403:
-#ifdef sparc
-	    mtioctop = 0x80086d01;
-	    mtiocget = 0x40146d02;
-#else
-	    mtioctop = 0x80066d01;
-	    mtiocget = 0x40126d02;
-#endif
-	    break;
-	case 41:
-#ifdef sparc
-	    mtioctop = 0x80086d01;
-	    mtiocget = 0x40186d02;
-#else
-	    mtioctop = 0x80066d01;
-	    mtiocget = 0x40166d02;
-#endif
-	    break;
-	default:
-	    mtioctop = MTIOCTOP;
-	    mtiocget = MTIOCGET;
-	    break;
-	}
-}
-
-
-/* Try to determine whether we are running on SunOS 4.0.3 or 4.1.
- */
-set_sunos_version()
-{
-	static	char *s1 = "SunOS Release 4.0.3";
-	static	char *s2 = "SunOS Release 4.1";
-	static	char *s3 = "SunOS 4.0.3";
-	static	char *s4 = "SunOS 4.1";
-
-	char	lbuf[SZ_LINE+1];
-	FILE	*fp;
-
-	if (sunos_version)
-	    return (sunos_version);
-
-	if ((fp = fopen ("/etc/motd", "r")) != NULL) {
-	    fgets (lbuf, SZ_LINE, fp);
-	    fclose (fp);
-
-	    if (strncmp (lbuf, s1, strlen(s1)) == 0) {
-		sunos_version = 403;
-		goto done;
-	    } else if (strncmp (lbuf, s2, strlen(s2)) == 0) {
-		sunos_version = 41;
-		goto done;
+	} else if (dev[0] == '~' && dev[1] == '/') {
+	    /* User home directory relative pathname. */
+	    struct  passwd *pwd;
+	    pwd = getpwuid (getuid());
+	    if (pwd != NULL) {
+		strcpy (path, pwd->pw_dir);
+		strcat (path, &dev[1]);
+		endpwent();
+		fd = open (path, u_acmode);
+	    }
+	} else {
+	    /* System device. */
+	    strcpy (path, "/dev/");
+	    strcat (path, dev);
+	    if ((fd = open (path, u_acmode)) == ERR) {
+		/* If that fails take a look in /dev/rmt too, since this
+		 * is where some SysV systems like to hide raw magtape device
+		 * files.
+		 */
+		strcpy (path, "/dev/rmt/");
+		strcat (path, dev);
+		fd = open (path, u_acmode);
 	    }
 	}
 
-	if ((fp = fopen ("/usr/etc/upgrade/TOC", "r")) != NULL) {
-	    fgets (lbuf, SZ_LINE, fp);
-	    fclose (fp);
-
-	    if (strncmp (lbuf, s3, strlen(s3)) == 0) {
-		sunos_version = 403;
-		goto done;
-	    } else if (strncmp (lbuf, s4, strlen(s4)) == 0) {
-		sunos_version = 41;
-		goto done;
-	    }
-	}
-done:
-	return (sunos_version);
+	return (fd);
 }
 
 
-#define	NSAVE	5
-struct	sv {
-	int	flags;
-	char	sv_dev[SZ_FNAME];
-};
-static	struct sv svv[NSAVE];
-static	int svnext;
-
-/* MT_SAVESTAT, MT_GETSTAT -- This is a kludge to save the ATEOT flag
- * over a close, which frees the runtime descriptor.
+/* ZMTCLOSE -- Close a magtape device.
  */
-mt_getstat (device)
-char	*device;
-{
-	register int	i;
-	register struct sv *sp;
-	char	path[SZ_FNAME];
-
-	strcpy (path, (*device == '/') ? "" : "/dev/");
-	strcat (path, device);
-
-	for (i=0;  i < NSAVE;  i++) {
-	    sp = &svv[i];
-	    if (sp->sv_dev[0] && strcmp (path, sp->sv_dev) == 0)
-		return (sp->flags);
-	}
-
-	return (0);
-}
-
-mt_savestat (device, flags)
-char	*device;
-int	flags;
-{
-	register int	i;
-	register struct sv *sp;
-	char	path[SZ_FNAME];
-
-	strcpy (path, (*device == '/') ? "" : "/dev/");
-	strcat (path, device);
-
-	/* Update existing device entry if there is one. */
-	for (i=0;  i < NSAVE;  i++) {
-	    sp = &svv[i];
-	    if (sp->sv_dev[0] && strcmp (path, sp->sv_dev) == 0) {
-		sp->flags = flags;
-		return;
-	    }
-	}
-
-	/* Allocate a new slot. */
-	if (++svnext >= NSAVE)
-	    svnext = 0;
-	sp = &svv[svnext];
-	strcpy (sp->sv_dev, path);
-	sp->flags = flags;
-}
-
-
-/* PSTAT -- Print file position (debug routine).
- */
-Pstat(fd)
+static
+zmtclose (fd)
 int	fd;
 {
-	struct  x_mtget mt;
+	register struct mtdesc *mp = get_mtdesc(fd);
+	zmtdbg (get_mtdesc(fd), "close device\n");
+	zmtfls (mp);
+	return (close (fd));
+}
 
-	if (ioctl (fd, mtiocget, &mt) != ERR)
-	    fprintf (stderr, "file=%d, record=%d\n",
-		mt.mt_fileno, mt.mt_blkno);
+
+/* ZMTDESC -- Allocate and initialize the main magtape device descriptor.
+ */
+static struct mtdesc *
+zmtdesc (device, acmode, devcap, devpos)
+char	*device;		/* host device to be used for i/o */
+int	acmode;			/* iraf file access mode code */
+char	*devcap;		/* tapecap entry for device */
+struct	mtpos *devpos;		/* device position info (or NULL ptr) */
+{
+	register struct mtdesc *mp;
+	register struct mtdev *dp;
+	register struct mtchar *pp;
+	register char *ip, *op;
+	int	pname;
+
+	/* Allocate and initialize the device descriptor. */
+	if ((mp = (struct mtdesc *) calloc (1, sizeof(*mp))) == NULL)
+	    return (NULL);
+
+	dp = &mp->mtdev;
+	dp->maxrec = MAXREC;
+	dp->optrec = OPTREC;
+	strcpy (dp->devtype, "generic");
+	strcpy (dp->tapetype, "unknown");
+
+	mp->acmode = acmode;
+	strcpy (mp->iodev, device);
+	mp->mtioctop = MTIOCTOP;
+	mp->mtbsr = MTBSR;
+	mp->mtbsf = MTBSF;
+	mp->mtfsr = MTFSR;
+	mp->mtfsf = MTFSF;
+	mp->mtrew = MTREW;
+
+	if (devpos) {
+	    mp->mtpos = *devpos;
+	    mp->mtpos.pflags = 0;
+	}
+
+	/* Prepare to scan tapecap entry. */
+	for (pp=devpar;  pp->pname;  pp++)
+	    pp->isset = 0;
+
+	/* Process the tapecap entry.  This is a sequence of entries of the
+	 * form "nn=value", where the NN is a two character name, the "=" is
+	 * actually either `=' or `#', and where successive entries are
+	 * delimited by colons.  For example, ":dv=nrst0:rd=rst0:bs#0:...".
+	 */
+	for (ip=devcap;  *ip;  ) {
+	    while (*ip && *ip != ':')
+		ip++;
+	    if (*ip == ':')
+		ip++;
+	    else
+		break;
+	    pname = PNAME(ip[0],ip[1]);
+
+	    ip += 2;
+	    if (*ip == '=' || *ip == '#')
+		ip++;
+
+	    for (pp=devpar;  pp->pname;  pp++) {
+		if (pp->pname == pname) {
+		    /* If multiple entries are given for the parameter ignore
+		     * all but the first.
+		     */
+		    if (pp->isset)
+			continue;
+		    else
+			mp->flags |= pp->bitflag;
+
+		    /* Check for a negated entry (e.g., ":ir@:"). */
+		    if (*ip == '@') {
+			mp->flags &= ~pp->bitflag;
+			pp->isset++;
+			continue;
+		    }
+
+		    /* Check for a string valued parameter. */
+		    switch (pp->pcode) {
+		    case P_DV:  op = mp->nr_device;  break;
+		    case P_RD:  op = mp->rw_device;  break;
+		    case P_DN:  op = mp->mtdev.density;    break;
+		    case P_DT:  op = mp->mtdev.devtype;    break;
+		    case P_TT:  op = mp->mtdev.tapetype;   break;
+		    case P_SO:  op = mp->mtdev.statusdev;  break;
+		    default:    op = NULL;
+		    }
+
+		    if (op != NULL) {
+			int     nchars;
+
+			/* String valued parameters. */
+			for (nchars=0;  *ip && *ip != ':';  ip++, nchars++) {
+			    if (*ip == '\\' && isdigit(*(ip+1))) {
+				int     n, i;
+				for (n=i=0;  i < 3;  i++)
+				    n = n * 10 + (*(++ip) - '0');
+				*op++ = n;
+			    } else
+				*op++ = *ip;
+			}
+			*op = EOS;
+			pp->isset++;
+
+			/* Default if no string value given but entry was
+			 * found, e.g., ":so:".
+			 */
+			if (!nchars)
+			    if (pp->pcode == P_SO)
+				strcpy (mp->mtdev.statusdev, ",");
+			break;
+
+		    } else if (*ip != ':') {
+			/* Numeric parameters. */
+			int     n = 0;
+
+			while (*ip && *ip != ':') {
+			    if (isdigit (*ip))
+				n = n * 10 + (*ip - '0');
+			    ip++;
+			}
+
+			switch (pp->pcode) {
+			case P_CT:  mp->mtioctop = n;	break;
+			case P_BF:  mp->mtbsf = n;	break;
+			case P_BR:  mp->mtbsr = n;	break;
+			case P_FF:  mp->mtfsf = n;	break;
+			case P_FR:  mp->mtfsr = n;	break;
+			case P_RI:  mp->mtrew = n;	break;
+
+			case P_BS:  dp->blksize = n;	break;
+			case P_FS:  dp->eofsize = n;	break;
+			case P_MR:  dp->maxrec = n;	break;
+			case P_OR:  dp->optrec = n;	break;
+			case P_RS:  dp->gapsize = n;	break;
+			case P_TS:  dp->tapesize = n;	break;
+			default:    /* ignore (bitflags) */
+			    ;
+			}
+
+			pp->isset++;
+			break;
+		    }
+		}
+	    }
+	}
+
+	/* Apply some obvious constraints. */
+	if (dp->blksize) {
+	    dp->maxrec = dp->maxrec / dp->blksize * dp->blksize;
+	    dp->optrec = dp->optrec / dp->blksize * dp->blksize;
+	}
+	if (dp->maxrec > 0 && dp->optrec > dp->maxrec)
+	    dp->optrec = dp->maxrec;
+
+	zmtdbgopen (mp);
+	return (mp);
+}
+
+
+/* ZMTFREE -- Free the magtape device descriptor.
+ */
+static
+zmtfree (mp)
+struct	mtdesc *mp;
+{
+	zmtdbgclose (mp);
+	free (mp);
+}
+
+
+/* ZMTFPOS -- Position to the indicated file.  The first file is #1.
+ * A negative newfile number signifies EOT.
+ */
+static
+zmtfpos (mp, newfile)
+register struct mtdesc *mp;
+int	newfile;		/* file we want to position to */
+{
+	register struct mtpos *pp = &mp->mtpos;
+	register int flags = mp->flags;
+	int	oldfile, oldrec, maxrec;
+	char	*buf = NULL;
+	int	fd, status, n;
+
+	oldfile = pp->filno;
+	oldrec  = pp->recno;
+
+	if (newfile > 0)
+	    zmtdbg1 (mp, "position to file %d\n", newfile);
+	else if (newfile < 0)
+	    zmtdbg (mp, "position to end of tape\n");
+	else
+	    return (oldfile);
+
+	/* If we are positioning to EOT and UE is not set to force a search
+	 * for EOT, use the nfiles information in the position descriptor to
+	 * position to just before the EOT marker.
+	 */
+	if (newfile < 0 && !(flags&UE) && pp->nfiles > 0) {
+	    newfile = pp->nfiles + 1;
+	    zmtdbg1 (mp, "end of tape is file %d\n", newfile);
+	}
+	zmtfls (mp);
+
+	/* Don't do anything if already positioned to desired file. */
+	if (newfile == oldfile && oldrec == 1)
+	    return (newfile);
+
+	/* It is necessary to move the tape.  Open the device if it has
+	 * not already been opened.
+	 */
+	if ((fd = zmtgetfd(mp)) < 0)
+	    return (ERR);
+
+	/* Move the tape. */
+	if (newfile == 1) {
+	    if (zmtrew(fd) < 0)
+		return (ERR);
+
+	} else if (newfile <= oldfile && newfile > 0) {
+	    /* Backspace to the desired file. */
+	    if ((flags & NB) || ((flags & NF) && newfile != oldfile)) {
+		/* Device cannot backspace; must rewind and space forward. */
+		if (zmtrew(fd) < 0)
+		    return (ERR);
+		oldfile = oldrec = 1;
+		goto fwd;
+	    } else if (flags & BO) {
+		/* BSF positions to BOF. */
+		if (zmtbsf (fd, oldfile - newfile) < 0)
+		    return (ERR);
+	    } else {
+		/* BSF positions to BOT side of filemark. */
+		if (zmtbsf (fd, oldfile - newfile + 1) < 0)
+		    return (ERR);
+		else if (zmtfsf (fd, 1) < 0)
+		    return (ERR);
+	    }
+
+	} else if (newfile < 0 && (pp->nfiles > 0 && oldfile == pp->nfiles+1)) {
+	    newfile = oldfile;
+	    /* already at EOT */
+
+	} else {
+	    /* Space forward to desired file or EOT.
+	     */
+fwd:
+	    /* Fast file skip forward to numbered file.  Used only when
+	     * positioning to a numbered file, as opposed to positioning
+	     * to EOT and the number of files on the tape is unknown.
+	     * A multifile FSF is much faster on some devices than skipping
+	     * a file at a time.  It is also an atomic, uninterruptable
+	     * operation so may be undesirable on devices where file
+	     * positioning takes a long time, and could result in tape
+	     * runaway in an attempt to position beyond EOT (if the host
+	     * device driver cannot detect this).  Fast skip is enabled if
+	     * the  MF (multifile-file) flag is set.
+	     */
+	    if (newfile > oldfile && (flags & MF)) {
+		if (zmtfsf (fd, newfile - oldfile) < 0)
+		    return (ERR);
+		else
+		    goto done;
+	    }
+
+	    /* Get a read buffer as large as the largest possible record,
+	     * for variable record size devices, or the size of a device
+	     * block for fixed block devices.
+	     */
+	    if (mp->mtdev.blksize)
+		maxrec = mp->mtdev.blksize;
+	    else {
+		maxrec = mp->mtdev.maxrec;
+		if (maxrec <= 0)
+		    maxrec = MAXREC;
+	    }
+	    if (buf == NULL && !(buf = malloc(maxrec)))
+		return (ERR);
+
+	    /* Skip file forward one file at a time.  This is tricky as we
+	     * must be able to detect EOT when spacing forward or we risk
+	     * tape runaway.  Detecting EOT portably requires looking for
+	     * a double EOT.  We FSF to the next file and then read the
+	     * first record; a read of zero (or ERR on some devices) signals
+	     * a tape mark and hence double EOF or EOT.
+	     */
+	    while (oldfile < newfile || newfile < 0) {
+		/* Test if the next record is a data record or filemark. */
+		n = read (fd, buf, maxrec);
+
+		/* Check for EOT, signified by two consecutive logical
+		 * filemarks, or equivalently, a zero length file.  On
+		 * some systems a read at EOT might be an error, so treat
+		 * a read error the same as EOF if the RE capability is set.
+		 * (the IR flag causes all read errors to be treated as EOF
+		 * and is intended only to try to workaround host driver bugs).
+		 */
+		if (n < 0 && !(flags & (RE|IR))) {
+		    goto err;
+		} else if (n <= 0 && oldrec == 1) {
+		    /* At EOT.  Leave the tape between the filemarks if such
+		     * a concept applies to the current device.  If SE is
+		     * not specified for the device, we are already there.
+		     */
+
+		    pp->nfiles = (newfile=oldfile) - 1;
+		    zmtdbg1 (mp, "nfiles = %d", pp->nfiles);
+		    zmtdbg (mp, "at end of tape\n");
+		    zmtfls (mp);
+
+		    if (flags & SE) {
+			/* Cannot backspace? */
+			if (flags & NB) {
+			    newfile = oldfile;
+			    if (zmtrew (fd) < 0)
+				goto err;
+			    if (zmtfsf (fd, newfile - 1) < 0)
+				goto err;
+			    oldrec = 1;
+			    break;
+			} else {
+			    if ((((flags & RF) ? zmtbsr:zmtbsf)(fd, 1)) < 0)
+				goto err;
+			}
+		    }
+
+		    /* On some devices, e.g., 1/2 inch reel tape, the space
+		     * between the two filemarks marking EOT can be large and
+		     * we can get more data on the tape if we back up over the
+		     * first filemark and then space forward over it, leaving
+		     * the tape just after the first filemark rather than just
+		     * before the second one.  The OW (overwrite) capability
+		     * enables this.
+		     */
+		    if (flags & OW && !(flags & NB)) {
+			if (flags & RF) {
+			    status = zmtbsr (fd, 1);
+			    status = (zmtfsr (fd, 1) < 0) ? ERR : status;
+			} else if (flags & BO) {
+			    /* This may not actually do anything, depending
+			     * upon the host driver... */
+			    status = zmtbsf (fd, 0);
+			} else {
+			    status = zmtbsf (fd, 1);
+			    status = (zmtfsf (fd, 1) < 0) ? ERR : status;
+			}
+			if (status < 0)
+			    goto err;
+		    }
+
+		    break;
+
+		} else if (n > 0) {
+		    if (zmtfsf (fd, 1) < 0) {
+err:			free (buf);
+			return (ERR);
+		    }
+		}
+
+		oldfile++;
+		oldrec = 1;
+	    }
+
+	    /* Set newfile to the file we actually ended up positioned to. */
+	    newfile = oldfile;
+	    free (buf);
+	}
+done:
+	/* Update position descriptor */
+	pp->filno = newfile;
+	pp->recno = 1;
+
+	return (newfile);
+}
+
+
+/* ZMTREW -- Rewind the tape.
+ */
+static
+zmtrew (fd)
+int	fd;
+{
+	register struct mtdesc *mp = get_mtdesc(fd);
+	struct	mtop mt_rewind;
+	int	status;
+
+	mt_rewind.mt_op = mp->mtrew;
+	mt_rewind.mt_count = 1;
+
+	zmtdbg (mp, "rewinding...");
+	zmtfls (mp);
+	status = ioctl (fd, mp->mtioctop, (char *)&mt_rewind);
+	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtfls (mp);
+
+	return (status);
+}
+
+
+/* ZMTFSF -- Skip file forward.
+ */
+static
+zmtfsf (fd, nfiles)
+int	fd;
+int	nfiles;
+{
+	register struct mtdesc *mp = get_mtdesc(fd);
+	struct mtop mt_fwdskipfile;
+	int	status;
+
+	mt_fwdskipfile.mt_op = mp->mtfsf;
+	mt_fwdskipfile.mt_count = nfiles;
+
+	zmtdbg2 (mp, "skip %d file%s forward...", nfiles,
+	    nfiles > 1 ? "s" : "");
+	zmtfls (mp);
+	status = ioctl (fd, mp->mtioctop, (char *)&mt_fwdskipfile);
+	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtfls (mp);
+
+	return (status);
+}
+
+
+/* ZMTBSF -- Skip file backward.
+ */
+static
+zmtbsf (fd, nfiles)
+int	fd;
+int	nfiles;
+{
+	register struct mtdesc *mp = get_mtdesc(fd);
+	struct mtop mt_backskipfile;
+	int	status;
+
+	mt_backskipfile.mt_op = mp->mtbsf;
+	mt_backskipfile.mt_count = nfiles;
+
+	zmtdbg2 (mp, "skip %d file%s backward...", nfiles,
+	    nfiles > 1 ? "s" : "");
+	zmtfls (mp);
+	status = ioctl (fd, mp->mtioctop, (char *)&mt_backskipfile);
+	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtfls (mp);
+
+	return (status);
+}
+
+
+/* ZMTFSR -- Skip record forward.
+ */
+static
+zmtfsr (fd, nrecords)
+int	fd;
+int	nrecords;
+{
+	register struct mtdesc *mp = get_mtdesc(fd);
+	struct mtop mt_fwdskiprecord;
+	int	status;
+
+	mt_fwdskiprecord.mt_op = mp->mtfsr;
+	mt_fwdskiprecord.mt_count = nrecords;
+
+	zmtdbg2 (mp, "skip %d record%s forward...", nrecords,
+	    nrecords > 1 ? "s" : "");
+	zmtfls (mp);
+	status = ioctl (fd, mp->mtioctop, (char *)&mt_fwdskiprecord);
+	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtfls (mp);
+
+	return (status);
+}
+
+
+/* ZMTBSR -- Skip record backward.
+ */
+static
+zmtbsr (fd, nrecords)
+int	fd;
+int	nrecords;
+{
+	register struct mtdesc *mp = get_mtdesc(fd);
+	struct mtop mt_backskiprecord;
+	int	status;
+
+	mt_backskiprecord.mt_op = mp->mtbsr;
+	mt_backskiprecord.mt_count = nrecords;
+
+	zmtdbg2 (mp, "skip %d record%s backward...", nrecords,
+	    nrecords > 1 ? "s" : "");
+	zmtfls (mp);
+	status = ioctl (fd, mp->mtioctop, (char *)&mt_backskiprecord);
+	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtfls (mp);
+
+	return (status);
+}
+
+
+/*
+ * I/O logging routines.
+ *
+ *	     zmtdbgopen (mp)
+ *	         zmtdbg (mp, msg)
+ *	        zmtdbg1 (mp, fmt, arg)
+ *	        zmtdbg2 (mp, fmt, arg1, arg2)
+ *	        zmtdbg3 (mp, fmt, arg1, arg2, arg3)
+ *		 zmtfls (mp)
+ *	    zmtdbgclose (mp)
+ *
+ * Output may be written to either a file, if an absolute file pathname is
+ * given, or to a socket specified as "host[,port]".
+ */
+
+#ifdef TCPIP
+static	PFI sigpipe = NULL;
+static	int nsockets = 0;
+static	int s_port[MAXDEV];
+static	FILE *s_fp[MAXDEV];
+static	int s_fd[MAXDEV];
+static	int s_checksum[MAXDEV];
+#endif
+
+/* ZMTDBGOPEN -- Attempt to open a file or socket for status logging.
+ */
+zmtdbgopen (mp)
+struct	mtdesc *mp;
+{
+#ifndef TCPIP
+        if (!mp->mtdev.statusdev[0] || mp->mtdev.statusout)
+	    return;
+	if (mp->mtdev.statusdev[0] == '/')
+	    mp->mtdev.statusout = fopen (mp->mtdev.statusdev, "a");
+#else
+	register char *ip, *op;
+	struct	sockaddr_in sockaddr;
+	int	port, isfile, sum, s, i;
+	char	host[SZ_FNAME];
+	struct	hostent *hp;
+	FILE	*fp;
+
+	/* Status logging disabled. */
+        if (!mp->mtdev.statusdev[0])
+	    return;
+
+	/* Status device already open.  This is only possible in repeated
+	 * calls to zmtdbgopen after a zzopmt.
+	 */
+        if (mp->mtdev.statusout) {
+	    if (nsockets > 0 && !sigpipe)
+		sigpipe = (PFI) signal (SIGPIPE, SIG_IGN);
+	    return;
+	}
+
+	/* Compute statusdev checksum. */
+	for (sum=0, ip = mp->mtdev.statusdev;  *ip;  ip++)
+	    sum += (sum + *ip);
+
+	/* Log status output to a file if a pathname is specified.
+	 */
+	for (isfile=0, ip=mp->mtdev.statusdev;  *ip;  ip++)
+	    if (isfile = (*ip == '/'))
+		break;
+	if (isfile) {
+	    mp->mtdev.statusout = fopen (mp->mtdev.statusdev, "a");
+	    if (mp->mtdev.statusout) {
+		for (i=0;  i < MAXDEV;  i++)
+		    if (!s_fp[i]) {
+			s_fp[i] = mp->mtdev.statusout;
+			s_port[i] = s_fd[i] = 0;
+			s_checksum[i] = sum;
+			break;
+		    }
+	    }
+	    return;
+	}
+
+	/* If the entry is of the form "host" or "host,port" then status output
+	 * is written to a socket connected to the specified host and port.
+	 */
+	for (ip=mp->mtdev.statusdev, op=host;  *ip && *ip != ',';  )
+	    *op++ = *ip++;
+	*op = EOS;
+	if (!host[0])
+	    strcpy (host, "localhost");
+	if (*ip == ',')
+	    ip++;
+	port = (isdigit(*ip)) ? atoi(ip) : DEFPORT;
+
+	/* Is port already open in cache? */
+	s = 0;
+	for (i=0;  i < MAXDEV;  i++)
+	    if (s_port[i] == port) {
+		if (s_checksum[i] != sum) {
+		    fclose (s_fp[i]);
+		    s_fd[i] = s_port[i] = s_checksum[i] = 0;
+		    s_fp[i] = NULL;
+		} else {
+		    s = s_fd[i];
+		    fp = s_fp[i];
+		}
+		break;
+	    }
+
+	if (!s) {
+	    if ((hp = gethostbyname(host)) == NULL)
+		return;
+	    if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0)
+		return;
+
+	    bzero ((char *)&sockaddr, sizeof(sockaddr));
+	    bcopy ((char *)hp->h_addr,(char *)&sockaddr.sin_addr, hp->h_length);
+	    sockaddr.sin_family = AF_INET;
+	    sockaddr.sin_port = htons((short)port);
+	    if (connect (s,(struct sockaddr *)&sockaddr,sizeof(sockaddr)) < 0) {
+		close (s);
+		return;
+	    }
+
+	    fp = fdopen (s, "w");
+	    for (i=0;  i < MAXDEV;  i++)
+		if (!s_fp[i]) {
+		    s_port[i] = port;
+		    s_fd[i] = s;
+		    s_fp[i] = fp;
+		    s_checksum[i] = sum;
+		    break;
+		}
+	}
+
+	/* Ignore signal generated if server goes away unexpectedly. */
+	nsockets++;
+	if (!sigpipe)
+	    sigpipe = (PFI) signal (SIGPIPE, SIG_IGN);
+
+	mp->mtdev.statusout = fp;
+	zmtdbg1 (mp, "iodev = %s", mp->iodev);
+	if (gethostname (host, SZ_FNAME) == 0)
+	    zmtdbg1 (mp, "host = %s", host);
+#endif
+}
+
+
+/* ZMTDBGCLOSE -- Close the status output.  Called at ZZCLMT time.  If the
+ * status output is a socket merely flush the output and restore the original
+ * sigpipe signal handler if the reference count for the process goes to zero.
+ * If the output is a file always close the file.  If the debug output is
+ * changed from a socket to a file during the execution of a process this
+ * will leave a socket open, never to be closed, but this is not likely to
+ * be worth fixing since the status output device, if used, should change
+ * infrequently.
+ */
+zmtdbgclose (mp)
+struct	mtdesc *mp;
+{
+	register int i;
+
+	if (mp->mtdev.statusout) {
+	    fflush (mp->mtdev.statusout);
+	    for (i=0;  i < MAXDEV;  i++) {
+		if (s_fp[i] == mp->mtdev.statusout) {
+		    if (s_port[i])
+			nsockets--;
+		    else {
+			fclose (mp->mtdev.statusout);
+			s_checksum[i] = 0;
+			s_fp[i] = NULL;
+		    }
+		    break;
+		}
+	    }
+
+	    if (sigpipe && nsockets <= 0) {
+#ifdef AUX
+		signal (SIGPIPE, (sigfunc_t)sigpipe);
+#else
+		signal (SIGPIPE, sigpipe);
+#endif
+		sigpipe = NULL;
+		nsockets = 0;
+	    }
+	}
+}
+
+zmtdbg (mp, msg)
+struct	mtdesc *mp;
+char	*msg;
+{
+	register FILE *out;
+	register char *ip;
+
+	if (out = mp->mtdev.statusout) {
+	    for (ip=msg;  *ip;  ip++) {
+		if (*ip == '\n') {
+		    putc ('\\', out);
+		    putc ('n', out);
+		} else
+		    putc (*ip, out);
+	    }
+	    putc ('\n', out);
+	}
+}
+
+zmtfls (mp)
+struct	mtdesc *mp;
+{
+	FILE	*out;
+	if (out = mp->mtdev.statusout)
+	    fflush (out);
+}
+
+zmtdbg1 (mp, fmt, arg)
+struct	mtdesc *mp;
+char	*fmt;
+int	arg;
+{
+	char	obuf[SZ_LINE];
+	sprintf (obuf, fmt, arg);
+	zmtdbg (mp, obuf);
+}
+zmtdbg2 (mp, fmt, arg1, arg2)
+struct	mtdesc *mp;
+char	*fmt;
+int	arg1, arg2;
+{
+	char	obuf[SZ_LINE];
+	sprintf (obuf, fmt, arg1, arg2);
+	zmtdbg (mp, obuf);
+}
+zmtdbg3 (mp, fmt, arg1, arg2, arg3)
+struct	mtdesc *mp;
+char	*fmt;
+int	arg1, arg2, arg3;
+{
+	char	obuf[SZ_LINE];
+	sprintf (obuf, fmt, arg1, arg2, arg3);
+	zmtdbg (mp, obuf);
+}
+zmtdbg4 (mp, fmt, arg1, arg2, arg3, arg4)
+struct	mtdesc *mp;
+char	*fmt;
+int	arg1, arg2, arg3, arg4;
+{
+	char	obuf[SZ_LINE];
+	sprintf (obuf, fmt, arg1, arg2, arg3, arg4);
+	zmtdbg (mp, obuf);
+}
+zmtdbg5 (mp, fmt, arg1, arg2, arg3, arg4, arg5)
+struct	mtdesc *mp;
+char	*fmt;
+int	arg1, arg2, arg3, arg4, arg5;
+{
+	char	obuf[SZ_LINE];
+	sprintf (obuf, fmt, arg1, arg2, arg3, arg4, arg5);
+	zmtdbg (mp, obuf);
 }

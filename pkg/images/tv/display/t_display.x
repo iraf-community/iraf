@@ -310,7 +310,7 @@ int	chan
 
 real	a, b, c, d, tx, ty
 int	wcsfile, ip, i, j, axis[2]
-pointer	w0, w1, sp, title, dir, fname, ftemp, device, textbuf
+pointer	w0, w1, sp, title, dir, fname, ftemp, device, textbuf, imname
 long	lv[IM_MAXDIM], pv1[IM_MAXDIM], pv2[IM_MAXDIM]
 int	envfind(), open(), strncmp()
 include	"iis.com"
@@ -319,6 +319,7 @@ begin
 	call smark (sp)
 	call salloc (title, SZ_LINE, TY_CHAR)
 	call salloc (dir, SZ_PATHNAME, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 	call salloc (ftemp, SZ_PATHNAME, TY_CHAR)
 	call salloc (device, SZ_FNAME, TY_CHAR)
@@ -408,10 +409,13 @@ begin
 	    ;
 	Memc[ip] = EOS
 
+	# Get the image name minus any image section.
+	call imgimage (image, Memc[imname], SZ_FNAME)
+
 	# Format the WCS text.
 	call sprintf (Memc[textbuf], SZ_WCSTEXT,
 	    "%s - %s\n%g %g %g %g %g %g %g %g %d\n")
-	    call pargstr (image)
+	    call pargstr (Memc[imname])
 	    call pargstr (Memc[title])
 	    call pargr (a)
 	    call pargr (b)

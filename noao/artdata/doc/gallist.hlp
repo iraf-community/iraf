@@ -335,8 +335,8 @@ in particular where all galaxies are at the same distance, the scale radius
 obeys the following relation.
 
 .nf
-  ellipticals:  r = eradius * 10. ** ((M - minmag) / 6)
-  spirals:      r = sradius * eradius * 10. ** ((M - minmag) / 6)
+  ellipticals:  r = eradius * 10. ** ((minmag - M) / 6)
+  spirals:      r = sradius * eradius * 10. ** ((minmag - M) / 6)
 .fi
 
 This relation gives the size decreasing slightly less rapidly than that

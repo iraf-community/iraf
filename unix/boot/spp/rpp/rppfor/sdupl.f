@@ -1,20 +1,20 @@
-      INTEGER FUNCTION SDUPL (STR)
-      INTEGER STR (100)
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER I
-      INTEGER LENGTH
-      INTEGER J
-      INTEGER DSGET
-      J = DSGET (LENGTH (STR) + 1)
-      SDUPL = J
-      I = 1
-23000 IF (.NOT.(STR (I) .NE. -2))GOTO 23002
-      MEM (J) = STR (I)
-      J = J + 1
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      MEM (J) = -2
-      RETURN
-      END
+      integer function sdupl (str)
+      integer str (100)
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer i
+      integer length
+      integer j
+      integer dsget
+      j = dsget (length (str) + 1)
+      sdupl = j
+      i = 1
+23000 if (.not.(str (i) .ne. -2))goto 23002
+      mem (j) = str (i)
+      j = j + 1
+23001 i = i + 1
+      goto 23000
+23002 continue
+      mem (j) = -2
+      return
+      end

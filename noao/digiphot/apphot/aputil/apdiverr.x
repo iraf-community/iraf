@@ -1,4 +1,4 @@
-# AP_DIVERR -- Procedure to return a value of unity  for 0 divide.
+# AP_DIVERR -- Error condition procedure which returns a value of unity.
 
 real procedure ap_diverr ()
 

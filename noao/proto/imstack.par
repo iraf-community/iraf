@@ -1,7 +1,0 @@
-
-# IMSTACK - Stack images into output image of higher dimension
-
-images,s,a,,,,Images to be stacked
-output,f,a,,,,Output image
-title,s,h,'*',,,Title of output image
-pixtype,s,h,'*',,,Pixel datatype of output image

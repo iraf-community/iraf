@@ -122,7 +122,7 @@ begin
 	    case 'l':
 		call lincoeff (fit, sx1, sy1, xshift, yshift, xscale, yscale,
 		    thetax, thetay)
-		call printf ("delx: %.2f dely: %.2f ")
+		call printf ("xshift: %.2f yshift: %.2f ")
 		    call pargr (xshift)
 		    call pargr (yshift)
 		call printf ("xmag: %.2f ymag: %.2f ")
@@ -405,7 +405,7 @@ begin
 	    case 'l':
 		call lincoeffd (fit, sx1, sy1, xshift, yshift, xscale, yscale,
 		    thetax, thetay)
-		call printf ("delx: %.2f dely: %.2f ")
+		call printf ("xshift: %.2f yshift: %.2f ")
 		    call pargd (xshift)
 		    call pargd (yshift)
 		call printf ("xmag: %.2f ymag: %.2f ")

@@ -60,5 +60,10 @@ trans003:
 
 	cl> imtranspose image[*,-*] image
 .ih
+BUGS
+
+It is currently not legal to transpose images with a wcs type of
+MULTISPEC.
+.ih
 SEE ALSO
 .endhelp

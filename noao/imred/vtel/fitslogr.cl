@@ -58,6 +58,7 @@
 	seconds = 0
 
 	# Now match keywords against this header to obtain needed output.
+tfile = filenum
 	while (fscan (fp, headline) != EOF) {
 	    keyword = substr(headline, 1, 8)
 	    if (keyword == "File: mt")

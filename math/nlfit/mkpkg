@@ -1,0 +1,63 @@
+# The Non-linear Least-squares Fitting Package
+
+$checkout	libnlfit.a lib$
+$update		libnlfit.a
+$checkin	libnlfit.a lib$
+$exit
+
+tfiles:
+	$set	GEN = "$$generic -k -t rd"
+
+	$ifnewer (nlacpts.gx,  nlacptsr.x)	$(GEN) nlacpts.gx  $endif
+	$ifnewer (nlchomat.gx, nlchomatr.x)	$(GEN) nlchomat.gx $endif
+	$ifnewer (nldump.gx,   nldumpr.x)	$(GEN) nldump.gx   $endif
+	$ifnewer (nlerrors.gx, nlerrorsr.x)	$(GEN) nlerrors.gx $endif
+	$ifnewer (nleval.gx,   nlevalr.x)	$(GEN) nleval.gx   $endif
+	$ifnewer (nlfit.gx,    nlfitr.x)	$(GEN) nlfit.gx    $endif
+	$ifnewer (nlfitdef.gh, nlfitdefr.h)	$(GEN) nlfitdef.gh $endif
+	$ifnewer (nlfree.gx,   nlfreer.x)	$(GEN) nlfree.gx   $endif
+	$ifnewer (nlinit.gx,   nlinitr.x)	$(GEN) nlinit.gx   $endif
+	$ifnewer (nliter.gx,   nliterr.x)	$(GEN) nliter.gx   $endif
+	$ifnewer (nlpget.gx,   nlpgetr.x)	$(GEN) nlpget.gx   $endif
+	$ifnewer (nlsolve.gx,  nlsolver.x)	$(GEN) nlsolve.gx  $endif
+	$ifnewer (nlstat.gx,   nlstatr.x)	$(GEN) nlstat.gx   $endif
+	$ifnewer (nlvector.gx, nlvectorr.x)	$(GEN) nlvector.gx $endif
+	$ifnewer (nlzero.gx,   nlzeror.x)	$(GEN) nlzero.gx   $endif
+	;
+
+libnlfit.a:
+
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	nlacptsd.x	<math/nlfit.h>   "nlfitdefd.h"
+	nlacptsr.x	<math/nlfit.h>   "nlfitdefr.h"
+	nlchomatd.x	<math/nlfit.h>   "nlfitdefd.h" <mach.h>
+	nlchomatr.x	<math/nlfit.h>   "nlfitdefr.h" <mach.h>
+	nldumpd.x	"nlfitdefd.h"
+	nldumpr.x	"nlfitdefr.h"
+	nlerrmsg.x	<math/nlfit.h>
+	nlerrorsd.x	<math/nlfit.h>   "nlfitdefd.h" <mach.h>
+	nlerrorsr.x	<math/nlfit.h>   "nlfitdefr.h" <mach.h>
+	nlevald.x	<math/nlfit.h>   "nlfitdefd.h"
+	nlevalr.x	<math/nlfit.h>   "nlfitdefr.h"
+	nlfitd.x	<math/nlfit.h>   "nlfitdefd.h" <mach.h>
+	nlfitr.x	<math/nlfit.h>   "nlfitdefr.h" <mach.h>
+	nlfreed.x	"nlfitdefd.h"
+	nlfreer.x	"nlfitdefr.h"
+	nlinitd.x	"nlfitdefd.h"
+	nlinitr.x	"nlfitdefr.h"
+	nliterd.x	<math/nlfit.h>   "nlfitdefd.h" <mach.h>
+	nliterr.x	<math/nlfit.h>   "nlfitdefr.h" <mach.h>
+	nllist.x	
+	nlpgetd.x	"nlfitdefd.h"
+	nlpgetr.x	"nlfitdefr.h"
+	nlsolved.x	<math/nlfit.h>   "nlfitdefd.h"
+	nlsolver.x	<math/nlfit.h>   "nlfitdefr.h"
+	nlstati.x	<math/nlfit.h>   "nlfitdefr.h"
+	nlstatd.x	<math/nlfit.h>   "nlfitdefd.h"
+	nlstatr.x	<math/nlfit.h>   "nlfitdefr.h"
+	nlvectord.x	<math/nlfit.h>   "nlfitdefd.h"
+	nlvectorr.x	<math/nlfit.h>   "nlfitdefr.h"
+	nlzerod.x	"nlfitdefd.h"
+	nlzeror.x	"nlfitdefr.h"
+	;

@@ -5,8 +5,10 @@
 procedure t_rewind()
 
 char	device[SZ_FNAME]
+bool	clgetb()
+int	btoi()
 
 begin
 	call clgstr ("device", device, SZ_FNAME)
-	call mtrewind (device)
+	call mtrewind (device, btoi(clgetb("initcache")))
 end

@@ -1,0 +1,294 @@
+.help revisions Jun88 images.tv
+.nf
+images$*imexam.par
+images$imexamine/*
+images$doc/imexamine.e
+    Made modifications to use coordinate formating in graphs and in
+    cursor readback.  Also the WCS label will be used if label="wcslabel".
+    Two paramters were added to the main PSET, xformat and yformat.
+    (4/10/92, Valdes)
+
+images$tv/wcslab.x
+    Wcslab was failing if an image larger than the frame buffer was
+    displayed with fill=no.
+    (3/25/92, Davis)
+
+images$tv/imexamine/iemw.x
+    The logical coordinate of an excluded axis is 1 and not axval+1.
+    (3/9/92, Valdes)
+
+images$tv/wcslab/wlwcslab.x
+    Replaced the routine wl_unused_wcs which searched for an unused wcs
+    with some code to save and replace the current wcs.
+
+    (2/18/92, Davis)
+
+images$tv/
+    Moved all the .keys files from the noao$lib/scr/ and proto$tvmark/ 
+    directories to the iraf$lib/scr/ directory.
+
+    (1/29/92, Davis)
+
+images$tv/wcslab/
+    Added the new task WCSLAB developed at ST by Jonathan Eisenhammer
+    and modified at NOAO to the TV package.
+
+    (1/24/92, Davis)
+
+images$tv/
+    
+    New version of the TV package created.
+
+    The IMEDIT, IMEXAMINE, and TVMARK tasks were removed from the old
+    NOAO.PROTO package and added to the IMAGES.TV package. See below
+    for list of previous revisions to these tasks.
+
+    The IIS dependent tasks BLINK, CV, CVL, ERASE, FRAME, LUMATCH,
+    MONOCHROME, PSEUDOCOLOR, RGB, WINDOW and ZOOM were removed from
+    the TV package and placed in the new subpackage TV.IIS.
+
+    The directory structure of the IIS package was modified.
+
+    (1/24/92, Davis)
+
+======================
+Package reorganization
+======================
+
+noao$proto/
+proto$imexamine/ievimexam.x
+    Corrected an error in the column limits computation in the routine
+    ie_get_vector that caused occasional glitches in vectors plotted
+    using the 'v' key. This bug may also explain occasional unrepeatable
+    bus errors which occurred after using the 'v' key. (12/11/91, Davis)
+
+proto$imedit/epcolon.x
+    Two calls to pargr changed to pargi.  (11/13/91, Valdes)
+
+proto$tvmark/t_tvmark.x
+proto$tvmark/mkcolon.x
+    Removed extra argument to mk_sets() calls. (11/13/91, Davis)
+
+proto$tvmark/mkppars.x
+    Changed two clputi calls to clputb calls. (11/13/91, Davis)
+
+proto$jimexam.par
+proto$proto.cl
+proto$mkpkg
+proto$imexamine/iejimexam.x
+proto$imexamine/iecolon.x
+proto$imexamine/t_imexam.x
+proto$imexamine/iegcur.x
+proto$imexamine/mkpkg
+proto$doc/imexamine.hlp
+noao$lib/scr/imexamine.key
+    Added new options for fitting 1D gaussians to lines and columns.
+    (9/2/91, Valdes)
+
+proto$imexamine/iemw.x +
+proto$imexamine/iecimexam.x
+proto$imexamine/iecolon.x
+proto$imexamine/iegimage.x
+proto$imexamine/ielimexam.x
+proto$imexamine/iepos.x
+proto$imexamine/ierimexam.x
+proto$imexamine/imexam.h
+proto$imexamine/mkpkg
+proto$imexamine/t_imexam.x
+proto$imexamine.par
+proto$doc/imexamine.hlp
+    Modified IMEXAMINE to use WCS information in axis labels and coordinate
+    readback.  (8/13/91, Valdes)
+
+proto$tvmark/mkonemark.x
+    Moved the two salloc routines to the top of the mk_onemark routine
+    where they cannot be called more than once.
+    (7/22/91, Davis)
+
+proto$tvmark.par
+    Modified the description of the pointsize parameter.
+    (7/17/91, Davis)
+
+proto$imexamine/iesimexam.x
+    Add code for checking and warning if data is all constant, all above the
+    specified ceiling, or all below the specified floor when making surface
+    plots.  (10/3/90, Valdes)
+
+proto$imedit/epmask.x
+    Added some protective changes so that if a radius of zero with a circular
+    aperture is used then round off will be less likely to cause missing
+    the pixel.  (9/23/90, Valdes)
+
+proto$tvmark/tvmark.key
+proto$tvmark/mkmark.x
+proto$tvmark/doc/tvmark.hlp
+    At user request changed the 'd' keystroke command  which marks an object
+    with a dot to the '.' and the 'u' keystroke command which deletes a
+    point to 'd'. (9/14/90 Davis)
+
+====
+V2.9
+====
+
+noao$proto/imedit/epgcur.x
+    Valdes, June 6, 1990
+    The fixpix format input was selecting interpolation across the longer
+    dimension instead of the shorter.  This meant that complete columns
+    or lines did not work at all.
+
+====
+V2.8
+====
+
+noao$proto/imexamine/t_imexam.x
+    Valdes, Mar 29, 1990
+    Even when use_display=no the task was trying to check the image display
+    for the name.  This was fixed by adding a check for this flag in the
+    relevant if statement.
+
+noao$proto/imexamine/ievimexam.x
+    Valdes, Mar 22, 1990
+    The pset was being closed without indicating this in the data structure.
+    The clcpset statement was removed.
+
+noao$proto/imedit/epgcur.x
+    Valdes, Mar 15, 1990
+    The EOF condition was being screwed up for two keystroke commands leading
+    to a possible infinite loop when using a cursor file input.  The fix
+    is to change the "nitems=nitems+clgcur" incrementing to simply
+    "nitems=clgcur".
+
+noao$proto/imedit/epbackground.x
+noao$proto/imedit/epgcur.x
+    Valdes, Mar 9, 1990
+    1. The surfit pointer was incorrectly declared as real in ep_bg causing the
+    'b' key to do nothing.  This appears to be SPARC dependent.
+    2. Fixed some more problems with cursor strings having missing coordinates
+    causing floating overflow errors.
+
+noao$proto/imexamine/iecolon.x
+    Valdes, Feb 16, 1990
+    Fixed a mistake in the the datatype of a parg call.
+
+noao$proto/imedit.par
+noao$proto/imedit/epcolon.x
+noao$proto/imedit/epmask.x
+    Valdes, Jan 17, 1990
+    1. Fixed typo in prompt string for y background order.
+    2. Wrong datatype in clput for order parameters resulting in setting
+       the user parameter file value to 0.
+    3. Bug fix in epmask.  The following is the correct line:
+       line 130:    call amovi (Memi[line], Memi[ptr2+i*EP_NX(ep)], EP_NX(ep))
+
+noao$proto/imedit/epdisplay.x
+    Valdes, Jan 7, 1990
+    Added initialization to the zoom state.  Without the intialization
+    starting IMEDIT without display and then turning display on followed by
+    a 'r' would cause an error (very obscure but found in a demo).
+
+noao$proto/tvmark/t_tvmark.x
+noao$proto/tvmark/mkmark.x
+noao$proto/tvmark/tvmark.key
+noao$proto/doc/tvmark.hlp
+    Valdes, Jan 4, 1990
+    Added filled rectangle command 'f'.
+
+noao$proto/tvmark/t_tvmark.x
+noao$proto/tvmark/mktools.x
+noao$proto/tvmark/mkshow.x
+noao$proto/tvmark/mkcolon.x
+noao$proto/tvmark/mkfind.x
+noao$proto/tvmark/mkremove.x
+    Davis, Dec 12, 1989
+    1. Tvmark has been modified to permit deletion as well as addition of
+    objects to the coordinate file. Objects to be deleted are marked
+    with the cursor and must be within a given tolerance of an
+    object in the coordinate list to be deleted.
+    2. The help screen no longer comes up in the text window when the task
+    is invoked for the sake of uniformity with all other IRAF tasks.
+    3. The coordinate file is opened read_only in batch mode. In interactive
+    mode a warning message is issued if the user tries to append or delete
+    objects from a file which does not have write permission and no action
+    is taken.
+
+noao$proto/imexamine/t_imexam.x
+noao$proto/imexamine/iegimage.x
+    Valdes, Nov 30, 1989
+    The default display frame when not using an input list was changed from
+    0 to 1.
+
+noao$proto/imeidt/epgcur.x
+    Valdes, Oct 30, 1989
+    1. There was no check against INDEF cursor coordinates.  Such coordinates
+    will occur when reading a previous logfile output and cursor input
+    where the shorthand ":command" is used.  The actual error occured when
+    attempting to add 0.5 to INDEF.
+
+noao$proto/imedit/epstatistics.x
+noao$proto/imedit/epmove.x
+noao$proto/imedit/epgsfit.x
+noao$proto/imedit/epnoise.x
+noao$proto/imedit/epbackground.x
+noao$proto/imedit/t_imedit.x
+    Valdes, Aug 17, 1989
+    1. Added errchk to main cursor loop to try and prevent loss of the
+       user's changes if an error occurs.
+    2. If no background points are found an error message is now printed
+       instead of aborting.
+
+noao$proto/tvmark/mkbmark.x
+    Davis, Aug 4, 1989
+    Modified tvmark so that drawing to the frame buffer is more efficient
+    in batch mode. This involved removing a number of imflush calls
+    which were unnecessarily flushing the output buffer to disk and
+    recoding the basic routines which draw concentric circles and rectangles.
+
+===========
+Version 2.8
+===========
+
+noao$proto/imexamine/* +
+noao$proto/imexamine.par +
+noao$proto/?imexam.par +
+noao$proto/doc/imexamine.hlp +
+noao$proto/proto.cl
+noao$proto/proto.men
+noao$proto/proto.hd
+noao$proto/x_proto.x
+noao$proto/mkpkg
+noao$lib/scr/imexamine.key
+    Valdes, June 13, 1989
+    New task IMEXAMINE added to the proto package.
+
+noao$proto/tvmark/
+    Davis, June 6, 1989
+    Fixed a bug in tvmark wherein circles were not being drawn if they
+    were partially off the image in the x dimension.
+
+noao$proto/tvmark/
+    Davis, June1, 1989
+    A labeling capability has been added to tvmark. If the label parameter
+    is turned on tvmark will label objects with the string in the third
+    column of the coordinate file.
+
+noao$proto/tvmark/
+    Davis,  May 25, 1989
+    The problem reported by phil wherein TVMARK would go into an infinite
+    loop if it encountered a blank line has been fixed.
+
+noao$proto/tvmark
+    Davis,  May 22, 1989
+    The new task TVMARK was added to the proto package.
+
+noao$proto/imedit/
+    Davis,  May 22, 1989
+    The new task IMEDIT was added to the proto package.
+
+======================
+Package reorganization
+======================
+
+===========
+Release 2.2
+===========
+.endhelp

@@ -126,19 +126,34 @@ int	maxch		# maximum number of characters in string parameter
 char	card[ARB]	# FITS card image
 char	comment[ARB]	# comment string
 
-int	nblanks, maxchar
+char	strparam[LEN_ALIGN+2]
+int	maxchar, nblanks
 
 begin
 	maxchar = min (maxch, LEN_OBJECT)
-	nblanks = LEN_OBJECT - maxchar
-        call sprintf (card, LEN_CARD, "%-8.8s= '%*.*s'  /  %*.*s")
-	    call pargstr (keyword)
-	    call pargi (-maxchar)
-	    call pargi (maxchar)
-	    call pargstr (param)
-	    call pargi (-nblanks)
-	    call pargi (nblanks)
-	    call pargstr (comment)
+	if (maxchar <= LEN_ALIGN - 1) {
+	    strparam[1] = '\''
+	    call sprintf (strparam[2], maxchar, "%*.*s")
+		call pargi (-maxchar)
+		call pargi (maxchar)
+		call pargstr (param)
+	    strparam[maxchar+2] = '\''
+	    strparam[maxchar+3] = EOS
+            call sprintf (card, LEN_CARD, "%-8.8s= %-20.20s  /  %-45.45s")
+	        call pargstr (keyword)
+	        call pargstr (strparam)
+	        call pargstr (comment)
+	} else {
+	    nblanks = LEN_OBJECT - maxchar
+            call sprintf (card, LEN_CARD, "%-8.8s= '%*.*s'  /  %*.*s")
+	        call pargstr (keyword)
+	        call pargi (-maxchar)
+	        call pargi (maxchar)
+	        call pargstr (param)
+	        call pargi (-nblanks)
+	        call pargi (nblanks)
+	        call pargstr (comment)
+	}
 end
 
 

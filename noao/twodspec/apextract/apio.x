@@ -1,10 +1,13 @@
 include	<time.h>
 
-# AP_LOG -- Write to the log file if defined.
+# AP_LOG -- Verbose, log, and error output.
 
-procedure ap_log (str)
+procedure ap_log (str, log, verbose, err)
 
 char	str[ARB]	# String
+int	log		# Write to log if logfile defined?
+int	verbose		# Write to stdout if verbose?
+int	err		# Write to stdout?
 
 int	fd, open()
 long	clktime()
@@ -18,21 +21,23 @@ begin
 	call salloc (date, SZ_DATE, TY_CHAR)
 	call cnvdate (clktime(0), Memc[date], SZ_DATE)
 
-	if (clgetb ("apio.verbose")) {
+	if (err == YES || (verbose == YES && clgetb ("verbose"))) {
 	    call printf ("%s: %s\n")
 	        call pargstr (Memc[date])
 	        call pargstr (str)
 	    call flush (STDOUT)
 	}
 
-	call clgstr ("apio.logfile", Memc[logfile], SZ_FNAME)
-	if (Memc[logfile] != EOS) {
-	    fd = open (Memc[logfile], APPEND, TEXT_FILE)
-	    call fprintf (fd, "%s: %s\n")
-	        call pargstr (Memc[date])
-	        call pargstr (str)
-	    call flush (fd)
-	    call close (fd)
+	if (log == YES) {
+	    call clgstr ("logfile", Memc[logfile], SZ_FNAME)
+	    if (Memc[logfile] != EOS) {
+	        fd = open (Memc[logfile], APPEND, TEXT_FILE)
+	        call fprintf (fd, "%s: %s\n")
+	            call pargstr (Memc[date])
+	            call pargstr (str)
+	        call flush (fd)
+	        call close (fd)
+	    }
 	}
 
 	call sfree (sp)
@@ -40,31 +45,45 @@ end
 
 
 # AP_GOPEN/AP_GCLOSE -- Open and close the graphics device.
-# This includes CLIO to get the graphics device.
+# The device "stdgraph" is used.
 
 procedure ap_gopen (gp)
 
 pointer	gp		# GIO pointer
 pointer	gplast		# Last GIO pointer
 
-pointer	sp, str, gopen()
+int	flag
+pointer	gopen()
 errchk	gopen
 
-data	gplast/NULL/
+data	flag/NO/
+common	/apgio/ gplast
 
 begin
-	if (gplast == NULL) {
-	    call smark (sp)
-	    call salloc (str, SZ_LINE, TY_CHAR)
-	    call clgstr ("apio.graphics", Memc[str], SZ_LINE)
-	    gplast = gopen (Memc[str], NEW_FILE, STDGRAPH)
-	    call sfree (sp)
+	if (flag == NO) {
+	    flag = YES
+	    call ap_gclose ()
 	}
 
-	gp = gplast
-	return
+	if (gplast == NULL)
+	    gplast = gopen ("stdgraph", NEW_FILE, STDGRAPH)
 
-entry	ap_gclose ()
+	gp = gplast
+end
+
+procedure ap_gclose ()
+
+int	flag
+pointer	gplast
+
+data	flag/NO/
+common	/apgio/ gplast
+
+begin
+	if (flag == NO) {
+	    flag = YES
+	    gplast = NULL
+	}
 
 	if (gplast != NULL) {
 	    call gclose (gplast)
@@ -74,34 +93,50 @@ end
 
 
 # AP_POPEN -- Open the plot device or metacode file.  This includes CLIO
-# to get the plot device.  To close use AP_PCLOSE.
+# to get the plot device.
 
-procedure ap_popen (gp, fd)
+procedure ap_popen (gp, fd, type)
 
 pointer	gp		# GIO pointer
 int	fd		# FIO channel for metacode file
+char	type[ARB]	# Plot type
 
-int	open()
+bool	streq(), strne()
+int	open(), nowhite(), strncmp()
 pointer	sp, str, gopen()
 errchk	gopen, open
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call clgstr ("apio.plots", Memc[str], SZ_LINE)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	call clgstr ("plotfile", Memc[str], SZ_LINE)
 
 	gp = NULL
 	fd = NULL
-	if (Memc[str] != EOS) {
-	    fd = open (Memc[str], APPEND, BINARY_FILE)
-	    gp = gopen ("stdvdm", NEW_FILE, fd)
+	if (nowhite (Memc[str], Memc[str], SZ_FNAME) > 0) {
+	    if (strncmp ("debug", Memc[str], 5) == 0) {
+		if (streq (type, Memc[str+5]) || streq ("all", Memc[str+5])) {
+		    fd = open (Memc[str], APPEND, BINARY_FILE)
+		    gp = gopen ("stdvdm", APPEND, fd)
+		}
+	    } else if (strne ("fits", type)) {
+		fd = open (Memc[str], APPEND, BINARY_FILE)
+		gp = gopen ("stdvdm", APPEND, fd)
+	    }
 	}
 
 	call sfree (sp)
-	return
+end
 
-entry ap_pclose (gp, fd)
 
+# AP_PCLOSE -- Close plot file.
+
+procedure ap_pclose (gp, fd)
+
+pointer	gp		# GIO pointer
+int	fd		# FIO channel for metacode file
+
+begin
 	if (gp != NULL)
 	    call gclose (gp)
 	if (fd != NULL)

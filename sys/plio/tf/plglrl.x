@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<plio.h>
+include	<plset.h>
 
 # PL_GLR -- Get a line segment as a range list, applying the given ROP to
 # combine the pixels with those of the output list.
@@ -14,8 +15,8 @@ int	rl_depth		#I range list depth, bits
 int	npix			#I number of pixels desired
 int	rop			#I rasterop
 
-int	nr
-pointer	sp, rl_out, ll_src
+int	mr, nr
+pointer	sp, rl_out, rl_src, ll_src
 int	pl_access(), pl_l2rl()
 errchk	pl_access
 
@@ -25,11 +26,17 @@ begin
 	    nr = pl_l2rl (Mems[ll_src], v[1], rl_dst, npix)
 	else {
 	    call smark (sp)
-	    call salloc (rl_out, min(RL_MAXLEN(pl),npix*3), TY_LONG)
+	    mr = min (RL_MAXLEN(pl), npix * 3)
+	    call salloc (rl_src, mr, TY_LONG)
+	    call salloc (rl_out, mr, TY_LONG)
 
-	    nr = pl_l2rl (Mems[ll_src], v[1], Meml[rl_out], npix)
-	    call pl_rangeropl (Meml[rl_out], 1, PL_MAXVAL(pl),
-		rl_dst, 1, MV(rl_depth), npix, rop)
+	    nr = pl_l2rl (Mems[ll_src], v[1], Meml[rl_src], npix)
+	    call pl_rangeropl (Meml[rl_src], 1, PL_MAXVAL(pl),
+			              rl_dst,  1, MV(rl_depth),
+				      Meml[rl_out], npix, rop)
+
+	     # Copy out the edited range list.
+	     call amovl (Meml[rl_out], rl_dst, RLL_LEN(rl_out))
 
 	    call sfree (sp)
 	}

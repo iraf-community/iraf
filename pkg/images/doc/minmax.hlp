@@ -1,4 +1,4 @@
-.help minmax Feb87 images
+.help minmax May91 images
 .ih
 NAME
 minmax -- compute the minimum and maximum pixel values of an image
@@ -23,9 +23,21 @@ processed.
 .le
 .ls minval = INDEF
 Set to the minimum pixel value of the last image processed.
+If the pixel type of the last input image was complex, this is the real
+part of the minimum value.
 .le
 .ls maxval = INDEF
 Set to the maximum pixel value of the last image processed.
+If the pixel type of the last input image was complex, this is the real
+part of the maximum value.
+.le
+.ls iminval = INDEF
+Set to the minimum imaginary part of the pixel value of the last image
+processed. Only used if the pixel type of the last input image was complex.
+.le
+.ls imaxval = INDEF
+Set to the maximum imaginary part of the pixel value of the last image
+processed. Only used if the pixel type of the last input image was complex.
 .le
 .ls minpix = ""
 Set to the minimum pixel specification of the last image processed.

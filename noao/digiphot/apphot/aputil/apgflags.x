@@ -1,6 +1,6 @@
 include	<gio.h>
 
-# APGFLAGS -- Procedure to get the value of the flags variable.
+# APGFLAGS -- Fetch the value of the graphics flags variable.
 
 int procedure apgflags (gp)
 

@@ -11,11 +11,13 @@ include	<fio.h>
 
 int procedure fstati (fd, what)
 
-int	fd, what
-int	flag, ffd
-pointer	ffp
-bool	envgetb()
+int	fd				#I file descriptor
+int	what				#I parameter to be returned
+
+pointer	ffp, pb, pbtop
+int	flag, ffd, nchars, seglen, iomode
 int	and(), btoi()
+bool	envgetb()
 long	ffilsz()
 include	<fio.com>
 
@@ -61,6 +63,13 @@ begin
 	    return (ffp)
 	case F_FLUSHNL:
 	    flag = FF_FLUSHNL
+	case F_IOMODE:
+	    iomode = 0
+	    if (and (fflags[fd], FF_RAW) != 0)
+		iomode = iomode + IO_RAW
+	    if (and (fflags[fd], FF_NDELAY) != 0)
+		iomode = iomode + IO_NDELAY
+	    return (iomode)
 	case F_KEEP:
 	    flag = FF_KEEP
 
@@ -92,7 +101,7 @@ begin
 	case F_OPTBUFSIZE:
 	    return (FOPTBUFSIZE(ffp))
 	case F_RAW:
-	    flag = FF_RAW + FF_NDELAY
+	    flag = FF_RAW
 	case F_READ:
 	    flag = FF_READ
 
@@ -110,9 +119,22 @@ begin
 	    flag = FF_WRITE
 	case F_MAXBUFSIZE:
 	    return (FMAXBUFSIZE(ffp))
+
 	case F_UNREAD:
 	    UPDATE_IOP(fd)
-	    return (itop[fd] - iop[fd])
+	    if (iop[fd] < bufptr[fd] || iop[fd] >= itop[fd])
+		nchars = 0
+	    else
+		nchars = itop[fd] - iop[fd]
+	    if (and (FF_PUSHBACK, fflags[fd]) != 0) {
+		pbtop = (FPBTOP(ffp) - 1) / SZ_INT + 1
+		for (pb=FPBSP(ffp);  pb < pbtop;  pb=pb+4) {
+		    seglen = Memi[pb+1] - Memi[pb]
+		    if (seglen > 0)
+			nchars = nchars + seglen
+		}
+	    }
+	    return (nchars)
 
 	default:
 	    return (ERR)

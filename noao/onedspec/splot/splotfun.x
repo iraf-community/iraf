@@ -1,70 +1,111 @@
 include	<mach.h>
-include "../oned.h"
-include "../idsmtn.h"
+include	"../shdr.h"
 
 # Function Mode for STEK
 
 # FUN_DO -- Branch and execute proper function
 
-procedure fun_do (key, pix, npts)
+procedure fun_do (key, sh1, y, n)
 
-real	pix[ARB]
-int	key, npts
+int	key
+pointer	sh1
+real	y[n]
+int	n
+
+char	spec2[SZ_FNAME]
+int	i, nline, nband, strlen()
+real	const, clgetr()
+pointer	im, mw, sh2
+bool	wave_scl
+errchk	getimage, shdr_rebin
 
 begin
 	switch (key) {
-	case 'l':
-	    # Log10
-	    call fun_l10 (pix, npts)
+	case 'a': # Absolute value
+	    do i = 1, n
+		y[i] = abs (y[i])
+	case 'd': # Dexp (base 10)
+	    const = log10 (MAX_REAL)
+	    do i = 1, n
+		if (abs (y[i]) < const)
+		    y[i] = 10.0 ** y[i]
+		else if (y[i] >= const)
+		    y[i] = MAX_REAL
+		else
+		    y[i] = 0.0
+	case 'e': # Exp base e
+	    const = log (MAX_REAL)
+	    do i = 1, n
+		if (abs (y[i]) < const)
+		    y[i] = exp (y[i])
+		else if (y[i] >= const)
+		    y[i] = MAX_REAL
+		else
+		    y[i] = 0.0
+	case 'i': # Inverse
+	    do i = 1, n
+		if (y[i] != 0.0)
+		    y[i] = 1.0/y[i]
+		else
+		    y[i] = 0.0
+	case 'l': # Log10
+	    do i = 1, n
+		if (y[i] > 0.0)
+		    y[i] = log10 (y[i])
+		else
+		    y[i] = -0.5
+	case 'm': # Multiply by constant
+	    const = clgetr ("constant")
+	    call amulkr (y, const, y, n)
+	case 'n': # Log base e
+	    do i = 1, n
+		if (y[i] > 0.0)
+		    y[i] = log (y[i])
+		else
+		    y[i] = -0.5
+	case 'p': # Add constant
+	    const = clgetr ("constant")
+	    call aaddkr (y, const, y, n)
+	case 's': # Square root
+	    do i = 1, n
+		if (y[i] >= 0.0)
+		    y[i] = sqrt (y[i])
+		else
+		    y[i] = 0.0
 
-	case 'n':
-	    # Log base e
-	    call fun_le  (pix, npts)
+	case '+', '-', '*', '/': # Binary operations
+	    call printf ("Second spectrum ")
+	    call clgstr ("spec2", spec2, SZ_FNAME)
+	    if (strlen (spec2) == 0)
+		return
 
-	case 'd':
-	    # Dexp (base 10)
-	    call fun_dxp (pix, npts)
-
-	case 'e':
-	    # Exp base e
-	    call fun_exp (pix, npts)
-
-	case 's':
-	    # Square root
-	    call fun_sqr (pix, npts)
-
-	case 'a':
-	    # Absolute value
-	    call fun_abs (pix, npts)
-
-	case 'i':
-	    # Inverse
-	    call fun_invers (pix, npts)
-
-	# Constant operators
-	case 'p':
-	    call fun_plus (pix, npts)
-
-	case 'm':
-	    call fun_mult (pix, npts)
-
-	# Two spectrum operators
-	case '+':
-	    call fun_splus (pix, npts)
-
-	case '-':
-	    call fun_sminus (pix, npts)
-
-	case '*':
-	    call fun_smult (pix, npts)
-
-	case '/':
-	    call fun_sdiv (pix, npts)
+	    wave_scl = true
+	    nline = 0
+	    nband = 0
+	    call getimage (spec2, nline, nband, wave_scl, "angstroms",
+		im, mw, sh2, NULL)
+	    call shdr_rebin (sh2, sh1)
+	    switch (key) {
+	    case '+':
+		call aaddr (y, Memr[SY(sh2)], y, n)
+	    case '-':
+		call asubr (y, Memr[SY(sh2)], y, n)
+	    case '*':
+		call amulr (y, Memr[SY(sh2)], y, n)
+	    case '/':
+		do i = 1, n
+		    if (Memr[SY(sh2)+i-1] == 0.0)
+			y[i] = 0.0
+		else
+		    y[i] = y[i] / Memr[SY(sh2)+i-1]
+	    }
+	    call shdr_close (sh2)
+	    call mw_close (mw)
+	    call imunmap (im)
 
 	# Redraw
 	case 'r':
 	    ;
-
 	default:
 	    call error (0, "Unknown function")
 	}
@@ -77,322 +118,4 @@ procedure fun_help ()
 begin
 	call printf ("q=quit l,n=log10,e d,e=d,exp s=sqrt a=abs i=1/s")
 	call printf (" p=+k m=*k  +,-,*,/=2spec ops\n")
-end
-
-# FUN_L10 -- Log 10 of spectrum.
-# if value is less than or equal to 0.0, log10 (value) = -0.5
-
-procedure fun_l10 (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	i
-
-begin
-	do i = 1, n
-	    if (pix[i] > 0.0)
-		pix[i] = log10 (pix[i])
-	    else
-		pix[i] = -0.5
-end
-
-# FUN_LE -- Natural log (base e)
-
-procedure fun_le (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	i
-
-begin
-	do i = 1, n
-	    if (pix[i] > 0.0)
-		pix[i] = log (pix[i])
-	    else
-		pix[i] = -0.5
-end
-
-# FUN_EXP -- Exponential base e
-
-procedure fun_exp (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	i
-real	max_exp
-
-begin
-	max_exp = log (MAX_REAL)
-	do i = 1, n
-	    if (abs (pix[i]) < max_exp)
-		pix[i] = exp (pix[i])
-	    else if (pix[i] >= max_exp)
-		pix[i] = MAX_REAL
-	    else
-		pix[i] = 0.0
-end
-
-# FUN_DXP -- Exponential base 10
-
-procedure fun_dxp (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	i
-real	max_exp
-
-begin
-	max_exp = log10 (MAX_REAL)
-	do i = 1, n
-	    if (abs (pix[i]) < max_exp)
-		pix[i] = 10.0 ** pix[i]
-	    else if (pix[i] >= max_exp)
-		pix[i] = MAX_REAL
-	    else
-		pix[i] = 0.0
-end
-
-# FUN_SQR -- Sqrt of value. If negative, set to 0.0
-
-procedure fun_sqr (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	i
-
-begin
-	do i = 1, n
-	    if (pix[i] >= 0.0)
-		pix[i] = sqrt (pix[i])
-	    else
-		pix[i] = 0.0
-end
-
-# FUN_ARB -- Absolute value
-
-procedure fun_abs (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	i
-
-begin
-	do i = 1, n
-	    pix[i] = abs (pix[i])
-end
-
-# FUN_INVERS -- Inverse
-
-procedure fun_invers (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	i
-
-begin
-	do i = 1, n
-	    if (pix[i] != 0.0)
-		pix[i] = 1.0/pix[i]
-	    else
-		pix[i] = 0.0
-end
-
-# FUN_PLUS -- Add a constant to spectrum
-# Will someday be able to add another spectrum
-
-procedure fun_plus (pix, n)
-
-real	pix[ARB]
-int	n
-
-real	const
-
-real	clgetr()
-
-begin
-	# Get constant
-	const = clgetr ("constant")
-
-	call aaddkr (pix, const, pix, n)
-end
-
-# FUN_MULT -- Multiply spectrum by a constant
-
-procedure fun_mult (pix, n)
-
-real	pix[ARB]
-int	n
-
-real	const
-
-real	clgetr()
-
-begin
-	# Get constant
-	const = clgetr ("constant")
-
-	call amulkr (pix, const, pix, n)
-end
-
-# FUN_SPLUS -- Add spectrum to a spectrum
-
-procedure fun_splus (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	npt2, nval, nline
-real	x1, x2, dx
-pointer	im, pix2, ids2, sp
-char	spec2[SZ_FNAME]
-bool	wave_scl
-
-int	strlen()
-errchk	getimage
-
-begin
-	# Get second spectrum
-	call printf ("add to ")
-	call clgstr ("spec2", spec2, SZ_FNAME)
-	if (strlen (spec2) == 0)
-	    return
-
-	call smark (sp)
-	call salloc (ids2, LEN_IDS, TY_STRUCT)
-	call salloc (POINT(ids2), MAX_NCOEFF, TY_REAL)
-
-	wave_scl = true
-	call getimage (spec2, nline, wave_scl, im, ids2, NULL, pix2, npt2,
-	    x1, x2, dx)
-	nval = min (n, npt2)
-	call aaddr (pix, Memr[pix2], pix, nval)
-	call imunmap (im)
-
-	call sfree (sp)
-end
-
-# FUN_SMULT -- Multiply spectrum by a spectrum
-
-procedure fun_smult (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	npt2, nval, nline
-real	x1, x2, dx
-pointer	im, pix2, ids2, sp
-char	spec2[SZ_FNAME]
-bool	wave_scl
-
-int	strlen()
-errchk	getimage
-
-begin
-	# Get second spectrum
-	call printf ("multiply by ")
-	call clgstr ("spec2", spec2, SZ_FNAME)
-	if (strlen (spec2) == 0)
-	    return
-
-	call smark (sp)
-	call salloc (ids2, LEN_IDS, TY_STRUCT)
-	call salloc (POINT(ids2), MAX_NCOEFF, TY_REAL)
-
-	wave_scl = true
-	call getimage (spec2, nline, wave_scl, im, ids2, NULL, pix2, npt2,
-	    x1, x2, dx)
-
-	nval = min (n, npt2)
-	call amulr (pix, Memr[pix2], pix, nval)
-	call imunmap (im)
-
-	call sfree (sp)
-end
-
-# FUN_SMINUS -- Subtract spectrum from a spectrum
-
-procedure fun_sminus (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	npt2, nval, nline
-real	x1, x2, dx
-pointer	im, pix2, ids2, sp
-char	spec2[SZ_FNAME]
-bool	wave_scl
-
-int	strlen()
-errchk	getimage
-
-begin
-	# Get second spectrum
-	call printf ("subtract ")
-	call clgstr ("spec2", spec2, SZ_FNAME)
-	if (strlen (spec2) == 0)
-	    return
-
-	call smark (sp)
-	call salloc (ids2, LEN_IDS, TY_STRUCT)
-	call salloc (POINT(ids2), MAX_NCOEFF, TY_REAL)
-
-	wave_scl = true
-	call getimage (spec2, nline, wave_scl, im, ids2, NULL, pix2, npt2,
-	    x1, x2, dx)
-	
-	nval = min (n, npt2)
-	call asubr (pix, Memr[pix2], pix, nval)
-	call imunmap (im)
-
-	call sfree (sp)
-end
-
-# FUN_SDIV -- Divide spectrum by a spectrum
-
-procedure fun_sdiv (pix, n)
-
-real	pix[ARB]
-int	n
-
-int	npt2, nval, i, nline
-real	x1, x2, dx
-pointer	im, pix2, ids2, sp
-char	spec2[SZ_FNAME]
-bool	wave_scl
-
-int	strlen()
-errchk	getimage
-
-begin
-	# Get second spectrum
-	call printf ("divide by ")
-	call clgstr ("spec2", spec2, SZ_FNAME)
-	if (strlen (spec2) == 0)
-	    return
-
-	call smark (sp)
-	call salloc (ids2, LEN_IDS, TY_STRUCT)
-	call salloc (POINT(ids2), MAX_NCOEFF, TY_REAL)
-
-	wave_scl = true
-	call getimage (spec2, nline, wave_scl, im, ids2, NULL, pix2, npt2,
-	    x1, x2, dx)
-	
-	nval = min (n, npt2)
-	do i = 1, nval
-	    if (Memr[pix2+i-1] == 0.0)
-		pix[i] = 0.0
-	    else
-		pix[i] = pix[i] / Memr[pix2+i-1]
-
-	call imunmap (im)
-
-	call sfree (sp)
 end

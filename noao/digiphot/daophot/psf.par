@@ -1,0 +1,18 @@
+# Parameters for the PSF task
+ 
+image,f,a,,,,"Image for which to build PSF"
+photfile,f,a,default,,,"Aperture photometry file (default: image.mag.?)"
+psfimage,f,a,default,,,"Output PSF image (default: image.psf.?)"
+groupfile,f,a,default,,,"Output PSF group file (default: image.psg.?)"
+datapars,pset,h,"",,,Data dependent parameters
+daopars,pset,h,"",,,Daophot fitting parameters
+showplots,b,h,yes,,,"Show plots of PSF stars and fit residuals?"
+plottype,s,h,"mesh",,,"Default plot type (mesh|contour)"
+plotfile,f,h,"",,,Name of output plot metacode file
+graphics,s,h,"stdgraph",,,Graphics device
+display,s,h,"stdimage",,,Display device
+commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+verify,b,h,yes,,,"Verify critical PSF parameters"
+update,b,h,no,,,"Update critical PSF parameters"
+mode,s,h,'ql'

@@ -23,7 +23,7 @@ No weighting.
 .ls instrumental
 The weight of each point is equal to 1. / SIGMAY ** 2.
 .le
-.ls
+.ls statistical
 The weight of each point is equal to 1. / Y.
 .le
 .le

@@ -55,7 +55,6 @@ int	ip, op, ch, opcode, cursor
 int	save1, save2, i, xres, yres, quality
 char	kwname[MAX_KWLEN]
 
-extern	pr_psio()
 pointer	gtr_init(), grc_open(), ttyodes()
 int	strdic(), grc_boolval(), ttygeti(), ttystati()
 real	grc_realval()

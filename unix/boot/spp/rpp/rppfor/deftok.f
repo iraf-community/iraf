@@ -1,234 +1,234 @@
-      INTEGER FUNCTION DEFTOK (TOKEN, TOKSIZ)
-      INTEGER TOKEN (100)
-      INTEGER TOKSIZ
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER T, C, DEFN (2048), MDEFN (2048)
-      INTEGER GTOK
-      INTEGER EQUAL
-      INTEGER AP, ARGSTK (100), CALLST (50), NLB, PLEV (50), IFL
-      INTEGER LUDEF, PUSH, IFPARM
-      INTEGER BALP(3)
-      INTEGER PSWRG(22)
-      DATA BALP(1)/40/,BALP(2)/41/,BALP(3)/-2/
-      DATA PSWRG(1)/115/,PSWRG(2)/119/,PSWRG(3)/105/,PSWRG(4)/116/,PSWRG
-     *(5)/99/,PSWRG(6)/104/,PSWRG(7)/95/,PSWRG(8)/110/,PSWRG(9)/111/,PSW
-     *RG(10)/95/,PSWRG(11)/114/,PSWRG(12)/97/,PSWRG(13)/110/,PSWRG(14)/1
-     *03/,PSWRG(15)/101/,PSWRG(16)/95/,PSWRG(17)/99/,PSWRG(18)/104/,PSWR
-     *G(19)/101/,PSWRG(20)/99/,PSWRG(21)/107/,PSWRG(22)/-2/
-      CP = 0
-      AP = 1
-      EP = 1
-      T = GTOK (TOKEN, TOKSIZ)
-23000 IF (.NOT.(T .NE. -1))GOTO 23002
-      IF (.NOT.(T .EQ. -9))GOTO 23003
-      IF (.NOT.(LUDEF (TOKEN, DEFN, DEFTBL) .EQ. 0))GOTO 23005
-      IF (.NOT.(CP .EQ. 0))GOTO 23007
-      GOTO 23002
-23007 CONTINUE
-      CALL PUTTOK (TOKEN)
-23008 CONTINUE
-      GOTO 23006
-23005 CONTINUE
-      IF (.NOT.(DEFN (1) .EQ. -4))GOTO 23009
-      CALL GETDEF (TOKEN, TOKSIZ, DEFN, 2048)
-      CALL ENTDEF (TOKEN, DEFN, DEFTBL)
-      GOTO 23010
-23009 CONTINUE
-      IF (.NOT.(DEFN (1) .EQ. -15 .OR. DEFN (1) .EQ. -16))GOTO 23011
-      C = DEFN (1)
-      CALL GETDEF (TOKEN, TOKSIZ, DEFN, 2048)
-      IFL = LUDEF (TOKEN, MDEFN, DEFTBL)
-      IF (.NOT.((IFL .EQ. 1 .AND. C .EQ. -15) .OR. (IFL .EQ. 0 .AND. C .
-     *EQ. -16)))GOTO 23013
-      CALL PBSTR (DEFN)
-23013 CONTINUE
-      GOTO 23012
-23011 CONTINUE
-      IF (.NOT.(DEFN(1) .EQ. -17 .AND. CP .EQ. 0))GOTO 23015
-      IF (.NOT.(GTOK (DEFN, 2048) .EQ. 32))GOTO 23017
-      IF (.NOT.(GTOK (DEFN, 2048) .EQ. -9))GOTO 23019
-      IF (.NOT.(EQUAL (DEFN, PSWRG) .EQ. 1))GOTO 23021
-      SWINRG = 1
-      GOTO 23022
-23021 CONTINUE
-      GOTO 10
-23022 CONTINUE
-      GOTO 23020
-23019 CONTINUE
-10    CALL PBSTR (DEFN)
-      CALL PUTBAK (32)
-      GOTO 23002
-23020 CONTINUE
-      GOTO 23018
-23017 CONTINUE
-      CALL PBSTR (DEFN)
-      GOTO 23002
-23018 CONTINUE
-      GOTO 23016
-23015 CONTINUE
-      CP = CP + 1
-      IF (.NOT.(CP .GT. 50))GOTO 23023
-      CALL BADERR (20Hcall stack overflow.)
-23023 CONTINUE
-      CALLST (CP) = AP
-      AP = PUSH (EP, ARGSTK, AP)
-      CALL PUTTOK (DEFN)
-      CALL PUTCHR (-2)
-      AP = PUSH (EP, ARGSTK, AP)
-      CALL PUTTOK (TOKEN)
-      CALL PUTCHR (-2)
-      AP = PUSH (EP, ARGSTK, AP)
-      T = GTOK (TOKEN, TOKSIZ)
-      IF (.NOT.(T .EQ. 32))GOTO 23025
-      T = GTOK (TOKEN, TOKSIZ)
-      CALL PBSTR (TOKEN)
-      IF (.NOT.(T .NE. 40))GOTO 23027
-      CALL PUTBAK (32)
-23027 CONTINUE
-      GOTO 23026
-23025 CONTINUE
-      CALL PBSTR (TOKEN)
-23026 CONTINUE
-      IF (.NOT.(T .NE. 40))GOTO 23029
-      CALL PBSTR (BALP)
-      GOTO 23030
-23029 CONTINUE
-      IF (.NOT.(IFPARM (DEFN) .EQ. 0))GOTO 23031
-      CALL PBSTR (BALP)
-23031 CONTINUE
-23030 CONTINUE
-      PLEV (CP) = 0
-23016 CONTINUE
-23012 CONTINUE
-23010 CONTINUE
-23006 CONTINUE
-      GOTO 23004
-23003 CONTINUE
-      IF (.NOT.(T .EQ. -69))GOTO 23033
-      NLB = 1
-23035 CONTINUE
-      T = GTOK (TOKEN, TOKSIZ)
-      IF (.NOT.(T .EQ. -69))GOTO 23038
-      NLB = NLB + 1
-      GOTO 23039
-23038 CONTINUE
-      IF (.NOT.(T .EQ. -68))GOTO 23040
-      NLB = NLB - 1
-      IF (.NOT.(NLB .EQ. 0))GOTO 23042
-      GOTO 23037
-23042 CONTINUE
-      GOTO 23041
-23040 CONTINUE
-      IF (.NOT.(T .EQ. -1))GOTO 23044
-      CALL BADERR (14HEOF in string.)
-23044 CONTINUE
-23041 CONTINUE
-23039 CONTINUE
-      CALL PUTTOK (TOKEN)
-23036 GOTO 23035
-23037 CONTINUE
-      GOTO 23034
-23033 CONTINUE
-      IF (.NOT.(CP .EQ. 0))GOTO 23046
-      GOTO 23002
-23046 CONTINUE
-      IF (.NOT.(T .EQ. 40))GOTO 23048
-      IF (.NOT.(PLEV (CP) .GT. 0))GOTO 23050
-      CALL PUTTOK (TOKEN)
-23050 CONTINUE
-      PLEV (CP) = PLEV (CP) + 1
-      GOTO 23049
-23048 CONTINUE
-      IF (.NOT.(T .EQ. 41))GOTO 23052
-      PLEV (CP) = PLEV (CP) - 1
-      IF (.NOT.(PLEV (CP) .GT. 0))GOTO 23054
-      CALL PUTTOK (TOKEN)
-      GOTO 23055
-23054 CONTINUE
-      CALL PUTCHR (-2)
-      CALL EVALR (ARGSTK, CALLST (CP), AP - 1)
-      AP = CALLST (CP)
-      EP = ARGSTK (AP)
-      CP = CP - 1
-23055 CONTINUE
-      GOTO 23053
-23052 CONTINUE
-      IF (.NOT.(T .EQ. 44 .AND. PLEV (CP) .EQ. 1))GOTO 23056
-      CALL PUTCHR (-2)
-      AP = PUSH (EP, ARGSTK, AP)
-      GOTO 23057
-23056 CONTINUE
-      CALL PUTTOK (TOKEN)
-23057 CONTINUE
-23053 CONTINUE
-23049 CONTINUE
-23047 CONTINUE
-23034 CONTINUE
-23004 CONTINUE
-23001 T = GTOK (TOKEN, TOKSIZ)
-      GOTO 23000
-23002 CONTINUE
-      DEFTOK = T
-      IF (.NOT.(T .EQ. -9))GOTO 23058
-      CALL FOLD (TOKEN)
-23058 CONTINUE
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      integer function deftok (token, toksiz)
+      integer token (100)
+      integer toksiz
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer t, c, defn (2048), mdefn (2048)
+      integer gtok
+      integer equal
+      integer ap, argstk (100), callst (50), nlb, plev (50), ifl
+      integer ludef, push, ifparm
+      integer balp(3)
+      integer pswrg(22)
+      data balp(1)/40/,balp(2)/41/,balp(3)/-2/
+      data pswrg(1)/115/,pswrg(2)/119/,pswrg(3)/105/,pswrg(4)/116/,pswrg
+     *(5)/99/,pswrg(6)/104/,pswrg(7)/95/,pswrg(8)/110/,pswrg(9)/111/,psw
+     *rg(10)/95/,pswrg(11)/114/,pswrg(12)/97/,pswrg(13)/110/,pswrg(14)/1
+     *03/,pswrg(15)/101/,pswrg(16)/95/,pswrg(17)/99/,pswrg(18)/104/,pswr
+     *g(19)/101/,pswrg(20)/99/,pswrg(21)/107/,pswrg(22)/-2/
+      cp = 0
+      ap = 1
+      ep = 1
+      t = gtok (token, toksiz)
+23000 if (.not.(t .ne. -1))goto 23002
+      if (.not.(t .eq. -9))goto 23003
+      if (.not.(ludef (token, defn, deftbl) .eq. 0))goto 23005
+      if (.not.(cp .eq. 0))goto 23007
+      goto 23002
+23007 continue
+      call puttok (token)
+23008 continue
+      goto 23006
+23005 continue
+      if (.not.(defn (1) .eq. -4))goto 23009
+      call getdef (token, toksiz, defn, 2048)
+      call entdef (token, defn, deftbl)
+      goto 23010
+23009 continue
+      if (.not.(defn (1) .eq. -15 .or. defn (1) .eq. -16))goto 23011
+      c = defn (1)
+      call getdef (token, toksiz, defn, 2048)
+      ifl = ludef (token, mdefn, deftbl)
+      if (.not.((ifl .eq. 1 .and. c .eq. -15) .or. (ifl .eq. 0 .and. c .
+     *eq. -16)))goto 23013
+      call pbstr (defn)
+23013 continue
+      goto 23012
+23011 continue
+      if (.not.(defn(1) .eq. -17 .and. cp .eq. 0))goto 23015
+      if (.not.(gtok (defn, 2048) .eq. 32))goto 23017
+      if (.not.(gtok (defn, 2048) .eq. -9))goto 23019
+      if (.not.(equal (defn, pswrg) .eq. 1))goto 23021
+      swinrg = 1
+      goto 23022
+23021 continue
+      goto 10
+23022 continue
+      goto 23020
+23019 continue
+10    call pbstr (defn)
+      call putbak (32)
+      goto 23002
+23020 continue
+      goto 23018
+23017 continue
+      call pbstr (defn)
+      goto 23002
+23018 continue
+      goto 23016
+23015 continue
+      cp = cp + 1
+      if (.not.(cp .gt. 50))goto 23023
+      call baderr (20Hcall stack overflow.)
+23023 continue
+      callst (cp) = ap
+      ap = push (ep, argstk, ap)
+      call puttok (defn)
+      call putchr (-2)
+      ap = push (ep, argstk, ap)
+      call puttok (token)
+      call putchr (-2)
+      ap = push (ep, argstk, ap)
+      t = gtok (token, toksiz)
+      if (.not.(t .eq. 32))goto 23025
+      t = gtok (token, toksiz)
+      call pbstr (token)
+      if (.not.(t .ne. 40))goto 23027
+      call putbak (32)
+23027 continue
+      goto 23026
+23025 continue
+      call pbstr (token)
+23026 continue
+      if (.not.(t .ne. 40))goto 23029
+      call pbstr (balp)
+      goto 23030
+23029 continue
+      if (.not.(ifparm (defn) .eq. 0))goto 23031
+      call pbstr (balp)
+23031 continue
+23030 continue
+      plev (cp) = 0
+23016 continue
+23012 continue
+23010 continue
+23006 continue
+      goto 23004
+23003 continue
+      if (.not.(t .eq. -69))goto 23033
+      nlb = 1
+23035 continue
+      t = gtok (token, toksiz)
+      if (.not.(t .eq. -69))goto 23038
+      nlb = nlb + 1
+      goto 23039
+23038 continue
+      if (.not.(t .eq. -68))goto 23040
+      nlb = nlb - 1
+      if (.not.(nlb .eq. 0))goto 23042
+      goto 23037
+23042 continue
+      goto 23041
+23040 continue
+      if (.not.(t .eq. -1))goto 23044
+      call baderr (14HEOF in string.)
+23044 continue
+23041 continue
+23039 continue
+      call puttok (token)
+23036 goto 23035
+23037 continue
+      goto 23034
+23033 continue
+      if (.not.(cp .eq. 0))goto 23046
+      goto 23002
+23046 continue
+      if (.not.(t .eq. 40))goto 23048
+      if (.not.(plev (cp) .gt. 0))goto 23050
+      call puttok (token)
+23050 continue
+      plev (cp) = plev (cp) + 1
+      goto 23049
+23048 continue
+      if (.not.(t .eq. 41))goto 23052
+      plev (cp) = plev (cp) - 1
+      if (.not.(plev (cp) .gt. 0))goto 23054
+      call puttok (token)
+      goto 23055
+23054 continue
+      call putchr (-2)
+      call evalr (argstk, callst (cp), ap - 1)
+      ap = callst (cp)
+      ep = argstk (ap)
+      cp = cp - 1
+23055 continue
+      goto 23053
+23052 continue
+      if (.not.(t .eq. 44 .and. plev (cp) .eq. 1))goto 23056
+      call putchr (-2)
+      ap = push (ep, argstk, ap)
+      goto 23057
+23056 continue
+      call puttok (token)
+23057 continue
+23053 continue
+23049 continue
+23047 continue
+23034 continue
+23004 continue
+23001 t = gtok (token, toksiz)
+      goto 23000
+23002 continue
+      deftok = t
+      if (.not.(t .eq. -9))goto 23058
+      call fold (token)
+23058 continue
+      return
+      end
+c     logic0  logical_column

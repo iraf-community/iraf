@@ -3,28 +3,30 @@
 $doc = "./doc/"
 
 badpiximage	hlp=doc$badpiximage.hlp
-ccdgeometry	hlp=doc$ccdgeometry.hlp
 ccdgroups	hlp=doc$ccdgroups.hlp
 ccdhedit	hlp=doc$ccdhedit.hlp
 ccdlist		hlp=doc$ccdlist.hlp
 ccdproc		hlp=doc$ccdproc.hlp
-ccdred		hlp=doc$ccdred.hlp
-ccdtypes	hlp=doc$ccdtypes.hlp
 combine		hlp=doc$combine.hlp
 cosmicrays	hlp=doc$cosmicrays.hlp
 darkcombine	hlp=doc$darkcombine.hlp
 flatcombine	hlp=doc$flatcombine.hlp
-flatfields	hlp=doc$flatfields.hlp
-guide		hlp=doc$guide.hlp
-instruments	hlp=doc$instruments.hlp
 mkfringecor	hlp=doc$mkfringecor.hlp
 mkillumcor	hlp=doc$mkillumcor.hlp
 mkillumflat	hlp=doc$mkillumflat.hlp
 mkskycor	hlp=doc$mkskycor.hlp
 mkskyflat	hlp=doc$mkskyflat.hlp
 setinstrument	hlp=doc$setinstrument.hlp
-subsets		hlp=doc$subsets.hlp
 zerocombine	hlp=doc$zerocombine.hlp
+
+ccdgeometry	hlp=doc$ccdgeometry.hlp
+ccdinstrument	hlp=doc$ccdinst.hlp
+ccdtypes	hlp=doc$ccdtypes.hlp
+flatfields	hlp=doc$flatfields.hlp
+guide		hlp=doc$guide.hlp
+instruments	hlp=doc$instruments.hlp
+package		hlp=doc$ccdred.hlp
+subsets		hlp=doc$subsets.hlp
 
 revisions	sys=Revisions
 
@@ -33,5 +35,4 @@ $ccdtest	= "noao$imred/ccdred/ccdtest/"
 ccdtest		men=ccdtest$ccdtest.men,
 		hlp=..,
 		sys=ccdtest$ccdtest.hlp,
-		pkg=ccdtest$ccdtest.hd,
 		src=ccdtest$ccdtest.cl

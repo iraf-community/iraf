@@ -24,12 +24,13 @@ pointer	ax1, ax2		# axis descriptors (output)
 int	angle			# axis orientation, 0 or 90 degrees
 
 pointer	w
-int	logflag, nminor, tmax, scaling, t1, t2
+int	logflag, nminor, scaling, t1, t2
 real	char_height, char_width, wctick, tval
 real	p1, p2, tp1, tp2, wcp1, tick1, step, minor_step, length
-int	gt_ndigits()
+
 bool	fp_equalr()
-real	ggetr(), elogr(), aelogr()
+int	gt_ndigits()
+real	ggetr(), elogr(), aelogr(), glb_minorstep()
 
 begin
 	w = GP_WCSPTR (gp, GP_WCS(gp))
@@ -129,26 +130,20 @@ begin
 	    wcp1 = aelogr (p1)
 	}
 
-# call eprintf ("....p1=%g, p2=%g, log=%d, tick1=%g, wctick=%g, step=%g\n")
-# call pargr(p1); call pargr(p2); call pargi(logflag); call pargr(tick1)
-# call pargr(wctick); call pargr(step)
-
 	# Compute the number of minor ticks.  If we are log scaling there
 	# are either no minor ticks or 8 minor ticks.  If the scaling is
 	# linear the tick placement algorithm is used to compute the best
-	# number of minor ticks, using GL_NMINOR as a close estimate.
+	# number of minor ticks, using GL_NMINOR as a close estimate.  If
+	# NMINOR is negative automatic tick selection is disabled and exactly
+	# abs(NMINOR) ticks will be drawn.  If NMINOR is zero no minor ticks
+	# are drawn.
 
-	if (GL_NMINOR(ap) <= 0)
+	if (GL_NMINOR(ap) == 0)			# no minor ticks
 	    nminor = 0
-	else if (logflag == YES)
+	else if (logflag == YES)		# log scaling
 	    nminor = 8
 	else {
-	    nminor = GL_NMINOR(ap)
-	    tmax = nminor * 2
-	    repeat {
-		call gtickr (tick1, tick1+step, nminor, NO, tval, minor_step)
-		nminor = nminor + 1
-	    } until (abs ((tval - tick1) / step) < TOL || nminor > tmax)
+	    minor_step = glb_minorstep (tick1, tick1+step, GL_NMINOR(ap))
 	    nminor = nint (abs (step / minor_step)) - 1
 	}
 
@@ -199,9 +194,6 @@ begin
 
 	# Set those parameters which differ depending on whether the axis is
 	# horizontal or vertical.
-
-# call eprintf ("____wctick=%g, inleft=%d, minorstep=%g\n")
-# call pargr(wctick);call pargi(AX_INLEFT(ax1)); call pargr(minor_step)
 
 	if (angle == 0) {
 	    AX_TICK1(ax1,1) = wctick - (AX_INLEFT(ax1) * minor_step)
@@ -296,4 +288,42 @@ begin
 	} else
 	    call strcpy (GL_TICKFORMAT(ap), AX_TICKFORMAT(ax1), SZ_FORMAT)
 	call strcpy (AX_TICKFORMAT(ax1), AX_TICKFORMAT(ax2), SZ_FORMAT)
+end
+
+
+# GLB_MINORSTEP -- Determine the step size for the minor ticks.  Adapted
+# from a routine by J. Eisenhamer (STScI) which was based on some MONGO code.
+
+real procedure glb_minorstep (x1, x2, nminor)
+
+real	x1, x2		#I interval between major ticks
+int	nminor		#I suggested number of minor ticks, or actual# if neg
+
+int	iexp
+real	amant, diff, num, range
+
+begin
+	range = abs (x2 - x1)
+	if (nminor < 0)
+	    return (range / real (-nminor + 1))
+	else {
+	    # Determine magnitude of the intervals.
+	    diff = log10 (range / nminor)
+	    iexp = int (diff)
+	    if (diff < 0)
+		iexp = iexp - 1
+	    amant = diff - real(iexp)
+
+	    # Determine an appropriate step size.
+	    if (amant < 0.15)
+		num = 1.0
+	    else if (amant < 0.50)
+		num = 2.0
+	    else if (amant < 0.85)
+		num = 5.0
+	    else
+		num = 10.0
+
+	    return (num * 10.0**iexp)
+	}
 end

@@ -43,12 +43,12 @@ begin
 
 	    # test to see if matrix is singular
 	    $if (datatype == r)
-	    if(((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= 100. * EPSILONR) {
+	    if(((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= 10. * EPSILONR) {
 	    $else
-	    if(((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= 100. * EPSILOND) {
+	    if(((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= 10. * EPSILOND) {
 	    $endif
 		do j = 1, nbands
-		    matfac[j,n] = 0.
+		    matfac[j,n] = PIXEL (0.0)
 		ier = SINGULAR
 		next
 	    }

@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<syserr.h>
+include	<ctype.h>
 include	<clio.h>
 
 .help clcache
@@ -16,23 +17,25 @@ running tasks which have many (dozens of) parameters.
 
 
 		 clc_init ()			# initialize the cache
-		 clc_newtask (taskname)		# set name of root pset
+	     clc_compress ()			# rebuild the cache
+	      clc_newtask (taskname)		# set name of root pset
 		 clc_mark (sp)			# mark cache status
 		 clc_free (sp)			# free to last mark
 
 		clc_enter (param, value)	# cache a parameter
        nchars = clc_fetch (param, out, maxch)	# fetch cached parameter
-         symp = clc_find (param, out, maxch)	# find cached parameter
+          symp = clc_find (param, out, maxch)	# find cached parameter
 
+		 clc_scan (cmd)			# scan a param=value stmt
+		 clc_list (fd, pset, format)	# list params to a file
 
-The cache is initialized by the IRAF main with CLC_INIT during process startup.
-CLC_MARK is called by the IRAF Main prior to parsing of the argument list of
-a task to mark the symbol table for storage reclamation at task termination.
-Parameter value pairs are entered into the cache with CLC_ENTER during
-processing of the command line.  Runtime get parameter requests from the task
-are satisfied from the cache if possible, querying the CL only if the cached
-value cannot be found.  Note that query mode and list type parameters are
-never cached since they do not have static values.
+The cache is initialized by the IRAF main with CLC_INIT during process
+startup and whenever a new task is run.  Parameter value pairs are entered
+into the cache with CLC_ENTER during processing of the command line.
+Runtime get parameter requests from the task are satisfied from the cache if
+possible, querying the CL only if the cached value cannot be found.  Note
+that query mode and list type parameters are never cached since they do not
+have static values.
 
 A task can be called either with named parameters or with unnamed, positional
 parameters.  In the latter case the parameters are passed as "$1", "$2", etc.
@@ -52,9 +55,9 @@ optimal performance.  There is no fixed limit on the size of the cache.
 .endhelp _____________________________________________________________________
 
 # SYMTAB default allocation parameters (non-limiting).
-define	LEN_INDEX	40		# nbuckets in symtab hash index
-define	LEN_STAB	150		# initial symbol table size
-define	SZ_SBUF		1024		# initial string buffer size
+define	LEN_INDEX	128		# nbuckets in symtab hash index
+define	LEN_STAB	512		# initial symbol table size
+define	SZ_SBUF		2048		# initial string buffer size
 
 
 # Symbol table structure (not much to it).
@@ -64,16 +67,24 @@ define	SYM_VALUE	Memi[$1]	# sbuf offset of value string
 
 
 # CLC_INIT -- Initialize the parameter cache.  Called during process
-# startup.
+# startup.  May be called repeatedly to reinitialize the cache.
 
 procedure clc_init()
 
 pointer	stopen()
+bool	first_time
+data	first_time /true/
 include	"clio.com"
 errchk	stopen
 
 begin
-	cl_stp = stopen ("clcache", LEN_INDEX, LEN_STAB, SZ_SBUF)
+	if (first_time) {
+	    cl_stp = stopen ("clcache", LEN_INDEX, LEN_STAB, SZ_SBUF)
+	    first_time = false
+	} else
+	    call stfree (cl_stp, cl_stmark)
+
+	call stmark (cl_stp, cl_stmark)
 	call aclri (cl_posarg, MAX_POSARGS)
 	cl_nposargs = 0
 	cl_nextarg  = 1
@@ -97,7 +108,8 @@ begin
 end
 
 
-# CLC_MARK -- Mark storage in the cache for subsequent restoration by clc_free.
+# CLC_MARK -- Mark storage in the cache for subsequent restoration by
+# clc_free.
 
 procedure clc_mark (marker)
 
@@ -312,4 +324,167 @@ begin
 	    call strcpy (cl_pname, outstr, maxch)
 
 	return (sym)
+end
+
+
+# CLC_SCAN -- Extract the param and value substrings from a param=value
+# statement and enter them into the CL parameter cache.
+
+procedure clc_scan (cmd)
+
+char	cmd[ARB]		#I command to be scanned
+
+int	ip
+pointer	sp, param, value, op, nchars
+int	stridx(), ctowrd()
+
+begin
+	call smark (sp)
+	call salloc (param, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_COMMAND, TY_CHAR)
+
+	# Skip any leading whitespace.
+	for (ip=1;  IS_WHITE(cmd[ip]);  ip=ip+1)
+	    ;
+
+	# Do nothing if blank line or comment.
+	if (cmd[ip] == EOS || cmd[ip] == '\n' || cmd[ip] == '#') {
+	    call sfree (sp)
+	    return
+	}
+
+	# Extract the param field.
+	op = param
+	while (IS_ALNUM (cmd[ip]) || stridx (cmd[ip], "_.$") > 0) {
+	    Memc[op] = cmd[ip]
+	    op = op + 1
+	    ip = ip + 1
+	}
+	Memc[op] = EOS
+
+	# Advance past the assignment operator.
+	while (IS_WHITE (cmd[ip]) || cmd[ip] == '=')
+	    ip = ip + 1
+
+	# Get the value string.
+	nchars = ctowrd (cmd, ip, Memc[value], SZ_COMMAND)
+
+	# Enter the param=value pair into the CL parameter cache.
+	call clc_enter (Memc[param], Memc[value])
+
+	call sfree (sp)
+end
+
+
+# CLC_LIST -- List the parameters in the named pset to an output file using
+# a caller supplied format.  If no pset is specified the entire contents of
+# the parameter cache are output.  A sample format is "set %s = \"%s\"\n".
+
+procedure clc_list (fd, pset, format)
+
+int	fd			#I output file
+char	pset[ARB]		#I pset to be listed, or EOS for full cache
+char	format[ARB]		#I output format - one %s each for param,value
+
+int	nsyms, i
+pointer	sp, syms, sympset, ip, op, sym, np
+
+bool	strne()
+pointer	sthead(), stnext(), stname(), strefsbuf()
+include	"clio.com"
+
+begin
+	# Count the number of parameters.
+	nsyms = 0
+	for (sym=sthead(cl_stp);  sym != NULL;  sym=stnext(cl_stp,sym))
+	    nsyms = nsyms + 1
+
+	call smark (sp)
+	call salloc (syms, nsyms, TY_POINTER)
+	call salloc (sympset, SZ_FNAME, TY_CHAR)
+
+	# Get a reversed list of symbol pointers.
+	op = syms + nsyms - 1
+	for (sym=sthead(cl_stp);  sym != NULL;  sym=stnext(cl_stp,sym)) {
+	    Memi[op] = sym
+	    op = op - 1
+	}
+
+	# Output the list.
+	do i = 1, nsyms {
+	    sym = Memi[syms+i-1]
+	    np = stname (cl_stp, sym)
+
+	    # Check the pset name if the user named a specific pset.
+	    if (pset[1] != EOS) {
+		# Get the pset name of the parameter.
+		op = sympset
+		for (ip=np;  Memc[ip] != EOS && Memc[ip] != '.';  ip=ip+1) {
+		    Memc[op] = Memc[ip]
+		    op = op + 1
+		}
+		Memc[op] = EOS
+
+		# Skip if the wrong pset.
+		if (strne (Memc[sympset], pset))
+		    next
+	    }
+
+	    call fprintf (fd, format)
+		call pargstr (Memc[np])
+		call pargstr (Memc[strefsbuf(cl_stp,SYM_VALUE(sym))])
+	}
+
+	call sfree (sp)
+end
+
+
+# CLC_COMPRESS -- Compress the parameter cache.  Since every parameter
+# modification results in a new parameter entry (redef), the symbol table
+# can grow quite large if there are many clput type parameter accesses.
+# This operator rebuilds the parameter cache eliminating all old entries.
+
+procedure clc_compress ()
+
+pointer	n_st, o_st
+pointer	sym, newsym, np, vp
+
+int	stpstr()
+pointer	strefsbuf(), stopen(), stname()
+pointer	sthead(), stnext(), stfind(), stenter()
+errchk	stopen, stenter, stpstr
+include	"clio.com"
+
+begin
+	n_st = stopen ("clcache", LEN_INDEX, LEN_STAB, SZ_SBUF)
+	o_st = cl_stp
+
+	# Copy the symbol table, saving only the most recent entry for
+	# each symbol.
+
+	for (sym=sthead(o_st);  sym != NULL;  sym=stnext(o_st,sym)) {
+	    np = stname (o_st, sym)
+	    if (stfind (n_st, Memc[np]) == NULL) {
+		vp = strefsbuf (o_st, SYM_VALUE(sym))
+		newsym = stenter (n_st, Memc[np], LEN_SYMSTRUCT)
+		SYM_VALUE(newsym) = stpstr (n_st, Memc[vp], 0)
+	    }
+	}
+
+	# Copy back the saved symbols.  The "push/pop" way in which we use
+	# the temporary symbol table to save the symbols automatically
+	# preserves the original symbol table ordering.
+
+	call stfree (o_st, cl_stmark)
+	call stmark (o_st, cl_stmark)
+
+	for (sym=sthead(n_st);  sym != NULL;  sym=stnext(n_st,sym)) {
+	    np = stname (n_st, sym)
+	    vp = strefsbuf (n_st, SYM_VALUE(sym))
+	    newsym = stenter (o_st, Memc[np], LEN_SYMSTRUCT)
+	    SYM_VALUE(newsym) = stpstr (o_st, Memc[vp], 0)
+	}
+
+	call stclose (n_st)
+	call stsqueeze (o_st)
 end

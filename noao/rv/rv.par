@@ -1,0 +1,7 @@
+# RV0 package parameter file
+
+z_threshold,r,h,0.2,,,"Redshift threshold for writing z values"
+tolerance,r,h,0.00001,,,"Fitting tolerance in pixels"
+maxiters,i,h,100,,,"Max number of fit iterations"
+interp,s,h,"poly5","|nearest|linear|poly3|poly5|spline3|sinc|",,"Data rebinning interpolator"
+version,s,h,"January 15, 1992"

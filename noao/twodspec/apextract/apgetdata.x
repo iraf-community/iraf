@@ -19,20 +19,17 @@ pointer	title			# Title for image data
 int	i, j, k, dispaxis
 pointer	buf
 
-int	imgeti()
 real	asumr()
 pointer	ap_immap(), imgs2r()
 
-errchk	ap_immap, imgeti
+errchk	ap_immap
 
 begin
 	# Map the image
-	im = ap_immap (image)
+	im = ap_immap (image, apaxis, dispaxis)
 	call strcpy (image, IM_HDRFILE(im), SZ_IMHDRFILE)
 
 	# Determine the dispersion and aperture axes.
-	dispaxis = imgeti (im, "dispaxis")
-	apaxis = mod (dispaxis, 2) + 1
 	if (IS_INDEFI (line))
 	    line = IM_LEN(im, dispaxis) / 2
 	else

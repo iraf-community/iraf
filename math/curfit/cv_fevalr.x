@@ -39,10 +39,10 @@ begin
 	call salloc (pnm2, npts, TY_REAL)
 
 	# a higher order polynomial
-	call amovkr (1.0, Memr[pnm2], npts)
+	call amovkr (real(1.0), Memr[pnm2], npts)
 	call altar (x, Memr[sx], npts, k1, k2)
 	call amovr (Memr[sx], Memr[pnm1], npts)
-	call amulkr (Memr[sx], 2.0, Memr[sx], npts)
+	call amulkr (Memr[sx], real(2.0), Memr[sx], npts)
 	do i = 3, order {
 	    call amulr (Memr[sx], Memr[pnm1], Memr[pn], npts)
 	    call asubr (Memr[pn], Memr[pnm2], Memr[pn], npts)
@@ -99,13 +99,13 @@ begin
 	call salloc (pnm2, npts, TY_REAL)
 
 	# a higher order polynomial
-	call amovkr (1.0, Memr[pnm2], npts)
+	call amovkr (real(1.0), Memr[pnm2], npts)
 	call altar (x, Memr[sx], npts, k1, k2)
 	call amovr (Memr[sx], Memr[pnm1], npts)
 	do i = 3, order {
 	    ri = i
-	    ri1 = (2.0 * ri - 3.0) / (ri - 1.0)
-	    ri2 = - (ri - 2.0) / (ri - 1.0)
+	    ri1 = (real(2.0) * ri - real(3.0)) / (ri - real(1.0))
+	    ri2 = - (ri - real(2.0)) / (ri - real(1.0))
 	    call amulr (Memr[sx], Memr[pnm1], Memr[pn], npts)
 	    call awsur (Memr[pn], Memr[pnm2], Memr[pn], npts, ri1, ri2)
 	    if (i < order) {
@@ -155,12 +155,13 @@ begin
 	azindex = sx - 1
 	do j = 1, npts {
 	    aindex = azindex + j
-	    Memr[aindex] = Memr[aindex] - Memi[index+j-1]
-	    Memr[tx+j-1] = 1.0 - Memr[aindex]
+	    Memr[aindex] = max (real(0.0), min (real(1.0), Memr[aindex] -
+	        Memi[index+j-1]))
+	    Memr[tx+j-1] = max (real(0.0), min (real(1.0), real(1.0) -
+	        Memr[aindex]))
 	}
 
     	# calculate yfit using the two non-zero basis function
-	call aclrr (yfit, npts)
 	do j = 1, npts
 	    yfit[j] = Memr[tx+j-1] * coeff[1+Memi[index+j-1]] +
 		      Memr[sx+j-1] * coeff[2+Memi[index+j-1]]
@@ -201,8 +202,10 @@ begin
 
         # transform sx to range 0 to 1
 	do j = 1, npts {
-	    Memr[sx+j-1] = Memr[sx+j-1] - Memi[index+j-1]
-	    Memr[tx+j-1] = 1.0 - Memr[sx+j-1]
+	    Memr[sx+j-1] = max (real(0.0), min (real(1.0), Memr[sx+j-1] -
+	        Memi[index+j-1]))
+	    Memr[tx+j-1] = max (real(0.0), min (real(1.0), real(1.0) -
+	        Memr[sx+j-1]))
 	}
 
         # calculate yfit using the four non-zero basis function
@@ -214,13 +217,15 @@ begin
 		call apowkr (Memr[tx], 3, Memr[temp], npts)
 	    case 2:
 		do j = 1, npts {
-		    Memr[temp+j-1] = 1.0 + Memr[tx+j-1] * (3.0 + Memr[tx+j-1] *
-			(3.0 - 3.0 * Memr[tx+j-1]))
+		    Memr[temp+j-1] = real(1.0) + Memr[tx+j-1] *
+		        (real(3.0) + Memr[tx+j-1] * (real(3.0) -
+			real(3.0) * Memr[tx+j-1]))
 		}
 	    case 3:
 		do j = 1, npts {
-		    Memr[temp+j-1] = 1.0 + Memr[sx+j-1] * (3.0 + Memr[sx+j-1] *
-			(3.0 - 3.0 * Memr[sx+j-1]))
+		    Memr[temp+j-1] = real(1.0) + Memr[sx+j-1] *
+		        (real(3.0) + Memr[sx+j-1] * (real(3.0) -
+			real(3.0) * Memr[sx+j-1]))
 		}
 	    case 4:
 		call apowkr (Memr[sx], 3, Memr[temp], npts)
@@ -231,7 +236,6 @@ begin
 	    call aaddr (yfit, Memr[temp], yfit, npts)
 	}
 
-    
 	# free space
 	call sfree (sp)
 

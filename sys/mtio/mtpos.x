@@ -2,41 +2,38 @@
 
 include	"mtio.h"
 
-# MTPOSITION -- Position the drive to the indicated file and record.
-# We are called to position the drive by device name, not to position an
-# open magtape file.
+# MTPOSITION -- Position the device to the indicated file and record.
+# We are called to position the device by device name, not to position
+# an open magtape file.
 
-procedure mtposition (filespec, file_number, record_number)
+procedure mtposition (mtname, file, record)
 
-char	filespec[ARB]		# drive to be positioned
-int	file_number		# desired file number
-int	record_number		# desired record number
+char	mtname[ARB]		#I device to be positioned
+int	file			#I desired file number
+int	record			#I desired record number
 
-int	nchars, junk
-pointer	sp, ip, op, mtspec, drive
-int	mtopen(), ki_extnode()
-errchk	mt_parse, mtopen
+int	junk
+pointer	sp, mtspec, device, devcap
+errchk	mtparse, mtopen
+int	mtopen()
 
 begin
 	call smark (sp)
-	call salloc (drive,  SZ_FNAME, TY_CHAR)
+	call salloc (device, SZ_FNAME, TY_CHAR)
 	call salloc (mtspec, SZ_FNAME, TY_CHAR)
+	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
 
-	# Get drive name from filespec.
-	call mt_parse (filespec, Memc[drive], SZ_FNAME, junk, junk, junk)
+	# Get device name (including node! prefix) from mtname.
+	call mtparse (mtname,
+	    Memc[device], SZ_FNAME, junk, junk, Memc[devcap], SZ_DEVCAP)
 
-	# Encode new filespec and open drive to position to desired file.
+	# Encode new mtname and open device to position to desired file.
 	# Note that we do not return until positioning is complete.  Thus,
-	# "mtposition(drive,1)" is a rewind with wait.
+	# "mtposition(device,1)" is a rewind with wait.
 
-	ip = drive + ki_extnode (Memc[drive], Memc[mtspec], SZ_FNAME, nchars)
-	op = nchars + 1
-
-	call sprintf (Memc[op], SZ_FNAME, "mt%s[%d,%d]")
-	    call pargstr (Memc[ip])
-	    call pargi (file_number)
-	    call pargi (record_number)
-
+	call mtencode (Memc[mtspec], SZ_FNAME,
+	    Memc[device], file, record, Memc[devcap])
 	call close (mtopen (Memc[mtspec], READ_ONLY, 1))
+
 	call sfree (sp)
 end

@@ -1,3 +1,0 @@
-input,s,a,,,,Input images
-output,s,a,,,,Output images
-function,s,a,log10,"log10|alog10|sqrt|abs",,Function

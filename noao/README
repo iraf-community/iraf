@@ -9,8 +9,11 @@ Optical Astronomy data.
     focas	faint object classification and analysis
     imred	image reductions
     mtlocal	data i/o programs for custom NOAO data formats
+    nobsolete	obsolete tasks
+    nproto	miscellaneous prototype quality tasks
+    observatory	Set and define observatory parameters
     onedspec	one dimensional spectra
-    proto	miscellaneous prototype quality tasks
+    rv          radial velocity analysis package
     surfphot	surface photometry package
     twodspec	two dimensional spectra
 

@@ -1,9 +1,9 @@
-      INTEGER FUNCTION LENGTH (STR)
-      INTEGER STR (100)
-      LENGTH = 0
-23000 IF (.NOT.(STR (LENGTH+1) .NE. -2))GOTO 23002
-23001 LENGTH = LENGTH + 1
-      GOTO 23000
-23002 CONTINUE
-      RETURN
-      END
+      integer function length (str)
+      integer str (100)
+      length = 0
+23000 if (.not.(str (length+1) .ne. -2))goto 23002
+23001 length = length + 1
+      goto 23000
+23002 continue
+      return
+      end

@@ -54,7 +54,7 @@ begin
 	    call set_zero (ccd)
 	    call set_dark (ccd)
 	    call set_flat (ccd)
-	case OBJECT:
+	case OBJECT, COMP:
 	    call set_zero (ccd)
 	    call set_dark (ccd)
 	    call set_flat (ccd)
@@ -96,8 +96,8 @@ begin
 	case ZERO:
 	    call readcor (input)
 	case FLAT:
-	    call ccdmean (input)
 	    call scancor (input)
+	    call ccdmean (input)
 	}
 
 	call sfree (sp)

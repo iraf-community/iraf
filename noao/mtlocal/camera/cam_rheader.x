@@ -34,7 +34,7 @@ begin
 	    nbytes = fstati (cam_fd, F_SZBBLK)
 	    if ((nbytes != SZB_CHAR * LEN_HEADER) && (nbytes != SZB_CHAR *
 		(LEN_HEADER+ 1)))
-		call error (0, "Not a camera tape")
+		call error (0, "Not a camera file")
 	}
 
 	# If the least significant byte is first byteswap the camera

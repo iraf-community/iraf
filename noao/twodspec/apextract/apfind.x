@@ -1,27 +1,26 @@
 include	<imhdr.h>
-include	<pkg/xtanswer.h>
 include	"apertures.h"
+
+# Sort flags
+define	ORDER	"|increasing|decreasing|"
 
 # AP_FIND -- Find and set apertures automatically.
 
-procedure ap_find (image, line, nsum, find, dbwrite, aps, naps)
+procedure ap_find (image, line, nsum, aps, naps)
 
 char	image[SZ_FNAME]		# Image name
 int	line			# Image dispersion line
 int	nsum			# Number of dispersion lines to sum
-int	find			# Find apertures?
-int	dbwrite			# Write apertures to database?
-
-pointer	aps[AP_MAXAPS]		# Aperture pointers
+pointer	aps			# Aperture pointers
 int	naps			# Number of apertures
 
 real	minsep, center
-int	i, npts, apaxis, nfind, nx
-pointer	im, imdata, title, sp, str, x
+int	i, j, npts, apaxis, nfind, nx
+pointer	im, imdata, title, sp, str, x, ids
 
-bool	clgetb()
-int	clgeti()
-real	clgetr(), ap_center(), cveval()
+bool	clgetb(), ap_answer()
+int	apgeti(), apgwrd()
+real	apgetr(), ap_center(), cveval()
 
 errchk	ap_getdata
 
@@ -30,69 +29,97 @@ begin
 	if (naps != 0)
 	     return
 
-	# Query the user.
+	# Query user.
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call sprintf (Memc[str], SZ_LINE, "Find apertures for %s?")
-	    call pargstr (image)
-	call xt_answer (Memc[str], find)
-	call sfree (sp)
-	if ((find == NO) || (find == ALWAYSNO))
+            call pargstr (image)
+	if (!ap_answer ("ansfind", Memc[str])) {
+	    call sfree (sp)
 	    return
+	}
+
+	if (clgetb ("verbose"))
+	    call printf ("Finding apertures ...\n")
 
 	# Get CL parameters.
-	nfind = min (clgeti ("apfind.nfind"), AP_MAXAPS)
+	nfind = apgeti ("nfind")
 	if (nfind == 0)
 	    return
-	minsep = clgetr ("apfind.minsep")
-
-	# Progress information.
-	if (clgetb ("apio.verbose"))
-	    call printf ("Finding apertures ...\n")
+	minsep = apgetr ("minsep")
 
 	# Map the image and get the image data.
 	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 
-	# Allocate working memory.
-	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (x, nfind, TY_REAL)
+	# If nfind > 0 find the peaks.  Otherwise divide the image evenly
+	# into apertures.
 
-	# Find the peaks.
-	nx = 0
-	call find_peaks (Memr[imdata], npts, 0., 1, nfind, minsep, 0., Memr[x],
-	    nx)
-	call asrtr (Memr[x], Memr[x], nx)
+	if (nfind > 0) {
+	    # Allocate working memory.
+	    call salloc (x, nfind+2, TY_REAL)
 
-	# Center on the peaks and define default apertures..
-	naps = 0
-	for (i = 1; i <= nx; i = i + 1) {
-	    center = Memr[x+i-1]
-	    center = ap_center (center, Memr[imdata], npts)
+	    # Find the peaks.
+	    nx = 0
+	    call find_peaks (Memr[imdata], npts, 0., 1, nfind+2, minsep, 0.,
+		Memr[x], nx)
+	    #call asrtr (Memr[x], Memr[x], nx)
 
-	    if (!IS_INDEF(center)) {
-		naps = naps + 1
-		if (naps == 1)
-		    call ap_default (im, 1, 1, apaxis, INDEFR, real (line),
-			aps[naps])
+	    # Center on the peaks.
+	    naps = 0
+	    for (i = 1; i <= nx && naps < nfind; i = i + 1) {
+		center = Memr[x+i-1]
+		center = ap_center (center, Memr[imdata], npts)
+
+		if (!IS_INDEF(center)) {
+		    if (mod (naps, 100) == 0)
+			call realloc (aps, naps+100, TY_POINTER)
+		    if (naps == 0)
+			call ap_default (im, INDEFI, 1, apaxis, INDEFR,
+			    real (line), Memi[aps+naps])
+		    else
+			call ap_copy (Memi[aps], Memi[aps+naps])
+
+		    AP_CEN(Memi[aps+naps], AP_AXIS(Memi[aps+naps])) = center -
+			cveval (AP_CV(Memi[aps+naps]), real (line))
+		    naps = naps + 1
+		}
+	    }
+
+	} else {
+	    nfind = abs (nfind)
+	    minsep = real (npts) / nfind
+	    naps = 0
+	    do i = 1, nfind {
+		if (mod (naps, 100) == 0)
+		    call realloc (aps, naps+100, TY_POINTER)
+		center = (i - 0.5) * minsep
+		IF (naps == 0)
+		    call ap_default (im, INDEFI, 1, apaxis, INDEFR,
+			real (line), Memi[aps+naps])
 		else
-		    call ap_copy (aps[1], aps[naps])
+		    call ap_copy (Memi[aps], Memi[aps+naps])
 
-		AP_ID(aps[naps]) = naps
-		AP_BEAM(aps[naps]) = naps
-		AP_CEN(aps[naps], AP_AXIS(aps[naps])) = center -
-		    cveval (AP_CV(aps[naps]), real (line))
+		AP_CEN(Memi[aps+naps], AP_AXIS(Memi[aps+naps])) = center -
+		    cveval (AP_CV(Memi[aps+naps]), real (line))
+		naps = naps + 1
 	    }
 	}
+	    
+	# Set the aperture ID's
+	i = apgwrd ("order", Memc[str], SZ_LINE, ORDER)
+	call ap_sort (j, Memi[aps], naps, i)
+	call ap_gids (ids)
+	call ap_ids (Memi[aps], naps, ids)
+	call ap_titles (Memi[aps], naps, ids)
+	call ap_fids (ids)
 
 	# Log the apertures found and write them to the database.
-	call sprintf (Memc[str], SZ_LINE,
-	    "APFIND  - %d apertures found for %s.")
+	call sprintf (Memc[str], SZ_LINE, "FIND - %d apertures found for %s")
 	    call pargi (naps)
 	    call pargstr (image)
-	call ap_log (Memc[str])
+	call ap_log (Memc[str], YES, YES, NO)
 
-	call ap_dbwrite (image, dbwrite, aps, naps)
+	call appstr ("ansdbwrite1", "yes")
 
 	# Free memory and unmap the image.
 	call mfree (imdata, TY_REAL)

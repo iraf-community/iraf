@@ -12,6 +12,7 @@ char	line[SZ_LINE]
 int	fd
 
 int	open(), ecf_geti()
+double	ecf_getd()
 errchk	open()
 
 begin
@@ -64,11 +65,13 @@ begin
 	    call fprintf (fd, "xorder = %d, yorder = %d\n")
 		call pargi (ecf_geti ("xorder"))
 		call pargi (ecf_geti ("yorder"))
+	    call fprintf (fd,
+		"niterate = %d, lowreject = %g, highreject = %g\n")
+		call pargi (ecf_geti ("niterate"))
+		call pargd (ecf_getd ("low"))
+		call pargd (ecf_getd ("high"))
 	    call fprintf (fd, "Fit at first pixel = %0.8g\n")
 		call pargd (Memd[EC_FITDATA(ec)])
-	    call fprintf (fd, "Average fit interval = %0.8g\n")
-		call pargd ((Memd[EC_FITDATA(ec)+EC_NLINES(ec)*EC_NPTS(ec)-1]-
-		    Memd[EC_FITDATA(ec)])/(EC_NLINES(ec)*EC_NPTS(ec)-1))
 	}
 
 	call close (fd)

@@ -49,13 +49,12 @@ int	fd			# file for which request is desired
 int	rwflag			# type of transfer to wait for
 
 pointer	ip, op
-bool	filter_gki, graphics_stream, xmit_pending
-int	stream, pr, in, record_type, rq, iotype
 int	stack[LEN_STACK], stkp, nchars, nleft
-int	pseudofile, destfd, destpr, destination, ps
+int	stream, pr, in, record_type, rq, iotype
+int	pseudofile, destfd, destpr, destination, ps, flags
+bool	filter_gki, graphics_stream, xmit_pending, ioctrl
 
-bool	streq()
-int	filbuf(), read()
+int	filbuf(), read(), strncmp()
 int	pr_findproc(), psio_isxmit(), zfunc2(), zfunc3()
 errchk	epa_writep, epa_giotr, epa_writetty, epa_readtty, epa_gflush
 errchk	pr_findproc, psio_xfer, filbuf, read, write, flush, syserr
@@ -221,22 +220,35 @@ begin
 			if (read (in, Memc[ip], nchars) < nchars)
 			    call syserr (SYS_PRIPCSYNTAX)
 
-			# If writing to STDOUT and the magic sequence to disable
-			# raw mode is received, disable raw mode on STDIN.  The
-			# writetty routine writes to the graphics plane status
-			# line if the workstation is activated, else performs
-			# a normal FIO write to the designated stream.
+			# If writing to a standard stream and a raw mode i/o
+			# control sequence is seen, do a fseti on STDIN in
+			# this process to set up raw mode at the FIO level
+			# on the stream.  If we don't do this, raw mode will
+			# be set in the driver but will be disabled in the
+			# first i/o operation by a nchars>1 read request from
+			# FIO.
 
-			if (destfd == STDOUT || destfd == STDERR) {
-			    if (nchars == LEN_RAWCMD && Memc[ip] == ESC) {
-				Memc[ip+nchars] = EOS
-				if (streq (Memc[ip], RAWOFF))
-				    call fseti (STDIN, F_RAW, NO)
-				else if (streq (Memc[ip], RAWON))
-				    call fseti (STDIN, F_RAW, YES)
-			    } else
-				call zcall3 (epa_writetty,
-				    destfd, Memc[ip], nchars)
+			if (destfd >= STDIN && destfd <= STDERR) {
+			    ioctrl = (Memc[ip] == ESC &&
+				(nchars==LEN_RAWCMD || nchars==LEN_RAWCMD+1))
+			    if (ioctrl) {
+				if (strncmp(Memc[ip],RAWOFF,LEN_RAWCMD) == 0) {
+				    flags = IO_NORMAL
+				} else if (strncmp (Memc[ip],
+				    RAWON, LEN_RAWCMD) == 0) {
+				    flags = IO_RAW
+				    if (Memc[ip+LEN_RAWCMD] == 'N')
+					flags = flags + IO_NDELAY
+				} else
+				    ioctrl = false
+			    }
+
+			    if (ioctrl)
+				call fseti (STDIN, F_IOMODE, flags)
+			    else {
+				call zcall3 (epa_writetty, destfd, Memc[ip],
+				    nchars)
+			    }
 			} else {
 			    call write (destfd, Memc[ip], nchars)
 			    if (!graphics_stream)
@@ -365,8 +377,10 @@ begin
 			    # A request to read a single char enables raw
 			    # mode, just as it does for ZGETTX.
 
-			    if (nchars == 1)
-				call fseti (destfd, F_RAW, YES)
+# This should not be necessary since the raw mode control sequence is
+# intercepted above.  Also it is incorrect since F_NDELAY is not supported.
+#			    if (nchars == 1)
+#				call fseti (destfd, F_RAW, YES)
 
 			    if (destfd == STDIN) {
 				nchars = zfunc3 (epa_readtty,

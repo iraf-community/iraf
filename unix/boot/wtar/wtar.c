@@ -376,7 +376,7 @@ putheader (fh, out)
 register struct	fheader *fh;	/* (input) file header		*/
 int	 out;			/* output file descriptor	*/
 {
-	register char	*ip, *op;
+	register char	*ip;
 	register int	n;
 	union	hblock	hb;
 	char	chksum[10];

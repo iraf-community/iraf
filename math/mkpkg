@@ -20,6 +20,7 @@ mathgen:
 	$call iminterp
 	$call interp
 	$call llsq
+	$call nlfit
 	$call surfit
 	$purge lib$
 	;
@@ -72,6 +73,12 @@ llsq:
 	$update   libllsq.a
 	$checkin  libllsq.a lib$
 	;
+nlfit:
+	$echo "-------------- LIBNLFIT -----------------"
+	$checkout libnlfit.a lib$
+	$update   libnlfit.a
+	$checkin  libnlfit.a lib$
+	;
 surfit:
 	$echo "-------------- LIBSURFIT ----------------"
 	$checkout libsurfit.a lib$
@@ -109,6 +116,10 @@ libinterp.a:				# Obsolete version of iminterp pkg
 
 libllsq.a:				# Lawson and Hanson Least Squares pkg
 	@llsq
+	;
+
+libnlfit.a:                             # Levenberg-Marquardt fitting package
+	@nlfit
 	;
 
 libsurfit.a:				# Surface fitting on an even grid

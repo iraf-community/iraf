@@ -1,3 +1,6 @@
+include	<gset.h>
+
+
 # EQWIDTH_CP -- Equivalent width following algorithm provided by
 #               Caty Pilachowski. This assumes a Gaussian line profile
 #               and fits to the specified core level, the width at the
@@ -9,18 +12,23 @@ define	LEFT	1	# Fit to left edge
 define	RIGHT	2	# Fit to right edge
 define	BOTH	3	# Fit to both edges
 
-procedure eqwidth_cp (gfd, npts, center, cont, ylevel, x1, x2, dx, pix,
-    key, ans)
+procedure eqwidth_cp (sh, gfd, center, cont, ylevel, y, n, key, fd1, fd2,
+	xg, yg, sg, ng)
 
-int	gfd, npts
-real	center, cont, ylevel, x1, x2, dx
-real	pix[ARB]
+pointer	sh
+int	gfd
+real	center, cont, ylevel
+real	y[n]
+int	n
 int	key
-char	ans[2*SZ_LINE]
+int	fd1, fd2
+pointer	xg, yg, sg		# Pointers to fit parameters
+int	ng			# Number of components
 
 int	i, i1, i2, isrch, icore, edge
-real	xleft, xright, delta, rcore, rinter, y, sigma, flux, eqw, w, w1, w2
-real	pi, xpara[3], coefs[3], xcore, pixcore
+real	xleft, xright, rcore, rinter, yl, sigma, flux, eqw, w, w1, w2
+real	pi, xpara[3], coefs[3], xcore, ycore
+double	shdr_lw(), shdr_wl()
 
 # Initialize reasonable values
 #	isrch -- nr of pixels on either side of cursor to search for min
@@ -46,10 +54,9 @@ begin
 	}
 
 	# Search for local minimum or maximum
-	call pixind (x1, x2, dx, center, i)
-	icore = i
-	i1 = max (1, i-isrch)
-	i2 = min (npts, i+isrch)
+	icore = max (1, min (n, nint (shdr_wl (sh, double(center)))))
+	i1 = max (1, icore-isrch)
+	i2 = min (n, icore+isrch)
 
 	# If half lines is selected, restrict the search
 	if (edge == LEFT)
@@ -61,7 +68,7 @@ begin
 	# Someday it may be desirable to use parabolic interpolation
 	# to locate an estimated minimum or maximum for the region
 	do i = i1, i2 {
-	    if (abs (pix[i] - cont) > abs (pix[icore] - cont))
+	    if (abs (y[i] - cont) > abs (y[icore] - cont))
 		icore = i
 	}
 
@@ -70,21 +77,21 @@ begin
 	xpara[2] = icore
 	xpara[3] = icore + 1
 
-	call para (xpara, pix[icore-1], coefs)
+	call para (xpara, y[icore-1], coefs)
 
 	# Compute pixel value at minimum
 	xcore = -coefs[2] / 2.0 / coefs[3]
-	pixcore = coefs[1] + coefs[2] * xcore + coefs[3] * xcore**2
+	ycore = coefs[1] + coefs[2] * xcore + coefs[3] * xcore**2
 
 	# Locate left and right line edges.  If the ylevel is INDEF then use
 	# the half flux point.
 	if (IS_INDEF (ylevel))
-	    y = (cont + pixcore) / 2.
+	    yl = (cont + ycore) / 2.
 	else
-	    y = ylevel
+	    yl = ylevel
 
-	rcore = abs (pixcore - cont)
-	rinter = abs (y - cont)
+	rcore = abs (ycore - cont)
+	rinter = abs (yl - cont)
 
 	if (rcore <= rinter) {
 	    call eprintf (
@@ -95,7 +102,7 @@ begin
 	# Bound flux level of interest
 	if ((edge == LEFT) || (edge == BOTH)) {
 	    for (i=icore; i >= 1; i=i-1)
-		if (abs (pix[i] - cont) < rinter)
+		if (abs (y[i] - cont) < rinter)
 		    break
 
 	    if (i < 1) {
@@ -103,37 +110,38 @@ begin
 		return
 	    }
 
-	    xleft = float (i) + (y - pix[i]) / (pix[i+1] - pix[i])
+	    xleft = float (i) + (yl - y[i]) / (y[i+1] - y[i])
 	    if (edge == LEFT)
 	        xright = xcore + (xcore - xleft)
 	}
 
 	# Now bound the right side
 	if ((edge == RIGHT) || (edge == BOTH)) {
-	    for (i=icore; i <= npts; i=i+1)
-		if (abs (pix[i] - cont) < rinter)
+	    for (i=icore; i <= n; i=i+1)
+		if (abs (y[i] - cont) < rinter)
 		    break
 
-	    if (i > npts) {
+	    if (i > n) {
 		call eprintf ("Can't find right edge of line\n")
 		return
 	    }
 
-	    xright = float (i) - (y - pix[i]) / (pix[i-1] - pix[i])
+	    xright = float (i) - (yl - y[i]) / (y[i-1] - y[i])
 	    if (edge == RIGHT)
 	        xleft  = xcore - (xright - xcore)
 	}
 
-	# Compute width in Angstroms
-	delta = (xright - xleft) * dx
+	# Compute in wavelength
+	w = shdr_lw (sh, double(xcore))
+	w1 = shdr_lw (sh, double(xleft))
+	w2 = shdr_lw (sh, double(xright))
 
-	# And apply Gaussian model
-	sigma = delta / 2. / sqrt (2. * log (rcore/rinter))
-	rcore = pixcore - cont
+	# Apply Gaussian model
+	sigma = (w2 - w1) / 2. / sqrt (2. * log (rcore/rinter))
+	rcore = ycore - cont
 	flux = rcore * sigma * sqrt (2. * pi)
-	eqw = abs (flux / cont)
+	eqw = -flux / cont
 
-	w = x1 + (xcore-1) * dx
 	call printf (
 	    "center = %9.7g, eqw = %9.4g, sigma = %9.4g, fwhm = %9.4g\n")
 	    call pargr (w)
@@ -141,29 +149,55 @@ begin
 	    call pargr (sigma)
 	    call pargr (2.355 * sigma)
 
-	call sprintf (ans, 2*SZ_LINE,
-	    " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
-	    call pargr (w)
-	    call pargr (cont)
-	    call pargr (flux)
-	    call pargr (eqw)
-	    call pargr (pixcore - cont)
-	    call pargr (sigma)
-	    call pargr (2.355 * sigma)
+	if (fd1 != NULL) {
+	    call fprintf (fd1, " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
+		call pargr (w)
+		call pargr (cont)
+		call pargr (flux)
+		call pargr (eqw)
+		call pargr (ycore - cont)
+		call pargr (sigma)
+		call pargr (2.355 * sigma)
+	}
+	if (fd2 != NULL) {
+	    call fprintf (fd2, " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
+		call pargr (w)
+		call pargr (cont)
+		call pargr (flux)
+		call pargr (eqw)
+		call pargr (ycore - cont)
+		call pargr (sigma)
+		call pargr (2.355 * sigma)
+	}
 
 	# Mark line computed
-	w1 = x1 + (xleft - 1) * dx
-	w2 = x1 + (xright- 1) * dx
-	call gline (gfd, w, cont, w, pixcore)
-	call gline (gfd, w1, y, w2, y)
+	call gline (gfd, w, cont, w, ycore)
+	call gline (gfd, w1, yl, w2, yl)
 
 	w1 = w - 3 * sigma
 	w2 = cont + rcore * exp (-0.5*((w1-w)/sigma)**2)
+	call gseti (gfd, G_PLTYPE, 2)
 	call gamove (gfd, w1, w2)
 	for (; w1 <= w+3*sigma; w1=w1+0.1*sigma) {
 	    w2 = cont + rcore * exp (-0.5*((w1-w)/sigma)**2)
 	    call gadraw (gfd, w1, w2)
 	}
+	call gseti (gfd, G_PLTYPE, 1)
+
+	# Save fit parameters
+	if (ng == 0) {
+	    call malloc (xg, 1, TY_REAL)
+	    call malloc (yg, 1, TY_REAL)
+	    call malloc (sg, 1, TY_REAL)
+	} else if (ng != 1) {
+	    call realloc (xg, 1, TY_REAL)
+	    call realloc (yg, 1, TY_REAL)
+	    call realloc (sg, 1, TY_REAL)
+	}
+	Memr[xg] = w
+	Memr[yg] = rcore
+	Memr[sg] = sigma
+	ng = 1
 end
 
 # PARA -- Fit a parabola to three points

@@ -334,7 +334,7 @@ int	interact		# Flag for interactive graphics
 
 pointer	gp, cv, sp, x, dum
 pointer	gopen()
-int	dcvstati()
+int	update, dcvstati()
 errchk	malloc, gopen
 
 begin
@@ -342,20 +342,23 @@ begin
 	    gp = gopen (dev, NEW_FILE, STDGRAPH)
 	    call icg_fitd (ic, gp, "cursor", gt, cv, den, exp, wts, errs, nvals)
 	    call gclose (gp)
+	    update = IC_UPDATE(ic)
 
 	} else {
 	    # Do fit non-interactively
+	    call smark (sp)
 	    call salloc (x, nvals, TY_DOUBLE)
 	    call salloc (dum, nvals, TY_INT)
 	    call hdic_transform (ic, den, wts, Memd[x], wts, Memi[dum], nvals)
 	    call ic_fitd (ic, cv, Memd[x], exp, wts, nvals, YES, YES, YES, YES)
 	    call sfree (sp)
+	    update = YES
 	}
 
-	nsave = dcvstati (cv, CVNSAVE)
+	nsave = (dcvstati (cv, CVORDER)) + 7
 	call malloc (save, nsave, TY_DOUBLE)
 	call dcvsave (cv, Memd[save])
 	call dcvfree (cv)
 
-	return (IC_UPDATE(ic))
+	return (update)
 end

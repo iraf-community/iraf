@@ -39,10 +39,10 @@ begin
 	call salloc (pnm2, npts, TY_DOUBLE)
 
 	# a higher order polynomial
-	call amovkd (1.0d0, Memd[pnm2], npts)
+	call amovkd (double(1.0), Memd[pnm2], npts)
 	call altad (x, Memd[sx], npts, k1, k2)
 	call amovd (Memd[sx], Memd[pnm1], npts)
-	call amulkd (Memd[sx], 2.0d0, Memd[sx], npts)
+	call amulkd (Memd[sx], double(2.0), Memd[sx], npts)
 	do i = 3, order {
 	    call amuld (Memd[sx], Memd[pnm1], Memd[pn], npts)
 	    call asubd (Memd[pn], Memd[pnm2], Memd[pn], npts)
@@ -99,13 +99,13 @@ begin
 	call salloc (pnm2, npts, TY_DOUBLE)
 
 	# a higher order polynomial
-	call amovkd (1.0d0, Memd[pnm2], npts)
+	call amovkd (double(1.0), Memd[pnm2], npts)
 	call altad (x, Memd[sx], npts, k1, k2)
 	call amovd (Memd[sx], Memd[pnm1], npts)
 	do i = 3, order {
 	    ri = i
-	    ri1 = (2.0d0 * ri - 3.0d0) / (ri - 1.0d0)
-	    ri2 = - (ri - 2.0d0) / (ri - 1.0d0)
+	    ri1 = (double(2.0) * ri - double(3.0)) / (ri - double(1.0))
+	    ri2 = - (ri - double(2.0)) / (ri - double(1.0))
 	    call amuld (Memd[sx], Memd[pnm1], Memd[pn], npts)
 	    call awsud (Memd[pn], Memd[pnm2], Memd[pn], npts, ri1, ri2)
 	    if (i < order) {
@@ -155,12 +155,13 @@ begin
 	azindex = sx - 1
 	do j = 1, npts {
 	    aindex = azindex + j
-	    Memd[aindex] = Memd[aindex] - Memi[index+j-1]
-	    Memd[tx+j-1] = 1.0d0 - Memd[aindex]
+	    Memd[aindex] = max (double(0.0), min (double(1.0), Memd[aindex] -
+	        Memi[index+j-1]))
+	    Memd[tx+j-1] = max (double(0.0), min (double(1.0), double(1.0) -
+	        Memd[aindex]))
 	}
 
     	# calculate yfit using the two non-zero basis function
-	call aclrd (yfit, npts)
 	do j = 1, npts
 	    yfit[j] = Memd[tx+j-1] * coeff[1+Memi[index+j-1]] +
 		      Memd[sx+j-1] * coeff[2+Memi[index+j-1]]
@@ -201,8 +202,10 @@ begin
 
         # transform sx to range 0 to 1
 	do j = 1, npts {
-	    Memd[sx+j-1] = Memd[sx+j-1] - Memi[index+j-1]
-	    Memd[tx+j-1] = 1.0d0 - Memd[sx+j-1]
+	    Memd[sx+j-1] = max (double(0.0), min (double(1.0), Memd[sx+j-1] -
+	        Memi[index+j-1]))
+	    Memd[tx+j-1] = max (double(0.0), min (double(1.0), double(1.0) -
+	        Memd[sx+j-1]))
 	}
 
         # calculate yfit using the four non-zero basis function
@@ -214,13 +217,15 @@ begin
 		call apowkd (Memd[tx], 3, Memd[temp], npts)
 	    case 2:
 		do j = 1, npts {
-		    Memd[temp+j-1] = 1.0d0 + Memd[tx+j-1] * (3.0d0 +
-		        Memd[tx+j-1] * (3.0d0 - 3.0d0 * Memd[tx+j-1]))
+		    Memd[temp+j-1] = double(1.0) + Memd[tx+j-1] *
+		        (double(3.0) + Memd[tx+j-1] * (double(3.0) -
+			double(3.0) * Memd[tx+j-1]))
 		}
 	    case 3:
 		do j = 1, npts {
-		    Memd[temp+j-1] = 1.0d0 + Memd[sx+j-1] * (3.0d0 +
-		        Memd[sx+j-1] * (3.0d0 - 3.0d0 * Memd[sx+j-1]))
+		    Memd[temp+j-1] = double(1.0) + Memd[sx+j-1] *
+		        (double(3.0) + Memd[sx+j-1] * (double(3.0) -
+			double(3.0) * Memd[sx+j-1]))
 		}
 	    case 4:
 		call apowkd (Memd[sx], 3, Memd[temp], npts)
@@ -231,7 +236,6 @@ begin
 	    call aaddd (yfit, Memd[temp], yfit, npts)
 	}
 
-    
 	# free space
 	call sfree (sp)
 

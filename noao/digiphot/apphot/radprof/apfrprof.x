@@ -1,5 +1,7 @@
 include <mach.h>
 include <gset.h>
+include <math.h>
+
 include <math/curfit.h>
 include <math/iminterp.h>
 include "../lib/apphotdef.h"
@@ -10,7 +12,7 @@ include "../lib/radprofdef.h"
 include "../lib/phot.h"
 include "../lib/radprof.h"
 
-# AP_FRPROF -- Procedure to compute the radial profile of an object.
+# AP_FRPROF -- Compute the radial profile of an object.
 
 int procedure ap_frprof (ap, im, wx, wy, pier)
 
@@ -39,23 +41,20 @@ begin
 	sky = AP_PSKY(ap)
 	rprof = AP_RPROF(ap)
 
-	# Get the pixels.
-	# Check for error conditions.
+	# Get the pixels and check for error conditions.
 	if (IS_INDEFR(wx) || IS_INDEFR(wy)) {
 	    pier = AP_APERT_NOAPERT
 	    return (AP_RP_NOPROFILE)
 	} else if (IS_INDEFR(AP_SKY_MODE(sky))) {
 	    pier = AP_APERT_NOSKYMODE
 	    return (AP_RP_NOSKYMODE)
-	} else {
-	    if (ap_rpbuf (ap, im, wx, wy) == AP_RP_NOPROFILE) {
-	        pier = AP_APERT_NOAPERT
-	        return (AP_RP_NOPROFILE)
-	    }
+	} else if (ap_rpbuf (ap, im, wx, wy) == AP_RP_NOPROFILE) {
+	    pier = AP_APERT_NOAPERT
+	    return (AP_RP_NOPROFILE)
 	}
 
 	# Do the photometry.
-	pier = ap_rmag (ap, im, wx, wy)
+	pier = ap_rmag (ap)
 
 	# Initialize some common variables.
 	nxpts = AP_RPNX(rprof)
@@ -92,6 +91,7 @@ begin
 		AP_RPNREJECT(rprof), AP_RPKSIGMA(rprof), fier)
 	else
 	    AP_RPNDATAREJ(rprof) = 0
+
 	AP_RPNDATA(rprof) = AP_RPNDATA(rprof) - AP_RPNDATAREJ(rprof)
 	AP_RPNDATAREJ(rprof) = AP_RPNDATAREJ(rprof) + AP_RPNBAD(rprof)
 
@@ -106,11 +106,15 @@ begin
 
 	    # Evaluate the integral.
 	    call asiinit (asi, II_SPLINE3)
-	    call asifit (asi, Memr[AP_INTENSITY(rprof)], nrpts)
+	    call amulr (Memr[AP_RPDIST(rprof)], Memr[AP_INTENSITY(rprof)],
+	        Memr[AP_TINTENSITY(rprof)], nrpts)
+	    call asifit (asi, Memr[AP_TINTENSITY(rprof)], nrpts)
 	    Memr[AP_TINTENSITY(rprof)] = 0.0
 	    do i = 2, nrpts
 	        Memr[AP_TINTENSITY(rprof)+i-1] = Memr[AP_TINTENSITY(rprof)+
 		    i-2] + asigrl (asi, real (i - 1), real (i))
+	    call amulkr (Memr[AP_TINTENSITY(rprof)], real (TWOPI) * step,
+	        Memr[AP_TINTENSITY(rprof)], nrpts)
 	    call asifree (asi)
 
 	    # Normalize the radial profile.
@@ -144,14 +148,11 @@ end
 
 # AP_RMAG -- Compute the magnitudes for the radial profile
 
-int procedure ap_rmag (ap, im, wx, wy)
+int procedure ap_rmag (ap)
 
 pointer	ap		# pointer to the apphot structure
-pointer	im		# pointer to the input image
-real	wx		# x center of the radial profile
-real	wy		# y center of the radial profile
 
-int	pier
+int	pier, nap
 pointer	sp, nse, sky, phot, rprof, aperts
 real	datamin, datamax, zmag
 
@@ -194,19 +195,20 @@ begin
 		Memr[AP_AREA(phot)], AP_NMAXAP(phot), AP_NMINAP(phot))
 
 	# Check for bad pixels.
-	if (pier == AP_OK && AP_NMINAP(phot) <= AP_NMAXAP(phot))
+	if ((pier == AP_OK) && (AP_NMINAP(phot) <= AP_NMAXAP(phot)))
 	    pier = AP_APERT_BADDATA
 
 	# Compute the magnitudes.
+	nap = min (AP_NMINAP(phot) - 1, AP_NMAXAP(phot))
 	zmag = AP_ZMAG(phot) + 2.5 * log10 (AP_ITIME(ap))
 	if (AP_POSITIVE(ap) == YES)
 	    call apcopmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
-	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], AP_NMAXAP(phot),
+	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], nap,
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_NSKY(sky), zmag,
 		AP_NOISEFUNCTION(nse), AP_EPADU(nse))
 	else
 	    call apconmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
-	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], AP_NMAXAP(phot),
+	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], nap,
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_NSKY(sky), zmag,
 		AP_NOISEFUNCTION(nse), AP_EPADU(nse), AP_READNOISE(nse))
 

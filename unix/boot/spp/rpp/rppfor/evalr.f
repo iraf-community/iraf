@@ -1,131 +1,131 @@
-      SUBROUTINE EVALR (ARGSTK, I, J)
-      INTEGER ARGSTK (100), I, J
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER ARGNO, K, M, N, T, TD, INSTR0, DELIM
-      EXTERNAL INDEX
-      INTEGER INDEX, LENGTH
-      INTEGER DIGITS(11)
-      DATA DIGITS(1)/48/,DIGITS(2)/49/,DIGITS(3)/50/,DIGITS(4)/51/,DIGIT
-     *S(5)/52/,DIGITS(6)/53/,DIGITS(7)/54/,DIGITS(8)/55/,DIGITS(9)/56/,D
-     *IGITS(10)/57/,DIGITS(11)/-2/
-      T = ARGSTK (I)
-      TD = EVALST (T)
-      IF (.NOT.(TD .EQ. -10))GOTO 23000
-      CALL DOMAC (ARGSTK, I, J)
-      GOTO 23001
-23000 CONTINUE
-      IF (.NOT.(TD .EQ. -12))GOTO 23002
-      CALL DOINCR (ARGSTK, I, J)
-      GOTO 23003
-23002 CONTINUE
-      IF (.NOT.(TD .EQ. -13))GOTO 23004
-      CALL DOSUB (ARGSTK, I, J)
-      GOTO 23005
-23004 CONTINUE
-      IF (.NOT.(TD .EQ. -11))GOTO 23006
-      CALL DOIF (ARGSTK, I, J)
-      GOTO 23007
-23006 CONTINUE
-      IF (.NOT.(TD .EQ. -14))GOTO 23008
-      CALL DOARTH (ARGSTK, I, J)
-      GOTO 23009
-23008 CONTINUE
-      INSTR0 = 0
-      K = T + LENGTH (EVALST (T)) - 1
-23010 IF (.NOT.(K .GT. T))GOTO 23012
-      IF (.NOT.(EVALST(K) .EQ. 39 .OR. EVALST(K) .EQ. 34))GOTO 23013
-      IF (.NOT.(INSTR0 .EQ. 0))GOTO 23015
-      DELIM = EVALST(K)
-      INSTR0 = 1
-      GOTO 23016
-23015 CONTINUE
-      INSTR0 = 0
-23016 CONTINUE
-      CALL PUTBAK (EVALST(K))
-      GOTO 23014
-23013 CONTINUE
-      IF (.NOT.(EVALST(K-1) .NE. 36 .OR. INSTR0 .EQ. 1))GOTO 23017
-      CALL PUTBAK (EVALST (K))
-      GOTO 23018
-23017 CONTINUE
-      ARGNO = INDEX (DIGITS, EVALST (K)) - 1
-      IF (.NOT.(ARGNO .GE. 0 .AND. ARGNO .LT. J - I))GOTO 23019
-      N = I + ARGNO + 1
-      M = ARGSTK (N)
-      CALL PBSTR (EVALST (M))
-23019 CONTINUE
-      K = K - 1
-23018 CONTINUE
-23014 CONTINUE
-23011 K = K - 1
-      GOTO 23010
-23012 CONTINUE
-      IF (.NOT.(K .EQ. T))GOTO 23021
-      CALL PUTBAK (EVALST (K))
-23021 CONTINUE
-23009 CONTINUE
-23007 CONTINUE
-23005 CONTINUE
-23003 CONTINUE
-23001 CONTINUE
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
-C     INSTR0  IN_STRING
+      subroutine evalr (argstk, i, j)
+      integer argstk (100), i, j
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer argno, k, m, n, t, td, instr0, delim
+      external index
+      integer index, length
+      integer digits(11)
+      data digits(1)/48/,digits(2)/49/,digits(3)/50/,digits(4)/51/,digit
+     *s(5)/52/,digits(6)/53/,digits(7)/54/,digits(8)/55/,digits(9)/56/,d
+     *igits(10)/57/,digits(11)/-2/
+      t = argstk (i)
+      td = evalst (t)
+      if (.not.(td .eq. -10))goto 23000
+      call domac (argstk, i, j)
+      goto 23001
+23000 continue
+      if (.not.(td .eq. -12))goto 23002
+      call doincr (argstk, i, j)
+      goto 23003
+23002 continue
+      if (.not.(td .eq. -13))goto 23004
+      call dosub (argstk, i, j)
+      goto 23005
+23004 continue
+      if (.not.(td .eq. -11))goto 23006
+      call doif (argstk, i, j)
+      goto 23007
+23006 continue
+      if (.not.(td .eq. -14))goto 23008
+      call doarth (argstk, i, j)
+      goto 23009
+23008 continue
+      instr0 = 0
+      k = t + length (evalst (t)) - 1
+23010 if (.not.(k .gt. t))goto 23012
+      if (.not.(evalst(k) .eq. 39 .or. evalst(k) .eq. 34))goto 23013
+      if (.not.(instr0 .eq. 0))goto 23015
+      delim = evalst(k)
+      instr0 = 1
+      goto 23016
+23015 continue
+      instr0 = 0
+23016 continue
+      call putbak (evalst(k))
+      goto 23014
+23013 continue
+      if (.not.(evalst(k-1) .ne. 36 .or. instr0 .eq. 1))goto 23017
+      call putbak (evalst (k))
+      goto 23018
+23017 continue
+      argno = index (digits, evalst (k)) - 1
+      if (.not.(argno .ge. 0 .and. argno .lt. j - i))goto 23019
+      n = i + argno + 1
+      m = argstk (n)
+      call pbstr (evalst (m))
+23019 continue
+      k = k - 1
+23018 continue
+23014 continue
+23011 k = k - 1
+      goto 23010
+23012 continue
+      if (.not.(k .eq. t))goto 23021
+      call putbak (evalst (k))
+23021 continue
+23009 continue
+23007 continue
+23005 continue
+23003 continue
+23001 continue
+      return
+      end
+c     logic0  logical_column
+c     instr0  in_string

@@ -1,0 +1,10 @@
+# Help directory for the OBSOLETE package.
+
+$doc		= "pkg$obsolete/doc/"
+
+imtitle		hlp =doc$imtitle.hlp,		src = t_imtitle.x
+mkhistogram     hlp =doc$mkhistogram.hlp,	src = t_mkhistogram.x
+oimcombine	hlp =doc$oimcombine.hlp,	src = t_imcombine.x
+radplt		hlp =doc$radplt.hlp,		src = t_radplt.x
+
+revisions	sys=Revisions

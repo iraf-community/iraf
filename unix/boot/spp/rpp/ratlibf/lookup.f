@@ -1,24 +1,24 @@
-      INTEGER FUNCTION LOOKUP (SYMBOL, INFO, ST)
-      INTEGER SYMBOL (100)
-      INTEGER INFO (100)
-      INTEGER ST
-      INTEGER MEM( 1)
-      COMMON/CDSMEM/MEM
-      INTEGER I, NODSIZ, KLUGE
-      INTEGER STLU
-      INTEGER NODE, PRED
-      IF (.NOT.(STLU (SYMBOL, NODE, PRED, ST) .EQ. 0))GOTO 23000
-      LOOKUP = 0
-      RETURN
-23000 CONTINUE
-      NODSIZ = MEM (ST)
-      I = 1
-23002 IF (.NOT.(I .LE. NODSIZ))GOTO 23004
-      KLUGE = NODE + 1 - 1 + I
-      INFO (I) = MEM (KLUGE)
-23003 I = I + 1
-      GOTO 23002
-23004 CONTINUE
-      LOOKUP = 1
-      RETURN
-      END
+      integer function lookup (symbol, info, st)
+      integer symbol (100)
+      integer info (100)
+      integer st
+      integer mem( 1)
+      common/cdsmem/mem
+      integer i, nodsiz, kluge
+      integer stlu
+      integer node, pred
+      if (.not.(stlu (symbol, node, pred, st) .eq. 0))goto 23000
+      lookup = 0
+      return
+23000 continue
+      nodsiz = mem (st)
+      i = 1
+23002 if (.not.(i .le. nodsiz))goto 23004
+      kluge = node + 1 - 1 + i
+      info (i) = mem (kluge)
+23003 i = i + 1
+      goto 23002
+23004 continue
+      lookup = 1
+      return
+      end

@@ -1,13 +1,13 @@
-      SUBROUTINE DOCANT(NAME)
-      INTEGER NAME(100), PROG(30)
-      INTEGER LENGTH
-      INTEGER GETARG
-      LENGTH = GETARG(0, PROG, 30)
-      IF (.NOT.(LENGTH .NE. -1))GOTO 23000
-      CALL PUTLIN(PROG, 2)
-      CALL PUTCH(58, 2)
-      CALL PUTCH(32, 2)
-23000 CONTINUE
-      CALL CANT(NAME)
-      RETURN
-      END
+      subroutine docant(name)
+      integer name(100), prog(30)
+      integer length
+      integer getarg
+      length = getarg(0, prog, 30)
+      if (.not.(length .ne. -1))goto 23000
+      call putlin(prog, 2)
+      call putch(58, 2)
+      call putch(32, 2)
+23000 continue
+      call cant(name)
+      return
+      end

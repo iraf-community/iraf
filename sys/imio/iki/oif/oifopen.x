@@ -51,14 +51,24 @@ begin
 	iferr (hfd = open (Memc[fname], mode, BINARY_FILE))
 	    goto err_
 
-	# If opening an existing image, read the OIF fixed format binary
-	# image header into the image descriptor.
+	call strcpy (Memc[fname], IM_HDRFILE(im), SZ_IMHDRFILE)
+	IM_HFD(im) = hfd
 
-	if (mode != NEW_FILE) {
+	# If opening an existing image, read the OIF fixed format binary
+	# image header into the image descriptor.  If opening a new image,
+	# write out a generic image header so that the image can be accessed
+	# and deleted with imdelete should the operation be aborted before
+	# a full image is written.
+
+	if (mode == NEW_FILE) {
+	    iferr (call oif_updhdr (im, status))
+		;
+	} else {
 	    iferr {
 		call seek (hfd, BOFL)
 		nchars = IM_LENHDRMEM(im) * SZ_STRUCT
 		n = read (hfd, IM_MAGIC(im), nchars)
+		call strcpy (Memc[fname], IM_HDRFILE(im), SZ_IMHDRFILE)
 	    } then
 		n = ERR
 
@@ -69,16 +79,14 @@ begin
 	    }
 	}
 
-	# If the image was opened read only, close the header file as we will
-	# not be accessing it again.
+	# It is best to close the header file at this point for two reasons:
+	# to improve error recovery (if an abort occurs with a new file still
+	# open FIO will delete it) and to free file descriptors (important for
+	# applications that open many images).  If the header needs to be
+	# updated, oif_updhdr will reopen the header file.
 
-	if (mode == READ_ONLY) {
-	    call close (hfd)
-	    hfd = NULL
-	}
-
-	call strcpy (Memc[fname], IM_HDRFILE(im), SZ_IMHDRFILE)
-	IM_HFD(im) = hfd
+	call close (hfd)
+	IM_HFD(im) = NULL
 
 	status = OK
 	call sfree (sp)

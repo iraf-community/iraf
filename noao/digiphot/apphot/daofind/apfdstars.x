@@ -1,5 +1,4 @@
 include <imhdr.h>
-include <fset.h>
 include "../lib/apphot.h"
 include "../lib/noise.h"
 include "../lib/display.h"
@@ -59,9 +58,9 @@ begin
 	# Compute the 1 and 2 D kernels.
 	relerr = ap_egkernel (Memr[ker2d], Memi[skip], nxk, nyk, a, b, c, f)
 	call ap_gkernel (Memr[ker1x], nxk, apstatr (ap, FWHMPSF) * apstatr (ap,
-	    SCALE), apstatr (ap, NSIGMA))
+	    SCALE))
 	call ap_gkernel (Memr[ker1y], nyk, apstatr (ap, FWHMPSF) * apstatr (ap,
-	    SCALE), apstatr (ap, NSIGMA))
+	    SCALE))
 
 	# Set up the image boundary extension characteristics.
 	call ap_imset (im, boundary, max (1 + nxk / 2, 1 + nyk / 2),
@@ -93,7 +92,7 @@ detect_
 	# characteristics.
 
 	nstars = apfind (im, cnv, out, id, Memr[ker1x], Memr[ker1y], Memi[skip],
-	    nxk, nyk, apstatr (ap, THRESHOLD), apstati (ap, POSITIVE),
+	    nxk, nyk, apstatr (ap, THRESHOLD), relerr, apstati (ap, POSITIVE),
 	    apstatr (ap, SHARPLO), apstatr (ap, SHARPHI), apstatr (ap,
 	    ROUNDLO), apstatr (ap, ROUNDHI), YES, stid, apstati (ap,
 	    MKDETECTIONS))

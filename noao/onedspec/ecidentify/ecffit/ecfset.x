@@ -36,7 +36,7 @@ include	"ecffit.com"
 
 begin
 	i = strdic (param, ecfstr, SZ_LINE,
-	    "|slope|offset|xorder|yorder|xtype|ytype|")
+	    "|slope|offset|xorder|yorder|xtype|ytype|niterate|")
 	switch (i) {
 	case 1:
 	    slope = ival
@@ -50,6 +50,8 @@ begin
 	    xtype = ival
 	case 6:
 	    ytype = ival
+	case 7:
+	    niterate = max (0, ival)
 	default:
 	    call error (0, "ecf_seti: Unknown parameter")
 	}
@@ -67,7 +69,8 @@ int	i, strdic()
 include	"ecffit.com"
 
 begin
-	i = strdic (param, ecfstr, SZ_LINE, "|xmin|xmax|ymin|ymax|shift|")
+	i = strdic (param, ecfstr, SZ_LINE,
+	    "|xmin|xmax|ymin|ymax|shift|low|high|")
 	switch (i) {
 	case 1:
 	    xmin = dval
@@ -79,6 +82,10 @@ begin
 	    ymax = dval
 	case 5:
 	    shift = dval
+	case 6:
+	    low = max (0.D0, dval)
+	case 7:
+	    high = max (0.D0, dval)
 	default:
 	    call error (0, "ecf_setd: Unknown parameter")
 	}

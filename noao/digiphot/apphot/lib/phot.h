@@ -1,28 +1,28 @@
 # APPHOT header file
 
-# phot errors (# 41 - 60)
+# phot errors (# 301 - 400)
 
 define	AP_OK			0	# no error
-define	AP_APERT_NOAPERT	41	# no aperture area
-define  AP_APERT_OUTOFBOUNDS	42	# 1 or more apertures out of bounds
-define	AP_APERT_NOSKYMODE	43	# INDEF valued sky
-define	AP_APERT_NEGMAG		44	# 0 or -ve magnitude
-define	AP_APERT_BADDATA	45	# bad pixels in aperture
+define	AP_APERT_NOAPERT	301	# no aperture area
+define  AP_APERT_OUTOFBOUNDS	302	# 1 or more apertures out of bounds
+define	AP_APERT_NOSKYMODE	303	# INDEF valued sky
+define	AP_APERT_NEGMAG		304	# 0 or -ve magnitude
+define	AP_APERT_BADDATA	305	# bad pixels in aperture
 
-# phot parameters and answers (# 61 - 80)
+# phot parameters and answers (# 301 - 400)
 
-define	ZMAG		61
-define	APERTS		63
-define	NAPERTS		64
-define	MAGS		65
-define	MAGERRS		66
-define	PXCUR		69
-define	PYCUR		70
-define	AREAS		72
-define	SUMS		73
-define	PWEIGHTS	74
-define	PWSTRING	75
-define	APSTRING	76
+define	ZMAG		301
+define	APERTS		302
+define	NAPERTS		303
+define	MAGS		304
+define	MAGERRS		305
+define	PXCUR		306
+define	PYCUR		307
+define	AREAS		308
+define	SUMS		309
+define	PWEIGHTS	310
+define	PWSTRING	311
+define	APSTRING	312
 
 # define the phot keywords
 
@@ -47,7 +47,7 @@ define	AP_PWGAUSS	3	# a Gaussian of given fwhm is used
 define	PCMDS		"|apertures|zmag|mkapert|weighting|"
 define	PSHOWARGS	"|center|sky|phot|data|"
 define	PWFUNCS		"|constant|cone|gauss|"
-define	QCMDS		"|show|cboxwidth|annulus|dannulus|apertures|zmag|epadu|exposure|radplots|image|output|coords|airmass|filter|"
+define	QCMDS		"|show|cboxwidth|annulus|dannulus|apertures|zmag|epadu|exposure|radplots|image|output|coords|airmass|filter|obstime|"
 
 define	PCMD_APERTURES		1
 define	PCMD_ZMAG		2
@@ -73,6 +73,7 @@ define	QCMD_OUTPUT		11
 define	QCMD_COORDS		12
 define	QCMD_AIRMASS		13
 define	QCMD_FILTER		14
+define	QCMD_OBSTIME		15
 
 # miscellaneous
 

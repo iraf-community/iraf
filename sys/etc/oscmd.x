@@ -84,6 +84,8 @@ begin
 	    # for a status return from the parent process before returning.
 	    # The redirection files are ignored in this mode.
 
+	    call flush (CLOUT)
+
 	    # Send command.
 	    Memc[cmdbuf] = '!'
 	    op = cmdbuf + 1

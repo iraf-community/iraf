@@ -1,4 +1,3 @@
-       apselect - Extract select fields from apphot output files
          aptest - Run basic tests on the apphot package tasks
 	 center - Compute accurate centers for a list of objects
      centerpars - Edit the centering parameters
@@ -7,7 +6,6 @@
 	 fitpsf - Model the stellar psf with an analytic function
          fitsky - Compute sky values in a list of annular or circular regions
      fitskypars - Edit the sky fitting parameters
-        lintran - Linearly transform a coordinate list
 	   phot - Measure magnitudes for a list of stars
        photpars - Edit the photometry parameters
        polymark - Create polygon lists for polyphot
@@ -16,3 +14,7 @@
 	  qphot - Measure quick magnitudes for a list of stars
         radprof - Compute the stellar radial profile of a list of stars
 	  wphot - Measure magnitudes for a list of stars with weighting
+
+        lintran - Linearly transform a coordinate list
+       pexamine - Interactively examine or edit an apphot output file
+	 txdump - Dump selected fields from an apphot output file

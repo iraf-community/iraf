@@ -1,6 +1,0 @@
-# Make the IIDS package.
-# In order to have separate parameter files under the current CL we must
-# checkout executables from other directories.
-
-update:
-	;

@@ -9,13 +9,15 @@ procedure imflsh (im, ier)
 
 pointer	im			# image descriptor
 int	ier
+
 int	status
+int	bfflsh()
 
 begin
 	ier = OK
 
 	# Flush any buffered output pixel data.
-	call bfflsh (IM_PIXFP(im), status)
+	status = bfflsh (IM_PIXFP(im))
 	if (status == ERR)
 	    ier = IE_FLUSH
 

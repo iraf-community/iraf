@@ -60,16 +60,16 @@ define	IOLINES		64		# image lines per i/o transfer
 # IDK_OPEN -- Open the metacode file.  Open the frame buffer as an image.
 # Initialize the bitmap based on the size of the frame.
 
-int procedure idk_open (frame, color, tty)
+int procedure idk_open (a_frame, a_color, tty)
 
-int	color			#I display device color index
-int	frame			#I display buffer frame number
+int	a_color			#I display device color index
+int	a_frame			#I display buffer frame number
 pointer	tty			#I pointer to graphcap descriptor
 
 real	x, y
-int	wcs, key
 char	strval[1]
 int	byte, off, i, j
+int	wcs, key, frame, color
 
 bool	ttygetb()
 real	ttygetr()
@@ -78,6 +78,9 @@ errchk	imd_mapframe, ttygetr, ttygeti, ttygetb
 include	"idk.com"
 
 begin
+	frame = a_frame
+	color = a_color
+
 	# The DB flag may be set in the graphcap entry for an IMD device to
 	# print debug messages during execution.
 

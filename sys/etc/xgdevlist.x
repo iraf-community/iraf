@@ -1,118 +1,49 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<xalloc.h>
-include	<ctype.h>
 
-define	DEVTABLE	"dev$devices"
-define	SZ_LONGLINE	1024
-
-
-# XGDEVLIST -- Fetch the host device list for the named logical device
-# from the device table.  DV_DEVNOTFOUND is returned there is no entry in
-# the device table for the device.  An error action is taken if there is any
-# problem reading the device table file.
+# XGDEVLIST -- Fetch the allocation string for the named logical device from
+# the device table (tapecap file).  DV_DEVNOTFOUND is returned there is no
+# entry in the device table for the device.  An error action is taken if there
+# is any problem reading the device entry.
 #
-# Each device appears as a single line of text in the devices file, ignoring
-# backslash line continuation and comments.  The format of a device entry is
-# as follows:
-#
-#	mtX[.density] [%maxbufsize] osname [other]
-#
-# where mta, mtb, etc are device names, .density (optional) is something like
-# .1600, %maxbufsize is the maximum transfer (record) size for the device,
-# osname is the host system device name, and [other] is other text to be passed
-# on to the device driver at open time.  If maxbufsize is not given in the
-# device entry, -1 is returned; 0 is a valid value indicating that there is no
-# max transfer size.
+# This routine is a bit of an anachronism in the days of tapecap, but is
+# left pretty much as it was originally to minimize code modifications.
+# In principle the allocation code can be used to allocate any device, not
+# just tape drives.  This is still the case, given an entry for the device
+# in the tapecap file.
 
-int procedure xgdevlist (device, maxbufsize, outstr, maxch, onedev)
+int procedure xgdevlist (device, outstr, maxch, onedev)
 
-char	device[ARB]		# IRAF name of device entry
-int	maxbufsize		# receives max device transfer size, bytes
-char	outstr[maxch]		# receives device list
-int	maxch			# max chars out
-int	onedev			# return only first name in list?
+char	device[ARB]		#I logical device name
+char	outstr[maxch]		#O receives device list
+int	maxch			#I max chars out
+int	onedev			#I return i/o device instead?
 
-bool	notfound
-int	fd, lineno, nchars
-pointer	sp, ip, lbuf, node, devlist, fname
-int	open(), getlongline(), strncmp(), strlen(), ctoi(), ki_extnode()
-errchk	open, getlongline
+pointer	gty
+int	nchars
+pointer	mtcap()
+int	gtygets(), strlen()
+errchk	syserrs
 
 begin
-	call smark (sp)
-	call salloc (lbuf, SZ_LONGLINE, TY_CHAR)
-	call salloc (node, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	# Fetch the tapecap entry for the named device.  Do not close the GTY
+	# descriptor.  mtcap always keeps the last one in an internal cache.
 
-	# Get node on which resource resides.
-	ip = ki_extnode (device, Memc[node], SZ_FNAME, nchars) + 1
-
-	# Fetch the device table entry for the named device into the line
-	# buffer.
-
-	call strcpy (Memc[node], Memc[fname], SZ_FNAME)
-	call strcat (DEVTABLE,   Memc[fname], SZ_FNAME)
-
-	fd = open (Memc[fname], READ_ONLY, TEXT_FILE)
-	nchars = strlen (device[ip])
-	lineno = 1
-	notfound = true
-
-	while (getlongline (fd, Memc[lbuf], SZ_LONGLINE, lineno) != EOF)
-	    if (IS_WHITE (Memc[lbuf+nchars]))
-		if (strncmp (Memc[lbuf], device[ip], nchars) == 0) {
-		    notfound = false
-		    break
-		}
-
-	call close (fd)
-	if (notfound) {
-	    call sfree (sp)
+	iferr (gty = mtcap (device))
 	    return (DV_DEVNOTFOUND)
-	}
 
-	# Extract the packed list of aliases (host device name or names
-	# corresponding to the named logical device).  Strip the newline
-	# and any trailing whitespace.  If there is only one host device
-	# name per logical device, a simple name with no leading or trailing
-	# whitespace is passed to the host.
+	if (onedev == YES)
+	    nchars = gtygets (gty, "dv", outstr, maxch)
+	else
+	    nchars = gtygets (gty, "al", outstr, maxch)
 
-	# Skip over the "mtX.NNNN   ".
-	for (ip=lbuf;  Memc[ip] != EOS;  ip=ip+1)
-	    if (IS_WHITE(Memc[ip]) || Memc[ip] == '%')
-		break
-	for (;  IS_WHITE (Memc[ip]);  ip=ip+1)
-	    ;
+	call ki_xnode (device, outstr, maxch)
+	nchars = strlen (outstr)
 
-	# Get optional max transfer size, %NNNN.
-	if (Memc[ip] == '%') {
-	    ip = ip + 1
-	    if (ctoi (Memc, ip, maxbufsize) <= 0)
-		maxbufsize = -1
-	} else
-	    maxbufsize = -1
+	if (nchars <= 0)
+	    call syserrs (SYS_MTTAPECAP, device)
 
-	# Set devlist to EOS delimited device driver id string.
-	for (;  IS_WHITE (Memc[ip]);  ip=ip+1)
-	    ;
-	for (devlist=ip;  Memc[ip] != EOS;  ip=ip+1)
-	    ;
-	for (ip=ip-1;  IS_WHITE (Memc[ip]) || Memc[ip] == '\n';  ip=ip-1)
-	    ;
-	Memc[ip+1] = EOS
-
-	# Truncate list to first device name if only one name is required.
-	if (onedev == YES) {
-	    for (ip=devlist;  Memc[ip] != EOS && !IS_WHITE (Memc[ip]);  ip=ip+1)
-		;
-	    Memc[ip] = EOS
-	}
-
-	# Return the host device name list, preserving the node name.
-	call strcpy (Memc[node], outstr, maxch)
-	call strcat (Memc[devlist], outstr, maxch)
-
-	call sfree (sp)
 	return (OK)
 end

@@ -129,7 +129,7 @@ ZCLSLP (chan, status)
 XINT	*chan;
 XINT	*status;
 {
-	static	PKCHAR	xnullstr[1] = XEOS;
+	static	PKCHAR	xnullstr[1] = { XEOS };
 	register char *ip, *op, *f;
 	PKCHAR	cmd[(SZ_LINE+1) / sizeof(PKCHAR)];
 	XINT	junk;

@@ -26,16 +26,16 @@ Array of input data.
 Number of data points.
 .le
 .ls interp_type
-Interpolant type. Options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5
-and II_SPLINE3 for
-nearest neighbour, linear, 3rd and fifth order polynomials and the cubic
-spline. The interpolant type definitions are contained in the package
-header file math/iminterp.h
+Interpolant type. Options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5,
+II_SPLINE3 and II_SINC, for nearest neighbour, linear, 3rd and fifth order
+polynomials, the cubic spline, and the sinc function respectively.
+The interpolant type definitions are contained in the package header file
+math/iminterp.h
 .le
 .ih
 DESCRIPTION
 ARIEVAL allows the evaluation of a few interpolated points without the
-computing and storage required for the sequential interpolant.
+storage required for the sequential interpolant.
 .ih
 NOTES
 Checking for out of bounds and INDEF valued pixels is the responsibility of

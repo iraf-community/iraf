@@ -26,13 +26,13 @@ longslit:
 libpkg.a:
 	@transform
 
-	illumination.x	<imhdr.h> <math/iminterp.h> <pkg/gtools.h>\
+	airmass.x	<math.h>
+	extinction.x	<error.h> <imhdr.h>
+	fluxcalib.x	<error.h> <imhdr.h> <math/iminterp.h>
+	illumination.x	<error.h> <imhdr.h> <math/iminterp.h> <pkg/gtools.h>\
 			<pkg/rg.h> <pkg/xtanswer.h>
 	ilsetbins.x	<gset.h> <imhdr.h> <pkg/gtools.h> <pkg/rg.h>\
 			<pkg/xtanswer.h>
 	lstools.x	<imhdr.h>
 	response.x	<imhdr.h> <pkg/gtools.h> <pkg/xtanswer.h>
-	extinction.x	<imhdr.h> <error.h>
-	fluxcalib.x	<imhdr.h> <error.h> <math/iminterp.h>
-	airmass.x	<math.h>
 	;

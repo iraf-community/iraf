@@ -13,6 +13,7 @@ include	"ki.h"
 define	DEBUG_FILE	"/tmp/ks.out"	# MACHDEP
 #define	DEBUG_FILE	"iraftmp:ks.out"
 define	DEBUG		NO
+#define	DEBUG		YES
 
 define	DEF_LENIOBUF	32768		# reallocated if too small
 define	SZ_TXBUF	1024		# handy text buffer
@@ -44,20 +45,28 @@ define	ZSTTBF		bfdd[($1)+5]
 # IRAFKS -- The main entry point of the iraf kernel server task.  The kernel
 # server program is not CL callable but is instead spawned by the OS to listen
 # listen on a socket.  The ONENTRY procedure gains control from the IRAF main
-# at process startup, before the in task interpreter is entered.  The onentry
+# at process startup, before the in task interpreter is entered.  The t_irafks
 # procedure is never actually called by the interpreter as the TASK statement 
 # suggests.  The purpose of the task statement is to give us an IRAF main.
 
-task	irafks = onentry
+task	irafks = t_irafks
+procedure t_irafks()
+begin
+end
 
-int procedure onentry (prtype, bkgfile)
 
-int	prtype			# process type flag (not used)
-char	bkgfile[ARB]		# bkgfilename if detached process (not used)
+# ONENTRY -- The real task executed by the irafks.e executable.
+
+int procedure onentry (prtype, bkgfile, cmd)
+
+int	prtype			#I process type flag (not used)
+char	bkgfile[ARB]		#I bkgfilename if detached process (not used)
+char	cmd[ARB]		#I optional command (used to flag irafks type) 
 
 bool	error_restart
 int	debuginit, chan, junk
 char	osfn[SZ_PATHNAME], debugfile[SZ_PATHNAME]
+
 int	getpid(), open()
 data	error_restart /false/
 data	debuginit /DEBUG/
@@ -90,7 +99,7 @@ begin
 	    error_restart = true
 
 	# Open the network connection to the host process.
-	call strpak ("host", osfn, SZ_PATHNAME)
+	call strpak (cmd, osfn, SZ_PATHNAME)
 	call zopnks (osfn, READ_WRITE, chan)
 
 	# Open the debug file if so indicated.  The value of the debug flag
@@ -200,12 +209,14 @@ begin
 	    p_sbuflen = 0
 
 	    if (debug == YES) {
-		call fprintf (spy, "opcode=%d, subcode=%d, arg[] = %d %d %d\n")
+		call fprintf (spy, "opcode=%d, subcode=%d, arg[] =")
 		    call pargi (opcode)
 		    call pargi (subcode)
-		    call pargi (arg1)
-		    call pargi (arg2)
-		    call pargi (arg3)
+		do i = 1, 10 {
+		    call fprintf (spy, " %d")
+		    call pargi (p_arg[i])
+		}
+		call fprintf (spy, "\n")
 	    }
 
 	    switch (opcode) {
@@ -425,6 +436,11 @@ begin
 
 	    case KI_ZDVALL:
 		# Allocate or deallocate a device.
+		if (debug == YES) {
+		    call fprintf (spy, "allocate `%s' flag=%d\n")
+			call pargstr (p_sbuf[arg1])
+			call pargi (arg2)
+		}
 		call strpak (p_sbuf[arg1], temp, SZ_PATHNAME)
 		call zdvall (temp, arg2, status)
 
@@ -1021,16 +1037,20 @@ int	in, out			# input and output channels to host
 pointer	iobuf			# scratch i/o buffer
 int	len_iobuf		# current length of buffer
 
-int	status, nchars
-int	newfile, nrecords, nfiles, arg[6]
+long	lval
+int	status, nchars, mode, dc_off, dc_len
+int	newfile, arg[MAX_ARGS]
 char	drive[SZ_FNAME]
 errchk	realloc
 include	"kii.com"
 int	ks_send()
 define	fatal_ 91
 
+int	debug, spy
+common	/dbgcom/ debug, spy
+
 begin
-	call amovi (p_arg, arg, 6)
+	call amovi (p_arg, arg, MAX_ARGS)
 
 	# Make sure the iobuffer is large enough.  If a large enough buffer
 	# cannot be allocated something is very wrong and the server shuts
@@ -1046,21 +1066,43 @@ begin
 
 	switch (p_subcode) {
 	case MT_OP:
-	    # Open the magtape device.
-	    newfile = arg[6]
+	    # Open a magtape device.
 
+	    mode = arg[2]
+	    dc_off = arg[3]
+	    dc_len = arg[4]
+	    newfile = arg[5]
+
+	    # Get the device name string.
 	    call strpak (p_sbuf[arg[1]], drive, SZ_PATHNAME)
-	    call zzopmt (drive, arg[2], arg[3], arg[4], arg[5],
-		newfile, status)
 
+	    # Get the devcap string.
+	    if (dc_len > 0 && dc_off == 0) {
+		call zardks (in, Memc[iobuf], dc_len+1, 0)
+		call zawtks (in, status)
+		if (status != dc_len + 1)
+		    goto fatal_
+	    } else
+		call strpak (p_sbuf[dc_off], Memc[iobuf], len_iobuf)
+
+	    if (debug == YES) {
+		call fprintf (spy,
+		    "open magtape device `%s', mode=%d, file=%d, devcap=`%s'\n")
+		    call pargstr (p_sbuf[arg[1]])
+		    call pargi (mode)
+		    call pargi (newfile)
+
+		    call strupk (Memc[iobuf], Memc[iobuf], len_iobuf)
+		    call pargstr (Memc[iobuf])
+		    call strpak (Memc[iobuf], Memc[iobuf], len_iobuf)
+	    }
+
+	    call zzopmt (drive, mode, Memc[iobuf], arg[6], newfile, status)
 	    p_arg[2] = newfile
 
 	case MT_CL:
 	    # Close a binary file.
-	    call zzclmt (arg[1], arg[2], nrecords, nfiles, status)
-
-	    p_arg[2] = nrecords
-	    p_arg[3] = nfiles
+	    call zzclmt (arg[1], p_arg[2], status)
 
 	case MT_RD:
 	    # Read from a magtape file.  The read must be performed in one
@@ -1070,8 +1112,8 @@ begin
 	    # complete each request before processing the next one.
 
 	    # Read the data.
-	    call zzrdmt (arg[1], Memc[iobuf], arg[2])
-	    call zzwtmt (arg[1], nrecords, nfiles, status)
+	    call zzrdmt (arg[1], Memc[iobuf], arg[2], arg[3])
+	    call zzwtmt (arg[1], p_arg[2], status)
 
 	    # Send the ZAWT packet to the host followed by the data block.
 	    # The next operation performed by the host on the channel MUST
@@ -1079,9 +1121,6 @@ begin
 	    # do other things before completing the transfer.
 
 	    p_arg[1] = status
-	    p_arg[2] = nrecords
-	    p_arg[3] = nfiles
-
 	    if (ks_send (out, p_opcode, MT_WT) == ERR)
 		goto fatal_
 	    if (status > 0) {
@@ -1112,9 +1151,9 @@ begin
 	    # Write the data to the output device.
 	    # TODO - delay the call to zawtbf to overlap i/o even further.
 
-	    call zzwrmt (arg[1], Memc[iobuf], arg[2])
-	    call zzwtmt (arg[1], nrecords, nfiles, status)
-	    if (status != arg[2] || nrecords != 1 || nfiles != 0)
+	    call zzwrmt (arg[1], Memc[iobuf], arg[2], arg[3])
+	    call zzwtmt (arg[1], p_arg[2], status)
+	    if (status != arg[2])
 		goto fatal_
 
 	    return
@@ -1127,10 +1166,29 @@ begin
 
 	    status = ERR
 
+	case MT_ST:
+	    # Get device status.
+	    call zzstmt (arg[1], arg[2], lval)
+	    status = lval
+
 	case MT_RW:
 	    # Rewind a drive.
+	    dc_off = p_arg[2]
+	    dc_len = p_arg[3]
+
+	    # Get the device name string.
 	    call strpak (p_sbuf[arg[1]], drive, SZ_PATHNAME)
-	    call zzrwmt (drive, status)
+
+	    # Get the devcap string.
+	    if (dc_len > 0 && dc_off == 0) {
+		call zardks (in, Memc[iobuf], dc_len+1, 0)
+		call zawtks (in, status)
+		if (status != dc_len + 1)
+		    goto fatal_
+	    } else
+		call strpak (p_sbuf[dc_off], Memc[iobuf], len_iobuf)
+
+	    call zzrwmt (drive, Memc[iobuf], status)
 
 	default:
 	    status = ERR
@@ -1138,6 +1196,11 @@ begin
 
 	# Return a status packet to the host if the operation was not a read
 	# or a write.
+
+	if (debug == YES) {
+	    call fprintf (spy, "status %d\n")
+	    call pargi (status)
+	}
 
 	p_arg[1] = status
 	if (ks_send (out, p_opcode, p_subcode) != ERR)

@@ -15,6 +15,9 @@ procedure oif_close (im, status)
 pointer	im			# image descriptor
 int	status
 
+int	junk
+int	protect()
+
 begin
 	# Close the pixel file and header file, if open.
 	if (IM_PFD(im) != NULL)
@@ -28,6 +31,6 @@ begin
 	# storage file lying about somewhere.
 
 	if (IM_ACMODE(im) == NEW_IMAGE || IM_ACMODE(im) == NEW_COPY)
-	    iferr (call protect (IM_HDRFILE(im), SET_PROTECTION))
+	    iferr (junk = protect (IM_HDRFILE(im), SET_PROTECTION))
 		call erract (EA_WARN)
 end

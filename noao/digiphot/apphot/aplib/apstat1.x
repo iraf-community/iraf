@@ -55,6 +55,10 @@ begin
 	    call strcpy (AP_FILTER(ap), str, maxch)
 	case FILTERID:
 	    call strcpy (AP_FILTERID(ap), str, maxch)
+	case OBSTIME:
+	    call strcpy (AP_OBSTIME(ap), str, maxch)
+	case OTIME:
+	    call strcpy (AP_OTIME(ap), str, maxch)
 	default:
 	    call error (0, "APSTATS: Unknown apphot string parameter")
 	}
@@ -117,7 +121,7 @@ begin
 end
 
 
-# AP2STATR -- Procedure to set a real apphot parameter.
+# AP1STATR -- Procedure to set a real apphot parameter.
 
 real procedure ap1statr (ap, param)
 

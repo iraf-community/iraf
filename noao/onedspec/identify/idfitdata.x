@@ -1,3 +1,4 @@
+include	"../shdr.h"
 include	"identify.h"
 
 # ID_FITDATA -- Compute fit coordinates from pixel coordinates.
@@ -12,8 +13,7 @@ begin
 	call malloc (ID_FITDATA(id), ID_NPTS(id), TY_DOUBLE)
 
 	if (ID_CV(id) == NULL)
-	    call altrd (PIXDATA(id,1), FITDATA(id,1), ID_NPTS(id),
-		-ID_CRPIX(id), ID_CDELT(id), ID_CRVAL(id))
+	    call achtrd (Memr[SX(ID_SH(id))], FITDATA(id,1), ID_NPTS(id))
 	else {
 	    call dcvvector (ID_CV(id), PIXDATA(id,1), FITDATA(id,1),
 		ID_NPTS(id))
@@ -28,7 +28,7 @@ begin
 	    }
 	}
 	if (ID_SHIFT(id) != 0.)
-	    call aaddkd (FITDATA(id,1), ID_SHIFT(id), FITDATA(id,1), ID_NPTS(id))
+	    call aaddkd (FITDATA(id,1), ID_SHIFT(id), FITDATA(id,1),ID_NPTS(id))
 end
 
 
@@ -63,18 +63,17 @@ double procedure id_fitpt (id, pix)
 pointer	id			# ID pointer
 double	pix			# Pixel coordinate
 
-int	i, j
 double	fit
 
-double	dcveval()
+double	mw_c1trand(), shdr_lw(), dcveval()
 
 begin
 	if (ID_CV(id) == NULL) {
-	    i = pix
-	    j = i + 1
-	    fit = FITDATA(id,j) * (pix - i) + FITDATA(id,i) * (j - pix)
+	    fit = mw_c1trand (ID_PL(id), pix)
+	    fit = shdr_lw (ID_SH(id), fit)
 	} else
-	    fit = dcveval (ID_CV(id), pix) + ID_SHIFT(id)
+	    fit = dcveval (ID_CV(id), pix)
+	fit = fit + ID_SHIFT(id)
 
 	return (fit)
 end
@@ -93,7 +92,7 @@ double	pixcoord		# Pixel coordinate returned
 int	i
 double	dx
 
-double	id_fitpt()
+double	mw_c1trand(), id_fitpt()
 
 begin
 	if (FITDATA(id,1) < FITDATA(id,ID_NPTS(id))) {
@@ -106,8 +105,8 @@ begin
 	    if (FITDATA(id,i) == fitcoord)
 	        return (double (i))
 
-	    pixcoord = i - .5
-	    dx = 0.5
+	    pixcoord = mw_c1trand (ID_LP(id), double(i-.5))
+	    dx = mw_c1trand (ID_LP(id), double(i+.5)) - pixcoord
 	    while (dx > DXMIN) {
 	        dx = dx / 2
 	        if (id_fitpt (id, pixcoord) < fitcoord)
@@ -125,8 +124,8 @@ begin
 	    if (FITDATA(id,i) == fitcoord)
 	        return (double (i))
 
-	    pixcoord = i - .5
-	    dx = 0.5
+	    pixcoord = mw_c1trand (ID_LP(id), double(i-.5))
+	    dx = mw_c1trand (ID_LP(id), double(i+.5)) - pixcoord
 	    while (dx > DXMIN) {
 	        dx = dx / 2
 	        if (id_fitpt (id, pixcoord) < fitcoord)

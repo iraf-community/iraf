@@ -10,6 +10,7 @@
  * and the code in the directory unix/shlib for additional information on the
  * shared library facility.
  */
+int	sh_debug = 0;
 unsigned USHLIB[3] = { 0, 0, 0 };	/* actual length does not matter */
 unsigned VSHLIB[3] = { 0, 0, 0 };
 unsigned VSHEND;

@@ -1,117 +1,117 @@
-      SUBROUTINE DECLCO (ID)
-      INTEGER ID(100)
-      INTEGER NEWID(100), TOK, TOKBL
-      INTEGER JUNK, LUDEF, EQUAL, GETTOK
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER XPTYP(9)
-      INTEGER XPNTR(7)
-      INTEGER XFUNC(7)
-      INTEGER XSUBR(7)
-      DATA XPTYP(1)/105/,XPTYP(2)/110/,XPTYP(3)/116/,XPTYP(4)/101/,XPTYP
-     *(5)/103/,XPTYP(6)/101/,XPTYP(7)/114/,XPTYP(8)/32/,XPTYP(9)/-2/
-      DATA XPNTR(1)/120/,XPNTR(2)/36/,XPNTR(3)/112/,XPNTR(4)/110/,XPNTR(
-     *5)/116/,XPNTR(6)/114/,XPNTR(7)/-2/
-      DATA XFUNC(1)/120/,XFUNC(2)/36/,XFUNC(3)/102/,XFUNC(4)/117/,XFUNC(
-     *5)/110/,XFUNC(6)/99/,XFUNC(7)/-2/
-      DATA XSUBR(1)/120/,XSUBR(2)/36/,XSUBR(3)/115/,XSUBR(4)/117/,XSUBR(
-     *5)/98/,XSUBR(6)/114/,XSUBR(7)/-2/
-      IF (.NOT.(LUDEF (ID, NEWID, XPPTBL) .EQ. 1))GOTO 23000
-      IF (.NOT.(EQUAL (ID, XPNTR) .EQ. 1))GOTO 23002
-      TOKBL = GETTOK (NEWID, 100)
-      IF (.NOT.(TOKBL .EQ. 32))GOTO 23004
-      TOK = GETTOK (NEWID, 100)
-      GOTO 23005
-23004 CONTINUE
-      TOK = TOKBL
-23005 CONTINUE
-      IF (.NOT.(TOK .EQ.  -166 .AND. EQUAL (NEWID, XFUNC) .EQ. 1))GOTO 2
+      subroutine declco (id)
+      integer id(100)
+      integer newid(100), tok, tokbl
+      integer junk, ludef, equal, gettok
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer xptyp(9)
+      integer xpntr(7)
+      integer xfunc(7)
+      integer xsubr(7)
+      data xptyp(1)/105/,xptyp(2)/110/,xptyp(3)/116/,xptyp(4)/101/,xptyp
+     *(5)/103/,xptyp(6)/101/,xptyp(7)/114/,xptyp(8)/32/,xptyp(9)/-2/
+      data xpntr(1)/120/,xpntr(2)/36/,xpntr(3)/112/,xpntr(4)/110/,xpntr(
+     *5)/116/,xpntr(6)/114/,xpntr(7)/-2/
+      data xfunc(1)/120/,xfunc(2)/36/,xfunc(3)/102/,xfunc(4)/117/,xfunc(
+     *5)/110/,xfunc(6)/99/,xfunc(7)/-2/
+      data xsubr(1)/120/,xsubr(2)/36/,xsubr(3)/115/,xsubr(4)/117/,xsubr(
+     *5)/98/,xsubr(6)/114/,xsubr(7)/-2/
+      if (.not.(ludef (id, newid, xpptbl) .eq. 1))goto 23000
+      if (.not.(equal (id, xpntr) .eq. 1))goto 23002
+      tokbl = gettok (newid, 100)
+      if (.not.(tokbl .eq. 32))goto 23004
+      tok = gettok (newid, 100)
+      goto 23005
+23004 continue
+      tok = tokbl
+23005 continue
+      if (.not.(tok .eq.  -166 .and. equal (newid, xfunc) .eq. 1))goto 2
      *3006
-      CALL OUTTAB
-      CALL OUTSTR (XPTYP)
-      JUNK = LUDEF (NEWID, NEWID, XPPTBL)
-      CALL OUTSTR (NEWID)
-      CALL EATUP
-      CALL OUTDON
-      CALL POICOD (0)
-      GOTO 23007
-23006 CONTINUE
-      CALL PBSTR (NEWID)
-      CALL POICOD (1)
-23007 CONTINUE
-      GOTO 23003
-23002 CONTINUE
-      IF (.NOT.(EQUAL (ID, XSUBR) .EQ. 1))GOTO 23008
-      CALL OUTTAB
-      CALL OUTSTR (NEWID)
-      CALL EATUP
-      CALL OUTDON
-      GOTO 23009
-23008 CONTINUE
-      CALL OUTTAB
-      CALL OUTSTR (NEWID)
-      CALL OUTCH (32)
-23009 CONTINUE
-23003 CONTINUE
-      GOTO 23001
-23000 CONTINUE
-      CALL SYNERR (32HInvalid x$type type declaration.)
-23001 CONTINUE
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      call outtab
+      call outstr (xptyp)
+      junk = ludef (newid, newid, xpptbl)
+      call outstr (newid)
+      call eatup
+      call outdon
+      call poicod (0)
+      goto 23007
+23006 continue
+      call pbstr (newid)
+      call poicod (1)
+23007 continue
+      goto 23003
+23002 continue
+      if (.not.(equal (id, xsubr) .eq. 1))goto 23008
+      call outtab
+      call outstr (newid)
+      call eatup
+      call outdon
+      goto 23009
+23008 continue
+      call outtab
+      call outstr (newid)
+      call outch (32)
+23009 continue
+23003 continue
+      goto 23001
+23000 continue
+      call synerr (32HInvalid x$type type declaration.)
+23001 continue
+      end
+c     logic0  logical_column

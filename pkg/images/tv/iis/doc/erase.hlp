@@ -1,0 +1,26 @@
+.help erase Jan86 images.tv.iis
+.ih
+NAME
+erase -- erase display frame
+.ih
+USAGE
+erase frame
+.ih
+PARAMETERS
+.ls frame
+Frame to be erased.
+.le
+.ih
+DESCRIPTION
+The specified frame in the image display ("stdimage") is erased.
+Note that the erased frame can be different than the frame currently
+being displayed on the monitor.  The graphics frame is not erased.
+.ih
+EXAMPLES
+To erase frame 3:
+
+	cl> erase 3
+.ih
+SEE ALSO
+cv
+.endhelp

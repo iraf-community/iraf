@@ -18,5 +18,5 @@ nxoverlap,i,h,-1,,,Number of columns of overlap between input images
 nyoverlap,i,h,-1,,,Number of rows of overlap between input images
 opixtype,s,h,"r",,,Output image pixel type
 oval,r,h,0.0,,,Value of undefined output image pixels
-verbose,b,h,n,,,Print out messages
+verbose,b,h,yes,,,Print out messages
 mode,s,h,'ql'

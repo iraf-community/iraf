@@ -2,6 +2,9 @@
 # is required to compile this.  The original UNIX ratfor compiler may not do
 # the job.
 
+.r.f:
+	/usr/local/bin/ratfor $*.r > $*.f
+
 SRCS=	addchr.r allblk.r alldig.r baderr.r balpar.r beginc.r brknxt.r\
 	cascod.r caslab.r declco.r deftok.r doarth.r docode.r doif.r\
 	doincr.r domac.r dostat.r dosub.r eatup.r elseif.r endcod.r\
@@ -16,9 +19,24 @@ SRCS=	addchr.r allblk.r alldig.r baderr.r balpar.r beginc.r brknxt.r\
 	strdcl.r swcode.r swend.r swvar.r synerr.r thenco.r ulstal.r\
 	uniqid.r unstak.r untils.r whilec.r whiles.r
 
+FORT=	addchr.f allblk.f alldig.f baderr.f balpar.f beginc.f brknxt.f\
+	cascod.f caslab.f declco.f deftok.f doarth.f docode.f doif.f\
+	doincr.f domac.f dostat.f dosub.f eatup.f elseif.f endcod.f\
+	entdef.f entdkw.f entfkw.f entrkw.f entxkw.f errchk.f errgo.f\
+	errorc.f evalr.f finit.f forcod.f fors.f getdef.f gettok.f\
+	gnbtok.f gocode.f gtok.f ifcode.f iferrc.f ifgo.f ifparm.f\
+	indent.f initkw.f labelc.f labgen.f lex.f litral.f lndict.f\
+	ludef.f mapid.f ngetch.f ogotos.f otherc.f outch.f outcon.f\
+	outdon.f outdwe.f outgo.f outnum.f outstr.f outtab.f parse.f\
+	pbnum.f pbstr.f poicod.f push.f putbak.f putchr.f puttok.f\
+	ratfor.f relate.f repcod.f retcod.f sdupl.f skpblk.f squash.f\
+	strdcl.f swcode.f swend.f swvar.f synerr.f thenco.f ulstal.f\
+	uniqid.f unstak.f untils.f whilec.f whiles.f
+
 # NOTE -- After regenerating the fortran CASLAB.F, comment out the unreachable
 # goto on line 32, generated due to a bug in the ratfor.
 
-fort:	$(SRCS)
-	find $(SRCS) -newer fort -print | sed -e 's/.*/f77 -F &/' | sh
-	mv *.f ../rppfor; touch fort
+fort:	$(SRCS) common defs
+	make fsrc; mv *.f ../rppfor; touch fort
+
+fsrc:	$(FORT)

@@ -1,5 +1,133 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
+ccdred$src/icombine.gx
+    Needed to clear buffers returned by impl1 during the memory check
+    to avoid possible invalid values.  (4/27/92, Valdes)
+
+ccdred$src/t_ccdproc.x
+ccdred$src/calimage.x
+    Made it an error if an explicit calibration image is specified but cannot
+    be opened.  Previously it would then look in the input list for the
+    appropriate type.  (4/24/92, Valdes)
+
+ccdred$ccdproc.x
+ccdred$t_ccdproc.x
+    Made the COMP type be processed like and OBJECT rather that the
+    default case.  The only effect of this is to not have CCDMEAN
+    calculated.  (4/8/92, Valdes)
+
+ccdred$src/icalip.gx
+ccdred$src/icclip.gx
+ccdred$src/ipslip.gx
+ccdred$src/icslip.gx
+ccdred$src/icmedian.gx
+    The median calculation with an even number of points for short data
+    could overflow (addition of two short values) and be incorrect.
+    (3/16/92, Valdes)
+
+ccdred$src/iclog.x
+    Added listing of read noise and gain.  (2/10/92, Valdes)
+
+ccdred$src/icpclip.gx
+    Reduced the minimum number of images allowed for PCLIP to 3.
+    (1/7/92, Valdes)
+
+ccdred$darkcombine.cl
+ccdred$flatcombine.cl
+    Set default parameters as requested by the support people.
+    (12/12/91, Valdes)
+
+ccdred$src/icgrow.gx
+    The first pixel to be checked was incorrectly set to 0 instead of 1
+    resulting in a segvio when using the grow option.  (12/6/91, Valdes)
+
+ccdred$src/proc.gx
+ccdred$src/icgdata.gx
+ccdred$src/icscale.x
+ccdred$src/setfixpix.x
+ccdred$src/t_combine.x
+    Fixed argument mismatch errors found by SPPLINT.  (11/22/91, Valdes)
+
+ccdred$src
+    Replaced COMBINE with new version.  (9/1/91, Valdes)
+
+ccdred$ccdtest/observe.cl -> artobs.cl
+ccdred$ccdtest/observe.hlp -> artobs.hlp
+ccdred$ccdtest/subsection.cl
+ccdred$ccdtest/subsection.hlp
+ccdred$ccdtest/mkimage.hlp
+ccdred$ccdtest/demo.dat
+ccdred$ccdtest/ccdtest.men
+ccdred$ccdtest/ccdtest.hd
+ccdred$ccdtest/ccdtest.cl
+ccdred$ccddb/kpno/demo.dat
+    Renamed OBSERVE to ARTOBS to avoid conflict with the CCDACQ task of
+    the same name.  (8/29/91, Valdes)
+
+ccdred$src/setoutput.x
+ccdred$src/setproc.x
+ccdred$src/setdark.x
+ccdred$src/setzero.x
+ccdred$src/setflat.x
+ccdred$src/setfringe.x
+ccdred$doc/ccdred.hlp
+    The default output pixel type and computation type are now real.  
+    The computation type may be separately specified.  (5/29/91, Valdes)
+
+ccdred$src/t_mkskycor.x
+    The computation of CCDMEAN failed to accumlate the last few lines causing
+    the mean to be underestimated.  (4/16/91, Valdes)
+
+ccdred$src/t_ccdinst.x +
+ccdred$src/ccdinst1.key +
+ccdred$src/ccdinst2.key +
+ccdred$src/ccdinst3.key +
+ccdred$src/hdrmap.x
+ccdred$src/mkpkg
+ccdred$ccdinstrument.par +
+ccdred$ccdred.cl
+ccdred$ccdred.hd
+ccdred$ccdred.men
+ccdred$x_ccdred.x
+    Added the new task CCDINSTRUMENT.  This also involved some changes to
+    the header translation package hdrmap.x.  (10/23/90, Valdes)
+
+ccdred$src/imcscales.x
+ccdred$src/imcmode.gx
+ccdred$src/mkpkg
+    Added error check for incorrect mode section specification.
+    (10/3/90, Valdes)
+
+ccdred$src/ccdred.h
+ccdred$src/proc.gx
+ccdred$src/setproc.x
+ccdred$ccdproc.par
+    Added a minreplace parameter to replace flat field values less than this
+    value by the value.  This provides zero division prevention without
+    requiring specific flat field checking.
+    (10/3/90, Valdes)
+
+ccdred$src/t_ccdproc.x
+ccdred$src/ccdproc.x
+ccdred$src/scancor.x
+    1.  The scan correction now computes the CCDMEAN to account for the
+	ramp down.
+    2.  Did a simple move of the ccdmean call from before scancor to
+	after scancor.  Since CCDMEAN is now computed in SCANCOR this
+	has no real affect and is just cosmetic.  If CCDMEAN were not
+	computed in SCANCOR then the new placement would have computed
+	the right value at the expense of another pass through the image.
+    (9/21/90, Valdes)
+
+ccdred$src/t_badpixim.x
+    The template image cannot be closed immediately after opening the NEW_COPY
+    mask image because the STF kernel doesn't make the header copy until
+    pixel I/O occurs.  This only affects STF images.  (6/19/90, Valdes)
+
+====
+V2.9
+====
+
 ccdred$src/t_combine.x
     Changed:
 	char images[SZ_FNAME-1,nimages] --> char images[SZ_FNAME,nimages-1]

@@ -8,6 +8,7 @@ include	<error.h>
 include	<ctype.h>
 include	<fset.h>
 include	<gset.h>
+include	<mwset.h>
 
 define	SZ_BUF		2048		# Initial pixel buffer size
 define	MAX_CURVES	20		# maximum curves if overplotting
@@ -26,14 +27,13 @@ char	input[SZ_LINE]
 pointer	x[MAX_CURVES], y[MAX_CURVES], size[MAX_CURVES]
 int	npix[MAX_CURVES], ncurves
 
+bool	append, overplot
 char	device[SZ_FNAME]
-int	mode, i, window
-int	tgrjmp[LEN_JUMPBUF], epa, old_onint, status
+int	tgrjmp[LEN_JUMPBUF], epa, old_onint, status, i
 
 bool	clgetb()
 int	fstati()
 extern	tgr_onint()
-data	window /0/
 common	/tgrcom/ tgrjmp
 
 begin
@@ -54,9 +54,8 @@ begin
 	# Fetch plotting parameters.
 
 	call clgstr ("device", device, SZ_FNAME)
-	mode = NEW_FILE
-	if (clgetb ("append"))
-	    mode = APPEND
+	overplot = clgetb ("overplot")
+	append = clgetb ("append")
 
 	# Install interrupt exception handler.
 	call zlocpr (tgr_onint, epa)
@@ -65,7 +64,8 @@ begin
 	call zsvjmp (tgrjmp, status)
 	if (status == OK) {
 	    # Fetch remaining params and draw the plot.
-	    iferr (call ggplot (device, mode, input, x, y, size, npix, ncurves))
+	    iferr (call ggplot (device, overplot, append, input, x, y,
+		size, npix, ncurves))
 		status = ERR
 	}
 
@@ -106,10 +106,11 @@ end
 # devics has been opened.  Fetch remaining parameters, read in the data,
 # and make the plot.
 
-procedure ggplot (device, mode, input, x, y, size, npix, ncurves)
+procedure ggplot (device, overplot, append, input, x, y, size, npix, ncurves)
 
 char	device[SZ_FNAME]	# Graphics device
-int	mode			# Mode of graphics stream
+bool	overplot		# Overplot graph
+bool	append			# Append graph
 char	input[ARB]		# List of operands to be plotted
 pointer	x[MAX_CURVES]		# X values
 pointer y[MAX_CURVES]		# Y values
@@ -119,7 +120,7 @@ int	ncurves			# Number of curves to overplot
 
 pointer	gd
 char	xlabel[SZ_LINE], ylabel[SZ_LINE], title[SZ_LINE]
-char	marker[SZ_FNAME]
+char	marker[SZ_FNAME], wcs[SZ_FNAME], xformat[SZ_FNAME], yformat[SZ_FNAME]
 bool	pointmode, lintran, xautoscale, yautoscale
 bool	drawbox, transpose, rdmarks
 int	xtran, ytran, axis, ticklabels, i, marker_type, j
@@ -130,14 +131,15 @@ pointer	ptemp
 pointer	gopen()
 bool	clgetb(), streq(), fp_equalr()
 int	clgeti(), gg_rdcurves()
-real	clgetr()
+real	clgetr(), plt_iformatr()
 errchk	clgetb, clgeti, clgstr, clgetr, glabax, gpmark
 errchk	gg_setdashpat, gswind, gseti, gg_rdcurves, gascale, grscale
 
 begin
 	# If computing projection along an axis (collapsing a multidimensional
-	# section to a vector), fetch axis number.
+	# section to a vector), fetch axis number.  Get wcs string.
 	axis = clgeti ("axis")
+	call clgstr ("wcs", wcs, SZ_FNAME)
 
 	# Initialize dashline index
 	call gg_initdashpat ()
@@ -160,9 +162,20 @@ begin
 	}
 
 	# Read all the curves specified by the operands in input into memory.
-	ncurves = gg_rdcurves (input, x, y, size, npix, axis, rdmarks)
+	# Get the first image title and coordinate label.
 
-	gd = gopen (device, mode, STDGRAPH)
+	title[1] = EOS
+	xlabel[1] = EOS
+	ylabel[1] = EOS
+	xformat[1] = EOS
+	yformat[1] = EOS
+	ncurves = gg_rdcurves (input, title, xlabel, ylabel, xformat,
+	    x, y, size, npix, axis, wcs, rdmarks)
+
+	if (overplot || append)
+	    gd = gopen (device, APPEND, STDGRAPH)
+	else
+	    gd = gopen (device, NEW_FILE, STDGRAPH)
 
 	xautoscale = false
 	yautoscale = false
@@ -171,7 +184,7 @@ begin
 	# autoscaling.  If device viewport has not been set, let glabax
 	# handle the viewport internally.
 
-	if (mode != APPEND) {
+	if (!append) {
 	    wx1 = clgetr ("wx1")
 	    wx2 = clgetr ("wx2")
 	    wy1 = clgetr ("wy1")
@@ -199,7 +212,7 @@ begin
 
 	# Draw box around plot?
 	drawbox = false
-	if (mode != APPEND)
+	if (!append)
 	    if (clgetb ("box"))
 		drawbox = true
 
@@ -210,14 +223,22 @@ begin
 	    call gseti (gd, G_YNMAJOR, clgeti ("majry"))
 	    call gseti (gd, G_YNMINOR, clgeti ("minry"))
 
-	    # Fetch labels and plot title string. 
+	    # Fetch plot title, labels and format
+	    call clgstr ("title", wcs, SZ_LINE)
+	    if (!streq (wcs, "imtitle"))
+		call strcpy (wcs, title, SZ_LINE)
 
-	    call clgstr ("xlabel", xlabel, SZ_LINE)
+	    call clgstr ("xlabel", wcs, SZ_LINE)
+	    if (!streq (wcs, "wcslabel"))
+		call strcpy (wcs, xlabel, SZ_LINE)
+
 	    call clgstr ("ylabel", ylabel, SZ_LINE)
 
-	    call clgstr ("title", title, SZ_LINE)
-	    if (streq (title, "imtitle"))
-		call gg_get_imtitle (input, title, SZ_LINE)
+	    call clgstr ("xformat", wcs, SZ_LINE)
+	    if (!streq (wcs, "wcsformat"))
+		call strcpy (wcs, xformat, SZ_FNAME)
+
+	    call clgstr ("yformat", yformat, SZ_LINE)
 
 	    # Label tick marks on axes?
 	    ticklabels = NO
@@ -241,7 +262,7 @@ begin
 	# the user window is known; if the user window was not input,
 	# autoscaling will reset it later.
 
-	if (mode == APPEND) {
+	if (append) {
 	    call ggeti (gd, G_XTRAN, xtran)
 	    call ggeti (gd, G_YTRAN, ytran)
 	    call ggwind (gd, wx1, wx2, wy1, wy2)
@@ -252,6 +273,10 @@ begin
 	    ytran = GW_LINEAR
 	    if (clgetb ("logy"))
 		ytran = GW_LOG
+	    wx1 = plt_iformatr (wx1, xformat)
+	    wx2 = plt_iformatr (wx2, xformat)
+	    wy1 = plt_iformatr (wy1, yformat)
+	    wy2 = plt_iformatr (wy2, yformat)
 	    call gswind (gd, wx1, wx2, wy1, wy2)
 	    call gseti (gd, G_XTRAN, xtran)
 	    call gseti (gd, G_YTRAN, ytran)
@@ -293,6 +318,8 @@ begin
 
 	# Draw box around plot if enabled.
 	if (drawbox) {
+	    call gsets (gd, G_XTICKFORMAT, xformat)
+	    call gsets (gd, G_YTICKFORMAT, yformat)
 	    call gseti (gd, G_LABELTICKS, ticklabels)
 	    call glabax (gd, title, xlabel, ylabel)
 	}
@@ -334,14 +361,20 @@ end
 # lists and/or image sections, producing a list of vectors as output.  Return
 # as the function value the number of curves.
 
-int procedure gg_rdcurves (oplist, x, y, size, npix, axis, rdmarks)
+int procedure gg_rdcurves (oplist, title, xlabel, ylabel, xformat,
+	x, y, size, npix, axis, wcs, rdmarks)
 
 char	oplist[ARB]		# Operand list
+char	title[ARB]		# Title
+char	xlabel[ARB]		# X label
+char	ylabel[ARB]		# Y label
+char	xformat[ARB]		# WCS coordinate format
 pointer	x[ARB]			# Pointer to x vector
 pointer	y[ARB]			# Pointer to y vector
 pointer	size[ARB]		# Pointer to vector of marker sizes
 int	npix[ARB]		# Number of values per vector
 int	axis			# Axis for projection
+char	wcs[ARB]		# WCS type
 bool	rdmarks			# Read marks from list?
 
 char	operand[SZ_FNAME]
@@ -360,7 +393,8 @@ begin
 		call error (0, "Maximum of 20 curves can be overplotted")
 	    i = ncurves
 	    iferr {
-		npix[i] = gg_rdcurve (operand, x[i],y[i],size[i], axis,rdmarks)
+		npix[i] = gg_rdcurve (operand, title, xlabel, ylabel,
+		    xformat, x[i], y[i], size[i], axis, wcs, rdmarks)
 	    } then {
 		call erract (EA_WARN)
 		ncurves = ncurves - 1
@@ -378,13 +412,20 @@ end
 
 # GG_RDCURVE -- Read a curve into memory.  The operand may specify either
 # list or image input; we determine which and then call the appropriate
-# input routine to access the data.
+# input routine to access the data.  Set the image title and coordinate
+# label if not previously defined.
 
-int procedure gg_rdcurve (operand, x, y, size, axis, rdmarks)
+int procedure gg_rdcurve (operand, title, xlabel, ylabel, xformat,
+	x, y, size, axis, wcs, rdmarks)
 
 char	operand[ARB]		# List of operaands to be plotted
+char	title[ARB]		# Title
+char	xlabel[ARB]		# X label
+char	ylabel[ARB]		# Y label
+char	xformat[ARB]		# WCS coordinate format
 pointer	x, y, size		# Pointers to x, y and size arrays
 int	axis			# Axis of image projection
+char	wcs[ARB]		# WCS type
 bool	rdmarks			# Read marks from list?
 
 int	gg_rdlist2(), gg_rdimage2(), gg_optype()
@@ -394,7 +435,8 @@ begin
 	if (gg_optype (operand) == LIST_OP)
 	    return (gg_rdlist2 (operand, x, y, size, rdmarks))
 	else
-	    return (gg_rdimage2 (operand, x, y, size, axis))
+	    return (gg_rdimage2 (operand, title, xlabel, ylabel, xformat,
+		x, y, size, axis, wcs))
 end
 
 
@@ -426,26 +468,37 @@ begin
 	    return (IMAGE_OP)
 	else if (access (operand, 0, TEXT_FILE) == YES)
 	    return (LIST_OP)
-	else
+	else 
 	    return (IMAGE_OP)
 end
 
 
 # GG_RDIMAGE2 -- Read an image section and compute the projection about
-# one dimension, producing x and y vectors as output.
+# one dimension, producing x and y vectors as output.  Set the title
+# and coordinate label if not previously defined.
 
-int procedure gg_rdimage2 (imsect, x, y, size, axis)
+int procedure gg_rdimage2 (imsect, title, xlabel, ylabel, xformat, x, y, size,
+	axis, wcs)
 
 char	imsect[ARB]		# Image section to be plotted
+char	title[ARB]		# Image title
+char	xlabel[ARB]		# Coordinate label
+char	ylabel[ARB]		# Pixel value label
+char	xformat[ARB]		# WCS coordinate format
 pointer	x, y, size		# Pointer to x, y and size vector
 int	axis			# Axis about which the projection is to be taken
+char	wcs[ARB]		# WCS type
 
-int	npix, i
-pointer	im
-pointer	immap()
-errchk	immap, im_projection, malloc
+int	npix, i, stridxs()
+pointer	sp, im, mw, ct, axvals, str
+pointer	immap(), mw_openim(), mw_sctran()
+errchk	immap, im_projection, malloc, mw_openim, mw_sctran, plt_wcs
 
 begin
+	call smark (sp)
+	call salloc (axvals, IM_MAXDIM, TY_REAL)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+
 	im = immap (imsect, READ_ONLY, 0)
 
 	if (axis < 1 || axis > IM_NDIM(im))
@@ -461,10 +514,32 @@ begin
 	} then
 	    call erract (EA_FATAL)
 
-	do i = 1, npix
-	    Memr[x+i-1] = i
+	# Set title if not previously defined
+	if (title[1] == EOS) {
+	    call strcpy (IM_TITLE(im), title, SZ_LINE)
+	    if (stridxs ("\n", title) == 0)
+		call strcat ("\n", title, SZ_LINE)
+	    call imgsection (imsect, Memc[str], SZ_LINE)
+	    if (Memc[str] != EOS)
+		    call strcat (Memc[str], title, SZ_LINE)
+	}
+
+	# Set WCS coordinates
+	mw = mw_openim (im)
+	call mw_seti (mw, MW_USEAXMAP, NO)
+	ct = mw_sctran (mw, "logical", wcs, 0)
+	call strcpy (wcs, Memc[str], SZ_LINE)
+	do i = 1, IM_NDIM(im)
+	    Memr[axvals+i-1] = (1 + IM_LEN(im, i)) / 2.
+	call plt_wcs (im, mw, ct, axis, Memr[axvals], 1., real(npix), Memr[x],
+	    npix, Memc[str], xformat,  SZ_FNAME)
+	if (xlabel[1] == EOS)
+	    call strcpy (Memc[str], xlabel, SZ_LINE)
+	call mw_close (mw)
 
 	call imunmap (im)
+
+	call sfree (sp)
 	return (npix)
 end
 
@@ -579,59 +654,6 @@ begin
 	call close (fd)
 	call sfree (sp)
 	return (n)
-end
-
-
-# GG_GET_IMTITLE -- Given the operand list as input, fetch the first operand
-# and try to open it as an image.  If the operand is an image return the
-# title string as an output argument, otherwise return the null string.
-# If there are multiple operands only the first is used.
-
-procedure gg_get_imtitle (oplist, title, maxch)
-
-char	oplist[ARB]		# List of operands to be graphed
-char	title[ARB]		# Image title string (output)
-int	maxch
-
-char	operand[SZ_FNAME], section[SZ_FNAME]
-int	fd
-pointer	im
-int	imtopen(), imtgetim(), gg_optype(), stridxs(), imtlen()
-pointer	immap()
-errchk	imtopen(), imtgetim()
-
-begin
-	title[1] = EOS
-
-	# Get the first operand name.  If it is not an image we are all done.
-	fd = imtopen (oplist)
-
-	if (imtgetim (fd, operand, SZ_FNAME) == EOF)
-	    return
-	if (gg_optype (operand) != IMAGE_OP)
-	    return
-
-	# Open the image.
-	iferr (im = immap (operand, READ_ONLY, 0))
-	    return
-
-	# Get image title.
-	call strcpy (IM_TITLE(im), title, maxch)
-	if (stridxs ("\n", title) == 0)
-	    call strcat ("\n", title, maxch)
-
-	# If an image section was given and there was only one operand in
-	# the operand list, append the section to the title.
-
-	call imgsection (operand, section, SZ_FNAME)
-
-	if (section[1] != EOS) {
-	    if (imtlen(fd) == 1)
-		call strcat (section, title, maxch)
-	}
-
-	call imunmap (im)
-	call imtclose (fd)
 end
 
 

@@ -1,222 +1,222 @@
-      INTEGER FUNCTION GTOK (LEXSTR, TOKSIZ)
-      INTEGER LEXSTR (100)
-      INTEGER TOKSIZ
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER C
-      INTEGER NGETCH
-      INTEGER I
-      EXTERNAL INDEX
-      INTEGER INDEX
-      INTEGER DIGITS(37)
-      DATA DIGITS(1)/48/,DIGITS(2)/49/,DIGITS(3)/50/,DIGITS(4)/51/,DIGIT
-     *S(5)/52/,DIGITS(6)/53/,DIGITS(7)/54/,DIGITS(8)/55/,DIGITS(9)/56/,D
-     *IGITS(10)/57/,DIGITS(11)/97/,DIGITS(12)/98/,DIGITS(13)/99/,DIGITS(
-     *14)/100/,DIGITS(15)/101/,DIGITS(16)/102/,DIGITS(17)/103/,DIGITS(18
-     *)/104/,DIGITS(19)/105/,DIGITS(20)/106/,DIGITS(21)/107/,DIGITS(22)/
-     *108/,DIGITS(23)/109/,DIGITS(24)/110/,DIGITS(25)/111/,DIGITS(26)/11
-     *2/,DIGITS(27)/113/,DIGITS(28)/114/,DIGITS(29)/115/,DIGITS(30)/116/
-     *,DIGITS(31)/117/,DIGITS(32)/118/,DIGITS(33)/119/,DIGITS(34)/120/,D
-     *IGITS(35)/121/,DIGITS(36)/122/,DIGITS(37)/-2/
-      C = NGETCH (LEXSTR (1))
-      IF (.NOT.(C .EQ. 32 .OR. C .EQ. 9))GOTO 23000
-      LEXSTR (1) = 32
-23002 IF (.NOT.(C .EQ. 32 .OR. C .EQ. 9))GOTO 23003
-      C = NGETCH (C)
-      GOTO 23002
-23003 CONTINUE
-      IF (.NOT.(C .EQ. 35))GOTO 23004
-23006 IF (.NOT.(NGETCH (C) .NE. 10))GOTO 23007
-      GOTO 23006
-23007 CONTINUE
-23004 CONTINUE
-      IF (.NOT.(C .NE. 10))GOTO 23008
-      CALL PUTBAK (C)
-      GOTO 23009
-23008 CONTINUE
-      LEXSTR (1) = 10
-23009 CONTINUE
-      LEXSTR (2) = -2
-      GTOK = LEXSTR (1)
-      RETURN
-23000 CONTINUE
-      I = 1
-      IF (.NOT.(((65.LE.C.AND.C.LE.90).OR.(97.LE.C.AND.C.LE.122))))GOTO 
+      integer function gtok (lexstr, toksiz)
+      integer lexstr (100)
+      integer toksiz
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer c
+      integer ngetch
+      integer i
+      external index
+      integer index
+c     integer digits(37)
+c     data digits(1)/48/,digits(2)/49/,digits(3)/50/,digits(4)/51/,digit
+c    *s(5)/52/,digits(6)/53/,digits(7)/54/,digits(8)/55/,digits(9)/56/,d
+c    *igits(10)/57/,digits(11)/97/,digits(12)/98/,digits(13)/99/,digits(
+c    *14)/100/,digits(15)/101/,digits(16)/102/,digits(17)/103/,digits(18
+c    *)/104/,digits(19)/105/,digits(20)/106/,digits(21)/107/,digits(22)/
+c    *108/,digits(23)/109/,digits(24)/110/,digits(25)/111/,digits(26)/11
+c    *2/,digits(27)/113/,digits(28)/114/,digits(29)/115/,digits(30)/116/
+c    *,digits(31)/117/,digits(32)/118/,digits(33)/119/,digits(34)/120/,d
+c    *igits(35)/121/,digits(36)/122/,digits(37)/-2/
+      c = ngetch (lexstr (1))
+      if (.not.(c .eq. 32 .or. c .eq. 9))goto 23000
+      lexstr (1) = 32
+23002 if (.not.(c .eq. 32 .or. c .eq. 9))goto 23003
+      c = ngetch (c)
+      goto 23002
+23003 continue
+      if (.not.(c .eq. 35))goto 23004
+23006 if (.not.(ngetch (c) .ne. 10))goto 23007
+      goto 23006
+23007 continue
+23004 continue
+      if (.not.(c .ne. 10))goto 23008
+      call putbak (c)
+      goto 23009
+23008 continue
+      lexstr (1) = 10
+23009 continue
+      lexstr (2) = -2
+      gtok = lexstr (1)
+      return
+23000 continue
+      i = 1
+      if (.not.(((65.le.c.and.c.le.90).or.(97.le.c.and.c.le.122))))goto 
      *23010
-      GTOK = -9
-      IF (.NOT.(C .EQ. 120))GOTO 23012
-      C = NGETCH (LEXSTR(2))
-      IF (.NOT.(C .EQ. 36))GOTO 23014
-      GTOK =  -166
-      I = 2
-      GOTO 23015
-23014 CONTINUE
-      CALL PUTBAK (C)
-23015 CONTINUE
-23012 CONTINUE
-23016 IF (.NOT.(I .LT. TOKSIZ - 2))GOTO 23018
-      C = NGETCH (LEXSTR(I+1))
-      IF (.NOT.(.NOT.((65.LE.C.AND.C.LE.90).OR.(97.LE.C.AND.C.LE.122)) .
-     *AND. .NOT.(48.LE.C.AND.C.LE.57) .AND. C .NE. 95))GOTO 23019
-      GOTO 23018
-23019 CONTINUE
-23017 I=I+1
-      GOTO 23016
-23018 CONTINUE
-      CALL PUTBAK (C)
-      GOTO 23011
-23010 CONTINUE
-      IF (.NOT.((48.LE.C.AND.C.LE.57)))GOTO 23021
-      I=1
-23023 IF (.NOT.(I .LT. TOKSIZ - 2))GOTO 23025
-      C = NGETCH (LEXSTR (I + 1))
-      IF (.NOT.(.NOT.(48.LE.C.AND.C.LE.57)))GOTO 23026
-      GOTO 23025
-23026 CONTINUE
-23024 I=I+1
-      GOTO 23023
-23025 CONTINUE
-      CALL PUTBAK (C)
-      GTOK = 48
-      GOTO 23022
-23021 CONTINUE
-      IF (.NOT.(C .EQ. 91))GOTO 23028
-      LEXSTR (1) = 123
-      GTOK = 123
-      GOTO 23029
-23028 CONTINUE
-      IF (.NOT.(C .EQ. 93))GOTO 23030
-      LEXSTR (1) = 125
-      GTOK = 125
-      GOTO 23031
-23030 CONTINUE
-      IF (.NOT.(C .EQ. 36))GOTO 23032
-      IF (.NOT.(NGETCH (LEXSTR (2)) .EQ. 40))GOTO 23034
-      I = 2
-      GTOK = -69
-      GOTO 23035
-23034 CONTINUE
-      IF (.NOT.(LEXSTR (2) .EQ. 41))GOTO 23036
-      I = 2
-      GTOK = -68
-      GOTO 23037
-23036 CONTINUE
-      CALL PUTBAK (LEXSTR (2))
-      GTOK = 36
-23037 CONTINUE
-23035 CONTINUE
-      GOTO 23033
-23032 CONTINUE
-      IF (.NOT.(C .EQ. 39 .OR. C .EQ. 34))GOTO 23038
-      GTOK = C
-      I = 2
-23040 IF (.NOT.(NGETCH (LEXSTR (I)) .NE. LEXSTR (1)))GOTO 23042
-      IF (.NOT.(LEXSTR (I) .EQ. 95))GOTO 23043
-      IF (.NOT.(NGETCH (C) .EQ. 10))GOTO 23045
-23047 IF (.NOT.(C .EQ. 10 .OR. C .EQ. 32 .OR. C .EQ. 9))GOTO 23048
-      C = NGETCH (C)
-      GOTO 23047
-23048 CONTINUE
-      LEXSTR (I) = C
-      GOTO 23046
-23045 CONTINUE
-      CALL PUTBAK (C)
-23046 CONTINUE
-23043 CONTINUE
-      IF (.NOT.(LEXSTR (I) .EQ. 10 .OR. I .GE. TOKSIZ - 1))GOTO 23049
-      CALL SYNERR (14Hmissing quote.)
-      LEXSTR (I) = LEXSTR (1)
-      CALL PUTBAK (10)
-      GOTO 23042
-23049 CONTINUE
-23041 I = I + 1
-      GOTO 23040
-23042 CONTINUE
-      GOTO 23039
-23038 CONTINUE
-      IF (.NOT.(C .EQ. 35))GOTO 23051
-23053 IF (.NOT.(NGETCH (LEXSTR (1)) .NE. 10))GOTO 23054
-      GOTO 23053
-23054 CONTINUE
-      GTOK = 10
-      GOTO 23052
-23051 CONTINUE
-      IF (.NOT.(C .EQ. 62 .OR. C .EQ. 60 .OR. C .EQ. 126 .OR. C .EQ. 33 
-     *.OR. C .EQ. 126 .OR. C .EQ. 94 .OR. C .EQ. 61 .OR. C .EQ. 38 .OR. 
-     *C .EQ. 124))GOTO 23055
-      CALL RELATE (LEXSTR, I)
-      GTOK = C
-      GOTO 23056
-23055 CONTINUE
-      GTOK = C
-23056 CONTINUE
-23052 CONTINUE
-23039 CONTINUE
-23033 CONTINUE
-23031 CONTINUE
-23029 CONTINUE
-23022 CONTINUE
-23011 CONTINUE
-      IF (.NOT.(I .GE. TOKSIZ - 1))GOTO 23057
-      CALL SYNERR (15Htoken too long.)
-23057 CONTINUE
-      LEXSTR (I + 1) = -2
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      gtok = -9
+      if (.not.(c .eq. 120))goto 23012
+      c = ngetch (lexstr(2))
+      if (.not.(c .eq. 36))goto 23014
+      gtok =  -166
+      i = 2
+      goto 23015
+23014 continue
+      call putbak (c)
+23015 continue
+23012 continue
+23016 if (.not.(i .lt. toksiz - 2))goto 23018
+      c = ngetch (lexstr(i+1))
+      if (.not.(.not.((65.le.c.and.c.le.90).or.(97.le.c.and.c.le.122)) .
+     *and. .not.(48.le.c.and.c.le.57) .and. c .ne. 95))goto 23019
+      goto 23018
+23019 continue
+23017 i=i+1
+      goto 23016
+23018 continue
+      call putbak (c)
+      goto 23011
+23010 continue
+      if (.not.((48.le.c.and.c.le.57)))goto 23021
+      i=1
+23023 if (.not.(i .lt. toksiz - 2))goto 23025
+      c = ngetch (lexstr (i + 1))
+      if (.not.(.not.(48.le.c.and.c.le.57)))goto 23026
+      goto 23025
+23026 continue
+23024 i=i+1
+      goto 23023
+23025 continue
+      call putbak (c)
+      gtok = 48
+      goto 23022
+23021 continue
+      if (.not.(c .eq. 91))goto 23028
+      lexstr (1) = 123
+      gtok = 123
+      goto 23029
+23028 continue
+      if (.not.(c .eq. 93))goto 23030
+      lexstr (1) = 125
+      gtok = 125
+      goto 23031
+23030 continue
+      if (.not.(c .eq. 36))goto 23032
+      if (.not.(ngetch (lexstr (2)) .eq. 40))goto 23034
+      i = 2
+      gtok = -69
+      goto 23035
+23034 continue
+      if (.not.(lexstr (2) .eq. 41))goto 23036
+      i = 2
+      gtok = -68
+      goto 23037
+23036 continue
+      call putbak (lexstr (2))
+      gtok = 36
+23037 continue
+23035 continue
+      goto 23033
+23032 continue
+      if (.not.(c .eq. 39 .or. c .eq. 34))goto 23038
+      gtok = c
+      i = 2
+23040 if (.not.(ngetch (lexstr (i)) .ne. lexstr (1)))goto 23042
+      if (.not.(lexstr (i) .eq. 95))goto 23043
+      if (.not.(ngetch (c) .eq. 10))goto 23045
+23047 if (.not.(c .eq. 10 .or. c .eq. 32 .or. c .eq. 9))goto 23048
+      c = ngetch (c)
+      goto 23047
+23048 continue
+      lexstr (i) = c
+      goto 23046
+23045 continue
+      call putbak (c)
+23046 continue
+23043 continue
+      if (.not.(lexstr (i) .eq. 10 .or. i .ge. toksiz - 1))goto 23049
+      call synerr (14Hmissing quote.)
+      lexstr (i) = lexstr (1)
+      call putbak (10)
+      goto 23042
+23049 continue
+23041 i = i + 1
+      goto 23040
+23042 continue
+      goto 23039
+23038 continue
+      if (.not.(c .eq. 35))goto 23051
+23053 if (.not.(ngetch (lexstr (1)) .ne. 10))goto 23054
+      goto 23053
+23054 continue
+      gtok = 10
+      goto 23052
+23051 continue
+      if (.not.(c .eq. 62 .or. c .eq. 60 .or. c .eq. 126 .or. c .eq. 33 
+     *.or. c .eq. 126 .or. c .eq. 94 .or. c .eq. 61 .or. c .eq. 38 .or. 
+     *c .eq. 124))goto 23055
+      call relate (lexstr, i)
+      gtok = c
+      goto 23056
+23055 continue
+      gtok = c
+23056 continue
+23052 continue
+23039 continue
+23033 continue
+23031 continue
+23029 continue
+23022 continue
+23011 continue
+      if (.not.(i .ge. toksiz - 1))goto 23057
+      call synerr (15Htoken too long.)
+23057 continue
+      lexstr (i + 1) = -2
+      return
+      end
+c     logic0  logical_column

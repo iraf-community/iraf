@@ -1,0 +1,38 @@
+.help nlpget Feb91 "Nlfit Package"
+
+.ih
+NAME
+nlpget -- get the number and values of the fitted parameters
+.ih
+SYNOPSIS
+nlpget[rd] (nl, params, nparams)
+
+.nf
+pointer		nl		# curve descriptor
+real/double	params[nparams]	# the parameters array
+int		nparams		# the number of parameters
+.fi
+.ih
+ARGUMENTS
+.ls nl
+Pointer to the curve descriptor.
+.le
+.ls params
+Array of fitted parameters.
+.le
+.ls nparameters
+The total number of parameters.
+.le
+.ih
+DESCRIPTION
+NLPGET fetches the parameters array and the number of parameters from the
+curve descriptor structure. All the parameters, both those that were
+fit and those that were held constant are output.
+.ih
+NOTES
+The array size required to hold the output parameters can be determined
+by a call to nlstati.
+.ih
+SEE ALSO
+nlstat
+.endhelp

@@ -1,31 +1,30 @@
 #{ IRRED -- KPNO IR Camera Reduction Package
 
-# Load necessary packages
+# Load necessary core packages
 
-lists
-utilities
+images			# tasks sections,imcopy,imarith,imcombine,imdelete 
+lists			# tokens task
+utilities		# task translit
+proto			# task bscale
 
 # Define necessary paths
 
-set	apphot		= "noao$digiphot/apphot/"
 set	generic		= "noao$imred/generic/"
-set	proto		= "noao$proto/"
+set	nproto		= "noao$nproto/"
 
 package irred
-
-task	bscale		= "irred$x_proto.e"
 
 task	iralign,
 	irmatch1d,
 	irmatch2d,
-	irmosaic	= "proto$x_proto.e"
+	irmosaic	= "nproto$x_nproto.e"
 
-# Define the apphot centering task
+# Define the apphot centering and related tasks
 
-task	apselect	= "irred$x_apphot.e"
 task	center		= "irred$x_apphot.e"
 task	centerpars	= "irred$centerpars.par"
 task	datapars	= "irred$datapars.par"
+task	txdump		= "irred$x_ptools.e"
 
 # Scripts
 

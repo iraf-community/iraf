@@ -1,4 +1,4 @@
-.help names May85 noao.onedspec
+.help names Mar92 noao.onedspec
 .ih
 NAME
 names -- Generate image names from a root and a range descriptor
@@ -42,12 +42,22 @@ EXAMPLES
 The following will generate names of the form nite1.0001, nite1.0002 ...
 nite1.0010 and place the list in the file nite1.lst.
 
+.nf
 	cl> names nite1 1-10 >nite1.lst
+.fi
 
 The next example uses the append option to specify that only the
 first 512 pixels of each image (spectrum) are to used in the image name.
 
+.nf
 	cl> names nite1 1-10 append="[1:512]" >nite1.lst
+.fi
+.ih
+REVISIONS
+.ls NAMES V2.10
+This task is unchanged.
+.le
+.ih
 .ih
 BUGS
 The append option is only useful for adding image sections since it is

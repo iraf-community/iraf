@@ -251,6 +251,9 @@ begin
 	    call strcpy (Memc[temp], LABEL(ids), SZ_LINE)
 	}
 
+	# Since this is IDSOUT format data, initialize COEFF(ids) to integer 0.
+	COEFF(ids) = 0
+
 	# Determine companion record number if appropriate
 	if (SMODE(ids) != 0) {
 	    if (BEAM_NUMBER(ids) == 1)

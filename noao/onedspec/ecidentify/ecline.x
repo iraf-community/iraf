@@ -1,3 +1,4 @@
+include	"../shdr.h"
 include	"ecidentify.h"
 
 # EC_LINE -- Get line corresponding to aperture.

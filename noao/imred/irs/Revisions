@@ -1,5 +1,10 @@
 .help revisions Jun88 noao.imred.irs
 .nf
+imred$irs/
+   Updated to new version of ONEDSPEC (7/11/91, Valdes)
+
+================
+
 imred$irs/standard.par
    Removed ennumerated list.  (4/10/89, Valdes)
 

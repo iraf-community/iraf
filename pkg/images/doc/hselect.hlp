@@ -69,5 +69,5 @@ Since individual image headers are currently stored as separate files,
 selection from a large database is quite slow.
 .ih
 SEE ALSO
-hedit
+hedit, imgets, imheader
 .endhelp

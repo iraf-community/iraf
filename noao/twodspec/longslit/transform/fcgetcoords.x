@@ -20,11 +20,12 @@ char	labels[SZ_LINE,IGSPARAMS]	# Axis labels
 char	image1[SZ_FNAME], image2[SZ_FNAME], root[SZ_FNAME]
 int	i, j, rec, index, offset, nfeatures
 real	value
-pointer	dt, im, x, y, user
+pointer	dt, im, mw, ct, x, y, user
 
 int	fc_getim(), dtgeti(), dtscan()
+real	mw_c1tranr()
 bool	strne()
-pointer	dtmap1(), immap()
+pointer	dtmap1(), immap(), mw_openim(), mw_sctran()
 
 errchk	dtgstr
 
@@ -65,13 +66,21 @@ begin
 		xmax = IM_SVLEN (im, 1)
 		ymin = 1.
 		ymax = IM_SVLEN (im, 2)
-		call imunmap (im)
 
 		if (axis == 0)
 		    axis = j
 
-		if (j != axis)
+		if (j != axis) {
+		    call imunmap (im)
 		    next
+		}
+
+		# Set the WCS to convert the feature positions from
+		# IDENTIFY/REIDENTIFY which are in "physical" coordinates
+		# to "logical" coordinates currently used by TRANSFORM.
+
+		mw = mw_openim (im)
+		ct = mw_sctran (mw, "physical", "logical", 1)
 
 		# Allocate memory for the feature information and read
 		# the database.
@@ -92,22 +101,25 @@ begin
 		do i = 1, nfeatures {
 		    offset = ncoords - nfeatures + i - 1
 		    j = dtscan (dt)
+		    call gargr (value)
 		    switch (axis) {
 		    case 1:
-		        call gargr (Memr[x+offset])
+			Memr[x+offset] = mw_c1tranr (ct, value)
 			Memr[y+offset] = index
 		    case 2:
 			Memr[x+offset] = index
-		        call gargr (Memr[y+offset])
+			Memr[y+offset] = mw_c1tranr (ct, value)
 		    }
-		    call gargr (Memr[user+offset])
+		    call gargr (value)
 		    call gargr (value)
 		    if (!IS_INDEF (value))
 			Memr[user+offset] = value
 		}
 	    }
 
-	    # Unmmap the database.
+	    # Finish up
+	    call mw_close (mw)
+	    call imunmap (im)
 	    call dtunmap (dt)
 	}
 

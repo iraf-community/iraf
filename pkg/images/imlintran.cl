@@ -1,3 +1,5 @@
+# IMLINTRAN -- Linearly transform and image by calling the GEOTRAN task
+# with the appropriate parameters.
 
 procedure imlintran (input, output, xrotation, yrotation, xmag, ymag, xin, yin,
 	xout, yout, ncols, nrows, interpolant, boundary, constant,
@@ -34,6 +36,7 @@ begin
 	txrotation = xrotation
 	tyrotation = yrotation
 
+	# Call GEOTRAN.
 	geotran (input=tinput, output=toutput, database="",
 	    xrotation=txrotation, yrotation=tyrotation, xin=xin, yin=yin,
 	    xout=xout, yout=yout, xshift=INDEF, yshift=INDEF, xmin=1.0,

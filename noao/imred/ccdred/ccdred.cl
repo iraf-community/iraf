@@ -10,6 +10,7 @@ task	$ccdtest	= ccdtest$ccdtest.cl
 task	badpiximage,
 	ccdgroups,
 	ccdhedit,
+	ccdinstrument,
 	ccdlist,
 	ccdproc,
 	combine,

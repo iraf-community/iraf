@@ -120,9 +120,86 @@ double	jd
 begin
       year = int (epoch) - 1
       century = year / 100
-      jd = 1721425.5 + 365 * year - century + int (year / 4) + int (century / 4)
+      jd = 1721425.5d0 +
+	  365 * year - century + int (year / 4) + int (century / 4)
       jd = jd + (epoch - int(epoch)) * 365.25
       return (jd)
+end
+
+
+# AST_DATE_TO_JULDAY -- Convert date to Julian day.
+# This assumes dates after year 99.
+
+double procedure ast_date_to_julday (year, month, day, t)
+
+int	year			# Year
+int	month			# Month (1-12)
+int	day			# Day of month
+double	t			# Time for date (mean solar day)
+
+double	jd
+int	y, m, d
+
+begin
+	if (year < 100)
+	    y = 1900 + year
+	else
+	    y = year
+
+	if (month > 2)
+	    m = month + 1
+	else {
+	    m = month + 13
+	    y = y - 1
+	}
+
+	jd = int (365.25 * y) + int (30.6001 * m) + day + 1720995
+	if (day + 31 * (m + 12 * y) >= 588829) {
+	    d = int (y / 100)
+	    m = int (y / 400)
+	    jd = jd + 2 - d + m
+	}
+	jd = jd - 0.5 + int (t * 360000. + 0.5) / 360000. / 24.
+	return (jd)
+end
+
+
+# AST_JULDAY_TO_DATE -- Convert Julian date to calendar date.
+# This is taken from Numerical Receipes by Press, Flannery, Teukolsy, and
+# Vetterling.
+
+procedure ast_julday_to_date (j, year, month, day, t)
+
+double	j			# Julian day
+int	year			# Year
+int	month			# Month (1-12)
+int	day			# Day of month
+double	t			# Time for date (mean solar day)
+
+int	ja, jb, jc, jd, je
+
+begin
+	ja = nint (j)
+	t = 24. * (j - ja + 0.5)
+
+	if (ja >= 2299161) {
+	    jb = int (((ja - 1867216) - 0.25) / 36524.25)
+	    ja = ja + 1 + jb - int (jb / 4)
+	}
+
+	jb = ja + 1524
+	jc = int (6680. + ((jb - 2439870) - 122.1) / 365.25)
+	jd = 365 * jc + int (jc / 4)
+	je = int ((jb - jd) / 30.6001)
+	day = jb - jd - int (30.6001 * je)
+	month = je - 1
+	if (month > 12)
+	    month = month - 12
+	year = jc - 4715
+	if (month > 2)
+	    year = year - 1
+	if (year < 0)
+	    year = year - 1
 end
 
 
@@ -142,10 +219,11 @@ begin
 	# Determine JD and UT, and T (JD in centuries from J2000.0).
 	jd = ast_julday (epoch)
 	ut = (jd - int (jd) - 0.5) * 24.
-	t = (jd - 2451545.) / 36525.
+	t = (jd - 2451545.d0) / 36525.d0
 
 	# The GMST at 0 UT in seconds is a power series in T.
-	st = 24110.54841 + t * (8640184.812866 + t * (0.093104 - t * 6.2e-6))
+	st = 24110.54841d0 +
+	    t * (8640184.812866d0 + t * (0.093104d0 - t * 6.2d-6))
 
 	# Correct for longitude and convert to standard hours.
 	st = mod (st / 3600. + ut - longitude / 15., 24.0D0)

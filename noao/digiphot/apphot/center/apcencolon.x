@@ -12,16 +12,17 @@ pointer	im		# pointer to the iraf image
 int	cl		# coordinate file descriptor
 int	out		# output file descriptor
 int	stid		# output file sequence number
-int	ltid		# list sequence number
+int	ltid		# input list sequence number
 char	cmdstr		# command string
-int	newbuf		# new center buffer
-int	newfit		# new center fit
+int	newbuf		# new center buffer ?
+int	newfit		# new center fit ?
 
 int	junk
 pointer	sp, incmd, outcmd
 int	strdic()
 
 begin
+	# Allocate working space.
 	call smark (sp)
 	call salloc (incmd, SZ_LINE, TY_CHAR)
 	call salloc (outcmd, SZ_LINE, TY_CHAR)
@@ -36,7 +37,7 @@ begin
 
 	# Process the command.
 	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, CCMDS) != 0)
-	    call apccolon (ap, out, stid, cmdstr, newbuf, newfit)
+	    call ap_ccolon (ap, out, stid, cmdstr, newbuf, newfit)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
 	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newbuf,
 	        newfit, junk, junk, junk, junk)
@@ -44,15 +45,15 @@ begin
 	    call ap_nscolon (ap, im, out, stid, cmdstr, newbuf, newfit,
 		junk, junk, junk, junk)
 	else
-	    call apcimcolon (ap, out, stid, cmdstr, newbuf, newfit)
+	    call ap_cimcolon (ap, cmdstr) 
 
 	call sfree (sp)
 end
 
 
-# APCCOLON -- Process colon commands affecting the centering parameters.
+# AP_CCOLON -- Process colon commands affecting the centering parameters.
 
-procedure apccolon (ap, out, stid, cmdstr, newbuf, newfit)
+procedure ap_ccolon (ap, out, stid, cmdstr, newbuf, newfit)
 
 pointer	ap		# pointer to the apphot structure
 int	out		# output file descriptor
@@ -236,16 +237,13 @@ begin
 end
 
 
-# APCIMCOLON --  Process colon commands for the center task that do
+# AP_CIMCOLON --  Process colon commands for the center task that do
 # not affect the centering parameters
 
-procedure apcimcolon (ap, out, stid, cmdstr, newcenterbuf, newcenter)
+procedure ap_cimcolon (ap, cmdstr)
 
 pointer	ap			# pointer to the apphot structure
-int	out			# output file descriptor
-int	stid			# output sequence number
 char	cmdstr[ARB]		# command string
-int	newcenterbuf, newcenter	# centering parameters
 
 bool	bval
 int	ncmd

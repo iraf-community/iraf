@@ -1,5 +1,5 @@
-      SUBROUTINE ERROR (LINE)
-      INTEGER LINE (100)
-      CALL REMARK (LINE)
-      CALL ENDST
-      END
+      subroutine error (line)
+      integer line (100)
+      call remark (line)
+      call endst
+      end

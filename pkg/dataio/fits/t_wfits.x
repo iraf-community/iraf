@@ -19,8 +19,9 @@ char	out_fname[SZ_FNAME]	# output file name
 int	imlist, flist, nimages, nfiles, file_number
 bool	clgetb()
 double	clgetd()
-int	imtopen(), imtlen (), strlen(), wft_get_bitpix(), clgeti(), imtgetim()
-int	mtfile(), strmatch(), stridxs(), btoi(), fstati(), fntlenb(), fntgfnb()
+int	imtopen(), imtlen (), wft_get_bitpix(), clgeti(), imtgetim()
+int	mtfile(), btoi(), fstati(), fntlenb(), fntgfnb(), mtneedfileno()
+int	wft_blkfac()
 pointer	fntopnb()
 
 include "wfits.com"
@@ -40,29 +41,11 @@ begin
 	short_header = btoi (clgetb ("short_header"))
 	make_image = btoi (clgetb ("make_image"))
 
-	# Get the FITS bits per pixel.
+	# Get the FITS bits per pixel and the FITS logical record size.
 	bitpix = wft_get_bitpix (clgeti ("bitpix"))
-	if (bitpix != ERR) {
-	    call printf ("WARNING: Default bitpix overridden.\n")
-	    call printf ("\tBitpix set to: %d\n")
-		call pargi (bitpix)
-	}
-
-	# Get length of record in FITS bytes.
 	len_record = FITS_RECORD
-	blkfac = clgeti ("blocking_factor")
-	if (blkfac > MAX_BLKFAC && mod (blkfac, SZB_CHAR) != 0)
-	    call error (0, "Block size must be an integral number of chars.")
-	if (blkfac > 1 && blkfac <= MAX_FITS_BLKFAC) {
-	    call printf ("WARNING: FITS tape blocking factor is %d\n")
-		call pargi (blkfac)
-	}
-	if (blkfac > MAX_FITS_BLKFAC) {
-	    call printf ("WARNING: Blocking factor %d is not legal fits\n")
-		call pargi (blkfac)
-	}
 
-	# Get scaling parameters.
+	# Get the scaling parameters.
 	scale = btoi (clgetb ("scale"))
 	if (scale == YES) {
 	    if (clgetb ("autoscale"))
@@ -77,34 +60,26 @@ begin
 	    bscale = 1.0d0
 	    bzero = 0.0d0
 	}
-	if (autoscale == NO) {
-	    call printf ("WARNING: Autoscaling has been turned off.\n")
-	    call printf ("\tBscale set to: %g  Bzero set to: %g\n")
-		call pargd (bscale)
-		call pargd (bzero)
-	}
 
-	# Get output file name. If no tape file number is given for output,
-	# the user is asked if the tape is blank or contains data.
-	# If the tape is blank output begins at BOT, otherwise at EOT
+	# Get the output file name and type (tape or disk). If no tape file
+	# number is given for output, the user is asked if the tape is blank
+	# or contains data. If the tape is blank output begins at BOT,
+	# otherwise at EOT.
 
 	if (make_image == YES) {
 	    call clgstr ("fits_files", fits_files, SZ_FNAME)
 	    if (mtfile (fits_files) == YES) {
 		flist = NULL
-	        if (fits_files[strlen(fits_files)] != ']') {
+		if (mtneedfileno (fits_files) == YES) {
 	            newtape = clgetb ("newtape")
-		    if (newtape) {
-		        call sprintf (fits_files[strlen(fits_files) + 1],
-			    SZ_FNAME, "%s")
-			    call pargstr ("[1]")
-		    } else {
-		        call sprintf (fits_files[strlen(fits_files) + 1],
-			    SZ_FNAME, "%s")
-			    call pargstr ("[EOT]")
-		    }
-	        } else
+		    if (newtape)
+			call mtfname (fits_files, 1, out_fname, SZ_FNAME)
+		    else
+			call mtfname (fits_files, EOT, out_fname, SZ_FNAME)
+	        } else {
+		    call strcpy (fits_files, out_fname, SZ_FNAME)
 		    newtape = false
+		}
 	    } else {
 		flist = fntopnb (fits_files, NO)
 		nfiles = fntlenb (flist)
@@ -117,42 +92,41 @@ begin
 	    flist = NULL
 	}
 
+	# Get the fits file blocking factor.
+	blkfac = wft_blkfac (fits_files, clgeti ("blocking_factor"))
+
 	# Loop through the list of input images files.
 
 	file_number = 1
 	while (imtgetim (imlist, in_fname, SZ_FNAME) != EOF) {
 
-	    # Print id string.
+	    # Print the id string.
 	    if (long_header == YES || short_header == YES) {
 		call printf ("File %d: %s")
 		    call pargi (file_number)
 		    call pargstr (in_fname)
 	    }
 
-	    # Get output filename. If single file output to disk, use name
-	    # fits_file. If multiple file output to disk, the file number
+	    # Get the output file name. If single file output to disk, use
+	    # name fits_file. If multiple file output to disk, the file number
 	    # is added to the output file name, if no output name list is
 	    # supplied. If an output name list is supplied then the names
 	    # are extracted one by one from that list.
 
 	    if (make_image == YES) {
 	        if (mtfile (fits_files) == YES) {
-		    if (file_number == 2 && strmatch(fits_files,"[EOT]") == 0) {
-		        call sprintf (fits_files[stridxs("[", fits_files)],
-			    SZ_FNAME, "%s")
-			    call pargstr ("[EOT]")
-		    }
-		    call strcpy (fits_files, out_fname, SZ_FNAME)
+		    if (file_number == 2)
+			call mtfname (out_fname, EOT, out_fname, SZ_FNAME)
 	        } else if (nfiles > 1) {
 		    if (fntgfnb (flist, out_fname, SZ_FNAME) == EOF)
 			 call error (0, "Error reading output file name")
 		} else {
-		    call strcpy (fits_files, out_fname, SZ_FNAME)
 		    if (nimages > 1) {
-		        call sprintf (out_fname[strlen(fits_files)+1], SZ_FNAME,
-			    "%03d")
+		        call sprintf (out_fname[1], SZ_FNAME, "%s%04d")
+			    call pargstr (fits_files)
 			    call pargi (file_number)
-		    }
+		    } else
+		        call strcpy (fits_files, out_fname, SZ_FNAME)
 	        }
 	    }
 
@@ -187,4 +161,55 @@ begin
 	default:
 	    return (ERR)
 	}
+end
+
+
+# WFT_BLKFAC -- Get the fits tape blocking factor.
+
+int procedure wft_blkfac (file, ublkfac)
+
+char	file[ARB]		# the input file name
+int	ublkfac			# the user supplied blocking factor
+
+int	bs, fb, blkfac
+pointer	gty
+int	mtfile(), mtcap(), gtygeti()
+errchk	mtcap(), gtygeti()
+
+begin
+	# Return a blocking factor of 1 if the file is a disk file.
+	if (mtfile (file) == NO)
+	    return (0)
+
+	# Open the tapecap device entry for the given device, and get
+	# the device block size and default FITS blocking factor
+	# parameters.
+
+	iferr (gty = mtcap (file))
+	    return (max (ublkfac,1))
+	iferr (bs = gtygeti (gty, "bs")) {
+	    call gtyclose (gty)
+	    return (max (ublkfac,1))
+	}
+	iferr (fb = max (gtygeti (gty, "fb"), 1))
+	    fb = 1
+
+	# Determine whether the device is a fixed or variable blocked
+	# device. Set the fits blocking factor to the value of the fb
+	# parameter if device is fixed block or if the user has
+	# requested the default blocking factor. Set the blocking factor
+	# to the user requested value if the device supports variable
+	# blocking factors.
+
+	if (bs == 0) {
+	    if (ublkfac <= 0)
+	        blkfac = fb
+	    else
+		blkfac = ublkfac
+	} else
+	    blkfac = fb
+
+	call gtyclose (gty)
+
+	return (blkfac)
 end

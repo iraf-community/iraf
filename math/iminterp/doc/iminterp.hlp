@@ -63,6 +63,7 @@ The interpolant is chosen at run time from the following list.
     II_POLY3		# 3rd order interior polynomial in x
     II_POLY5		# fifth order interior polynomial in x
     II_SPLINE3		# cubic spline in x
+    II_SINC		# sinc interpolation in x
 
     II_BINEAREST	# nearest neighbour in x and y
     II_BILINEAR		# bilinear interpolation

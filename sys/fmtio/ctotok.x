@@ -94,9 +94,9 @@ int	ip			# pointer into input string
 char	outstr[ARB]		# buffer to receive token
 int	maxch			# max chars in output buffer
 
-int	op, ch, i, junk, nchars
 int	currclass
-char	class[TABLESIZE], numch[NUMCHSIZE]
+char	class[TABLESIZE]
+int	op, ch, i, junk, nchars
 int	ctowrd(), lexnum(), cctoc()
 include	"tokdata.inc"
 

@@ -1,4 +1,4 @@
-.help geotran Feb90 images
+.help geotran Apr92 images
 .ih
 NAME
 geotran -- geometrically transform a list of images
@@ -56,9 +56,9 @@ The output picture x and y scales in units of
 x and y reference units per output pixel,
 e.g  " / pixel or Angstroms / pixel if the reference coordinates
 are " or Angstroms. If the reference coordinates are in pixels
-then xscale and yscale are both 1.0 to preserve the scale of the reference
+then xscale and yscale should be 1.0 to preserve the scale of the reference
 image.
-If xscale and yscale are undefined, xscale and yscale default to the
+If xscale and yscale are undefined (INDEF), xscale and yscale default to the
 range of the reference coordinates over the range in pixels.
 Xscale and yscale overide the values of ncols and nlines.
 .le
@@ -219,29 +219,27 @@ and bilinear and biquintic interpolation respectively (Vax 11/750 fpa).
 EXAMPLES
 
 .nf
-1. Register images where the reference and input images are the same size.
-   The output image will have the same number of lines and columns as the
-   input image and the scale will be determined by the xmin, xmax, ymin,
-   ymax parameters used in the task GEOMAP. The file "database" containing
-   the record "m51.coo" was produced by GEOMAP.
+1. Register two images by transforming the coordinate system of the input
+   image to the coordinate system of the reference image.
+   The output image scale will be 1.0 and its size will be determined by
+   the xmin, xmax, ymin, ymax parameters set in the task GEOMAP. The file
+   "database" containing the record "m51.coo" was produced by GEOMAP.
 
    cl> geotran m51 m51.tran database m51.coo
 
-2. Register images where the reference and input images are of different
-   size. The output image will have the same number of lines and columns
-   as the input image. If the reference coordinates are in pixel units
-   xscale and yscale should be 1.
+2. Repeat the above command but set the output image scale to 2.0 reference
+   images pixels per output image pixel.
 
-   cl> geotran m51 m51.tran database m51.coo xscale=xrefscale \
-   >>> yscale=yrefscale
+   cl> geotran m51 m51.tran database m51.coo xscale=2.0 yscale=2.0
 
-3. Correct an image for geometric distortion using a scale of 2 reference
-   units per pixel and bicubic spline interpolation with no flux correction. 
+3. Correct an image for geometric distortion using an output scale of
+   2 reference units per pixel and bicubic spline interpolation with no
+   flux correction. 
 
    cl> geotran m51 m51.tran database m51.coo xscale=2. yscale=2. \
    >>> inter=spline3 flux-
 
-4. Register a list of images of the same size using the set of transforms
+4. Register a list of images using the set of transforms
    computed by GEOMAP. The input images, output images and transforms are
    listed in the files inlist, outlist and reclist respectively.
 

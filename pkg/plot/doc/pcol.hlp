@@ -1,4 +1,4 @@
-.help pcol Jun86 plot
+.help pcol Sep91 plot
 .ih
 NAME
 pcol -- plot an image column
@@ -12,6 +12,32 @@ Input image containing column to be plotted.
 .le
 .ls col      
 The column to be plotted.
+.le
+.ls wcs = "logical"
+The world coordinate system (\fIwcs\fR) to be used for axis labeling when
+input is f rom images.
+The following standard world systems are predefined.
+.ls logical
+Logical coordinates are image pixel coordinates relative to the image currently
+being displayed.
+.le
+.ls physical
+The physical coordinate system is invariant with respect to linear
+transformations of the physical image matrix.  For example, if the reference
+image was created by extracting a section of another image, the physical
+coordinates of an object in the reference image will be the pixel coordinates
+of the same object in the original image.  The physical coordinate system
+thus provides a consistent coordinate system (a given object always has the
+same coordinates) for all images, regardless of whether any user world
+coordinate systems have been defined.
+.le
+.ls world
+The "world" coordinate system is the \fIcurrent default WCS\fR.
+The default world system is the system named by the environment variable
+\fIdefwcs\fR if defined in the user environment and present in the reference
+image WCS description, else it is the first user WCS defined for the image
+(if any), else physical coordinates are returned.
+.le
 .le
 .ls wx1=0., wx2=0., wy1=0., wy2=0.
 The range of window (user) coordinates to be included in the plot.  If
@@ -36,8 +62,17 @@ The size of the marker drawn when \fBpointmode\fR = yes.
 .ls logx = no, logy = no
 Draw the x or y axis in log units, versus linear?
 .le
-.ls xlabel="", ylabel=""
-The x-axis and y-axis labels.
+.ls xlabel = "wcslabel", ylabel = ""
+Label for the X-axis or Y-axis.  if \fBxlabel\fR = "wcslabel"
+the world coordinate system label in the image, if defined, is used.
+.le
+.ls xformat = "wcsformat"
+The numerical format for the coordinate labels.  The values may be ""
+(an empty string), %f for decimal format, %h and %H for xx:xx:xx format, and
+%m and %M for xx:xx.x format.  The upper case %H and %M convert degrees
+to hours.  Some images have a recommended x coordinate format defined as
+a WCS attribute.  If the xformat value is "wcsformat" the WCS attribute
+format will be used.  Any other value will override the image attribute.
 .le
 .ls title = "imtitle"
 Title for plot.  If not changed from the default, the title string from the

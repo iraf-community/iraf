@@ -11,13 +11,12 @@ generic:
 	$ifolder (icdeviantr.x, icdeviant.gx)	$(GEN) icdeviant.gx $endif
 	$ifolder (icerrorsr.x, icerrors.gx)	$(GEN) icerrors.gx $endif
 	$ifolder (icfitr.x, icfit.gx)		$(GEN) icfit.gx $endif
-	$ifolder (icgaddfitr.x, icgaddfit.gx)	$(GEN) icgaddfit.gx $endif
+	$ifolder (icgaddr.x, icgadd.gx)		$(GEN) icgadd.gx $endif
 	$ifolder (icgcolonr.x, icgcolon.gx)	$(GEN) icgcolon.gx $endif
 	$ifolder (icgdeleter.x, icgdelete.gx)	$(GEN) icgdelete.gx $endif
 	$ifolder (icgfitr.x, icgfit.gx)		$(GEN) icgfit.gx $endif
 	$ifolder (icgaxesr.x, icgaxes.gx)	$(GEN) icgaxes.gx $endif
 	$ifolder (icggraphr.x, icggraph.gx)	$(GEN) icggraph.gx $endif
-	$ifolder (icginsertr.x, icginsert.gx)	$(GEN) icginsert.gx $endif
 	$ifolder (icgnearestr.x, icgnearest.gx)	$(GEN) icgnearest.gx $endif
 	$ifolder (icgparamsr.x, icgparams.gx)	$(GEN) icgparams.gx $endif
 	$ifolder (icgsampler.x, icgsample.gx)	$(GEN) icgsample.gx $endif
@@ -41,8 +40,8 @@ libxtools.a:
 	icerrorsr.x	icfit.h names.h <math/curfit.h>
 	icfitd.x	icfit.h names.h <math/curfit.h>
 	icfitr.x	icfit.h names.h <math/curfit.h>
-	icgaddfitd.x	icfit.h names.h <error.h> <pkg/gtools.h>
-	icgaddfitr.x	icfit.h names.h <error.h> <pkg/gtools.h>
+	icgaddd.x	icfit.h <gset.h>
+	icgaddr.x	icfit.h <gset.h>
 	icgaxesd.x	icfit.h names.h <pkg/gtools.h>
 	icgaxesr.x	icfit.h names.h <pkg/gtools.h>
 	icgcolond.x	icfit.h names.h <error.h>
@@ -53,8 +52,6 @@ libxtools.a:
 	icgfitr.x	icfit.h names.h <error.h> <pkg/gtools.h>
 	icggraphd.x	icfit.h names.h <gset.h> <pkg/gtools.h>
 	icggraphr.x	icfit.h names.h <gset.h> <pkg/gtools.h>
-	icginsertd.x
-	icginsertr.x
 	icgnearestd.x	<mach.h> <pkg/gtools.h> icfit.h
 	icgnearestr.x	<mach.h> <pkg/gtools.h> icfit.h
 	icgparamsd.x	icfit.h names.h <pkg/gtools.h>

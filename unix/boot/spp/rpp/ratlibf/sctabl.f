@@ -1,54 +1,54 @@
-      INTEGER FUNCTION SCTABL (TABLE, SYM, INFO, POSN)
-      INTEGER TABLE, POSN
-      INTEGER SYM (100)
-      INTEGER INFO (100)
-      INTEGER MEM( 1)
-      COMMON/CDSMEM/MEM
-      INTEGER BUCKET, WALKER
-      INTEGER DSGET
-      INTEGER NODSIZ, I, J
-      IF (.NOT.(POSN .EQ. 0))GOTO 23000
-      POSN = DSGET (2)
-      MEM (POSN) = 1
-      MEM (POSN + 1) = MEM (TABLE + 1)
-23000 CONTINUE
-      BUCKET = MEM (POSN)
-      WALKER = MEM (POSN + 1)
-      NODSIZ = MEM (TABLE)
-23002 CONTINUE
-      IF (.NOT.(WALKER .NE. 0))GOTO 23005
-      I = WALKER + 1 + NODSIZ
-      J = 1
-23007 IF (.NOT.(MEM (I) .NE. -2))GOTO 23008
-      SYM (J) = MEM (I)
-      I = I + 1
-      J = J + 1
-      GOTO 23007
-23008 CONTINUE
-      SYM (J) = -2
-      I = 1
-23009 IF (.NOT.(I .LE. NODSIZ))GOTO 23011
-      J = WALKER + 1 + I - 1
-      INFO (I) = MEM (J)
-23010 I = I + 1
-      GOTO 23009
-23011 CONTINUE
-      MEM (POSN) = BUCKET
-      MEM (POSN + 1) = MEM (WALKER + 0)
-      SCTABL = 1
-      RETURN
-23005 CONTINUE
-      BUCKET = BUCKET + 1
-      IF (.NOT.(BUCKET .GT. 43))GOTO 23012
-      GOTO 23004
-23012 CONTINUE
-      J = TABLE + BUCKET
-      WALKER = MEM (J)
-23006 CONTINUE
-23003 GOTO 23002
-23004 CONTINUE
-      CALL DSFREE (POSN)
-      POSN = 0
-      SCTABL = -1
-      RETURN
-      END
+      integer function sctabl (table, sym, info, posn)
+      integer table, posn
+      integer sym (100)
+      integer info (100)
+      integer mem( 1)
+      common/cdsmem/mem
+      integer bucket, walker
+      integer dsget
+      integer nodsiz, i, j
+      if (.not.(posn .eq. 0))goto 23000
+      posn = dsget (2)
+      mem (posn) = 1
+      mem (posn + 1) = mem (table + 1)
+23000 continue
+      bucket = mem (posn)
+      walker = mem (posn + 1)
+      nodsiz = mem (table)
+23002 continue
+      if (.not.(walker .ne. 0))goto 23005
+      i = walker + 1 + nodsiz
+      j = 1
+23007 if (.not.(mem (i) .ne. -2))goto 23008
+      sym (j) = mem (i)
+      i = i + 1
+      j = j + 1
+      goto 23007
+23008 continue
+      sym (j) = -2
+      i = 1
+23009 if (.not.(i .le. nodsiz))goto 23011
+      j = walker + 1 + i - 1
+      info (i) = mem (j)
+23010 i = i + 1
+      goto 23009
+23011 continue
+      mem (posn) = bucket
+      mem (posn + 1) = mem (walker + 0)
+      sctabl = 1
+      return
+23005 continue
+      bucket = bucket + 1
+      if (.not.(bucket .gt. 43))goto 23012
+      goto 23004
+23012 continue
+      j = table + bucket
+      walker = mem (j)
+23006 continue
+23003 goto 23002
+23004 continue
+      call dsfree (posn)
+      posn = 0
+      sctabl = -1
+      return
+      end

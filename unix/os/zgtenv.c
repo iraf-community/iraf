@@ -90,13 +90,13 @@ struct	env ev_table[NENV] = {
  *			    also serves as the default IMDIR.
  *	
  * The entries for these variables in the <iraf.h> must adhere to a standard
- * format, e.g.:
+ * format, e.g. (substituting @ for *):
  *
- *	/* ### Start of run time definitions
+ *	/@ ### Start of run time definitions @/
  *	#define	iraf		"/iraf/"
  *	#define	host		"/iraf/unix/"
  *	#define	tmp		"/tmp/"
- *	/* ### End of run time definitions
+ *	/@ ### End of run time definitions @/
  *
  * Although the definitions are entered as standard C #defines, they should not
  * be directly referenced in C programs.
@@ -189,6 +189,8 @@ error:
 }
 
 
+#define	to_lower(c)        ((c)+'a'-'A')
+
 /* EV_STREQ -- Compare two strings for equality, ignoring case.  The logical
  * names are given in upper case in <iraf.h> since they are presented as
  * macro defines.
@@ -202,10 +204,10 @@ int	n;
 	while (--n >= 0) {
 	    ch1 = *s1++;
 	    if (isupper (ch1))
-		ch1 = tolower (ch1);
+		ch1 = to_lower(ch1);
 	    ch2 = *s2++;
 	    if (isupper (ch2))
-		ch2 = tolower (ch2);
+		ch2 = to_lower(ch2);
 	    if (ch1 != ch2)
 		return (0);
 	}

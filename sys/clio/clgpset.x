@@ -3,6 +3,7 @@
 include	"clpset.h"
 
 # CLGPSET -- Get the string value of the named pset parameter.
+# [OBSOLETE ROUTINE - see clgpseta.x]
 
 procedure clgpset (pp, pname, outstr, maxch)
 

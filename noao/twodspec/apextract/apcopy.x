@@ -1,6 +1,7 @@
 include	"apertures.h"
 
 # AP_COPY -- Make a copy of an aperture.
+# The title is not copied.
 
 procedure ap_copy (apin, apout)
 

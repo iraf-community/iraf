@@ -30,7 +30,8 @@ The interior polynomial interpolants are saved as the data points. The
 polynomial coefficients are calculated directly from the data points in
 the evaluation
 stage. The B-spline coefficients are calculated in ASIFIT as they depend
-on the entire data array.
+on the entire data array.  The sinc interpolation type simple stores
+the data points.
 .ih
 NOTES
 Checking for INDEF valued and out of bounds pixels is the responsibility

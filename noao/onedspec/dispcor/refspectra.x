@@ -16,9 +16,8 @@ pointer	refs			# List of reference images
 int	select			# Selection method for reference spectra
 int	type			# Type of reference specification
 
-int	clgwrd(), odr_getim()
-bool	clgetb()
-pointer	sp, ref, im, immap()
+int	clgwrd(), imtgetim()
+pointer	sp, ref, im, imtopenp(), immap()
 errchk	immap
 
 begin
@@ -26,15 +25,15 @@ begin
 	call salloc (ref, SZ_LINE, TY_CHAR)
 
 	# Get input and reference spectra lists.  Determine selection method.
-	if (clgetb ("recformat"))
-	    call odr_open1 ("input", "records", input)
-	else
-	    call odr_open1 ("input", "", input)
-	call odr_open1 ("references", "", refs)
+	input = imtopenp ("input")
+	call clgstr ("records", Memc[ref], SZ_LINE)
+	call odr_openp (input, Memc[ref])
+	refs = imtopenp ("references")
 	select = clgwrd ("select", Memc[ref], SZ_FNAME, SELECT)
 
 	# Determine if reference list is a table.
-	if (odr_getim (refs, Memc[ref], SZ_FNAME) != EOF) {
+	if (imtgetim (refs, Memc[ref], SZ_FNAME) != EOF) {
+	    call refnoextn (Memc[ref])
 	    iferr {
 		im = immap (Memc[ref], READ_ONLY, 0)
 	        call imunmap (im)
@@ -43,7 +42,7 @@ begin
 		type = TABLE
 	} else
 	    call error (0, "No reference spectra specified")
-	call odr_rew (refs)
+	call imtrew (refs)
 
 	# Initialize confirm flag, symbol table and logging streams.
 	call refconfirm1 ()
@@ -69,8 +68,8 @@ begin
 	    call reftable (input, Memc[ref], select)
 
 	call refclose ()
-	call odr_close (input)
-	call odr_close (refs)
+	call imtclose (input)
+	call imtclose (refs)
 	call sfree (sp)
 end
 
@@ -131,7 +130,7 @@ begin
 
 	# Log output.
 	while (clgfil (logfiles, Memc[str], SZ_LINE) != EOF) {
-	    if (streq (Memc[str], STDOUT) && confirm)
+	    if (streq (Memc[str], "STDOUT") && confirm)
 		next
 	    fd = open (Memc[str], APPEND, TEXT_FILE)
 	    if (wt1 < 0.995) {

@@ -199,6 +199,17 @@ forms_
 		H_RAWOUT(ctrl) = YES
 	}
 
+	# Get the current package.  Normally this is specified as the null
+	# string or "AskCL", which causes a runtime query of the CL for the
+	# current package when a help template is expanded.  The reason for
+	# providing this parameter is to allow this query to be disabled
+	# (by setting the value to the name of an actual package such as
+	# system or clpackage) so that, e.g., the help task can be called
+	# as a host level task.
+
+	iferr (call clgstr ("curpack", H_CURPACK(ctrl), SZ_CURPACK))
+	    call strcpy ("AskCL", H_CURPACK(ctrl), SZ_CURPACK)
+
 	# Get output device (normally "terminal"), open TTY descriptor for
 	# the device.  The TTY descriptor is left open between calls to HELP
 	# provided the process does not shutdown and the device name or page

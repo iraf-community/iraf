@@ -1,21 +1,21 @@
-      SUBROUTINE RMTABL (ST)
-      INTEGER ST
-      INTEGER MEM( 1)
-      COMMON/CDSMEM/MEM
-      INTEGER I
-      INTEGER WALKER, BUCKET, NODE
-      BUCKET = ST
-      DO 23000 I = 1, 43
-      BUCKET = BUCKET + 1
-      WALKER = MEM (BUCKET)
-23002 IF (.NOT.(WALKER .NE. 0))GOTO 23003
-      NODE = WALKER
-      WALKER = MEM (NODE + 0)
-      CALL DSFREE (NODE)
-      GOTO 23002
-23003 CONTINUE
-23000 CONTINUE
-23001 CONTINUE
-      CALL DSFREE (ST)
-      RETURN
-      END
+      subroutine rmtabl (st)
+      integer st
+      integer mem( 1)
+      common/cdsmem/mem
+      integer i
+      integer walker, bucket, node
+      bucket = st
+      do 23000 i = 1, 43
+      bucket = bucket + 1
+      walker = mem (bucket)
+23002 if (.not.(walker .ne. 0))goto 23003
+      node = walker
+      walker = mem (node + 0)
+      call dsfree (node)
+      goto 23002
+23003 continue
+23000 continue
+23001 continue
+      call dsfree (st)
+      return
+      end

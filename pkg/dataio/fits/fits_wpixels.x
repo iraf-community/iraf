@@ -13,7 +13,7 @@ procedure wft_init_write_pixels (npix_record, spp_type, bitpix, blkfac)
 int	npix_record		# number of data pixels per record
 int	spp_type		# pixel data type
 int	bitpix			# output bits per pixel
-int	blkfac			# blocking factor
+int	blkfac			# fits blocking factor (0 for disk)
 
 # entry wft_write_pixels, wft_write_last_record
 
@@ -24,7 +24,7 @@ int	nrecords		# number of FITS records written
 
 char	blank, zero
 int	ty_mii, ty_spp, npix_rec, nch_rec, len_mii, sz_rec, nchars, n, nrec
-int	blocking, szblk
+int	bf, szblk
 pointer	spp, mii, ip, op
 
 int	sizeof(), miilen(), fstati()
@@ -38,7 +38,7 @@ begin
 	ty_spp = spp_type
 	npix_rec = npix_record
 	nch_rec = npix_rec * sizeof (ty_spp)
-	blocking = blkfac
+	bf = blkfac
 	blank = ' '
 	zero = 0
 
@@ -138,11 +138,12 @@ entry	wft_write_last_record (fd, nrecords)
 
 
 	    nrec = nrec + 1
-	    #op = op + n
 
 	    # Pad out the record if the blocking is non-standard.
-	    if ((blocking > MAX_BLKFAC) && (ty_spp != TY_CHAR)) {
-		szblk = fstati (fd, F_SZBBLK) / SZB_CHAR
+	    szblk = fstati (fd, F_BUFSIZE) * SZB_CHAR
+	    if ((bf > 0) && mod (szblk, FITS_RECORD) != 0 &&
+	        (ty_spp != TY_CHAR)) {
+		szblk = szblk / SZB_CHAR
 		n = note (fd) - 1
 		if (mod (n, szblk) == 0)
 		    n = 0
@@ -151,14 +152,8 @@ entry	wft_write_last_record (fd, nrecords)
 		for (op = 1; op <= n; op = op + nch_rec) {
 		    szblk = min (nch_rec, n - op + 1)
 		    call amovkc (zero, Memc[spp], szblk)
-		    call write (fd, Memc[spp], szblk)
-		}
-		#repeat {
-		    #szblk = min  (nch_rec, n)
-		    #call amovkc (zero, Memc[spp], szblk)
 		    #call write (fd, Memc[spp], szblk)
-		    #n = n - szblk
-		#} until (n <= 0)
+		}
 	    }
 
 	}

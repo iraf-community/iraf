@@ -1,7 +1,7 @@
 include <gset.h>
 include <pkg/gtools.h>
 
-# AP_GTINIT -- Initialize gtools for the apphot package.
+# AP_GTINIT -- Initialize the gtools package for the apphot routines.
 
 pointer procedure ap_gtinit (image, wx, wy)
 
@@ -29,7 +29,7 @@ begin
 end
 
 
-# AP_GTFREE -- Free apphot gtools parameters.
+# AP_GTFREE -- Free the gtools package.
 
 procedure ap_gtfree (gt)
 
@@ -40,25 +40,25 @@ begin
 end
 
 
-# AP_PLOTRAD -- Routine to plot the radial profile of the sky pixels.
+# AP_PLOTRAD -- Plot the radial profile of a list of pixels.
 
-procedure ap_plotrad (gd, gt, x, r, nskypix, polymark) 
+procedure ap_plotrad (gd, gt, r, i, npts, polymark) 
 
 pointer	gd		# pointer to graphics stream
-pointer	gt		# GTOOLS pointer
-real	x[ARB]		# x array
-real	r[ARB]		# histogram
-int	nskypix		# number of bins
+pointer	gt		# the GTOOLS pointer
+real	r[ARB]		# the radii array
+real	i[ARB]		# the intensity array
+int	npts		# number of points
 char	polymark[ARB]	# polyline type
 
 begin
 	call gt_sets (gt, GTTYPE, "mark")
 	call gt_sets (gt, GTMARK, polymark)
-	call gt_plot (gd, gt, x, r, nskypix)
+	call gt_plot (gd, gt, r, i, npts)
 end
 
 
-# AP_RSET -- Procedure to set up parameters for radial profile plot.
+# AP_RSET -- Set up the parameters for the radial profile plot.
 
 procedure ap_rset (gd, gt, xmin, xmax, ymin, ymax, xscale)
 

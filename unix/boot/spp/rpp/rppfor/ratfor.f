@@ -1,119 +1,119 @@
-      SUBROUTINE RATFOR
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER I, N
-      INTEGER GETARG, RFOPEN
-      INTEGER ARG (30)
-      INTEGER DEFNS(1)
-      DATA DEFNS(1)/-2/
-      CALL INITKW
-      IF (.NOT.(DEFNS (1) .NE. -2))GOTO 23000
-      INFILE (1) = RFOPEN(DEFNS, 1)
-      IF (.NOT.(INFILE (1) .EQ. -3))GOTO 23002
-      CALL REMARK (37Hcan't open standard definitions file.)
-      GOTO 23003
-23002 CONTINUE
-      CALL FINIT
-      CALL PARSE
-      CALL RFCLOS(INFILE (1))
-23003 CONTINUE
-23000 CONTINUE
-      N = 1
-      I = 1
-23004 IF (.NOT.(GETARG (I, ARG, 30) .NE. -1))GOTO 23006
-      N = N + 1
-      CALL QUERY (32Husage:  ratfor [files] >outfile.)
-      IF (.NOT.(ARG (1) .EQ. 45 .AND. ARG (2) .EQ. -2))GOTO 23007
-      INFILE (1) = 0
-      CALL FINIT
-      GOTO 23008
-23007 CONTINUE
-      INFILE (1) = RFOPEN(ARG, 1)
-      IF (.NOT.(INFILE (1) .EQ. -3))GOTO 23009
-      CALL CANT (ARG)
-      GOTO 23010
-23009 CONTINUE
-      CALL FINIT
-      CALL SCOPY (ARG, 1, FNAMES, 1)
-      FNAMP=1
-23011 IF (.NOT.(FNAMES(FNAMP) .NE. -2))GOTO 23013
-      IF (.NOT.(FNAMES(FNAMP) .EQ. 46 .AND. FNAMES(FNAMP+1) .EQ. 114))GO
-     *TO 23014
-      FNAMES(FNAMP+1) = 120
-23014 CONTINUE
-23012 FNAMP=FNAMP+1
-      GOTO 23011
-23013 CONTINUE
-23010 CONTINUE
-23008 CONTINUE
-      CALL PARSE
-      IF (.NOT.(INFILE (1) .NE. 0))GOTO 23016
-      CALL RFCLOS(INFILE (1))
-23016 CONTINUE
-23005 I = I + 1
-      GOTO 23004
-23006 CONTINUE
-      IF (.NOT.(N .EQ. 1))GOTO 23018
-      INFILE (1) = 0
-      CALL FINIT
-      CALL PARSE
-23018 CONTINUE
-      CALL LNDICT
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      subroutine ratfor
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer i, n
+      integer getarg, rfopen
+      integer arg (30)
+      integer defns(1)
+      data defns(1)/-2/
+      call initkw
+      if (.not.(defns (1) .ne. -2))goto 23000
+      infile (1) = rfopen(defns, 1)
+      if (.not.(infile (1) .eq. -3))goto 23002
+      call remark (37Hcan't open standard definitions file.)
+      goto 23003
+23002 continue
+      call finit
+      call parse
+      call rfclos(infile (1))
+23003 continue
+23000 continue
+      n = 1
+      i = 1
+23004 if (.not.(getarg (i, arg, 30) .ne. -1))goto 23006
+      n = n + 1
+      call query (32Husage:  ratfor [files] >outfile.)
+      if (.not.(arg (1) .eq. 45 .and. arg (2) .eq. -2))goto 23007
+      infile (1) = 0
+      call finit
+      goto 23008
+23007 continue
+      infile (1) = rfopen(arg, 1)
+      if (.not.(infile (1) .eq. -3))goto 23009
+      call cant (arg)
+      goto 23010
+23009 continue
+      call finit
+      call scopy (arg, 1, fnames, 1)
+      fnamp=1
+23011 if (.not.(fnames(fnamp) .ne. -2))goto 23013
+      if (.not.(fnames(fnamp) .eq. 46 .and. fnames(fnamp+1) .eq. 114))go
+     *to 23014
+      fnames(fnamp+1) = 120
+23014 continue
+23012 fnamp=fnamp+1
+      goto 23011
+23013 continue
+23010 continue
+23008 continue
+      call parse
+      if (.not.(infile (1) .ne. 0))goto 23016
+      call rfclos(infile (1))
+23016 continue
+23005 i = i + 1
+      goto 23004
+23006 continue
+      if (.not.(n .eq. 1))goto 23018
+      infile (1) = 0
+      call finit
+      call parse
+23018 continue
+      call lndict
+      end
+c     logic0  logical_column

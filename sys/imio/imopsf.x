@@ -87,7 +87,7 @@ begin
 		depth = PL_MAXDEPTH
 		if (and (IM_PLFLAGS(im), PL_BOOL) != 0)
 		    depth = 1
-		call pl_ssize (IM_PL(im), IM_NDIM(im), IM_LEN(im,1), depth, 0)
+		call pl_ssize (IM_PL(im), IM_NDIM(im), IM_LEN(im,1), depth)
 	    }
 
 	    call strcpy (Memc[imname], IM_NAME(im), SZ_IMNAME)

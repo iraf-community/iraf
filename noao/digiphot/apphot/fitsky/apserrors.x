@@ -5,7 +5,7 @@ include "../lib/fitsky.h"
 
 procedure ap_serrors (ap, ier)
 
-pointer	ap		# pointer to apphot structure
+pointer	ap		# pointer to apphot structure (not used)
 int	ier		# integer error code
 
 begin
@@ -27,11 +27,13 @@ begin
 	case AP_NOGRAPHICS:
 	    call printf ("Interactive graphics are not available.\n")
 	case AP_NOSKYFILE:
-	    call printf ("The text file containing sky values does not exist.\n")
+	    call printf (
+	        "The text file containing sky values does not exist.\n")
 	case AP_EOFSKYFILE:
 	    call printf ("The sky file is at EOF.\n")
 	case AP_BADSKYSCAN:
-	    call printf ("An error occurred in decoding the current line in the sky file.\n")
+	    call printf (
+	    "An error occurred in decoding the current line in the sky file.\n")
 	case AP_BADPARAMS:
 	    call printf ("Out of range mode or -ve sigma in Gaussian fit.\n")
 	default:

@@ -7,11 +7,11 @@ x1,r,h,INDEF,,,Output starting x coordinate
 x2,r,h,INDEF,,,Output ending x coordinate
 dx,r,h,INDEF,,,Output X pixel interval
 nx,r,h,INDEF,,,Number of output x pixels
-xlog,b,h,no,,,Logrithmic x coordinate?
+xlog,b,h,no,,,Logarithmic x coordinate?
 y1,r,h,INDEF,,,Output starting y coordinate
 y2,r,h,INDEF,,,Output ending y coordinate
 dy,r,h,INDEF,,,Output Y pixel interval
 ny,r,h,INDEF,,,Number of output y pixels
-ylog,b,h,no,,,Logrithmic y coordinate?
+ylog,b,h,no,,,Logarithmic y coordinate?
 flux,b,h,yes,,,Conserve flux per pixel?
 logfiles,s,h,"STDOUT,logfile",,,List of log files

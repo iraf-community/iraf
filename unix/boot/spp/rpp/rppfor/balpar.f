@@ -1,41 +1,41 @@
-      SUBROUTINE BALPAR
-      INTEGER T, TOKEN (100)
-      INTEGER GETTOK, GNBTOK
-      INTEGER NLPAR
-      IF (.NOT.(GNBTOK (TOKEN, 100) .NE. 40))GOTO 23000
-      CALL SYNERR (19Hmissing left paren.)
-      RETURN
-23000 CONTINUE
-      CALL OUTSTR (TOKEN)
-      NLPAR = 1
-23002 CONTINUE
-      T = GETTOK (TOKEN, 100)
-      IF (.NOT.(T .EQ. 59 .OR. T .EQ. 123 .OR. T .EQ. 125 .OR. T .EQ. -1
-     *))GOTO 23005
-      CALL PBSTR (TOKEN)
-      GOTO 23004
-23005 CONTINUE
-      IF (.NOT.(T .EQ. 10))GOTO 23007
-      TOKEN (1) = -2
-      GOTO 23008
-23007 CONTINUE
-      IF (.NOT.(T .EQ. 40))GOTO 23009
-      NLPAR = NLPAR + 1
-      GOTO 23010
-23009 CONTINUE
-      IF (.NOT.(T .EQ. 41))GOTO 23011
-      NLPAR = NLPAR - 1
-23011 CONTINUE
-23010 CONTINUE
-23008 CONTINUE
-      IF (.NOT.(T .EQ. -9))GOTO 23013
-      CALL SQUASH (TOKEN)
-23013 CONTINUE
-      CALL OUTSTR (TOKEN)
-23003 IF (.NOT.(NLPAR .LE. 0))GOTO 23002
-23004 CONTINUE
-      IF (.NOT.(NLPAR .NE. 0))GOTO 23015
-      CALL SYNERR (33Hmissing parenthesis in condition.)
-23015 CONTINUE
-      RETURN
-      END
+      subroutine balpar
+      integer t, token (100)
+      integer gettok, gnbtok
+      integer nlpar
+      if (.not.(gnbtok (token, 100) .ne. 40))goto 23000
+      call synerr (19Hmissing left paren.)
+      return
+23000 continue
+      call outstr (token)
+      nlpar = 1
+23002 continue
+      t = gettok (token, 100)
+      if (.not.(t .eq. 59 .or. t .eq. 123 .or. t .eq. 125 .or. t .eq. -1
+     *))goto 23005
+      call pbstr (token)
+      goto 23004
+23005 continue
+      if (.not.(t .eq. 10))goto 23007
+      token (1) = -2
+      goto 23008
+23007 continue
+      if (.not.(t .eq. 40))goto 23009
+      nlpar = nlpar + 1
+      goto 23010
+23009 continue
+      if (.not.(t .eq. 41))goto 23011
+      nlpar = nlpar - 1
+23011 continue
+23010 continue
+23008 continue
+      if (.not.(t .eq. -9))goto 23013
+      call squash (token)
+23013 continue
+      call outstr (token)
+23003 if (.not.(nlpar .le. 0))goto 23002
+23004 continue
+      if (.not.(nlpar .ne. 0))goto 23015
+      call synerr (33Hmissing parenthesis in condition.)
+23015 continue
+      return
+      end

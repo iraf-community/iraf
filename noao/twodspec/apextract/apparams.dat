@@ -1,0 +1,68 @@
+"OUTPUT PARAMETERS"
+format		s	%s	26
+extras		b	%b	26
+dbwrite		s	%s	26
+
+"DEFAULT APERTURE PARAMETERS"
+lower		r	%g	26
+upper		r	%g	26
+apidtable	s	%s	26
+
+"DEFAULT BACKGROUND PARAMETERS"
+b_function	s	%s	26
+b_order		i	%d	26
+b_sample	s	%s	26
+b_naverage	i	%d	26
+b_niterate	i	%d	26
+b_low_reject	r	%g	26
+b_high_reject	r	%g	26
+b_grow		r	%g	26
+
+"APERTURE CENTERING PARAMETERS: FINDING, RECENTERING, MARKING"
+width		r	%g	26
+radius		r	%g	26
+threshold	r	%g	26
+
+"AUTOMATIC APERTURE FINDING AND ORDERING PARAMETERS"
+minsep		r	%g	26
+maxsep		r	%g	26
+order		s	%s	26
+
+"RECENTERING PARAMETERS"
+apertures	s	%s	26
+npeaks		r	%g	26
+shift		b	%b	26
+
+"RESIZING PARAMETERS"
+llimit		r	%g	26
+ulimit		r	%g	26
+ylevel		r	%g	26
+peak		b	%b	26
+bkg		b	%b	26
+r_grow		r	%g	26
+avglimits	b	%b	26
+
+"TRACING PARAMETERS"
+t_nsum		i	%d	26
+t_step		i	%d	26
+t_width		r	%g	26
+t_function	s	%s	26
+t_order		i	%d	26
+t_sample	s	%s	26
+t_naverage	i	%d	26
+t_niterate	i	%d	26
+t_low_reject	r	%g	26
+t_high_reject	r	%g	26
+t_grow		r	%g	26
+
+"EXTRACTION PARAMETERS"
+weights		s	%s	26
+background	s	%s	26
+clean		b	%b	26
+saturation	r	%g	26
+readnoise	r	%g	26
+gain		r	%g	26
+lsigma		r	%g	26
+usigma		r	%g	26
+skybox		i	%d	26
+nsubaps		i	%d	26

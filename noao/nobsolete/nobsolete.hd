@@ -1,0 +1,7 @@
+# Help directory for the NOBSOLETE package.
+
+$doc		= "noao$nobsolete/doc/"
+
+
+revisions	sys=Revisions
+

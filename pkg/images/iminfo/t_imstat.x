@@ -249,8 +249,8 @@ real	upper		# upper data boundary
 int	minmax		# compute the minimum and maximum
 
 int	i, npix
-real	lo, hi, xx, xx2, xmin, xmax
-double	sumx, sumx2, sumx3, sumx4
+real	lo, hi, xmin, xmax
+double	xx, xx2, sumx, sumx2, sumx3, sumx4
 
 begin
 	lo = IS_LO(is)
@@ -343,8 +343,8 @@ real	upper		# upper data boundary
 int	minmax		# compute the minimum and maximum
 
 int	i, npix
-real	lo, hi, xx, xx2, xmin, xmax
-double 	sumx, sumx2, sumx3
+real	lo, hi, xmin, xmax
+double 	xx, xx2, sumx, sumx2, sumx3
 
 begin
 	lo = IS_LO(is)
@@ -431,8 +431,8 @@ real	upper		# upper data boundary
 int	minmax		# compute the minimum and maximum
 
 int	i, npix
-real	lo, hi, xx, xmin, xmax
-double	sumx, sumx2
+real	lo, hi, xmin, xmax
+double	xx, sumx, sumx2
 
 begin
 	lo = IS_LO(is)
@@ -636,7 +636,7 @@ pointer	ist			# statistics structure
 int	bskew			# skew switch
 int	bkurtosis		# kurtosis switch
 
-real	var
+double	mean, var, stdev
 bool	fp_equalr()
 
 begin
@@ -647,32 +647,33 @@ begin
 
 	if (IS_NPIX(ist) <= 0)
 	    return
-	IS_MEAN(ist) = IS_SUMX(ist) / IS_NPIX(ist)
+	mean = IS_SUMX(ist) / IS_NPIX(ist)
+	IS_MEAN(ist) = mean
 
 	if (IS_NPIX(ist) < 2)
 	    return
-	var = (IS_SUMX2(ist) - IS_SUMX(ist) * IS_MEAN(ist)) /
+	var = (IS_SUMX2(ist) - IS_SUMX(ist) * mean) /
 	    (IS_NPIX(ist) - 1)
 	if (var <= 0.0) {
 	    IS_STDDEV(ist) = 0.0
 	    return
-	} else
-	    IS_STDDEV(ist) = sqrt (var)
+	} else {
+	    stdev = sqrt (var)
+	    IS_STDDEV(ist) = stdev
+	}
 
 	if (bskew == YES)
 	    IS_SKEW(ist) = (IS_SUMX3(ist) - 3.0d0 * IS_MEAN(ist) *
-	        IS_SUMX2(ist) + 3.0d0 * IS_MEAN(ist) * IS_MEAN(ist) *
-		IS_SUMX(ist) - IS_NPIX(ist) * IS_MEAN(ist) ** 3) /
-		IS_NPIX(ist) / IS_STDDEV(ist) / IS_STDDEV(ist) / IS_STDDEV(ist)
+	        IS_SUMX2(ist) + 3.0d0 * mean * mean *
+		IS_SUMX(ist) - IS_NPIX(ist) * mean ** 3) /
+		IS_NPIX(ist) / stdev / stdev / stdev
 	    
-
 	if (bkurtosis == YES)
-	    IS_KURTOSIS(ist) = (IS_SUMX4(ist) - 4.0d0 * IS_MEAN(ist) *
-	        IS_SUMX3(ist) + 6.0d0 * IS_MEAN(ist) * IS_MEAN(ist) *
-	        IS_SUMX2(ist) - 4.0 * IS_MEAN(ist) ** 3 * IS_SUMX(ist) +
-	        IS_NPIX(ist) * IS_MEAN(ist) ** 4) / IS_NPIX(ist) /
-	        IS_STDDEV(ist) / IS_STDDEV(ist) / IS_STDDEV(ist) /
-	        IS_STDDEV(ist) - 4.0d0
+	    IS_KURTOSIS(ist) = (IS_SUMX4(ist) - 4.0d0 * mean *
+	        IS_SUMX3(ist) + 6.0d0 * mean * mean *
+	        IS_SUMX2(ist) - 4.0 * mean ** 3 * IS_SUMX(ist) +
+	        IS_NPIX(ist) * mean ** 4) / IS_NPIX(ist) /
+	        stdev / stdev / stdev / stdev - 3.0d0
 end
 
 
@@ -778,7 +779,24 @@ real	hpeak, dh1, dh2, denom
 bool	fp_equalr()
 
 begin
-	# Find the three points surrounding the histogram max.
+	# If there is a single bin return the midpoint of that bin.
+	if (nbins == 1) {
+	    IS_MODE(ist) = hmin + 0.5 * hwidth
+	    return
+	}
+
+	# If there are two bins return the midpoint of the greater bin.
+	if (nbins == 2) {
+	    if (hgm[1] > hgm[2])
+	        IS_MODE(ist) = hmin + 0.5 * hwidth
+	    else if (hgm[2] > hgm[1])
+	        IS_MODE(ist) = hmin + 1.5 * hwidth
+	    else
+	        IS_MODE(ist) = hmin + hwidth
+	    return
+	}
+
+	# Find the bin containing the histogram maximum.
 	hpeak = hgm[1]
 	bpeak = 1
 	do i = 2, nbins {
@@ -787,7 +805,21 @@ begin
 		bpeak = i
 	    }
 	}
-	bpeak = max (1, bpeak-1)
+
+	# If the maximum is in the first bin return the midpoint of the bin.
+	if (bpeak == 1) {
+	    IS_MODE(ist) = hmin + 0.5 * hwidth
+	    return
+	}
+
+	# If the maximum is in the last bin return the midpoint of the bin.
+	if (bpeak == nbins) {
+	    IS_MODE(ist) = hmin + (nbins - 0.5) * hwidth
+	    return
+	}
+
+	# Compute the lower limit of bpeak.
+	bpeak = bpeak - 1
 
 	# Do a parabolic interpolation to find the peak.
 	dh1 = hgm[bpeak+1] - hgm[bpeak]
@@ -796,9 +828,15 @@ begin
 	if (fp_equalr (denom, 0.0)) {
 	    IS_MODE(ist) = hmin + (bpeak + 0.5) * hwidth
 	} else {
-	    IS_MODE(ist) = bpeak + 1 + 0.5 * (dh2 - dh1) / denom
-	    IS_MODE(ist) = hmin + .5 * hwidth + (IS_MODE(ist) - 1.0) * hwidth
+	    IS_MODE(ist) = bpeak + 1 + 0.5 * (dh1 - dh2) / denom
+	    IS_MODE(ist) = hmin + (IS_MODE(ist) - 0.5) * hwidth
 	}
+
+
+	dh1 = hgm[bpeak] * (hmin + (bpeak - 0.5) * hwidth) +
+	    hgm[bpeak+1] * (hmin + (bpeak + 0.5) * hwidth) +
+	    hgm[bpeak+2] * (hmin + (bpeak + 1.5) * hwidth)
+	dh2 = hgm[bpeak] + hgm[bpeak+1] + hgm[bpeak+2]
 end
 
 

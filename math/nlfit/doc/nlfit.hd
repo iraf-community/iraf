@@ -1,0 +1,12 @@
+# Help directory for the NLFIT (non-linear least-squares fitting) package.
+
+$nlfit	= "math$nlfit/"
+
+nlerrors	hlp = nlerrors.hlp,	src = nlfit$nlerrorsr.x
+nleval		hlp = nleval.hlp,	src = nlfit$nlevalr.x
+nlinit		hlp = nlinit.hlp,	src = nlfit$nlinitr.x
+nlfit		hlp = nlfit.hlp,	src = nlfit$nlfitr.x
+nlfree		hlp = nlfree.hlp,	src = nlfit$nlfreer.x
+nlpget		hlp = nlpget.hlp,	src = nlfit$nlpgetr.x
+nlstat		hlp = nlstat.hlp,	src = nlfit$nlstatr.x
+nlvector	hlp = nlvector.hlp,	src = nlfit$nlvectorr.x

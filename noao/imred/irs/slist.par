@@ -1,5 +1,0 @@
-# SLIST parameter file
-
-input,s,a,,,,Input image root file name
-records,s,a,,,,Range of spectral records
-long_header,b,h,no,,,List header in long format

@@ -12,22 +12,23 @@ pointer	id			# ID pointer
 int	i, j, npeaks, ndiff, find_peaks()
 real	d, dmin
 double	pix, id_center(), id_fitpt()
-pointer	x, diff
+pointer	x, y, diff
 errchk	malloc, find_peaks
 
 begin
 	# Find the peaks in the image data and center.
-	call malloc (x, ID_NPTS(id), TY_DOUBLE)
-	npeaks = find_peaks (IMDATA(id,1), Memd[x], ID_NPTS(id), 0.,
+	call malloc (x, ID_NPTS(id), TY_REAL)
+	npeaks = find_peaks (IMDATA(id,1), Memr[x], ID_NPTS(id), 0.,
 	    int (ID_MINSEP(id)), 0, ID_MAXFEATURES(id), 0., false)
 
 	# Center the peaks and convert to user coordinates.
+	call malloc (y, npeaks, TY_DOUBLE)
 	j = 0
 	do i = 1, npeaks {
-	    pix = Memd[x+i-1]
-	    pix = id_center (id, pix, ID_FWIDTH(id), ID_FTYPE(id))
+	    pix = id_center (id, double(Memr[x+i-1]), ID_FWIDTH(id),
+		ID_FTYPE(id))
 	    if (!IS_INDEFD (pix)) {
-	        Memd[x+j] = id_fitpt (id, pix)
+	        Memd[y+j] = id_fitpt (id, pix)
 		j = j + 1
 	    }
 	}
@@ -39,11 +40,12 @@ begin
 	ndiff = 0
 	do i = 1, ID_NFEATURES(id) {
 	    do j = 1, npeaks {
-		Memr[diff+ndiff] = Memd[x+j-1] - FIT(id,i)
+		Memr[diff+ndiff] = Memd[y+j-1] - FIT(id,i)
 		ndiff = ndiff + 1
 	    }
 	}
-	call mfree (x, TY_DOUBLE)
+	call mfree (x, TY_REAL)
+	call mfree (y, TY_DOUBLE)
 
 	# Sort the differences and find the mode.
 	call asrtr (Memr[diff], Memr[diff], ndiff)

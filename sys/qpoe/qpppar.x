@@ -122,7 +122,7 @@ common	/qppval/ pval, sym, elem, pp, put_value
 
 begin
 	if (put_value) {
-	    sz_elem = qp_sizeof (qp, S_DTYPE(sym), S_DSYM(sym))
+	    sz_elem = qp_sizeof (qp, S_DTYPE(sym), S_DSYM(sym), INSTANCEOF)
 	    fd = fm_getfd (QP_FM(qp), S_LFILE(sym), READ_WRITE, 0)
 
 	    call seek (fd, S_OFFSET(sym) + (elem - 1) * sz_elem)

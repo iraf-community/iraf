@@ -1,4 +1,4 @@
-.help sinterp May87 noao.onedspec
+.help sinterp Mar92 noao.onedspec
 .ih
 NAME
 sinterp -- Interpolate a tables of x,y pairs to produce a spectrum
@@ -131,6 +131,11 @@ standard star using the calibration file data as the source.
 	cl> sinterp textfile make+ x1=3550 dx=1.242 npts=1024 \
 	>>> interp_mode=linear image=feige34
 .fi
+.ih
+REVISIONS
+.ls SINTERP V2.10
+This task is unchanged.
+.le
 .ih
 SEE ALSO
 lcalib

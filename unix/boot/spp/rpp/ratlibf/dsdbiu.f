@@ -1,47 +1,47 @@
-      SUBROUTINE DSDBIU (B, FORM)
-      INTEGER B
-      INTEGER FORM
-      INTEGER MEM( 1)
-      COMMON/CDSMEM/MEM
-      INTEGER L, S, LMAX
-      INTEGER BLANKS(6)
-      DATA BLANKS(1)/9/,BLANKS(2)/32/,BLANKS(3)/32/,BLANKS(4)/32/,BLANKS
-     *(5)/32/,BLANKS(6)/-2/
-      CALL PUTINT (B, 5, 2)
-      CALL PUTCH (32, 2)
-      CALL PUTINT (MEM (B + 0), 0, 2)
-      CALL REMARK (14H words in use.)
-      L = 0
-      S = B + MEM (B + 0)
-      IF (.NOT.(FORM .EQ. 48))GOTO 23000
-      LMAX = 5
-      GOTO 23001
-23000 CONTINUE
-      LMAX = 50
-23001 CONTINUE
-      B = B + 2
-23002 IF (.NOT.(B .LT. S))GOTO 23004
-      IF (.NOT.(L .EQ. 0))GOTO 23005
-      CALL PUTLIN (BLANKS, 2)
-23005 CONTINUE
-      IF (.NOT.(FORM .EQ. 48))GOTO 23007
-      CALL PUTINT (MEM (B), 10, 2)
-      GOTO 23008
-23007 CONTINUE
-      IF (.NOT.(FORM .EQ. 97))GOTO 23009
-      CALL PUTCH (MEM (B), 2)
-23009 CONTINUE
-23008 CONTINUE
-      L = L + 1
-      IF (.NOT.(L .GE. LMAX))GOTO 23011
-      L = 0
-      CALL PUTCH (10, 2)
-23011 CONTINUE
-23003 B = B + 1
-      GOTO 23002
-23004 CONTINUE
-      IF (.NOT.(L .NE. 0))GOTO 23013
-      CALL PUTCH (10, 2)
-23013 CONTINUE
-      RETURN
-      END
+      subroutine dsdbiu (b, form)
+      integer b
+      integer form
+      integer mem( 1)
+      common/cdsmem/mem
+      integer l, s, lmax
+      integer blanks(6)
+      data blanks(1)/9/,blanks(2)/32/,blanks(3)/32/,blanks(4)/32/,blanks
+     *(5)/32/,blanks(6)/-2/
+      call putint (b, 5, 2)
+      call putch (32, 2)
+      call putint (mem (b + 0), 0, 2)
+      call remark (14H words in use.)
+      l = 0
+      s = b + mem (b + 0)
+      if (.not.(form .eq. 48))goto 23000
+      lmax = 5
+      goto 23001
+23000 continue
+      lmax = 50
+23001 continue
+      b = b + 2
+23002 if (.not.(b .lt. s))goto 23004
+      if (.not.(l .eq. 0))goto 23005
+      call putlin (blanks, 2)
+23005 continue
+      if (.not.(form .eq. 48))goto 23007
+      call putint (mem (b), 10, 2)
+      goto 23008
+23007 continue
+      if (.not.(form .eq. 97))goto 23009
+      call putch (mem (b), 2)
+23009 continue
+23008 continue
+      l = l + 1
+      if (.not.(l .ge. lmax))goto 23011
+      l = 0
+      call putch (10, 2)
+23011 continue
+23003 b = b + 1
+      goto 23002
+23004 continue
+      if (.not.(l .ne. 0))goto 23013
+      call putch (10, 2)
+23013 continue
+      return
+      end

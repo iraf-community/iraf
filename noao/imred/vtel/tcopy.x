@@ -22,11 +22,11 @@ char	outputfile[SZ_FNAME]
 
 char	tapename[SZ_FNAME]
 int	filerange[2 * MAX_RANGES + 1]
-int	nfiles, filenumber, numrecords, strsize, whichfile
+int	nfiles, filenumber, numrecords, whichfile
 bool	verbose 
 
-int	strncmp(), strlen(), decode_ranges(), strldxs()
-int	get_next_number(), tapecopy()
+int	decode_ranges(), mtfile()
+int	get_next_number(), tapecopy(), mtneedfileno()
 bool	clgetb()
 errchk	tapecopy
 
@@ -35,8 +35,7 @@ begin
 
         # Get input file(s).
         call clgstr ("inputfile", inputfile, SZ_FNAME)
-        if (strncmp (inputfile, "mt", 2) != 0 || inputfile[strlen(inputfile)]
-		   == ']') {
+	if (mtfile (inputfile) == NO || mtneedfileno (inputfile) == NO) {
 	    call strcpy ("1", files, SZ_LINE)
         } else {
 	    call clgstr ("files", files, SZ_LINE)
@@ -49,25 +48,18 @@ begin
 	call clgstr ("outputfile", outputfile, SZ_FNAME)
 
 	# See if the output is mag tape, if not, error.
-	if (strncmp (outputfile, "mt", 2) != 0)
+	if (mtfile (outputfile) == NO)
 	    call error (1, "Outputfile should be magnetic tape.")
-
-	# Get the size of the output file name.
-	strsize = strlen (outputfile)
 
 	# If no tape file number is given, then ask whether the tape
 	# is blank or contains data.  If blank then start at [1], else
 	# start at [EOT].
 
-	if (strldxs ("]", outputfile) != strsize) {
-	    if (!clgetb ("new_tape")) {
-		call sprintf(outputfile [strsize+1], SZ_FNAME, "%s")
-		    call pargstr("[EOT]")
-	    } else {
-		call sprintf(outputfile[strsize+1], SZ_FNAME, "%s")
-		    call pargstr("[1]")
-	    }
-	}
+	if (mtneedfileno(outputfile) == YES)
+	    if (!clgetb ("new_tape"))
+		call mtfname (outputfile, EOT, outputfile, SZ_FNAME)
+	    else
+		call mtfname (outputfile, 1, outputfile, SZ_FNAME)
 
 	# Get verbose flag.
 	verbose = clgetb ("verbose")
@@ -78,18 +70,14 @@ begin
         while (get_next_number (filerange, filenumber) != EOF) {
 
 	    # Assemble the appropriate tape file name.
-	    call strcpy (inputfile, tapename, SZ_FNAME)
-	    if (strncmp (tapename, "mt", 2) == 0 &&
- 		    tapename[strlen(tapename)] != ']') {
-	        call sprintf (tapename[strlen(tapename) + 1], SZ_FNAME,
-		            "[%d]")
-		    call pargi (filenumber)
-	    }
+	    if (mtneedfileno (inputfile) == NO)
+		call strcpy (inputfile, tapename, SZ_FNAME)
+	    else
+		call mtfname (inputfile, filenumber, tapename, SZ_FNAME)
 
 	    if (whichfile > 1) {
 	        # Assemble the appropriate output file name.
-	        call sprintf(outputfile[strsize+1], SZ_FNAME, "%s")
-		    call pargstr("[EOT]")
+		call mtfname (outputfile, EOT, outputfile, SZ_FNAME)
 	    }
 
 	    if (verbose) {

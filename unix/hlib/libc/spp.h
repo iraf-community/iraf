@@ -8,7 +8,7 @@
  * Use osb$zzeps.f to compute the machine epsilon.
  */
 #define	OSOK		0		/* normal successful completion	*/
-#define	LEN_JUMPBUF	64		/* C "jmp_buf" len + 1 (or larger) */
+#define	LEN_JUMPBUF	84		/* C "jmp_buf" len + 1 (or larger) */
 #define	EPSILON		(1.192e-7)	/* smallest real E s.t. (1.0+E > 1.0) */
 #define EPSILOND	(2.220d-16)	/* double precision epsilon */
 #define	MAX_LONG	2147483647

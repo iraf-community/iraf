@@ -22,10 +22,12 @@ define	RL_MAXLEN	(Memi[$1+3]*3)	# maximum range list length (arg=pl)
 
 define	RL_LEN		$1[1,1]		# physical length of range list
 define	RL_AXLEN	$1[2,1]		# length of mask image line
-define	RLI_LEN		Memi[$1]	# RL_LEN for rl = ptr to int
-define	RLI_AXLEN	Memi[$1+1]	# RL_AXLEN  "     "     "
 define	RLS_LEN		Mems[$1]	# RL_LEN for rl = ptr to int
 define	RLS_AXLEN	Mems[$1+1]	# RL_AXLEN  "     "     "
+define	RLI_LEN		Memi[$1]	# RL_LEN for rl = ptr to int
+define	RLI_AXLEN	Memi[$1+1]	# RL_AXLEN  "     "     "
+define	RLL_LEN		Meml[$1]	# RL_LEN for rl = ptr to int
+define	RLL_AXLEN	Meml[$1+1]	# RL_AXLEN  "     "     "
 
 define	RL_X		$1[1,$2]	# fields of a range list entry ($2=rn)
 define	RL_N		$1[2,$2]	# direct array references

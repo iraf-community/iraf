@@ -7,11 +7,12 @@ include	"refspectra.h"
 # REFGINPUT -- Get input spectrum.  Apply various checks.
 # REFGREF   -- Get reference spectrum.  Apply various checks.
 
-define	REF_LEN		4		# Length of reference structure
-define	REF_AP		Memi[$1]	# Aperture number
-define	REF_SORTVAL	Memr[$1+1]	# Sort value
-define	REF_SPEC1	Memi[$1+2]	# Offset for reference spectrum 1
-define	REF_SPEC2	Memi[$1+3]	# Offset for reference spectrum 2
+define	REF_LEN		6		# Length of reference structure
+define	REF_SORTVAL	Memd[P2D($1)]	# Sort value
+define	REF_AP		Memi[$1+2]	# Aperture number
+define	REF_GVAL	Memi[$1+3]	# Sort value
+define	REF_SPEC1	Memi[$1+4]	# Offset for reference spectrum 1
+define	REF_SPEC2	Memi[$1+5]	# Offset for reference spectrum 2
 
 
 # REFOPEN  -- Set verbose and log file descriptors and open symbol table.
@@ -21,38 +22,59 @@ define	REF_SPEC2	Memi[$1+3]	# Offset for reference spectrum 2
 procedure refopen ()
 
 bool	clgetb()
+real	clgetr()
 pointer	stopen()
-int	fd, btoi(), clpopnu(), clgfil(), open()
-pointer	sp, logfile
+int	fd, btoi(), clpopnu(), clgfil(), open(), decode_ranges(), nowhite()
 errchk	open()
 
 include	"refspectra.com"
 
 begin
-	# Set log files and verbose output.
-	call smark (sp)
-	call salloc (logfile, SZ_FNAME, TY_CHAR)
+	call malloc (aps, 3*NRANGES, TY_INT)
+	call malloc (raps, 3*NRANGES, TY_INT)
+	call malloc (sort, SZ_FNAME, TY_CHAR)
+	call malloc (group, SZ_FNAME, TY_CHAR)
 
-	verbose = btoi (clgetb ("verbose"))
+	# Check log files
 	logfiles = clpopnu ("logfiles")
-	while (clgfil (logfiles, Memc[logfile], SZ_FNAME) != EOF) {
-	    fd = open (Memc[logfile], APPEND, TEXT_FILE)
+	while (clgfil (logfiles, Memc[sort], SZ_FNAME) != EOF) {
+	    fd = open (Memc[sort], APPEND, TEXT_FILE)
 	    call close (fd)
 	}
 	call clprew (logfiles)
+
+	# Get other parameters
+	call clgstr ("apertures", Memc[sort], SZ_FNAME)
+	if (decode_ranges (Memc[sort], Memi[aps], NRANGES, fd) == ERR)
+	    call error (0, "Bad aperture list")
+	call clgstr ("refaps", Memc[sort], SZ_FNAME)
+	if (decode_ranges (Memc[sort], Memi[raps], NRANGES, fd) == ERR)
+	    call error (0, "Bad reference aperture list")
+	call clgstr ("sort", Memc[sort], SZ_FNAME)
+	call clgstr ("group", Memc[group], SZ_FNAME)
+	time = btoi (clgetb ("time"))
+	timewrap = clgetr ("timewrap")
+	verbose = btoi (clgetb ("verbose"))
+
+	fd = nowhite (Memc[sort], Memc[sort], SZ_FNAME)
+	fd = nowhite (Memc[group], Memc[group], SZ_FNAME)
 
 	# Open symbol table.
 	stp = stopen ("refspectra", 10, 20, 10*SZ_FNAME)
 end
 
 
-# REFCLOSE  -- Close file descriptors and symbol table.
+# REFCLOSE  -- Finish up
 
 procedure refclose ()
 
 include	"refspectra.com"
 
 begin
+	call mfree (aps, TY_INT)
+	call mfree (raps, TY_INT)
+	call mfree (sort, TY_CHAR)
+	call mfree (group, TY_CHAR)
 	call clpcls (logfiles)
 	call stclose (stp)
 end
@@ -64,22 +86,21 @@ end
 # the information is stored in a symbol table keyed on the spectrum name.
 # The spectrum need be mapped only once!  Any error from IMMAP is returned.
 
-procedure refgspec (spec, sort, time, timewrap, ap, sortval, ref1, ref2)
+procedure refgspec (spec, ap, sortval, gval, ref1, ref2)
 
 char	spec[ARB]	# Spectrum image name
-char	sort[ARB]	# Sort value key
-bool	time		# Time parameter?
-real	timewrap	# Time wrap
 int	ap		# Spectrum aperture number
-real	sortval		# Spectrum sort value
-char	ref1[SZ_FNAME]	# Reference spectrum 1
-char	ref2[SZ_FNAME]	# Reference spectrum 2
+double	sortval		# Spectrum sort value
+pointer	gval		# Group string
+pointer	ref1		# Reference spectrum 1
+pointer	ref2		# Reference spectrum 2
 
 pointer	sym, stfind(), stenter(), stpstr(), strefsbuf()
-pointer	im, immap()
+pointer	im, str, immap()
+bool	streq()
 int	imgeti(), strlen()
-real	imgetr()
-errchk	immap, imgetr
+double	imgetd()
+errchk	immap, imgetd, imgstr
 
 include	"refspectra.com"
 
@@ -93,28 +114,48 @@ begin
 	    im = immap (spec, READ_ONLY, 0)
 	    iferr (ap = imgeti (im, "BEAM-NUM"))
 		ap = 1
+
+	    # Failure to find a specified keyword is a fatal error.
 	    iferr {
-		sortval = imgetr (im, sort)
-		if (time)
-		    sortval = mod (sortval + 24. - timewrap, 24.)
+		if (Memc[sort] == EOS || streq (Memc[sort], "none"))
+		    sortval = INDEFD
+		else {
+		    sortval = imgetd (im, Memc[sort])
+		    if (time == YES)
+			sortval = mod (sortval + 24. - timewrap, 24.0D0)
+		}
+
+		call malloc (str, SZ_FNAME, TY_CHAR)
+		if (Memc[group] == EOS || streq (Memc[group], "none"))
+		    Memc[str] = EOS
+		else
+		    call imgstr (im, Memc[group], Memc[str], SZ_FNAME)
+		gval = stpstr (stp, Memc[str], strlen (Memc[str])+1)
 	    } then
-		sortval = INDEFR
-	    iferr (call imgstr (im, "refspec1", ref1, SZ_FNAME))
-		ref1[1] = EOS
-	    iferr (call imgstr (im, "refspec2", ref2, SZ_FNAME))
-		ref2[1] = EOS
+		call erract (EA_FATAL)
+
+	    iferr (call imgstr (im, "refspec1", Memc[str], SZ_FNAME))
+		Memc[str] = EOS
+	    ref1 = stpstr (stp, Memc[str], strlen (Memc[str])+1)
+	    iferr (call imgstr (im, "refspec2", Memc[str], SZ_FNAME))
+		Memc[str] = EOS
+	    ref2 = stpstr (stp, Memc[str], strlen (Memc[str])+1)
+	    call mfree (str, TY_CHAR)
+
 	    call imunmap (im)
+
 	    sym = stenter (stp, spec, REF_LEN)
 	    REF_AP(sym) = ap
 	    REF_SORTVAL(sym) = sortval
-	    REF_SPEC1(sym) = stpstr (stp, ref1, strlen (ref1)+1)
-	    REF_SPEC2(sym) = stpstr (stp, ref2, strlen (ref2)+1)
-	} else {
-	    ap = REF_AP(sym)
-	    sortval = REF_SORTVAL(sym)
-	    call strcpy (Memc[strefsbuf (stp, REF_SPEC1(sym))], ref1, SZ_FNAME)
-	    call strcpy (Memc[strefsbuf (stp, REF_SPEC2(sym))], ref2, SZ_FNAME)
+	    REF_GVAL(sym) = gval
+	    REF_SPEC1(sym) = ref1
+	    REF_SPEC2(sym) = ref2
 	}
+	ap = REF_AP(sym)
+	sortval = REF_SORTVAL(sym)
+	gval = strefsbuf (stp, REF_GVAL(sym))
+	ref1 = strefsbuf (stp, REF_SPEC1(sym))
+	ref2 = strefsbuf (stp, REF_SPEC2(sym))
 end
 
 
@@ -126,30 +167,24 @@ end
 #	3. Check if the aperture is correct.
 # Return true if the spectrum is acceptable and false if not.
 
-bool procedure refginput (spec, aps, sort, time, timewrap, ap, val)
+bool procedure refginput (spec, ap, val, gval)
 
 char	spec[ARB]	# Spectrum image name
-int	aps		# Aperture list
-char	sort[ARB]	# Sort value key
-bool	time		# Time parameter?
-real	timewrap	# Time wrap
 int	ap		# Spectrum aperture number (returned)
-real	val		# Spectrum sort value (returned)
+double	val		# Spectrum sort value (returned)
+pointer	gval		# Spectrum group value (returned)
 
 bool	clgetb(), is_in_range()
-pointer	sp, ref1, ref2
+pointer	ref1, ref2
 errchk	refgspec
+
+include	"refspectra.com"
 
 define	err_	99
 
 begin
-	call smark (sp)
-	call salloc (ref1, SZ_FNAME, TY_CHAR)
-	call salloc (ref2, SZ_FNAME, TY_CHAR)
-
 	# Get the spectrum from the symbol table.
-	iferr (call refgspec (spec, sort, time, timewrap, ap, val,
-	    Memc[ref1], Memc[ref2])) {
+	iferr (call refgspec (spec, ap, val, gval, ref1, ref2)) {
 	    call refmsgs (NO_SPEC, spec, ap, "", "")
 	    goto err_
 	}
@@ -172,11 +207,9 @@ begin
 	    }
 	}
 
-	call sfree (sp)
 	return (true)
 
 err_
-	call sfree (sp)
 	return (false)
 end
 
@@ -190,30 +223,24 @@ end
 #	3. Check if the aperture is correct.
 # Return true if the spectrum is acceptable and false if not.
 
-bool procedure refgref (spec, aps, sort, time, timewrap, ap, val)
+bool procedure refgref (spec, ap, val, gval)
 
 char	spec[ARB]	# Spectrum image name
-pointer	aps		# Aperture list
-char	sort[ARB]	# Sort value key
-bool	time		# Time parameter?
-real	timewrap	# Time wrap
 int	ap		# Spectrum aperture number (returned)
-real	val		# Spectrum sort value (returned)
+double	val		# Spectrum sort value (returned)
+pointer	gval		# Spectrum group value (returned)
 
 bool	strne(), is_in_range()
-pointer	sp, ref1, ref2
+pointer	ref1, ref2
 errchk	refgspec
+
+include	"refspectra.com"
 
 define	err_	99
 
 begin
-	call smark (sp)
-	call salloc (ref1, SZ_FNAME, TY_CHAR)
-	call salloc (ref2, SZ_FNAME, TY_CHAR)
-
 	# Get spectrum from symbol table.
-	iferr (call refgspec (spec, sort, time, timewrap, ap, val,
-	    Memc[ref1], Memc[ref2])) {
+	iferr (call refgspec (spec, ap, val, gval, ref1, ref2)) {
 	    call refmsgs (NO_REF, spec, ap, "", "")
 	    goto err_
 	}
@@ -225,17 +252,15 @@ begin
 	}
 	
 	# Check aperture numbers.
-	if (aps != NULL) {
-	    if (!is_in_range (Memi[aps], ap)) {
+	if (raps != NULL) {
+	    if (!is_in_range (Memi[raps], ap)) {
 	        call refmsgs (BAD_REFAP, spec, ap, "", "")
 	        goto err_
 	    }
 	}
 
-	call sfree (sp)
 	return (true)
 
 err_
-	call sfree (sp)
 	return (false)
 end

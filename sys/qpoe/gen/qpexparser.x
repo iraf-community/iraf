@@ -116,7 +116,7 @@ errchk	syserr, malloc, realloc
 define	pop_ 91
 
 double	dtemp
-bool	fp_equalr()
+bool	bval, fp_equalr()
 int	qp_ctod()
 
 begin
@@ -280,11 +280,16 @@ pop_
 	do j = 1, nrg {
 	    xmin = XV(j);  umin = UV(j)
 	    jval = j
-	    do i = j+1, nrg
-		if (XV(i) < xmin || (fp_equalr(XV(i),xmin) && UV(i) < umin)) {
+	    do i = j+1, nrg {
+		bval = (XV(i) < xmin)
+		if (!bval)
+		    if (abs (XV(i) - xmin) < 1.0E-5)
+			bval = (fp_equalr(XV(i),xmin) && UV(i) < umin)
+		if (bval) {
 		    xmin = XV(i);  umin = UV(i)
 		    jval = i
 		}
+	    }
 	    if (jval != j) {
 		temp  = XV(j);  XV(j) = XV(jval);  XV(jval) = temp
 		itemp = UV(j);  UV(j) = UV(jval);  UV(jval) = itemp
@@ -309,9 +314,16 @@ pop_
 
 	for (r1=1;  r1 <= nrg;	r1=r2+1) {
 	    # Get a range of breakpoint entries for a single XV position.
-	    for (r2=r1;  r2 <= nrg;  r2=r2+1)
-		    if (!fp_equalr(XV(r2),XV(r1)) || UV(r2) != UV(r1))
+	    for (r2=r1;  r2 <= nrg;  r2=r2+1) {
+		    bval = (UV(r2) != UV(r1))
+		    if (!bval) {
+			bval = (abs (XV(r2) - XV(r1)) > 1.0E-5)
+			if (!bval)
+			    bval = !fp_equalr(XV(r2),XV(r1))
+		    }
+		    if (bval)
 			break
+	    }
 	    r2 = r2 - 1
 
 	    # Collapse into a single breakpoint.

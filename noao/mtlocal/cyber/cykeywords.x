@@ -89,7 +89,7 @@ begin
 	# condition is a test for IDSOUT data, where the df coeffecients
 	# have been applied but not stored in the header.)
 
-	if (DF_FLAG(ids) != -1 && Memd[COEFF(ids)] != 0.) {
+	if (DF_FLAG(ids) != -1 && COEFF(ids) != 0) {
 	    call strcpy ("DF", keyword, LEN_KEYWORD)
    	    do i = 1, DF_FLAG(ids) {
 		call sprintf (keyword[3], LEN_KEYWORD, "%s")

@@ -1,101 +1,101 @@
-      SUBROUTINE SQUASH (ID)
-      INTEGER ID(100)
-      INTEGER JUNK, I, J
-      INTEGER LOOKUP, LUDEF
-      INTEGER NEWID(100), RECDID(100)
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      IF (.NOT.(BODY .EQ. 1 .AND. ERRTBL .NE. 0 .AND. ERNAME .EQ. 0))GOT
-     *O 23000
-      IF (.NOT.(LOOKUP (ID, JUNK, ERRTBL) .EQ. 1))GOTO 23002
-      ERNAME = 1
-23002 CONTINUE
-23000 CONTINUE
-      J = 1
-      I=1
-23004 IF (.NOT.(ID(I) .NE. -2))GOTO 23006
-      IF (.NOT.(((65.LE.ID(I).AND.ID(I).LE.90).OR.(97.LE.ID(I).AND.ID(I)
-     *.LE.122)) .OR. (48.LE.ID(I).AND.ID(I).LE.57)))GOTO 23007
-      NEWID(J) = ID(I)
-      J = J + 1
-23007 CONTINUE
-23005 I=I+1
-      GOTO 23004
-23006 CONTINUE
-      NEWID(J) = -2
-      IF (.NOT.(I-1 .LT. 6 .AND. I .EQ. J))GOTO 23009
-      RETURN
-23009 CONTINUE
-      IF (.NOT.(LOOKUP (ID, JUNK, FKWTBL) .EQ. 1))GOTO 23011
-      RETURN
-23011 CONTINUE
-      IF (.NOT.(LUDEF (ID, RECDID, NAMTBL) .EQ. 1))GOTO 23013
-      CALL SCOPY (RECDID, 1, ID, 1)
-      RETURN
-23013 CONTINUE
-      CALL MAPID (NEWID)
-      IF (.NOT.(LOOKUP (NEWID, JUNK, GENTBL) .EQ. 1))GOTO 23015
-      CALL SYNERR (39HWarning: identifier mapping not unique.)
-      CALL UNIQID (NEWID)
-23015 CONTINUE
-      CALL ENTDEF (NEWID, ID, GENTBL)
-      CALL ENTDEF (ID, NEWID, NAMTBL)
-      CALL SCOPY (NEWID, 1, ID, 1)
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      subroutine squash (id)
+      integer id(100)
+      integer junk, i, j
+      integer lookup, ludef
+      integer newid(100), recdid(100)
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      if (.not.(body .eq. 1 .and. errtbl .ne. 0 .and. ername .eq. 0))got
+     *o 23000
+      if (.not.(lookup (id, junk, errtbl) .eq. 1))goto 23002
+      ername = 1
+23002 continue
+23000 continue
+      j = 1
+      i=1
+23004 if (.not.(id(i) .ne. -2))goto 23006
+      if (.not.(((65.le.id(i).and.id(i).le.90).or.(97.le.id(i).and.id(i)
+     *.le.122)) .or. (48.le.id(i).and.id(i).le.57)))goto 23007
+      newid(j) = id(i)
+      j = j + 1
+23007 continue
+23005 i=i+1
+      goto 23004
+23006 continue
+      newid(j) = -2
+      if (.not.(i-1 .lt. 6 .and. i .eq. j))goto 23009
+      return
+23009 continue
+      if (.not.(lookup (id, junk, fkwtbl) .eq. 1))goto 23011
+      return
+23011 continue
+      if (.not.(ludef (id, recdid, namtbl) .eq. 1))goto 23013
+      call scopy (recdid, 1, id, 1)
+      return
+23013 continue
+      call mapid (newid)
+      if (.not.(lookup (newid, junk, gentbl) .eq. 1))goto 23015
+      call synerr (39HWarning: identifier mapping not unique.)
+      call uniqid (newid)
+23015 continue
+      call entdef (newid, id, gentbl)
+      call entdef (id, newid, namtbl)
+      call scopy (newid, 1, id, 1)
+      end
+c     logic0  logical_column

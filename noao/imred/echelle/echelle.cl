@@ -1,55 +1,79 @@
-#{ ECHELLE -- KPNO Echelle Spectral Reduction Package
+#{ ECHELLE -- Echelle Spectral Reduction Package
 
 # Load necessary packages
+proto		# bscale
 
-bias
-generic
-lists
-utilities
-
-# Define necessary paths
-
-set	onedstds	= "noao$lib/onedstds/"
-set	apextract	= "twodspec$apextract/"
+# Increase header space for echelle format keywords
+s1 = envget ("min_lenuserarea")
+if (s1 == "")
+    reset min_lenuserarea = 40000
+else if (int (s1) < 40000)
+    reset min_lenuserarea = 40000
 
 package echelle
 
-	
-task	calibrate,
-	eccontinuum,
-	ecdispcor,
+# Ecslitproc and dofoe
+cl < doecslit$slittasks.cl
+cl < dofoe$dofoetasks.cl
+
+# Demos
+set	demos		= "echelle$demos/"
+task	demos		= "demos$demos.cl"
+
+# Onedspec tasks
+task	continuum,
+	deredden,
+	dispcor,
+	dopcor,
 	ecidentify,
 	ecreidentify,
-	ecselect,
 	refspectra,
-	setdisp,
-	shedit,
+	sarith,
+	scombine,
 	slist,
-	sensfunc,
 	specplot,
-	splot,
-	standard	= echelle$x_onedspec.e
+	splot		= "onedspec$x_onedspec.e"
+task	bplot		= "onedspec$bplot.cl"
+task	scopy		= "onedspec$scopy.cl"
+task	dispcor1	= "onedspec$dispcor1.par"
 
-task	apfind,
+# Different default parameters
+task	calibrate,
+	sensfunc,
+	standard	= "echelle$x_onedspec.e"
+
+# Apextract tasks
+task	apall,
+	apedit,
+	apfind,
+	apfit,
+	apflatten,
+	apmask,
 	apnormalize,
+	aprecenter,
+	apresize,
 	apscatter,
-	apstrip,
 	apsum,
-	aptrace		= apextract$x_apextract.e
+	aptrace		= "apextract$x_apextract.e"
+task	apparams	= "apextract$apparams.par"
+task	apall1		= "apextract$apall1.par"
+task	apfit1		= "apextract$apfit1.par"
+task	apflat1		= "apextract$apflat1.par"
+task	apnorm1		= "apextract$apnorm1.par"
+task	apdefault	= "apextract$apdefault.par"
+task	apscat1		= "apextract$apscat1.par"
+task	apscat2		= "apextract$apscat2.par"
 
-task	apedit		= echelle$x_apextract.e
+# Astutil tasks
+task	setairmass,
+	setjd		= "astutil$x_astutil.e"
 
-# Scripts
+# Hide tasks from the user
+hidetask apparams, apall1, apfit1, apflat1, apnorm1
+hidetask apscat1, apscat2, dispcor1
 
-task	ecbplot		= echelle$ecbplot.cl
+# Set echelle extraction output
+apall.format = "echelle"
+apsum.format = "echelle"
 
-task	apio		= echelle$apio.par
-task	apscat1		= echelle$apscat1.par
-task	apscat2		= echelle$apscat2.par
-task	dispcor1	= onedspec$dispcor1.par
-task	shparams	= onedspec$shparams.cl
-task	apdefault	= apextract$apdefault.cl
-
-hidetask apstrip,apscat1,apscat2,shparams,dispcor1
-
-clbye()
+clbye

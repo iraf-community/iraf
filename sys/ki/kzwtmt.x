@@ -1,28 +1,26 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<config.h>
+include	<fio.h>
 include	"ki.h"
 
 # KZWTMT -- Wait for i/o to complete on a magtape channel.
 
-procedure kzwtmt (chan, nrecords, nfiles, status)
+procedure kzwtmt (chan, devpos, status)
 
-int	chan			# active magtape channel
-int	nrecords		# nrecords skipped in last transfer
-int	nfiles			# nfiles skipped in last transfer
-int	status			# receives nbytes transferred or ERR
+int	chan			#I active magtape channel
+int	devpos[ARB]		#O device position structure
+int	status			#O receives nbytes transferred or ERR
 
+pointer	bd
 include	"kichan.com"
 
 begin
 	if (k_node[chan] == NULL)
-	    call zzwtmt (k_oschan[chan], nrecords, nfiles, status)
+	    call zzwtmt (k_oschan[chan], devpos, status)
 	else {
-	    # The file positioning information is returned in the not otherwise
-	    # used k_bufp pointer for a magtape device.
-
-	    status   = k_status[chan]
-	    nrecords = mod (k_bufp[chan], 10)
-	    nfiles   = k_bufp[chan] / 10
+	    bd = k_bufp[chan]
+	    status = k_status[chan]
+	    call amovi (Memi[bd], devpos, LEN_MTDEVPOS)
 	}
 end

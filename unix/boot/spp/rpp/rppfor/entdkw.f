@@ -1,14 +1,14 @@
-      SUBROUTINE ENTDKW
-      INTEGER DEFT(2), PRAG(2)
-      INTEGER DEFNAM(7)
-      INTEGER PRGNAM(7)
-      DATA DEFNAM(1)/100/,DEFNAM(2)/101/,DEFNAM(3)/102/,DEFNAM(4)/105/,D
-     *EFNAM(5)/110/,DEFNAM(6)/101/,DEFNAM(7)/-2/
-      DATA PRGNAM(1)/112/,PRGNAM(2)/114/,PRGNAM(3)/97/,PRGNAM(4)/103/,PR
-     *GNAM(5)/109/,PRGNAM(6)/97/,PRGNAM(7)/-2/
-      DATA DEFT (1), DEFT (2) /-4, -2/
-      DATA PRAG (1), PRAG (2) /-17, -2/
-      CALL ULSTAL (DEFNAM, DEFT)
-      CALL ULSTAL (PRGNAM, PRAG)
-      RETURN
-      END
+      subroutine entdkw
+      integer deft(2), prag(2)
+      integer defnam(7)
+      integer prgnam(7)
+      data defnam(1)/100/,defnam(2)/101/,defnam(3)/102/,defnam(4)/105/,d
+     *efnam(5)/110/,defnam(6)/101/,defnam(7)/-2/
+      data prgnam(1)/112/,prgnam(2)/114/,prgnam(3)/97/,prgnam(4)/103/,pr
+     *gnam(5)/109/,prgnam(6)/97/,prgnam(7)/-2/
+      data deft (1), deft (2) /-4, -2/
+      data prag (1), prag (2) /-17, -2/
+      call ulstal (defnam, deft)
+      call ulstal (prgnam, prag)
+      return
+      end

@@ -8,7 +8,8 @@ int	i, strdic()
 include	"ecffit.com"
 
 begin
-	i = strdic (param, ecfstr, SZ_LINE, "|slope|offset|xorder|yorder|")
+	i = strdic (param, ecfstr, SZ_LINE,
+	    "|slope|offset|xorder|yorder|niterate|")
 	switch (i) {
 	case 1:
 	    return (slope)
@@ -18,6 +19,8 @@ begin
 	    return (xorder)
 	case 4:
 	    return (yorder)
+	case 5:
+	    return (niterate)
 	default:
 	    call error (0, "ecf_geti: Unknown parameter")
 	}
@@ -56,7 +59,8 @@ int	i, strdic()
 include	"ecffit.com"
 
 begin
-	i = strdic (param, ecfstr, SZ_LINE, "|xmin|xmax|ymin|ymax|shift|rms|")
+	i = strdic (param, ecfstr, SZ_LINE,
+	    "|xmin|xmax|ymin|ymax|shift|rms|low|high|")
 	switch (i) {
 	case 1:
 	    return (xmin)
@@ -70,6 +74,10 @@ begin
 	    return (shift)
 	case 6:
 	    return (rms)
+	case 7:
+	    return (low)
+	case 8:
+	    return (high)
 	default:
 	    call error (0, "ecf_gets: Unknown parameter")
 	}

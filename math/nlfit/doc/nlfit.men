@@ -1,0 +1,8 @@
+      nlerrors - Compute the fits statistics and errors in the parameters
+	 nlfit - Fit the function
+	nlfree - Free memory allocated by nlinit
+	nlinit - Initialize the fitting routines
+	nlpget - Get the values of the fitted parameters
+        nlstat - Get the value of an NLFIT parameter
+	nleval - Evaluate the curve at a given point
+      nlvector - Evaluate the curve at an array of points 

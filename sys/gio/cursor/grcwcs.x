@@ -60,6 +60,7 @@ real	ct[LEN_CT]			# transformation descriptor
 real	worigin, scale
 real	m1, m2, w1, w2
 int	transformation, ax
+bool	fp_equalr()
 real	elogr()
 
 begin
@@ -82,13 +83,22 @@ begin
 
 	    if (transformation == LINEAR) {
 		worigin = w1
-		scale = (m2 - m1) / (w2 - w1)
+		if (fp_equalr (w1, w2))
+		    scale = 1.0
+		else
+		    scale = (m2 - m1) / (w2 - w1)
 	    } else if (transformation == LOG && w1 > 0 && w2 > 0) {
 		worigin = log10 (w1)
-		scale = (m2 - m1) / (log10(w2) - worigin)
+		if (fp_equalr (log10(w2), worigin))
+		    scale = 1.0
+		else
+		    scale = (m2 - m1) / (log10(w2) - worigin)
 	    } else {
 		worigin = elogr (w1)
-		scale = (m2 - m1) / (elogr(w2) - worigin)
+		if (fp_equalr (elogr(w2), worigin))
+		    scale = 1.0
+		else
+		    scale = (m2 - m1) / (elogr(w2) - worigin)
 	    }
 
 	    ct[ax,CT_TRAN]    = transformation

@@ -46,13 +46,8 @@ begin
 	# remove basis functions calculated by any previous cvrefit call
 	if (CV_BASIS(cv) != NULL) {
 
-	    $if (datatype == r)
-	    call mfree (CV_BASIS(cv), TY_REAL)
-	    call mfree (CV_WY(cv), TY_REAL)
-	    $else
-	    call mfree (CV_BASIS(cv), TY_DOUBLE)
-	    call mfree (CV_WY(cv), TY_DOUBLE)
-	    $endif
+	    call mfree (CV_BASIS(cv), TY_PIXEL)
+	    call mfree (CV_WY(cv), TY_PIXEL)
 
 	    CV_BASIS(cv) = NULL
 	    CV_WY(cv) = NULL
@@ -66,11 +61,7 @@ begin
 	# calculate weights
 	switch (wtflag) {
 	case WTS_UNIFORM:
-	    $if (datatype == r)
-	    call amovkr (1.0, w, npts)
-	    $else
-	    call amovkd (1.0d0, w, npts)
-	    $endif
+	    call amovk$t (PIXEL(1.0), w, npts)
 	case WTS_SPACING:
 	    if (npts == 1)
 		w[1] = 1.
@@ -86,27 +77,15 @@ begin
 	    # user supplied weights
 	case WTS_CHISQ:
 	    # data assumed to be scaled to photons with Poisson statistics
-	    $if (datatype == r)
-	    call arcpr (1.0, y, w, npts)
-	    $else
-	    call arcpd (1.0d0, y, w, npts)
-	    $endif
+	    call arcp$t (PIXEL(1.0), y, w, npts)
 	default:
-	    $if (datatype == r)
-	    call amovkr (1.0, w, npts)
-	    $else
-	    call amovkd (1.0d0, w, npts)
-	    $endif
+	    call amovk$t (PIXEL(1.0), w, npts)
 	}
 
 
 	# allocate space for the basis functions
 	call smark (sp)
-	$if (datatype == r)
-	call salloc (CV_BASIS(cv), npts * CV_ORDER(cv), TY_REAL)
-	$else
-	call salloc (CV_BASIS(cv), npts * CV_ORDER(cv), TY_DOUBLE)
-	$endif
+	call salloc (CV_BASIS(cv), npts * CV_ORDER(cv), TY_PIXEL)
 
 	# calculate the non-zero basis functions
 	switch (CV_TYPE(cv)) {
@@ -132,11 +111,7 @@ begin
 
 
 	# allocate temporary storage space for matrix accumulation
-	$if (datatype == r)
-	call salloc (bw, npts, TY_REAL)
-	$else
-	call salloc (bw, npts, TY_DOUBLE)
-	$endif
+	call salloc (bw, npts, TY_PIXEL)
 	call salloc (rows, npts, TY_INT)
 
 	# one index the pointers

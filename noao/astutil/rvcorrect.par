@@ -6,9 +6,7 @@ imupdate,b,h,no,,,"Update image header with corrections?
 "
 
 epoch,r,h,INDEF,,,Epoch of observation coordinates (years)
-longitude,r,h,)observatory.longitude,,,Longitude of observation
-latitude,r,h,)observatory.latitude,,,Latitude of observation
-altitude,r,h,)observatory.altitude,,,Altitude of observation
+observatory,s,h,)_.observatory,,,Observatory
 vsun,r,h,20.,,,Solar velocity (km/s)
 ra_vsun,r,h,18.,0.,24.,Right ascension of solar velocity (hours)
 dec_vsun,r,h,30.,-90.,90.,Declination of solar velocity (degrees)

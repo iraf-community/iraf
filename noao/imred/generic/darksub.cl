@@ -81,13 +81,15 @@ begin
 
 	    # Scale the dark image if necessary.
 	    if (expi != exp) {
-		imarith (dark, "*", expi / exp, dark)
+		imarith (dark, "*", expi / exp, dark, title="", divzero=0.,
+    		    hparams="", pixtype="", calctype="", verbose=no, noact=no)
 		exp = expi
 	    }
 
 	    # Subtract the dark image from the input image.
-	    imarith (in, "-", dark, out, pixtype=pixtype, calctype=pixtype,
-		hparams="")
+	    imarith (in, "-", dark, out, title="", divzero=0.,
+		hparams="", pixtype=pixtype, calctype=pixtype,
+		verbose=no, noact=no)
 	}
 
 	# Finish up.

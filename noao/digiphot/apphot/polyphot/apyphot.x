@@ -7,13 +7,13 @@ include "../lib/polyphot.h"
 
 define	HELPFILE	"apphot$polyphot/polyphot.key"
 
-# AP_YPHOT -- Procedure to compute flux inside polygonal apertures.
+# AP_YPHOT -- Compute the flux inside polygonal apertures.
 
 int procedure ap_yphot (py, im, cl, pl, gd, id, out, stid, interactive)
 
 pointer py		# pointer to apphot structure
 pointer	im		# pointer to IRAF image
-int	cl		# coordinate file list
+int	cl		# coordinate file descriptor
 int	pl		# starlist file descriptor
 pointer	gd		# pointer to graphcis stream
 pointer	id		# pointer to image display stream
@@ -326,7 +326,7 @@ begin
 	    # Center, compute the sky and the magnitudes and save the results.
 	    case 'h', 'm', 'f', ' ':
 
-		# Compute the centers
+		# Compute the centers.
 		if (key == 'f' || key == ' ') {
 		    if (newcenterbuf == YES)
 		        cier = ap_ycenter (py, im, wx, wy, Memr[x], Memr[y],
@@ -365,7 +365,7 @@ begin
 		newmagbuf = NO; newmag = NO
 
 		# Write the results to an output file.
-		if (key == ' ') {
+		if (key == ' ' || key == 'm') {
 		    if (stid == 1)
 		        call ap_param (py, out, "polyphot")
 		    if (newlist == YES)

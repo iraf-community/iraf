@@ -24,6 +24,9 @@ The polynomial coefficients are calculated directly from the data points
 or the B-spline coefficients. The
 actual calculation is done by adding and multiplying terms
 according to Everett's central difference interpolation formula.
+
+The sinc interpolation is computed using a range of data points around
+the desired position.
 .ih
 NOTES
 Checking for out of bounds and INDEF valued pixels is the

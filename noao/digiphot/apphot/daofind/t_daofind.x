@@ -78,6 +78,14 @@ begin
 	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
+	# Confirm the parameters.
+	call ap_fdgpars (ap)
+	if (verify == YES && interactive == NO)  {
+	    call ap_fdconfirm (ap)
+	    if (update == YES)
+		call ap_fdpars (ap)
+	}
+
 	# Open the graphics and display devices.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
 	call clgstr ("display", Memc[display], SZ_FNAME)
@@ -111,14 +119,6 @@ begin
 	    id = NULL
 	}
 
-	# Confirm the parameters.
-	call ap_fdgpars (ap)
-	if (verify == YES && interactive == NO)  {
-	    call ap_fdconfirm (ap)
-	    if (update == YES)
-		call ap_fdpars (ap)
-	}
-
 	# Loop over the images.
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
@@ -129,6 +129,7 @@ begin
 	    call ap_itime (im, ap)
 	    call ap_airmass (im, ap)
 	    call ap_filter (im, ap)
+	    call ap_otime (im, ap)
 	    call apsets (ap, IMNAME, Memc[image])
 
 	    # Set up the results file. If output is a null string or
@@ -172,8 +173,8 @@ begin
 
 		cnv = NULL
 		if (Memc[cname] != EOS) {
-		    stat = ap_fdfind (Memc[cnvname], ap, im, NULL, NULL, NULL,
-		        out, boundary, constant, save, NO)
+		    stat = ap_fdfind (Memc[cnvname], ap, im, NULL, NULL, out,
+		        boundary, constant, save, NO)
 		} else {
 	            cnv = ap_cnvmap (Memc[cnvname], im, ap, save)
 		    if (Memc[outfname] != EOS)
@@ -189,7 +190,7 @@ begin
 		}
 
 	    } else {
-		stat = ap_fdfind (Memc[cnvname], ap, im, gd, NULL, id, out,
+		stat = ap_fdfind (Memc[cnvname], ap, im, gd, id, out,
 		    boundary, constant, save, YES)
 	    }
 
@@ -202,13 +203,13 @@ begin
 	}
 
 	# Close image and output file lists.
-	if (id == gd && id != NULL) {
+	if (id == gd && id != NULL)
 	    call gclose (id)
-	} else {
+	else {
 	    if (gd != NULL)
 	        call gclose (gd)
 	    if (id != NULL)
-	        call gclose (gd)
+	        call gclose (id)
 	}
 	call ap_fdfree (ap)
 	call imtclose (imlist)

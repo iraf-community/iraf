@@ -1,0 +1,7 @@
+	MENU of ECHELLE Demonstrations
+
+   mkdoecslit - Make test echelle slit data (3 orders, 100x256)
+     doecslit - Quick test of DOECSLIT (small images, no comments, no delays)
+
+      mkdofoe - Make test FOE data (3 orders, 100x256)
+        dofoe - Quick test of DOFOE (small images, no comments, no delays)

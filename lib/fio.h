@@ -136,9 +136,14 @@ define	VFN_UPDATE	1
 
 # Terminal driver escape sequences.
 
-define	LEN_RAWCMD	5
+define	LEN_RAWCMD	5		# +1 for iomode character (N|B)
 define	RAWOFF		"\033-rAw"	# raw mode off
 define	RAWON		"\033+rAw"	# raw mode on
 
 define	LEN_SETREDRAW	6		# 5 char escape sequence + code
 define	SETREDRAW	"\033=rDw"	# set/enable screen redraw code
+
+
+# Magtape driver global definitions.
+
+define	LEN_MTDEVPOS	5

@@ -1,4 +1,4 @@
-.help surface Jan90 plot
+.help surface Aug91 plot
 .ih
 NAME
 surface -- draw a three dimensional perspective plot of a surface
@@ -10,15 +10,13 @@ PARAMETERS
 .ls image
 Image or image section to be plotted.
 .le
-.ls floor = 0.
-Data values below \fBfloor\fR are clipped.  If \fBfloor = 0\fR, a value
-rounded up from the image minimum is used.  If \fBfloor\fR is less than
-the image minimum, this parameter has no effect.
+.ls floor = INDEF
+Data values below \fBfloor\fR are clipped.  If \fBfloor = INDEF\fR, the data
+minimum is used for the floor.
 .le
-.ls ceiling = 0.
-Data values above \fBceiling\fR are clipped.  If \fBceiling = 0\fR, a value
-rounded up from the image maximum is used.  If \fBceiling\fR is greater than
-the image maximum, this parameter has no effect.
+.ls ceiling = INDEF
+Data values above \fBceiling\fR are clipped.  If \fBceiling = INDEF\fR, the
+data maximum is used for the ceiling.
 .le
 .ls angh = -33.0
 Horizontal viewing angle, degrees.

@@ -26,6 +26,8 @@ begin
 	    call ap_rpcls (ap)
 	if (AP_PSKY(ap) != NULL)
 	    call ap_skycls (ap)
+	if (AP_IMBUF(ap) != NULL)
+	    call mfree (AP_IMBUF(ap), TY_REAL)
 	call mfree (ap, TY_STRUCT)
 end
 

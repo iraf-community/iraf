@@ -6,6 +6,9 @@ procedure mkexamples (name, image)
 string	name		{prompt="Example name"}
 string	image		{prompt="Image name"}
 
+int	oseed=1		{prompt="Object seed"}
+int	nseed=1		{prompt="Noise seed"}
+bool	comments=no	{prompt="Add comments to image?"}
 bool	verbose=yes	{prompt="Print operation?"}
 bool	errors=yes	{prompt="Report errors?"}
 bool	list=no		{prompt="List example script file only?"}
@@ -31,6 +34,9 @@ begin
 	    page (example)
 	else {
 	    s1 = image 
+	    i = oseed
+	    j = nseed
+	    b1 = comments
 	    if (s1 == "" || name1 == "")
 		return
 	    if ((access (s1) || access (s1//".imh") || access (s1 //".hhh"))) {

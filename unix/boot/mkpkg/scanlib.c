@@ -10,6 +10,7 @@
 
 #define import_spp
 #include <iraf.h>
+#include "mkpkg.h"
 #include "extern.h"
 
 /*
@@ -22,16 +23,13 @@
  *	h_ardate (modname)		return long integer module date
  */
 
-#define	SZ_SBUF		8192		/* character storage		*/
 #define	SZ_KEY		128		/* arbitrary			*/
-#define	MAX_SYMBOLS	2048		/* no. hash keys		*/
-
 extern	int forceupdate;		/* NOT IMPLEMENTED for UNIX	*/
 
 char	mlb_sbuf[SZ_SBUF];		/* string buffer		*/
 int	mlb_op = 0;			/* index into string buffer	*/
-int	mlb_index[MAX_SYMBOLS];		/* sbuf indices for each symbol	*/
-long	mlb_fdate[MAX_SYMBOLS];		/* file date of each module	*/
+int	mlb_index[MAX_LIBFILES];	/* sbuf indices for each symbol	*/
+long	mlb_fdate[MAX_LIBFILES];	/* file date of each module	*/
 int	mlb_modified;			/* modified flag		*/
 char	*mlb_filename();
 
@@ -54,7 +52,6 @@ char	*library;
 	char	modname[SZ_KEY+1];
 	char	lbuf[SZ_LINE];
 	struct	ar_hdr arf;
-	struct	dbentry key;
 	long	length, fdate;
 	int	len_arfmag, nmodules;
 	FILE	*fp;
@@ -65,7 +62,7 @@ char	*library;
 	mlb_op = 1;
 	nmodules = 0;
 
-	for (i=0;  i < MAX_SYMBOLS;  i++)
+	for (i=0;  i < MAX_LIBFILES;  i++)
 	    mlb_index[i] = 0;
 
 	/* Open the UNIX archive file.
@@ -179,7 +176,7 @@ long	fdate;			/* object file date	*/
 	 */
 	for (hashval=0, keylen=0, ip=modname;  *ip;  ip++, keylen++)
 	    hashval += hashval + *ip;
-	start = hashval % MAX_SYMBOLS;
+	start = hashval % MAX_LIBFILES;
 
 	mlb_modified = YES;
 
@@ -193,7 +190,7 @@ long	fdate;			/* object file date	*/
 		    mlb_fdate[i] = fdate;
 		    return (OK);
 		}
-	    if (++i >= MAX_SYMBOLS)
+	    if (++i >= MAX_LIBFILES)
 		i = 0;
 	    if (i == start) {
 		printf ("error: library module list overflow\n");
@@ -227,7 +224,6 @@ long
 mlb_getdate (modname)
 char	*modname;
 {
-	
 	register int	hashval, keylen, i;
 	register char	*ip;
 	int	start;
@@ -239,7 +235,7 @@ char	*modname;
 	 */
 	for (hashval=0, keylen=0, ip=modname;  *ip;  ip++, keylen++)
 	    hashval += hashval + *ip;
-	start = hashval % MAX_SYMBOLS;
+	start = hashval % MAX_LIBFILES;
 
 	/* Search the symbol table for the named module.
 	 */
@@ -248,7 +244,7 @@ char	*modname;
 	    if (*ip == *modname)
 		if (strncmp (modname, ip, keylen) == 0)
 		    return (mlb_fdate[i]);
-	    if (++i >= MAX_SYMBOLS)
+	    if (++i >= MAX_LIBFILES)
 		i = 0;
 	    if (i == start)
 		return (0L);

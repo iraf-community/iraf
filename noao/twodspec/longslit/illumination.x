@@ -151,14 +151,17 @@ char	graphics[SZ_FNAME]	# Graphics output device
 int	i, axis, npts, nbins, len_title
 pointer	bins, cv, gp, sp, x, y, z, z1, wts
 
-int	imgeti(), strlen()
 pointer	gopen()
-errchk	imgeti
+int	clgeti()
+int	imgeti(), strlen()
 
 begin
 	# Determine the slit axis and set the axis labels.
 
-	axis = imgeti (in, "dispaxis")
+	iferr (axis = imgeti (in, "dispaxis")) {
+	    axis = clgeti ("dispaxis")
+	    call imaddi (in, "dispaxis", axis)
+	}
 	if (axis == 1)
 	    axis = 2
 	else

@@ -1,0 +1,61 @@
+.help mkhistogram Feb88 obsolete
+.ih
+NAME
+mkhistogram -- print or plot the histogram of a data stream
+.ih
+USAGE
+mkhistogram file
+.ih
+PARAMETERS
+.ls file
+The name of the text file containing the data (may be STDIN).
+.le
+.ls nbins
+The number of bins in the histogram.
+.le
+.ls z1 = INDEF, z2 = INDEF
+The minimum and maximum histogram intensity. Z1 and z2 default to the data
+minimum and maximum.
+.le
+.ls listout = yes
+List instead of plot the histogram.
+.le
+.ls device = "stdgraph"
+The output graphics device.
+.le
+.ih
+DESCRIPTION
+MKHISTOGRAM calculates the histogram of the data in the text
+file \fIfile\fR using
+the parameters \fInbins\fR, \fIz1\fR and \fIz2\fR. If the z1 or z2 are
+undefined the image min or max is used. If \fIlistout\fR = no, the
+histogram is plotted on the graphics device specified by \fIdevice\fR.
+Otherwise the histogram is listed on the standard output.
+.ih
+EXAMPLES
+
+1. Output the histogram of data to a file.
+
+.nf
+    cl> mkhisto magsdata nbins=100 > magsdata.hst
+.fi
+
+2. Plot the histogram of data between the 12.0  and 26.0 with a binsize
+   if 0.5 on standard graph. Notice that the extra bin will contain
+   points for which z2 is exactly 26.
+
+.nf
+    cl> mkhist magsdat nbins=29 z1=12.0 z2=26.0 li-
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+USE INSTEAD
+plot.phistogram
+.ih
+SEE ALSO
+images.imhistogram, fields
+.endhelp

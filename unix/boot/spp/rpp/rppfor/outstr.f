@@ -1,30 +1,30 @@
-      SUBROUTINE OUTSTR (STR)
-      INTEGER STR (100)
-      INTEGER C
-      INTEGER I, J
-      I = 1
-23000 IF (.NOT.(STR (I) .NE. -2))GOTO 23002
-      C = STR (I)
-      IF (.NOT.(C .NE. 39 .AND. C .NE. 34))GOTO 23003
-      CALL OUTCH (C)
-      GOTO 23004
-23003 CONTINUE
-      I = I + 1
-      J = I
-23005 IF (.NOT.(STR (J) .NE. C))GOTO 23007
-23006 J = J + 1
-      GOTO 23005
-23007 CONTINUE
-      CALL OUTNUM (J - I)
-      CALL OUTCH (72)
-23008 IF (.NOT.(I .LT. J))GOTO 23010
-      CALL OUTCH (STR (I))
-23009 I = I + 1
-      GOTO 23008
-23010 CONTINUE
-23004 CONTINUE
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      RETURN
-      END
+      subroutine outstr (str)
+      integer str (100)
+      integer c
+      integer i, j
+      i = 1
+23000 if (.not.(str (i) .ne. -2))goto 23002
+      c = str (i)
+      if (.not.(c .ne. 39 .and. c .ne. 34))goto 23003
+      call outch (c)
+      goto 23004
+23003 continue
+      i = i + 1
+      j = i
+23005 if (.not.(str (j) .ne. c))goto 23007
+23006 j = j + 1
+      goto 23005
+23007 continue
+      call outnum (j - i)
+      call outch (72)
+23008 if (.not.(i .lt. j))goto 23010
+      call outch (str (i))
+23009 i = i + 1
+      goto 23008
+23010 continue
+23004 continue
+23001 i = i + 1
+      goto 23000
+23002 continue
+      return
+      end

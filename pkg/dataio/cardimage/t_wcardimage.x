@@ -10,19 +10,22 @@ define	TABSIZE		8
 
 procedure t_wcardimage()
 
-bool    verbose
-char    out_file[SZ_FNAME], in_file[SZ_FNAME], out_fname[SZ_FNAME]
-int	strsize, ncards
-int     file_number, nlines, list, len_list
+char    out_file[SZ_FNAME]		# input file name list
+char	in_file[SZ_FNAME]		# output file name list
+bool    verbose				# verbose mode ?
 
-int	btoi()
+char	out_fname[SZ_FNAME]
+int	ncards, file_number, nlines, list, len_list
+
 bool	clgetb()
-int	clpopni(), clplen(), mtfile(), strldxs(), clgeti(), clgfil(), strlen()
+int	fstati(), clpopni(), clplen(), mtfile(), mtneedfileno()
+int	clgeti(), clgfil(), strlen(), btoi()
 include "wcardimage.com"
 
 begin
 	# Flush standard output on newline
-	call fseti (STDOUT, F_FLUSHNL, YES)
+	if (fstati (STDOUT, F_REDIR) == NO)
+	    call fseti (STDOUT, F_FLUSHNL, YES)
 
 	# Get the parameters.
 	list = clpopni ("textfile")
@@ -32,19 +35,18 @@ begin
 	# If no tape file number is given tape output then the program
 	# asks whether the tape is blank or contains data.
 	# If it is blank the tape begins writing at file 1 otherwise at EOT.
+	# Note that at some point this code needs to be modified to
+	# accept an output file name template.
 
 	call clgstr ( "cardfile", out_file, SZ_FNAME)
 	if (mtfile (out_file) == YES) {
-	    strsize = strlen (out_file)
-	    if (strldxs ("]", out_file) != strsize) {
-		if (! clgetb("new_tape")) {
-		    call sprintf (out_file[strsize+1], SZ_FNAME, "%s")
-			call pargstr ("[EOT]")
-		} else {
-		    call sprintf (out_file[strsize+1], SZ_FNAME, "%s")
-		        call pargstr ("[1]")
-		}
-	    }
+	    if (mtneedfileno (out_file) == YES) {
+		if (! clgetb("new_tape"))
+		    call mtfname (out_file, EOT, out_fname, SZ_FNAME)
+		else
+		    call mtfname (out_file, 1, out_fname, SZ_FNAME)
+	    } else
+		call strcpy (out_file, out_fname, SZ_FNAME)
 	}
 
 	# Get card_length and determine whether it fits in an integral number
@@ -57,13 +59,14 @@ begin
 	# Get number of cards per physical block and convert to packed chars.
 	cards_per_blk = clgeti ("cards_per_blk")
 
+	# Get the formatting parameters.
 	call clgstr ("contn_string", contn_string, SZ_LINE)
 	    if (strlen (contn_string) > card_length)
 		call error (2,
 		    "Continuation string cannot be > card_length chars.")
-
 	detab = btoi (clgetb ("detab"))
 
+	# Get the character type parameters.
 	ebcdic = btoi (clgetb ("ebcdic"))
 	ibm = btoi (clgetb ("ibm"))
 	if (ibm == YES && ebcdic == YES)
@@ -75,19 +78,14 @@ begin
 	while (clgfil (list, in_file, SZ_FNAME) !=  EOF) {
 	    if (mtfile (out_file) == NO) {
 		if (len_list > 1) {
-		    call strcpy (out_file, out_fname, SZ_FNAME)
-		    call sprintf (out_fname[strlen(out_fname)+1],
-			SZ_FNAME, "%03d")
+		    call sprintf (out_fname[1], SZ_FNAME, "%s%03d")
+			call pargstr (out_file)
 		        call pargi (file_number)
 		} else
 		    call strcpy (out_file, out_fname, SZ_FNAME)
 	    } else {
-		if (file_number == 2) {
-		    call sprintf (out_file[strldxs("[", out_file)],
-			SZ_FNAME, "%s")
-			call pargstr ("[EOT]")
-		}
-		call strcpy (out_file, out_fname, SZ_FNAME)
+		if (file_number == 2)
+		    call mtfname (out_fname, EOT, out_fname, SZ_FNAME)
 	    }
 
 	    # Copy text file to cardimage file.
@@ -97,7 +95,6 @@ begin
 		    call printf ("File: %s -> %s: ")
 			call pargstr (in_file)
 			call pargstr (out_fname)
-		    call flush (STDOUT)
 		}
 
 		call wc_textfile_to_cardfile (in_file, out_fname, ncards,
@@ -107,16 +104,15 @@ begin
 		    call printf ("%d lines read -> %d cards written\n")
 			call pargi (nlines)
 			call pargi (ncards)
-		    call flush (STDOUT)
 		}
 	    } then {
+		call flush (STDOUT)
 		call erract (EA_FATAL)
 	    } else if (ncards == 0) {
-		if (verbose) {
+		if (verbose)
 		    call printf ("\tInput file is binary or empty\n")
-		    call flush (STDOUT)
-		}
 	    }
+
 	    file_number = file_number + 1
 	}
 end
@@ -127,10 +123,10 @@ end
 
 procedure wc_textfile_to_cardfile (in_file, out_fname, ncards, nlines)
 
-char    in_file[ARB]
-char	out_fname[ARB]
-int     ncards
-int     nlines
+char    in_file[ARB]			# input file name
+char	out_fname[ARB]			# output file name
+int     ncards				# number of card images
+int     nlines				# number of text lines
 
 char    linebuf[SZ_LINE]
 int     in, out, nchars, chars_per_blk
@@ -145,6 +141,7 @@ begin
 	if (access (in_file, READ_ONLY, TEXT_FILE) != YES)
 	    return
 
+	# Open the file.
 	in = open (in_file, READ_ONLY, TEXT_FILE)
 	if (mtfile (out_fname) == YES) {
 	    chars_per_blk = cards_per_blk * card_length / SZB_CHAR
@@ -152,7 +149,7 @@ begin
 	} else
 	    out = open (out_fname, NEW_FILE, BINARY_FILE)
 
-	# write file
+	# Write file.
 	nchars = wc_fetchline (in, linebuf, nlines, card_length+1)
 	while (nchars != EOF) {
 	    call wc_text_to_card (linebuf, nchars, linebuf)
@@ -173,21 +170,23 @@ end
 
 procedure wc_text_to_card (line, nchars, card)
 
-char    line[ARB], card[ARB]
-int     init, ip, nchars
+char    line[ARB]			# input text line
+int	nchars				# number of chars in line
+char	card[ARB]			# output packed card image
 
+int     init, ip
 errchk	ascii_to_ebcdic, ascii_to_ibm, achtsb, chrpak
 include "wcardimage.com"
 
 begin
-	# pad with blanks
+	# Pad with blanks.
 	init = nchars
 	if (line[init] != '\n')
 	    init = init + 1
 	for (ip=init;  ip <= card_length;  ip=ip+1)
 	    line[ip] = ' '
 
-	# pack the line
+	# Pack the line.
 	if (ebcdic == YES) {
 	    call ascii_to_ebcdic (line, card, card_length)
 	    call achtsb (card, card, card_length)
@@ -199,16 +198,16 @@ begin
 end
 
 
-# WC_FETCHLINE -- Procedure to fetch a line of text and split into pieces
-# <= maxch characters long optionally prefixing the remainders of lines
+# WC_FETCHLINE -- Procedure to fetch a line of text and split it into pieces
+# <= maxch characters long, optionally prefixing the remainders of lines
 # with a character string.
 
 int procedure wc_fetchline (fd, linebuf, lp, maxch)
 
-int    fd
-char   linebuf[ARB]
-int    lp
-int    maxch
+int    fd				# input file descriptor
+char   linebuf[ARB]			# output chunk of text
+int    lp				# number of lines read
+int    maxch				# maximum size of chunk of text
 
 char   line[SZ_LINE], inline[SZ_LINE]
 int    nchars, ip, op, offset, strsize

@@ -29,23 +29,23 @@ int	dcvstati()
 $endif
 
 begin
-	call smark (sp)
-	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
 	$if (datatype == r)
-	call salloc (cf_coeff, ncoeff, TY_REAL)
 	function = cvstati (cv, CVTYPE)
 	$else
-	call salloc (cf_coeff, ncoeff, TY_DOUBLE)
 	function = dcvstati (cv, CVTYPE)
 	$endif
-	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
 
 	if (function != LEGENDRE && function != CHEBYSHEV) {
 	    call eprintf ("Cannot convert coefficients - wrong function type\n")
-	    call amovk$t (INDEFR, ps_coeff, ncoeff)
-	    call sfree (sp)
+	    call amovk$t (INDEF, ps_coeff, ncoeff)
 	    return
 	}
+
+	call smark (sp)
+	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
+	call salloc (cf_coeff, ncoeff, TY_PIXEL)
+
+	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
 
 	# Get existing coefficients
 	$if (datatype == r)

@@ -17,7 +17,7 @@ begin
 	for (i=1; i <= EC_NFEATURES(ec); i = i + 1) {
 	    if (IS_INDEFD (USER(ec,i)))
 		next
-	    delta = USER(ec,i) - ec_fitpt (ec, AP(ec,i), PIX(ec,i))
+	    delta = USER(ec,i) - ec_fitpt (ec, APN(ec,i), PIX(ec,i))
 	    delta = delta * ORDER(ec,i)
 	    shft = shft + delta
 	    rms = rms + delta * delta

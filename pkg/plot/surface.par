@@ -1,6 +1,6 @@
 image,s,a,,,,image or image section to be plotted
-floor,r,h,0,,,minimum value to be plotted (0 if none)
-ceiling,r,h,0,,,maximum value to be plotted (0 if none)
+floor,r,h,INDEF,,,minimum value to be plotted (INDEF for min)
+ceiling,r,h,INDEF,,,maximum value to be plotted (INDEF for max)
 angh,r,h,-33.0,,,"horizontal viewing angle, degrees"
 angv,r,h,25.0,,,"vertical viewing angle, degrees"
 device,s,h,stdgraph,,,output device

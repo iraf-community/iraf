@@ -40,15 +40,22 @@ retry_
 	# HMS format is implemented using calls to DTOC3, LTOC.  Use zero
 	# fill to get two chars for the second and third fields, if necessary.
 	# The second field is omitted for "m" format.  No whitespace is
-	# permitted in an HMS (or other) number.
+	# permitted in an HMS (or other) number.  If the format is %H or %M
+	# (instead of the usual %h or %m) scale the number by 15 before output
+	# (converting degrees to hours).
 
-	if (dval < 0.0D0 && long (dval) == 0)
+	if (IS_UPPER (a_fmt))
+	    val = dval / 15.0
+	else
+	    val = dval
+
+	if (val < 0.0D0 && long(val) == 0)
 	    op = gstrcpy ("-0", outstr, maxch) + 1
 	else
-	    op = ltoc (long(dval), outstr, maxch) + 1
+	    op = ltoc (long(val), outstr, maxch) + 1
 	output (':')						# "+/-nnn:..."
 
-	val = abs (dval)
+	val = abs (val)
 	val = val - long (val)					# abs fraction
 
 	if (fmt == FMT_HMS) {					# "...nn:..."

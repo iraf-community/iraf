@@ -1,9 +1,10 @@
 include	<error.h>
 include	<imhdr.h>
 include	<gset.h>
+include	"../shdr.h"
 include	"ecidentify.h"
 
-define	HELP		"noao$lib/scr/ecidentify.key"
+define	HELP		"noao$onedspec/ecidentify/ecidentify.key"
 define	PROMPT		"ecidentify options"
 
 define	PAN		1	# Pan graph
@@ -26,6 +27,7 @@ bool	answer
 double	pix, fit, user, shift, pix_shift, z_shift
 pointer	peaks
 
+bool	clgetb()
 int	clgcur(), scan(), nscan(), find_peaks(), ec_next(), ec_previous()
 int	ec_line()
 double	ec_center(), ec_fittopix(), ec_fitpt(), ec_shift(), ec_rms()
@@ -39,6 +41,12 @@ define	beep_		99
 begin
 newim_	# Start here for each new image.
 
+	# Get the image data.  Return if there is an error.
+	iferr (call ec_gdata (ec)) {
+	    call erract (EA_WARN)
+	    return
+	}
+
 	# Look for a database entry for the image.
 	iferr {
 	    call ec_dbread (ec, Memc[EC_IMAGE(ec)], NO)
@@ -46,12 +54,6 @@ newim_	# Start here for each new image.
 	} then
 	    if ((EC_NFEATURES(ec) > 0) || (EC_ECF(ec) != NULL))
 	        EC_NEWDBENTRY(ec) = YES
-
-	# Get the image data.  Return if there is an error.
-	iferr (call ec_gdata (ec)) {
-	    call erract (EA_WARN)
-	    return
-	}
 
 	# Set the coordinate array and the feature data.
 	iferr (call ec_fitdata (ec))
@@ -114,7 +116,7 @@ newim_	# Start here for each new image.
 		        PIX(ec,i) = ec_center (ec, PIX(ec,i), FWIDTH(ec,i),
 			    FTYPE(ec,i))
 		        if (!IS_INDEFD (PIX(ec,i))) {
-			    FIT(ec,i) = ec_fitpt (ec, AP(ec,i), PIX(ec,i))
+			    FIT(ec,i) = ec_fitpt (ec, APN(ec,i), PIX(ec,i))
 		            call ec_mark (ec, i)
 			} else {
 			    call ec_delete (ec, i)
@@ -137,7 +139,7 @@ newim_	# Start here for each new image.
 			PIX(ec,EC_CURRENT(ec)) = pix
 		        FWIDTH(ec,EC_CURRENT(ec)) = EC_FWIDTH(ec)
 			FIT(ec,EC_CURRENT(ec)) =
-			    ec_fitpt (ec, AP(ec,EC_CURRENT(ec)), pix)
+			    ec_fitpt (ec, APN(ec,EC_CURRENT(ec)), pix)
 		        call gseti (EC_GP(ec), G_PLTYPE, 1)
 			call ec_mark (ec, EC_CURRENT(ec))
 		        EC_NEWFEATURES(ec) = YES
@@ -165,7 +167,7 @@ newim_	# Start here for each new image.
 		    last = 0
 		}
 	    case 'f':	# Fit dispersion function
-		iferr (call ec_dofit (ec, YES)) {
+		iferr (call ec_dofit (ec, YES, NO)) {
 		    call erract (EA_WARN)
 		    prfeature = NO
 		    goto beep_
@@ -201,8 +203,7 @@ newim_	# Start here for each new image.
 	    case 'l':	# Find features using a line list
 		if (EC_ECF(ec) == NULL) {
 		    call eprintf ("Doing initial fit ...\n")
-		    call ec_dofit (ec, NO)
-		    iferr (call ec_dofit (ec, NO)) {
+		    iferr (call ec_dofit (ec, NO, NO)) {
 		        call erract (EA_WARN)
 		        prfeature = NO
 			goto beep_
@@ -238,7 +239,7 @@ newim_	# Start here for each new image.
 		    USER(ec,EC_CURRENT(ec)))
 		call ec_mark (ec, EC_CURRENT(ec))
 		call printf ("%3d %10.2f %10.8g (%10.8g): ")
-		    call pargi (AP(ec,EC_CURRENT(ec)))
+		    call pargi (APN(ec,EC_CURRENT(ec)))
 		    call pargd (PIX(ec,EC_CURRENT(ec)))
 		    call pargd (FIT(ec,EC_CURRENT(ec)))
 		    call pargd (USER(ec,EC_CURRENT(ec)))
@@ -260,8 +261,7 @@ newim_	# Start here for each new image.
 			if (j != EC_AP(ec)) {
 			    iferr {
 				i = ec_line (ec, j)
-				if (!IS_INDEFI(i))
-				   call ec_gline (ec, i)
+				call ec_gline (ec, i)
 				EC_LINE(ec) = i
 				EC_AP(ec) = j
 				EC_ORDER(ec) = ORDERS(ec,i)
@@ -333,14 +333,14 @@ newim_	# Start here for each new image.
 			     EC_CURRENT(ec) = 0
 			next
 		    }
-		    fit = ec_fitpt (ec, AP(ec,i), pix)
+		    fit = ec_fitpt (ec, APN(ec,i), pix)
 
 		    pix_shift = pix_shift + pix - PIX(ec,i)
 		    if (FIT(ec,i) != 0.)
 		        z_shift = z_shift + (fit - FIT(ec,i)) / FIT(ec,i)
 
 		    j = j + 1
-		    AP(ec,j) = AP(ec,i)
+		    APN(ec,j) = APN(ec,i)
 		    LINE(ec,j) = LINE(ec,i)
 		    ORDER(ec,j) = ORDER(ec,i)
 		    PIX(ec,j) = pix
@@ -388,7 +388,7 @@ newim_	# Start here for each new image.
 		pix = ec_fittopix (ec, double (wx))
 		PIX(ec,EC_CURRENT(ec)) = pix
 		FIT(ec,EC_CURRENT(ec)) =
-		    ec_fitpt (ec, AP(ec,EC_CURRENT(ec)), pix)
+		    ec_fitpt (ec, APN(ec,EC_CURRENT(ec)), pix)
 		call gseti (EC_GP(ec), G_PLTYPE, 1)
 		call ec_mark (ec, EC_CURRENT(ec))
 		EC_NEWFEATURES(ec) = YES
@@ -397,7 +397,7 @@ newim_	# Start here for each new image.
 		    goto beep_
 
 		call printf ("%3d %10.2f %10.8g (%10.8g): ")
-		    call pargi (AP(ec,EC_CURRENT(ec)))
+		    call pargi (APN(ec,EC_CURRENT(ec)))
 		    call pargd (PIX(ec,EC_CURRENT(ec)))
 		    call pargd (FIT(ec,EC_CURRENT(ec)))
 		    call pargd (USER(ec,EC_CURRENT(ec)))
@@ -412,22 +412,23 @@ newim_	# Start here for each new image.
 	    case 'w':	# Window graph
 		call gt_window (EC_GT(ec), EC_GP(ec), "cursor", EC_NEWGRAPH(ec))
 	    case 'y':	# Find peaks in order
-		call malloc (peaks, EC_NPTS(ec), TY_DOUBLE)
-		npeaks = find_peaks (IMDATA(ec,1), Memd[peaks],
+		call malloc (peaks, EC_NPTS(ec), TY_REAL)
+		npeaks = find_peaks (IMDATA(ec,1), Memr[peaks],
 		    EC_NPTS(ec), 0., int (EC_MINSEP(ec)), 0, EC_MAXFEATURES(ec),
 		    0., false)
 		for (j = 1; j <= EC_NFEATURES(ec); j = j + 1) {
 		    for (i = 1; i <= npeaks; i = i + 1) {
-		        pix = Memd[peaks + i - 1]
-			if (!IS_INDEFD (pix))
+			if (!IS_INDEF(pix)) {
+			    pix = Memr[peaks + i - 1]
 			    if (abs (pix - PIX(ec,j)) < EC_MINSEP(ec))
-			        Memd[peaks + i - 1] = INDEFD
+			        Memr[peaks + i - 1] = INDEF
+			}
 		    }
 		}
 		for (i = 1; i <= npeaks; i = i + 1) {
-		    pix = Memd[peaks+i-1]
-		    if (IS_INDEFD (pix))
+		    if (IS_INDEF(pix))
 			next
+		    pix = Memr[peaks+i-1]
 		    pix = ec_center (ec, pix, EC_FWIDTH(ec), EC_FTYPE(ec))
 		    if (IS_INDEFD (pix))
 			next
@@ -438,7 +439,7 @@ newim_	# Start here for each new image.
 			EC_FWIDTH(ec), EC_FTYPE(ec))
 		    call ec_mark (ec, EC_CURRENT(ec))
 		}
-		call mfree (peaks, TY_DOUBLE)
+		call mfree (peaks, TY_REAL)
 	    case 'z':	# Go to zoom mode
 		if (EC_CURRENT(ec) == 0)
 		    goto beep_
@@ -464,7 +465,7 @@ newkey_
 
 	    # Refit the dispersion function if needed.
 	    if (EC_REFIT(ec) == YES) {
-		iferr (call ec_dofit (ec, NO)) {
+		iferr (call ec_dofit (ec, NO, NO)) {
 		    call erract (EA_WARN)
 		    prfeature = NO
 		}
@@ -496,7 +497,7 @@ newkey_
 		call gscur (EC_GP(ec), real (FIT(ec,EC_CURRENT(ec))), wy)
 		if (prfeature == YES) {
 	            call printf ("%d %10.2f %10.8g %10.8g\n")
-		        call pargi (AP(ec,EC_CURRENT(ec)))
+		        call pargi (APN(ec,EC_CURRENT(ec)))
 		        call pargd (PIX(ec,EC_CURRENT(ec)))
 		        call pargd (FIT(ec,EC_CURRENT(ec)))
 		        call pargd (USER(ec,EC_CURRENT(ec)))
@@ -509,24 +510,22 @@ newkey_
 	# Warn user that feature data is newer than database entry.
 	if (EC_NEWDBENTRY(ec) == YES) {
 	    answer = true
-	    call printf ("Write feature data to the database (yes)? ")
-	    call flush (STDOUT)
-	    if (scan() != EOF)
-	        call gargb (answer)
+	    if (!clgetb ("autowrite")) {
+		call printf ("Write feature data to the database (yes)? ")
+		call flush (STDOUT)
+		if (scan() != EOF)
+		    call gargb (answer)
+	    }
 	    if (answer)
 	        call ec_dbwrite (ec, Memc[EC_IMAGE(ec)], NO)
 	}
 
 	call flush (STDOUT)
 
-	# Free image data.
-	call mfree (EC_APS(ec), TY_INT)
-	call mfree (EC_ORDERS(ec), TY_INT)
-	call mfree (EC_CRVAL(ec), TY_DOUBLE)
-	call mfree (EC_CDELT(ec), TY_DOUBLE)
+	# Free image data and MWCS
 	call mfree (EC_PIXDATA(ec), TY_DOUBLE)
-	call mfree (EC_IMDATA(ec), TY_DOUBLE)
 	call mfree (EC_FITDATA(ec), TY_DOUBLE)
+	call mw_close (MW(EC_SH(ec)))
 
 	# If a new image was specified by a colon command don't return.
 	if (newimage[1] != EOS) {

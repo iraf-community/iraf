@@ -20,10 +20,9 @@ int	param		# parameter
 char	str[ARB]	# string
 int	maxch		# maximum number of characters
 
-pointer	 dsp, nse, ply
+pointer	 nse, ply
 
 begin
-	dsp = AP_PDISPLAY(ap)
 	nse = AP_NOISE(ap)
 	ply = AP_POLY(ap)
 
@@ -101,10 +100,9 @@ real procedure ap2statr (ap, param)
 pointer	ap		# pointer to apphot structure
 int	param		# parameter
 
-pointer	dsp, nse, ply, rprof, fnd
+pointer	nse, ply, rprof, fnd
 
 begin
-	dsp = AP_PDISPLAY(ap)
 	nse = AP_NOISE(ap)
 	ply = AP_POLY(ap)
 	rprof = AP_RPROF(ap)

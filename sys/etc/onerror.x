@@ -11,7 +11,7 @@ include	<error.h>
 
 procedure onerror (user_proc)
 
-extern	user_proc()			# procedure to be posted
+extern	user_proc()			#I procedure to be posted
 
 int	epa, i
 bool	first_time
@@ -47,6 +47,24 @@ begin
 end
 
 
+# ONERROR_REMOVE -- Remove a previously posted ONERROR procedure.
+
+procedure onerror_remove (user_proc)
+
+extern	user_proc()			#I procedure to be posted
+
+int	epa, i
+int	proc_list[MAX_ONERROR], nprocs
+common	/onercm/ nprocs, proc_list
+
+begin
+	call zlocpr (user_proc, epa)
+	for (i=1;  i <= nprocs;  i=i+1)
+	    if (proc_list[i] == epa)
+		proc_list[i] = 0
+end
+
+
 # XONERROR -- Called at task termination by the IRAF Main to execute each of
 # the posted user error cleanup procedures (if any).  Procedures are executed
 # in the order in which they were posted.  The task termination status is
@@ -55,7 +73,8 @@ end
 
 procedure xonerror (status)
 
-int	status			# task termination status (OK or error code)
+int	status			#I task termination status (OK or error code)
+
 int	nprocs_to_execute, i
 int	proc_list[MAX_ONERROR], nprocs
 common	/onercm/ nprocs, proc_list
@@ -72,5 +91,6 @@ begin
 	nprocs = 0
 
 	for (i=1; i <= nprocs_to_execute;  i=i+1)
-	    call zcall1 (proc_list[i], status)
+	    if (proc_list[i] != 0)
+		call zcall1 (proc_list[i], status)
 end

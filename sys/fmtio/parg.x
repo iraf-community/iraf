@@ -115,7 +115,7 @@ int	dtype
 char	ch
 long	lnum
 complex	xnum
-int	n, precision, i, junk, ival, nchars, nbits
+int	n, precision, i, junk, ival, nchars, nbits, fmt
 int	ctocc(), gltoc(), dtoc(), xtoc(), fprfmt()
 errchk	putci, fmtstr, fpradv
 include "fmt.com"
@@ -161,7 +161,12 @@ begin
 	# Convert number from binary into character form in OBUF, applying
 	# defaults as needed.
 
-	switch (format_char) {
+	# Ignore case in testing format type.
+	fmt = format_char
+	if (IS_UPPER (fmt))
+	    fmt = TO_LOWER(fmt)
+
+	switch (fmt) {
 	case FMT_BOOL:
 	    if (IS_INDEFD (value))
 		call strcpy ("INDEF", obuf, SZ_OBUF)
@@ -179,7 +184,7 @@ begin
 	    }
 
 	case FMT_DECIMAL, FMT_OCTAL, FMT_HEX, FMT_RADIX, FMT_UNSIGNED:
-	    switch (format_char) {
+	    switch (fmt) {
 	    case FMT_DECIMAL:
 		radix = DECIMAL				# signed decimal
 	    case FMT_OCTAL:
@@ -205,13 +210,13 @@ begin
 		    nbits = SZB_CHAR * NBITS_BYTE
 		    if (dtype == TY_SHORT)
 			nbits = nbits * SZ_SHORT
-		    if (format_char == FMT_OCTAL) {
+		    if (fmt == FMT_OCTAL) {
 			n = nchars - (nbits + 2) / 3
 			if (n > 0) {
 			    call strcpy (obuf[n+2], obuf[2], SZ_OBUF)
 			    obuf[1] = '1'
 			}
-		    } else if (format_char == FMT_HEX) {
+		    } else if (fmt == FMT_HEX) {
 			n = nchars - (nbits + 3) / 4
 			if (n > 0)
 			    call strcpy (obuf[n+1], obuf[1], SZ_OBUF)
@@ -221,7 +226,7 @@ begin
 
 	case FMT_EXPON, FMT_FIXED, FMT_GENERAL, FMT_HMS, FMT_MINSEC:
 	    if (decpl == USE_DEFAULT || decpl == 0)
-		switch (format_char) {
+		switch (fmt) {
 		case FMT_EXPON, FMT_GENERAL:
 		    decpl = precision
 		case FMT_HMS, FMT_MINSEC:
@@ -232,6 +237,7 @@ begin
 			decpl = precision
 		}
 	    repeat {
+		# Need the case sensitive format char here.
 		n = dtoc (value, obuf, SZ_OBUF, decpl, format_char, width+1)
 		decpl = decpl - 1
 	    } until (n <= width || decpl <= 0)

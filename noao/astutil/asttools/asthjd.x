@@ -1,8 +1,8 @@
 include	<math.h>
 
-# AST_HJD -- Helocentric Julian Day
+# AST_HJD -- Helocentric Julian Day from Epoch
 
-procedure ast_hjd (ra, dec, epoch, t, hjd)
+procedure ast_hjd (ra, dec, epoch, lt, hjd)
 
 double	ra		# Right ascension of observation (hours)
 double	dec		# Declination of observation (degrees)
@@ -10,25 +10,43 @@ double	epoch		# Julian epoch of observation
 double	lt		# Light travel time in seconds
 double	hjd		# Helocentric Julian Day
 
-double	jd, t, manom, lperi, oblq, eccen, tanom, slong, r, d, l, b, rsun
 double	ast_julday()
+
+begin
+	call ast_jd_to_hjd (ra, dec, ast_julday(epoch), lt, hjd)
+end
+
+
+# AST_JD_TO_HJD -- Helocentric Julian Day from UT Julian date
+
+procedure ast_jd_to_hjd (ra, dec, jd, lt, hjd)
+
+double	ra		# Right ascension of observation (hours)
+double	dec		# Declination of observation (degrees)
+double	jd		# Geocentric Julian date of observation
+double	lt		# Light travel time in seconds
+double	hjd		# Helocentric Julian Day
+
+double	t, manom, lperi, oblq, eccen, tanom, slong, r, d, l, b, rsun
 
 begin
 	# JD is the geocentric Julian date.
 	# T is the number of Julian centuries since J1900.
 
-	jd = ast_julday (epoch)
-	t = (jd - 2415020) / 36525.
+	t = (jd - 2415020d0) / 36525d0
 
 	# MANOM is the mean anomaly of the Earth's orbit (degrees)
 	# LPERI is the mean longitude of perihelion (degrees)
 	# OBLQ is the mean obliquity of the ecliptic (degrees)
 	# ECCEN is the eccentricity of the Earth's orbit (dimensionless)
 
-	manom = 358.47583 + t * (35999.04975 - t * (0.000150 + t * 0.000003))
-	lperi = 101.22083 + t * (1.7191733 + t * (0.000453 + t * 0.000003))
-	oblq = 23.452294 - t * (0.0130125 + t * (0.00000164 - t * 0.000000503))
-	eccen = 0.01675104 - t * (0.00004180 + t * 0.000000126)
+	manom = 358.47583d0 +
+	    t * (35999.04975d0 - t * (0.000150d0 + t * 0.000003d0))
+	lperi = 101.22083d0 +
+	    t * (1.7191733d0 + t * (0.000453d0 + t * 0.000003d0))
+	oblq = 23.452294d0 -
+	    t * (0.0130125d0 + t * (0.00000164d0 - t * 0.000000503d0))
+	eccen = 0.01675104d0 - t * (0.00004180d0 + t * 0.000000126d0)
 
 	# Convert to principle angles
 	manom = mod (manom, 360.0D0)
@@ -59,6 +77,6 @@ begin
 	rsun = (1. - eccen**2) / (1. + eccen * cos (tanom))
 
 	# LT is the light travel difference to the Sun.
-	lt = -0.005770 * rsun * cos (b) * cos (l - slong)
+	lt = -0.005770d0 * rsun * cos (b) * cos (l - slong)
 	hjd = jd + lt
 end

@@ -43,7 +43,7 @@ begin
 	    call achtdr (D(mw,WCS_W(wp)), w, ndim)
 
 	if (WCS_CD(wp) == NULL)
-	    call aclrr (cd, ndim*ndim)
+	    call mw_mkidmr (cd, ndim)
 	else
 	    call achtdr (D(mw,WCS_CD(wp)), cd, ndim*ndim)
 end

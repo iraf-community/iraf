@@ -28,7 +28,7 @@ int	nsky			# number of sky pixels used in fit
 int	nsky_reject		# number of sky pixels rejected
 
 double 	sumpx, sumsqpx, sumcbpx
-int	nreject, nbins, nker, i, j, iter, ier
+int	nreject, nbins, nker, i, j, iter
 pointer	sp, hgm, shgm, wgt
 real	hmin, hmax, dh, locut, hicut, sky_mean, center
 int	ap_grow_hist2(), aphgmr(), aptopt()
@@ -185,8 +185,8 @@ begin
 	    sky_sigma = 0.0
 	    sky_skew = 0.0
 	    return (AP_OK)
-	} else if (ier != AP_OK) {
-	    return (ier)
+	} else if (iter < 0) {
+	    return (AP_SKY_NOCONVERGE)
 	} else {
 	    return (AP_OK)
 	}

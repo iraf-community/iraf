@@ -14,10 +14,12 @@ int	out		# output file descriptor
 int	stid		# output file sequence number
 
 pointer	sp, cstr, sstr, aperts
-real	fwhmpsf, capert, cthreshold, annulus, dannulus, skysigma, radius, step
+real	fwhmpsf, capert, cthreshold, annulus, dannulus, skysigma
+real	datamin, datamax, radius, step
 int	apstati()
 real	apstatr(), ap_vfwhmpsf(), ap_vcthreshold(), ap_vcapert()
-real	ap_vannulus(), ap_vdannulus(), ap_vsigma(), ap_vstep(), ap_vrpradius()
+real	ap_vannulus(), ap_vdannulus(), ap_vsigma(), ap_vstep()
+real	ap_vdatamin(), ap_vdatamax(), ap_vrpradius()
 
 begin
 	call smark (sp)
@@ -82,6 +84,10 @@ begin
 	# Confirm the step size of profile
 	step = ap_vstep (ap)
 
+	# Confirm the minimum and maximum good data values.
+	datamin = ap_vdatamin (ap)
+	datamax = ap_vdatamax (ap)
+
 	call printf ("\n")
 
 	# Update the database file.
@@ -104,6 +110,10 @@ begin
 	        "standard deviation of 1 sky pixel")
 	    call ap_sparam (out, KY_APERTS, Memc[aperts], UN_APERTS,
 		"list of apertures")
+	    call ap_rparam (out, KY_DATAMIN, datamin, UN_DATAMIN,
+	        "minimum good data value")
+	    call ap_rparam (out, KY_DATAMAX, datamax, UN_DATAMAX,
+	        "maximum good data value")
 	    call ap_rparam (out, KY_RPRADIUS, radius, UN_RPRADIUS,
 	        "fitting radius")
 	    call ap_rparam (out, KY_RPSTEP, step, UN_RPSTEP,

@@ -12,17 +12,15 @@ pointer	im			# pointer to the iraf image
 pointer	out			# output file descriptor
 int	stid			# output file sequence number
 char	cmdstr[ARB]		# command string
-int	newcenterbuf, newcenter	# change centering parameters
-int	newskybuf, newsky	# change sky fitting parameters
-int	newbuf, newfit		# change magnitude parameters
+int	newcenterbuf, newcenter	# new centering parameters ?
+int	newskybuf, newsky	# new sky fitting parameters ?
+int	newbuf, newfit		# new photometry parameters ?
 
-int	ncmd, stat, ip, nchars
+int	ncmd, stat, ip
 pointer	sp, cmd, str
 real	rval
-
 int	strdic(), nscan(), ctowrd()
 real	apstatr()
-
 errchk	immmap
 
 begin
@@ -122,7 +120,8 @@ begin
 		    call pargstr (KY_GAIN)
 		    call pargstr (Memc[str])
 	    } else {
-	        nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE)
+	        if (ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE) <= 0)
+		    Memc[str] = EOS
 		call apsets (ap, GAIN, Memc[str])
 		if (im != NULL)
 		    call ap_padu (im, ap)
@@ -142,7 +141,8 @@ begin
 		    call pargstr (KY_CCDREAD)
 		    call pargstr (Memc[str])
 	    } else {
-	        nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE)
+	        if (ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE) <= 0)
+		    Memc[str] = EOS
 		call apsets (ap, CCDREAD, Memc[str])
 		if (im != NULL)
 		    call ap_rdnoise (im, ap)

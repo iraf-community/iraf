@@ -1,20 +1,30 @@
 # Help directory for the IMRED package.
 
+$doc		= "./doc/"
+
+$argus		= "noao$imred/argus/"
 $bias		= "noao$imred/bias/"
 $ccdred		= "noao$imred/ccdred/"
-$coude		= "noao$imred/coude/"
+$ctioslit	= "noao$imred/ctioslit/"
 $dtoi		= "noao$imred/dtoi/"
 $echelle	= "noao$imred/echelle/"
 $generic	= "noao$imred/generic/"
+$hydra		= "noao$imred/hydra/"
 $iids		= "noao$imred/iids/"
 $irred		= "noao$imred/irred/"
 $irs		= "noao$imred/irs/"
-$msred		= "noao$imred/msred/"
-$specphot	= "noao$imred/specphot/"
+$kpnocoude	= "noao$imred/kpnocoude/"
+$kpnoslit	= "noao$imred/kpnoslit/"
+$specred	= "noao$imred/specred/"
 $vtel		= "noao$imred/vtel/"
 
-observatory	hlp=observatory.hlp,	src=observatory.cl
-#tutor		hlp=tutor.hlp,		src=tutor.cl
+demos		hlp=doc$demos.hlp
+#tutor		hlp=doc$tutor.hlp,		src=tutor.cl
+
+argus		men=argus$argus.men,
+		hlp=..,
+		pkg=argus$argus.hd,
+		src=argus$argus.cl
 
 bias		men=bias$bias.men,
 		hlp=..,
@@ -27,11 +37,10 @@ ccdred		men=ccdred$ccdred.men,
 		pkg=ccdred$ccdred.hd,
 		src=ccdred$ccdred.cl
 
-coude		men=coude$coude.men,
+ctioslit	men=ctioslit$ctioslit.men,
 		hlp=..,
-		sys=coude$coude.hlp,
-		pkg=coude$coude.hd,
-		src=coude$coude.cl
+		pkg=ctioslit$ctioslit.hd,
+		src=ctioslit$ctioslit.cl
 
 dtoi		men=dtoi$dtoi.men,
 		hlp=..,
@@ -49,6 +58,11 @@ generic		men=generic$generic.men,
 		sys=generic$generic.hlp,
 		pkg=generic$generic.hd,
 		src=generic$generic.cl
+
+hydra		men=hydra$hydra.men,
+		hlp=..,
+		pkg=hydra$hydra.hd,
+		src=hydra$hydra.cl
 
 iids		men=iids$iids.men,
 		hlp=..,
@@ -68,17 +82,21 @@ irs		men=irs$irs.men,
 		pkg=irs$irs.hd,
 		src=irs$irs.cl
 
-msred		men=msred$msred.men,
+kpnocoude	men=kpnocoude$kpnocoude.men,
 		hlp=..,
-		sys=msred$msred.hlp,
-		pkg=msred$msred.hd,
-		src=msred$msred.cl
+		pkg=kpnocoude$kpnocoude.hd,
+		src=kpnocoude$kpnocoude.cl
 
-specphot	men=specphot$specphot.men,
+kpnoslit	men=kpnoslit$kpnoslit.men,
 		hlp=..,
-		sys=specphot$specphot.hlp,
-		pkg=specphot$specphot.hd,
-		src=specphot$specphot.cl
+		pkg=kpnoslit$kpnoslit.hd,
+		src=kpnoslit$kpnoslit.cl
+
+specred		men=specred$specred.men,
+		hlp=..,
+		sys=specred$specred.hlp,
+		pkg=specred$specred.hd,
+		src=specred$specred.cl
 
 vtel		men=vtel$vtel.men,
 		hlp=..,

@@ -166,6 +166,33 @@ c                      this is used when nonpositive numbers are plotted
 c                      with log scaling.
 c
 c
+      dimension mfssx(2), mfssy(2), mnsss(9)
+c
+      data mfssx(1)/4h(e10/
+      data mfssx(2)/4h.3) /
+      data mfssy(1)/4h(e10/
+      data mfssy(2)/4h.3) /
+c
+      data mnsss(1)/4hcase/
+      data mnsss(2)/4hintn/
+      data mnsss(3)/4horen/
+      data mnsss(4)/4hcsiz/
+      data mnsss(5)/4hfont/
+      data mnsss(6)/4hdpat/
+      data mnsss(7)/4hssiz/
+      data mnsss(8)/4hcent/
+      data mnsss(9)/4hcolr/
+c
+      do 10 i = 1, 2
+	  mfmtx(i) = mfssx(i)
+10    continue
+      do 11 i = 1, 2
+	  mfmty(i) = mfssy(i)
+11    continue
+      do 12 i = 1, 9
+	  mname(i) = mnsss(i)
+12    continue
+c
 c     data iclrfb/0/, isetfb/0/, ibpw/32/, ifwd/1/
       iclrfb   = 0
       isetfb   = 0
@@ -319,4 +346,17 @@ c     data mjxmax,mjymax,mjxmin,mjymin/0,0,32767,32767/
       mjxmin   = 32767
       mjxmin   = 32767
 c
+c set to unit number for printer
+c
+c     data mprint/6/
+      mprint   = 6
+c
+c set to unit number for plotter
+c
+c     data munit/8/
+      munit     = 8
+c set to smallest positive number on the computer
+c
+c     data small/1.e-25/
+      small     = 1.e-25
       end

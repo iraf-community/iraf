@@ -1,116 +1,116 @@
-      INTEGER FUNCTION LEX (LEXSTR)
-      INTEGER LEXSTR (100)
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER GNBTOK, T, C
-      INTEGER LOOKUP, N
-      INTEGER SDEFA0(8)
-      DATA SDEFA0(1)/100/,SDEFA0(2)/101/,SDEFA0(3)/102/,SDEFA0(4)/97/,SD
-     *EFA0(5)/117/,SDEFA0(6)/108/,SDEFA0(7)/116/,SDEFA0(8)/-2/
-      LEX = GNBTOK (LEXSTR, 100)
-23000 IF (.NOT.(LEX .EQ. 10))GOTO 23002
-23001  LEX = GNBTOK (LEXSTR, 100)
-      GOTO 23000
-23002 CONTINUE
-      IF (.NOT.(LEX .EQ. -1 .OR. LEX .EQ. 59 .OR. LEX .EQ. 123 .OR. LEX 
-     *.EQ. 125))GOTO 23003
-      RETURN
-23003 CONTINUE
-      IF (.NOT.(LEX .EQ. 48))GOTO 23005
-      LEX = -89
-      GOTO 23006
-23005 CONTINUE
-      IF (.NOT.(LEX .EQ. 37))GOTO 23007
-      LEX = -85
-      GOTO 23008
-23007 CONTINUE
-      IF (.NOT.(LEX .EQ.  -166))GOTO 23009
-      LEX = -67
-      GOTO 23010
-23009 CONTINUE
-      IF (.NOT.(LOOKUP (LEXSTR, LEX, RKWTBL) .EQ. 1))GOTO 23011
-      IF (.NOT.(LEX .EQ. -90))GOTO 23013
-      N = -1
-23015 CONTINUE
-      C = NGETCH (C)
-      N = N + 1
-23016 IF (.NOT.(C .NE. 32 .AND. C .NE. 9))GOTO 23015
-23017 CONTINUE
-      CALL PUTBAK (C)
-      T = GNBTOK (LEXSTR, 100)
-      CALL PBSTR (LEXSTR)
-      IF (.NOT.(N .GT. 0))GOTO 23018
-      CALL PUTBAK (32)
-23018 CONTINUE
-      CALL SCOPY (SDEFA0, 1, LEXSTR, 1)
-      IF (.NOT.(T .NE. 58))GOTO 23020
-      LEX = -80
-23020 CONTINUE
-23013 CONTINUE
-      GOTO 23012
-23011 CONTINUE
-      LEX = -80
-23012 CONTINUE
-23010 CONTINUE
-23008 CONTINUE
-23006 CONTINUE
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
-C     SDEFA0  SDEFAULT
+      integer function lex (lexstr)
+      integer lexstr (100)
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer gnbtok, t, c
+      integer lookup, n
+      integer sdefa0(8)
+      data sdefa0(1)/100/,sdefa0(2)/101/,sdefa0(3)/102/,sdefa0(4)/97/,sd
+     *efa0(5)/117/,sdefa0(6)/108/,sdefa0(7)/116/,sdefa0(8)/-2/
+      lex = gnbtok (lexstr, 100)
+23000 if (.not.(lex .eq. 10))goto 23002
+23001  lex = gnbtok (lexstr, 100)
+      goto 23000
+23002 continue
+      if (.not.(lex .eq. -1 .or. lex .eq. 59 .or. lex .eq. 123 .or. lex 
+     *.eq. 125))goto 23003
+      return
+23003 continue
+      if (.not.(lex .eq. 48))goto 23005
+      lex = -89
+      goto 23006
+23005 continue
+      if (.not.(lex .eq. 37))goto 23007
+      lex = -85
+      goto 23008
+23007 continue
+      if (.not.(lex .eq.  -166))goto 23009
+      lex = -67
+      goto 23010
+23009 continue
+      if (.not.(lookup (lexstr, lex, rkwtbl) .eq. 1))goto 23011
+      if (.not.(lex .eq. -90))goto 23013
+      n = -1
+23015 continue
+      c = ngetch (c)
+      n = n + 1
+23016 if (.not.(c .ne. 32 .and. c .ne. 9))goto 23015
+23017 continue
+      call putbak (c)
+      t = gnbtok (lexstr, 100)
+      call pbstr (lexstr)
+      if (.not.(n .gt. 0))goto 23018
+      call putbak (32)
+23018 continue
+      call scopy (sdefa0, 1, lexstr, 1)
+      if (.not.(t .ne. 58))goto 23020
+      lex = -80
+23020 continue
+23013 continue
+      goto 23012
+23011 continue
+      lex = -80
+23012 continue
+23010 continue
+23008 continue
+23006 continue
+      return
+      end
+c     logic0  logical_column
+c     sdefa0  sdefault

@@ -5,7 +5,8 @@
 # With the exceptions of H_EOF and H_NLINES, the control parameters are
 # read only outside the main routine.
 
-define	LEN_CTRLSTRUCT	180
+define	LEN_CTRLSTRUCT	220
+define	SZ_CURPACK	39		# current package
 define	SZ_SECNAME	39		# section name, single section mode
 define	SZ_PARNAME	39		# parameter name
 define	SZ_TEMPLATE	79		# the original modules template
@@ -30,9 +31,10 @@ define	H_QUIT		Memi[$1+15]	# stop program
 define	H_LENTL		Memi[$1+16]	# length of the TL template list
 define	H_ALLMODULES	Memi[$1+17]	# process all modules matching template
 			# (extra space)
-define	H_SECNAME	Memc[P2C($1+20)]	# section name
-define	H_PARNAME	Memc[P2C($1+60)]	# parameter name
-define	H_TEMPLATE	Memc[P2C($1+100)]	# module name template
+define	H_CURPACK	Memc[P2C($1+20)]	# current package
+define	H_SECNAME	Memc[P2C($1+60)]	# section name
+define	H_PARNAME	Memc[P2C($1+100)]	# parameter name
+define	H_TEMPLATE	Memc[P2C($1+140)]	# module name template
 
 # The nomore flag is set whenever the user responds negatively to the more?
 # query.  A nomore at the beginning of a help block or two nomores in a row

@@ -67,6 +67,7 @@ static	char logfile[SZ_FNAME];
 static	int rbufsz, wbufsz;
 static	int t_fileno;
 static	int t_blkno;
+static	int t_acmode;
 static	int verbose;
 static	int status;
 extern	int errno;
@@ -210,6 +211,10 @@ quit:		if (in != stdin)
 		strcpy (o_mtdev, mtdev);
 	    } else if (!strncmp (token, "close", 1)) {
 		close (tape);
+		if (t_acmode) {
+		    t_fileno++;
+		    t_blkno = 0;
+		}
 		mtdev[0] = EOS;
 		errno = 0;
 	    } else if (!strncmp (token, "rew", 3)) {

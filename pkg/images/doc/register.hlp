@@ -1,4 +1,4 @@
-.help register Feb90 images
+.help register Apr92 images
 .ih
 NAME
 register -- transform a list of images from one coordinate system to another
@@ -38,14 +38,14 @@ The minimum and maximum x and y reference values of the output image.
 Xmin, xmax, ymin and ymax default to minimum and maximum values set in GEOMAP,
 and may not extend beyond the bounds of those parameters.
 .le
-.ls xscale = INDEF, yscale = INDEF
+.ls xscale = 1.0, yscale = 1.0
 The output x and y scales in units of reference x and y
 units per pixel, e.g "/ pixel or Angstroms / pixel if the reference
 coordinates
 are arc-seconds or Angstroms. If the reference coordinates are in pixels
-then xscale and yscale are both 1.0 to preserve the scale of the reference
-image.
-If xscale and yscale are undefined, xscale and yscale default to the
+then xscale and yscale should be 1.0 to preserve the scale of the reference
+image. The default is set for pixel coordinates.
+If xscale and yscale are undefined (INDEF), xscale and yscale default to the
 range of the reference coordinates over the range in pixels.
 Xscale and yscale overide the values of ncols and nlines.
 .le
@@ -164,25 +164,27 @@ and bilinear and biquintic interpolation respectively (Vax 11/750 far).
 EXAMPLES
 .ls 4 1.
 Transform an image to the reference coordinate system. The output image
-will have the same number of lines and columns as the input image.
+will have the same scale as the reference image if the reference
+coordinates are in pixels.
 
 .nf
 cl> register input output database transform
 .fi
 .le
 .ls 4 2.
-Transform an image to the reference coordinate system. If the reference
-coordinates were in pixels the output image will be the same size as the
-reference image.
+Transform an image to the reference coordinate system. The scale of the
+output image will be 2.5 reference units per pixel and its size will be
+determined by the xmin, xmax, ymin, ymax parameters as set by the user
+or the default values in the geomap database.
 
 .nf
-cl> register input output database transform xscale=1.0 yscale=1.0
+cl> register input output database transform xscale=2.5 yscale=2.5
 .fi
 .le
 .ls 4 3.
-Correct an image for geometric distortion using a scale of 2 reference units
-per pixel reference unit and bicubic spline interpolation with no flux
-correction. 
+Correct an image for geometric distortion using an output scale of 2
+reference units per pixel reference unit and bicubic spline interpolation
+with no flux correction. 
 
 .nf
 cl> register input output database transform xscale=2. yscale=2. \

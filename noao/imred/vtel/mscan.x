@@ -22,8 +22,8 @@ char	diskfile[SZ_LINE]
 int	filerange[2 * MAX_RANGES + 1]
 int	nfiles, filenumber, recsize, listin
 
-bool	clgetb()
-int	strlen(), decode_ranges(), get_next_number(), mscan()
+bool	clgetb(), mtneedfileno()
+int	decode_ranges(), get_next_number(), mscan()
 int	fntopnb(), clgfil()
 int	mtfile()
 errchk	mscan
@@ -63,7 +63,7 @@ begin
 	    }
 	    call clpcls (listin)
 
-	} else if (input[strlen(input)] == ']') {
+	} else if (mtneedfileno(input) == NO) {
 	    
 	    # This is a tape file and the user specified which file.
 	    iferr (recsize = mscan (input, 0, brief, verbose,
@@ -88,13 +88,7 @@ begin
             while (get_next_number (filerange, filenumber) != EOF) {
 
 	        # Assemble the appropriate tape file name.
-	        call strcpy (input, tapename, SZ_FNAME)
-	        if (mtfile (input) == YES &&
-			input[strlen(input)] != ']') {
-	            call sprintf (tapename[strlen(tapename) + 1], SZ_FNAME,
-		            "[%d]")
-		        call pargi (filenumber)
-	        }
+		call mtfname (input, filenumber, tapename, SZ_FNAME)
 
 	        # Read this file.
 	        iferr {

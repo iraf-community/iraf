@@ -28,8 +28,8 @@ begin
 	    if (ch2 == 'D') {
 		if (IS_DIGIT (card[3])) {
 		    type = TY_CD
-		    axis = TO_INTEG (card[3])
-		    index = TO_INTEG (card[5])
+		    axis = TO_INTEG (card[5])
+		    index = TO_INTEG (card[3])
 		} else if (strncmp (card, "CDELT", 5) == 0) {
 		    type = TY_CDELT
 		    axis = TO_INTEG (card[6])
@@ -71,6 +71,12 @@ begin
 		if (card[3] == 'T' && IS_DIGIT (card[4])) {
 		    type = TY_WATDATA
 		    axis = TO_INTEG (card[4])
+		    if (ctoi (card, ip, index) <= 0)
+			type = ERR
+		} else if (strncmp (card, "WAXMAP", 6) == 0) {
+		    type = TY_WAXMAP
+		    axis = ERR
+		    ip = 7
 		    if (ctoi (card, ip, index) <= 0)
 			type = ERR
 		}

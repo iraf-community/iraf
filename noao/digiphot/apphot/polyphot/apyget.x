@@ -117,8 +117,7 @@ begin
 end
 
 
-# AP_YMKPOLY -- Procedure to mark the coordinates of a polygon
-# on the display device.
+# AP_YMKPOLY -- Mark the coordinates of a polygon on the display device.
 
 int procedure ap_ymkpoly (py, id, x, y, max_nvertices)
 
@@ -136,11 +135,11 @@ real	apstatr(), asumr()
 errchk	gscur
 
 begin
-	# Reopen the device
+	# Reopen the device.
 	if (id != NULL)
 	    call greactivate (id, 0)
 
-	# Initialize
+	# Initialize.
 	call smark (sp)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
 

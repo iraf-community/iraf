@@ -15,6 +15,9 @@ Output spectra when modifying input spectra.  If no output spectra are
 given then existing spectra in the input list are modified directly.
 If an output list is given then it must match in number the input list.
 .le
+.ls ap = 1
+Image line to be created or modified in images of dimension greater than 1.
+.le
 .ls rv = 0.
 Radial velocity (km/s) or redshift, as selected by the parameter \fIz\fR,
 applied to line positions and continuum.  Velocities are converted to
@@ -30,15 +33,25 @@ WHEN CREATING NEW SPECTRA
 .ls title = ""
 Image title to be given to the spectra.  Maximum of 79 characters.
 .le
+.ls format = "onedspec"
+Image spectral to be created.  The choices are "onedspec", "multispec",
+or "echelle".
+.le
 .ls ncols = 512
 Number of columns.
 .le
+.ls naps = 1
+Number of lines or apertures for multispec and echelle format.
+.le
 .ls header = "artdata$stdheader.dat"
-Header keyword data file.  Header keywords are added from this file, if
-defined, to new images created.  Note this applies only to new images.
-The file consists of lines with a keyword, a datatype (one of
-"integer", "real", or "string", usually abbreviated to one character),
-and the parameter value.
+Image or header keyword data file.  If an image is given then the image header
+is copied.  If a file is given then the FITS format cards are copied.
+This only applies to new images.   The data file consists of lines
+in FITS format with leading whitespace ignored.  A FITS card must begin
+with an uppercase/numeric keyword.  Lines not beginning with a FITS
+keyword such as comments or lower case are ignored.  The user keyword
+output of \fBimheader\fR is an acceptible data file.  See \fBmkheader\fR
+for further information.
 .le
 .ls wstart = 4000., wend = 8000.
 Starting and ending wavelengths in Angstroms.  The dispersion is
@@ -54,6 +67,11 @@ Blackbody continuum temperture in Kelvin.  A value of 0 is used if
 no blackbody continuum is desired.  The intensity level is set by
 scaling to the continuum level of the starting wavelength at rest.
 .le
+.ls fnu = no
+Compute the continuum as flux per unit frequency (F-nu) if yes or flux per
+unit wavelength (F-lambda) if no.
+.le
+
 
 LINE PARAMETERS
 .ls lines = ""
@@ -90,6 +108,10 @@ random lines or when the width is missing from the spectral line file.
 Random number seed.
 .le
 
+.ls comments = yes
+Include comments recording task parameters in the image header?
+.le
+
 PACKAGE PARAMETERS
 .ls nxsub = 10
 Number of pixel subsamples used in computing the gaussian spectral line
@@ -102,30 +124,43 @@ the profiles.
 .le
 .ih
 DESCRIPTION
-This task creates or modifies one dimensional spectra with a
-combination of blackbody and linear sloped continuum and emission and
-absorption gaussian profile spectral lines.  A velocity shift may be
-applied to the underlying artificial spectrum which is shifted into the
-specified observed wavelength region.  No noise is included but may be
-added with the task \fBmknoise\fR.  New spectra are created with the
-specified number of pixels, wavelength range, and real datatype.
-Existing spectra may be modified in place or new spectra output.
-Spectra are modified by adding the continuum and lines defined by the
-parameters.
+This task creates or modifies one dimensional spectra in onedspec,
+multispec, or echelle format with a combination of blackbody and linear
+sloped continuum and emission and absorption gaussian profile spectral
+lines.  A velocity shift may be applied to the underlying artificial
+spectrum which is shifted into the specified observed wavelength region.
+No noise is included but may be added with the task \fBmknoise\fR.  New
+spectra are created with the specified number of pixels, wavelength range,
+and real datatype.  For multispec and echelle format an image of the
+specified number of lines is also created though only the line given by the
+\fIap\fR is will have a spectrum.  Existing spectra may be modified in
+place or new spectra output.  Spectra are modified by adding the continuum
+and lines defined by the parameters.
 
-For new images a set of header keywords may be added by specifying a
-data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
-This file contains lines with keyword names, datatype ("integer",
-"real", or "string"), and values.  In addition to these optional
-keywords, parameters for the wavelength coordinates are defined.
-Finally, comments are added to the image header recording the task
+For new images a set of header keywords may be added by specifying an
+image or data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
+If a data file is specified lines beginning with FITS keywords are
+entered in the image header.  Leading whitespace is ignored and any
+lines beginning with words having lowercase and nonvalid FITS keyword
+characters are ignored.  In addition to this optional header,
+parameters for the wavelength coordinates are defined.
+Finally, comments may be added to the image header recording the task
 parameters and any information from the line file which are not
 line definitions.
+
+For multispec and echelle format spectra the task must be executed for
+each image line.  If there is no APNUM keyword it is created with
+whatever values of the dispersion are set.  This lets
+spectra have different wavelength ranges as is allowed by the
+multispec format.  If there is an APNUM keyword it is not modified
+and its dispersion parameters are used (overriding the task parameters
+and the global W0 and WPC image header parameters).
 
 A continuum is defined by the value at the starting wavelength at rest,
 a slope, and a blackbody function of a given temperture.  The blackbody
 function is scaled to have the specified continuum value at the
-starting wavelength at rest.  A zero continuum value or a zero
+starting wavelength at rest.  The blackbody flux units are per unit
+wavelength (F-lambda).  A zero continuum value or a zero
 temperture will not produce a blackbody continuum.
 
 Spectral lines are modeled by gaussian profiles of specified
@@ -263,6 +298,16 @@ in redshift.
 	cl> mk1dspec restspec nl=30
 	cl> mk1dspec redspec rv=3000 nl=30
 	cl> mk1dspec bluespec rv=-.01 z+ nl=30
+.fi
+
+9. Make a multispec image with 5 apertures and a range of redshifts.
+
+.nf
+	cl> mk1dspec spec.ms ap=1 nl=30 rv=0 naps=5 format=multispec
+	cl> mk1dspec spec.ms ap=2 nl=30 rv=1000
+	cl> mk1dspec spec.ms ap=3 nl=30 rv=2000
+	cl> mk1dspec spec.ms ap=4 nl=30 rv=3000
+	cl> mk1dspec spec.ms ap=5 nl=30 rv=4000
 .fi
 .ih
 SEE ALSO

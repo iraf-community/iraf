@@ -124,6 +124,8 @@ struct _bkgjob {
 #define	J_KILLED	04		/* job was killed 		*/
 #define	busy(job)	(jobtable[(job)-1].b_flags & J_RUNNING)
 
+static	bkg_close();
+
 
 /* BKG_INIT -- Setup to execute a background job.  Called by the lexical
  * analyzer when the & is seen.  Read in the bkg control string (anything
@@ -365,7 +367,8 @@ int	pmsg;			/* print event messages		*/
 /* BKG_CLOSE -- Close a bkg job.  Called after determining that the job has
  * terminated.
  */
-static bkg_close (job, pmsg)
+static
+bkg_close (job, pmsg)
 int	job;			/* job ordinal			*/
 int	pmsg;			/* print termination message	*/
 {

@@ -13,6 +13,7 @@ begin
 	EC_NALLOC(ec) = 20
 	EC_NFEATURES(ec) = 0
 	EC_CURRENT(ec) = 0
+	EC_NLINES(ec) = 0
 	EC_LL(ec) = NULL
 	EC_ECF(ec) = NULL
 	EC_LABELS(ec) = 1
@@ -37,8 +38,13 @@ end
 procedure ec_free (ec)
 
 pointer	ec				# ID pointer
+int	i
 
 begin
+	do i = 1, EC_NLINES(ec)
+	    call shdr_close (SH(ec,i))
+	call mfree (EC_SHS(ec), TY_POINTER)
+
 	call mfree (EC_IMAGE(ec), TY_CHAR)
 	call mfree (EC_DATABASE(ec), TY_CHAR)
 	call mfree (EC_COORDLIST(ec), TY_CHAR)

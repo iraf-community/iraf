@@ -1,0 +1,9 @@
+# Parameters for the SEEPSF task
+
+psfimage,f,a,,,,"PSF image name"
+image,f,a,,,,"Output image name"
+dimension,i,h,INDEF,,,"Dimension of the output PSF image"
+xpsf,r,h,INDEF,,,"X distance from the PSF star"
+ypsf,r,h,INDEF,,,"Y distance from the PSF star"
+magnitude,r,h,INDEF,,,"Magnitude of the PSF star"
+mode,s,h,'ql'

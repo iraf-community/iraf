@@ -2,13 +2,13 @@
 
 procedure t_names ()
 
-pointer	odr			# Input record list
+pointer	list			# Input record list
 pointer	append			# String to append to name
 bool	check			# Check existence of image?
 
-int	odr_getim()
+int	imtgetim()
 bool	clgetb()
-pointer	sp, image, im, immap()
+pointer	sp, image, im, imtopenp(), immap()
 
 begin
 	call smark (sp)
@@ -16,12 +16,14 @@ begin
 	call salloc (append, SZ_LINE, TY_CHAR)
 
 	# Get parameters.
-	call odr_open1 ("input", "records", odr)
+	list = imtopenp ("input")
+	call clgstr ("records", Memc[append], SZ_LINE)
+	call odr_openp (list, Memc[append])
 	call clgstr ("append", Memc[append], SZ_LINE)
 	check = clgetb ("check")
 
 	# Loop over all input images - print name on STDOUT
-	while (odr_getim (odr, Memc[image], SZ_FNAME) != EOF) {
+	while (imtgetim (list, Memc[image], SZ_FNAME) != EOF) {
 	    # Open image if check for existence required
 	    if (check) {
 		ifnoerr (im = immap (Memc[image], READ_ONLY, 0)) {
@@ -38,6 +40,6 @@ begin
 	    call flush (STDOUT)
 	}
 
-	call odr_close (odr)
+	call imtclose (list)
 	call sfree (sp)
 end

@@ -53,26 +53,19 @@ begin
 	    call apnscolon (ap, im, out, stid, cmdstr, newcenterbuf,
 	        newcenter, newskybuf, newsky, newmagbuf, newmag)
 	else
-	    call aphimcolon (ap, out, stid, cmdstr, newcenterbuf, newcenter,
-	        newskybuf, newsky, newmagbuf, newmag)
+	    call ap_himcolon (ap, cmdstr)
 
 	call sfree (sp)
 end
 
 
-# APHIMCOLON -- Procedure to process commands which alter the centering, sky
+# AP_HIMCOLON -- Procedure to process commands which alter the centering, sky
 # fitting and photometry buffers.
 
-procedure aphimcolon (ap, out, stid, cmdstr, newcenterbuf, newcenter,
-    newskybuf, newsky, newmagbuf, newmag)
+procedure ap_himcolon (ap, cmdstr)
 
 pointer	ap			# pointer to the apphot structure
-int	out			# output file descriptor
-int	stid			# list id
 char	cmdstr[ARB]		# command string
-int	newcenterbuf, newcenter	# centering parameters
-int	newskybuf, newsky	# skyfitting parameters
-int	newmagbuf, newmag	# magnitude parameters
 
 bool	bval
 int	ncmd

@@ -99,7 +99,7 @@ begin
 	$endif
 	call alta$t (x, Mem$t[sx], npts, k1, k2)
 	call amov$t (Mem$t[sx], Mem$t[pnm1], npts)
-	call amulk$t (Mem$t[sx], 2., Mem$t[sx], npts)
+	call amulk$t (Mem$t[sx], 2$f, Mem$t[sx], npts)
 	do i = 3, order {
 	    call amul$t (Mem$t[sx], Mem$t[pnm1], Mem$t[pn], npts)
 	    call asub$t (Mem$t[pn], Mem$t[pnm2], Mem$t[pn], npts)

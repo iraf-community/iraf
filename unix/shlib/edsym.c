@@ -82,12 +82,14 @@ char	*argv[];
 #endif
 
 	unsigned *vec;
-	char	*fname, *shlib, *ip;
+	char	*fname, *shlib, *ip, *oop, *out;
 	int	fd, nsym, nosym, arg;
 	int	errcode = 0;
-	char	tempfile[128];
+	char	tempfile[256];
+	char	shpath[256];
 	struct	nlist nl[3];
 	FILE	*fp, *tp;
+	int	version;
 
 	if (argc < 3) {
 	    fprintf (stderr, "Usage: edsym <file> <shlib> [-dkntT]\n");
@@ -152,6 +154,44 @@ char	*argv[];
 	    }
 #endif
 	}
+
+	/* Get the shared image version number.  This is stored in the
+	 * first element of the ushlib vector in the file being edited.
+	 */
+#ifdef i386
+	nl[0].n_name = "ushlib_";
+	nl[1].n_name = NULL;
+#else
+	nl[0].n_un.n_name = "_ushlib_";
+	nl[1].n_un.n_name = NULL;
+#endif
+	if (nlist (fname, nl) != 0) {
+	    fprintf (stderr, "cannot read name list from %s\n", fname);
+	    exit (4);
+	}
+
+#ifdef i386
+	lseek (fileno(fp), (unsigned)nl[0].n_value - 0x1000, L_SET);
+#else
+	lseek (fileno(fp), (unsigned)nl[0].n_value - PAGSIZ, L_SET);
+#endif
+	if (read (fileno(fp), &version, sizeof(version)) != sizeof(version)) {
+	    fprintf (stderr,
+		"cannot read shared image version number from %s\n", fname);
+	    exit (9);
+	}
+
+	/* Use the correct version of the shared image. */
+	for (ip=shlib, out=oop=shpath;  *oop = *ip++;  oop++)
+	    if (*oop == '/')
+		out = oop + 1;
+	if (strcmp (out, "S.e") == 0) {
+	    sprintf (out, "S%d.e", version);
+	    shlib = shpath;
+	}
+
+	if (debug)
+	    printf ("use shared image %s\n", shlib);
 
 	/* Get the location of the shared image transfer vector. */
 #ifdef i386

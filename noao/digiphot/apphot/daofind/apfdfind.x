@@ -6,14 +6,13 @@ define	HELPFILE	"apphot$daofind/daofind.key"
 
 # AP_FDFIND -- Find objects in an image interactively.
 
-int procedure ap_fdfind (cnvname, ap, im, gd, mgd, id, out, boundary, constant,
+int procedure ap_fdfind (cnvname, ap, im, gd, id, out, boundary, constant,
         save, interactive)
 
 char	cnvname[ARB]		# name of convolved image
 pointer ap			# pointer to the apphot structure
 pointer	im			# pointer to the IRAF image
 pointer	gd			# pointer to the graphics stream
-pointer	mgd			# pointer to the plot metacode stream
 pointer	id			# pointer to the image display stream
 int	out			# output file descriptor
 int	boundary		# type of boundary extension
@@ -37,7 +36,7 @@ begin
 	# Initialize cursor command.
 	key = ' '
 	Memc[cmd] = EOS
-	call strcpy (" ", Memc[root], TY_CHAR)
+	call strcpy (" ", Memc[root], SZ_FNAME)
 
 	# Initialize fitting parameters.
 	cnv = NULL

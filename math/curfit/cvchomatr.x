@@ -38,9 +38,9 @@ begin
 	do n = 1, nrows {
 
 	    # test to see if matrix is singular
-	    if(((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= 100. * EPSILONR) {
+	    if(((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= 10. * EPSILONR) {
 		do j = 1, nbands
-		    matfac[j,n] = 0.
+		    matfac[j,n] = real (0.0)
 		ier = SINGULAR
 		next
 	    }

@@ -14,6 +14,14 @@
 static	int lastsig;
 extern	int pr_onint();
 
+#ifdef SYSV
+#define	vfork	fork
+#else
+#  ifdef sun
+#  include <vfork.h>
+#  endif
+#endif
+
 
 /* ZOSCMD -- Send a (machine dependent) command to the host operating
  * system.  If nonnull stdout or stderr filenames are given, try to spool
@@ -76,7 +84,7 @@ XINT	*status;
 	    }
 
 	    if (*sout != EOS) {					/* stdout */
-		fd = creat (sout, FILE_MODEBITS);
+		fd = creat (sout, _u_fmode(FILE_MODEBITS));
 		if (fd == ERR)
 		    fprintf (stderr, "cannot create `%s'\n", sout);
 		else {
@@ -91,7 +99,7 @@ XINT	*status;
 		if (strcmp (sout, serr) == 0) {
 		    close (2); dup (1);
 		} else {
-		    fd = creat (serr, FILE_MODEBITS);
+		    fd = creat (serr, _u_fmode(FILE_MODEBITS));
 		    if (fd == ERR)
 			fprintf (stderr, "cannot create `%s'\n", serr);
 		    else {

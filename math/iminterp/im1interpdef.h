@@ -21,10 +21,18 @@ define	ASI_SAVENCOEFF	$1[2]
 define	ASI_SAVEOFFSET	$1[3]
 define	ASI_SAVECOEFF	3
 
+# define the sinc function truncation length, taper and precision parameters
+
+define	NSINC		30 		# the sinc truncation length
+define	NTAPER		25 		# the start of the sinc taper
+define	STAPER		0.2		# the slope of the taper
+define	DX		0.001		# interpolation minimum
+
 # define number of points used in spline interpolation for ARIEVAL, ARIDER
 # and ARBPIX
 
 define	SPLPTS		16
+
 
 # miscellaneous
 

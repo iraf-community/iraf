@@ -47,5 +47,5 @@ TIME REQUIREMENTS
 BUGS
 .ih
 SEE ALSO
-imgets
+imgets, hedit, hselect
 .endhelp

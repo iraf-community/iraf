@@ -1,21 +1,28 @@
+include	<error.h>
+include	"../shdr.h"
+
 define	VLIGHT		2.997925e18
 
 # CONFNU -- Convert to FNU from FLAMBDA
 
-procedure confnu (pix, w0, wpc, npts)
+procedure confnu (sh)
 
-real	pix[ARB], w0, wpc
-int	npts
+pointer	sh			# SHDR pointer
 
 int	i
-real	w
+real	lambda
+pointer	ang, un_open()
+errchk	un_open, un_ctranr
 
 begin
-	if (IS_INDEF (w0) || IS_INDEF(wpc))
-	    return
+	ang = un_open ("angstroms")
+	iferr {
+	    do i = 0, SN(sh)-1 {
+		call un_ctranr (UN(sh), ang, Memr[SX(sh)+i], lambda, 1)
+		Memr[SY(sh)+i] = Memr[SY(sh)+i] * lambda**2 / VLIGHT
+	    }
+	} then
+	    call erract (EA_WARN)
 
-	do i = 1, npts {
-	    w = w0 + (i-1) * wpc
-	    pix[i] = pix[i] * w**2 / VLIGHT
-	}
+	call un_close (ang)
 end

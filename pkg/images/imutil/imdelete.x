@@ -8,12 +8,12 @@ include	<error.h>
 
 procedure t_imdelete()
 
-int	list
 bool	verify
-pointer	sp, tty, imname
+int	list, nchars
+pointer	sp, tty, imname, im
 
-pointer	ttyodes()
-int	imtopenp(), imtgetim(), imaccess()
+pointer	ttyodes(), immap()
+int	imtopenp(), imtgetim(), imaccess(), strlen()
 bool	clgetb()
 
 begin
@@ -41,11 +41,28 @@ begin
 		# most recent response).
 
 		call clputb ("go_ahead", clgetb ("default_action"))
+
+		# Output prompt, with image name.
 		call printf ("delete image ")
 		call ttyso (STDOUT, tty, YES)
 		call printf ("`%s'")
 		    call pargstr (Memc[imname])
 		call ttyso (STDOUT, tty, NO)
+
+		# Include portion of image title in prompt.
+		ifnoerr (im = immap (Memc[imname], READ_ONLY, 0)) {
+		    nchars = strlen (IM_TITLE(im))
+		    if (nchars > 0) {
+			call printf (" - %0.28s")
+			    call pargstr (IM_TITLE(im))
+			if (nchars > 28)
+			    call printf ("...")
+		    }
+		    iferr (call imunmap (im))
+			;
+		}
+
+		# Do the query.
 		if (! clgetb ("go_ahead"))
 		    next
 	    }

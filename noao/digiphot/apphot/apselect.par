@@ -1,8 +1,0 @@
-# APSELECT PARAMETERS
-
-textfile,s,a,,,,apphot output textfile(s)
-fields,s,a,,,,fields to be extracted
-expr,s,a,yes,,,boolean expression
-savepars,b,h,no,,,save the parameters
-format,b,h,no,,,format the output file
-mode,s,h,"ql",,,mode of task

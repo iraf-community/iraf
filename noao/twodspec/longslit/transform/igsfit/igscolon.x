@@ -104,6 +104,6 @@ begin
 		call pargr (ymax)
 		call pargr (xgseval (sf, xmax, ymax))
 	default:
-	    call printf ("\07\n")
+	    call printf ("Unrecognized or ambiguous command\007")
 	}
 end

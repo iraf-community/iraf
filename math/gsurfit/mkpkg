@@ -39,7 +39,7 @@ tfiles:
 
 libgsurfit.a:
 
-	$ifeq (USE_GENERIC, YES) $call tfiles $endif
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
 
 	gs_b1evalr.x	
 	gs_bevalr.x	

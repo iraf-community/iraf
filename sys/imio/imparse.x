@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<ctype.h>
 
 # IMPARSE -- Parse an image specification into the cluster name, cluster index,
@@ -29,11 +30,16 @@ int	sz_section		# max chars in image section name
 int	cl_index		# receives cluster index (default 0)
 int	cl_size			# receives cluster size (default 0)
 
-bool	is_ksection
+pointer	sp, cp, secbuf
 int	ip, op, lbrack, level, ch, n
+bool	is_ksection, sect_out, ksect_out
 int	stridx()
+errchk	syserrs
 
 begin
+	call smark (sp)
+	call salloc (secbuf, SZ_LINE, TY_CHAR)
+
 	ip = 1
 	op = 1
 
@@ -60,8 +66,10 @@ begin
 	cl_index    = 0
 	cl_size     = 0
 
-	if (ch == EOS)
+	if (ch == EOS) {
+	    call sfree (sp)
 	    return
+	}
 
 	# If we have a [...] field, determine whether it is a cl_index
 	# subscript or a kernel or image section.  A cl_index subscript is
@@ -69,7 +77,7 @@ begin
 	# kernel or image section.
 
 	ip = ip + 1
-	n  = 0
+	n = 0
 
 	for (ch=imspec[ip];  ch != EOS;  ch=imspec[ip]) {
 	    if (IS_DIGIT(ch)) {
@@ -97,11 +105,14 @@ begin
 	# The rest of the input string consists of the kernel and image
 	# sections, if any.
 
-	is_ksection = false
-	level = 0
-	op = 1
+	sect_out = false
+	ksect_out = false
 
-	if (imspec[ip] == '[') {
+	while (imspec[ip] == '[') {
+	    is_ksection = false
+	    cp = secbuf
+	    level = 0
+
 	    for (ch=imspec[ip];  ch != EOS;  ch=imspec[ip]) {
 		if (ch == '[')
 		    level = level + 1
@@ -111,18 +122,32 @@ begin
 		    if (stridx (imspec[ip], " 0123456789+-:*,") == 0)
 			is_ksection = true
 
-		section[op] = ch
-		op = min (sz_section, op + 1)
+		Memc[cp] = ch
+		cp = cp + 1
 		ip = ip + 1
 
 		if (level == 0)
 		    break
 	    }
-	    section[op] = EOS
+	    Memc[cp] = EOS
+
+	    if (level != 0)
+		call syserrs (SYS_IMSYNSEC, imspec)
+	    if (is_ksection) {
+		if (ksect_out)
+		    call syserrs (SYS_IMSYNSEC, imspec)
+		call strcpy (Memc[secbuf], ksection, sz_ksection)
+		ksect_out = true
+	    } else {
+		if (sect_out)
+		    call syserrs (SYS_IMSYNSEC, imspec)
+		call strcpy (Memc[secbuf], section, sz_section)
+		sect_out = true
+	    }
+
+	    while (imspec[ip] != EOS && imspec[ip] != '[')
+		ip = ip + 1
 	}
 
-	if (is_ksection) {
-	    call strcpy (section, ksection, sz_ksection)
-	    call strcpy (imspec[ip], section, sz_section)
-	}
+	call sfree (sp)
 end

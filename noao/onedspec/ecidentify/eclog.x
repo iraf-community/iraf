@@ -28,7 +28,7 @@ begin
 	call fprintf (fd, "Features identified in image %s.\n")
 	    call pargstr (Memc[EC_IMAGE(ec)])
 
-	call fprintf (fd, "      %3s %4s %5s %8s %10s %10s %10s %6s\n")
+	call fprintf (fd, "      %3s %4s %5s %8s %10s %10s %10s %6s %6d\n")
 	    call pargstr ("Ap")
 	    call pargstr ("Line")
 	    call pargstr ("Order")
@@ -37,14 +37,15 @@ begin
 	    call pargstr ("User")
 	    call pargstr ("Residual")
 	    call pargstr ("Fwidth")
+	    call pargstr ("Reject")
 
 	rms = 0.
 	nrms = 0
 	do i = 1, EC_NFEATURES(ec) {
 	    call fprintf (fd,
-		"%5d %3d %4d %5d %8.2f %10.8g %10.8g %10.8g %6.2f\n")
+		"%5d %3d %4d %5d %8.2f %10.8g %10.8g %10.8g %6.2f %6b\n")
 		call pargi (i)
-		call pargi (AP(ec,i))
+		call pargi (APN(ec,i))
 		call pargi (LINE(ec,i))
 		call pargi (ORDER(ec,i))
 		call pargd (PIX(ec,i))
@@ -54,11 +55,17 @@ begin
 		    call pargd (USER(ec,i))
 		else {
 		    resid = FIT(ec,i) - USER(ec,i)
-		    rms = rms + resid ** 2
-		    nrms = nrms + 1
 		    call pargd (resid)
+		    if (FTYPE(ec,i) > 0) {
+			rms = rms + resid ** 2
+			nrms = nrms + 1
+		    }
 		}
 		call pargr (FWIDTH(ec,i))
+		if (FTYPE(ec,i) > 0)
+		    call pargb (false)
+		else
+		    call pargb (true)
 	}
 
 	if (nrms > 1) {

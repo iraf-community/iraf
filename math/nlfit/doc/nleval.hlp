@@ -1,0 +1,35 @@
+.help nleval Feb91 "Nlfit Package"
+.ih
+NAME
+nleval -- evaluate the fitted function at a single point
+.ih
+SYNOPSIS
+z = nleval[rd] (nl, x, nvars)
+
+.nf
+pointer		nl		# curve descriptor
+real/double	x[nvars]	# array of variables
+int		nvars		# the number of variables
+.fi
+.ih
+ARGUMENTS
+.ls nl    
+Pointer to the curve descriptor structure.
+.le
+.ls x   
+Array of variable values at which the curve is to be evaluated.
+.le
+.ls nvars
+The number of variables.
+.le
+.ih
+DESCRIPTION
+Evaluate the curve at the specified point. NLEVAL is a real or double
+function which returns the fitted z value.
+.ih
+NOTES
+NLEVAL uses the parameter array stored in the curve descriptor structure.
+.ih
+SEE ALSO
+nlvector
+.endhelp

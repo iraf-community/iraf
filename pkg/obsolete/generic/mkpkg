@@ -1,0 +1,22 @@
+# Make IMARITH.
+
+$checkout libpkg.a pkg$images/
+$update   libpkg.a
+$checkin  libpkg.a pkg$images/
+$exit
+
+libpkg.a:
+	imcasigclip.x	<imhdr.h>
+	imcaverage.x	<imhdr.h>
+	imccopy.x	<imhdr.h>
+	imcmaxrej.x	<imhdr.h>
+	imcmedian.x	<imhdr.h>
+	imcminrej.x	<imhdr.h>
+	imcmmrej.x	<imhdr.h>
+	imcmode.x	<imhdr.h>
+	imcombine.x	<error.h> <imhdr.h> <imset.h>
+	imcsigclip.x	<imhdr.h>
+	imcsum.x	<imhdr.h>
+	imcthresh.x	<imhdr.h>
+	sigma.x	
+	;

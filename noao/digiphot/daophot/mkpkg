@@ -1,0 +1,55 @@
+# DAOPHOT libraries
+
+$call relink
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+
+relink:
+	$omake x_daophot.x
+	$ifdef (tables)
+	    !mkpkg -p noao -p tables trelink
+	$else
+	    $call tundefined
+	$endif
+	;
+
+linkonly:
+	$ifdef (tables)
+	    !mkpkg -p noao -p tables trelink
+	$else
+	    $call tundefined
+	$call install
+	;
+
+install:
+	$move xx_daophot.e noaobin$x_daophot.e
+	;
+
+trelink:
+	$set LIBS = "-lncar -lgks -ltbtables -lxtools"
+	$update libpkg.a
+	$link x_daophot.o libpkg.a ../lib/libpttables.a $(LIBS) -o xx_daophot.e
+	;
+
+tundefined:
+	$echo "cannot find file tbset.h"
+	$echo "tbtables library is not defined"
+	$echo "cannot build xx_daophot.e"
+	;
+
+libpkg.a:
+	@allstar
+	@addstar
+	@daolib
+	@group
+	@grpselect
+	@nstar
+	@peak
+	@psf
+	@seepsf
+	@substar
+	;

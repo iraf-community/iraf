@@ -17,9 +17,11 @@ read, the ordinal of the text file in \fBinput\fR
 is appended to \fIoutput\fR to generate a unique image name.
 .le
 .ls otype = ""
-The data type of the output IRAF image pixels.  If the IRAFTYPE keyword
-is found in the FITS header, it will supply a default value for \fBotype\fR.
-Otherwise, the user wil be queried.
+The data type of the output IRAF image pixels.  If left unset and the IRAFTYPE
+keyword is found in the FITS header, output pixels will be of type IRAFTYPE.
+If IRAFTYPE appears more than once in the FITS header, the last value of 
+IRAFTYPE is used.  If left unset and the IRAFTYPE keyword is not provided in
+the FITS header, the output data type is determined from the pixels themselves.
 .le
 .ls header = yes
 If \fBheader\fR = yes, \fIrtextimage\fR will attempt to read a FITS

@@ -1,7 +1,10 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<error.h>
 include	<ctype.h>
 include	<pkg/rg.h>
+
+define	NRGS	10		# Allocation size
 
 # RG_RANGES -- Parse a range string.  Return a pointer to the ranges.
 
@@ -10,101 +13,125 @@ pointer procedure rg_ranges (rstr, rmin, rmax)
 char	rstr[ARB]		# Range string
 int	rmin			# Minimum value
 int	rmax			# Maximum value
+pointer	rg			# Range pointer
 
-pointer	rg			# Ranges
-int	nrgs			# Number of ranges
-
-int	i, x1, x2, ctoi()
+int	i, fd, strlen(), open(), getline()
+pointer	sp, str, ptr
+errchk	open, rg_add
 
 begin
-	# Check for a valid string and deterimine the number of ranges.
+	call smark (sp)
+	call salloc (str, max (strlen (rstr), SZ_LINE), TY_CHAR)
+	call calloc (rg, LEN_RG, TY_STRUCT)
 
 	i = 1
-	nrgs = 0
-
 	while (rstr[i] != EOS) {
 
-	    # Skip delimiters
-	    while (IS_WHITE(rstr[i]) || (rstr[i]==',') || (rstr[i]=='\n'))
+	    # Find beginning and end of a range and copy it to the work string
+	    while (IS_WHITE(rstr[i]) || rstr[i]==',' || rstr[i]=='\n')
 	        i = i + 1
-
-	    # Check for end of string.
-
 	    if (rstr[i] == EOS)
 		break
 
-	    # First character must be a *, -, or digit.
+	    ptr = str
+	    while (!(IS_WHITE(rstr[i]) || rstr[i]==',' || rstr[i]=='\n' ||
+		rstr[i]==EOS)) {
+		Memc[ptr] = rstr[i]
+	        i = i + 1
+		ptr = ptr + 1
+	    }
+	    Memc[ptr] = EOS
 
-	    if ((rstr[i] == '*') || (rstr[i] == '-') || IS_DIGIT(rstr[i])) {
-		i = i + 1
-	        nrgs = nrgs + 1
-
-		# Remaining characters must be :, -, or digits.
-	        while ((rstr[i]==':') || (rstr[i]=='-') || IS_DIGIT(rstr[i]))
-		    i = i + 1
-	    } else
-		call error (0, "Syntax error in range string")
+	    # Add range(s)
+	    iferr {
+		if (Memc[str] == '@') {
+		    fd = open (Memc[str+1], READ_ONLY, TEXT_FILE)
+		    while (getline (fd, Memc[str]) != EOF) {
+			iferr (call rg_add (rg, Memc[str], rmin, rmax))
+			    call erract (EA_WARN)
+		    }
+		    call close (fd)
+		} else
+		    call rg_add (rg, Memc[str], rmin, rmax)
+	    } then
+		call erract (EA_WARN)
 	}
 
-	# Allocate memory for the ranges.
+	call sfree (sp)
+	return (rg)
+end
 
-	call malloc (rg, LEN_RG + 2 * max (1, nrgs), TY_STRUCT)
 
-	# Rescan the string and set the ranges.
+# RG_ADD -- Add a range
+
+procedure rg_add (rg, rstr, rmin, rmax)
+
+pointer	rg			# Range descriptor
+char	rstr[ARB]		# Range string
+int	rmin			# Minimum value
+int	rmax			# Maximum value
+
+int	i, j, nrgs, strlen(), ctoi()
+int	rval1, rval2
+pointer	sp, str, ptr
+
+begin
+	call smark (sp)
+	call salloc (str, strlen (rstr), TY_CHAR)
 
 	i = 1
-	nrgs = 0
-
 	while (rstr[i] != EOS) {
 
-	    # Skip delimiters.
-	    while (IS_WHITE(rstr[i]) || (rstr[i]==',') || (rstr[i]=='\n'))
+	    # Find beginning and end of a range and copy it to the work string
+	    while (IS_WHITE(rstr[i]) || rstr[i]==',' || rstr[i]=='\n')
 	        i = i + 1
-
-	    # Check for end of string.
-
 	    if (rstr[i] == EOS)
 		break
 
-	    # If first character is * then set range to full range.
-	    # Otherwise parse the range.
+	    ptr = str
+	    while (!(IS_WHITE(rstr[i]) || rstr[i]==',' || rstr[i]=='\n' ||
+		rstr[i]==EOS)) {
+		if (rstr[i] == ':')
+		    Memc[ptr] = ' '
+		else
+		    Memc[ptr] = rstr[i]
+	        i = i + 1
+		ptr = ptr + 1
+	    }
+	    Memc[ptr] = EOS
 
-	    if (rstr[i] == '*') {
-		i = i + 1
-		x1 = rmin
-		x2 = rmax
-
+	    # Parse range
+	    if (Memc[str] == '@')
+		call error (1, "Cannot nest @files")
+	    else if (Memc[str] == '*') {
+		rval1 = rmin
+		rval2 = rmax
 	    } else {
-		# First digit is starting value.
-		if (ctoi (rstr, i, x1) == 0) {
-		    nrgs = 0
-		    break
-		}
-		x2 = x1
-
-		# Check for an ending value for the range.
-		if (rstr[i] == ':') {
-		    i = i + 1
-		    if (ctoi (rstr, i, x2) == 0) {
-			nrgs = 0
-			break
-		    }
-		}
+		# Get range
+		j = 1
+		if (ctoi (Memc[str], j, rval1) == 0)
+		    call error (1, "Range syntax error")
+		rval2 = rval1
+		if (ctoi (Memc[str], j, rval2) == 0)
+		    ;
 	    }
 
 	    # Check limits.
-	    if ((max (x1, x2) >= rmin) && (min (x1, x2) <= rmax)) {
+	    j = rval1
+	    rval1 = min (j, rval2)
+	    rval2 = max (j, rval2)
+	    if (rval2 >= rmin && rval1 <= rmax) {
+		nrgs = RG_NRGS(rg)
+		if (mod (nrgs, NRGS) == 0)
+		    call realloc (rg, LEN_RG+2*(nrgs+NRGS), TY_STRUCT)
 		nrgs = nrgs + 1
-		RG_X1(rg, nrgs) = max (rmin, min (rmax, x1))
-		RG_X2(rg, nrgs) = max (rmin, min (rmax, x2))
+		RG_NRGS(rg) = nrgs
+		RG_X1(rg, nrgs) = max (rmin, rval1)
+		RG_X2(rg, nrgs) = min (rmax, rval2)
+		RG_NPTS(rg) = RG_NPTS(rg) +
+		    abs (RG_X1(rg, nrgs) - RG_X2(rg, nrgs)) + 1
 	    }
 	}
 
-	RG_NRGS(rg) = nrgs
-	RG_NPTS(rg) = 0
-	do i = 1, RG_NRGS(rg)
-	    RG_NPTS(rg) = RG_NPTS(rg) +
-		abs (RG_X1(rg, i) - RG_X2(rg, i)) + 1
-
-	return (rg)
+	call sfree (sp)
 end

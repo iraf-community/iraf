@@ -78,43 +78,48 @@ struct task {
 #define	CH_INVIS	'_'
 
 /* t_flags */
-#define	T_SCRIPT	0000001	/* means t_ltp->lt_flags & LT_SCRIPT >0	*/
-#define	T_CL		0000002	/* means that t_ltp == firstask->t_ltp	*/
-#define	T_INTERACTIVE	0000004	/* T_CL && t_stdio == real stdio	*/
-#define	T_BUILTIN	0000010	/* task is built in; see builtin.c	*/
-#define	T_FOREIGN	0000020	/* host task, a type of builtin		*/
-#define	T_PSET		0000040	/* pset (parameter set) task		*/
-#define	T_PKGCL		0000100	/* task is name of a loaded package	*/
-#define	T_CLEOF		0000200	/* cl() with EOF on current stream	*/
-#define	T_TIMEIT	0000400	/* print time consumed by task		*/
+#define	T_SCRIPT	00000001 /* means t_ltp->lt_flags & LT_SCRIPT >0*/
+#define	T_CL		00000002 /* means that t_ltp == firstask->t_ltp	*/
+#define	T_INTERACTIVE	00000004 /* T_CL && t_stdio == real stdio	*/
+#define	T_BUILTIN	00000010 /* task is built in; see builtin.c	*/
+#define	T_FOREIGN	00000020 /* host task, a type of builtin	*/
+#define	T_PSET		00000040 /* pset (parameter set) task		*/
+#define	T_PKGCL		00000100 /* task is name of a loaded package	*/
+#define	T_CLEOF		00000200 /* cl() with EOF on current stream	*/
+#define	T_TIMEIT	00000400 /* print time consumed by task		*/
 
 
 /* These flags are set by the opcodes that change a newtask's pseudofile,
  * such as SETSTDOUT.  Only when the flag is set will the file then be
  * closed by a "bye" or eof from the ltask by clbye().
  */
-#define	T_MYOUT		0001000	/* t_stdout was set to exec this task	*/
-#define	T_MYIN		0002000	/* t_stdin             "		*/
-#define	T_MYERR		0004000	/* t_stderr	       "		*/
-#define	T_MYSTDGRAPH	0010000	/* t_stdgraph	       "		*/
-#define	T_MYSTDIMAGE	0020000	/* t_stdimage	       "		*/
-#define	T_MYSTDPLOT	0040000	/* t_stdplot	       "		*/
-#define	T_STDINB	0100000	/* stdin is binary			*/
-#define	T_STDOUTB	0200000	/* stdout is binary			*/
-#define	T_APPEND	0400000	/* append output of foreign task	*/
+#define	T_MYOUT		00001000 /* t_stdout was set to exec this task	*/
+#define	T_MYIN		00002000 /* t_stdin             "		*/
+#define	T_MYERR		00004000 /* t_stderr	        "		*/
+#define	T_MYSTDGRAPH	00010000 /* t_stdgraph	        "		*/
+#define	T_MYSTDIMAGE	00020000 /* t_stdimage	        "		*/
+#define	T_MYSTDPLOT	00040000 /* t_stdplot	        "		*/
+#define	T_IPCIO		00100000 /* t_stdout redirected to t_out	*/
+#define	T_STDINB	00200000 /* stdin is binary			*/
+#define	T_STDOUTB	00400000 /* stdout is binary			*/
+#define	T_APPEND	01000000 /* append output of foreign task	*/
 
 /* This flag is set by execnewtask() when a task begins running, and is
  * cleared by iofinish() when the task's i/o is closed down.  Provided so
  * that we can call iofinish at several points during error recovery without
  * trying to close files more than once.
  */
-#define	T_RUNNING	01000000
+#define	T_RUNNING	02000000
 
 /* When this bit is set we are running unattended as a background cl.
  * Seeing this bit on will prevent pfile writes and all errors and signals
  * will cause immediate io flushing and exit.
  */
-#define	T_BATCH		02000000
+#define	T_BATCH		04000000
+
+/* IPCIO definitions. */
+#define	IPCOUT		"IPC$IPCIO-OUT"
+#define	IPCDONEMSG	"# IPC$IPCIO-FINISHED\n"
 
 
 /* Struct LTASK -- One of these is created at the top of the dictionary and

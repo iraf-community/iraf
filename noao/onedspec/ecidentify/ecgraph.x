@@ -36,7 +36,7 @@ begin
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (x, EC_NPTS(ec), TY_REAL)
-	call salloc (y, EC_NPTS(ec), TY_REAL)
+	y = EC_IMLINE(ec)
 
 	call sprintf (Memc[str], SZ_LINE,
 	    "Aperture %d, Image line %d, Order %d")
@@ -45,7 +45,6 @@ begin
 	    call pargi (EC_ORDER(ec))
 	call gt_sets (EC_GT(ec), GTPARAMS, Memc[str])
 	call achtdr (FITDATA(ec,1), Memr[x], EC_NPTS(ec))
-	call achtdr (IMDATA(ec,1), Memr[y], EC_NPTS(ec))
 
 	call gclear (EC_GP(ec))
 	xmin = min (Memr[x], Memr[x+EC_NPTS(ec)-1])
@@ -58,7 +57,7 @@ begin
 	call gt_plot (EC_GP(ec), EC_GT(ec), Memr[x], Memr[y], EC_NPTS(ec))
 
 	do i = 1, EC_NFEATURES(ec)
-	    if (AP(ec,i) == EC_AP(ec))
+	    if (APN(ec,i) == EC_AP(ec))
 	        call ec_mark (ec, i)
 
 	call sfree (sp)
@@ -79,13 +78,12 @@ begin
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (x, EC_NPTS(ec), TY_REAL)
-	call salloc (y, EC_NPTS(ec), TY_REAL)
+	y = EC_IMLINE(ec)
 
 	call sprintf (Memc[str], SZ_LINE, "Order %d")
 	    call pargi (EC_AP(ec))
 	call gt_sets (EC_GT(ec), GTPARAMS, Memc[str])
 	call achtdr (FITDATA(ec,1), Memr[x], EC_NPTS(ec))
-	call achtdr (IMDATA(ec,1), Memr[y], EC_NPTS(ec))
 
 	xmin = real (FIT(ec,EC_CURRENT(ec))) - EC_ZWIDTH(ec) / 2.
 	xmax = real (FIT(ec,EC_CURRENT(ec))) + EC_ZWIDTH(ec) / 2.
@@ -109,7 +107,7 @@ begin
 	call gt_plot (EC_GP(ec), EC_GT(ec), Memr[x], Memr[y], EC_NPTS(ec))
 
 	do i = 1, EC_NFEATURES(ec)
-	    if (AP(ec,i) == EC_AP(ec))
+	    if (APN(ec,i) == EC_AP(ec))
 	        call ec_mark (ec, i)
 
 	call sfree (sp)
@@ -130,12 +128,11 @@ begin
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (x, npts, TY_REAL)
-	call salloc (y, npts, TY_REAL)
+	y = EC_IMLINE(ec)
 
 	call sprintf (Memc[str], SZ_LINE, "All orders")
 	call gt_sets (EC_GT(ec), GTPARAMS, Memc[str])
 	call achtdr (Memd[EC_FITDATA(ec)], Memr[x], npts)
-	call achtdr (Memd[EC_IMDATA(ec)], Memr[y], npts)
 
 	call gclear (EC_GP(ec))
 	xmin = min (Memr[x], Memr[x+npts-1])

@@ -17,6 +17,8 @@ begin
 	switch (parameter) {
 	case CL_PRTYPE:
 	    return (cl_prtype)
+	case CL_PCACHE:
+	    return (cl_stp)
 	default:
 	    call syserrs (SYS_CLSTATUS, "clstati")
 	}

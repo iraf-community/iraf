@@ -1,7 +1,0 @@
-images,s,a,,,,Images to be scaled
-bzero,s,h,"0.",,,Zero point (mean|median|mode or value)
-bscale,s,h,"1.",,,Scale (mean|median|mode or value)
-section,s,h,"",,,Sample image section
-step,i,h,10,1,,Default sample step
-logfile,s,h,STDOUT,,,Log file
-noact,b,h,no,,,No action?

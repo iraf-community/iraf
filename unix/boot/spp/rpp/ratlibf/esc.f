@@ -1,27 +1,27 @@
-      INTEGER FUNCTION ESC (ARRAY, I)
-      INTEGER ARRAY (100)
-      INTEGER I
-      IF (.NOT.(ARRAY (I) .NE. 64))GOTO 23000
-      ESC = ARRAY (I)
-      GOTO 23001
-23000 CONTINUE
-      IF (.NOT.(ARRAY (I+1) .EQ. -2))GOTO 23002
-      ESC = 64
-      GOTO 23003
-23002 CONTINUE
-      I = I + 1
-      IF (.NOT.(ARRAY (I) .EQ. 110 .OR. ARRAY (I) .EQ. 78))GOTO 23004
-      ESC = 10
-      GOTO 23005
-23004 CONTINUE
-      IF (.NOT.(ARRAY (I) .EQ. 116 .OR. ARRAY (I) .EQ. 84))GOTO 23006
-      ESC = 9
-      GOTO 23007
-23006 CONTINUE
-      ESC = ARRAY (I)
-23007 CONTINUE
-23005 CONTINUE
-23003 CONTINUE
-23001 CONTINUE
-      RETURN
-      END
+      integer function esc (array, i)
+      integer array (100)
+      integer i
+      if (.not.(array (i) .ne. 64))goto 23000
+      esc = array (i)
+      goto 23001
+23000 continue
+      if (.not.(array (i+1) .eq. -2))goto 23002
+      esc = 64
+      goto 23003
+23002 continue
+      i = i + 1
+      if (.not.(array (i) .eq. 110 .or. array (i) .eq. 78))goto 23004
+      esc = 10
+      goto 23005
+23004 continue
+      if (.not.(array (i) .eq. 116 .or. array (i) .eq. 84))goto 23006
+      esc = 9
+      goto 23007
+23006 continue
+      esc = array (i)
+23007 continue
+23005 continue
+23003 continue
+23001 continue
+      return
+      end

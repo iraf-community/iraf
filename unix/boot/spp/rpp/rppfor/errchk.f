@@ -1,116 +1,116 @@
-      SUBROUTINE ERRCHK
-      INTEGER TOK, LASTT0, GNBTOK, TOKEN(100)
-      INTEGER NTOK
-      INTEGER MKTABL
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER SERRC0(15)
-      INTEGER SERRD0(23)
-      DATA SERRC0(1)/108/,SERRC0(2)/111/,SERRC0(3)/103/,SERRC0(4)/105/,S
-     *ERRC0(5)/99/,SERRC0(6)/97/,SERRC0(7)/108/,SERRC0(8)/32/,SERRC0(9)/
-     *120/,SERRC0(10)/101/,SERRC0(11)/114/,SERRC0(12)/102/,SERRC0(13)/10
-     *8/,SERRC0(14)/103/,SERRC0(15)/-2/
-      DATA SERRD0(1)/99/,SERRD0(2)/111/,SERRD0(3)/109/,SERRD0(4)/109/,SE
-     *RRD0(5)/111/,SERRD0(6)/110/,SERRD0(7)/32/,SERRD0(8)/47/,SERRD0(9)/
-     *120/,SERRD0(10)/101/,SERRD0(11)/114/,SERRD0(12)/99/,SERRD0(13)/111
-     */,SERRD0(14)/109/,SERRD0(15)/47/,SERRD0(16)/32/,SERRD0(17)/120/,SE
-     *RRD0(18)/101/,SERRD0(19)/114/,SERRD0(20)/102/,SERRD0(21)/108/,SERR
-     *D0(22)/103/,SERRD0(23)/-2/
-      NTOK = 0
-      TOK = 0
-23000 CONTINUE
-      LASTT0 = TOK
-      TOK = GNBTOK (TOKEN, 100)
-      I23003=(TOK)
-      GOTO 23003
-23005 CONTINUE
-      IF (.NOT.(ERRTBL .EQ. 0))GOTO 23006
-      ERRTBL = MKTABL(0)
-      CALL OUTTAB
-      CALL OUTSTR (SERRC0)
-      CALL OUTDON
-      CALL OUTTAB
-      CALL OUTSTR (SERRD0)
-      CALL OUTDON
-23006 CONTINUE
-      CALL ENTER (TOKEN, 0, ERRTBL)
-      GOTO 23004
-23008 CONTINUE
-      GOTO 23004
-23009 CONTINUE
-      IF (.NOT.(LASTT0 .NE. 44))GOTO 23010
-      GOTO 23002
-23010 CONTINUE
-      GOTO 23004
-23012 CONTINUE
-      CALL SYNERR (35HSyntax error in ERRCHK declaration.)
-      GOTO 23004
-23003 CONTINUE
-      IF (I23003.EQ.-9)GOTO 23005
-      IF (I23003.EQ.10)GOTO 23009
-      IF (I23003.EQ.44)GOTO 23008
-      GOTO 23012
-23004 CONTINUE
-23001 GOTO 23000
-23002 CONTINUE
-      END
-C     LASTT0  LAST_TOK
-C     LOGIC0  LOGICAL_COLUMN
-C     SERRC0  SERRCOM1
-C     SERRD0  SERRCOM2
+      subroutine errchk
+      integer tok, lastt0, gnbtok, token(100)
+      integer ntok
+      integer mktabl
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer serrc0(15)
+      integer serrd0(23)
+      data serrc0(1)/108/,serrc0(2)/111/,serrc0(3)/103/,serrc0(4)/105/,s
+     *errc0(5)/99/,serrc0(6)/97/,serrc0(7)/108/,serrc0(8)/32/,serrc0(9)/
+     *120/,serrc0(10)/101/,serrc0(11)/114/,serrc0(12)/102/,serrc0(13)/10
+     *8/,serrc0(14)/103/,serrc0(15)/-2/
+      data serrd0(1)/99/,serrd0(2)/111/,serrd0(3)/109/,serrd0(4)/109/,se
+     *rrd0(5)/111/,serrd0(6)/110/,serrd0(7)/32/,serrd0(8)/47/,serrd0(9)/
+     *120/,serrd0(10)/101/,serrd0(11)/114/,serrd0(12)/99/,serrd0(13)/111
+     */,serrd0(14)/109/,serrd0(15)/47/,serrd0(16)/32/,serrd0(17)/120/,se
+     *rrd0(18)/101/,serrd0(19)/114/,serrd0(20)/102/,serrd0(21)/108/,serr
+     *d0(22)/103/,serrd0(23)/-2/
+      ntok = 0
+      tok = 0
+23000 continue
+      lastt0 = tok
+      tok = gnbtok (token, 100)
+      I23003=(tok)
+      goto 23003
+23005 continue
+      if (.not.(errtbl .eq. 0))goto 23006
+      errtbl = mktabl(0)
+      call outtab
+      call outstr (serrc0)
+      call outdon
+      call outtab
+      call outstr (serrd0)
+      call outdon
+23006 continue
+      call enter (token, 0, errtbl)
+      goto 23004
+23008 continue
+      goto 23004
+23009 continue
+      if (.not.(lastt0 .ne. 44))goto 23010
+      goto 23002
+23010 continue
+      goto 23004
+23012 continue
+      call synerr (35HSyntax error in ERRCHK declaration.)
+      goto 23004
+23003 continue
+      if (I23003.eq.-9)goto 23005
+      if (I23003.eq.10)goto 23009
+      if (I23003.eq.44)goto 23008
+      goto 23012
+23004 continue
+23001 goto 23000
+23002 continue
+      end
+c     lastt0  last_tok
+c     logic0  logical_column
+c     serrc0  serrcom1
+c     serrd0  serrcom2

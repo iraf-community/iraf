@@ -16,16 +16,15 @@ char	new_root[ARB]		# new image root name
 char	new_extn[ARB]		# old image extn
 int	status
 
-int	nchars
 pointer	sp, im
 bool	heq, peq
 pointer	old_hfn, new_hfn
 pointer	old_pfn, new_pfn
-pointer	name1, name2
+int	nchars, old_rootoff, new_rootoff, junk
 
 bool	streq()
 pointer	immapz()
-int	access(), strlen(), strncmp(), fnroot()
+int	access(), strlen(), strncmp()
 errchk	immapz, rename
 
 begin
@@ -34,8 +33,6 @@ begin
 	call salloc (new_hfn, SZ_PATHNAME, TY_CHAR)
 	call salloc (old_pfn, SZ_PATHNAME, TY_CHAR)
 	call salloc (new_pfn, SZ_PATHNAME, TY_CHAR)
-	call salloc (name1, SZ_PATHNAME, TY_CHAR)
-	call salloc (name2, SZ_PATHNAME, TY_CHAR)
 
 	# Get filenames of old and new images.
 	call iki_mkfname (old_root, old_extn, Memc[old_hfn], SZ_PATHNAME)
@@ -66,9 +63,9 @@ begin
 	    # mkpixfname.
 
 	    peq = false
-	    if (fnroot (old_root, Memc[name1], SZ_PATHNAME) ==
-		fnroot (new_root, Memc[name2], SZ_PATHNAME))
-		peq = streq (Memc[name1], Memc[name2])
+	    call zfnbrk (old_root, old_rootoff, junk)
+	    call zfnbrk (new_root, new_rootoff, junk)
+	    peq = streq (old_root[old_rootoff], new_root[new_rootoff])
 
 	    if (peq) {
 		nchars = strlen (Memc[new_pfn]) - strlen ("aa.imh")
@@ -93,6 +90,7 @@ begin
 	} else
 	    call strcpy (Memc[new_hfn], IM_HDRFILE(im), SZ_IMHDRFILE)
 
+	call strcpy (Memc[old_hfn], IM_HDRFILE(im), SZ_IMHDRFILE)
 	call imunmap (im)
 
 	# Rename the header file.

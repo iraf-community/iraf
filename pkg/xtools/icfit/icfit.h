@@ -1,7 +1,8 @@
 # The ICFIT data structure
 
 define	IC_NGKEYS	5		# Number of graph keys
-define	IC_LENSTRUCT	40		# Length of ICFIT structure
+define	IC_LENSTRUCT	41		# Length of ICFIT structure
+define	IC_SZSAMPLE	1024		# Size of sample string
 
 # User fitting parameters
 define	IC_FUNCTION	Memi[$1]	# Function type
@@ -31,13 +32,14 @@ define	IC_NEWWTS	Memi[$1+19]	# New weights?
 define	IC_NEWFUNCTION	Memi[$1+20]	# New fitting function?
 define	IC_OVERPLOT	Memi[$1+21]	# Overplot next plot?
 define	IC_FITERROR	Memi[$1+22]	# Error in fit
-define	IC_LABELS	Memi[$1+23+$2-1]# Graph axis labels
-define	IC_UNITS	Memi[$1+25+$2-1]# Graph axis units
-define	IC_HELP		Memi[$1+27]	# Pointer to help file name
+define	IC_MARKREJ	Memi[$1+23]	# Mark rejected points?
+define	IC_LABELS	Memi[$1+24+$2-1]# Graph axis labels
+define	IC_UNITS	Memi[$1+26+$2-1]# Graph axis units
+define	IC_HELP		Memi[$1+28]	# Pointer to help file name
 
 # ICFIT key definitions
-define	IC_GKEY		Memi[$1+28]			# Graph key
-define	IC_AXES		Memi[$1+29+($2-1)*2+$3-1]	# Graph axis codes
+define	IC_GKEY		Memi[$1+29]			# Graph key
+define	IC_AXES		Memi[$1+30+($2-1)*2+$3-1]	# Graph axis codes
 
 # Default help file and prompt
 define	IC_DEFHELP	"noao$lib/scr/icgfit.key"

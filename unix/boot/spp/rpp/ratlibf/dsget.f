@@ -1,45 +1,45 @@
-      INTEGER FUNCTION DSGET (W)
-      INTEGER W
-      INTEGER MEM( 1)
-      COMMON/CDSMEM/MEM
-      INTEGER P, Q, L
-      INTEGER N, K, JUNK
-      INTEGER GETLIN
-      INTEGER C (10)
-      N = W + 2
-      Q = 2
-23000 CONTINUE
-      P = MEM (Q + 1)
-      IF (.NOT.(P .EQ. 0))GOTO 23003
-      CALL REMARK (31Hin dsget: out of storage space.)
-      CALL REMARK (41Htype 'c' or 'i' for char or integer dump.)
-      JUNK = GETLIN (C, 0)
-      IF (.NOT.(C (1) .EQ. 99 .OR. C (1) .EQ. 67))GOTO 23005
-      CALL DSDUMP (97)
-      GOTO 23006
-23005 CONTINUE
-      IF (.NOT.(C (1) .EQ. 105 .OR. C (1) .EQ. 73))GOTO 23007
-      CALL DSDUMP (48)
-23007 CONTINUE
-23006 CONTINUE
-      CALL ERROR (19Hprogram terminated.)
-23003 CONTINUE
-      IF (.NOT.(MEM (P + 0) .GE. N))GOTO 23009
-      GOTO 23002
-23009 CONTINUE
-      Q = P
-23001 GOTO 23000
-23002 CONTINUE
-      K = MEM (P + 0) - N
-      IF (.NOT.(K .GE. 8))GOTO 23011
-      MEM (P + 0) = K
-      L = P + K
-      MEM (L + 0) = N
-      GOTO 23012
-23011 CONTINUE
-      MEM (Q + 1) = MEM (P + 1)
-      L = P
-23012 CONTINUE
-      DSGET=(L + 2)
-      RETURN
-      END
+      integer function dsget (w)
+      integer w
+      integer mem( 1)
+      common/cdsmem/mem
+      integer p, q, l
+      integer n, k, junk
+      integer getlin
+      integer c (10)
+      n = w + 2
+      q = 2
+23000 continue
+      p = mem (q + 1)
+      if (.not.(p .eq. 0))goto 23003
+      call remark (31Hin dsget: out of storage space.)
+      call remark (41Htype 'c' or 'i' for char or integer dump.)
+      junk = getlin (c, 0)
+      if (.not.(c (1) .eq. 99 .or. c (1) .eq. 67))goto 23005
+      call dsdump (97)
+      goto 23006
+23005 continue
+      if (.not.(c (1) .eq. 105 .or. c (1) .eq. 73))goto 23007
+      call dsdump (48)
+23007 continue
+23006 continue
+      call error (19Hprogram terminated.)
+23003 continue
+      if (.not.(mem (p + 0) .ge. n))goto 23009
+      goto 23002
+23009 continue
+      q = p
+23001 goto 23000
+23002 continue
+      k = mem (p + 0) - n
+      if (.not.(k .ge. 8))goto 23011
+      mem (p + 0) = k
+      l = p + k
+      mem (l + 0) = n
+      goto 23012
+23011 continue
+      mem (q + 1) = mem (p + 1)
+      l = p
+23012 continue
+      dsget=(l + 2)
+      return
+      end

@@ -18,13 +18,13 @@ begin
 	list = clpopni ("files")
 
 	# Multiple files are converted to files of the same name with the
-	# extension ".uc".
+	# extension ".lc".
 
 	while (clgfil (list, Memc[in_file], SZ_FNAME) != EOF) {
 	    in = open (Memc[in_file], READ_ONLY, TEXT_FILE)
 	    if (clplen (list) > 1 && strne (Memc[in_file], "STDIN")) {
 		call strcpy (Memc[in_file], Memc[out_file], SZ_FNAME)
-		call strcat (".uc", Memc[out_file], SZ_FNAME)
+		call strcat (".lc", Memc[out_file], SZ_FNAME)
 	    } else
 		call strcpy ("STDOUT", Memc[out_file], SZ_FNAME)
 	    out = open (Memc[out_file], NEW_FILE, TEXT_FILE)

@@ -1,0 +1,133 @@
+.help addstar Aug91 noao.digiphot.daophot
+.ih
+NAME
+addstar -- add artificial stars to images
+.ih
+USAGE
+addstar image starlist psfimage addimage
+.ih
+PARAMETERS
+.ls image
+The list of images to which the artificial stars are to be added.
+.le
+.ls starlist
+The list of files containing the x and y coordinates and magnitudes of the
+artificial stars to be added. If \fIstarlist\fR is null ("") then
+\fInstar\fR artificial stars uniformly distributed in position and in magnitude
+between \fIminmag\fR and \fImaxmag\fR are added to the input image.
+Otherwise \fIstarlist\fR must specify one coordinate file for each image
+in \fIimage\fR.
+\fIStarlist\fR may be either a simple text file conaining x, y, and mag in
+columns 1, 2 and 3 respectively (\fIsimple_text\fR = yes), an APPHOT/DAOPHOT
+text database or an STSDAS table.
+.le
+.ls psfimage
+The list of PSF images created by the DAOPHOT PSF task. If \fIpsfimage\fR
+is "default", "dir$default", or a directory specification, then ADDSTAR
+will look for a file with the name image.psf.?, where ? is the highest
+existing version number. Otherwise \fIpsfimage\fR must specify one PSF
+image for every image in \fIimage\fR.
+.le
+.ls addimage
+The root name of output image with the artificial stars added.
+If \fIaddimage\fR is "default", "dir$default" or a directory specification,
+then an output image and artificial star list called image.add.? and
+image.art.? respectively are written, where ? is the next available version
+number. Otherwise an image called addimage
+and the artificial starlist called \fIaddimage\fR are written.
+If the DAOPHOT  package parameter \fItext\fR is "yes" then an APPHOT/DAOPHOT
+text database is written, otherwise an STSDAS table is written.
+.le
+.ls datapars = ""
+The text file in which the data dependent parameters are stored.
+If \fIdatapars\fR is null ("") then the default parameter set in the
+user's uparm directory will be used.
+.le
+.ls daopars = ""
+The text file in which the daophot fitting parameters are stored.
+If \fIdaopars\fR is null ("") then the default parameter set in the
+user's uparm directory will be used.
+.le
+.ls minmag
+The minimum magnitude of the computer generated artificial stars to be
+added to the image. The actual intensities of the pixels in the artificial
+stars are computed with respect to the magnitude of the PSF stored in
+\fIpsfimage\fR.
+.le
+.ls maxmag
+The maximum magnitude of the computer generated artificial stars to be
+added to the image. The actual intensities of the pixels in the artificial
+stars are computed with respect to the magnitude of the PSF stored in
+\fIpsfimage\fR.
+.le
+.ls nstar
+The number of computer generated artificial stars to be added to the input
+image.
+.le
+.ls idoffset = 0
+The integer offset to be added to the id numbers of stars in the output
+artificial starlist. By default the stars are numbered from 1 to N where
+N is the number of artifical stars added to the input frame.
+.le
+.ls nimage = 1
+The number of output images created per input image.
+.le
+.ls simple_text = no
+If \fIstarlist\fR is a text file and \fIsimple_text\fR = "no", then
+ADDSTAR expects an APPHOT/DAOPHOT database. Otherwise ADDSTAR expects
+a simple list format with x, y and magnitude in columns 1, 2 and 3
+respectively.
+.le
+.ls verbose = no
+Print messages about the progress of the task?
+.le
+.ls verify = yes
+Verify the critical ADDSTAR task parameters?
+.le
+.ls update = no
+Update the critical ADDSTAR task parameters if \fIverify\fR = "yes"?
+.le
+.ih
+DESCRIPTION
+ADDSTAR adds artificial stars from the \fIstarlist\fR or generated at random
+by the computer using the PSF in \fIpsfimage\fR to the input image \fIimage\fR
+and writes the result to the output image and list specified by
+\fIaddimage\fR. The starlist
+may be an STSDAS table database, an APPHOT/DAOPHOT text database or a simple
+text file with the x and y positions and magnitude in columns 1, 2 and 3
+respectively. The ids of stars in the output list may be set to numbers
+outside the range of the real data by setting the parameter \fIoffset\fR.
+Several output images may be written for each input image
+by setting \fInimage\fR greater than 1.
+
+If \fIstarlist\fR is null ("") then the computer will generate an
+articial starlist containing \fInstar\fR stars uniformly distributed
+in position over the image and in magnitude between \fIminmag\fR
+and \fImaxmag\fR.
+
+Users should be sure to specify the correct value of \fIepadu\fR in
+the DATAPARS task so that Poisson noise in the stars can be correctly
+added to the image.
+
+.ih
+EXAMPLES
+1. Add 30 stars uniformly distributed between 17 and 20th magnitude and
+in position to the input image m92.
+
+.nf
+    da> addstar m92 "" m92.psf.1 "default" 17.0 20.0 30 
+.fi
+
+2. Add the articifial stars in the simple list file artdata to the same image.
+
+.nf
+    da> addstar m92 artdata  m92.psf.1 "default" simple+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+.endhelp

@@ -127,7 +127,7 @@ begin
 	call salloc (coeff, GS_NCOEFF(sf1), TY_REAL)
 	call gscoeff (sf1, Mem$t[coeff], ncoeff)
 	$else
-	call salloc (coeff, GS_COEFF(sf1), TY_DOUBLE)
+	call salloc (coeff, GS_NCOEFF(sf1), TY_DOUBLE)
 	call dgscoeff (sf1, Mem$t[coeff], ncoeff)
 	$endif
 

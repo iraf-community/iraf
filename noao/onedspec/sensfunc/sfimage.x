@@ -1,10 +1,7 @@
 include	<gset.h>
-include	<mach.h>
-include	<imhdr.h>
-include	<imset.h>
 include	<math/curfit.h>
 include	"sensfunc.h"
-include	"../idsmtn.h"
+include	"../shdr.h"
 
 
 # SF_IMAGE -- Graph fluxed image data and possible standard flux points.
@@ -23,17 +20,17 @@ real	extn[nextn]		# Extinction table values
 int	nextn			# Number of extinction table values
 pointer	ecv			# Residual extinction curve
 
-int	scale[SF_NGRAPHS], npts[SF_NGRAPHS]
-real	wstart[SF_NGRAPHS], wend[SF_NGRAPHS]
-pointer	bufs[SF_NGRAPHS]
+int	scale[SF_NGRAPHS], log[SF_NGRAPHS]
 
+bool	newobs, obshead
 int	i, j, n, err
-real	airmass, exposure, w, dw, ext, sens, smin, smax, latitude, xmin, xmax
-pointer	im, skyim, buf, gio, sp, str, ids, x, y, z
-pointer	immap(), imgl1r()
-real	cveval(), clgetr(), cvstatr()
+real	a, t, w, dw, e, sens, latitude, smin, smax, xmin, xmax
+pointer	im, mw, sh, skyim, skymw, skysh, std, gio, sp, str, x, y, z, obs
+pointer	immap(), smw_openim()
+real	cveval(), obsgetr(), cvstatr()
+double	shdr_lw()
 bool	streq(), strne()
-errchk	immap
+errchk	immap, smw_openim, obsimopen
 
 define	plot_	99
 
@@ -46,124 +43,169 @@ begin
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the spectrum and sky subtract if necessary.
-	im = GP_IMIO(gp,wc)
-	buf = bufs[wc]
-	if (im != NULL) {
-	    call imstats (im, IM_IMAGENAME, Memc[str], SZ_LINE)
-	    if (streq (Memc[GP_IMAGES(gp,wc)], Memc[str]))
-		goto plot_
-	    call imunmap (im)
+	sh = GP_SHDR(gp,wc)
+	if (sh != NULL) {
+	    if (streq (Memc[GP_IMAGES(gp,wc)], SPECTRUM(sh))) {
+		if (GP_LOG(gp) == log[wc])
+		    goto plot_
+		else
+		    call shdr_close (sh)
+	    }
 	}
+
+	# Determine a valid standard star to get aperture number.
+	do i = 1, nstds
+	    if (STD_FLAG(stds[i]) != SF_EXCLUDE) {
+		std = stds[i]
+		break
+	    }
 
 	im = immap (Memc[GP_IMAGES(gp,wc)], READ_ONLY, 0)
-	if (IM_NDIM(im) > 1) {
+	mw = smw_openim (im)
+	call shdr_open (im, mw, 1, 1, STD_BEAM(std), SHDATA, sh)
+
+	# Check for dispersion correction
+	if (DC(sh) == DCNO) {
+	    call shdr_close (sh)
+	    call mw_close (mw)
 	    call imunmap (im)
-	    call error (0, "Graphs of two dimensional formats not supported")
-	}
-	buf = imgl1r (im)
-	if (Memc[GP_SKYS(gp,wc)] != EOS) {
-	    skyim = immap (Memc[GP_SKYS(gp,wc)], READ_ONLY, 0)
-	    call asubr (Memr[buf], Memr[imgl1r(skyim)], Memr[buf], IM_LEN(im,1))
-	    call imunmap (skyim)
-	}
-
-	# Save the IMIO data for future redraw.
-	GP_IMIO(gp,wc) = im
-	npts[wc] = IM_LEN(im,1)
-	bufs[wc] = buf
-
-	# Get the header data to determine airmass, wavelength scale, etc.
-	# Check the image is dispersion corrected.
-
-	call salloc (ids, LEN_IDS, TY_STRUCT)
-	call salloc (POINT(ids), MAX_NCOEFF, TY_REAL)
-	call load_ids_hdr (ids, im, 1)
-	if (DC_FLAG(ids) != 0) {
-	    call imunmap (im)
+	    GP_SHDR(gp,wc) = NULL
 	    call sfree (sp)
-	    call printf ("-%s must be linearly dispersion corrected-")
+	    call printf ("-%s must be dispersion corrected-")
 		call pargstr (Memc[GP_IMAGES(gp,wc)])
 	    return
 	}
-	if (IS_INDEF (ITM(ids)))
-	    exposure = 1.
-	else
-	    exposure = ITM(ids)
-	if (IS_INDEF (AIRMASS(ids))) {
-	    latitude = clgetr ("latitude")
-	    call get_airm (RA(ids), DEC(ids), HA(ids), ST(ids), latitude,
-		AIRMASS(ids))
-	}
-	airmass = AIRMASS(ids)
-	dw = WPC(ids)
-	wstart[wc] = W0(ids)
-	wend[wc] = wstart[wc] + (npts[wc] - 1) * dw
 
-	# Apply extinction correction if needed.
-	if (EX_FLAG(ids) < 0) {
+	# Sky subtract if necessary
+	if (Memc[GP_SKYS(gp,wc)] != EOS) {
+	    skyim = immap (Memc[GP_SKYS(gp,wc)], READ_ONLY, 0)
+	    skymw = smw_openim (skyim)
+	    call shdr_open (skyim, skymw, 1, 1, STD_BEAM(std), SHDATA, skysh)
+	    call shdr_rebin (skysh, sh)
+	    call asubr (Memr[SY(sh)], Memr[SY(skysh)], Memr[SY(sh)], SN(sh))
+	    call shdr_close (skysh)
+	    call mw_close (skymw)
+	    call imunmap (skyim)
+	}
+
+	# Set airmass and exposure time
+	if (IS_INDEF (AM(sh))) {
+	    obs = NULL
+	    call clgstr ("observatory", Memc[str], SZ_LINE)
+	    call obsimopen (obs, im, Memc[str], NO, newobs, obshead)
+	    latitude = obsgetr (obs, "latitude")
+	    call obsclose (obs)
+	    call get_airm (RA(sh), DEC(sh), HA(sh), ST(sh), latitude,
+		AM(sh))
+	}
+	a = AM(sh)
+	if (IS_INDEF (IT(sh)))
+	    t = 1.
+	else
+	    t = IT(sh)
+
+	# Apply extinction correction if needed
+	if (EC(sh) == ECNO) {
 	    if (ecv != NULL) {
 	        xmin = cvstatr (ecv, CVXMIN)
 	        xmax = cvstatr (ecv, CVXMAX)
 	    }
-	    do i = 1, npts[wc] {
-	        w = wstart[wc] + (i - 1) * dw 
-	        call intrp (1, wextn, extn, nextn, w, ext, err)
+	    do i = 1, SN(sh) {
+		w = Memr[SX(sh)+i-1]
+	        call intrp (1, wextn, extn, nextn, w, e, err)
 	        if (ecv != NULL)
-		    ext = ext + cveval (ecv, min (xmax, max (w, xmin)))
-	        Memr[buf+i-1] = Memr[buf+i-1] * 10. ** (0.4 * airmass * ext)
+		    e = e + cveval (ecv, min (xmax, max (w, xmin)))
+	        Memr[SY(sh)+i-1] = Memr[SY(sh)+i-1] * 10. ** (0.4 * a * e)
 	    }
 	} else {
 	    call printf ("-%s already extinction corrected-")
 	       call pargstr (Memc[GP_IMAGES(gp,wc)])
 	}
 
-	# Apply flux calibration if needed.
-	if (CA_FLAG(ids) < 0) {
-	    do i = 1, npts[wc] {
-	        w = wstart[wc] + (i - 1) * dw 
+	# Apply flux calibration if needed
+	if (FC(sh) == FCNO) {
+	    do i = 1, SN(sh) {
+	        w = Memr[SX(sh)+i-1]
+		dw = shdr_lw (sh, double (i+0.5)) - shdr_lw (sh, double (i-0.5))
 	        sens = cveval (cv, w)
-	        Memr[buf+i-1] = Memr[buf+i-1] / exposure / dw / 10.**(0.4*sens)
+	        Memr[SY(sh)+i-1] = Memr[SY(sh)+i-1] / t / dw / 10.**(0.4*sens)
 	    }
 	} else {
 	    call printf ("-%s already flux calibrated-")
 		call pargstr (Memc[GP_IMAGES(gp,wc)])
 	}
 
-	call alimr (Memr[buf], npts[wc], smin, smax)
-	if (smin > 0.) {
-	    scale[wc] = 0
-	    do i = 1, npts[wc]
-		Memr[buf+i-1] = log10 (Memr[buf+i-1])
-	} else if (smax > 0.) {
-	    scale[wc] =  -log10 (smax)
+	# Set flux scaling
+	call alimr (Memr[SY(sh)], SN(sh), smin, smax)
+	if (smax < 0.)
+	    scale[wc] = 0.
+	else if (GP_LOG(gp) == NO) {
+	    scale[wc] = -log10 (smax) + 1
 	    w = 10. ** scale[wc]
-	    call amulkr (Memr[buf], w, Memr[buf], npts[wc])
-	} else
-	    scale[wc] = 1
+	    call amulkr (Memr[SY(sh)], w, Memr[SY(sh)], SN(sh))
+	} else {
+	    scale[wc] = INDEFI
+	    smin = smax / 1000.
+	    w = smax
+	    y = SY(sh)
+	    do i = 1, SN(sh) {
+		if (Memr[y] > smin)
+		    w = min (w, Memr[y])
+		y = y + 1
+	    }
+	    y = SY(sh)
+	    do i = 1, SN(sh) {
+		Memr[y] = log10 (max (Memr[y], w))
+		y = y + 1
+	    }
+	}
+	log[wc] = GP_LOG(gp)
 
-#	scale[wc] = 1 - log10 (smin)
-#	w = 10. ** scale[wc]
-#	call amulkr (Memr[buf], w, Memr[buf], npts[wc])
+	# Save the spectrum for future redraw.
+	GP_SHDR(gp,wc) = sh
+	call mw_close (mw)
+	call imunmap (im)
 
 plot_
 	# Plot scaled graph.
-	if (scale[wc] == 0) { 
+	smin = GP_FMIN(gp)
+	smax = GP_FMAX(gp)
+	if (IS_INDEFI(scale[wc])) {
 	    call sprintf (Memc[str], SZ_LINE, "%s: Log Flux")
 	        call pargstr (Memc[GP_IMAGES(gp,wc)])
-	} else {
-	    call sprintf (Memc[str], SZ_LINE, "%s: Flux x 10E%d")
+	    if (!IS_INDEF(smin)) {
+		if (smin > 0.)
+		    smin = log10 (smin)
+		else
+		    smin = INDEF
+	    }
+	    if (!IS_INDEF(smax)) {
+		if (smax > 0.)
+		    smax = log10 (smax)
+		else
+		    smax = INDEF
+	    }
+	} else if (scale[wc] != 0) {
+	    call sprintf (Memc[str], SZ_LINE, "%s: Flux x 1E%d")
 	        call pargstr (Memc[GP_IMAGES(gp,wc)])
 	        call pargi (scale[wc])
 	    w = 10. ** scale[wc]
+	    if (!IS_INDEF(smin))
+		smin = w * smin
+	    if (!IS_INDEF(smax))
+		smax = w * smax
+	} else {
+	    call sprintf (Memc[str], SZ_LINE, "%s: Flux")
+	        call pargstr (Memc[GP_IMAGES(gp,wc)])
+	    w = 1.
 	}
-#	call sprintf (Memc[str], SZ_LINE, "%s: Flux x 10E%d")
-#	    call pargstr (Memc[GP_IMAGES(gp,wc)])
-#	    call pargi (scale[wc])
+
 	gio = GP_GIO(gp)
-	call gswind (gio, wstart[wc], wend[wc], INDEF, INDEF)
-	call gascale (gio, Memr[buf], npts[wc], 2)
+	call gascale (gio, Memr[SX(sh)], SN(sh), 1)
+	call gascale (gio, Memr[SY(sh)], SN(sh), 2)
+	call gswind (gio, INDEF, INDEF, smin, smax)
 	call glabax (gio, Memc[str], "", "")
-	call gvline (gio, Memr[buf], npts[wc], wstart[wc], wend[wc])
+	call gpline (gio, Memr[SX(sh)], Memr[SY(sh)], SN(sh))
 
 	call sfree (sp)
 
@@ -175,7 +217,7 @@ plot_
 	    x = STD_WAVES(stds[i])
 	    y = STD_FLUXES(stds[i])
 	    z = STD_DWAVES(stds[i])
-	    if (scale[wc] == 0) {
+	    if (IS_INDEFI(scale[wc])) {
 	        do j = 0, n-1
 		    call gmark (gio, Memr[x+j], log10 (Memr[y+j]), GM_HEBAR,
 			-Memr[z+j], 1.)

@@ -17,11 +17,11 @@ include	"mtio.h"
 # the named directory is normally a user directory and may not exist on the
 # remote host.
 
-procedure mt_lockname (drive, lockfile, maxch)
+procedure mt_lockname (device, lockfile, maxch)
 
-char	drive[ARB]		# drive name
-char	lockfile[maxch]		# receives generated lockfile name
-int	maxch			# max chars out
+char	device[ARB]		#I device name
+char	lockfile[maxch]		#O receives generated lockfile name
+int	maxch			#I max chars out
 
 pointer	sp, node, cp
 int	ip, op, nchars
@@ -32,12 +32,12 @@ begin
 	call salloc (node, SZ_FNAME, TY_CHAR)
 
 	# Extract the node name prefix, if any.
-	ip = ki_extnode (drive, Memc[node], SZ_FNAME, nchars) + 1
+	ip = ki_extnode (device, Memc[node], SZ_FNAME, nchars) + 1
 
-	# Begin with the directory name prefix, "mt", and drive name.
+	# Begin with the directory name prefix, "mt", and device name.
 	op = gstrcpy (LOCKLDIR, lockfile, maxch) + 1
 	op = op + gstrcpy (LOCKFILE,  lockfile[op], maxch-op+1)
-	op = op + gstrcpy (drive[ip], lockfile[op], maxch-op+1)
+	op = op + gstrcpy (device[ip], lockfile[op], maxch-op+1)
 
 	# Add the node name as the root lockfile filename, minus any funny
 	# characters that may be in the node name (such as - and the !).

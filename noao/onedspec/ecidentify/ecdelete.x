@@ -10,8 +10,11 @@ int	feature			# Feature to be deleted
 int	i
 
 begin
+	if (feature == 0)
+	    return
+
 	do i = feature + 1, EC_NFEATURES(ec) {
-	    AP(ec,i-1) = AP(ec,i)
+	    APN(ec,i-1) = APN(ec,i)
 	    LINE(ec,i-1) = LINE(ec,i)
 	    ORDER(ec,i-1) = ORDER(ec,i)
 	    PIX(ec,i-1) = PIX(ec,i)

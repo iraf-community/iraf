@@ -4,6 +4,8 @@
 
 $special "sys$osb/":		aclrb.c		as$aclrb.c
 				bytmov.c	as$bytmov.c
+				ieeer.x		as$ieeer.x
+				ieeed.x		as$ieeed.x
 				;
 
 $special "sys$vops/ak/":	aclrc.x		as$aclrc.c
@@ -41,6 +43,7 @@ $special "sys$vops/ak/":
 $special "sys$vops/lz/":
 	aveqx.x		$(XNO)
 	;
-$special "sys$etc/":
-	oscmd.x		as$oscmd.s
-	;
+# TMPFS bug should be fixed by now.
+#$special "sys$etc/":
+#	oscmd.x		as$oscmd.s
+#	;

@@ -89,7 +89,8 @@ begin
 		else
 	            call gsinit (sf1, GM_FUNCTION(fit), 2, 2, NO, GM_XMIN(fit),
 		        GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
-		if (GM_XXORDER(fit) > 2 || GM_XYORDER(fit) > 2)
+		if (GM_XXORDER(fit) > 2 || GM_XYORDER(fit) > 2 ||
+		    GM_XXTERMS(fit) == YES)
 	            call gsinit (sf2, GM_FUNCTION(fit), GM_XXORDER(fit),
 		        GM_XYORDER(fit), GM_XXTERMS(fit), GM_XMIN(fit),
 			GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
@@ -103,7 +104,8 @@ begin
 		else
 	            call gsinit (sf1, GM_FUNCTION(fit), 2, 2, NO, GM_XMIN(fit),
 		        GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
-		if (GM_YXORDER(fit) > 2 || GM_YYORDER(fit) > 2)
+		if (GM_YXORDER(fit) > 2 || GM_YYORDER(fit) > 2 ||
+		    GM_YXTERMS(fit) == YES)
 	            call gsinit (sf2, GM_FUNCTION(fit), GM_YXORDER(fit),
 		        GM_YYORDER(fit), GM_YXTERMS(fit), GM_XMIN(fit),
 			GM_XMAX(fit), GM_YMIN(fit), GM_YMAX(fit))
@@ -416,7 +418,8 @@ begin
 	        call dgsinit (sf1, GM_FUNCTION(fit), 2, 2, NO,
 	            double (GM_XMIN(fit)), double (GM_XMAX(fit)),
 		    double (GM_YMIN(fit)), double (GM_YMAX(fit)))
-	    if (GM_XXORDER(fit) > 2 || GM_XYORDER(fit) > 2)
+	    if (GM_XXORDER(fit) > 2 || GM_XYORDER(fit) > 2 || 
+		GM_XXTERMS(fit) == YES)
 	        call dgsinit (sf2, GM_FUNCTION(fit), GM_XXORDER(fit),
 		    GM_XYORDER(fit), GM_XXTERMS(fit), double (GM_XMIN(fit)),
 		    double (GM_XMAX(fit)), double (GM_YMIN(fit)),
@@ -433,7 +436,8 @@ begin
 	        call dgsinit (sf1, GM_FUNCTION(fit), 2, 2, NO,
 		    double (GM_XMIN(fit)), double (GM_XMAX(fit)),
 		    double (GM_YMIN(fit)), double (GM_YMAX(fit)))
-	    if (GM_YXORDER(fit) > 2 || GM_YYORDER(fit) > 2)
+	    if (GM_YXORDER(fit) > 2 || GM_YYORDER(fit) > 2 ||
+		GM_YXTERMS(fit) == YES)
 	        call dgsinit (sf2, GM_FUNCTION(fit), GM_YXORDER(fit),
 		    GM_YYORDER(fit), GM_YXTERMS(fit), double (GM_XMIN(fit)),
 		    double (GM_XMAX(fit)), double (GM_YMIN(fit)),

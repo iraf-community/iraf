@@ -20,15 +20,16 @@ If no package name is given all packages in the database are searched.
 
 define	SZ_TLSBUF	1024		# local string buffer
 define	INC_SZTLSBUF	512		# increment if overflow
-define	SZ_CURPAK	31		# allocation for curpak name string
+define	SZ_CURPACK	31		# allocation for curpack name string
 
-define	LEN_TLSTRUCT	6
-define	TL_SBUF		Memi[$1]	# string buffer
-define	TL_SZSBUF	Memi[$1+1]	# size of string buffer
-define	TL_NEXTCH	Memi[$1+2]	# index of next char in sbuf
-define	TL_LISTPTR	Memi[$1+3]	# for fetching list elements
-define	TL_CURPAK	Memi[$1+4]	# offset of name of current package
-define	TL_LISTLEN	Memi[$1+5]	# number of elements in list
+define	LEN_TLSTRUCT	7
+define	TL_CTRL		Memi[$1]	# string buffer
+define	TL_SBUF		Memi[$1+1]	# string buffer
+define	TL_SZSBUF	Memi[$1+2]	# size of string buffer
+define	TL_NEXTCH	Memi[$1+3]	# index of next char in sbuf
+define	TL_LISTPTR	Memi[$1+4]	# for fetching list elements
+define	TL_CURPACK	Memi[$1+5]	# offset of name of current package
+define	TL_LISTLEN	Memi[$1+6]	# number of elements in list
 
 
 # TL_OPEN -- Take the template list supplied by the user and produce as
@@ -47,8 +48,8 @@ pointer	ctrl
 
 int	ip, junk
 pointer	sp, op, tl, sbuf, template, pakstr, modstr
-int	tl_fetchelem(), tl_matchpak(), tl_putstr(), tl_getcurpak()
-errchk	tl_getcurpak, tl_ambiguous, tl_matchpak
+int	tl_fetchelem(), tl_matchpak(), tl_putstr(), tl_getcurpack()
+errchk	tl_getcurpack, tl_ambiguous, tl_matchpak
 define	paknotfound_	91
 
 begin
@@ -60,13 +61,14 @@ begin
 	call calloc (tl, LEN_TLSTRUCT, TY_STRUCT)
 	call malloc (sbuf, SZ_TLSBUF, TY_CHAR)
 
+	TL_CTRL(tl)    = ctrl
 	TL_SBUF(tl)    = sbuf
 	TL_SZSBUF(tl)  = SZ_TLSBUF
-	TL_NEXTCH(tl)  = SZ_CURPAK + 2
-	TL_LISTPTR(tl) = SZ_CURPAK + 2
+	TL_NEXTCH(tl)  = SZ_CURPACK + 2
+	TL_LISTPTR(tl) = SZ_CURPACK + 2
 	TL_LISTLEN(tl) = 0
 
-	# If null template list, set to "curpak.".  This will cause the
+	# If null template list, set to "curpack.".  This will cause the
 	# help for the current package to be printed.  Otherwise expand
 	# the template.  Template expansion can produce a very big list.
 
@@ -75,7 +77,7 @@ begin
 
 	if (tlist[ip] == EOS) {
 	    # Put current package name into list.
-	    op = template + tl_getcurpak (tl, Memc[template], SZ_LINE)
+	    op = template + tl_getcurpack (tl, Memc[template], SZ_LINE)
 	    Memc[op] = '.'
 	    Memc[op+1] = EOS
 	    junk = tl_putstr (tl, Memc[template])
@@ -155,7 +157,7 @@ begin
 end
 
 
-# TL_MATCHPAK -- Match package name against the system package list,
+# TL_MATCHPACK -- Match package name against the system package list,
 # add each package matched to the list.
 
 int procedure tl_matchpak (tl, hp, package, module)
@@ -207,7 +209,7 @@ end
 #	[2] all modules in all packages, except the current package
 # 
 # For example, "alpha" might be expanded into the list
-#	curpak.alpha, pak1.alpha, pak2.alpha, ...
+#	curpack.alpha, pak1.alpha, pak2.alpha, ...
 #
 # The search [2] is a depth-first search of all packages in the root.  Since
 # each non-root package is a module of some other package, this search will
@@ -223,21 +225,21 @@ pointer	hp			# package directory
 char	module[ARB]		# module template
 
 int	paklen, junk, ip, pk
-pointer	sp, curpak, template, op
+pointer	sp, curpack, template, op
 bool	streq()
-int	tl_putstr(), stridx(), tl_getcurpak(), hd_getname()
-errchk	tl_putstr, tl_getcurpak, hd_getname
+int	tl_putstr(), stridx(), tl_getcurpack(), hd_getname()
+errchk	tl_putstr, tl_getcurpack, hd_getname
 
 begin
 	call smark (sp)
 	call salloc (template, SZ_LINE, TY_CHAR)
-	call salloc (curpak, SZ_FNAME, TY_CHAR)
+	call salloc (curpack, SZ_FNAME, TY_CHAR)
 
 	# Output the template for the current package.  Save the name of
 	# the current package for later use.
 
-	op = template + tl_getcurpak (tl, Memc[template], SZ_LINE)
-	call strcpy (Memc[template], Memc[curpak], SZ_FNAME)
+	op = template + tl_getcurpack (tl, Memc[template], SZ_LINE)
+	call strcpy (Memc[template], Memc[curpack], SZ_FNAME)
 	Memc[op] = '.'
 	call strcpy (module, Memc[op+1], SZ_LINE-(op-template)-1)
 	junk = tl_putstr (tl, Memc[template])
@@ -261,7 +263,7 @@ begin
 	    pk = pk + 1
 	    if (paklen <= 0)
 		break
-	    if (streq (Memc[template], Memc[curpak]))
+	    if (streq (Memc[template], Memc[curpack]))
 		next
 	    op = template + paklen
 	    Memc[op] = '.'
@@ -325,36 +327,50 @@ begin
 end
 
 
-# TL_GETCURPAK -- Get the name of the current package.  The hidden CL command
+# TL_GETCURPACK -- Get the name of the current package.  The hidden CL command
 # "_curpack" prints the name of the current package.
 
-int procedure tl_getcurpak (tl, pakname, maxch)
+int procedure tl_getcurpack (tl, pakname, maxch)
 
 pointer	tl			# template list
 char	pakname[maxch]		# package name (output)
 int	maxch
 
+pointer	ctrl
 int	nchars, junk
 int	gstrcpy(), fscan()
+bool	strne()
 errchk	clcmd
 
 begin
 	# The current package is read only once for each tlist expansion.
 	# The following uses the CL global parameter "list" to read the
 	# package list.  The CL interface is violated by sending an explicit
-	# command to the CL.  Yeech!!
+	# command to the CL.  Poor practice, but the query can be disabled
+	# by setting the help.curpack parameter, if this causes a problem.
 
-	if (TL_CURPAK(tl) == NULL) {
-	    # Send "_curpack" command to the CL, read the response (a single
-	    # line) from CLIN.
+	if (TL_CURPACK(tl) == NULL) {
+	    # Was the current package set via a help task parameter?
+	    ctrl = TL_CTRL(tl)
+	    if (H_CURPACK(ctrl) != EOS)
+		if (strne (H_CURPACK(ctrl), "AskCL")) {
+		    call strcpy (H_CURPACK(ctrl),
+			Memc[TL_SBUF(tl)+1], SZ_CURPACK)
+		    TL_CURPACK(tl) = 1
+		}
 
-	    call clcmd ("_curpack")
-	    junk = fscan (CLIN)
-		call gargwrd (Memc[TL_SBUF(tl)], SZ_CURPAK)
-	    TL_CURPAK(tl) = 0
+	    if (TL_CURPACK(tl) == NULL) {
+		# Send "_curpack" command to the CL, read the response (a single
+		# line) from CLIN.
+
+		call clcmd ("_curpack")
+		junk = fscan (CLIN)
+		    call gargwrd (Memc[TL_SBUF(tl)+1], SZ_CURPACK)
+		TL_CURPACK(tl) = 1
+	    }
 	}
 
-	nchars = gstrcpy (Memc[TL_SBUF(tl) + TL_CURPAK(tl)], pakname, maxch)
+	nchars = gstrcpy (Memc[TL_SBUF(tl) + TL_CURPACK(tl)], pakname, maxch)
 	return (nchars)
 end
 

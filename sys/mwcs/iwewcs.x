@@ -127,10 +127,17 @@ samperr_		call eprintf (
 		axes[1] = axis
 		axes[2] = decax
 		call mw_swtype (mw, axes, 2, ctype[ip],
-		    "axis 1: axtype=ra, axis 2: axtype=dec")
+		    "axis 1: axtype=ra axis 2: axtype=dec")
 
 	    } else if (strncmp (ctype, "dec-", 4) == 0) {
 		;   # This case is handled when RA-- is seen.
+
+	    } else if (strncmp (ctype, "multispec", 8) == 0) {
+		# Multispec format image.  Axis 1,2 are coupled.
+		if (axis == 1) {
+		    axes[1] = 1;  axes[2] = 2
+		    call mw_swtype (mw, axes, 2, "multispec", "")
+		}
 
 	    } else {
 		# Since we have to be able to read any FITS header, we have
@@ -146,10 +153,18 @@ samperr_		call eprintf (
 	# CD matrix was input, the CROTA/CDELT representation was input,
 	# or nothing was input, in which case we have the identity matrix.
 
-	if (iw_findcard (iw, TY_CD, ERR, 0) == NULL)
-	    if (iw_findcard (iw, TY_CDELT, ERR, 0) == NULL)
-		call mw_mkidmd (IW_CD(iw,1,1), ndim)
-	    else {
+	if (iw_findcard (iw, TY_CD, ERR, 0) == NULL) {
+	    # Initialize CD matrix to the identity matrix.  Can't use mw_mkidm
+	    # here as IW_CD is not dimensioned ndim.
+
+	    do j = 1, ndim {
+		do i = 1, ndim
+		    IW_CD(iw,i,j) = 0.0
+		IW_CD(iw,j,j) = 1.0
+	    }
+
+	    # Convert CDELT/CROTA to CD matrix.
+	    if (iw_findcard (iw, TY_CDELT, ERR, 0) != NULL) {
 		theta = DEGTORAD(IW_CROTA(iw))
 		ax2 = decax
 		ax1 = 3 - decax
@@ -162,6 +177,7 @@ samperr_		call eprintf (
 		if (IW_CDELT(iw,ax2) < 0)
 		    IW_CD(iw,ax2,ax1) = -IW_CD(iw,ax2,ax1)
 	    }
+	}
 
 	# Extract an NDIM submatrix from LTM and CD.
 	do j = 1, ndim

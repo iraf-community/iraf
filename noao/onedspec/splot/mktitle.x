@@ -1,18 +1,15 @@
 include	<imhdr.h>
 include	<pkg/gtools.h>
-include	"../idsmtn.h"
+include	"../shdr.h"
+include	"../units.h"
 
 # MKTITLE -- Make a spectrum title (IIDS style)
 
-procedure mktitle (image, nline, im, ids, gt)
+procedure mktitle (sh, gt)
 
-char	image[ARB]
-int	nline
-pointer	im, ids, gt
+pointer	sh, gt
 
-int	beamnr
 pointer	sp, str1, str2
-errchk	imgstr()
 
 begin
 	# Do nothing if no GTOOLS pointer is defined.
@@ -23,37 +20,67 @@ begin
 	call smark (sp)
 	call salloc (str1, SZ_LINE, TY_CHAR)
 	call salloc (str2, SZ_LINE, TY_CHAR)
-	if (nline > 0) {
-	    call sprintf (Memc[str1], SZ_LINE, "[%s[*,%d]]: ")
-	        call pargstr (image)
-		call pargi (nline)
-	} else {
-	    call sprintf (Memc[str1], SZ_LINE, "[%s]: ")
-	        call pargstr (image)
+	switch (FORMAT(sh)) {
+	case TWODSPEC:
+	    switch (NDIM(sh)) {
+	    case 1:
+		call sprintf (Memc[str1], SZ_LINE, "[%s]: ")
+		    call pargstr (SPECTRUM(sh))
+	    default:
+		if (NSUM(sh) == 1) {
+		    if (DAXIS(sh) == 1)
+			call sprintf (Memc[str1], SZ_LINE, "[%s[*,%d]]: ")
+		    else
+			call sprintf (Memc[str1], SZ_LINE, "[%s[%d,*]]: ")
+		    call pargstr (SPECTRUM(sh))
+		    call pargi (nint (APLOW(sh)))
+		} else {
+		    if (DAXIS(sh) == 1)
+			call sprintf (Memc[str1], SZ_LINE, "[%s[*,%d:%d]]: ")
+		    else
+			call sprintf (Memc[str1], SZ_LINE, "[%s[%d:%d,*]]: ")
+		    call pargstr (SPECTRUM(sh))
+		    call pargi (nint (APLOW(sh)))
+		    call pargi (nint (APHIGH(sh)))
+		}
+	    }
+	default:
+	    switch (NDIM(sh)) {
+	    case 1:
+		call sprintf (Memc[str1], SZ_LINE, "[%s]: ")
+		    call pargstr (SPECTRUM(sh))
+	    case 2:
+		call sprintf (Memc[str1], SZ_LINE, "[%s[*,%d]]: ")
+		    call pargstr (SPECTRUM(sh))
+		    call pargi (INDEX1(sh))
+	    case 3:
+		call sprintf (Memc[str1], SZ_LINE, "[%s[*,%d,%d]]: ")
+		    call pargstr (SPECTRUM(sh))
+		    call pargi (INDEX1(sh))
+		    call pargi (INDEX2(sh))
+	    }
 	}
 
 	# Copy image title
-	call strcpy (IM_TITLE(im), Memc[str2], SZ_LINE)
+	call strcpy (TITLE(sh), Memc[str2], SZ_LINE)
 	call strcat (Memc[str2], Memc[str1], SZ_LINE)
 
 	# Load exposure time and aperture number
-	if (BEAM(ids) >= 0 && BEAM(ids) < 100)
-	    beamnr = BEAM(ids)
-	else
-	    beamnr = 0
-	call sprintf (Memc[str2], SZ_LINE, " %7.2fs ap:%1d")
-	    call pargr (ITM(ids))
-	    call pargi (beamnr)
+	call sprintf (Memc[str2], SZ_LINE, " %.2fs ap:%d beam:%d")
+	    call pargr (IT(sh))
+	    call pargi (AP(sh))
+	    call pargi (BEAM(sh))
 	call strcat (Memc[str2], Memc[str1], SZ_LINE)
 
 	# Set GTOOLS labels.
 	call gt_sets (gt, GTTITLE, Memc[str1])
-	iferr {
-    	    call imgstr (im, "CTYPE1", Memc[str1], SZ_LINE)
-   	    call gt_sets (gt, GTXLABEL, Memc[str1])
-    	    call imgstr (im, "CUNIT1", Memc[str1], SZ_LINE)
-    	    call gt_sets (gt, GTXUNITS, Memc[str1])
-	} then
-	    ;
+	if (UN_LABEL(UN(sh)) != EOS) {
+	    call gt_sets (gt, GTXLABEL, UN_LABEL(UN(sh)))
+	    call gt_sets (gt, GTXUNITS, UN_UNITS(UN(sh)))
+	} else {
+	    call gt_sets (gt, GTXLABEL, LABEL(sh))
+	    call gt_sets (gt, GTXUNITS, UNITS(sh))
+	}
+
 	call sfree (sp)
 end

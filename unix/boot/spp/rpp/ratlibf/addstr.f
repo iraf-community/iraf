@@ -1,16 +1,16 @@
-      INTEGER FUNCTION ADDSTR (S, STR, J, MAXSIZ)
-      INTEGER J, MAXSIZ
-      INTEGER S (100), STR (MAXSIZ)
-      INTEGER I, ADDSET
-      I = 1
-23000 IF (.NOT.(S (I) .NE. -2))GOTO 23002
-      IF (.NOT.(ADDSET (S (I), STR, J, MAXSIZ) .EQ. 0))GOTO 23003
-      ADDSTR = 0
-      RETURN
-23003 CONTINUE
-23001 I = I + 1
-      GOTO 23000
-23002 CONTINUE
-      ADDSTR = 1
-      RETURN
-      END
+      integer function addstr (s, str, j, maxsiz)
+      integer j, maxsiz
+      integer s (100), str (maxsiz)
+      integer i, addset
+      i = 1
+23000 if (.not.(s (i) .ne. -2))goto 23002
+      if (.not.(addset (s (i), str, j, maxsiz) .eq. 0))goto 23003
+      addstr = 0
+      return
+23003 continue
+23001 i = i + 1
+      goto 23000
+23002 continue
+      addstr = 1
+      return
+      end

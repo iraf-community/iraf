@@ -12,8 +12,8 @@ XALLOC -- Device allocation package.
 	  xallocate (device)
 	xdeallocate (device, rewind)
 	  xdevowner (device, owner, maxch)
-	 xdevstatus (fd, device)
-	  xgdevlist (device, devlist, maxch)
+	 xdevstatus (device, out)
+	  xgdevlist (device, devlist, maxch, onedev)
 
 status:
 
@@ -22,18 +22,7 @@ status:
 	DV_DEVINUSE	device is in use by someone else
 	DV_DEVNOTFOUND	device is not in device table
 
-The allocatable devices are defined in the text file DEV$DEVICES.  Note that
-for each magtape device there are a set of entries corresponding to the
-specific densities and the default density, e.g.:
-
-	mta		magtape device A, default density
-	mta.800		magtape device A, 800 bpi
-	mta.1600	magtape device A, 1600 bpi
-				(etc.)
-
-The XGDEVLIST procedure is used to get the host device list from the device
-table.  If the device being allocated is a magtape, XALLOCATE will call
-MT_ALLOCATE to initialize MTIO, and XDEALLOCATE will call MT_DEALLOCATE.
+The allocatable devices are defined in the text file dev$tapecap.
 .endhelp ____________________________________________________________________
 
 define	SZ_DEVLIST	256
@@ -48,11 +37,12 @@ define	DEALLOCATE	0
 
 int procedure xallocate (device)
 
-char	device[ARB]		# IRAF name of device to be allocated.
-int	status, onedev, junk
+char	device[ARB]		#I device to be allocated
+
 pointer	sp, devlist
+int	status, onedev
 int	xgdevlist(), mtfile()
-errchk	xgdevlist, mt_allocate
+errchk	xgdevlist, mtallocate
 
 begin
 	call smark (sp)
@@ -60,7 +50,7 @@ begin
 
 	# Fetch the device list for the named device.
 	onedev = NO
-	status = xgdevlist (device, junk, Memc[devlist], SZ_DEVLIST, onedev)
+	status = xgdevlist (device, Memc[devlist], SZ_DEVLIST, onedev)
 	if (status != OK)
 	    return (status)
 
@@ -72,7 +62,7 @@ begin
 	# the allocation process.
 
 	if (status == OK && mtfile (device) == YES)
-	    call mt_allocate (device)
+	    call mtallocate (device)
 
 	call sfree (sp)
 	return (status)
@@ -83,12 +73,12 @@ end
 
 int procedure xdeallocate (device, rewind)
 
-char	device[ARB]		# IRAF name of device to be deallocated
-int	rewind			# rewind if magtape?
+char	device[ARB]		#I device to be deallocated
+int	rewind			#I rewind if magtape?
 
-int	status, onedev, junk, ip
+int	status, onedev
 pointer	sp, devlist, osdev, owner
-int	xgdevlist(), mtfile(), ctowrd()
+int	xgdevlist(), mtfile()
 errchk	xgdevlist, syserrs
 
 begin
@@ -97,9 +87,9 @@ begin
 	call salloc (osdev, SZ_FNAME, TY_CHAR)
 	call salloc (owner, SZ_FNAME, TY_CHAR)
 
-	# Fetch the device list for the named device.
-	onedev = NO
-	status = xgdevlist (device, junk, Memc[devlist], SZ_DEVLIST, onedev)
+	# Get the i/o device name.
+	onedev = YES
+	status = xgdevlist (device, Memc[osdev], SZ_FNAME, onedev)
 	if (status != OK)
 	    return (status)
 
@@ -107,13 +97,18 @@ begin
 	# magtape, call MTIO to conditionally rewind the drive and deallocate
 	# the drive in MTIO.
 
-	ip = 1; status = ctowrd (Memc[devlist], ip, Memc[osdev], SZ_FNAME)
 	call strpak (Memc[osdev], Memc[osdev], SZ_FNAME)
 	call zdvown (Memc[osdev], Memc[owner], SZ_FNAME, status)
 	if (status != DV_DEVALLOC)
 	    call syserrs (SYS_MTNOTALLOC, device)
 	else if (mtfile (device) == YES)
-	    call mt_deallocate (device, rewind)
+	    call mtdeallocate (device, rewind)
+
+	# Fetch the device list for the named device.
+	onedev = NO
+	status = xgdevlist (device, Memc[devlist], SZ_DEVLIST, onedev)
+	if (status != OK)
+	    return (status)
 
 	# Physically deallocate the device.
 	call strpak (Memc[devlist], Memc[devlist], SZ_DEVLIST)
@@ -126,10 +121,10 @@ end
 
 # XDEVSTATUS -- Print the status of the named device on the output file.
 
-procedure xdevstatus (out, device)
+procedure xdevstatus (device, out)
 
-int	out			# output file
-char	device[ARB]		# device
+char	device[ARB]		#I device
+int	out			#I output file
 
 int	status
 char	owner[SZ_FNAME]
@@ -143,6 +138,9 @@ begin
 	case DV_DEVFREE:
 	    call fprintf (out, "device %s is not currently allocated\n")
 		call pargstr (device)
+	    if (mtfile (device) == YES)
+		iferr (call mtstatus (out, device))
+		    ;
 	case DV_DEVINUSE:
 	    call fprintf (out, "device %s is currently allocated to %s\n")
 		call pargstr (device)
@@ -161,18 +159,18 @@ begin
 end
 
 
-# XDEVOWNER -- Determine whether or not the named device is already allocated,
-# and if the device is currently allocated to someone else, return the owner
-# name.
+# XDEVOWNER -- Determine whether or not the named device is already
+# allocated, and if the device is currently allocated to someone else,
+# return the owner name.
 
 int procedure xdevowner (device, owner, maxch)
 
-char	device[ARB]		# IRAF name of device to be deallocated.
-char	owner[maxch]		# receives owner name if alloc to someone else
-int	maxch
+char	device[ARB]		#I device to be deallocated
+char	owner[maxch]		#O receives owner name
+int	maxch			#I max chars out
 
-int	status, onedev, junk
 pointer	sp, devlist
+int	status, onedev
 int	xgdevlist()
 errchk	xgdevlist
 
@@ -182,7 +180,7 @@ begin
 
 	# Fetch the device list for the named device.
 	onedev = YES
-	status = xgdevlist (device, junk, Memc[devlist], SZ_DEVLIST, onedev)
+	status = xgdevlist (device, Memc[devlist], SZ_DEVLIST, onedev)
 	if (status != OK)
 	    return (status)
 

@@ -105,18 +105,16 @@ begin
 	    }
 	}
 
+	nreject = nreject + newreject
+	call sfree (sp)
+
 	if ((refit == YES) && (newreject > 0)) {
 	    call dcvsolve (cv, i)
-
 	    switch (i) {
 	    case SINGULAR:
-		call eprintf ("ic_reject: Singular solution\n")
+		call error (1, "ic_reject: Singular solution")
 	    case NO_DEG_FREEDOM:
-		call eprintf ("ic_reject: No degrees of freedom\n")
+		call error (2, "ic_reject: No degrees of freedom")
 	    }
 	}
-
-	nreject = nreject + newreject
-
-	call sfree (sp)
 end

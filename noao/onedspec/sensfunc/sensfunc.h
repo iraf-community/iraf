@@ -39,7 +39,7 @@ define	STD_Y		Memi[$1+115]	# Pointer to plotted y values
 
 define	GP_SZTITLE	79			# Size of title string
 
-define	LEN_GP		65			# Length of structure
+define	LEN_GP		70			# Length of structure
 
 define	GP_GIO		Memi[$1]		# GIO pointer
 define	GP_TITLE	Memc[P2C($1+1)]		# General title
@@ -51,7 +51,10 @@ define	GP_SZMARK	Memr[$1+53]		# Mark size
 define	GP_MDEL		Memi[$1+54]		# Deleted mark
 define	GP_SZMDEL	Memr[$1+55]		# Size of deleted mark
 define	GP_MADD		Memi[$1+56]		# Mark type
-define	GP_WSTART	Memr[$1+57]		# Starting wavelength for plots
-define	GP_WEND		Memr[$1+58]		# Ending wavelength for plots
-define	GP_IMIO		Memi[$1+58+$2]		# IMIO pointers
-define	GP_AIRMASS	Memr[$1+62+$2]		# Airmass range of plots
+define  GP_WSTART       Memr[$1+57]             # Starting wavelength for plots
+define  GP_WEND         Memr[$1+58]             # Ending wavelength for plots
+define	GP_LOG		Memi[$1+59]		# Log flux plots?
+define	GP_FMIN		Memr[$1+60]		# Minimum flux plot limit
+define	GP_FMAX		Memr[$1+61]		# Maximum flux plot limit
+define	GP_SHDR		Memi[$1+61+$2]		# SHDR pointer
+define	GP_AIRMASS	Memr[$1+65+$2]		# Airmass range of plots

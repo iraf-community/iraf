@@ -26,8 +26,8 @@ pointer	mw				#I pointer to MWCS descriptor
 pointer	im				#I pointer to image descriptor
 
 double	cdelt
-bool	update
 char	label[SZ_VALSTR]
+bool	update, output_cdelt
 char	kwname[SZ_KWNAME], ctype[SZ_KWNAME], axtype[3]
 int	ndim, axis, fn, ira, idec, i, j, pv, wv, npts, fd
 pointer	sp, iw, wp, wf, vp, cp, at, o_r, n_r, o_cd, n_cd, ltm
@@ -63,8 +63,12 @@ begin
 	call salloc (n_cd, ndim*ndim, TY_DOUBLE)
 	call salloc (ltm, ndim*ndim, TY_DOUBLE)
 
-	# Set the default world system.
-	call mw_ssystem (mw, "world")
+	# Get pointer to the world system to be saved.  Currently only one
+	# such system can be saved since the image header is FITS based and
+	# FITS doesn't support multiple world coordinate systems.  The system
+	# to be saved can be set by calling MW_SSYSTEM before doing the
+	# mw_saveim.
+
 	wp = MI_WCS(mw)
 
 	# Do we need to save any WCS information at all?
@@ -207,9 +211,15 @@ begin
 	# Output CDELT1/CDELT2 if the image dimension is 2 or less and the
 	# CD matrix is a diagonal matrix (no rotational or skew terms).
 
-	if (ndim == 1 || (ndim == 2 &&
-	    (fp_equald(Memd[n_cd+1],0.D0) && fp_equald(Memd[n_cd+2],0.D0)))) {
+	output_cdelt = false
+	if (ndim == 1)
+	    output_cdelt = true
+	else if (ndim == 2) {
+	    output_cdelt = (fp_equald(Memd[n_cd+1],0.0D0) &&
+			    fp_equald(Memd[n_cd+2],0.0D0))
+	}
 
+	if (output_cdelt) {
 	    do j = 1, ndim {
 		cdelt = Memd[n_cd+(j-1)*(ndim+1)]
 		cp = iw_findcard (iw, TY_CDELT, j, 0)
@@ -227,7 +237,7 @@ begin
 
 	# Update the CD matrix.
 	do j = 1, ndim {
-	    call sprintf (kwname, SZ_KWNAME, "CD%%d_%d")
+	    call sprintf (kwname, SZ_KWNAME, "CD%d_%%d")
 		call pargi (j)
 	    call iw_putarray (iw, Memd[n_cd+(j-1)*ndim],
 		IW_CD(iw,1,j), ndim, kwname, TY_CD, j)
@@ -250,6 +260,23 @@ ewcs_
 	    }
 	}
 
+	# Output axis map if any.
+	if (MI_USEAXMAP(mw) == YES) {
+	    fd = open ("WAXMAP", READ_WRITE, SPOOL_FILE)
+	    axis = ERR
+
+	    do i = 1, ndim {
+		call fprintf (fd, "%d %d ")
+		    call pargi (MI_AXNO(mw,i))
+		    call pargi (MI_AXVAL(mw,i))
+	    }
+
+	    # Output successive WAXMAPj FITS cards.
+	    call seek (fd, BOFL)
+	    call iw_putstr (fd, iw, axis, TY_WAXMAP, "WAXMAP%02d")
+	    call close (fd)
+	}
+
 	# Output any WCS attributes.
 	do axis = 0, ndim {
 	    fd = open ("WAT", READ_WRITE, SPOOL_FILE)
@@ -263,12 +290,16 @@ ewcs_
 		if (AT_AXIS(at) != axis)
 		    next
 
-		if (stridxs (" \t", S(mw,(AT_VALUE(at)))) > 0)
-		    call fprintf (fd, "%s = \"%s\" ")
-		else
-		    call fprintf (fd, "%s=%s ")
-		call pargstr (S(mw,AT_NAME(at)))
-		call pargstr (S(mw,AT_VALUE(at)))
+		call putline (fd, S(mw,AT_NAME(at)))
+		if (stridxs (" \t", S(mw,(AT_VALUE(at)))) > 0) {
+		    call putline (fd, " = \"")
+		    call putline (fd, S(mw,AT_VALUE(at)))
+		    call putline (fd, "\" ")
+		} else {
+		    call putline (fd, "=")
+		    call putline (fd, S(mw,AT_VALUE(at)))
+		    call putline (fd, " ")
+		}
 
 		npts = npts + 1
 	    }

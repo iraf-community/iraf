@@ -1,13 +1,10 @@
 include	"apertures.h"
 
 # Sort flags:
-define	ID	1	# Sort by aperture ID
-define	POS	2	# Sort by aperture position
+define	INC	1	# Sort by aperture position in increasing order
+define	DEC	2	# Sort by position in decreasing order
 
-# AP_SORT -- Sort the apertures.  This routine is not
-# called often or with a large number of apertures so we use the brute
-# force method.  Return the new aperture index corresponding to the
-# current aperture.
+# AP_SORT -- Sort the apertures.
 
 procedure ap_sort (current, aps, naps, flag)
 
@@ -20,11 +17,15 @@ int	i, j, apaxis
 pointer	ap
 
 begin
+	if (naps < 1)
+	    return
+
 	switch (flag) {
-	case ID:
+	case INC:
+	    apaxis = AP_AXIS (aps[1])
 	    for (i = 1; i <= naps - 1; i = i + 1) {
 	        for (j = i + 1; j <= naps; j = j + 1) {
-	            if (AP_ID(aps[i]) > AP_ID(aps[j])) {
+		    if (AP_CEN(aps[i], apaxis) > AP_CEN(aps[j], apaxis)) {
 		        ap = aps[i]
 		        aps[i] = aps[j]
 		        aps[j] = ap
@@ -35,11 +36,11 @@ begin
 		    }
 	        }
 	    }
-	case POS:
+	case DEC:
 	    apaxis = AP_AXIS (aps[1])
 	    for (i = 1; i <= naps - 1; i = i + 1) {
 	        for (j = i + 1; j <= naps; j = j + 1) {
-		    if (AP_CEN(aps[i], apaxis) > AP_CEN(aps[j], apaxis)) {
+		    if (AP_CEN(aps[i], apaxis) < AP_CEN(aps[j], apaxis)) {
 		        ap = aps[i]
 		        aps[i] = aps[j]
 		        aps[j] = ap

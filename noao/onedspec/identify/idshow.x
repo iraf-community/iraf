@@ -1,4 +1,3 @@
-include	<pkg/center1d.h>
 include	"identify.h"
 
 # ID_SHOW -- Show parameter information.
@@ -37,7 +36,11 @@ begin
 	case 3:
 	    call fprintf (fd, "labels pixel\n")
 	case 4:
+	    call fprintf (fd, "labels coords\n")
+	case 5:
 	    call fprintf (fd, "labels user\n")
+	case 6:
+	    call fprintf (fd, "labels both\n")
 	default:
 	    call fprintf (fd, "labels none\n")
 	}

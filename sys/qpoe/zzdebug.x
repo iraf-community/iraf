@@ -1443,7 +1443,7 @@ int	p1, p2
 char	list1[SZ_LINE], list2[SZ_LINE]
 pointer	sp, rl1, rl2, op, xs, xe, ys, ye, os, oe
 int	fd, ch, xlen, ylen, olen, nx, ny, nout, i
-int	open(), getci(), qpex_parsei(), qpex_mergei()
+int	open(), getci(), qpex_parsei(), qp_rlmergei()
 
 begin
 	call smark (sp)
@@ -1495,7 +1495,7 @@ begin
 	olen = 100
 	call malloc (os, olen, TY_INT)
 	call malloc (oe, olen, TY_INT)
-	nout = qpex_mergei (os,oe,olen,
+	nout = qp_rlmergei (os,oe,olen,
 	    Memi[xs],Memi[xe],nx, Memi[ys],Memi[ye],ny)
 
 	# Print results:

@@ -19,7 +19,8 @@ menus,b,h,yes,,,Display menu when changing packages?
 showtype,b,h,no,,,Add task-type suffix in menus?
 notify,b,h,yes,,,Send done message when bkgrnd task finishes?
 szprcache,i,h,4,1,10,Size of the process cache
-version,s,h,"V2.9EXPORT March 1990"
+version,s,h,"IRAF V2.10EXPORT April 1992 revision 1",,,IRAF version
+logver,s,h,"",,,login.cl version
 mode,s,h,ql,,,CL mode of execution (query or query+learn)
 
 auto,s,h,a,,,The next 4 params are read-only.

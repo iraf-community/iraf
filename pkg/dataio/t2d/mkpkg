@@ -6,5 +6,5 @@ $checkin  libpkg.a ../
 $exit
 
 libpkg.a:
-	t_t2d.x		<fset.h> <error.h> <printf.h> <mach.h>
+	t_t2d.x		<fset.h> <error.h> <mach.h>
 	;

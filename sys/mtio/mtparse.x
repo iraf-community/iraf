@@ -5,149 +5,122 @@ include	<syserr.h>
 include	<ctype.h>
 include	"mtio.h"
 
-define	SZ_EOTSTR	3
-
-# MT_PARSE -- Decode a virtual magtape file specification, returning the
-# fields "drive", "density", and "file_number".  The latter two fields are
-# set to -1 if absent.  The drive name field is required.
+# MTPARSE -- Decode a virtual magtape file specification, returning the device
+# name, file and record to which the drive is to be positioned, and any special
+# device attributes (these will override the device defaults).  The file and
+# record fields are returned as ERR if missing.  Only the drive name field is
+# required.
 # 
-# Filespec syntax:
+# Magtape device syntax:
 #
-#    [node!]"mt"(drive)(800|1600|6250)?("["(fileno)?[,(recno)?]|"eot""]")?
+#	[node!] mtX [ '[' file[.record] [:attr-list] ']' ]
 #
-# We do not actually know what densities are legal for each tape drive; all we
-# do is look for the integer constant, convert it, and return the value.  We
-# do check that the drive unit number is legal.  Extra characters anywhere are
-# an error.
+# for example,
+#
+#	mtexb1[4:nb:se@:ts=1200:so=/dev/ttya8]
+#
+# The "mt" prefix is required for the object to be considered a magtape
+# device reference.  The device name returned is "mtX" as shown above; there
+# must be an entry for device mtX in the tapecap file in DEV.
+#
+# The file and record numbers are optional.  Files and records are numbered
+# starting with 1.  A sequence such as "mtX[eot]" will cause the tape to be
+# positioned to end of tape.  "mtX[0]" causes the tape to be opened at the
+# current position, i.e., without being moved.
+#
+# The optional attr-list field consists of a sequence of colon-delimited
+# tapecap fields.  These will override any values given in the tapecap
+# entry for the device.  The syntax for attr-list is the same as in tapecap.
 
-procedure mt_parse (filespec, drive, maxch, density, filenum, recordnum)
+procedure mtparse (mtname, device, sz_device, file, record, attrl, sz_attrl)
 
-char	filespec[ARB]		# filespec to be decoded
-char	drive[maxch]		# drive name
-int	maxch			# max chars in drive name
-int	density			# desired density or -1 if don't care
-int	filenum			# desired filenumber or -1 if current pos
-int	recordnum		# desired record number or 1 if not given
+char	mtname[ARB]		#I device specification
+char	device[ARB]		#O device name as in tapecap
+int	sz_device		#I max chars in device name
+int	file			#O file number or -1
+int	record			#O record number or -1
+char	attrl[ARB]		#O attribute list
+int	sz_attrl		#I max char in attribute list
 
-int	ip, op, nchars
-char	eotstr[SZ_EOTSTR], ch
+char	eotstr[3]
+int	ip, op, nchars, ival
+int	ctoi(), strncmp(), ki_extnode()
 bool	streq()
-int	ctoi(), strncmp(), ki_extnode(), delim()
-define	badspec_ 91
+define	bad_ 91
 
 begin
-	# Extract the node name, if any, from the filespec.  IP is left
-	# pointing to the first char following the node prefix.
-
-	ip = ki_extnode (filespec, drive, maxch, nchars) + 1
+	# Extract the node name, if any, from the mtname.
+	ip = ki_extnode (mtname, device, sz_device, nchars) + 1
 	op = nchars + 1
 
-	# The remainder of the filespec must be a conventional MTIO magtape
-	# name.
+	# Verify that this is a magtape device specification.
+	if (strncmp (mtname[ip], "mt", 2) != 0)
+	    goto bad_
 
-	if (strncmp (filespec[ip], "mt", 2) != 0)
-	    goto badspec_
-
-	# Skip the prefix "mt".
-	ip = ip + 2
-
-	# Extract the drive name field.  If the first character following
-	# the "mt" is nonalphanumeric that character is taken as the drive
-	# name field delimiter and is not included in the drive name string,
-	# thus a delimiter may be used to mark drive name fields containing
-	# arbitrary data.  If no delimiter character is given the drive
-	# name field is assumed to be an alphabetic sequence.  Hence, old
-	# syntax magtape file names such as "mta1600[1]" are still permitted.
-
-	if (IS_ALPHA (filespec[ip])) {
-	    for (;  IS_ALPHA (filespec[ip]);  ip=ip+1) {
-		drive[op] = filespec[ip]
-		op = op + 1
-	    }
-
-	    # Skip an unmatched delimiter, as in "mta.1600", rather than
-	    # "mt.*.1600", which puts us in the else clause, below.
-
-	    if (filespec[ip] == '.')
-		ip = ip + 1
-
-	} else {
-	    delim = filespec[ip]
-	    for (ip=ip+1;  filespec[ip] != EOS;  ip=ip+1)
-		if (filespec[ip] == delim) {
-		    ip = ip + 1
-		    break
-		} else if (op > maxch || filespec[ip] == '[') {
-		    break
-		} else {
-		    drive[op] = filespec[ip]
-		    op = op + 1
-		}
-	}
-
-	if (op == 1)
-	    goto badspec_
-	else
-	    drive[op] = EOS
-
-	# Get the density, if any.  Default to zero.  We do not know what
-	# densities are legal (that is machine dependent) so any positve
-	# number is ok.
-
-	if (ctoi (filespec, ip, density) > 0) {
-	    if (density < 0)				# negative density?
-		goto badspec_
-	} else {					# not a number
-	    if (filespec[ip] != '[' && filespec[ip] != EOS)
-		goto badspec_				# mtaNNjunk
-	    else
-		density = 0
-	}
-
-	# Get the file number and record numbers, if any.  "[eot]" is a
-	# special case, referencing the end of tape.
-
-	filenum = -1
-	recordnum = 1
-
-	if (filespec[ip] == '[') {
+	# Extract the device name field.
+	while (mtname[ip] != EOS && mtname[ip] != '[') {
+	    device[op] = mtname[ip]
+	    op = min (sz_device, op + 1)
 	    ip = ip + 1
-	    ch = filespec[ip]
+	}
+	device[op] = EOS
 
-	    if (ctoi (filespec, ip, filenum) > 0) {
-		if (filenum < 0)
-		    goto badspec_			# [-nn]
-	    } else if (IS_ALPHA(ch)) {
-		call strcpy (filespec[ip], eotstr, SZ_EOTSTR)
+	file = ERR
+	record = ERR
+	attrl[1] = EOS
+
+	# Process the [...] part of the device specification.
+	if (mtname[ip] == '[') {
+	    ip = ip + 1
+
+	    # Get the file number.
+	    if (ctoi (mtname, ip, ival) > 0) {
+		file = ival
+		if (file < 0)
+		    goto bad_
+	    } else if (IS_ALPHA(mtname[ip])) {
+		call strcpy (mtname[ip], eotstr, 3)
 		call strlwr (eotstr)
 		if (streq (eotstr, "eot")) {
-		    filenum = EOT
-		    ip = ip + SZ_EOTSTR
+		    file = EOT
+		    ip = ip + 3
 		} else
-		    goto badspec_			# string not 'eot'
+		    goto bad_
 	    }
 
-	    if (filespec[ip] == ',') {			# record num field
+	    # Get the record number.
+	    if (mtname[ip] == '.' || mtname[ip] == ',') {
 		ip = ip + 1
-		if (filespec[ip] == ']')
-		    recordnum = 0
-		else if (ctoi (filespec, ip, recordnum) > 0) {
-		    if (recordnum < 0)
-			goto badspec_			# [nn,junk]
+		if (mtname[ip] == ']')
+		    record = ERR
+		else if (ctoi (mtname, ip, ival) > 0) {
+		    record = ival
+		    if (record < 0)
+			goto bad_
 		}
 	    }
 
-	    if (filespec[ip] == ']')
+	    # Get the device attribute list.
+	    op = 1
+	    if (mtname[ip] == ':') {
+		attrl[op] = mtname[ip]
+		op = max(1, min(sz_attrl, op + 1))
 		ip = ip + 1
-	    else
-		goto badspec_				# no trailing ']'
+
+		while (mtname[ip] != EOS && mtname[ip] != ']') {
+		    attrl[op] = mtname[ip]
+		    op = max(1, min(sz_attrl, op + 1))
+		    ip = ip + 1
+		}
+	    }
+	    attrl[op] = EOS
+
+	    # Check for the ']' terminator.
+	    if (mtname[ip] != ']')
+		goto bad_
 	}
 
-	if (filespec[ip] != EOS)
-	    goto badspec_				# extra junk at end
-
 	return
-
-badspec_
-	call syserrs (SYS_MTFILSPEC, filespec)
+bad_
+	call syserrs (SYS_MTFILSPEC, mtname)
 end

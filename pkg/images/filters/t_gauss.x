@@ -5,7 +5,8 @@ include <imhdr.h>
 include <imset.h>
 include <math.h>
 
-# T_GAUSS -- Convolve a list of IRAF images with a Gaussian
+# T_GAUSS -- Convolve a list of IRAF images with a Gaussian convolution
+# kernel.
 
 procedure t_gauss()
 
@@ -15,44 +16,46 @@ char	imtlist2[SZ_LINE]			# Output image list
 char	image1[SZ_FNAME]			# Input image
 char	image2[SZ_FNAME]			# Output image
 
-real	sigma					# Half width in x
-real	ratio					# Ratio of halfwidth in y to x
+real	sigma					# Sigma in x
+real	ratio					# Ratio of sigma in y to x
 real	theta					# Position angle
 real	nsigma					# Extent of Gaussian
+int	bilinear				# Use bilinear kernel approx
 
 int	boundary				# Type of boundary extension
 real	constant				# Constant boundary extension
 
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	list1, list2, nxk, nyk, radsym
-pointer	sp, im1, im2, kernel
-real	a, b, c, f
+int	list1, list2, kbilinear, nxk1, nyk1, nxk2, nyk2, radsym
+pointer	sp, im1, im2, kernel1, kernel2
+real	a1, b1, c1, f1, a2, b2, c2, f2
 
-bool	fp_equalr()
-int	imtopen(), imtgetim(), imtlen(), clgwrd()
+bool	clgetb(), fp_equalr()
+int	imtopen(), imtgetim(), imtlen(), clgwrd(), btoi()
 pointer	immap()
 real	clgetr()
 
 errchk	cnv_ell_gauss, cnv_gauss_kernel, cnv_convolve
 
 begin
-	# Get task parameters
+	# Get task input and output parameters.
 	call clgstr ("input", imtlist1, SZ_FNAME)
 	call clgstr ("output", imtlist2, SZ_FNAME)
 
-	# Get kernel parameters
+	# Get the convolution kernel parameters.
 	sigma = clgetr ("sigma")
 	ratio = clgetr ("ratio")
 	theta = clgetr ("theta")
 	nsigma = clgetr ("nsigma")
+	bilinear = btoi (clgetb ("bilinear"))
 
-	# Get boundary extension parameters
+	# Get the image boundary extension parameters.
 	boundary = clgwrd ("boundary", str, SZ_LINE,
 	    ",constant,nearest,reflect,wrap,")
 	if (boundary == BT_CONSTANT)
 	    constant = clgetr ("constant")
 
-	# Check list lengths
+	# Check the input and output image list lengths.
 	list1 = imtopen (imtlist1)
 	list2 = imtopen (imtlist2)
 	if (imtlen (list1) != imtlen (list2)) {
@@ -61,7 +64,7 @@ begin
 	    call error (0, "Number of input and output images not the same.")
 	}
 
-	# Check parameters
+	# Check kernel parameters.
 	if (fp_equalr (sigma, 0.0))
 	    call error (0, "T_GAUSS: Sigma must be greater than 0.")
 	if (ratio < 0.0 || ratio > 1.0)
@@ -74,48 +77,86 @@ begin
 	    ! fp_equalr (theta, 90.0) && ! fp_equalr (theta, 180.0))
 	    call error (0, "T_GAUSS: Cannot make 1D Gaussian at given theta.")
 
-	# Convolve the images with a Gaussian
+	# Convolve the images in the list the with the Gaussian kernel.
 	while ((imtgetim (list1, image1, SZ_FNAME) != EOF) &&
 	      (imtgetim (list2, image2, SZ_FNAME) != EOF)) {
 	    
-	    # Make temporary image
+	    # Make the temporary image.
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
-	    # Open images
+	    # Open the input and output images.
 	    im1 = immap (image1, READ_ONLY, 0)
 	    im2 = immap (image2, NEW_COPY, im1)
 
-	    kernel = NULL
+	    kernel1 = NULL
+	    kernel2 = NULL
 
-	    # Convolve an image with a Gaussian
+	    # Convolve an image with the Gaussian kernel. 
 	    iferr {
 
-		# calculate the ellipse parameters
+		# Calculate the ellipse parameters.
 		switch (IM_NDIM(im1)) {
 		case 1:
-		    call cnv_ell_gauss (sigma, 0.0, 0.0, nsigma, a, b,
-		        c, f, nxk, nyk)
+		    kbilinear = NO
 		    radsym = YES
+		    call cnv_ell_gauss (sigma, 0.0, 0.0, nsigma, a1, b1,
+		        c1, f1, nxk1, nyk1)
 		case 2:
-		    call cnv_ell_gauss (sigma, ratio, theta, nsigma, a, b,
-		        c, f, nxk, nyk)
-		    if (ratio < 1.0)
-			radsym = NO
-		    else
+		    if (ratio < 1.0) {
+			if (fp_equalr (ratio, 0.0)) {
+			    kbilinear = NO
+			    radsym = YES
+			} else if (fp_equalr (theta, 0.0) || fp_equalr (theta,
+			    90.0) || fp_equalr (theta, 180.0)) {
+			    kbilinear = bilinear
+			    radsym = YES
+			} else {
+			    kbilinear = NO
+			    radsym = NO
+			}
+			if (kbilinear == YES) {
+		    	    call cnv_ell_gauss (sigma, 0.0, 0.0, nsigma, a1,
+			        b1, c1, f1, nxk1, nyk1)
+		    	    call cnv_ell_gauss (ratio * sigma, 0.0, 90.0,
+			        nsigma, a2, b2, c2, f2, nxk2, nyk2)
+			} else
+		            call cnv_ell_gauss (sigma, ratio, theta, nsigma,
+			        a1, b1, c1, f1, nxk1, nyk1)
+		    } else {
+			kbilinear = bilinear
 			radsym = YES
+			if (kbilinear == YES) {
+		    	    call cnv_ell_gauss (sigma, 0.0, 0.0, nsigma, a1,
+			        b1, c1, f1, nxk1, nyk1)
+		    	    call cnv_ell_gauss (sigma, 0.0, 90.0, nsigma, a2,
+			        b2, c2, f2, nxk2, nyk2)
+			} else
+		            call cnv_ell_gauss (sigma, ratio, theta, nsigma,
+			        a1, b1, c1, f1, nxk1, nyk1)
+		    }
 		default:
 		    call error (0,
-		        "T_GAUSS: Cannot convolve 3D or greater image.")
+		   "T_GAUSS: Cannot convolve a 3D or higher dimensioned image.")
 		}
 
-		# calculate the kernel
+		# Compute the kernel.
 		call smark (sp)
-		call salloc (kernel, nxk * nyk, TY_REAL)
-		call cnv_gauss_kernel (Memr[kernel], nxk, nyk, a, b, c, f)
+		call salloc (kernel1, nxk1 * nyk1, TY_REAL)
+		call cnv_gauss_kernel (Memr[kernel1], nxk1, nyk1, a1, b1,
+		    c1, f1)
+		if (kbilinear == YES) {
+		    call salloc (kernel2, nxk2 * nyk2, TY_REAL)
+		    call cnv_gauss_kernel (Memr[kernel2], nxk2, nyk2, a2, b2,
+		        c2, f2)
+		}
 
-		# convolve image
-		call cnv_convolve (im1, im2, Memr[kernel], nxk, nyk, boundary,
-		    constant, radsym)
+		# Convolve the image.
+		if (kbilinear == YES)
+		    call cnv_xyconvolve (im1, im2, Memr[kernel1], nxk1,
+		        Memr[kernel2], nyk2, boundary, constant, radsym)
+		else
+		    call cnv_convolve (im1, im2, Memr[kernel1], nxk1, nyk1,
+		        boundary, constant, radsym)
 
 	    } then {
 		call eprintf ("Error convolving image: %s\n")
@@ -130,41 +171,40 @@ begin
 	        call xt_delimtemp (image2, imtemp)
 	    }
 
-	    if (kernel != NULL)
+	    if (kernel1 != NULL || kernel2 != NULL)
 	        call sfree (sp)
-	    kernel = NULL
+	    kernel1 = NULL
+	    kernel2 = NULL
 	}
 
-	# close images
+	# Close images lists.
 	call imtclose (list1)
 	call imtclose (list2)
 end
 
-# define	HALFWIDTH	1.177410022
 
-# CNV_ELL_GAUSS -- Make the elliptical Gaussian parameters
+# CNV_ELL_GAUSS -- Compute the parameters of the elliptical Gaussian.
 
 procedure cnv_ell_gauss (sigma, ratio, theta, nsigma, a, b, c, f, nx, ny)
 
-real	sigma			# sigma of Gaussian in x
+real	sigma			# Sigma of Gaussian in x
 real	ratio			# Ratio of half-width in y to x
-real	theta			# position angle of Gaussian
-real	nsigma			# limit of convolution
-real	a, b, c, f		# ellipse parameters
-int	nx, ny			# dimensions of the kernel
+real	theta			# Position angle of Gaussian
+real	nsigma			# Limit of convolution
+real	a, b, c, f		# Ellipse parameters
+int	nx, ny			# Dimensions of the kernel
 
 real	sx2, sy2, cost, sint, discrim
-
 bool	fp_equalr ()
 
 begin
+	# Define some constants.
 	sx2 = sigma ** 2
 	sy2 = (ratio * sigma) ** 2
-
 	cost = cos (DEGTORAD (theta))
 	sint = sin (DEGTORAD (theta))
 
-	# compute the ellipse parameters
+	# Compute the ellipse parameters.
 	if (fp_equalr (ratio, 0.0)) {
 
 	    if (fp_equalr (theta, 0.0) || fp_equalr (theta, 180.)) {
@@ -179,7 +219,6 @@ begin
 		call error (0, "CNV_GAUSS_KERNEL: Cannot make 1D Gaussian.")
 
 	    f = nsigma ** 2 / 2.
-
 	    nx = 2. * sigma * nsigma * abs (cost) + 1.
 	    ny = 2. * sigma * nsigma * abs (sint) + 1.
 
@@ -194,32 +233,34 @@ begin
 	    ny = 2. * sqrt (-8. * a * f / discrim) + 1.
 	}
 
-	# force to nearest odd integer
+	# Force the kernel to the next nearest odd integer.
 	if (mod (nx, 2) == 0)
 	    nx = nx + 1
 	if (mod (ny, 2) == 0)
 	    ny = ny + 1
 end
 
-# CNV_GAUSS_KERNEL -- Make the Gaussian kernel using an elliptical Gaussian
+
+# CNV_GAUSS_KERNEL -- Construct the Gaussian kernel using an the elliptical
+# Gaussian parameters.
 
 procedure cnv_gauss_kernel (kernel, nx, ny, a, b, c, f)
 
 real	kernel[nx,ny]		# Gaussian kernel
-int	nx, ny			# dimensions of the kernel
+int	nx, ny			# Dimensions of the kernel
 real	a, b, c, f		# Ellipse parameters
 
 int	i, j, x0, y0, x, y
 real	norm
-
 bool 	fp_equalr()
 
 begin
+	# Define some constants.
 	x0 = nx / 2 + 1
 	y0 = ny / 2 + 1
 	norm = 0.0
 
-	# Compute the kernel
+	# Compute the kernel.
 	do j = 1, ny {
 	    y = j - y0
 	    do i = 1, nx {
@@ -233,7 +274,7 @@ begin
 	    }
 	}
 
-	# Normalize the kernel
+	# Normalize the kernel.
 	if (! fp_equalr (norm, 0.0))
 	    call adivkr (kernel, norm, kernel, nx * ny)
 end

@@ -220,7 +220,7 @@ badkey_			call eprintf ("QPIO: bad key value `%s'\n")
 			    call pargstr (F(value))
 			status = ERR
 		    } else
-			IO_EVXOFF(io) = byte_offset / (SZ_SHORT * SZB_CHAR)
+			IO_EVYOFF(io) = byte_offset / (SZ_SHORT * SZB_CHAR)
 		}
 		op = start
 

@@ -3,7 +3,9 @@
 
 #include <stdio.h>
 #include <sys/types.h>
+#ifndef SYSV
 #include <sys/timeb.h>
+#endif
 #include <sys/times.h>
 #include <sys/time.h>
 

@@ -1,7 +1,7 @@
 # Demonstration parameter setting script.
 
 # Set package parameters:
-ccdred.pixeltype = "real"
+ccdred.pixeltype = "real real"
 ccdred.verbose = yes
 ccdred.logfile = "Demo.log"
 ccdred.plotfile = "Demo.plots"
@@ -39,27 +39,28 @@ ccdproc.niterate = 1
 ccdproc.low_reject = 3.
 ccdproc.high_reject = 3.
 ccdproc.grow = 0.
+flatcombine.process = no
 
 # Set demonstration observation parameters:
-observe.ncols = 132
-observe.nlines = 100
-observe.filter = ""
-observe.datasec = "[1:100,1:100]"
-observe.trimsec = "[3:98,3:98]"
-observe.biassec = "[103:130,*]"
-observe.imdata = ""
-observe.skyrate = 0.
-observe.badpix = "ccdtest$badpix.dat"
-observe.biasval = 500.
-observe.badval = 500.
-observe.zeroval = 100.
-observe.darkrate = 1.
-observe.zeroslope = 0.01
-observe.darkslope = 0.002
-observe.flatslope = 3.0000000000000E-4
-observe.sigma = 5.
-observe.seed = 0
-observe.overwrite = no
+artobs.ncols = 132
+artobs.nlines = 100
+artobs.filter = ""
+artobs.datasec = "[1:100,1:100]"
+artobs.trimsec = "[3:98,3:98]"
+artobs.biassec = "[103:130,*]"
+artobs.imdata = ""
+artobs.skyrate = 0.
+artobs.badpix = "ccdtest$badpix.dat"
+artobs.biasval = 500.
+artobs.badval = 500.
+artobs.zeroval = 100.
+artobs.darkrate = 1.
+artobs.zeroslope = 0.01
+artobs.darkslope = 0.002
+artobs.flatslope = 3.0000000000000E-4
+artobs.sigma = 5.
+artobs.seed = 0
+artobs.overwrite = no
 
 # Set demonstration subsection readout parameters:
 subsection.ncols = 82

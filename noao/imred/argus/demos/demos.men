@@ -1,0 +1,4 @@
+	MENU of ARGUS Demonstrations
+
+      doargus - Quick test of DOARGUS (small images, no comments, no delays)
+    mkdoargus - Make DOARGUS test data (12 fibers, 100x256)

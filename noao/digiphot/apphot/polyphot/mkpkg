@@ -1,4 +1,4 @@
-# POLYPHOT routines
+# POLYPHOT and POLYMARK routines
 
 $checkout libpkg.a ".."
 $update libpkg.a
@@ -6,6 +6,8 @@ $checkin  libpkg.a ".."
 $exit
 
 libpkg.a:
+	# POLYPHOT routines
+
 	appyerrors.x	../lib/polyphot.h
 	apgypars.x	../lib/display.h	../lib/fitsky.h         \
 			../lib/apphot.h		../lib/noise.h          \
@@ -25,8 +27,8 @@ libpkg.a:
 			../lib/noise.h		../lib/display.h	\
 			<gset.h>		<error.h>
 	apyfit.x	../lib/polyphot.h	../lib/noise.h          \
-			../lib/center.h		../lib/apphot.h         \
-			<imhdr.h>		<mach.h>
+			../lib/apphot.h		 <imhdr.h>              \
+			<mach.h>
 	apyget.x	<fset.h>		../lib/apphot.h         \
 			../lib/fitsky.h		../lib/polyphot.h
 	polyshow.x	../lib/display.h	../lib/polyphot.h
@@ -39,4 +41,15 @@ libpkg.a:
 			../lib/apphot.h		../lib/polyphot.h
 	t_polyphot.x	<gset.h>		<fset.h>		\
 			../lib/apphot.h		../lib/polyphot.h
+
+	# POLYMARK routines
+
+	t_polymark.x	<gset.h>		<fset.h>		\
+			"../lib/apphot.h"	"../lib/polyphot.h"
+	apmkpylist.x	<gset.h>		<ctype.h>		\
+			"../lib/apphot.h"	"../lib/polyphot.h"
+	apydraw.x	"../lib/polyphot.h"
+	apymkinit.x	"../lib/apphotdef.h"
+	apymkfree.x	"../lib/apphotdef.h"
+	apywrite.x	"../lib/apphot.h"	"../lib/polyphot.h"
 	;

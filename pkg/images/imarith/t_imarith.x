@@ -187,6 +187,7 @@ begin
 		    j = OK
 		    do i = 1, min (IM_NDIM (im1), IM_NDIM (im2))
 	    	        if (IM_LEN (im1, i) != IM_LEN (im2, i))
+			    j = ERR
 		    if (j == ERR) {
 			call imunmap (im1)
 			call imunmap (im2)

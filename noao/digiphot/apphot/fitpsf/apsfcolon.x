@@ -44,7 +44,7 @@ begin
 	    call apnscolon (ap, im, out, stid, cmdstr, junk, junk,
 	        junk, junk, newbuf, newfit)
 	else
-	    call ap_pfimcolon (ap, out, stid, cmdstr, newbuf, newfit)
+	    call ap_pfimcolon (ap, cmdstr)
 
 	call sfree (sp)
 end
@@ -107,7 +107,7 @@ begin
 		        call apseti (ap, NPARS, 7)
 		    }
 		    if (stid > 1)
-			call ap_sparam (out, "FUNCTION", "radgauss", "model",
+			call ap_sparam (out, "FUNCTION", Memc[cmd], "model",
 			    "fitting function")
 		    newfit = YES
 		}
@@ -187,14 +187,10 @@ end
 # AP_PFIMCOLON -- Procedure to process fitpsf commands that are not fitpsf
 # parameters.
 
-procedure ap_pfimcolon (ap, out, stid, cmdstr, newbuf, newfit)
+procedure ap_pfimcolon (ap, cmdstr)
 
 pointer	ap		# pointer to the apphot structure
-int	out		# output file descriptor
-int	stid		# output file sequence number
 char	cmdstr		# command string
-int	newbuf		# new psf buffer
-int	newfit		# new psf fit
 
 int	ncmd
 pointer	sp, cmd

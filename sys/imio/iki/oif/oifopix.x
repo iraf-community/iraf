@@ -27,8 +27,9 @@ pointer	im				# image descriptor
 int	status				# return status
 
 long	pixoff
-int	nchars, pfd, blklen
 pointer	sp, pixhdr, pixfile
+int	nchars, pfd, blklen
+
 bool	strne()
 int	open(), read(), fdevblk()
 errchk	open, read, falloc, fdevblk
@@ -88,6 +89,9 @@ begin
 	    # headerless pixfiles, and reconstruction of header if it gets lost.
 
 	    call oif_wphdr (pfd, im, IM_HDRFILE(im))
+
+	    # Update the image header so that it knows about the pixel file.
+	    call oif_updhdr (im, status)
 
 	default:
 	    call imerr (IM_NAME(im), SYS_IMACMODE)

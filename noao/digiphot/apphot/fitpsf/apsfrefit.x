@@ -35,31 +35,30 @@ begin
 	case AP_RADGAUSS:
 
 	    ier = apsfradgauss (Memr[AP_PSFPIX(psf)], AP_PNX(psf), AP_PNY(psf),
-		AP_FWHMPSF(ap) * AP_SCALE(ap), datamin, datamax,
-		AP_NOISEFUNCTION(nse), AP_EPADU(nse), AP_READNOISE(nse) /
-		AP_EPADU(nse), AP_PMAXITER(psf), AP_PK2(psf), AP_PNREJECT(psf),
-		Memr[AP_PPARS(psf)], Memr[AP_PPERRS(psf)], AP_PSFNPARS(psf))
+		AP_POSITIVE(ap), AP_FWHMPSF(ap) * AP_SCALE(ap), datamin,
+		datamax, AP_NOISEFUNCTION(nse), AP_EPADU(nse),
+		AP_READNOISE(nse) / AP_EPADU(nse), AP_PMAXITER(psf),
+		AP_PK2(psf), AP_PNREJECT(psf), Memr[AP_PPARS(psf)],
+		Memr[AP_PPERRS(psf)], AP_PSFNPARS(psf))
 
 	    Memr[AP_PPARS(psf)+1] = Memr[AP_PPARS(psf)+1] + AP_PFXCUR(psf) -
 		AP_PXC(psf)
 	    Memr[AP_PPARS(psf)+2] = Memr[AP_PPARS(psf)+2] + AP_PFYCUR(psf) -
 		AP_PYC(psf)
-	    Memr[AP_PPARS(psf)+3] = sqrt (abs (Memr[AP_PPARS(psf)+3]))
 
 	case AP_ELLGAUSS:
 
 	    ier = apsfelgauss (Memr[AP_PSFPIX(psf)], AP_PNX(psf), AP_PNY(psf),
-		AP_FWHMPSF(ap) * AP_SCALE(ap), datamin, datamax,
-		AP_NOISEFUNCTION(nse), AP_EPADU(nse), AP_READNOISE(nse) /
-		AP_EPADU(nse), AP_PMAXITER(psf), AP_PK2(psf), AP_PNREJECT(psf),
-		Memr[AP_PPARS(psf)], Memr[AP_PPERRS(psf)], AP_PSFNPARS(psf))
+		AP_POSITIVE(ap), AP_FWHMPSF(ap) * AP_SCALE(ap), datamin,
+		datamax, AP_NOISEFUNCTION(nse), AP_EPADU(nse),
+		AP_READNOISE(nse) / AP_EPADU(nse), AP_PMAXITER(psf),
+		AP_PK2(psf), AP_PNREJECT(psf), Memr[AP_PPARS(psf)],
+		Memr[AP_PPERRS(psf)], AP_PSFNPARS(psf))
 
 	    Memr[AP_PPARS(psf)+1] = Memr[AP_PPARS(psf)+1] + AP_PFXCUR(psf) -
 		AP_PXC(psf)
 	    Memr[AP_PPARS(psf)+2] = Memr[AP_PPARS(psf)+2] + AP_PFYCUR(psf) -
 		AP_PYC(psf)
-	    Memr[AP_PPARS(psf)+3] = sqrt (abs (Memr[AP_PPARS(psf)+3]))
-	    Memr[AP_PPARS(psf)+4] = sqrt (abs (Memr[AP_PPARS(psf)+4]))
 
 	case AP_MOMENTS:
 

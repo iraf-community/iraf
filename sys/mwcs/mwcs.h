@@ -9,7 +9,7 @@ define	DEF_SZDBUF	64		# initial double buffer size
 define	INC_SZDBUF	64		# increment double buffer size
 define	MAX_DIM		7		# max dimension of a wcs
 define	MAX_WCS		8		# max wcs per mwcs
-define	MAX_WATTR	64		# max attributes per wcs
+define	MAX_WATTR	256		# max attributes per wcs
 define	MAX_CTRAN	20		# max runtime ctran descriptors
 define	MAX_CALL	7		# max CTRAN function calls
 define	MAX_FUNC	7		# max WCS function descriptors
@@ -17,7 +17,6 @@ define	MAX_WCSFD	10		# max loaded WCS function drivers
 define	MAX_FN		20		# max MWCS function drivers
 define	SZ_FNNAME	20		# max size function name
 define	SZ_ATNAME	20		# max size attribute name
-define	SZ_ATVAL	256		# max size attribute value
 
 # MWCS descriptor.  This consists of the base descriptor, global string
 # buffer, global data buffer (TY_DOUBLE), and separately allocated buffers
@@ -31,7 +30,7 @@ define	SZ_ATVAL	256		# max size attribute value
 # and for each WCS, for a fixed number of attributes.
 
 define	LEN_BASEMWCS	70
-define	LEN_WCS		282
+define	LEN_WCS		858 # (depends upon MAX_WATTR)
 define	LEN_MWCS	(LEN_BASEMWCS+LEN_WCS*MAX_WCS)
 define	MI_LEN		(LEN_BASEMWCS+LEN_WCS*MI_NWCS($1))
 
@@ -147,17 +146,6 @@ define	F_LINEAR	0			# linear (not a function)
 
 # WCS function type bit flags.
 define	F_RADEC		01B			# function requires RA/DEC
-
-# Header for saved MWCS.  Object LENs are types, offsets are char.
-define	LEN_SVHDR	16
-define	SV_MAGIC	Memi[$1]		# magic marker
-define	SV_CWCSLEN	Memi[$1+1]		# length of compressed MWCS
-define	SV_MWCSLEN	Memi[$1+2]		# full length of MWCS descr.
-define	SV_MWCSOFF	Memi[$1+3]		# char offset of saved MWCS
-define	SV_DBUFLEN	Memi[$1+4]		# length of saved DBUF
-define	SV_DBUFOFF	Memi[$1+5]		# char offset of saved DBUF
-define	SV_SBUFLEN	Memi[$1+6]		# length of saved SBUF
-define	SV_SBUFOFF	Memi[$1+7]		# char offset of saved SBUF
 
 # Handy macros.
 define	S		Memc[MI_SBUF($1)+$2-1]	# string = S(mw,i)

@@ -74,6 +74,7 @@ begin
 		call error (2,
 		    "The number of input images and shifts are not the same.")
 	} else {
+	    sf = NULL
 	    txshift = clgetr ("xshift")
 	    tyshift = clgetr ("yshift")
 	}
@@ -118,7 +119,8 @@ begin
 		# Update the image WCS to reflect the shift.
 		if (!envgetb ("nomwcs")) {
 		    mw = mw_openim (im1)
-		    shifts[1] = xshift;  shifts[2] = yshift
+		    shifts[1] = xshift
+		    shifts[2] = yshift
 		    call mw_shift (mw, shifts, 03B)
 		    call mw_saveim (mw, im2)
 		    call mw_close (mw)

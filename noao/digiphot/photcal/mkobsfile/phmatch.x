@@ -1,0 +1,380 @@
+include <mach.h>
+include "../lib/obsfile.h"
+
+define	DEF_LENLABEL	20
+define	DEF_LENINDEX	6
+
+# PH_JOIN -- For each individual field join the data from each image
+# line for line.
+
+procedure ph_join (out, label, sym, filters, nfilters, x, y, mag, merr,
+	allfilters, verbose)
+
+int	out		# the output file descriptor
+char	label[ARB]	# the label string
+pointer	sym[ARB]	# list of pointers to the image set  data
+char	filters[ARB]	# the filter id string
+int	nfilters	# number of filters in an image  set
+real	x[ARB]		# array of shifted x coordinates
+real	y[ARB]		# array of shifted y coordinates
+real	mag[ARB]	# array of corrected magnitudes
+real	merr[ARB]	# array of magnitude errors
+int	allfilters	# match objects in all filters ?
+int	verbose		# print status, warning and error messages ?
+
+int	i, j, nobjs, dptr, len_label
+pointer	sp, outfilter, newlabel, bptrs, eptrs
+int	ph_nthlabel(), strlen()
+
+begin
+	# Find the maximum length of the output. Return if there is no data
+	# in any of the frames, or if there is no data in one frame and
+	# the match in all filters switch is on.
+
+	if (allfilters == YES) {
+	    nobjs = MAX_INT
+	    do i = 1, nfilters {
+		if (sym[i] == NULL)
+		    return
+		if (IMT_NENTRIES(sym[i]) == 0)
+		    return
+		nobjs = min (nobjs, IMT_NENTRIES(sym[i]))
+	    }
+	} else {
+	    nobjs = 0
+	    do i = 1, nfilters {
+		if (sym[i] == NULL)
+		    next
+	        nobjs = max (nobjs, IMT_NENTRIES(sym[i]))
+	    }
+	}
+
+	# Return if there is no data.
+	if (nobjs <= 0)
+	    return
+
+	# Allocate working space.
+	call smark (sp)
+	call salloc (newlabel, SZ_FNAME, TY_CHAR)
+	call salloc (outfilter, SZ_FNAME, TY_CHAR)
+	call salloc (bptrs, nfilters, TY_INT)
+	call salloc (eptrs, nfilters, TY_INT)
+
+	# Initialize the arrays which point to the beginning and ending of
+	# the data for each image in the set.
+
+	do j = 1, nfilters {
+	    if (sym[j] == NULL) {
+		Memi[bptrs+j-1] = 0
+		Memi[eptrs+j-1] = 0
+	    } else {
+		Memi[bptrs+j-1] = IMT_OFFSET(sym[j])
+		Memi[eptrs+j-1] = IMT_OFFSET(sym[j]) + IMT_NENTRIES(sym[j]) - 1
+	    }
+	}
+
+	# Write out the output.
+	if (nobjs == 1)
+	    len_label = max (DEF_LENLABEL, strlen (label))
+	else
+	    len_label = max (DEF_LENLABEL, strlen (label)+DEF_LENINDEX)
+
+	do i = 1, nobjs {
+
+	    do j = 1, nfilters {
+
+		# Write the label.
+		if (j == 1) {
+		    if (nobjs == 1) {
+		        call fprintf (out, "%*.*s  ")
+			    call pargi (-len_label)
+			    call pargi (len_label)
+			    call pargstr (label)
+		    } else {
+			call sprintf (Memc[newlabel], SZ_FNAME, "%s-%d")
+			    call pargstr (label)
+			    call pargi (i)
+		        call fprintf (out, "%*.*s  ")
+			    call pargi (-len_label)
+			    call pargi (len_label)
+			    call pargstr (Memc[newlabel])
+		    }
+		} else {
+		    call fprintf (out, "%*.*s  ")
+			    call pargi (-len_label)
+			    call pargi (len_label)
+			call pargstr ("*")
+		}
+
+		# Write the results.
+		dptr = Memi[bptrs+j-1]
+		if (dptr == 0) {
+		    if (ph_nthlabel (filters, j, Memc[outfilter],
+		        SZ_FNAME) != j)
+			Memc[outfilter] = EOS
+		    call fprintf (out,
+		        "%-10.10s  %-6.3f  %-7.2f  %-7.2f  %-9.3f  %-6.3f\n")
+		        call pargstr (Memc[outfilter])
+		        call pargr (INDEFR)
+		        call pargr (INDEFR)
+		        call pargr (INDEFR)
+		        call pargr (INDEFR)
+		        call pargr (INDEFR)
+		} else {
+		    call fprintf (out,
+		        "%-10.10s  %-6.3f  %-7.2f  %-7.2f  %-9.3f  %-6.3f\n")
+		        call pargstr (IMT_IFILTER(sym[j]))
+		        call pargr (IMT_XAIRMASS(sym[j]))
+		        call pargr (x[dptr] - IMT_XSHIFT(sym[j]))
+		        call pargr (y[dptr] - IMT_YSHIFT(sym[j]))
+		        call pargr (mag[dptr])
+		        call pargr (merr[dptr])
+		}
+
+		# Increment the data pointers making sure to check for non-
+		# existent data and unequal length object lists.
+
+		if (dptr == 0)
+		    next
+		if (dptr >= Memi[eptrs+j-1])
+		    dptr = 0
+		else
+		    Memi[bptrs+j-1] = dptr + 1
+	    }
+	}
+
+	if (verbose == YES) {
+	    call printf (
+	        "\tImage set: %s  %d stars written to the observations file\n")
+	        call pargstr (label)
+	        call pargi (nobjs)
+	}
+
+	call sfree (sp)
+end
+
+
+# PH_MERGE -- For an individual field join the data from each image (filter) in
+# the image (filter) set by matching the x-y positions.
+
+procedure ph_merge (out, label, sym, filters, nfilters, x, y, mag, merr,
+	ysort, match, index, ndata, tolerance, allfilters, verbose)
+
+int	out			# the output file descriptor
+char	label[ARB]		# label string
+pointer	sym[ARB]		# list of pointers to the image set  data
+char	filters[ARB]		# filter string
+int	nfilters		# number of images an image set
+real	x[ARB]			# array of x coordinates
+real	y[ARB]			# array of y coordinates
+real	mag[ARB]		# array of magnitudes
+real	merr[ARB]		# array of magnitude errors
+int	ysort[ARB]		# the y sort index
+int	match[ARB]		# the matching array
+int	index[ndata,ARB]	# the matching index array
+int	ndata			# the number of data points
+real	tolerance		# tolerance in pixels
+int	allfilters		# match objects in all filters
+int	verbose			# print status, warning and error messages
+
+int	i, j, k, l, biptr, eiptr, bjptr, ejptr, len_label
+int	ntimes, nobjs, nref, starok
+pointer	sp, newlabel, outfilter
+real	tol2, dx, dy, maxrsq, distsq
+int	ph_nthlabel(), strlen()
+
+begin
+	# Allocate working space.
+	call smark (sp)
+	call salloc (newlabel, SZ_FNAME, TY_CHAR)
+	call salloc (outfilter, SZ_FNAME, TY_CHAR)
+
+	# Initialize.
+	do i = 1, nfilters {
+	    if (sym[i] != NULL)
+		call amovki (NO, match[IMT_OFFSET(sym[i])],
+		    IMT_NENTRIES(sym[i]))
+	}
+	tol2 = tolerance ** 2
+	nobjs = 0
+	if (allfilters == YES)
+	    ntimes = 1
+	else
+	    ntimes = nfilters
+
+	# Loop over the filters.
+	do i = 1, ntimes {
+
+	    # Find the data pointers for the first frame.
+	    if (sym[i] == NULL)
+		next
+	    biptr = IMT_OFFSET(sym[i])
+	    if (biptr == 0)
+		next
+	    eiptr = biptr + IMT_NENTRIES(sym[i]) - 1
+
+	    # Initialize.
+	    nref = 0
+
+	    # Clear the index array.
+	    do j = 1, nfilters
+	        call aclri (index[1,j], ndata)
+
+	    # Loop over the other frames matching stars.
+	    do j = i + 1, nfilters {
+
+		# Find the data pointers for the second frame.
+	        if (sym[j] == NULL)
+		    next
+	        bjptr = IMT_OFFSET(sym[j])
+	        if (bjptr == 0)
+		    next
+	        ejptr = bjptr + IMT_NENTRIES(sym[j]) - 1
+
+	        # Loop over the stars in the first frame.
+	        nref = 0
+	        do k = biptr, eiptr {
+
+		    if (match[ysort[k]] == YES)
+			next
+		    if (IS_INDEFR(x[ysort[k]]) || IS_INDEFR(y[ysort[k]]))
+			next
+		    nref = nref + 1
+		    index[ysort[k]-biptr+1,i] = ysort[k]
+		    maxrsq = tol2
+
+		    do l = bjptr, ejptr {
+			if (match[ysort[l]] == YES)
+			    next
+		        if (IS_INDEFR(x[ysort[l]]) || IS_INDEFR(y[ysort[l]]))
+			    next
+			dy = y[ysort[l]] - y[ysort[k]]
+			if (dy > tolerance)
+			    break
+			dx = x[ysort[l]] - x[ysort[k]]
+			distsq = dx * dx + dy * dy 
+			if (distsq > maxrsq)
+			    next
+			match[ysort[l]] = YES
+			index[ysort[k]-biptr+1,j] = ysort[l]
+			maxrsq = distsq
+		    }
+	        }
+
+		# If all the stars have been matched quit the loop.
+		if (nref == 0)
+		    break
+	    }
+
+	    # Search for unmatched stars in the last frame.
+	    if ((allfilters == NO) && (i == nfilters)) {
+		do k = biptr, eiptr {
+		    if (match[ysort[k]] == YES)
+			next
+		    if (IS_INDEFR(x[ysort[k]]) || IS_INDEFR(y[ysort[k]]))
+			next
+		    nref = nref + 1
+		    index[ysort[k]-biptr+1,i] = ysort[k]
+		}
+	    }
+
+	    # Write the results.
+	    do j = 1, eiptr - biptr + 1 {
+
+		# Break if no stars were matched.
+	        if (nref <= 0)
+		    next
+
+		# If the allfilters switch is on only print points with
+		# data for all the filters, otherwise print all the objects.
+
+		if (allfilters == YES) {
+		    starok = YES
+		    do k = 1, nfilters {
+			if (index[j,k] > 0)
+			    next
+			starok = NO
+			break
+		    }
+		} else {
+		    starok = NO
+		    do k = 1, nfilters {
+			if (index[j,k] <= 0)
+			    next
+			starok = YES
+			break
+		    }
+		}
+		if (starok == NO)
+		    next
+
+	        if (nobjs == 1)
+	    	    len_label = max (DEF_LENLABEL, strlen (label))
+		else
+	    	    len_label = max (DEF_LENLABEL, strlen (label)+DEF_LENINDEX)
+
+		# Loop over the filters, writing the data for each point.
+		do k = 1, nfilters {
+
+		    # Write the label.
+		    if (k == 1) {
+		        if ((nref == 1) && (nobjs == 0)) {
+		            call fprintf (out, "%*.*s  ")
+				call pargi (-len_label)
+				call pargi (len_label)
+			        call pargstr (label)
+		        } else {
+			    call sprintf (Memc[newlabel], SZ_FNAME, "%s-%d")
+			        call pargstr (label)
+			        call pargi (nobjs + 1)
+		            call fprintf (out, "%*.*s  ")
+				call pargi (-len_label)
+				call pargi (len_label)
+			        call pargstr (Memc[newlabel])
+		        }
+		    } else {
+		        call fprintf (out, "%*.*s  ")
+			    call pargi (-len_label)
+			    call pargi (len_label)
+			    call pargstr ("*")
+		    }
+
+		    # Write the data.
+		    if (index[j,k] == 0) {
+		        if (ph_nthlabel (filters, k, Memc[outfilter],
+		            SZ_FNAME) != k)
+			    Memc[outfilter] = EOS
+		        call fprintf (out,
+		        "%-10.10s  %-6.3f  %-7.2f  %-7.2f  %-9.3f  %-6.3f\n")
+		            call pargstr (Memc[outfilter])
+		            call pargr (INDEFR)
+		            call pargr (INDEFR)
+		            call pargr (INDEFR)
+		            call pargr (INDEFR)
+		            call pargr (INDEFR)
+		    } else {
+		        call fprintf (out,
+		        "%-10.10s  %-6.3f  %-7.2f  %-7.2f  %-9.3f  %-6.3f\n")
+		            call pargstr (IMT_IFILTER(sym[k]))
+		            call pargr (IMT_XAIRMASS(sym[k]))
+		            call pargr (x[index[j,k]] - IMT_XSHIFT(sym[k]))
+		            call pargr (y[index[j,k]] - IMT_YSHIFT(sym[k]))
+		            call pargr (mag[index[j,k]])
+		            call pargr (merr[index[j,k]])
+		    }
+
+		}
+
+		nobjs = nobjs + 1
+	    }
+	}
+
+	if (verbose == YES) {
+	    call printf (
+	        "\tImage set: %s  %d stars written to the observations file\n")
+	        call pargstr (label)
+	        call pargi (nobjs)
+	}
+
+	call sfree (sp)
+end

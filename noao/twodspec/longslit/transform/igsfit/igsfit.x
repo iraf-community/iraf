@@ -335,8 +335,8 @@ begin
 		    npts, dtype)
 
 	    case 'f':
-		call printf ("Fitting ...")
-		call flush (STDOUT)
+		#call printf ("Fitting ...")
+		#call flush (STDOUT)
 		call igs_solve (sf,pts[1,X],pts[1,Y],pts[1,Z],pts[1,W],npts)
 		call xgsvector (sf, pts[1,X], pts[1,Y], pts[1,S], npts)
 		call asubr (pts[1,Z], pts[1,S], pts[1,R], npts)

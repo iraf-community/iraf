@@ -4,21 +4,21 @@ include "../lib/fitsky.h"
 # using a radial profile plot of the sky pixels and cursor readback
 
 int procedure ap_radplot (gd, gt, skypix, coords, nskypix, sxc, syc, snx, sny,
-    scale, k2, sky_mode, sky_skew, sky_sigma, nsky, nsky_reject)
+	scale, k2, sky_mode, sky_skew, sky_sigma, nsky, nsky_reject)
 
 pointer	gd			# pointer to graphics stream
 pointer	gt			# pointer to GTOOLS structure
 real	skypix[ARB]		# array of sky pixels
-int	coords[ARB]		# coordinates
+int	coords[ARB]		# array of sky coordinates
 int	nskypix			# number of sky pixels
 real	sxc, syc		# sky subraster center
-int	snx, sny		# sky subraster size
-real	scale			# scale factor
-real	k2			# k-sigma rejection limit
-real	sky_mode		# sky value
-real	sky_sigma		# sigma of sky pixels
-real	sky_skew		# skew of sky pixels
-int	nsky			# number of sky pixels
+int	snx, sny		# sky subraster size (sny unused)
+real	scale			# image scale
+real	k2			# k-sigma rejection limit in sky sigma
+real	sky_mode		# computed sky value
+real	sky_sigma		# computed sigma of sky pixels
+real	sky_skew		# computed skew of sky pixels
+int	nsky			# number of sky pixels used in fit
 int	nsky_reject		# number of rejected sky pixels
 
 double	sumpx, sumsqpx, sumcbpx

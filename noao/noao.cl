@@ -1,6 +1,3 @@
-images
-plot
-
 #{ NOAO -- The NOAO optical astronomy suite of packages.
 
 cl < "noao$lib/zzsetenv.def"
@@ -13,9 +10,13 @@ task	digiphot.pkg	= "digiphot$digiphot.cl"
 task	focas.pkg	= "focas$focas.cl"
 task	imred.pkg	= "imred$imred.cl"
 task	mtlocal.pkg	= "mtlocal$mtlocal.cl"
+task	nobsolete.pkg	= "nobsolete$nobsolete.cl"
+task	nproto.pkg	= "nproto$nproto.cl"
 task	onedspec.pkg	= "onedspec$onedspec.cl"
-task	proto.pkg	= "proto$proto.cl"
+task	rv.pkg		= "rv$rv.cl"
 task	surfphot.pkg	= "surfphot$surfphot.cl"
 task	twodspec.pkg	= "twodspec$twodspec.cl"
+
+task	observatory	=  "astutil$x_astutil.e"
 
 clbye()

@@ -20,6 +20,9 @@
 #ifdef SUNOS4
 #include <floatingpoint.h>
 #endif
+#ifdef ultrix
+#include <mips/fpu.h>
+#endif
 
 /*
  * ZZSTRT,ZZSTOP -- Routines to perform initialization and cleanup functions
@@ -29,7 +32,6 @@
 
 /* #define	DEBUG */
 
-static	short debug_ieee = 0;
 static	int prtype, ipc_isatty=NO;
 static	char os_process_name[SZ_FNAME];
 static	char osfn_bkgfile[SZ_PATHNAME];
@@ -37,6 +39,9 @@ extern	malloc(), realloc(), free();
 extern	char *((*environ)[]);
 extern	int errno;
 
+#ifdef SUNOS4
+extern	int sh_debug;			/* map shared image writeable */
+static	short debug_ieee = 0;
 extern	unsigned USHLIB[], VSHLIB[];	/* shared library descriptors */
 static	unsigned vshlib[8];
 #define	v_version	vshlib[0]	/* shared image version number */
@@ -45,8 +50,8 @@ static	unsigned vshlib[8];
 #define	v_edata		vshlib[3]
 #define	v_end		vshlib[4]
 #define	u_version	USHLIB[0]	/* application version number */
-#define	sh_debug	USHLIB[2]	/* map shared image writeable */
 #define	sh_machtype	USHLIB[6]	/* machine architecture */
+#endif
 
 #define	align(a)	((a)&(~pmask))
 
@@ -66,10 +71,12 @@ int	BSS_kludge[256];
 ZZSTRT()
 {
 	XINT	wsetsize=0L, junk;
+#ifdef SUNOS4
 	static	int fd = 0;
 	struct  stat fi;
 	XCHAR	*bp;
 	char	*seg;
+#endif
 
 	sprintf (os_process_name, "%d", getpid());
 	strcpy (osfn_bkgfile, "");
@@ -220,7 +227,7 @@ ZZSTRT()
 	    }
 
 	    /* Map the data segment read-write. */
-	    addr = mmap (d_loc, d_len, PROT_READ|PROT_WRITE,
+	    addr = mmap (d_loc, d_len, PROT_READ|PROT_WRITE|PROT_EXEC,
 		MAP_PRIVATE|MAP_FIXED, fd, d_off);
 	    if ((int)addr == -1) {
 		seg = "data";
@@ -233,7 +240,7 @@ ZZSTRT()
 	     * of the BSS segment does not exceed the file size; this would
 	     * not be true in general but should always be true in our case.
 	     */
-	    addr = mmap (b_loc, b_len, PROT_READ|PROT_WRITE,
+	    addr = mmap (b_loc, b_len, PROT_READ|PROT_WRITE|PROT_EXEC,
 		MAP_PRIVATE|MAP_FIXED, fd, b_off);
 
 	    if ((int)addr == -1) {
@@ -337,8 +344,25 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	    int mode = FP_BSUN|FP_SNAN|FP_OPERR|FP_DZ|FP_OVFL|FP_INVALID;
 	    fpmode_ (&mode);
 	}
+#else
+#ifdef ultrix
+	{
+	    union fpc_csr csr;
+	    csr.fc_word = get_fpc_csr();
+	    csr.fc_struct.en_overflow = 1;
+	    csr.fc_struct.en_divide0 = 1;
+	    csr.fc_struct.en_invalid = 1;
+	    set_fpc_csr (csr.fc_word);
+	}
 #endif
 #endif
+#endif
+
+#ifdef SYSV
+	/* Initialize the time zone data structures. */
+	tzset();
+#endif
+
 	/* Place a query call to ZAWSET to set the process working set limit
 	 * to the IRAF default value, in case we did not inherit a working set
 	 * limit value from the parent process.

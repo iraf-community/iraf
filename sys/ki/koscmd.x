@@ -68,7 +68,7 @@ begin
 		if (Memc[locfn] != EOS) {
 		    # Copy to a textfile on the local node.
 
-		    call zopntx (Memc[locfn], APPEND, outchan)
+		    call zopntx (stdout_file, APPEND, outchan)
 		    if (outchan == ERR) {
 			call kclstx (inchan, status)
 			status = ERR
@@ -79,7 +79,7 @@ begin
 		    repeat {
 			call kgettx (inchan, Memc[lbuf], SZ_LINE, nchars)
 			if (nchars > 0)
-			    call kputtx (outchan, Memc[lbuf], nchars, status)
+			    call zputtx (outchan, Memc[lbuf], nchars, status)
 		    } until (nchars <= 0)
 
 		    call zclstx (outchan, status)

@@ -491,9 +491,12 @@ begin
 	call malloc (c_modlist, len_modlist, TY_STRUCT)
 	call amovi (Memi[HD_MODULE(hp,1)], Memi[c_modlist], len_modlist)
 
-	do i = 1, HD_NMODULES(hp) {
-	    # Get position in the copied modlist, and pointer to helpdir
-	    # file name.
+	pos = 0
+	do j = 1, HDB_NENTRIES(db) {
+	    # Find next valid index entry.
+	    ix = index + (j - 1) * LEN_HDBINDEX
+	    if (strncmp (DBI_KEY(ix), "_index", 6) == 0)
+		next
 
 	    o_mp = c_modlist + (i - 1) * LEN_MODSTRUCT
 	    hdfile = HD_SBUF(hp) + M_PKG(o_mp)
@@ -517,13 +520,6 @@ begin
 		} else
 		    pos = pos + 1
 	    }
-
-	    # Copy the module entry back into the original modlist,
-	    # overwriting a field.
-
-	    if (newpos != ERR)
-		call amovi (Memi[o_mp], Memi[HD_MODULE(hp,newpos)],
-		    LEN_MODSTRUCT)
 	}
 
 	call mfree (c_modlist, TY_STRUCT)
@@ -533,10 +529,10 @@ begin
 	HD_SZSBUF(hp) = HD_NEXTCH(hp)
 
 	# Return any unused module descriptors.
-	HD_LENHD(hp) = HD_LENHD(hp) -
+        HD_LENHD(hp) = HD_LENHD(hp) -
 	    LEN_MODSTRUCT * (HD_MAXMODULES(hp) - HD_NMODULES(hp))
-	HD_MAXMODULES(hp) = HD_NMODULES(hp)
 	call realloc (hp, HD_LENHD(hp), TY_STRUCT)
+	HD_MAXMODULES(hp) = HD_NMODULES(hp)
 
 	return (hp)
 end

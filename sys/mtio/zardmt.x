@@ -5,17 +5,18 @@ include	<config.h>
 include	"mtio.h"
 
 # ZARDMT -- MTIO asynchronous read primitive.  Initiate a read of up to
-# maxbytes bytes into the user buffer.  Do nothing if we are already at
-# EOF or EOT.
+# maxbytes bytes into the user buffer.
 
 procedure zardmt (mtchan, buf, maxbytes, offset)
 
-int	mtchan, maxbytes
-char	buf[ARB]
-long	offset
+int	mtchan			#I i/o channel
+char	buf[ARB]		#O output data buffer
+int	maxbytes		#I max bytes to read
+long	offset			#I file offset
+
 include	"mtio.com"
 
 begin
-	if (MT_ATEOF(mtchan) == NO && MT_ATEOT(mtchan) == NO)
-	    call zzrdmt (MT_OSCHAN(mtchan), buf, maxbytes)
+	if (MT_ATEOF(mtchan) == NO)
+	    call zzrdmt (MT_OSCHAN(mtchan), buf, maxbytes, offset)
 end

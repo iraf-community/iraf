@@ -5,13 +5,18 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <setjmp.h>
-#include <sgtty.h>
 #include <stdio.h>
 #include <errno.h>
 
-# ifndef O_NDELAY
+#ifdef SYSV
+#include <termio.h>
+#else
+#include <sgtty.h>
+#endif
+
+#ifndef O_NDELAY
 #include <fcntl.h>
-# endif
+#endif
 
 #define	import_kernel
 #define	import_knames
@@ -23,6 +28,7 @@
 #define	CTRLC	3
 extern	int errno;		/* error code returned by the kernel	*/
 static	jmp_buf jmpbuf;
+static	tty_rawon(), tty_reset(), uio_bwrite();
 
 /*
  * ZFIOTX -- File i/o to textfiles, for UNIX 4.1BSD.  This driver is used for
@@ -60,9 +66,14 @@ static	jmp_buf jmpbuf;
 #define	MAX_TRYS	2	/* max interrupted trys to read		*/
 #define	NEWLINE	'\n'
 static	int	tty_fd = -1;	/* FD of tty device if charmode set	*/
-static	short	tty_flags = 0;	/* terminal driver mode flag bits	*/
 static	char	tty_redraw = 0;	/* screen redraw control code		*/
 static	int	tty_getraw = 0;	/* raw getc in progress			*/
+
+#ifdef SYSV
+static	struct	termio tc_state; /* save terminal state			*/
+#else
+static	short	tty_flags = 0;	/* terminal driver mode flag bits	*/
+#endif
 
 static	PFI	sigint, sigterm;
 static	PFI	sigtstp, sigcont;
@@ -122,7 +133,12 @@ XINT	*chan;			/* UNIX channel of file (output)	*/
 	if ((filestat.st_mode & S_IFREG) &&
 	    (*mode == WRITE_ONLY || *mode == NEW_FILE)) {
 
-	    if (chmod ((char *)osfn, filestat.st_mode | FILE_MODEBITS) == ERR) {
+	    int    newmode;
+	    int    maskval;
+
+	    umask (maskval = umask (022));
+	    newmode = ((filestat.st_mode | 066) & ~maskval);
+	    if (chmod ((char *)osfn, newmode) == ERR) {
 		fclose (fp);
 		goto error;
 	    }
@@ -135,7 +151,6 @@ XINT	*chan;			/* UNIX channel of file (output)	*/
 	zfd[fd].fpos = 0;
 	zfd[fd].nbytes = 0;
 	zfd[fd].io_flags = 0;
-	zfd[fd].sg_flags = 0;
 	zfd[fd].flags = (filestat.st_mode & S_IFCHR) ? KF_NOSEEK : KF_NOSTTY;
 
 	*chan = fd;
@@ -154,7 +169,6 @@ XINT	*fd;
 XINT	*status;
 {
 	register struct	fiodes *kfp = &zfd[*fd];
-	struct	sgttyb ttystat;
 
 	/* Disable character mode if still in effect.  If this is necessary
 	 * then we have already saved the old tty status flags in sg_flags.
@@ -265,7 +279,6 @@ XINT	*status;
 	    sigterm = (PFI) signal (SIGTERM, tty_onsig);
 	    tty_getraw = 1;
 
-	    op = buf;
 	    if ((ch = setjmp (jmpbuf)) == 0) {
 		clearerr (fp);
 		ch = getc (fp);
@@ -277,6 +290,7 @@ XINT	*status;
 
 	    /* Clear parity bit just in case raw mode is used.
 	     */
+	    op = buf;
 	    if (ch == EOF) {
 		*op++ = ch;
 		nbytes = 0;
@@ -537,21 +551,52 @@ int	fd;			/* file descriptor */
 int	flags;			/* file mode control flags */
 {
 	register struct	fiodes *kfp = &zfd[fd];
-	struct	sgttyb ttystat;
 
 	if (!(kfp->flags & (KF_CHARMODE|KF_NOSTTY))) {
+#ifdef SYSV
+	    struct  termio tc;
+	    int     i;
+
+	    ioctl (fd, TCGETA, &tc);
+
+	    /* Save terminal state. */
+	    kfp->tc_iflag = tc.c_iflag;
+	    kfp->tc_oflag = tc.c_oflag;
+	    kfp->tc_lflag = tc.c_lflag;
+	    kfp->flags |= KF_CHARMODE;
+	    for (i=0;  i < NCC && i < MAXCC;  i++)
+		kfp->tc_cc[i] = tc.c_cc[i];
+
+	    /* Set raw mode. */
+	    tc.c_iflag = 0;
+	    tc.c_oflag = 0;
+	    tc.c_lflag  = ISIG;
+	    tc.c_cc[VMIN] = 2;
+	    tc.c_cc[VTIME] = 2;
+	    ioctl (fd, TCSETAF, &tc);
+
+	    /* Save FD, state flags of raw mode tty device. */
+	    tty_fd = fd;
+	    tc_state = tc;
+#else
+	    struct  sgttyb ttystat;
+
 	    ioctl (fd, TIOCGETP, &ttystat);
 	    kfp->sg_flags = ttystat.sg_flags;
 	    kfp->flags |= KF_CHARMODE;
 
 	    /* Set raw mode in the terminal driver. */
-	    ttystat.sg_flags |= CBREAK;
+	    if ((flags & KF_NDELAY) && !(kfp->flags & KF_NDELAY))
+		ttystat.sg_flags |= (RAW|TANDEM);
+	    else
+		ttystat.sg_flags |= CBREAK;
 	    ttystat.sg_flags &= ~(ECHO|CRMOD);
 	    ioctl (fd, TIOCSETN, &ttystat);
 
 	    /* Save FD, SG_FLAGS of raw mode tty device. */
 	    tty_fd = fd;
 	    tty_flags = ttystat.sg_flags;
+#endif
 
 	    /* Post signal handlers to clear/restore raw mode if process is
 	     * suspended.
@@ -580,6 +625,32 @@ tty_reset (fd)
 int	fd;
 {
 	register struct	fiodes *kfp = &zfd[fd];
+#ifdef SYSV
+	struct	termio tc;
+	int     i;
+
+	if (ioctl (fd, TCGETA, &tc) == -1)
+	    return;
+
+	/* If no saved status use current tty status. */
+	if (!(kfp->flags & KF_CHARMODE)) {
+	    kfp->tc_iflag = tc.c_iflag;
+	    kfp->tc_oflag = tc.c_oflag;
+	    kfp->tc_lflag = tc.c_lflag;
+	    for (i=0;  i < NCC && i < MAXCC;  i++)
+		kfp->tc_cc[i] = tc.c_cc[i];
+	}
+
+	/* Clear raw mode. */
+	tc.c_iflag = (kfp->tc_iflag | ICRNL);
+	tc.c_oflag = (kfp->tc_oflag | OPOST);
+	tc.c_lflag = (kfp->tc_lflag | (ICANON|ISIG|ECHO));
+	for (i=0;  i < NCC && i < MAXCC;  i++)
+	    tc.c_cc[i] = kfp->tc_cc[i];
+
+	ioctl (fd, TCSETAF, &tc);
+	kfp->flags &= ~KF_CHARMODE;
+#else
 	struct	sgttyb ttystat;
 
 	if (ioctl (fd, TIOCGETP, &ttystat) == -1)
@@ -588,9 +659,10 @@ int	fd;
 	if (!(kfp->flags & KF_CHARMODE))
 	    kfp->sg_flags = ttystat.sg_flags;
 
-	ttystat.sg_flags = (kfp->sg_flags | (ECHO|CRMOD)) & ~CBREAK;
+	ttystat.sg_flags = (kfp->sg_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
 	ioctl (fd, TIOCSETN, &ttystat);
 	kfp->flags &= ~KF_CHARMODE;
+#endif
 
 	if (kfp->flags & KF_NDELAY) {
 	    fcntl (fd, F_SETFL, kfp->io_flags & ~O_NDELAY);
@@ -624,12 +696,27 @@ int	sig;			/* signal which was trapped	*/
 int	code;			/* subsignal code (vax)		*/
 struct	sigcontext *scp;	/* not used			*/
 {
+#ifdef SYSV
+        register struct fiodes *kfp = &zfd[tty_fd];
+	struct	termio tc;
+	int	i;
+
+	if (ioctl (tty_fd, TCGETA, &tc) != -1) {
+	    tc.c_iflag = (kfp->tc_iflag | ICRNL);
+	    tc.c_oflag = (kfp->tc_oflag | OPOST);
+	    tc.c_lflag = (kfp->tc_lflag | (ICANON|ISIG|ECHO));
+	    for (i=0;  i < NCC && i < MAXCC;  i++)
+		tc.c_cc[i] = kfp->tc_cc[i];
+	    ioctl (tty_fd, TCSETAF, &tc);
+	}
+#else
 	struct	sgttyb ttystat;
 
 	if (ioctl (tty_fd, TIOCGETP, &ttystat) != -1) {
-	    ttystat.sg_flags = (tty_flags | (ECHO|CRMOD)) & ~CBREAK;
+	    ttystat.sg_flags = (tty_flags | (ECHO|CRMOD)) & ~(CBREAK|RAW);
 	    ioctl (tty_fd, TIOCSETN, &ttystat);
 	}
+#endif
 
 	kill (getpid(), SIGSTOP);
 }
@@ -645,13 +732,16 @@ int	sig;			/* signal which was trapped	*/
 int	code;			/* subsignal code (vax)		*/
 struct	sigcontext *scp;	/* not used			*/
 {
+#ifdef SYSV
+	ioctl (tty_fd, TCSETAF, &tc_state);
+#else
 	struct	sgttyb ttystat;
 
 	if (ioctl (tty_fd, TIOCGETP, &ttystat) != -1) {
 	    ttystat.sg_flags = tty_flags;
 	    ioctl (tty_fd, TIOCSETN, &ttystat);
 	}
-
+#endif
 	if (tty_redraw && tty_getraw)
 	    longjmp (jmpbuf, tty_redraw);
 }

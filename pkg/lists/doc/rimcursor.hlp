@@ -1,4 +1,4 @@
-.help rimcursor Jan90 lists
+.help rimcursor Mar92 lists
 .ih
 NAME
 rimcursor -- repeatedly read and return image cursor values
@@ -44,6 +44,12 @@ image WCS description, else it is the first user WCS defined for the image
 In addition to these three reserved WCS names, the name of any user WCS
 defined for the reference image may be given.  A user world coordinate system
 may be any linear or nonlinear world system.
+.le
+.ls wxformat = "", wyformat = ""
+The default output format for the x and y coordinates. If wxformat or wyformat
+are undefined, rimcursor uses formatting options stored with the WCS in the  
+image header. If the WCS formatting options are not defined in the image
+header, then rimcursor uses a default format.
 .le
 .ls cursor = ""
 The source for image cursor input.  By default, the hardware image cursor
@@ -112,6 +118,84 @@ to transform image pixel coordinate lists of x and y values, as produced
 by some tasks such as \fBapphot\fR or \fBdaophot\fR into world
 coordinates by specifying cursor input from the file rather than the
 image display cursor.
+
+.ih
+FORMATS
+A  format  specification has the form "%w.dCn", where w is the field
+width, d is the number of decimal places or the number of digits  of
+precision,  C  is  the  format  code,  and  n is radix character for
+format code "r" only.  The w and d fields are optional.  The  format
+codes C are as follows:
+    
+.nf
+b       boolean (YES or NO)
+c       single character (c or '\c' or '\0nnn')
+d       decimal integer
+e       exponential format (D specifies the precision)
+f       fixed format (D specifies the number of decimal places)
+g       general format (D specifies the precision)
+h       hms format (hh:mm:ss.ss, D = no. decimal places)
+m       minutes, seconds (or hours, minutes) (mm:ss.ss)
+o       octal integer
+rN      convert integer in any radix N
+s       string (D field specifies max chars to print)
+t       advance To column given as field W
+u       unsigned decimal integer 
+w       output the number of spaces given by field W
+x       hexadecimal integer
+z       complex format (r,r) (D = precision)
+    
+    
+Conventions for w (field width) specification:
+    
+    W =  n      right justify in field of N characters, blank fill
+        -n      left justify in field of N characters, blank fill
+        0n      zero fill at left (only if right justified)
+absent, 0       use as much space as needed (D field sets precision)
+    
+    
+Escape sequences (e.g. "\n" for newline):
+    
+\b      backspace   (not implemented)
+\f      formfeed
+\n      newline (crlf)
+\r      carriage return
+\t      tab
+\"      string delimiter character
+\'      character constant delimiter character
+\\      backslash character
+\nnn    octal value of character
+    
+Examples
+    
+%s          format a string using as much space as required
+%-10s       left justify a string in a field of 10 characters
+%-10.10s    left justify and truncate a string in a field of 10 characters
+%10s        right justify a string in a field of 10 characters
+%10.10s     right justify and truncate a string in a field of 10 characters
+    
+%7.3f       print a real number right justified in floating point format
+%-7.3f      same as above but left justified
+%15.7e      print a real number right justified in exponential format
+%-15.7e     same as above but left justified
+%12.5g      print a real number right justified in general format
+%-12.5g     same as above but left justified
+
+%h	    format as nn:nn:nn.n
+%15h	    right justify nn:nn:nn.n in field of 15 characters
+%-15h	    left justify nn:nn:nn.n in a field of 15 characters
+%12.2h	    right justify nn:nn:nn.nn
+%-12.2h	    left justify nn:nn:nn.nn
+    
+%H	    / by 15 and format as nn:nn:nn.n
+%15H	    / by 15 and right justify nn:nn:nn.n in field of 15 characters
+%-15H	    / by 15 and left justify nn:nn:nn.n in field of 15 characters
+%12.2H	    / by 15 and right justify nn:nn:nn.nn
+%-12.2H	    / by 15 and left justify nn:nn:nn.nn
+
+\n          insert a newline
+.fi
+
 .ih
 EXAMPLES
 1. Interactively generate a starlist (file "starlist") to be used as input
@@ -149,12 +233,29 @@ contain the following cursor values.
     12.13499 63.5588 101 \040
 .fi
 
-In this case the coordinates are decimal RA and DEC.  Sexagesimal output
-(hours minutes and seconds or degrees minutes and seconds) will be
-generated if specified by the formatting options stored with the WCS in
-the image header.
+Since there is no format information in the image header, the coordinates are
+decimal RA and DEC in degrees.
 
-3. Convert a list of pixel coordinates to world coordinates.
+3. Output the RA and DEC coordinates for an image in sexagesimal degrees.
+
+.nf
+    cl> rimcur wcs=world xformat=%12.2h yformat=%12.2h
+    19:47:12.25 33:15:03.66
+    19:43:12.10 33:14:38.06
+    19:45:12.40 33:15:56.03
+.fi
+
+4. Output the RA in sexagesimal hours and DEC in sexagesimal degrees for an
+image.
+
+.nf
+    cl> rimcur wcs=world xformat=%12.2H yformat=%12.2h
+    13:47:12.25 47:15:03.66
+    13:47:12.10 47:15:38.06
+    13:47:12.40 47:15:56.03
+.fi
+
+5. Convert a list of pixel coordinates to world coordinates.
 
 .nf
     cl> rimcur obs001 wcs=world cursor=coordlist >worldlist

@@ -25,22 +25,22 @@ begin
 	# allocate space for the surface descriptor
 	call calloc (sf, LEN_SFSTRUCT, TY_STRUCT)
 
-	xorder = int (SF_SAVEXORDER(fit))
+	xorder = nint (SF_SAVEXORDER(fit))
 	if (xorder < 1)
 	    call error (0, "SFRESTORE: Illegal x order.")
-	yorder = int (SF_SAVEYORDER(fit))
+	yorder = nint (SF_SAVEYORDER(fit))
 	if (yorder < 1)
 	    call error (0, "SFRESTORE: Illegal y order.")
 
-	ncols = int (SF_SAVENCOLS(fit))
+	ncols = nint (SF_SAVENCOLS(fit))
 	if (ncols < 1)
 	    call error (0, "SFRESTORE: Illegal x range.")
-	nlines = int (SF_SAVENLINES(fit))
+	nlines = nint (SF_SAVENLINES(fit))
 	if (nlines < 1)
 	    call error (0, "SFRESTORE: Illegal y range.")
 
 	# set surface type dependent surface descriptor parameters
-	surface_type = int (SF_SAVETYPE(fit))
+	surface_type = nint (SF_SAVETYPE(fit))
 
 	switch (surface_type) {
 	case SF_LEGENDRE, SF_CHEBYSHEV:

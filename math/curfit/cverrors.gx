@@ -38,11 +38,7 @@ pointer	sp, covptr
 begin
 	# allocate space for covariance vector
 	call smark (sp)
-	$if (datatype == r)
-	call salloc (covptr, CV_NCOEFF(cv), TY_REAL)
-	$else
-	call salloc (covptr, CV_NCOEFF(cv), TY_DOUBLE)
-	$endif
+	call salloc (covptr, CV_NCOEFF(cv), TY_PIXEL)
 
 	# estimate the variance and chi-squared of the fit
 	n = 0

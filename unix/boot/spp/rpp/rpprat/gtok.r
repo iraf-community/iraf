@@ -15,7 +15,7 @@ include  defs
    external index
    integer index
 
-   string digits "0123456789abcdefghijklmnopqrstuvwxyz"
+#  string digits "0123456789abcdefghijklmnopqrstuvwxyz"
 
    c = ngetch (lexstr (1))
 

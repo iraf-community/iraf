@@ -1,3 +1,6 @@
+include	<error.h>
+include	<syserr.h>
+
 .help hdrmap
 .nf-----------------------------------------------------------------------------
 HDRMAP -- Map translation between task parameters and image header parameters.
@@ -17,8 +20,10 @@ the IMIO header package.
 
 	        hdmopen (fname)
 		hdmclose ()
+		hdmwrite (fname, mode)
 		hdmname (parameter, str, max_char)
 		hdmgdef (parameter, str, max_char)
+		hdmpdef (parameter, str, max_char)
 	  y/n = hdmaccf (im, parameter)
 		hdmgstr (im, parameter, str, max_char)
 	 ival = hdmgeti (im, parameter)
@@ -33,8 +38,11 @@ the IMIO header package.
 
 hdmopen  -- Open the translation file and map it into a symbol table pointer.
 hdmclose -- Close the symbol table pointer.
+hdmwrite -- Write out translation file.
 hdmname  -- Return the image header parameter name.
+hdmpname -- Put the image header parameter name.
 hdmgdef  -- Get the default value as a string (null if none).
+hdmpdef  -- Put the default value as a string.
 hdmaccf  -- Return whether the image header parameter exists (regardless of
 	    whether there is a default value).
 hdmgstr  -- Get a string valued parameter.  Return default value if not in the
@@ -72,21 +80,23 @@ procedure hdmopen (fname)
 
 char	fname[ARB]		# Image header map file
 
-int	fd, open(), fscan(), nscan()
-pointer	sp, sym, parameter, stopen(), stenter()
+int	fd, open(), fscan(), nscan(), errcode()
+pointer	sp, parameter, sym, stopen(), stenter()
 include	"hdrmap.com"
 
 begin
-	# If the file is not found set the symbol table to null.
-	stp = NULL
-	iferr (fd = open (fname, READ_ONLY, TEXT_FILE))
+	# Create an empty symbol table.
+	stp = stopen (fname, LEN_INDEX, LEN_STAB, SZ_SBUF)
+
+	# Return if file not found.
+	iferr (fd = open (fname, READ_ONLY, TEXT_FILE)) {
+	    if (errcode () != SYS_FNOFNAME)
+		call erract (EA_WARN)
 	    return
+	}
 
 	call smark (sp)
 	call salloc (parameter, SZ_NAME, TY_CHAR)
-
-	# Create an empty symbol table.
-	stp = stopen (fname, LEN_INDEX, LEN_STAB, SZ_SBUF)
 
 	# Read the file an enter the translations in the symbol table.
 	while (fscan(fd) != EOF) {
@@ -115,6 +125,51 @@ begin
 end
 
 
+# HDMWRITE -- Write out translation file.
+
+procedure hdmwrite (fname, mode)
+
+char	fname[ARB]		# Image header map file
+int	mode			# Access mode (APPEND, NEW_FILE)
+
+int	fd, open(), stridxs()
+pointer	sym, sthead(), stnext(), stname()
+errchk	open
+include	"hdrmap.com"
+
+begin
+	# If there is no symbol table do nothing.
+	if (stp == NULL)
+	    return
+
+	fd = open (fname, mode, TEXT_FILE)
+
+	sym = sthead (stp)
+	for (sym = sthead (stp); sym != NULL; sym = stnext (stp, sym)) {
+	    if (stridxs (" 	", Memc[stname (stp, sym)]) > 0)
+		call fprintf (fd, "'%s'%30t")
+	    else
+		call fprintf (fd, "%s%30t")
+	    call pargstr (Memc[stname (stp, sym)])
+	    if (stridxs (" 	", NAME(sym)) > 0)
+		call fprintf (fd, " '%s'%10t")
+	    else
+		call fprintf (fd, " %s%10t")
+	    call pargstr (NAME(sym))
+	    if (DEFAULT(sym) != EOS) {
+		if (stridxs (" 	", DEFAULT(sym)) > 0)
+		    call fprintf (fd, " '%s'")
+		else
+		    call fprintf (fd, " %s")
+		call pargstr (DEFAULT(sym))
+	    }
+	    call fprintf (fd, "\n")
+	}
+
+	call close (fd)
+end
+
+
 # HDMNAME -- Return the image header parameter name
 
 procedure hdmname (parameter, str, max_char)
@@ -139,6 +194,30 @@ begin
 end
 
 
+# HDMPNAME -- Put the image header parameter name
+
+procedure hdmpname (parameter, str)
+
+char	parameter[ARB]		# Parameter name
+char	str[ARB]		# String containing mapped parameter name
+
+pointer	sym, stfind(), stenter()
+include	"hdrmap.com"
+
+begin
+	if (stp == NULL)
+	    return
+
+	sym = stfind (stp, parameter)
+	if (sym == NULL) {
+	    sym = stenter (stp, parameter, SYMLEN)
+	    DEFAULT(sym) = EOS
+	}
+
+	call strcpy (str, NAME(sym), SZ_NAME)
+end
+
+
 # HDMGDEF -- Get the default value as a string (null string if none).
 
 procedure hdmgdef (parameter, str, max_char)
@@ -160,6 +239,30 @@ begin
 	    call strcpy (DEFAULT(sym), str, max_char)
 	else
 	    str[1] = EOS
+end
+
+
+# HDMPDEF -- PUt the default value as a string.
+
+procedure hdmpdef (parameter, str)
+
+char	parameter[ARB]		# Parameter name
+char	str[ARB]		# String containing default value
+
+pointer	sym, stfind(), stenter()
+include	"hdrmap.com"
+
+begin
+	if (stp == NULL)
+	    return
+
+	sym = stfind (stp, parameter)
+	if (sym == NULL) {
+	    sym = stenter (stp, parameter, SYMLEN)
+	    call strcpy (parameter, NAME(sym), SZ_NAME)
+	}
+
+	call strcpy (str, DEFAULT(sym), SZ_DEFAULT)
 end
 
 

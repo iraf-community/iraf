@@ -843,6 +843,12 @@ o_redir ()
 	    /* If foreign task let ZOSCMD open the spool file.
 	     */
 	    newtask->ft_out = comdstr (fname);
+
+	} else if (strcmp (fname, IPCOUT) == 0) {
+	    /* Redirect the task stdout via IPC to a subprocess. */
+	    newtask->t_stdout = newtask->t_out;
+	    newtask->t_flags |= T_IPCIO;
+
 	} else {
 	    mode = (newtask->t_flags & T_STDOUTB) ? "wb" : "w";
 
@@ -1010,6 +1016,36 @@ o_doscan()
 	cl_scan (o.o_val.v_i - 1, "stdin");
 }
 
+o_doscanf()
+{
+	struct operand o;
+	struct operand o_sv[64];
+	char	format[SZ_LINE];
+	int	nargs, i;
+
+	/* Get number of arguments. */
+	o = popop();
+	nargs = o.o_val.v_i;
+
+	/* Get scan format.  Unfortunately the way the parser works this
+	 * is the last operand on the stack.  We need to pop and save the
+	 * first nargs-1 operands and restore them when done.
+	 */
+	for (i=0;  i < nargs-1;  i++)
+	    o_sv[i] = popop();
+
+	o = popop();
+	if ((o.o_type & OT_BASIC) != OT_STRING)
+	    cl_error (E_UERR, "scanf: bad format string\n");
+	strcpy (format, o.o_val.v_s);
+
+	for (--i;  i >= 0;  i--)
+	    pushop (&o_sv[i]);
+
+	/* Do the scan. */
+	cl_scanf (format, nargs-2, "stdin");
+}
+
 /* <paramn> ... <param1> <source> <n> .
  * Do the fscan function.  First op on stack is number of string ops to
  * follow.  Next one is the name of the source parameter, rest are names of
@@ -1021,6 +1057,52 @@ o_dofscan()
 
 	o = popop();
 	cl_scan (o.o_val.v_i - 1, "");
+}
+
+o_dofscanf()
+{
+	struct operand o, param;
+	struct operand o_sv[64];
+	char	format[SZ_LINE];
+	char	pname[SZ_FNAME];
+	int	nargs, i;
+
+	/* Get number of arguments. */
+	o = popop();
+	nargs = o.o_val.v_i;
+
+	/* Get scan format and input parameter name.  The arguments on the
+	 * stack are pushed in the order input param name, format string,
+	 * and then the output arguments.
+	 */
+
+	/* Get output arguments. */
+	for (i=0;  i < nargs-2;  i++)
+	    o_sv[i] = popop();
+
+	/* Get format string. */
+	o = popop();
+	if ((o.o_type & OT_BASIC) != OT_STRING)
+	    cl_error (E_UERR, "fscanf: bad format string\n");
+	strcpy (format, o.o_val.v_s);
+
+	/* Get parameter name. */
+	o = popop();
+	if ((o.o_type & OT_BASIC) != OT_STRING)
+	    cl_error (E_UERR, "fscanf: bad input parameter specification\n");
+	strcpy (pname, o.o_val.v_s);
+
+	/* Restore the output argument operands. */
+	for (--i;  i >= 0;  i--)
+	    pushop (&o_sv[i]);
+
+	/* Restore the input parameter name operand. */
+	o.o_type = OT_STRING;
+	o.o_val.v_s = pname;
+	pushop (&o);
+
+	/* Do the scan. */
+	cl_scanf (format, nargs-2, "");
 }
 
 /* <op1> <op2> . <op1 - op2>
@@ -1207,73 +1289,76 @@ o_fixlanguage()
 
 int (*opcodetbl[])() = {
 /*  0 */	o_undefined,
+
 /*  1 */	o_absargset,
 /*  2 */	o_add,
 /*  3 */	o_addassign,
 /*  4 */	o_doaddpipe,
-
 /*  5 */	o_allappend,
+
 /*  6 */	o_allredir,
 /*  7 */	o_and,
 /*  8 */	o_append,
 /*  9 */	o_assign,
-
 /* 10 */	o_biff,
+
 /* 11 */	o_call,
 /* 12 */	0,		/* The CASE operand is never executed.*/
 /* 13 */	o_chsign,
 /* 14 */	o_concat,
-
 /* 15 */	0,		/* The DEFAULT operand is never executed. */
+
 /* 16 */	o_div,
 /* 17 */	o_divassign,
 /* 18 */	o_doend,
 /* 19 */	o_eq,
-
 /* 20 */	o_exec,
+
 /* 21 */	o_dofscan,
-/* 22 */	o_ge,
-/* 23 */	o_dogoto,
-/* 24 */	o_dogetpipe,
+/* 22 */	o_dofscanf,
+/* 23 */	o_ge,
+/* 24 */	o_dogoto,
+/* 25 */	o_dogetpipe,
 
-/* 25 */	o_gt,
-/* 26 */	o_immed,
-/* 27 */	o_indirabsset,
-/* 28 */	o_indirposset,
-/* 29 */	o_indxincr,
+/* 26 */	o_gt,
+/* 27 */	o_immed,
+/* 28 */	o_indirabsset,
+/* 29 */	o_indirposset,
+/* 30 */	o_indxincr,
 
-/* 30 */	o_inspect,
-/* 31 */	o_intrinsic,
-/* 32 */	o_le,
-/* 33 */	o_lt,
-/* 34 */	o_mul,
+/* 31 */	o_inspect,
+/* 32 */	o_intrinsic,
+/* 33 */	o_le,
+/* 34 */	o_lt,
+/* 35 */	o_mul,
 
-/* 35 */	o_mulassign,
-/* 36 */	o_ne,
-/* 37 */	o_not,
-/* 38 */	o_or,
-/* 39 */	o_osesc,
+/* 36 */	o_mulassign,
+/* 37 */	o_ne,
+/* 38 */	o_not,
+/* 39 */	o_or,
+/* 40 */	o_osesc,
 
-/* 40 */	o_posargset,
-/* 41 */	o_dopow,
-/* 42 */	o_doprint,
-/* 43 */	o_pushconst,
-/* 44 */	o_pushindex,
+/* 41 */	o_posargset,
+/* 42 */	o_dopow,
+/* 43 */	o_doprint,
+/* 44 */	o_pushconst,
+/* 45 */	o_pushindex,
 
-/* 45 */	o_pushparam,
-/* 46 */	o_redir,
-/* 47 */	o_redirin,
-/* 48 */	o_rmpipes,
-/* 49 */	o_doreturn,
+/* 46 */	o_pushparam,
+/* 47 */	o_redir,
+/* 48 */	o_redirin,
+/* 49 */	o_rmpipes,
+/* 50 */	o_doreturn,
 
-/* 50 */	o_doscan,
-/* 51 */	o_sub,
-/* 52 */	o_subassign,
-/* 53 */	o_doswitch,
-/* 54 */	o_swoff,
+/* 51 */	o_doscan,
+/* 52 */	o_doscanf,
+/* 53 */	o_sub,
+/* 54 */	o_subassign,
+/* 55 */	o_doswitch,
 
-/* 55 */	o_swon,
-/* 56 */	o_fixlanguage,
-/* 57 */	o_gsredir,
-/* 58 */	o_catassign
+/* 56 */	o_swoff,
+/* 57 */	o_swon,
+/* 58 */	o_fixlanguage,
+/* 59 */	o_gsredir,
+/* 60 */	o_catassign
 };

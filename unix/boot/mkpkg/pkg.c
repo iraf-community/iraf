@@ -624,8 +624,8 @@ char	*dflist[];		/* receives filename pointers	*/
 int	maxfiles;		/* maxfiles out			*/
 {
 	char	fname[SZ_FNAME+1];
-	char	*op, *save_cp;
 	int	token, nfiles=0;
+	char	*save_cp;
 	int	i;
 
 	save_cp = cp;
@@ -804,7 +804,6 @@ int	level;			/* subdirectory level		*/
 search_mkpkgfile (cx)
 register struct context *cx;
 {
-	register char	*ip;
 	char	word1[SZ_FNAME+1], word2[SZ_FNAME+1];
 	char	*prev, *curr, *temp;
 	int	tok, gettok();

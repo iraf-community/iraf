@@ -1,6 +1,6 @@
-      INTEGER FUNCTION GETPAT (STR, PAT)
-      INTEGER STR (100), PAT (100)
-      INTEGER MAKPAT
-      GETPAT=(MAKPAT (STR, 1, -2, PAT))
-      RETURN
-      END
+      integer function getpat (str, pat)
+      integer str (100), pat (100)
+      integer makpat
+      getpat=(makpat (str, 1, -2, pat))
+      return
+      end

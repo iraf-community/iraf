@@ -76,7 +76,7 @@ begin
 	# Draw the plot.
 	call gclear (gd)
 	call ap_spset (gd, gt, ap, sier, rmin, rmax, imin, imax)
-	call ap_spannotate (gd, gt, ap, rmin, rmax, imin, imax)
+	call ap_spannotate (gd, ap, rmin, rmax, imin, imax)
 	call ap_plotrad (gd, gt, Memr[r], Memr[AP_SKYPIX(sky)], nskypix, "plus")
 
 	# Restore the viewport and window coordinates.
@@ -98,9 +98,9 @@ procedure ap_spset (gd, gt, ap, sier, xmin, xmax, ymin, ymax)
 pointer	gd		# graphics stream
 pointer	gt		# gtools pointer
 pointer	ap		# apphot pointer
-int	sier		# centering error
+int	sier		# sky fitting error (unused)
 real	xmin, xmax	# minimum and maximum radial distance
-real	ymin, ymax	# min and max of x axis
+real	ymin, ymax	# minimum and maximum of the y axis
 
 int	fd
 pointer	sp, str, title
@@ -162,10 +162,9 @@ end
 
 # AP_SPANNOTATE -- Procedure to annotate the radial plot in fitsky.
 
-procedure ap_spannotate (gd, gt, ap, xmin, xmax, ymin, ymax)
+procedure ap_spannotate (gd, ap, xmin, xmax, ymin, ymax)
 
 pointer	gd		# graphics stream
-pointer	gt		# gtools stream
 pointer	ap		# apphot structure
 real	xmin, xmax	# min and max of x axis
 real	ymin, ymax	# min and max of y axis

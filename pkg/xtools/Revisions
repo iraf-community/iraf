@@ -1,5 +1,56 @@
 .help revisions Jun88 pkg.xtools
 .nf
+lib$pkx/dttext.h
+pkg$xtools/dttext.x
+    Added a new routine, dtremap, which allows keeping the database
+    open across multiple calls and remapping when a new database file
+    is specified.  It is also optimized when switching back and forth
+    between read and append modes.  The data structure was modified
+    to record the current database and file names for checking when
+    the name changes.  (4/30/92, Valdes)
+
+pkg$xtools/obsdb.x
+    1.  Removed obsimcheck procedure.  Did not like the defaulting
+	to last set observatory if OBSERVAT not found.
+    2.  Added obsimopen procedure.  This is the procedure to call when
+	dealing with images.  It returns flags to determine whether a
+	new observatory was opened and whether the observatory was
+	define by the image header
+    3.  Added a verbose obsvopen to allow tracking what the interface is
+	doing.
+    4.  These changes made in conjunction with changes to the
+	astutil.observatory task.
+    (2/4/92, Valdes)
+
+pkg$xtools/xtimnames.x +
+    Added some tools for dealing with image kernel extensions in image names.
+    (1/22/92, Valdes)
+
+pkg$xtools/inlfit/infit.gx
+pkg$xtools/inlfit/infitr.x
+pkg$xtools/inlfit/infitd.x
+    The fit status was not being updated correctly if point were 
+    automatically rejected from the fit as opposed to being deleted.
+    (1/8/92, Davis)
+
+pkg$numrecipes.x
+    Added some fourier routines.  Note that this is still a source only
+    entry and is not part of libxtools.  (9/4/91, Valdes for MJF)
+
+pkg$numrecipes.x
+    mr = 0.1 * mr --> mr = max (EPSILONR, 0.1 * mr)	(9/2/91, Valdes)
+
+pkg$xtools/inlfit/
+    The interactive non-linear least squares fitting package used by PHOTCAL
+    was installed in XTOOLS. (8/6/91)
+
+pkg$obsdb.x +
+    New observatory database routines.  (11/6/90, Valdes)
+
+====
+V2.9
+====
+
 pkg$xtools/center1d.x
     In the case that the position correction flipped back and forth about the
     center no center would be found.  In this case I added a check to

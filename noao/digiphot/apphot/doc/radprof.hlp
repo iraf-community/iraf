@@ -1,4 +1,4 @@
-.help radprof Jan90 noao.digiphot.apphot
+.help radprof Jul91 noao.digiphot.apphot
 .ih
 NAME
 radprof -- compute the radial profile of an object
@@ -135,92 +135,121 @@ The RADPROF cursor commands are listed below.
 
 ?	Print help for RADPROF commands
 :	RADPROF colon escape commands (see below)
-e	Print RADPROF error messages
-d	Plot a centered stellar radial profile
-i	Setup RADPROF parameters using a stellar radial profile plot
-v	Verify the critical RADPROF parameters
+v	Verify critical radprof parameters
 w	Store current RADPROF parameters in the pset files
-l	Compute profiles for the remainder of the coordinate
-	list, output results
-r	Rewind the coordinate list
+q	Exit program
+
+d	Plot the radial profile of current star (cursor or list)
+i	Setup RADPROF interactively using the current star,
+	cursor or list
+
+spbar	Fit center, sky, radial profile of current star (cursor or list),
+	and output results
+f	Fit center, sky, radial profile of current star (cursor or list)
+e	Print RADPROF error messages
+
 c	Fit center of current star (cursor or list)
 t	Fit sky around the current star (cursor or list)
 s	Fit sky around the current center (cursor or list)
 p	Compute the radial profile around cursor position using
 	current sky
-f	Fit center, sky, radial profile of current star
-	(cursor or list)
-spbar	Fit center, sky, radial profile of current star
-	(cursor or list), output results
-q	Exit program
 
 :m [n]	Move to next [nth] object in the coordinate list
 :n [n]	Fit next [nth] object in the coordinate list, output results
+l	Compute profiles for the remainder of the coordinate
+	list, and output results
+r	Rewind the coordinate list
 
 Radprof parameters are listed or set with the following commands.
+
+# commands
+
+:show	[data/center/sky/fit]	List the parameters
+
+# file names
 
 :image		[string]	Image name
 :coords		[string]	Coordinate file name
 :output		[string]	Output file name
-:show [data/center/sky/phot/radprof]	List the parameters
 
-:scale		[value]		Image scale (units per pixel)
+# data dependent parameters
+
+:scale		[vlaue]		Image scale (units per pixel)
 :fwhmpsf	[value]		Full width half maximum of PSF (scale units)
 :emission	[y/n]		Emission feature (y), absorption (n)
-:noise		[string]	Noise model (constant|poisson)
+:sigma		[value]		Standard deviation of sky (counts)
+:datamin	[value]		Minimum good pixel value (counts)
+:datamax	[value]		Maximum good pixel value (counts)
 :threshold	[value]		Detection intensity threshold (counts)
 :cthreshold	[value]		Centering intensity threshold (counts)
-:sigma		[value]		Standard deviation of sky (counts)
-:gain		[string]	Gain image header keyword
-:epadu		[value]		Gain (electrons per adu)
-:ccdread	[string]	Readout noise image header keyword
-:readnoise	[value]		Readout noise (electrons)
-:exposure	[value]		Exposure time image header keyword
-:itime		[value]		Integration time (time units)
-:airmass	[string]	Airmass image header keyword
-:xairmass	[value]		Airmass value (number)
-:filter		[string]	Filter image header keyword
-:ifilter	[string]	Filter id string
-:datamin	[value]		Minimum good data value (counts)
-:datamax	[value]		maximum good data value (counts)
 
-:calgorithm	[string]	Centering algorithm (centroid|gauss|
-				none|ofilt)
-:cbox		[value]		Width of the centering box (scale)
-:maxshift	[value]		Maximum center shift (scale)
+# noise parameters
+
+:noise		[string]	Noise model (constant|poisson)
+:gain		[string]	Gain image header keyword
+:ccdread	[string]	Readout noise image header keyword
+:epadu		[value]		Gain (electrons per adu)
+:readnoise	[value]		Readout noise (electrons)
+
+# observing parameters
+
+:exposure	[value]		Exposure time image header keyword
+:airmass	[string]	Airmass image header keyword
+:filter		[string]	Filter image header keyword
+:obstime	[string]	Time of observation image header keyword
+:itime		[value]		Integration time (time units)
+:xairmass	[value]		Airmass value (number)
+:ifilter	[string]	Filter id string
+:otime		[string]	Time of observation (time units)
+
+# centering algorithm parameters
+
+:calgorithm	[string]	Centering algorithm
+				(centroid|gauss| none|ofilt)
+:cbox		[value]		Width of the centering box (scale units)
+:maxshift	[value]		Maximum center shift (scale units)
 :cmaxiter	[value]		Maximum number iterations
 :minsnratio	[value]		Minimum signal to noise ratio for
 				centering
 :clean		[y/n]		Clean subraster before centering
-:rclean		[value]		Cleaning radius (scale)
-:rclip		[value]		Clipping radius (scale)
+:rclean		[value]		Cleaning radius (scale units)
+:rclip		[value]		Clipping radius (scale units)
 :kclean		[value]		Clean K-sigma rejection limit (sigma)
-:mkcenter	[y/n]		Mark computed centers on display
+
+# sky fitting algorithm parameters
 
 :salgorithm	[string]	Sky fitting algorithm (constant|median|
 				mode|centroid|gauss| crosscor|histplot|
 				radplot)
 :skyvalue	[value]		User supplied sky value (counts)
-:annulus	[value]		Inner radius of sky annulus (scale)
-:dannulus	[value]		Width of sky annulus (scale)
+:annulus	[value]		Inner radius of sky annulus (scale units)
+:dannulus	[value]		Width of sky annulus (scale units)
 :smaxiter	[value]		Maximum number of iterations
 :skreject	[value]		Pixel rejection limits (sky sigma)
 :snreject	[value]		Maximum number of rejection cycles
 :khist		[value]		Sky histogram extent (+/- sky sigma)
 :binsize	[value]		Resolution of sky histogram (sky sigma)
 :smooth		[y/n]		Lucy smooth the sky histogram
-:rgrow		[value]		Region growing radius (scale)
-:mksky		[y/n]		Mark the sky annuli on the display
+:rgrow		[value]		Region growing radius (scale units)
 
-:apertures	[string]	List of apertures (scale)
+# photometry parameters
+
+:apertures	[string]	List of apertures (scale units)
 :zmag		[value]		Zero point of magnitude scale
-:mkapert	[y/n]		Mark apertures on the display
 
-:radius		[value]		Maximum profile radius (scale)
-:step		[value]		Step size for computed profile (scale)
+# profile fitting parameters
+
+:radius		[value]		Maximum profile radius (scale units)
+:step		[value]		Step size for computed profile (scale units)
 :order		[value]		Number of spline pieces in fit
 :kreject	[value]		K-sigma rejection for fit (sigma)
 :nreject	[value]		Maximum number of rejection cycles
+
+# marking and plotting parameters
+
+:mkcenter	[y/n]		Mark computed centers on display
+:mksky		[y/n]		Mark the sky annuli on the display
+:mkapert	[y/n]		Mark apertures on the display
 :radplot	[y/n]		Plot the radial profile
 
 
@@ -295,7 +324,7 @@ following record is written
 	image  xinit  yinit  id  coords  lid
 	   xcenter  ycenter  xshift  yshift  xerr  yerr  cier error
 	   msky  stdev  sskew  nsky  nsrej  sier  serror
-	   itime  airmass  filter
+	   itime  xairmass  ifilter  otime
 	   rapert  sum  area  mag  merr  pier  perr
 	   pfwhm  inorm  tinorm  rier  rerror
 	   pradius  intensity  tintensity
@@ -318,8 +347,10 @@ Msky, stdev and sskew are the sky value,
 standard deviation and skew respectively. Nsky and nsrej are the number of
 sky pixels and the number of sky pixels rejected respectively.
 
-Itime is the exposure time, airmass is self-evident, and filter is an id
-string specifying the filter used during the observation.
+Itime is the exposure time, xairmass is self-evident, filter is an id
+string specifying the filter used during the observation and otime is
+a string containing the time of observation in whatever units the user
+has defined.
 
 Rapert, sum, and area are the radius of the aperture in pixels, the total
 number of counts including sky in the aperture and the area of the aperture
@@ -342,45 +373,45 @@ If the object centering was error free then the field cier will be zero.
 Non-zero values of cier flag the following error conditions.
 
 .nf
-	0       # No error
-	21      # The centering box is off image
-	22      # The centering box is partially off the image
-	23      # The S/N ratio is low in the centering box
-	24      # There are two few points for a good fit
-	25      # The x or y center fit is singular
-	26      # The x or y center fit did not converge
-	27      # The x or y center shift is greater than maxshift
-	28      # There is bad data in the centering box
+	0        # No error
+	101      # The centering box is off image
+	102      # The centering box is partially off the image
+	103      # The S/N ratio is low in the centering box
+	104      # There are two few points for a good fit
+	105      # The x or y center fit is singular
+	106      # The x or y center fit did not converge
+	107      # The x or y center shift is greater than maxshift
+	108      # There is bad data in the centering box
 .fi
 
 If all goes well during the sky fitting process then the error code sier
 will be 0. Non-zero values of sier flag the following error conditions.
 
 .nf
-	0       # No error
-	1       # There are no sky pixels in the sky annulus
-	2       # Sky annulus is partially off the image
-	3       # The histogram of sky pixels has no width
-	4       # The histogram of sky pixels is flat or concave
-	5       # There are too few points for a good sky fit
-	6       # The sky fit is singular
-	7       # The sky fit did not converge
-	8       # The graphics stream is undefined
-	9       # The file of sky values does not exist
-	10      # The sky file is at EOF
-	11      # Cannot read the sky value correctly
-	12      # The best fit parameter are non-physical
+	0         # No error
+	201       # There are no sky pixels in the sky annulus
+	202       # Sky annulus is partially off the image
+	203       # The histogram of sky pixels has no width
+	204       # The histogram of sky pixels is flat or concave
+	205       # There are too few points for a good sky fit
+	206       # The sky fit is singular
+	207       # The sky fit did not converge
+	208       # The graphics stream is undefined
+	209       # The file of sky values does not exist
+	210       # The sky file is at EOF
+	211       # Cannot read the sky value correctly
+	212       # The best fit parameter are non-physical
 .fi
 
 If no error occursor during the measurment of the magnitudes then pier is
 0. Non-zero values of pier flag the following error conditins.
 
 .nf
-	0       # No error
-	41      # The aperture is off the image
-	42      # The aperture is partially off the image
-	43      # The sky value is undefined
-	45      # There is bad data in the aperture
+	0        # No error
+	301      # The aperture is off the image
+	302      # The aperture is partially off the image
+	303      # The sky value is undefined
+	305      # There is bad data in the aperture
 .fi
 
 If no error occursor during the profile fitting then rier is 0.
@@ -388,11 +419,11 @@ Non-zero values of rier flag the following error conditions.
 
 .nf
 	0       # No error
-	161     # The profile profile is off the image
-	162     # The profile region is partially off the image
-	163	# There are too few points in the profile
-	164	# The fit is singular
-	165     # The sky value is undefined
+	901     # The profile profile is off the image
+	902     # The profile region is partially off the image
+	903	# There are too few points in the profile
+	904	# The fit is singular
+	905     # The sky value is undefined
 .fi
 
 .ih
@@ -418,9 +449,10 @@ interactive setup menu defined by the i key command.
 	... move the image cursor to a star
 	... type i to enter the interactive setup menu
 	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    apertures, sigma, threshold radius, and step size using the graphics
-	    cursor and the stellar radial profile plot
+	... set the fwhmpsf, centering radius, inner and outer sky
+    	    annuli, apertures, sigma, threshold radius, and step size
+	    using the graphics cursor and the stellar radial profile
+	    plot
 	... typing <CR> leaves everything at the default value
 
 	... type the v key to verify the parameters
@@ -578,9 +610,10 @@ device coordinates.
 
 	... type i to enter the interactive setup menu
 	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, the centering radius, the inner and outer sky
-	    annuli, the apertures, sigma, threshold radius, and the step size
-	    using the graphics cursor and the stellar radial profile plot
+	... set the fwhmpsf, the centering radius, the inner and outer
+	    sky annuli, the apertures, sigma, threshold radius, and the
+	    step size using the graphics cursor and the stellar radial
+	    profile plot
 	... typing <CR> leaves everything at the default value
 
 	... type r to rewind the coordinate list
@@ -612,5 +645,5 @@ IMTOOL window and the APPHOT package has no control over it.
 
 .ih
 SEE ALSO
-local.radplt, datapars, centerpars, fitskypars, photpars
+datapars, centerpars, fitskypars, photpars
 .endhelp

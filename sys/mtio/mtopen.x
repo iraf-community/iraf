@@ -7,57 +7,68 @@ include	<fset.h>
 include	<mach.h>
 include	"mtio.h"
 
-.help mtopen
-.nf ___________________________________________________________________________
-MTOPEN -- Open a magtape file, or a regular binary file if the file name is
-not "mt" prefixed.  Access modes are restricted to read_only, write_only,
-append, and new_tape.  The buffer size argument specifies the size of the FIO
-buffer(s) used to access the tape; system dependent defaults are supplied
-if the buffer size is given as zero.
+# MTOPEN -- Open a magtape file, or a regular binary file if the file name is
+# not "mt" prefixed.  Access modes are restricted to read_only, write_only,
+# append, and new_tape.  The buffer size argument specifies the size of the
+# FIO buffer used to access the tape; a system and device dependent default
+# is supplied if the buffer size is given as zero.  If the device is a fixed
+# block size device the buffer size will be adjusted to an integral multiple
+# of the device block size.  For variable size record devices, the buffer size
+# determines the size of the tape record on a write, or the maximum record
+# size on a read.
+# 
+# The device to be accessed is specified as follows:
+# 
+#	[node!] mtX [ '[' file[.record] [:attr-list] ']' ]
+# 
+# for example,
+# 
+#	mtexb1[4:nb:se@:ts=1200:so=/dev/ttya8]
+# 
+# The "mt" prefix is required for the object to be considered a magtape device
+# reference.  The device name returned is "mtX" as shown above; there must be
+# an entry for device mtX in the tapecap file in DEV.
+# 
+# The file and record numbers are optional.  Files and records are numbered
+# starting with 1.  A sequence such as "mtX[eot]" will cause the tape to be
+# positioned to end of tape.  "mtX[0]" causes the tape to be opened at the
+# current position, i.e., without being moved.
+# 
+# The optional attr-list field consists of a sequence of colon-delimited
+# tapecap fields.  These will override any values given in the tapecap entry
+# for the device.  The syntax for attr-list is the same as in tapecap.
+# 
+# If the filespec does not have the prefix "mt", we assume that the file is
+# a regular binary file and try to open that.  If a tape file is specified
+# then the drive must be allocated before we are called.  We allocate and
+# initialize an MTIO file descriptor and call FOPNBF to install the magtape
+# device in FIO and open the device/file.
 
-The filespec specifies the tape drive, density, and file number on the tape
-in a machine and device independent fashion.  The syntax is
+int procedure mtopen (mtname, acmode, bufsize)
 
-	"mt"(drive)"."(800|1600|6250)?("["(fileno)?[,(recno)?]|"eot""]")?
-e.g., 
-	mta  or  mta.1600  or mta.800[3]  or  mtdraco@a.800[3], etc.
-
-where a "fileno" of 1 refers to the first file on the tape.  If the file
-number is absent, the tape is opened positioned to BOF of the "current"
-file (the file to which the tape was left positioned when last closed).
-The actual number of drives and their densities is machine dependent
-and is defined by the device table referenced internally to ZOPNMT.
-
-If the filespec does not have the prefix "mt", we assume that the file is
-a regular binary file and try to open that.  If a tape file is specified
-then the drive must be allocated before we are called.  We allocate and
-initialize an MTIO file descriptor and call FOPNBF to install the magtape
-device in FIO and open the device/file.
-.endhelp ______________________________________________________________________
-
-int procedure mtopen (filespec, access_mode, fio_buffer_size)
-
-char	filespec[ARB]		# device to be opened
-int	access_mode		# desired access mode (read only, etc.)
-int	fio_buffer_size		# fio buffer size to be used else 0 for default
+char	mtname[ARB]		#I device to be opened
+int	acmode			#I access mode
+int	bufsize			#I fio buffer size (record size) or 0
 
 bool	first_time
-pointer	sp, pkosfn
-int	mt, fd, status, nskip, max_bufsize
+pointer	sp, devcap, fname, gty
+int	mt, fd, nskip, new_file, new_record
 
 bool	streq()
-int	open(), fopnbf(), fstati()
+pointer	mt_gtyopen(), gtycaps()
+int	open(), fopnbf(), gtygets(), access()
 int	mt_skip_record(), mtfile(), mt_devallocated()
 extern	zopnmt(), zardmt(), zawrmt(), zawtmt(), zsttmt(), zclsmt()
 
-errchk	open, fopnbf, fseti, syserrs, mt_parse
-errchk	mt_getpos, mt_skip_record, mt_osdev
+errchk	open, fopnbf, fseti, syserrs, mtparse
+errchk	mt_getpos, mt_skip_record, mt_gtyopen, gtygets, mt_glock, mtallocate
 data	first_time /true/
 include	"mtio.com"
 
 begin
 	call smark (sp)
-	call salloc (pkosfn, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
 
 	# Runtime initialization of the mtio file descriptor common.
 	# Make each file descriptor available for use.
@@ -70,8 +81,8 @@ begin
 	}
 
 	# If regular binary file, we are done.
-	if (mtfile (filespec) == NO)
-	    return (open (filespec, access_mode, BINARY_FILE))
+	if (mtfile(mtname) == NO)
+	    return (open (mtname, acmode, BINARY_FILE))
 
 	# Get mtio file descriptor slot, but do not allocate it until
 	# we are ready to open the file.
@@ -79,117 +90,93 @@ begin
 	for (mt=1;  mt <= MT_MAXTAPES && MT_OSCHAN(mt) != NULL;  mt=mt+1)
 	    ;
 	if (mt > MT_MAXTAPES)
-	    call syserrs (SYS_MTMULTOPEN, filespec)
+	    call syserrs (SYS_MTMULTOPEN, mtname)
 
-	# Break mtfilespec into drive name, density, etc.
-	call mt_parse (filespec, MT_DRIVE(mt), SZ_DRIVE, MT_DENSITY(mt),
-	    MT_FILE(mt), MT_RECORD(mt))
+	# Break mtname into drive name, file and record number, etc.
+	call mtparse (mtname, MT_DEVICE(mt), SZ_DEVICE, 
+	    new_file, new_record, Memc[devcap], SZ_DEVCAP)
+	if (new_record == ERR)
+	    new_record = 1
 
-	# Get OS device name from device table (and verify that device exists).
-	call mt_osdev (MT_DRIVE(mt), MT_DENSITY(mt), MT_OSDEV(mt), SZ_OSDEV,
-	    MT_MAXBUFSIZE(mt))
+	# Get tapecap info.
+	gty = mt_gtyopen (MT_DEVICE(mt), Memc[devcap])
+	MT_DEVCAP(mt) = gtycaps (gty)
+	if (gtygets (gty, "dv", MT_IODEV(mt), SZ_IODEV) <= 0) {
+	    call eprintf ("missing `dv' parameter in tapecap entry for %s\n")
+		call pargstr (mtname)
+	    call syserrs (SYS_MTTAPECAP, mtname)
+	}
+	call ki_xnode (MT_DEVICE(mt), MT_IODEV(mt), SZ_IODEV)
 
-	# Verify that the device has been allocated.
-	if (mt_devallocated (MT_OSDEV(mt)) == NO)
-	    call syserrs (SYS_MTNOTALLOC, filespec)
+	# If the device has not been allocated, at least write out the
+	# lock file.  This will not physically allocate the device, but
+	# the lock file is required to be able to access the device.
 
-	# Get current tape position.  If the tape is being opened to file zero,
-	# e.g., mtX[0], set both the current position and desired position to
-	# the same arbitrary file number to try to keep the kernel driver from
-	# moving the tape.
+	call mt_glock (mtname, MT_LKNAME(mt), SZ_LKNAME)
+	if (mt_devallocated (MT_IODEV(mt)) == NO)
+	    if (access (MT_LKNAME(mt), 0,0) == NO)
+		call mtallocate (mtname)
 
-	if (MT_FILE(mt) == 0) {
-	    MT_OLDFILE(mt) = 1
-	    MT_OLDRECORD(mt) = 1
+	# Get current tape position.
+	call mt_getpos (mtname, mt)
 
-	} else {
-	    call mt_getpos (mt, MT_OLDFILE(mt), MT_OLDRECORD(mt))
+	MT_FILE(mt) = new_file
+	MT_RECORD(mt) = new_record
+	MT_ATEOF(mt) = NO
 
-	    # If tape is opened for writing but no file number is given,
-	    # default to EOT.  Defaulting to current file or BOT could result
-	    # in destruction of the tape.  Note that this default WILL RESULT
-	    # IN TAPE RUNAWAY if used on a blank tape.  Blank tapes must be
-	    # explicitly written at file [1], or opened with access mode
-	    # NEW_TAPE.
+	# If tape is opened for writing but no file number is given, default
+	# to EOT.  Defaulting to current file or BOT could result in
+	# destruction of the tape.  Note that this default WILL RESULT IN TAPE
+	# RUNAWAY if used on a blank tape.  Blank tapes must be explicitly
+	# written at file [1], or opened with access mode NEW_TAPE.
 
-	    if ((access_mode == WRITE_ONLY && MT_FILE(mt) == -1) ||
-		(access_mode == APPEND)) {
-
-		MT_FILE(mt) = EOT
-		MT_RECORD(mt) = 1
-
-	    } else if (access_mode == NEW_TAPE) {
-		MT_FILE(mt) = 1
-		MT_RECORD(mt) = 1
-	    }
+	if ((acmode == WRITE_ONLY && MT_FILE(mt) == -1) || (acmode == APPEND)) {
+	    MT_FILE(mt) = EOT
+	    MT_RECORD(mt) = 1
+	} else if (acmode == NEW_TAPE) {
+	    MT_FILE(mt) = 1
+	    MT_RECORD(mt) = 1
 	}
 
 	# Make sure that we are not reopening a drive which is already open.
 	for (fd=1;  fd <= MT_MAXTAPES;  fd=fd+1)
 	    if (fd != mt && MT_OSCHAN(fd) != NULL)
-		if (streq (MT_DRIVE(fd), MT_DRIVE(mt)))
-		    call syserrs (SYS_MTMULTOPEN, filespec)
+		if (streq (MT_DEVICE(fd), MT_DEVICE(mt)))
+		    call syserrs (SYS_MTMULTOPEN, mtname)
 
-	# If the file position is undefined (<0, e.g., due to an abort), rewind
-	# the tape to get to a defined position.
+	# Initialize the remaining fields in the file descriptor and open the
+	# device.  ZOPNMT will position the tape.  Note that we pass the index
+	# of the new mtio descriptor slot to ZOPNMT in the common.  This is a
+	# bit ugly, but is safe enough, since we know that FOPNBF is going to
+	# call ZOPNMT.
 
-	if (MT_OLDFILE(mt) <= 0) {
-	    call strpak (MT_OSDEV(mt), Memc[pkosfn], SZ_FNAME)
-	    call zzrwmt (Memc[pkosfn], status)
-	    if (status == ERR)
-		call syserrs (SYS_MTREW, filespec)
-
-	    MT_OLDFILE(mt) = 1
-	    MT_OLDRECORD(mt) = 1
-
-	    # Was file opened to "current record", which is indefinite?
-	    if (MT_RECORD(mt) <= 0)
-		call syserrs (SYS_MTPOSINDEF, filespec)
-	}
-
-	# Initialize the remaining fields in file descriptor and open the
-	# device/file.  ZOPNMT will position the tape.  Note that we pass
-	# the index of the new mtio descriptor slot to ZOPNMT in the common.
-	# This is poor form, but it is portable and safe, since we know
-	# that FOPNBF is going to call ZOPNMT.
-
-	switch (access_mode) {
+	switch (acmode) {
 	case READ_ONLY:
 	    MT_ACMODE(mt) = READ_ONLY
 	case WRITE_ONLY, APPEND, NEW_TAPE:
 	    MT_ACMODE(mt) = WRITE_ONLY
 	default:
-	    call syserrs (SYS_MTACMODE, filespec)
+	    call syserrs (SYS_MTACMODE, mtname)
 	}
 
-	MT_ATEOT(mt) = NO
-	MT_ATEOF(mt) = NO
-	MT_NRECORDS(mt) = MT_MAGIC		# used for verification of call
-	new_mtchan = mt				# pass mt index in common
-
-	fd = fopnbf (MT_OSDEV(mt), access_mode,
+	new_mtchan = mt
+	fd = fopnbf (MT_IODEV(mt), acmode,
 	    zopnmt, zardmt, zawrmt, zawtmt, zsttmt, zclsmt)
 
-	if (fio_buffer_size > 0) {
-	    max_bufsize = fstati (fd, F_MAXBUFSIZE)
-	    if (max_bufsize > 0 && (fio_buffer_size > max_bufsize) &&
-		access_mode != READ_ONLY) {
-		call eprintf ("WARNING: max device record size is %d bytes\n")
-		    call pargi (max_bufsize * SZB_CHAR)
-	    }
-	    call fseti (fd, F_BUFSIZE, fio_buffer_size)
-	}
+	# Set the file buffer size (record size for variable block devices).
+	if (bufsize > 0)
+	    call fseti (fd, F_BUFSIZE, bufsize)
 	
 	# If the user specified a record offset, skip records up to there.
 	# Zero means leave positioned to old record.
 
 	if (MT_RECORD(mt) == 0)
-	    MT_RECORD(mt) = MT_OLDRECORD(mt)
+	    MT_RECORD(mt) = MT_RECNO(mt)
 	if (MT_RECORD(mt) > 1) {
 	    nskip = MT_RECORD(mt) - 1
 	    MT_RECORD(mt) = 1
 	    if (mt_skip_record (fd, nskip) != nskip)
-		call syserrs (SYS_MTSKIPREC, filespec)
+		call syserrs (SYS_MTSKIPREC, mtname)
 	}
 
 	call mt_savepos (mt)

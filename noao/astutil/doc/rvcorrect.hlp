@@ -1,4 +1,4 @@
-.help rvcorrect Dec88 astutil
+.help rvcorrect Nov90 astutil
 .ih
 NAME
 rvcorrect -- Compute radial velocity corrections
@@ -33,18 +33,16 @@ of rest (in the \fIVSUN\fR keyword).
 Epoch of observation coordinates in Julian years. If zero or INDEF then the
 epoch is assumed to be the same as the date of observation.
 .le
-.ls longitude = ")observatory.longitude"
-Longitude of observation in degrees west of the Greenwich meridian.
-The default is taken from the parameter \fIobservatory.longitude\fR.
-.le
-.ls latitude = ")observatory.latitude"
-Latitude of observation in degrees.  Positive latitudes to the north and
-negative latitiudes to the south.
-The default is taken from the parameter \fIobservatory.latitude\fR.
-.le
-.ls altitude = ")observatory.altitude"
-Altitude of observation in meters.
-The default is taken from the parameter \fIobservatory.altitude\fR.
+.ls observatory = ")_.observatory"
+Observatory for  which corrections are to be computed.  The default is a
+redirection to look in the parameters for the parent package for a value.
+This may be one of the observatories in the observatory database,
+"observatory" to select the observatory defined by the environment variable
+"observatory" or the parameter \fBobservatory.observatory\fR, or "obspars"
+to select the current parameters set in the \fBobservatory\fR task.  See
+help for \fBobservatory\fR for additional information.  If the input
+consists of images then the observatory is defined by the OBSERVAT keyword
+if present.
 .le
 .ls vsun = 20.
 Velocity in km/s of the sun relative to the desired standard of rest.  The
@@ -107,12 +105,15 @@ of rest.
 The input parameters consist of the date and time of the observation,
 the direction of observation, the location of the observation, the
 direction and magnitude of the solar motion relative to some standard
-of rest, and the observed radial velocity.  The location of the observation
-defaults to that specified by the task \fBobservatory\fR.  The solar
-motion defaults to that relative to the galactic local standard of rest
-(LSR).  Note that one can make the local standard of rest velocity be
-equivalent to the heliocentric velocity by setting the velocity of the
-solar motion to zero.
+of rest, and the observed radial velocity.  The observatory for the
+observations defaults to that specified by the environment variable
+"observatory" if defined or that set for the task \fBobservatory\fR.
+If the input consists of images the observatory is defined by the
+OBSERVAT image header parameter if present.  See \fBovservatory\fR for
+additional information.  The solar motion defaults to that relative to
+the galactic local standard of rest (LSR).  Note that one can make the
+local standard of rest velocity be equivalent to the heliocentric
+velocity by setting the velocity of the solar motion to zero.
 
 The observed velocity, date, time, and direction of observation may be
 specified in three ways; from files, images, or the task parameters.
@@ -354,5 +355,5 @@ for the subroutine DOP in the program DOPSET written by R. N. Manchester
 and M. A. Gordon of NRAO dated January 1970.
 .ih
 SEE ALSO
-imred.observatory, asttimes
+observatory, asttimes
 .endhelp

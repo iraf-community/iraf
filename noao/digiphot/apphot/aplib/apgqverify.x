@@ -12,7 +12,6 @@ char	task[ARB]	# name of the apphot task
 pointer	ap		# pointer to apphot structure
 int	ch		# character keystroke command
 
-int	stat
 pointer	tty
 int	getci(), strmatch()
 pointer	ttyodes()
@@ -24,9 +23,9 @@ begin
 
 	call printf (QUERY)
 	call flush (STDOUT)
-
 	call fseti (STDIN, F_RAW, YES)
-	stat = getci (STDIN, ch)
+	if (getci (STDIN, ch) == EOF)
+	    ;
 	call fseti (STDIN, F_RAW, NO)
 	call ttyso (STDOUT, tty, NO)
 	call ttyclearln (STDOUT, tty)

@@ -28,8 +28,8 @@ int	i, fd, input, refs
 pointer	stp, sym
 pointer	sp, image, ref1, ref2
 
-pointer	stopen(), strefsbuf(), stenter(), stpstr(), stfind()
-int	odr_getim(), open(), fscan(), nscan()
+pointer	stopen(), strefsbuf(), stenter(), stpstr(), stfind(), imtopen()
+int	imtgetim(), open(), fscan(), nscan()
 errchk	open
 
 begin
@@ -60,12 +60,13 @@ begin
 
 	    i = stpstr (stp, Memc[ref1], SZ_FNAME)
 
-	    call odr_open (Memc[image], "", input)
-	    while (odr_getim (input, Memc[image], SZ_FNAME) != EOF) {
+	    input = imtopen (Memc[image])
+	    while (imtgetim (input, Memc[image], SZ_FNAME) != EOF) {
+		call refnoextn (Memc[image])
 	        sym = stenter (stp, Memc[image], 1)
 	        Memi[sym] = i
 	    }
-	    call odr_close (input)
+	    call imtclose (input)
 	}
 	call close (fd)
 
@@ -73,15 +74,16 @@ begin
 	# If no list is found print a message and continue.  Switch on the
 	# selection method.
 
-	while (odr_getim (list, Memc[image], SZ_FNAME) != EOF) {
+	while (imtgetim (list, Memc[image], SZ_FNAME) != EOF) {
+	    call refnoextn (Memc[image])
 	    sym = stfind (stp, Memc[image])
 	    if (sym == NULL) {
-		call refmsgs (NO_REFSPEC, Memc[image], 0., "", "")
+		call refmsgs (NO_REFSPEC, Memc[image], 0, "", "")
 		next
 	    }
 
-	    call odr_open (Memc[image], "", input)
-	    call odr_open (Memc[strefsbuf (stp, Memi[sym])], "", refs)
+	    input = imtopen (Memc[image])
+	    refs = imtopen (Memc[strefsbuf (stp, Memi[sym])])
 
 	    switch (select) {
 	    case MATCH:
@@ -98,8 +100,8 @@ begin
 	        call refaverage (input, refs)
 	    }
 
-	    call odr_close (input)
-	    call odr_close (refs)
+	    call imtclose (input)
+	    call imtclose (refs)
 	}
 
 	call stclose (stp)

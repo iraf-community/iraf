@@ -42,7 +42,7 @@ begin
 	im = immap (Memc[image], READ_ONLY, 0)
 	ndim = IM_NDIM(im)
 	if (ndim > 2)
-	    call error ("The number of image dimensions is greater then 2.")
+	    call error (0, "The number of image dimensions is greater then 2.")
 
 	# See if we're going to output the vector
 	call clgstr ("vec_output", Memc[output], SZ_FNAME)
@@ -182,11 +182,11 @@ begin
 	    wy2 = clgetr ("wy2")
 
 	    # Set window limits to defaults if not specified by user.
-	    if ((wx2 - wx1) < tol) {
+	    if (abs(wx2 - wx1) < tol) {
 	        wx1 = 1.0
 	        wx2 = real (nzvals)
 	    }
-	    if ((wy2 - wy1) < tol) {
+	    if (abs(wy2 - wy1) < tol) {
 	        wy1 = zmin
 	        wy2 = zmax
 	    }
@@ -499,7 +499,6 @@ begin
 
 	# Compute offset from the nominal vector to the first sample point.
 	ratio = dx / dy
-#	ratio = abs ((dx ** 2 + dy ** 2) / dx)
 	nedge  = width + 1
 	noff = (real (width) - 1.0) / 2.0
 	xoff = noff * dpx
@@ -533,14 +532,13 @@ begin
 	    # The input data is buffered in a section of size NLINES + 2 *
 	    # NEDGE.
 
-	    if (dy >= 0.0 && (buf == NULL || line > (linea))) {
+	    if (dy >= 0.0 && (buf == NULL || line > linea)) {
 		linea = min (line2, line + NLINES - 1)
 		lineb = max (line1, line - nedge)
 		linec = min (line2, linea + nedge)
 		lim1 = xv
 		lim2 = lim1 + double (width - 1) * dpx
-#		lim3 = xv + double (linea - line + 1) * ratio * dx
-		lim3 = xv + double (linea - line) * ratio
+		lim3 = xv + double (linea - line + 1) * ratio
 		lim4 = lim3 + double (width - 1) * dpx
 		colb = max (col1, int (min (lim1, lim2, lim3, lim4)) - 1)
 		colc = min (col2, nint (max (lim1, lim2, lim3, lim4)) + 1)
@@ -553,8 +551,7 @@ begin
 		linec = min (line2, line + nedge)
 		lim1 = xv
 		lim2 = lim1 + double (width - 1) * dpx
-#		lim3 = xv + double (line - linea + 1) * ratio * dx
-		lim3 = xv + double (linea - line) * ratio
+		lim3 = xv + double (linea - line - 1) * ratio
 		lim4 = lim3 + double (width - 1) * dpx
 		colb = max (col1, int (min (lim1, lim2, lim3, lim4)) - 1)
 		colc = min (col2, nint (max (lim1, lim2, lim3, lim4)) + 1)

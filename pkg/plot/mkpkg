@@ -42,10 +42,14 @@ linkplot:
 libpkg.a:
 	@crtpict
 
+	gdevices.x
 	getdata.x	<imhdr.h>
 	improject.x	<imhdr.h>
 	initmarker.x	<gset.h>
 	perim.x		<gset.h> <mach.h>
+	phistogram.x	<mach.h> <imhdr.h> <gset.h>
+	phminmax.x	<imhdr.h>
+	pltwcs.x	<imhdr.h> <mwset.h>
 	t_contour.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
 			<mach.h> <xwhen.h>
 	t_gkidir.x	<gki.h>
@@ -53,12 +57,14 @@ libpkg.a:
 			<math.h>
 	t_gkixt.x	<gki.h>
 	t_graph.x	<config.h> <ctype.h> <error.h> <fset.h> <gset.h>\
-			<imhdr.h> <mach.h> <xwhen.h>
+			<imhdr.h> <mach.h> <xwhen.h> <mwset.h>
 	t_hafton.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
 			<mach.h> <xwhen.h>
-	t_implot.x	<ctype.h> <error.h> <gset.h> <imhdr.h> <mach.h>
+	t_implot.x	<ctype.h> <error.h> <gset.h> <imhdr.h> <mach.h>\
+			<mwset.h>
 	t_pcol.x	<gset.h> <imhdr.h> <mach.h>
 	t_pcols.x	<gset.h> <imhdr.h> <mach.h>
+	t_pradprof.x	<gset.h> <imhdr.h>
 	t_prow.x	<gset.h> <imhdr.h> <mach.h>
 	t_prows.x	<gset.h> <imhdr.h> <mach.h>
 	t_pvector.x	<gset.h> <imhdr.h> <mach.h> <imset.h> <math.h>\

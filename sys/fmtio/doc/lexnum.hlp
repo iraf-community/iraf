@@ -110,7 +110,7 @@ dhr:			(+|-)?[0-9]+				(4)
 	:		shift	maybe_real_number
 	.		shift	real_fraction
 	x		reduce	hex_number
-	b		reduce	octal_number
+	b		shift	h
 	other		reduce	decimal_number
 .fi
 .ke

@@ -14,7 +14,7 @@ define	n__	LEX_NONNUM		# (other actions are new states)
 data	action /UNM, ODH, DHR, n__, n__, QRN, QRF, n__, n__, n__,	# start
 		Rvt, ODH, DHR, Rvt, Rvt, Rvt, QRF, Rvt, Rvt, Rvt,	# UNM
 		d_d, Acc, DHR, HEX, QHX, QRN, RFR, x_x, OHN, d_d,	# ODH
-		d_d, Acc, Acc, HEX, QHX, QRN, RFR, x_x, d_d, d_d,	# DHR
+		d_d, Acc, Acc, HEX, QHX, QRN, RFR, x_x, HEX, d_d,	# DHR
 		Rvt, RFR, RFR, Rvt, Rvt, Rvt, Rvt, Rvt, Rvt, Rvt,	# QRF
 		Rvt, Acc, Acc, Acc, Acc, Rvt, Rvt, x_x, Acc, Rvt,	# HEX
 		QRX, HRX, HRX, HEX, HEX, Rvt, Rvt, x_x, HEX, Rvt,	# QHX

@@ -1,4 +1,4 @@
-.help mkspec Jan85 noao.onedspec
+.help mkspec Mar92 noao.onedspec
 .ih
 NAME
 mkspec -- generate an artifical spectrum or image
@@ -72,10 +72,11 @@ EXAMPLES
 	>>> end=8000 temp=5000
 .fi
 .ih
-BUGS
-The current NCAR graphics utility cannot plot a constant level spectrum
-if autoscaling is in effect, nor can it reliably plot either a ramp
-or a black body. Do not be alarmed if the plot is all screwed up.
-
-The only pixel type currently provided is type real.
+REVISIONS
+.ls MKSPEC V2.10
+This task is unchanged.
+.le
+.ih
+SEE ALSO
+artdata.mk1dspec, artdata.mk2dspec, artdata.mkechelle
 .endhelp

@@ -1,22 +1,22 @@
-      INTEGER FUNCTION OUTSUB (ARG, FILE, ACCESS)
-      INTEGER ARG (100), FILE (100)
-      INTEGER ACCESS
-      IF (.NOT.(ARG (1) .EQ. 62 .AND. ARG (2) .NE. 62 .AND. ARG (2) .NE.
-     * -2))GOTO 23000
-      OUTSUB = 1
-      ACCESS = 2
-      CALL SCOPY (ARG, 2, FILE, 1)
-      GOTO 23001
-23000 CONTINUE
-      IF (.NOT.(ARG (1) .EQ. 62 .AND. ARG (2) .EQ. 62 .AND. ARG (3) .NE.
-     * -2))GOTO 23002
-      ACCESS = 4
-      OUTSUB = 1
-      CALL SCOPY (ARG, 3, FILE, 1)
-      GOTO 23003
-23002 CONTINUE
-      OUTSUB = 0
-23003 CONTINUE
-23001 CONTINUE
-      RETURN
-      END
+      integer function outsub (arg, file, access)
+      integer arg (100), file (100)
+      integer access
+      if (.not.(arg (1) .eq. 62 .and. arg (2) .ne. 62 .and. arg (2) .ne.
+     * -2))goto 23000
+      outsub = 1
+      access = 2
+      call scopy (arg, 2, file, 1)
+      goto 23001
+23000 continue
+      if (.not.(arg (1) .eq. 62 .and. arg (2) .eq. 62 .and. arg (3) .ne.
+     * -2))goto 23002
+      access = 4
+      outsub = 1
+      call scopy (arg, 3, file, 1)
+      goto 23003
+23002 continue
+      outsub = 0
+23003 continue
+23001 continue
+      return
+      end

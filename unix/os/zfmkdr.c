@@ -24,7 +24,7 @@ XINT	*status;
 	if (*--op == '/')
 	    *op = EOS;
 
-	if (mkdir (osdir, 0755) == ERR)
+	if (mkdir (osdir, _u_fmode(0777)) == ERR)
 	    *status = XERR;
 	else
 	    *status = XOK;

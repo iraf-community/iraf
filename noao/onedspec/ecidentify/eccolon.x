@@ -196,7 +196,7 @@ begin
 	    } else {
 	        EC_LABELS(ec) = strdic (cmd, cmd, SZ_LINE, LABELS)
 		do i = 1, EC_NFEATURES(ec) {
-		    if (AP(ec,i) == EC_AP(ec))
+		    if (APN(ec,i) == EC_AP(ec))
 		        call ec_mark (ec, i)
 		}
 	    }
@@ -236,5 +236,8 @@ begin
 	        prfeature = NO
 	    } else
 		EC_THRESHOLD(ec) = rval[1]
+	default:
+	    call printf ("Unrecognized or ambiguous command\007")
+	    prfeature = NO
 	}
 end

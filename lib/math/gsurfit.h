@@ -2,6 +2,7 @@
 
 # define the permitted types of curves
 
+define	GS_FUNCTIONS	"|chebyshev|legendre|polynomial|"
 define	GS_CHEBYSHEV	1
 define	GS_LEGENDRE	2
 define	GS_POLYNOMIAL	3
@@ -9,6 +10,7 @@ define	NTYPES		3
 
 # define the weighting flags
 
+define	GS_WEIGHTS	"|user|uniform|spacing|"
 define	WTS_USER	1	# user enters weights
 define	WTS_UNIFORM	2	# equal weights
 define	WTS_SPACING	3	# weight proportional to spacing of data points

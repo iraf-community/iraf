@@ -29,7 +29,7 @@ begin
 
 	call ast_coord (ao, bo, ap, bp, a1, b1, a2, b2)
 
-	a2 = mod (24.0D0 + RADTODEG(a2) / 15.0D0, 24.0D0)
+	a2 = mod (24.0d0 + RADTODEG(a2) / 15.0d0, 24.0d0)
 	b2 = RADTODEG (b2)
 
 	# Precess the coordinates

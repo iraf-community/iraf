@@ -1,17 +1,17 @@
-      INTEGER FUNCTION MKTABL (NODSIZ)
-      INTEGER NODSIZ
-      INTEGER MEM( 1)
-      COMMON/CDSMEM/MEM
-      INTEGER ST
-      INTEGER DSGET
-      INTEGER I
-      ST = DSGET (43 + 1)
-      MEM (ST) = NODSIZ
-      MKTABL = ST
-      DO 23000 I = 1, 43
-      ST = ST + 1
-      MEM (ST) = 0
-23000 CONTINUE
-23001 CONTINUE
-      RETURN
-      END
+      integer function mktabl (nodsiz)
+      integer nodsiz
+      integer mem( 1)
+      common/cdsmem/mem
+      integer st
+      integer dsget
+      integer i
+      st = dsget (43 + 1)
+      mem (st) = nodsiz
+      mktabl = st
+      do 23000 i = 1, 43
+      st = st + 1
+      mem (st) = 0
+23000 continue
+23001 continue
+      return
+      end

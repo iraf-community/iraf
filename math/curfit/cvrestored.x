@@ -22,7 +22,7 @@ begin
 	# allocate space for curve descriptor
 	call malloc (cv, LEN_CVSTRUCT, TY_STRUCT)
 
-	order = int (CV_SAVEORDER(fit))
+	order = nint (CV_SAVEORDER(fit))
 	if (order < 1)
 	    call error (0, "CVRESTORE: Illegal order.")
 
@@ -30,7 +30,7 @@ begin
 	    call  error (0, "CVRESTORE: xmax <= xmin.")
 
 	# set curve_type dependent curve descriptor parameters
-	curve_type = int (CV_SAVETYPE(fit))
+	curve_type = nint (CV_SAVETYPE(fit))
 	switch (curve_type) {
 	case CHEBYSHEV, LEGENDRE:
 	    CV_ORDER(cv) = order

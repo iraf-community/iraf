@@ -23,9 +23,10 @@ int	what			#I flags defining what to print
 
 pointer	sp, buf, rng, rl, pp
 int	line_1, line_2, nne, nv, v, lp, i
-int	naxes, axlen, nlp, firstcol, maxcol, col
+int	naxes, axlen, nlp, firstcol, maxcol, col, rlen
 errchk	pl_valid, fprintf, pl_debugout, pll_prints, plr_printi
 bool	pl_empty()
+int	pl_l2ri()
 
 define	index_ 91
 define	lines_ 92
@@ -192,7 +193,7 @@ llout_
 
 		# Output as a range list.
 		if (and (what, PD_RLOUT) != 0) {
-		    call pl_l2ri (LL(pl,lp), 1, Memi[rl], axlen)
+		    rlen = pl_l2ri (LL(pl,lp), 1, Memi[rl], axlen)
 		    call plr_printi (Memi[rl], fd, Memc[buf], firstcol, maxcol)
 		}
 

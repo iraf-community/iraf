@@ -60,6 +60,7 @@ define	TY_WATDATA	9
 define	TY_WSVLEN	10
 define	TY_WSVDATA	11
 define	TY_WCSDIM	12
+define	TY_WAXMAP	13
 
 # IW_RFITS definitions.
 define	RF_REFERENCE	0		# reference directly into header

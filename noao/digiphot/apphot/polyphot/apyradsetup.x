@@ -3,13 +3,13 @@ include "../lib/polyphot.h"
 
 define	HELPFILE	"apphot$polyphot/ipolyphot.key"
 
-# AP_YRADSETUP -- Procedure to set up phot interactively using a radial profile
+# AP_YRADSETUP - Set up polyphot interactively using a radial profile
 # plot of a bright star.
 
 int procedure ap_yradsetup (ap, im, id, gd, out, stid, x, y, max_nvertices)
 
 pointer	ap			# pointer to apphot structure
-pointer	im			# pointero to the IRAF image
+pointer	im			# pointer to the IRAF image
 pointer	id			# pointer to the image display
 pointer	gd			# pointer to graphics stream
 int	out			# output file descriptor
@@ -115,8 +115,8 @@ begin
 
 	# Print the answer.
 	cier = ap_ycenter (ap, im, xcenter, ycenter, x, y, nvertices + 1)
-	sier = apfitsky (ap, im, apstatr (ap, PYCX), apstatr (ap, PYCY), NULL,
-	    gd)
+	sier = apfitsky (ap, im, apstatr (ap, PYCX), apstatr (ap, PYCY),
+	    NULL, gd)
 	pier = ap_yfit (ap, im, x, y, nvertices + 1, apstatr (ap, SKY_MODE),
 	    apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
 	call ap_qyprint (ap, cier, sier, pier)

@@ -135,7 +135,7 @@ begin
 
 	# Store the results.
 	if (out != NULL && stid > 1)
-	    call ap_rparam (out, PSFAPERT, 2.0 * psfapert, UN_PSFAPERT,
+	    call ap_rparam (out, KY_PSFAPERT, 2.0 * psfapert, UN_PSFAPERT,
 	        "width of the fitting box")
 
 	call sfree (sp)

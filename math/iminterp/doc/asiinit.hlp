@@ -20,9 +20,9 @@ ARGUMENTS
 Pointer to sequential interpolant descriptor.
 .le
 .ls interp_type
-Interpolant type. The options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5 and
-II_SPLINE3 for nearest neighbour, linear, 3rd order polynomial, 5th order
-polynomial and cubic spline respectively. The interpolant type
+Interpolant type. The options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5,
+II_SPLINE3 and II_SINC for nearest neighbour, linear, 3rd order polynomial,
+5th order polynomial, cubic spline, and sinc respectively. The interpolant type
 definitions are found in the package header file math/iminterp.h.
 .le
 .ih

@@ -20,7 +20,7 @@ pointer	mgd			# pointer to plot metacode file
 pointer	gid			# pointer to image display stream
 int	interactive		# interactive pr batch mode
 
-int	stdin, ild, cier, sier, pier
+int	stdin, ild, radius, cier, sier, pier
 pointer	sp, str
 real	wx, wy
 int	fscan(), nscan(), apfitsky(), apfitcenter(), apmag(), strncmp()
@@ -34,16 +34,17 @@ begin
 
 	# Initialize
 	ild = ld
+	radius = 4 * (apstatr (ap, ANNULUS) + apstatr (ap, DANNULUS) + 1.0) *
+	    apstatr (ap, SCALE)
+	call ap_imbuf (ap, radius, YES)
 
 	# Print query.
-	if (strncmp ("STDIN", Memc[str], 5) == 0)
+	if (strncmp ("STDIN", Memc[str], 5) == 0) {
 	    stdin = YES
-	else
-	    stdin = NO
-	if (stdin == YES) {
 	    call printf ("Type object x and y coordinates (^D or ^Z to end): ")
 	    call flush (STDOUT)
-	}
+	} else
+	    stdin = NO
 
 	# Loop over the coordinate file.
 	while (fscan (cl) != EOF) {
@@ -53,7 +54,8 @@ begin
 	    call gargr (wy)
 	    if (nscan () != 2) {
 		if (stdin == YES) {
-	    	    call printf ("Type object x and y coordinates (^D or ^Z to end): ")
+	    	    call printf (
+		        "Type object x and y coordinates (^D or ^Z to end): ")
 	    	    call flush (STDOUT)
 		}
 		next
@@ -61,7 +63,7 @@ begin
 	    call apsetr (ap, CWX, wx)
 	    call apsetr (ap, CWY, wy)
 
-	    # Center the coordinatess, fit the sky and compute magnitudes.
+	    # Center the coordinates, fit the sky and compute magnitudes.
 	    cier = apfitcenter (ap, im, wx, wy)
 	    sier = apfitsky (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 	        YCENTER), sd, gd)
@@ -69,16 +71,20 @@ begin
 	        apstati (ap, POSITIVE), apstatr (ap, SKY_MODE),
 		apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
 
-	    # Write the results.
+	    # Print the results if interactive mode.
 	    if (interactive == YES) {
 		call ap_qpmag (ap, cier, sier, pier)
 		if (gid != NULL)
 		    call apmark (ap, gid, apstati (ap, MKCENTER), apstati (ap,
 			MKSKY), apstati (ap, MKAPERT))
 	    }
+
+	    # Write the results.
 	    if (id == 1)
 	        call ap_param (ap, out, "phot")
 	    call ap_pmag (ap, out, id, ild, cier, sier, pier)
+
+	    # Make plots if mgd is enabled.
 	    call appplot (ap, im, id, cier, sier, pier, mgd, YES)
 
 	    # Prepare for the next object.
@@ -93,5 +99,6 @@ begin
 	    }
 	}
 
+	call ap_imbuf (ap, 0, YES)
 	call sfree (sp)
 end

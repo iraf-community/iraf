@@ -59,7 +59,8 @@ begin
 		if (ch == EOS)
 		    break
 		else if (!IS_ASCII(ch))
-		    call strcpy ("out of band data on ki channel\n", p_sbuf)
+		    call strcpy ("out of band data on ki channel\n", p_sbuf,
+			SZ_LINE)
 	    }
 
 	    call xer_putline (STDERR, p_sbuf)

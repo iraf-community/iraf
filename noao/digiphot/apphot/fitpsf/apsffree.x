@@ -16,6 +16,8 @@ begin
 	    call ap_dispcls (ap)
 	if (AP_PPSF(ap) != NULL)
 	    call ap_psfcls (ap)
+	if (AP_IMBUF(ap) != NULL)
+	    call mfree (AP_IMBUF(ap), TY_REAL)
 	call mfree (ap, TY_STRUCT)
 end
 

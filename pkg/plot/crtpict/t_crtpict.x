@@ -119,7 +119,7 @@ begin
 		    call gscan (Memc[command])
 		    next
 		} else 
-		    call gargwrd (Memc[image])
+		    call gargwrd (Memc[image], SZ_FNAME)
 	    } else {
 		stat = imtgetim (list, Memc[image], SZ_FNAME)
 		if (stat == EOF)

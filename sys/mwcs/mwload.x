@@ -4,6 +4,7 @@ include	<syserr.h>
 include	<error.h>
 include	<mach.h>
 include	"mwcs.h"
+include	"mwsv.h"
 
 # MW_LOAD -- Load a saved MWCS into a descriptor.  The saved MWCS will
 # have been created in a previous call to MW_SAVE.  In its saved form,
@@ -14,20 +15,41 @@ procedure mw_load (mw, bp)
 pointer	mw			#I pointer to MWCS descriptor
 pointer	bp			#I pointer to save buffer, type char
 
-int	nelem, n, i
-pointer	sp, sv, ct, ip, oo
+pointer	sp, sv, ct, ip, cw, ms, wp
+int	nelem, cwlen, mslen, nwcs, lenwcs, n, i
 errchk	syserrs, malloc
 pointer	coerce()
 int	pl_l2pi()
 
 begin
-	# Get the save header.
-	sv = coerce (bp, TY_CHAR, TY_STRUCT)
-	if (SV_MAGIC(sv) != MWCS_MAGIC)
-	    call syserrs (SYS_MWMAGIC, "MWCS save buffer")
-
 	call smark (sp)
-	call salloc (oo, SV_CWCSLEN(sv), TY_INT)
+	call salloc (sv, LEN_SVHDR, TY_STRUCT)
+
+	# Get the save header.
+	ip = coerce (bp, TY_CHAR, TY_STRUCT)
+	call miiupk32 (Memi[ip], Memi[sv], LEN_SVHDR, TY_INT)
+	if (SV_MAGIC(sv) != MWSV_MAGIC)
+	    call syserrs (SYS_MWMAGIC, "MWCS save file")
+
+	cwlen = SV_CWCSLEN(sv)
+	mslen = SV_MWSVLEN(sv)
+
+	# Prior to MWSV version 1 lenwcs and nwcs were not recorded.
+	if (SV_VERSION(sv) < 1) {
+	    lenwcs = MWSV_LENWCS0
+	    nwcs = (mslen - MWSV_BASELEN) / lenwcs
+	} else {
+	    lenwcs = SV_LENWCS(sv)
+	    nwcs = SV_NWCS(sv)
+	}
+
+	call salloc (cw, cwlen, TY_INT)
+	call salloc (ms, mslen, TY_INT)
+
+	# Unpack the saved MWSV descriptor.
+	ip = coerce (bp + SV_MWSVOFF(sv), TY_CHAR, TY_STRUCT)
+	call miiupk32 (Memi[ip], Memi[cw], SV_CWCSLEN(sv), TY_INT)
+	n = pl_l2pi (Memi[cw], 1, Memi[ms], mslen)
 
 	# Free any storage associated with the old descriptor.
 	# Start with any still allocated CTRAN descriptors.
@@ -45,14 +67,20 @@ begin
 	if (MI_DBUF(mw) != NULL)
 	    call mfree (MI_DBUF(mw), TY_DOUBLE)
 
-	# Load the main descriptor, which is stored in compressed and MII
-	# encoded form in the save buffer.
+	# Copy the MWSV descriptor to the active MWCS descriptor.  This
+	# assumes that the base descriptor and the WCS sub-descriptor have
+	# identical structures, except for the length of each element.
 
-	nelem = SV_MWCSLEN(sv)
-	ip = coerce (bp + SV_MWCSOFF(sv), TY_CHAR, TY_STRUCT)
-	call miiupk32 (Memi[ip], Memi[oo], SV_CWCSLEN(sv), TY_INT)
-	n = pl_l2pi (Memi[oo], 1, Memi[mw], nelem)
-	call aclri (Memi[mw+nelem], LEN_MWCS-nelem)
+	call amovi (Memi[ms], Memi[mw], LEN_BASEMWCS)
+	nelem = min (lenwcs, LEN_WCS)
+	do i = 1, nwcs {
+	    wp = MI_WCSP(mw,i)
+	    call amovi (Memi[MS_WCSP(ms,i,lenwcs)], Memi[wp], nelem)
+	    if (nelem < LEN_WCS)
+		call aclri (Memi[wp+nelem], LEN_WCS-nelem)
+	}
+	do i = nwcs+1, MAX_WCS
+	    call aclri (Memi[MI_WCSP(mw,i)], LEN_WCS)
 
 	# Load the data buffer.
 	nelem = SV_DBUFLEN(sv)

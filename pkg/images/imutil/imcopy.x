@@ -28,7 +28,7 @@ begin
 
 	# If verbose print the operation.
 	if (verbose) {
-	    call eprintf ("%s -> %s\n")
+	    call printf ("%s -> %s\n")
 		call pargstr (image1)
 		call pargstr (image2)
 	}

@@ -13,6 +13,7 @@ libpkg.a:
 	ecfget.x	ecffit.com
 	ecfgraph.x	<gset.h> <pkg/gtools.h>
 	ecfnearest.x	<gset.h> <mach.h> <pkg/gtools.h>
+	ecfreject.x	ecffit.com <mach.h>
 	ecfrms.x
 	ecfset.x	ecffit.com
 	ecfsolve.x	ecffit.com <mach.h> <math/gsurfit.h>

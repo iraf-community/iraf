@@ -1,4 +1,4 @@
-.help lcalib Sep87 noao.onedspec
+.help lcalib Mar92 noao.onedspec
 .ih
 NAME
 lcalib -- List information about the spectral calibration data
@@ -17,7 +17,8 @@ the star (selected by the star_name parameter) at each wavelength, or
 .le
 .ls star_name
 Selects which star's magnitude list is chosen if the option parameter
-is "mags", "fnu", "flam", or "bands".
+is "mags", "fnu", "flam", or "bands".  Also if '?' a list of available
+stars in the specified calibration directory is given.
 .le
 .ls extinction
 Extinction file.  The current standard extinction files:
@@ -27,14 +28,12 @@ Extinction file.  The current standard extinction files:
 .fi
 .le
 .ls caldir
-Calibration directory containing standard star data.  The current
-calibration directories are:
+Calibration directory containing standard star data.  The directory name
+must end with /.  The current calibration directories available in the
+onedstds$ may be listed with the command:
+
 .nf
-	onedstds$irscal/   - IRS standard stars
-	onedstds$iidscal/  - IIDS standard stars
-	onedstds$ctiocal/  - CTIO standard stars
-	onedstds$bstdscal/ - Bright standard stars
-	onedstds$redcal/   - IRS and IIDS extended red standard stars
+	cl> page onedstds$README
 .fi
 .le
 .ls fnuzero = 3.68e-20
@@ -89,10 +88,12 @@ EXAMPLES
 	cl> lcalib stars calib_file=onedstds$iidscal/
 .fi
 .ih
+REVISIONS
+.ls LCALIB V2.10
+This task has a more compact listing for the "stars" option and allows
+paging a list of stars when the star name query is not recognized.
+.le
+.ih
 SEE ALSO
-.nf
-standard, sensfunc, onedstds$irscal/, onedstds$iidscal/, onedstds$ctiocal/,
-onedstds$bstdscal/, onedstds$redcal/, onedstds$kpnoextinct.dat,
-onedstds$ctioextinct.dat
-.fi
+standard, sensfunc, onedstds$README
 .endhelp

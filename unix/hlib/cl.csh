@@ -4,12 +4,12 @@
 # machine.
 
 #set	echo
-#set	MACH = vax
-set	MACH = `mach`		# SUNOS specific.
+set	MACH = dsux
+#set	MACH = `mach`		# SUNOS specific.
 
 # Determine IRAF root directory (value set in install script).
 if ($?iraf == 0) then
-    setenv iraf "/local/iraf/"
+    setenv iraf "/usr/iraf/"
 endif
 
 # Check for obsolete IRAFBIN definition.
@@ -36,7 +36,13 @@ if ($?IRAFARCH) then
 endif
 
 # Determine the architecture to be used.
-if ("$MACH" == "sparc") then
+if ("$MACH" == "dsux") then
+    if (-e $iraf/bin.ddec/cl.e) then
+	setenv IRAFARCH "ddec"
+    else
+	setenv IRAFARCH "dmip"
+    endif
+else if ("$MACH" == "sparc") then
     setenv IRAFARCH "sparc"
 else if ("$MACH" == "i386") then
     setenv IRAFARCH "i386"

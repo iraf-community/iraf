@@ -21,7 +21,7 @@ pointer	sp, str, cmd
 real	xc, yc, xcenter, ycenter, rmin, rmax, imin, imax, rval
 real	u1, u2, v1, v2, x1, x2, y1, y2
 
-int	apfitcenter(), clgcur(), apfitsky(), apfrprof(), apstati()
+int	apfitcenter(), clgcur(), apfitsky(), ap_frprof(), apstati()
 int	ap_showplot()
 real	apstatr(), ap_cfwhmpsf(), ap_ccapert(), ap_cannulus(), ap_cdannulus()
 real	ap_ccthresh(), ap_crprof(), ap_crpstep(), ap_cdatamin()
@@ -117,9 +117,8 @@ begin
 	cier = apfitcenter (ap, im, xcenter, ycenter)
 	sier = apfitsky (ap, im, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
 	    NULL, gd)
-	rier = apfrprof (ap, im, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
-	    apstatr (ap, SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap,
-	    NSKY), pier)
+	rier = ap_frprof (ap, im, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
+	    pier)
 	call ap_rpplot (ap, 0, cier, sier, pier, rier, gd, apstati (ap,
 	    RADPLOTS))
 	call ap_qprprof (ap, cier, sier, pier, rier)

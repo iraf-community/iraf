@@ -2,10 +2,9 @@ include	"apertures.h"
 
 # AP_INFO -- Print information about an aperture.
 
-procedure ap_info (ap, line)
+procedure ap_info (ap)
 
 pointer	ap		# Aperture pointer
-int	line		# Line or column for center position
 
 int	n, ic_geti(), strlen()
 real	ic_getr()

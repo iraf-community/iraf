@@ -14,9 +14,8 @@ int	stid			# output file sequence number)
 
 int	key, wcs
 pointer	sp, cmd
-real	rmin, rmax, imin, imax, xcenter, ycenter
+real	rmin, rmax, imin, imax, xcenter, ycenter, rval
 real	u1, u2, v1, v2, x1, x2, y1, y2
-real	rval
 
 int	ap_showplot(), clgcur()
 real	ap_cfwhmpsf(), ap_cthresh(), ap_csigma(), ap_cdatamin(), ap_cdatamax()

@@ -1,0 +1,18 @@
+input,s,a,"",,,List of input spectra
+output,s,a,"",,,List of output spectra
+woutput,s,h,"",,,List of output weight spectra
+apertures,s,h,"",,,Apertures to combine
+group,s,h,"apertures","all|images|apertures",,Grouping option
+combine,s,h,"average","average|sum",,Combining option
+scale,s,h,"",,,Header keyword for scaling
+weight,s,h,"","",,"Header keyword for weighting
+"
+w1,r,h,INDEF,,,Starting wavelength of output spectra
+w2,r,h,INDEF,,,Ending wavelength of output spectra
+dw,r,h,INDEF,,,Wavelength increment of output spectra
+nw,i,h,INDEF,,,Length of output spectra
+log,b,h,no,,,"Logarithmic increments?
+"
+interactive,b,h,no,,,Adjust spectra interactively?
+sort,s,h,"none","none|increasing|decreasing",,Interactive combining order
+cursor,*gcur,h,"",,,Graphics cursor input

@@ -1,0 +1,19 @@
+# GROUP task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	dpmkgroup.x	<imhdr.h>		<mach.h>                \
+			../lib/apsel.h		../lib/daophot.h        \
+			../lib/daophotdef.h
+	dpsmpsf.x	<mach.h>		../lib/daophotdef.h
+	dpgconfirm.x	../lib/daophot.h
+	dpwrtgroup.x	<time.h>		<tbset.h>               \
+			../lib/daophot.h	../lib/daophotdef.h     \
+			../lib/apsel.h		<mach.h>
+	t_group.x	<fset.h>		../lib/daophotdef.h     \
+			../lib/daophot.h
+	;

@@ -1,0 +1,18 @@
+$checkout libpkg.a ..
+$update   libpkg.a
+$checkin  libpkg.a ..
+$exit
+
+libpkg.a:
+	astcoord.x	
+	astgalactic.x	<math.h>
+	astgaltoeq.x	<math.h>
+	astprecess.x	<math.h>
+	asttimes.x	
+	asthjd.x	<math.h>
+	astvbary.x	<math.h>
+	astvorbit.x	<math.h>
+	astvr.x		<math.h>
+	astvrotate.x	<math.h>
+	astvsun.x	<math.h>
+	;

@@ -11,27 +11,36 @@ include	<mwset.h>
 procedure t_rimcursor()
 
 double	px, py, wx, wy
-pointer sp, gp, ct, mw, fmt, rest
+pointer gp, ct, mw, sp, wcs, rest, format[2], fmt[2]
 int	axis, frame, newframe, ntokens
 pointer	gopen(), rim_getctran()
-errchk	gopen, rim_getctran
 int	clscan(), nscan()
+errchk	gopen, rim_getctran
 
 begin
+	# Allocate working space.
 	call smark (sp)
-	call salloc (fmt, SZ_FNAME, TY_CHAR)
+	call salloc (wcs, SZ_FNAME, TY_CHAR)
 	call salloc (rest, SZ_LINE, TY_CHAR)
+	do axis = 1, 2 {
+	    call salloc (format[axis], SZ_FNAME, TY_CHAR)
+	    call salloc (fmt[axis], SZ_FNAME, TY_CHAR)
+	}
 
 	# Open graphics context (doesn't work currently for stdimage).
 	iferr (gp = gopen ("stdimage", APPEND, STDIMAGE))
 	    gp = NULL
 
+	# Initialize.
 	frame = 1
 	mw = NULL
 	ct = NULL
+	call clgstr ("wxformat", Memc[format[1]], SZ_FNAME)
+	call clgstr ("wyformat", Memc[format[2]], SZ_FNAME)
 
 	# Read the cursor repeatedly until EOF is seen.
 	while (clscan ("cursor") != EOF) {
+
 	    # Get cursor value.
 	    call gargd (px)
 	    call gargd (py)
@@ -44,10 +53,25 @@ begin
 	    if (ntokens < 2)
 		call error (1, "bad cursor read")
 	    else if (mw == NULL || (ntokens >= 3 && newframe != frame)) {
+
 		if (mw != NULL)
 		    call mw_close (mw)
-		ct = rim_getctran (newframe, mw)
+		ct = rim_getctran (newframe, Memc[wcs], mw)
+		if (mw != NULL)
+		    call mw_ssystem (mw, Memc[wcs])
 		frame = newframe
+
+		do axis = 1, 2 {
+		    if (Memc[format[axis]] != EOS)
+		        call strcpy (Memc[format[axis]], Memc[fmt[axis]],
+			    SZ_FNAME)
+		    else if (mw != NULL) {
+		        iferr (call mw_gwattrs (mw, axis, "format",
+			    Memc[fmt[axis]], SZ_FNAME))
+		            call strcpy ("%0.15g", Memc[fmt[axis]], SZ_FNAME)
+		    } else
+		        call strcpy ("%0.15g", Memc[fmt[axis]], SZ_FNAME)
+		}
 	    }
 
 	    # Transform coordinates.
@@ -60,21 +84,15 @@ begin
 
 	    # Always output transformed coordinates.
 	    do axis = 1, 2 {
-		# Use format given in MWCS, if there is one.
-		Memc[fmt] = EOS
-		if (mw != NULL) {
-		    iferr (call mw_gwattrs(mw,axis,"format",Memc[fmt],SZ_FNAME))
-			Memc[fmt] = EOS
-		}
-		if (Memc[fmt] == EOS)
-		    call strcpy ("%0.15g", Memc[fmt], SZ_FNAME)
 
 		# Output the transformed value.
-		call fprintf (STDOUT, Memc[fmt])
-		    if (axis == 1)
+		if (axis == 1) {
+		    call fprintf (STDOUT, Memc[fmt[axis]])
 			call pargd (wx)
-		    else
+		} else {
+		    call fprintf (STDOUT, Memc[fmt[axis]])
 			call pargd (wy)
+		}
 
 		call putci (STDOUT, ' ')
 	    }
@@ -105,14 +123,15 @@ end
 # Determine the reference image, load the WCS, and compile a transform from
 # logical image coordinates to the desired coordinate system.
 
-pointer procedure rim_getctran (frame, mw)
+pointer procedure rim_getctran (frame, wcs, mw)
 
 int	frame			#I image frame, if display is used
+char	wcs[ARB]		#O name of requested wcs
 pointer	mw			#O MWCS descriptor
 
 int	status
 bool	use_display
-pointer	sp, wcs, imname, ds, iw, im, ct
+pointer	sp, imname, ds, iw, im, ct
 pointer	imd_mapframe(), iw_open(), immap(), mw_sctran(), mw_openim()
 errchk	imd_mapframe, iw_open, immap, mw_sctran, mw_openim
 int	envfind(), clgeti()
@@ -121,7 +140,6 @@ bool	streq()
 begin
 	call smark (sp)
 	call salloc (imname, SZ_LINE, TY_CHAR)
-	call salloc (wcs, SZ_FNAME, TY_CHAR)
 
 	# Access image display to get name of reference image?
 	if (clgeti ("$nargs") > 0)
@@ -150,12 +168,13 @@ begin
 	if (im == NULL) {
 	    mw = NULL
 	    ct = NULL
+	    wcs[1] = EOS
 	} else {
 	    ifnoerr (mw = mw_openim (im)) {
-		call clgstr ("wcs", Memc[wcs], SZ_FNAME)
-		if (Memc[wcs] == EOS)
-		    call strcpy ("logical", Memc[wcs], SZ_FNAME)
-		ct = mw_sctran (mw, "logical", Memc[wcs], 03B)
+		call clgstr ("wcs", wcs, SZ_FNAME)
+		if (wcs[1] == EOS)
+		    call strcpy ("logical", wcs, SZ_FNAME)
+		ct = mw_sctran (mw, "logical", wcs, 03B)
 	    } else {
 		mw = NULL
 		ct = NULL

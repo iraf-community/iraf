@@ -1,31 +1,34 @@
 include	<error.h>
 include	<imhdr.h>
+include	<math.h>
 include	<math/iminterp.h>
 
 # Template data structure
-define	LEN_MKT		17
+define	LEN_MKT		18
 define	MKT_PROF	Memi[$1]	# Pointer to profile
 define	MKT_MSI		Memi[$1+1]	# MSI interpolation pointer
 define	MKT_NXM		Memi[$1+2]	# Number of X points in model
 define	MKT_NYM		Memi[$1+3]	# Number of Y points in model
-define	MKT_SCALE	Memi[$1+4]	# Radius scale
+define	MKT_F		Memr[$1+4]	# Fraction of total flux in profile
+define	MKT_SCALE	Memi[$1+5]	# Radius scale
 
-define	MKT_NALLOC	Memi[$1+5]	# Allocated space for saved templates
-define	MKT_N		Memi[$1+6]	# Number of saved templates
+define	MKT_NALLOC	Memi[$1+6]	# Allocated space for saved templates
+define	MKT_N		Memi[$1+7]	# Number of saved templates
 
-define	MKT_DATA	Memi[$1+7]	# Data pointer
-define	MKT_PTRS	Memi[$1+8]	# Data pointers
-define	MKT_NX		Memi[$1+9]	# Number of X pixels
-define	MKT_NY		Memi[$1+10]	# Number of Y pixels
-define	MKT_XC		Memi[$1+11]	# Subpixel X center
-define	MKT_YC		Memi[$1+12]	# Subpixel Y center
-define	MKT_FLUX	Memi[$1+13]	# Flux
-define	MKT_R		Memi[$1+14]	# Radius
-define	MKT_AR		Memi[$1+15]	# Axial ratio
-define	MKT_PA		Memi[$1+16]	# Position angle
+define	MKT_DATA	Memi[$1+8]	# Data pointer
+define	MKT_PTRS	Memi[$1+9]	# Data pointers
+define	MKT_NX		Memi[$1+10]	# Number of X pixels
+define	MKT_NY		Memi[$1+11]	# Number of Y pixels
+define	MKT_XC		Memi[$1+12]	# Subpixel X center
+define	MKT_YC		Memi[$1+13]	# Subpixel Y center
+define	MKT_FLUX	Memi[$1+14]	# Flux
+define	MKT_R		Memi[$1+15]	# Radius
+define	MKT_AR		Memi[$1+16]	# Axial ratio
+define	MKT_PA		Memi[$1+17]	# Position angle
 
 define	NALLOC	25		# Allocation block for saved templates
 define	NPROF	5001		# Profile length
+define	NY	11		# BINPROF binning parameter
 
 
 # MKT_INIT    -- Initialize template memory.
@@ -35,7 +38,7 @@ define	NPROF	5001		# Profile length
 # MKT_STAR    -- Set star and seeing templates.
 # MKT_OBJECT  -- Set object profiles.
 # MKT_GOBJECT -- Get image raster.
-# MKT_FIXPROF -- Convert cumulative flux profile to binned linear profile
+# MKT_BINPROF -- Bin intensity profile
 # MKT_GSTAR   -- Get the precomputed template with center nearest (x,y).
 # MKT_PROFILE -- Make template from profile.
 # MKT_MSI     -- Make template from image interpolation function.
@@ -78,7 +81,7 @@ begin
 	# the last unsaved data buffer, all saved templates, and the object
 	# structure.  Finally free the symbol table.
 
-	for (sym = sthead (stp); sym != NULL; sym = stnext (stp, mkt)) {
+	for (sym = sthead (stp); sym != NULL; sym = stnext (stp, sym)) {
 	    mkt = Memi[sym]
 	    if (mkt != NULL) {
 	        call mfree (MKT_PROF(mkt), TY_REAL)
@@ -233,96 +236,97 @@ real	r		# Major axis sigma (pixels)
 real	ar		# Axial ratio (minor / major)
 real	pa		# Position angle (radians)
 
-int	i, j, k, nxm, nym, nx, ny
-real	dr, intensity, flux, radius, seeing, beta, xc, yc, dxc, dyc
-pointer	sym, mkt1, mkt2, prof, prof1, asi, msi, data
+int	i, j, nxm, nym, nx, ny, fd
+real	dr, flux, radius, seeing, beta, xc, yc, dxc, dyc, der[2]
+pointer	sym, mkt1, mkt2, prof, prof1, asi, msi, data, im
 
 bool	streq()
 real	clgetr(), asieval()
 int	open(), fscan(), nscan()
 pointer	immap(), imgs2r(), stfind(), stenter()
-errchk	immap, open, imgs2r, asifit, asieval
+errchk	immap, open, imgs2r, asifit, asieval, asider
 
 include	"mktemplates.com"
 
 begin
+	# Check if previously defined.
 	sym = stfind (stp, "star")
 	if (sym != NULL)
 	    return (Memi[sym])
 
-	# Select type of star profile and set profile array.
+	# Select type of star profile and set intensity profile array.
+	# Compute the fraction of the total flux in the profile.
+	# Insure that the profile subsamples a subpixel.
+
 	star = NULL
 	see = NULL
 	prof = NULL
 	msi = NULL
 	if (streq (name, "gaussian")) {
-	    nxm = NPROF
-	    call malloc (prof, nxm, TY_REAL)
+	    r = clgetr ("radius") / sqrt (log (2.))
 	    radius = sqrt (log (dynrange))
 	    seeing = sqrt (log (psfrange))
+	    nxm = max (NPROF, 1 + nint (radius*r*nxssub*nyssub))
+	    call malloc (prof, nxm, TY_REAL)
+
 	    dr = radius / (nxm - 1)
-	    do i = 0, nxm - 1 {
-		r = (i * dr) ** 2
-		intensity = exp (-r)
-		flux = 1 - intensity
-		Memr[prof+i] = flux
-	    }
+	    do i = 0, nxm - 1
+		Memr[prof+i] = exp (-(i * dr) ** 2)
+	    flux = 1 - Memr[prof+nxm-1]
 
 	    r = sqrt (log (2.))
 	    radius = radius / r
 	    seeing = seeing / r
-	    flux = Memr[prof+nxm-1]
 	} else if (streq (name, "moffat")) {
-	    nxm = NPROF
-	    call malloc (prof, nxm, TY_REAL)
 	    beta = clgetr ("beta")
+	    r = clgetr ("radius") / sqrt (2. ** (1/beta) - 1.)
 	    radius = sqrt ((dynrange) ** (1/beta) - 1)
 	    seeing = sqrt ((psfrange) ** (1/beta) - 1)
+	    nxm = max (NPROF, 1 + nint (radius*r*nxssub*nyssub))
+	    call malloc (prof, nxm, TY_REAL)
+
 	    dr = radius / (nxm - 1)
-	    Memr[prof] = 0
 	    flux = 0
-	    do i = 1, nxm - 1 {
-		r = (i - 0.5) * dr
-		intensity = 1. / ((1 + r**2) ** beta)
-		flux = flux + intensity * r * dr
-		Memr[prof+i] = flux
+	    do i = 0, nxm - 1 {
+		r = i * dr
+		Memr[prof+i] =  1. / ((1 + r**2) ** beta)
+		flux = flux + r * Memr[prof+i]
 	    }
 
-	    # The last part of the flux below is computed by expanding
+	    # Compute the fraction of the total flux in the profile.
+	    # The last part of the total flux below is computed by expanding
 	    # (1+r**2) --> r**2 under the approximation that r >> 1.
 	    # Note that it is possible to explicitly compute the total
 	    # flux  F(total) = beta / (2 * beta - 2) (CRC 53rd edition)
-	    # If found errors in other versions of CRC for this integral!
+	    # I found errors in other versions of CRC for this integral!
 
 	    r = r + dr / 2
 	    xc = 2 * beta - 2
-	    flux = flux + 1. / (xc * r ** xc)
-	    call adivkr (Memr[prof], flux, Memr[prof], nxm)
+	    flux = flux / (flux + 1. / (xc * r ** xc))
 
 	    r = sqrt (2. ** (1/beta) - 1.)
 	    radius = radius / r
 	    seeing = seeing / r
-	    flux = Memr[prof+nxm-1]
-	} else ifnoerr (i = immap (name, READ_ONLY, 0)) {
+	} else ifnoerr (im = immap (name, READ_ONLY, 0)) {
 	    iferr {
-		nxm = IM_LEN(i,1)
-		nym = IM_LEN(i,2)
-		data = imgs2r (i, 1, nxm, 1, nym)
+		nxm = IM_LEN(im,1)
+		nym = IM_LEN(im,2)
+		data = imgs2r (im, 1, nxm, 1, nym)
 		call msiinit (msi, II_BILINEAR)
 		call msifit (msi, Memr[data], nxm, nym, nxm)
 	    } then
 		call erract (EA_WARN)
-	    call imunmap (i)
+	    call imunmap (im)
 
-	    radius = 1
-	    seeing = 0.4
 	    flux = 1.
-	} else ifnoerr (i = open (name, READ_ONLY, TEXT_FILE)) {
+	    radius = 1
+	    seeing = 0.8
+	} else ifnoerr (fd = open (name, READ_ONLY, TEXT_FILE)) {
 	    nxm = NPROF
 	    call malloc (prof1, nxm, TY_REAL)
 
 	    j = 0
-	    while (fscan (i) != EOF) {
+	    while (fscan (fd) != EOF) {
 	 	call gargr (flux)
 		if (nscan() < 1)
 		    next
@@ -333,39 +337,57 @@ begin
 		Memr[prof1+j] = flux
 		j = j + 1
 	    }
-	    call close (i)
+	    call close (fd)
 	    if (j == 0) {
 		call mfree (prof1, TY_REAL)
 		call error (1, "PSF template not found")
 	    }
-	    call asiinit (asi, II_LINEAR)
+
+	    r = clgetr ("radius")
+	    nxm = max (NPROF, 1 + nint (r*nxssub*nyssub))
+	    call malloc (prof, nxm, TY_REAL)
+	    dr = 1. / (nxm - 1)
+	    j = j - 1
+
+	    call asiinit (asi, II_SPLINE3)
 	    call asifit (asi, Memr[prof1], j)
+	    xc = Memr[prof1]
 	    call mfree (prof1, TY_REAL)
 
-	    nxm = NPROF
-	    call malloc (prof, nxm, TY_REAL)
-	    radius = j - 1
-	    dr = radius / (nxm - 1)
-	    do i = 0, nxm - 1 {
-		r = i * dr
-		flux = asieval (asi, 1 + r)
-		if (flux < 0.9)
-		    k = i
-		Memr[prof+i] = flux
+	    if (xc == 0.) {
+		flux = 0.
+		do i = 1, nxm - 1 {
+		    r = i * dr
+		    call asider (asi, 1+j*r, der, 2)
+		    Memr[prof+i] = max (0., der[2] / r)
+		    flux = flux + r * Memr[prof+i]
+		}
+		Memr[prof] = max (0., 2 * Memr[prof+1] - Memr[prof+2])
+	    } else {
+		flux = 0.
+		do i = 0, nxm - 1 {
+		    r = i * dr
+		    Memr[prof+i] = asieval (asi, 1+j*r)
+		    flux = flux + r * Memr[prof+i]
+		}
 	    }
-
 	    call asifree (asi)
 
+	    xc = 0.9 * flux
+	    flux = 0.
+	    for (i=1; i<nxm && flux<xc; i=i+1)
+		flux = flux + i * dr * Memr[prof+i]
+
+	    flux = 1.
 	    radius = 1.
-	    seeing = (k - 1.) / (nxm - 1.)
-	    flux = Memr[prof+nxm-1]
+	    seeing = (i - 1.) * dr
 	} else
 	    call error (1, "PSF template not found")
 
 	# Set size and orientation parameters.
 	r = clgetr ("radius")
 	ar = clgetr ("ar")
-	pa = clgetr ("pa") 
+	pa = DEGTORAD (clgetr ("pa"))
 	radius = r * radius
 	seeing = r * seeing
 
@@ -383,13 +405,14 @@ begin
 	dxc = 1. / nxc
 	dyc = 1. / nyc
 	if (prof != NULL) {
-	    call malloc (prof1, nxm, TY_REAL)
-	    call mkt_fixprof (Memr[prof], Memr[prof1], nxm, radius, nxssub)
+	    nym = 1 + nint (radius * nxssub * nyssub)
+	    call malloc (prof1, nym, TY_REAL)
+	    call mkt_binprof (Memr[prof], nxm, Memr[prof1], nym, radius, nxssub)
 	    for (yc = -0.5+dyc/2; yc < 0.5; yc = yc+dyc) {
 	        for (xc = -0.5+dxc/2; xc < 0.5; xc = xc+dxc) {
 		    call malloc (data, nx*ny, TY_REAL)
 		    call mkt_profile (data, nx, ny, xc, yc, 1., Memr[prof1],
-		        nxm, radius, ar, pa, nxssub, nyssub)
+		        nym, radius, ar, pa, nxssub, nyssub)
 		    call mkt_save (mkt1, data, nx, ny, xc, yc, 1., 0., 0., 0.,
 			YES)
 	        }
@@ -420,7 +443,7 @@ begin
 	        for (xc = 0.5+dxc/2; xc < 1.5; xc = xc+dxc) {
 		    call malloc (data, nx*ny, TY_REAL)
 		    call mkt_profile (data, nx, ny, xc, yc, flux, Memr[prof1],
-		        nxm, radius, ar, pa, nxssub, nyssub)
+		        nym, radius, ar, pa, nxssub, nyssub)
 		    call mkt_save (mkt2, data, nx, ny, xc, yc, 1., 0., 0., 0.,
 			YES)
 	        }
@@ -452,24 +475,27 @@ pointer procedure mkt_object (name)
 
 char	name[ARB]	# Profile name or file
 
-int	i, j, nxm, nym
-real	radius, r, dr, intensity, flux, c3, c4, c5, c6, c7
-pointer	sym, mkt, prof, asi, msi, buf
+int	i, j, nxm, nym, fd
+real	radius, r, dr, flux, c3, c4, c5, c6, c7, der[2]
+pointer	sym, mkt, prof, asi, msi, buf, im
 
 real	asieval()
 int	open(), fscan(), nscan()
 pointer	immap(), imgs2r(), stfind(), stenter()
 bool	streq()
-errchk	open, immap, asifit, asieval
+errchk	open, immap, asifit, asieval, asider
 
 include	"mktemplates.com"
 
 begin
+	# Check if previously defined.
 	sym = stfind (stp, name)
 	if (sym != NULL)
 	    return (Memi[sym])
 
-	# Set up model.
+	# Select type of profile and set intensity profile array.
+	# Compute the fraction of the total flux in the profile.
+
 	prof = NULL
 	msi = NULL
 	if (streq (name, "expdisk")) {
@@ -479,47 +505,48 @@ begin
 	    dr = radius / (nxm - 1)
 	    do i = 0, nxm - 1 {
 		r = i * dr
-		intensity = exp (-r)
-		flux = 1 - intensity * (1 + r)
-		Memr[prof+i] = flux
+		Memr[prof+i] = exp (-r)
 	    }
+
+	    flux = 1 - Memr[prof+nxm-1] * (1 + r)
 	    radius = radius / 1.6783
 	} else if (streq (name, "devauc")) {
-	    c3 = 1. / 6
-	    c4 = c3 / 4
-	    c5 = c4 / 5
-	    c6 = c5 / 6
-	    c7 = c6 / 7
-
 	    nxm = NPROF
 	    call malloc (prof, nxm, TY_REAL)
 	    radius = log (dynrange) ** 4
 	    dr = radius / (nxm - 1)
 	    do i = 0, nxm - 1 {
 		r = (i * dr) ** 0.25
-		intensity = exp (-r)
-		flux = 1 - intensity *
-		    (1+r*(1+r*(.5+r*(c3+r*(c4+r*(c5+r*(c6+c7*r)))))))
-		Memr[prof+i] = flux
+		Memr[prof+i] = exp (-r)
 	    }
+
+	    c3 = 1. / 6
+	    c4 = c3 / 4
+	    c5 = c4 / 5
+	    c6 = c5 / 6
+	    c7 = c6 / 7
+	    flux = 1 - Memr[prof+nxm-1] *
+		(1+r*(1+r*(.5+r*(c3+r*(c4+r*(c5+r*(c6+c7*r)))))))
 	    radius = radius / 7.67 ** 4
-	} else ifnoerr (i = immap (name, READ_ONLY, 0)) {
+	} else ifnoerr (im = immap (name, READ_ONLY, 0)) {
 	    iferr {
-		nxm = IM_LEN(i,1)
-		nym = IM_LEN(i,2)
-		buf = imgs2r (i, 1, nxm, 1, nym)
+		nxm = IM_LEN(im,1)
+		nym = IM_LEN(im,2)
+		buf = imgs2r (im, 1, nxm, 1, nym)
 		call msiinit (msi, II_BILINEAR)
 		call msifit (msi, Memr[buf], nxm, nym, nxm)
 	    } then
 		call erract (EA_WARN)
-	    call imunmap (i)
+	    call imunmap (im)
+
+	    flux = 1.
 	    radius = 1.
-	} else ifnoerr (i = open (name, READ_ONLY, TEXT_FILE)) {
+	} else ifnoerr (fd = open (name, READ_ONLY, TEXT_FILE)) {
 	    nxm = NPROF
 	    call malloc (buf, nxm, TY_REAL)
 
 	    j = 0
-	    while (fscan (i) != EOF) {
+	    while (fscan (fd) != EOF) {
 	 	call gargr (flux)
 		if (nscan() < 1)
 		    next
@@ -530,27 +557,39 @@ begin
 		Memr[buf+j] = flux
 		j = j + 1
 	    }
-	    call close (i)
+	    call close (fd)
 	    if (j == 0) {
 		call mfree (buf, TY_REAL)
 		nxm = 0
+		call error (1, "PSF template not found")
 	    }
-	    call asiinit (asi, II_LINEAR)
-	    call asifit (asi, Memr[buf], j)
-	    call mfree (buf, TY_REAL)
 
 	    nxm = NPROF
 	    call malloc (prof, nxm, TY_REAL)
-	    radius = j - 1
-	    dr = radius / (nxm - 1)
-	    do i = 0, nxm - 1 {
-		r = i * dr
-		flux = asieval (asi, 1 + r)
-		Memr[prof+i] = flux
-	    }
+	    dr = 1. / (nxm - 1)
+	    j = j - 1
 
+	    call asiinit (asi, II_SPLINE3)
+	    call asifit (asi, Memr[buf], j)
+	    c3 = Memr[buf]
+	    call mfree (buf, TY_REAL)
+
+	    if (c3 == 0.) {
+		do i = 1, nxm - 1 {
+		    r = i * dr
+		    call asider (asi, 1+j*r, der, 2)
+		    Memr[prof+i] = max (0., der[2] / r)
+		}
+		Memr[prof] = max (0., 2 * Memr[prof+1] - Memr[prof+2])
+	    } else {
+		do i = 0, nxm - 1 {
+		    r = i * dr
+		    Memr[prof+i] = asieval (asi, 1+j*r)
+		}
+	    }
 	    call asifree (asi)
 
+	    flux = 1.
 	    radius = 1.
 	} else {
 	    call eprintf ("WARNING: Object template %s not found.\n")
@@ -567,6 +606,7 @@ begin
 	    MKT_MSI(mkt) = msi
 	    MKT_NXM(mkt) = nxm
 	    MKT_NYM(mkt) = nym
+	    MKT_F(mkt) = flux
 	    MKT_SCALE(mkt) = radius
 	}
 
@@ -592,7 +632,7 @@ real	ar		# Axial ratio (minor / major)
 real	pa		# Position angle (radians)
 int	save		# Use/save template?
 
-real	xc, yc, radius, flux
+real	xc, yc, radius
 int	nprof
 pointer	prof
 
@@ -625,13 +665,11 @@ begin
 	    call malloc (data, nx * ny, TY_REAL)
 
 	    if (MKT_PROF(mkt) != 0) {
-	        nprof = MKT_NXM(mkt)
+	        nprof = 1 + nint (radius * nxgsub * nxgsub)
 	        call malloc (prof, nprof, TY_REAL)
-	        call mkt_fixprof (Memr[MKT_PROF(mkt)], Memr[prof], nprof,
-		    radius, nxgsub)
-#	        flux = z * Memr[prof+nprof-1]
-	        flux = z * Memr[MKT_PROF(mkt)+nprof-1]
-	        call mkt_profile (data, nx, ny, x, y, flux, Memr[prof],
+	        call mkt_binprof (Memr[MKT_PROF(mkt)], MKT_NXM(mkt),
+		    Memr[prof], nprof, radius, nxgsub)
+	        call mkt_profile (data, nx, ny, x, y, z*MKT_F(mkt), Memr[prof],
 		    nprof, radius, ar, pa, nxgsub, nygsub)
 	        call mfree (prof, TY_REAL)
 	    } else {
@@ -645,44 +683,78 @@ begin
 end
 
 
-# MKT_FIXPROF -- Convert cumulative flux profile to binned linear profile
-# at the requested sample size and scale.
+# MKT_BINPROF -- Bin intensity profile into subpixels
 
-procedure mkt_fixprof (prof, prof1, nprof, radius, nsub)
+procedure mkt_binprof (prof, nprof, prof1, nprof1, radius, nsub)
 
-real	prof[nprof]		# 1D profile
-real	prof1[nprof]		# Integrated 1D profile
-int	nprof			# Number of profile points
+real	prof[nprof]		# Input intensity profile
+int	nprof			# Number of input points
+real	prof1[nprof]		# Output binned intensity profile
+int	nprof1			# Number of output points
 real	radius			# Radius of profile
 int	nsub			# Maximum subsampling
 
-int	i, dr, r, r1, r2
+int	i, j, k, k1, k2, dx
+real	scale, dy, val
+
+int	debug, open()
+data	debug/0/
 
 begin
 	if (radius < 0.1) {
-	    call amovkr (prof[nprof], prof1, nprof)
+	    call amovkr (1., prof1, nprof1)
 	    return
+	} else
+	    call aclrr (prof1, nprof1)
+
+	# Set binning parameters
+	scale = (nprof - 1.) / (nprof1 - 1.)
+	dx = nint ((nprof1 - 1.) / nsub / radius / 2.)
+	dy = dx / (NY - 1.)
+
+	# Bin central pixels
+	do i = -dx, 2*dx {
+	    k = abs (i)
+	    k1 = max (1, i - dx + 1) 
+	    k2 = i + dx + 1
+	    do j = 0, NY-1 {
+		if (j == 0)
+		    val = k
+		else if (k == 0)
+		    val = dy * j
+		else
+		    val = k * sqrt (1. + (dy * j / k) ** 2)
+		val = prof[nint (scale * val + 1)] / NY
+		do k = k1, k2
+		    prof1[k] = prof1[k] + val
+	    }
 	}
 
-	dr = (nprof - 1) / nsub / radius + 0.5
-	i = 1
-	r = (1 + dr) / 2
-	for (r1=1+r; r1<=dr; r1=r1+1) {
-	    prof1[i] = prof[r1] / (r * r)
-	    i = i + 1
-	    r = r + 1
+	# Now bin remainder of pixels more crudely
+	do i = 2*dx+1, nprof1-1 {
+	    k1 = i - dx + 1
+	    k2 = min (nprof1, i + dx + 1)
+	    val = prof[nint (scale * i + 1)]
+	    do k = k1, k2
+		prof1[k] = prof1[k] + val
 	}
-	r = i
-	for (r2=1; r1<=nprof; r1=r1+1) {
-	    prof1[i] = (prof[r1] - prof[r2]) / (2 * r * dr)
-	    i = i + 1
-	    r = r + 1
-	    r2 = r2 + 1
-	}
-	for (; i<=nprof; r2=r2+1) {
-	    prof1[i] = (prof[nprof] - prof[r2]) / (2 * r * dr)
-	    i = i + 1
-	    r = r + 1
+
+	if (debug == YES) {
+	    j = open ("debug1.dat", APPEND, TEXT_FILE)
+	    do i = 1, nprof {
+		call fprintf (j, "%d %g\n")
+		    call pargi (i)
+		    call pargr (prof[i])
+	    }
+	    call close (j)
+
+	    j = open ("debug2.dat", APPEND, TEXT_FILE)
+	    do i = 1, nprof1 {
+		call fprintf (j, "%d %g\n")
+		    call pargi (i)
+		    call pargr (prof1[i])
+	    }
+	    call close (j)
 	}
 end
 

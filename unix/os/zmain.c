@@ -13,13 +13,21 @@
 #define	import_xnames
 #include <iraf.h>
 
+/*
+ * ZMAIN.C -- C main for IRAF processes.
+ */
+
 extern	unsigned USHLIB[];
-#define	sh_debug USHLIB[2]
+extern	int sh_debug;
+
+#define	LOGIPC	"LOGIPC"		/* define to enable IPC logging. */
 
 static	char os_process_name[SZ_FNAME];
 static	char osfn_bkgfile[SZ_PATHNAME];
+static	ipc_in = 0, ipc_out = 0;
 static	ipc_isatty = NO;
 static	int prtype;
+char	*getenv();
 
 
 /* MAIN -- UNIX Main routine for IRAF processes.  The process is a C process
@@ -46,7 +54,6 @@ char	*argv[];
 	XINT	driver;			/* EPA i/o chan device driver	*/
 	XINT	devtype;		/* device type (text or binary)	*/
 	XINT	jobcode;		/* bkg jobcode, if detached pr	*/
-	XINT	wsetsize=0L, junk;	/* for ZAWSET			*/
 	int	len_irafcmd, nchars;
 	XCHAR	*irafcmd;
 	char	*ip;
@@ -91,6 +98,17 @@ char	*argv[];
 		 */
 		signal (SIGINT, SIG_IGN);
 		arg++;
+
+		/* Check if we want IPC debug logging. */
+		if (getenv (LOGIPC)) {
+		    char   fname[SZ_FNAME];
+
+		    sprintf (fname, "%d.in", getpid());
+		    ipc_in = creat (fname, 0644);
+		    sprintf (fname, "%d.out", getpid());
+		    ipc_out = creat (fname, 0644);
+		}
+
 ipc_:
 		prtype = PR_CONNECTED;
 		ZLOCPR (ZARDPR, &driver);
@@ -156,7 +174,8 @@ ipc_:
 	 * the actual external parmeters (which may be in a shared library
 	 * and hence inaccessible).
 	 */
-	ZZSETK (os_process_name, osfn_bkgfile, prtype, ipc_isatty);
+	ZZSETK (os_process_name, osfn_bkgfile, prtype,
+	    ipc_isatty, ipc_in, ipc_out);
 
 	/* Call the IRAF Main, which does all the real work.  Return status
 	 * OK when the main returns.  The process can return an error status

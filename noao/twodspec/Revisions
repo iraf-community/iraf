@@ -1,5 +1,23 @@
 .help revisions Jun88 noao.twodspec
 .nf
+twodspec$mkpkg
+    Commented out multispec package.
+    (2/14/92, Valdes)
+
+twodspec$twodspec.cl
+twodspec$twodspec.men
+    The SETDISP  task is now defunct.  (8/28/91, Valdes)
+
+twodspec$twodspec.cl
+twodspec$twodspec.men
+twodspec$twodspec.hd
+    Commented out multispec package.  Some day it may be resurrected.
+    (8/23/90, Valdes)
+
+====
+V2.9
+====
+
 twodspec$twodspec.cl
 twodspec$twodspec.men
     Added SETAIRMASS and OBSERVATORY tasks. (6/2/89, Valdes)

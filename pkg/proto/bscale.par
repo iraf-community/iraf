@@ -1,0 +1,9 @@
+input,s,a,,,,Input images
+output,s,a,,,,Output images
+bzero,s,h,"0.",,,Zero point (mean|median|mode or value)
+bscale,s,h,"1.",,,Scale factor (mean|median|mode or value)
+section,s,h,"",,,Image section for calculating statistics
+step,i,h,10,1,,Default sampling  step for calculating statistics
+lower,r,h,INDEF,,,Lower limit for calculating statistics 
+upper,r,h,INDEF,,,Upper limit for calculating statistics 
+verbose,b,h,yes,,,Verbose mode ?

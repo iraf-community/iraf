@@ -1,9 +1,11 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <stdio.h>
+#ifndef SYSV
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <stdio.h>
+#endif
 
 #define	import_kernel
 #define	import_knames
@@ -24,6 +26,13 @@ XINT	*best_size;		/* requested working set size, bytes.	*/
 XINT	*new_size, *old_size;	/* actual new and old sizes, bytes.	*/
 XINT	*max_size;		/* max working set size, bytes		*/
 {
+#ifdef SYSV
+	if (*best_size == 0)
+	    *old_size = *new_size = SZ_DEFWORKSET;
+	else
+	    *new_size = *old_size = min (SZ_MAXWORKSET, *best_size);
+	*max_size = SZ_MAXWORKSET;
+#else
 	static	int initialized;
 	int	working_set_size;
 	struct	rlimit rlp;
@@ -59,4 +68,5 @@ XINT	*max_size;		/* max working set size, bytes		*/
 	    *old_size = working_set_size;
 	    *new_size = min (*best_size, rlp.rlim_cur);
 	}
+#endif
 }

@@ -23,14 +23,13 @@ char	device[SZ_FNAME], title[SZ_LINE]
 pointer	u_im, v_im, u_subras, v_subras
 int	tcojmp[LEN_JUMPBUF]
 int	u_ncols, v_ncols, u_nlines, v_nlines, epa, status, wkid
-int	nset, mode, old_onint
+int	mode, old_onint
 
 pointer	gp, gopen()
 
 bool	clgetb(), streq()
 extern	vl_tco_onint()
 pointer	immap(), imgs2r()
-data	nset /0/
 common	/tcocom/ tcojmp
 
 begin

@@ -19,30 +19,34 @@ define	NFORMATS	5
 procedure t_mtexamine()
 
 int	nfiles, file_number, ndumps, nrecords
-pointer	sp, tape_name, tape_file, file_list, rec_list
 int	file_range[2*MAX_RANGES+1], rec_range[2*MAX_RANGES+1]
+pointer	sp, tape_name, tape_file, file_list, rec_list
 
 bool	clgetb()
 char	clgetc()
-int	mtfile(), strlen(), decode_ranges(), get_next_number()
+int	fstati(), mtfile(), mtneedfileno(), decode_ranges(), get_next_number()
 int	mt_examine(), mt_get_format(), clgeti(), btoi()
 include "mtexamine.com"
 
 begin
+	# Allocate working space.
 	call smark (sp)
 	call salloc (tape_name, SZ_FNAME, TY_CHAR)
 	call salloc (tape_file, SZ_FNAME, TY_CHAR)
 	call salloc (file_list, SZ_LINE, TY_CHAR)
 	call salloc (rec_list,  SZ_LINE, TY_CHAR)
 
-	call fseti (STDOUT, F_FLUSHNL, YES)
+	# Flush STDOUT on a newline only if output is not redirected.
+	if (fstati (STDOUT, F_REDIR) == NO)
+	    call fseti (STDOUT, F_FLUSHNL, YES)
 
         # Get input file(s).
         call clgstr ("tape_file", Memc[tape_file], SZ_FNAME)
-        if (mtfile (Memc[tape_file]) == NO ||
-	    Memc[tape_file+strlen(Memc[tape_file])-1] == ']') {
+        if (mtfile (Memc[tape_file]) == NO)
 	    call strcpy ("1", Memc[file_list], SZ_LINE)
-        } else
+	else if (mtneedfileno (Memc[tape_file]) == NO)
+	    call strcpy ("1", Memc[file_list], SZ_LINE)
+        else
 	    call clgstr ("file_list", Memc[file_list], SZ_LINE)
         if (decode_ranges (Memc[file_list],file_range,MAX_RANGES,nfiles) == ERR)
 	    call error (0, "Illegal file number list.")
@@ -69,13 +73,12 @@ begin
 	file_number = 0
         while (get_next_number (file_range, file_number) != EOF) {
 
-	    call strcpy (Memc[tape_file], Memc[tape_name], SZ_FNAME)
-	    if (mtfile (Memc[tape_name]) == YES &&
-		Memc[tape_name + strlen(Memc[tape_name])-1] != ']') {
-	        call sprintf (Memc[tape_name + strlen(Memc[tape_name])],
-		    SZ_FNAME, "[%d]")
-		    call pargi (file_number)
-	    }
+	    if (mtfile (Memc[tape_file]) == YES &&
+		mtneedfileno (Memc[tape_file]) == YES)
+		call mtfname (Memc[tape_file], file_number, Memc[tape_name],
+		    SZ_FNAME)
+	    else
+	        call strcpy (Memc[tape_file], Memc[tape_name], SZ_FNAME)
 
 	    iferr {
 	        nrecords = mt_examine (Memc[tape_name], rec_range)

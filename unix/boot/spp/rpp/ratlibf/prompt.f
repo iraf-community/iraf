@@ -1,11 +1,11 @@
-      SUBROUTINE PROMPT (STR, BUF, FD)
-      INTEGER STR(100), BUF(100)
-      INTEGER FD
-      INTEGER ISATTY
-      IF (.NOT.(ISATTY(FD) .EQ. 1))GOTO 23000
-      CALL PUTLIN (STR, FD)
-      CALL RFFLUS(FD)
-23000 CONTINUE
-      CALL GETLIN (BUF, FD)
-      RETURN
-      END
+      subroutine prompt (str, buf, fd)
+      integer str(100), buf(100)
+      integer fd
+      integer isatty
+      if (.not.(isatty(fd) .eq. 1))goto 23000
+      call putlin (str, fd)
+      call rfflus(fd)
+23000 continue
+      call getlin (buf, fd)
+      return
+      end

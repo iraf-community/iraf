@@ -3,32 +3,35 @@
 include	<gset.h>
 include	<mach.h>
 include	<imhdr.h>
+include	<mwset.h>
 
 # T_PROWS -- Plot the average of a range of rows from an image.
 
 procedure t_prows()
 
-pointer	image, section
-pointer	im, sp, x_vec, y_vec
+pointer	image, wcslab, fmt
+pointer	im, mw, ct, sp, x_vec, y_vec
 int	row1, row2, ncols, nlines
 real	zmin, zmax
 int	clgeti()
-pointer	immap()
+pointer	immap(), mw_openim(), mw_sctran()
 
 begin
 	call smark (sp)
 	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (wcslab, SZ_LINE, TY_CHAR)
+	call salloc (fmt, SZ_LINE, TY_CHAR)
 
-	# Open image and graphics stream.
+	# Open image
 	call clgstr ("image", Memc[image], SZ_FNAME)
-
 	im = immap (Memc[image], READ_ONLY, 0)
+	call clgstr ("wcs", Memc[wcslab], SZ_LINE)
+	mw = mw_openim (im)
+	call mw_seti (mw, MW_USEAXMAP, NO)
+	ct = mw_sctran (mw, "logical", Memc[wcslab], 0)
+
 	ncols  = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
-
-	call clputi ("row1.p_maximum", nlines)
-	call clputi ("row2.p_maximum", nlines)
 
 	row1 = clgeti ("row1")
 	row2 = clgeti ("row2")
@@ -40,46 +43,56 @@ begin
 	# Get the requested rows from the image.
 	call malloc (x_vec, ncols, TY_REAL)
 	call malloc (y_vec, ncols, TY_REAL)
-	call plt_grows (im, min(row1,row2), max(row1,row2),
-	    Memr[x_vec], Memr[y_vec], zmin, zmax)
+	call plt_grows (im, mw, ct, min(row1,row2), max(row1,row2),
+	    Memr[x_vec], Memr[y_vec], zmin, zmax, Memc[wcslab], Memc[fmt],
+	    SZ_LINE)
 
 	# Now draw the vector to the screen.
 	call pr_draw_vector (Memc[image], Memr[x_vec], Memr[y_vec], ncols,
-	    zmin, zmax, row1, row2, true)
+	    zmin, zmax, row1, row2, Memc[wcslab], Memc[fmt], true)
 
         # Free resources.
 	call mfree (x_vec, TY_REAL)
 	call mfree (y_vec, TY_REAL)
-
 	call imunmap (im)
 	call sfree (sp)
 end
 
 
 # PLT_GROWS -- Get the average of specified rows from the image.  The average
-# data vector is returned as y_vector; the column numbers are returned in
+# data vector is returned as y_vector; the column coordinates are returned in
 # x_vector.  The data vector min and max are also returned.
  
-procedure plt_grows (im, row1, row2, x_vector, y_vector, zmin, zmax)
+procedure plt_grows (im, mw, ct, row1, row2, x_vector, y_vector, zmin, zmax,
+	wcslab, format, sz_wcslab)
  
 pointer im              # Pointer to image section header
+pointer	mw		# MWCS pointer
+pointer	ct		# CT pointer
 int     row1            # The first row to be extracted
 int     row2            # The last row to be extracted
 real    x_vector[ARB]   # Data values in x direction (returned)
 real    y_vector[ARB]   # Data values in y direction (returned)
 real    zmin, zmax      # Minimum and maximum values in y_vector (returned)
+char	wcslab[sz_wcslab]	# WCS label if present
+char	format[sz_wcslab]	# WCS format if present
+int	sz_wcslab	# String length
  
 int     i, ncols, nrows
-pointer imgl2r()
+pointer sp, axvals, imgl2r()
  
 begin
+	call smark (sp)
+	call salloc (axvals, IM_MAXDIM, TY_REAL)
+
         # Fill x and y arrays.
         ncols = IM_LEN(im,1)
         nrows = row2 - row1 + 1
  
-        do i = 1, ncols
-            x_vector[i] = real(i)
-
+	Memr[axvals+1] = (row1 + row2) / 2. 
+	call plt_wcs (im, mw, ct, 1, Memr[axvals], 1., real(ncols), x_vector,
+	    ncols, wcslab, format, sz_wcslab)
+	    
         call aclrr (y_vector, ncols)
         do i = row1, row2 {
             call aaddr (Memr[imgl2r(im,i)], y_vector, y_vector, ncols)
@@ -88,19 +101,23 @@ begin
          
         # Now find min and max values in y array.
         call alimr (y_vector, ncols, zmin, zmax)
+
+	call sfree (sp)
 end
 
 
 # PR_DRAW_VECTOR -- Draw the projected vector to the screen.
 
 procedure pr_draw_vector (image,
-	xvec, yvec, nyvals, zmin, zmax, row1, row2, prows)
+	xvec, yvec, ncols, zmin, zmax, row1, row2, wcslab, format, prows)
 
 char	image[SZ_FNAME]				#I image name
-real	xvec[nyvals], yvec[nyvals]		#I vectors to be plot
-int	nyvals					#I npts in vector
+real	xvec[ncols], yvec[ncols]		#I vectors to be plot
+int	ncols					#I number of columns
 real	zmin, zmax				#I vector min max
 int	row1, row2				#I selected rows
+char	wcslab[ARB]				#I WCS label
+char	format[ARB]				#I WCS format
 bool	prows					#I is task PROWS (y/n)
 
 pointer	sp, gp
@@ -110,7 +127,7 @@ int	mode, imark
 bool	pointmode
 
 pointer	gopen()
-real	clgetr()
+real	clgetr(), plt_iformatr()
 bool	clgetb(), streq()
 int	btoi(), clgeti()
 
@@ -132,16 +149,40 @@ begin
 	tol = 10. * EPSILONR
 
 	if (mode != APPEND) {
+	    call clgstr ("xformat", Memc[xlabel], SZ_LINE)
+	    if (!streq (Memc[xlabel], "wcsformat"))
+		call strcpy (Memc[xlabel], format, SZ_FNAME)
+
+            call clgstr ("xlabel", Memc[xlabel], SZ_LINE)
+	    if (streq (Memc[xlabel], "wcslabel"))
+		call strcpy (wcslab, Memc[xlabel], SZ_LINE)
+
+            call clgstr ("title",  Memc[title],  SZ_LINE)
+            if (streq (Memc[title], "imtitle")) {
+                call strcpy (image, Memc[title], SZ_LINE)
+                if (prows) {
+		    call sprintf (Memc[suffix], SZ_FNAME, ": rows %d to %d")
+                        call pargi (row1)
+                        call pargi (row2)
+		} else {
+		    call sprintf (Memc[suffix], SZ_FNAME, ": row %d")
+                        call pargi (row1)
+		}
+                call strcat (Memc[suffix], Memc[title], SZ_LINE)
+            }
+
+            call clgstr ("ylabel", Memc[ylabel], SZ_LINE)
+
 	    # Establish window.
-	    wx1 = clgetr ("wx1")
-	    wx2 = clgetr ("wx2")
+	    wx1 = plt_iformatr (clgetr ("wx1"), format)
+	    wx2 = plt_iformatr (clgetr ("wx2"), format)
 	    wy1 = clgetr ("wy1")
 	    wy2 = clgetr ("wy2")
 
 	    # Set window limits to defaults if not specified by user.
 	    if ((wx2 - wx1) < tol) {
-	        wx1 = 1.0
-	        wx2 = real (nyvals)
+	        wx1 = x_vec[1]
+	        wx2 = x_vec[ncols]
 	    }
 
 	    if ((wy2 - wy1) < tol) {
@@ -165,23 +206,7 @@ begin
 		    call gseti (gp, G_ASPECT, 1)
 	    }
    
-            call clgstr ("xlabel", Memc[xlabel], SZ_LINE)
-            call clgstr ("ylabel", Memc[ylabel], SZ_LINE)
-            call clgstr ("title",  Memc[title],  SZ_LINE)
-
-            if (streq (Memc[title], "imtitle")) {
-                call strcpy (image, Memc[title], SZ_LINE)
-                if (prows) {
-		    call sprintf (Memc[suffix], SZ_FNAME, ": rows %d to %d")
-                        call pargi (row1)
-                        call pargi (row2)
-		} else {
-		    call sprintf (Memc[suffix], SZ_FNAME, ": row %d")
-                        call pargi (row1)
-		}
-                call strcat (Memc[suffix], Memc[title], SZ_LINE)
-            }
-    
+	    call gsets (gp, G_XTICKFORMAT, format)
 	    call gseti (gp, G_XNMAJOR, clgeti ("majrx"))
 	    call gseti (gp, G_XNMINOR, clgeti ("minrx"))
 	    call gseti (gp, G_YNMAJOR, clgeti ("majry"))
@@ -207,9 +232,9 @@ begin
 
         # Now to actually draw the plot.
         if (pointmode)
-            call gpmark (gp, xvec, yvec, nyvals, imark, szm, szm)
+            call gpmark (gp, xvec, yvec, ncols, imark, szm, szm)
         else
-            call gpline (gp, xvec, yvec, nyvals)
+            call gpline (gp, xvec, yvec, ncols)
        
 	call gflush (gp)
         call gclose (gp)

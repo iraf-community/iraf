@@ -74,20 +74,11 @@ begin
 	CV_XMAX(cv) = xmax
 
 	# allocate space for the matrix and vectors
-	$if (datatype == r)
-	call calloc (CV_XBASIS(cv), CV_ORDER(cv), TY_REAL)
-	call calloc (CV_MATRIX(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_REAL)
-	call calloc (CV_CHOFAC(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_REAL)
-	call calloc (CV_VECTOR(cv), CV_NCOEFF(cv), TY_REAL)
-	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_REAL)
-	$else
-	call calloc (CV_XBASIS(cv), CV_ORDER(cv), TY_DOUBLE)
-	call calloc (CV_MATRIX(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_DOUBLE)
-	call calloc (CV_CHOFAC(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_DOUBLE)
-	call calloc (CV_VECTOR(cv), CV_NCOEFF(cv), TY_DOUBLE)
-	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_DOUBLE)
-	$endif
-
+	call calloc (CV_XBASIS(cv), CV_ORDER(cv), TY_PIXEL)
+	call calloc (CV_MATRIX(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_PIXEL)
+	call calloc (CV_CHOFAC(cv), CV_ORDER(cv)*CV_NCOEFF(cv), TY_PIXEL)
+	call calloc (CV_VECTOR(cv), CV_NCOEFF(cv), TY_PIXEL)
+	call calloc (CV_COEFF(cv), CV_NCOEFF(cv), TY_PIXEL)
 
 	# initialize pointer to basis functions to null
 	CV_BASIS(cv) = NULL

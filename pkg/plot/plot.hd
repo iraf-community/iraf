@@ -6,6 +6,7 @@ $crtpict	= "plot$crtpict/"
 calcomp		hlp=doc$calcomp.hlp
 contour		hlp=doc$contour.hlp,		src=t_contour.x
 crtpict		hlp=doc$crtpict.hlp,		src=crtpict$t_crtpict.x
+gdevices	hlp=doc$gdevices.hlp,		src=gdevices.x
 gkidecode	hlp=doc$gkidecode.hlp
 gkidir		hlp=doc$gkidir.hlp,		src=t_gkidir.x
 gkiextract	hlp=doc$gkiextract.hlp,		src=t_gkixt.x.x
@@ -17,6 +18,8 @@ implot		hlp=doc$implot.hlp,		src=t_implot.x
 nsppkern	hlp=doc$nsppkern.hlp,		src=gio$nsppkern/t_nsppkern.x
 pcol		hlp=doc$pcol.hlp,		src=t_pcol.x
 pcols		hlp=doc$pcols.hlp,		src=t_pcols.x
+phistogram	hlp=doc$phistogram.hlp,		src=phistogram.x
+pradprof	hlp=doc$pradprof.hlp,		src=t_pradprof.x
 prow		hlp=doc$prow.hlp,		src=t_prow.x
 prows		hlp=doc$prows.hlp,		src=t_prows.x
 pvector		hlp=doc$pvector.hlp,		src=t_pvector.x

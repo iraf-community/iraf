@@ -1,8 +1,8 @@
 # Make the Subset Preprocessor language (SPP) compiler.
 
 echo "----------------------- XC  ----------------------------"
-cc $HSI_CF	xc.c $HSI_LIBS -o xc.e
-mv -f		xc.e ../../hlib
+$CC $HSI_CF	xc.c $HSI_LIBS -o xc.E
+mv -f		xc.E ../../hlib
 
 echo "----------------------- XPP ----------------------------"
 (cd xpp; sh -x mkpkg.sh)

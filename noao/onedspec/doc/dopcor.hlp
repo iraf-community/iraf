@@ -1,0 +1,113 @@
+.help dopcor Mar92 noao.onedspec
+.ih
+NAME
+dopcor -- Apply doppler correction
+.ih
+USAGE
+dopcor input output redshift
+.ih
+PARAMETERS
+.ls input
+List of input spectra to be doppler corrected.
+.le
+.ls output
+List of doppler corrected spectra.  If no output list is specified then
+the input spectra are modified.  Also the output name may be
+the same as the input name to replace the input spectra by the
+calibrated spectra.
+.le
+.ls redshift
+Redshift or radial velocity (Km/s) to be removed?  The spectra are corrected so
+that the specified redshift is removed; i.e. spectra with a positive
+velocity are shifted to shorter wavelengths and vice-versa.  This parameter
+may be either a number or an image header keyword with the desired redshift
+or velocity value.  An image header keyword may also have an initial minus
+sign, '-', to specify the negative of the header keyword value.  The choice
+between a redshift and a velocity is made with the \fIisvelocity\fR
+parameter.
+.le
+.ls isvelocity = no
+Is the value specified by the \fIredshift\fR parameter a velocity?  If
+no then the value is interpreted as a redshift and if it is yes then
+it is interpreted as a velocity in kilometers per second.
+.le
+.ls dispersion = yes
+Apply a correction to the dispersion function?
+.le
+.ls flux = no
+Apply a flux correction?
+.le
+.ls factor = 3
+Flux correction factor as a power of 1+z when applying a flux correction.
+.le
+.ls apertures = ""
+List of apertures to be corrected.  If none are specified then all apertures
+are corrected.  An aperture list consists of comma separated aperture
+number or aperture number ranges.  A range is hypen separated and may
+include an interval step following the character 'x'.  See \fBranges\fR
+for further information.
+.le
+.ls verbose = no
+Print corrections performed?  The information includes the output image
+name, the apertures, the redshift, and the flux correction factor.
+.le
+.ih
+DESCRIPTION
+The input spectra (as specified by the input image list and apertures) are
+corrected by removing a specified doppler velocity and written to the
+specified output images.  The correction is such that if the actual
+velocity of the observed object is specified then the corrected spectra
+will be the rest spectra.  The opposite sign may be used to add a doppler
+velocity to a spectrum.
+
+The redshift or velocity in Km/s is specified either as a number of as an
+image header keyword containing the velocity.  If a number is given it
+applies to all the input spectra while an image header keyword may differ
+for each image.  The latter method of specifying a velocity is useful if
+velocity corrections are recorded in the image header.  See \fBrvcorrect\fR
+for example.  The choice between a redshift and a velocity is made using
+the \fIisvelocity\fR parameter.
+
+There are two corrections which may be made and the user selects one
+or both of these.  A correction to the dispersion function is selected
+with the \fIdispersion\fR parameter.  This correction is a term to be
+applied to the dispersion coordinates defined for the image.  \fIThe spectrum
+is not resampled, only the dispersion coordinate function is affected\fR.
+A correction to the flux, pixel values, is selected with the \fIflux\fR
+parameter.  This correction is only significant for cosmological redshifts.
+As such the correction is dependent on a cosmological model as well as
+whether a total flux or surface brightness is measured.  To provide the
+range of possible corrections the flux correction factor is defined by
+the \fIfactor\fR parameter as the power of 1+z (where z is the
+redshift) to be multiplied into the observed pixel values.
+.ih
+EXAMPLES
+1.  To dispersion and flux correct a quasar spectrum with redshift of
+3.2 to a rest frame:
+
+.nf
+	cl> dopcor qso001.ms qso001rest.ms 3.2 flux+
+.fi
+
+2.  To correct a set of spectra (in place) to heliocentric rest the task
+\fBrvcorrect\fR is used to set the VHELIO keyword using an observed
+velocity of 0.  Then:
+
+.nf
+	cl> dopcor *.imh "" vhelio isvel+
+.fi
+
+3.  To artificially add a redshift of 3.2 to a spectrum:
+
+.nf
+	cl> dopcor artspec "" -3.2 flux+
+.fi
+.ih
+REVISIONS
+.ls DOPCOR V2.10
+This task is new.
+.le
+.ih
+SEE ALSO
+ranges, rvcorrect
+.endhelp

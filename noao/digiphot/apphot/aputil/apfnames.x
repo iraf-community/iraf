@@ -1,0 +1,210 @@
+
+# APINNAME -- Construct an apphot input file name.
+# If input is null or a directory, a name is constructed from the root
+# of the image name and the extension. The disk is searched to avoid
+# name collisions.
+
+procedure apinname (image, input, ext, name, maxch)
+
+char	image[ARB]		# image name
+char	input[ARB]		# input directory or name
+char	ext[ARB]		# extension
+char	name[ARB]		# input name
+int	maxch			# maximum size of name
+
+int	ndir
+pointer	sp, root
+int	fnldir(), strlen(), apimroot()
+
+begin
+	call smark (sp)
+	call salloc (root, SZ_FNAME, TY_CHAR)
+	call strcpy (image, Memc[root], maxch)
+
+	ndir = fnldir (input, name, maxch)
+	if (strlen (input) == ndir) {
+	    ndir = ndir + apimroot (Memc[root], name[ndir+1], maxch)
+	    call sprintf (name[ndir+1], maxch, ".%s.*")
+		call pargstr (ext)
+	    call apiversion (name, name, maxch)
+	} else
+	    call strcpy (input, name, maxch)
+
+	call sfree (sp)
+end
+
+
+# APOUTNAME -- Construct an apphot output file name.
+# If output is null or a directory, a name is constructed from the root
+# of the image name and the extension. The disk is searched to avoid
+# name collisions.
+
+procedure apoutname (image, output, ext, name, maxch)
+
+char	image[ARB]		# image name
+char	output[ARB]		# output directory or name
+char	ext[ARB]		# extension
+char	name[ARB]		# output name
+int	maxch			# maximum size of name
+
+int	ndir
+pointer	sp, root
+int	fnldir(), strlen(), apimroot()
+
+begin
+	call smark (sp)
+	call salloc (root, SZ_FNAME, TY_CHAR)
+	call strcpy (image, Memc[root], maxch)
+
+	ndir = fnldir (output, name, maxch)
+	if (strlen (output) == ndir) {
+	    ndir = ndir + apimroot (Memc[root], name[ndir+1], maxch)
+	    call sprintf (name[ndir+1], maxch, ".%s.*")
+		call pargstr (ext)
+	    call apoversion (name, name, maxch)
+	} else
+	    call strcpy (output, name, maxch)
+
+	call sfree (sp)
+end
+
+
+# APTMPIMAGE -- Generate a temporary image name either by calling a system
+# routine or by appending the image name to a user specified prefix.
+
+int procedure aptmpimage (image, prefix, tmp, name, maxch)
+
+char	image[ARB]		# image name
+char	prefix[ARB]		# user supplied prefix
+char	tmp[ARB]		# user supplied temporary root
+char	name[ARB]		# output name
+int	maxch			# max number of chars
+
+int	npref, ndir
+int	fnldir(), apimroot(), strlen()
+
+begin
+	npref = strlen (prefix)
+	ndir = fnldir (prefix, name, maxch)
+	if (npref == ndir) {
+	    call mktemp (tmp, name[ndir+1], maxch)
+	    return (NO)
+	} else {
+	    call strcpy (prefix, name, npref)
+	    if (apimroot (image, name[npref+1], maxch) <= 0)
+		;
+	    return (YES)
+	}
+end
+
+
+# APIMROOT -- Fetch the root image name minus the directory specification
+# and the section notation. The length of the root name is returned.
+
+int procedure apimroot (image, root, maxch)
+
+char	image[ARB]		# image specification
+char	root[ARB]		# rootname
+int	maxch			# maximum number of characters
+
+int	nchars
+pointer	sp, str
+int	fnldir(), strlen()
+
+begin
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+
+	call imgimage (image, root, maxch)
+	nchars = fnldir (root, Memc[str], maxch)
+	call strcpy (root[nchars+1], root, maxch)
+
+	call sfree (sp)
+	return (strlen (root))
+end
+
+
+# APOVERSION -- Compute the next available version number of a given file
+# name template and output the new file name.
+
+procedure apoversion (template, filename, maxch)
+
+char	template[ARB]			# name template
+char	filename[ARB]			# output name
+int	maxch				# maximum number of characters
+
+char	period
+int	newversion, version, len
+pointer	sp, list, name
+int	fntgfnb() strldx(), ctoi()
+pointer	fntopnb()
+
+begin
+	# Allocate temporary space
+	call smark (sp)
+	call salloc (name, maxch, TY_CHAR)
+	period = '.'
+	list = fntopnb (template, NO)
+
+	# Loop over the names in the list searchng for the highest version.
+	newversion = 0
+	while (fntgfnb (list, Memc[name], maxch) != EOF) {
+	    len = strldx (period, Memc[name])
+	    len = len + 1
+	    if (ctoi (Memc[name], len, version) <= 0)
+		next
+	    newversion = max (newversion, version)
+	}
+
+	# Make new output file name.
+	len = strldx (period, template)
+	call strcpy (template, filename, len)
+	call sprintf (filename[len+1], maxch, "%d")
+	    call pargi (newversion + 1)
+
+	call fntclsb (list)
+	call sfree (sp)
+end
+
+
+# APIVERSION -- Compute the highest available version number of a given file
+# name template and output the file name.
+
+procedure apiversion (template, filename, maxch)
+
+char	template[ARB]			# name template
+char	filename[ARB]			# output name
+int	maxch				# maximum number of characters
+
+char	period
+int	newversion, version, len
+pointer	sp, list, name
+int	fntgfnb() strldx(), ctoi()
+pointer	fntopnb()
+
+begin
+	# Allocate temporary space
+	call smark (sp)
+	call salloc (name, maxch, TY_CHAR)
+	period = '.'
+	list = fntopnb (template, NO)
+
+	# Loop over the names in the list searchng for the highest version.
+	newversion = 0
+	while (fntgfnb (list, Memc[name], maxch) != EOF) {
+	    len = strldx (period, Memc[name])
+	    len = len + 1
+	    if (ctoi (Memc[name], len, version) <= 0)
+		next
+	    newversion = max (newversion, version)
+	}
+
+	# Make new output file name.
+	len = strldx (period, template)
+	call strcpy (template, filename, len)
+	call sprintf (filename[len+1], maxch, "%d")
+	    call pargi (newversion)
+
+	call fntclsb (list)
+	call sfree (sp)
+end

@@ -24,7 +24,7 @@ int	fd			# metacode output file
 pointer	gp, tty
 int	outfd, stream_type, junk
 bool	close_at_end, kf_ok, vdm_device, std_stream
-pointer	sp, graphcap_file, devname, envname, kfname
+pointer	sp, devname, envname, kfname
 
 bool	streq()
 extern	gflush()
@@ -38,11 +38,9 @@ string	stdimage "stdimage"
 string	stdplot  "stdplot"
 string	vdm 	 "vdm"
 string	stdvdm 	 "stdvdm"
-string	graphcap "graphcap"
 
 begin
 	call smark (sp)
-	call salloc (graphcap_file, SZ_FNAME, TY_CHAR)
 	call salloc (devname, SZ_FNAME, TY_CHAR)
 	call salloc (envname, SZ_FNAME, TY_CHAR)
 	call salloc (kfname,  SZ_FNAME, TY_CHAR)

@@ -665,3 +665,293 @@ STATUS: Both bugs have been fixed in 2.10. Bug 1 was fixed some time ago
 	The workaround is to multiply the quantity TINORM by the step size
 	in pixels, and compare it to the aperture photometry results.
 	The two numbers should be equal to within the expected errors.
+
+NUMBER:	156
+MODULE:	images.imstatistics
+SYSTEM:	V2.9
+DATE:	Tue Sep 24 09:17:16 MST 1991
+FROM:	davis
+
+BUG:	The mode statistic was not being computed correctly in imstatistics,
+	because the parabolic interpolation correction for computing the
+	histogram peak was being applied in the wrong direction.
+
+STATUS:	The bug has been fixed in IRAF 2.10 and the help page which uses
+	dev$pix as an example has been modified appropriately. There is no
+	workaround.
+
+NUMBER:	157
+MODULE:	XC compiler
+SYSTEM:	V2.9 Sun/IRAF, all versions
+DATE:	Wed Oct  9 14:22:11 MST 1991
+FROM:	tody
+
+BUG:	XC will not recognize the V1.4 Sun Fortran compiler.  The bug is due
+	to XC looking for V1.3 and finding V1.4 instead.
+
+STATUS:	The workaround is to do a "ln -s f77-1.4 f77-1.3" in /usr/lang, or
+	wherever the compiler is installed.
+
+NUMBER:	158
+MODULE:	dataio.rfits
+SYSTEM:	V2.9
+DATE:	Wed Oct  9 15:50:36 MST 1991
+FROM:	davis
+
+BUG:	IRAF 2.9 rfits was not reading fits files with short last logical
+	records correctly, i.e. records not correctly padded out to 2880
+	bytes. For each output image line contained or partially contained
+	in the final short record, an error message was generated,
+	and incorrect data was written to the output image.
+
+STATUS:	The bug has been fixed in 2.10 and was not a problem in IRAF 2.8
+	and earlier. The workaround is to use Unix dd command or the IRAF
+	reblock task to reformat the file.
+
+NUMBER:	159
+MODULE:	images.imstatistics
+SYSTEM:	V2.9
+DATE:	Fri Oct 11 13:54:19 MST 1991
+FROM:	davis
+
+BUG:	The computed value of the kurtosis was 1.0 too small, i.e. a
+	Gaussian distribution  would have a computed kurtosis of -1.0
+	instead of 0.0.
+
+STATUS:	The bug has been fixed in IRAF 2.10. The workaround is to add
+	1.0 to the computed value of the kurtosis.
+
+NUMBER:	160
+MODULE:	onedspec.standard
+SYSTEM:	V2.9
+DATE:	Thu Oct 17 09:22:06 MST 1991
+FROM:	valdes
+
+BUG:	If the calibration bandpasses are less than a pixel wide the flux
+	summation is incorrectly done when both endpoints are within the
+	same pixel; the code assumed that the two endpoint pixels were
+	not the same.  Generally the calibration data, in onedstds$, has
+	much larger bandpasses than typical spectra and so this bug has
+	not be seen except in one reported case where a private calibration
+	file with very small bandpasses was used.
+
+STATUS:	Fixed in V2.10.  The workarounds are to revise the calibration
+	file to larger bandpasses (if using a private version), resample
+	the spectra to smaller dispersion, or, the best choice, specify
+	the bandpass widths and separations in the task to override the
+	calibration file bandpasses and interpolate the calibration file
+	data.
+
+NUMBER:	161
+MODULE:	apextract.apsum
+SYSTEM:	V2.9
+DATE:	Wed Oct 30 11:02:38 MST 1991
+FROM:	valdes
+
+BUG:	If the background regions go off the image, due to tilts in the
+	spectrum such as with echelle data, while the object apertures
+	remains on the image a segmentation violation occurs.  This will
+	only happen with one-sided background regions as otherwise this
+	condition could not occur.  The error is caused by a failure to
+	check for an error condition from background fitting.
+
+STATUS:	This error is fixed in V2.10.  The workaround is to insure
+	at least part of the background regions are on the image while the
+	object aperture is on the image.  This would be true if background
+	regions are defined on both sides of the aperture.  Note that it is
+	ok for the object aperture and background regions to both be off
+	the the image.  The source fix is simple and could be supplied if
+	absolutely necessary.
+
+NUMBER:	162
+MODULE:	reidentify
+SYSTEM:	V2.9
+DATE:	Mon Nov 18 10:27:25 MST 1991
+FROM:	valdes
+
+BUG:	If reference features are identified in user coordinates other than
+	pixels, usually Angstroms for arc lines, and the user forgets to
+	type 'f' to fit a dispersion function, then REIDENTIFY will
+	compute a very large coordinate shift and then fail to trace
+	any features.
+
+STATUS:	The workaround is to recognize this behavior and then go back and
+	do a dispersion function fit for the reference.  The logical bug
+	in the task is fixed in V2.10.
+
+NUMBER:	163
+MODULE:	artdata.gallist
+SYSTEM:	V2.9
+DATE:	Tue Nov 26 17:07:03 MST 1991
+FROM:	valdes
+
+BUG:	The randomization of the galaxy size distribution when using the
+	Schecter luminosity function is incorrect.  Instead of a 20% range
+	about the scaled eradius/sradius for a given magnitude a range of
+	100% is computed coupled with a reduction of the size by a factor
+	of 2.5.
+
+STATUS:	There is no workaround for the increased dispersion but the factor
+	of 2.5 in the size can be compensated by adjusting the eradius
+	parameter.  This has been fixed in V2.10
+
+NUMBER:	164
+MODULE:	artdata.gallist
+SYSTEM:	V2.9
+DATE:	Tue Nov 26 17:11:37 MST 1991
+FROM:	valdes
+
+BUG:	The axial ratios for elliptical galaxies when a mixture of spiral
+	elliptical galaxies is computed are incorrect.  In particular
+	there will be axial ratio values greater than 1 in the output
+	file.
+
+STATUS:	The work around is to compute the elliptical and spiral galaxy
+	data separately.  This has been fixed in V2.10.
+
+NUMBER:	165
+MODULE:	plot.pvector, proto.imexamine
+SYSTEM:	V2.9
+DATE:	Wed Dec 11 11:32:36 MST 1991
+FROM:	davis
+
+BUG:	Profiles computed and plotted using the pvector task or the 'v'
+	key in imexamine occasionally show glitches, where 1-3 pixels
+	have bad values. This bug was traced to any error in
+	the column limits computed by the code which reads the
+	image pixels. As a result the image interpolator was requesting
+	values off the ends of the pixel array producing bad output values.
+
+STATUS:	The bug has been fixed in 2.10. There is no workaround.
+
+NUMBER:	166
+MODULE:	apphot.polyphot
+SYSTEM:	V2.9
+DATE:	Tue Feb 25 16:37:41 MST 1992
+FROM:	davis
+
+BUG:	The intersection points of an image line and a polygon could be
+	incorrectly translated into a list of line segments if the polygon
+	was concave and contained one or more sides exactly collinear with
+	the image line. The symptom of this problem is a larger than expected
+	difference (larger than can be accounted for by fractional pixel
+	effects) in the computed area of the polygon as it is shifted
+	to different positions in the image (shifting by floating point
+	numbers tends to remove the condition of exact collinearity);
+	or larger than expected differences in the area and flux
+	of the same object measured with the same polygonal aperture
+	at slightly different positions in different images (again
+	shifting the polygon tends to remove the condition of exact
+	collinearity).
+
+STATUS:	The bug has been fixed in 2.10. There is no work around except to
+	alter the shape of the polygon slightly.
+
+NUMBER:	167
+MODULE:	images.imstatistics
+SYSTEM:	V2.9
+DATE:	Tue Mar 10 14:58:59 MST 1992
+FROM:	davis
+
+BUG:    Precision was being lost unnecessarily in the computation of the
+	standard deviation, skew, and kurtosis because two of the
+	intermediate variables in the computation were real instead of
+	double precision.
+
+STATUS:	The bug is fixed in 2.10. There is no workaround.
+
+NUMBER:	168
+MODULE:	noao.twodspec.longslit.fluxcalib
+SYSTEM:	V2.9
+DATE:	Thu Mar 19 11:27:18 MST 1992
+FROM:	valdes
+
+BUG:	Flux calibrating a short pixel type image will produce a short
+	pixel type output image which is generall all zeros since the
+	typical flux values are of order 10e-14.
+
+STATUS:	The workaround is to convert the images to real (with chpixtype for
+	instance) before flux calibrating.  For V2.10 the output image
+	will be of type real pixels.
+
+NUMBER:	169
+MODULE:	imred.irs.batchred, imred.iids.batchred
+SYSTEM:	V2.10
+DATE:	Mon Jul  6 10:01:35 MST 1992
+FROM:	valdes
+
+BUG:	The PROCESS script generated by BATCHRED included parameters no
+	longer part of STANDARD and CALIBRATE.  Running this task produces
+	the error
+
+	ir> process
+	ERROR on line 9: parameter `recformat' not found
+	    process ()
+	    process ()
+
+STATUS:	To be fixed in V2.10.0.  The workaround is to edit the process.cl
+	script generated by BATCHRED and delete two cases of "recformat=yes,"
+	and one case of "apertures='',".
+
+NUMBER:	170
+MODULE:	apphot
+SYSTEM:	V2.9
+DATE:	Wed Jul  8 17:43:45 MST 1992
+FROM:	davis
+
+BUG:	The apphot tasks were failing to close up the coordinate files
+	in the case that 1) the number of input images was greater
+	than one and 2) the input coords parameter was set to "default".
+	If the input image list was sufficiently long the task could run
+	out of file descriptors producing a system error.
+
+STATUS:	The bug is fixed in 2.10.0. The workaround is to break the image
+	lists into smaller groups (<= ~ 60).
+
+NUMBER:	171
+MODULE:	apextract.apfit, apextract.apflatten
+SYSTEM:	V2.10.0
+DATE:	Thu Jul  9 16:17:01 MST 1992
+FROM:	valdes
+
+BUG:	In these tasks which output the difference, ratio, or fit
+	based on a profile model the profile model is low by a factor of
+	the gain.  Thus if the gain is not one the results will not be
+	correct.  For example APFLATTEN will produce flat field values
+	within the aperture which are multiplied by the gain except outside
+	the apertures.  The workarounds are either to use a gain of 1 or
+	correct the output such as with IMARITH.  The latter option may be
+	difficult to apply for APFLATTEN since special steps need to be
+	taken for the interaperture values.  Note that using an gain of 1
+	even though the true gain is higher will often be unimportant,
+	especially if cosmic ray cleaning is not done.
+
+STATUS:	Fixed in V2.10.1.
+
+NUMBER:	172
+MODULE:	onedspec
+SYSTEM:	V2.10.0
+DATE:	Mon Jul 20 14:24:07 MST 1992
+FROM:	valdes
+
+BUG:	The ability to extract and operate on long slit images using the
+	dispaxis/nsum parameters does not work.  There is no workaround;
+	which is particularly unfortunate since TOONEDSPEC is no longer
+	available.  One must resort to APEXTRACT to extract 1D spectra
+	from long slit images.
+
+STATUS:	Fixed in V2.10.1
+
+NUMBER:	173
+MODULE:	images.gauss
+SYSTEM:	V2.10
+DATE:	Thu Jul 23 08:17:27 MST 1992
+FROM:	davis
+
+BUG:	An incorrect convolution kernel is computed in the case theta=90.0,
+	0.0 < ratio < 1.0, and blinear=yes. The long axis of the kernel is
+	aligned along the x axis instead of the y axis as intended.
+
+	The workaround is to set bilinear=no.
+
+STATUS: Fixed in 2.10.1	

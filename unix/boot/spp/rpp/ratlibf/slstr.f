@@ -1,32 +1,32 @@
-      INTEGER FUNCTION SLSTR (FROM, TO, FIRST, CHARS)
-      INTEGER FROM (100), TO (100)
-      INTEGER FIRST, CHARS
-      INTEGER LEN, I, J, K
-      INTEGER LENGTH
-      LEN = LENGTH (FROM)
-      I = FIRST
-      IF (.NOT.(I .LT. 1))GOTO 23000
-      I = I + LEN + 1
-23000 CONTINUE
-      IF (.NOT.(CHARS .LT. 0))GOTO 23002
-      I = I + CHARS + 1
-      CHARS = - CHARS
-23002 CONTINUE
-      J = I + CHARS - 1
-      IF (.NOT.(I .LT. 1))GOTO 23004
-      I = 1
-23004 CONTINUE
-      IF (.NOT.(J .GT. LEN))GOTO 23006
-      J = LEN
-23006 CONTINUE
-      K = 0
-23008 IF (.NOT.(I .LE. J))GOTO 23010
-      TO (K + 1) = FROM (I)
-      I = I + 1
-23009 K = K + 1
-      GOTO 23008
-23010 CONTINUE
-      TO (K + 1) = -2
-      SLSTR=(K)
-      RETURN
-      END
+      integer function slstr (from, to, first, chars)
+      integer from (100), to (100)
+      integer first, chars
+      integer len, i, j, k
+      integer length
+      len = length (from)
+      i = first
+      if (.not.(i .lt. 1))goto 23000
+      i = i + len + 1
+23000 continue
+      if (.not.(chars .lt. 0))goto 23002
+      i = i + chars + 1
+      chars = - chars
+23002 continue
+      j = i + chars - 1
+      if (.not.(i .lt. 1))goto 23004
+      i = 1
+23004 continue
+      if (.not.(j .gt. len))goto 23006
+      j = len
+23006 continue
+      k = 0
+23008 if (.not.(i .le. j))goto 23010
+      to (k + 1) = from (i)
+      i = i + 1
+23009 k = k + 1
+      goto 23008
+23010 continue
+      to (k + 1) = -2
+      slstr=(k)
+      return
+      end

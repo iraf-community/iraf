@@ -28,7 +28,7 @@ bool	fluxcor
 pointer	im1, im2, ff, fluxdata
 
 int	imtopen(), imtgetim()
-bool	clgetb(), imgetb(), strne()
+bool	clgetb(), imgetb(), streq()
 pointer	immap()
 errchk	get_fluxdata(), do_fluxcalib()
 
@@ -71,10 +71,12 @@ begin
 		next
 	    }
 
-	    # Open new output image if needed.
-	    im2 = im1
-	    if (strne (image1, image2))
+	    # Open output image
+	    if (streq (image1, image2))
+	        im2 = immap ("fluxcalibtemp", NEW_COPY, im1)
+	    else
 	        im2 = immap (image2, NEW_COPY, im1)
+	    IM_PIXTYPE(im2) = TY_REAL
 
 	    # Apply flux calibration.  If error delete output image.
 	    iferr {
@@ -89,15 +91,16 @@ begin
 		    call pargstr (fluxfile)
 		    call pargb (fnu)
 		call xt_phistory (im2, history)
-	        if (im2 != im1)
-		    call imunmap (im2)
+		call imunmap (im2)
 	        call imunmap (im1)
-	    } then {
-	        if (im2 != im1) {
-		    call imunmap (im2)
-		    call imdelete (image2)
+		if (streq (image1, image2)) {
+		    call imdelete (image1)
+		    call imrename ("fluxcalibtemp", image1)
 		}
+	    } then {
+		call imunmap (im2)
 	        call imunmap (im1)
+		call imdelete (image2)
 		call printf ("!!No flux calibration for %s!!\n")
 		    call pargstr (image1)
 		call flush (STDOUT)
@@ -130,7 +133,7 @@ char	exposure[SZ_LINE]
 real	w, dw, w0, wpc, crpix, exptime, ff_w0, ff_wpc
 pointer	ff_data, wavelens, asi
 
-int	imgeti()
+int	imgeti(), clgeti()
 real	imgetr()
 pointer	imgl1r()
 errchk	imgeti(), imgetr()
@@ -159,8 +162,10 @@ begin
 	}
 
 	# Determine dispersion and exposure time for the image.
-
-	dispaxis = imgeti (im, "dispaxis")
+	iferr (dispaxis = imgeti (im, "dispaxis")) {
+	    dispaxis = clgeti ("dispaxis")
+	    call imaddi (im, "dispaxis", dispaxis)
+	}
 	dcflag = imgeti (im, "dc-flag")
 	if (dispaxis == 1) {
 	    w0 = imgetr (im, "crval1")
@@ -265,12 +270,15 @@ int	dispaxis, nw, npts
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	in, out
 
-int	imgeti(), imgnlr(), impnlr()
+int	imgeti(), clgeti(), imgnlr(), impnlr()
 
 begin
 	# Determine the dispersion axis of the image.
 
-	dispaxis = imgeti (im1, "dispaxis")
+	iferr (dispaxis = imgeti (im1, "dispaxis")) {
+	    dispaxis = clgeti ("dispaxis")
+	    call imaddi (im1, "dispaxis", dispaxis)
+	}
 	nw = IM_LEN (im1, dispaxis)
 
 	# Calibrate the image.

@@ -1,0 +1,273 @@
+.help allstar Aug91 noao.digiphot.daophot
+.ih
+NAME
+allstar -- group and fit psf to multiple stars simultaneously
+.ih
+USAGE
+allstar image photfile psfimage allstarfile subimage
+.ih
+PARAMETERS
+.ls image
+The list of images containing the stars to be fit
+.le
+.ls photfile
+The input file list or directory containing the
+initial estimates of the positions
+and magnitudes of the stars to be fit.
+If \fIphotfile\fR is "default", "dir$default", or a directory specification,
+then ALLSTAR will look for a file with the name image.mag.?
+where ? is the highest existing version number.  Otherwise \fIphotfile\fR
+must specify one photometry file for every image in \fIphotfile\fR.
+\fIPhotfile\fR is usually
+the output of the DAOPHOT PHOT task but may also be the output of the
+PSF, PEAK and NSTAR tasks, or the ALLSTAR task itself.
+.le
+.ls psfimage
+The list of images or directory containing the PSF computed by
+the DAOPHOT PSF task.
+If psfimage is "default", "dir$default", or a directory specification,
+then ALLSTAR will look for an image with the name image.psf.? where
+? is the highest existing version number. Otherwise \fIpsfimage\fR must
+specify one PSF image for every image in \fIimage\fR.
+.le
+.ls allstarfile
+The list of output photometry files.
+If \fIallstarfile\fR is "default", "dir$default", or a directory specification
+then ALLSTAR will write an output file with the name image.al.?
+where ? is the next available version number.
+Otherwise \fIallstarfile\fR must specify one output photometry file
+for every image in \fIimage\fR.
+\fIAllstarfile\fR is a text database if the DAOPHOT package parameter \fItext\fR
+is "yes", an STSDAS table database if it is "no".
+.le
+.ls subimage
+The list of output images or directory containing the data with the
+fitted stars subtracted.
+If subimage is "default", "dir$default", or a directory specification,
+then ALLSTAR will create an image with the name image.sub.? where
+? is the next available version number. Otherwise \fIsubimage\fR must
+specify one output image for every image in \fIimage\fR.
+.le
+.ls cache = yes
+Cache all the data in memory ?
+If \fIcache\fR is "yes", then ALLSTAR
+attempts to find space to store the input image plus the two working
+images it requires, plus space for the starlist, in memory. This can
+significantly reduce the total execution time. Users should
+however beware of creating a situation where excessive paging occurs.
+If \fIcache\fR = "no", ALLSTAR operates on subrasters
+containing the group currently being reduced, and writes the intermediate
+results to temporary scratch images. This option will
+work on any-sized image (unless a single group becomes the size of the
+entire image!) but can become slow of there are a large number of
+disk accesses. Users may wish to experiment to see which mode
+of operation suits their system best.
+.le
+.ls datapars = ""
+The name of the file containing the DAOPHOT data dependent parameters.
+If \fIdatapars\fR is null ("") then the default parameter set in the user's
+uparm directory is used.
+.le
+.ls daopars = ""
+The name of the file containing the DAPHOT fitting parameters.
+If \fIdaopars\fR is null ("") then the default parameter set in the user's
+uparm directory is used.
+.le
+.ls verbose = no
+Print messages about the progress of the task.
+.le
+.ls verify = yes
+Verify critical ALLSTAR task parameters.
+.le
+.ls update = no
+Update the critical ALLSTAR task parameters if \fIverify\fR = "yes".
+.le
+.ih
+DESCRIPTION
+ALLSTAR computes x and y centers and magnitudes of the stars in \fIphotfile\fR
+by fitting the PSF \fIpsfimage\fR to groups of stars in the IRAF image   
+\fIimage\fR.
+Initial estimates of the centers and magnitudes,
+and sky values are supplied by the photometry list in \fIphotfile\fR.
+ALLSTAR groups the stars dynamicaly, performing a regrouping
+operation after every iteration.
+The computed centers and magnitudes are written to \fIallstarfile\fR
+along with the sky values, the number of iterations it took to fit the
+star, the goodness of fit statistic chi, and the image sharpness statistic
+sharp.
+\fIAllstarfile\fR is text database if the DAOPHOT package parameter \fItext\fR
+is "yes", an STSDAS table database if it is "no".
+An image with all the fitted stars subtracted out is written to \fIsubimage\fR.
+In effect ALLSTAR performs the combined operations of GROUP,
+GRPSELECT, NSTAR,  and SUBSTAR.
+
+Only pixels within the good data range delimited by the DATAPARS task
+parameters \fIdatamin\fR and \fIdatamax\fR are included in the fit.
+Most users set \fIdatamin\fR and \fIdatamax\fR so as to 
+exclude pixels outside the linearity
+regime of the detector. By default all the data is fit.
+Users are advised to determine accurate values for these parameters
+for their detector and set the values in DATAPARS before beginning any DAOPHOT
+reductions.
+
+Only pixels within the fitting radius 
+parameter \fIfitrad\fR / \fIscale\fR are included in the fit for each star.
+\fIFitrad\fR is located in the DAOPARS task and \fIscale\fR is located in
+the DATAPARS task.  Since the non-linear least-squares
+fits compute three unknowns, the x and y position of the star's centroid
+and its brightness, the value of \fIfitrad\fR  must be
+sufficiently
+large to include at least three pixels in the fit for each star.
+To accelerate the convergence of the non-linear least-squares fitting
+algorithm pixels within \fIfitrad\fR are assigned weights which
+are  inversely proportional to the radial distance of the pixel from the x and
+y centroid of the star, falling from a maximum at the centroid
+to zero at the fitting radius. \fIFitrad\fR must be sufficiently large
+to include at least three pixels with non-zero weights in the fit for each
+star.  Values of \fIfitrad\fR close to the full-width at half-maxima of the
+PSF are recommended. In actual fact ALLSTAR imposes a minimum number of pixels
+limit of four.
+
+ALLSTAR performs a weighted fit to the PSF. The weight of each pixel
+is computed by combining the radial weighting function described above
+with weights derived from the random errors ALLSTAR expects based on the
+values of the DATAPARS parameters \fIreadnoise\fR and \fIepadu\fR
+specified by the user. Both to obtain optimal fits, and
+because ALLSTAR employs a conservative formula for reducing the weights
+of deviant pixels (parametrized by \fIclipexp\fR and \fIcliprange\fR in
+the DAOPARS task) which do not approach the model as the fit proceeds,
+which depends on \fIreadnoise\fR and \fIepadu\fR, users
+are strongly advised to determine those parameters accurately 
+and to enter their values in DATAPARS before beginning any DAOPHOT
+reductions.
+
+By default for each group of stars to be fit during each iteration,
+ALLSTAR extracts a subraster
+from \fIimage\fR which extends approximately
+\fIpsfrad\fR / \fIscale\fR + 1 pixels wide past the limiting values of x
+and y coordinates
+of the stars in the group. \fIPsfrad\fR
+is the PSF radius specified in the DAOPARS task. \fIScale\fR is the image
+scale specified by the DATAPARS task. \fIPsfrad\fR may
+be less than or equal to but can never exceed the value of the image header
+parameter "PSFRAD" in \fIpsfimage\fR.
+\fIPsfrad\fR should be several pixels larger
+than \fIfitrad\fR to permit the x and y centroids to wander during the
+fitting process.
+
+If the \fIcache\fR parameter is set to "yes" then
+ALLSTAR will attempt to stored all the vectors and arrays in memory.
+This can significantly reduce the system overhead but may cause excessive
+paging on machines with a small amount of memory. For large images
+it may be necessary to set \fIcache\fR to "no", and use the disk for
+scratch storage. Users should experiment to see what suits them best.
+
+As well as the computed x and y centers and magnitudes, ALLSTAR outputs
+the number of times the PSF fit had to be iterated. The
+minimum number of iterations is four. The maximum
+number of iteration permitted is specified by the 
+\fImaxiter\fR parameter in the DAOPARS task.
+Obviously the results for stars which
+have reached the maximum iteration count should be viewed with 
+suspicion. However since the convergence criteria are quite strict,
+(the computed magnitude must change  by less than .001 magnitudes or
+0.05 sigma whichever is larger and the x and y centroids must change
+by less than 0.01 pixels from one iteration to the next), even
+these stars may be reasonably well measured. It must be emphasized
+that every star in the group must individually satisfy the convergence
+criteria in order for the group to be considered adequately reduced.
+
+ALLSTAR computes a goodnes of fit statistic chi which is essentially the
+ratio of the observed pixel-to-pixel scatter in the fitting residuals
+to the expected scatter. Since the expected scatter is dependent
+on the DATAPARS task parameters \fIreadnoise\fR and \fIepadu\fR,
+it is important for these values to be set correctly.
+A plot of chi versus magnitude should scatter around
+unity with little or no trend in chi with magnitude, except at the
+bright end where saturation effects may be present.
+
+Finally ALLSTAR computes the statistic sharp which estimates the intrinsic
+angular size of the measured object outside the atmosphere.
+Sharp is roughly defined as the difference between the square of the
+width of the object and the square of the width of PSF.
+Sharp has values close to zero for single stars, large positive values
+for blended doubles and partially resolved galaxies and large
+negative values for cosmic rays and blemishes.
+
+ALLSTAR as a highly sophisticated star rejection algorithm. First of
+all any group of stars which is more than a certain number in size
+is simple not reduced. ALLSTAR however in constrast to NSTAR
+makes some attempt to subdivide large groups. The maximum group
+size is specified by the
+\fImaxgroup\fR parameter in the DAOPARS task. Larger groups may run
+into numerical precision problems during the fits. Users should exercise
+care in experimenting with this option. If two stars in a group
+have centroids separated by a crtical distance currently set arbitrarily
+to 0.37 * the FWHM of the stellar core and their photocentric position
+and combined magnitude is assigned to the brighter of the two and the
+fainter is eliminated. Ay star which converges to 12.5 magnitudes
+greater than the magnitude of the PSF is considered to be non-existent
+and eliminated from the group.
+
+After iterations 4 to 7, if the faintest star in the group has a 
+brightness less than one sigma above zero it is eliminated.
+After iterations 8 to 11 if the faintest star in the group has a brightness
+less than 1.5 sigma above zero it is eliminated. After iterations 12 to
+50 or whenever the solutions has converged whichever comes first,
+if the faintest star in the group has a brightness less than 2.0 sigma
+above zero it is eliminated.
+Before iterations 4 to 7, 8 to 11 and 12 to 50 if two stars are separated
+by more than 0.37 * FWHM and less than 1.0 * FWHM and if the fainter
+of the two is more uncertain than 1.0, 1.5 or 2.0 sigma respectively
+the fainter one is eliminated.
+
+ALLSTAR operates in a similar manner to NSTAR.
+However ALLSTAR does not have a rigid maximum group size. Instead
+it dynamically resizes the groups by reducing the internal critical
+separation between stars until all groups are under or
+equal in size to \fImaxgroup\fR in the DAOPARS task or until the
+critical separation is less than 1.2 pixels which may result in
+less than four pixels per star.
+Any group still larger than \fImaxgroup\fR is rejected.
+ALLSTAR replaces
+GROUP, GRPSELECT, NSTAR and SUBSTAR. However the user has little control
+over the grouping process and does not know at the end which stars were
+fit together. The quality of the fits fits fill vary over
+the image as a function of crowding in an unknown way.
+NSTAR is the task of choice when a user wants to maintain
+control over the composition of the stellar groups.
+
+.ih
+EXAMPLES
+
+1. Fit the PSF to a list stars in a crowded field near M92.
+
+.nf
+    da> allstar m92 m92.mag.1 m92.psf.1 default default verb+ veri+
+.fi
+
+2. Run ALLSTAR exactly as in example 1 but submit the task to the background
+saving all the verbose output in a file called allstar.out. Remember to
+turn the verify switch off.
+
+.nf
+    da> allstar m92 m92.mag.1 m92.psf.1 default default verb+ veri- \
+        > allstar.out & 
+.fi
+
+3. Run ALLSTAR exactly as in example 2 but cache all the data in memory.
+
+.nf
+    da> allstar m92 m92.grp.1 m92.psf.1 default default verb+ veri- \
+        cache+ > allstar.out & 
+.fi
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+datapars,daopars,peak,nstar
+.endhelp

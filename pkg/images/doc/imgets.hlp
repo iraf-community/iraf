@@ -66,5 +66,5 @@ the image "nite1.1001", and compute and print the hour angle in degrees:
 .ke
 .ih
 SEE ALSO
-imheader
+imheader, hedit, hselect
 .endhelp

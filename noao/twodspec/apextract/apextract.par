@@ -1,4 +1,7 @@
 # APEXTRACT Package
 
-version,s,h,"APEXTRACT V2.0: February 1988"
-mode,s,h,a
+database,f,h,"database",,,Database
+verbose,b,h,no,,,Verbose output?
+logfile,s,h,"",,,Text log file
+plotfile,s,h,"",,,Plot file
+version,s,h,"APEXTRACT V3.0: August 1990"

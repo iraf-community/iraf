@@ -1,4 +1,4 @@
-.help sensfunc Jun88 noao.onedspec
+.help sensfunc Mar92 noao.onedspec
 .ih
 NAME
 sensfunc -- Determine sensitivity and extinction functions
@@ -34,7 +34,7 @@ Output log filename for statistical information about the stars used
 and the sensitivity function and extinction function.
 If no filename is given then no file is written.
 .le
-.ls extinction = ")_.extinction"
+.ls extinction = <no default>
 Input extinction file.  Any extinction determination made will be
 relative to this extinction.  If no file is given then no extinction
 correction is applied and any extinction determination from the
@@ -48,11 +48,17 @@ Output revised extinction file.  If the extinction is revised and an
 output filename is given then a revised extinction file is written.  It
 has the same format as the standard extinction files.
 .le
-.ls latitude = ")observatory.latitude"
-Observatory latitude used in determining the airmass of a spectrum.
-This is only used when graphing flux calibrated data of spectra which
-do not include the airmass in the image header.  The default value
-is redirected to the value from the task \fBobservatory\fR.
+.ls observatory = ")_.observatory"
+Observatory at which the spectra were obtained if not specified in the
+image header by the keyword OBSERVAT.  The default is a redirection to look
+in the parameters for the parent package for a value.  This is only used
+when graphing flux calibrated data of spectra which do not include the
+airmass in the image header.  The observatory may be one of the
+observatories in the observatory database, "observatory" to select the
+observatory defined by the environment variable "observatory" or the
+parameter \fBobservatory.observatory\fR, or "obspars" to select the current
+parameters set in the \fBobservatory\fR task.  See help for
+\fBobservatory\fR for additional information.
 .le
 .ls function = "spline3"
 Function used to fit the sensitivity data.  The function types are
@@ -121,6 +127,7 @@ s	Toggle shift of standard stars to eliminate mean deviations
 u	Undelete point, star, or wavelength nearest the cursor
 w	Change weights of point, star, or wavelength nearest the cursor
 
+:flux [min] [max]  Limits for flux calibrated graphs (INDEF for autoscale)
 :function [type]   Function to be fit to sensitivity data:
 			chebyshev - Chebyshev polynomial
 			legendre  - Legendre polynomial
@@ -131,6 +138,7 @@ w	Change weights of point, star, or wavelength nearest the cursor
 		c - Composite residuals and error bars vs wavelength
 		e - Extinction (and revised extinction) vs wavelength
 		i - Flux calibrated image vs wavelength
+		l - Log of flux calibrated image vs wavelength
 		r - Residual sensitivity vs wavelength
 		s - Sensitivity vs wavelength
 :images [images]   Images to flux calibrate and plot (up to four)
@@ -182,7 +190,7 @@ The format of this table is described in \fBlcalib\fR.
 
 The calibration factor at each point is computed as
 
-	(1) C = 2.5 log (O / (T B F)) - A E
+	(1) C = 2.5 log (O / (T B F)) + A E
 
 where O is the observed counts in a bandpass of an observation,
 T is the exposure time of the observation, B is the bandpass width,
@@ -193,7 +201,7 @@ Angstrom corrected to some extinction curve to the expected flux
 expressed in magnitudes.  The goal of the task is to fit the observations
 to the relation
 
-	(2) C = S(W) - AE(W)
+	(2) C = S(W) + AE(W)
 
 where W is wavelength, S(W) is the sensitivity function, and E(W) is
 a residual extinction function relative to the extinction used in (1).
@@ -365,6 +373,8 @@ if no argument is given the current value is displayed.  For the statistics
 commands an optional output file may be given to record the information.
 
 .nf
+:flux 1e-12 INDEF    Set lower limit for flux plots
+:flux INDEF INDEF    Restore autoscaling in flux plots
 :func spline3	     Select cubic spline function
 :g srae		     Graph sensitivity, residuals, airmass,
 		     and extinction
@@ -379,7 +389,14 @@ commands an optional output file may be given to record the information.
 :vstats stdstats     Print verbose statistics to file
 .fi
 .ih
-NOTES
+REVISIONS
+.ls SENSFUNC V2.10
+The latitude parameter has been replaced by the observatory parameter.
+The 'i' flux calibrated graph type now shows flux in linear scaling 
+while the new graph type 'l' shows flux in log scaling.  A new colon
+command allows fixing the flux limits for the flux calibrated graphs.
+.le
+.ls SENSFUNC V2.8
 This task has been completely rewritten from that of versions 2.5 and
 earlier.
 
@@ -396,6 +413,16 @@ earlier.
 9. Additional flexibility is provided for treating apertures.
 .fi
 .ih
+BUGS
+If the flux points do not span the wavelength range, set by the
+standard star observations, then the fitting may fail at some maximum
+order.  When it fails there is no message but the highest order which
+can be successfully fit is used.  To work around this one can either
+add fake points, truncate the wavelength range in the first line of each
+tabulated object in the file produced by \fBstandard\fR, or exclude the
+part of the image data which cannot be uncalibrated (using
+\fBscopy\fR or \fBdispcor\fR).
+.ih
 SEE ALSO
-standard, lcalib, calibrate, observatory, icfit, ranges
+standard, lcalib, calibrate, observatory, icfit, ranges, scopy, dispcor
 .endhelp

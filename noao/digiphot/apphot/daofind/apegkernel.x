@@ -123,12 +123,11 @@ end
 
 # AP_GKERNEL -- Compute the 1D Gaussian convolution kernel.
 
-procedure ap_gkernel (ker1, nbox, fwhmpsf, nsigma)
+procedure ap_gkernel (ker1, nbox, fwhmpsf)
 
 real	ker1[nbox]		# 1-D kernel
 int	nbox			# dimensions of kernel
 real	fwhmpsf			# fwhmpsf Gaussian
-real	nsigma			# number of sigma in convolution
 
 int	j, middle, jsq
 real	sumk1, sumk1sq, sigsq

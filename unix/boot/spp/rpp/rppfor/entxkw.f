@@ -1,159 +1,159 @@
-      SUBROUTINE ENTXKW
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER SBOOL(7)
-      INTEGER SCHAR(7)
-      INTEGER SSHORT(8)
-      INTEGER SINT(6)
-      INTEGER SLONG(7)
-      INTEGER SREAL(7)
-      INTEGER SDBLE(7)
-      INTEGER SCPLX(7)
-      INTEGER SPNTR(7)
-      INTEGER SFCHR(7)
-      INTEGER SFUNC(7)
-      INTEGER SSUBR(7)
-      INTEGER SEXTN(7)
-      INTEGER DBOOL(8)
-      INTEGER DCHAR(10)
-      INTEGER DSHORT(10)
-      INTEGER DINT(8)
-      INTEGER DLONG(10)
-      INTEGER DREAL(5)
-      INTEGER DDBLE(17)
-      INTEGER DCPLX(8)
-      INTEGER DPNTR(8)
-      INTEGER DFCHR(10)
-      INTEGER DFUNC(9)
-      INTEGER DSUBR(11)
-      INTEGER DEXTN(9)
-      DATA SBOOL(1)/120/,SBOOL(2)/36/,SBOOL(3)/98/,SBOOL(4)/111/,SBOOL(5
-     *)/111/,SBOOL(6)/108/,SBOOL(7)/-2/
-      DATA SCHAR(1)/120/,SCHAR(2)/36/,SCHAR(3)/99/,SCHAR(4)/104/,SCHAR(5
-     *)/97/,SCHAR(6)/114/,SCHAR(7)/-2/
-      DATA SSHORT(1)/120/,SSHORT(2)/36/,SSHORT(3)/115/,SSHORT(4)/104/,SS
-     *HORT(5)/111/,SSHORT(6)/114/,SSHORT(7)/116/,SSHORT(8)/-2/
-      DATA SINT(1)/120/,SINT(2)/36/,SINT(3)/105/,SINT(4)/110/,SINT(5)/11
-     *6/,SINT(6)/-2/
-      DATA SLONG(1)/120/,SLONG(2)/36/,SLONG(3)/108/,SLONG(4)/111/,SLONG(
-     *5)/110/,SLONG(6)/103/,SLONG(7)/-2/
-      DATA SREAL(1)/120/,SREAL(2)/36/,SREAL(3)/114/,SREAL(4)/101/,SREAL(
-     *5)/97/,SREAL(6)/108/,SREAL(7)/-2/
-      DATA SDBLE(1)/120/,SDBLE(2)/36/,SDBLE(3)/100/,SDBLE(4)/98/,SDBLE(5
-     *)/108/,SDBLE(6)/101/,SDBLE(7)/-2/
-      DATA SCPLX(1)/120/,SCPLX(2)/36/,SCPLX(3)/99/,SCPLX(4)/112/,SCPLX(5
-     *)/108/,SCPLX(6)/120/,SCPLX(7)/-2/
-      DATA SPNTR(1)/120/,SPNTR(2)/36/,SPNTR(3)/112/,SPNTR(4)/110/,SPNTR(
-     *5)/116/,SPNTR(6)/114/,SPNTR(7)/-2/
-      DATA SFCHR(1)/120/,SFCHR(2)/36/,SFCHR(3)/102/,SFCHR(4)/99/,SFCHR(5
-     *)/104/,SFCHR(6)/114/,SFCHR(7)/-2/
-      DATA SFUNC(1)/120/,SFUNC(2)/36/,SFUNC(3)/102/,SFUNC(4)/117/,SFUNC(
-     *5)/110/,SFUNC(6)/99/,SFUNC(7)/-2/
-      DATA SSUBR(1)/120/,SSUBR(2)/36/,SSUBR(3)/115/,SSUBR(4)/117/,SSUBR(
-     *5)/98/,SSUBR(6)/114/,SSUBR(7)/-2/
-      DATA SEXTN(1)/120/,SEXTN(2)/36/,SEXTN(3)/101/,SEXTN(4)/120/,SEXTN(
-     *5)/116/,SEXTN(6)/110/,SEXTN(7)/-2/
-      DATA DBOOL(1)/108/,DBOOL(2)/111/,DBOOL(3)/103/,DBOOL(4)/105/,DBOOL
-     *(5)/99/,DBOOL(6)/97/,DBOOL(7)/108/,DBOOL(8)/-2/
-      DATA DCHAR(1)/105/,DCHAR(2)/110/,DCHAR(3)/116/,DCHAR(4)/101/,DCHAR
-     *(5)/103/,DCHAR(6)/101/,DCHAR(7)/114/,DCHAR(8)/42/,DCHAR(9)/50/,DCH
-     *AR(10)/-2/
-      DATA DSHORT(1)/105/,DSHORT(2)/110/,DSHORT(3)/116/,DSHORT(4)/101/,D
-     *SHORT(5)/103/,DSHORT(6)/101/,DSHORT(7)/114/,DSHORT(8)/42/,DSHORT(9
-     *)/50/,DSHORT(10)/-2/
-      DATA DINT(1)/105/,DINT(2)/110/,DINT(3)/116/,DINT(4)/101/,DINT(5)/1
-     *03/,DINT(6)/101/,DINT(7)/114/,DINT(8)/-2/
-      DATA DLONG(1)/105/,DLONG(2)/110/,DLONG(3)/116/,DLONG(4)/101/,DLONG
-     *(5)/103/,DLONG(6)/101/,DLONG(7)/114/,DLONG(8)/42/,DLONG(9)/52/,DLO
-     *NG(10)/-2/
-      DATA DREAL(1)/114/,DREAL(2)/101/,DREAL(3)/97/,DREAL(4)/108/,DREAL(
+      subroutine entxkw
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer sbool(7)
+      integer schar(7)
+      integer sshort(8)
+      integer sint(6)
+      integer slong(7)
+      integer sreal(7)
+      integer sdble(7)
+      integer scplx(7)
+      integer spntr(7)
+      integer sfchr(7)
+      integer sfunc(7)
+      integer ssubr(7)
+      integer sextn(7)
+      integer dbool(8)
+      integer dchar(10)
+      integer dshort(10)
+      integer dint(8)
+      integer dlong(10)
+      integer dreal(5)
+      integer ddble(17)
+      integer dcplx(8)
+      integer dpntr(8)
+      integer dfchr(10)
+      integer dfunc(9)
+      integer dsubr(11)
+      integer dextn(9)
+      data sbool(1)/120/,sbool(2)/36/,sbool(3)/98/,sbool(4)/111/,sbool(5
+     *)/111/,sbool(6)/108/,sbool(7)/-2/
+      data schar(1)/120/,schar(2)/36/,schar(3)/99/,schar(4)/104/,schar(5
+     *)/97/,schar(6)/114/,schar(7)/-2/
+      data sshort(1)/120/,sshort(2)/36/,sshort(3)/115/,sshort(4)/104/,ss
+     *hort(5)/111/,sshort(6)/114/,sshort(7)/116/,sshort(8)/-2/
+      data sint(1)/120/,sint(2)/36/,sint(3)/105/,sint(4)/110/,sint(5)/11
+     *6/,sint(6)/-2/
+      data slong(1)/120/,slong(2)/36/,slong(3)/108/,slong(4)/111/,slong(
+     *5)/110/,slong(6)/103/,slong(7)/-2/
+      data sreal(1)/120/,sreal(2)/36/,sreal(3)/114/,sreal(4)/101/,sreal(
+     *5)/97/,sreal(6)/108/,sreal(7)/-2/
+      data sdble(1)/120/,sdble(2)/36/,sdble(3)/100/,sdble(4)/98/,sdble(5
+     *)/108/,sdble(6)/101/,sdble(7)/-2/
+      data scplx(1)/120/,scplx(2)/36/,scplx(3)/99/,scplx(4)/112/,scplx(5
+     *)/108/,scplx(6)/120/,scplx(7)/-2/
+      data spntr(1)/120/,spntr(2)/36/,spntr(3)/112/,spntr(4)/110/,spntr(
+     *5)/116/,spntr(6)/114/,spntr(7)/-2/
+      data sfchr(1)/120/,sfchr(2)/36/,sfchr(3)/102/,sfchr(4)/99/,sfchr(5
+     *)/104/,sfchr(6)/114/,sfchr(7)/-2/
+      data sfunc(1)/120/,sfunc(2)/36/,sfunc(3)/102/,sfunc(4)/117/,sfunc(
+     *5)/110/,sfunc(6)/99/,sfunc(7)/-2/
+      data ssubr(1)/120/,ssubr(2)/36/,ssubr(3)/115/,ssubr(4)/117/,ssubr(
+     *5)/98/,ssubr(6)/114/,ssubr(7)/-2/
+      data sextn(1)/120/,sextn(2)/36/,sextn(3)/101/,sextn(4)/120/,sextn(
+     *5)/116/,sextn(6)/110/,sextn(7)/-2/
+      data dbool(1)/108/,dbool(2)/111/,dbool(3)/103/,dbool(4)/105/,dbool
+     *(5)/99/,dbool(6)/97/,dbool(7)/108/,dbool(8)/-2/
+      data dchar(1)/105/,dchar(2)/110/,dchar(3)/116/,dchar(4)/101/,dchar
+     *(5)/103/,dchar(6)/101/,dchar(7)/114/,dchar(8)/42/,dchar(9)/50/,dch
+     *ar(10)/-2/
+      data dshort(1)/105/,dshort(2)/110/,dshort(3)/116/,dshort(4)/101/,d
+     *short(5)/103/,dshort(6)/101/,dshort(7)/114/,dshort(8)/42/,dshort(9
+     *)/50/,dshort(10)/-2/
+      data dint(1)/105/,dint(2)/110/,dint(3)/116/,dint(4)/101/,dint(5)/1
+     *03/,dint(6)/101/,dint(7)/114/,dint(8)/-2/
+      data dlong(1)/105/,dlong(2)/110/,dlong(3)/116/,dlong(4)/101/,dlong
+     *(5)/103/,dlong(6)/101/,dlong(7)/114/,dlong(8)/42/,dlong(9)/52/,dlo
+     *ng(10)/-2/
+      data dreal(1)/114/,dreal(2)/101/,dreal(3)/97/,dreal(4)/108/,dreal(
      *5)/-2/
-      DATA DDBLE(1)/100/,DDBLE(2)/111/,DDBLE(3)/117/,DDBLE(4)/98/,DDBLE(
-     *5)/108/,DDBLE(6)/101/,DDBLE(7)/32/,DDBLE(8)/112/,DDBLE(9)/114/,DDB
-     *LE(10)/101/,DDBLE(11)/99/,DDBLE(12)/105/,DDBLE(13)/115/,DDBLE(14)/
-     *105/,DDBLE(15)/111/,DDBLE(16)/110/,DDBLE(17)/-2/
-      DATA DCPLX(1)/99/,DCPLX(2)/111/,DCPLX(3)/109/,DCPLX(4)/112/,DCPLX(
-     *5)/108/,DCPLX(6)/101/,DCPLX(7)/120/,DCPLX(8)/-2/
-      DATA DPNTR(1)/105/,DPNTR(2)/110/,DPNTR(3)/116/,DPNTR(4)/101/,DPNTR
-     *(5)/103/,DPNTR(6)/101/,DPNTR(7)/114/,DPNTR(8)/-2/
-      DATA DFCHR(1)/99/,DFCHR(2)/104/,DFCHR(3)/97/,DFCHR(4)/114/,DFCHR(5
-     *)/97/,DFCHR(6)/99/,DFCHR(7)/116/,DFCHR(8)/101/,DFCHR(9)/114/,DFCHR
+      data ddble(1)/100/,ddble(2)/111/,ddble(3)/117/,ddble(4)/98/,ddble(
+     *5)/108/,ddble(6)/101/,ddble(7)/32/,ddble(8)/112/,ddble(9)/114/,ddb
+     *le(10)/101/,ddble(11)/99/,ddble(12)/105/,ddble(13)/115/,ddble(14)/
+     *105/,ddble(15)/111/,ddble(16)/110/,ddble(17)/-2/
+      data dcplx(1)/99/,dcplx(2)/111/,dcplx(3)/109/,dcplx(4)/112/,dcplx(
+     *5)/108/,dcplx(6)/101/,dcplx(7)/120/,dcplx(8)/-2/
+      data dpntr(1)/105/,dpntr(2)/110/,dpntr(3)/116/,dpntr(4)/101/,dpntr
+     *(5)/103/,dpntr(6)/101/,dpntr(7)/114/,dpntr(8)/-2/
+      data dfchr(1)/99/,dfchr(2)/104/,dfchr(3)/97/,dfchr(4)/114/,dfchr(5
+     *)/97/,dfchr(6)/99/,dfchr(7)/116/,dfchr(8)/101/,dfchr(9)/114/,dfchr
      *(10)/-2/
-      DATA DFUNC(1)/102/,DFUNC(2)/117/,DFUNC(3)/110/,DFUNC(4)/99/,DFUNC(
-     *5)/116/,DFUNC(6)/105/,DFUNC(7)/111/,DFUNC(8)/110/,DFUNC(9)/-2/
-      DATA DSUBR(1)/115/,DSUBR(2)/117/,DSUBR(3)/98/,DSUBR(4)/114/,DSUBR(
-     *5)/111/,DSUBR(6)/117/,DSUBR(7)/116/,DSUBR(8)/105/,DSUBR(9)/110/,DS
-     *UBR(10)/101/,DSUBR(11)/-2/
-      DATA DEXTN(1)/101/,DEXTN(2)/120/,DEXTN(3)/116/,DEXTN(4)/101/,DEXTN
-     *(5)/114/,DEXTN(6)/110/,DEXTN(7)/97/,DEXTN(8)/108/,DEXTN(9)/-2/
-      CALL ENTDEF (SBOOL, DBOOL, XPPTBL)
-      CALL ENTDEF (SCHAR, DCHAR, XPPTBL)
-      CALL ENTDEF (SSHORT, DSHORT, XPPTBL)
-      CALL ENTDEF (SINT, DINT, XPPTBL)
-      CALL ENTDEF (SLONG, DLONG, XPPTBL)
-      CALL ENTDEF (SREAL, DREAL, XPPTBL)
-      CALL ENTDEF (SDBLE, DDBLE, XPPTBL)
-      CALL ENTDEF (SCPLX, DCPLX, XPPTBL)
-      CALL ENTDEF (SPNTR, DPNTR, XPPTBL)
-      CALL ENTDEF (SFCHR, DFCHR, XPPTBL)
-      CALL ENTDEF (SFUNC, DFUNC, XPPTBL)
-      CALL ENTDEF (SSUBR, DSUBR, XPPTBL)
-      CALL ENTDEF (SEXTN, DEXTN, XPPTBL)
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      data dfunc(1)/102/,dfunc(2)/117/,dfunc(3)/110/,dfunc(4)/99/,dfunc(
+     *5)/116/,dfunc(6)/105/,dfunc(7)/111/,dfunc(8)/110/,dfunc(9)/-2/
+      data dsubr(1)/115/,dsubr(2)/117/,dsubr(3)/98/,dsubr(4)/114/,dsubr(
+     *5)/111/,dsubr(6)/117/,dsubr(7)/116/,dsubr(8)/105/,dsubr(9)/110/,ds
+     *ubr(10)/101/,dsubr(11)/-2/
+      data dextn(1)/101/,dextn(2)/120/,dextn(3)/116/,dextn(4)/101/,dextn
+     *(5)/114/,dextn(6)/110/,dextn(7)/97/,dextn(8)/108/,dextn(9)/-2/
+      call entdef (sbool, dbool, xpptbl)
+      call entdef (schar, dchar, xpptbl)
+      call entdef (sshort, dshort, xpptbl)
+      call entdef (sint, dint, xpptbl)
+      call entdef (slong, dlong, xpptbl)
+      call entdef (sreal, dreal, xpptbl)
+      call entdef (sdble, ddble, xpptbl)
+      call entdef (scplx, dcplx, xpptbl)
+      call entdef (spntr, dpntr, xpptbl)
+      call entdef (sfchr, dfchr, xpptbl)
+      call entdef (sfunc, dfunc, xpptbl)
+      call entdef (ssubr, dsubr, xpptbl)
+      call entdef (sextn, dextn, xpptbl)
+      end
+c     logic0  logical_column

@@ -2,40 +2,50 @@
 
 # Define directories.
 
-set	bias		= "imred$bias/"
+set	argus		= "imred$argus/"
+set	biasdir		= "imred$bias/"
 set	ccdred		= "imred$ccdred/"
-set	coude		= "imred$coude/"
+set	ctioslit	= "imred$ctioslit/"
 set	dtoi		= "imred$dtoi/"
 set	echelle		= "imred$echelle/"
 set	generic		= "imred$generic/"
+set	hydra		= "imred$hydra/"
 set	iids		= "imred$iids/"
 set	irred		= "imred$irred/"
 set	irs		= "imred$irs/"
-set	msred		= "imred$msred/"
-set	specphot	= "imred$specphot/"
+set	kpnocoude	= "imred$kpnocoude/"
+set	kpnoslit	= "imred$kpnoslit/"
+set	specred		= "imred$specred/"
 set	vtel		= "imred$vtel/"
+
+set	apextract	= "twodspec$apextract/"
+set	doecslit	= "imred$src/doecslit/"
+set	dofoe		= "imred$src/dofoe/"
+set	doslit		= "imred$src/doslit/"
+set	srcfibers	= "imred$src/fibers/"
 
 # Define the package.
 
 package imred
 
-	# Tasks
-	task	observatory	= imred$observatory.cl
-	task	setairmass	= astutil$x_astutil.e
-#	task	tutor		= imred$tutor.cl
+# Tasks
+#task	tutor		= "imred$tutor.cl"
 
-	# Packages
-	task	bias.pkg	= bias$bias.cl
-	task	ccdred.pkg	= ccdred$ccdred.cl
-	task	coude.pkg	= coude$coude.cl
-	task	dtoi.pkg	= dtoi$dtoi.cl
-	task	echelle.pkg	= echelle$echelle.cl
-	task	generic.pkg	= generic$generic.cl
-	task	iids.pkg	= iids$iids.cl
-	task	irred.pkg	= irred$irred.cl
-	task	irs.pkg		= irs$irs.cl
-	task	msred.pkg	= msred$msred.cl
-	task	specphot.pkg	= specphot$specphot.cl
-	task	vtel.pkg	= vtel$vtel.cl
+# Packages
+task	argus.pkg	= "argus$argus.cl"
+task	bias.pkg	= "biasdir$bias.cl"
+task	ccdred.pkg	= "ccdred$ccdred.cl"
+task	ctioslit.pkg	= "ctioslit$ctioslit.cl"
+task	dtoi.pkg	= "dtoi$dtoi.cl"
+task	echelle.pkg	= "echelle$echelle.cl"
+task	generic.pkg	= "generic$generic.cl"
+task	hydra.pkg	= "hydra$hydra.cl"
+task	iids.pkg	= "iids$iids.cl"
+task	irred.pkg	= "irred$irred.cl"
+task	irs.pkg		= "irs$irs.cl"
+task	kpnocoude.pkg	= "kpnocoude$kpnocoude.cl"
+task	kpnoslit.pkg	= "kpnoslit$kpnoslit.cl"
+task	specred.pkg	= "specred$specred.cl"
+task	vtel.pkg	= "vtel$vtel.cl"
 
 clbye

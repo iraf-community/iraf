@@ -1,0 +1,64 @@
+# Make the OBSOLETE package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_obsolete.x
+	$link	x_obsolete.o libpkg.a -o xx_obsolete.e
+	;
+
+install:
+	$move	xx_obsolete.e bin$x_obsolete.e
+	;
+
+generic:
+	$set	GEN = "$$generic -k"
+
+        $ifolder (generic/imcasigclip.x, imcasigclip.gx)
+	    $(GEN) imcasigclip.gx -o generic/imcasigclip.x $endif
+        $ifolder (generic/imcaverage.x, imcaverage.gx)
+	    $(GEN) imcaverage.gx -o generic/imcaverage.x $endif
+        $ifolder (generic/imccopy.x, imccopy.gx)
+	    $(GEN) imccopy.gx -o generic/imccopy.x $endif
+        $ifolder (generic/imcmaxrej.x, imcmaxrej.gx)
+	    $(GEN) imcmaxrej.gx -o generic/imcmaxrej.x $endif
+        $ifolder (generic/imcmedian.x, imcmedian.gx)
+	    $(GEN) imcmedian.gx -o generic/imcmedian.x $endif
+        $ifolder (generic/imcminrej.x, imcminrej.gx)
+	    $(GEN) imcminrej.gx -o generic/imcminrej.x $endif
+        $ifolder (generic/imcmmrej.x, imcmmrej.gx)
+	    $(GEN) imcmmrej.gx -o generic/imcmmrej.x $endif
+        $ifolder (generic/imcmode.x, imcmode.gx)
+	    $(GEN) imcmode.gx -o generic/imcmode.x $endif
+        $ifolder (generic/imcsigclip.x, imcsigclip.gx)
+	    $(GEN) imcsigclip.gx -o generic/imcsigclip.x $endif
+        $ifolder (generic/imcsum.x, imcsum.gx)
+	    $(GEN) imcsum.gx -o generic/imcsum.x $endif
+        $ifolder (generic/imcthresh.x, imcthresh.gx)
+	    $(GEN) imcthresh.gx -o generic/imcthresh.x $endif
+        $ifolder (generic/imcombine.x, imcombine.gx)
+	    $(GEN) imcombine.gx -o generic/imcombine.x $endif
+        $ifolder (generic/sigma.x, sigma.gx)
+	    $(GEN) sigma.gx -o generic/sigma.x $endif
+	;
+
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+	@generic
+
+	imclogsum.x	<imhdr.h> <imset.h> <time.h>
+	imcscales.x	<imhdr.h> <imset.h> <time.h>
+	imcsection.x	<ctype.h>
+	t_imcombine.x	<imhdr.h> <error.h>
+	t_imtitle.x	<imhdr.h>
+	t_mkhgm.x	<gset.h> <mach.h>
+	t_radplt.x	<imhdr.h> <error.h> <mach.h> <gset.h>
+	;

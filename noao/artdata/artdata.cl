@@ -5,6 +5,7 @@ package artdata
 task	gallist,
 	mk1dspec,
 	mk2dspec,
+	mkechelle,
 	mkheader,
 	mknoise,
 	mkobjects,

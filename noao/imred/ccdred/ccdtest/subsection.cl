@@ -19,8 +19,8 @@ begin
 
 	im = subimage
 	imdata = image
-	biasval = observe.biasval
-	sigma = observe.sigma
+	biasval = artobs.biasval
+	sigma = artobs.sigma
 
 	if (access (im//".imh") == yes)
 	    im = im // ".imh"

@@ -44,13 +44,8 @@ begin
 
 	    # allocate space for the basis functions and array containing
 	    # the index of the first non-zero basis function
-	    $if (datatype == r)
-	    call malloc (CV_BASIS(cv), CV_NPTS(cv)*CV_ORDER(cv), TY_REAL)
-	    call malloc (CV_WY(cv), CV_NPTS(cv), TY_REAL)
-	    $else
-	    call malloc (CV_BASIS(cv), CV_NPTS(cv)*CV_ORDER(cv), TY_DOUBLE)
-	    call malloc (CV_WY(cv), CV_NPTS(cv), TY_DOUBLE)
-	    $endif
+	    call malloc (CV_BASIS(cv), CV_NPTS(cv)*CV_ORDER(cv), TY_PIXEL)
+	    call malloc (CV_WY(cv), CV_NPTS(cv), TY_PIXEL)
 
 	    # calculate the non-zero basis functions
 	    switch (CV_TYPE(cv)) {

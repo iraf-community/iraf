@@ -34,7 +34,7 @@ must be specified for every input file. In the latter case iraf_file is
 a root output image name to which the input file sequence number or tape
 file number is appended if the number of input files > 1. For example
 reading files 1 and 3 from a FITS tape with a value of iraf_file of "data"
-will produce the files data001 and data003, whereas reading the same
+will produce the files data0001 and data0003, whereas reading the same
 two files with a value of iraf_file of "data1,data2" will produce the files
 data1 and data2.
 .le
@@ -77,8 +77,8 @@ disk with the filename defined by the IRAFNAME parameter in the FITS header.
 .ls offset = 0
 Offset is an integer parameter specifying the offset to the current tape file
 number. For example if offset = 100, iraf_file = "fits" and file_list = "1-3"
-then the output file names will be "fits101", "fits102" and "fits103"
-respectively rather than "fits001", "fits002" and "fits003".
+then the output file names will be "fits0101", "fits0102" and "fits0103"
+respectively rather than "fits0001", "fits0002" and "fits0003".
 .le
 .ih
 DESCRIPTION
@@ -109,8 +109,8 @@ rfits to select the output datatype. Blanks are set to zero.
 .fi
 
 Convert a list of FITS files on disk to a set of IRAF images. In the first
-case the files specified by fits* are written to the images images001,
-images002, etc. In the second case the fits disk files listed one per
+case the files specified by fits* are written to the images images0001,
+images0002, etc. In the second case the fits disk files listed one per
 line in the text file fitslist are written to the output images listed
 one per line in the file imlist.
 

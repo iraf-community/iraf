@@ -28,7 +28,10 @@ libpkg.a:
 	ccdtime.x	
 	galactic.x	<fset.h>
 	precess.x	<fset.h>
+	t_gratings.x	<error.h> <math.h>
 	t_setairmass.x	<imhdr.h> <error.h>
+	t_setjd.x	<error.h> <imhdr.h> <ctype.h>
 	t_asttimes.x	<error.h>
 	t_rvcorrect.x	rvcorrect.com <error.h>
+	t_obs.x
 	;

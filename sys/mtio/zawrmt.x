@@ -9,11 +9,13 @@ include	"mtio.h"
 
 procedure zawrmt (mtchan, buf, nbytes, offset)
 
-int	mtchan, nbytes
-char	buf[ARB]
-long	offset
+int	mtchan			#I i/o channel
+char	buf[ARB]		#I data to be written
+int	nbytes			#I number of bytes of data
+long	offset			#I file offset
+
 include	"mtio.com"
 
 begin
-	call zzwrmt (MT_OSCHAN(mtchan), buf, nbytes)
+	call zzwrmt (MT_OSCHAN(mtchan), buf, nbytes, offset)
 end

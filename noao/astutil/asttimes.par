@@ -1,7 +1,6 @@
 files,s,h,"",,,List of files containing dates and times
 header,b,h,yes,,,Print header?
-zone,i,h,0,0,23,Local time zone from Greenwich
-longitude,r,h,)observatory.longitude,,,"Longitude for siderial time
+observatory,s,h,)_.observatory,,,"Observatory
 "
 
 year,i,h,,,,Year

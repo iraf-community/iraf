@@ -1,3 +1,5 @@
+# APSCAT1
+
 function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,Fitting function
 order,i,h,1,1,,Order of fitting function
 sample,s,h,"*",,,Sample points to use in fit

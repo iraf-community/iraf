@@ -3,11 +3,10 @@ include	"sensfunc.h"
 
 # SF_RMS -- Compute the RMS of the sensitivity function fit.
 
-procedure sf_rms (stds, nstds, cv, rms, npts)
+procedure sf_rms (stds, nstds, rms, npts)
 
 pointer	stds[nstds]		# Standard star data
 int	nstds			# Number of standard stars
-pointer	cv			# Sensitivity function
 real	rms			# RMS about fit (returned)
 int	npts			# Number of points in fit (excluding zero wts.)
 

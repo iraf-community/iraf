@@ -4,7 +4,7 @@ include <error.h>
 include <gset.h>
 include "pdm.h"
 
-define	MSIZE		2.		# Mark size
+define	MSIZE		2		# Mark size
 
 # PDM_UNDELETE -- Undelete the nearest deleted point from the plot
 # and set it's inuse array entry to one (in-use).

@@ -8,7 +8,8 @@ procedure ap_nshow (ap)
 pointer	ap	# pointer to the apphot structure
 
 pointer	sp, str1, str2
-int	apstati(), itob()
+bool	itob()
+int	apstati()
 real	apstatr()
 
 begin
@@ -76,6 +77,15 @@ begin
 	    call pargstr (Memc[str1])
 	    call pargstr (KY_XAIRMASS)
 	    call pargr (apstatr (ap, XAIRMASS))
+
+	# Set the time of observation.
+	call apstats (ap, OBSTIME, Memc[str1], SZ_FNAME)
+	call apstats (ap, OTIME, Memc[str2], SZ_FNAME)
+	call printf ("    %s = %s    %s = %s\n")
+	    call pargstr (KY_OBSTIME)
+	    call pargstr (Memc[str1])
+	    call pargstr (KY_OTIME)
+	    call pargstr (Memc[str2])
 
 	# Set the noise model.
 	call printf ("\nNoise Model\n")

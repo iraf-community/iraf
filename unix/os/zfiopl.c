@@ -121,7 +121,7 @@ ZCLSPL (chan, status)
 XINT	*chan;
 XINT	*status;
 {
-	static	PKCHAR	xnullstr[1] = EOS;
+	static	PKCHAR	xnullstr[1] = { EOS };
 	register char *ip, *op, *f;
 	PKCHAR	cmd[(SZ_OSCMD+1) / sizeof(PKCHAR)];
 	XINT	junk;

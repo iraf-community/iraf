@@ -8,6 +8,7 @@ $ieee		= "math$ieee/doc/"
 $llsq		= "math$llsq/doc/"
 $interp		= "math$interp/doc/"
 $iminterp	= "math$iminterp/doc/"
+$nlfit		= "math$nlfit/doc/"
 $surfit		= "math$surfit/doc/"
 $gsurfit	= "math$gsurfit/doc/"
 
@@ -28,8 +29,8 @@ ieee		hlp = ieee$ieee.men,
 		pkg = ieee$ieee.hd
 
 iminterp	hlp = iminterp$iminterp.men,
-		sys  = iminterp$iminterp.hlp,
-		pkg  = iminterp$iminterp.hd
+		sys = iminterp$iminterp.hlp,
+		pkg = iminterp$iminterp.hd
 
 interp		hlp = interp$interp.men,
 		sys  = interp$interp.hlp,
@@ -38,6 +39,10 @@ interp		hlp = interp$interp.men,
 llsq		hlp = llsq$llsq.men,
 		sys = llsq$llsq.hlp,
 		pkg = llsq$llsq.hd
+
+nlfit		hlp = nlfit$nlfit.men,
+		sys = nlfit$nllmfit.hlp,
+		pkg = nlfit$nlfit.hd
 
 surfit		hlp = surfit$surfit.men,
 		sys = surfit$surfit.hlp,

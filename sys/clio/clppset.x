@@ -3,6 +3,7 @@
 include	"clpset.h"
 
 # CLPPSET -- Set the string value of the named pset parameter.
+# [OBSOLETE ROUTINE - see clppseta.x]
 
 procedure clppset (pp, pname, sval)
 

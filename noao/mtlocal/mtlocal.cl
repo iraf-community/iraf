@@ -12,8 +12,8 @@ task	rcamera,
 	r2df,
 	ridsout,
 	ridsfile,
-	ridsmtn		= mtlocal$x_mtlocal.e
+	ridsmtn		= "mtlocal$x_mtlocal.e"
 
-task	widstape	= onedspec$x_onedspec.e
+task	widstape	= "onedspec$irsiids/x_onedspec.e"
 
 clbye()

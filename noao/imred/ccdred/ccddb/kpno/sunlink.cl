@@ -1,9 +1,9 @@
 # Generic routine for setting parameters.
 
-ccdred.pixeltype = "real"
+ccdred.pixeltype = "real real"
 ccdred.verbose = yes
 ccdred.logfile = "logfile"
-ccdred.plotfile = "plotfile"
+ccdred.plotfile = ""
 ccdred.backup = ""
 ccdred.instrument = "ccddb$kpno/sunlink.dat"
 ccdred.ssfile = "subsets"

@@ -1,7 +1,7 @@
 .help aptest Mar90 noao.digiphot.apphot
 .ih
 NAME
-aptest -- run basic tests on the apphot package task
+aptest -- run basic tests on the apphot package tasks
 .ih
 USAGE
 aptest imname

@@ -1,0 +1,38 @@
+# Make the PHOTCAL package
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools -lnlfit"
+	$update	libpkg.a
+	$omake	x_photcal.x
+	$link	x_photcal.o libpkg.a $(LIBS) -o xx_photcal.e
+	;
+
+linkonly:
+	$set	LIBS = "-lxtools -lnlfit"
+	$link	x_photcal.o libpkg.a $(LIBS) -o xx_photcal.e
+	$call install
+	;
+
+install:
+	$move	xx_photcal.e noaobin$x_photcal.e
+	;
+
+libpkg.a:
+	@evaluate
+	@fitparams
+	@io
+	@mctable
+	@mkcatalog
+	@mkconfig
+	@mkimsets
+	@mkobsfile
+	@parser
+	;

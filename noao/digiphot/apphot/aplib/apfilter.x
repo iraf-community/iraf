@@ -29,10 +29,13 @@ begin
 		    call pargstr (Memc[key])
 	    }
 	}
-	if (Memc[filt] == EOS)
+
+	if (Memc[filt] == EOS) {
 	    call apsets (ap, FILTERID, "INDEF")
-	else
+	} else {
+	    call ap_rmwhite (Memc[filt], Memc[filt], SZ_FNAME)
 	    call apsets (ap, FILTERID, Memc[filt])
+	}
 
 	call sfree (sp)
 end

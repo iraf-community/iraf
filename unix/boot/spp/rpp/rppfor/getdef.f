@@ -1,133 +1,133 @@
-      SUBROUTINE GETDEF (TOKEN, TOKSIZ, DEFN, DEFSIZ)
-      INTEGER TOKEN (100), DEFN (2048)
-      INTEGER TOKSIZ, DEFSIZ
-      COMMON /CDEFIO/ BP, BUF (4096)
-      INTEGER BP
-      INTEGER BUF
-      COMMON /CFNAME/ FCNAME (30)
-      INTEGER FCNAME
-      COMMON /CFOR/ FORDEP, FORSTK (200)
-      INTEGER FORDEP
-      INTEGER FORSTK
-      COMMON /CGOTO/ XFER
-      INTEGER XFER
-      COMMON /CLABEL/ LABEL, RETLAB, MEMFLG, COL, LOGIC0
-      INTEGER LABEL
-      INTEGER RETLAB
-      INTEGER MEMFLG
-      INTEGER COL
-      INTEGER LOGIC0
-      COMMON /CLINE/ LEVEL, LINECT (5), INFILE (5), FNAMP, FNAMES ( 150)
-      INTEGER LEVEL
-      INTEGER LINECT
-      INTEGER INFILE
-      INTEGER FNAMP
-      INTEGER FNAMES
-      COMMON /CMACRO/ CP, EP, EVALST (500), DEFTBL
-      INTEGER CP
-      INTEGER EP
-      INTEGER EVALST
-      INTEGER DEFTBL
-      COMMON /COUTLN/ OUTP, OUTBUF (74)
-      INTEGER OUTP
-      INTEGER OUTBUF
-      COMMON /CSBUF/ SBP, SBUF(2048), SMEM(240)
-      INTEGER SBP
-      INTEGER SBUF
-      INTEGER SMEM
-      COMMON /CSWTCH/ SWTOP, SWLAST, SWSTAK(1000), SWVNUM, SWVLEV, SWVST
-     *K(10), SWINRG
-      INTEGER SWTOP
-      INTEGER SWLAST
-      INTEGER SWSTAK
-      INTEGER SWVNUM
-      INTEGER SWVLEV
-      INTEGER SWVSTK
-      INTEGER SWINRG
-      COMMON /CKWORD/ RKWTBL
-      INTEGER RKWTBL
-      COMMON /CLNAME/ FKWTBL, NAMTBL, GENTBL, ERRTBL, XPPTBL
-      INTEGER FKWTBL
-      INTEGER NAMTBL
-      INTEGER GENTBL
-      INTEGER ERRTBL
-      INTEGER XPPTBL
-      COMMON /ERCHEK/ ERNAME, BODY, ESP, ERRSTK(30)
-      INTEGER ERNAME
-      INTEGER BODY
-      INTEGER ESP
-      INTEGER ERRSTK
-      INTEGER MEM( 60000)
-      COMMON/CDSMEM/MEM
-      INTEGER C, T, PTOKEN (100)
-      INTEGER GTOK, NGETCH
-      INTEGER I, NLPAR
-      CALL SKPBLK
-      C = GTOK (PTOKEN, 100)
-      IF (.NOT.(C .EQ. 40))GOTO 23000
-      T = 40
-      GOTO 23001
-23000 CONTINUE
-      T = 32
-      CALL PBSTR (PTOKEN)
-23001 CONTINUE
-      CALL SKPBLK
-      IF (.NOT.(GTOK (TOKEN, TOKSIZ) .NE. -9))GOTO 23002
-      CALL BADERR (22Hnon-alphanumeric name.)
-23002 CONTINUE
-      CALL SKPBLK
-      C = GTOK (PTOKEN, 100)
-      IF (.NOT.(T .EQ. 32))GOTO 23004
-      CALL PBSTR (PTOKEN)
-      I = 1
-23006 CONTINUE
-      C = NGETCH (C)
-      IF (.NOT.(I .GT. DEFSIZ))GOTO 23009
-      CALL BADERR (20Hdefinition too long.)
-23009 CONTINUE
-      DEFN (I) = C
-      I = I + 1
-23007 IF (.NOT.(C .EQ. 35 .OR. C .EQ. 10 .OR. C .EQ. -1))GOTO 23006
-23008 CONTINUE
-      IF (.NOT.(C .EQ. 35))GOTO 23011
-      CALL PUTBAK (C)
-23011 CONTINUE
-      GOTO 23005
-23004 CONTINUE
-      IF (.NOT.(T .EQ. 40))GOTO 23013
-      IF (.NOT.(C .NE. 44))GOTO 23015
-      CALL BADERR (24Hmissing comma in define.)
-23015 CONTINUE
-      NLPAR = 0
-      I = 1
-23017 IF (.NOT.(NLPAR .GE. 0))GOTO 23019
-      IF (.NOT.(I .GT. DEFSIZ))GOTO 23020
-      CALL BADERR (20Hdefinition too long.)
-      GOTO 23021
-23020 CONTINUE
-      IF (.NOT.(NGETCH (DEFN (I)) .EQ. -1))GOTO 23022
-      CALL BADERR (20Hmissing right paren.)
-      GOTO 23023
-23022 CONTINUE
-      IF (.NOT.(DEFN (I) .EQ. 40))GOTO 23024
-      NLPAR = NLPAR + 1
-      GOTO 23025
-23024 CONTINUE
-      IF (.NOT.(DEFN (I) .EQ. 41))GOTO 23026
-      NLPAR = NLPAR - 1
-23026 CONTINUE
-23025 CONTINUE
-23023 CONTINUE
-23021 CONTINUE
-23018 I = I + 1
-      GOTO 23017
-23019 CONTINUE
-      GOTO 23014
-23013 CONTINUE
-      CALL BADERR (19Hgetdef is confused.)
-23014 CONTINUE
-23005 CONTINUE
-      DEFN (I - 1) = -2
-      RETURN
-      END
-C     LOGIC0  LOGICAL_COLUMN
+      subroutine getdef (token, toksiz, defn, defsiz)
+      integer token (100), defn (2048)
+      integer toksiz, defsiz
+      common /cdefio/ bp, buf (4096)
+      integer bp
+      integer buf
+      common /cfname/ fcname (30)
+      integer fcname
+      common /cfor/ fordep, forstk (200)
+      integer fordep
+      integer forstk
+      common /cgoto/ xfer
+      integer xfer
+      common /clabel/ label, retlab, memflg, col, logic0
+      integer label
+      integer retlab
+      integer memflg
+      integer col
+      integer logic0
+      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      integer level
+      integer linect
+      integer infile
+      integer fnamp
+      integer fnames
+      common /cmacro/ cp, ep, evalst (500), deftbl
+      integer cp
+      integer ep
+      integer evalst
+      integer deftbl
+      common /coutln/ outp, outbuf (74)
+      integer outp
+      integer outbuf
+      common /csbuf/ sbp, sbuf(2048), smem(240)
+      integer sbp
+      integer sbuf
+      integer smem
+      common /cswtch/ swtop, swlast, swstak(1000), swvnum, swvlev, swvst
+     *k(10), swinrg
+      integer swtop
+      integer swlast
+      integer swstak
+      integer swvnum
+      integer swvlev
+      integer swvstk
+      integer swinrg
+      common /ckword/ rkwtbl
+      integer rkwtbl
+      common /clname/ fkwtbl, namtbl, gentbl, errtbl, xpptbl
+      integer fkwtbl
+      integer namtbl
+      integer gentbl
+      integer errtbl
+      integer xpptbl
+      common /erchek/ ername, body, esp, errstk(30)
+      integer ername
+      integer body
+      integer esp
+      integer errstk
+      integer mem( 60000)
+      common/cdsmem/mem
+      integer c, t, ptoken (100)
+      integer gtok, ngetch
+      integer i, nlpar
+      call skpblk
+      c = gtok (ptoken, 100)
+      if (.not.(c .eq. 40))goto 23000
+      t = 40
+      goto 23001
+23000 continue
+      t = 32
+      call pbstr (ptoken)
+23001 continue
+      call skpblk
+      if (.not.(gtok (token, toksiz) .ne. -9))goto 23002
+      call baderr (22Hnon-alphanumeric name.)
+23002 continue
+      call skpblk
+      c = gtok (ptoken, 100)
+      if (.not.(t .eq. 32))goto 23004
+      call pbstr (ptoken)
+      i = 1
+23006 continue
+      c = ngetch (c)
+      if (.not.(i .gt. defsiz))goto 23009
+      call baderr (20Hdefinition too long.)
+23009 continue
+      defn (i) = c
+      i = i + 1
+23007 if (.not.(c .eq. 35 .or. c .eq. 10 .or. c .eq. -1))goto 23006
+23008 continue
+      if (.not.(c .eq. 35))goto 23011
+      call putbak (c)
+23011 continue
+      goto 23005
+23004 continue
+      if (.not.(t .eq. 40))goto 23013
+      if (.not.(c .ne. 44))goto 23015
+      call baderr (24Hmissing comma in define.)
+23015 continue
+      nlpar = 0
+      i = 1
+23017 if (.not.(nlpar .ge. 0))goto 23019
+      if (.not.(i .gt. defsiz))goto 23020
+      call baderr (20Hdefinition too long.)
+      goto 23021
+23020 continue
+      if (.not.(ngetch (defn (i)) .eq. -1))goto 23022
+      call baderr (20Hmissing right paren.)
+      goto 23023
+23022 continue
+      if (.not.(defn (i) .eq. 40))goto 23024
+      nlpar = nlpar + 1
+      goto 23025
+23024 continue
+      if (.not.(defn (i) .eq. 41))goto 23026
+      nlpar = nlpar - 1
+23026 continue
+23025 continue
+23023 continue
+23021 continue
+23018 i = i + 1
+      goto 23017
+23019 continue
+      goto 23014
+23013 continue
+      call baderr (19Hgetdef is confused.)
+23014 continue
+23005 continue
+      defn (i - 1) = -2
+      return
+      end
+c     logic0  logical_column

@@ -41,7 +41,7 @@ pointer	i_ltm, i_ltv, o_ltm, o_ltv, t_ltm, t_ltv, ltm, ltv
 pointer	sp, w1, w2, ct, wf, fc, lp, ip, op, ct_r, sv_wcs
 
 pointer	coerce()
-errchk	syserr, syserrs, calloc, zcall2, mw_invertd, mw_system
+errchk	syserr, syserrs, calloc, zcall2, mw_invertd, mw_ssystem
 include	"mwcs.com"
 
 begin

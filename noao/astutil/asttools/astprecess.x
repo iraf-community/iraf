@@ -90,11 +90,11 @@ begin
 	# in Julian centuries from the standard epoch.  The coefficients are
 	# in degrees.
 
-	t = (ast_julday (epoch) - 2451545.0) / 36525
+	t = (ast_julday (epoch) - 2451545.0d0) / 36525d0
 
-	a = t * (0.6406161 + t * (0.0000839 + t * 0.0000050))
-	b = t * (0.6406161 + t * (0.0003041 + t * 0.0000051))
-	c = t * (0.5567530 - t * (0.0001185 + t * 0.0000116))
+	a = t * (0.6406161d0 + t * (0.0000839d0 + t * 0.0000050d0))
+	b = t * (0.6406161d0 + t * (0.0003041d0 + t * 0.0000051d0))
+	c = t * (0.5567530d0 - t * (0.0001185d0 + t * 0.0000116d0))
 
 	# Compute the cosines and sines once for efficiency.
 	ca = cos (DEGTORAD (a))

@@ -262,7 +262,8 @@ long	note()
 pointer	lno_open()
 bool	streq(), ttygetb()
 int	pg_getcmd(), ctoi(), strncmp(), patmake(), patmatch(), pg_peekcmd()
-int	open(), finfo(), strlen(), pg_getline(), getci(), lno_fetch(), fstati()
+int	open(), finfo(), strlen(), pg_getline(), getci()
+int	lno_fetch(), fstati(), ttyctrl()
 data	first_call /true/
 
 define	err_ 91
@@ -894,7 +895,7 @@ destline_
 				    if (destline+1 == pglno[pageno])
 					call ttyclear (STDERR, tty)
 				    call ttygoto (STDOUT, tty, 1, 1)
-				    call ttyctrl (STDOUT, tty, "al", maxlines)
+				    junk = ttyctrl (STDOUT, tty, "al", maxlines)
 				    lnout = 0
 				} else {
 				    call ttyclear (STDERR, tty)

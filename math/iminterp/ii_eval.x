@@ -137,3 +137,87 @@ begin
 	    y[i] = c0 + deltax * (c1 + deltax * (c2 + deltax * c3))
 	}
 end
+
+
+# II_SINC -- Evaluate the sinc interpolant at an array of points.
+# The sinc truncation length is nsinc. The taper is a triangle function of
+# slope staper which begins at ntaper. If the point to be interpolated
+# is less than mindx from a data point no interpolation is done and the
+# data point itself is returned.
+
+procedure ii_sinc (x, y, npts, data, npix, nsinc, ntaper, staper, mindx)
+
+real	x[ARB]		# x values, must be within [1,npts]
+real	y[ARB]		# interpolated values returned to user
+int	npts		# number of x values
+real	data[ARB]	# data to be interpolated
+int	npix		# number of data pixels
+int	nsinc		# sinc truncation length
+int	ntaper		# start of triangular taper
+real	staper		# slope of triangular taper
+real	mindx		# interpolation minimum
+
+int	i, j, k, xc
+real	dx, w, d, z
+real	w1, u1, v1, u1a, v1a
+
+begin
+	do i = 1, npts {
+
+	    # Return zero outside of data.
+	    xc = nint (x[i])
+	    if (xc < 1 || xc > npix) {
+		y[i] = 0.
+		next
+	    }
+
+	    # Return the data value if x is tool close to x[i].
+	    dx = x[i] - xc
+	    if (abs (dx) < mindx) {
+		y[i] = data[xc]
+		next
+	    }
+
+	    # Initialize.
+	    w = 1.
+	    d = data[xc]
+	    z = 1. / dx
+	    w1 = w * z; u1 = d * w1; v1 = w1
+
+	    do j = 1, nsinc {
+
+		# Get the taper.
+		w = -w
+		if (j > ntaper) {
+		    if (w < 0.)
+			w = min (0., w + staper)
+		    else
+			w = max (0., w - staper)
+		    if (w == 0.)
+			break
+		}
+
+		# Store previous value.
+		u1a = u1; v1a = v1
+
+		# Sum the low side.
+		k = xc - j
+		if (k >= 1) {
+		    d = data[k]
+		    z = 1. / (dx + j)
+		    w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
+		}
+
+		# Sum the high side.
+		k = xc + j
+		if (k <= npix) {
+		    d = data[k]
+		    z = 1. / (dx - j)
+		    w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
+		}
+	    }
+
+	    # Average current and previous value.
+	    y[i] = (u1 / v1 + u1a / v1a) / 2.
+	}
+end
