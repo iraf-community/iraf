@@ -48,7 +48,7 @@ libpkg.a:
 	icrmasks.x	<imhdr.h>
 	icscale.x	icombine.com icombine.h <error.h> <imhdr.h> <imset.h>
 	icsection.x	<ctype.h>
-	icsetout.x	icombine.com <imhdr.h> <mwset.h>
+	icsetout.x	icombine.com <imhdr.h> <mwset.h> <imset.h>
 	t_imcombine.x	icombine.com icombine.h <error.h> <imhdr.h> <mach.h> \
-			<syserr.h>
+			<syserr.h> <pmset.h>
 	;

@@ -20,20 +20,14 @@ time_t	gmt;
 {
 	struct	tm *localtime();
 	time_t	time_var;
-#ifdef AUX
 	long	gmtl;
-#endif
 	
 	/* Subtract seconds westward from GMT */
 	time_var = gmt - get_timezone();
 
 	/* Correct for daylight savings time, if in effect */
-#ifdef AUX
 	gmtl = (long)gmt;
 	if (localtime(&gmtl)->tm_isdst)
-#else
-	if (localtime(&gmt)->tm_isdst)
-#endif
 	    time_var += 60L * 60L;
 
 	return (time_var - SECONDS_1970_TO_1980);

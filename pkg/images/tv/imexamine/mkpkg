@@ -8,14 +8,14 @@ $exit
 libpkg.a:
 	iecimexam.x	imexam.h <error.h> <imhdr.h>
 	iecolon.x	imexam.h <error.h> <imhdr.h>
-	iedisplay.x	
+	iedisplay.x     <error.h>	
 	ieeimexam.x	imexam.h <config.h> <error.h> <fset.h> <gset.h>\
 			<imhdr.h> <mach.h> <xwhen.h>
-	iegcur.x	imexam.h
+	iegcur.x	imexam.h <imhdr.h> <ctype.h> <mach.h>
 	iegdata.x	<imhdr.h>
 	iegimage.x	imexam.h <error.h> <imhdr.h>
-	iegnfr.x	imexam.h
-	iegraph.x	<gset.h>
+	iegnfr.x	imexam.h <imhdr.h>
+	iegraph.x	imexam.h <gset.h>
 	iehimexam.x	imexam.h <error.h> <imhdr.h>
 	ieimname.x
 	iejimexam.x	imexam.h <error.h> <imhdr.h> <gset.h> <mach.h>
@@ -32,6 +32,7 @@ libpkg.a:
 	iestatistics.x	imexam.h <error.h>
 	ievimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <mach.h>\
 			<imset.h> <math.h> <math/iminterp.h>
-	stfmeasure.x	starfocus.h <error.h> <imhdr.h> <imset.h>
+	stfmeasure.x	starfocus.h <error.h> <imhdr.h> <imset.h> <mach.h>\
+			<math.h> <math/nlfit.h> <math/iminterp.h>
 	t_imexam.x	imexam.h <error.h> <gset.h> <imhdr.h>
 	;

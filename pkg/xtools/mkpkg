@@ -19,7 +19,8 @@ libxtools.a:
 	clginterp.x	<math/iminterp.h>
 	clgsec.x	<ctype.h> <imhdr.h> <mach.h>
 	cogetr.x	cogetr.h <imhdr.h>
-	dttext.x	<ctotok.h> <ctype.h> <finfo.h> <pkg/dttext.h> <time.h>
+	dttext.x	<ctotok.h> <ctype.h> <error.h> <finfo.h> <fset.h>\
+			<pkg/dttext.h> <time.h>
 	extrema.x	
 	getdatatype.x	
 	gstrdetab.x	
@@ -31,7 +32,7 @@ libxtools.a:
 	peaks.x	
 	ranges.x	<ctype.h> <mach.h>
 	rngranges.x	<ctype.h> <mach.h>
-	obsdb.x
+	obsdb.x	<error.h> <imset.h>
 	strdetab.x	
 	strentab.x	
 	xt21imsum.x	<imhdr.h>

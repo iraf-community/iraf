@@ -5655,3 +5655,343 @@ STATUS:	Fixed for the next release.  The IMCNV external package version of
 	for instructions on patching the system.  Workarounds are to write
 	a 24-bit image instead and do the conversion using host tools, e.g.
 	write a 24-bit rasterfile and convert to GIF afterwards.
+
+NUMBER:	433
+MODULE:	fitprofs
+SYSTEM:	V2.10-V2.11.2
+DATE:	Thu Aug 26 12:00:09 MST 1999
+FROM:	valdes
+
+BUG:	The option to output an image of the fit or residuals only includes
+	the last profile component regardless of the "components"
+	parameter value.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	434
+MODULE:	tv.wcslab
+SYSTEM:	V2.11.2 and earlier
+DATE:	Sat Aug 28 11:03:21 MST 1999
+FROM:	davis
+
+BUG:	Wcslab was failing with the message "ERROR: MWCS: coordinate system
+	not defined (physical)" on the Dec Alpha when usewcs=yes, and with
+	a segmentation violation on Sun systems when the input image was
+	undefined.
+
+STATUS:	Fixed for the next release of IRAF. There is no work-around.
+
+NUMBER:	435
+MODULE:	photcal.fitparams
+SYSTEM:	V2.11.2 only
+DATE:	Mon Aug 30 08:22:45 MST 1999
+FROM:	davis
+
+BUG:    The fitparams task quits with a cannot write to string file error.	
+	The problem was caused by a missing file dependency in the package
+	mkpkg file, which resulted in a routine not being rebuilt.
+
+STATUS:	Fixed for next patch/release of IRAF. Contact the IRAF group for a fix.
+
+NUMBER:	436
+MODULE:	astcalc, asthedit, rvcorrect
+SYSTEM:	V2.11.2
+DATE:	Mon Aug 30 10:17:18 MST 1999
+FROM:	valdes
+
+BUG:	The year is incorrectly determined as yy+1900+1900 when DATE-OBS
+	is in the old FITS format (dd/mm/yy).  In other words, an extra
+	1900 is added to the two digit year.  This is caused by a
+	misunderstanding of where the 1900 is added.  This will make
+	further calculations which use the year grossly incorrect.  The
+	workaround is to manually edit the image headers to convert them to
+	the new FITS format (yyyy-mm-dd).
+
+STATUS:	Fixed for a future patch or release.
+
+NUMBER:	437
+MODULE:	astcalc
+SYSTEM:	V2.10-V2.11.2
+DATE:	Tue Aug 31 10:48:49 MST 1999
+FROM:	valdes
+
+BUG:	When ASTCALC is run on more than one image at a time the image
+	is incorrectly opened twice and only closed once.  This has
+	one consequence, if the list of images is large (greater than
+	about 60) and they are in the Space Telescope Geiss format
+	(the files with ??h and ??d extensions) then the task will
+	run out of file descriptors with an error message such as
+
+	    ERROR: 757 noao/lib$obsdb.dat
+	    ERROR: 787 pix61.c0h4451ef
+
+	The workarounds are 1) use smaller lists of images per execution,
+	2) change the image format to imh or fits, 3) run the task in
+	a script loop using one image at a time.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	438
+MODULE:	mscred.mscimatch
+SYSTEM:	V3.0-V3.2
+DATE:	Fri Sep  3 11:07:46 MST 1999
+FROM:	valdes
+
+BUG:	The iterative rejection step (niterate > 0) produces a floating
+	operand error on some systems such as Linux.  This was cased by
+	an incorrect argument declaration which so whether is affects
+	a system depends on the byte order used by the system.  The
+	workarounds are to not use iterative rejection by setting
+	niterate to zero, update to the latest distribution of MSCRED,
+	or work on a machine where this error does not occur (such as
+	Suns).
+
+STATUS:	Fixed in V3.2.1.
+
+NUMBER:	439
+MODULE:	ccdred.cosmicrays
+SYSTEM:	V2.11.2
+DATE:	Fri Sep 17 13:56:16 MST 1999
+FROM:	valdes
+
+BUG:	Changes in include files related to graphics where not applied
+	in the V2.11.2 update resulting in the graphics being garbled.
+	The workarounds are 1) to delete the ccdred object libraries
+	and rebuilt the executable (not recommended unless you really
+	know what you are doing), 2) installing new binaries obtained
+	from NOAO (contact iraf@noao.edu), or 3) installing the CRUTIL
+	external package which also contains a version of COSMICRAYS.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	440
+MODULE:	tv.wcslab
+SYSTEM:	V2.11
+DATE:	Fri Sep 17 15:06:47 MST 1999
+FROM:	davis
+
+BUG:	Wcslab could produce garbled plots if the projection was set to
+	tnx, especially if the ra ~ 0 hours.
+
+STATUS:	Fixed for the next patch / release of IRAF. A workaround is to
+	change the wtype parameter to tan using wcsedit, make the plot,
+	and then reset wtype to tnx. The wcslab overlay will lose a bit
+	of accuracy but for most display purposes this should not matter.
+
+NUMBER:	441
+MODULE:	utilities.curfit
+SYSTEM:	V2.11.2 (only)
+DATE:	Tue Sep 21 14:01:15 MST 1999
+FROM:	cheselka
+
+BUG:	If run in non-interactive mode (in scripts, for example), a
+	segmentation fault occurs.
+
+	A workaround is to run the task interactively, set the 'cursor' 
+	parameter to a disk file containing the command 'q', send graphics 
+	output to dev$null, and the text output to a disk file.
+
+	From the command line:
+
+	cl> curfit dev$pix inter+ cursor=quit_command >G dev$null >& fit.info
+
+	Or from a script:
+
+	utilities.curfit (input="dev$pix", inter+, cursor="quit_command", \
+		>G "dev$null", >& "fit.info")
+
+	The resulting file (fit.info) will have a single line of junk at
+	the top of the file, but will otherwise contain the fit data.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	442
+MODULE:	doslit, dofibers, dohydra, doargus
+SYSTEM:	V2.11.1-V2.11.2
+DATE:	Fri Sep 24 17:01:26 MST 1999
+FROM:	valdes
+
+BUG:	When the new feature was added to allow an attempt to automatically
+	determine the dispersion function, values of the parameters "crval"
+	and "cdelt" both set to INDEF (the default parameter values) was
+	supposed to skip the automatic identification.  An oddity of the CL
+	prevented these tasks from seeing this case and so they always try
+	to do an automatic solution.  With a large spectrum and a large
+	line list and no guidelines as to the correct dispersion this can
+	cause the tasks to take a very long time at the step where the
+	dispersion is determined.  The workarounds are to set these values
+	to something close to what is expected or to use a short line
+	list.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	443
+MODULE:	digiphot.daophot, digiphot.photcal
+SYSTEM:	V2.11
+DATE:	Tue Sep 28 08:43:02 MST 1999
+FROM:	davis
+
+BUG:	If the tables pacakge is undefined the daophot and pphotcal package
+	scripts will hang which may require terminating the IRAF session. The
+	problem is a missing ; in the daophot and photcal scripts which trips
+	a cl bug.
+
+STATUS:	Fixed for the next patch release of IRAF. The fix is to add the ;
+	to the daophot script as follows. Change the 4 lines
+
+	    } else {
+		type "daophot$lib/warning.dat"
+	    }
+        }
+
+	to 5 lines as follows
+
+	    } else {
+		type "daophot$lib/warning.dat"
+	    }
+        }
+	;
+
+	The same fix will work for the photcal script. The workaround
+	is to install the tables package.
+
+
+
+NUMBER:	444
+MODULE:	imedit
+SYSTEM:	V2.10-V2.11.2
+DATE:	Fri Oct  1 09:03:48 MST 1999
+FROM:	valdes
+
+BUG:	The output image type will be that set by the "imtype"
+	variable regardless of the image type of the input image or any
+	explicit image type in the input and output image names.
+	When the temporary editing buffer is created it is always created
+	with the "imtype" value and when the output image is created
+	from the edited temporary image it retains the image type of
+	the temporary image.  The two workarounds are either to set
+	"imtype" to the type desired for the output or copy the output
+	image to the desired type after it is created.
+
+STATUS:	In the next release if an explicit image type extension is specified
+	for the output image name then that image type will be created for
+	the temporary editing image and the final output image.  If no
+	explicit type is given then the output will be that specified
+	by the "imtype" variable.  In no case is the image type of the
+	input image automatically used.
+
+NUMBER:	445
+MODULE:	ared.quad.quadproc
+SYSTEM:	V2.11.2
+DATE:	Fri Oct  8 16:25:14 MST 1999
+FROM:	valdes
+
+BUG:	ARED external package versions prior to "Rev 1.32 - Oct 8, 1999"
+	installed with IRAF V2.11.2 cause the QUADPROC task to produce
+	the error:
+
+	ERROR: parameter `output' not found
+	    quadproc (images=tryme.fits)
+
+	QUADPROC is a script that calls CCDPROC and the parameter "output"
+	is a new parameter in that task.  Installation of ARED includes
+	copying the CCDPROC executable but not the parameter file.
+	The workaround is either to get the latest version of ARED or
+	edit the file quad$ccdproc.par (quad is defined after loading
+	the quad package) to add the line:
+
+	output,s,h,"",,,List of output CCD images
+
+	after the first line.
+
+STATUS:	ARED package updated to include the revised ccdproc.par file.
+
+NUMBER:	446
+MODULE:	rv.rvidlines, rv.rvreidlines
+SYSTEM:	V2.11.2 (only)
+DATE:	Tue Oct 12 11:34:07 MST 1999
+FROM:	valdes
+
+BUG:	For 1D spectra the error
+
+	    PANIC in `/iraf/iraf/noao/bin.ssun/x_rv.e': Salloc underflow
+
+	may occur due to an incorrect change in memory management.  This
+	error may cause the CL to abort.  A workaround is to turn the 1D
+	image into a 2D image of 1 line with the command:
+
+	    cl> imstack spec spec2d
+
+	where spec is the 1D spectrum and spec2D is the spectrum to use
+	with RVIDLINES/RVREIDLINES.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	447
+MODULE:	crutil.crnebula
+SYSTEM:	CRUTIL V1.2 and earlier
+DATE:	Tue Oct 19 15:04:41 MST 1999
+FROM:	valdes
+
+BUG:	The rin and rout parameters are ignored and the default values are
+	hardwired in the task.  The only workaround is to edit the script
+	crutil$src/crnebula.cl and in the rmedian statement replace the
+	"1.5" with rin and the "6." with rout.
+
+STATUS:	Fixed in V1.3: Oct 19, 1999 release.
+
+NUMBER:	448
+MODULE:	mscred.msccmatch
+SYSTEM:	-V3.2
+DATE:	Mon Oct 25 15:00:04 MST 1999
+FROM:	valdes
+
+BUG:	If the specified image name is more than 19 characters then the
+	task will fail to center on the objects.  When verbose is yes you
+	will see the same numbers printed for each object; i.e. one line is
+	repeated many times.  The workarounds are to shorten the names by
+	renaming, logical links, or possibly eliminating the ".fits"
+	in the specified name.  In the latter case a name such as
+	"abcdefghijklmnopqrs" will be ok but "abcdefghijklmnopqrs.fits" or
+	"abcdefg*" will not work.
+
+STATUS:	Fixed in a future version.
+
+NUMBER:	449
+MODULE:	ared.quad.quadproc
+SYSTEM:	V2.0
+DATE:	Fri Oct 29 12:52:13 MST 1999
+FROM:	valdes
+
+BUG:	This task assumes the image data is in "imh" format.  If it is
+	not in this format then overscan and trim will not occur and
+	further in the processing the following message will appear.
+
+	ERROR on line 173: Bias section not specified or given as full image.
+
+	The workaround is to change the image format to "imh".  Also change
+	the "imtype" variable with "reset imtype=imh; flpr".  Getting the
+	latest version of the ARED package source (ared.tar) will also fix
+	this problem.  In this version the "imtype" variable must be set to
+	match extension of the image type being used; e.g. "fits" for
+	*.fits data.  The binaries do not need to be updated since the fix
+	applies only to a script task.
+
+STATUS:	Fixed in the current distribution from iraf.noao.edu.
+
+NUMBER:	450
+MODULE:	imfilter.fmedian,imfilter.frmedian,imfilter.fmode,imfilter.frmode
+SYSTEM:	V2.11
+DATE:	Fri Nov 19 14:20:16 MST 1999
+FROM:	davis
+
+BUG:	The fast median / mode filtering tasks will overflow producing
+	pathological pixel values if the size of the filtering kernel
+	xfilter * yfilter > 32767 and the number of pixels in 1 histogram
+	bin happens to be > 32767 as may happen in bad pixel regions.
+
+	The problem was due to the fact that for historical reason the
+	algorithm histogram was stored as a short instead of an int.
+
+STATUS:	Fixed for 2.11.3. The workaround is to try and keep the filter size
+	< 32767 pixels in size, or to use the much slower median task.

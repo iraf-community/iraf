@@ -33,17 +33,17 @@ libxtools.a:
 	rgintersect.x	<pkg/rg.h>
 	rginverse.x	<pkg/rg.h>
 	rgmerge.x	<pkg/rg.h>
-	rgnext.x	<pkg/rg.h>
+	rgnext.x	<mach.h> <pkg/rg.h>
 	rgorder.x	<pkg/rg.h>
 	rgpackd.x	<pkg/rg.h>
 	rgpackr.x	<pkg/rg.h>
-	rgranges.x	<ctype.h> <pkg/rg.h>
+	rgranges.x	<ctype.h> <error.h> <pkg/rg.h>
 	rgunion.x	<pkg/rg.h>
 	rgunpackd.x	<pkg/rg.h>
 	rgunpackr.x	<pkg/rg.h>
 	rgwindow.x	<pkg/rg.h>
 	rgwtbind.x	<pkg/rg.h>
 	rgwtbinr.x	<pkg/rg.h>
-	rgxrangesd.x	<ctype.h> <pkg/rg.h>
-	rgxrangesr.x	<ctype.h> <pkg/rg.h>
+	rgxrangesd.x	<ctype.h> <error.h> <pkg/rg.h>
+	rgxrangesr.x	<ctype.h> <error.h> <pkg/rg.h>
 	;

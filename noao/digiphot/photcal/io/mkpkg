@@ -6,10 +6,10 @@ $checkin	libpkg.a ".."
 $exit
 
 libpkg.a:
-	iocat.x		"../lib/io.h" <error.h>
+	iocat.x		"../lib/io.h" <error.h> <time.h>
 	iocoeffs.x	"../lib/parser.h"  "../lib/fitparams.h"\
 			"../lib/io.h"
-	iogetline.x	
+	iogetline.x	"../lib/io.h"
 	iolineid.x	<ctype.h>
 	ioobs.x	        "../lib/io.h"
 	iostrwrd.x

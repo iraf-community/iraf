@@ -15,7 +15,8 @@ generic:
 libpkg.a:
         $ifeq (USE_GENERIC, yes) $call generic $endif
 
-        ccfunc.x        <imhdr.h> <math.h> <mwset.h> "../../lib/skywcs.h"
+        ccfunc.x        <imhdr.h> <math.h> <mwset.h> "../../lib/skywcs.h" \
+			<math/gsurfit.h>
         ccxytran.x      <math.h> "../../lib/skywcs.h"
 	rgstr.x		<ctype.h>
         sfconvolve.x    <imset.h> <math.h> starfind.h

@@ -87,9 +87,7 @@ callopt(){
 			}
 		if( k <= j ){ /* nontrivial situation */
 			/* temporarily, kill this for compatibility
-			 * j is now the range
-			j -= k;
-			 */
+			j -= k;  /* j is now the range */
 			if( k > maxoff ) maxoff = k;
 			}
 		greed[i] = (yypact[i+1]-yypact[i]) + 2*j;

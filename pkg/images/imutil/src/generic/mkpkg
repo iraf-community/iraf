@@ -15,7 +15,7 @@ libpkg.a:
         imasub.x        <imhdr.h>
         imfuncs.x       <imhdr.h> <mach.h> <math.h>
 	imjoin.x	<imhdr.h>
-	imrep.x		<imhdr.h>
+	imrep.x		<imhdr.h> <mach.h>
         imsum.x         ../imsum.h <imhdr.h>
         ;
 

@@ -194,6 +194,15 @@ imt39|imtf1ka|KPNO Ford (Loral) 1200x800:cn#39:xr#1232:yr#800:\
 imt40|imtweather|GOES weather pictures:cn#40:xr#1200:yr#600:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1200,600:tc=iism70:
 
+imt41|imt8800|Full-frame Mosaic image w/ gaps:cn#41:xr#8800:yr#8800:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,8800,8800:tc=iism70:
+imt42|imt4400|Mosaic block averaged by 2:cn#42:xr#4400:yr#4400:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,4400,4400:tc=iism70:
+imt43|imt2200|Mosaic block averaged by 4:cn#43:xr#2200:yr#2200:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,2200,2200:tc=iism70:
+imt44|imt1100|Mosaic block averaged by 8:cn#44:xr#1100:yr#1100:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1100,1100:tc=iism70:
+
 iism70d|iism70c|iism70l|NOAO Draco hosted IIS model 70:\
 	:BS:DD=draco!iism70,iia0:tc=iism70:
 iism70a|NOAO Aquila hosted IIS model 70:\

@@ -10,9 +10,9 @@ clear\n\{%V-%!200\}
     dome is opening and we are ready to begin observing...\}
 \n\{%V-\}
 unlearn\sccdred;unlearn\sccdtest\n\{	# Initialize parameters and data...\}
-imdelete\s%B%%*.??h\sv-\n\{%V-\}
-imrename\sB*.??h\s%B%%*.??h\sv-\n\{%V-\}
-imdelete\sZero*.??h,Flat*.??h\n\{%V-\}
+imdelete\s%B%%*.*\sv-\n\{%V-\}
+imrename\sB*.*\s%B%%*.*\sv-\n\{%V-\}
+imdelete\sZero*.*,Flat*.*\n\{%V-\}
 delete\sDemo*\sv-\n\{%V-\}
 \n\{%V-\}
 setinstrument\sdemo\sreview-\n\{		# Set instrument parameters...\}
@@ -97,7 +97,7 @@ demo\r
 \r
 Zero\r
 \r
-Flat*.??h\r
+Flat*.*\r
 ^Z
 clear\n\{%5000				# Continue...\}
 \n\{%20000
@@ -118,7 +118,7 @@ clear\n\{%5000				# Continue...\}
 
 \n\{%V-\}
 imheader\sobs023\sl+\n\{			# List object image header...\}
-ccdlist\sobs*.??h\n\{%5000			# List short CCD status...\}
+ccdlist\sobs*.*\n\{%5000			# List short CCD status...\}
 ccdlist\sobs023\sl+\n\{%5000			# List long CCD status...\}
 clear\n\{%5000					# Continue...\}
 \n\{%20000
@@ -134,10 +134,10 @@ clear\n\{%5000					# Continue...\}
     selects the appropriate images to combine! ...\}
 \n\{%V-\}
 zerocombine\smode=m\n\{			# Combine zero level images...\}
-obs*.??h\r
+obs*.*\r
 \{%5000\}^Z
 flatcombine\smode=m\n\{			# Combine flat field images...\}
-obs*.??h\r
+obs*.*\r
 \{%5000\}^Z
 clear\n\{%5000			# Continue...\}
 \n\{%15000
@@ -158,7 +158,7 @@ clear\n\{%5000			# Continue...\}
     including finding the one dark count image "obs006".  Watch the log
     messages to see what the task is doing...\}
 \n\{%V-\}
-ccdproc\sobs*.??h\n\{			# Process object images...\}
+ccdproc\sobs*.*\n\{			# Process object images...\}
 \n\{%V-\}
 \{%V-\}q0,+,\r
 NO\n\{%V-\}
@@ -168,7 +168,7 @@ NO\n\{%V-\}
     and of pixel datatype real.  The CCDSEC parameter identifies the relation
     of the image to the actual CCD pixels of the detector...\}
 \n\{%V-\}
-ccdlist\sobs*.??h\sccdtype=object\n\{		# List short CCD status...\}
+ccdlist\sobs*.*\sccdtype=object\n\{		# List short CCD status...\}
 ccdlist\sobs023\sl+\n\{%5000			# List long CCD status...\}
 imhead\sobs023\sl+\n\{%5000			# List object image header...\}
 dir\n\{%5000				# Check the data directory...\}

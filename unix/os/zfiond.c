@@ -564,7 +564,7 @@ XLONG	*offset;		/* 1-indexed file offset to read at */
 	 * restore blocking i/o after the open.
 	 */
 	if (np->domain == FIFO && np->datain < MAXSEL) {
-#ifdef SOLARIS
+#ifdef POSIX
 	    fd_set readfds;
 	    FD_ZERO (&readfds);
 	    FD_SET (np->datain, &readfds);

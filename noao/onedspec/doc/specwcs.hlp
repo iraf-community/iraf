@@ -404,8 +404,8 @@ than or equal to s.
 
 .nf
     p = (l - LTV1) / LTM1_1
-    n = (p - pmiddle) / (2 * prange)
-      = (p - (pmax+pmin)/2) / (2*(pmax-pmin))
+    n = (p - pmiddle) / (prange / 2)
+      = (p - (pmax+pmin)/2) / ((pmax-pmin) / 2)
     s = (p - pmin) / (pmax - pmin) * npieces
     j = int(s)
 .fi

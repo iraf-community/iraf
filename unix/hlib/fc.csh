@@ -8,6 +8,8 @@
 # Determine platform architecture.
 if (-f /etc/redhat-release) then
     set MACH = redhat
+else if (-f /etc/SuSE-release) then
+    set MACH = suse
 else
     set MACH = `uname -s | tr '[A-Z]' '[a-z]'`
 endif
@@ -33,6 +35,10 @@ if (! $?IRAFARCH) then
 	setenv IRAFARCH "linux"
     else if ("$MACH" == "redhat") then
 	setenv IRAFARCH "redhat"
+    else if ("$MACH" == "suse") then
+	setenv IRAFARCH "suse"
+    else if ("$MACH" == "sunos") then
+	setenv IRAFARCH "sunos"
     else if ("$MACH" == "ssol") then
 	setenv IRAFARCH "ssun"
     else if ("$MACH" == "sparc") then

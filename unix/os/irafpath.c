@@ -70,6 +70,9 @@ char *fname;			/* simple filename, no dirs */
 	strcpy (pathname, (char *)hostdir);
 	strcat (pathname, "bin.");
 
+#ifdef SUSE
+	strcat (pathname, "suse");
+#else
 #ifdef REDHAT
 	strcat (pathname, "redhat");
 #else
@@ -80,7 +83,11 @@ char *fname;			/* simple filename, no dirs */
 	strcat (pathname, "freebsd");
 #else
 #ifdef SOLARIS
+#ifdef X86
+	strcat (pathname, "sunos");
+#else
 	strcat (pathname, "ssol");
+#endif
 #else
 #ifdef mc68010
 	strcat (pathname, "mc68010");
@@ -99,6 +106,7 @@ char *fname;			/* simple filename, no dirs */
 #else
 #ifdef vax
 	strcat (pathname, "vax");
+#endif
 #endif
 #endif
 #endif

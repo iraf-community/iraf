@@ -13,6 +13,7 @@ if (! defpac ("tables")) {
         type "photcal$lib/warning.dat"
     }
 }
+;
 
 
 # Load other packages

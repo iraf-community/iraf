@@ -48,8 +48,8 @@ libcurfit.a:
 	cv_fevalr.x	
 	cvfitr.x	curfitdef.h <math/curfit.h>
 	cvfreer.x	curfitdef.h
-	cvinitr.x	curfitdef.h <math/curfit.h>
-	cvpowerr.x	curfitdef.h <math/curfit.h>
+	cvinitr.x	curfitdef.h <math/curfit.h> <mach.h>
+	cvpowerr.x	curfitdef.h <math/curfit.h> <mach.h>
 	cvrefitr.x	curfitdef.h <math/curfit.h>
 	cvrejectr.x	curfitdef.h <math/curfit.h>
 	cvrestorer.x	curfitdef.h <math/curfit.h>
@@ -72,8 +72,8 @@ libcurfit.a:
 	cv_fevald.x	
 	cvfitd.x	dcurfitdef.h <math/curfit.h>
 	cvfreed.x	dcurfitdef.h
-	cvinitd.x	dcurfitdef.h <math/curfit.h>
-	cvpowerd.x	dcurfitdef.h <math/curfit.h>
+	cvinitd.x	dcurfitdef.h <math/curfit.h> <mach.h>
+	cvpowerd.x	dcurfitdef.h <math/curfit.h> <mach.h>
 	cvrefitd.x	dcurfitdef.h <math/curfit.h>
 	cvrejectd.x	dcurfitdef.h <math/curfit.h>
 	cvrestored.x	dcurfitdef.h <math/curfit.h>

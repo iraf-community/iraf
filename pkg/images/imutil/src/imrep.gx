@@ -14,9 +14,16 @@ real	img				# Imaginary value for complex
 
 pointer	buf1, buf2
 int	npix, junk
+$if (datatype == sil)
+real	ilower
+$endif
 PIXEL	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 int	imgnl$t(), impnl$t()
+	    
+$if (datatype == sil)
+bool	fp_equalr()
+$endif
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -51,7 +58,11 @@ begin
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
 	    $if (datatype == sil)
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    $else
 	    floor = double (lower)
 	    $endif
@@ -64,7 +75,11 @@ begin
 	# Replace pixels between lower and upper by value.
 	} else {
 	    $if (datatype == sil)
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = int (upper)
 	    $else
 	    floor = double (lower)
@@ -93,6 +108,9 @@ real	img				# Imaginary value for complex
 
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
+$if (datatype == sil)
+int	ilower
+$endif
 PIXEL	floor, ceil, newval, val1, val2
 $if (datatype == x)
 real	abs_floor, abs_ceil
@@ -100,6 +118,9 @@ $endif
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 int	imgnl$t(), impnl$t()
+$if (datatype == sil)
+bool	fp_equalr()
+$endif
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -141,7 +162,11 @@ begin
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
 	    $if (datatype == sil)
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = MAX_PIXEL
 	    $else $if (datatype == x)
 	    floor = real (lower)
@@ -156,7 +181,11 @@ begin
 	# Replace pixels between lower and upper by value.
 	} else {
 	    $if (datatype == sil)
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = int (upper)
 	    $else $if (datatype == x)
 	    floor = real (lower)

@@ -1,6 +1,22 @@
 .help revisions Dec94 noao.imred.src.doslit
 .nf
 doslit$sarcrefs.cl
+     The test for INDEF values on CRVAL/CDELT did not work correctly.
+     (9/24/99, Valdes)
+
+doslit$doslit.cl
+doslit$doslit.par
+doslit$sarcrefs.cl
+doslit$sarcrefs.par
+doslit$sproc.cl
+doslit$sproc.par
+     No change made though dates were modified.  (9/24/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+doslit$sarcrefs.cl
     The test on CRVAL and CDELT would not work with header keywords.
     (9/22/98, Valdes)
 

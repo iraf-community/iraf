@@ -58,8 +58,10 @@ begin
 	# specified wcs.
 	if (mw == NULL)
 	    call wl_wcs_params (mw, log_x1, log_x2, log_y1, log_y2)
-	else if (clgetb ("usewcs"))
+	else if (clgetb ("usewcs")) {
+	    call mw_close (mw)
 	    call wl_wcs_params (mw, junkx1, junkx2, junky1, junky2)
+	}
 	WL_MW(wd) = mw
 
 	# Determine axis types.
@@ -255,12 +257,11 @@ pointer mw              # I: the MWCS descriptor
 char    input[ARB]      # I: the string input
 int     axno            # I: the axis being worked on
 
-int     i, input_len
+int     i, input_len, axes[2]
 int     strncmp(), strldx(), strlen()
 string  empty ""
 
 begin
-
         input_len = strlen (input)
 
         # Fix some characters.
@@ -275,24 +276,28 @@ begin
 
         # Determine the type of function on this axis.
         if (strncmp (input, "linear", 6) == 0) {
-          call mw_swtype (mw, 1, 2, "linear", empty)
+          call mw_swtype (mw, axno, 1, "linear", empty)
 
         } else if (strncmp (input, "ra--", 4) == 0) {
+	  axes[1] = axno
+	  if (axno == 1)
+	    axes[2] = 2
+	  else
+	    axes[2] = 1
           i = strldx ("-", input) + 1
-          call mw_swtype (mw, 1, 2, input[i], empty)
-          call mw_swattrs (mw, axno, "axtype", "ra")
+          call mw_swtype (mw, axes, 2, input[i],
+	      "axis 1: axtype = ra axis 2: axtype=dec")
 
+	# This is dealt with in the ra case.
         } else if (strncmp (input, "dec-", 4) == 0) {
-          i = strldx ("-", input) + 1
-          call mw_swtype (mw, 1, 2, input[i], empty) 
-          call mw_swattrs (mw, axno, "axtype", "dec")
+	  ;
 
         } else {
           # Since we have to be able to read any FITS header, we have
           # no control over the value of CTYPEi.  If the value is
           # something we don't know about, assume a LINEAR axis, using
           # the given value of CTYPEi as the default axis label.
-          call mw_swtype (mw, 1, 2, "linear", empty)
+          call mw_swtype (mw, axno, 1, "linear", empty)
           call mw_swattrs (mw, axno, "label", input)
         }
         

@@ -8,7 +8,7 @@ include	"dctable.h"
 include	<smw.h>
 include	<units.h>
  
-# Spectra formats
+# Dispersion types.
 define	MULTISPEC	1
 define	ECHELLE		2
 
@@ -22,13 +22,14 @@ int	out			# List of output spectra
 bool	linearize		# Linearize spectra?
 bool	log			# Log scale?
 bool	flux			# Conserve flux?
+int	ignoreaps		# Ignore aperture numbers?
 int	fd1			# Log file descriptor
 int	fd2			# Log file descriptor
  
-int	i, format, naps, open(), nowhite()
-int	imtopenp(), imtgetim(), errcode()
+int	i, format, naps
+int	open(), nowhite(), imtopenp(), imtgetim(), errcode(), btoi()
 pointer	sp, input, output, str, err, stp, table
-pointer	im, smw, ap, immap(), smw_openim()
+pointer	im, im1, smw, smw1, ap, immap(), smw_openim()
 bool	clgetb()
 errchk	open, immap, smw_openim, dc_gms, dc_gec, dc_multispec, dc_echelle
  
@@ -48,6 +49,7 @@ begin
 	call clgstr ("database", Memc[str], SZ_FNAME)
 	call clgstr ("logfile", Memc[err], SZ_LINE)
 	linearize = clgetb ("linearize")
+	ignoreaps = btoi (clgetb ("ignoreaps"))
  
 	# Initialize the database cacheing and wavelength table.
 	call dc_open (stp, Memc[str])
@@ -81,61 +83,96 @@ begin
 		call strcpy (Memc[input], Memc[output], SZ_FNAME)
 		
 	    iferr {
-		im = NULL
-		smw = NULL
+		im = NULL; im1 = NULL
+		smw = NULL; smw1 = NULL
 		ap = NULL
 
 		i = immap (Memc[input], READ_ONLY, 0); im = i
 		i = smw_openim (im); smw = i
 
-		# This task requires EQUISPEC or MULTISPEC WCS.
-		if (SMW_FORMAT(smw) == SMW_ND) {
-		    if (SMW_NSPEC(smw) <= 100)
-			call smw_ndes (im, smw)
-		    else
-			call error (1, "Spectral format not allowed")
-		}
+		switch (SMW_FORMAT(smw)) {
+		case SMW_ND:
+		    # Use first line for reference.
+		    switch (SMW_LDIM(smw)) {
+		    case 1:
+			call strcpy (Memc[input], Memc[str], SZ_LINE)
+		    case 2:
+			switch (SMW_LAXIS(smw,1)) {
+			case 1:
+			    call sprintf (Memc[str], SZ_LINE, "%s[*,1]")
+				call pargstr (Memc[input])
+			case 2:
+			    call sprintf (Memc[str], SZ_LINE, "%s[1,*]")
+				call pargstr (Memc[input])
+			}
+		    case 3:
+			switch (SMW_LAXIS(smw,1)) {
+			case 1:
+			    call sprintf (Memc[str], SZ_LINE, "%s[*,1,1]")
+				call pargstr (Memc[input])
+			case 2:
+			    call sprintf (Memc[str], SZ_LINE, "%s[1,*,1]")
+				call pargstr (Memc[input])
+			case 3:
+			    call sprintf (Memc[str], SZ_LINE, "%s[*,1,1]")
+				call pargstr (Memc[input])
+			}
+		    }
+		    im1 = immap (Memc[str], READ_ONLY, 0)
+		    smw1 = smw_openim (im1)
+		    call smw_ndes (im1, smw1)
+		    if (SMW_PDIM(smw1) == 1)
+			call smw_esms (smw1)
 
-		# This task requires a 2D WCS.
-		if (SMW_PDIM(smw) == 1)
-		    call smw_esms (smw)
+		    call dc_gms (Memc[input], im1, smw1, stp, YES, ap, fd1, fd2)
+		    call dc_ndspec (im, smw, smw1, ap, Memc[input],
+			Memc[output], linearize, log, flux, table, naps,
+			fd1, fd2)
+		default:
+		    # Get dispersion functions.  Determine type of dispersion
+		    # by the error return.
 
-		# Get dispersion functions.  Determine type of dispersion
-		# by the error return.
-
-		format = MULTISPEC
-		iferr (call dc_gms (im, smw, stp, ap, fd1, fd2)) {
-		    if (errcode() > 1 && errcode() < 100)
-			call erract (EA_ERROR)
-		    format = ECHELLE
-		    iferr (call dc_gec (im, smw, stp, ap, fd1, fd2)) {
+		    format = MULTISPEC
+		    iferr (call dc_gms (Memc[input], im, smw, stp, ignoreaps,
+			ap, fd1, fd2)) {
 			if (errcode() > 1 && errcode() < 100)
 			    call erract (EA_ERROR)
-			call erract (EA_WARN)
-			iferr (call dc_gms (im, smw, stp, ap, fd1, fd2))
+			format = ECHELLE
+			iferr (call dc_gec (Memc[input], im, smw, stp, ap,
+			    fd1, fd2)) {
+			    if (errcode() > 1 && errcode() < 100)
+				call erract (EA_ERROR)
 			    call erract (EA_WARN)
-			call sprintf (Memc[err], SZ_LINE,
-			    "%s: Dispersion data not found")
-			    call pargstr (Memc[input])
-			call error (1, Memc[err])
+			    iferr (call dc_gms (Memc[input], im, smw, stp,
+				ignoreaps, ap, fd1, fd2))
+				call erract (EA_WARN)
+			    call sprintf (Memc[err], SZ_LINE,
+				"%s: Dispersion data not found")
+				call pargstr (Memc[input])
+			    call error (1, Memc[err])
+			}
 		    }
-		}
 
-		switch (format) {
-		case MULTISPEC:
-		    call dc_multispec (im, smw, ap, Memc[input],
-			Memc[output], linearize, log, flux, table, naps,
-			fd1, fd2)
-		case ECHELLE:
-		    call dc_echelle (im, smw, ap, Memc[input],
-			Memc[output], linearize, log, flux, table, naps,
-			fd1, fd2)
+		    switch (format) {
+		    case MULTISPEC:
+			call dc_multispec (im, smw, ap, Memc[input],
+			    Memc[output], linearize, log, flux, table, naps,
+			    fd1, fd2)
+		    case ECHELLE:
+			call dc_echelle (im, smw, ap, Memc[input],
+			    Memc[output], linearize, log, flux, table, naps,
+			    fd1, fd2)
+		    }
 		}
 	    } then
 		call erract (EA_WARN)
 
 	    if (ap != NULL)
 		call mfree (ap, TY_STRUCT)
+	    if (smw1 != NULL)
+		call smw_close (smw1)
+	    if (im1 != NULL)
+		call imunmap (im1)
 	    if (smw != NULL)
 		call smw_close (smw)
 	    if (im != NULL)
@@ -154,6 +191,139 @@ begin
 	    call close (fd1)
 	if (fd2 != NULL)
 	    call close (fd2)
+	call sfree (sp)
+end
+ 
+ 
+# DC_NDSPEC -- Dispersion correct N-dimensional spectrum.
+ 
+procedure dc_ndspec (in, smw, smw1, ap, input, output, linearize, log, flux,
+	table, naps, fd1, fd2)
+ 
+pointer	in			# Input IMIO pointer
+pointer	smw			# SMW pointer
+pointer	smw1			# SMW pointer
+pointer	ap			# Aperture pointer
+char	input[ARB]		# Input multispec spectrum
+char	output[ARB]		# Output root name
+bool	linearize		# Linearize?
+bool	log			# Log wavelength parameters?
+bool	flux			# Conserve flux?
+pointer	table			# Wavelength table
+int	naps			# Number of apertures
+int	fd1			# Log file descriptor
+int	fd2			# Log file descriptor
+
+int	i, j, nin, ndim, dispaxis, n1, n2, n3, axis[2]
+pointer	sp, temp, str, out, mwout, cti, cto, indata, outdata
+pointer	immap(), imgs3r(), imps3r(), mw_open(), smw_sctran()
+bool	clgetb(), streq()
+errchk	immap, mw_open, smw_open, dispcor, imgs3r, imps3r
+
+data	axis/1,2/
+ 
+begin
+	# Determine the wavelength parameters.
+	call dc_wavelengths (in, ap, output, log, table, naps, 1,
+	    DC_AP(ap,1), DC_W1(ap,1), DC_W2(ap,1), DC_DW(ap,1), DC_NW(ap,1))
+	DC_Z(ap,1) = 0.
+	if (log)
+	    DC_DT(ap,1) = 1
+	else
+	    DC_DT(ap,1) = 0
+	
+	call dc_log (fd1, output, ap, 1, log)
+	call dc_log (fd2, output, ap, 1, log)
+
+	if (clgetb ("listonly"))
+	    return
+
+	call smark (sp)
+	call salloc (temp, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+ 
+	# Open output image.  Use temp. image if output is the same as input.
+	if (streq (input, output)) {
+	    call mktemp ("temp", Memc[temp], SZ_LINE)
+	    out = immap (Memc[temp], NEW_COPY, in)
+	    if (IM_PIXTYPE(out) != TY_DOUBLE)
+		IM_PIXTYPE(out) = TY_REAL
+	} else {
+	    out = immap (output, NEW_COPY, in)
+	    if (IM_PIXTYPE(out) != TY_DOUBLE)
+		IM_PIXTYPE(out) = TY_REAL
+	}
+
+	# Set dimensions.
+	ndim = SMW_LDIM(smw)
+	dispaxis = SMW_LAXIS(smw,1)
+	n1 = DC_NW(ap,1)
+	n2 = SMW_LLEN(smw,2)
+	n3 = SMW_LLEN(smw,3)
+	nin = IM_LEN(in,dispaxis)
+	IM_LEN(out,dispaxis) = n1
+
+	# Set WCS header.
+	mwout = mw_open (NULL, ndim)
+	call mw_newsystem (mwout, "world", ndim)
+	do i = 1, ndim
+	    call mw_swtype (mwout, i, 1, "linear", "")
+	if (UN_LABEL(DC_UN(ap,1)) != EOS)
+	    call mw_swattrs (mwout, dispaxis, "label", UN_LABEL(DC_UN(ap,1)))
+	if (UN_UNITS(DC_UN(ap,1)) != EOS)
+	    call mw_swattrs (mwout, dispaxis, "units", UN_UNITS(DC_UN(ap,1)))
+	call smw_open (mwout, NULL, out)
+	call smw_swattrs (mwout, INDEFI, INDEFI, INDEFI, INDEFI, DC_DT(ap,1),
+	    DC_W1(ap,1), DC_DW(ap,1), DC_NW(ap,1), DC_Z(ap,1), INDEFR, INDEFR,
+	    NULL)
+
+	# Set WCS transformations.
+	cti = smw_sctran (smw1, "world", "logical", 3)
+	switch (dispaxis) {
+	case 1:
+	    cto = smw_sctran (mwout, "logical", "world", 1)
+	case 2:
+	    cto = smw_sctran (mwout, "logical", "world", 2)
+	case 3:
+	    cto = smw_sctran (mwout, "logical", "world", 4)
+	}
+
+	# Dispersion correct.
+	do j = 1, n3 {
+	    do i = 1, n2 {
+		switch (dispaxis) {
+		case 1:
+		    indata = imgs3r (in, 1, nin, i, i, j, j)
+		    outdata = imps3r (out, 1, n1, i, i, j, j)
+		case 2:
+		    indata = imgs3r (in, i, i, 1, nin, j, j)
+		    outdata = imps3r (out, i, i, 1, n1, j, j)
+		case 3:
+		    indata = imgs3r (in, i, i, j, j, 1, nin)
+		    outdata = imps3r (out, i, i, j, j, 1, n1)
+		}
+
+		call aclrr (Memr[outdata], n1)
+		call dispcor (cti, 1, cto, INDEFI, Memr[indata], nin,
+		    Memr[outdata], n1, flux)
+	    }
+	}
+
+	# Save REFSPEC keywords if present.
+	call dc_refspec (out)
+ 
+	# Finish up.  Replace input by output if needed.
+	call smw_ctfree (cti)
+	call smw_ctfree (cto)
+	call smw_saveim (mwout, out)
+	call smw_close (mwout)
+	call imunmap (out)
+	call imunmap (in)
+	if (streq (input, output)) {
+	    call imdelete (input)
+	    call imrename (Memc[temp], output)
+	}
+ 
 	call sfree (sp)
 end
  
@@ -296,7 +466,7 @@ begin
 		    indata = imgl3r (in, i, j)
 		    outdata = impl3r (out, i, j)
 		    call aclrr (Memr[outdata], IM_LEN(out,1))
-		    call dispcor (cti, cto, i, Memr[indata], nc,
+		    call dispcor (cti, i, cto, i, Memr[indata], nc,
 			Memr[outdata], DC_NW(ap,i), flux)
 		    if (DC_NW(ap,i) < IM_LEN(out,1))
 			call amovkr (Memr[outdata+DC_NW(ap,i)-1],
@@ -447,7 +617,7 @@ begin
 		    indata = imgl3r (in, i, j)
 		    outdata = impl3r (out, i, j)
 		    call aclrr (Memr[outdata], IM_LEN(out,1))
-		    call dispcor (cti, cto, i, Memr[indata], nc,
+		    call dispcor (cti, i, cto, i, Memr[indata], nc,
 			Memr[outdata], DC_NW(ap,i), flux)
 		    if (DC_NW(ap,i) < IM_LEN(out,1))
 			call amovkr (Memr[outdata+DC_NW(ap,i)-1],

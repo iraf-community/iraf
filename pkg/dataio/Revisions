@@ -1,8 +1,22 @@
 .help revisions Jun88 pkg.dataio
 .nf
+dataio$import.par
+dataio$export.par
+    Changed query param modes to auto to avoid prompt from epar :go 
+    command. (11/4/99 MJF)
+
+dataio$export/bltins/exeps.x
+    Fixed an array overrun when writing EPS trailer comments. (10/25/99 MJF)
+
+dataio$export/mkpkg
+dataio$export/*/mkpkg
+dataio$import/mkpkg
+dataio$import/*/mkpkg
+    Fixed missing/extra file dependencies  (9/20/99, MJF)
+
 dataio$export/exrgb8.x
-   Fixed a bug causing the cmap() function to write a garbage line at the
-   top or bottom of the output image. (8/20/99 MJF)
+    Fixed a bug causing the cmap() function to write a garbage line at the
+    top or bottom of the output image. (8/20/99 MJF)
 
 dataio$export/exzscale.x
 dataio$import/t_import.x

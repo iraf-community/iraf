@@ -29,7 +29,7 @@ libpkg.a:
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 
 	curfit.x	curfit.h <fset.h> <imhdr.h> <pkg/gtools.h>\
-			<math/curfit.h>
+			<math/curfit.h> <ttyset.h>
 	decod_tablst.x	<ctype.h>
 	lcase.x	
 	pfregres.f

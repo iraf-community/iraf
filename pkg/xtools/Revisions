@@ -1,5 +1,14 @@
 .help revisions Jun88 pkg.xtools
 .nf
+xtools$ranges/mkpkg
+xtools$icfit/mkpkg
+xtools$fixpix/mkpkg
+xtools$mkpkg
+    Added missing dependencies.  (10/11/99, Valdes)
+
+xtools$inlfit/mkpkg
+    Removed an uncessary file dependency from the mkpkg file. (20/9/99, Davis)
+
 =======
 V2.11.2
 =======

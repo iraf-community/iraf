@@ -1,5 +1,10 @@
 .help revisions Jun89 math.curfit
 .nf
+From Davis, September 20, 1999
+
+Added some missing file dependices to the mkpkg file.
+pkg/math/curfit/mkpkg
+
 From Davis, March 20, 1997
 
 The weights computed by the WTS_CHISQ option in the routines cvacpts[rd]

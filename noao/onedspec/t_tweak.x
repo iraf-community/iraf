@@ -11,23 +11,24 @@ include	<pkg/xtanswer.h>
 
 # Tweak data object definitions.
 define	TWK_SLEN	999		# Length of sample region string
-define	TWK_LEN		574		# Length of data object
+define	TWK_LEN		580		# Length of data object
 
 define	TWK_TYPE	Memc[P2C($1)]	# Tweak type (maxchars=19)
 define	TWK_SH		Memi[$1+11]	# Spectrum pointer
 define	TWK_CAL		Memi[$1+12]	# Calibration pointer
-define	TWK_SPEC	Memi[$1+13]	# Pointer to calibrated spectrum
-define	TWK_SHIFT	Memr[$1+14]	# Shift
-define	TWK_DSHIFT	Memr[$1+15]	# Shift step
-define	TWK_SCALE	Memr[$1+16]	# Scaling factor
-define	TWK_DSCALE	Memr[$1+17]	# Scaling factor step
-define	TWK_RG		Memi[$1+18]	# Range pointer
-define	TWK_RMS		Memr[$1+19]	# RMS in sample regions
-define	TWK_OFFSET	Memr[$1+20]	# Offset in graphs
-define	TWK_BOX		Memi[$1+21]	# Boxcar smoothing size
-define	TWK_THRESH	Memr[$1+22]	# Calibration threshold
-define	TWK_SAMPLE	Memc[P2C($1+23)]# Sample regions (maxchars=999)
-define	TWK_HELP	Memc[P2C($1+523)]# Help file (maxchars=99)
+define	TWK_WAVE	Memi[$1+13]	# Pointer to wavelengths
+define	TWK_SPEC	Memi[$1+14]	# Pointer to calibrated spectrum
+define	TWK_SHIFT	Memr[$1+15]	# Shift
+define	TWK_DSHIFT	Memr[$1+16]	# Shift step
+define	TWK_SCALE	Memr[$1+17]	# Scaling factor
+define	TWK_DSCALE	Memr[$1+18]	# Scaling factor step
+define	TWK_RG		Memi[$1+19]	# Range pointer
+define	TWK_RMS		Memr[$1+20]	# RMS in sample regions
+define	TWK_OFFSET	Memr[$1+21]	# Offset in graphs
+define	TWK_BOX		Memi[$1+22]	# Boxcar smoothing size
+define	TWK_THRESH	Memr[$1+23]	# Calibration threshold
+define	TWK_SAMPLE	Memc[P2C($1+30)]# Sample regions (maxchars=999)
+define	TWK_HELP	Memc[P2C($1+530)]# Help file (maxchars=99)
 
 # Tweak types.
 define	SKYTWEAK	1		# Sky subtraction
@@ -98,7 +99,7 @@ pointer	in, smw, sh, out, pcal, cal, x, y, data, tmp
 int	clgeti(), imtgetim(), imtlen()
 bool	clgetb(), streq()
 real	clgetr(), asieval()
-double	shdr_wl()
+double	shdr_wl(), shdr_lw()
 pointer	imtopenp(), immap(), smw_openim(), impl3r(), imgl3r()
 errchk	immap, smw_openim, shdr_open, twk_gcal, twk_tweak, impl3r, imgl3r
 
@@ -108,6 +109,7 @@ begin
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (calname, SZ_FNAME, TY_CHAR)
 	call salloc (temp, SZ_LINE, TY_CHAR)
+	call malloc (TWK_WAVE(twk), 1000, TY_DOUBLE)
 	call malloc (TWK_SPEC(twk), 1000, TY_REAL)
 
 	# Get task parameters.
@@ -199,6 +201,12 @@ begin
 
 		    # Get the spectra.
 		    call shdr_open (in, smw, i, 1, INDEFI, SHDATA, sh)
+		    call realloc (TWK_WAVE(twk), SN(sh), TY_DOUBLE)
+		    x = TWK_WAVE(twk)
+		    do k = 1, SN(sh) {
+			Memd[x] = shdr_lw (sh, double(k))
+			x = x + 1
+		    }
 		    if (ignoreaps)
 			call twk_gcal (twk, Memc[calname], INDEFI,
 			    pcal, ncal, cal)
@@ -232,12 +240,12 @@ begin
 		    # Calibrate the output spectrum.
 		    nout = 0
 		    mean = 0.
-		    x = SX(sh)
+		    x = TWK_WAVE(twk)
 		    y = SY(sh)
 		    n = SN(sh)
 		    data = impl3r (out, i, 1)
 		    do k = 1, n {
-			ical = shdr_wl (cal, double(Memr[x])) + shift
+			ical = shdr_wl (cal, Memd[x]) + shift
 			if (ical < 1. || ical > SN(cal)) {
 			    if (ical < 0.5 || ical > SN(cal) + 0.5)
 				nout = nout + 1
@@ -420,7 +428,7 @@ int	lag		#I Cross correlation lag
 int	i, n, nlag
 real	ical, asieval()
 double	shdr_wl()
-pointer	sh, cal, rg, asi, x, y, rg_xrangesr()
+pointer	sh, cal, rg, asi, x, y, rg_xrangesd()
 errchk	twk_rmsmin, twk_fit
 
 begin
@@ -428,7 +436,7 @@ begin
 	cal = TWK_CAL(twk)
 
 	# Set ranges.
-	rg = rg_xrangesr (TWK_SAMPLE(twk), Memr[SX(sh)], SN(sh))
+	rg = rg_xrangesd (TWK_SAMPLE(twk), Memd[TWK_WAVE(twk)], SN(sh))
 	call rg_order (rg)
 	call rg_merge (rg)
 	TWK_RG(twk) = rg
@@ -442,7 +450,7 @@ begin
 
 	    do i = 0, n-1 {
 		ical = max (1D0, min (double(SN(cal)),
-		    shdr_wl (cal, double (Memr[SX(sh)+i]))))
+		    shdr_wl (cal, Memd[TWK_WAVE(twk)+i])))
 		Memr[y+i] = asieval (IM(cal), ical)
 	    }
 
@@ -789,7 +797,7 @@ begin
 	sh = TWK_SH(twk)
 	cal = TWK_CAL(twk)
 	asi = IM(cal)
-	x = SX(sh)
+	x = TWK_WAVE(twk)
 	y = SY(sh)
 	ycal = SY(cal)
 	z = TWK_SPEC(twk)
@@ -806,7 +814,7 @@ begin
 	nstat = 0
 	do i = 0, n-1 {
 	    # Spectra
-	    xcal = shdr_wl (cal, double(Memr[x+i])) + shift
+	    xcal = shdr_wl (cal, Memd[x+i]) + shift
 	    xcal1 = max (1., min (real(ncal), xcal))
 	    #Memr[ycal+i] = asieval (asi, xcal1) ** (amratio * scale)
 	    #Memr[z+i] = Memr[y+i] / (Memr[ycal+i]
@@ -833,11 +841,13 @@ begin
 	}
 
 	# Normalize
-	norm = norm / n
-	if (norm > 0.) {
-	    call adivkr (Memr[z], norm, Memr[z], n)
-	    sum1 = sum1 / norm
-	    sum2 = sum2 / norm / norm
+	if (TWK_TYPE(twk) == 'T') {
+	    norm = norm / n
+	    if (norm > 0.) {
+		call adivkr (Memr[z], norm, Memr[z], n)
+		sum1 = sum1 / norm
+		sum2 = sum2 / norm / norm
+	    }
 	}
 
 	# RMS
@@ -881,7 +891,7 @@ int	graph1, graph2
 real	wx, wy, shift[3], scale[3], dy, gt_getr()
 double	shdr_wl()
 pointer	sp, str, cmd, z[3]
-pointer	sh, gp, gt[2], gopen(), gt_init(), rg_xrangesr()
+pointer	sh, gp, gt[2], gopen(), gt_init(), rg_xrangesd()
 errchk	twk_spec, twk_rmsmin
 
 begin
@@ -983,8 +993,8 @@ begin
 		    call sprintf (TWK_SAMPLE(twk), TWK_SLEN, "%g:%g")
 			call pargr (dy)
 			call pargr (wx)
-		    TWK_RG(twk) = rg_xrangesr (TWK_SAMPLE(twk), Memr[SX(sh)],
-			SN(sh))
+		    TWK_RG(twk) = rg_xrangesd (TWK_SAMPLE(twk),
+			Memd[TWK_WAVE(twk)], SN(sh))
 		    newdata = YES
 		case 's':
 		    call rg_free (TWK_RG(twk))
@@ -998,8 +1008,8 @@ begin
 			    call pargr (wx)
 			call strcat (Memc[cmd], TWK_SAMPLE(twk), TWK_SLEN)
 		    }
-		    TWK_RG(twk) = rg_xrangesr (TWK_SAMPLE(twk), Memr[SX(sh)],
-			SN(sh))
+		    TWK_RG(twk) = rg_xrangesd (TWK_SAMPLE(twk),
+			Memd[TWK_WAVE(twk)], SN(sh))
 		    newdata = YES
 		}
 	    case 'w':
@@ -1214,7 +1224,7 @@ int	newgraph		#O New graph flag
 
 int	ncmd, ival, gt_geti(), strdic(), nscan()
 real	rval, gt_getr()
-pointer	sp, cmd, rg, rg_xrangesr()
+pointer	sp, cmd, rg, rg_xrangesd()
 
 begin
 	# Check for GTOOLS command.
@@ -1313,7 +1323,7 @@ begin
 		call printf ("sample %s\n")
 		    call pargstr (TWK_SAMPLE(twk))
 	    } else {
-		ifnoerr (rg = rg_xrangesr (Memc[cmd+1], Memr[SX(TWK_SH(twk))],
+		ifnoerr (rg = rg_xrangesd (Memc[cmd+1], Memd[TWK_WAVE(twk)],
 		    SN(TWK_SH(twk)))) {
 		    call rg_free (TWK_RG(twk))
 		    call strcpy (Memc[cmd+1], TWK_SAMPLE(twk), TWK_SLEN)

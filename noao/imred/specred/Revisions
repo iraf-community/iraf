@@ -1,5 +1,14 @@
 .help revisions Jun88 noao.imred.msred
 .nf
+imred$specred/doc/msresp1d.hlp
+    The package was incorrect and the requirement that the unextracted
+    spectrum must be present even if the extracted spectrum is present
+    was made clearer.  (9/20/99, Valdes)
+
+=======
+V2.11.2
+=======
+
 imred$specred/doc/dofibers.hlp
 imred$specred/doc/doslit.hlp
 imred$specred/doc/dofibers.ms

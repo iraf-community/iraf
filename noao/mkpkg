@@ -228,6 +228,12 @@ redhat:					# install Redhat Linux binaries
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh redhat -d $(DIRS)
 	;
+suse:					# install SUSE Linux binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh suse -d $(DIRS)
+	;
 linuz:					# install LINUZ binaries
 	$verbose off
 	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\

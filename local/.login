@@ -6,27 +6,23 @@
 # see also csh(1), environ(7).
 #
 
-# A rightous umask
-umask 22
-
+source ~iraf/.cshrc
 set notify
+
 #set autologout = 1440
-set prompt = "$user@`cat /proc/sys/kernel/hostname`% "
 
 if ($TERM != "linux" && $TERM != "cons25") then
     stty erase '^?'
 endif
-[ -x /usr/games/fortune ] && /usr/games/fortune
 
-setenv BLOCKSIZE K
 setenv EDITOR vi
+setenv BLOCKSIZE K
+setenv PAGER "less -C -e -M"
 setenv IPAGER "less -C -M +G"
 setenv MANPATH "/usr/man:/usr/X11R6/man:/usr/local/man"
-setenv MINICOM "-c on"
 setenv MOZILLA_HOME /usr/local/bin/netscape
 setenv NNTPSERVER noao.edu
-setenv PAGER "less -C -e -M"
-setenv TAPE /dev/nst0
+setenv TAPE /dev/nrsa0
 setenv SHELL /bin/csh
 
 # Uncomment for IRAF admin/prog definitions.

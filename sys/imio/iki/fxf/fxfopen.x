@@ -282,7 +282,10 @@ begin
 
 	    iferr (call fxf_rheader (im, group, acmode)) {
 		call close (IM_HFD(im))
-		goto err_
+		call mfree (fit, TY_STRUCT)
+		call sfree (sp)
+		status = ERR
+		call erract (EA_ERROR)
 	    }
 
 	    if (group == 0) 

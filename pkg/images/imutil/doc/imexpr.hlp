@@ -405,21 +405,21 @@ do this of course).
 4. Create a new image containing a simple test pattern consisting of a 5
 element vector repeated 100 times across each image line.
 
-    cl> imexpr "repl((9 // 3 // 3 // 11 // 11), 100)" dim=500,500
+    cl> imexpr "repl((9 // 3 // 3 // 11 // 11), 100)" patt dim=500,500
 
 5. Subtract the median value from each line of an image.
 
-    cl> imexpr "a - median(a)"
+    cl> imexpr "a - median(a)" medimage
 
-6. Compute the LOV (low value) projection of an image.  The result is a
+6. Compute the HIV (low value) projection of an image.  The result is a
 transposed 1D image.
 
-    cl> imexpr "hiv(a)"
+    cl> imexpr "hiv(a)" hvector
 
 7. Swap the left and right halves of an image.
 
 .nf
-    cl> imexpr "a // b" pix
+    cl> imexpr "a // b" pix swapimage
     operand a: dev$pix[256:512,*]
     operand b: dev$pix[1:255,*]
 .fi
@@ -429,7 +429,7 @@ transposed 1D image.
 .nf
     cl> type expr
     (sqrt((I-b)**2 + (J-c)**2) <= d)
-    cl> imexpr @expr mask.pl a=pix b=256 c=256 d=100
+    cl> imexpr @expr mask.pl b=256 c=256 d=100 dims=512,512
 .fi
 
 .ih

@@ -35,7 +35,7 @@ libgkt.a:
 	gktflush.x	gkt.com gkt.h
 	gktfont.x	gkt.com gkt.h <gki.h> <gset.h>
 	gktgcell.x	
-	gktinit.x	gkt.com gkt.h <ctype.h> <gki.h> <mach.h>
+	gktinit.x	gkt.com gkt.h nspp.com <ctype.h> <gki.h> <mach.h>
 	gktline.x	gkt.com gkt.h <gset.h>
 	gktmfopen.x	gkt.h <fset.h> <knet.h> <mach.h>
 	gktopen.x	gkt.com gkt.h <gki.h>

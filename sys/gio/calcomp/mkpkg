@@ -29,7 +29,7 @@ libccp.a:
 	ccpcolor.x	ccp.com ccp.h
 	ccpcseg.x	ccp.com ccp.h <gki.h> <gset.h> <mach.h>
 	ccpdrawch.x	ccp.com ccp.h font.com font.h <gki.h> <gset.h>\
-			<math.h> ccp.com
+			<math.h>
 	ccpdseg.x	ccp.com ccp.h <math.h>
 	ccpescape.x	ccp.com ccp.h <gescape.h>
 	ccpfa.x		ccp.com ccp.h

@@ -14,13 +14,13 @@ libpkg.a:
 			<time.h>
 	helpdir.x	help.h helpdir.h <ctype.h> <error.h>
 	hinput.x	help.h <ctype.h>
-	houtput.x	help.h <ttyset.h> <chars.h>
+	houtput.x	help.h <ttyset.h> <chars.h> <fset.h>
 	manout.x	help.h <chars.h> <ctype.h>
 	modlist.x	help.h helpdir.h <ctype.h> <error.h>
 	modtemp.x	help.h <ctype.h>
 	prblkhdr.x	help.h
 	prdir.x		help.h <error.h> <ttyset.h>
-	prfile.x	help.h <finfo.h> <time.h>
+	prfile.x	help.h <finfo.h> <time.h> <ctype.h>
 	prfnames.x	help.h helpdir.h
 	prhelp.x	help.h helpdir.h <error.h>
 	prhlpblk.x	help.h <error.h>
@@ -30,5 +30,5 @@ libpkg.a:
 	t_help.x	help.h <error.h> <fset.h> <finfo.h>
 	t_lroff.x	
 	t_mkhelpdb.x	<error.h>
-	tlist.x		help.h <ctype.h> <error.h>
+	tlist.x		help.h <ctype.h>
 	;

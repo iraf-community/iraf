@@ -45,7 +45,7 @@ libpkg.a:
 
 	@generic
 
-        gettok.x        <error.h> <ctype.h> <fset.h> gettok.h
+        gettok.x        <error.h> <ctype.h> <fset.h> gettok.h <syserr.h>
         hedit.x         <error.h> <evexpr.h> <imset.h> <ctype.h> <lexnum.h>
         imdelete.x      <imhdr.h> <error.h>
 	imexpr.x        <ctotok.h> <imhdr.h> <ctype.h> <mach.h> <imset.h>\

@@ -1,6 +1,6 @@
 arcref1,f,a,"",,,
-crval,s,a,INDEF,,,
-cdelt,s,a,INDEF,,,
+crval,s,a,"INDEF",,,
+cdelt,s,a,"INDEF",,,
 done,f,a,"",,,
 log1,f,a,"",,,
 log2,f,a,"",,,

@@ -14,7 +14,7 @@ libpkg.a:
 	epdosurface.x	epix.h
 	epgcur.x	epix.h
 	epgdata.x	epix.h <imhdr.h>
-	epgsfit.x	<math/gsurfit.h>
+	epgsfit.x	epix.h <math/gsurfit.h>
 	epimcopy.x	<imhdr.h>
 	epinput.x	epix.h
 	epline.x	epix.h

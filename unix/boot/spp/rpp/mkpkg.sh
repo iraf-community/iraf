@@ -8,6 +8,6 @@ echo "----------------------- RATLIBC ------------------------"
 (cd ratlibc;	sh -x mkpkg.sh)
 
 $CC -c $HSI_CF	rpp.c
-$CC $HSI_LF	rpp.o librpp.a libf.a libratc.a $HSI_F77LIBS -o rpp.e
+$CC $HSI_LF	rpp.o librpp.a libf.a libc.a $HSI_F77LIBS -o rpp.e
 mv -f		rpp.e ../../../hlib
 rm		*.[ao]

@@ -19,7 +19,7 @@ libex.a:
 	fxfmkcard.x	
 	fxfnull.x	fxf.h
 	fxfopen.x	fxf.h fxfcache.com <error.h> <imhdr.h> <imio.h>\
-			fxfcache.com <fset.h> <mii.h>
+			<fset.h> <mii.h>
 	fxfopix.x	fxf.h <fset.h> <imhdr.h> <imio.h> <error.h> <mach.h>
 	fxfpak.x	fxf.h <mach.h>
 	fxfrcard.x	fxf.h <mii.h>

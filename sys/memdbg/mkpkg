@@ -12,16 +12,16 @@ libmemdbg.a:
 	begmem.x	<mach.h>
 	calloc.x	
 	coerce.x	<szdtype.inc>
-	kmalloc.x	<config.h>
-	krealloc.x	<config.h> <mach.h>
-	malloc.x	<config.h>
-	malloc1.x	<mach.h>
+	kmalloc.x	memdbg.com <config.h>
+	krealloc.x	memdbg.com <config.h> <mach.h>
+	malloc.x	memdbg.com <config.h>
+	malloc1.x	memdbg.com <mach.h>
 	mfree.x	
 	mgdptr.x	
 	mgtfwa.x	<config.h> <mach.h>
 	msvfwa.x	
 	realloc.x	
-	salloc.x	<config.h> <szdtype.inc>
+	salloc.x	memdbg.com <config.h> <szdtype.inc>
 	sizeof.x	<szdtype.inc>
-	vmalloc.x	<config.h> <mach.h>
+	vmalloc.x	memdbg.com <config.h> <mach.h>
 	;

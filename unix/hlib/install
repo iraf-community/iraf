@@ -40,6 +40,8 @@ alias PUT	"mv -f \!*; chown $user \!$ "
 # Determine platform architecture.
 if (-f /etc/redhat-release) then
     set mach = redhat
+else if (-f /etc/SuSE-release) then
+    set mach = suse
 else
     set mach = `uname -s | tr '[A-Z]' '[a-z]'`
 endif
@@ -510,7 +512,8 @@ endif
 # SUN/IRAF specific stuff.
 # ------------------------------
 
-if ($mach == linux || $mach == redhat || $mach == freebsd) then
+if ($mach == linux || $mach == redhat || || $mach == suse || \
+	$mach == freebsd || $mach == sunos) then
     set pciraf = yes
 else
     set pciraf = no
@@ -801,10 +804,12 @@ foreach i (/dev/imt1i /dev/imt1o)
     else
 	echo "make device entry $i for imtool"
 	if ($exec == yes) then
-	    if ($mach == linux || $mach == redhat) then
+	    if ($mach == linux || $mach == redhat || $mach == suse) then
 		mknod $i p
 	    else if ($mach == freebsd) then
 		mkfifo $i
+	    else
+		mknod $i p
 	    endif
 	    chmod 777 $i
 	endif

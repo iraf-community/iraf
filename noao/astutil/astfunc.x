@@ -132,8 +132,6 @@ begin
 	case F_EPOCH, F_JULDAY, F_MST:
 	    if (dtm_decode (O_VALC(args[1]), yr, mo, day, time, flags) == ERR)
 		call xvv_error ("unrecognized date format")
-	    if (and (flags, TF_OLDFITS) != 0)
-		yr = yr + 1900
 	    switch (opcode) {
 	    case F_EPOCH, F_JULDAY:
 		if (nargs > 1)

@@ -21,6 +21,8 @@
 # This file contains the SUN/UNIX 386i (80386) version of ZSVJMP.
  
         .globl	zsvjmp_
+        .globl	sfpucw_
+        .globl	gfpucw_
 
 	# The following has nothing to do with ZSVJMP, and is included here
 	# only because this assembler module is loaded with every process.
@@ -43,3 +45,28 @@ zsvjmp_:
 	addl	$4, %ecx		# change stack to point to &jmpbuf[1]
 	movl	%ecx, 4(%esp)		# 	...
 	jmp	__setjmp		# let setjmp do the rest
+
+gfpucw_:				# Get fpucw:  gfpucw_ (&cur_fpucw)
+	pushl	%ebp
+	movl	%esp,%ebp
+	subl    $0x4,%esp
+	movl    0x8(%ebp), %eax
+	fnstcw  0xfffffffe(%ebp)
+	movw    0xfffffffe(%ebp), %dx
+	movl	%edx,(%eax)
+	movl	%ebp, %esp
+	popl	%ebp
+	ret
+
+sfpucw_:				# Set fpucw:  sfpucw_ (&new_fpucw)
+	pushl   %ebp
+	movl    %esp,%ebp
+	subl    $0x4,%esp
+	movl    0x8(%ebp), %eax
+	movl	(%eax), %eax
+	andl    $0xf3f, %eax
+	fclex
+	movw    %ax, 0xfffffffe(%ebp)
+	fldcw   0xfffffffe(%ebp)
+	leave  
+	ret    

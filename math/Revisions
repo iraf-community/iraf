@@ -1,5 +1,27 @@
 .help revisions Jun88 math
 .nf
+gsurfit/gsder.gx
+gsurfit/gsderr.x
+gsurfit/gsderd.x
+gsurfit/gs_fder.gx
+gsurfit/gs_fderr.x
+gsurfit/gs_fderd.x
+gsurfit/gs_deval.gx
+gsurfit/gs_devalr.x
+gsurfit/gs_devald.x
+	Rewrote the routines which compute the derivatives of the polynomial
+	surfaces. There were some renormalization problems in this code
+	for non-linear chebyshev and legendre polynomial surfaces.  The new
+	code uses recursion relations for computation the derivatives which
+	could cause small errors if they are used to do flux conservation.
+	(27/10/99 LED)
+
+curfit/mkpkg
+deboor/mkpkg
+iminterp/mkpkg
+	Added some missing file dependencies to the above mkpkg files.
+	(20/9/99 LED)
+
 slalib
 	Upgraded slalib from Version 1.6.3 to Version 2.3.0. Seventeen
 	new routines were added including 4 dealing with FK5 to ICRS

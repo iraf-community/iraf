@@ -1,5 +1,16 @@
 .help revisions Jun88 noao.twodspec.apextract
 .nf
+doc/apflatten.hlp
+    Removed extraneous parameters not actually in task parameter set.
+    (10/21/99, Valdes)
+
+mkpkg
+    Added missing dependencies.  (10/11/99, Valdes)
+
+=======
+V2.11.2
+=======
+
 apextract.x
     Added a keyword SUBAP when using echelle output with subapertures.
     (3/26/99, Valdes)

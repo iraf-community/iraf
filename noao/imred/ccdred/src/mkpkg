@@ -64,7 +64,7 @@ libpkg.a:
 	ccdsubsets.x	<ctype.h>
 	ccdtypes.x	ccdtypes.h
 	doproc.x	ccdred.h
-	hdrmap.x	hdrmap.com <error.h>
+	hdrmap.x	hdrmap.com <error.h> <syserr.h>
 	icimstack.x	<error.h> <imhdr.h>
 	iclog.x		icmask.h icombine.com icombine.h <imhdr.h> <imset.h>\
 			<mach.h>
@@ -87,7 +87,7 @@ libpkg.a:
 	setoverscan.x	ccdred.h <imhdr.h> <imset.h> <pkg/xtanswer.h>\
 			<pkg/gtools.h>
 	setproc.x	ccdred.h <imhdr.h>
-	setsections.x	ccdred.h <imhdr.h>
+	setsections.x	ccdred.h <imhdr.h> <mwset.h>
 	settrim.x	ccdred.h <imhdr.h> <imset.h>
 	setzero.x	ccdred.h ccdtypes.h <imhdr.h>
 	t_badpixim.x	<imhdr.h>
@@ -98,7 +98,7 @@ libpkg.a:
 	t_ccdmask.x	<imhdr.h>
 	t_ccdproc.x	ccdred.h ccdtypes.h <error.h> <imhdr.h>
 	t_combine.x	ccdred.h icombine.com icombine.h <error.h> <imhdr.h>\
-			<mach.h>
+			<mach.h> <syserr.h>
 	t_mkfringe.x	ccdred.h <imhdr.h>
 	t_mkillumcor.x	ccdred.h
 	t_mkillumft.x	ccdred.h <imhdr.h>

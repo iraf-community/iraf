@@ -10,7 +10,7 @@ define	STF_MAXDIM	7		# max NAXIS
 define	MAX_CACHE	5		# max cached header files
 define	DEF_CACHE	3		# default size of header file cache
 define	ENV_STFCACHE	"stfcache"	# environment variable for cache size
-define	MAX_PCOUNT	50		# max param descriptors
+define	MAX_PCOUNT	99		# max param descriptors
 define	SZ_DATATYPE	16		# e.g., `REAL*4'
 define	SZ_KEYWORD	8		# size of a FITS keyword
 define	SZ_PTYPE	8		# e.g., `CRPIX1'

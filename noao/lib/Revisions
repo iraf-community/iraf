@@ -1,6 +1,9 @@
 .help revisions May93 noao.lib
 .nf
 noaolib$obsdb.dat
+    Added Whitin Obs upon request.  (10/14/99, Valdes)
+
+noaolib$obsdb.dat
     Added DDSAZ and HOLI observatories upon request.  (8/5/99, Valdes)
 
 noaolib$obsdb.dat

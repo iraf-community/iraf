@@ -13,6 +13,10 @@
 #define import_spp
 #include <iraf.h>
 
+#ifdef LINUX
+#define	USE_SIGACTION
+#endif
+
 static	int lastsig;
 extern	int pr_onint();
 
@@ -34,12 +38,16 @@ PKCHAR	*oscmd;
 PKCHAR	*stdin_file, *stdout_file, *stderr_file;
 XINT	*status;
 {
-	SIGFUNC	old_sigint;
 	char	*shell, *sh = "/bin/sh";
 	char	*sin, *sout, *serr, *cmd;
 	struct	rlimit rlim;
 	int	maxfd, fd, pid;
 	char	*getenv();
+#ifdef USE_SIGACTION
+	struct sigaction oldact;
+#else
+	SIGFUNC	old_sigint;
+#endif
 
 	cmd  = (char *)oscmd;
 	sin  = (char *)stdin_file;
@@ -56,7 +64,11 @@ XINT	*status;
 	} else if ((shell = getenv ("SHELL")) == NULL)
 	    shell = sh;
 
+#ifdef USE_SIGACTION
+	sigaction (SIGINT, NULL, &oldact);
+#else
 	old_sigint = (SIGFUNC) signal (SIGINT, SIG_IGN);
+#endif
 
 	/* Vfork is faster if we can use it.
 	 */
@@ -125,7 +137,13 @@ XINT	*status;
 
 	    /* Spawn a shell to execute the command.
 	     */
+
+	    /* Setting old_sigint here doesn't make sense if we will be
+	     * execl-ing a different process.  Use SIG_DFL instead.
 	    signal (SIGINT, old_sigint);
+	     */
+	    signal (SIGINT, SIG_DFL);
+
 	    execl (shell, shell, "-c", cmd, 0);
 
 	    /* NOTREACHED (unless execl fails) */
@@ -162,7 +180,11 @@ XINT	*status;
 	if (lastsig == SIGINT)
 	    *status = SYS_XINT;
 
+#ifdef USE_SIGACTION
+	sigaction (SIGINT, &oldact, NULL);
+#else
 	signal (SIGINT, old_sigint);
+#endif
 }
 
 

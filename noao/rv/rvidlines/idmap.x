@@ -175,6 +175,8 @@ begin
 		case 4:
 		    call error (1, "Image dimension greater than 3 not allowed")
 		}
+
+		call sfree (sp)
 	    }
 	}
 
@@ -224,8 +226,6 @@ begin
 	else
 	    im = immap (Memc[ID_IMAGE(id)], READ_ONLY, 0)
 	IM(ID_SH(id)) = im
-
-	call sfree (sp)
 end
 
 

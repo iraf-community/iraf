@@ -118,7 +118,7 @@ to be treated as good (goodbits) or bad (badbits).  The pixel mask
 file name comes from the image header keyword BPM.  Note that when
 combining images by projection of the highest dimension only one
 pixel mask is applied to all the images.  \fBNote\fR, if the number of
-input images becomes too large (currently about 115 .imh or 57 .hhh
+input images becomes too large (currently about 250 .imh or 125 .hhh
 images) then the images are temporarly stacked and combined by projection
 which also means the bad pixel mask from the first image will be used
 for all images.
@@ -646,7 +646,7 @@ the same dimension as the image being projected but this is not
 currently how the task works.
 
 When the number of input images exceeds the maximum number of open files
-allowed by IRAF (currently about 115 or 57 .hhh images) the input images
+allowed by IRAF (currently about 250 or 125 .hhh images) the input images
 are stacked and combined with the \fIproject\fR option.  \fBNote\fR that
 this means that the bad pixel mask from the first input image will be
 applied to all the images.

@@ -23,7 +23,8 @@ libpkg.a:
 	apmeasure.x
 	apppars.x	../lib/display.h
 	appconfirm.x	../lib/apphot.h		../lib/noise.h         \
-			../lib/center.h
+			../lib/center.h         ../lib/fitsky.h        \
+			../lib/phot.h
 	apperrors.x	../lib/phot.h
 	appfree.x	../lib/apphotdef.h	../lib/photdef.h
 	apphot.x	<ctype.h>		<gset.h>               \
@@ -32,7 +33,8 @@ libpkg.a:
 			../lib/phot.h
 	apphotcolon.x	../lib/noise.h		../lib/apphot.h        \
 			../lib/display.h	../lib/fitsky.h        \
-			../lib/center.h		../lib/phot.h
+			../lib/center.h		../lib/phot.h          \
+			<gset.h>
 	appinit.x	../lib/apphotdef.h	../lib/photdef.h       \
 			../lib/phot.h
 	appplot.x	<gset.h>		<pkg/gtools.h>         \
@@ -46,8 +48,8 @@ libpkg.a:
 	apradsetup.x	../lib/fitsky.h		../lib/center.h        \
 			../lib/display.h	../lib/apphot.h
 	apremag.x	<mach.h>		../lib/apphotdef.h     \
-			../lib/fitskydef.h	../lib/noisedef.h      \
-			../lib/photdef.h	../lib/phot.h
+			../lib/noisedef.h       ../lib/photdef.h       \
+			../lib/phot.h
 	t_phot.x	<fset.h>		<gset.h>	       \
 			<lexnum.h>		../lib/apphot.h        \
 			../lib/fitsky.h

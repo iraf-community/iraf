@@ -1,5 +1,16 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
+longslit$transform/mkpkg
+    Added missing dependency.  (10/11/99, Valdes)
+
+longslit$transform/t_transform.x
+    The REFSPEC keywords are now deleted if present.  (9/7/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+longslit$transform/
 longslit$transform/fcgetcoords.x
     Added an error check for there only being one line or column measured.
     (7/21/99, Valdes)

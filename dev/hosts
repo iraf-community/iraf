@@ -4,29 +4,38 @@
 #lpnode			: @ursa
 #plnode			: @ursa
 
+vmware			: vmware!/iraf/iraf/bin.redhat/irafks.e
+slack40			: slack40!/iraf/iraf/bin.linux/irafks.e
+suse62			: suse62!/iraf/iraf/bin.suse/irafks.e
+sol7			: sol7!/iraf/iraf/bin.sunos/irafks.e
+
 # Host table.
 aloe                	: aloe!/iraf/iraf/bin.linux/irafks.e
 anasazi                 : anasazi!/local/iraf/iraf/bin.ssun/irafks.e
 aquarius                : aquarius!/iraf/iraf/bin.ssun/irafks.e
 apus			: apus!/iraf/iraf/bin.ssun/irafks.e
 argo arg		: argo!/iraf/iraf/bin.ssun/irafks.e
+arun			: arun!/iraf/iraf/bin.sparc/irafks.e
 aten			: aten!/iraf/iraf/bin.ssun/irafks.e
 beet                    : beet!/iraf/iraf/bin.ssun/irafks.e
 bigx                    : bigx!/iraf/iraf/bin.sparc/irafks.e
-benhur                  : benhur!/iraf/iraf/bin.sparc/irafks.e
 betelgeuse              : betelgeuse!/iraf/iraf/bin.linux/irafks.e
+bluemoon		: bluemoon!/iraf/iraf/bin.ssun/irafks.e
 bokchoy			: bokchoy!/iraf/iraf/bin.ssun/irafks.e
 carina			: carina!/iraf/iraf/bin.ssun/irafks.e
 cephus			: cephus!/re02/iraf/iraf/bin.ddec/irafks.e
 ceres			: ceres!/iraf/iraf/bin.linux/irafks.e
 charfman                : charfman!/iraf/iraf/bin.sparc/irafks.e
 chomper                 : chomper!/iraf/iraf/bin.ssun/irafks.e
-coma			: coma!/iraf/iraf/bin.sparc/irafks.e
+chopin                  : chopin!/iraf/iraf/bin.ssun/irafks.e
+coma			: coma!/iraf/iraf/bin.ssun/irafks.e
 condorito		: condorito!/usr/iraf/bin.sparc/irafks.e
 corvus			: corvus!/iraf/iraf/bin.ssun/irafks.e
+crunch			: crunch!/iraf/iraf/bin.ssun/irafks.e
 cygnus			: cygnus!/local/iraf/bin.sparc/irafks.e
 data			: data!/iraf/iraf/bin.ssun/irafks.e
-deneb			: deneb!/local/iraf/iraf/bin.sparc/irafks.e
+defiant			: defiant!/iraf/iraf/bin.ssun/irafks.e
+deneb			: deneb!/local/iraf/iraf/bin.ssun/irafks.e
 driftwood		: driftwood!/iraf/iraf/bin.ssun/irafks.e
 dynamo                  : dynamo!/usr/iraf/iraf/bin.sparc/irafks.e
 eagle			: eagle!/iraf/iraf/bin.sparc/irafks.e
@@ -35,31 +44,37 @@ enzo                    : enzo!/iraf/iraf/bin.ssun/irafks.e
 equuleus		: equuleus!/local/iraf/iraf/bin.sparc/irafks.e
 felis			: felis!/u1/iraf/iraf/bin.rs6000/irafks.e
 gemini g		: gemini!/iraf/iraf/bin.sparc/irafks.e
-grus			: grus!/iraf/iraf/bin.sparc/irafks.e
+gronk			: gronk!/iraf/iraf/bin.ssun/irafks.e
+grotrian		: grotrian!/iraf/iraf/bin.sparc/irafks.e
+grus			: grus!/iraf/iraf/bin.ssun/irafks.e
 hohokam                 : hohokam!/local/iraf/iraf/bin.ssun/irafks.e
-herbie                  : herbie!/iraf/iraf/bin.ssun/irafks.e
 humu                    : humu!/solaris/iraf/iraf/bin.ssun/irafks.e
 inti                    : inti!/iraf/iraf/bin.ssun/irafks.e
 isis                    : isis!/local/iraf/iraf/bin.ssun/irafks.e
 jalapeno		: jalapeno!/iraf/iraf/bin.sparc/irafks.e
-jannu			: jannu!/iraf/iraf/bin.sparc/irafks.e
 jupiter			: jupiter!/iraf/iraf/bin.sparc/irafks.e
+kalahari                : kalahari!/iraf/iraf/bin.ssun/irafks.e
 kale                    : kale!/iraf/iraf/bin.sparc/irafks.e
-katmai                  : katmai!/iraf/iraf/bin.sparc/irafks.e
 kingfisher kingfishe kf	: kingfisher!/iraf/iraf/bin.sparc/irafks.e
 kukita                  : kukita!/iraf/iraf/bin.ssun/irafks.e
+kumbhakarna             : kumbhakarna!/iraf/iraf/bin.ssun/irafks.e
 lacerta lac             : lacerta!/local/iraf/iraf/bin.ssun/irafks.e
 lemming                 : lemming!/iraf/iraf/bin.sparc/irafks.e
 lepus			: lepus!/iraf/iraf/bin.freebsd/irafks.e
+lilawati		: lilawati!/iraf/iraf/bin.ssun/irafks.e
+loaner-1                : loaner-1!/iraf/iraf/bin.sparc/irafks.e
 lonestar		: lonestar!/iraf/iraf/bin.sparc/irafks.e
 lyra			: lyra!/iraf/iraf/bin.alpha/irafks.e
+magenta			: magenta!/iraf/iraf/bin.ssun/irafks.e
+makalu			: makalu!/iraf/iraf/bin.ssun/irafks.e
+matisse			: matisse!/iraf/iraf/bin.ssun/irafks.e
 mars			: mars!/iraf/iraf/bin.sparc/irafks.e
+mele			: mele!/iraf/iraf/bin.ssun/irafks.e
 mdi			: mdi!/iraf/iraf/bin.ssun/irafks.e
 mimbres                 : mimbres!/local/iraf/iraf/bin.ssun/irafks.e
 mintchip		: mintchip!/iraf/iraf/bin.sparc/irafks.e
 mira                    : mira!/iraf/iraf/bin.sparc/irafks.e
-mogoallan               : mogollan!/local/iraf/iraf/bin.ssun/irafks.e
-monoceros               : monoceros!/iraf/iraf/bin.sparc/irafks.e
+mogollan                : mogollan!/local/iraf/iraf/bin.ssun/irafks.e
 mozart			: mozart!/iraf/iraf/bin.ssun/irafks.e
 msgsun			: msgsun!/iraf/iraf/bin.sparc/irafks.e
 musca                   : musca!/iraf/iraf/bin.sparc/irafks.e
@@ -69,47 +84,47 @@ odysseus                : odysseus!/iraf/iraf/bin.sparc/irafks.e
 orion o			: orion!/iraf/iraf/bin.sparc/irafks.e
 otter                   : otter!/iraf/iraf/bin.sparc/irafks.e
 oso                     : oso!/iraf/iraf/bin.ssun/irafks.e
-ozzie			: ozzie!/iraf/iraf/bin.linux/irafks.e
 pandora    		: pandora!/iraf/iraf/bin.sparc/irafks.e
 pantera			: pantera!/iraf/iraf/bin.sparc/irafks.e
 pavo			: pavo!/iraf/iraf/bin.sparc/irafks.e
 pegasus peg		: pegasus!/iraf/iraf/bin.sparc/irafks.e
 perseus per		: perseus!/iraf/iraf/bin.sparc/irafks.e
 phoenix pho		: phoenix!/iraf/iraf/bin.sparc/irafks.e
-pictor pic		: pictor!/iraf/iraf/bin.sparc/irafks.e
-pisces pi		: pisces!/usr/iraf/bin.sparc/irafks.e
-piscis 			: piscis!/iraf/iraf/bin.sparc/irafks.e
+pisces pi		: pisces!/iraf/iraf/bin.ssun/irafks.e
 potosi 			: potosi!/iraf/iraf/bin.ssun/irafks.e
 prometheus prometheu    : prometheus!/local/iraf/iraf/bin.ssun/irafks.e
-puppis pu		: puppis!/iraf/iraf/bin.sparc/irafks.e
+puppis pu		: puppis!/iraf/iraf/bin.ssun/irafks.e
 pyxis pyx		: pyxis!/iraf/iraf.v2104/bin.f68881/irafks.e
 radix			: radix!/iraf/iraf/bin.sparc/irafks.e
 rainbow                 : rainbow!/iraf/iraf/bin.sparc/irafks.e
+roadrunner              : roadrunner!/iraf/iraf/bin.ssun/irafks.e
 rush                    : rush!/iraf/iraf/bin.sparc/irafks.e
 sagittarius		: sagittarius!/iraf/iraf/bin.sparc/irafks.e
 scorpius sco s		: scorpius!/local/iraf/bin.sparc/irafks.e
-seurat                  : seurat!/iraf/iraf/bin.sparc/irafks.e
+seurat                  : seurat!/iraf/iraf/bin.ssun/irafks.e
+shea			: shea!/iraf/iraf/bin.redhat/irafks.e
 soi			: soi!/iraf/iraf/bin.ssun/irafks.e
 sol                     : sol!/usr/local/iraf/iraf/bin.ssun/irafks.e
 solarium		: solarium!/iraf/iraf/bin.sparc/irafks.e
 soleil                  : soleil!/iraf/iraf/bin.ssun/irafks.e
 solstice                : solstice!/local/iraf/iraf/bin.ssun/irafks.e
-sonoma                  : sonoma!/usr/iraf/bin.f68881/irafks.e
 spud			: spud!/iraf/iraf/bin.sparc/irafks.e
 sunset			: sunset!/local/iraf/iraf/bin.ssun/irafks.e
 surya			: surya!/iraf/iraf/bin.sparc/irafks.e
 stis1			: stis1!/scr0/iraf/iraf/bin.sparc/irafks.e
 taco			: taco!/iraf/iraf/bin.sparc/irafks.e
+tesla			: tesla!/iraf/iraf/bin.sparc/irafks.e
 tofu			: tofu!/iraf/iraf/bin.ssun/irafks.e
-tribble			: tribble!/iraf/iraf/bin.sparc/irafks.e
+tribble			: tribble!/iraf/iraf/bin.ssun/irafks.e
 tucana tuc t		: tucana!/iraf/iraf/bin.sparc/irafks.e
 new-tucana 		: new-tucana!/iraf/iraf/bin.ssun/irafks.e
 turkey                  : turkey!/iraf/iraf/bin.sparc/irafks.e
 ursa u			: ursa!/iraf/iraf/bin.ssun/irafks.e
 vega			: vega!/iraf/iraf/bin.hp700/irafks.e
+vissun-1		: vissun-1!/iraf/iraf/bin.sparc/irafks.e
 volans			: volans!/iraf/iraf/bin.sparc/irafks.e
-virgo			: virgo!/local/iraf/iraf/bin.ssun/irafks.e
-zippy			: zippy!/iraf/iraf/bin.linux/irafks.e
+xari			: xari!/iraf/iraf/bin.ssun/irafks.e
+zippy			: zippy!/iraf/iraf/bin.redhat/irafks.e
 
 
 # VMS (decnet) nodes, via internet gateway robur.
@@ -139,6 +154,7 @@ taupe taupe.kpno.noao.edu       : taupe!/usr/iraf/iraf/bin.sparc/irafks.e
 rust rust.kpno.noao.edu         : rust!/usr/iraf/iraf/bin.sparc/irafks.e
 rush rush.kpno.noao.edu         : rush!/usr/iraf/iraf/bin.sparc/irafks.e
 loden loden.kpno.noao.edu       : loden!/usr/iraf/iraf/bin.sparc/irafks.e
+pecan pecan.kpno.noao.edu	: pecan!/iraf/iraf/bin.ssun/irafks.e
 pacifico pacifico.kpno.noao.edu : pacifico!/usr/iraf/iraf/bin.sparc/irafks.e
 corona corona.kpno.noao.edu     : corona!/usr/iraf/iraf/bin.sparc/irafks.e
 dynamo dynamo.kpno.noao.edu     : dynamo!/usr/iraf/iraf/bin.sparc/irafks.e
@@ -148,6 +164,7 @@ claret claret.kpno.noao.edu     : claret!/usr/iraf/iraf/bin.sparc/irafks.e
 coral coral.kpno.noao.edu       : coral!/usr/iraf/iraf/bin.sparc/irafks.e
 gyaos gyaos.kpno.noao.edu       : gyaos!/usr/iraf/iraf/bin.sparc/irafks.e
 gamera gamera.kpno.noao.edu     : gamera!/usr/iraf/iraf/bin.sparc/irafks.e
+almond almond.kpno.noa          : almond!/iraf/iraf/bin.irix/irafks.e
 
 # Cerro Tololo mountain sites
 ctio4m			: ctio4m!/usr/iraf/bin/irafks.e

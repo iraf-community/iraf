@@ -7,7 +7,7 @@ procedure fmd_ashgmi (data, npix, hgm, nbins, z1, z2)
 
 int 	data[ARB]		#I data vector
 int	npix			#I number of pixels
-short	hgm[ARB]		#U output histogram
+int	hgm[ARB]		#U output histogram
 int	nbins			#I number of bins in histogram
 int	z1, z2			#I greyscale values of first and last bins
 

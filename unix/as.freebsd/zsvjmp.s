@@ -19,9 +19,10 @@
 # by the "jmp_buf" used by setjmp/longjmp.
 #
 # This file contains the FreeBSD (x86) version of ZSVJMP.
+# Modified to remove leading underscore for ELF (Jan99).
  
-        .globl	_zsvjmp_
-        .globl	_exit_
+        .globl	zsvjmp_
+        .globl	exit_
 
 	# The following has nothing to do with ZSVJMP, and is included here
 	# only because this assembler module is loaded with every process.
@@ -38,7 +39,7 @@
 	_mem_	=	0
 
 	.text
-_zsvjmp_:
+zsvjmp_:
 	movl	4(%esp), %ecx		# &jmpbuf to ECX
 	movl	8(%esp), %eax		# &status to EAX
 	movl	%eax, (%ecx)		# store &status in jmpbuf[0]

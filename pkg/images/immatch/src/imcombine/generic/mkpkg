@@ -14,7 +14,7 @@ libpkg.a:
 	icmedian.x	../icombine.com ../icombine.h
 	icmm.x		../icombine.com ../icombine.h
 	icombine.x	../icombine.com ../icombine.h <error.h> <imhdr.h>\
-			<imset.h> <mach.h> <pmset.h>
+			<imset.h> <mach.h> <pmset.h> <syserr.h>
 	icpclip.x	../icombine.com ../icombine.h
 	icsclip.x	../icombine.com ../icombine.h
 	icsigma.x	../icombine.com ../icombine.h <imhdr.h>

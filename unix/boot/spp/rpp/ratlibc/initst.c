@@ -3,11 +3,7 @@
 
 #include "ratdef.h"
 
-FILE	*_fdtofile[10] = {
-		stdin,		/* standard input */
-		stdout,		/* standard output */
-		stderr		/* error output */
-	};
+FILE	*_fdtofile[10];
 
 /*
  * Ratfor initialization routine.  To be called as the first
@@ -16,5 +12,7 @@ FILE	*_fdtofile[10] = {
  */
 INITST()
 {
-	return;
+	_fdtofile[0] = stdin;
+	_fdtofile[1] = stdout;
+	_fdtofile[2] = stderr;
 }

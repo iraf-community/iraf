@@ -16,6 +16,7 @@ begin
 	string	arcref, arcrefms, arc, arcms, temp, str1, str2
 	int	i, dc, nspec
 	bool	log
+	struct	str3
 
 	temp = mktemp ("tmp$iraf")
 
@@ -60,7 +61,8 @@ begin
 	if (i < 1 || dc == -1) {
 	    print ("Determine dispersion solution for ", arcref) | tee (log1)
 	    #delete (database//"/id"//arcref//".ms*", verify=no)
-	    if (crval == "INDEF" && cdelt == "INDEF")
+	    printf ("%s %s\n", crval, cdelt) | scan (str3)
+	    if (str3 == "INDEF INDEF")
 		identify (arcrefms, section="middle line", database=database,
 		    coordlist=sparams.coordlist, nsum=1, match=sparams.match,
 		    maxfeatures=50, zwidth=100., ftype="emission",

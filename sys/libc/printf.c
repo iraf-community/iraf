@@ -91,6 +91,11 @@ FILE	*fp;				/* output file			*/
 			done++;
 			break;
 
+		    case 'l':
+			/* arg size modifier; ignored for now */
+			fsp--;
+			break;
+
 		    case '*':
 			prec[varprec++] = va_arg ((*argp), int);
 			break;
@@ -129,6 +134,13 @@ FILE	*fp;				/* output file			*/
 			done++;
 			break;
 
+		    case 'E':			/* ANSI emulation	*/
+			*(fsp-1) = 'e';
+			goto rval;
+		    case 'G':			/* ANSI emulation	*/
+			*(fsp-1) = 'g';
+			goto rval;
+
 		    case 'z':			/* nonstandard UNIX	*/
 		    case 'h':			/* nonstandard UNIX	*/
 		    case 'H':			/* nonstandard UNIX	*/
@@ -140,7 +152,7 @@ FILE	*fp;				/* output file			*/
 			/* If no precision was specified, default to 14 digits
 			 * for %[efgz] and 3 digits for %[hm].
 			 */
-			if (!dotseen) {
+rval:			if (!dotseen) {
 			    *(fsp-1) = '.';
 			    if (ch == 'h' || ch == 'm' ||
 				ch == 'H' || ch == 'M') {

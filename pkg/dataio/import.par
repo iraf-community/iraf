@@ -1,6 +1,6 @@
 # IMPORT Task Parameter File
-binfiles,s,q,"",,,"The list of input binary files to be read"
-images,s,q,"",,,"The list of output IRAF images to be written"
+binfiles,s,a,"",,,"The list of input binary files to be read"
+images,s,a,"",,,"The list of output IRAF images to be written"
 format,s,h,"sense",,,"The type of format to be processed
 
 		INPUT PARAMETERS

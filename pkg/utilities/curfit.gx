@@ -2,7 +2,6 @@
 
 include	<fset.h>
 include	<imhdr.h>
-include	<ttyset.h>
 include <math/curfit.h>
 include	<pkg/gtools.h>
 include	"curfit.h"

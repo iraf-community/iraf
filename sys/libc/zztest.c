@@ -46,7 +46,7 @@ tscan_()
 	char	buf[SZ_LINE];
 	char	str[SZ_LINE];
 	char	cval;
-	int	ival, nscan;
+	int	ival, nscan, n1, n2;
 	int	onint(), oldint;
 	double	dval;
 
@@ -56,9 +56,10 @@ tscan_()
 	fflush (stdout);
 
 	while (fgets (buf, SZ_LINE, stdin) != NULL) {
-	    nscan = sscanf (buf, "%c %*s %d %lg %s", &cval, &ival, &dval, str);
-	    printf ("nscan=%d: '%c' %d %g '%s'\n",
-		nscan, cval, ival, dval, str);
+	    nscan = sscanf (buf,
+		"%n%c %*s %d %lg %s%n", &n1, &cval, &ival, &dval, str, &n2);
+	    printf ("nscan=%d: %d '%c' %d %g '%s' %d\n",
+		nscan, n1, cval, ival, dval, str, n2);
 	    printf (">> \n");
 	    fflush (stdout);
 	}

@@ -27,7 +27,8 @@ libsys.a:
 	kbzawt.x	ki.h kichan.com <config.h>
 	kbzcls.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	kbzopn.x	ki.h kii.com <mach.h>
-	kbzstt.x	ki.h kichan.com kii.com <config.h> <fio.h> <mach.h>
+	kbzstt.x	ki.h kichan.com kii.com kinode.com <config.h>\
+			<fio.h> <mach.h>
 	kclcpr.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	kcldir.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	kcldpr.x	ki.h kichan.com kii.com <config.h> <mach.h>

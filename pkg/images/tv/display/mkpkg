@@ -14,7 +14,7 @@ zzdebug.e:
 libds.a:
 	dsmap.x		<fset.h> <imset.h> <mach.h>
 	dspmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
-			<mwset.h> <pmset.h>
+			<pmset.h> <syserr.h>
 	dsulut.x	display.h <ctype.h> <error.h>
 	findz.x		iis.com iis.h <imhdr.h>
 	iisblk.x	<mach.h> iis.h zdisplay.h
@@ -52,7 +52,7 @@ libds.a:
 	maxmin.x	iis.com iis.h <imhdr.h> <mach.h>
 	sigl2.x		<error.h> <imhdr.h>
 	sigm2.x		<error.h> <imhdr.h>
-	t_dcontrol.x	iis.com display.h iis.h zdisplay.h <fset.h>
+	t_dcontrol.x	iis.com display.h iis.h zdisplay.h <fset.h> <syserr.h>
 	t_display.x	display.h gwindow.h <error.h> <pmset.h> <imhdr.h>\
 			<imset.h> <mach.h>
 	zardim.x	zdisplay.h
@@ -69,7 +69,7 @@ libds.a:
 	zrcrim.x	zdisplay.h
 	zrgbim.x	zdisplay.h
 	zrmim.x		zdisplay.h
-	zscale.x	<ctype.h> <imhdr.h> <imset.h> <pmset.h>
+	zscale.x	<ctype.h> <imhdr.h> <imset.h> <pmset.h> <imio.h>
 	zsttim.x	iis.com iis.h <fio.h> <knet.h>
 	zwndim.x	zdisplay.h
 	;

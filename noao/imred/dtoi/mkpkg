@@ -25,14 +25,16 @@ dtoi:
 	;
 
 libpkg.a:
-	hdfit.x		<math/curfit.h> <imhdr.h> <fset.h> <mach.h> <ctype.h>\
-			<error.h> <pkg/gtools.h> <pkg/xtanswer.h>
+	database.x	<ctotok.h> <ctype.h> <finfo.h> <time.h>
 	dematch.x	<error.h>
-	hdtoi.x		<mach.h> <imhdr.h> <math/curfit.h> <error.h>
-	spotlist.x	<imhdr.h> <mach.h> <fset.h> <error.h>
-	database.x	<time.h> <ctype.h> <ctotok.h> <finfo.h>
-	hdshift.x	<math/curfit.h>
-	minmax.x	<imhdr.h>
-	selftest.x	<imhdr.h> <math/curfit.h> <pkg/gtools.h> <mach.h>
 	hd_aravr.x	<mach.h>
+	hdfit.x		hdicfit/hdicfit.h <ctype.h> <error.h> <fset.h>\
+			<imhdr.h> <mach.h> <math/curfit.h> <pkg/gtools.h>\
+			<pkg/xtanswer.h>
+	hdshift.x	<math/curfit.h>
+	hdtoi.x		hdicfit/hdicfit.h <error.h> <imhdr.h> <mach.h>\
+			<math/curfit.h>
+	minmax.x	<imhdr.h>
+	selftest.x	<gio.h> <gset.h> <mach.h>
+	spotlist.x	<error.h> <fset.h> <imhdr.h> <mach.h>
 	;

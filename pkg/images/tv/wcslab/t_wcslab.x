@@ -106,7 +106,8 @@ begin
 	    vr = clgetr ("vr")
 	    vb = clgetr ("vb")
 	    vt = clgetr ("vt")
-	    call wl_imd_viewport (frame, im, c1, c2, l1, l2, vl, vr, vb, vt)
+	    if (im != NULL)
+	        call wl_imd_viewport (frame, im, c1, c2, l1, l2, vl, vr, vb, vt)
 	    gp = gopen (Memc[device], mode, STDGRAPH)
 
 	# Otherwise set up a standard viewport.

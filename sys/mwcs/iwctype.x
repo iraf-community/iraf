@@ -27,33 +27,49 @@ begin
 	if (ch1 == 'C') {
 	    if (ch2 == 'D') {
 		if (IS_DIGIT (card[3])) {
+		    # CDi_j
 		    type = TY_CD
 		    axis = TO_INTEG (card[5])
 		    index = TO_INTEG (card[3])
+		    if (card[6] != ' ')
+			type = ERR
 		} else if (strncmp (card, "CDELT", 5) == 0) {
+		    # CDELTi
 		    type = TY_CDELT
 		    axis = TO_INTEG (card[6])
 		    index = ERR
+		    if (card[7] != ' ')
+			type = ERR
 		}
 	    } else if (ch2 == 'R') {
 		if (strncmp (card, "CROTA2", 6) == 0) {
+		    # CROTA2
 		    type = TY_CROTA
 		    axis = ERR
 		    index = ERR
 		} else if (strncmp (card, "CRPIX", 5) == 0) {
+		    # CRPIXi
 		    type = TY_CRPIX
 		    axis = TO_INTEG (card[6])
 		    index = ERR
+		    if (card[7] != ' ')
+			type = ERR
 		} else if (strncmp (card, "CRVAL", 5) == 0) {
+		    # CRVALi
 		    type = TY_CRVAL
 		    axis = TO_INTEG (card[6])
 		    index = ERR
+		    if (card[7] != ' ')
+			type = ERR
 		}
 	    } else if (ch2 == 'T') {
 		if (strncmp (card, "CTYPE", 5) == 0) {
+		    # CTYPEi
 		    type = TY_CTYPE
 		    axis = TO_INTEG (card[6])
 		    index = ERR
+		    if (card[7] != ' ')
+			type = ERR
 		}
 	    }
 	} else if (ch1 == 'L' && ch2 == 'T') {

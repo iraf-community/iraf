@@ -1,5 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	"icfit.h"
+
 # IC_VSHOW -- Show fit parameters in verbose mode.
 
 procedure ic_vshowr (ic, file, cv, x, y, wts, npts, gt)
@@ -18,6 +20,7 @@ errchk	open, ic_fvshowr
 
 begin
 	fd = open (file, APPEND, TEXT_FILE)
+	IC_GT(ic) = gt
 	call ic_fvshowr (ic, cv, x, y, wts, npts, fd)
 	call close (fd)
 end

@@ -422,6 +422,11 @@ ir> dispcor nite101 dcnite101 "1-10" ignore+ confirm-
 
 .ih
 REVISIONS
+.ls DISPCOR V2.11.3
+Long slit and data cubes can be used with this task to either resample
+using the existing WCS or to use a single dispersion function from
+IDENTIFY.  It uses the first one found.
+.le
 .ls DISPCOR V2.10.3
 Provision was added for IDENTIFY dispersion solutions consisting of
 only a shift (as produced by the 'g' key in IDENTIFY or the refit=no

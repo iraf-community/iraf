@@ -227,12 +227,10 @@ go2gen(c){ /* output the gotos for nonterminal c */
 		}
 	}
 
-precftn(r,t,s){
-	/* decide a shift/reduce conflict by precedence.
-	 * r is a rule number, t a token number
-	 * the conflict is in states
-	 * temp1[t] is changed to reflect the action
-	 */
+precftn(r,t,s){ /* decide a shift/reduce conflict by precedence.
+	/* r is a rule number, t a token number */
+	/* the conflict is in state s */
+	/* temp1[t] is changed to reflect the action */
 
 	int lp,lt, action;
 
@@ -293,9 +291,7 @@ wract(i)
 		}
 
 	/* for error recovery, arrange that, if there is a shift on the
-	 * error recovery token, `error', that the default be the error
-	 * action
-	 */
+	/* error recovery token, `error', that the default be the error action */
 	if( temp1[1] > 0 ) lastred = 0;
 
 	/* clear out entries in temp1 which equal lastred */
@@ -423,10 +419,10 @@ int	*v, n;
 
 hideprod(){
 	/* in order to free up the mem and amem arrays for the optimizer,
-	 * and still be able to output yyr1, etc., after the sizes of
-	 * the action array is known, we hide the nonterminals
-	 * derived by productions in levprd.
-	 */
+	/* and still be able to output yyr1, etc., after the sizes of
+	/* the action array is known, we hide the nonterminals
+	/* derived by productions in levprd.
+	*/
 
 	register i, j;
 

@@ -1,5 +1,16 @@
 .help revisions Jun88 noao.digiphot.apphot
 .nf
+apphot/*/mkpkg
+    Removed duplicate file dependencies from mkpkg.
+
+    Davis, September 30, 1999
+
+apphot/*/mkpkg
+    Added some missing file dependencies and deleted some unecessary ones 
+    from the mkpkg files.
+
+    Davis, September 20, 1999
+    
 apphot/polyphot/apyfit.x
 apphot/polyphot/appyerrors.x
 apphot/aplib/apwres2.x

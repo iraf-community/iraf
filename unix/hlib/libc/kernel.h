@@ -71,12 +71,6 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define	LEN_SETREDRAW	6		/* nchars in setredraw string	*/
 #define SETREDRAW	"\033=rDw"	/* set/enable screenredraw code	*/
 
-#define	STDIO_FILES {			/* initialization of stdio	*/\
-	stdin,  0L, 0L, 0, 0, KF_NOSEEK, NULL,\
-	stdout, 0L, 0L, 0, 0, KF_NOSEEK, NULL,\
-	stderr, 0L, 0L, 0, 0, KF_NOSEEK, NULL\
-}
-
 #ifdef AUX
 #define SIGFUNC sigfunc_t
 #else

@@ -296,3 +296,28 @@ observatory = "holi"
         latitude = 50.16276
         altitude = 541
         timezone = -1
+
+# Submitted by Steven Majewski 8/27/99
+observatory = "lmo"
+        name = "Leander McCormick Observatory"
+        longitude = 78:31:24
+        latitude =  38:02:00
+        altitude = 264
+        timezone = 5
+
+# Submitted by Steven Majewski 8/27/99
+observatory = "fmo"
+        name = "Fan Mountain Observatory"
+        longitude = 78:41:34
+        latitude =  37:52:41
+        altitude = 556 
+        timezone = 5
+
+# Submitted by Kim K. McLeod 10/13/1999
+observatory = "whitin"
+	name = "Whitin Observatory, Wellesley College"
+	longitude = 71.305833
+	latitude = 42.295
+	altitude = 32
+	timezone = 5
+

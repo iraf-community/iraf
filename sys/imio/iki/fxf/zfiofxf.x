@@ -1,6 +1,5 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  
-include <syserr.h>
 include <mach.h>
 include <knet.h>
 include <fio.h>
@@ -159,9 +158,8 @@ int	boffset			#I file offset
 bool	noconvert
 pointer fit, im, sp, obuf
 int	ip, op, pixtype, npix, totpix, nb, nchars, i
-int	datasizeb, pixoffb, nb_skipped
+int	datasizeb, pixoffb, nb_skipped, obufsize
 int	sizeof()
-errchk  syserrs
 
 begin
 	fit = chan
@@ -189,12 +187,6 @@ begin
 	    return
         }		
 
-	# Convert any pixel data in the input buffer to the binary format
-	# required for FITS and write it out.  Any non-pixel data in the
-	# buffer should be left as-is.
-
-	call smark (sp)
-	call salloc (obuf, (nbytes + SZB_CHAR-1) / SZB_CHAR, TY_CHAR)
 
 	totpix = IM_PHYSLEN(im,1)
 	do i = 2, IM_NPHYSDIM(im)
@@ -220,10 +212,8 @@ begin
 	    nb = min (nbytes, datasizeb - nb_skipped)
 	npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
 
-	if (npix == 0) {
-	    call sfree (sp)
+	if (npix == 0) 
 	    return
-	}
 
 	# We don't do scaling (e.g. BSCALE/BZERO) when writing.  All the
 	# generated FITS files in this interface are ieee fits standard.
@@ -233,10 +223,19 @@ begin
 	### When writing a new image I suppose the application would take
 	### care of any scaling.
 
+	# Convert any pixel data in the input buffer to the binary format
+	# required for FITS and write it out.  Any non-pixel data in the
+	# buffer should be left as-is.
+
+	obufsize = (nbytes + SZB_CHAR-1) / SZB_CHAR
+
+	call smark (sp)
+	call salloc (obuf, obufsize, TY_CHAR)
+
 	# Preserve any leading non-pixel data.
 	op = 1
 	if (ip > 1) {
-	    nchars = ip - 1
+	    nchars = min (obufsize, ip - 1) 
 	    call amovc (ibuf[1], Memc[obuf], nchars)
 	    op = op + nchars
 	}
@@ -246,7 +245,7 @@ begin
 	op = op + npix * sizeof(pixtype)
 
 	# Preserve any remaining non-pixel data.
-	nchars = (nbytes / SZB_CHAR) - op + 1
+	nchars = obufsize - op + 1
 	if (nchars > 0)
 	    call amovc (ibuf[op], Memc[obuf+op-1], nchars)
 
@@ -332,7 +331,6 @@ begin
 	}
 end
 
-
 # FXF_CNVPX -- Convert FITS type BITPIX = 8 to SHORT or REAL depending
 # on the value of BSCALE, BZERO (1, 32768 is already iraf supported as ushort
 # and is not treated in here). If BITPIX=16 and BSCALE and BZERO are 
@@ -340,17 +338,17 @@ end
 
 procedure fxf_cnvpx (im, totpix, obuf, nbytes, boffset)
 
-pointer im			#I image descriptor
-int	totpix			#I total number of pixels		
-char    obuf[ARB]		#O output data buffer
-int	nbytes			#I size in bytes of the output buffer
-int	boffset			#I byte offset into the virtual image
+pointer im			#I Image descriptor
+int	totpix			#I Total number of pixels		
+char    obuf[ARB]		#O Output data buffer
+int	nbytes			#I Size in bytes of the output buffer
+int	boffset			#I Byte offset into the virtual image
 
 pointer sp, buf, fit, op
 double	bscale, bzero
+int	ip, nelem, pfactor
+int	pixtype, nb, buf_size, bzoff, nboff
 int	status, offset, npix
-int	pixtype, nb, buf_size
-int	ip, nelem, ubytes, pfactor
 int	datasizeb, pixoffb, nb_skipped
 int	sizeof()
 
@@ -366,7 +364,7 @@ begin
 	# The beginning of the data portion in bytes.
 	pixoffb = (FIT_PIXOFF(fit)-1) * SZB_CHAR + 1
 	
-	# Determine the factor to applied: size(im_pixtype)/size(fit_pixtype).
+	# Determine the factor to applied: size(im_pixtype)/size(fit_pixtype)
 	if (FIT_PIXTYPE(fit) == TY_UBYTE) {
 	    if (IM_PIXTYPE(im) == TY_REAL)
 		pfactor = SZ_REAL * SZB_CHAR
@@ -390,22 +388,28 @@ begin
 	# the resultant value by the convertion factor.
 	# We then add the size of the header if necessary.
 
-	nelem = nbytes - pixoffb
+	# Determine the offset into the pixel area.
+	nboff = boffset - pixoffb
+	if (nboff > 0) {
+	    nelem = nboff / pfactor
+	    offset = nelem + pixoffb
+	} else  {
+	    # Keep the 1st boffset.
+	    bzoff = boffset
+	    offset = boffset
+	}
+
+	# Calculates the number of elements to convert. We keep the offset from
+	# the beginning of the unit (bzoff) and not from file's 1st byte.
+
+	nelem = nbytes - (pixoffb - bzoff + 1)
 	nelem = nelem / pfactor
-	buf_size = nelem + pixoffb
+	buf_size = nelem + (pixoffb - bzoff + 1)
 	if (buf_size*pfactor > nbytes && ip == 1)
 	    buf_size = (nbytes - 1) / pfactor + 1 
 
-	# Determine the offset into the pixel area.
-	ubytes = boffset - pixoffb
-	if (ubytes > 0) {
-	    nelem = ubytes / pfactor
-	    offset = nelem + pixoffb
-	} else 
-	    offset = boffset
-
-	# Allocate space for TY_SHORT.
-	call smark (sp)
+	# Allocate space for TY_SHORT
+	call smark(sp)
 	call salloc (buf, buf_size/SZB_CHAR, TY_SHORT)
 	    
 	call zardbf (FIT_IO(fit), Mems[buf], buf_size, offset)
@@ -415,7 +419,7 @@ begin
 	    call sfree (sp)
 	    return
 	}
-
+	    
 	# Map the number of bytes of datatype FIT_PIXTYPE to 
 	# IM_PIXTYPE for use in zfxfwt().
 	     
@@ -441,8 +445,8 @@ begin
 		call fxf_altmr (obuf[ip], obuf[ip], npix, bscale, bzero)
 	    }
 	case TY_SHORT:
-	    npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
 	    op = buf + ip - 1
+	    npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
 	    if (BYTE_SWAP2 == YES)
 		call bswap2 (Mems[op], 1, Mems[op], 1, npix*SZB_CHAR)
 	    call fxf_astmr (Mems[op], obuf[ip], npix, bscale, bzero)

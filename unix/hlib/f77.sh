@@ -1,5 +1,5 @@
 #!/bin/sh
-PATH=/v/bin:/bin:/usr/bin
+PATH=/v/bin:/bin:/usr/bin:/usr/local/bin
 # f77-style shell script to compile and load fortran, C, and assembly codes
 #	usage:	f77 [-g] [-O|-O2|-O6] [-o absfile] [-c] files [-l library]
 #		-o objfile	Override default executable name a.out.
@@ -30,8 +30,9 @@ PATH=/v/bin:/bin:/usr/bin
 
 s=/tmp/stderr_$$
 t=/tmp/f77_$$
-CC=${CC_f2c:-'/usr/bin/cc -m486'}
-CFLAGS=${CFLAGS:-'-I${iraf}unix/bin'}
+#CC=${CC_f2c:-'/usr/bin/cc -m486'}
+CC=${CC_f2c:-'gcc'}
+CFLAGS=${CFLAGS:-"-I${iraf}unix/bin.${IRAFARCH}"}
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-/usr/bin/f2c}
@@ -154,7 +155,7 @@ do
 		    $F2C $F2CFLAGS $b.f
 		fi
 		if [ $xsrc = 1 ]; then
-		    sed -e "s/$b.f/$b.x/" < $b.c > $b.t; mv $b.t $b.c
+		    sed -e "s/$b\\.f/$b.x/" < $b.c > $b.t; mv $b.t $b.c
 		fi
                 $CC $CPPFLAGS -c $CFLAGS $b.c 2>$s
 		rc=$?

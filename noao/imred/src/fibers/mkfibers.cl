@@ -16,6 +16,7 @@ int	seed=1				{prompt="Noise seed"}
 
 begin
 	int	i, ap, beam
+	real	ar
 	file	out, obj, sky, arc, dat
 	string	htype, imtype
 

@@ -166,8 +166,8 @@ begin
 		airm_eff = (airm_beg + 4.*airm_mid + airm_end) / 6.
 
 	    } then {
-		call imunmap (im)
 		call erract (EA_WARN)
+		call imunmap (im)
 		next
 	    }
 

@@ -1,5 +1,13 @@
 .help revisions Jun88 noao.imred.dtoi
 .nf
+
+imred$dtoi/mkpkg
+	Added missing dependencies.  (10/11/99, Valdes)
+
+=======
+V2.11.2
+=======
+
 imred$dtoi/doc/hdfit.hlp
 imred$dtoi/doc/hdshift.hlp
 imred$dtoi/doc/hdtoi.hlp

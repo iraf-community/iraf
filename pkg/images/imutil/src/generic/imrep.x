@@ -14,9 +14,12 @@ real	img				# Imaginary value for complex
 
 pointer	buf1, buf2
 int	npix, junk
+real	ilower
 short	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 int	imgnls(), impnls()
+	    
+bool	fp_equalr()
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -42,7 +45,11 @@ begin
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    while (imgnls (im, buf1, v1) != EOF) {
 		junk = impnls (im, buf2, v2)
 		call amovs (Mems[buf1], Mems[buf2], npix)
@@ -51,7 +58,11 @@ begin
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = int (upper)
 	    while (imgnls (im, buf1, v1) != EOF) {
 		junk = impnls (im, buf2, v2)
@@ -76,10 +87,12 @@ real	img				# Imaginary value for complex
 
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
+int	ilower
 short	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 int	imgnls(), impnls()
+bool	fp_equalr()
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -106,12 +119,20 @@ begin
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = MAX_SHORT
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = int (upper)
 	}
 
@@ -237,9 +258,12 @@ real	img				# Imaginary value for complex
 
 pointer	buf1, buf2
 int	npix, junk
+real	ilower
 int	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 int	imgnli(), impnli()
+	    
+bool	fp_equalr()
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -265,7 +289,11 @@ begin
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    while (imgnli (im, buf1, v1) != EOF) {
 		junk = impnli (im, buf2, v2)
 		call amovi (Memi[buf1], Memi[buf2], npix)
@@ -274,7 +302,11 @@ begin
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = int (upper)
 	    while (imgnli (im, buf1, v1) != EOF) {
 		junk = impnli (im, buf2, v2)
@@ -299,10 +331,12 @@ real	img				# Imaginary value for complex
 
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
+int	ilower
 int	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 int	imgnli(), impnli()
+bool	fp_equalr()
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -329,12 +363,20 @@ begin
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = MAX_INT
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = int (upper)
 	}
 
@@ -460,9 +502,12 @@ real	img				# Imaginary value for complex
 
 pointer	buf1, buf2
 int	npix, junk
+real	ilower
 long	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 int	imgnll(), impnll()
+	    
+bool	fp_equalr()
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -488,7 +533,11 @@ begin
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    while (imgnll (im, buf1, v1) != EOF) {
 		junk = impnll (im, buf2, v2)
 		call amovl (Meml[buf1], Meml[buf2], npix)
@@ -497,7 +546,11 @@ begin
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = int (upper)
 	    while (imgnll (im, buf1, v1) != EOF) {
 		junk = impnll (im, buf2, v2)
@@ -522,10 +575,12 @@ real	img				# Imaginary value for complex
 
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
+int	ilower
 long	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 int	imgnll(), impnll()
+bool	fp_equalr()
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -552,12 +607,20 @@ begin
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = MAX_LONG
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    floor = int (lower+0.9999)
+	    ilower = int (lower)
+	    if (fp_equalr(lower,ilower))
+	        floor = int (lower)
+	    else
+	        floor = int (lower+1.0)
 	    ceil = int (upper)
 	}
 
@@ -686,6 +749,7 @@ int	npix, junk
 real	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 int	imgnlr(), impnlr()
+	    
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -909,6 +973,7 @@ int	npix, junk
 double	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 int	imgnld(), impnld()
+	    
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -1132,6 +1197,7 @@ int	npix, junk
 complex	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 int	imgnlx(), impnlx()
+	    
 
 begin
 	# Setup start vector for sequential reads and writes.

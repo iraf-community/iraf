@@ -1,13 +1,17 @@
 # TAPECAP file for FreeBSD.  Apr97.
 # ------------------------------------
 
-# LEPUS - Gateway P5-166, Adaptec 2940 PCI SCSI adaptor, HPDAT tape drive.
-mta|HP DAT drive unit 0|		:so:tc=mtst0-dat:
-mtax|HP DAT with debug output|		:so=/tmp/mt.log:tc=mtst0-dat:
+# LEPUS - Gateway P6-400, 256 MB, HP C1537A 12 GB DDS-3 DAT drive.
+mta|HP DAT drive unit 0|		:so:tc=mtsa0:
+mtax|HP DAT with debug output|		:so=/tmp/mt.log:tc=mtsa0:
 
 
 # Unit assignments (FreeBSD).
 # ---------------------------
+
+mtsa0|mtst0.fbsd.dat|DAT drive on lepus:\
+	:se:dt=HP C1537A L708 DDS-3 tape drive:tt=DDS-3:ts=12884902:\
+	:al=ersa0 nrsa0 rsa0:dv=nrsa0:lk=sa0:tc=generic-dat:
 
 mtdat0|mtst0-dat|HP DAT drive unit 0:\
 	:se:dt=HP 35480A Helical Scan DAT drive:al=erst0 nrst0 rst0:\

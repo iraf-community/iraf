@@ -45,7 +45,7 @@ begin
 	    else {
 		print ("searching the help database...")
 		help ("[a-z]*.", section="all", option="ref", curpack="AsckCL",
-		    helpdb="helpdb") | sort(ignore+) | unique |
+		    helpdb="helpdb") |& sort(ignore+) | unique |
 		    match (pattern, metacharacters=yes)
 	    }
 	}

@@ -245,7 +245,6 @@ begin
 		if (nim > 0) {
 		    if (imtgetim (imlist, Memc[image], SZ_FNAME) == EOF)
 			break
-		    AST_IM(ast) = immap (Memc[image], READ_ONLY, 0)
 		    iferr (AST_IM(ast) = immap (Memc[image], READ_WRITE, 0))
 			AST_IM(ast) = immap (Memc[image], READ_ONLY, 0)
 		    call sprintf (Memc[expr], sz_cmd, "\"%s\"")

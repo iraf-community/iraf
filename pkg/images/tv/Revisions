@@ -1,5 +1,37 @@
 .help revisions Jun88 images.tv
 .nf
+pkg/images/tv/imedit/t_imedit.x
+    The use of a temporary image causes the output image type to be
+    set by "imtype" instead of any explicit extension.  Changed to
+    use the xt_mkimtemp routine which tries to create a temporary image
+    of the desired output image type.  (10/1/99, Valdes)
+
+pkg/images/tv/display/mkpkg
+pkg/images/tv/wcslab/mkpkg
+pkg/images/tv/imedit/mkpkg
+pkg/images/tv/imexamine/mkpkg
+    Added some missing file dependencies and removed some unecessary ones
+    from the package mkpkg files.
+    (9/21/99 LED)
+
+pkg/images/tv/wcslab/wcslab.h
+    Added an entry for tnx to the list of supported projection types.
+    tnx image sometimes produced garbled plots, especially for ra ~0.0.
+    (9/17/99 LED)
+
+pkg/images/tv/wcslab/t_wcslab.x
+pkg/images/tv/wcslab/wcslab.x
+    Fixed a couple of bugs in the wcslab task that were causing it to fail with
+    the message "ERROR: MWCS: coordinate system not defined (physical)" on the
+    Dec Alpha when the usewcs parameter was set to yes, and on Sun systems when
+    the input image was undefined. The problems were a bad call to the
+    routine mw_swtype in the routine wl_decode_ctype and a missing check
+    for the image = "" case. (8/28/99 LED)
+
+=======
+V2.11.2
+=======
+
 images$tv/display/sigm2.x
     An argument to sigm2_setup was being changed by the routine and this
     changed argument was then incorrectly used by the calling program.

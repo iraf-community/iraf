@@ -25,7 +25,7 @@ generic:
 libpkg.a:
         $ifeq (USE_GENERIC, yes) $call generic $endif
 	@generic
-	@bltins				# compile the builtin format code
+	@bltins
 
 	fmtdb.x		import.h <ctotok.h> <error.h> <evvexpr.h> <fset.h>
 	ipbuiltin.x	import.h

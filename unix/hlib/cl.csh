@@ -18,6 +18,8 @@ endif
 if (! $?MACH) then
     if (-f /etc/redhat-release) then
 	set mach = redhat
+    else if (-f /etc/SuSE-release) then
+	set mach = suse
     else
 	set mach = `uname -s | tr '[A-Z]' '[a-z]'`
     endif
@@ -30,6 +32,10 @@ if (! $?MACH) then
 	set MACH = linux
     else if (-e $iraf/bin.redhat/cl.e) then
 	set MACH = redhat
+    else if (-e $iraf/bin.suse/cl.e) then
+	set MACH = suse
+    else if (-e $iraf/bin.sunos/cl.e) then
+	set MACH = sunos
     else if (-e $iraf/bin.linuz/cl.e) then
 	set MACH = linuz
     else
@@ -68,18 +74,12 @@ else if ("$MACH" == "linux") then
     setenv IRAFARCH "linux"
 else if ("$MACH" == "redhat") then
     setenv IRAFARCH "redhat"
+else if ("$MACH" == "suse") then
+    setenv IRAFARCH "suse"
+else if ("$MACH" == "sunos") then
+    setenv IRAFARCH "sunos"
 else if ("$MACH" == "linuz") then
     setenv IRAFARCH "linuz"
-else if ("$MACH" == "ssol") then
-    setenv IRAFARCH "ssun"
-else if ("$MACH" == "sparc") then
-    setenv IRAFARCH "sparc"
-else if ("$MACH" == "i386") then
-    setenv IRAFARCH "i386"
-else if (-e /dev/fpa && -e ${iraf}bin.ffpa/cl.e) then
-    setenv IRAFARCH "ffpa"
-else
-    setenv IRAFARCH "f68881"
 endif
 
 setenv arch .$IRAFARCH

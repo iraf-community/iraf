@@ -24,7 +24,7 @@ libsys.a:
 	cnvdate.x	<time.h>
 	cnvtime.x	<time.h>
 	cputime.x	
-	dtmcnv.x	<time.h>
+	dtmcnv.x	<time.h> <ctype.h>
 	envgetb.x	
 	envgetd.x	<mach.h>
 	envgeti.x	<mach.h>

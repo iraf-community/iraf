@@ -41,7 +41,8 @@ libpkg.a:
 	apoutpars2.x	../lib/display.h	../lib/center.h		\
 			../lib/fitsky.h		../lib/phot.h           \
 			../lib/polyphot.h
-	apqrad.x	../lib/apphot.h		../lib/center.h
+	apqrad.x	../lib/apphot.h		../lib/center.h         \
+			<mach.h>
 	appadu.x	../lib/noise.h		<imhdr.h>
 	aprcursor1.x	../lib/apphot.h		../lib/noise.h          \
 			../lib/center.h		../lib/fitsky.h         \
@@ -88,7 +89,7 @@ libpkg.a:
 	apwres3.x	../lib/apphotdef.h	../lib/radprofdef.h	\
 			../lib/apphot.h		../lib/radprof.h
 	apwres4.x	../lib/apphotdef.h	../lib/fitpsfdef.h	\
-			../lib/fitpsf.h
+			../lib/fitpsf.h         ../lib/apphot.h
 	apwparam1.x	<time.h>		../lib/apphot.h	        \
 			../lib/noise.h		../lib/center.h         \
 			../lib/fitsky.h		../lib/phot.h		\

@@ -4256,3 +4256,319 @@ language/doc/hidetask.hlp
 pkg/dataio/export/exrgb8.x
    	Fixed a bug causing the cmap() function to write a garbage line at the
    	top or bottom of the output image. (8/20/99 MJF)
+
+dev/devices.hlp
+	Added and entry for ursa!mtp at Taft's request (8/24/99 MJF)
+
+pkg/images/tv/wcslab/t_wcslab.x
+pkg/images/tv/wcslab/wcslab.x
+	Fixed a couple of bugs in the wcslab task that were causing it
+	to fail with the message "ERROR: MWCS: coordinate system not
+	defined (physical)" on the DecAlpha when the usewcs parameter
+	was set to yes, and on Sun systems when the input image was
+	undefined. (8/28/99 LED)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+	1. An sfree was in the wrong place; moved to the end of the block
+	of code it was in.
+	2. In the "diff" routine, the OBJECT keyword was not being accounted
+	for correctly in computing the new header size.
+	3. If the new header were more than one FITS block (36 cards) smaller
+	than the old, the extra blocks were being filled with zeros instead
+	of blanks.
+	4. Boy would this code be a lot better off it were using the new KWDB
+	interface to manage the headers...
+	(9/15)
+
+pkg/images/tv/wcslab/wcslab.h
+	Added an entry for tnx to the list of supported projections types.
+	This apparently fixed a garbled plot problem for tnx images,
+	espcially for thos around ra=0.0.
+	(9/17 LED)
+
+pkg/math/curfit/mkpkg
+pkg/math/deboor/mkpkg
+pkg/math/iminterp/mkpkg
+pkg/xtools/inlfit/mkpkg
+	Added some missing file dependencies to the math library mkpkg files.
+	(9/20 LED)
+
+pkg/images/tv/display/mkpkg
+pkg/images/tv/wcslab/mkpkg
+pkg/images/tv/imedit/mkpkg
+pkg/images/tv/imexamine/mkpkg
+        Added some missing file dependencies and removed some unecessary ones
+        from the tv package mkpkg files.
+        (9/21 LED)
+
+
+pkg/images/imcoords/src/mkpkg
+pkg/images/imgeom/src/mkpkg
+pkg/images/immmatch/src/imcombine/generic/mkpkg
+pkg/images/immmatch/src/imcombine/mkpkg
+pkg/images/immmatch/src/imutil/generic/mkpkg
+pkg/images/immmatch/src/imutil/mkpkg
+        Added some missing file dependencies and removed some uneccessary ones
+        from the image package mkpkg files. (9/21, LED)
+
+pkg/plot/mkpkg
+        Added some missing file dependencies and removed some uneccessary ones
+        from the plot package mkpkg files. (9/21, LED)
+
+pkg/proto/mkpkg
+        Added some missing file dependencies and removed some uneccessary ones
+        from the proto package mkpkg files. (9/21, LED)
+
+pkg/utilities/curfit.gx
+pkg/utilities/curfit.x
+	Removed an unecessary include statement (9/22, LED)
+
+pkg/xtools/icfit/icshow.x
+pkg/xtools/icfit/icvshow.gx
+	The gt pointer was not being used when called directly by 
+	UTILITIES.CURFIT.  If the task was run non-interactively, so there 
+	was no prior call to the icfit graphics routines, then IC_GT structure
+	element was not set causing an error.  These routines now set the 
+	element with the gt argument passed by the calling routine.  
+	(9/14, Valdes)
+
+pkg/images/imutil/imreplace.par
+pkg/images/imutil/src/imrep.gx
+    	Fixed a floating-point precision problem with short/int images in 
+	which the lower cutoff could be rounded up. Also fixed a typo in the 
+	parameter file.  (9/22/99, MJF)
+
+imio/iki/fxf/zfiofxf.x
+        The routine fxf_cnvpx() was not offsetting properly to FITS
+        units other than one, e.g. giving a segvio when trying to access
+	the 2nd extension.  This would only affect access to images of
+	type byte or short where on-the-fly conversion is required.
+        Adjusting to the beginning of the unit solved the problem.
+	(Some clean up done as well).  (9/23 NZ/DT)
+
+imio/iki/fxf/fxfopix.x
+	In routine fxf_discard_keyw() a change was made to filter out the
+	keyword BLOCKED from obsolete GEIS files in FITS format.  This was
+	causing problems when adding a keyword into a header that was full
+	to the 2880 bytes block and the INHERIT keyword was set to T.
+	(9/23 NZ/DT)
+
+imio/iki/fxf/zfiofxf.x
+	A buffer overrun could occur in fxfzwr, when writing to the output
+	image.  This caused a SEGVIO when testing the new kernel on an
+	OpenVMS system.  (9/29)
+
+pkg/images/tv/imexamine/mkpkg
+        Added a file dependency to the mkpkg file that was missed the last
+	time, (9/30 LED)
+
+pkg/images/tv/imedit/t_imedit.x
+	The use of a temporary image causes the output image type to be
+	set by "imtype" instead of any explicit extension.  Changed to
+	use the xt_mkimtemp routine which tries to create a temporary image
+	of the desired output image type.  (10/1 FV)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+	Modified error recovery to avoid a tranfer out of an IFERR block
+	message.  (10/14, FV)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+	A call to IMUNMAP within the THEN clause of an IFERR replaces the
+	error string (inappropriately) so that a later ERRACT reports the
+	wrong error.  The code was modified to get the error string before
+	calling IMUNMAP and then restores the error condition with an
+	ERROR call instead of an ERRACT.  (10/21, FV)
+
+pkg/dataio/export/bltins/exeps.x
+    	Fixed an array overrun when writing EPS trailer comments. (10/25/99 MJF)
+
+sys/imio/iki/fxf/fxfopen.x
+	The iferr handler for fxf_rheader was catching header read errors and
+	turning them into warning messages.  These can be serious errors
+	though requiring the image open to fail.  Added an erract(EA_ERROR)
+	to repost the error after the cleanup performed in the iferr block
+	in fxfopen.  (10/26)
+
+sys/etc/mkpkg
+sys/fmio/mkpkg
+sys/gio/calcomp/mkpkg
+sys/gio/cursor/grcstatus.x
+sys/gio/mkpkg
+sys/gio/nsppkern/mkpkg
+sys/gio/stdgraph/mkpkg
+sys/imio/iki/fxf/mkpkg
+sys/imio/iki/oif/mkpkg
+sys/imio/iki/qpf/mkpkg
+sys/ki/mkpkg
+sys/memdbg/mkpkg
+sys/plio/tf/mkpkg
+pkg/system/help/mkpkg
+	Fixed minor mkpkg library file dependency related problems or
+	oddities.  (10/26)
+
+sys/mwcs/iwctype.x
+	Modified the code which recognizes the cards CDi_j, CDELTi, CRPIXi,
+	CRVALi, and CTYPEi to accept these cards only if the name is an
+	exact match, i.e., no trailing characters.  Data in the draft FITS
+	WCS standard may have a character appended if there are multiple WCS,
+	and this could cause a secondary WCS to be confused with the primary.
+	(10/26)
+
+unix/os/zfchdr.c
+	This code trims any trailing "/" from a directory path before
+	doing a chdir to the new directory.  This would fail if the path
+	were "/" (the unix root directory).   Changed the code to trim the
+	trailing slash only if it is a trailing slash.  (10/26)
+
+pkg/math/gsurfit/gsder.gx
+pkg/math/gsurfit/gsderr.x
+pkg/math/gsurfit/gsderd.x
+pkg/math/gsurfit/gs_fder.gx
+pkg/math/gsurfit/gs_fderr.x
+pkg/math/gsurfit/gs_fderd.x
+pkg/math/gsurfit/gs_deval.gx
+pkg/math/gsurfit/gs_devalr.x
+pkg/math/gsurfit/gs_devald.x
+	Fixed a bug in the code which computes the derivatives for non-linear
+	chebyshev and legendre polynomials surfaces. In the process
+	of fixing those bugs decided to rewrite the code using the same
+	recursion relations that are used to generate the original surface.
+	(10/27 LED)
+
+pkg/system/references.cl
+	Modified the task to filter the stderr as well as stdout, to eliminate
+	the "No help available" warning messages.  (10/29)
+
+dev/hosts
+	Added new redhat boxes atand and omhah  (11/3/99, MJF)
+
+pkg/dataio/import.par
+pkg/dataio/export.par
+    	Changed query param modes to auto to avoid prompt from epar :go 
+	command. (11/4/99 MJF)
+
+---------------------------------
+V2.11.3 patch in BETA test.  (11/05)
+
+dev/hosts
+	Added PC-IRAF systems vmware, slack40, suse62 and sol7 (11/16/99 MJF)
+
+pkg/images/immatch/src/imcombine/icombine.gx
+	An input array was declared with a value of 3 though it was passed to
+	the routine with 4 elements.  Later there was a reference to
+	the 4th element.  While this is legal as the size in the declaration
+	is a dummy this was a compiler error on one platform.  Changed the
+	declaration to 4.  (11/19/99, Valdes)
+
+pkg/images/imfilter/src/fmedian.x
+pkg/images/imfilter/src/frmedian.x
+pkg/images/imfilter/src/fmode.x
+pkg/images/imfilter/src/frmode.x
+pkg/images/imfilter/src/fmd_hist.x
+	Modified the fast median algorithm histogram storage from short to int
+	to avoid integer overflows in the case that xfilter * yfilter > 32767
+	and more than 32767 pixels end up in 1 bin as is likely to happen
+	in bad pixel regions. (11/19/99, Davis)
+
+pkg/math/gsurfit/gsder.gx
+pkg/math/gsurfit/gsderr.gx
+pkg/math/gsurfit/gsderd.gx
+	After rewriting the derivative code to work correctly for the higher
+	order chebyshev and legendre cases, forgot to add back in the 4 lines
+	that do the final normalization to user (not -1.0 to 1.0 normalized)
+	coordinates, causing the derivatives to be way offscale. Found
+	by user running longslit. Only affects 2.11.3. (11/23/99 Davis)
+
+sys/fmtio/evvexpr.gy
+	The main routine of evvexpr dynamically allocates the output operand
+	structure.  It was setting the flags O_FREEVAL+O_FREEOP for this
+	structure, overriding any flags in the operand returned by the
+	expression evaluator, but clearly only O_FREEOP is warannted as the
+	only thing this code allocates is the operand structure.  Whether
+	or not any vector value buffer should be freed has to be determined
+	by the expression code which generates the operand returned by the
+	expression evaluator.  Hence the O_FREEVAL flag was removed.  (11/23)
+
+pkg/images/imutil/src/imexpr.gx
+	Several places in the code where a new operand structure is being
+	initialized, code was added to either clear the entire structure,
+	or explicitly set O_FLAGS(o)=0 in cases where we wanted to be sure
+	that any values from an earlier use of the same operand structure
+	were not unintentionally reused.  In particular, in any case where
+	the operand structure is being reused the O_FREEOP flag should be
+	clear.  In any case where the operand is vector-valued and the
+	data vector is a pointer returned by IMIO, O_FREEVAL should be
+	clear as it is up to IMIO to eventually free the buffer.  (11/23)
+
+pkg/images/imutil/src/imexpr.gx
+	Changed the value of LEN_IMOPERAND from 16 to 17.  This problem was
+	probably never seen as it would be a problem only for double
+	operands, which are probably not used all that often.  (11/24)
+
+pkg/images/imutil/doc/imexpr.hlp
+	Fixed some typos in the imexpr task help page. (11/24 LED)
+
+unix/os/zfiomt.c
+	Changed one occurrence of zmtdbg1() to zmtdbg() as the call in
+	question did not have an argument.  This was harmless, but incorrect
+	and caused a compiler warning on one platform.  (11/24)
+
+---------------------------------
+V2.11.3 patch on verge of being frozen...  (11/24)
+
+dev/graphcap
+dev/imtoolrc
+	Added new frame buffers for Mosaic at full frame and with several
+	block averaging factors.   New buffers are: imt41|imt8800=8800x8800,
+	imt42|imt4400=4400x4400, imt43|imt2200=2200x2200, and
+	imt44|imt1100=1100x1100  (11/25  MJF)
+
+sys/osb/ieee.gx
+unix/as.sparc/ieee.gx
+unix/as.ssol/ieee.gx
+	This routine was missing some {} braces around an IF clause in
+	ieevupk.  Although the code was technically correct as there was
+	only one statement (a multiline do-loop) in the IF clause, it
+	needed braces to be safe against modifications.  (11/30)
+
+sys/fmtio/evvexpr.gy
+	There was another bug in this routine which went undetected when it
+	was modified several days earlier.  The code would set O_FLAGS on
+	the output operand to ensure that the operand structure is later
+	deleted.  By this point the actual operand had been created by
+	the expression evaluator.  The bug was that the code was simply
+	overwriting O_FLAGS in the output operand.  Instead it needed to
+	preserve the existing flags, merely insuring that the O_FREEOP flag
+	was set (setting the flag to O_FREEOP would clear the O_FREEVAL
+	flag if already set in the operand).  The code was modified to
+	"or" in the flag, rather than clobber the whole flag word.  (12/01)
+
+sys/imio/iki/stf/stf.h
+	Increased MAX_PCOUNT (the number of keywords in a group header block
+	for STF images) from 50 to 99.  (12/02)
+
+sys/libc/scanf.c
+	Added support for "%n".  This returns to an integer output argument
+	the number of input characters scanned thus far (a feature of ANSI C
+	stdio).  (12/02)
+
+sys/libc/printf.c
+	Modified the *printf routines to recognize 'l', 'E', and 'G' in
+	formatted prints, for enhanced compatibility with ANSI C.  'l' is
+	ignored since it is a no-op on our current platforms anyway (related
+	modifiers such as 'h', 'L', and 'q' are not supported).  'E' and 'G'
+	are permitted, but are handled the same as 'e' and 'g' since IRAF
+	already prints floating point numbers using 'E'.  (12/02)
+
+sys/libc/zztest.c
+	Added support to the test routine for scan for %n, and ran some
+	simple tests.  Seems to work.  (12/02)
+
+pkg/images/imfilter/src/frmedian.x
+pkg/images/imfilter/src/frmode.x
+	Changed 2 aclrs calls to aclri calls that were missed when the
+	frmedian / frmode tasks were upgraded to work with larger kernels.
+	(12/03 LED)
+
+---------------------------------
+V2.11.3 patch frozen.  (12/03)

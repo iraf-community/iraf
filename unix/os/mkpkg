@@ -12,10 +12,19 @@ alloc:
 	;
 
 libos.a:
-	$set XFLAGS = "-c $(HSI_XF)"
+	$set XFLAGS = "-cd $(HSI_XF)"
 
-	"as$zsvjmp.s"
-	"as$enbint.s"
+	$ifdef (DEBUG)
+	    $iffile (as$zsvjmp_p.s)
+		as$zsvjmp_p.s
+	    $else
+		as$zsvjmp.s
+	    $endif
+	$else
+	    as$zsvjmp.s
+	$endif
+
+	#"as$enbint.s"
 
 	# Do not put zmain.o in the library if it is linked explicitly as a .o
 	# on the host machine.  Having it in the library prevents use of the
@@ -78,6 +87,8 @@ libos.a:
 	zshlib.c
 	zwmsec.c	<libc/kernel.h> <libc/spp.h>
 	zxwhen.c	<libc/kernel.h> <libc/spp.h>
+	zzexit.c	<libc/spp.h>
+	zzpstr.c	<libc/spp.h>
 	zzsetk.c	<libc/spp.h>
 	zzstrt.c
 	;

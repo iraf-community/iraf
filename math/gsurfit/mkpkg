@@ -13,6 +13,8 @@ tfiles:
 	$ifolder (gs_chomatr.x, gs_chomat.gx)	$(GEN)	gs_chomat.gx	$endif
 	$ifolder (gs_f1devalr.x, gs_f1deval.gx)	$(GEN)	gs_f1deval.gx	$endif
 	$ifolder (gs_fevalr.x, gs_feval.gx)	$(GEN)	gs_feval.gx	$endif
+	$ifolder (gs_fderr.x, gs_fder.gx)	$(GEN)	gs_fder.gx	$endif
+	$ifolder (gs_devalr.x, gs_deval.gx)	$(GEN)	gs_deval.gx	$endif
 	$ifolder (gsaccumr.x, gsaccum.gx)	$(GEN)	gsaccum.gx	$endif
 	$ifolder (gsacptsr.x, gsacpts.gx)	$(GEN)	gsacpts.gx	$endif
 	$ifolder (gsaddr.x, gsadd.gx)		$(GEN)	gsadd.gx	$endif
@@ -46,6 +48,8 @@ libgsurfit.a:
 	gs_chomatr.x	gsurfitdef.h <mach.h> <math/gsurfit.h>
 	gs_f1devalr.x	
 	gs_fevalr.x	<math/gsurfit.h>
+	gs_fderr.x	<math/gsurfit.h>
+	gs_devalr.x	
 	gsaccumr.x	gsurfitdef.h <math/gsurfit.h>
 	gsacptsr.x	gsurfitdef.h <math/gsurfit.h>
 	gsaddr.x	gsurfitdef.h <math/gsurfit.h>
@@ -74,6 +78,8 @@ libgsurfit.a:
 	gs_chomatd.x	dgsurfitdef.h <mach.h> <math/gsurfit.h>
 	gs_f1devald.x	
 	gs_fevald.x	<math/gsurfit.h>
+	gs_fderd.x	<math/gsurfit.h>
+	gs_devald.x	
 	gsaccumd.x	dgsurfitdef.h <math/gsurfit.h>
 	gsacptsd.x	dgsurfitdef.h <math/gsurfit.h>
 	gsaddd.x	dgsurfitdef.h <math/gsurfit.h>

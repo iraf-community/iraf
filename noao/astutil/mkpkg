@@ -35,7 +35,8 @@ libpkg.a:
 	@pdm
 
 	airmass.x	<math.h>
-	astfunc.x	astfunc.h <evvexpr.h> <imset.h> <lexnum.h> <mach.h>
+	astfunc.x	astfunc.h <evvexpr.h> <imset.h> <lexnum.h> <mach.h>\
+			<time.h>
 	ccddb.x	
 	galactic.x	<fset.h>
 	precess.x	<fset.h>
@@ -47,7 +48,7 @@ libpkg.a:
 	t_ccdtime.x	
 	t_gratings.x	<error.h> <math.h>
 	t_obs.x		<error.h>
-	t_rvcorrect.x	rvcorrect.com <error.h>
-	t_setairmass.x	<ctotok.h> <error.h> <imhdr.h>
+	t_rvcorrect.x	rvcorrect.com <error.h> <time.h>
+	t_setairmass.x	<error.h> <imhdr.h>
 	t_setjd.x	<error.h> <ctype.h> <imhdr.h>
 	;

@@ -64,11 +64,11 @@ libpkg.a:
 			<mach.h> <xwhen.h>
 	t_implot.x	<ctype.h> <error.h> <gset.h> <imhdr.h> <mach.h>\
 			<mwset.h>
-	t_pcol.x	<gset.h> <imhdr.h> <mach.h>
-	t_pcols.x	<gset.h> <imhdr.h> <mach.h>
+	t_pcol.x	<gset.h> <imhdr.h> <mach.h> <mwset.h>
+	t_pcols.x	<gset.h> <imhdr.h> <mach.h> <mwset.h>
 	t_pradprof.x	<gset.h> <imhdr.h>
-	t_prow.x	<gset.h> <imhdr.h> <mach.h>
-	t_prows.x	<gset.h> <imhdr.h> <mach.h>
+	t_prow.x	<gset.h> <imhdr.h> <mach.h> <mwset.h>
+	t_prows.x	<gset.h> <imhdr.h> <mach.h> <mwset.h>
 	t_pvector.x	<gset.h> <imhdr.h> <mach.h> <imset.h> <math.h>\
 			<math/iminterp.h>
 	t_surface.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\

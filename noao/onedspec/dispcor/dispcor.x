@@ -8,11 +8,12 @@ include	<math/iminterp.h>
 # procedure does some CLIO to get the interpolation function and to
 # query whether to conserve flux.
 
-procedure dispcor (cti, cto, line, in, npts, out, nw, flux)
+procedure dispcor (cti, linei, cto, lineo, in, npts, out, nw, flux)
 
 pointer	cti			#I MWCS input inverse transformation
+int	linei			#I Spectrum line
 pointer	cto			#I MWCS output forward transformation
-int	line			#I Spectrum line
+int	lineo			#I Spectrum line
 real	in[npts]		#I Input spectrum
 int	npts			#I Number of input pixels
 real	out[nw]			#O Output spectrum
@@ -23,7 +24,7 @@ char	interp[10]
 bool	ofb_a, ofb_b
 int	i, j, ia, ib, clgwrd()
 real	a, b, sum, asieval(), asigrl()
-double	x, xmin, xmax, w, y1, y2
+double	x, xmin, xmax, w, y1, y2, smw_c1trand()
 pointer	asi, temp
 
 begin
@@ -45,19 +46,38 @@ begin
 
 	xmin = 0.5
 	xmax = npts + 0.5
-	y1 = line
 
 	x = 0.5
-	call smw_c2trand (cto, x, y1, w, y2)
-	call smw_c2trand (cti, w, y2, x, y1)
+	if (IS_INDEFI(lineo))
+	    w = smw_c1trand (cto, x)
+	else {
+	    y1 = lineo
+	    call smw_c2trand (cto, x, y1, w, y2)
+	}
+	if (IS_INDEFI(linei))
+	    x = smw_c1trand (cti, w)
+	else {
+	    y2 = linei
+	    call smw_c2trand (cti, w, y2, x, y1)
+	}
 	ofb_b = (x < xmin || x > xmax)
 	b = max (xmin, min (xmax, x)) + 1
 	do i = 1, nw {
 	    ofb_a = ofb_b
 	    a = b
 	    x = i + 0.5
-	    call smw_c2trand (cto, x, y1, w, y2)
-	    call smw_c2trand (cti, w, y2, x, y1)
+	    if (IS_INDEFI(lineo))
+		w = smw_c1trand (cto, x)
+	    else {
+		y1 = lineo
+		call smw_c2trand (cto, x, y1, w, y2)
+	    }
+	    if (IS_INDEFI(linei))
+		x = smw_c1trand (cti, w)
+	    else {
+		y2 = linei
+		call smw_c2trand (cti, w, y2, x, y1)
+	    }
 	    ofb_b = (x < xmin || x > xmax)
 	    b = max (xmin, min (xmax, x)) + 1
 	    if (ofb_a && ofb_b)

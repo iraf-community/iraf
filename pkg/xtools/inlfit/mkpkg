@@ -59,8 +59,8 @@ libxtools.a:
 	indumpr.x	<pkg/inlfit.h>	  "inlfitdef.h"
 	inerrorsd.x	<pkg/inlfit.h>    <math/nlfit.h>
 	inerrorsr.x	<pkg/inlfit.h>    <math/nlfit.h>
-	infitd.x	<pkg/inlfit.h>    <math/nlfit.h> "inlfitdef.h"
-	infitr.x	<pkg/inlfit.h>    <math/nlfit.h> "inlfitdef.h"
+	infitd.x	<pkg/inlfit.h>    <math/nlfit.h>
+	infitr.x	<pkg/inlfit.h>    <math/nlfit.h>
 	infreed.x	"inlfitdef.h"
 	infreer.x	"inlfitdef.h"
 	ingaxesd.x	<pkg/inlfit.h> <pkg/gtools.h>

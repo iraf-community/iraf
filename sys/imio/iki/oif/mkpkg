@@ -12,7 +12,7 @@ libex.a:
 	oifdelete.x	<error.h> <imhdr.h> <protect.h>
 	oifgpfn.x	oif.h <knet.h>
 	oifmkpfn.x	oif.h <imhdr.h> <imio.h> <knet.h>
-	oifopen.x	oif.h <imhdr.h> <imio.h>
+	oifopen.x	oif.h <imhdr.h> <imio.h> <fio.h> <error.h>
 	oifopix.x	oif.h <config.h> <imhdr.h> <imio.h>
 	oifrdhdr.x	imhv1.h imhv2.h oif.h <imhdr.h> <imio.h> <mach.h>
 	oifrename.x	oif.h <error.h> <imhdr.h> <imio.h>

@@ -1,5 +1,34 @@
 .help revisions Jun88 noao.astutil
 .nf
+
+t_setairmass.x
+    Moved erract call before imunmap to avoid an incorrect error string
+    (about isodate) being printed.  (10/21/99, Valdes)
+
+astfunc.x
+t_rvcorrect.x
+    Added missing time.h dependencies.  (10/11/99, Valdes)
+
+asttools/mkpkg
+    Added missing dependency for astgalactic.x.  (10/11/99, Valdes)
+
+t_astcalc.x
+    There was an extra READ_ONLY immap when processing a list of images.
+    Therefore when using a long list of STF format images where a file
+    descriptor is opened and not closed until imunmap it was possible to
+    run out of file descriptors.  This was not a problem with imh
+    or fits formats.  (8/31/99, Valdes)
+
+t_rvcorrect.x
+astfunc.x
+    The dates in old FITS format incorrectly are adding 1900 to the year
+    where the 1900 is already added by the parsing routine.
+    (8/30/99, Valdes)
+
+=======
+V2.11.2
+=======
+
 t_asthedit.x
 t_astcalc.x
 astfunc.x

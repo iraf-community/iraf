@@ -86,16 +86,6 @@ is less than this value then a flat field value of 1 is output.
 .le
 
 The following parameters control the profile and spectrum fitting.
-.ls background = "none"
-Type of background subtraction.  The choices are "none" for no
-background subtraction, "average" to average the background within the
-background regions, or "fit" to fit across the dispersion using the
-background within the background regions.  Note that the "average"
-option does not do any medianing or bad pixel checking; it is faster
-than fitting however.  Background subtraction also requires that the
-background fitting parameters are properly defined.  For the "average"
-option only the background sample regions parameter is used.
-.le
 .ls pfit = "fit1d" (fit1d|fit2d)
 Profile fitting algorithm to use with variance weighting or cleaning.
 When determining a profile the two dimensional spectrum is divided by
@@ -107,14 +97,6 @@ function, "fit2d", described by Marsh (see \fBapprofile\fR).
 .le
 .ls clean = no
 Detect and replace deviant pixels?
-.le
-.ls skybox = 1
-Box car smoothing length for sky background when using background
-subtraction.  Since the background noise is often the limiting factor
-for good extraction one may box car smooth the sky to improve the
-statistics in smooth background regions at the expense of distorting
-the subtraction near spectral features.  This is most appropriate when
-the sky regions are limited due to a small slit length.
 .le
 .ls saturation = INDEF
 Saturation or nonlinearity level.  During variance weighted extractions

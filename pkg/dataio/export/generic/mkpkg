@@ -7,6 +7,6 @@ $exit
 
 libpkg.a:
 	exobands.x	../exfcn.h ../export.h <error.h> <evvexpr.h> \
-			<fset.h> <mach.h>
+			<fset.h> <mach.h> <ctype.h>
 	exraster.x	../export.h <evvexpr.h> <imhdr.h> <mach.h>
 	;

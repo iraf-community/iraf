@@ -38,15 +38,19 @@ struct _format {
  */
 struct _input {
 	int	i_type;			/* file input if !0, else str	*/
+	int	i_nchars;		/* nchars read thus far		*/
 	union {
 	FILE	*fp;			/* file pointer if file		*/
 	char	*ip;			/* char pointer if string	*/
 	} u;
 };
 
-#define	input()    (in->i_type ? getc(in->u.fp) : *in->u.ip++)
-#define	unput(ch)  (in->i_type ? ungetc((ch),in->u.fp) : (int)(*--(in->u.ip)))
-#define	ateof()    (in->i_type ? feof(in->u.fp) : *(in->u.ip-1) == EOS)
+#define	input()\
+    (in->i_nchars++, in->i_type ? (int)getc(in->u.fp) : (int)*in->u.ip++)
+#define	unput(ch)\
+    (in->i_nchars--, in->i_type ? ungetc((ch),in->u.fp) : (int)(*--(in->u.ip)))
+#define	ateof()\
+    (in->i_type ? feof(in->u.fp) : *(in->u.ip-1) == EOS)
 
 
 /* SCANF -- Scan the standard input.  The output arguments must be
@@ -63,6 +67,7 @@ va_dcl
 	struct	_input in;
 
 	in.i_type = SCAN_FILE;
+	in.i_nchars = 0;
 	in.u.fp = stdin;
 
 	va_start (argp);
@@ -90,6 +95,7 @@ va_dcl
 	format = va_arg (argp, char *);
 
 	in.i_type = SCAN_FILE;
+	in.i_nchars = 0;
 	in.u.fp = fp;
 
 	status = u_doscan (&in, format, &argp);
@@ -116,6 +122,7 @@ va_dcl
 	format = va_arg (argp, char *);
 
 	in.i_type = SCAN_STRING;
+	in.i_nchars = 0;
 	in.u.ip = str;
 
 	status = u_doscan (&in, format, &argp);
@@ -153,9 +160,12 @@ va_list	*argp;			/* pointer to first argument	*/
 		 * the field specification just generated.
 		 */
 		ch = *format++;
-		if (ch == '[')
+		if (ch == 'n') {
+		    *(va_arg ((*argp), int *)) = in->i_nchars;
+		    continue;
+		} else if (ch == '[') {
 		    format = u_setucc (format, &fmt);
-		else if (isupper (ch)) {
+		} else if (isupper (ch)) {
 		    fmt.f_longword++;
 		    ch = tolower (ch);
 		}

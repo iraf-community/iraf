@@ -229,15 +229,26 @@ freebsd:				# install freebsd binaries
         !$(hlib)/mkfloat.csh freebsd
         !(cd ./unix; setenv MACH freebsd; sh -x setarch.sh)
         ;
-linux:					# install Slackware Linux binaries
+        ;
+sunos:					# install sunos binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh sunos
+        !(cd ./unix; setenv MACH sunos; sh -x setarch.sh)
+        ;
+linux:					# install linux binaries
         $verbose off
         !$(hlib)/mkfloat.csh linux
         !(cd ./unix; setenv MACH linux; sh -x setarch.sh)
         ;
-redhat:					# install Redhat Linux binaries
+redhat:					# install redhat binaries
         $verbose off
         !$(hlib)/mkfloat.csh redhat
         !(cd ./unix; setenv MACH redhat; sh -x setarch.sh)
+        ;
+suse:					# install suse binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh suse
+        !(cd ./unix; setenv MACH suse; sh -x setarch.sh)
         ;
 linuz:					# install linuz binaries
         $verbose off

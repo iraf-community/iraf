@@ -50,6 +50,12 @@
 39  1 1232  800		# imt39|imtf1ka
 40  4 1200  600		# imt40|imtweather
 
+# Mosaic formats.
+41  1 8800  8800	# imt41|imt8800
+42  1 4400  4400	# imt42|imt4400
+43  1 2200  2200	# imt43|imt2200
+44  1 1100  1100	# imt44|imt1100
+
 # User added formats.  (start with #64)
 # (add here)
 

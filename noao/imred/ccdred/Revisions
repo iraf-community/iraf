@@ -1,5 +1,22 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
+ccdred/src/t_combine.x
+    Added workaround for error recovery problem that loses the error
+    message.  (10/21/99, Valdes)
+
+ccdred$doc/ccdproc.hlp
+    The overscan type name was incorrectly given as "average" instead of
+    "mean".  This was corrected in the documentation.  (10/15/99, Valdes)
+
+ccdred$src/generic/mkpkg
+ccdred$src/cosmic/mkpkg
+ccdred$src/mkpkg
+    Added missing dependencies.  (10/11/99, Valdes)
+
+=======
+V2.11.2
+=======
+
 ccdred$src/t_ccdlist.x
     Date accidentally changed.  File not modified.  (5/13/99, Valdes)
 

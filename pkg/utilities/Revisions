@@ -1,5 +1,17 @@
 .help revisions Jun88 pkg.utilities
 .nf
+
+utilities$mkpkg
+    Added missing dependencies.  (10/11/99, Valdes)
+
+utilities$curfit.gx
+utilities$curfit.x
+    Removed an unneccessay include file statmenet. (9/22/99, Davis)
+
+=======
+V2.11.2
+=======
+
 utilities$surfit.par
 utilities$t_surfit.x
 utilities$doc/surfit.hlp

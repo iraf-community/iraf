@@ -35,13 +35,14 @@ libpkg.a:
 			../lib/fitsky.h
 	apserrors.x	../lib/fitsky.h
 	apsfree.x	../lib/apphotdef.h	../lib/fitskydef.h
-	apsinit.x	../lib/apphotdef.h	../lib/fitskydef.h
+	apsinit.x	../lib/apphotdef.h	../lib/fitskydef.h      \
+			../lib/fitsky.h
 	apsky.x		<ctype.h>		<gset.h>		\
 			../lib/apphot.h		../lib/display.h        \
 			../lib/fitsky.h
 	apskybuf.x	<imhdr.h>		<math.h>                \
 			../lib/apphotdef.h	../lib/fitskydef.h	\
-			../lib/fitsky.h
+			../lib/fitsky.h         <mach.h>
 	apskycolon.x	../lib/apphot.h		../lib/fitsky.h         \
 			../lib/display.h	../lib/noise.h
 	apsradsetup.x	../lib/display.h	../lib/fitsky.h

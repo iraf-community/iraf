@@ -1,5 +1,24 @@
 .help revisions May91 noao.digiphot.photcal
 .nf
+photcal/photcal.cl
+    Added a missing ; to the cl file that could cause a hangup if the
+    tables package is not defined.
+
+    (Davis, September 29, 1999)
+
+photcal/*/mkpkg
+    Added some missing file dependencies and removed some unecessary ones.
+
+    (Davis, September 20, 1999)
+
+
+photcal/io/mkpkg
+    Added a missing <time.h> dependence for the iocat.x file in the mkpkg
+    file. iocat.x must be recompiled to pick up the change in the time
+    structure buffer.
+
+    (Davis, August 27, 1999)
+    
 photcal/catalogs/nlandolt.dat
     Replaced the existing catalog which was an early version I got off a tape
     given to us by Arlo Landolt with a new version in which the positions

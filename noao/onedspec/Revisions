@@ -1,5 +1,52 @@
 .help revisions Jun88 noao.onedspec
 .nf
+
+t_fitprof.x
+    Fixed double/int mismatch in a min call.  (11/22/99, Valdes)
+
+smw/mkpkg
+ecidentify/ecffit/mkpkg
+sensfunc/mkpkg
+splot/mkpkg
+mkpkg
+    Added missing dependencies.  (10/11/99, Valdes)
+
+t_fitprofs.x
+doc/fitprofs.hlp
+    The background region specification was extended to allow a third
+    argument as a scaling factor.  (9/22/99, Valdes)
+
+doc/specwcs.hlp
+    Fixed typo defining the variable n.  (9/13/99, Valdes)
+
+t_tweak.x
+    1.  Changed wavelength evaluations to double precision.
+    2.  The normalization step for the rms calculation was removed for
+	the case of sky subtraction.
+    (9/8/99, Valdes)
+
+dispcor/t_dispcor.x
+dispcor/dcio.x
+dispcor/dispcor.x
+doc/dispcor.hlp
+    Now allows NDSPEC format spectra.  (9/7/99, Valdes)
+
+t_fitprofs.x
+doc/fitprofs.hlp
+    1.  The background region specification was extended to allow taking
+	the average or median or a region.
+    2.  The image identification label was incorrect.
+    3.  If verbose=no there was an attempt to close a non-existent structure.
+    (6/26/99, Valdes)
+
+t_fitprofs.x
+    Fixed bug which only allowed the last component to be saved to an
+    image.  (8/25/99, Valdes)
+
+=======
+V2.11.2
+=======
+
 smw/units.x
 smw/funits.x
     Stripped trailing whitespace from units label.  (8/5/99, Valdes)

@@ -207,7 +207,7 @@ begin
 	# subroutine has a fixed calling sequence.
 
 	junk = xvv_parse (ip, debug, xvv_gettok)
-	O_FLAGS(ev_oval) = O_FREEVAL+O_FREEOP
+	O_FLAGS(ev_oval) = or (O_FLAGS(ev_oval), O_FREEOP)
 
 	call sfree (sp)
 	return (ev_oval)

@@ -16,7 +16,7 @@ libex.a:
 	qpfopix.x	qpf.h <imhdr.h> <imio.h>
 	qpfrename.x	qpf.h <error.h>
 	qpfupdhdr.x	
-	qpfwattr.x	qpf.h <ctype.h>
+	qpfwattr.x	qpf.h <ctype.h> <qpioset.h>
 	qpfwfilter.x	qpf.h
 	zfioqp.x	qpf.h <fio.h> <imhdr.h> <imio.h> <mach.h> <qpioset.h>
 	;

@@ -1,5 +1,11 @@
 .help revisions Jan97 images.imutil
 .nf
+pkg/images/imutil/imreplace.par
+pkg/images/imutil/src/imrep.gx
+    Fixed a floating-point precision problem with short/int images in which
+    the lower cutoff could be rounded up. Also fixed a typo in the parameter
+    file.  (9/22/99, MJF)
+
 pkg/images/imutil/src/t_imarith.x
     Added a check for division by zero in the header keywords.
     (8/10/99, Valdes)

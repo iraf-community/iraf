@@ -300,13 +300,14 @@ char	logfile[ARB]			# Log filename
 int	stack				# Stack input images?
 bool	delete				# Delete input images?
 
+char	errstr[SZ_LINE]
 int	i, j, nimages, intype, bufsize, maxsize, memory, oldsize, stack1, err
 pointer	sp, sp1, in, out[3], offsets, temp, key, tmp
 
 int	getdatatype()
 real	clgetr()
 char	clgetc()
-int	clgeti(), begmem(), errcode(), open(), ty_max(), sizeof()
+int	clgeti(), begmem(), errget(), open(), ty_max(), sizeof()
 pointer	immap(), ic_plfile()
 errchk	ic_imstack, immap, ic_plfile, ic_setout, ccddelete
 
@@ -500,7 +501,7 @@ retry_
 		    bufsize)
 	    }
 	} then {
-	    err = errcode ()
+	    err = errget (errstr, SZ_LINE)
 	    if (icm != NULL)
 		call ic_mclose (nimages)
 	    if (!project) {
@@ -540,13 +541,13 @@ retry_
 		    call imdelete (Memc[temp])
 		call fixmem (oldsize)
 		call sfree (sp1)
-		call erract (EA_ERROR)
+		call error (err, errstr)
 	    default:
 		if (stack1 == YES)
 		    call imdelete (Memc[temp])
 		call fixmem (oldsize)
 		call sfree (sp1)
-		call erract (EA_ERROR)
+		call error (err, errstr)
 	    }
 	}
 

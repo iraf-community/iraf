@@ -13,7 +13,7 @@ libpkg.a:
 			<xwhen.h>		<fset.h>                    \
 			../lib/daophotdef.h	../lib/psfdef.h
 	dpdelstar.x	<imhdr.h>		../lib/daophotdef.h         \
-			../lib/psfdef.h
+			../lib/psfdef.h		<mach.h>
 	dpfitpsf.x	<mach.h>                <imhdr.h>                   \
 			../lib/daophotdef.h	../lib/apseldef.h           \
 			../lib/psfdef.h		../lib/peakdef.h

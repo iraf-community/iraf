@@ -794,6 +794,10 @@ begin
 	# ONEDSPEC package.
 
 	call imastr (out, "DCLOG1", "Transform")
+	iferr (call imdelf (out, "REFSPEC1"))
+	    ;
+	iferr (call imdelf (out, "REFSPEC2"))
+	    ;
 	call get_daxis (in, laxis, paxis)
 	call imaddi (out, "dispaxis", laxis)
 	switch (laxis) {

@@ -29,7 +29,7 @@ begin
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Allocate space for the histogram and zero.
-	call calloc (hst, FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1, TY_SHORT)
+	call calloc (hst, FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1, TY_INT)
 
 	# Check for 1D images.
 	if (IM_NDIM(im1) == 1)
@@ -80,7 +80,7 @@ begin
 		real (FMED_HMAX(fmd)))
 
 	    # Set up median filter array for each line scanned.
-	    call fmd_medboxset (fmd, Memi[inbuf], ncols, nlines, Mems[hst],
+	    call fmd_medboxset (fmd, Memi[inbuf], ncols, nlines, Memi[hst],
 		FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1, line)
 
 	    # Get output image line.
@@ -90,7 +90,7 @@ begin
 
 	    # Median filter the image line.
 	    call fmd_medboxfilter (fmd, Memi[inbuf], ncols, nlines,
-	        Memr[outbuf], int (IM_LEN(im2, 1)), Mems[hst],
+	        Memr[outbuf], int (IM_LEN(im2, 1)), Memi[hst],
 		FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1, line)
 
 	    # Recover original data range.
@@ -101,7 +101,7 @@ begin
 	}
 
 	# Free space.
-	call mfree (hst, TY_SHORT)
+	call mfree (hst, TY_INT)
 	call mfree (inbuf, TY_INT)
 end
 
@@ -114,7 +114,7 @@ pointer fmd				#I pointer to the fmedian structure
 int	data[nx, ny]			#I image data buffer
 int	nx				#I number of columns in image buffer
 int	ny				#I number of lines in the image buffer
-short	hist[nbins]			#U histogram
+int	hist[nbins]			#U histogram
 int	nbins				#I number of histogram bins
 int	line				#I line number
 
@@ -266,7 +266,7 @@ int	data[nx, ny]	#I image data
 int	nx, ny		#I dimensions of data
 real	medline[ncols]	#O median array
 int	ncols		#I number of output image columns
-short	hist[nbins]	#U histogram
+int	hist[nbins]	#U histogram
 int	nbins		#I length of histogram
 int	line		#I current line number
 
@@ -289,7 +289,7 @@ int	data[nx,ny]		#I buffer of image data
 int	nx, ny			#I dimensions of image buffer
 real	medline[ncols]		#O medians
 int	ncols			#I length of output image line
-short	hist[nbins]		#U histogram
+int	hist[nbins]		#U histogram
 int	nbins			#I size of histogram
 
 int	i, j, xbox, ybox, dindex, hmin, hmax, hindex, hlo, hhi, nhlo, nhhi
@@ -427,7 +427,7 @@ int	data[nx,ny]		#I buffer of image data
 int	nx, ny			#I dimensions of image buffer
 real	medline[ncols]		#O medians
 int	ncols			#I length of output image line
-short	hist[nbins]		#U histogram
+int	hist[nbins]		#U histogram
 int	nbins			#I size of histogram
 
 int	i, j, xbox, ybox, dindex, hmin, hmax, hindex, hlo, hhi, nhlo, nhhi

@@ -24,8 +24,8 @@ XINT	*status;
 	 */
 	for (ip=(char *)newdir, op=dirname;  (*op = *ip++) != EOS;  op++)
 	    ;
-	if (*--op == '/')
-	    *op = EOS;
+	if ((*(op-1) == '/') && (op - dirname > 1))
+	    *(op-1) = EOS;
 
 	/* Ask UNIX to change the cwd to newdir.
 	 */

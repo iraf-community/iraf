@@ -169,19 +169,19 @@ char	sigma[ARB]		# Sigma image (optional)
 char	logfile[ARB]		# Logfile (optional)
 int	stack			# Stack input images?
 
+char	errstr[SZ_LINE]
 int	i, j, nimages, intype, bufsize, maxsize, memory, oldsize, stack1, err
 pointer	sp, in, out[4], icm, offsets, key, tmp
 
 char	clgetc()
 int	imtlen(), imtgetim(), imtrgetim(), getdatatype()
-int	begmem(), errcode(), open(), ty_max(), sizeof()
+int	begmem(), errget(), open(), ty_max(), sizeof()
 pointer	immap(), ic_pmmap()
 errchk	ic_imstack, immap, ic_pmmap, ic_setout
 
 include	"icombine.com"
 
 define	retry_	98
-define	done_	99
 
 begin
 	# Map the input images.
@@ -229,10 +229,8 @@ retry_
 	    }
 
 	    # Check if there are no images.
-	    if (nimages == 0) {
-		call eprintf ("No input images to combine\n")
-		goto done_
-	    }
+	    if (nimages == 0)
+		call error (1, "No input images to combine")
 
 	    # Convert the pclip parameter to a number of pixels rather than
 	    # a fraction.  This number stays constant even if pixels are
@@ -258,10 +256,8 @@ retry_
 		j = fhigh * nimages
 		if (i + j == 0)
 		    reject = NONE
-		else if (i + j >= nimages) {
-		    call eprintf ("Bad minmax rejection parameters\n")
-		    goto done_
-		}
+		else if (i + j >= nimages)
+		    call error (1, "Bad minmax rejection parameters")
 	    }
 
 	    # Map the output image and set dimensions and offsets.
@@ -368,7 +364,7 @@ retry_
 		call icombiner (Memi[in], out, Memi[offsets], nimages, bufsize)
 	    }
 	} then {
-	    err = errcode ()
+	    err = errget (errstr, SZ_LINE)
 	    if (icm != NULL)
 		call ic_mclose (nimages)
 	    if (!project) {
@@ -408,13 +404,13 @@ retry_
 		    call imdelete (input)
 		call fixmem (oldsize)
 		call sfree (sp)
-		call erract (EA_ERROR)
+		call error (err, errstr)
 	    default:
 		if (stack1 == YES)
 		    call imdelete (input)
 		call fixmem (oldsize)
 		call sfree (sp)
-		call erract (EA_ERROR)
+		call error (err, errstr)
 	    }
 	}
 
@@ -446,18 +442,6 @@ retry_
 	if (icm != NULL)
 	    call ic_mclose (nimages)
 	call fixmem (oldsize)
-	call sfree (sp)
-	return
-
-done_
-	do i = 1, nimages {
-	    call imunmap (Memi[in+i-1])
-	    if (project)
-		break
-	}
-	if (stack1 == YES)
-	    call imdelete (input)
-
 	call sfree (sp)
 end
 

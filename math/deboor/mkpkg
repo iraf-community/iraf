@@ -21,7 +21,7 @@ libdeboor.a:
 	dtblok.f
 	factrb.f
 	fcblok.f
-	fsplin.x
+	fsplin.x	bspln.h
 	interv.f
 	knots.f
 	l2appr.f
@@ -34,14 +34,14 @@ libdeboor.a:
 	setdat2.f
 	setdat3.f
 	setupq.f
-	seval.x
+	seval.x		bspln.h
 	shiftb.f
 	slvblk.f
 	smooth.f
-	spline.x
+	spline.x	bspln.h
 	splint.f
-	spllsq.x
-	splsqv.x
+	spllsq.x	bspln.h
+	splsqv.x	bspln.h
 	subbak.f
 	subfor.f
 	tautsp.f

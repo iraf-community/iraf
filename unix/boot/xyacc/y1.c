@@ -66,8 +66,12 @@ main(argc,argv) int argc; char *argv[]; {
 others(){ /* put out other arrays, copy the parsers */
 	register c, i, j;
 
-	finput = fopen( PARSER, "r" );
-	if( finput == NULL ) error( "cannot find parser %s", PARSER );
+	finput = fopen (PARSER1, "r");
+	if (finput == NULL) {
+	    finput = fopen (PARSER2, "r");
+	    if (finput == NULL)
+		error ("cannot find parser %s", PARSER2);
+	}
 
 	warray( "yyr1", levprd, nprod );
 
@@ -508,16 +512,14 @@ stagen(){ /* generate the states */
 	register struct wset *p, *q;
 
 	/* initialize */
-	nstate = 0;
 
-	/* THIS IS FUNNY from the standpoint of portability
-	 * it represents the magic moment when the mem0 array, which has
-	 * been holding the productions, starts to hold item pointers, of a
-	 * different type...
-	 * someday, alloc should be used to allocate all this stuff...
-	 * for now, we accept that if pointers don't fit in integers,
-	 * there is a problem...
-	 */
+	nstate = 0;
+	/* THIS IS FUNNY from the standpoint of portability */
+	/* it represents the magic moment when the mem0 array, which has
+	/* been holding the productions, starts to hold item pointers, of a
+	/* different type... */
+	/* someday, alloc should be used to allocate all this stuff... for now, we
+	/* accept that if pointers don't fit in integers, there is a problem... */
 
 	pstate[0] = pstate[1] = (struct item *)mem;
 	aryfil( clset.lset, tbitset, 0 );

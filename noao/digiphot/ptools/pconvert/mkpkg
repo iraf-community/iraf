@@ -8,7 +8,7 @@ $exit
 libpkg.a:
 	ptconvert.x	<error.h>		<evexpr.h>                  \
 			<tbset.h>  		../../lib/ptkeysdef.h
-	ptdeftable.x	../../lib/ptkeysdef.h	<tbset.h>
+	ptdeftable.x	../../lib/ptkeysdef.h	<tbset.h> <ctype.h>
 	ptstrwrd.x
  	t_pconvert.x	<fset.h>
 	;

@@ -11,7 +11,7 @@ libpkg.a:
 	fcdbio.x	<error.h> <math/gsurfit.h> <pkg/dttext.h> <units.h>
 	fcdlist.x	<error.h>
 	fcfitcoords.x	<pkg/gtools.h> <pkg/igsfit.h> <pkg/xtanswer.h>
-	fcgetcoords.x	<imio.h> <pkg/dttext.h> <pkg/igsfit.h>
+	fcgetcoords.x	<imio.h> <mach.h> <pkg/dttext.h> <pkg/igsfit.h>
 	fcgetim.x	
 	fitcoords.x	<error.h> <pkg/igsfit.h> <pkg/xtanswer.h>
 	t_transform.x	transform.com <imhdr.h> <math.h> <math/gsurfit.h>\

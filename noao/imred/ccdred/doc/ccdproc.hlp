@@ -183,9 +183,9 @@ the following parameters.
 Line-by-line determination of the overscan is specified by:
 
 .nf
-      average - the average of the biassec columns at each line
+         mean - the mean of the biassec columns at each line
        median - the median of the biassec columns at each line
-       minmax - the average at each line with the min and max excluded
+       minmax - the mean at each line with the min and max excluded
 .fi
 
 The smoothed overscan vector may be fit by one of the functions:
@@ -378,10 +378,10 @@ direction to make an overscan vector, fits a smoothing function to the vector,
 and then evaluate and then evaluates the smooth function at each readout
 line or column.
 
-The line-by-line determination provides an average, median, or
-average with the minimum and maximum values excluded.  The median
+The line-by-line determination provides an mean, median, or
+mean with the minimum and maximum values excluded.  The median
 is lowest value of the middle two when the number of overscan columns
-is even rather than the average.
+is even rather than the mean.
 
 The smoothed overscan vector determination uses the \fBicfit\fR options
 including interactive fitting.  The fitting function is generally either a

@@ -43,29 +43,30 @@ libpkg.a:
 	getcalib.x	<error.h> <ctype.h>
 	getextn.x	<error.h>
 	odropenp.x	<ctype.h>
-	t_calibrate.x	<smw.h> <error.h> <imhdr.h> <math/iminterp.h>
-	t_deredden.x	<smw.h> <error.h> <imhdr.h>
-	t_dopcor.x	<smw.h> <error.h> <imhdr.h>
-	t_fitprofs.x	<smw.h> <error.h> <gset.h> <imhdr.h> <imset.h> <time.h>
+	t_calibrate.x	<error.h> <imhdr.h> <imset.h> <math/iminterp.h> <smw.h>
+	t_deredden.x	<error.h> <imhdr.h> <smw.h>
+	t_dopcor.x	<error.h> <imhdr.h> <smw.h>
+	t_fitprofs.x	<ctotok.h> <error.h> <gset.h> <imhdr.h> <smw.h> <time.h>
 	t_lcalib.x	<ctype.h>
 	t_mkspec.x	<imhdr.h>
 	t_names.x	
-	t_rstext.x
-	t_sapertures.x	<smw.h> <error.h> <imhdr.h>
-	t_sarith.x	<smw.h> <error.h> <imhdr.h> <mach.h>
-	t_sbands.x	<smw.h> <error.h>
+	t_rstext.x	
+	t_sapertures.x	<error.h> <imhdr.h> <smw.h>
+	t_sarith.x	<error.h> <imhdr.h> <mach.h> <smw.h>
+	t_sbands.x	<error.h> <smw.h>
+	t_sbandsr.x	<error.h> <smw.h>
 	t_scoords.x	<error.h> <imhdr.h>
-	t_sfit.x	<smw.h> <error.h> <imhdr.h> <math/curfit.h>\
+	t_sfit.x	<error.h> <imhdr.h> <smw.h> <math/curfit.h>\
 			<pkg/gtools.h> <pkg/rg.h>
-	t_sflip.x	<smw.h> <error.h> <imhdr.h>
+	t_sflip.x	<error.h> <imhdr.h> <smw.h>
 	t_sinterp.x	<imhdr.h> <math/curfit.h>
-	t_slist.x	<smw.h> <error.h> <fset.h> <imhdr.h>
-	t_specplot.x	<smw.h> specplot.h <units.h> <error.h> <gset.h>\
-			<imhdr.h> <mach.h> <pkg/gtools.h>
-	t_specshift.x	<smw.h> <error.h>
-	t_standard.x	<smw.h> <error.h> <gset.h> <imhdr.h> <mach.h>\
-			<pkg/gtools.h>
-	t_tweak.x	<error.h> <gset.h> <imset.h> <imhdr.h> <math.h>\
-			<math/iminterp.h> <pkg/gtools.h> <smw.h> <units.h>\
-			<pkg/xtanswer.h>
+	t_slist.x	<error.h> <fset.h> <imhdr.h> <smw.h>
+	t_specplot.x	specplot.h <ctype.h> <error.h> <gset.h> <imhdr.h>\
+			<mach.h> <pkg/gtools.h> <smw.h> <units.h>
+	t_specshift.x	<error.h> <smw.h>
+	t_standard.x	<error.h> <gset.h> <imhdr.h> <imset.h> <mach.h>\
+			<pkg/gtools.h> <smw.h>
+	t_tweak.x	<error.h> <gset.h> <imhdr.h> <imset.h> <math.h>\
+			<math/iminterp.h> <pkg/gtools.h> <pkg/xtanswer.h>\
+			<smw.h> <units.h>
 	;

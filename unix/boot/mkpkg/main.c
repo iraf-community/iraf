@@ -247,6 +247,11 @@ addflag:		for (op=flags;  *op;  op++)
 	    putsym (LFLAGS, new_lflags);
 	}
 
+	/* Define the symbol "DEBUG" if building for debugging (-x).
+	 */
+	if (dbgout)
+	    putsym (DEBUGSYM, "1");
+
 	/* Enter any symbols or macros defined on the command line into the
 	 * symbol table and environment.  Must be given without embedded
 	 * whitespace, e.g., "symbol=value".

@@ -193,8 +193,6 @@ begin
 	        call imgstr (im, Memc[datop], Memc[date], SZ_LINE)
 		if (dtm_decode (Memc[date], year, month, day, ut, flags) == ERR)
 		    call error (1, "Error parsing DATE-OBS keyword")
-		if (and (flags, TF_OLDFITS) != 0)
-		    year = year + 1900
 
 		if (IS_INDEFD(ut))
 		    ut = imgetd (im, Memc[utp])

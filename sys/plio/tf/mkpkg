@@ -9,9 +9,9 @@ libex.a:
 	plglpi.x	<plio.h>
 	plglpl.x	<plio.h>
 	plglps.x	<plio.h>
-	plglri.x	<plio.h>
-	plglrl.x	<plio.h>
-	plglrs.x	<plio.h>
+	plglri.x	<plio.h> <plset.h>
+	plglrl.x	<plio.h> <plset.h>
+	plglrs.x	<plio.h> <plset.h>
 	pll2pi.x	<plio.h>
 	pll2pl.x	<plio.h>
 	pll2ps.x	<plio.h>

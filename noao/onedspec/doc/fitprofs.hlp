@@ -53,12 +53,17 @@ widths are specified in the coordinate units of the image, usually
 wavelength for dispersion corrected spectra and pixels otherwise.
 .le
 .ls background = ""
-Initial or fixed linear background defined by the region
-endpoints.  If not specified the pixel values nearest the fitting
-region endpoints are used.  Other values are specified by a pair of
-space separated numbers.  When fitting the background this parameter
-defines the initial guess otherwise the background is fixed as
-specified.
+Background values defining the linear background.  If not specified the
+single pixel values nearest the fitting region endpoints are used.
+Otherwise two whitespace separated values are expected.  If a value is
+a number then that is the background at the lower or upper end of the
+fitting region (ordered in pixel space not wavelength).  The special
+values "avg(w1,w2,z)" or "med(w1,w2,z)" (note that there can be no
+whitespace) may be specified, where w1 and w2 are dispersion values, and z
+is a multiplier.  This will take the average or median of pixels within the
+specified range and multiply the result by the third argument.  The
+dispersion point used for that value in computing the linear background is
+the average of the dispersion coordinates of the pixels used.
 .le
 .ls profile = "gaussian" (gaussian|lorentzian|voigt)
 Default profile type to be fit when a profile type is not specified in
@@ -175,9 +180,17 @@ units used for the positions and widths are those defined by the standard
 linear coordinate header parameters.  For dispersion corrected spectra
 these are generally wavelengths in Angstroms and otherwise they are
 generally pixels.  A fitting region must be specified by a pair of
-numbers.  The background parameter may be left empty to select the pixel
-values at the endpoints of the fitting region for defining the initial
-linear background.
+numbers.
+
+The background parameter may be left empty to select the pixel values at
+the endpoints of the fitting region for defining the initial linear
+background.  Or values at the endpoints of the fitting region may be given
+explicitly in pixel space order (i.e. the first value is for the edge of
+the fitting region which has smaller pixel coordinate0 Values can also be
+computed from the data using the functions "avg(w1,w2)" or "med(w1,w2)"
+where w1 and w2 are dispersion coordinates.  The pixels in the specified
+range are average or medianed and the dispersion point for the linear
+background is the average of the dispersion coordinates of the pixels.
 
 The position list file consists of one or more columns.
 The format of this file has
@@ -326,8 +339,22 @@ It requires the \fBartdata\fR and \fBproto\fR packages be loaded.
       5022.948  1132.066   -7532.8    6.654  -325.594   21.73      0.
 
 .fi
+
+2.  Suppose there is no obvious continuum level near the fitting
+region but you want to specify a flat continuum level as the average
+of pixels in a specified wavelength region.  The background region
+would be specified as
+
+.nf
+    background = "avg(4250,4425.3) avg(4250,4425.3)"
+.fi
+
+Note that the value must be given twice to get a flat continuum.
 .ih
 REVISIONS
+.ls FITPROFS V2.11.3
+Modified to allow a more general specification of the background.
+.le
 .ls FITPROFS V2.11
 Modified to include lorentzian and voigt profiles.  The parameters and
 positions file format have changed in this version.  A new parameter

@@ -3,8 +3,8 @@ arcs1,f,a,"",,,"List of arc spectra"
 arctable,f,a,"",,,"Arc assignment table (optional)"
 standards,f,a,"",,,"List of standard star spectra
 "
-crval,s,a,INDEF,,,"Approximate wavelength"
-cdelt,s,a,INDEF,,,"Approximate dispersion
+crval,s,a,"INDEF",,,"Approximate wavelength"
+cdelt,s,a,"INDEF",,,"Approximate dispersion
 "
 dispcor,b,a,yes,,,"Dispersion correct spectra?"
 extcor,b,a,no,,,"Extinction correct spectra?"

@@ -110,7 +110,7 @@ common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 begin
 	if (IEEE_SWAP == YES) {
 	    call BSWAP (ieee, 1, native, 1, nelem * NSWAP)
-	    if (mapin != NO)
+	    if (mapin != NO) {
 		# Check for IEEE exceptional values and map NaN to the native
 		# NaN value, and denormalized numbers (zero exponent) to zero.
 
@@ -124,6 +124,7 @@ begin
 			nin = nin + 1
 		    }
 		}
+	    }
 	} else {
 	    if (mapin == NO)
 		call amovd (ieee, native, nelem)

@@ -39,8 +39,8 @@ libxtools.a:
 	icdeviantr.x	names.h <mach.h> <math/curfit.h>
 	icdosetupd.x	icfit.h names.h <math/curfit.h>
 	icdosetupr.x	icfit.h names.h <math/curfit.h>
-	icerrorsd.x	
-	icerrorsr.x	
+	icerrorsd.x	names.h
+	icerrorsr.x	names.h
 	icferrorsd.x	icfit.h names.h <math/curfit.h>
 	icferrorsr.x	icfit.h names.h <math/curfit.h>
 	icfitd.x	icfit.h names.h <error.h> <math/curfit.h>
@@ -79,7 +79,7 @@ libxtools.a:
 	icparams.x	icfit.h
 	icrejectd.x	names.h <math/curfit.h>
 	icrejectr.x	names.h <math/curfit.h>
-	icshow.x	
-	icvshowd.x	
-	icvshowr.x	
+	icshow.x	icfit.h
+	icvshowd.x	icfit.h
+	icvshowr.x	icfit.h
 	;

@@ -24,6 +24,7 @@ begin
 	int	i, n, nspec, dc
 	real	w
 	bool	log
+	struct	str3
 
 	imtype = "." // envget ("imtype")
 	i = stridx (",", imtype)
@@ -136,7 +137,8 @@ begin
 	if (nscan () != 1) {
 	    print ("Determine dispersion solution for ", arcref) | tee (log1)
 	    #delete (database//"/id"//arcrefms//"*", verify=no)
-	    if (crval == "INDEF" && cdelt == "INDEF")
+	    printf ("%s %s\n", crval, cdelt) | scan (str3)
+	    if (str3 == "INDEF INDEF")
 		identify (arcrefms, section="middle line", database=database,
 		    coordlist=params.coordlist, nsum=1, match=params.match,
 		    maxfeatures=50, zwidth=100., ftype="emission",

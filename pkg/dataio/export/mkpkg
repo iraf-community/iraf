@@ -23,14 +23,14 @@ libpkg.a:
 	@generic			# compile the generic format code
 	@bltins				# compile the builtin format code
 	
-	exbltins.x	exbltins.h export.h
+	exbltins.x	exbltins.h export.h <mach.h>
 	excmap.x	cmaps.inc export.h <lexnum.h>
-	exhdr.x		export.h <error.h> <fset.h> <imhdr.h> <mach.h> <time.h>
-	expreproc.x	exbltins.h exfcn.h export.h <ctype.h> <error.h>
+	exhdr.x		export.h <error.h> <fset.h> <imhdr.h> \
+				<imio.h> <mach.h> <time.h>
+	expreproc.x	exfcn.h export.h <ctype.h> <error.h>
 	exrgb8.x	export.h <imhdr.h>
 	exzscale.x	export.h <error.h> <evvexpr.h>
-	t_export.x	exbltins.h export.h <ctype.h> <error.h> <evvexpr.h> \
-			<fset.h> <imhdr.h> <mach.h>
-
+	t_export.x	export.h <ctype.h> <error.h> <evvexpr.h> \
+				<fset.h> <imhdr.h> <mach.h>
 	zzedbg.x	exbltins.h export.h <evvexpr.h>
 	;

@@ -1,5 +1,51 @@
 .help revisions Jan97 images
 .nf
+
+pkg/images/imfilter/src/fmedian.x
+pkg/images/imfilter/src/fmode.x
+pkg/images/imfilter/src/frmedian.x
+pkg/images/imfilter/src/frmode.x
+pkg/images/imfilter/src/fmd_hist.x
+    Changed the fast median / mode histogram storage from short to int to
+    avoid overflows in the case that xfilter * yfilter > 32767 and > 32767
+    pixels fall into a single bin as may happen in bad pixel regions.
+    (11/19/99, Davis)
+
+pkg/images/immatch/src/imcombine/icombine.gx
+    An input array was declared with a value of 3 though it was passed to
+    the routine with 4 elements.  Later there was a reference to
+    the 4th element.  While this is legal as the size in the declaration
+    is a dummy this was a compiler error on one platform.  Changed the
+    declaration to 4.  (11/19/99, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+    A call to IMUNMAP within the THEN clause of an IFERR replaces the
+    error string (inappropriately) so that a later ERRACT reports the
+    wrong error.  The code was modified to get the error string before
+    calling IMUNMAP and then restores the error condition with an
+    ERROR call instead of an ERRACT.  (10/21/99, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+    Modified error recovery to avoid a tranfer out of an IFERR block
+    message.  (10/14/99, Valdes)
+
+pkg/images/immatch/doc/imcombine.hlp
+    Updated the expected number of images that can be combined without
+    stacking.  (10/11/99, Valdes)
+
+pkg/images/imcoords/src/mkpkg
+pkg/images/imgeom/src/mkpkg
+pkg/images/immmatch/src/imcombine/generic/mkpkg
+pkg/images/immmatch/src/imcombine/mkpkg
+pkg/images/immmatch/src/imutil/generic/mkpkg
+pkg/images/immmatch/src/imutil/mkpkg
+    Added some missing file dependencies and removed some uneccessary ones
+    from the mkpkg files. (9/21/99, Davis)
+
+=======
+V2.11.2
+=======
+
 pkg/images/imutil/src/t_imarith.x
     Added a check for division by zero in the header keywords.  A warning
     is printed, the keyword is not updated, and task completes without

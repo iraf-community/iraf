@@ -8,13 +8,12 @@ $exit
 libpkg.a:
 	apbfitpsf.x	<fset.h>		../lib/apphot.h         \
 			../lib/display.h
-	apfbuf.x	<math.h>		../lib/apphotdef.h	\
-			../lib/apphotdef.h	../lib/fitpsfdef.h	\
-			../lib/fitpsf.h
+	apfbuf.x	<imhdr.h>		../lib/apphotdef.h	\
+			../lib/fitpsfdef.h	../lib/fitpsf.h
 	apfitpsf.x	<ctype.h>		<gset.h>		\
 			../lib/apphot.h		../lib/display.h	\
 			../lib/fitpsf.h
-	apppfpars.x	../lib/apphot.h
+	apppfpars.x	../lib/fitpsf.h         ../lib/display.h
 	apgpfpars.x	../lib/display.h	../lib/fitpsf.h         \
 			../lib/noise.h
 	appfconfirm.x	../lib/apphot.h		../lib/noise.h          \
@@ -26,7 +25,7 @@ libpkg.a:
 	appfradsetup.x
 	apsfcolon.x	../lib/display.h	../lib/fitpsf.h         \
 			../lib/apphot.h		 ../lib/noise.h
-	apsfelgauss.x	<math.h>		../lib/apphot.h         \
+	apsfelgauss.x	<math.h>		../lib/fitpsf.h         \
 			<math/nlfit.h>		../lib/noise.h
 	apsffree.x	../lib/apphotdef.h	../lib/fitpsfdef.h
 	apsfinit.x	../lib/apphotdef.h	../lib/fitpsfdef.h	\

@@ -21,7 +21,7 @@ install:
 
 libpkg.a:
 	d1900.x	
-	decodeheader.x	"vt.h" <error.h> <fset.h> <mach.h> <printf.h>
+	decodeheader.x	"vt.h" <mach.h>
 	destreak.x	"vt.h" <imhdr.h> <imset.h> <mach.h>
 	dicoplot.x	"gryscl.inc" "dicoplot.h" "vt.h" <gset.h> <imhdr.h>\
 			<imset.h> <mach.h> <math/curfit.h>
@@ -32,28 +32,28 @@ libpkg.a:
 	imfilt.x	"vt.h" <imhdr.h> <imset.h> <mach.h>
 	imratio.x	
 	textim.x	 <imhdr.h> <mach.h>
-	lstsq.x	
+	lstsq.x	         <mach.h>
 	merge.x		"vt.h" <imhdr.h> <mach.h>
 	mrqmin.x
-	mscan.x		"vt.h" <error.h> <fset.h> <mach.h> <printf.h>
+	mscan.x		"vt.h" <error.h> <mach.h>
 	numeric.x	"vt.h" "numeric.h" <mach.h>
-	pimtext.x
+	pimtext.x       "vt.h"
 	pixbit.x	"asciilook.inc" "pixelfont.inc"
 	putsqib.x	"vt.h" <imhdr.h> <mach.h>
 	quickfit.x	"vt.h" <imhdr.h> <mach.h>
-	readheader.x	"vt.h" <mach.h>
-	readss1.x	"vt.h" <imhdr.h> <mach.h>
-	readss2.x	"vt.h" <imhdr.h> <mach.h>
-	readss3.x	"vt.h" <imhdr.h> <mach.h>
-	readss4.x	"vt.h" <imhdr.h> <mach.h>
-	readsubswath.x	"vt.h" <mach.h>
-	readvt.x	"vt.h" <imhdr.h> <mach.h>
+	readheader.x	"vt.h" <mach.h> <fset.h>
+	readss1.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
+	readss2.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
+	readss3.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
+	readss4.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
+	readsubswath.x	"vt.h" <mach.h> <fset.h>
+	readvt.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
 	rmap.x		"vt.h" "numeric.h" <imhdr.h> <mach.h>
 	syndico.x	"vt.h" "trnsfrm.inc" "syndico.h" <mach.h> <imhdr.h>\
 			<imset.h> <gset.h>
-	tcopy.x		<error.h> <fset.h> <mach.h> <printf.h>
+	tcopy.x		"vt.h" <error.h> <fset.h> <mach.h> <printf.h>
 	trim.x		"vt.h" <imhdr.h> <mach.h>
-	unwrap.x	"vt.h" <imhdr.h> <mach.h>
+	unwrap.x	<imhdr.h> <mach.h>
 	vtexamine.x	"vt.h" <error.h> <fset.h> <mach.h> <printf.h>
 	writevt.x	"vt.h" <error.h> <fset.h> <mach.h>
 	;

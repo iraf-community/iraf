@@ -19,7 +19,7 @@ define	DEF_LENSBUF	8192
 define	DEF_LINELEN	8192
 
 # Input image operands.
-define	LEN_IMOPERAND	16
+define	LEN_IMOPERAND	17
 define	IO_OPNAME	Memi[$1]		# symbolic operand name
 define	IO_TYPE		Memi[$1+1]		# operand type
 define	IO_IM		Memi[$1+2]		# image pointer if image
@@ -206,8 +206,11 @@ begin
 
 	    call clgstr (Memc[opnam], Memc[opval], SZ_LINE)
 	    IO_OPNAME(io) = Memc[opnam]
-	    o = IO_OP(io)
 	    ip = opval
+
+	    # Initialize the input operand; these values are overwritten below.
+	    o = IO_OP(io)
+	    call aclri (Memi[o], LEN_OPERAND)
 
 	    if (Memc[ip] == '.' && (Memc[ip+1] == EOS || Memc[ip+1] == '[')) {
 		# A "." is shorthand for the last output image.
@@ -279,6 +282,7 @@ image_
 
 		O_TYPE(o) = max (IE_INTYPE(ie), O_TYPE(o))
 		O_LEN(o) = IM_LEN(im,1)
+		O_FLAGS(o) = 0
 
 		# If one dimensional image read in data and be done with it.
 		if (IM_NDIM(im) == 1) {
@@ -658,7 +662,7 @@ image_
 	    if (O_TYPE(o) == TY_CHAR)
 		call mfree (O_VALP(o), TY_CHAR)
 	}
-	
+
 	call evvfree (out)
 	call mfree (expr, TY_CHAR)
 	if (st != NULL)
@@ -708,8 +712,10 @@ begin
 		v = IO_OP(io)
 
 	    call amovi (Memi[v], Memi[o], LEN_OPERAND)
-	    if (IO_TYPE(io) == IMAGE)
+	    if (IO_TYPE(io) == IMAGE) {
 		O_VALP(o) = IO_DATA(io)
+		O_FLAGS(o) = 0
+	    }
 
 	    call sfree (sp)
 	    return

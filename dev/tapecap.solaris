@@ -1,0 +1,456 @@
+# TAPECAP file (SunOS + Solaris).
+# -------------------------------------
+
+# User logical devices (aliases).  These entries are SERVER specific.
+# Uncomment the set which applies to the server on which iraf is installed.
+
+# Here are some simple examples of user logical device aliases.
+#mta|Generic DAT entry, unit 0|		:tc=mtst0.solaris.dat:
+#mtb|Generic Exabyte entry, unit 0|	:tc=mtst0.solaris.exb8200:
+#mtc|Generic DAT entry, unit 1|		:tc=mtst1.solaris.dat:
+#mtd|Generic Exabyte entry, unit 2|	:tc=mtst1.solaris.exb8200:
+
+
+# NOAO/TUCSON servers and device aliases.  If installing on a non-NOAO/TUCSON
+# machine these entries should be considered only examples.  You can delete
+# them if you want.  Unless otherwise specified all of the following are
+# SunOS systems.
+
+# ORION (Sun 4/75).
+#mta|mtwd|				:tc=mtorion.dat:
+
+# GEMINI (Sun 4 server).
+#mta|mtahi|mta6250|mthpa|		:tc=mtgemini.xt0-6250:
+#mtalo|mta1600|				:tc=mtgemini.xt0-1600:
+#mtavl|mta800|				:tc=mtgemini.xt0-800:
+#mtb|mtbhi|mtb6250|mthpb|		:tc=mtgemini.xt1-6250:
+#mtblo|mtb1600|				:tc=mtgemini.xt1-1600:
+#mtbvl|mtb800|				:tc=mtgemini.xt1-800:
+#mtc|mtexb1|				:tc=mtgemini.exb.c-8200:
+#mtd|mtexb2|				:tc=mtgemini.exb.d-8200:
+#mte|mtqic|				:tc=mtgemini.qic-150:
+#mtj|mtwd|				:tc=mtgemini.dat:
+#mtk|mtwdc|				:tc=mtgemini.dat-comp:
+
+# URSA (4-processor Sun 4/670MP).
+#mta|mtahi|mta6250|mthpa|		:tc=mtursa.hp.a-6250:
+#mtalo|mta1600|				:tc=mtursa.hp.a-1600:
+#mtavl|mta800|				:tc=mtursa.hp.a-800:
+#mtb|mtbhi|mtb6250|mthpb|		:tc=mtursa.hp.b-6250:
+#mtblo|mtb1600|				:tc=mtursa.hp.b-1600:
+#mtbvl|mtb800|				:tc=mtursa.hp.b-800:
+#mtc|mtexb1|				:tc=mtursa.exb.c-8200:
+#mtd|mtexb2|				:tc=mtursa.exb.d-8200:
+#mte|mtqic|				:tc=mtursa.qic-150:
+#mtj|mtwd|				:tc=mtursa.dat:
+#mtk|mtwdc|				:tc=mtursa.dat-comp:
+
+# URSA satellite systems (Libra, Argo, Pandora).
+#mtl|mtlhi|mtl6250|Libra Xylogics drive:	:tc=mtmt0-6250:
+#mtllo|mtl1600|Libra Xylogics drive:	:tc=mtmt0-1600:
+#mtlvl|mtl800|Libra Xylogics drive:	:tc=mtmt0-800:
+#mtm|Argo Exabyte, Ciprico driver:	:tc=mtrt0-exb:
+#mtn|Argo Exabyte, Ciprico driver:	:tc=mtrt1-exb:
+#mto|mtolo|Argo Exabyte 8500:		:tc=mtursa.exb-8500.f-lo:
+#mtohi|Argo Exabyte 8500:		:tc=mtursa.exb-8500.f-hi:
+#mtoc|Argo Exabyte 8500:		:tc=mtursa.exb-8500.f-comp:
+#mtr|Pandora Exabyte 8200:		:tc=mtursa.exb.e-8200:
+#mts|mtslo|Argo Exabyte 8500:		:tc=mtursa.exb-8500.g-lo:
+#mtshi|Argo Exabyte 8500:		:tc=mtursa.exb-8500.g-hi:
+#mtsc|Argo Exabyte 8500:		:tc=mtursa.exb-8500.g-comp:
+#mtt|mttlo|Argo Exabyte 8500:		:tc=mtursa.exb-8500.h-lo:
+#mtthi|Argo Exabyte 8500:		:tc=mtursa.exb-8500.h-hi:
+#mttc|Argo Exabyte 8500:		:tc=mtursa.exb-8500.h-comp:
+
+# BIGX (X terminal server - Sun SS II)
+#mta|mtahi|mta6250|mthp6250|mthp|       :tc=mtbigx.hp-6250:
+#mtalo|mta1600|mthp1600|                :tc=mtbigx.hp-1600:
+#mtavl|mta800|mthp800|                  :tc=mtbigx.hp-800:
+#mtb|mtexb|                             :tc=mtbigx.exb-8200:
+
+# TUCANA (Sun 4/60).
+#mta|mtahi|mta6250|			:tc=mttucana.xt-6250:
+#mtalo|mta1600|				:tc=mttucana.xt-1600:
+#mtavl|mta800|				:tc=mttucana.xt-800:
+#mtb|mtct|				:tc=mttucana.qic-24:
+#mtc|mtwd|				:tc=mtcoma.dat:
+
+# LEPUS (Macintosh IIfx running A/UX).
+#mta|mttc|				:so:tc=mtlepus.tc:
+#mtb|mtfd|				:so:tc=mtlepus.fd:
+
+# OTHER local aliases.
+mtf|Personal Exabyte unit 0:		:tc=mtst0-exb:
+mtg|Personal Exabyte unit 1:		:tc=mtst1-exb:
+mth|Personal Exabyte unit 2:		:tc=mtst2-exb:
+mti|Personal Exabyte unit 3:		:tc=mtst3-exb:
+mtp|Personal DAT unit 0:		:tc=mtwd0-dat:
+mtq|Personal DAT unit 1:		:tc=mtwd1-dat:
+
+
+# Site logical devices.  These entries are SITE specific.  These should be
+# the same for all copies of the tapecap file at a given site.  Make any
+# site or host specific device capability changes here.
+
+mtu1|mtursa.hp.a-6250|			:tc=mtst4-6250:
+mtu2|mtursa.hp.a-1600|			:tc=mtst4-1600:
+mtu3|mtursa.hp.a-800|			:tc=mtst4-800:
+mtu4|mtursa.hp.b-6250|			:tc=mtst5-6250:
+mtu5|mtursa.hp.b-1600|			:tc=mtst5-1600:
+mtu6|mtursa.hp.b-800|			:tc=mtst5-800:
+mtu7|mtursa.exb.c-8200|			:tc=mtsx1-exb:
+mtu8|mtursa.exb.d-8200|			:tc=mtsx2-exb:
+mtu9|mtursa.qic-150|			:se:tc=mtst0.qic-150:
+mtua|mtursa.dat|			:tc=mtwd0-dat:
+mtub|mtursa.dat-comp|			:tc=mtwd0-dat.comp:
+mtuc|mtursa.exb-8500.f-lo|		:ow:tc=mtst0-exb.lo:
+mtud|mtursa.exb-8500.f-hi|		:ow:tc=mtst0-exb.hi:
+mtue|mtursa.exb-8500.f-comp|		:ow:tc=mtst0-exb.comp:
+mtuf|mtursa.exb.e-8200|                 :ow:tc=mtst2-exb:
+mtug|mtursa.exb-8500.g-lo|		:ow:tc=mtst1-exb.lo:
+mtuh|mtursa.exb-8500.g-hi|		:ow:tc=mtst1-exb.hi:
+mtui|mtursa.exb-8500.g-comp|		:ow:tc=mtst1-exb.comp:
+mtuj|mtursa.exb-8500.h-lo|		:ow:tc=mtst2-exb.lo:
+mtuk|mtursa.exb-8500.h-hi|		:ow:tc=mtst2-exb.hi:
+mtul|mtursa.exb-8500.h-comp|		:ow:tc=mtst2-exb.comp:
+
+mtg1|mtgemini.xt0-6250|			:tc=mtmt0-6250:
+mtg2|mtgemini.xt0-1600|			:tc=mtmt0-1600:
+mtg3|mtgemini.xt0-800|			:tc=mtmt0-800:
+mtg4|mtgemini.xt1-6250|			:tc=mtmt1-6250:
+mtg5|mtgemini.xt1-1600|			:tc=mtmt1-1600:
+mtg6|mtgemini.xt1-800|			:tc=mtmt1-800:
+mtg7|mtgemini.exb.c-8200|		:tc=mtsx1-exb:
+mtg8|mtgemini.exb.d-8200|		:tc=mtsx2-exb:
+mtg9|mtgemini.qic-150|			:tc=mtst0.qic-150:
+mtga|mtgemini.dat|			:tc=mtwd0-dat:
+mtgb|mtgemini.dat-comp|			:tc=mtwd0-dat.comp:
+
+mto1|mtorion.dat|			:tc=mtwd0-dat:
+
+mtb1|mtbigx.hp-6250|                    :tc=mtst0-6250:
+mtb2|mtbigx.hp-1600|                    :tc=mtst0-1600:
+mtb3|mtbigx.hp-800|                     :tc=mtst0-800:
+mtb4|mtbigx.exb-8200|                   :ow:tc=mtst1-exb:
+
+mtt1|mttucana.xt-6250|			:tc=mtmt0-6250:
+mtt2|mttucana.xt-1600|			:tc=mtmt0-1600:
+mtt3|mttucana.xt-800|			:tc=mtmt0-800:
+mtt4|mttucana.qic-24|			:tc=mtst0.qic-24:
+
+mtc1|mtcoma.dat|			:tc=mtwd0-dat:
+mtl1|mtlepus.tc|			:tc=mttc2:
+mtl2|mtlepus.fd|			:tc=mtfd0:
+
+
+# Everything below this line is mostly (but not entirely) site independent.
+# It is impossible to list every possible combination of device type, bus
+# address, etc. here, but most of the common configurations are listed.
+# --------------------------------------------------------------------------
+
+# Unit assignments (Solaris).
+# ---------------------------
+
+mtsd0|mtst0.solaris.dat|DAT drive on Solaris:\
+	:al=0 0bn 0cb 0cn 0hb 0hn 0lb 0ln 0mb 0mn 0u 0ubn \
+	0b 0c 0cbn 0h 0hbn 0l 0lbn 0m 0mbn 0n 0ub 0un:\
+	:dv=0bn:lk=0:tc=solaris-dat:
+mtsd0c|mtst0.solaris.dat-comp|DAT drive on Solaris with compression:\
+	:al=0 0bn 0cb 0cn 0hb 0hn 0lb 0ln 0mb 0mn 0u 0ubn \
+	0b 0c 0cbn 0h 0hbn 0l 0lbn 0m 0mbn 0n 0ub 0un:\
+	:dv=0cbn:lk=0:tc=solaris-dat:
+mtsd1|mtst1.solaris.dat|DAT drive on Solaris:\
+	:al=1 1bn 1cb 1cn 1hb 1hn 1lb 1ln 1mb 1mn 1u 1ubn \
+	1b 1c 1cbn 1h 1hbn 1l 1lbn 1m 1mbn 1n 1ub 1un:\
+	:dv=1bn:lk=1:tc=solaris-dat:
+mtsd1c|mtst1.solaris.dat-comp|DAT drive on Solaris with compression:\
+	:al=1 1bn 1cb 1cn 1hb 1hn 1lb 1ln 1mb 1mn 1u 1ubn \
+	1b 1c 1cbn 1h 1hbn 1l 1lbn 1m 1mbn 1n 1ub 1un:\
+	:dv=1cbn:lk=1:tc=solaris-dat:
+mtse0|mtst0.solaris.exb8200|Exabyte 8200 drive on Solaris:\
+	:al=0 0bn 0cb 0cn 0hb 0hn 0lb 0ln 0mb 0mn 0u 0ubn \
+	0b 0c 0cbn 0h 0hbn 0l 0lbn 0m 0mbn 0n 0ub 0un:\
+	:dv=0bn:lk=0:tc=solaris-exb8200:
+mtse1|mtst1.solaris.exb8200|Exabyte 8200 drive on Solaris:\
+	:al=1 1bn 1cb 1cn 1hb 1hn 1lb 1ln 1mb 1mn 1u 1ubn \
+	1b 1c 1cbn 1h 1hbn 1l 1lbn 1m 1mbn 1n 1ub 1un:\
+	:dv=1bn:lk=1:tc=solaris-exb8200:
+
+
+# Unit assignments (SunOS).
+# ---------------------------
+
+mtwd0|mtwd0-dat|ApUNIX WangDAT drive 0:\
+	:al=cwd0 ncwd0 nrcwd0 nrwd0 nwd0 rcwd0 rwd0 wd0:\
+	:dv=nrwd0:lk=wd0:tc=apunix-dat:
+mtwd0c|mtwd0-dat.comp|ApUNIX WangDAT drive 0 with compression:\
+	:dv=nrcwd0:tc=mtwd0-dat:
+mtwd1|mtwd1-dat|ApUNIX WangDAT drive 1:\
+	:al=cwd1 ncwd1 nrcwd1 nrwd1 nwd1 rcwd1 rwd1 wd1:\
+	:dv=nrwd1:lk=wd1:tc=apunix-dat:
+mtwd1c|mtwd1-dat.comp|ApUNIX WangDAT drive 1 with compression:\
+	:dv=nrcwd1:tc=mtwd1-dat:
+
+mtht0|mtht0-dat|ApUNIX HP DAT drive 0:\
+	:al=cht0 ncht0 nrcht0 nrht0 nht0 rcht0 rht0 ht0:\
+	:dv=nrht0:lk=ht0:tc=apunix-hpdat:
+mtht0c|mtht0-dat.comp|ApUNIX HP DAT drive 0 with compression:\
+	:dv=nrcht0:tc=mtht0-dat:
+mtht1|mtht1-dat|ApUNIX HP DAT drive 1:\
+	:al=cht1 ncht1 nrcht1 nrht1 nht1 rcht1 rht1 ht1:\
+	:dv=nrht1:lk=ht1:tc=apunix-hpdat:
+mtht1c|mtht1-dat.comp|ApUNIX HP DAT drive 1 with compression:\
+	:dv=nrcht1:tc=mtht1-dat:
+
+mtxb0|mtst0-exb|Exabyte drive on ST 0:\
+	:al=nrst0 rst0 nrst8 rst8 nrst16 rst16 nrst24 rst24:\
+	:dv=nrst8:lk=st0:tc=sun-exabyte:
+mtxb0l|mtst0-exb.lo|:dv=nrst0:tc=mtxb0:
+mtxb0h|mtst0-exb.hi|:dv=nrst8:tc=mtxb0:
+mtxb0c|mtst0-exb.comp|:dv=nrst16:tc=mtxb0:
+
+mtxb1|mtst1-exb|Exabyte drive on ST 1:\
+	:al=nrst1 rst1 nrst9 rst9 nrst17 rst17 nrst25 rst25:\
+	:dv=nrst9:lk=st1:tc=sun-exabyte:
+mtxb1l|mtst1-exb.lo|:dv=nrst1:tc=mtxb1:
+mtxb1h|mtst1-exb.hi|:dv=nrst9:tc=mtxb1:
+mtxb1c|mtst1-exb.comp|:dv=nrst17:tc=mtxb1:
+
+mtxb2|mtst2-exb|Exabyte drive on ST 2:\
+	:al=nrst2 rst2 nrst10 rst10 nrst18 rst18 nrst26 rst26:\
+	:dv=nrst10:lk=st2:tc=sun-exabyte:
+mtxb2l|mtst2-exb.lo|:dv=nrst2:tc=mtxb2:
+mtxb2h|mtst2-exb.hi|:dv=nrst10:tc=mtxb2:
+mtxb2c|mtst2-exb.comp|:dv=nrst18:tc=mtxb2:
+
+mtxb3|mtst3-exb|Exabyte drive on ST 3:\
+	:al=nrst3 rst3 nrst11 rst11 nrst19 rst19 nrst27 rst27:\
+	:dv=nrst11:lk=st3:tc=sun-exabyte:
+mtxb3l|mtst3-exb.lo|:dv=nrst3:tc=mtxb3:
+mtxb3h|mtst3-exb.hi|:dv=nrst11:tc=mtxb3:
+mtxb3c|mtst3-exb.comp|:dv=nrst19:tc=mtxb3:
+
+mtxb4|mtst4-exb|Exabyte drive on ST 4:\
+	:al=nrst4 rst4 nrst12 rst12 nrst20 rst20 nrst28 rst28:\
+	:dv=nrst12:lk=st4:tc=sun-exabyte:
+mtxb4l|mtst4-exb.lo|:dv=nrst4:tc=mtxb4:
+mtxb4h|mtst4-exb.hi|:dv=nrst12:tc=mtxb4:
+mtxb4c|mtst4-exb.comp|:dv=nrst20:tc=mtxb4:
+
+mtrt0|mtrt0-exb|Exabyte drive on Ciprico unit 0:\
+	:al=nrrt0 nrt0 rrt0 rt0 fnrrt0 fnrt0 frrt0 frt0:\
+	:dv=nrrt0:lk=rt0:tc=ciprico-exabyte:
+mtrt1|mtrt1-exb|Exabyte drive on Ciprico unit 1:\
+	:al=nrrt1 nrt1 rrt1 rt1 fnrrt1 fnrt1 frrt1 frt1:\
+	:dv=nrrt1:lk=rt1:tc=ciprico-exabyte:
+
+mtsx0|mtsx0-exb|Exabyte drive on ApUNIX unit 0:\
+	:al=lsx0 nlsx0 nrlsx0 nrsx0 nsx0 rlsx0 rsx0 sx0:\
+	:dv=nrsx0:lk=sx0:tc=apunix-exabyte:
+mtsx1|mtsx1-exb|Exabyte drive on ApUNIX unit 1:\
+	:al=lsx1 nlsx1 nrlsx1 nrsx1 nsx1 rlsx1 rsx1 sx1:\
+	:dv=nrsx1:lk=sx1:tc=apunix-exabyte:
+mtsx2|mtsx2-exb|Exabyte drive on ApUNIX unit 2:\
+	:al=lsx2 nlsx2 nrlsx2 nrsx2 nsx2 rlsx2 rsx2 sx2:\
+	:dv=nrsx2:lk=sx2:tc=apunix-exabyte:
+
+mtqi0|mtst0.qic-11|QIC-11 cartridge tape, unit 0:\
+	:al=nrst0 rst0 nrst8 rst8 nrst16 rst16 nrst24 rst24:\
+	:dv=nrst0:lk=st0:tc=qic-11:
+mtqi1|mtst1.qic-11|QIC-11 cartridge tape, unit 1:\
+	:al=nrst1 rst1 nrst9 rst9 nrst17 rst17 nrst25 rst25:\
+	:dv=nrst1:lk=st1:tc=qic-11:
+mtqc0|mtst0.qic-24|QIC-24 cartridge tape, unit 0:\
+	:al=nrst0 rst0 nrst8 rst8 nrst16 rst16 nrst24 rst24:\
+	:dv=nrst8:lk=st0:tc=qic-24:
+mtqc1|mtst1.qic-24|QIC-24 cartridge tape, unit 1:\
+	:al=nrst1 rst1 nrst9 rst9 nrst17 rst17 nrst25 rst25:\
+	:dv=nrst9:lk=st1:tc=qic-24:
+mtct0|mtst0.qic-150|QIC-150 cartridge tape, unit 0:\
+	:al=nrst0 rst0 nrst8 rst8 nrst16 rst16 nrst24 rst24:\
+	:dv=nrst8:lk=st0:tc=qic-150:
+mtct1|mtst1.qic-150|QIC-150 cartridge tape, unit 1:\
+	:al=nrst1 rst1 nrst9 rst9 nrst17 rst17 nrst25 rst25:\
+	:dv=nrst9:lk=st1:tc=qic-150:
+
+mtxt0|mtxt0hi|mtmt0-6250|Xylogics controller, 9track reel tape at 6250 bpi:\
+	:al=rmt0 rmt8 nrmt0 nrmt8:\
+	:dv=nrmt8:lk=xt0:se:tc=9tk-6250:
+mtxt0lo|mtmt0-1600|Xylogics controller, 9track reel tape at 1600 bpi:\
+	:al=rmt0 rmt8 nrmt0 nrmt8:\
+	:dv=nrmt0:lk=xt0:se:tc=9tk-1600:
+mtxt1|mtxt1hi|mtmt1-6250|Xylogics controller, 9track reel tape at 6250 bpi:\
+	:al=rmt1 rmt9 nrmt1 nrmt9:\
+	:dv=nrmt9:lk=xt1:se:tc=9tk-6250:
+mtxt1lo|mtmt1-1600|Xylogics controller, 9track reel tape at 1600 bpi:\
+	:al=rmt1 rmt9 nrmt1 nrmt9:\
+	:dv=nrmt1:lk=xt1:se:tc=9tk-1600:
+
+mthp0|mtst0hi|mtst0-6250|HP SCSI 9track reel tape at 6250 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst0 nrst8 nrst16 nrst24 rst0 rst8 rst16 rst24:\
+	:dv=nrst16:lk=st0:tc=9tk-6250:
+mthp0lo|mtst0-1600|HP SCSI 9track reel tape at 1600 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst0 nrst8 nrst16 nrst24 rst0 rst8 rst16 rst24:\
+	:dv=nrst8:lk=st0:tc=9tk-6250:
+mthp0vl|mtst0-800|HP SCSI 9track reel tape at 800 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst0 nrst8 nrst16 nrst24 rst0 rst8 rst16 rst24:\
+	:dv=nrst0:lk=st0:tc=9tk-6250:
+mthp0c|mtst0-comp|HP SCSI 9track reel tape with data compression:\
+	:dt=HP 88780 1/2 inch tape drive with data compression:\
+	:al=nrst0 nrst8 nrst16 nrst24 rst0 rst8 rst16 rst24:\
+	:dv=nrst24:lk=st0:tc=9tk-6250:
+
+mthp1|mtst1hi|mtst1-6250|HP SCSI 9track reel tape at 6250 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst1 nrst9 nrst17 nrst25 rst1 rst9 rst17 rst25:\
+	:dv=nrst17:lk=st1:tc=9tk-6250:
+mthp1lo|mtst1-1600|HP SCSI 9track reel tape at 1600 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst1 nrst9 nrst17 nrst25 rst1 rst9 rst17 rst25:\
+	:dv=nrst9:lk=st1:tc=9tk-6250:
+mthp1vl|mtst1-800|HP SCSI 9track reel tape at 800 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst1 nrst9 nrst17 nrst25 rst1 rst9 rst17 rst25:\
+	:dv=nrst1:lk=st1:tc=9tk-6250:
+mthp1c|mtst1-comp|HP SCSI 9track reel tape with data compression:\
+	:dt=HP 88780 1/2 inch tape drive with data compression:\
+	:al=nrst1 nrst9 nrst17 nrst25 rst1 rst9 rst17 rst25:\
+	:dv=nrst25:lk=st1:tc=9tk-6250:
+
+mthp2|mtst2hi|mtst2-6250|HP SCSI 9track reel tape at 6250 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst2 nrst10 nrst18 nrst26 rst2 rst10 rst18 rst26:\
+	:dv=nrst18:lk=st2:tc=9tk-6250:
+mthp2lo|mtst2-1600|HP SCSI 9track reel tape at 1600 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst2 nrst10 nrst18 nrst26 rst2 rst10 rst18 rst26:\
+	:dv=nrst10:lk=st2:tc=9tk-1600:
+mthp2vl|mtst2-800|HP SCSI 9track reel tape at 800 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst2 nrst10 nrst18 nrst26 rst2 rst10 rst18 rst26:\
+	:dv=nrst2:lk=st2:tc=9tk-800:
+mthp2c|mtst2-comp|HP SCSI 9track reel tape with data compression:\
+	:dt=HP 88780 1/2 inch tape drive with data compression:\
+	:al=nrst2 nrst10 nrst18 nrst26 rst2 rst10 rst18 rst26:\
+	:dv=nrst26:lk=st2:tc=9tk-6250:
+
+mthp3|mtst3hi|mtst3-6250|HP SCSI 9track reel tape at 6250 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst3 nrst11 nrst19 nrst27 rst3 rst11 rst19 rst27:\
+	:dv=nrst19:lk=st3:tc=9tk-6250:
+mthp3lo|mtst3-1600|HP SCSI 9track reel tape at 1600 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst3 nrst11 nrst19 nrst27 rst3 rst11 rst19 rst27:\
+	:dv=nrst11:lk=st3:tc=9tk-1600:
+mthp3vl|mtst3-800|HP SCSI 9track reel tape at 800 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst3 nrst11 nrst19 nrst27 rst3 rst11 rst19 rst27:\
+	:dv=nrst3:lk=st3:tc=9tk-800:
+mthp3c|mtst3-comp|HP SCSI 9track reel tape with data compression:\
+	:dt=HP 88780 1/2 inch tape drive with data compression:\
+	:al=nrst3 nrst11 nrst19 nrst27 rst3 rst11 rst19 rst27:\
+	:dv=nrst27:lk=st3:tc=9tk-6250:
+
+mthp4|mtst4hi|mtst4-6250|HP SCSI 9track reel tape at 6250 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst4 nrst12 nrst20 nrst28 rst4 rst12 rst20 rst28:\
+	:dv=nrst20:lk=st4:tc=9tk-6250:
+mthp4lo|mtst4-1600|HP SCSI 9track reel tape at 1600 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst4 nrst12 nrst20 nrst28 rst4 rst12 rst20 rst28:\
+	:dv=nrst12:lk=st4:tc=9tk-1600:
+mthp4vl|mtst4-800|HP SCSI 9track reel tape at 800 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst4 nrst12 nrst20 nrst28 rst4 rst12 rst20 rst28:\
+	:dv=nrst4:lk=st4:tc=9tk-800:
+mthp4c|mtst4-comp|HP SCSI 9track reel tape with data compression:\
+	:dt=HP 88780 1/2 inch tape drive with data compression:\
+	:al=nrst4 nrst12 nrst20 nrst28 rst4 rst12 rst20 rst28:\
+	:dv=nrst28:lk=st4:tc=9tk-6250:
+
+mthp5|mtst5hi|mtst5-6250|HP SCSI 9track reel tape at 6250 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst5 nrst13 nrst21 nrst29 rst5 rst13 rst21 rst29:\
+	:dv=nrst21:lk=st5:tc=9tk-6250:
+mthp5lo|mtst5-1600|HP SCSI 9track reel tape at 1600 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst5 nrst13 nrst21 nrst29 rst5 rst13 rst21 rst29:\
+	:dv=nrst13:lk=st5:tc=9tk-1600:
+mthp5vl|mtst5-800|HP SCSI 9track reel tape at 800 bpi:\
+	:dt=HP 88780 1/2 inch tape drive:\
+	:al=nrst5 nrst13 nrst21 nrst29 rst5 rst13 rst21 rst29:\
+	:dv=nrst5:lk=st5:tc=9tk-800:
+mthp5c|mtst5-comp|HP SCSI 9track reel tape with data compression:\
+	:dt=HP 88780 1/2 inch tape drive with data compression:\
+	:al=nrst5 nrst13 nrst21 nrst29 rst5 rst13 rst21 rst29:\
+	:dv=nrst29:lk=st5:tc=9tk-6250:
+
+
+# Unit assignments (Macintosh A/UX).
+# ---------------------------
+
+mttc2|Apple drive at SCSI 2:\
+        :al=tc2 tc2n:lk=tc2:\
+        :dv=tc2n:rd=tc2:tc=appletape:
+mtfd0|Macintosh FDHD floppy drive 0:\
+        :so=/dev/ttyp2:\
+        :al=floppy0 rfloppy0:lk=fd0:\
+        :dv=rfloppy0:rd=rfloppy0:tc=fdhd:
+
+
+# Generic device entries.
+# -------------------------
+solaris-dat|sdat-60m|Sun/Solaris DAT drive:\
+	:dt=Archive Python 4mm Helical Scan tape drive:tt=DG-60M:\
+	:ts#1274378:bs#0:mr#0:or#65536:fb#10:fs#127000:mf:fe#2000:
+solaris-exb8200|Sun/Solaris Exabyte Model 8200 drive:\
+        :dt=Exabyte EXB-8200 8mm tape drive with Solaris ST driver:\
+	:tt=P6-120MP:ts#2347794:\
+        :bs#0:mr#64512:or#64512:fb#10:rs#2000:fs#188416:mf:
+
+hpdat-90m|HP DAT with 90 meter tape:tt=DG-90M:ts#1911570:tc=hpdat-60m:
+apunix-hpdat|hpdat|hpdat-60m|HP DAT with ApUNIX driver:\
+        :dt=HP DAT DDS 4mm:tt=DG-60M:tc=apunix-dat:
+dat-90m|WangDAT with 90 meter tape:tt=DG-90M:ts#1911570:tc=dat-60m:
+apunix-dat|dat|dat-60m|WangDAT 1300 DDS with ApUNIX driver:\
+        :dt=WangDAT 1300 DDS 4mm:tt=DG-60M:ts#1274378:\
+        :bs#0:mr#0:or#65536:fb#10:fs#127000:mf:fe#2000:
+sun-exabyte|exb8200|Exabyte on Sun ST driver:\
+        :dt=Exabyte EXB-8200 8mm tape drive:tt=P6-120MP:ts#2347794:\
+        :bs#0:mr#0:or#65536:fb#10:rs#2000:fs#2252800:mf:re:
+ciprico-exabyte|Exabyte on Ciprico RT driver:\
+        :dt=Exabyte EXB-8200 8mm tape drive on Ciprico controller:\
+	:tt=P6-120MP:ts#2347794:\
+        :bs#0:mr#0:or#65536:fb#10:rs#2000:fs#2252800:mf:re:se:
+apunix-exabyte|Exabyte on ApUNIX driver:\
+        :dt=Exabyte EXB-8200 8mm tape drive with ApUNIX driver:\
+	:tt=P6-120MP:ts#2347794:\
+        :bs#0:mr#64512:or#64512:fb#10:rs#2000:fs#188416:mf:re:
+qic-11|QIC-11 cartridge tape:\
+	:dt=QIC-11 4 track 1/4inch cartridge tape drive:tt=DC-300A:ts#20000:\
+	:bs#512:mr#64512:or#64512:fb#22:re:nb:fe#2000:
+qic-24|QIC-24 cartridge tape:\
+	:dt=QIC-24 9 track 1/4inch cartridge tape drive:tt=DC-300A:ts#45000:\
+	:bs#512:mr#64512:or#64512:fb#22:re:nb:fe#2000:
+qic-150|QIC-150 cartridge tape:\
+	:dt=QIC-150 1/4inch cartridge tape drive:tt=DC-6150:ts#150000:\
+	:bs#512:mr#64512:or#64512:fb#22:re:nb:fe#2000:
+9tk-6250|9track 1/2 inch tape drive at 6250 bpi:\
+	:dt=9 track at 6250 bpi:tt=2400 foot:ts#140000:\
+	:dn#6250:bs#0:mr#65535:or#65535:fb#10:
+9tk-1600|9track 1/2 inch tape drive at 1600 bpi:\
+	:dt=9 track at 1600 bpi:tt=2400 foot:ts#40000:\
+	:dn#1600:bs#0:mr#65535:or#65535:fb#10:
+9tk-800|9track 1/2 inch tape drive at 800 bpi:\
+	:dt=9 track at 800 bpi:tt=2400 foot:ts#20000:\
+	:dn#800:bs#0:mr#65535:or#65535:fb#10:
+
+tc|appletape|Macintosh DC2000 cartridge tape drive:\
+        :dt=Apple Tape 40SC:tt=DC2000:ts#38500:\
+        :bs#8192:mr#0:or#65536:fb#22:se:nf:
+fdhd|Macintosh FDHD 1440 Kb floppy disk:\
+        :dt=Apple FDHD 1440 Kb floppy disk:tt=FDHD:ts#1440:\
+        :bs#512:mr#0:or#65536:fb#22:nb:np:

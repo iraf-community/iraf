@@ -31,7 +31,7 @@ begin
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Allocate space for the histogram and zero.
-	call calloc (hst, FRMOD_HMAX(fmd) - FRMOD_HMIN(fmd) + 1, TY_SHORT)
+	call calloc (hst, FRMOD_HMAX(fmd) - FRMOD_HMIN(fmd) + 1, TY_INT)
 
 	# Check for 1D images.
 	if (IM_NDIM(im1) == 1)
@@ -88,7 +88,7 @@ begin
 
 	    # Modal filter the image line.
 	    call fmd_romodfilter (fmd, Memi[inbuf], ncols, nlines, Memr[outbuf],
-		int (IM_LEN(im2, 1)), Mems[hst], FRMOD_HMAX(fmd) -
+		int (IM_LEN(im2, 1)), Memi[hst], FRMOD_HMAX(fmd) -
 		FRMOD_HMIN(fmd) + 1, kernel, nxk, nyk)
 
 	    # Recover original data range.
@@ -99,7 +99,7 @@ begin
 	}
 
 	# Free space.
-	call mfree (hst, TY_SHORT)
+	call mfree (hst, TY_INT)
 	call mfree (inbuf, TY_INT)
 end
 
@@ -114,7 +114,7 @@ int	data[nx,ny]		#I buffer of image data
 int	nx, ny			#I dimensions of image buffer
 real	medline[ncols]		#O medians
 int	ncols			#I length of output image line
-short	hist[nbins]		#U histogram
+int	hist[nbins]		#U histogram
 int	nbins			#I size of histogram
 short	kernel[xbox,ARB]	#I the ring filter kernel
 int	xbox, ybox		#I the dimensions of the kernel
@@ -172,7 +172,7 @@ begin
 		    hsum = hsum + hist[j]
 		}
 		medline[i] = 3.0 * (j + hmin - 1) - 2.0 * sum / nzero
-	        call aclrs (hist[ohmin-hmin+1], ohmax - ohmin + 1)
+	        call aclri (hist[ohmin-hmin+1], ohmax - ohmin + 1)
 	    } else if (nhlo < nhhi)
 	        medline[i] = hhi
 	    else

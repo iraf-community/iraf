@@ -24,7 +24,7 @@ libpkg.a:
 	sfmarks.x	sensfunc.h <gset.h>
 	sfmove.x	<gset.h> sensfunc.h
 	sfnearest.x	<gset.h> <mach.h> sensfunc.h
-	sfoutput.x	sensfunc.h <imhdr.h>
+	sfoutput.x	sensfunc.h <imhdr.h> <mach.h>
 	sfreset.x	sensfunc.h
 	sfrms.x		sensfunc.h
 	sfsensfunc.x	sensfunc.h <error.h> <gset.h> <mach.h>

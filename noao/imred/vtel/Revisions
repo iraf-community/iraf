@@ -1,5 +1,9 @@
 This is the vacuum telescope package revisions file.
 
+mkpkg
+    Added some missing file dependencies and removed unnecessary ones from
+    the mkpkg file. (9/30/99, Davis)
+
 doc/dicoplot.hlp
 doc/readvt.hlp
 doc/unwrap.hlp

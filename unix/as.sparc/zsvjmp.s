@@ -20,7 +20,6 @@
 	.global	_mem_
 	_mem_	=	0
 
-
 	.proc	0
 _zsvjmp_:
 	st	%o1, [%o0]		! save &status in jmpbuf[0]

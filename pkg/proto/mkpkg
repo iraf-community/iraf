@@ -27,7 +27,8 @@ libpkg.a:
 	t_bscale.x	<ctype.h> <error.h> <imhdr.h> <mach.h>
 	t_fixpix.x	<error.h> <imhdr.h> <imset.h> <pmset.h>
 	t_hfix.x	<ctype.h> <error.h> <imhdr.h> <imio.h>
-	t_imext.x	<error.h> <syserr.h> <imhdr.h> <imset.h>
+	t_imext.x	<error.h> <syserr.h> <imhdr.h> <imset.h> <mach.h> \
+			<ctype.h>
 	t_imcntr.x	<imhdr.h>
 	t_imscale.x	<imhdr.h> <mach.h>
 	t_joinlines.x	

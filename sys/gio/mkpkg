@@ -100,7 +100,7 @@ libex.a:
 	gmark.x		markers.inc <gio.h> <gset.h>
 	gmftitle.x	<gio.h>
 	gmprintf.x
-	gmsg.x		<gio.h> <chars.h>
+	gmsg.x		<gio.h> <chars.h> <fset.h> <mach.h>
 	gopen.x		<error.h> <gio.h> <gset.h> <knet.h> <gki.h>
 	gpagefile.x	<error.h> <gset.h> <gio.h>
 	gpcell.x	gpl.com <gio.h>

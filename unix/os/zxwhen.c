@@ -13,6 +13,13 @@
 # endif
 #endif
 
+#ifdef SOLARIS
+# define USE_SIGACTION
+# include <sys/siginfo.h>
+# include <sys/ucontext.h>
+# include <ieeefp.h>
+#endif
+
 #define import_spp
 #define	import_kernel
 #define	import_knames
@@ -29,12 +36,16 @@
 int debug_sig = 0;
 
 #ifdef LINUX
-static int fpstatus();
 
-/* The following definition has intimate knowledge of the STDIO structures. */
+#define FPSTAT          /* system-dependent FPU debugging */
+
+/* The following definition has intimate knowledge of the STDIO structures.
+ *    OBSOLETE - problem this fixed has gone away
 #define	fcancel(fp)	( \
     (fp)->_IO_read_ptr = (fp)->_IO_read_end = (fp)->_IO_read_base,\
     (fp)->_IO_write_ptr = (fp)->_IO_write_end = (fp)->_IO_write_base)
+*/
+#define	fcancel(fp)
 
 /* x86 Traps.
  */
@@ -77,11 +88,21 @@ static int fpstatus();
 # ifdef BSD
 /* The following definition has intimate knowledge of the STDIO structures. */
 # define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
-# endif
+
+#else
+# ifdef SOLARIS
+# define	fcancel(fp)     ((fp)->_cnt=BUFSIZ,(fp)->_ptr=(fp)->_base)
+
+#endif
+#endif
 #endif
 
 static long setsig();
 static int ex_handler();
+
+#ifdef FPSTAT
+static int fpstatus();
+#endif
 
 
 /* Exception handling:  ZXWHEN (exception, handler, old_handler)
@@ -138,9 +159,9 @@ struct osexc unix_exception[] = {
 	NULL,		"quit",
 	X_ACV,		"illegal instruction",
 	NULL,		"trace trap",
-	X_ACV,		"IOT",
-	X_ACV,		"EMT",
-	X_ARITH,	"FPE",
+	X_ACV,		"abort",
+	X_ACV,		"EMT exception",
+	X_ARITH,	"arithmetic exception",
 	NULL,		"kill",
 	X_ACV,		"bus error",
 	X_ACV,		"segmentation violation",
@@ -200,7 +221,7 @@ struct	_hwx hwx_exception[] = {
 };
 
 #else
-# ifdef BSD
+#ifdef BSD
 struct	_hwx hwx_exception[] = {
 	FPE_INTOVF_TRAP,	"integer overflow",
 	FPE_INTDIV_TRAP,	"integer divide by zero",
@@ -211,7 +232,23 @@ struct	_hwx hwx_exception[] = {
 	FPE_SUBRNG_TRAP,	"subrange out of bounds",
 	EOMAP,			""
 };
-# endif
+
+#else
+#ifdef SOLARIS
+struct	_hwx hwx_exception[] = {
+	FPE_INTDIV,             "integer divide by zero",
+	FPE_INTOVF,             "integer overflow",
+	FPE_FLTDIV,             "floating point divide by zero",
+	FPE_FLTOVF,             "floating point overflow",
+	FPE_FLTUND,             "floating point underflow",
+	FPE_FLTRES,             "floating point inexact result",
+	FPE_FLTINV,             "invalid floating point operation",
+	FPE_FLTSUB,             "subscript out of range",
+	EOMAP,			""
+};
+
+#endif
+#endif
 #endif
 
 
@@ -316,6 +353,12 @@ SIGFUNC	handler;
  * stop process execution immediately (used to kill detached processes).
  */
 static int
+#ifdef SOLARIS
+    ex_handler (unix_signal, info, ucp)
+    int unix_signal;
+    siginfo_t *info;
+    ucontext_t *ucp;
+#else
 #ifdef USE_SIGACTION
     ex_handler (unix_signal, hwcode, scp)
     int unix_signal, hwcode;
@@ -324,17 +367,23 @@ static int
     ex_handler (unix_signal)
     int unix_signal;
 #endif
+#endif
 {
 	XINT next_epa, epa, x_vex;
 	int *frame, vex;
 
 	last_os_exception = unix_signal;
+#ifdef SOLARIS
+        last_os_hwcode = info ? info->si_code : 0;
+#else
 	last_os_hwcode = 0;
+#endif
 	x_vex = unix_exception[unix_signal].x_vex;
 	vex = x_vex - X_FIRST_EXCEPTION;	
 	epa = handler_epa[vex];
 
 #ifdef LINUX
+#ifdef FPSTAT
 	/* [LINUX] The following is horribly system dependent but is the only
 	 * way to find out more about what type of system trap has occurred.
 	 * The EBP register points to the beginning of the current stack frame.
@@ -351,31 +400,33 @@ static int
 	 */
 	if (unix_signal == SIGFPE)
 	    last_os_hwcode = fpstatus (last_os_hwcode);
-
-	/* If signal was SIGINT, cancel any buffered standard output.
-	 */
-	if (unix_signal == SIGINT) {
-	    /* Linux stdio appears to have a problem with interrupts: the
-	     * file descriptor is partially initialized before the read and
-	     * if an interrupt occurs during the read initialization is not
-	     * completed, causing the next read to reread some old data.
-	     */
-	    fcancel (stdin);
-
-	    /* Cancel the stdout on all systems. */
-	    fcancel (stdout);
-	}
+#endif
 
 	/* Reenable the exception (LINUX).  */
 #ifndef USE_SIGACTION
 	sigset (unix_signal, (SIGFUNC) ex_handler);
 #endif
-	__setfpucw (0x1372);
+	/* setfpucw (0x1372); */
+	{   int fpucw = 0x332;
+	    sfpucw_ (&fpucw);
+	}
 
 #else
-# ifdef BSD
-# endif
+#ifdef BSD
+
+#else
+#ifdef SOLARIS
+        fpsetsticky (0x0);
+	fpsetmask (FP_X_INV | FP_X_OFL | FP_X_DZ);
+
 #endif
+#endif
+#endif
+
+	/* If signal was SIGINT, cancel any buffered standard output.  */
+	if (unix_signal == SIGINT) {
+	    fcancel (stdout);
+	}
 
 	/* Call user exception handler(s).  Each handler returns with the
 	 * "value" (epa) of the next handler, or X_IGNORE if exception handling
@@ -462,7 +513,7 @@ int old_hwcode;
 	    return (old_hwcode);
 
 	/* Get floating point status register. */
-	asm ("fstsw %0" : "=g" (status));
+	asm ("fstsw %0" : "=ax" (status));
 
 	/* Return the old hardware code if the status register has been
 	 * cleared and doesn't tell us anything.

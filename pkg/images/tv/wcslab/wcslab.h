@@ -46,7 +46,7 @@ define SUBSEC_HIGH 5
 
 # Define the possible MWCS transformation types.
 
-define	RA_DEC_DICTIONARY	"|tan|arc|sin|"
+define	RA_DEC_DICTIONARY	"|tan|arc|sin|tnx|"
 define	LINEAR_DICTIONARY	"|linear|"
 
 define NUMBER_OF_SUPPORTED_TYPES 2

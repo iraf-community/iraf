@@ -1,5 +1,22 @@
 .help revisions May92 noao.rv
 .nf
+
+rvidlines/idmap.x
+	The SFREE added earlier was in the wrong place causing 1D images
+	to abort with a salloc underflow.  (10/12/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+mkpkg
+rvidlines/mkpkg
+	Fixed missing/extra file dependencies  (9/20/99)
+
+aplist.x
+rvidlines/idmap.x
+	Fixed some problems picked up with SPPLINT.  (7/28/99)
+
 rv.cl
 rv.hd
 x_rv.x

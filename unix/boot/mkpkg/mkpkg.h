@@ -24,6 +24,7 @@
 #define	LFLAGS		"lflags"
 #define	XFLAGS		"xflags"
 #define	XVFLAGS		"xvflags"
+#define	DEBUGSYM	"debug"
 #define	XC		"xc"
 #define	GENERIC		"generic"
 #define	GFLAGS		"gflags"

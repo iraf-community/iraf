@@ -26,10 +26,18 @@ typedef char *va_list;
  * loop.
  */
 #include <varargs-bsd.h>
+
+#else
+#ifdef SOLARIS
+/* Solaris varargs requires compiler builtins that only work with the Sun
+ * C compiler, not GCC, so we need to use a different approach here as well.
+ */
+#include <varargs-bsd.h>
+
 #else
 #include "/usr/include/varargs.h"
 #endif
-
+#endif
 #endif
 
 #define	D_varargs

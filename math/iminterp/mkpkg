@@ -28,7 +28,7 @@ libiminterp.a:
 	ii_eval.x	<math.h>	
 	ii_greval.x	<math.h> <math/iminterp.h>
 	ii_pc1deval.x	<math.h> im1interpdef.h
-	ii_pc2deval.x	
+	ii_pc2deval.x	<math.h>	
 	ii_polterp.x	im1interpdef.h
 	ii_sinctable.x	<math.h>
 	ii_spline.x	

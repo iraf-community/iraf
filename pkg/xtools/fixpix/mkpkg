@@ -16,5 +16,6 @@ libxtools.a:
 
 	xtfixpix.x	xtfixpix.h <imhdr.h> <imset.h> <pmset.h>
 	xtfp.x		xtfixpix.h <imhdr.h> <pmset.h>
-	xtpmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <pmset.h>
+	xtpmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
+			<mwset.h> <pmset.h>
 	;

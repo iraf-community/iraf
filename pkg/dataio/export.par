@@ -1,6 +1,6 @@
 # EXPORT Task Parameter File
-images,s,q,"",,,"The list of input iraf images"
-binfiles,s,q,"",,,"The list of output binary files"
+images,s,a,"",,,"The list of input iraf images"
+binfiles,s,a,"",,,"The list of output binary files"
 format,s,q,"raw",,,"The type of binary file to write { raw|list|<format> }"
 header,s,h,"yes",,,"Prepend a header describing how the data are stored?"
 outtype,s,h,"",,,"Output pixel type"

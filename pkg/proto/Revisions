@@ -1,5 +1,12 @@
 .help revisions Jun88 proto
 .nf
+mkpkg
+    Added missing file dependencies to the mkpkg file. (9/22/99, Davis)
+
+=====
+V2.11.2
+=====
+
 t_imext.x
 doc/imextensions.hlp
     1.  Image template expansion is used intead of file template expansion.

@@ -13,6 +13,7 @@ if (! defpac ("tables")) {
         type "daophot$lib/warning.dat"
     }
 }
+;
 
 # Load other packages
 

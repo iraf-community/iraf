@@ -133,7 +133,7 @@ XINT	*chan;
 	dp->entry = 0;
 	dp->dir = dir;
 
-#ifdef REDHAT
+#if (defined(REDHAT) | defined(SUSE))
 	fd = dirfd(dir);
 #else
 	fd = dir->dd_fd;		/* MACHDEP */

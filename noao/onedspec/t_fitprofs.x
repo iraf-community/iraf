@@ -2,6 +2,7 @@ include	<error.h>
 include	<imhdr.h>
 include	<smw.h>
 include	<gset.h>
+include	<ctotok.h>
 
 
 # Profile types.
@@ -212,21 +213,11 @@ begin
 	call realloc (sg, ng+2, TY_REAL)
 	call realloc (lg, ng+2, TY_REAL)
 
-	# Get fitting region and background points and add to end of
-	# xg and sg arrays.
-
+	# Get fitting region and add to end of xg array.
 	i = clscan ("region")
 	    call gargr (Memr[xg+ng])
 	    call gargr (Memr[xg+ng+1])
 	    if (i == EOF || nscan() < 1)
-		call error (1, "Error specifying fitting region")
-	i = clscan ("background")
-	    call gargr (Memr[sg+ng])
-	    call gargr (Memr[sg+ng+1])
-	    if (nscan() < 1)
-		Memr[sg+ng] = INDEF
-	    if (nscan() < 2)
-		Memr[sg+ng+1] = Memr[sg+ng]
  
 	# Decode range strings and set complement if needed.
 	complement = false
@@ -345,7 +336,7 @@ begin
 	# Initialize.
 	in = NULL; out = NULL; tmp = NULL
 	mwin = NULL; mwout = NULL
-	sh = NULL
+	sh = NULL; shout = NULL
 	ninaps = 0; noutaps = 0; nbands = 0
 
 	iferr {
@@ -624,7 +615,8 @@ begin
 	call imunmap (in)
 	if (out != NULL) {
 	    call smw_saveim (mwout, out)
-	    call smw_close (MW(shout))
+	    if (shout != NULL)
+		call smw_close (MW(shout))
 	    call imunmap (out)
 	    if (strne (Memc[temp], output)) {
 		call imdelete (output)
@@ -632,10 +624,14 @@ begin
 	    }
 	}
 	} then {
-	    if (mwout != NULL)
+	    if (shout != NULL)
 		call smw_close (MW(shout))
-	    if (mwin != NULL)
+	    else if (mwout != NULL)
+		call smw_close (mwout)
+	    if (sh != NULL)
 		call smw_close (MW(sh))
+	    else if (mwin != NULL)
+		call smw_close (mwin)
 	    if (tmp != NULL)
 	        call imunmap (tmp)
 	    if (out != NULL)
@@ -686,7 +682,7 @@ real	mod[n]			# Model
 
 int	i, j, k, i1, i2, nfit, nsub, mc_n, mc_p, mc_sig
 long	seed
-real	xc, x1, x2, dx, y1, y2, dy, z1, dz, w, z, scale, sscale
+real	xc, x1, x2, dx, y1, dy, z1, dz, w, z, scale, sscale
 real	peak, flux, cont, gfwhm, lfwhm, eqw, chisq
 real	flux1, cont1, eqw1, wyc1, slope1, v, u
 bool	doerr
@@ -696,7 +692,7 @@ pointer	gp, gopen()
 bool	rng_elementi()
 real	model(), gasdev(), asumr()
 double	shdr_lw(), shdr_wl
-errchk	dofit, dorefit
+errchk	fp_background, dofit, dorefit
 
 begin
 	# Determine fitting region.
@@ -728,13 +724,7 @@ begin
 	call salloc (pg, ng, TY_INT)
 
 	# Subtract the continuum and scale the data.
-	y1 = gfwhms[ng+1]
-	y2 = gfwhms[ng+2]
-	if (IS_INDEF (y1))
-	    y1 = y[i1]
-	if (IS_INDEF (y2))
-	    y2 = y[i2]
-	dy = (y2 - y1) / (x2 - x1)
+	call fp_background (sh, x, y, n, x1, x2, y1, dy)
 	scale = 0.
 	doerr = !IS_INDEF(sigma0)
 	do i = i1, i2 {
@@ -964,8 +954,10 @@ begin
 	    if (!rng_elementi (components, i+1))
 		next
 	    do j = 1, n
-		mod[j] = model (x[j], dx, nsub, Memr[xg+i], Memr[yg+i],
-		    Memr[sg+i], Memr[lg+i], Memi[pg+i], ng)
+		#mod[j] = model (x[j], dx, nsub, Memr[xg+i], Memr[yg+i],
+		#    Memr[sg+i], Memr[lg+i], Memi[pg+i], ng)
+		mod[j] = mod[j] + model (x[j], dx, nsub, Memr[xg+i], Memr[yg+i],
+		    Memr[sg+i], Memr[lg+i], Memi[pg+i], 1)
 	}
 
 	# Draw graphs
@@ -1011,6 +1003,105 @@ begin
 end
 
 
+# FP_BACKGROUND -- Iniital background.
+
+procedure fp_background (sh, x, y, n, x1, x2, y1, dy)
+
+pointer	sh			#I Spectrum pointer
+real	x[n]			#I Coordinate values
+real	y[n]			#I Data
+int	n			#I Number of data points
+real	x1, x2			#I Fit endpoints
+real	y1, dy			#O Background
+
+int	i, j, k, m, func
+real	xval[2], yval[2]
+double	z1, z2, z3
+pointer	sp, bkg, str
+
+int	ctotok(), ctor(), ctod(), strdic(), nscan()
+real	asumr(), amedr()
+double	shdr_wl(), shdr_lw()
+
+define	err_	10
+
+begin
+	call smark (sp)
+	call salloc (bkg, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+
+	xval[1] = x1
+	xval[2] = x2
+
+	call clgstr ("background", Memc[bkg], SZ_LINE)
+	call sscan (Memc[bkg])
+	do j = 1, 2 {
+	    call gargwrd (Memc[bkg], SZ_LINE)
+	    if (nscan() != j) {
+		i = max (1, min (n, nint (shdr_wl (sh, double(xval[j])))))
+		xval[j] = shdr_lw (sh, double(i))
+		yval[j] = y[i]
+		next
+	    }
+
+	    k = 1
+	    if (ctor (Memc[bkg], k, yval[j]) == 0) {
+		if (ctotok (Memc[bkg], k, Memc[str], SZ_LINE) != TOK_IDENTIFIER)
+		    goto err_
+		func = strdic (Memc[str], Memc[str], SZ_LINE, "|avg|med|")
+		if (func == 0)
+		    goto err_
+		k = k + 1
+		if (ctod (Memc[bkg], k, z1) == 0)
+		    goto err_
+		k = k + 1
+		if (ctod (Memc[bkg], k, z2) == 0)
+		    goto err_
+		k = k + 1
+		if (ctod (Memc[bkg], k, z3) == 0)
+		    z3 = 1
+
+		z1 = shdr_wl (sh, z1)
+		z2 = shdr_wl (sh, z2)
+		i = max (1, nint(min(z1,z2)))
+		m = min (n, nint(max(z1,z2))) - i + 1
+		if (m < 1)
+		    goto err_
+
+		# This is included to eliminate an optimizer bug on solaris.
+		call sprintf (Memc[bkg], SZ_LINE, "%g %g %g %d %d\n")
+		    call pargd (z1)
+		    call pargd (z2)
+		    call pargd (z3)
+		    call pargi (i)
+		    call pargi (m)
+
+		switch (func) {
+		case 1:
+		    xval[j] = z3 * asumr (x[i], m) / m
+		    yval[j] = z3 * asumr (y[i], m) / m
+		case 2:
+		    xval[j] = z3 * asumr (x[i], m) / m
+		    yval[j] = z3 * amedr (y[i], m)
+		}
+	    }
+	}
+
+	if (xval[1] == xval[2]) {
+	   dy = 0.
+	   y1 = (yval[1] + yval[2]) / 2.
+	} else {
+	    dy = (yval[2] - yval[1]) / (xval[2] - xval[1])
+	    y1 = yval[1] + dy * (x1 - xval[1])
+	}
+	return
+    
+err_
+	call sfree (sp)
+	call error (1, "Syntax error in background specification")
+end
+
+
 include	<time.h>
 
 # FP_TITLE -- Set title string and print.
@@ -1030,13 +1121,9 @@ begin
 	smw = MW(sh)
 	switch (SMW_FORMAT(smw)) {
 	case SMW_ND:
-	    if (SMW_LAXIS(smw,1) == 1)
-		call sprintf (str, SZ_LINE, "%s[*,%d:%d]: %s")
-	    else
-		call sprintf (str, SZ_LINE, "%s[%d:%d,*]: %s")
+	    call sprintf (str, SZ_LINE, "%s%s: %s")
 		call pargstr (IMNAME(sh))
-		call pargi (nint (APLOW(sh,1)))
-		call pargi (nint (APHIGH(sh,1)))
+		call pargstr (IMSEC(sh))
 		call pargstr (TITLE(sh))
 	case SMW_ES, SMW_MS:
 	    call sprintf (str, SZ_LINE, "%s - Ap %d: %s")

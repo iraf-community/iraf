@@ -27,10 +27,11 @@ libpkg.a:
 			../lib/phot.h
 	apwpcolon.x	../lib/noise.h		../lib/apphot.h        \
 			../lib/display.h	../lib/fitsky.h        \
-			../lib/center.h		../lib/phot.h
+			../lib/center.h		../lib/phot.h          \
+			<gset.h>
 	apwremag.x	<mach.h>		../lib/apphotdef.h     \
-			../lib/fitskydef.h	../lib/noisedef.h      \
-			../lib/photdef.h	../lib/phot.h
+			../lib/noisedef.h       ../lib/photdef.h       \
+			../lib/phot.h
 	t_wphot.x	<fset.h>		<gset.h>	       \
 			<lexnum.h>		../lib/apphot.h        \
 			../lib/fitsky.h

@@ -360,10 +360,11 @@ begin
 		FIT_CACHEHDR(fit), clines, merge, pb)
 	    Memc[pb] = EOS
 	    ualen = strlen (Memc[tb])
-	    call sfree (sp)
 
 	    # Now copy the buffer pointed by 'pb' to UA.
 	    call strcpy (Memc[tb], Memc[ua], ualen)
+
+	    call sfree (sp)
 	}
 
 	# See also fitopix.x for an explanation of this call.
@@ -397,12 +398,16 @@ begin
 	else {
 	    iferr (call imgstr (im, "OBJECT", temp, LEN_CARD)) {
 	        temp[1] = EOS
-                # If there is no OBJECT keyword, don't create one.
-		nheader_cards = nheader_cards - 1
+#                # If there is no OBJECT keyword, don't create one.
+#		nheader_cards = nheader_cards - 1
 	    }
 	    if (strcmp (FIT_OBJECT(fit), temp) != 0)
 	        call strcpy (temp, FIT_OBJECT(fit), LEN_CARD)
 	}
+
+	# If there is no OBJECT keyword, don't create one.
+	if (FIT_OBJECT(fit) == EOS)
+	    nheader_cards = nheader_cards - 1
 
 	# Too many mandatory cards if we are using the PHU in READ_WRITE mode.
 	# Because fxf_mandatory_cards gets call with FIT_NEWIMAGE set to NO,
@@ -693,14 +698,14 @@ begin
 	    }
 	    nbk = diff / 1440     
 
-	    do i = 1, nbk-1 {
-		call amovkc (blank, Memc[spp], 2880)
-		call write (hdr_fd, Memc[spp], sz_rec)
-	    }
+	    call amovkc (blank, Memc[spp], 2880)
+	    call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
+	    do i = 1, nbk-1
+		call write (hdr_fd, Memi[mii], sz_rec)
+	   
 	    call amovkc (blank, Memc[spp], 2880)
 	    rp = spp+2880-LEN_CARD
 	}
-	   
 	call amovc ("END", Memc[rp], 3)
 	call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
 	call write (hdr_fd, Memi[mii], sz_rec)

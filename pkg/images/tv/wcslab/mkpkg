@@ -15,7 +15,7 @@ libpkg.a:
 libds.a:
 	wlutil.x	<imio.h> <imhdr.h> <gset.h> <math.h>
 	wcslab.x	<gset.h> <imhdr.h> <mwset.h> <math.h> "wcslab.h"\
-			"wcs_desc.h"
+			"wcs_desc.h" <ctype.h>
 	wlwcslab.x	<gio.h> <gset.h> "wcslab.h" "wcs_desc.h"
 	wlsetup.x	<gset.h> <mach.h> <math.h> <math/curfit.h>\
 			"wcslab.h" "wcs_desc.h"

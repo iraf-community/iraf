@@ -563,6 +563,7 @@ begin
 
 	call fxf_filter_keyw (im, "GROUPS")
 	call fxf_filter_keyw (im, "PSIZE")
+	call fxf_filter_keyw (im, "BLOCKED")
 	call fxf_filter_keyw (im, "IRAFNAME")
 	call fxf_filter_keyw (im, "IRAF-BPX")
 	call fxf_filter_keyw (im, "IRAFTYPE")

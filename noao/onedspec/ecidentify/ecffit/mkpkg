@@ -8,13 +8,13 @@ $exit
 libpkg.a:
 	ecfcolon.x	ecffit.com <error.h> <gset.h>
 	ecfeval.x	ecffit.com
-	ecffit.x	ecffit.com <pkg/gtools.h>
-	ecfgdata.x	<pkg/gtools.h>
+	ecffit.x	ecffit.com <error.h> <pkg/gtools.h>
+	ecfgdata.x	ecffit.com <pkg/gtools.h>
 	ecfget.x	ecffit.com
-	ecfgraph.x	<gset.h> <pkg/gtools.h>
+	ecfgraph.x	<gset.h> <mach.h> <pkg/gtools.h>
 	ecfnearest.x	<gset.h> <mach.h> <pkg/gtools.h>
 	ecfreject.x	ecffit.com <mach.h>
-	ecfrms.x
+	ecfrms.x	
 	ecfset.x	ecffit.com
 	ecfsolve.x	ecffit.com <mach.h> <math/gsurfit.h>
 	ecftitle.x	ecffit.com <pkg/gtools.h>

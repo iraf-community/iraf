@@ -1,5 +1,10 @@
 .help revisions Jan90 noao.digiphot.ptools
 .nf
+ptools$*/mkpkg
+    Added some missing file dependencies to the ptools package mkpkg files.
+
+    (Davis, September 30, 1999)
+     
 ptools$mkpkg
     Modified the build procedures to support picking up user compile and
     link flags.

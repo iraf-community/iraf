@@ -14,8 +14,7 @@ libpkg.a:
 			<tbset.h>		../../lib/ptkeysdef.h
 	dpgppars.x 	<ctotok.h>              ../lib/daophotdef.h
 	dpppars.x 	../lib/daophotdef.h
-	dpinit.x	../lib/daophotdef.h	../lib/psfdef.h            \
-			../lib/apseldef.h	../lib/nstardef.h          \
+	dpinit.x	../lib/daophotdef.h	../lib/apseldef.h	   \
 			../lib/allstardef.h
 	dpreadpsf.x	<imhdr.h>		../lib/daophotdef.h        \
 			<error.h>

@@ -10,8 +10,8 @@ libpkg.a:
 
 	appyerrors.x	../lib/polyphot.h
 	apgypars.x	../lib/display.h	../lib/fitsky.h         \
-			../lib/apphot.h		../lib/noise.h          \
-			../lib/polyphot.h	../lib/center.h
+			../lib/noise.h          ../lib/polyphot.h	\
+			../lib/center.h
 	apycenter.x	../lib/center.h		../lib/polyphot.h
 	apyconfirm.x	../lib/apphot.h		../lib/noise.h		\
 			../lib/center.h		../lib/fitsky.h

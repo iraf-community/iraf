@@ -1,5 +1,18 @@
 .help revisions Jan90 noao.digiphot.daophot
 .nf
+daophot/*/mkpkg
+    Added some missing file dependencies and removed some unnecessary ones
+    from the package mkpkg files.
+
+    Davis, Sept 30, 1999
+
+
+daophot/daophot.cl
+    Added a missing ; to the cl file to avoid a package hangup if tables
+    is undefined.
+
+    Davis, Sep 29, 1999
+
 daophot/mkpkg
     Modified the mkpkg scripts in order to support important command line 
     compile and relink flags.

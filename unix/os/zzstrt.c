@@ -5,6 +5,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef LINUX
+#include <fpu_control.h>
+#undef SOLARIS
+#endif
+
 #ifdef SHLIB
 #ifdef SOLARIS
 #include <libelf.h>
@@ -18,16 +23,20 @@
 #endif
 #endif
 
+#ifdef sun
+#include <floatingpoint.h>
+#endif
+
+#ifdef SOLARIS
+#include <ieeefp.h>
+#endif
+
 #define	import_spp
 #define	import_kernel
 #define	import_knames
 #define	import_xnames
 #define import_prtype
 #include <iraf.h>
-
-#ifdef sun
-#include <floatingpoint.h>
-#endif
 
 /*
  * ZZSTRT,ZZSTOP -- Routines to perform initialization and cleanup functions
@@ -83,9 +92,18 @@ ZZSTRT()
 	XCHAR	*bp;
 #endif
 
+	spp_debug();
+
+	/* Initialize globals.
+	 */
 	sprintf (os_process_name, "%d", getpid());
 	strcpy (osfn_bkgfile, "");
 	prtype = PR_HOST;
+
+	/* Initialize the kernel file descriptor. */
+	zfd[0].fp = stdin;	zfd[0].flags = KF_NOSEEK;
+	zfd[1].fp = stdout;	zfd[1].flags = KF_NOSEEK;
+	zfd[2].fp = stderr;	zfd[2].flags = KF_NOSEEK;
 
 #ifdef SHLIB
 	/* Map in the Sun/IRAF shared library, if the calling process was
@@ -152,32 +170,14 @@ ZZSTRT()
 	     * 2.3 and 2.4, and a separate shared library is required for
 	     * each.  Call uname() to get the OS version and use the 
 	     * appropriate shared library.  If this isn't found attempt to
-	     * fallback on the generic version.  E.g. if the shared library
-	     * version is 11 and the OS is Solaris 2.6, try "S11_5.6.X.e"
-	     * first (where .X is the minor release number if any), then
-	     * "S11_5.6.e", then "S11.e".
-	     *
-	     * This whole business may not be necessary any longer with 2.6
-	     * and later as the socket library has been moved back into the
-	     * kernel, but we may as well keep the option to tailor shared
-	     * libraries to OS versions.
+	     * fallback on the generic version.
 	     */
 	    uname (&uts);
-	    /* Try "SXX_Y.Z.n.e" */
 	    sprintf (shimage, "S%d_%s.e", u_version, uts.release);
 	    shlib = irafpath (shimage);
-
 	    if (shlib == NULL || (fd = open (shlib, 0)) == -1) {
-		/* Try "SXX_Y.Z.e" */
-		uts.release[3] = '\0';
-		sprintf (shimage, "S%d_%s.e", u_version, uts.release);
+		sprintf (shimage, "S%d.e", u_version);
 		shlib = irafpath (shimage);
-
-		if (shlib == NULL || (fd = open (shlib, 0)) == -1) {
-		    /* Try "SXX.e" */
-		    sprintf (shimage, "S%d.e", u_version);
-		    shlib = irafpath (shimage);
-		}
 	    }
 	    if (shlib == NULL || (fd = open (shlib, 0)) == -1) {
 		fprintf (stderr,
@@ -253,22 +253,22 @@ ZZSTRT()
 	    adjust = phdr->p_offset % pgsize;
 
 	    t_off = phdr->p_offset - adjust;
-	    t_loc = (caddr_t) ((unsigned)phdr->p_vaddr - adjust);
+	    t_loc = (caddr_t) ((int)phdr->p_vaddr - adjust);
 	    t_len = phdr->p_filesz + adjust;
 
 	    phdr = &seg[1];
 	    adjust = phdr->p_offset % pgsize;
 
 	    d_off = phdr->p_offset - adjust;
-	    d_loc = (caddr_t) ((unsigned)phdr->p_vaddr - adjust);
+	    d_loc = (caddr_t) ((int)phdr->p_vaddr - adjust);
 	    d_len = phdr->p_filesz + adjust;
 
 	    /* Map the BSS segment beginning with the first hardware page
 	     * following the end of the data segment.
 	     */
 	    b_off = 0;				/* anywhere will do */
-	    b_loc = (caddr_t) align ((unsigned)d_loc + d_len + pgsize);
-	    b_len = phdr->p_vaddr + phdr->p_memsz - (unsigned)b_loc;
+	    b_loc = (caddr_t) align ((int)d_loc + d_len + pgsize);
+	    b_len = phdr->p_vaddr + phdr->p_memsz - (int)b_loc;
 
 	    b_start = phdr->p_vaddr + phdr->p_filesz;
 	    b_bytes = phdr->p_memsz - phdr->p_filesz;
@@ -425,14 +425,34 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	/* Dummy routine called to indicate that mapping is complete. */
 	ready();
 
+#ifdef LINUX
+	/* Enable the common IEEE exceptions.  Newer Linux systems disable
+	 * these by default, the usual SYSV behavior.
+	 */
+
+	/* Old code; replaced by SFPUCW in as$zsvjmp.s 
+	    asm ("fclex");
+	    setfpucw (0x1372);
+	 */
+	{   
+	    /* 0x332: round to nearest, 64 bit precision, mask P-U-D. */
+	    int fpucw = 0x332;
+	    sfpucw_ (&fpucw);
+	}
+#endif
 #ifdef SOLARIS
 	/* Enable the common IEEE exceptions.  _ieee_enbint is as$enbint.s.
 	 */
+#ifdef X86
+	fpsetsticky (0x0);
+	fpsetmask (FP_X_INV | FP_X_OFL | FP_X_DZ);
+#else
 	_ieee_enbint (
 	    (1 << (int)fp_division) |
 	    (1 << (int)fp_overflow) |
 	    (1 << (int)fp_invalid)
 	);
+#endif
 
 #else
 #ifdef SUNOS

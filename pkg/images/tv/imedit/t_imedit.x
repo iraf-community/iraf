@@ -61,7 +61,9 @@ begin
 	    }
  
 	    # The editing takes place in a temporary editing image buffer.
-newim_	    call mktemp ("imedit", EP_WORK(ep), EP_SZFNAME)
+newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
+	    call xt_mkimtemp (EP_OUTPUT(ep), EP_WORK(ep), EP_OUTPUT(ep),
+		EP_SZFNAME)
 	    iferr (call ep_imcopy (EP_INPUT(ep), EP_WORK(ep))) {
 		call erract (EA_WARN)
 		next

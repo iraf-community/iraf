@@ -35,22 +35,24 @@ libstg.a:
 	stgescape.x	
 	stgfa.x		stdgraph.com stdgraph.h
 	stgfaset.x	stdgraph.com stdgraph.h <gki.h>
-	stgfilter.x	stdgraph.com stdgraph.h <ttset.h> <chars.h>
+	stgfilter.x	stdgraph.com stdgraph.h <ttset.h> <chars.h> <fset.h>
 	stgflush.x	stdgraph.com stdgraph.h
 	stggcell.x	
 	stggcur.x	stdgraph.com stdgraph.h
 	stggdisab.x	stdgraph.com stdgraph.h
-	stggim.x	stdgraph.com <chars.h> <ctype.h> <fset.h>\
-			<gescape.h> <gki.h>
+	stggim.x	stdgraph.com stdgraph.h <chars.h> <ctype.h> <fset.h>\
+			<mach.h> <gescape.h> <gki.h> <gim.h>
 	stggenab.x	stdgraph.com stdgraph.h
 	stggrstr.x	stdgraph.com stdgraph.h
-	stginit.x	stdgraph.com stdgraph.h <ctype.h> <gki.h> <mach.h>
+	stginit.x	stdgraph.com stdgraph.h <ctype.h> <gki.h> <gset.h>\
+			<mach.h>
 	stglkcur.x	stdgraph.com stdgraph.h <gset.h>
 	stgmove.x	stdgraph.com stdgraph.h
 	stgonerr.x	stdgraph.com stdgraph.h
 	stgonint.x	stdgraph.h <config.h> <xwhen.h>
 	stgopen.x	stdgraph.com stdgraph.h <gki.h> <gset.h>
-	stgopenws.x	stdgraph.com stdgraph.h <error.h> <gki.h> <ttset.h>
+	stgopenws.x	stdgraph.com stdgraph.h <error.h> <gki.h> <ttset.h>\
+			<chars.h> <finfo.h>
 	stgoutput.x	stdgraph.com stdgraph.h
 	stgoutstr.x	stdgraph.com stdgraph.h
 	stgpcell.x	stdgraph.com stdgraph.h <gki.h>

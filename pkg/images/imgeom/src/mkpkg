@@ -30,6 +30,6 @@ libpkg.a:
 	t_imshift.x	<error.h> <imhdr.h> <imset.h> <math/iminterp.h>
 	t_imtrans.x	<imhdr.h> <error.h> <mwset.h>
 	t_im3dtran.x	<imhdr.h> <error.h> <mwset.h>
-	t_magnify.x	<imhdr.h> <imset.h> <math/iminterp.h>
+	t_magnify.x	<imhdr.h> <imset.h> <error.h> <math/iminterp.h>
 	t_shiftlines.x	<error.h>
 	;

@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<gio.h>
-include	<gio.h>
 include	"gtr.h"
 include	"grc.h"
 

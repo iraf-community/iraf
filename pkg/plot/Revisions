@@ -1,5 +1,12 @@
 .help revisions Aug90 pkg.plot
 .nf
+pkg/plot/mkpkg
+    Added some missing file dependencies to the mkpkg file. (21/9/99, Davis)
+
+=======
+V2.11.2
+=======
+
 pkg/plot/doc/implot.hlp
 pkg/plot/doc/surface.hlp
     Fixed minor formating problem.  (4/22/99, Valdes)

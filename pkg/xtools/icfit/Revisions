@@ -1,5 +1,10 @@
 .help revisions Jun88 pkg.xtools.icfit
 .nf
+icshow.x
+icvshow.gx
+    The gt pointer was not being used when called by CURFIT noninteractively.
+    The IC_GT structure is now set in these routines.  (9/14/99, Valdes)
+
 =======
 V2.11.2
 =======

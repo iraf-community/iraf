@@ -14,7 +14,8 @@ libpkg.a:
 			<mach.h>                ../lib/daophotdef.h       \
 			../lib/apseldef.h       ../lib/nstardef.h
 	dpnstarfit.x	<imhdr.h>		../lib/daophotdef.h       \
-			../lib/apseldef.h	../lib/nstardef.h
+			../lib/apseldef.h	../lib/nstardef.h         \
+			<mach.h>
 	dpntwrite.x	<tbset.h>		<time.h>		  \
 			../lib/daophotdef.h	../lib/apseldef.h         \
 			../lib/nstardef.h
