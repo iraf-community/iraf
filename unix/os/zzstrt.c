@@ -4,16 +4,18 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
-#ifdef OSF1
-#include <machine/fpu.h>
-#undef SHLIB
+#ifdef LINUX
+#include <fpu_control.h>
+#undef SOLARIS
 #endif
 
 #ifdef SHLIB
 #ifdef SOLARIS
 #include <libelf.h>
 #include <sys/mman.h>
+#include <sys/utsname.h>
 #include <unistd.h>
 #include <dlfcn.h>
 #else
@@ -22,16 +24,27 @@
 #endif
 #endif
 
+#ifdef sun
+#include <floatingpoint.h>
+#endif
+
+#ifdef SOLARIS
+#include <ieeefp.h>
+#endif
+
+#ifdef LINUXPPC
+#define MACUNIX
+#endif
+#ifdef MACOSX
+#define MACUNIX
+#endif
+
 #define	import_spp
 #define	import_kernel
 #define	import_knames
 #define	import_xnames
 #define import_prtype
 #include <iraf.h>
-
-#ifdef sun
-#include <floatingpoint.h>
-#endif
 
 /*
  * ZZSTRT,ZZSTOP -- Routines to perform initialization and cleanup functions
@@ -45,10 +58,11 @@ static	int prtype, ipc_isatty=NO;
 static	char os_process_name[SZ_FNAME];
 static	char osfn_bkgfile[SZ_PATHNAME];
 extern	malloc(), realloc(), free();
-extern	char *((*environ)[]);
 extern	int errno;
 
 #ifdef SHLIB
+extern	char *((*environ)[]);
+
 extern	int sh_debug;			/* map shared image writeable */
 static	short debug_ieee = 0;
 extern	unsigned USHLIB[], VSHLIB[];	/* shared library descriptors */
@@ -86,10 +100,18 @@ ZZSTRT()
 	char	*segname;
 	XCHAR	*bp;
 #endif
+	spp_debug();
 
+	/* Initialize globals.
+	 */
 	sprintf (os_process_name, "%d", getpid());
 	strcpy (osfn_bkgfile, "");
 	prtype = PR_HOST;
+
+	/* Initialize the kernel file descriptor. */
+	zfd[0].fp = stdin;	zfd[0].flags = KF_NOSEEK;
+	zfd[1].fp = stdout;	zfd[1].flags = KF_NOSEEK;
+	zfd[2].fp = stderr;	zfd[2].flags = KF_NOSEEK;
 
 #ifdef SHLIB
 	/* Map in the Sun/IRAF shared library, if the calling process was
@@ -115,6 +137,7 @@ ZZSTRT()
 	    register Elf32_Ehdr *ehdr;
 	    caddr_t t_loc, d_loc, b_loc;
 	    int adjust, phnum, nseg, i;
+	    struct utsname uts;
 	    Elf32_Phdr *phdr_array;
 	    Elf32_Phdr seg[32];
 	    Elf *elf;
@@ -148,7 +171,28 @@ ZZSTRT()
 	    sprintf (envdef, "IRAFARCH=%s", arch);
 	    if (!(arch = getenv("IRAFARCH")) || strcmp(envdef,arch))
 		putenv (envdef);
-	
+
+#ifdef SOLARIS
+	    /* Open the shared library file.  In the case of Solaris the
+	     * statically linked shared library doesn't work for both Solaris
+	     * 2.3 and 2.4, and a separate shared library is required for
+	     * each.  Call uname() to get the OS version and use the 
+	     * appropriate shared library.  If this isn't found attempt to
+	     * fallback on the generic version.
+	     */
+	    uname (&uts);
+	    sprintf (shimage, "S%d_%s.e", u_version, uts.release);
+	    shlib = irafpath (shimage);
+	    if (shlib == NULL || (fd = open (shlib, 0)) == -1) {
+		sprintf (shimage, "S%d.e", u_version);
+		shlib = irafpath (shimage);
+	    }
+	    if (shlib == NULL || (fd = open (shlib, 0)) == -1) {
+		fprintf (stderr,
+		    "Error: cannot open iraf shared library %s\n", shlib);
+		exit (1);
+	    }
+#else
 	    /* Open the shared library file */
 	    sprintf (shimage, "S%d.e", u_version);
 	    shlib = irafpath (shimage);
@@ -157,6 +201,7 @@ ZZSTRT()
 		    "Error: cannot open iraf shared library %s\n", shlib);
 		exit (1);
 	    }
+#endif
 
 #ifdef SOLARIS
 	    /* With Solaris executables are ELF format files.  The file
@@ -194,7 +239,7 @@ ZZSTRT()
 		phdr = &seg[0];
 		hsize = (unsigned)((char *)VSHLIB) - USHLIB[1];
 		/* lseek (fd, phdr->p_offset + (long)hsize, 0); */
-		lseek (fd, (long)hsize, 0);
+		lseek (fd, (off_t)hsize, 0);
 		if (read (fd, (char *)vshlib, sizeof(vshlib)) !=
 			sizeof(vshlib)) {
 		    fprintf (stderr, "Read error on %s\n", shlib);
@@ -241,7 +286,7 @@ ZZSTRT()
 	     * image memory.  The shared image is mapped at address s_base.
 	     */
 	    hsize = (unsigned)((char *)VSHLIB) - USHLIB[1];
-	    lseek (fd, (long)hsize, 0);
+	    lseek (fd, (off_t)hsize, 0);
 	    if (read (fd, (char *)vshlib, sizeof(vshlib)) != sizeof(vshlib)) {
 		fprintf (stderr, "Read error on %s\n", shlib);
 		exit (1);
@@ -388,26 +433,41 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	/* Dummy routine called to indicate that mapping is complete. */
 	ready();
 
-#ifdef OSF1
-	ieee_set_fp_control (
-	      IEEE_TRAP_ENABLE_INV
-	    | IEEE_TRAP_ENABLE_DZE
-	    | IEEE_TRAP_ENABLE_OVF
-	 /* | IEEE_TRAP_ENABLE_UNF */
-	 /* | IEEE_TRAP_ENABLE_INE */
-	);
+#ifdef LINUX
+	/* Enable the common IEEE exceptions.  Newer Linux systems disable
+	 * these by default, the usual SYSV behavior.
+	 */
+
+	/* Old code; replaced by SFPUCW in as$zsvjmp.s 
+	    asm ("fclex");
+	    setfpucw (0x1372);
+	 */
+	{   
+	    /* 0x332: round to nearest, 64 bit precision, mask P-U-D. */
+#ifdef MACUNIX
+	    int fpucw = _FPU_IEEE;
 #else
+	    int fpucw = 0x332;
+#endif
+	    sfpucw_ (&fpucw);
+	}
+#endif
 #ifdef SOLARIS
 	/* Enable the common IEEE exceptions.  _ieee_enbint is as$enbint.s.
 	 */
+#ifdef X86
+	fpsetsticky (0x0);
+	fpsetmask (FP_X_INV | FP_X_OFL | FP_X_DZ);
+#else
 	_ieee_enbint (
 	    (1 << (int)fp_division) |
 	    (1 << (int)fp_overflow) |
 	    (1 << (int)fp_invalid)
 	);
+#endif
 
 #else
-#ifdef SUNOS4
+#ifdef SUNOS
 	/* The following enables the common IEEE floating point exceptions
 	 * invalid, overflow, and divzero, causing the program to abort if
 	 * any of these are detected.  If ZZSTRT is called from an IRAF
@@ -484,10 +544,9 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	    int mode = FP_BSUN|FP_SNAN|FP_OPERR|FP_DZ|FP_OVFL|FP_INVALID;
 	    fpmode_ (&mode);
 	}
-#endif mc68000
-#endif SUNOS4
-#endif SOLARIS
-#endif OSF1
+#endif
+#endif
+#endif
 
 #ifdef SYSV
 	/* Initialize the time zone data structures. */
@@ -506,6 +565,9 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	    ZOPNTY (U_STDOUT, &wo, &chan);
 	    ZOPNTY (U_STDERR, &wo, &chan);
 	}
+
+	/* Pass the values of the kernel parameters into the kernel. */
+	ZZSETK (os_process_name, osfn_bkgfile, prtype, ipc_isatty);
 }
 
 

@@ -12,6 +12,7 @@ set	demos		= "longslit$demos/"
 # Tasks.
 
 task	extinction,
+	fceval,
 	fitcoords,
 	fluxcalib,
 	illumination,

@@ -15,7 +15,7 @@ pointer	ie			#I imexamine descriptor
 pointer	sp, imname, ds, iw
 int	server, nframes, status, i
 
-int	clgeti(), strncmp()
+int	clgeti(), strncmp(), imd_wcsver()
 pointer	imd_mapframe(), iw_open()
 errchk	imd_mapframe, clgeti
 
@@ -38,7 +38,7 @@ begin
 	    # allocated frames in the case of a server device.
 
 	    server = IM_LEN(ds,4)
-	    if (server == YES) {
+	    if (server == YES && imd_wcsver() != 0) {
 		nframes = 1
 		do i = 1, MAX_FRAMES {
 		    iferr (iw = iw_open (ds, i, Memc[imname], SZ_FNAME, status))

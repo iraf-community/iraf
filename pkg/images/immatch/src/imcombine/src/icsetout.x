@@ -24,10 +24,10 @@ real	val
 bool	proj, reloff, flip, streq(), fp_equald()
 pointer	sp, str, fname
 pointer	ltv, lref, wref, cd, ltm, coord, shift, axno, axval, section
-pointer	mw, ct, mw_openim(), mw_sctran(), immap()
+pointer	mw, ct, mw_openim(), mw_sctran(), xt_immap()
 int	open(), fscan(), nscan(), mw_stati(), strlen(), strdic()
 errchk	mw_openim, mw_gwtermd, mw_gltermd, mw_gaxmap
-errchk	mw_sctran, mw_ctrand, open, immap
+errchk	mw_sctran, mw_ctrand, open, xt_immap
 
 include	"icombine.com"
 define	newscan_ 10
@@ -141,8 +141,8 @@ begin
 		if (flip) {
 		    call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_FNAME)
 		    call strcat (Memc[section], Memc[fname], SZ_FNAME)
-		    call imunmap (in[i])
-		    in[i] = immap (Memc[fname], READ_ONLY, TY_CHAR) 
+		    call xt_imunmap (in[i], i)
+		    in[i] = xt_immap (Memc[fname], READ_ONLY, TY_CHAR, i) 
 		    call mw_close (mw)
 		    mw = mw_openim (in[i])
 		    call mw_gltermd (mw, Memd[cd], Memd[coord], indim)

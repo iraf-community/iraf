@@ -1,5 +1,78 @@
 .help revisions Jun88 noao.nproto
 .nf
+=======
+V2.12.2
+=======
+
+findgain.cl
+findthresh.cl
+    Modified to eliminate goto statements (12/28/03, MJF)
+
+mkms.cl		+
+doc/mkms.hlp	+
+nproto.cl
+nproto.hd
+nproto.men
+    Added a prototype script task to create a multispec format image from
+    1D spectra including the associated arrays.  (1/7/03, Valdes)
+
+ace/skyfit.x
+    If a complete line is exceptionally deviant from the true sky it
+    will bias the sky surface.  As a quick fix for the possibly common
+    case that the first or last lines are high due to charge transfer
+    effects, the lines to use was changed to start and end a half step
+    from the ends.  This is only a quick fix and a more sophisticated
+    solutions is needed.  (10/17/02, Valdes)
+
+ace/skyblock.x
+    There was another bug in interp2.  (10/17/02, Valdes)
+
+ace/skyblock.x
+    There was a bug in interp2.  (9/30/02, Valdes)
+
+ace/convolve.x
+    Fixed error when reference image does not overlap target image on
+    the right.  (9/23/02, Valdes)
+
+ace/detect.x
+    The flux comparison in difference detection used sigma normalized
+    fluxes.  This was changed to unnormalized fluxes which is done
+    by using the same sigmas for the target and reference images.
+    (9/23/02, Valdes)
+
+ace/t_acedetect.x
+ace/pars.x
+ace/diffdetect.pars
+    Made changes for diffdetect.  (9/23/02, Valdes)
+
+ace/t_acedetect.x
+    Switched over to the xtools version of xt_pmmap.
+    (9/10/02, Valdes)
+
+ace/t_acedetect.x
+ace/skyblock.x
+ace/omwrite.x
+    If DATASEC is present then it is automatically applied to the
+    image.  It is also deleted from the output sky and mask since
+    they will be the size of the data section.  (9/10/02, Valdes)
+
+ace/skyfit.x
+    The sigma is fit by a constant to avoid potential negative sigmas.
+    (8/6/02, Valdes)
+
+ace/skyfit.x
+    The sigma is fit by a constant to avoid potential negative sigmas.
+    (8/6/02, Valdes)
+
+=======
+V2.12.1
+=======
+
+ace/skyfit.x
+ace/skyblock.x
+    Fixed a type mismatch in a min() function.  (6/13/02, Valdes)
+
+=====
 =====
 V2.12
 =====

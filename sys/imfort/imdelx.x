@@ -9,7 +9,7 @@ include	"imfort.h"
 
 procedure imdelx (image, ier)
 
-char	image			#I image to be deleted
+char	image[ARB]		#I image to be deleted
 int	ier			#O receives error status
 
 int	status

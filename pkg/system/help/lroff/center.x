@@ -14,13 +14,13 @@ char	linebuf[ARB]
 int	ip
 
 int	len_inputline, center_column, nblanks, i
-int	in(), input(), getarg()
+int	in(), input(), lgetarg()
 errchk	breakline, input, outc, outline
 include	"lroff.com"
 
 begin
 	call breakline (out, NJ)
-	center_column = getarg (linebuf, ip, (left_margin + right_margin) / 2)
+	center_column = lgetarg (linebuf, ip, (left_margin + right_margin) / 2)
 	len_inputline = input (in, linebuf) - 1
 
 	if (len_inputline != EOF) {

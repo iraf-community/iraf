@@ -13,6 +13,7 @@
   mimstatistics - Do image statistics through a mask
         mskexpr - Create masks using an expression and reference images
      mskregions - Create or modify masks using regions lists
+	ringavg - Compute pixel averages in concentric rings about given center
         rskysub - Sky subtract images using running mean or median
       suntoiraf - Convert Sun rasters into IRAF images
       text2mask - Convert text description to pixel mask

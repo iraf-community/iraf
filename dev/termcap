@@ -29,12 +29,24 @@ apple7|lw7|tops|	:tc=sapple7:
 apple8|lw8|		:tc=sapple8:
 lw9|			:tc=sapple9:
 lw10|			:tc=sapple10:
+lw12|                   :tc=sapple12:
+lw13|                   :tc=sapple13:
 lw14|                   :tc=sapple14:
-lw15|lwcloset|		:tc=sapple15:
 lw16|			:tc=sapple16:
+lw18|			:tc=sapple18:
 lw19|			:tc=sapple19:
 lw20|			:tc=sapple20:
+lw21|			:tc=sapple21:
+lw23|			:tc=sapple23:
+lw24|			:tc=sapple24:
+lw25|			:tc=sapple25:
+lw26|			:tc=sapple26:
+lw27|			:tc=sapple27:
+lw28|			:tc=sapple28:
 lw29|                   :tc=sapple29:
+lw30|                   :tc=sapple30:
+lw34|                   :tc=sapple34:
+lw35|                   :tc=sapple35:
 lwdp|			:tc=sappledp:
 lwti|ti|		:tc=slwti:
 vmsprint|vmslp|		:tc=svprint:
@@ -165,24 +177,60 @@ sapple9|Apple laser writer on Aquila:co#80:li#66:os:pt:ta^I:\
 sapple10|SPARCprinter on Solitaire:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw10 $F; rm $F; }:
+sapple12|HP LaserJet 4mPlus in Rm 157:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw12 $F; rm $F; }:
+sapple13|Apple LaserWriter 16/600 in Rm 128:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw13 $F; rm $F; }:
 sapple14|Printer on Helios:\
         :co#80:li#66:os:pt:ta^I:\
         :DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw14 $F; rm $F; }:
-sapple15|QMS-PS printer in PC "closet":\
-	:co#80:li#66:os:pt:ta^I:\
-	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw15 $F; rm $F; }:
 sapple16|HP LaserJet 4M 600dpi printer:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw16 $F; rm $F; }:
+sapple18|HP LaserJet 4000N in Rm 123:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw18 $F; rm $F; }:
 sapple19|HP LaserJet 4M 600dpi printer:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw19 $F; rm $F; }:
 sapple20|HP LaserJet 4 600dpi printer:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw20 $F; rm $F; }:
+sapple21|HP LaserJet 4 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw21 $F; rm $F; }:
+sapple23|HP LaserJet 4 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw23 $F; rm $F; }:
+sapple24|HP LaserJet 4 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw24 $F; rm $F; }:
+sapple25|HP LaserJet 4 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw25 $F; rm $F; }:
+sapple26|HP LaserJet 4 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw26 $F; rm $F; }:
+sapple27|HP LaserJet 4 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw27 $F; rm $F; }:
+sapple28|HP LaserJet 4 600dpi printer:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw28 $F; rm $F; }:
 sapple29|HP LaserJet 4m 600dpi printer:\
         :co#80:li#66:os:pt:ta^I:\
         :DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw29 $F; rm $F; }:
+sapple30|HP LaserJet 4m 600dpi printer:\
+        :co#80:li#66:os:pt:ta^I:\
+        :DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw30 $F; rm $F; }:
+sapple34|HP LaserJet 4m 600dpi printer:\
+        :co#80:li#66:os:pt:ta^I:\
+        :DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw34 $F; rm $F; }:
+sapple35|HP LaserJet 4m 600dpi printer:\
+        :co#80:li#66:os:pt:ta^I:\
+        :DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw35 $F; rm $F; }:
 sappledp|HP LaserJet 5M duplex printer:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plwdp $F; rm $F; }:

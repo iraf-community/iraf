@@ -13,9 +13,9 @@ echo "+"; echo "+"
 echo "----------------------- BOOT ---------------------------"
 echo "+"; echo "+"
 (cd boot; sh -x mkpkg.sh)
-echo "----------------------- SHLIB --------------------------"
-echo "+"; echo "+"
-(cd shlib; sh -x mkpkg.sh)
+#echo "----------------------- SHLIB --------------------------"
+#echo "+"; echo "+"
+#(cd shlib; sh -x mkpkg.sh)
 echo "----------------------- GDEV ---------------------------"
 (cd gdev; sh -x mkpkg.sh)
 

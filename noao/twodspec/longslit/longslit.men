@@ -3,6 +3,7 @@
       calibrate - Apply extinction and flux calibrations to spectra
        deredden - Apply interstellar extinction correction
          dopcor - Apply doppler corrections
+	 fceval - Evaluate coordinates using the FITSCOORDS solutions
       fitcoords - Fit user coordinates to image coordinates
        identify - Identify features
    illumination - Determine illumination calibration

@@ -3,41 +3,183 @@
 # then add the package helpdb to the `helpdb' list.
 
 #reset	local		= iraf$local/
-#task	local.pkg	= local$nlocal.cl
+#task	local.pkg	= local$local.cl
 
 reset	noao		= iraf$noao/
 task	noao.pkg	= noao$noao.cl
 
-reset	tables		= /iraf/extern/tables/
+reset	tables		= /shared/iraf/extern/tables/
 task	tables.pkg	= tables$tables.cl
 
-reset	mscred		= /iraf/extern/mscred/
-task	mscred.pkg	= mscred$mscred.cl
+reset	nlocal		= /shared/iraf/extern/nlocal/
+task	nlocal.pkg	= nlocal$nlocal.cl
 
-reset	guiapps		= /iraf/extern/guiapps/
-task	guiapps.pkg	= guiapps$guiapps.cl
+reset	ctio		= /shared/iraf/extern/ctio/
+task	ctio.pkg	= ctio$ctio.cl
 
-reset	fitsutil	= /iraf/extern/fitsutil/
-task	fitsutil.pkg	= fitsutil$fitsutil.cl
+#reset	cxc		= /u4/cxc/cxc-test-export/ASCDS_ROOT/
+#task	cxc.pkg		= cxc$cxc.cl
 
-reset	nmisc		= /iraf/extern/nmisc/
+reset	arcon		= /xp/iraf/arcon/
+task	arcon.pkg	= arcon$arcon.cl
+
+reset	ared		= /shared/iraf/extern/ared/
+task	ared.pkg	= ared$ared.cl
+
+reset	stsdas		= /shared/iraf/extern/stsdas/
+task    stsdas.pkg      = stsdas$stsdas.cl
+
+reset	adccdrom	= /shared/iraf/extern/adccdrom/
+task	adccdrom.pkg	= adccdrom$adccdrom.cl
+
+reset	vol		= /shared/iraf/extern/vol/
+task	vol.pkg		= vol$vol.cl
+
+reset	spptools	= /shared/iraf/extern/spptools/
+task	spptools.pkg	= spptools$spptools.cl
+
+#reset	imcnv		= /shared/iraf/extern/imcnv/
+#task	imcnv.pkg	= imcnv$imcnv.cl
+
+reset	ftools		= /shared/iraf/extern/ftools/ftools/
+task	ftools.pkg	= ftools$ftools.cl
+
+reset	xray		= /shared/iraf/extern/xray/xray/
+task	xray.pkg	= xray$xray.cl
+
+reset	steward		= /shared/iraf/extern/steward/
+task	steward.pkg	= steward$steward.cl
+
+reset   ice             = /shared/iraf/extern/ice2/
+task    ice.pkg         = ice$ice.cl
+
+reset   ccdacq          = /shared/iraf/extern/ice/ccdacq/
+task    ccdacq.pkg      = ccdacq$ccdacq.cl
+
+reset	color		= /shared/iraf/extern/color/
+task	color.pkg	= color$color.cl
+
+reset   grasp           = /shared/iraf/extern/grasp/
+task    grasp.pkg       = grasp$grasp.cl
+
+reset   graspo          = /shared/iraf/extern/graspo/
+task    graspo.pkg      = graspo$graspo.cl
+
+reset	nso		= /shared/iraf/extern/nso/
+task	nso.pkg		= nso$nso.cl
+
+reset	nmisc		= /shared/iraf/extern/nmisc/
 task	nmisc.pkg	= nmisc$nmisc.cl
 
-#reset	grasp		= /iraf/extern/grasp/
-#task	grasp.pkg	= grasp$grasp.cl
+reset	xccdred		= /shared/iraf/extern/xccdred/
+task	xccdred.pkg	= xccdred$xccdred.cl
 
-#reset	arcon		= /u1/arcon/iraf/arcon/
-#task	arcon.pkg	= arcon$arcon.cl
+reset	mtools		= /shared/iraf/extern/mtools/
+task	mtools.pkg	= mtools$mtools.cl
+
+reset	sqiid		= /shared/iraf/extern/sqiid/
+task	$sqiid.pkg	= sqiid$sqiid.cl
+
+reset	xdimsum		= /shared/iraf/extern/xdimsum/
+task	xdimsum.pkg	= xdimsum$xdimsum.cl
+
+reset	dimsum		= /shared/iraf/extern/dimsum/
+task	dimsum.pkg	= dimsum$dimsum.cl
+
+reset	rgo		= /shared/iraf/extern/rgo/
+task	rgo.pkg		= rgo$rgo.cl
+
+reset	aspec		= /shared/iraf/extern/aspec/
+task	aspec.pkg	= aspec$aspec.cl
+
+reset	mscred		= /shared/iraf/extern/mscred/
+reset	mscdb		= /shared/iraf/extern/mscdb/
+task	mscred.pkg	= mscred$mscred.cl
+
+reset	xmscred		= /shared/iraf/extern/xmscred/
+
+reset	xdwred		= /shared/iraf/extern/xdwred/
+task	xdwred.pkg	= xdwred$xdwred.cl
+
+reset	fitsutil	= /shared/iraf/extern/fitsutil/
+task	fitsutil.pkg	= fitsutil$fitsutil.cl
+
+reset	ifocas		= /shared/iraf/extern/ifocas/
+task	ifocas.pkg	= ifocas$ifocas.cl
+
+#reset	crutil		= /shared/iraf/extern/crutil/
+#task	crutil.pkg	= crutil$crutil.cl
+
+reset	etools		= /data/asds/lib/datamodel/edsutil/
+task	etools.pkg	= etools$etools.cl
+
+reset	guiapps		= /shared/iraf/extern/guiapps/
+task	guiapps.pkg	= guiapps$guiapps.cl
+
+reset	spectime	= /shared/iraf/extern/spectime/
+reset	spectimedb	= /shared/iraf/extern/noaospectime/
+task	spectime.pkg	= spectime$spectime.cl
+
+reset	finder		= /shared/iraf/extern/finder/
+task	finder.pkg	= finder$finder.cl
+
+reset	gmisc		= /shared/iraf/extern/gmisc/
+task	gmisc.pkg	= gmisc$gmisc.cl
+
+reset	gemini		= /shared/iraf/extern/gemini/
+task	gemini.pkg	= gemini$gemini.cl
+
+reset	mxtools		= /shared/iraf/extern/mxtools/
+task	mxtools.pkg	= mxtools$mxtools.cl
+
+reset	ace		= /shared/iraf/extern/ace/
+task	ace.pkg		= ace$ace.cl
+
+noao
+reset	focas		= /shared/iraf/extern/focas/
+redefine $focas.pkg	= focas$focas.cl
+clpackage
 
 reset	helpdb		= "lib$helpdb.mip\
-#			  ,local$lib/helpdb.mip\
 			  ,noao$lib/helpdb.mip\
-			  ,tables$lib/helpdb.mip\
+			  ,nlocal$lib/helpdb.mip\
+#			  ,local$lib/helpdb.mip\
 			  ,mscred$lib/helpdb.mip\
-			  ,nmisc$lib/helpdb.mip\
-			  ,guiapps$lib/helpdb.mip\
-#			  ,grasp$lib/helpdb.mip\
+			  ,xdwred$lib/helpdb.mip\
+			  ,ctio$lib/helpdb.mip\
+#			  ,cxc$lib/helpdb.mip\
 #			  ,arcon$lib/helpdb.mip\
+			  ,ared$lib/helpdb.mip\
+			  ,stsdas$lib/helpdb.mip\
+			  ,adccdrom$lib/helpdb.mip\
+			  ,vol$lib/helpdb.mip\
+			  ,tables$lib/helpdb.mip\
+#			  ,spptools$lib/helpdb.mip\
+#			  ,imcnv$lib/helpdb.mip\
+			  ,ftools$lib/helpdb.mip\
+			  ,xray$lib/helpdb.mip\
+			  ,steward$lib/helpdb.mip\
+			  ,ccdacq$lib/helpdb.mip\
+			  ,color$lib/helpdb.mip\
+			  ,grasp$lib/helpdb.mip\
+#			  ,graspo$lib/helpdb.mip\
+			  ,nso$lib/helpdb.mip\
+			  ,nmisc$lib/helpdb.mip\
+			  ,xccdred$lib/helpdb.mip\
+			  ,mtools$lib/helpdb.mip\
+			  ,dimsum$lib/helpdb.mip\
+			  ,rgo$lib/helpdb.mip\
+			  ,fitsutil$lib/helpdb.mip\
+			  ,ifocas$lib/helpdb.mip\
+#			  ,crutil$lib/helpdb.mip\
+			  ,guiapps$lib/helpdb.mip\
+			  ,aspec$lib/helpdb.mip\
+			  ,spectime$lib/helpdb.mip\
+			  ,finder$lib/helpdb.mip\
+			  ,gmisc$lib/helpdb.mip\
+			  ,gemini$lib/helpdb.mip\
+			  ,mxtools$lib/helpdb.mip\
+			  ,ace$lib/helpdb.mip\
 			  "
 
 keep

@@ -37,7 +37,6 @@ libpkg.a:
 	airmass.x	<math.h>
 	astfunc.x	astfunc.h <evvexpr.h> <imset.h> <lexnum.h> <mach.h>\
 			<time.h>
-	ccddb.x	
 	galactic.x	<fset.h>
 	precess.x	<fset.h>
 	t_astcalc.x	astfunc.h <ctotok.h> <ctype.h> <error.h> <evvexpr.h>\
@@ -45,7 +44,6 @@ libpkg.a:
 	t_asthedit.x	astfunc.h <ctotok.h> <ctype.h> <error.h> <evvexpr.h>\
 			<fset.h> <imset.h> <lexnum.h> <time.h>
 	t_asttimes.x	<error.h>
-	t_ccdtime.x	
 	t_gratings.x	<error.h> <math.h>
 	t_obs.x		<error.h>
 	t_rvcorrect.x	rvcorrect.com <error.h> <time.h>

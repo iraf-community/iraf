@@ -48,6 +48,7 @@ long	seed			# Random number seed
 
 bool	new, ranlist
 int	i, j, dtype, ptype
+long	seed1
 double	w, x, x1, x2, x3, z1
 real	v, u, aplow[2], aphigh[2]
 pointer	sp, input, output, lines, comment, coeff
@@ -193,7 +194,9 @@ begin
 		x3 = clgetd ("lfwhm")
 	        seed = clgetl ("seed")
 		if (IS_INDEFL(seed))
-		    seed = clktime (long (0))
+		    seed1 = seed1 + clktime (long (0))
+		else
+		    seed1 = seed
 	        while (fscan (i) != EOF) {
 		    call gargd (w)
 		    call gargd (peak)
@@ -208,7 +211,7 @@ begin
 		    case 0:
 			next
 		    case 1:
-			peak = x1 * urand (seed)
+			peak = x1 * urand (seed1)
 			ptype = dtype
 			gfwhm = x2
 			lfwhm = x3
@@ -262,14 +265,16 @@ begin
 	        lfwhm = clgetd ("lfwhm")
 	        seed = clgetl ("seed")
 		if (IS_INDEFL(seed))
-		    seed = clktime (long (0))
+		    seed1 = seed1 + clktime (long (0))
+		else
+		    seed1 = seed
 	        call malloc (ptypes, nlines, TY_INT)
 	        call malloc (waves, nlines, TY_DOUBLE)
 	        call malloc (peaks, nlines, TY_DOUBLE)
 	        call malloc (gfwhms, nlines, TY_DOUBLE)
 	        call malloc (lfwhms, nlines, TY_DOUBLE)
 	        do i = 0, nlines-1 {
-		    w = z * (w0 + wpc * (nw - 1) * urand (seed))
+		    w = z * (w0 + wpc * (nw - 1) * urand (seed1))
 		    x = (w - w0) / wpc / (nw - 1)
 		    if (x < 0)
 			x = x - int (x - 1)
@@ -278,7 +283,7 @@ begin
 		    w = w0 + wpc * (nw - 1) * x
 		    Memi[ptypes+i] = ptype
 		    Memd[waves+i] = w
-		    Memd[peaks+i] = peak / z * urand (seed)
+		    Memd[peaks+i] = peak / z * urand (seed1)
 		    Memd[gfwhms+i] = z * gfwhm
 		    Memd[lfwhms+i] = z * lfwhm
 	        }

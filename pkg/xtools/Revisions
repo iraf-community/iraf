@@ -1,5 +1,37 @@
 .help revisions Jun88 pkg.xtools
 .nf
+
+fixpix/xtpmmap.x
+    If the mask and data are offset by a fraction of a pixel it was possible
+    to get an out-of-bounds error.  (8/14/03, Valdes)
+
+fixpix/xtpmmap.x
+    The loop over the range list in xt_match should start at 2 rather
+    than 1.  (8/14/03, Valdes)
+
+fixpix/xtpmmap.x
+    Added some error checks to avoid a segmentation violation in xt_pmtext
+    when there is an error in im_pmmapo.  (9/16/02, Valdes)
+
+fixpix/xtpmmap.x
+    A common case of matching a mask to an image is where the pixel sizes
+    are the same but there are offsets and/or different sizes.  An optimized
+    mask matching based on using range lists and not calling mwcs was
+    added.  (9/12/02, Valdes)
+
+fixpix/xtpmmap.x
+    Added test for a pm pointer in xt_pmmap.  I can't remember why this
+    is was added in the version in ACE but it seems right.  (9/10/02, Valdes)
+
+fixpix/xtpmmap.x
+    In the mask matching if there is no offset or sampling difference it
+    was returning the mask unchanged even if the sizes are not the same.
+    (9/10/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 =====
 V2.12
 =====

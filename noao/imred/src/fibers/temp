@@ -1,0 +1,16 @@
+Prototype Data Manager Keywords
+
+COMMAND
+STATUS
+EOF
+
+LABEL
+
+IMAGEID
+MJD-OBS
+
+FILTER
+XTALK
+BPM
+ZERO
+FLAT

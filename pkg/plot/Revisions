@@ -1,5 +1,18 @@
 .help revisions Aug90 pkg.plot
 .nf
+=======
+V2.12.2
+=======
+
+pkg/plot/t_pradprof.x
+pkg/plot/doc/pradprof.hlp
+    Added parameters "az1" and "az2" to select a range of azimuths for
+    the profile.  (9/13/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 =====
 V2.12
 =====

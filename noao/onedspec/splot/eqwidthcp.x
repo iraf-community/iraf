@@ -27,14 +27,13 @@ int	ng			# Number of components
 
 int	i, i1, i2, isrch, icore, edge
 double	xleft, xright, rcore, rinter, yl, gfwhm, lfwhm, flux, eqw, w, w1, w2
-double	pi, xpara[3], ypara[3], coefs[3], xcore, ycore
+double	xpara[3], ypara[3], coefs[3], xcore, ycore
 double	shdr_lw(), shdr_wl()
 
 # Initialize reasonable values
 #	isrch -- nr of pixels on either side of cursor to search for min
 
 data	isrch /3/
-data	pi /3.1415926/
 
 begin
 	# Check continuum.
@@ -155,7 +154,7 @@ begin
 	if (fd1 != NULL) {
 	    call fprintf (fd1, " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
 		call pargd (w)
-		call pargd (cont)
+		call pargr (cont)
 		call pargd (flux)
 		call pargd (eqw)
 		call pargd (ycore - cont)
@@ -165,7 +164,7 @@ begin
 	if (fd2 != NULL) {
 	    call fprintf (fd2, " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
 		call pargd (w)
-		call pargd (cont)
+		call pargr (cont)
 		call pargd (flux)
 		call pargd (eqw)
 		call pargd (ycore - cont)

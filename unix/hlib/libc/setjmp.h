@@ -3,10 +3,10 @@
  */
 #ifndef D_libc
 #ifndef import_libc
-#include <libc.h>
+#include "libc.h"
 #endif
 #ifndef import_knames
-#include <knames.h>
+#include "knames.h"
 #endif
 #endif
 
@@ -20,6 +20,6 @@ static	int	u_jmpstat;
  * doing unwise things with setjmp on a Sun-4.
  */
 extern	zsvjmp_();
-/* #pragma unknown_control_flow(zsvjmp_) */
+#pragma unknown_control_flow(zsvjmp_)
 
 #define	D_setjmp

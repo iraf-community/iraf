@@ -217,8 +217,8 @@ begin
 		}
 	    }
 	    call apsets (ap, CLNAME, Memc[outfname])
-	    call apfroot (Memc[outfname], Memc[coords], SZ_FNAME)
-	    call apsets (ap, CLROOT, Memc[coords])
+	    call apfroot (Memc[outfname], Memc[str], SZ_LINE)
+	    call apsets (ap, CLROOT, Memc[str])
 
 	    # Open the skys file.
 	    if (lslist <= 0) {

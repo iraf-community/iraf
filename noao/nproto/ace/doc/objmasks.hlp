@@ -263,14 +263,15 @@ pixels and a linear function is fit by least squares to obtain an estimate
 for <I> along the line.  The fitting weights are the number of good pixels
 in each block average after elimination of bad pixels specified by the
 user in a bad pixel mask.  The absolute values of the residuals are also
-fit to produce a function for <S>.
+fit to produce a constant function for <S>.
 
 To exclude objects from affecting these estimates the fitting is iterated
 using sigma clipping rejection on the normal deviations R.  In the
 first iteration the fitting function for <S> is a constant and in
 subsequent steps a linear fit is used.  When the sigma clipping iteration
 rejects no more data, the remaining block averages, absolute residuals, and
-weights are used to fit a 2D plane for both <I> and <S>.
+weights are used to fit a 2D plane for both <I> and <S>.  The <S> surface
+is a constant in order to avoid potential negative sigma values.
 
 This first pass algorithm is fast and produces good estimates for the
 planar approximation to the background.  The second pass divides the image
@@ -697,3 +698,13 @@ REVISIONS
 .ih
 SEE ALSO
 .endhelp
+266c266
+< fit to produce a function for <S>.
+---
+> fit to produce a constant function for <S>.
+273c273,274
+< weights are used to fit a 2D plane for both <I> and <S>.
+---
+> weights are used to fit a 2D plane for both <I> and <S>.  The <S> surface
+> is a constant in order to avoid potential negative sigma values.
+

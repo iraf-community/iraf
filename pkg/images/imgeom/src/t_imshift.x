@@ -26,12 +26,14 @@ pointer	interpstr		# Interpolant string
 
 int	list1, list2, boundary_type, ixshift, iyshift, nshifts, interp_type
 pointer	sp, str, xs, ys, im1, im2, sf, mw
-real	txshift, tyshift, xshift, yshift, constant, shifts[2]
+real	constant, shifts[2]
+double	txshift, tyshift, xshift, yshift
 
-bool	fp_equalr(), envgetb()
+bool	fp_equald(), envgetb()
 int	imtgetim(), imtlen(), clgwrd(), strdic(), open(), ish_rshifts()
 pointer	immap(), imtopen(), mw_openim()
 real	clgetr()
+double	clgetd()
 errchk	ish_ishiftxy, ish_gshiftxy, mw_openim, mw_saveim, mw_shift
 
 begin
@@ -71,16 +73,16 @@ begin
 	# Determine the source of the shifts.
 	if (Memc[sfile] != EOS) {
 	    sf = open (Memc[sfile], READ_ONLY, TEXT_FILE)
-	    call salloc (xs, imtlen (list1), TY_REAL)
-	    call salloc (ys, imtlen (list1), TY_REAL)
-	    nshifts = ish_rshifts (sf, Memr[xs], Memr[ys], imtlen (list1))
+	    call salloc (xs, imtlen (list1), TY_DOUBLE)
+	    call salloc (ys, imtlen (list1), TY_DOUBLE)
+	    nshifts = ish_rshifts (sf, Memd[xs], Memd[ys], imtlen (list1))
 	    if (nshifts != imtlen (list1))
 		call error (2,
 		    "The number of input images and shifts are not the same.")
 	} else {
 	    sf = NULL
-	    txshift = clgetr ("xshift")
-	    tyshift = clgetr ("yshift")
+	    txshift = clgetd ("xshift")
+	    tyshift = clgetd ("yshift")
 	}
 
 
@@ -96,8 +98,8 @@ begin
 	    im2 = immap (Memc[image2], NEW_COPY, im1)
 
 	    if (sf != NULL) {
-		xshift = Memr[xs+nshifts]
-		yshift = Memr[ys+nshifts]
+		xshift = Memd[xs+nshifts]
+		yshift = Memd[ys+nshifts]
 	    } else {
 		xshift = txshift
 		yshift = tyshift
@@ -111,8 +113,8 @@ begin
 		if (interp_type == II_BINEAREST) {
 		    call ish_ishiftxy (im1, im2, nint(xshift), nint(yshift),
 		        boundary_type, constant)
-		} else if (fp_equalr (xshift, real(ixshift)) &&
-		    fp_equalr (yshift, real(iyshift))) {
+		} else if (fp_equald (xshift, double(ixshift)) &&
+		    fp_equald (yshift, double(iyshift))) {
 		    call ish_ishiftxy (im1, im2, ixshift, iyshift,
 		        boundary_type, constant)
 		} else {
@@ -290,8 +292,8 @@ procedure ish_gshiftxy (im1, im2, xshift, yshift, interpstr, boundary_type,
 
 pointer	im1		#I pointer to input image
 pointer	im2		#I pointer to output image
-real	xshift		#I shift in x direction
-real	yshift		#I shift in y direction
+double	xshift		#I shift in x direction
+double	yshift		#I shift in y direction
 char	interpstr[ARB]	#I type of interpolant
 int	boundary_type	#I type of boundary extension
 real	constant	#I value of constant for boundary extension
@@ -299,12 +301,12 @@ real	constant	#I value of constant for boundary extension
 int	lout1, lout2, nyout, nxymargin, interp_type, nsinc, nincr
 int	cin1, cin2, nxin, lin1, lin2, nyin, i
 int	ncols, nlines, nbpix, fstline, lstline
-real	xshft, yshft, deltax, deltay, dx, dy, cx, ly
+double	xshft, yshft, deltax, deltay, dx, dy, cx, ly
 pointer	sp, x, y, msi, sinbuf, soutbuf
 
 pointer	imps2r()
 int	msigeti()
-bool	fp_equalr()
+bool	fp_equald()
 errchk	msisinit(), msifree(), msifit(), msigrid()
 errchk	imgs2r(), imps2r()
 
@@ -335,14 +337,14 @@ begin
 
 	# Define the x and y shifts for the interpolation.
 	dx = abs (xshft - int (xshft))
-	if (fp_equalr (dx, 0.0))
+	if (fp_equald (dx, 0D0))
 	    deltax = 0.0
 	else if (xshft > 0.)
 	    deltax = 1. - dx
 	else
 	    deltax = dx
 	dy = abs (yshft - int (yshft))
-	if (fp_equalr (dy, 0.0))
+	if (fp_equald (dy, 0D0))
 	    deltay = 0.0
 	else if (yshft > 0.)
 	    deltay = 1. - dy
@@ -396,7 +398,7 @@ begin
 
 	# Define column ranges in the input image.
 	cx = 1. - nxymargin - xshft
-	if ((cx <= 0.) &&  (! fp_equalr (dx, 0.0)))
+	if ((cx <= 0.) &&  (! fp_equald (dx, 0D0)))
 	    cin1 = int (cx) - 1
 	else
 	    cin1 = int (cx)
@@ -412,7 +414,7 @@ begin
 
 	    # Define correspoding range of input lines.
 	    ly = lout1 - nxymargin - yshft
-	    if ((ly <= 0.0) && (! fp_equalr (dy, 0.0)))
+	    if ((ly <= 0.0) && (! fp_equald (dy, 0D0)))
 	        lin1 = int (ly) - 1
 	    else
 		lin1 = int (ly)
@@ -507,8 +509,8 @@ end
 int procedure ish_rshifts (fd, x, y, max_nshifts)
 
 int	fd		#I shifts file
-real	x[ARB]		#O x array
-real	y[ARB]		#O y array
+double	x[ARB]		#O x array
+double	y[ARB]		#O y array
 int	max_nshifts	#I the maximum number of shifts
 
 int	nshifts
@@ -517,8 +519,8 @@ int	fscan(), nscan()
 begin
 	nshifts = 0
 	while (fscan (fd) != EOF && nshifts < max_nshifts) {
-	    call gargr (x[nshifts+1])
-	    call gargr (y[nshifts+1])
+	    call gargd (x[nshifts+1])
+	    call gargd (y[nshifts+1])
 	    if (nscan () != 2)
 		next
 	    nshifts = nshifts + 1

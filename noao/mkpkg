@@ -266,3 +266,9 @@ sunos:					# install SUNOS (Solaris x86) binaries
 	             nproto nobsolete rv surfphot twodspec obsutil"
 	!$(hlib)/mkfloat.csh sunos -d $(DIRS)
 	;
+linuxppc:				# install Linux (PPC) binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh linuxppc -d $(DIRS)
+	;

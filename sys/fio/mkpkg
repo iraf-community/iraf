@@ -76,6 +76,7 @@ libsys.a:
 	fstrfp.x	<config.h> <fio.com> <fio.h>
 	fsvtfn.x	<error.h>
 	fswapfd.x	<config.h> <fio.com> <fio.h>
+	futime.x	<config.h> <knet.h>
 	fwatio.x	<config.h> <fio.com> <fio.h>
 	fwritep.x	<fio.com> <config.h> <fio.h>
 	fwtacc.x	<config.h> <fio.com> <fio.h> <finfo.h>

@@ -305,12 +305,12 @@ begin
 		    }
 		}
 	    } then {
+		call erract (EA_WARN)
 		if (out != NULL) {
 		    call imunmap (out)
 		    if (!streq (Memc[input], Memc[output]))
 			call imdelete (Memc[output])
 		}
-		call erract (EA_WARN)
 	    }
 
 	    # Finish up this image.
@@ -828,13 +828,16 @@ begin
 	    } else
 		Memr[z+i] = Memr[y+i] - (Memr[ycal+i] * scale)
 	    norm = norm + Memr[z+i]
+	}
 
+	do i = 3, n-4 {
 	    # Statistics
 	    if (rg_inrange (rg, i+1) == NO)
 		next
-	    if (xcal < 1 || xcal > ncal)
-		next
-	    zval = Memr[z+i]
+#	    if (xcal < 1 || xcal > ncal)
+#		next
+#	    zval = Memr[z+i]
+	    zval = Memr[z+i] - (Memr[z+i-3] + Memr[z+i+3]) / 2
 	    sum1 = sum1 + zval
 	    sum2 = sum2 + zval * zval
 	    nstat = nstat + 1
@@ -906,7 +909,7 @@ begin
 	z[2] = TWK_SPEC(twk)
 
 	# Initialize the graphics.
-	gp = gopen ("stdgraph", NEW_FILE, STDGRAPH)
+	gp = gopen ("stdgraph", NEW_FILE+AW_DEFER, STDGRAPH)
 	gt[1] = gt_init ()
 	call sprintf (Memc[str], SZ_LINE,
 	    "%s: spectrum = %s%s, calibration = %s%s")
@@ -1079,6 +1082,10 @@ begin
 		    newdata = NO
 		} then {
 		    TWK_SPEC(twk) = z[2]
+		    call gt_free (gt[1])
+		    call gt_free (gt[2])
+		    call gclose (gp)
+		    call sfree (sp)
 		    call erract (EA_ERROR)
 		}
 

@@ -24,7 +24,7 @@ char	kwname[SZ_KEYWORD]
 pointer sp, fk, pl, lp, ip, ix
 long	data_offset, data_len, heap_offset, llen, loff
 int	naxes, axlen[IM_MAXDIM], depth, maxlen
-int	fd, i, j, nelem, nlines, v[PL_MAXDIM]
+int	fd, i, j, nelem, nlines, v[PL_MAXDIM], maxoff, nbytes
 
 long	note()
 bool	streq()
@@ -93,11 +93,29 @@ begin
 	# Read the line list index from the input file.  The index contains
 	# one entry for every line in the (possibly multidimensional) image.
 	# Each entry consists of two integer values, the length of the
-	# stored line list, and the heap offset of the stored list.
+	# stored line list, and the heap offset (in bytes) of the stored list.
 
 	nelem = miireadi (fd, Memi[ix], nlines * 2)
 	if (nelem != nlines * 2)
 	    call syserrs (SYS_FXFRMASK, IM_NAME(im))
+	
+	# Find out the maximum offset value to determine if they were
+	# written using the 2 byte units rather than the standard (byte unit)
+
+	maxoff = 0
+        ip = ix
+	do j = 1, axlen[3] {
+            do i = 1, axlen[2] {
+	       maxoff = max (maxoff, Memi[ip+1]) 
+   	       ip = ip + 2
+	    }
+	}
+
+	if (maxoff < (FIT_PCOUNT(fk) - maxoff/2)) {
+	    nbytes = 1
+        } else {	
+	    nbytes = 2
+	}
 
 	# Read the line list data and insert it into the PLIO mask.  
 	# pl_update will be called for each line of the mask even if multiple
@@ -114,11 +132,17 @@ begin
 		v[2] = i
 
 		llen = Memi[ip]
-		loff = Memi[ip+1]
+
+		# This offset on the table data is in byte units, convert
+		# to short.
+
+		loff = Memi[ip+1] / nbytes
+
 		call seek (fd, heap_offset + loff)
 		nelem = miireads (fd, Mems[lp], llen)
 		if (nelem != llen)
 		    call syserrs (SYS_FXFRMASK, IM_NAME(im))
+
 		call pl_update (pl, v, Mems[lp])
 
 		ip = ip + 2

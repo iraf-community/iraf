@@ -164,6 +164,19 @@ with:
       49   50       1.       1.  49   49
       50   50       1.       1.  50   49
 .fi
+
+4.  Because a text file input automatically sets the mask values to
+2 or 3 you may need to set the linterp and cinterp parameters to
+force the direction.  In particular, to apply FIXPIX to a 1D image,
+say a spectrum, if you have regions described by ranges in columns
+the mask interpolation values will be assigned as 3.  This means
+it is trying to interpolation between line 0 and line 2 which is
+obviously not what is intended.  To make this work set linterp to
+3:
+
+.nf
+    cl> fixpix myimage mask.dat linterp=3
+.fi
 .ih
 REVISIONS
 .ls FIXPIX V2.11

@@ -1,4 +1,4 @@
-.help aidpars Jan96 noao.onedspec
+.help aidpars Jan04 noao.onedspec
 .ih
 NAME
 aidpars -- Automatic line identification parameters and algorithm
@@ -24,13 +24,29 @@ It need not have the same dispersion increment or dispersion coverage as
 the target spectrum.
 .le
 .ls crpix = "INDEF"
-Coordinate reference pixel for the coordinate reference value specified
-by the \fIcrval\fR parameter.  This may be specified as a pixel coordinate
-or an image header keyword name.  In the latter case the value of the
-keyword in the image header of the spectrum being identified is used.
-A value of INDEF translates to the middle of the target spectrum.
+Coordinate reference pixel for the coordinate reference value specified by
+the \fIcrval\fR parameter.  This may be specified as a pixel coordinate
+or an image header keyword name (with or without a '!' prefix).  In the
+latter case the value of the keyword in the image header of the spectrum
+being identified is used.  A value of INDEF translates to the middle of
+the target spectrum.
 .le
-.ls cddir = "unknown" (unknown|sign|increasing|decreasing)
+.ls crquad = INDEF
+Quadratic correction to the detected pixel positions to "linearize" the
+pattern of line spacings.  The corrected positions x' are derived from
+the measured positions x by
+
+.nf
+    x' = x + crquad * (x - crpix)**2
+.fi
+
+where crpix is the pixel reference point as defined by the \fIcrpix\fR
+parameter.  The measured and corrected positions may be examined by
+using the 't' debug flag.  The value may be a number or a header
+keyword (with or without a '!' prefix).  The default of INDEF translates
+to zero; i.e. no quadratic correction.
+.le
+.ls cddir = "sign" (unknown|sign|increasing|decreasing)
 The sense of the dispersion increment with respect to the pixel coordinates
 in the input spectrum.  The possible values are "increasing" or
 "decreasing" if the dispersion coordinates increase or decrease with
@@ -39,35 +55,41 @@ increment (positive is increasing and negative is decreasing), and
 "unknown" if the sense is unknown and to be determined by the algorithm.
 .le
 .ls crsearch = "INDEF"
-Coordinate reference value search radius.  The value may be specified as a
-numerical value or as an image header keyword whose value is to be used.
-The algorithm will search for a final coordinate reference value within
-this amount of the value specified by \fIcrval\fR.  If the value is
-positive the search radius is the specified value.  If the value is
-negative it is the absolute value of this parameter times \fIcdelt\fR times
-the number of pixels in the input spectrum; i.e. it is the fraction of
-dispersion range covered by the target spectrum assuming a dispersion
-increment per pixel of \fIcdelt\fR.  A value of INDEF translates to -0.1
-which corresponds to a search radius of 10% of the estimated dispersion
-range.
+Coordinate reference value search radius.  The value may be specified
+as a numerical value or as an image header keyword (with or without
+a '!' prefix) whose value is to be used.  The algorithm will search
+for a final coordinate reference value within this amount of the value
+specified by \fIcrval\fR.  If the value is positive the search radius is
+the specified value.  If the value is negative it is the absolute value
+of this parameter times \fIcdelt\fR times the number of pixels in the
+input spectrum; i.e. it is the fraction of dispersion range covered by the
+target spectrum assuming a dispersion increment per pixel of \fIcdelt\fR.
+A value of INDEF translates to -0.1 which corresponds to a search radius
+of 10% of the estimated dispersion range.
 .le
 .ls cdsearch = "INDEF"
 Dispersion coordinate increment search radius.  The value may be specified
-as a numerical value or as an image header keyword whose value is to be
-used.  The algorithm will search for a dispersion coordinate increment
-within this amount of the value specified by \fIcdelt\fR.  If the value is
-positive the search radius is the specified value.  If the value is
-negative it is the absolute value of this parameter times \fIcdelt\fR; i.e.
-it is a fraction of \fIcdelt\fR.  A value of INDEF translates to -0.1 which
-corresponds to a search radius of 10% of \fIcdelt\fR.
+as a numerical value or as an image header keyword (with or without
+a '!' prefix) whose value is to be used.  The algorithm will search
+for a dispersion coordinate increment within this amount of the value
+specified by \fIcdelt\fR.  If the value is positive the search radius is
+the specified value.  If the value is negative it is the absolute value of
+this parameter times \fIcdelt\fR; i.e.  it is a fraction of \fIcdelt\fR.
+A value of INDEF translates to -0.1 which corresponds to a search radius
+of 10% of \fIcdelt\fR.
 .le
-.ls ntarget = 20
+.ls ntarget = 100
 Number of spectral lines from the target spectrum to use in the pattern
 matching.
 .le
 .ls npattern = 5
-Number of spectral lines in patterns to be matched.  There is a minimum
-of 3 and a maximum of 10.
+Initial number of spectral lines in patterns to be matched.  There is a
+minimum of 3 and a maximum of 10.  The algorithm starts with the specified
+number and if no solution is found with that number it is iteratively
+decreased by one to the minimum of 3.  A larger number yields fewer
+and more likely candidate matches and so will produce a result sooner.
+But in order to be thorough the algorithm will try smaller patterns to
+search more possiblities.
 .le
 .ls nneighbors = 10
 Number of neighbors to use in making patterns of lines.  This parameter
@@ -79,9 +101,8 @@ in searching for a solution.  When there are no weak dispersion constraints
 the algorithm subdivides the full range of the coordinate list or reference
 spectrum into one bin, two bins, etc. up to this maximum.  Each bin is
 searched for a solution.
-
 .le
-.ls ndmax = 20
+.ls ndmax = 1000
 Maximum number of candidate dispersions to examine.  The algorithm ranks
 candidate dispersions by how many candidate spectral lines are fit and the
 the weights assigned by the pattern matching algorithm.  Starting from
@@ -97,6 +118,19 @@ function.  The order should be restricted to values of two or three.
 Higher orders can lead to incorrect solutions because of the increased
 degrees of freedom if finding incorrect line identifications.
 .le
+.ls maxnl = 0.02
+Maximum non-linearity allowed in any trial dispersion function.
+The definition of the non-linearity test is
+
+.nf
+    maxnl > (w(0.5) - w(0)) / (w(1) - w(0)) - 0.5
+.fi
+
+where w(x) is the dispersion function value (e.g. wavelength) of the fit
+and x is a normalized pixel positions where the endpoints of the spectrum
+are [0,1].  If the test fails on a trial dispersion fit then a linear
+function is determined.
+.le
 .ls nfound = 6
 Minimum number of identified spectral lines required in the final solution.
 If a candidate solution has fewer identified lines it is rejected.
@@ -110,14 +144,16 @@ the observed patterns of lines.
 Minimum spacing ratio used.  Patterns of lines in which the ratio of
 spacings between consecutive lines is less than this amount are excluded.
 .le
-.ls rms = 0.3
-Pixel RMS goal for a correct dispersion solution.  This is the RMS in the
+.ls rms = 0.1
+RMS goal for a correct dispersion solution.  This is the RMS in the
 measured spectral lines relative to the expected positions from the
-coordinate line list based on the coordinate dispersion solution.  This RMS
-is expressed in pixels to be independent of the dispersion.  The RMS will
-be small for a valid solution.
+coordinate line list based on the coordinate dispersion solution.
+The parameter is specified in terms of the line centering parameter
+\fIfwidth\fR since for broader lines the pixel RMS would be expected
+to be larger.  A pixel-based RMS criterion is used to be independent of
+the dispersion.  The RMS will be small for a valid solution.
 .le
-.ls fmatch = 0.3
+.ls fmatch = 0.2
 Goal for the fraction of unidentified lines in a correct dispersion
 solution.  This is the fraction of the strong lines seen in the spectrum
 which are not identified and also the fraction of all lines in the
@@ -279,6 +315,11 @@ that task parameters \fIftype\fR, \fIfwidth\fR, \fIcradius\fR,
 \fIthreshold\fR, and \fIminsep\fR are used for the centering.  The number
 of spectral lines selected is set by the parameter \fIntarget\fR.
 
+In order to insure that lines are selected across the entire spectrum
+when all the strong lines are concentrated in only a part of the
+spectrum, the spectrum is divided into five regions and approximately
+a fifth of the requested number of lines is found in each region.
+
 A list of reference dispersion coordinates is selected from the coordinate
 file (\fIcoordlist\fR or \fIreflist\fR).  The number of reference
 dispersion coordinates is set at twice the number of target lines found.
@@ -317,6 +358,25 @@ found.  When there are a sufficient number of true pairs between the lists
 common in many different patterns.  Thus the highest counts of candidate
 identifications are the most likely to be true identifications.
 
+Because the relationship between the pixel positions of the lines in the
+target spectrum and the line positions in the reference coordinate space
+is generally non-linear the line spacing ratios are distorted and may
+reduce the pattern matching.  The line patterns are normally restricted
+to be somewhat near each other by the \fInneighbors\fR so some degree of
+distortion can be tolerated.  But in order to provide the ability to remove
+some of this distortion when it is known the parameter \fIcrquad\fR is
+provided.  This parameter applies a quadratic transformion to the measured
+pixel positions to another set of "linearized" positions  which are used
+in the line ratio pattern matching.  The form of the transformation is
+
+.nf
+    x' = x + crquad * (x - crpix)**2
+.fi
+
+where x is the measured position, x' is the transformed position,
+crquad is the value of the distortion parameter, and crpix is the value
+of the coordinate reference position.
+
 If approximate dispersion parameters and search ranges are defined then
 candidate identifications which fall outside the range of dispersion
 function possibilities are rejected.  From the remaining candidate
@@ -330,7 +390,7 @@ functions are ranked primarily by the number of candidate identifications
 fitting the dispersion and secondarily by the total votes in the
 identifications.  Only the highest ranking candidate linear dispersion
 are kept.  The number of candidate dispersions kept is set by the
-parameter \fIndisp\fR.
+parameter \fIndmax\fR.
 
 The candidate dispersions are evaluated in order of their ranking.  Each
 line in the coordinate file (\fIcoordlist\fR) is converted to a pixel
@@ -342,24 +402,39 @@ function with \fIaidord\fR coefficients.  The order should be linear or
 quadratic because otherwise the increased degrees of freedom allow
 unrealistic dispersion functions to appear to give a good result.  A
 quadratic function (\fIaidord\fR = 3) is allowed since this is the
-approximate form of many dispersion functions.  However, to avoid
-unrealistic dispersion functions a test is made that the maximum amplitude
-deviation from a linear function is less that 0.5% of dispersion range.  If
-an extreme quadratic function is found then a linear function is
-substituted.  The process of adding lines based on the last dispersion
-function and then refitting the dispersion function is iterated twice.  At
-the end of this step if fewer than the number of lines specified by the
-parameter \fInfound\fR have been identified the candidate dispersion is
-eliminated.
+approximate form of many dispersion functions.
+
+However, to avoid unrealistic dispersion functions a test is made that
+the maximum amplitude deviation from a linear function is less than
+an amount specified by the \fImaxnl\fR parameter.  The definition of
+the test is
+
+.nf
+    maxnl > (w(0.5) - w(0)) / (w(1) - w(0)) - 0.5
+.fi
+
+where w(x) is the dispersion function value (e.g. wavelength) of the fit
+and x is a normalized pixel positions where the endpoints of the spectrum
+are [0,1].  What this relation means is that the wavelength interval
+between one end and the center relative to the entire wavelength interval
+is within maxnl of one-half.  If the test fails then a linear function
+is fit.  The process of adding lines based on the last dispersion function
+and then refitting the dispersion function is iterated twice.  At the end
+of this step if fewer than the number of lines specified by the parameter
+\fInfound\fR have been identified the candidate dispersion is eliminated.
 
 The quality of the line identifications and dispersion solution is
 evaluated based on three criteria.  The first one is the root-mean-square
 of the residuals between the pixel coordinates derived from lines found
 from the dispersion coordinate file based on the dispersion function and
 the observed pixel coordinates.  This pixel RMS is normalized by the target
-RMS set with the \fIrms\fR parameter.  A good solution will have a value
-less than one.  A pixel RMS, as opposed to a dispersion coordinate RMS, is
-used since this is independent of the actual dispersion of the spectrum.
+RMS set with the \fIrms\fR parameter.  Note that the \fIrms\fR parameter
+is specified in units of the \fIfwidth\fR parameter.  This is because if
+the lines are broader, requiring a larger fwidth to obtain a centroid,
+then the expected uncertainty would be larger.  A good solution will have
+a normalized rms value less than one.  A pixel RMS criterion, as opposed
+to a dispersion coordinate RMS, is used since this is independent of the
+actual dispersion of the spectrum.
 
 The other two criteria are the fraction of strong lines from the target
 spectrum list which were not identified with lines in the coordinate file
@@ -392,7 +467,8 @@ correct solutions over a wide range of resolutions and dispersion coverage
 have figures of merit less than one and typically of order 0.2.  All
 incorrect candidate dispersion have values of order two to three.
 
-The search for the correct dispersion function terminates immediately when
+The search for the correct dispersion function terminates immediately,
+but after checking the first five most likely candidates, when
 a figure of merit less than one is found.  The order in which the candidate
 dispersions are tested, that is by rank, was chosen to try the most promising
 first so that often the correct solution is found on the first attempt.
@@ -413,6 +489,14 @@ in the middle of the dispersion range and working outward towards larger
 and smaller bins and larger and smaller dispersion ranges.  This is done to
 improved the chances of finding the correction dispersion function in the
 smallest number of steps.
+
+Another iteration performed if no solution is found after trying all the
+candidate dispersion and bins is to reduce the number of lines in the
+pattern.  So the parameter \fInpattern\fR is an initial maximum pattern.
+A larger pattern gives fewer and higher quality candidate identifications
+and so converges faster.  However, if no solution is found the algorithm
+tries more possible matches produced by a lower number of lines in
+the pattern.  The pattern groups are reduced to a minimum of three lines.
 
 When a set of line identifications and dispersion solution satisfying the
 figure of merit criterion is found a final step is performed.
@@ -461,6 +545,15 @@ EXAMPLES
 .fi
 .ih
 REVISIONS
+.ls AIDPARS V2.12.2
+There were many changes made in the paramters and algorithm.  New parameters
+are "crquad" and "maxnl".  Changed definitions are for "rms".  Default
+value changes are for "cddir", "ntarget", "ndmax", and "fmatch".  The most
+significant changes in the algorithm are to allow for more non-linear
+dispersion with the "maxnl" parameter, to decrease the "npattern" value
+if no solution is found with the specified value, and to search a larger
+number of candidate dispersions.
+.le
 .ls AIDPARS V2.11
 This parameter set is new in this version.
 .le

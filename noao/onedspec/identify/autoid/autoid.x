@@ -13,10 +13,10 @@ procedure aid_target (aid)
 pointer	aid		#I AID pointer
 
 int	i, j, l, nt, n
-double	dw, dwmin, dwmax, pix, imgetd(), id_center()
-pointer	sp, x, y, idt, idr, im, xt
-int	ctod(), id_peaks(), stridxs()
-errchk	id_peaks, id_center
+double	dw, dwmin, dwmax, pix, aid_imgd(), id_center()
+pointer	sp, x, y, idt, idr, im, xt, xtl
+int	id_upeaks(), stridxs()
+errchk	id_upeaks, id_center
 
 begin
         call smark (sp)
@@ -28,34 +28,18 @@ begin
 	nt = ID_NPTS(idt)
 
 	# Set the approximate coordinate information.
-	iferr (AID_CRVAL(aid) = imgetd (im, AID_CR(aid))) {
-	    i = 1
-	    if (ctod (AID_CR(aid), i, AID_CRVAL(aid)) == 0)
-		AID_CRVAL(aid) = INDEFD
-	}
-	iferr (AID_CDELT(aid) = imgetd (im, AID_CD(aid))) {
-	    i = 1
-	    if (ctod (AID_CD(aid), i, AID_CDELT(aid)) == 0)
-		AID_CDELT(aid) = INDEFD
-	}
-	iferr (AID_CRPIX(aid) = imgetd (im, AID_CP(aid))) {
-	    i = 1
-	    if (ctod (AID_CP(aid), i, AID_CRPIX(aid)) == 0)
-		AID_CRPIX(aid) = INDEFD
-	}
-	iferr (AID_CRSEARCH(aid) = imgetd (im, AID_CRS(aid))) {
-	    i = 1
-	    if (ctod (AID_CRS(aid), i, AID_CRSEARCH(aid)) == 0)
-		AID_CRSEARCH(aid) = INDEFD
-	}
-	iferr (AID_CDSEARCH(aid) = imgetd (im, AID_CDS(aid))) {
-	    i = 1
-	    if (ctod (AID_CDS(aid), i, AID_CDSEARCH(aid)) == 0)
-		AID_CDSEARCH(aid) = INDEFD
-	}
+	AID_CRVAL(aid) = aid_imgd (im, AID_CR(aid))
+	AID_CDELT(aid) = aid_imgd (im, AID_CD(aid))
+	AID_CRPIX(aid) = aid_imgd (im, AID_CP(aid))
+	AID_CRQUAD(aid) = aid_imgd (im, AID_CQ(aid))
+	AID_CRSEARCH(aid) = aid_imgd (im, AID_CRS(aid))
+	AID_CDSEARCH(aid) = aid_imgd (im, AID_CDS(aid))
 
 	if (IS_INDEFD(AID_CRPIX(aid)))
 	    AID_CRPIX(aid) = (nt+1) / 2.
+
+	if (IS_INDEFD(AID_CRQUAD(aid)))
+	    AID_CRQUAD(aid) = 0D0
 
 	if (!IS_INDEFD(AID_CRVAL(aid)) && !IS_INDEFD(AID_CDELT(aid))) {
 	    dw = nt * AID_CDELT(aid)
@@ -81,12 +65,12 @@ begin
         # Find the peaks in the target spectrum.
 	if (ID_FTYPE(idt) == ABSORPTION) {
 	    call anegr (IMDATA(idt,1), IMDATA(idt,1), nt)
-	    n = id_peaks (idt, IMDATA(idt,1), Memr[x], nt, INDEF,
-		int (ID_MINSEP(idt)), 0, AID_NTMAX(aid), INDEF, false)
+	    n = id_upeaks (idt, IMDATA(idt,1), Memr[x], nt, INDEF,
+		int (ID_MINSEP(idt)), 0, AID_NTMAX(aid), 5, INDEF, false)
 	    call anegr (IMDATA(idt,1), IMDATA(idt,1), nt)
 	} else {
-	    n = id_peaks (idt, IMDATA(idt,1), Memr[x], nt, INDEF,
-		int (ID_MINSEP(idt)), 0, AID_NTMAX(aid), INDEF, false)
+	    n = id_upeaks (idt, IMDATA(idt,1), Memr[x], nt, INDEF,
+		int (ID_MINSEP(idt)), 0, AID_NTMAX(aid), 5, INDEF, false)
 	}
 	call salloc (y, n, TY_REAL)
 	do i = 1, n
@@ -134,11 +118,27 @@ begin
             call error (1, Memc[x])
         }
 
+	# Linearize the lines.
+        if (AID_XTL(aid) == NULL)
+            call malloc (AID_XTL(aid), j, TY_DOUBLE)
+        else
+            call realloc (AID_XTL(aid), j, TY_DOUBLE)
+	xt = AID_XT(aid)
+	xtl = AID_XTL(aid)
+	do i = 1, j
+	    Memd[xtl+i-1] = Memd[xt+i-1] +
+	         AID_CRQUAD(aid) * (Memd[xt+i-1]-AID_CRPIX(aid))**2
+
         # Debug t: Print list of target lines.
 	if (stridxs ("t", AID_DEBUG(aid,1)) != 0) {
+	    call eprintf ("# Selected target lines:\n")
+	    call eprintf ("#%10s %11s\n")
+	        call pargstr ("Measured")
+		call pargstr ("Undistorted")
             do i = 1, j {
-                call eprintf ("%10.6g\n")
+                call eprintf ("%11.6g %11.6g\n")
                     call pargd (Memd[xt+i-1])
+                    call pargd (Memd[xtl+i-1])
             }
 	    call eprintf ("\n")
         }
@@ -291,6 +291,12 @@ begin
 		    (nt - AID_CRPIX(aid))
 		wb = AID_CRMAX(aid) + (cdelt - AID_CDSEARCH(aid)) *
 		    (1 - AID_CRPIX(aid))
+	    }
+
+	    if (stridxs ("m", AID_DEBUG(aid,1)) != 0) {
+		call eprintf ("wa=%g wb=%g\n")
+		    call pargd (wa)
+		    call pargd (wb)
 	    }
 
 	    if (sh != NULL) {
@@ -485,6 +491,7 @@ begin
 
 	# Debug r: Print list of reference lines.
 	if (stridxs ("r", AID_DEBUG(aid,1)) != 0) {
+	    call eprintf ("# Selected reference lines:\n")
 	    do i = 1, nr {
 		call eprintf ("%10.6g\n")
 		    call pargd (Memd[xr+i-1])
@@ -507,7 +514,7 @@ pointer	aid		#I AID pointer
 pointer	ev		#I EV pointer
 
 int	i, nn, n1, n2, nr1, nr2, n, nd
-pointer	sp, idt, x1, x2, r1, s1, r2, s2, votes, svotes
+pointer	sp, idt, x1, x2, x3, r1, s1, r2, s2, votes, svotes
 pointer	x, y, w, w1, dw, nw, nv
 
 int	aid_rsort(), aid_vsort(), stridxs()
@@ -521,7 +528,8 @@ begin
 	nn = AID_NN(aid)
 	x1 = AID_XR(aid)
 	n1 = AID_NR(aid)
-	x2 = AID_XT(aid)
+	x2 = AID_XTL(aid)
+	x3 = AID_XT(aid)
 	n2 = AID_NT(aid)
 
         # Debug l: Graph lines and spectra.
@@ -556,11 +564,15 @@ begin
 	    Memi[svotes+i-1] = i
 	call gqsort (Memi[svotes], n1*n2, aid_vsort, votes)
 
-	n = 3 * n2
+	do n = 1, n1 * n2
+	    if (Memi[votes+Memi[svotes+n-1]-1] < 1)
+	        break
+	n = max (3 * n2, n-1)
+
 	call malloc (x, n, TY_REAL)
 	call malloc (y, n, TY_REAL)
 	call salloc (w, n, TY_REAL)
-	iferr (call aid_select (aid, Memd[x1], Memd[x2], Memi[votes],
+	iferr (call aid_select (aid, Memd[x1], Memd[x2], Memd[x3], Memi[votes],
 	    Memi[svotes], n1, n2, Memr[x], Memr[y], Memr[w], n)) {
 	    call sfree (sp)
 	    call erract (EA_ERROR)
@@ -1022,11 +1034,12 @@ end
 
 # AID_SELECT -- Select top vote getters.
 
-procedure aid_select (aid, x1, x2, votes, svotes, n1, n2, x, y, w, ns)
+procedure aid_select (aid, x1, x2, x3, votes, svotes, n1, n2, x, y, w, ns)
 
 pointer	aid		#I AID pointer
 double	x1[n1]		#I Reference lines
-double	x2[n2]		#I Target lines
+double	x2[n2]		#I Linearized target lines
+double	x3[n2]		#I Target lines
 int	votes[n1,n2]	#I Vote array
 int	svotes[ARB]	#I Sort indices for vote array
 int	n1, n2		#I Number of lines
@@ -1048,8 +1061,8 @@ begin
 	for (k=1; k<=n1*n2 && n<ns; k=k+1) {
 	    i = mod (svotes[k]-1, n1) + 1 
 	    j = (svotes[k]-1) / n1 + 1 
-	    if (votes[i,j] == 0)
-		next
+	    if (votes[i,j] < 1)
+		break
 	    if (check) {
 		a = (x2[j] - AID_CRPIX(aid)) * AID_CDSIGN(aid) * AID_CDMIN(aid)
 		b = (x2[j] - AID_CRPIX(aid)) * AID_CDSIGN(aid) * AID_CDMAX(aid)
@@ -1059,7 +1072,7 @@ begin
 		    next
 	    }
 	    n = n + 1
-	    x[n] = x2[j]
+	    x[n] = x3[j]
 	    y[n] = x1[i]
 	    w[n] = votes[i,j]
 	}
@@ -1090,14 +1103,32 @@ int	nw[nd]		#O Number of points
 int	nv[nd]		#O Sum of votes
 int	nd		#U Number of dispersions
 
-int	i, j, k, l, m, sumn, sumv, stridxs()
+bool	debug, skip
+int	i, j, k, l, m, ii, sumn, sumv, stridxs()
 double	aw, bw, cw, sumx, sumy, sumyy, sumxy
+pointer	iii
 
 begin
 	# Sort the candidates by reference coordinate.
 	call xt_sort2 (x, y, n)
 
+	debug = (stridxs ("m", AID_DEBUG(aid,1)) != 0)
+	if (debug) {
+	    call eprintf ("# Selected pairs with votes.\n")
+	    do i = 1, n {
+		call eprintf ("%4d %8.6g %8.6g %d\n")
+		call pargi (i)
+		call pargr (x[i])
+		call pargr (y[i])
+		call pargr (v[i])
+	    }
+	    call eprintf ("# Dispersions to check up to %d.\n")
+	        call pargi (nd)
+	}
+
 	m = 0
+	ii = 0
+	call malloc (iii, nd, TY_INT)
 	do i = 1, n-2 {
 	    do j = i+1, n-1 {
 		if (x[j] == x[i] || y[j] == y[i])
@@ -1108,11 +1139,14 @@ begin
 		cw = aw + bw * AID_CRPIX(aid)
 
 		# Check dispersion ranges.
+		skip = false
 		if (abs (bw) < AID_CDMIN(aid) || abs (bw) > AID_CDMAX(aid))
-		    next
+		    skip = true
 		else if (cw < AID_CRMIN(aid) || cw > AID_CRMAX(aid))
-		    next
+		    skip = true
 		if (AID_CDSIGN(aid) * bw < 0.)
+		    skip = true
+		if (skip)
 		    next
 
 		sumn = 2
@@ -1137,15 +1171,19 @@ begin
 		aw = (sumx*sumyy - sumy*sumxy) / (sumn * sumyy - sumy * sumy)
 		bw = (sumn*sumxy - sumx*sumy) / (sumn * sumyy - sumy * sumy)
 		cw = aw + bw * AID_CRPIX(aid)
+		ii = ii + 1
 
-		# Check dispersion ranges.
-		if (abs (bw) < AID_CDMIN(aid) || abs (bw) > AID_CDMAX(aid))
-		    next
-		else if (cw < AID_CRMIN(aid) || cw > AID_CRMAX(aid))
-		    next
-		if (AID_CDSIGN(aid) * bw < 0.)
-		    next
-		
+		if (debug) {
+		    call eprintf ("     %4d %4d %4d %8.5g  %8.3g  %8d %8d")
+		    call pargi (ii)
+		    call pargi (i)
+		    call pargi (j)
+		    call pargd (aw+bw*(ID_NPTS(AID_IDT(aid))/2.+1))
+		    call pargd (bw)
+		    call pargi (sumn)
+		    call pargi (sumv)
+		}
+
 		# Check if already found.
 		for (k = 1; k <= m; k = k + 1)
 		    if (abs ((x[1]-aw)/bw - (x[1]-w1[k])/dw[k]) < 2. &&
@@ -1160,12 +1198,34 @@ begin
 			    dw[l] = dw[l-1]
 			    nw[l] = nw[l-1]
 			    nv[l] = nv[l-1]
+			    Memi[iii+l-1] = Memi[iii+l-2]
+			}
+			if (debug) {
+			    call eprintf (" replace %4d\n")
+			    call pargi (Memi[iii+l-1])
 			}
 			w1[l] = aw
 			dw[l] = bw
 			nw[l] = sumn
 			nv[l] = sumv
+			Memi[iii+l-1] = ii
+		    } else if (debug) {
+			call eprintf (" use %4d\n")
+			call pargi (Memi[iii+k-1])
 		    }
+		    next
+		}
+
+		# Check dispersion ranges.
+		if (abs (bw) < AID_CDMIN(aid) || abs (bw) > AID_CDMAX(aid))
+		    skip = true
+		else if (cw < AID_CRMIN(aid) || cw > AID_CRMAX(aid))
+		    skip = true
+		if (AID_CDSIGN(aid) * bw < 0.)
+		    skip = true
+		if (skip) {
+		    if (debug)
+			call eprintf (" out of range\n")
 		    next
 		}
 
@@ -1174,23 +1234,45 @@ begin
 		    if (sumn > nw[k] || (sumn == nw[k] && sumv > nv[k]))
 			break
 		if (k <= nd) {
-		    if (m < nd)
+		    if (m < nd) {
 			m = m + 1
+			if (debug)
+			    call eprintf (" add\n")
+		    } else if (debug) {
+			call eprintf (" bump %4d\n")
+			    call pargi (Memi[iii+m-1])
+		    }
 		    for (l = m; l > k; l = l - 1) {
 			w1[l] = w1[l-1]
 			dw[l] = dw[l-1]
 			nw[l] = nw[l-1]
 			nv[l] = nv[l-1]
+			Memi[iii+l-1] = Memi[iii+l-2]
 		    }
 		    w1[k] = aw
 		    dw[k] = bw
 		    nw[k] = sumn
 		    nv[k] = sumv
-		}
+		    Memi[iii+k-1] = ii
+		} else if (debug)
+		    call eprintf (" failed\n")
 	    }
 	}
 
 	nd = m
+
+	if (debug) {
+	    call eprintf ("# Final ordered dispersions to try.\n")
+	    do i = 1, nd {
+		call eprintf ("     %4d %8.5g  %8.3g  %8d %8d\n")
+		call pargi (Memi[iii+i-1])
+		call pargr (w1[i]+dw[i]*(ID_NPTS(AID_IDT(aid))/2.+1))
+		call pargr (dw[i])
+		call pargi (nw[i])
+		call pargi (nv[i])
+	    }
+	}
+	call mfree (iii, TY_INT)
 
         # Debug d: Graph dispersions.
 	if (stridxs ("d", AID_DEBUG(aid,1)) != 0)
@@ -1297,7 +1379,7 @@ double	fmatch		#O Line list non-matching fraction
 double	ftmatch		#O Target line non-matching fraction
 double	best		#O Best fit parameter
 
-int	i, j, k, nmin, nfound, nt, ntmatch, maxfeatures, stridxs()
+int	i, j, k, l, nmin, nfound, nt, ntmatch, maxfeatures, stridxs()
 double	fit, user, dcveval(), id_fitpt()
 pointer	cv, xt, label
 
@@ -1320,19 +1402,26 @@ begin
 		    call id_dofit (id, YES)
 		else
 		    call id_dofit (id, NO)
-		if (AID_ORD(aid) > 2) {
+		do l = AID_ORD(aid)-1, 2, -1 {
 		    cv = ID_CV(id)
 		    user = dcveval (cv, 1D0)
 		    fit = (dcveval (cv, double (ID_NPTS(id)/2)) - user) /
 			(dcveval (cv, double (ID_NPTS(id))) - user)
-		    if (abs (fit - 0.5) > 0.005) {
-			 call ic_puti (ID_IC(id), "order", 2)
-			if (stridxs ("i", AID_DEBUG(aid,1)) != 0)
-			    call id_dofit (id, YES)
-			else
-			    call id_dofit (id, NO)
-			call ic_puti (ID_IC(id), "order", AID_ORD(aid))
+		    if (abs (fit - 0.5) <= AID_MAXNL(aid))
+		        break
+		    if (stridxs ("n", AID_DEBUG(aid,1)) != 0) {
+			call eprintf (
+			    "order %d: non-linearity of %.1f%% > %.1f%%\n")
+			call pargi (l+1)
+			call pargd (100*abs(fit-0.5))
+			call pargr (100*AID_MAXNL(aid))
 		    }
+		    call ic_puti (ID_IC(id), "order", l)
+		    if (stridxs ("i", AID_DEBUG(aid,1)) != 0)
+			call id_dofit (id, YES)
+		    else
+			call id_dofit (id, NO)
+		    call ic_puti (ID_IC(id), "order", AID_ORD(aid))
 		}
 		call id_fitdata (id)
 		call id_fitfeatures (id)
@@ -1364,11 +1453,12 @@ begin
 	if (ID_NFEATURES(id) < nfound)
 	    call error (0, "aid_dofit: not enough features")
 
-	# Compute pixel rms.
+	# Compute fwidth rms.
 	rms = 0.
 	for (i=1; i<=ID_NFEATURES(id); i=i+1)
 	    rms = rms + (FIT(id,i) - USER(id,i)) ** 2
 	rms = sqrt (rms/ max (1, ID_NFEATURES(id)-nmin)) / abs (cdelt)
+	rms = rms / ID_FWIDTH(id)
 
 	# Compute line list matching fraction.
 	ncandidate = max (nfound, (ncandidate-(nmatch1-nmatch2)))
@@ -1481,4 +1571,29 @@ begin
 	call mfree (AID_Y(ev), TY_REAL)
 	call mfree (AID_A(ev), TY_REAL)
 	call mfree (AID_B(ev), TY_REAL)
+end
+
+
+# AID_IMGD -- Get value from image header or parameter string.
+
+double procedure aid_imgd (im, param)
+
+pointer	im			#I IMIO pointer
+char	param[ARB]		#I Parameter
+
+int	i, ctod()
+double	dval, imgetd()
+
+begin
+	if (param[1] == '!') {
+	    iferr (dval = imgetd (im, param[2]))
+		dval = INDEFD
+	} else {
+	    iferr (dval = imgetd (im, param)) {
+		i = 1
+		if (ctod (param, i, dval) == 0)
+		    dval = INDEFD
+	    }
+	}
+	return (dval)
 end

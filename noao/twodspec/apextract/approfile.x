@@ -49,7 +49,7 @@ pointer	sp, str, spec, x1, x2, y, reject, xreject, data, sky, cv, gp
 int	apgeti()
 real	apgetr(), cveval(), apgimr()
 bool	apgetb()
-errchk	salloc, ap_horne, ap_marsh, apgimr, asifit
+errchk	salloc, ap_horne, ap_marsh, apgimr, ap_asifit
 
 begin
 	# Allocate memory. Adjust pointers to be one indexed.
@@ -124,11 +124,13 @@ begin
 		next
 	    }
 
-	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
+	    call ap_asifit (dbuf+(iy+ys-1-l1)*nc, nc, xs[iy]-c1+1,
+		Memr[x1+iy]-c1+xs[iy], Memr[x2+iy]-c1+xs[iy], data, asi)
+#	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
 	    if (sbuf != NULL)
 		sky = sbuf + (iy - 1) * nx - 1
-	    if (asi != NULL)
-	        call asifit (asi, Memr[data], nc)
+#	    if (asi != NULL)
+#	        call asifit (asi, Memr[data], nc-xs[iy]+c1)
 	    call ap_edge (asi, Memr[x1+iy]+1, Memr[x2+iy]+1, wt1, wt2)
 	    ix1 = nint (Memr[x1+iy])
 	    ix2 = nint (Memr[x2+iy])
@@ -202,13 +204,15 @@ begin
 	        s = Memr[spec+iy]
 		if (s <= 0.)
 		    next
-		data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
+		call ap_asifit (dbuf+(iy+ys-1-l1)*nc, nc, xs[iy]-c1+1,
+		    Memr[x1+iy]-c1+xs[iy], Memr[x2+iy]-c1+xs[iy], data, asi)
+#		data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
 		if (sbuf != NULL) {
 		    sky = sbuf + (iy - 1) * nx - 1
 		    var0 = rdnoise + Memr[svar+iy-1]
 		}
-		if (asi != NULL)
-		    call asifit (asi, Memr[data], nc)
+#		if (asi != NULL)
+#		    call asifit (asi, Memr[data], nc-xs[iy]+c1)
 		call ap_edge (asi, Memr[x1+iy]+1, Memr[x2+iy]+1, wt1, wt2)
 		xreject = reject + (iy - 1) * nx - 1
 	        ix1 = nint (Memr[x1+iy])

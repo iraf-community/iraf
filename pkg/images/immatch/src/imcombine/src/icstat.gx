@@ -26,9 +26,17 @@ bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
 int	i, j, ndim, n, nv
-real	a, asum$t()
+real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnl$t()
+
+$if (datatype == csir)
+real	asum$t()
+$else $if (datatype == ld)
+double	asum$t()
+$else
+PIXEL	asum$t()
+$endif $endif
 PIXEL	ic_mode$t()
 
 include	"../icombine.com"

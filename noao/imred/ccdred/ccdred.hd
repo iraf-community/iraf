@@ -34,5 +34,5 @@ $ccdtest	= "noao$imred/ccdred/ccdtest/"
 
 ccdtest		men=ccdtest$ccdtest.men,
 		hlp=..,
-		sys=ccdtest$ccdtest.hlp,
+		pkg=ccdtest$ccdtest.hd,
 		src=ccdtest$ccdtest.cl

@@ -634,7 +634,7 @@ begin
 		    dispcor (specms, "", linearize=params.linearize,
 			database=database, table=arcref1ms, w1=INDEF,
 			w2=INDEF, dw=INDEF, nw=INDEF, log=params.log,
-			flux=params.flux, samedisp=yes, global=no,
+			flux=params.flux, samedisp=no, global=no,
 			ignoreaps=no, confirm=no, listonly=no,
 			verbose=verbose, logfile=logfile)
 		    if (params.nsubaps > 1) {

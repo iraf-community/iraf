@@ -160,6 +160,7 @@ int	bfdd[LEN_BFDD], txdd[LEN_TXDD]
 
 char	txbuf[SZ_TXBUF], queue[SZ_FNAME]
 char	osfn1[SZ_PATHNAME], osfn2[SZ_PATHNAME], temp[SZ_PATHNAME]
+char	o_str[SZ_LINE], s_str[SZ_LINE]
 int	ks_receive(), ks_send(), strlen(), envscan()
 int	diropen(), gstrcpy(), getline()
 include	"kii.com"
@@ -186,6 +187,11 @@ begin
 	    len_iobuf = DEF_LENIOBUF / SZB_CHAR
 	call malloc (iobuf, len_iobuf, TY_CHAR)
 
+	if (debug == YES) {
+	    call fprintf (spy, "kernel server, len_iobuf=%d\n")
+		call pargi (len_iobuf)
+	}
+
 	# Load the device drivers.
 	call ks_loadbf (bfdd)
 	call ks_loadtx (txdd)
@@ -210,9 +216,15 @@ begin
 	    p_sbuflen = 0
 
 	    if (debug == YES) {
-		call fprintf (spy, "opcode=%d, subcode=%d, arg[] =")
-		    call pargi (opcode)
-		    call pargi (subcode)
+		call  ks_op2str (opcode, subcode, o_str, s_str)
+		if (opcode < KI_ZFIOBF) {
+		    call fprintf (spy, "opcode=%s, arg[] =")
+		        call pargstr (o_str)
+		} else {
+		    call fprintf (spy, "opcode=%s), subcode=%s, arg[] =")
+		        call pargstr (o_str)
+		        call pargstr (s_str)
+		}
 		do i = 1, 10 {
 		    call fprintf (spy, " %d")
 		    call pargi (p_arg[i])
@@ -451,6 +463,20 @@ begin
 		call zdvown (osfn1, temp, SZ_PATHNAME, status)
 		call strupk (temp, p_sbuf, SZ_SBUF)
 		p_sbuflen = strlen (p_sbuf)
+
+            case KI_ZFUTIM:
+                # Update thje file modify time.
+                call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
+                if (debug == YES) {
+                    call fprintf (spy, "utime `%s' atime=%d mtime=%d\n")
+                        call pargstr (temp)
+                        call pargi (arg2)
+                        call pargi (arg3)
+                }
+                iferr (call ks_fmapfn (temp, osfn1, SZ_PATHNAME))
+                    status = ERR
+                else
+                    call zfutim (osfn1, arg2, arg3, status)
 
 	    case KI_ZOPDIR:
 		# Open a directory for reading.  Since we must perform the
@@ -1358,6 +1384,9 @@ int	subcode			# function subcode (for drivers)
 int	status
 include	"kii.com"
 
+int	debug, spy
+common	/dbgcom/ debug, spy
+
 begin
 	p_opcode  = opcode
 	p_subcode = subcode
@@ -1372,6 +1401,10 @@ begin
 	# Transmit the packet.
 	call zawrks (server, p_packet, SZB_PACKET, long(0))
 	call zawtks (server, status)
+
+	if (debug == YES) {
+	    call fprintf (spy, "ks_send: status=%d\n");call pargi (status)
+	}
 
 	return (status)
 end
@@ -1388,12 +1421,20 @@ int	server			# os channel to server process
 int	status
 include	"kii.com"
 
+int	debug, spy
+common	/dbgcom/ debug, spy
+
 begin
 	# Read the packet.
 	# [DEBUG]: call zzrdks (server, p_packet, SZB_PACKET, long(0))
 
 	call zardks (server, p_packet, SZB_PACKET, long(0))
 	call zawtks (server, status)
+
+	if (debug == YES && status <= 0) {
+	    call fprintf (spy, "ERROR: ks_receive: status=%d\n")
+		call pargi (status)
+	}
 
 	if (status <= 0)
 	    return (status)
@@ -1404,6 +1445,10 @@ begin
 	call miiupk32 (p_packet, FIRSTINTFIELD, LEN_INTFIELDS, TY_INT)
 	call chrupk (p_packet, LEN_INTFIELDS * 4 + 1, p_sbuf, 1,
 	    min (SZ_SBUF, p_sbuflen + 1))
+
+	if (debug == YES) {
+	    call fprintf (spy, "ks_receive: status=%d\n") ; call pargi (status)
+	}
 
 	return (status)
 end
@@ -1432,4 +1477,103 @@ begin
 		call pargstr (vfn)
 		call pargstr (upk_osfn)
 	}
+end
+
+
+procedure ks_op2str (opcode, subcode, o_str, s_str)
+
+int	opcode			#i opcode
+int	subcode			#i opcode
+char	o_str[ARB]		#o string containing opcode instruction
+char	s_str[ARB]		#o string containing subcode instruction
+
+begin
+	switch (opcode) {
+	case KI_ENVINIT: call strcpy ("KI_ENVINIT", o_str, SZ_LINE) 
+	case KI_SETROOT: call strcpy ("KI_SETROOT", o_str, SZ_LINE) 
+	case KI_ZOSCMD:  call strcpy ("KI_OSCMD",   o_str, SZ_LINE) 
+	case KI_FMAPFN:  call strcpy ("KI_FMAPFN",  o_str, SZ_LINE) 
+
+	case KI_ZFACSS:  call strcpy ("KI_ZFACSS", o_str, SZ_LINE)  
+	case KI_ZFALOC:	 call strcpy ("KI_ZFALOC", o_str, SZ_LINE)  
+	case KI_ZFCHDR:  call strcpy ("KI_ZFCHDR", o_str, SZ_LINE)  
+	case KI_ZFDELE:  call strcpy ("KI_ZFDELE", o_str, SZ_LINE)  
+	case KI_ZFINFO:  call strcpy ("KI_ZFINFO", o_str, SZ_LINE)  
+	case KI_ZFGCWD:  call strcpy ("KI_ZFGCWD", o_str, SZ_LINE)  
+	case KI_ZFMKCP:  call strcpy ("KI_ZFMKCP", o_str, SZ_LINE)  
+	case KI_ZFMKDR:  call strcpy ("KI_ZFMKDR", o_str, SZ_LINE)  
+	case KI_ZFPATH:  call strcpy ("KI_ZFPATH", o_str, SZ_LINE)  
+	case KI_ZFPROT:  call strcpy ("KI_ZFPROT", o_str, SZ_LINE)  
+	case KI_ZFRNAM:  call strcpy ("KI_ZFRNAM", o_str, SZ_LINE)  
+	case KI_ZFSUBD:  call strcpy ("KI_ZFSUBD", o_str, SZ_LINE)  
+	case KI_ZDVALL:  call strcpy ("KI_ZDVALL", o_str, SZ_LINE)  
+	case KI_ZDVOWN:  call strcpy ("KI_ZDVOWN", o_str, SZ_LINE)  
+	case KI_ZFUTIM:  call strcpy ("KI_ZFUTIM", o_str, SZ_LINE)  
+
+	case KI_ZOPDIR:  call strcpy ("KI_ZOPDIR", o_str, SZ_LINE)  
+	case KI_ZCLDIR:  call strcpy ("KI_ZCLDIR", o_str, SZ_LINE)  
+	case KI_ZGFDIR:  call strcpy ("KI_ZGFDIR", o_str, SZ_LINE)  
+ 
+	case KI_ZOPDPR:  call strcpy ("KI_ZOPDPR", o_str, SZ_LINE)  
+	case KI_ZCLDPR:  call strcpy ("KI_ZCLDPR", o_str, SZ_LINE)  
+	case KI_ZOPCPR:  call strcpy ("KI_ZOPCPR", o_str, SZ_LINE)  
+	case KI_ZCLCPR:  call strcpy ("KI_ZCLCPR", o_str, SZ_LINE)  
+	case KI_ZINTPR:  call strcpy ("KI_ZINTPR", o_str, SZ_LINE)  
+
+	# Device driver opcodes.
+	case KI_ZFIOBF:  call strcpy ("KI_ZFIOBF", o_str, SZ_LINE)  
+	case KI_ZFIOLP:  call strcpy ("KI_ZFIOLP", o_str, SZ_LINE)  
+	case KI_ZFIOPL:  call strcpy ("KI_ZFIOPL", o_str, SZ_LINE)  
+	case KI_ZFIOPR:  call strcpy ("KI_ZFIOPR", o_str, SZ_LINE)  
+	case KI_ZFIOSF:  call strcpy ("KI_ZFIOSF", o_str, SZ_LINE)  
+	case KI_ZFIOGD:  call strcpy ("KI_ZFIOGD", o_str, SZ_LINE)  
+
+	case KI_ZFIOTX:  call strcpy ("KI_ZFIOTX", o_str, SZ_LINE)  
+	case KI_ZFIOTY:  call strcpy ("KI_ZFIOTY", o_str, SZ_LINE)  
+
+	case KI_ZFIOMT:  call strcpy ("KI_ZFIOMT", o_str, SZ_LINE)  
+
+	default: 	 call strcpy ("", o_str, SZ_LINE)
+	}
+
+
+	# Now convert the subcode if needed.
+	call aclrc (s_str, SZ_LINE)
+	if (opcode >= KI_ZFIOBF && opcode <= KI_ZFIOGD) {
+	    switch (subcode) {
+	    case BF_OPN:  call strcpy ("BF_OPN", s_str, SZ_LINE) 
+	    case BF_CLS:  call strcpy ("BF_CLS", s_str, SZ_LINE) 
+	    case BF_ARD:  call strcpy ("BF_ARD", s_str, SZ_LINE) 
+	    case BF_AWR:  call strcpy ("BF_AWR", s_str, SZ_LINE) 
+	    case BF_AWT:  call strcpy ("BF_AWT", s_str, SZ_LINE) 
+	    case BF_STT:  call strcpy ("BF_STT", s_str, SZ_LINE) 
+	    default: 	  call strcpy ("", s_str, SZ_LINE)
+	    }
+	
+	} else if (opcode >= KI_ZFIOTX || opcode <= KI_ZFIOTY) {
+	    switch (subcode) {
+	    case TX_OPN:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
+	    case TX_CLS:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
+	    case TX_GET:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
+	    case TX_PUT:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
+	    case TX_FLS:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
+	    case TX_SEK:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
+	    case TX_NOT:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
+	    case TX_STT:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
+	    default: 	  call strcpy ("", s_str, SZ_LINE)
+	    }
+
+	} else if (opcode >= KI_ZFIOMT) {
+	    switch (subcode) {
+	    case MT_OP:   call strcpy ("MT_OP", s_str, SZ_LINE) 
+	    case MT_CL:   call strcpy ("MT_CL", s_str, SZ_LINE) 
+	    case MT_RD:   call strcpy ("MT_RD", s_str, SZ_LINE) 
+	    case MT_WR:   call strcpy ("MT_WR", s_str, SZ_LINE) 
+	    case MT_WT:   call strcpy ("MT_WT", s_str, SZ_LINE) 
+	    case MT_ST:   call strcpy ("MT_ST", s_str, SZ_LINE) 
+	    case MT_RW:   call strcpy ("MT_RW", s_str, SZ_LINE) 
+	    default: 	  call strcpy ("", s_str, SZ_LINE)
+	    }
+	}
+
 end

@@ -19,14 +19,16 @@ real	xmax		# maximum value of x
 errchk	malloc, calloc
 
 begin
-	# allocate space for the curve descriptor
-	call malloc (cv, LEN_CVSTRUCT, TY_STRUCT)
-
+	# check for bad parameters.
+	cv = NULL
 	if (order < 1)
 	    call error (0, "CVINIT: Illegal order.")
 
 	if (xmax <= xmin)
 	    call error (0, "CVINIT: xmax <= xmin.")
+
+	# allocate space for the curve descriptor
+	call calloc (cv, LEN_CVSTRUCT, TY_STRUCT)
 
 	# specify the curve-type dependent parameters
 	switch (curve_type) {

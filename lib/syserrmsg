@@ -136,6 +136,7 @@
 789 Illegal filename operand (null string)
 790 FSETI: The F_CLOSEFD option is not supported for text files
 791 FSETI: The F_CLOSEFD option cannot be used with files opened NEW_FILE
+792 FUTIME: Cannot reset file access/modify time
 
 # IMIO (800-899)
 800 Cannot read pixel storage file

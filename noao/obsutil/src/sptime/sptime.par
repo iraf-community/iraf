@@ -34,9 +34,10 @@ ybin,i,h,1,1,,"Detector binning (spatial)
 
 # Calculation parameters"
 search,s,h,"spectimedb$",,,List of directories to search for tables
+minexp,r,h,0.01,,,Minimum time per exposure (sec)
 maxexp,r,h,3600.,,,Maximum time per exposure (sec)
 units,s,h,"Angstroms",,,Wavelength units
-skysub,s,h,"",,,Type of sky subtaction (none|longslit|multiap)
+skysub,s,h,"",,,Type of sky subtaction (none|longslit|multiap|shuffle)
 nskyaps,i,h,10,0,,Number of multiap sky apertures
 subpixels,i,h,INDEF,,,Number of subpixels in calculation
 sensfunc,s,h,"",,,"Sensitivity function value or table

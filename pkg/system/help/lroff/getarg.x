@@ -3,15 +3,15 @@
 include	<chars.h>
 include	"lroff.h"
 
-.help getarg
+.help lgetarg
 .nf _________________________________________________________________________
-GETARG -- Get an integer argument to a directive.  If no argument is found,
+LGETARG -- Get an integer argument to a directive.  If no argument is found,
 return the default value.  We are called with IP pointing to the start of
 the argument field to be searched.  Leave IP pointing to the next argument
 field.
 .endhelp ____________________________________________________________________
 
-int procedure getarg (input_line, ip, default_value)
+int procedure lgetarg (input_line, ip, default_value)
 
 char	input_line[ARB]
 int	ip, default_value

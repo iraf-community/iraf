@@ -1,8 +1,10 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<config.h>
 include	<mach.h>
 include	<fset.h>
+include	<finfo.h>
 include	<fio.h>
 
 
@@ -21,7 +23,8 @@ task	mpp	= t_mpp,
 	oserver	= t_old_server,
 	oclient	= t_old_client,
 	daytime = t_daytime,
-	http	= t_http
+	http	= t_http,
+	utime	= t_utime
 
 
 define 	SZ_BUF		2048
@@ -537,4 +540,52 @@ begin
 	}
 
 	return (sum)
+end
+
+
+# UTIME -- Test file modify time updates.
+
+procedure t_utime ()
+
+char	fname[SZ_LINE]
+int	offset
+long    fi[LEN_FINFO]
+
+int	futime(), finfo(), clgeti()
+
+begin
+	# Get parameters.
+	call clgstr ("fname", fname, SZ_LINE)
+	offset = clgeti ("offset")
+
+	# Get initial file times.
+        if (finfo (fname, fi) == ERR) 
+            call syserrs (SYS_FOPEN, fname)
+	call printf ("Initial times:  atime = %d  mtime = %d\n")
+	    call pargl (FI_ATIME(fi))
+	    call pargl (FI_MTIME(fi))
+
+
+	# Update the time by the offset.
+	if (futime (fname, FI_ATIME(fi)+offset, FI_MTIME(fi)+offset) == ERR)
+	    call error (0, "Fatal futime() error")
+	
+	# Get modified file times.
+        if (finfo (fname, fi) == ERR) 
+            call syserrs (SYS_FOPEN, fname)
+	call printf ("Mofified times: atime = %d  mtime = %d\n")
+	    call pargl (FI_ATIME(fi))
+	    call pargl (FI_MTIME(fi))
+
+
+	# Test the NULL arguments, output shouldn't change.
+	if (futime (fname, NULL, FI_MTIME(fi)) == ERR)
+	    call error (0, "Fatal futime() error")
+	
+	# Get modified file times.
+        if (finfo (fname, fi) == ERR) 
+            call syserrs (SYS_FOPEN, fname)
+	call printf ("NULL test time: atime = %d  mtime = %d\n")
+	    call pargl (FI_ATIME(fi))
+	    call pargl (FI_MTIME(fi))
 end

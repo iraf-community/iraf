@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <sys/types.h>
+#include <time.h>
 
 #define	import_kernel
 #define	import_knames
@@ -18,7 +19,7 @@
 ZGMTCO (gmtcor)
 XINT	*gmtcor;				/* seconds */
 {
-	time_t gmt_to_lst();
+	time_t gmt_to_lst(), ltime;
 
 	/* Given an input value of zero (biased by SECONDS_1970_TO_1980)
 	 * gmt_to_lst will return a negative value in seconds for a location
@@ -31,4 +32,14 @@ XINT	*gmtcor;				/* seconds */
 	 */
 
 	*gmtcor = -((XINT) gmt_to_lst ((time_t) SECONDS_1970_TO_1980));
+
+
+        /* Daylight saving time is not added to the output of gmt_to_lst()
+	 * since it assumes Jan 1.  Use the current date to determin if
+	 * DST is in effect.
+	 */
+
+	ltime = time(0);
+	if (localtime(&ltime)->tm_isdst)
+	    *gmtcor = *gmtcor - 60L * 60L;
 }

@@ -97,6 +97,7 @@
 #define	ZFUNC8		zfunc8_
 #define	ZFUNC9		zfunc9_
 #define	ZFUNCA		zfunca_
+#define	ZFUTIM		zfutim_
 #define	ZFXDIR		zfxdir_
 #define	ZGCMDL		zgcmdl_
 #define	ZGETTT		zgettt_
@@ -151,7 +152,7 @@
 #define	ZXGMES		zxgmes_
 #define	ZXWHEN		zxwhen_
 #define	ZZCLMT		zzclmt_
-#define	ZZEPRO		zzepro_
+#define ZZEPRO          zzepro_
 #define	ZZOPMT		zzopmt_
 #define	ZZRDMT		zzrdmt_
 #define	ZZRWMT		zzrwmt_
@@ -219,6 +220,7 @@
 #define zfmkdr_	kfmkdr_
 #define zfprot_	kfprot_
 #define zfrnam_	kfrnam_
+#define zfutim_	kfutim_
 #define zgettx_	kgettx_
 #define zgetty_	kgetty_
 #define zgfdir_	kgfdir_

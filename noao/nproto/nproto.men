@@ -5,5 +5,6 @@
       irmatch2d - Align and intensity match image produced by irmosaic (2D)
        irmosaic - Mosaic an ordered list of images onto a grid
          linpol - Calculate polarization frames and Stoke's parameters
+	   mkms - Create multispec from 1D spectra including associated bands
        objmasks - Detect objects in images and make masks
 	slitpic - Generate IRAF image of aperture slit mask

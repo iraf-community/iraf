@@ -598,23 +598,6 @@ freevfd_
 end
 
 
-# VVFN_CHECKSUM -- Compute the integer checksum of a char array.
-
-int procedure vvfn_checksum (a, nchars)
-
-char	a[nchars]		# array to be summed
-int	nchars			# length of array
-int	i, sum
-
-begin
-	sum = 0
-	do i = 1, nchars
-	    sum = sum + a[i]
-
-	return (sum)
-end
-
-
 # VVFN_READMAPFILE -- Open and read the mapping file.  In VFN_WRITE mode a
 # new mapping file is created if necessary.
 
@@ -896,4 +879,21 @@ begin
 	}
 
 	return (ERR)
+end
+
+
+# VVFN_CHECKSUM -- Compute the integer checksum of a char array.
+
+int procedure vvfn_checksum (a, nchars)
+
+char	a[nchars]		# array to be summed
+int	nchars			# length of array
+int	i, sum
+
+begin
+	sum = 0
+	do i = 1, nchars
+	    sum = sum + a[i]
+
+	return (sum)
 end

@@ -1,5 +1,6 @@
 include <fset.h>
 include	<ctype.h>
+include	<math/gsurfit.h>
 
 define	MAX_FIELDS	100		# Maximum number of fields in list
 define	TABSIZE		8		# Spacing of tab stops
@@ -13,7 +14,7 @@ define	GEO_DOUBLE	2		# Computation type is double
 
 procedure t_geoxytran()
 
-int	inlist, outlist, reclist, calctype, geometry, xcolumn, ycolumn
+int	inlist, outlist, reclist, calctype, geometry, dir, xcolumn, ycolumn
 int	min_sigdigits, infd, outfd
 pointer	sp, in_fname, out_fname, record, xformat, yformat, str, dt
 pointer	sx1, sy1, sx2, sy2
@@ -64,12 +65,18 @@ begin
 		    "Input file and record lists are not the same length.")
 	}
 
+	# Get geometry and transformation direction.
 	geometry = clgwrd ("geometry", Memc[str], SZ_LINE,
 	    ",linear,distortion,geometric,")
+	dir = clgwrd ("direction", Memc[str], SZ_LINE,
+	    ",forward,backward,")
 
 	# Get field numbers from cl
-	calctype = clgwrd ("calctype", Memc[str], SZ_LINE,
-	    ",real,double,")
+	if (dir == 1)
+	    calctype = clgwrd ("calctype", Memc[str], SZ_LINE,
+		",real,double,")
+	else
+	    calctype = GEO_DOUBLE
 	xcolumn = clgeti ("xcolumn")
 	ycolumn = clgeti ("ycolumn")
 	call clgstr ("xformat", Memc[xformat], SZ_FNAME)
@@ -100,8 +107,9 @@ begin
 	    infd = open (Memc[in_fname], READ_ONLY, TEXT_FILE)
 
 	    # Transform the coordinates.
-	    call geo_transform_file (infd, outfd, xcolumn, ycolumn, calctype,
-	        Memc[xformat], Memc[yformat], min_sigdigits, sx1, sy1, sx2, sy2)
+	    call geo_transform_file (infd, outfd, xcolumn, ycolumn, dir,
+	        calctype, Memc[xformat], Memc[yformat], min_sigdigits,
+		sx1, sy1, sx2, sy2)
 
 	    # Do not get a new output file name if there is not output 
 	    # file list or if only one output file was specified.
@@ -198,13 +206,14 @@ end
 # blank or comment, the line is transformed.  Blank and comment
 # lines are output unaltered.
 
-procedure geo_transform_file (infd, outfd, xfield, yfield, calctype, xformat,
-	yformat, min_sigdigits, sx1, sy1, sx2, sy2)
+procedure geo_transform_file (infd, outfd, xfield, yfield, dir, calctype,
+	xformat, yformat, min_sigdigits, sx1, sy1, sx2, sy2)
 
 int	infd			#I the input file descriptor
 int	outfd			#I the output file descriptor
 int	xfield			#I the x column number
 int	yfield			#I the y column number
+int	dir			#I transform direction
 int	calctype		#I the computation type
 char	xformat[ARB]		#I output format of the x coordinate
 char	yformat[ARB]		#I output format of the y coordinate
@@ -218,6 +227,11 @@ real	xr, yr, xtr, ytr
 pointer	sp, inbuf, linebuf, field_pos, outbuf, ip
 int	getline(), li_get_numr(), li_get_numd()
 
+int	nsx, nsy
+double	der[8], xmin, xmax, ymin, ymax, tol
+pointer	sx[2], sy[2]
+double	dgsgetd()
+
 #double	x, y, xt, yt
 
 begin
@@ -228,6 +242,24 @@ begin
 	call salloc (outbuf, SZ_LINE, TY_CHAR)
 
 	max_fields = MAX_FIELDS
+
+	# Initialize for backward transform.
+	if (dir == 2) {
+	    sx[1] = sx1; sy[1] = sy1; sx[2] = sx2; sy[2] = sy2
+	    nsx = 2; nsy = 2
+	    if (sx2 == NULL)
+		nsx = 1
+	    if (sy2 == NULL)
+		nsy = 1
+	    xmin = dgsgetd (sx1, GSXMIN)
+	    xmax = dgsgetd (sx1, GSXMAX)
+	    ymin = dgsgetd (sx1, GSYMIN)
+	    ymax = dgsgetd (sx1, GSYMAX)
+	    tol = abs (xmax - xmin) / 1E10
+	    xd = (xmin + xmax) / 2
+	    yd = (ymin + ymax) / 2
+	    call tr_init (sx, nsx, sy, nsy, xd, yd, der)
+	}
 
 	for (nline=1;  getline (infd, Memc[inbuf]) != EOF;  nline = nline + 1) {
 	    for (ip=inbuf;  IS_WHITE(Memc[ip]);  ip=ip+1)
@@ -285,13 +317,19 @@ begin
 	    }
 		 
 	    if (calctype == GEO_REAL) {
-	        call geo_do_transformr (xr, yr, xtr, ytr, sx1, sy1, sx2, sy2)
+		call geo_do_transformr (xr, yr, xtr, ytr,
+		    sx1, sy1, sx2, sy2)
 	        call li_pack_liner (Memc[linebuf], Memc[outbuf], SZ_LINE,
 	            Memi[field_pos], nfields, xfield, yfield, xtr, ytr,
 		    xformat, yformat, nsdig_x, nsdig_y, min_sigdigits)
 
 	    } else {
-	        call geo_do_transformd (xd, yd, xtd, ytd, sx1, sy1, sx2, sy2)
+		if (dir == 1)
+		    call geo_do_transformd (xd, yd, xtd, ytd,
+		        sx1, sy1, sx2, sy2)
+		else
+		    call tr_invert (sx, nsx, sy, nsy, xd, yd, xtd, ytd,
+		        der, xmin, xmax, ymin, ymax, tol)
 	        call li_pack_lined (Memc[linebuf], Memc[outbuf], SZ_LINE,
 	            Memi[field_pos], nfields, xfield, yfield, xtd, ytd,
 		    xformat, yformat, nsdig_x, nsdig_y, min_sigdigits)

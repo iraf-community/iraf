@@ -6,7 +6,7 @@
 #ifndef D_libc
 #ifndef D_spp
 #ifndef import_spp
-#include <spp.h>
+#include "spp.h"
 #endif
 #endif
 

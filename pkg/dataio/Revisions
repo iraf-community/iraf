@@ -1,5 +1,20 @@
 .help revisions Jun88 pkg.dataio
 .nf
+dataio$export/exraster.gx
+    Fixed a bug in computing the number of output pixels (1/5/04, MJF)
+
+dataio$import/ipproc.gx
+    An operand point was possibly being freed twice, once in the ip_wrline()
+    procedure and again in the evvfree() call when processing completed.  
+    This could cause a segfault on some system (9/27/02, MJF)
+
+dataio$export/exraster.gx
+dataio$export/bltins/exppm.x
+    There was a bug in the generation of PPM files when using images with
+    and odd number of columns causing the line to be too long by one byte.
+    The output image will now truncate the last column to avoid this since
+    we cannot write byte data. (8/9/02, MJF)
+
 dataio$export/export.h
     Changed the zscale sampling parameters to use more points spread out
     over more of the image.  The old values would sometimes find an

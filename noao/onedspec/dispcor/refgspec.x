@@ -115,7 +115,8 @@ begin
 
 	    # Failure to find a specified keyword is a fatal error.
 	    iferr {
-		if (Memc[sort] == EOS || streq (Memc[sort], "none"))
+		if (Memc[sort] == EOS || streq (Memc[sort], "none") ||
+		    select == MATCH || select == AVERAGE)
 		    sortval = INDEFD
 		else {
 		    sortval = imgetd (im, Memc[sort])
@@ -124,7 +125,8 @@ begin
 		}
 
 		call malloc (str, SZ_FNAME, TY_CHAR)
-		if (Memc[group] == EOS || streq (Memc[group], "none"))
+		if (Memc[group] == EOS || streq (Memc[group], "none") ||
+		    select == MATCH || select == AVERAGE)
 		    Memc[str] = EOS
 		else
 		    call imgstr (im, Memc[group], Memc[str], SZ_FNAME)

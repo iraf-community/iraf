@@ -16,6 +16,7 @@ include <time.h>
 #       nchars = dtm_encode (datestr,maxch, y,m,d, h, precision, flags)
 #   status = dtm_decode_hms (datestr, y,m,d, h,m,s, oldfits)
 #   nchars = dtm_encode_hms (datestr,maxch, y,m,d, h,m,s, precision, flags)
+#        status = dtm_ltime (datestr, ltime)
 # 
 # 
 # General Date and Time Conversions
@@ -338,9 +339,9 @@ end
 
 int procedure dtm_encode_hms (datestr, maxch,
 	year, month, day, hours, minutes, seconds, precision, flags)
-
 char	datestr[ARB]		#O the output date string
 int	maxch			#I the maximum length of the output date string
+
 int	year			#I the input year, e.g. 1999
 int	month			#I the input month, e.g. 1-12
 int	day			#I the input day, e.g. 1-31 
@@ -388,4 +389,94 @@ begin
 	}
 
 	return (strlen (datestr))
+end
+
+
+# DTM_LTIME -- Decode a FITS format DATE-OBS string into the number of
+# seconds since 00:00:00 01-Jan-1980.  OK is returned if the date string
+# is successfully decoded, ERR if it is not or if it is a negative value.
+# The 'datestr' string value may be in any of the following forms: DD/MM/YY
+# or CCYY-MM-DD (where time is INDEF and assumed to be midnight), or as
+# CCYY-MM-DDTHH:MM:SS[.SSS...].
+
+int procedure dtm_ltime (datestr, ltime)
+
+char	datestr[ARB]		#I the input date string
+long	ltime			#O seconds since 00:00:00 01-Jan-1980
+
+double	sec
+int	oldfits, ndays
+int	hr, min, yr, mon, day
+
+double	dtm_date_to_julday()
+int	dtm_decode_hms()
+
+define	START_IRAF_EPOCH	2444239.5	# JD of 00:00:00 01-Jan-1980
+define  SECONDS_PER_DAY         86400
+define  SECONDS_PER_HOUR        3600
+define  SECONDS_PER_MINUTE      60
+
+begin
+	ltime = INDEFL		# initialize
+
+	if (dtm_decode_hms (datestr, yr,mon,day, hr,min,sec, oldfits) == ERR)
+	    return (ERR)
+
+	# Take care of the assumption that 2-digit years are 1900.
+	if (oldfits == YES)
+	    yr = yr + 100
+
+	# If we had a time specified, convert it to the number of seconds
+	# that day.
+	if (IS_INDEFI(hr) || IS_INDEFI(min) || IS_INDEFD(sec)) 
+	    ltime = 0
+	else
+	    ltime = (hr * SECONDS_PER_HOUR) + (min * SECONDS_PER_MINUTE) + sec
+
+	# Compute the number of days since the start of the iraf epoch.
+	ndays =  dtm_date_to_julday (yr, mon, day, 0.0d0) - START_IRAF_EPOCH
+
+	# Convert days to seconds, add to time from before.
+	ltime = ltime + (ndays * SECONDS_PER_DAY)
+
+	if (ltime >= 0)
+	    return (OK)
+	else
+	    return (ERR)
+end
+
+
+# DTM_DATE_TO_JULDAY -- Convert date to Julian day. Assumes dates after year 99.
+
+double procedure dtm_date_to_julday (year, month, day, t)
+
+int	year			# Year
+int	month			# Month (1-12)
+int	day			# Day of month
+double	t			# Time for date (mean solar day)
+
+double	jd
+int	y, m, d
+
+begin
+	if (year < 100)
+	    y = 1900 + year
+	else
+	    y = year
+
+	if (month > 2)
+	    m = month + 1
+	else {
+	    m = month + 13
+	    y = y - 1
+	}
+
+	jd = int (365.25D0 * y) + int (30.6001 * m) + day + 1720995
+	if (day + 31 * (m + 12 * y) >= 588829) {
+	    d = int (y / 100)
+	    m = int (y / 400)
+	    jd = jd + 2 - d + m
+	}
+	jd = jd - 0.5 + int (t * 360000. + 0.5) / 360000. / 24.
+	return (jd)
 end

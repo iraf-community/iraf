@@ -642,14 +642,14 @@ the order in which they appear, have the following meaning.
     xmax	Maximum x for normalization
     omin	Minimum o for normalization
     omax	Maximum o for normalization
-    Cmn		Coefficients: m=0-xpow, n=0-ypow, i varies first
+    Cmn		Coefficients: m=0-xpow, n=0-opow, m varies first
 .fi
 
 The functions are evaluated by a sum over m and n up to the specified
 highest powers.
 
 .nf
-    (3)  f(x,o) = sum {Cmn * Pm * Pn}	m=0-xpow, n=0-ypow
+    (3)  f(x,o) = sum {Cmn * Pm * Pn}	m=0-xpow, n=0-opow
 .fi
 
 The Cmn are the coefficients of the polynomial terms Pm and Pn which

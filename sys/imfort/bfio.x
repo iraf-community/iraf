@@ -457,7 +457,7 @@ int	status
 
 begin
 	if (BF_UPDATE(fp) == NO)
-	    return
+	    return (OK)
 	else
 	    BF_UPDATE(fp) = NO
 

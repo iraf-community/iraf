@@ -67,7 +67,7 @@ nfields 17
 
 begin usno2@cadc
 address inet:80:cadcwww.dao.nrc.ca:text
-query GET /cadcbin/getusno2?ra=%-s&dec=%-s&radius=%-s&m=0,21 HTTP/1.0\n\n
+query GET /cadcbin/getusno2?ra=%-s&dec=%-s&radius=%-s&m=0,21&nout=1000000 HTTP/1.0\n\n
 nquery 4
     ra 00:00:00.00 hours %0.2h
     dec +00:00:00.0 degrees %0.1h
@@ -96,7 +96,7 @@ nfields 9
 
 begin usno1@cadc
 address inet:80:cadcwww.dao.nrc.ca:text
-query GET /cadcbin/getusno?ra=%-s&dec=%-s&radius=%-s&m=0,21 HTTP/1.0\n\n
+query GET /cadcbin/getusno?ra=%-s&dec=%-s&radius=%-s&m=0,21&nout=1000000 HTTP/1.0\n\n
 nquery 4
     ra 00:00:00.00 hours %0.2h
     dec +00:00:00.0 degrees %0.1h
@@ -208,7 +208,7 @@ nfields 6
 
 begin gsc2@stsci
 address inet:80:www-gsss.stsci.edu:text
-query GET /cgi-bin/gsc22query.exe?ra=%-s&dec=%-s&r1=0.0&r2=%-s&m1=0.0&m2=19.5&n=10000&submit2=Submit+Request HTTP/1.0\n\n
+query GET /cgi-bin/gsc22query.exe?ra=%-s&dec=%-s&r1=0.0&r2=%-s&m1=0.0&m2=19.5&n=100000&submit2=Submit+Request HTTP/1.0\n\n
 nquery 4
     ra  00:00:00.0 hours %0.2h
     dec +00:00:00 degrees %0.1h

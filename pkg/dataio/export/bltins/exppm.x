@@ -27,8 +27,13 @@ begin
         call salloc (hdr, SZ_LINE, TY_CHAR)
         call aclrc (Memc[hdr], SZ_LINE)
 
+	# If we have an odd number of pixels we can't correctly write the
+	# last column to the file, so truncate the column in the output image.
+        if (mod (EX_NCOLS(ex),2) == 1)
+            EX_OCOLS(ex) = EX_OCOLS(ex) - 1
+
         call sprintf (Memc[hdr], SZ_LINE, "P6\n%-6d  %-6d\n255\n")
-            call pargi (EX_OCOLS(ex) - mod (EX_OCOLS(ex),2))
+            call pargi (EX_OCOLS(ex))
             call pargi (EX_OROWS(ex))
 	len = strlen (Memc[hdr])
         call strpak (Memc[hdr], Memc[hdr], SZ_LINE)

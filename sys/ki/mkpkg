@@ -54,6 +54,7 @@ libsys.a:
 	kfprot.x	ki.h kii.com <mach.h>
 	kfrnam.x	ki.h kii.com <mach.h>
 	kfsubd.x	ki.h
+	kfutim.x	ki.h kii.com <mach.h>
 	kfxdir.x	ki.h kinode.com <chars.h>
 	kgfdir.x	ki.h kichan.com kii.com <config.h> <mach.h>
 	kiconnect.x	ki.h kichan.com kii.com kinode.com <chars.h>\

@@ -1,5 +1,17 @@
 .help revisions May93 noao.lib
 .nf
+
+noaolib$obsdb.dat
+    Added SLN.  (7/17/03, Valdes)
+
+noaolib$obsdb.dat
+    Added IAO, Hanle.
+    (6/28/03, Valdes)
+
+noaolib$ccdtime/ctio.dat
+    Added andicam_ir detector and 1.3m telescope as researched by
+    Dave Bell.  (11/14/02, Valdes)
+
 noaolib$obsdb.dat
     Added additional ESO entries supplied by Peter Weilbacher.
     (1/30/02, Valdes)

@@ -196,7 +196,7 @@ begin
 			    nw = Memi[nx+i-1]
 			    inbuf = imgl3r (in, i, j)
 			    outbuf = impl3r (out, i, j)
-			    call dispcor (ctin, ctout, i, Memr[inbuf], n,
+			    call dispcor (ctin, i, ctout, i, Memr[inbuf], n,
 				Memr[outbuf], nw, NO)
 			    if (nw < n)
 				call amovkr (Memr[outbuf+nw-1], Memr[outbuf+nw],

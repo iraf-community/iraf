@@ -57,6 +57,7 @@ real	nsigma			# Dynamic range of gaussian (dynrange param)
 int	ncnew, nlnew, nonew
 bool	new, flag[2]
 int	i, j, k, k1, k2, m, m1, m2, dc
+long	seed1
 real	mwc, mw1, mw2, dmw, x, x1, x2, dx, w, p, s, xc1, dx1
 real	p1, p2, pcen, fwhm, flux, flux1
 real	a[2], b[2], c[2], tb[2], cb[2], tt[2], ctb[2], t2tb[2], xmin[2], xmax[2]
@@ -124,7 +125,9 @@ begin
 	sigma = clgetr ("sigma")
 	seed = clgetl ("seed")
 	if (IS_INDEFL(seed))
-	    seed = clktime (long(0))
+	    seed1 = seed1 + clktime (long(0))
+	else
+	    seed1 = seed
 	subsample = 1. / clgeti ("nxsub")
 	nsigma = sqrt (2. * log (clgetr ("dynrange")))
 
@@ -346,7 +349,7 @@ begin
 		    if (nscan() < 3)
 			s = sigma
 		    if (nscan() < 2)
-			p = peak * urand (seed)
+			p = peak * urand (seed1)
 		    if (nrandom == 0) {
 			j = 50
 			call malloc (waves, j, TY_REAL)
@@ -371,11 +374,11 @@ begin
 		call malloc (sigmas, nrandom, TY_REAL)
 		j = max (1, mc[1] - (norders-1) / 2)
 		do i = 0, nrandom-1 {
-		    w = z * (mw1 + dmw * urand (seed))
+		    w = z * (mw1 + dmw * urand (seed1))
 		    w = w - dmw * nint ((w - mwc) / dmw)
-		    m = j + norders * urand (seed)
+		    m = j + norders * urand (seed1)
 		    Memr[waves+i] = w / m
-		    Memr[peaks+i] = peak * urand (seed) / z
+		    Memr[peaks+i] = peak * urand (seed1) / z
 		    Memr[sigmas+i] = sigma * z
 		}
 		if (nrandom > 0 && Memc[fname] != EOS) {

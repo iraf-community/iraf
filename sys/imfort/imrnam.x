@@ -19,6 +19,7 @@ pointer	sp, im, ip
 pointer	root, extn, osfn
 pointer	old_hfn, new_hfn
 pointer	old_pfn, new_pfn
+pointer	o_osfn, n_osfn
 
 bool	strne()
 int	stridxs()
@@ -32,6 +33,8 @@ begin
 	call salloc (new_hfn, SZ_PATHNAME, TY_CHAR)
 	call salloc (old_pfn, SZ_PATHNAME, TY_CHAR)
 	call salloc (new_pfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (n_osfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (o_osfn, SZ_PATHNAME, TY_CHAR)
 	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
 	ier = OK
@@ -56,14 +59,16 @@ begin
 	# Perform clobber checking and delete any old image with the new
 	# name, if clobber is enabled.
 
-	if (strne (oimage, nimage)) {
+	call f77upk (oimage, Memc[o_osfn], SZ_PATHNAME)
+	call f77upk (nimage, Memc[n_osfn], SZ_PATHNAME)
+	if (strne (Memc[o_osfn], Memc[n_osfn])) {
 	    call strpak (Memc[new_hfn], Memc[osfn], SZ_PATHNAME)
 	    call zfacss (Memc[osfn], 0, 0, status)
 	    if (status == YES) {
 		call strpak ("clobber", Memc[osfn], SZ_FNAME)
 		call zgtenv (Memc[osfn], Memc[osfn], SZ_FNAME, status)
 		if (status != ERR) {
-		    call imdelx (nimage, ier)
+		    call imdele (nimage, ier)
 		    if (ier != OK) {
 			ier = IE_IMRENAME
 			goto quit_

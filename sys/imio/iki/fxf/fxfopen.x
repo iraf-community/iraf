@@ -28,7 +28,7 @@ int	acmode			#I access mode
 int	status			#O status flag to calling routine
 
 long	fi[LEN_FINFO]
-int	newimage, i, gn, ksinh, type
+int	newimage, i, gn, ksinh, type, fmode
 pointer	sp, path, fit_extn, ua, o_fit, fit
 bool    pre_read, fks_extn_or_ver, dyh, fsec, plio
 int	fxf_check_dup_extnv(), itoc(), strcmp(), strncmp()
@@ -48,6 +48,8 @@ begin
 	call fxf_init()
 	ua = IM_USERAREA(im)
 
+	fmode = acmode
+
 	# Allocate internal FITS image descriptor.
 	call fxf_alloc (fit)
 
@@ -58,7 +60,7 @@ begin
 
 	# Generate full header file name.
 	if (extn[1] == EOS) {
-	    call fxf_gethdrextn (im, o_im, acmode, Memc[fit_extn], FITS_LENEXTN)
+	    call fxf_gethdrextn (im, o_im, fmode, Memc[fit_extn], FITS_LENEXTN)
 	    call iki_mkfname (root, Memc[fit_extn], Memc[path], SZ_PATHNAME)
 	    call strcpy (Memc[fit_extn], extn, FITS_LENEXTN)
 	} else                                 
@@ -79,15 +81,15 @@ begin
 	# For simplicity treat the APPEND mode as NEW_IMAGE.  For the FK
 	# is the same.
 
-	if (acmode == APPEND)
-	    acmode = NEW_IMAGE
-	FIT_ACMODE(fit) = acmode
+	if (fmode == APPEND)
+	    fmode = NEW_IMAGE
+	FIT_ACMODE(fit) = fmode
 
 	# Read fkinit and ksection and check that the extension number
 	# specifications therein and the IMIO cluster index "group" are
 	# consistent.
 
-	call fxf_check_group (im, ksection, acmode, group, ksinh)
+	call fxf_check_group (im, ksection, fmode, group, ksinh)
 
 	fks_extn_or_ver = FKS_EXTNAME(fit) != EOS || !IS_INDEFL(FKS_EXTVER(fit))
 
@@ -119,7 +121,7 @@ begin
 		goto err_ 
 	    newimage = NO
 	    dyh = true
-	    if (acmode == NEW_COPY && type == FK_PLIO) 
+	    if (fmode == NEW_COPY && type == FK_PLIO) 
 		FIT_PIXOFF(fit) = fxf_header_size(im) + FITS_BLOCK_CHARS
 	}
 	if (newimage == NO) {
@@ -140,7 +142,7 @@ begin
 	pre_read = (fks_extn_or_ver ||
 	    FKS_OVERWRITE(fit) == YES || FKS_INHERIT(fit) == YES)
 
-	if (newimage == NO && acmode != READ_ONLY) {
+	if (newimage == NO && fmode != READ_ONLY) {
 	    # See that INHERIT makes sense if it has been set by
 	    # 'fkinit' when reading a file with PHU (naxis != 0).
 
@@ -150,7 +152,7 @@ begin
 		    FKS_INHERIT(fit) = NO
 
 		    # Issue an error only if the inherit is in the filename.
-		    if (acmode == NEW_COPY && ksinh == YES)
+		    if (fmode == NEW_COPY && ksinh == YES)
 			call syserr (SYS_FXFBADINH)
 	        } else if (FIT_NAXIS(fit) != 0)
 		    FKS_INHERIT(fit) = NO
@@ -160,14 +162,14 @@ begin
 		    FKS_INHERIT(fit) == YES) || FKS_OVERWRITE(fit) == YES)
 	    }
 
-	    if (pre_read && acmode != NEW_COPY && !dyh)
+	    if (pre_read && fmode != NEW_COPY && !dyh)
 	        call fxf_prhdr (im, group)
 
-	    if (access (IM_HDRFILE(im), acmode, 0) == NO)
+	    if (access (IM_HDRFILE(im), fmode, 0) == NO)
 		call syserrs (SYS_FNOWRITEPERM, IM_HDRFILE(im))
 	}
 
-	switch (acmode) {
+	switch (fmode) {
 	case NEW_IMAGE, APPEND:
 	    if (newimage == NO) {
 	        # Make sure the UA is empty when overwriting.
@@ -255,7 +257,7 @@ begin
 	    FIT_NEWIMAGE(fit) = newimage
 	    if (newimage == NO)
 		FIT_XTENSION(fit) = YES
-	    FIT_ACMODE(fit) = acmode
+	    FIT_ACMODE(fit) = fmode
 	    if (FKS_APPEND(fit) != YES)
 	        FIT_GROUP(fit) = group
 	    FIT_BSCALE(fit) = 1.0d0
@@ -319,12 +321,12 @@ begin
 	    # Open an existing image.
             iferr (call fpathname (IM_HDRFILE(im), Memc[path], SZ_PATHNAME))
 		goto err_
-	    if (acmode == READ_WRITE)
+	    if (fmode == READ_WRITE)
 		IM_HFD(im) = open (Memc[path], READ_WRITE, BINARY_FILE)
 	    else
 		IM_HFD(im) = open (Memc[path], READ_ONLY, BINARY_FILE)
 
-	    iferr (call fxf_rheader (im, group, acmode)) {
+	    iferr (call fxf_rheader (im, group, fmode)) {
 		call close (IM_HFD(im))
 		call mfree (fit, TY_STRUCT)
 		call sfree (sp)
@@ -336,6 +338,13 @@ begin
 	        FIT_XTENSION(fit) = NO
 	    else
 	        FIT_XTENSION(fit) = YES
+
+	    # Some non-iraf fits files might have keywords that are
+	    # imcompatible with our header. For example if hediting the header,
+	    # make sure that they are eliminated.
+
+	    if (fmode == READ_WRITE)
+	       call fxf_discard_keyw (im)
 
 	    FIT_EOFSIZE(fit) = fstatl (IM_HFD(im), F_FILESIZE) + 1
 
@@ -349,7 +358,7 @@ begin
 		# We need to setup the IMIO descriptor if we need to write
 		# over a section; in particular IM_PFD needs to be defined.
 
-		if (acmode == READ_WRITE)
+		if (fmode == READ_WRITE)
 		    call fxf_plpf (im)
 	    }
 
@@ -443,7 +452,9 @@ begin
 	call salloc (path, SZ_PATHNAME, TY_CHAR)
 
 	# We will use a local temporary imio and fit structures.
-	call calloc (lim, LEN_IMDES+LEN_IMHDR+MIN_LENUSERAREA, TY_STRUCT)
+#	call calloc (lim, LEN_IMDES+LEN_IMHDR+MIN_LENUSERAREA, TY_STRUCT)
+	call calloc (lim, LEN_IMDES+IM_LENHDRMEM(im), TY_STRUCT)
+
 	call fxf_alloc (lfit)
 
 	IM_KDES(lim) = lfit
@@ -468,6 +479,8 @@ begin
 
         call fpathname (IM_HDRFILE(im), Memc[path], SZ_PATHNAME)
 	IM_HFD(lim) = open (Memc[path], READ_ONLY, BINARY_FILE)
+
+	IM_LENHDRMEM(lim) = IM_LENHDRMEM(im)
 
 	# If we want to inherit the global header we need to read
 	# the group specified in the filename.
@@ -660,6 +673,13 @@ begin
 
 	    # Verify that we have the correct file.
 	    if (streq (Memc[hdrfile], rf_fname[1,cindx])) {
+                call mfree (rf_pextv[cindx], TY_INT)
+                call mfree (rf_pextn[cindx], TY_CHAR)
+                call mfree (rf_pixp[cindx], TY_INT)
+                call mfree (rf_hdrp[cindx], TY_INT)
+                call mfree (rf_fit[cindx], TY_STRUCT)
+                call mfree (rf_hdr[cindx], TY_CHAR)
+	        rf_fit[cindx] = NULL
 	        rf_mtime[cindx] = 0      # invalidate cache entry
 	        rf_fname[1,cindx] = EOS
 	        break
@@ -761,6 +781,7 @@ begin
 		    call mfree (rf_hdrp[cindx], TY_INT)
 		    call mfree (rf_fit[cindx], TY_STRUCT)
 		    call mfree (rf_hdr[cindx], TY_CHAR)
+                    rf_fit[cindx] = NULL
 		}
 	    }
 	}

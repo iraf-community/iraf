@@ -16,12 +16,13 @@ define MIN_BUFSIZE     2880
 # fxf_expandh will expand all the headers in the file so they will have at 
 # least 'nlines' blank cards.
 
-procedure fxf_expandh (in_fd, out_fd, nlines, group, hdroff, pixoff)
+procedure fxf_expandh (in_fd, out_fd, nlines, group, nbks, hdroff, pixoff)
 
 int	in_fd		#I input file descriptor
 int	out_fd		#I output file descriptor
 int	nlines		#I minimum number of blank cards
 int	group		#I group that initiated the expansion
+int	nbks		#I numbers of blocks to expand group 'group'
 int	hdroff		#O new offset for beginning of 'group' 
 int	pixoff		#0 new offset for beginning of data
 
@@ -66,8 +67,14 @@ begin
 		poffset, hsize))
 		    break
 	    
-	    # Determine the number of blocks (36 cards) to expand.
+	    # Determine the number of cards to expand. newc is in blocks
+	    # of 36 cards. 0, 36, 72, ...
+
 	    newc = fxf_xaddl (buf, hsize, nlines)
+
+	    # expand the given group at least one block
+	    if (newc == 0 && nbks > 0 && group == gn)
+		newc = nbks * 36
 
 	    # OP points to the top of the last block read, IP to the bottom.
 	    op = buf + hsize - FITS_BLOCK_BYTES

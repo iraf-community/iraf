@@ -1086,13 +1086,27 @@ EXAMPLES
 	... type in a file name
 	 
 	    The task exits.
-.fi
 
-.ih
-TIME REQUIREMENTS
-Cross correlation of two 800 pixel spectra requires approximately 4-5 seconds
-on a SparcStation 1 if both spectra require continuum subtraction.  The
-actual correlation without continuum subtraction requires less than 2 seconds.
+    7. Save the correlation function of two galaxy spectra: 
+
+	rv> fxcor obj temp inter+ ccftype="text"
+	    Screen is cleared and CCF peak with fit displayed
+
+	... type ":wccf" to write the CCF
+	... type in a filename for the text output
+	... quit the task
+
+	rv> rspectext ccf.txt ccf.fits dtype=interp
+	rv> splot ccf.fits
+
+       The velocity per-pixel-shift is non-linear and is an approximation
+       which works well for low-velocity shifts.  In the case of hi-velocity
+       correlations (or when there are many points) it is best to save the
+       CCF as a text file where the velocity at each shift is written to
+       the file,  then use RSPECTEXT to linearize and convert to an image
+       format.  This avoids the task interpolating a saved image CCF in
+       cases where it may not be required.
+.fi
 
 .ih
 SEE ALSO

@@ -1,9 +1,10 @@
 include	<error.h>
 include	<imhdr.h>
+include	<imset.h>
 include	<mach.h>
 include	"starfocus.h"
 
-define	HELP		"starfocus$starfocus.key"
+define	HELP		"nmisc$src/starfocus.key"
 define	PROMPT		"Options"
 
 
@@ -121,6 +122,7 @@ begin
 	SF_LEVEL(sf) = max (0.05, min (0.95, SF_LEVEL(sf)))
 
 	# Accumulate the psf/focus data.
+	key = 'm'
 	mark = NULL
 	nstars = 0
 	nmark = 0
@@ -129,6 +131,8 @@ begin
 	nsfd = 0
 	while (imtgetim (list, Memc[image], SZ_FNAME) != EOF) {
 	    im = immap (Memc[image], READ_ONLY, 0)
+	    call imseti (im, IM_TYBNDRY, TYBNDRY)
+	    call imseti (im, IM_NBNDRYPIX, NBNDRYPIX)
 	    if (streq (Memc[system], "logical")) {
 		mw = NULL
 		ct = NULL
@@ -312,8 +316,10 @@ begin
 			}
 		    }
 				
-		    if (wx < SF_RADIUS(sf) || wx > IM_LEN(im,1)-SF_RADIUS(sf) ||
-		        wy < SF_RADIUS(sf) || wy > IM_LEN(im,2)-SF_RADIUS(sf))
+		    if (wx < SF_RADIUS(sf)-NBNDRYPIX ||
+			wx > IM_LEN(im,1)-SF_RADIUS(sf)+NBNDRYPIX ||
+		        wy < SF_RADIUS(sf)-NBNDRYPIX ||
+			wy > IM_LEN(im,2)-SF_RADIUS(sf)+NBNDRYPIX)
 			next
 		    if (nexp == 1)
 			j = nimages

@@ -5,7 +5,7 @@
 # The following definitions are site dependent. [SITEDEP]
 
 set	iraf	= "/iraf/iraf"
-set	imdir	= "/data0/irafimdirs"
+set	imdir	= "/d0/imdirs"
 set	ttymsg  =\
 "Terminal types: xgterm,xterm,gterm,vt640,vt100,etc."
 

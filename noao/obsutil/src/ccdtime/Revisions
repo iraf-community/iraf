@@ -1,6 +1,21 @@
 .help revisions Jun88 noao.obsutil
 .nf
 
+=======
+V2.12.2
+=======
+
+ccdtime.par
+t_ccdtime.x
+    1.	The minimum seeing is now 0.001.
+    2.  The formating of the seeing was changed in case the seeing is set
+	less than 0.1.
+    (4/24/03, Valdes)
+
+=======
+V2.12.1
+=======
+
 =====
 V2.12
 =====

@@ -1,6 +1,21 @@
 .help revisions Jun88 noao.astutil
 .nf
 
+
+=======
+V2.12.2
+=======
+
+astutil.cl
+t_ccdtime.x     -
+ccdb.x          -
+ccdtime.par     -
+mkpkg
+    CCDTIME was moved to the OBSUTIL package in V2.12.  But the version in
+    ASTUTIL was retained.  The change here was to have the ASTUTIL version
+    point to the OBSUTIL version so that there is only one source,
+    parameter file, and executable.  (4/28/03, Valdes)
+
 =====
 V2.12
 =====

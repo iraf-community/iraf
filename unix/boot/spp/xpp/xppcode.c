@@ -39,7 +39,7 @@
  */
 #define MAX_TASKS	100	/* max no. of tasks we can handle	*/
 #define SZ_OBUF		131072	/* buffers procedure body		*/
-#define SZ_DBUF		4096	/* for errchk, common, ect. decls	*/
+#define SZ_DBUF		8192	/* for errchk, common, ect. decls	*/
 #define SZ_SBUF		8192	/* buffers text of strings		*/
 #define MAX_STRINGS	256	/* max strings in a procedure		*/
 #define MAX_INCLUDE	5	/* maximum nesting of includes		*/
@@ -1582,7 +1582,6 @@ char	delim;
 		    break;
 		} else if (*op == '\n') {
 		    --op;			/* explicit continuation */
-		    linenum[istkptr]++;
 		    continue;
 		} else if ((cp = index (esc_ch, *op)) != NULL) {
 		    *op = esc_val[cp-esc_ch];
@@ -1619,9 +1618,9 @@ char	*errmsg;
 }
 
 
-/* XPP_WARN -- Output a warning message.  Do not set exit flag since this is
- * only a warning message; linking should occur if there are not any more
- * serious errors.
+/* WARN -- Output a warning message.  Do not set exit flag since this is only
+ * a warning message; linking should occur if there are not any more serious
+ * errors.
  */
 xpp_warn (warnmsg)
 char	*warnmsg;

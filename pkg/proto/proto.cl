@@ -24,6 +24,7 @@ task	binfil,
 	rskysub,
 	text2mask = proto$x_proto.e
 
+task	ringavg = proto$ringavg.cl
 
 hidetask	mask2text
 

@@ -594,7 +594,7 @@ begin
 	} else {
 	    call eprintf ("WARNING: Object template %s not found.\n")
 		call pargstr (name)
-	    return
+	    return (NULL)
 	}
 
 	# Create the template structure if a model is defined..

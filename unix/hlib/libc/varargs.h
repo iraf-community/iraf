@@ -24,13 +24,13 @@ typedef char *va_list;
 #ifdef LINUX
 
 #ifdef LINUXPPC
-#include <varargs-linuxppc.h>
+#include "varargs-linuxppc.h"
 #else
 
 /* Linux has one of these but it is self-referential and causes an infinite
  * loop.
  */
-#include <varargs-bsd.h>
+#include "varargs-bsd.h"
 #endif
 
 #else
@@ -38,7 +38,7 @@ typedef char *va_list;
 /* Solaris varargs requires compiler builtins that only work with the Sun
  * C compiler, not GCC, so we need to use a different approach here as well.
  */
-#include <varargs-bsd.h>
+#include "varargs-bsd.h"
 
 #else
 #include "/usr/include/varargs.h"

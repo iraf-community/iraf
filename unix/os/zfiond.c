@@ -9,6 +9,8 @@
 #include <sys/un.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <setjmp.h>
 
 #ifdef LINUX
 #include <sys/time.h>
@@ -32,7 +34,7 @@
  * "filename" and file access mode arguments.  The syntax for the filename
  * argument is as follows:
  *
- *	<domain> : <address> [ : <flag ] [ : flag...]
+ *	<domain> : <address> [ : flag ] [ : flag...]
  *
  * where <domain> is one of "inet" (internet tcp/ip socket), "unix" (unix
  * domain socket) or "fifo" (named pipe).  The form of the address depends
@@ -69,11 +71,15 @@
  * The address field may contain up to two "%d" fields.  If present, the
  * user's UID will be substituted (e.g. "unix:/tmp/.IMT%d").
  *
- * The protocol flags currently supported are "text", "binary", and "nonblock".
- * If "text" is specified the datastream is assumed to consist only of byte
- * packed ascii text and is automatically converted by the driver to and
- * from SPP chars during i/o.  The default is binary i/o (no conversions).
- * The "nonblock" flag is used to specify nonblocking mode.
+ * The protocol flags currently supported are "text", "binary", "nonblock",
+ * and "nodelay".  If "text" is specified the datastream is assumed to
+ * consist only of byte packed ascii text and is automatically converted by
+ * the driver to and from SPP chars during i/o.  The default is binary i/o
+ * (no conversions).  The "nonblock" flag is used to specify nonblocking
+ * mode.  The "nodelay" flag is used to return an error when opening a
+ * "sock" connection in "nonblock" mode and for read when there is no
+ * pending connection or data.
+ *
  *
  * Client connections normally use mode READ_WRITE, although READ_ONLY and
  * WRITE_ONLY are permitted.  APPEND is the same as WRITE_ONLY.  A server
@@ -95,13 +101,22 @@
  * channel).  The server sees an EOF on the input stream when the client
  * disconnects.
  *
- * FIFO domain connection are slightly different.  When the server opens a FIFO
- * connection the open returns immediately.  When the server reads from the
- * input fifo the server will block until some data is written to the fifo by a
- * client.  The server connection will remain open over multiple client
- * connections until it is closed by the server.  This is done to avoid a race
- * condition that could otherwise occur at open time, with both the client and
- * the server blocked waiting for an open on the opposite stream.
+ * The "nodelay" flag will poll for "sock" connections or for a pending
+ * read.  This uses the SELECT call.  If there is no pending connection
+ * then the open call will return an error through FIO.  The application
+ * may trap the error and try again later.  If there is no pending data in a
+ * read then the number of bytes read is set to XERR and FIO will return ERR.
+ * The exception to this is if asynchronous reads are used with AREADB
+ * and AWAITB.  In this case the application will see the number of bytes
+ * read as zero for EOF (client disconnected) and ERR for no data.
+ *
+ * FIFO domain connection are slightly different.  When the server opens a
+ * FIFO connection the open returns immediately.  When the server reads from
+ * the input fifo the server will block until some data is written to the
+ * fifo by a client.  The server connection will remain open over multiple
+ * client connections until it is closed by the server.  This is done to
+ * avoid a race condition that could otherwise occur at open time, with both
+ * the client and the server blocked waiting for an open on the opposite stream.
  */
 
 #define	SZ_NAME		256
@@ -119,6 +134,7 @@
 #define	F_TEXT		00004
 #define	F_DEL1		00010
 #define	F_DEL2		00020
+#define	F_NODELAY	00040
 
 /* Network portal descriptor. */
 struct portal {
@@ -136,8 +152,12 @@ struct portal {
 #define set_desc(fd,np)		zfd[fd].fp = (FILE *)np
 #define	min(a,b)		(((a)<(b))?(a):(b))
 
+static	jmp_buf jmpbuf;
+static	int jmpset = 0;
+static	int recursion = 0;
 extern	int errno;
 static	int getstr();
+static	nd_onsig();
 
 
 /* ZOPNND -- Open a network device.
@@ -277,6 +297,9 @@ XINT	*chan;			/* file number (output) */
 	    if (strcmp (flag, "nonblock") == 0)
 		np->flags |= F_NONBLOCK;
 
+	    /* Check for no delay flag. */
+	    if (strcmp (flag, "nodelay") == 0)
+		np->flags |= F_NODELAY;
 	}
 
 	/* Open the network connection.
@@ -322,8 +345,8 @@ XINT	*chan;			/* file number (output) */
 		    sizeof(host_addr));
 
 		/* Connect to server. */
-		if (fd >= MAXOFILES || connect (fd,
-			(struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
+		if (fd >= MAXOFILES || (connect (fd,
+			(struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0)) {
 		    close (fd);
 		    fd = ERR;
 		} else {
@@ -346,8 +369,8 @@ XINT	*chan;			/* file number (output) */
 		    np->path1, sizeof(sockaddr.sun_path));
 
 		/* Connect to server. */
-		if (fd >= MAXOFILES || connect (fd,
-			(struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
+		if (fd >= MAXOFILES || (connect (fd,
+			(struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0)) {
 		    close (fd);
 		    fd = ERR;
 		} else {
@@ -481,11 +504,31 @@ XINT	*chan;			/* file number (output) */
 		/* Open (accept) a client connection on a server socket. */
 		int s = s_np->channel;
 
-		if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0)
-		    goto err;
+                if (s_np->flags & F_NODELAY) {
+		    struct timeval timeout;
+#ifdef POSIX
+		    fd_set readfds;
+                    FD_ZERO (&readfds);
+                    FD_SET (s, &readfds);
+#else
+		    int readfds = (1 << s);
+#endif
+                    timeout.tv_sec = 0;
+                    timeout.tv_usec = 0;
+                    if (select (MAXSEL, &readfds, NULL, NULL, &timeout)) {
+                        if ((fd = accept (s, (struct sockaddr *)0, (int *)0))<0)
+                            goto err;
+	            } else {
+			goto err;
+	            }
+		} else {
+		    if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0)
+		        goto err;
+		}
 
 		np->datain = fd;
 		np->dataout = fd;
+		np->flags = s_np->flags;
 
 	    } else if (np->domain == FIFO) {
 		/* Server side FIFO connection. */
@@ -626,6 +669,14 @@ XLONG	*offset;		/* 1-indexed file offset to read at */
 	register char *ip;
 	register XCHAR *op;
 	int nbytes, maxread;
+	struct timeval timeout;
+#ifdef POSIX
+	fd_set readfds;
+	FD_ZERO (&readfds);
+	FD_SET (np->datain, &readfds);
+#else
+	int readfds;
+#endif
 
 	/* Determine maximum amount of data to be read. */
 	maxread = (np->flags & F_TEXT) ? *maxbytes/sizeof(XCHAR) : *maxbytes;
@@ -636,20 +687,29 @@ XLONG	*offset;		/* 1-indexed file offset to read at */
 	 * end writes any data.  This happens even though fcntl is called to
 	 * restore blocking i/o after the open.
 	 */
-	if (np->domain == FIFO && np->datain < MAXSEL) {
 #ifdef POSIX
-	    fd_set readfds;
-	    FD_ZERO (&readfds);
-	    FD_SET (np->datain, &readfds);
+	FD_ZERO (&readfds);
+	FD_SET (np->datain, &readfds);
 #else
-	    int readfds = (1 << np->datain);
+	readfds = (1 << np->datain);
 #endif
-	    select (MAXSEL, &readfds, NULL, NULL, NULL);
-	    nbytes = read (np->datain, (char *)buf, maxread);
-	} else
-	    nbytes = read (np->datain, (char *)buf, maxread);
+        if ((np->flags & F_NODELAY) && np->datain < MAXSEL) {
+	     timeout.tv_sec = 0;
+	     timeout.tv_usec = 0;
+	     if (select (MAXSEL, &readfds, NULL, NULL, &timeout))
+	         nbytes = read (np->datain, (char *)buf, maxread);
+	     else
+		 nbytes = XERR;
+	 } else {
+	    if (np->domain == FIFO && np->datain < MAXSEL) {
+	        select (MAXSEL, &readfds, NULL, NULL, NULL);
+	        nbytes = read (np->datain, (char *)buf, maxread);
+	    } else {
+	        nbytes = read (np->datain, (char *)buf, maxread);
+	    }
+	}
 
-	if ((n = nbytes) && (np->flags & F_TEXT)) {
+	if ((n = nbytes) > 0 && (np->flags & F_TEXT)) {
 	    op = (XCHAR *) buf;
 	    op[n] = XEOS;
 	    for (ip = (char *)buf;  --n >= 0;  )
@@ -677,6 +737,13 @@ XLONG	*offset;		/* 1-indexed file offset */
 	int nwritten, maxbytes, n;
 	char *text, *ip = (char *)buf;
 	char obuf[SZ_OBUF];
+	SIGFUNC sigpipe;
+
+
+	/* Enable a signal mask to catch SIGPIPE when the server has died. 
+	 */
+	sigpipe = (SIGFUNC) signal (SIGPIPE, (SIGFUNC)nd_onsig);
+	recursion = 0;
 
 	maxbytes = (np->domain == FIFO || (np->flags & F_TEXT)) ? SZ_OBUF : 0;
 	for (nwritten=0;  nwritten < *nbytes;  nwritten += n, ip+=n) {
@@ -687,23 +754,58 @@ XLONG	*offset;		/* 1-indexed file offset */
 	    if (np->flags & F_TEXT) {
 		register XCHAR *ipp = (XCHAR *)ip;
 		register char *op = (char *)obuf;
-		register int nbytes = n;
+		register int nbytes = n / sizeof(XCHAR);
 
 		while (--nbytes >= 0)
 		    *op++ = *ipp++;
 		text = obuf;
-		if ((n = write (np->dataout, text, n / sizeof(XCHAR))) < 0)
+
+		jmpset++;
+		if (setjmp (jmpbuf) == 0) {
+		    if ((n = write(np->dataout, text, n / sizeof(XCHAR))) < 0) {
+		        nwritten = ERR;
+		        break;
+	            }
+		} else {
+		    nwritten = ERR;
 		    break;
+	        }
+
 		n *= sizeof(XCHAR);
 
 	    } else {
 		text = ip;
-		if ((n = write (np->dataout, text, n)) < 0)
+		if ((n = write (np->dataout, text, n)) < 0) {
+		    nwritten = ERR;
 		    break;
+	        }
 	    }
 	}
 
+	/* Restore the signal mask. */
+	jmpset = 0;
+	signal (SIGPIPE, sigpipe);
+
 	kfp->nbytes = nwritten;
+}
+
+
+/* ND_ONSIG -- Catch a signal.
+ *  */
+static
+nd_onsig (sig, arg1, arg2)
+int     sig;                    /* signal which was trapped     */
+int     *arg1;                  /* not used */
+int     *arg2;                  /* not used */
+{
+        /* If we get a SIGPIPE writing to a server the server has probably
+         * died.  Make it look like there was an i/o error on the channel.
+         */
+        if (sig == SIGPIPE && recursion++ == 0)
+            ;
+
+        if (jmpset)
+            longjmp (jmpbuf, sig);
 }
 
 

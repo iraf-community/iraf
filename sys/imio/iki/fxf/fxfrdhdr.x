@@ -72,7 +72,7 @@ begin
 	lzero =  fxf_fpl_equald (0.0d0, FIT_BZERO(fit), 1)
 
 	# Determine if scaling is necessary.
-	bfloat = !(lscale && lzero)
+	bfloat = (!lscale || !lzero)
 
 	FIT_PIXTYPE(fit) = NULL
 	FIT_ZCNV(fit) = NO

@@ -13,3 +13,6 @@
        bitcount - Accumulate the bit statistics for a list of images
        findgain - Estimate the gain and readnoise of a CCD 
         shutcor - Shutter correction from images of varying exposure times
+
+-- Miscellaneous
+       cgiparse - Parse STRING_QUERY environment variable into task parameters

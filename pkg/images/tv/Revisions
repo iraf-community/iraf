@@ -1,5 +1,44 @@
 .help revisions Jun88 images.tv
+.help revisions Nov93 nmisc
 .nf
+
+=======
+V2.12.2
+=======
+
+pkg/images/tv/display/t_display.x
+    The image may be specified as a template provided it match only one
+    image.  (9/11/03, Valdes)
+
+pkg/images/tv/imexamine/stfmeasure.x
+    The selection of a point to get a first estimation of the FWHM in
+    stf_fit did not check for the case of a zero value.  This could cause
+    a floating divide by zero.  (5/5/03, Valdes)
+
+pkg/images/tv/imexamine/stfmeasure.x
+    The subpixel evaluation involves fitting an image interpolator to a
+    subraster.  To avoid attempting to evaluate a point outside the center
+    of the edge pixels, which is a requirement of the image interpolators,
+    the interpolator is fit to the full data raster and the evaluations
+    exclude the boundary pixels.  (5/5/03, Valdes)
+
+pkg/images/tv/imexamine/iegnfr.x
+    The test for the number of frames needed to check imd_wcsver to avoid
+    trying to use more than four frames with DS9.  (1/24/03, Valdes)
+
+pkg/images/tv/imexamine/t_imexam.x
+    Added some missing braces so that if a display is not used it doesn't
+    check for the number of frames to use.  This is only cosmetic at this
+    time.  (1/24/03, Valdes)
+
+=======
+V2.12.1
+=======
+
+pkg/images/tv/doc/display.hlp
+    Clarified what "non-zero" means in the context of masks and images
+    used as masks.  (7/29/02, Valdes)
+
 pkg/images/tv/display/t_display.x
     Removed an unused extern declaration for ds_errfcn() which was causing
     a link failure on the alpha (6/12/02, MJF)

@@ -118,6 +118,8 @@ begin
 		# Decode the image and sky strings.
 	        call strcpy (Memc[title], STD_TITLE(std), SZ_STDTITLE)
 		i = stridxs ("]", Memc[image])
+		if (Memc[image+i] == ']')
+		    i = i + 1
 		Memc[image+i-1] = EOS
 	        call strcpy (Memc[image+1], STD_IMAGE(std), SZ_STDIMAGE)
 		if (Memc[image+i] == '-') {

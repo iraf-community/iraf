@@ -548,7 +548,8 @@ char	rangstr[ARB]		#I the input range specification string
 
 pointer	sp, ranges
 int	i, lastix, nvals
-int	me_decode_ranges(), me_is_in_range()
+int	me_decode_ranges()
+bool	me_is_in_range()
 
 begin
 	# Allocate space for storing the ranges.
@@ -569,7 +570,7 @@ begin
 	do i = 1, npts {
 	    if (ix[i] == lastix) {
 		stat[i] = YES
-	    } else if (me_is_in_range (Memi[ranges], ix[i]) == YES) {
+	    } else if (me_is_in_range (Memi[ranges], ix[i])) {
 		lastix = ix[i]
 		stat[i] = YES
 	    }

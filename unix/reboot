@@ -18,7 +18,7 @@ echo "mach     = $MACH"
 echo "HSI_CF   = $HSI_CF"
 echo "HSI_LIBS = $HSI_LIBS"
 
-if ("`echo $HSI_LIBS | grep NOVOS`" != "") then
+if ("`echo $HSI_CF | grep NOVOS`" != "") then
     echo "HSI is being built NOVOS, should be rebuilt once VOS is compiled"
 endif
 

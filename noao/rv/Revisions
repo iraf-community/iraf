@@ -1,5 +1,35 @@
 .help revisions May92 noao.rv
 .nf
+=======
+V2.12.2
+=======
+
+doc/fxcor.hlp
+	Added an example about saving the CCF which explains how to
+	save a linearized CCF for large spectra.  Also removed the
+	obsolete 'time requirements' section.  (9/15/03)
+
+wrtccf.x
+	Fixed a bug in the text CCF output so it writes the velocity
+	computed specifically for each point rather than the approximation
+	as done before.  (9/15/03)
+
+wrtccf.x
+	Added CTYPE1='velocity' and CUNIT1='km/s' keywords to the CCF
+	output image so it will display in velocity units (8/19/03)
+
+rvrebin.x
+	In very rare cases the code could overrun a stack array and 
+	cause a segvio.  This array wasn't actually being used in the
+	routine and so the code was removed (8/15/03)
+
+rvidlines/idvhelio.x
+	The previous change would trash the year, month, and day when
+	parsing the UT.  This is fixed.  (2/6/03, Valdes)
+
+=======
+V2.12.1
+=======
 =====
 V2.12
 =====

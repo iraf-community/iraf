@@ -12,7 +12,6 @@ int procedure force_rebin (rv)
 
 pointer	rv					#I RV struct pointer
 
-pointer sp, dy
 int     npts, dcflag, which, status
 int	force_which(), rv_getim()
 real    w0, wpc, w2
@@ -28,20 +27,13 @@ begin
 	if (force_which (rv, which, w0, wpc, npts) == NO)
 	    return (OK)
 
-	call smark (sp)
-	call salloc (dy, npts, TY_REAL)
-	#call salloc (tmp, SZ_LINE, TY_CHAR)
-
 	# Move the data before rebinning and increase the size of the data cache
-	call amovkr (0.0, Memr[dy], npts)
 	if (which == OBJECT_SPECTRUM) {
-	    call amovr (OBJPIXY(rv,1), Memr[dy], RV_NPTS(rv))
 	    call realloc (RV_OPIXX(rv), npts, TY_REAL)
 	    call realloc (RV_OPIXY(rv), npts, TY_REAL)
 	    call aclrr (OBJPIXX(rv,1), npts)
 	    call aclrr (OBJPIXY(rv,1), npts)
 	} else {
-	    call amovr (REFPIXY(rv,1), Memr[dy], RV_RNPTS(rv))
 	    call realloc (RV_RPIXX(rv), npts, TY_REAL)
 	    call realloc (RV_RPIXY(rv), npts, TY_REAL)
 	    call aclrr (REFPIXX(rv,1), npts)
@@ -81,7 +73,6 @@ begin
 	RV_GLOB_W1(rv) = min (RV_OW0(rv), RV_RW0(rv))
 	RV_GLOB_W2(rv) = max (RV_OW2(rv), RV_RW2(rv))
 
-	call sfree (sp)
 	return (OK)
 end
 

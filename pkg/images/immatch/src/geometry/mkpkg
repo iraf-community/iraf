@@ -30,4 +30,5 @@ libpkg.a:
         t_geotran.x     <imhdr.h> <mwset.h> <math.h> <math/gsurfit.h> \
                         geotran.h
 	t_geoxytran.x	<fset.h> <ctype.h>
+	trinvert.x
 	;

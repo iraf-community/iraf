@@ -39,7 +39,7 @@
 
 /* ZLOCVA style pointer to address conversions.
  */
-#define	ADDR_TO_LOC(addr)	(((long)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
+#define	ADDR_TO_LOC(addr)	(((int)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
 #define	LOC_TO_ADDR(loc,type)	((type *)((XCHAR *)((loc)<<(sizeof(XCHAR)-1))))
 
 /* Kernel file descriptor for accessing UNIX files.  A static array ZFD of
@@ -71,12 +71,6 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define RAWON		"\033+rAw"	/* turn raw mode on		*/
 #define	LEN_SETREDRAW	6		/* nchars in setredraw string	*/
 #define SETREDRAW	"\033=rDw"	/* set/enable screenredraw code	*/
-
-#define STDIO_FILES {                   /* initialization of stdio      */\
-        stdin,  0L, 0L, 0, 0, KF_NOSEEK, NULL,\
-        stdout, 0L, 0L, 0, 0, KF_NOSEEK, NULL,\
-        stderr, 0L, 0L, 0, 0, KF_NOSEEK, NULL\
-}
 
 #ifdef AUX
 #define SIGFUNC sigfunc_t

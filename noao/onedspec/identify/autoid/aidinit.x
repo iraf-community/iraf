@@ -30,6 +30,7 @@ begin
 	call clgpseta (pp, "reflist", AID_REFLIST(aid), AID_SZLINE) 
 	call clgpseta (pp, "refspec", AID_REFSPEC(aid), AID_SZLINE) 
 	call clgpseta (pp, "crpix", AID_CP(aid), AID_SZLINE) 
+	call clgpseta (pp, "crquad", AID_CQ(aid), AID_SZLINE) 
 	call clgpseta (pp, "cddir", AID_DEBUG(aid,1), AID_SZLINE) 
 	AID_CDDIR(aid) = strdic (AID_DEBUG(aid,1), AID_DEBUG(aid,1),
 	    AID_SZLINE, CDDIR)
@@ -39,6 +40,7 @@ begin
 	#AID_NRMAX(aid) = clgpseti (pp, "nreference")
 	AID_NRMAX(aid) = 2 * AID_NTMAX(aid)
 	AID_ORD(aid) = clgpseti (pp, "aidord")
+	AID_MAXNL(aid) = clgpsetd (pp, "maxnl")
 	AID_NB(aid) = clgpseti (pp, "nbins")
 	AID_NN(aid) = clgpseti (pp, "nneighbors")
 	AID_NP(aid) = clgpseti (pp, "npattern")

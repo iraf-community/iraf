@@ -45,7 +45,7 @@ pointer	sp, str, work, wt, xplot, yplot, eplot, fplot, data, sky, data1
 
 real	apgetr(), apgimr(), cveval()
 bool	apgetb()
-errchk	apgimr, asifit
+errchk	apgimr, ap_asifit
 
 begin
 	# Get task parameters.
@@ -116,15 +116,17 @@ begin
 	    ix1 = nint (x1)
 	    ix2 = nint (x2)
 
-	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
+	    call ap_asifit (dbuf+(iy+ys-1-l1)*nc, nc, xs[iy]-c1+1,
+		low+shift, high+shift, data, asi)
+#	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
 	    if (sbuf != NULL) {
 		sky = sbuf + (iy - 1) * nx - 1
 		var0 = rdnoise + Memr[svar+iy-1]
 	    }
 
 	    # Set pixel weights for summing.
-	    if (asi != NULL)
-		call asifit (asi, Memr[data], nc)
+#	    if (asi != NULL)
+#		call asifit (asi, Memr[data], nc-xs[iy]+c1)
 	    call ap_edge (asi, x1+1, x2+1, wt1, wt2)
 
 	    # First estimate spectrum by summing across the aperture.

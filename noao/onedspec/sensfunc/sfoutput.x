@@ -13,12 +13,11 @@ pointer	cv			# Sensitivity function curve
 char	output[SZ_FNAME]	# Output root image name (must be SZ_FNAME)
 bool	ignoreaps		# Ignore apertures?
 
-int	i, ap, nw, axis[2], scan(), nscan()
+int	i, ap, nw, scan(), nscan()
 real	w1, w2, dw, dw1, aplow[2], aphigh[2], cveval()
 pointer	sp, fname, std, im, mw, buf, immap(), mw_open(), impl1r()
 errchk	imaddi, imaddr
 
-data	axis/1,2/
 define	makeim_	99
 
 begin

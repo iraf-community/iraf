@@ -215,6 +215,11 @@ begin
 	    # there put it in a spool file. At the end, the spool file size is
 	    # the output extension header size to be use in fitupdhdr.
 
+	    # Check if the file is still in cache. We need CACHELEN and
+            # CACHEHDR. 
+
+            call fxf_not_incache (im)
+
 	    op = IM_USERAREA(im)
 	    ualen = strlen (Memc[op])
 	    ulines = ualen / LEN_UACARD
@@ -684,3 +689,54 @@ begin
 	    IM_NDIM(im) = ndim
 	}
 end
+
+        
+# FXF_NOT_INCACHE -- Procedure to find whether the file is in the
+# cache. It could happen that the slot with the entry might have been
+# freed to make room for another file. We want to have valid pointers
+# for FIT_CACHEHDR and FIT_CACHELEN since the calling routine will use them.
+
+procedure fxf_not_incache (im)
+
+pointer im                      #I image descriptor
+
+int     cindx, group, sfit[4]
+pointer sp, hdrfile, fit
+bool    streq()
+
+include "fxfcache.com"
+
+begin
+        call smark (sp)
+        call salloc (hdrfile, SZ_PATHNAME, TY_CHAR) 
+
+        call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
+        fit = IM_KDES(im)
+
+        do cindx=1, rf_cachesize {
+            if (rf_fit[cindx] == NULL)
+                next
+
+            if (streq (Memc[hdrfile], rf_fname[1,cindx])) {
+                call sfree (sp)
+                return      
+            }
+        }
+        sfit[1]= FIT_NAXIS(fit)
+        sfit[2] = FIT_INHERIT(fit)
+        sfit[3] = FIT_PLMAXLEN(fit)
+        sfit[4] = IM_CTIME(im)  
+
+        group = max (0, FIT_GROUP(fit))
+
+        call fxf_prhdr(im,group)
+
+        FIT_NAXIS(fit) = sfit[1]
+        FIT_INHERIT(fit) = sfit[2]
+        FIT_PLMAXLEN(fit) = sfit[3]
+        IM_CTIME(im) = sfit[4]
+
+        call sfree (sp)
+        return
+end
+

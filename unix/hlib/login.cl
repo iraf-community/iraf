@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.12.1 July 2002"
+    logver = "IRAF V2.12.2 January 2004"
 
 set	home		= "U_HOME"
 set	imdir		= "U_IMDIR"
@@ -35,7 +35,7 @@ if (envget("TERM") == "xterm") {
 #set	imextn		= "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
 
 
-# IMTOOL/XIMAGE stuff.  Set node to the name of your workstation to
+# XIMTOOL/DISPLAY stuff.  Set node to the name of your workstation to
 # enable remote image display.  The trailing "!" is required.
 #set	node		= "my_workstation!"
 
@@ -43,6 +43,11 @@ if (envget("TERM") == "xterm") {
 #ehinit   = "nostandout eol noverify"
 #epinit   = "standout showall"
 showtype = yes
+
+# Load the default CL package.  Doing so here allows us to override package
+# paths and load personalized packages from our loginuser.cl. 
+clpackage
+
 
 # Default USER package; extend or modify as you wish.  Note that this can
 # be used to call FORTRAN programs from IRAF.
@@ -53,7 +58,7 @@ task	$adb $bc $cal $cat $comm $cp $csh $date $dbx $df $diff	= "$foreign"
 task	$du $find $finger $ftp $grep $lpq $lprm $ls $mail $make	= "$foreign"
 task	$man $mon $mv $nm $od $ps $rcp $rlogin $rsh $ruptime	= "$foreign"
 task	$rwho $sh $spell $sps $strings $su $telnet $tip $top	= "$foreign"
-task	$touch $vi $emacs $w $wc $less $rusers $sync $pwd $gdb	= "$foreign"
+task	$vi $emacs $w $wc $less $rusers $sync $pwd $gdb		= "$foreign"
 
 task	$xc $mkpkg $generic $rtar $wtar $buglog			= "$foreign"
 #task	$fc = "$xc -h $* -limfort -lsys -lvops -los"
@@ -69,7 +74,8 @@ if (access ("home$loginuser.cl"))
     cl < "home$loginuser.cl"
 ;
 
-keep;   clpackage
+keep
+
 
 prcache directory
 cache   directory page type help

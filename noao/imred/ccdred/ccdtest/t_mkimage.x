@@ -42,8 +42,6 @@ real	clgetr()
 long	clgetl()
 pointer	immap()
 
-int	pixtype[2]
-data	pixtype/TY_SHORT,TY_REAL/
 data	seed/1/
 
 begin

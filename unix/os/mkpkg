@@ -66,6 +66,7 @@ libos.a:
 	zfprot.c	<libc/kernel.h> <libc/spp.h>
 	zfrnam.c	<libc/kernel.h> <libc/spp.h>
 	zfsubd.c	<libc/kernel.h> <libc/spp.h>
+	zfutim.c        <libc/kernel.h> <libc/spp.h>
 	zfxdir.c	<libc/kernel.h> <libc/spp.h>
 	zgcmdl.c	<libc/kernel.h> <libc/spp.h>
 	zghost.c	<libc/kernel.h> <libc/spp.h>

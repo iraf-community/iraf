@@ -1,5 +1,17 @@
 .help revisions Jun88 noao.imred.echelle
 .nf
+=======
+V2.12.2
+=======
+
+imred$echelle/doc/ecidentify.hlp
+    Fixed some minor typos in the function description section.
+    (8/26/03, Valdes)
+
+=======
+V2.12.1
+=======
+
 =====
 V2.12
 =====

@@ -6976,3 +6976,572 @@ BUG:	The QUADPROC task, which is essentially the same as the
 	contact iraf support (iraf@noao.edu) for instructions.
 
 STATUS:	Fixed for the next release.
+
+NUMBER:	502
+MODULE:	pl files and fixpix, imreplace, and others
+SYSTEM:	V2.12
+DATE:	Mon Jul 22 08:42:45 MST 2002
+FROM:	valdes
+
+BUG:	Between IRAF versions 2.11 and 2.12 there was a change in the
+	structure of pixel list (pl) files to allow for larger images.  The
+	change was made so that old format pl files can be read.  However,
+	updating of old format files is not supported.  This means some
+	tasks that truly work in-place, such as IMREPLACE, will fail.
+	(Tasks that replace the input file by their result using a
+	temporary intermediate file, which are more common, are not truly
+	in-place operations and so do not have this problem.)  It is a bug
+	that in-place update operations will result in the file being
+	deleted.  Some tasks don't actually write out a pl file but
+	internally modify it.  The task FIXPIX is in this class.  This will
+	result in the same type of error.  Typically the error is "Cannot
+	update image header".  The workaround is to use IMCOPY to create a
+	new version of the pl files when starting with V2.11 or early files
+	but working with V2.12.
+
+STATUS:	There is currently no plan to support pl update operations on
+	the older pl format.
+
+NUMBER:	503
+MODULE:	ccdred: mkfringe, mkillumcor, mkillumflat, mkskycor, mkskyflat
+SYSTEM:	V2.11.2 - V2.12.1
+DATE:	Wed Jul 31 11:47:49 MST 2002
+FROM:	valdes
+
+BUG:	In V2.11.2 the CCDPROC task added an "output" parameter.  Because
+	the tasks listed above have the option to call CCDPROC to do
+	preprocessing and also have a parameter "output" there can be
+	confusion about the output parameter.  If the task output
+	parameter is given explicitly on the command line; i.e.
+
+	    cc> mkillumcor in out
+
+	Then the correct output is produced.  However, if the task
+	is excuted in hidden mode (such as with a :go from EPAR) or
+	without the output on the command line where one expects a
+	query, then the CCDPROC.OUTPUT parameter is used instead which
+	can lead to either the input being replaced by the output or
+	whatever is set in that parameter being used.
+
+	The workarounds are 1) put the output name explicitly on the
+	command line or 2) set the desired output name in the CCDPROC
+	parameters.
+
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	504
+MODULE:	nproto.objmasks
+SYSTEM:	V2.12-V2.12.1
+DATE:	Tue Aug  6 16:03:28 MST 2002
+FROM:	valdes
+
+BUG:	This task may abort with a floating divide error.  This is caused
+	by the first pass estimate of the background sigma using a
+	planar fit.  The can produce zero or negative sigma values.
+	The workaround is to set the "fitxorder" and "fityorder"
+	parameters to 1 in the hidden parameters set objmasks1;
+	i.e. epar objmasks1.
+
+STATUS:	In the next release the initial sky will still be fit by a surface of
+	some specified order but the initial sigma will be purely a
+	constant.
+
+NUMBER:	505
+MODULE:	data.export
+SYSTEM:	V2.11 - V2.12.1
+DATE:	Fri Aug  9 15:03:10 MST 2002
+FROM:	fitz
+
+BUG:	The task was failing to write a PPM file properly when the input
+	image contained an odd number of columns, resulting in a corrupted
+	image.
+
+STATUS:	PPM files interleave the pixels, but when there are an odd number of
+	columns in the image the resulting line contains an odd number of
+	bytes/line.  IRAF file I/O cannot properly write data and the task
+	was not structured to buffer lines for a case such as this.  The
+	task will now truncate the last column of the input image so the
+	output will contain an even number of bytes.  The workaround is
+	simply to copy out a new image with an even number of columns before
+	running the task.
+
+	Fixed for future releases or contact site support for a code change.
+
+NUMBER:	506
+MODULE:	imalign
+SYSTEM:	-V2.12.1
+DATE:	Mon Aug 19 11:36:28 MST 2002
+FROM:	valdes
+
+BUG:	The error "parameter `    7' not found" may occur, where the number
+	may vary.  This is caused by a corruption of the centroiding
+	information by the warning messages.  The workaround requires
+	making a private copy of the script with a small change:
+
+	cl> immatch			    	# load package
+	im> copy immatch$imalign.* home$    	# copy to home directory
+	im> edit home$imalign.cl	  	# edit private copy
+	  Change: verbose=verbose, >& tmpfile)
+	  To:     verbose=verbose, > tmpfile)
+        im> redefine imalign=home$imalign.cl    # redefine imalign
+
+	The warnings, which can be ignored, will now appear on the terminal.
+	Contact iraf@noao.edu for more information.
+
+STATUS:	The problem is fixed in the next release.
+
+NUMBER:	507
+MODULE:	imreplace
+SYSTEM:	-V2.12.1
+DATE:	Wed Sep  4 09:52:48 MST 2002
+FROM:	valdes
+
+BUG:	When using IMREPLACE with integer images and with a grow radius,
+	the specified lower limit is not properly adjusted to include the
+	lower limit if given as an integer.  With radius=0 a different
+	subroutine is used and so it works correctly.  The workarounds are
+	to use a fractional lower limit; i.e. 0.5 to include values of 1 or
+	to convert to real images.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	508
+MODULE:	imshift
+SYSTEM:	-V2.12.1
+DATE:	Thu Sep 12 17:05:20 MST 2002
+FROM:	valdes
+
+BUG:	Using a shift smaller than the precision of a real value
+	(~10^-6) causes the image output to actually have a shift of 1
+	pixel except at the edges.  This is caused by the fact that while
+	the shift is seen as non-zero, one plus the shift is not
+	seen as different from 1.  There is no workaround other than
+	avoiding using very small shifts.  Note that using such small
+	shifts is computationally not significant.
+
+STATUS:	Fixed in the next release by doing computations in double
+	precisions when appropriate.
+
+NUMBER:	509
+MODULE:	APPHOT: CENTER, FITPSF, FITSKY, PHOT, QPHOT, POLYPHOT, RADPROF, WPHOT
+SYSTEM:	V2.12.1 and earlier
+DATE:	Tue Oct  1 11:28:22 MST 2002
+FROM:	fitz, valdes
+
+BUG:	The handling of the "default" parameter value for coordinate lists
+    	failed when the input list had more than one image, resulting in
+	either an "Illegal file descriptor (bad fd or file not open)" 
+	message or the task silently re-using the coordinate list from the
+	first image.  The workaround is to explicitly specify the coordinate
+	file list using a template, for example
+
+		cl> phot *.fits coords="*.coo.1"
+
+
+STATUS:	Fixed for the next release.  Contact site support for a patched
+	binary or code changes.  Note that all tasks in this package which
+	allow this value are affected and have been modified.
+
+NUMBER:	510
+MODULE:	mscred.ccdproc
+SYSTEM:	-V4.7: June 14, 2002
+DATE:	Wed Oct 23 14:56:41 MST 2002
+FROM:	valdes
+
+BUG:	The syntax for the "bleed" parameter of the form
+	saturation-<constant> or saturation/<constant> is not recognized.
+	This is due to a bug in parsing the string.  There is no workaround
+	other than to use an explicit value, mean+<constant>, or
+	mean*<constant>.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	511
+MODULE:	crutil.craverage
+SYSTEM:	-V2.12.1
+DATE:	Wed Oct 23 15:49:21 MST 2002
+FROM:	valdes
+
+BUG:	If a new output mask is specified, as opposed to updating an existing
+	mask, then the grow option will fail to grow the detected pixels.
+	The workaround is to do the growing in a separate call to CRGROW.
+
+STATUS:	This is revised for the next release.
+
+NUMBER:	512
+MODULE:	imcombine, mscred.combine (and related combine scripts)
+SYSTEM:	V2.12, MSCRED V4.7
+DATE:	Fri Oct 25 09:50:21 MST 2002
+FROM:	valdes
+
+BUG:	The log output from the combining when using masks will incorrectly
+	show all the images using the same mask (the one for the last image).
+	This is an error in the output formating and the correct masks will
+	actually be used.  There is no workaround other than to ignore
+	the incorrect output.
+
+STATUS:	This is fixed in V2.12.1 and will be fixed in the next release
+	of MSCRED.
+
+NUMBER:	513
+MODULE:	icfit (apextract, curfit, ...)
+SYSTEM:	V2.12-V2.12.1
+DATE:	Mon Nov 18 16:11:42 MST 2002
+FROM:	valdes
+
+BUG:	When a single fitting (sample) region is defined and binning is used
+	(|naverage| > 1) such that only a single binned fitting point
+	results, then incorrect results or a segmentation error may occur.
+
+	A case where this occurs is in apall/apsum when a single background
+	region is defined and a large binning value is set to use the
+	median or average of the background sample regions.  An inobvious
+	situation resulting in this is when there are actually two
+	background regions on either side of an aperture which are defined
+	relative to the aperture.  If the aperture is defined or moves too
+	close to the edge of the image such that one of the background
+	regions goes entirely off the image, then this error can be
+	triggered.
+
+	This problem behavior was introduced in V2.12 when the stability of
+	the fit was improved by only fitting only over the range of the data
+	selected in by the sample region(s) rather than over the entire
+	data set.
+
+	The only workaround is to avoid this case.  For apall/apsum one
+	needs to check for a background region going off the edge or be
+	sure to use |naverage| smaller than the width of the background
+	regions to insure at least two fitting points.
+
+STATUS:	The case of a single fitting point in binned data will be handled
+	properly in the next release.
+
+NUMBER:	514
+MODULE:	sensfunc
+SYSTEM:	All
+DATE:	Fri Nov 22 11:56:05 MST 2002
+FROM:	valdes
+
+BUG:	This report is not actually a bug but a guide as to the source of
+	the error "no degrees of freedom" from the task SENSFUNC.  If the
+	standard star file used with the task STANDARD has the standard
+	values in flux units instead of magnitudes there will be no
+	apparent error from that task.  But the file produced will have
+	zero or very small numbers for the points to be fit by SENSFUNC.
+	Using this file with SENSFUNC produces the error "no degrees of
+	freedom".  So if you see this error and it is not solved by using
+	lower fitting orders then it is probably the values in the file
+	produced by STANDARD were generated from an incorrect standard data
+	file given in flux.
+
+	Why this has come up is that if you retrieve standard star data
+	from the ESO web pages be sure to get ones given in magnitudes
+	and not in flux.
+
+STATUS:	No change is contemplated at this time.
+
+NUMBER:	515
+MODULE:	ahedit/awcspars
+SYSTEM:	-V2.12.1
+DATE:	Tue Dec  3 09:27:02 MST 2002
+FROM:	valdes
+
+BUG:	The parameter awcspars.wraunits used by the task ahedit may take
+	the values "", "degrees", "radians", and "hours".  However, the
+	value "hours" is incorrectly interpreted as "degrees".  So to
+	specify that the reference ra/longitude coordinate is in hours use
+	the value "" which defaults to hours.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	516
+MODULE:	xdimsum.xmosaic
+SYSTEM:	- August 8, 2002
+DATE:	Fri Jan 24 15:41:15 MST 2003
+FROM:	valdes
+
+BUG:	When defining the shifts interactively IMEXAMINE is used in a mode
+	where it determines the maximum number of frames available in the
+	display server (XIMTOOL, DS9, SAOimage, etc).  However, this was
+	not working correctly and it would attempt to use frames which are
+	not available with DS9 (currently up to V2.2) and servers other
+	than XIMTOOL.  There is no workaround other than to update the
+	software. (After installing the new version be sure to
+	reset the parameters for xdshifts; "unlearn xdshifts").
+
+STATUS:	The script XDSHIFTS was modified in XDIMSUM version January 24, 2003
+	to allow control of the maximum number of frames with a default
+	value suitable for all display servers.
+
+NUMBER:	517
+MODULE:	rv.rvidlines
+SYSTEM:	V2.12-V2.12.1
+DATE:	Thu Feb  6 15:01:26 MST 2003
+FROM:	valdes
+
+BUG:	The task first parses the date keyword given in KEYWPARS which
+	sets the year, month, day, and optionally the UT.  But then
+	it parses the UT keyword given in KEYWPARS in the same way
+	as for the date.  If this keyword is not in YYYY-MM-DDTHH:MM:SS.S
+	format then the year, month, and day are clobbered the program
+	crashes.  So in this version there is no substitue to using
+	this format for the date and setting the UT keyword to
+	be the same as the date keyword.
+
+STATUS:	Fixed in the next release.
+
+NUMBER:	518
+MODULE:	guiapps.spectool
+SYSTEM:	V1.1: December 2000
+DATE:	Mon Feb 17 10:17:03 MST 2003
+FROM:	valdes
+
+BUG:	The Voigt profile fitting will crash with a segmentation error
+	(or possibly just produce a bad fit).  This is a programming error
+	where a subroutine return argument was mistyped.  There is no
+	workaround other than updating.
+
+STATUS:	Fixed in next release of the GUIAPPS package.
+
+NUMBER:	519
+MODULE:	spectool
+SYSTEM:	-V1.2: February 2003
+DATE:	Wed Feb 19 12:28:59 MST 2003
+FROM:	valdes
+
+BUG:	This is not exactly a bug but a limitation.  The Voigt profile fitting
+	requires a minimum value for the width parameters to avoid
+	numerical problems.  The limit is the value, in the current
+	dispersion units, corresponding 3.3% of a pixel.  Attempting to set
+	the value any smaller, say with fitting of the parameter turned
+	off, will still result in a returned value corresponding to the
+	minumum.  If you want one of the values to be zero then the profile
+	type should be set to Gaussian or Lorentzian.  If you want a fixed
+	value smaller than the minimum the only workaround is to resample
+	the spectrum to finer pixels.
+
+STATUS:	A smaller minimum could be put into the code but there will always
+	be some point and so no changed is currently planned.
+
+NUMBER:	520
+MODULE:	onedspec.telluric
+SYSTEM:	-V2.12.2
+DATE:	Mon Feb 24 12:18:04 MST 2003
+FROM:	valdes
+
+BUG:	When an error, such as invalid parameters or missing images, occurs
+	the task first does some error clean up operations before reporting
+	the error.  The problem with this is that the actual error message
+	can get lost and a misleading message, such as environment variable
+	or image header parameter not found, will be given.  Avoid this
+	requires a code change.  One way to sometimes get to the true error
+	is to eliminate the misleading error by setting a value for the
+	missing evironment or header parameter.  Also check carefully all
+	the task parameters since most error are the result of problems
+	with them.
+
+STATUS:	The error handling will be improved in the next release.
+
+NUMBER:	521
+MODULE:	mscred.ccdproc
+SYSTEM:	V4.8: November 4, 2002
+DATE:	Fri Mar 14 14:59:49 MST 2003
+FROM:	valdes
+
+BUG:	When using the "merge" option in conjunction with "bpmasks" output
+	and "fixpix" the merged masks are not properly created.  They will
+	have names "tmp...", will not contain the right pixels, nor will
+	the BPM pointers in the data images be correct.  The workarounds
+	are either not merge the amplifiers or do the merging first and
+	then do the fixpix and saturation/bleed trail masking after the
+	extensions are merged.
+
+STATUS:	The latest version of MSCRED has this bug fixed.
+
+NUMBER:	522
+MODULE:	mscred
+SYSTEM:	V4.8: March 2003 releases
+DATE:	Fri Apr 11 15:40:16 MST 2003
+FROM:	valdes
+
+BUG:	A bug was introduced in the coordinate conversions between pixels
+	and celestial coordinates in the March 2003 releases.  The bug
+	affects MSCCMATCH, MSCZERO, MSCCTRAN, MSCTVMARK, MSCPIXAREA,
+	MSCGETCAT, and MSCIMAGE.  The bug was to not deproject the
+	tangent plane correctly.  There is no workaround other than
+	to update.
+
+
+STATUS:	The bug has been fixed a a new release made.
+
+NUMBER:	523
+MODULE:	dohydra, doargus, dofibers, do3fiber
+SYSTEM:	V2.11-V2.12
+DATE:	Wed May 21 15:16:02 MST 2003
+FROM:	valdes
+
+BUG:    When dispersion linearization is selected and the dispersion
+	parameters are modified in response to "Change wavelength
+	coordinate assignments?" the new parameters are not applied to the
+	extractions.  One workaround is to not linearize and then later use
+	DISPCOR to linearize.
+
+	The code fix is simple.  In the directory srcfibers$
+	($iraf/noao/imred/src/fibers) change samedisp=yes to samedisp=no in
+	proc.cl.  There is only one occurrence.  If you don't have
+	permissions to modify the installed version you can copy this file
+	to your working directory, modify it, and redefine it (after
+	loading the package) with "redefine proc=proc.cl".  If you use the
+	batch option you need to do the same thing to the file batch.cl.
+
+STATUS:	Fixed for V2.12.2.
+
+NUMBER:	524
+MODULE:	reidentify
+SYSTEM:	-V2.12.1
+DATE:	Tue May 27 15:16:39 MST 2003
+FROM:	valdes
+
+BUG:	When doing REIDENTIFY with refit=no the "User Shift" shown in the
+	log output is wrong after the first reidentifications.  This is
+	because the previous shift was being applied inappropriately when
+	doing the next case.  This only affects the log output and not the
+	results in the database.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	525
+MODULE:	guiapps.xapphot.xguiphot
+SYSTEM:	-V1.1 (Feb03)
+DATE:	Fri May 30 13:34:46 MST 2003
+FROM:	valdes
+
+BUG:	When changing the directory in the Files->Files panel a memory
+	corruption or segmentation error can occur.  This is caused by
+	closing the previous information but not marking it as closed.
+	The only workarounds are to avoid using the directories and
+	file panel if this occurs.
+
+STATUS:	Fixed in V1.2 (May03).
+
+NUMBER:	526
+MODULE:	disptrans
+SYSTEM:	V2.11.3 - V2.12.1
+DATE:	Wed Jun  4 10:53:33 MST 2003
+FROM:	valdes
+
+BUG:	The option to resample to constant steps in the transformed dispersion
+	units (linearize=yes) was broken in V2.11.3 due to a change in
+	subroutine arguments.  The workaround is to use linearize=no
+	to change the dispersion function associated with the pixels and
+	then use DISPCOR to resample to linear increments.
+
+STATUS:	Fixed for V2.12.2.
+
+NUMBER:	527
+MODULE:	mscred.ccdproc
+SYSTEM:	- V4.8 April 11, 2003
+DATE:	Tue Jun 24 13:30:57 MST 2003
+FROM:	valdes
+
+BUG:	The "fixpix" option suffers from a bug in the system mask code
+	which can cause large segments of the image to be marked and/or
+	interpolated as bad.  This happens when there are bad pixels near
+	the right edge of the mask.  There is no workaround other than
+	not using the fixpix option or making masks with the bleed trail
+	and saturation options.  In recent versions this bug has been fixed
+	in RedHat systems (using the distributed binaries) but not on
+	Solaris.
+
+STATUS:	The system bug has been fixed for the next IRAF patch release.
+	It is also fixed in the June, 2003 version of the ssun binaries
+	for mscred.
+
+NUMBER:	528
+MODULE:	ARTDATA tasks using random numbers and URAND
+SYSTEM:	-V2.12.2
+DATE:	Thu Aug  7 12:38:19 MST 2003
+FROM:	valdes
+
+BUG:	Many tasks using random numbers in ARTDATA (GALLIST, STARLIST,
+	MKNOISE, MKOBJECTS, MK1DSPEC, MKECHELLE) as well as UTILITIES.URAND
+	have a parameter to provide the seed value and a feature to specify
+	it as INDEF to set it based on the system clock.  This is to allow
+	generation of different results each time the task is called.
+	However, the clock-based seed only changes each second so if the
+	same task is called rapidly enough the seed may not change between
+	executions.  The workaround is to include some delay beween calls,
+	such as using sleep in scripts and CL loops.
+
+STATUS:	The tasks listed above have been modified for the next release
+	to avoid the behavior described above.
+
+NUMBER:	529
+MODULE:	imcombine
+SYSTEM:	V2.11-V2.11.3
+DATE:	Mon Aug 11 12:13:29 MST 2003
+FROM:	valdes
+
+BUG:	When specifying a bad pixel mask output with the "plfile" parameter
+	it is possible to get
+
+	    Warning: Operation would overwrite existing image (<name>.pl)
+
+	This occurs when a problem is encountered and the task tries again
+	with a different parameters to avoid the problem.  The bug is that
+	the pl file is not deleted before tryng again.  This retry behavior
+	occurs for several reasons, most commonly when the number of images
+	being combined exceeds a limit of about 250 images.  The workaround
+	is to "reset imclobber=yes".  Note that this resets the clobber
+	policy for all IRAF tasks so one should probably reset it to "no"
+	after working around this IMCOMBINE bug.
+
+STATUS:	This is fixed in V2.12.
+
+NUMBER:	530
+MODULE:	apall, apsum
+SYSTEM:	-V2.12.1
+DATE:	Tue Oct 21 14:00:15 MST 2003
+FROM:	valdes
+
+BUG:	When DISPAXIS=1 there is a potential for a segmentation violation
+	due to referencing outside an array.  This is more likely with
+	variance weighting and cleaning but is not limited to this case.
+	The bug does not affect the results if the task completes without
+	error.  The only workaround is to transpose the image so that
+	DISPAXIS=2.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	531
+MODULE:	mkheader
+SYSTEM:	-V2.12.1
+DATE:	Mon Nov 10 15:57:28 MST 2003
+FROM:	valdes
+
+BUG:	The error
+
+	     Old format = "%s%*t<>\n")
+	     ERROR: No write permission on file (String_File)
+
+	occurs when the number of keywords being added exceeds the internal
+	limits of the header.  The workaround is to ignore this error,
+	clean up any problems in the last keyword added, and add more
+	headers in additional steps.
+
+STATUS:	The unclear error has been replaced by the warning "Possibly failed
+	to add all keywords".  This change was added for V2.12.2.
+
+NUMBER:	532
+MODULE:	apextract tasks
+SYSTEM:	V2.11.2 - V2.12.1
+DATE:	Wed Dec  3 14:20:07 MST 2003
+FROM:	valdes
+
+BUG:	Support for extractions on image sections added in V2.10.4 was
+	lost in the V2.11.2 release.  By lost we mean that any image
+	section specified for the input data is automatically stripped.
+
+STATUS:	The ability to specify input images sections is restored in the
+	V2.12.2 release.

@@ -12,7 +12,7 @@ define	SZ_MONTH		3
 
 procedure cnvdate (ltime, outstr, maxch)
 
-long	ltime			# seconds since 00:00:00 10-Jan-1980
+long	ltime			# seconds since 00:00:00 01-Jan-1980
 char	outstr[ARB]
 int	maxch
 

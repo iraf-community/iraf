@@ -18,6 +18,8 @@ define	MAX_FRAMES	8		# Maximum number of display frames
 
 # Data structures for STARFOCUS
 
+define	NBNDRYPIX	0		# Number of boundary pixels
+define	TYBNDRY		BT_REFLECT	# Type of boundary extension
 define	SAMPLE		.2		# Subpixel sampling size
 define	SF_SZFNAME	79		# Length of file names
 define	SF_SZWTYPE	7		# Length of width type string

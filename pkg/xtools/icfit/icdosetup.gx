@@ -65,7 +65,10 @@ begin
 		call alim$t (x, npts, xmin, xmax)
 	    } else {
 	        call malloc (IC_YFIT(ic), IC_NFIT(ic), TY_PIXEL)
-		call alim$t (Mem$t[IC_XFIT(ic)], IC_NFIT(ic), xmin, xmax)
+		if (IC_NFIT(ic) == 1)
+		    call alim$t (x, npts, xmin, xmax)
+		else
+		    call alim$t (Mem$t[IC_XFIT(ic)], IC_NFIT(ic), xmin, xmax)
 	    }
 
 	    IC_XMIN(ic) = min (IC_XMIN(ic), real(xmin))

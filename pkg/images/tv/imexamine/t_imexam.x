@@ -37,13 +37,14 @@ begin
 	# the maximum number of frames to be accessed.
 
 	IE_USEDISPLAY(ie) = btoi (clgetb ("use_display"))
-	if (IE_USEDISPLAY(ie) == YES)
+	if (IE_USEDISPLAY(ie) == YES) {
 	    if (imd_wcsver() == 0)
 		;
 	    iferr (nframes = ie_getnframes (ie)) {
 		call eprintf ("cannot access display\n")
 		IE_USEDISPLAY(ie) = NO
 	    }
+	}
 
 	# Get the list of images to be examined, if given on the command
 	# line.  If no images are explicitly listed use the display to

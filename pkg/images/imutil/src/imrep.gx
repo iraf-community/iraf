@@ -109,7 +109,7 @@ real	img				# Imaginary value for complex
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
 $if (datatype == sil)
-int	ilower
+real	ilower
 $endif
 PIXEL	floor, ceil, newval, val1, val2
 $if (datatype == x)

@@ -12,11 +12,11 @@ procedure t_sptime ()
 
 bool	interactive
 int	i, j, nexp, niter, npix, nw, fd, outlist
-real	nobj[4], nsky[4], time, snr, sngoal, wave, x, x1, dx, thruput
-real	sat, dnmax
+real	nobj[4], nsky[4], time, minexp, maxexp, snr, sngoal
+real	wave, x, x1, dx, thruput, sat, dnmax
 pointer sp, str, err, st, tab, waves, counts, snrs, gp
 
-bool	streq(), tabexists()
+bool	streq(), tabexists(), fp_equalr()
 int	stgeti(), strdic()
 int	clpopnu(), fntopnb(), fntgfnb(), nowhite(), open(), tabgeti()
 real	stgetr(), tabgetr(), tabinterp1(), gr_mag(), gr_getr()
@@ -173,9 +173,12 @@ begin
 	ST_SKYSUB(st) = strdic (Memc[str], Memc[str], SZ_LINE, SKYSUB)
 
 	# Set calculation parameters.
+	ST_MINEXP(st) = stgetr (st, "minexp", "spectrograph", MINEXP)
 	ST_MAXEXP(st) = stgetr (st, "maxexp", "spectrograph", 3600.)
-	if (ST_MAXEXP(st) <= 0.)
-	    ST_MAXEXP(st) = 3600.
+	if (ST_MINEXP(st) <= 0.)
+	    ST_MINEXP(st) = MINEXP
+	if (ST_MAXEXP(st) <= ST_MINEXP(st))
+	    ST_MAXEXP(st) = ST_MINEXP(st)
 	time = stgetr (st, "time", "spectrograph", INDEFR)
 	sngoal = stgetr (st, "sn", "spectrograph", 25.)
 	if (IS_INDEF(time) && IS_INDEF(sngoal))
@@ -287,12 +290,17 @@ begin
 	    x = ST_APSIZE(st,2) / ST_SCALE(st,2) + ST_RES(st,2)
 	    npix = max (1, int (x + 0.999))
 	    ST_NOBJPIX(st) = npix
+	    ST_APLIM(st) = YES
 	case RECTANGULAR:
 	    x = ST_APSIZE(st,2) / ST_SCALE(st,2) + ST_RES(st,2)
 	    npix = max (1, int (x + 0.999))
 	    x = min (ST_APSIZE(st,2), 3*ST_SEEING(st)) / ST_SCALE(st,2) +
 		ST_RES(st,2)
 	    ST_NOBJPIX(st) = min (npix, int (x + 0.999))
+	    if (ST_NOBJPIX(st) > npix)
+		ST_APLIM(st) = NO
+	    else
+		ST_APLIM(st) = YES
 	}
 
 	# Set number of pixels in sky.
@@ -303,6 +311,8 @@ begin
 	    ST_NSKYPIX(st) = max (0, npix - ST_NOBJPIX(st))
 	case SKY_MULTIAP:
 	    ST_NSKYPIX(st) = npix * ST_NSKYAPS(st)
+	case SKY_SHUFFLE:
+	    ST_NSKYPIX(st) = npix
 	}
 
 	# Compute exposure time and S/N.
@@ -382,43 +392,65 @@ begin
 	    }
 
 	    nexp = 1
-	    time = ST_MAXEXP(st)
+	    minexp = ST_MINEXP(st)
+	    maxexp = ST_MAXEXP(st)
+	    time = maxexp
 	    snr = 0.
 
+	    # Iterate to try and achieve the requested SNR.
 	    do niter = 1, MAXITER {
+
 		if (snr > 0.) {
-		    x = time*sngoal*sngoal/(nexp*snr*snr)
-		    if (x < MINEXP && nexp > 1) {
-			nexp = max (1, int (nexp * x / MINEXP))
-			x = time*sngoal*sngoal/(nexp*snr*snr)
+		    x = time
+		    i = nexp
+
+		    # After the first pass we use the last calculated SNR to
+		    # estimate a new time per exposure and number of exposures.
+		    time = time*sngoal*sngoal/(nexp*snr*snr)
+
+		    # Divide into multiple exposures if the time per exposure
+		    # exceeds a maximum.  Note the maximum may be reset by
+		    # saturation criteria.
+		    if (time > maxexp) {
+			nexp = nexp * max (1, int (time / maxexp + 0.99))
+			time = x*sngoal*sngoal/(nexp*snr*snr)
+		    } 
+
+		    # Apply a minimum time per exposure if possible.
+		    if (time < minexp && nexp > 1) {
+			nexp = max (1, nexp * time / minexp)
+			time = x*sngoal*sngoal/(nexp*snr*snr)
 		    }
-		    time = max (MINEXP, x)
+
+		    # New time per exposure to try.
+		    time = max (minexp, min (maxexp, time))
+		    if (fp_equalr (time, x) && nexp == i)
+			break
 		}
 
-		if (time > ST_MAXEXP(st)) {
-		    nexp = max (1, int (time / ST_MAXEXP(st) + 0.99))
-		    time = time / nexp
-		}
-
+		# Compute SNR.
 		call st_snr (st, NULL, wave, nexp, time, nobj, nsky,
 		    snr, thruput)
 
-		# Adjust for maximum number of counts.
-		if (nobj[1]+nsky[1] > sat && nexp < MAXNEXP && snr < sngoal) {
+		# Reset maximum time per exposure to avoid saturation.
+		if (nobj[1]+nsky[1] > sat && time > minexp && snr < sngoal) {
+		    time = time * nexp
 		    snr = snr * snr * nexp
-		    nexp = min (real(MAXNEXP),
-			nexp * (1 + (nobj[1] + nsky[1]) / sat))
-		    snr = sqrt (snr / nexp)
+		    nexp = nexp * (1 + (nobj[1] + nsky[1]) / sat)
 		    time = time / nexp
+		    snr = sqrt (snr / nexp)
+		    maxexp = max (minexp, time)
 		    next
 		}
-		if ((nobj[1]+nsky[1])/ST_GAIN(st) > dnmax &&
-		    nexp < MAXNEXP && snr < sngoal) {
+		if ((nobj[1]+nsky[1])/ST_GAIN(st) > dnmax && time > minexp &&
+			snr < sngoal) {
+		    time = time * nexp
 		    snr = snr * snr * nexp
-		    nexp = max (real(MAXNEXP), nexp * (1 + (nobj[1] + nsky[1]) /
-			(ST_GAIN(st) * dnmax)))
-		    snr = sqrt (snr / nexp)
+		    nexp = nexp * (1 + (nobj[1] + nsky[1]) /
+			(ST_GAIN(st) * dnmax))
 		    time = time / nexp
+		    snr = sqrt (snr / nexp)
+		    maxexp = max (minexp, time)
 		    next
 		}
 
@@ -736,8 +768,12 @@ begin
 
 	call fprintf (fd, "\n")
 	call fprintf (fd,
-	    "Source pixels: %d pixels (3xFWHM seeing disk)\n")
+	    "Source pixels: %d pixels")
 	    call pargi (ST_NOBJPIX(st))
+	if (ST_APLIM(st) == YES)
+	    call fprintf (fd, " (aperture & camera resolution limited)\n")
+	else
+	    call fprintf (fd, " (3xFWHM seeing disk & camera resolution)\n")
 	switch (ST_SKYSUB(st)) {
 	case SKY_NONE:
 	    call fprintf (fd,
@@ -750,6 +786,10 @@ begin
 		"Background pixels: %d apertures each with %d pixels\n")
 		call pargi (ST_NSKYAPS(st))
 		call pargi (ST_NSKYPIX(st) / ST_NSKYAPS(st))
+	case SKY_SHUFFLE:
+	    call fprintf (fd,
+		"Background pixels: shuffle with %d pixels (same as source)\n")
+		call pargi (ST_NSKYPIX(st))
 	}
 	call fprintf (fd, "\n")
 end
@@ -892,7 +932,7 @@ real	snr		#O S/N per pixel
 real	thruput		#O System thruput
 
 int	i, ncols
-real	n, ndark
+real	tobs, n, ndark
 real	w, w1, nmag, sky, thermal, bkg, dobj, dbkg, ddark, dreadout, tnoise
 real	ext, tel, adc, ap, fib, inst, fltr1, fltr2, col, eff1, eff2, disp
 real	cor, cam, vig, dqe, cum, sqnexp
@@ -908,6 +948,14 @@ begin
 	    snr = 0.
 	    thruput = 0.
 	    return
+	}
+
+	# Set observation time.
+	switch (ST_SKYSUB(st)) {
+	case SKY_SHUFFLE:
+	    tobs = time / 2
+	default:
+	    tobs = time
 	}
 
 	# Compute pixel counts over subsampled pixels.
@@ -1046,7 +1094,7 @@ begin
 
 	    # Source photons detected.
 	    nmag = flux / (C * H / w)
-	    n = nmag * ST_AREA(st) * thruput * time * disp
+	    n = nmag * ST_AREA(st) * thruput * tobs * disp
 	    if (!IS_INDEF(ext))
 		n = n * ext
 	    n = max (0., n)
@@ -1065,8 +1113,9 @@ begin
 	    if (!IS_INDEF(ST_THERMAL(st))) {
 		iferr {
 		    thermal = tabinterp1 (ST_TAB(st), "emissivity", w)
-		    thermal = thermal * 18.8363e18 / (w ** 4) /
-			(exp (min (20., 1.4338e8 / (w * ST_THERMAL(st)))) - 1)
+		    # 1.41e24 = 2 * c * (arcsec/rad)^2 * (A/cm) * (A/cm)^-4
+		    thermal = thermal * 1.41e24 / (w ** 4) /
+			(exp (min (30., 1.43877e8 / (w * ST_THERMAL(st)))) - 1)
 		} then
 		    thermal = 0.
 	    }
@@ -1078,12 +1127,9 @@ begin
 	    case CIRCULAR:
 		bkg = bkg * PI * ST_APSIZE(st,1) ** 2 / ap
 	    case RECTANGULAR:
-    #	    bkg = bkg * ST_APSIZE(st,1) *
-    #		min (ST_APSIZE(st,2), 3 * ST_SEEING(st)) / ap
-		bkg = bkg * ST_APSIZE(st,1) * ST_SCALE(st,1) *
-		    ST_NOBJPIX(st)
+		bkg = bkg * ST_APSIZE(st,1) * ST_SCALE(st,1) * ST_NOBJPIX(st)
 	    }
-	    n = bkg * ST_AREA(st) * thruput * time * disp
+	    n = bkg * ST_AREA(st) * thruput * tobs * disp
 	    n = max (0., n)
 	    if (n < 100000.)
 		n = int (n)
@@ -1301,22 +1347,24 @@ begin
 		call pargi (nexp)
 		call pargr (time)
 	    if (nexp * time > 60.) {
-		call fprintf (fd, " (%.1h)\n")
+		call fprintf (fd, " (%.1h)")
 		    call pargr (nexp * time / 3600.)
 	    } else {
-		call fprintf (fd, " (%.1f)\n")
+		call fprintf (fd, " (%.1f)")
 		call pargr (nexp * time)
 	    }
 	} else {
 	    call fprintf (fd, "\nExposure time: %.2fs")
 		call pargr (time)
 	    if (time > 60.) {
-		call fprintf (fd, " (%.1h)\n")
+		call fprintf (fd, " (%.1h)")
 		    call pargr (time / 3600.)
-	    } else {
-		call fprintf (fd, "\n")
 	    }
 	}
+	if (ST_SKYSUB(st) == SKY_SHUFFLE)
+	    call fprintf (fd, " (shuffled)\n")
+	else
+	    call fprintf (fd, "\n")
 	call fprintf (fd, "\n")
 end
 
@@ -1636,8 +1684,8 @@ begin
 	case SPEC_TAB:
 	    flux = tabinterp1 (ST_TAB(st), "spectrum", wave)
 	case SPEC_BB:
-	    flux = (exp (min (20., 1.4338e8/(ST_REFW(st)*ST_PARAM(st)))) - 1) /
-		(exp (min (20., 1.4338e8/(wave*ST_PARAM(st)))) - 1)
+	    flux = (exp (min (30., 1.4338e8/(ST_REFW(st)*ST_PARAM(st)))) - 1) /
+		(exp (min (30., 1.4338e8/(wave*ST_PARAM(st)))) - 1)
 	    flux = ST_REFFL(st) * (ST_REFW(st) / wave) ** 5 * flux
 	case SPEC_FL:
 	    flux = ST_REFFL(st) * (wave/ST_REFW(st)) ** ST_PARAM(st)

@@ -163,7 +163,7 @@ begin
 	    call pargi (sum)
 	    call pargr (pixsize)
 	    call pargr (npix)
-	call printf ("  Seeing: %-3.1f  Airmass: %-4.2f  Phase: %-4.1f\n")
+	call printf ("  Seeing: %-.3g  Airmass: %-4.2f  Phase: %-4.1f\n")
 	    call pargr (seeing)
 	    call pargr (airmass)
 	    call pargr (phase)

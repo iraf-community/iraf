@@ -1,5 +1,73 @@
 .help Revisions Nov01 obsutuil
 
+=======
+V2.12.2
+=======
+
+sptime/t_sptime.x
+sptime/sptime.par
+sptime/sptime.h
+    1.  Improved algorithm for handling saturation.
+    2.  Added a minimum exposure parameter.
+    (5/15/03, Valdes)
+
+starfocus/stfprofile.x
+    Limits on centroided image raster at the boundary have been removed.
+    Instead boundary reflection allows a somewhat unbiased centroid estimation
+    for sources near the edge.  (5/6/03, Valdes)
+
+starfocus/t_starfocus.x
+starfocus/starfocus.h
+starfocus/mkpkg
+    1.  Added 100 pixels of boundary reflection to allow some attempt at
+	measuring PSFs near the image edges.
+    2.  Now starting coordinates closer that a radius distance from the
+	image edge are allowed.  (5/6/03, Valdes)
+
+starfocus/stfprofile.x
+    The selection of a point to get a first estimation of the FWHM in
+    stf_fit did not check for the case of a zero value.  This could cause
+    a floating divide by zero.  (5/5/03, Valdes)
+
+starfocus/stfprofile.x
+    The subpixel evaluation involves fitting an image interpolator to a
+    subraster.  To avoid attempting to evaluate a point outside the center
+    of the edge pixels, which is a requirement of the image interpolators,
+    the interpolator is fit to the full data raster and the evaluations
+    exclude the boundary pixels.  (5/5/03, Valdes)
+
+ccdtime.par
+t_ccdtime.x
+    1.	The minimum seeing is now 0.001.
+    2.  The formating of the seeing was changed in case the seeing is set
+	less than 0.1.
+    (4/24/03, Valdes)
+
+t_sptime.x
+    The thermal background calculation was wrong.  (3/17/03, Valdes)
+
+../doc/cgiparse.hlp        +
+../../obsutil.hd
+    Added CGIPARSE task help.  (3/3/03, Valdes)
+
+sptime/t_cgiparse.x	+
+sptime/x_spectime.x
+sptime/mkpkg.x
+x_obsutil.x
+../obsutil.cl
+../obsutil.men
+    Added CGIPARSE task.  (3/3/03, Valdes)
+
+sptime/t_sptime.x
+sptime/specpars.par
+sptime/sptime.par
+sptime/sptime.h
+    See sptime/Revisions.  (3/3/03, Valdes)
+
+=======
+V2.12.1
+=======
+
 =====
 V2.12
 =====

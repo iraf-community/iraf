@@ -9,8 +9,12 @@ define	INC_LENSCRATCHBUF	256
 define	MAX_PSEUDOFILES		10
 define	SZ_TRDEVNAME		229
 define	SZ_KERNFNAME		259
-define	LEN_GTRCOM		28		# see "gtr.com"
-define	KSHIFT			100		# encode pr ("etc$prpsio.x")
+define	LEN_GTRCOM		28	# see "gtr.com"
+define	KSHIFT			10000	# encode pr ("etc$prpsio.x") such that
+					#
+					#    ((pr*KSHIFT)+stream) > LAST_FD
+					#
+					# see also <gio.h>
 
 define	LEN_TRSTRUCT	(564+187)
 

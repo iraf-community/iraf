@@ -19,7 +19,7 @@ real	smw_c1tranr()
 double	w1, dw
 pointer	sp, str, axno, axval, r, w, cd, mw, ct, smw_sctran()
 int	mw_stati(), imgeti()
-bool	fp_equald()
+bool	streq(), fp_equald()
 errchk	smw_sctran
 
 begin
@@ -163,7 +163,11 @@ begin
 	    call smw_ctfree (ct)
 
 	    iferr (dtype = imgeti (im, "DC-FLAG")) {
-		if (fp_equald (1D0, w1) || fp_equald (1D0, dw))
+		iferr (call mw_gwattrs (mw,paxis,"axtype",Memc[str],SZ_LINE))
+		    Memc[str] = EOS
+		if (streq (Memc[str], "ra") || streq (Memc[str], "dec"))
+		    dtype = DCNO
+		else if (fp_equald (1D0, w1) || fp_equald (1D0, dw))
 		    dtype = DCNO
 		else
 		    dtype = DCLINEAR
@@ -178,6 +182,8 @@ begin
 	    }
 
 	    if (dtype != DCNO) {
+		
+		
 		iferr (call mw_gwattrs (mw,paxis,"label",Memc[str],SZ_LINE)) {
 		iferr (call mw_gwattrs(mw,paxis,"units",Memc[str],SZ_LINE)) {
 			call mw_swattrs (mw, paxis, "units", "angstroms")

@@ -1,5 +1,35 @@
 .help revisions Jun88 proto
 .nf
+=======
+V2.12.2
+=======
+
+maskexpr/peregfuncs.x
+     Fixed a size decl error in a salloc call in pe_lines() (9/29/03, MJF)
+
+maskexpr/meregfuncs.x
+     Fixed an type declaration/usage error for me_is_in_range() (9/29/03, MJF)
+
+ringavg.cl
+     Included help page in script in order to document for adass.iraf.sources.
+     (1/7/03, Valdes)
+
+ringavg.cl	+
+doc/ringavg.hlp	+
+proto.cl
+proto.men
+proto.hd
+    Added a script task to compute pixel averages in concentric rings.
+    (11/25/02, Valdes)
+
+doc/fixpix.hlp
+    Added an example for using a text file on a 1D image.
+    (9/20/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 =====
 V2.12
 =====

@@ -1,6 +1,72 @@
 .help revisions Jun88 noao.twodspec.apextract
 .nf
 
+=======
+V2.12.2
+=======
+
+apextract.x
+    The edge weighting interpolation buffer space, interpbuf,  was
+    increased by one pixel.  This makes the data buffer wider so that
+    interpolation avoids using boundary extension except in cases where the
+    aperture actually approaches the image edge.  Note that this change
+    results in an improvement in the extracted spectra over the previous
+    release where wraparound boundary extension was used.  This also means
+    extractions will not be identical between the versions.
+    (1/23/04, Valdes)
+
+apextract.x
+    The new routine ap_asifit was not correct.  (1/22/04, Valdes)
+
+apextract.x
+approfile.x
+apvariance.x
+    A problem related to the change of 10/21/03 is when the trace goes
+    far outside the data buffer.  This could result in the number of points
+    specified for asifit being too small for the interpolation function.
+    An interface routine, ap_asifit, was added to do all the checks related
+    to using asifit for evaluating the edge pixels.  (12/10/03, Valdes)
+
+===========
+V2.12.2BETA
+===========
+
+apextract.x
+    The output name based on the input name for multiextension images
+    produces a multiextension output with the same extension description.
+    (12/3/03, Valdes)
+
+apgetim.x
+    1.	Restored ability to use image sections which was lost in the change
+	on 7/13/98 for V2.11.2.
+    2.	Support for multiextension data was added.  This consists of using
+	a standard name based on EXTNAME and EXTVER and without the
+	file type extension.  Note that this means that image names specified
+	by index will be converted to extension name and extension version.
+    (12/3/03, Valdes)
+
+apextract.x
+approfile.x
+apvariance.x
+    The call to asifit was specifying too many points to fit, a whole line
+    in the data buffer, because the data vector may be offset from the first
+    column of the data buffer.  This could cause a segmentation violation.
+    (10/21/03, Valdes)
+
+
+apwidth.cl
+    Script to compute aperture widths from database.  This was written
+    for a user and is saved here though it is not currently defined by
+    default.  (12/2/02, Valdes)
+
+apflat1.par
+    The indirect reference needs to be spelled out without abbreviation to
+    be "apflatten" instead of "apflat".  (11/18/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 apextract.x
 approfile.x
 apvariance.x

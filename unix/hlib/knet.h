@@ -51,6 +51,7 @@ define	zfpath	kfpath
 define	zfprot	kfprot
 define	zfrnam	kfrnam
 define	zfsubd	kfsubd
+define	zfutim	kfutim
 define	zfxdir	kfxdir
 define	zgettx	kgettx
 define	zgetty	kgetty

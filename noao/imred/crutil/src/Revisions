@@ -1,5 +1,17 @@
 .help revisions Nov99 crutil
 .nf
+=======
+V2.12.2
+=======
+
+t_craverage.x
+    To grow an output mask create by the task requires closing the new mask
+    and reopening it READ_WRITE.  (10/23/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 =====
 V2.12
 =====

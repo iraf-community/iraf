@@ -1,0 +1,71 @@
+.help touch Jan04 system
+.ih
+NAME
+touch -- change file access and modification times
+.ih
+USAGE
+touch files
+.ih
+PARAMETERS
+.ls files
+List of files to be created or touched.
+.le
+.ls create = yes
+If enabled, the file will be created as a zero-length text file if it doesn't
+already exist.
+.le
+.ls atime = yes
+Change the access time of the file.  Will not change the modification time
+unless \fImtime\fR is also set.
+.le
+.ls mtime = yes
+Change the modification time of the file.  Will not change the access time
+unless \fIatime\fR is also set.
+.le
+.ls time = ""
+Time and date to set for the file.  The format of this string may be any
+of DD/MM/YY or CCYY-MM-DD (in which case time is assumed to be midnight of
+that day), or CCYY-MM-DDTHH:MM:SS[.SSS...] to specify both date and time.
+If not specified, the current system time is used unless the \fIref_file\fR
+parameter is set.  If specified, \fIref_file\fR will be ignored.
+.le
+.ls ref_file = ""
+Use the corresponding times of the specified file for modifying the
+times of the \fIinput_files\fR.  If not specified, the current time is
+used unless the \fItime\fR parameter is set.
+.le
+.ls verbose = no
+Print verbose output of the files and times being reset.
+.le
+.ih
+DESCRIPTION
+The \fItouch\fR task sets the access and modification times of each file
+in the \fIfiles\fR list.  The file will be created if it does not already
+exist when the \fIcreate\fR parameter is set.  The time used can be
+specified by \fItime\fR parameter or by the corresponding fields of the
+file specified by \fIref_file\fR, otherwise the current system time will
+be used.  The task will update both the modification and access times of
+the file unless disabled by the \fIatime\fR or \fImtime\fR parameter.
+
+.ih
+EXAMPLES
+
+1.  Update the times of all SPP source files in the current directory:
+
+	cl> touch *.x
+
+2.  Create an empty file on a remode node:
+
+	cl> touch ursa!/data/trigger_file
+
+3.  Reset the file modification time to 2:33:45 pm on June 5, 2003:
+
+	cl> touch nite1.fits time="2003-06-05T14:23:45"
+
+4.  Reset the file modification time to match dev$hosts:
+
+	cl> touch nite1.fits ref_file=dev$hosts
+
+.ih
+SEE ALSO
+.endhelp

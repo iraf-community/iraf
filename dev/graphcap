@@ -58,18 +58,43 @@ lw9|                    :tc=uapl9:
 lw9s|                   :PW#1.2:tc=uapl9:
 lw10|                   :tc=uapl10:
 lw10s|                  :PW#1.2:tc=uapl10:
+lw12|                   :tc=uapl12:
+lw12s|                  :PW#1.2:tc=uapl12:
+lw13|                   :tc=uapl13:
+lw13s|                  :PW#1.2:tc=uapl13:
 lwti|ti|		:tc=ulwti:
 lw14|                   :tc=uapl14:
 lw14s|                  :PW#1.2:tc=uapl14:
-lw15|lwcloset|		:tc=uapl15:
 lw16|                   :tc=uapl16:
 lw16s|                  :PW#1.2:tc=uapl16:
+lw18|                   :tc=uapl18:
+lw18s|                  :PW#1.2:tc=uapl18:
 lw19|                   :tc=uapl19:
 lw19s|                  :PW#1.2:tc=uapl19:
 lw20|                   :tc=uapl20:
 lw20s|                  :PW#1.2:tc=uapl20:
+lw21|                   :tc=uapl21:
+lw21s|                  :PW#1.2:tc=uapl21:
+lw23|                   :tc=uapl23:
+lw23s|                  :PW#1.2:tc=uapl23:
+lw24|                   :tc=uapl24:
+lw24s|                  :PW#1.2:tc=uapl24:
+lw25|                   :tc=uapl25:
+lw25s|                  :PW#1.2:tc=uapl25:
+lw26|                   :tc=uapl26:
+lw26s|                  :PW#1.2:tc=uapl26:
+lw27|                   :tc=uapl27:
+lw27s|                  :PW#1.2:tc=uapl27:
+lw28|                   :tc=uapl28:
+lw28s|                  :PW#1.2:tc=uapl28:
 lw29|                   :tc=uapl29:
 lw29s|                  :PW#1.2:tc=uapl29:
+lw30|                   :tc=uapl30:
+lw30s|                  :PW#1.2:tc=uapl30:
+lw34|                   :tc=uapl34:
+lw34s|                  :PW#1.2:tc=uapl34:
+lw35|                   :tc=uapl35:
+lw35s|                  :PW#1.2:tc=uapl35:
 lwdp|                   :tc=uapldp:
 lwdp|                   :PW#1.2:tc=uapldp:
 printronix|ptx|		:tc=uptx:
@@ -317,7 +342,7 @@ psi_def|psi_land|Postscript Kernel Default 8.5x11in 300dpi Landscape:\
         :IF=stsdas$lib/psikern_prolog.ps:\
         :LG=stsdas$lib/invxgterm:\
         :MF#100:PI#1.:PW#.00011:TD#.01221:TP#.001221:TS#.006104:\
-        :XO#0.01:YO#0.01:
+        :XO#0.001:YO#0.001:
 
 
 # SGI kernel (STDPLOT).
@@ -375,18 +400,26 @@ uapl10|UNIX generic interface to 300dpi SPARCPrinter on Solitaire:\
         :xs#0.267:ys#0.201:ar#0.753:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
         -h$(YW) -p$(PW) | lpr -Plw10; rm $F; }&:tc=sgi_apl:
-uapl14|UNIX generic interface to 300dpi Printer on Helios:\
-       :xs#0.267:ys#0.201:ar#0.753:\
-       :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
-       -h$(YW) -p$(PW) | lpr -Plw14; rm $F; }&:tc=sgi_apl:
-uapl15|UNIX generic interface to QMS-PS in PC "closet":\
+uapl12|UNIX generic interface to 300dpi SPARCPrinter on Solitaire:\
         :xs#0.267:ys#0.201:ar#0.753:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
-        -h$(YW) -p$(PW) | lpr -Plw15; rm $F; }&:tc=sgi_apl:
+        -h$(YW) -p$(PW) | lpr -Plw12; rm $F; }&:tc=sgi_apl:
+uapl13|UNIX generic interface to 300dpi SPARCPrinter on Solitaire:\
+        :xs#0.267:ys#0.201:ar#0.753:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw13; rm $F; }&:tc=sgi_apl:
+uapl14|UNIX generic interface to 300dpi Printer on Helios:\
+        :xs#0.267:ys#0.201:ar#0.753:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw14; rm $F; }&:tc=sgi_apl:
 uapl16|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
         :xs#0.265:ys#0.202:ar#0.760:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
         -h$(YW) -p$(PW) | lpr -Plw16; rm $F; }&:tc=sgi_apl:
+uapl18|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw18; rm $F; }&:tc=sgi_apl:
 uapl19|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
         :xs#0.265:ys#0.202:ar#0.760:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
@@ -395,10 +428,50 @@ uapl20|UNIX generic interface to Hewlett-Packard LaserJet 4:\
         :xs#0.265:ys#0.202:ar#0.760:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
         -h$(YW) -p$(PW) | lpr -Plw20; rm $F; }&:tc=sgi_apl:
+uapl21|UNIX generic interface to Hewlett-Packard LaserJet 4:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw21; rm $F; }&:tc=sgi_apl:
+uapl23|UNIX generic interface to Hewlett-Packard LaserJet 4:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw23; rm $F; }&:tc=sgi_apl:
+uapl24|UNIX generic interface to Hewlett-Packard LaserJet 4:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw24; rm $F; }&:tc=sgi_apl:
+uapl25|UNIX generic interface to Hewlett-Packard LaserJet 4:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw25; rm $F; }&:tc=sgi_apl:
+uapl26|UNIX generic interface to Hewlett-Packard LaserJet 4:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw26; rm $F; }&:tc=sgi_apl:
+uapl27|UNIX generic interface to Hewlett-Packard LaserJet 4:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw27; rm $F; }&:tc=sgi_apl:
+uapl28|UNIX generic interface to Hewlett-Packard LaserJet 4:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw28; rm $F; }&:tc=sgi_apl:
 uapl29|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
         :xs#0.265:ys#0.202:ar#0.760:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
         -h$(YW) -p$(PW) | lpr -Plw29; rm $F; }&:tc=sgi_apl:
+uapl30|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw30; rm $F; }&:tc=sgi_apl:
+uapl34|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw34; rm $F; }&:tc=sgi_apl:
+uapl35|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw35; rm $F; }&:tc=sgi_apl:
 uapldp|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
         :xs#0.265:ys#0.202:ar#0.760:MF#2:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
@@ -420,7 +493,7 @@ uepsf|ueps|Encapsulated Postscript file (portrait) UNIX:\
         :DD=eps,tmp$sgk,!{ sgidispatch sgi2ueps $F -l$(XO) \
         -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgi$$.eps; rm $F; }&:tc=sgi_apl:
 uepsfl|uepsl|Encapsulated Postscript file (landscape) UNIX:\
-        :XO#300:XW#1950:YO#300:YW#2700:RO:YF:\
+        :XO#100:XW#2150:YO#100:YW#2900:RO:YF:\
         :RO:YF:DD=eps,tmp$sgk,!{ sgidispatch sgi2ueps $F -l$(XO) \
         -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgi$$.eps; rm $F; }&:tc=sgi_apl:
 

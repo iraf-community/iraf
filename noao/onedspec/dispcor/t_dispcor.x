@@ -214,14 +214,12 @@ int	naps			# Number of apertures
 int	fd1			# Log file descriptor
 int	fd2			# Log file descriptor
 
-int	i, j, nin, ndim, dispaxis, n1, n2, n3, axis[2]
+int	i, j, nin, ndim, dispaxis, n1, n2, n3
 pointer	sp, temp, str, out, mwout, cti, cto, indata, outdata
 pointer	immap(), imgs3r(), imps3r(), mw_open(), smw_sctran()
 bool	clgetb(), streq()
 errchk	immap, mw_open, smw_open, dispcor, imgs3r, imps3r
 
-data	axis/1,2/
- 
 begin
 	# Determine the wavelength parameters.
 	call dc_wavelengths (in, ap, output, log, table, naps, 1,
@@ -275,7 +273,7 @@ begin
 	call smw_open (mwout, NULL, out)
 	call smw_swattrs (mwout, INDEFI, INDEFI, INDEFI, INDEFI, DC_DT(ap,1),
 	    DC_W1(ap,1), DC_DW(ap,1), DC_NW(ap,1), DC_Z(ap,1), INDEFR, INDEFR,
-	    NULL)
+	    "")
 
 	# Set WCS transformations.
 	cti = smw_sctran (smw1, "world", "logical", 3)

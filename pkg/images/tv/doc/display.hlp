@@ -19,7 +19,7 @@ Bad pixel mask.  The bad pixel mask is used to exclude bad pixels from the
 automatic intensity mapping algorithm.  It may also be displayed as an
 overlay or to interpolate the input image as selected by the \fIbpdisplay\fR
 parameter.  The bad pixel mask is specified by a pixel list image
-(.pl extension) or an regular image.  Non-zero values define the
+(.pl extension) or an regular image.  Values greater than zero define the
 bad pixels.  The special value "BPM" may be specified to select a pixel list
 image defined in the image header under the keyword "BPM".  If the
 bad pixel mask cannot be found a warning is given and the bad pixel mask
@@ -43,7 +43,7 @@ described in the OVERLAY COLOR section.
 .ls overlay = ""
 Overlay mask to be displayed.  The overlay mask may be a pixel list image
 (.pl extension) or a regular image.  Overlay pixels are identified by
-non-zero values.  The overlay values are displayed with a mapping given by
+values greater than zero.  The overlay values are displayed with a mapping given by
 the \fIocolors\fR parameter.  If the overlay cannot be found a warning is
 given and the overlay is not displayed.
 .le
@@ -90,7 +90,7 @@ the image header.
 Pixel mask selecting the sample pixels for the automatic or range intensity
 mapping algorithm.  The pixel mask may be a pixel list image (.pl
 extension), a regular image, or an image section.  The sample pixels are
-identified by non-zero values in the masks and by the region specified in
+identified by values greater than zero in the masks and by the region specified in
 an image section.  If no mask specification is given then a uniform sample
 of approximately \fInsample\fR good pixels will be used.  The \fInsample\fR
 parameter also limits the number of sample pixels used from a mask.  Note that
@@ -190,9 +190,15 @@ the input data.  The task \fBfixpix\fR provides the same algorithm to fix
 the data in the image.
 
 An overlay mask may be specified by the \fIoverlay\fR parameter.  Any
-non-zero value in the overlay mask will be displayed in the color or
+value greater than zero in the overlay mask will be displayed in the color or
 intensity specified by the \fIocolor\fR parameter (see the OVERLAY COLOR
 section).
+
+Note that bad pixel masks in "pixel list" format are constrained to
+non-negative values.  When an image is used instead of a pixel list the
+image is internally converted to a pixel list.  Negative values are
+set to zero or good pixels and positive real values are truncated to
+the nearest integer.
 
 A display window is defined in terms of the full frame.  The lower left
 corner of the frame is (0, 0) and the upper right corner is (1, 1) as
@@ -277,10 +283,10 @@ histogram.  This is particularly useful for astronomical images which
 generally have a very peaked histogram corresponding to the background
 sky in direct imaging or the continuum in a two dimensional spectrum.
 
-The sample of pixels, specified by the non-zero values in the sample mask
+The sample of pixels, specified by values greater than zero in the sample mask
 \fIzmask\fR or by an image section, is selected up to a maximum of
 \fInsample\fR pixels.  If a bad pixel mask is specified by the \fIbpmask\fR
-parameter then any pixels with mask values which are non-zero are not
+parameter then any pixels with mask values which are greater than zero are not
 counted in the sample.  Only the first pixels up to the limit are selected
 where the order is by line beginning from the first line.  If no mask is
 specified then a grid of pixels with even spacing along lines and columns

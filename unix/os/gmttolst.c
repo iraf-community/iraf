@@ -52,7 +52,7 @@ get_timezone()
 #ifdef MACOSX
 	struct tm *tm;
 	time_t clock = time(NULL);
-	tm = gmtime (&clock);
+	tm = localtime (&clock);
 	return (-(tm->tm_gmtoff));
 #else
 	struct timeb time_info;

@@ -20,7 +20,7 @@ char	value[ARB]		#I new parameter value
 
 bool	string_valued
 int	nchars, ch, i
-pointer	rp, ip, op, sp, val, start, text
+pointer	rp, ip, op, sp, val, start, text, cmmt
 int	idb_putstring(), idb_findrecord(), idb_filstr()
 errchk	syserrs
 
@@ -28,6 +28,7 @@ begin
 	call smark (sp)
 	call salloc (val, SZ_LINE, TY_CHAR)
 	call salloc (text, SZ_LINE, TY_CHAR)
+	call salloc (cmmt, SZ_LINE, TY_CHAR)
 
 	# Filter the value string to remove any undesirable characters.
 	nchars = idb_filstr (value, Memc[text], SZ_LINE)
@@ -44,14 +45,17 @@ begin
 
 	# Determine the actual datatype of the parameter.  String valued
 	# parameters will have an apostrophe in the first nonblank column
-	# of the value field.
+	# of the value field.  Skip the value and treat the rest of
+	# the line as a comment to be preserved.
 
 	string_valued = false
-	for (ip=IDB_STARTVALUE;  ip <= IDB_ENDVALUE;  ip=ip+1)
-	    if (Memc[rp+ip-1] == '\'') {
-		# String valued keyword.  Clear the previous value up to
-		# the second quote.
+	for (ip=IDB_STARTVALUE;  ip <= IDB_ENDVALUE;  ip=ip+1) {
+	    # Skip leading whitespace.
+	    for (; Memc[rp+ip-1] == ' '; ip=ip+1)
+		;
 
+	    if (Memc[rp+ip-1] == '\'') {
+		# Skip string value.
 		do i = ip, IDB_RECLEN {
 		    ch = Memc[rp+i]
 		    if (ch == '\n')
@@ -65,25 +69,43 @@ begin
 		break
 
 	    } else {
-		# Numeric keyword.  Clear any trailing characters from the
-		# previous value where trailing characters are those beyond
-		# column 31, ending with either a comment or the end of card.
-
-		do i = IDB_ENDVALUE, IDB_RECLEN {
+		# Skip numeric value.
+		do i = ip, IDB_RECLEN {
 		    ch = Memc[rp+i]
 		    if (ch == '\n' || ch == ' ' || ch == '/')
 			break
 		    Memc[rp+i] = ' '
 		}
+		break
 	    }
+	}
+
+	# Skip whitespace before any comment.
+	for (ip = i; Memc[rp+ip-1] == ' '; ip=ip+1)
+	    ;
+
+	# Save comment.  Include a leading space and add a / if missing.
+	Memc[cmmt] = ' '
+	for (i = 1; Memc[rp+ip-1] != '\n'; ip=ip+1) {
+	    if (i == 1 && Memc[rp+ip-1] != '/') {
+		Memc[cmmt+i] = '/'
+		i = i + 1
+	    }
+	    Memc[cmmt+i] = Memc[rp+ip-1]
+	    Memc[rp+ip-1] = ' '
+	    i = i + 1
+	}
+	Memc[cmmt+i] = EOS
 
 	# Encode the new value of the parameter.
 	if (string_valued) {
-	   call sprintf (Memc[val], SZ_LINE, " '%-0.68s%11t'%21t")
+	   call sprintf (Memc[val], SZ_LINE, " '%-0.68s%11t'%22t%-0.68s")
 		call pargstr (Memc[text])
+		call pargstr (Memc[cmmt])
 	} else {
-	    call sprintf (Memc[val], SZ_LINE, "%21s")
+	    call sprintf (Memc[val], SZ_LINE, "%21s%-0.68s")
 		call pargstr (Memc[text])
+		call pargstr (Memc[cmmt])
 	}
 
 	# Update the parameter value.
@@ -92,27 +114,6 @@ begin
 	for (ip=val;  Memc[ip] != EOS && Memc[op] != '\n';  ip=ip+1) {
 	    Memc[op] = Memc[ip]
 	    op = op + 1
-	}
-
-	# If writing a string make sure the closing quote is written and
-	# blank fill any leftover data from the old string value.  Don't
-	# overwrite data with the closing quote, omit the closing quote if
-	# it would overwrite a data (nonblank) character.
-
-	if (string_valued) {
-	    while (op > start && Memc[op-1] == ' ')
-		op = op - 1
-	    if (Memc[op-1] != '\'' && Memc[op] == ' ') {
-		Memc[op] = '\''
-		op = op + 1
-	    }
-	    for (ch=Memc[op];  ch != EOS && ch != '\n';  ch=Memc[op])
-		if (ch == '/')		# comment field
-		    break
-		else {
-		    Memc[op] = ' '
-		    op = op + 1
-		}
 	}
 
 	call sfree (sp)

@@ -3,43 +3,82 @@
 # to XC, the purpose of this script is to determine the IRAF architecture
 # and add the appropriate host compiler file to XC.
 
-# set echo
+# set	echo
 
 # Determine platform architecture.
-setenv	MACH	`uname -m`
+if (-f /etc/redhat-release) then
+    if (`uname -m` == "ppc") then
+        setenv MACH linuxppc
+    else
+        setenv MACH redhat
+    endif
+else if (-f /etc/SuSE-release) then
+    set MACH = suse
+else if (-f /etc/yellowdog-release || "`uname -m`" == "ppc") then
+    setenv MACH linuxppc
+else
+    set MACH = `uname -s | tr '[A-Z]' '[a-z]'`
+endif
 
-set need_outfile = 1
-set outfile = ""
+if ($MACH == "darwin") then
+    setenv MACH macosx
+endif
 
 # Scan the argument list and concatenate all arguments.
 set args = ""
 while ("$1" != "")
-    if ($need_outfile && $1:e == "f" || $1:e == "o") then
-	set outfile = $1:r".e"
-	set need_outfile = 0
-    else if ("$1" == "-o") then
-	set need_outfile = 0
-	set outfile = ""
-    endif
     set args = "$args $1"
     shift
 end
 
-if ($outfile != "") then
-    set out = "-o $outfile"
-else
-    set out = ""
-endif
-
 # Determine the desired architecture.
 if (! $?IRAFARCH) then
-    setenv IRAFARCH "alpha"
+    if ("$MACH" == "convex") then
+	if (-e ${iraf}bin.ieee/cl.e) then
+	    setenv IRAFARCH "ieee"
+	else
+	    setenv IRAFARCH "native"
+	endif
+    else if ("$MACH" == "freebsd") then
+	setenv IRAFARCH "freebsd"
+    else if ("$MACH" == "macosx") then
+	setenv IRAFARCH "macosx"
+    else if ("$MACH" == "linux") then
+	setenv IRAFARCH "linux"
+    else if ("$MACH" == "redhat") then
+	setenv IRAFARCH "redhat"
+    else if ("$MACH" == "suse") then
+	setenv IRAFARCH "suse"
+    else if ("$MACH" == "linuxppc") then
+	setenv IRAFARCH "linuxppc"
+    else if ("$MACH" == "sunos") then
+	setenv IRAFARCH "sunos"
+    else if ("$MACH" == "ssol") then
+	setenv IRAFARCH "ssun"
+    else if ("$MACH" == "sparc") then
+	setenv IRAFARCH "sparc"
+    else if ("$MACH" == "i386") then
+	setenv IRAFARCH "i386"
+    else if (-e /dev/fpa && -e ${iraf}bin.ffpa/cl.e) then
+	setenv IRAFARCH "ffpa"
+    else
+	setenv IRAFARCH "f68881"
+    endif
 endif
 
 # Get float option switch.
 switch ($IRAFARCH)
-case alpha:
-    set float = "/usr/lib/cmplrs/fort/for_main.o"
+case ieee:
+    set float = "-/fi"
+    breaksw
+case native:
+    set float = "-/fn"
+    breaksw
+case f68881:
+    set float = "-/f68881"
+    breaksw
+case ffpa:
+    set float = "-/ffpa"
     breaksw
 default:
     set float = ""
@@ -47,4 +86,4 @@ default:
 endsw
 
 # Call XC with the appropriate float option.
-xc $out $float $args
+xc $float $args

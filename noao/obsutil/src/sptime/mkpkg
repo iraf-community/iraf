@@ -14,6 +14,7 @@ standalone:
 libpkg.a:
 	grating.x	<error.h> <math.h>
 	stdisperser.x	sptime.h
+	t_cgiparse.x
 	t_sptime.x	sptime.h <error.h> <gset.h> <math.h> <ctype.h> <mach.h>
 	tabinterp.x	<error.h> <math/iminterp.h> <mach.h>
 	;

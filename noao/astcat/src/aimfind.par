@@ -20,7 +20,7 @@ append,b,h,no,,,"Append the predicted pixel coordinates ?"
 # The task mode parameters
 
 update,b,h,no,,,"Update algorithm parameters at task termination ?"
-verbose,b,h,no,,,"Print task statis messages ?"
+verbose,b,h,yes,,,"Print task status messages ?"
 
 # The task configuration parameters.
 

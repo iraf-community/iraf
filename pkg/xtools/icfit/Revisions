@@ -1,5 +1,19 @@
 .help revisions Jun88 pkg.xtools.icfit
 .nf
+
+icdosetup.gx
+    When there is only one sample range that is binned to a single point
+    this would result in the fitting limits (introduced 8/11/00) being
+    equal.  This causes cvinit to return an error and the cv pointer
+    is invald.   The change is if the number of binned fitting points
+    is 1 then the full range of the unbinned data is used.  Note that
+    a change was also made on this date to have cvinit return a null
+    pointer rather than a partially initialized pointer.  (11/18/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 =====
 V2.12
 =====

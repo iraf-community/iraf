@@ -26,9 +26,11 @@ bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
 int	i, j, ndim, n, nv
-real	a, asums()
+real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnls()
+
+real	asums()
 short	ic_modes()
 
 include	"../icombine.com"
@@ -246,9 +248,11 @@ bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
 int	i, j, ndim, n, nv
-real	a, asumi()
+real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnli()
+
+real	asumi()
 int	ic_modei()
 
 include	"../icombine.com"
@@ -466,9 +470,11 @@ bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
 int	i, j, ndim, n, nv
-real	a, asumr()
+real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnlr()
+
+real	asumr()
 real	ic_moder()
 
 include	"../icombine.com"
@@ -684,9 +690,11 @@ bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
 int	i, j, ndim, n, nv
-real	a, asumd()
+real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnld()
+
+double	asumd()
 double	ic_moded()
 
 include	"../icombine.com"
@@ -881,3 +889,4 @@ begin
 
 	return (mode)
 end
+

@@ -34,7 +34,7 @@ bool	format, quit_at_le, quit_at_ih, formatted
 
 pointer	ps_open()
 int	lh_findsection(), lh_findblock(), nextcmd()
-int	stridxs(), getline(), strlen(), strmatch(), getarg()
+int	stridxs(), getline(), strlen(), strmatch(), lgetarg()
 
 define	text_ 	99
 define	err_ 	98
@@ -190,7 +190,7 @@ begin
 		        ls_level = 0
 		        indent = 0
 		    }
-		    call lh_set_level (getarg(Memc[ibuf],ip,1), Memc[level])
+		    call lh_set_level (lgetarg(Memc[ibuf],ip,1), Memc[level])
 		    if (nsec > 0) {
 		        call ps_linebreak (ps, NO)
 		        call ps_linebreak (ps, NO)
@@ -208,17 +208,17 @@ begin
 		case BR:		# break line
 		    call ps_linebreak (ps, NO)
 		case SP:		# break, space N spaces on output
-		    arg = getarg (Memc[ibuf], ip, 1)
+		    arg = lgetarg (Memc[ibuf], ip, 1)
 		    call ps_linebreak (ps, NO)
 		    for (i=1; i < arg; i = i + 1)
 		        call ps_linebreak (ps, NO)
 		case IN:		# indent +/- N spaces
-		    arg = getarg (Memc[ibuf], ip, 0)
+		    arg = lgetarg (Memc[ibuf], ip, 0)
 		    call ps_indent (ps, arg)
 		    next
 
 		case LS:		# begin labelled section
-		    arg = getarg (Memc[ibuf], ip, INDENT)
+		    arg = lgetarg (Memc[ibuf], ip, INDENT)
 	  	    if (arg == 0)
 			ip = 5
 

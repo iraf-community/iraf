@@ -1,5 +1,21 @@
 .help revisions Jun88 math
 .nf
+
+curfit/cvinit.gx
+	If one of the error checks caused an error return the cv pointer
+	would have been allocated (cv != NULL) but some of the pointer
+	fields could have garbage values since a malloc was used instead
+	of a calloc.  A later call to cvfree could result in a segmentation
+	error.  This was changed so that 1) a null cv pointer is returned
+	in the initial error checks cause an error return and 2) the
+	cv pointer is initially allocated with calloc so that no pointer
+	fields will be non-NULL until explicitly set.
+	(11/18/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 gsurfit/gsder.gx
 gsurfit/gsderr.x
 gsurfit/gsderd.x

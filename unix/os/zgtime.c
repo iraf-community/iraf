@@ -10,10 +10,6 @@
 #include <sys/time.h>
 #include <time.h>
 
-#ifdef POSIX
-#include <unistd.h>
-#endif
-
 #define	import_kernel
 #define	import_knames
 #define import_spp
@@ -28,18 +24,14 @@ XLONG	*clock_time;				/* seconds */
 XLONG	*cpu_time;				/* milliseconds */
 {
 	struct	tms t;
-	time_t	time();
+	long	time();
 	time_t	gmt_to_lst();
 	long	cpu, clkfreq;
 
 #ifdef LINUX
 	clkfreq = CLK_TCK;
 #else
-#ifdef OSF1
-	clkfreq = (long) sysconf (_SC_CLK_TCK);
-#else
 	clkfreq = CLKFREQ;
-#endif
 #endif
 
 	times (&t);

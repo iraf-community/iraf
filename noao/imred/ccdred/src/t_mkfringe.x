@@ -29,7 +29,7 @@ begin
 	# file.  Initialize the interactive flag and the calibration images.
 
 	listin = imtopenp ("input")
-	listout = imtopenp ("output")
+	listout = imtopenp ("mkfringecor.output")
 	call clgstr ("instrument", Memc[input], SZ_FNAME)
 	call hdmopen (Memc[input])
 	call set_interactive ("", interactive)

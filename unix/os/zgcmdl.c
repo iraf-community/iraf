@@ -6,17 +6,17 @@
 
 extern	char *environ[];
 
-#ifdef OSF1
-#define xargv __Argv            /* Ultrix 4.2, OSF1 */
-extern  char **__Argv;
-#else
+#ifdef LINUXPPC
+#define xargc	f__xargc
+#define xargv	f__xargv
+#endif
+
 #ifdef LINUX
 extern	char **xargv;		/* defined in getarg(3f); requires libU77! */
 extern	int xargc;
 #else
 static	char **xargv = NULL;
 static	int xargc = 0;
-#endif
 #endif
 
 /* ZGCMDL -- Get the host system command line used to invoke this process.

@@ -1,5 +1,38 @@
 .help revisions Jan90 noao.artdata
 .nf
+=======
+V2.12.2
+=======
+
+mkheader.x
+    The routine was not putting an EOS for lines longer than IDB_RECLEN
+    resulting in cards longer than the FITS standard.
+    (1/29/04, Valdes)
+
+mktemplates.x
+    Pointer procedure mkt_object() could return w/out value (12/29/03, MJF)
+
+mkheader.x
+    Added checks and warning messages for overflowing the user header
+    area.  (11/10/03, Valdes)
+
+t_mknoise.x
+t_mkobjects.x
+t_mk1dspec.x
+t_mkechelle.x
+lists/t_starlist.x
+lists/t_gallist.x
+    The behavior of the random number seed used when specified as INDEF
+    was changed to avoid the 1 second grandularity.  See buglog 528.
+    (8/7/03, Valdes)
+
+t_mknoise.x
+    The string for the header file name was increased in length from
+    LEN_COMMENT to SZ_FNAME.  (6/27/03, Valdes)
+
+=======
+V2.12.1
+=======
 =====
 V2.12
 =====

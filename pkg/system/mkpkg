@@ -45,6 +45,7 @@ libpkg.a:
 	sort.x		sort.com <ctype.h>
 	tail.x		<error.h>
 	tee.x		<fset.h>
+	touch.x 	<error.h> <finfo.h> <time.h>
 	type.x		<error.h>
 	unprotect.x	<error.h> <protect.h>
 	;

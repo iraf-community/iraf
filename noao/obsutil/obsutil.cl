@@ -19,7 +19,8 @@ task	bitcount	= "obssrc$x_obsutil.e"
 task	ccdtime		= "ccdtimesrc$x_obsutil.e"
 task	pairmass	= "pairmass$x_obsutil.e"
 task	specfocus	= "specfocus$x_obsutil.e"
-task	sptime		= "sptime$x_obsutil.e"
+task	sptime,
+	$cgiparse	= "sptime$x_obsutil.e"
 task	psfmeasure,
 	starfocus	= "starfocus$x_obsutil.e"
 

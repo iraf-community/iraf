@@ -2,6 +2,111 @@
 .nf
 
 =======
+V2.12.2
+=======
+
+images$immatch/src/imcombine/src/xtimmap.gx
+    Copying the IMIO structure to an internal structure required two
+    amovi calls in order to maintain alignment.  (2/12/04, Zarate/Valdes)
+
+images$immatch/src/geometry/t_geoxytran.x
+images$immatch/src/geometry/trinvert.x          +
+images$immatch/src/geometry/mkpkg
+images$immatch/geoxytran.par
+images$immatch/doc/geoxytran.hlp
+    A new parameter "direction" was added to GEOXYTRAN to allow evaluating
+    the transformation in either the forward direction (the previous behavior
+    and default with the new parameter) or the backward direction.  The
+    help page was updated to describe this new feature and address confusion
+    over the relationship between geomap, geotran, and geoxytran.
+    (2/7/03, Valdes)
+
+images$immatch/imalign.cl
+    Restructured to avoid goto statements, no functional changes (12/29/03, MJF)
+
+images$lib/geomap.gx
+    Small change to improve stability.  Instead of checking the value
+    of the difference of two large numbers for zero, the equality of
+    the two numbers is checked.  (10/29/03, Valdes)
+
+images$immatch/src/imcombine/src/xtimmap.gx
+    Increase the stored filename length.  (8/20/03, Valdes)
+
+images$immatch/src/imcombine/src/icsetout.x
+    When using offsets based on physical coordinates and there is a flip
+    the routine was incorrectly using imunmap instead of xt_imunmap.
+    (7/30/03, Valdes)
+
+images$immatch/src/imcombine/src/icstat.gx
+    Fixed an incorrect declaration for asum$t() in the generic routine.
+    This is the correct fix for:
+	images$immatch/src/imcombine/src/generic/icstat.x
+	    Fixed an incorrect declaration for asumd() (7/8/03, MJF)
+    (7/30/03, Valdes)
+
+images$imgeom/src/t_imshift.x
+    Fixed and incorrect declaration for clgetd() (7/8/03, MJF)
+
+images$tv/imexamine/stfprofile.x
+    The selection of a point to get a first estimation of the FWHM in
+    stf_fit did not check for the case of a zero value.  This could cause
+    a floating divide by zero.  (5/5/03, Valdes)
+
+images$tv/imexamine/stfprofile.x
+    The subpixel evaluation in stf_profile involves fitting an image
+    interpolator to a subraster.  To avoid attempting to evaluate a point
+    outside the center of the edge pixels, which is a requirement of the
+    image interpolators, the interpolator is fit to the full data raster
+    and the evaluations exclude the boundary pixels.  (5/5/03, Valdes)
+
+images$tv/imexamine/stfmeasure.x
+images$tv/imexamine/stfprofile.x	+
+images$tv/imexamine/mkpkg.x
+    Separated the routines in stfmeasure.x to correspond to those used
+    in OBSUTIL.  (5/6/03, Valdes)
+
+images$immatch/src/imcombine/src/icombine.x
+    Due to the way IMIO works it converts an out of memory error to
+    cannot open pixel file if a memory alloaction error occurs when
+    allocating file descriptor memory.  So if this error occurs and the
+    number of images is small the error will be interpreted as
+    a memory allocation error.  (4/9/03, Valdes)
+
+images$tv/display/dspmmap.x
+    Added errchk's for im_pmmapo to avoid the potential for a segmentation
+    violation due to an uncaught error.  (9/16/02, Valdes)
+
+images$imgeom/src/t_imshift.x
+    An incorrect shift of one pixel would appear when the specified shift
+    was near zero and less than the precision of a real; i.e. yshift=1e-9.
+    The code was changed to use double precision as appropriate.
+    (9/12/02, Valdes)
+
+images$tv/imexamine/iemw.x
+    Added a heuristic check for the appropriate hHmM formats.
+    (9/12/02, Valdes)
+
+images$tv/display/dspmmap.x
+    A common case of matching a mask to an image is where the pixel sizes
+    are the same but there are offsets and/or different sizes.  An optimized
+    mask matching based on using range lists and not calling mwcs was
+    added.  (9/12/02, Valdes)
+
+images$tv/display/dspmmap.x
+    The matched mask was incorrectly returning the input mask when the
+    scale and offset matched but not the size.  (9/10/02, Valdes)
+
+images$imutil/src/imrep.gx
+    In imrepr$t there was a declaration error for ilower.  (see buglog #507)
+    (9/4/02, Valdes/Warner)
+
+images$immatch/src/listmatch/t_imctroid.x
+    Added a F_FLUSHNL for the standard output to avoid having the warnings
+    printed with eprintf from occuring in the middle of the output
+    lines.  This caused a problem in imalign when scanning the lines.
+    (8/19/02, Valdes)
+
+=======
 V2.12.1
 =======
 

@@ -13,6 +13,7 @@ task	binpairs,
 	slitpic		= nproto$x_nproto.e
 
 task	findthresh	= "nproto$findthresh.cl"
+task	mkms		= "nproto$mkms.cl"
 
 task	detect		= "nproto$ace/x_nproto.e"
 task	objmasks	= "nproto$ace/objmasks.cl"

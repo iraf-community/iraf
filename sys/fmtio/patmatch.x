@@ -72,6 +72,8 @@ int	ip, nchars_matched
 int	pat_amatch()				# anchored match
 
 begin
+	nchars_matched = 0
+
 	if (pat[1] == BOL) {
 	    ip = 1
 	    nchars_matched = pat_amatch (str, ip, pat)

@@ -419,6 +419,7 @@ begin
 
 	    mwtmp = mw_open (NULL, mwoutdim)
 	    call mw_newsystem (mwtmp, "equispec", mwoutdim)
+	    call mw_swattrs (mwout, 0, "sformat", "equispec")
 	    call mw_swtype (mwtmp, axis, mwoutdim, "linear", "")
 	    if (LABEL(sh2) != EOS)
 		call mw_swattrs (mwtmp, 1, "label", LABEL(sh2))
@@ -513,6 +514,7 @@ begin
 
 	    ptr = mw_open (NULL, mwoutdim); mwout = ptr
 	    call mw_newsystem (mwout, "equispec", mwoutdim)
+	    call mw_swattrs (mwout, 0, "sformat", "equispec")
 	    call mw_swtype (mwout, axis, mwoutdim, "linear", "")
 	    if (LABEL(sh1) != EOS)
 		call mw_swattrs (mwout, 1, "label", LABEL(sh1))
@@ -945,6 +947,7 @@ begin
 		    k = SMW_PAXIS(MW(sh1),1)
 		    ptr = mw_open (NULL, 1); mwout = ptr
 		    call mw_newsystem (mwout, "equispec", 1)
+		    call mw_swattrs (mwout, 0, "sformat", "equispec")
 		    call mw_swtype (mwout, 1, 1, "linear", "")
 		    if (LABEL(sh1) != EOS)
 			call mw_swattrs (mwout, 1, "label", LABEL(sh1))

@@ -119,13 +119,14 @@ fexpr|fnames|fntypes|fnunits|fnformats|"
 # Units definitions.
 
 # Define the supported celestial coordinate units.
+# It appears only the first three are used and they must agree with skywcs.h. FV
 
-define  AT_RA_UNITS    "|degrees|radians|dms|hours|hms|"
-define  AT_DEC_UNITS   "|degrees|radians|dms|"
+define  AT_RA_UNITS    "|degrees|radians|hours|dms|hms|"
+define  AT_DEC_UNITS   "|degrees|radians|invalid|dms|"
 define  AT_DEGREES      1
 define  AT_RADIANS      2
-define  AT_DMS          3
-define  AT_HOURS        4
+define  AT_HOURS        3
+define  AT_DMS          4
 define  AT_HMS          5
 
 # Define the supported celestial coordinate error units.

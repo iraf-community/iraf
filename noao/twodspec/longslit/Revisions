@@ -1,5 +1,21 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
+longslit$transform/t_fceval.x	+
+longslit$transform/fceval.par	+
+longslit$doc/fceval.hlp		+
+longslit$transform/mkpkg
+longslit$x_longslit.x
+longslit$longslit.cl
+longslit$longslit.hd
+    New task to evaluate FITCOORDS solutions added.  (8/27/03, Valdes)
+
+longslit$transform/fcgetcoord.x
+    Features in the IDENTIFY database with zero weight are now ignored.
+    (7/22/02, Valdes)
+
+=======
+V2.12.1
+=======
 =====
 V2.12
 =====

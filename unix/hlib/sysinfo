@@ -112,15 +112,13 @@ switch ($UNAME)
         breaksw
     case linux:
         if (`$uname_cmd -m` == "ppc") then		# LinuxPPC
-            if (-f /etc/redhat-release) then
-                set mach 	= "linuxppc"
-                set hmach 	= "linuxppc"
-		set TAPES	= "/dev/*st[0-7]"
-		set shlib	= "no"
-		set LIBFILES    = ""
-		set LS		= "/bin/ls -s"
-		set LSDF	= "-lLtg"
-            endif
+            set mach 		= "linuxppc"
+            set hmach 		= "linuxppc"
+	    set TAPES		= "/dev/*st[0-7]"
+	    set shlib		= "no"
+	    set LIBFILES    	= ""
+	    set LS		= "/bin/ls -s"
+	    set LSDF		= "-lLt"
         else
             if (-f /etc/redhat-release) then		# RedHat Linux
                 set mach 	= "redhat"

@@ -18,5 +18,5 @@ libpkg.a:
 			<math/nlfit.h>
 	stfprofile.x	starfocus.h <imhdr.h> <mach.h> <math.h>\
 			<math/iminterp.h> <math/nlfit.h>
-	t_starfocus.x	starfocus.h <error.h> <imhdr.h> <mach.h>
+	t_starfocus.x	starfocus.h <error.h> <imhdr.h> <imset.h> <mach.h>
 	;

@@ -145,7 +145,7 @@ begin
 
 	# Each subblock must have at least  SKYMIN or FRAC sky pixels.
 	SKB_NSKYMIN(skb) = min (SKB_SKYMIN(skb),
-	     nint(SKB_FRAC(skb) * SKB_NCSPIX(skb) * SKB_NLSPIX(skb)))
+	     nint (SKB_FRAC(skb) * SKB_NCSPIX(skb) * SKB_NLSPIX(skb)))
 
 	# Histogram parameters.
 	SKB_NAV(skb) = nint (real(SKB_NBINS(skb)) / (min (SKB_NBINS(skb),
@@ -864,6 +864,10 @@ begin
 		call strcpy (Memc[title], IM_TITLE(im), SZ_IMTITLE)
 		iferr (call imdelf (im, "BPM"))
 		    ;
+		iferr (call imdelf (im, "DATASEC"))
+		    ;
+		iferr (call imdelf (im, "TRIMSEC"))
+		    ;
 
 		do i = 1, nlblk {
 		    buf = impl2r(im,i)
@@ -968,7 +972,7 @@ begin
 		    if (Memi[flags+i-1] == ERR) {
 			# Find nearest line with good data.
 			do k1 = i-1, 1, -1
-			    if (Memi[flags+k2-1] == OK)
+			    if (Memi[flags+k1-1] == OK)
 				break
 			do k2 = i+1, nl
 			    if (Memi[flags+k2-1] == OK)
@@ -978,7 +982,7 @@ begin
 				out[j,i] = out[j,k1]
 			    else
 				out[j,i] = out[j,k2]
-			} else if (k1 >= 0)
+			} else if (k1 >= 1)
 			    out[j,i] = out[j,k1]
 			else if (k2 <= nl)
 			    out[j,i] = out[j,k2]

@@ -29,8 +29,8 @@ int	i
 pointer	sp, wdes, im, ds
 
 bool	clgetb()
-int	clgeti(), btoi(), imd_wcsver()
-pointer	immap(), imd_mapframe1()
+int	clgeti(), btoi(), imd_wcsver(), imtlen(), imtgetim()
+pointer	immap(), imd_mapframe1(), imtopenp()
 errchk	immap, imd_mapframe1
 errchk	ds_getparams, ds_setwcs, ds_load_display, ds_erase_border
 
@@ -40,7 +40,12 @@ begin
 	call aclri (Memi[wdes], LEN_WDES)
 
 	# Open input imagefile.
-	call clgstr ("image", image, SZ_FNAME)
+	im = imtopenp ("image")
+	if (imtlen (im) != 1)
+	    call error (1, "Only one image may be displayed")
+	i = imtgetim (im, image, SZ_FNAME)
+	call imtclose (im)
+	#call clgstr ("image", image, SZ_FNAME)
 	im = immap (image, READ_ONLY, 0)
 	if (IM_NDIM(im) <= 0)
 	    call error (1, "image has no pixels")

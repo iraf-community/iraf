@@ -63,7 +63,8 @@ begin
 		    > statsfile)
 
 		list2 = statsfile
-		if (fscan (list2, mean, stddev) != 2) goto err
+		if (fscan (list2, mean, stddev) != 2) 
+		    break
 		list2 = ""; delete (statsfile, ver-, >& "dev$null")
 
 		random = sqrt (mean*peff + reff**2) / peff
@@ -79,7 +80,7 @@ begin
 		    print (random, "\t", stddev)
 	    }
 
-   err:	    list1 = ""; delete (tmpfile, ver-, >& "dev$null")
+   	    list1 = ""; delete (tmpfile, ver-, >& "dev$null")
 	    list2 = ""; delete (statsfile, ver-, >& "dev$null")
 
 	} else {

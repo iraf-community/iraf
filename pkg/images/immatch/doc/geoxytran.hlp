@@ -31,7 +31,7 @@ If defined the values of xref, yref, xout, yout, xshift, yshift, xmag, ymag,
 xrotation, and yrotation will supersede the computed values in the
 database file.
 .le
-.ls geometry = "geometric"
+.ls geometry = "geometric" (linear|geometric)
 The type of geometric transformation. The geometry parameter is
 only requested if database is defined. The options are:
 .ls linear
@@ -40,6 +40,12 @@ Perform only the linear part of the spatial transformation.
 .ls geometric
 Compute both the linear and distortion portions of the spatial transformation.
 .le
+.le
+.ls direction = "forward" (forward|backwards)
+The transformation direction may be "forward" or "backward".  The forward
+direction directly evaluates the database solution.  The backward
+direction iteratively dtermines the coordinate which evaluates to the
+specified coordinate.
 .le
 .ls xref = INDEF, yref = INDEF
 The x and y coordinates of the reference origin.
@@ -89,7 +95,9 @@ The columns in the input coordinate file containing the x and y coordinates.
 .le
 .ls calctype = "real"
 The precision of the coordinate transformation calculations. The options
-are "real" and "double".
+are "real" and "double".  Note that this only applies to a "forward"
+transformation.  The "backward" transformation is done iteratively and
+is always calculated in double precision to get the best convergence.
 .le
 .ls xformat = "", yformat = ""
 The default output format for the computed x and y coordinates. If
@@ -200,6 +208,33 @@ themselves not the coordinate axes.
 	   d = yo - e * xref0 - f * yref0 = xshift
 .fi
 
+
+.ih
+Forward vs. Backward Transformations
+
+The transformation direction is specified by the \fIdirection\fR parameter
+which may take the values "forward" or "backward".  The forward transformation
+is a direct evaluation of the database solution.  The backward
+transformation is an iterative evaluation to obtain the coordinate which
+evaluates to the desired coordinate.
+
+When the same solution is used with \fBgeotran\fR to transform an image
+to another image matching the "reference" image is needed to obtain
+coordinates in the transformed image.  This is because the transformation
+is produced with \fBgeomap\fR to map "reference" coordinates to the
+image which is subsequently transformed.  Therefore, if you have coordinates
+in the image which has been transformed then you should use the "backward"
+transformation to get coordinates for the transformed image.  But if you
+have standard coodinates from the reference image being matched then you
+would use the "forward" transformation.  If you are not sure then you can
+use \fBtvmark\fR to overlay the results to find which direction produces
+the desired coordinates.
+
+Because the backward transformation is performed iteratively it can be
+slow.  If higher speeds are desired, such as when evaluating a very
+large number of coordinates, one might create a transformation solution
+that can be evaluated in the forward direction.  This is done by
+using \fBgeomap\fR with the reference and target coordinates reversed.
 
 .ih
 FORMATS
@@ -333,7 +368,20 @@ the list of unknowns.
 
     cl> geoxytran unknowns unknowns.tran rtran.db rtran
 
-2. Evaluate the transform computed in example 1 for the same list of
+2.  Evaluate the backward transformation to take coordinates from the
+output system to the reference system.  In this example we use the
+output of the first example to illustrate getting back the coordinates
+used in the original geomap input.
+
+    cl> geoxytran rtran STDOUT rtran.db rtran dir=forward |\
+    >>> geoxytran STDIN STDOUT rtran.db rtran dir=backward
+    0.999798 0.9997257 184.1445 -153.0376
+        512. 0.9999674 684.0376 184.1445
+	512.     512. 346.8555 684.0376
+    0.999918 512.0001 -153.0380 346.8555
+
+
+3. Evaluate the transform computed in example 1 for the same list of
 unknowns but modify the transformation slightly by setting xmag
 and ymag to 1.18 and 1.18 exactly.
 
@@ -341,7 +389,7 @@ and ymag to 1.18 and 1.18 exactly.
 	ymag=1.18
 
 
-3. Evaluate the same transformation for the same unknowns as before
+4. Evaluate the same transformation for the same unknowns as before
 using the linear transformation parameters not the transform computed
 by geomap. Note that the angle is the negative of the one defined
 in the database file.

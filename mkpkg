@@ -16,6 +16,7 @@ mkall:
 relink:
 	$call sysexe
 	$call packages
+	$ifeq (hostid, unix)  !(touch unix/hlib/utime)  $endif
 	$echo "====================== (done) ==========================="
 	$ifeq (hostid, unix)  !(date)  $endif
 	;
@@ -250,10 +251,10 @@ suse:					# install suse binaries
         !$(hlib)/mkfloat.csh suse
         !(cd ./unix; setenv MACH suse; sh -x setarch.sh)
         ;
-linuxppc:					# install Linux PPC binaries
+linuxppc:				# install Linux PPC binaries
         $verbose off
         !$(hlib)/mkfloat.csh linuxppc
-        !(cd ./unix; setenv MACH ppc; sh -x setarch.sh)
+        !(cd ./unix; setenv MACH linuxppc; sh -x setarch.sh)
         ;
 macosx:					# install MacOS X binaries
         $verbose off

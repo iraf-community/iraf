@@ -31,12 +31,12 @@ include "fxf.h"
 # of type variable length integer array.  Each element of this column is a
 # BINTABLE variable length array descriptor which physically consists of two
 # integer values: an integer giving the length of the stored array (encoded
-# line list), followed by an integer giving the offset of the array data
-# (encoded line list) in the heap area.  Multiple variable length array
-# descriptors may point to the same stored array, and in fact PLIO uses 
-# this feature to implement compression in the Y direction (adjacent mask
-# lines will point to the same encoded line list).  The code here supports
-# masks of up to 3 dimensions.
+# line list), followed by an integer (in byte unit) giving the offset of 
+# the array data (encoded line list) in the heap area.  Multiple variable 
+# length array descriptors may point to the same stored array, and in 
+# fact PLIO uses this feature to implement compression in the Y direction 
+# (adjacent mask lines will point to the same encoded line list).  
+# The code here supports masks of up to 3 dimensions.
 
 procedure fxf_plwrite (im, fd)
 
@@ -86,11 +86,16 @@ begin
 		    op = heap_offset
 
 		vararray[1] = lp_len
-		vararray[2] = op
+
+		# The offsets on the FITS BINTABLE is in byte unit 
+		# as establish by the FITS standard.
+
+		vararray[2] = op * 2              # Byte offset
+
 		call miiwritei (fd, vararray, 2)
 
 		lastline = lp
-		lp_off = op
+		lp_off = op 
 		if (lp == emptyline && ep_off < 0)
 		    ep_off = op
 
@@ -213,6 +218,7 @@ begin
 		FIT_LENAXIS(fk,3)
 	datasize = (datasize + pcount)/SZB_CHAR
 
+	call fxf_not_incache(im)
 	hdrp = FIT_HDRPTR(fk)
 	pixp = FIT_PIXPTR(fk)
 	group = FIT_GROUP(fk)

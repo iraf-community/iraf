@@ -1,3 +1,4 @@
+include	<fset.h>
 include <imhdr.h>
 include <error.h>
 include <mach.h>
@@ -95,6 +96,9 @@ begin
 	cp = NULL
 
 	iferr {
+	    # Flush on new line to avoid eprint output from appear
+	    # in the middle of regular output.
+	    call fseti (STDOUT, F_FLUSHNL, YES)
 
 	    # Open the input image list.
 	    imlist = imtopenp ("input")

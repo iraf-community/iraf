@@ -13,12 +13,14 @@ procedure t_refspectra ()
 
 pointer	input			# List of input images
 pointer	refs			# List of reference images
-int	select			# Selection method for reference spectra
+#int	select			# Selection method for reference spectra
 int	type			# Type of reference specification
 
 int	clgwrd(), imtgetim()
 pointer	sp, ref, im, imtopenp(), immap()
 errchk	immap
+
+include	"refspectra.com"
 
 begin
 	call smark (sp)

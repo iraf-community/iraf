@@ -67,7 +67,7 @@ define	IM_PLFLAGS	Memi[$1+36]		# PL mask i/o flags
 define	IM_SVLEN	Meml[$1+$2+40-1]	# save true axis lengths
 define	IM_VMAP		Memi[$1+$2+47-1]	# map section dimensions
 define	IM_VOFF		Meml[$1+$2+54-1]	# section offsets
-define	IM_VSTEP	Memi[$1+$2+59-1]	# section sample step size
+define	IM_VSTEP	Memi[$1+$2+61-1]	# section sample step size
 define	IM_NAME		Memc[P2C($1+68)]	# imagefile name
 			# (extra space)
 

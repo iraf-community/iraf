@@ -19,6 +19,7 @@ betelgeuse              : betelgeuse!/iraf/iraf/bin.linux/irafks.e
 bluemoon		: bluemoon!/iraf/iraf/bin.ssun/irafks.e
 bobcat			: bobcat!/iraf/iraf/bin.ssun/irafks.e
 bokchoy			: bokchoy!/iraf/iraf/bin.ssun/irafks.e
+bonza			: bonza!/iraf/iraf/bin.redhat/irafks.e
 bruckner		: bruckner!/iraf/iraf/bin.sparc/irafks.e
 bunyip			: bunyip!/iraf/iraf/bin.ssun/irafks.e
 camille                 : camille!/iraf/iraf/bin.redhat/irafks.e
@@ -35,18 +36,22 @@ coma			: coma!/iraf/iraf/bin.ssun/irafks.e
 condorito		: condorito!/usr/iraf/bin.sparc/irafks.e
 corvus			: corvus!/iraf/iraf/bin.ssun/irafks.e
 crunch			: crunch!/iraf/iraf/bin.ssun/irafks.e
+crux			: crux!/iraf/iraf/bin.redhat/irafks.e
 cygnus			: cygnus!/local/iraf/bin.sparc/irafks.e
 data			: data!/iraf/iraf/bin.ssun/irafks.e
 defiant			: defiant!/iraf/iraf/bin.ssun/irafks.e
 deneb			: deneb!/local/iraf/iraf/bin.ssun/irafks.e
+dhcp-4-152		: dhcp-4-152!/iraf/iraf/bin.redhat/irafks.e
 driftwood		: driftwood!/iraf/iraf/bin.ssun/irafks.e
 dropbear		: dropbear!/iraf/iraf/bin.redhat/irafks.e
+dtsn1			: dtsn1!/iraf/iraf/bin.redhat/irafks.e
 eagle			: eagle!/iraf/iraf/bin.sparc/irafks.e
 elqui			: elqui!/iraf/iraf/bin.sparc/irafks.e
 enzo                    : enzo!/iraf/iraf/bin.ssun/irafks.e
 equuleus		: equuleus!/local/iraf/iraf/bin.ssun/irafks.e
 new-equuleus		: new-equuleus!/local/iraf/iraf/bin.ssun/irafks.e
 felis			: felis!/u1/iraf/iraf/bin.rs6000/irafks.e
+fungo			: fungo!/u1/iraf/iraf/bin.redhat/irafks.e
 gemini g		: gemini!/iraf/iraf/bin.sparc/irafks.e
 gonk			: gonk!/iraf/iraf/bin.ssun/irafks.e
 gongxx			: gongxx!/iraf/iraf/bin.ssun/irafks.e
@@ -98,6 +103,8 @@ pavo			: pavo!/iraf/iraf/bin.sparc/irafks.e
 pegasus peg		: pegasus!/iraf/iraf/bin.sparc/irafks.e
 perseus per		: perseus!/iraf/iraf/bin.sparc/irafks.e
 phoenix pho		: phoenix!/iraf/iraf/bin.sparc/irafks.e
+pictor			: pictor!/iraf/iraf/bin.redhat/irafks.e
+pipedevn		: pipedevn!/iraf/iraf/bin.redhat/irafks.e
 pisces pi		: pisces!/iraf/iraf/bin.ssun/irafks.e
 potosi 			: potosi!/iraf/iraf/bin.ssun/irafks.e
 prometheus prometheu    : prometheus!/local/iraf/iraf/bin.ssun/irafks.e
@@ -122,6 +129,7 @@ spud			: spud!/iraf/iraf/bin.sparc/irafks.e
 sunset			: sunset!/local/iraf/iraf/bin.ssun/irafks.e
 surya			: surya!/iraf/iraf/bin.sparc/irafks.e
 stis1			: stis1!/scr0/iraf/iraf/bin.sparc/irafks.e
+tarat			: tarat!/iraf/iraf/bin.ssun/irafks.e
 taco			: taco!/iraf/iraf/bin.sparc/irafks.e
 tesla			: tesla!/iraf/iraf/bin.sparc/irafks.e
 tofu			: tofu!/iraf/iraf/bin.ssun/irafks.e
@@ -134,6 +142,7 @@ vega			: vega!/iraf/iraf/bin.hp700/irafks.e
 vissun-1		: vissun-1!/iraf/iraf/bin.sparc/irafks.e
 vmware                  : vmware!/iraf/iraf/bin.redhat/irafks.e
 volans			: volans!/iraf/iraf/bin.sparc/irafks.e
+wombat			: wombat!/iraf/iraf/bin.redhat/irafks.e
 xari			: xari!/iraf/iraf/bin.ssun/irafks.e
 zathras			: zathras!/iraf/iraf/bin.ssun/irafks.e
 zippy			: zippy!/iraf/iraf/bin.redhat/irafks.e
@@ -153,6 +162,7 @@ rush36                          : rush36!/iraf/iraf/bin.sparc/irafks.e
 
 # Kitt Peak mountain sites
 khaki khaki.kpno.noao.edu       : khaki!/usr/iraf/iraf/bin.sparc/irafks.e
+azure azure.kpno.noao.edu       : azure!/usr/iraf/iraf/bin.ssun/irafks.e
 cocoa cocoa.kpno.noao.edu       : cocoa!/usr/iraf/iraf/bin.sparc/irafks.e
 burgundy burgundy.kpno.noao.edu : burgundy!/usr/iraf/iraf/bin.sparc/irafks.e
 pearl pearl.kpno.noao.edu       : pearl!/usr/iraf/iraf/bin.sparc/irafks.e
@@ -181,6 +191,7 @@ sand sand.kpno.noao.ed          : sand!/iraf/iraf/bin.redhat/irafks.e
 
 # Cerro Tololo mountain sites
 ctio4m			: ctio4m!/usr/iraf/bin/irafks.e
+ctios8			: ctios8!/iraf/iraf/bin.redhat/irafks.e
 
 # U.of.A sites.
 astro astro.as.ariz	: astro.as.arizona.edu!/usr/iraf/bin.sparc/irafks.e

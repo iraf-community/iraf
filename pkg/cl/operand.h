@@ -92,6 +92,9 @@ struct arr_desc {
 #define	OP_CONCAT	10	/* string concatenatation		*/
 #define OP_RADIX	11	/* string = radix (decimal, newradix)	*/
 #define OP_STRIDX	12	/* first occurrence of a char in str	*/
+#define OP_STRLDX	13	/* last occurrence of a char in str	*/
+#define OP_STRSTR	14	/* first occurrence of str1 in str2	*/
+#define OP_STRLSTR	15	/* last occurrence of str1 in str2	*/
 
 /* binary logical expressions, handled by binexp();
  * uses o_val.v_i as boolean result
@@ -137,6 +140,9 @@ struct arr_desc {
 #define	OP_SUBSTR	24	/* extract substring			*/
 #define	OP_TAN		25	/* tangent				*/
 #define OP_STRLEN	26	/* length of a string constant		*/
+#define OP_ISINDEF	27	/* is value INDEF			*/
+#define OP_STRLWR	28	/* convert string to lower case		*/
+#define OP_STRUPR	29	/* convert string to upper case		*/
 
 /* These area used by intrinsic() to categorize the various opcodes.
  * The lower OP_BITS encode the specific function, while bits above that

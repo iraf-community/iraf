@@ -35,6 +35,7 @@ real	energy				# Maximum random energy (electrons)
 bool	cmmts				# Add comments?
 
 bool	new, fcmmts
+long	seed1
 real	x, y, z, dmin, dmax
 int	i, j, k, l, nx, ny, nlines, c1, c2, c3, c4, l1, l2, l3, l4, irbuf, ipbuf
 pointer	sp, input, output, fname, comment, rbuf, pbuf
@@ -60,7 +61,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (comment, LEN_COMMENT, TY_CHAR)
+	call salloc (comment, max (SZ_FNAME,LEN_COMMENT), TY_CHAR)
 
 	# Get parameters which apply to all images.
 	ilist = imtopenp ("input")
@@ -79,7 +80,9 @@ begin
 	    call salloc (pbuf, ranbuf, TY_REAL)
 	seed = clgetl ("seed")
 	if (IS_INDEFL(seed))
-	    seed = clktime (long (0))
+	    seed1 = seed1 + clktime (long (0))
+	else
+	    seed1 = seed
 	cmmts = clgetb ("comments")
 
 	if (imtlen (ilist) == 0)
@@ -107,7 +110,7 @@ begin
 		    }
 		    in = out
 
-		    call clgstr ("header", Memc[comment], LEN_COMMENT)
+		    call clgstr ("header", Memc[comment], SZ_FNAME)
 		    iferr (call mkh_header (out, Memc[comment], true, false))
 			call erract (EA_WARN)
 
@@ -196,9 +199,9 @@ begin
 		    call malloc (MKO_Z(mko), nobjects, TY_REAL)
 		    call malloc (MKO_SORT(mko), nobjects, TY_INT)
 		    do i = 0, nobjects-1 {
-			Memr[MKO_X(mko)+i] = 1 + (nc-1) * urand (seed)
-			Memr[MKO_Y(mko)+i] = 1 + (nl-1) * urand (seed)
-			Memr[MKO_Z(mko)+i] = energy * urand (seed)
+			Memr[MKO_X(mko)+i] = 1 + (nc-1) * urand (seed1)
+			Memr[MKO_Y(mko)+i] = 1 + (nl-1) * urand (seed1)
+			Memr[MKO_Z(mko)+i] = energy * urand (seed1)
 			Memi[MKO_SORT(mko)+i] = i
 		    }
 		    if (Memc[fname] != EOS) {
@@ -233,10 +236,10 @@ begin
 			    call amovkr (background, Memr[obuf], nc)
 			if (poisson)
 			    call mkpnoise (Memr[obuf], Memr[obuf], nc, 0.,
-				gain, pbuf, ranbuf, ipbuf, seed)
+				gain, pbuf, ranbuf, ipbuf, seed1)
 			if (rdnoise > 0.)
 			    call mkrnoise (Memr[obuf], nc, rdnoise,
-				rbuf, ranbuf, irbuf, seed)
+				rbuf, ranbuf, irbuf, seed1)
 			call alimr (Memr[obuf], nc, dmin, dmax)
 			IM_MIN(out) = min (IM_MIN(out), dmin)
 			IM_MAX(out) = max (IM_MAX(out), dmax)
@@ -252,10 +255,10 @@ begin
 				Memr[obuf], nc)
 			if (poisson)
 			    call mkpnoise (Memr[obuf], Memr[obuf], nc, 0.,
-				gain, pbuf, ranbuf, ipbuf, seed)
+				gain, pbuf, ranbuf, ipbuf, seed1)
 			if (rdnoise > 0.)
 			    call mkrnoise (Memr[obuf], nc, rdnoise,
-				rbuf, ranbuf, irbuf, seed)
+				rbuf, ranbuf, irbuf, seed1)
 			call alimr (Memr[obuf], nc, dmin, dmax)
 			IM_MIN(out) = min (IM_MIN(out), dmin)
 			IM_MAX(out) = max (IM_MAX(out), dmax)
@@ -371,10 +374,10 @@ begin
 			call aaddkr (Memr[ptr2], background, Memr[ptr2], nc)
 		    if (poisson)
 			call mkpnoise (Memr[ptr2], Memr[ptr2], nc, 0., gain,
-			    pbuf, ranbuf, ipbuf, seed)
+			    pbuf, ranbuf, ipbuf, seed1)
 		    if (rdnoise > 0.)
 			call mkrnoise (Memr[ptr2], nc, rdnoise,
-			    rbuf, ranbuf, irbuf, seed)
+			    rbuf, ranbuf, irbuf, seed1)
 		    obuf = impl2r (out, l)
 		    call amovr (Memr[ptr2], Memr[obuf], nc) 
 		    call alimr (Memr[obuf], nc, dmin, dmax)
@@ -403,10 +406,10 @@ begin
 			call aaddkr (Memr[ptr1], background, Memr[obuf], nc)
 		    if (poisson)
 			call mkpnoise (Memr[obuf], Memr[obuf], nc, 0., gain,
-			    pbuf, ranbuf, ipbuf, seed)
+			    pbuf, ranbuf, ipbuf, seed1)
 		    if (rdnoise > 0.)
 			call mkrnoise (Memr[obuf], nc, rdnoise,
-			    rbuf, ranbuf, irbuf, seed)
+			    rbuf, ranbuf, irbuf, seed1)
 		    call alimr (Memr[obuf], nc, dmin, dmax)
 		    IM_MIN(out) = min (IM_MIN(out), dmin)
 		    IM_MAX(out) = max (IM_MAX(out), dmax)

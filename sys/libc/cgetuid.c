@@ -8,11 +8,14 @@
 
 /* C_GETUID -- Get the user identification string (user name).
  */
+char *
 c_getuid (outstr, maxch)
+char	*outstr;		/* user name, C string		*/
+int	maxch;			/* max chars out, incl EOS	*/
 {
 	XCHAR	spp_uid[SZ_FNAME+1];
 	XINT	x_maxch = SZ_FNAME;
 
 	GETUID (spp_uid, &x_maxch);
-	return (c_stupak (spp_uid, outstr, maxch));
+	return (c_strpak (spp_uid, outstr, maxch));
 }

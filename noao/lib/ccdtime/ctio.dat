@@ -122,6 +122,13 @@ telescope = "Schmidt"
 	scale = 96.6
 	transmission =  0.870
 
+telescope = "1.3m"
+        aperture = 1.3
+        scale = 11.8
+        transmission = 0.727
+        transmission(andicam_opt) = 0.65
+        transmission(andicam_ir) = 0.80
+
 end
 
 # Filter data:
@@ -305,6 +312,14 @@ detector = "andicam_opt"
 	V = 0.87467
 	R = 0.8874
 	I = 0.7166
+
+detector = "andicam_ir"
+        rdnoise = 11
+        dark = 0.5
+        pixsize = 18.5
+        J = 0.23
+        H = 0.33
+        K = 0.31
 
 detector = "cirim"
         rdnoise = 37

@@ -46,6 +46,7 @@ real	x, y, z, r, ar, pa, dmin, dmax
 
 bool	new, bsave, cmmts, fcmmts
 int	i, j, k, l, nx, ny, nlines, c1, c2, c3, c4, l1, l2, l3, l4, irbuf, ipbuf
+long	seed1
 pointer	sp, input, output, fname, type, star, comment, rbuf, pbuf
 pointer	in, out, buf, obuf, lines, newlines, obj, ptr1, ptr2
 pointer	mko, mkt
@@ -96,7 +97,9 @@ begin
 	m0 = clgetr ("magzero")
 	seed = clgetl ("seed")
 	if (IS_INDEFL(seed))
-	    seed = clktime (long (0))
+	    seed1 = seed1 + clktime (long (0))
+	else
+	    seed1 = seed
 	cmmts = clgetb ("comments")
 
 	background = exptime * background
@@ -255,10 +258,10 @@ begin
 			    call amovkr (background, Memr[obuf], nc)
 			if (poisson)
 			    call mkpnoise (Memr[obuf], Memr[obuf], nc, 0., gain,
-				pbuf, ranbuf, ipbuf, seed)
+				pbuf, ranbuf, ipbuf, seed1)
 			if (rdnoise > 0.)
 			    call mkrnoise (Memr[obuf], nc, rdnoise,
-				rbuf, ranbuf, irbuf, seed)
+				rbuf, ranbuf, irbuf, seed1)
 			call alimr (Memr[obuf], nc, dmin, dmax)
 			IM_MIN(out) = min (IM_MIN(out), dmin)
 			IM_MAX(out) = max (IM_MAX(out), dmax)
@@ -385,10 +388,10 @@ begin
 		    if (!new) {
 		        if (poisson)
 			    call mkpnoise (Memr[ptr1], Memr[ptr2], k,
-				background, gain, pbuf, ranbuf, ipbuf, seed)
+				background, gain, pbuf, ranbuf, ipbuf, seed1)
 		        if (rdnoise > 0.)
 			    call mkrnoise (Memr[ptr2], k,
-				rdnoise, rbuf, ranbuf, irbuf, seed)
+				rdnoise, rbuf, ranbuf, irbuf, seed1)
 		    }
 		    ptr1 = ptr1 + nx
 		}
@@ -412,10 +415,10 @@ begin
 			    call aaddkr (Memr[ptr2], background, Memr[ptr2], nc)
 			if (poisson)
 			    call mkpnoise (Memr[ptr2], Memr[ptr2], nc, 0., gain,
-				pbuf, ranbuf, ipbuf, seed)
+				pbuf, ranbuf, ipbuf, seed1)
 			if (rdnoise > 0.)
 			    call mkrnoise (Memr[ptr2], nc, rdnoise,
-				rbuf, ranbuf, irbuf, seed)
+				rbuf, ranbuf, irbuf, seed1)
 		    }
 		    obuf = impl2r (out, l)
 		    call amovr (Memr[ptr2], Memr[obuf], nc) 
@@ -446,10 +449,10 @@ begin
 			    call aaddkr (Memr[ptr1], background, Memr[obuf], nc)
 			if (poisson)
 			    call mkpnoise (Memr[obuf], Memr[obuf], nc, 0., gain,
-				pbuf, ranbuf, ipbuf, seed)
+				pbuf, ranbuf, ipbuf, seed1)
 			if (rdnoise > 0.)
 			    call mkrnoise (Memr[obuf], nc, rdnoise,
-				rbuf, ranbuf, irbuf, seed)
+				rbuf, ranbuf, irbuf, seed1)
 			call alimr (Memr[obuf], nc, dmin, dmax)
 			IM_MIN(out) = min (IM_MIN(out), dmin)
 			IM_MAX(out) = max (IM_MAX(out), dmax)

@@ -96,7 +96,7 @@ int	fd1		#I Logfile descriptor
 int	fd2		#I Logfile descriptor
 
 double	wt1, wt2, dval
-int	i, j, k, k1, k2, l, dc, sfd, axis[2], naps, naps1, naps2, ncoeffs
+int	i, j, k, k1, k2, l, dc, sfd, naps, naps1, naps2, ncoeffs
 pointer	sp, str1, str2, papcen, pshift, coeffs, ct1, ct2, un, un1, un2
 pointer	paps1, paps2, punits1, punits2, pshift1, pshift2, pcoeff1, pcoeff2
 
@@ -106,7 +106,6 @@ int	imaccf(), nscan(), stropen()
 pointer	smw_sctran(), un_open()
 errchk	dc_gmsdb, dc_refshft, imgstr, smw_sctran, un_open
 
-data	axis/1,2/
 define	done_	90
 
 begin
@@ -706,7 +705,7 @@ int	fd1		#I Logfile descriptor
 int	fd2		#I Logfile descriptor
 
 double	wt1, wt2, dval
-int	i, j, k, l, dc, sfd, axis[2], naps, ncoeffs, offset, slope
+int	i, j, k, l, dc, sfd, naps, ncoeffs, offset, slope
 pointer	sp, str1, str2, coeff, coeffs, ct1, ct2, un1, un2, un3
 pointer	pshift1, pshift2, pshift3, pcoeff1, pcoeff2, pcoeff3
 
@@ -716,7 +715,6 @@ int	imaccf(), nscan(), stropen()
 pointer	smw_sctran(), un_open()
 errchk	dc_gecdb, imgstr, smw_sctran, un_open
 
-data	axis/1,2/
 define	done_	90
 
 begin

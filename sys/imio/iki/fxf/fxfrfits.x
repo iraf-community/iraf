@@ -34,15 +34,17 @@ long	fi[LEN_FINFO]
 pointer hoff,totpix, extn, extv
 pointer sp, fit, o_fit, lbuf, hdrfile, hdr
 int	cindx, cfit, user, fitslen, offs_count
-int	in, spool, slot, i, nrec1440
+int	in, spool, slot, i, nrec1440, acmode
 
-bool	initialized, reload, extname_or_ver
+bool	initialized, reload, extname_or_ver, ext_append
 data	initialized /false/
 int	rf_refcount
 
 bool	streq()
-long	clktime(), fstatl()
+long	cputime(), fstatl()
+
 int	finfo(), open(), stropen(), getline()
+
 errchk	putline, syserrs, seek, calloc, realloc, syserr
 errchk	fpathname, malloc, fxf_load_header, fxf_skip_xtn, fxf_read_xtn
 
@@ -75,6 +77,8 @@ begin
 	if (finfo (Memc[hdrfile], fi) == ERR) 
 	    call syserrs (SYS_FOPEN, IM_HDRFILE(im))
 	
+        acmode = FIT_ACMODE(o_fit)
+	ext_append = (acmode == NEW_IMAGE || acmode == NEW_COPY)
 	repeat {
 	    # Search the header file cache for the named image.
 	    do cindx = 1, rf_cachesize {
@@ -84,11 +88,19 @@ begin
 		}
 		if (streq (Memc[hdrfile], rf_fname[1,cindx])) {
 		    # File is in cache; is cached entry still valid?
-		    if (FI_MTIME(fi) != rf_mtime[cindx]) {
+		    # If we are appending extension, do not reload from
+		    # disk.
+
+		    if (FI_MTIME(fi) != rf_mtime[cindx] && !ext_append) {
 			# File modify date has changed, reuse slot.
 			slot = cindx
 			break
 		    } 
+		    
+		    # For every non-empty file the fxf_open() call
+		    # pre reads every PHU, so that when the fxf_rdhdr()
+		    # comes, the cache entry is already here.
+
 		    # Return the cached header.
 		    rf_lru[cindx] = rf_refcount
 		    cfit = rf_fit[cindx]
@@ -134,16 +146,6 @@ begin
 			}	
 		    }
 
-		    # See if the cached has been loaded in the last 2 clock
-		    # "tick" (second) and only for the main header (i.e. group
-		    # zero.  If so reload the header.
-
-		    if (group == 0 && !reload && clktime(rf_time[cindx]) < 2) {
-			reload = true
-			slot = cindx
-			break
-		    }
-
 		    # The main header has already been read at this point,
 		    # now merge with UA.
 
@@ -160,6 +162,18 @@ begin
 			call fxf_read_xtn (im,
 			    cfit, group, hoff, poff, extn, extv)
 		    } 
+
+		    # IM_CTIME takes the value of the DATE keyword
+		    if (IM_CTIME(im)==0) {
+			IM_CTIME(im) = FI_CTIME(fi)
+		    }
+
+		    # FIT_MTIME takes the value of keyword IRAF-TLM.
+		    # If not present use the mtime from the finfo value.
+
+		    if (FIT_MTIME(cfit) == 0) {
+			FIT_MTIME(cfit) = FI_MTIME(fi)
+		    }
 
 		    # Invalidate entry if cache is disabled.
 		    if (rf_cachesize <= 0)
@@ -187,6 +201,7 @@ begin
 		call mfree (rf_hdrp[slot], TY_INT)
 		call mfree (rf_fit[slot], TY_STRUCT)
 		call mfree (rf_hdr[slot], TY_CHAR)
+		rf_fit[slot] = NULL
 		rf_lru[slot] = 0
 		rf_fname[1,slot] = EOS
 	    }
@@ -228,10 +243,9 @@ begin
 	    rf_lru[slot] = rf_refcount
 	    rf_mtime[slot] = FI_MTIME(fi)
 
-	    if (!reload) {
-		rf_time[slot] = clktime (0)
-	    }
-	    
+	    if (!reload)
+		rf_time[slot] = cputime (0)
+
 	    reload = true
 
 	    in = IM_HFD(im)
@@ -242,6 +256,7 @@ begin
 	    call amovki (1, FIT_LENAXIS(fit,1), IM_MAXDIM)
 
 	    call fxf_load_header (in, fit, spool, nrec1440, totpix)
+
 
 	    # Record group 0 (PHU) as having just been read.
 	    FIT_GROUP(fit) = 0
@@ -432,7 +447,7 @@ rxtn_
 	# message.
 
 	if (strcmp(FIT_EXTTYPE(lfit), "BINTABLE") == 0) {
-	    if (strcmp(FIT_EXTSTYPE(lfit), "PLIO_1")!=0)
+	    if (strcmp(FIT_EXTSTYPE(lfit), "PLIO_1") != 0)
 		call syserrs (SYS_IKIEXTN, IM_NAME(im))
 	}
 	
@@ -442,8 +457,11 @@ rxtn_
 	# Copy the spool array into a static array. We cannot reliable
 	# get the pointer from the spool file.
 	call smark (sp)
-	call salloc (po, fitslen+1, TY_CHAR)
 	call salloc (ln, LEN_UACARD, TY_CHAR)
+
+	if (po != NULL)
+	    call mfree(po, TY_CHAR)
+	call malloc(po, fitslen+1, TY_CHAR)
 
 	i = po
 	call seek (spool, BOFL)
@@ -471,9 +489,14 @@ rxtn_
 	if (FKS_INHERIT(lfit) != NO_KEYW)
 	    FIT_INHERIT(lfit) = FKS_INHERIT(lfit)
 
-	if (FIT_TFIELDS(lfit) > 0)
+	if (FIT_TFIELDS(lfit) > 0) {
 	    fitslen = fitslen + FIT_TFIELDS(lfit)*LEN_UACARD
+	    call realloc (po, fitslen, TY_CHAR)
+        }
+
 	call fxf_merge_w_ua (im, po, fitslen)
+
+	call mfree (po, TY_CHAR)
 
 	call sfree (sp)
 	call close (spool)
@@ -853,6 +876,7 @@ begin
 	    IM_LENHDRMEM(im) = len_hdrmem
 	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
 	}
+
 
 	# Copy the extension header to the USERAREA if not inherit or copy
 	# the global header plus the extension header if inherit is set.

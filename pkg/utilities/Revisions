@@ -1,5 +1,14 @@
 .help revisions Jun88 pkg.utilities
 .nf
+=======
+V2.12.2
+=======
+
+utilities$urand.x
+    Modified method based on clktime for generating a new seed when
+    the users specifies it as INDEF so that it doesn't have a 1 second
+    granularity.  (8/7/03, Valdes)
+
 =====
 V2.12
 =====

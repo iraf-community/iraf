@@ -660,6 +660,7 @@ begin
 	    nc2 = c2 - c1 + 1
 	    off1 = c1 - off2 - 1
 	    off3 = c2 - off2
+	    off2 = max (0, off2)
 	    nc3 = nc1 - off3
 	    if (off1 > 0) {
 		call aclrr (Memr[imdata[2]], off1)

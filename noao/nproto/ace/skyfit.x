@@ -79,8 +79,8 @@ begin
 
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
-	l1 = 1
-	l2 = nl
+	l1 = 1 + step / 2
+	l2 = nl - step / 2
 	step = real (l2-l1) / max (nint((l2-l1)/step),xorder+2,lmin)
 
 	if (logfd != NULL) {
@@ -142,8 +142,8 @@ begin
 		xterms, 1., real(nc), 1., real(nl))
 	}
 	if (dosig) {
-	    call cvinit (cvsig, func1d, xorder, Memr[x1], Memr[x1+nc-1])
-	    call gsinit (gssig, func2d, xorder, yorder, xterms,
+	    call cvinit (cvsig, CHEBYSHEV, 1, Memr[x1], Memr[x1+nc-1])
+	    call gsinit (gssig, GS_CHEBYSHEV, 1, 1, xterms,
 		1., real(nc), 1., real(nl))
 	}
 

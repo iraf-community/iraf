@@ -95,9 +95,6 @@ char *fname;			/* simple filename, no dirs */
 	strcat (pathname, "ssol");
 #endif
 #else
-#ifdef OSF1
-	strcat (pathname, "alpha");
-#else
 #ifdef mc68010
 	strcat (pathname, "mc68010");
 #else
@@ -115,7 +112,6 @@ char *fname;			/* simple filename, no dirs */
 #else
 #ifdef vax
 	strcat (pathname, "vax");
-#endif
 #endif
 #endif
 #endif

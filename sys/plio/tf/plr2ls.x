@@ -105,8 +105,8 @@ begin
 	    # Output range of zeros to catch up to current range?
 	    if (nz > 0) {
 		# Output the ZN instruction.
-		for (;  nz > 0;  nz = nz - I_DATAMAX) {
-		    ll_dst[op] = M_ZN + min(I_DATAMAX,nz)
+		for (;  nz > 0;  nz = nz - (I_DATAMAX-1)) {
+		    ll_dst[op] = M_ZN + min(I_DATAMAX-1,nz)
 		    op = op + 1
 		}
 		# Convert to PN if range is a single pixel.

@@ -22,6 +22,9 @@ real	newx, x[3], news, s[3], delx
 real	adotr(), apqzero()
 
 begin
+	if (sigma <= 0.0)
+	    return (-1)
+
 	# Allocate working space.
 	call smark (sp)
 	call salloc (wgt, npix, TY_REAL)

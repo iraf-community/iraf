@@ -41,7 +41,7 @@ relink:
 
 	$update libpkg.a
 
-	$set	xflags = "$(xflags) -x"
+	#$set	xflags = "$(xflags) -x"
 	$omake  cl.x
 	$omake	globals.c <libc/libc.h> <libc/stdio.h> <libc/spp.h>\
 		construct.h eparam.h operand.h param.h task.h

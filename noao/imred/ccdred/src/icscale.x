@@ -348,10 +348,11 @@ begin
 	    call close (fd)
 	    if (i < nimages) {
 		call salloc (errstr, SZ_LINE, TY_CHAR)
-		call sprintf (errstr, SZ_FNAME, "Insufficient %s values in %s")
+		call sprintf (Memc[errstr], SZ_FNAME,
+		    "Insufficient %s values in %s")
 		    call pargstr (param)
 		    call pargstr (name[2])
-		call error (1, errstr)
+		call error (1, Memc[errstr])
 	    }
 	} else if (name[1] == '!') {
 	    type = S_KEYWORD

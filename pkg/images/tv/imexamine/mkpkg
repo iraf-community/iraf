@@ -41,7 +41,8 @@ libpkg.a:
 	ietimexam.x	imexam.h <error.h> <imhdr.h>
 	ievimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <mach.h>\
 			<imset.h> <math.h> <math/iminterp.h>
-	stfmeasure.x	starfocus.h <error.h> <imhdr.h> <imset.h> <mach.h>\
+	stfmeasure.x	starfocus.h <error.h> <imhdr.h> <imset.h> <math/nlfit.h>
+	stfprofile.x	starfocus.h <imhdr.h> <mach.h>\
 			<math.h> <math/nlfit.h> <math/iminterp.h>
 	t_imexam.x	imexam.h <error.h> <gset.h> <imhdr.h>
 	;

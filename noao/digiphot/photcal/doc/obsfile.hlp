@@ -16,10 +16,11 @@ the output of the user's own digital photometry program. All the files in the
 list must have the format specified by \fIincolumns\fR.
 .le
 .ls incolumns
-A list of nine numbers separated by commas or whitespace specifying which
+A list of ten numbers separated by commas or whitespace specifying which
 columns in \fIphotfiles\fR contain the following fields: the image name or id,
 x coordinate, y coordinate, filter id, exposure time, airmass, time of
-observation, instrumental magnitude, and magnitude error, respectively.  
+observation, instrumental magnitude, magnitude error, and object id
+respectively.  
 .le
 .ls idfilters
 The list of filter ids separated by whitespace or commas which define a
@@ -136,14 +137,15 @@ a given observation by order of occurence or x-y position, and
 5) assigns a unique name to each object in each field.
 
 The parameter \fIincolumns\fR describes the format of \fIphotfiles\fR.
-\fIIncolumns\fR is a list of nine numbers separated by commas or whitespace
+\fIIncolumns\fR is a list of ten numbers separated by commas or whitespace
 which specify the columns containing the following fields: the
 image name or id,
 the x coordinate, the y coordinate, the filter id, the exposure time, 
-the airmass, the time of observation the instrumental magnitude and the magnitude error.
+the airmass, the time of observation the instrumental magnitude, the
+magnitude error, and the object id.
 For example
-if \fIincolumns\fR is "1 2 3 6 8 7 9 4 5", the image name is assumed to
-be in column 1, the x and y positions in columns 2 and 3, the filter id,
+if \fIincolumns\fR is "10 2 3 6 8 7 9 4 5 1", the object id is assumed to
+be in column 1, the image id in column 10, the x and y positions in columns 2 and 3, the filter id,
 exposure time, airmass, and time of observation in columns 6, 8, 7 and 9,
 and the instrumental
 magnitude and magnitude error in columns 4 and 5. The image names must

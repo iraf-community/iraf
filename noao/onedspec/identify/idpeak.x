@@ -57,3 +57,39 @@ begin
 
 	return (n)
 end
+
+
+# ID_UPEAKS -- Find uniformly distributed peaks in the data.  This just calls
+# find_upeaks but does the logical to physical pixel conversion.
+
+int procedure id_upeaks (id, data, x, npoints, contrast, separation, edge,
+	nmax, nbins, threshold, debug)
+
+pointer	id		#I Identify pointer
+real	data[npoints]	#I Input data array
+real	x[npoints]	#O Output peak position array
+int	npoints		#I Number of data points
+real	contrast	#I Maximum contrast between strongest and weakest
+int	separation	#I Minimum separation between peaks
+int	edge		#I Minimum distance from the edge
+int	nmax		#I Maximum number of peaks to be returned
+int	nbins		#I Number of bins across the data array
+real	threshold	#I Minimum threshold level for peaks
+bool	debug		#I Print diagnostic information?
+
+int	i, n, np1, find_upeaks()
+double	smw_c1trand()
+errchk	find_upeaks
+
+begin
+	# Find the peaks in logical coordinates.
+	n = find_upeaks (data, x, npoints, contrast, separation, edge,
+	    nmax, nbins, threshold, debug)
+
+	# Convert to physical coordinates.
+	np1 = NP1(ID_SH(id)) - 1
+	do i = 1, n
+	    x[i] = smw_c1trand (ID_LP(id), double (x[i]+np1))
+
+	return (n)
+end

@@ -6,7 +6,7 @@
 
 #ifndef D_libc
 #ifndef import_libc
-#include <libc.h>
+#include "libc.h"
 #endif
 #endif
 

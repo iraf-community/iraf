@@ -238,7 +238,12 @@ begin
 	    }
 
 	    # Compute the rotation angle.
-	    det = sxrxi * syryi - syrxi * sxryi
+	    num = sxrxi * syryi
+	    denom = syrxi * sxryi
+	    if (fp_equald (num, denom))
+		det = 0.0d0
+	    else
+		det = num - denom
 	    if (det < 0.0d0) {
 		num = syrxi + sxryi
 	        denom = -sxrxi + syryi
@@ -459,7 +464,12 @@ begin
 	    }
 
 	    # Compute the rotation angle.
-	    det = sxrxi * syryi - syrxi * sxryi
+	    num = sxrxi * syryi
+	    denom = syrxi * sxryi
+	    if (fp_equald (num, denom))
+		det = 0.0d0
+	    else
+		det = num - denom
 	    if (det < 0.0d0) {
 		num = syrxi + sxryi
 	        denom = -sxrxi + syryi
@@ -1442,7 +1452,12 @@ begin
 	    }
 
 	    # Compute the rotation angle.
-	    det = sxrxi * syryi - syrxi * sxryi
+	    num = sxrxi * syryi
+	    denom = syrxi * sxryi
+	    if (fp_equald (num, denom))
+		det = 0.0d0
+	    else
+		det = num - denom
 	    if (det < 0.0d0) {
 		num = syrxi + sxryi
 	        denom = -sxrxi + syryi
@@ -1663,7 +1678,12 @@ begin
 	    }
 
 	    # Compute the rotation angle.
-	    det = sxrxi * syryi - syrxi * sxryi
+	    num = sxrxi * syryi
+	    denom = syrxi * sxryi
+	    if (fp_equald (num, denom))
+		det = 0.0d0
+	    else
+		det = num - denom
 	    if (det < 0.0d0) {
 		num = syrxi + sxryi
 	        denom = -sxrxi + syryi

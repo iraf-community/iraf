@@ -211,6 +211,7 @@ begin
 		Memi[pp+j-1] = o
 
 		npix = O_LEN(op)
+		#npix = EX_OCOLS(op)
 	 	call evvfree (op)
 	    }
 

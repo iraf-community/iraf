@@ -16,19 +16,19 @@ include	<imset.h>
 define	MAX_OPENIM	(LAST_FD-16)		# Maximum images kept open
 define	MAX_OPENPIX	45			# Maximum pixel files kept open
 
-define	XT_SZIMNAME	99			# Size of IMNAME string
-define	XT_LEN		79			# Structure length
+define	XT_SZIMNAME	299			# Size of IMNAME string
+define	XT_LEN		179			# Structure length
 define	XT_IMNAME	Memc[P2C($1)]		# Image name
-define	XT_ARG		Memi[$1+50]		# IMMAP header argument
-define	XT_IM		Memi[$1+51]		# IMIO pointer
-define	XT_HDR		Memi[$1+52]		# Copy of IMIO pointer
-define	XT_CLOSEFD	Memi[$1+53]		# Close FD?
-define	XT_FLAG		Memi[$1+54]		# Flag
-define	XT_BUFSIZE	Memi[$1+55]		# Buffer size
-define	XT_BUF		Memi[$1+56]		# Data buffer
-define	XT_BTYPE	Memi[$1+57]		# Data buffer type
-define	XT_VS		Memi[$1+57+$2]		# Start vector (10)
-define	XT_VE		Memi[$1+67+$2]		# End vector (10)
+define	XT_ARG		Memi[$1+150]		# IMMAP header argument
+define	XT_IM		Memi[$1+151]		# IMIO pointer
+define	XT_HDR		Memi[$1+152]		# Copy of IMIO pointer
+define	XT_CLOSEFD	Memi[$1+153]		# Close FD?
+define	XT_FLAG		Memi[$1+154]		# Flag
+define	XT_BUFSIZE	Memi[$1+155]		# Buffer size
+define	XT_BUF		Memi[$1+156]		# Data buffer
+define	XT_BTYPE	Memi[$1+157]		# Data buffer type
+define	XT_VS		Memi[$1+157+$2]		# Start vector (10)
+define	XT_VE		Memi[$1+167+$2]		# End vector (10)
 
 # Options
 define	XT_MAPUNMAP	1	# Map and unmap images.
@@ -94,8 +94,9 @@ begin
 	im = xt_opix (NULL, index, 0)
 
 	# Make copy of IMIO pointer for header keyword access.
-	call malloc (XT_HDR(xt), LEN_IMDES+IM_HDRLEN(im), TY_STRUCT)
-	call amovi (Memi[im], Memi[XT_HDR(xt)], LEN_IMDES+IM_HDRLEN(im))
+	call malloc (XT_HDR(xt), LEN_IMDES+IM_HDRLEN(im)+1, TY_STRUCT)
+	call amovi (Memi[im], Memi[XT_HDR(xt)], LEN_IMDES)
+	call amovi (IM_MAGIC(im), IM_MAGIC(XT_HDR(xt)), IM_HDRLEN(im)+1)
 
 	return (XT_HDR(xt))
 end

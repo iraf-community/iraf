@@ -118,6 +118,8 @@ begin
 	    call imaddr (im, "cdelt1", 1.)
 	}
 	call imaddi (im, "crpix1", 1)
+	call imastr (im, "ctype1", "velocity")
+	call imastr (im, "cunit1", "km/s")
 	call nam_filtype (rv, Memc[bp])
 	call imastr (im, "filtype", Memc[bp])
 	call imaddi (im, "cuton", RVF_CUTON(rv))
@@ -158,11 +160,9 @@ begin
 
 	# Sret up X-axis
 	if (RV_DCFLAG(rv) != -1) {
-	    i = - (RV_CCFNPTS(rv) / 2)
-	    do j = 1, npts {
-		Memr[x+j-1] = real (rv_shift2vel(rv,real(i)))
-		i = i + 1
-	    }
+            do i = 1, npts 
+                Memr[x+i-1] = real (rv_shift2vel(rv,WRKPIXX(rv,i)))
+
 	} else {
 	    i = - (RV_CCFNPTS(rv) / 2)
 	    do j = 1, npts {

@@ -147,16 +147,18 @@ begin
 		    if (LABEL(sh) == EOS)
 			call strcpy ("", UNITS(sh), LEN_SHDRS)
 		    else if (streq (LABEL(sh), "lambda"))
-			call strcpy ("meters", UNITS(sh), LEN_SHDRS)
+			call strcpy ("angstroms", UNITS(sh), LEN_SHDRS)
 		    else if (streq (LABEL(sh), "freq"))
 			call strcpy ("hertz", UNITS(sh), LEN_SHDRS)
 		    else if (strncmp (LABEL(sh), "velo", 4) == 0)
-			call strcpy ("m/s 21 centimeters", UNITS(sh), LEN_SHDRS)
+			call strcpy ("m/s", UNITS(sh), LEN_SHDRS)
 		    else if (streq (LABEL(sh), "waveleng"))
-			call strcpy ("meters", UNITS(sh), LEN_SHDRS)
+			call strcpy ("angstroms", UNITS(sh), LEN_SHDRS)
 		    else
 			call strcpy ("", UNITS(sh), LEN_SHDRS)
 		}
+		if (strncmp (LABEL(sh), "velo", 4) == 0)
+		    call strcat (" 21 centimeters", UNITS(sh), LEN_SHDRS)
 	    }
 	    if (UNITS(sh) == EOS && DC(sh) != DCNO)
 		call strcpy ("Angstroms", UNITS(sh), LEN_SHDRS)

@@ -21,7 +21,7 @@ FINT *maxsiz;
 	else
 		return(REOF);	/* non-existent argument */
 
-	for(i = 0; i<*maxsiz && *t!='\0' ; ++i)
+	for(i = 0; i<*maxsiz-1 && *t!='\0' ; ++i)
 		*s++ = *t++;
 	*s++ = REOS;	/* terminate ratfor string with eos */
 	return(i);	/* return length of argument */

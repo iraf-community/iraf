@@ -5,7 +5,7 @@ database,s,h,"ccdtime$kpno.dat",,,Database file
 telescope,s,h,,,,Telescope name (? for list)
 detector,s,h,,,,Detector name (? for list)
 sum,i,h,1,,,CCD summing factor
-seeing,r,h,1.5,0.1,10.0,Seeing (arcsec)
+seeing,r,h,1.5,0.001,10.0,Seeing (arcsec)
 airmass,r,h,1.2,1.,,Airmass
 phase,r,h,0.,0.,28.,Moon phase (0-28)
 f1,s,h,U,,,Filter 1

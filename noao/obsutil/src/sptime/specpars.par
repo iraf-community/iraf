@@ -46,7 +46,7 @@ xeff,r,h,INDEF,,,"Peak efficiency
 # Aperture"
 aperture,s,h,"",,,Aperture transmission or table
 aptitle,s,h,"",,,Aperture title
-aptype,s,h,"",,,"Aperture type (rectanglular|circle)
+aptype,s,h,"",,,"Aperture type (rectanglular|circular)
 
 # Fiber"
 fiber,s,h,"",,,Fiber transmission or table

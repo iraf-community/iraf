@@ -1,5 +1,34 @@
 .help revisions May91 noao.digiphot.photcal
 .nf
+
+=======
+V2.12.2
+=======
+
+photcal/photcal.cl
+photcal/photcal.hd
+photcal/photcal.men
+    Typo changes referencing PHTOCALX fixed (11/11/03 MJF)
+
+photcal/photcal.par
+    Fixed reference to photcalx$ in 'catdir' default value (11/11/03 MJF)
+
+photcal/doc/obsfile.hlp
+    OBSFILE expects "incolumns" to have 10 numbers and not 9 and specified
+    in the help file.  The extra column is for an object ID.  This may
+    have been added in Aug. 2001 judging from the last modify date of
+    the include defining the structure.  (1/24/03, Valdes)
+
+    In the descriptions of the catalog files, the first catalog in the
+    list "Elias" has the wrong filename for the formats and templates
+    file.  Currently they are flandolt.dat and and tlandolt.dat, which
+    should be felias.dat and telias.dat.
+    (9/13/02, Valdes, Warner)
+
+=======
+V2.12.1
+=======
+
 photcal/mknobsfile.cl
 photcal/mkobsfile.cl
 photcal/obsfile.par

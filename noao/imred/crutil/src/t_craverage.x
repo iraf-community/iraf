@@ -176,6 +176,12 @@ begin
 		# grow is zero.
 
 		if (pm != NULL) {
+		    if (pmmode != READ_WRITE) {
+			call imunmap (pm)
+			iferr (pm = immap (Memc[crmask], READ_WRITE, 0))
+			    call error (1, "Can't reopen mask for growing")
+		    }
+
 		    if (crval == objval)
 			call crgrow (pm, max (crgrw, objgrw), crval, crval)
 		    else {

@@ -194,8 +194,8 @@ begin
 		}
 	    }
 	    call apsets (py, PYNAME, Memc[outfname])
-	    call apfroot (Memc[outfname], Memc[polygon], SZ_FNAME)
-	    call apsets (py, PYROOT, Memc[polygon])
+	    call apfroot (Memc[outfname], Memc[str], SZ_LINE)
+	    call apsets (py, PYROOT, Memc[str])
 
 	    # Open the coordinates file.
 	    if (lclist <= 0) {
@@ -219,8 +219,8 @@ begin
 		}
 	    }
 	    call apsets (py, CLNAME, Memc[outfname])
-	    call apfroot (Memc[outfname], Memc[coords], SZ_FNAME)
-	    call apsets (py, CLROOT, Memc[coords])
+	    call apfroot (Memc[outfname], Memc[str], SZ_LINE)
+	    call apsets (py, CLROOT, Memc[str])
 
 	    # Set output file name.
 	    if (lolist == 0) {

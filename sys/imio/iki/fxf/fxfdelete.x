@@ -63,6 +63,7 @@ begin
 		call mfree (rf_hdrp[cindx], TY_INT)
 		call mfree (rf_fit[cindx], TY_STRUCT)
 		call mfree (rf_hdr[cindx], TY_CHAR)
+		rf_fit[cindx] = NULL
 		rf_lru[cindx] = 0
 		rf_fname[1,cindx] = EOS
 	    }

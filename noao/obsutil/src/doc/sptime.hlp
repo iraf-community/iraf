@@ -186,11 +186,18 @@ direction is always searched first and the directory sptimelib$ is searched
 last so it is not necessary to include these directories.  The list may be
 a comma delimited list of directories, an @file, or a template.
 .le
+.ls minexp = 0.01 (0.01) [spectrograph]
+Minimumm time in seconds per individual exposure time.  This only applies
+when \fItime\fR is INDEF.  Adjustment of the exposure time for saturation
+will not allow the exposure time to fall below this value.
+.le
 .ls maxexp = 3600. (3600.) [spectrograph]
-Maximum time in seconds per individual exposure.  If the total exposure
-time exceeds this amount by more than 1% then the total exposure time will
-be divided up into the fewest individual exposures with equal exposure time
-that are less than this amount.
+Maximum time in seconds per individual exposure.  The minimum exposure time
+has precedence over this value.  If the total exposure time exceeds this
+amount by more than 1% then the total exposure time will be divided up into
+the fewest individual exposures with equal exposure time that are less than
+this amount.  Note that by making the minimum and maximum times the same a
+fixed integration time can be defined.
 .le
 .ls units = "Angstroms" ("Angstroms") [spectrograph]
 Dispersion units for input and output dispersion coordinates.  The
@@ -201,11 +208,13 @@ apply to the dispersion units in the tables which are always in Angstroms.
 .ls skysub = "" (default based on context) [spectrograph]
 Type of sky and background subtraction.  The values are "none" for no
 background subtraction, "longslit" for subtraction using pixels in the
-aperture, and "multiap" for background determined from a number of other
-apertures.  The last case is typical for fiber spectrographs.  If no sky or
-thermal background is specified then the default is "none".  If a fiber
-table or circular aperture is specified the default is "multiap" otherwise
-the default is "longslit".
+aperture, "multiap" for background determined from a number of other
+apertures, and "shuffle" for shuffled observations.  The multiap case is
+typical for fiber spectrographs.  For shuffle the duty cycle is 50% and the
+exposure times are the sum of both sky and object.  If no sky or thermal
+background is specified then the default is "none".  If a fiber table or
+circular aperture is specified the default is "multiap" otherwise the
+default is "longslit".
 .le
 .ls nskyaps = 10  (10) [spectrograph]
 Number of sky apertures when using "multiap" sky subtraction.
@@ -625,10 +634,15 @@ Dark count rate in photons/s.
 .le
 .ls saturation = INDEF [detector|spectrograph]
 Number of detected photons in a pixel resulting in saturation.
-The default is no saturation.
+The default is no saturation.  The time per exposure will be reduced,
+but no lower than the minimum time per exposure,
+and the number of exposures increased to try and avoid saturation.
 .le
 .ls dnmax = INDEF [detector|spectrograph]
 Maximum data number or ADU allowed.  The default is no maximum.
+The time per exposure will be reduced,
+but no lower than the minimum time per exposure,
+and the number of exposures increased to try and avoid overflow.
 .le
 .ls xbin = 1 (1) [detector|spectrograph]
 Detector binning along the dispersion direction.

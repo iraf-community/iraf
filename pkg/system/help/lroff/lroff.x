@@ -49,7 +49,7 @@ int	foflag_val		# output form control chars?
 char	ctrlstr[2]
 pointer	sp, ibuf
 int	ip, command, last_command
-int	in(), nextcmd(), getarg(), input(), nofill()
+int	in(), nextcmd(), lgetarg(), input(), nofill()
 
 errchk	input, textout, nofill, rawcopy, skiplines, breakline, right_justify
 errchk	salloc, new_section, new_indented_section, center_text, init_ls
@@ -143,9 +143,9 @@ begin
 	    case CE:
 		call center_text (in, out, Memc[ibuf], ip)
 	    case SP:
-		call skiplines (out, getarg(Memc[ibuf],ip,1))
+		call skiplines (out, lgetarg(Memc[ibuf],ip,1))
 	    case IN:
-		call indent_left_margin (in, out, getarg(Memc[ibuf],ip,0))
+		call indent_left_margin (in, out, lgetarg(Memc[ibuf],ip,0))
 	    case LS, LE:
 		call do_LS (out, Memc[ibuf+ip-1], command, last_command)
 
@@ -173,7 +173,7 @@ begin
 		call breakline (out, NJ)
 		if (foflag == YES) {
 		    ctrlstr[1] = FC_TESTPAGE
-		    ctrlstr[2] = getarg (Memc[ibuf], ip, DEF_TPNLINES)
+		    ctrlstr[2] = lgetarg (Memc[ibuf], ip, DEF_TPNLINES)
 		    ctrlstr[3] = EOS
 		    call out (out_magic_arg, ctrlstr)
 		}

@@ -22,7 +22,7 @@ int	last_command
 
 int	indent[MAX_NLS]
 int	n, ip, next_output_column
-int	getarg(), strlen()
+int	lgetarg(), strlen()
 errchk	skiplines, outstr, outc, breakline
 include	"lroff.com"
 
@@ -49,7 +49,7 @@ begin
 	    # Get number of spaces to indent, if given.  If arg is negative,
 	    # do not remember the argument, otherwise make it the new default.
 	    ip = 1
-	    n = getarg (lbuf, ip, ls_indent)
+	    n = lgetarg (lbuf, ip, ls_indent)
 	    if (n < 0)
 		indent[nls] = -n
 	    else {

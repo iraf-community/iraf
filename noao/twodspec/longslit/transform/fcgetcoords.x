@@ -21,7 +21,7 @@ pointer	un				# Units pointer
 
 char	image1[SZ_FNAME], image2[SZ_FNAME], root[SZ_FNAME], units[SZ_FNAME]
 int	i, j, rec, index, imin, imax, nfeatures, ntotal
-real	value, ltm[2,2], ltv[2]
+real	value, wt, ltm[2,2], ltv[2]
 pointer	dt, im, mw, ct, x, y, user
 
 int	fc_getim(), dtgeti(), dtscan()
@@ -138,7 +138,10 @@ begin
 		    }
 		    call gargr (value)
 		    call gargr (value)
-		    if (!IS_INDEF (value)) {
+		    call gargr (wt)
+		    call gargr (wt)
+		    call gargr (wt)
+		    if (!IS_INDEF (value) && wt > 0.) {
 			Memr[user+ncoords] = value
 			ncoords = ncoords + 1
 		    }

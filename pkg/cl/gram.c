@@ -694,7 +694,9 @@ int	nargs;
 	    "mod",       "nint",      "osfn",      "radix",
 	    "real",      "sin",       "sqrt",      "str",
 	    "substr",    "tan",       "mktemp",    "stridx",
-	    "strlen",	 "imaccess",  "defvar",
+	    "strlen",	 "imaccess",  "defvar",	   "strldx",
+	    "strstr",    "strlwr",    "strupr",    "isindef",
+	    "strlstr",
 	    NULL
 	};
 	static int optbl[] = {
@@ -705,10 +707,12 @@ int	nargs;
 	   BINOP|OP_MOD,     UNOP|OP_NINT,     UNOP|OP_OSFN,   BINOP|OP_RADIX,
 	    UNOP|OP_REAL,    UNOP|OP_SIN,      UNOP|OP_SQRT,    UNOP|OP_STR,
 	  MULTOP|OP_SUBSTR,  UNOP|OP_TAN,      UNOP|OP_MKTEMP, BINOP|OP_STRIDX,
-	    UNOP|OP_STRLEN,  UNOP|OP_IMACCESS, UNOP|OP_DEFVAR,
+	    UNOP|OP_STRLEN,  UNOP|OP_IMACCESS, UNOP|OP_DEFVAR, BINOP|OP_STRLDX,
+	   BINOP|OP_STRSTR,  UNOP|OP_STRLWR,   UNOP|OP_STRUPR,  UNOP|OP_ISINDEF,
+	   BINOP|OP_STRLSTR,
 	};
 	int	index, op;
-	int	n, subi[2];
+	int	i, n, subi[2];
 	char	sbuf[SZ_LINE+1];
 	struct	operand o;
 
@@ -776,8 +780,15 @@ int	nargs;
 		opcast (OT_STRING);		/* get string arg	*/
 		o = popop();
 
-		n = subi[1] - subi[0] + 1;
-		strncpy (sbuf, &o.o_val.v_s[subi[0]-1], n);
+		if (subi[1] >= subi[0]) {
+		    n = subi[1] - subi[0] + 1;
+		    strncpy (sbuf, &o.o_val.v_s[subi[0]-1], n);
+		} else {
+		    /* Reverse the string. */
+		    n = subi[0] - subi[1] + 1;
+		    for (i = 0; i < n; i++)
+			sbuf[i] = o.o_val.v_s[subi[0]-i-1];
+		}
 		sbuf[n] = '\0';
 
 		o.o_val.v_s = sbuf;
@@ -806,6 +817,7 @@ char	*s;
 	int	n, sign;
 	int	hr, minutes;
 	float	sec;
+	extern double atof();
 
 	o.o_type = OT_REAL;
 	sign = (*s == '-') ? (s++, -1) : 1;
@@ -816,7 +828,11 @@ char	*s;
 	if (n < 1 || minutes < 0 || sec < 0)
 	    setopundef (&o);
 	else
+	    o.o_val.v_r = sign * (atof (s));
+	    /*  Old evaluation producing roundoff errors.
 	    o.o_val.v_r = sign*(hr + ((float)minutes)/60. + sec/3600.);
+	    */
+
 	return (o);
 }
 

@@ -208,6 +208,14 @@ observatory = "vbo"
 	altitude = 725. 
 	timezone = -5.5
 
+# Submitted by S. Giridhar 6/28/03
+observatory = "iao"
+	name = "Indian Astronomical Observatory, Hanle"
+	longitude = 281.03583
+	latitude = 32.7794
+	altitude = 4500
+	timezone = -5.5
+
 # Submitted by Doug Mink 1/6/97
 observatory = "flwo"
         name = "Whipple Observatory"
@@ -407,4 +415,12 @@ observatory = "esovlt"
 	altitude = 2648
 	timezone = 4
 
+
+# Submited by Giovanni Catanzaro, 7/17/03.
+observatory = "sln"
+	name = "SLN - Catania Astrophysical Observatory"
+	longitude = 345:01:36
+	latitude = 37:41.5
+	altitude = 1725.
+	timezone = -1
 

@@ -15,7 +15,7 @@ define	DEF_CHARWIDTH	0.0125			# default char width
 
 # PSIO/CURSOR definitions.
 
-define	KSHIFT		100
+define	KSHIFT		10000
 define	DATA		0
 define	XMIT		1
 define	XFER		2

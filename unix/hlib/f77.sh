@@ -1,7 +1,7 @@
 #!/bin/sh
 PATH=/v/bin:/bin:/usr/bin:/usr/local/bin
 # f77-style shell script to compile and load fortran, C, and assembly codes
-#	usage:	f77 [-g] [-O|-O2|-O6] [-o absfile] [-c] files [-l library]
+#	usage:	f77 [-g] [-O|-O[23456]] [-o absfile] [-c] files [-l library]
 #		-o objfile	Override default executable name a.out.
 #		-c		Do not call linker, leave relocatables in *.o.
 #		-S		leave assembler output on file.s
@@ -9,6 +9,8 @@ PATH=/v/bin:/bin:/usr/bin:/usr/local/bin
 #		-u		complain about undeclared variables
 #		-w		omit all warning messages
 #		-w66		omit Fortran 66 compatibility warning messages
+#		-f*		pass thru gcc optimizer options
+#		-W*		pass thru gcc warning options
 #		files		FORTRAN source files ending in .f .
 #				C source files ending in .c .
 #				Assembly language files ending in .s .
@@ -70,6 +72,14 @@ do
 		shift 1
 		;;
 
+	-f2c)	F2C="$2"
+		shift 2
+		;;
+
+	-f*)	CFLAGS="$CFLAGS $1"
+		shift 1
+		;;
+
 	-g)	CFLAGS="$CFLAGS -g"
 		F2CFLAGS="$F2CFLAGS -g"
 		G="-g"
@@ -83,17 +93,26 @@ do
 		shift 1
 		;;
 
+	-m*)	CFLAGS="$CFLAGS $1"
+		shift 1
+		;;
+
 	-o)	OUTF=$2
 		shift 2
 		;;
 
-	-O|-O1|-O2|-O6)
+	-O*)
 		CFLAGS="$CFLAGS $1"
 		shift
 		;;
 
 	-u)	F2CFLAGS="$F2CFLAGS -u"
 		shift
+		;;
+
+	-W*)	CFLAGS="$CFLAGS $1"
+		warn=1
+		shift 1
 		;;
 
 	-w)	F2CFLAGS="$F2CFLAGS -w"
@@ -123,10 +142,6 @@ do
 	-S)	CFLAGS="$CFLAGS -S"
 		cOPT=0
 		shift
-		;;
-
-	-f2c)	F2C="$2"
-		shift 2
 		;;
 
 	-*)

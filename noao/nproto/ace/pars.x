@@ -198,7 +198,6 @@ begin
 	    DET_MINPIX(pars) = clgpseti (pp, "minpix")
 	    DET_SIGAVG(pars) = clgpsetr (pp, "sigavg")
 	    DET_SIGPEAK(pars) = clgpsetr (pp, "sigmax")
-	    DET_FRAC2(pars) = 0.
 	    DET_BPVAL(pars) = clgpseti (pp, "bpval")
 	    if (clgpsetb (pp, "updatesky"))
 		call skb_pars ("open", pset, DET_SKB(pars))
@@ -213,6 +212,41 @@ begin
 		if (i == 1 && j == 1)
 		    Memc[DET_CNV(pars)] = EOS
 	    }
+
+	    call clcpset (pp)
+	case 'd':
+	    if (pars != NULL)
+		return
+	    call calloc (pars, DET_LEN, TY_STRUCT)
+
+	    pp = clopset (pset)
+
+	    call clgpseta (pp, "convolve", Memc[DET_CNV(pars)], DET_STRLEN)
+	    DET_HSIG(pars) = clgpsetr (pp, "hsigma")
+	    DET_LSIG(pars) = clgpsetr (pp, "lsigma")
+	    DET_HDETECT(pars) = btoi (clgpsetb (pp, "hdetect"))
+	    DET_LDETECT(pars) = btoi (clgpsetb (pp, "ldetect"))
+	    DET_NEIGHBORS(pars) = clgpseti (pp, "neighbors")
+	    DET_MINPIX(pars) = clgpseti (pp, "minpix")
+	    DET_SIGAVG(pars) = clgpsetr (pp, "sigavg")
+	    DET_SIGPEAK(pars) = clgpsetr (pp, "sigmax")
+	    DET_BPVAL(pars) = clgpseti (pp, "bpval")
+	    if (clgpsetb (pp, "updatesky"))
+		call skb_pars ("open", pset, DET_SKB(pars))
+
+	    # Check convolution kernel.
+	    for (cp=DET_CNV(pars); IS_WHITE(Memc[cp]); cp=cp+1)
+		;
+	    call strcpy (Memc[cp], Memc[DET_CNV(pars)], DET_STRLEN)
+	    if (Memc[DET_CNV(pars)] != EOS) {
+		call cnvparse (Memc[DET_CNV(pars)], ptr, i, j, NULL)
+		call mfree (ptr, TY_REAL)
+		if (i == 1 && j == 1)
+		    Memc[DET_CNV(pars)] = EOS
+	    }
+
+	    # The following are unique to diffdetect.
+	    DET_FRAC2(pars) = clgpsetr (pp, "rfrac")
 
 	    call clcpset (pp)
 	case 'c':

@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.12.1 July 2002"
+    logver = "IRAF V2.12.2 January 2004"
 
 set	home		= "iraf$local/"
 set	imdir		= "HDR$"
@@ -10,10 +10,10 @@ set	uparm		= "home$uparm/"
 set	userid		= "iraf"
 
 # Set the terminal type.
-if (envget("TERM") == "sun") {
+if (envget("TERM") == "xterm") {
     if (!access (".hushiraf"))
-	print "setting terminal type to gterm..."
-    stty gterm
+	print "setting terminal type to xgterm..."
+    stty xgterm
 } else {
     if (!access (".hushiraf"))
 	print "setting terminal type to xgterm..."
@@ -22,15 +22,17 @@ if (envget("TERM") == "sun") {
 
 # Uncomment and edit to change the defaults.
 #set	editor		= vi
-#set	printer		= lw
+#set	printer		= lp
+#set    pspage          = "letter"
 #set	stdimage	= imt800
 #set	stdimcur	= stdimage
 #set	stdplot		= lw
 #set	clobber		= no
 #set	filewait	= yes
 #set	cmbuflen	= 512000
-#set	min_lenuserarea	= 24000
+#set	min_lenuserarea	= 64000
 #set	imtype		= "imh"
+#set    imextn          = "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
 
 # IMTOOL/XIMAGE stuff.  Set node to the name of your workstation to
 # enable remote image display.
@@ -50,7 +52,7 @@ task	$adb $bc $cal $cat $comm $cp $csh $date $df $diff	= "$foreign"
 task	$du $find $finger $ftp $grep $lpq $ls $mail $make	= "$foreign"
 task	$man $mon $mv $nm $od $ps $rcp $rlogin $rsh $ruptime	= "$foreign"
 task	$rwho $sh $spell $sps $strings $su $telnet $tip $top	= "$foreign"
-task	$touch $vi $emacs $w $wc $less $rusers $sync $pwd	= "$foreign"
+task	$vi $emacs $w $wc $less $rusers $sync $pwd		= "$foreign"
 
 task	$xc $mkpkg $generic $rtar $wtar $buglog			= "$foreign"
 #task	$fc = "$xc -h $* -limfort -lsys -lvops -los"
@@ -59,6 +61,8 @@ task	$fc = ("$" // envget("iraf") // "unix/hlib/fc.csh" //
 task	$nbugs = ("$(setenv EDITOR 'buglog -e';" //
 	    "less -Cqm +G " // envget ("iraf") // "local/bugs.*)")
 task	$cls = "$clear;ls"
+task    $clw = "$clear;w"
+task    $pg = ("$(less -Cqm $*)")
 
 if (access ("home$loginuser.cl"))
     cl < "home$loginuser.cl"

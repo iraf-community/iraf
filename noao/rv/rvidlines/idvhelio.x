@@ -10,7 +10,7 @@ double	hjd			#O Heliocentric Julian Date
 int	fd			#I Log file descriptor
 
 bool	newobs, obshead
-int	year, month, day, flags
+int	year, month, day, flags, dummy
 double	ra, dec, ep, ut, lt
 double	epoch, vrot, vbary, vorb
 double	latitude, longitude, altitude
@@ -54,7 +54,7 @@ begin
 
 	    call clgpset (kp, "ut", Memc[str1], SZ_LINE)
 	    call imgstr (im, Memc[str1], Memc[str2], SZ_LINE)
-	    if (dtm_decode (Memc[str2],year,month,day,ut,flags) == ERR) {
+	    if (dtm_decode (Memc[str2],dummy,dummy,dummy,ut,flags) == ERR) {
 		iferr (ut = imgetd (im, Memc[str1]))
 		    call error (1, "Error in UT keyword")
 	    }

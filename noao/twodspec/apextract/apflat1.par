@@ -73,18 +73,18 @@ t_grow,r,h,)aptrace.grow,,,">aptrace.grow
 
 # EXTRACTION PARAMETERS
 "
-background,s,h,"none",,,>apflat.background
-skybox,i,h,1,,,>apflat.skybox
+background,s,h,"none",,,>apflatten.background
+skybox,i,h,1,,,>apflatten.skybox
 weights,s,h,"none",,,Extraction weights (none|variance)
-pfit,s,h,)apflat.pfit,,,>apflat.pfit
-clean,b,h,)apflat.clean,,,>apflat.clean
+pfit,s,h,)apflatten.pfit,,,>apflatten.pfit
+clean,b,h,)apflatten.clean,,,>apflatten.clean
 nclean,r,h,0.5,,,Maximum number of pixels to clean
 niterate,i,h,5,0,,Number of profile fitting iterations
-saturation,r,h,)apflat.saturation,,,>apflat.saturation
-readnoise,s,h,)apflat.readnoise,,,>apflat.readnoise
-gain,s,h,)apflat.gain,,,>apflat.gain
-lsigma,r,h,)apflat.lsigma,,,>apflat.lsigma
-usigma,r,h,)apflat.usigma,,,>apflat.usigma
+saturation,r,h,)apflatten.saturation,,,>apflatten.saturation
+readnoise,s,h,)apflatten.readnoise,,,>apflatten.readnoise
+gain,s,h,)apflatten.gain,,,>apflatten.gain
+lsigma,r,h,)apflatten.lsigma,,,>apflatten.lsigma
+usigma,r,h,)apflatten.usigma,,,>apflatten.usigma
 polysep,r,h,0.90,0.1,0.90,Marsh algorithm polynomial spacing
 polyorder,i,h,10,1,,Marsh algorithm polynomial order
 nsubaps,i,h,1,,,"Number of subapertures per aperture

@@ -1,6 +1,6 @@
 # FITS.H -- IKI/FITS internal definitions.
 
-define	FITS_ORIGIN	"NOAO-IRAF FITS Image Kernel December 2001"
+define	FITS_ORIGIN	"NOAO-IRAF FITS Image Kernel July 2003"
 
 define	FITS_LENEXTN	4		# max length imagefile extension
 define	SZ_DATATYPE	16		# size of datatype string (eg "REAL*4")

@@ -14,12 +14,18 @@
 #define	import_knames
 #include <iraf.h>
 
+#if defined(LINUX) || defined(BSD)
+# ifdef SOLARIS
+#  undef SOLARIS
+# endif
+#endif
+
 /*
  * XC -- Main entry point of the XC compiler front-end used by the IRAF
  * system.
  */
 
-#define VERSION		"Digital Unix/IRAF XC V2.0 Tue Jun 11 2002"
+#define VERSION		"PC-IRAF XC V2.2 Dec 18 2003"
 
 #define	ERR		(-1)
 #define	EOS		'\0'
@@ -27,6 +33,7 @@
 #define	NO		0
 #define	MAXFLAG		64			/* maximum option flags */
 #define MAXFILE		1024			/* maximum files on cmdline */
+#define	SZ_CMDBUF	4096			/* maximum command buffer */
 #define	SZ_BUFFER	4096			/* library names, flags */
 #define	SZ_LIBBUF	4096			/* full library names */
 #define	SZ_FNAME	255
@@ -34,56 +41,149 @@
 #define	SZ_PKGENV	256
 #define DEF_PKGENV	"iraf"
 
+#ifdef MACOSX
 #define	CCOMP		"cc"			/* C compiler (also .s etc.) */
-#define	F77COMP		"f77"			/* Fortran compiler */
 #define	LINKER		"cc"			/* Linking utility */
+#else
+#define	CCOMP		"gcc"			/* C compiler (also .s etc.) */
+#define	LINKER		"gcc"			/* Linking utility */
+#endif
+#define	F77COMP		"f77"			/* Fortran compiler */
 #define	DEBUGFLAG	'g'			/* host flag for -x */
+#define	USEF2C		1			/* use Fortran to C trans. */
 
 #define	LIBCINCLUDES	"hlib$libc/"		/* IRAF LIBC include dir */
 #define	LOCALBINDIR	"/usr/local/bin/"	/* standard local BIN */
-#define	SYSBINDIR	"/usr/ccs/bin/"		/* special system BIN */
+#define	SYSBINDIR	"/usr/bin/"		/* special system BIN */
 
 #define	XPP		"xpp.e"
 #define	RPP		"rpp.e"
 #define	EDSYM		"edsym.e"
+#define	SHIMAGE		"S.e"
 #define LIBMAIN		"libmain.o"
+#define SHARELIB	"libshare.a"
 #define IRAFLIB1	"libex.a"
 #define IRAFLIB2	"libsys.a"
 #define IRAFLIB3	"libvops.a"
 #define IRAFLIB4	"libos.a"
 
-#ifdef OSF1
-#define	SHIMAGE		"libiraf.so"
-#define SHARELIB	"libiraf.so"
+#ifdef LINUX
+char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
+		    "-lf2c",			/*  1  */
+		    "-lm",			/*  2  */
+#ifndef LINUXPPC
+		    "-lcompat",			/*  3  */
 #else
-#define	SHIMAGE		"S.e"
-#define SHARELIB	"libshare.a"
+		    "-lg2c",			/*  3  */
+#endif
+		    "",				/*  4  */
+		    "",				/*  5  */
+		    "",				/*  6  */
+		    "",				/*  7  */
+		    "",				/*  8  */
+		    "",				/*  9  */
+		    0};				/* EOF */
+
+char *opt_flags[] = { "-O",			/*  0  */
+		    0};				/* EOF */
+int  nopt_flags	   = 1;				/* No. optimizer flags */
+
+#else
+#ifdef BSD
+char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
+		    "-lf2c",			/*  1  */
+		    "-lm",			/*  2  */
+		    "-lcompat",			/*  3  */
+		    "",				/*  4  */
+		    "",				/*  5  */
+		    "",				/*  6  */
+		    "",				/*  7  */
+		    "",				/*  8  */
+		    "",				/*  9  */
+		    0};				/* EOF */
+
+char *opt_flags[] = { "-O",			/*  0  */
+		    0};				/* EOF */
+int  nopt_flags	   = 1;				/* No. optimizer flags */
+
+#else
+#ifdef MACOSX
+char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
+		    "-lf2c",			/*  1  */
+		    "-lm",			/*  2  */
+		    "",				/*  3  */
+		    "",				/*  4  */
+		    "",				/*  5  */
+		    "",				/*  6  */
+		    "",				/*  7  */
+		    "",				/*  8  */
+		    "",				/*  9  */
+		    0};				/* EOF */
+
+char *opt_flags[] = { "-O3",			/*  0  */
+		    "-fstrength-reduce",	/*  1  */
+		    "-fpcc-struct-return",	/*  2  */
+		    0};				/* EOF */
+int  nopt_flags	   = 3;				/* No. optimizer flags */
+
+#else
+#ifdef SOLARIS
+char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
+		    "-lf2c",			/*  1  */
+		    "-lm",			/*  2  */
+		    "-lsocket",			/*  3  */
+		    "-lnsl",			/*  4  */
+		    "-lintl",			/*  5  */
+		    "-ldl",			/*  6  */
+		    "-lelf",			/*  7  */
+		    "",				/*  8  */
+		    "",				/*  9  */
+		    0};				/* EOF */
+
+char *opt_flags[] = { "-O",			/*  0  */
+		    0};				/* EOF */
+int  nopt_flags	   = 1;				/* No. optimizer flags */
+
+#else
+char *fortlib[] = { "-lU77",			/*  0  (host progs) */
+		    "-lm",			/*  1  */
+		    "-lF77",			/*  2  */
+		    "-lI77",			/*  3  */
+		    "-lm",			/*  4  */
+		    "",				/*  5  */
+		    "",				/*  6  */
+		    "",				/*  7  */
+		    "",				/*  8  */
+		    "",				/*  9  */
+		    0};				/* EOF */
+
+char *opt_flags[] = { "-O",			/*  0  */
+		    0};				/* EOF */
+int  nopt_flags	   = 1;				/* No. optimizer flags */
+
+#endif
+#endif
+#endif
 #endif
 
-#ifdef OSF1
-#define FORTLIB0	"-lUfor"
-#define FORTLIB1	"-lfor"
-#define FORTLIB2	"-lFutil"
-#define FORTLIB3	"-lm_4sqrt"
-#define FORTLIB4	"-lm"
-#define FORTLIB5	"-lots"
-#define FORTLIB6	""
-#define FORTLIB7	""
-#define FORTLIB8	""
-#define FORTLIB9	""
-#define FORTLIBA	""
+#ifdef BSD
+#define	F_STATIC	"-static"
+#define	F_SHARED	"-shared"
 #else
-#define FORTLIB0	"-lU77"
-#define FORTLIB1	"-lm"
-#define FORTLIB2	"-lF77"
-#define FORTLIB3	"-lI77"
-#define FORTLIB4	"-lm"
-#define FORTLIB5	""
-#define FORTLIB6	""
-#define FORTLIB7	""
-#define FORTLIB8	""
-#define FORTLIB9	""
-#define FORTLIBA	""
+#ifdef MACOSX
+#define	F_STATIC	"-static"
+#define	F_SHARED	"-shared"
+#else
+#ifdef LINUX
+#define	F_STATIC	"-Wl,-Bstatic"
+#define	F_SHARED	"-Wl,-Bdynamic"
+#else
+#ifdef SOLARIS
+#define	F_STATIC	"-Wl,-Bstatic"
+#define	F_SHARED	"-Wl,-Bdynamic"
+#endif
+#endif
+#endif
 #endif
 
 #define isxfile(str)	(getextn(str) == 'x')
@@ -95,6 +195,16 @@
 #define isofile(str)	(getextn(str) == 'o')
 
 
+#ifdef SOLARIS
+#ifdef X86
+int	usesharelib = NO;
+int	noedsym = YES;
+#else
+int	usesharelib = YES;
+int	noedsym = NO;
+#endif
+
+#else
 #ifdef SHLIB
 int	usesharelib = YES;
 int	noedsym = NO;
@@ -102,27 +212,39 @@ int	noedsym = NO;
 int	usesharelib = NO;
 int	noedsym = YES;
 #endif
+#endif
 
-int	stripexe = NO;
-int	notvsym = NO;
-int	noshsym = NO;
-int	errflag = NO;
-int	objflags = NO;
-int	keepfort = NO;
-int	mkobject = YES;
-int	mktask = YES;
-int	optimize = YES;
-int	cflagseen = NO;
-int	nfileargs = 0;
-int	link_static = 0;
-int	debug = NO;
-int	hostprog = NO;
-int	voslibs = YES;
-int	nolibc = NO;
+int	stripexe 	= NO;
+int	notvsym 	= NO;
+int	noshsym 	= NO;
+int	errflag 	= NO;
+int	objflags 	= NO;
+int	keepfort 	= NO;
+int	mkobject 	= YES;
+int	mktask 		= YES;
+int	optimize 	= YES;
+int	cflagseen 	= NO;
+int	nfileargs 	= 0;
+int	link_static 	= NO;
+int	link_nfs 	= NO;
+int	debug 		= NO;
+int	dbgout 		= NO;
+int	hostprog 	= NO;
+int	voslibs 	= YES;
+int	nolibc 		= NO;
+int	usef2c 		= YES;
+#ifdef LINUXPPC
+int	useg2c 		= YES;
+#else
+int	useg2c 		= NO;
+#endif
+int	host_c_main 	= NO;
 
-char	ccomp[SZ_FNAME] = CCOMP;
-char	f77comp[SZ_FNAME] = F77COMP;
-char	linker[SZ_FNAME] = LINKER;
+char	ccomp[SZ_FNAME] 	= CCOMP;
+char	f77comp[SZ_FNAME] 	= F77COMP;
+char	linker[SZ_FNAME] 	= LINKER;
+char	f2cpath[SZ_FNAME] 	= "/usr/bin/f2c";
+char	g77path[SZ_FNAME] 	= "/usr/bin/g77";
 
 char	outfile[SZ_FNAME] = "";
 char	tempfile[SZ_FNAME] = "";
@@ -177,7 +299,18 @@ char	*argv[];
 	/* Initialization. */
 	ZZSTRT();
 	isv13();
-	isv3();
+
+#if defined(LINUX) || defined(BSD) || defined(X86) || defined(MACOSX)
+	if (os_sysfile ("f77.sh", f77comp, SZ_FNAME) < 0) {
+	    strcpy (f77comp, "f77");
+	    usef2c = 0;
+	} else
+	    usef2c = 1;
+	if (os_sysfile ("f2c.e", tempfile, SZ_FNAME) > 0)
+	    strcpy (f2cpath, tempfile);
+#else
+	strcpy (f77comp, "f77");
+#endif
 
 	nflags = nfiles = nhlibs = nxfiles = nffiles = 0;
 
@@ -191,12 +324,16 @@ char	*argv[];
 
 	/* Load any XC related environment definitions.
 	 */
-	if (s = os_getenv ("XC-CC"))
+	if ((s = os_getenv ("XC-CC")) || (s = os_getenv ("XC_CC")))
 	    strcpy (ccomp, s);
-	if (s = os_getenv ("XC-F77"))
+	if ((s = os_getenv ("XC-F77")) || (s = os_getenv ("XC_F77"))) {
 	    strcpy (f77comp, s);
-	if (s = os_getenv ("XC-LINKER"))
+	    usef2c = (strncmp (f77comp, "f77", 3) == 0 ? 1 : 0);
+	}
+	if ((s = os_getenv ("XC-LINKER")) || (s = os_getenv ("XC_LINKER")))
 	    strcpy (linker, s);
+
+
 
         /* Always load the default IRAF package environment. */
 	loadpkgenv (DEF_PKGENV);
@@ -307,7 +444,7 @@ char	*argv[];
 		    /* Library file (-llib) or library directory (-Ldir)
 		     * reference.
 		     */
-		    if ((lfiles[nfiles] = iraflib (&arg[2])) == NULL) {
+		    if ((lfiles[nfiles] = iraflib (arg)) == NULL) {
 			hlibs[nhlibs] = arg;
 		        nhlibs++;
 		    } else
@@ -360,6 +497,21 @@ char	*argv[];
 		    nolibc++;
 		    break;
 
+		case 'G':
+		    /* Force a program to link w/ libg2c.a instead of libf2c.a
+		     */
+		    useg2c++;
+		    break;
+
+		case 'C':
+		    /* Link a host program which has a C main.  We may need
+		     * to tweak the command line as a special case here since
+		     * we normally assume Fortran sources.  This is currently
+		     * only needed for host C programs under LinuxPPC.
+		     */
+		    host_c_main++;
+		    break;
+
 		case 'V':
 		    /* Print XC version identification.
 		     */
@@ -381,6 +533,9 @@ char	*argv[];
 		    lflags[nflags] = bp;
 		    *bp++ = '-';
 
+		    /* Process list of flags without arguments, e.g. "-xyz"
+		     * which is the same as "-x -y -z".
+		     */
 		    for (ip = &arg[1];  *ip != EOS;  ip++)
 			if (*ip == 'c') {
 			    mkobject = YES;
@@ -402,6 +557,8 @@ char	*argv[];
 				mktask = NO;
 			    }
 			} else if (*ip == 'x') {
+			    dbgout++;
+			    optimize = NO;
 			    *bp++ = DEBUGFLAG;
 			    if (bp - buffer >= SZ_BUFFER)
 				fatal ("Out of buffer space for options");
@@ -416,6 +573,15 @@ char	*argv[];
 			} else if (*ip == 's') {
 			    stripexe = YES;
 			    goto passflag;
+			} else if (*ip == 'N') {
+			    /* "NFS" link option.  Generate the output temp
+			     * file in /tmp during the link, then move it to
+			     * the output directory in one operation when done.
+			     * For cases such as linking in an NFS-mounted
+			     * directory, where all the NFS i/o may slow the
+			     * link down excessively.
+			     */
+			    link_nfs = YES;
 			} else {
 passflag:		    mkobject = YES;
 			    if (!cflagseen)
@@ -450,6 +616,10 @@ passflag:		    mkobject = YES;
 			*last_dot = EOS;
 		    strcat (outfile, ".e");
 		}
+
+		/* Munge filename if file is a library. */
+		if (isafile(arg) && (s = iraflib(arg)))
+		    arg = s;
 
 		if (access (arg,0) == -1) {
 		    fprintf (stderr, "Warning: file `%s' not found\n", arg);
@@ -524,6 +694,16 @@ passflag:		    mkobject = YES;
 	    }
 	}
 
+	/* Now check for any alternative compiler definitions or commandline
+	 * flags which will affect out link line.  Some systems like LinuxPPC
+	 * will require use of -lg2c even though we can continue to use the
+	 * hlib$f77.sh the fortran compiler script on that system.
+	 */
+	if (useg2c || strncmp (f77comp, "g77", 3) == 0) {
+	    fortlib[0] = fortlib[1] = "-lg2c";
+	}
+
+
 #ifdef sun
 	/* Determine if any special architecture dependent compilation flags
 	 * are needed.  For the Sun V1.3 compiler, since FLOAT_OPTION is no
@@ -535,7 +715,6 @@ passflag:		    mkobject = YES;
 	    if (irafarch[0] == 'f')
 		sprintf (floatoption, "-%s", irafarch);
 #endif
-
 	/* Compile all F77 source files with F77 to produce object code.
 	 * This compilation is separate from that used for the '.x' files,
 	 * because we do not want to use the UNIX "-u" flag (requires that
@@ -544,12 +723,29 @@ passflag:		    mkobject = YES;
 	nargs = 0;
 	arglist[nargs++] = f77comp;
 	arglist[nargs++] = "-c";
+	if (usef2c == YES) {
+	    arglist[nargs++] = "-f2c";
+	    arglist[nargs++] = f2cpath;
+	}
+
+#ifdef LINUXAOUT
+	arglist[nargs++] = "-b";
+	arglist[nargs++] = "i486-linuxaout";
+#endif
 #ifdef sun
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
 #endif
-	if (optimize)
-	    arglist[nargs++] = "-O3";
+        if (optimize) {
+	    for (i=0;  i < nopt_flags;  i++)
+	        arglist[nargs++] = opt_flags[i];
+	}
+
+	/* Add the user-defined flags last so they can override the 
+	 * hardwired options.
+	 */
+	if ((s = os_getenv("XC-FFLAGS")) || (s = os_getenv("XC_FFLAGS")))
+	    addflags (s, arglist, &nargs);
 
 	for (i=0;  i < nflags;  i++)
 	    arglist[nargs++] = lflags[i];
@@ -561,7 +757,16 @@ passflag:		    mkobject = YES;
 	if (i > 0) {
 	    if (debug)
 		printargs (f77comp, arglist, nargs);
-	    errflag += run (f77comp, arglist);
+	    status = run (f77comp, arglist);
+#ifdef LINUX
+	/* This kludge is to work around a bug in the F2C based F77 script
+	 * on Linux, which returns an exit status of 4 when successfully
+	 * compiling a Fortran file.
+	 */
+	if (status == 4)
+	    status = 0;
+#endif
+	    errflag += status;
 	}
 
 
@@ -570,24 +775,32 @@ passflag:		    mkobject = YES;
 	 */
 	nargs = 0;
 	arglist[nargs++] = f77comp;
-	if (isv5()) 
-	    arglist[nargs++] = "-old_f77";
 	arglist[nargs++] = "-c";
 	arglist[nargs++] = "-u";
+	arglist[nargs++] = "-x";
+	if (usef2c == YES) {
+	    arglist[nargs++] = "-f2c";
+	    arglist[nargs++] = f2cpath;
+	}
 
-        /* Suppress warnings about unreachable statements for SPP generated
-	 * Fortran, as this case occurrs naturally and harmlessly in some
-	 * cases. (DEC/OSF1)
-	 */
-	arglist[nargs++] = "-warn";
-	arglist[nargs++] = "nounreachable";
-
+#ifdef LINUXAOUT
+        arglist[nargs++] = "-b";
+	arglist[nargs++] = "i486-linuxaout";
+#endif
 #ifdef sun
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
 #endif
-	if (optimize)
-	    arglist[nargs++] = "-O3";
+        if (optimize) {
+	    for (i=0;  i < nopt_flags;  i++)
+	       arglist[nargs++] = opt_flags[i];
+	}
+
+	/* Add the user-defined flags last so they can override the 
+	 * hardwired options.
+	 */
+	if ((s = os_getenv("XC-FFLAGS")) || (s = os_getenv("XC_FFLAGS")))
+	    addflags (s, arglist, &nargs);
 
 	for (i=0;  i < nflags;  i++)
 	    arglist[nargs++] = lflags[i];
@@ -608,7 +821,16 @@ passflag:		    mkobject = YES;
 	if (noperands > 0) {
 	    if (debug)
 		printargs (f77comp, arglist, nargs);
-	    errflag += run (f77comp, arglist);
+	    status = run (f77comp, arglist);
+#ifdef LINUX
+	    /* This kludge is to work around a bug in the F2C based F77 script
+	     * on Linux, which returns an exit status of 4 when successfully
+	     * compiling a Fortran file.
+	     */
+	    if (status == 4)
+		status = 0;
+#endif
+	    errflag += status;
 	}
 
 
@@ -618,12 +840,58 @@ passflag:		    mkobject = YES;
 	nargs = 0;
 	arglist[nargs++] = ccomp;
 	arglist[nargs++] = "-c";
+
+#ifdef LINUX
+	arglist[nargs++] = "-DLINUX";
+#ifdef REDHAT
+	arglist[nargs++] = "-DREDHAT";
+#endif
+#ifdef LINUXPPC
+	arglist[nargs++] = "-DLINUXPPC";
+#endif
+#ifdef SUSE
+	arglist[nargs++] = "-DSUSE";
+#endif
+	arglist[nargs++] = "-DPOSIX";
+	arglist[nargs++] = "-DSYSV";
+#endif
+
+#ifdef BSD
+	arglist[nargs++] = "-DBSD";
+#endif
+
+#ifdef MACOSX
+	arglist[nargs++] = "-DMACOSX";
+#endif
+
+#ifdef SOLARIS
+	arglist[nargs++] = "-DSOLARIS";
+#ifdef X86
+	arglist[nargs++] = "-DX86";
+#endif
+	arglist[nargs++] = "-DPOSIX";
+	arglist[nargs++] = "-DSYSV";
+#endif
+
+#ifdef LINUXAOUT
+        arglist[nargs++] = "-b";
+	arglist[nargs++] = "i486-linuxaout";
+#endif
+
 #ifdef sun
 	if (floatoption[0])
 	    arglist[nargs++] = floatoption;
 #endif
-	if (optimize)
-	    arglist[nargs++] = "-O3";
+	if (optimize) {
+	    for (i=0;  i < nopt_flags;  i++)
+	        arglist[nargs++] = opt_flags[i];
+	}
+
+	/* Add the user-defined flags last so they can override the 
+	 * hardwired options.
+	 */
+	if ((s = os_getenv("XC-CFLAGS")) || (s = os_getenv("XC_CFLAGS")))
+	    addflags (s, arglist, &nargs);
 
 	for (i=0;  i < nflags;  i++)
 	    arglist[nargs++] = lflags[i];
@@ -657,16 +925,41 @@ passflag:		    mkobject = YES;
 	 */
 	nargs = 0;
 	arglist[nargs++] = linker;
+	if ((s = os_getenv("XC-LFLAGS")) || (s = os_getenv("XC_LFLAGS")))
+	    addflags (s, arglist, &nargs);
+
 #ifdef SOLARIS
-	arglist[nargs++] = "-t";
-#else
-#ifdef OSF1
-	arglist[nargs++] = "-taso";
+	arglist[nargs++] = "-Wl,-t";
 #endif
+#ifdef LINUX
+	arglist[nargs++] = "-Wl,--defsym,mem_=0";
+#endif
+#ifdef SUSE
+	{   char gcc_specs[SZ_PATHNAME];
+	    static char cmd[SZ_CMDBUF];
+
+	    if (os_sysfile ("gcc-specs", gcc_specs, SZ_PATHNAME) < 0)
+		arglist[nargs++] = "/iraf/iraf/unix/bin.suse/gcc-specs";
+	    sprintf (cmd, "-specs=%s", gcc_specs);
+
+	    arglist[nargs++] = cmd;
+	}
+#endif
+#ifdef LINUXAOUT
+        arglist[nargs++] = "-b";
+	arglist[nargs++] = "i486-linuxaout";
 #endif
 	arglist[nargs++] = "-o";
 
-	sprintf (tempfile, "T_%s", outfile);
+	if (link_nfs) {
+	    sprintf (tempfile, "/tmp/T_%s.XXXXXX", outfile);
+#ifdef LINUX
+	    mkstemp (tempfile);
+#else
+	    mktemp (tempfile);
+#endif
+	} else
+	    sprintf (tempfile, "T_%s", outfile);
 	arglist[nargs++] = tempfile;
 
 	ncomp = 0;
@@ -692,9 +985,9 @@ passflag:		    mkobject = YES;
 	link_static = 0;
 	for (i=0;  i < nflags;  i++) {
 	    arglist[nargs++] = lflags[i];
-	    if (strcmp (lflags[i], "-Bstatic") == 0)
+	    if (strcmp (lflags[i], F_STATIC) == 0)
 		link_static = 1;
-	    else if (strcmp (lflags[i], "-Bdynamic") == 0)
+	    else if (strcmp (lflags[i], F_SHARED) == 0)
 		link_static = 0;
 	}
 
@@ -710,8 +1003,8 @@ passflag:		    mkobject = YES;
 	 * is searched for linking.
 	 */
 	if (isv13()) {
-	    char    libpath[SZ_PATHNAME+1];
-	    char    dir[SZ_PATHNAME+1], *path;
+	    char    libpath[SZ_PATHNAME];
+	    char    dir[SZ_PATHNAME], *path;
 	    char    *pp, *ip, *op, *s;
 	    int     n;
 
@@ -755,8 +1048,17 @@ passflag:		    mkobject = YES;
 	/* Libraries to link against.
 	 */
 	if (hostprog) {
+#ifdef LINUXPPC
+	    /* LinuxPPC (YellowDog anyway) requires this library to resolve
+	     * the MAIN__ generated by the fortran program statement into
+	     * the 'main'.
+	     */
+	    if (host_c_main == 0)
+	        arglist[nargs++] = "-lfrtbegin";
+#else
 	    if (!isv13())
-		arglist[nargs++] = FORTLIB0;
+		arglist[nargs++] = mkfname (fortlib[0]);
+#endif
 	} else
 	    arglist[nargs++] = mkfname (LIBMAIN);
 
@@ -776,48 +1078,24 @@ passflag:		    mkobject = YES;
 	for (i=0;  i < nhlibs;  i++)
 	    arglist[nargs++] = hlibs[i];
 
-	/* The remaining system libraries depend upon which vversion of
+	/* The remaining system libraries depend upon which version of
 	 * the SunOS compiler we are using.  The V1.3 compilers use only
 	 * -lF77 and -lm.
 	 */
 	if (isv13()) {
-	    addflag (FORTLIB2, arglist, &nargs);
-	    addflag (FORTLIB4, arglist, &nargs);
+	    addflags (fortlib[2], arglist, &nargs);
+	    addflags (fortlib[4], arglist, &nargs);
 	} else {
-	    addflag (FORTLIB1, arglist, &nargs);
-	    addflag (FORTLIB2, arglist, &nargs);
-	    if (!isv5())
-	        addflag (FORTLIB3, arglist, &nargs);
-	    addflag (FORTLIB4, arglist, &nargs);
-#ifdef SOLARIS
-	/* On Solaris if linking -z we want the socket code (-lsocket -lnsl)
-	 * to be linked dynamic so that the executable will work on different
-	 * versions of Solaris.
-	 */
-	if (link_static && !usesharelib)
-	    arglist[nargs++] = "-Bdynamic";
-#endif
-	    addflag (FORTLIB5, arglist, &nargs);
-	    addflag (FORTLIB6, arglist, &nargs);
-	    addflag (FORTLIB7, arglist, &nargs);
-	    addflag (FORTLIB8, arglist, &nargs);
-	    addflag (FORTLIB9, arglist, &nargs);
-	    addflag (FORTLIBA, arglist, &nargs);
+	    addflags (fortlib[1], arglist, &nargs);
+	    addflags (fortlib[2], arglist, &nargs);
+	    addflags (fortlib[3], arglist, &nargs);
+	    addflags (fortlib[4], arglist, &nargs);
+	    addflags (fortlib[5], arglist, &nargs);
+	    addflags (fortlib[6], arglist, &nargs);
+	    addflags (fortlib[7], arglist, &nargs);
+	    addflags (fortlib[8], arglist, &nargs);
+	    addflags (fortlib[9], arglist, &nargs);
 	}
-
-#ifdef SOLARIS
-	/* If linking static, switch back to dynamic at the end to cause
-	 * libc to be linked dynamic.
-	 */
-	if (link_static)
-	    arglist[nargs++] = "-Bdynamic";
-
-	/* libcompat.a is used to provide versions of routines missing from
-	 * libc.a in order to be able to fully link a process.
-	 */
-	arglist[nargs++] = "-lc";
-	arglist[nargs++] = mkfname ("libcompat.a");
-#endif
 	arglist[nargs] = NULL;
 
 	if (ncomp) {
@@ -833,7 +1111,16 @@ passflag:		    mkobject = YES;
 	 */
 	if ((status = run (linker, arglist)) == 0) {
 	    unlink (outfile);
-	    link   (tempfile, outfile);
+
+	    if (link_nfs) {
+		char command[1024];
+		sprintf (command, "/bin/cp -f %s %s", tempfile, outfile);
+		if (debug)
+		    printargs (command, NULL, 0);
+		status = sys (command);
+	    } else
+		link (tempfile, outfile);
+
 	    unlink (tempfile);
 	}
 	errflag += status;
@@ -845,7 +1132,7 @@ passflag:		    mkobject = YES;
 	if (usesharelib && !noedsym && !stripexe) {
 	    char    shlib[SZ_PATHNAME+1];
 	    char    edsym[SZ_PATHNAME+1];
-	    char    command[SZ_BUFFER];
+	    char    command[SZ_CMDBUF];
 
 	    /* The os_sysfile(SHIMAGE) below assumes the existence of a file
 	     * entry "S.e" in the directory containing the real shared image
@@ -876,59 +1163,89 @@ passflag:		    mkobject = YES;
  */
 char *
 mkfname (i_fname)
-char	*i_fname;
+char *i_fname;
 {
-	char	path[SZ_PATHNAME+1];
-	char	fname[SZ_PATHNAME+1];
-	char	*oname;
+	char fname[SZ_PATHNAME+1];
+	char *oname;
 
+	/* Library referenced as -lXXX */
 	if (strncmp (i_fname, "-l", 2) == 0) {
 	    sprintf (fname, "lib%s.a", &i_fname[2]);
-	    if (os_sysfile (fname, path, SZ_PATHNAME) <= 0)
+	    if (oname = iraflib (fname))
+		return (oname);
+	    else
 		return (i_fname);
-	} else {
-	    strcpy (fname, i_fname);
-	    if (os_sysfile (fname, path, SZ_PATHNAME) <= 0)
-		sprintf (path, "iraf$lib/%s", fname);
 	}
 
-	strcpy (libp, vfn2osfn (path, 0));
-	libp += strlen (oname = libp) + 1;
+	/* Must be a library filename or pathname */
+	strcpy (fname, i_fname);
+	if (oname = iraflib (fname))
+	    strcpy (libp, oname);
+	else
+	    strcpy (libp, fname);
+
+	oname = libp;
+	libp += strlen (libp) + 1;
 
 	return (oname);
 }
 
 
-/* ADDFLAG -- Add a flag to an argument list.  Ignore null flags.
+/* ADDFLAGS -- Add one or more flags to an argument list.  Ignore null flags,
+ * separate multiple flags on whitespace.
  */
-addflag (flag, arglist, p_nargs)
+addflags (flag, arglist, p_nargs)
 char *flag;
 char *arglist[];
 int *p_nargs;
 {
-	register nargs = *p_nargs;
+	register int i, len, nargs = *p_nargs;
+	register char *fp, *fs, lflag[SZ_FNAME];
 
 	if (flag && *flag) {
-	    if (strcmp (flag, "-Bstatic") == 0)
-		link_static = 1;
-	    else if (strcmp (flag, "-Bdynamic") == 0)
-		link_static = 0;
-#ifdef SOLARIS
-	    else if (strcmp (flag, "-ldl") == 0) {
-		/* This beastie has to be linked dynamic on Solaris, but
-		 * we don't want to have to know this everywhere so we do
-		 * it automatically there.
-		 */
-		if (link_static)
-		    arglist[nargs++] = "-Bdynamic";
-		arglist[nargs++] = flag;
-		if (link_static)
-		    arglist[nargs++] = "-Bstatic";
-		*p_nargs = nargs;
-		return (1);
-	    }
+
+	    for (fp = flag; *fp; ) {
+		while (*fp && isspace(*fp)) 		/* skip leading space */
+		    fp++;
+		for (i=0; *fp && !isspace(*fp); ) 	/* collect flag       */
+		    lflag[i++] = *fp++;
+		lflag[i] = '\0';
+		len = strlen (lflag);
+		strcpy ((fs = malloc(len+1)), lflag);
+
+	        if (strcmp (lflag, F_STATIC) == 0) {
+		    link_static = 1;
+	        } else if (strcmp (lflag, F_SHARED) == 0) {
+		    link_static = 0;
+#if defined(LINUX) || defined(BSD) || defined(X86) || defined(MACOSX)
+	        } else if ((strcmp (lflag, "-lf2c") == 0) || 
+	    	    (strcmp (lflag, "-lcompat") == 0)) {
+		        /* Use the IRAF version of libf2c.a or libcompat.a,
+		         * not the host version which may or may not be present.
+		         */
+		        arglist[nargs++] = mkfname (lflag);
+		        *p_nargs = nargs;
+		        return (1);
+	        }
 #endif
-	    arglist[nargs++] = flag;
+#ifdef SOLARIS
+	        else if (strcmp (lflag, "-ldl") == 0) {
+		    /* This beastie has to be linked dynamic on Solaris, but
+		     * we don't want to have to know this everywhere so we do
+		     * it automatically there.
+		     */
+		    if (link_static)
+		        arglist[nargs++] = F_SHARED;
+		    arglist[nargs++] = fs;
+		    if (link_static)
+		        arglist[nargs++] = F_STATIC;
+		    *p_nargs = nargs;
+		    return (1);
+	        }
+#endif
+	        arglist[nargs++] = fs;
+	    }
+
 	    *p_nargs = nargs;
 	    return (1);
 	}
@@ -941,23 +1258,84 @@ int *p_nargs;
  * the pathname of the library, else return NULL.
  */
 char *
-iraflib (libname)
-char	*libname;
+iraflib (libref)
+char	*libref;
 {
-	char	fname[SZ_FNAME+1];
-	char	path[SZ_PATHNAME+1];
-	char	*absname;
+	register char *ip, *op;
+	char savename[SZ_PATHNAME+1];
+	char libname[SZ_PATHNAME+1];
+	char fname[SZ_PATHNAME+1];
+	char path[SZ_PATHNAME+1];
+	int foundit, dbg = dbgout;
+	char *absname;
 
-	sprintf (fname, "lib%s.a", libname);
-	if (os_sysfile (fname, path, SZ_PATHNAME) > 0) {
-	    absname = bp;
-	    strcpy (absname, vfn2osfn (path, 0));
+	strcpy (savename, libref);
+
+	/* If dbgout is enabled try the debug library first, but fall back
+	 * to the normal library if thie debug library is not found.
+	 */
+again:
+	if (strncmp (libref, "-l", 2) == 0) { 
+	    sprintf (libname, "lib%s.a", libref+2);
+	    libref = libname;
+	    goto again;
+	} else
+	    strcpy (libname, libref);
+
+	/* Position IP to EOS. */
+	for (ip=libref;  *ip;  ip++)
+	    ;
+
+	if (!(*(ip-2) == '.' && *(ip-1) == 'a')) {
+	    /* Not a library file, leave it alone.
+	     */
+	    strcpy (fname, libref);
+
+	} else {
+	    /* Normalize the library file name, "libXXX[_p].a".
+	     */
+	    for (ip=libref, op=fname;  *op = *ip;  op++, ip++)
+		;
+	    if ((*(op-2) == '.' && *(op-1) == 'a')) {
+		*(op-2) = '\0';
+		op -= 2;
+	    } else
+		op -= 1;
+
+	    if (dbg && !(*(op-2) == '_' && *(op-1) == 'p')) {
+		*op++ = '_';
+		*op++ = 'p';
+	    }
+	    *op++ = '.';
+	    *op++ = 'a';
+	    *op++ = '\0';
+	}
+
+	foundit = 0;
+	if (access (fname, 0) == 0) {
+	    strcpy (path, fname);
+	    foundit++;
+	} else {
+	    if (os_sysfile (fname, path, SZ_PATHNAME) > 0)
+		foundit++;
+	}
+
+	if (foundit) {
+	    strcpy (absname=bp, vfn2osfn (path, 0));
 	    bp += strlen (absname) + 1;
 	    if (bp - buffer >= SZ_BUFFER)
 		fatal ("Out of space for library names");
+	    if (debug > 1)
+		fprintf (stderr, "iraflib: %s -> %s\n", savename, absname);
 	    return (absname);
-	} else
+	} else if (dbg) {
+	    dbg = 0;
+	    goto again;
+	} else {
+	    if (debug > 1)
+		fprintf (stderr, "iraflib: %s -> %s\n", savename, savename);
 	    return (NULL);
+	}
 }
 
 
@@ -985,8 +1363,7 @@ xtof (file)
 char	*file;
 {
 	static  char xpp_path[SZ_PATHNAME+1], rpp_path[SZ_PATHNAME+1];
-	char	cmdbuf[SZ_BUFFER+1], fname[SZ_PATHNAME+1];
-	char	*mkfname();
+	char	cmdbuf[SZ_CMDBUF], fname[SZ_FNAME];
 
 	lxfiles[nxfiles++] = file;
 	if (nxfiles > MAXFILE)
@@ -1020,7 +1397,8 @@ char	*file;
 	if (!rpp_path[0])
 	    if (os_sysfile (RPP, rpp_path, SZ_PATHNAME) <= 0)
 		strcpy (rpp_path, RPP);
-	sprintf (cmdbuf, "%s %s >%s", rpp_path, file, fname);
+	sprintf (cmdbuf, "%s %s%s >%s",
+	    rpp_path, dbgout ? "-g " : "", file, fname);
 	if (!(errflag & XPP_BADXFILE))
 	    errflag |= sys (cmdbuf);
 
@@ -1077,7 +1455,7 @@ char	*task;
 char	*argv[];
 {
 	int	waitpid, fork();
-	char	path[SZ_PATHNAME+1];
+	char	path[SZ_PATHNAME];
 
 	if ((waitpid = fork()) == 0) {
 	    enbint (SIG_DFL);
@@ -1111,7 +1489,7 @@ sys (cmd)
 char	*cmd;
 {
 	register char *ip;
-	char	*argv[SZ_PATHNAME+1];
+	char	*argv[256];
 	char	*inname, *outname;
 	int	append;
 	int	waitpid;
@@ -1262,7 +1640,7 @@ rmfiles()
 fatalstr (s1, s2)
 char	*s1, *s2;
 {
-	char	out[SZ_BUFFER];
+	char	out[SZ_CMDBUF];
 
 	sprintf (out, s1, s2);
 	fatal (out);
@@ -1296,13 +1674,19 @@ char	*s;
  */
 isv3()
 {
-        static  int v3 = -1;
-        char    dir[SZ_PATHNAME+1], link[SZ_PATHNAME+1], *name, *path;
-        int     n;
+	static	int v3 = -1;
+	struct	dirent *dp;
+	char	dir[SZ_PATHNAME];
+	char	*name;
+	DIR	*dirp;
 
 #ifndef SOLARIS
-        return (v3 = 0);
+	return (v3 = 0);
 #else
+	char	*path;
+	char	link[SZ_PATHNAME];
+	int	n;
+
         if (v3 != -1)
             return (v3);
 
@@ -1313,7 +1697,7 @@ isv3()
              * file for the same thing.  This assumes that V3 is true
              * unless something is found to say otherwise.
              */
-            if ((n = readlink (path, link, SZ_PATHNAME)) > 0) {
+            if ((n = readlink (path, link, 128)) > 0) {
                 link[n] = '\0';
                 if (strstr (link, "SC2.0"))
                     return (v3 = 0);
@@ -1326,41 +1710,6 @@ isv3()
 #endif
 }
 
-
-#ifndef sun
-/* ISV5 -- Test if we are using the version 5.x (or greater) Dec Compilers.
- * This returns true when the 'f77' command path contains a 'fort90' string.
- */
-isv5()
-{
-        static  int v5 = -1;
-        char    dir[SZ_PATHNAME+1], link[SZ_PATHNAME+1], *name, *path;
-        int     n;
-
-        if (v5 != -1)
-            return (v5);
-
-        if ((path = findexe ("f77", dir))) {
-            /* Check if command is a symlink to someplace else, if so look
-             * for the string 'fort90' in the link path indicating this is
-             * a V5 compiler installation.  Otherwise check the path to a
-             * file for the same thing.  This assumes that V3 is false
-             * unless something is found to say otherwise.
-             */
-            if ((n = readlink (path, link, SZ_PATHNAME)) > 0) {
-                link[n] = '\0';
-                if (strstr (link, "fort90"))
-                    return (v5 = 1);
-            } else
-                if (strstr (dir, "fort90"))
-                    return (v5 = 1);
-        }
-
-        return (v5 = 0);
-}
-#endif
-
-
 /* ISV13 -- Test if we are using the version 1.3 Sun Fortran compiler.
  * There is no simple, reliable way to do this.  The heuristic used is
  * to first locate the "f77" we will use, then see if there is a file
@@ -1370,7 +1719,7 @@ isv13()
 {
 	static	int v13 = -1;
 	struct	dirent *dp;
-	char	dir[SZ_PATHNAME+1];
+	char	dir[SZ_PATHNAME];
 	char	*name;
 	DIR	*dirp;
 
@@ -1412,8 +1761,8 @@ char	*prog;			/* file to search for */
 char	*dir;			/* pointer to output string buf, or NULL */
 {
 	register char *ip, *op;
-	static	char path[SZ_PATHNAME+1];
-	char	dirpath[SZ_PATHNAME+1];
+	static	char path[SZ_PATHNAME];
+	char	dirpath[SZ_PATHNAME];
 	char	*dp = dir ? dir : dirpath;
 	char	*pathp;
 

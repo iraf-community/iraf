@@ -83,6 +83,10 @@ begin
 	    }
 	}
 
+	iferr (call imdelf (im, "DATASEC"))
+	    ;
+	iferr (call imdelf (im, "TRIMSEC"))
+	    ;
 	if (catalog[1] != EOS)
 	    call imastr (im, "CATALOG", catalog)
 	if (objid[1] != EOS)

@@ -1,5 +1,6 @@
 include <imhdr.h>
 include <gset.h>
+include	<math.h>
 
 # T_ PRADPROF -- Compute a radial profile using user specified coordinates
 # and plot or list the result. 
@@ -9,12 +10,13 @@ procedure t_pradprof()
 int	images 			# the list of images
 real	xinit, yinit		# the initial guess for the profile center
 real	pradius			# the plotting radius
+real	paz1, paz2		# azimuth limits
 bool	center			# center the object before computing profile
 int	cboxsize		# the centering box width
 bool	list			# list output instead of plot output
 
 int	rboxsize, npts
-pointer	sp, imname, im, radius, intensity
+pointer	sp, imname, im, radius, azimuth, intensity
 real	xcntr, ycntr
 
 bool	clgetb()
@@ -33,6 +35,8 @@ begin
 	xinit = clgetr ("xinit")
 	yinit = clgetr ("yinit")
 	pradius = clgetr ("radius")
+	paz1 = clgetr ("az1")
+	paz2 = clgetr ("az2")
 	rboxsize = 2 * (nint (pradius + 1.0)) + 1
 
 	# Get the centering parameters. The centering box must be odd.
@@ -48,6 +52,7 @@ begin
 
 	# Allocate memory for vectors. 
 	call malloc (radius, rboxsize * rboxsize, TY_REAL)
+	call malloc (azimuth, rboxsize * rboxsize, TY_REAL)
 	call malloc (intensity, rboxsize * rboxsize, TY_REAL)
 
 	# Loop over all images
@@ -69,16 +74,16 @@ begin
 	    }
 
 	    # Get the radius and intensity vectors.
-	    npts = rp_radius (im, xcntr, ycntr, rboxsize, pradius,
-	        Memr[radius], Memr[intensity])
+	    npts = rp_radius (im, xcntr, ycntr, rboxsize, pradius, paz1, paz2,
+	        Memr[radius], Memr[azimuth], Memr[intensity])
 
 	    # Make list of the radial profile if list=yes or plot if list=no.
    	    if (list) 
-		call rp_rlist (Memc[imname], xcntr, ycntr, Memr[radius],
-		    Memr[intensity], npts)
+		call rp_rlist (Memc[imname], xcntr, ycntr, paz1, paz2,
+		    Memr[radius], Memr[azimuth], Memr[intensity], npts)
 	    else 
-		call rp_rplot (Memc[imname], xcntr, ycntr, Memr[radius], 
-		    Memr[intensity], npts)
+		call rp_rplot (Memc[imname], xcntr, ycntr, paz1, paz2,
+		    Memr[radius], Memr[azimuth], Memr[intensity], npts)
 
 	    call imunmap (im)
 	}
@@ -163,13 +168,16 @@ end
 
 # RP_RADIUS  -- Get the data and compute the radius and intensity vectors.
 
-int procedure rp_radius (im, xcntr, ycntr, rboxsize, pradius, radius, intensity)
+int procedure rp_radius (im, xcntr, ycntr, rboxsize, pradius, paz1, paz2,
+	radius, azimuth, intensity)
 
 pointer	im			# pointer to the input image
 real	xcntr, ycntr		# the center of the extraction box
 int	rboxsize		# the width of the extraction box
 real	pradius			# the plotting radius
+real	paz1, paz2		# the azimuth limits
 real	radius[ARB]		# the output radius vector
+real	azimuth[ARB]		# the output azimuth vector
 real	intensity[ARB]		# the output intensity vector
 
 int	half_box, ncols, nrows, x1, x2, y1, y2, nx, ny, npts
@@ -197,7 +205,7 @@ begin
 
 	# Compute the radius and intensity vectors.
 	npts = rp_vectors (Memr[bufptr], nx, ny, x1, y1, xcntr, ycntr, 
-	    pradius, radius, intensity) 
+	    pradius, paz1, paz2, radius, azimuth, intensity) 
 
 	return (npts)
 end
@@ -206,11 +214,14 @@ end
 # RP_RLIST -- Print the intensity as a function of radial distance on the
 # standard output.
 
-procedure rp_rlist (imname,  xcntr, ycntr, radius, intensity, npts)
+procedure rp_rlist (imname,  xcntr, ycntr, paz1, paz2, radius, azimuth,
+	intensity, npts)
 
 char	imname[ARB]		# the name of the input image
 real	xcntr, ycntr		# the center of the radial profile
+real	paz1, paz2		# the azimuth limits
 real	radius[npts]		# the radius vector
+real	azimuth[npts]		# the azimuth vector
 real	intensity[npts]		# the intensity vector
 int	npts			# the number of points
 
@@ -221,6 +232,9 @@ begin
 	    call pargstr (imname)
 	    call pargr (xcntr)
 	    call pargr (ycntr)
+	call printf ("# az1:%7.2f   az2:%7.2f\n")
+	    call pargr (min(paz1,paz2))
+	    call pargr (max(paz1,paz2))
 
 	do i = 1, npts {
 	    call printf ("%7.2f   %g\n")
@@ -232,11 +246,13 @@ end
 
 # RP_RPLOT -- Plot intensity as a function of radial distance.
 
-procedure rp_rplot (imname, xcntr, ycntr, radius, intensity, npts)
+procedure rp_rplot (imname, xcntr, ycntr, az1, az2,
+	radius, azimuth, intensity, npts)
 
 char	imname[ARB]
 int	npts
-real	xcntr, ycntr, radius[npts], intensity[npts]
+real	xcntr, ycntr, az1, az2
+real	radius[npts], azimuth[npts], intensity[npts]
 
 char	device[SZ_LINE]
 int	mode
@@ -254,39 +270,60 @@ begin
 	   mode = NEW_FILE
  
 	gp = gopen (device, mode, STDGRAPH)
-	call rp_graph (gp, imname, xcntr, ycntr, mode, radius, intensity, npts) 
+	call rp_graph (gp, imname, xcntr, ycntr, az1, az2,
+	    mode, radius, intensity, npts) 
 	call gclose (gp)
 end
 
 
 # RP_VECTORS -- Compute the radius and intensity vectors.
 
-int procedure rp_vectors (a, nx, ny, x1, y1, xcntr, ycntr, pradius,
-	radius, intensity)
+int procedure rp_vectors (a, nx, ny, x1, y1, xcntr, ycntr, pradius, paz1, paz2,
+	radius, azimuth, intensity)
 								
 real	a[nx,ny]		# the input data array
 int	nx, ny			# dimensions of the input array
 int	x1, y1			# lower left corner of input array
 real	xcntr, ycntr		# coordinates of center pixel
 real	pradius			# the plotting radius
+real	paz1, paz2		# the azimuth limits
 real	radius[ARB]		# the output radius vector
+real	azimuth[ARB]		# the output azimuth vector
 real	intensity[ARB]		# the output intensity vector
 
 int	i, j, npts
-real	pr2, r2, dy2
+real	dx, dy, az, pr2, az1, az2, r2, dy2
 
 begin
+	az1 = DEGTORAD (min (paz1, paz2))
+	az2 = DEGTORAD (max (paz1, paz2))
+	while (az1 < 0.) {
+	    az1 = az1 + TWOPI
+	    az2 = az2 + TWOPI
+	}
+	while (az1 > TWOPI) {
+	    az1 = az1 - TWOPI
+	    az2 = az2 - TWOPI
+	}
 	pr2 = pradius * pradius
 
 	npts = 0
 	do i = 1, ny {
-	    dy2 = (ycntr - y1 + 1 - i) ** 2 
+	    dy = (ycntr - y1 + 1 - i)
+	    dy2 = dy ** 2 
 	    do j = 1, nx {
-		r2 = (xcntr - x1 + 1 - j) ** 2 + dy2 
+		dx = (xcntr - x1 + 1 - j)
+		r2 = dx ** 2 + dy2 
 		if (r2 > pr2)
+		    next
+		az = atan2 (dy, dx)
+		if (az < 0.)
+		    az = az + TWOPI
+		if (az < az1 || az > az2)
 		    next
 		npts = npts + 1
 		radius[npts] = sqrt (r2)
+		azimuth[npts] = RADTODEG (az)
 		intensity[npts] = a[j,i]
 	    }
         }
@@ -362,12 +399,13 @@ define	DEF_IMTITLE	"imtitle"
 
 # RP_GRAPH -- Graph the radial profile.
 
-procedure rp_graph (gp, imname, xcntr, ycntr, mode, x, y, npts)
+procedure rp_graph (gp, imname, xcntr, ycntr, az1, az2, mode, x, y, npts)
 
 pointer	gp		# GIO pointer
 char	imname[ARB]	# image name
 real	xcntr		# starting x coordinate 
 real	ycntr		# starting y coordinate 
+real	az1, az2	# azimuth limits
 int	mode		# Mode
 real	x[npts]		# X data
 real	y[npts]		# Y data
@@ -471,10 +509,12 @@ begin
 		call clgstr ("title", Memc[marker], SZ_LINE)
 		if (streq (Memc[marker], DEF_IMTITLE)) {
 		   call sprintf (Memc[marker], SZ_LINE, 
-		       "Radial Plot of %s at [%0.2f,%0.2f]")
+		       "Radial Plot of %s at [%0.2f,%0.2f] az=[%.1f,%.1f]")
 		       call pargstr (imname)
 		       call pargr (xcntr)
 		       call pargr (ycntr)
+		       call pargr (az1)
+		       call pargr (az2)
 		}
 		call strcat (Memc[marker], Memc[title], RP_SZTITLE)
 

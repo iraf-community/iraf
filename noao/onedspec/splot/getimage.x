@@ -141,8 +141,8 @@ begin
 	    b =  gt_getr (gt, GTXMAX)
 	    if (IS_INDEF(a) && IS_INDEF(b)) {
 		if (!wave_scl) {
-		    call gt_setr (gt, GTXMIN, sec[da,1])
-		    call gt_setr (gt, GTXMAX, sec[da,2])
+		    call gt_setr (gt, GTXMIN, real(sec[da,1]))
+		    call gt_setr (gt, GTXMAX, real(sec[da,2]))
 		} else {
 		    a = shdr_lw (sh, double(sec[da,1]))
 		    b = shdr_lw (sh, double(sec[da,2]))

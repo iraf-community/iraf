@@ -20,6 +20,7 @@ mskregions	hlp =doc$mskregions.hlp, src = t_mskregions.x
 mskexpr		hlp =doc$mskexpr.hlp,   src = t_mskexpr.x
 mskregions	hlp =doc$mskregions.hlp, src = t_mskregions.x
 mimstatistics	hlp =doc$mimstat.hlp,	src = masks$t_mimstat.x
+ringavg		hlp =doc$ringavg.hlp,	src = ringavg.cl
 rskysub		hlp =doc$rskysub.hlp,	src = masks$t_rskysub.x
 suntoiraf	hlp =doc$suntoiraf.hlp, src = t_suntoiraf.x
 text2mask	hlp =doc$text2mask.hlp, src = t_text2mask.x

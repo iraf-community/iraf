@@ -295,6 +295,8 @@ retry_
 	    }
 	} then {
 	    err = errget (errstr, SZ_LINE)
+	    if (err == SYS_IKIOPIX && nimages < 250)
+		err = SYS_MFULL
 	    call ic_mclose (nimages)
 	    if (!project) {
 		do j = 2, nimages {

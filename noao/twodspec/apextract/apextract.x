@@ -231,11 +231,11 @@ begin
 	# Initialize image interpolator for edge pixel weighting.
 	switch (interptype) {
 	case II_LINEAR:
-	    interpbuf = 1
-	case II_POLY3:
 	    interpbuf = 2
+	case II_POLY3:
+	    interpbuf = 3
 	case II_SINC:
-	    interpbuf = 15
+	    interpbuf = 16
 	default:
 	    interpbuf = 0
 	}
@@ -251,8 +251,8 @@ begin
 	    ic = AP_IC(ap)
 
 	    # Dispersion axis limits
-	    bmin = max (1, nint (AP_CEN(ap,baxis) + AP_LOW(ap,baxis)))
-	    bmax = min (nb, nint (AP_CEN(ap,baxis) + AP_HIGH(ap,baxis)))
+	    bmin = min (nb, max (1, nint (AP_CEN(ap,baxis)+AP_LOW(ap,baxis))))
+	    bmax = max (1, min (nb, nint (AP_CEN(ap,baxis)+AP_HIGH(ap,baxis))))
 
 	    # Aperture axis shifts
 	    if (cv != NULL) {
@@ -282,8 +282,8 @@ begin
 		xmax = max (xmax, ic_getr (ic, "xmax"))
 	    }
 
-	    Memi[a1+i] = max (1, nint (AP_CEN(ap,aaxis) + xmin + cmin))
-	    Memi[a2+i] = min (namax, nint (AP_CEN(ap,aaxis) + xmax + cmax))
+	    Memi[a1+i] = min (namax, max (1, nint (AP_CEN(ap,aaxis)+xmin+cmin)))
+	    Memi[a2+i] = max (1, min (namax, nint (AP_CEN(ap,aaxis)+xmax+cmax)))
 	    Memi[b1+i] = bmin
 	    Memi[b2+i] = bmax
 	    Memr[c1+i] = cmin
@@ -589,9 +589,9 @@ int	naps				# Number of apertures
 int	nsubaps				# Number of subapertures
 
 int	i, j, fmt
-pointer	sp, name, name1, input1, ans
+pointer	sp, name, name1, input1, ksection, ans
 
-int	strdic(), imaccess()
+int	strdic(), imaccess(), stridxs()
 bool	streq(), ap_answer()
 
 begin
@@ -599,6 +599,7 @@ begin
 	call salloc (name, SZ_LINE, TY_CHAR)
 	call salloc (name1, SZ_LINE, TY_CHAR)
 	call salloc (input1, SZ_LINE, TY_CHAR)
+	call salloc (ksection, SZ_LINE, TY_CHAR)
 	call salloc (ans, SZ_LINE, TY_CHAR)
 
 	fmt = strdic (format, format, SZ_LINE, FORMATS)
@@ -606,6 +607,12 @@ begin
 
 	switch (fmt) {
 	case MULTISPEC, NORM, FLAT, RATIO, DIFF, FIT:
+	    i = stridxs ("[", Memc[input1])
+	    if (i > 0) {
+		call strcpy (Memc[input1+i-1], Memc[ksection], SZ_LINE)
+		Memc[input1+i-1] = EOS
+	    } else
+		Memc[ksection] = EOS
 	    if (output[1] == EOS)
 	        call strcpy (Memc[input1], Memc[name], SZ_LINE)
 	    else
@@ -613,23 +620,35 @@ begin
 
 	    switch (fmt) {
 	    case MULTISPEC:
-		if (streq (Memc[input1], Memc[name]))
+		if (streq (Memc[input1], Memc[name])) {
 	            call strcat (".ms", Memc[name], SZ_LINE)
+		    call strcat (Memc[ksection], Memc[name], SZ_LINE)
+		}
 	    case NORM:
-		if (streq (Memc[input1], Memc[name]))
+		if (streq (Memc[input1], Memc[name])) {
 	            call strcat (".norm", Memc[name], SZ_LINE)
+		    call strcat (Memc[ksection], Memc[name], SZ_LINE)
+		}
 	    case FLAT:
-		if (streq (Memc[input1], Memc[name]))
+		if (streq (Memc[input1], Memc[name])) {
 	            call strcat (".flat", Memc[name], SZ_LINE)
+		    call strcat (Memc[ksection], Memc[name], SZ_LINE)
+		}
 	    case RATIO:
-		if (streq (Memc[input1], Memc[name]))
+		if (streq (Memc[input1], Memc[name])) {
 	            call strcat (".ratio", Memc[name], SZ_LINE)
+		    call strcat (Memc[ksection], Memc[name], SZ_LINE)
+		}
 	    case DIFF:
-		if (streq (Memc[input1], Memc[name]))
+		if (streq (Memc[input1], Memc[name])) {
 	            call strcat (".diff", Memc[name], SZ_LINE)
+		    call strcat (Memc[ksection], Memc[name], SZ_LINE)
+		}
 	    case FIT:
-		if (streq (Memc[input1], Memc[name]))
+		if (streq (Memc[input1], Memc[name])) {
 	            call strcat (".fit", Memc[name], SZ_LINE)
+		    call strcat (Memc[ksection], Memc[name], SZ_LINE)
+		}
 	    }
 	    if (imaccess (Memc[name], 0) == YES) {
 		call sprintf (Memc[ans], SZ_LINE,
@@ -660,8 +679,10 @@ begin
 			call pargi (int(log10(real(nsubaps)))+1)
 			call pargi (i)
 		}
-		if (streq (Memc[input1], Memc[name]))
+		if (streq (Memc[input1], Memc[name])) {
 		    call strcat (".ec", Memc[name1], SZ_LINE)
+		    call strcat (Memc[ksection], Memc[name1], SZ_LINE)
+		}
 
 		if (imaccess (Memc[name1], 0) == YES) {
 		    call sprintf (Memc[ans], SZ_LINE,
@@ -753,12 +774,13 @@ int	fmt			# Output format
 bool	extras			# Include raw spectrum, sky, and sigma
 
 real	low, high, step
-int	k, l, m, apid, apaxis, dispaxis
-pointer	sp, str, str1, name, name1, input, ap, out, outsave, gt, apmw, buf
+int	i, k, l, m, apid, apaxis, dispaxis
+pointer	sp, str, str1, name, name1, input, ksection
+pointer	ap, out, outsave, gt, apmw, buf
 pointer	sum2, sum4, nsum
 
 real	clgetr()
-int	scan(), strdic(), imaccf()
+int	scan(), strdic(), imaccf(), stridxs()
 bool	streq(), ap_answer(), apgetb()
 pointer	immap(), imgl2r(), impl2r(), impl3r()
 pointer	gt_init(), apmw_open()
@@ -773,6 +795,7 @@ begin
 	call salloc (name, SZ_LINE, TY_CHAR)
 	call salloc (name1, SZ_LINE, TY_CHAR)
 	call salloc (input, SZ_LINE, TY_CHAR)
+	call salloc (ksection, SZ_LINE, TY_CHAR)
 
 	fmt = strdic (format, format, SZ_LINE, FORMATS)
 	extras = apgetb ("extras")
@@ -783,6 +806,14 @@ begin
 
 	# Set output name.
 	call imgimage (image, Memc[input], SZ_LINE)
+	i = stridxs ("[", Memc[input])
+	if (i > 0) {
+	    call strcpy (Memc[input+i-1], Memc[ksection], SZ_LINE)
+	    Memc[input+i-1] = EOS
+	    i = stridxs ("]", Memc[ksection])
+	    call strcpy (",append]", Memc[ksection+i-1], SZ_LINE)
+	} else
+	    Memc[ksection] = EOS
 	if (output[1] == EOS)
 	    call strcpy (Memc[input], Memc[name], SZ_LINE)
 	else
@@ -792,23 +823,35 @@ begin
 	case ECHELLE:
 	    ;
 	case MULTISPEC:
-	    if (streq (Memc[input], Memc[name]))
+	    if (streq (Memc[input], Memc[name])) {
 		call strcat (".ms", Memc[name], SZ_LINE)
+		call strcat (Memc[ksection], Memc[name], SZ_LINE)
+	    }
 	case NORM:
-	    if (streq (Memc[input], Memc[name]))
+	    if (streq (Memc[input], Memc[name])) {
 	        call strcat (".norm", Memc[name], SZ_LINE)
+		call strcat (Memc[ksection], Memc[name], SZ_LINE)
+	    }
 	case FLAT:
-	    if (streq (Memc[input], Memc[name]))
+	    if (streq (Memc[input], Memc[name])) {
 	        call strcat (".flat", Memc[name], SZ_LINE)
+		call strcat (Memc[ksection], Memc[name], SZ_LINE)
+	    }
 	case RATIO:
-	    if (streq (Memc[input], Memc[name]))
+	    if (streq (Memc[input], Memc[name])) {
 	        call strcat (".ratio", Memc[name], SZ_LINE)
+		call strcat (Memc[ksection], Memc[name], SZ_LINE)
+	    }
 	case DIFF:
-	    if (streq (Memc[input], Memc[name]))
+	    if (streq (Memc[input], Memc[name])) {
 	        call strcat (".diff", Memc[name], SZ_LINE)
+		call strcat (Memc[ksection], Memc[name], SZ_LINE)
+	    }
 	case FIT:
-	    if (streq (Memc[input], Memc[name]))
+	    if (streq (Memc[input], Memc[name])) {
 	        call strcat (".fit", Memc[name], SZ_LINE)
+		call strcat (Memc[ksection], Memc[name], SZ_LINE)
+	    }
 	case NOISE:
 	    Memc[name] = EOS
 	}
@@ -994,8 +1037,10 @@ begin
 			call pargi (int(log10(real(nsubaps)))+1)
 			call pargi (l)
 		}
-		if (streq (Memc[input], Memc[name]))
+		if (streq (Memc[input], Memc[name])) {
 		    call strcat (".ec", Memc[name1], SZ_LINE)
+		    call strcat (Memc[ksection], Memc[name1], SZ_LINE)
+		}
 
 		if (iap == 1) {
 		    out = immap (Memc[name1], NEW_COPY, in)
@@ -1498,10 +1543,12 @@ begin
 	step = (high - low) / nsubaps
 	cv = AP_CV(ap)
 	do iy = 1, ny {
-	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
-	    if (asi != NULL)
-		call asifit (asi, Memr[data], nc)
 	    s = cveval (cv, real (iy + ys - 1)) - c1 + 1
+	    call ap_asifit (dbuf+(iy+ys-1-l1)*nc, nc, xs[iy]-c1+1,
+		low+s, high+s, data, asi)
+#	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
+#	    if (asi != NULL)
+#		call asifit (asi, Memr[data], nc-xs[iy]+c1)
 	    do i = 1, nsubaps {
 	        x1 = max (0.5, low + (i - 1) * step + s) + c1 - xs[iy]
 	        x2 = min (nc + 0.49, low + i * step + s) + c1 - xs[iy]
@@ -1512,7 +1559,7 @@ begin
 	        ix1 = nint (x1)
 	        ix2 = nint (x2)
 
-		# Compute end pixel weights.  Remember x1/x2 are zero indexed.
+		# Compute end pixel weights.  Remember asi is offset by 1.
 		call ap_edge (asi, x1+1, x2+1, wt1, wt2)
 
 		# Sum pixels.
@@ -1703,4 +1750,79 @@ begin
 	    call amovr (profile[1,ix], Memr[impl2r(out,ix)], ny)
 
 	call asifree (asi)
+end
+
+
+# AP_ASIFIT -- Return interpolation pointer and data pointer.
+#
+# The main reason for this routine is to shift the origin of the data by
+# one pixel so that the interpolator may be called to evaluate across
+# the extent of the first and last pixels.  This means the calling program
+# will reference asi fit between 1.5 and N+1.5.  It also means the returned
+# data pointer may start before the first point but will never be
+# dereferenced outside of the data range.
+
+procedure ap_asifit (dbuf, nc, xs, low, high, data, asi)
+
+pointer	dbuf			#I Data buffer pointer
+int	nc			#I Size of data buffer
+int	xs			#I Start of aperture array (in dbuf coords)
+real	low			#I Low aperture edge (in dbuf coords)
+real	high			#I High aperture edge (in dbuf coords)
+pointer	data			#O Data pointer
+pointer	asi			#I ASI pointer
+
+int	i, ix1, ix2, n
+real	x1, x2
+pointer	fit
+
+begin
+	# Check for in bounds data.
+	x1 = max (0.5, low)
+	x2 = min (nc + 0.49, high)
+	if (x1 >= x2)
+	    return
+
+	# Set data pointer relative to the aperture start with an offset for
+	# one indexing; i.e. pixel i is referenced as Memr[data+i].  The
+	# aperture start may put this outside the data buffer but we expect
+	# routines using the pointer to never index outside of the buffer.
+
+	data = (dbuf + xs - 1) - 1
+
+	# If not using an interpolator we are done.
+
+	if (asi == NULL)
+	    return
+
+	# If the aperture, with one extra pixel on each end for integration
+	# across the end pixel, is within the data buffer then fit an
+	# interpolator directly.  Otherwise we need to use a temporary
+	# padded buffer.  The origin of the fitted buffer is relative
+	# to the data pointer.  Note that this means that evaluating the
+	# fit requires the aperture start coordinates to be incremented
+	# by 1.
+
+	ix1 = 0
+	ix2 = nint (x2) + 1 - (xs - 1)
+	n = ix2 + ix1 + 1
+	if (data + ix1 >= dbuf && data + ix2 <= dbuf + nc - 1) {
+	    call asifit (asi, Memr[data+ix1], n)
+	    return
+	}
+
+	# One or the other end point is out of bounds so to avoid potential
+	# NAN and segmentation errors use an internal array to pad.
+
+	call malloc (fit, n, TY_REAL)
+	do i = 0, n-1 {
+	    if (data + i < dbuf)
+		Memr[fit+i] = Memr[dbuf]
+	    else if (data + i > dbuf + nc - 1)
+		Memr[fit+i] = Memr[dbuf+nc-1]
+	    else
+		Memr[fit+i] = Memr[data+i]
+	}
+	call asifit (asi, Memr[fit], n)
+	call mfree (fit, TY_REAL)
 end

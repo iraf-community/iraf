@@ -13,8 +13,9 @@ task	airmass,
 	asttimes,
 	rvcorrect,
 	setairmass,
-	setjd,
-	ccdtime		= "astutil$x_astutil.e"
+	setjd		= "astutil$x_astutil.e"
+
+task	ccdtime		= "obsutil$src/ccdtime/x_obsutil.e"
 
 # Script tasks.
 task	astradius	= "astutil$astradius.cl"

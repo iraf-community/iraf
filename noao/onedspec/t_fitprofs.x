@@ -860,7 +860,7 @@ begin
 	call sprintf (Memc[str], SZ_LINE,
 	    "# Nfit=%d, background=%b, positions=%s, gfwhm=%s, lfwhm=%s\n")
 	    call pargi (ng)
-	    call pargi (fit[BKG] == SINGLE)
+	    call pargb (fit[BKG] == SINGLE)
 	    if (fit[POS] == FIXED)
 		call pargstr ("fixed")
 	    else if (fit[POS] == SINGLE)

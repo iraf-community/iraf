@@ -1,0 +1,11 @@
+/dev/hda7	/	reiserfs	defaults 1 1
+/dev/hda5	/boot	ext2	defaults 1 2
+/dev/cdrom	/media/cdrom	auto	ro,noauto,user,exec 0 0
+devpts	/dev/pts	devpts	defaults 0 0
+/dev/fd0	/media/floppy	auto	noauto,user,sync 0 0
+proc	/proc	proc	defaults 0 0
+/dev/hda6	swap	swap	pri=42 0 0
+vmware:/d0	/vmware/d0	nfs	rw,hard,rsize=8192,wsize=8192,nfsvers=2
+vmware:/u1	/vmware/u1	nfs	rw,hard,rsize=8192,wsize=8192,nfsvers=2
+vmware:/u2	/vmware/u2	nfs	rw,hard,rsize=8192,wsize=8192,nfsvers=2
+vmware:/u3	/vmware/u3	nfs	rw,hard,rsize=8192,wsize=8192,nfsvers=2

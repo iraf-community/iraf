@@ -292,6 +292,7 @@ begin
 	        call pargstr (arg)
 
 	    call gmsg (XH_GP(xh), param, Memc[msg]) 	# send it to the GUI
+	    call gflush (XH_GP(xh))
 	    call sfree (sp)
 	    return
 	}
@@ -325,12 +326,14 @@ begin
 
 	# Begin the message by adding the arg and make a Tcl list of the
 	# contents.
-	call sprintf (Memc[msg], nchars, "%s { %s }")
+	call sprintf (Memc[msg], nchars, "%s { ")
 	    call pargstr (arg)
-	    call pargstr (Memc[list])
+	call strcat (Memc[list], Memc[msg], nchars)
+	call strcat (" }", Memc[msg], nchars)
 
 	# Finally, send it to the GUI.
 	call gmsg (XH_GP(xh), param, Memc[msg])
+	call gflush (XH_GP(xh))
 
 	call sfree (sp)
 end
@@ -452,6 +455,7 @@ begin
 	    call pargstr (CURDIR(xh))
 
 	call gmsg (XH_GP(xh), "directory", Memc[dirbuf])
+	call gflush (XH_GP(xh))
 
 	call sfree (sp)
 end
@@ -475,6 +479,7 @@ begin
 
 	call strcpy (pattern, PATTERN(xh), SZ_FNAME)
 	call gmsg (XH_GP(xh), "directory", Memc[patbuf])
+	call gflush (XH_GP(xh))
 
 	call sfree (sp)
 end
@@ -497,6 +502,7 @@ begin
 	    call pargstr (selection)
 
 	call gmsg (XH_GP(xh), "directory", Memc[buf])
+	call gflush (XH_GP(xh))
 	call sfree (sp)
 end
 

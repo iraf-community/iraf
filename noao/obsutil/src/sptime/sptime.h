@@ -26,10 +26,11 @@ define	LPMAG		14
 define	MMAG		15
 
 # Sky subtraction options.
-define	SKYSUB		"|none|longslit|multiap|"
+define	SKYSUB		"|none|longslit|multiap|shuffle|"
 define	SKY_NONE	1
 define	SKY_LONGSLIT	2
 define	SKY_MULTIAP	3
+define	SKY_SHUFFLE	4
 
 # Aperture types.
 define	APTYPES		"|circular|rectangular|"
@@ -78,7 +79,7 @@ define	C		2.99792456E18
 
 # Data structure.
 define	ST_SZSTRING	99			# Length of strings
-define	ST_LEN		152			# Structure length
+define	ST_LEN		154			# Structure length
 
 define	ST_TAB		Memi[$1]		# Tables pointer
 define	ST_SEARCH	Memi[$1+1]		# Search list
@@ -89,40 +90,42 @@ define	ST_AV		Memr[$1+5]		# A(V)
 define	ST_RV		Memr[$1+6]		# A(V)/E(B-V)
 define	ST_TIME		Memr[$1+7]		# Exposure time
 define	ST_NEXP		Memi[$1+8]		# Number of exposures
-define	ST_MAXEXP	Memr[$1+9]		# Maximum exposure time
-define	ST_AIRMASS	Memr[$1+10]		# Airmass
-define	ST_SEEING	Memr[$1+11]		# Seeing (FWHM in arcsec)
-define	ST_PHASE	Memr[$1+12]		# Moon phase
-define	ST_REFW		Memr[$1+13]		# Reference wavelength
-define	ST_REFF		Memr[$1+14]		# Reference flux
-define	ST_REFFL	Memr[$1+15]		# Reference flambda
-define	ST_CW		Memr[$1+16]		# Central wavelength
-define	ST_ORDER	Memi[$1+16+$2]		# Grating orders (2)
-define	ST_APSIZE	Memr[$1+18+$2]		# Aperture sizes (2) 
-define	ST_BIN		Memi[$1+20+$2]		# Binning (2)
-define	ST_GAIN		Memr[$1+23]		# Detector gain
-define	ST_RDNOISE	Memr[$1+24]		# Detector read noise
-define	ST_DARK		Memr[$1+25]		# Detector dark counts
-define	ST_INOUTA	Memr[$1+25+$2]		# Incident-diffracted angle(deg)
-define	ST_SKYSUB	Memi[$1+28]		# Sky subtraction type
-define	ST_NSKYAPS	Memi[$1+29]		# Number of sky apertures
+define	ST_MINEXP	Memr[$1+9]		# Minimum time per integration
+define	ST_MAXEXP	Memr[$1+10]		# Maximum time per integration
+define	ST_AIRMASS	Memr[$1+11]		# Airmass
+define	ST_SEEING	Memr[$1+12]		# Seeing (FWHM in arcsec)
+define	ST_PHASE	Memr[$1+13]		# Moon phase
+define	ST_REFW		Memr[$1+14]		# Reference wavelength
+define	ST_REFF		Memr[$1+15]		# Reference flux
+define	ST_REFFL	Memr[$1+16]		# Reference flambda
+define	ST_CW		Memr[$1+17]		# Central wavelength
+define	ST_ORDER	Memi[$1+17+$2]		# Grating orders (2)
+define	ST_APSIZE	Memr[$1+19+$2]		# Aperture sizes (2) 
+define	ST_BIN		Memi[$1+21+$2]		# Binning (2)
+define	ST_GAIN		Memr[$1+24]		# Detector gain
+define	ST_RDNOISE	Memr[$1+25]		# Detector read noise
+define	ST_DARK		Memr[$1+26]		# Detector dark counts
+define	ST_INOUTA	Memr[$1+26+$2]		# Incident-diffracted angle(deg)
+define	ST_SKYSUB	Memi[$1+29]		# Sky subtraction type
+define	ST_NSKYAPS	Memi[$1+30]		# Number of sky apertures
 
-define	ST_DISPTYPE	Memi[$1+29+$2]		# Disperser type
-define	ST_GR		Memi[$1+31+$2]		# Grating pointer (2)
-define	ST_DISP		Memr[$1+33+$2]		# Dispersion (2)
-define	ST_SCALE	Memr[$1+35+$2]		# Scale at detector (2)
-define	ST_RES		Memr[$1+37+$2]		# Resolution at detector (2)
-define	ST_AREA		Memr[$1+40]		# Effective collecting area
-define	ST_TELSCALE	Memr[$1+41]		# Telescope scale at aperture
-define	ST_NOBJPIX	Memi[$1+42]		# Number of object pixels
-define	ST_NSKYPIX	Memi[$1+43]		# Number of sky pixels
-define	ST_APTYPE	Memi[$1+44]		# Aperture type
-define	ST_PIXSIZE	Memr[$1+45]		# Pixel weighted disp. size
-define	ST_FILTBLK	Memi[$1+46]		# Block filter flag
-define	ST_DUNANG	Memi[$1+47]		# Angstrom units pointer
-define	ST_DUN		Memi[$1+48]		# User units pointer
-define	ST_SUBPIXELS	Memi[$1+49]		# Number of subpixels
-define	ST_COLFL	Memr[$1+50]		# Collimator focal length
-define	ST_CAMFL	Memr[$1+51]		# Collimator focal length
-define	ST_DUNITS	Memc[P2C($1+52)]	# Dispersion units
-define	ST_FUNITS	Memc[P2C($1+102)]	# Flux units
+define	ST_DISPTYPE	Memi[$1+30+$2]		# Disperser type
+define	ST_GR		Memi[$1+32+$2]		# Grating pointer (2)
+define	ST_DISP		Memr[$1+34+$2]		# Dispersion (2)
+define	ST_SCALE	Memr[$1+36+$2]		# Scale at detector (2)
+define	ST_RES		Memr[$1+38+$2]		# Resolution at detector (2)
+define	ST_AREA		Memr[$1+41]		# Effective collecting area
+define	ST_TELSCALE	Memr[$1+42]		# Telescope scale at aperture
+define	ST_NOBJPIX	Memi[$1+43]		# Number of object pixels
+define	ST_NSKYPIX	Memi[$1+44]		# Number of sky pixels
+define	ST_APLIM	Memi[$1+45]		# Aperture limited?
+define	ST_APTYPE	Memi[$1+46]		# Aperture type
+define	ST_PIXSIZE	Memr[$1+47]		# Pixel weighted disp. size
+define	ST_FILTBLK	Memi[$1+48]		# Block filter flag
+define	ST_DUNANG	Memi[$1+49]		# Angstrom units pointer
+define	ST_DUN		Memi[$1+50]		# User units pointer
+define	ST_SUBPIXELS	Memi[$1+51]		# Number of subpixels
+define	ST_COLFL	Memr[$1+52]		# Collimator focal length
+define	ST_CAMFL	Memr[$1+53]		# Collimator focal length
+define	ST_DUNITS	Memc[P2C($1+54)]	# Dispersion units
+define	ST_FUNITS	Memc[P2C($1+104)]	# Flux units

@@ -7,24 +7,45 @@
 # assumed that the environment variables defined in the IRAF .login and in
 # hlib/irafuser.csh are defined.
 
+
 set ARCH = "$1"
 set DIRS = "lib pkg sys"
 set FILE = unix/hlib/mkpkg.inc
 set DFL  = _DFL.mkfloat
 set TFL  = _TFL.mkfloat
-unalias	ls rm cat grep tar cmp diff echo ln mv zcat
+unalias	ls rm cat grep tar cmp diff echo ln mv zcat gunzip compress which
 unset noclobber
 
 # Set the following to -xpf for BSD Tar and to -xof for SYSV Tar.
-#set TARXFLGS = -xpf
+set TARXFLGS = -xpf
 #set TARXFLGS = -xof
-
-# Digital Unix can't handle -p.
-set TARXFLGS = -xf
 
 # set echo
 
-set float = `ls -l bin | sed -e 's+^.*bin\.++'`
+# See if we're able to compress the files.
+set do_compress = 1
+if (! -x `which compress`) then
+    if (! -x `which gzip`) then
+        echo "no compress command found, OBJS.arc files will not be compressed"
+	set do_compress = 0
+    else
+	set COMPRESS = "gzip -S .Z"
+    endif
+else
+    set COMPRESS =  `which compress`
+endif
+
+# Check for an error in the package structure, i.e. the 'bin' is a directory
+# and not a symlink we can change.  It's valid for an external package to
+# have only a 'bin' directory, but then it's toplevel mkpkg shouldn't be
+# calling us.
+if ("`ls -l bin | grep 'l.........'`" == "") then
+    echo "'bin' is a directory, should be symbolic link pointing to valid"
+    echo "architecture.  Possible error in copying package structure??"
+    exit 1
+else
+    set float = `ls -l bin | sed -e 's+^.*bin\.++'`
+endif
 if ("$ARCH" == "") then
     echo "system is configured for $float"
     exit 0
@@ -47,11 +68,13 @@ if ("$1" == "-d") then
     end
 endif
 
-echo "delete any dreg .e files left lying about in the source directories"
+echo -n \
+"deleting any dreg .e files left lying about in the source directories... "
 rmbin -n -o .a .o .e .E $DIRS > $TFL;  grep '\.[eE]$' $TFL | tee _.e_files
 rm -f `cat _.e_files` _.e_files; grep -v '\.[eE]$' $TFL > $DFL; rm $TFL
+echo "done"
 
-echo "archive and delete $float objects"
+echo -n "archiving and deleting $float objects... "
 if (-e bin.$float) then
     if (! -z $DFL) then
 	tar -cf bin.$float/OBJS.arc `cat $DFL`
@@ -62,9 +85,10 @@ if (-e bin.$float) then
 	    diff $DFL $TFL
 	    rm $DFL $TFL bin.$float/OBJS.arc
 	    exit 1
-	else
-	    echo -n "compress bin.$float/OBJS.arc "
-	    nice compress -f bin.$float/OBJS.arc &
+	else if ($do_compress == 1) then
+	    echo "done"
+	    echo -n "compressing bin.$float/OBJS.arc "
+	    nice $COMPRESS -f bin.$float/OBJS.arc &
 	    rm -f $TFL
 	endif
     endif
@@ -74,15 +98,22 @@ endif
 rm -f `cat $DFL` $DFL
 
 if ($ARCH != generic) then
-    echo "restore archived $ARCH objects"
+    echo -n "restoring archived $ARCH objects... "
     if (-e bin.$ARCH/OBJS.arc.Z) then
 	if ({ (zcat bin.$ARCH/OBJS.arc.Z | tar $TARXFLGS -) }) then
 	    rm -f bin.$ARCH/OBJS.arc.Z
 	endif
+	echo "done"
+    else if (-e bin.$ARCH/OBJS.arc.gz) then
+	if ({ (cat bin.$ARCH/OBJS.arc.gz | gunzip | tar $TARXFLGS -) }) then
+	    rm -f bin.$ARCH/OBJS.arc.gz
+	endif
+	echo "done"
     else if (-e bin.$ARCH/OBJS.arc) then
 	if ({ (cat bin.$ARCH/OBJS.arc | tar $TARXFLGS -) }) then
 	    rm -f bin.$ARCH/OBJS.arc
 	endif
+	echo "done"
     else
 	echo "no object archive found; full sysgen will be needed"
     endif

@@ -4,52 +4,83 @@
 #include <stdio.h>
 #include <signal.h>
 
+#ifdef LINUX
+# include <fpu_control.h>
+#else
+# ifdef BSD
+# include <floatingpoint.h>
+# endif
+#endif
+
+#ifdef SOLARIS
+# include <sys/siginfo.h>
+# include <sys/ucontext.h>
+# include <ieeefp.h>
+#endif
+
+#ifdef LINUXPPC
+#define MACUNIX
+#endif
+
+#ifdef MACOSX
+#define MACUNIX
+
+/* The following are needed for OS X 10.1 for backward compatability.  The
+ * signal sa_flags are set to use them to get signal handling working on
+ * 10.2 and later systems.
+ */
+#ifdef OLD_MACOSX
+#ifndef SA_NODEFER
+#define SA_NODEFER      0x0010  /* don't mask the signal we're delivering */
+#endif
+#ifndef SA_NOCLDWAIT
+#define SA_NOCLDWAIT    0x0020  /* don't keep zombies around */
+#endif
+#ifndef SA_SIGINFO
+#define SA_SIGINFO      0x0040  /* signal handler with SA_SIGINFO args */
+#endif
+#endif
+
+#endif
+
 #define import_spp
 #define	import_kernel
 #define	import_knames
 #define import_xwhen
 #include <iraf.h>
 
-#ifdef sun
-#include <floatingpoint.h>
-#endif
-
-#ifdef OSF1
-#include <sys/siginfo.h>
-#include <sys/ucontext.h>
-#endif
-
-/* NOTES (OSF) -- This code is getting to be a mess, too many #ifdefs, but
- * I am leaving it that way for now to minimize changes.
+/* ZXWHEN.C -- IRAF exception handling interface.  This version has been 
+ * customized for PC-IRAF, i.e., LINUX and FreeBSD.
  *
- * This code originally used signal for the non-FPE exception and sigaction
- * for the FPE ones, but this caused problems with signals not being trapped
- * leading to infinite loops.  Using signal uniformly everywhere avoided
- * this problem; using sigaction uniformly everywhere might also have worked
- * but that would have required greater code changes and I did not try it.
- *
- * The calling sequence for the user exception handler for signal does not
- * appear to be documented so I had to try to determine this by trial and
- * error.  The signal and hwcode arguments appear to be valid but oddly
- * enough the hwcode for SIGFPE signals appears to correspond to the "sparc"
- * definitions in <signal.h>.  These are what is encoded in hwx_exception
- * below.  I found that -2 was returned instead of 2 for an integer divide
- * by zero, hence the abs(hwcode) in zxgmes.  With these changes at least
- * segvio, floating divide by zero, and integer divide by zero are caught
- * and reported correctly.
+ * Rewritten Aug200 to use sigaction by default on all systems (done in 
+ * connection with the LinuxPPC port).  This got rid of a lot of old kludgy
+ * platform-dependent code used to workaround Linux signal handling problems.
  */
 
 /* Set the following nonzero to cause process termination with a core dump
  * when the first signal occurs.
  */
-int	debug_sig = 0;
+int debug_sig = 0;
 
-/* The following definition has intimate knowledge of the STDIO structures. */
-#ifdef SOLARIS
-#define	fcancel(fp)	((fp)->_cnt=BUFSIZ,(fp)->_ptr=(fp)->_base)
+#ifdef LINUX
+# define	fcancel(fp)
 #else
-#define	fcancel(fp)	((fp)->_cnt=(fp)->_bufsiz,(fp)->_ptr=(fp)->_base)
+# ifdef BSD
+# define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
+#else
+# ifdef MACOSX
+# define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
+#else
+# ifdef SOLARIS
+# define	fcancel(fp)     ((fp)->_cnt=BUFSIZ,(fp)->_ptr=(fp)->_base)
 #endif
+#endif
+#endif
+#endif
+
+int ex_handler();
+static long setsig();
+static int ignore_sigint = 0;
 
 
 /* Exception handling:  ZXWHEN (exception, handler, old_handler)
@@ -106,9 +137,9 @@ struct osexc unix_exception[] = {
 	NULL,		"quit",
 	X_ACV,		"illegal instruction",
 	NULL,		"trace trap",
-	X_ACV,		"IOT",
-	X_ACV,		"EMT",
-	X_ARITH,	"FPE",
+	X_ACV,		"abort",
+	X_ACV,		"EMT exception",
+	X_ARITH,	"arithmetic exception",
 	NULL,		"kill",
 	X_ACV,		"bus error",
 	X_ACV,		"segmentation violation",
@@ -116,6 +147,7 @@ struct osexc unix_exception[] = {
 	X_IPC,		"write to pipe with no reader",
 	NULL,		"alarm clock",
 	X_INT,		"software terminate (interrupt)",
+	X_ARITH,	"STKFLT",
 	EOMAP,		""
 };
 
@@ -129,108 +161,28 @@ struct	_hwx {
 	char	*v_msg;			/* Descriptive error message	*/
 };
 
-struct	_hwx hwx_exception[] = {
-#ifdef OSF1
-#ifdef OSF1_siginfo
-	FPE_INTDIV,		"integer divide by zero",
-	FPE_INTOVF,		"integer overflow",
-	FPE_FLTDIV,		"floating point divide by zero",
-	FPE_FLTOVF,		"floating point overflow",
-	FPE_FLTUND,		"floating point underflow",
-	FPE_FLTRES,		"floating point inexact result",
-	FPE_FLTINV,		"invalid floating point operation",
-	FPE_FLTSUB,		"subscript out of range",
-	FPE_FLTCPL,		"complete",
-#else
-	FPE_INTOVF_TRAP,	"integer overflow",
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_FLTOVF_TRAP,	"floating overflow",
-	FPE_FLTDIV_TRAP,	"floating/decimal divide by zero",
-	FPE_FLTUND_TRAP,	"floating underflow",
-	FPE_DECOVF_TRAP,	"decimal overflow",
-	FPE_SUBRNG_TRAP,	"subscript out of range",
-	FPE_FLTOVF_FAULT,	"floating overflow fault",
-	FPE_FLTDIV_FAULT,	"divide by zero floating fault",
-	FPE_FLTUND_FAULT,	"floating underflow fault",
-	FPE_UNIMP_FAULT,	"unimplemented FPU instruction",
-	FPE_INVALID_FAULT,	"invalid floating point operation",
-	FPE_INEXACT_FAULT,	"inexact floating point result",
-	FPE_HPARITH_TRAP,	"high performance trap",
-	FPE_INTOVF_FAULT,	"integer overflow fault",
-	FPE_ILLEGAL_SHADOW_TRAP, "illegal trap shadow trap",
-	FPE_GENTRAP,		"floating point error",
+#ifdef MACOSX
+#define	FPE_INTDIV	(-2)		/* N/A */
+#define	FPE_INTOVF	(-2)		/* N/A */
+#ifdef OLD_MACOSX
+#define FPE_FLTRES	0x02000000	/* inexact */
+#define FPE_FLTDIV	0x04000000	/* divide-by-zero */
+#define FPE_FLTUND	0x08000000	/* underflow */
+#define FPE_FLTOVF	0x10000000	/* overflow */
+#define FPE_FLTINV	0x20000000	/* invalid */
+#endif
+#define	FPE_FLTSUB	(-2)		/* N/A */
 #endif
 
-#else
-#ifdef SOLARIS
-	FPE_INTDIV,		"integer divide by zero",
-	FPE_INTOVF,		"integer overflow",
-	FPE_FLTDIV,		"floating point divide by zero",
-	FPE_FLTOVF,		"floating point overflow",
-	FPE_FLTUND,		"floating point underflow",
-	FPE_FLTRES,		"floating point inexact result",
-	FPE_FLTINV,		"invalid floating point operation",
-	FPE_FLTSUB,		"subscript out of range",
-#else
-
-#ifdef vax
-	FPE_INTOVF_TRAP,	"integer overflow",
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_FLTOVF_TRAP,	"floating overflow",
-	FPE_FLTDIV_TRAP,	"floating/decimal divide by zero",
-	FPE_FLTUND_TRAP,	"floating underflow",
-	FPE_DECOVF_TRAP,	"decimal overflow",
-	FPE_SUBRNG_TRAP,	"subscript out of range",
-	FPE_FLTOVF_FAULT,	"floating overflow fault",
-	FPE_FLTDIV_FAULT,	"divide by zero floating fault",
-	FPE_FLTUND_FAULT,	"floating underflow fault",
-#endif vax
-
-#ifdef mc68000
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_CHKINST_TRAP,	"CHK [CHK2] instruction",
-	FPE_TRAPV_TRAP,		"TRAPV [cpTRAPcc TRAPcc] instr",
-	FPE_FLTBSUN_TRAP,	"[branch or set on unordered cond]",
-	FPE_FLTINEX_TRAP,	"[floating inexact result]",
-	FPE_FLTDIV_TRAP,	"[floating divide by zero]",
-	FPE_FLTUND_TRAP,	"[floating underflow]",
-	FPE_FLTOPERR_TRAP,	"[floating operand error]",
-	FPE_FLTOVF_TRAP,	"[floating overflow]",
-	FPE_FLTNAN_TRAP,	"[floating Not-A-Number]",
-#ifdef sun
-	FPE_FPA_ENABLE,		"[FPA not enabled]",
-	FPE_FPA_ERROR,		"[FPA arithmetic exception]",
-#endif sun
-#endif mc68000
-
-#ifdef sparc
-	FPE_INTOVF_TRAP,	"integer overflow",
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_FLTINEX_TRAP,	"[floating inexact result]",
-	FPE_FLTDIV_TRAP,	"[floating divide by zero]",
-	FPE_FLTUND_TRAP,	"[floating underflow]",
-	FPE_FLTOPERR_TRAP,	"[floating operand error]",
-	FPE_FLTOVF_TRAP,	"[floating overflow]",
-#endif sparc
-
-#ifdef i386
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_INTOVF_TRAP,	"integer overflow",
-	FPE_FLTOPERR_TRAP,	"[floating operand error]",
-	FPE_FLTDEN_TRAP,	"[floating denormalized operand]",
-	FPE_FLTDIV_TRAP,	"[floating divide by zero]",
-	FPE_FLTOVF_TRAP,	"[floating overflow]",
-	FPE_FLTUND_TRAP,	"[floating underflow]",
-	FPE_FLTINEX_TRAP,	"[floating inexact result]",
-	FPE_UUOP_TRAP,		"[floating undefined opcode]",
-	FPE_DATACH_TRAP,	"[floating data chain exception]",
-	FPE_FLTSTK_TRAP,	"[floating stack fault]",
-	FPE_FPA_ENABLE,		"[FPA not enabled]",
-	FPE_FPA_ERROR,		"[FPA arithmetic exception]",
-#endif i386
-
-#endif SOLARIS
-#endif OSF1
+struct	_hwx hwx_exception[] = {
+	FPE_INTDIV,             "integer divide by zero",
+	FPE_INTOVF,             "integer overflow",
+	FPE_FLTDIV,             "floating point divide by zero",
+	FPE_FLTOVF,             "floating point overflow",
+	FPE_FLTUND,             "floating point underflow",
+	FPE_FLTRES,             "floating point inexact result",
+	FPE_FLTINV,             "floating point invalid operation",
+	FPE_FLTSUB,             "subscript out of range",
 	EOMAP,			""
 };
 
@@ -245,10 +197,8 @@ XINT	*epa;			/* EPA of new exception handler	*/
 XINT	*old_epa;		/* receives EPA of old handler	*/
 {
 	static	int first_call = 1;
-	static	int ignore_sigint;
 	int     vex, uex;
 	SIGFUNC	vvector;
-	extern  ex_handler();
 
 	/* Convert code for virtual exception into an index into the table
 	 * of exception handler EPA's.
@@ -286,35 +236,47 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 	    if (unix_exception[uex].x_vex == *sig_code)
 		if (uex == SIGINT) {
 		    if (first_call) {
-			if (signal (uex, vvector) == SIG_IGN) {
-			    signal (uex, SIG_IGN);
+			if (setsig (uex, vvector) == (long) SIG_IGN) {
+			    setsig (uex, SIG_IGN);
 			    ignore_sigint++;
 			}
 			first_call = 0;
 		    } else if (!ignore_sigint) {
 			if (debug_sig)
-			    signal (uex, SIG_DFL);
+			    setsig (uex, SIG_DFL);
 			else
-			    signal (uex, vvector);
+			    setsig (uex, vvector);
 		    }
 		} else {
 		    if (debug_sig)
-			signal (uex, SIG_DFL);
+			setsig (uex, SIG_DFL);
 		    else
-#ifdef SOLARIS
-			if (uex == SIGFPE) {
-			    struct sigaction sig;
-			    sig.sa_handler = (SIGFUNC) ex_handler;
-			    sigemptyset (&sig.sa_mask);
-			    sig.sa_flags = SA_SIGINFO|SA_NODEFER;
-			    sigaction (SIGFPE, &sig, NULL);
-			} else
-			    signal (uex, vvector);
-#else
-			signal (uex, vvector);
-#endif
+			setsig (uex, vvector);
 		}
 	}
+}
+
+
+/* SETSIG -- Post an exception handler for the given exception.
+ */
+static long
+setsig (code, handler)
+int code;
+SIGFUNC	handler;
+{
+	struct sigaction sig;
+	long status;
+
+	sigemptyset (&sig.sa_mask);
+#ifdef MACOSX
+	sig.sa_handler = (SIGFUNC) handler;
+#else
+	sig.sa_sigaction = (SIGFUNC) handler;
+#endif
+	sig.sa_flags = (SA_NODEFER|SA_SIGINFO);
+	status = (long) sigaction (code, &sig, NULL);
+
+	return (status);
 }
 
 
@@ -324,60 +286,82 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-#ifdef SOLARIS
-ex_handler (unix_signal, info, ucp)
-int	unix_signal;			/* SIGINT, SIGFPE, etc.		*/
-siginfo_t *info;
-ucontext_t *ucp;
+#ifdef MACOSX
+
+ex_handler (unix_signal, info, scp)
+int unix_signal;
+#ifdef OLD_MACOSX
+void *info;
 #else
-ex_handler (unix_signal, hwcode, scp, addr)
-int	unix_signal;			/* SIGINT, SIGFPE, etc.		*/
-int	hwcode;				/* VAX hardware trap/fault codes */
-struct	sigcontext *scp;
-char	*addr;				/* added for SunOS 4.0 */
+siginfo_t *info;
+#endif
+struct sigcontext *scp;
+
+#else
+
+ex_handler (unix_signal, info, ucp)
+int unix_signal;
+siginfo_t *info;
+void *ucp;
+
 #endif
 {
-	int	vex;
-	XINT	next_epa, epa, x_vex;
-
-#ifdef mc68000
-	/* The Sun floating point accelerator board routinely uses the
-	 * following signal to force recomputation of floating point results
-	 * by the mc68881 when the results would violate the IEEE std.
-	 * If this code is missing the program will enter an infinite loop.
-	 */
-	if (hwcode == FPE_FPA_ERROR)
-	    if (fpa_handler (unix_signal, hwcode, scp, addr))
-		return;
-#endif
+	XINT next_epa, epa, x_vex;
+	int *frame, vex;
 
 	last_os_exception = unix_signal;
-#ifdef SOLARIS
-	last_os_hwcode = info ? info->si_code : 0;
+#ifdef MACOSX
+        last_os_hwcode = scp->sc_psw;
 #else
-	last_os_hwcode = hwcode;
+        last_os_hwcode = info ? info->si_code : 0;
 #endif
+
 	x_vex = unix_exception[unix_signal].x_vex;
 	vex = x_vex - X_FIRST_EXCEPTION;	
 	epa = handler_epa[vex];
 
-	/* If signal was SIGINT, cancel any buffered standard output.
+	/* Reenable/initialize the exception handler.
 	 */
-	if (unix_signal == SIGINT)
+#ifdef MACOSX
+	/* Since we don't currently enable hardware exceptions on MacOSX,
+	 * this just clears the exception-occurred bits in the FPSCR.
+	 */
+	{   int v = 0;
+	    sfpscr_ (&v);
+	}
+#endif
+#ifdef LINUX
+	/* setfpucw (0x1372); */
+	{
+#ifdef MACUNIX
+	/* This is for Linux on a Mac, e.g., LinuxPPC (not MacOSX). */
+	    int fpucw = _FPU_IEEE;
+
+	    /*
+	    if (unix_signal == SIGFPE)
+		kernel_panic ("unrecoverable floating exception");
+	    else
+		sfpucw_ (&fpucw);
+	    if (unix_signal == SIGPIPE && !ignore_sigint)
+		sigset (SIGINT, (SIGFUNC) ex_handler);
+	     */
+
+	    sfpucw_ (&fpucw);
+#else
+	    int fpucw = 0x332;
+	    sfpucw_ (&fpucw);
+#endif
+	}
+#endif
+#ifdef SOLARIS
+        fpsetsticky (0x0);
+	fpsetmask (FP_X_INV | FP_X_OFL | FP_X_DZ);
+#endif
+
+	/* If signal was SIGINT, cancel any buffered standard output.  */
+	if (unix_signal == SIGINT) {
 	    fcancel (stdout);
-
-#ifndef OSF1
-	/* Unblock the signal, in the event that the handler never returns.
-	 * sigsetmask (sigblock(0) & ~mask(unix_signal));
-	 */
-	sigsetmask (0);
-#endif
-
-#ifdef i386
-	/* Reenable the floating point exceptions. */
-	ieee_handler ("set", "common", SIGFPE_ABORT);
-	abrupt_underflow_();
-#endif
+	}
 
 	/* Call user exception handler(s).  Each handler returns with the
 	 * "value" (epa) of the next handler, or X_IGNORE if exception handling
@@ -400,14 +384,8 @@ XINT	*os_exception;
 PKCHAR	*errmsg;
 XINT	*maxch;
 {
-	register int v, hwcode;
-	char *os_errmsg;
-
-#ifdef OSF1
-	hwcode = abs(last_os_hwcode);
-#else
-	hwcode = last_os_hwcode;
-#endif
+	register int	v;
+	char	*os_errmsg;
 
 	*os_exception = last_os_exception;
 
@@ -417,7 +395,7 @@ XINT	*maxch;
 	    os_errmsg = unix_exception[last_os_exception].x_name;
 	    if (last_os_exception == SIGFPE) {
 		for (v=0;  hwx_exception[v].v_code != EOMAP;  v++)
-		    if (hwx_exception[v].v_code == hwcode) {
+		    if (hwx_exception[v].v_code == last_os_hwcode) {
 			os_errmsg = hwx_exception[v].v_msg;
 			break;
 		    }

@@ -1,6 +1,190 @@
 .help revisions Jun88 noao.onedspec
 .nf
+
+
+=======
+V2.12.2
+=======
+
+identify/autoid/aidlog.x
+    Added a test to avoid an arithmetic error if the dispersion
+    turns out to be zero.  (1/29/04, Valdes)
+
+identify/autoid/aidautoid.x
+identify/autoid/autoid.x
+    Two new debugging characters, "nm", were added.
+    (1/29/04, Valdes)
+
+aidpars.par
+    Default values were changed:
+	cddir: "unknown" -> "sign"
+	ntarget: 30 -> 100
+	ndmax: 20 -> 500
+	fmatch: 0.3 -> 0.2
+    (1/29/04, Valdes)
+
+identify/autoid/autoid.x
+    The parameters that can be specified by header keywords can now be
+    either the keyword or the keyword prefixed by '!'.  This was done
+    because there are a number of other IRAF tasks that use the '!' prefix
+    and users may be confused and use this syntax.  (1/29/04, Valdes)
+
+identify/autoid/autoid.x
+aidpars.par
+    The number of highest vote potential dispersions checked was
+    previously limited to a maximum of three times the number of target lines.
+    Now the number may be as large as specified by the "ndmax" parameter.
+    The default parameter value was greatly increased to 500.
+    (1/29/04, Valdes)
+
+identify/autoid/aidautoid.x
+doc/aidpars.hlp
+    The algorithm was modified to iterate on the pattern parameter
+    "npattern".  After exhausting the search with the initial
+    number of lines per pattern the value is reduced successively by
+    one down to the minimum of 3.  This makes the algorithm take longer
+    but the search is more exhaustive.  Use of larger patterns initially
+    allows finding fewer and more likely candidates first to speed
+    a solution.  (1/29/04, Valdes)
+
+aidpars.par
+identify/autoid/autoid.x
+doc/aidpars.hlp
+    The "rms" parameter is now specified in units of the "fwidth"
+    parameter rather than in pixels.  This is because if fwidth is
+    made larger to deal with broad lines (i.e. a wide slit) then the
+    expected uncertainties in pixel centroids will be larger.  The
+    default value was changed from 0.3 pixels to 0.1 of fwidth.
+    (1/29/04, Valdes)
+
+identify/autoid/autoid.x
+doc/aidpars.hlp
+identify/id_peaks.x
+    The selection of target lines was changed from using id_peaks to a
+    new routine id_upeaks.  In the former routine the ntarget strongest
+    peaks are selected regardless of position in the spectrum.  But this
+    can result in no lines being used in some parts of the spectrum if
+    the spectrum is dominated by strong lines in just one part of the
+    spectrum.  The id_upeaks routine finds lines over the whole spectrum
+    by dividing the spectrum into regions and then alternatively selecting
+    the brightest line in each region until the desired number of lines
+    is obtained.  In this case the number of regions if hardwired at 5.
+    (1/29/04, Valdes)
+
+aidpars.par
+identify/autoid/autoid.h
+doc/aidpars.hlp
+identify/autoid/aidinit.x
+identify/autoid/aidset.x
+identify/autoid/autoid.x
+    Added two new parameters to aidpars.  The first is "maxnl" which
+    defines the maximum non-linearity to accept after a dispersion function
+    fit.  Previously the maximum was hardwired in the code to be 0.5%
+    which was too small for many applications.  The default is set at
+    2%.  The second new parameter is "crquad" which defines a quadratic
+    correction to the pixel positions of detected lines in order to
+    "linearize" the pattern of line spacings which are matched against
+    the coordinate list.  This was found to not be as important as the
+    "maxnl" limitation in handling non-linear dispersion and has a default
+    value of zero.  (1/29/04)
+
+sensfunc/sfstds.x
+    Added a check for names with a kernel section.  Specifically, names
+    that end in ']'.  (12/18/03, Valdes)
+
+smw/shdr.x
+    Now if CUNITn is specified in velocity (m/s or km/s) and if
+    CTYPEn is VELO (or VELOCITY) then internally the velocity zero point
+    reference of 21 centimenters will be automatically added.
+    (8/19/03, Valdes)
+
+smw/shdr.x
+    Experience has shown that data with no units that users want to
+    import is mostly in Angstroms.  So rather than use the old FITS
+    standard that units are meters it will now assume Angstroms.
+    (8/15/03, Valdes)
+
+smw/smwaxes.x
+    A check is made if the physical axis is ra or dec in which case the
+    image is considered not to be dispersion corrected.  (8/5/03, Valdes)
+
+smw/smwsctran.x
+    If there is an error the physical coordinate system is used instead of
+    the world coordinate system.  This is meant to allow coupled WCS
+    (particularly celestial WCS) to be used without an error.
+    (8/5/03, Valdes)
+
+t_dopcor.x
+    Moved the erract before the imunmap/imdelete to produce the correct
+    error message.  (7/8/03, Valdes)
+
+dispcor/t_disptrans.x
+    When the subroutine dispcor was modified with an extra arguement this
+    task was not modified.  The extra argument was added.  (6/4/03, Valdes)
+
+identify/idinit.x
+    The restore function was not resetting the shift value at the right
+    time.  This had the effect of causing the user shift to be wrong
+    in the REIDENTIFY output when refit=no.  (5/27/03, Valdes)
+
+t_tweak.x
+    The statistics computation is now relative to neighboring points.
+    This change was developed working with the Coude-Feed spectral atlas
+    pipeline.  (4/3/03, Valdes)
+
+t_tweak.x
+    WHen an error, such as calibration values too low, occurs in twk_fit it
+    would exit without closing the graphics.  Now the graphics is opened with
+    AW_DEFER and the error action is to first close the graphics before
+    returning to the calling routine with the error.  (2/28/03, Valdes)
+
+t_tweak.x (Bug 520)
+    The erract was after error cleanup which could cause the incorrect
+    error to be reported.  Since the error action is to WARN it makes sense
+    to immediate report the error and then do the clean up.  (2/24/03, Valdes)
+
+dispcor/refspectra.x
+dispcor/refgspec.x
+dispcor/refspectra.com
+    The "select" parameter is now included in the common so that
+    refgspec does not try to look for the sort and group keyword if
+    it is not needed.  (9/5/02, Valdes)
+
+t_sarith.x
+    When a new MWCS pointer is created the attribute "sformat" has to
+    be added.  (8/3/02, Valdes)
+
+t_fitprofs.x
+    Incorrectly used pargi instead of pargb.  (8/2/02, Valdes)
+
+splot/getimage.x
+    Gt_setr was being called with an integer argument.  (8/2/02, Valdes)
+
+
+splot/eqwidthcp.x
+    1.  A pargd was used with the real variable cont.
+    2.  Variable pi never used.
+    (8/2/02, Valdes)
+
+scombine/icscale.x
+    Needed to dereference the error string in icgscale.
+    (8/2/02, Valdes)
+
+t_dispcor.x
+    String argument was incorrectly given as NULL.
+    (8/2/02, Valdes)
+
+t_dispcor.x
+dispcor/dcio.x
+sensfunc/sfoutput.x
+    The axis variable is not used and was deleted.  (8/2/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 scombine/t_scombine.x
+doc/scombine.hlp
     The rejection option is ignored when "combine=sum".  The documentation
     did not make this clear and the output log would show whatever was
     set for the rejection parameter.  The help was clarified and the

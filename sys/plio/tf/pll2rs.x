@@ -53,21 +53,25 @@ begin
 	    case I_ZN:
 		pv = 0
 		goto range_
-	    case I_HN, I_PN:
+	    case I_HN:
 		pv = hi
 range_
 		# Determine inbounds region of segment.
 		x2 = x1 + data - 1
 		i1 = max (x1, xs)
 		i2 = min (x2, xe)
-
-		# Process segment if any region is inbounds.
 		np = i2 - i1 + 1
-		if (opcode == I_PN && np > 0 && i2 == x2) {
+		x1 = x2 + 1
+
+	    case I_PN:
+		pv = hi
+		x2 = x1 + data - 1
+		if (x2 < xs || x2 > xe)
+		    np = 0
+		else {
 		    i1 = x2
 		    np = 1
 		}
-
 		x1 = x2 + 1
 
 	    case I_SH:

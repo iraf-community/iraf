@@ -13,6 +13,7 @@ long	seed			# seed for the random number generator
 real	scale_factor		# scale output numbers by this factor
 
 int	n, i
+long	seed1
 int	clgeti()
 long	clgetl(), clktime()
 real	clgetr(), urand()
@@ -30,14 +31,16 @@ begin
 	# is dependent on the ndigits of precision, set by the user.
 
 	if (IS_INDEFL(seed))
-	    seed = clktime (long(0))
+	    seed1 = seed1 + clktime (long(0))
+	else
+	    seed1 = seed
 
 	for (n=1;  n <= nlines;  n=n+1) {
 	    do i = 1, ncols {
 		call printf ("%*.*g ")
 		    call pargi (ndigits + 2)		# field width
 		    call pargi (ndigits)		# precision
-		    call pargr (urand (seed) * scale_factor)
+		    call pargr (urand (seed1) * scale_factor)
 	    }
 	    call printf ("\n")
 	}

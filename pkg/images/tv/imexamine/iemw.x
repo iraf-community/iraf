@@ -11,7 +11,7 @@ procedure ie_mwinit (ie)
 
 pointer	ie			# IMEXAM descriptor
 
-int	i, j, wcsdim, mw_stati(), nowhite()
+int	i, j, wcsdim, mw_stati(), nowhite(), stridxs()
 pointer	im, mw, ctlw, ctwl, mw_openim(), mw_sctran()
 pointer	sp, axno, axval, str1, str2
 bool	streq()
@@ -107,6 +107,15 @@ begin
 	    if (IE_YFORMAT(ie) != '%')
 		ifnoerr (call mw_gwattrs (mw, j, "format", Memc[str1], SZ_LINE))
 		    call strcpy (Memc[str1], IE_YFORMAT(ie), IE_SZFORMAT)
+
+	    # Check for equitorial coordinate and reversed formats.
+	    ifnoerr (call mw_gwattrs (mw, i, "axtype", Memc[str1], SZ_LINE))
+		if ((streq(Memc[str1],"ra")&&stridxs("hm",IE_XFORMAT(ie))>0) ||
+		    (streq(Memc[str1],"dec")&&stridxs("HM",IE_XFORMAT(ie))>0)) {
+		    call strcpy (IE_XFORMAT(ie), Memc[str1], IE_SZFORMAT)
+		    call strcpy (IE_YFORMAT(ie), IE_XFORMAT(ie),IE_SZFORMAT)
+		    call strcpy (Memc[str1], IE_YFORMAT(ie), IE_SZFORMAT)
+		}
 	}
 
 	IE_MW(ie) = mw

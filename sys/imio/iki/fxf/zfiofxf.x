@@ -54,7 +54,7 @@ begin
 	lzero =  fxf_fpl_equald (0.0d0, FIT_BZERO(fit), 1)
 
 	# Determine if scaling is necessary.
-	bfloat = !(lscale && lzero)
+	bfloat = (!lscale || !lzero)
 	if (bfloat && (FIT_BITPIX(fit) == -32 || FIT_BITPIX(fit) == -64)) {
 	    FIT_IOSTAT(fit) = ERR
 	    #call syserrs (SYS_FXFRDHSC,IM_HDRFILE(im))
@@ -201,7 +201,7 @@ begin
 	lzero =  fxf_fpl_equald (0.0d0, FIT_BZERO(fit), 1)
 
 	# Determine if scaling is necessary.
-	bfloat = !(lscale && lzero)
+	bfloat = (!lscale || !lzero)
 	if (bfloat &&
 		(IM_PIXTYPE(im) == TY_REAL || IM_PIXTYPE(im) == TY_DOUBLE)) {
 	    FIT_IOSTAT(fit) = ERR

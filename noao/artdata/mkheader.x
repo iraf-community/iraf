@@ -1,3 +1,4 @@
+include	<error.h>
 include	<imhdr.h>
 include	<imio.h>
 include	<ctype.h>
@@ -47,14 +48,22 @@ begin
 
 	# Append from an image header.
 	ifnoerr (fd = immap (fname, READ_ONLY, 0)) {
-	    call strcat (Memc[IM_USERAREA(fd)], Memc[ua], max_lenuserarea)
-	    if (strlen (Memc[ua]) == max_lenuserarea)
+	    iferr {
+		i = strlen (Memc[IM_USERAREA(fd)]) + strlen (Memc[ua])
+		call strcat (Memc[IM_USERAREA(fd)], Memc[ua], max_lenuserarea)
+		if (i > max_lenuserarea)
+		    call error (1, "Possibly failed to add all the keywords")
+	    } then {
+		call erract (EA_WARN)
+
 		# Check for truncated card.
-		for (i=ua+max_lenuserarea-1;  i > ua;  i=i-1)
+		for (i=ua+max_lenuserarea-1;  i > ua;  i=i-1) {
 		    if (Memc[i] == '\n') {
 			Memc[i+1] = EOS
 			break
 		    }
+		}
+	    }
 	    call imunmap (fd)
 
 	# Append from a text file.
@@ -81,18 +90,26 @@ begin
 			;
 		    if (Memc[j-1] == '\n')
 			Memc[j-1] = EOS
+		    if (j == i + IDB_RECLEN || Memc[j] == '\n')
+			Memc[j] = EOS
+		    if (strlen (Memc[ua]) + IDB_RECLEN >= max_lenuserarea)
+			call error (1,
+			    "Possibly failed to add all the keywords")
 		    call fprintf (out, "%s%*t\n")
 			call pargstr (Memc[i])
 			call pargi (IDB_RECLEN+1)
 		}
 	    } then {
+		call erract (EA_WARN)
+
 		# Check for truncated card.
 		call close (out)
-		for (i=ua+max_lenuserarea-1;  i > ua;  i=i-1)
+		for (i=ua+max_lenuserarea-1;  i > ua;  i=i-1) {
 		    if (Memc[i] == '\n') {
 			Memc[i+1] = EOS
 			break
 		    }
+		}
 	    }
 	    call close (out)
 	    call close (fd)

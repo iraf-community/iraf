@@ -41,15 +41,21 @@ int	opcode;
 	long	ival, iresult;
 	char	*sval, *sresult;
 	char	fname[SZ_PATHNAME];
+	char	ch, sbuf[SZ_LINE];
 	char	*envget();
+	int 	i;
 
 	o = popop();			/* pop operand from stack	*/
 	in_type = o.o_type;
 
-	if (opindef (&o)) {		/* exit if indefinite		*/
-	    result.o_type = OT_INT;
-	    setopindef (&result);
-	    goto pushresult;
+	/* Exit if indefinite and we're not testing for it. */
+	if (opindef(&o)) {		
+	   if (opcode != OP_ISINDEF) {
+	       result.o_type = OT_INT;
+	       setopindef (&result);
+	       goto pushresult;
+	    } else
+		in_type = OT_BOOL;
 	}
 
 
@@ -103,7 +109,7 @@ int	opcode;
 	    /* fall through */
 
 	case OP_ACCESS:			/* these all require string op	*/
-	case OP_IMACCESS:		/* these all require string op	*/
+	case OP_IMACCESS:
 	case OP_DEFPAC:
 	case OP_DEFPAR:
 	case OP_DEFVAR:
@@ -115,6 +121,8 @@ int	opcode;
 	case OP_ENVGET:
 	case OP_MKTEMP:
 	case OP_OSFN:
+	case OP_STRLWR:
+	case OP_STRUPR:
 	    if (in_type != OT_STRING)
 		cl_error (E_UERR, "operand must be of type string");
 	    /* fall through */
@@ -122,6 +130,10 @@ int	opcode;
 	case OP_STR:
 	    if (out_type == UNSET)
 		out_type = OT_STRING;
+	    break;
+
+	case OP_ISINDEF:
+	    out_type = OT_BOOL;
 	    break;
 
 	default:
@@ -137,7 +149,7 @@ int	opcode;
 		ival = o.o_val.v_i;		/* str(bool) is ok	*/
 	    else if (opcode == OP_MINUS)
 		cl_error (E_UERR, "Arithmetic negation of a boolean operand");
-	    else
+	    else if (opcode != OP_ISINDEF)
 		cl_error (E_UERR,
 		"Intrinsic function called with illegal boolean argument");
 	    break;
@@ -199,6 +211,9 @@ int	opcode;
 	    } else
 		rresult = rval - (int) rval;
 	    break;
+	case OP_ISINDEF:
+	    iresult = opindef(&o);
+	    break;
 	case OP_ENVGET:
 	    if ((sresult = envget (sval)) == NULL)
 		cl_error (E_UERR, "Environment variable '%s' not found", sval);
@@ -259,6 +274,18 @@ int	opcode;
 	    opcast (OT_STRING);
 	    o = popop();
 	    sresult = o.o_val.v_s;
+	    break;
+	case OP_STRLWR:
+	    for (i=0; (ch = o.o_val.v_s[i]) != EOS; i++)
+		sbuf[i] = tolower (ch);
+	    sbuf[i] = EOS;
+	    sresult = sbuf;
+	    break;
+	case OP_STRUPR:
+	    for (i=0; (ch = o.o_val.v_s[i]) != EOS; i++)
+		sbuf[i] = toupper (ch);
+	    sbuf[i] = EOS;
+	    sresult = sbuf;
 	    break;
 	case OP_SQRT:
 	    if (rval < 0)

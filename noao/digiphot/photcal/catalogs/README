@@ -18,7 +18,7 @@ describes which photometric indices are stored in which column. This file is
 used by the MKCONFIG task to construct the user's configuration file. The
 following format files are defined.
 
-      flandolt.dat - format file for Elias JHKL standards
+        felias.dat - format file for Elias JHKL standards
       flandolt.dat - format file for Landolt UBVRI standards
      fnlandolt.dat - format file for new Landolt UBVRI standards
       fodewahn.dat - format file for Odewahn BVR cluster standards
@@ -33,7 +33,7 @@ used as a template by the MKCONFIG task to guide the user in the construction
 of a set of transformation equations. The following transformation equations
 sets are defined.
 
-   flandolt.dat - template trnasformations for Elias JHKL standards
+     telias.dat - template trnasformations for Elias JHKL standards
    tlandolt.dat - template transformations for Landolt UBVRI standards
   tnlandolt.dat - template transformations for new Landolt UBVRI standards
    todewahn.dat - template transformations for Odewahn BVR cluster standards

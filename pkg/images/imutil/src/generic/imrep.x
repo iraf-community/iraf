@@ -87,7 +87,7 @@ real	img				# Imaginary value for complex
 
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
-int	ilower
+real	ilower
 short	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
@@ -331,7 +331,7 @@ real	img				# Imaginary value for complex
 
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
-int	ilower
+real	ilower
 int	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
@@ -575,7 +575,7 @@ real	img				# Imaginary value for complex
 
 pointer	buf, buf1, buf2, ptr
 int	i, j, k, l, nc, nl, nradius, nbufs
-int	ilower
+real	ilower
 long	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors

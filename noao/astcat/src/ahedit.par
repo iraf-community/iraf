@@ -20,7 +20,7 @@ aimpars,pset,h,"",,,"The default image header keyword parameters"
 # The task parameters
 
 update,b,h,no,,,"Update algorithm parameters at task termination ?"
-verbose,b,h,no,,,"Print task status messages ?"
+verbose,b,h,yes,,,"Print task status messages ?"
 
 # The task configuration parameters.
 

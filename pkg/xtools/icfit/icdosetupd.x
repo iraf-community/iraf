@@ -65,7 +65,10 @@ begin
 		call alimd (x, npts, xmin, xmax)
 	    } else {
 	        call malloc (IC_YFIT(ic), IC_NFIT(ic), TY_DOUBLE)
-		call alimd (Memd[IC_XFIT(ic)], IC_NFIT(ic), xmin, xmax)
+		if (IC_NFIT(ic) == 1)
+		    call alimd (x, npts, xmin, xmax)
+		else
+		    call alimd (Memd[IC_XFIT(ic)], IC_NFIT(ic), xmin, xmax)
 	    }
 
 	    IC_XMIN(ic) = min (IC_XMIN(ic), real(xmin))

@@ -633,7 +633,8 @@ begin
 	OBJ_FLUX(obj) = OBJ_FLUX(obj) + val
 	OBJ_ISIGMAX(obj) = max (OBJ_ISIGMAX(obj), val)
 	OBJ_ISIGAVG(obj) = OBJ_ISIGAVG(obj) + val
-	OBJ_ISIGAVG2(obj) = OBJ_ISIGAVG2(obj) + (data2 - sky2) / sigma2
+	#OBJ_ISIGAVG2(obj) = OBJ_ISIGAVG2(obj) + (data2 - sky2) / sigma2
+	OBJ_ISIGAVG2(obj) = OBJ_ISIGAVG2(obj) + (data2 - sky2) / sigma
 end
 
 

@@ -1,5 +1,26 @@
 .help revisions Sep01 noao.astcat
 .nf
+
+=======
+V2.12.2
+=======
+
+astcat$lib/catdb.dat
+    The usno?@cadc entries were extend to allow more than the default
+    number of records to be returned.  (11/6/03, Valdes)
+
+astcat$lib/astrom.h
+    The decoding of "hours" in awcs/dbwcs.x was not working because the
+    string match index values set when reading the units using AT_RAUNITS
+    from astrom.h are decoded using the index values from pkg/skywcs.h.
+    Since I could not find where "hms" and "dms" are used I made the
+    first three index values agree between the two include files.
+    (12/03/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 astcat$src/attools/atinpars.x
     Added a protection against entering illegal numbers in aregpars.
     (04/11/02, Davis)

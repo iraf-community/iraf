@@ -14,6 +14,8 @@ include	"autoid.h"
 # Debug f: Print final result.
 # Debug i: Show ICFIT iterations.
 # Debug l: Graph lines and spectra.
+# Debug m: Print miscellaneous debug information
+# Debug n: Show non-linearity constraint
 # Debug r: Print list of reference lines.
 # Debug s: Print search iterations.
 # Debug t: Print list of target lines.
@@ -33,7 +35,7 @@ pointer	aid		#U AID pointer
 
 bool	cdflip
 int	i, j, k, l, iev, nbins, bin, nbest
-double	best
+double	best, dval1, dval2
 pointer	sp, str, idr, ev, evf, sid
 
 bool	streq(), strne()
@@ -43,6 +45,7 @@ pointer	gopen(), aid_evalloc(), id_getid()
 errchk	id_mapll, aid_reference, aid_target, aid_autoid1, aid_evalutate
 
 define	done_	10
+define	redo_	20
 
 begin
 	call smark (sp)
@@ -139,6 +142,7 @@ begin
 	AID_BEST(aid) = MAX_REAL
 	nbest = 0
 	iev = 0
+redo_
 	do i = 0, 1 {
 	    do j = 1, AID_NB(aid) {
 		if (j == 1)
@@ -212,7 +216,7 @@ begin
 	# Go back and evaluate candidates with lower weights.
 	# Terminate the search if the number of best fit values
 	# less than 1. is equal to the specified number.
-	do j = 6, 20 {
+	do j = 6, AID_ND(ev) {
 	    do i = 1, iev {
 		ev = aid_evalloc (aid, i)
 		best = aid_eval (aid, ev, j)
@@ -221,6 +225,14 @@ begin
 		    if (nbest >= AID_NBEST(aid))
 			goto done_
 		}
+	    }
+	}
+
+	# Add other loops here.
+	if (AID_BEST(aid) > 1.) {
+	    if (AID_NP(aid) > 3) {
+	        AID_NP(aid) = AID_NP(aid) - 1
+		goto redo_
 	    }
 	}
 
@@ -247,28 +259,38 @@ done_
 	# Debug f: Print final result.
 	if (stridxs ("f", AID_DEBUG(aid,1)) != 0) {
 	    if (AID_BEST(aid) == MAX_REAL) {
-		call printf ("%s %8.5g %8.3g     No solution found\n")
+		call eprintf ("%s %8.5g %8.3g     No solution found\n")
 		    call pargstr (ID_IMAGE(id))
 		    call pargd (AID_CRVAL(aid))
 		    call pargd (AID_CDELT(aid))
 	    } else {
-		call printf (
+		call eprintf (
 		    "%s %8.5g %8.3g %8.5g %8.3g %3d %3d %6.3f %5.2f\n")
 		    call pargstr (ID_IMAGE(id))
 		    call pargd (AID_CRVAL(aid))
 		    call pargd (AID_CDELT(aid))
 		    if (ID_CV(id) == NULL) {
-			call pargd (FITDATA(id,1))
-			call pargd (FITDATA(id,2) - FITDATA(id,1))
+			dval1 = FITDATA(id,1)
+			dval2 = FITDATA(id,2) - FITDATA(id,1)
 		    } else  {
-			call pargd (dcveval (ID_CV(id), AID_CRPIX(aid)))
-			call pargd (FITDATA(id,2) - FITDATA(id,1))
+			dval1 = dcveval (ID_CV(id), AID_CRPIX(aid)+1D0)
+			dval2 = dcveval (ID_CV(id), AID_CRPIX(aid)-1D0)
+			dval2 = (dval1 - dval2) / 2D0
+			dval1 = dcveval (ID_CV(id), AID_CRPIX(aid))
 		    }
+		    call pargd (dval1)
+		    call pargd (FITDATA(id,2) - FITDATA(id,1))
 		    call pargi (nint(100.*AID_FMATCH(aid)))
 		    call pargi (nint(100.*AID_FTMATCH(aid)))
 		    call pargr (AID_RMS(aid))
 		    call pargr (AID_BEST(aid))
-		call flush (STDOUT)
+		call eprintf (
+		    "   dCRVAL = %.4g (%.3g),  dCDELT = %.4g (%.3g)\n")
+		    call pargd (dval1 - AID_CRVAL(aid))
+		    call pargd (abs((dval1-AID_CRVAL(aid))/
+		        (ID_NPTS(id)*AID_CDELT(aid))))
+		    call pargd (dval2 - AID_CDELT(aid))
+		    call pargd (abs((dval2-AID_CDELT(aid))/AID_CDELT(aid)))
 	    }
 	}
 

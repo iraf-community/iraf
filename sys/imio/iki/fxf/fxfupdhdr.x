@@ -32,7 +32,7 @@ pointer	sp, fit, mii, poff
 pointer	outname, fits_file, tempfile
 bool    adjust_header, overwrite, append
 int	nchars_ua, hdr_fd, group, hdr_off, size
-int	npad, nlines, pixoff, grp_pix_off
+int	npad, nlines, pixoff, grp_pix_off, nbks
 int	acmode, junk, in_fd, diff, hdr_acmode, in_off, nchars, subtype
 int	read(), fxf_hdr_offset(), access(), strncmp()
 int	open(), fnroot(), fstatl(), fnldir()
@@ -40,7 +40,7 @@ bool	fnullfile()
 
 errchk  open, read, write, fxf_header_diff, fxf_write_header, fxf_make_adj_copy
 errchk  set_cache_time, syserr, syserrs, imerr
-
+int	clktime()
 begin
 	call smark (sp)
 	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
@@ -101,6 +101,7 @@ begin
 	    call strcpy (IM_HDRFILE(im), Memc[fits_file], SZ_FNAME)
 	
 	# Calculate the header offset corresponding to group number 'group'. 
+	FIT_IM(fit) = im
 	hdr_off = fxf_hdr_offset (group, fit, IM_PFD(im), acmode)
 
 	# If the pixfile has not been created, open new one.  This could
@@ -160,17 +161,24 @@ begin
 
 	    nlines= FKS_PADLINES(fit)
 	    IM_HFD(im) = in_fd
+
 	    if (adjust_header && acmode != NEW_COPY && 
 		FIT_XTENSION(fit) == YES) {
-		call fxf_expandh (in_fd, hdr_fd, nlines, group, hdr_off, pixoff)
+		nbks = -diff/1440     # number of blocks to expand
+		call fxf_expandh (in_fd, hdr_fd, nlines, group, nbks,
+		    hdr_off, pixoff)
+		# Reload PHU from file if necessary
+	        call fxf_not_incache(im)
 		poff = FIT_PIXPTR(fit)
 		Memi[poff+group] = pixoff
 	    } else {
 		if (append)
 		    grp_pix_off = FIT_PIXOFF(fit)
-		else
+		else {
+		    # Reload PHU from file if necessary
+	            call fxf_not_incache(im)
 		    grp_pix_off = Memi[FIT_PIXPTR(fit)+group]
-
+		}
 		call fxf_make_adj_copy (in_fd, hdr_fd,
 		    hdr_off, grp_pix_off, nchars_ua)
 	    }
@@ -194,10 +202,25 @@ begin
 	if (acmode == NEW_COPY)
 	    call fxf_setbitpix (im, fit)
 
+	# Lets changed the value of FIT_MTIME that will be used as the mtime for
+	# this updated file. This time them will be different in other
+	# executable's FITS cache, hence rereading the PHU. 
+	# We need to use FIT_MTIME since it reflec the value of keyword
+	# IRAF_TLM which could have just recently been modified, hence adding
+	# the 4 seconds.
+	
+        if (abs(FIT_MTIME(fit) - clktime(long(0))) > 60)
+	    FIT_MTIME(fit) = clktime(long(0))
+
+	# We cannot use clktime() directly since the previuos value
+	# of FIT_MTIME might already have a 4 secs increment.
+
+        FIT_MTIME(fit) = FIT_MTIME(fit) + 4
+
 	# Now write default cards and im_userarea to disk.
 	call fxf_write_header (im, fit, hdr_fd, diff)
 
- 	size = fstatl(hdr_fd,F_FILESIZE)
+ 	size = fstatl (hdr_fd, F_FILESIZE)
 	npad = FITS_BLOCK_CHARS - mod(size,FITS_BLOCK_CHARS)
 
 	# If we are appending a new extension, we need to write padding to
@@ -226,7 +249,7 @@ begin
 
 	    in_fd = open (IM_HDRFILE(im), READ_ONLY, BINARY_FILE)
 	    group = FIT_GROUP(fit)
-
+	    call fxf_not_incache (im)
 	    in_off = Memi[FIT_HDRPTR(fit)+group+1]
 	    call seek (hdr_fd, EOF)
 	    call seek (in_fd, in_off)
@@ -261,7 +284,19 @@ begin
 	# Make sure we reset the modification time for the cached header
 	# since we have written a new version. This way the header will
 	# be read from disk next time the file is accessed.
-  
+
+        if (IM_ACMODE(im) == READ_WRITE || overwrite)  {
+           # The modification time of a file in the cache can be different
+	   # from another mod entry in another executable. We need to make
+	   # sure that the mod time has changed in more than a second so that
+	   # the other executable can read the header from disk and not
+	   # from the cache entry. The FIT_MTIME value has already been
+	   # changed by adding 4 seconds. (See above).
+
+           call futime (IM_HDRFILE(im), NULL, FIT_MTIME(fit))
+#           call futime (IM_HDRFILE(im), NULL, clktime(long(0))+4)
+	}
+
 	if (FIT_GROUP(fit) == 0 || FIT_GROUP(fit) == -1)
 	   call fxf_set_cache_time (im, false)
 
@@ -295,8 +330,10 @@ begin
 	if (group == -1) {
 	    # We are appending or creating a new FITS IMAGE.
 	    hdr_off = FIT_EOFSIZE(fit)
-	} else
+	} else {
+	    call fxf_not_incache (FIT_IM(fit))
 	    hdr_off = Memi[FIT_HDRPTR(fit)+group]
+        }
 	
 	# If pixel file descriptor is empty for a newcopy or newimage
 	# in an existent image then the header offset is EOF.
@@ -371,6 +408,11 @@ begin
 	    # Form an extension header by copying cards in the UA that
 	    # do not belong in the global header nor in the old
 	    # extension header if the image is open READ_WRITE.
+
+	    # Check if the file is still in cache. We need CACHELEN and
+            # CACHEHDR. 
+
+            call fxf_not_incache (im)
 
 	    len = strlen (Memc[ua])
 	    ulines = len / LEN_UACARD
@@ -510,6 +552,7 @@ begin
 
 	# Have we go over the FITS header area already allocated?
 	if (acmode == READ_WRITE || acmode == WRITE_ONLY) {
+	    call fxf_not_incache(im)
 	    hoff = FIT_HDRPTR(fit)
 	    poff = FIT_PIXPTR(fit)
 	    orig_hdr_size = Memi[poff+group] - Memi[hoff+group]
@@ -551,7 +594,7 @@ int     pos, group, pcount, depth, subtype, maxlen, ndim
 long	clktime()
 int	imaccf(), strlen(), fxf_ua_card(), envgeti()
 int	idb_findrecord(), strncmp(), btoi()
-bool	fxf_fpl_equald(), imgetb()
+bool	fxf_fpl_equald(), imgetb(), itob()
 long	note()
 errchk  write 
 
@@ -650,28 +693,30 @@ begin
 		   i = btoi (imgetb (im, "EXTEND"))
 		   call fxf_filter_keyw (im, "EXTEND") 
 		}
+		if (FIT_EXTEND(fit) == YES)
+		    i = YES
 		call fxf_akwb ("EXTEND", i, "File may contain extensions", n)
 		FIT_EXTEND(fit) = YES
 	    }
 	}
 
-	# Delete BSCALE and BZERO just in case the application puts them
-	# in the UA after the pixels have been written. The keywords
-	# should not be there since the FK does not allow reading pixels
-	# with BITPIX -32 and BSCALE and BZERO. If the application
-	# really wants to circumvent this restriction the code below
-	# will defeat that. The implications are left to the application.
-	# This fix is put in here to save the ST Hstio interface to be
-	# a victim of the fact that in v2.12 the BSCALE and BZERO keywords
-	# are left in the header for the user to see or change. Previous
-	# FK versions, the keywords were deleted from the UA.
- 
-	if ((IM_PIXTYPE(im) == TY_REAL || IM_PIXTYPE(im) == TY_DOUBLE)
-		&& FIT_TOTPIX(fit) > 0) {
+        # Delete BSCALE and BZERO just in case the application puts them
+        # in the UA after the pixels have been written. The keywords
+        # should not be there since the FK does not allow reading pixels
+        # with BITPIX -32 and BSCALE and BZERO. If the application
+        # really wants to circumvent this restriction the code below
+        # will defeat that. The implications are left to the application.
+        # This fix is put in here to save the ST Hstio interface to be
+        # a victim of the fact that in v2.12 the BSCALE and BZERO keywords
+        # are left in the header for the user to see or change. Previous
+        # FK versions, the keywords were deleted from the UA.
 
-	     call fxf_filter_keyw (im, "BSCALE")
-	     call fxf_filter_keyw (im, "BZERO")
-	}
+        if ((IM_PIXTYPE(im) == TY_REAL || IM_PIXTYPE(im) == TY_DOUBLE)
+                && (FIT_TOTPIX(fit) > 0 && FIT_BITPIX(fit) <= 0)) {
+
+             call fxf_filter_keyw (im, "BSCALE")
+             call fxf_filter_keyw (im, "BZERO")
+        }
 
 	# Do not write BSCALE and BZERO if they have the default 
 	# values (1.0, 0.0).
@@ -737,7 +782,7 @@ begin
 		    call fxf_akwb ("INHERIT",
 			FIT_INHERIT(fit), "Inherits global header", n)
 		} else if (acmode != READ_WRITE)
-		    call imputb (im, "INHERIT", FIT_INHERIT(fit))
+		    call imputb (im, "INHERIT", itob(FIT_INHERIT(fit)))
 	    } else {
 		call fxf_akwb ("INHERIT",
 		    FIT_INHERIT(fit), "Inherits global header", n)
@@ -773,8 +818,12 @@ begin
 	}
 
 	# Encode the "IRAF_TLM" keyword (records time of last modification).
-	call fxf_encode_date (clktime(long(0)), datestr, SZ_DATESTR,
-	    "TLM", 2010)
+	if (acmode == NEW_IMAGE || acmode == NEW_COPY) {
+	    FIT_MTIME(fit) = IM_MTIME(im)
+	}
+
+	call fxf_encode_date (FIT_MTIME(fit), datestr, SZ_DATESTR, "TLM", 2010)
+#	call fxf_encode_date (clktime(long(0))+4, datestr, SZ_DATESTR, "TLM", 2010)
 	len = strlen (datestr)
 
 	if (idb_findrecord (im, "IRAF-TLM", rp) == 0) {
@@ -847,7 +896,7 @@ begin
 	# Write the UA now.
 	up = 1
 	nbk = 0
-	n = n - spp
+	n = n - spp 
 	sz_rec = 1440
 
 	while (fxf_ua_card (fit, im, up, card) == YES) {
@@ -882,6 +931,7 @@ begin
 		nbk = diff / 1440
 	    } else {
 		pos = note (hdr_fd)
+		call fxf_not_incache(im)
 		poff = FIT_PIXPTR(fit)
 		nbk = (Memi[poff+group] - pos)
 		nbk = nbk / 1440
@@ -1044,9 +1094,9 @@ end
 procedure fxf_set_cache_time (im, overwrite)
 
 pointer im			#I image descriptor
-bool    overwrite		#I invalidate entry
+bool    overwrite		#I invalidate entry if true
 
-pointer sp, hdrfile
+pointer sp, hdrfile, fit
 long    fi[LEN_FINFO]
 int	finfo(), cindx
 errchk	syserr, syserrs
@@ -1057,6 +1107,8 @@ include "fxfcache.com"
 begin
 	call smark (sp)
 	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+
+	fit = IM_KDES(im)
 
 	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
 	if (finfo (Memc[hdrfile], fi) == ERR)
@@ -1069,15 +1121,22 @@ begin
 
 	    if (streq (Memc[hdrfile], rf_fname[1,cindx])) {
 		# Reset cache
-		if (IM_ACMODE(im) == READ_WRITE) {
+		if (IM_ACMODE(im) == READ_WRITE || overwrite) {
 		    # Invalidate entry.
+		    call mfree (rf_pextv[cindx], TY_INT)
+		    call mfree (rf_pextn[cindx], TY_CHAR)
+		    call mfree (rf_pixp[cindx], TY_INT)
+		    call mfree (rf_hdrp[cindx], TY_INT)
+		    call mfree (rf_fit[cindx], TY_STRUCT)
+		    call mfree (rf_hdr[cindx], TY_CHAR)
 		    rf_fname[1,cindx] = EOS
+		    rf_mtime[cindx] = 0
+	     	    rf_fit[cindx] = NULL
+
 		} else {
 		    # While we are appending we want to keep the cache entry
 		    # in the slot.
 		    rf_mtime[cindx] = FI_MTIME(fi)
-		    if (overwrite)
-		        rf_fname[1,cindx] = EOS
 		}
 		break
 	    }
@@ -1191,6 +1250,7 @@ begin
 		call mfree (rf_hdrp[cindx], TY_INT)
 		call mfree (rf_fit[cindx], TY_STRUCT)
 		call mfree (rf_hdr[cindx], TY_CHAR)
+		rf_fit[cindx] = NULL
 	    }
 	}
 

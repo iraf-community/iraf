@@ -1,7 +1,7 @@
 # AUTOIDENTIFY data structure.
 
 define	AID_SZLINE	99
-define	AID_LEN		458
+define	AID_LEN		512
 
 # Algorithm input parameters.
 define	AID_REFLIST	Memc[P2C($1)]		# Reference coordinate list
@@ -9,62 +9,66 @@ define	AID_REFSPEC	Memc[P2C($1+50)]		# Reference spectrum
 define	AID_CR		Memc[P2C($1+100)]	# Coordinate reference value
 define	AID_CD		Memc[P2C($1+150)]	# Coordinate reference value
 define	AID_CP		Memc[P2C($1+200)]	# Coordinate reference value
-define	AID_CRS		Memc[P2C($1+250)]	# Coordinate reference value
-define	AID_CDS		Memc[P2C($1+300)]	# Coordinate reference value
-define	AID_DEBUG	Memc[P2C($1+350)+$2-1]  # Debug flags (19 chars)
-define	AID_CDDIR	Memi[$1+400]	# Coordinate direction
-define	AID_NTMAX	Memi[$1+401]	# Maximum number of target lines
-define	AID_NRMAX	Memi[$1+402]	# Maximum number of reference lines
-define	AID_ORD		Memi[$1+403]	# Maximum fitting order
-define	AID_NB		Memi[$1+404]	# Number of sub-bins
-define	AID_NN		Memi[$1+405]	# Number of neighbor lines
-define	AID_NP		Memi[$1+406]	# Number of lines in pattern
-define	AID_SIG		Memr[$1+407]	# Target line centering sigma
-define	AID_NFOUND	Memi[$1+408]	# Minimum number to be found
-define	AID_RMSG	Memr[$1+409]	# Pixel RMS (goal)
-define	AID_FMATCHG	Memr[$1+410]	# Frac of unmatched lines (goal)
-define	AID_FTMATCHG	Memr[$1+411]	# Frac of unmatched target lines (goal)
+define	AID_CQ		Memc[P2C($1+250)]	# Coordinate quad distortion
+define	AID_CRS		Memc[P2C($1+300)]	# Coordinate reference value
+define	AID_CDS		Memc[P2C($1+350)]	# Coordinate reference value
+define	AID_DEBUG	Memc[P2C($1+400)+$2-1]  # Debug flags (19 chars)
+define	AID_CDDIR	Memi[$1+450]	# Coordinate direction
+define	AID_NTMAX	Memi[$1+451]	# Maximum number of target lines
+define	AID_NRMAX	Memi[$1+452]	# Maximum number of reference lines
+define	AID_ORD		Memi[$1+453]	# Maximum fitting order
+define	AID_MAXNL	Memr[$1+454]	# Maximum non-linearity
+define	AID_NB		Memi[$1+455]	# Number of sub-bins
+define	AID_NN		Memi[$1+456]	# Number of neighbor lines
+define	AID_NP		Memi[$1+457]	# Number of lines in pattern
+define	AID_SIG		Memr[$1+458]	# Target line centering sigma
+define	AID_NFOUND	Memi[$1+459]	# Minimum number to be found
+define	AID_RMSG	Memr[$1+460]	# Pixel RMS (goal)
+define	AID_FMATCHG	Memr[$1+461]	# Frac of unmatched lines (goal)
+define	AID_FTMATCHG	Memr[$1+462]	# Frac of unmatched target lines (goal)
 
-define	AID_IDT		Memi[$1+412]	# Target ID pointer
-define	AID_IDR		Memi[$1+413]	# Reference ID pointer
-define	AID_IC1		Memi[$1+414]	# ICFIT pointer
-define	AID_IC2		Memi[$1+415]	# ICFIT pointer
+define	AID_IDT		Memi[$1+463]	# Target ID pointer
+define	AID_IDR		Memi[$1+464]	# Reference ID pointer
+define	AID_IC1		Memi[$1+465]	# ICFIT pointer
+define	AID_IC2		Memi[$1+466]	# ICFIT pointer
 
-define	AID_XR		Memi[$1+416]	# Reference lines (ptr)
-define	AID_NR		Memi[$1+417]	# Number of reference lines
-define	AID_XTF		Memi[$1+418]	# Full target lines sorted by peak
-define	AID_NTF		Memi[$1+419]	# Full number of target lines
-define	AID_XT		Memi[$1+420]	# Target lines to use sorted by pix
-define	AID_NT		Memi[$1+421]	# Number of target lines to use
+define	AID_XR		Memi[$1+467]	# Reference lines (ptr)
+define	AID_NR		Memi[$1+468]	# Number of reference lines
+define	AID_XTF		Memi[$1+469]	# Full target lines sorted by peak
+define	AID_NTF		Memi[$1+470]	# Full number of target lines
+define	AID_XT		Memi[$1+471]	# Target lines to use sorted by pix
+define	AID_XTL		Memi[$1+472]	# Linearized target lines sorted by pix
+define	AID_NT		Memi[$1+473]	# Number of target lines to use
 
-define	AID_CDSIGN	Memi[$1+422]		# Sign of coordinate interval
-define	AID_CRVAL	Memd[P2D($1+424)]	# Reference coordinate value
-define	AID_CDELT	Memd[P2D($1+426)]	# Coordinate interval per pixel
-define	AID_CRPIX	Memd[P2D($1+428)]	# Reference pixel
-define	AID_CRSEARCH	Memd[P2D($1+430)]	# Search radius for ref value
-define	AID_CDSEARCH	Memd[P2D($1+432)] 	# Search radius for coord int
-define	AID_CRMIN	Memd[P2D($1+434)]	# Min for central coordinate
-define	AID_CRMAX	Memd[P2D($1+436)]	# Max for central coordinate
-define	AID_CDMIN	Memd[P2D($1+438)]	# Min for coordinate interval
-define	AID_CDMAX	Memd[P2D($1+440)]	# Max for coordinate interval
+define	AID_CDSIGN	Memi[$1+474]		# Sign of coordinate interval
+define	AID_CRVAL	Memd[P2D($1+476)]	# Reference coordinate value
+define	AID_CDELT	Memd[P2D($1+478)]	# Coordinate interval per pixel
+define	AID_CRPIX	Memd[P2D($1+480)]	# Reference pixel
+define	AID_CRQUAD	Memd[P2D($1+482)]	# Quadratic distortion
+define	AID_CRSEARCH	Memd[P2D($1+484)]	# Search radius for ref value
+define	AID_CDSEARCH	Memd[P2D($1+486)] 	# Search radius for coord int
+define	AID_CRMIN	Memd[P2D($1+488)]	# Min for central coordinate
+define	AID_CRMAX	Memd[P2D($1+490)]	# Max for central coordinate
+define	AID_CDMIN	Memd[P2D($1+492)]	# Min for coordinate interval
+define	AID_CDMAX	Memd[P2D($1+494)]	# Max for coordinate interval
 
-define	AID_MINRATIO	Memr[$1+442]	# Minimum ratio
-define	AID_NDMAX	Memi[$1+443]	# Max number of dispersions to check
-define	AID_RMS		Memr[$1+444]	# Pixel RMS (best)
-define	AID_FMATCH	Memr[$1+445]	# Fraction of unmatched linelist lines
-define	AID_FTMATCH	Memr[$1+446]	# Fraction of unmatched target lines
-define	AID_WRMS	Memr[$1+447]	# Weight for RMS
-define	AID_WFMATCH	Memr[$1+448]	# Weight for FMATCH
-define	AID_WFTMATCH	Memr[$1+449]	# Weight for FTMATCH
-define	AID_NBEST	Memi[$1+450]	# Number of best values < 1 to check
-define	AID_BEST	Memr[$1+451]	# Best fit parameter
-define	AID_EVS		Memi[$1+452]	# Evaluate structure
+define	AID_MINRATIO	Memr[$1+496]	# Minimum ratio
+define	AID_NDMAX	Memi[$1+497]	# Max number of dispersions to check
+define	AID_RMS		Memr[$1+498]	# Pixel RMS (best)
+define	AID_FMATCH	Memr[$1+499]	# Fraction of unmatched linelist lines
+define	AID_FTMATCH	Memr[$1+500]	# Fraction of unmatched target lines
+define	AID_WRMS	Memr[$1+501]	# Weight for RMS
+define	AID_WFMATCH	Memr[$1+502]	# Weight for FMATCH
+define	AID_WFTMATCH	Memr[$1+503]	# Weight for FTMATCH
+define	AID_NBEST	Memi[$1+504]	# Number of best values < 1 to check
+define	AID_BEST	Memr[$1+505]	# Best fit parameter
+define	AID_EVS		Memi[$1+506]	# Evaluate structure
 
-define	AID_SPECR	Memi[$1+453]	# Reference spectrum (ptr)
-define	AID_X1R		Memi[$1+454]	# First pixel of full ref spectrum
-define	AID_X2R		Memi[$1+455]	# Last pixel of full ref spectrum
-define	AID_W1		Memr[$1+456]	# Tentative wavelength of first pixel
-define	AID_W2		Memr[$1+457]	# Tentative wavelength of last pixel
+define	AID_SPECR	Memi[$1+507]	# Reference spectrum (ptr)
+define	AID_X1R		Memi[$1+508]	# First pixel of full ref spectrum
+define	AID_X2R		Memi[$1+509]	# Last pixel of full ref spectrum
+define	AID_W1		Memr[$1+510]	# Tentative wavelength of first pixel
+define	AID_W2		Memr[$1+511]	# Tentative wavelength of last pixel
 
 
 # Evaluation structure.

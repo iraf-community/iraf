@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <pwd.h>
@@ -140,15 +141,15 @@ extern	int save_prtype;
 #endif
 #endif
 
-#define	IRAFKS_DIRECT	0		/* direct connection (via rexec)  */
-#define	IRAFKS_CALLBACK	1		/* callback to client socket	  */
-#define	IRAFKS_DAEMON	2		/* in.irafksd daemon process	  */
-#define	IRAFKS_SERVER	3		/* irafks server process	  */
-#define	IRAFKS_CLIENT	4		/* zfioks client process	  */
+#define	IRAFKS_DIRECT		0	/* direct connection (via rexec)  */
+#define	IRAFKS_CALLBACK		1	/* callback to client socket	  */
+#define	IRAFKS_DAEMON		2	/* in.irafksd daemon process	  */
+#define	IRAFKS_SERVER		3	/* irafks server process	  */
+#define	IRAFKS_CLIENT		4	/* zfioks client process	  */
 
-#define	C_RSH 		1		/* rsh connect protocol		  */
-#define	C_REXEC		2		/* rexec connect protocol	  */
-#define	C_REXEC_CALLBACK 3		/* rexec-callback protocol	  */
+#define	C_RSH 			1	/* rsh connect protocol		  */
+#define	C_REXEC			2	/* rexec connect protocol	  */
+#define	C_REXEC_CALLBACK 	3	/* rexec-callback protocol	  */
 
 struct	ksparam {
 	int	auth;			/* user authorization code	  */
@@ -167,6 +168,7 @@ extern	char *getenv();
 static	jmp_buf jmpbuf;
 static	int jmpset = 0;
 static	int recursion = 0;
+static	int parent = -1;
 static	SIGFUNC old_sigcld;
 static  int ks_pchan[MAXOFILES];
 static  int ks_achan[MAXOFILES];
@@ -174,7 +176,7 @@ static	int ks_getresvport(), ks_rexecport();
 static	int ks_socket(), ks_geti(), ks_puti(), ks_getlogin();
 static	dbgmsg(), dbgmsg1(), dbgmsg2(), dbgmsg3(), dbgmsg4();
 static	char *ks_getpass();
-static	ks_onsig();
+static	ks_onsig(), ks_reaper();
 
 
 /* ZOPNKS -- Open a connected subprocess on a remote node.  Parse the "server"
@@ -197,6 +199,11 @@ XINT	*chan;			/* receives channel code (socket) */
 	char	*hostp, *cmd;
 	char	obuf[SZ_LINE];
 	struct	ksparam ks;
+
+
+
+	/* Initialize local arrays */
+	host[0] = username[0] = password[0] = NULL;
 
 	/* Parse the server specification.  We can be called to set up either
 	 * the irafks daemon or to open a client connection.
@@ -266,6 +273,7 @@ XINT	*chan;			/* receives channel code (socket) */
 	    }
 	}
 
+
 	/* Debug output.  If debug_ks is set (e.g. with adb) but no filename
 	 * is given, debug output goes to stderr.
 	 */
@@ -277,11 +285,13 @@ XINT	*chan;			/* receives channel code (socket) */
 		debug_fp = stderr;
 	}
 
+
 	/* Begin debug message log. */
 	dbgmsg ("---------------------------------------------------------\n");
 	dbgmsg1 ("zopnks (`%s')\n", server);
 	dbgmsg4 ("kstype=%d, prot=%d, host=`%s', cmd=`%s')\n",
 	    proctype, ks.protocol, host, ip);
+	parent = getpid();
 
 	/*
 	 * SERVER side code.
@@ -434,8 +444,9 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 	     * server in response to each such request.
 	     */
 
-	    dbgmsg1 ("in.irafksd started, pid=%d\n", getpid());
-	    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_onsig);
+	    dbgmsg3 ("in.irafksd started, pid=%d ppid=%d pgid=%d\n",
+		getpid(), getppid(), getpgid(0));
+	    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_reaper);
 
 	    /* Reset standard streams to console to record error messages. */
 	    fd = open ("/dev/null", 0);     close(0);  dup(fd);  close(fd);
@@ -461,9 +472,11 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 		 */
 		jmpset++;
 		if (sig = setjmp(jmpbuf)) {
-		    if (sig == SIGCHLD)
-			wait (NULL);
-		    else
+	    	    if (sig == SIGCHLD) {
+	    		dbgmsg ("in.irafksd sigchld return\n");
+			while (waitpid (NULL, NULL, WNOHANG) > 0) 
+			    ;
+		    } else
 			exit (0);
 		}
 		if (select (SELWIDTH,&rfd,NULL,NULL, nsec ? &timeout : 0) <= 0)
@@ -519,7 +532,7 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 		    goto s_err;
 		}
 
-		if (pid) {
+		if (pid) {					/** parent **/
 s_err:		    dbgmsg1 ("in.irafksd fork complete, status=%d\n",
 			status);
 		    ks_puti (fd, status);
@@ -528,13 +541,17 @@ s_err:		    dbgmsg1 ("in.irafksd fork complete, status=%d\n",
 			exit (0);
 		    /* otherwise loop indefinitely */
 
-		} else {
+		} else {					/** child  **/
 		    /* Set up iraf kernel server. */
 		    u_long  n_addr, addr;
 		    unsigned char *ap = (unsigned char *)&n_addr;
 
-		    dbgmsg1 ("irafks server started, pid=%d\n", getpid());
+		    dbgmsg2 ("irafks server started, pid=%d ppid=%d pgid=%d\n",
+			getpid(), getppid(), getpgid(0));
 		    signal (SIGCHLD, old_sigcld);
+		    /*
+		    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_reaper);
+		    */
 		    close (fd); close (s);
 
 		    n_addr = from.sin_addr.s_addr;
@@ -834,13 +851,14 @@ c_err:		dbgmsg1 ("zfioks client status=%o\n", status);
 
 done:
 	jmpset = 0;
-	if (*chan > 0)
+	if (*chan > 0) {
 	    if (*chan < MAXOFILES)
 		zfd[*chan].nbytes = 0;
 	    else {
 		close (*chan);
 		*chan = ERR;
 	    }
+	}
 
 	dbgmsg1 ("zopnks returns status=%d\n", *chan);
 }
@@ -858,11 +876,12 @@ XINT	*status;			/* receives close status	*/
 	*status = close (*chan);
 
 	/* Close any alternate channels associated with the primary. */
-	for (i=0;  i < MAXOFILES;  i++)
+	for (i=0;  i < MAXOFILES;  i++) {
 	    if (ks_pchan[i] == *chan) {
 		close (ks_achan[i]);
 		ks_pchan[i] = 0;
 	    }
+	}
 
 	dbgmsg2 ("server [%d] terminated, status = %d\n", *chan, *status);
 }
@@ -895,7 +914,9 @@ XLONG	*loffset;		/* not used				*/
 	fd = *chan;
 	op = (char *)buf;
 	zfd[fd].nbytes = nbytes = *totbytes;
-	dbgmsg2 ("initiate read of %d bytes from KS channel %d\n", nbytes, fd);
+	if (debug_ks > 1)
+	    dbgmsg2 ("initiate read of %d bytes from KS channel %d\n",
+		nbytes, fd);
 
 	/* Now read exactly nbytes of data from channel into user buffer.
 	 * Return actual byte count if EOF is seen.  If ERR is seen return
@@ -930,7 +951,8 @@ XLONG	*loffset;		/* not used				*/
 	jmpset = 0;
 	signal (SIGINT,  sigint);
 	signal (SIGTERM, sigterm);
-	dbgmsg2 ("read %d bytes from KS channel %d:\n", op - (char *)buf, fd);
+	if (debug_ks > 1)
+	    dbgmsg2 ("read %d bytes from KS channel %d:\n", op-(char *)buf, fd);
 }
 
 
@@ -958,7 +980,9 @@ XLONG	*loffset;		/* not used				*/
 	    ofd = 1;
 
 	zfd[fd].nbytes = nbytes = *totbytes;
-	dbgmsg2 ("initiate write of %d bytes to KS channel %d\n", nbytes, ofd);
+	if (debug_ks > 1)
+	    dbgmsg2 ("initiate write of %d bytes to KS channel %d\n",
+		nbytes, ofd);
 
 	/* Write exactly nbytes of data to the channel from user buffer to
 	 * the channel.  Block interrupt during the write to avoid corrupting
@@ -981,7 +1005,8 @@ XLONG	*loffset;		/* not used				*/
 	signal (SIGINT,  sigint);
 	signal (SIGTERM, sigterm);
 	signal (SIGPIPE, sigpipe);
-	dbgmsg2 ("wrote %d bytes to KS channel %d:\n", zfd[fd].nbytes, ofd);
+	if (debug_ks > 1)
+	    dbgmsg2 ("wrote %d bytes to KS channel %d:\n", zfd[fd].nbytes, ofd);
 }
 
 
@@ -998,6 +1023,24 @@ int	*arg2;			/* not used */
 	 */
 	if (sig == SIGPIPE && recursion++ == 0)
 	    fputs ("kernel server process has died\n", stderr);
+
+	if (jmpset)
+	    longjmp (jmpbuf, sig);
+}
+
+
+/* KS_REAPER -- Catch a SIGCHLD signal and reap all children.
+ */
+static
+ks_reaper (sig, arg1, arg2)
+int     sig;                    /* signal which was trapped     */
+int     *arg1;                  /* not used */
+int     *arg2;                  /* not used */
+{
+        int status=0, pid=0;
+
+        while ((pid = waitpid (NULL, &status, WNOHANG)) > 0)
+	    dbgmsg2 ("ks_reaper -- pid=%d, status=%d\n", pid, status);
 
 	if (jmpset)
 	    longjmp (jmpbuf, sig);
@@ -1196,7 +1239,7 @@ int	fd;
 	jmpset++;
 	if (sig = setjmp(jmpbuf))
 	    if (sig == SIGCHLD)
-		wait (NULL);
+		waitpid (NULL, NULL, WNOHANG);
 
 	timeout.tv_sec = PRO_TIMEOUT;
 	timeout.tv_usec = 0;
@@ -1262,12 +1305,21 @@ char	*outstr;
 
 /* KS_MSG -- Print debugging messages.
  */
+static char *dbgsp (pid)
+int	pid;
+{
+	int i, nsp = ((parent > 0) ? (pid - parent) : 0);
+	for (i=0; i < nsp; i++)
+	    fprintf (debug_fp, "    ");
+}
+
 static
 dbgmsg (msg)
 char    *msg;
 {
+	int pid;
 	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", getpid());
+	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
 	    fprintf (debug_fp, msg);
 	}
 }
@@ -1276,8 +1328,9 @@ dbgmsg1 (fmt, arg)
 char    *fmt;
 int     arg;
 {
+	int pid;
 	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", getpid());
+	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
 	    fprintf (debug_fp, fmt, arg);
 	    fflush (debug_fp);
 	}
@@ -1287,8 +1340,9 @@ dbgmsg2 (fmt, arg1, arg2)
 char    *fmt;
 int     arg1, arg2;
 {
+	int pid;
 	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", getpid());
+	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
 	    fprintf (debug_fp, fmt, arg1, arg2);
 	    fflush (debug_fp);
 	}
@@ -1298,8 +1352,9 @@ dbgmsg3 (fmt, arg1, arg2, arg3)
 char    *fmt;
 int     arg1, arg2, arg3;
 {
+	int pid;
 	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", getpid());
+	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
 	    fprintf (debug_fp, fmt, arg1, arg2, arg3);
 	    fflush (debug_fp);
 	}
@@ -1309,8 +1364,9 @@ dbgmsg4 (fmt, arg1, arg2, arg3, arg4)
 char    *fmt;
 int     arg1, arg2, arg3, arg4;
 {
+	int pid;
 	if (debug_ks) {
-	    fprintf (debug_fp, "[%5d] ", getpid());
+	    fprintf (debug_fp, "[%5d] ", (pid = getpid())); dbgsp(pid);
 	    fprintf (debug_fp, fmt, arg1, arg2, arg3, arg4);
 	    fflush (debug_fp);
 	}
@@ -1948,4 +2004,25 @@ char	*host;
 	    password[n-1] = EOS;
 
 	return (password);
+}
+
+
+/* PR_MASK -- Debug routine to print the current SIGCHLD mask.
+ */
+void pr_mask (str)
+char	*str;
+{
+	sigset_t	sigset, pending;
+
+	if (sigprocmask (0, NULL, &sigset) < 0)
+	    dbgmsg ("sigprocmask error");
+
+	dbgmsg (str);
+	if (sigismember (&sigset, SIGCHLD))
+	    dbgmsg ("pr_mask: SIGCHLD set\n");
+
+	if (sigpending (&pending) < 0)
+	    dbgmsg ("sigpending error");
+	if (sigismember (&pending, SIGCHLD))
+	    dbgmsg ("\tpr_mask: SIGCHLD pending\n"); 
 }

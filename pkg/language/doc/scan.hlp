@@ -1,4 +1,4 @@
-.help "scan,fscan,nscan" Jul95 language
+.help "scan,scanf,fscan,fscanf,nscan" Jul95 language
 .ih
 NAME
 .nf

@@ -14,12 +14,12 @@ extern	in(), out()
 char	linebuf[ARB]
 int	ip
 
-int	inbold(), in(), getarg()
+int	inbold(), in(), lgetarg()
 errchk	skiplines, inbold, outline
 include	"lroff.com"
 
 begin
-	sh_nskip = getarg (linebuf, ip, sh_nskip)
+	sh_nskip = lgetarg (linebuf, ip, sh_nskip)
 	call skiplines (out, sh_nskip)
 	left_margin = perm_left_margin
 	call testpage (out, DEF_TPNLINES)
@@ -44,14 +44,14 @@ char	linebuf[ARB]
 int	ip
 
 int	i, n
-int	inbold(), in(), getarg(), strlen()
+int	inbold(), in(), lgetarg(), strlen()
 errchk	skiplines, sprintf, pargi, outstr, outc, inbold, outline
 include	"lroff.com"
 
 begin
 	# Get level, nskip arguments.
-	n = max (1, min (MAX_NHLEVEL, getarg (linebuf, ip, 1)))
-	nh_nskip = getarg (linebuf, ip, nh_nskip)
+	n = max (1, min (MAX_NHLEVEL, lgetarg (linebuf, ip, 1)))
+	nh_nskip = lgetarg (linebuf, ip, nh_nskip)
 
 	call skiplines (out, nh_nskip)
 	left_margin = perm_left_margin
@@ -110,13 +110,13 @@ extern	in(), out()
 char	linebuf[ARB]
 int	ip
 
-int	inbold(), in(), getarg()
+int	inbold(), in(), lgetarg()
 errchk	skiplines, inbold, outline
 include	"lroff.com"
 
 begin
-	ih_indent = getarg (linebuf, ip, ih_indent)
-	ih_nskip = getarg (linebuf, ip, ih_nskip)
+	ih_indent = lgetarg (linebuf, ip, ih_indent)
+	ih_nskip = lgetarg (linebuf, ip, ih_nskip)
 
 	call skiplines (out, ih_nskip)
 	left_margin = perm_left_margin

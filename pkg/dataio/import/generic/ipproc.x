@@ -619,7 +619,8 @@ begin
 	    }
 	}
 
-	call mfree (optr, type)
+	if (IP_OUTTYPE(ip) != O_TYPE(out))
+	    call mfree (optr, type)
 	call sfree (sp)
 end
 

@@ -1,9 +1,9 @@
 include	"autoid.h"
 
-define	AIDSET "|reflist|refspec|crval|cdelt|crpix|crsearch|cdsearch|cddir\
-		|ntarget|nreference|aidord|nbins|nneighbors|npattern|sigma\
-		|nfound|rms|fmatch|ftmatch|minratio|ndmax|debug|nbest|wrms\
-		|wfmatch|wftmatch|"
+define	AIDSET "|reflist|refspec|crval|cdelt|crpix|crquad|crsearch|cdsearch\
+		|cddir|ntarget|nreference|aidord|maxnl|nbins|nneighbors\
+		|npattern|sigma|nfound|rms|fmatch|ftmatch|minratio|ndmax\
+		|debug|nbest|wrms|wfmatch|wftmatch|"
 
 
 # AID_SETS -- Set AID parameters by name.
@@ -17,7 +17,7 @@ pointer	aid		#I AID object
 char	param[ARB]	#I Parameter name
 char	value[ARB]	#I Value
 
-int	i, j, strdic(), strncmp(), envfind(), nowhite(), ctoi(), ctor()
+int	i, j, strdic(), strncmp(), envfind(), nowhite(), ctoi(), ctor(), ctod()
 pointer	sp, str
 
 begin
@@ -48,49 +48,53 @@ begin
 	case 5:
 	    call strcpy (Memc[str], AID_CP(aid), AID_SZLINE)
 	case 6:
-	    call strcpy (Memc[str], AID_CRS(aid), AID_SZLINE)
+	    i = ctod (Memc[str], j, AID_CRQUAD(aid))
 	case 7:
-	    call strcpy (Memc[str], AID_CDS(aid), AID_SZLINE)
+	    call strcpy (Memc[str], AID_CRS(aid), AID_SZLINE)
 	case 8:
+	    call strcpy (Memc[str], AID_CDS(aid), AID_SZLINE)
+	case 9:
 	    AID_CDDIR(aid) = strdic (Memc[str], Memc[str], SZ_LINE, CDDIR)
 	    if (AID_CDDIR(aid) == 0)
 		AID_CDDIR(aid) = CDUNKNOWN
-	case 9:
-	    i = ctoi (Memc[str], j, AID_NTMAX(aid))
 	case 10:
-	    i = ctoi (Memc[str], j, AID_NRMAX(aid))
+	    i = ctoi (Memc[str], j, AID_NTMAX(aid))
 	case 11:
+	    i = ctoi (Memc[str], j, AID_NRMAX(aid))
+	case 12:
 	    i = ctoi (Memc[str], j, AID_ORD(aid))
 	    call ic_puti (AID_IC1(aid), "order", AID_ORD(aid))
-	case 12:
-	    i = ctoi (Memc[str], j, AID_NB(aid))
 	case 13:
-	    i = ctoi (Memc[str], j, AID_NN(aid))
+	    i = ctor (Memc[str], j, AID_MAXNL(aid))
 	case 14:
-	    i = ctoi (Memc[str], j, AID_NP(aid))
+	    i = ctoi (Memc[str], j, AID_NB(aid))
 	case 15:
-	    i = ctor (Memc[str], j, AID_SIG(aid))
+	    i = ctoi (Memc[str], j, AID_NN(aid))
 	case 16:
-	    i = ctoi (Memc[str], j, AID_NFOUND(aid))
+	    i = ctoi (Memc[str], j, AID_NP(aid))
 	case 17:
-	    i = ctor (Memc[str], j, AID_RMSG(aid))
+	    i = ctor (Memc[str], j, AID_SIG(aid))
 	case 18:
-	    i = ctor (Memc[str], j, AID_FMATCHG(aid))
+	    i = ctoi (Memc[str], j, AID_NFOUND(aid))
 	case 19:
-	    i = ctor (Memc[str], j, AID_FTMATCHG(aid))
+	    i = ctor (Memc[str], j, AID_RMSG(aid))
 	case 20:
-	    i = ctor (Memc[str], j, AID_MINRATIO(aid))
+	    i = ctor (Memc[str], j, AID_FMATCHG(aid))
 	case 21:
-	    i = ctoi (Memc[str], j, AID_NDMAX(aid))
+	    i = ctor (Memc[str], j, AID_FTMATCHG(aid))
 	case 22:
-	    call strcpy (Memc[str], AID_DEBUG(aid,1), AID_SZLINE)
+	    i = ctor (Memc[str], j, AID_MINRATIO(aid))
 	case 23:
-	    i = ctoi (Memc[str], j, AID_NBEST(aid))
+	    i = ctoi (Memc[str], j, AID_NDMAX(aid))
 	case 24:
-	    i = ctor (Memc[str], j, AID_WRMS(aid))
+	    call strcpy (Memc[str], AID_DEBUG(aid,1), AID_SZLINE)
 	case 25:
-	    i = ctor (Memc[str], j, AID_WFMATCH(aid))
+	    i = ctoi (Memc[str], j, AID_NBEST(aid))
 	case 26:
+	    i = ctor (Memc[str], j, AID_WRMS(aid))
+	case 27:
+	    i = ctor (Memc[str], j, AID_WFMATCH(aid))
+	case 28:
 	    i = ctor (Memc[str], j, AID_WFTMATCH(aid))
 	}
 

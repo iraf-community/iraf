@@ -29,4 +29,5 @@ task	concatenate	= t_concatenate,
 	lroff		= t_lroff,
 	mkhelpdb	= t_mkhelpdb,
 	hdbexamine	= t_hdbexamine,
-	cmdstr		= t_cmdstr
+	cmdstr		= t_cmdstr,
+	touch		= t_touch

@@ -1,0 +1,87 @@
+.help fceval Aug03 noao.twodspec.longslit
+.ih
+NAME
+fceval -- Evaluate coordinates using the FITCOORDS solutions
+.ih
+USAGE
+fceval input output fitnames
+.ih
+PARAMETERS
+.ls input
+Input text file of pixel coordinates.  This may be "STDIN" to read
+coordinates from the terminal or pipe.
+.le
+.ls output
+Output text file of pixel coordinates and fitted coordinates.  This may
+be "STDOUT" to write coordinates to the terminal or pipe.
+.le
+.ls fitnames  
+Names of the user coordinate maps to evaluate.
+.le
+.ls database = "database"
+Database containing the coordinate maps.
+.le
+.ih
+DESCRIPTION
+This task transforms pixel coordinates to the world coordinates fit with
+FITCOORDS.  When there is no map for an axis the identify transform is
+used.  If there are more the one map for an axis the average of the mapped
+coordinates is output.  This is the same behavior as TRANSFORM.
+
+The input file consists of two columns giving the x and y pixel values
+in the frame of the untransformed image data.  The output is a file
+with four columns giving the input x any y pixel values and the
+user coordinates fit by FITCOORDS.
+
+Two typical uses for this task are to look up world coordinates for
+points in the untransformed data and to generate transformations using
+GEOMAP and GEOTRAN.
+.ih
+EXAMPLES
+1. Evaluate a wavelength and slit position fit where the input pixel coordinates
+are entered interactively and the output is written to the terminal.
+
+.nf
+    cl> fceval STDIN STDOUT arcfit,std
+    1 1
+    1. 1. 20.60425149463117 4202.47202514205
+    60 1
+    60. 1. 79.60425149463118 4203.316616448186
+    1 512
+    1. 512. 19.15606081299484 7356.089801036373
+    60 512
+    60. 512. 78.15606081299485 7355.042495319318
+.fi
+
+In this case the first axis corresponds to the spatial dimension and
+the second to the dispersion dimension.  The arcfit was created using
+Angstroms and so the units of the last column is Angstroms.
+
+2. One use of this task is to generate the inverse transformation from
+that produced by TRANSFORM.  The steps are: 1) produce a grid of
+coordinates using LISTPIX and FCEVAL, 2) convert the user coordinates to
+pixel coordinates in the transformed data using WCSCTRAN, 3) fit a
+transformation using GEOMAP, and 4) transform the data with GEOTRAN.
+
+.nf
+    cl> listpix orig[*:5,*:5] wcs=physical verb- |
+    >>> fceval STDIN STDOUT arcfit,std |
+    >>> wcsctran STDIN coords trans world logical columns="3 4"
+    cl> geomap coords geomap.db 1 61 1 512
+    cl> geotran trans origNEW geomap.db coords flux+
+.fi
+
+This example uses pipes to eliminate intermediate files.  But these
+files can be useful for understanding the process.  LIXTPIX is used to
+generate a grid of points with some subsampling.  Be sure to use "physical"
+for the coordinate system otherwise the grid of x and y values will be
+for the subsection.  The order of the columns will be appropriate for
+GEOMAP to compute the inverse transformation.  By reversing the order
+of the columns one could generate a transformation similar to that
+produced by TRANSFORM in order to use features in GEOTRAN not provided
+by TRANSFORM.  However, the world coordinate system information will
+not be automatically set.
+.ih
+SEE ALSO
+fitcoords, transform, geomap, geotran
+.endhelp

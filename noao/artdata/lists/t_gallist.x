@@ -8,6 +8,7 @@ pointer	graphics		# poionter to graphics device name
 
 int	sf, lf
 long	seed, sseed, lseed
+long	sseed1, lseed1
 pointer	sp, str, x, y, mag, egal, axis, round, phi, dt, st, gd
 
 bool	clgetb()
@@ -95,13 +96,17 @@ begin
 
 	# Get the spatial density and luminosity function sampling parameters.
 	seed = clktime (long (0))
-	sseed = clgetl ("sseed")
-	if (IS_INDEFL(sseed))
-	    sseed = seed
+	sseed1 = clgetl ("sseed")
+	if (IS_INDEFL(sseed1))
+	    sseed = sseed + seed
+	else
+	    sseed = sseed1
 	ST_SSEED(st) = sseed
-	lseed = clgetl ("lseed")
-	if (IS_INDEFL(lseed))
-	    lseed = seed + 1
+	lseed1 = clgetl ("lseed")
+	if (IS_INDEFL(lseed1))
+	    lseed = lseed + seed + 1
+	else
+	    lseed = lseed1
 	ST_LSEED(st) = lseed
 	ST_NSSAMPLE(st) = clgeti ("nssample")
 	ST_NLSAMPLE(st) = clgeti ("nlsample")

@@ -14,7 +14,8 @@
 define	SW	SPACE_WIDTH
 
 # Declare the width tables.
-short	i, roman[96], bold[96], italic[96]	
+int	i
+short	roman[96], bold[96], italic[96]	
 
 
 # Times-Roman 10-point normal.

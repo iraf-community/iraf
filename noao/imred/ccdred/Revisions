@@ -1,6 +1,32 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
 
+=======
+V2.12.2
+=======
+
+ccdred/ccdred.hd
+    Hooked up help pages for ccdtest package.  (2/14/04, Valdes)
+
+ccdred/ccdtest/t_mkimage.x
+    Removed unused variable.  (8/8/02, Valdes)
+
+ccdred/src/icscale.x
+    Error dereferencing a string pointer.  (8/8/02, Valdes)
+
+ccdred/src/t_mkfringe.x
+ccdred/src/t_mkillumcor.x
+ccdred/src/t_mkillumft.x
+ccdred/src/t_mkskycor.x
+ccdred/src/t_mkskyflat.x
+    There was a confusion with the "output" parameter which is also in
+    the ccdproc pset.  Each task now explicitly calls its own output
+    parameter.  (7/31/02, Valdes)
+
+=======
+V2.12.1
+=======
+
 =====
 V2.12
 =====

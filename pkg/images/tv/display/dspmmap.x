@@ -65,9 +65,9 @@ pointer	refim			#I Reference image pointer
 int	i, ndim, npix, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
-int	imgnli()
+int	imstati(), imgnli()
 pointer immap(), pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
-errchk	immap, mw_openim
+errchk	immap, mw_openim, im_pmmapo
 
 begin
 	call smark (sp)
@@ -78,6 +78,9 @@ begin
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
 
 	im_in = immap (pmname, READ_ONLY, 0)
+	pm = imstati (im_in, IM_PMDES)
+	if (pm != NULL)
+	    return (im_in)
 	pm = pm_newmask (im_in, 27)
 
 	ndim = IM_NDIM(im_in)
@@ -126,7 +129,7 @@ pointer	pm, pmnew, imnew, mw, ctx, cty, bufref, bufpm
 int	imstati()
 pointer	pm_open(), mw_openim(), im_pmmapo(), imgl1i(), mw_sctran()
 bool	pm_empty(), pm_linenotempty()
-errchk	pm_open, mw_openim
+errchk	pm_open, mw_openim, im_pmmapo
 
 begin
 	if (im == NULL)
@@ -169,7 +172,8 @@ begin
 	    call error (1, "Image and mask have a relative rotation")
 	
 	# Check for an exact match.
-	if (lt[1] == 1D0 && lt[4] == 1D0 && lt[5] == 0D0 && lt[6] == 0D0)
+	if (lt[1] == 1D0 && lt[4] == 1D0 && lt[5] == 0D0 && lt[6] == 0D0 &&
+	    nc == ncpm && nl == nlpm)
 	    return
 
 	# Set reference to mask coordinates.
@@ -199,39 +203,65 @@ begin
 	# within each reference pixel in the overlap region.
 	if (i1 <= i2 && j1 <= j2) {
 	    nx = i2 - i1 + 1
-	    call malloc (bufpm, nx, TY_INT)
-	    call malloc (bufref, nc, TY_INT)
 	    vold[1] = i1
 	    vnew[1] = 1
-	    do j = 1, nl {
-		call mw_ctrand (cty, j-0.5D0, y1, 1)
-		call mw_ctrand (cty, j+0.5D0, y2, 1)
-		j1 = max (1, nint(min(y1,y2)+1D-5))
-		j2 = min (nlpm, nint(max(y1,y2)-1D-5))
-		if (j2 < j1)
-		    next
 
-		vnew[2] = j
-		call aclri (Memi[bufref], nc)
-		do l = j1, j2 {
-		    vold[2] = l
-		    if (!pm_linenotempty (pm, vold))
-			next
-		    call pmglpi (pm, vold, Memi[bufpm], 0, nx, 0)
-		    do i = 1, nc {
-			call mw_ctrand (ctx, i-0.5D0, x1, 1)
-			call mw_ctrand (ctx, i+0.5D0, x2, 1)
-			i1 = max (1, nint(min(x1,x2)+1D-5))
-			i2 = min (ncpm, nint(max(x1,x2)-1D-5))
-			if (i2 < i1)
-			    next
-			val = Memi[bufref+i-1]
-			do k = i1-vold[1], i2-vold[1]
-			    val = max (val, Memi[bufpm+k])
-			Memi[bufref+i-1] = val
+	    # If the scales are the same then it is just a problem of
+	    # padding.  In this case use range lists for speed.
+	    if (lt[1] == 1D0 && lt[4] == 1D0) {
+		call malloc (bufpm, 3+3*nc, TY_INT)
+		k = nint (lt[5])
+		l = nint (lt[6])
+		do j = j1, j2 {
+		    vold[2] = j
+		    call pmglri (pm, vold, Memi[bufpm], 0, nc, PIX_SRC)
+		    if (k != 0) {
+			bufref = bufpm
+			do i = 1, Memi[bufpm] {
+			    bufref = bufref + 3
+			    Memi[bufref] = Memi[bufref] + k
+			}
+			bufref = NULL
 		    }
+		    vnew[2] = j + l
+		    call pmplri (pmnew, vnew, Memi[bufpm], 0, nc, PIX_SRC)
 		}
-		call pmplpi (pmnew, vnew, Memi[bufref], 0, nc, PIX_SRC)
+
+	    # Do all the geometry and pixel size matching.  This can
+	    # be slow.
+	    } else {
+		call malloc (bufpm, nx, TY_INT)
+		call malloc (bufref, nc, TY_INT)
+		do j = 1, nl {
+		    call mw_ctrand (cty, j-0.5D0, y1, 1)
+		    call mw_ctrand (cty, j+0.5D0, y2, 1)
+		    j1 = max (1, nint(min(y1,y2)+1D-5))
+		    j2 = min (nlpm, nint(max(y1,y2)-1D-5))
+		    if (j2 < j1)
+			next
+
+		    vnew[2] = j
+		    call aclri (Memi[bufref], nc)
+		    do l = j1, j2 {
+			vold[2] = l
+			if (!pm_linenotempty (pm, vold))
+			    next
+			call pmglpi (pm, vold, Memi[bufpm], 0, nx, 0)
+			do i = 1, nc {
+			    call mw_ctrand (ctx, i-0.5D0, x1, 1)
+			    call mw_ctrand (ctx, i+0.5D0, x2, 1)
+			    i1 = max (1, nint(min(x1,x2)+1D-5))
+			    i2 = min (ncpm, nint(max(x1,x2)-1D-5))
+			    if (i2 < i1)
+				next
+			    val = Memi[bufref+i-1]
+			    do k = i1-vold[1], i2-vold[1]
+				val = max (val, Memi[bufpm+k])
+			    Memi[bufref+i-1] = val
+			}
+		    }
+		    call pmplpi (pmnew, vnew, Memi[bufref], 0, nc, PIX_SRC)
+		}
 	    }
 	    call mfree (bufref, TY_INT)
 	    call mfree (bufpm, TY_INT)

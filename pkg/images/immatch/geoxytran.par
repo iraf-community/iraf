@@ -6,6 +6,7 @@ database,f,a,,,,The GEOMAP database file
 transforms,s,a,,,,Names of the coordinate transforms in the database
 
 geometry,s,h,"geometric",|linear|geometric|,,'Transformation type (linear,geometric)'
+direction,s,h,"forward","forward|backward",,Transformation direction (forward|backward)
 xref,r,h,INDEF,,,X input origin in reference units
 yref,r,h,INDEF,,,Y input origin in reference units
 xmag,r,h,INDEF,,,X scale in output units per reference unit

@@ -43,7 +43,7 @@ unset	noclobber
 onintr	cleanup_
 unalias cd cp cmp echo ln mv rm sed set grep ls chmod chown pwd touch sort which
 
-set	path  = (/sbin /usr/sbin /bin /usr/bin /usr/ucb /etc /usr/etc $path /usr/local/bin /opt/local/bin /local/bin /home/local/bin /usr/openwin/bin /usr/X11R6/bin /usr/X11/bin)
+setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $path /usr/local/bin /opt/local/bin /local/bin /home/local/bin /usr/openwin/bin /usr/X11R6/bin /usr/X11/bin)"
 
 # set echo
 
@@ -54,8 +54,8 @@ set	path  = (/sbin /usr/sbin /bin /usr/bin /usr/ucb /etc /usr/etc $path /usr/loc
 ##############################################################################
 
 # MACHDEP definitions which may be reset below.
-set LS			= "/bin/ls"			# [MACHDEP]
-set LSDF        	= "-lLtgs"			# [MACHDEP]
+set LS			= "/bin/ls"				# [MACHDEP]
+set LSDF        	= "-lLtgs"				# [MACHDEP]
 
 set VERSION		= "V2.12.1"
 set hmach 		= "INDEF"
@@ -146,13 +146,11 @@ switch ($UNAME)
 	set pciraf		= 1
 	set do_tapecaps 	= 1
         if (`$uname_cmd -m` == "ppc") then		    # LinuxPPC
-            if (-f /etc/redhat-release) then
-                set mach 	= "linuxppc"
-                set hmach 	= "linuxppc"
-		set TAPES	= "/dev/*st[0-7]"
-		set shlib	= "no"
-		set LIBFILES    = ""
-            endif
+            set mach 		= "linuxppc"
+            set hmach 		= "linuxppc"
+	    set TAPES		= "/dev/*st[0-7]"
+	    set shlib		= "no"
+	    set LIBFILES    	= ""
         else
             if (-f /etc/redhat-release) then		    # Linux RedHat 6.x
                 set mach 	= "redhat"
@@ -331,6 +329,10 @@ while ("$1" != "")
 	alias SO_OFF    "(if ($hilite) tput rmso)"
 	breaksw
     case -h:				# print help summary
+	goto Usage
+    case -help:				# print help summary
+	goto Usage
+    case --help:			# print help summary
 	goto Usage
     case -b:				# set local bin directory
 	if ("$2" != "") then
@@ -539,7 +541,7 @@ if ("$iraf" == "") then
 	end
     endif
 
-    if ("$iraf" == "") then
+    if ("$d_iraf" == "") then
 	set d_iraf = /iraf/iraf
     endif
 else
@@ -654,6 +656,12 @@ set o_imdir = `echo $o_imdir | sed -e 's+/\(["]*\)$+\1+'`
 
 
 #=============================================================================
+# Get the iraf parent directory to be used below.
+#=============================================================================
+pushd $iraf/.. >& /dev/null ; set iraf_p = `echo $cwd` ; popd >& /dev/null
+
+
+#=============================================================================
 # Set $imdir, the default user image storage root directory.  Each user imdir
 # will be a subdirectory of this directory by default, when MKIRAF is run.
 # Since bulk image data can consume hundreds of megabytes of disk space, IRAF
@@ -663,7 +671,6 @@ set o_imdir = `echo $o_imdir | sed -e 's+/\(["]*\)$+\1+'`
 #=============================================================================
 
 if ("$imdir" == "") then
-    pushd $iraf/.. >& /dev/null ; set iraf_p = `echo $cwd` ; popd >& /dev/null
 
     if (-d $o_imdir) then
 	set d_imdir = $o_imdir
@@ -1022,9 +1029,14 @@ if (($pciraf && $mach == "macosx") || (!(-r /etc/passwd)) ) then
   # Special-case user info check for OS X and systems where the /etc/passwd
   # file may not contain the user info or isn't readable.
 
-  if ("`which id |& grep -i 'Command not found'`" == "" && \
-      "`which id |& grep -i 'no id'`" == "") then
-
+  set id_found = 0
+  foreach d ($path)
+      if (-e $d/id) then
+          set id_found = 1
+          break
+      endif
+  end
+  if ($id_found == 1) then
     if (`id iraf |& grep -i 'no such user'` != "") then
       DO_WARN ; set warn_stat = 1
       NEWLINE
@@ -1040,7 +1052,7 @@ if (($pciraf && $mach == "macosx") || (!(-r /etc/passwd)) ) then
       # Check iraf user login path and shell
       echo -n "Checking iraf user login directory ... 				" 
 
-      set v = `finger iraf |& egrep "^Directory"`
+      set v = `finger iraf |& egrep '^Directory'`
       set ihome = `echo $v[2] | sed -e 's+/\(["]*\)$+\1+'`
       set shel  = `echo $v[4] | sed -e 's+/\(["]*\)$+\1+' | grep csh`
       if ("$ihome" != "$iraf/local" && $shel == "") then
@@ -1065,8 +1077,8 @@ if (($pciraf && $mach == "macosx") || (!(-r /etc/passwd)) ) then
   endif
 
 else
-  set pass1 = `grep ^iraf: /etc/passwd`
-  set pass2 = `ypcat passwd |& grep ^iraf:`
+  set pass1 = "`grep ^iraf: /etc/passwd`"
+  set pass2 = "`ypcat passwd |& grep ^iraf:`"
 
   if ("$pass1" == "" && "$pass2" == "") then
     DO_WARN ; set warn_stat = 1
@@ -1084,7 +1096,7 @@ else
     if ("$pass1" != "") then
         set pass = `grep ^iraf: /etc/passwd |sed -e 's/[ \*]/_/g' |sed -e 's/:/ /g'`
     else
-        set pass = `ypcat passwd | grep ^iraf: /etc/passwd |sed -e 's/[ \*]/_/g' |sed -e 's/:/ /g'`
+        set pass = `ypcat passwd | grep ^iraf: |sed -e 's/[ \*]/_/g' |sed -e 's/:/ /g'`
     endif
 
     set c = `echo $pass | wc -w`
@@ -1391,10 +1403,17 @@ set CMDLINKS	= "cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch w
 #=============================================================================
 
 echo -n "Checking for existing commands directory...			"
-if ("`which cl |& grep -i 'Command not found'`" == "" && \
-    "`which cl |& grep -i 'no cl'`" == "") then
-        set clpath = `which cl`
-        set o_lbin = $clpath:h
+set cl_found = 0
+set clpath   = ""
+foreach d ($path)
+    if (-e $d/cl) then
+	set cl_found = 1
+	set clpath = $d/cl
+	break
+    endif
+end
+if ($cl_found == 1) then
+    set o_lbin = $clpath:h
 
     if ("$o_lbin" != "$lbin") then
         DO_WARN
@@ -1564,7 +1583,7 @@ set err_seen = 0
 if ($pciraf && $mach == "macosx") then
 echo -n "Creating iraf user .login/.cshrc links ...			"
 
-    set v = `finger iraf |& egrep "^Directory"`
+    set v = `finger iraf |& egrep '^Directory'`
     set ihome = `echo $v[2] | sed -e 's+/\(["]*\)$+\1+'`
 
     if ("$ihome" != "$iraf/local") then
@@ -1973,9 +1992,15 @@ foreach i (/dev/imt1i /dev/imt1o)
 	endif
     else
 	if ($exec == yes) then
-	    if ("`which mkfifo |& grep -i 'Command not found'`" != "" && \
-    		"`which mkfifo |& grep -i 'no mkfifo'`" == "") then
-		    mkfifo $i
+	    set mkfifo_found = 0
+	    foreach d ($path)
+	        if (-e $d/mkfifo) then
+	            set mkfifo_found = 1
+	            break
+	        endif
+	    end
+	    if ($mkfifo_found == 1) then
+		mkfifo $i
 	    else
 		mknod $i p
 	    endif
@@ -2091,7 +2116,7 @@ endif
 #=============================================================================
 
 echo -n "Checking if termcap file contains an XGterm entry ...		"
-set temp = `grep -l xgterm $iraf/dev/termcap | grep -v "^#"`
+set temp = `grep -l xgterm $iraf/dev/termcap | grep -v '^#'`
 if ("$temp" == "") then
     DO_FAIL
     set err_count = `expr $err_count + 1`
@@ -2102,7 +2127,7 @@ endif
 echo -n "Checking graphcap file for XGterm/imtool entries ...		"
 set gcok = yes
 foreach i (xgterm imtool)
-    set temp = `grep -l $i $iraf/dev/graphcap | grep -v "^#"`
+    set temp = `grep -l $i $iraf/dev/graphcap | grep -v '^#'`
     if ("$temp" == "" && "$gcok" == "yes") then
         DO_FAIL
         set err_count = `expr $err_count + 1`
@@ -2195,7 +2220,7 @@ endif
 
 
 # Get the networking values.
-set hname       = `hostname`
+set hname       = "`hostname`"
 set lhost_abbr  = `hostname | awk '{printf ("%16.16s\n", $1 ) }'`
 set ihosts      = $iraf/dev/hosts
 set tmp_host    = /tmp/_host$$
@@ -2204,14 +2229,14 @@ set tmp_host    = /tmp/_host$$
 if (`echo $hname | grep "\."` != "") then
     # When using FQDN lnode may not be set....
     set is_fqdn = yes
-    set domain  = `hostname | sed -e 's/^[a-zA-Z0-9_\-]*\.//g'`
-    set lhost = `hostname | sed -e 's/\.[a-zA-Z0-9]*//g'`
+    set domain  = "`hostname | sed -e 's/^[a-zA-Z0-9_\-]*\.//g'`"
+    set lhost = "`hostname | sed -e 's/\.[a-zA-Z0-9]*//g'`"
 else
     set is_fqdn = no
     set domain  = "<unknown>"
     set lhost = $hname
 endif
-set nnode = `hostname`
+set nnode = "`hostname`"
 
 # Compute the recommended hosts entry.
 set irafks = $iraf/bin.$mach/irafks.e

@@ -22,7 +22,8 @@ define	F_REUSE		02B		# node descriptor may be reused
 
 # ZFIOTX buffer descriptor.
 
-define	SZ_TXBUF	2048		# size of text file buffer
+define	SZ_TXBUF	16386		# size of text file buffer (should be
+					# at least (2*LEN_SEQBUF*SZ_LINE))
 define	LEN_TXBDES	(5+SZ_TXBUF/SZ_STRUCT)
 
 define	B_CI		Memi[$1]	# character index into current record
@@ -83,6 +84,7 @@ define	KI_ZFRNAM	20
 define	KI_ZFSUBD	21
 define	KI_ZDVALL	22
 define	KI_ZDVOWN	23
+define	KI_ZFUTIM	24
 
 define	KI_ZOPDIR	30
 define	KI_ZCLDIR	31

@@ -19,7 +19,7 @@ afiltpars,pset,h,"",,,The astrometry file filtering parameters
 # The task mode parameters
 
 update,b,h,no,,,"Update algorithm parameters at task termination ?"
-verbose,b,h,yes,,,"Print task messages in non-interactive mode ?"
+verbose,b,h,yes,,,"Print task messages ?"
 
 # The task configuration parameters.
 

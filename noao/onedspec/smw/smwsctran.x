@@ -1,3 +1,4 @@
+include	<error.h>
 include	<smw.h>
 
 
@@ -46,7 +47,19 @@ begin
 
 	# If the MWCS is not split use the MWCS transformation directly.
 	if (nct == 1) {
-	    SMW_CT(ct,0) = mw_sctran (SMW_MW(smw,0), system1, system2, axbits)
+	    iferr (SMW_CT(ct,0) = mw_sctran (SMW_MW(smw,0), system1, system2,
+		axbits)) {
+		switch (cttype) {
+		case SMW_WL, SMW_WP:
+	            SMW_CT(ct,0) = mw_sctran (SMW_MW(smw,0), "physical",
+			system2, axbits)
+		case SMW_LW, SMW_PW:
+	            SMW_CT(ct,0) = mw_sctran (SMW_MW(smw,0), system1,
+			"physical", axbits)
+		default:
+		    call erract (EA_ERROR)
+		}
+	    }
 	    return(ct)
 	}
 
@@ -55,19 +68,28 @@ begin
 	case SMW_LW:
 	    SMW_CTL(ct) = mw_sctran (SMW_MW(smw,0), system1, "physical",
 		axbits)
-	    do i = 0, nct-1
-		SMW_CT(ct,i) = mw_sctran (SMW_MW(smw,i), "physical",
-		    system2, axbits)
+	    do i = 0, nct-1 {
+		iferr (SMW_CT(ct,i) = mw_sctran (SMW_MW(smw,i), "physical",
+		    system2, axbits))
+		    SMW_CT(ct,i) = mw_sctran (SMW_MW(smw,i), "physical",
+			"physical", axbits)
+	    }
 	case SMW_WL:
-	    do i = 0, nct-1
-		SMW_CT(ct,i) = mw_sctran (SMW_MW(smw,i), system1,
-		    "physical", axbits)
+	    do i = 0, nct-1 {
+		iferr (SMW_CT(ct,i) = mw_sctran (SMW_MW(smw,i), system1,
+		    "physical", axbits))
+		    SMW_CT(ct,i) = mw_sctran (SMW_MW(smw,i), "physical",
+			"physical", axbits)
+	    }
 	    SMW_CTL(ct) = mw_sctran (SMW_MW(smw,0), "physical", system2,
 		axbits)
 	case SMW_PW, SMW_WP:
-	    do i = 0, nct-1
-		SMW_CT(ct,i) = mw_sctran (SMW_MW(smw,i), system1,
-		    system2, axbits)
+	    do i = 0, nct-1 {
+		iferr (SMW_CT(ct,i) = mw_sctran (SMW_MW(smw,i), system1,
+		    system2, axbits))
+		    SMW_CT(ct,i) = mw_sctran (SMW_MW(smw,i), "physical",
+			system2, axbits)
+	    }
 	}
 
 	return (ct)

@@ -234,11 +234,11 @@ begin
 		}
 
 	    } then {
+		call erract (EA_WARN)
 		if (out != NULL && out != in) {
 		    call imunmap (out)
 		    call imdelete (Memc[output])
 		}
-		call erract (EA_WARN)
 	    }
 
 	    if (mw != NULL && out != NULL)

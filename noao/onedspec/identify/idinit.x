@@ -340,6 +340,7 @@ begin
 	}
 
 	# Use a SAVE and RESTORE to copy the CURFIT data.
+	ID_SHIFT(id) = ID_SHIFT(sid)
 	if (ID_CV(sid) != NULL) {
 	    if (ID_CV(id) != NULL)
 	        call dcvfree (ID_CV(id))
@@ -364,5 +365,4 @@ begin
 	ID_LINE(id,2) = ID_LINE(sid,2)
 	ID_AP(id,1) = ID_AP(sid,1)
 	ID_AP(id,2) = ID_AP(sid,2)
-	ID_SHIFT(id) = ID_SHIFT(sid)
 end

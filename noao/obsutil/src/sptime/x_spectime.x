@@ -1,1 +1,2 @@
-task	sptime = t_sptime
+task	sptime = t_sptime,
+	cgiparse = t_cgiparse

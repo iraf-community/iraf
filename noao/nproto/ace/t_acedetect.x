@@ -298,7 +298,7 @@ begin
 	PAR_BPMLIST(par,1) = imtopenp ("masks")
 	PAR_SKYLIST(par,1) = imtopenp ("skys")
 	PAR_SIGLIST(par,1) = imtopenp ("sigmas")
-	PAR_EXPLIST(par,1) = imtopenp ("exp")
+	PAR_EXPLIST(par,1) = imtopenp ("exps")
 	PAR_GAINLIST(par,1) = imtopenp ("gains")
 	PAR_SCALELIST(par,1) = clpopnu ("scales")
 
@@ -306,7 +306,7 @@ begin
 	PAR_BPMLIST(par,2) = imtopenp ("rmasks")
 	PAR_SKYLIST(par,2) = imtopenp ("rskys")
 	PAR_SIGLIST(par,2) = imtopenp ("rsigmas")
-	PAR_EXPLIST(par,2) = imtopenp ("rexpmaps")
+	PAR_EXPLIST(par,2) = imtopenp ("rexps")
 	PAR_GAINLIST(par,2) = imtopen ("")
 	PAR_SCALELIST(par,2) = clpopnu ("rscales")
 
@@ -322,8 +322,9 @@ begin
 
 	# Get other parameters.
 	call sky_pars ("open", "", PAR_SKY(par))
-	call det_pars ("open", "", PAR_DET(par))
+	call det_pars ("diff", "", PAR_DET(par))
 	call grw_pars ("open", "", PAR_GRW(par))
+	call evl_pars ("open", "", PAR_EVL(par))
 
 	# Do the detection.
 	call aceall (par)
@@ -377,9 +378,12 @@ pointer	sp, str
 pointer	image[4], bpmask[4], skyname[4], signame[4], expname[4], gainname[4]
 pointer	incat[2], outcat[2], objmask[2], outsky[2], outsig[2], scalestr[2]
 pointer	catdef, logfile
+pointer	im, ptr
 
-int	nowhite(), mscextensions(), strldxs()
+int	nowhite(), mscextensions(), strldxs(), strlen()
 int	imtlen(), imtgetim(), clplen(), clgfil()
+pointer	immap()
+errchk	immap
 
 begin
 	call smark (sp)
@@ -468,7 +472,7 @@ begin
 	    call error (1,
 		"Reference image and sky sigma lists do not match")
 	i = imtlen (PAR_EXPLIST(par,2))
-	if (i != 1 && i != k)
+	if (i > 1 && i != k)
 	    call error (1,
 		"Reference image and exposure map lists do not match")
 	i = imtlen (PAR_GAINLIST(par,2))
@@ -630,9 +634,25 @@ begin
 			call strcat (Memc[str], Memc[objmask[2]], SZ_FNAME)
 		}
 
+		# Append DATASEC.
+		do i = 3, 4 {
+		    if (Memc[image[i]] == EOS)
+			next
+		    iferr {
+			im = NULL
+			ptr = immap (Memc[image[i]], READ_ONLY, 0); im = ptr
+			j = strlen (Memc[image[i]])
+			call imgstr (im, "DATASEC", Memc[image[i]+j],
+			    SZ_FNAME-j)
+		    } then
+			;
+		    if (im != NULL)
+			call imunmap (im)
+		}
+
 		# Process the image.
 		call ace (par, image[3], bpmask[3], skyname[3], signame[3],
-		    expname[3], gainname[3], scalestr[3], Memc[incat[2]],
+		    expname[3], gainname[3], scalestr, Memc[incat[2]],
 		    Memc[outcat[2]], Memc[objmask[2]], Memc[outsky[2]],
 		    Memc[outsig[2]], Memc[catdef], Memc[logfile])
 
@@ -666,9 +686,9 @@ bool	strne()
 real	imgetr()
 int	ctor(), strdic(), fnextn(), imstati()
 int	open(), access(), imaccess()
-pointer	immap(), yt_pmmap(), pm_open(), map_open()
+pointer	immap(), xt_pmmap(), pm_open(), map_open()
 
-errchk	open, immap, yt_pmmap, pm_newmask
+errchk	open, immap, xt_pmmap, pm_newmask
 errchk	cnvparse, sky, detect, split, grow, evaluate, map_open
 errchk	catdefine, catopen, catgets
 
@@ -757,7 +777,7 @@ begin
 		call catrobjs (cat, "")
 		if (objmask[1] == EOS)
 		    call catgets (cat, "mask", objmask, SZ_FNAME)
-		omim = yt_pmmap (objmask, im[1], objmask, SZ_FNAME)
+		omim = xt_pmmap (objmask, im[1], objmask, SZ_FNAME)
 		om = imstati (omim, IM_PMDES)
 	    } else {
 		# Check for existing catalog.  Check catalog definitions.
@@ -784,7 +804,7 @@ begin
 	    }
 
 	    # Open bad pixel mask.
-	    ptr = yt_pmmap (Memc[bpmask[1]], im[1], Memc[bpname[1]],
+	    ptr = xt_pmmap (Memc[bpmask[1]], im[1], Memc[bpname[1]],
 		SZ_FNAME)
 	    bpm[1] = ptr
 
@@ -831,7 +851,7 @@ begin
 #		    }
 #		}
 
-		ptr = yt_pmmap (Memc[bpmask[2]], im[2], Memc[bpname[2]],
+		ptr = xt_pmmap (Memc[bpmask[2]], im[2], Memc[bpname[2]],
 		    SZ_FNAME)
 		bpm[2] = ptr
 
@@ -840,7 +860,7 @@ begin
 		    scale[1] = 1.
 		else if (Memc[scalestr[1]] == '!') {
 		    iferr (scale[1] = imgetr (im[1], Memc[scalestr[1]+1]))
-			call error (1, "Bad scale for reference image")
+			call error (1, "Bad scale for input image")
 		} else if (ctor (Memc[scalestr[1]], i, scale[1]) == 0)
 		    call error (1, "Bad scale for image")
 

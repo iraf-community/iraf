@@ -197,8 +197,8 @@ begin
 		}
 	    }
 	    call apsets (ap, CLNAME, Memc[outfname])
-	    call apfroot (Memc[outfname], Memc[coords], SZ_FNAME)
-	    call apsets (ap, CLROOT, Memc[coords])
+	    call apfroot (Memc[outfname], Memc[str], SZ_LINE)
+	    call apsets (ap, CLROOT, Memc[str])
 
 	    # Open the output text file, if output is "default", dir$default
 	    # or a directory specification then the extension "sky" is added

@@ -108,6 +108,9 @@ int	opcode;
 	    case OP_RADIX:
 	    case OP_ATAN2:
 	    case OP_STRIDX:
+	    case OP_STRLDX:
+	    case OP_STRSTR:
+	    case OP_STRLSTR:
 		cl_error (E_UERR,
 		"Intrinsic function called with illegal boolean argument");
 		break;
@@ -133,6 +136,9 @@ int	opcode;
 	    typecode = OT_STRING;
 	    break;
 	case OP_STRIDX:
+	case OP_STRLDX:
+	case OP_STRSTR:
+	case OP_STRLSTR:
 	    if (typ1 != OT_STRING || typ2 != OT_STRING)
 		cl_error (E_UERR,
 		    "stridx: both arguments must be of type string");
@@ -244,18 +250,128 @@ int	opcode;
 		    char    *ip, *cp, ch;
 
 		    iresult = 0;
-		    for (ip=o2.o_val.v_s;  !iresult && (ch = *ip) != EOS;  ip++)
-			for (cp=o1.o_val.v_s;  *cp != EOS;  cp++)
+		    for (ip=o2.o_val.v_s; !iresult && (ch = *ip) != EOS; ip++) {
+			for (cp=o1.o_val.v_s;  *cp != EOS;  cp++) {
 			    if (*cp == ch) {
 				iresult = (ip - o2.o_val.v_s + 1);
 				break;
 			    }
+		        }
+		    }
 		}
 
 		result.o_val.v_i = iresult;
 		result.o_type = OT_INT;
 		goto pushresult;
 		break;
+
+	    case OP_STRLDX:
+		/* index = strldx (chars, string); "chars" may be a string.
+		 * Return index of last occurence of any of the "chars"
+		 * in "string", or ZERO if none found.
+		 */
+		{
+		    char    *ip, *cp, ch, len;
+
+		    iresult = 0;
+		    len = strlen (o2.o_val.v_s);
+		    for (ip=&o2.o_val.v_s[len-1]; 
+			!iresult && (ch = *ip) != EOS && ip >= o2.o_val.v_s;
+			ip--) {
+			    for (cp=o1.o_val.v_s;  *cp != EOS;  cp++) {
+			        if (*cp == ch) {
+				    iresult = (ip - o2.o_val.v_s + 1);
+				    break;
+			        }
+			    }
+		    }
+		}
+
+		result.o_val.v_i = iresult;
+		result.o_type = OT_INT;
+		goto pushresult;
+		break;
+
+	    case OP_STRSTR:
+		/* index = strstr (s1, s2);
+		 * Return index of first occurance of the string 's1' in 's2',
+		 * or ZERO if none found.
+		 */
+		{
+		    char    *ip, *cp, *fp, first_char, ch;
+
+		    first_char = o1.o_val.v_s[0];
+		    
+		    /* Null patterns match any string. */
+		    if (first_char == NULL) {
+			result.o_val.v_i = 1;
+			result.o_type = OT_INT;
+			goto pushresult;
+		    } else
+		        iresult = 0;
+
+		    /* Search s2 for first_char, if found check for complete
+		     * match of s1, else move on.
+		     */
+		    for (ip=o2.o_val.v_s; !iresult && (ch = *ip) != EOS; ip++) {
+			if (ch == first_char) {
+			    fp = ip;
+			    cp = o1.o_val.v_s;  
+			    while (*cp != EOS && *cp++ == *ip++)
+				;
+			    if (*cp == EOS) {
+				iresult = (fp - o2.o_val.v_s + 1);
+				break;
+			    }
+		        }
+		    }
+		}
+
+		result.o_val.v_i = iresult;
+		result.o_type = OT_INT;
+		goto pushresult;
+
+	    case OP_STRLSTR:
+		/* index = strstr (s1, s2);
+		 * Return index of last occurance of the string 's1' in 's2',
+		 * or ZERO if none found.
+		 */
+		{
+		    char    *ip, *cp, *fp, first_char, ch, len;
+
+		    first_char = o1.o_val.v_s[0];
+		    
+		    /* Null patterns match any string. */
+		    if (first_char == NULL) {
+			result.o_val.v_i = 1;
+			result.o_type = OT_INT;
+			goto pushresult;
+		    } else
+		        iresult = 0;
+
+		    /* Search s2 for first_char, if found check for complete
+		     * match of s1, else move on.
+		     */
+		    len = strlen (o2.o_val.v_s);
+		    for (ip=&o2.o_val.v_s[len-1];
+			!iresult && (ch = *ip) != EOS && ip >= o2.o_val.v_s;
+			ip--) {
+			    if (ch == first_char) {
+			        fp = ip;
+			        cp = o1.o_val.v_s;  
+			        while (*cp != EOS && *cp++ == *ip++)
+				    ;
+			        if (*cp == EOS) {
+				    iresult = (fp - o2.o_val.v_s + 1);
+				    break;
+			        }
+		            }
+		    }
+		}
+
+		result.o_val.v_i = iresult;
+		result.o_type = OT_INT;
+		goto pushresult;
 	    }
 
 	    /* Cannot "goto pushresult" because would lose res core */
@@ -419,6 +535,10 @@ int	opcode;
 	if (opcode != OP_EQ && opcode != OP_NE)
 	    if (opindef (&o1) || opindef (&o2)) {
 		result.o_type = OT_BOOL;
+		/*
+		result.o_val.v_i = 0;
+		printf ("Warning: INDEF operand value in a boolean expression");
+		*/
 		setopindef (&result);
 		goto pushresult;
 	    }

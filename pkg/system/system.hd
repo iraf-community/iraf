@@ -38,5 +38,6 @@ sort		hlp=doc$sort.hlp,	 src=sort.x
 spy		hlp=doc$spy.hlp,	 src=spy.cl
 tail		hlp=doc$tail.hlp,	 src=tail.x
 tee		hlp=doc$tee.hlp,	 src=tee.x
+touch		hlp=doc$touch.hlp,	 src=touch.x
 type		hlp=doc$type.hlp,	 src=type.x
 unprotect	hlp=doc$unprotect.hlp,	 src=unprotect.x

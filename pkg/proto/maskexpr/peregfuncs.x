@@ -1646,7 +1646,7 @@ begin
 
 	call smark (sp)
 	call salloc (ufd, LEN_LINESDES, TY_STRUCT)
-	call salloc (rgptr, 3 * MAX_NRANGES, + 1, TY_INT)
+	call salloc (rgptr, 3 * MAX_NRANGES + 1, TY_INT)
 
 	# Decode the ranges string
 	if (me_decode_ranges (rangestr, Memi[rgptr], MAX_NRANGES,

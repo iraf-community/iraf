@@ -41,7 +41,7 @@ int	i, arg, nsec, cmd
 bool	format, quit_at_le, quit_at_ih, formatted
 
 int	lh_findsection(), lh_findblock(), nextcmd()
-int	stridxs(), getline(), strlen(), strmatch(), getarg()
+int	stridxs(), getline(), strlen(), strmatch(), lgetarg()
 
 define	text_ 	99
 define	err_ 	98
@@ -186,7 +186,7 @@ begin
 		        call fprintf (out, "</DD>\n</DL>\n")
 		        ls_level = 0
 		    }
-		    call lh_set_level (getarg(Memc[ibuf],ip,1), Memc[level])
+		    call lh_set_level (lgetarg(Memc[ibuf],ip,1), Memc[level])
 		    lastline = DIRECTIVE
 		    next
 
@@ -202,7 +202,7 @@ begin
 		case BR:		# break line
 		    call fprintf (out, "<BR>\n")
 		case SP:		# break, space N spaces on output
-		    arg = getarg (Memc[ibuf], ip, 1)
+		    arg = lgetarg (Memc[ibuf], ip, 1)
 		    call fprintf (out, "<BR>\n")
 		    for (i=1; i < arg; i = i + 1)
 		        call fprintf (out, "<BR>\n")
@@ -211,7 +211,7 @@ begin
 		    next
 
 		case LS:		# begin labelled section
-		    arg = getarg (Memc[ibuf], ip, 0)
+		    arg = lgetarg (Memc[ibuf], ip, 0)
 		    if (arg == 0) 
 			ip = 5
 
