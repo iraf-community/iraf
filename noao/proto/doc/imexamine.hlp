@@ -4,7 +4,7 @@ NAME
 imexamine -- examine images using image display, plots, and text
 .ih
 USAGE
-imexamine [[input [frame]]
+imexamine [input [frame]]
 .ih
 PARAMETERS
 .ls input
@@ -815,4 +815,5 @@ SEE ALSO
 cursors, eparam, unlearn, plot., tv., digiphot., apphot.,
 implot, imedit, radplt, imcntr, imhistogram, imstatistics, display
 .endhelp
+
 

@@ -84,20 +84,24 @@ over the extent of each output pixel.  This is slower than
 simple interpolation.
 .le
 .ls samedisp = no
-Use the same dispersion parameters for all apertures?  If no then the
+Use the same dispersion parameters for all apertures within a
+multispec spectrum? If no then the
 dispersion parameters are set independently for each aperture while
 if yes then the all the apertures will have the same dispersion.
 .le
 .ls global = no
-Apply global wavelength defaults?  Defaults for the INDEF wavelength
-coordinate parameters are determined if two or less of the wavelength
-parameters are specified.  If this parameter is \fIno\fR this is done
+Use the same dispersion parameters for the same aperture in all
+spectra?  Defaults for the INDEF wavelength coordinate parameters are
+determined if two or less of the wavelength parameters are specified
+for an aperture.  If this parameter is \fIno\fR this is done
 independently for each input spectrum.  If this parameter is \fIyes\fR
-then the wavelength ranges and aperture lengths from all the input spectra
-are used to determine defaults for all the spectra.  The global option
-is used to have all the dispersion corrected spectra have the same
+then the wavelength ranges and aperture lengths from all the input
+spectra for each aperture are used to determine defaults for all the
+spectra of the same aperture.  The global option is used to have all
+the dispersion corrected spectra for each aperture have the same
 wavelength coordinates without actually specifying the wavelength
-parameters.
+parameters.  If both \fBsamedisp\fR and \fBglobal\fR are set then all
+spectra from all apertures will have the same dispersion parameters.
 .le
 .ls confirm = no
 Confirm the wavelength parameters for each spectrum and aperture?  If
@@ -318,7 +322,7 @@ w034.ms: ap = 31, w1 = 6831.369, w2 = 6938.742, dw = 0.1202346, nw = 800
 the same dispersion.
  
 .nf
-cl> msdispcor f034.ms w034.ms
+cl> msdispcor f034.ms w034.ms samedisp+ confirm-
 w034.ms: w1 = 6821.513, w2 = 6917.617, dw = 0.1202804, nw = 800, log = no
 .fi
  

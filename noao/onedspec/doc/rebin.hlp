@@ -82,6 +82,9 @@ in DISPCOR. Note that the default selection of "poly5" as the
 interpolator maintains good high frequency response (i.e. little
 smoothing is introduced), but may cause ringing near strong
 emission lines where spline3 may be a better choice.
+
+This task is largely obsoleted and replaced by the rebin option
+of DISPCOR.
 .ih
 EXAMPLES
 The following example rebins the data from several spectra to

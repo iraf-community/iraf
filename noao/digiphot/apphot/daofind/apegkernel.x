@@ -121,7 +121,7 @@ begin
 end
 
 
-# AP_GKERNEL -- Setup 1D the convolution kernel.
+# AP_GKERNEL -- Compute the 1D Gaussian convolution kernel.
 
 procedure ap_gkernel (ker1, nbox, fwhmpsf, nsigma)
 

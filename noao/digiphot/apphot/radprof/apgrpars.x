@@ -6,8 +6,6 @@ include "../lib/fitsky.h"
 include "../lib/phot.h"
 include "../lib/radprof.h"
 
-define	MAX_NAPERTS	15
-
 # AP_GRPPARS -- Procedure to fetch the radprof parameters.
 
 procedure ap_grppars (ap)
@@ -104,6 +102,13 @@ begin
 	call clgpset (np, "exposure", Memc[str], SZ_FNAME)
 	call apsets (ap, EXPOSURE, Memc[str])  
 	call apsetr (ap, ITIME, clgpsetr (np, "itime"))
+	call clgpset (np, "airmass", Memc[str], SZ_FNAME)
+	call apsets (ap, AIRMASS, Memc[str])  
+	call apsetr (ap, XAIRMASS, clgpsetr (np, "xairmass"))
+	call clgpset (np, "filter", Memc[str], SZ_FNAME)
+	call apsets (ap, FILTER, Memc[str])  
+	call clgpset (np, "ifilter", Memc[str], SZ_FNAME)
+	call apsets (ap, FILTERID, Memc[str])  
 
 	# Set remainder of photometry parameters.
 	call apsetr (ap, ZMAG, clgpsetr (pp, "zmag"))

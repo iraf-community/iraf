@@ -27,6 +27,7 @@ news		hlp=doc$news.hlp,	 src=news.cl
 netstatus	hlp=doc$netstatus.hlp,	 src=netstatus.x
 page		hlp=doc$page.hlp,	 src=page.x
 pathnames	hlp=doc$pathnames.hlp,	 src=pathnames.x
+phelp		hlp=doc$phelp.hlp,	 src=phelp.cl
 protect		hlp=doc$protect.hlp,	 src=protect.x
 references	hlp=doc$references.hlp,	 src=references.cl
 rename		hlp=doc$rename.hlp,	 src=rename.x

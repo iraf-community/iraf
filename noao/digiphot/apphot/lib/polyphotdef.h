@@ -15,10 +15,11 @@ define	AP_PYMINRAD	Memr[$1+7]	# Minimum sky fitting radius in scale
 
 # polyphot answers
 
-define	AP_PYFLUX	Memr[$1+8]	# Flux
-define	AP_PYNPIX	Memr[$1+9]	# Polygon area
-define	AP_PYMAG	Memr[$1+10]	# Magnitude
-define	AP_PYMAGERR	Memr[$1+11]	# Magnitude error
+define	AP_PYBADPIX	Memi[$1+8]	# Are there bad pixels
+define	AP_PYFLUX	Memr[$1+9]	# Flux
+define	AP_PYNPIX	Memr[$1+10]	# Polygon area
+define	AP_PYMAG	Memr[$1+11]	# Magnitude
+define	AP_PYMAGERR	Memr[$1+12]	# Magnitude error
 
 # polyphot parameters
 

@@ -26,6 +26,7 @@ real	mode, amedr()
 real	z1, z2, zstep, zbin
 int	i, n, nx, nmax
 pointer	sp, v1, v2, dv, va, vb, data, ptr1, ptr2, ptr3, imgnlr()
+bool	fp_equalr()
 
 begin
 	call smark (sp)
@@ -93,7 +94,7 @@ begin
 	ptr3 = data + n * (1. + ZRANGE) / 2.
 	z1 = Memr[ptr1]
 	z2 = Memr[ptr3]
-	if (z1 == z2) {
+	if (fp_equalr (z1, z2)) {
 	    mode = z1
 	    call sfree (sp)
 	    return (mode)
@@ -104,17 +105,17 @@ begin
 
 	nmax = 0
 	repeat {
-	    for (; Memr[ptr1] < z1; ptr1=ptr1+1)
+	    for (; ptr1 < ptr3 && Memr[ptr1] < z1; ptr1=ptr1+1)
 		;
 	    z2 = z1 + zbin
-	    for (; (ptr2 < ptr3) && (Memr[ptr2] < z2); ptr2=ptr2+1)
+	    for (; ptr2 < ptr3 && Memr[ptr2] < z2; ptr2=ptr2+1)
 		;
 	    if (ptr2 - ptr1 > nmax) {
 	        nmax = ptr2 - ptr1
 	        mode = Memr[(ptr2+ptr1)/2]
 	    }
 	    z1 = z1 + zstep
-	} until (ptr2 == ptr3)
+	} until (ptr2 >= ptr3)
 
 	call sfree (sp)
 	return (mode)
@@ -139,6 +140,7 @@ short	mode, ameds()
 real	z1, z2, zstep, zbin
 int	i, n, nx, nmax
 pointer	sp, v1, v2, dv, va, vb, data, ptr1, ptr2, ptr3, imgnls()
+bool	fp_equalr()
 
 begin
 	call smark (sp)
@@ -206,7 +208,7 @@ begin
 	ptr3 = data + n * (1. + ZRANGE) / 2.
 	z1 = Mems[ptr1]
 	z2 = Mems[ptr3]
-	if (z1 == z2) {
+	if (fp_equalr (z1, z2)) {
 	    mode = z1
 	    call sfree (sp)
 	    return (mode)
@@ -219,17 +221,17 @@ begin
 
 	nmax = 0
 	repeat {
-	    for (; Mems[ptr1] < z1; ptr1=ptr1+1)
+	    for (; ptr1 < ptr3 && Mems[ptr1] < z1; ptr1=ptr1+1)
 		;
 	    z2 = z1 + zbin
-	    for (; (ptr2 < ptr3) && (Mems[ptr2] < z2); ptr2=ptr2+1)
+	    for (; ptr2 < ptr3 && Mems[ptr2] < z2; ptr2=ptr2+1)
 		;
 	    if (ptr2 - ptr1 > nmax) {
 	        nmax = ptr2 - ptr1
 	        mode = Mems[(ptr2+ptr1)/2]
 	    }
 	    z1 = z1 + zstep
-	} until (ptr2 == ptr3)
+	} until (ptr2 >= ptr3)
 
 	call sfree (sp)
 	return (mode)

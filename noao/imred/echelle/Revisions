@@ -1,5 +1,12 @@
 .help revisions Jun88 noao.imred.echelle
 .nf
+imred$echelle/ecbplot.cl
+    Added a missing parameter declaration for "cur".  (10/27/89, Valdes)
+
+====
+V2.8
+====
+
 imred$echelle/eccontinuum.par +
 imred$echelle/doc/eccontinuum.hlp +
 imred$echelle/echelle.cl

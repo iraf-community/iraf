@@ -23,7 +23,7 @@ begin
 	# Check for 0 radius aperture.
 	phot = AP_PPHOT(ap)
 	if (Memr[AP_APERTS(phot)] <= 0.0)
-	    return (AP_NOAPERT)
+	    return (AP_APERT_NOAPERT)
 
 	# Compute the maximum aperture size
 	AP_APIX(phot) = NULL
@@ -39,7 +39,7 @@ begin
 
 	# Return the appropriate error code.
 	if (AP_APIX(phot) == NULL) {
-	    return (AP_NOAPERT)
+	    return (AP_APERT_NOAPERT)
 	} else if (AP_NMAXAP(phot) < AP_NAPERTS(phot)) {
 	    return (AP_APERT_OUTOFBOUNDS)
 	} else {

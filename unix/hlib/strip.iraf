@@ -32,5 +32,7 @@
 
 # Sun/IRAF only.
 # ---------------
--file bin.68881/OBJS.arc
--file bin.ffpa/OBJS.arc
+-file bin.f68881/OBJS.arc.Z
+-file bin.ffpa/OBJS.arc.Z
+-file bin.sparc/OBJS.arc.Z
+-file bin.i386/OBJS.arc.Z

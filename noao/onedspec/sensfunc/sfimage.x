@@ -85,7 +85,7 @@ begin
 		call pargstr (Memc[GP_IMAGES(gp,wc)])
 	    return
 	}
-	if (IS_INDEFI (ITM(ids)))
+	if (IS_INDEF (ITM(ids)))
 	    exposure = 1.
 	else
 	    exposure = ITM(ids)

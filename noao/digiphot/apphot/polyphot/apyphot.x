@@ -6,7 +6,6 @@ include "../lib/fitsky.h"
 include "../lib/polyphot.h"
 
 define	HELPFILE	"apphot$polyphot/polyphot.key"
-define	SHELPFILE	"apphot$polyphot/spolyphot.key"
 
 # AP_YPHOT -- Procedure to compute flux inside polygonal apertures.
 
@@ -53,6 +52,7 @@ begin
 	newsky = YES
 	newmagbuf = YES
 	newmag = YES
+
 	cier = AP_OK
 	sier = AP_OK
 	pier = AP_OK
@@ -61,12 +61,6 @@ begin
 	newlist = NO
 	ptid = 0
 	ltid = 0
-
-	# Print short help page.
-	if (id != NULL)
-	    call gpagefile (id, SHELPFILE, "")
-	else if (interactive == YES)
-	    call pagefile (SHELPFILE, "")
 
 	# Loop over the polygon file.
 	nvertices = 0
@@ -125,7 +119,7 @@ begin
 
 	    # Verify the critical parameters.
 	    case 'v':
-		call ap_yconfirm (py)
+		call ap_yconfirm (py, out, stid)
 
 	    # Define a polygon interactively.
 	    case 'g':
@@ -263,7 +257,6 @@ begin
 	    # Process the remainder of the list
 	    case 'l':
 		if (pl != NULL) {
-		    #ptid = ptid + 1; ltid = ltid + 1
 		    call ap_ybphot (py, im, cl, pl, out, stid, ltid, ptid, id,
 		        YES)
 		} else if (interactive == YES)
@@ -279,7 +272,8 @@ begin
 		    cier = ap_ycenter (py, im, wx, wy, Memr[x], Memr[y],
 		        nvertices + 1)
 		else if (newcenter == YES)
-		    cier = ap_yrecenter (py, Memr[x], Memr[y], nvertices + 1)
+		    cier = ap_yrecenter (py, Memr[x], Memr[y], nvertices + 1,
+			cier)
 		if (interactive == YES)
 		    call ap_qcenter (py, cier)
 		call apmark (py, id, apstati (py, MKCENTER), NO, NO)
@@ -319,10 +313,9 @@ begin
 
 	    # Compute the magnitudes of current polygon using the current sky.
 	    case 'p':
-		if (newmagbuf == YES || newmag == YES)
-		    pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
-		        apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
-		        apstati (py, NSKY))
+		pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
+		    apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
+		    apstati (py, NSKY))
 		if (interactive == YES)
 		    call ap_qyprint (py, cier, sier, pier)
 		call appymark (py, id, Memr[x], Memr[y], nvertices + 1, NO, NO,
@@ -330,54 +323,25 @@ begin
 		newmagbuf = NO
 		newmag = NO
 
-	    # Fit the sky and compute the magnitudes.
-	    case 'f':
+	    # Center, compute the sky and the magnitudes and save the results.
+	    case 'h', 'm', 'f', ' ':
 
 		# Compute the centers
-		if (newcenterbuf == YES)
-		    cier = ap_ycenter (py, im, wx, wy, Memr[x], Memr[y],
-		        nvertices + 1)
-		else if (newcenter == YES)
-		    cier = ap_yrecenter (py, Memr[x], Memr[y], nvertices + 1)
-
-		# Compute the sky values.
-	        if (newskybuf == YES || ! fp_equalr (apstatr (py,
-		    PYCX), apstatr (py, SXCUR)) || ! fp_equalr (apstatr (py,
-		    PYCY), apstatr (py, SYCUR)))
-		    sier = apfitsky (py, im, apstatr (py, PYCX), apstatr (py,
-		        PYCY), NULL, gd)
-		else if (newsky == YES)
-		    sier = aprefitsky (py, gd)
-
-		# Compute the magnitudes.
-		if (newmag == YES || newmagbuf == YES)
-		    pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
-			apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
-			apstati (py, NSKY))
-
-		# Print and/or plot the results.
-		if (interactive == YES)
-		    call ap_qyprint (py, cier, sier, pier)
-		call appymark (py, id, Memr[x], Memr[y], nvertices + 1,
-		    apstati (py, MKCENTER), apstati (py, MKSKY), apstati (py,
-		    MKPOLYGON))
-
-		newcenterbuf = NO
-		newcenter = NO
-		newskybuf = NO
-		newsky = NO
-		newmagbuf = NO
-		newmag = NO
-
-	    # Compute the sky and the magnitudes and save the results.
-	    case ' ':
-
-		# Compute the centers
-		if (newcenterbuf == YES)
-		    cier = ap_ycenter (py, im, wx, wy, Memr[x], Memr[y],
-		        nvertices + 1)
-		else if (newcenter == YES)
-		    cier = ap_yrecenter (py, Memr[x], Memr[y], nvertices + 1)
+		if (key == 'f' || key == ' ') {
+		    if (newcenterbuf == YES)
+		        cier = ap_ycenter (py, im, wx, wy, Memr[x], Memr[y],
+		            nvertices + 1)
+		    else if (newcenter == YES)
+		        cier = ap_yrecenter (py, Memr[x], Memr[y],
+			    nvertices + 1, cier)
+		} else {
+		    if (newcenterbuf == YES)
+		        cier = ap_ycenter (py, im, apstatr (py, PYCX),
+			    apstatr (py, PYCY), Memr[x], Memr[y], nvertices + 1)
+		    else if (newcenter == YES)
+		        cier = ap_yrecenter (py, Memr[x], Memr[y],
+			    nvertices + 1, cier)
+		}
 
 		# Compute the sky values and the magnitudes.
 	        if (newskybuf == YES || ! fp_equalr (apstatr (py,
@@ -386,34 +350,32 @@ begin
 		    apstatr (py, PYCX), apstatr (py, PYCY), NULL, gd)
 		else if (newsky == YES)
 		    sier = aprefitsky (py, gd)
-		if (newmag == YES || newmagbuf == YES)
-		    pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
-			apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
-			apstati (py, NSKY))
+		pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
+		    apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
+		    apstati (py, NSKY))
 
-		# Write the results to an output file.
 		if (interactive == YES)
 		    call ap_qyprint (py, cier, sier, pier)
 		call appymark (py, id, Memr[x], Memr[y], nvertices + 1,
 		    apstati (py, MKCENTER), apstati (py, MKSKY), apstati (py,
 		    MKPOLYGON))
-		if (stid == 1)
-		    call ap_param (py, out, "polyphot")
-		if (newlist == YES)
-		    call ap_yprint (py, out, Memr[x], Memr[y], nvertices, stid,
-		        ltid, ptid, cier, sier, pier)
-		else
-		    call ap_yprint (py, out, Memr[x], Memr[y], nvertices, stid,
-		        0, ptid, cier, sier, pier)
 
-		# Set up for the next object
-		stid = stid + 1
-		newcenterbuf = NO
-		newcenter = NO
-		newskybuf = NO
-		newsky = NO
-		newmagbuf = NO
-		newmag = NO
+		newcenterbuf = NO; newcenter = NO
+		newskybuf = NO; newsky = NO
+		newmagbuf = NO; newmag = NO
+
+		# Write the results to an output file.
+		if (key == ' ') {
+		    if (stid == 1)
+		        call ap_param (py, out, "polyphot")
+		    if (newlist == YES)
+		        call ap_yprint (py, out, Memr[x], Memr[y], nvertices,
+			    stid, ltid, ptid, cier, sier, pier)
+		    else
+		        call ap_yprint (py, out, Memr[x], Memr[y], nvertices,
+			    stid, 0, ptid, cier, sier, pier)
+		    stid = stid + 1
+		}
 
 	    default:
 		call printf ("Unknown or ambigous keystroke command\7\n")

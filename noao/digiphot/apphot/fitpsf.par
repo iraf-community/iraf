@@ -2,12 +2,12 @@
 
 image,f,a,,,,Image
 box,r,a,,,,Fitting box width in scale units
+datapars,pset,h,"",,,Data dependent parameters
 function,s,h,"radgauss",,,Fitting function
 maxiter,i,h,50,,,Maximum number of iterations
 kreject,r,h,0.0,,,K-sigma rejection limit
 nreject,i,h,0,,,Maximum number of rejection cycles
 mkbox,b,h,no,,,Draw the fitting box on the display
-datapars,pset,h,"",,,Data dependent parameters
 coords,f,h,"",,,Coordinate list
 output,f,h,"default",,,Results
 graphics,s,h,"stdgraph",,,Graphics device
@@ -16,5 +16,6 @@ commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
 cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 interactive,b,h,yes,,,Mode of use
 verify,b,h,yes,,,Verify critical parameters in non interactive mode
+update,b,h,yes,,,Update critical parameters in non interactive mode
 verbose,b,h,no,,,Print messages in non interactive mode
 mode,s,h,'ql'

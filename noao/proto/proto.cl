@@ -8,6 +8,7 @@ package proto
 task	epix,
 	fixpix,
 	fields,
+	imcentroid,
 	imcntr,
 	imedit,
 	imexamine,
@@ -22,6 +23,7 @@ task	epix,
 	irmatch1d,
 	irmatch2d,
 	irmosaic,
+	join,
 	mkhistogram,
 	radplt,
 	slitpic,
@@ -32,8 +34,8 @@ task	epix,
 	bscale,
 	irafil 		= proto$x_proto.e
 
-task 	join 		= proto$join.cl
 task	ndprep		= proto$ndprep.cl
+task	imalign		= proto$imalign.cl
 
 # Imexamine psets.
 task	cimexam = proto$cimexam.par;	hidetask cimexam

@@ -6,15 +6,36 @@ reset	noao		= iraf$noao/
 task	noao.pkg	= noao$noao.cl
 
 reset	local		= iraf$local/
-#reset	local		= /u2/kpnolocal/
-task	local.pkg	= local$src/local.cl
+#reset	local		= /orion/local/kpnolocal/
+#task	local.pkg	= local$src/local.cl
 
-#reset	stsdas		= /tmp2/stsdas/
+#reset	ctio		= /orion/local/ctio/
+#task	ctio.pkg	= ctio$ctio.cl
+
+#reset	stsdas		= /orion/local/stsdas/
 #task	stsdas.pkg	= stsdas$stsdas.cl
+
+#reset	rv		= /orion/local/iraftest/rv/
+#task	rv.pkg		= rv$rv.cl
+
+#reset	vol		= /orion/local/iraftest/vol/
+#task	vol.pkg		= vol$vol.cl
+
+#reset	newimred	= /orion/local/iraftest/newimred/
+#task	$newimred.pkg	= newimred$newimred.cl
+
+#reset	testphot	= /tucana/u3/extra/testphot/
+#task	testphot.pkg	= testphot$testphot.cl
 
 reset	helpdb		= "lib$helpdb.mip\
 			  ,noao$lib/helpdb.mip\
 			  ,local$lib/helpdb.mip\
-#			  ,stsdas$lib/helpdb.mip\
 			  "
+#			  ,ctio$lib/helpdb.mip\
+#			  ,stsdas$lib/helpdb.mip\
+#			  ,rv$lib/helpdb.mip\
+#			  ,vol$lib/helpdb.mip\
+#			  ,newimred$lib/helpdb.mip\
+#			  ,testphot$lib/helpdb.mip\
+#			  "
 keep

@@ -21,12 +21,13 @@ int	pixtype			# receives pixel type
 int	ier			# receives error status
 
 long	pfsize, clktime, cputime
-pointer	sp, hdrfile, pixfile, osfn, root, extn, im
-int	fp, status, nbytes, nchars, i
+pointer	sp, hdrfile, pixfile, osfn, root, extn, sval, im
+int	fp, status, nbytes, i
 
 pointer	bfopnx()
-int	imwphdr(), fnldir(), imgdirx()
+int	imwphdr()
 define	done_ 91
+define	operr_ 92
 errchk	calloc
 
 begin
@@ -36,6 +37,7 @@ begin
 	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 	call salloc (root, SZ_FNAME, TY_CHAR)
 	call salloc (extn, SZ_FNAME, TY_CHAR)
+	call salloc (sval, SZ_FNAME, TY_CHAR)
 
 	# Verify image size and datatype operands.
 
@@ -58,27 +60,47 @@ begin
 	# Construct name of image header file.
 	call imf_parse (image, Memc[root], Memc[extn])
 	if (Memc[extn] == EOS)
-	    call strcpy (OIF_EXTN, Memc[extn], SZ_FNAME)
+	    call strcpy (OIF_HDREXTN, Memc[extn], SZ_FNAME)
 
 	call strcpy (Memc[root], Memc[hdrfile], SZ_FNAME)
 	call strcat (".", Memc[hdrfile], SZ_FNAME)
 	call strcat (Memc[extn], Memc[hdrfile], SZ_FNAME)
 
-	# Open the header file.
+	# Check to see if the new image would overwrite an existing one.
+	# This is an error, unless "clobber" is defined in the user
+	# environment.
+
 	call strpak (Memc[hdrfile], Memc[osfn], SZ_PATHNAME)
+	call zfacss (Memc[osfn], 0, 0, status)
+	if (status == YES) {
+	    call strpak ("clobber", Memc[sval], SZ_FNAME)
+	    call zgtenv (Memc[sval], Memc[sval], SZ_FNAME, status)
+	    if (status != ERR) {
+		call imdelx (image, ier)
+		if (ier != OK) {
+		    ier = IE_CREHDR
+		    goto operr_
+		}
+	    } else {
+		ier = IE_CLOBBER
+		goto operr_
+	    }
+	}
+
+	# Create the new image.
 	call zopnbf (Memc[osfn], NEW_FILE, fp)
 	if (fp == ERR) {
-	    call sfree (sp)
 	    ier = IE_CREHDR
+operr_	    call sfree (sp)
 	    call im_seterrop (ier, Memc[hdrfile])
 	    return
 	}
 
 	# Allocate and initialize the image header.
-
 	call calloc (im, LEN_IMDES + LEN_IMHDR, TY_STRUCT)
 	call zgtime (clktime, cputime)
 
+	call strcpy ("imhdr", IM_MAGIC(im), SZ_IMMAGIC)
 	call amovi (axlen, IM_LEN(im,1), naxis)
 	IM_NDIM(im) = naxis
 	IM_PIXTYPE(im) = pixtype
@@ -88,22 +110,11 @@ begin
 	call imf_initoffsets (im, SZ_DEVBLK)
 	pfsize = IM_HGMOFF(im) - 1
 
-	# Construct the pixel file name.  Initialize the remaining fields
-	# of the image header.
-
-	nchars = fnldir (Memc[root], Memc[pixfile], SZ_IMPIXFILE)
-	if (nchars > 0)
-	    call strcpy (Memc[root+nchars], Memc[root], SZ_IMPIXFILE)
-
-	nchars = imgdirx (IM_PIXFILE(im), SZ_IMPIXFILE)
-	call strcat (Memc[root], IM_PIXFILE(im), SZ_IMPIXFILE)
-	call strcat (".", IM_PIXFILE(im), SZ_IMPIXFILE)
-	call strcat ("pix", IM_PIXFILE(im), SZ_IMPIXFILE)
-
+	# Get a unique pixel file name.
 	call strcpy (Memc[hdrfile], IM_HDRFILE(im), SZ_IMHDRFILE)
-	call imf_gpixfname (IM_PIXFILE(im), IM_HDRFILE(im), Memc[pixfile],
-	    SZ_PATHNAME)
-	call strcpy ("imhdr", IM_MAGIC(im), SZ_IMMAGIC)
+	call imf_mkpixfname (im, Memc[pixfile], SZ_IMPIXFILE, ier)
+	if (ier != OK)
+	    goto done_
 
 	# Write the image header and close the header file.  Do not use BFIO
 	# to write the header, because we want the file to be odd sized.

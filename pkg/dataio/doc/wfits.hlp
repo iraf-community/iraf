@@ -1,4 +1,4 @@
-.help wfits Mar89 dataio
+.help wfits Jan90 dataio
 .ih
 NAME
 wfits -- convert IRAF image files to FITS image files
@@ -19,14 +19,33 @@ number specified in fits_files, e.g. file 5 if fits_files =
 "mtb1600[5]". Data in file 5 and succeeding files will be overwritten.
 If no tape file number is specified in fits_files, the newtape parameter
 is requested. Tape output will begin at BOT (beginning of tape) if
-newtape = yes, otherwise ate EOT (after the double EOF).
-If more than one file is to be output to disk, the file number is
-appended to the output file name.
+newtape = yes, otherwise at EOT (after the double EOF).
+In the case of disk output fits_files may be either a file name template
+or a root filename. In the former case there must be an output fits file
+name for every image. In the latter case the image sequence number is
+appended to fits_files if the number of input images > 1.
 .le
 .ls newtape
 Boolean parameter specifying whether an output tape is blank or contains
 data. Newtape is requested only if no tape file number is specified in
 fits_files, e.g. fits_files = "mtb1600".
+.le
+.ls bscale
+The FITS bscale parameter, defined as p = i * bscale + bzero, where
+p and i are the physical and tape data values respectively.
+The bscale parameters is only requested if the scale switch is set
+and the autoscale switch is turned off.
+.le
+.ls bzero
+The FITS bzero parameter (see bscale for a definition).
+Bzero is only requested if the scale switch is set and the autoscale
+switch is turned off.
+.le
+.ls make_image = yes
+By default wfits writes the FITS image(s) to the output destination.
+If the make_image switch is turned off, wfits prints the FITS headers
+on the standard output and no output file is created. In this way the
+FITS headers can be examined before actually writing a FITS tape.
 .le
 .ls long_header = no
 If this switch is set the full FITS header will be printed on the standard
@@ -37,17 +56,29 @@ If this switch is set only a short header, listing files processed and
 their dimensions will be printed on the standard output.
 The long_header switch must be turned off.
 .le
-.ls make_image = yes
-By default wfits writes the FITS image(s) to the output destination.
-If the make_image switch is turned off, wfits prints the FITS headers
-on the standard output and no output file is created. In this way the
-FITS headers can be examined before actually writing a FITS tape.
-.le
 .ls bitpix = 0
 A bitpix of 8, 16, or 32 will produce either an unsigned byte,
 twos-complement 16 bit integer, or twos-complement 32 bit integer FITS
-image. If bitpix is set to any other value, wfits will choose one of 8, 16 or
-32 based on the precision of the IRAF image.
+image. If bitpix is set to 0 (the default), wfits will choose one of 8,
+16 or 32 based on the precision of the IRAF image. If bitpix is -32 or
+-64 IEEE real or double precision floating point FITS images are produced.
+Although this option can avoid the loss of precision involved with scaling
+real data to integers, users should be wary about its use as many
+local FITS readers and versions of IRAF earlier than 2.9 do not
+support this option.
+.le
+.ls blocking_factor = 1
+The tape blocking factor for FITS. WFITS normally writes 2880 byte records.
+If the blocking factor is greater than 1 and less than or equal to 10, then
+\fIblocking_factor\fR * 2880
+byte records will be written to a single tape record. The FITS standard
+specifies that \fIblocking_factor\fR must be less than or equal to 10.
+If \fIblocking_factor\fR > 10 then WFITS will interpret this number as the
+actual tape block size in bytes. For example if \fIblocking_factor\fR = 1024
+then 1024 byte records will be written to tape. This is a very dangerous
+option and has been included to accomodate users with restricted block
+size devices such as SUN microcassettes. WFITS will issue a warning message
+if it sees an illegal block size before it begins to execute.
 .le
 .ls scale = yes
 If the scale switch is set, the IRAF image will be scaled before output.
@@ -64,40 +95,17 @@ bzero  factors
 based on the IRAF image data type, and the maximum and minimum
 values of the data.
 .le
-.ls bscale
-The FITS bscale parameter, defined as p = i * bscale + bzero, where
-p and i are the physical and tape data values respectively.
-The bscale parameters is only requested if the scale switch is set
-and the autoscale switch is turned off.
-.le
-.ls bzero
-The FITS bzero parameter (see bscale for a definition).
-Bzero is only requested if the scale switch is set and the autoscale
-switch is turned off.
-.le
-.ls blocking_factor = 1
-The tape blocking factor for FITS. WFITS normally writes 2880 byte records.
-If the blocking factor is greater than 1 and less than or equal to 10, then
-\fIblocking_factor\fR 2880
-byte records will be written to a single tape record. The FITS standard
-specifies that \fIblocking_factor\fR must be less than or equal to 10.
-If \fIblocking_factor\fR > 10 then WFITS will interpret this number as the
-actual tape block size in bytes. For example if \fIblocking_factor\fR = 1024
-then 1024 byte records will be written to tape. This is a very dangerous
-option and has been included to accomodate users with restricted block
-size devices such as SUN microcassettes. WFITS will issue a warning message
-if it sees an illegal block size before it begins to execute.
-.le
 .ih
 DESCRIPTION
 
 IRAF data is read from disk and written to the specified destination,
 either disk or magnetic tape. The FITS header may optionally be printed
 on the standard output as either a full listing or a short description,
-with or without creating an output image file. If a nonstandard value
-of bitpix (default = 0) is entered wfits will select the the appropriate
-bitpix value based on the precision of the IRAF data. Two data scaling
-options are availble. In autoscale mode wfits calculates the appropriate
+with or without creating an output image file. If a the default value
+of bitpix (default = 0) is entered, wfits will select the the appropriate
+bitpix value based on the precision of the IRAF data. Otherwise the
+user value is used with possible loss of precision. Two data scaling
+options are available. In autoscale mode wfits calculates the appropriate
 scaling factors based on the maximum and minimum data values in the
 IRAF image and the FITS bits per pixel. Alternatively the scaling factors
 can be entered directly. If no scaling is requested the IRAF data values
@@ -112,6 +120,19 @@ and scaling parameters.
 
 .nf
 	cl> wfits iraf_file* mtb1600[1]
+.fi
+
+Convert a series of IRAF image files to FITS image files on disk,
+allowing wfits to select the appropriate bitpix and scaling parameters.
+In the first case the images specified by the template are written
+to fits001, fits002 etc. In the second case the list of input images
+specified onr per line in the text file imlist are written to the
+files specified one per line in the text file fitslist.
+
+.nf
+	cl> wfits iraf_file* fits
+
+	cl> wfits @imlist @fitslist
 .fi
 
 Convert an IRAF image file to a 32 bits per pixel FITS file with no
@@ -154,7 +175,7 @@ detected, WFITS issues an error message and attempts to write a double
 EOF at the end of the last good record. In this case the last file on
 the tape will be a partial file. IF WFITS is not successful in writing
 the double EOF, the message "Cannot close magtape file (name)" will be
-issued. Problem occurs as some drives permit the double EOF to be
+issued. Problems occur as some drives permit the double EOF to be
 written after the physical end of tape and some do not. Similarly
 some drives can read a double EOF after end of tape and some cannot. Depending
 on operating system and device driver, an attempt to read or write past

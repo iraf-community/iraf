@@ -57,7 +57,11 @@ int	new;			/* new file			*/
 	 * names.
 	 */
 	for (ip=fname, op=osfn;  (*op = *ip++);  op++)
+#ifdef apollo
+	    if (*op == '/' && op > osfn+1 && *(op-1) == '/')
+#else
 	    if (*op == '/' && op > osfn && *(op-1) == '/')
+#endif
 		--op;
 
 	return (osfn);

@@ -32,14 +32,14 @@ int	fntopnb(), fstati()
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_LINE, TY_CHAR)
+	call salloc (template, SZ_COMMAND, TY_CHAR)
 
 	sort = YES
 
 	if (fstati (STDIN, F_REDIR) == YES)
 	    list = fntopnb ("STDIN", sort)
 	else {
-	    call clgstr (param, Memc[template], SZ_LINE)
+	    call clgstr (param, Memc[template], SZ_COMMAND)
 	    list = fntopnb (Memc[template], sort)
 	}
 
@@ -60,11 +60,11 @@ int	fntopnb()
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_LINE, TY_CHAR)
+	call salloc (template, SZ_COMMAND, TY_CHAR)
 
 	sort = YES
 
-	call clgstr (param, Memc[template], SZ_LINE)
+	call clgstr (param, Memc[template], SZ_COMMAND)
 	list = fntopnb (Memc[template], sort)
 
 	call sfree (sp)
@@ -84,11 +84,11 @@ int	fntopnb()
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_LINE, TY_CHAR)
+	call salloc (template, SZ_COMMAND, TY_CHAR)
 
 	sort = NO
 
-	call clgstr (param, Memc[template], SZ_LINE)
+	call clgstr (param, Memc[template], SZ_COMMAND)
 	list = fntopnb (Memc[template], sort)
 
 	call sfree (sp)

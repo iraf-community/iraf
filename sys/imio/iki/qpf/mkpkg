@@ -12,9 +12,10 @@ libex.a:
 	qpfcopypar.x	qpf.h <error.h> <imhdr.h> <imio.h> <qpset.h>
 	qpfdelete.x	<error.h>
 	qpfopen.x	qpf.h <error.h> <imhdr.h> <imio.h> <mach.h>\
-			<qpset.h> <qpioset.h>
+			<qpioset.h> <qpset.h>
 	qpfopix.x	qpf.h <imhdr.h> <imio.h>
 	qpfrename.x	qpf.h <error.h>
 	qpfupdhdr.x	
+	qpfwfilter.x	qpf.h
 	zfioqp.x	qpf.h <fio.h> <imhdr.h> <imio.h> <mach.h> <qpioset.h>
 	;

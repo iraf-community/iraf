@@ -1,0 +1,26 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	"../mwcs.h"
+
+# MW_C1TRAN -- Optimized 1D coordinate transformation.
+
+PIXEL procedure mw_c1tran$t (a_ct, x)
+
+pointer	a_ct			#I pointer to CTRAN descriptor
+PIXEL	x			#I coordinates in input system
+
+PIXEL	y
+pointer	ct
+
+begin
+	# Get real or double version of descriptor.
+	ct = CT_$T(a_ct)
+
+	# Perform the transformation; LNR is a simple linear transformation.
+	if (CT_TYPE(ct) == LNR) {
+	    return (Mem$t[CT_LTM(ct)] * x + Mem$t[CT_LTV(ct)])
+	} else {
+	    call mw_ctran$t (a_ct, x, y, 1)
+	    return (y)
+	}
+end

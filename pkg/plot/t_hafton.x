@@ -17,25 +17,22 @@ define	LEN_STDLINE	40
 
 procedure t_hafton()
 
+int	sign
+bool	sub, pre
+pointer	im, subras, gp
+int	tcojmp[LEN_JUMPBUF]
 char	imsect[SZ_FNAME], mapping_function[SZ_FNAME]
 char	device[SZ_FNAME], title[SZ_LINE], system_id[SZ_LINE]
-pointer	im, subras
-int	tcojmp[LEN_JUMPBUF]
 int	ncols, nlines, epa, status, wkid, mode, old_onint
-int	nlevels, nprm, nopt
-int	xres, yres, nfunction
-real	first_col, last_col, first_row, last_row
-real	vx1, vx2, vy1, vy2
-int	x_sample, y_sample, sign, subsample
+int	nlevels, nprm, nopt, xres, yres, nfunction, nx, ny
 real	z1, z2, wx1, wx2, wy1, wy2, contrast
+real	xs, xe, ys, ye, vx1, vx2, vy1, vy2
 
-pointer	gp, gopen()
-
-bool	clgetb(), fp_equalr(), streq()
-int	clgeti(), btoi(), strncmp()
 real	clgetr()
 extern	hf_tco_onint()
-pointer	immap(), imgs2r()
+int	clgeti(),  strncmp()
+pointer	gopen(), plt_getdata(), immap()
+bool	clgetb(), fp_equalr(), streq()
 common	/tcocom/ tcojmp
 
 begin
@@ -48,6 +45,7 @@ begin
 
 	z1 = clgetr ("z1")
 	z2 = clgetr ("z2")
+
 	# Gaurantee that image min/max is up to date
 	if (IM_LIMTIME(im) < IM_MTIME(im))
 	    call hf_minmax (im, IM_MIN(im), IM_MAX(im))
@@ -80,11 +78,9 @@ begin
 	else
 	    call error (0, "Hafton: unknown mapping function")
 
-
 	sign = 1.0
 	if (contrast < 0.0)
 	    sign = -1.0
-
 	nopt = sign * nfunction
 
 	mode = NEW_FILE
@@ -94,53 +90,43 @@ begin
 	# Read in subraster.  Image resolution can be decreased by
 	# subsampling or block averaging.
 
-	ncols  = IM_LEN(im, 1)
-	nlines = IM_LEN(im, 2)
-	first_col = 1.0
-	last_col  = real (ncols)
-	first_row = 1.0
-	last_row  = real (nlines)
-
 	xres = clgeti ("xres")
 	yres = clgeti ("yres")
+	sub = clgetb ("subsample")
+	pre = clgetb ("preserve")
 
-	# Does images resolution need to be decreased?  It does if the number
-	# of rows or columns exceeds the x or y resolution and the user
-	# hasn't prevented subsampling by setting xres or yres to 0.
-
-	if (ncols > xres && xres != 0)
-	    # Need to decrease resolution in x
-	    x_sample = (ncols + xres - 1) / xres
-	else
-	    x_sample = 1
-
-	if (nlines > yres && yres != 0)
-	    # Need to decrease resolution in y
-	    y_sample = (nlines + yres - 1) / yres
-	else
-	    y_sample = 1
-
-	subsample = btoi (clgetb ("subsample"))
-	if (x_sample > 1 || y_sample > 1) 
-	    call plt_getdata (im, subsample, imsect, x_sample, y_sample,
-		subras, ncols, nlines, clgetb("preserve"))
-	else
-	    subras = imgs2r (im, 1, ncols, 1, nlines)
-
-	call clgstr ("title", title, SZ_LINE)
+	# Retrieve values from image header that will be needed.
+	ncols = IM_LEN(im,1)
+	nlines = IM_LEN(im,2)
 	if (streq (title, "imtitle")) {
 	    call strcpy (imsect, title, SZ_LINE)
 	    call strcat (": ", title, SZ_LINE)
 	    call strcat (IM_TITLE(im), title, SZ_LINE)
 	}
 
-	if (nfunction == 6)
+	xs = 1.0
+	xe = real (ncols)
+	ys = 1.0
+	ye = real (nlines)
+
+	# Get data with proper resolution.  Procedure plt_getdata returns
+	# a pointer to the data matrix to be contoured.  The resolution
+	# is decreased by the specified mathod in this procedure.  The
+	# dimensions of the data array are also returned.  The image
+	# header pointer can be unmapped after plt_getdata is called.
+
+	nx = 0
+	ny = 0
+	subras = plt_getdata (im, sub, pre, xres, yres, nx, ny)
+
+	if (nfunction == 6) {
 	    # User wants crtpict automatic algorithm - linear mapping
 	    # between calculated z1, z2 using possible non-integer contrast.
 	    # Get z1, z2 as if positive contrast.  Set nopt later to negative
 	    # if necessary.
-	    call zscale (im, z1, z2, abs(contrast), SAMPLE_SIZE, LEN_STDLINE)
 
+	    call zscale (im, z1, z2, abs(contrast), SAMPLE_SIZE, LEN_STDLINE)
+	}
 
 	call eprintf ("Intensities from z1=%.2f to z2=%.2f mapped with a")
     	    call pargr (z1)
@@ -159,18 +145,19 @@ begin
 	    call eprintf ("n arcsine function\n")
         case (6):
 	    call eprintf (" CRTPICT function\n")
-	    if (nopt > 0)
+	    if (nopt > 0) {
 		# Positive contrast.  Set nopt to positive linear mapping.
 	        nopt = 1
-	    else 
+	    } else  {
 		# Negative contrast. Set nopt to negative linear mapping.
 		nopt = -1
+	    }
         }
 
-	vx1  = clgetr ("vx1")
-	vx2  = clgetr ("vx2")
-	vy1  = clgetr ("vy1")
-	vy2  = clgetr ("vy2")
+	vx1 = clgetr ("vx1")
+	vx2 = clgetr ("vx2")
+	vy1 = clgetr ("vy1")
+	vy2 = clgetr ("vy2")
 
 	# Open device and make contour plot.
 	call gopks (STDERR)
@@ -179,8 +166,8 @@ begin
 	call gopwk (wkid, DUMMY, gp)
 	call gacwk (wkid)
 
-	call pl_map_viewport (gp, ncols, nlines, vx1, vx2, vy1, vy2, 
-	    clgetb ("fill"))
+	call pl_map_viewport (gp,
+	    ncols, nlines, vx1, vx2, vy1, vy2, clgetb ("fill"), true)
 	nprm = -1
 
 	# Install interrupt exception handler.
@@ -192,7 +179,7 @@ begin
 
 	call zsvjmp (tcojmp, status)
 	if (status == OK) {
-	    call hafton (Memr[subras], ncols, ncols, nlines, z1, z2,
+	    call hafton (Memr[subras], nx, nx, ny, z1, z2,
 	        nlevels, nopt, nprm, 0, 0.)
 	} else {
 	    call gcancel (gp)
@@ -201,18 +188,19 @@ begin
 
 	# Should a fancy (crtpict like) perimeter be drawn around the plot?
 	if (clgetb ("perimeter")) {
-	    call gswind (gp, first_col, last_col, first_row, last_row)
+	    call gswind (gp, xs, xe, ys, ye)
 	    call draw_perimeter (gp)
 	} else
 	    call perim (1, ncols - 1, nlines - 1, 1)
 
 	# Now find window and output text string title.  The window is
 	# set to the full image coordinates for labelling.
+
 	call ggview (gp, wx1, wx2, wy1, wy2)
 	call gseti (gp, G_WCS, 0)
 	call gtext (gp, (wx1 + wx2) / 2.0, wy2 + .03, title, "h=c;v=b;f=b;s=.7")
 
-	# Add system id banner to plot
+	# Add system id banner to plot.
 	call gseti (gp, G_CLIP, NO)
 	call sysid (system_id, SZ_LINE)
 	call gtext (gp, (wx1+wx2)/2.0, wy1-0.07, system_id, "h=c;v=b;s=.5")
@@ -222,9 +210,8 @@ begin
 	call gclks ()
 	call imunmap (im)
 
-	if (subsample == NO && (x_sample > 1 || y_sample > 1))
-	    # Free space used for scaled input routines
-	    call mfree (subras, TY_REAL)
+	# Free space used for scaled input routines.
+	call mfree (subras, TY_REAL)
 end
 
 

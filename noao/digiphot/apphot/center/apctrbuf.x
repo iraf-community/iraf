@@ -1,5 +1,6 @@
 include <imhdr.h>
 include <math.h>
+include <mach.h>
 include "../lib/apphotdef.h"
 include "../lib/centerdef.h"
 include "../lib/center.h"
@@ -16,7 +17,7 @@ real	wx, wy		# center coordinates
 
 int	icpix
 pointer	ctr
-real	cpix
+real	cpix, gdatamin, gdatamax, datamin, datamax
 pointer	ap_ctrpix()
 
 begin
@@ -25,7 +26,7 @@ begin
 
 	# Check for 0 sized aperture.
 	if (AP_CAPERT(ctr) <= 0.0)
-	    return (AP_NOCTRAREA)
+	    return (AP_CTR_NOAREA)
 
 	# Get the centering buffer of pixels.
 	cpix = max (1.0, AP_CAPERT(ctr) * AP_SCALE(ap))
@@ -35,7 +36,22 @@ begin
 	AP_CTRPIX(ctr) = ap_ctrpix (im, wx, wy, icpix,
 	    AP_CXC(ctr), AP_CYC(ctr), AP_CNX(ctr), AP_CNY(ctr))
 	if (AP_CTRPIX(ctr) == NULL)
-	    return (AP_NOCTRAREA)
+	    return (AP_CTR_NOAREA)
+
+	# Compute the data limits.
+	if (IS_INDEFR(AP_DATAMIN(ap)))
+	    gdatamin = -MAX_REAL
+	else
+	    gdatamin = AP_DATAMIN(ap)
+	if (IS_INDEFR(AP_DATAMAX(ap)))
+	    gdatamax = MAX_REAL
+	else
+	    gdatamax = AP_DATAMAX(ap)
+	call alimr (Memr[AP_CTRPIX(ctr)], AP_CNX(ctr) * AP_CNY(ctr),
+	    datamin, datamax)
+
+	if (datamin < gdatamin || datamax > gdatamax)
+	    return (AP_CTR_BADDATA)
 	else if (AP_CNX(ctr) < icpix || AP_CNY(ctr) < icpix)
 	    return (AP_CTR_OUTOFBOUNDS)
 	else

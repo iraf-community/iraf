@@ -49,19 +49,26 @@ begin
 
 	# Open the apphot structure.
 	if (naperts <= 0)
-	    call apinit (ap, cfunction, cbox, sfunction, annulus,
+	    call appinit (ap, cfunction, cbox, sfunction, annulus,
 	        dannulus, 0.0, 1, weight, fwhmpsf, noise) 
 	else
-	    call apinit (ap, cfunction, cbox, sfunction, annulus,
+	    call appinit (ap, cfunction, cbox, sfunction, annulus,
 	        dannulus, Memr[aperts], naperts, weight, fwhmpsf, noise) 
 
 	# Set the remaining noise parameters.
 	call clgpset (np, "exposure", Memc[str], SZ_LINE)
 	call apsets (ap, EXPOSURE, Memc[str])
+	call apsetr (ap, ITIME, clgpsetr (np, "itime"))
+	call clgpset (np, "airmass", Memc[str], SZ_LINE)
+	call apsets (ap, AIRMASS, Memc[str])
+	call apsetr (ap, XAIRMASS, clgpsetr (np, "xairmass"))
+	call clgpset (np, "filter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTER, Memc[str])
+	call clgpset (np, "ifilter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTERID, Memc[str])
 	call apsetr (ap, SCALE, 1.0 / clgpsetr (np, "scale"))
 	call apsetr (ap, DATAMIN, clgpsetr (np, "datamin"))
 	call apsetr (ap, DATAMAX, clgpsetr (np, "datamax"))
-	call apsetr (ap, ITIME, clgpsetr (np, "itime"))
 	call apseti (ap, POSITIVE, btoi (clgpsetb (np, "emission")))
 	call apsetr (ap, THRESHOLD, clgpsetr (np, "threshold"))
 	call apsetr (ap, CTHRESHOLD, clgpsetr (np, "cthreshold"))

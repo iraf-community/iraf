@@ -1,4 +1,4 @@
-.help irmosaic Jan88 proto
+.help irmosaic Oct89 proto
 .ih
 NAME
 irmosaic -- mosaic a set of infrared ccd images
@@ -28,16 +28,16 @@ The number of subrasters along a row of the output image.
 .ls nysub
 The number of subrasters along a column of the output image.
 .le
-.ls section = "[*,*]"
+.ls trim_section = "[*,*]"
 The section of the input images to be mosaiced into the output image.
 Section can be used to flip and/or trim the individual subrasters before adding
 them to the mosaic. For example if we want to flip each subraster around the
-y axis before adding it to the mosaic, then \fIsection\fR = "[*,-*]".
+y axis before adding it to the mosaic, then \fItrim_section\fR = "[*,-*]".
 .le
-.ls unobserved = ""
+.ls null_input = ""
 The list of unobserved subrasters. For example if the subrasters 3 to 5 and
 10 of a sequence of observations were not observed then
-\fIunobserved\fR = "3-5,10".
+\fInull_input\fR = "3-5,10".
 This parameter follows the ranges notation convention. The number of unobserved
 subrasters plus the number of images must equal \fInxsub\fR *
 \fInysub\fR.
@@ -53,7 +53,27 @@ Add subrasters to the output image in row or column order. The options are
 .le
 .ls raster = no
 Add subrasters to the output image in a raster pattern or return to the start
-of a column or a row.
+of a column or a row?
+.le
+.ls median_section = ""
+The section of each input subraster for which the median is computed. If
+\fImedian_section\fR is the null string then the medians are not computed.
+If \fImedian_section\fR is "[*,*]" the whole input subraster is used to
+compute the median.
+.le
+.ls subtract = no
+Subtract the median value from each input subraster before placing the
+subraster in the output image.
+.le
+.ls nimcols = INDEF
+The number of columns in the output image. If \fInimcols\fR is INDEF then
+the program will compute the number of columns using the size of the input
+subrasters, \fInxsub\fR and \fInxoverlap\fR.
+.le
+.ls nimrows = INDEF
+The number of rows in the output image. If \fInimrows\fR is INDEF then
+the program will compute the number of rows using the size of the input
+subrasters, \fInysub\fR and \fInyoverlap\fR.
 .le
 .ls nxoverlap = -1
 The number of columns between adjacent frames. A negative value specifies 
@@ -66,16 +86,6 @@ The number of rows between adjacent frames. A negative value specifies
 the amount of row space between adjacent subrasters.
 A positive value specifies the amount of row overlap on adjacent subrasters.
 .le
-.ls nimcols = INDEF
-The number of columns in the output image. If \fInimcols\fR is INDEF then
-the program will compute the number of columns using the size of the input
-subrasters, \fInxsub\fR and \fInxoverlap\fR.
-.le
-.ls nimrows = INDEF
-The number of rows in the output image. If \fInimrows\fR is INDEF then
-the program will compute the number of rows using the size of the input
-subrasters, \fInysub\fR and \fInyoverlap\fR.
-.le
 .ls oval = 0.0
 The output image pixel value in regions undefined by the by the list of input
 images.
@@ -85,15 +95,8 @@ The pixel type of the output image. The options are "s" (short integer),
 "i" (integer), "l" (long integer), "r" (real) and "d" for double
 precision.
 .le
-.ls median = no
-Compute the median of each input subraster.
-.le
-.ls subtract = no
-Subtract the median value from each input subraster before placing the
-subraster in the output image.
-.le
-.ls verbose = no
-Print messages about actions taken etc.
+.ls verbose = yes
+Print messages about task progress and actions taken.
 .le
 .ih
 DESCRIPTION
@@ -103,7 +106,7 @@ by \fIinput\fR and combines them into a single
 output image \fIoutput\fR. The order in which the subrasters are placed
 in the output image is determined by the parameters \fIcorner\fR,
 \fIdirection\fR and \fIraster\fR. The orientation of each individual
-subraster in the output image may be altered by setting the \fIsection\fR
+subraster in the output image may be altered by setting the \fItrim_section\fR
 parameter.
 
 IRMOSAIC uses the subraster size, the number of subrasters, the \fInxoverlap\fR
@@ -113,8 +116,11 @@ minimum required can be specified by setting \fInimcols\fR and \fInimrows\fR.
 The pixel type of the output image is specified by \fIopixtype\fR and undefined
 regions of the output image are given the value \fIoval\fR.
 
-The median of each subraster may be optionally computed and placed in the
-database file. Task action messages will be printed on the standard output
+The median of a section each subraster may be optionally computed
+and placed in the database file by setting \fImedian_section\fR.
+The computed median will be subtracted from the input subrasters if
+\fIsubtract\fR is set to yes.
+Task action messages will be printed on the standard output
 if \fIverbose\fR is set to yes.
 .ih
 EXAMPLES
@@ -125,21 +131,27 @@ between each subraster.
 
 .nf
 	pr> irmosaic @imlist mosaic mosaic.dat nxsub=8 nysub=8 \
-	    nxoverlap=-1 nyoverlap=-1 corner="ur" order="column"
+	    nxoverlap=-1 nyoverlap=-1 corner="ur" direct="column"
+.fi
+
+2. Mosaic a list of 62 infrared images onto an 8 by 8 grid in column order
+starting in the upper right hand corner. Allow one blank column and row
+between each subraster. Subrasters 3 and 9 in the sequence do not exist
+and are to be replaced in the output image with an unknown value of -1.0.
+
+.nf
+	pr> irmosaic @imlist mosaic mosaic.dat nxsub=8 nysub=8 \
+	    nxoverlap=-1 nyoverlap=-1 corner="ur" direct="column"\
+	    null_input="3,9", oval=-1.0
 .fi
 
 .ih
 TIME REQUIREMENTS
 .ih
 BUGS
-At present this routine reads an entire subraster into memory before
-inserting it into the output image. If the size of each subraster
-becomes very large the timings may become very long and/or memory
-allocation problems occur.
-
 At present only integral pixel overlaps are allowed in this routine.
 Fine tuning of the alignments can be done with iralign.
 .ih
 SEE ALSO
-iralign
+iralign,irmatch1d,irmatch2d
 .endhelp

@@ -47,10 +47,10 @@ begin
 
 	# Open the apphot structure.
 	if (naperts <= 0.0)
-	    call apinit (ap, cfunction, cbox, sfunction, annulus,
+	    call appinit (ap, cfunction, cbox, sfunction, annulus,
 	        dannulus, 0.0, 1, AP_PWCONSTANT, fwhmpsf, noise) 
 	else
-	    call apinit (ap, cfunction, cbox, sfunction, annulus,
+	    call appinit (ap, cfunction, cbox, sfunction, annulus,
 	        dannulus, Memr[aperts], naperts, AP_PWCONSTANT, fwhmpsf, noise) 
 
 	# Set the remaining noise parameters.
@@ -67,9 +67,17 @@ begin
 	call clgpset (np, "ccdread", Memc[str], SZ_LINE)
 	call apsets (ap, CCDREAD, Memc[str])
 	call apsetr (ap, READNOISE, clgpsetr (np, "readnoise"))
+
 	call clgpset (np, "exposure", Memc[str], SZ_LINE)
 	call apsets (ap, EXPOSURE, Memc[str])
 	call apsetr (ap, ITIME, clgpsetr (np, "itime"))
+	call clgpset (np, "airmass", Memc[str], SZ_LINE)
+	call apsets (ap, AIRMASS, Memc[str])
+	call apsetr (ap, XAIRMASS, clgpsetr (np, "xairmass"))
+	call clgpset (np, "filter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTER, Memc[str])
+	call clgpset (np, "ifilter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTERID, Memc[str])
 
 	# Set the remainder of the centering parameters.
 	call apsetr (ap, MAXSHIFT, clgpsetr (cp, "maxshift"))

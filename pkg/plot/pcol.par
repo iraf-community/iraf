@@ -1,5 +1,5 @@
-image,s,a,,,,Image containing column to be plotted
-col,i,a,,1,,Column to be plotted
+image,s,a,,,,image containing column to be plotted
+col,i,a,,1,,column to be plotted
 wx1,r,h,0.,,,left user x-coord if not autoscaling
 wx2,r,h,0.,,,right user x-coord if not autoscaling
 wy1,r,h,0.,,,lower user y-coord if not autoscaling

@@ -1,0 +1,17 @@
+# Declare the IMFORT test/demo tasks as CL foreign tasks [MACHDEP].
+# Usage: uncomment the appropriate declarations, and type `cl < tasks.cl'.
+
+task $args = "$args:==\$irafdisk:[iraf.sys.imfort.tasks]args.exe!args $1 $2 $3 $4 $5"
+task $hello = "$hello:==\$irafdisk:[iraf.sys.imfort.tasks]hello.exe!hello"
+task $imcopy = "$imcopy:==\$irafdisk:[iraf.sys.imfort.tasks]imcopy.exe!imcopy $(*)"
+task $imdel = "$imdel:==\$irafdisk:[iraf.sys.imfort.tasks]imdel.exe!imdel $(*)"
+task $imren = "$imren:==\$irafdisk:[iraf.sys.imfort.tasks]imren.exe!imren $(*)"
+task $keyw = "$keyw:==\$irafdisk:[iraf.sys.imfort.tasks]keyw.exe!keyw"
+task $minmax = "$minmax:==\$irafdisk:[iraf.sys.imfort.tasks]minmax.exe!minmax $(*)"
+task $mkim = "$mkim:==\$irafdisk:[iraf.sys.imfort.tasks]mkim.exe!mkim $(*) $2 $3 $4"
+task $pcube = "$pcube:==\$irafdisk:[iraf.sys.imfort.tasks]pcube.exe!pcube $(*) $2 $3 $4 $5 $6 $7"
+task $phead = "$phead:==\$irafdisk:[iraf.sys.imfort.tasks]phead.exe!phead $(1) $2"
+task $planck = "$planck:==\$irafdisk:[iraf.sys.imfort.tasks]planck.exe!planck"
+task $readim = "$readim:==\$irafdisk:[iraf.sys.imfort.tasks]readim.exe!readim $(*)"
+
+keep

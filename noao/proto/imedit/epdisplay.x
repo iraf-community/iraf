@@ -113,6 +113,7 @@ bool	erase		# Erase?
  
 real	zoom
 int	nc, nl, nx, ny, zx, zy, x1, x2, y1, y2
+data	zoom/1./
  
 begin
 	erase = true

@@ -46,7 +46,7 @@ XINT	*nbits;			/* number of bits to be set		*/
 /* BITUPK -- Unpack an unsigned integer bit field from a longword.
  */
 BITUPK (wordp, offset, nbits)
-unsigned XINT	*wordp;		/* longword to be written into		*/
+unsigned XINT	*wordp;		/* longword to be examined		*/
 XINT	*offset;		/* one-indexed offset of first bit	*/
 XINT	*nbits;			/* number of bits to be set		*/
 {

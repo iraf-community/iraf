@@ -48,7 +48,7 @@ median		hlp=doc$median.hlp,	src=filters$t_median.x
 minmax		hlp=doc$minmax.hlp,	src=imutil$t_minmax.x
 mode		hlp=doc$mode.hlp,	src=filters$t_mode.x
 register	hlp=doc$register.hlp
-revisions	hlp=Revisions
+revisions	sys=Revisions
 rotate		hlp=doc$rotate.hlp
 sections	hlp=doc$sections.hlp,	src=iminfo$t_sections.x
 shiftlines	hlp=doc$shiftlines.hlp,	src=geometry$t_shiftlines.x

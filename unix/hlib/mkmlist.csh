@@ -2,10 +2,11 @@
 # MKMLIST -- Make a library member list on the standard output, e.g., for
 # inclusion in a MKPKG file.
 
-unalias	ls ex rm	# try to protect people from themselves
+# try to protect people from themselves...
+unalias	ls ex rm grep sed sort uniq cat
 
 ls	*.[xfcs] > _ml1
-fgrep	include *.x >> _ml1
+grep	'^include' *.x >> _ml1
 
 grep -v	'#' _ml1 | grep -v '<syserr.h>' | sort | uniq |\
 	sed -e	's/^.*include./ /' | sed -e 's/\"//g' |\

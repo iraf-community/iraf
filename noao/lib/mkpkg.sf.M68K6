@@ -1,0 +1,15 @@
+# NOAO pkg mkpkg special file list for Domain/OS, SR10.1, Motorola architecture.
+
+# All files needing special processing for the local host operating system,
+# e.g., to permit host dependent optimization or to work around compiler bugs,
+# should be listed here.
+
+# Files requiring special compilation due to host compiler bugs.
+# -------------------------------------------------------------
+
+$set	XNO	= '& "$xc -cq -/W0,-opt,0,-db,-cpu,3000 &"'
+
+$special "noao$onedspec/identify/":
+	idlinelist.x	$(XNO)
+	;
+

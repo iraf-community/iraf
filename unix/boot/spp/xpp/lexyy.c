@@ -6,7 +6,7 @@
 # define YYLERR yysvec
 # define YYSTATE (yyestate-yysvec-1)
 # define YYOPTIM 1
-# define YYLMAX 1024
+# define YYLMAX BUFSIZ
 # define output(c) putc(c,yyout)
 # define input() (((yytchar=yysptr>yysbuf?U(*--yysptr):getc(yyin))==10?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
 # define unput(c) {yytchar= (c);if(yytchar=='\n')yylineno--;*yysptr++=yytchar;}
@@ -278,7 +278,7 @@ int	typecode;
 	else
 	    dtype = typecode;
 }
-int yyvstop[] ={
+int yyvstop[] = {
 0,
 
 42,
@@ -893,7 +893,7 @@ int yyvstop[] ={
 0,
 0};
 # define YYTYPE int
-struct yywork { YYTYPE verify, advance; } yycrank[] ={
+struct yywork { YYTYPE verify, advance; } yycrank[] = {
 0,0,	0,0,	1,0,	1,0,	
 1,0,	1,0,	1,0,	1,0,	
 1,0,	1,0,	1,0,	1,3,	
@@ -2271,7 +2271,7 @@ struct yywork { YYTYPE verify, advance; } yycrank[] ={
 262,266,	262,266,	262,266,	262,266,	
 262,266,	0,0,	0,0,	0,0,	
 0,0};
-struct yysvf yysvec[] ={
+struct yysvf yysvec[] = {
 0,	0,	0,
 yycrank+-1,	0,		0,	
 yycrank+97,	0,		0,	
@@ -2542,7 +2542,7 @@ yycrank+0,	0,		yyvstop+421,
 0,	0,	0};
 struct yywork *yytop = yycrank+5500;
 struct yysvf *yybgin = yysvec+1;
-char yymatch[] ={
+char yymatch[] = {
 00  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
 01  ,011 ,012 ,01  ,01  ,01  ,01  ,01  ,
 01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
@@ -2560,7 +2560,7 @@ char yymatch[] ={
 'a' ,'a' ,'a' ,'a' ,'a' ,'a' ,'a' ,'a' ,
 'a' ,'a' ,'a' ,01  ,01  ,01  ,01  ,01  ,
 0};
-char yyextra[] ={
+char yyextra[] = {
 0,1,1,1,1,1,1,1,
 1,1,1,1,1,1,0,0,
 0,1,0,1,1,1,1,1,
@@ -2568,7 +2568,9 @@ char yyextra[] ={
 0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,
 0};
-/*	ncform	4.1	83/08/11	*/
+#ifndef lint
+static	char ncform_sccsid[] = "@(#)ncform 1.6 88/02/08 SMI"; /* from S5R2 1.2 */
+#endif
 
 int yylineno =1;
 # define YYU(x) x
@@ -2584,7 +2586,7 @@ yylook(){
 	register struct yysvf *yystate, **lsp;
 	register struct yywork *yyt;
 	struct yysvf *yyz;
-	int yych;
+	int yych, yyfirst;
 	struct yywork *yyr;
 # ifdef LEXDEBUG
 	int debug;
@@ -2594,6 +2596,7 @@ yylook(){
 # ifdef LEXDEBUG
 	debug = 0;
 # endif
+	yyfirst=1;
 	if (!yymorfg)
 		yylastch = yytext;
 	else {
@@ -2609,12 +2612,13 @@ yylook(){
 			if(debug)fprintf(yyout,"state %d\n",yystate-yysvec-1);
 # endif
 			yyt = yystate->yystoff;
-			if(yyt == yycrank){		/* may not be any transitions */
+			if(yyt == yycrank && !yyfirst){  /* may not be any transitions */
 				yyz = yystate->yyother;
 				if(yyz == 0)break;
 				if(yyz->yystoff == yycrank)break;
 				}
 			*yylastch++ = yych = input();
+			yyfirst=0;
 		tryagain:
 # ifdef LEXDEBUG
 			if(debug){

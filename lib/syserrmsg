@@ -212,48 +212,74 @@
 925 PLIO: reference out of bounds on mask
 926 PMIO: null reference image
 927 PMIO: mask must be the same size as reference image
+928 PLIO: stack overflow
 
-930 SYS_FMBADMAGIC
-931 SYS_FMCLOSE
-932 SYS_FMCOPYO
-933 SYS_FMLFCOPY
-934 SYS_FMLFNOOB
-935 SYS_FMOOF
-936 SYS_FMOPEN
-937 SYS_FMPTIOVFL
-938 SYS_FMRERR
-939 SYS_FMTRUNC
-940 SYS_FMWRERR
-941 SYS_FMBLKCHSZ
-942 SYS_FMFSINUSE
-943 SYS_FMLFLOCKED
-944 SYS_FMFCFULL
-945 SYS_FMLOKACTLF
+930 File does not appear to be a FMIO datafile
+931 Error closing FMIO datafile
+932 Error rebuilding FMIO datafile
+933 Error copying FMIO datafile
+934 FMIO: bad lfile number
+935 FMIO: out of lfiles
+936 FMIO: cannot open datafile
+937 FMIO: datafile too large - increase page size or MAXPTPAGES
+938 Read error on FMIO datafile
+939 FMIO: datafile appears to be truncated
+940 Write error on FMIO datafile
+941 FMIO: datafile page size not a multiple of device block size
+942 FMIO: attempt to reopen for writing an lfile already open for reading
+943 FMIO: attempt to open an lfile already open for exclusive access
+944 FMIO: lfile cache overflow
+945 FMIO: attempt to obtain a lock on an already active lfile
 
-950 SYS_QMNFILES
-951 SYS_QPBADCONV
-952 SYS_QPBADFILE
-953 SYS_QPBADIX
-954 SYS_QPBADKEY
-955 SYS_QPBADVAL
-956 SYS_QPCLOBBER
-957 SYS_QPEVNSORT
-958 SYS_QPEXBADRNG
-959 SYS_QPEXDBOVFL
-960 SYS_QPEXLEVEL
-961 SYS_QPEXMLP
-962 SYS_QPEXPBOVFL
-963 SYS_QPEXRPAREN
-964 SYS_QPINDXOOR
-965 SYS_QPINVDD
-966 SYS_QPMRECUR
-967 SYS_QPNEVPAR
-968 SYS_QPNOEH
-969 SYS_QPNOVAL
-970 SYS_QPNOXYF
-971 SYS_QPPLSIZE
-972 SYS_QPPOPEN
-973 SYS_QPPVALOVF
-974 SYS_QPREDEF
-975 SYS_QPUKNPAR
-976 SYS_QPXYFNS
+950 QPOE: too many macro definition files in list
+951 QPOE: header parameter has bad datatype code
+952 Error reading QPOE file header
+953 QPOE: cannot read event list index
+954 QPOE: cannot parse coordinate pair key specification for index
+955 QPOE: cannot read parameter value
+956 QPIO: new event list would clobber existing header parameter
+957 QPOE: cannot build index for unordered event list
+958 QPEX: bad range specifier in event attribute filter
+959 QPEX: data buffer overflow (expanded expression too large)
+960 Maximum nesting exceeded in QPEX expression
+961 QPEX syntax error: missing left parenthesis
+962 QPEX: program buffer overflow (expression too large)
+963 QPEX syntax error: unmatched right parenthesis
+964 QPOE: array parameter index out of range
+965 QPOE: cannot parse event structure field list
+966 QPOE: probable macro recursion detected
+967 QPIO: attempt to open an nonevent parameter for event i/o
+968 QPIO: cannot read event list header
+969 QPOE: cannot access parameter value field
+970 QPIO: default index key not flagged in event struct field list
+971 QPIO: pixel mask not same size as image
+972 QPOE: attempt to open existing nonarray parameter for array i/o
+973 QPOE: attempt to use getparam to fetch value of struct type parameter
+974 QPOE: attempt to redefine an existing header parameter
+975 QPOE: attempt to delete a nonexistent parameter
+976 QPIO: coordinate fields used for index must be type short
+977 QPOE file does not have a default WCS
+978 QPIO expression syntax
+979 QPEX: errors encountered while compiling expression
+
+980 MWCS: too many WCS attributes
+981 MWCS: too many function calls in compiled transformation
+982 MWCS: too many function calls in WCS
+983 MWCS: cannot invert axis map
+984 MWCS: bad MWCS save buffer
+985 MWCS: too many WCS
+986 MWCS: cannot compile transformation, dependent axis has been excluded
+987 MWCS: dimension mismatch
+988 MWCS: no current default WCS
+989 MWCS: no sampled WCS has been entered
+990 MWCS: cannot compile transformation, rotated axis has been excluded
+991 MWCS: mw_seti called with bad interface parameter type code
+992 MWCS: mw_stati called with bad interface parameter type code
+993 MWCS: unknown WCS function type
+994 MWCS: attribute not found
+995 MWCS: coordinate system not defined
+996 MWCS: attempt to redefine an existing coordinate system
+997 MWCS: function driver table overflow
+998 MWCS: too many coordinate transformation (ctran) descriptors
+999 MWCS: mw_rotate can only deal with rotations between two axes
+1000 MWCS: out of storage for FITS-WCS cards

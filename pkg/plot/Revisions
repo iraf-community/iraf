@@ -1,5 +1,40 @@
-.help revisions Jun88 pkg.plot
+.help revisions Mar90 pkg.plot
 .nf
+pkg$plot/t_surface.x
+	procedure surf_limits was modified to avoid an arithmetic exception
+	for images with values entirely above ceiling or below floor.  This
+	modification was coded by Phil Hodge at ST.	(ShJ 4/4/90)
+
+pkg$plot/getdata.x
+	procedure plt_getdata was completely rewritten to remove the call
+	to imparse and any built-in dependency on knowledge of image 
+	section notation.  				(ShJ 4/4/90)
+
+pkg$plot/t_contour.x, t_surface.x, t_hafton.x
+	were modified to call plt_getdata with its new calling sequence.
+							(ShJ 4/4/90)
+pkg$plot/t_pcol.x, t_pcols.x
+pkg$plot/t_prow.x, t_prows.x
+	The dependency of these routines on knowledge of image section
+	notation has been removed.  Previously an image section name would
+	be built using the column limits input by the user.  The data are
+	now extracted from the image with procedure plt_gcols and plt_grows. 
+	Code was also cleaned up to make use of single graphics procedure. 
+	(MJF 4/3/90)
+
+pkg$plot/doc/pvector.hlp
+pkg$plot/t_pvector.x, pvector.par
+	Implemented output options to PVECTOR task allowing computed
+	vector to be output as an image or text file  (MJF 4/3/90)
+
+pkg$plot/doc/surface.hlp
+	Clarified floor and ceiling parmeters in surface manual page.  
+							(ShJ 3/1/90)
+pkg$plot/t_gkimos.x
+	Added a call to flush the gki metacode stream before closing it
+	when interactive=no.  Without this, the stdgraph terminal would
+	remain in graphics mode when gkimosaic terminated.  (ShJ 3/8/89)
+
 pkg$plot/t_pvector.x
 	Fixed bug causing vectors near theta=0 to fail.  (FV 15/6/89)
 

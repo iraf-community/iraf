@@ -8,18 +8,13 @@ define	OBJECT	IM_TITLE($1)			# Image title
 define	HISTORY	IM_HISTORY($1)			# History
 define	UNKNOWN	Memc[($1+IMU-1)*SZ_STRUCT+1]	# IRAF user area
 
-define	PIXTYPE		IM_PIXTYPE($1)
-define	NBPIX		IM_NBPIX($1)
-define	LIMTIME		IM_LIMTIME($1)
-define	MTIME		IM_MTIME($1)
-define	CTIME		IM_CTIME($1)
+define	PIXTYPE		IM_PIXTYPE($1)		# IMage pixel type
+define	NBPIX		IM_NBPIX($1)		# Number of bad pixels
+define	LIMTIME		IM_LIMTIME($1)		# Last modify limits time
+define	MTIME		IM_MTIME($1)		# Last modify time
+define	CTIME		IM_CTIME($1)		# Create time
 
-define	LEN_ORIGIN	9	# Length of origin keyword
-define	LEN_OBJECT	63	# Maximum length of string parameter
-define	LEN_BLANK	11	# Length of the blank string
-define	LEN_STRING	8	# Minimum length of a FITS string
-
-# Set up a structure for FITS parameters
+# Set up a structure for wfits parameters
 
 define	LEN_FITS	(44 + SZ_FNAME + 1)
 
@@ -39,9 +34,12 @@ define	IRAFNAME	Memc[P2C($1+41)]# IRAF file name
 
 # define FITS data types
 
+define	FITS_RECORD	2880		# Size of standard FITS record (bytes)
 define	FITS_BYTE	8		# Number of bits in a FITS byte
 define	FITS_SHORT	16		# Number of bits in a FITS short
-define	FITS_LONG	32		# NUmber of bits in a FITS long
+define	FITS_LONG	32		# Number of bits in a FITS long
+define	FITS_REAL	-32		# Number of bits in a FITS real * -1
+define	FITS_DOUBLE	-64		# Number of bits in a FITS double * -1
 
 # define FITS precision in decimal digits
 
@@ -74,26 +72,30 @@ define	NDEC_DOUBLE		11	# Precision of double
 
 # define the KEYWORD parameters
 
-define	NOPTIONS	12			# Number of optional keywords
 
-define	FIRST_CARD	1
-define	SECOND_CARD	2
-define	THIRD_CARD	3
+define	FIRST_CARD	1		# FITS simple parameter
+define	SECOND_CARD	2		# FITS bitpix parameter
+define	THIRD_CARD	3		# FITS naxis parameter
 
-# define optional header keywords
+define	NOPTIONS	12		# Number of optional keywords
 
 define	KEY_BSCALE	1		# FITS bscale parameter
 define	KEY_BZERO	2		# FITS bzero parameter
 define	KEY_BUNIT	3		# FITS physical units
 define	KEY_BLANK	4		# FITS value of blank pixel
 define	KEY_OBJECT	5		# FITS title string
-define	KEY_ORIGIN	6		# origin of FITS tape
-define	KEY_DATE	7		# date the tape was written
-define	KEY_IRAFNAME	8		# root name of IRAF image
-define	KEY_IRAFMAX	9		# maximum value of IRAF image
-define	KEY_IRAFMIN	10		# minimum value of IRAF image
-define	KEY_IRAFBP	11		# bits per pixel in IRAF image
+define	KEY_ORIGIN	6		# Origin of FITS tape
+define	KEY_DATE	7		# Date the tape was written
+define	KEY_IRAFNAME	8		# Root name of IRAF image
+define	KEY_IRAFMAX	9		# Maximum value of IRAF image
+define	KEY_IRAFMIN	10		# Minimum value of IRAF image
+define	KEY_IRAFBP	11		# Bits per pixel in IRAF image
 define	KEY_IRAFTYPE	12		# IRAF image data type
+
+define	LEN_ORIGIN	9		# Length of origin keyword
+define	LEN_OBJECT	63		# Maximum length of string parameter
+define	LEN_BLANK	11		# Length of the blank string
+define	LEN_STRING	8		# Minimum length of a FITS string
 
 # miscellaneous
 

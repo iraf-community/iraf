@@ -1,4 +1,4 @@
-.help datapars May89 noao.digiphot.apphot
+.help datapars Oct89 noao.digiphot.apphot 
 .ih
 NAME
 datapars -- edit the data dependent parameters
@@ -7,181 +7,264 @@ USAGE
 datapars
 .ih
 PARAMETERS
-.ls scale = 1.0
-The scale of the data in units per pixel. If \fIscale\fR = 1 all the distance
-units are in pixels.
-All APPHOT
-distance dependent parameters including, cbox, maxshift,
-rclean and rclip
-in the \fIcenterpars\fR parameter set, annulus, dannulus, and rgrow in
-the \fIfitskypars\fR parameter set and apertures in the \fIphotpars\fR
-parameter set are expressed in units of the scale.
-.le
 .ls fwhmpsf = 1.0 (scale units)
-The full width half maximum of the point spread function.
-Certain tasks, for example \fIwphot\fR and \fIdaofind\fR, and the "gauss" and
+The full width half maximum of the point spread function in scale units
+for example arc-seconds.
+Certain tasks, for example WPHOT and DAOFIND, and the "gauss" and
 "ofilter" centering
-algorithms inside \fIcenter\fR depend critically on the value of fwhmpsf.
+algorithms depend critically on the value of fwhmpsf.
 The radial and elliptical Gaussian fitting functions in the \fIfitpsf\fR task
 converge significantly faster if the initial fwhmpsf parameter is
 approximately correct.
+APPHOT users can either determine fwhmpsf using an external task such
+as IMEXAMINE in the PROTO package or make use of the interactive
+capabilities of the tasks to compute and store it.
 .le
 .ls emission = yes
 The feature to be measured is above sky. By default the APPHOT package
-considers the features of interest to be emission features. However
+considers all features to be emission features. However
 all the package tasks will operate on absorption features if the
 \fIemission\fR parameter is set to no.
 .le
 .ls noise = "poisson"
 The noise model used to estimate the uncertainties in the computed APPHOT
 magnitudes. The options are the following:
+.ls poisson
+Poisson statistics in the object as well as the sky
+background are used to estimate the error in the object measurement.
+There are two components to the sky  noise
+measurement, the sky noise in the object aperture and the mean error in the
+sky value.
+.le
 .ls constant
 The standard deviation of the sky background is used to estimate the
 error in the object measurement.  There are two components to the error
 estimate, the sky noise in the object aperture and the mean error in the
 sky value.
 .le
-.ls poisson
-Poisson statistics in the object as well as the standard deviation of the sky
-background are used to estimate the error in the object measurement.
-There are two components to the sky  noise
-measurement, the sky noise in the object aperture and the mean error in the
-sky value.
-.le
+
+In general APPHOT users are recommended to stick to the Poisson model.
+APPHOT users should also be aware that gain parameter \fIepadu\fR
+must be set correctly in order to put the mangitude errors on the
+correct scale.
 .le
 .ls threshold = 0
-The threshold in counts above (below) local sky used for image detection in the
-\fIdaofind\fR task.
+The threshold in counts above (emission features) or  below (absorption
+features) local sky used for image detection in the
+DAOFIND task and moments computation in the FITPSF task.
+A good starting value is 5 times the standard deviation
+of the image background level.
+APPHOT users can either determine threshold using an external task such
+as IMEXAMINE in the PROTO package or make use of the interactive
+capabilities of the APPHOT tasks to compute
+and store it.
 .le
 .ls cthreshold = 0
-The threshold in counts above (below) the data minimum (maximum) in the
+The threshold in counts above (emission features) or below (absorption)
+features the data minimum (maximum) in the
 centering subraster below (above) which pixels are not used for centering.
+APPHOT users are recommended to leave this value at 0.0.
 .le
 .ls sigma = INDEF
-The estimate of the standard deviation of the sky pixels. \fISigma\fR is used by
-the centering routines to define deviant pixels by means of the kclean
-parameter if the clean switch
-is enabled and to provide an estimate of the signal to noise ratio in the
-centering subraster.
-The centering subraster is assumed to have infinite signal to noise if
-sigma is undefined.
-Sigma is also used to estimate the contribution of sky noise to the magnitude
-error estimate if the sky fitting algorithm is constant.
-The sky fitting routines use sigma to compute the width
-and resolution of the sky pixel histogram, khist and binsize.
+The estimate of the standard deviation of the sky pixels.
+Although this parameter is not critical and leaving it at INDEF
+does little harm, APPHOT users should set it to some value
+representative of the noise in the sky background.
+.le
+.ls scale = 1.0
+The scale of the image in user units, for example seconds of arc per pixel.
+If \fIscale\fR = 1 all these scale dependent parameters are in units of
+pixels. APPHOT users should typically leave scale set to 1.0 unless they
+wish to compare their aperture photometry with that in the literature.
 .le
 .ls ccdread = ""
-The image header keyword defining the readout noise parameter.
-The units are assumed to be electrons.
+The image header keyword defining the readout noise parameter whose
+units are assumed to be electrons.
 .le
 .ls readnoise = INDEF
 The readout noise of the ccd in electrons.
+This parameter is not critical for APPHOT users but should be set for
+bookkeeping purposes.
 .le
 .ls gain = ""
-The image header keyword defining the gain parameter.
-The units are assumed to be electrons per adu.
+The image header keyword defining the gain parameter whose
+units are assumed to be electrons per adu.
 .le
 .ls epadu = 1.0
 The gain in electrons per adu.
+APPHOT users should set this parameter or the \fIgain\fR parameter to its
+correct value before
+running any of the APPHOT tasks, in order to insure that the scale
+of the magnitude error computation is correct.
 .le
 .ls exposure = ""
 The image header exposure time keyword. The time units are arbitrary but
-must be consistent for the list of images to be compared.
+must be consistent for any list of images whose magnitudes are to be compared.
+The magnitudes are normalized to 1 timeunit.
+Setting this parameter can save APPHOT users a lot of unnecessry zero 
+point corrections in future reduction steps.
 .le
-.ls itime = 0.0
+.ls itime = INDEF
 The exposure time for the image in arbitrary units.
 The magnitudes are normalized to 1 timeunit  using the value of \fIexposure\fR
 in the image header if present or the value of \fIitime\fR.
 .le
+.ls airmass = ""
+The image header airmass keyword. This parameter is information only
+and does not affect the computations in any way. The value of \fIairmass\fR
+is recorded in the PHOT output file.
+.le
+.ls xairmass = INDEF
+The value of the airmass which by default is undefined.
+The airmass is set using the value of \fIairmass\fR
+in the image header if present or the value of \fIxairmass\fR.
+The value of \fIxairmass\fR does not affect the computations in any way but is
+stored in the PHOT output file.
+.le
+.ls filter = ""
+The image header filter id keyword. This parameter is information only
+and does not affect the computations in any way. The value of \fIfilter\fR
+is recorded in the PHOT header.
+.le
+.ls ifilter = "INDEF"
+The value of the filter id string which by default is undefined.
+The filter id is set using the value of \fIfilter\fR
+in the image header if present or the value of \fIifilter\fR.
+The value of \fIifilter\fR does not affect the computations in any but is
+stored in the PHOT output file.
+.le
 .ls datamin = INDEF
-The minimum good pixel value. This is an information only parameters for
-APPHOT but is (will be) required by the \fIdaophot\fR package.
+The minimum good pixel value, which defaults to -MAX_REAL, the minimum
+floating point number supported by the host computer.
+APPHOT users should set this if they wish to remove bad data from the
+sky fit before the actual fit or they wish to detect stars
+with bad data in the measurements.
+They should also realize that
+exercising this option will cost them in execution time.
 .le
 .ls datamax = INDEF
-The maximum good pixel value. This is an information only parameter for
-APPHOT but is (will be) required by \fIdaophot\fR package.
+The maximum good pixel value, which defaults to MAX_REAL, the maximum
+floating point number supported by the host computer.
+APPHOT users should set this if they are interested in detecting
+saturated stars or bad data automatically.
+They should also realize that
+exercising this option will cost them in execution time.
 .le
 .ih
 DESCRIPTION
 \fIDatapars\fR sets those parameters which are expected to
-changes as a function of the data.
+change as a function of the data.
 These quantities include the seeing, optical quality of the instrument,
 the noise
 characteristics and range of linearity of the detector, and data dependent
 image header parameters. The remaining centering, sky
-fitting and photometry algorithm parameters in the \fIcenterpars\fR,
-\fIfitskypars\fR and \fRphotpars\fR parameter sets scale with the data
+fitting and photometry algorithm parameters in the CENTERPARS,
+FITSKYPARS and PHOTPARS  parameter sets scale with the data
 dependent parameters.
-The parameters sets provide
+The parameter sets provide
 a mechanism for storing parameter files with the relevant data. A
-user can edit the datapars parameter set, write it out to file in the
+user can edit the DATAPARS parameter set, write it out to a file in the
 same directory as the data, and subsequently use it as input to
-the APPHOT tasks.
+other APPHOT tasks.
 
-The parameter \fIscale\fR sets the scale of the apertures use by the
+The parameter \fIscale\fR sets the scale of the apertures used by the
 centering, sky fitting and photometry algorithms.  Scale converts
 distance measurements in pixel units to distance measurements in
-scale units. The following APPHOT distance dependent parameters cbox, maxshift,
+scale units. The following APPHOT parameters, cbox, maxshift,
 rclean and rclip
-in the \fIcenterpars\fR parameter set, annulus, dannulus, and rgrow in
-\fIfitskypars\fR parameter set and apertures in the \fIphotpars\fR
+in the CENTERPARS parameter set, annulus, dannulus, and rgrow in
+the FITSKYPARS parameter set and apertures in the PHOTPARS
 parameter set are expressed in units of the scale. Scale is useful
 in the case where observations are to be compared to published
 aperture photometry measurements in the literature.
 
 The parameter \fIfwhmpsf\fR defines the seeing disk of stars in the
-image. Most apphot programs do not require knowledge of this
+image. Most APPHOT programs do not require knowledge of this
 parameter. The exceptions are the DAOFIND task, the centering algorithms
-"gauss" and "ofilt", and the WPHOT task. The user may choose to setup
-the image scale in units of the half width half maximim of the points
-spread function. In this case
-fwhmpsf would be set to "2.0" and the remaining centering, sky
-fitting and photometry algorithm parameters in the \fIcenterpars\fR,
-\fIfitskypars\fR and \fRphotpars\fR parameter sets would be set to
-appropriate values in units of the half width at half maximum.
+"gauss" and "ofilter", the FITPSF task and the WPHOT task.
+The parameters \fIscale\fR and \fIfwhmpsf\fR may be chosen so as to interact
+in an interesting way.
+First the user defines
+the image scale in units of the half-width at half-maximum of the point
+spread function and sets
+fwhmpsf to "2.0". Then the remaining centering, sky
+fitting and photometry algorithm parameters in the CENTERPARS,
+FITSKYPARS and PHOTPARS  parameter sets could be set to
+appropriate values in units of the half-width at half-maximum of the
+point-spread function. 
 In this situation, once an optimum set of algorithm parameters is
-chosen the user rarely needs to alter anything but the \fIdatapars\fR
+chosen, the user rarely needs to alter anything but the DATAPARS
 parameter scale before executing any APPHOT task.
 
 Two noise models are available. If \fInoise\fR = constant, the total noise
 is assumed to be due to noise in the background alone. If \fInoise\fR =
 poisson, the total noise includes Poisson noise from the object and the 
-sky noise. The parameter \fIsigma\fR estimates the standard deviation of
+sky noise.
+
+The parameter \fIsigma\fR estimates the standard deviation of
 the sky background pixels. The centering algorithm uses this parameter
 to define deviant pixels through the kclean parameter  if \fIclean\fR is
 enabled and to estimate the signal to
 noise ratio in the object.  If sigma is undefined no cleaning is performed
-and the total noise is assumed to be 0. The sky fitting routines use sigma
+and the total noise is assumed to be 0. Some sky fitting routines use sigma
 to compute the width and resolution of the sky pixel histogram through the
-parameters khist and binsize. If sigma
+parameters \fIkhist\fR and \fIbinsize\fR. If sigma
 is undefined each object will have a sky histogram with an extent
 and resolution dependent on the standard deviation of the pixels in the
 local sky.
+Although this parameter is not critical and leaving it at INDEF
+does no harm in the case of a typical default setup, APPHOT users should
+set it to some value representative of the noise in the sky background.
 
 The two parameters \fIgain\fR and \fIepadu\fR define the signal gain
 characteristics. The gain parameter specifies which keyword in the
 image header contains the gain value. If gain is undefined or
 not present in the image header the value of epadu is used.
 Epadu is in units of electrons per adu.
+APPHOT users should set either gain or epadu before running any 
+APPHOT tasks to insure the magnitude error computations are correct.
 
 The two parameters \fIccdread\fR and \fIreadnoise\fR define the ccd noise
 characteristics. The ccdread parameter specifies which keyword in the
 image header contains the readout noise value. If ccdread is undefined or
 not present in the image header the value of readnoise is used.
 Readnoise is assumed to be in units of electrons.
+The ccdread and readnoise parameters are not critical to any of
+the APPHOT tasks.
 
 The magnitudes can be normalized to an exposure time of 1 timeunit using
 the value of the exposure time in the image header parameter 
 \fIexposure\fR or \fIitime\fR. If exposure is undefined or not present
 in the image header a warning message is issued and the value of itime
 is used. Itime is assumed to be in arbitrary units.
+Setting either exposure or itime can save APPHOT users a lot of
+unnecessary zero point corrections.
+
+The two parameters \fIairmass\fR and \fIxairmass\fR define the airmass
+of the observation. The airmass parameter specifies which keyword in the
+image header contains the airmass value. If filter is undefined or
+not present in the image header the value of xairmass is used.
+The airmass is an information only quantity and is not used in any APPHOT 
+computations.
+
+The two parameters \fIfilter\fR and \fIifilter\fR define the filter
+of the observation. The filter parameter specifies which keyword in the
+image header contains the filter id. If airmass is undefined or
+not present in the image header the value of ifilter is used.
+The filter is an information only quantity and is not used in any APPHOT
+computations.
 
 The \fIdatamin\fR and \fIdatamax\fR parameters define the range of good
 data. For example datamin and datamax can be used to define the range
-of intensity
-over which the detector is linear. In the APPHOT package these parameters
-are currently information only parameters. However inside the future
-DAOPHOT package they will be be used to exclude pixels from the fit.
+of intensity over which the detector is linear. Bad pixels in the 
+centering subraster and in the photometry apertures are noted and the
+measurment tagged with an error code. In the case of sky fitting,
+psf modelling in the FITPSF task, and radial profile modelling in the
+RADPROF task bad data is removed before the fit is performed.
+APPHOT users should set datamin and datamax to appropriate values before
+running any APPHOT tasks if they are interested in for example
+saturation information. APPHOT users should also be aware that setting
+data limits will cost them something in execution time.
 
 .ih
 EXAMPLES
@@ -198,15 +281,39 @@ EXAMPLES
 	ap> datapars
 .fi
 
+3. Edit the DATAPARS parameters from within the PHOT task.
+
+.nf
+    da> epar phot
+
+	... edit a few parameters
+
+	... move to the datapars parameter and type :e
+
+	... edit the datapars parameters and type :q
+
+	... finish editing the phot parameters and type ^Z
+.fi
+
+4. Save the current DATAPARS parameter set in a text file datnite1.par.
+This can also be done from inside a higher level task as in the
+above example.
+
+.nf
+    da> datapars
+
+	... edit a few parameters
+
+	... type ":w datnite1.par"  from within epar
+.fi
+
 .ih
 TIME REQUIREMENTS
+
 .ih
 BUGS
 
-The parameters datamin and datamax are not currently activated.
-
 .ih
 SEE ALSO
-epar, centerpars, center, fitskypars, fitsky, phot, qphot, wphot, polyphot
-radprof, fitpsf, daofind
+epar,lpar,center,fitsky,phot,wphot,polyphot,radprof,fitpsf,daofind
 .endhelp

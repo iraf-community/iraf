@@ -1,3 +1,6 @@
+                  The Aperture Photometry Package
+                 ----------------------------------
+
 The apphot package contains routines which perform aperture
 photometry in circular and polygonal apertures using fractional pixel
 techniques. No point spread function fitting techniques are employed.
@@ -10,7 +13,7 @@ specific to the center task or by function, for example the nlfit
 directory contains the non-linear least squares fitting routines.
 The wphot task shares alot of code with the phot task. Similarly
 the polymark task shares some code with the polyphot task.
-The .h files are all in aplib as many of them are shared by several tasks.
+The .h files are all in lib as many of them are shared by several tasks.
 
              |-aplib---------apphot routines used by several tasks
              |-apselect------routines specific to the apselect task
@@ -20,13 +23,17 @@ The .h files are all in aplib as many of them are shared by several tasks.
              |-doc-----------apphot documentation
 |-apphot-----|-fitpsf--------routines specific to the fitpsf task
              |-fitsky--------routines specific to the fitsky task
+	     |-lib-----------apphot definitions or .h files
              |-nlfit---------non-linear least squares fitting routines
              |-phot----------routines specific to the phot task
 	     |-polymark------routines specific to the polymark task
              |-polyphot------routines specific to the polyphot task
 	     |-qphot---------routines specific to the qphot task
              |-radprof-------routines specific to the radprof task
+	     |-wphot---------routines specific to the wphot task
              |-test----------test data
 
 
-Lindsey Davis August 1988
+Lindsey Davis
+NOAO IRAF GROUP
+November 1989

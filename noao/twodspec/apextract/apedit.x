@@ -176,8 +176,8 @@ new_	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 		call cvfree (cv)
 
 	        # Set background min and max based on sample regions.
-	        wx = MAX_REAL
-	        wy = -MAX_REAL
+	        wx = low
+	        wy = high
 		call ic_gstr (AP_IC(aps[current]), "sample", Memc[str], SZ_LINE)
 	        for (i=str; Memc[i]!=EOS; i=i+1)
 		    if (Memc[i] == ':')

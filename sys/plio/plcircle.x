@@ -26,6 +26,7 @@ int	rop			#I rasterop
 
 int	y1, y2
 pointer	sp, ufd
+bool	pl_ucircle()
 extern	pl_ucircle()
 
 begin

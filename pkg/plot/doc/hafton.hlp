@@ -23,7 +23,7 @@ A string specifying the image intensity to half tone mapping function.
 The default is linear mapping between \fBz1\fR and \fBz2\fR.  For other
 choices, see the description section below.
 .le
-.ls contrast = 1
+.ls contrast = 0.25
 Positive or negative contrast.  Negative constrast is indicated by setting
 \fBcontrast\fR to a negative number.  The magnitude of \fBcontrast\fR is
 not important unless \mapping_function = crtpict\fR.
@@ -100,19 +100,17 @@ viewports (e.g., the vt640), a square image will appear extended when
 \fBfill=yes\fR.
 .ih
 EXAMPLES
-.nf
-[1] Image "crab.6563" is plotted in negative contrast, with linear mapping
-    between the minimum and maximum image pixel.
+1. Image "crab.6563" is plotted in negative contrast, with linear mapping
+between the minimum and maximum image pixel.
 
-	cl> hafton crab.6563 contrast=-1
+    cl> hafton crab.6563 contrast=-1
 
-[2] The image is plotted in negative contrast using the same mapping
-    function as used by the \fIcrtpict\fR task.  The resulting plot is
-    in negative contrast.
+2. The image is plotted in negative contrast using the same mapping
+function as used by the \fIcrtpict\fR task.  The resulting plot is
+in negative contrast.
 
-	cl> hafton crab.6563 mapping_fun=crt contrast =-0.25
+    cl> hafton crab.6563 mapping_fun=crt contrast =-0.25
 
-.fi
 .ih
 TIME REQUIREMENTS
 To produce a \fIhafton\fR plot on the terminal takes just under 9 cpu
@@ -122,4 +120,6 @@ nspp device) the total cp time is about an hour.
 BUGS
 A large number of plotter instructions ( > 100,000 polylines) is generated 
 per frame for square images.
+.endhelp
+es.
 .endhelp

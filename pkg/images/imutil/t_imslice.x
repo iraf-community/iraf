@@ -139,9 +139,11 @@ begin
 	    ncols = IM_LEN(im1,1)
 	}
 	nlout = 1
-	do i = 2, ndim
+	do i = 1, sdim - 1
 	    nlout = nlout * IM_LEN(im1,i)
-	nlout = nlout / nimout
+	do i = sdim + 1, ndim
+	    nlout = nlout * IM_LEN(im1,i)
+	nlout = nlout / ncols 
 
 	call amovkl (long(1), Meml[vim1], IM_MAXDIM)
 	do i = 1, nimout {

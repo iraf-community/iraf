@@ -4,7 +4,7 @@
 #define	import_xnames
 #include "bootlib.h"
 
-#define	SZ_VALUE	1024
+#define	SZ_VALUE	SZ_COMMAND
 
 #ifdef NOVOS
 /* OS_PUTENV -- Set the value of the named environment variable.
@@ -18,10 +18,14 @@ char	*value;
 	sprintf (buf, "%s=%s", name, value);
 	if (env = (char *) malloc (strlen(buf) + 1)) {
 	    strcpy (env, buf);
+#ifdef ultrix
+	    putenv (env);			/* must keep env around. */
+#else
 #ifdef vax
 	    setenv (name, value, 1);
 #else
-	    /* putenv (env);			/* must keep env around. */
+	    putenv (env);			/* must keep env around. */
+#endif
 #endif
 	}
 }
@@ -46,10 +50,14 @@ char	*value;
 	sprintf (buf, "%s=%s", name, value);
 	if (env = (char *) malloc (strlen(buf) + 1)) {
 	    strcpy (env, buf);
+#ifdef ultrix
+	    putenv (env);
+#else
 #ifdef vax
 	    setenv (name, value, 1);
 #else
-	    /* putenv (env);			/* must keep env around. */
+	    putenv (env);			/* must keep env around. */
+#endif
 #endif
 	}
 }

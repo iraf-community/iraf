@@ -18,7 +18,7 @@ real	x, x1, x2
 pointer	ic, sp, str
 
 int	clgeti(), ctor()
-real	clgetr()
+real	clgetr(), ic_getr()
 
 begin
 	if (AP_IC(apout) == NULL)
@@ -44,8 +44,8 @@ begin
 		    call ic_pstr (ic, "xlabel", "Line")
 
 	    # Set background min and max based on sample regions.
-	    x1 = MAX_REAL
-	    x2 = -MAX_REAL
+	    x1 = xmin
+	    x2 = xmax
 	    for (i=str; Memc[i]!=EOS; i=i+1)
 		if (Memc[i] == ':')
 		    Memc[i] = ','
@@ -70,4 +70,12 @@ begin
 	    } else
 	        call ic_copy (AP_IC(apin), AP_IC(apout))
 	}
+
+	# Insure the background region passes under the aperture.
+	x1 = AP_LOW(apout, AP_AXIS(apout))
+	x2 = AP_HIGH(apout, AP_AXIS(apout))
+	call ic_putr (AP_IC(apout), "xmin",
+	    min (x1, x2, ic_getr (AP_IC(apout), "xmin")))
+	call ic_putr (AP_IC(apout), "xmax",
+	    max (x1, x2, ic_getr (AP_IC(apout), "xmax")))
 end

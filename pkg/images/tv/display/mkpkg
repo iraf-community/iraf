@@ -21,6 +21,12 @@ install:
 	$move	xx_display.e bin$x_display.e
 	;
 
+zzdebug:
+zzdebug.e:
+	$omake	zzdebug.x <imhdr.h>
+	$link	zzdebug.o -lds -lstg -o zzdebug.e
+	;
+
 libds.a:
 	dsmap.x		<fset.h> <imset.h> <mach.h>
 	dsulut.x	display.h <ctype.h> <error.h>

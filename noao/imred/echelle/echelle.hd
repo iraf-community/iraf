@@ -2,7 +2,7 @@
 
 $doc	=	"./doc/"
 
-revisions	hlp=Revisions
+revisions	sys=Revisions
 ecbplot		hlp=doc$ecbplot.hlp
 eccontinuum	hlp=doc$eccontinuum.hlp
 ecdispcor	hlp=doc$ecdispcor.hlp

@@ -13,8 +13,8 @@
  *   dictionary, a fatal error.  We have a static sized dictionary until
  *   this can be fixed.
  */
-#define	STACKSIZ	20000
-#define	DICTSIZE	40000
+#define	STACKSIZ	32000
+#define	DICTSIZE	128000
 #define	MEMINCR		1024
 
 /* History and command block buffer dimensions.  The command block buffer

@@ -136,21 +136,21 @@ EXAMPLES
 previously determined values of z1 and z2 for the greyscale transformation
 the command would be:
 
-	cl> crtpict sunpic[*:4,*:4] ztrans=min z1=0 z2=800
+    cl> crtpict sunpic[*:4,*:4] ztrans=min z1=0 z2=800
 
 2.  To process every image with the root name ccdpic, using default values of
 all parameters, the command would be:
 
-	cl> crtpict ccdpic*
+    cl> crtpict ccdpic*
 
 3.  To process images created with \fBsnap\fR, ztrans and z2 must be changed
 from their default values:
 
-	cl> crtpict iis.snap ztrans=min z2=1023
+    cl> crtpict iis.snap ztrans=min z2=1023
 
 4.  Image `mypic' is processed using the look up table in file `mylut',
 
-	cl> crtpict mypic ztrans=user lutfile=mylut
+    cl> crtpict mypic ztrans=user lutfile=mylut
 
 Where file `mylut' contains this information:
 .nf

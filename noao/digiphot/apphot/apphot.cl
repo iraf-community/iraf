@@ -1,5 +1,6 @@
 #{ APPHOT -- Digital aperture photometry package.
 
+dataio
 lists
 
 package apphot
@@ -22,6 +23,6 @@ task datapars = "apphot$datapars.par"
 task photpars = "apphot$photpars.par"
 task polypars = "apphot$polypars.par"
 
-#task lintran = "pkg$lists/x_lists.e"
+task aptest = "apphot$aptest.cl"
 
 clbye()

@@ -3,7 +3,6 @@
 include	<finfo.h>
 include	<imhdr.h>
 include	<imio.h>
-include	<fset.h>
 include	<mach.h>
 include	"stf.h"
 
@@ -23,13 +22,13 @@ int	acmode		# access mode
 long	pixoff
 long	fi[LEN_FINFO]
 real	datamin, datamax
-pointer	sp, stf, lbuf, root, extn
+pointer	sp, stf, lbuf, root, extn, op
 int	compress, devblksz, ival, ch, i , junk
-int	spool, sz_userarea, user_header, sz_gpbhdr
+int	fits, fitslen, sz_userarea, sz_gpbhdr, len_hdrmem
+long	totpix, mtime, ctime
 
-long	totpix, mtime, ctime, fstatl()
-int	open(), stropen(), strlen(), sizeof(), finfo(), fnroot()
-errchk	stf_rfitshdr, stf_rgpb, open
+int	fnroot(), strlen(), sizeof(), finfo()
+errchk	stf_rfitshdr, stf_rgpb, open, realloc, imaddb, imaddi
 
 begin
 	call smark (sp)
@@ -39,17 +38,11 @@ begin
 
 	stf = IM_KDES(im)
 
-	# We need to write out the FITS encoded GPB before the user FITS
-	# cards, so open a memory spool file to spool the user FITS cards.
-
-	spool = open ("fits_spool", READ_WRITE, SPOOL_FILE)
-
 	# Read the FITS header, setting the values of all reserved fields
-	# in the STF descriptor and spooling the remaining parameters.
-	# This reads the entire FITS header into either the STF descriptor
-	# or the spool file.
+	# in the STF descriptor and saving all the user FITS cards in the
+	# save buffer "fits".
 
-	call stf_rfitshdr (im, spool)
+	call stf_rfitshdr (im, fits, fitslen)
 
 	# Process the reserved keywords (set in the STF descriptor) into the
 	# corresponding fields of the IMIO descriptor.
@@ -113,10 +106,16 @@ begin
 	STF_SZGROUP(stf) = totpix * sizeof (IM_PIXTYPE(im)) +
 	    STF_PSIZE(stf) / (SZB_CHAR * NBITS_BYTE)
 
+	# Write GPB related cards to the beginning of the IMIO user area.
+	call imaddb (im, "GROUPS", STF_GROUPS(stf) == YES)
+	call imaddi (im, "GCOUNT", STF_GCOUNT(stf))
+	call imaddi (im, "PCOUNT", STF_PCOUNT(stf))
+	call imaddi (im, "PSIZE", STF_PSIZE(stf))
+
 	# Extract the group parameter block from the pixfile, encoding the
-	# group parameters as FITS cards at the beginning of the IMIO user
-	# area.  Return the values of DATAMIN and DATAMAX from the GPB so
-	# that we can update the IMIO min/max fields.
+	# group parameters as FITS cards and appending to the cards above.
+	# Get the values of DATAMIN and DATAMAX from the GPB so that we can
+	# update the IMIO min/max fields.
 
 	call stf_rgpb (im, group, acmode, datamin, datamax)
 
@@ -135,26 +134,25 @@ begin
 	# FITS cards plus a little extra for new parameters.
 
 	sz_gpbhdr = strlen (Memc[IM_USERAREA(im)])
-	sz_userarea = sz_gpbhdr + fstatl (spool, F_FILESIZE) + SZ_EXTRASPACE
-	STF_SZGPBHDR(stf) = sz_gpbhdr
+	sz_userarea = sz_gpbhdr + fitslen + SZ_EXTRASPACE
 
-	# Following line to update amount of space in header 
-	# descriptor actually used--added by dlb--6/4/87
 	IM_HDRLEN(im) = LEN_IMHDR +
 	    (sz_userarea - SZ_EXTRASPACE + SZ_STRUCT-1) / SZ_STRUCT
-
-	IM_LENHDRMEM(im) = LEN_IMHDR +
+	len_hdrmem = LEN_IMHDR +
 	    (sz_userarea+1 + SZ_STRUCT-1) / SZ_STRUCT
-	call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
 
-	# Append the spooled FITS cards from the STF header to the user area,
-	# opening the user area as a string file.
+	if (IM_LENHDRMEM(im) < len_hdrmem) {
+	    IM_LENHDRMEM(im) = len_hdrmem
+	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	}
 
-	user_header = stropen (Memc[IM_USERAREA(im)], sz_userarea, APPEND)
-	call seek (spool, BOFL)
-	call fcopyo (spool, user_header)
-	call close (user_header)
-	call close (spool)
+	# Append the saved FITS cards from the STF header to the user area.
+	# Any cards which redefine GPB cards were already deleted when the
+	# fits save buffer was created (we don't want the GPB cards since
+	# we already output a FITS card for each GPB parameter above).
+
+	op = IM_USERAREA(im) + sz_gpbhdr
+	call amovc (Memc[fits], Memc[op], fitslen+1)
 
 	# Call up IMIO set set up the remaining image header fields used to
 	# define the physical offsets of the pixels in the pixfile.

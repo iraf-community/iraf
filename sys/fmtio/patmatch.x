@@ -463,7 +463,7 @@ begin
 	call chdeposit (cval, patbuf, sz_pat, op)
 
 	op_start = op
-	cval = ARB
+	cval = 0
 	call chdeposit (cval, patbuf, sz_pat, op)	# leave room for count
 	call pat_filset (CH_CCLEND, patstr, ip, patbuf, sz_pat, op)
 	patbuf[op_start] = op - op_start - 1		# fix up count
@@ -498,9 +498,9 @@ begin
 	next_closure = last_op
 
 	cvals[1] = CLOSURE
-	cvals[2] = ARB				# COUNT
+	cvals[2] = 0				# COUNT
 	cvals[3] = last_closure			# PREVCL
-	cvals[4] = ARB				# START
+	cvals[4] = 0				# START
 
 	do i = 1, 4
 	    call chdeposit (cvals[i], patbuf, sz_pat, last_op)

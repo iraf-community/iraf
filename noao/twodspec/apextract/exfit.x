@@ -93,7 +93,7 @@ begin
 		sum1 = 0.
 		sum2 = 0.
 		do i = ps, pe {
-		    if (!IS_INDEF (data[i])) {
+		    if (model[i] > 0. && !IS_INDEF (data[i])) {
 			if (v0 == 0.)
 			    var = v1 * max (1., scale * model[i] + bckgrnd[i])
 			else
@@ -197,7 +197,7 @@ begin
 		        if ((residual < resid_min) || (residual > resid_max)) {
 			    # Remove point from the least squares fit
 			    # and flag the deviant pixel with INDEF.
-			    if (wtflag) {
+			    if (wtflag && model[i] > 0.) {
 			        sum1 = sum1 - wt * data[i] * model[i]
 			        sum2 = sum2 - wt * model[i] * model[i]
 			    } else {

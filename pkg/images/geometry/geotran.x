@@ -28,9 +28,6 @@ pointer	sp, xref, yref, msi
 real	gsgetr()
 
 begin
-	# setup input image boundary extension parameters
-	call geoimset (input, geo, sx1, sy1, sx2, sy2)
-
 	# allocate working space
 	call smark (sp)
 	call salloc (xref, GT_NCOLS(geo), TY_REAL)
@@ -43,6 +40,10 @@ begin
 	call georef (geo, Memr[xref], GT_NCOLS(geo), Memr[yref],
 	    GT_NLINES(geo), gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
 	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX))
+
+	# setup input image boundary extension parameters
+	call geoimset (input, geo, sx1, sy1, sx2, sy2, Memr[xref],
+	    GT_NCOLS(geo), Memr[yref], GT_NLINES(geo))
 
 	# loop over the line blocks
 	for (l1 = 1; l1 <= GT_NLINES(geo); l1 = l1 + nyblock) {
@@ -90,17 +91,16 @@ pointer	xmsi, ymsi, jmsi, msi, xbuf, ybuf, jbuf
 real	gsgetr()
 
 begin
-	# setup input image boundary extension parameters
-	call geoimset (input, geo, sx1, sy1, sx2, sy2)
-	nxsample = GT_NCOLS(geo) / GT_XSAMPLE(geo)
-	nysample = GT_NLINES(geo) / GT_YSAMPLE(geo)
-
 	# allocate working space and intialize the interpolant
 	call smark (sp)
-	call salloc (xsample, nxsample, TY_REAL)
-	call salloc (ysample, nysample, TY_REAL)
+	call salloc (xsample, GT_NCOLS(geo), TY_REAL)
+	call salloc (ysample, GT_NLINES(geo), TY_REAL)
 	call salloc (xinterp, GT_NCOLS(geo), TY_REAL)
 	call salloc (yinterp, GT_NLINES(geo), TY_REAL)
+
+	# compute the sample size
+	nxsample = GT_NCOLS(geo) / GT_XSAMPLE(geo)
+	nysample = GT_NLINES(geo) / GT_YSAMPLE(geo)
 
 	# intialize interpolants
 	call msiinit (xmsi, II_BILINEAR)
@@ -108,6 +108,13 @@ begin
 	call msiinit (msi, GT_INTERPOLANT(geo))
 	if (GT_FLUXCONSERVE(geo) == YES)
 	    call msiinit (jmsi, II_BILINEAR)
+
+	# setup input image boundary extension parameters
+	call georef (geo, Memr[xsample], GT_NCOLS(geo), Memr[ysample],
+	    GT_NLINES(geo), gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
+	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX))
+	call geoimset (input, geo, sx1, sy1, sx2, sy2, Memr[xsample],
+	    GT_NCOLS(geo), Memr[ysample], GT_NLINES(geo))
 
 	# calculate the sampled reference coordinates and the interpolated
 	# reference coordinates
@@ -784,19 +791,25 @@ end
 
 # GEOIMSET -- Procedure to set up input image boundary conditions
 
-procedure geoimset (im, geo, sx1, sy1, sx2, sy2)
+procedure geoimset (im, geo, sx1, sy1, sx2, sy2, xref, nx, yref, ny)
 
 pointer	im		# pointer to image
 pointer	geo		# pointer to geotran structure
 pointer	sx1, sy1	# pointer to linear surface
 pointer	sx2, sy2	# pointer to distortion surface
+real	xref[ARB]	# x reference coordinates
+int	nx		# number of x reference coordinates
+real	yref[ARB]	# y reference coordinates
+int	ny		# number of y reference coordinates
 
-int	bndry
+int	bndry, npts
+pointer	sp, x1, x2, y1, y2, xtemp, ytemp
 real	xn1, xn2, xn3, xn4, yn1, yn2, yn3, yn4, xmin, xmax, ymin, ymax
-
 real	gseval()
 
 begin
+	npts = max (nx, ny)
+
 	xn1 = gseval (sx1, GT_XMIN(geo), GT_YMIN(geo))
 	xn2 = gseval (sx1, GT_XMAX(geo), GT_YMIN(geo))
 	xn3 = gseval (sx1, GT_XMAX(geo), GT_YMAX(geo))
@@ -812,21 +825,79 @@ begin
 	ymax = max (yn1, yn2, yn3, yn4)
 
 	if (sx2 != NULL) {
-	    xn1 = xn1 + gseval (sx2, GT_XMIN(geo), GT_YMIN(geo))
-	    xn2 = xn2 + gseval (sx2, GT_XMAX(geo), GT_YMIN(geo))
-	    xn3 = xn3 + gseval (sx2, GT_XMAX(geo), GT_YMAX(geo))
-	    xn4 = xn4 + gseval (sx2, GT_XMIN(geo), GT_YMAX(geo))
+
+	    call smark (sp)
+	    call salloc (x1, npts, TY_REAL)
+	    call salloc (x2, npts, TY_REAL)
+	    call salloc (xtemp, npts, TY_REAL)
+	    call salloc (ytemp, npts, TY_REAL)
+
+	    call amovkr (GT_YMIN(geo), Memr[ytemp], nx) 
+	    call gsvector (sx1, xref, Memr[ytemp], Memr[x1], nx)
+	    call gsvector (sx2, xref, Memr[ytemp], Memr[x2], nx)
+	    call aaddr (Memr[x1], Memr[x2], Memr[x1], nx)
+	    call alimr (Memr[x1], nx, xn1, yn1)
+
+	    call amovkr (GT_XMAX(geo), Memr[xtemp], ny) 
+	    call gsvector (sx1, Memr[xtemp], yref, Memr[x1], ny)
+	    call gsvector (sx2, Memr[xtemp], yref, Memr[x2], ny)
+	    call aaddr (Memr[x1], Memr[x2], Memr[x1], ny)
+	    call alimr (Memr[x1], ny, xn2, yn2)
+
+	    call amovkr (GT_YMAX(geo), Memr[ytemp], nx) 
+	    call gsvector (sx1, xref, Memr[ytemp], Memr[x1], nx)
+	    call gsvector (sx2, xref, Memr[ytemp], Memr[x2], nx)
+	    call aaddr (Memr[x1], Memr[x2], Memr[x1], nx)
+	    call alimr (Memr[x1], nx, xn3, yn3)
+
+	    call amovkr (GT_XMIN(geo), Memr[xtemp], ny) 
+	    call gsvector (sx1, Memr[xtemp], yref, Memr[x1], ny)
+	    call gsvector (sx2, Memr[xtemp], yref, Memr[x2], ny)
+	    call aaddr (Memr[x1], Memr[x2], Memr[x1], ny)
+	    call alimr (Memr[x1], ny, xn4, yn4)
+
 	    xmin = min (xn1, xn2, xn3, xn4)
-	    xmax = max (xn1, xn2, xn3, xn4)
+	    xmax = max (yn1, yn2, yn3, yn4)
+
+	    call sfree (sp)
 	}
 
 	if (sy2 != NULL) {
-	    yn1 = yn1 + gseval (sy2, GT_XMIN(geo), GT_YMIN(geo))
-	    yn2 = yn2 + gseval (sy2, GT_XMAX(geo), GT_YMIN(geo))
-	    yn3 = yn3 + gseval (sy2, GT_XMAX(geo), GT_YMAX(geo))
-	    yn4 = yn4 + gseval (sy2, GT_XMIN(geo), GT_YMAX(geo))
-	    ymin = min (yn1, yn2, yn3, yn4)
+
+	    call smark (sp)
+	    call salloc (y1, npts, TY_REAL)
+	    call salloc (y2, npts, TY_REAL)
+	    call salloc (xtemp, npts, TY_REAL)
+	    call salloc (ytemp, npts, TY_REAL)
+
+	    call amovkr (GT_YMIN(geo), Memr[ytemp], nx) 
+	    call gsvector (sy1, xref, Memr[ytemp], Memr[y1], nx)
+	    call gsvector (sy2, xref, Memr[ytemp], Memr[y2], nx)
+	    call aaddr (Memr[y1], Memr[y2], Memr[y1], nx)
+	    call alimr (Memr[y1], nx, xn1, yn1)
+
+	    call amovkr (GT_XMAX(geo), Memr[xtemp], ny) 
+	    call gsvector (sy1, Memr[xtemp], yref, Memr[y1], ny)
+	    call gsvector (sy2, Memr[xtemp], yref, Memr[y2], ny)
+	    call aaddr (Memr[y1], Memr[y2], Memr[y1], ny)
+	    call alimr (Memr[y1], ny, xn2, yn2)
+
+	    call amovkr (GT_YMAX(geo), Memr[ytemp], nx) 
+	    call gsvector (sy1, xref, Memr[ytemp], Memr[y1], nx)
+	    call gsvector (sy2, xref, Memr[ytemp], Memr[y2], nx)
+	    call aaddr (Memr[y1], Memr[y2], Memr[y1], nx)
+	    call alimr (Memr[y1], nx, xn3, yn3)
+
+	    call amovkr (GT_XMIN(geo), Memr[xtemp], ny) 
+	    call gsvector (sy1, Memr[xtemp], yref, Memr[y1], ny)
+	    call gsvector (sy2, Memr[xtemp], yref, Memr[y2], ny)
+	    call aaddr (Memr[y1], Memr[y2], Memr[y1], ny)
+	    call alimr (Memr[y1], ny, xn4, yn4)
+
+	    ymin = min (xn1, xn2, xn3, xn4)
 	    ymax = max (yn1, yn2, yn3, yn4)
+
+	    call sfree (sp)
 	}
 
 	if (xmin < 1.0 || ymin < 1.0 || xmax > real (IM_LEN(im,1)) ||

@@ -81,7 +81,8 @@ begin
 			op = op + 1
 		    } else {
 			if (dv < 0)
-			    ll_dst[op] = M_DH + -dv
+#Domain/OS:		    ll_dst[op] = M_DH + -dv
+			    ll_dst[op] = M_DH + (-dv)
 			else
 			    ll_dst[op] = M_IH + dv
 			op = op + 1

@@ -80,13 +80,15 @@ begin
 	case AP_RADPLOT:
 	    call strcpy ("radplot", AP_SSTRING(sky), SZ_FNAME)
 	case AP_MEDIAN:
-	    call pargstr ("median", AP_SSTRING(sky), SZ_FNAME)
+	    call strcpy ("median", AP_SSTRING(sky), SZ_FNAME)
 	case AP_GAUSS:
 	    call strcpy ("gauss", AP_SSTRING(sky), SZ_FNAME)
 	case AP_OFILT:
 	    call strcpy ("ofilt", AP_SSTRING(sky), SZ_FNAME)
 	case AP_CROSSCOR:
 	    call strcpy ("crosscor", AP_SSTRING(sky), SZ_FNAME)
+	case AP_MEAN:
+	    call strcpy ("mean", AP_SSTRING(sky), SZ_FNAME)
 	default:
 	    AP_SKYFUNCTION(sky) = DEF_SKYFUNCTION
 	    call strcpy ("mode", AP_SSTRING(sky), SZ_FNAME)

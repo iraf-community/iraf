@@ -5,36 +5,37 @@ include "../lib/noise.h"
 
 procedure ap_nshow (ap)
 
-pointer	ap	# pointer to the apphot strucuture
+pointer	ap	# pointer to the apphot structure
 
-pointer	sp, str
+pointer	sp, str1, str2
 int	apstati(), itob()
 real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
 
 	# Set the object charactersitics.
 	call printf ("\nData Characteristics\n")
-	call apstats (ap, IMNAME, Memc[str], SZ_FNAME)
+	call apstats (ap, IMNAME, Memc[str1], SZ_FNAME)
 	call printf ("    %s: %s (%.2f, %.2f)   %s: %g\n")
 	    call pargstr (KY_IMNAME)
-	    call pargstr (Memc[str])
+	    call pargstr (Memc[str1])
 	    call pargr (apstatr (ap, CWX))
 	    call pargr (apstatr (ap, CWY))
 	    call pargstr (KY_SCALE)
 	    call pargr (1.0 / apstatr (ap, SCALE))
 
-	call apstats (ap, OUTNAME, Memc[str], SZ_FNAME)
+	call apstats (ap, OUTNAME, Memc[str1], SZ_FNAME)
 	call printf ("    %s: %s")
 	    call pargstr (KY_OUTNAME)
-	    call pargstr (Memc[str])
+	    call pargstr (Memc[str1])
 
-	call apstats (ap, CLNAME, Memc[str], SZ_FNAME)
+	call apstats (ap, CLNAME, Memc[str1], SZ_FNAME)
 	call printf ("    %s: %s\n")
 	    call pargstr (KY_CLNAME)
-	    call pargstr (Memc[str])
+	    call pargstr (Memc[str1])
 
 	call printf ("    %s = %g %s    %s = %b\n")
 	    call pargstr (KY_FWHMPSF)
@@ -51,20 +52,37 @@ begin
 	    call pargr (apstatr (ap, DATAMAX))
 	    call pargstr (UN_DATAMAX)
 
-	call apstats (ap, EXPOSURE, Memc[str], SZ_FNAME)
+	call apstats (ap, EXPOSURE, Memc[str1], SZ_FNAME)
 	call printf ("    %s = %s    %s = %g %s\n")
 	    call pargstr (KY_EXPOSURE)
-	    call pargstr (Memc[str])
+	    call pargstr (Memc[str1])
 	    call pargstr (KY_ITIME)
 	    call pargr (apstatr (ap, ITIME))
 	    call pargstr (UN_ITIME)
 
+	# Set the filter ID.
+	call apstats (ap, FILTER, Memc[str1], SZ_FNAME)
+	call apstats (ap, FILTERID, Memc[str2], SZ_FNAME)
+	call printf ("    %s = %s    %s = %s\n")
+	    call pargstr (KY_FILTER)
+	    call pargstr (Memc[str1])
+	    call pargstr (KY_FILTERID)
+	    call pargstr (Memc[str2])
+
+	# Set the airmass.
+	call apstats (ap, AIRMASS, Memc[str1], SZ_FNAME)
+	call printf ("    %s = %s    %s = %g\n")
+	    call pargstr (KY_AIRMASS)
+	    call pargstr (Memc[str1])
+	    call pargstr (KY_XAIRMASS)
+	    call pargr (apstatr (ap, XAIRMASS))
+
 	# Set the noise model.
 	call printf ("\nNoise Model\n")
-	call apstats (ap, NSTRING, Memc[str], SZ_FNAME)
+	call apstats (ap, NSTRING, Memc[str1], SZ_FNAME)
 	call printf ("    %s = %s  %s    %s = %g %s\n")
 	    call pargstr (KY_NSTRING)
-	    call pargstr (Memc[str])
+	    call pargstr (Memc[str1])
 	    call pargstr (UN_NSTRING)
 	    call pargstr (KY_SKYSIGMA)
 	    call pargr (apstatr (ap, SKYSIGMA))
@@ -78,18 +96,18 @@ begin
 	    call pargr (apstatr (ap, CTHRESHOLD))
 	    call pargstr (UN_CTHRESHOLD)
 
-	call apstats (ap, GAIN, Memc[str], SZ_LINE)
+	call apstats (ap, GAIN, Memc[str1], SZ_LINE)
 	call printf ("    %s = %s    %s = %g %s\n")
 	    call pargstr (KY_GAIN)
-	    call pargstr (Memc[str])
+	    call pargstr (Memc[str1])
 	    call pargstr (KY_EPADU)
 	    call pargr (apstatr (ap, EPADU))
 	    call pargstr (UN_EPADU)
 
-	call apstats (ap, CCDREAD, Memc[str], SZ_LINE)
+	call apstats (ap, CCDREAD, Memc[str1], SZ_LINE)
 	call printf ("    %s = %s    %s = %g %s\n")
 	    call pargstr (KY_CCDREAD)
-	    call pargstr (Memc[str])
+	    call pargstr (Memc[str1])
 	    call pargstr (KY_READNOISE)
 	    call pargr (apstatr (ap, READNOISE))
 	    call pargstr (UN_READNOISE)

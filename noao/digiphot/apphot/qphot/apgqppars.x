@@ -33,15 +33,19 @@ begin
 
 	# Open the apphot structure.
 	if (naperts <= 0.0)
-	    call apinit (ap, AP_CENTROID1D, cbox, AP_MODE, annulus,
+	    call appinit (ap, AP_CENTROID1D, cbox, AP_MODE, annulus,
 	        dannulus, 0.0, 1, AP_PWCONSTANT, 1.0, AP_NPOISSON) 
 	else
-	    call apinit (ap, AP_CENTROID1D, cbox, AP_MODE, annulus, dannulus,
+	    call appinit (ap, AP_CENTROID1D, cbox, AP_MODE, annulus, dannulus,
 	        Memr[aperts], naperts, AP_PWCONSTANT, 1.0, AP_NPOISSON) 
 
 	# Set remaining parameters.
 	call clgstr ("exposure", Memc[str], SZ_FNAME)
 	call apsets (ap, EXPOSURE, Memc[str])
+	call clgstr ("airmass", Memc[str], SZ_FNAME)
+	call apsets (ap, AIRMASS, Memc[str])
+	call clgstr ("filter", Memc[str], SZ_FNAME)
+	call apsets (ap, FILTER, Memc[str])
 	call apsetr (ap, EPADU, clgetr ("epadu"))
 	call apsetr (ap, ZMAG, clgetr ("zmag"))
 	if (naperts > 0)

@@ -126,28 +126,28 @@ this reason, all intersection angles less than 5 degrees are treated as
 though they were exactly 5 degrees.
 .ih
 EXAMPLES
-Plot a metacode file exactly as is:
+1. Plot a metacode file exactly as is:
 
-	cl> calcomp metacodefile
+    cl> calcomp metacodefile
 
-Get the fastest plot you can -- no bold lines or text, no dashed or dotted
+2. Get the fastest plot you can -- no bold lines or text, no dashed or dotted
 lines:
 
-	cl> calcomp metacodefile lwover+ ltover+ txquality=low
+    cl> calcomp metacodefile lwover+ ltover+ txquality=low
 
-Get a plot half the size of the original; suppose the original plot had
+3. Get a plot half the size of the original; suppose the original plot had
 metacode scales = 0.0003 inches / GKI unit:
 
-	cl> calcomp metacodefile xscale=0.00015 yscale=0.00015
+    cl> calcomp metacodefile xscale=0.00015 yscale=0.00015
 
-Get the highest quality plot you can without having to change pens:
+4. Get the highest quality plot you can without having to change pens:
 
-	cl> calcomp metacodefile txqual=high 
+    cl> calcomp metacodefile txqual=high 
 
-Get a high-quality plot where you have to change the pen each time the
+5. Get a high-quality plot where you have to change the pen each time the
 metacode switches from bold to single-width lines or text:
 
-	cl> calcomp metacodefile txqual=high lwtype=penchange
+    cl> calcomp metacodefile txqual=high lwtype=penchange
 
 .ih
 TIME REQUIREMENTS

@@ -203,8 +203,8 @@ begin
 	op = op + gstrcpy (key, Memc[op], MAX_SZKEY)
 	Memc[op] = '='
 	op = op + 1
-	E_LEN(el) = max (MIN_SZVALUE, gstrcpy(value,Memc[op],MAX_SZVALUE)) + 1
-	op = op + E_LEN(el)
+	E_LEN(el) = max (MIN_SZVALUE, gstrcpy(value,Memc[op],MAX_SZVALUE))
+	op = op + E_LEN(el) + 1
 
 	last = top
 	threads[thread_index] = last

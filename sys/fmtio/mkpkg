@@ -48,8 +48,8 @@ libsys.a:
 	gargb.x		scan.com <ctype.h>
 	gargc.x		scan.com
 	gargd.x		scan.com
-	gargi.x	
-	gargl.x	
+	gargi.x		<mach.h>
+	gargl.x		<mach.h>
 	gargr.x	
 	gargrad.x	scan.com
 	gargs.x	

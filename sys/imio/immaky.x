@@ -16,9 +16,11 @@ procedure im_make_newcopy (im, o_im)
 pointer	im				# new copy image
 pointer	o_im				# image being copied
 
+pointer	mw
 long	clktime()
-bool	strne()
-errchk	imerr, realloc
+pointer	mw_open()
+bool	strne(), envgetb()
+errchk	imerr, realloc, mw_open, mw_loadim, mw_saveim, mw_close
 
 begin
 	if (strne (IM_MAGIC(o_im), "imhdr"))
@@ -36,6 +38,20 @@ begin
 	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
 	}
 	call amovi (IM_MAGIC(o_im), IM_MAGIC(im), IM_HDRLEN(o_im) + 1)
+
+	# If the old image was opened with an image section, modify the
+	# WCS of the new image accordingly.  The section is applied to the
+	# MWCS Lterm automatically when the WCS is loaded from an image,
+	# so all we have to do is load the WCS of the old image section,
+	# and store it in the new image.
+
+	if (IM_SECTUSED(o_im) == YES)
+	    if (!envgetb ("nomwcs")) {
+		mw = mw_open (NULL, IM_NPHYSDIM(o_im))
+		call mw_loadim (mw, o_im)
+		call mw_saveim (mw, im)
+		call mw_close (mw)
+	    }
 
 	# If the pixels of the old image were stored in byte stream mode,
 	# make the new image that way too.  Otherwise, the physical line

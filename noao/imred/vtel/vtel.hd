@@ -26,4 +26,4 @@ makeimages	hlp=doc$makeimages.hlp,		src=vtel$makeimages.cl
 makehelium	hlp=doc$makehelium.hlp,		src=vtel$makehelium.cl
 writetape	hlp=doc$writetape.hlp,		src=vtel$writetape.cl
 syndico		hlp=doc$syndico.hlp,		src=vtel$syndico.x
-revisions	hlp=Revisions
+revisions	sys=Revisions

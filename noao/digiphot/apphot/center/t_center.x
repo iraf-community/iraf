@@ -17,6 +17,7 @@ pointer	graphics		# pointer to graphics device
 pointer display			# pointer to display device
 int	interactive		# interactive mode
 int	verify			# verify parameters
+int	update			# update parameters
 int	verbose			# verbose mode
 
 int	limlist, lclist, lolist, sid, lid, cl, pfd, out, root, stat
@@ -68,14 +69,23 @@ begin
 	}
 
 	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
-	interactive = btoi (clgetb ("interactive"))
+	if (Memc[cname] != EOS)
+	    interactive = NO
+	else if (lclist == 0)
+	    interactive = YES
+	else
+	    interactive = btoi (clgetb ("interactive"))
 	verbose = btoi (clgetb ("verbose"))
 	verify = btoi (clgetb ("verify"))
+	update = btoi (clgetb ("update"))
 
 	# Fetch the centering parameters.
 	call ap_gcpars (ap)
-	if (verify == YES && interactive == NO)
-	    call ap_cconfirm (ap)
+	if (verify == YES && interactive == NO) {
+	    call ap_cconfirm (ap, NULL, 1)
+	    if (update == YES)
+		call ap_pcpars (ap)
+	}
 	
 	# Open plot files.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
@@ -128,6 +138,9 @@ begin
 	    call apsets (ap, IMNAME, Memc[image])
 	    call ap_padu (im, ap)
 	    call ap_rdnoise (im, ap)
+	    call ap_itime (im, ap)
+	    call ap_filter (im, ap)
+	    call ap_airmass (im, ap)
 
 	    # Open the coordinate file; where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -135,12 +148,29 @@ begin
 
 	    if (lclist <= 0) {
 		cl = NULL
-		call strcpy ("", Memc[coords], SZ_FNAME)
-	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF)
-	        cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
-	    else
-		call seek (cl, BOF)
-	    call apsets (ap, CLNAME, Memc[coords])
+		call strcpy ("", Memc[outfname], SZ_FNAME)
+	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords]))
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+		else
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+	    } else {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords])) {
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else {
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+		    call seek (cl, BOF)
+		}
+	    }
+	    call apsets (ap, CLNAME, Memc[outfname])
 
 	    # Open output text file; if output is "default", dir$default  or
 	    # a directory specification then the extension "ctr" is added to

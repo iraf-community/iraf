@@ -18,9 +18,12 @@ begin
 	call salloc (sval, SZ_FNAME, TY_CHAR)
 
 	# Reduce the precision of the encoded value if necessary to fit in
-	# the FITS value field.
+	# the FITS value field.  Start with NDIGITS_DP-1 as the precision
+	# estimate NDIGITS_DP is only approximate, and if we make up half a
+	# digit of precision the result can be 1.00000000000000001 instead
+	# of 1.0.
 
-	for (i=NDIGITS_DP;  i >= NDIGITS_RP;  i=i-1) {
+	for (i=NDIGITS_DP-1;  i >= NDIGITS_RP;  i=i-1) {
 	    call sprintf (Memc[sval], SZ_FNAME, "%0.*g")
 		call pargi (i)
 		call pargd (dval)

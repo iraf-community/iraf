@@ -3,6 +3,6 @@
 # Package task statement for the NCAR utilities package.
 
 task	contour		= t_contour,
-	hafton		= t_hafton,
 	surface		= t_surface,
+	hafton		= t_hafton,
 	velvect		= t_velvect

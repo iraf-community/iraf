@@ -114,25 +114,50 @@ The log contains a time, the combining options and relevant parameters,
 a list of the input images, and weight parameters if used, and the name
 of the output image.
 
-Except for medianing and summing, the images are combined by averaging.
-The average may be weighted by
-
-	weight = (N * scale / mode) ** 2
-
-where N is the number of images previously combined (using the image
-header parameter NCOMBINE), scale is the multiplicative scale from the
-exposure or mode scaling, and mode is the background mode estimate used
-when adding a variable offset.  Combining with weighting and/or scaling
+Except for summing the images may be scaled.  There are currently three
+ways to scale the images.  The images may be scaled to the same
+exposure time.  If the background level or sensitivity is variable then
+the images may be either scaled or offset (by a constant) to the same
+mode.  The mode is determined by sampling up to 100 points per
+dimension within the specified mode image section.  A scaling
+correction is used when the overall brightness or sensitivity is
+varying.  The offset correction is used when the background brightness
+is varying independently of the object brightness.  When scaling by the
+mode, the exposure time (and setting of the exposure and offset
+parameters) is ignored.  Except for medianing and summing, the images
+are combined by averaging.  Combining with weighting and/or scaling
 is slower than if not weighting and scaling.
 
-There are currently three ways to scale the images.  The images may
-be scaled to the same exposure time.  If the background level or
-sensitivity is variable then the images may be either scaled or
-offset (by a constant) to the same mode.  The mode is determined
-by sampling up to 100 points per dimension within the specified mode
-image section.  A scaling correction is used when the overall brightness or
-sensitivity is varying.  The offset correction is used when the background
-brightness is varying independently of the object brightness.
+The relationships between the exposure time and modes determining the
+scaling, offsets, and weights used and printed in the log output are
+given below.
+
+    if scale = yes:
+	scale = <M> / M
+	offset = 0.
+	weight = (N*M)**1/2 / sum {(N*M)**1/2}
+
+    if exposure = yes and offset = no:
+	scale = <T> / T
+	offset = 0.
+	weight = (N*T)**1/2 / sum {(N*T)**1/2}
+
+    if exposure = no and offset = yes:
+	scale = 1
+	offset = <M> - M
+	weight = (N/M)**1/2 / sum {(N/M)**1/2}
+
+    if exposure = yes and offset = yes:
+	scale = <T> / T
+	offset = <T> * (<M/T> - M/T)
+	weight = (N*T/(M/T))**1/2 / sum {(N*T/(M/T))**1/2}
+
+where M is the mode of an image, <M> is the average mode over all
+images, N is the number of images previously combined (using the image
+header parameter NCOMBINE), T is the exposure time (with a minimum of
+0.001 imposed), and <T> is the average exposure time over all images.
+The operation **1/2 is the square root.  Note that the scales average
+to 1, the offsets sum to zero, and the weights sum to 1.
 
 The \fIoption\fR parameter is the heart of the task.  It selects from
 one of a number of algorithms for combining the images.  The list

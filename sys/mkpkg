@@ -46,6 +46,7 @@ sysgen:
 	$call gks
 	$call ncar
 	$call sgi
+	$call imd
 
 	# Not all systems want the NCAR/NSPP and CALCOMP graphics kernels.
 	$ifeq (USE_NSPP, yes)
@@ -96,6 +97,9 @@ libmain:
 	$echo "-------------- LIBMAIN.O -------------" 
 	$ifolder (lib$libmain.o, host$os/zmain.c)
 	    $call libmain.o
+	    $echo " ***** DOMAIN/OS SITES:  You must manually recompile "
+	    $echo " os$zmain.c with normal $HSI_CF flags and insert into "
+	    $echo " bin$libmain.o.  Domain/CC barfs on -save flag in $HSI_XF. "
 	$else
 	    $echo "Libmain.o is up to date"
 	$endif
@@ -123,6 +127,12 @@ sgi:
 	$checkout libsgi.a  lib$
 	$update   libsgi.a
 	$checkin  libsgi.a  lib$
+	;
+imd:
+	$echo "-------------- LIBIMD ----------------" 
+	$checkout libimd.a  lib$
+	$update   libimd.a
+	$checkin  libimd.a  lib$
 	;
 ds:
 	$echo "-------------- LIBDS ----------------" 
@@ -182,6 +192,7 @@ libex.a:				# High level system stuff
 	@plio
 	@pmio
 	@qpoe
+	@mwcs
 	;
 
 libvops.a:
@@ -196,7 +207,19 @@ libcur.a:
 libmain.o:				# The root object module
 	$set XFLAGS = "-c $(HSI_XF)"
 	$checkout zmain.c host$os/
-	$omake	  zmain.c
+	
+	# Workaround for Domain/OS:  cannot use $HSI_XF for .c files on
+	# Apollo; cc aborts if "-save" flag seen, which is needed in HSI_XF.
+	$set	HOST_CC = no
+	$ifeq (MACH, m68k_fpa)	$set HOST_CC = yes	$endif
+	$ifeq (MACH, m68k_f68)	$set HOST_CC = yes	$endif
+	$ifeq (MACH, a88k)	$set HOST_CC = yes	$endif
+	$ifeq (HOST_CC, yes) then
+	    !cc -c $HSI_CF zmain.c
+	$else
+	    $omake	  zmain.c
+	$endif
+
 	$iffile (bin$libsys.a)		# store all binaries in BIN?
 	    $move zmain.o bin$libmain.o
 	$else
@@ -230,6 +253,10 @@ libstg.a:				# The STDGRAPH graphics kernel
 	;
 
 libsgi.a:				# The SGI (simple graphics) kernel
+	@gio
+	;
+
+libimd.a:				# The IMD (image device) kernel
 	@gio
 	;
 

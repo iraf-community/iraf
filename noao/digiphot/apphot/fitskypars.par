@@ -1,6 +1,6 @@
 # SKY FITTING PARAMETERS
 
-salgorithm,s,h,"mode","|median|mode|centroid|gauss|crosscor|ofilter|histplot|radplot|constant|file|",,Sky fitting algorithm
+salgorithm,s,h,"mode","|median|mode|centroid|gauss|crosscor|ofilter|histplot|radplot|constant|file|mean|",,Sky fitting algorithm
 annulus,r,h,10.0,,,Inner radius of sky annulus in scale units
 dannulus,r,h,10.0,,,Width of sky annulus in scale units
 skyvalue,r,h,0.0,,,User sky value

@@ -1,7 +1,7 @@
 .help polypars May88 noao.digiphot.apphot
 .ih
 NAME
-polypars -- edit the polyphot photometry parameters
+polypars -- edit the polygon photometry parameters
 .ih
 USAGE
 polypars
@@ -16,21 +16,46 @@ Draw the polygons on the screen.
 .ih
 DESCRIPTION
 The zero point of the magnitude scale is determined by \fIzmag\fR.
-If the \fImkpolygon\fR switch enabled polygons are marked on the screen.
+If the \fImkpolygon\fR switch is enabled polygons are marked on the screen.
 .ih
 EXAMPLES
 
-1. List the polyphot photometry parameters.
+1. List the POLYPHOT photometry parameters.
 
 .nf
 	ap> lpar polypars
 .fi
 
-2. Edit the polyphot photometry parameters.
+2. Edit the POLYPHOT photometry parameters.
 
 .nf
 	ap> polypars
 .fi
+
+3. Edit the POLYPARS parameters from within the POLYPHOT task.
+
+.nf
+    da> epar polyphot
+
+	... edit a few polyphot parameters
+
+	... move to the polypars parameter and type :e
+
+	... edit the polypars parameters and type :q
+
+	... finish editing the polyphot parameters and type ^Z
+.fi
+
+4. Save the current POLYPARS parameter set in a text file polynite1.par.
+This can also be done from inside a higher level task as in the
+above example.
+
+.nf
+    da> polypars
+
+	... edit some parameters
+
+	... type ":w polynite1.par"  from within epar
 
 .ih
 TIME REQUIREMENTS

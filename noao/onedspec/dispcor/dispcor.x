@@ -222,6 +222,7 @@ begin
 	call imaddr (out, "CRPIX1", 1.)
 	call imaddr (out, "CRVAL1", w1)
 	call imaddr (out, "CDELT1", dw)
+	call imaddr (out, "CD1_1", dw)
 	call imaddr (out, "W0", w1)
 	call imaddr (out, "WPC", dw)
 	call imaddi (out, "NP1", 0)
@@ -586,8 +587,8 @@ double	func()			# Dispersion function
 
 int	i, j, i1, i2, clgwrd()
 real	a, b, asieval(), asigrl()
-double	x, dx, xmin, xmax, y, dxdy, w, w1d, dwd
-pointer	asi, sp, str
+double	x, dx, xmin, xmax, xmin1, xmax1, y, dxdy, w, w1d, dwd
+pointer	asi, sp, str, temp
 extern	func
 
 int	asitype[4]
@@ -600,6 +601,8 @@ begin
 	# Determine approximate slope of dispersion function.
 	xmin = 1
 	xmax = npts
+	xmin1 = xmin - 0.5
+	xmax1 = xmax + 0.5
 	w1d = w1
 	dwd = dw
 	x = func (xmin)
@@ -624,10 +627,18 @@ begin
 
 	# Get the image buffers, determine the interpolaion type, and
 	# fit the interpolation function to the input spectrum.
+	# Extend the interpolation by one pixel at each end.
 
 	i = clgwrd ("interpolation", Memc[str], SZ_LINE, INTERP)
+	call malloc (temp, npts+2, TY_REAL)
+	call amovr (in, Memr[temp+1], npts)
+	Memr[temp] = in[1]
+	Memr[temp+npts+1] = in[npts]
+
 	call asiinit (asi, asitype[i])
-	call asifit (asi, in, npts)
+	call asifit (asi, Memr[temp], npts+2)
+
+	call mfree (temp, TY_REAL)
 
 	# If flux conserving determine edges of output pixels in input
 	# spectrum and integrate using ASIGRL.  If not flux conserving
@@ -647,7 +658,7 @@ begin
 	        if (abs (dx) < DX)
 		    break
 	    }
-	    b = max (xmin, min (xmax, x))
+	    b = max (xmin1, min (xmax1, x)) + 1
 	    do i = i1, i2 {
 	        w = w1d + dwd * (i - 0.5)
 	        if (log)
@@ -661,7 +672,7 @@ begin
 		        break
 	        }
 		a = b
-	        b = max (xmin, min (xmax, x))
+	        b = max (xmin1, min (xmax1, x)) + 1
 		if (a < b)
 		    out[i] = asigrl (asi, a, b)
 		else
@@ -681,8 +692,8 @@ begin
 		        break
 	        }
 
-		if ((x >= xmin) && (x <= xmax)) {
-		    a = x
+		if ((x >= xmin1) && (x <= xmax1)) {
+		    a = x + 1
 	            out[i] = asieval (asi, a)
 		} else
 	            out[i] = 0.

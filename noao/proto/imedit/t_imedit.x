@@ -92,117 +92,123 @@ newim_	    if (imaccess (EPIXBUF, READ_ONLY) == YES)
 	        newdisplay = NO
 	        change = NO
  
-	        switch (key) {
-	        case '?':	# Print help
-		    call pagefile (HELP, PROMPT)
-	        case ':':	# Process colon commands
-		    call ep_colon (ep, Memc[cmd], newimage)
-		    if (newimage == YES)
-			break
-		case 'a', 'b':	# Background replacement
-		    call ep_background (ep, ap, xa, ya, xb, yb)
-		    if (EP_OUTDATA(ep) != NULL) {
-			change = YES
-			changes = changes + 1
-		    }
-		case 'c':	# Column interpolation
-		    call ep_col (ep, ap, xa, ya, xb, yb)
-		    if (EP_OUTDATA(ep) != NULL) {
-			change = YES
-			changes = changes + 1
-		    }
-		case 'd', 'e':	# Constant value
-		    call ep_constant (ep, ap, xa, ya, xb, yb)
-		    if (EP_OUTDATA(ep) != NULL) {
-			change = YES
-			changes = changes + 1
-		    }
-		case 'f':	# Diagonal aperture
-		    if (ap == APCDIAG)
+		iferr {
+		    switch (key) {
+		    case '?':	# Print help
+			call pagefile (HELP, PROMPT)
+		    case ':':	# Process colon commands
+			call ep_colon (ep, Memc[cmd], newimage)
+			if (newimage == YES)
+			    break
+		    case 'a', 'b':	# Background replacement
+			call ep_background (ep, ap, xa, ya, xb, yb)
+			if (EP_OUTDATA(ep) != NULL) {
+			    change = YES
+			    changes = changes + 1
+			}
+		    case 'c':	# Column interpolation
 			call ep_col (ep, ap, xa, ya, xb, yb)
-		    else
+			if (EP_OUTDATA(ep) != NULL) {
+			    change = YES
+			    changes = changes + 1
+			}
+		    case 'd', 'e':	# Constant value
+			call ep_constant (ep, ap, xa, ya, xb, yb)
+			if (EP_OUTDATA(ep) != NULL) {
+			    change = YES
+			    changes = changes + 1
+			}
+		    case 'f':	# Diagonal aperture
+			if (ap == APCDIAG)
+			    call ep_col (ep, ap, xa, ya, xb, yb)
+			else
+			    call ep_line (ep, ap, xa, ya, xb, yb)
+			if (EP_OUTDATA(ep) != NULL) {
+			    change = YES
+			    changes = changes + 1
+			}
+		    case 'i':	# Initialize
+			call imunmap (EP_IM(ep))
+			goto newim_
+		    case 'j', 'k':	# Replace with input
+			call ep_input (ep, ap, xa, ya, xb, yb)
+			if (EP_OUTDATA(ep) != NULL) {
+			    change = YES
+			    changes = changes + 1
+			}
+		    case 'l':	# Line interpolation
 			call ep_line (ep, ap, xa, ya, xb, yb)
-		    if (EP_OUTDATA(ep) != NULL) {
-			change = YES
-			changes = changes + 1
+			if (EP_OUTDATA(ep) != NULL) {
+			    change = YES
+			    changes = changes + 1
+			}
+		    case 'm', 'n':	# Move
+			    i = ep_gcur (ep, ap, x1, y1, x2, y2, key,
+				Memc[cmd],SZ_LINE)
+			call ep_move (ep, ap, xa, ya, xb, yb, x1, y1, x2, y2,
+			    key)
+			if (EP_OUTDATA(ep) != NULL) {
+			    change = YES
+			    changes = changes + 1
+			}
+		    case 'g':	# Surface graph
+			call ep_dosurface (ep)
+		    case ' ':	# Statistics
+			call ep_statistics (ep, ap, xa, ya, xb, yb, NO)
+		    case 'p':
+			call ep_statistics (ep, ap, xa, ya, xb, yb, YES)
+		    case 't':
+			EP_SEARCH(ep) = -EP_SEARCH(ep)
+			call ep_colon (ep, "search", newimage)
+		    case '+':
+			EP_RADIUS(ep) = EP_RADIUS(ep) + 1.
+			call ep_colon (ep, "radius", newimage)
+		    case '-':
+			EP_RADIUS(ep) = max (0., EP_RADIUS(ep) - 1.)
+			call ep_colon (ep, "radius", newimage)
+		    case 's':	# Surface plot
+			i = max (5.,
+			    abs (EP_SEARCH(ep))+EP_BUFFER(ep)+EP_WIDTH(ep)+1)
+			x1 = min (xa, xb) - i
+			x2 = max (xa, xb) + i
+			y1 = min (ya, yb) - i
+			y2 = max (ya, yb) + i
+			call ep_gindata (ep, x1, x2, y1, y2)
+			EP_OUTDATA(ep) = NULL
+			call ep_dosurface (ep)
+		    case 'q':	# Quit and save
+		    case 'u':	# Undo
+			if (EP_OUTDATA(ep) != NULL) {
+			    call malloc (temp, EP_NPTS(ep), TY_REAL)
+			    call amovr (Memr[EP_OUTDATA(ep)], Memr[temp],
+				EP_NPTS(ep))
+			    call amovr (Memr[EP_INDATA(ep)],
+				Memr[EP_OUTDATA(ep)], EP_NPTS(ep))
+			    call amovr (Memr[temp], Memr[EP_INDATA(ep)],
+				EP_NPTS(ep))
+			    call mfree (temp, TY_REAL)
+			    change = YES
+			} else
+			    call eprintf ("Can't undo last change\007\n")
+		    case 'r', 'E', 'P', 'R', 'Z', '0', '1', '2', '3', '4', '5',
+			'6', '7', '8', '9':
+			if (EP_DISPLAY(ep) == YES) {
+			    call ep_zoom (ep, xa, ya, xb, yb, key, erase)
+			    newdisplay = YES
+			}
+		    case 'Q':	# Quit and no save
+			changes = 0
+		    case 'I':	# Immediate interrupt
+			    call imdelete (EPIXBUF)
+			call fatal (1, "Interrupt")
+		    default:
+			call printf ("\007")
 		    }
-		case 'i':	# Initialize
-	            call imunmap (EP_IM(ep))
-		    goto newim_
-		case 'j', 'k':	# Replace with input
-		    call ep_input (ep, ap, xa, ya, xb, yb)
-		    if (EP_OUTDATA(ep) != NULL) {
-			change = YES
-			changes = changes + 1
-		    }
-		case 'l':	# Line interpolation
-		    call ep_line (ep, ap, xa, ya, xb, yb)
-		    if (EP_OUTDATA(ep) != NULL) {
-			change = YES
-			changes = changes + 1
-		    }
-		case 'm', 'n':	# Move
-	    	    i = ep_gcur (ep, ap, x1, y1, x2, y2, key, Memc[cmd],SZ_LINE)
-		    call ep_move (ep, ap, xa, ya, xb, yb, x1, y1, x2, y2, key)
-		    if (EP_OUTDATA(ep) != NULL) {
-			change = YES
-			changes = changes + 1
-		    }
-		case 'g':	# Surface graph
-		    call ep_dosurface (ep)
-		case ' ':	# Statistics
-		    call ep_statistics (ep, ap, xa, ya, xb, yb, NO)
-		case 'p':
-		    call ep_statistics (ep, ap, xa, ya, xb, yb, YES)
-		case 't':
-		    EP_SEARCH(ep) = -EP_SEARCH(ep)
-		    call ep_colon (ep, "search", newimage)
-		case '+':
-		    EP_RADIUS(ep) = EP_RADIUS(ep) + 1.
-		    call ep_colon (ep, "radius", newimage)
-		case '-':
-		    EP_RADIUS(ep) = max (0., EP_RADIUS(ep) - 1.)
-		    call ep_colon (ep, "radius", newimage)
-		case 's':	# Surface plot
-		    i = max (5.,
-			abs (EP_SEARCH(ep))+EP_BUFFER(ep)+EP_WIDTH(ep)+1)
-		    x1 = min (xa, xb) - i
-		    x2 = max (xa, xb) + i
-		    y1 = min (ya, yb) - i
-		    y2 = max (ya, yb) + i
-		    call ep_gindata (ep, x1, x2, y1, y2)
-		    EP_OUTDATA(ep) = NULL
-		    call ep_dosurface (ep)
-		case 'q':	# Quit and save
+		} then
+		    call erract (EA_WARN)
+
+		if (key == 'q' || key == 'Q')
 		    break
-		case 'u':	# Undo
-		    if (EP_OUTDATA(ep) != NULL) {
-			call malloc (temp, EP_NPTS(ep), TY_REAL)
-		        call amovr (Memr[EP_OUTDATA(ep)], Memr[temp],
-			    EP_NPTS(ep))
-		        call amovr (Memr[EP_INDATA(ep)], Memr[EP_OUTDATA(ep)],
-			    EP_NPTS(ep))
-		        call amovr (Memr[temp], Memr[EP_INDATA(ep)],
-			    EP_NPTS(ep))
-			call mfree (temp, TY_REAL)
-			change = YES
-		    } else
-			call eprintf ("Can't undo last change\007\n")
-		case 'r', 'E', 'P', 'R', 'Z', '0', '1', '2', '3', '4', '5',
-		    '6', '7', '8', '9':
-		    if (EP_DISPLAY(ep) == YES) {
-		        call ep_zoom (ep, xa, ya, xb, yb, key, erase)
-		        newdisplay = YES
-		    }
-		case 'Q':	# Quit and no save
-		    changes = 0
-		    break
-		case 'I':	# Immediate interrupt
-	    	    call imdelete (EPIXBUF)
-		    call fatal (1, "Interrupt")
-		default:
-		    call printf ("\007")
-		}
  
 		if (change == YES && EP_AUTOSURFACE(ep) == YES)
 		    call ep_dosurface (ep)

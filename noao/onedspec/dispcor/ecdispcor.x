@@ -196,7 +196,7 @@ begin
 	IM_LEN(out,1) = nw
 	outdata = impl1r (out)
 	call aclrr (Memr[outdata], IM_LEN(out,1))
-	call calloc (spec, nw, TY_REAL) 
+	call malloc (spec, nw, TY_REAL) 
 	call calloc (count, nw, TY_INT) 
 
 	do i = 1, IM_LEN(in, 2) {
@@ -206,10 +206,16 @@ begin
 	    order = offset + slope * j
 
 	    indata = imgl2r (in, i)
+	    call aclrr (Memr[spec], nw)
 	    call dispcor (Memr[indata], IM_LEN(in,1), Memr[spec],
 		w1, dw, nw, log, flux, ec_eval)
 	    switch (combine) {
-	    case SUM, AVERAGE:
+	    case SUM:
+		do j = 1, nw
+		    if (Memr[spec+j-1] != 0.)
+		        Memr[outdata+j-1] = Memr[outdata+j-1] +
+			    Memr[spec+j-1]
+	    case AVERAGE:
 		do j = 1, nw {
 		    if (Memr[spec+j-1] != 0.) {
 		        Memr[outdata+j-1] = Memr[outdata+j-1] +
@@ -248,6 +254,7 @@ begin
 	call imaddr (out, "CRPIX1", 1.)
 	call imaddr (out, "CRVAL1", w1)
 	call imaddr (out, "CDELT1", dw)
+	call imaddr (out, "CD1_1", dw)
 	call imaddr (out, "W0", w1)
 	call imaddr (out, "WPC", dw)
 	call imaddi (out, "NP1", 0)

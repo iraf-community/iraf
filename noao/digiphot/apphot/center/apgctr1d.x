@@ -27,7 +27,7 @@ real	chisqr, p[NPARS], dp[NPARS]
 begin
 	# Check the number of points.
 	if (nx < NPARS || ny < NPARS)
-	    return (AP_NCTR_TOO_SMALL)
+	    return (AP_CTR_NTOO_SMALL)
 	npts = max (nx, ny)
 
 	call smark (sp)
@@ -86,7 +86,7 @@ begin
 	# Return the appropriate error code.
 	call sfree (sp)
 	if (xier == NO_DEG_FREEDOM || yier == NO_DEG_FREEDOM)
-	    return (AP_NCTR_TOO_SMALL)
+	    return (AP_CTR_NTOO_SMALL)
 	else if (xier == SINGULAR || yier == SINGULAR)
 	    return (AP_CTR_SINGULAR)
 	else if (xier == NOT_DONE || yier == NOT_DONE)

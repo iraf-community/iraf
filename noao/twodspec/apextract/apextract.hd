@@ -11,6 +11,6 @@ apscatter	hlp=doc$apscatter.hlp
 aptrace		hlp=doc$aptrace.hlp
 apstrip		hlp=doc$apstrip.hlp
 apsum		hlp=doc$apsum.hlp
-Tutorial	hlp=doc$Tutorial.hlp
+Tutorial	sys=doc$Tutorial.hlp
 
-revisions	hlp=Revisions
+revisions	sys=Revisions

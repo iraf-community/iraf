@@ -83,19 +83,17 @@ appears extended in the x direction unless \fBfill\fR = no.
 
 .ih
 EXAMPLES
-.nf
-[1] Plot row 128 of image crab.5009 with default parameters:
+1. Plot row 128 of image crab.5009 with default parameters:
 
-	cl> prow crab.5009 128
+    cl> prow crab.5009 128
 
-[2] Overplot row 128 of crab.red using crosses to mark the added points:
+2. Overplot row 128 of crab.red using crosses to mark the added points:
 
-	cl> prow crab.red 128 append+ pointmode+ marker=cross
+    cl> prow crab.red 128 append+ pointmode+ marker=cross
 
-[3] Annotate the axes of a row plot:
+3. Annotate the axes of a row plot:
 
-	cl> prow crab.5009 64 xlabel="Column Number" ylabel=Intensity
-.fi
+    cl> prow crab.5009 64 xlabel="Column Number" ylabel=Intensity
 .ih
 TIME REQUIREMENTS
 \fIprow\fR takes about 1 cp second to plot a row of a 512 square image.
@@ -105,3 +103,4 @@ BUGS
 SEE ALSO
 prows, pcol, pcols
 .endhelp
+p

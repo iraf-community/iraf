@@ -2,10 +2,10 @@ include "../lib/apphotdef.h"
 include "../lib/photdef.h"
 include "../lib/phot.h"
 
-# APINIT - Procedure to initialize apphot structure.
+# APPINIT - Procedure to initialize apphot structure.
 
-procedure apinit (ap, cfunction, cbox, sfunction, annulus, dannulus,
-    aperts, napert, weight, fwhmpsf, noise)
+procedure appinit (ap, cfunction, cbox, sfunction, annulus, dannulus,
+        aperts, napert, weight, fwhmpsf, noise)
 
 pointer	ap		# pointer to the apphot structure
 int	cfunction	# centering algorithm

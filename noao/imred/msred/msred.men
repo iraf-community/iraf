@@ -8,6 +8,7 @@
  
       calibrate - Extinction and flux calibrate spectra
        identify - Identify features in spectrum for dispersion solution
+	msbplot - Batch plots of multspec spectra using SPLOT
       msdispcor - Dispersion correct spectra
    msreidentify - Reidentify features from one multispec image to another
        msselect - Select and extract apertures from spectra

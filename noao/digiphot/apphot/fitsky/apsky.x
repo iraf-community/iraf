@@ -5,7 +5,6 @@ include "../lib/display.h"
 include "../lib/fitsky.h"
 
 define	HELPFILE	"apphot$fitsky/fitsky.key"
-define	SHELPFILE	"apphot$fitsky/sfitsky.key"
 
 # APSKY -- Procedure to interactively determine sky values in an annular
 # region around a list of objects.
@@ -48,12 +47,6 @@ begin
 	# Initialize sequencing.
 	newlist = NO
 	ltid = 0
-
-	# Print a short help page.
-	if (id != NULL)
-	    call gpagefile (id, SHELPFILE, "")
-	else if (interactive == YES)
-	    call pagefile (SHELPFILE, "")
 
 	# Loop over the cursor commands.
 	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
@@ -106,11 +99,11 @@ begin
 
 	    # Verify the critical parameters.
 	    case 'v':
-		call ap_sconfirm (ap)
+		call ap_sconfirm (ap, out, stid)
 
 	    # Save the sky fitting parameters.
 	    case 'w':
-		call ap_sppars (ap)
+		call ap_pspars (ap)
 
 	    # Draw a centered radial profile plot.
 	    case 'd':
@@ -202,21 +195,8 @@ begin
 		        newobject, newsky)
 		}
 
-	    # Fit the sky.
-	    case 'f':
-		if (newobject == YES)
-		    ier = apfitsky (ap, im, wx, wy, sd, gd)
-		else if (newsky == YES)
-		    ier = aprefitsky (ap, gd)
-		call apmark (ap, id, NO, apstati (ap, MKSKY), NO)
-		call apsplot (ap, stid, ier, gd, apstati (ap, RADPLOTS))
-		if (interactive == YES)
-		    call ap_qspsky (ap, ier)
-		newobject = NO
-		newsky = NO
-
 	    # Fit the sky and store the results.
-	    case ' ':
+	    case 'f', ' ':
 		if (newobject == YES)
 		    ier = apfitsky (ap, im, wx, wy, sd, gd)
 		else if (newsky == YES)
@@ -225,17 +205,18 @@ begin
 		call apsplot (ap, stid, ier, gd, apstati (ap, RADPLOTS))
 		if (interactive == YES)
 		    call ap_qspsky (ap, ier)
+		newobject = NO; newsky = NO
 
-		if (stid == 1)
-		    call ap_param (ap, out, "fitsky")
-		if (newlist == YES)
-		    call ap_pssky (ap, out, stid, ltid, ier)
-		else
-		    call ap_pssky (ap, out, stid, 0, ier)
-		call apsplot (ap, stid, ier, mgd, YES)
-		stid = stid + 1
-		newobject = NO
-		newsky = NO
+		if (key == ' ') {
+		    if (stid == 1)
+		        call ap_param (ap, out, "fitsky")
+		    if (newlist == YES)
+		        call ap_pssky (ap, out, stid, ltid, ier)
+		    else
+		        call ap_pssky (ap, out, stid, 0, ier)
+		    call apsplot (ap, stid, ier, mgd, YES)
+		    stid = stid + 1
+		}
 
 	    # Process the remainder of the list.
 	    case 'l':

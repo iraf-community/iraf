@@ -10,7 +10,7 @@ char	ans[ARB]
 char	command[SZ_FNAME]
 real	wc
 real	eqx1, eqx2, eqy1, eqy2
-real	flux_diff, rsum, sum, cont, eqw, ctr
+real	flux_diff, rsum, esum, sum, cont, eqw, ctr
 real	temp, hctr
 int	key, junk
 
@@ -34,7 +34,7 @@ begin
 
 	# Derive the needed values
 	call sumflux (pix, x1, x2, dx, eqx1, eqx2, eqy1, eqy2,
-	    sum, rsum, ctr)
+	    sum, rsum, esum, ctr)
 
 	# Compute difference in flux between ramp and spectrum
 	flux_diff = rsum - sum
@@ -51,15 +51,17 @@ begin
 	call printf (
 	    "center = %9.7g, eqw = %9.4f, continuum = %9.7g flux = %9.6g\n")
 	    call pargr (ctr)
-	    call pargr (eqw)
+#	    call pargr (eqw)
+	    call pargr (esum)
 	    call pargr (cont)
 	    call pargr (-(flux_diff))
 
 	call sprintf (ans, 2*SZ_LINE,
-	    " %9.7g %9.7g %9.6g %9.4g\n")
+	    " %9.7g %9.7g %9.6g %9.4g %9w %9w %9w (%7.4g)\n")
 	    call pargr (ctr)
 	    call pargr (cont)
 	    call pargr (-(flux_diff))
+	    call pargr (esum)
 	    call pargr (eqw)
 
 	# Draw cursor position

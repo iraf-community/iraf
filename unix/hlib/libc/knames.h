@@ -250,6 +250,7 @@
 #define	BITUPK		bitupk_
 #define	BSWAP2		bswap2_
 #define	BSWAP4		bswap4_
+#define	BSWAP8		bswap8_
 #define	BYTMOV		bytmov_
 #define	CHRPAK		chrpak_
 #define	CHRUPK		chrupk_

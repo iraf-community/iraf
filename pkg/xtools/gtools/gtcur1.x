@@ -1,6 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
-include	<pkg/gtools.h>
+include	"gtools.h"
 
 # GT_GCUR1 -- Interface to clgcur to confirm EOF, map key 'q' to EOF.
 # Transposes X and Y if needed.

@@ -5,7 +5,7 @@
 #define	import_libc
 #include <iraf.h>
 
-#define	SZ_UPKSTR	128
+#define	SZ_UPKSTR	SZ_COMMAND
 static	XCHAR u_upkstr[SZ_UPKSTR+1];
 
 /* C_SPPSTR -- Unpack a C string into an SPP string.  This routine is offered

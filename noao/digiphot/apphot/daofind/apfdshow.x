@@ -1,4 +1,4 @@
-# AP_FDSHOW -- Procedure to display the current find parameters.
+# AP_FDSHOW -- Display the current find parameters.
 
 procedure ap_fdshow (ap)
 

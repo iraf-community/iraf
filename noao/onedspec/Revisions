@@ -1,5 +1,127 @@
 .help revisions Jun88 noao.onedspec
 .nf
+onedspec$t_sums.x
+onedspec$sums.par
+    If an image already exists a new query parameter will be used to get
+    a new image name.  (3/29/90, Valdes)
+
+onedspec$batchred.cl
+    Turned on extinction correction in calibrate for the case the spectra
+    are not already extinction calibrated.  (3/29/90, Valdes)
+
+onedspec$ecidentify/ecdofit.x
+    When INDEF valued lines were used and features were deleted during
+    fitting the resorting of the feature list would get messed up.
+    This is a very rare condition which has now been fixed.
+    (3/16/90, Valdes)
+
+onedspec$identify/idgdata.x
+onedspec$dispcor/dcio.x
+onedspec$dispcor/ecdispcor.x
+onedspec$dispcor/dispcor.x
+onedspec$dispcor/msdispcor.x
+onedspec$dispcor/disptable.r
+onedspec$sensfunc/sfoutput.x
+onedspec$load_hdr.x
+onedspec$idsm_keywrds.x
+onedspec$t_specplot.x
+    Added CDn_n to the set of keywords which may be used for the dispersion.
+    (2/8/90, Valdes)
+
+onedspec$splot/eqwidths.x
+onedspec$splot/sumflux.x
+    The equivalent width is now computed using the ratio of the spectrum
+    to the continuum.  The previous approximation is printed in the log
+    file for comparison.
+    (3/5/90, Valdes)
+
+onedspec$splot/splot.x
+onedspec$splot/mktitle.x
+    1. For :show added test for existence of spool file and an appropriate
+       message if it does not exist.
+    2. Increase length of plotted title to SZ_LINE from 32.
+       (3/2/90, Valdes)
+
+onedspec$identify/iddofit.x
+    When INDEF valued lines were used and features were deleted during
+    fitting the resorting of the feature list would get messed up.
+    This is a very rare condition which has now been fixed.
+    (1/17/90, Valdes)
+
+onedspec$dispcor/ecdispcor.x
+    The sum option was actually the same as the average option!
+    (1/15/90, Valdes)
+
+199c199
+< 	call calloc (spec, nw, TY_REAL) 
+---
+> 	call malloc (spec, nw, TY_REAL) 
+208a209
+> 	    call aclrr (Memr[spec], nw)
+212c213,218
+< 	    case SUM, AVERAGE:
+---
+> 	    case SUM:
+> 		do j = 1, nw
+> 		    if (Memr[spec+j-1] != 0.)
+> 		        Memr[outdata+j-1] = Memr[outdata+j-1] +
+> 			    Memr[spec+j-1]
+> 	    case AVERAGE:
+
+onedspec$load_hdr.x
+    Add limit checks for NP1 and NP2.  (11/8/89, Valdes)
+
+onedspec$sensfunc/sfstds.x
+    The data for apertures which are in the aperture list when the ignoreaps
+    flag is set was not being read unless the aperture list included
+    aperture 1.  This has been fixed. (11/8/89, Valdes)
+
+onedspec$identify/iddofit.x
+    The order of evaluation in complex if statements is not necessarily
+    left to right as I'd thought.  This caused a bus error on the
+    Convex.  The particular change is as follows:
+
+    old:
+	if (rejpts != NULL && Memi[rejpts+k-1] == YES)
+	    WTS(id,j) = 0.
+	else
+	    WTS(id,j) = Memd[wts+k-1]
+    new:
+	WTS(id,j) = Memd[wts+k-1]
+	if (rejpts != NULL)
+	    if (Memi[rejpts+k-1] == YES)
+		WTS(id,j) = 0.
+
+onedspec$load_hdr.x
+    Modified header access to use imaccf to check if header parameter exists
+    rather than rely on an error return.  On a Sun3x the error checking
+    results in an exception.  (9/28/89, Valdes)
+
+onedspec$t_calibrate.x
+    The data outside of calibration range message was changed to print how many
+    pixels are outside of the calibration range is printed once.
+    (8/8/89, Valdes)
+
+====
+V2.8
+====
+
+onedspec$idsmtn.h
+onedspec$t_subsets.x
+onedspec$t_standard.x
+onedspec$t_slist.x
+onedspec$t_shedit.x
+onedspec$t_flatdiv.x
+onedspec$t_calibrate.x
+onedspec$t_bswitch.x
+onedspec$t_addsets.x
+onedspec$load_hdr.x
+onedspec$idsm_keywrds.x
+onedspec$sensfunc/sfimage.x
+onedspec$splot/mktitle.x
+onedspec$shparams.par
+    The exposure time is used as a real rather than an integer (7/11/89, Valdes)
+
 onedspec$t_specplot.x
     The wavelengths were off by one pixel because CRPIX was uninitialized
     and so defaulting to zero instead of 1.  (6/6/89, Valdes)

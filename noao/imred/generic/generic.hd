@@ -8,4 +8,4 @@ flatten		hlp=doc$flatten.hlp,	src=flatten.cl
 flat1d		hlp=doc$flat1d.hlp,	src=flat1d.x
 normalize	hlp=doc$normalize.hlp,	src=normalize.cl
 normflat	hlp=doc$normflat.hlp,	src=normflat.cl
-revisions	hlp=Revisions
+revisions	sys=Revisions

@@ -85,20 +85,18 @@ square full device viewports (e.g., the vt640), a plot drawn by \fIpcols\fR
 appears extended in the x direction unless \fBfill\fR = no.
 .ih
 EXAMPLES
-.nf
-[1] Plot columns 64 through 128 of image crab.5009 with default parameters:
+1. Plot columns 64 through 128 of image crab.5009 with default parameters:
 
-	cl> pcols crab.5009 64 128
+    cl> pcols crab.5009 64 128
 
-[2] Overplot columns 64 through  128 of crab.red using boxes to mark the 
-    added points:
+2. Overplot columns 64 through  128 of crab.red using boxes to mark the 
+added points:
 
-	cl> pcols crab.red 64 128 append+ pointmode+
+    cl> pcols crab.red 64 128 append+ pointmode+
 
-[3] Annotate the axes of the plot:
+3. Annotate the axes of the plot:
 
-	cl> pcols crab.5009 64 84 xlabel="Row Number" ylabel=Intensity
-.fi
+    cl> pcols crab.5009 64 84 xlabel="Row Number" ylabel=Intensity
 .ih
 TIME REQUIREMENTS
 \fBpcols\fR takes about 3.25 cp seconds to plot the average of 20 columns
@@ -109,3 +107,4 @@ BUGS
 SEE ALSO
 prow, prows, pcol
 .endhelp
+dhelp

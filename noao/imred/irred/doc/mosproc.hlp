@@ -57,12 +57,12 @@ The name of the flat field image.
 .ls transpose = no
 Transpose the input images before inserting them into the mosaic.
 .le
-.ls section = "[*,*]"
+.ls trim_section = "[*,*]"
 The section of the input images to be mosaiced into the output
 image. Section can be used to flip and/or trim the individual
 subrasters before adding them to the mosaic. For example if we
 want to flip each subraster around the y axis before adding it
-to the mosaic, then \fIsection\fR = "[*,-*]".
+to the mosaic, then \fItrim_section\fR = "[*,-*]".
 .le
 .ls corner = "lr"
 The starting position in the output image. The four options are "ll" for
@@ -78,8 +78,9 @@ specified must agree with the order of the input list.
 Add the columns or rows to the output image in a raster pattern or return
 to the start of a column or a row.
 .le
-.ls median = no
-Compute the median of each input image inserted into the mosaic.
+.ls median_section = ""
+Compute the median of each input image inserted into the mosaic using the
+specified section.
 .le
 .ls subtract = no
 Subtract the computed median from each input image before inserting it
@@ -118,7 +119,7 @@ output image in positions determined by their order in the input list,
 \fInxsub\fR, \fInysub\fR and the parameters  \fIcorner\fR, \fIdirection\fR
 and \fIraster\fR. 
 The orientation and size of each individual subraster in the output image
-may be altered by setting the parameter \fIsections\fR. The size
+may be altered by setting the parameter \fItrim_section\fR. The size
 of the output image is determined by nxsub and nysub and the size of
 the individual input images. A one column wide border is drawn between
 each of the output image subrasters with a pixel value of \fIoval\fR.

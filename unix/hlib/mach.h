@@ -5,7 +5,7 @@ define	SZB_ADDR	1		# machine bytes per address increment
 define	SZ_VMPAGE	256		# page size (1 if no virtual mem.)
 define	MAX_DIGITS 	25		# max digits in a number
 define	NDIGITS_RP	7		# number of digits of real precision
-define	NDIGITS_DP 	17		# number of digits of precision (double)
+define	NDIGITS_DP 	16		# number of digits of precision (double)
 define	MAX_EXPONENT	38		# max exponent, base 10
 define	MAX_EXPONENTR	38
 define	MAX_EXPONENTD	38
@@ -22,8 +22,11 @@ define	EPSILONR	(1.192e-7)	# smallest E such that 1.0 + E > 1.0
 define	EPSILOND	(2.220d-16)	# double precision epsilon
 define	EPSILON		EPSILONR
 
-# Is byte swapping (i.e., a call to bswap2 or bswap4) needed for a 2 or 4 byte
-# MII integer to convert to or from MII format on this machine?
+# Is byte swapping needed for a 2 or 4 byte MII integer or a 4 or 8 byte
+# IEEE floating to convert to or from MII format on this machine?
 
 define	BYTE_SWAP2	NO
 define	BYTE_SWAP4	NO
+define	IEEE_SWAP4	NO
+define	IEEE_SWAP8	NO
+define	IEEE_USED	YES

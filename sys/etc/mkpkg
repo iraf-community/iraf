@@ -5,7 +5,19 @@ $update   libsys.a
 $checkin  libsys.a lib$
 $exit
 
+generic:
+	$ifolder (gen/miireadi.x, miiread.gx) 
+		$generic -k -p gen/ -t silrd miiread.gx
+	$endif
+	$ifolder (gen/miiwritei.x, miiwrite.gx)
+		$generic -k -p gen/ -t silrd miiwrite.gx
+	$endif
+	;
+
 libsys.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+	@gen
+
 	brktime.x	<time.h>
 	btoi.x	
 	clktime.x	
@@ -41,11 +53,7 @@ libsys.a:
 	main.x		<clset.h> <config.h> <ctype.h> <error.h> <fset.h>\
 			<knet.h> <printf.h> <xwhen.h>
 	miireadc.x	<mii.h>
-	miireadi.x	<mii.h>
-	miireads.x	<mii.h>
 	miiwritec.x	<mii.h>
-	miiwritei.x	<mii.h>
-	miiwrites.x	<mii.h>
 	onentry.x	<clset.h> <fset.h> <knet.h>
 	onerror.x	<config.h> <error.h>
 	onexit.x	<config.h> <error.h>

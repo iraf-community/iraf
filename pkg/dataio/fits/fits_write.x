@@ -13,33 +13,40 @@ include "wfits.h"
 
 procedure wft_write_fitz (iraf_file, fits_file)
 
-char	iraf_file[SZ_FNAME]	# IRAF file name
-char	fits_file[SZ_FNAME]	# FITS file name
+char	iraf_file[ARB]		# IRAF file name
+char	fits_file[ARB]		# FITS file name
 
-pointer	im, sp, fits
 int	fits_fd, chars_rec, dev_blk, nchars, ip
+pointer	im, sp, fits
 
-pointer	immap()
 int	mtfile(), mtopen(), open(), fnldir(), fstati(), ctowrd()
+pointer	immap()
 errchk	immap, imunmap, open, mtopen, close, smark, salloc, sfree
 errchk	delete, wft_write_header, wft_write_image, wft_data_limits
+
 include "wfits.com"
 
 begin
-	# Open input image.
-	im = immap (iraf_file, READ_ONLY, 0)
-
 	# Allocate memory for program data structure.
 	call smark (sp)
 	call salloc (fits, LEN_FITS, TY_STRUCT)
-	call imgcluster (iraf_file, IRAFNAME(fits), SZ_FNAME)
-	nchars = fnldir (IRAFNAME(fits), IRAFNAME(fits), SZ_FNAME)
+
+	# Construct the old iraf name by removing and directory and 
+	# section specifications.
+
+	nchars = fnldir (iraf_file, IRAFNAME(fits), SZ_FNAME)
 	call imgcluster (iraf_file, IRAFNAME(fits), SZ_FNAME)
 	ip = nchars + 1
 	if (ctowrd (IRAFNAME(fits), ip, IRAFNAME(fits), SZ_FNAME) <= 0)
 	    IRAFNAME(fits) = EOS
 
-	# Open output file.
+	# Open input image.
+	im = immap (iraf_file, READ_ONLY, 0)
+
+	# Open output file. Check whether the output file is a magtape
+	# device or a binary file. If the output file is magtape check
+	# for a legal blocking factor.
+
 	if (make_image == NO)
 	    call strcpy ("dev$null", fits_file, SZ_FNAME)
 
@@ -69,9 +76,9 @@ begin
 		if (long_header == YES)
 		    call printf ("\n")
 	    }
+	    call flush (STDOUT)
 
 	    call wft_write_header (im, fits, fits_fd)
-
 	    if (make_image == YES)
 		call wft_write_image (im, fits, fits_fd)
 
@@ -80,7 +87,8 @@ begin
 
 	} then {
 
-	    # print the error message
+	    # Print the error message.
+	    call flush (STDOUT)
 	    call erract (EA_WARN)
 
 	    # Close files and cleanup.
@@ -90,10 +98,11 @@ begin
 	        call delete (fits_file)
 	    call sfree (sp)
 
-	    # assert an error
+	    # Assert an error.
 	    call erract (EA_ERROR)
 
 	} else {
+
 	    # Close files and cleanup.
 	    call imunmap (im)
 	    call close (fits_fd)
@@ -115,19 +124,22 @@ pointer	im		# image pointer
 real	irafmin		# minimum picture value
 real	irafmax		# maximum picture value
 
-pointer	buf
 int	npix
 long	v[IM_MAXDIM]
+pointer	buf
 real	maxval, minval
 int	imgnlr()
 errchk	imgnlr
 
 begin
+	# Compute the data minimum and maximum if the image values
+	# are undefined out-of-date.
+
 	if (LIMTIME(im) < MTIME(im) && NAXIS(im) > 0) {
+
 	    irafmax = -MAX_REAL
 	    irafmin = MAX_REAL
 	    npix = NAXISN(im,1)
-
 	    call amovkl (long(1), v, IM_MAXDIM)
 	    while (imgnlr (im, buf, v) != EOF) {
 	        call alimr (Memr[buf], npix, minval, maxval)
@@ -136,7 +148,9 @@ begin
 	    }
 
 	} else {
+
 	    irafmax = IM_MAX(im)
 	    irafmin = IM_MIN(im)
+
 	}
 end

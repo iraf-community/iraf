@@ -24,10 +24,11 @@ begin
 	nse = AP_NOISE(ap)
 	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot)]
 	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot)]
+
 	if (IS_INDEFR(AP_PXCUR(phot)) || IS_INDEFR(AP_PYCUR(phot)))
-	    return (AP_NOAPERT)
+	    return (AP_APERT_NOAPERT)
 	if (IS_INDEFR(skyval))
-	    return (AP_NOSKYMODE)
+	    return (AP_APERT_NOSKYMODE)
 
 	# Compute the magnitudes and errors.
 	if (positive == YES)
@@ -46,7 +47,9 @@ begin
 	call aaddkr (Memr[AP_MAGS(phot)], zmag, Memr[AP_MAGS(phot)],
 	    AP_NAPERTS(phot)]
 
-	if (AP_NMAXAP(phot) < AP_NAPERTS(phot))
+	if (AP_NMINAP(phot) <= AP_NMAXAP(phot))
+	    return (AP_APERT_BADDATA)
+	else if (AP_NMAXAP(phot) < AP_NAPERTS(phot))
 	    return (AP_APERT_OUTOFBOUNDS)
 	else
 	    return (AP_OK)

@@ -28,6 +28,10 @@ begin
 
 	call apstats (ap, EXPOSURE, Memc[str], SZ_LINE)
 	call clpstr ("exposure", Memc[str], SZ_LINE)
+	call apstats (ap, AIRMASS, Memc[str], SZ_LINE)
+	call clpstr ("airmass", Memc[str], SZ_LINE)
+	call apstats (ap, FILTER, Memc[str], SZ_LINE)
+	call clpstr ("filter", Memc[str], SZ_LINE)
 	call clputr ("epadu", apstatr (ap, EPADU))
 	call clputr ("zmag", apstatr (ap, ZMAG))
 	call clputb ("radplots", itob (apstati (ap, RADPLOTS)))

@@ -25,7 +25,10 @@ errchk	imgs2r, impl2r
 begin
 	# Number of columns and lines of output image
 	ncols = IM_LEN(im2,1)
-	nlines = IM_LEN(im2,2)
+	if (IM_NDIM(im2) == 1)
+	    nlines = 1
+	else
+	    nlines = IM_LEN(im2,2)
 
 	# Set input image column limits
 	col1 = 1 - nxk / 2

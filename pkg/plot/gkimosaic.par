@@ -1,5 +1,3 @@
-# Parameter for the gkimosaic task
-
 input,f,a,,,,metacode input
 device,s,h,"stdgraph",,,output device
 output,f,h,,,,name of binary output file

@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<ttyset.h>
 include	<ttset.h>
 include	<fset.h>
 
@@ -23,7 +24,7 @@ pointer	sp, patbuf, buf, qs, wh, ip, op
 int	index, len_qs, len_wh, w_index, h_index, sv_raw, nchars, junk
 
 int	patmake(), patindex(), gstrcpy(), ctoi()
-int	ttygets(), ttyread(), ttygeti(), ttstati(), fstati()
+int	ttygets(), ttyread(), ttystati(), ttstati(), fstati()
 define	noquery_ 91
 errchk	ttyread
 
@@ -102,10 +103,11 @@ begin
 
 noquery_
 	# If we still do not know the screen width or height, use the values
-	# given in the termcap entry for the device.
+	# given in the user environment, else in the termcap entry for the
+	# device.
 
 	if (width <= 0)
-	    width = ttygeti (tty, "co")
+	    width = ttystati (tty, TTY_NCOLS)
 	if (height <= 0)
-	    height = ttygeti (tty, "li")
+	    height = ttystati (tty, TTY_NLINES)
 end

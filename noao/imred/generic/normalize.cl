@@ -14,7 +14,6 @@
 #meanfd,*s,h
 #mean,r,h
 #stat,i,h
-#junk,s,h
 
 {
 	# Startup message.
@@ -35,10 +34,10 @@
 
 	    if (norm == INDEF) {
 	        # Determine the mean of the sample region.
-	        imstatistics (input // sample_section, lower=lower, upper=upper,
-		    verbose=no, >meanlist)
+	        imstatistics (input // sample_section, fields="mean",
+		    lower=lower, upper=upper, format=no, >meanlist)
 	        meanfd = meanlist
-	        stat = fscan (meanfd, junk, junk, mean)
+	        stat = fscan (meanfd, mean)
 		meanfd = ""			# close list file
 	        delete (meanlist, verify=no)
 	    } else

@@ -1,0 +1,3 @@
+#!/bin/csh
+HBIN/rpp.e $1 | sed -e 's+setjmp+_setjmp+'
+

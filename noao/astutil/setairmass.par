@@ -1,8 +1,11 @@
-# AIRMASS parameter file
+# SETAIRMASS parameter file
 images,s,a,,,,"Input images"
 intype,s,h,"beginning","beginning|middle|end",,"Input keyword time stamp"
 outtype,s,h,"effective","beginning|middle|end|effective",,"Output airmass time stamp\n"
+date,s,h,"date-obs",,,"Observation date keyword"
 exposure,s,h,"exptime",,,"Exposure time keyword (seconds)"
+airmass,s,h,"airmass",,,"Airmass keyword (output)"
+utmiddle,s,h,"utmiddle",,,"Mid-observation UT keyword (output)"
 latitude,r,h,)observatory.latitude,,,"Observatory latitude\n"
 show,b,h,yes,,,"Print the airmasses and mid-UT?"
 update,b,h,no,,,"Update the image header?"

@@ -2,7 +2,8 @@
  
 $doc	=	"./doc/"
  
-revisions	hlp=Revisions
+revisions	sys=Revisions
+msbplot		hlp=doc$msbplot.hlp
 msdispcor	hlp=doc$msdispcor.hlp
 msreidentify	hlp=doc$msreidentify.hlp
 msselect	hlp=doc$msselect.hlp

@@ -1,5 +1,12 @@
 .help revisions Jun88 math
 .nf
+math$iminterp/msigrl.x: Davis, Feb 8, 1989
+    1. There was a bug in the shift and wrap routines in the 2D routine
+    which integrates in polygonal apertures. If the vertices of the
+    polygon  were listed in certain orders the routine would produce
+    wrong results. The routine has been totally rewritten to use
+    the polygon clipping code in polyphot.
+
 math$interp/asigrl.x: Davis, Jan 27, 1988
     1. The routine ii_getpcoeff was duplicated in the files asigrl.x and
     ii_1dinteg.x. I removed the copy in asigrl.x and rebuilt the library.

@@ -9,9 +9,12 @@ include	<mach.h>
 
 int procedure miinelem (nchars, mii_type)
 
-int	nchars			# size in chars of packed array
-int	mii_type
+int	nchars			#I size in chars of packed array
+int	mii_type		#I MII type of packed data
+
+int	nbits
 
 begin
-	return ((nchars * SZB_CHAR * NBITS_BYTE + mii_type-1) / mii_type)
+	nbits = abs (mii_type)
+	return ((nchars * SZB_CHAR * NBITS_BYTE + nbits-1) / nbits)
 end

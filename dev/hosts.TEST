@@ -1,0 +1,26 @@
+# HOSTS -- Nodes on the local network.  The special logical node aliases
+# "lpnode" and "plnode", if specified, will direct line printer and plotter
+# output to the indicated node.
+
+argo cephus coma draco gemini-gw gll1 orion pavo pegasus perseus phoenix \
+    pictor pisces puppis pyxis tucana : tucana!/usr/iraf/bin.f68881/irafks.e
+
+argo 				: argo!/local/iraf/bin.f68881/irafks.e
+auriga 				: auriga!/usr/iraf/bin/irafks.e
+cephus				: cephus!/usr/iraf/bin.mips/irafks.e
+coma				: coma!/usr/iraf/bin.sparc/irafks.e
+draco vela d class6		: draco!/u1/iraf/bin/irafks.exe
+gemini-gw gemini noao.edu noao	: gemini-gw!/local/iraf/bin.sparc/irafks.e
+gll1 gll1u			: gll1!/usr/iraf/bin/irafks.e
+orion ori o			: orion!/local/iraf/bin.sparc/irafks.e
+pavo pav p			: pavo!/usr/iraf/bin.f68881/irafks.e
+pegasus peg			: pegasus!/files/vol/iraf/bin.i386/irafks.e
+perseus per			: perseus!/usr/iraf/bin.f68881/irafks.e
+phoenix pho			: phoenix!/local/iraf/bin.sparc/irafks.e
+pictor pic			: pictor!/local/iraf/bin.sparc/irafks.e
+pisces pi			: pisces!/usr/iraf/bin.f68881/irafks.e
+puppis pu			: puppis!/usr/iraf/bin.f68881/irafks.e
+pyxis pyx			: pyxis!/local/iraf/bin.f68881/irafks.e
+tucana 				: tucana!/usr/iraf/bin.f68881/irafks.e
+rtucana tuc t			: tucana!/usr/iraf/bin.f68881/irafks.e
+

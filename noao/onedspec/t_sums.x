@@ -196,7 +196,7 @@ begin
 	iferr (imnew = immap (output, NEW_COPY, im)) {
 	    call eprintf ("Cannot create [%s] -- Already exists??\07\n")
 		call pargstr (output)
-	    call clgstr ("output", ofile, SZ_FNAME)
+	    call clgstr ("newoutput", ofile, SZ_FNAME)
 	    go to 10
 	}
 

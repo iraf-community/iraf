@@ -39,7 +39,7 @@ begin
 	if (IO_DD(io) != NULL)
 	    call mfree (IO_DD(io), TY_STRUCT)
 	if (IO_BBMASK(io) != NULL)
-	    call mfree (IO_BBMASK(io), TY_INT)
+	    call plr_close (IO_BBMASK(io))
 	if (IO_PARAM(io) != NULL)
 	    call mfree (IO_PARAM(io), TY_CHAR)
 	if (IO_MASK(io) != NULL)

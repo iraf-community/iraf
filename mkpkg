@@ -28,7 +28,6 @@ update:
 syslibs:
 	$echo "====================== SYSLIBS =========================="
 	$echo "+"
-	$set XFLAGS = "$(XSFLAGS)"
 	$call sysgen@sys
 	$echo "+" $echo "+"
 	;
@@ -95,8 +94,8 @@ srcarc:
 	;
 
 
-# SUN/IRAF Stuff.
-# ------------------------
+# UNIX/IRAF stuff (multiple architecture support).
+# ---------------------------------------------------
 
 showfloat:				# show current float option
 	$verbose off
@@ -105,36 +104,56 @@ showfloat:				# show current float option
 generic:				# make architecture indep. (no bins)
 	$verbose off
 	!$(hlib)/mkfloat.csh generic
+	!(cd ./unix; setenv MACH generic; sh -x setarch.sh)
 	;
 f68881:					# install f68881 binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh f68881
+	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
 	;
 ffpa:					# install ffpa binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh ffpa
+	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
 	;
 fswitch:				# install fswitch binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh fswitch
+	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
 	;
 fsoft:					# install fsoft binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh fsoft
+	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
 	;
 pg:					# install profiled binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh pg
+	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
 	;
 sparc:					# install sparc binaries
 	$verbose off
 	!$(hlib)/mkfloat.csh sparc
+	!(cd ./unix; setenv MACH sparc; sh -x setarch.sh)
 	;
-ieee:					# install ieee binaries (CONVEX)
+386i:
+i386:					# install 386i binaries
 	$verbose off
-	!$(hlib)/mkfloat.csh ieee
+	!$(hlib)/mkfloat.csh i386
+	!(cd ./unix; setenv MACH i386; sh -x setarch.sh)
 	;
-native:					# install native binaries (CONVEX)
+m68k_fpa:				# install apollo m68k fpa binaries
 	$verbose off
-	!$(hlib)/mkfloat.csh native
+	!$(hlib)/mkfloat.csh m68k_fpa
+	!(cd ./unix; setenv MACH m68k_fpa; sh -x setarch.sh)
+	;
+m68k_f68:				# install apollo m68k f68882 binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh m68k_f68
+	!(cd ./unix; setenv MACH m68k_f68; sh -x setarch.sh)
+	;
+a88k:					# install apollo prism binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh a88k
+	!(cd ./unix; setenv MACH a88k; sh -x setarch.sh)
 	;

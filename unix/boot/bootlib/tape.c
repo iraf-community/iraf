@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 
@@ -45,6 +48,9 @@ char	*fname;		/* file or device to be opened	*/
 int	mode;		/* access mode			*/
 {
 	PKCHAR	osfn[SZ_PATHNAME+1];
+#ifdef apollo
+	char	*vfn2osfn();
+#endif
 	int	chan, density;
 
 	if (strcmp (fname, "stdin") == 0) {
@@ -192,6 +198,9 @@ int	*density;	/* receives density			*/
 	char	drive[SZ_FNAME+1];
 	char	tabname[SZ_FNAME+1];
 	char	lbuf[SZ_LINE];
+#ifdef apollo
+	char	*vfn2osfn();
+#endif
 	FILE	*fp;
 
 	drive[0] = EOS;

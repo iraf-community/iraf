@@ -12,9 +12,11 @@ libpkg.a:
 	mkgmarks.x	<ctype.h> <lexnum.h>
 	mkgpars.x	<ctype.h> "tvmark.h"
 	mkgscur.x	<gset.h>  <fset.h>
+	mkremove.x
+	mkfind.x	<mach.h>
 	mkppars.x	<ctype.h> "tvmark.h"
 	mkmag.x		<imhdr.h>
-	mkmark.x	<imhdr.h> "tvmark.h"
+	mkmark.x	<imhdr.h> <fset.h> "tvmark.h"
 	mknew.x
 	mkonemark.x	<imhdr.h> "tvmark.h"
 	mkoutname.x

@@ -74,6 +74,8 @@ begin
 		    rp = ip
 		    break
 		}
+		if (Memc[ip] != EOS)
+		    ip = ip + 1
 		while (Memc[ip] != '\n' && Memc[ip] != EOS)
 		    ip = ip + 1
 		recno = recno + 1

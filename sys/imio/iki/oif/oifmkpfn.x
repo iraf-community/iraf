@@ -21,7 +21,7 @@ int	len_osdir, len_root, len_extn, n
 pointer	sp, imdir, osdir, root, extn, subdir, fname, ip, op
 int	fnroot(), fnldir(), access(), envgets(), strncmp()
 string	pixextn OIF_PIXEXTN
-errchk	fmkdir
+errchk	fmkdir, imerr
 
 begin
 	call smark (sp)
@@ -90,7 +90,7 @@ begin
 		    if (suffix[2] == 'z') {
 			suffix[2] = 'a'
 			if (suffix[1] == 'z')
-			    call fatal (SYS_FMKTEMP) 
+			    call imerr (IM_NAME(im), SYS_FMKTEMP)
 			else
 			    suffix[1] = suffix[1] + 1
 		    } else

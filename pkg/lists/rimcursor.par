@@ -1,0 +1,3 @@
+image,s,a,,,,image to which coordinates should refer
+wcs,s,h,logical,,,output world coordinate system name
+cursor,*imcur,h,,,,image cursor

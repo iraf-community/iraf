@@ -1,5 +1,14 @@
 .help revisions Jun88 noao.imred.bias
 .nf
+noao$imred/bias/colbias.x
+    Valdes, January 6, 1990
+    The graphics device parameter was being ignored and "stdgraph" always
+    opened.
+
+===
+V2.8
+====
+
 noao$imred/bias/colbias.x,linebias.x,colbias.par,linebias.par
     Davis, October 4, 1988
     1. The parameters low_reject, high_reject and niterate have been added

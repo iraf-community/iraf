@@ -19,23 +19,19 @@ libpkg.a:
 			"../lib/find.h"		"../lib/noise.h"
 	apfdfree.x	"../lib/apphotdef.h"
 	apfdgpars.x	"../lib/apphot.h"	"../lib/noise.h"	\
-			"../lib/find.h"
+			"../lib/find.h"         "../lib/display.h"
 	apfdinit.x	"../lib/apphotdef.h"	"../lib/finddef.h"
-	apfdpars.x	"../lib/apphot.h"	"../lib/noise.h"	\
-			"../lib/display.h"	"../lib/find.h"
-	apfdradsetup.x	<pkg/gtools.h>		<math.h>		\
-			"../lib/apphot.h"	"../lib/noise.h"	\
-			"../lib/find.h"
+	apfdpars.x	"../lib/find.h"		"../lib/display.h"
+	apfdradsetup.x	
 	apfdshow.x
 	apfdstars.x	<imhdr.h>		"../lib/apphot.h"	\
-			"../lib/noise.h"	"../lib/find.h"
-	apfind.x	<imhdr.h>		<imset.h>
+			"../lib/noise.h"	"../lib/find.h"         \
+			"../lib/display.h"
+	apfind.x	<imhdr.h>		<imset.h>               \
+			<gset.h>
 	apfshow.x	"../lib/apphot.h"	"../lib/noise.h"	\
 			"../lib/find.h"
 	apimset.x	<imset.h>
-	#aprdfind.x	<gset.h>		<pkg/gtools.h>		\
-			#<math.h>		"../lib/apphot.h"	\
-			#"../lib/noise.h"
 	t_daofind.x	<fset.h> 		 <imhdr.h>		\
 			<gset.h>		"../lib/apphot.h"	\
 			"../lib/noise.h"	"../lib/find.h"

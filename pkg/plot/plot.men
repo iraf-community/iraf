@@ -7,6 +7,7 @@
       gkimosaic - Condense metacode frames to fit on one page
 	  graph - Graph one or more image sections or lists
 	 hafton - Generate half-tone plots of an image
+	imdkern - Image display device (IMD) graphics kernel
 	 implot - Plot lines and columns of images using cursors
        nsppkern - Plot metacode on a NSPP (NCAR) plotter device
 	   pcol - Plot a column of an image

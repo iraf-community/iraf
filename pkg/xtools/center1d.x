@@ -15,6 +15,7 @@ define	INTERPTYPE	II_SPLINE3	# Image interpolation type
 # A value of INDEF is returned in the centering fails for any reason.
 # This procedure just sets up the data and adjusts for emission or
 # absorption features.  The actual centering is done by C1D_CENTER.
+# If twidth <= 1 return the nearest minima or maxima.
 
 real procedure center1d (x, data, npts, width, type, radius, threshold)
 
@@ -85,7 +86,7 @@ begin
 	}
 
 	# Determine the center.
-	xc = c1d_center (x - x1 + 1, Memr[data1], nx, wid)
+	xc = c1d_center (x - x1 + 1, Memr[data1], nx, width)
 
 	# Check user centering error radius.
 	if (!IS_INDEF(xc)) {
@@ -101,6 +102,7 @@ end
 
 
 # C1D_CENTER -- One dimensional centering algorithm.
+# If the width is <= 1. return the nearest local maximum.
 
 real procedure c1d_center (x, data, npts, width)
 
@@ -110,7 +112,7 @@ real	data[npts]			# Data vector
 real	width				# Centering width
 
 int	i, j, iteration, dxcheck
-real	xc, hwidth, dx, dxabs, dxlast
+real	xc, wid, hwidth, dx, dxabs, dxlast
 real	a, b, sum1, sum2, intgrl1, intgrl2
 pointer	asi1, asi2, sp, data1
 
@@ -135,8 +137,13 @@ begin
 	else
 	    xc = j
 
+	if (width <= 1.)
+	    return (xc)
+
+	wid = max (width, MIN_WIDTH)
+
 	# Check data range.
-	hwidth = width / 2
+	hwidth = wid / 2
 	if ((xc - hwidth < 1) || (xc + hwidth > npts))
 	    return (INDEF)
 
@@ -209,6 +216,10 @@ begin
 		dxcheck = dxcheck + 1
 		if (dxcheck > MAX_DXCHECK)
 		    break
+	    } else if (dxabs > dxlast - EPSILON1) {
+		xc = xc - dx / 2.
+		dxcheck = 0
+		dxlast = dxabs / 2.
 	    } else {
 		dxcheck = 0
 	        dxlast = dxabs

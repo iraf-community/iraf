@@ -644,7 +644,7 @@ in place of the threshold
 The errors are estimated in the following way
 .nf
 
-    $sigma sup 2 ~=~ {sum I sub i ~ x sub i sup 2} ~-~ x sub c sup 2$
+    $sigma sup 2 ~=~ {sum I sub i ~ x sub i sup 2} over {sum I sub i} ~-~ x sub c sup 2$
 
     $err sub xc ~=~ sqrt {{sigma sup 2} ~/~ sum I sub i}$
 

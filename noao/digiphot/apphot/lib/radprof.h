@@ -21,11 +21,11 @@ define	RPNDATAREJ		174
 # radprof error codes (# 161 - 180)
 
 define	AP_OK			0
-define	AP_NOPROFILE		161
-define	AP_RPOUTOFBOUNDS	162
-define	AP_NRP_TOO_SMALL	163
+define	AP_RP_NOPROFILE		161
+define	AP_RP_OUTOFBOUNDS	162
+define	AP_RP_NPTS_TOO_SMALL	163
 define	AP_RP_SINGULAR		164
-define	AP_RPNOSKYMODE		165
+define	AP_RP_NOSKYMODE		165
 
 # define radprof keywords
 

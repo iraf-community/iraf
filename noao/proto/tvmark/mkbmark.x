@@ -102,29 +102,32 @@ begin
 
 	    case MK_RECTANGLE:
 		if (mk_rlimits (fx, fy, lmax, lratio, ncols, nlines, x1, x2,
-		    y1, y2) == YES)
+		    y1, y2) == YES) {
 		    call mk_drawbox (im, fx, fy, x1, x2, y1, y2, Memr[lengths],
 		        lratio, nr, mk_stati (mk, GRAYLEVEL))
+		}
 
 	    case MK_CIRCLE:
 		if (mk_climits (fx, fy, rmax, ratio, ncols, nlines, x1, x2,
-		    y1, y2) == YES)
+		    y1, y2) == YES) {
 		    call mk_drawcircles  (im, fx, fy, x1, x2, y1, y2,
 		        Memr[radii], ratio, nc, mk_stati (mk,
 			GRAYLEVEL))
+	            call imflush (im)
+		}
 
 	    case MK_PLUS:
 		call mk_textim (im, "+", nint (fx), nint (fy), mk_stati (mk,
 		    SIZE), mk_stati (mk, SIZE), mk_stati (mk, GRAYLEVEL), YES)
+	        call imflush (im)
 
 	    case MK_CROSS:
 		call mk_textim (im, "x", nint (fx), nint (fy), mk_stati (mk,
 		    SIZE), mk_stati (mk, SIZE), mk_stati (mk, GRAYLEVEL), YES)
+	        call imflush (im)
 
 	    default:
 	    }
-
-	    call imflush (im)
 
 	    # Number the text file.
 	    ltid = ltid + 1
@@ -150,6 +153,7 @@ begin
 	    ofy = fy
 	}
 
+	call imflush (im)
 	call sfree (sp)
 end
 
@@ -308,9 +312,9 @@ int	ncircles		# number of circles
 int	graylevel		# gray level for marking
 
 int	i, j, k, ix1, ix2, npix
-pointer	ivp, ovp
-real	dy2, dym, dyp, r2, dx1, dx2, xc
-pointer	imgs2s(), imps2s()
+pointer	ovp
+real	dy2, dym, dyp, r2, dx1, dx2
+pointer	imps2s()
 
 begin
 	if (ratio <= 0)
@@ -319,10 +323,6 @@ begin
 	npix = x2 - x1 + 1
 
 	do i = y1, y2 {
-
-	    ovp = imps2s (im, x1, x2, i, i)
-	    ivp = imgs2s (im, x1, x2, i, i)
-	    call amovs (Mems[ivp], Mems[ovp], npix)
 
 	    dy2 = (i - fy) ** 2
 	    if (i >= fy) {
@@ -338,7 +338,6 @@ begin
 		r2 = cradii[j] ** 2
 		if (r2 < dym )
 		    next
-		xc = fx - x1 + 1
 
 		dx1 = r2 - dym
 		if (dx1 >= 0.0)
@@ -351,21 +350,23 @@ begin
 		else
 		    dx2 = 0.0
 
-		ix1 = nint (xc - dx1)
-		ix2 = nint (xc - dx2)
-		if (ix1 <= npix && ix2 >= 1) {
+		ix1 = nint (fx - dx1)
+		ix2 = nint (fx - dx2)
+		if (ix1 <= IM_LEN(im,1) && ix2 >= 1) {
 		    ix1 = max (1, ix1)
-		    ix2 = min (ix2, npix)
-		    do k = ix1, ix2
+		    ix2 = min (ix2, IM_LEN(im,1))
+		    ovp = imps2s (im, ix1, ix2, i, i)
+		    do k = 1, ix2 - ix1 + 1
 		        Mems[ovp+k-1] = graylevel
 		}
 
-		ix1 = nint (xc + dx1)
-		ix2 = nint (xc + dx2)
-		if (ix2 <= npix && ix1 >= 1) {
+		ix1 = nint (fx + dx1)
+		ix2 = nint (fx + dx2)
+		if (ix2 <= IM_LEN(im,1) && ix1 >= 1) {
 		    ix2 = max (1, ix2)
-		    ix1 = min (ix1, npix)
-		    do k = ix2, ix1
+		    ix1 = min (ix1, IM_LEN(im,1))
+		    ovp = imps2s (im, ix2, ix1, i, i)
+		    do k = 1, ix2 - ix1 + 1
 		        Mems[ovp+k-1] = graylevel
 		}
 	    }
@@ -419,9 +420,9 @@ int	nbox			# number of boxes
 int	graylevel		# value of graylevel
 
 int	i, j, k, npix, ydist, bdist, ix1, ix2
-pointer	ivp, ovp
+pointer	ovp
 real	hlength
-pointer	imgs2s(), imps2s()
+pointer	imps2s()
 
 begin
 	if (x1 == x2) {
@@ -437,27 +438,26 @@ begin
 	} else {
 	    npix = x2 - x1 + 1
 	    do i = y1, y2 {
-
-	        ovp = imps2s (im, x1, x2, i, i)
-	        ivp = imgs2s (im, x1, x2, i, i)
-	        call amovs (Mems[ivp], Mems[ovp], npix)
-
 		ydist = nint (abs (i - fy))
 		do j = 1, nbox {
 		    hlength = length[j] / 2.0
 		    bdist = nint (hlength * ratio)
 		    if (ydist > bdist)
 			next
-		    ix1 = max (x1, nint (fx - hlength)) - x1 + 1
-		    ix2 = min (x2, nint (fx + hlength)) - x1 + 1
-		    if (ix1 < 1 || ix1 > npix || ix2 < 1 || ix2 > npix)
+		    ix1 = max (x1, nint (fx - hlength))
+		    ix2 = min (x2, nint (fx + hlength))
+		    if (ix1 < 1 || ix1 > IM_LEN(im,1) || ix2 < 1 ||
+		        ix2 > IM_LEN(im,1))
 			next
 		    if (ydist == bdist) {
-			do k = ix1, ix2
+			ovp = imps2s (im, ix1, ix2, i, i)
+			do k = 1, ix2 - ix1 + 1
 			    Mems[ovp+k-1] = graylevel
 		    } else {
-			Mems[ovp+ix1-1] = graylevel
-			Mems[ovp+ix2-1] = graylevel
+			ovp = imps2s (im, ix1, ix1, i, i)
+			Mems[ovp] = graylevel
+			ovp = imps2s (im, ix2, ix2, i, i)
+			Mems[ovp] = graylevel
 		    }
 		}
 	    }

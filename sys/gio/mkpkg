@@ -10,6 +10,7 @@ $exit
 update:
 	@stdgraph
 	@sgikern
+	@imdkern
 	$ifeq (USE_NSPP,    yes) @nsppkern $endif
 	$ifeq (USE_CALCOMP, yes) @calcomp  $endif
 	;
@@ -35,6 +36,9 @@ libstg.a:
 	;
 libsgi.a:
 	@sgikern
+	;
+libimd.a:
+	@imdkern
 	;
 libgkt.a:
 	@nsppkern

@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<ctype.h>
 include	"qpoe.h"
 include	"qpex.h"
@@ -27,7 +28,7 @@ int	level, zlevel, status, start, value, token, op, kw
 
 pointer	qp_opentext()
 int	qp_gettok(), gstrcpy(), strlen(), strdic(), ctoi()
-errchk	qp_opentext, malloc, realloc, qp_gettok, qp_ungettok
+errchk	qp_opentext, malloc, realloc, qp_gettok, qp_ungettok, syserrs
 
 define	F Memc[filter+($1)-1]
 define	noval_  91
@@ -288,6 +289,10 @@ noval_		    call eprintf ("QPIO: kewyord `%s' requires an argument\n")
 		F(op) = EOS
 	    }
 	}
+
+	# Verify that the parens etc. match.
+	if (level != 0)
+	    call syserrs (SYS_QPIOSYN, QP_DFNAME(qp))
 
 	F(op) = EOS
 	sz_filter = op

@@ -63,9 +63,17 @@ begin
 	call clgpset (np, "ccdread", Memc[str], SZ_LINE)
 	call apsets (ap, CCDREAD, Memc[str])
 	call apsetr (ap, READNOISE, clgpsetr (np, "readnoise"))
+
 	call clgpset (np, "exposure", Memc[str], SZ_LINE)
 	call apsets (ap, EXPOSURE, Memc[str])
 	call apsetr (ap, ITIME, clgpsetr (np, "itime"))
+	call clgpset (np, "airmass", Memc[str], SZ_LINE)
+	call apsets (ap, AIRMASS, Memc[str])
+	call apsetr (ap, XAIRMASS, clgpsetr (np, "xairmass"))
+	call clgpset (np, "filter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTER, Memc[str])
+	call clgpset (np, "ifilter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTERID, Memc[str])
 
 	# Get radial plots.
 	call apseti (ap, RADPLOTS, btoi (clgetb ("radplots")))

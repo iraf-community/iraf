@@ -153,7 +153,7 @@ begin
 	        call clputb ("display", bval)
 	    }
 	case EPARAM:
-	    call clcmdw ("eparam epix")
+	    call clcmdw ("eparam imedit")
 	    call ep_setpars (ep)
 	case GRAPHICS:
 	    call gargwrd (Memc[cmd], SZ_FNAME)
@@ -240,11 +240,11 @@ begin
 	    }
 	case WIDTH:
 	    call gargr (rval)
-	    if (nscan() == 1) {
+	    if (nscan() == 1 || rval < 1.) {
 	        call printf ("width %g\n")
 		    call pargr (EP_WIDTH(ep))
 	    } else {
-		EP_WIDTH(ep) = rval
+		EP_WIDTH(ep) = max (1., rval)
 	        call clputr ("width", EP_WIDTH(ep))
 		if (EP_LOGFD(ep) != NULL) {
 		    call fprintf (EP_LOGFD(ep), ":width %g\n")
@@ -280,7 +280,7 @@ begin
 		    call pargr (EP_XORDER(ep))
 	    } else {
 		EP_XORDER(ep) = max (1, ival)
-	        call clputr ("xorder", EP_XORDER(ep))
+	        call clputi ("xorder", EP_XORDER(ep))
 		if (EP_LOGFD(ep) != NULL) {
 		    call fprintf (EP_LOGFD(ep), ":xorder %d\n")
 			call pargi (EP_XORDER(ep))
@@ -293,7 +293,7 @@ begin
 		    call pargr (EP_YORDER(ep))
 	    } else {
 		EP_YORDER(ep) = max (1, ival)
-	        call clputr ("yorder", EP_YORDER(ep))
+	        call clputi ("yorder", EP_YORDER(ep))
 		if (EP_LOGFD(ep) != NULL) {
 		    call fprintf (EP_LOGFD(ep), ":yorder %d\n")
 			call pargi (EP_YORDER(ep))

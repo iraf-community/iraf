@@ -33,7 +33,9 @@ follows:
 .fi
 .ih
 EXAMPLES
-	cl> gkidir file1
+1. List the plots in the GKI metacode file "file":
+
+    cl> gkidir file
 .ih
 SEE ALSO
 gkiextract

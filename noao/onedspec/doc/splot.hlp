@@ -245,7 +245,7 @@ Quit Function mode
 Get another spectrum to work on. The current spectrum is discarded.
 .le
 .ls h
-Measure equivalent width assuming a Gaussian profile on one side a
+Measure equivalent width assuming a Gaussian profile on one side of a
 blended line.  A second cursor key is requested with one of the following
 values:
 .ls a

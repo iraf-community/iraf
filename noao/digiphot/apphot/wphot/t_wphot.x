@@ -18,6 +18,7 @@ pointer graphics	# pointer to graphics display device
 pointer	display		# pointer to display device
 int	interactive	# mode of use
 int	verify		# verify critical parameters
+int	update		# update the critical parameters
 int	verbose		# print messages in verbose mode
 
 int	limlist, lclist, lolist, lslist, sid, lid, sd, out, cl, root, stat, pfd
@@ -25,7 +26,7 @@ pointer	sp, outfname, cname, ap, im, gd, mgd, id, imlist, clist, olist, slist
 
 bool	clgetb(), streq()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), apstati()
-int	strncmp(), strlen(), fnldir(), ap_wophot()
+int	strncmp(), strlen(), fnldir(), ap_wphot()
 pointer	imtopenp(), clpopnu(), immap(), open(), gopen()
 errchk	gopen
 
@@ -70,14 +71,23 @@ begin
 	}
 
 	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
-	interactive = btoi (clgetb ("interactive"))
+	if (Memc[cname] != EOS)
+	    interactive = NO
+	else if (lclist == 0)
+	    interactive = YES
+	else
+	    interactive = btoi (clgetb ("interactive"))
 	verify = btoi (clgetb ("verify"))
+	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
 	# Intialize the phot structure.
 	call ap_gwppars (ap)
-	if (verify == YES && interactive == NO)
-	    call ap_wconfirm (ap)
+	if (verify == YES && interactive == NO) {
+	    call ap_wconfirm (ap, NULL, 1)
+	    if (update == YES)
+		call ap_wpars (ap)
+	}
 
 	# Open the plot files.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
@@ -142,9 +152,11 @@ begin
 	    # Open the image and store image parameters.
 	    im = immap (Memc[image], READ_ONLY, 0)
 	    call apsets (ap, IMNAME, Memc[image])
-	    call ap_itime (im, ap)
 	    call ap_padu (im, ap)
 	    call ap_rdnoise (im, ap)
+	    call ap_itime (im, ap)
+	    call ap_airmass (im, ap)
+	    call ap_filter (im, ap)
 
 	    # Open the coordinate file, where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -152,12 +164,29 @@ begin
 
 	    if (lclist <= 0) {
 		cl = NULL
-		call strcpy ("", Memc[coords], SZ_FNAME)
-	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF)
-		cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
-	    else
-		call seek (cl, BOF)
-	    call apsets (ap, CLNAME, Memc[coords])
+		call strcpy ("", Memc[outfname], SZ_FNAME)
+	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords]))
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+		else
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+	    } else {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords])) {
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else {
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+		    call seek (cl, BOF)
+		}
+	    }
+	    call apsets (ap, CLNAME, Memc[outfname])
 
 	    # Open the skys file.
 	    if (lslist <= 0) {
@@ -198,17 +227,17 @@ begin
 	    # Do aperture photometry.
 	    if (interactive == NO) {
 	        if (Memc[cname] != EOS)
-		    stat = ap_wophot (ap, im, cl, sd, NULL, mgd, NULL, out,
+		    stat = ap_wphot (ap, im, cl, sd, NULL, mgd, NULL, out,
 		        sid, NO)
 	        else if (cl != NULL) {
 		    lid = 1
-	            call ap_bwophot (ap, im, cl, sd, out, sid, lid, gd, mgd, id,
+	            call ap_bwphot (ap, im, cl, sd, out, sid, lid, gd, mgd, id,
 		        verbose)
 		    stat = NO
 		} else 
 		    stat = NO
 	    } else
-		stat = ap_wophot (ap, im, cl, sd, gd, mgd, id, out, sid, YES)
+		stat = ap_wphot (ap, im, cl, sd, gd, mgd, id, out, sid, YES)
 
 	    call imunmap (im)
 	    if (cl != NULL) {
@@ -231,7 +260,7 @@ begin
 
 
 	# Close the coordinate, sky and output files.
-	call apfree (ap)
+	call appfree (ap)
 	if (cl != NULL && lclist == 1)
 	    call close (cl)
 	if (sd != NULL && lslist == 1)

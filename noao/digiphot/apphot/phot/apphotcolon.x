@@ -46,8 +46,11 @@ begin
 	        newsky)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, PCMDS) != 0)
 	    call apmagcolon (ap, out, stid, cmdstr, newmagbuf, newmag)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
+	        newcenter, newskybuf, newsky, newmagbuf, newmag)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
-	    call apnscolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
+	    call apnscolon (ap, im, out, stid, cmdstr, newcenterbuf,
 	        newcenter, newskybuf, newsky, newmagbuf, newmag)
 	else
 	    call aphimcolon (ap, out, stid, cmdstr, newcenterbuf, newcenter,

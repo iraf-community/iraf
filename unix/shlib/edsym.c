@@ -340,8 +340,10 @@ char	*argv[];
 		    !(ch == 'L') &&
 		    !(ch == 'v' && name[1] == '.') &&
 		    !(ch == 'V' && strncmp(name,"VAR_SEG",7)==0) &&
-		    !(ch == 'A' && strncmp(name,"ARR_SEG",7)==0) &&
-		    !(n=strlen(name), (name[n-2] == '.' && name[n-1] == 'o'))
+		    !(ch == 'A' && strncmp(name,"ARR_SEG",7)==0)
+		    /*
+		&& !(n=strlen(name), (name[n-2] == '.' && name[n-1] == 'o'))
+		     */
 		    ));
 
 		if (keep && !(omit_shsym && v >= vshlib && v <= v_end)) {

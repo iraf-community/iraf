@@ -136,7 +136,7 @@ if (calibrate) {			# CALIBRATE?
 
     print ("calibrate (input='",in,"',output='",out,"',records=s1,",>>s2)
     print ("\trecformat=yes,apertures='',ignoreaps=no,",>>s2)
-    print ("\textinct=no,flux=yes,",>>s2)
+    print ("\textinct=yes,flux=yes,",>>s2)
     print ("\tsensitivity='",sns,"',fnu=",fnu,",",ttl,>>s2)
 
     print ("")

@@ -63,6 +63,8 @@ begin
 	    AP_RPNREJECT(rprof) = ival
 	case PYNVER:
 	    AP_PYNVER(ply) = ival
+	case PYBADPIX:
+	    AP_PYBADPIX(ply) = ival
 	case MKSKY:
 	    AP_MKSKY(dsp) = ival
 	case MKCENTER:
@@ -105,7 +107,7 @@ begin
 	nse = AP_NOISE(ap)
 	ply = AP_POLY(ap)
 	rprof = AP_RPROF(ap)
-	fnd = AP_FIND(ap)
+	fnd = AP_PFIND(ap)
 
 	switch (param) {
 	case RPFWHM:

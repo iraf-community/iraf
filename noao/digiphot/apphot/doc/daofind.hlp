@@ -1,4 +1,4 @@
-.help daofind May89 noao.digiphot.apphot
+.help daofind Jan90 noao.digiphot.apphot
 .ih
 NAME
 daofind -- automatically detect objects in an image
@@ -23,6 +23,8 @@ of input images.
 .ls datapars = ""
 The name of the file containing the data dependent parameters. The critical
 parameters \fIfwhmpsf\fR and \fIthreshold\fR are located here.
+If \fIdatapars\fR is null ("") then the default parameter set in the user's
+uparm directory is used.
 .le
 .ls convolution= ""
 The name of the image prefix and/or directory where the density enhancements
@@ -104,18 +106,20 @@ Interactive or batch mode.
 Automatically confirm the critical parameters when running in non-interactive
 mode.
 .le
+.ls update = no
+Update the critical parameters in non interactive mode if verify is yes.
+.le
 .ls verbose = NO
 Print out information about the progress of the task in non interactive mode.
 .le
 
 .ih
 DESCRIPTION
-
 DAOFIND searches the IRAF images \fIimage\fR for local density maxima,
 with a full width half maximum \fIdatapars.fwhmpsf\fR,
 greater than \fIdatapars.threshold\fR above the local background and produces a
-list of detected images in the file \fIoutput\fR.
-The detected images are also listed on the standard output
+list of detected objects in the file \fIoutput\fR.
+The detected objects are also listed on the standard output
 if the program is running in interactive mode or the \fIverbose\fR
 switch is turned on in non interactive mode.
 
@@ -145,7 +149,7 @@ spbar	Find the stars in the image and output the results
 q	Exit
 
 
-Daofind parameters are listed or set with the following commands.
+DAOFIND parameters are listed or set with the following commands.
 
 :image		[string]	Image name
 :output		[string]	Output file name
@@ -164,6 +168,10 @@ Daofind parameters are listed or set with the following commands.
 :readnoise	[value]		Readout noise (electrons)
 :exposure	[string]	Exposure time image header keyword
 :itime		[value]		Exposure time (time units)
+:airmass	[string]	Airmass image header keyword
+:xairmass	[value]		Airmass value (number)
+:filter		[string]	Filter image header keyword
+:ifilter	[string]	Filter id string
 :datamin	[value]		Minimum good data value (counts)
 :datamax	[value]		Maximum good data value (counts)
 
@@ -175,11 +183,25 @@ Daofind parameters are listed or set with the following commands.
 :roundlo	[value]		Lower bound on roundness
 :roundhi	[value]		Upper bound on roundness
 :mkdetections	[y/n]		Mark detections on the image display
+
+
+The following commands are available for inside the interactive setup menu.	
+
+
+                    Interactive DAOFIND Setup Menu
+
+	v	Set and verify critical DAOFIND parameters (f,t)
+
+	f	Set and verify the full width half maximum of the psf
+	t	Set and verify the detection threshold 
+	s	Set and verify the standard deviation of the background
+	l	Set and verify the minimum good data value
+	u	Set and verify the maximum good data value
+
 .fi
 
 .ih
 ALGORITHMS
-
 In the first step of the detection process, DAOFIND computes a linear
 function of the brightness values in an approximately
 circular array of pixels within radius of
@@ -209,7 +231,6 @@ and the object is added to the output file.
 
 .ih
 OUTPUT
-
 In interactive mode or in batch mode with the verbose switch turned on
 the following quantities are written to the terminal as each object is
 measured.
@@ -231,10 +252,9 @@ written. The parameters can subsequently be altered.
 
 .ih
 EXAMPLES
-
 1. Run daofind interactively on n4147 using the image display
 and display cursor. Set the fwhmpsf and threshold parameters
-with the graphics cursor,  radial profile plot and the interactive
+with the graphics cursor, a  radial profile plot and the interactive
 setup key i.
 
 .nf
@@ -248,7 +268,7 @@ setup key i.
 
 	ap> daofind n4147 interactive+
 
-	... a short help page appears on the screen
+	... type ? to get a help page on the screen
 
 	... move display cursor to a setup star
 	... type i to enter the interactive setup menu
@@ -286,7 +306,7 @@ key i.
 
 	ap> daofind m92 display=stdgraph interactive+
 
-	... a short help page appears on the screen
+	... type ? to get a help page on the screen
 
 	... type :.read m92.plot1 to load the contour plot on the screen
 
@@ -310,11 +330,31 @@ key i.
 
 .fi
 
-3. Run DAOFIND interactively on a SUN workstation using the imtool window,
+3. Run daofind on a list of 3 images contained in the file imlist in batch mode.
+The program will ask the user to verify that the fwhmpsf and the threshold are
+correct before beginning execution.
+
+.nf
+	ap> daofind @imlist inter-
+.fi
+
+4. The user can submit the same job to the backgound after satisfying
+themselves that the parameter values are correct by appending an
+& at the end of the command and turning off the parameter queries 
+with the verify switch.
+
+.nf
+	ap> daofind @imlist inter- verify-
+.fi
+
+
+5. Run DAOFIND interactively on a SUN workstation using the imtool window,
 setting the parameters interactively with the i key as in example 1, but
-without using cursor readback. This
-example assumes knowledge of the basis imtool functions and that the
-imtool cursor is reading back positions in image pixel coordinates.
+without using cursor readback. This example assumes knowledge of the
+basic imtool functions and that the imtool cursor is reading back positions
+in image pixel coordinates. Users should be aware that this example is
+somewhat obsolete, but has been left in place to illustrate that the image
+cursor can be aliased to text.
 
 .nf
 	ap> set stdimcur = text
@@ -330,8 +370,7 @@ imtool cursor is reading back positions in image pixel coordinates.
 
 	ap> daofind m92 interactive+
 
-	... a short help page appears on the screen plus the image
-	    cursor read prompt
+	... type ? to get an optional help page on the screen
 
 	... move the mouse to the imtool window
 	... move the cursor cursor to a setup star, press the center mouse
@@ -360,32 +399,13 @@ imtool cursor is reading back positions in image pixel coordinates.
 	... full output will appear in the text file m92.coo.2
 .fi
 
-4. Run daofind on a list of 3 images contained in the file imlist in batch mode.
-The program will ask the user to verify that the fwhmpsf and the threshold are
-correct before beginning execution.
-
-.nf
-	ap> daofind @imlist inter-
-.fi
-
-5. The user can submit the same job to the backgound after satisfying
-themselves that the parameter values are correct by appending an
-& at the end of the command and turning off the parameter queries 
-with the verify switch.
-
-.nf
-	ap> daofind @imlist inter- verify-
-.fi
-
 .ih
 TIME REQUIREMENTS
 
 .ih
 BUGS
-
 It is currently the responsibility of the user to make sure that the
-image displayed in the frame is the same as that specified by the image
-parameter.
+displayed image is the same as that specified by the image parameter.
 
 Commands which draw to the image display are currently disabled.
 The TVMARK task in the proto package  can be used to draw simple marks
@@ -398,4 +418,5 @@ IMTOOL window and the APPHOT package has no control over it.
 
 .ih
 SEE ALSO
+datapars
 .endhelp

@@ -1,6 +1,6 @@
 include "../lib/apphotdef.h"
 
-# AP_FDFREE -- Procedure to free the data structure.
+# AP_FDFREE -- Free the apphot data structure.
 
 procedure ap_fdfree (ap)
 
@@ -11,18 +11,20 @@ begin
 	    return
 	if (AP_NOISE(ap) != NULL)
 	    call ap_noisecls (ap)
-	if (AP_FIND(ap) != NULL)
+	if (AP_PFIND(ap) != NULL)
 	    call ap_fdcls (ap)
+	if (AP_PDISPLAY(ap) != NULL)
+	    call ap_dispcls (ap)
 	call mfree (ap, TY_STRUCT)
 end
 
 
-# AP_FDCLS -- Procedure to free the find data structure.
+# AP_FDCLS -- Free the find data structure.
 
 procedure ap_fdcls (ap)
 
 pointer	ap		# pointer to the apphot structure
 
 begin
-	call mfree (AP_FIND(ap), TY_STRUCT)
+	call mfree (AP_PFIND(ap), TY_STRUCT)
 end

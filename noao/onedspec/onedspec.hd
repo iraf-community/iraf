@@ -18,7 +18,7 @@ powercor	hlp=doc$powercor.hlp,		src=powercor.cl
 process		hlp=doc$process.hlp,		src=process.cl
 reidentify	hlp=doc$reidentify.hlp
 refspectra	hlp=doc$refspectra.hlp,		src=dispcor/refspectra.x
-revisions	hlp=Revisions
+revisions	sys=Revisions
 sensfunc	hlp=doc$sensfunc.hlp,		src=sensfunc/t_sensfunc.x
 setdisp		hlp=doc$setdisp.hlp,		src=setdisp.x
 shedit		hlp=doc$shedit.hlp,		src=t_shedit.x

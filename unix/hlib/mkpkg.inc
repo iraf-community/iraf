@@ -14,22 +14,33 @@ $else $ifeq (MACH, i386) then
 $set	XFLAGS		= "-c"
 $set	XVFLAGS		= "-c"
 $set	LFLAGS		= "-/Bstatic"
-$else $ifeq (MACH, ieee) then
-$set	FLOAT		= "fi"
-$set	XFLAGS		= "-c -q -/sa -/fi -/O2 -/na -/nw -/nv"
-$set	XSFLAGS		= "-c -q -/sa -/fi -/O1 -/na -/nw -/nv"
-$set	XVFLAGS		= "-c -q -/sa -/fi -/O2 -/na -/nw"
-$set	LFLAGS		= "-z -/fi"
-$else $ifeq (MACH, native) then
-$set	FLOAT		= "fn"
-$set	XFLAGS		= "-c -q -/sa -/fn -/O2 -/na -/nw -/nv"
-$set	XSFLAGS		= "-c -q -/sa -/fn -/O1 -/na -/nw -/nv"
-$set	XVFLAGS		= "-c -q -/sa -/fn -/O2 -/na -/nw"
-$set	LFLAGS		= "-z -/fn"
+$else $ifeq (MACH, pg) then
+$set	XFLAGS		= "-c -/$(MACH) -/f68881"
+$set	XVFLAGS		= "-c -/$(MACH) -/f68881"
+$set	LFLAGS		= "-/Bstatic -/$(MACH) -/f68881"
+$set	MACH		= f68881
+$else $ifeq (MACH, m68k_fpa) then
+$set	XFLAGS		= "-cq -/W0,-opt,2,-db,-cpu,FPA1"	# default XC
+$set	XVFLAGS		= "-cq -/W0,-opt,3,-db,-cpu,FPA1"	# XC VOPS flags
+$set	XSFLAGS		= "-cq -/W0,-opt,2,-db,-cpu,FPA1"	# XC libsys 
+$set	XEFLAGS		= "-cq -/W0,-opt,2,-db,-cpu,FPA1"	# XC libex
+$set	LFLAGS		= "-z -/w -/W0,-db"
+$else $ifeq (MACH, m68k_f68) then
+$set	XFLAGS		= "-cq -/W0,-opt,2,-db,-cpu,3000"	# default XC
+$set	XVFLAGS		= "-cq -/W0,-opt,3,-db,-cpu,3000"	# XC VOPS flags
+$set	XSFLAGS		= "-cq -/W0,-opt,2,-db,-cpu,3000"	# XC libsys 
+$set	XEFLAGS		= "-cq -/W0,-opt,2,-db,-cpu,3000"	# XC libex
+$set	LFLAGS		= "-z -/w -/W0,-db"
+$else $ifeq (MACH, a88k) then
+$set	XFLAGS		= "-cq -/W0,-opt,2,-db,-cpu,a88k -/DA88K"
+$set	XVFLAGS		= "-cq -/W0,-opt,3,-db,-cpu,a88k"	# XCVOPS flags
+$set	XSFLAGS		= "-cq -/W0,-opt,2,-db,-cpu,a88k"	# XC libsys 
+$set	XEFLAGS		= "-cq -/W0,-opt,2,-db,-cpu,a88k"	# XC libex
+$set	LFLAGS		= "-z -/W0,-dbs"
 $else
-$set	XFLAGS		= "-c"
-$set	XVFLAGS		= "-c"
-$set	LFLAGS		= "-z"
+$set	XFLAGS		= "-c -/$(MACH)"
+$set	XVFLAGS		= "-c -/$(MACH)"
+$set	LFLAGS		= "-/Bstatic -/$(MACH)"
 $end
 
 $set	USE_LIBMAIN	= yes		# update lib$libmain.o (root object)
@@ -45,10 +56,12 @@ $ifeq (MACH, sparc) then
 $include "hlib$mkpkg.sf.SUN4"
 $else $ifeq (MACH, i386) then
 $include "hlib$mkpkg.sf.I386"
-$else $ifeq (MACH, vax) then
-$include "hlib$mkpkg.sf.VAX"
-$else $ifeq (MACH, ieee) then
-$include "hlib$mkpkg.sf.CX"
-$else $ifeq (MACH, native) then
-$include "hlib$mkpkg.sf.CX"
+$else $ifeq (MACH, m68k_fpa) then
+$include "hlib$mkpkg.sf.M68K"
+$else $ifeq (MACH, m68k_f68) then
+$include "hlib$mkpkg.sf.M68K"
+$else $ifeq (MACH, a88k) then
+$include "hlib$mkpkg.sf.A88K"
+$else
+$include "hlib$mkpkg.sf.SUN3"
 $end

@@ -377,8 +377,8 @@ will create the named parameter if it does not already exist (see also
                     qp_gstr (qp, param, outstr, maxch)
            qp_put[bcsilrdx] (qp, param, val)
                     qp_pstr (qp, param, strval)
-           qp_add[bcsilrdx] (qp, param, defval)
-                    qp_astr (qp, param, strval)
+           qp_add[bcsilrdx] (qp, param, defval, comment)
+                    qp_astr (qp, param, strval, comment)
 
               fd = qp_popen (qp, param, mode, type)
             nelem = qp_read (qp, param, buf, nelem, first, dtype)

@@ -18,14 +18,14 @@ int	fnldir(), strlen(), apimroot()
 begin
 	call smark (sp)
 	call salloc (root, SZ_FNAME, TY_CHAR)
-	call imgimage (image, Memc[root], maxch)
+	call strcpy (image, Memc[root], maxch)
 
 	ndir = fnldir (output, name, maxch)
 	if (strlen (output) == ndir) {
 	    ndir = ndir + apimroot (Memc[root], name[ndir+1], maxch)
 	    call sprintf (name[ndir+1], maxch, ".%s.*")
 		call pargstr (ext)
-	    call apversion (name, name, maxch)
+	    call apoversion (name, name, maxch)
 	} else
 	    call strcpy (output, name, maxch)
 

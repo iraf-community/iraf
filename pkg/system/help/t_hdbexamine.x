@@ -2,8 +2,7 @@
 
 include	<syserr.h>
 include	<error.h>
-
-define	SZ_HELPDB	256
+include	"help.h"
 
 
 # HDBEXAMINE -- Examine the help database.

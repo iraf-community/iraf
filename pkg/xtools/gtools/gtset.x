@@ -1,7 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<gset.h>
-include	<pkg/gtools.h>
+include	"gtools.h"
 
 # GT_SETI -- Set integer parameters.
 
@@ -20,6 +20,8 @@ begin
 	    GT_LINE(gt) = ival
 	case GTTRANSPOSE:
 	    GT_TRANSPOSE(gt) = ival
+	case GTSYSID:
+	    GT_SYSID(gt) = ival
 	}
 end
 

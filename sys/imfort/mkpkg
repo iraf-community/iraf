@@ -20,12 +20,14 @@ libimfort.a:
 	imclos.x	imfort.h
 	imcrea.x	
 	imcrex.x	imfort.h oif.h <fio.h> <imhdr.h> <mach.h>
-	imdele.x	imfort.h <imhdr.h> <protect.h>
+	imdele.x
 	imdelk.x	imfort.h
+	imdelx.x	imfort.h <imhdr.h> <protect.h>
 	imemsg.x	imfort.h <imhdr.h>
 	imfdir.x	oif.h
 	imfgpfn.x	oif.h
 	imflsh.x	imfort.h
+	imfmkpfn.x	imfort.h oif.h <imhdr.h>
 	imfparse.x	oif.h
 	imfupdhdr.x	imfort.h <imhdr.h>
 	imgkwb.x	imfort.h

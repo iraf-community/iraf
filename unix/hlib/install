@@ -23,7 +23,7 @@
 # ----------------------------------------------------------------------------
 
 unset noclobber
-unalias cd cmp echo ln mv rm sed set
+unalias cd cp cmp echo ln mv rm sed set grep ls chmod chown pwd touch
 
 # set echo
 
@@ -31,8 +31,12 @@ set W		= '\([ 	"]\)'		# match a blank, tab, or "
 set TEMP	= "/tmp/I_temp"
 set exec	= yes
 set user	= iraf
-#set mach	= `mach`
-set mach	= convex
+#set mach	= `mach`		# comment out if "mach" does not exist
+set mach	= $MACH			# comment out if "mach" exists
+#set display	= imtool		# comment out if server is saoimage
+set display	= saoimage		# comment out if server is imtool
+#set dispserver	= no			# comment out if display server present
+set dispserver	= yes			# comment out if no display server
 
 alias PUT	"mv -f \!*; /etc/chown $user \!$ "
 
@@ -274,8 +278,12 @@ set BINDIRS	= "$hbin $hlib $fbin"
 
 # The following file lists are partially system dependent.
 set PATHFILES	= "mkiraf.csh libc/iraf.h cl.csh"
-set MODEFILES	= "mkiraf.csh mkmlist.csh edsym.e generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e ic.csh xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e $hlib/sgi2*.e cl.csh mkfloat.csh"
-set LINKFILES	= "cl.e generic.e mkiraf.csh mkmlist.csh edsym.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xc.e ic.csh"
+set MODEFILES	= "mkiraf.csh mkmlist.csh edsym.e generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e $hlib/sgi2*.e cl.csh mkfloat.csh fc.csh $host/reboot"
+if ($mach == "a88k") then
+    set LINKFILES	= "cl.e generic.e mkiraf.csh mkmlist.csh mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e xpp.e xc.e"
+else
+    set LINKFILES	= "cl.e generic.e mkiraf.csh mkmlist.csh mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xc.e"
+endif
 # ------------------------------------------
 
 # Begin installation.
@@ -307,7 +315,7 @@ endif
 
 foreach i ($BINDIRS)
     if (-e $i/alloc.e) then
-	if ("`ls -l $i/alloc.e | grep root`" != "") then
+	if ("`ls -l $i/alloc.e | grep 'rwsr-.*root'`" != "") then
 	    echo "device allocation task $i/alloc.e is ok"
 	else
 	    echo "chown $i/alloc.e to root, set uid modebit"
@@ -361,6 +369,21 @@ foreach i ($PATHFILES)
 	echo "cannot find $i"
     endif
 end
+
+# For Apollo, architecture a88k (and later to support m68k), we use a fake
+# rpp script in localbindir that re-prepends an underscore to _setjmp.
+# This is of course a hack, but should get us by until OSF/1...
+if ($mach == "a88k") then
+    cd $iraf/unix/boot/spp
+    if (-e rpp.a88k) then
+	rm rpp.a88k
+    endif
+    if (-e $lbin/rpp) then
+	rm $lbin/rpp
+    endif
+    sed -e "s+HBIN+$hbin+" rpp.template > rpp.a88k
+    cp rpp.a88k $lbin/rpp
+endif
 
 # Set default file permissions for the executable files in the BINDIRS,
 # in case the file mode has somehow been changed, e.g., in a file restore
@@ -464,40 +487,84 @@ if ($exec == yes) then
     touch $hlib/utime
 endif
 
-exit 0					# COMMENT OUT FOR SUN/IRAF
+# We are finished if no display server is present.
+if ($dispserver == no) then
+    exit 0
+endif
 
-# SUN/IRAF specific stuff.
+# SUN/IRAF or XWindows specific stuff.
 # ------------------------------
 
-# Install custom suntools (GTERM and IMTOOL).
+# This code was placed here at an earlier time when the image server was
+# more closely coupled with IRAF installation.  More recently, the SAOIMAGE
+# installation has been moved to the iraf/unix/x11/saoimage/makefile.  See
+# the cover letter for Apollo installations.  The rest of this code is not
+# executed now.
 
-if ("`grep Release.4 /etc/motd`" != "" || `mach` == "i386") then
+echo 'Domain/IRAF:  SAOIMAGE is installed using the makefile in'
+echo 'unix/x11/saoimage.  See also the cover letter or installation notes.'
+
+exit 0
+
+# Install custom suntools (GTERM and IMTOOL) or X applications (SAOIMAGE).
+
+if ("`grep Release.4 /etc/motd`" != "" || $mach == "i386") then
     set SUNOS4 = yes
 else
     set SUNOS4 = no
 endif
 
 echo ""
-echo "------------ Custom Suntools Installation -------------"
+echo "------------ Custom Suntools or XWindows Installation -------------"
 
-if ($SUNOS4 == "yes") then
-    # SunOS 4.0 and later versions.
-    # Install GTERM and IMTOOL executables in /usr/bin.
+if ($SUNOS4 == "yes" || $display == "saoimage") then
+    # SunOS 4.0 and later versions or X Window System applications.
+    # Install (GTERM and IMTOOL) or SAOIMAGE executables in /usr/bin.
     # ----------------------------------
 
     # Get the path to the user bin directory.
     set usrbin = /usr/bin
-    if ($mach != `mach`) then
-	echo -n "/usr/bin directory for machine type $mach ($usrbin): "
-	set usrbin = "$<"
-	if ("$usrbin" == "") then
-	    set usrbin = "$usrbin"
+    if (-e mach) then
+	if ($mach != `mach`) then
+	    echo -n "/usr/bin directory for machine type $mach ($usrbin): "
+	    set usrbin = "$<"
+	    if ("$usrbin" == "") then
+		set usrbin = "$usrbin"
+	    endif
 	endif
     endif
 
     # Install the executables.
     cd $usrbin
-    foreach i (gterm imtool)
+    if ($display == "imtool") then
+	set executables = "gterm imtool"
+    else
+	set executables = "saoimage"
+
+	# If a fresh saoimage archive has been built, the executable is still
+	# in its source directory; move it to $hbin.
+	set file1 = $iraf/unix/x/saoimage/saoimage
+	set file2 = $hbin/saoimage.e
+	set moveit = no
+	if (-e $file1 && -e $file2) then
+	    if ("`find $file1 -newer $file2 -print`" != "") then
+		set moveit = yes
+	    endif
+	else if (-e $file1) then
+	    set moveit = yes
+	else if (! (-e $file2 || -e saoimage)) then
+	    echo "cannot find saoimage executable ($file1 or $file2)"
+	    exit (1)
+	endif
+	if ($moveit == yes) then
+	    echo "moving $file1 to $file2"
+	    if ($exec == yes) then
+		mv -f $file1 $file2
+	    endif
+	endif
+    endif
+
+    foreach i ($executables)
 	set file2 = $hbin/$i.e
 	# Check if installed executable, if any, is up to date.
 	if (-e $i) then
@@ -532,31 +599,34 @@ if ($SUNOS4 == "yes") then
     end
 
     # Add entries for GTERM and IMTOOL to rootmenu file, if necessary.
-    set file = /usr/lib/rootmenu
-    if ("`/bin/grep gterm $file`" != "" &&\
-	"`/bin/grep imtool $file`" != "") then
-	echo "standard rootmenu file is ok (has gterm, imtool entries)"
-    else
-	echo -n "add entries for gterm and imtool to rootmenu file? (yes): "
-	set temp = "$<"
+    if ($display == "imtool") then
+	set file = /usr/lib/rootmenu
+	if ("`/bin/grep gterm $file`" != "" &&\
+	    "`/bin/grep imtool $file`" != "") then
+	    echo "standard rootmenu file is ok (has gterm, imtool entries)"
+	else
+	    echo -n "add entries for gterm and imtool to rootmenu file? (yes): "
+	    set temp = "$<"
 
-	if ("$temp" == "" || "$temp" == "y" || "$temp" == "yes") then
-	    if ("`/bin/grep gterm $file`" == "") then
-		echo '7a\' > $TEMP.s
-		echo '"Gterm"			gterm' >> $TEMP.s
-		sed -f $TEMP.s < $file > $TEMP
-		PUT $TEMP $file; rm $TEMP.s
-	    endif
-	    if ("`/bin/grep imtool $file`" == "") then
-		echo '8a\' > $TEMP.s
-		echo '"ImTool"		imtool' >> $TEMP.s
-		sed -f $TEMP.s < $file > $TEMP
-		PUT $TEMP $file; rm $TEMP.s
+	    if ("$temp" == "" || "$temp" == "y" || "$temp" == "yes") then
+		if ("`/bin/grep gterm $file`" == "") then
+		    echo '7a\' > $TEMP.s
+		    echo '"Gterm"			gterm' >> $TEMP.s
+		    sed -f $TEMP.s < $file > $TEMP
+		    PUT $TEMP $file; rm $TEMP.s
+		endif
+		if ("`/bin/grep imtool $file`" == "") then
+		    echo '8a\' > $TEMP.s
+		    echo '"ImTool"		imtool' >> $TEMP.s
+		    sed -f $TEMP.s < $file > $TEMP
+		    PUT $TEMP $file; rm $TEMP.s
+		endif
 	    endif
 	endif
     endif
 
-else
+# If installing gterm & imtool but prior to SunOS 4.0:
+else if ($display == "imtool") then
     # Install the custom Suntools - SunOS versions prior to 4.0.
     # -------------------------------
     echo -n "install custom suntools (GTERM, IMTOOL)? (yes): "; set temp = "$<"
@@ -731,20 +801,28 @@ else
     endif
 endif
 
-# Common code for GTERM/IMTOOL installation.
+# Common code for GTERM/IMTOOL/SAOIMAGE installation.
 # -------------------------------------------
 
-# Make sure special device entries for the IMTOOL display server exist
-# in /dev.
+# Make sure special device entries for the display server exist in /dev.
 
 foreach i (/dev/imt1i /dev/imt1o)
     if (-e $i) then
-	echo "imtool device entry $i is ok"
+	echo "imtool/saoimage device entry $i is ok"
     else
-	echo "make device entry $i for imtool"
+	echo "make device entry $i for imtool/saoimage"
 	if ($exec == yes) then
-	    /etc/mknod $i p
-	    chmod 777 $i
+ 	    if ($mach == "m68k") then
+ 		# Apollo hack:  only sysV mknod will currently create a fifo.
+ 		echo "Apollo version; attempting to use sys5.3 version of mknod"
+ 		set oldtype = $SYSTYPE
+ 		setenv SYSTYPE sys5.3
+ 		/sys5.3/etc/mknod $i p
+ 		setenv SYSTYPE $oldtype
+ 	    else
+ 		/etc/mknod $i p
+ 		chmod 777 $i
+ 	    endif
 	endif
     endif
 end
@@ -769,14 +847,19 @@ else
 endif
 
 # Install the default IMTOOLRC frame buffer configuration file.
-# The /usr/local/lib path is wired in to imtool and cannot easily be changed,
-# but if installation of the default imtoolrc in this directory is not possible,
-# the file can be installed in each imtool user's login directory as .imtoolrc,
-# or the environment variable IMTOOLRC can be defined in each imtool usr's
-# .login or .cshrc to define the path to the file.
+# The /usr/local/lib path is wired in to imtool/saoimage and cannot easily be
+# changed, but if installation of the default imtoolrc in this directory is not
+# possible, the file can be installed in each imtool user's login directory as
+# .imtoolrc, or the environment variable IMTOOLRC can be defined in each imtool
+# usr's .login or .cshrc to define the path to the file.
 
 set lib = /usr/local/lib
-set src = $iraf/unix/sun/imtoolrc
+if ($display == "saoimage") then
+    set src = $iraf/unix/x/imtoolrc
+else
+    set src = $iraf/unix/sun/imtoolrc
+endif
+
 set dst = $lib/imtoolrc
 
 if (! -e $dst) then
@@ -801,74 +884,133 @@ else
 	echo "updating $dst"
 	if ($exec == yes) then
 	    mv -f $dst $dst.OLD
-	    mv -f $src $dst
+	    cp $src $dst
 	endif
     else
 	echo "$dst is ok"
     endif
 endif
 
-# Make sure there are entries in the the termcap and graphcap files for gterm
-# and imtool.
+# Make sure there are entries in the the termcap and graphcap files for [gterm
+# and] imtool.
 
-set temp = `grep -l gterm $iraf/dev/termcap | grep -v "^#"`
-if ("$temp" == "") then
-    echo "WARNING: no gterm entry in termcap file"
+# GTERM:
+if ($display == "imtool") then
+    set temp = `grep -l gterm $iraf/dev/termcap | grep -v "^#"`
+    if ("$temp" == "") then
+	echo "WARNING: no gterm entry in termcap file"
+    else
+	echo "termcap file is ok (contains gterm entry)"
+    endif
+
+    set gcok = yes
+    set temp = `grep -l gterm $iraf/dev/graphcap | grep -v "^#"`
+    if ("$temp" == "") then
+	echo "WARNING: no gterm entry in graphcap file"
+	set gcok = no
+    endif
 else
-    echo "termcap file is ok (contains gterm entry)"
+    set gcok = yes
 endif
 
-set gcok = yes
-set temp = `grep -l gterm $iraf/dev/graphcap | grep -v "^#"`
-if ("$temp" == "") then
-    echo "WARNING: no gterm entry in graphcap file"
-    set gcok = no
-endif
+# IMTOOL (SAOIMAGE graphcap entry *is* "imtool").
 set temp = `grep -l imtool $iraf/dev/graphcap | grep -v "^#"`
 if ("$temp" == "") then
-    echo "WARNING: no imtool entry in graphcap file"
+    echo "WARNING: no imtool entry in graphcap file [also used for saoimage]"
     set gcok = no
 endif
 if ($gcok == yes) then
-    echo "graphcap file is ok (contains gterm, imtool entries)"
+    if ($display == "saoimage") then
+	echo "graphcap file is ok (contains imtool [=saoimage] entry)"
+    else
+	echo "graphcap file is ok (contains gterm, imtool entries)"
+    endif
 endif
 
-# Install or update the GTERM and IMTOOL manual pages.
-if (-e /usr/man/manl) then
-    cd /usr/man/manl
-    set src = $iraf/unix/sun
-
-    foreach i (gterm imtool)
-	set file1 = $i.l
-	set file2 = $src/$i.man
-
-	# Install or update the manpage source file.
-	if (-e $file1) then
-	    cmp -s $file1 $file2
-	    if ($status) then
-		echo "update $i manual page"
-		if ($exec == yes) then
-		    cp $file2 $file1
-		endif
-	    else
-		echo "$i manual page is up to date"
+# Install or update the GTERM and IMTOOL or SAOIMAGE manual pages.
+if (! -e /usr/man/manl) then
+    echo "creating directory /usr/man/manl"
+    if (! -e /usr/man/catl) then
+	if ($mach == "m68k") then
+	    echo "For domain/os, only /usr/man/catl will work, but /etc/catman"
+	    echo "can only be run on ALL system manpages; could take hours."
+	endif
+	echo -n "create /usr/man/catl (needs more space but faster)? (no): "
+	set temp = "$<"
+	if ("$temp" == "y" || "$temp" == "yes") then
+	    echo "creating directory /usr/man/catl"
+	    if ($exec == yes) then
+		mkdir /usr/man/catl
 	    endif
-	else
-	    echo "install $i manual page in /usr/man/manl"
+	endif
+    endif
+    if ($exec == yes) then
+	mkdir /usr/man/manl
+    endif
+endif
+
+cd /usr/man/manl
+
+if ($display == "saoimage") then
+    set src = $iraf/unix/x/saoimage/doc
+    set executables = "saoimage"
+else
+    set src = $iraf/unix/sun
+    set executables = "gterm imtool"
+endif
+
+foreach i ($executables)
+    set file1 = $i.l
+    set file2 = $src/$i.man
+    if (! -e $file2) then
+	echo "cannot find $file2"
+	exit (1)
+    endif
+
+    # Install or update the manpage source file.
+    if (-e $file1) then
+	cmp -s $file1 $file2
+	if ($status) then
+	    echo "update $i manual page"
 	    if ($exec == yes) then
 		cp $file2 $file1
 	    endif
+	else
+	    echo "$i manual page source is up to date"
 	endif
+    else
+	echo "install $i manual page in /usr/man/manl"
+	if ($exec == yes) then
+	    cp $file2 $file1
+	endif
+    endif
 
-	# Rerun catman if necessary.
-	if (-e /usr/man/catl) then
-	    set file2 = /usr/man/catl/$i.l
-	    if (! -e $file2 || "`find $file1 -newer $file2 -print`" != "") then
-		echo "rerun catman on section l"
-		if ($exec == yes) then
+    # Rerun catman if necessary.
+    if (-e /usr/man/catl) then
+	set file2 = /usr/man/catl/$i.l
+	# (Note that "find" returns aborting error if file nonexistent on
+	# some systems, so must first test existence)
+	if (-e $file2) then
+	    if ("`find $file1 -newer $file2 -print`" != "") then
+		set runcat = yes
+	    else
+		set runcat = no
+	    endif
+	else
+	    set runcat = yes
+	endif
+	if ($runcat == yes) then
+	    echo "rerun catman on section l"
+	    if ($exec == yes) then
+		if (-e /usr/etc/catman) then
 		    /usr/etc/catman l
+		else if (-e /etc/catman) then
+		    /etc/catman l
+		else
+		    echo "cannot find catman"
+		    exit (1)
 		endif
 	    endif
 	endif
-    end
-endif
+    endif
+end

@@ -1,3 +1,4 @@
+       apselect - Select fields from the center output file
          bscale - Brightness scale images 
 	 center - Compute accurate centers for a list of objects
      centerpars - Edit the centering parameters

@@ -8,3 +8,4 @@ $set	XP	= '& "$xc -cq -/P -/$(MACH) &"'
 $special "$(noao)twodspec/apextract/":	trltrace.x	$(XO2)
 $special "$(noao)onedspec/dispcor/":	ranges.x	$(XNO)	# OS-3
 $special "$(noao)proto/ir/":		irmatch2d.x	$(XP)	# OS-3
+$special "$(noao)astutil/asttools/":	astcoord.x	$(XNO)

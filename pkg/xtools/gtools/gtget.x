@@ -1,7 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<gset.h>
-include	<pkg/gtools.h>
+include	"gtools.h"
 
 # GT_GETI -- Set integer parameters.
 

@@ -12,9 +12,9 @@ procedure stf_reblock (im)
 pointer	im			# image descriptor
 
 pointer	sp, lbuf, op, ua
-int	fd, spool, nlines, nchars, sz_userarea
+int	fd, spool, nlines, nchars, sz_userarea, len_hdrmem
+errchk	stropen, open, getline, putline, realloc, seek, fcopyo
 int	open(), stropen(), getline()
-errchk	stropen, open, getline, putline
 
 begin
 	call smark (sp)
@@ -43,15 +43,15 @@ begin
 	# Reallocate header the right size.
 	sz_userarea = nlines * (FITS_RECLEN+1) + SZ_EXTRASPACE
 
-	# Following line to update amount of space in header 
-	# descriptor actually used--added by dlb--6/4/87.
-
 	IM_HDRLEN(im) = LEN_IMHDR +
 	    (sz_userarea - SZ_EXTRASPACE + SZ_STRUCT-1) / SZ_STRUCT
-
-	IM_LENHDRMEM(im) = LEN_IMHDR +
+	len_hdrmem = LEN_IMHDR +
 	    (sz_userarea+1 + SZ_STRUCT-1) / SZ_STRUCT
-	call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+
+	if (IM_LENHDRMEM(im) < len_hdrmem) {
+	    IM_LENHDRMEM(im) = len_hdrmem
+	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	}
 
 	# Move spooled data back to user area.
 	ua = IM_USERAREA(im)

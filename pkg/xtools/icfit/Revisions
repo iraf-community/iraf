@@ -1,6 +1,12 @@
 .help revisions Jun88 pkg.xtools.icfit
 .nf
 pkg$xtools/icfit/icparams.x
+pkg$xtools/icfit/icgcolon.x
+    1. ic_puti uses max (1, order) for setting the order.
+    2. icg_colon prints error if attempting to set order < 1.
+    (3/6/90, Valdes)
+
+pkg$xtools/icfit/icparams.x
     Added ability to get information about the number of fit points and the
     rejected points to the ic_geti procedure.  (5/4/89, Valdes)
 

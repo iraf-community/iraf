@@ -1,6 +1,5 @@
-# Parameter file for the gkiextract task
-input,f,a,"",,,Metacode source file
-frames,s,ql,"1-99",,,Ranges of frames to extract
-verify,b,h,no,,,Verify operation before extracting each frame?
+input,f,a,"",,,metacode source file
+frames,s,ql,"1-99",,,ranges of frames to extract
+verify,b,h,no,,,verify operation before extracting each frame?
 go_ahead,b,q,yes,,," ?"
-default_action,b,h,yes,,,Default extract action for verify query
+default_action,b,h,yes,,,default extract action for verify query

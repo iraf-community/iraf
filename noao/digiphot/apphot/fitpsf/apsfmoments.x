@@ -6,11 +6,13 @@ define	NPARAMETERS	7
 # APSFMOMENTS -- Procedure to compute the 0, 1st and second moments of an 
 # image and estimate the x,y center, the ellipticity and the position angle.
 
-int procedure apsfmoments (ctrpix, nx, ny, threshold, positive, par, perr, npar)
+int procedure apsfmoments (ctrpix, nx, ny, lthreshold, uthreshold, positive,
+	par, perr, npar)
 
 real	ctrpix[nx, ny]		# object to be centered
 int	nx, ny			# dimensions of subarray
-real	threshold		# threshold for moment computation
+real	lthreshold		# lower threshold for moment computation
+real	uthreshold		# upper threshold for moment computation
 int	positive		# emission feature
 real	par[ARB]		# parameters
 real	perr[ARB]		# errors in parameters
@@ -33,7 +35,9 @@ begin
 	if (positive == YES) {
 	    do j = 1, ny {
 	        do i = 1, nx {
-		    temp = ctrpix[i,j] - threshold
+		    if (ctrpix[i,j] > uthreshold)
+			next
+		    temp = ctrpix[i,j] - lthreshold
 		    if (temp <= 0.0)
 		        next
 		    sumi = sumi + temp
@@ -47,7 +51,9 @@ begin
 	} else {
 	    do j = 1, ny {
 	        do i = 1, nx {
-		    temp = threshold - ctrpix[i,j]
+		    if (ctrpix[i,j] < uthreshold)
+			next
+		    temp = lthreshold - ctrpix[i,j]
 		    if (temp <= 0.0)
 		        next
 		    sumi = sumi + temp
@@ -68,7 +74,7 @@ begin
 	    par[4] = 0.0
 	    par[5] = 0.0
 	    par[6] = 0.0
-	    par[7] = threshold
+	    par[7] = lthreshold
 	} else {
 	    par[1] = sumi
 	    par[2] = sumxi / sumi
@@ -90,7 +96,7 @@ begin
 		else
 		    par[6] = RADTODEG (atan (varxy / par[6]))
 	    }
-	    par[7] = threshold
+	    par[7] = lthreshold
 	}
 
 	# Compute the errors.

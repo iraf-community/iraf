@@ -1,5 +1,41 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
+#
+# Note:  the following change was negated, as the problem was due to a last
+# minute change to decl.c in xpp.  File date for t_combine.x is left as
+# Jun 18, 1990, but it is a direct copy of the Jun '89 file.  (6/18/90 SRo)
+#
+#ccdred$src/t_combine.x
+#    Changed:
+#	char images[SZ_FNAME-1,nimages] --> char images[SZ_FNAME,nimages-1]
+#    The incorrect declaration results in each successive image name have
+#    additional leading characters.  Apparently, since this has not be
+#    found previously, the leading characters have generally been blanks.
+#    (3/30/90, Valdes)
+
+ccdred$doc/combine.hlp
+    Clarified and documented definitions of the scale, offset, and weights.
+    (11/30/89, Valdes)
+
+ccdred$ccdproc.par
+    1.  All parameters now have default values.  (10/31/89, Valdes)
+
+ccdred$src/cosmic/mkpkg
+ccdred$src/gtascale.x -
+ccdred$t_cosmicrays.x
+    1.  Removed duplicate of gtools procedure.
+    2.  Fixed transfer out of IFERR block message when input image was wrong.
+    3.  The badpixel file was not initialized to null if the user did not
+	want a badpixel file output.  (9/21/89, Valdes)
+
+====
+V2.8
+===
+
+ccdred$src/imcmode.gx
+    Fixed bug causing infinite loop when computing mode of constant value
+    section.  (8/14/89, Valdes)
+
 ccdred$src/ccdproc.x
 ccdred$src/ccddelete.x
 ccdred$src/t_ccdproc.x

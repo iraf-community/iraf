@@ -1,6 +1,5 @@
-fits		Generic mountain FITS header
-camera		Generic mountain CAMERA header
-sunlink		Generic link to SUN
-new/ccd         CTIO genetic CCD
-new/cfccd       CTIO generic CF/CCD
-new/csccd       CTIO generic CS/CCD
+ccd         CTIO genetic CCD
+ech         CTIO generic Echelle/CCD
+cfccd       CTIO generic CF/CCD
+csccd       CTIO generic CS/CCD
+fpccd       CTIO generic FP/CCD

@@ -51,11 +51,13 @@ begin
 	MK_IMAGE(mk) = EOS
 	MK_OUTIMAGE(mk) = EOS
 	MK_COORDS(mk) = EOS
+	MK_DELETIONS(mk) = EOS
 	MK_LOGFILE(mk) = EOS
 	MK_AUTOLOG(mk) = NO
 
 	# Initilize the display command parameters.
 	MK_FRAME(mk) = 1
+	MK_TOLERANCE(mk) = 1.0
 
 	# Initialize the buffers.
 	call mk_rinit (mk)
@@ -287,6 +289,8 @@ begin
 	    return (MK_RTHETA(mk))
 	case ETHETA:
 	    return (MK_ETHETA(mk))
+	case TOLERANCE:
+	    return (MK_TOLERANCE(mk))
 	default:
 	    call error (0, "MK_STATR: Unknown real parameter.")
 	}
@@ -310,6 +314,8 @@ begin
 	    call strcpy (MK_OUTIMAGE(mk), str, maxch)
 	case COORDS:
 	    call strcpy (MK_COORDS(mk), str, maxch)
+	case DELETIONS:
+	    call strcpy (MK_DELETIONS(mk), str, maxch)
 	case LOGFILE:
 	    call strcpy (MK_LOGFILE(mk), str, maxch)
 	case FONT:
@@ -420,6 +426,8 @@ begin
 	    MK_RTHETA(mk) = value
 	case ETHETA:
 	    MK_ETHETA(mk) = value
+	case TOLERANCE:
+	    MK_TOLERANCE(mk) = value
 	default:
 	    call error (0, "MK_SETR: Unknown real parameter.")
 	}
@@ -450,6 +458,10 @@ begin
 	case COORDS:
 	    rp = fnldir (str, MK_COORDS(mk), SZ_FNAME)
 	    call strcpy (str[rp+1], MK_COORDS(mk), SZ_FNAME)
+
+	case DELETIONS:
+	    rp = fnldir (str, MK_DELETIONS(mk), SZ_FNAME)
+	    call strcpy (str[rp+1], MK_DELETIONS(mk), SZ_FNAME)
 
 	case LOGFILE:
 	    rp = fnldir (str, MK_LOGFILE(mk), SZ_FNAME)

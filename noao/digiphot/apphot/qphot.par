@@ -8,6 +8,8 @@ apertures,s,a,"3.0",,,List of apertures
 zmag,r,h,26.0,,,Zero point of magnitude scale
 coords,s,h,"",,,Name of coordinate file
 exposure,s,h,"",,,Exposure time image header keyword
+airmass,s,h,"",,,Airmass image header keyword
+filter,s,h,"",,,Filter image header keyword
 epadu,r,h,1.0,,,Instrument gain
 output,f,h,"default",,,Results
 plotfile,f,h,"",,,File of plot metacode

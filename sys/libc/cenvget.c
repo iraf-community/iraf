@@ -13,7 +13,7 @@
  * ENVRESET -- Reset (overwrite) the value of an environment variable.
  */
 
-#define SZ_VALUESTR	512
+#define SZ_VALUESTR	SZ_COMMAND
 static	XCHAR valuestr[SZ_VALUESTR+1];
 static	XINT len_valuestr = SZ_VALUESTR;
 

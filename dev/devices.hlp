@@ -29,6 +29,9 @@
     tucana!mtb  [4|9]		Sun QIC 1/4" cartridge,  Rm B-50
     orion!mta   [1600|6250]	Fujitsu 1/2" tapedrive, Rm 101
     orion!mtb	[1600|6250]	Fujitsu 1/2" tapedrive, Rm 101
+    gemini!mta	[1600|6250]	Fujitsu 1/2" tapedrive, Rm 101
+    gemini!mtb	[?]		Exabyte, Rm 101
+    gemini!mtc	[?]		Sun 1/4" cartridge, Rm 101
     aquila!mta  [1600]		DEC TU80 1/2" tapedrive, Rm B-49
     aquila!mtb  [1600|6250]    	Kennedy 1/2" tapedrive,  Rm B-49
     aquila!mtc	[1600|6250]    	Kennedy 1/2" tapedrive, Rm B-49

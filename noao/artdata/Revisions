@@ -1,0 +1,14 @@
+.help revisions Jan90 noao.artdata
+.nf
+artdata$t_mkpattern.x
+    The COORDINATES pattern was off by 1.  (3/12/90, Valdes)
+
+artdata$
+    Davis, Feb 19, 1990
+    1. The STARLIST and GALLIST tasks for making artificial star and
+    galaxies fields were added to the artdata package.
+
+artdata$* +
+    First version of the artificial data package installed.  (2/1/90, Valdes)
+
+.endhelp

@@ -59,22 +59,28 @@ begin
 	    j = 0
 	    k = 0
 	    do i = 1, ID_NFEATURES(id) {
-	    	if (IS_INDEFD (PIX(id,j+1)) || IS_INDEFD (USER(id,j+1))) {
+	    	if (IS_INDEFD (PIX(id,i)) || IS_INDEFD (USER(id,i))) {
 		    j = j + 1
-		    next
-		}
-		k = k + 1
-		if (Memd[wts+k-1] != 0.) {
-		    j = j + 1
-	    	    PIX(id,j) = Memd[x+k-1]
-	    	    FIT(id,j) = FIT(id,k)
-	    	    USER(id,j) = Memd[y+k-1]
-		    if (rejpts != NULL && Memi[rejpts+k-1] == YES)
-			WTS(id,j) = 0.
-		    else
-	    	        WTS(id,j) = Memd[wts+k-1]
-	    	    FWIDTH(id,j) = FWIDTH(id,k)
-	    	    FTYPE(id,j) = FTYPE(id,k)
+	    	    PIX(id,j) = PIX(id,i)
+	    	    FIT(id,j) = FIT(id,i)
+	    	    USER(id,j) = USER(id,i)
+	    	    WTS(id,j) = WTS(id,i)
+	    	    FWIDTH(id,j) = FWIDTH(id,i)
+	    	    FTYPE(id,j) = FTYPE(id,i)
+		} else {
+		    if (Memd[wts+k] != 0.) {
+		        j = j + 1
+	    	        PIX(id,j) = Memd[x+k]
+	    	        FIT(id,j) = FIT(id,i)
+	    	        USER(id,j) = Memd[y+k]
+	    	        WTS(id,j) = Memd[wts+k]
+		        if (rejpts != NULL)
+			    if (Memi[rejpts+k] == YES)
+			        WTS(id,j) = 0.
+	    	        FWIDTH(id,j) = FWIDTH(id,i)
+	    	        FTYPE(id,j) = FTYPE(id,i)
+		    }
+		    k = k + 1
 		}
 	    }
 	    ID_NFEATURES(id) = j

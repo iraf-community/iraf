@@ -5,7 +5,7 @@ $update   libvops.a
 $checkin  libvops.a lib$
 $exit
 
-tfiles:
+generic:
 	# Convert the generic files into typed files.
 	$set GFLAGS = "-k -t UBcsilrdx"
 	$ifolder (achtiu.c, achtzu.gc)
@@ -16,13 +16,15 @@ tfiles:
 	    $generic $(GFLAGS) achtu.gc				$endif
 	$ifolder (achtbi.c, achtb.gc)
 	    $generic $(GFLAGS) achtb.gc				$endif
+	$ifolder (ieeer.x, ieee.gx)
+	    $generic -k -t rd ieee.gx				$endif
 	;
 
 libvops.a:
 	# Generic preprocessing is normally done only on the development system,
 	# and need not be available on all systems.
 
-	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+	$ifeq (USE_GENERIC, yes) $call generic $endif
 
 	# The following contain machine dependent constants.
 	hlib$i1mach.f
@@ -93,6 +95,7 @@ libvops.a:
 	$ifeq (USE_CCOMPILER, yes)
 	    bswap2.c
 	    bswap4.c
+	    bswap8.c
 	    chrpak.c
 	    chrupk.c
 	    strpak.c
@@ -100,6 +103,7 @@ libvops.a:
 	$else
 	    bswap2.f
 	    bswap4.f
+	    bswap8.f		# not written; wait until we need it
 	    chrpak.f
 	    chrupk.f
 	    strpak.f
@@ -108,17 +112,23 @@ libvops.a:
 
 	# The following are fairly portable, but potentially machine dependent.
 
+	ieeer.x		<mach.h>
+	ieeed.x		<mach.h>
 	miilen.x	<mach.h>
 	miinelem.x	<mach.h>
 	miipak.x	<mii.h>
 	miipak16.x	<mach.h>
 	miipak32.x	<mach.h>
 	miipak8.x	
+	miipakd.x	<mach.h>
+	miipakr.x	<mach.h>
 	miipksize.x	<mach.h>
 	miiupk.x	<mii.h>
 	miiupk16.x	<mach.h>
 	miiupk32.x	<mach.h>
 	miiupk8.x	
+	miiupkd.x	<mach.h>
+	miiupkr.x	<mach.h>
 
 	f77pak.f
 	f77upk.f

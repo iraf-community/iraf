@@ -744,12 +744,14 @@ begin
 	else
 	    call imaddr (out, "crval1", u1)
 	call imaddr (out, "cdelt1", du)
+	call imaddr (out, "cd1_1", du)
 	call imaddr (out, "crpix2", 1.)
 	if (vlog)
 	    call imaddr (out, "crval2", log10 (v1))
 	else
 	    call imaddr (out, "crval2", v1)
 	call imaddr (out, "cdelt2", dv)
+	call imaddr (out, "cd2_2", dv)
 
 	# The following image parameters are for compatibility with the
 	# ONEDSPEC package.

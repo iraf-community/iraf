@@ -21,8 +21,8 @@ See QPOE.hlp for detailed information.
 		qp_sync (qp)
 	       qp_close (qp)
 
-       qp_add[bcsilrdx] (qp, param, value)
-		qp_astr (qp, param, value)
+       qp_add[bcsilrdx] (qp, param, value, comment)
+		qp_astr (qp, param, value, comment)
  val = qp_get[bcsilrdx] (qp, param)
        nchars = qp_gstr (qp, param, outstr, maxch)
        qp_put[bcsilrdx] (qp, param, value)
@@ -31,6 +31,8 @@ See QPOE.hlp for detailed information.
 	    n = qp_read (qp, param, buf, maxelem, first, datatype)
 	       qp_write (qp, param, buf, nelem, first, datatype)
           fd = qp_popen (qp, param, mode, type)
+	mw = qp_loadwcs (qp)
+	     qp_savewcs (qp, mw)
 
     yes|no = qp_accessf (qp, param)
 	     qp_deletef (qp, param)
@@ -95,6 +97,7 @@ nchars = qp_elementsize (qp, datatype)
 nchars = qpio_getfilter (io, outstr, maxch)
 	      qpio_seti (io, param, value)
       ival = qpio_stati (io, param)
+      mw = qpio_loadwcs (io)
 	   qpio_mkindex (io, key)
 
 	 qpio_putevents (io, i_ev, nevents)

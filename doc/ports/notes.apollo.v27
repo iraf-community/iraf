@@ -1,0 +1,641 @@
+NOTES.APOLLO -- Begin Apollo/IRAF port 12 June 1989, Steve Rooke.
+Node is auriga, an Apollo DN3500 with all three operating environments
+installed, but configured for BSD4.3, including protection model.
+
+/usr/iraf
+	Read in wtar -of archive taken from tucana 6-12-89 AM (should be VERY
+	close to final frozen version of IRAF v2.8).  Had to chacl -B /usr/iraf
+	[and have umask set to 022] in order to retrieve the correct file
+	permissions, ownership including group, and file dates with tar -xpf.
+	(6/12/89 SRo)
+
+local/.login
+	Edited for local iraf root, default terminal types, remove 'mach'
+	command (not present on Apollo).  (6/12 SRo)
+
+unix/hlib/irafuser.csh
+	Added apo68k branch for hsi environment variables.  (6/12 SRo)
+
+Begin bootstrap, to see what we're up against.
+cd $host; sh -x mkpkg.sh
+	Well, for starters there's no assembler (cc reports `Cant exec
+	/bin/as').  A call to an Apollo engineer reveals that assemblers are
+	not available at all in SR10.x except under special conditions,
+	involving a non-disclosure agreement.  They no longer show a Domain/OS
+	Assembler Reference Manual in their catalog, and no software product.
+	Perhaps there's a way to get around this using Domain/OS calls.  (6/13)
+
+/usr/include/iraf.h ->
+unix/hlib/libc/iraf.h
+	Defined DOMAINOS, undefined SUNOS.  (6/13)
+
+unix/os/mkpkg.sh
+	Removed attempted assembly of zsvjmp.s.  (6/13)
+
+unix/mkpkg.sh
+	Changed "test -h" to "test -L" (-h not supported; -L for "soft links").
+	(6/13)
+
+unix/os/alloc.c
+	Moved `#include <sys/types.h>' to before utmp.h; utmp.h requires
+	types time_t, ut_time.  (6/13)
+
+unix/os/getproc.c
+	No <sys/proc.h>, nor any proc.h in /usr/include/*.  One of Domain/OS's
+	own include files, sys/tty.h, references struct proc, defined in
+	the nonexistent sys/proc.h.  An apollo engineer is looking into this
+	right now; he sounded completely surprised that something like that
+	actually got into the release, so maybe this isn't an indication of
+	things to come.  Did nothing for now; will have to implement some
+	workaround later.  (6/13)
+
+unix/os/zfiobf.c
+unix/os/zfiotx.c
+	If domain/os, fcntl.h is in /usr/include, not /usr/include/sys.  (6/13)
+
+unix/os/zfiolp.c
+unix/os/zfiopl.c
+	Domain/os C requires initialization of aggregate types (including
+	arrays) to have braces surrounding the constant value, even if there
+	is only one element:  "static	PKCHAR	xnullstr[1] = {XEOS};".  (6/13)
+
+unix/os/zmain.c
+	Compiler warning: wsetsize never used.  Removed wsetsize and junk
+	declarations, which are now in zzstrt.c.  (6/13)
+
+unix/boot/bootlib/oschdir.c
+	Compiler warning about sz_dpath value never being used.  No change.
+	(6/13)
+
+unix/boot/bootlib/osfcopy.c
+	binary_file never used; no change.  (6/13)
+
+unix/boot/bootlib/osstrupk.c
+	"Line 27:  no path exists to this statement" -- oh yeah?:
+	    if (maxch)
+		if (sizeof(char) != sizeof(XCHAR) || str != (char *)outstr) {
+	27->	    n = min (n, strlen(ip));
+		    [...]
+		}
+	
+	No change, but should check runtime system to see if true.  (6/13)
+
+unix/boot/bootlib/tape.c
+	Wanted a "char *vfn2osfn();" declaration; illegal combination of
+	pointer and integer at line 236.  (6/13)
+
+unix/boot/mkpkg/char.c
+	Compiler complained about no path to this statement:
+
+	    goto push;
+	    break;
+	
+	Removed the break.  (6/13)
+
+unix/boot/mkpkg/host.c
+	Smart optimizer!  Complained that exit_status never used at two places;
+	it is used in lots of other places, but here the compiler griped:
+
+	    exit_status = ERR;
+	    return;
+	
+	Modified to return (exit_status), lines 88 & 151.  (6/13)
+
+unix/boot/mkpkg/main.c
+	This seems to be a very intelligent optimizer.  It realized that
+	the value assigned to islib at:
+
+		islib       = YES;
+	
+	was never used, even though islib appeared as an argument to a 
+	subroutine later on in the code.  Careful analysis showed that,
+	indeed, the assigned value could never have been used; statement
+	removed.  (6/13)
+
+unix/boot/mkpkg/sflist.c
+	Compiler correctly points out that in "old_cp = cp", cp had never
+	been initialized.  This should be checked out by Doug, as it looks
+	in some branches of the code as if it is assumed that old_cp has
+	some particular value.  (6/14)
+
+unix/os/zxwhen.c
+	Inserted ILL_ and FPE_ string declarations from signal.h, ifndef'd
+	around BUS_HWERR, BUS_ALIGN, SEGV_NOMAP, SEGV_PROT, SEGV_OBJERR,
+	the first time recently these haven't been defined.  (6/14)
+
+unix/boot/mkpkg/tok.c
+unix/boot/mkpkg/mkpkg.sh
+	BAD:  compiler flagged lines 605 & 704 in tok.c as:
+
+	"Line 605 of "tok.c": [Warning #202]  Value assigned to cx is never used;
+		 assignment eliminated by optimizer.
+
+	where cx was declared pointer to struct:
+
+	    do_call (cx, program, islib)
+	    struct	context *cx;		/* current context	*/
+		...
+		cx = pop_context (ncx);
+
+	This is the case with all four levels of optimization -O [0123].
+	Compiled without optimization in mkpkg.sh.  (6/15)
+
+unix/boot/rmfiles/rmfiles.c
+	Added required declaration char *vfn2osfn().  (6/15)
+
+unix/boot/rtar/rtar.c
+	Compiler correctly claims value assigned to fd never used:
+	    fd = os_createdir (fname, mode);
+	    ...
+	    fd = OK;
+	"fd = " removed from first statement (line 596).  (6/15)
+
+unix/boot/wtar/wtar.c
+	Another value never used; total at line 534.  No change; some of these
+	look like they might be intended for modification/use some day.  (6/15)
+
+unix/boot/spp/xpp/xppcode.c
+	Ditto for len at line 1591.  No change.  (6/15)
+
+unix/boot/spp/xpp/*
+unix/boot/spp/rpp/*
+	Dozens of value assigned never used, assignment deleted messages, no
+	files edited.  (6/15)
+
+unix/boot/spp/rpp/ratlibf/gfnarg.f
+	**** Warning #921 on Line 68: Use of uninitialized variable: stdin1
+	**** Warning #921 on Line 72: Use of uninitialized variable: stdin2
+	**** Warning #921 on Line 76: Use of uninitialized variable: stdin3
+	**** Warning #921 on Line 113: Use of uninitialized variable: fd
+	These are indeed uninitialized, the 3 stdin's are even undeclared,
+	defaulting to type real.  Must not be very important; not edited.  (6/15)
+
+unix/mkpkg.sh
+	Commented out shlib part.  There appear to be lots of references to
+	shared libraries & memory mapping in Domain/OS, so this can probably
+	be implemented some day.  (6/15)
+
+unix/gdev/sgidev/sgidispatch.c
+	Removed unused "maxch" declaration.  (6/15)
+
+unix/gdev/sgidev/sgi2uapl.c
+	Changed "int out" to "FILE *out" in several subroutines.  (6/15)
+	Removed unused 'i' from ";  i++)" in last 'for' statement in xyencode()
+	at line 463.  (6/15)
+
+unix/os/zfiotx.c
+	Changed ifdef DOMAINOS to ifdef apollo.  (6/16)
+
+unix/os/zxwhen.c
+	Finally looked at /usr/include/apollo_$std, and saw that both "apollo"
+	and "mc68000" are defined automatically for all C files.  Decided to
+	use just these in all C files, not "apo68k", which would have to
+	be in iraf.h; all ifdef mc68000's need to be examined anyway wherever
+	they occur, as some will work and others not on an apollo (e.g. the
+	ifdef mc68000 branch in zxwhen.h includes definitions not available
+	on the apollo).  Where necessary, use the following combinations:
+
+	    #ifdef apollo	#ifndef mc68000
+	    #ifdef mc68000	#ifdef apollo
+	    ...			...
+	    #endif mc68000	#endif apollo
+	    #endif apollo	#endif mc68000
+
+	Also, _bufsiz is defined as _bufsiz(p), not as a member of a structure.
+	So, redefined fcancel(fp).  (6/16)
+
+unix/boot/spp/xc.c
+	Parameterized "f77" and "cc", and made CC_COMMAND = "f77".  Apollo
+	cc does not compile Fortran, but f77 does compile C.  (6/16)
+
+/usr/local/bin/mach
+	Created short csh script to echo "apo68k" so as not to have to
+	edit a number of places in the hsi.  (6/16)
+	
+unix/hlib/install
+	Commented out Sun stuff.  Ran install script.  (6/16)
+
+unix/hlib/irafuser.csh
+	Changed HSI_FF and HSI_XF to "-W0,-opt 2" after verifying that rpp.e
+	crashes as reported by Nordlund; there were sufficient individual
+	fortran files causing bugs at opt 3 that I don't want to chase down
+	every runtime bug in the HSI just yet.  Plus, the Fortran Release
+	Notes warn right up front that if your program doesn't work right,
+	try compiling with lesser optimization.  The -W0, syntax means pass
+	the subsequent arguments, comma separated, directly to FTN compiler.
+	Otherwise, you get only -O = -opt 3, or no -O = -opt 0.  This is
+	different from Nordlund, who got no -O = -opt 3, so we have different
+	releases of f77.  The -W0, syntax is only described in the Fortran
+	Release Notes, which I should have read earlier.  (6/20 SRo)
+
+	[later:  "-W0,-opt N" only passes "-W0,-opt" on through whenever the
+	flag is expressed as an environment variable (it works correctly when
+	given directly on a command line or in a script without the envvar),
+	which results automatically in -opt 3.  Spent a lot of time trying to
+	defeat this bug by shell script front-ends, various quoting mechanisms,
+	but f77.real always breaks it.]
+
+unix/os/mkpkg.sh
+	Commented out alloc.c & getproc.c compilation & linking.  Come back
+	later to look at device allocation.  (6/20 SRo)
+
+[another bootstrap]
+
+unix/hlib/irafuser.csh
+	Got message from CC concerning bootlib/envinit.c:
+
+	    printf ((&_iob[2]), "cannot translate logical name `hlib'");
+
+	    Line 62 of "envinit.c": [Warning #080]  Illegal pointer combination
+	    incompatible types.
+
+	In the source, that was:  "printf (stderr, ..."; decided the compiler
+	had to be doing function-prototype checking, but no compiler switch
+	was available in the manual for turning it off.  Found it in the 
+	Release Notes:  "cc -A nansi" tells CC we are not ANSI C; otherwise
+	it does the prototype checking.  Probably we are going to want to go
+	through all our C code to make it ANSI compatible some day, but not
+	now.  Added HSI_CF "-O -A nansi".  (6/20)
+
+[another bootstrap]
+[although I had sourced $hlib/irafuser.csh from the process under which I
+ ran the bootstrap, subprocesses had the old value for HSI_FF (-O 2); this
+ is after "su iraf" from the "rooke" account.  After ^Z'ing out of iraf and
+ re-su'ing & sourcing ~iraf/.login, subprocesses had the new environment
+ variable values.]
+
+unix/boot/spp/rpp/rppfor/ratfor.f
+
+unix/boot/bootlib/vfn2osfn.c
+
+[This is pretty discouraging:  faced with a crashing RPP.E even with
+optimization level 2 set [later 0, then even ftn -nopt on all code],
+as per Nordlund, I attempt to debug with dbx; dbx crashes with an IOT
+error upon entering query().  This is a routine called by ratfor with:
+query (32h...), and is declared as integer mesg(100) inside query.
+Could find no way to display assembly code in source window (also could
+find no doc. in BSD manuals about the window system used in dbx).  Now to
+learn DDE, which Nordlund was impressed by and is what he used to chase
+down several compiler bugs.]
+
+[Looks like a neat source-level debugger, with machine-level support,
+but something's wrong with setting breakpoints, hopefully pilot error.]
+
+unix/hlib/libc.h
+	Removed "extern" in extern mem_ declaration as per Nordlund to
+	cause runtime resolution of common block name.  (6/22)
+
+unix/hlib/irafuser.csh
+	setenv	HSI_CF	"-W0,-opt,2,-nbss,-pic,-dbs -A nansi"
+	setenv	HSI_FF	"-W0,-opt,2,-save,-dbs"
+	setenv	HSI_XF	"-/W0,-opt,2,-save,-dbs"
+
+	Finally settled on optlevel 2 AND -save flags.  Anything else 
+	introduced fatal bugs in rpp that I was unable to trace (debuggers
+	crashed with internal errors).  This was true even with -nopt, i.e.
+	absolutely no optimization, everything is a memory reference.  (6/23)
+
+[Finally, a successful bootstrap.  RPP runs.]
+
+unix/hlib/mkpkg.inc
+	$set	XFLAGS		= "-c -q -/W0,-opt,2,-dbs"
+	$set	XVFLAGS		= "-c -q -/W0,-opt,3,-dbs"
+	$set	LFLAGS		= "-z"
+	
+	-W0, introduces an escaped argument to the ftn compiler.  Optlevel
+	2 chosen for bulk of code due to so many opt 3 bugs in rpp.  -dbs
+	says put symbol table and other debugging information into object
+	code.  Without this, there is no way to list the arguments of a
+	routine in a traceback in either dbx or dde.  (6/23)
+
+[Began a sysgen, which ran 6:35:15 -- built almost all object files with
+no compile-time error, but nothing linked because of no zsvjmp_ symbol.]
+
+sys/imfort/imemsg.x
+	Three error messages extended past column 72 after preprocessing to
+	f77 (same as in HP-UX port):
+
+	errmsg = 'imfort short integer i/o requires a type short image'
+	**** Error #151 on Line 76: [ errmsg = @'imfort sh] invalid operator
+	errmsg = 'image header modified but image was opened read only'
+	**** Error #151 on Line 94: [ errmsg = @'image hea] invalid operator
+	errmsg = 'attempt to delete a nonexistent image header keyword'
+	**** Error #151 on Line 121: [ errmsg = @'attempt t] invalid operator
+
+	Shortened the messages.  (6/24)
+
+unix/os/zdojmp.c
+	After experimenting with pfm_$ calls, decided there was no obvious
+	way to decrement the stack frame (no stack frame data structures, 
+	and pfm_$cleanup acts just like setjmp).  So now to implement
+	Nordlund's strategy, which is to use macros for "zsvjmp" to actually
+	call _setjmp directly from fortran.  Consequently, we need jumpbuf
+	to be the canonical setjmp/longjmp jumpbuf, starting at address 0.
+	Placed status word into last word of jumpbuf.  Also added global
+	definitions for mem_, fiocom_, and zjucom_, needed in the CL C code.
+	(6/24)
+
+unix/hlib/iraf.h
+	Added a macro definition for zsvjmp, so that SPP programs will call
+	_setjmp directly.  Status is stored in last word of jumpbuf.  
+
+	    define	zsvjmp		_setjmp[$1];$2=jumpbuf[LEN_JUMPBUF]
+	
+	(6/24)
+
+unix/hlib/libc/spp.h
+unix/hlib/config.h
+	Lowered LEN_JUMPBUF to 14 for Domain/OS.  (6/24)
+
+/usr/local/bin/rpp +
+/usr/local/bin/rpp.e	-> $hbin/rpp.e
+	Made rpp a script which passes the real rpp.e's output through sed,
+	to reinstate the leading _ in _setjmp.  Hopefully we can dispense with
+	this when we get an assembler, or else implement a more elegant way
+	to optionally leave leading underscores in external names.  (6/24)
+
+sys/plio/plp2l.gx
+sys/plio/plr2l.gx
+sys/plio/pllrop.x
+sys/plio/pllsten.x
+	f77 simply won't compile the likes of:
+
+	    ll_dst[op] = M_DH + -dv
+
+	changed to + (-dv).  (6/24)
+
+sys/pmio/pmrop.x
+sys/pmio/pmsten.x
+	Both routines had typos in IM_LEN(PM_REFIM(pm_src,1)) -- should
+	be IM_LEN(PM_REFIM(pm_src),1).  Caught because the preprocessor
+	turned:
+	    call aminl (v2, IM_LEN(PM_REFIM(pm_src,1)), v2, PM_MAXDIM)
+	into
+            call aminl (v2, meml(memi(pmsrc),1) +200 ++6-1) , v2, 7 )
+	(6/24)
+
+sys/gio/nspp/portlib/gridal.f
+	Compiler doesn't like a 2d array referenced as a 1d array in an
+	equivalence statement (ifmt(3,2) ... (mfmtx(1),ifmt(1)).  Changed
+	to ifmt(1,1).  (6/24)
+
+unix/hlib/mkpkg.inc
+	Set USE_SHLIB to no.  (6/24)
+
+pkg/cl/main.c
+	Not sure if this is necessary, but Nordlund made sure he called
+	the same routines as from SPP with this, so I'm doing the same:
+
+	    #define	setjmp	_setjmp
+	    #define	longjmp	_longjmp
+
+[ sysgen.  no executables, linker griped 'would overwrite T_thing.e',
+left over from previous pass.  Hand-built xx_images.e (all system libraries
+compiled with -dbs), taking about 10 minutes!  xx_images.e is 5.3Mb!
+Gave up trying to run it standalone or under dbx after about 5 minutes
+of attempted loading, with disk clacking away furiously.  -dbs object files
+are usually more than twice as big as without! Rebuild everything without
+-dbs (according to Mike Burati, means never get any argument list in debuggers).
+(6/25)
+
+unix/hlib/irafuser.csh
+	setenv	HSI_CF	"-W0,-opt,2,-nbss,-pic -A nansi"
+	setenv	HSI_FF	"-W0,-opt,2,-save"
+	setenv	HSI_XF	"-/W0,-opt,2,-save"
+	(6/25)
+
+unix/hlib/mkpkg.inc
+	$set	XFLAGS		= "-c -q -/W0,-opt,2"
+	$set	XVFLAGS		= "-c -q -/W0,-opt,3,-pic"
+	(6/25)
+
+[ renamed bin.apo68k bin.apo68kdbs, to keep them around; rm *.a in
+all directories except unix & bin.apo68kdbs ]
+
+[ bootstrap ]  (6/25 18:00)
+
+[ sysgen ]  (6/25 18:45)
+
+unix/hlib/mkpkg.inc
+	Added -db compilation flag so we can set breakpoints.  Also added
+	separate X*FLAGS for libsys.a and libex.a.  We will definitely need
+	to compile the three core system libraries with special flags for
+	the shared library (in particular, position-independent code).  (6/26)
+
+	    $set	XFLAGS		= "-c -q -/W0,-opt,2,-db"
+	    $set	XVFLAGS		= "-c -q -/W0,-opt,3,-pic,-db"
+	    $set	XSFLAGS		= "-c -q -/W0,-opt,2,-pic,-db"
+	    $set	XEFLAGS		= "-c -q -/W0,-opt,2,-pic,-db"
+
+sys/mkpkg
+	Added `$set XFLAGS = "$(XSFLAGS)"' for updating libsys.a, and similarly
+	XEFLAGS for libex.a.  Perhaps this should be made standard for
+	all IRAF systems (or equivalent mechanism for specific control of
+	compilation options for the main system libraries).  (6/26)
+
+unix/hlib/irafuser.csh
+	Added "-db" flag so we can set breakpoints.  (6/26)
+
+	    setenv	HSI_CF	"-W0,-opt,2,-nbss,-pic,-db -A nansi"
+	    setenv	HSI_FF	"-W0,-opt,2,-save,-db"
+	    setenv	HSI_XF	"-/W0,-opt,2,-save,-db"
+
+[ Another bootstrap (to pick up minimal symbol table stuff with -db) ]
+
+[ Another sysgen, now using -db for everything, and -pic,-db for system
+  libraries.  Theoretically, should be able to construct shared library
+  and link with it (with about a million compilation flags for common
+  block sharing & alignment). ]
+
+/usr/local/bin/rpp
+/usr/local/bin/rpp.e -> $hbin/rpp.e
+	Reinstated sed script as rpp to insert "_" into "_setjmp":
+	    /usr/local/bin/rpp.e $1 | sed -e 's+setjmp+_setjmp+' 
+	This was lost running hlib$install.  Not worth fixing, because
+	assembler due any day now.  (6/27)
+
+[ Still can't get an IRAF executable to run; appears to be stuck in infinite
+  loop at startup time.  Debugging is EXTREMELY difficult; there is absolutely
+  no way to get an argument list, even with -db, short of printing out $a6
+  (the sp) in dbx, and examining the contents of memory 8 bytes after its
+  value.  (Only good for current routine).  DDE has an "args" command, but
+  it only works if code compiled with -dbs, and source code exists; object
+  libraries are 2-3 times larger.  DBX dies with internal errors too frequently
+  to be of much use (e.g. just printing the memory address at $a6 causes DBX to
+  die with "I/O error").  The other possibility is that building any of the
+  system libraries with position-independent code causes the loader to take
+  _minutes_ to remap the transfer vectors, and I've never waited long enough
+  for an executable to load.  I attempted to turn the 4 main libraries into
+  a shared library using "-a -r -A loadhigh -marksection mem_ -align mem_ page"
+  (plus other commons), but both f77 and ld refused to recognize all the flags
+  (yes, using -Wl,-marksection,mem_ etc.).
+
+  Will now rebuild libos with -dbs, and without -pic,-nbss, then experiment,
+  and probably have to recompile the system libs with "-c -g -F -q -W0,-opt,2".]
+
+[ Bootstrap, no -pic, no -nbss, yes -dbs ]
+
+[ Finally was able to load an executable and debug, though VERY slowly and
+  painfully. ]
+
+unix/os/zdojmp.c
+	Indirection "*((int *)jmpbuf[LEN_JUMPBUF-1]) = *status;" was not working, and couldn't
+	find any alternative acceptable to the compiler, so did:
+
+	    int	*op;
+	    op = jmpbuf;
+	    op = op + LEN_JUMPBUF - 1;
+	    *op = *status;
+	    longjmp (&jmpbuf[0], *status);
+	
+	which works, finally!  (This is a test program; the CL code will
+	definitely not work yet).
+	(6/28)
+
+unix/os/zlocpr.c
+	Added one level of indirection:  PFI proc; -> PFI *proc;
+	*o_epa = (XINT)(*epa);  (6/28)
+
+[ Sizes of object files built with various debug flags:
+
+	11758 main.o.ndb	no debug at all
+	27244 main.o.dbs	full debug but with optimization
+	29110 main.o.dba	full debug but without optimization
+	13046 main.o.db		entry point symbol table names + ? else ]
+
+unix/os/zmain.c
+	Finally worked out that a function name [declared with ()'s] passed
+	to a subroutine by C was being passed the value, not address, whereas
+	an external function declared in Fortran got the address.  The C
+	compiler didn't like any combination of coercion, so added an
+	intermediate pointer epaptr = (int *)ZGETTY; ZLOCPR (&epaptr, &driver);
+	(7/3)
+
+[ got an assembler from Apollo R&D, even has a manual! ]
+
+unix/hlib/iraf.h
+	Removed fake zsvjmp -> setjmp definition.  (7/7)
+
+unix/as -> unix/as.apo68k
+unix/as.apo68k/zsvjmp.asm
+	Domain version; assembler won't assemble at all unless file is named
+	".asm"; the default output file is zsvjmp.bin, and by default a listing
+	file zsvjmp.lst is produced (-nl to suppress).  (7/7)
+
+unix/os/mkpkg.sh
+	Added apollo assembler commands to assemble as$zsvjmp.asm.  (7/7)
+
+[7/11:  Have had numerous problems with the machine:  installed a syslib.881
+ patch yesterday, rebooted, which caused salvol to report a bunch of bad
+ files, which it said it fixed; the patch was bad, had to replace the old
+ one and reboot.  Lost /bsd4.3/usr, vi, etc.; recovered from /install.
+ Then new mail from Nordlund, including a good zsvjmp.asm, and his observation
+ that DDE, on a machine with an FPA, is the cause of the random processes
+ being messed up:  don't use DDE, or take out FPA!]
+
+unix/as.apo68k/zsvjmp.asm
+	Used Nordlund's, which was supplied by Apollo/Denmark.  (7/11)
+
+unix/hlib/libc/libc.h
+	Took out "extern" again in MEMCOM declaration, as per Nordlund.  (7/11)
+
+unix/hlib/mkpkg.inc
+	$set	XFLAGS		= "-cqF -/W0,-opt,0,-dbs"
+	$set	XVFLAGS		= "-cqF -/W0,-opt,2,-dbs"
+	$set	XSFLAGS		= "-cqF -/W0,-opt,0,-dbs"
+	$set	XEFLAGS		= "-cqF -/W0,-opt,0,-dbs"
+	(7/11)
+
+[ another bootstrap & sysgen.  Unable to find mem_ common.  Nordlund says
+  to use -nbss for the C code; this collects all uninitialized global
+  variables into a single section, presumably required for sharing common
+  blocks between C and Fortran; there are other ways to do this, but I
+  haven't been successful yet.  Loading code linked with libraries compiled
+  with -nbss seems to take a lot longer (may take a full minute or more
+  to load under a debugger, many seconds without).]
+
+unix/os/zdojmp.c -> Orig_zdojmp.c
+	Turns out Apollo/Denmark included zdojmp as an entry point inside
+	zsvjmp.asm, making it multiply defined.  Removed .o from libos.a.  (7/11)
+
+unix/hlib/irafuser.csh
+	setenv	HSI_CF	"-W0,-opt,2,-nbss,-dbs -A nansi"	(7/11)
+
+[ another bootstrap.  Test code looped infinitely through calls to xerror.
+  Tried to run DBX, but even it generated a coprocessor protocol violation.
+  Finally took out the FPA board, reconfigured, rebooted. ]
+
+unix/hlib/config.h
+unix/hlib/libc/spp.h
+	Looking more closely at Apollo/Denmark's zsvjmp.asm, realized it
+	was saving all registers plus some other stuff, more than 14 words
+	required in jumpbuf.  Changed back from 14 to 60, like Sun.  (7/11)
+
+[ another bootstrap & sysgen (leaving for day anyway) (7/11)]
+
+[ still getting infinite xerror loop at startup time.  But when traced
+  with dde, happens in iraf_main at onentry call.  Realized then that
+  sysruk & onentry are now passed as epa's into iraf_main... ]
+
+unix/os/zmain.c
+	Added:
+
+	int *epaptr, *epaptr2;
+	epaptr = (int *)SYSRUK;				/* Domain/OS */
+	epaptr2 = (int *)ONENTRY;			/* Domain/OS */
+	IRAF_MAIN (irafcmd, &inchan, &outchan, &errchan,
+	    &driver, &devtype, &prtype, osfn_bkgfile, &jobcode, &epaptr,
+	    &epaptr2);
+	(7/12)
+
+[ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+  After 6 weeks, finally got through the iraf main, into application code!
+  system task works, now to see why CL won't link. ]
+
+pkg/cl/main.c
+	Removed setjmp/longjmp macro definition for old fake-zsvjmp calls.
+	Now original file.  (7/12)
+
+unix/hlib/libc/stdio.h
+	Removed "extern" from FIOCOM declaration; otherwise fiocom_ is
+	undefined in CL C code.  Results in harmless compile-time warning about 
+	'size of fiocom_ 0 at initialization'.  (7/12)
+
+pkg/cl/*.c
+	Hand-compiled with HSI_CF flag values (in particular, need -nbss to
+	place C global references that are also Fortran common blocks into
+	separate, named sections; otherwise they are in bss when compiled with
+	cc (as opposed to /com/cc), and cannot be shared with Fortran commons
+	-- segmentation violation).  (7/12)
+
+unix/hlib/mkpkg.sf.apo68k
+unix/hlib/mkpkg.inc
+	Created special file list file, inserted pkg$cl/main.c,opcodes.c,exec.c
+	for compilation with -nbss flag; pointed to in mkpkg.inc.  (7/12)
+
+[ CL seems to work fine.  (7/12) ]
+
+unix/hlib/mkpkg.inc
+	$set	XFLAGS		= "-cqF -/W0,-opt,2,-db"
+	$set	XVFLAGS		= "-cqF -/W0,-opt,3,-db"
+	$set	XSFLAGS		= "-cqF -/W0,-opt,2,-db"
+	$set	XEFLAGS		= "-cqF -/W0,-opt,2,-db"
+	$set	LFLAGS		= "-z -/W0,-db"
+	(7/13)
+
+[ Another full sysgen, to return to optimization and chop object file sizes
+  to less than half their size by removing -dbs. ]
+
+pkg/cl/mkpkg
+	As it turns out, the special file list is not consulted for files
+	compiled with $omake (globals.c & opcodes.c).  Couldn't see any
+	reason why these files shouldn't be in the library, so moved them
+	there.  (7/14)
+
+unix/boot/spp/xc.c
+	Well, although Apollo f77 does compile C source, (see 6/16), it
+	does NOT pass along the -W0,... parameters to cc at all.  Modified
+	to use CC_COMMAND for c compilation, LD_COMMAND for linking.  (7/14)
+
+
+*** Remember to remove rpp sed script ***

@@ -384,7 +384,9 @@ subtraction, and trimming.  Also if a scan mode is used and the
 parameter \fIscancor\fR is specified then a scan mode correction is
 applied (see below).  The processing also computes the mean of the
 flat field image which is used later to scale the flat field before
-division into the input image.  Note that there is no check for
+division into the input image.  For scan mode flat fields the ramp
+part is included in computing the mean which will affect the level
+of images processed with this flat field.  Note that there is no check for
 division by zero in the interest of efficiency.  If division by zero
 does occur a fatal error will occur.  The flat field can be fixed by
 replacing small values using a task such as \fBimreplace\fR.

@@ -18,4 +18,4 @@ ridsout		hlp=doc$ridsout.hlp,		src=cyber$t_ridsout.x
 rpds		hlp=doc$rpds.hlp,		src=pds$t_rpds.x
 rrcopy		hlp=doc$rrcopy.hlp,		src=rrcopy$t_rrcopy.x
 widstape	hlp=doc$widstape.hlp,		src=onedspec$t_widstape.x
-revisions	hlp=Revisions
+revisions	sys=Revisions

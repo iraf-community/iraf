@@ -9,7 +9,7 @@ define	LEN_CTRLSTRUCT	180
 define	SZ_SECNAME	39		# section name, single section mode
 define	SZ_PARNAME	39		# parameter name
 define	SZ_TEMPLATE	79		# the original modules template
-define	SZ_HELPDB	512		# max chars in helpdb file list
+define	SZ_HELPDB	1024		# max chars in helpdb file list
 
 define	H_IN		Memi[$1]	# input file descriptor
 define	H_OUT		Memi[$1+1]	# output file descriptor

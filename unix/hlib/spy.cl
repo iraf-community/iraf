@@ -15,6 +15,6 @@ begin
 	    # Merely give info on who is logged in and what they are doing.
 	    # The following is for Berkeley UNIX only.
 
-	    !! w
+	    !! who
 	}
 end

@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #define	import_spp
 #define	import_xnames
@@ -5,8 +8,9 @@
 
 #define	isspace(c)	((c)==' '||(c)=='\t'||(c)=='\n')
 #define	SETENV		"zzsetenv.def"
-#define	SZ_VALUE	1024
+#define	SZ_VALUE	SZ_COMMAND
 #define	MAXLEV		8
+#define	PKGLIBS		"pkglibs"
 
 extern	char *_os_getenv();
 extern	char *os_getenv();
@@ -27,6 +31,8 @@ char	*pkg;
 {
 	char	osfn[SZ_PATHNAME+1];
 	char	vfn[SZ_PATHNAME+1];
+	char	pkglibs[SZ_COMMAND+1];
+	char	newlibs[SZ_COMMAND+1];
 
 	_envinit();
 
@@ -34,7 +40,44 @@ char	*pkg;
 	strcat (vfn, "$lib/");
 	strcat (vfn, SETENV);
 
+	/* Load the package environment.  The new values are added to the
+	 * environment in the conventional way except for the value of
+	 * "pkglibs".  As each package environment is loaded we want to
+	 * add the newly defined package libraries to the current list
+	 * of package libraries, otherwise the most recent package environment
+	 * overrides the earlier ones.  It is still possible that user
+	 * defined environment variables will be redefined but there is
+	 * little we can do about that; "pkglibs" is special though since
+	 * it is a part of the loadpkgenv facility.
+	 */
+	_os_getenv (PKGLIBS, pkglibs, SZ_COMMAND);
 	loadenv (vfn2osfn (vfn, 0));
+	_os_getenv (PKGLIBS, newlibs, SZ_COMMAND);
+
+	if (strlen(newlibs) > 0 && strcmp (newlibs, pkglibs)) {
+	    char    *ip, *op;
+	    char    *otop;
+
+	    /* Find the end of the current pkglibs file list. */
+	    for (ip=op=pkglibs;  *ip;  ip++)
+		if (!isspace(*ip))
+		    op = ip + 1;
+
+	    /* Concatenate the new files list segment. */
+	    if (op > pkglibs)
+		*op++ = ',';
+	    for (ip=newlibs, otop=pkglibs+SZ_COMMAND;  *ip && op < otop;  ip++)
+		if (!isspace(*ip))
+		    *op++ = *ip;
+
+	    /* Blank fill to the next SZ_LINE increment to optimize resets. */
+	    while (op < otop && ((op-pkglibs) % SZ_LINE))
+		*op++ = ' ';
+	    *op++ = EOS;
+		
+	    /* Reset the stored value in the environment. */
+	    os_putenv (PKGLIBS, pkglibs);
+	}
 }
 
 
@@ -77,7 +120,7 @@ char	*osfn;
 	register XCHAR	*op;
 
 	char	lbuf[SZ_LINE+1];
-	char	pkname[SZ_FNAME+1], old_value[SZ_LINE+1];
+	char	pkname[SZ_FNAME+1], old_value[SZ_VALUE+1];
 	XCHAR	name[SZ_FNAME+1], value[SZ_VALUE+1];
 	FILE	*fp, *sv_fp[MAXLEV];
 	int	lev=0;
@@ -168,14 +211,17 @@ again:		    if (fgets (lbuf, SZ_LINE, fp) == NULL)
 	    *op = XEOS;
 
 	    /* Allow the user to override the values of environment variables
-	     * by defining them in their host environment.
+	     * by defining them in their host environment.  Once again,
+	     * "pkglibs" requires special treatment as we want to permit
+	     * redefinitions to allow concatenation in loadpkgenv().
 	     */
 	    os_strpak (name, pkname, SZ_FNAME);
-	    if (_os_getenv (pkname, old_value, SZ_LINE)) {
+	    if (strcmp (pkname, PKGLIBS) &&
+		_os_getenv (pkname, old_value, SZ_VALUE)) {
 		if (bdebug)
 		    printf ("%s = %s\n", pkname, old_value);
 	    } else
-		ENVPUTS (name, value);
+		ENVRESET (name, value);
 	}
 
 	fclose (fp);

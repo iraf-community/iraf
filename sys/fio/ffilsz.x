@@ -18,11 +18,15 @@ begin
 	fp = fiodes[fd]
 	UPDATE_IOP(fd)					# update i/o pointers
 
-	if (FTYPE(fp) == TEXT_FILE) {			# don't keep track
+	switch  (FTYPE(fp)) {
+	case TEXT_FILE:
 	    call zcall3 (ZSTTTX(fp), FCHAN(fp), FSTT_FILSIZE, file_size)
 	    file_size = file_size + (otop[fd] - bufptr[fd])
 
-	} else {
+	case STRING_FILE, SPOOL_FILE:
+	    file_size = otop[fd] - bufptr[fd]
+
+	default:
 	    # Call channel status z-routine to get file size if this is the
 	    # first request.  Thereafter, FIO keeps track of file size.
 	    # Beware that FILSIZE (updated by AWRITE or by us) does not

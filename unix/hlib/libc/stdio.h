@@ -43,7 +43,11 @@ struct _iobuf {
 	int	_fflags;		/* bit flags			*/
 };
 
+#ifdef apollo
+int 	FIOCOM[];			/* the FIO common		*/
+#else
 extern	int FIOCOM[];			/* the FIO common		*/
+#endif
 
 #define	_FFLUSHNL	01		/* flush buffer on newline	*/
 #define	_FREAD		02		/* read perm on file		*/

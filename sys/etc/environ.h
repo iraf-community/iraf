@@ -5,13 +5,13 @@ define	IS_QUOTE	($1 == '\'' || $1 == '"')
 
 # Size limiting definitions.
 
-define	NTHREADS	100		# number of hash threads
+define	NTHREADS	199		# number of hash threads
 define	MAX_HASHCHARS	18		# max chars to use for hashing
-define	LEN_ENVBUF	2048		# storage for environment list
-define	INC_ENVBUF	512		# increment if overflow occurs
+define	LEN_ENVBUF	4096		# storage for environment list
+define	INC_ENVBUF	1024		# increment if overflow occurs
 define	MAX_SZKEY	32		# max chars in a key
 define	MIN_SZVALUE	20		# min allocated space for value
-define	MAX_SZVALUE	512		# max chars in value string
+define	MAX_SZVALUE	1024		# max chars in value string
 define	MAX_LENLISTELEM	(4+(MAX_SZKEY+1+MAX_SZVALUE+1+SZ_SHORT-1)/SZ_SHORT)
 
 # List element structure, stored in ENVBUF, which is allocated as an array of

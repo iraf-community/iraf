@@ -12,6 +12,7 @@ gkiextract	hlp=doc$gkiextract.hlp,		src=t_gkixt.x.x
 gkimosaic	hlp=doc$gkimosaic.hlp,		src=t_gkimos.x
 graph		hlp=doc$graph.hlp,		src=t_graph.x
 hafton		hlp=doc$hafton.hlp,		src=t_hafton.x
+imdkern		hlp=doc$imdkern.hlp,		src=gio$imdkern/idk.x
 implot		hlp=doc$implot.hlp,		src=t_implot.x
 nsppkern	hlp=doc$nsppkern.hlp,		src=gio$nsppkern/t_nsppkern.x
 pcol		hlp=doc$pcol.hlp,		src=t_pcol.x
@@ -19,10 +20,10 @@ pcols		hlp=doc$pcols.hlp,		src=t_pcols.x
 prow		hlp=doc$prow.hlp,		src=t_prow.x
 prows		hlp=doc$prows.hlp,		src=t_prows.x
 pvector		hlp=doc$pvector.hlp,		src=t_pvector.x
-revisions	hlp=Revisions
-showcap		hlp=doc$showcap.hlp
-sgikern		hlp=doc$sgikern.hlp,		src=gio$sgikern/sgk.x
+revisions	sys=Revisions
 sgidecode	hlp=doc$sgidecode.hlp,		src=gio$sgikern/t_sgideco.x
+sgikern		hlp=doc$sgikern.hlp,		src=gio$sgikern/sgk.x
+showcap		hlp=doc$showcap.hlp
 stdgraph	hlp=doc$stdgraph.hlp
 stdplot		hlp=doc$stdplot.hlp
 surface		hlp=doc$surface.hlp,		src=t_surface.x

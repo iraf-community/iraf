@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<error.h>
 include	<imhdr.h>
 include	<imio.h>
@@ -20,11 +21,12 @@ int	gc_arg			# number of groups in STF image
 int	acmode			# access mode
 int	status
 
-pointer	sp, fname, stf, stf_extn, ua
+pointer	sp, fname, stf, stf_extn, ua, o_stf
+int	group, gcount, newimage, gpb, hdr, o_stflen
+
 bool	fnullfile()
-int	group, gcount, hmode, sz_gpbhdr, newimage
-int	open()
-errchk	fmkcopy
+int	open(), stropen(), access()
+errchk	stf_initwcs, fmkcopy, calloc, realloc
 define	err_ 91
 
 begin
@@ -41,6 +43,7 @@ begin
 	group  = max (1, gr_arg)
 	gcount = max (group, gc_arg)
 
+	STF_GRARG(stf)	= gr_arg
 	STF_GROUP(stf)  = group
 	STF_GCOUNT(stf) = gcount
 	STF_ACMODE(stf) = acmode
@@ -74,20 +77,21 @@ begin
 	call stf_mkpixfname (root, extn, Memc[fname], SZ_PATHNAME)
 	call strcpy (Memc[fname], IM_PIXFILE(im), SZ_IMPIXFILE)
 
-	# Open the image header file.  Since STF header files have a weird
-	# VMS specific file type, we must create a new header file with
-	# FMKCOPY rather than OPEN.
+	# Create and open the image header file if create a new physical
+	# image.  If opening an existing image we do not open the header file
+	# here since the header may already be in the STF header cache.
+	# Since STF header files have a weird file type on some systems (VMS)
+	# we must create a new header file with FMKCOPY rather than OPEN.
 
 	if (STF_NEWIMAGE(stf) == YES && !fnullfile (IM_HDRFILE(im))) {
+	    if (access (IM_HDRFILE(im), 0,0) == YES)
+		iferr (call syserrs (SYS_FCLOBBER, IM_HDRFILE(im)))
+		    goto err_
 	    iferr (call fmkcopy (HDR_TEMPLATE, IM_HDRFILE(im)))
 		goto err_
+	    iferr (IM_HFD(im) = open (IM_HDRFILE(im), READ_WRITE, TEXT_FILE))
+		goto err_
 	}
-
-	hmode = acmode
-	if (acmode != READ_ONLY)
-	    hmode = READ_WRITE
-	iferr (IM_HFD(im) = open (IM_HDRFILE(im), hmode, TEXT_FILE))
-	    goto err_
 
 	# If opening an existing image, read the image header into the STF
 	# image descriptor.
@@ -122,11 +126,17 @@ begin
 		# default data values for the GPB parameters are inherited from
 		# the image being copied.
 
-		sz_gpbhdr = 0
+		# Filter the copied user area to retain only the GPB cards.
+		# Opening the user area on two string file descriptors is a
+		# bit tricky, but will work since fixed size cards are copied,
+		# and the EOS isn't written until close time.
+
 		if (IM_KDES(o_im) != NULL && IM_KERNEL(o_im) == IM_KERNEL(im)) {
-		    # Truncate the copied user area after the GPB data cards.
-		    sz_gpbhdr = STF_SZGPBHDR(IM_KDES(o_im))
-		    Memc[ua+sz_gpbhdr] = EOS
+		    hdr = stropen (Memc[ua], ARB, READ_ONLY)
+		    gpb = stropen (Memc[ua], ARB, NEW_FILE)
+		    call stf_copyfits (IM_KDES(o_im), hdr, gpb, NULL)
+		    call close (gpb)
+		    call close (hdr)
 		}
 
 		# Read in the FITS header of the new image after the inherited
@@ -135,8 +145,11 @@ begin
 
 		iferr (call stf_rdheader (im, group, acmode))
 		    goto err_
-		else
-		    STF_SZGPBHDR(stf) = sz_gpbhdr
+
+		# Initialize the WCS description if this is not done by the
+		# inherited user header.
+
+		call stf_initwcs (im)
 
 	    } else {
 		# Completely new copy of an existing image, which may or may
@@ -149,7 +162,9 @@ begin
 		# descriptor.  
 
 		if (IM_KDES(o_im) != NULL && IM_KERNEL(o_im) == IM_KERNEL(im)) {
-		    call amovi (Memi[IM_KDES(o_im)], Memi[stf], LEN_STFDES)
+		    o_stf = IM_KDES(o_im)
+		    o_stflen = LEN_STFBASE + STF_PCOUNT(o_stf) * LEN_PDES
+		    call amovi (Memi[o_stf], Memi[stf], o_stflen)
 		    STF_ACMODE(stf)   = acmode
 		    STF_GROUP(stf)    = group
 		    STF_GCOUNT(stf)   = gcount
@@ -183,12 +198,17 @@ begin
 	    IM_CLSIZE(im)  = STF_GCOUNT(stf)
 	}
 
-	call sfree (sp)
+	# Free any unneeded space in the STF descriptor.
+	if (STF_PCOUNT(stf) > 0)
+	    call realloc (stf,
+		LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES, TY_STRUCT)
+	IM_KDES(im) = stf
 	status = OK
+
+	call sfree (sp)
 	return
 err_
 	status = ERR
 	call mfree (stf, TY_STRUCT)
 	call sfree (sp)
-	call erract (EA_ERROR)
 end

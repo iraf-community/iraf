@@ -293,9 +293,9 @@ begin
 		return (i)
 	}
 
-	call printf ("Record = %s\n")
-	    call pargstr (name)
-	call flush (STDOUT)
+#	call printf ("Record = %s\n")
+#	    call pargstr (name)
+#	call flush (STDOUT)
 	call error (0, "Database record not found")
 end
 

@@ -104,6 +104,8 @@ begin
 	    if (nscan() == 1) {
 		call printf ("order = %d\n")
 		    call pargi (IC_ORDER(ic))
+	    } else if (ival < 1) {
+		call printf ("Order must be greater than zero\n")
 	    } else {
 		IC_ORDER(ic) = ival
 		IC_NEWFUNCTION(ic) = YES

@@ -78,7 +78,6 @@ char	*argv[];
 	ifstate[0]  = PASS;
 	iflev       = 0;
 	lflags[0]   = EOS;
-	islib       = YES;
 	pkgenv	    = NULL;
 
 	/* Process the command line.

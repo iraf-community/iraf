@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include "bootlib.h"
 
 /* Uncomment the following if the kernel for this machine does not need
@@ -48,9 +51,9 @@ int	maxch;
 	if (files = os_getenv ("pkglibs")) {
 	    for (ip=files;  *ip;  ) {
 		/* Get the next library name from the list. */
-		while (*ip == ' ' || *ip == '\t' || *ip == ',')
+		while (isspace(*ip) || *ip == ',')
 		    ip++;
-		for (op=fname;  *ip && *ip != ',';  op++)
+		for (op=fname;  *ip && !isspace(*ip) && *ip != ',';  op++)
 		    *op = *ip++;
 		*op = EOS;
 

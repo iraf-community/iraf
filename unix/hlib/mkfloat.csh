@@ -1,6 +1,4 @@
 #! /bin/csh
-# THIS IS A SUN/IRAF SYSTEM MANAGEMENT UTILITY.
-# -------------------------------------------------
 # MKFLOAT.CSH -- Install the indicated version of the IRAF binaries, i.e.,
 # archive the current objects and libraries, set BIN to point to bin.FFF,
 # and set mkpkg to produce FFF binaries (FFF = f68881, ffpa, sparc, etc.).
@@ -14,6 +12,8 @@ set DIRS = "lib pkg sys"
 set FILE = unix/hlib/mkpkg.inc
 set DFL  = _DFL.mkfloat
 set TFL  = _TFL.mkfloat
+unalias	ls rm cat grep tar cmp diff echo ln mv zcat
+unset noclobber
 
 # set echo
 
@@ -41,21 +41,25 @@ if ("$1" == "-d") then
 endif
 
 echo "delete any dreg .e files left lying about in the source directories"
-rmbin -n -o .a .o .e $DIRS > $TFL;  grep '\.e$' $TFL | tee > _.e_files
+rmbin -n -o .a .o .e $DIRS > $TFL;  grep '\.e$' $TFL | tee _.e_files
 rm -f `cat _.e_files` _.e_files;  grep -v '\.e$' $TFL > $DFL;  rm $TFL
 
 echo "archive and delete $float objects"
 if (-e bin.$float) then
-    tar -cf bin.$float/OBJS.arc `cat $DFL`
-    tar -tf bin.$float/OBJS.arc > $TFL
-    cmp -s $DFL $TFL
-    if ($status) then
-	echo "Error: cannot archive $float objects"
-	diff $DFL $TFL
-	rm $DFL $TFL bin.$float/OBJS.arc
-	exit 1
-    else
-	rm -f $TFL
+    if (! -z $DFL) then
+	tar -cf bin.$float/OBJS.arc `cat $DFL`
+	tar -tf bin.$float/OBJS.arc | grep -v '/$' > $TFL
+	cmp -s $DFL $TFL
+	if ($status) then
+	    echo "Error: cannot archive $float objects"
+	    diff $DFL $TFL
+	    rm $DFL $TFL bin.$float/OBJS.arc
+	    exit 1
+	else
+	    echo -n "compress bin.$float/OBJS.arc "
+	    nice compress -f bin.$float/OBJS.arc &
+	    rm -f $TFL
+	endif
     endif
 else
     echo "old objects will not be archived as no bin.$float directory found"
@@ -63,9 +67,12 @@ endif
 rm -f `cat $DFL` $DFL
 
 echo "restore archived $ARCH objects"
-if (-e bin.$ARCH/OBJS.arc) then
-    tar -xpf bin.$ARCH/OBJS.arc
-    if ($status == 0) then
+if (-e bin.$ARCH/OBJS.arc.Z) then
+    if ({ (zcat bin.$ARCH/OBJS.arc.Z | tar -xpf -) }) then
+	rm -f bin.$ARCH/OBJS.arc.Z
+    endif
+else if (-e bin.$ARCH/OBJS.arc) then
+    if ({ (cat bin.$ARCH/OBJS.arc | tar -xpf -) }) then
 	rm -f bin.$ARCH/OBJS.arc
     endif
 else

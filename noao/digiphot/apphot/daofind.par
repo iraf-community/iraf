@@ -20,5 +20,6 @@ cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 mkdetections,b,h,no,,,Mark detected stars on the display
 interactive,b,h,no,,,Interactive mode
 verify,b,h,yes,,,Verify critical parameters in non interactive mode
+update,b,h,no,,,Update critical parameters in non interactive mode
 verbose,b,h,no,,,Print messages in non interactive mode
 mode,s,h,'ql'

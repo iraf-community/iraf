@@ -34,7 +34,7 @@ int	spp_type	# SPP data type to be returned
 # entry cam_read_pixels (fd, buffer, npix)
 int	cam_read_pixels
 int	fd		# Input file descriptor
-char	buffer[ARB]	# Output buffer
+char	buffer[1]	# Output buffer
 int	npix		# Number of pixels to read
 
 int	ty_mii, ty_spp

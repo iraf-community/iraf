@@ -6,6 +6,7 @@ $ifeq (hostid, unix)  !(date)  $endif
 $exit
 
 update:
+	$call artdata
 	$call astutil
 	$call mtlocal
 	$call digiphot
@@ -18,6 +19,10 @@ update:
 	$purge noaobin$
 	;
 
+artdata:
+	$echo "--------------------- ARTDATA ---------------------"
+	$call update@artdata
+	;
 astutil:
 	$echo "--------------------- ASTUTIL ---------------------"
 	$call update@astutil
@@ -76,62 +81,73 @@ showfloat:				# show current float option
 	;
 generic:				# make architecture indep. (no bins)
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
 	!$(hlib)/mkfloat.csh generic -d $(DIRS)
 	;
 sparc:					# install sparc binaries
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
 	!$(hlib)/mkfloat.csh sparc -d $(DIRS)
 	;
 i386:					# install i386 binaries
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
 	!$(hlib)/mkfloat.csh i386 -d $(DIRS)
 	;
 f68881:					# install f68881 binaries
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
 	!$(hlib)/mkfloat.csh f68881 -d $(DIRS)
 	;
 ffpa:					# install ffpa binaries
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
 	!$(hlib)/mkfloat.csh ffpa -d $(DIRS)
 	;
 fswitch:				# install fswitch binaries
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
 	!$(hlib)/mkfloat.csh fswitch -d $(DIRS)
 	;
 fsoft:					# install fsoft binaries
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
 	!$(hlib)/mkfloat.csh fsoft -d $(DIRS)
 	;
 pg:					# install -pg -f68881 binaries
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
 	!$(hlib)/mkfloat.csh pg -d $(DIRS)
 	;
-ieee:					# install ieee binaries (CONVEX)
+mips:					# install mips binaries
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
-	!$(hlib)/mkfloat.csh ieee -d $(DIRS)
+	!$(hlib)/mkfloat.csh mips -d $(DIRS)
 	;
-native:					# install native binaries (CONVEX)
+m68k_fpa:				# install apollo fpa binaries
 	$verbose off
-	$set DIRS = "lib astutil digiphot imred mtlocal onedspec proto\
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
 		     surfphot twodspec"
-	!$(hlib)/mkfloat.csh native -d $(DIRS)
+	!$(hlib)/mkfloat.csh m68k_fpa -d $(DIRS)
 	;
-
+m68k_f68:				# install apollo mc68882 binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
+		     surfphot twodspec"
+	!$(hlib)/mkfloat.csh m68k_f68 -d $(DIRS)
+	;
+a88k:					# install apollo PRISM binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
+		     surfphot twodspec"
+	!$(hlib)/mkfloat.csh a88k -d $(DIRS)
+	;

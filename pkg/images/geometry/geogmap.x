@@ -267,7 +267,6 @@ begin
 	call gt_free (gt5)
 end
 
-define	HELPFILE 	"/u2/davis/iraf/geo/geomap/geomap.key"
 
 # GEOMGFITD -- Fit the surface using interactive graphics
 

@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 
@@ -22,7 +25,7 @@ int	maxch;
 {
 	register int	ch;
 	register char	*op;
-	char	tokbuf[SZ_LINE+1];
+	char	tokbuf[SZ_COMMAND+1];
 	int	token, delim;
 
 	if (debug > 1) {
@@ -98,7 +101,7 @@ again:
 	    /* Replace '<' by system library pathname, concatentate
 	     * filename and exit.
 	     */
-	    getstr (cx, tokbuf, SZ_LINE, SYSFILE_END);
+	    getstr (cx, tokbuf, SZ_COMMAND, SYSFILE_END);
 	    if (m_sysfile (tokbuf, outstr, maxch) <= 0)
 		sprintf (outstr, "<%s>", tokbuf);
 
@@ -293,7 +296,7 @@ char	*keyword;
 {
 	register int	ch;
 	register char	*op;
-	char	tokbuf[SZ_LINE+1];
+	char	tokbuf[SZ_COMMAND+1];
 	char	buf[SZ_PREDBUF], *argv[MAX_ARGS];
 	long    fdate, altdate, os_fdate();
 	int	argc, negate, bval, i;
@@ -340,7 +343,7 @@ char	*keyword;
 	    } else if (ch == ' ') {
 		continue;
 	    } else if (ch == SYSFILE_BEGIN && op == argv[argc]) {
-		getstr (cx, tokbuf, SZ_LINE, SYSFILE_END);
+		getstr (cx, tokbuf, SZ_COMMAND, SYSFILE_END);
 		if (m_sysfile (tokbuf, op, SZ_PREDBUF+buf-op) <= 0)
 		    sprintf (op, "<%s>", tokbuf);
 		while (*op)
@@ -571,7 +574,7 @@ int	islib;			/* module list for a library	*/
 	register int	ch;
 	struct	context *ncx;
 	char	module[SZ_FNAME+1], subdir[SZ_FNAME+1], fname[SZ_FNAME+1];
-	char	symbol[SZ_FNAME+1], value[SZ_LINE+1];
+	char	symbol[SZ_FNAME+1], value[SZ_COMMAND+1];
 	char	modspec[SZ_FNAME+1];
 	char	*old_cp;
 	int	old_nsymbols;
@@ -712,7 +715,7 @@ do_omake (cx, fname)
 struct	context *cx;
 char	*fname;
 {
-	char	cmd[SZ_LINE+1];
+	char	cmd[SZ_COMMAND+1];
 	char	*dflist[MAX_DEPFILES+1];
 	char	*xflags, *dfile;
 	long	sourcedate, objdate, date;
@@ -1145,7 +1148,7 @@ register struct context *cx;	/* current context	*/
 {
 	register int	ch;
 	static	char	args[SZ_PBBUF+1];
-	char	tokbuf[SZ_LINE+1];
+	char	tokbuf[SZ_COMMAND+1];
 	int	delim;
 
 	while ((ch = m_getc(cx)) == ' ')
@@ -1162,7 +1165,7 @@ register struct context *cx;	/* current context	*/
 	    m_ungetc (ch, cx);
 	}
 
-	getstr (cx, tokbuf, SZ_LINE, delim);
+	getstr (cx, tokbuf, SZ_COMMAND, delim);
 	strcpy (args, tokbuf);
 
 	if (delim == SYSFILE_END)

@@ -1,5 +1,5 @@
-image,s,a,,,,Image containing row to be plotted
-row,i,a,,1,,Row to be plotted
+image,s,a,,,,image containing row to be plotted
+row,i,a,,1,,row to be plotted
 wx1,r,h,0.,,,left user x-coord 
 wx2,r,h,0.,,,right user x-coord
 wy1,r,h,0.,,,lower user y-coord 

@@ -3,7 +3,9 @@
 	 bscale - Brightness scale images:  new = (old - bzero) / bscale
 	   epix - Edit pixels in an image
 	 fields - Extract specified fields from a list
-         fixpix - Fix bad pixels by linear interpolation from nearby pixels
+        imalign - Register and shift a list of images 
+     imcentroid - Compute relative shifts for a list of images
+	 fixpix - Fix bad pixels by linear interpolation from nearby pixels
 	 imcntr - Locate the center of a stellar image
 	 imedit - Examine and edit pixels in images
       imexamine - Examine images using image display, graphics, and text
@@ -19,7 +21,7 @@
       irmatch1d - Align and intensity match image produced by irmosaic (1D)
       irmatch2d - Align and intensity match image produced by irmosaic (2D)
        irmosaic - Mosaic an ordered list of images onto a grid
-	   join - Join two files line by line
+	   join - Join text files line by line
     mkhistogram - List or plot the histogram of a data stream
 	 ndprep - Make neutral density filter calibration image
 	 radplt - Plot a radial profile of a stellar image

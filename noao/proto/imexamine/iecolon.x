@@ -136,7 +136,7 @@ begin
 	    call gargb (bval)
 	    if (nscan() == 1) {
 		call printf ("background %b\n")
-		    call pargr (clgetb ("rimexam.background"))
+		    call pargb (clgetb ("rimexam.background"))
 	    } else {
 		call clputb ("rimexam.background", bval)
 		if (IE_GTYPE(ie) == 'r')
@@ -200,7 +200,7 @@ begin
 	    call gargb (bval)
 	    if (nscan() == 1) {
 		call printf ("center %b\n")
-		    call pargr (clgetb ("rimexam.center"))
+		    call pargb (clgetb ("rimexam.center"))
 	    } else {
 		call clputb ("rimexam.center", bval)
 		if (IE_GTYPE(ie) == 'r')
@@ -261,7 +261,7 @@ begin
 	    call gargb (bval)
 	    if (nscan() == 1) {
 		call printf ("fill %b\n")
-		    call pargr (clgetb ("eimexam.fill"))
+		    call pargb (clgetb ("eimexam.fill"))
 	    } else {
 		call clputb ("eimexam.fill", bval)
 		if (IE_GTYPE(ie) == 'e')

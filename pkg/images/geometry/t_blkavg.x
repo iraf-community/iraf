@@ -28,10 +28,12 @@ char	image2[SZ_FNAME]			# Output image name
 char	imtemp[SZ_FNAME]			# Temporary file
 
 int	list1, list2, i
-pointer	im1, im2
+pointer	im1, im2, mw
+real	shifts[IM_MAXDIM], mags[IM_MAXDIM]
 
+bool	envgetb()
 int	imtopen(), imtgetim(), imtlen(), clgeti(), clgwrd()
-pointer	immap()
+pointer	immap(), mw_openim()
 
 string	blk_param	"bX"
 
@@ -81,6 +83,19 @@ begin
 		call blkavd (im1, im2, blkfac, option)
 	    default:
 		call blkavr (im1, im2, blkfac, option)
+	    }
+
+	    # Update the world coordinate system.
+	    if (!envgetb ("nomwcs")) {
+		mw = mw_openim (im1)
+		call achtir (blkfac, mags, IM_NDIM(im1))
+		call arcpr (1.0, mags, mags, IM_NDIM(im1))
+		call mw_scale (mw, mags, 0)
+		do i = 1, IM_NDIM(im1)
+		    shifts[i] = 1.0 - mags[i] * (1. + real (blkfac[i])) / 2.0
+		call mw_shift (mw, shifts, 0)
+		call mw_saveim (mw, im2)
+		call mw_close (mw)
 	    }
 
 	    call imunmap (im2)

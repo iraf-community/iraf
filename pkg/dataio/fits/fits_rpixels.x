@@ -6,7 +6,8 @@ include <mach.h>
 
 # RFT_INIT_READ_PIXELS and READ_PIXELS -- Read pixel data with record buffering
 # and data type conversion.  The input data must meet the MII standard
-# except for possibly having the least significant byte first.
+# except for possibly in the case of integers having the least significant
+# byte first.
 #
 # Read data in records of len_record and convert to the specified IRAF
 # data type.  Successive calls of rft_read_pixels returns the next npix pixels.
@@ -25,16 +26,17 @@ include <mach.h>
 
 int procedure rft_init_read_pixels (npix_record, bitpix, lsbf, spp_type)
 
-int	npix_record	# Number of pixels per input record
-int	bitpix		# Bits per pixel (must correspond to an MII type)
+int	npix_record	# number of pixels per input record
+int	bitpix		# bits per pixel (must correspond to an MII type)
 int	lsbf		# byte swap?
 int	spp_type	# SPP data type to be returned
 
 # entry rft_read_pixels (fd, buffer, npix)
+
 int	rft_read_pixels
-int	fd		# Input file descriptor
-char	buffer[ARB]	# Output buffer
-int	npix		# Number of pixels to read
+int	fd		# input file descriptor
+char	buffer[1]	# output buffer
+int	npix		# number of pixels to read
 
 int	swap
 int	ty_mii, ty_spp, npix_rec, nch_rec, sz_rec, nchars, len_mii, recptr

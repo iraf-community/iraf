@@ -17,7 +17,7 @@ char	out_str[ARB]		# Output string as found in dictionary
 int	maxchars		# Maximum length of output string
 char	dict[ARB]		# Dictionary string
 
-char	ch
+char	ch, fch
 int	start, len, ip, i, match, entry
 int	strlen(), strncmp()
 
@@ -32,6 +32,7 @@ begin
 	match = 0
 	ip    = 2
 	len   = strlen (in_str)
+	fch   = in_str[i]
 
 	# Search the dictionary string.  If the input string matches a
 	# dictionary entry it is either an exact match (len = dictionary
@@ -39,25 +40,27 @@ begin
 	# matches two entries it is ambiguous and an error.
 
 	for (entry=1;  dict[ip] != EOS;  entry=entry+1) {
-	    if (strncmp (dict[ip], in_str[start], len) == 0) {
-		for (i=1;  i <= maxchars;  i=i+1) {
-		    ch = dict[ip+i-1]
-		    if ((ch == dict[1]) || (ch == EOS))
-			break
-		    out_str[i] = ch
-		}
-		out_str[i] = EOS
+	    if (dict[ip] == fch) {
+		if (strncmp (dict[ip], in_str[start], len) == 0) {
+		    for (i=1;  i <= maxchars;  i=i+1) {
+			ch = dict[ip+i-1]
+			if ((ch == dict[1]) || (ch == EOS))
+			    break
+			out_str[i] = ch
+		    }
+		    out_str[i] = EOS
 
-		if ((dict[ip+len] == dict[1]) || (dict[ip+len] == EOS))
-		    return (entry)		# exact match
-		else {
-		    # If we already have a match and the new match is not
-		    # exact, then the abbreviation is ambiguous.
+		    if ((dict[ip+len] == dict[1]) || (dict[ip+len] == EOS))
+			return (entry)		# exact match
+		    else {
+			# If we already have a match and the new match is not
+			# exact, then the abbreviation is ambiguous.
 
-		    if (match != 0)
-			return (0)
-		    else
-			match = entry
+			if (match != 0)
+			    return (0)
+			else
+			    match = entry
+		    }
 		}
 	    }
 

@@ -10,13 +10,14 @@ define	AP_OFILT1D	4	# 1-D optimal filtering
 # centering errors (# 21 - 40)
 
 define	AP_OK			0	# No error
-define	AP_NOCTRAREA		21	# No pixels for centering
+define	AP_CTR_NOAREA		21	# No pixels for centering
 define	AP_CTR_OUTOFBOUNDS	22	# Centering aperture extends oob
-define	AP_LOWSNRATIO		23	# S/N ratio too low for centering
-define	AP_NCTR_TOO_SMALL	24	# Too few histogram bins
+define	AP_CTR_LOWSNRATIO	23	# S/N ratio too low for centering
+define	AP_CTR_NTOO_SMALL	24	# Too few histogram bins
 define	AP_CTR_SINGULAR		25	# Fit is singular
 define	AP_CTR_NOCONVERGE	26	# Solution does not converge
-define	AP_BADSHIFT		27	# Max shift parameter exceeded
+define	AP_CTR_BADSHIFT		27	# Max shift parameter exceeded
+define	AP_CTR_BADDATA		28	# Bad data in centering subraster
 
 # centering parameters (# 41 - 60)
 
@@ -38,7 +39,7 @@ define	CYCUR		55
 define	XSHIFT		56
 define	YSHIFT		57
 define	CSTRING		59
-define	DATALIMIT	60
+define	CDATALIMIT	60
 
 # center keywords
 

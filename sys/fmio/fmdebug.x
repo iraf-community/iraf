@@ -60,7 +60,7 @@ begin
 	}
 
 	filesize = FM_PTNPTE(fm) * szbpage + FM_DATASTART(fm) - 1
-	freespace = filesize - spaceinuse - (FM_DATASTART(fm)-1)
+	freespace = max (0, filesize - spaceinuse - (FM_DATASTART(fm)-1))
 
 	call fprintf (out,
 	"FMIO V%d.%d: datafile=%s, pagesize=%d, nlfiles=%d\n")

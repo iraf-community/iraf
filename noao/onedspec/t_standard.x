@@ -124,7 +124,7 @@ begin
 		call imunmap (im)
 		next
 	    }
-	    if (IS_INDEFI (ITM(hdr))) {
+	    if (IS_INDEF (ITM(hdr))) {
 		call eprintf ("%s: Warning - exposure time missing\n")
 		    call pargstr (Memc[image])
 	    }
@@ -322,7 +322,7 @@ begin
 		call imunmap (im)
 		next
 	    }
-	    if (IS_INDEFI (ITM(hdr))) {
+	    if (IS_INDEF (ITM(hdr))) {
 		call eprintf ("%s: Warning - exposure time missing\n")
 		    call pargstr (Memc[image])
 	    }
@@ -675,10 +675,10 @@ begin
 	    call fprintf (fd, "-[%s]")
 	        call pargstr (sky)
 	}
-	call fprintf (fd, " %d %d %d %5.3f %9.3f %9.3f %s\n")
+	call fprintf (fd, " %d %d %.2f %5.3f %9.3f %9.3f %s\n")
 	    call pargi (BEAM(ids))
 	    call pargi (NP2(ids))
-	    call pargi (ITM(ids))
+	    call pargr (ITM(ids))
 	    call pargr (AIRMASS(ids))
 	    call pargr (W0(ids))
 	    call pargr (W0(ids) + (NP2(ids)-1) * WPC(ids))

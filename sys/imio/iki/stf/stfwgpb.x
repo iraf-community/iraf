@@ -109,7 +109,13 @@ begin
 
 	    case TY_REAL:
 		iferr (rval = imgetr (im, P_PTYPE(pp))) {
-		    call erract (EA_WARN)
+		    # Currently with MWCS, WCS cards such as CRVAL, CDi_j,
+		    # etc. (always type real or double) are omitted from the
+		    # header if their value is zero.  Hence if the card is
+		    # missing assume a value of zero rather than issue a
+		    # warning.
+
+		    # call erract (EA_WARN)
 		    rval = 0.0
 		}
 		# Memr[(op-1)/SZ_REAL+1] = rval
@@ -117,7 +123,8 @@ begin
 
 	    case TY_DOUBLE:
 		iferr (dval = imgetd (im, P_PTYPE(pp))) {
-		    call erract (EA_WARN)
+		    # Skip warning as assume zero, as above or TY_REAL.
+		    # call erract (EA_WARN)
 		    dval = 0.0D0
 		}
 		# Memd[(op-1)/SZ_DOUBLE+1] = dval

@@ -5,7 +5,6 @@ include "../lib/display.h"
 include "../lib/center.h"
 
 define	HELPFILE	"apphot$center/center.key"
-define	SHELPFILE	"apphot$center/scenter.key"
 
 # APCENTER -- Procedure to determine accurate centers for a list of objects
 # interactively.
@@ -47,12 +46,6 @@ begin
 	# Initialize sequencing.
 	newlist = NO
 	ltid = 0
-
-	# Print a short help page.
-	if (gd != NULL)
-	    call gpagefile (gd, SHELPFILE, "")
-	else if (interactive == YES)
-	    call pagefile (SHELPFILE, "")
 
 	# Loop over the cursor commands.
 	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
@@ -121,7 +114,7 @@ begin
 
 	    # Verify critical parameters.
 	    case 'v':
-		call ap_cconfirm (ap)
+		call ap_cconfirm (ap, out, stid)
 
 	    # Save centering parameters in the pset files.
 	    case 'w':
@@ -209,44 +202,31 @@ begin
 		        newobject, newcenter)
 		}
 
-	    # Fit the center.
-	    case 'f':
+	    # Fit the center, and save the results.
+	    case 'f',  ' ':
+
+		# Compute the center.
 		if (newobject == YES)
 		    ier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
-		    ier = aprefitcenter (ap)
+		    ier = aprefitcenter (ap, ier)
 		call apmark (ap, id, apstati (ap, MKCENTER), NO, NO)
 		call apcplot (ap, stid, ier, gd, apstati (ap, RADPLOTS))
 		if (interactive == YES)
 		    call ap_qcenter (ap, ier)
 		newobject = NO; newcenter = NO
 
-	    # Fit the center and save the results.
-	    case ' ':
-
-		# Compute the center.
-		if (newobject == YES)
-		    ier = apfitcenter (ap, im, wx, wy)
-		else if (newcenter == YES)
-		    ier = aprefitcenter (ap)
-		call apmark (ap, id, apstati (ap, MKCENTER), NO, NO)
-		call apcplot (ap, stid, ier, gd, apstati (ap, RADPLOTS))
-		if (interactive == YES)
-		    call ap_qcenter (ap, ier)
-
 		# Write the results to the output file(s).
-		if (stid == 1)
-		    call ap_param (ap, out, "center")
-		if (newlist == YES)
-		    call ap_pcenter (ap, out, stid, ltid, ier)
-		else
-		    call ap_pcenter (ap, out, stid, 0, ier)
-		call apcplot (ap, stid, ier, mgd, YES)
-
-		# Setup for the next object.
-		stid = stid + 1
-		newobject = NO
-		newcenter = NO
+		if (key == ' ') {
+		    if (stid == 1)
+		        call ap_param (ap, out, "center")
+		    if (newlist == YES)
+		        call ap_pcenter (ap, out, stid, ltid, ier)
+		    else
+		        call ap_pcenter (ap, out, stid, 0, ier)
+		    call apcplot (ap, stid, ier, mgd, YES)
+		    stid = stid + 1
+		}
 
 	    # Fit centers for the rest of the list.
 	    case 'l':

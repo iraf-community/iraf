@@ -24,7 +24,6 @@ XINT	*status;		/* status return: XOK or XERR		*/
 	    *status = XERR;
 }
 
-#ifdef SKIPTHISFORCONVEX
 #ifndef DEBUGMEM
 
 /* We do not use the memory allocator used in 4.2BSD and 4.3BSD UNIX because
@@ -312,6 +311,5 @@ allock()
 	return(1);
 #endif
 }
-#endif
 #endif
 #endif

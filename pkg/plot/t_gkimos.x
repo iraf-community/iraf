@@ -187,6 +187,7 @@ cursor_loop_	    call gki_setwcs (out, Memi[wcs], LEN_WCSARRAY)
 	}
 
 	call mfree (vp, TY_REAL)
+	call gki_flush (out)
 	call gki_closews (out, Memc[device])
 	call close (out)
 	call clpcls (inlist)

@@ -1,5 +1,182 @@
 .help revisions Jun88 noao.digiphot.apphot
+
 .nf
+Davis, Mar 29, 1980
+apphot/daofind/apconvolve.x
+    1. Added an imflush after the last write in apconolve which cured
+    a "pixel file is truncated error". This error showed up when
+    daofind was run on an image that was 641 by 1025 but not on
+    one that was 640 by 1024. Apparently this problem has been there
+    all along but only occurs very rarely.
+
+Davis, Mar 19, 1990
+    1. The aptest task was added to the apphot package.
+
+Davis, Mar 14, 1990
+    1. Fixed two bugs in the output formating code. Long file names could
+    overflow the fixed format space allotted and destroy the syntax of the
+    file making it impossible for apselect to decode it. Second the COORDS
+    parameter was mistakenly typed as integer instead of string.
+
+Davis, Mar 12, 1990
+   1. Fixed a bug which was causing daofind to fail to compute the convolved
+   image when the input and output images were in hhh format. The hhh format
+   convolved image was failing the test [if (IM_PIXFILE(im) == EOS)] as
+   the pixel file names are set a different places in the oif and stf kernel.
+   The test was dangerous and redundant and has been removed.
+
+Davis, Feb 20, 1990
+apphot/qphot/mkpkg
+   1. Removed a duplicate entry for the file apqcolon.x from the mkpkg file.
+
+Davis, Feb 13, 1990
+apphot/center/apcsnratio.x
+   1. Recoded this routine slightly to avoid an optimizer bug.
+
+Davis. Feb 7, 1990
+apphot/center/apcinit.x
+apphot/fitsky/apsinit.x,apsplot.x
+apphot/phot/appplot.x
+    1. The sky fitting algorithm string was not being correctly set if
+    salgorithm was "gauss" or "median" resulting in garbage in the output
+    file header. The correct algorithm was being used.
+
+    2. A floating point error would occur if salgorithm = "constant",
+    sigma = "INDEFR" and radial profile plotting was enabled. The problem
+    occurred because the plot was trying to draw the 3 * sigma of the
+    sky line by adding the sky value and the sky sigma which is INDEFR.
+
+    3. Disabled plotting the centering pixel buffer in the case where
+    "calgorithm" was none and the sky pixel buffer when salgorithm is
+    "none".
+
+apphot
+    Davis, Jan29, 1990
+    Fixed a bug in the weighting scheme for fitpsf in which the gain was
+    not scaling the image intensities correctly. I also added a check
+    for 0 valued weights.
+
+apphot
+    Davis, Jan 29, 1990
+    Added a setup menu mode to all the apphot tasks. When the user types
+    i they enter the setup menu instead of a predefined set of commands.
+    The default setup is still available as the v key, but each parameter
+    can now be set individually as well.
+
+    The documentation has been brought uptodate.
+
+apphot
+    Davis, Jan 16, 1990
+    Added calls to ap_airmass and ap_filter to the phot task as the filter
+    and airmass were not updating correctly.
+
+apphot
+    Davis, Nov 28, 1989
+    Four new parameters airmass, xairmass, filter, ifilter were added to
+    the datapars task  to permit users to pick up the filter and airmass
+    quantities form the image headers for later transmission to calibration
+    programs.
+
+apphot
+    Davis, Nov 28, 1989
+    The default value of the verbose parameter in radprof was yes
+    instead of no as it should have been.
+
+apphot
+    Davis, Nov 17, 1989
+    Added a new algorithm "mean" to the sky fitting options.
+
+apphot
+    Davis, Nov 16, 1989
+    Added an update parameter to all the apphot tasks. If verify is yes
+    and the task is run in non-interactive mode update will update
+    the critical parameters into the psets.
+
+apphot
+    Davis, Nov 9, 1989
+    Removed a defunct define MAX_NAPERTS 15 statement from the
+    radprof task. It now uses the definition in phot.h like all
+    the other tasks.
+
+apphot
+    Davis, Oct 30, 1989
+    Changed daofind so that a new .coo file is output everytime daofind
+    is run in interactive mode.
+
+apphot
+    Davis, October 11, 1989
+    1. apphot$fitsky/apmode
+    Made some subtle mods to the mode fitting algorithm. In particular
+    only the first cut is made around the median the remainder are around
+    the mode.
+
+apphot
+    Davis, October 10, 1989
+    1.  apphot$center, fitsky, phot, wphot, polyphot, fitpsf and radprof tasks
+    Activated the datamin and datamax parameters. Pixels outside
+    this range are rejected from sky fitting algorithms and from the
+    non-linear least squares fits in fitpsf and radprof. If a bad pixel
+    is in the centering aperture or in a photometry aperture a magnitude
+    is still computed but a warning message is issued.
+
+    The only task where these parameters are not currently implemented
+    is daofind pending algorithm review.
+
+    2. apphot$polyphot/apyphot.x
+    Added a keystroke option to fit polygons that are not shifted to the
+    current cursor position.
+
+    3. apphot$fitsky/aprefitsky.x
+    Fixed an error in the stellar position reported on the plot in the
+    radplot option for sky fitting. The last cursor position was not
+    being reported.
+
+    4. apphot$fitsky/apmode.x
+    Changed the cut to one around the mode. Things look ok.
+
+
+apphot
+    Davis, Sept 15, 1989
+    apphot$apselect/apkeywords.x
+    1. Fixed a bug in the apselect task. Apselect was not picking up changes
+    int the keywords (#K) values correctly. The pointer in the ky_addval
+    procedure was being incorrectly computed and the new value was being
+    put in the wrong place.
+
+apphot
+    Davis, Aug 22, 1989
+    1. I removed the query for fwhmpsf from phot.
+
+    2. I fixed a serious problem in daofind when interactive = yes and
+    the task was rerun on the same convolved image but using a new
+    threshold. There was also a problem with the naming of the
+    temporary image.
+
+apphot
+    Davis, Aug 1, 1989
+
+    1. apphot$aplib/aprcursor.x
+    The prompt for the psf fitting box parameter box has been changed from
+    "centering radius" to "fitting box half width".
+    The prompt for the centering box parameter cbox has been changed from
+    "centering radius" to "centering box half width".
+
+    2. apphot$aplib/apradpsf.x 
+    The code to quickly center the radial profile before fitting has
+    been added to the interactive setting routine. Somehow the psffit
+    task was overlooked when this update was made.
+
+apphot
+    Davis, July 31, 1989
+    The procedure ap_caper inside apphot$aplib/aprcursor.x was define as
+    a type real procedure but called as a subroutine. I removed the type
+    real declaration.
+
+
+Version 2.8 export
+
+*************************************************************************
+
 apphot
     Davis, June 20, 1989
     1. The inverse of the scale was being incorrectly printed out by

@@ -5,7 +5,7 @@ include <mach.h>
 include <fset.h>
 include	"rfits.h"
 
-# RFT_READ_IMAGE --  Read FITS image pixels to IRAF image file
+# RFT_READ_IMAGE --  Convert FITS image pixels to IRAF image pixels.
 
 procedure rft_read_image (fits_fd, fits, im)
 
@@ -16,78 +16,141 @@ pointer	im		# IRAF image descriptor
 int	i, npix, npix_record, blksize
 long	v[IM_MAXDIM], nlines, il
 pointer	tempbuf, buf
-real	linemax, linemin
+real	linemax, linemin, lirafmin, lirafmax
 
 long	clktime()
 int	fstati(), rft_init_read_pixels(), rft_read_pixels()
-data	tempbuf /NULL/
 
-errchk	malloc, mfree, rft_init_read_pixels, rft_read_pixels, rft_scale_pix
-errchk	rft_change_pix, rft_put_image_line, rft_pix_limits
+errchk	malloc, mfree, rft_init_read_pixels, rft_read_pixels, rft_lscale_pix
+errchk	rft_lchange_pix, rft_rchange_pix, rfit_dchange_pix, rft_put_image_line
+errchk	rft_pix_limits, rft_rscale_pix, rft_dscale_pix
 
 include	"rfits.com"
 
 begin
+	# No pixel file was created.
 	if (NAXIS(im) == 0) {
 	    call printf ("Warning: No pixel file created\n")
 	    return
 	}
 
-	# intialize
+	# Initialize the header.
 	call rft_set_image_header (fits, im)
 
+	# Compute the number of columns and lines in the image.
 	npix = NAXISN(im, 1)
 	nlines = 1
 	do i = 2, NAXIS(im)
 	    nlines = nlines * NAXISN(im, i)
+	lirafmax = -MAX_REAL
+	lirafmin = MAX_REAL
 
-	IRAFMAX(im) = -MAX_REAL
-	IRAFMIN(im) = MAX_REAL
+	# Compute the number of pixels per record and the number of records
+	# per output block.
 
-	# FITS data is converted to type  LONG.  If BITPIX is not one
-	# of the MII types then rft_read_pixels returns an ERROR.
-
-	if (tempbuf != NULL)
-	    call mfree (tempbuf, TY_LONG)
-	call malloc (tempbuf, npix, TY_LONG)
-
-	npix_record = len_record * FITS_BYTE / BITPIX(fits)
-	i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_LONG)
+	npix_record = len_record * FITS_BYTE / abs (BITPIX(fits))
 	blksize = fstati (fits_fd, F_SZBBLK)
-	if (mod (blksize, 2880) == 0)
-	    blksize = blksize / 2880
+	if (mod (blksize, FITS_RECORD) == 0)
+	    blksize = blksize / FITS_RECORD
 	else
 	    blksize = 1
+
+	# FITS data is converted to type  LONG, REAL or DOUBLE. If BITPIX is
+	# not one of the MII types then rft_read_pixels returns an ERROR.
+
 	call amovkl (long(1), v, IM_MAXDIM)
+	switch (BITPIX(fits)) {
+	case FITS_REAL:
 
-	do il = 1, nlines {
+	    # Allocate temporary space.
+	    call malloc (tempbuf, npix, TY_REAL)
 
-	    # Write image line
-	    call rft_put_image_line (im, buf, v, PIXTYPE(im))
+	    # Allocate the space for the output line, read in the image
+	    # line, convert from the ieee to native format, and compute the
+	    # minimum and maximum.
 
-	    # Read in image line
-	    if (rft_read_pixels (fits_fd, Meml[tempbuf], npix,
-	        NRECORDS(fits), blksize) != npix)
-		call printf ("Error reading FITS data\n")
+	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_REAL)
+	    do il = 1, nlines {
+	        call rft_put_image_line (im, buf, v, PIXTYPE(im))
+	        if (rft_read_pixels (fits_fd, Memr[tempbuf], npix,
+	            NRECORDS(fits), blksize) != npix)
+		    call printf ("Error reading FITS data\n")
+	        if (SCALE(fits) == YES)
+	            call rft_rscale_pix (Memr[tempbuf], buf, npix,
+		        FITS_BSCALE(fits), FITS_BZERO(fits), PIXTYPE(im))
+		else
+		    call rft_rchange_pix (Memr[tempbuf], buf, npix, PIXTYPE(im))
+	        call rft_pix_limits (buf, npix, PIXTYPE(im), linemin, linemax)
+	        lirafmax = max (lirafmax, linemax)
+	        lirafmin = min (lirafmin, linemin)
+	    }
 
-	    # Scale data
-	    if (SCALE(fits) == YES)
-	        call rft_scale_pix (Meml[tempbuf], buf, npix, FITS_BSCALE(fits),
-		    FITS_BZERO(fits), PIXTYPE(im))
-	    else
-		call rft_change_pix (Meml[tempbuf], buf, npix, PIXTYPE(im))
+	    # Free space.
+	    call mfree (tempbuf, TY_REAL)
 
-	    # Map blanks
-	    if (BLANKS(fits) == YES)
-	        call rft_map_blanks (Meml[tempbuf], buf, npix, PIXTYPE(im),
-		    BLANK_VALUE(fits), blank, NBPIX(im))
+	case FITS_DOUBLE:
 
-	    # Calculate image maximum and minimum
-	    call rft_pix_limits (buf, npix, PIXTYPE(im), linemin, linemax)
-	    IRAFMAX(im) = max (IRAFMAX(im), linemax)
-	    IRAFMIN(im) = min (IRAFMIN(im), linemin)
+	    # Allocate temporary space.
+	    call malloc (tempbuf, npix, TY_DOUBLE)
+
+	    # Allocate the space for the output line, read in the image
+	    # line, convert from the ieee to native format, and compute the
+	    # minimum and maximum.
+
+	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF,
+	        TY_DOUBLE)
+	    do il = 1, nlines {
+	        call rft_put_image_line (im, buf, v, PIXTYPE(im))
+	        if (rft_read_pixels (fits_fd, Memd[tempbuf], npix,
+	            NRECORDS(fits), blksize) != npix)
+		    call printf ("Error reading FITS data\n")
+	        if (SCALE(fits) == YES)
+	            call rft_dscale_pix (Memd[tempbuf], buf, npix,
+		        FITS_BSCALE(fits), FITS_BZERO(fits), PIXTYPE(im))
+		else
+		    call rft_dchange_pix (Memd[tempbuf], buf, npix, PIXTYPE(im))
+	        call rft_pix_limits (buf, npix, PIXTYPE(im), linemin, linemax)
+	        lirafmax = max (lirafmax, linemax)
+	        lirafmin = min (lirafmin, linemin)
+	    }
+
+	    # Free space.
+	    call mfree (tempbuf, TY_DOUBLE)
+
+	default:
+
+	    # Allocate the required space.
+	    call malloc (tempbuf, npix, TY_LONG)
+
+	    # Allocate the space for the output line, read in the image
+	    # line, convert from the ieee to native format, and compute the
+	    # minimum and maximum.
+
+	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_LONG)
+	    do il = 1, nlines {
+	        call rft_put_image_line (im, buf, v, PIXTYPE(im))
+	        if (rft_read_pixels (fits_fd, Meml[tempbuf], npix,
+	            NRECORDS(fits), blksize) != npix)
+		    call printf ("Error reading FITS data\n")
+	        if (SCALE(fits) == YES)
+	            call rft_lscale_pix (Meml[tempbuf], buf, npix,
+		        FITS_BSCALE(fits), FITS_BZERO(fits), PIXTYPE(im))
+	        else
+		    call rft_lchange_pix (Meml[tempbuf], buf, npix, PIXTYPE(im))
+	        if (BLANKS(fits) == YES)
+	            call rft_map_blanks (Meml[tempbuf], buf, npix, PIXTYPE(im),
+		        BLANK_VALUE(fits), blank, NBPIX(im))
+	        call rft_pix_limits (buf, npix, PIXTYPE(im), linemin, linemax)
+	        lirafmax = max (lirafmax, linemax)
+	        lirafmin = min (lirafmin, linemin)
+	    }
+
+	    # Free space.
+	    call mfree (tempbuf, TY_LONG)
 	}
 
+	IRAFMIN(im) = lirafmin
+	IRAFMAX(im) = lirafmax
 	LIMTIME(im) = clktime (long(0))
 
 	if (NBPIX (im) != 0) {
@@ -105,22 +168,21 @@ procedure rft_set_image_header (fits, im)
 pointer	fits		# FITS data structure
 pointer	im		# IRAF image pointer
 
-int	precision
-errchk	rft_set_precision
 include	"rfits.com"
 
 begin
 	# Determine data type from BITPIX if user data type not specified.
 
 	if (data_type == ERR) {
-	    if (SCALE(fits) == YES) {
-		call rft_set_precision (BITPIX(fits), precision)
-		# if (precision <= NDIGITS_RP)
+	    if (BITPIX(fits) < 0) {
+		if (abs (BITPIX(fits)) <= (SZ_REAL * SZB_CHAR * NBITS_BYTE))
 		    PIXTYPE(im) = TY_REAL
-		# else
-		    # PIXTYPE(im) = TY_DOUBLE
+		else
+		    PIXTYPE(im) = TY_DOUBLE
+	    } else if (SCALE(fits) == YES) {
+		PIXTYPE(im) = TY_REAL
 	    } else {
-	        if (BITPIX(fits) <= SZ_SHORT * SZB_CHAR * NBITS_BYTE)
+	        if (BITPIX(fits) <= (SZ_SHORT * SZB_CHAR * NBITS_BYTE))
 		    PIXTYPE(im) = TY_SHORT
 		else
 		    PIXTYPE(im) = TY_LONG
@@ -149,6 +211,226 @@ begin
 	    precision = FITSL_PREC
 	default:
 	    call error (16, "RFT_SET_PRECISION: Unknown FITS type")
+	}
+end
+
+
+# RFT_PUT_IMAGE_LINE -- Procedure to output an image line to and IRAF file.
+
+procedure rft_put_image_line (im, buf, v, data_type)
+
+pointer	im			# IRAF image descriptor
+pointer	buf			# Pointer to output image line
+long	v[ARB]			# imio pointer
+int	data_type		# output pixel type
+
+int	impnll(), impnlr(), impnld(), impnlx()
+errchk	impnll, impnlr, impnld, impnlx
+
+begin
+	switch (data_type) {
+	case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
+	    if (impnll (im, buf, v) == EOF)
+		call error (3, "RFT_PUT_IMAGE_LINE: Error writing FITS data")
+	case TY_REAL:
+	    if (impnlr (im, buf, v) == EOF)
+		call error (3, "RFT_PUT_IMAGE_LINE: Error writing FITS data")
+	case TY_DOUBLE:
+	    if (impnld (im, buf, v) == EOF)
+		call error (3, "RFT_PUT_IMAGE_LINE: Error writing FITS data")
+	case TY_COMPLEX:
+	    if (impnlx (im, buf, v) == EOF)
+		call error (3, "RFT_PUT_IMAGE_LINE: Error writing FITS data")
+	default:
+	    call error (10, "RFT_PUT_IMAGE_LINE: Unsupported IRAF image type")
+	}
+end
+
+
+# RFT_RSCALE_PIX -- Procedure to convert an IRAF image line from type real
+# to the requested output data type with optional scaling using the
+# FITS parameters BSCALE and BZERO.
+
+procedure rft_rscale_pix (inbuf, outbuf, npix, bscale, bzero, data_type)
+
+real	inbuf[ARB]		# buffer of FITS integers
+pointer	outbuf			# pointer to output image line
+int	npix			# number of pixels
+double	bscale, bzero		# FITS bscale and bzero
+int	data_type		# IRAF image pixel type
+
+errchk	altmdr, achtrl, amovr, achtrd, achtrx
+
+begin
+	switch (data_type) {
+	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
+	    call altmdr (inbuf, inbuf, npix, bscale, bzero)
+	    call achtrl (inbuf, Meml[outbuf], npix)
+	case TY_REAL:
+	    call altmdr (inbuf, inbuf, npix, bscale, bzero)
+	    call amovr (inbuf, Memr[outbuf], npix)
+	case TY_DOUBLE:
+	    call altmdr (inbuf, inbuf, npix, bscale, bzero)
+	    call achtrd (inbuf, Memd[outbuf], npix)
+	case TY_COMPLEX:
+	    call altmdr (inbuf, inbuf, npix, bscale, bzero)
+	    call achtrx (inbuf, Memx[outbuf], npix)
+	default:
+	    call error (10, "RFT_SCALE_LINE: Illegal IRAF image type")
+	}
+end
+
+
+# RFT_DSCALE_PIX -- Procedure to convert an IRAF image line from type double
+# to the requested output data type with optional scaling using the
+# FITS parameters BSCALE and BZERO.
+
+procedure rft_dscale_pix (inbuf, outbuf, npix, bscale, bzero, data_type)
+
+double	inbuf[ARB]		# buffer of FITS integers
+pointer	outbuf			# pointer to output image line
+int	npix			# number of pixels
+double	bscale, bzero		# FITS bscale and bzero
+int	data_type		# IRAF image pixel type
+
+errchk	altmd, achtdl, amovd, achtdr, achtdx
+
+begin
+	switch (data_type) {
+	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
+	    call altmd (inbuf, inbuf, npix, bscale, bzero)
+	    call achtdl (inbuf, Meml[outbuf], npix)
+	case TY_REAL:
+	    call altmd (inbuf, inbuf, npix, bscale, bzero)
+	    call achtdr (inbuf, Memr[outbuf], npix)
+	case TY_DOUBLE:
+	    call altmd (inbuf, inbuf, npix, bscale, bzero)
+	    call amovd (inbuf, Memd[outbuf], npix)
+	case TY_COMPLEX:
+	    call altmd (inbuf, inbuf, npix, bscale, bzero)
+	    call achtdx (inbuf, Memx[outbuf], npix)
+	default:
+	    call error (10, "RFT_SCALE_LINE: Illegal IRAF image type")
+	}
+end
+
+
+
+# RFT_LSCALE_PIX -- Procedure to convert an IRAF image line from type long
+# to the requested output data type with optional scaling using the
+# FITS parameters BSCALE and BZERO.
+
+procedure rft_lscale_pix (inbuf, outbuf, npix, bscale, bzero, data_type)
+
+long	inbuf[ARB]		# buffer of FITS integers
+pointer	outbuf			# pointer to output image line
+int	npix			# number of pixels
+double	bscale, bzero		# FITS bscale and bzero
+int	data_type		# IRAF image pixel type
+
+errchk	achtll, achtlr, achtld, achtlx
+errchk	altml, altmr, altmd, altmx
+
+begin
+	switch (data_type) {
+	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
+	    call achtll (inbuf, Meml[outbuf], npix)
+	    call altml (Meml[outbuf], Meml[outbuf], npix, bscale, bzero)
+	case TY_REAL:
+	    call achtlr (inbuf, Memr[outbuf], npix)
+	    call altmdr (Memr[outbuf], Memr[outbuf], npix, bscale, bzero)
+	case TY_DOUBLE:
+	    call achtld (inbuf, Memd[outbuf], npix)
+	    call altmd (Memd[outbuf], Memd[outbuf], npix, bscale, bzero)
+	case TY_COMPLEX:
+	    call achtlx (inbuf, Memx[outbuf], npix)
+	    call altmx (Memx[outbuf], Memx[outbuf], npix, real (bscale),
+	        real (bzero))
+	default:
+	    call error (10, "RFT_SCALE_LINE: Illegal IRAF image type")
+	}
+end
+
+
+# RFT_RCHANGE_PIX -- Procedure to change a line of real numbers to the
+# IRAF image type.
+
+procedure rft_rchange_pix (inbuf, outbuf, npix, data_type)
+
+real	inbuf[ARB]		# array of FITS integers
+pointer	outbuf			# pointer to IRAF image line
+int	npix			# number of pixels
+int	data_type		# IRAF pixel type
+
+errchk	achtrl, amovr, achtrd, achtrx
+
+begin
+	switch (data_type) {
+	case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
+	    call achtrl (inbuf, Meml[outbuf], npix)
+	case TY_REAL:
+	    call amovr (inbuf, Memr[outbuf], npix)
+	case TY_DOUBLE:
+	    call achtrd (inbuf, Memd[outbuf], npix)
+	case TY_COMPLEX:
+	    call achtrx (inbuf, Memx[outbuf], npix)
+	default:
+	    call error (10, "RFT_RCHANGE_LINE: Illegal IRAF image type")
+	}
+end
+
+
+# RFT_DCHANGE_PIX -- Procedure to change a line of double precision numbers
+# to the IRAF image type.
+
+procedure rft_dchange_pix (inbuf, outbuf, npix, data_type)
+
+double  inbuf[ARB]		# array of FITS integers
+pointer	outbuf			# pointer to IRAF image line
+int	npix			# number of pixels
+int	data_type		# IRAF pixel type
+
+errchk	achtdl, achtdr, amovd, achtdx
+
+begin
+	switch (data_type) {
+	case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
+	    call achtdl (inbuf, Meml[outbuf], npix)
+	case TY_REAL:
+	    call achtdr (inbuf, Memr[outbuf], npix)
+	case TY_DOUBLE:
+	    call amovd (inbuf, Memd[outbuf], npix)
+	case TY_COMPLEX:
+	    call achtdx (inbuf, Memx[outbuf], npix)
+	default:
+	    call error (10, "RFT_DCHANGE_LINE: Illegal IRAF image type")
+	}
+end
+
+
+
+# RFT_LCHANGE_PIX -- Procedure to change a line of long integers to the
+# IRAF image type.
+
+procedure rft_lchange_pix (inbuf, outbuf, npix, data_type)
+
+long	inbuf[ARB]		# array of FITS integers
+pointer	outbuf			# pointer to IRAF image line
+int	npix			# number of pixels
+int	data_type		# IRAF pixel type
+
+begin
+	switch (data_type) {
+	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
+	    call achtll (inbuf, Meml[outbuf], npix)
+	case TY_REAL:
+	    call achtlr (inbuf, Memr[outbuf], npix)
+	case TY_DOUBLE:
+	    call achtld (inbuf, Memd[outbuf], npix)
+	case TY_COMPLEX:
+	    call achtlx (inbuf, Memx[outbuf], npix)
+	default:
+	    call error (10, "RFT_CHANGE_LINE: Illegal IRAF image type")
 	}
 end
 
@@ -203,117 +485,6 @@ begin
 end
 
 
-# RFT_PUT_IMAGE_LINE -- Procedure to output an image line to and IRAF file.
-
-procedure rft_put_image_line (im, buf, v, data_type)
-
-pointer	im			# IRAF image descriptor
-pointer	buf			# Pointer to output image line
-long	v[ARB]			# imio pointer
-int	data_type		# output pixel type
-
-int	impnll(), impnlr(), impnld(), impnlx()
-errchk	impnll, impnlr, impnld, impnlx
-
-begin
-	switch (data_type) {
-	case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
-	    if (impnll (im, buf, v) == EOF)
-		call error (3, "RFT_PUT_IMAGE_LINE: Error writing FITS data")
-	case TY_REAL:
-	    if (impnlr (im, buf, v) == EOF)
-		call error (3, "RFT_PUT_IMAGE_LINE: Error writing FITS data")
-	case TY_DOUBLE:
-	    if (impnld (im, buf, v) == EOF)
-		call error (3, "RFT_PUT_IMAGE_LINE: Error writing FITS data")
-	case TY_COMPLEX:
-	    if (impnlx (im, buf, v) == EOF)
-		call error (3, "RFT_PUT_IMAGE_LINE: Error writing FITS data")
-	default:
-	    call error (10, "RFT_PUT_IMAGE_LINE: Unsupported IRAF image type")
-	}
-end
-
-
-# RFT_SCALE_PIX -- Procedure to convert an IRAF image line from type long
-# to the requested output data type with optional scaling using the
-# FITS parameters BSCALE and BZERO.
-
-procedure rft_scale_pix (inbuf, outbuf, npix, bscale, bzero, data_type)
-
-long	inbuf[ARB]		# buffer of FITS integers
-pointer	outbuf			# pointer to output image line
-int	npix			# number of pixels
-double	bscale, bzero		# FITS bscale and bzero
-int	data_type		# IRAF image pixel type
-
-errchk	achtll, achtlr, achtld, achtlx
-errchk	altml, altmr, altmd, altmx
-
-begin
-	switch (data_type) {
-	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
-	    call achtll (inbuf, Meml[outbuf], npix)
-	    call altml (Meml[outbuf], Meml[outbuf], npix, bscale, bzero)
-	case TY_REAL:
-	    call achtlr (inbuf, Memr[outbuf], npix)
-	    #call altmr (Memr[outbuf], Memr[outbuf], npix, real (bscale),
-	        #real (bzero))
-	    call altmdr (Memr[outbuf], Memr[outbuf], npix, bscale, bzero)
-	case TY_DOUBLE:
-	    call achtld (inbuf, Memd[outbuf], npix)
-	    call altmd (Memd[outbuf], Memd[outbuf], npix, bscale, bzero)
-	case TY_COMPLEX:
-	    call achtlx (inbuf, Memx[outbuf], npix)
-	    call altmx (Memx[outbuf], Memx[outbuf], npix, real (bscale),
-	        real (bzero))
-	default:
-	    call error (10, "RFT_SCALE_LINE: Illegal IRAF image type")
-	}
-end
-
-# ALTMDR -- procedure to scale lines
-
-procedure altmdr (a, b, npix, bscale, bzero)
-
-real	a[ARB]		# input array
-real	b[ARB]		# output array
-int	npix		# number of pixels
-double	bscale, bzero	# scaling parameters
-
-int	i
-
-begin
-	do i = 1, npix
-	    b[i] = a[i] * bscale + bzero
-end
-
-# RFT_CHANGE_PIX -- Procedure to change a line of long integers to the
-# IRAF image type.
-
-procedure rft_change_pix (inbuf, outbuf, npix, data_type)
-
-long	inbuf[ARB]		# array of FITS integers
-pointer	outbuf			# pointer to IRAF image line
-int	npix			# number of pixels
-int	data_type		# IRAF pixel type
-
-begin
-	switch (data_type) {
-	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
-	    call achtll (inbuf, Meml[outbuf], npix)
-	case TY_REAL:
-	    call achtlr (inbuf, Memr[outbuf], npix)
-	case TY_DOUBLE:
-	    call achtld (inbuf, Memd[outbuf], npix)
-	case TY_COMPLEX:
-	    call achtlx (inbuf, Memx[outbuf], npix)
-	default:
-	    call error (10, "RFT_CHANGE_LINE: Illegal IRAF image type")
-	}
-end
-
-
 # RFT_PIX_LIMITS -- Procedure to determine to maxmimum and minimum values in a
 # line.
 
@@ -350,4 +521,21 @@ begin
 	default:
 	    call error (30, "RFT_PIX_LIMITS: Unknown IRAF type")
 	}
+end
+
+
+# ALTMDR -- procedure to scale a real vector with double precision constants.
+
+procedure altmdr (a, b, npix, bscale, bzero)
+
+real	a[ARB]		# input array
+real	b[ARB]		# output array
+int	npix		# number of pixels
+double	bscale, bzero	# scaling parameters
+
+int	i
+
+begin
+	do i = 1, npix
+	    b[i] = a[i] * bscale + bzero
 end

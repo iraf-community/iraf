@@ -9,11 +9,12 @@ define	CONVERT	.424660900	# conversion factor from fwhmpsf to sigma
 # APREFITCENTER -- Procedure to refit the centers assuming that the appropriate
 # pixel buffer is in memory. See apfitcenter for further information.
 
-int procedure aprefitcenter (ap)
+int procedure aprefitcenter (ap, ier)
 
 pointer	ap		# pointer to the apphot structure
+int	ier		# previous error code
 
-int	fier, ier
+int	fier
 pointer	cen, nse
 int	ap_ctr1d(), ap_mctr1d(), ap_gctr1d(), ap_lgctr1d()
 
@@ -31,16 +32,9 @@ begin
 
 	# Return input coordinates if no center fitting.
 	if (IS_INDEFR(AP_CXCUR(cen)) || IS_INDEFR(AP_CYCUR(cen)))
-	    return (AP_NOCTRAREA)
-	else if (AP_CENTERFUNCTION(cen) == AP_NONE) {
-	    AP_XCENTER(cen) = AP_CXCUR(cen)
-	    AP_YCENTER(cen) = AP_CYCUR(cen)
-	    AP_XSHIFT(cen) = 0.0
-	    AP_YSHIFT(cen) = 0.0
-	    AP_XERR(cen) = INDEFR
-	    AP_YERR(cen) = INDEFR
+	    return (AP_CTR_NOAREA)
+	else if (AP_CENTERFUNCTION(cen) == AP_NONE)
 	    return (AP_OK)
-	}
 
 	# Choose the centering algorithm.
 	switch (AP_CENTERFUNCTION(cen)) {
@@ -99,23 +93,27 @@ begin
         }
 
 	# Return appropriate error code.
-	if (ier == AP_LOWSNRATIO)
-	    return (AP_LOWSNRATIO)
-	else if (fier == AP_OK) {
-	    if (abs (AP_XSHIFT(cen)) > (AP_MAXSHIFT(cen) * AP_SCALE(ap)))
-	        return (AP_BADSHIFT)
-	    else if (abs (AP_YSHIFT(cen)) > (AP_MAXSHIFT(cen) * AP_SCALE(ap)))
-	        return (AP_BADSHIFT)
-	    else
-		return (AP_OK)
-	} else if (fier != AP_NCTR_TOO_SMALL) {
-	    AP_XCENTER(cen) = AP_CXCUR(cen)
-	    AP_YCENTER(cen) = AP_CYCUR(cen)
-	    AP_XSHIFT(cen) = 0.0
-	    AP_YSHIFT(cen) = 0.0
-	    AP_XERR(cen) = INDEFR
-	    AP_YERR(cen) = INDEFR
-	    return (AP_NCTR_TOO_SMALL)
+	if (ier == AP_CTR_BADDATA) {
+	    return (AP_CTR_BADDATA)
+	} else if (fier != AP_OK) {
+	    if (fier == AP_CTR_NTOO_SMALL) {
+	        AP_XCENTER(cen) = AP_CXCUR(cen)
+	        AP_YCENTER(cen) = AP_CYCUR(cen)
+	        AP_XSHIFT(cen) = 0.0
+	        AP_YSHIFT(cen) = 0.0
+	        AP_XERR(cen) = INDEFR
+	        AP_YERR(cen) = INDEFR
+	        return (AP_CTR_NTOO_SMALL)
+	    } else
+		return (fier)
+	} else if (ier == YES) {
+	    return (AP_CTR_LOWSNRATIO)
+	} else if (abs (AP_XSHIFT(cen)) > (AP_MAXSHIFT(cen) * AP_SCALE(ap))) {
+	    return (AP_CTR_BADSHIFT)
+	} else if (abs (AP_YSHIFT(cen)) > (AP_MAXSHIFT(cen) * AP_SCALE(ap))) {
+	    return (AP_CTR_BADSHIFT)
+	} else if (ier == AP_CTR_OUTOFBOUNDS) {
+	    return (AP_CTR_OUTOFBOUNDS)
 	} else
-	    return (fier)
+	    return (AP_OK)
 end

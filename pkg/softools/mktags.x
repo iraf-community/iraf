@@ -31,6 +31,7 @@ bool	listing, mktags
 int	fd, list, ip, ip1, ip2, op, linenum, i, j, out
 
 bool	clgetb()
+int	tg_compare()
 extern	tg_compare()
 int	clpopni(), clgfil()
 int	open(), tg_getlongline(), gstrmatch(), stridxs()

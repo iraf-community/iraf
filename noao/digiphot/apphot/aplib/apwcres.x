@@ -72,13 +72,13 @@ int	maxch		# maximum number of characters
 
 begin
 	switch (ier) {
-	case AP_NOCTRAREA:
+	case AP_CTR_NOAREA:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("No_ctr_pixels")
         case AP_CTR_OUTOFBOUNDS:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("Out_of_bounds")
-	case AP_NCTR_TOO_SMALL:
+	case AP_CTR_NTOO_SMALL:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("Npts_too_few")
 	case AP_CTR_SINGULAR:
@@ -87,12 +87,15 @@ begin
 	case AP_CTR_NOCONVERGE:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("No_converge")
-	case AP_BADSHIFT:
+	case AP_CTR_BADSHIFT:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("Shift_too_big")
-	case AP_LOWSNRATIO:
+	case AP_CTR_LOWSNRATIO:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("Low_snr")
+	case AP_CTR_BADDATA:
+	    call sprintf (str, maxch, "%s")
+		call pargstr ("Bad_pixels")
 	default:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("No_error")

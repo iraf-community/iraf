@@ -1,12 +1,13 @@
 include <imhdr.h>
+include <fset.h>
 include "../lib/apphot.h"
 include "../lib/noise.h"
+include "../lib/display.h"
 include "../lib/find.h"
 
 define	FWHM_TO_SIGMA		0.42467
 
-# AP_FDSTARS -- Procedure to find stars in an image using a pattern matching
-# technique.
+# AP_FDSTARS -- Find stars in an image using a pattern matching technique.
 
 procedure ap_fdstars (im, ap, cnv, out, id, boundary, constant, refit, stid)
 
@@ -21,15 +22,18 @@ int	refit		# detect stars again
 int	stid		# output file sequence number
 
 int	nxk, nyk, nstars
-pointer	ker1x, ker1y, ker2d, skip
+pointer	sp, str, ker1x, ker1y, ker2d, skip
 real	a, b, c, f, relerr
-
 int	apstati(), apfind()
 real	ap_egkernel(), apstatr()
+data	ker1x /NULL/, ker1y/NULL/, ker2d/NULL/, skip /NULL/
 
 define	detect_ 99
 
 begin
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+
 	if (refit == YES)
 	    goto detect_
 
@@ -70,13 +74,11 @@ begin
 	# function centered in the subarray which best represents the data
 	# within a circle of nsigma * sigma of the Gaussian.
 
-	if (IM_PIXFILE(cnv) == EOS)
-	    call ap_convolve (im, cnv, Memr[ker2d], nxk, nyk)
-
-	if (stid <= 1)
-	    call ap_wfdparam (out, ap)
+	call ap_convolve (im, cnv, Memr[ker2d], nxk, nyk)
 
 detect_
+	if (stid <= 1)
+	    call ap_wfdparam (out, ap)
 
 	call printf ("\nImage: %s  ")
 	    call pargstr (IM_HDRFILE(im))
@@ -90,10 +92,11 @@ detect_
 	# Find all the objects in the input image with the specified image
 	# characteristics.
 
-	nstars = apfind (im, cnv, out, Memr[ker1x], Memr[ker1y], Memi[skip],
+	nstars = apfind (im, cnv, out, id, Memr[ker1x], Memr[ker1y], Memi[skip],
 	    nxk, nyk, apstatr (ap, THRESHOLD), apstati (ap, POSITIVE),
 	    apstatr (ap, SHARPLO), apstatr (ap, SHARPHI), apstatr (ap,
-	    ROUNDLO), apstatr (ap, ROUNDHI), YES, stid)
+	    ROUNDLO), apstatr (ap, ROUNDHI), YES, stid, apstati (ap,
+	    MKDETECTIONS))
 	stid = stid + nstars
 
 	call printf ("\n%d  stars detected threshold: %g  %g <= sharp <= %g  ")
@@ -104,4 +107,10 @@ detect_
 	call printf ("%g <= round <= %g  \n\n")
 	    call pargr (apstatr (ap, ROUNDLO))
 	    call pargr (apstatr (ap, ROUNDHI))
+
+	call apstats (ap, OUTNAME, Memc[str], SZ_FNAME)
+	call printf ("Output file: %s\n\n")
+	    call pargstr (Memc[str])
+
+	call sfree (sp)
 end

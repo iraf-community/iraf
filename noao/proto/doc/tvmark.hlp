@@ -1,4 +1,4 @@
-.help tvmark May89 proto
+.help tvmark Dec89 proto
 .ih
 NAME
 tvmark -- mark objects on the image display 
@@ -40,6 +40,15 @@ with the interactive colon  write command.  In this case the name of the output
 snapped image will be in order of priority, the name specifed
 by the user in the colon write ommand,  "outimage.snap.version",  or,
 "imagename.snap.version".
+.le
+.ls deletions = ""
+The extension of the output file containing objects which were deleted
+from the coordinate file in interactive or command file mode.
+By default no output deletions file is written.
+If \fIdeletions\fR is not equal to the null string (""), then deleted
+objects are written to a file called \fIcoords.deletions\fR. For
+example if \fIcoords\fR = "nite1" and \fIdeletions\fR = "del", then the
+deletions file will be called "nite1.del".
 .le
 .ls commands = ""
 The text file containing the marking commands.
@@ -122,6 +131,12 @@ The size of text, numbers and the plus and cross marks to be written.
 The size is in font units which are 6 display pixels wide and 7 display 
 pixels high.
 .le
+.ls tolerance = 1.5
+Objects marked by the cursor for deletion from the coordinate list
+\fIcoords\fR must be less than or equal to \fItolerance\fR pixels
+from the cursor position to be deleted. If 1 or more objects
+is closer than \fItolerance\fR, the closest object is deleted.
+.le
 .ls interactive = no
 Interactive mode.
 .le
@@ -197,6 +212,7 @@ The following keystroke commands are available.
     s	    Draw line segments, 2 keystrokes
     v       Draw a circle, 2 keystrokes
     b       Draw a rectangle, 2 keystrokes
+    f       Draw filled rectangle, 2 keystrokes
     e	    Mark region to be erased and restored, 2 keystrokes
 
     -       Move to previous object in the coordinate list
@@ -205,7 +221,9 @@ The following keystroke commands are available.
     n       Mark next object in the coordinate list	
     l	    Mark all the objects in the coordinate list
     o       Rewind the coordinate list
-    a       Mark and append object at cursor position to coordinate list
+    a       Append object at cursor position to coordinate list and mark
+    u	    Delete object nearest the cursor position in the coordinate list
+	    and mark
 
     k       Keep last cursor command
     q       Exit tvmark

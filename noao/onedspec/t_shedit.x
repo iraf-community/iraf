@@ -69,7 +69,7 @@ real	clgetr()
 
 begin
 	call clgstr ("shparams.title", title, maxchars)
-	ITM(ids) = clgeti ("shparams.exposure")
+	ITM(ids) = clgetr ("shparams.exposure")
 	OFLAG(ids) = clgeti ("shparams.oflag")
 	BEAM(ids) = clgeti ("shparams.beam")
 	NP1(ids) = clgeti ("shparams.np1")
@@ -107,7 +107,7 @@ pointer	ids		# Header parameters
 begin
 	call clpstr ("shparams.image", image)
 	call clpstr ("shparams.title", title)
-	call clputi ("shparams.exposure", ITM(ids))
+	call clputr ("shparams.exposure", ITM(ids))
 	call clputi ("shparams.oflag", OFLAG(ids))
 	call clputi ("shparams.beam", BEAM(ids))
 	call clputi ("shparams.np1", NP1(ids))

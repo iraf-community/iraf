@@ -1,7 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <mach.h>
-include	<pkg/gtools.h>
+include	"gtools.h"
 	
 # GT_ASCALE -- Set graphics window to the range of the data.
 # Unlike GASCALE the data is limited to the GTOOLS window.
@@ -14,7 +14,7 @@ real	x[npts], y[npts]	# Data to scale
 int	npts			# Number of data points
 
 int	i
-real	xmin, xmax, ymin, ymax, x1, x2, y1, y2
+real	xmin, xmax, ymin, ymax, x1, x2, y1, y2, temp
 
 begin
 	if (gt == NULL) {
@@ -44,12 +44,12 @@ begin
 	if (IS_INDEF(ymax))
 	    ymax = MAX_REAL
 
-	x1 = max (xmin, xmax)
+	temp = max (xmin, xmax)
 	xmin = min (xmin, xmax)
-	xmax = x1
-	y1 = max (ymin, ymax)
+	xmax = temp
+	temp = max (ymin, ymax)
 	ymin = min (ymin, ymax)
-	ymax = y1
+	ymax = temp
 
 	x1 = xmax
 	x2 = xmin

@@ -49,6 +49,12 @@ begin
 	    call strcpy (AP_PSFSTRING(psf), str, maxch)
 	case OUTNAME:
 	    call strcpy (AP_OUTNAME(ap), str, maxch)
+	case AIRMASS:
+	    call strcpy (AP_AIRMASS(ap), str, maxch)
+	case FILTER:
+	    call strcpy (AP_FILTER(ap), str, maxch)
+	case FILTERID:
+	    call strcpy (AP_FILTERID(ap), str, maxch)
 	default:
 	    call error (0, "APSTATS: Unknown apphot string parameter")
 	}
@@ -127,8 +133,8 @@ begin
 	psf = AP_PPSF(ap)
 
 	switch (param) {
-	case DATALIMIT:
-	    return (AP_DATALIMIT(cen))
+	case CDATALIMIT:
+	    return (AP_CDATALIMIT(cen))
 	case XSHIFT:
 	    return (AP_XSHIFT(cen))
 	case YSHIFT:
@@ -213,6 +219,8 @@ begin
 	    return (AP_DATAMIN(ap))
 	case DATAMAX:
 	    return (AP_DATAMAX(ap))
+	case XAIRMASS:
+	    return (AP_XAIRMASS(ap))
 	default:
 	    call error (0, "APSTATR: Unknown apphot parameter")
 	}

@@ -65,14 +65,14 @@ begin
 	 # get optional keywords
 	 switch (optiono) {
 	 case KEY_BSCALE:
-	    if (NAXIS(im) <= 0)
+	    if ((NAXIS(im) <= 0) || (FITS_BITPIX(fits) < 0))
 		stat = NO
 	    else {
 	        call wft_encoded ("BSCALE", BSCALE(fits), card,
 	        "REAL = TAPE*BSCALE + BZERO", NDEC_DOUBLE)
 	    }
 	 case KEY_BZERO:
-	    if (NAXIS(im) <= 0)
+	    if ((NAXIS(im) <= 0) || (FITS_BITPIX(fits) < 0))
 		stat = NO
 	    else
 	        call wft_encoded ("BZERO", BZERO(fits), card, "", NDEC_DOUBLE)
@@ -202,6 +202,14 @@ begin
 	        else if (strmatch (card, "^BZERO   ") != 0)
 		    stat = NO
 	        else if (strmatch (card, "^BLANK   ") != 0)
+		    stat = NO
+	        else if (strmatch (card, "^IRAF-MAX") != 0)
+		    stat = NO
+	        else if (strmatch (card, "^IRAF-MIN") != 0)
+		    stat = NO
+	        else if (strmatch (card, "^IRAFTYPE") != 0)
+		    stat = NO
+	        else if (strmatch (card, "^IRAF-B/P") != 0)
 		    stat = NO
 	        else
                     stat = YES

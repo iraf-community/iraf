@@ -155,7 +155,8 @@ begin
 	    iferr (crval = imgetr (im, "W0"))
 		crval = imgetr (im, "CRVAL1")
 	    iferr (cdelt = imgetr (im, "WPC"))
-		cdelt = imgetr (im, "CDELT1")
+		iferr (cdelt = imgetr (im, "CDELT1"))
+		    cdelt = imgetr (im, "CD1_1")
 	    return (im)
 	}
 

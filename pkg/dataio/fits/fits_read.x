@@ -13,22 +13,22 @@ char	fitsfile[ARB]		# FITS file name
 char	iraffile[ARB]		# IRAF file name
 
 int	fits_fd, stat
-int	rft_read_header(), mtopen(), immap(), strlen()
 pointer	im, sp, fits
-
+int	rft_read_header(), mtopen(), immap(), strlen()
 errchk	smark, sfree, salloc, rft_read_header, rft_read_image, mtopen, immap
 errchk	imdelete, close, imunmap
 
 include	"rfits.com"
 
 begin
-	# Open input FITS data
+	# Open input FITS data.
 	fits_fd = mtopen (fitsfile, READ_ONLY, 0)
 
-	# Allocate memory for program data structure
+	# Allocate memory for program data structure.
 	call smark (sp)
 	call salloc (fits, LEN_FITS, TY_STRUCT)
 
+	# Set up for printing a long or a short header.
 	if (long_header == YES || short_header == YES) {
 	    if (make_image == YES) {
 	        call printf ("File: %s  ")
@@ -40,8 +40,9 @@ begin
 	    if (long_header == YES)
 		call printf ("\n")
 	}
+	call flush (STDOUT)
 
-	# Create IRAF image header.  If only a header listing is desired
+	# Create the IRAF image header. If only a header listing is desired
 	# then map the scratch image onto DEV$NULL (faster than a real file).
 
 	if (make_image == NO)
@@ -60,12 +61,15 @@ begin
 	        if (make_image == YES)
 	            call rft_read_image (fits_fd, fits, im)
 	    }
-	} then
+	} then {
+	    call flush (STDOUT)
 	    call erract (EA_WARN)
+	}
 
 	# Close files and clean up.
 	call imunmap (im)
 
+	# Optionally restore the old IRAF name.
 	if (stat == EOF || make_image == NO) {
 	    call imdelete (iraffile)
 	} else if (old_name == YES && strlen (IRAFNAME(fits)) != 0) {

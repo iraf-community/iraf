@@ -12,6 +12,7 @@ define	AP_RADPLOT	7	# Mark sky on radial profile plot
 define	AP_GAUSS	8	# Non-linear fit to a Gaussian
 define	AP_OFILT	9	# Optimal filtering
 define	AP_CROSSCOR	10	# Cross correlation method
+define	AP_MEAN		11	# Compute the mean of the sky pixels
 
 # define sky fitting errors (# 1 - 20)
 
@@ -82,7 +83,7 @@ define	UN_SKY_BACKGROUND	"counts"
 # fitsky string definitions
 
 define	SSHOWARGS	"|data|sky|"
-define	SFUNCS		"|constant|mode|centroid|file|histplot|median|radplot|gauss|ofilter|crosscor|"
+define	SFUNCS		"|constant|mode|centroid|file|histplot|median|radplot|gauss|ofilter|crosscor|mean|"
 define	SCMDS		"|annulus|dannulus|salgorithm|khist|skreject|smaxiter|binsize|smooth|rgrow|snreject|skyvalue|mksky|"
 
 define	SCMD_ANNULUS		1

@@ -20,8 +20,8 @@ begin
 
 	# Compute the marginal distributions.
 	call ap_mkmarg (ctrpix, Memr[xm], Memr[ym], nx, ny)
-	call adivkr (Memr[xm], real (nx), Memr[xm], nx)
-	call adivkr (Memr[ym], real (ny), Memr[ym], ny)
+	call adivkr (Memr[xm], real (ny), Memr[xm], nx)
+	call adivkr (Memr[ym], real (nx), Memr[ym], ny)
 
 	# Get the centers and errors.
 	call ap_cmarg (Memr[xm], nx, xc, xerr)

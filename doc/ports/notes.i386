@@ -1,0 +1,1124 @@
+Sun 386i (RoadRunner) Sun/IRAF port.  Begin 5 Oct 88.
+--------------------------------------------------------
+
+    o	Created the IRAF root directory at /files/vol/iraf in accordance
+	with the recommendations in the administration guide for 3rd party
+	software.
+
+    o	Moved in a copy of iraf from tucana.
+    o	Installed the SunOS 4.0 mods made earlier on taurus.
+
+sun/hlib/libc/iraf.h
+	Manually edited for the new root.
+
+/etc/fstab
+/usr/include/iraf.h +
+	Installed a symbolic link for iraf.h in /usr/include.  In order to
+	do this on the 386i, I had to remount the /usr file system read-write;
+	it was read-only at first for some reason.
+
+unix/bin.i386 +
+unix/as.i386 +
+	Added these directories.  "mach" is "i386" on the 386i.
+
+unix/as.i386/zsvjmp.s
+	Figured out enough of the 386i assembler to write a stubbed out
+	zsvjmp routine.  Will have to write a real one later.
+
+unix/sun/Makefile
+	Changed the float option to -fsingle as for the Sun4.
+	Added a "-o `mach` = "i386" condition to test for SunOS 4.0.
+
+------------------------
+Compiled GTERM and IMTOOL.  They seem to work!.
+Did a bootstrap.  Completed normally except that the library scanning code
+in MKPKG did not compile, no doubt due to the COFF objects on the 386i.
+Did an INSTALL to install the iraf links, GTERM, IMTOOL, etc.
+
+    o	Configured /usr/local.
+    o	Reconfigured my .sunview file (used to be .suntools) to use GTERM and
+	IMTOOL as on the Sun-3; came up ok.
+
+PROBLEMS
+	Window refresh is abysmally slow on the 386i.
+	Perfmeters sometimes core dump and die after running fine for a while.
+
+unix/hlib/irafuser.csh
+	Deleted the "-fsoft" entries - not used on the 386i.  (10/19)
+
+unix/boot/mkpkg/scanlib.c
+	Had to add
+
+		#ifdef i386
+		#define PORTAR 1
+		#endif
+	
+	at the top of the file to get include <ar.h> to define the appropriate
+	library format.  Also, on the 386i, the code which scans the library
+	has to deal with the following peculiarities:
+
+	    o	The first "file" in the archive is a dummy entry containing
+		symbol information; the name field is null, hence the code
+		can skip this entry by checking for archive members with
+		null-string names.
+
+	    o	The names of the archive members now have a trailing /,
+		e.g., "file.o/", followed by blank padding.  Previously
+		only the blank padding was there.  I modified the code to
+		accept either / or blank as the name delimiter.
+
+	I also added some debug code which prints the name and date of each
+	archive member as the library is scanned, if debug > 1.  These
+	changes should be portable to other systems.  (10/19)
+
+SUNBUG - f77
+	The command "f77 -c -O file.c" produces the following:
+
+		Assembler: /tmp/optim.01231.5.s
+			aline 1	: Warning: cannot field update- '.file' not
+			   on first line
+
+	This prevents use of f77 to compile C files, at least on the 386i!
+	(It works if the optimizer is not used).  Will have to modify XC to
+	use CC instead.  (10/19)
+
+unix/boot/spp/xc.c
+	1. Hacked XC to use F77 only to compile Fortran source files, and to
+	use CC for everything else.
+	2. Added /usr/local/bin to the list of directories to be searched for
+	commands like XPP and RPP.
+	3. Changed the defined names from "xpp.e" and "rpp.e" to "xpp" and
+	"rpp", since this is how they appear in /usr/local/bin.  (10/19)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.I386 +
+	Added code for case FPU = i386 (not really an fpu), plus a special
+	file list for the 386.  (10/19)
+
+unix/hlib/cl.csh
+	Added a case for the i386, similar to that for sparc.  (10/19)
+
+---------------------
+Sysgen completed with a half a dozen files with errors, but no executables
+were linked due to a library conflict with the dummy zsvjmp.s I wrote.  (10/20)
+
+unix/as/zsvjmp.s
+unix/as/zzdebug.c
+	Wrote a ZSVJMP.S for the 386i (80386), plus a little test program to
+	make sure it works.  (10/20)
+
+---------------------
+Linked x_system.e and it runs on the first attempt!!  (10/20)
+Start another sysgen - ignore files that didn't compile for now, until we
+see which executables they prevent from being linked.
+
+sys/vops/acht.gx
+	On the 386i, statements of the form "b[i] = a[i]", where B was
+	COMPLEX and A was INTEGER*2, revealed a compiler error in the
+	386i Fortran compiler (the error was a syntax error in the assembler
+	code input to the system assembler).  I decided that assigning
+	an integer*2 to a complex in a straight assignment wasn't a very
+	safe thing to do anyhow, so the generic source was changed to
+	generate  "b[i] = complex(real(a[i]),0.0)" instead, whenever B
+	is complex and A isn't.  (10/20)
+
+sys/vops/amod.gx
+	No changes here, just logging the compiler bug.  The code is as
+	follows:
+
+	     do 110 i = 1, npix
+		c(i) = mod (a(i), b(i))
+
+	where A, B, and C are integer*2.  Once again, the compiler is
+	generating incorrect assembler for this case, causing a "syntax error"
+	from the assembler (evidently, because of the rather restrictive
+	instruction set of the 80386).  I am not sure there is anything in
+	IRAF that uses this routine anyhow, so we will try to ignore it for
+	now.  (10/20)
+
+unix/hlib/mach.h
+	1. Set the BYTE_SWAP[24] flags to YES - forgot to do that before the
+	sysgen, unfortunately.
+	2. Changed MAX_EXPONENTD and related variables (MAX_DOUBLE, INDEFD)
+	to reflect the fact that the max exponent for IEEE double is 2**1023
+	or 10**307.  (10/21)
+
+unix/hlib/mkpkg.sf.I386
+	Commented out the entries for as$ishift.s for now.  (10/21)
+
+noao/astutil/pdm/pdmstatistics.x			pdmstats.x
+noao/digiphot/apphot/center/apcentercolon.x		apcencolon.x
+noao/digiphot/apphot/center/aprefitcenter.x		aprefitcen.x
+noao/digiphot/apphot/center/apfitcenter.x		apfitcen.x
+noao/proto/t_mkhistogram.x				t_mkhgm.x
+	Shortened the names of the above source files.  These will not compile
+	on the 386i, which has a limit of 14 characters for the names of
+	modules in object libraries (which are COFF format libraries from
+	Sys V, hence the 14 char limit).  (10/21)
+
+unix/hlib/mpkg.sf.I386
+	Turned off the optimizer for conrec.f, srface.f, pwrzi.f.  An apparent
+	optimizer bug was causing declaration of an external which would cause
+	an unsatisfied exernal error at link time.  (10/21)
+
+pkg/images/iminfo/t_imstat.x
+	Replaced some ==INDEF constructs by IS_INDEF, and took the n=n+1 out
+	of the inner loop, since it isn't needed.  (10/21)
+
+unix/boot/mkpkg/host.c
+	Disabled the ranlib (library rebuild) on the 386, since it uses COFF
+	type libraries, which don't need to be ranlib-ed.  (10/21)
+
+unix/hlib/mach.h
+	For the moment, restored the former, incorrect for IEEE, values of
+	the machine constants for type double.  There are obviously a number
+	of bugs in the system where code assumes that the values for types
+	real and double are the same.  This will have to be addressed later
+	when there is more time to debug this.  (10/21)
+
+unix/hlib/mpkg.sf.I386
+unix/as/amods.s +
+	Edited the assembler for the VOPS amods routine (to work around the
+	compiler bug mentioned above) and placed the assembler version in
+	AS and added the file to the special file list for the 386i.  (10/21)
+
+-------------------
+	As far as I know, all bugs are now fixed and the system is up on
+	the 386i, although there is still a lot of work to be done on improving
+	the installation procedures, optimization to reduce paging, etc.
+	A full system mkpkg/relink (no compiles) took 23 minutes on the 386i.
+	(10/21)
+
+buglog
+	Cannot access 5!mta, although page 5!dev$devices works.  (10/22)
+	(May be VOS bug not 386i bug?).
+
+sys/fio/mkpkg
+sys/fio/ungetci.x +
+	Added a new routine UNGETCI to FIO.  Since there is an ungetc for getc,
+	there should be an ungetci for getci.  (10/22)
+
+buglog
+	The statement
+
+		if (1)
+		    ...
+
+	does NOT result in any errors or warnings from the Fortran compiler.
+	(10/22)
+
+unix/hlib/libc/*.h
+unix/hlib/irafuser.csh
+	In order to remove the need to modify anything in /usr (which wants
+	to be mounted read-only in the latest SunOS), I modified the HSI to
+	call the C compiler in such a way that $hlib/libc is searched for
+	include files, as well as the system directories.  This is done via
+	the HSI_CF environment definition in $hlib/irafuser.csh, which adds
+	$hlib/libc to the list of directories to be searched.  The C compiler,
+	presented with #include <iraf.h>, will load $hlib/iraf.h  To avoid
+	having the compiler resolve files like <stdio.h> etc. to $hlib/libc
+	as well, I had to prefix the names of all these files with a "u",
+	e.g., "ustdio.h", modifing the references in <iraf.h> as well.
+	Since the files are referenced only in <iraf.h>, this change should
+	be completely transparent.  (10/23)
+
+sys/memio/salloc.x
+	Hard to believe, but it appears that buffers allocated on the stack
+	are not necessarily aligned to TY_DOUBLE (proper alignment would
+	result for anything smaller).  (10/24)
+
+unix/boot/spp/xc.c
+	Added a link time -align mem_ switch to double word (actually page)
+	align the MEM common.  (11/11)
+
+unix/os/irafpath.c
+	Added a #ifdef i386 case.  (11/14)
+
+unix/boot/mkpkg/host.c
+	Added support for IRAFULIB (a user defined private library) to
+	the $checkout and $checkin directives.  For example, in
+
+		$checkout libex.a lib$
+
+	if file libex.a is found in IRAFULIB, that version is checked out,
+	rather than the one in the system directory lib$.  (11/15)
+
+-------------------------
+Log of changes for the Sun/IRAF shared library facility.  This was developed
+on the 386i initially.  This log was written on 28 December and summarizes the
+revisions made during the period Tue 20 Dec to Wed 28 Dec 1988.
+
+[background]
+	Although SunOS 4.0 supports dynamic linking, mapped files, and shared
+	libraries, currently only the C compiler can generate position
+	independent code (PIC).  Sun Fortran does not currently support shared
+	libraries since it cannot yet generate PIC code.  In any case, PIC
+	code executes less efficiently than nonrelocatable code, and the
+	dynamic linking required by relocatable shared libraries slows down
+	process startup.
+
+	Our strategy is to implement the equivalent of a shared library by
+	building a *nonrelocatable* shareable image (executable process),
+	and mapping it to a fixed address in the address space of client
+	processes at process startup time.  A transfer vector is used to
+	vector procedure calls to arbitrary offsets in the shared image,
+	allowing new shared images to be installed without having to relink
+	client processes (in most cases).  The mapped file feature of SunOS
+	4.0 is the only thing essential for this scheme to work, and it is
+	the lack of the mapped file capability which has prevented us from
+	implementing a shared library up until now.
+
+	Even when (and if) Sun/Fortran eventually adds support for PIC and
+	shared libraries, the mapped image approach we have followed here
+	may still be the best choice.  Despite the slight loss of execution
+	efficiency caused by the use of position independent code, use of
+	PIC is not likely to be a serious drawback.  More serious drawbacks
+	derive from the use of global data, and dynamic linking at runtime.
+	Dynamic linking, e.g., to set the address of a global variable for
+	which the location is not known until runtime, requires the
+	modification of every text page containing code which references the
+	variable.  Aside from the obvious time penalty during process startup 
+	while this linking and page copying is taking place, modification of
+	a text page defeats shared text, increasing memory and paging
+	requirements.
+
+	Trying to avoid this problem in a relocatable shared library can be
+	very difficult, requiring modification to source code if it can be
+	done at all.  The nonrelocatable approach we have followed guarantees
+	sharing of the entire text of the shared image and does not require
+	any changes to system or applications source code (provided no
+	interfaces have been violated).  There are other advantages which
+	derive from the facility being part of the Sun/IRAF HSI, e.g., if
+	iraf is linked on an NOAO node and later installed with a different
+	root on a remote node, there is no problem locating the shared library
+	at runtime.  Furthermore, since our approach requires on the part of
+	the host system only the ability to map files to fixed addresses,
+	and the ability to specify the base address of the text segment of
+	an image at link time, it should be applicable to other (non-Sun)
+	systems which may provide these capabilities but not shared libraries.
+
+unix/as.i386/zsvjmp.s
+	After a little experimentation I found that the .SET assembler macro
+	could be used to set the value of absolute symbols.  This allows MEM
+	to be located at virtual address 0, making shared libraries possible
+	for the 386i, and improving assembly level debugging as well.
+
+unix/shlib/README
+unix/shlib/S.nm.i386		external names in 386i shared library
+unix/shlib/S.nm.mc68020		external names in Sun-3 shared library
+unix/shlib/S.ver.i386		386i shared library version number
+unix/shlib/S.ver.mc68020	Sun-3 shared library version number
+unix/shlib/Slib.c		support code
+unix/shlib/aout.c		utility to decode a.out format process headers
+unix/shlib/coff.c		utility to decode COFF format process headers
+unix/shlib/edsym.c		called by XC to edit symbol table of .e file
+unix/shlib/mkpkg		mkpkg tie-in
+unix/shlib/mkpkg.sh		called to boostrap edsym.e
+unix/shlib/mkshlib.csh		script which does it all
+unix/shlib/omit.i386		external names to be excluded from 386i shlib
+unix/shlib/omit.mc68020		external names to be excluded from Sun-3 shlib
+
+	This directory contains all the code needed to build and maintain the
+	shared library.   The shell script mkshlib.csh, normally called via
+	the mkpkg, does all the work.  This constructs a name list for the
+	shared library, generates the assembler required for the transfer
+	vector modules (V.s and S.s), and links the shared image (S.e).
+
+	When building a new shared library, mkshlib checks to see if any
+	externals have been deleted from or added to the name list of the
+	old shared library.  If any externals have been deleted, the version
+	number is incremented and any applications linked with the shared
+	library will have to be relinked.  If there were no changes to the
+	name list or new externals have been added, then the version number
+	is not incremented, and existing applications are permitted to use
+	the new shared image without having to be relinked.  The shared image
+	is linked -Bstatic, meaning that any required host library procedures 
+	are bound at link time.
+
+	Only Fortran or Fortran-like externals are permitted, i.e., exported
+	from the shared image to the client via the transfer vector.  This is
+	necessary to permit clients to be linked -Bdyamic, allowing use of
+	the host system shared libraries (otherwise name conflicts would
+	occur at link time).
+
+	The objects produced by the SHLIB code are libshare.a (the shared
+	library) and S.e (the shareable image), discussed further below.
+
+bin/S.e +
+	The shared image.  This gets mapped into the address space of any
+	process linked with the shared library.  It is also a runnable process
+	in its own right; if run directly, it prints out some information
+	about itself and exits.  The full contents (minus the omitted
+	externals) of the EX, SYS, VOPS, and OS libraries are currently
+	linked into this image; other libraries may be added in the future,
+	e.g., some of the MATH libraries.  The transfer vector module V.o,
+	located at a fixed (absolute) offset in the image, is used to vector
+	procedure calls from the client process into the shared image.
+
+lib/libshare.a
+	The shared library.  This contains several object modules, including
+	a single object S.o consisting of a short header plus a name list
+	containing all the externals exported by the shared image.  Each
+	external (i.e., VOS procedure such as 'clgeti' etc.) appears in S.o
+	as an absolute symbol, pointing to a fixed location in the transfer
+	vector in the shared image.  Note that externals appear in S.o only
+	as symbols, hence no actual executable code gets linked into the
+	client process.  To link with the shared library, XC links with
+	libshare.a instead of libex.a,libsys.a,libvops.a,libos.a.
+
+unix/os/zmain.c
+	The zmain is the main procedure for an iraf process.  The first thing
+	the zmain does now is call ZZSTRT, which is described below.  Some
+	code was moved out of the zmain into ZZSTRT, and all references to
+	global variables in the kernel had to be eliminated, since the zmain
+	is no longer linked with the kernel procedures (which are off in the
+	shared image).  Other changes included the addition of calls to ZZSETK
+	to set the values of the kernel variables, and changes to the calling
+	sequence of IRAFMN to permit the address of SYSRUK and ONENTRY to be
+	passed in the argument list, rather than being bound at link time.
+
+unix/os/zzstrt.c
+	The function of this procedure, which has been a no-op in UNIX/IRAF
+	up until now, is to perform any runtime initialization of the kernel.
+	Currently, ZZSTRT maps and initializes the shared image, sets the
+	desired IEEE exceptions (partially implemented at present), sets the
+	process working set soft limits, and sets the default values of the
+	kernel variables via the new ZZSETK procedure.
+
+	Mapping and initializing the shared image is similar to what unix
+	does during startup of a normal process.  The shared image file is
+	opened, and the header is read to determine the sizes of the text,
+	data (initialized data), and bss (unitialized data) segments.
+	IRAF uses an additional shared image header segment containing the
+	file header and the FIO common (fiocom), which has to be directly
+	accessed by the client, making it necessary to locate it at a fixed
+	address in virtual memory.
+
+	The header segment containing the FIO common is then mapped read-write
+	private, meaning that if any pages are modified the client gets a
+	private copy of the page.  The text segment of the shared image is
+	mapped read-only shared.  The data segment is mapped read-write
+	private; pages are shared until modified by the client at runtime.
+	The BSS segment is then mapped onto an arbitrary file offset (zero)
+	and promptly zeroed, causing all of the pages to belong to the client.
+	Finally, the addresses of the unix malloc, realloc, and free procedures
+	are passed into the shared image (dynamic memory allocation must be
+	in the data space of the client), and the environment pointer in the
+	shared image is set to point to the environment of the client, so that
+	the VOS will see the host environment and command line arguments seen
+	by the client.
+
+	Both ZMAIN and ZZSTRT are linked directly into each client process,
+	since they are required to map in and initialize the shared image.
+	(S.e has its own private copies, of course).
+
+unix/os/zlocpr.c
+	ZLOCPR had to be modified to deal with the transfer vector.
+	The problem is that calls to ZLOCPR in the client image and in the
+	shared image must return the same value, since equality comparisons
+	of procedure entry points are are used to determine, e.g., if a
+	particular file driver is referenced.  ZLOCPR was modified to check
+	if the referenced procedure is actually a transfer vector entry,
+	returning the address of the actual procedure in the shared image
+	if so.  Since this is a host level procedure, this is done by
+	disassembling the JMP instruction in the transfer vector.
+
+unix/os/zshlib.c +
+	This object contains everything needed to link a process against the
+	standard libraries, ignoring the shared library.  Dummy shared image
+	descriptors and procedure entry points are defined so that the code
+	in ZMAIN and ZZSTRT will link properly.  At runtime, the startup code
+	determines that the shared library is not in use, skipping the map and
+	initialize operations.
+
+unix/os/zzsetk.c +
+	This new kernel procedure is used to initialize the values of all the
+	global kernel variables formerly initialized via EXTERN references in
+	the zmain.  A procedure (with transfer vector) must be used instead
+	of a series of global data references in order to be able to link
+	against the shared library.
+
+unix/boot/spp/xc.c
+	1. XC was modified to link against the shared library by default.
+	The new switch -z (as in VMS/IRAF) is used to link without using
+	the shared library.  Both the shared library and the shared image
+	may be in an IRAFULIB directory if desired.
+
+	2. If linking against the shared library, XC will by default call
+	EDSYM to edit the symbol table of the new executable, renaming the
+	symbols pointing to transfer vectors by prefixing a "V", and adding
+	new symbols to point into the shared image to the actual locations
+	of the VOS procedures referenced by the transfer vector.  This provides
+	symbols for debugging executables that used the shared image.
+
+	New XC switches:
+
+		-e	do not call edsym to do symbol editing
+		-s	strip executable (UNIX linker switch; for XC, defeats
+			    call to edsym).
+
+	edsym switches (accepted by XC):
+
+		-d	print symbol table
+		-k	do not delete "uninteresting" symbols
+		-n	do not modify any files
+		-t	omit transfer vector symbols to save some space
+		-T	delete all symbols associated with the shared library
+
+	3. The -align switch, formerly passed to the 386i linker to page
+	align the MEM common, was deleted since MEM is now assigned to
+	location zero with a .SET.
+
+sys/etc/main.x
+sys/etc/xmjbuf.x +
+	1. The calling sequence of the iraf main was modified to add sys_runtask
+	(SYSRUK) and onentry (ONENTY) as arguments, allowing a runtime rather
+	than link time reference.  This was necessary for the shared library
+	since SYSRUK and ONENTY are client symbols but are called by the iraf
+	main, which is in the shared image.  The new scheme is more flexible
+	in any case.
+	2. The new procedure XMJBUF is used to get an XCHAR pointer to the
+	zsvjmp/zdojmp context vector used by the iraf main for interrupt and
+	error recovery.  Again, a runtime procedural reference using a pointer
+	is necessary since the global data area cannot be referenced at link
+	time.  The CL uses both a custom onentry and a custom zdojmp context
+	vector in order to gain full control over command interpretation.
+
+unix/hlib/libc/libc.h
+unix/hlib/libc/knames.h
+unix/hlib/libc/xnames.h
+	1. In libc.h, the ZJUCOM reference was deleted since the XMJBUF
+	procedure is now used to access the interpreter context vector.
+	2. Entries for the new VOS and kernel procedures were added to
+	[xk]names.h.
+
+unix/hlib/irafuser.csh
+unix/hlib/mkpkg.inc
+mkpkg	[at iraf root]
+	1. The -z flag (no shared library) was added to the HSI_XF flags in
+	irafuser.csh, so that HSI executables will not use the shared image.
+	2. The mkpkg.inc now includes a switch USE_SHLIB, which if set causes
+	mkpkg to automatically update the shared library and shared image
+	during a sysgen.  This switch does not actually determine whether the
+	shared library is *used*, since that is determined by the -z switch
+	to XC at link time.
+	3. For Sun/IRAF, the switch -/Bstatic was added to LFLAGS so that
+	the iraf executables will be statically linked, rather than using the
+	SunOS shared library (e.g., libc.a).  This was not necessary - there
+	is no conflict between the iraf and SunOS shared libraries - but was
+	done to save disk space (see CAVEATS, below).
+
+unix/mkpkg.sh
+unix/shlib/mkpkg.sh
+	Will build the edsym.e utility and install it in HBIN during a
+	bootstrap.
+
+unix/hlib/install
+	Will make a link for EDSYM in the local/bin directory.
+
+pkg/cl/main.c
+	A call to XMJBUF was added to convert to a vectored procedure reference
+	to the main interpreter context vector.
+
+sys/gio/cursor/prpsinit.x
+sys/gio/cursor/mkpkg
+sys/etc/mkpkg
+sys/etc/prfindpr.x
+sys/etc/propcpr.x
+sys/etc/prsignal.x
+sys/etc/prfilbuf.x
+sys/etc/prgline.x
+sys/etc/prupdate.x
+sys/etc/prclcpr.x
+sys/etc/prstati.x
+sys/etc/prredir.x
+sys/etc/prgredir.x
+sys/etc/prclose.x
+sys/etc/proscmd.x		[moved from gio/cursor to ETC]
+sys/etc/prpsio.x		[moved from gio/cursor to ETC]
+sys/etc/prc.com			[moved from LIB to ETC]
+sys/etc/prpsload.x +
+	Most of the "pr" prefixed files, e.g., PRPSIO, were moved from
+	gio/cursor to ETC, and the file prc.com (the PR common) was moved
+	from LIB to ETC, making it a private common.  This was necessary
+	to avoid the global data reference, which would cause the process
+	control code to fail at runtime due to the client and shared image
+	having separate copies of the PRC common (another reason to not use
+	commons!).  PRPSIO was modified to use a loadable driver to provide
+	a runtime technique for linking to the graphics pseudofile i/o
+	procedures in gio/cursor.  In addition to making the shared library
+	cleaner to implement, this collects all of the process control code
+	together in one place in the VOS (in ETC - libsys.a), avoids some
+	circular library references, and makes it possible to use LIBC/stdio
+	in applications processes without an unresolved linker reference
+	to PRPSIO (STScI has run into this).
+
+	PRPSINIT is a procedure called by the CL at startup time to load
+	the gio/cursor graphics pseudofile i/o driver into PRPSIO.
+
+lib/syserr.h
+lib/syserrmsg
+	A new error SYS_PRPSIOEPA was added, in support of the above
+	modifications.
+
+pkg/images/filters/mkpkg
+pkg/images/filters/convolve.x
+pkg/images/filters/radcnvr.x	[used to be called acnvrr.x]
+	This code contained a routine ACNVRR which redefined a VOPS library
+	procedure, causing a multiply defined linker error when linking with
+	the shared library.  The offending procedure was renamed CNV_RADCNVR
+	(radially symmetric convolve, type real).  Applications should not
+	use reserved package prefixes.
+
+unix/os/zfunc.c +
+	A set of new kernel primitives ZFUNC1, ZFUNC2, ... ZFUNC9 were added.
+	These are similar to ZCALL[1-9], but allow calling of functions by
+	their LOCPR entry point address, as has long been possible with
+	subroutines and ZCALL.
+
+CAVEATS - Shared libraries
+	Several interesting things about SunOS were learned in the process of
+	implementing the Sun/IRAF shared library.
+
+	1. Linker Bug.  There is a bug in the SunOS linker.  The size of the
+	BSS area is not being computed accurately.  For processes with a very
+	small BSS section, this can lead to a BSS size of zero being computed.
+	Normally this does not cause a problem, since a small BSS area will
+	usually fit into the last page of the data area.  In some cases,
+	however, the small BSS area is in an additional page, but since BSS
+	is zero no BSS area is allocated during process startup, causing a
+	segmentation violation when the unix code tries to set the value of
+	the BSS global variable "environ" during process startup.  I managed
+	to avoid this problem by the subtle kludge of adding the following
+	declaration to the ZZSTRT object (which is linked into every iraf
+	process):
+
+		int	BSS_kludge[256];
+
+	This provides the process with enough BSS storage (statically allocated
+	unitialized data space) to avoid having the size of the BSS segment
+	being set to zero at link time.
+
+	2. Does using the SunOS shared libraries really save space?
+	For some reason which I was not able to determine, a small iraf
+	process linked -Bdyamic (the default, i.e., use the SunOS shared
+	libraries) always has a text segment of 75-85 Kb, even though the
+	sum of all the objects therein may be much less.  It appears that
+	the linker may be incorrectly computing the size of the text segment,
+	causing it to effectively be padded out to a size considerably larger
+	than what it should be.  Linking the process -Bstatic (no SunOS
+	shared libraries) avoids the bug, yielding a much smaller executable
+	file, even though more text space is actually required due to the
+	need to link in modules from the SunOS libraries which would otherwise
+	be shared.
+
+	3. Processes with a large BSS segment execute slowly.  One thing which
+	became very clear to me while working on image execution was that
+	processes with a large BSS segment take a long time to execute.
+	The reason is that the BSS segment must be zeroed during process
+	startup.  Zeroing a large region of mapped memory involves both the
+	cpu time required to zero the storage, plus all the mapped file i/o
+	(paging) required to initialize the mapped swap file pages.  This is
+	not a big deal for processes with a BSS segment in the N*10K region,
+	but if the BSS is N*100K or N*1000K, then it can take seconds.  The
+	moral is USE DYNAMICALLY RATHER THAN STATICALLY ALLOCATED BUFFERS.
+	I am going to modify some of the system code as a result of this
+	lesson, e.g., the CL currently statically allocates about 250K of
+	combined stack and dictionary buffer space.  In applications, BSS
+	storage is most commonly found as declarations of the form
+
+		char	fname[SZ_FNAME]
+		char	line[SZ_LINE]
+	
+	and so on.  This is of no consequence for small individual programs,
+	but can add up to a lot of BSS for large packages.  The unix "size"
+	utility may be used to determine the BSS requirements of a process.
+
+unix/boot/mkpkg/tok.c
+	An unrelated bug in MKPKG was fixed, which would cause one or the
+	other of IFOLDER or IFNEWER to fail, when presented with a list of
+	files to be compared.  The bug was that IFOLDER is not equivalent
+	to !IFNEWER when more than one file must be compared.  (12/28)
+
+unix/as.i386/README
+unix/as.i386/aclrb.c
+unix/as.i386/aclrc.c
+unix/as.i386/bytmov.c
+unix/as.i386/aclrs.c
+unix/as.i386/aclri.c
+unix/as.i386/aclrl.c
+unix/as.i386/aclrr.c
+unix/as.i386/aclrd.c
+unix/as.i386/amovc.c
+unix/as.i386/amovs.c
+unix/as.i386/amovi.c
+unix/as.i386/amovl.c
+unix/as.i386/amovr.c
+unix/as.i386/amovd.c
+unix/hlib/mkpkg.sf.I386
+	In an unrelated optimization, the above zero and move procedures
+	were added to AS.  These are written to use calls to the host
+	BZERO and BCOPY functions to zero or copy blocks of memory, taking
+	advantage of the special repeat-string-op instructions provided by
+	the 80386 cpu.  (12/28)
+
+sys/ki/irafks.x
+	In the open-binary-file code, the fprintf debug message was incorrectly
+	passing arg1 rather than arg2 as the file access mode.  (12/29)
+
+unix/boot/mkpkg/tok.c
+	In the $ifeq code, strcmp() would be called with a NULL string pointer
+	if the referenced environment variable was undefined.  (1/2)(1989)
+
+---------------------
+Moved shared library stuff to tucana (Sun-3) over the period 30Dec-2Jan.
+Reworked mkshlib.csh, edsym.c, zzstrt.c etc. for the "a.out" format object
+files used on the Sun-3; these are quite different than the Sys V COFF
+object format used on the 386i.
+
+---------------------
+Moved everything back to the 386i, rebuilt the shared library, and relinked
+the system.  Merged in all recent changes from tucana.  (1/3)
+
+---------------------
+Begin changes to better support layered external software.  (1/28)
+
+unix/os/zgtenv.c
+sys/etc/environ.x
+sys/etc/envgets.x
+	ZGTENV, ENVFIND, and ENVGETS were changed to make it possible to
+	discriminate between undefined environment variables, and variables
+	that have a null string value.  ERR is returned if the variable does
+	not exist; 0 if exists but has a null value.  Since most programs
+	do a <= 0 test to check for valid environment definitions, this should
+	be a fairly safe change, although some programs may be affected
+	(i.e., any program that only does an == 0 test).  (1/28)
+
+sys/libc/cenvget.c
+pkg/cl/builtin.c
+	Minor changes to allow for null valued environment variables.  (1/28)
+
+sys/fio/vfntrans.x
+	Added a new feature to virtual filename translation, to provide general
+	environment symbol replacement during translation.  This was needed to
+	support multiple architectures, e.g., different version of the PKG and
+	LIB directories, but it is a general facility which will be useful
+	for multiple versions of other types of directories and files as well.
+
+	For example, one might make the following definitions:
+
+		set arch = ""
+		set bin = iraf$bin(arch)/
+		set lib = iraf$lib(arch)/
+
+	Which become iraf$bin/ and iraf$lib/ by default.  If arch is defined
+	as, for example, ".ffpa", then we have iraf$bin.ffpa/ and likewise
+	for lib.  The default case, where arch is the null string, is what
+	required the revisions discussed earlier.  (1/28)
+
+-----------------
+The following revisions were made all together over a period of a couple
+of weeks and summarized on 2/21.
+
+pkg/system/help/helpdb.x
+pkg/system/help/helpdir.x
+pkg/system/help/modlist.x
+pkg/system/help/modtemp.x
+pkg/system/help/prdir.x
+pkg/system/help/prfile.x
+pkg/system/help/prhlpblk.x
+pkg/system/help/prsummary.x
+pkg/system/help/t_help.x
+pkg/system/help/tlist.x
+pkg/system/mkhelpdb.par
+	1. The compiled help database files are now stored externally in a
+	machine independent format.
+
+	2. HELP now permits multiple compiled help database files.  The
+	parameter / environment variable `helpdb' is now a file template
+	(e.g., a comma delimited list of files) specifying the helpdb files
+	to be combined to produce the composite help database to be used
+	at runtime.  HELP takes a little longer to respond the first time
+	while it is reading and combining all the files, but once the
+	composite database has been generated in-core all is as it was before.
+	If any of the helpdb files are modified, or if new files are added,
+	the incore composite database is automatically regenerated.
+
+	It is still necessary that all package names be unique; this
+	restriction will be removed in a future implementation but it is
+	too difficult to fix in the current program.
+
+dev/help.db -
+lib/helpdb.mip +
+	The old core sytem help database file dev$help.db has been deleted
+	and replaced by the new machine independent file lib$helpdb.mip,
+	which now contains only entries for core system help modules.
+	Each external layered package (noao, local, stsdas, etc.) will
+	have its own lib/helpdb.mip.
+	
+mkpkg
+	1. All references to the noao and local packages have been removed
+	from the root mkpkg file.  Layered packages are maintained
+	independently of the core system and separate mkpkg sysgens,
+	etc, are required for each package.
+	2. The `stripall' entry has been deleted leaving only `mkpkg strip'
+	for stripping the system.
+
+noao/README
+	Completely new README for the reorganized NOAO package.
+
+noao/bin +
+noao/bin.i386 +
+	NOAO now has its own BIN directory.  For Sun/IRAF, `bin' is a
+	symbolic link to the bin directory for the architecture for which
+	the system is currently configured, bin.i386 on my development
+	system.
+
+noao/lib/helpdb.mip +		compiled help database
+noao/lib/mkpkg.inc +		global mkpkg definitions for noao
+noao/lib/mkpkg.sf.I386 +	special file lists for various architectures
+noao/lib/mkpkg.sf.SUN3 +		"
+noao/lib/mkpkg.sf.SUN4 +		"
+noao/lib/root.hd +		root help directory for the noao packages
+noao/lib/strip.noao +		stripper file for the noao directories
+
+	The above files were added to noao$lib, the global library for the
+	NOAO packages.  All files are maintained in a machine independent
+	format and may be included in distributions.  Files like the mkpkg.*
+	include machine dependent information but are easily modified or
+	extended to support new architectures - there is no better way,
+	one must have things like special file lists for different
+	architectures (if there isn't one, as in a new port, the application
+	will still sysgen but there is a real possibility of undetected
+	compiler bugs).
+
+	The helpdb.mip is machine independent as well, and should be generated
+	by the developers of an exportable package, and included in the
+	distribution.  The ".mip" extension tells the HSI utilities such as
+	WTAR that it is a machine independent file and can be included in
+	"source only" archives.  It can be generated under V2.8 with a command
+	such as
+
+	    cl> mkhelpdb helpdir=noao$lib/root.hd helpdb=noao$lib/helpdb.mip
+
+	By default, MKHELPDB will generate the core system help database.
+
+noao/mkpkg
+	Added a `mkpkg strip' entry.  Other entries will need to be added
+	in the future to support multiple architecture switching for Sun/IRAF.
+
+noao/noao.cl
+	Added the following lines to the noao.cl file:
+
+		set	noaobin = "noao$bin(arch)/"
+		package	noao, bin = noaobin$
+
+	The bin= argument to package is required to tell the CL that noao
+	has its own bin directory and is discussed below.  The `noaobin'
+	definition permits user redefinition of the noao BIN directory,
+	as well as specification of the architecture for all packages
+	via the environment variable `arch', which is defined in terms
+	of `mach', which defines the machine architecture.
+
+pkg/cl/bkg.c
+pkg/cl/builtin.c
+pkg/cl/exec.c
+pkg/cl/main.c
+pkg/cl/prcache.c
+pkg/cl/task.c
+pkg/cl/task.h
+	The CL was modified to generalize the BIN directory scheme.  Formerly
+	executables could be stored either in the package directory or in BIN.
+	The same is true now except that there can be multiple BIN directories.
+	By default bin is iraf$bin/.  This may be overridden for a package by
+	specifying the package bin directory with a bin=bindir argument to
+	the PACKAGE directive (see example above).  The new bin will be used
+	for the referenced package and all subpackages of that package, unless
+	overridden by another PACKAGE directive.  Note that no bin-path
+	searching is involved; the CL never has more than two directories to
+	look in for a given executable, since every package has a well defined,
+	unique BIN directory.
+
+sys/etc/envgets.x
+sys/etc/environ.h
+sys/etc/environ.x
+sys/etc/envscan.x
+	1. ENVFIND will now return ERR if the named variable does not exist,
+	and a string length of zero if the variable exists but has a null
+	string value.
+	2. ENVSCAN now permits newline to be escaped in the value field,
+	permitting arbitrarily long value strings.  Leading whitespace is
+	discarded in each continuation line, allowing continuation text to
+	be left justified at any arbitrary column for readibility.
+	3. ENVSCAN recognizes both SET and RESET.
+	4. ENVSCAN now supports the "set @filename" syntax for inclusion
+	of other files containing set environment definitions.  All non
+	set or reset statements are ignored.
+	5. The max size value string is increased to 512 chars.
+
+	All of these changes hold also for the HSI version of ENVSCAN
+	(see the bootlib.envinit.c notes below).
+
+sys/fio/vfntrans.x
+	General environment variable replacement is now supported within
+	virtual filenames via the syntax "(envvar)", which is replaced
+	by the value of the named environment variable "envvar".  This is
+	different from logical directory replacement which replaces
+	everything to the left of the $.  (Perhaps we should have simply
+	used the unix symbol replacement syntax in the first place, but
+	it is too late to change now).  For example,
+
+		set mach = f68881
+		set arch = .(mach)
+		set bin = iraf$bin(arch)/
+
+	This point of this facility is that it allows any field of a filename
+	to be parameterized with an environment variable.  If the named
+	variable does not exist the null string is used.
+
+sys/imio/iki/ikiopen.x
+sys/libc/cenvget.c
+	Replaced an "envfind() == 0" by "envfind() <= 0" to reflect the fact
+	that ENVFIND can now return a negative value.
+
+unix/boot/bootlib/mkpkg
+unix/boot/bootlib/bootlib.h
+unix/boot/bootlib/osfn2vfn.c
+unix/boot/bootlib/vfn2osfn.c
+	The UNIX/IRAF HSI has been modified to use VOS filename mapping,
+	to facilitate use of the zzsetenv.def and extern.pkg logical directory
+	definitions, as well as all the other semantics of general filename
+	mapping.  Note that this requires use of libsys.a (etc.), but it
+	was done in such a way that if the library does not exist, bootstrap
+	filename mapping is used.  VOS filename mapping is used only if the
+	environment variable NOVOS is not defined at HSI bootstrap time; this
+	variable is defined in the file hlib$irafuser.csh which is assumed
+	to be referenced at login time by the account of whoever is doing
+	the bootstrap (normally user iraf).
+
+	A true bootstrap is performed with VOS filename mapping disabled,
+	and then repeated once a sysgen has been performed to generate the
+	VOS system libraries.  The HSI bootstrap filename mapping facilites
+	are adequate to compile the VOS but do not support external layered
+	packages.
+
+unix/boot/bootlib/envinit.c
+	This routine is used by the HSI to read the zzsetenv.def file.
+	This cannot be done with the VOS, even when VOS filename mapping
+	is in use, because the VOS routine envscan uses FIO (the filename
+	mapping primitives are much lower level, being layered on the kernel).
+	I made all the same changes as for ENVSCAN above, so that the
+	environment variables defined in hlib$extern.pkg will be defined
+	in the HSI.
+
+unix/boot/bootlib/osfpathname.c
+	1. Modified to avoid the null filename bug that appeared in VMS/IRAF
+	long ago (VMS/IRAF also uses VOS filename mapping).
+	2. Fixed a second bug that would probably only affect UNIX/IRAF.
+	The filename ".." was not being mapped properly on UNIX/IRAF, whereas
+	it worked fine on VMS/IRAF.  This was because on UNIX/IRAF the call
+	to vfn2osfn to translate the ".." to the pathname of the previous
+	directory, whereas on VMS/IRAF all it would do is pass it on, to be
+	used in the later call to ZFSUBD.
+
+unix/boot/bootlib/ossysfile.c
+	Added support for an applications defined system library search path,
+	e.g., for XC command line -llib library references, or <file.h> global
+	include file references.  LIB, HLIB, and any other system libraries
+	are searched first, followed by any package libraries as specified
+	by the environment variable `pkglibs'.  The latter is defined in
+	extern.pkg and this mechanism is intended as a way of extending the
+	global library mechanism to support applications libraries.  There is
+	a flaw - a search path opens the possibility of file name collisions,
+	resulting in the wrong file being used.  At least this will be obvious
+	if it occurs, and the search path is the simplest mechanism in this
+	case.
+
+	This HSI level library search path mechanism should not be confused
+	with the IRAFULIB facility used in UNIX/IRAF.  Any IRAFULIB directories
+	are searched *before* the system libraries, allowing custom versions
+	of system library files for testing or development purposes.  In the
+	case of the `pkglibs' the system libraries are searched first, with the
+	full search order being the IRAFULIBs, followed by the system libraries
+	(LIB, HLIB, and also BIN, bin.`mach` etc. for Sun/IRAF), and lastly
+	the package libraries in the order in which they appear in pkglibs.
+	There should be minimal execution time penalty from adding pkglibs
+	searching, since most global file references will be satisfied early
+	in the search by a system library.
+
+unix/boot/bootlib/osgetenv.c
+	Added VOS and NOVOS cases.  The VOS case calls ENVFIND to lookup
+	environment names.  This is required to make the environment used
+	for VOS filename mapping available in the HSI utilities, e.g.,
+	in mkpkg.
+
+unix/boot/mkpkg/mkpkg
+unix/boot/generic/mkpkg.sh
+unix/boot/mkpkg/mkpkg.sh
+unix/boot/rmbin/mkpkg.sh
+unix/boot/rmfiles/mkpkg.sh
+unix/boot/rtar/mkpkg.sh
+unix/boot/spp/mkpkg.sh
+unix/boot/spp/mkxc.sh
+unix/boot/spp/xpp/mkpkg.sh
+unix/boot/wtar/mkpkg.sh
+	All these files had to be modified to parameterize the list of
+	libraries to be used to link HSI executables.  Formerly libboot
+	and libos were being referenced explicitly, but now that the HSI
+	can be linked either VOS or NOVOS, the list can also include
+	libsys and libvops.  The parameter is the unix environment variable
+	HSI_LIBS defined in hlib$irafuser.csh.
+
+unix/hlib/clpackage.cl
+unix/hlib/clpackage.hd
+	Removed all references to local, noao, and stsdas.  External packages
+	now have their own root help directories and help database files, so
+	no entry in the clpackage.hd is required.  The external packages are
+	picked up by clpackage.cl by the following statements:
+
+		# Define the external (user-configurable) packages.
+		cl < hlib$extern.pkg
+
+	which executes the TASK statements in the extern.pkg to define the
+	external packages.  The environment variables in extern.pkg will
+	already have been defined by the zzsetenv.def @extern.pkg include,
+	so they are reset harmlessly when extern.pkg is reinterpreted by
+	the CL.
+
+unix/hlib/extern.pkg +
+unix/hlib/zzsetenv.def
+	1. Removed all references to noao, local, and stsdas from zzsetenv.def,
+	replacing these by the statement
+
+		set @hlib$extern.pkg
+
+	which includes set (actually reset) statements defining the root
+	directory of each external package.
+
+	For HELP, deleted the entries for helpdir and helpdb.  The helpdir
+	environment variable is no longer used, and helpdb has been moved
+	to extern.pkg.
+
+	2. Added the file hlib$extern.pkg, which is the sole link between the
+	core system and external packages.  To install an external package,
+	ALL that should be required is to make an entry in this file, after
+	reading the files onto disk (a mkpkg at the package root will also
+	be required if the package is distributed in source only form).
+	To deinstall a package, all one need do is comment out or delete
+	the related entries in extern.pkg, and backup and delete the external
+	package directory tree.  The core iraf system can be updated without
+	affecting external packages.
+
+	These things are possible ONLY if we strictly localize package files
+	to package trees, i.e., do not install library files and executables
+	from an external package in core system directories, do not rebuild
+	a central help database file, etc.  A further major advantage for
+	NOAO is that we can easily maintain private LOCAL packages, have
+	STSDAS on disk for our users, etc., without making modifications to
+	our export systems which would affect our distribution tapes.
+	By localizing the changes required to interface an external package
+	to a single file, we need only replace that one file to make a
+	distribution tape from one of our master systems.
+
+	For software maintenance purposes, developers should assume that ONLY
+	the root directory of their package tree is globally defined in the
+	HSI, and use only references such as "noao$lib/", "-llib", or
+	"<file.h>" in their applications (any VOS pathname relative to the
+	package root is acceptable).  Note that a package global library
+	may be set up by adding the path of the library directory (e.g.,
+	"noao$lib/") to the `pkglibs' entry in the extern.pkg.
+
+	Additional logical directories may be defined in the global package
+	mkpkg.inc and used in mkpkg files, but these logical directory names
+	will not be propagated to XC hence cannot be used in include file
+	references etc.  Additional environment variables could in principle
+	be added to the entry for the package in the extern.pkg, but I would
+	like to keep the interface as small as possible, localizing all
+	package information in the package itself as far as possible.
+
+	VMS/IRAF users should note that since XC executes in the context of
+	MKPKG in VMS/IRAF, mkpkg definitions may be propagated to XC (I
+	haven't tested this), but to make use of this side effect of how XC
+	is implemented in VMS/IRAF would be nonportable.
+
+unix/hlib/gripes.cl
+unix/hlib/gripesfile-
+	Commented out the code which appends gripes to the gripesfile, and
+	deleted the gripesfile.  We will use only electronic mail to enter
+	gripes from here on.
+
+unix/hlib/irafuser.csh
+	1. Added NOVOS and HSI_LIBS entries to define whether or not VOS file
+	name mapping is to be used in the HSI, and to list the libraries
+	to be searched to link HSI executables.  If libsys.a does not exist
+	NOVOS is automatically set, hence bootstrapping UNIX/IRAF on a source
+	only system will automatically generate the HSI without the VOS.
+	Redoing the bootstrap once the VOS is compiled will cause the HSI
+	to be rebuilt with VOS filename mapping, as may be required to compile
+	any external packages (the core system does not require VOS filename
+	mapping in the HSI).
+
+	2. Added a couple of utility command aliases.  `mkv' runs mkpkg with
+	the link flags set in such a way that the resultant executable has
+	symbols for the transfer vector entries.  This is necessary to be
+	able to see what VOS routines are being called from an application
+	when debugging (otherwise one sees an offset from vshlib_).  Perhaps
+	I should make this the default on our development system, even though
+	it almost doubles the size of the symbol table in each executable.
+
+	A second utility definition `mkz' runs mkpkg, linking without the
+	shared library (like xc -z).  These name may change but they should
+	serve to illustrate how to use the linker options for debugging.
+
+unix/hlib/libc/knames.h
+	Made several new entries.
+
+unix/hlib/login.cl
+	Added commented out commands to load the `noao' and `tv' packages.
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.I386
+unix/hlib/mkpkg.sf.OS4
+unix/hlib/mkpkg.sf.S34
+unix/hlib/mkpkg.sf.SUN3
+	1. In the mkpkg.inc, changed the FPU definition to MACH, since FPU
+	is too restrictive a name for what we use this switch for; MACH for
+	machine architecture comes closer.  Possible values of MACH are
+	f68881, ffpa etc. for Sun-3 hardware options, sparc for the Sun-4,
+	i386 for the Sun-386, vax for the VAX, and so on.  This switch is
+	used to select default compile and link flags, determine which
+	special file list to load, etc., allowing the generation of relatively
+	machine independent mkpkg definition files.
+
+unix/hlib/strip.iraf
+	1. Changed the name from stripper to strip.iraf (strip.noao etc. for
+	other packages.).  Deleted the stripall since I have never been happy
+	with what that level of stripping anyhow.  Still need to review the
+	action of the strip file to ensure that everything that can be deleted
+	is being deleted, to add something to strip executables on unix
+	systems, and so on.
+	2. Deleted all entries for the noao and local packages.  These packages
+	now have their own strip files.
+
+unix/os/zfacss.c
+	Modified to test for the null filename and return NO in that case.
+
+unix/os/zgtenv.c
+	Will now return ERR for a undefined variable, and 0 for a defined
+	variable with a null string value.
+
+unix/os/zmain.c
+unix/os/zshlib.c		[DEBUGGING POINTER]
+unix/os/zzstrt.c
+	Added a new command line switch "-w" to the zmain.  Currently this is
+	only used in Sun/IRAF.  Specifying -w causes the shared image text to
+	be mapped with write permission, allowing breakpoints to be set in
+	VOS routines.  This cannot be done by default because one has to
+	reserve swap space for the entire shared image text segment in order
+	to have write (copy on modify) permission.
+
+unix/shlib/mkpkg
+	Fixed a bug in the code used to delete old versions of the S.e shared
+	image files in BIN.
+
+--------- (end of accumulated notes) ------------

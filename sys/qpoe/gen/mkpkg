@@ -6,13 +6,14 @@ $checkin  libex.a lib$
 $exit
 
 libex.a:
-	qpaddb.x	
-	qpaddc.x	
-	qpaddd.x	
-	qpaddi.x	
-	qpaddl.x	
-	qpaddr.x	
-	qpadds.x	
+	qpaddb.x	../qpoe.h
+	qpaddc.x	../qpoe.h
+	qpaddd.x	../qpoe.h
+	qpaddi.x	../qpoe.h
+	qpaddl.x	../qpoe.h
+	qpaddr.x	../qpoe.h
+	qpadds.x	../qpoe.h
+	qpaddx.x	../qpoe.h
 	qpexcoded.x	../qpex.h <mach.h>
 	qpexcodei.x	../qpex.h <mach.h>
 	qpexcoder.x	../qpex.h <mach.h>

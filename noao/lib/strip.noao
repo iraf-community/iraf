@@ -1,17 +1,17 @@
 # STRIP.NOAO -- Rmfiles command script, used to strip the NOAO directories
 # of all files not required for ordinary runtime use of the system.
 
-artdata		-allbut .hlp .hd .men .cl .par .key .dat .mip
-astrometry	-allbut .hlp .hd .men .cl .par .key .dat .mip
-astutil		-allbut .hlp .hd .men .cl .par .key .dat .mip
-digiphot	-allbut .hlp .hd .men .cl .par .key .dat .mip
-filterphot	-allbut .hlp .hd .men .cl .par .key .dat .mip
-focas		-allbut .hlp .hd .men .cl .par .key .dat .mip
-imred		-allbut .hlp .hd .men .cl .par .key .dat .mip
-mtlocal		-allbut .hlp .hd .men .cl .par .key .dat .mip
-proto		-allbut .hlp .hd .men .cl .par .key .dat .mip
-surfphot	-allbut .hlp .hd .men .cl .par .key .dat .mip
-twodspec	-allbut .hlp .hd .men .cl .par .key .dat .mip
+artdata		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+astrometry	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+astutil		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+digiphot	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+filterphot	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+focas		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+imred		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+mtlocal		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+proto		-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+surfphot	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
+twodspec	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 
 onedspec/doc/sys -all
 filterphot	-only .hlp
@@ -24,5 +24,7 @@ filterphot	-only .hlp
 
 # Sun/IRAF only.
 # ---------------
--file bin.68881/OBJS.arc
--file bin.ffpa/OBJS.arc
+-file bin.f68881/OBJS.arc.Z
+-file bin.ffpa/OBJS.arc.Z
+-file bin.sparc/OBJS.arc.Z
+-file bin.i386/OBJS.arc.Z

@@ -86,7 +86,7 @@ char	*irafdir;		/* iraf root directory		*/
 		printf ("OS command overflow; cannot compile files\n");
 		fflush (stdout);
 		exit_status = ERR;
-		return;
+		return (exit_status);
 	    }
 
 	    if (verbose) {
@@ -149,7 +149,7 @@ char	*irafdir;		/* iraf root directory		*/
 		    library);
 		fflush (stdout);
 		exit_status = ERR;
-		return;
+		return (exit_status);
 	    }
 
 	    if (verbose) {

@@ -1,5 +1,102 @@
 .help revisions Jun88 pkg.images
 .nf
+pkg$images
+    Added world coordinate system support to the following tasks: imshift,
+    shiftlines, magnify, imtranspose, blkrep, blkavg, rotate, imlintran,
+    register and geotran. The only limitation is that register and geotran
+    will only support simple linear transformations. 
+    (2/24/90 Davis)
+    
+pkg$images/geometry/geotimtran.x
+    Fixed a problem in the boundary extension "reflect" option code for small
+    images which was causing odd values to be inserted at the edges of the
+    image.
+    (2/14/90 Davis)
+
+pkg$images/iminfo/imhistogram.x
+    A new parameter "hist_type" was added to the imhistogram task giving
+    the user the option of plotting the integral, first derivative and
+    second derivative of the histogram as well as the normal histogram.
+    Code was contributed by Rob Seaman.
+    (2/2/90 Davis)
+
+pkg$images/geometry/geogmap.x
+    The path name of the help file was being erroneously renamed with
+    the result that when users ran the double precision version of the
+    code they could not find the help file.
+    (26/1/90 Davis)
+
+pkg$images/filters/t_boxcar.x,t_convolve.x
+    Added some checks for 1-D images.
+    (1/20/90 Davis)
+
+pkg$images/iminfo/t_imstat.x,imstat.h
+    Made several minor bug fixes and alterations in the imstatistics task
+    in response to user complaints and suggestions.
+
+    1. Changed the verbose parameter to the format parameter. If format is
+    "yes" (the default) then the selected fields are printed in fixed format
+    with column labels. Other wise the fields are printed in free format
+    separated by 2 blanks. This fixes the problem of fields running together.
+
+    2. Fixed a bug in the code which estimates the median from the image
+    histogram by linearly interpolating around the midpt of the integrated
+    histogram. The bug occurred when more than half the pixels were in the
+    first bin.
+
+    3. Added a check to ensure that the number of fields did not overflow
+    the fields array.
+
+    4. Removed the extraneous blank line printed after the title.
+
+    5. The pound sign is now printed at the beginning of the column header
+    string regardless of which field is printed first. In the previous
+    versions it was only being printed if the image name field was
+    printed first.
+
+    6. Changed the name of the median field to midpt in response to user
+    confusions about how the median is computed.
+
+    (1/20/90, Davis)
+
+pkg$images/imutil/t_imslice.hlp
+    The imslice was not correctly computing the number of lines in the
+    output image in the case where the slice dimension was 1.
+    (12/4/89, Davis)
+
+pkg$images/doc/imcombine.hlp
+    Clarified and documented definitions of the scale, offset, and weights.
+    (11/30/89, Valdes)
+
+pkg$images/geometry/geotran.x
+    High order surfaces of a certain functional form could occasionally
+    produce out of bounds pixel errors. The bug was caused by not properly
+    computing the distortion of the image boundary for higher order
+    surfaces.
+    (11/21/89, Davis)
+
+pkg$images/geometry/imshift.x
+    The circulating buffer space was not being freed after each execution
+    of IMSHIFT. This did not cause an error in execution but for a long
+    list of frames could result in alot of memory being tied up.
+    (10/25/89, Davis)
+
+pkg$images/imarith/t_imarith.x
+    IMARITH is not prepared to deal with images sections in the output.
+    It used to look for '[' to decide if the output specification included
+    and image section.  This has been changed to call the IMIO procedure
+    imgsection and check if a non-null section string is returned.
+    Thus it is up to IMIO to decide what part of the image name is
+    an image section.  (9/5/89, Valdes)
+
+pkg$images/imarith/imcmode.gx
+    Fixed bug causing infinite loop when computing mode of constant value
+    section.  (8/14/89, Valdes)
+
+====
+V2.8
+====
+
 pkg$images/iminfo/t_imstat.x
     Davis, Jun 15, 1989
     Added a couple of switches to that skew and kurtosis are not computed

@@ -385,7 +385,7 @@ register struct param *pp;
 char	field;
 {
 	char	mode[5];	/* used to turn bits into string	*/
-	struct	operand result;
+	struct	operand result, ojunk;
 	char	buf[20];	/* to stuff the expanded type in	*/
 	char 	*bp;
 	int	bastype;
@@ -736,7 +736,7 @@ char	*pkname, *ltname, *pname;
 		     * positional args cannot work like this since the name
 		     * isn't saved.
 		    query (pp);
-		    popop();  
+		    ojunk = popop();  
 		    pp->p_flags |= P_OK;
 		     */
 		}

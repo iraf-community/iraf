@@ -59,6 +59,7 @@
 #define	RWXR_XR_X	0755
 #define	SZ_PADBUF	8196
 #define	SYMLINK		2
+#define ctrlcode(c)	((c) >= '\007' && (c) <= '\017')
 
 /* File header structure.  One of these precedes each file on the tape.
  * Each file occupies an integral number of TBLOCK size logical blocks
@@ -555,7 +556,7 @@ struct	fheader *fh;		/* decoded file header		*/
 	    ch = *cp++;
 	    if (ch == '\n')
 		newline_seen++;
-	    else if (!(isprint(ch) || isspace(ch)))
+	    else if (!isprint(ch) && !isspace(ch) && !ctrlcode(ch))
 		break;
 	}
 
@@ -593,7 +594,11 @@ int	type;			/* text, binary, directory	*/
 	    cp = rindex (fname, '/');
 	    if (cp && *(cp+1) == EOS)
 		*cp = EOS;
+#ifdef apollo
+	    os_createdir (fname, mode);	/* compiler doesn't like fd not used */
+#else
 	    fd = os_createdir (fname, mode);
+#endif
 
 	    /* Ignore any error creating directory, as this may just mean
 	     * that the directory already exists.  If the directory does

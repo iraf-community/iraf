@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 
@@ -25,7 +28,7 @@ register struct context *cx;
 	register int	ch, nch;
 	register char	*op;
 	char	name[SZ_FNAME+1], *val;
-	char	lbuf[SZ_LINE+1];
+	char	lbuf[SZ_CMD+1];
 
 	while ((ch = m_rawgetc (cx)) == '$') {
 	    /* Check for the escape sequence "$$" and return the literal $
@@ -51,28 +54,55 @@ register struct context *cx;
 		    *op = EOS;
 		    val = name;
 		    goto push;
-		    break;
+#ifndef apollo
+		    break;	/* domain compiler barfs; should prob be axed */
+#endif
 		}
 	    *op = EOS;
 
 	    /* If the symbol name is prefixed by a question mark, e.g., $(?sym),
 	     * query for the symbol and read the value from the standard input.
-	     * Otherwise look in the symbol table and then in the environment
-	     * for the named symbol.  If the symbol cannot be found in either
-	     * place push its name and hope for the best.
+	     * If the syntax is "$(@file)" return the contents of the named
+	     * file as the value of the macro reference.  Otherwise look in
+	     * the symbol table and then in the environment for the named
+	     * symbol.  If the symbol cannot be found in either place push
+	     * its name and hope for the best.
 	     */
 	    if (name[0] == '?') {
+		/* Interactive query. */
 		if (cx->fp == stdin) {
 		    warns ("`$(%s)': cannot query in -f stdin mode", name);
 		    val = &name[1];
 		} else {
 		    printf ("%s: ", &name[1]);
 		    fflush (stdout);
-		    if (fgets (lbuf, SZ_LINE, stdin) == NULL)
+		    if (fgets (lbuf, SZ_CMD, stdin) == NULL)
 			strcpy (lbuf, name);
 		    if (val = index (lbuf, '\n'))
 			*val = EOS;
 		    val = lbuf;
+		}
+	    } else if (name[0] == '@') {
+		/* Return contents of a file. */
+		FILE    *fp;
+		int     ch, n;
+
+		if ((fp = fopen (&name[1], "r")) == NULL) {
+		    warns ("`$(%s)': cannot open file", name);
+		    val = &name[1];
+		} else {
+		    for (n=SZ_CMD,op=lbuf; --n >= 0 && (ch=getc(fp)) != EOF; )
+			*op++ = isspace(ch) ? ' ' : ch;
+		    while (op > lbuf) {
+			ch = *(op-1);
+			if (isspace (ch))
+			    --op;
+			else
+			    break;
+		    }
+		    *op = EOS;
+		    val = lbuf;
+		    fclose (fp);
 		}
 
 	    } else if ((val = getsym (name)) == NULL) {

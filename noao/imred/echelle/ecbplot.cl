@@ -16,7 +16,7 @@ begin
 	int	ncur = 1
 
 	file	ifile, ofile, tfile, rfile
-	string	l_images, img, delim, junk
+	string	l_images, img, delim, junk, cur
 	int	naxis, xsiz, ysiz, lo, hi, i
 
 	cache ("sections")

@@ -1,4 +1,4 @@
-.help contour Jun86 plot
+.help contour Mar90 plot
 .ih
 NAME
 contour -- draw a contour plot of an image
@@ -74,6 +74,9 @@ Fill the output viewport regardless of the device aspect ratio?
 A title to be centered above the plot.  The user can specify a title string;
 the default string is the image title.
 .le
+.ls append = no
+Append to an existing plot?
+.le
 .ih
 DESCRIPTION
 Contours are traced, smoothed with splines under tension, and optionally printed
@@ -92,31 +95,50 @@ reduced to the specified resolution.
 No reduction is done if \fBxres\fR and \fByres\fR = 0, if the input image is 
 an image section, or if the image is smaller than \fBxres\fR by \fByres\fR.
 
-If the device viewport is not set by the user, \fIcontour\fR automatically
+If the device viewport (plotting area) is not set by the user,
+\fIcontour\fR automatically
 sets a viewport centered on the output device.  The default value of
 \fBfill=no\fR means the viewport will be adjusted so that equal
 numbers of image pixels in x and y will occupy equal lengths when plotted.
 That is, when \fBfill = no\fR, a unity aspect ratio is enforced, and square 
 images are represented as square plots regardless of the device aspect ratio.
 On devices with non square full device viewports (e.g., the vt640), a 
-square image will appear extended when \fBfill\fR = yes.
+square image will appear extended when \fBfill\fR = yes.  To completely
+fill the device viewport with contour lines, disable perimeter drawing
+and enable fill, and nothing but the coutour map will be drawn.
+
+Contour plots may be overlayed on a displayed image by setting the output
+\fBdevice\fR to "imd" for image display and the contouring parameters
+\fBfill\fR and \fBperimeter\fR to "yes" and "no" respectively. By default
+green contours will be drawn on the image display. Other choices for
+\fBdevice\fR are "imdr", "imb", "imdy", "imdw" amd "imdg" for red, blue,
+yellow, white and green output contours respectively.
 
 .ih
 EXAMPLES
-Draw a contour plot of a 512 square image on the graphics terminal.
+1. Draw a contour plot of a 512 square image on the graphics terminal.
 With the default values for \fBxres\fR and \fByres\fR, the image
 would automatically be block averaged by a factor of 8 in x and y.
 
-	cl> contour crab.5009
+    cl> contour crab.5009
 
-The plot could be output to the plotter as a background job:
+2. The plot could be output to the plotter as a background job:
 
-	cl> contour crab.5009 device=stdplot &
+    cl> contour crab.5009 device=stdplot &
 
-Place a ceiling at an intensity value of 500 to cut out a noise spike.  The
-plot has been moved to the lower left corner of the display.
+3. Place a ceiling at an intensity value of 500 to cut out a noise spike.
+The plot has been moved to the lower left corner of the display.
 
-	cl> cont crab.5009 ceil=500 vx1=.1 vx2=.6 vy1=.1 vy2=.6
+    cl> cont crab.5009 ceil=500 vx1=.1 vx2=.6 vy1=.1 vy2=.6
+
+4. Overlay a contour plot of an image on the same image displayed on the
+display device. Note that the contour parameters \fBfill\fR and \fBperimeter\fR
+must be on and off respectively.
+
+.nf
+    cl> display m51 1
+    cl> cont m51 fill+ per- device=imd
+.fi
 .ih
 TIME REQUIREMENTS
 The time required for \fIcontour\fR depends on the number of coutours
@@ -128,8 +150,15 @@ picture will be plotted more quickly if block averaged rather than
 subsampled.
 .ih
 BUGS
+If block averaging is used the precision with which a contour is drawn
+will be no better than the blocking factor.  For example, if a contour
+map drawn with a block averaging factor of 8 is overlaid on an image of
+a starfield, contours drawn around stars in the field may not appear to
+be centered.  If this is a problem the solution is to increase the plotting
+resolution using the \fIxres\fR and \fIyres\fR parameters.
+
 It should be possible to have list input as well as image section input.
 .ih
 SEE ALSO
-surface
+surface, display, imdkern, imexamine
 .endhelp

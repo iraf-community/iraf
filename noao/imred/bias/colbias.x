@@ -206,7 +206,7 @@ begin
 	call ic_putr (ic, "xmax", real (ylen))
 	if ((interactive == YES) || (interactive == ALWAYSYES)) {
 	    call clgstr ("graphics", graphics, SZ_FNAME)
-	    gp = gopen ("stdgraph", NEW_FILE, STDGRAPH)
+	    gp = gopen (graphics, NEW_FILE, STDGRAPH)
 	    call gt_setr (gt, GTXMIN, 1.)
 	    call gt_setr (gt, GTXMAX, real (ylen))
 	    call icg_fit (ic, gp, "cursor", gt, cv, Memr[ybias], Memr[zbias],

@@ -24,7 +24,7 @@ bool	fnullfile()
 
 begin
 	call smark (sp)
-	call salloc (cmdbuf, SZ_LINE, TY_CHAR)
+	call salloc (cmdbuf, SZ_COMMAND, TY_CHAR)
 	call salloc (osin, SZ_PATHNAME, TY_CHAR)
 	call salloc (osout, SZ_PATHNAME, TY_CHAR)
 	call salloc (oserr, SZ_PATHNAME, TY_CHAR)
@@ -42,7 +42,7 @@ begin
 	    # interpreter.
 		
 	    # Pack command string and get OS versions of the filenames.
-	    call strpak (cmd, Memc[cmdbuf], SZ_LINE)
+	    call strpak (cmd, Memc[cmdbuf], SZ_COMMAND)
 	    if (infile[1] == EOS)
 		call strpak ("", Memc[osin], SZ_PATHNAME)
 	    else

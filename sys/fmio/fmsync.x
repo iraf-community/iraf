@@ -15,7 +15,7 @@ procedure fm_sync (fm)
 pointer	fm			#I FMIO descriptor
 
 pointer	sp, ip, op, dhbuf, pgbuf, pti, dh, ft, pt
-int	maxpages, nbytes, npti, p1, p2, d1, d2, i
+int	maxpages, nbytes, npti, p1, p2, d1, d2, dp, i
 int	szbpage, chan, buflen, status, npte_perpage
 int	fmio_extend()
 long	clktime()
@@ -39,13 +39,27 @@ begin
 	# time to provide maximal separation of the data pages and PT pages,
 	# rendering both as contiguous as possible.
 
+	# Check for page table index overflow (datafile too large).
 	npti = (FM_PTNPTE(fm) + npte_perpage-1) / npte_perpage
-	if (npti > FM_PTILEN(fm))
+	if (npti > FM_PTILEN(fm)) {
 	    call fmio_posterr (fm, SYS_FMPTIOVFL, FM_DFNAME(fm))
+
+	    # Truncate the page table to try to recover the datafile with
+	    # some loss of data.
+
+	    npti = FM_PTILEN(fm)
+	    FM_PTNPTE(fm) = npti * npte_perpage - (npti - FM_PTINPTI(fm))
+	}
+
+	# Allocate the page table pages.
 	for (p1=FM_PTINPTI(fm)+1;  p1 <= npti;  p1=p1+1) {
-	    Memi[FM_PTINDEX(fm)+p1-1] = fmio_extend (fm, PT_LFILE, 1)
-	    FM_PTINPTI(fm) = p1
-	    FM_DHMODIFIED(fm) = YES
+	    dp = fmio_extend (fm, PT_LFILE, 1)
+	    if (dp != ERR) {
+		Memi[FM_PTINDEX(fm)+p1-1] = dp
+		FM_PTINPTI(fm) = p1
+		FM_DHMODIFIED(fm) = YES
+	    } else
+		call fmio_posterr (fm, SYS_FMPTIOVFL, FM_DFNAME(fm))
 	}
 
 	# Update the datafile header area.

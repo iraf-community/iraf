@@ -33,6 +33,7 @@ int	rop			#I rasterop defining operation
 
 int	line_1, line_2, i
 pointer	sp, ufd, xp, yp, oo
+bool	pl_upolygon()
 extern	pl_upolygon()
 errchk	plvalid
 

@@ -7,7 +7,6 @@ include "../lib/fitsky.h"
 include "../lib/radprof.h"
 
 define	HELPFILE	"apphot$radprof/radprof.key"
-define	SHELPFILE	"apphot$radprof/sradprof.key"
 
 # AP_RADPROF -- Procedure to determine radial profiles for a list of objects
 # in a list of images.
@@ -60,12 +59,6 @@ begin
 	# Initialize the sequencing.
 	newlist = NO
 	ltid = 0
-
-	# Print a short header.
-	if (gd != NULL)
-	    call gpagefile (gd, SHELPFILE, "")
-	else if (interactive == YES)
-	    call pagefile (SHELPFILE, "")
 
 	# Loop over the coordinate file.
 	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
@@ -189,9 +182,7 @@ begin
 		    	    sier = apfitsky (ap, im, apstatr (ap, XCENTER),
 			        apstatr (ap, YCENTER), NULL, gd)
 		    	    rier = ap_frprof (ap, im, apstatr (ap, XCENTER),
-			        apstatr (ap, YCENTER), apstatr (ap, SKY_MODE),
-				apstatr (ap, SKY_SIGMA), apstati (ap, NSKY),
-				pier)
+			        apstatr (ap, YCENTER), pier)
 
 			    call aprmark (ap, id, apstati (ap, MKCENTER),
 				apstati (ap, MKSKY), apstati (ap, MKAPERT))
@@ -253,14 +244,14 @@ begin
 
 	    # Verify the critical radprof parameters.
 	    case 'v':
-		call ap_rconfirm (ap)
+		call ap_rconfirm (ap, out, stid)
 
 	     # Fit the center around the current cursor value.
 	     case 'c':
 		if (newcenterbuf == YES)
 		    cier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
-		    cier = aprefitcenter (ap)
+		    cier = aprefitcenter (ap, cier)
 		call aprmark (ap, id, apstati (ap, MKCENTER), NO, NO)
 		call apcplot (ap, stid, cier, gd, apstati (ap, RADPLOTS))
 		if (interactive == YES)
@@ -306,52 +297,20 @@ begin
 	        if (newfit == YES || newbuf == YES || ! fp_equalr (wx,
 		    apstatr (ap, RPXCUR)) || ! fp_equalr (apstatr (ap, RPYCUR),
 		    wy))
-		    rier = ap_frprof (ap, im, wx, wy, apstatr (ap, SKY_MODE),
-		        apstatr (ap, SKY_SIGMA), apstati (ap, NSKY), pier)
+		    rier = ap_frprof (ap, im, wx, wy, pier)
 		if (interactive == YES)
 		    call ap_qprprof (ap, cier, sier, pier, rier)
 		newbuf = NO
 		newfit = NO
 
 	    # Center, fit the sky, and compute magnitudes.
-	    case 'f':
-		if (newcenterbuf == YES)
-		    cier = apfitcenter (ap, im, wx, wy)
-		else if (newcenter == YES)
-		    cier = aprefitcenter (ap)
-	        if (newskybuf == YES || ! fp_equalr (apstatr (ap,
-		    XCENTER), apstatr (ap, SXCUR)) || ! fp_equalr (apstatr (ap,
-		    SYCUR), apstatr (ap, YCENTER)))
-		    sier = apfitsky (ap, im, apstatr (ap, XCENTER),
-		        apstatr (ap, YCENTER), NULL, gd)
-		else if (newsky == YES)
-		    sier = aprefitsky (ap, gd)
-	        if (newbuf == YES || newfit == YES || ! fp_equalr (apstatr (ap,
-		    XCENTER), apstatr (ap, RPXCUR)) || ! fp_equalr (apstatr (ap,
-		    RPYCUR), apstatr (ap, YCENTER)))
-		    rier = ap_frprof (ap, im, apstatr (ap, XCENTER),
-		        apstatr (ap, YCENTER), apstatr (ap, SKY_MODE),
-			apstatr (ap, SKY_SIGMA), apstati (ap, NSKY), pier)
-		call aprmark (ap, id, apstati (ap, MKCENTER), apstati (ap,
-		    MKSKY), apstati (ap, MKAPERT))
-		call ap_rpplot (ap, stid, cier, sier, pier, rier, gd,
-		    apstati (ap, RADPLOTS))
-		if (interactive == YES)
-		    call ap_qprprof (ap, cier, sier, pier, rier)
-		newcenterbuf = NO
-		newcenter = NO
-		newskybuf = NO
-		newsky = NO
-		newbuf = NO
-		newfit = NO
-
 	    # Compute the centers, fit the sky, compute the magnitudes
 	    # and save the results.
-	    case ' ':
+	    case 'f', ' ':
 		if (newcenterbuf == YES)
 		    cier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
-		    cier = aprefitcenter (ap)
+		    cier = aprefitcenter (ap, cier)
 		if (newskybuf == YES || ! fp_equalr (apstatr (ap, XCENTER),
 		    apstatr (ap, SXCUR)) || ! fp_equalr (apstatr (ap, YCENTER),
 		    apstatr (ap, SYCUR)))
@@ -364,8 +323,7 @@ begin
 		    XCENTER), apstatr (ap, RPXCUR)) || ! fp_equalr (apstatr (ap,
 		    YCENTER), apstatr (ap, RPYCUR)))
 		    rier = ap_frprof (ap, im, apstatr (ap, XCENTER),
-		        apstatr (ap, YCENTER), apstatr (ap, SKY_MODE),
-			apstatr (ap, SKY_SIGMA), apstati (ap, NSKY), pier)
+		        apstatr (ap, YCENTER), pier)
 		call aprmark (ap, id, apstati (ap, MKCENTER), apstati (ap,
 		    MKSKY), apstati (ap, MKAPERT))
 		call ap_rpplot (ap, stid, cier, sier, pier, rier, gd,
@@ -373,21 +331,22 @@ begin
 		if (interactive == YES)
 		    call ap_qprprof (ap, cier, sier, pier, rier)
 
-		if (stid == 1)
-		    call ap_param (ap, out, "radprof")
-		if (newlist == YES)
-		    call ap_prprof (ap, out, stid, ltid, cier, sier, pier, rier)
-		else
-		    call ap_prprof (ap, out, stid, 0, cier, sier, pier, rier)
-		call ap_rpplot (ap, stid, cier, sier, pier, rier, mgd, YES)
-		stid = stid + 1
+		newcenterbuf = NO; newcenter = NO
+		newskybuf = NO; newsky = NO
+		newbuf = NO; newfit = NO
 
-		newcenterbuf = NO
-		newcenter = NO
-		newskybuf = NO
-		newsky = NO
-		newbuf = NO
-		newfit = NO
+		if (key == ' ') {
+		    if (stid == 1)
+		        call ap_param (ap, out, "radprof")
+		    if (newlist == YES)
+		        call ap_prprof (ap, out, stid, ltid, cier, sier, pier,
+			    rier)
+		    else
+		        call ap_prprof (ap, out, stid, 0, cier, sier, pier,
+			    rier)
+		    call ap_rpplot (ap, stid, cier, sier, pier, rier, mgd, YES)
+		    stid = stid + 1
+		}
 
 	    default:
 		# do nothing

@@ -1228,6 +1228,7 @@ end_code()
 	fputs ("save\n", yyout);
 
 	/* Output data statements to initialize character strings, followed
+	 * by any runtime procedure entry initialization statments, followed
 	 * by the spooled text in the output buffer, followed by the END.
 	 * Clear the string and output buffers.  Any user data statements
 	 * will already have been moved into the output buffer, and they
@@ -1236,6 +1237,7 @@ end_code()
 	 * are not permitted in the procedure body.
 	 */
 	init_strings();
+	d_runtime (yyout);
 	*op++ = EOS;
 	fputs (obuf, yyout);
 	fputs ("end\n", yyout);

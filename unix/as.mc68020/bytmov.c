@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #define	import_spp
 #define import_knames
 #include <iraf.h>
@@ -15,5 +18,6 @@ XCHAR	*b;			/* output byte array			*/
 XINT	*boff;			/* first byte in B to be written	*/
 XINT	*nbytes;		/* number of bytes to move		*/
 {
-	bcopy ((char *)a + (*aoff-1), (char *)b + (*boff-1), *nbytes);
+	if (a + *aoff != b + *boff)
+	    bcopy ((char *)a + (*aoff-1), (char *)b + (*boff-1), *nbytes);
 }

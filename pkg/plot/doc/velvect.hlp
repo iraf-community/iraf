@@ -34,12 +34,14 @@ is proportional to the strength of the field at that location and the direction
 of the arrow indicates the direction of the flow at that location.  The
 two images \fIuimage\fR and \fIvimage\fR contain the velocity field to be
 plotted.  The vector at the point (i,j) has:
-.nf
 
-	magnitude =  sqrt (uimage(i,j)**2 + vimage(i,j)**2)
-	direction = atan2 (vimage(i,j), uimage(i,j))
+.nf
+    magnitude = sqrt (uimage(i,j)**2 + vimage(i,j)**2)
+    direction = atan2 (vimage(i,j), uimage(i,j))
 .fi
 .ih
 EXAMPLES
-	cl> velvect crab.blue crab.red
+1. Make a vector plot from the two images "crab.blue" and "crab.red".
+
+    cl> velvect crab.blue crab.red
 .endhelp

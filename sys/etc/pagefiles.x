@@ -8,14 +8,14 @@ include	<mach.h>
 include	<finfo.h>
 include	<fset.h>
 
-# PAGEFILES.X -- Page through a set of file or files.  This facility is
-# patterned after the UNIX `less' and `more' utilities, in particular, after
-# `less'.  The present program is a bit of a hack as it was coded starting from
-# the original PAGE program, which was much simpler.
+# PAGEFILES.X -- Page through a file or set of files.  Both backwards and
+# forwards traversals of files and file lists are supported, but not
+# (currently) backwards paging of a pipe.
 #
-# TODO: Add upscrolling and the ability to buffer input and scoll backwards on
-# a pipe.  The present program is monolithic and should be restructured if
-# these features are added.
+# This program is a hack as it was coded starting from the original PAGE
+# program, which was much simpler.  TODO: Add upscrolling and the ability
+# to buffer input and scoll backwards on a pipe.  The present program is
+# monolithic and should be restructured if these features are added.
 
 define	CC_PREFIX	'^'
 define	MAKE_PRINTABLE	($1+'A'-1)
@@ -23,6 +23,8 @@ define	SZ_QUERYMSG	80
 define	SZ_KEYSTR	80
 define	LNO_MAXLINES	2048
 define	SZ_LONGLINE	1024
+define	MAX_PAGE	100
+define	MAX_PBCMD	100
 define	UKEYS		"ukey"		# CL parameter for keyboard input
 
 # Command keystrokes.
@@ -248,23 +250,25 @@ bool	redirin			# reading from the standard input
 int	spoolfd			# fd if spooling output in a file
 
 char	patbuf[SZ_LINE]
-bool	ateof, first_call, redirout, pushback
+int	nlines, ncols, maxlines, maxcols
 long	fi[LEN_FINFO], nchars, totchars, loffset
 pointer	sp, lbuf, prompt, token, cmdbuf, ip, op, lp
-int	nlines, ncols, maxlines, maxcols
-int	fd, lineno, linelen, nleft, destline, toklen
-int	o_loffset, o_nchars, o_lineno, junk, page, cmd, ch, n
+long	pgoff[MAX_PAGE], pgnch[MAX_PAGE], pglno[MAX_PAGE]
+int	fd, lineno, linelen, nleft, destline, toklen, lnout, i
+bool	ateof, first_call, redirout, pushback, upline, upline_ok
+int	o_loffset, o_nchars, o_lineno, o_pageno, junk, pageno, cmd, ch, n
 
 long	note()
-bool	streq()
 pointer	lno_open()
-int	pg_getcmd(), ctoi(), strncmp(), patmake(), patmatch()
+bool	streq(), ttygetb()
+int	pg_getcmd(), ctoi(), strncmp(), patmake(), patmatch(), pg_peekcmd()
 int	open(), finfo(), strlen(), pg_getline(), getci(), lno_fetch(), fstati()
 data	first_call /true/
 
 define	err_ 91
-define	search_ 92
-define	destline_ 93
+define	quit_ 92
+define	search_ 93
+define	destline_ 94
 
 begin
 	call smark (sp)
@@ -286,6 +290,8 @@ begin
 	maxcols  = ncols
 
 	redirout = (fstati (STDOUT, F_REDIR) == YES)
+	upline_ok = (!redirout && ttygetb(tty,"cm") && ttygetb(tty,"al"))
+	call pg_pushcmd (NULL)
 
 	# Get file size for (xx%) info in nomore.  If reading from the
 	# standard input, file size is not known.
@@ -329,16 +335,34 @@ begin
 	# count it.  This is necessary to count pages correctly whether or not
 	# the first page is preceeded by a FF.
 
+	pageno = 1
+	lineno = 1
+	pgoff[1] = BOF
+	pgnch[1] = nchars
+	pglno[1] = lineno
+
 	if (first_page > 1) {
 	    junk = getci (fd, ch)
-	    for (page=1;  page < first_page;  page=page+1)
-		while (getci (fd, ch) != '\f')
+	    nchars = nchars + 1
+
+	    while (pageno < first_page) {
+		while (getci (fd, ch) != '\f') {
+		    nchars = nchars + 1
+		    if (ch == '\n')
+			lineno = lineno + 1
 		    if (ch == EOF) {
 			call close (fd)
 			call lno_close (lp)
 			call sfree (sp)
 			return
 		    }
+		}
+		pageno = pageno + 1
+		nchars = nchars + 1
+		pgoff[pageno] = note (fd)
+		pgnch[pageno] = nchars
+		pglno[pageno] = lineno
+	    }
 	}
 
 	# Always clear the screen between files; the "clear_screen" param
@@ -355,7 +379,7 @@ begin
 	pushback= false
 	ateof	= false
 	nleft	= maxlines	# nlines left to display before prompt
-	lineno	= 0		# line number within file
+	lnout   = 0
 
 	repeat {
 	    # Fetch and display the next line of the file.
@@ -387,6 +411,10 @@ begin
 		# yet written anything on the screen (nleft=maxlines) don't
 		# bother to prompt again.
 
+		pageno = pageno + 1
+		pgoff[pageno] = loffset
+		pglno[pageno] = lineno
+		pgnch[pageno] = nchars
 		call ungetline (fd, Memc[lbuf+1])
 		pushback = true
 
@@ -400,18 +428,52 @@ begin
 		# Keep track of position in file for %done message in prompt,
 		# and of position on screen so that we know when to prompt.
 
+		call lno_save (lp, lineno, loffset, nchars)
 		linelen = strlen (Memc[lbuf])
 		nchars  = nchars + linelen
-		nleft   = nleft - max (1, ((linelen-1 + maxcols-1) / maxcols))
 		lineno  = lineno + 1
+
+		# Count the number of printed columns in the output text.
+		n = 1
+		do i = 1, linelen
+		    if (ch >= ' ')
+			n = n + 1
+		    else if (ch == '\t') {
+			n = n + 1
+			while (mod (n-1, 8) != 0)
+			    n = n + 1
+		    }
+
+		# Decrement lines left on screen.
+		nleft = nleft - max (1, ((n + maxcols-1) / maxcols))
 
 		if (spoolfd != NULL)
 		    call putline (spoolfd, Memc[lbuf])
-		call ttyputline (STDOUT, tty, Memc[lbuf], map_cc)
-		call lno_save (lp, lineno, loffset, nchars)
+
+		# Cancel upline if line is too long.
+		if (upline && lnout <= 0 && linelen >= maxcols) {
+		    call ttyclear (STDERR, tty)
+		    call flush (STDERR)
+		    upline = false
+		    lnout = 0
+		}
+
+		if (!(upline && lnout > 0))
+		    call ttyputline (STDOUT, tty, Memc[lbuf], map_cc)
+		lnout = min (maxlines, lnout + 1)
 	    }
 
 	    if (nleft <= 0) {
+		# Move cursor to query line at end of line insert sequence.
+		if (upline) {
+		    # Don't bother if the next command is another insert.
+		    if (pg_peekcmd() != PREV_LINE) {
+			call ttygoto (STDOUT, tty, 1, lnout + 1)
+			call ttyclearln (STDOUT, tty)
+		    }
+		    upline = false
+		}
+
 		# Pause and get next keystroke from the user.
 		cmd = pg_getcmd (tty, Memc[prompt], nchars, totchars, lineno,
 		    fileno, nfiles)
@@ -419,13 +481,108 @@ begin
 		# Allow use of the space bar to advance to the next file,
 		# when at the end of the current file.
 
-		if (ateof && (cmd == BLANK || cmd == FWD_SCREEN))
+		if (ateof && nfiles > 1 && (cmd == BLANK || cmd == FWD_SCREEN))
 		    cmd = NEXT_FILE
 
 		repeat {
 		    switch (cmd) {
-		    case QUIT, NEXT_FILE, PREV_FILE:
-			call close (fd)
+		    case NEXT_FILE:
+			# This really means the next file if multiple files.
+			if (nfiles > 1)
+			    goto quit_
+			else if (pushback) {
+			    cmd = FWD_SCREEN
+			    next
+			}
+
+			# Otherwise we want the next page (formfeed).
+			o_loffset = note (fd)
+			o_nchars  = nchars
+			o_lineno  = lineno
+
+			repeat {
+			    loffset = note (fd)
+			    n = pg_getline (fd, Memc[lbuf])
+			    if (n == EOF) {
+				if (!redirin) {
+				    call seek (fd, o_loffset)
+				    pushback = false
+				    nchars = o_nchars
+				    lineno = o_lineno
+				    ateof  = false
+				}
+				cmd = pg_getcmd (tty, "No more pages",
+				    nchars,totchars, lineno, fileno,nfiles)
+				Memc[lbuf] = EOS
+				break
+			    }
+
+			    call lno_save (lp, lineno, loffset, nchars)
+
+			    if (Memc[lbuf] == '\f') {
+				pageno = min (MAX_PAGE, pageno + 1)
+				pgoff[pageno] = loffset
+				pgnch[pageno] = nchars
+				pglno[pageno] = lineno
+				if (!redirout) {
+				    call ttyclear (STDERR, tty)
+				    call flush (STDERR)
+				    lnout = 0
+				}
+				call ungetline (fd, Memc[lbuf+1])
+				pushback = true
+				nleft = maxlines
+				break
+			    }
+
+			    nchars = nchars + n
+			    lineno = lineno + 1
+			}
+
+			if (n == EOF)
+			    next
+			else
+			    break
+
+		    case PREV_FILE:
+			# If there are multiple files go to previous file,
+			# otherwise, go to previous page (formfeed).
+
+			if (nfiles > 1)
+			    goto quit_
+			if (redirin)
+			    goto err_
+
+			# Special case - just reached beginning of next
+			# page, but still displaying previous page.
+
+			if (pglno[pageno] == lineno)
+			    pageno = max (1, pageno - 1)
+
+			# If the beginning of the current page is not on
+			# the screen, go back to the beginning of the page.
+
+			if (lineno <= pglno[pageno]+maxlines)
+			    pageno = max (1, pageno - 1)
+
+			# Go there.
+			call seek (fd, pgoff[pageno])
+			nchars = pgnch[pageno]
+			lineno = pglno[pageno]
+			pushback = false
+
+			if (!redirout) {
+			    call ttyclear (STDERR, tty)
+			    call flush (STDERR)
+			    lnout = 0
+			}
+			if (getci (fd, ch) != '\f')
+			    call ungetci (fd, ch)
+			nleft = maxlines
+			break
+
+		    case QUIT:
+quit_			call close (fd)
 			call lno_close (lp)
 			call sfree (sp)
 			return (cmd)
@@ -439,20 +596,23 @@ begin
 			pushback = false
 			Memc[lbuf] = EOS
 			ateof  = false
-			lineno = 0
+			lineno = 1
 			nchars = 0
 			nleft  = maxlines
+			pageno = 1
 
 			if (!redirout) {
 			    call ttyclear (STDERR, tty)
 			    call flush (STDERR)
+			    lnout = 0
 			}
 			break
 
 		    case FWD_SCREEN, BLANK:
-			if (clear_screen == YES && !redirout) {
+			if (!ateof && clear_screen == YES && !redirout) {
 			    call ttyclear (STDERR, tty)
 			    call flush (STDERR)
+			    lnout = 0
 			}
 			nleft = maxlines
 			break
@@ -466,17 +626,23 @@ begin
 		    case SCROLL_UP:
 			if (redirin)
 			    goto err_
-			destline = lineno - ((maxlines + 1) / 2)
+			if (upline_ok) {
+			    destline = lineno - 2
+			    do i = 1, ((maxlines + 1) / 2 - 1)
+				if (lineno - lnout - i > 1)
+				    call pg_pushcmd (PREV_LINE)
+			} else
+			    destline = lineno - ((maxlines + 1) / 2) - 1
 			goto destline_
 		    case BACK_SCREEN:
 			if (redirin)
 			    goto err_
-			destline = lineno - maxlines
+			destline = lineno - maxlines - 1
 			goto destline_
 		    case PREV_LINE:
 			if (redirin)
 			    goto err_
-			destline = lineno - 1
+			destline = lineno - 2
 			goto destline_
 		    case REDRAW:
 			if (redirin)
@@ -522,10 +688,11 @@ begin
 			if (!redirout) {
 			    call ttyclear (STDERR, tty)
 			    call flush (STDERR)
+			    lnout = 0
 			}
 			Memc[lbuf] = EOS
 			nchars = 0
-			lineno = 0
+			lineno = 1
 			nleft  = maxlines
 			break
 
@@ -561,6 +728,7 @@ search_
 			    o_loffset = note (fd)
 			    o_nchars  = nchars
 			    o_lineno  = lineno
+			    o_pageno  = pageno
 
 			    repeat {
 				loffset = note (fd)
@@ -571,28 +739,39 @@ search_
 					pushback = false
 					nchars = o_nchars
 					lineno = o_lineno
+					pageno = o_pageno
 					ateof  = false
 				    }
 				    cmd = pg_getcmd (tty, "Pattern not found",
-					nchars,totchars, lineno, fileno,nfiles)
+					nchars,totchars,lineno,fileno,nfiles)
 				    Memc[lbuf] = EOS
 				    break
 				}
 
-				nchars = nchars + n
-				lineno = lineno + 1
 				call lno_save (lp, lineno, loffset, nchars)
+				if (Memc[lbuf] == '\f') {
+				    pageno = pageno + 1
+				    pgoff[pageno] = loffset
+				    pgnch[pageno] = nchars
+				    pglno[pageno] = lineno
+				}
 
 				if (patmatch (Memc[lbuf], patbuf) > 0) {
 				    if (redirin) {
 					call ungetline (fd, Memc[lbuf])
+					pushback = true
 					nleft = maxlines
 					break
 				    } else {
 					destline = lineno
+					nchars = nchars + n
+					lineno = lineno + 1
 					goto destline_
 				    }
 				}
+
+				nchars = nchars + n
+				lineno = lineno + 1
 			    }
 
 			    if (n == EOF)
@@ -634,45 +813,94 @@ search_
 			    } else if (ctoi (Memc, ip, n) > 0)
 				destline = n
 destline_
+			    # Upscroll one line?
+			    if (upline_ok && destline == lineno-2)
+				upline = true
+
+			    # Determine line at top of new screen.
 			    nleft = maxlines
-			    destline = max (1, destline - nleft + 1)
+			    if (destline < lineno && destline >= lineno-lnout-1)
+				destline = destline - lnout + 1
+			    else
+				destline = destline - nleft + 1
+
+			    # Don't upscroll off the top of the screen.
+			    if (destline < 1) {
+				destline = 1
+				upline = false
+			    }
 
 			    # Look up the desired line offset in the database
 			    # and go directly there if found, otherwise either
 			    # advance forward or rewind the file and advance
 			    # forward to the indicated line.
 
-			    if (lno_fetch (lp,destline,loffset,nchars) == ERR) {
+			    if (lno_fetch(lp,destline,loffset,nchars)==ERR) {
 				if (!redirin && destline < lineno) {
 				    call seek (fd, BOFL)
 				    pushback = false
-				    lineno = 0
+				    lineno = 1
+				    pageno = 1
 				    nchars = 0
 				    ateof  = false
 				    call pg_setprompt (Memc[prompt],
 					u_prompt, fname)
 				}
-				while (lineno < destline-1) {
+
+				while (lineno < destline) {
 				    loffset = note (fd)
 				    n = pg_getline (fd, Memc[lbuf])
 				    if (n == EOF) {
-					destline = lineno + 1	# goto EOF
+					destline = lineno - 1	# goto EOF
 					goto destline_
+				    }
+				    call lno_save (lp, lineno, loffset, nchars)
+				    if (Memc[lbuf] == '\f') {
+					pageno = pageno + 1
+					pgoff[pageno] = loffset
+					pgnch[pageno] = nchars
+					pglno[pageno] = lineno
 				    }
 				    nchars = nchars + n
 				    lineno = lineno + 1
-				    call lno_save (lp, lineno, loffset, nchars)
 				}
 			    } else if (!redirin) {
 				call seek (fd, loffset)
 				pushback = false
-				lineno = destline - 1
+				lineno = destline
 				ateof  = false
+
+				# Determine which page we are in.
+				do i = 2, MAX_PAGE
+				    if (pglno[i] <= 0) {
+					pageno = i - 1
+					break
+				    } else if (pglno[i] >= lineno) {
+					pageno = i
+					break
+				    }
+
 				call pg_setprompt (Memc[prompt],u_prompt,fname)
 			    }
 
+			    # Prepare to draw the screen.  Upline mode means
+			    # we want to insert a line at the top of the screen
+			    # and then skip to the page prompt; otherwise we
+			    # clear the screen and output a full page of text.
+
 			    if (!redirout) {
-				call ttyclear (STDERR, tty)
+				if (upline) {
+				    # Clear screen if backing up over a page.
+				    if (destline+1 == pglno[pageno])
+					call ttyclear (STDERR, tty)
+				    call ttygoto (STDOUT, tty, 1, 1)
+				    call ttyctrl (STDOUT, tty, "al", maxlines)
+				    lnout = 0
+				} else {
+				    call ttyclear (STDERR, tty)
+				    upline = false
+				    lnout = 0
+				}
 				call flush (STDERR)
 			    }
 			    Memc[lbuf] = EOS
@@ -787,12 +1015,21 @@ int	lineno			# current line number
 int	fileno			# current file number
 int	nfiles			# nfiles being paged through
 
-int	key
 char	keystr[SZ_KEYSTR]
-common	/pgucom/ key, keystr
+int	key, pb, pbcmd[MAX_PBCMD]
+common	/pgucom/ key, pb, pbcmd, keystr
 int	clgkey(), fstati()
 
 begin
+	# If any commands have been pushed, return the next pushed command
+	# without generating a query.
+
+	if (pb > 0) {
+	    key = pbcmd[pb]
+	    pb = pb - 1
+	    return (key)
+	}
+
 	# If the standard output is redirected, skip the query and just go on
 	# to the next page.
 
@@ -811,13 +1048,12 @@ begin
 		call eprintf ("-(EOF)")
 	    else {
 		call eprintf ("-(%02d%%)")
-		    call pargi (max (0, min (100,
-			nint (real(nchars) / real(totchars) * 100.0))))
+		    call pargi (max(0, min(99, nchars * 100 / totchars)))
 	    }
 	}
 	if (lineno > 0) {
 	    call eprintf ("-line %d")
-		call pargi (lineno)
+		call pargi (lineno - 1)
 	}
 	if (fileno > 0 && nfiles > 0) {
 	    call eprintf ("-file %d of %d")
@@ -858,10 +1094,46 @@ procedure pg_getstr (strval, maxch)
 char	strval[maxch]		# receives string
 int	maxch
 
-int	key
 char	keystr[SZ_KEYSTR]
-common	/pgucom/ key, keystr
+int	key, pb, pbcmd[MAX_PBCMD]
+common	/pgucom/ key, pb, pbcmd, keystr
 
 begin
 	call strcpy (keystr, strval, maxch)
+end
+
+
+# PG_PUSHCMD -- Push back a command keystroke.
+
+procedure pg_pushcmd (cmd)
+
+int	cmd			#I command to be pushed
+
+char	keystr[SZ_KEYSTR]
+int	key, pb, pbcmd[MAX_PBCMD]
+common	/pgucom/ key, pb, pbcmd, keystr
+
+begin
+	if (cmd <= 0)
+	    pb = 0
+	else {
+	    pb = min (MAX_PBCMD, pb + 1)
+	    pbcmd[pb] = cmd
+	}
+end
+
+
+# PG_PEEKCMD -- Peek at any pushed back command keystroke.
+
+int procedure pg_peekcmd()
+
+char	keystr[SZ_KEYSTR]
+int	key, pb, pbcmd[MAX_PBCMD]
+common	/pgucom/ key, pb, pbcmd, keystr
+
+begin
+	if (pb <= 0)
+	    return (ERR)
+	else
+	    return (pbcmd[pb])
 end

@@ -42,19 +42,16 @@ Coordinates can be printed in either GKI (0 - 32767) or NDC (0.0 - 1.0)
 units.
 .ih
 EXAMPLES
+1. Extract the fourth frame from metacode file "oned.mc" and plot it.
 
-Extract the fourth frame from metacode file "oned.mc" and plot it.
-.nf
-	cl> gkiextract oned.mc 4 | nsppkern
+    cl> gkiextract oned.mc 4 | nsppkern
 
-.fi
-Plot metacode frame "contour.demo" in debug mode, so the plotting instructions
-can be read as they are processed.
-.nf
-	cl> nsppkern contour.demo debug+
+2. Plot metacode frame "contour.demo" in debug mode, so the plotting
+instructions can be read as they are processed.
 
-.fi
+    cl> nsppkern contour.demo debug+
 .ih
 SEE ALSO
 stdgraph, sgikern, calcomp
 .endhelp
+elp

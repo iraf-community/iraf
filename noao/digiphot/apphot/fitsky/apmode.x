@@ -24,7 +24,7 @@ int	nsky_reject	# the number of sky pixels rejected
 double	sumpx, sumsqpx, sumcbpx
 int	i, j, ilo, ihi, il, ih, med
 pointer	sp, wgt 
-real	locut, hicut, sky_mean, sky_med
+real	cut, locut, hicut, sky_mean, sky_med
 int	ap_grow_regions(), apimed()
 real	apsmed(), apwsmed()
 
@@ -58,8 +58,15 @@ begin
 	do i = 1, maxiter {
 
 	    # Compute the new rejection limits.
-	    locut = sky_med - k1 * sky_sigma
-	    hicut = sky_med + k1 * sky_sigma
+	    if (i == 1) {
+	        cut = k1 * sky_sigma# + 0.5 * abs (sky_mode - sky_mean)
+	        locut = sky_med - cut
+	        hicut = sky_med + cut
+	    } else {
+	        cut = k1 * sky_sigma# + 0.5 * abs (sky_mode - sky_mean)
+	        locut = sky_mode - cut
+	        hicut = sky_mode + cut
+	    }
 
 	    # Perform lower bound pixel rejection.
 	    for (il = ilo; il <= nskypix; il = il + 1) {

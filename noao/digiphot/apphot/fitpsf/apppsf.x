@@ -5,7 +5,7 @@ include "../lib/fitpsf.h"
 
 # AP_PPSF -- Procedure to write the results of fitpsf to the output file.
 
-procedure ap_pdtpsf (ap, fd, id, lid, ier)
+procedure ap_ppsf (ap, fd, id, lid, ier)
 
 pointer	ap	# pointer to apphot structure
 int	fd	# output file descriptor

@@ -1,6 +1,6 @@
 image,s,h,,,,Image name
 title,s,h,,,,Image title
-exposure,i,h,,,,Exposure time in seconds
+exposure,r,h,,,,Exposure time in seconds
 oflag,i,h,,,,Spectrum type
 beam,i,h,,,,Beam number
 np1,i,h,,,,First good pixel

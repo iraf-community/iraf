@@ -18,7 +18,8 @@ libpkg.a:
 			../lib/noise.h		../lib/apphot.h
 	aphistplot.x	<gset.h>		<pkg/gtools.h>		\
 			../lib/fitsky.h
-	aplgoad.x	../lib/fitsky.h
+	aplgsky.x	../lib/fitsky.h
+	apmean.x		../lib/fitsky.h
 	apmedian.x	../lib/fitsky.h
 	apmode.x	../lib/fitsky.h
 	appsky.x	../lib/fitsky.h		../lib/apphot.h
@@ -26,8 +27,7 @@ libpkg.a:
 	apreadsky.x
 	aprefitsky.x	../lib/apphotdef.h	../lib/noisedef.h	\
 			../lib/fitskydef.h	../lib/fitsky.h
-	apsconfirm.x	../lib/apphot.h		../lib/noise.h          \
-			../lib/fitsky.h
+	apsconfirm.x	../lib/noise.h		../lib/fitsky.h
 	apserrors.x	../lib/fitsky.h
 	apsfree.x	../lib/apphotdef.h	../lib/fitskydef.h
 	apsinit.x	../lib/apphotdef.h	../lib/fitskydef.h
@@ -39,11 +39,8 @@ libpkg.a:
 			../lib/fitsky.h
 	apskycolon.x	../lib/apphot.h		../lib/fitsky.h         \
 			../lib/display.h	../lib/noise.h
-	apskyphot.x	../lib/fitskydef.h	../lib/fitsky.h         \
-			../lib/apphotdef.h	../lib/apphot.h         \
-			../lib/noise.h
-	apspars.x	../lib/apphot.h		../lib/fitsky.h         \
-			../lib/display.h	../lib/noise.h
+	apsradsetup.x	../lib/display.h	../lib/fitsky.h
+	appspars.x	../lib/display.h
 	apsplot.x	<pkg/gtools.h>		<gset.h>		\
 			../lib/apphot.h		../lib/noise.h          \
 			../lib/fitsky.h		../lib/fitskydef.h	\

@@ -3,14 +3,18 @@
 include	"qpoe.h"
 
 # QP_ASTR -- Set the value of a string parameter, creating the parameter if
-# it does not already exist.  (Additional control over the parameter attributes
-# is possible if the parameter is created before being set).
+# it does not already exist.  This works for the common case of string
+# parameters allocated a fixed amount of space at create time (any type of
+# string parameter can be written into if it already exists).  Additional
+# control over the parameter attributes is possible if the parameter is
+# explicitly created with qp_addf before being written into.
 
-procedure qp_astr (qp, param, value)
+procedure qp_astr (qp, param, value, comment)
 
 pointer	qp			#I QPOE descriptor
 char	param[ARB]		#I parameter name
 char	value[ARB]		#I parameter value
+char	comment[ARB]		#I comment field, if creating parameter
 
 int	nchars
 int	qp_accessf(), strlen()
@@ -24,7 +28,7 @@ begin
 
 	if (qp_accessf (qp, param) == NO) {
 	    nchars = (strlen(value) + INC_STRLEN-1) / INC_STRLEN * INC_STRLEN
-	    call qp_addf (qp, param, TY_CHAR, nchars, "", 0)
+	    call qp_addf (qp, param, "c", nchars, comment, 0)
 	}
 
 	call qp_pstr (qp, param, value)

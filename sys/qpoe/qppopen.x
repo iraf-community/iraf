@@ -23,8 +23,6 @@ int	mode			#I file(param) access mode
 int	type			#I file type, text or binary
 
 pointer	sym
-int	dtype
-
 int	fm_fopen()
 pointer	qp_gpsym()
 errchk	qp_gpsym, qp_addf(), fm_lockout, syserrs
@@ -43,10 +41,9 @@ begin
 	    else {
 		# Create a new parameter.
 		if (type == TEXT_FILE)
-		    dtype = TY_CHAR
+		    call qp_addf (qp, param, "c", 0, "", 0)
 		else
-		    dtype = TY_OPAQUE
-		call qp_addf (qp, param, dtype, 0, "", 0)
+		    call qp_addf (qp, param, "opaque", 0, "", 0)
 		sym = qp_gpsym (qp, param)
 		if (sym == NULL)
 		    call syserrs (SYS_QPUKNPAR, param)

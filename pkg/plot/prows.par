@@ -1,6 +1,6 @@
-image,s,a,,,,Image containing rows to be plotted
-row1,i,a,,1,,First row to average
-row2,i,a,,1,,Last row to average
+image,s,a,,,,image containing rows to be plotted
+row1,i,a,,1,,first row to average
+row2,i,a,,1,,last row to average
 wx1,r,h,0.,,,left user x-coord if not autoscaling
 wx2,r,h,0.,,,right user x-coord if not autoscaling
 wy1,r,h,0.,,,lower user y-coord if not autoscaling

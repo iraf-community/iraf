@@ -27,20 +27,17 @@ a \fBgkidir\fR style line will be printed for each specified frame
 and the user will be queried whether or not to extract the frame.
 .ih
 EXAMPLES
-Extract frames 1, 3 and 5 from metacode file "mc_file" and
-plot them on the upstairs versatec:
-.nf
+1. Extract frames 1, 3 and 5 from metacode file "mc_file" and
+plot them on the device "vup":
 
-	cl> gkiextract mc_file 1,3,5 | stdplot dev=vup
-.fi
+    cl> gkiextract mc_file 1,3,5 | stdplot dev=vup
 
-Print a directory of the first 99 frames in "mc_file", extract
+2. Print a directory of the first 99 frames in "mc_file", extract
 those files requested by the user and write them to file "new_mc_file".
-.nf
 
-	cl> gkiextract mc_file 1-99 ver+ > new_mc_file
-.fi
+    cl> gkiextract mc_file 1-99 ver+ > new_mc_file
 .ih
 SEE ALSO
 gkidir
+.endhelp
 .endhelp

@@ -8,9 +8,24 @@
  * Use osb$zzeps.f to compute the machine epsilon.
  */
 #define	OSOK		0		/* normal successful completion	*/
+
+#ifdef apollo
+#define	LEN_JUMPBUF	60		/* save buffer for ZSVJMP/ZDOJMP  */
+#define	EPSILON		1.19e-7		/* smallest real E s.t. (1.0+E > 1.0) */
+#define EPSILOND	2.22e-16	/* double precision epsilon */
+#else
 #define	LEN_JUMPBUF	16		/* save buffer for ZSVJMP/ZDOJMP  */
 #define	EPSILON		5.97e-8		/* smallest real E s.t. (1.0+E > 1.0) */
 #define EPSILOND	1.39e-17	/* double precision epsilon */
+#endif
+
+/* Apollo:
+ * -cpu,3000 (f68882):   single precision epsilon:  1.0842022E-19
+ * -cpu,3000 (f68882):   double precision epsilon:  1.0842021724855040E-19
+ * -cpu,FPA1 (fpa,soft): single precision epsilon:  1.1920929E-07
+ * -cpu,FPA1 (fpa,soft): double precision epsilon:  2.2204460492503130E-16
+ */
+
 #define	MAX_LONG	2147483647
 #define	FNNODE_CHAR	'!'		/* node name delimiter character */
 
@@ -30,6 +45,7 @@
 #define	SZ_LINE		161
 #define	SZ_FNAME	63
 #define	SZ_PATHNAME	127
+#define	SZ_COMMAND	1024
 #define	EOS		'\0'
 #define	ERR		(-1)
 #define	OK		0

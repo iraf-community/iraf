@@ -5,7 +5,7 @@ include "tvmark.h"
 
 # MK_COLON -- Procedure to process immark colon commands.
 
-procedure mk_colon (mk, cmdstr, im, iw, sim, log, cl, ltid)
+procedure mk_colon (mk, cmdstr, im, iw, sim, log, cl, ltid, dl)
 
 pointer	mk		# pointer to the immark structure
 char	cmdstr[ARB]	# command string
@@ -15,10 +15,11 @@ pointer	sim		# pointer to a scratch image
 int	log		# log file descriptor
 int	cl		# coords file descriptor
 int	ltid		# coords file sequence number
+int	dl		# deletions file descriptor
 
 bool	bval
 real	rval
-pointer	sp, cmd, str, outim
+pointer	sp, cmd, str, outim, deletions, ext
 int	ncmd, mark, font, ival, ip, nchars, wcs_status
 
 real	mk_statr()
@@ -32,6 +33,8 @@ begin
 	call smark (sp)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (deletions, SZ_FNAME, TY_CHAR)
+	call salloc (ext, SZ_FNAME, TY_CHAR)
 
 	# Get the command.
 	ip = 1
@@ -56,6 +59,18 @@ begin
 	    } else {
 		nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE)
 		call mk_sets (mk, OUTIMAGE, Memc[str])
+	    }
+
+	case MKCMD_DELETIONS:
+	    call gargstr (Memc[cmd], SZ_LINE)
+	    call mk_stats (mk, DELETIONS, Memc[str], SZ_FNAME)
+	    if (Memc[cmd] == EOS || streq (Memc[cmd], Memc[str])) {
+		call printf ("%s:  %s\n")
+		    call pargstr (KY_DELETIONS)
+		    call pargstr (Memc[str])
+	    } else {
+		nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE)
+		call mk_sets (mk, DELETIONS, Memc[str])
 	    }
 
 	case MKCMD_SNAP:
@@ -92,18 +107,28 @@ begin
 		nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_LINE)
 		if (cl != NULL) {
 		    call close( cl)
+		    call close (dl)
 		    cl = NULL
+		    dl = NULL
 		}
 		iferr {
 		    if (Memc[str] != EOS) {
 		        iferr (cl = open (Memc[str], READ_WRITE, TEXT_FILE)) {
-			    cl = open (memc[str], NEW_FILE, TEXT_FILE)
+			    cl = open (Memc[str], NEW_FILE, TEXT_FILE)
 			    call close (cl)
-			    cl = open (memc[str], READ_WRITE, TEXT_FILE)
+			    cl = open (Memc[str], READ_WRITE, TEXT_FILE)
+			    call mk_stats (mk, DELETIONS, Memc[ext], SZ_FNAME)
+			    call sprintf (Memc[deletions], SZ_FNAME, "%s.%s")
+				call pargstr (Memc[str])
+			    if (Memc[ext] == EOS)
+				call pargstr ("del")
+			    else
+				call pargstr (Memc[ext])
 			}
 		    }
 		} then {
 		    cl = NULL
+		    dl = NULL
 		    call erract (EA_WARN)
 		    call mk_sets (mk, COORDS, "")
 		} else {
@@ -248,6 +273,15 @@ begin
 		    call pargi (mk_stati (mk, SIZE))
 	    } else
 		call mk_seti (mk, SIZE, ival)
+
+	case MKCMD_TOLERANCE:
+	    call gargr (rval)
+	    if (nscan () == 1) {
+		call printf ("%s = %g\n")
+		    call pargstr (KY_TOLERANCE)
+		    call pargr (mk_statr (mk, TOLERANCE))
+	    } else
+		call mk_setr (mk, TOLERANCE, rval)
 
 	case MKCMD_MARK:
 	    call gargwrd (Memc[cmd], SZ_LINE)

@@ -4,107 +4,54 @@ include "../lib/fitpsf.h"
 
 # AP_PFCONFIRM -- Procedure to confirm the critical fitpsf parameters.
 
-procedure ap_pfconfirm (ap)
+procedure ap_pfconfirm (ap, out, stid)
 
 pointer	ap		# pointer to the apphot structure
+int	out		# the output file descriptor
+int	stid		# the output file sequence number
 
-int	pfunc
 pointer	sp, str
-real	scale, fwhmpsf, psfapert, threshold, skysigma
-int	apstati(), scan(), nscan(), strdic()
-real	apstatr()
+real	fwhmpsf, psfapert, threshold
+int	apstati()
+real	apstatr(), ap_vfwhmpsf(), ap_vthreshold(), ap_vpsfapert()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	call printf ("\n")
-
-	scale = apstatr (ap, SCALE)
-
-	# Confirm the fwhmpsf.
-	call printf ( "FWHM of features in pixels (%g): ")
-	    call pargr (apstatr (ap, FWHMPSF))
-	call flush (STDOUT)
-	if (scan() == EOF)
-	    fwhmpsf = apstatr (ap, FWHMPSF)
-	else {
-	    call gargr (fwhmpsf)
-	    if (nscan () != 1)
-	        fwhmpsf = apstatr (ap, FWHMPSF)
-	}
-	call printf ( "\tNew FWHM of features: %g in scale units  %g pixels\n")
-	    call pargr (fwhmpsf)
-	    call pargr (scale * fwhmpsf)
 
 	# Confirm the fitting function.
-	call apstats (ap, PSFSTRING, Memc[str], SZ_LINE)
-	call printf ("Fitting function (%s): ")
-	    call pargstr (Memc[str])
-	call flush (STDOUT)
-	if (scan() != EOF) {
-	    call gargwrd (Memc[str], SZ_LINE)
-	    pfunc = strdic (Memc[str], Memc[str], SZ_LINE, PSFFUNCS)
-	    if (nscan () == 1 && pfunc > 0) {
-		call apseti (ap, PSFUNCTION, pfunc)
-		call apsets (ap, PSFSTRING, Memc[str])
-	    }
-	}
-	call apstats (ap, PSFSTRING, Memc[str], SZ_LINE)
-	call printf ("\tNew fitting function: %s\n")
-	    call pargstr (Memc[str])
+	call ap_vpfstring (ap, Memc[str], SZ_FNAME)
+
+	# Confirm the fwhmpsf.
+	if (apstati (ap, PSFUNCTION) != AP_MOMENTS)
+	    fwhmpsf = ap_vfwhmpsf (ap)
+	else
+	    fwhmpsf = apstatr (ap, FWHMPSF)
 
 	# Confirm the fitting box.
-	call printf ("Fitting box width in scale units (%g): ")
-	    call pargr (2.0 * apstatr (ap, PSFAPERT))
-	call flush (STDOUT)
-	if (scan() == EOF)
-	    psfapert = 2.0 * apstatr (ap, PSFAPERT)
-	else {
-	    call gargr (psfapert)
-	    if (nscan () != 1)
-	        psfapert = 2.0 * apstatr (ap, PSFAPERT)
-	}
-	call printf ("\tNew fitting box width: %g scale units  %g pixels\n")
-	    call pargr (psfapert)
-	    call pargr (scale 	* psfapert)
+	psfapert = 2.0 * ap_vpsfapert (ap)
 
-	# Confirm the centering threshold parameter.
-	if (apstati (ap, PSFUNCTION) == AP_MOMENTS) {
-	    call printf (
-	        "Threshold in counts above background (%g): ")
-	        call pargr (apstatr (ap, THRESHOLD))
-	    call flush (STDOUT)
-	    if (scan() == EOF)
-	        threshold = apstatr (ap, THRESHOLD)
-	    else {
-	        call gargr (threshold)
-	        if (nscan () != 1)
-	            threshold = apstatr (ap, THRESHOLD)
-	    }
-	    call printf ("\tNew threshold: %g counts\n")
-	        call pargr (threshold)
-	} else
+	# Confirm the threshold parameter.
+	if (apstati (ap, PSFUNCTION) == AP_MOMENTS)
+	    threshold = ap_vthreshold (ap)
+	else
 	    threshold = apstatr (ap, THRESHOLD)
-
-	# Confirm the sky sigma parameter.
-	call printf ("Standard deviation of background in counts (%g): ")
-	    call pargr (apstatr (ap, SKYSIGMA))
-	call flush (STDOUT)
-	if (scan() == EOF)
-	    skysigma = apstatr (ap, SKYSIGMA)
-	else {
-	    call gargr (skysigma)
-	    if (nscan () != 1)
-	        skysigma = apstatr (ap, SKYSIGMA)
-	}
-	call printf ("\tNew standard deviation of background: %g counts\n")
-	    call pargr (skysigma)
 
 	call printf ("\n")
 
-	call apsetr (ap, FWHMPSF, fwhmpsf)
-	call apsetr (ap, PSFAPERT, psfapert / 2.0)
-	call apsetr (ap, THRESHOLD, threshold)
-	call apsetr (ap, SKYSIGMA, skysigma)
+	# Update the database file.
+	if (out != NULL && stid > 1) {
+	    call ap_sparam (out, KY_PSFSTRING, Memc[str], UN_PSFSTRING,
+		"psf fitting function")
+	    call ap_rparam (out, KY_FWHMPSF, fwhmpsf, UN_FWHMPSF,
+	        "full width half maximum of the psf")
+	    call ap_rparam (out, KY_PSFAPERT, psfapert, UN_PSFAPERT,
+	        "width of fitting box")
+	    call ap_rparam (out, KY_THRESHOLD, threshold, UN_THRESHOLD,
+	        "threshold")
+	}
+
+	call sfree (sp)
 end

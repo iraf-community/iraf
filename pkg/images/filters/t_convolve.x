@@ -79,13 +79,15 @@ begin
 
 	    # Convolve an image with the kernel
 	    iferr {
-		# Check for 1D images
-		if (kydim > 1 && IM_NDIM(im1) == 1)
-		    call error (0, "T_CONVOLVE: Kernel y dimension too large.")
 
-		# Check for images greater than 2D
-		if (IM_NDIM(im1) > 2)
-		    call error (0, "T_CONVOLVE: Image dimensions too large.")
+		switch (IM_NDIM(im1)) {
+		case 1:
+		    kydim = 1
+		case 2:
+		    ;
+		default:
+		    call error (0, "T_CONVOLVE: Image dimension > 2.")
+		}
 
 		# Convolve image
 		call cnv_convolve (im1, im2, Memr[kernel], kxdim, kydim,

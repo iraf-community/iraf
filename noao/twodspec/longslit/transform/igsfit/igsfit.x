@@ -134,12 +134,13 @@ begin
 		else
 		    call igs_colon (cmd, gp, sf)
 
-	    # Set ordinate
+	    # Set abscissa
 
 	    case 'x':
-		call printf ("Select ordinate (x, y, z, s, r): ")
+		call printf ("Select abscissa (x, y, z, s, r): ")
 		if (clgcur ("cursor", wx, wy, wcs, key, cmd, SZ_LINE) == EOF)
 		    goto 10
+		call printf ("\n")
 
 		switch (key) {
 		case 'x':
@@ -163,12 +164,13 @@ begin
 		    call gt_setr (gt, GTXMAX, INDEF)
 		}
 
-	    # Set abscissa
+	    # Set ordinate
 
 	    case 'y':
-		call printf ("Select abscissa (x, y, z, s, r): ")
+		call printf ("Select ordinate (x, y, z, s, r): ")
 		if(clgcur ("cursor", wx, wy, wcs, key, cmd, SZ_LINE) == EOF)
 		    goto 10
+		call printf ("\n")
 
 		switch (key) {
 		case 'x':
@@ -203,6 +205,7 @@ begin
 		    call printf ("Zoom type (x, y, z): ")
 		    if (clgcur ("cursor",wx,wy,wcs,key,cmd,SZ_LINE) == EOF)
 			goto 10
+		    call printf ("\n")
 
 		    switch (key) {
 		    case 'x':
@@ -283,6 +286,7 @@ begin
 		call printf ( "Delete 'p'oint or constant 'x', 'y', or 'z': ")
 		if (clgcur ("cursor", wx, wy, wcs, key, cmd, SZ_LINE) == EOF)
 		    goto 10
+		call printf ("\n")
 
 		switch (key) {
 		case 'p':
@@ -311,6 +315,7 @@ begin
 		call printf ( "Undelete 'p'oint or constant 'x', 'y', or 'z': ")
 		if (clgcur ("cursor", wx, wy, wcs, key, cmd, SZ_LINE) == EOF)
 		    goto 10
+		call printf ("\n")
 
 		switch (key) {
 		case 'p':

@@ -60,7 +60,7 @@ begin
 	case TY_MACRO:
 	    call strcpy ("macro", datatype, SZ_DATATYPE)
 	case TY_OPAQUE:
-	    call strcpy ("oqaque", datatype, SZ_DATATYPE)
+	    call strcpy ("opaque", datatype, SZ_DATATYPE)
 
 	case TY_USER:
 	    # User defined type: if S_DSYM is NULL, this is the domain entry

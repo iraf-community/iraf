@@ -37,8 +37,11 @@ begin
 	# Process the command.
 	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, PSFCMDS) != 0)
 	    call ap_fitcolon (ap, out, stid, cmdstr, newbuf, newfit)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, junk, junk,
+	        junk, junk, newbuf, newfit)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
-	    call apnscolon (ap, im, cl, out, stid, ltid, cmdstr, junk, junk,
+	    call apnscolon (ap, im, out, stid, cmdstr, junk, junk,
 	        junk, junk, newbuf, newfit)
 	else
 	    call ap_pfimcolon (ap, out, stid, cmdstr, newbuf, newfit)

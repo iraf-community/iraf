@@ -1,4 +1,4 @@
-.help xc Nov86 softools
+.help xc Oct89 softools
 .ih
 NAME
 xc -- portable IRAF compile/link utility
@@ -79,6 +79,14 @@ object.
 .ls 10 -O
 Optimize object code produced; this is now the default, but this switch
 is still provided for backwards compatibility.
+.le
+.ls 10 -p pkgname
+Load the package environment for the named external package, e.g.,
+"xc -c -p noao file.x".  If the same package is always specified
+the environment variable or logical name PKGENV may be defined at the
+host level to accomplish the same thing.  The package name \fImust\fR
+be specified when doing software development in an external or layered
+package.
 .le
 .ls 10 -P
 Check portability.  This should be used all of the time in IRAF,

@@ -112,9 +112,9 @@ begin
 	    call printf ("airmass = %5.3f,%25tW0 = %0.3f,")
 	        call pargr (AIRMASS(ids))
 	        call pargr (W0(ids))
-	    call printf ("   WPC = %0.5g,      ITM = %d,\n")
+	    call printf ("   WPC = %0.5g,      ITM = %.2f,\n")
 	        call pargr (WPC(ids))
-		call pargi (ITM(ids))
+		call pargr (ITM(ids))
 	    call printf ("NP1 = %d, NP2 = %d,")
 		call pargi (NP1(ids))
 		call pargi (NP2(ids))
@@ -162,7 +162,7 @@ begin
 	    if (IM_NDIM(im) == 1)
 	        call printf ("[%s]:%s %4ds %4dpts   %s\n")
 	    else
-	        call printf ("[%s]:%s %4ds %4dpts %dspectra   %s\n")
+	        call printf ("[%s]:%s %6.2fs %4dpts %dspectra   %s\n")
 
 	        call pargstr (image)
 
@@ -171,7 +171,7 @@ begin
 		else
 		    call pargstr ("s")
 
-		call pargi (ITM(ids))
+		call pargr (ITM(ids))
 		call pargi (IM_LEN(im,1))
 	    if (IM_NDIM(im) > 1)
 		call pargi (IM_LEN(im,2))

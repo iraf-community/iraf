@@ -7,13 +7,16 @@ define	TOL		0.001
 
 # APSFRADGAUSS -- Procedure to fit a radial Gaussian to the data.
 
-int procedure apsfradgauss (ctrpix, nx, ny, fwhmpsf, noise, sigma, maxiter,
-	k2, nreject, par, perr, npar)
+int procedure apsfradgauss (ctrpix, nx, ny, fwhmpsf, datamin, datamax, noise,
+	gain, sigma, maxiter, k2, nreject, par, perr, npar)
 
 real	ctrpix[nx, ny]		# object to be centered
 int	nx, ny			# dimensions of subarray
 real	fwhmpsf			# full width half max of the psf
+real	datamin			# minimum good data value
+real	datamax			# maximum good data value
 int	noise			# noise model to be used
+real	gain			# the gain in the data
 real	sigma			# sigma of constant noise term
 int	maxiter			# maximum number of iterations
 real	k2			# k-sigma rejection criterion
@@ -34,35 +37,40 @@ begin
 	npts = nx * ny
 	if (npts < NPARAMETERS)
 	    return (AP_NPSF_TOO_SMALL)
+
 	call smark (sp)
 	call salloc (x, nx, TY_REAL)
 	call salloc (y, ny, TY_REAL)
 	call salloc (w, npts, TY_REAL)
 	call salloc (list, NPARAMETERS, TY_INT)
 
-	# Set up x, y and weight arrays.
+	# Define the active parameters.
+	do i = 1, NPARAMETERS
+	    Memi[list+i-1] = i
+
+	# Set up x and y arrays.
 	do i = 1, nx
 	    Memr[x+i-1] = i
 	do i = 1, ny
 	    Memr[y+i-1] = i
+
+	# Define the weight array.
 	switch (noise) {
 	case AP_NCONSTANT:
 	    call amovkr (1.0, Memr[w], npts)
 	case AP_NPOISSON:
+	    call amaxkr (ctrpix, 0.0, Memr[w], npts)
+	    if (gain  > 0.0)
+		call adivkr (Memr[w], gain, Memr[w], npts)
 	    if (! IS_INDEFR(sigma))
-	        call amovkr (sigma ** 2, Memr[w], npts)
-	    else
-		call aclrr (Memr[w], npts)
-	    call aaddr (ctrpix, Memr[w], Memr[w], npts)
+	        call aaddkr (Memr[w], sigma ** 2, Memr[w], npts)
 	    call apreciprocal (Memr[w], Memr[w], npts, 1.0)
 	default:
 	    call amovkr (1.0, Memr[w], npts)
 	}
-	do i = 1, NPARAMETERS
-	    Memi[list+i-1] = i
 
 	# Make an initial guess at the parameters.
-	call alimr (ctrpix, npts, par[5], par[1])
+	call ap_wlimr (ctrpix, Memr[w], npts, datamin, datamax, par[5], par[1])
 	par[1] = par[1] - par[5]
 	par[2] = (1. + nx) / 2.
 	par[3] = (1. + ny) / 2.

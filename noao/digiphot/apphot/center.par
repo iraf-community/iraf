@@ -11,7 +11,8 @@ display,s,h,"stdimage",,,Display device
 commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
 cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 interactive,b,h,yes,,,Mode of use
-verify,b,h,yes,,,Verify critical parameters in non interactive mode
+verify,b,h,yes,,,Verify critical parameters in non-interactive mode
+update,b,h,no,,,Update critical parameters in non-interactive mode
 radplots,b,h,no,,,Plot radial plots on standard graph
 verbose,b,h,no,,,Print messages in non interactive mode
 mode,s,h,'ql'

@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #define	import_xnames
 #include "bootlib.h"
 
@@ -12,13 +15,13 @@ char	*envvar;
 {
 	static	char	irafdir[SZ_PATHNAME+1] = "";
 	static	char	hostdir[SZ_PATHNAME+1] = "";
-	static	char	valstr[SZ_LINE+1];
+	static	char	valstr[SZ_COMMAND+1];
 	static	char	errmsg[] = "environment variable `%s' not found\n";
 	extern	char	*os_subdir();
 	char	*vp;
 
 	/* Try the standard environment first. */
-	if (vp = _os_getenv (envvar, valstr, SZ_LINE))
+	if (vp = _os_getenv (envvar, valstr, SZ_COMMAND))
 	    return (vp);
 
 	/* The following maps certain well-known IRAF logical directories
@@ -73,8 +76,8 @@ char	*outstr;		/* receives value		*/
 int	maxch;
 {
 	PKCHAR	symbol[SZ_FNAME+1];
-	PKCHAR	value[SZ_LINE+1];
-	XINT	x_maxch = SZ_LINE, status=1;
+	PKCHAR	value[SZ_COMMAND+1];
+	XINT	x_maxch = SZ_COMMAND, status=1;
 
 	strcpy ((char *)symbol, envvar);
 	ZGTENV (symbol, value, &x_maxch, &status);
@@ -99,8 +102,8 @@ char	*outstr;		/* receives value		*/
 int	maxch;
 {
 	XCHAR	x_symbol[SZ_FNAME+1];
-	XCHAR	x_value[SZ_LINE+1];
-	XINT	x_maxch = SZ_LINE, status=1;
+	XCHAR	x_value[SZ_COMMAND+1];
+	XINT	x_maxch = SZ_COMMAND, status=1;
 
 	os_strupk (envvar, x_symbol, SZ_FNAME);
 	status = ENVFIND (x_symbol, x_value, &x_maxch);

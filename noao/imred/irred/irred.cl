@@ -22,6 +22,7 @@ task	iralign,
 
 # Define the apphot centering task
 
+task	apselect	= "irred$x_apphot.e"
 task	center		= "irred$x_apphot.e"
 task	centerpars	= "irred$centerpars.par"
 task	datapars	= "irred$datapars.par"

@@ -3,7 +3,7 @@ include "../lib/noise.h"
 include "../lib/display.h"
 include "../lib/find.h"
 
-# AP_FCOLON -- Procedure to process colon commands for setting the find
+# AP_FCOLON -- Process colon commands for setting the find algorithm
 # parameters.
 
 procedure ap_fcolon (ap, out, stid, cmdstr, newbuf, newfit)

@@ -1,4 +1,4 @@
-.help surface Sep85 plot
+.help surface Jan90 plot
 .ih
 NAME
 surface -- draw a three dimensional perspective plot of a surface
@@ -11,12 +11,14 @@ PARAMETERS
 Image or image section to be plotted.
 .le
 .ls floor = 0.
-Minimum value to be plotted.  If \fBfloor = 0\fR, a value rounded up from the
-image minimum is used.
+Data values below \fBfloor\fR are clipped.  If \fBfloor = 0\fR, a value
+rounded up from the image minimum is used.  If \fBfloor\fR is less than
+the image minimum, this parameter has no effect.
 .le
 .ls ceiling = 0.
-Maximum value to be plotted.  If \fBceiling = 0\fR, a value rounded up from the
-image maximum is used.
+Data values above \fBceiling\fR are clipped.  If \fBceiling = 0\fR, a value
+rounded up from the image maximum is used.  If \fBceiling\fR is greater than
+the image maximum, this parameter has no effect.
 .le
 .ls angh = -33.0
 Horizontal viewing angle, degrees.
@@ -64,21 +66,21 @@ No reduction is done if
 the image is smaller than \fBxres\fR by \fByres\fR.
 .ih
 EXAMPLES
-Surface plot of a 512 square image.  With the default values of \fBxres\fR and
-\fByres\fR, the image would be block averaged by a factor of 8 in x and y.
+1. Surface plot of a 512 square image.  With the default values of \fBxres\fR
+and \fByres\fR, the image would be block averaged by a factor of 8 in x and y.
 
-	cl> surface crab.5009
+    cl> surface crab.5009
 
-Look at the bottom of the surface, but subsample rather that block average
+2. Look at the bottom of the surface, but subsample rather that block average
 to decrease resolution and speed things up.  Also, the output device will
 be the plotter, and the job will run in the background:
 
-	cl> surface crab.5009 angv=-30 subsample+ device=stdplot &
+    cl> surface crab.5009 angv=-30 subsample+ device=stdplot &
 
-Surface plot of band 4 of an image cube.  Since the image is specified using
+3. Surface plot of band 4 of an image cube.  Since the image is specified using
 image section notation, no block averaging or subsampling will be done.
 
-	cl> surface cube[*,*,4]
+    cl> surface cube[*,*,4]
 .ih
 TIME REQUIREMENTS
 The time required by \fIsurface\fR depends on image size and resolution.

@@ -16,11 +16,15 @@ procedure cnvdate (ltime, outstr, maxch)
 long	ltime			# seconds since 00:00:00 10-Jan-80
 char	outstr[maxch]
 int	maxch
-int	tm[LEN_TMSTRUCT]	# broken down time structure
-long	one_year_ago, clktime()
-int	fd, stropen()
-string	month	"JanFebMarAprMayJunJulAugSepOctNovDec"
+
+long	one_year_ago
+int	fd, tm[LEN_TMSTRUCT]
+
+long	clktime()
+int	stropen()
+string	month "JanFebMarAprMayJunJulAugSepOctNovDec"
 data	one_year_ago /0/
+errchk	stropen
 
 begin
 	if (one_year_ago == 0)

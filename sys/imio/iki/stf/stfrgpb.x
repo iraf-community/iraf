@@ -21,14 +21,19 @@ int	group			# group to be accessed
 int	acmode			# image access mode
 real	datamin, datamax	# min,max pixel values from GPB
 
+#int	i
+#char	pname[SZ_KEYWORD]
+
 long	offset
+bool	newgroup
 pointer	sp, stf, gpb, lbuf, pp
 int	pfd, pn, sz_param, sz_gpb
-real	imgetr()
+errchk	imaddb, imadds, imaddl, imaddr, imaddd, imastr
+errchk	imputd, impstr, open, read
 int	open(), read(), imaccf()
-errchk	open, read
+real	imgetr()
 
-string	readerr "cannot read group data block"
+string	readerr "cannot read group data block - no such group?"
 string	badtype "illegal group data parameter datatype"
 define	minmax_ 91
 
@@ -67,13 +72,15 @@ begin
 	# uninitialized group (acmode = new_image or new_copy), do not
 	# physically read the GPB as it is will be uninitialized data.
 
-	if (acmode != NEW_IMAGE && acmode != NEW_COPY && pfd != NULL) {
+	newgroup = (acmode == NEW_IMAGE || acmode == NEW_COPY || pfd == NULL)
+	if (newgroup)
+	    call aclrc (Memc[gpb], sz_gpb)
+	else {
 	    offset = (group * STF_SZGROUP(stf) + 1) - sz_gpb
 	    call seek (pfd, offset)
 	    if (read (pfd, Memc[gpb], sz_gpb) != sz_gpb)
 		call error (1, readerr)
-	} else
-	    call aclrc (Memc[gpb], sz_gpb)
+	}
 
 	# Extract the binary value of each parameter in the GPB and encode it
 	# in FITS format in the IMIO user area.
@@ -141,6 +148,21 @@ begin
 
 	    offset = offset + sz_param
 	}
+
+	# If writing to a new element of a group format image, in which case
+	# the GPB has been zeroed, provide the default pixel WCS.
+
+#	if (newgroup)
+#	    do i = 1, IM_NDIM(im) {
+#		call sprintf (pname, SZ_KEYWORD, "CTYPE%d")
+#		    call pargi (i)
+#		call impstr (im, pname, "PIXEL")
+#
+#		call sprintf (pname,  SZ_KEYWORD, "CD%d_%d")
+#		    call pargi (i)
+#		    call pargi (i)
+#		call imputd (im, pname, 1.0D0)
+#	    }
 
 minmax_
 	# Return DATAMIN, DATAMAX.  This is done by searching the user area so

@@ -1,0 +1,8 @@
+input,f,a,"",,,"Input image list"
+output,f,h,"",,,"Input image list"
+models,f,h,"",,,"List of model parameter files
+
+IF NEW IMAGE"
+title,s,h,"",,,"Title of spectrum"
+ncols,i,h,100,1,,"Number of columns"
+nlines,i,h,512,1,,"Number of lines"

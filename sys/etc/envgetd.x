@@ -11,7 +11,8 @@ double procedure envgetd (varname)
 
 char	varname[ARB]
 
-int	dval, ip
+int	ip
+double	dval
 char	val[MAX_DIGITS]
 int	ctod(), envfind()
 errchk	envfind, syserrs

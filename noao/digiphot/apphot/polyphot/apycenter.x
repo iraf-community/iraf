@@ -36,19 +36,19 @@ end
 # AP_YRECENTER -- Recenter the polygon using the existing buffer of pixels
 # and the centering package routines.
 
-int procedure ap_yrecenter (py, x, y, nver)
+int procedure ap_yrecenter (py, x, y, nver, cier)
 
 pointer	py		# pointer to polyphot structure
 real	x[ARB]		# x coordinates of the polygon
 real	y[ARB]		# y coordinates of the polygon
 int	nver		# number of vertices
+int	cier		# original centering error
 
-int	cier
 int	aprefitcenter()
 real	apstatr()
 
 begin
-	cier = aprefitcenter (py)
+	cier = aprefitcenter (py, cier)
 	if (! IS_INDEFR (apstatr (py, XCENTER)) && ! IS_INDEFR (apstatr (py,
 	    YCENTER)) && ! IS_INDEFR (apstatr (py, PYCX)) && !
 	    IS_INDEFR (apstatr (py, PYCY)))

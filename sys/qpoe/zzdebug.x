@@ -29,6 +29,7 @@ task	parsei		= t_parsei,	# parse integer range list
 	countpoe	= t_countpoe,	# count photons in regions
 	plotpoe		= t_plotpoe,	# read and plot photons
 	sum		= t_sum,	# sum counts in an image section
+	setwcs		= t_setwcs,	# store a wcs in a qpoe file
 	clear		= t_clear	# clear the screen
 
 define	SZ_EXPR		256
@@ -422,12 +423,12 @@ end
 
 procedure t_hlist()
 
-pointer	qp, list
+pointer	qp, list, sym
 int	nelem, maxelem, flags
 char	datatype[SZ_DATATYPE], comment[SZ_COMMENT]
 char	fname[SZ_FNAME], param[SZ_FNAME], pattern[SZ_FNAME]
+pointer	qp_open(), qp_ofnlu(), qp_gpsym()
 int	qp_queryf(), qp_gnfn()
-pointer	qp_open(), qp_ofnlu()
 
 begin
 	call clgstr ("fname", fname, SZ_FNAME)
@@ -436,14 +437,18 @@ begin
 	qp = qp_open (fname, READ_ONLY, 0)
 	list = qp_ofnlu (qp, pattern)
 
-	call printf ("          PARAM  DTYPE NELEM MAXEL FLG COMMENT\n")
+	call printf ("          PARAM  DTYPE NELEM MAXEL LF OFF FLG COMMENT\n")
 	while (qp_gnfn (list, param, SZ_FNAME) != EOF) {
 	    nelem = qp_queryf (qp, param, datatype, maxelem, comment, flags)
-	    call printf ("%15s %6s %5d %5d %3o %s\n")
+	    sym = qp_gpsym (qp, param)
+
+	    call printf ("%15s %6s %5d %5d %2d%4d %3o %s\n")
 		call pargstr (param)
 		call pargstr (datatype)
 		call pargi (nelem)
 		call pargi (maxelem)
+		call pargi (S_LFILE(sym))
+		call pargi (S_OFFSET(sym))
 		call pargi (and (flags, 777B))
 		call pargstr (comment)
 	}
@@ -1086,6 +1091,26 @@ begin
 	    call pargd (sum)
 
 	call imunmap (im)
+end
+
+
+# SETWCS -- Store a wcs in a QPOE file.
+
+procedure t_setwcs()
+
+pointer	qp, mw
+char	text[SZ_LINE]
+pointer	qp_open, mw_open
+
+begin
+	call clgstr ("poefile", text, SZ_LINE)
+	qp = qp_open (text, READ_WRITE, 0)
+	
+	mw = mw_open (NULL, 2)
+	call qp_savewcs (qp, mw)
+
+	call mw_close (mw)
+	call qp_close (qp)
 end
 
 

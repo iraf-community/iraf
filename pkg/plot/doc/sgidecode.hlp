@@ -31,11 +31,9 @@ Coordinates are printed in NDC units (0-1) by default.  When \fBgkiunits\fR
 \fBverbose\fR is currently not implemented.
 .ih
 EXAMPLES
-.nf
-Decode the metacode in file home$vdm.sgi
+1. Decode the metacode in file "home$vdm.sgi".
 
-	cl> sgidecode home$vdm.sgi
-.fi
+    cl> sgidecode home$vdm.sgi
 .ih
 SEE ALSO
 gkidecode sgikern

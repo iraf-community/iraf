@@ -1,7 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<gset.h>
-include	<pkg/gtools.h>
+include	"gtools.h"
 	
 # GT_LABAX -- Set graphics axis.
 
@@ -17,12 +17,15 @@ int	strlen()
 
 begin
 	if (gt != NULL) {
-	    len = SZ_LINE
-	    call malloc (title, len, TY_CHAR)
-	    call sysid (Memc[title], len)
-	    len = strlen (Memc[title])
-	    call realloc (title, len, TY_CHAR)
-
+	    call malloc (title, SZ_LINE, TY_CHAR)
+	    Memc[title] = EOS
+	    len = 0
+	    if (GT_SYSID(gt) == YES) {
+		len = SZ_LINE
+	        call sysid (Memc[title], len)
+	        len = strlen (Memc[title])
+	        call realloc (title, len, TY_CHAR)
+	    }
 	    if (GT_PARAMS(gt) != NULL) {
 		len = len + strlen (Memc[GT_PARAMS(gt)]) + 1
 		call realloc (title, len, TY_CHAR)

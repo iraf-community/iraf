@@ -37,7 +37,8 @@ begin
 	# Print query if coords is equal to STDIN.
 	if (strncmp ("STDIN", Memc[str], 5) == 0) {
 	    stdin = YES
-	    call printf ("Type x and y coordinates of object (^D or ^Z to end): ")
+	    call printf (
+	    "Type x and y coordinates of object (^D or ^Z to end): ")
 	    call flush (STDOUT)
 	} else
 	    stdin = NO
@@ -50,7 +51,8 @@ begin
 	    call gargr (wy)
 	    if (nscan () != 2) {
 		if (stdin == YES) {
-	    	    call printf ("Type x and y coordinates of object (^D or ^Z to end): ")
+	    	    call printf (
+		    "Type x and y coordinates of object (^D or ^Z to end): ")
 	    	    call flush (STDOUT)
 		}
 		next
@@ -65,8 +67,7 @@ begin
 	    sier = apfitsky (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 	        YCENTER), NULL, gd)
 	    rier = ap_frprof (ap, im, apstatr (ap, XCENTER), apstatr (ap,
-		YCENTER), apstatr (ap, SKY_MODE), apstatr (ap,
-		SKY_SIGMA), apstati (ap, NSKY), pier)
+		YCENTER), pier)
 
 	    # Output the results.
 	    if (interactive == YES) {
@@ -86,7 +87,8 @@ begin
 	    call apsetr (ap, WX, wx)
 	    call apsetr (ap, WY, wy)
 	    if (stdin == YES) {
-	        call printf ("Type x and y coordinates of object (^D or ^Z to end): ")
+	        call printf (
+		"Type x and y coordinates of object (^D or ^Z to end): ")
 	        call flush (STDOUT)
 	    }
 	}

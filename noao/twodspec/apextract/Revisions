@@ -1,5 +1,38 @@
 .help revisions Jun88 noao.twodspec.apextract
 .nf
+apextract$exsum.x
+    There was an incorrect sfree called if output images exist and the user
+    does not chose to clobber them (which is also the default for
+    noninteractive.  (4/4/90, Valdes)
+
+apextract$exsum.x
+    Added a test for the existence of output images before extractions and
+    a query to select whether to clobber spectra or not.  (8/9/89, Valdes)
+
+apextract$exmvsum.x
+apextract$exfit.x
+    1.  The moving average for profile images did not work correctly.  It
+	subtracted the line moving out of the moving average but failed to
+	add in the line moving into the average.  This caused the profile
+	to depart more and more from the data as the extraction procedes
+	through the image.
+    2.  The moving average for profile images actually used naverage + 1
+	instead of naverage becuase in this case the line being extract is
+	also included in the average.
+    3.  The fitting of the model to the data had a funny behavior when the
+	model had negative values and variance weight was used.  The
+	negative values are now excluded from the fitting calculation in
+	this case.  Note that the model is supposed to not contain negative
+	values.  Also note that if variance weighting is not used then the
+	negative values are used in straight least-squares fitting.
+	(8/8/89, Valdes)
+
+apextract$apicset.x
+apextract$apedit.x
+apextract$apupdate.x
+    The region over which the background fitting is defined has been extended
+    to require overlapping the aperture. (7/31/89, Valdes)
+
 apextract$apcolon.x
     Added gdeactivate/greactivate calls when using EPARAM.  (6/14/89, Valdes)
 

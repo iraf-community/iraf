@@ -5,6 +5,7 @@
 #define	import_libc
 #define	import_stdio
 #define	import_error
+#define	import_finfo
 #define	import_prstat
 #include <iraf.h>
 #include "config.h"
@@ -61,6 +62,7 @@ typedef	int (*PFI)();
 
 struct process {
 	int	pr_pid;			/* process id of subprocess	*/
+	long	pr_time;		/* time when process executed	*/
 	short	pr_flags;		/* flag bits			*/
 	short	pr_pno;			/* prcache process number	*/
 	FILE	*pr_in, *pr_out;	/* in, out IPC channels		*/
@@ -163,6 +165,7 @@ FILE	**in, **out;			/* IPC channels (output)	*/
 {
 	register struct process *pr;
 	struct	process *pr_findproc();
+	struct	_finfo fi;
 	int	fd_in, fd_out;
 
 	if (pr_head == NULL)
@@ -174,9 +177,20 @@ FILE	**in, **out;			/* IPC channels (output)	*/
 	 * inactive.  If the process is found idling in the cache, relink it
 	 * at the head of the cache list, otherwise disconnect the inactive
 	 * process nearest the tail of the list and spawn the new one to
-	 * replace it.
+	 * replace it.  The cached entry is automatically invalidated if the
+	 * corresponding executable file has been modified (e.g., relinked),
+	 * provided the process is not currently busy.  A process is considered
+	 * busy if it is active or if it is locked in the cache.
 	 */
-	if ((pr = pr_findproc (process)) != NULL)
+	fi.fi_mtime = 0;
+	if ((pr = pr_findproc (process)) != NULL && !pr_busy(pr)) {
+	    if (c_finfo (process, &fi) == ERR || fi.fi_mtime > pr->pr_time) {
+		pr_pdisconnect (pr);
+		pr = NULL;
+	    }
+	}
+
+	if (pr != NULL)
 	    pr_tohead (pr);
 	else {
 	    /* Get process slot. */
@@ -200,6 +214,11 @@ FILE	**in, **out;			/* IPC channels (output)	*/
 	    }
 	    intr_enable();
 
+	    if (fi.fi_mtime == 0)
+		if (c_finfo (process, &fi) == ERR)
+		    fi.fi_mtime = 0;
+
+	    pr->pr_time = fi.fi_mtime;
 	    pr->pr_in  = FDTOFP (fd_in);
 	    pr->pr_out = FDTOFP (fd_out);
 	    pr->pr_flags = 0;

@@ -78,17 +78,18 @@ which is selected with the parameter \fIinterp_type\fR.
 The value of the output pixels corresponding to input pixel positions
 outside the boundaries of the image is determined by the parameter
 \fIboundary_type\fR.
+
 .ih
 EXAMPLES
 
 1. Shift the lines of an image by 0.25 pixels to the right.
 
-	cl> imshiftlines imagein imageout 0.25
+	cl> shiftlines imagein imageout 0.25
 
 2. Shift the lines of an image by -.3 pixels using cubic spline interpolation
 and replace the input image by the output image.
 
-	cl> imshiftlines image image -.3 interp=spline3
+	cl> shiftlines image image -.3 interp=spline3
 
 .ih
 TIMINGS

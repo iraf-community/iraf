@@ -66,7 +66,7 @@ begin
 	    }
 	    if (id == 1)
 	        call ap_param (ap, out, "fitpsf")
-	    call ap_pdtpsf (ap, out, id, ild, ier)
+	    call ap_ppsf (ap, out, id, ild, ier)
 	    
 	    # Prepare for the next object.
 	    id = id + 1

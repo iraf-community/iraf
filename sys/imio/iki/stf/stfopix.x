@@ -29,12 +29,13 @@ int	status				# return status
 
 int	compress, blklen
 bool	copy_of_stf_image
+int	pfd, sz_gpb, group, i
 pointer	stf, o_stf, o_im, ua, gpb
 long	sz_pixfile, pixoff, totpix, offset
-int	pfd, sz_gpbhdr, spool, ua_fd, ua_size, sz_gpb, group, i
 
-int	open(), stropen(), strlen(), sizeof()
-errchk	fseti, falloc, stropen, seek, fcopyo, syserrs, imioff
+int	open(), sizeof()
+errchk	open, fseti, falloc, seek, syserrs, imioff, calloc
+errchk	write
 
 begin
 	status = OK
@@ -64,7 +65,10 @@ begin
 		call imioff (im, pixoff, compress, blklen)
 
 		# Set up the required GPB parameters for the new image.
+		# Note - this call can change the STF pointer.
+
 		call stf_newimage (im)
+		stf = IM_KDES(im)
 
 		# Save the size of the old GPB user area header if we are
 		# making a new copy of an old STF format image.
@@ -74,52 +78,54 @@ begin
 
 		if (copy_of_stf_image) {
 		    o_stf = IM_KDES(o_im)
-		    sz_gpbhdr = STF_SZGPBHDR(o_stf)
-		    STF_SZGPBHDR(stf) = STF_SZGPBHDR(o_stf)
 		    STF_PCOUNT(stf) = STF_PCOUNT(o_stf)
 		    STF_PSIZE(stf) = STF_PSIZE(o_stf)
-		} else
-		    sz_gpbhdr = STF_SZGPBHDR(stf)
+		}
 
-		# We have to have space for the GPB data cards at the beginning
-		# of the user area, so spool any existing user cards in a
-		# buffer and truncate the user area at the end of the GPB.
-
-		ua_fd = stropen (Memc[ua+sz_gpbhdr], ARB, READ_ONLY)
-		spool = open ("opix_spool", READ_WRITE, SPOOL_FILE)
-		call fcopyo (ua_fd, spool)
-		call close (ua_fd)
-		Memc[ua+sz_gpbhdr] = EOS
-
-		# Merge any extra GPB parameters from the old image into the
-		# GPB structure of the new image.  The GPB data cards for
-		# these parameters should already be in the user area.
-		# Order the group parameters to match the ordering in the
-		# old image.  NOTE:  since the STF now copies all relevant
-		# GPB parameters from an old image into the new or 
-		# generates a default standard set (in stf_newimage),
-		# the following is no longer necessary.  Note that if we
-		# eventually may add parameters to the GPB, these routines
-		# will again be useful!
-
-		#if (copy_of_stf_image) {
-		#    call stf_mergegpb (im, o_im)
-		#    call stf_ordergpb (o_stf, stf)
-		#}
-			
-		# Now append the spooled user header cards to the new user
-		# area following the GPB data cards.
-
-		ua_size = (IM_LENHDRMEM(im) - LEN_IMHDR) * SZ_STRUCT
-		ua_fd = stropen (Memc[ua], ua_size, APPEND)
-		call seek (spool, BOFL)
-		call fcopyo (spool, ua_fd)
-		call close (spool)
-		call close (ua_fd)
-
-		# Compute the length of the new header
-		IM_HDRLEN(im) = LEN_IMHDR +
-		    (strlen(Memc[ua]) + SZ_STRUCT-1) / SZ_STRUCT
+#		Since the stf_mergegpb code below has been deactivated,
+#		there is no need to do the complex and expensive spool/copy
+# 		operation below.  (dct 1/4/90)
+#		-------------------------------
+#		# We have to have space for the GPB data cards at the beginning
+#		# of the user area, so spool any existing user cards in a
+#		# buffer and truncate the user area at the end of the GPB.
+#
+#		ua_fd = stropen (Memc[ua+sz_gpbhdr], ARB, READ_ONLY)
+#		spool = open ("opix_spool", READ_WRITE, SPOOL_FILE)
+#		call fcopyo (ua_fd, spool)
+#		call close (ua_fd)
+#		Memc[ua+sz_gpbhdr] = EOS
+#
+#		# Merge any extra GPB parameters from the old image into the
+#		# GPB structure of the new image.  The GPB data cards for
+#		# these parameters should already be in the user area.
+#		# Order the group parameters to match the ordering in the
+#		# old image.  NOTE:  since the STF now copies all relevant
+#		# GPB parameters from an old image into the new or 
+#		# generates a default standard set (in stf_newimage),
+#		# the following is no longer necessary.  Note that if we
+#		# eventually may add parameters to the GPB, these routines
+#		# will again be useful!
+#
+#		#if (copy_of_stf_image) {
+#		#    call stf_mergegpb (im, o_im)
+#		#    call stf_ordergpb (o_stf, stf)
+#		#}
+#			
+#		# Now append the spooled user header cards to the new user
+#		# area following the GPB data cards, deleting any user cards
+#		# which redefine GPB cards in the process.
+#
+#		call seek (spool, BOFL)
+#		ua_size = (IM_LENHDRMEM(im) - LEN_IMHDR) * SZ_STRUCT
+#		ua_fd = stropen (Memc[ua], ua_size, APPEND)
+#		call stf_copyfits (stf, spool, NULL, ua_fd)
+#		call close (ua_fd)
+#		call close (spool)
+#
+#		# Compute the length of the new header
+#		IM_HDRLEN(im) = LEN_IMHDR +
+#		    (strlen(Memc[ua]) + SZ_STRUCT-1) / SZ_STRUCT
 
 		# Open the new pixel storage file (preallocate space if
 		# enabled on local system).  Save the physical pathname of
@@ -175,10 +181,6 @@ begin
 		STF_SZGROUP(stf) = totpix * sizeof (IM_PIXTYPE(im)) +
 		    STF_PSIZE(stf) / (SZB_CHAR * NBITS_BYTE)
 	    }
-
-	    # Copy / transform the WCS of the old image to the new image.
-            if (o_im != NULL)
-	        call stf_copywcs (o_im, im)
 
 	    if (pfd == NULL)
 		pfd = open (IM_PIXFILE(im), READ_WRITE, BINARY_FILE)

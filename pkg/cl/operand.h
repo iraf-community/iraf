@@ -153,7 +153,12 @@ struct arr_desc {
 
 extern char *truestr, *falsestr;
 
-struct operand popop(), pushop();
+#ifdef A88K
+void pushop();
+#else
+struct operand pushop();
+#endif
+struct operand popop();
 struct operand makeop();
 struct operand readlist();	/* read and return operand from list	*/
 struct operand sexa();		/* convert n:n:n string to sexagesimal	*/

@@ -1,4 +1,4 @@
-.help phot May89 noao.digiphot.apphot
+.help phot Jan90 noao.digiphot.apphot
 .ih
 NAME
 phot -- perform aperture photometry on a list of stars
@@ -12,15 +12,28 @@ The list of images containing the objects to be measured.
 .le
 .ls datapars = ""
 The name of the text file containing the data dependent parameters.
+If \fIdatapars\fR is null ("") then the default parameter set in the
+user's uparm directory is used.
+The critical parameters \fIfwhmpsf\fR, and \fIsigma\fR
+are located here.
 .le
 .ls centerpars = ""
 The name of the text file containing the centering parameters.
+If \fIcenterpars\fR is null ("") then the default parameter set in the
+user's uparm directory is used. The critical parameters \fIcalgorithm\fR
+and \fIcbox\fR are located here.
 .le
 .ls fitskypars = ""
 The name of the text file containing the sky fitting parameters.
+If \fIfitskypars\fR is null ("") then the default parameter set in the
+user's uparm directory is used. The critical parameters \fIsalgorithm\fR,
+\fIannulus\fR, and \fIdannulus\fR are located here.
 .le
 .ls photpars = ""
 The name of the text file containing the photometry parameters.
+If \fIphotpars\fR is null ("") then the default parameter set in the
+user's uparm directory is used. The critical parameter \fIapertures\fR
+is located here.
 .le
 .ls coords = ""
 The name of the text files containing the initial coordinates of the objects to
@@ -80,6 +93,9 @@ Interactive or batch mode.
 .le
 .ls verify = yes
 Verify the critical PHOT parameters in non interactive mode.
+.le
+.ls update = no
+Update the critical parameters in on interactive mode if verify is yes.
 .le
 .ls verbose = no
 Print results on the screen in non interactive mode.
@@ -167,6 +183,10 @@ Photometry parameters are listed or set with the following commands.
 :readnoise	[value]		Readout noise (electrons)
 :exposure	[string]	Exposure time image header keyword
 :itime 		[value]		Integration time (time units)
+:airmass	[string]	Airmass image header keyword
+:xairmass	[value]		Airmass value (number)
+:filter		[string]	Filter image header keyword
+:ifilter	[string]	Filter id string
 :datamin	[value]		Minimum good pixel value (counts)
 :datamax	[value]		Maximum good pixel value (counts)
 
@@ -202,6 +222,30 @@ Photometry parameters are listed or set with the following commands.
 :zmag		[value]		Zero point of magnitude scale
 :mkapert	[y/n]		Mark apertures on the display
 :radplot	[y/n]		Plot radial profile of object
+
+
+The following commands are available from inside the interactive setup menu.
+
+                    Interactive PHOT/WPHOT Setup Menu
+
+	v	Set and verify the critical PHOT/WPHOT parameters
+		(f,c,s,a,d,r)
+
+	f	Set and verify the full width half maximum of the psf
+	h	Set and verify the centering threshold
+	s	Set and verify the standard deviation of the background
+	l	Set and verify the minimum good data value
+	u	Set and verify the maximum good data value
+
+	c	Set and verify the centering box width
+	n	Set and verify the cleaning radius
+	p	Set and verify the clipping radius
+
+	a	Set and verify the inner radius of the sky annulus
+	d	Set and verify the width of the sky annulus
+	g	Set and verify the region growing radius
+
+	r	Set and verify the aperture radii
 .fi
 
 .ih
@@ -238,6 +282,7 @@ following record is written
 	image  xinit  yinit  id  coords  lid
 	   xcenter  ycenter  xshift  yshift  xerr  yerr  cier error
 	   msky  stdev  sskew  nsky  nsrej  sier  serror
+	   itime  airmass filter
 	   rapert  sum  area  mag  merr  pier  perr
 .fi
 
@@ -258,11 +303,62 @@ Msky, stdev and sskew are the sky value,
 standard deviation and skew respectively. Nsky and nsrej are the number of
 sky pixels and the number of sky pixels rejected respectively.
 
+Itime is the exposure time, airmass is self-evident and filter is an
+id string identifying the filter used in the observations.
+
 Rapert, sum, and area are the radius of the aperture in scale units, the total
 number of counts including sky in the aperture and the area of the aperture
 in square pixels. Mag and merr are the magnitude and error in the magnitude
 in the aperture. Pier and perror are photometry error code and accompanying
 error message.
+
+.ih
+ERRORS
+
+If the object centering was error free then the field cier will be zero.
+Non-zero values of cier flag the following error conditions.
+
+.nf
+	0       # No error
+	21      # The centering box is off image
+	22      # The centering box is partially off the image
+	23      # The S/N ratio is low in the centering box
+	24      # There are two few points for a good fit
+	25      # The x or y center fit is singular
+	26      # The x or y center fit did not converge
+	27      # The x or y center shift is greater than maxshift
+	28      # There is bad data in the centering box
+.fi
+
+If all goes well during the sky fitting process then the error code sier
+will be 0. Non-zero values of sier flag the following error conditions.
+
+.nf
+	0       # No error
+	1       # There are no sky pixels in the sky annulus
+	2       # Sky annulus is partially off the image
+	3       # The histogram of sky pixels has no width
+	4       # The histogram of sky pixels is flat or concave
+	5       # There are too few points for a good sky fit
+	6       # The sky fit is singular
+	7       # The sky fit did not converge
+	8       # The graphics stream is undefined
+	9       # The file of sky values does not exist
+	10      # The sky file is at EOF
+	11      # Cannot read the sky value correctly
+	12      # The best fit parameter are non-physical
+.fi
+
+If no error occursor during the measurment of the magnitudes then pier is
+0. Non-zero values of pier flag the following error conditins.
+
+.nf
+	0       # No error
+	41      # The aperture is off the image
+	42      # The aperture is partially off the image
+	43      # The sky value is undefined
+	45      # There is bad data in the aperture
+.fi
 
 .ih
 EXAMPLES
@@ -282,13 +378,13 @@ setup menu defined by the i key command and a radial profile plot.
 
 	ap> phot n4147
 
-	... a short help page appears on the screen
+	... type ? to print an optional help page
 
 	... move the image cursor to a star
 	... type i to enter the interactive setup menu
 	... enter maximum radius in pixels of the radial profile
 	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    apertures, sigma and threshold using the graphics cursor and the
+	    apertures, and sigma using the graphics cursor and the
             stellar radial profile plot
 	... typing <CR> leaves everything at the default value
 
@@ -321,7 +417,7 @@ setup menu defined by the i key command.
 
 	ap> phot m92 display=stdgraph
 
-	... a short help page appears on the screen
+	... type ? to get an optional help page
 
 	... type :.read m92.plot1 to load the contour plot on the screen
 
@@ -329,7 +425,7 @@ setup menu defined by the i key command.
 	... type i to enter the interactive setup menu
 	... enter maximum radius in pixels of the radial profile
 	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    apertures, sigma and threshold using the graphics cursor and the
+	    apertures, and sigma using the graphics cursor and the
             stellar radial profile plot
 	... typing <CR> leaves everything at the default value
 
@@ -378,7 +474,7 @@ saved in example 1.
 
 	ap> phot m92 coords=m92.coo.1 display=stdgraph
 
-	... a short help menu appears
+	... type ? to get an optional help page
 
 	... type :.read m92.plot2 to read in the contour plot
 
@@ -441,18 +537,13 @@ device coordinates.
 
 	... type the F6 key to enter cursor readback mode
 
-
 	... move the image cursor to the stars of interest, press the
-	    left mouse button
-	... a number will appear beside each star measured
-	... the x and y coordinates of each star measured will appear
-	    in the file m92.coo.2
-
+	    left mouse button and a number will appear beside each star
+	    measured
 
 	ap> phot m92 coords=m92.coo.2
 
-	... a short help page appears on the screen followed by the
-	    cursor read prompt
+	... type ? to get an optional help page
 
 	... type :m 3 to set the coordinates to the third star
 	    in the list
@@ -460,7 +551,7 @@ device coordinates.
 	... type i to enter the interactive setup menu
 	... enter maximum radius in pixels of the radial profile
 	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    apertures, sigma and threshold using the graphics cursor and
+	    apertures, and sigma using the graphics cursor and
 	    the stellar radial profile plot
 	... typing <CR> leaves everything at the default value
 

@@ -46,6 +46,9 @@ $special "sys$etc/":
 $special "sys$gio/cursor/":
 	grcwcs.x	$(XNO);
 
+$special "sys$gio/ncarutil/autograph/":
+	agstup.f	$(XNO);
+
 # The following causes the compiler to produce semi-infinite intermediate code
 # tables, necessitating use of reduced levels (O1 or O2) of optimization.
 

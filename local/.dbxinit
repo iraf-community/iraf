@@ -1,0 +1,16 @@
+alias c cont
+alias d delete
+alias e edit
+alias f func
+alias l list
+alias n next
+alias p print
+alias a step
+alias q stepi
+alias r run
+alias s stop
+alias st status
+alias t trace
+alias u use
+alias w where
+alias x "when at 58 {print nvox,xind[1],yind[1],xind[4],yind[4],xind[5],yind[5],xind[6],yind[6];}"

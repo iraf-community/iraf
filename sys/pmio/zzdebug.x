@@ -194,7 +194,10 @@ begin
 	call eprintf ("totpix=%d, sum=%g, mean=%g\n")
 	    call pargi (totpix)
 	    call pargr (rsum)
-	    call pargr (rsum / totpix)
+	    if (totpix == 0)
+		call pargr (INDEFR)
+	    else
+		call pargr (rsum / totpix)
 
 	call mio_close (mp)
 	call imunmap (im)

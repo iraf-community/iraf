@@ -11,34 +11,27 @@ define	BTYPES		"|constant|nearest|reflect|wrap|project|"
 define	SZ_BTYPE	8	# Length of boundary type string
 define	NLINES		16	# Number of image  lines in the buffer
 
-
 # T_PVECTOR -- Plot the vector of image data between two pixels.
 
 procedure t_pvector()
 
-bool	pointmode
-int	btype, mode, nxvals, nyvals, nzvals, imark, ndim, width
-pointer	image, device, marker, xlabel, ylabel, title, suffix, hostid, boundary
-pointer	sp, im, gp, x_vec, y_vec
-real	xc, yc, x1, y1, x2, y2, theta, length, zmin, zmax, szm, tol
-real	wx1, wx2, wy1, wy2, vx1, vx2, vy1, vy2, bconstant
+pointer	image, boundary, output, outtype
+pointer	sp, im, x_vec, y_vec
+int	wrt_image, wrt_text
+int	btype, ndim, nxvals, nyvals, nzvals, width
+real	xc, yc, x1, y1, x2, y2, theta, length, zmin, zmax, bconstant
 
-bool	clgetb(), streq(), fp_equalr()
-int	clgeti(), btoi(), clgwrd()
-pointer	immap(), gopen()
+bool	streq(), fp_equalr()
+int	clgeti(), clgwrd(), nowhite()
+pointer	immap()
 real	clgetr()
 
 begin
 	call smark (sp)
 	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (marker, SZ_FNAME, TY_CHAR)
-	call salloc (xlabel, SZ_LINE, TY_CHAR)
-	call salloc (ylabel, SZ_LINE, TY_CHAR)
-	call salloc (hostid, 2 * SZ_LINE, TY_CHAR)
-	call salloc (title, SZ_LINE, TY_CHAR)
-	call salloc (suffix, SZ_FNAME, TY_CHAR)
 	call salloc (boundary, SZ_BTYPE, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (outtype, SZ_FNAME, TY_CHAR)
 
 	# Get boundary extension parameters.
 	btype  = clgwrd ("boundary", Memc[boundary], SZ_BTYPE, BTYPES)
@@ -50,6 +43,19 @@ begin
 	ndim = IM_NDIM(im)
 	if (ndim > 2)
 	    call error ("The number of image dimensions is greater then 2.")
+
+	# See if we're going to output the vector
+	call clgstr ("vec_output", Memc[output], SZ_FNAME)
+	call clgstr ("out_type", Memc[outtype], SZ_FNAME)
+
+	wrt_text = NO
+	wrt_image = NO
+	if (nowhite (Memc[output], Memc[output], SZ_FNAME) > 0) {
+	    if (streq("image",Memc[outtype]))
+		wrt_image = YES
+	    else if (streq("text",Memc[outtype]))
+		wrt_text = YES
+	}
 
 	# Store the maximum coordinate values in the parameter file.
 	nxvals = IM_LEN(im,1)
@@ -78,7 +84,6 @@ begin
 	}
 	width = clgeti ("width")
 
-
 	# Check the boundary and compute the length of the output vector.
 	x1 = max (1.0, min (x1, real (nxvals)))
 	x2 = min (real(nxvals), max (1.0, x2))
@@ -89,20 +94,74 @@ begin
 	# Check for cases which should be handled by pcols or prows.
 	call malloc (x_vec, nzvals, TY_REAL)
 	call malloc (y_vec, nzvals, TY_REAL)
+
 	if (fp_equalr (x1, x2)) {
 	    call pv_get_col (im, x1, y1, x2, y2, nzvals, width, btype,
 	        bconstant, Memr[x_vec], Memr[y_vec], zmin, zmax)
 	} else if (fp_equalr (y1, y2)) {
-	    if (ndim == 1)
+	    if (ndim == 1) {
 		call pv_get_row1 (im, x1, x2, nzvals, btype, bconstant,
 		    Memr[x_vec], Memr[y_vec], zmin, zmax)
-	    else
+	    } else {
 	        call pv_get_row (im, x1, y1, x2, y2, nzvals, width, btype,
 	            bconstant, Memr[x_vec], Memr[y_vec], zmin, zmax)
+	    }
 	} else {
 	    call pv_get_vector (im, x1, y1, x2, y2, nzvals, width, btype,
 	        bconstant, Memr[x_vec], Memr[y_vec], zmin, zmax)
 	}
+
+	# Output the plot, via the graphics stream, or as a textfile or image.
+	if (wrt_image == YES) {
+	    call pv_wrt_image (im, Memc[image], Memc[output],
+		Memr[x_vec], Memr[y_vec], nzvals, x1, x2, y1, y2, width)
+	} else if (wrt_text == YES) {
+	    call pv_wrt_pixels (Memc[output],
+		Memr[x_vec], Memr[y_vec], nzvals)
+	} else {
+	    call pv_draw_vector (Memr[x_vec], Memr[y_vec], nzvals,
+		x1, x2, y1, y2, zmin, zmax, width, Memc[image])
+	}
+
+        # Free resources.
+	call mfree (x_vec, TY_REAL)
+	call mfree (y_vec, TY_REAL)
+	call imunmap (im)
+	call sfree (sp)
+end
+
+
+# PV_DRAW_VECTOR - Draw the vector to the specified output device.
+
+procedure pv_draw_vector (xvec, yvec, nzvals,
+	x1, x2, y1, y2, zmin, zmax, width, image)
+
+real	xvec[nzvals], yvec[nzvals]			#I Vectors to draw
+int	nzvals, width					#I Plot parameters
+real	x1, x2, y1, y2, zmin, zmax			#I Plot parameters
+char	image[SZ_FNAME]					#I Image name
+
+pointer	sp, gp
+int	mode, imark
+pointer	device, marker, xlabel, ylabel, title, suffix, hostid
+real	wx1, wx2, wy1, wy2, vx1, vx2, vy1, vy2, szm, tol
+bool	pointmode
+
+bool	clgetb(), streq()
+int	clgeti(), btoi()
+pointer	gopen()
+real	clgetr()
+errchk 	gopen
+
+begin
+	call smark (sp)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (marker, SZ_FNAME, TY_CHAR)
+	call salloc (xlabel, SZ_LINE, TY_CHAR)
+	call salloc (ylabel, SZ_LINE, TY_CHAR)
+	call salloc (hostid, 2 * SZ_LINE, TY_CHAR)
+	call salloc (title, SZ_LINE, TY_CHAR)
+	call salloc (suffix, SZ_FNAME, TY_CHAR)
 
 	# Open the graphics stream.
 	call clgstr ("device", Memc[device], SZ_FNAME)
@@ -110,12 +169,12 @@ begin
 	    mode = APPEND
 	else
 	    mode = NEW_FILE
-	gp = gopen (Memc[device], mode, STDGRAPH)
+	iferr (gp = gopen (Memc[device], mode, STDGRAPH))
+	    call error (0, "Error opening graphics device.")
 
 	tol = 10. * EPSILONR
 
 	if (mode != APPEND) {
-
 	    # Establish window.
 	    wx1 = clgetr ("wx1")
 	    wx2 = clgetr ("wx2")
@@ -153,7 +212,7 @@ begin
 	    call sysid (Memc[hostid], SZ_LINE)
 	    call strcat ("\n", Memc[hostid], SZ_LINE)
 	    if (streq (Memc[title], "imtitle")) {
-	        call strcpy (Memc[image], Memc[title], SZ_FNAME)
+	        call strcpy (image, Memc[title], SZ_LINE)
 		call sprintf (Memc[suffix], SZ_FNAME, 
 		    ": vector %.1f,%.1f to %.1f,%.1f width: %d") {
 		    call pargr (x1)
@@ -162,7 +221,7 @@ begin
 		    call pargr (y2)
 		    call pargi (width)
 		}
-	        call strcat (Memc[suffix], Memc[title], SZ_FNAME)
+	        call strcat (Memc[suffix], Memc[title], SZ_LINE)
 	    }
 	    call strcat (Memc[title], Memc[hostid], 2 * SZ_LINE)
     
@@ -185,20 +244,104 @@ begin
         if (pointmode) {
             call clgstr ("marker", Memc[marker], SZ_FNAME)
             szm= clgetr ("szmarker")
-            call pv_init_marker (Memc[marker], imark)
+            call init_marker (Memc[marker], imark)
         }
 
         # Now to actually draw the plot.
         if (pointmode)
-            call gpmark (gp, Memr[x_vec], Memr[y_vec], nzvals, imark, szm, szm)
+            call gpmark (gp, x_vec, y_vec, nzvals, imark, szm, szm)
         else
-            call gpline (gp, Memr[x_vec], Memr[y_vec], nzvals)
+            call gpline (gp, x_vec, y_vec, nzvals)
        
         # Close up graphics and image.
-	call mfree (x_vec, TY_REAL)
-	call mfree (y_vec, TY_REAL)
         call gclose (gp)
-	call imunmap (im)
+	call sfree (sp)
+end
+
+
+# PV_WRT_PIXELS - Write out the vector to the specified file.  File may be
+# specified as STDOUT.  Behaves much like LISTPIX.
+
+procedure pv_wrt_pixels (file, x, y, npts)
+
+char	file[SZ_FNAME]				#I Output file name
+real	x[npts], y[npts]			#I Vector to write
+int	npts					#I Npts in vector
+
+int	i
+pointer	fd, open()
+bool	streq()
+errchk	open
+
+begin
+	if (streq("STDOUT", file))
+	    fd = STDOUT
+	else if (streq("STDERR", file))
+	    fd = STDERR
+	else
+	    iferr (fd = open (file, APPEND, TEXT_FILE))
+		call error (0, "Error opening output file.")
+
+	do i = 1, npts {
+	    call fprintf (fd, "%.1f  %.4f\n")
+		call pargr (x[i])
+		call pargr (y[i])
+	}
+
+	call flush (fd)
+	if (fd != STDOUT && fd != STDERR)
+	    call close (fd)
+end
+
+
+# PV_WRT_IMAGE - Write out the vector to the specified image name.  The original
+# image header is coptired to the new image and a acomment added describing the
+# computed vector
+
+procedure pv_wrt_image (im, image, file, x, y, npts, x1, x2, y1, y2, width)
+
+pointer	im					#I Parent image pointer
+char	image[SZ_FNAME]				#I Name of original image
+char	file[SZ_FNAME]				#I Ouput image name
+real	x[npts], y[npts]			#I Vector to write
+int	npts					#I Npts in vector
+real	x1, x2, y1, y2				#I Endpoints of vector
+int	width					#I Width of sampled points
+
+pointer	sp, comment, imo
+pointer	immap(), impl2r()
+bool	streq()
+errchk	immap, impl2r
+
+begin
+	if (streq(file,"STDOUT") || streq(file,"STDERR"))
+	    call error (0, "Illegal filename for output image.")
+
+	# Open a (new) image
+	iferr (imo = immap(file, NEW_COPY, im)) 
+	    call error (0, "Error opening output image.")
+
+	call smark (sp)
+	call salloc (comment, SZ_LINE, TY_CHAR)
+
+	# Do some header manipulations
+	IM_NDIM(imo) = 1
+	IM_LEN(imo,1) = npts
+	call sprintf (Memc[comment], SZ_LINE,
+	    "%s: vector %.1f,%.1f to %.1f,%.1f  width: %d")
+		call pargstr (image)
+		call pargr (x1)
+		call pargr (x2)
+		call pargr (y1)
+		call pargr (y2)
+		call pargi (width)
+	call imastr (imo, "VSLICE", Memc[comment])
+
+	# Now dump it into the image
+	call amovr (y, Memr[impl2r(imo,1)], npts)
+
+	# Do some housecleaning
+	call imunmap (imo)
 	call sfree (sp)
 end
 
@@ -808,7 +951,6 @@ begin
 	}
 
 	# Read only the image lines with are different from the last buffer.
-
 	if (line1 < llast1) {
 	    do i = line2, line1, -1 {
 		if (i > llast1)
@@ -832,36 +974,8 @@ begin
 	}
 
 	# Save the buffer parameters.
-
 	llast1 = line1
 	llast2 = line2
 	nclast = ncols
 	nllast = nlines
-end
-
-
-# PV_INIT_MARKER -- Returns integers code for marker type string.
-
-procedure pv_init_marker (marker, imark)
-
-char	marker[ARB]		# Marker type as a string
-int	imark			# Integer code for marker - returned
-
-bool	streq()
-
-begin
-	if (streq (marker, "point"))
-	    imark = GM_POINT
-	else if (streq (marker,   "box"))
-	    imark = GM_BOX
-	else if (streq (marker,  "plus"))
-	    imark = GM_PLUS
-	else if (streq (marker, "cross"))
-	    imark = GM_CROSS
-	else if (streq (marker, "circle"))
-	    imark = GM_CIRCLE
-	else {
-	    call eprintf ("Unrecognized marker type, using 'box'\n")
-	    imark = GM_BOX
-	}
 end

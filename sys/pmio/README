@@ -80,6 +80,14 @@ physical image matrix.
 		     pm_stencil (pm_src, vs, pm_dst, vs, pm_stl, vs, vn, rop)
 
 
+2.1 Random Access to a Pixel Mask
+
+		 pmr = pmr_open (pm, plane, buflimit)
+		    pmr_setrect (pmr, x1,y1, x2,y2)
+	      mval = pmr_getpix (pmr, i, j)
+		      pmr_close (pmr)
+
+
 3. Pixel List Interface (stands alone; independent of IMIO; no coord xforms)
 
 		   pl = pl_open (bufptr|NULL)
@@ -117,7 +125,16 @@ physical image matrix.
 		     pl_stencil (pl_src, vs, pl_dst, vs, pl_stl, vs, vn, rop)
 
 
-3.1 Pixel, Line, and Range List Routines
+3.1 Random Access to a Pixel List
+
+		 plr = plr_open (pl, plane, buflimit)
+		    plr_setrect (plr, x1,y1, x2,y2)
+	      mval = plr_getpix (plr, i, j)
+		     plr_getlut (plr, bufp, xsize,ysize, xblock,yblock)
+		      plr_close (plr)
+
+
+3.2 Pixel, Line, and Range List Routines
 
 		      pl_pixrop (px_src, xs, src_maxval,
 				 px_dst, ds, dst_maxval, npix, rop)

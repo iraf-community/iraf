@@ -1,5 +1,19 @@
 .help revisions Jun88 pkg.xtools.gtools
 .nf
+pkg$xtools/gtools
+    1.  Added new colon command :/sysid to turn off system ID banner.
+    2.  Added new colon command :/type hist to plot histogram type lines.
+    (10/5/89, Valdes)
+
+pkg$xtools/gtools/gtascale.x
+    Made a trivial change, a temp variable is now used for switching two
+    variables, to work around an optimizer bug on Sun3/OS4/f68881.
+    (9/21/89, Valdes)
+
+====
+V2.8
+====
+
 pkg$xtools/gtools/gtascale.x +
     Added a procedure to complement GSCALE to scale data only within
     a GTOOLS window.  (11/30/87 Valdes)

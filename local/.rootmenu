@@ -1,0 +1,123 @@
+#
+#	@(#)rootmenu	1.6	Sun Microsystems
+#	2/8/88	ECD
+#
+#	ecd sunview root menu
+#
+
+"Command Windows "	MENU
+#?	sunview:rmcommandwindows
+
+	"Commands"		cmdtool    -Wf  0 0 0 -Wl "One moment, please..." -WL ""
+#?	sunview:rmcommands
+	"DOS Window"		dos -b     -Wf  0 87 137
+#?	sunview:rmdoswindow
+
+
+	"System Messages"	cmdtool    -Wp   16  17 -Ws 498  99 -WP   92  52 -Wi -Wb 171 171 171 -Wf   0   0 134 -WI /usr/include/images/sunlogo.icon -C -Wl "One moment, please..." -WL "" isconsole 
+#?	sunview:rmsysmessages
+
+"Command Windows "			END
+
+"Services"				MENU
+#?	sunview:rmservices
+	"Redisplay All"			REFRESH
+#?	sunview:redisplay
+	"Lock Screen"			lockscreen 
+#?	sunview:rmlockscreen
+	"Save Screen Layout"   save_screen_layout
+#?	sunview:rmsavescreen
+"Help Viewer"		 help_viewer -Wp 228 21 -Wf 38 134 110 -file help/Help_Basics 
+#?	sunview:rmhelpviewer
+"Organizer"		organizer -Wp 107 132 -Wf 0 87 137
+#?	sunview:rmorganizer
+"User Defaults"		defaultsedit -Wf 255 200 0
+#?	sunview:rmuserdefaults
+	"SNAP Administration" 	snap -Wf 0 130 200 -WP 16 584
+#?	sunview:rmadministration
+	"Color Editor"			coloredit -Wf 0 0 0
+"Display Clock"			MENU
+#?	sunview:rmdisplayclock
+	                	</usr/include/images/clock.icon>        clock 
+#?	sunview:rmroundclock
+	                	</usr/include/images/clock.rom.icon>    clock -r
+#?	sunview:rmsquareclock
+	        "Display Clock"         	END
+	"Printing"	MENU
+#?	sunview:rmprinting
+
+	"Check Printer Queue"   sh -c "echo; echo '-----------------'; echo 'Printer queue'; lpq; echo '-----------------'"
+#?	sunview:rmprintqueue
+	"Print Selected Text"   sh -c "get_selection | lpr ; echo 'Selection printed'."
+#?	sunview:rmprinttext
+	"Print Screen"			sh -c "echo 'Saving screen image'. ; screendump|rasfilter8to1|lpr -v ; echo 'Screen printed'."
+#?	sunview:rmprintscreen
+	"Printing"	END
+	"Default Font"   MENU 
+#?	sunview:rmdefaultfont
+		"Tiny Font" changefont /usr/lib/fonts/fixedwidthfonts/screen.r.7 "the tiny font"
+#?	sunview:rmtinyfont
+		"Standard Font" changefont /usr/lib/fonts/fixedwidthfonts/screen.r.13 "the standard font"
+#?	sunview:rmstandardfont
+		"Bold font" changefont /usr/lib/fonts/fixedwidthfonts/screen.b.14 "the Bold font"
+#?	sunview:rmboldfont
+		"Large Font" changefont /usr/lib/fonts/fixedwidthfonts/cour.b.18 "the large font"	
+#?	sunview:rmlargefont
+	"Default Font"   END
+	"Remote Login"		MENU
+                "Gterm"         gterm csh -c "echo -n 'Hostname? '; exec rlogin $<"
+		"Command Tool"  cmdtool csh -c "echo -n 'Hostname? '; exec rlogin $<"
+                "Shell Tool"    shelltool csh -c "echo -n 'Hostname? '; exec rlogin $<"
+        "Remote Login"		END
+"Services"				END
+
+
+#--------------------------------------
+#
+#	@(#)rootmenu.4.0	1.1 87/11/07 SMI
+#
+#	sunview root menu
+#
+"Editors"               MENU
+        "Text Editor"		textedit
+        "Defaults Editor"	defaultsedit
+        "Icon Editor"		iconedit
+        "Font Editor"		fontedit
+"Editors"               END
+"Shells"		MENU
+	"Gterm"			gterm -Wh 40 -I "source ~/.login"
+	"IRAF"			gterm -Wh 40 -Wf 0 0 255 -I cl -G -Wb 128 0 0 -Wf 0 255 255 -I "source ~/.login"
+	"Shell Tool"		shelltool
+	"Command Tool"		cmdtool
+	"Graphics Tool"         gfxtool
+	"Console"               cmdtool -C
+"Shells"		END
+"Tools"            	MENU
+	VT100-tools	MENU
+	"VT100 emulator"        vttool
+	"VT100 Tool"		shelltool -Ww 80 -Wh 24 -Wl " VT100 Tool" vtem
+	"VT100 (EDT)"           vttool -b edt.buttons
+	"Shelltool (novices)"   vttool -b shell.buttons /bin/csh
+	VT100-tools	END
+	"ImTool"		imtool
+	"Movie" cmdtool -Wn -Ww 80 -Wh 1 csh -c "echo -n 'Movie directory? '; (cd $<; overview movie)"
+
+	"MoonTool"		/usr/local/bin/moontool
+	"Touchup"		/usr/local/bin/touchup
+	"Mail Tool"             mailtool
+        "Dbx (debug) Tool"   dbxtool
+	"Net Traffic"	traffic
+        "Performance Meter"	MENU
+                "Percent CPU Used"			perfmeter -v cpu
+		"Load Average"				perfmeter -v load
+                "Disk Transfers"                        perfmeter -v disk
+		"Paging Activity"			perfmeter -v page
+                "Swapped Jobs"                          perfmeter -v swap
+		"Device Interrupts"			perfmeter -v intr
+		"Context Switches"			perfmeter -v cntxt
+                "Ethernet Packets"                      perfmeter -v pkts
+		"Ethernet Collisions"			perfmeter -v colls
+		"Ethernet Errors"			perfmeter -v errs
+        "Performance Meter"	END
+"Tools"			END
+"Exit SunView"          EXIT

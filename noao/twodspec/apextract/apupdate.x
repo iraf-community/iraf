@@ -14,7 +14,7 @@ real	center		# New center at dispersion line
 real	low		# New lower limit
 real	high		# New upper limit
 
-real	cveval()
+real	cveval(), ic_getr()
 
 begin
 	# Erase the current aperture.
@@ -27,6 +27,12 @@ begin
 	AP_CEN(ap, AP_AXIS(ap)) = center - cveval (AP_CV(ap), real (line))
         AP_LOW(ap, AP_AXIS(ap)) = min (low, high)
         AP_HIGH(ap, AP_AXIS(ap)) = max (low, high)
+	if (AP_IC(ap) != NULL) {
+	    call ic_putr (AP_IC(ap), "xmin",
+		min (low, high, ic_getr (AP_IC(ap), "xmin")))
+	    call ic_putr (AP_IC(ap), "xmax",
+		max (low, high, ic_getr (AP_IC(ap), "xmax")))
+	}
 
 	# Mark the new aperture.
 	call gseti (gp, G_PLTYPE, 1)

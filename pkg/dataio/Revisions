@@ -1,5 +1,67 @@
 .help revisions Jun88 pkg.dataio
 .nf
+dataio$fits/fits_wheader.x: From Davis, April 21
+dataio$fits/fits_write.x: From Davis, April 21
+dataio$fits/fits_read.x: From Davis, April 21
+    The original scaling algorithm was restored due to problems encountered
+    with the new one. This will be looked into more fully in version 2.10.
+    These means that a problem with double precision images may remain.
+
+    Since I had to make the above change at the last minute I added some
+    code to flush the STDOUT  after in input and output file names
+    are computed and written to STDOUT. This avoids a problem with
+    output not being flushed when an error condition occurs and output
+    is being redirected causing confusion for the user who may not be able
+    to tell where the error occured in that case.
+
+dataio$fits/fits_wheader.x: From Davis, Mar 24, 1990
+    Fixed a problem with the scaling routines in wfits. Images with a
+    minimum which was negative and distant from the majority of the
+    data values could cause a problem in the scaling.
+
+dataio$fits/fits_rimage.x: From Davis, Mar 10, 1990
+    Recoded the routine that computes the mins and maxs of an image
+    slightly to remove a problem with the STF kernel. The mins and maxs
+    of the image were being reset to 0 when the first data was written
+    over-riding the program initialization of MAX_REAL and -MAX_REAL
+    and defeating the minimum calculation for all positive data.
+
+dataio$fits/fits_wheader.x: From Davis, Mar 9, 1990
+    Fixed a problem in the way bscale and bzero were computed that was
+    causing floating point errors for some double precision images,
+    basically because the precision was worse than I thought.
+    The really problem is that the min and max of a double precision
+    image are  stored as reals in the image header do they do not
+    quite correspond to what is in the image. The solution was to extend
+    the values of the min and max to slightly lower and higher values
+    respectively. These problems will go away when ieee becomes more
+    accepted.
+
+dataio$fits/fits_cards: From Davis, Jan 20, 1990
+    Added a filter to remove duplicate IRAF-MIN, IRAF-MAX, IRAFTYPE,
+    and IRAF-B/P keywords from the user area. 
+
+dataio$fits: From Davis, Jan 19, 1990
+    1. Support was added for the IEEE floating point format to both
+    the rfits and wfits tasks. Rfits now recognizes -32 and -64 to
+    be legal values of bitpix representing respectively real and
+    double IEEE floating point format. Values of bscale and bzero
+    are applied if present in the header. By default wfits still
+    writes integer format FITS tapes with autoscaling. However if
+    the users selects a bitpix of -32 or -64 the appropriate floating
+    point format is written. In this case scaling is disabled.
+
+    2. Rfits was modified to take a list of output images names or
+    an output image root name.
+
+    3. Wfits was modified to take a list of output fits file names
+    or an output fits file root name.
+
+dataio$fits/fits_wheader.x: From Davis, Nov 20, 1989
+    1. Fixed wfits so it would write out type "ushort" images correctly
+    with the default parameters. The chosen bitpix is 32 instead of
+    16.
+
 dataio$fits/t_rfits.x,t_wfits.x: From Davis, May 29, 1989
     1. Changed both these tasks so the STDOUT is only flushed on a newline
     if has not been redirected. Changed the remaining eprintf statements

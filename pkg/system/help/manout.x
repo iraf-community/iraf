@@ -33,7 +33,7 @@ reinit variables.
 
 define	LEN_HEADER		2
 define	LEN_FOOTER		3
-define	LEN_KEEP		100
+define	LEN_KEEP		1024
 define	SZ_PAGELABEL		6
 define	SZ_HEADER_GAP		2
 

@@ -49,6 +49,9 @@ char	*argv[];
 	char	*ip;
 
 	int	arg = 1;
+#ifdef apollo
+ 	int	(*epaptr)(), (*epaptr2)();
+#endif
 	int	ZGETTX(), ZGETTY(), ZARDPR(), SYSRUK(), ONENTRY();
 
 	/* The following flag must be set before calling ZZSTRT. */
@@ -72,7 +75,18 @@ char	*argv[];
 
         /* Default if no -cCd process type flags. */
 	prtype = PR_HOST;
+
+/* In Domain/OS, referencing an argument in a procedure that was declared
+ * int ROUTINE() in the caller results in a segmentation violation.  This
+ * was the problem that broke both debuggers and the domain kernel when such
+ * a process was debugged on a dn3500 with fpa under sr10.1.
+ */
+#ifdef apollo
+ 	epaptr = ZGETTY;
+ 	ZLOCPR (&epaptr, &driver);
+#else
 	ZLOCPR (ZGETTY, &driver);
+#endif
 	devtype = TEXT_FILE;
 
 	if (arg < argc) {
@@ -90,7 +104,12 @@ char	*argv[];
 		arg++;
 ipc_:
 		prtype = PR_CONNECTED;
+#ifdef apollo
+ 		epaptr = ZARDPR;
+ 		ZLOCPR (&epaptr, &driver);
+#else
 		ZLOCPR (ZARDPR, &driver);
+#endif
 		devtype = BINARY_FILE;
 
 	    } else if (strncmp (argv[arg], "-d", 2) == 0) {
@@ -111,7 +130,12 @@ ipc_:
 
 		freopen ("/dev/null", "r", stdin);
 		prtype = PR_DETACHED;
+#ifdef apollo
+ 		epaptr = ZGETTX;
+ 		ZLOCPR (&epaptr, &driver);
+#else
 		ZLOCPR (ZGETTX, &driver);
+#endif
 		devtype = TEXT_FILE;
 
 		/* Copy the bkgfile to PKCHAR buffer to avoid the possibility
@@ -159,8 +183,15 @@ ipc_:
 	 * OK when the main returns.  The process can return an error status
 	 * code only in the event of a panic.
 	 */
+#ifdef apollo
+ 	epaptr = SYSRUK;
+ 	epaptr2 = ONENTRY;
+	IRAF_MAIN (irafcmd, &inchan, &outchan, &errchan, &driver,
+	    &devtype, &prtype, osfn_bkgfile, &jobcode, &epaptr, &epaptr2);
+#else
 	IRAF_MAIN (irafcmd, &inchan, &outchan, &errchan,
 	    &driver, &devtype, &prtype, osfn_bkgfile, &jobcode, SYSRUK,ONENTRY);
+#endif
 
 	/* Normal process shutdown.  Our only action is to delete the bkgfile
 	 * if run as a detached process (see also zpanic).

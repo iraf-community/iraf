@@ -1,5 +1,30 @@
 .help revisions Jun88 pkg.xtools
 .nf
+pkg$xtools/center1d.x
+    In the case that the position correction flipped back and forth about the
+    center no center would be found.  In this case I added a check to
+    divide the correction factor in half.  (3/13/90, Valdes)
+
+pkg$xtools/numrecipes.x +
+    Add some procedures for generating Gaussian and Possion deviates
+    as well as an implementation of the Levenberg-Marquardt nonlinear
+    chi square minimization algorithm.  These routines are either
+    direct implementations from Numerical Recipes or based on descriptions
+    in that book. (10/25/89, Valdes)
+
+pkg$xtools/dttext.x
+    Commented out the diagnostic message in dtlocate.  (7/19/89, Valdes)
+
+pkg$xtools/center1d.x
+pkg$xtools/doc/center1d.hlp
+    If the centering width is less than or equal to 1 the nearest minima or
+    maxima is found.  As before, a minimum width of 3 is used if
+    the width is between 1 and 3.  (7/13/89, Valdes)
+
+===========
+Version 2.8
+===========
+
 pkg$xtools/logfiles.x
     Added these routines to open and to close a list of logfiles.
     (6/2/89, Seaman)

@@ -1,7 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<gset.h>
-include	<pkg/gtools.h>
+include	"gtools.h"
 
 define	KEY	"lib$scr/gtools.key"
 define	PROMPT	"graph format options"
@@ -9,7 +9,7 @@ define	PROMPT	"graph format options"
 # Defined colon commands for the GTOOLS package
 define	COMMANDS "|/xwindow|/ywindow|/xtransform|/ytransform|/title|/xlabel|\
 	|/ylabel|/xunits|/yunits|/comments|/help|/redraw|/subtitle|/xsize|\
-	|/ysize|/parameters|/type|/mark|/line|/transpose|"
+	|/ysize|/parameters|/type|/mark|/line|/transpose|/sysid|"
 define	XWINDOW		1	# Set X window limits
 define	YWINDOW		2	# Set Y window limits
 define	XTRANSFORM	3	# Set X transformation function
@@ -32,6 +32,7 @@ define	TYPE		19	# Set graph type
 define	MARK		20	# Set symbol mark type
 define	LINE		21	# Set line type
 define	TRANSPOSE	22	# Transpose graph
+define	SYSID		23	# Draw SYSID?
 
 
 # GT_COLON -- Process standard gtools colon commands.
@@ -45,9 +46,11 @@ int	newgraph			# Update graph?
 
 char	cmd[SZ_LINE]
 int	ncmd, ival
+bool	bval
 real	rval[2]
 
 int	nscan(), strdic(), gt_geti()
+bool	btoi()
 real	gt_getr()
 
 begin
@@ -193,5 +196,14 @@ begin
 		call gt_seti (gt, GTTRANSPOSE, YES)
 	    else
 		call gt_seti (gt, GTTRANSPOSE, NO)
+
+	case SYSID: # /sysid: Write SYSID string?
+	    call gargb (bval)
+	    if (nscan() == 2)
+		call gt_seti (gt, GTSYSID, btoi (bval))
+	    else {
+		call printf ("sysid = %b\n")
+		    call pargi (gt_geti (gt, GTSYSID))
+	    }
 	}
 end

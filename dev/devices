@@ -11,10 +11,7 @@
 # plus one entry for the default density.  Backslash continuation may be used
 # to break long lines, and # style comments are permitted anywhere.
 
-mta		rmt20	mt0 mt4 mt8 mt12 mt16 mt20 rmt0 rmt4 rmt8 rmt12 rmt16
-mta.1600	rmt12	mt0 mt4 mt8 mt12 mt16 mt20 rmt0 rmt4 rmt8 rmt20 rmt16
-mta.6250	rmt20	mt0 mt4 mt8 mt12 mt16 mt20 rmt0 rmt4 rmt8 rmt12 rmt16
+mta		rct8	rct12
+mta.low		rct8	rct12
+mta.high	rct12	rct8
 
-mtb		rmt21	mt1 mt5 mt9 mt13 mt17 mt21 rmt1 rmt5 rmt9 rmt13 rmt17
-mtb.1600	rmt13	mt1 mt5 mt9 mt13 mt17 mt21 rmt1 rmt5 rmt9 rmt21 rmt17
-mtb.6250	rmt21	mt1 mt5 mt9 mt13 mt17 mt21 rmt1 rmt5 rmt9 rmt13 rmt17

@@ -30,6 +30,7 @@ define	QPOE_VERSION	101		# QPOE interface version number
 define	QPOE_TITLE	"QPOE-V1.1"	# title string, for symbol table
 define	QPOE_EXTN	".qp"		# QPOE file extension
 define	QPOE_MACROEXTN	".qpm"		# QPOE macro definitions file extension
+define	QPWCS		"qpwcs"		# header parameter for default WCS
 define	IMMEDIATE	0		# for qp_sizeof
 define	INSTANCEOF	1		# for qp_sizeof
 

@@ -21,6 +21,7 @@ int	nx, ny
 pointer	ctr, sp, str, r, gt
 real	xcenter, ycenter, xc, yc, rmin, rmax, imin, imax
 real	u1, u2, v1, v2, x1, x2, y1, y2
+int	apstati()
 pointer	ap_gtinit()
 real	apstatr()
 
@@ -35,10 +36,16 @@ begin
 	if (IS_INDEFR(xcenter) || IS_INDEFR(ycenter))
 	    return
 
+	# Check for a centering algorithm.
+	if (apstati (ap, CENTERFUNCTION) == AP_NONE)
+	    return
+
 	# Get the pixel buffer parameters.
 	ctr = AP_PCENTER(ap)
 	nx = AP_CNX(ctr)
 	ny = AP_CNY(ctr)
+	if (AP_CTRPIX(ctr) == NULL || nx <= 0 || ny <= 0)
+	    return
 	xc = AP_CXC(ctr) + (xcenter - apstatr (ap, CXCUR))
 	yc = AP_CYC(ctr) + (ycenter - apstatr (ap, CYCUR))
 
@@ -132,7 +139,7 @@ begin
 	scale = apstatr (ap, SCALE)
 	aspect = gstatr (gd, G_ASPECT)
 	call gsetr (gd, G_ASPECT, 0.75)
-	datalimit = apstatr (ap, DATALIMIT)
+	datalimit = apstatr (ap, CDATALIMIT)
 	threshold = apstatr (ap, CTHRESHOLD)
 
 	if (apstati (ap, POSITIVE) == YES) {
@@ -194,7 +201,7 @@ begin
 
 	fwhmpsf = 0.5 * apstatr (ap, FWHMPSF) * apstatr (ap, SCALE)
 	capert = 2.0 * fwhmpsf * apstatr (ap, CAPERT)
-	datalimit = apstatr (ap, DATALIMIT)
+	datalimit = apstatr (ap, CDATALIMIT)
 	threshold = apstatr (ap, CTHRESHOLD)
 	if (apstati (ap, POSITIVE) == YES)
 	    threshold = datalimit + threshold
@@ -256,7 +263,7 @@ real	apstatr()
 
 begin
 	# Set the data window.
-	datalimit = apstatr (ap, DATALIMIT)
+	datalimit = apstatr (ap, CDATALIMIT)
 	threshold = apstatr (ap, CTHRESHOLD)
 	call gt_setr (gt, GTXMIN, xmin)
 	call gt_setr (gt, GTXMAX, xmax)

@@ -106,7 +106,8 @@ will be called during process shutdown.  Any error occuring while executing
 an ONEXIT procedure is fatal and will result in a panic abort of the process.
 .endhelp _____________________________________________________________________
 
-define	SZ_VALSTR		512
+define	SZ_VALSTR		SZ_COMMAND
+define	SZ_CMDBUF		(SZ_COMMAND+1024)
 define	SZ_TASKNAME		32
 define	TIMEIT_CHAR		'$'
 define	MAXFD			5		# max redirectable fd's
@@ -139,7 +140,7 @@ extern	onentry()		# client onentry procedure
 
 bool	networking
 int	inchan, outchan, errchan, driver, devtype
-char	cmd[SZ_LINE], taskname[SZ_TASKNAME], bkgfname[SZ_FNAME]
+char	cmd[SZ_CMDBUF], taskname[SZ_TASKNAME], bkgfname[SZ_FNAME]
 int	arglist_offset, timeit, junk, interactive, builtin_task, cmdin
 int	jumpbuf[LEN_JUMPBUF], status, state, interpret, i
 long	save_time[2]
@@ -325,7 +326,9 @@ begin
 	    if (streq (taskname, "bye")) {
 		# Initiate process shutdown.
 		break
-	    } else if (streq (taskname, "set") || streq (taskname, "chdir")) {
+	    } else if (streq (taskname, "set") || streq (taskname, "reset")) {
+		builtin_task = YES
+	    } else if (streq (taskname, "cd")  || streq (taskname, "chdir")) {
 		builtin_task = YES
 	    } else if (prtype == PR_CONNECTED && streq (taskname, "_go_")) {
 		# Restore the normal standard output streams, following
@@ -365,8 +368,10 @@ begin
 
 	    if (sys_runtask (taskname,cmd,arglist_offset,interactive) == ERR) {
 		call flush (STDOUT)
-		call putline (CLOUT,
-		    "ERROR (0, \"Iraf Main: Unknown task name\")\n")
+		call sprintf (cmd, SZ_CMDBUF,
+		    "ERROR (0, \"Iraf Main: Unknown task name (%s)\")\n")
+		    call pargstr (taskname)
+		call putline (CLOUT, cmd)
 		call flush (CLOUT)
 		state = IDLE
 		next
@@ -376,7 +381,7 @@ begin
 	    # standard output, cancel any unread standard input so the next
 	    # task won't try to read it, print elapsed time if enabled,
 	    # check for an incorrect error handler, call any user posted
-	    # termiation procedures, close open files, close any redirected
+	    # termination procedures, close open files, close any redirected
 	    # i/o and restore the normal standard i/o streams.
 
 	    if (builtin_task == NO) {
@@ -425,14 +430,14 @@ end
 int procedure sys_getcommand (fd, cmd, taskname, arglist_offset, timeit, prtype)
 
 int	fd			#I command input file
-char	cmd[SZ_LINE]		#O command line
+char	cmd[SZ_CMDBUF]		#O command line
 char	taskname[SZ_TASKNAME]	#O extracted taskname, lower case
 int	arglist_offset		#O offset into CMD of first argument
 int	timeit			#O if YES, time the command
 int	prtype			#I process type code
 
 int	ip, op
-int	getline(), stridx()
+int	getlline(), stridx()
 
 begin
 	repeat {
@@ -443,7 +448,7 @@ begin
 		call putline (CLOUT, "> ")
 		call flush (CLOUT)
 	    }					
-	    if (getline (fd, cmd) == EOF)
+	    if (getlline (fd, cmd, SZ_CMDBUF) == EOF)
 		return (EOF)
 
 	    # Check for timeit character and advance to first character of
@@ -511,14 +516,14 @@ char	i_args[ARB]		# (first part of) argument list
 int	fd
 char	ch
 pointer	sp, fname, args, ip, op
-int	getline()
+int	getlline()
 
 begin
 	call smark (sp)
-	call salloc (args, SZ_LINE, TY_CHAR)
+	call salloc (args, SZ_CMDBUF, TY_CHAR)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 
-	call strcpy (i_args, Memc[args], SZ_LINE)
+	call strcpy (i_args, Memc[args], SZ_CMDBUF)
 
 	# Inform FIO that all standard i/o streams are unredirected (overridden
 	# below if redirected by an argument).
@@ -538,7 +543,7 @@ begin
 	    # Check for continuation.
 	    ch = Memc[ip]
 	    if (ch == '\\' && (Memc[ip+1] == '\n' || Memc[ip+1] == EOS)) {
-		if (getline (cmdin, Memc[args]) == EOF)
+		if (getlline (cmdin, Memc[args], SZ_CMDBUF) == EOF)
 		    return
 		ip = args
 		next
@@ -583,17 +588,17 @@ char	fname			# pset file
 
 int	lineno, fd
 pointer	sp, lbuf, ip
-int	open(), getline()
-errchk	open, getline
+int	open(), getlline()
+errchk	open, getlline
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (lbuf, SZ_CMDBUF, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 
 	lineno = 0
-	while (getline (fd, Memc[lbuf], SZ_LINE) != EOF) {
+	while (getlline (fd, Memc[lbuf], SZ_CMDBUF) != EOF) {
 	    lineno = lineno + 1
 	    for (ip=lbuf;  IS_WHITE (Memc[ip]);  ip=ip+1)
 		;
@@ -695,9 +700,9 @@ int	ip			# pointer to first char of redir arg
 
 int	fd, mode, type, junk
 pointer	sp, fname
-int	ctoi(), fredir()
+int	ctoi()			# Domain/OS:  , fredir()
 define	badredir_ 91
-errchk	fredir, fseti
+errchk	fseti			# Domain/OS:  fredir, 
 
 begin
 	call smark (sp)
@@ -790,7 +795,8 @@ begin
 	# recovery.
 
 	if (Memc[fname] != EOS)
-	    junk = fredir (fd, Memc[fname], mode, type)
+#Domain/OS: junk = fredir (fd, Memc[fname], mode, type)
+	    call fredir (fd, Memc[fname], mode, type)
 	else
 	    call fseti (fd, F_REDIR, YES)
 

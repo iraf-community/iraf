@@ -1,4 +1,4 @@
-.help imstack Mar89 images
+.help imstack Feb90 images
 .ih
 NAME
 imstack -- stack images into an image of higher dimension
@@ -36,6 +36,10 @@ EXAMPLES
 2. To stack a section of images:
 
 	cl> imstack image*[1:10,1:10] newimage
+.ih
+BUGS
+IMSTACK does not currently update the world coordinate system of the image
+after a stack operation.
 .ih
 SEE ALSO
 imslice

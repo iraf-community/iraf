@@ -33,7 +33,7 @@ int	i, j, first, last
 begin
 	if (vec == 1) {
 	    first = 1
-	    last = EX_NAVG(ex)
+	    last = EX_NAVG(ex) - 1
 	    call aclrr (profiles, len_profs)
 	    do i = first, last {
 		j = 2 + mod (i - 1, EX_NAVG(ex))
@@ -41,7 +41,7 @@ begin
 		    YES, profiles[1,j], bckgrnd)
 	        call aaddr (profiles, profiles[1,j], profiles, len_profs)
 	    }
-	} else if (vec > EX_NAVG(ex) / 2) {
+	} else if (vec > (EX_NAVG(ex) - 1) / 2) {
 	    if (last < EX_DLEN(im)) {
 	        j = 2 + mod (first - 1, EX_NAVG(ex))
 	        call asubr (profiles, profiles[1,j], profiles, len_profs)
@@ -51,6 +51,7 @@ begin
 	        j = 2 + mod (last - 1, EX_NAVG(ex))
 		call ex_gprofs (ex, im, last, aps, naps, pstart, pcen, pend,
 		    YES, profiles[1,j], bckgrnd)
+	        call aaddr (profiles, profiles[1,j], profiles, len_profs)
 	    }
 	}
 end

@@ -21,7 +21,7 @@ begin
 	# Check for 0 radius aperture.
 	rprof = AP_RPROF(ap)
 	if (AP_RPRADIUS(rprof) <= 0.0)
-	    return (AP_NOPROFILE)
+	    return (AP_RP_NOPROFILE)
 
 	# Compute the maximum aperture size
 	rbuf =  2. * AP_RPRADIUS(rprof) * AP_SCALE(ap) + 1.
@@ -33,9 +33,9 @@ begin
 
 	# Return the appropriate error code.
 	if (AP_RPIX(rprof) == NULL) {
-	    return (AP_NOPROFILE)
+	    return (AP_RP_NOPROFILE)
 	} else if (AP_RPNX(rprof) < rbuf || AP_RPNY(rprof) < rbuf) {
-	    return (AP_RPOUTOFBOUNDS)
+	    return (AP_RP_OUTOFBOUNDS)
 	} else {
 	    return (AP_OK)
 	}

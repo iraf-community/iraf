@@ -20,7 +20,7 @@ int	in, out, pn, junk, i, width
 
 bool	fnullfile()
 int	stropen(), open(), protect(), strlen() #ditto-dlb
-errchk	fmkcopy, open
+errchk	fmkcopy, open, stropen, fcopyo, fprintf
 
 begin
 	if (fnullfile (IM_HDRFILE(im)))
@@ -89,9 +89,10 @@ begin
 	    pp = STF_PDES(stf,pn)
 
 	    # PTYPE MUST be 8 characters or less.
-	    call fprintf (out, "PTYPE%d%9t= '%-8.8s'%32t/%81t\n")
+	    call fprintf (out, "PTYPE%d%9t= '%-8.8s'%32t/%s%81t\n")
 		call pargi (pn)
 		call pargstr (P_PTYPE(pp))
+		call pargstr (P_COMMENT(pp))
 
 	    # Need width for string--6/26/87, dlb
 	    call fprintf (out, "PDTYPE%d%9t= '%-*.*s'%32t/%81t\n")
@@ -106,13 +107,11 @@ begin
 		call pargi (P_PSIZE(pp))
 	}
 
-	# Add the contents of the IMIO user area, excluding the GPB value
-	# cards at the beginning of the area.  We can only hope that the
-	# user will not have deleted any of these cards.
+	# Add the contents of the IMIO user area, excluding the cards used
+	# to represent GPB parameters.
 
-	pp = IM_USERAREA(im) + STF_SZGPBHDR(stf)
-	in = stropen (Memc[pp], ARB, READ_ONLY)
-	call fcopyo (in, out)
+	in = stropen (Memc[IM_USERAREA(im)], ARB, READ_ONLY)
+	call stf_copyfits (stf, in, NULL, out)
 	call close (in)
 
 	# End of FITS header.

@@ -29,10 +29,14 @@ allocate/deallocate the word buffer.
 
 procedure set_wordbuf (max_words)
 
-int	word_buffer_size, max_words
-extern	out()
-char	text[ARB], ch
+int	max_words
 
+# entry	textout (out, text)
+extern	out()
+char	text[1]
+
+char	ch
+int	word_buffer_size
 int	ip_save, wcols_save, ip
 errchk	malloc, breakline
 include	"lroff.com"

@@ -2,7 +2,7 @@ include "../lib/apphot.h"
 include "../lib/noise.h"
 include "../lib/find.h"
 
-# AP_FDCOLON -- Process colon commands from the centering task.
+# AP_FDCOLON -- Process colon commands from the daofind task.
 
 procedure ap_fdcolon (ap, im, out, stid, cmdstr, newbuf, newfit)
 
@@ -33,15 +33,18 @@ begin
 
 	# Process the command making sure that the pointer to the
 	# coords file is always NULL.
-	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0) {
+	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0) {
 	    cl = NULL
-	    call apnscolon (ap, im, cl, out, stid, junk, cmdstr, junk, junk,
+	    call ap_apcolon (ap, im, cl, out, stid, junk, cmdstr, junk, junk,
 		junk, junk, newbuf, newfit)
 	    if (cl != NULL) {
 		call close (cl)
 		cl = NULL
 		call apsets (cl, CLNAME, "")
 	    }
+	} else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0) {
+	    call ap_nscolon (ap, im, out, stid, cmdstr, junk, junk,
+		junk, junk, newbuf, newfit)
 	} else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, FCMDS) != 0) {
 	    call ap_fcolon (ap, out, stid, cmdstr, newbuf, newfit)
 	} else {
@@ -52,8 +55,8 @@ begin
 end
 
 
-# AP_FIMCOLON --  Process colon commands for the center task that do
-# not affect the centering parameters
+# AP_FIMCOLON --  Process colon commands for the daofind task that do
+# not affect the data dependent or find parameters.
 
 procedure ap_fimcolon (ap, out, stid, cmdstr, newbuf, newfit)
 

@@ -19,7 +19,7 @@ int	nsky		# number of sky pixels
 
 int	c1, c2, l1, l2, ier
 pointer	sp, nse, phot, temp
-real	zmag
+real	datamin, datamax, zmag
 int	apmagbuf()
 
 begin
@@ -35,38 +35,74 @@ begin
 
 	# Make sure the center is defined.
 	if (IS_INDEFR(wx) || IS_INDEFR(wy))
-	    return (AP_NOAPERT)
+	    return (AP_APERT_NOAPERT)
 
 	# Fetch the aperture pixels.
 	ier = apmagbuf (ap, im, wx, wy, c1, c2, l1, l2)
-	if (ier == AP_NOAPERT)
-	    return (AP_NOAPERT)
+	if (ier == AP_APERT_NOAPERT)
+	    return (AP_APERT_NOAPERT)
 
 	call smark (sp)
 	call salloc (temp, AP_NAPERTS(phot), TY_REAL)
 
+	# Compute the min and max.
+	if (IS_INDEFR(AP_DATAMIN(ap)))
+	    datamin = -MAX_REAL
+	else
+	    datamin = AP_DATAMIN(ap)
+	if (IS_INDEFR(AP_DATAMAX(ap)))
+	    datamax = MAX_REAL
+	else
+	    datamax = AP_DATAMAX(ap)
+
 	# Do photometry for all the apertures.
+	AP_NMINAP(phot) = AP_NMAXAP(phot) + 1
 	call amulkr (Memr[AP_APERTS(phot)], AP_SCALE(ap), Memr[temp],
 	    AP_NAPERTS(phot)]
 	switch (AP_PWEIGHTS(phot)) {
 	case AP_PWCONSTANT:
-	    call  apmeasure (im, wx, wy, c1, c2, l1, l2, Memr[temp],
-	        Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+	    if (IS_INDEFR(AP_DATAMIN(ap)) && IS_INDEFR(AP_DATAMAX(ap)))
+	        call  apmeasure (im, wx, wy, c1, c2, l1, l2, Memr[temp],
+	            Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+	    else
+	        call  apbmeasure (im, wx, wy, c1, c2, l1, l2, datamin,
+		    datamax, Memr[temp], Memr[AP_SUMS(phot)],
+		    Memr[AP_AREA(phot)], AP_NMAXAP(phot), AP_NMINAP(phot))
 	case AP_PWCONE:
-	    call  ap_tmeasure (ap, im, wx, wy, c1, c2, l1, l2, Memr[temp],
-	        Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+	    if (IS_INDEFR(AP_DATAMIN(ap)) && IS_INDEFR(AP_DATAMAX(ap)))
+	        call  ap_tmeasure (ap, im, wx, wy, c1, c2, l1, l2, Memr[temp],
+	            Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+	    else
+	        call  ap_btmeasure (ap, im, wx, wy, c1, c2, l1, l2, datamin,
+		    datamax, Memr[temp], Memr[AP_SUMS(phot)],
+		    Memr[AP_AREA(phot)], AP_NMAXAP(phot), AP_NMINAP(phot))
 	case AP_PWGAUSS:
-	    call  ap_gmeasure (ap, im, wx, wy, c1, c2, l1, l2, Memr[temp],
-	        Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+	    if (IS_INDEFR(AP_DATAMIN(ap)) && IS_INDEFR(AP_DATAMAX(ap)))
+	        call  ap_gmeasure (ap, im, wx, wy, c1, c2, l1, l2, Memr[temp],
+	            Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+		else
+	            call  ap_bgmeasure (ap, im, wx, wy, c1, c2, l1, l2,
+		        datamin, datamax, Memr[temp], Memr[AP_SUMS(phot)],
+			Memr[AP_AREA(phot)], AP_NMAXAP(phot), AP_NMINAP(phot))
 	default:
-	    call  apmeasure (im, wx, wy, c1, c2, l1, l2, Memr[temp],
-	        Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+	    if (IS_INDEFR(AP_DATAMIN(ap)) && IS_INDEFR(AP_DATAMAX(ap)))
+	        call  apmeasure (im, wx, wy, c1, c2, l1, l2, Memr[temp],
+	            Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+	    else
+	        call  apbmeasure (im, wx, wy, c1, c2, l1, l2, datamin,
+		    datamax, Memr[temp], Memr[AP_SUMS(phot)],
+		    Memr[AP_AREA(phot)], AP_NMAXAP(phot), AP_NMINAP(phot))
 	}
 
 	# Make sure that the sky value has been defined.
 	if (IS_INDEFR(skyval))
-	    ier = AP_NOSKYMODE
+	    ier = AP_APERT_NOSKYMODE
+
 	else {
+
+	    # Check for bad pixels.
+	    if (AP_NMINAP(phot) <= AP_NMAXAP(phot))
+		ier = AP_APERT_BADDATA
 
 	    # Compute the magnitudes and errors.
 	    if (positive == YES)

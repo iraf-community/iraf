@@ -18,6 +18,7 @@ pointer	graphics		# graphics display device
 pointer	display			# display device
 int	interactive		# mode of use
 int	verify			# verify critical parameters in batch mode
+int	update			# update the critical parameters
 int	verbose			# type messages on the terminal
 
 int	limlist, lclist, lolist, lslist, sid, lid, sd, out, cl, root, stat, pfd
@@ -70,8 +71,14 @@ begin
 	}
 
 	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
-	interactive = btoi (clgetb ("interactive"))
+	if (Memc[cname] != EOS)
+	    interactive = NO
+	else if (lclist == 0)
+	    interactive = YES
+	else
+	    interactive = btoi (clgetb ("interactive"))
 	verify = btoi (clgetb ("verify"))
+	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
 	# Open the plot files.
@@ -99,7 +106,7 @@ begin
 		    id = gopen (Memc[display], APPEND, STDIMAGE)
 		} then {
 		    call eprintf (
-		"Warning: Graphics overlay not avaialble for display device.\n")
+		"Warning: Graphics overlay not available for display device.\n")
 		    id = NULL
 		}
 	    }
@@ -118,8 +125,11 @@ begin
 
 	# Intialize the phot structure.
 	call ap_gppars (ap)
-	if (verify == YES && interactive == NO)
-	    call ap_pconfirm (ap)
+	if (verify == YES && interactive == NO) {
+	    call ap_pconfirm (ap, NULL, 1)
+	    if (update == YES)
+		call ap_ppars (ap)
+	}
 
 	# Get the file name for the sky values.
 	if (apstati (ap, SKYFUNCTION) == AP_SKYFILE) {
@@ -145,6 +155,8 @@ begin
 	    call ap_itime (im, ap)
 	    call ap_padu (im, ap)
 	    call ap_rdnoise (im, ap)
+	    call ap_filter (im, ap)
+	    call ap_airmass (im, ap)
 
 	    # Open the coordinate file, where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -152,12 +164,29 @@ begin
 
 	    if (lclist <= 0) {
 		cl = NULL
-		call strcpy ("", Memc[coords], SZ_FNAME)
-	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF)
-		cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
-	    else
-		call seek (cl, BOF)
-	    call apsets (ap, CLNAME, Memc[coords])
+		call strcpy ("", Memc[outfname], SZ_FNAME)
+	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords]))
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+		else
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+	    } else {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords])) {
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else {
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+		    call seek (cl, BOF)
+		}
+	    }
+	    call apsets (ap, CLNAME, Memc[outfname])
 
 	    # Open the skys file.
 	    if (lslist <= 0) {
@@ -230,7 +259,7 @@ begin
 
 
 	# Close the coordinate, sky and output files.
-	call apfree (ap)
+	call appfree (ap)
 	if (cl != NULL && lclist == 1)
 	    call close (cl)
 	if (sd != NULL && lslist == 1)

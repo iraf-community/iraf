@@ -18,7 +18,6 @@ pointer	im			# image descriptor
 char	key[ARB]		# parameter to be returned
 char	strval[ARB]		# string value of parameter
 
-long	lval
 double	dval
 bool	numeric
 int	ip, axis
@@ -37,9 +36,6 @@ begin
 		numeric = (strval[ip] == EOS)
 	    }
 
-	if (numeric)
-	    lval = nint(dval)
-
 	# A standard keyword is recognized with or without the "i_" prefix.
 	if (key[1] == 'i' && key[2] == '_')
 	    ip = 3
@@ -51,7 +47,7 @@ begin
 	    if (IS_DIGIT (key[ip+5])) {
 		axis = TO_INTEG(key[ip+5])
 		if (numeric && axis >= 1 && axis <= IM_NDIM(im)) {
-		    IM_LEN(im,axis) = lval
+		    IM_LEN(im,axis) = nint(dval)
 		    return (OK)
 		} else
 		    call syserrs (SYS_IDBTYPE, key)
@@ -64,12 +60,12 @@ begin
 	switch (idb_kwlookup (key[ip])) {
 	case I_CTIME:
 	    if (numeric)
-		IM_CTIME(im) = lval
+		IM_CTIME(im) = nint(dval)
 	case I_HISTORY:
 	    return (gstrcpy (strval, IM_HISTORY(im), SZ_IMHIST))
 	case I_LIMTIME:
 	    if (numeric)
-		IM_LIMTIME(im) = lval
+		IM_LIMTIME(im) = nint(dval)
 	case I_MAXPIXVAL:
 	    if (numeric)
 		IM_MAX(im) = dval
@@ -78,15 +74,15 @@ begin
 		IM_MIN(im) = dval
 	case I_MTIME:
 	    if (numeric)
-		IM_MTIME(im) = lval
+		IM_MTIME(im) = nint(dval)
 	case I_NAXIS:
 	    if (numeric)
-		IM_NDIM(im) = lval
+		IM_NDIM(im) = nint(dval)
 	case I_PIXFILE:
 	    return (gstrcpy (strval, IM_PIXFILE(im), SZ_IMPIXFILE))
 	case I_PIXTYPE:
 	    if (numeric)
-		IM_PIXTYPE(im) = lval
+		IM_PIXTYPE(im) = nint(dval)
 	case I_TITLE:
 	    return (gstrcpy (strval, IM_TITLE(im), SZ_IMTITLE))
 	default:

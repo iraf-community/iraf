@@ -18,7 +18,6 @@ int	fits_fd		# the FITS file descriptor
 
 char	card[LEN_CARD+1], trim_card[LEN_CARD+1]
 int	nrecords, recntr, cardptr, cardcnt, stat, cards_per_rec, i
-
 int	wft_card_encode(), wft_set_bitpix(), sizeof(), strncmp()
 int	wft_init_card_encode()
 
@@ -33,8 +32,18 @@ begin
 	FITS_BITPIX(fits) = wft_set_bitpix (bitpix, PIXTYPE(im),
 	    DATA_BITPIX(fits))
 
-	# Calculate the FITS bscale and bzero parameters.
-	if (autoscale == YES) {
+	# Calculate the FITS bscale and bzero parameters. Notice for the
+	# time being that scaling is turned off if IEEE floating point
+	# output is selected. May decide to change this later after
+	# checking the specifications.
+
+	if (FITS_BITPIX(fits) < 0) {
+	    IRAFMIN(fits) = IM_MIN(im)
+	    IRAFMAX(fits) = IM_MAX(im)
+	    SCALE(fits) = NO
+	    BZERO(fits) = 0.0d0
+	    BSCALE(fits) = 1.0d0
+	} else if (autoscale == YES) {
 	    call wft_get_tape_limits (FITS_BITPIX(fits), TAPEMIN(fits),
 	        TAPEMAX(fits))
 	    call wft_data_limits (im, IRAFMIN(fits), IRAFMAX(fits))
@@ -49,49 +58,60 @@ begin
 	    BSCALE(fits) = bscale
 	}
 
-	# If blanks in image set the blank parameter
+	# If blanks in image set the blank parameter. Currently information
+	# on blanks is not written out so this is effectively a nullop
+	# in IRAF.
+
 	if (NBPIX(im) > 0)
 	    call wft_set_blank (FITS_BITPIX(fits), BLANK(fits),
 	        BLANK_STRING(fits))
 
+	# Set the IRAF datatype parameter.
 	call wft_get_iraf_typestring (PIXTYPE(im), TYPE_STRING(fits))
 
-	# initialize card counters, these counters are used only for
-	# information printed to the standard output
+	# Initialize the card counters. These counters are used only for
+	# information printed to the standard output.
+
 	recntr = 1
 	cardptr = 1
 	cardcnt = 1
 	cards_per_rec = len_record / LEN_CARD
 
-	# Get set up to write header
+	# Get set up to write header. Initialize for an ASCII write.
 	stat = wft_init_card_encode (im, fits)
 	if (make_image == YES)
 	    call wft_init_wrt_pixels (len_record, TY_CHAR, FITS_BYTE, blkfac)
 
-	# print short header
+	# Print short header.
 	if (short_header == YES && long_header == NO) {
 	    call printf ("%-20.20s  ")
 		call pargstr (OBJECT(im))
 	    do i = 1, NAXIS(im) {
 		if (i == 1) {
 		    call printf ("Size = %d")
-			call pargl (NAXISN(im, i))
+			call pargl (NAXISN(im,i))
 		} else {
 		    call printf (" x %d")
-			call pargl (NAXISN(im, i))
+			call pargl (NAXISN(im,i))
 		}
 	    }
 	    call printf ("\n")
 	}
 
-	# Write the cards to the FITS header
+	# Write the cards to the FITS header.
 	repeat {
+
+	    # Encode the card.
 	    stat = wft_card_encode (im, fits, card)
 	    if (stat == NO)
 		next
 
+	    # Write the card to the output file is make_images is yes.
 	    if (make_image == YES)
 	        call wft_write_pixels (fits_fd, card, LEN_CARD)
+
+	    # Trim the card and write is to the standard output if 
+	    # long_header is yes.
 
 	    if (long_header == YES) {
 		call wft_trimstr (card, trim_card, LEN_CARD)
@@ -122,12 +142,13 @@ end
 
 
 # WFT_SET_BITPIX -- This procedure sets the FITS bitpix for each image based on
-# either the user given value or the precision of the IRAF data.	
+# either the user given value or the precision of the IRAF data. Notice that
+# the user must explicitly set the bitpix parameter to -16 or -32 to select
+# the IEEE output format.
 
 int procedure wft_set_bitpix (bitpix, datatype, data_bitpix)
 
-int	bitpix		# the user defined FITS bits per pixel, ERR if
-			# not legal FITS type
+int	bitpix		# the user set bits per pixel, ERR or legal bitpix
 int	datatype	# the IRAF image data type
 int	data_bitpix	# the bits per pixel in the data
 
@@ -137,9 +158,12 @@ begin
 	    case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
 	        if (data_bitpix <= FITS_BYTE)
 		    return (FITS_BYTE)
-	        else if (data_bitpix <= FITS_SHORT)
-		    return (FITS_SHORT)
-	        else
+	        else if (data_bitpix <= FITS_SHORT) {
+		    if (datatype == TY_USHORT)
+			return (FITS_LONG)
+		    else
+		        return (FITS_SHORT)
+	        } else
 		    return (FITS_LONG)
 	    case TY_REAL, TY_COMPLEX:
 		if (NDIGITS_RP <= BYTE_PREC)
@@ -239,11 +263,10 @@ double	mintape, maxtape	# min and max FITS tape values
 double	bscale, bzero		# the calculated bscale and bzero values
 
 double	maxdata, mindata, num, denom
-
 bool	rft_equald()
 
 begin
-	# calculate the maximum and minimum values in the data
+	# Calculate the maximum and minimum values in the data.
 	maxdata = datamax
 	mindata = datamin
 	denom =  maxtape - mintape
@@ -251,7 +274,7 @@ begin
 	#denom = denom - denom / (1.0d1 ** (NDIGITS_RP - 1))
 	num = num + num / (1.0d1 ** (NDIGITS_RP - 1))
 
-	# check for constant image case
+	# Check for constant image case.
 	if (rft_equald (num, 0.0d0)) {
 	    bscale = 1.0d0
 	    bzero = maxdata
@@ -276,11 +299,11 @@ begin
 	    maxtape = BYTE_MAX
 	    mintape = BYTE_MIN
 	case FITS_SHORT:
-	    maxtape = SHORT_MAX #- 1.0d0
-	    mintape = SHORT_MIN #+ 1.0d0
+	    maxtape = SHORT_MAX
+	    mintape = SHORT_MIN
 	case FITS_LONG:
-	    maxtape = LONG_MAX #- 2.147d3
-	    mintape = LONG_MIN #+ 2.147d3
+	    maxtape = LONG_MAX
+	    mintape = LONG_MIN
 	default:
 	    call error (4, "TAPE_LIMITS: Unknown FITS type.")
 	}
@@ -288,7 +311,7 @@ end
 
 
 # WFT_SET_BLANK -- Determine the FITS integer value for a blank pixel from the
-# FITS bitpix.
+# FITS bitpix. Notice that these are null ops for IEEE floating point format.
 
 procedure wft_set_blank (fits_bitpix, blank, blank_str)
 
@@ -307,6 +330,12 @@ begin
 	case FITS_LONG:
 	    blank = long (LONG_BLANK)
 	    call strcpy ("-2147483648", blank_str, LEN_BLANK)
+	case FITS_REAL:
+	    blank = INDEFL
+	    call strcpy ("", blank_str, LEN_BLANK)
+	case FITS_DOUBLE:
+	    blank = INDEFL
+	    call strcpy ("", blank_str, LEN_BLANK)
 	default:
 	    call error (5, "SET_BLANK: Unknown FITS type.")
 	}
@@ -329,8 +358,8 @@ char	card[LEN_CARD+1]	# string containing the card image
 
 int	cardno, axisno, optiono, hist_ptr, unknown_ptr
 int	nstandard, noptions, stat
-int	wft_standard_card(), wft_option_card()
-int	wft_history_card(), wft_unknown_card(), wft_last_card()
+int	wft_standard_card(), wft_option_card(), wft_last_card()
+int	wft_history_card(), wft_unknown_card()
 errchk	wft_standard_card, wft_option_card, wft_history_card
 errchk	wft_unknown_card, wft_last_card
 
@@ -348,12 +377,13 @@ begin
 
 	return (YES)
 
+
 # WFT_CARD_ENCODE -- Procedure to encode the FITS header parameters into
 # FITS card images.
 
 entry	wft_card_encode (im, fits, card)
 
-	# fetch the appropriate FITS header card image
+	# Fetch the appropriate FITS header card image.
 	if (cardno <= nstandard) {
 	    stat = wft_standard_card (cardno, im, fits, axisno, card)
 	} else if (cardno <= noptions) {
@@ -372,7 +402,7 @@ entry	wft_card_encode (im, fits, card)
 end
 
 
-# WFT_TRIMSTR -- Procedure to trim trailing blanks from a string
+# WFT_TRIMSTR -- Procedure to trim trailing blanks from a fixed size string.
 
 procedure wft_trimstr (instr, outstr, nchars)
 
@@ -384,10 +414,8 @@ int	ip
 
 begin
 	call strcpy (instr, outstr, nchars)
-
 	ip = nchars
 	while (outstr[ip] == ' ')
 	    ip = ip - 1
-
 	outstr[ip+1] = EOS
 end

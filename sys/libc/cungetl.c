@@ -6,7 +6,7 @@
 #define	import_xnames
 #include <iraf.h>
 
-#define	MAX_STRLEN	1024
+#define	MAX_STRLEN	SZ_COMMAND
 
 /* C_UNGETLINE -- Push a string back into the input stream.  Pushback is last
  * in first out, i.e., the last string pushed back is the first one read by

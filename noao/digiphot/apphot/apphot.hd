@@ -1,7 +1,8 @@
 # Help directory for the APPHOT package
 
 $doc		= "noao$digiphot/apphot/doc/"
-$apselect	= "noao$digiphot/apphot/apslect/"
+$apselect	= "noao$digiphot/apphot/apselect/"
+$aptest		= "noao$digiphot/apphot/aptest/"
 $center		= "noao$digiphot/apphot/center/"
 $daofind	= "noao$digiphot/apphot/daofind/"
 $fitpsf		= "noao$digiphot/apphot/fitpsf/"
@@ -14,6 +15,7 @@ $radprof	= "noao$digiphot/apphot/radprof/"
 $wphot		= "noao$digiphot/apphot/wphot/"
 
 apselect	hlp=doc$apselect.hlp,		src=apselect$t_apselect.x
+aptest		hlp=doc$aptest.hlp
 center		hlp=doc$center.hlp,		src=center$t_center.x
 centerpars	hlp=doc$centerpars.hlp
 daofind		hlp=doc$daofind.hlp,		src=daofind$t_daofind.x
@@ -28,5 +30,5 @@ polyphot	hlp=doc$polyphot.hlp,		src=polyphot$t_polyphot.x
 polypars	hlp=doc$polypars.hlp
 qphot		hlp=doc$qphot.hlp,		src=qphot$t_qphot.x
 radprof		hlp=doc$radprof.hlp,		src=radprof$t_radprof.x
-revisions	hlp=Revisions
+revisions	sys=Revisions
 wphot		hlp=doc$wphot.hlp,		src=wphot$t_wphot.x

@@ -25,7 +25,7 @@ int	review			# Review extractions and output names?
 pointer	aps[ARB]		# Apertures
 int	naps			# Number of apertures
 
-int	i, ap1, ap2, nap, npts, rev, ex_max
+int	i, ap1, ap2, nap, npts, rev, ex_max, clobber
 pointer	in, immod, apsmod, sp, str, ex, bufout, skyout
 
 int	clgeti(), clgwrd(), clginterp(), btoi()
@@ -38,6 +38,18 @@ errchk	ex_map, ex_gmodaps
 begin
 	if (naps == 0) {
 	    call eprintf ("APSUM - No apertures defined for %s\n")
+		call pargstr (input)
+	    return
+	}
+
+	if (clgetb ("interactive"))
+	    clobber = NO
+	else
+	    clobber = ALWAYSNO
+	call ex_sumout (input, output, review, clobber, NULL, aps, naps, 1,
+	    naps, Memi[1], 1, i)
+	if (i == 0) {
+	    call eprintf ("APSUM - Output spectra exist for %s\n")
 		call pargstr (input)
 	    return
 	}
@@ -105,11 +117,11 @@ begin
 
 	    call ex_sum1 (ex, in, immod, aps[ap1],
 		Memi[apsmod+ap1-1], nap, Memr[bufout], Memr[skyout], npts)
-	    call ex_sumout (input, output, rev, EX_IM(in), aps, naps, ap1, nap,
-		Memr[bufout], npts)
+	    call ex_sumout (input, output, rev, clobber, EX_IM(in), aps, naps,
+		ap1, nap, Memr[bufout], npts, i)
 	    if (EX_BKGD(ex) != NONE)
-		call ex_sumsky (input, sky, EX_IM(in), aps, naps, ap1, nap,
-		    Memr[skyout], npts)
+		call ex_sumsky (input, sky, clobber, EX_IM(in), aps, naps, ap1,
+		    nap, Memr[skyout], npts)
 	}
 
 	if (immod != in) {
@@ -277,26 +289,29 @@ define	ONEDSPEC	1	# Individual 1D spectra
 define	MULTISPEC	2	# Multiple spectra
 define	ECHELLE		3	# Echelle spectra
 
-# EX_SUMOUT -- Review the extracted spectra and write them to an image.
+# EX_SUMOUT -- Check, Review the extracted spectra and write them to an image.
+# To check the output spectra the image pointer is NULL.
 
-procedure ex_sumout (image, output, review, im, aps, naps, ap1, naps1,
-	data, npts)
+procedure ex_sumout (image, output, review, clobber, im, aps, naps, ap1, naps1,
+	data, npts, nout)
 
 char	image[ARB]		# Input image name
 char	output[ARB]		# Output root name
 int	review			# Review spectra and output names?
+int	clobber			# Clobber images?
 pointer	im			# Input IMIO pointer
 pointer	aps[naps]		# Apertures
 int	naps			# Number of apertures
 int	ap1			# Starting aperture
 int	naps1			# Number of apertures to output
-real	data[npts, naps1]	# Output data
+real	data[npts, ARB]		# Output data
 int	npts			# Number of points
+int	nout			# Number of spectra output
 
-int	i, j, k, format, apaxis, dispaxis, err
+int	i, j, k, format, apaxis, dispaxis
 pointer	sp, str, str1, name, fmt, out, gt
 
-int	scan(), clgwrd()
+int	scan(), clgwrd(), imaccess()
 pointer	immap(), impl1r(), impl2r(), gt_init()
 errchk	immap
 
@@ -310,36 +325,62 @@ begin
 
 	format = clgwrd ("apio.format", Memc[fmt], SZ_LINE, FORMATS)
 
-	# Write out the extracted spectra.
+	# Check or write out the extracted spectra.
+	nout = naps1
 	do i = ap1, ap1+naps1-1 {
 	    j = i - ap1 + 1
-	    if (output[1] == EOS) {
-		switch (format) {
-		case ECHELLE:
-	            call sprintf (Memc[name], SZ_FNAME, "%s.ec")
-	                call pargstr (image)
-		case MULTISPEC:
-	            call sprintf (Memc[name], SZ_FNAME, "%s.ms")
-	                call pargstr (image)
-		default:
-	            call sprintf (Memc[name], SZ_FNAME, "%s.%04d")
-	                call pargstr (image)
-	                call pargi (AP_ID(aps[i]))
-		}
-	    } else {
-		switch (format) {
-		case ECHELLE:
-	            call sprintf (Memc[name], SZ_FNAME, "%s.ec")
-	                call pargstr (output)
-		case MULTISPEC:
-	            call sprintf (Memc[name], SZ_FNAME, "%s.ms")
-	                call pargstr (output)
-		default:
-	            call sprintf (Memc[name], SZ_FNAME, "%s.%04d")
-	                call pargstr (output)
-	                call pargi (AP_ID(aps[i]))
-		}
+	    if (output[1] == EOS)
+		call strcpy (image, Memc[str], SZ_LINE)
+	    else
+		call strcpy (output, Memc[str], SZ_LINE)
+
+	    switch (format) {
+	    case ECHELLE:
+	        call sprintf (Memc[name], SZ_FNAME, "%s.ec")
+	            call pargstr (Memc[str])
+	    case MULTISPEC:
+	        call sprintf (Memc[name], SZ_FNAME, "%s.ms")
+	            call pargstr (Memc[str])
+	    default:
+	        call sprintf (Memc[name], SZ_FNAME, "%s.%04d")
+	            call pargstr (Memc[str])
+	            call pargi (AP_ID(aps[i]))
 	    }
+
+	    if (imaccess (Memc[name], 0) == YES) {
+	        switch (format) {
+	        case ECHELLE, MULTISPEC:
+		    if (i == 1) {
+		        if (im == NULL) {
+			    call sprintf (Memc[str], SZ_LINE,
+			        "Clobber existing output image %s?")
+			        call pargstr (Memc[name])
+			    call xt_answer (Memc[str], clobber)
+			    if (clobber == YES || clobber == ALWAYSYES)
+			        call imdelete (Memc[name])
+			    else
+			        nout = 0
+		        }
+	    		call sfree (sp)
+	    		return
+		    }
+	        default:
+		    if (im == NULL) {
+		        call sprintf (Memc[str], SZ_LINE,
+		            "Clobber existing output image %s?")
+		            call pargstr (Memc[name])
+			call xt_answer (Memc[str], clobber)
+			if (clobber == YES || clobber == ALWAYSYES)
+		            call imdelete (Memc[name])
+			else
+			    nout = nout - 1
+		    }
+		    next
+	        }
+	    }
+
+	    if (im == NULL)
+		next
 	    
 	    # Set the review graph title.
 	    call sprintf (Memc[str], SZ_LINE,
@@ -379,83 +420,73 @@ begin
 	    }
 
 	    # Output the image.
-	    iferr {
-		switch (format) {
-		case ECHELLE, MULTISPEC:
-		    if (i == 1) {
-			out = immap (Memc[name], NEW_COPY, im)
-			apaxis = AP_AXIS(aps[i])
-		        dispaxis = mod (apaxis, 2) + 1
-			IM_PIXTYPE(out) = TY_REAL
-			IM_LEN(out, 1) = IM_LEN(im, dispaxis)
-			IM_LEN(out, 2) = naps
-			call imastr (out, "apformat", Memc[fmt])
-			do k = 1, naps {
-			    call sprintf (Memc[str], SZ_LINE, "APNUM%d")
-				call pargi (k)
-			    call sprintf (Memc[str1], SZ_LINE, "%d %d 1 1 %d")
-				call pargi (AP_ID(aps[k]))
-				call pargi (AP_BEAM(aps[k]))
-				call pargi (npts)
-		    	    call imastr (out, Memc[str], Memc[str1])
-			}
-			call ex_setdisp (out, dispaxis)
-			err = NO
-		    } else if (err == YES)
-			call error (0, "Image already exists")
-		    else
-			out = immap (Memc[name], READ_WRITE, 0)
-	            call amovr (data[1,j], Memr[impl2r(out,i)], npts)
-	            call imunmap (out)
-			
-		default:
+	    switch (format) {
+	    case ECHELLE, MULTISPEC:
+		if (i == 1) {
 		    out = immap (Memc[name], NEW_COPY, im)
 		    apaxis = AP_AXIS(aps[i])
 		    dispaxis = mod (apaxis, 2) + 1
 		    IM_PIXTYPE(out) = TY_REAL
-		    IM_NDIM(out) = 1
 		    IM_LEN(out, 1) = IM_LEN(im, dispaxis)
-		    call sprintf (Memc[str], SZ_LINE, "%s - Aperture %d")
-			call pargstr (IM_TITLE(out))
-			call pargi (AP_ID(aps[i]))
-		    call strcpy (Memc[str], IM_TITLE(out), SZ_IMTITLE)
-			call imastr (out, "apformat", Memc[fmt])
-		    call sprintf (Memc[str1], SZ_LINE, "%d %d 1 1 %d")
-			call pargi (AP_ID(aps[i]))
-			call pargi (AP_BEAM(aps[i]))
-			call pargi (npts)
-		    call imastr (out, "APNUM1", Memc[str1])
-		    call imaddi (out, "BEAM-NUM", AP_BEAM(aps[i]))
-		    call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
-			call pargr (AP_CEN(aps[i], apaxis))
-			call pargr (AP_CEN(aps[i], dispaxis))
-		    call imastr (out, "APCENTER", Memc[str1])
-		    call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
-			call pargr (AP_LOW(aps[i], apaxis))
-			call pargr (AP_LOW(aps[i], dispaxis))
-		    call imastr (out, "APLOW", Memc[str1])
-		    call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
-			call pargr (AP_HIGH(aps[i], apaxis))
-			call pargr (AP_HIGH(aps[i], dispaxis))
-		    call imastr (out, "APHIGH", Memc[str1])
+		    IM_LEN(out, 2) = naps
+		    call imastr (out, "apformat", Memc[fmt])
+		    do k = 1, naps {
+			call sprintf (Memc[str], SZ_LINE, "APNUM%d")
+			    call pargi (k)
+			call sprintf (Memc[str1], SZ_LINE, "%d %d 1 1 %d")
+			    call pargi (AP_ID(aps[k]))
+			    call pargi (AP_BEAM(aps[k]))
+			    call pargi (npts)
+			    call imastr (out, Memc[str], Memc[str1])
+		    }
 		    call ex_setdisp (out, dispaxis)
-
-	            call amovr (data[1,j], Memr[impl1r(out)], npts)
-	            call imunmap (out)
-		}
-
-	        call sprintf (Memc[str], SZ_LINE,
-	            "APSUM   - Aperture %d from %s --> %s")
+		} else
+		    out = immap (Memc[name], READ_WRITE, 0)
+		call amovr (data[1,j], Memr[impl2r(out,i)], npts)
+		call imunmap (out)
+		    
+	    default:
+		out = immap (Memc[name], NEW_COPY, im)
+		apaxis = AP_AXIS(aps[i])
+		dispaxis = mod (apaxis, 2) + 1
+		IM_PIXTYPE(out) = TY_REAL
+		IM_NDIM(out) = 1
+		IM_LEN(out, 1) = IM_LEN(im, dispaxis)
+		call sprintf (Memc[str], SZ_LINE, "%s - Aperture %d")
+		    call pargstr (IM_TITLE(out))
 		    call pargi (AP_ID(aps[i]))
-       	            call pargstr (image)
-		    call pargstr (Memc[name])
-	        call ap_log (Memc[str])
+		call strcpy (Memc[str], IM_TITLE(out), SZ_IMTITLE)
+		    call imastr (out, "apformat", Memc[fmt])
+		call sprintf (Memc[str1], SZ_LINE, "%d %d 1 1 %d")
+		    call pargi (AP_ID(aps[i]))
+		    call pargi (AP_BEAM(aps[i]))
+		    call pargi (npts)
+		call imastr (out, "APNUM1", Memc[str1])
+		call imaddi (out, "BEAM-NUM", AP_BEAM(aps[i]))
+		call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
+		    call pargr (AP_CEN(aps[i], apaxis))
+		    call pargr (AP_CEN(aps[i], dispaxis))
+		call imastr (out, "APCENTER", Memc[str1])
+		call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
+		    call pargr (AP_LOW(aps[i], apaxis))
+		    call pargr (AP_LOW(aps[i], dispaxis))
+		call imastr (out, "APLOW", Memc[str1])
+		call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
+		    call pargr (AP_HIGH(aps[i], apaxis))
+		    call pargr (AP_HIGH(aps[i], dispaxis))
+		call imastr (out, "APHIGH", Memc[str1])
+		call ex_setdisp (out, dispaxis)
 
-	    } then {
-		err = YES
-		call erract (EA_WARN)
+		call amovr (data[1,j], Memr[impl1r(out)], npts)
+		call imunmap (out)
 	    }
 
+	    call sprintf (Memc[str], SZ_LINE,
+		"APSUM   - Aperture %d from %s --> %s")
+		call pargi (AP_ID(aps[i]))
+		call pargstr (image)
+		call pargstr (Memc[name])
+	    call ap_log (Memc[str])
 	    call ex_plot (gt, data[1,j], npts)
 	    call gt_free (gt)
 	}
@@ -464,10 +495,12 @@ end
 
 # EX_SUMSKY -- Output sky spectrum
 
-procedure ex_sumsky (image, sky, im, aps, naps, ap1, naps1, skydata, npts)
+procedure ex_sumsky (image, sky, clobber, im, aps, naps, ap1, naps1, skydata,
+	npts)
 
 char	image[ARB]		# Input image name
 char	sky[ARB]		# Output sky root name
+int	clobber			# Clobber output images?
 pointer	im			# Input IMIO pointer
 pointer	aps[naps]		# Apertures
 int	naps			# Number of apertures
@@ -476,7 +509,7 @@ int	naps1			# Number of apertures to output
 real	skydata[npts, naps]	# Sky data
 int	npts			# Number of points
 
-int	i, j, k, format, apaxis, dispaxis, err
+int	i, j, k, format, apaxis, dispaxis
 pointer	sp, str, str1, name, fmt, out
 
 bool	clgetb()
@@ -502,110 +535,114 @@ begin
 	do i = ap1, ap1+naps1-1 {
 	    j = i - ap1 + 1
 	    if (sky[1] == EOS) {
-		switch (format) {
-		case ECHELLE:
-	            call sprintf (Memc[name], SZ_FNAME, "%ssky.ec")
-	                call pargstr (image)
-		case MULTISPEC:
-	            call sprintf (Memc[name], SZ_FNAME, "%ssky.ms")
-	                call pargstr (image)
-		default:
-	            call sprintf (Memc[name], SZ_FNAME, "%ssky.%04d")
-	                call pargstr (image)
-	                call pargi (AP_ID(aps[i]))
-		}
-	    } else {
-		switch (format) {
-		case ECHELLE:
-	            call sprintf (Memc[name], SZ_FNAME, "%s.ec")
-	                call pargstr (sky)
-		case MULTISPEC:
-	            call sprintf (Memc[name], SZ_FNAME, "%s.ms")
-	                call pargstr (sky)
-		default:
-	            call sprintf (Memc[name], SZ_FNAME, "%s.%04d")
-	                call pargstr (sky)
-	                call pargi (AP_ID(aps[i]))
-		}
+		call sprintf (Memc[str], SZ_LINE, "%ssky")
+		    call pargstr (image)
+	    } else
+		call strcpy (sky, Memc[str], SZ_LINE)
+
+	    switch (format) {
+	    case ECHELLE:
+	        call sprintf (Memc[name], SZ_FNAME, "%s.ec")
+	            call pargstr (Memc[str])
+	    case MULTISPEC:
+	        call sprintf (Memc[name], SZ_FNAME, "%s.ms")
+	            call pargstr (Memc[str])
+	    default:
+	        call sprintf (Memc[name], SZ_FNAME, "%s.%04d")
+	            call pargstr (Memc[str])
+	            call pargi (AP_ID(aps[i]))
 	    }
 
 	    # Output the image.
-	    iferr {
-		switch (format) {
-		case ECHELLE, MULTISPEC:
-		    if (i == 1) {
-			out = immap (Memc[name], NEW_COPY, im)
-			apaxis = AP_AXIS(aps[i])
-		        dispaxis = mod (apaxis, 2) + 1
-			IM_PIXTYPE(out) = TY_REAL
-			IM_LEN(out, 1) = IM_LEN(im, dispaxis)
-			IM_LEN(out, 2) = naps
-			call imastr (out, "apformat", Memc[fmt])
-			do k = 1, naps {
-			    call sprintf (Memc[str], SZ_LINE, "APNUM%d")
-				call pargi (k)
-			    call sprintf (Memc[str1], SZ_LINE, "%d %d 1 1 %d")
-				call pargi (AP_ID(aps[k]))
-				call pargi (AP_BEAM(aps[k]))
-				call pargi (npts)
-		    	    call imastr (out, Memc[str], Memc[str1])
+	    switch (format) {
+	    case ECHELLE, MULTISPEC:
+		if (i == 1) {
+		    iferr (out = immap (Memc[name], NEW_COPY, im)) {
+			call sprintf (Memc[str], SZ_LINE,
+			    "Clobber existing output image %s?")
+			    call pargstr (Memc[name])
+			call xt_answer (Memc[str], clobber)
+			if (clobber == YES || clobber == ALWAYSYES) {
+			    call imdelete (Memc[name])
+			    out = immap (Memc[name], NEW_COPY, im)
+			} else {
+			     call sfree (sp)
+			     return
 			}
-			call ex_setdisp (out, dispaxis)
-			err = NO
-		    } else if (err == YES)
-			call error (0, "Sky image already exists")
-		    else
-			out = immap (Memc[name], READ_WRITE, 0)
-	            call amovr (skydata[1,j], Memr[impl2r(out,i)], npts)
-	            call imunmap (out)
-			
-		default:
-		    out = immap (Memc[name], NEW_COPY, im)
+		    }
 		    apaxis = AP_AXIS(aps[i])
 		    dispaxis = mod (apaxis, 2) + 1
 		    IM_PIXTYPE(out) = TY_REAL
-		    IM_NDIM(out) = 1
 		    IM_LEN(out, 1) = IM_LEN(im, dispaxis)
-		    call sprintf (Memc[str], SZ_LINE, "%s - Aperture %d")
-			call pargstr (IM_TITLE(out))
-			call pargi (AP_ID(aps[i]))
-		    call strcpy (Memc[str], IM_TITLE(out), SZ_IMTITLE)
-			call imastr (out, "apformat", Memc[fmt])
-		    call sprintf (Memc[str1], SZ_LINE, "%d %d 1 1 %d")
-			call pargi (AP_ID(aps[i]))
-			call pargi (AP_BEAM(aps[i]))
-			call pargi (npts)
-		    call imastr (out, "APNUM1", Memc[str1])
-		    call imaddi (out, "BEAM-NUM", AP_BEAM(aps[i]))
-		    call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
-			call pargr (AP_CEN(aps[i], apaxis))
-			call pargr (AP_CEN(aps[i], dispaxis))
-		    call imastr (out, "APCENTER", Memc[str1])
-		    call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
-			call pargr (AP_LOW(aps[i], apaxis))
-			call pargr (AP_LOW(aps[i], dispaxis))
-		    call imastr (out, "APLOW", Memc[str1])
-		    call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
-			call pargr (AP_HIGH(aps[i], apaxis))
-			call pargr (AP_HIGH(aps[i], dispaxis))
-		    call imastr (out, "APHIGH", Memc[str1])
+		    IM_LEN(out, 2) = naps
+		    call imastr (out, "apformat", Memc[fmt])
+		    do k = 1, naps {
+			call sprintf (Memc[str], SZ_LINE, "APNUM%d")
+			    call pargi (k)
+			call sprintf (Memc[str1], SZ_LINE, "%d %d 1 1 %d")
+			    call pargi (AP_ID(aps[k]))
+			    call pargi (AP_BEAM(aps[k]))
+			    call pargi (npts)
+			    call imastr (out, Memc[str], Memc[str1])
+		    }
 		    call ex_setdisp (out, dispaxis)
-
-	            call amovr (skydata[1,j], Memr[impl1r(out)], npts)
-	            call imunmap (out)
+		} else
+		    out = immap (Memc[name], READ_WRITE, 0)
+		call amovr (skydata[1,j], Memr[impl2r(out,i)], npts)
+		call imunmap (out)
+			
+	    default:
+		iferr (out = immap (Memc[name], NEW_COPY, im)) {
+		    call sprintf (Memc[str], SZ_LINE,
+			"Clobber existing output image %s?")
+			call pargstr (Memc[name])
+		    call xt_answer (Memc[str], clobber)
+		    if (clobber == YES || clobber == ALWAYSYES) {
+			call imdelete (Memc[name])
+			out = immap (Memc[name], NEW_COPY, im)
+		    } else
+			next
 		}
-
-	        call sprintf (Memc[str], SZ_LINE,
-	            "APSUM   - Sky for aperture %d from %s --> %s")
+		apaxis = AP_AXIS(aps[i])
+		dispaxis = mod (apaxis, 2) + 1
+		IM_PIXTYPE(out) = TY_REAL
+		IM_NDIM(out) = 1
+		IM_LEN(out, 1) = IM_LEN(im, dispaxis)
+		call sprintf (Memc[str], SZ_LINE, "%s - Aperture %d")
+		    call pargstr (IM_TITLE(out))
 		    call pargi (AP_ID(aps[i]))
-       	            call pargstr (image)
-		    call pargstr (Memc[name])
-	        call ap_log (Memc[str])
+		call strcpy (Memc[str], IM_TITLE(out), SZ_IMTITLE)
+		    call imastr (out, "apformat", Memc[fmt])
+		call sprintf (Memc[str1], SZ_LINE, "%d %d 1 1 %d")
+		    call pargi (AP_ID(aps[i]))
+		    call pargi (AP_BEAM(aps[i]))
+		    call pargi (npts)
+		call imastr (out, "APNUM1", Memc[str1])
+		call imaddi (out, "BEAM-NUM", AP_BEAM(aps[i]))
+		call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
+		    call pargr (AP_CEN(aps[i], apaxis))
+		    call pargr (AP_CEN(aps[i], dispaxis))
+		call imastr (out, "APCENTER", Memc[str1])
+		call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
+		    call pargr (AP_LOW(aps[i], apaxis))
+		    call pargr (AP_LOW(aps[i], dispaxis))
+		call imastr (out, "APLOW", Memc[str1])
+		call sprintf (Memc[str1], SZ_LINE, "%7.2f %7.2f")
+		    call pargr (AP_HIGH(aps[i], apaxis))
+		    call pargr (AP_HIGH(aps[i], dispaxis))
+		call imastr (out, "APHIGH", Memc[str1])
+		call ex_setdisp (out, dispaxis)
 
-	    } then {
-		err = YES
-		call erract (EA_WARN)
+		call amovr (skydata[1,j], Memr[impl1r(out)], npts)
+		call imunmap (out)
 	    }
+
+	    call sprintf (Memc[str], SZ_LINE,
+		"APSUM   - Sky for aperture %d from %s --> %s")
+		call pargi (AP_ID(aps[i]))
+		       call pargstr (image)
+		call pargstr (Memc[name])
+	    call ap_log (Memc[str])
 	}
 end
 

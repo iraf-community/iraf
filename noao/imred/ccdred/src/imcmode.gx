@@ -26,6 +26,7 @@ PIXEL	mode, amed$t()
 real	z1, z2, zstep, zbin
 int	i, n, nx, nmax
 pointer	sp, v1, v2, dv, va, vb, data, ptr1, ptr2, ptr3, imgnl$t()
+bool	fp_equalr()
 
 begin
 	call smark (sp)
@@ -93,7 +94,7 @@ begin
 	ptr3 = data + n * (1. + ZRANGE) / 2.
 	z1 = Mem$t[ptr1]
 	z2 = Mem$t[ptr3]
-	if (z1 == z2) {
+	if (fp_equalr (z1, z2)) {
 	    mode = z1
 	    call sfree (sp)
 	    return (mode)
@@ -108,17 +109,17 @@ begin
 
 	nmax = 0
 	repeat {
-	    for (; Mem$t[ptr1] < z1; ptr1=ptr1+1)
+	    for (; ptr1 < ptr3 && Mem$t[ptr1] < z1; ptr1=ptr1+1)
 		;
 	    z2 = z1 + zbin
-	    for (; (ptr2 < ptr3) && (Mem$t[ptr2] < z2); ptr2=ptr2+1)
+	    for (; ptr2 < ptr3 && Mem$t[ptr2] < z2; ptr2=ptr2+1)
 		;
 	    if (ptr2 - ptr1 > nmax) {
 	        nmax = ptr2 - ptr1
 	        mode = Mem$t[(ptr2+ptr1)/2]
 	    }
 	    z1 = z1 + zstep
-	} until (ptr2 == ptr3)
+	} until (ptr2 >= ptr3)
 
 	call sfree (sp)
 	return (mode)

@@ -8,9 +8,9 @@ airmass		hlp=doc$airmass.hlp,	src=airmass.x
 asttimes	hlp=doc$asttimes.hlp,	src=t_asttimes.x
 ccdtime		hlp=doc$ccdtime.hlp,	src=ccdtime.x
 galactic	hlp=doc$galactic.hlp,	src=galactic.x
-pdm		hlp=doc$pdm.hlp,	src=pdm/t_pdm.x
+pdm		hlp=doc$pdm.hlp,	src=pdm$t_pdm.x
 precess		hlp=doc$precess.hlp,	src=precess.x
 rvcorrect	hlp=doc$rvcorrect.hlp,	src=t_rvcorrect.x
 setairmass	hlp=doc$setairmass.hlp,	src=t_setairmass.x
 
-revisions	hlp=Revisions
+revisions	sys=Revisions

@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<mach.h>
 include	"qpoe.h"
 include	"qpex.h"
@@ -16,7 +17,7 @@ pointer	qp			#I QPOE descriptor
 char	expr[ARB]		#I selection expression (filter) 
 
 pointer	ex, pb, db
-int	pb_len, db_len, junk
+int	pb_len, db_len
 int	qpex_modfilter()
 errchk	calloc
 
@@ -57,7 +58,10 @@ begin
 	}
 
 	# If a selection expression was given, compile it into the descriptor.
-	junk = qpex_modfilter (ex, expr)
+	if (qpex_modfilter (ex, expr) == ERR) {
+	    call qpex_close (ex)
+	    call syserrs (SYS_QPEXSYN, QP_DFNAME(qp))
+	}
 
 	return (ex)
 end

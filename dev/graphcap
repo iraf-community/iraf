@@ -4,20 +4,15 @@
 # for selected devices (normally the graphics terminals) are precompiled.
 # For a list of devices for which the graphcap entry is precompiled see
 # "dev$cacheg.dat".  To rebuild the cache, type `cl> help mktty'.
-#-------------------------------------------------------------------------
-# VLA additions.
-uqms|UNIX generic interface to 300dpi QMS (Talaris) LaserWriter:\
-	:DD=qms,tmp$sgk,!{ sgidispatch sgi2uqms $F -l$(XO) -w$(XW) -b$(YO) \
-	-h$(YW) -p$(PW) | lpr -Plp; rm $F; }&:tc=sgi_qms:
-sgi_qms|QMS (Talaris) LaserWriter 300dpi:\
-	:kf=bin$x_sgikern.e:tn=sgikern:cw#.0125:ch#.0294:\
-	:ar#0.762:xs#0.267:ys#0.203:xr#3150:yr#2340:\
-	:MF#8:FE:YF:XO#30:XW#3180:YO#60:YW#2400:PW#3.4:
-iism70c|Cholla IIS model 70:\
-	:BS:DD=cholla!iism70,/dev/iis:tc=iism70:
-iism70y|Yucca IIS model 70:\
-	:BS:DD=yucca!iism70,/dev/iis:tc=iism70:
-#-------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# START of site local additions.
+#	(add local graphcap device entries here)
+
+bogus|bogus device for fake cache to work around apollo FTN bug:\
+	:tc=4012:
+
+# END of site local additions.
+# ---------------------------------------------------------------------------
 
 # Special devices.
 vdm|stdvdm|Virtual Device Metafile:\
@@ -37,7 +32,50 @@ sgibi|SGI bitmap (raster) file:\
 	:BI:MF#1:XS#1024:YS#1024:PX#1024:PY#1024:LO#1:LS#1:\
 	:X1#0:X2#1023:Y1#0:Y2#1023:DD=sgibi,home$sgibi,:
 
+# STDPLOT devices.  The following are pointer to host system dependent
+# entries given later.
+
+versatec|ver|vup|	:WS:tc=uver:
+imagen|i240|		:tc=ui240:
+imagend|i300|		:tc=ui300:
+i240s|			:PW#1.2:tc=ui240:
+i300s|			:PW#1.2:tc=ui300:
+qms|			:tc=uqms:
+qmss|			:PW#1.2:tc=uqms:
+apple|apl|lw|lw1|	:tc=uapl1:
+apples|apls|lws|lw1s|	:PW#1.2:tc=uapl1:
+apple2|apl2|lw2|	:tc=uapl2:
+apple2s|apl2s|lw2s|	:PW#1.2:tc=uapl2:
+apple3|apl3|lw3|	:tc=uapl3:
+apple3s|apl3s|lw3s|	:PW#1.2:tc=uapl3:
+apple4|apl4|lw4|	:tc=uapl4:
+apple4s|apl4s|lw4s|	:PW#1.2:tc=uapl4:
+nlw|lw5|		:tc=uapl5:
+nlws|lw5s|		:PW#1.2:tc=uapl5:
+apl7|lw7|tops|		:tc=uapl7:
+apl7s|lw7s|topss|	:PW=#1.2:tc=uapl7:
+printronix|ptx|		:tc=uptx:
+
+lpr|			:tc=g-lpr:
+psdump|			:tc=g-psdump:
+calcomp|ccp|		:tc=ccp_calcomp:
+dicomed|d47|		:tc=nspp_dicomed:
+trilog|tri|		:tc=vtri:
+hpplot|			:tc=vhpp:
+hplaser|		:tc=vhpl:
+ln03|			:tc=vln03:
+
+laserup|		:HN=solpl!:tc=laser:
+laserdown|		:HN=cti!:tc=laser:
+lasers|			:PW#1.2:tc=laser:
+laser|			:tc=talaris:
+printronix|px|		:HN=solpl!:QN=lpt:tc=aptx:
+datasouth|		:HN=cti!:QN=lpt:tc=adts:
+talaris|		:QN=laser:tc=aqms:
+laserjet|		:QN=laser:tc=ahpl:
+
 # STDIMAGE devices.
+
 imtx|Imtool display server:\
 	:cn#1:LC:BS@:z0#1:zr#200:DD=node!imtool,/tmp/imt1,512,512:tc=iism70:
 imt1|imt512|imtool|Imtool display server:\
@@ -95,47 +133,17 @@ iism70|IIS model 70 image display:\
 	:xr#512:yr#512:ip#4:gp#4:ca:in:nc#1:ro:zo:zr#256:ch#.0294:cw#.0125:\
 	:BS:DD=carina!iism70,/dev/iis:
 
-# STDPLOT devices.  The following logical device names may differ for each
-# node in the local network, e.g., because different nodes can directly access
-# the same device.
+# IMD kernel (IMDKERN).  Plots into graphics overlay of image display.
 
-versatec|ver|vup|	:WS:tc=uver:
-imagen|i240|		:tc=ui240:
-imagend|i300|		:tc=ui300:
-i240s|			:PW#1.2:tc=ui240:
-i300s|			:PW#1.2:tc=ui300:
-qms|			:tc=uqms:
-qmss|			:PW#1.2:tc=uqms:
-apple|apl|lw|lw1|	:tc=uapl1:
-apples|apls|lws|lw1s|	:PW#1.2:tc=uapl1:
-apple2|apl2|lw2|	:tc=uapl2:
-apple2s|apl2s|lw2s|	:PW#1.2:tc=uapl2:
-apple3|apl3|lw3|	:tc=uapl3:
-apple3s|apl3s|lw3s|	:PW#1.2:tc=uapl3:
-apple4|apl4|lw4|	:tc=uapl4:
-apple4s|apl4s|lw4s|	:PW#1.2:tc=uapl4:
-nlw|lw5|		:tc=uapl5:
-nlws|lw5s|		:PW#1.2:tc=uapl5:
-apl7|lw7|tops|		:tc=uapl7:
-apl7s|lw7s|topss|	:PW=#1.2:tc=uapl7:
-dpp|dp|dlw|default|	:tc=udpp:
-psdump|			:tc=upsdump:
-printronix|ptx|		:tc=uptx:
-calcomp|ccp|		:tc=ccp_calcomp:
-dicomed|d47|		:tc=nspp_dicomed:
-trilog|tri|		:tc=vtri:
-hpplot|			:tc=vhpp:
-hplaser|		:tc=vhpl:
-ln03|			:tc=vln03:
-
-laserup|		:HN=solpl!:tc=laser:
-laserdown|		:HN=cti!:tc=laser:
-lasers|			:PW#1.2:tc=laser:
-laser|			:tc=talaris:
-printronix|px|		:HN=solpl!:QN=lpt:tc=aptx:
-datasouth|		:HN=cti!:QN=lpt:tc=adts:
-talaris|		:QN=laser:tc=aqms:
-laserjet|		:QN=laser:tc=ahpl:
+imdw|	:CI#203:tc=imd:
+imdr|	:CI#204:tc=imd:
+imdg|	:CI#205:tc=imd:
+imdb|	:CI#206:tc=imd:
+imdy|	:CI#207:tc=imd:
+imd|imdkern|Image device kernel:\
+	:kf=bin$x_imdkern.e:tn=imdkern:cw#.0125:ch#.0294:\
+	:ar#1.0:xs#0.263:ys#0.202:xr#2048:yr#2048:ip#4:gp#4:ca:in:nc#1:\
+	:z0#1:zr#200:LC:LO#1:LS#1:CI#205:FN#0:
 
 # SGI kernel (STDPLOT).
 
@@ -178,16 +186,13 @@ uptx|UNIX generic printronix interface for UNIX/IRAF:\
 # Science Group <jh@athena.mit.edu>.  The first entry writes a PostScript
 # file in /tmp.  The second entry spools PostScript to the UNIX default
 # device as defined by the environment variable PRINTER.
-upsdump|UNIX generic interface to Postscript file dump:\
-        :DD=upsdump,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
+g-psdump|UNIX generic interface to Postscript file dump:\
+        :DD=psdump,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
         -b$(YO) -h$(YW) -p$(PW) > /tmp/irafdmp$$.ps ; rm $F; }&:tc=sgi_apl:
-
-udpp|upostscript|UNIX generic to 300dpi Postscriptlpr default device:\
-        :DD=upostscript,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
+g-lpr|UNIX generic interface to default printer device (lpr):\
+        :DD=lpr,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
         -b$(YO) -h$(YW) -p$(PW) | lpr ; rm $F ; }&:tc=sgi_apl:
-
-# End of Joe Harrington entries
-      
+# End of Joe Harrington entries.
 
 # SGI/VMS devices.
 vver|VMS generic interface to the versatec:\
@@ -208,7 +213,7 @@ vqms|VMS generic interface to 300dpi QMS (Talaris) LaserWriter:\
 vapl|VMS generic interface to 300dpi Apple Laserwriter (Postscript):\
 	:DD=vapl,tmp$sgk,submit/que=fast/noprint/nolog \
 	/para=\050"vapl","$F","$(XO) $(XW) $(YO) $(YW) $(PW) none" \
-	\051 irafhlib:sgiqueue.com:tc=sgi_apl:
+	\051 irafhlib\072sgiqueue.com:tc=sgi_apl:
 vapl1|VMS interface to a 300dpi Apple LaserWriter (remote to a UNIX node):\
 	:DD=plnode!apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) \
 	-b$(YO) -h$(YW) -p$(PW) | lpr  -Plw; rm $F; }&:tc=sgi_apl:

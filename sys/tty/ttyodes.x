@@ -10,44 +10,41 @@ define	DEF_BAUDRATE	9600
 define	DEF_TTYNLINES	24
 define	DEF_TTYNCOLS	80
 
-.help ttyodes
-.nf ___________________________________________________________________________
-TTYODES
-    Open a TTY terminal descriptor.  If ttyname is "terminal" or "printer",
-get the name of the default terminal or printer from the environment.  If the
-"name" of the terminal is a filename, the first termcap entry in the name file
-is read.  Otherwise, the termcap file is searched for an entry corresponding
-to the named device.
-
-The descriptor is then allocated, and the termcap entry read in.  Termcap
-permits an entry to be defined in terms of another entry with the "tc"
-field; we must expand such references by rescanning the file once for each
-such reference.  Finally, the termcap entry is indexed for efficient access.
-
-The form of a termcap entry is one logical line (usually extending over several
-physical lines using newline escapes), consisting of several alternate
-names for the device, followed by a list of ':' delimited capabilities:
-
-	name1 '|' name2 [ '|' namen... ] ':' cap ':' [ cap ':' ... ]
-
-If the final cap in an entry is of the form ":tc=name:", the capability
-is replaced by the capability list of the named entry.
-.endhelp ______________________________________________________________________
-
+# TTYODES -- Open a TTY terminal descriptor.  If ttyname is "terminal" or
+# "printer", get the name of the default terminal or printer from the
+# environment.  If the "name" of the terminal is a filename, the first termcap
+# entry in the name file is read.  Otherwise, the termcap file is searched for
+# an entry corresponding to the named device.
+# 
+# The descriptor is then allocated, and the termcap entry read in.  Termcap
+# permits an entry to be defined in terms of another entry with the "tc"
+# field; we must expand such references by rescanning the file once for each
+# such reference.  Finally, the termcap entry is indexed for efficient access.
+# 
+# The form of a termcap entry is one logical line (usually extending over
+# several physical lines using newline escapes), consisting of several alternate
+# names for the device, followed by a list of ':' delimited capabilities:
+# 
+# 	name1 '|' name2 [ '|' namen... ] ':' cap ':' [ cap ':' ... ]
+# 
+# If the final cap in an entry is of the form ":tc=name:", the capability
+# is replaced by the capability list of the named entry.
 
 pointer procedure ttyodes (ttyname)
 
 char	ttyname[ARB]
 
+bool	istty
 int	nchars
 pointer	sp, ttysource, device, devname, fname, tty
+
 pointer	ttyopen()
 extern	ttyload()
 bool	streq(), ttygetb()
-int	fnldir(), ttygeti(), ttygets()
 int	envgets(), envgeti(), btoi()
-errchk	envgets, envgeti, envindir
+int	fnldir(), ttygeti(), ttygets()
 errchk	syserrs, tty_index_caps, ttygeti, ttyopen, ttygets
+errchk	envgets, envgeti, envindir
 
 string	terminal "terminal"	# terminal named in environment
 string	printer  "printer"	# printer named in environment
@@ -152,17 +149,25 @@ begin
 	# Allow environment variables to override physical screen dimensions
 	# if device is the standard terminal.
 
-	if (streq (Memc[devname], terminal)) {
-	    T_NLINES(tty) = envgeti ("ttynlines")
-	    T_NCOLS(tty) = envgeti ("ttyncols")
-	} else {
-	    T_NLINES(tty) = ttygeti (tty, "li")
-	    T_NCOLS(tty) = ttygeti (tty, "co")
-	}
+	istty = (streq (Memc[devname], terminal))
 
-	# Supply default values if these parameters are missing.
+	# Get nlines.
+	if (istty)
+	    iferr (T_NLINES(tty) = envgeti ("ttynlines"))
+		T_NLINES(tty) = 0
+	if (T_NLINES(tty) <= 0)
+	    iferr (T_NLINES(tty) = ttygeti (tty, "li"))
+		T_NLINES(tty) = 0
 	if (T_NLINES(tty) <= 0)
 	    T_NLINES(tty) = DEF_TTYNLINES
+
+	# Get ncols.
+	if (istty)
+	    iferr (T_NCOLS(tty) = envgeti ("ttyncols"))
+		T_NCOLS(tty) = 0
+	if (T_NCOLS(tty) <= 0)
+	    iferr (T_NCOLS(tty) = ttygeti (tty, "co"))
+		T_NCOLS(tty) = 0
 	if (T_NCOLS(tty) <= 0)
 	    T_NCOLS(tty) = DEF_TTYNCOLS
 

@@ -5,12 +5,11 @@ flatfield,f,a,,,,Flat field image
 norm,r,h,INDEF,,,Normalization if not INDEF
 minflat,r,h,INDEF,,,Minimum data value to use in the flat field
 sample_section,s,h,"[]",,,Sample section for determining normalization
-keeplog,b,h,)generic.keeplog,,,Keep log of processing?
-logfile,f,h,)generic.logfile,,,Log file
+keeplog,b,h,)_.keeplog,,,Keep log of processing?
+logfile,f,h,)_.logfile,,,Log file
 img,f,h
 flt,f,h
 tmp,f,h
 rlist,*s,h
 mean,r,h
-junk,s,h
 stat,i,h

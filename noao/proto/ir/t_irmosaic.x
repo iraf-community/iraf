@@ -8,85 +8,112 @@ include "iralign.h"
 
 procedure t_irmosaic ()
 
-int	nxsub, nysub, nxoverlap, nyoverlap, raster, corner, order
-int	ncols, nrows, nimages, nmissing, verbose, median, subtract
-pointer	sp, outimage, database, section, nobs, ranges
-pointer	str, imlist, outim, dt
-real	oval
+int	nimages, nmissing, verbose, subtract
+pointer	ir, sp, outimage, database, trimsection, medsection, nullinput, ranges
+pointer	str, index, c1, c2, l1, l2, isnull, median, imlist, outim, dt
 
 bool	clgetb()
-int	btoi(), clgwrd(), imtlen()
-int	decode_ranges()
+char	clgetc()
+int	btoi(), clgwrd(), imtlen(), clgeti(), decode_ranges(), ir_get_imtype()
 pointer	imtopenp(), ir_setim(), dtmap()
+real	clgetr()
 
 begin
 	call fseti (STDOUT, F_FLUSHNL, YES)
+	call malloc (ir, LEN_IRSTRUCT, TY_STRUCT)
 
 	# Allocate temporary working space.
 	call smark (sp)
 	call salloc (outimage, SZ_FNAME, TY_CHAR)
 	call salloc (database, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (nobs, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (trimsection, SZ_FNAME, TY_CHAR)
+	call salloc (medsection, SZ_FNAME, TY_CHAR)
+	call salloc (nullinput, SZ_FNAME, TY_CHAR)
 	call salloc (ranges, 3 * MAX_NRANGES + 1, TY_INT)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Get the image list, output image name and database file name.
 	imlist = imtopenp ("input")
-	call clgstr ("section", Memc[section], SZ_FNAME)
-	call clgstr ("unobserved", Memc[nobs], SZ_FNAME)
 	call clgstr ("output", Memc[outimage], SZ_FNAME)
 	call clgstr ("database", Memc[database], SZ_FNAME)
+	call clgstr ("trim_section", Memc[trimsection], SZ_FNAME)
+	call clgstr ("null_input", Memc[nullinput], SZ_FNAME)
+	call clgstr ("median_section", Memc[medsection], SZ_FNAME)
+	if (Memc[medsection] == EOS)
+	    subtract = NO
+	else
+	    subtract = btoi (clgetb ("subtract"))
+	verbose = btoi (clgetb ("verbose"))
 
 	# Get the mosaicing parameters.
-	corner = clgwrd ("corner", Memc[str], SZ_FNAME, ",ll,lr,ul,ur,")
-	order = clgwrd ("direction", Memc[str], SZ_FNAME, ",row,column,")
-	raster = btoi (clgetb ("raster"))
+	IR_NXSUB(ir) = clgeti ("nxsub")
+	IR_NYSUB(ir) = clgeti ("nysub")
+	IR_CORNER(ir) = clgwrd ("corner", Memc[str], SZ_FNAME, ",ll,lr,ul,ur,")
+	IR_ORDER(ir) = clgwrd ("direction", Memc[str], SZ_FNAME, ",row,column,")
+	IR_RASTER(ir) = btoi (clgetb ("raster"))
+	IR_NXOVERLAP(ir) = clgeti ("nxoverlap")
+	IR_NYOVERLAP(ir) = clgeti ("nyoverlap")
+	IR_OVAL(ir) = clgetr ("oval")
 
 	# Check that the number of observed and missing images matches
 	# the number of specified subrasters.
-	if (Memc[nobs] == EOS) {
+	if (Memc[nullinput] == EOS) {
 	    nmissing = 0
 	    Memi[ranges] = 0
 	    Memi[ranges+1] = 0
 	    Memi[ranges+2] = 0
 	    Memi[ranges+3] = NULL
 	} else {
-	    if (decode_ranges (Memc[nobs], Memi[ranges], MAX_NRANGES,
+	    if (decode_ranges (Memc[nullinput], Memi[ranges], MAX_NRANGES,
 	        nmissing) == ERR)
 	        call error (0, "Error decoding list of unobserved rasters.")
 	}
-
-	# Compute the output image characteristics.
-	outim = ir_setim (imlist, Memc[section], Memc[outimage], nxsub, nysub,
-	    nxoverlap, nyoverlap, ncols, nrows, oval)
 	nimages = imtlen (imlist) + nmissing
-	if (nimages != (nxsub * nysub))
+	if (nimages != (IR_NXSUB(ir) * IR_NYSUB(ir)))
 	    call error (0,
-	        "The number of images does not match the number of subrasters.")
-	median = btoi (clgetb ("median"))
-	subtract = btoi (clgetb ("subtract"))
-	verbose = btoi (clgetb ("verbose"))
+	        "The number of input images is not equal to nxsub * nysub.")
+
+	# Compute the output image characteristics and open the output image.
+	outim = ir_setim (ir, imlist, Memc[trimsection], Memc[outimage],
+	    clgeti ("nimcols"), clgeti ("nimrows"), ir_get_imtype (clgetc (
+	    "opixtype")))
+
+	# Open the database file.
+	dt = dtmap (Memc[database], APPEND)
+
+	# Allocate space for and setup the database.
+	call salloc (index, nimages, TY_INT)
+	call salloc (c1, nimages, TY_INT)
+	call salloc (c2, nimages, TY_INT)
+	call salloc (l1, nimages, TY_INT)
+	call salloc (l2, nimages, TY_INT)
+	call salloc (isnull, nimages, TY_INT)
+	call salloc (median, nimages, TY_REAL)
+
+	call ir_setup (ir, imlist, Memi[ranges], Memc[trimsection],
+	    Memc[medsection], outim, Memi[index], Memi[c1], Memi[c2],
+	    Memi[l1], Memi[l2], Memi[isnull], Memr[median])
 
 	# Write the parameters to the database file.
-	dt = dtmap (Memc[database], APPEND)
-	call ir_dtwparams (dt, Memc[outimage], Memc[section], ncols, nrows,
-	    nxsub, nysub, nxoverlap, nyoverlap, corner, order, raster, oval)
-
-	# Fill the output image with the blank value.
-	call ir_imzero (outim, int (IM_LEN(outim,1)), int (IM_LEN(outim, 2)),
-	    oval)
+	call ir_dtwparams (dt, Memc[outimage], Memc[trimsection],
+	    Memc[medsection], ir)
 
 	# Make the output image.
-	call ir_mkmosaic (imlist, Memc[section], Memi[ranges], outim, dt,
-	    ncols, nrows, corner, order, raster, nxsub, nysub, nxoverlap,
-	    nyoverlap, oval, median, subtract, verbose)
+	call ir_mkmosaic (imlist, Memc[trimsection], outim, Memi[index],
+	    Memi[c1], Memi[c2], Memi[l1], Memi[l2], Memi[isnull],
+	    Memr[median], IR_NXSUB(ir), IR_NYSUB(ir), IR_OVAL(ir), subtract)
 
-	# Close up files
+	# Write the database file.
+	call ir_dtwinput (imlist, Memc[trimsection], Memc[outimage], dt,
+	    Memi[index], Memi[c1], Memi[c2], Memi[l1], Memi[l2], Memi[isnull],
+	    Memr[median], IR_NXSUB(ir) * IR_NYSUB(ir), subtract, verbose)
+
+	# Close up files and free space.
 	call dtunmap (dt)
 	call imunmap (outim)
 	call clpcls (imlist)
 	call sfree (sp)
+	call mfree (ir, TY_STRUCT)
 end
 
 
@@ -113,423 +140,359 @@ begin
 end
 
 
+# IR_SETUP -- Setup the data base parameters for the images.
+
+procedure ir_setup (ir, imlist, ranges, trimsection, medsection, outim,
+	index, c1, c2, l1, l2, isnull, median)
+
+pointer	ir			# pointer to the ir structure
+pointer	imlist			# pointer to the list of input images
+int	ranges[ARB]		# list of missing subrasters
+char	trimsection[ARB]	# input image section for output
+char	medsection[ARB]		# input image section for median computation
+pointer	outim			# pointer to the output image
+int	index[ARB]		# index array
+int	c1[ARB]			# array of beginning column limits
+int	c2[ARB]			# array of ending column limits
+int	l1[ARB]			# array of beginning line limits
+int	l2[ARB]			# array of ending line limits
+int	isnull[ARB]		# output input image order number
+real	median[ARB]		# output median of input image
+
+int	i, j, k, nimrows, nimcols, imcount, next_null
+pointer	sp, imname, im, buf
+int	get_next_number(), imtgetim()
+pointer	immap(), imgs2r()
+real	amedr()
+
+begin
+	nimcols = IM_LEN(outim,1)
+	nimrows = IM_LEN(outim,2)
+
+	call smark (sp)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+
+	imcount = 1
+	next_null = 0
+	if (get_next_number (ranges, next_null) == EOF)
+	    next_null = IR_NXSUB(ir) * IR_NYSUB(ir) + 1
+
+	# Loop over the input images.
+	do i = 1, IR_NXSUB(ir) * IR_NYSUB(ir) {
+
+	    # Set the indices array.
+	    call ir_indices (i, j, k, IR_NXSUB(ir), IR_NYSUB(ir),
+	        IR_CORNER(ir), IR_RASTER(ir), IR_ORDER(ir))
+	    index[i] = i
+	    c1[i] = max (1, min (1 + (j - 1) * (IR_NCOLS(ir) -
+	        IR_NXOVERLAP(ir)), nimcols))
+	    c2[i] = min (nimcols, max (1, c1[i] + IR_NCOLS(ir) - 1))
+	    l1[i] = max (1, min (1 + (k - 1) * (IR_NROWS(ir) -
+	        IR_NYOVERLAP(ir)), nimrows))
+	    l2[i] = min (nimrows, max (1, l1[i] + IR_NROWS(ir) - 1))
+
+	    # Set the index of each image in the image template
+	    # and compute the median of the subraster.
+	    if (i < next_null) {
+		isnull[i] = imcount
+		if (medsection[1] != EOS) {
+		    if (imtgetim (imlist, Memc[imname], SZ_FNAME) == EOF)
+			call error (0, "Error reading input image list.")
+		    call strcat (medsection, Memc[imname], SZ_FNAME)
+		    im = immap (Memc[imname], READ_ONLY, TY_CHAR)
+		    buf = imgs2r (im, 1, int (IM_LEN(im,1)), 1, int (IM_LEN(im,
+		        2)))
+		    median[i] = amedr (Memr[buf], int (IM_LEN(im,1)) *
+			    int (IM_LEN(im,2)))
+		    call imunmap (im)
+		} else
+		    median[i] = INDEFR
+		imcount = imcount + 1
+	    } else {
+		isnull[i] = 0
+		if (medsection[1] == EOS)
+		    median[i] = INDEFR
+		else
+		    median[i] = IR_OVAL(ir)
+		if (get_next_number (ranges, next_null) == EOF)
+	    	    next_null = IR_NXSUB(ir) * IR_NYSUB(ir) + 1
+	    }
+
+	}
+
+	call imtrew (imlist)
+	call sfree (sp)
+end
+
+
 # IR_SETIM -- Procedure to set up the output image characteristics.
 
-pointer procedure ir_setim (list, section, outimage, nxsub, nysub, nxoverlap,
-    nyoverlap, ncols, nrows, oval)
+pointer procedure ir_setim (ir, list, trimsection, outimage, nimcols, nimrows,
+	opixtype)
 
+pointer	ir		# pointer to the ir structure
 pointer	list		# pointer to list of input images
-char	section[ARB]	# input image section
+char	trimsection[ARB]# input image section
 char	outimage[ARB]	# name of the output image
-int	nxsub		# number of subrasters in the x direction
-int	nysub		# number of subrasters in the y direction
-int	nxoverlap	# number of columns of overlap
-int	nyoverlap	# number of rows of overlap
-int	ncols		# number of columns per subraster
-int	nrows		# number of rows per subraster
-real	oval		# pixel value of undefined regions
+int	nimcols		# number of output image columns
+int	nimrows		# number of output image rows
+int	opixtype	# output image pixel type
 
-int	ijunk, opixtype, nimcols, nimrows
-pointer	sp, image, im, outim
-char	clgetc()
-int	clgeti(), ir_get_imtype()
+int	ijunk, nc, nr
+pointer	sp, imname, im, outim
 pointer	imtgetim(), immap()
-real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
 
-	# Get the number of subrasters and the overlap parameters.
-	nxsub = clgeti ("nxsub")
-	nysub = clgeti ("nysub")
-	nxoverlap = clgeti ("nxoverlap")
-	nyoverlap = clgeti ("nyoverlap")
-
-	# Get the individual subraster size.
-	if (imtgetim (list, Memc[image], SZ_FNAME) == EOF)
-	    call error (0, "Null length image list.")
-	call strcat (section, Memc[image], SZ_FNAME)
-	im = immap (Memc[image], READ_ONLY, 0)
-	ncols = IM_LEN(im,1)
-	nrows = IM_LEN(im,2)
+	# Get the size of the first subraster.
+	if (imtgetim (list, Memc[imname], SZ_FNAME) != EOF) {
+	    call strcat (trimsection, Memc[imname], SZ_FNAME)
+	    im = immap (Memc[imname], READ_ONLY, 0)
+	    IR_NCOLS(ir) = IM_LEN(im,1)
+	    IR_NROWS(ir) = IM_LEN(im,2)
+	    call imunmap (im)
+	    call imtrew (list)
+	} else
+	    call error (0, "Error reading first input image.\n")
 
 	# Compute the size of the output image.
-	nimcols = nxsub * ncols - (nxsub - 1) * nxoverlap
-	nimrows = nysub * nrows - (nysub - 1) * nyoverlap
-	ijunk = clgeti ("nimcols")
-	if (! IS_INDEFI(ijunk))
-	    nimcols = max (nimcols, ijunk)
-	ijunk = clgeti ("nimrows")
-	if (! IS_INDEFI(ijunk))
-	    nimrows = max (nimrows, ijunk)
+	ijunk = IR_NXSUB(ir) * IR_NCOLS(ir) - (IR_NXSUB(ir) - 1) *
+	    IR_NXOVERLAP(ir)
+	if (IS_INDEFI(nimcols))
+	    nc = ijunk
+	else
+	    nc = max (nimcols, ijunk)
+	ijunk = IR_NYSUB(ir) * IR_NROWS(ir) - (IR_NYSUB(ir) - 1) *
+	    IR_NYOVERLAP(ir)
+	if (IS_INDEFI(ijunk))
+	    nr = ijunk
+	else
+	    nr = max (nimrows, ijunk)
 
 	# Set the output pixel type.
-	opixtype = ir_get_imtype (clgetc ("opixtype"))
 	if (opixtype == ERR)
-	    opixtype = IM_PIXTYPE(im)
-
-	# Set the output pixel value.
-	oval = clgetr ("oval")
+	    opixtype = TY_REAL
 
 	# Open output image and set the parameters.
 	outim = immap (outimage, NEW_IMAGE, 0)
 	IM_NDIM(outim) = 2
-	IM_LEN(outim,1) = nimcols
-	IM_LEN(outim,2) = nimrows
+	IM_LEN(outim,1) = nc
+	IM_LEN(outim,2) = nr
 	IM_PIXTYPE(outim) = opixtype
 
-	call imunmap (im)
-	call imtrew (list)
 	call sfree (sp)
+
 	return (outim)
-end
-
-
-# IR_LOOP -- Procedure to compute the ordering parameters for inserting the
-# subrasters into the output image.
-
-procedure ir_loop (corner, nxsub, nysub, order, kbegin, kend, kincr, jbegin,
-    jend, jincr)
-
-int	corner	# beginning corner for adding subrasters to the image
-int	nxsub	# number of subrasters in the x direction
-int	nysub	# number of subrasters in the y direction
-int	order	# row or column order
-int	kbegin	# beginning parameter for the inner loop
-int	kend	# ending parameter for the inner loop
-int	kincr	# inner loop increment
-int	jbegin	# beginning parameter for the inner loop
-int	jend	# ending parameter for the inner loop
-int	jincr	# outer loop increment
-
-begin
-	switch (corner) {
-	case IR_LL:
-	    if (order == IR_ROW) {
-	        kbegin = 1
-	        kend = nxsub
-	        kincr = 1
-	        jbegin = 1
-	        jend = nysub
-	        jincr = 1
-	    } else {
-		kbegin = 1
-		kend = nysub
-		kincr = 1
-		jbegin = 1
-		jend = nxsub
-		jincr = 1
-	    }
-	case IR_LR:
-	    if (order == IR_ROW) {
-	        kbegin = nxsub
-	        kend = 1
-	        kincr = -1
-	        jbegin = 1
-	        jend = nysub
-	        jincr = 1
-	    } else {
-		kbegin = 1
-		kend = nysub
-		kincr = 1
-		jbegin = nxsub
-		jend = 1
-		jincr = -1
-	    }
-	case IR_UL:
-	    if (order == IR_ROW) {
-	        kbegin = 1
-	        kend = nxsub
-	        kincr = 1
-	        jbegin = nysub
-	        jend = 1
-	        jincr = -1
-	    } else {
-		kbegin = nysub
-		kend = 1
-		kincr = -1
-		jbegin = 1
-		jend = nxsub
-		jincr = 1
-	    }
-	case IR_UR:
-	    if (order == IR_ROW) {
-	        kbegin = nxsub
-	        kend = 1
-	        kincr = -1
-	        jbegin = nysub
-	        jend = 1
-	        jincr = -1
-	    } else {
-		kbegin = nysub
-		kend = 1
-		kincr = -1
-		jbegin = nxsub
-		jend = 1
-		jincr = -1
-	    }
-	}
 end
 
 
 # IR_MKMOSAIC -- Procedure to make the mosaiced image.
 
-procedure ir_mkmosaic (imlist, section, ranges, outim, dt, ncols, nrows, corner,
-    order, raster, nxsub, nysub, nxoverlap, nyoverlap, oval, median,
-    subtract, verbose)
+procedure ir_mkmosaic (imlist, trimsection, outim, index, c1, c2, l1, l2,
+	isnull, median, nxsub, nysub, oval, subtract)
 
 pointer	imlist		# pointer to input image list
-char	section[ARB]	# input image section
-int	ranges[ARB]	# list of missing subrasters
+char	trimsection[ARB]# input image section
 pointer	outim		# pointer to the output image
-pointer	dt		# pointer to the database file
-int	ncols		# maximum number of columns in input image
-int	nrows		# maximum number of rows in input image
-int	corner		# which corner to begin mosaic
-int	order		# row or column order
-int	raster		# raster scan pattern
+int	index[ARB]	# index array for sorting the images
+int	c1[ARB]		# array of column beginnings
+int	c2[ARB]		# array of column endings
+int	l1[ARB]		# array of line beginnings
+int	l2[ARB]		# array of line endings
+int	isnull[ARB]	# index of input image in the template
+real	median[ARB]	# array of input image median values
 int	nxsub		# number of subrasters per output image column
 int	nysub		# number of subrasters per output image row
-int	nxoverlap	# number of columns of overlap
-int	nyoverlap	# number of rows of overlap
 real	oval		# pixel value of undefined output image regions
-int	median	 	# compute the median of each subraster
 int	subtract	# subtract the median off each subraster
-int	verbose		# print output messages
 
-int	k, j, kbegin, kend, kincr, jbegin, jend, jincr, ncount, next_missing
-int	itemp
-pointer	sp, inimage, subim
-int	get_next_number()
-pointer	imtgetim(), immap()
+int	i, j, noutcols, noutlines, olineptr, ll1, ll2
+pointer	sp, inimage, imptrs, buf
+pointer	imtrgetim(), immap(), impl2r()
 
 begin
 	# Allocate temporary space.
 	call smark (sp)
+	call salloc (imptrs, nxsub, TY_POINTER)
 	call salloc (inimage, SZ_FNAME, TY_CHAR)
 
-	# Compute the looping parameters.
-	call ir_loop (corner, nxsub, nysub, order, kbegin, kend, kincr, jbegin,
-	    jend, jincr)
+	# Sort the subrasters on the yindex.
+	call ir_qsorti (l1, index, index, nxsub * nysub)
 
-	# Initialize the counters
-	ncount = 1
-	next_missing = 0
-	if (get_next_number (ranges, next_missing) == EOF)
-	    next_missing = nxsub * nysub + 1
+	noutcols = IM_LEN(outim,1)
+	noutlines = IM_LEN(outim,2)
 
-	# Write out the number of subraster
-	call dtput (dt, "\tnsubrasters\t%d\n")
-	    call pargi (nxsub * nysub)
+	# Loop over the input images.
+	olineptr = 1
+	do i = 1, nxsub * nysub, nxsub {
 
-	# Loop over the list of subrasters.
-	do j = jbegin, jend, jincr {
+	    # Compute the line and column limits.
+	    ll1 = l1[index[i]]
+	    ll2 = l2[index[i]]
 
-	    do k = kbegin, kend, kincr {
-		if (ncount < next_missing) {
-		    if (imtgetim (imlist, Memc[inimage], SZ_FNAME) == EOF)
-			call error (0, "Error reading subraster.")
-		    call strcat (section, Memc[inimage], SZ_FNAME)
-		    subim = immap (Memc[inimage], READ_ONLY, 0)
-		    call ir_put_subraster (dt, subim, outim, ncols, nrows, oval,
-			k, j, nxoverlap, nyoverlap, order, median, subtract,
-			verbose)
-		    call imunmap (subim)
+	    # Open the nxsub input images.
+	    do j = i, i + nxsub - 1 {
+		if (isnull[index[j]] <= 0) {
+		    Memc[inimage] = EOS
+		    Memi[imptrs+j-i] = NULL
 		} else {
-		    call ir_put_null (dt, outim, ncols, nrows, oval, k, j,
-			nxoverlap, nyoverlap, order, median, subtract, verbose)
-		    if (get_next_number (ranges, next_missing) == EOF)
-			next_missing = nxsub * nysub + 1
+		    if (imtrgetim (imlist, isnull[index[j]], Memc[inimage],
+		        SZ_FNAME) == EOF)
+			Memi[imptrs+j-i] = NULL
+		    else {
+			call strcat (trimsection, Memc[inimage], SZ_FNAME)
+			Memi[imptrs+j-i] = immap (Memc[inimage], READ_ONLY, 0)
+		    }
 		}
-		ncount = ncount + 1
 	    }
 
-	    if (raster == YES) {
-		itemp = kbegin
-		kbegin = kend
-		kend = itemp
-		kincr = - kincr
+	    # Write out the undefined lines.
+	    while (olineptr < ll1) {
+		buf = impl2r (outim, olineptr)
+		call amovkr (oval, Memr[buf], noutcols)
+		olineptr = olineptr + 1
 	    }
+
+	    # Write the output lines.
+	    call ir_mklines (Memi[imptrs], outim, index, c1, c2, ll1, ll2,
+	        median, i, nxsub, oval, subtract)
+	    olineptr = ll2 + 1
+
+	    # Close up the images.
+	    # Open the nxsub input images.
+	    do j = i, i + nxsub - 1 {
+		if (Memi[imptrs+j-i] != NULL)
+		    call imunmap (Memi[imptrs+j-i])
+	    }
+
+	}
+
+	# Write out the remaining undefined lines.
+	while (olineptr < noutlines) {
+	    buf = impl2r (outim, olineptr)
+	    call amovkr (oval, Memr[buf], noutcols)
+	    olineptr = olineptr + 1
 	}
 
 	call sfree (sp)
 end
 
 
-# IR_PUT_NULL -- Procedure to store a dummy subraster.
+# IR_MKLINES -- Construct and output image lines.
 
-procedure ir_put_null (dt, outim, ncols, nrows, oval, k, j, nxoverlap,
-    nyoverlap, order, median, subtract, verbose)
+procedure ir_mklines (imptrs, outim, index, c1, c2, l1, l2, meds, init, nsub, 
+	oval, subtract)
 
-pointer	dt		# pointer to the database file
-pointer	outim		# pointer to the output image
-int	ncols		# number of columns in the subraster
-int	nrows		# number of rows in the subraster
-real	oval		# value of the output pixel
-int	k		# index of the inner loop
-int	j		# index of the outer loop
-int	nxoverlap	# the amount of column overlap
-int	nyoverlap	# the amount of row overlap
-int	order		# row or column order
-int	median		# compute the median value
-int	subtract	# subtract the median from the image
-int	verbose		# print verbose messages
+pointer	imptrs[ARB]		# array of input image pointers
+pointer	outim			# output imnage pointer
+int	index[ARB]		# array of indices
+int	c1[ARB]			# array of beginning columns
+int	c2[ARB]			# array of ending columns
+int	l1			# beginning line
+int	l2			# ending line
+real	meds[ARB]		# array of median values
+int	init			# first index
+int	nsub			# number of subrasters
+real	oval			# output value
+int	subtract		# subtract the median value
 
-int	nimcols, nimrows, c1, c2, l1, l2
-pointer	buf
-pointer	imps2r()
+int	i, j, jj, noutcols
+pointer	obuf, ibuf
+pointer	impl2r(), imgl2r()
 
 begin
-	# Compute the column and row limits.
-	nimcols = IM_LEN(outim,1)
-	nimrows = IM_LEN(outim,2)
-
-	# Compute the section limits.
-	if (order == IR_ROW) {
-	    c1 = max (1, min (1 + (k - 1) * (ncols - nxoverlap), nimcols))
-	    c2 = min (nimcols, max (1, c1 + ncols - 1))
-	    l1 = max (1, min (1 + (j - 1) * (nrows - nyoverlap), nimrows))
-	    l2 = min (nimrows, max (1, l1 + nrows - 1))
-	} else {
-	    c1 = max (1, min (1 + (j - 1) * (ncols - nxoverlap), nimcols))
-	    c2 = min (nimcols, max (1, c1 + ncols - 1))
-	    l1 = max (1, min (1 + (k - 1) * (nrows - nyoverlap), nimrows))
-	    l2 = min (nimrows, max (1, l1 + nrows - 1))
-	}
-
-	# Move the constant into buffer.
-	buf = imps2r (outim, c1, c2, l1, l2)
-	if (buf == NULL)
-	    call error (0, "Error writing the image.\n")
-	if (median == YES && subtract == YES)
-	    call amovkr (0.0, Memr[buf], (c2 - c1 + 1) * (l2 - l1 + 1)) 
-	else
-	    call amovkr (oval, Memr[buf], (c2 - c1 + 1) * (l2 - l1 + 1)) 
-
-	# Write the record to the data base.
-	call dtput (dt,"\tnullraster\t%s[%d:%d,%d:%d]  %g  %s\n")
-	    call pargstr (IM_HDRFILE(outim))
-	    call pargi (c1)
-	    call pargi (c2)
-	    call pargi (l1)
-	    call pargi (l2)
-	if (median == YES)
-	    call pargr (oval)
-	else
-	    call pargr (INDEFR)
-	if (median == YES && subtract == YES)
-	    call pargstr ("subtract")
-	else
-	    call pargstr ("")
-
-	# Print messages on the standard output.
-	if (verbose == YES) {
-	    call printf ("imcopy  nullimage  %s[%d:%d,%d:%d]  %g  %s\n") 
-		call pargstr (IM_HDRFILE(outim))
-		call pargi (c1)
-		call pargi (c2)
-		call pargi (l1)
-		call pargi (l2)
-	    if (median == YES)
-		call pargr (oval)
-	    else
-		call pargr (INDEFR)
-	    if (median == YES && subtract == YES)
-	        call pargstr ("subtract")
-	    else
-	        call pargstr ("")
+	noutcols = IM_LEN(outim, 1)
+	do i = l1, l2 {
+	    obuf = impl2r (outim, i)
+	    call amovkr (oval, Memr[obuf],  noutcols)
+	    do j = 1, nsub {
+		jj = index[j+init-1]
+		if (imptrs[j] != NULL) {
+		    ibuf = imgl2r (imptrs[j], i - l1 + 1)
+		    if (subtract == YES)
+		        call asubkr (Memr[ibuf], meds[jj], Memr[obuf+c1[jj]-1],
+			    c2[jj] - c1[jj] + 1)
+		    else
+		        call amovr (Memr[ibuf], Memr[obuf+c1[jj]-1], c2[jj] -
+			    c1[jj] + 1)
+		}
+	    }
 	}
 end
 
 
-# IR_PUT_SUBRASTER -- Procedure to  output a subraster
+# IR_DTWINPUT -- Procedure to  write the output database file.
 
-procedure ir_put_subraster (dt, subim, outim, ncols, nrows, oval, k, j,
-    nxoverlap, nyoverlap, order, median, subtract, verbose)
+procedure ir_dtwinput (imlist, trimsection, outimage, dt, index, c1, c2, l1,
+	l2, isnull, median, nsub, subtract, verbose)
 
+int	imlist		# input image list
+char	trimsection[ARB]# trim section of input image
+char	outimage[ARB]	# output image
 pointer	dt		# pointer to the database file
-pointer	subim		# pointer to input subraster
-pointer	outim		# pointer to the output image
-int	ncols		# number of columns in the subraster
-int	nrows		# number of rows in the subraster
-real	oval		# value of the output pixel
-int	k		# index of the inner loop
-int	j		# index of the outer loop
-int	nxoverlap	# the amount of column overlap
-int	nyoverlap	# the amount of row overlap
-int	order		# row or column order
-int	median		# compute the median of the subraster
+int	index[ARB]	# array of sorted indices (not used at present)
+int	c1[ARB]		# array of beginning column limits
+int	c2[ARB]		# array of ending column limits
+int	l1[ARB]		# array of beginning line limits
+int	l2[ARB]		# array of ending line limits
+int     isnull[ARB]	# image name index
+real	median[ARB]	# array of medians
+int	nsub		# number of subrasters
 int	subtract	# subtract the median from the subraster
 int	verbose		# print verbose messages
 
-int	nimcols, nimrows, c1, c2, l1, l2
-pointer	inbuf, outbuf
-real	medval
-pointer	imgs2r(), imps2r()
-real	amedr()
+int	i
+pointer	sp, imname
+int	imtrgetim()
 
 begin
-	# Compute the column and row limits.
-	nimcols = IM_LEN(outim,1)
-	nimrows = IM_LEN(outim,2)
+	call smark (sp)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
 
-	# Compute the output section limits.
-	if (order == IR_ROW) {
-	    c1 = max (1, min (1 + (k - 1) * (ncols - nxoverlap), nimcols))
-	    c2 = min (nimcols, max (1, c1 + ncols - 1))
-	    l1 = max (1, min (1 + (j - 1) * (nrows - nyoverlap), nimrows))
-	    l2 = min (nimrows, max (1, l1 + nrows - 1))
-	} else {
-	    c1 = max (1, min (1 + (j - 1) * (ncols - nxoverlap), nimcols))
-	    c2 = min (nimcols, max (1, c1 + ncols - 1))
-	    l1 = max (1, min (1 + (k - 1) * (nrows - nyoverlap), nimrows))
-	    l2 = min (nimrows, max (1, l1 + nrows - 1))
-	}
+	# Write out the number of subrasters.
+	call dtput (dt, "\tnsubrasters\t%d\n")
+	    call pargi (nsub)
 
-	# Fetch the input pixels.
-	inbuf = imgs2r (subim, 1, (c2 - c1 + 1), 1, (l2 - l1 + 1))
-	if (inbuf == NULL)
-	    call error (0, "Error reading image.")
+	do i = 1, nsub {
 
-	# Move the constant into buffer.
-	outbuf = imps2r (outim, c1, c2, l1, l2)
-	if (outbuf == NULL)
-	    call error (0, "Error writing the image.")
-	call amovr (Memr[inbuf], Memr[outbuf], (c2 - c1 + 1) * (l2 - l1 + 1)) 
-	if (median == YES) {
-	    medval = amedr (Memr[inbuf], (c2 - c1 + 1) * (l2 - l1 + 1))
-	    if (subtract == YES)
-		call asubkr (Memr[outbuf], medval, Memr[outbuf],
-		    (c2 - c1 + 1) * (l2 - l1 + 1)) 
-	} else
-	    medval = INDEFR
-
-	call dtput (dt,"\t%s\t%s[%d:%d,%d:%d]\t%g\t%s\n")
-	    call pargstr (IM_HDRFILE(subim))
-	    call pargstr (IM_HDRFILE(outim))
-	    call pargi (c1)
-	    call pargi (c2)
-	    call pargi (l1)
-	    call pargi (l2)
-	    call pargr (medval)
-	if (median == YES && subtract == YES)
-	    call pargstr ("subtract")
-	 else
-	    call pargstr ("")
-
-	if (verbose == YES) {
-	    call printf ("imcopy  %s  %s[%d:%d,%d:%d]  %g  %s\n") 
-		call pargstr (IM_HDRFILE(subim))
-		call pargstr (IM_HDRFILE(outim))
-		call pargi (c1)
-		call pargi (c2)
-		call pargi (l1)
-		call pargi (l2)
-		call pargr (medval)
-	    if (median == YES && subtract == YES)
-		call pargstr ("subtract")
+	    if (isnull[i] <= 0)
+		call strcpy ("nullimage", Memc[imname], SZ_FNAME)
+	    else if (imtrgetim (imlist, isnull[i], Memc[imname],
+	        SZ_FNAME) != EOF)
+		call strcat (trimsection, Memc[imname], SZ_FNAME)
 	    else
-	        call pargstr ("")
+		Memc[imname] = EOS
+
+	    call dtput (dt,"\t%s  %s[%d:%d,%d:%d]  %g  %g\n")
+	        call pargstr (Memc[imname])
+	        call pargstr (outimage)
+	        call pargi (c1[i])
+	        call pargi (c2[i])
+	        call pargi (l1[i])
+	        call pargi (l2[i])
+	        call pargr (median[i])
+	    if (subtract == YES)
+	        call pargr (-median[i])
+	     else
+	        call pargr (0.0)
+
+	    if (verbose == YES) {
+	        call printf ("imcopy  %s  %s[%d:%d,%d:%d]  %g  %g\n") 
+		    call pargstr (Memc[imname])
+		    call pargstr (outimage)
+		    call pargi (c1[i])
+		    call pargi (c2[i])
+		    call pargi (l1[i])
+		    call pargi (l2[i])
+		    call pargr (median[i])
+	        if (subtract == YES)
+		    call pargr (-median[i])
+	        else
+	            call pargr (0.0)
+	    }
 	}
+
+	call sfree (sp)
 end

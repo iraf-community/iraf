@@ -129,7 +129,7 @@ of known instruments may be listed by using '?' for the instrument name.
 
 .nf
     cl> setinstrument
-    Instrument ID (type ? for a list) \fI<enter instrument id or ?>
+    Instrument ID (type ? for a list) \fI<enter instrument id or ?>\fR
         <Set ccdred package parameters using eparam>
         <Set ccdproc task parameters using eparam>
 .fi

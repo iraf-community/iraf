@@ -3,6 +3,7 @@
 include	<error.h>
 include	<ctype.h>
 include	<fmlfstat.h>
+include	<mach.h>
 include	"fmset.h"
 
 # ZZDEBUG.X -- Debug routines for the FMIO package.
@@ -10,6 +11,7 @@ include	"fmset.h"
 task	create	= t_create,
 	enter	= t_enter,
 	extract	= t_extract,
+	mkfile	= t_mkfile,
 	type	= t_type,
 	show	= t_show,
 	copy	= t_copy,
@@ -104,6 +106,36 @@ begin
 
 	call close (lf)
 	call close (fd)
+	call fm_close (fm)
+end
+
+
+# MKFILE -- Create a file of the given size (in kilobytes) containing all
+# zero data.
+
+procedure t_mkfile()
+
+pointer	fm
+int	lfile, lf, kb, i
+char	datafile[SZ_FNAME], buf[1024/SZB_CHAR]
+int	clgeti(), fm_fopen()
+pointer	fm_open()
+
+begin
+	call clgstr ("datafile", datafile, SZ_FNAME)
+	lfile = clgeti ("lfile")
+	kb = clgeti ("kb")
+
+	fm = fm_open (datafile, READ_WRITE)
+	lf = fm_fopen (fm, lfile, NEW_FILE, BINARY_FILE)
+
+	do i = 1, kb
+	    iferr (call write (lf, buf, 1024/SZB_CHAR)) {
+		call erract (EA_WARN)
+		break
+	    }
+
+	call close (lf)
 	call fm_close (fm)
 end
 

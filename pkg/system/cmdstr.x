@@ -10,13 +10,14 @@ define	SZ_CMDSTR	4096
 procedure t_cmdstr()
 
 bool	hidden, hparam
-pointer	sp, ltask, ibuf, obuf, ip, op, nl, last
+pointer	sp, ltask, pname, ibuf, obuf, ip, op, pp, nl, last
 int	getline(), gstrcpy(), strncmp()
 bool	clgetb()
 
 begin
 	call smark (sp)
 	call salloc (ltask, SZ_FNAME, TY_CHAR)
+	call salloc (pname, SZ_FNAME, TY_CHAR)
 	call salloc (ibuf, SZ_LINE, TY_CHAR)
 	call salloc (obuf, SZ_CMDSTR, TY_CHAR)
 
@@ -52,24 +53,33 @@ begin
 		next
 
 	    # Copy or skip parameter name.
+	    pp = pname
 	    while (!IS_WHITE (Memc[ip])) {
 		if (hparam) {
 		    Memc[op] = Memc[ip]
 		    op = op + 1
 	        }
+		Memc[pp] = Memc[ip]
+		pp = pp + 1
 		ip = ip + 1
 	    }
+	    Memc[pp] = EOS
 
 	    # Copy or skip = and skip whitespace.
 	    if (hparam) {
-	        Memc[op] = '='
-	        op = op + 1
+		Memc[op] = '='
+		op = op + 1
 	    }
 	    ip = ip + 3
 
 	    # Copy parameter value.  It is an error if there is no value.
-	    if (IS_WHITE (Memc[ip]) || (Memc[ip] == ')'))
-		call error (1, "Undefined parameter value")
+	    if (IS_WHITE (Memc[ip]) || (Memc[ip] == ')')) {
+		call sprintf (Memc[obuf], SZ_CMDSTR,
+		    "Undefined parameter value (%s.%s)")
+		    call pargstr (Memc[ltask])
+		    call pargstr (Memc[pname])
+		call error (1, Memc[obuf])
+	    }
 
 	    # If the parameter is a quoted string copy until the closing quote,
 	    # otherwise copy until whitespace or ).

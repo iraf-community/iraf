@@ -18,7 +18,7 @@ libsys.a:
 	fmcopyo.x	fmio.h <mach.h>
 	fmdebug.x	fmio.h fmset.h
 	fmdelete.x	
-	fmfcache.x	fmio.h fmset.h <error.h>
+	fmfcache.x	fmio.h fmset.h <error.h> <fset.h>
 	fmfopen.x	
 	fmiobind.x	fmio.h <mach.h>
 	fmioerr.x	fmio.h

@@ -258,6 +258,7 @@ begin
 		    call eprintf ("QPOE macro save file %s\n")
 			call pargstr (Memc[qmsave])
 		} else {
+		    call stclose (st)
 		    st = strestore (fd)
 		    call close (fd)
 		    goto uptodate_

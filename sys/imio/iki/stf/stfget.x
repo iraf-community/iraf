@@ -62,3 +62,36 @@ begin
 	} else
 	    outstr[1] = EOS
 end
+
+
+# STF_GETCMT -- Get the comment field of a FITS encoded card.
+
+procedure stf_getcmt (card, comment, maxch)
+
+char	card[ARB]		#I FITS card to be decoded
+char	comment[ARB]		#O output string to receive comment
+int	maxch			#I max chars out
+
+int	ip, op
+int	lastch
+
+begin
+	# Find the slash which marks the beginning of the comment field.
+	ip = FITS_ENDVALUE + 1
+	while (card[ip] != EOS && card[ip] != '\n' && card[ip] != '/')
+	    ip = ip + 1
+
+	# Copy the comment to the output string, omitting the /, any
+	# trailing blanks, and the newline.
+
+	lastch = 0
+	do op = 1, maxch {
+	    if (card[ip] == EOS)
+		break
+	    ip = ip + 1
+	    comment[op] = card[ip]
+	    if (card[ip] > ' ')
+		lastch = op
+	}
+	comment[lastch+1] = EOS
+end

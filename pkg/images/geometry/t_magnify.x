@@ -23,7 +23,7 @@ define	SZ_BTYPE	8
 procedure t_magnify ()
 
 pointer	input				# Pointer to input image list
-pointer	output				# POinter to output image list
+pointer	output				# Pointer to output image list
 pointer	interp				# Pointer to image interpolation type
 pointer	boundary			# Pointer to boundary extension type
 real	bconst				# Boundary extension pixel value
@@ -34,12 +34,13 @@ real	x2, y2				# Ending coordinates
 int	flux				# Flux conserve
 
 int	list1, list2, itype, btype, logfd
-pointer	sp, in, out, image1, image2, image3, time
-real	a, b, c, d
+pointer	sp, in, out, image1, image2, image3, time, mw
+real	a, b, c, d, ltv[2], ltm[2,2]
 
-bool	clgetb()
+bool	clgetb(), envgetb(), fp_equalr()
 int	clgwrd(), imtopen(), imtgetim(), imtlen(), open(), btoi(), immap()
 long	clktime()
+pointer	mw_openim()
 real	clgetr()
 errchk	open()
 
@@ -90,17 +91,20 @@ begin
 	    else
 		dy = 0.0
 	}
-	if ((dx == 0.) || (dy == 0.))
+	if (fp_equalr (dx, 0.0) || fp_equalr (dy, 0.0)) {
 	    call error (0, "Illegal magnification")
+	} else {
+	    xmag = 1.0 / dx
+	    ymag = 1.0 / dy
+	}
+
 
 	# Open the log file.
-
 	call clgstr ("logfile", Memc[image1], SZ_FNAME)
 	iferr (logfd = open (Memc[image1], APPEND, TEXT_FILE))
 	    logfd = NULL
 
 	# Expand the input and output image lists.
-
 	list1 = imtopen (Memc[input])
 	list2 = imtopen (Memc[output])
 	if (imtlen (list1) != imtlen (list2)) {
@@ -127,13 +131,33 @@ begin
 	    y1 = c
 	    y2 = d
 
-	    if (IM_NDIM(in) == 1)
+
+	    # Magnify the image making sure to update the wcs.
+	    if (IM_NDIM(in) == 1) {
 		call mg_magnify1 (in, out, itype, btype, bconst, x1, x2, dx,
 		    flux)
-	    else if (IM_NDIM(in) == 2)
+		if (!envgetb ("nomwcs")) {
+		    mw = mw_openim (in)
+		    ltv[1] =  1. - xmag * x1; ltv[2] = 0.0
+		    ltm[1,1] = xmag; ltm[2,1] = 0.0
+		    ltm[1,2] = 0.0; ltm[2,2] = 1.0
+		    call mw_sltermr (mw, ltm, ltv, 1)
+		    call mw_saveim (mw, out)
+		    call mw_close (mw)
+		}
+	    } else if (IM_NDIM(in) == 2) {
 	        call mg_magnify2 (in, out, itype, btype, bconst, x1, x2, dx,
 	            y1, y2, dy, flux)
-	    else {
+		if (!envgetb ("nomwcs")) {
+		    mw = mw_openim (in)
+		    ltv[1] =  1. - xmag * x1; ltv[2] =  1. - ymag * y1
+		    ltm[1,1] = xmag; ltm[2,1] = 0.0
+		    ltm[1,2] = 0.0; ltm[2,2] = ymag
+		    call mw_sltermr (mw, ltm, ltv, 2)
+		    call mw_saveim (mw, out)
+		    call mw_close (mw)
+		}
+	    } else {
 	        call imunmap (in)
 	        call imunmap (out)
 	        call xt_delimtemp (Memc[image2], Memc[image3])

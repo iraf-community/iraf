@@ -1,7 +1,7 @@
 .help polymark May89 noao.digiphot.apphot
 .ih
 NAME
-polymark -- create polygon and coordinate lists for the polyphot task
+polymark -- create polygon and coordinate lists for input to the polyphot task
 .ih
 USAGE
 polymark image
@@ -11,39 +11,42 @@ PARAMETERS
 The list of input images.
 .le
 .ls coords = "default"
-The name of the coordinate file or results directory. The average of the x and
-y vertices of the current marked polygon
-cursor position are written to the text file defined by
+The name of the output coordinate file or results directory.
+The average of the x and
+y vertices of the current marked polygon, shifted to the current cursor
+position, are written to the text file
 \fIcoords\fR 1 per line with the x and y coordinates in columns 1 and 2
 respectively.
-These center positions are associated with a particular polygon where a
-single ';' character in column 1 means switch to the next polygon.
-The string "default"
-indicates the current directory. If output is "default", "dir$default"
-or a directory specification then an output name of the form
+These center positions are associated with a particular polygon.
+POLYMARK inserts a
+single ';' character in column 1 when the user defines a new polygon.
+If \fIcoords\fR is "default", "dir$default"
+or a directory specification then a coordinate file name of the form
 dir$root.extension.version
 is constructed, where dir is the directory, root is the root image name,
-and extension is "coo" and version is the current version of the file.
-The number of output files must equal to the number of image files.
-If output is the null string then no output file is written.
+extension is "coo" and version is the next available version of the file.
+If \fIcoords\fR is the null string then no coordinate file is written.
 .le
 .ls polygons = "default"
 The name of the polygons file or results directory. The x and
 y vertices of each marked polygon are written to the text file
 \fIpolygons\fR 1 per line with the x and y coordinates in columns 1 and 2
 respectively. Each polygon is terminated by a single ';' in column 1.
-The string "default"
-indicates the current directory. If output is "default", "dir$default"
+If \fIpolygons\fR is "default", "dir$default"
 or a directory specification then an output name of the form
 dir$root.extension.version
 is constructed, where dir is the directory, root is the root image name,
-and extension is "ver" and version is the current version of the file.
-The number of output files must be equal to the number of image files.
-If output is the null string then no output file is written.
+extension is "ver" and version is the current version of the file.
+The number of polygon files must be equal to the number of image files.
+If \fIpolygons\fR is the null string then no output file is written.
 .le
 .ls display = "stdimage"
-The image display device. At present since there is no image display
-interface. Display can be set to stdgraph and run off of a contour plot.
+The image display device. At present the display interface can read
+from the image display but not write to it. This means that the marked
+polygons are not drawn on the display device.
+\fIDisplay\fR can be set to "stdgraph", and POLYMARK 
+run off a contour plot. In this case the marked polygons can be drawn
+on the displayed contour plot.
 .le
 .ls graphics = "stdgraph"
 The standard graphics device.
@@ -58,15 +61,23 @@ The graphics cursor.
 .ih
 DESCRIPTION
 
-POLYMARK creates and optionally displays coordinate and polygons files
+POLYMARK creates and displays coordinate and polygons files
 suitable for input to POLYPHOT. For each image in the input list POLYMARK
-creates a polygons file containing 1 or more polygonal apertures and
-and accompanying coordinates file containing the desired centers for
-each of the marked polygons. The user can draw polygons on the display
-or input their vertices by hand and then use the image cursor to shift
-them. At any point in the marking process the user may rewind the
+creates a polygons file \fIpolygons\fR which may contain 1 or more polygonal
+apertures and
+an accompanying \fIcoords\fR coordinates file which contains a list of
+centers for each of the marked polygons.
+The user marks the polygonal apertures on the display
+and uses the image cursor to define a list of effective centers for
+each aperture.
+At any point in the marking process the user may rewind the
 polygon and coordinate file and draw the previously defined polygons on
 the display.
+
+Currently POLYMARK is unable to draw on the image display although it
+can read the image cursor. Users wishing to make use of the marking
+facilities of POLYMARK must set \fIdisplay\fR to "stdgraph" and run
+POLYMARK off of a contour plot.
 
 .ih
 CURSOR COMMANDS
@@ -74,15 +85,16 @@ CURSOR COMMANDS
 The following interactive keystroke and : commands are available.
 
 .nf
-	Interactive Polymark Commands
+	Interactive POLYMARK Commands
 
 ?	Print help for POLYMARK commands
 :	POLYMARK colon escape commands (see below)
-g	Draw a polygon on the display
+d	Plot a centered stellar radial profile
+g	Define the current polygonal aperture
 r	Rewind the polygon list
 l	Draw all the remaining polygons in the list on the display
-f	Mark the current polygon on the display
-spbar	Mark the current polygon on the display and store
+f	Draw the current polygon on the display
+spbar	Draw the current polygon on the display and output it
 q	Exit
 
 :m [n]	Draw the next [nth] polygon in the polygon list
@@ -94,7 +106,7 @@ OUTPUT
 A sample polygons file and accompanying coordinates file is listed below.
 
 .nf
-	Sample Polygons File (2 polygons)
+	# Sample Polygons File (2 polygons)
 
 	200.5  200.5
 	300.5  200.5
@@ -108,7 +120,7 @@ A sample polygons file and accompanying coordinates file is listed below.
 .fi
 
 .nf
-	Sample Coords File (2 groups, 1 for each polygon)
+	# Sample Coordinates File (2 groups, 1 for each polygon)
 
 	123.4  185.5
 	110.4  130.4
@@ -122,7 +134,7 @@ A sample polygons file and accompanying coordinates file is listed below.
 .ih
 EXAMPLES
 
-1. Create a coordiante list and polygon file using the image display and
+1. Create a coordinate list and polygon file using the image display and
 image display cursor.
 
 .nf
@@ -132,40 +144,38 @@ image display cursor.
 
 	ap> display m31 1 fi+ 
 
-	... display the image of the image display
+	... display the image on the image display
 
 	ap> polymark m31
 
-	... a short help page appears on the screen
+	... type ? for an optional help page 
 
-	... type g and use the cursor to draw a polygon
+	... type g to enter the "define a polygon" menu
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertex and repeat for each vertex
+	... type q to quit the "define a polygon" menu
 	... mark each vertex only once, POLYPHOT will close the
 	    polygon for you
 
-	... move the cursor to the desired polygon position and
-	    tap the space bar
-
-	... repeate for all desired polygon centers
-
-	... type g and draw the next polygon
-	... mark each vertex only once, POLYPHOT will close the
-	    polygon for you
-
-	... move the cursor to the desired polygon position  and
-	    tap the space bar
-
+	... move the cursor to the desired polygon center and
+	    tap the space bar to record the polygon
 	... repeat for all desired polygon centers
 
-	... type r to rewind the coordinate and polygon lists
+	... type g to define the next polygon
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertex and repeat for each vertex
+	... type q to quit the polygon menu
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
 
-	... type :.read m31.plot to reread the contour plot
+	... move the cursor to the desired polygon center and
+	    tap the space bar
+	... repeat for all desired polygon centers
 
-	... type l to display all the polygons ...
-
-	... type q to quit ...
+	... type q to quit polymark ...
 .fi
 
-2. Create a coordinate list and polygon list using a contour plot.
+2. Create a coordinate and polygon list using a contour plot.
 
 .nf
 	ap> set stdimcur = stdgraph
@@ -174,31 +184,34 @@ image display cursor.
 
 	ap> contour m31 >G m31.plot
 
-	... store the contour plotof m92 in the file m31.plot
+	... store the contour plot of m31 in the file m31.plot
 
 	ap> polymark m31 display=stdgraph
 
-	... a short help page appears on the screen
-
 	... type :.read m31.plot to load the contour plot on the screen
 
-	... type g and use the cursor to draw a polygon
-	... mark each vertex only once, POLYPHOT will close the polygon
-	    for you
 
-	... move the cursor to the desired polygon position and
+	... type g to enter the "define a polygon" menu
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertex and repeat for each vertex
+	... type q to quit the polygon menu
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
+
+	... move the cursor to the desired polygon center and
+	    tap the space bar to record the polygon
+	... repeat for all desired polygon centers
+
+	... type g to define the next polygon
+	... move the cursor to the first vertex, tap the space bar
+	    to mark the vertext and repeat for each vertex
+	... type q to quit the polygon menu
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
+
+	... move the cursor to the desired polygon center and
 	    tap the space bar
-
-	... repeate for all polygon centers
-
-	... type g and draw the next polygon
-	... mark each vertex only once, POLYPHOT will close the polygon
-	    for you
-
-	... move the cursor to the desired polygon position  and
-	    tap the space bar
-
-	... repeate for all desired centers
+	... repeat for all desired polygon centers
 
 	... type r to rewind the coordinate and polygon lists
 
@@ -206,15 +219,18 @@ image display cursor.
 
 	... type l to display all the polygons ...
 
-	... type q to quit ...
+	... type q to quit polymark ...
 
 .fi
 
 .ih
 BUGS
 
-There are no restrictions on the shape of the polygon but there are
-must be listed in order either clockwise or counterclockwise.
+POLYMARK cannot currently draw on the image display.
+
+There are no restrictions on the shape of the polygon but the vertices
+must be listed in order either clockwise or counterclockwise in the
+polygons file.
 
 It is not necessary to close the polygon when drawing on the display.
 POLYMARK will complete the polygon for you.

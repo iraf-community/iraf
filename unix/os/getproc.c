@@ -1,13 +1,12 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/file.h>
-#include <stdio.h>
-#include <iraf.h>
-
-#ifndef CONVEX
 #include <sys/proc.h>
+#include <stdio.h>
 #include <nlist.h>
-#endif
 
 #define	SYMBOLS		"/vmunix"
 #define	KMEM		"/dev/kmem"
@@ -19,10 +18,6 @@
 uid_executing (uid)
 register int	uid;
 {
-#ifdef CONVEX
-	return (0);
-}
-#else
 	register struct proc *pt;
 	register int	found, kmem, i;
 	struct proc *get_processtable();
@@ -99,4 +94,3 @@ kerr:	    fprintf (stderr, "Cannot read kernel memory\n");
 	*o_nproc = nproc;
 	return (pt);
 }
-#endif

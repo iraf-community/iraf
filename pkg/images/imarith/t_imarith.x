@@ -45,7 +45,7 @@ pointer	im1, im2, im3
 pointer	sp, operand1, operand2, result, imtemp
 pointer	opstr, dtstr, field, title, hparams
 
-int	imtopenp(), imtgetim(), imtlen(), imofnlu(), imgnfn(), stridxs()
+int	imtopenp(), imtgetim(), imtlen(), imofnlu(), imgnfn()
 double	clgetd(), imgetd()
 bool	clgetb(), streq()
 int	clgwrd()
@@ -96,7 +96,8 @@ begin
 		call strcpy (Memc[imtemp], Memc[operand2], SZ_FNAME)
 
 	    # Image sections in the output are not allowed.
-	    if (stridxs ("[", Memc[result]) > 0) {
+	    call imgsection (Memc[result], Memc[field], SZ_FNAME)
+	    if (Memc[field] != EOS) {
 		call eprintf (
 	        "imarith: image sections in the output are not allowed (%s)\n")
 		    call pargstr (Memc[result])
@@ -382,14 +383,23 @@ begin
 	# Determine maximum precedence datatype.
 	switch (pixtype1) {
 	case TY_SHORT:
-	    max_type = pixtype2
+	    if (pixtype2 == TY_USHORT)
+		max_type = TY_LONG
+	    else
+	        max_type = pixtype2
+	case TY_USHORT:
+	    if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT))
+		max_type = TY_LONG
+	    else
+		max_type = pixtype2
 	case TY_INT:
-	    if (pixtype2 == TY_SHORT)
+	    if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT))
 		max_type = pixtype1
 	    else
 		max_type = pixtype2
 	case TY_LONG:
-	    if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_INT))
+	    if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT) ||
+	        (pixtype2 == TY_INT))
 		max_type = pixtype1
 	    else
 		max_type = pixtype2
@@ -406,13 +416,21 @@ begin
 	call clgstr ("calctype", line, 1)
 	switch (line[1]) {
 	case '1':
-	    calctype = pixtype1
+	    if (pixtype1 == TY_USHORT)
+		calctype = TY_LONG
+	    else
+	        calctype = pixtype1
 	case '2':
-	    calctype = pixtype2
+	    if (pixtype2 == TY_USHORT)
+		calctype = TY_LONG
+	    else
+	        calctype = pixtype2
 	case EOS:
 	    calctype = max_type
 	case 's':
 	    calctype = TY_SHORT
+	case 'u':
+	    calctype = TY_LONG
 	case 'i':
 	    calctype = TY_INT
 	case 'l':
@@ -436,6 +454,8 @@ begin
 	    pixtype = calctype
 	case 's':
 	    pixtype = TY_SHORT
+	case 'u':
+	    pixtype = TY_USHORT
 	case 'i':
 	    pixtype = TY_INT
 	case 'l':

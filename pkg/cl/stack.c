@@ -105,7 +105,11 @@ register unsigned int	p;
  *		    |--------------|
  *			...
  */
+#ifdef A88K
+void
+#else
 struct operand
+#endif
 pushop (op)
 struct operand *op;
 {
@@ -128,7 +132,11 @@ struct operand *op;
 	    topos += OPSIZ+1;
 	    stack[topos] = lasttopos;
 
+#ifdef A88K
+	    return;
+#else
 	    return (*dest);
+#endif
 	}
 
 overflow:

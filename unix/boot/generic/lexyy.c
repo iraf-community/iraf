@@ -6,7 +6,7 @@
 # define YYLERR yysvec
 # define YYSTATE (yyestate-yysvec-1)
 # define YYOPTIM 1
-# define YYLMAX 200
+# define YYLMAX BUFSIZ
 # define output(c) putc(c,yyout)
 # define input() (((yytchar=yysptr>yysbuf?U(*--yysptr):k_getc(yyin))==10?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
 # define unput(c) {yytchar= (c);if(yytchar=='\n')yylineno--;*yysptr++=yytchar;}
@@ -74,80 +74,86 @@ case 8:
 			outstr ("INDEF");
 break;
 case 9:
+	{
+					yytext[strlen(yytext)-5] = '\0';
+					output_upper (yytext);
+				}
+break;
+case 10:
 			{	if (isupper (type_char))
 					    output (tolower (type_char));
 					else
 					    output (type_char);
 				}
 break;
-case 10:
+case 11:
 			{	if (islower (type_char))
 					    output (toupper (type_char));
 					else
 					    output (type_char);
 				}
 break;
-case 11:
+case 12:
 			pass_through();
 break;
-case 12:
+case 13:
 	make_float (type_char);
 break;
-case 13:
-		do_if();
-break;
 case 14:
-		do_else();
+		do_if();
 break;
 case 15:
-		do_endif();
-break;
-case 16:
-		do_for();
-break;
-case 17:
-		do_endfor();
-break;
-case 18:
-		do_if();
-break;
-case 19:
 		do_else();
 break;
-case 20:
+case 16:
 		do_endif();
 break;
-case 21:
+case 17:
 		do_for();
 break;
-case 22:
+case 18:
 		do_endfor();
 break;
+case 19:
+		do_if();
+break;
+case 20:
+		do_else();
+break;
+case 21:
+		do_endif();
+break;
+case 22:
+		do_for();
+break;
 case 23:
-			output ('$');
+		do_endfor();
 break;
 case 24:
-			copy_comment();
+			output ('$');
 break;
 case 25:
-			copy_string();
+			copy_comment();
 break;
 case 26:
-			ECHO;
+			copy_string();
 break;
 case 27:
 			ECHO;
 break;
 case 28:
-		ECHO;
+			ECHO;
 break;
 case 29:
 		ECHO;
 break;
 case 30:
-			copy_line();
+		ECHO;
 break;
 case 31:
+			copy_line();
+break;
+case 32:
 			copy_line();
 break;
 case -1:
@@ -173,22 +179,25 @@ int	ch;
 {
 	unput (ch);
 }
-int yyvstop[] ={
+int yyvstop[] = {
 0,
 
-25,
-0,
-
-30,
-0,
-
-30,
+26,
 0,
 
 31,
 0,
 
-23,
+31,
+0,
+
+32,
+0,
+
+24,
+0,
+
+12,
 0,
 
 11,
@@ -197,28 +206,7 @@ int yyvstop[] ={
 10,
 0,
 
-9,
-0,
-
-24,
-0,
-
-18,
-0,
-
-13,
-0,
-
-12,
-0,
-
-26,
-0,
-
-21,
-0,
-
-16,
+25,
 0,
 
 19,
@@ -227,34 +215,10 @@ int yyvstop[] ={
 14,
 0,
 
-3,
-0,
-
-1,
+13,
 0,
 
 27,
-0,
-
-20,
-0,
-
-8,
-0,
-
-7,
-0,
-
-15,
-0,
-
-4,
-0,
-
-2,
-0,
-
-28,
 0,
 
 22,
@@ -263,17 +227,65 @@ int yyvstop[] ={
 17,
 0,
 
-5,
+20,
 0,
 
-6,
+15,
+0,
+
+3,
+0,
+
+1,
+0,
+
+28,
+0,
+
+21,
+0,
+
+8,
+0,
+
+7,
+0,
+
+16,
+0,
+
+9,
+0,
+
+4,
+0,
+
+2,
+9,
 0,
 
 29,
 0,
+
+23,
+0,
+
+18,
+0,
+
+5,
+9,
+0,
+
+6,
+9,
+0,
+
+30,
+0,
 0};
 # define YYTYPE char
-struct yywork { YYTYPE verify, advance; } yycrank[] ={
+struct yywork { YYTYPE verify, advance; } yycrank[] = {
 0,0,	0,0,	0,0,	0,0,	
 0,0,	0,0,	0,0,	0,0,	
 0,0,	0,0,	1,3,	0,0,	
@@ -283,161 +295,179 @@ struct yywork { YYTYPE verify, advance; } yycrank[] ={
 0,0,	0,0,	0,0,	0,0,	
 0,0,	0,0,	0,0,	0,0,	
 0,0,	1,3,	0,0,	1,4,	
-1,5,	1,6,	2,14,	3,3,	
-2,15,	0,0,	0,0,	3,16,	
-7,28,	0,0,	0,0,	0,0,	
+1,5,	1,6,	2,15,	3,3,	
+2,16,	0,0,	0,0,	3,17,	
+7,29,	0,0,	0,0,	0,0,	
 1,7,	1,8,	1,8,	1,8,	
 1,8,	1,8,	1,8,	1,8,	
-1,8,	1,8,	1,8,	6,17,	
+1,8,	1,8,	1,8,	0,0,	
 0,0,	0,0,	0,0,	0,0,	
-0,0,	0,0,	0,0,	0,0,	
-0,0,	0,0,	6,18,	30,49,	
-0,0,	0,0,	1,9,	10,31,	
-22,43,	34,53,	37,41,	21,41,	
-9,30,	1,10,	13,34,	20,40,	
-1,11,	1,12,	19,38,	21,42,	
-19,39,	1,13,	29,48,	12,33,	
-6,19,	6,20,	11,32,	31,50,	
-6,21,	8,29,	16,19,	16,20,	
-32,51,	33,52,	16,37,	6,22,	
-14,35,	26,47,	38,58,	6,23,	
-14,36,	8,8,	8,8,	8,8,	
+0,0,	0,0,	1,9,	1,9,	
+1,9,	1,9,	1,9,	1,9,	
+1,9,	1,9,	1,10,	1,9,	
+1,9,	1,9,	1,9,	1,9,	
+1,9,	1,11,	1,9,	1,9,	
+1,12,	1,13,	1,9,	1,9,	
+1,9,	1,14,	1,9,	1,9,	
+6,18,	8,30,	10,32,	11,33,	
+12,34,	13,35,	14,36,	20,40,	
+21,42,	20,41,	23,45,	6,19,	
+27,49,	8,8,	8,8,	8,8,	
 8,8,	8,8,	8,8,	8,8,	
-8,8,	8,8,	8,8,	24,44,	
-25,46,	24,45,	29,48,	39,59,	
-6,24,	6,25,	40,60,	35,54,	
-6,26,	35,55,	16,24,	16,25,	
-36,56,	42,61,	16,26,	43,62,	
-44,63,	45,64,	46,65,	6,27,	
-36,57,	49,66,	50,67,	51,68,	
-52,69,	53,70,	54,71,	55,72,	
-57,73,	58,74,	59,75,	61,77,	
-62,78,	59,76,	63,79,	64,80,	
-66,82,	67,83,	64,81,	68,84,	
-69,85,	70,86,	71,87,	72,88,	
-73,89,	75,90,	76,91,	77,92,	
-78,93,	80,94,	81,95,	82,96,	
-84,97,	85,98,	86,99,	88,100,	
-82,96,	89,101,	90,102,	82,96,	
-94,103,	97,104,	98,105,	101,106,	
-104,107,	82,96,	82,96,	105,108,	
-106,109,	0,0,	0,0,	82,96,	
+8,8,	8,8,	8,8,	15,37,	
+17,20,	17,21,	26,48,	15,38,	
+17,39,	25,46,	22,43,	25,47,	
+30,50,	6,20,	6,21,	31,51,	
+32,52,	6,22,	22,44,	33,53,	
+34,54,	35,55,	36,56,	37,57,	
+6,23,	37,58,	38,59,	39,43,	
+6,24,	40,61,	41,62,	42,63,	
+44,64,	45,65,	38,60,	46,66,	
+17,25,	17,26,	47,67,	48,68,	
+17,27,	51,69,	52,70,	53,71,	
+30,50,	6,25,	6,26,	54,72,	
+55,73,	6,27,	56,74,	57,75,	
+58,76,	60,77,	61,78,	62,79,	
+64,81,	65,82,	62,80,	66,83,	
+6,28,	9,9,	9,9,	9,9,	
+9,9,	9,9,	9,9,	9,9,	
+9,9,	9,9,	9,9,	9,9,	
+9,9,	9,9,	9,9,	9,9,	
+9,31,	9,9,	9,9,	9,9,	
+9,9,	9,9,	9,9,	9,9,	
+9,9,	9,9,	9,9,	67,84,	
+69,86,	70,87,	67,85,	9,9,	
+71,88,	72,89,	73,90,	74,91,	
+75,92,	76,93,	77,94,	79,95,	
+80,96,	81,97,	82,98,	84,99,	
+85,100,	86,101,	87,102,	89,103,	
+90,104,	91,105,	93,106,	87,102,	
+94,107,	95,108,	87,102,	99,109,	
+103,110,	104,111,	107,112,	110,113,	
+87,102,	87,102,	111,114,	112,115,	
+0,0,	0,0,	87,102,	0,0,	
 0,0};
-struct yysvf yysvec[] ={
+struct yysvf yysvec[] = {
 0,	0,	0,
 yycrank+1,	0,		0,	
 yycrank+3,	yysvec+1,	0,	
 yycrank+7,	0,		0,	
 yycrank+0,	0,		yyvstop+1,
 yycrank+0,	0,		yyvstop+3,
-yycrank+23,	0,		0,	
+yycrank+56,	0,		0,	
 yycrank+2,	0,		0,	
-yycrank+61,	0,		0,	
-yycrank+2,	0,		0,	
-yycrank+2,	0,		0,	
-yycrank+4,	0,		0,	
-yycrank+2,	0,		0,	
-yycrank+2,	0,		0,	
-yycrank+3,	0,		yyvstop+5,
+yycrank+57,	0,		0,	
+yycrank+108,	0,		0,	
+yycrank+16,	yysvec+9,	0,	
+yycrank+22,	yysvec+9,	0,	
+yycrank+6,	yysvec+9,	0,	
+yycrank+8,	yysvec+9,	0,	
+yycrank+18,	yysvec+9,	0,	
+yycrank+14,	0,		yyvstop+5,
 yycrank+0,	0,		yyvstop+7,
-yycrank+29,	0,		0,	
+yycrank+47,	0,		0,	
 yycrank+0,	0,		yyvstop+9,
 yycrank+0,	0,		yyvstop+11,
-yycrank+10,	0,		0,	
-yycrank+4,	0,		0,	
-yycrank+9,	0,		0,	
-yycrank+3,	0,		0,	
+yycrank+23,	0,		0,	
+yycrank+21,	0,		0,	
+yycrank+52,	0,		0,	
+yycrank+29,	0,		0,	
 yycrank+0,	0,		yyvstop+13,
-yycrank+11,	0,		0,	
-yycrank+9,	0,		0,	
-yycrank+3,	0,		0,	
+yycrank+13,	0,		0,	
+yycrank+7,	0,		0,	
+yycrank+2,	0,		0,	
 yycrank+0,	0,		yyvstop+15,
 yycrank+0,	0,		yyvstop+17,
-yycrank+20,	0,		0,	
-yycrank+3,	0,		0,	
-yycrank+7,	0,		0,	
-yycrank+5,	0,		0,	
-yycrank+6,	0,		0,	
-yycrank+4,	0,		0,	
-yycrank+19,	0,		0,	
-yycrank+30,	0,		0,	
-yycrank+8,	0,		0,	
-yycrank+23,	0,		0,	
-yycrank+55,	0,		0,	
-yycrank+44,	0,		0,	
+yycrank+54,	0,		0,	
+yycrank+54,	yysvec+9,	0,	
+yycrank+60,	yysvec+9,	0,	
+yycrank+43,	yysvec+9,	0,	
+yycrank+37,	yysvec+9,	0,	
+yycrank+38,	yysvec+9,	0,	
+yycrank+61,	yysvec+9,	0,	
+yycrank+27,	0,		0,	
+yycrank+36,	0,		0,	
+yycrank+69,	0,		0,	
+yycrank+58,	0,		0,	
+yycrank+74,	0,		0,	
+yycrank+61,	0,		0,	
 yycrank+0,	0,		yyvstop+19,
-yycrank+65,	0,		0,	
-yycrank+47,	0,		0,	
-yycrank+21,	0,		0,	
+yycrank+76,	0,		0,	
+yycrank+57,	0,		0,	
+yycrank+32,	0,		0,	
+yycrank+50,	0,		0,	
 yycrank+37,	0,		0,	
-yycrank+24,	0,		0,	
 yycrank+0,	0,		yyvstop+21,
 yycrank+0,	0,		yyvstop+23,
-yycrank+72,	0,		0,	
-yycrank+73,	0,		0,	
-yycrank+63,	0,		0,	
+yycrank+65,	yysvec+9,	0,	
+yycrank+85,	yysvec+9,	0,	
+yycrank+86,	yysvec+9,	0,	
+yycrank+79,	yysvec+9,	0,	
+yycrank+80,	yysvec+9,	0,	
+yycrank+74,	yysvec+9,	0,	
+yycrank+48,	0,		0,	
 yycrank+64,	0,		0,	
-yycrank+57,	0,		0,	
-yycrank+31,	0,		0,	
-yycrank+47,	0,		0,	
 yycrank+0,	0,		yyvstop+25,
-yycrank+49,	0,		0,	
-yycrank+80,	0,		0,	
-yycrank+80,	0,		0,	
-yycrank+0,	0,		yyvstop+27,
-yycrank+82,	0,		0,	
-yycrank+83,	0,		0,	
-yycrank+53,	0,		0,	
-yycrank+53,	0,		0,	
-yycrank+0,	0,		yyvstop+29,
-yycrank+86,	0,		0,	
-yycrank+81,	0,		0,	
-yycrank+86,	0,		0,	
-yycrank+87,	0,		0,	
-yycrank+92,	0,		0,	
-yycrank+61,	0,		0,	
-yycrank+58,	0,		0,	
-yycrank+56,	0,		0,	
-yycrank+0,	0,		yyvstop+31,
-yycrank+86,	0,		0,	
-yycrank+96,	0,		0,	
+yycrank+66,	0,		0,	
 yycrank+97,	0,		0,	
-yycrank+92,	0,		0,	
+yycrank+97,	0,		0,	
+yycrank+0,	0,		yyvstop+27,
+yycrank+99,	0,		0,	
+yycrank+100,	0,		0,	
+yycrank+70,	0,		0,	
+yycrank+97,	0,		0,	
+yycrank+0,	0,		yyvstop+29,
+yycrank+131,	yysvec+9,	0,	
+yycrank+131,	yysvec+9,	0,	
+yycrank+128,	yysvec+9,	0,	
+yycrank+132,	yysvec+9,	0,	
+yycrank+133,	yysvec+9,	0,	
+yycrank+138,	yysvec+9,	0,	
+yycrank+107,	0,		0,	
+yycrank+104,	0,		0,	
+yycrank+102,	0,		0,	
+yycrank+0,	0,		yyvstop+31,
+yycrank+132,	0,		0,	
+yycrank+142,	0,		0,	
+yycrank+143,	0,		0,	
+yycrank+138,	0,		0,	
 yycrank+0,	0,		yyvstop+33,
-yycrank+58,	0,		0,	
-yycrank+68,	0,		0,	
-yycrank+103,	0,		yyvstop+35,
-yycrank+0,	0,		yyvstop+37,
-yycrank+84,	0,		0,	
-yycrank+85,	0,		0,	
-yycrank+98,	0,		0,	
+yycrank+104,	0,		0,	
+yycrank+114,	0,		0,	
+yycrank+141,	yysvec+9,	0,	
+yycrank+150,	yysvec+9,	yyvstop+35,
+yycrank+0,	yysvec+9,	yyvstop+37,
+yycrank+131,	yysvec+9,	0,	
+yycrank+132,	yysvec+9,	0,	
+yycrank+145,	yysvec+9,	0,	
 yycrank+0,	0,		yyvstop+39,
-yycrank+73,	0,		0,	
-yycrank+60,	0,		0,	
-yycrank+96,	0,		0,	
+yycrank+120,	0,		0,	
+yycrank+107,	0,		0,	
+yycrank+143,	0,		0,	
 yycrank+0,	0,		yyvstop+41,
 yycrank+0,	0,		yyvstop+43,
 yycrank+0,	0,		yyvstop+45,
-yycrank+66,	0,		0,	
-yycrank+0,	0,		yyvstop+47,
-yycrank+0,	0,		yyvstop+49,
-yycrank+112,	0,		0,	
 yycrank+113,	0,		0,	
-yycrank+0,	0,		yyvstop+51,
-yycrank+0,	0,		yyvstop+53,
-yycrank+83,	0,		0,	
-yycrank+0,	0,		yyvstop+55,
-yycrank+0,	0,		yyvstop+57,
-yycrank+108,	0,		0,	
-yycrank+111,	0,		0,	
-yycrank+87,	0,		0,	
-yycrank+0,	0,		yyvstop+59,
-yycrank+0,	0,		yyvstop+61,
-yycrank+0,	0,		yyvstop+63,
+yycrank+0,	0,		yyvstop+47,
+yycrank+0,	yysvec+9,	yyvstop+49,
+yycrank+0,	yysvec+9,	yyvstop+51,
+yycrank+159,	yysvec+9,	0,	
+yycrank+160,	yysvec+9,	0,	
+yycrank+0,	yysvec+9,	yyvstop+53,
+yycrank+0,	0,		yyvstop+56,
+yycrank+130,	0,		0,	
+yycrank+0,	0,		yyvstop+58,
+yycrank+0,	0,		yyvstop+60,
+yycrank+155,	yysvec+9,	0,	
+yycrank+158,	yysvec+9,	0,	
+yycrank+134,	0,		0,	
+yycrank+0,	yysvec+9,	yyvstop+62,
+yycrank+0,	yysvec+9,	yyvstop+65,
+yycrank+0,	0,		yyvstop+68,
 0,	0,	0};
-struct yywork *yytop = yycrank+191;
+struct yywork *yytop = yycrank+238;
 struct yysvf *yybgin = yysvec+1;
-char yymatch[] ={
+char yymatch[] = {
 00  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
 01  ,011 ,01  ,01  ,01  ,01  ,01  ,01  ,
 01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
@@ -446,22 +476,25 @@ char yymatch[] ={
 01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
 '0' ,'0' ,'0' ,'0' ,'0' ,'0' ,'0' ,'0' ,
 '0' ,'0' ,01  ,01  ,01  ,01  ,01  ,01  ,
-01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
-01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
-01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
-01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
+01  ,'A' ,'A' ,'A' ,'A' ,'A' ,'A' ,'A' ,
+'A' ,'A' ,'A' ,'A' ,'A' ,'A' ,'A' ,'A' ,
+'A' ,'A' ,'A' ,'A' ,'A' ,'A' ,'A' ,'A' ,
+'A' ,'A' ,'A' ,01  ,01  ,01  ,01  ,'_' ,
 01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
 01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
 01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
 01  ,01  ,01  ,01  ,01  ,01  ,01  ,01  ,
 0};
-char yyextra[] ={
+char yyextra[] = {
+0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,
 0};
-/*	ncform	4.1	83/08/11	*/
+#ifndef lint
+static	char ncform_sccsid[] = "@(#)ncform 1.6 88/02/08 SMI"; /* from S5R2 1.2 */
+#endif
 
 int yylineno =1;
 # define YYU(x) x
@@ -477,7 +510,7 @@ yylook(){
 	register struct yysvf *yystate, **lsp;
 	register struct yywork *yyt;
 	struct yysvf *yyz;
-	int yych;
+	int yych, yyfirst;
 	struct yywork *yyr;
 # ifdef LEXDEBUG
 	int debug;
@@ -487,6 +520,7 @@ yylook(){
 # ifdef LEXDEBUG
 	debug = 0;
 # endif
+	yyfirst=1;
 	if (!yymorfg)
 		yylastch = yytext;
 	else {
@@ -502,12 +536,13 @@ yylook(){
 			if(debug)fprintf(yyout,"state %d\n",yystate-yysvec-1);
 # endif
 			yyt = yystate->yystoff;
-			if(yyt == yycrank){		/* may not be any transitions */
+			if(yyt == yycrank && !yyfirst){  /* may not be any transitions */
 				yyz = yystate->yyother;
 				if(yyz == 0)break;
 				if(yyz->yystoff == yycrank)break;
 				}
 			*yylastch++ = yych = input();
+			yyfirst=0;
 		tryagain:
 # ifdef LEXDEBUG
 			if(debug){

@@ -8,7 +8,7 @@
 #define	import_varargs
 #include <iraf.h>
 
-#define	SZ_OBUF		512		/* sz intermediate buffer	*/
+#define	SZ_OBUF		SZ_COMMAND	/* sz intermediate buffer	*/
 
 
 /* SPRINTF -- Formatted print to a string.  If char and XCHAR are the

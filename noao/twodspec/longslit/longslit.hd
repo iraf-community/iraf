@@ -8,5 +8,5 @@ fitcoords	hlp=doc$fitcoords.hlp
 fluxcalib	hlp=doc$fluxcalib.hlp
 illumination	hlp=doc$illumination.hlp
 response	hlp=doc$response.hlp
-revisions	hlp=Revisions
+revisions	sys=Revisions
 transform	hlp=doc$transform.hlp

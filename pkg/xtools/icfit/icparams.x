@@ -188,7 +188,7 @@ begin
 	if (streq (param, "naverage"))
 	    IC_NAVERAGE(ic) = ival
 	else if (streq (param, "order"))
-	    IC_ORDER(ic) = ival
+	    IC_ORDER(ic) = max (1, ival)
 	else if (streq (param, "niterate"))
 	    IC_NITERATE(ic) = ival
 	else if (streq (param, "key"))

@@ -1,0 +1,23 @@
+#  .aprinit    iraf    12 April 1990 
+# Comment lines begin with '#' 
+# Non-comment lines have the following form: 
+#    FIELD_NAME : FIELD_VALUE : IGNORED 
+# The field name must not be changed. 
+# The ':' character delimits fields. 
+# The field value may be changed; it must not contain ':' 
+# unless the field value is quoted by either ' ' or " " pairs. 
+# Anything after the second ':' is thrown away. 
+# 
+customer_contact : 
+customer_name : 
+customer_addr1 : 
+customer_addr2 : 
+customer_addr3 : 
+customer_addr4 : 
+customer_phone : 
+save_path : .
+mail_path : apollo!apr_cs_admin
+mail_options : -oi -om
+print_command : prf -left 0.5 -wrap
+# 
+#  End of .aprinit 

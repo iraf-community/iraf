@@ -30,7 +30,7 @@ long	parameters[LEN_PAR_ARRAY]	# array of header parameters
 
 int	pds_read_scan()
 int	fd
-short	scanbuf[ARB]
+short	scanbuf[1]
 
 int	maxbufsize, len_mii, linecount, temp
 int	npts_first, npts_full, npts_last

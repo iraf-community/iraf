@@ -16,15 +16,17 @@ Relink:
 	$set	rebuild = yes
 relink_:
 	$set	ADDR = 0e000000
+	$set	VV = "$$(@S.ver.$(MACH))"
+	$set	SI = bin$$S$(VV).e
 
 	$set	L1 = <libos.a>
 	$set	L2 = <libex.a>
 	$set	L3 = <libsys.a>
 	$set	L4 = <libvops.a>
 
-	$ifnfile (bin$S.e, lib$libshare.a)
+	$ifnfile ($(SI), lib$libshare.a)
 	    $set rebuild = yes
-	$else $ifolder (bin$S.e: $(L1), $(L2), $(L3), $(L4), Slib.c)
+	$else $ifolder ($(SI): $(L1), $(L2), $(L3), $(L4), Slib.c)
 	    $set rebuild = yes
 	$end
 
@@ -37,14 +39,17 @@ relink_:
 	;
 
 install:
+	$set	VV = "$$(@S.ver.$(MACH))"
+	$set	SI = S$(VV).e
+
 	$iffile (S.e)
-	    $iffile (bin$S.e.2) $move bin$S.e.2 bin$S.e.3 $endif
-	    $iffile (bin$S.e.1) $move bin$S.e.1 bin$S.e.2 $endif
-	    $iffile (bin$S.e  ) $move bin$S.e   bin$S.e.1 $endif
-	    $move S.e bin$
+	    $iffile (bin$$$(SI).2) $move bin$$$(SI).2 bin$$$(SI).3 $endif
+	    $iffile (bin$$$(SI).1) $move bin$$$(SI).1 bin$$$(SI).2 $endif
+	    $iffile (bin$$$(SI)  ) $move bin$$$(SI)   bin$$$(SI).1 $endif
+	    $move S.e  bin$$$(SI)
 	    $move libshare.a bin$
-	    $iffile (bin$S.e.1, bin$S.e.2, bin$S.e.3)
-		!(find $(iraf)bin/S.e.[123] -atime +1 -exec rm {} \;)
+	    $iffile (bin$$$(SI).1, bin$$$(SI).2, bin$$$(SI).3)
+		!(find $(iraf)bin/$(SI).[123] -atime +1 -exec rm {} \;)
 	    $endif
 	$endif
 	;

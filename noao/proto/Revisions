@@ -1,5 +1,160 @@
 .help revisions Jun88 noao.proto
 .nf
+noao$proto/
+    Davis, April 6, 1990
+    Two new tasks IMALIGN and IMCENTROID written by Rob Seaman were added
+    to the proto package. IMCENTROID computes a set of relative shifts
+    required to register a set of images. IMALIGN both computes the
+    shifts and aligns the images.
+
+noao$proto/imexamine/t_imexam.x
+    Valdes, Mar 29, 1990
+    Even when use_display=no the task was trying to check the image display
+    for the name.  This was fixed by adding a check for this flag in the
+    relevant if statement.
+
+noao$proto/imexamine/ievimexam.x
+    Valdes, Mar 22, 1990
+    The pset was being closed without indicating this in the data structure.
+    The clcpset statement was removed.
+
+noao$proto/imedit/epgcur.x
+    Valdes, Mar 15, 1990
+    The EOF condition was being screwed up for two keystroke commands leading
+    to a possible infinite loop when using a cursor file input.  The fix
+    is to change the "nitems=nitems+clgcur" incrementing to simply
+    "nitems=clgcur".
+
+noao$proto/imedit/epbackground.x
+noao$proto/imedit/epgcur.x
+    Valdes, Mar 9, 1990
+    1. The surfit pointer was incorrectly declared as real in ep_bg causing the
+    'b' key to do nothing.  This appears to be SPARC dependent.
+    2. Fixed some more problems with cursor strings having missing coordinates
+    causing floating overflow errors.
+
+noao$proto/iralign.par,ir/t_iralign.x
+    Davis, Feb 27, 1990
+    Changed the iralign parameter align to alignment for consistency with
+    the other tasks.
+
+noao$proto/imexamine/iecolon.x
+    Valdes, Feb 16, 1990
+    Fixed a mistake in the the datatype of a parg call.
+
+noao$proto/ir/
+    Davis, Feb 16, 1990
+    Added a feature to the iralign code that permits the user to rerun
+    the iralign, irmatch1d, and irmatch2d  using the first runs output
+    as input. This permits the user to fine tune the intensity adjustments
+    and shifts.
+
+noao$proto/proto.cl
+noao$proto/proto.men
+noao$proto/mkpkg
+noao$proto/x_proto.x
+noao$proto/t_join.x	+
+noao$proto/join.par	+
+noao$proto/join.cl	-
+noao$proto/doc/join.hlp
+    Valdes, Feb 13, 1990
+    Added compiled version of the join task and updated the documentation.
+    Note that the parameters are now different.
+
+noao$proto/imedit.par
+noao$proto/imedit/epcolon.x
+noao$proto/imedit/epmask.x
+    Valdes, Jan 17, 1990
+    1. Fixed typo in prompt string for y background order.
+    2. Wrong datatype in clput for order parameters resulting in setting
+       the user parameter file value to 0.
+    3. Bug fix in epmask.  The following is the correct line:
+       line 130:    call amovi (Memi[line], Memi[ptr2+i*EP_NX(ep)], EP_NX(ep))
+
+noao$proto/imedit/epdisplay.x
+    Valdes, Jan 7, 1990
+    Added initialization to the zoom state.  Without the intialization
+    starting IMEDIT without display and then turning display on followed by
+    a 'r' would cause an error (very obscure but found in a demo).
+
+noao$proto/tvmark/t_tvmark.x
+noao$proto/tvmark/mkmark.x
+noao$proto/tvmark/tvmark.key
+noao$proto/doc/tvmark.hlp
+    Valdes, Jan 4, 1990
+    Added filled rectangle command 'f'.
+
+noao$proto/tvmark/t_tvmark.x
+noao$proto/tvmark/mktools.x
+noao$proto/tvmark/mkshow.x
+noao$proto/tvmark/mkcolon.x
+noao$proto/tvmark/mkfind.x
+noao$proto/tvmark/mkremove.x
+    Davis, Dec 12, 1989
+    1. Tvmark has been modified to permit deletion as well as addition of
+    objects to the coordinate file. Objects to be deleted are marked
+    with the cursor and must be within a given tolerance of an
+    object in the coordinate list to be deleted.
+    2. The help screen no longer comes up in the text window when the task
+    is invoked for the sake of uniformity with all other IRAF tasks.
+    3. The coordinate file is opened read_only in batch mode. In interactive
+    mode a warning message is issued if the user tries to append or delete
+    objects from a file which does not have write permission and no action
+    is taken.
+
+noao$proto/imexamine/t_imexam.x
+noao$proto/imexamine/iegimage.x
+    Valdes, Nov 30, 1989
+    The default display frame when not using an input list was changed from
+    0 to 1.
+
+noao$proto/ir/
+    Davis, Nov 28, 1989
+    New versions of the proto tasks IRMOSAIC, IRALIGN, IRMATCH1D and
+    IRMATCH2D have been installed in the PROTO package. The routine
+    have been modularised and now share code in preparation for a
+    future database approach to the registration problem. The image i/o
+    has been optimized so that all the tasks, but IRMOSAIC in particular,
+    will run much faster. A bug in the alignment code in which errors of
+    alignment of up to 0.5 pixels can occur has been fixed.
+    There is now an option to trim each section before insertion into
+    the output image. Finally the actions taken by the task can optionally
+    be printed on the terminal.
+
+noao$proto/imeidt/epgcur.x
+    Valdes, Oct 30, 1989
+    1. There was no check against INDEF cursor coordinates.  Such coordinates
+    will occur when reading a previous logfile output and cursor input
+    where the shorthand ":command" is used.  The actual error occured when
+    attempting to add 0.5 to INDEF.
+
+noao$proto/imedit/epstatistics.x
+noao$proto/imedit/epmove.x
+noao$proto/imedit/epgsfit.x
+noao$proto/imedit/epnoise.x
+noao$proto/imedit/epbackground.x
+noao$proto/imedit/t_imedit.x
+    Valdes, Aug 17, 1989
+    1. Added errchk to main cursor loop to try and prevent loss of the
+       user's changes if an error occurs.
+    2. If no background points are found an error message is now printed
+       instead of aborting.
+
+noao$proto/tvmark/mkbmark.x
+    Davis, Aug 4, 1989
+    Modified tvmark so that drawing to the frame buffer is more efficient
+    in batch mode. This involved removing a number of imflush calls
+    which were unnecessarily flushing the output buffer to disk and
+    recoding the basic routines which draw concentric circles and rectangles.
+
+noao$proto/imreplace.par
+    Valdes, July 20, 1989
+    Changed mode of imaginary component value to hidden.
+
+===========
+Version 2.8
+===========
+
 noao$proto/imexamine/* +
 noao$proto/imexamine.par +
 noao$proto/?imexam.par +

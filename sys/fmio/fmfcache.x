@@ -2,6 +2,7 @@
 
 include	<syserr.h>
 include	<error.h>
+include	<fset.h>
 include	"fmset.h"
 include	"fmio.h"
 
@@ -56,12 +57,12 @@ int	lfile		# lfile to be opened
 int	mode		# file access mode
 int	type		# file type
 
-int	lru, i
+int	acmode, lru, i
 pointer	oldest, fc, fs, st
 
-int	fm_fopen()
 bool	fm_locked()
 pointer	fm_findlf()
+int	fm_fopen(), fstati()
 errchk	fm_fopen, fm_fcinit, syserrs, close
 define	ref_	91
 
@@ -79,25 +80,36 @@ begin
 
 	fs = fm_findlf (fc, lfile)
 	if (fs != NULL) {
-	    # If NEW_FILE and lfile already cached, reopen new file.
-	    if (mode == NEW_FILE) {
-ref_		if (FC_NREF(fs) > 1)
+	    # If lfile is already in the cache and the new mode is NEW_FILE,
+	    # or we need write perm and do not currently have it, close and
+	    # reopen the lfile with the desired mode.
+
+	    if (mode == NEW_FILE ||
+		(mode != READ_ONLY && fstati (FC_FD(fs), F_WRITE) == NO)) {
+ref_
+		if (FC_NREF(fs) > 1)
 		    call syserrs (SYS_FMFSINUSE, FM_DFNAME(fm))
 		if (FC_NREF(fs) == 1)
 		    call close (FC_FD(fs))
 		if (fm_locked (fm, lfile))
 		    call syserrs (SYS_FMLFLOCKED, FM_DFNAME(fm))
 
-		FC_FD(fs) = fm_fopen (fm, lfile, mode, type)
+		if (mode == WRITE_ONLY || mode == APPEND)
+		    acmode = READ_WRITE
+		else
+		    acmode = mode
+
+		FC_FD(fs) = fm_fopen (fm, lfile, acmode, type)
 		FC_NREF(fs) = 1
 		FC_LFILE(fs) = lfile
-	    } else if (mode == APPEND)
-		call seek (FC_FD(fs), EOFL)
+	    }
 
 	    # Reference the cached lfile.
 	    FC_REFCNT(fc) = FC_REFCNT(fc) + 1
 	    FC_LRU(fs)    = FC_REFCNT(fc)
 	    FC_NREF(fs)   = FC_NREF(fs) + 1
+	    if (mode == APPEND)
+		call seek (FC_FD(fs), EOFL)
 
 	    return (FC_FD(fs))
 

@@ -2,16 +2,62 @@
 # "lpnode" and "plnode", if specified, will direct line printer and plotter
 # output to the indicated node.
 
-cholla                  : cholla!/iraf/iraf/bin.ieee/irafks.e
-yucca                   : yucca!/iraf/iraf/bin.ieee/irafks.e
-vsun1                   : vsun1!/usr2/iraf/bin.f68881/irafks.e
-tecate                  : tecate!/yucca/isis/iraf/iraf/bin.f68881/irafks.e
-negra                   : negra!/yucca/isis/iraf/iraf/bin.f68881/irafks.e
-dosequis                : dosequis!/yucca/isis/iraf/iraf/bin.f68881/irafks.e
+#aquila 1 class1 plnode lpnode	: aquila!/iraf/bin/irafks.e
+aquila a 1 class1		: aquila!/iraf/bin/irafks.e
+argo arg			: argo!/local/iraf/bin.f68881/irafks.e
+auriga aur			: auriga!/usr/iraf/bin/irafks.e
+bokchoy				: bokchoy!/local/iraf/bin.sparc/irafks.e
+carina 5 class5			: carina!/iraf/iraf/bin/irafks.e
+cephus				: cephus!/usr/iraf/bin.mips/irafks.e
+coma				: coma!/usr/iraf/bin.sparc/irafks.e
+corvus				: corvus!/local/iraf/bin.sparc/irafks.e
+cygnus				: cygnus!/local/iraf/bin.sparc/irafks.e
+draco vela d class6		: draco!/u1/iraf/bin/irafks.exe
+gemini gemini-gw noao.edu noao	: gemini-gw!/local/iraf/bin.sparc/irafks.e
+gll1 gll1u			: gll1!/usr/iraf/bin/irafks.e
+grus				: grus!/local/iraf/bin.f68881/irafks.e
+hummel				: hummel!/local/iraf/bin.sparc/irafks.e
+jalapeno			: jalapeno!/local/iraf/bin.sparc/irafks.e
+jupiter				: jupiter!/local/iraf/bin.sparc/irafks.e
+lacerta lac			: lacerta!/u2/iraf/bin/irafks.e
+libra				: libra!/local/iraf/bin.ffpa/irafks.e
+lyra b 2 class2			: lyra!/iraf/bin/irafks.e
+mintchip			: mintchip!/local/iraf/bin.sparc/irafks.e
+msgsun				: msgsun!/local/iraf/bin.sparc/irafks.e
+mytoy				: mytoy!/local/iraf/bin.i386/irafks.e
+norma				: norma!/local/iraf/bin.sparc/irafks.e
+octans oct			: octans!/usr/iraf/bin.ffpa/irafks.e
+omega om			: omega!/u2/iraf/bin.ffpa/irafks.e
+orion ori o			: orion!/local/iraf/bin.sparc/irafks.e
+pavo pav p			: pavo!/usr/iraf/bin.f68881/irafks.e
+pegasus peg			: pegasus!/files/vol/iraf/bin.i386/irafks.e
+perseus per			: perseus!/usr/iraf/bin.f68881/irafks.e
+phoenix pho			: phoenix!/local/iraf/bin.sparc/irafks.e
+pictor pic			: pictor!/local/iraf/bin.sparc/irafks.e
+pisces pi			: pisces!/usr/iraf/bin.f68881/irafks.e
+puppis pu			: puppis!/usr/iraf/bin.f68881/irafks.e
+pyxis pyx			: pyxis!/local/iraf/bin.f68881/irafks.e
+sagittarius			: sagittarius!/local/iraf/bin.sparc/irafks.e
+scorpius sco s			: scorpius!/local/iraf/bin.f68881/irafks.e
+serpens 			: serpens!/usr/iraf/bin.ffpa/irafks.e
+suntest				: suntest!/local/iraf/bin.sparc/irafks.e
+tofu				: tofu!/local/iraf/bin.sparc/irafks.e
+tucana tuc t			: tucana!/usr/iraf/bin.f68881/irafks.e
 
-# NOAO hosts.
-noao.edu		: noao.edu!/iraf/iraf/bin.vax/irafks.e
-tucana			: tucana!/usr/iraf/bin.f68881/irafks.e
-orion			: tucana!/local/iraf/bin.sparc/irafks.e
-pisces			: pisces!/usr/iraf/bin.f68881/irafks.e
-pegasus			: pegasus!/files/vol/iraf/bin.i386/irafks.e
+# U.of.A Sites
+astro astro.as.arizona.edu : astro.as.arizona.edu!/usr/iraf/bin.sparc/irafks.e
+bok                     : bok.as.arizona.edu!/usr/iraf/bin.sparc/irafks.e
+strato                  : strato.as.arizona.edu!/usr/iraf/bin.sparc/irafks.e
+solpl   SOLPL           : solpl.as.arizona.edu!:iraf:bin:irafks.pr
+cti     CTI             : cti.as.arizona.edu!:iraf:bin:irafks.pr
+
+# STScI Nodes.
+hector				: hector!/ra1/iraf/bin.f68881/irafks.e
+
+# Decnet/iraf networking nodes:
+dnidraco			: draco!irafks.com
+dnivela				: vela!241
+
+# Test/debug nodes:
+dbgemini	: gemini-gw!/u2/rooke/ki/irafks.e
+

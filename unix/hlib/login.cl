@@ -37,8 +37,10 @@ if (access ("home$loginuser.cl")) cl < "home$loginuser.cl"
 task	$mail $man $lpq $diff $od $find $touch $w $ls	= "$foreign"
 task	$adb $rsh $rlogin $rwho $telnet $ruptime	= "$foreign"
 task	$xc $mkpkg $generic $rtar $wtar $buglog		= "$foreign"
-task	$sps $top $mon $bgrep $su $emacs $edt		= "$foreign"
-task	$fc = "$ic -h $* -limfort -lsys -lvops -los"
+task	$sps $top $mon $grep $su			= "$foreign"
+#task	$fc = "$xc -h $* -limfort -lsys -lvops -los"
+task	$fc = ("$" // envget("iraf") // "unix/hlib/fc.csh" //
+	    " -h $* -limfort -lsys -lvops -los")
 task	$nbugs = ("$(setenv EDITOR 'buglog -e';" //
 	    "less -Cqm +G " // envget ("iraf") // "local/bugs.*)")
 keep;	clpackage

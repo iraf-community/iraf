@@ -1,0 +1,25 @@
+images,s,a,,,,"List of images"
+coords,s,a,,,,"Coordinate file"
+reference,s,a,,,,"Reference image"
+shifts,s,h,"",,,"Initial shift file"
+prefix,s,h,"rg",,,"Prefix for the new images\n"
+
+shiftimages,b,h,yes,,,"Shift the images?"
+trimimages,b,h,yes,,,"Trim the shifted images?"
+verbose,b,h,yes,,,"Print the centers, shifts, and trim section?\n"
+
+boxsize,i,h,7,1,,"Size of the small centering box"
+bigbox,i,h,11,1,,"Size of the big centering box\n"
+
+negative,b,h,no,,,"Are the features negative?"
+background,r,h,INDEF,,,"Reference background level"
+lower,r,h,INDEF,,,"Lower threshold for data"
+upper,r,h,INDEF,,,"Upper threshold for data"
+niterate,i,h,3,2,,"Maximum number of iterations"
+tolerance,i,h,0,0,,"Tolerance for convergence\n"
+
+interp_type,s,h,"spline3","nearest|linear|poly3|poly5|spline3",,"Imshift interpolant"
+boundary_type,s,h,"constant","constant|nearest|reflect|wrap",,"Imshift boundary type"
+constant,r,h,0.,,,"Imshift boundary constant\n"
+
+list,*s,h

@@ -66,6 +66,7 @@ int	ufcn_epa		# user supplied function call procedure
 
 pointer	sp, ip
 int	debug, junk
+int	xev_gettok()
 extern	xev_gettok()
 int	strlen(), xev_parse()
 

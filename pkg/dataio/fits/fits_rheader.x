@@ -6,7 +6,7 @@ include <imio.h>
 include <mach.h>
 include	"rfits.h"
 
-define	NEPSILON 10.0d0
+define	NEPSILON 10.0d0    # number of machine epsilon
 
 # RFT_READ_HEADER -- Read a FITS header.
 # If BSCALE and BZERO are different from 1.0 and 0.0  scale is set to true
@@ -30,30 +30,35 @@ errchk	stropen, close
 include "rfits.com"
 
 begin
-	# Initialization
+	# Initialization.
+	SIMPLE(fits) = YES
+	SCALE(fits) = NO
 	FITS_BSCALE(fits) = 1.0d0
 	FITS_BZERO(fits) = 0.0d0
 	BLANKS(fits) = NO
 	BLANK_VALUE(fits) = INDEFL
-	SCALE(fits) = NO
-	SIMPLE(fits) = YES
 	NRECORDS(fits) = 0
 	ndiscard = 0
 	max_lenuser = (LEN_IMDES + IM_LENHDRMEM(im) - IMU) * SZ_STRUCT - 1
 
-	# Header is character data in FITS_BYTE form
-	fd_usr = stropen (UNKNOWN(im), max_lenuser, NEW_FILE)
-	i = rft_init_read_pixels (len_record, FITS_BYTE, LSBF, TY_CHAR)
+	# The FITS header is character data in FITS_BYTE form. Open the
+	# header for reading. Open the user area which is a character
+	# string as a file.
 
-	# Loop until the END card is encountered
+	i = rft_init_read_pixels (len_record, FITS_BYTE, LSBF, TY_CHAR)
+	fd_usr = stropen (UNKNOWN(im), max_lenuser, NEW_FILE)
+
+	# Loop until the END card is encountered.
 	nread = 0
 	repeat {
 
+	    # Read the card.
 	    i = rft_read_pixels (fits_fd, card, LEN_CARD, NRECORDS(fits), 1)
 	    card[LEN_CARD + 1] = '\n'
 	    card[LEN_CARD + 2] = EOS
 
-	    if ((i == EOF) && (nread == 0)) {		# At EOT
+	    # Decode the card images.
+	    if ((i == EOF) && (nread == 0)) {
 		return (EOF)
 	    } else if ((nread == 0) && strmatch (card, "^SIMPLE  ") == 0) {
 		call flush (STDOUT)
@@ -64,18 +69,18 @@ begin
 	    } else
 	        nread = nread + 1
 
-	    # Print FITS card images if long_header option specified
+	    # Print FITS card images if long_header option specified.
 	    if (long_header == YES) {
 		call printf ("%-80.80s\n")
 		    call pargstr (card)
 	    }
 
-	    stat = rft_decode_card (fits, im, fd_usr, card, ndiscard)
 	    # Stat = YES if FITS END card is encountered.
+	    stat = rft_decode_card (fits, im, fd_usr, card, ndiscard)
 
 	} until (stat == YES)
 
-	# Print short header if desired
+	# Print optional short header.
 	if (short_header == YES && long_header == NO) {
 	    if (make_image == NO && old_name == YES) {
 	        call printf ("(%s)  %-20.20s  ")
@@ -97,6 +102,7 @@ begin
 	    call printf ("\n")
 	}
 
+	# Let the user know if there is not enough space in the user area.
 	if (ndiscard > 0) {
 	    call printf (
 	        "Warning: User area too small %d card images discarded\n")
@@ -110,7 +116,7 @@ end
 
 
 # RFT_DECODE_CARD -- Decode a FITS card and return YES when the END
-# card is encountered.  The keywords understood are given in fits.h.
+# card is encountered.  The keywords understood are given in rfits.h.
 
 int procedure rft_decode_card (fits, im, fd_usr, card, ndiscard)
 
@@ -127,8 +133,8 @@ pointer	sp, comment
 
 bool	rft_equald()
 int	strmatch(), ctoi(), ctol(), ctod(), cctoc(), rft_hms()
-
 errchk	putline
+
 include	"rfits.com"
 
 begin
@@ -174,7 +180,7 @@ begin
 	        FITS_BSCALE(fits) = dval
 	    else
 		call printf ("Warning: Error decoding BSCALE, BSCALE=1.0\n")
-	    if (! rft_equald (dval, 1.0d0) && scale == YES)
+	    if (! rft_equald (dval, 1.0d0) && (scale == YES))
 		SCALE(fits) = YES
 	} else if (strmatch (card, "^BZERO   ") != 0) {
 	    nchar = ctod (card, i, dval)
@@ -182,7 +188,7 @@ begin
 	        FITS_BZERO(fits) = dval
 	    else
 		call printf ("Warning: Error decoding BZERO, BZERO=0.0\n")
-	    if (! rft_equald (dval, 0.0d0) && scale == YES)
+	    if (! rft_equald (dval, 0.0d0) && (scale == YES))
 		SCALE(fits) = YES
 	} else if (strmatch (card, "^OBJECT  ") != 0) {
 	    call rft_get_fits_string (card, OBJECT(im), SZ_OBJECT)
@@ -278,7 +284,7 @@ begin
 end
 
 
-# RFT_HMS -- Procedure to decode a FITS HMS card from the mountain
+# RFT_HMS -- Procedure to decode a FITS HMS card from the mountain.
 
 int procedure rft_hms (card, str, comment, maxch)
 
@@ -293,7 +299,7 @@ real	sec
 int	stridx(), strldx(), strlen(), ctoi(), ctor()
 
 begin
-	# Return if not a FITS string parameter
+	# Return if not a FITS string parameter.
 	if (card[COL_VALUE] != '\'')
 	    return (0)
 
@@ -319,6 +325,7 @@ begin
 	if (fst == lst)
 	    return (0)
 
+	# Decode the degrees field.
 	ip = 1
 	while (IS_WHITE(str[ip]))
 	    ip = ip + 1
@@ -327,9 +334,8 @@ begin
 	nchar = ctoi (str, ip, deg)
 	if (nchar == 0)
 	    deg = 0
-	#else if (nchar > 3)
-	    #return (0)
 
+	# Decode the minutes field.
 	ip = fst + 1
 	while (IS_WHITE(str[ip]))
 	    ip = ip + 1
@@ -338,9 +344,8 @@ begin
 	nchar = ctoi (str, ip, min)
 	if (nchar == 0)
 	    min = 0
-	#else if (nchar > 3)
-	    #return (0)
 
+	# Decode the seconds field.
 	ip = lst + 1
 	while (IS_WHITE(str[ip]))
 	    ip = ip + 1
@@ -349,9 +354,8 @@ begin
 	nchar = ctor (str, ip, sec)
 	if (nchar == 0)
 	    sec = 0.0
-	#else if (nchar > 3)
-	    #return (0)
 
+	# Reformat the HMS card.
 	if (stridx (minus, str) > 0 || deg < 0 || min < 0 || sec < 0.0) {
 	    call sprintf (str, maxch, "%c%d:%02d:%05.2f")
 		call pargc (minus)
@@ -381,7 +385,6 @@ int	istart, j
 
 begin
 	istart = 0
-
 	for (j = LEN_CARD; (j >= 1) && (card[j] != '\''); j = j - 1) {
 	    if (card[j] == '/') {
 		for (istart = j + 1; IS_WHITE(card[istart]) && istart <=
@@ -417,14 +420,14 @@ begin
 	    ;
 	istart = istart + 1
 
-	# closing quote
+	# Check for closing quote.
 	for (j = istart; (j<LEN_CARD)&&(card[j]!='\''); j = j + 1)
 	    ;
 	for (j = j - 1; (j >= istart) && (card[j] == ' '); j = j - 1)
 	    ;
 	nchar = min (maxchar, j - istart + 1)
 
-	# copy string
+	# Copy the string.
 	if (nchar <= 0)
 	    str[1] = EOS
 	else
@@ -509,10 +512,10 @@ begin
 	while (incard[ip] == ' ' || incard[ip] == '\t' || incard[ip] == '\0')
 	    ip = ip - 1
 	call amovc (incard, outcard, ip)
-
 	outcard[ip+1] = '\n'
 	outcard[ip+2] = EOS
 end
+
 
 # RFT_LAST_CARD -- Remove a partially written card from the data base
 

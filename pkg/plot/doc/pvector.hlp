@@ -1,4 +1,4 @@
-.help pvector Mar88 plot
+.help pvector Mar90 plot
 .ih
 NAME
 pvector -- plot an arbitrary vector in a 2D image
@@ -20,7 +20,7 @@ Ending coordinates of the vector to be plotted.
 The center coordinates of the vector to be plotted if the position
 angle \fItheta\fR is defined.
 .le
-.ls  width = 1
+.ls width = 1
 Number of pixels perpendicular to the vector to average.
 .le
 .ls theta = INDEF
@@ -48,6 +48,19 @@ Generate a value by wrapping around to the opposite side of the image.
 .le
 .ls constant = 0.
 The constant for constant valued boundary extension.
+.le
+.ls vec_output = ""
+File or image name if output vector is desired.  If this parameter is
+non-null, then the computed vector will be output to the named file of
+the type specified by the \fIout_type\fR parameter.  If set to STDOUT
+or STDERR, a listing of the pixels (i.e. text format) will be output to 
+either of these streams.  Plotting is disabled if vector output is selected.
+.le
+.ls out_type = "text"
+Type of output format (image|text). If an image is created, then a new
+header keyword, "VSLICE", will be appended to the new image describing
+the endpoints of the vector, the width, and the parent image name. The 
+parent image header will be copied to the new image.
 .le
 .ls wx1 = 0., wx2 = 0., wy1 = 0., wy2 = 0.
 The range of world coordinates to be included in the plot.  If the
@@ -101,6 +114,8 @@ by specifying the center position, length and position angle of the vector.
 The user can specify
 the plot size and placement, the scaling and labeling of axes.  Data can be
 plotted as a continuous line or individual points with a specified marker.
+Optionally, the computed vector may be output to a named image or text file
+(as specified by the \fIvec_output\fR and \fIout_type\fR parameters).
 
 The vector is extracted as a straight line between the given
 coordinates.  It is possible to specify an averaging width
@@ -131,31 +146,29 @@ appears extended in the x direction unless \fBfill\fR = no.
 
 .ih
 EXAMPLES
-.nf
 1. Plot from the lower left to upper right of 512 square image crab.5009.
 
-	cl> pvector crab.5009 1. 1. 512. 512.
+    cl> pvector crab.5009 1. 1. 512. 512.
 
 2. Plot the same vector but with the sampling width = 3.
 
-	cl> pvector crab.5009 1. 1. 512. 512. width=3
+    cl> pvector crab.5009 1. 1. 512. 512. width=3
 
 3. Plot a vector in same image with center position 256, 256, and a position
-angle of 45 degrees which extends from on edge of the frame to the other
+angle of 45 degrees which extends from one edge of the frame to the other.
 
-	cl> pvector crab.5009 256. 256. theta=45.
+    cl> pvector crab.5009 256. 256. theta=45.
 
 4. Plot the above vector with a length of 100 pixels.
 
-	cl> pvector crab.5009 256. 256. theta=45. length=100.
-.fi
+    cl> pvector crab.5009 256. 256. theta=45. length=100.
 .ih
 TIME REQUIREMENTS
-It tasks approximately 6.7 cpu seconds to compute and plot the twenty
+It takes approximately 6.7 cpu seconds to compute and plot the twenty
 pixel wide diagonal of a 512 square real image. (VAX/VMS 750 with fpa).
 .ih
 BUGS
 .ih
 SEE ALSO
-prow, pcol, pcols
+prow, pcol, prow, pcols
 .endhelp

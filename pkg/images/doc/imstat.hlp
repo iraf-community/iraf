@@ -1,4 +1,4 @@
-.help imstatistics Mar89 images
+.help imstatistics Jan90 images
 .ih
 NAME
 imstatistics -- compute and print image pixel statistics
@@ -22,11 +22,13 @@ Use only pixels with values less than or equal to this limit.
 All pixels are below the default value of INDEF.
 .le
 .ls binwidth = 0.1
-The width of the histogram bins used for computing the median and the mode.
+The width of the histogram bins used for computing the midpoint (estimate
+of the median) and the mode.
 The units are in sigma.
 .le
-.ls verbose = yes
-Label the output columns.
+.ls format = yes
+Label the output columns and print the result in fixed format. If format
+is "no" no column labels are printed and the output is in free format.
 .le
 .ih
 DESCRIPTION
@@ -40,7 +42,7 @@ following.
 	 image - the image name
 	  npix - the number of pixels used to do the statistics
 	  mean - the mean of the pixel distribution
-	median - the median of the pixel distribution
+	 midpt - estimate of the median of the pixel distribution
 	  mode - the mode of the pixel distribution
 	stddev - the standard deviation of the pixel distribution
 	  skew - the skew of the pixel distribution
@@ -62,10 +64,10 @@ Only the quantities selected by the fields parameter are actually computed.
       kurtosis = sum ((y1 / stddev) ** 4,...,(yN / stddev) ** 4) / (N-1) - 3
 .fi
 
-The median and mode are computed in two passes through the image. In the
+The midpoint and mode are computed in two passes through the image. In the
 first pass the standard deviation of the pixels is calculate and used
 with the \fIbinwidth\fR parameter to compute the resolution of the data
-histogram. The median is estimated by integrating the histogram and
+histogram. The midpoint is estimated by integrating the histogram and
 computing by interpolation the data value at which exactly half the
 pixels are below that data value and half are above it. The mode is
 computed by locating the maximum of the data histogram and fitting the
@@ -86,13 +88,13 @@ and maximum pixel value of a bias region in an image.
 The string "flat*" uses a wildcard to select all images beginning with the
 word flat.  The string "[*,1]" is an image section selecting row 1.
 
-2. Compute the mean, median, mode and standard deviation of a pixel
+2. Compute the mean, midpoint, mode and standard deviation of a pixel
 distribution.
 
 .nf
-    cl> imstat m51 fields="image,mean,median,mode,stddev"
-    #      IMAGE    PIXELS      MEAN    MEDIAN     MODE     STDDEV
-	     M51    262144     108.3     14.09      941.     1062.
+    cl> imstat m51 fields="image,mean,midpoint,mode,stddev"
+    #      IMAGE    PIXELS      MEAN     MIDPT     MODE     STDDEV
+	     M51    262144     108.3     88.75    40.51      131.3
 .fi
 
 .ih

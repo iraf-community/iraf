@@ -25,7 +25,7 @@ data	first_time /true/
 int	elem
 pointer	pp, sym
 bool	put_value
-double	pval[LEN_PVAL]
+double	pval[LEN_PVAL+1]
 common	/qppval/ pval, sym, elem, pp, put_value
 
 pointer	qp_gpsym()
@@ -42,10 +42,12 @@ begin
 	fm = QP_FM(qp)
 
         # Compute pointer (Memc index) to the static pval buffer.
+	# Make sure that the computed pointer is double aligned.
+
 	if (first_time) {
 	    call zlocva (pval, loc_pval)
 	    call zlocva (Memc, loc_Mem)
-	    pp = loc_pval - loc_Mem + 1
+	    pp = (loc_pval+SZ_DOUBLE - loc_Mem) / SZ_DOUBLE * SZ_DOUBLE + 1
 	    put_value = false
 	    first_time = false
 	} else if (put_value)
@@ -115,7 +117,7 @@ errchk	fm_getfd, seek, write
 int	elem
 pointer	pp, sym
 bool	put_value
-double	pval[LEN_PVAL]
+double	pval[LEN_PVAL+1]
 common	/qppval/ pval, sym, elem, pp, put_value
 
 begin
@@ -126,6 +128,7 @@ begin
 	    call seek (fd, S_OFFSET(sym) + (elem - 1) * sz_elem)
 	    call write (fd, Memc[pp], sz_elem)
 	    S_NELEM(sym) = max (S_NELEM(sym), elem)
+	    QP_MODIFIED(qp) = YES
 
 	    call fm_retfd (QP_FM(qp), S_LFILE(sym))
 	    put_value = false

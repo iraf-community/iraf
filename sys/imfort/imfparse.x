@@ -13,43 +13,19 @@ char	root[SZ_PATHNAME]	# output root pathname
 char	extn[MAX_LENEXTN]	# output extension
 
 int	ip, op
-int	dot, delim
-pointer	sp, pattern
-string	ex HDR_EXTENSIONS
+pointer	sp, pattern, osdir
+int	delim, len_osdir, len_root, len_extn
 int	strmatch(), strlen()
+string	ex HDR_EXTENSIONS
 
 begin
 	call smark (sp)
 	call salloc (pattern, SZ_FNAME, TY_CHAR)
+	call salloc (osdir, SZ_PATHNAME, TY_CHAR)
 
-	dot = 0
-	op  = 1
-
-	# Copy image name to root and mark the position of the last dot.
-	for (ip=1;  image[ip] != EOS;  ip=ip+1) {
-	    root[op] = image[ip]
-	    if (root[op] == '.')
-		dot = op
-	    op = op + 1
-	}
-
-	root[op] = EOS
-	extn[1]  = EOS
-
-	# Reject . delimited fields longer than the maximum extension length.
-	if (op - dot - 1 > MAX_LENEXTN)
-	    dot = NULL
-
-	# If found extension, chop the root and fill in the extn field.
-	# If no extension found, we are all done.
-
-	if (dot == NULL) {
-	    call sfree (sp)
-	    return
-	} else {
-	    root[dot] = EOS
-	    call strcpy (root[dot+1], extn, MAX_LENEXTN)
-	}
+	# Parse the image name into the root and extn fields (discard osdir).
+	call vfn_translate (image, Memc[osdir], len_osdir,
+	    root, len_root, extn, len_extn)
 
 	# Search the list of legal imagefile extensions.  If the extension
 	# given is not found in the list, tack it back onto the root and
@@ -61,7 +37,7 @@ begin
 	#
 	# Note - EX is a string of the form "|imh|hhh|...|". (iki.h).
 
-	if (strlen (extn) == LEN_EXTN) {
+	if (strlen(extn) == LEN_EXTN) {
 	    delim = ex[1]
 	    for (ip=2;  ex[ip] != EOS;  ip=ip+1) {
 		op = pattern
@@ -79,9 +55,16 @@ begin
 	}
 
 	# Not a legal image header extension.  Restore the extn field to the
-	# root and null the extn.
+	# root and null the extn.  Tacking on the dummy extension .foo and
+	# later discarding it ensures that the root name is properly encoded
+	# for the local host.
 
-	root[dot] = '.'
-	extn[1] = EOS
+	if (len_extn > 0) {
+	    call strcpy (image, Memc[osdir], SZ_PATHNAME)
+	    call strcat (".foo", Memc[osdir], SZ_PATHNAME)
+	    call vfn_encode (Memc, osdir, root, len_root, extn, len_extn)
+	    extn[1] = EOS
+	}
+
 	call sfree (sp)
 end

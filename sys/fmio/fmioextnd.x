@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <syserr.h>
 include <mach.h>
 include "fmio.h"
 
@@ -16,13 +17,25 @@ int     lfile                   #I lfile getting the new pages
 int     npages                  #I number of pages to add
 
 pointer pt, pm, lf
-int     inc, p1, p2, l1, l2, i
+int	npte_perpage, npti
+int     inc, np, p1, p2, l1, l2, i
 int	krealloc()
 
 begin
         # Extend the global page table.
         p1 = FM_PTNPTE(fm) + 1
         p2 = p1 + npages - 1
+
+	# Make sure we have enough page table index entries for the new pages.
+	if (lfile != PT_LFILE) {
+	    npte_perpage = FM_SZBPAGE(fm) / (SZB_CHAR*SZ_SHORT)
+	    np = p2 + FM_PTILEN(fm)
+	    npti = (np + npte_perpage-1) / npte_perpage
+	    if (npti > FM_PTILEN(fm)) {
+		call fmio_posterr (fm, SYS_FMPTIOVFL, FM_DFNAME(fm))
+		return (ERR)
+	    }
+	}
 
         # Increase the size of the in-core page table if necessary.
         if (p2 > FM_PTLEN(fm)) {

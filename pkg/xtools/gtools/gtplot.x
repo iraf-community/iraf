@@ -1,7 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<gset.h>
-include	<pkg/gtools.h>
+include	"gtools.h"
 
 # GT_GRAPH -- Plot polymarks or polypoints.
 
@@ -13,7 +13,8 @@ real	x[npts]		# Abscissas
 real	y[npts]		# Ordinates
 int	npts		# Number of points
 
-int	pltype, gstati()
+int	i, pltype, gstati()
+real	x1, x2
 
 begin
 	switch (GT_TYPE(gt)) {
@@ -31,6 +32,39 @@ begin
 	        call gpline (gp, x, y, npts)
 	    else
 	        call gpline (gp, y, x, npts)
+	    call gseti (gp, G_PLTYPE, pltype)
+	case 3:
+	    pltype = gstati (gp, G_PLTYPE)
+	    call gseti (gp, G_PLTYPE, GT_LINE(gt))
+	    if (GT_TRANSPOSE(gt) == NO) {
+		x1 = x[1]
+		x2 = (x[1] + x[2]) / 2
+		call gline (gp, x1, y[1], x2, y[1])
+		do i = 2, npts - 1 {
+		    x1 = x2
+		    x2 = (x[i] + x[i+1]) / 2
+		    call gline (gp, x1, y[i-1], x1, y[i]) 
+		    call gline (gp, x1, y[i], x2 , y[i])
+		}
+		x1 = x2
+		x2 = x[npts]
+		call gline (gp, x1, y[i-1], x1, y[i]) 
+		call gline (gp, x1, y[i], x2 , y[i])
+	    } else {
+		x1 = y[1]
+		x2 = (y[1] + y[2]) / 2
+		call gline (gp, x1, x[1], x2, x[1])
+		do i = 2, npts - 1 {
+		    x1 = x2
+		    x2 = (y[i] + y[i+1]) / 2
+		    call gline (gp, x1, x[i-1], x1, x[i]) 
+		    call gline (gp, x1, x[i], x2 , x[i])
+		}
+		x1 = x2
+		x2 = y[npts]
+		call gline (gp, x1, y[i-1], x1, y[i]) 
+		call gline (gp, x1, y[i], x2 , y[i])
+	    }
 	    call gseti (gp, G_PLTYPE, pltype)
 	}
 end

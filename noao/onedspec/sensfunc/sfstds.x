@@ -57,8 +57,6 @@ begin
 			call pargstr (Memc[image])
 		    exptime = 1.
 		}
-		if (ignoreaps)
-		    beam = 1
 
 		# For the first one create the pointer to the array of
 		# structures.  For the following stars increase the size
@@ -99,7 +97,10 @@ begin
 		# Start a new standard star.
 	        call calloc (std, LEN_STD, TY_STRUCT)
 	        Memi[stds+nstds-1] = std
-	        STD_BEAM(std) = beam
+		if (ignoreaps)
+	            STD_BEAM(std) = 1
+		else
+	            STD_BEAM(std) = beam
 		STD_NPTS(std) = npts
 	        STD_EXPTIME(std) = exptime
 	        STD_AIRMASS(std) = airmass

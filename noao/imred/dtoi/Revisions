@@ -1,5 +1,12 @@
 .help revisions Jun88 noao.imred.dtoi
 .nf
+imred$dtoi/spotlist.x	7 Sept, 1989 SRo
+	In Suzanne's absence, removed the divide by nfog fog images in
+	hd_fogcalc() after a bug report by Steve Majewski that when multiple
+	fog images are used, the resultant fog values are too low by 1/nfog.
+	The total_pix accumulator is already a total for all images.  Should
+	be verified by Suzanne on her return.
+
 imred$dtoi/hdicfit/hdicgdelte.x  17 April, 1989 ShJ
 	Procedure icg_dl1 was declared as an integer procedure, although
 	it does not return a function values and was not being called

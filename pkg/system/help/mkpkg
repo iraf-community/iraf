@@ -26,7 +26,7 @@ libpkg.a:
 	prhlpblk.x	help.h <error.h>
 	prmodname.x	help.h
 	prsummary.x	help.h
-	t_hdbexamine.x	<error.h>
+	t_hdbexamine.x	help.h <error.h>
 	t_help.x	help.h <error.h> <fset.h> <finfo.h>
 	t_lroff.x	
 	t_mkhelpdb.x	<error.h>

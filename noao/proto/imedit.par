@@ -11,7 +11,7 @@ search,r,h,2.,,,Search radius
 buffer,r,h,1.,0.,,Background buffer width
 width,r,h,2.,1.,,Background width
 xorder,i,h,2,1,,Background x order
-yorder,i,h,2,1,,Background x order
+yorder,i,h,2,1,,Background y order
 value,r,h,0.,,,Constant value substitution
 sigma,r,h,INDEF,,,Added noise sigma
 angh,r,h, -33.,,,Horizontal viewing angle (degrees)

@@ -131,10 +131,15 @@ begin
 	# the new line.
 update_
 
+	# Dereference the old line and free the space if it is no longer used.
+	# If the old line buffer is freed we reclaim only LP_LEN words, since
+	# we already reclaimed LP_BLEN-LP_LEN in an earlier edit operation.
+
 	LP_NREF(o_pp) = LP_NREF(o_pp) - 1
 	if (LP_NREF(o_pp) == 0 && o_lp != PL_EMPTYLINE)
-	    PL_LLFREE(pl) = PL_LLFREE(pl) + LP_BLEN(o_pp)
+	    PL_LLFREE(pl) = PL_LLFREE(pl) + LP_LEN(o_pp)
 
+	# Add another reference to the new line.
 	LP_NREF(n_pp) = LP_NREF(n_pp) + 1
 	if (LP_NREF(n_pp) == 1 && n_lp != PL_EMPTYLINE)
 	    PL_LLFREE(pl) = PL_LLFREE(pl) - LP_BLEN(n_pp)

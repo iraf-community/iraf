@@ -124,7 +124,8 @@ begin
 	while (imtgetim (list1, Memc[input], SZ_FNAME) != EOF) {
 	    if (imtgetim (list2, Memc[output], SZ_FNAME) == EOF)
 		call strcpy (Memc[input], Memc[output], SZ_FNAME)
-	    i = clgfil (list3, Memc[badpix], SZ_FNAME)
+	    if (clgfil (list3, Memc[badpix], SZ_FNAME) == EOF)
+		Memc[badpix] = EOS
 
 	    iferr {
 		in = NULL
@@ -138,7 +139,7 @@ begin
 
 		call set_input (Memc[input], im, i)
 		if (im == NULL)
-		    next
+		    call error (1, "Skipping input image")
 
 		if (ccdflag (im, "crcor")) {
 		    call eprintf ("WARNING: %s previously corrected\n")

@@ -13,6 +13,7 @@ pointer	fieldstr			# Pointer to fields string
 real	lower				# Lower limit of data value window
 real	upper				# Upper limit of data value window
 real	binwidth			# Width of histogram bin in sigma
+int	format				# Format the output
 
 int	nfields, nbins
 int	minmax, npix, mean, median, mode, stddev, skew, kurtosis
@@ -21,7 +22,7 @@ pointer	im, list, ist, buf, hgm
 real	hwidth, hmin, hmax
 
 bool	clgetb()
-int	ist_fields(), ist_isfield, imtgetim(), ist_ihist()
+int	ist_fields(), ist_isfield, imtgetim(), ist_ihist(), btoi()
 pointer	imtopenp(), imgnlr()
 real	clgetr()
 pointer	immap()
@@ -40,6 +41,7 @@ begin
 	lower = clgetr ("lower")
 	upper = clgetr ("upper")
 	binwidth = clgetr ("binwidth")
+	format = btoi (clgetb ("format"))
 
 	# Get the selected fields.
 	nfields = ist_fields (Memc[fieldstr], Memi[fields], NFIELDS)
@@ -67,8 +69,8 @@ begin
 	    minmax = NO
 
 	# Print a header banner for the selected fields.
-	if (clgetb ("verbose"))
-	    call ist_pheader (ist, Memi[fields], nfields)
+	if (format == YES)
+	    call ist_pheader (Memi[fields], nfields)
 
 	# Loop through the input images.
 	while (imtgetim (list, Memc[image], SZ_FNAME) != EOF) {
@@ -124,7 +126,10 @@ begin
 	    }
 
 	    # Print the statistics.
-	    call ist_print (Memc[image], ist, Memi[fields], nfields)
+	    if (format == YES)
+	        call ist_print (Memc[image], ist, Memi[fields], nfields)
+	    else
+	        call ist_fprint (Memc[image], ist, Memi[fields], nfields)
 		
 	    if (hgm != NULL)
 		call mfree (hgm, TY_INT)
@@ -156,14 +161,13 @@ begin
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	flist = fntopenb (fieldstr, NO)
-	while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF) {
+	while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF && 
+	    (nfields < max_nfields)) {
 	    field = strdic (Memc[fname], Memc[fname], SZ_FNAME, IS_FIELDS)
 	    if (field == 0)
 		next
-	    else {
-		nfields = nfields + 1
-		fields[nfields] = field
-	    }
+	    nfields = nfields + 1
+	    fields[nfields] = field
 	}
 	call fntclsb (flist)
 
@@ -187,10 +191,10 @@ int	i, isfield
 begin
 	isfield = NO
 	do i = 1, nfields {
-	    if (field == fields[i]) {
-		isfield = YES
-		break
-	    }
+	    if (field != fields[i])
+		next
+	    isfield = YES
+	    break
 	}
 
 	return (isfield)
@@ -729,21 +733,28 @@ begin
 	hnorm = Memr[ihgm+nbins-1]
 	call adivkr (Memr[ihgm], hnorm, Memr[ihgm], nbins)
 
+	# Initialize the low and high bin numbers.
+	lo = 0
+	hi = 1
+
 	# Search for the point which divides the integral in half.
-	lo = 1
-	hi = nbins
 	do i = 1, nbins {
 	    if (Memr[ihgm+i-1] > 0.5)
 		break
 	    lo = i
 	}
-	hi = min (lo + 1, nbins)
+	hi = lo + 1
 
 	# Approximate the histogram.
 	h1 = hmin + lo * hwidth
-	hdiff = Memr[ihgm+hi-1] - Memr[ihgm+lo-1]
+	if (lo == 0)
+	    hdiff = Memr[ihgm+hi-1]
+	else
+	    hdiff = Memr[ihgm+hi-1] - Memr[ihgm+lo-1]
 	if (fp_equalr (hdiff, 0.0))
 	    IS_MEDIAN(ist) = h1
+	else if (lo == 0)
+	    IS_MEDIAN(ist) = h1 + 0.5 / hdiff * hwidth
 	else
 	    IS_MEDIAN(ist) = h1 + (0.5 - Memr[ihgm+lo-1]) / hdiff * hwidth
 
@@ -793,19 +804,19 @@ end
 
 # IST_PHEADER -- Print the banner fields.
 
-procedure ist_pheader (ist, fields, nfields)
+procedure ist_pheader (fields, nfields)
 
-pointer	ist			# pointer to the statistics structure
 int	fields[ARB]		# fields to be printed
 int	nfields			# number of fields
 
 int	i
 
 begin
+	call printf ("#")
 	do i = 1, nfields {
 	    switch (fields[i]) {
 	    case IS_FIMAGE:
-	        call printf (IS_FICOLUMN)
+	        call printf (IS_FSTRING)
 		    call pargstr (IS_KIMAGE)
 	    case IS_FNPIX:
 	        call printf (IS_FCOLUMN)
@@ -837,7 +848,7 @@ begin
 	    }
 	}
 
-	call printf ("\n\n")
+	call printf ("\n")
 	call flush (STDOUT)
 end
 
@@ -854,6 +865,7 @@ int	nfields			# number of fields
 int	i
 
 begin
+	call printf (" ")
 	do i = 1, nfields {
 	    switch (fields[i]) {
 	    case IS_FIMAGE:
@@ -887,6 +899,60 @@ begin
 		call printf (IS_FREAL)
 		    call pargr (IS_KURTOSIS(ist))
 	    }
+	}
+
+	call printf ("\n")
+	call flush (STDOUT)
+end
+
+
+# IST_FPRINT -- Print the fields using a free format.
+
+procedure ist_fprint (image, ist, fields, nfields)
+
+char	image[ARB]		# image name
+pointer	ist			# pointer to the statistics structure
+int	fields[ARB]		# fields to be printed
+int	nfields			# number of fields
+
+int	i
+
+begin
+	do i = 1, nfields {
+	    switch (fields[i]) {
+	    case IS_FIMAGE:
+	        call printf ("%s")
+		    call pargstr (image)
+	    case IS_FNPIX:
+	        call printf ("%d")
+		    call pargi (IS_NPIX(ist))
+	    case IS_FMIN:
+		call printf ("%g")
+		    call pargr (IS_MIN(ist))
+	    case IS_FMAX:
+		call printf ("%g")
+		    call pargr (IS_MAX(ist))
+	    case IS_FMEAN:
+		call printf ("%g")
+		    call pargr (IS_MEAN(ist))
+	    case IS_FMEDIAN:
+		call printf ("%g")
+		    call pargr (IS_MEDIAN(ist))
+	    case IS_FMODE:
+		call printf ("%g")
+		    call pargr (IS_MODE(ist))
+	    case IS_FSTDDEV:
+		call printf ("%g")
+		    call pargr (IS_STDDEV(ist))
+	    case IS_FSKEW:
+		call printf ("%g")
+		    call pargr (IS_SKEW(ist))
+	    case IS_FKURTOSIS:
+		call printf ("%g")
+		    call pargr (IS_KURTOSIS(ist))
+	    }
+	    if (i < nfields)
+		call printf ("  ")
 	}
 
 	call printf ("\n")

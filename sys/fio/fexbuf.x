@@ -3,7 +3,7 @@
 include	<config.h>
 include	<fio.h>
 
-define	INC_BUFSIZE		1024
+define	INC_BUFSIZE		4096
 
 
 # FEXBUF -- Expand the size of the file buffer.  Called by FLSBUF when the FIO

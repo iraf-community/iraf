@@ -1,15 +1,15 @@
-         blkavg - Block average or sum a list of images
+         blkavg - Block average or sum a list of N-D images
 	 blkrep - Block replicate a list of images
-	 boxcar - Boxcar smooth a list of 2-D images
+	 boxcar - Boxcar smooth a list of 1 or 2-D images
       chpixtype - Change the pixel type of a list of images
-       convolve - Convolve a list of 2-D images with a rectangular filter
+       convolve - Convolve a list of 1 or 2-D images with a rectangular filter
           fit1d - Fit a function to image lines or columns
 	fmedian - Quantize and median filter a 2-D image or a list of images
 	  fmode - Quantize and modal filter a 2-D image or list of images
-	  gauss - Convolve a list of 2-D images with an elliptical Gaussian
+	  gauss - Convolve a list of 1 or 2-D images with an elliptical Gaussian
 	 geomap - Calculate a coordinate transformation
 	geotran - Geometrically transform a set of 2-D images
-       gradient - Convolve a list of 2-D images with a gradient operator
+       gradient - Convolve a list of 1 or 2-D images with a gradient operator
 	  hedit - Header editor
 	hselect - Select a subset of images satisfying a boolean expression
         imarith - Simple image arithmetic
@@ -30,7 +30,7 @@
           imsum - Compute the sum, average, or median of a set of images
        imsurfit	- Fit a surface to a 2-D image
     imtranspose - Transpose a 2-D image
-	laplace - Laplacian filter a list of 2-D images
+	laplace - Laplacian filter a list of 1 or 2-D images
       lineclean - Replace deviant pixels in image lines
      listpixels - Convert an image section into a list of pixels
         magnify - Magnify a list of 1-D or 2-D images

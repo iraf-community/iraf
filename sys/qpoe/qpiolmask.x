@@ -59,7 +59,7 @@ tryfile_
 
 		    call salloc (plbuf, S_NELEM(sym) / SZ_SHORT, TY_SHORT)
 		    if (qp_read (qp, Memc[mp], Mems[plbuf], S_NELEM(sym), 1,
-			TY_OPAQUE) < S_NELEM(sym)) {
+			"opaque") < S_NELEM(sym)) {
 			call syserrs (SYS_QPBADVAL, Memc[mp])
 		    } else {
 			IO_PL(io) = pl_open (plbuf)	# no deref
@@ -100,3 +100,4 @@ tryfile_
 
 	call sfree (sp)
 end
+

@@ -25,7 +25,7 @@ called with an unknown error code.
 .ih
 SEE ALSO
 .nf
-the individual manual pages for the symbolic names of the error codes
-imfort$imfort.h and lib$syserr.h for the integer error codes
+The individual manual pages for the symbolic names of the error codes
+imfort$imfort.h and lib$syserr.h for the integer error codes.
 .fi
 .endhelp

@@ -104,6 +104,7 @@ define	NoINDEX_NoRMorBB	0	# nonindexed, no RM no BB
 define	NoINDEX_RMorBB		1	# nonindexed, maybe RM or BB
 define	INDEX_NoRMorBB		2	# indexed, no RM or BB
 define	INDEX_RMorBB		3	# indexed, maybe RM or BB
+define	NoDATA_NoAREA		4	# no events can be returned
 
 # Stored Event List header (one per stored event list).
 define	LEN_EHDES	16

@@ -27,6 +27,8 @@ begin
 
 	    if (osdir[delim+1] == EOS) {
 		call zfgcwd (osdir[delim+1], maxch - delim, nchars)
+		if (nchars == ERR)
+		    return
 		call strupk (osdir[delim+1], osdir[delim+1], maxch-delim)
 	    }
 	    call zfsubd (osdir[delim+1], maxch - delim, subdir, nchars)

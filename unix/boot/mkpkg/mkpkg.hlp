@@ -1,4 +1,4 @@
-.help mkpkg May87 "softools"
+.help mkpkg Mar90 "softools"
 .ih
 NAME
 mkpkg - make or update a package or library
@@ -27,6 +27,14 @@ it does anyhow, so this switch has little effect at present.
 No execute.  Go through the motions, but do not touch any files.
 No execute mode automatically enables verbose mode (flag "-v").
 This switch should be used to verify new mkpkg files before execution.
+.le
+.ls 10 \fB-p \fIpkgname\fR
+Load the package environment for the named external package, e.g.,
+"mkpkg -p noao update".  If the same package is always specified
+the environment variable or logical name PKGENV may be defined at the
+host level to accomplish the same thing.  The package name \fImust\fR
+be specified when doing software development in an external or layered
+package.
 .le
 .ls 10 \fB-u\fR    [AOSVS/IRAF only]
 Forcibly update the dates of improperly dated library modules.  This option
@@ -294,9 +302,10 @@ as in the following example, which prints the pathname of the
 "$(" triggers macro substitution.  The value of a symbol may be obtained
 interactively from the standard input by adding a question mark after the
 left parenthesis, i.e., "$(?terminal)" (this does not work with the -f stdin
-flag).  Note that case is ignored in macro names; by convention, logical
-directories are normally given in lower case, and locally defined symbols
-in upper case.
+flag).  The contents of a file may be included using the notation
+"$(@\fIfile\fR)".   Note that case is ignored in macro names; by convention,
+logical directories are normally given in lower case, and locally defined
+symbols in upper case.
 
 
 .ks

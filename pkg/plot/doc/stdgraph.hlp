@@ -55,22 +55,19 @@ units.
 
 .ih
 EXAMPLES
+1. Extract the fourth frame from metacode file "plots.mc" and plot it.
 
-Extract the fourth frame from metacode file "plots.mc" and plot it.
-.nf
-	cl> gkiextract plots.mc 4 | stdgraph
+    cl> gkiextract plots.mc 4 | stdgraph
 
-.fi
-Process file "one.mc" in debug mode.
-.nf
-	cl> stdgraph oned.mc debug+
+2. Process file "one.mc" in debug mode.
 
-.fi
-Plot file "oned.mc" with high quality text generation.
-.nf
-	cl> stdgraph oned.mc txquality=high
-.fi
+    cl> stdgraph oned.mc debug+
+
+3. Plot file "oned.mc" with high quality text generation.
+
+    cl> stdgraph oned.mc txquality=high
 .ih
 SEE ALSO
 gkiextract,  stdplot
 .endhelp
+elp

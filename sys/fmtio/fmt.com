@@ -10,7 +10,7 @@ int	fmt_state		# current state of FPRFMT (gets a format)
 int	ofile_type		# type of output file
 int	format_char 		# format type character (bcdefghmorstuxz#*)
 char	fill_char		# filler char for rt. justification
-char	format[SZ_LINE]		# format string
+char	format[SZ_OBUF]		# format string
 char	obuf[SZ_OBUF]		# for formatting output
 
 common	/fmtcom/  fd,ip,width,decpl,col,left_justify,radix,fmt_state,

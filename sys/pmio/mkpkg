@@ -57,7 +57,9 @@ libex.a:
 	pmplls.x	pmio.com <plio.h> <pmset.h>
 	pmpoint.x	pmio.com <plio.h> <pmset.h>
 	pmpolygon.x	pmio.com <plio.h> <pmset.h>
+	pmrio.x		pmio.com <plio.h> <pmset.h>
 	pmrop.x		pmio.com <plio.h> <imhdr.h> <pmset.h>
+	pmsectnc.x	pmio.com <plio.h> <pmset.h>
 	pmsectne.x	pmio.com <plio.h> <pmset.h>
 	pmseti.x	<imio.h> <plio.h> <pmset.h>
 	pmsplane.x	pmio.com <plio.h> <pmset.h>

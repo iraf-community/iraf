@@ -13,9 +13,9 @@ char	*args;
 int	ttin, ttout;
 int	outfd;
 {
-	XCHAR	x_args[1024];
+	XCHAR	x_args[SZ_COMMAND];
 
-	c_strupk (args, x_args, 1024);
+	c_strupk (args, x_args, SZ_COMMAND);
 	STTYCO (x_args, &ttin, &ttout, &outfd);
 }
 

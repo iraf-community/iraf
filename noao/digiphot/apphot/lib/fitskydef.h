@@ -22,23 +22,24 @@ define	AP_SKYPIX	Memi[$1+11]	# Pointer to sky pixels
 define	AP_INDEX	Memi[$1+12]	# Pointer to ordering array
 define	AP_COORDS	Memi[$1+13]	# Pointer to sky coordinates array
 define	AP_NSKYPIX	Memi[$1+14]	# Number of sky pixels
-define	AP_LENSKYBUF	Memi[$1+15]	# Length of sky buffers
-define	AP_SXCUR	Memr[$1+16]	# X center of sky annulus
-define	AP_SYCUR	Memr[$1+17]	# Y center of sky annulus
-define	AP_SXC		Memr[$1+18]	# X center of sky subraster
-define	AP_SYC		Memr[$1+19]	# Y center of sky subraster
-define	AP_SNX		Memi[$1+20]	# X dimension of sky subraster
-define	AP_SNY		Memi[$1+21]	# Y dimension of sky subraster
+define	AP_NBADSKYPIX	Memi[$1+15]	# Number of bad sky pixels
+define	AP_LENSKYBUF	Memi[$1+16]	# Length of sky buffers
+define	AP_SXCUR	Memr[$1+17]	# X center of sky annulus
+define	AP_SYCUR	Memr[$1+18]	# Y center of sky annulus
+define	AP_SXC		Memr[$1+19]	# X center of sky subraster
+define	AP_SYC		Memr[$1+20]	# Y center of sky subraster
+define	AP_SNX		Memi[$1+21]	# X dimension of sky subraster
+define	AP_SNY		Memi[$1+22]	# Y dimension of sky subraster
 
 # fitsky output
 
-define	AP_SKY_MODE		Memr[$1+22]	# computed sky value
-define	AP_SKY_SIG		Memr[$1+23]	# computed sky sigma
-define	AP_SKY_SKEW		Memr[$1+24]	# skew of sky pixels
-define	AP_NSKY			Memi[$1+25]	# number of sky pix
-define	AP_NSKY_REJECT		Memi[$1+26]	# number of pixels
+define	AP_SKY_MODE		Memr[$1+23]	# computed sky value
+define	AP_SKY_SIG		Memr[$1+24]	# computed sky sigma
+define	AP_SKY_SKEW		Memr[$1+25]	# skew of sky pixels
+define	AP_NSKY			Memi[$1+26]	# number of sky pix
+define	AP_NSKY_REJECT		Memi[$1+27]	# number of pixels
 
-define	AP_SSTRING		Memc[P2C($1+27)]# salgorithm string
+define	AP_SSTRING		Memc[P2C($1+28)]# salgorithm string
 
 # default setup values for sky fitting
 

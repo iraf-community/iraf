@@ -9,6 +9,7 @@ define	GTYTRAN		5	# WCS Y transform
 define	GTXSIZE		6	# X Mark size
 define	GTYSIZE		7	# Y Mark size
 
+define	GTSYSID		22	# Add SYSID?
 define	GTPARAMS	8	# Graph parameters
 define	GTTITLE		9	# Graph title
 define	GTSUBTITLE	10	# Graph subtitle
@@ -25,7 +26,7 @@ define	GTMARK		19	# Mark type
 define	GTLINE		20	# Line type
 define	GTTRANSPOSE	21	# Transpose X and Y axes?
 
-define	LEN_GT		21	# Length of graphics tools extension
+define	LEN_GT		23	# Length of graphics tools extension
 
 define	GT_XMIN		Memr[$1+GTXMIN]
 define	GT_XMAX		Memr[$1+GTXMAX]	
@@ -35,6 +36,7 @@ define	GT_XTRAN	Memi[$1+GTXTRAN]
 define	GT_YTRAN	Memi[$1+GTYTRAN]
 define	GT_XSIZE	Memr[$1+GTXSIZE]
 define	GT_YSIZE	Memr[$1+GTYSIZE]
+define	GT_SYSID	Memi[$1+GTSYSID]
 define	GT_PARAMS	Memi[$1+GTPARAMS]
 define	GT_TITLE	Memi[$1+GTTITLE]
 define	GT_SUBTITLE	Memi[$1+GTSUBTITLE]

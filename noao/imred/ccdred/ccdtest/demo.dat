@@ -174,7 +174,7 @@ clear\n\{%5000			# Continue...\}
 \n\{%V-\}
 ccdproc\sobs*.??h\n\{			# Process object images...\}
 \n\{%V-\}
-q0\s+/\{%V-\}\r
+\{%V-\}q0,+,\r
 NO\n\{%V-\}
 \n\{%10000
     That's it!  We're done.  Now lets check the results.  The "ccdlist"

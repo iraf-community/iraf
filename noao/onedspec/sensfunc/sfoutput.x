@@ -78,6 +78,7 @@ makeim_
 	call imaddi (im, "crpix1", 1)
 	call imaddr (im, "crval1", crval1)
 	call imaddr (im, "cdelt1", cdelt1)
+	call imaddr (im, "cd1_1", cdelt1)
 	call imaddr (im, "w0", crval1)
 	call imaddr (im, "wpc", cdelt1)
 	call imaddi (im, "dc-flag", 0)

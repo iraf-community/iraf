@@ -83,29 +83,22 @@ backward by N input plots.
 .fi
 .ih
 EXAMPLES
-
-Plot every frame in the metacode file "oned.plots".  There will be 4 plots
+1. Plot every frame in the metacode file "oned.plots".  There will be 4 plots
 to the page originally, but this can be overridden interactively.
-.nf
 
-1.	cl> gkimosaic oned.plots
+    cl> gkimosaic oned.plots
 
-.fi
-Extract every third plot from the metacode file "oned.plots" with task
+2. Extract every third plot from the metacode file "oned.plots" with task
 \fIgkiextract\fR and plot them four to a page.
-.nf
 
-2.	cl> gkiextract oned.plots 1-99x3 | gkimosaic
+    cl> gkiextract oned.plots 1-99x3 | gkimosaic
 
-.fi
-Plot all frames in every metacode file beginning with "mcode." and
+3. Plot all frames in every metacode file beginning with "mcode." and
 condense them so 16 fit on a page.  The metacode is being spooled;
 it will be plotted, perhaps, when the computer isn't so busy.  Interactive
 mode is automatically disabled when not plotting to a graphics terminal.
-.fi
 
-3.	cl> gkimosaic mcode.* nx=4 ny=4 output=plt.spool
-.fi
+    cl> gkimosaic mcode.* nx=4 ny=4 output=plt.spool
 .ih
 BUGS
 Setting \fBdevice\fR to "stdvdm" does not work.  To produce an output file
@@ -113,5 +106,7 @@ of mosaiced metacode, use the \fIoutput\fR parameter or the ">G" graphics
 stream redirection feature of the cl.
 .ih
 SEE ALSO
-gkidir  gkiextract
+gkidir, gkiextract
+.endhelp
+act
 .endhelp

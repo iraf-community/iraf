@@ -6,7 +6,7 @@ include "../lib/noise.h"
 include "../lib/fitskydef.h"
 include "../lib/fitsky.h"
 
-# APSPLOT -- Procedure to compute radial profile plots for the centering
+# APSPLOT -- Procedure to compute radial profile plots for the sky fitting
 # routine.
 
 procedure apsplot (ap, sid, sier, gd, makeplot)
@@ -21,6 +21,7 @@ int	nx, ny, nskypix
 pointer	sp, sky, str, r, gt
 real	xcenter, ycenter, rmin, rmax, imin, imax
 real	u1, u2, v1, v2, x1, x2, y1, y2
+int	apstati()
 pointer	ap_gtinit()
 real	apstatr()
 
@@ -29,16 +30,21 @@ begin
 	if (gd == NULL || makeplot == NO)
 	    return
 
-	# Check for defined center.
+	# Check for defined center and non-constant algorithm.
 	xcenter = apstatr (ap, SXCUR)
 	ycenter = apstatr (ap, SYCUR)
 	if (IS_INDEFR(xcenter) || IS_INDEFR(ycenter))
 	    return
+	if (apstati (ap, SKYFUNCTION) == AP_CONSTANT)
+	    return
 
+	# Check that a buffer of sky pixels exists.
 	sky = AP_PSKY(ap)
 	nskypix = AP_NSKYPIX(sky)
 	nx = AP_SNX(sky)
 	ny = AP_SNY(sky)
+	if (nskypix <= 0 || nx <= 0 || ny <= 0)
+	    return
 
 	# Allocate working space
 	call smark (sp)
@@ -194,7 +200,7 @@ begin
 	}
 
 	# Mark the sky sigma if defined.
-	sigma = apstatr (ap, SKYSIGMA)
+	sigma = apstatr (ap, SKY_SIGMA)
 	if (! IS_INDEFR(sigma)) {
 	    call gmark (gd, (xmin + xmax) / 2.0, (ymin + ymax) / 2.0, 
 		GM_VEBAR, -0.25, -sigma)
@@ -214,8 +220,11 @@ begin
 
 	# Mark the upper sky sigma.
 	call gseti (gd, G_PLTYPE, GL_DASHED)
-	skysigma = skyval + apstatr (ap, K2) * apstatr (ap, SKY_SIGMA)
-	if (skysigma >= ymin && skysigma <= ymax) {
+	if (! IS_INDEFR(apstatr (ap, SKY_SIGMA)))
+	    skysigma = skyval + apstatr (ap, K2) * apstatr (ap, SKY_SIGMA)
+	else
+	    skysigma = INDEFR
+	if (! IS_INDEFR(skysigma) && (skysigma >= ymin) && skysigma <= ymax) {
 	    call gamove (gd, xmin, skysigma)
 	    call gadraw (gd, xmax, skysigma)
 	    #call sprintf (Memc[str], SZ_LINE, "sky sigma= %g")
@@ -223,12 +232,13 @@ begin
 	}
 
 	# Mark the lower sky sigma
-	skysigma = skyval - apstatr (ap, K2) * apstatr (ap, SKY_SIGMA)
-	if (skysigma >= ymin && skysigma <= ymax) {
+	if (! IS_INDEFR(apstatr (ap, SKY_SIGMA)))
+	    skysigma = skyval - apstatr (ap, K2) * apstatr (ap, SKY_SIGMA)
+	else
+	    skysigma = INDEFR
+	if (! IS_INDEFR(skysigma) && (skysigma >= ymin) && skysigma <= ymax) {
 	    call gamove (gd, xmin, skysigma)
 	    call gadraw (gd, xmax, skysigma)
-	    #call sprintf (Memc[str], SZ_LINE, "sky sigma= %g")
-	        #call pargr (skysigma)
 	}
 
 	call sfree (sp)

@@ -346,7 +346,7 @@ begin
 		else
 		    xout[i] = xin[i]
 		if (yin[i] < 1.0)
-		    yout[i] = 1.0 + (1.0 - xin[i])
+		    yout[i] = 1.0 + (1.0 - yin[i])
 		else if (yin[i] > ymax)
 		    yout[i] = ymax - (yin[i] - ymax)
 		else

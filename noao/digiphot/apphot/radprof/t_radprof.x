@@ -15,6 +15,7 @@ pointer graphics	# pointer to the graphics device
 pointer display		# pointer to the display device
 int	interactive	# interactive mode
 int	verify		# verify the critical parameters
+int	update		# update the critical parameters
 int	verbose		# verbose mode
 
 int	limlist, lclist, lolist, sid, lid, cl, out, pfd, root, stat
@@ -66,14 +67,23 @@ begin
 	}
 
 	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
-	interactive = btoi (clgetb ("interactive"))
+	if (Memc[cname] != EOS)
+	    interactive = NO
+	else if (lclist == 0)
+	    interactive = YES
+	else
+	    interactive = btoi (clgetb ("interactive"))
 	verify = btoi (clgetb ("verify"))
+	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
 	# Get the radial profile fitting parameters.
 	call ap_grppars (ap)
-	if (verify == YES && interactive == NO)
-	    call ap_rconfirm (ap)
+	if (verify == YES && interactive == NO) {
+	    call ap_rconfirm (ap, NULL, 1)
+	    if (update == YES)
+		call ap_rpars (ap)
+	}
 
 	# Open the plot files.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
@@ -122,9 +132,11 @@ begin
 	    # Open the image.
 	    im = immap (Memc[image], READ_ONLY, 0)
 	    call apsets (ap, IMNAME, Memc[image])
-	    call ap_itime (im, ap)
 	    call ap_rdnoise (im, ap)
 	    call ap_padu (im, ap)
+	    call ap_itime (im, ap)
+	    call ap_airmass (im, ap)
+	    call ap_filter (im, ap)
 
 	    # Open the coordinate file, where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -132,12 +144,29 @@ begin
 
 	    if (lclist <= 0) {
 		cl = NULL
-		call strcpy ("", Memc[coords], SZ_FNAME)
-	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF)
-	        cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
-	    else
-		call seek (cl, BOF)
-	    call apsets (ap, CLNAME, Memc[coords])
+		call strcpy ("", Memc[outfname], SZ_FNAME)
+	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords]))
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+		else
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+	    } else {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords])) {
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else {
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+		    call seek (cl, BOF)
+		}
+	    }
+	    call apsets (ap, CLNAME, Memc[outfname])
 
 	    # Open output text file, if output is "default", dir$default,
 	    # or a directory specification then the extension "prf" is added

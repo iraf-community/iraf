@@ -1,0 +1,535 @@
+New Apollo port notes file started 24 October 1989, Steve Rooke.
+This is a diff/merge into standard bsd/iraf 2.8 from an earlier port
+started in June 1989 from sun/iraf 2.8 about a month prior to freezing.
+Since the port has already been done, the order of entries in this notes
+file will not be a chronological record, but it will be complete
+
+Historically, this port was assisted in good measure by Aake Nordlund
+of Copenhagen University, who did an initial port of iraf 2.6 to domain/os
+on a dn3500 (and later to a dn10000).  The original zsvjmp.asm file came from
+Aake, courtesy of apollo/denmark.
+
+Archived all files modified for the apollo, deleted all of iraf.
+Read in standard IRAF v2.8 port tape (cut from carina; bsd unix).
+
+local/.login
+	Set TERM to apollo_15_color if on the console, else vt100.  Moved
+	everything else to .cshrc, to avoid having to source .login all
+	over the place; this will be an X11 environment, and X processes
+	on the apollo (domain too for that matter) don't inherit much of
+	anything from the parent.  (10/24/89 SRo)
+
+local/.cshrc
+	Added a "umask 022", without which domain/os does all kinds of crazy
+	things.  Added /usr/apollo/bin and /usr/bin/X11 to search path (Apollo 
+	recommends this for all BSD accounts).  Set iraf path to /usr/iraf/,
+	prompt to "iraf% ", added some aliases.  Set IRAFARCH and MACH to
+	"apo68k".  (10/24/89 SRo)
+
+local/.dbxinit
+local/.dderc
+	Added these two apollo debugger startup files (no adb in domain).
+	(10/24/89 SRo)
+
+dev/hosts
+	Added auriga entry.  (10/24/89 SRo)
+
+local/apollo
+	Created this directory and moved in a bunch of stuff used during the
+	port (communications with apollo personnel about domain/os problems,
+	etc. -- the sort of thing that isn't really part of iraf but was
+	turned up during the port).  This should be removed some day.
+	(10/24/89 SRo)
+
+local/user_data
+local/user_data/key_defs_8bit3
+local/user_data/startup_dm.19l
+	The domain display manager requires this directory to be present in
+	the user's login directory (creates it if not already present).  The
+	key_defs file stores user's most recent key mappings, and the startup
+	file is needed to set up reasonable fonts etc.  (10/24/89 SRo)
+
+unix/as.apo68k/zsvjmp.asm
+unix/as.apo68k/zsvjmp.bin
+	Imported apollo motorola 68k version of zsvjmp.s, originated in
+	Denmark, courtesy of Aake Nordlund and Denmark field office.
+	The apollo assembler will only take a .asm file and produce a .bin
+	object file.  (10/24/89 SRo)
+
+unix/boot/bootlib/tape.c
+	Wanted a "char *vfn2osfn();" declaration; illegal combination of
+	pointer and integer at line 236.  (6/13; 10/24/89 SRo)
+
+unix/boot/bootlib/vfn2osfn.c
+	Apollo uses leading // for node name, thus when // is first in path,
+	we cannot contract to /.  If apollo, changed to osfn+1 in the
+	following test (nordlund):
+ 
+            if (*op == '/' && op > osfn+1 && *(op-1) == '/')
+	
+	(10/25/89 SRo)
+ 
+unix/os/alloc.c
+	In domain/os, utmp.h needs time_t and ut_time, defined in <sys/types.h>
+	(order change of #includes).  alloc.c disabled anyway for now, due to
+	lack of getproc function; must come back later.  (10/25/89 SRo)
+
+unix/os/getproc.c
+	No <getproc.h> in domain/os (processes mapped into virtual memory
+	differently than in bsd).  Disabled for now in mkpkg.sh.  (10/25/89 SRo)
+
+unix/os/mkpkg.sh
+	Commented out alloc & getproc.  Changed zsvjmp.s to zsvjmp.asm; the
+	domain assembler is not generally available, and must be obtained
+	directly from apollo r&d, unsupported.  None of the other compilers
+	can act as a front end for the assembler.  The .asm is hardwired into
+	the assembler, and the object file is automatically named zsvjmp.bin.
+	(10/25/89 SRo)
+
+unix/os/zfiobf.c
+unix/os/zfiotx.c
+	If apollo, <fcntl.h> rather than <sys/fcntl.h>.  (10/25/89 SRo)
+
+unix/os/zfiolp.c
+unix/os/zfiopl.c
+	Domain/os C requires initialization of aggregate types (including
+	arrays) to have braces surrounding the constant value, even if there
+	is only one element, e.g.: "static PKCHAR xnullstr[1] = {XEOS};".
+	(10/25/89 SRo)
+
+unix/os/zlocpr.c
+	If apollo, added one level of indirection:  PFI proc; -> PFI *proc;
+	*o_epa = (XINT)(*epa);  (10/25/89 SRo)
+
+unix/os/zmain.c
+	If apollo, had to add pointer to int's to pass as addresses to 
+	functions.  In Domain/OS, referencing an argument in a procedure that
+	was declared int ROUTINE() in the caller results in a segmentation
+	violation.  This was the problem that broke both debuggers and the
+	domain kernel when such a process was debugged on a dn3500 with fpa
+	under sr10.1.  The symptom was crazy, unpredictable behavior of the
+	debugger when examining the stack or at the time the epa was referenced
+	inside the procedure, followed by deteriorating behavior of virtually
+	any other command in the OS until a reboot.  This problem went away
+	when the FPA was physically removed from the chassis.  Note that it
+	happened even if there was no floating point code, and without any
+	fpa compilation flags.  The kernel bug was fixed in the 9/89 sr10.1
+	patch tape plus a new syslib.881 library sent by apollo r&d, which
+	is to be included in later domain patch releases.
+
+	The fix is as follows:
+
+	    #ifdef apollo
+		    int	*epaptr, *epaptr2;
+		    ...
+		    epaptr = (int *)ZGETTY;
+		    ZLOCPR (&epaptr, &driver);
+	    #else
+		    ZLOCPR (ZGETTY, &driver);
+	    #endif
+	
+	(10/27/89 SRo)
+
+unix/hlib/libc/iraf.h
+	Changed iraf pathname to /usr/iraf/.  Left BSDUNIX, BSD43 defined; the
+	only apollo-specific flag we rely upon is the "apollo" globally defined 
+	in domain/os.  (10/27/89 SRo)
+
+unix/os/zxwhen.c
+	Numerous changes, lotsof ifdefs, to implement domain exception codes.
+	(10/27/89 SRo)
+
+unix/boot/mkpkg/char.c
+	Compiler complained about no path to this statement:
+
+	    goto push;
+	    break;
+	
+	Removed the break.  (10/30/89 SRo)
+
+unix/boot/mkpkg/host.c
+	Smart optimizer!  Complained that exit_status never used at two places;
+	it is used in lots of other places, but here the compiler griped:
+
+	    exit_status = ERR;
+	    return;
+	
+	Modified to return (exit_status), lines 88 & 151.  (10/30/89 SRo)
+
+unix/boot/mkpkg/main.c
+	This seems to be a very intelligent optimizer.  It realized that
+	the value assigned to islib at:
+
+		islib       = YES;
+	
+	was never used, even though islib appeared as an argument to a 
+	subroutine later on in the code.  Careful analysis showed that,
+	indeed, the assigned value could never have been used; statement
+	removed.  (10/30/89 SRo)
+
+unix/boot/rmfiles/rmfiles.c
+	Added required declaration char *vfn2osfn().  (10/30/89 SRo)
+
+unix/boot/rtar/rtar.c
+	Compiler correctly claims value assigned to fd never used:
+	    fd = os_createdir (fname, mode);
+	    ...
+	    fd = OK;
+	"fd = " removed from first statement (line 596).  (10/30/89 SRo)
+
+unix/boot/spp/xc.c
+	Parameterized "cc", "f77", and "ld" as CC_COMMAND, etc.; had to compile
+	.c with cc, .f with f77, and link with ld.  Apollo cc does not compile
+	Fortran, but f77 does compile C.  Although cc or f77 will link, neither
+	will pass along the -W0,... etc. parameters to LD that are essential
+	to correct compilation on apollo.  Apollo does not support -u flag, so
+	ifdef'd around it.  (10/30/89 SRo)
+
+unix/gdev/sgidev/sgi2uapl.c
+	Changed "int out" to "FILE *out" in several subroutines.  Removed
+	unused 'i++' from ";  i++)" in last 'for' statement in xyencode()
+	at line 463.  (10/30/89 SRo)
+
+unix/gdev/sgidev/sgidispatch.c
+	Removed unused "maxch" declaration.  (10/30/89 SRo)
+
+unix/hlib/config.h
+	Upped LEN_JUMPBUF from 16 to 60.  (10/30/89 SRo)
+
+unix/x/saoimage/*
+	Created directory & unpacked 26 Oct 1989 version of saoimage source.
+	Planning for additional X applications here, thus x/ directory.
+	(10/30/89 SRo)
+
+unix/x/saoimage/imtoolrc
+	Copied in from tucana; needed during saoimage installation, which
+	should be self-contained.  (10/30/89 SRo)
+
+unix/hlib/install
+	Extensively revised portions related to the image display server,
+	generalizing for either suntools (gterm, imtool) or x applications
+	(saoimage).  Should be usable for Ultrix as well.  (10/30/89 SRo)
+
+unix/hlib/irafuser.csh
+	Hardwired "MACH" to be "apo68k", defined apollo-dependent custom
+	cc & f77 flags to be passed through to aegis compilers:
+
+	    setenv	HSI_CF	"-W0,-opt,2,-nbss,-pic,-db -A nansi"
+	    setenv	HSI_FF	"-W0,-opt,2,-save,-dbs"
+	    setenv	HSI_XF	"-/W0,-opt,2,-save,-dbs"
+
+	(10/30/89 SRo)
+
+unix/hlib/libc/libc.h
+	Had to declare MEMCOM "char", not "extern char", as per Nordlund, to
+	cause runtime resolution of common block name (necessary in domain
+	shared library environment).  (10/30/89 SRo)
+
+unix/hlib/libc/spp.h
+	Raised LEN_JUMPBUF from 14 to 60 for apollo.  Denmark's zsvjmp.asm
+	saves all registers plus a bunch of other stuff.  (10/30/89 SRo)
+
+unix/hlib/libc/stdio.h
+	Changed extern int FIOCOM to int to cause runtime resolution of common
+	block name.  (10/30/89 SRo)
+
+unix/hlib/mkpkg.inc
+	Added apo68k branches, defined new XC compile flag categories for
+	libvops, libsys, libex to facilitate compiling code for shared 
+	libraries under domain/os; branch for apo68k special file list.
+	(10/30/89 SRo)
+
+unix/hlib/mkpkg.sf.apo68k
+	C source files outside the HSI that contain C uninitialized globals
+	require compilation with -nbss; by default cc passes -bss to /com/cc,
+	which puts all such globals into bss, which causes segmentation
+	violations for those globals that are also fortran common block names.
+
+	    $set	XNBSS	= '& "$xc -cq -/W0,-opt,2,-db,-nbss &"'
+
+	    $special "pkg$cl/":
+		    main.c	$(XNBSS)
+		    exec.c	$(XNBSS)
+		    opcodes.c	$(XNBSS)
+		    globals.c	$(XNBSS)
+		    ;
+
+	(10/30/89 SRo)
+
+unix/mkpkg.sh
+	Uncommented the portions commented out on vax/bsd tape; MACH can be
+	assumed to have been defined in irafuser.csh, and besides there were
+	still a couple of live references to $MACH.  Also had to change the
+	"-h" in "test -h" to "-L" for apollo.  (10/30/89 SRo)  *see 10/31
+
+pkg/cl/mkpkg
+	As it turns out, the special file list is not consulted for files
+	compiled with $omake (globals.c & opcodes.c).  Couldn't see any
+	reason why these files shouldn't be in the library, so moved them
+	there if mach == apo68k (changed $omakes, $link, libpkg.a).
+	(10/30/89 SRo)
+
+sys/gio/nspp/portlib/gridal.f
+	Compiler doesn't like a 2d array referenced as a 1d array in an
+	equivalence statement (ifmt(3,2) ... (mfmtx(1),ifmt(1)).  Changed
+	to ifmt(1,1).  (10/30/89 SRo)
+
+sys/imfort/imemsg.x
+	Three error messages extended past column 72 after preprocessing to
+	f77 (same as in HP-UX port):
+
+	errmsg = 'imfort short integer i/o requires a type short image'
+	**** Error #151 on Line 76: [ errmsg = @'imfort sh] invalid operator
+	errmsg = 'image header modified but image was opened read only'
+	**** Error #151 on Line 94: [ errmsg = @'image hea] invalid operator
+	errmsg = 'attempt to delete a nonexistent image header keyword'
+	**** Error #151 on Line 121: [ errmsg = @'attempt t] invalid operator
+
+	Shortened the messages.  (10/30/89 SRo)
+
+sys/mkpkg
+	Reset XFLAGS to $(XSFLAGS) or $(XEFLAGS) for libsys and libex libraries
+	(need special compilation of all modules that are intended to go into
+	a shared library)  (10/30/89 SRo).
+
+sys/osb/mkpkg
+	Reset XFLAGS to $(XVFLAGS) for libvops.  (10/30/89 SRo)
+
+sys/plio/plp2l.gx
+sys/plio/plr2l.gx
+sys/plio/pllrop.x
+sys/plio/pllsten.x
+	f77 simply won't compile the likes of:
+
+	    ll_dst[op] = M_DH + -dv
+
+	changed to + (-dv).  (10/30/89 SRo)
+
+unix/mkpkg.sh
+	Reinstated Sun version of "if test" stuff; uncommented bsd version 
+	would not work; kept unexpectedly finding eof, apparently never getting
+	out of an if test.  Now automatically links bin to bin.$MACH (apo68k).
+	(10/31/89 SRo)
+
+unix/hlib/irafuser.csh
+unix/boot/bootlib/mkpkg.sh
+unix/boot/spp/rpp/ratlibc/mkpkg.sh
+unix/boot/spp/rpp/ratlibf/mkpkg.sh
+unix/boot/spp/rpp/rppfor/mkpkg.sh
+unix/os/mkpkg.sh
+	Execute ranlib only if $USE_RANLIB defined.  Defined USE_RANLIB in
+	irafuser.csh.  (10/31/89 SRo)
+
+[ New CC & FTN compilers:  cc v6.7, ftn v10.7 installed today on auriga. ]
+[ Successful bootstrap, good sign. ]
+[ Begin sysgen <Tue Oct 31 15:38:44 MST 1989>; end <Tue Oct 31 21:10:07 MST 1989>
+
+[ 294 compiler warnings in about 100 files:  no path to this statement.
+[ On inspection, these are due to "continue" statements inserted by the
+[ preprocessor that indeed have no path.  E.g. fio$fstati.f:
+
+		       goto 100
+	351         continue
+		 goto 111
+
+[ There is no reference to statement 351.  These should probably be checked
+[ out someday, but are harmless for now. ]
+
+sys/etc/main.x
+	Very interesting:  the new FTN compiler (called by f77) caught a
+	subroutine referenced as a function in module sys_redirect(), which
+	had been called as a subroutine in other modules in the same source
+	file.  The earlier version of ftn did not catch this (verified that
+	carefully).  In sys_redirect(), fredir() was declared and called
+	consistently as a function, so there is some global checking going on.
+	Removed the function declaration and the "junk" dummy return value,
+	and called fredir as subroutine.  (11/1/89 SRo)
+
+bin -> bin.apo68k
+	Created bin.apo68k, which I should have done prior to the sysgen,
+	and established the bin link to it.  (11/1/89 SRo)
+
+sys/mkpkg
+	Had to branch around '$omake zmain.c', which uses HSI_XF rather than
+	HSI_CF; the apollo cc compiler barfs when it sees the "-save" IN
+	HSI_XF.  (11/1/89 SRo)
+
+	    ( $ifeq (mach, apo68k)
+		!cc -c $HSI_CF zmain.c
+	    $else
+		$omake	  zmain.c
+	    $endif
+
+[ Ran hlib$install.  Couldn't find $host/x/saoimage/saoimage.e (install
+  script tacks on .e for gterm, imtool, also saoimage). ]
+
+unix/x/saoimage/mkpkg.sh
+	Added script for building an hsi task.  Executes MAKE within buttonlib
+	and main directory, renames saoimage to saoimage.e so that install will
+	find it, and deletes object files.  (11/2/89 SRo)
+
+unix/mkpkg.sh
+	Added branch for executing saoimage mkpkg.sh.  (11/2/89 SRo)
+
+noao/bin -
+noao/bin.vax -
+noao/bin.apo68k
+noao/bin -> bin.apo68k
+	Created directory & link, removed old bin link & bin.vax; started
+	noao update.  (11/7/89 SRo)
+
+lib/helpdb.mip -
+noao/lib/helpdb.mip -
+local/lib/helpdb.mip -
+	Deleted these files, which HELP complained were not helpdb files.
+	Should check to see why they got included in a wtar -o archive.
+	Ran MKHELPDB for lib, noao$lib, and local$lib.  (11/7/89 SRo)
+
+/bin/ranlib
+	Reinserted dummy ranlib function so as not to have to reedit saoimage
+	makefiles on each update.  WATCH OUT for assumptions about presence
+	of RANLIB when preparing final apollo distribution tape.  (11/9/89 SRo)
+
+noao
+	Relink failed with numerous bad-looking fatal ld errors, e.g.
+	    xc -z -/W0,-db -p noao x_proto.o libpkg.a -lxtools -liminterp
+		-lbev -lgsurfit -lncar -lgks -lds -o xx_proto.e
+	    ld warning: memory allocation failure on 7200-byte 'calloc' call
+	    ld fatal:  run is too large and complex
+	    HSI is compiled NOVOS
+
+unix
+noao
+	Did another bootstrap, VOS this time of course, followed by successful
+	relink of noao (previous problems were solved by booting auriga; also
+	had to clear off a lot of disk space; removed all domain f77 & cc
+	source examples plus all patch installation directories.  (11/9/89 SRo)
+
+[ bootstrap:  newly installed domain sr10.1.1.6 patches including system
+  libraries both needed by bootstrap executables, and possibly by the compilers
+  themselves. ]
+
+unix/mkpkg.sh
+	Disabled descent into x/saoimage to run mkpkg.sh; since not present
+	in sao archives, this poses too many update problems.  May just
+	execute make directly, but check later.  (11/15/89 SRo)
+
+unix/hlib/mkpkg.inc
+	Changed name of mkpkg.sf.apo68k to mkpkg.sf.APO68k to be like the
+	others, with caps.  (11/16/89 SRo)
+
+unix/hlib/mkpkg.sf.APO68k
+	Added ncarutil/conrec.f to special file list for compilation without
+	optimization.  This was generating a segmentation violation, which is
+	virtually impossible to track down with dbx, because in order to be
+	able to use dbx successfully the executable has to be compiled w/out
+	opt anyway... (11/16/89 SRo)
+
+unix/hlib/[dir]1mach.f
+	!! Replaced with the IEEE versions from the Sun.  I had started with
+	the VAX versions from carina, and some of the NCAR tasks were doing
+	weird things, like hanging up, requiring processes to be killed 
+	(sometimes kill & ps would show the process gone, but its window would
+	still be present and would generate an error when attempting to logout;
+	but there was no way to kill it other than rebooting [which reported
+	some weird stuff when it tried to shut down all processes]).  This 
+	probably means floating point exception handling needs to be further
+	investigated...  (11/20/89 SRo)
+
+[ Deleted libncar.a and libnspp.a, and started another sysgen.  12/1/89 SRo]
+
+unix/hlib/mkpkg.inc
+	added -cpu,3000 flag & did a complete system recompile.  An
+	Apollo engineer told me that due to a bug, the MC68882 was
+	*not* being used without this flag, even though MC68030 is
+	the default architecture for compilation.  Things seemed to work,
+	no compiler errors.  (2/5/90 SRo)
+
+unix/hlib/mkpkg.inc
+	Same with -cpu,FPA1 for the fpa.  No fpa executable would run, getting
+	various FPE fatal errors.  Discovered that NEITHER DBX NOR DDE ARE
+	CAPABLE OF DISASSEMBLING FLOATING POINT INSTRUCTIONS (either 68882
+	or fpa)!  The only way to tell what floating point hardware is actually
+	being used is by timing tests, or if you trust it, there is a very
+	verbose native compiler listing you can generate with "-W0,-lst" (not
+	of course usable as input to ASM; and the -S options are not supported).
+	I observed that even simple f77 fp statements generated FPE's, decided
+	I had a bad FPA1 board (finally got a diagnostic to run and confirm
+	this).  (2/6/90 SRo)
+
+unix/hlib/mkpkg.inc
+	Back to 68882 version with -/W0,-cpu,3000.  (2/6/90 SRo)
+
+	    [ hiatus due to illness ]
+
+Note:
+unix/os/zoscmd.c?	[ no modification yet ]
+	the numerous "ioctl: Not a typewriter" messages coming
+	out in the spoolfile happen whenever the kernel routine "zoscmd" is
+	executed by a process that has stdout/stderr redirected.  E.g. with
+	the following mkpkg file:
+
+	    mkall:
+		    !(date)
+		    ;
+
+	% mkpkg >& sp 			generates:
+
+	    !date
+	    ioctl: Not a typewriter
+	    Mon Feb 26 11:27:39 MST 1990
+	
+	The ioctl message only comes out if the parent process' i/o is
+	redirected.  NOTE:  get same message when using command 
+	":r!grep something file" from interactive vi!  (It does get 
+	into the read buffer, too.)  (2/26/90)
+
+unix/boot/spp/mkxc.sh
+	Replaced with version using $HSI_CF (noted in v2.9 notes file).
+	(2/26/90 SRo)
+
+unix/hlib/irafuser.csh
+	Changed -db to -dbs for HSI_CF.  (2/26/90 SRo)
+
+[ Unable to use DDE debugger on kernel routines (system is currently 
+  set up for source-level debugging), so ran another bootstrap.  Got
+  the following messages, new at 10.2, for the bootstrao executables 
+  only:
+
+    ld warning: inputs are PIC, output is ABS (use -r -a to generate
+    PIC output)
+]
+
+unix/hlib/mach.h
+	Changed BYTE_SWAPs to NO (forgot to do this when I re-did
+	the 2.8 port from carina!).  Cause of the irafks-crash bug.
+	(2/28/90 SRo)
+
+unix/hlib/libc/spp.h
+	Placed Apollo machine epsilons from osb$zzeps.f for [soft,fpa]
+	into apollo ifdef.  (2/28/90 SRo)
+
+[ New bootstrap ]
+
+unix/hlib/mach.h
+	Changed machine epsilons to accord with those from zzeps.
+	(3/26/90 SRo)
+
+unix/hlib/libc/libc.h
+	Added conditional #ifdef ATTRIBUTE apollo-specific construct:
+
+	    int  FIOCOM[] #attribute[section(FIOCOM)];
+	    char MEMCOM[] #attribute[section(MEMCOM)];
+
+	This enables routines including libc.h to be compiled either with
+	or without -nbss without generating error or warning.  (3/26/90 SRo)
+
+unix/hlib/mkpkg.sf.APO68K
+	Added -DATTRIBUTE to XNBSS declaration.  (3/26/90 SRo)
+
+*****	Investigate the effect on both -nbss and (not -nbss) compilation
+	using -DATTRIBUTE or not.  See if it affects producing PIC code or
+	not, document whether get compilation warnings, make sure code
+	runs.  pkg$cl/opcodes.c:  should this be -nbss?  especially now
+	with #attribute?
+

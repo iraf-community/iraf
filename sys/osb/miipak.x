@@ -11,6 +11,11 @@ format provides for three machine independent integer datatypes:
     MII_SHORT	16 bit twos complement signed integer
     MII_LONG	32 bit twos complement signed integer
 
+plus, more recently, two IEEE floating point formats:
+
+    MII_REAL	32 bit IEEE floating point
+    MII_DOUBLE	64 bit IEEE floating point
+
 The MII datatypes are the same as are used in the FITS transportable image
 format.  In the case of the short and long integers, the most significant
 bytes of an integer are given first.
@@ -20,7 +25,8 @@ MII format and the SPP format.  The latter format, of course, is potentially
 quite machine dependent.  The implementation given here assumes that the
 SPP datatypes include 16 bit and 32 bit twos complement integers; the ordering
 of the bytes within these integer formats is described by the machine
-constants BYTE_SWAP2 and BYTE_SWAP4.
+constants BYTE_SWAP2 and BYTE_SWAP4.  Byte swapping for the IEEE floating
+formats is defined by the machine constants IEEE_SWAP4 and IEEE_SWAP8.
 .endhelp ______________________________________________________________________
 
 
@@ -29,11 +35,11 @@ constants BYTE_SWAP2 and BYTE_SWAP4.
 
 procedure miipak (spp, mii, nelems, spp_datatype, mii_datatype)
 
-int	spp[ARB]		# input array of SPP integers
-int	mii[ARB]		# output MII format array
-int	nelems			# number of integers to be converted
-int	spp_datatype		# SPP datatype code
-int	mii_datatype		# MII datatype code
+int	spp[ARB]		#I input array of SPP integers
+int	mii[ARB]		#O output MII format array
+int	nelems			#I number of integers to be converted
+int	spp_datatype		#I SPP datatype code
+int	mii_datatype		#I MII datatype code
 
 begin
 	switch (mii_datatype) {
@@ -43,5 +49,9 @@ begin
 	    call miipak16 (spp, mii, nelems, spp_datatype)
 	case MII_LONG:
 	    call miipak32 (spp, mii, nelems, spp_datatype)
+	case MII_REAL:
+	    call miipakr (spp, mii, nelems, spp_datatype)
+	case MII_DOUBLE:
+	    call miipakd (spp, mii, nelems, spp_datatype)
 	}
 end

@@ -33,3 +33,4 @@ define	AP_DNORM	Memr[$1+19]	# Normalization for incremental inten
 define	AP_RPFWHM	Memr[$1+20]	# Fitted profile FWHM
 define	AP_RPNDATA	Memi[$1+21]	# Number of data points
 define	AP_RPNDATAREJ	Memi[$1+22]	# Number of points rejected from fit
+define	AP_RPNBAD	Memi[$1+23]	# Number of bad pixel points

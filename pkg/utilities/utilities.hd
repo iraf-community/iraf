@@ -8,7 +8,7 @@ detab		hlp=doc$detab.hlp,	src=detab.x
 entab		hlp=doc$entab.hlp,	src=entab.x
 lcase		hlp=doc$lcase.hlp,	src=lcase.x
 polyfit		hlp=doc$polyfit.hlp,	src=t_polyfit.x
-revisions	hlp=Revisions
+revisions	sys=Revisions
 split		hlp=doc$split.hlp,	src=split.x
 translit	hlp=doc$translit.hlp,	src=tranlist.x
 ucase		hlp=doc$ucase.hlp,	src=ucase.x

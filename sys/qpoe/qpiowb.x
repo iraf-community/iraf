@@ -115,6 +115,7 @@ begin
 	    # Increment the total event count.
 	    IO_NEVENTS(io) = max (IO_NEVENTS(io), IO_EVI(io) - 1)
 	    S_NELEM(IO_PSYM(io)) = IO_NEVENTS(io)
+	    QP_MODIFIED(IO_QP(io)) = YES
 	}
 
 	# Set up the buffer for the new bucket.

@@ -34,22 +34,19 @@ Coordinates can be printed in either GKI (0 - 32767) or NDC (0.0 - 1.0)
 units.
 .ih
 EXAMPLES
+1. Decode the metacode instructions in file crtpict.mc in verbose mode.
 
-Decode the metacode instructions in file crtpict.mc in verbose mode.
-.nf
-	cl> gkidecode crtpict.mc verbose+
+    cl> gkidecode crtpict.mc verbose+
 
-.fi
-Print a shorter listing of the same file on the versatec.
-.nf
-	cl> gkidecode crtpict.mc | lprint dev=ver
+2. Print a shorter listing of the same file on the versatec.
 
-.fi
-Decode the third frame in metacode file "oned.mc".
-.nf
-	cl> gkiextract oned.mc 3 | gkidecode
-.fi
+    cl> gkidecode crtpict.mc | lprint dev=ver
+
+3. Decode the third frame in metacode file "oned.mc".
+
+    cl> gkiextract oned.mc 3 | gkidecode
 .ih
 SEE ALSO
 stdgraph stdplot 
 .endhelp
+elp

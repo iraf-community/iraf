@@ -4,69 +4,147 @@ include	<gset.h>
 include	<mach.h>
 include	<imhdr.h>
 
-# T_PCOLS --  Plot the average of a range of columns from an image.
+# T_PCOLS -- Plot the average of a range of columns from an image.
 
 procedure t_pcols ()
 
-bool	pointmode
-pointer	im, gp, x_vec, y_vec
-char	image[SZ_FNAME], device[SZ_FNAME], marker[SZ_FNAME], section[SZ_FNAME]
-char	xlabel[SZ_LINE], ylabel[SZ_LINE], title[SZ_LINE], suffix[SZ_FNAME]
-int	mode, col1, col2, nxvals, nyvals, imark, ndim
-real	zmin, zmax, szm, tol
-real	wx1, wx2, wy1, wy2, vx1, vx2, vy1, vy2
-pointer	immap(), gopen()
-bool	clgetb(), streq()
-int	clgeti(), btoi()
-real	clgetr()
+real	zmin, zmax
+pointer	image, section
+pointer	im, sp, x_vec, y_vec
+int	col1, col2, ncols, nlines, ndim
+pointer	immap()
+int	clgeti()
 
 begin
-	# Open image and graphics stream
-	call clgstr ("image", image, SZ_FNAME)
-	im = immap (image, READ_ONLY, 0)
+	call smark (sp)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
 
-	# Watch out for one dimensional images
+	# Open image and graphics stream.
+	call clgstr ("image", Memc[image], SZ_FNAME)
+	im = immap (Memc[image], READ_ONLY, 0)
+
+	# Watch out for one dimensional images.
 	ndim = IM_NDIM(im)
 	if (ndim == 1)
 	    call error (0, "One dimensional image - use prow")
-	else
-	    nxvals = IM_LEN(im, 1)
-	call imunmap (im)
+	
+	ncols  = IM_LEN(im,1)
+	nlines = IM_LEN(im,2)
 
-	call clputi ("col1.p_maximum", nxvals)
-	call clputi ("col2.p_maximum", nxvals)
+	# Get the columns numbers.
+	call clputi ("col1.p_maximum", ncols)
+	call clputi ("col2.p_maximum", ncols)
 	col1 = clgeti ("col1")
 	col2 = clgeti ("col2")
+	if (min(col1,col2) < 1 || max(col1,col2) > ncols) {
+	    call imunmap (im)
+	    call error (2, "column index references outside image")
+	}
 
-	call pc_section_name (image, col1, col2, section)
-	im = immap (section, READ_ONLY, 0)
-	nyvals = IM_LEN(im, 2)
+	# Now get the vector.
+	call malloc (x_vec, nlines, TY_REAL)
+	call malloc (y_vec, nlines, TY_REAL)
+	call plt_gcols (im, min(col1,col2), max(col1,col2),
+	    Memr[x_vec], Memr[y_vec], zmin, zmax)
 
-	call clgstr ("device", device, SZ_FNAME)
+	# Now draw the vector.
+	call pc_draw_vector (Memc[image], Memr[x_vec], Memr[y_vec], nlines, 
+	    zmin, zmax, col1, col2, true)
+
+	# Close graphics and image.
+	call mfree (x_vec, TY_REAL) 
+	call mfree (y_vec, TY_REAL) 
+	call imunmap (im) 
+	call sfree (sp) 
+end
+
+
+# PLT_GCOLS -- Get average of columns from an image.  Two vectors are
+# returned, one the data values, the other a vector of row ordinals.
+# Also the min and max of the data vector are calculated and returned.
+ 
+procedure plt_gcols (im, col1, col2, x_vector, y_vector, zmin, zmax)
+ 
+pointer im              # Pointer to image header
+int     col1            # First column to extract
+int     col2            # Last column to extract
+real    x_vector[ARB]   # The row ordinal values (returned)
+real    y_vector[ARB]   # The column data values (returned)
+real    zmin, zmax      # Minimum and maximum data values (returned)
+ 
+int     i, nrows, navg
+errchk  imgl2r, asumr, alimr
+pointer off, imgl2r()
+real    asumr()
+ 
+begin
+        # Fill x and y arrays.
+        nrows = IM_LEN(im,2)
+        navg = col2 - col1 + 1
+ 
+        do i = 1, nrows {
+            x_vector[i] = real(i)
+            off = imgl2r (im, i)
+            y_vector[i] = asumr (Memr[off+col1-1], navg) / real (navg)
+        }
+ 
+        # Find min and max values in y array.
+        call alimr (y_vector, nrows, zmin, zmax)
+end
+
+
+# PC_DRAW_VECTOR - Draw the projected vector to the screen.
+
+procedure pc_draw_vector (image,
+	xvec, yvec, nlines, zmin, zmax, col1, col2, pcols)
+
+char	image[SZ_FNAME]				#I Image name
+real	xvec[nlines], yvec[nlines]		#I Vectors to be plot
+int	nlines					#I Npts in vector
+real	zmin, zmax				#I Vector min max
+int	col1, col2				#I Selected columns
+bool	pcols					#I Is task PCOLS? (y/n)
+
+pointer	sp, gp
+pointer	device, marker, xlabel, ylabel, title, suffix
+real	wx1, wx2, wy1, wy2, vx1, vx2, vy1, vy2, szm, tol
+int	mode, imark
+bool	pointmode
+
+pointer	gopen()
+real	clgetr()
+bool	clgetb(), streq()
+int	btoi(), clgeti()
+
+begin
+	call smark (sp)
+	call salloc (device, SZ_FNAME, TY_CHAR)
+	call salloc (marker, SZ_FNAME, TY_CHAR)
+	call salloc (xlabel, SZ_LINE,  TY_CHAR)
+	call salloc (ylabel, SZ_LINE,  TY_CHAR)
+	call salloc (title,  SZ_LINE,  TY_CHAR)
+	call salloc (suffix, SZ_FNAME, TY_CHAR)
+
+	call clgstr ("device", Memc[device], SZ_FNAME)
 	mode = NEW_FILE
 	if (clgetb ("append"))
 	    mode = APPEND
 
-	gp = gopen (device, mode, STDGRAPH)
-	call malloc (x_vec, nyvals, TY_REAL)
-	call malloc (y_vec, nyvals, TY_REAL)
-
-	call get_cols (im, Memr[x_vec], Memr[y_vec], zmin, zmax)
-
+	gp = gopen (Memc[device], mode, STDGRAPH)
 	tol = 10. * EPSILONR
 
 	if (mode != APPEND) {
-
-	    # Establish window
+	    # Establish window.
 	    wx1 = clgetr ("wx1")
 	    wx2 = clgetr ("wx2")
 	    wy1 = clgetr ("wy1")
 	    wy2 = clgetr ("wy2")
 
-	    # Set window limits to defaults if not specified by user
+	    # Set window limits to defaults if not specified by user.
 	    if ((wx2 - wx1) < tol) {
 	        wx1 = 1.0
-	        wx2 = real (nyvals)
+	        wx2 = real (nlines)
 	    }
 
 	    if ((wy2 - wy1) < tol) {
@@ -76,32 +154,37 @@ begin
 
 	    call gswind (gp, wx1, wx2, wy1, wy2)
     
-	    # Establish viewport
+	    # Establish viewport.
 	    vx1 = clgetr ("vx1")
 	    vx2 = clgetr ("vx2")
 	    vy1 = clgetr ("vy1")
 	    vy2 = clgetr ("vy2")
 
-	    # Set viewport only if specified by user
-	    if ((vx2 - vx1) > tol && (vy2 - vy1) > tol)
+	    # Set viewport only if specified by user.
+	    if ((vx2 - vx1) > tol && (vy2 - vy1) > tol) {
 	        call gsview (gp, vx1, vx2, vy1, vy2)
-
-	    else {
+	    } else {
 		if (!clgetb ("fill"))
 		    call gseti (gp, G_ASPECT, 1)
 	    }
     
-	    call clgstr ("xlabel", xlabel, SZ_LINE)
-	    call clgstr ("ylabel", ylabel, SZ_LINE)
-	    call clgstr ("title",  title,  SZ_LINE)
-	    if (streq (title, "imtitle")) {
-	        call strcpy (image, title, SZ_FNAME)
-		call sprintf (suffix, SZ_FNAME, ": columns %d to %d")
-		    call pargi (col1)
-		    call pargi (col2)
-	        call strcat (suffix, title, SZ_FNAME)
+	    call clgstr ("xlabel", Memc[xlabel], SZ_LINE)
+	    call clgstr ("ylabel", Memc[ylabel], SZ_LINE)
+	    call clgstr ("title",  Memc[title],  SZ_LINE)
+
+	    if (streq (Memc[title], "imtitle")) {
+	        call strcpy (image, Memc[title], SZ_LINE)
+		if (pcols) {
+		    call sprintf (Memc[suffix], SZ_FNAME, ": columns %d to %d")
+		        call pargi (col1)
+		        call pargi (col2)
+		} else {
+		    call sprintf (Memc[suffix], SZ_FNAME, ": column %d")
+		        call pargi (col1)
+		}
+	        call strcat (Memc[suffix], Memc[title], SZ_LINE)
 	    }
-    
+
 	    call gseti (gp, G_XNMAJOR, clgeti ("majrx"))
 	    call gseti (gp, G_XNMINOR, clgeti ("minrx"))
 	    call gseti (gp, G_YNMAJOR, clgeti ("majry"))
@@ -114,111 +197,24 @@ begin
 	    if (clgetb ("logy"))
 	        call gseti (gp, G_YTRAN, GW_LOG)
 
-	    # Draw axes using all this information
-	    call glabax (gp, title, xlabel, ylabel)
+	    # Draw axes using all this information.
+	    call glabax (gp, Memc[title], Memc[xlabel], Memc[ylabel])
 	}
     
 	pointmode = clgetb ("pointmode")
         if (pointmode) {
-            call clgstr ("marker", marker, SZ_FNAME)
-            szm= clgetr ("szmarker")
-            call init_marker (marker, imark)
+            call clgstr ("marker", Memc[marker], SZ_FNAME)
+            szm = clgetr ("szmarker")
+            call init_marker (Memc[marker], imark)
         }
 
-        # Now to actually draw the plot
+        # Now to actually draw the plot.
         if (pointmode)
-            call gpmark (gp, Memr[x_vec], Memr[y_vec], nyvals, imark, szm, szm)
+            call gpmark (gp, xvec, yvec, nlines, imark, szm, szm)
         else
-            call gpline (gp, Memr[x_vec], Memr[y_vec], nyvals)
+            call gpline (gp, xvec, yvec, nlines)
        
-        # Close graphics and image
-	call mfree (x_vec, TY_REAL)
-	call mfree (y_vec, TY_REAL)
+	call gflush (gp)
         call gclose (gp)
-	call imunmap (im)
-end
-
-
-# GET_COLS -- Average image columns between given limits and return data
-# vectors of row numbers and average pixel value.  Also returned is
-# the min and max value in the data vector.
-
-procedure get_cols (im, x_vector, y_vector, zmin, zmax)
-
-pointer	im		# Pointer to image section header
-real	x_vector[ARB]	# Data values in x direction (returned)
-real	y_vector[ARB]	# Data values in y direction (returned)
-real	zmin, zmax	# Minimum and maximum values in y_vector (returned)
-
-int	i, nrows
-
-begin
-	nrows = IM_LEN(im, 2)
-	call im_projection (im, y_vector, nrows, 2)
-
-	# Now fill x_vector as well as find min,max of y_vector
-	do i = 1, nrows 
-	    x_vector[i] = real(i)
-
-	call alimr (y_vector, nrows, zmin, zmax)
-end
-
-
-# PC_SECTION_NAME -- construct section name from image name and rows to be
-# averaged.
-
-procedure pc_section_name (image, col1, col2, section)
-
-char	image[SZ_FNAME]		# Original image name
-int	col1			# First columns to average
-int	col2			# Last column to average
-char	section[SZ_FNAME]	# Section name to be returned
-
-int	ip, op, ndim
-int	stridxs()
-pointer	im, immap()
-
-begin
-	# See if this is a one dimensional image
-	im = immap (image, READ_ONLY, 0)
-	ndim = IM_NDIM(im)
-	if (ndim == 1)  {
-	    call pr_section_name (image, col1, col2, section)
-	    call imunmap (im)
-	    return
-	}
-
-	# Construct name of image section to be compressed
-	if (stridxs ("[", image) == 0) {
-	    # Not an image section.  Just append column information.
-	    call sprintf (section, SZ_FNAME, "%s[%d:%d,*]") {
-	        call pargstr (image)
-	        call pargi (col1)
-	        call pargi (col2)
-	    }
-	} else {
-	    # More complicated - image is already an image section
-	    ip = 1
-	    op = 1
-	    # First, copy original name through left bracket
-	    for (ip = 1; image[ip] != '[' && image[ip] != EOS; ip = ip + 1) {
-		section[op] = image[ip]
-		op = op + 1
-	    }
-
-	    # Append bracket and column section notation to new image name
-	    ip = ip + 1
-	    call sprintf (section[op], SZ_FNAME, "[%d:%d,")
-		call pargi (col1)
-		call pargi (col2)
-
-	    # Find first comma or closing ']' in original image name
-	    for (; image[ip] != ',' && image[ip] != ']' && image[ip] != EOS; 
-		ip = ip + 1) 
-		;
-	    ip = ip + 1
-	    
-	    # Append remainder of original name to new name
-	    call strcat (image[ip], section, SZ_LINE)
-	}
+	call sfree (sp)
 end

@@ -16,8 +16,8 @@ char	image[SZ_FNAME]
 char	rec_numbers[SZ_LINE], ofile[SZ_FNAME]
 int	root, nfiles, start_rec, subset
 int	nrecs, records[3, MAX_RANGES]
-int	npts, nrem, expo, ifile, tog
-real	wtsum
+int	npts, nrem, ifile, tog
+real	expo, wtsum
 pointer	ids[2], sp, sp1, im[2], cur_pix, sp_sum
 
 int	clpopni(), clplen(), clgeti()

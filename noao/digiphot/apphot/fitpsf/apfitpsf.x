@@ -5,7 +5,6 @@ include "../lib/display.h"
 include "../lib/fitpsf.h"
 
 define	HELPFILE	"apphot$fitpsf/fitpsf.key"
-define	SHELPFILE	"apphot$fitpsf/sfitpsf.key"
 
 # APFITPSF -- Procedure to fit a functional form to the PSF for a list of
 # objects in interactive mode.
@@ -47,12 +46,6 @@ begin
 	# Initialize the sequencing.
 	newlist = NO
 	ltid = 0
-
-	# Print a short header.
-	if (id != NULL)
-	    call gpagefile (id, SHELPFILE, "")
-	else if (interactive == YES)
-	    call pagefile (SHELPFILE, "")
 
 	# Loop over the cursor commands.
 	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
@@ -157,7 +150,7 @@ begin
 			    call appfmark (ap, id, apstati (ap, MKPSFBOX))
 		    	    if (stid == 1)
 				call ap_param (ap, out, "fitpsf")
-		            call ap_pdtpsf (ap, out, stid, ltid, ier)
+		            call ap_ppsf (ap, out, stid, ltid, ier)
 		            stid = stid + 1
 		            newbuf = NO
 			    newfit = NO
@@ -183,7 +176,7 @@ begin
 
 	    # Verify the parameters interactively.
 	    case 'v':
-		call ap_pfconfirm (ap)
+		call ap_pfconfirm (ap, out, stid)
 
 	    # Interactively set up fitpsf parameters.
 	    case 'i':
@@ -197,20 +190,8 @@ begin
 	    case 'w':
 		call ap_ppfpars (ap)
 
-	    # Fit the psf.
-	    case 'f':
-	        if (newbuf == YES)
-	            ier = apsffit (ap, im, wx, wy)
-	        else if (newfit == YES)
-	            ier = apsfrefit (ap)
-		if (interactive == YES)
-	            call ap_qppsf (ap, ier)
-		call appfmark (ap, id, apstati (ap, MKPSFBOX))
-		newbuf = NO
-		newfit = NO
-
 	    # Fit the PSF and save the results.
-	    case ' ':
+	    case 'f',  ' ':
 	        if (newbuf == YES)
 	            ier = apsffit (ap, im, wx, wy)
 	        else if (newfit == YES)
@@ -218,15 +199,18 @@ begin
 		if (interactive == YES)
 		    call ap_qppsf (ap, ier)
 		call appfmark (ap, id, apstati (ap, MKPSFBOX))
-		if (stid == 1)
-		    call ap_param (ap, out, "fitpsf")
-		if (newlist == YES)
-		    call ap_pdtpsf (ap, out, stid, ltid, ier)
-		else
-		    call ap_pdtpsf (ap, out, stid, 0, ier)
-		stid = stid + 1
 		newbuf = NO
 		newfit = NO
+
+		if (key == ' ') {
+		    if (stid == 1)
+		        call ap_param (ap, out, "fitpsf")
+		    if (newlist == YES)
+		        call ap_ppsf (ap, out, stid, ltid, ier)
+		    else
+		        call ap_ppsf (ap, out, stid, 0, ier)
+		    stid = stid + 1
+		}
 
 	    # Process the remainder of the coordinate list.
 	    case 'l':

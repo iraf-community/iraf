@@ -4,9 +4,18 @@ include	<mach.h>
 include	<imhdr.h>
 include	<gset.h>
 
-define	HGM_TYPES	"|line|box|"
-define	HGM_LINE	1		# line vectors for histogram plot
-define	HGM_BOX		2		# box vectors for histogram plot
+define	SZ_CHOICE	18
+
+define	HIST_TYPES	"|normal|cumulative|difference|second_difference|"
+define	NORMAL		1
+define	CUMULATIVE	2
+define	DIFFERENCE	3
+define	SECOND_DIFF	4
+
+define	PLOT_TYPES	"|line|box|"
+define	LINE		1
+define	BOX		2
+
 define	SZ_TITLE	512		# plot title buffer
 
 # IMHISTOGRAM -- Compute and plot the histogram of an image.
@@ -15,7 +24,7 @@ procedure t_imhistogram()
 
 long	v[IM_MAXDIM]
 real	z1, z2, dz, z1temp, z2temp
-int	npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, maxch
+int	npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, maxch, histtype
 pointer gp, im, sp, hgm, hgmr, buf, image, device, str, title, op
 
 real	clgetr()
@@ -27,6 +36,7 @@ bool	clgetb(), fp_equalr()
 begin
 	call smark (sp)
 	call salloc (image, SZ_LINE, TY_CHAR)
+	call salloc (str, SZ_CHOICE, TY_CHAR)
 
 	# Get the image name.
 	call clgstr ("image", Memc[image], SZ_LINE)
@@ -78,8 +88,8 @@ begin
 
 	# The extra bin counts the pixels that equal z2 and shifts the
 	# remaining bins to evenly cover the interval [z1,z2].
-	# Note that real numbers could be handled better - perhaps
-	# adjust z2 upward by ~ EPSILONR (in ahgm itself).
+	# Real numbers could be handled better - perhaps adjust z2
+	# upward by ~ EPSILONR (in ahgm itself).
 
 	nbins1 = nbins + 1
 
@@ -124,10 +134,32 @@ begin
 	if (clgetb ("top_closed"))
 	    Memi[hgm+nbins-1] = Memi[hgm+nbins-1] + Memi[hgm+nbins1-1]
 
+	dz = (z2 - z1) / real (nbins)
+
+	histtype = clgwrd ("hist_type", Memc[str], SZ_CHOICE, HIST_TYPES)
+
+	switch (histtype) {
+	case NORMAL:
+	    # do nothing
+	case CUMULATIVE:
+	    call ih_acumi (Memi[hgm], Memi[hgm], nbins)
+	case DIFFERENCE:
+	    call ih_amrgi (Memi[hgm], Memi[hgm], nbins)
+	    z1 = z1 + dz / 2.
+	    z2 = z2 - dz / 2.
+	    nbins = nbins - 1
+	case SECOND_DIFF:
+	    call ih_amrgi (Memi[hgm], Memi[hgm], nbins)
+	    call ih_amrgi (Memi[hgm], Memi[hgm], nbins-1)
+	    z1 = z1 + dz
+	    z2 = z2 - dz
+	    nbins = nbins - 2
+	default:
+	    call error (1, "bad switch 1")
+	}
+
 	# List or plot the histogram.  In list format, the bin value is the
 	# z value of the left side (start) of the bin.
-
-	dz = (z2 - z1) / real (nbins)
 
 	if (clgetb ("listout"))
 	    do i = 1, nbins {
@@ -138,7 +170,6 @@ begin
 	else {
 	    call salloc (device, SZ_FNAME, TY_CHAR)
 	    call salloc (title, SZ_TITLE, TY_CHAR)
-	    call salloc (str, SZ_LINE, TY_CHAR)
 	    call salloc (hgmr, nbins, TY_REAL)
 	    call achtir (Memi[hgm], Memr[hgmr], nbins)
 
@@ -158,18 +189,38 @@ begin
 
 	    # Format the remainder of the plot title.
 	    call sprintf (Memc[op], maxch,
-		"%s\nHistogram from z1=%g to z2=%g, nbins=%d")
+		"%s of %s = %s\nFrom z1=%g to z2=%g, nbins=%d, width=%g")
+		switch (histtype) {
+		case NORMAL:
+		    call pargstr ("Histogram")
+		case CUMULATIVE:
+		    call pargstr ("Cumulative histogram")
+		case DIFFERENCE:
+		    call pargstr ("Difference histogram")
+		case SECOND_DIFF:
+		    call pargstr ("Second difference histogram")
+		default:
+		    call error (1, "bad switch 3")
+		}
+
+		call pargstr (Memc[image])
 		call pargstr (IM_TITLE(im))
 		call pargr (z1)
 		call pargr (z2)
 		call pargi (nbins)
+		call pargr (dz)
 
 	    # Draw the plot.  Center the bins for plot_type=line.
 	    call glabax (gp, Memc[title], "", "")
-	    if (clgwrd ("plot_type", Memc[str], SZ_LINE, HGM_TYPES) == HGM_BOX)
-		call hgline (gp, Memr[hgmr], nbins, z1, z2)
-	    else
+
+	    switch (clgwrd ("plot_type", Memc[str], SZ_LINE, PLOT_TYPES)) {
+	    case LINE:
 		call gvline (gp, Memr[hgmr], nbins, z1 + dz/2., z2 - dz/2.)
+	    case BOX:
+		call hgline (gp, Memr[hgmr], nbins, z1, z2)
+	    default:
+		call error (1, "bad switch 2")
+	    }
 
 	    call gclose (gp)
 	}
@@ -209,4 +260,59 @@ begin
 	    # horizontal line
 	    call gadraw (gp, x + dx, y)
 	}
+end
+
+
+# These two routines are intended to be generic vops routines.  Only
+# the integer versions are included since that's all that's used here.
+
+# <NOT IMPLEMENTED!>  The operation is carried out in such a way that
+# the result is the same whether or not the output vector overlaps
+# (partially) the input vector.  The routines WILL work in place!
+
+# ACUM -- Compute a cumulative vector (generic).  Should b[1] be zero?
+
+procedure ih_acumi (a, b, npix)
+
+int	a[ARB], b[ARB]
+int	npix, i
+
+# int	npix, i, a_first, b_first
+
+begin
+#	call zlocva (a, a_first)
+#	call zlocva (b, b_first)
+#
+#	if (b_first <= a_first) {
+	    # Shouldn't use output arguments internally,
+	    # but no reason to use this routine unsafely.
+	    b[1] = a[1]
+	    do i = 2, npix
+		b[i] = b[i-1] + a[i]
+#	} else {
+	    # overlapping solution not implemented yet!
+#	}
+end
+
+
+# AMRG -- Compute a marginal (forward difference) vector (generic).
+
+procedure ih_amrgi (a, b, npix)
+
+int	a[ARB], b[ARB]
+int	npix, i
+
+# int	npix, i, a_first, b_first
+
+begin
+#	call zlocva (a, a_first)
+#	call zlocva (b, b_first)
+#
+#	if (b_first <= a_first) {
+	    do i = 1, npix-1
+		b[i] = a[i+1] - a[i]
+	    b[npix] = 0
+#	} else {
+	    # overlapping solution not implemented yet!
+#	}
 end

@@ -145,7 +145,8 @@ begin
 
 	    ff_dcflag = imgeti (ff, "dc-flag")
 	    ff_w0 = imgetr (ff, "crval1")
-	    ff_wpc = imgetr (ff, "cdelt1")
+	    iferr (ff_wpc = imgetr (ff, "cdelt1"))
+	        ff_wpc = imgetr (ff, "cd1_1")
 	    crpix = imgetr (ff, "crpix1")
 	    ff_w0 = ff_w0 + (1 - crpix) * ff_wpc
 	    ff_nw = IM_LEN (ff, 1)
@@ -163,11 +164,13 @@ begin
 	dcflag = imgeti (im, "dc-flag")
 	if (dispaxis == 1) {
 	    w0 = imgetr (im, "crval1")
-	    wpc = imgetr (im, "cdelt1")
+	    iferr (wpc = imgetr (im, "cdelt1"))
+	        wpc = imgetr (im, "cd1_1")
 	    crpix = imgetr (im, "crpix1")
 	} else {
 	    w0 = imgetr (im, "crval2")
-	    wpc = imgetr (im, "cdelt2")
+	    iferr (wpc = imgetr (im, "cdelt2"))
+	        wpc = imgetr (im, "cd2_2")
 	    crpix = imgetr (im, "crpix2")
 	}
 	w0 = w0 + (1 - crpix) * wpc

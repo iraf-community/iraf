@@ -1,4 +1,4 @@
-.help geotran Feb89 images
+.help geotran Feb90 images
 .ih
 NAME
 geotran -- geometrically transform a list of images
@@ -201,6 +201,14 @@ Xin, yin, xshift, yshift, xout and yout can be used to redefine the shift.
 Xmag, ymag and scangle reset the scale of the transformation. Xrotation and
 yrotation define the orientation of the tranformation.
 
+If the CL environment variable \fInomwcs\fR is "no" then the world
+coordinate system of the input image will be modified in the output image
+to reflect the effects of the \fIlinear\fR portion of the geometric
+transformation operation.
+Support does not yet exist in the IRAF world coordinate system interface
+for the higher order distortion corrections that GEOTRAN is capable of
+performing.
+
 .ih
 TIMINGS
 It requires approximately 70 and 290 cpu seconds to correct a 512 by 512
@@ -241,6 +249,10 @@ EXAMPLES
 .fi
 .ih
 BUGS
+Support does not yet exist in the IRAF world coordinate system interface
+for the higher order distortion corrections that GEOTRAN is capable of
+performing.
+
 .ih
 SEE ALSO
 imshift, magnify, rotate, imlintran, geotran, geomap

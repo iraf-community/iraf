@@ -30,6 +30,7 @@ libpkg.a:
 	apmapr.x
 	apmeds.x
 	apmoments.x
+	apinname.x
 	apoutname.x
 	apqsort.x
 	apqzero.x		<mach.h>
@@ -39,6 +40,7 @@ libpkg.a:
 	aptmpimage.x
 	aptopt.x		<math.h> <mach.h>
 	apversion.x
+	apwlimr.x
 	apwssqr.x
 	apxytor.x
 	;

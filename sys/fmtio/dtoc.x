@@ -18,6 +18,7 @@ int	width			# field width
 
 int	op
 double	val
+long	lval
 int	dtoc3(), ltoc(), gstrcpy()
 define	output {outstr[op]=$1;op=op+1;if(op>maxch)goto retry_}
 define	retry_ 91
@@ -52,19 +53,21 @@ retry_
 
 	if (fmt == FMT_HMS) {					# "...nn:..."
 	    val = val * 60.0D0
-	    if (long(val) < 10)
+	    lval = long (val)
+	    if (lval < 10)
 		output ('0')
-	    op = op + ltoc (long(val), outstr[op], maxch-op+1)
+	    op = op + ltoc (lval, outstr[op], maxch-op+1)
 	    output (':')
-	    val = val - long (val)
+	    val = val - lval
 	}
 
 	val = val * 60.0D0					# "...nn.nnn"
-	if (long(val) < 10)
+	lval = long (val)
+	if (lval < 10)
 	    output ('0')
 
 	if (decpl <= 0)						# no decimal?
-	    op = op + ltoc (long(val), outstr[op], maxch-op+1)
+	    op = op + ltoc (lval, outstr[op], maxch-op+1)
 	else
 	    op = op + dtoc3 (val, outstr[op], maxch-op+1, decpl, FMT_FIXED, ARB)
 

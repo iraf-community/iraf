@@ -22,12 +22,12 @@ include	"prc.com"
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (cmd, SZ_COMMAND, TY_CHAR)
 
 	# Make sure that the message string is non-null and is newline
 	# delimited.
 
-	op = cmd + gstrcpy (message, Memc[cmd], SZ_LINE)
+	op = cmd + gstrcpy (message, Memc[cmd], SZ_COMMAND)
 	if (op == cmd) {
 	    call sfree (sp)
 	    return

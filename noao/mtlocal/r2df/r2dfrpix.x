@@ -35,7 +35,7 @@ int	spp_type	# SPP data type to be returned
 
 int	r2dfrpix
 int	fd		# Input file descriptor
-char	buffer[ARB]	# Output buffer
+char	buffer[1]	# Output buffer
 int	npix		# Number of pixels to read
 
 int	ty_mii, ty_spp

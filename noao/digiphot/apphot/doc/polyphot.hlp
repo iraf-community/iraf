@@ -1,4 +1,4 @@
-.help polyphot May89 noao.digiphot.apphot
+.help polyphot Jan90 noao.digiphot.apphot
 .ih
 NAME
 polyphot -- compute fluxes inside a polygonal aperture
@@ -12,24 +12,38 @@ The list of images containing the objects to be measured.
 .le
 .ls datapars = ""
 The name of the file containing the data dependent parameters.
+If \fIdatapars\fR is null ("") then the default parameter set in the
+user's uparm directory is used.
+The critical parameters \fIfwhmpsf\fR, and \fIsigma\fR
+are located here.
 .le
 .ls centerpars = ""
 The name of the file containing the centering algorithm parameters.
+If \fIcenterpars\fR is null ("") then the default parameter set in the
+user's uparm directory is used.
+The critical parameters \fIcalgorithm\fR and \fIcbox\fR are located
+here.
 .le
 .ls fitskypars = ""
 The name of the file containing the sky fitting algorithm parameters.
+If \fIfitskypars\fR is null ("") then the default parameter set in the
+user's uparm directory is used.
+The critical parameters \fIsalgorithm\fR, \fIannulus\fR and \fIdannulus\fR
+are located here.
 .le
 .ls polypars = ""
 The name of the file containing the photometry parameters.
+If \fIpolypars\fR is null ("") then the default parameter set in the
+user's uparm directory is used.
 .le
 .ls coords = ""
 The list of text files containing the centers of the polygons
 to be measured, one center per line with the x and y coordinates in
-columns one and two respectively. The ";" character is column tells POLYPHOT
+columns one and two respectively. The ";" character in column 1 tells POLYPHOT
 to skip to the next polygon listed in \fIpolygons\fR. If \fIcoords\fR
 is the null string the coordinates of the polygon are read
 directly from \fIpolygons\fR otherwise the mean x and y value of the
-polygon is shifted to the coordinates listed in \fIcoords\fR.
+current polygon is shifted to the coordinates listed in \fIcoords\fR.
 .le
 .ls polygons = ""
 The file containing the x and y coordinates of the vertices of the polygons to
@@ -52,9 +66,7 @@ interactive mode a subset of the results is written to the standard output.
 The graphics device.
 .le
 .ls display = "stdimage"
-The display device. For the time being the image display has been set
-to stdgraph so that polyphot can work off of a contour plot in interactive
-mode.
+The display device.
 .le
 .ls cursor = ""
 The graphics cursor.
@@ -67,6 +79,9 @@ Interactive or batch mode.
 .le
 .ls verify = yes
 Verify the critical parameters in non interactive mode
+.le
+.ls update = yes
+Update the critical parameters in non interactive mode if verify is yes.
 .le
 .ls verbose = no
 Print messages in non interactive mode.
@@ -112,10 +127,12 @@ t	Fit sky in annulus around cursor position
 s	Fit sky in annulus around center of currently defined
 	polygon (cursor or list)
 p	Compute magnitude of current polygon using current sky
-f	Center, fit sky and compute magnitude of current polygon
-	(cursor or list)
-spbar	Center, fit sky, compute magnitude of current polygon
-	(cursor or list), output results
+h	Center, fit sky and compute mangitude of current polygon
+m	Center, fit sky and compute magnitude inside current polygon
+f	Shift current polygon to cursor or list position, center, fit sky,
+        and compute magnitude
+spbar	Shift current polygon to cursor or list position, center, fit sky,
+	compute magnitude, and output results
 q	Exit
 
 :m [n]	Move to next [nth] polygon in polygon list
@@ -143,6 +160,10 @@ Polyphot parameters are listed or set with the following commands.
 :epadu		[value]		Readout noise (electrons)
 :exposure	[string]	Exposure time image header keyword
 :itime		[value]		Integration time (time units)
+:airmass	[string]	Airmass image header keyword
+:xairmass	[value]		Airmass value (number)
+:filter		[string]	Filter image header keyword
+:ifilter	[string]	Filter id string
 :datamin	[value]		Minimum good data value (counts)
 :datamax	[value]		Maximum good data value (counts)
 
@@ -176,6 +197,29 @@ Polyphot parameters are listed or set with the following commands.
 
 :zmag		[value]		Zero point of magnitude scale
 :mkpolygon	[y/n]		Mark the polygon on the display
+
+
+The following commands are available from inside the interactive setup menu.
+
+                    Interactive POLYPHOT Setup Menu
+
+	v	Set and verify the critical POLYPHOT parameters
+		(f,c,s,a,d)
+
+	f	Set and verify the full width half maximum of the psf
+	h	Set and verify the centering threshold
+	s	Set and verify the standard deviation of the background
+	l	Set and verify the minimum good data value
+	u	Set and verify the maximum good data value
+
+	c	Set and verify the centering box width
+	n	Set and verify the cleaning radius
+	p	Set and verify the clipping radius
+
+	a	Set and verify the inner radius of the sky annulus
+	d	Set and verify the width of the sky annulus
+	g	Set and verify the region growing radius
+
 .fi
 
 .ih
@@ -219,6 +263,7 @@ following record is written
 	image  xinit  yinit  id  coords  lid
 	   xcenter  ycenter  xshift  yshift  xerr  yerr  cier error
 	   msky  stdev  sskew  nsky  nsrej  sier  serror
+	   itime  airmass  filter
 	   sum  area  mag  merr  pier  perr
 	   polygons  pid  oldxmean  oldymean  xmean  ymean  maxrad  nver
 	   xvertex  yvertex
@@ -226,7 +271,8 @@ following record is written
 
 Image and coords are the name of the image and coordinate file respectively.
 Id and lid are the sequence numbers of stars in the output and coordinate
-files respectively. Cier and cerror are the error code and accompanying
+files respectively. Cier and cerror are the centering error code and
+accompanying
 error message respectively.  Xinit, yinit, xcenter, ycenter, xshift, yshift,
 and xerr, yerr are self explanatory and output in pixel units. The sense of
 the xshift and yshift definitions is the following.
@@ -236,16 +282,19 @@ the xshift and yshift definitions is the following.
 	yshift = ycenter - yinit
 .fi
 
-Sier and serror are the error code and accompanying error message respectively.
-Msky, stdev and sskew are the sky value,
+Sier and serror are the sky fitting error code and accompanying error
+message respectively.  Msky, stdev and sskew are the sky value,
 standard deviation and skew respectively. Nsky and nsrej are the number of
-sky pixels and the number of sky pixels rejected respectively.
+sky pixels used and the number of sky pixels rejected respectively.
+
+Itime is the exposure time, airmass is self-evident, and filter is an id string
+identifying the filter used during the observation.
 
 Sum, and area are the total number of counts including sky in the polygonal
 aperture and the area of the aperture
 in square pixels. Mag and merr are the magnitude and error in the magnitude
-in the aperture. Pier and perror are photometry error code and accompanying
-error message.
+in the aperture after subtracting the sky value. Pier and perror are
+photometry error code and accompanying error message.
 
 Polygons and pid are the name of the polygons file and the polygon id
 respectively. Oldxmean, oldymean, xmean and ymean are the original and
@@ -258,6 +307,55 @@ centered polygonal aperture. Maxrad is the maximum
 distance of a polygon vertex from the average of the vertices. Nver, xvertex
 and yvertex are the number of vertices and the coordinates of the vertices
 of the polygonal aperture.
+
+.ih
+ERRORS
+
+If the object centering was error free then the field cier will be zero.
+Non-zero values of cier flag the following error conditions.
+
+.nf
+	0       # No error
+	21      # The centering box is off image
+	22      # The centering box is partially off the image
+	23      # The S/N ratio is low in the centering box
+	24      # There are two few points for a good fit
+	25      # The x or y center fit is singular
+	26      # The x or y center fit did not converge
+	27      # The x or y center shift is greater than maxshift
+	28      # There is bad data in the centering box
+.fi
+
+If all goes well during the sky fitting process then the error code sier
+will be 0. Non-zero values of sier flag the following error conditions.
+
+.nf
+	0       # No error
+	1       # There are no sky pixels in the sky annulus
+	2       # Sky annulus is partially off the image
+	3       # The histogram of sky pixels has no width
+	4       # The histogram of sky pixels is flat or concave
+	5       # There are too few points for a good sky fit
+	6       # The sky fit is singular
+	7       # The sky fit did not converge
+	8       # The graphics stream is undefined
+	9       # The file of sky values does not exist
+	10      # The sky file is at EOF
+	11      # Cannot read the sky value correctly
+	12      # The best fit parameter are non-physical
+.fi
+
+If no error occurs during the measurment of the magnitudes then pier is
+0. Non-zero values of pier flag the following error conditins.
+
+.nf
+	0       # No error
+	141	# The polygon is undefined
+	142     # The polygon is partially off the image
+	143     # The polygon is off the image
+	144     # The sky value is undefined
+	145     # There is bad data in the aperture
+.fi
 
 .ih
 EXAMPLES
@@ -277,23 +375,22 @@ using the interactive setup menu defined by the i key command.
 
 	ap> polyphot n4147 
 
-	... a short help page appears on the screen
+	... type ? to print a help page
 
 	... move image cursor to a star
 
 	... type i to enter the interactive setup menu
 	... use the image cursor to mark the vertices of the polygonal
-       	    aperture
-	... mark each vertex once, POLYPHOT will cose the polygon
+       	    aperture as directed
+	... mark each vertex only once, POLYPHOT will close the polygon
 	    for you
-
 	... enter maximum radius in pixels of the radial profile
 	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    sigma and threshold using the graphics cursor and the
-            stellar radial profile plot
+	    and sigma using the graphics cursor and the stellar radial
+	    profile plot, verifying each value
 	... typing <CR> leaves everything at the default value
 
-	... type the v key to verify the parameters
+	... type the v key to verify the parameters one more time
 
 	... type the w key to save the parameters in the parameter files
 
@@ -301,8 +398,7 @@ using the interactive setup menu defined by the i key command.
 	    the space bar
 
 	... a one line summary of the fitted parameters will appear on the
-	    standard output for each star measured and the polygons will
-	    be drawn on the display
+	    standard output for each star measured
 
 	... the output will appear in n4147.ply.1
 .fi
@@ -324,24 +420,24 @@ setup menu defined by the i key command.
 
 	ap> polyphot m92 display=stdgraph mkpoly+
 
-	... a short help page appears on the screen
+	... type ? to print a help page
 
 	... type :.read m92.plot1 to load the contour plot on the screen
 
 	... move graphics cursor to a star
 
 	... type i to enter the interactive setup menu
-	... use the graphics cursor to draw the polygonal aperture
+	... use the graphics cursor as directed  to draw the polygonal
+	    aperture
 	... mark each vertex only once, POLYPHOT will close the polygon
 	    for you
-
 	... enter maximum radius in pixels of the radial profile
 	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    sigma and threshold using the graphics cursor and the
-            stellar radial profile plot
+	    and sigma using the graphics cursor and the stellar radial
+	    profile plot, verifying each entry
 	... typing <CR> leaves everything at the default value
 
-	... type the v key to verify the parameters
+	... type the v key one more time to verify the parameters
 
 	... type the w key to save the parameters in the parameter files
 
@@ -357,7 +453,7 @@ setup menu defined by the i key command.
 	... full output will appear in the text file m92.ply.1 
 .fi
 
-2. Setup and run POLYPHOT interactively on a list of objects,
+3. Setup and run POLYPHOT interactively on a list of objects,
 using a contour plot as the image display and the parameters defined and
 saved in example 1.
 
@@ -380,7 +476,8 @@ saved in example 1.
 
 	ap> polymark m92 
 
-	... type g to draw a polygon on the display
+	... type g to draw a polygon on the display and follow the
+	    instructions 
 	... mark each vertex only once, POLYPHOT will cose the
 	    polygon for you
 
@@ -395,7 +492,7 @@ saved in example 1.
 	ap> polyphot m92 coords=m92.coo.1 poly=m92.ver.1 display=stdgraph \
 	    mkpoly+
 
-	... a short help menu appears
+	... type ? to print a help page
 
 	... type :.read m92.plot2 to read in the contour plot
 
@@ -404,13 +501,14 @@ saved in example 1.
 	... if everything looks okay type l to measure the rest of the stars 
 
 	... a one line summary of results will appear on the standard output
-	    for each star measured
+	    for each star measured and the aperture will be plotted on
+	    the contour plot
 
 	... the output will appear in m92.ply.2 ...
 .fi
 
-3. Run POLYPHOT in batch mode using the coordinate file and the previously
-saved parameters.  Verify the critical parameters.
+4. Run POLYPHOT in batch mode using a polygon and coordinate file and the
+previously saved parameters.  Verify the critical parameters.
 
 .nf
 	ap> polyphot m92 coords=m92.coo.1 poly=m92.ver.1 inter- verify+
@@ -421,10 +519,11 @@ saved parameters.  Verify the critical parameters.
 
 4. Run POLYPHOT in batch mode using the coordinate file and the previously
 saved parameters. The task can be submitted to the background by
-appending an ampersand to the command line listed below.
+appending an ampersand to the command line as shown below. Be sure to
+turn off the verify switch.
 
 .nf
-	ap> polyphot m92 coords=m92.coo.1 poly=m92.ver.1 inter- verify-
+	ap> polyphot m92 coords=m92.coo.1 poly=m92.ver.1 inter- verify- &
 
 	... output will appear in m92.ply.4
 .fi
@@ -438,10 +537,10 @@ must be listed or marked in order.
 
 When marking the polygon on the display it is not necessary to close
 the polygon. When the user types q to quit the marking the program
-will automatically close the trailing polygon.
+will automatically close the polygon.
 
 It is currently the responsibility of the user to make sure that the
-image displayed in the frame is the same as that specified by the image
+image displayed on the display is the same as that specified by the image
 parameter.
 
 Commands which draw to the image display are currently disabled.
@@ -449,11 +548,7 @@ The TVMARK task in the proto package  can be used to draw simple marks
 on the display. All the APPHOT marking commands will however function
 if a contour plot is used in lieu of the image display.
 
-Users should not be confused by the normally enabled markcur option in the
-SUN/IMTOOL setup window. This feature is under the control of the
-IMTOOL window and the APPHOT package has no control over it.
-
 .ih
 SEE ALSO
-phot, datapars, centerpars, fitskypars, polypars
+datapars,centerpars,fitskypars,polypars,qphot,phot,wphot
 .endhelp

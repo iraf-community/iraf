@@ -53,5 +53,8 @@ define	IE_YOOB		28
 define	IE_ZOOB		29
 define	IE_NAXIS	30
 define	IE_AXLEN	31
+define	IE_MKDIR	32
+define	IE_PFNNUNIQ	33
+define	IE_CLOBBER	34
 
 define	IE_EOF		99

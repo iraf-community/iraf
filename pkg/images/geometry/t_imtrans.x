@@ -22,10 +22,12 @@ char	image2[SZ_FNAME]			# Output image name
 char	imtemp[SZ_FNAME]			# Temporary file
 
 int	list1, list2
-pointer	im1, im2
+pointer	im1, im2, mw
+real	ltv[2], ltm[2,2]
 
+bool	envgetb()
 int	clgeti(), imtopen(), imtgetim(), imtlen()
-pointer	immap()
+pointer	immap(), mw_openim()
 
 begin
 	# Get input and output image template lists and the size of
@@ -57,6 +59,16 @@ begin
 
 	    # Do the transpose.
 	    call imtranspose (im1, im2, len_blk)
+
+	    # Update the image WCS to reflect the shift.
+	    if (!envgetb ("nomwcs")) {
+		mw = mw_openim (im1)
+		ltv[1] = 0.0; ltv[2] = 0.0
+		ltm[1,1] = 0.0; ltm[2,1] = 1.0; ltm[1,2] = 1.0; ltm[2,2] = 0.0
+		call mw_sltermr (mw, ltm, ltv, 2)
+		call mw_saveim (mw, im2)
+		call mw_close (mw)
+	    }
 
 	    # Unmap the input and output images.
 	    call imunmap (im1)

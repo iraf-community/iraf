@@ -26,13 +26,15 @@ int	maskval			#O receives the mask value of the events
 int	maxev			#I max events out
 int	o_nev			#O same as function value (nev_out|EOF)
 
-bool	useindex, lineio, bbused, rmused
-pointer	pl, rl, rp, bp, ex, ev, op, bbmask
 int	x1, x2, y1, y2, xs, xe, ys, ye, x, y
-int	v[NDIM], szs_event, mval, nev, npix, off, evi, evtop, temp, i
+pointer	pl, rl, rp, bp, ex, ev, bbmask, bb_bufp
+bool	useindex, lineio, bbused, rmused, nodata
+int	bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj
+int	v[NDIM], szs_event, mval, nev, evi, evtop, temp, i
 
-int	qpio_rbucket(), qpex_evaluate(), btoi()
+pointer	plr_open()
 bool	pl_linenotempty(), pl_sectnotempty()
+int	qpio_rbucket(), qpex_evaluate(), btoi(), plr_getpix()
 
 define	swap {temp=$1;$1=$2;$2=temp}
 define	putevent_  91
@@ -80,17 +82,25 @@ begin
 	    lineio = (IO_VS(io,1) == 1 && IO_VE(io,1) == IO_NCOLS(io))
 	    bbused = (!lineio || IO_VS(io,2) > 1 || IO_VE(io,2) < IO_NLINES(io))
 
-	    # Determine if region mask data is to be used.  This is the case
-	    # only if a region mask is defined, and it is nonzero within the
-	    # given bounding box.
+	    # Determine if region mask data is to be used and if there is any
+	    # data to be read.
 
+	    nodata = (IO_NEVENTS(io) <= 0)
 	    rmused = false
+
 	    if (pl != NULL)
 		if (pl_sectnotempty (pl, IO_VS(io,1), IO_VE(io,1), NDIM))
 		    rmused = true
+		else
+		    nodata = true
 
 	    # Select the optimal type of i/o to be used for extraction.
-	    if (bbused || rmused) {
+	    if (nodata) {
+		IO_IOTYPE(io) = NoDATA_NoAREA
+		useindex = false
+		bbused = false
+
+	    } else if (bbused || rmused) {
 		if (useindex)
 		    IO_IOTYPE(io) = INDEX_RMorBB
 		else
@@ -119,25 +129,18 @@ begin
 		IO_RLI(io) = RLI_INITIALIZE
 	    }
 
-	    # Get the populated mask subraster if it will be used.
+	    # Open the mask for random access if i/o is not indexed and
+	    # a region mask is used.
+
 	    bbmask = IO_BBMASK(io)
 	    if (IO_IOTYPE(io) == NoINDEX_RMorBB && rmused) {
-		npix = IO_VN(io,1) * IO_VN(io,2)
-		if (bbmask == NULL)
-		    call malloc (bbmask, npix, TY_INT)
-		else
-		    call realloc (bbmask, npix, TY_INT)
-		call amovi (IO_VS(io,1), v, NDIM)
-
-		op = bbmask
-		do i = IO_VS(io,2), IO_VE(io,2) {
-		    v[2]= i
-		    call pl_glpi (pl, v, Memi[op],
-			IO_MDEPTH(io), IO_VN(io,1), PIX_SRC)
-		    op = op + IO_VN(io,1)
-		}
+		bbmask = plr_open (pl, v, 0)	# (v is never referenced)
+		call plr_setrect (bbmask, IO_VS(io,1),IO_VS(io,2),
+		    IO_VE(io,1),IO_VE(io,2))
+		call plr_getlut (bbmask,
+		    bb_bufp, bb_xsize, bb_ysize, bb_xblock, bb_yblock)
 	    } else if (bbmask != NULL)
-		call mfree (bbmask, TY_INT)
+		call plr_close (bbmask)
 
 	    # Update the QPIO descriptor.
 	    IO_LINEIO(io)   = btoi(lineio)
@@ -161,6 +164,13 @@ begin
 	# selection critera (index, mask, BB, EAF, etc.).
 again_
 	switch (IO_IOTYPE(io)) {
+	case NoDATA_NoAREA:
+	    # We know in advance that there are no events to be returned,
+	    # either because there is no data, or the area of the region
+	    # mask within the bounding box is empty.
+
+	    goto exit_
+
 	case NoINDEX_NoRMorBB:
 	    # This is the simplest case; no index, region mask, or bounding
 	    # box.  Read and output all events in sequence.
@@ -239,9 +249,12 @@ again_
 		if (bbmask == NULL)
 		    goto putevent_
 
-		# Get the region mask pixel value.
-		off = (y - y1) * IO_VN(io,2) + x - x1
-		mval = Memi[bbmask+off]
+		# Get the mask pixel associated with this event.
+		ii = (x - 1) / bb_xblock
+		jj = (y - 1) / bb_yblock
+		mval = Memi[bb_bufp + jj*bb_xsize + ii]
+		if (mval < 0)
+		    mval = plr_getpix (bbmask, x, y)
 
 		# Accumulate points lying in the first nonzero mask range
 		# encountered.
@@ -297,7 +310,7 @@ putevent_		if (nev >= maxev)
 				if (!pl_linenotempty (pl,IO_V(io,1)))
 				    next
 			    } else {
-				v[1] = IO_V(io,1);  v[2] = y
+				v[1] = IO_VE(io,1);  v[2] = y
 				if (!pl_sectnotempty (pl,IO_V(io,1),v,NDIM))
 				    next
 			    }

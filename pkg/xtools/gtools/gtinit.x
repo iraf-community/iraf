@@ -1,7 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<gset.h>
-include	<pkg/gtools.h>
+include	"gtools.h"
 
 # GT_INIT -- Allocate and initialize extended graphic tools structure.
 
@@ -21,6 +21,7 @@ begin
 	call gt_sets (gt, GTYTRAN, "linear")
 	GT_XSIZE(gt) = 2.
 	GT_YSIZE(gt) = 2.
+	GT_SYSID(gt) = YES
 	GT_PARAMS(gt) = NULL
 	GT_TITLE(gt) = NULL
 	GT_SUBTITLE(gt) = NULL

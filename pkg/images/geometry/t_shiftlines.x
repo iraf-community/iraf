@@ -26,12 +26,13 @@ char	imtemp[SZ_FNAME]		# Temporary file
 
 char	str[SZ_LINE]
 int	list1, list2, ishift
-pointer	im1, im2
+pointer	im1, im2, mw
 
-bool	fp_equalr()
+bool	fp_equalr(), envgetb()
 int	clgwrd(), imtopen(), imtgetim(), imtlen()
+pointer	immap(), mw_openim()
 real	clgetr()
-pointer	immap()
+errchk	sh_lines, sh_linesi, mw_openim, mw_shift, mw_saveim, mw_close
 
 begin
 	# Get input and output image template lists.
@@ -68,11 +69,21 @@ begin
 
 	    # Shift the image.
 	    iferr {
+
 		if (fp_equalr (shift, real (ishift)))
 		    call sh_linesi (im1, im2, ishift, boundary, constant)
 		else
 	            call sh_lines (im1, im2, shift, boundary, constant,
 			interpolation)
+
+		# Update the image WCS to reflect the shift.
+		if (!envgetb ("nomwcs")) {
+		    mw = mw_openim (im1)
+		    call mw_shift (mw, shift, 1B)
+		    call mw_saveim (mw, im2)
+		    call mw_close (mw)
+		}
+
 	    } then {
 		call eprintf ("Error shifting image: %s\n")
 		    call pargstr (image1)

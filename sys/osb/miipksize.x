@@ -9,9 +9,9 @@ include	<mach.h>
 
 int procedure miipksize (nelems, mii_type)
 
-int	nelems			# number of MII elements of type mii_type
-int	mii_type		# <mii.h> type code (=8,16,32)
+int	nelems			#I number of MII elements of type mii_type
+int	mii_type		#I <mii.h> type code (=8,16,32,-32,-64)
 
 begin
-	return ((nelems * mii_type / NBITS_BYTE + SZB_CHAR-1) / SZB_CHAR)
+	return ((nelems * abs(mii_type) / NBITS_BYTE + SZB_CHAR-1) / SZB_CHAR)
 end

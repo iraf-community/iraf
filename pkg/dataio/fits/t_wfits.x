@@ -10,42 +10,46 @@ include "wfits.h"
 
 procedure t_wfits ()
 
-bool	newtape
-char	iraf_files[SZ_FNAME], fits_files[SZ_FNAME], in_fname[SZ_FNAME]
-char	out_fname[SZ_FNAME]
-int	list, nfiles, file_number, fits_record
+char	iraf_files[SZ_FNAME]	# list of IRAF images
+char	fits_files[SZ_FNAME]	# list of FITS files
+bool	newtape			# new or used tape ?
+char	in_fname[SZ_FNAME]	# input file name
+char	out_fname[SZ_FNAME]	# output file name
 
+int	imlist, flist, nimages, nfiles, file_number
 bool	clgetb()
 double	clgetd()
 int	imtopen(), imtlen (), strlen(), wft_get_bitpix(), clgeti(), imtgetim()
-int	mtfile(), strmatch(), stridxs(), btoi(), fstati()
-data	fits_record/2880/
+int	mtfile(), strmatch(), stridxs(), btoi(), fstati(), fntlenb(), fntgfnb()
+pointer	fntopnb()
+
 include "wfits.com"
 
 begin
+	# Flush on a newline if STDOUT has not been redirected.
 	if (fstati (STDOUT, F_REDIR) == NO)
 	    call fseti (STDOUT, F_FLUSHNL, YES)
 
-	# Open iraf_files template and determine number of files in list
+	# Open iraf_files template and determine number of files in list.
 	call clgstr ("iraf_files", iraf_files, SZ_FNAME)
-	list = imtopen (iraf_files)
-	nfiles = imtlen (list)
+	imlist = imtopen (iraf_files)
+	nimages = imtlen (imlist)
 
+	# Get the wfits parameters.
 	long_header = btoi (clgetb ("long_header"))
 	short_header = btoi (clgetb ("short_header"))
 	make_image = btoi (clgetb ("make_image"))
+
+	# Get the FITS bits per pixel.
 	bitpix = wft_get_bitpix (clgeti ("bitpix"))
 	if (bitpix != ERR) {
 	    call printf ("WARNING: Default bitpix overridden.\n")
 	    call printf ("\tBitpix set to: %d\n")
 		call pargi (bitpix)
-	    call printf ("\tLoss of precision may result.\n\n")
 	}
 
-	# Get length of record in FITS bytes
-	len_record = fits_record
-	if (len_record != fits_record)
-	    call printf ("Warning: Record length is not FITS standard\n")
+	# Get length of record in FITS bytes.
+	len_record = FITS_RECORD
 	blkfac = clgeti ("blocking_factor")
 	if (blkfac > 10 && mod (blkfac, SZB_CHAR) != 0)
 	    call error (0, "Block size must be an integral number of chars.")
@@ -58,13 +62,15 @@ begin
 		call pargi (blkfac)
 	}
 
-	# Get scaling parameters
+	# Get scaling parameters.
 	scale = btoi (clgetb ("scale"))
 	if (scale == YES) {
-	    autoscale = btoi (clgetb ("autoscale"))
-	    if (autoscale == NO) {
-		bscale = clgetd ("bscale")
-		bzero = clgetd ("bzero")
+	    if (clgetb ("autoscale"))
+		autoscale = YES
+	    else {
+	        bscale = clgetd ("bscale")
+	        bzero = clgetd ("bzero")
+		autoscale = NO
 	    }
 	} else {
 	    autoscale = NO
@@ -76,7 +82,6 @@ begin
 	    call printf ("\tBscale set to: %g  Bzero set to: %g\n")
 		call pargd (bscale)
 		call pargd (bzero)
-	    call printf ("\tLoss of precision may result.\n\n")
 	}
 
 	# Get output file name. If no tape file number is given for output,
@@ -86,6 +91,7 @@ begin
 	if (make_image == YES) {
 	    call clgstr ("fits_files", fits_files, SZ_FNAME)
 	    if (mtfile (fits_files) == YES) {
+		flist = NULL
 	        if (fits_files[strlen(fits_files)] != ']') {
 	            newtape = clgetb ("newtape")
 		    if (newtape) {
@@ -99,16 +105,24 @@ begin
 		    }
 	        } else
 		    newtape = false
+	    } else {
+		flist = fntopnb (fits_files, NO)
+		nfiles = fntlenb (flist)
+		if ((nfiles > 1) && (nfiles != nimages))
+		    call error (0,
+		    "T_WFITS: Input and output lists are not the same length")
 	    }
-	} else
+	} else {
 	    fits_files[1] = EOS
+	    flist = NULL
+	}
 
-	# Loop through the list of output files.
+	# Loop through the list of input images files.
 
 	file_number = 1
-	while (imtgetim (list, in_fname, SZ_FNAME) != EOF) {
+	while (imtgetim (imlist, in_fname, SZ_FNAME) != EOF) {
 
-	    # print id string
+	    # Print id string.
 	    if (long_header == YES || short_header == YES) {
 		call printf ("File %d: %s")
 		    call pargi (file_number)
@@ -117,7 +131,9 @@ begin
 
 	    # Get output filename. If single file output to disk, use name
 	    # fits_file. If multiple file output to disk, the file number
-	    # is added to the output file name.
+	    # is added to the output file name, if no output name list is
+	    # supplied. If an output name list is supplied then the names
+	    # are extracted one by one from that list.
 
 	    if (make_image == YES) {
 	        if (mtfile (fits_files) == YES) {
@@ -127,9 +143,12 @@ begin
 			    call pargstr ("[EOT]")
 		    }
 		    call strcpy (fits_files, out_fname, SZ_FNAME)
-	        } else {
+	        } else if (nfiles > 1) {
+		    if (fntgfnb (flist, out_fname, SZ_FNAME) == EOF)
+			 call error (0, "Error reading output file name")
+		} else {
 		    call strcpy (fits_files, out_fname, SZ_FNAME)
-		    if (nfiles > 1) {
+		    if (nimages > 1) {
 		        call sprintf (out_fname[strlen(fits_files)+1], SZ_FNAME,
 			    "%03d")
 			    call pargi (file_number)
@@ -137,7 +156,7 @@ begin
 	        }
 	    }
 
-	    # write each output file
+	    # Write each output file.
 	    iferr (call wft_write_fitz (in_fname, out_fname)) {
 		call printf ("Error writing file: %s\n")
 		    call pargstr (out_fname)
@@ -147,7 +166,10 @@ begin
 		file_number = file_number + 1
 	}
 
-	call clpcls (list)
+	# Close up the input and output lists.
+	call clpcls (imlist)
+	if (flist != NULL)
+	    call fntclsb (flist)
 end
 
 
@@ -160,7 +182,7 @@ int	bitpix
 
 begin
 	switch (bitpix) {
-	case FITS_BYTE, FITS_SHORT, FITS_LONG:
+	case FITS_BYTE, FITS_SHORT, FITS_LONG, FITS_REAL, FITS_DOUBLE:
 	    return (bitpix)
 	default:
 	    return (ERR)

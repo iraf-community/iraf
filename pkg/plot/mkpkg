@@ -1,4 +1,4 @@
-# Make the PLOT package
+# Make the PLOT package.
 
 $call	relink
 $exit
@@ -15,8 +15,8 @@ relink:
 	;
 
 install:
-	$move	xx_plot.e   bin$x_plot.e
-	$move   xx_ncar.e   bin$x_ncar.e
+	$move	xx_plot.e bin$x_plot.e
+	$move   xx_ncar.e bin$x_ncar.e
 	;
 
 ncar:
@@ -41,30 +41,34 @@ linkplot:
 
 libpkg.a:
 	@crtpict
-	t_hafton.x	<config.h> <error.h> <fset.h>   <gset.h> <imhdr.h>\
-			<mach.h>   <xwhen.h>
-	t_contour.x	<config.h> <error.h> <fset.h>   <gset.h> <imhdr.h>\
-			<mach.h>   <xwhen.h>
-	t_gkidir.x	<gki.h>
-	t_gkixt.x	<gki.h>
-	t_gkimos.x	<error.h>  <fset.h>  <gio.h>   <gki.h>   <gset.h>\
-			<mach.h>   <math.h>
-	t_graph.x	<config.h> <ctype.h> <error.h> <fset.h>  <gset.h>\
-			<imhdr.h>  <mach.h>  <xwhen.h>
-	t_implot.x	<ctype.h>  <error.h> <gset.h>  <imhdr.h> <mach.h>
+
+	getdata.x	<imhdr.h>
 	improject.x	<imhdr.h>
 	initmarker.x	<gset.h>
-	t_pcol.x	<gset.h>   <imhdr.h> <mach.h>
-	t_pcols.x	<gset.h>   <imhdr.h> <mach.h>
-	perim.x		<gset.h>   <mach.h>
-	getdata.x	<imhdr.h>
-	t_prow.x	<gset.h>   <imhdr.h> <mach.h>
-	t_prows.x	<gset.h>   <imhdr.h> <mach.h>
-	t_surface.x	<config.h> <error.h> <fset.h>  <gset.h>  <imhdr.h>\
-			<mach.h>   <xwhen.h>
-	t_pvector.x	<gset.h>   <mach.h>  <math.h>  <imhdr.h> <imset.h>\
+	perim.x		<gset.h> <mach.h>
+	t_contour.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
+			<mach.h> <xwhen.h>
+	t_gkidir.x	<gki.h>
+	t_gkimos.x	<error.h> <fset.h> <gio.h> <gki.h> <gset.h> <mach.h>\
+			<math.h>
+	t_gkixt.x	<gki.h>
+	t_graph.x	<config.h> <ctype.h> <error.h> <fset.h> <gset.h>\
+			<imhdr.h> <mach.h> <xwhen.h>
+	t_hafton.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
+			<mach.h> <xwhen.h>
+	t_implot.x	<ctype.h> <error.h> <gset.h> <imhdr.h> <mach.h>
+	t_pcol.x	<gset.h> <imhdr.h> <mach.h>
+	t_pcols.x	<gset.h> <imhdr.h> <mach.h>
+	t_prow.x	<gset.h> <imhdr.h> <mach.h>
+	t_prows.x	<gset.h> <imhdr.h> <mach.h>
+	t_pvector.x	<gset.h> <imhdr.h> <mach.h> <imset.h> <math.h>\
 			<math/iminterp.h>
-	t_velvect.x	<config.h> <error.h> <fset.h>  <gset.h>  <imhdr.h>\
-			<mach.h>   <xwhen.h>
+	t_surface.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
+			<mach.h> <xwhen.h>
+	t_velvect.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
+			<mach.h> <xwhen.h>
+	vport.x		<gset.h>
+	;
+		<mach.h>   <xwhen.h>
 	vport.x		<gset.h>
 	;

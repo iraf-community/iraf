@@ -27,6 +27,7 @@ char	ttyname[ARB]
 int	nchars
 pointer	sp, ttysource, device, devname, fname, tty
 pointer	ttyopen()
+int	g_ttyload()
 extern	g_ttyload()
 bool	streq(), ttygetb()
 int	fnldir(), ttygeti(), ttygets()

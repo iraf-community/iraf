@@ -4,7 +4,6 @@ include "../lib/center.h"
 include "../lib/fitsky.h"
 include "../lib/photdef.h"
 include "../lib/phot.h"
-include "../lib/radprofdef.h"
 include "../lib/radprof.h"
 
 # AP_PRPROF -- Procedure to write the results of radprof to the output file.
@@ -21,7 +20,6 @@ int	pier	# photometric error
 int	rier	# radial profile error
 
 int	i, naperts
-pointer	rprof
 real	xpos, ypos
 int	apstati()
 real	apstatr()
@@ -29,9 +27,6 @@ real	apstatr()
 begin
 	if (fd == NULL)
 	    return
-
-	# Initialize.
-	rprof = AP_RPROF(ap)
 
 	# Print the id parameters.
 	xpos = apstatr (ap, XCENTER) - apstatr (ap, XSHIFT)
@@ -66,9 +61,10 @@ pointer	ap		# apphot descriptor
 pointer	out		# output file descriptor
 
 begin
-	# Print out the keywords.
 	if (out == NULL)
 	    return
+
+	# Print out the keywords.
 	call ap_idhdr (ap, out)
 	call ap_chdr (ap, out)
 	call ap_shdr (ap, out)
@@ -96,6 +92,7 @@ begin
 	call smark (sp)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
 	phot = AP_PPHOT(ap)
+
 	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
 	call printf ("%s x: %0.2f y: %0.2f s: %0.2f fwhm: %0.2f ")
 	    call pargstr (Memc[imname])
@@ -103,11 +100,13 @@ begin
 	    call pargr (apstatr (ap, RPYCUR))
 	    call pargr (apstatr (ap, SKY_MODE))
 	    call pargr (apstatr (ap, RPFWHM))
+
 	call printf ("mag: %0.2f err: %s\n")
 	    call pargr (Memr[AP_MAGS(phot)+AP_NAPERTS(phot)-1])
 	if (cier != AP_OK || sier != AP_OK || pier != AP_OK || rier != AP_OK)
 	    call pargstr ("err")
 	else
 	    call pargstr ("ok")
+
 	call sfree (sp)
 end

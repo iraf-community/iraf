@@ -1,4 +1,4 @@
-.help implot Feb87 plot
+.help implot Feb90 plot
 .ih
 NAME
 implot -- plot lines and columns of images
@@ -83,9 +83,9 @@ commands are provided:
 .ks
 .nf
 	:a N		set number of lines or columns to average
-	:c N		plot column N
+	:c N [M]	plot column N [average of columns N to M]
 	:i imagename	open a new image for input
-	:l N		plot line N
+	:l N [M]	plot line N [average of lines N to M]
 	:o		overplot
 	:log+		log scale in Y
 	:log-		turn off log scale in Y
@@ -116,12 +116,11 @@ the fixed scale to be lost).  Plotting different lines or columns or even
 changing images does not cause loss of fixed scaling.  If the X scale is
 fixed to a range less than an entire line or column Y autoscaling, if enabled,
 will only pertain to the displayed range in X.
-
 .ih
 EXAMPLES
 1. Enter cursor mode, plotting line 240 of the 300x480 image 'crab':
 
-.ks
+.nf
 	cl> implot crab
 	(plot appears)
 .fi
@@ -133,15 +132,13 @@ plot since the entire image must be read).  Go back to a line plot and
 try several 'k' keystrokes to step up through the image.  Try a cursor
 mode 'E' to playback a movie of a small region, then type 0 (zero) to
 restore the original plot.
-.ke
-
 .ih
 BUGS
 It should be possible to use the image display cursor to mark the lines or
 columns to be plotted.  This capability will be added when the image display
 is interfaced to GIO (the IRAF graphics subsystem).
-
 .ih
 SEE ALSO
 cursor
 .endhelp
+ndhelp

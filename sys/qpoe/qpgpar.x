@@ -19,7 +19,7 @@ pointer o_pp			#O pointer to parameter value
 
 int	loc_pval, loc_Mem, ip, ch, elem, sz_elem, fd
 pointer sp, key, fm, pp, op, sym
-double	pval[LEN_PVAL]
+double	pval[LEN_PVAL+1]
 data	pp /NULL/
 
 pointer qp_gpsym()
@@ -36,10 +36,12 @@ begin
 	fm = QP_FM(qp)
 
 	# Compute pointer (Memc index) to the static pval buffer.
+	# Make sure that the computed pointer is double aligned.
+
 	if (pp == NULL) {
 	    call zlocva (pval, loc_pval)
 	    call zlocva (Memc, loc_Mem)
-	    pp = loc_pval - loc_Mem + 1
+	    pp = (loc_pval+SZ_DOUBLE - loc_Mem) / SZ_DOUBLE * SZ_DOUBLE + 1
 	}
 
 	# Extract the primary parameter name, minus any whitespace and

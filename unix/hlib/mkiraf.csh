@@ -4,15 +4,15 @@
 
 # The following definitions are site dependent. [SITEDEP]
 
-set	iraf	= "/iraf/iraf"
-set	imdir	= "/iraf/pixels"
+set	iraf	= "/usr/iraf"
+set	imdir	= "/usr/users/iraf"
 set	ttymsg  =\
 "Terminal types: gterm=ttysw+graphics,vt640=(vt100+retrographics),etc."
 
 # ------------- (end of site dependent definitions) ------------------------
 # Make an empty "uparm" (user parameter) directory.
 
-unalias rm mkdir pwd
+unalias rm mkdir pwd echo mkdir sed whoami
 
 if (! -e uparm) then
     echo '-- creating a new uparm directory'
@@ -27,7 +27,7 @@ else
 endif
 
 if (-e login.cl) then
-    rm login.cl
+    mv -f login.cl login.cl.OLD
 endif
 
 

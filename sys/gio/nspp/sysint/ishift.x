@@ -31,25 +31,25 @@ begin
 end
 
 
-# # IAND -- AND two integers.
-# 
-# int procedure iand (a, b)
-# 
-# int	a, b
-# int	and()
-# 
-# begin
-# 	return (and (a, b))
-# end
-# 
-# 
-# # IOR -- OR two integers.  
-# 
-# int procedure ior (a, b)
-# 
-# int	a, b
-# int	or()
-# 
-# begin
-# 	return (or (a, b))
-# end
+# IAND -- AND two integers.
+
+int procedure iand (a, b)
+
+int	a, b
+int	and()
+
+begin
+	return (and (a, b))
+end
+
+
+# IOR -- OR two integers.  
+
+int procedure ior (a, b)
+
+int	a, b
+int	or()
+
+begin
+	return (or (a, b))
+end

@@ -241,7 +241,7 @@ begin
 	    if (coincidence)
 	        if (CO_FLAG (ids) < 1)
 		    call coincor (Memr[rawpix], Memr[rawpix], ncols, ids,
-			real (ITM (ids)), dtime, power, ccmode)
+			ITM (ids), dtime, power, ccmode)
 
 	    call adivr (Memr[rawpix], Memr[flat], Memr[calpix], ncols)
 	}

@@ -3,10 +3,11 @@
 # phot errors (# 41 - 60)
 
 define	AP_OK			0	# no error
-define	AP_NOAPERT		41	# no aperture area
+define	AP_APERT_NOAPERT	41	# no aperture area
 define  AP_APERT_OUTOFBOUNDS	42	# 1 or more apertures out of bounds
-define	AP_NOSKYMODE		43	# INDEF valued sky
-define	AP_NEGMAG		44	# 0 or -ve magnitude
+define	AP_APERT_NOSKYMODE	43	# INDEF valued sky
+define	AP_APERT_NEGMAG		44	# 0 or -ve magnitude
+define	AP_APERT_BADDATA	45	# bad pixels in aperture
 
 # phot parameters and answers (# 61 - 80)
 
@@ -46,7 +47,7 @@ define	AP_PWGAUSS	3	# a Gaussian of given fwhm is used
 define	PCMDS		"|apertures|zmag|mkapert|weighting|"
 define	PSHOWARGS	"|center|sky|phot|data|"
 define	PWFUNCS		"|constant|cone|gauss|"
-define	QCMDS		"|show|cboxwidth|annulus|dannulus|apertures|zmag|epadu|exposure|radplots|image|output|coords|"
+define	QCMDS		"|show|cboxwidth|annulus|dannulus|apertures|zmag|epadu|exposure|radplots|image|output|coords|airmass|filter|"
 
 define	PCMD_APERTURES		1
 define	PCMD_ZMAG		2
@@ -70,6 +71,8 @@ define	QCMD_RADPLOTS		9
 define	QCMD_IMAGE		10
 define	QCMD_OUTPUT		11
 define	QCMD_COORDS		12
+define	QCMD_AIRMASS		13
+define	QCMD_FILTER		14
 
 # miscellaneous
 

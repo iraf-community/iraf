@@ -1,5 +1,19 @@
 .help revisions Jun88 noao.imred.generic
 .nf
+generic$normalize.cl
+generic$normflat.cl
+generic$normalize.par
+generic$normflat.par
+    Modified use of IMSTATISTICS for additional fields parameter.  If the
+    user redefined the defaults for IMSTAT then NORMALIZE and NORMFLAT
+    will fail.  (11/30/89, Valdes)
+
+generic$flatten.par
+generic$normalize.par
+generic$normflat.par
+    Change parameter reference from )generic. to )_. to allow defining
+    tasks in other packages.
+
 generic$darksub.cl
     The last change caused the nscan to have the wrong value causing an
     improper error (exposure time for ... not found).  The value of nscan()

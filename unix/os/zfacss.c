@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -12,6 +15,7 @@
 #define	MAX_LINELEN	256		/* when looking for newlines	*/
 #define	R		04		/* UNIX access() codes		*/
 #define W		02
+#define ctrlcode(c)	((c) >= '\007' && (c) <= '\017')
 
 /* ZFACSS -- Try to determine if FILE is accessible in the indicated MODE.
  * If file is accessible for reading and TYPE is given as TEXT_FILE,
@@ -84,7 +88,7 @@ XINT	*mode, *type, *status;
 			ch = *ip++;
 			if (ch == '\n')
 			    newline_seen++;
-			else if (!(isprint(ch) || isspace(ch)))
+			else if (!isprint(ch) && !isspace(ch) && !ctrlcode(ch))
 			    break;
 		    }
 

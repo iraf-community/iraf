@@ -1,4 +1,4 @@
-.help setairmass May89 astutil
+.help setairmass Nov89 astutil
 .ih
 NAME
 setairmass -- update image headers with the effective airmass 
@@ -22,9 +22,20 @@ The output time stamp desired for the airmass.  The choices are the
 "effective" airmass, or the airmass at the "beginning", "middle" or
 "end" of the observation.
 .le
+.ls date = "date-obs"
+The name of the keyword that contains the date of the observation.
+The format should be `DD/MM/YY'.
+.le
 .ls exposure = "exptime"
 The name of the keyword that contains the exposure time (in seconds) of
 the image.
+.le
+.ls airmass = "airmass"
+The name of the output keyword that will receive the computed airmass.
+.le
+.ls utmiddle = "utmiddle"
+The name of the output keyword that will receive the universal time for
+the middle of the observation.
 .le
 .ls latitude = ")observatory.latitude"
 The latitude of the observatory.  The default value is for Kitt Peak
@@ -42,17 +53,19 @@ recorded?
 .le
 .ih
 DESCRIPTION
-SETAIRMASS will calculate the effective airmass of an astronomical image,
-as described below under "ALGORITHMS".  The task requires the
+SETAIRMASS will calculate the effective airmass of an astronomical
+image, as described below under "ALGORITHMS".  The task requires the
 instantaneous zenith distance at the beginning, middle and end of the
 exposure.  These are calculated using the right ascension, declination,
-sidereal time and exposure time from the image header, in addition to
-the value of the \fBlatitude\fR parameter.  The RA, Dec and ST keywords
-are assumed to have the names "RA", "DEC" and "ST".  The name of the
-exposure time keyword can be specified as a parameter.  This keyword
-should express the exposure time in seconds.  If any of the required
-keywords are missing from the image headers, they can be added using
-the hedit task.
+and epoch as well as the sidereal time, exposure time, and date from
+the image header, in addition to the value of the \fBlatitude\fR
+parameter.  The RA and Dec will be precessed from the given epoch to
+the date of observation.  The RA, Dec, epoch, and ST keywords are
+assumed to have the names "RA", "DEC", "EPOCH", and "ST".  The name of
+the exposure time and date keywords can be specified as parameters.
+These should express the exposure time in seconds and the date in the
+format `DD/MM/YY'.  If any of the required keywords are missing from
+the image headers, they can be added using the hedit task.
 
 Before using this task, you will need to know the "time stamp" of the
 time varying header quantities (e.g. sidereal time).  Do the recorded
@@ -61,17 +74,18 @@ This should be set in the \fBintype\fR parameter.
 
 If for some reason the effective airmass is not desired, the value of
 the airmass at the beginning, middle or end of the exposure can be
-recorded in the "AIRMASS" keyword in the header.  The \fBshow\fR
-parameter can be used to control the output to the terminal.  The
-\fBupdate\fR and \fBoverride\fR parameters control the header keyword
-output.
+recorded in the header keyword specified by the \fIairmass\fR
+parameter.  The \fBshow\fR parameter can be used to control the output
+to the terminal.  The \fBupdate\fR and \fBoverride\fR parameters
+control the header keyword output.
 
-AIRMASS will also calculate the universal time of the middle of the
-exposure and place the value in a keyword "UTMIDDLE", in the image
-header.  This assumes that the value for the UT is in the keyword "UT",
-with the same time stamp as the sidereal time.  UTMIDDLE is useful for
-interpolating calibration arc dispersion solutions using REFSPECTRA,
-especially when the exposure time is long.
+SETAIRMASS will also calculate the universal time of the middle of the
+exposure and place the value in the header keyword specified by the
+\fIutmiddle\fR parameter.  This assumes that the value for the UT is in
+the keyword "UT", with the same time stamp as the sidereal time.
+The mid-observation UT is useful for interpolating calibration arc
+dispersion solutions using REFSPECTRA, especially when the exposure
+time is long.
 .ih
 ALGORITHMS
 The mean airmass is calculated uses the formula described in "Some
@@ -106,11 +120,21 @@ Right ascension in hours at the beginning, middle, or end of the observation.
 .ls DEC
 Declination in degrees at the beginning, middle, or end of the observation.
 .le
+.ls EPOCH
+The epoch of the coordinates.  The right ascension and declination will
+be precessed from this epoch to the date of the observation before being
+used.
+.le
 .ls ST
 Siderial time in hours at the beginning, middle, or end of the observation.
 .le
 .ls UT
 Universal time in hours at the beginning, middle, or end of the observation.
+.le
+.ls \fIdate\fR
+The value of the date parameter is the keyword name to be used for the
+date of the observation.  The format is anything reasonably close to
+`DD/MM/YY'.
 .le
 .ls \fIexposure\fR
 The value of the exposure parameter is the keyword name to be used for the
@@ -118,23 +142,25 @@ exposure time in seconds.
 .le
 
 The output keywords are:
-.ls AIRMASS
-The computed airmass at either the beginning, middle, end, or weighted
-effective value over the exposure.
+.ls \fIairmass\fR
+The value of the airmass parameter is the keyword name to be used for
+the computed airmass at either the beginning, middle, or end of the
+exposure, or for the weighted effective value over the exposure.
 .le
-.ls UTMIDDLE
-The universal time at the middle of the exposure.
+.ls \fIutmiddle\fR
+The value of the utmiddle parameter is the keyword name to be used for
+the universal time at the middle of the exposure.
 .le
 .ih
 EXAMPLES
 Calculate the effective airmass of the IRAF test picture, dev$pix:
 
-.nf
-	airmass dev$pix exposure=itime
-.fi
+	setairmass dev$pix exposure=itime
 
-Note that the default value of the update parameter is no, so that only
-a listing of the calculated airmasses is generated.
+Note that the test picture does not have the correct coordinate epoch
+listed in its header, so no precession will be performed.  Also the
+default value of the update parameter is no, so that only a listing of
+the calculated airmasses is generated.
 .ih
 SEE ALSO
 airmass, hedit, refspectra

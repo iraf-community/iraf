@@ -1,4 +1,4 @@
-# Make the LISTS package
+# Make the LISTS package.
 
 $call	relink
 $exit
@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set	LIBS = "-lxtools"
+	$set	LIBS = "-lxtools -lds"
 
 	$update	libpkg.a
 	$omake	x_lists.x
@@ -24,7 +24,7 @@ libpkg.a:
 	columns.x	
 	lintran.x	<ctype.h> <pattern.h>
 	rgcursor.x	
-	rimcursor.x	
+	rimcursor.x	<mach.h> <mwset.h>
 	table.x		<ctype.h>
 	tokens.x	<ctotok.h>
 	unique.x	

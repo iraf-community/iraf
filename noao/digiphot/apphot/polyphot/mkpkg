@@ -17,14 +17,8 @@ libpkg.a:
 	apyfree.x	../lib/apphotdef.h	../lib/polyphotdef.h
 	apyinit.x	../lib/apphotdef.h	../lib/polyphotdef.h
 	apynextobj.x	<fset.h>		../lib/polyphot.h
-	apypars.x	../lib/apphot.h		../lib/fitsky.h         \
-			../lib/noise.h		../lib/display.h	\
-			../lib/polyphot.h	../lib/center.h
-	apyradsetup.x	<gset.h>		<pkg/gtools.h>		\
-			../lib/apphotdef.h	../lib/fitskydef.h	\
-			../lib/apphot.h		../lib/center.h         \
-			../lib/fitsky.h		../lib/noise.h          \
-			../lib/display.h	../lib/polyphot.h
+	apypars.x	
+	apyradsetup.x	../lib/fitsky.h		../lib/polyphot.h
 	apyshift.x	../lib/polyphot.h
 	apycolon.x	../lib/polyphot.h	../lib/center.h         \
 			../lib/apphot.h		../lib/fitsky.h         \
@@ -32,7 +26,7 @@ libpkg.a:
 			<gset.h>		<error.h>
 	apyfit.x	../lib/polyphot.h	../lib/noise.h          \
 			../lib/center.h		../lib/apphot.h         \
-			<imhdr.h>
+			<imhdr.h>		<mach.h>
 	apyget.x	<fset.h>		../lib/apphot.h         \
 			../lib/fitsky.h		../lib/polyphot.h
 	polyshow.x	../lib/display.h	../lib/polyphot.h

@@ -6,7 +6,11 @@
 #include <sys/file.h>
 
 # ifndef O_NDELAY
+# ifdef apollo
 #include <fcntl.h>
+# else
+#include <sys/fcntl.h>
+# endif
 # endif
 
 #include <errno.h>
@@ -67,12 +71,25 @@ XINT	*chan;			/* file number (output)		*/
 	    /* The O_NDELAY is necessary for some types of special devices,
 	     * e.g., a FIFO, and should be harmless for other file types.
 	     */
+#ifdef apollo
+	    /* In Domain/OS through SR10.2, fifo's ONLY work if opened
+	     * blocking and kept that way.
+	     */
+	    fd = open ((char *)osfn, O_RDONLY);
+#else
 	    if ((fd = open ((char *)osfn, O_RDONLY|O_NDELAY)) != ERR)
 		fcntl (fd, F_SETFL, O_RDONLY);
+#endif
 	    break;
+
 	case WRITE_ONLY:
+
+#ifdef apollo
+	    fd = open ((char *)osfn, O_WRONLY);
+#else
 	    if ((fd = open ((char *)osfn, O_WRONLY|O_NDELAY)) != ERR)
 		fcntl (fd, F_SETFL, O_WRONLY);
+#endif
 	    break;
 
 	case READ_WRITE:

@@ -4,7 +4,8 @@ include <mach.h>
 include <fset.h>
 
 # WFT_INIT_WRITE_PIXELS -- This procedure calculates the input and
-# output buffer sizes and allocates the required space.
+# output buffer sizes based in the spp and mii data types and allocates
+# the required space.
 
 procedure wft_init_write_pixels (npix_record, spp_type, bitpix, blkfac)
 
@@ -16,7 +17,7 @@ int	blkfac			# blocking factor
 # entry wft_write_pixels, wft_write_last_record
 
 int	fd			# output file descriptor
-char	buffer[ARB]		# input buffer
+char	buffer[1]		# input buffer
 int	npix			# number of pixels in the input buffer
 int	nrecords		# number of FITS records written
 
@@ -26,12 +27,12 @@ int	blocking, szblk
 pointer	spp, mii, ip, op
 
 int	sizeof(), miilen(), fstati()
-long	note
+long	note()
 errchk	malloc, mfree, write, miipak, amovc
 data	mii /NULL/, spp/NULL/
 
 begin
-	# Change input parameters into local variables
+	# Change input parameters into local variables.
 	ty_mii = bitpix
 	ty_spp = spp_type
 	npix_rec = npix_record
@@ -39,14 +40,14 @@ begin
 	blocking = blkfac
 	blank = ' '
 
+	# Compute the size of the mii buffer.
 	len_mii = miilen (npix_rec, ty_mii)
 	sz_rec = len_mii * SZ_INT
 
-	# Allocate space for the buffers
+	# Allocate space for the buffers.
 	if (spp != NULL)
 	    call mfree (spp, TY_CHAR)
 	call malloc (spp, nch_rec, TY_CHAR)
-
 	if (mii != NULL)
 	    call mfree (mii, TY_INT)
 	call malloc (mii, len_mii, TY_INT)
@@ -56,9 +57,9 @@ begin
 
 	return
 
-# WFT_WRITE_PIXELS -- Wrt_pixels gets an image line and places it in the output
-# buffer. When the output buffer is full the data are packed by the mii routines
-# and written to the specified output.
+# WFT_WRITE_PIXELS -- Wft_wrt_pixels gets an image line and places it in the
+# output buffer. When the output buffer is full the data are packed by the mii
+# routines and written to the specified output.
 
 entry	wft_write_pixels (fd, buffer, npix)
 
@@ -66,6 +67,7 @@ entry	wft_write_pixels (fd, buffer, npix)
 	ip = 0
 
 	repeat {
+
 	    # Fill output buffer.
 	    n = min (nch_rec - op, nchars - ip)
 	    call amovc (buffer[1 + ip], Memc[spp + op], n)
@@ -99,6 +101,7 @@ entry	wft_write_pixels (fd, buffer, npix)
 
 	return
 
+
 # WFT_WRITE_LAST_RECORD -- Procedure to write the last partially filled record
 # to tape. Fill with blanks if header record otherwise fill with zeros.
 
@@ -106,7 +109,7 @@ entry	wft_write_last_record (fd, nrecords)
 
 	if (op != 0) {
 
-	    # Blank or zero fill.
+	    # Blank or zero fill the last record.
 	    n = nch_rec - op
 	    if (ty_spp == TY_CHAR)
 		call amovkc (blank, Memc[spp + op], n)
@@ -135,8 +138,8 @@ entry	wft_write_last_record (fd, nrecords)
 	    nrec = nrec + 1
 	    op = op + n
 
-	    # Pad out the record if non-standard device tape.
-	    if (blocking > 10 && ty_spp != TY_CHAR) {
+	    # Pad out the record if the blocking is non-standard.
+	    if ((blocking > 10) && (ty_spp != TY_CHAR)) {
 		szblk = fstati (fd, F_SZBBLK) / SZB_CHAR
 		n = note (fd) - 1
 		n = szblk - mod (n, szblk)

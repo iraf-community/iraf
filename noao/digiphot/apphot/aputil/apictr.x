@@ -22,7 +22,7 @@ begin
 	cbuf = ap_ctrpix (im, wx, wy, radius, xc, yc, nx, ny)
 	if (cbuf == NULL) {
 	    xcenter = wx
-	    ycenter = wx
+	    ycenter = wy
 	    return
 	}
 
@@ -35,7 +35,7 @@ begin
 	    call aaddkr (Memr[cbuf], datamax, Memr[cbuf], nx * ny)
 	}
 	cier = ap_mctr1d (Memr[cbuf], nx, ny, xcenter, ycenter, junk, junk)
-	call amaxkr (Memr[cbuf], 0.0, Memr[cbuf], nx * ny)
+
 	if (IS_INDEFR(xcenter))
 	    xcenter = wx
 	else

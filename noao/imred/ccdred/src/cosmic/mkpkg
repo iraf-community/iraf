@@ -12,6 +12,4 @@ libpkg.a:
 	crlist.x	crlist.h <error.h>
 	crsurface.x	
 	t_cosmicrays.x	crlist.h <error.h> <math/gsurfit.h> <imhdr.h> <imset.h>
-
-	gtascale.x	<pkg/gtools.h> <mach.h>
 	;

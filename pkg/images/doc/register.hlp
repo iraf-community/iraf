@@ -1,4 +1,4 @@
-.help register Feb89 images
+.help register Feb90 images
 .ih
 NAME
 register -- transform a list of images from one coordinate system to another
@@ -147,6 +147,13 @@ image at the positions of the transformed output pixels. If the
 the Jacobian of the transformation.  REGISTER uses the routines in the
 2-D interpolation package.
 
+If the environment variable \fInomwcs\fR is "no" then the world coordinate
+system of the input image is modified in the output image to reflect the
+effects of the \fIlinear\fR portion of the registration operation.
+Support does not yet exist in the IRAF world coordinate system interface
+for the higher order distortion corrections that REGISTER is capable
+of performing.
+
 .ih
 TIMINGS
 It requires approximately 70 and 290 cpu seconds to correct a 512 by 512
@@ -204,6 +211,9 @@ register @inlist @outlist database @reclist
 
 .ih
 BUGS
+Support does yet exist in the IRAF world coordinate system interface
+for the higher order distortion corrections that REGISTER is capable
+of performing.
 
 .ih
 SEE ALSO

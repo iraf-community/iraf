@@ -1,0 +1,20 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# MW_VTRAN -- Transform an array of N-dimensional points, expressed as a
+# 2D vector where v[1,i] is point I of vector V.
+
+procedure mw_vtran$t (ct, v1, v2, ndim, npts)
+
+pointer	ct			#I pointer to CTRAN descriptor
+PIXEL	v1[ndim,npts]		#I points to be transformed
+PIXEL	v2[ndim,npts]		#O vector to get the transformed points
+int	ndim			#I dimensionality of each point
+int	npts			#I number of points
+
+int	i
+errchk	mw_ctran$t
+
+begin
+	do i = 1, npts
+	    call mw_ctran$t (ct, v1[1,i], v2[1,i], ndim)
+end

@@ -1,8 +1,9 @@
 include "../lib/apphot.h"
 include "../lib/noise.h"
+include "../lib/display.h"
 include "../lib/find.h"
 
-# AP_FDGPARS -- Routine to open up the apphot data structure and get the input
+# AP_FDGPARS -- Open up the apphot data structure and get the input
 # parameters.
 
 procedure ap_fdgpars (ap)
@@ -13,7 +14,7 @@ int	noise
 pointer	sp, str, np
 real	fwhmpsf
 
-bool	clgpsetb()
+bool	clgetb(), clgpsetb()
 int	strdic(), btoi()
 pointer	clopset()
 real	clgpsetr(), clgetr()
@@ -50,6 +51,13 @@ begin
 	call clgpset (np, "exposure", Memc[str], SZ_LINE)
 	call apsets (ap, EXPOSURE, Memc[str])
 	call apsetr (ap, ITIME, clgpsetr (np, "itime"))
+	call clgpset (np, "airmass", Memc[str], SZ_LINE)
+	call apsets (ap, AIRMASS, Memc[str])
+	call apsetr (ap, XAIRMASS, clgpsetr (np, "xairmass"))
+	call clgpset (np, "filter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTER, Memc[str])
+	call clgpset (np, "ifilter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTERID, Memc[str])
 
 	# Get the remaining kernel statistics.
 	call apsetr (ap, RATIO, clgetr ("ratio"))
@@ -61,6 +69,9 @@ begin
 	call apsetr (ap, SHARPHI, clgetr ("sharphi"))
 	call apsetr (ap, ROUNDLO, clgetr ("roundlo"))
 	call apsetr (ap, ROUNDHI, clgetr ("roundhi"))
+
+	# Set the marking command.
+	call apseti (ap, MKDETECTIONS, btoi (clgetb ("mkdetections")))
 
 	# Close the parameter set files.
 	call clcpset (np)

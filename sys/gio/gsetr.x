@@ -15,7 +15,7 @@ int	param			# parameter to be set
 real	rval			# new value for parameter
 
 real	char_height
-int	wcs, axes, field, ax[2], i, ival
+int	wcs, axes, field, ax[2], i
 pointer	w, p, pl, pm, tx, fa
 real	ggetr()
 
@@ -28,33 +28,31 @@ begin
 	tx  = GP_TXAP(gp)
 	fa  = GP_FAAP(gp)
 
-	ival = nint (rval)
-
 	switch (param) {
 
 	# General GIO parameters.
 
 	case G_FD:
-	    GP_FD(gp) = ival
+	    GP_FD(gp) = nint(rval)
 	case G_TTY:
-	    GP_TTY(gp) = ival
+	    GP_TTY(gp) = nint(rval)
 	case G_WCS:
-	    GP_WCS(gp) = ival
+	    GP_WCS(gp) = nint(rval)
 	case G_CURSOR:
-	    GP_CURSOR(gp) = ival
+	    GP_CURSOR(gp) = nint(rval)
 
 	# These parameters affect the current WCS.
 
 	case G_XTRAN:
-	    WCS_XTRAN(w) = ival
+	    WCS_XTRAN(w) = nint(rval)
 	    GP_WCSSTATE(gp) = MODIFIED
 	    call gpl_reset()
 	case G_YTRAN:
-	    WCS_YTRAN(w) = ival
+	    WCS_YTRAN(w) = nint(rval)
 	    GP_WCSSTATE(gp) = MODIFIED
 	    call gpl_reset()
 	case G_CLIP:
-	    WCS_CLIP(w) = ival
+	    WCS_CLIP(w) = nint(rval)
 	    GP_WCSSTATE(gp) = MODIFIED
 	    call gpl_reset()
 
@@ -72,57 +70,57 @@ begin
 	# Polyline attributes.
 
 	case G_PLTYPE:
-	    call gst_set_attribute_i (ival, PL_LTYPE(pl), PL_STATE(pl))
+	    call gst_set_attribute_i (nint(rval), PL_LTYPE(pl), PL_STATE(pl))
 	case G_PLWIDTH:
 	    call gst_set_attribute_r (rval, PL_WIDTH(pl), PL_STATE(pl))
 	case G_PLCOLOR:
-	    call gst_set_attribute_i (ival, PL_COLOR(pl), PL_STATE(pl))
+	    call gst_set_attribute_i (nint(rval), PL_COLOR(pl), PL_STATE(pl))
 
 	# Polymarker attributes.
 
 	case G_PMLTYPE:
-	    call gst_set_attribute_i (ival, PM_LTYPE(pm), PM_STATE(pm))
+	    call gst_set_attribute_i (nint(rval), PM_LTYPE(pm), PM_STATE(pm))
 	case G_PMWIDTH:
 	    call gst_set_attribute_r (rval, PM_WIDTH(pm), PM_STATE(pm))
 	case G_PMCOLOR:
-	    call gst_set_attribute_i (ival, PM_COLOR(pm), PM_STATE(pm))
+	    call gst_set_attribute_i (nint(rval), PM_COLOR(pm), PM_STATE(pm))
 
 	# Text drawing attributes.
 
 	case G_TXUP:
-	    call gst_set_attribute_i (ival, TX_UP(tx), TX_STATE(tx))
+	    call gst_set_attribute_i (nint(rval), TX_UP(tx), TX_STATE(tx))
 	case G_TXSIZE:
 	    call gst_set_attribute_r (rval, TX_SIZE(tx), TX_STATE(tx))
 	case G_TXPATH:
-	    call gst_set_attribute_i (ival, TX_PATH(tx), TX_STATE(tx))
+	    call gst_set_attribute_i (nint(rval), TX_PATH(tx), TX_STATE(tx))
 	case G_TXSPACING:
 	    call gst_set_attribute_r (rval, TX_SPACING(tx), TX_STATE(tx))
 	case G_TXHJUSTIFY:
-	    call gst_set_attribute_i (ival, TX_HJUSTIFY(tx), TX_STATE(tx))
+	    call gst_set_attribute_i (nint(rval), TX_HJUSTIFY(tx), TX_STATE(tx))
 	case G_TXVJUSTIFY:
-	    call gst_set_attribute_i (ival, TX_VJUSTIFY(tx), TX_STATE(tx))
+	    call gst_set_attribute_i (nint(rval), TX_VJUSTIFY(tx), TX_STATE(tx))
 	case G_TXFONT:
-	    call gst_set_attribute_i (ival, TX_FONT(tx), TX_STATE(tx))
+	    call gst_set_attribute_i (nint(rval), TX_FONT(tx), TX_STATE(tx))
 	case G_TXQUALITY:
-	    call gst_set_attribute_i (ival, TX_QUALITY(tx), TX_STATE(tx))
+	    call gst_set_attribute_i (nint(rval), TX_QUALITY(tx), TX_STATE(tx))
 	case G_TXCOLOR:
-	    call gst_set_attribute_i (ival, TX_COLOR(tx), TX_STATE(tx))
+	    call gst_set_attribute_i (nint(rval), TX_COLOR(tx), TX_STATE(tx))
 
 	# Fill area attributes.
 
 	case G_FASTYLE:
-	    call gst_set_attribute_i (ival, FA_STYLE(fa), FA_STATE(fa))
+	    call gst_set_attribute_i (nint(rval), FA_STYLE(fa), FA_STATE(fa))
 	case G_FACOLOR:
-	    call gst_set_attribute_i (ival, FA_COLOR(fa), FA_STATE(fa))
+	    call gst_set_attribute_i (nint(rval), FA_COLOR(fa), FA_STATE(fa))
 
 	# Axis labelling parameters affecting more than one axis.
 
 	case G_DRAWTITLE:
-	    GP_DRAWTITLE(gp) = ival
+	    GP_DRAWTITLE(gp) = nint(rval)
 	case G_TITLESIZE:
 	    GP_TITLESIZE(gp) = rval
 	case G_NTITLELINES:
-	    GP_NTITLELINES(gp) = ival
+	    GP_NTITLELINES(gp) = nint(rval)
 	case G_ASPECT:
 	    GP_ASPECT(gp) = rval
 
@@ -166,29 +164,29 @@ begin
 
 		    switch (field) {
 		    case G_DRAWAXES:
-			GL_DRAWAXES(p) = ival
+			GL_DRAWAXES(p) = nint(rval)
 		    case G_SETAXISPOS:
-			GL_SETAXISPOS(p) = ival
+			GL_SETAXISPOS(p) = nint(rval)
 		    case G_AXISPOS1:
 			GL_AXISPOS1(p) = rval
 		    case G_AXISPOS2:
 			GL_AXISPOS2(p) = rval
 		    case G_DRAWGRID:
-			GL_DRAWGRID(p) = ival
+			GL_DRAWGRID(p) = nint(rval)
 		    case G_ROUND:
-			GL_ROUND(p) = ival
+			GL_ROUND(p) = nint(rval)
 		    case G_LABELAXIS:
-			GL_LABELAXIS(p) = ival
+			GL_LABELAXIS(p) = nint(rval)
 		    case G_AXISLABELSIZE:
 			GL_AXISLABELSIZE(p) = rval
 		    case G_DRAWTICKS:
-			GL_DRAWTICKS(p) = ival
+			GL_DRAWTICKS(p) = nint(rval)
 		    case G_LABELTICKS:
-			GL_LABELTICKS(p) = ival
+			GL_LABELTICKS(p) = nint(rval)
 		    case G_NMAJOR:
-			GL_NMAJOR(p) = ival
+			GL_NMAJOR(p) = nint(rval)
 		    case G_NMINOR:
-			GL_NMINOR(p) = ival
+			GL_NMINOR(p) = nint(rval)
 		    case G_MAJORLENGTH:
 			GL_MAJORLENGTH(p) = rval
 		    case G_MINORLENGTH:

@@ -14,11 +14,19 @@ extern	unsigned VSHLIB[], VSHEND;	/* shared library descriptor */
  * to call the procedure.
  */
 ZLOCPR (proc, o_epa)
+#ifdef apollo
+PFI	*proc;			/* procedure for which we desire address */
+#else
 PFI	proc;			/* procedure for which we desire address */
+#endif
 XINT	*o_epa;			/* entry point address */
 {
 	register unsigned *epa = (unsigned *) proc;
+#ifdef apollo
+	*o_epa = (XINT)(*epa);
+#else
 	*o_epa = (XINT) epa;
+#endif
 
 #ifdef SUNOS4
 	/* Return immediately if the shared library is not in use. */

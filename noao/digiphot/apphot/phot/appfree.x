@@ -3,7 +3,7 @@ include "../lib/photdef.h"
 
 # APFREE -- Free the apphot structure.
 
-procedure apfree (ap)
+procedure appfree (ap)
 
 pointer	ap		# pointer to the apphot structure
 

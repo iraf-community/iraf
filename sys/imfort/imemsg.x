@@ -49,11 +49,11 @@ begin
 	case IE_NEXKW:
 %	    errmsg = 'nonexistent header keyword referenced'
 	case IE_NONNUMARG:
-%	    errmsg = 'command line argument cannot be decoded as a number'
+%           errmsg = 'command line argument cannot be decoded as number'
 	case IE_NOTIMH:
 %	    errmsg = 'attempt to access a non-image file as an image'
 	case IE_NOTSHORT:
-%	    errmsg = 'imfort short integer i/o requires a type short image'
+%	    errmsg = 'imfort short integer i/o needs a type short image'
 	case IE_OPEN:
 %	    errmsg = 'cannot open image'
 	case IE_OPNPIX:
@@ -65,7 +65,7 @@ begin
 	case IE_UPDHDR:
 %	    errmsg = 'error updating image header file'
 	case IE_UPDRO:
-%	    errmsg = 'image header modified but image was opened read only'
+%	    errmsg = 'image header modified but image opened read only'
 	case IE_WRHDR:
 %	    errmsg = 'error writing to image header file'
 	case IE_WRPIX:
@@ -82,9 +82,15 @@ begin
 %	    errmsg = 'wrong number of axes on image'
 	case IE_AXLEN:
 %	    errmsg = 'length of each image axis must be .ge. 1'
+	case IE_MKDIR:
+%	    errmsg = 'cannot create pixel subdirectory'
+	case IE_PFNNUNIQ:
+%	    errmsg = 'cannot create unique pixel file name'
+	case IE_CLOBBER:
+%	    errmsg = 'new image would overwrite existing image'
 
 	case SYS_IDBDELNXKW:
-%	    errmsg = 'attempt to delete a nonexistent image header keyword'
+%	    errmsg = 'attempt to delete nonexistent im-header keyword'
 	case SYS_IDBKEYNF:
 %	    errmsg = 'image header keyword not found'
 	case SYS_IDBNODEL:

@@ -1,2 +1,0 @@
-		call zcall4 (IKI_ACCESS(k), root, extn, acmode, status)
-		if (status == YES) {

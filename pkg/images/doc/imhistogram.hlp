@@ -1,4 +1,4 @@
-.help imhistogram May89 images
+.help imhistogram Nov89 images
 .ih
 NAME
 imhistogram -- print or plot the histogram of an image
@@ -27,6 +27,12 @@ that is half open at the top.  \fITop_closed\fR decides whether those
 pixels with values equal to z2 are to be counted in the histogram.  If
 \fBtop_closed\fR is yes, the top bin will be larger than the other bins.
 .le
+.ls hist_type = "normal"
+The type of histogram to plot or list.  The choices are "normal",
+"cumulative", "difference", or "second_difference".  The two
+"difference" options are calculated as forward differences, i.e.,
+diff[n] = hist[n+1] - hist[n].
+.le
 .ls listout = no
 List instead of plot the histogram?  The list is never log scaled.
 .le
@@ -50,6 +56,13 @@ the graphics device \fIdevice\fR in the vector mode specified by
 default).  If \fIlistout\fR = yes, the histogram is listed on the
 standard output.
 
+In addition to producing the "normal" histogram, the task will also
+calculate cumulative and marginal (forward difference) histograms
+depending on the choice of the \fIhist_type\fR parameter (choices
+are:  "normal", "cumulative", "difference", and "second_difference").
+The plot will be labeled by the type of histogram as well as the image
+name and title and the binning parameters.
+
 Each bin of the histogram is defined to be half open at the top.  This
 results in an ambiguity deciding whether those pixels with z=z2 are
 included in the topmost bin.  This decision is left to the user via the
@@ -59,17 +72,21 @@ images and histograms with few bins.
 EXAMPLES
 1. Output the histogram of an image to a file.
 
-    cl> imhist fits1 li+ nbins=100 > fits1.hst
+    cl> imhist M51.imh li+ nbins=100 > fits1.hst
 
-2. Plot the histogram of image between the values 0 and 2000.
+2. Plot the histogram of another image between the values 0 and 2000.
 
-    cl> imhist fits1 nbins=100 z1=0. z2=2000.
+    cl> imhist M31.imh nbins=100 z1=0. z2=2000.
 
 3. Ditto, but set the histogram resolution explicitly to avoid
 smoothing the histogram.
 
-    cl> imhist fits1 nbins=100 z1=0 z2=2000 nbins=2001
+    cl> imhist M31.imh nbins=100 z1=0 z2=2000 nbins=2001
 
+4. Plot the cumulative histogram.  This is most useful for images with
+fairly flat "normal" histograms.
+
+    cl> imhist R50.imh hist=cum
 .ih
 BUGS
 If the resolution of the histogram (number of bins) is a non-integral multiple

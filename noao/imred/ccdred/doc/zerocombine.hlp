@@ -76,6 +76,11 @@ This task is a script which applies \fBccdproc\fR and \fBcombine\fR.
 The parameters and combining algorithms are described in detail in
 the help for \fBcombine\fR.  This script has default parameters
 specifically set for zero level images.
+
+Note that if the images are processed before combining, the \fImodesec\fR
+parameter in \fBcombine\fR refers to the processed images.  In other
+words the mode section is applied after any trimming of the original
+images.
 .ih
 EXAMPLES
 1. The image data contains four zero level images.

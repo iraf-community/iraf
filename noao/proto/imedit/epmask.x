@@ -127,7 +127,7 @@ begin
 	    for (i=x1a; i<=x2a; i=i+1)
 	        Memi[ptr1+i] = 0
 	    for (i=y1b; i<y1a; i=i+1)
-	        call amovi (Memi[mask], Memi[ptr2+i*EP_NX(ep)], EP_NX(ep))
+	        call amovi (Memi[line], Memi[ptr2+i*EP_NX(ep)], EP_NX(ep))
 	    for (i=y2a+1; i<=y2b; i=i+1)
 	        call amovi (Memi[line], Memi[ptr2+i*EP_NX(ep)], EP_NX(ep))
  

@@ -58,7 +58,7 @@ char	*source;
 	char	*bp, *start, c;
 	char	*pk, *t, *p, *f;
 	char	field;
-	struct	operand o;
+	struct	operand o, junk;
 	struct	param *pp;
 	int	eoftst;
 
@@ -112,7 +112,7 @@ char	*source;
 	    o.o_type = OT_INT;
 	    o.o_val.v_i = CL_EOF;
 	    while (nargs-- > 0)
-		popop();		/* flush op stack		*/
+		junk = popop();		/* flush op stack		*/
 	    pushop (&o);
 	    return;
 	}
@@ -181,7 +181,7 @@ char	*source;
 	 * conversion, we must pop the remaining unused operands off the stack.
 	 */
 	while (--nargs >= 0)
-	    popop();
+	    junk = popop();
 
 	o.o_type = OT_INT;
 	o.o_val.v_i = nscan_val;

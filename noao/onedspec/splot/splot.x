@@ -78,7 +78,7 @@ pointer	gp, gt, im, pix, ids, sp
 bool	wave_scl, fnu
 
 pointer	gopen(), gt_init()
-int	clgcur(), imtopen(), imtgetim(), imaccess()
+int	clgcur(), imtopen(), imtgetim(), imaccess(), access()
 real	clgetr()
 bool	streq()
 errchk	getimage, fun_do
@@ -136,9 +136,12 @@ begin
 	        case ':':
 		    if (command[1] == '/')
 		        call gt_colon (command, gp, gt, newgraph)
-		    else if (command[1] == 's')
-		        call gpagefile (gp, save_temp, "splot data")
-		    else
+		    else if (command[1] == 's') {
+			if (access (save_temp, READ_ONLY, TEXT_FILE) == YES)
+		            call gpagefile (gp, save_temp, "splot data")
+			else
+			    call printf ("No measurements\n")
+		    } else
 		        call printf ("\07\n")
 
 	        case 'a': # Autoexpand

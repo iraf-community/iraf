@@ -29,27 +29,30 @@
 
 #define	DEBUGFLAG	'g'		/* what to use when -x is seen */
 #define	XPP		"xpp"
-#define	XPPEXE		"xpp.e"
 #define	RPP		"rpp"
-#define	RPPEXE		"rpp.e"
 #define LIBMAIN		"libmain.o"
 #define SHARELIB	"libshare.a"
 #define IRAFLIB1	"libex.a"
 #define IRAFLIB2	"libsys.a"
 #define IRAFLIB3	"libvops.a"
 #define IRAFLIB4	"libos.a"
-
-#define FORTLIB0	"-lU77"		/* Convex libraries */
-#define FORTLIB1	"-lF77"
-#define FORTLIB2	"-lI77"
-#define FORTLIB3	"-lD77"
+#define	FORTLIB0	"-lU77"
+#define FORTLIB1	"-lm"
+#define FORTLIB2	"-lF77"
+#define FORTLIB3	"-lI77"
 #define FORTLIB4	"-lm"
-#define FORTLIB5	"-lmathC1"
+#define	CC_COMMAND	"cc"
+#define	F77_COMMAND	"f77"
+#define	LD_COMMAND	"f77"
 
 #ifdef SUNOS4
 int	usesharelib = YES;
 #else
 int	usesharelib = NO;
+#endif
+
+#ifndef apollo
+#define	U_USED				/* whether to use -u compilation flag */
 #endif
 
 int	noedsym = NO;
@@ -324,10 +327,10 @@ passflag:		    mkobject = YES;
 	 * everything be declared) for raw Fortran files.
 	 */
 	nargs = 0;
-	arglist[nargs++] = "fc";
+	arglist[nargs++] = F77_COMMAND;
 	arglist[nargs++] = "-c";
 	if (optimize)
-	    arglist[nargs++] = "-O1";
+	    arglist[nargs++] = "-O";
 
 	for (i=0;  i < nflags;  i++)
 	    arglist[nargs++] = lflags[i];
@@ -338,8 +341,8 @@ passflag:		    mkobject = YES;
 
 	if (i > 0) {
 	    if (debug)
-		printargs ("fc", arglist, nargs);
-	    errflag += run ("fc", arglist);
+		printargs (F77_COMMAND, arglist, nargs);
+	    errflag += run (F77_COMMAND, arglist);
 	}
 
 
@@ -347,11 +350,13 @@ passflag:		    mkobject = YES;
 	 * object code.
 	 */
 	nargs = 0;
-	arglist[nargs++] = "fc";
+	arglist[nargs++] = F77_COMMAND;
 	arglist[nargs++] = "-c";
-	/* arglist[nargs++] = "-u"; */
+#ifdef	U_USED
+	arglist[nargs++] = "-u";
+#endif
 	if (optimize)
-	    arglist[nargs++] = "-O1";
+	    arglist[nargs++] = "-O";
 
 	for (i=0;  i < nflags;  i++)
 	    arglist[nargs++] = lflags[i];
@@ -371,8 +376,8 @@ passflag:		    mkobject = YES;
 
 	if (noperands > 0) {
 	    if (debug)
-		printargs ("fc", arglist, nargs);
-	    errflag += run ("fc", arglist);
+		printargs (F77_COMMAND, arglist, nargs);
+	    errflag += run (F77_COMMAND, arglist);
 	}
 
 
@@ -380,7 +385,7 @@ passflag:		    mkobject = YES;
 	 * object code.
 	 */
 	nargs = 0;
-	arglist[nargs++] = "cc";
+	arglist[nargs++] = CC_COMMAND;
 	arglist[nargs++] = "-c";
 	if (optimize)
 	    arglist[nargs++] = "-O";
@@ -401,8 +406,8 @@ passflag:		    mkobject = YES;
 
 	if (noperands > 0) {
 	    if (debug)
-		printargs ("cc", arglist, nargs);
-	    errflag += run ("cc", arglist);
+		printargs (CC_COMMAND, arglist, nargs);
+	    errflag += run (CC_COMMAND, arglist);
 	}
 
 
@@ -416,7 +421,11 @@ passflag:		    mkobject = YES;
 	/* Link the object files and libraries to produce the "-o" task.
 	 */
 	nargs = 0;
-	arglist[nargs++] = "cc";
+#ifdef apollo
+	arglist[nargs++] = LD_COMMAND;
+#else
+	arglist[nargs++] = CC_COMMAND;
+#endif
 	arglist[nargs++] = "-o";
 
 	sprintf (tempfile, "T_%s", outfile);
@@ -447,9 +456,9 @@ passflag:		    mkobject = YES;
 	for (i=0;  i < nfiles;  i++)
 	    arglist[nargs++] = lfiles[i];
 
-	if (hostprog)
+	if (hostprog) {
 	    arglist[nargs++] = mkfname (FORTLIB0);
-	else {
+	} else {
 	    arglist[nargs++] = mkfname (LIBMAIN);
 	    if (usesharelib) {
 		arglist[nargs++] = mkfname (SHARELIB);
@@ -466,7 +475,6 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = mkfname (FORTLIB2);
 	arglist[nargs++] = mkfname (FORTLIB3);
 	arglist[nargs++] = mkfname (FORTLIB4);
-	arglist[nargs++] = mkfname (FORTLIB5);
 	arglist[nargs] = NULL;
 
 	if (ncomp) {
@@ -474,13 +482,21 @@ passflag:		    mkobject = YES;
 	    fflush (stderr);
 	}
 	if (debug)
-	    printargs ("cc", arglist, nargs);
+#ifdef apollo
+	    printargs (LD_COMMAND, arglist, nargs);
+#else
+	    printargs (CC_COMMAND, arglist, nargs);
+#endif
 
 	/* If the link is successful, replace the old executable with the
 	 * new one.  Do not delete the bad executable if the link fails,
 	 * as we might want to examine its symbol table.
 	 */
-	if ((status = run ("cc", arglist)) == 0) {
+#ifdef apollo
+	if ((status = run (LD_COMMAND, arglist)) == 0) {
+#else
+	if ((status = run (CC_COMMAND, arglist)) == 0) {
+#endif
 	    unlink (outfile);
 	    link   (tempfile, outfile);
 	    unlink (tempfile);
@@ -600,7 +616,7 @@ char	*file;
 	}
 
 	if (!xpp_path[0])
-	    if (os_sysfile (XPPEXE, xpp_path, SZ_PATHNAME) <= 0)
+	    if (os_sysfile (XPP, xpp_path, SZ_PATHNAME) <= 0)
 		strcpy (xpp_path, XPP);
 
 	if (pkgenv)
@@ -620,7 +636,7 @@ char	*file;
 	chdot (fname, 'f');
 
 	if (!rpp_path[0])
-	    if (os_sysfile (RPPEXE, rpp_path, SZ_PATHNAME) <= 0)
+	    if (os_sysfile (RPP, rpp_path, SZ_PATHNAME) <= 0)
 		strcpy (rpp_path, RPP);
 	sprintf (cmdbuf, "%s %s >%s", rpp_path, file, fname);
 	if (!(errflag & XPP_BADXFILE))
@@ -724,14 +740,6 @@ char	*argv[];
 	    execv (path+4, argv);	/* /bin/command */
 	    execv (path  , argv);	/* /usr/bin/command */
 
-	    s = path;
-	    t = "/usr/convex/";
-	    while (*t != EOS)
-		*s++ = *t++;
-	    for (t = task;  (*s++ = *t++) != EOS;  )
-		;
-	    execv (path  , argv);	/* /usr/convex/command */
-
 	    fatalstr ("Cannot execute %s", path+9);
 	}
 
@@ -815,28 +823,13 @@ char	*str;
 	    texec (path  , argv);	/* /usr/bin/command */
 
 	    s = path;
-	    t = "/local/bin/";
-	    while (*t)
-		*s++ = *t++;
-	    for (t = argv[1] ; *s++ = *t++ ; )
-		;
-	    texec (path  , argv);	/* /local/bin/command */
-
-	    s = path;
 	    t = "/usr/local/bin/";
 	    while (*t)
 		*s++ = *t++;
 	    for (t = argv[1] ; *s++ = *t++ ; )
 		;
-	    texec (path  , argv);	/* /usr/local/bin/command */
 
-	    s = path;
-	    t = "/iraf/local/bin/";
-	    while (*t)
-		*s++ = *t++;
-	    for (t = argv[1] ; *s++ = *t++ ; )
-		;
-	    texec (path  , argv);	/* /iraf/local/bin/command */
+	    texec (path  , argv);	/* /usr/local/bin/command */
 
 	    fatalstr ("Cannot execute %s", path);
 	}

@@ -10,6 +10,7 @@ pointer	mk		# pointer to the immark structure
 pointer	sp, str
 bool	itob()
 int	mk_stati()
+real	mk_statr()
 
 begin
 	# Allocate working space.
@@ -22,9 +23,9 @@ begin
 
 	# Store the circle and rectangles descriptors.
 	call mk_stats (mk, CSTRING, Memc[str], SZ_LINE)
-	call clputstr ("radii", Memc[str])
+	call clpstr ("radii", Memc[str])
 	call mk_stats (mk, RSTRING, Memc[str], SZ_LINE)
-	call clputstr ("lengths", Memc[str])
+	call clpstr ("lengths", Memc[str])
 
 	call clputi ("number", itob (mk_stati (mk, NUMBER)))
 	call clputi ("label", itob (mk_stati (mk, LABEL)))
@@ -33,6 +34,7 @@ begin
 	call clputi ("color", mk_stati (mk, GRAYLEVEL))
 	call clputi ("nxoffset", mk_stati (mk, NXOFFSET))
 	call clputi ("nyoffset", mk_stati (mk, NYOFFSET))
+	call clputr ("tolerance", mk_statr (mk, TOLERANCE))
 
 	call sfree (sp)
 end

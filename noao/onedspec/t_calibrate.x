@@ -238,7 +238,7 @@ int	nbeams		# Number of active beams
 real	data[npts]	# Data to be calibrated
 int	npts		# Number of data points
 
-int	i, err
+int	i, nout
 real	expo, w0, wpc, x, w, d1, d2, asieval()
 pointer	cal, asi
 errchk	asifit
@@ -248,7 +248,7 @@ begin
 	call cal_getflux (sens, fnu, beam, beams, nbeams, cal)
 
 	# Compute correction for dispersion and exposure time
-	if (IS_INDEFI(ITM(ids)) || (ITM(ids) <= 0))
+	if (IS_INDEF(ITM(ids)) || (ITM(ids) <= 0.))
 	    expo = 1.0
 	else
 	    expo = ITM(ids)
@@ -268,30 +268,24 @@ begin
 	    call asiinit (asi, II_SPLINE3)
 	    call asifit (asi, Memr[CAL_DATA(cal)], CAL_NPTS(cal))
 
-	    err = YES
+	    nout = 0
 	    w = w0 - wpc
 	    do i = 1, npts {
 		w = w + wpc
 		x = (w - CAL_W0(cal)) / CAL_WPC(cal) + 1
-		if (err == YES && (x < 1. || x > CAL_NPTS(cal))) {
-		    call eprintf (
-        "  WARNING: Spectrum extends outside of flux calibration limits\n")
-#		    call eprintf (
-#	"w0=%g wpc=%g npts=%d\ncal_w0=%g cal_wpc=%g cal_npts=%d\nw=%g x=%g\n\n")
-#			call pargr (w0)
-#			call pargr (wpc)
-#			call pargi (npts)
-#			call pargr (CAL_W0(cal))
-#			call pargr (CAL_WPC(cal))
-#			call pargi (CAL_NPTS(cal))
-#			call pargr (w)
-#			call pargr (x)
+		if (x < 1. || x > CAL_NPTS(cal)) {
 		    x = max (1., min (real (CAL_NPTS(cal)), x))
-		    err = NO
+		    nout = nout + 1
 		}
 		data[i] = data[i] * asieval (asi, x)
 	    }
 	    call asifree (asi)
+
+	    if (nout > 0) {
+	        call eprintf (
+                "  WARNING: %d pixels lie outside of flux calibration limits\n")
+		    call pargi (nout)
+	    }
 	}
 
 	CA_FLAG(ids) = 0

@@ -26,7 +26,7 @@ setinstrument	hlp=doc$setinstrument.hlp
 subsets		hlp=doc$subsets.hlp
 zerocombine	hlp=doc$zerocombine.hlp
 
-revisions	hlp=Revisions
+revisions	sys=Revisions
 
 $ccdtest	= "noao$imred/ccdred/ccdtest/"
 

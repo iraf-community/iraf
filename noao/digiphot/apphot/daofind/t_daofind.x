@@ -5,8 +5,8 @@ include "../lib/apphot.h"
 include "../lib/noise.h"
 include "../lib/find.h"
 
-# T_DAOFIND --  Program to automatically detect objects in an image given
-# the full width half maximum of the image PSF and an intensity threshold.
+# T_DAOFIND --  Automatically detect objects in an image given the full
+# width half maximum of the image PSF and an intensity threshold.
 
 procedure t_daofind ()
 
@@ -17,6 +17,7 @@ int	boundary		# type of boundary extension
 real	constant		# constant for constant boundary extension
 int	interactive		# interactive mode
 int	verify			# verify mode
+int	update			# update critical parameters
 int	verbose			# verbose mode
 
 int	limlist, lolist, save, out, root, stat
@@ -24,7 +25,7 @@ pointer	imlist, olist, im, cnv, sp, outfname, cnvname, str, ap, cname
 pointer	display, graphics, id, gd
 
 bool	clgetb(), streq()
-int	imtlen(), clplen(), btoi(), clgwrd(), aptmpimage()
+int	imtlen(), clplen(), btoi(), clgwrd(), aptmpimage(), access()
 int	open(), strmatch(), strncmp(), strlen(), fnldir(), ap_fdfind()
 pointer	imtopenp(), clpopnu(), clgfil(), imtgetim(), immap(), ap_cnvmap()
 pointer	gopen()
@@ -74,6 +75,7 @@ begin
 	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
 	interactive = btoi (clgetb ("interactive"))
 	verify = btoi (clgetb ("verify"))
+	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
 	# Open the graphics and display devices.
@@ -111,14 +113,22 @@ begin
 
 	# Confirm the parameters.
 	call ap_fdgpars (ap)
-	if (verify == YES && interactive == NO) 
+	if (verify == YES && interactive == NO)  {
 	    call ap_fdconfirm (ap)
+	    if (update == YES)
+		call ap_fdpars (ap)
+	}
 
 	# Loop over the images.
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the image and results file
 	    im = immap (Memc[image], READ_ONLY, 0)
+	    call ap_rdnoise (im, ap)
+	    call ap_padu (im, ap)
+	    call ap_itime (im, ap)
+	    call ap_airmass (im, ap)
+	    call ap_filter (im, ap)
 	    call apsets (ap, IMNAME, Memc[image])
 
 	    # Set up the results file. If output is a null string or
@@ -126,8 +136,8 @@ begin
 	    # root image name and the appropriate version number is appended
 	    # in order to construct a default output file name.
 
+	    out = NULL
 	    if (lolist == 0) {
-		out = NULL
 		call strcpy ("", Memc[outfname], SZ_FNAME)
 	    } else {
 		stat = clgfil (olist, Memc[output], SZ_FNAME)
@@ -136,14 +146,16 @@ begin
 		    strlen (Memc[output])) {
 	            call apoutname (Memc[image], "", "coo", Memc[outfname],
 		        SZ_FNAME)
-	            out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+	            #out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 		    lolist = limlist
 		} else if (stat != EOF) {
 		    call strcpy (Memc[output], Memc[outfname], SZ_FNAME)
-		    out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+		    #out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 		}
 	    }
 	    call apsets (ap, OUTNAME, Memc[outfname])
+	    if (access (Memc[outfname], 0, 0) == YES)
+		call error (0, "T_DAOFIND: Output file already exists.\n")
 
 	    # Set up the directory and name for the density enhancement image.
 	    # Note that the default value for cnvimage is the null string
@@ -158,11 +170,16 @@ begin
 	    # Find the stars in an image.
 	    if (interactive == NO) {
 
+		cnv = NULL
 		if (Memc[cname] != EOS) {
 		    stat = ap_fdfind (Memc[cnvname], ap, im, NULL, NULL, NULL,
 		        out, boundary, constant, save, NO)
 		} else {
 	            cnv = ap_cnvmap (Memc[cnvname], im, ap, save)
+		    if (Memc[outfname] != EOS)
+		        out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+		    else
+			out = NULL
 		    call ap_bfdfind (im, cnv, out, ap, boundary, constant,
 			verbose)
 	            call imunmap (cnv)
@@ -185,10 +202,14 @@ begin
 	}
 
 	# Close image and output file lists.
-	if (gd != NULL)
-	    call gclose (gd)
-	if (id != NULL)
-	    call gclose (gd)
+	if (id == gd && id != NULL) {
+	    call gclose (id)
+	} else {
+	    if (gd != NULL)
+	        call gclose (gd)
+	    if (id != NULL)
+	        call gclose (gd)
+	}
 	call ap_fdfree (ap)
 	call imtclose (imlist)
 	call clpcls (olist)
@@ -196,7 +217,7 @@ begin
 end
 
 
-# AP_CNVMAP -- Procedure to access the convolved image.
+# AP_CNVMAP -- Access the convolved image.
 
 pointer procedure ap_cnvmap (cnvname, im, ap, save)
 
@@ -215,7 +236,6 @@ real	apstatr(), imgetr()
 errchk	imgetr()
 
 begin
-
 	# Check to see if the image already exists. If it does not
 	# open a new image and write the PSF characteristics into the
 	# image user area, otherwise fetch the PSF parameters from the image
@@ -274,4 +294,66 @@ begin
 	}
 
 	return (cnv)
+end
+
+
+# AP_OUTMAP -- Manufacture an output coordinate file name.
+
+procedure ap_outmap (ap, out, root)
+
+pointer	ap		# pointer to the apphot structure
+int	out		# pointer to the output file
+char	root[ARB]	# root of the previous output file name, may be
+			# updated
+
+int	findex, lindex, version
+pointer	sp, image, outname, newoutname
+int	strmatch(), gstrmatch(), open(), fnldir(), access()
+
+begin
+	if (out != NULL)
+	    call close (out)
+
+	call smark (sp)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (outname, SZ_FNAME, TY_CHAR)
+	call salloc (newoutname, SZ_FNAME, TY_CHAR)
+
+	# Get the old names.
+	call apstats (ap, IMNAME, Memc[image], SZ_FNAME)
+	call apstats (ap, OUTNAME, Memc[outname], SZ_FNAME)
+
+	# Manufacture a new name. Search first for existing files with
+	# the form "outname.coo.*" and create a new version number.
+	# If the first search fails look for names containing root
+	# and append a version number to create a new output file
+	# name. Otherwise simply use the output name.
+
+	if (Memc[outname] == EOS) {
+	    Memc[newoutname] = EOS
+        } else if (strmatch (Memc[outname], "\.coo\.") > 0) {
+	    findex = fnldir (Memc[outname], Memc[newoutname], SZ_FNAME)
+	    call apoutname (Memc[image], "", "coo", Memc[newoutname],
+		SZ_FNAME)
+	} else if (gstrmatch (Memc[outname], root, findex, lindex) > 0) {
+	    repeat {
+	        version = version + 1
+	        call strcpy (Memc[outname], Memc[newoutname], SZ_FNAME)
+	        call sprintf (Memc[newoutname+lindex], SZ_FNAME, ".%d")
+		    call pargi (version)
+	    } until (access (Memc[newoutname], 0, 0) == NO)
+	} else {
+	    version = 1
+	    call strcpy (Memc[outname], root, SZ_FNAME)
+	    call strcpy (Memc[outname], Memc[newoutname], SZ_FNAME)
+	}
+
+	# Open the output image.
+	if (Memc[newoutname] == EOS)
+	    out = NULL
+	else
+	    out = open (Memc[newoutname], NEW_FILE, TEXT_FILE)
+	call apsets (ap, OUTNAME, Memc[newoutname])
+
+	call sfree (sp)
 end

@@ -31,10 +31,6 @@ begin
 	call greactivate (gd, 0)
 	call gclear (gd)
 
-	# Fit the center.
-	call ap_ictr (im, wx, wy, CRADIUS, apstati (ap, POSITIVE), xcenter,
-	    ycenter)
-
 	# Get the radius of the extraction region.
 	call printf ("Half width of extraction box (%4.1f) pixels:")
 	    call pargr (RADIUS)
@@ -55,7 +51,11 @@ begin
 	call salloc (r, maxpix, TY_REAL)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
 
-	# Fetch the radial profile and reset the sky.
+	# Fit the center.
+	call ap_ictr (im, wx, wy, CRADIUS, apstati (ap, POSITIVE), xcenter,
+	    ycenter)
+
+	# Fetch the pixels for the radial profile.
 	npix = ap_skypix (im, xcenter, ycenter, 0.0, radius, Memr[pix],
 	    Memi[coords], xc, yc, nx, ny)
 	if (npix <= 0) {

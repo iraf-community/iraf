@@ -5,7 +5,7 @@ $icfit		= "pkg$xtools/icfit/"
 $gtools		= "pkg$xtools/gtools/"
 $ranges		= "pkg$xtools/ranges/"
 
-revisions	hlp = xtools$Revisions
+revisions	sys = xtools$Revisions
 dttext		hlp = xtools$dttext.x,		src = ..
 cogetr		hlp = cogetr.hlp,		src = xtools$cogetr.x
 comap		hlp = cogetr.hlp,		src = xtools$cogetr.x

@@ -60,8 +60,13 @@ begin
 	    ID_CRVAL(id) = 1.
 	call sprintf (Memc[str2], SZ_LINE, "cdelt%d")
 	    call pargi (vmap)
-	iferr (ID_CDELT(id) = imgetd (im, Memc[str2]))
-	    ID_CDELT(id) = 1.
+	iferr (ID_CDELT(id) = imgetd (im, Memc[str2])) {
+	    call sprintf (Memc[str2], SZ_LINE, "cd%d_%d")
+	        call pargi (vmap)
+	        call pargi (vmap)
+	    iferr (ID_CDELT(id) = imgetd (im, Memc[str2]))
+	        ID_CDELT(id) = 1.
+	}
 	call sprintf (Memc[str2], SZ_LINE, "ctype%d")
 	    call pargi (vmap)
 	if (imaccf (im, Memc[str2]) == YES) {

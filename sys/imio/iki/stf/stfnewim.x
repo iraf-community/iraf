@@ -5,7 +5,6 @@ include	<imio.h>
 include	<mach.h>
 include	"stf.h"
 
-define	SZ_KEYWORD	8
 define	NBITS_CHAR	(SZB_CHAR * NBITS_BYTE)
 
 
@@ -22,6 +21,7 @@ pointer	o_im
 long	totpix
 char	pname[SZ_KEYWORD]
 int	pixtype, bitpix, nbytes, pno, ndim, i, j
+errchk	stf_addpar
 int	sizeof()
 string	zero "0"
 string	one  "1"
@@ -85,11 +85,17 @@ begin
 	   (IM_KERNEL(o_im) != IM_KERNEL(im))) ) {
 
 	    # Set up the standard STF group parameter block parameters.
-
 	    STF_GROUPS(stf) = YES
 	    STF_PCOUNT(stf) = 2 + ndim * (3 + ndim)
 	    STF_PSIZE(stf)  = 2 * SZ_REAL*NBITS_CHAR + ndim * 
 	        ((ndim+1) * SZ_REAL*NBITS_CHAR + 2 * SZ_DOUBLE*NBITS_CHAR)
+
+	    # Free any unneeded space in the STF descriptor.
+	    if (STF_PCOUNT(stf) > 0) {
+		call realloc (stf,
+		    LEN_STFBASE + STF_PCOUNT(stf)*LEN_PDES, TY_STRUCT)
+		IM_KDES(im) = stf
+	    }
 
 	    # Set up the group data block in the STF descriptor and in 
 	    # the IMIO FITS format user area.  WARNING--the STF kernel
@@ -107,9 +113,9 @@ begin
 
 	    do i = 1, ndim {
 		call sprintf (pname,  SZ_KEYWORD, "CRPIX%d"); call pargi (i)
-		call stf_addpar (im, pname, TY_REAL, 1, one, pno)
+		call stf_addpar (im, pname, TY_REAL, 1, zero, pno)
 		call sprintf (pname,  SZ_KEYWORD, "CRVAL%d"); call pargi (i)
-		call stf_addpar (im, pname, TY_DOUBLE, 1, one, pno)
+		call stf_addpar (im, pname, TY_DOUBLE, 1, zero, pno)
 		call sprintf (pname,  SZ_KEYWORD, "CTYPE%d"); call pargi (i)
 		call stf_addpar (im, pname, TY_CHAR, 8, "PIXEL", pno)
 
@@ -123,17 +129,6 @@ begin
 			call stf_addpar (im, pname, TY_REAL, 1, zero, pno)
 		}
 	    }
-
-	    # Record the size of the FITS encoded GPB, one for each parameter
-	    # and four for the header resident params (GROUPS, GCOUNT, PCOUNT,
-	    # and PSIZE)
-
-	    # NOTE (Nelson Zarate Jan 26 '89). The above 4 parameters are not
-	    # written into the userarea when an image in created; therefore we
-	    # should not account for them.
-
-#	    STF_SZGPBHDR(stf) = (STF_PCOUNT(stf) + 4) * (FITS_RECLEN + 1)
-	    STF_SZGPBHDR(stf) = STF_PCOUNT(stf) * (FITS_RECLEN + 1)
 	}
 
 	# Compute the size of each group in the pixel file, in chars.

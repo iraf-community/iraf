@@ -1,6 +1,5 @@
 include <imhdr.h>
 include <fset.h>
-include <pkg/dttext.h>
 include "iralign.h"
 
 # T_IRMATCHD2 -- Align the individual subraster elements in the input image.
@@ -11,20 +10,20 @@ include "iralign.h"
 
 procedure t_irmatchd2 ()
 
-int	cl, nxrsub, nyrsub, ncols, nrows, nxsub, nysub, nxoverlap, nyoverlap
-int	corner, order, raster, nimlines, nimcols, interp, align, verbose
-int	nshifts, nmatch
-pointer	sp, inimage, outimage, database, coords, section, matchlist, ranges
-pointer	str, im, outim, dt
-pointer	nrshifts, ncshifts, xrshifts, yrshifts, xcshifts, ycshifts, inshifts
-real	xshift, yshift, rval, oval
+int	cl, interp, align, verbose, nimages, nmatch
+pointer	sp, inimage, outimage, database, coords, matchlist, trimlimits, ranges
+pointer	str, ir, im, outim, dt
 
 bool	clgetb()
-int	open(), clgeti(), clgwrd(), btoi(), ir_shifts(), decode_ranges()
+int	open(), clgwrd(), btoi(), ir_links(), ir_clinks(), ir_flinks()
+int	decode_ranges()
 pointer	immap(), dtmap()
 real	clgetr()
 
 begin
+	# Allocate space for the ir strucuture.
+	call ir_init (ir)
+
 	# Set the standard output to flush on a new line.
 	call fseti (STDOUT, F_FLUSHNL, YES)
 
@@ -35,17 +34,18 @@ begin
 	call salloc (coords, SZ_FNAME, TY_CHAR)
 	call salloc (database, SZ_FNAME, TY_CHAR)
 	call salloc (matchlist, SZ_LINE, TY_CHAR)
+	call salloc (trimlimits, SZ_FNAME, TY_CHAR)
 	call salloc (ranges, 3 * MAX_NRANGES + 1, TY_INT)
-	call salloc (section, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the input and output images and the coordinate list.
 	call clgstr ("input", Memc[inimage], SZ_FNAME)
 	call clgstr ("output", Memc[outimage], SZ_FNAME)
 	call clgstr ("database", Memc[database], SZ_FNAME)
-	call clgstr ("refsection", Memc[section], SZ_FNAME)
-	align = clgwrd ("alignment", Memc[str], SZ_LINE, ",coords,shifts,")
+	call clgstr ("coords", Memc[coords], SZ_FNAME)
+	align = clgwrd ("alignment", Memc[str], SZ_LINE, ",coords,shifts,file,")
 	call clgstr ("match", Memc[matchlist], SZ_LINE)
+	call clgstr ("trimlimits", Memc[trimlimits], SZ_FNAME)
 
 	# Open the images and files.
 	im = immap (Memc[inimage], READ_ONLY, 0)
@@ -53,33 +53,21 @@ begin
 	dt = dtmap (Memc[database], READ_ONLY)
 
 	# Get the data base parameters.
-	call ir_dtrparams (dt, Memc[inimage], ncols, nrows, nxsub, nysub,
-	    nxoverlap, nyoverlap, corner, order, raster, oval)
-	nxrsub = clgeti ("nxrsub")
-	if (IS_INDEFI(nxrsub) || nxrsub < 1 || nxrsub > nxsub)
-	    nxrsub = (nxsub + 1) / 2
-	nyrsub = clgeti ("nyrsub")
-	if (IS_INDEFI(nyrsub) || nyrsub < 1 || nyrsub > nysub)
-	    nyrsub = (nysub + 1) / 2
-	nimcols = clgeti ("nimcols")
-	if (! IS_INDEFI(nimcols) && nimcols > 0 && nimcols >= IM_LEN(im,1))
-	    IM_LEN(outim,1) = nimcols
-	nimlines = clgeti ("nimlines")
-	if (! IS_INDEFI(nimlines) && nimlines > 0 && nimlines >= IM_LEN(im,2))
-	    IM_LEN(outim,2) = nimlines
+	call ir_dtrparams (dt, Memc[inimage], ir)
+
+	call ir_params (ir, im, outim)
+
 	interp = clgwrd ("interpolant", Memc[str], SZ_LINE,
 	    ",nearest,linear,poly3,poly5,spline3,")
-	rval = clgetr ("oval")
-	if (! IS_INDEFR(rval))
-	    oval = rval
 	verbose = btoi (clgetb ("verbose"))
 
 	# Decode the list of input images to be intensity matched.
+	nimages = IR_NXSUB(ir) * IR_NYSUB(ir)
 	if (Memc[matchlist] == EOS) {
 	    Memi[ranges] = NULL
 	} else if (Memc[matchlist] == '*') {
 	    Memi[ranges] = 1
-	    Memi[ranges+1] = nxsub * nysub
+	    Memi[ranges+1] = nimages
 	    Memi[ranges+2] = 1
 	    Memi[ranges+3] = NULL
 	} else if (decode_ranges (Memc[matchlist], Memi[ranges], MAX_NRANGES,
@@ -89,53 +77,83 @@ begin
 
 	}
 
-	# Allocate temporary space.
-	call salloc (xrshifts, nxsub * nysub, TY_REAL)
-	call salloc (yrshifts, nxsub * nysub, TY_REAL)
-	call salloc (xcshifts, nxsub * nysub, TY_REAL)
-	call salloc (ycshifts, nxsub * nysub, TY_REAL)
-	call salloc (nrshifts, nxsub * nysub, TY_INT)
-	call salloc (ncshifts, nxsub * nysub, TY_INT)
-	call salloc (inshifts, nxsub * nysub, TY_REAL)
+	# Allocate working space.
+	call ir_arrays (ir, nimages)
 
 	# Compute the shifts for each subraster.
 	switch (align) {
 	case IR_COORDS:
-	    call clgstr ("coords", Memc[coords], SZ_FNAME)
 	    cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
-	    nshifts = ir_shifts (cl, Memr[xrshifts], Memr[yrshifts],
-	        Memr[xcshifts], Memr[ycshifts], Memi[nrshifts], Memi[ncshifts],
-		ncols, nrows, nxrsub, nyrsub, nxsub, nysub, nxoverlap,
-		nyoverlap, order)
+	    if (ir_links (cl, Memr[IR_XRSHIFTS(ir)], Memr[IR_YRSHIFTS(ir)],
+	        Memr[IR_XCSHIFTS(ir)], Memr[IR_YCSHIFTS(ir)],
+		Memi[IR_NRSHIFTS(ir)], Memi[IR_NCSHIFTS(ir)],
+		IR_NCOLS(ir), IR_NROWS(ir), IR_NXRSUB(ir), IR_NYRSUB(ir),
+		IR_NXSUB(ir), IR_NYSUB(ir), IR_NXOVERLAP(ir), IR_NYOVERLAP(ir),
+		IR_ORDER(ir)) > 0) {
+	        call ir_shifts (ir, im, outim, Memr[IR_XRSHIFTS(ir)],
+		    Memr[IR_YRSHIFTS(ir)], Memr[IR_XCSHIFTS(ir)],
+		    Memr[IR_YCSHIFTS(ir)], Memi[IR_IC1(ir)], Memi[IR_IC2(ir)],
+		    Memi[IR_IL1(ir)], Memi[IR_IL2(ir)], Memi[IR_OC1(ir)],
+		    Memi[IR_OC2(ir)], Memi[IR_OL1(ir)], Memi[IR_OL2(ir)],
+		    Memr[IR_DELTAX(ir)], Memr[IR_DELTAY(ir)])
+	        call ir_m2match (ir, im, Memi[ranges], Memi[IR_IC1(ir)],
+		    Memi[IR_IC2(ir)], Memi[IR_IL1(ir)], Memi[IR_IL2(ir)],
+		    Memr[IR_DELTAX(ir)], Memr[IR_DELTAY(ir)],
+		    Memr[IR_DELTAI(ir)])
+	    } else
+	        call error (0, "There are no legal shifts in the coords file.")
 	    call close (cl)
+
 	case IR_SHIFTS:
-	    xshift = clgetr ("xshift")
-	    yshift = clgetr ("yshift")
-	    nshifts = 1
-	    call ir_cshifts (Memr[xrshifts], Memr[yrshifts], Memr[xcshifts],
-	        Memr[ycshifts], nxrsub, nyrsub, nxsub, nysub, xshift, yshift)
+	    if (ir_clinks (Memr[IR_XRSHIFTS(ir)], Memr[IR_YRSHIFTS(ir)],
+	        Memr[IR_XCSHIFTS(ir)], Memr[IR_YCSHIFTS(ir)], IR_NXRSUB(ir),
+		IR_NYRSUB(ir), IR_NXSUB(ir), IR_NYSUB(ir), clgetr ("xshift"),
+		clgetr ("yshift")) > 0) {
+	        call ir_shifts (ir, im, outim, Memr[IR_XRSHIFTS(ir)],
+		    Memr[IR_YRSHIFTS(ir)], Memr[IR_XCSHIFTS(ir)],
+		    Memr[IR_YCSHIFTS(ir)], Memi[IR_IC1(ir)], Memi[IR_IC2(ir)],
+		    Memi[IR_IL1(ir)], Memi[IR_IL2(ir)], Memi[IR_OC1(ir)],
+		    Memi[IR_OC2(ir)], Memi[IR_OL1(ir)], Memi[IR_OL2(ir)],
+		    Memr[IR_DELTAX(ir)], Memr[IR_DELTAY(ir)])
+	        call ir_m2match (ir, im, Memi[ranges], Memi[IR_IC1(ir)],
+		    Memi[IR_IC2(ir)], Memi[IR_IL1(ir)], Memi[IR_IL2(ir)],
+		    Memr[IR_DELTAX(ir)], Memr[IR_DELTAY(ir)],
+		    Memr[IR_DELTAI(ir)])
+	    } else
+	        call error (0, "There are no legal shifts in the coords file.")
+
+	case IR_FILE:
+	    cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
+	    if (ir_flinks (cl, Memr[IR_DELTAX(ir)], Memr[IR_DELTAY(ir)],
+	        Memr[IR_DELTAI(ir)], nimages) >= nimages) {
+	        call ir_fshifts (ir, im, outim, Memr[IR_DELTAX(ir)],
+		    Memr[IR_DELTAY(ir)], Memi[IR_IC1(ir)], Memi[IR_IC2(ir)],
+		    Memi[IR_IL1(ir)], Memi[IR_IL2(ir)], Memi[IR_OC1(ir)],
+		    Memi[IR_OC2(ir)], Memi[IR_OL1(ir)], Memi[IR_OL2(ir)])
+	    } else
+	        call error (0, "There are fewer shifts than input subrasters.")
+	    call close (cl)
+
 	default:
 	    call error (0, "T_IRALIGN: Undefined alignment algorithm")
 	}
 
+
+	# Fill the output image with the unknown value.
+	call ir_imzero (outim, int (IM_LEN(outim,1)), int (IM_LEN(outim, 2)),
+	    IR_OVAL(ir))
+
 	# Shift and match all the subrasters.
-	if (nshifts > 0) {
-	    call ir_imzero (outim, int (IM_LEN(outim,1)), int (IM_LEN(outim,
-	        2)), oval)
-	    call ir_match (im, Memi[ranges], Memr[xrshifts], Memr[yrshifts],
-	        Memr[xcshifts], Memr[ycshifts], Memr[inshifts], nxsub, nysub,
-		nxrsub, nyrsub, ncols, nrows, nxoverlap, nyoverlap, corner,
-		raster, order)
-	    call ir_m2subalign (im, outim, Memc[section], Memr[xrshifts],
-	        Memr[yrshifts], Memr[xcshifts], Memr[ycshifts], Memr[inshifts],
-		nxsub, nysub, nxrsub, nyrsub, ncols, nrows, nxoverlap,
-		nyoverlap, corner, raster, order, interp, verbose)
-	} else
-	    call error (0, "There are no legal shifts in the coords file.")
+	call ir_subalign (ir, im, outim, Memc[trimlimits], Memi[IR_IC1(ir)],
+	    Memi[IR_IC2(ir)], Memi[IR_IL1(ir)], Memi[IR_IL2(ir)],
+	    Memi[IR_OC1(ir)], Memi[IR_OC2(ir)], Memi[IR_OL1(ir)],
+	    Memi[IR_OL2(ir)], Memr[IR_DELTAX(ir)], Memr[IR_DELTAY(ir)], 
+	    Memr[IR_DELTAI(ir)], YES, interp, verbose)
 
 	# Close up files.
 	call imunmap (im)
 	call imunmap (outim)
 	call dtunmap (dt)
 	call sfree (sp)
+	call ir_free (ir)
 end

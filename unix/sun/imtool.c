@@ -1859,6 +1859,7 @@ int	type;			/* pattern type desired */
 #define	IIS_READ	0100000
 #define	IMC_SAMPLE	0040000
 #define	IMT_FBCONFIG	077
+#define	XYMASK		077777
 
 struct	iism70 {
 	short	tid;
@@ -1993,8 +1994,8 @@ Notify_event_type type;
 
 		fb = (unsigned char *) mpr_d(rf_p->fb_pr)->md_image;
 		nbytes = ndatabytes;
-		x = iis.x & 01777;
-		y = iis.y & 01777;
+		x = iis.x & XYMASK;
+		y = iis.y & XYMASK;
 
 		ip = max (fb, min (fb + Fb_width * Fb_height - nbytes,
 		    fb + y * Fb_width + x));
@@ -2038,8 +2039,8 @@ Notify_event_type type;
 		 */
 		fb = (unsigned char *) mpr_d(rf_p->fb_pr)->md_image;
 		nbytes = ndatabytes;
-		x = iis.x & 07777;
-		y = iis.y & 07777;
+		x = iis.x & XYMASK;
+		y = iis.y & XYMASK;
 
 		op = max (fb, min (fb + Fb_width * Fb_height - nbytes,
 		    fb + y * Fb_width + x));
@@ -2185,8 +2186,8 @@ Notify_event_type type;
 		    int     sx, sy;
 		    float   wx, wy;
 
-		    wx = sx = last_x + pw_rect.r_left;
-		    wy = sy = last_y + pw_rect.r_top;
+		    wx = sx = last_sx + pw_rect.r_left;
+		    wy = sy = last_sy + pw_rect.r_top;
 
 		    if (wcs) {
 			ct = wcs_update (df_p);
@@ -3934,7 +3935,15 @@ int	op1, op2;
 		CURSOR_CROSSHAIR_THICKNESS, 1,
 		CURSOR_CROSSHAIR_LENGTH, 20,
 		CURSOR_CROSSHAIR_GAP, 6,
+
+#ifdef sparc
+		/* This is a kludge to work around a bug with the
+		 * sparcstation 1 under 4.0.3. */
+		CURSOR_CROSSHAIR_OP, PIX_SRC ^ PIX_DST,
+#else
 		CURSOR_CROSSHAIR_OP, PIX_SRC,
+#endif
+
 		CURSOR_CROSSHAIR_COLOR, CMS_CURSOR,
 		0);
 	    window_set (gio_canvas, WIN_CURSOR, cursor, 0);

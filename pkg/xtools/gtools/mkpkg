@@ -6,21 +6,21 @@ $checkin  libxtools.a lib$
 $exit
 
 libxtools.a:
-	gtascale.x	<mach.h> <pkg/gtools.h>
-	gtcolon.x	<gset.h> <pkg/gtools.h>
-	gtcopy.x	<pkg/gtools.h>
+	gtascale.x	<mach.h> gtools.h
+	gtcolon.x	<gset.h> gtools.h
+	gtcopy.x	gtools.h
 	gtctran.x
 	gtcur.x
-	gtcur1.x	<pkg/gtools.h>
-	gtfree.x	<pkg/gtools.h>
-	gtget.x		<gset.h> <pkg/gtools.h>
+	gtcur1.x	gtools.h
+	gtfree.x	gtools.h
+	gtget.x		<gset.h> gtools.h
 #	gthelp.x	<error.h>
-	gtinit.x	<gset.h> <pkg/gtools.h>
-	gtlabax.x	<gset.h> <pkg/gtools.h>
+	gtinit.x	<gset.h> gtools.h
+	gtlabax.x	<gset.h> gtools.h
 #	gtpage.x	<ttyset.h>
-	gtplot.x	<gset.h> <pkg/gtools.h>
-	gtvplot.x	<gset.h> <pkg/gtools.h>
-	gtset.x		<gset.h> <pkg/gtools.h>
-	gtswind.x	<gset.h> <pkg/gtools.h> <mach.h>
-	gtwindow.x	<pkg/gtools.h>
+	gtplot.x	<gset.h> gtools.h
+	gtvplot.x	<gset.h> gtools.h
+	gtset.x		<gset.h> gtools.h
+	gtswind.x	<gset.h> gtools.h <mach.h>
+	gtwindow.x	gtools.h
 	;

@@ -1,4 +1,4 @@
-.help fitpsf May89 noao.digiphot.apphot
+.help fitpsf Jan90 noao.digiphot.apphot
 .ih
 NAME
 fitpsf -- model the point spread function with an analytic function
@@ -11,7 +11,14 @@ PARAMETERS
 The list of images containing the objects to be measured.
 .le
 .ls box    
-The width of the rectangular fitting region in scale.
+The width of the rectangular fitting region in scale units.
+.le
+.ls datapars = ""
+The parameter file containing the data dependent parameters.
+If \fIdatapars\fR is null ("") then the default parameter set in the user's
+uparm directory is used.
+The critical parameters \fIfwhmpf\fR, \fIsigma\fR and \fIthreshold\fR are
+located here.
 .le
 .ls function = "radgauss"
 The function to be fit. The options are:
@@ -41,11 +48,6 @@ The k-sigma rejection limit in units of sigma. The default is no rejection.
 .le
 .ls nreject = 0
 The maximum number of rejection cycles after the non-linear least squares fit.
-.le
-.ls datapars = ""
-The parameter file containing the data dependent parameters.
-These include the first guess at the fwhmpsf of the point spread function,
-noise model information and the scale of the image.
 .le
 .ls coords = ""
 The name of the text file(s) containing the coordinates of the objects
@@ -90,6 +92,9 @@ Interactive or batch mode.
 .le
 .ls verify = yes
 Verify the critical parameters in non interactive mode.
+.le
+.ls update = no
+Update the critical parameters in non interactive mode.
 .le
 .ls verbose = no
 Print messages on the terminal in non interactive mode.
@@ -157,6 +162,10 @@ PSF modelling parameters are listed or set with the following commands.
 :readnoise	[value]		Readnoise (electrons)
 :exposure	[string]	Exposure time image header keyword
 :itime		[value]		Exposure time (time units)
+:airmass	[string]	Airmass image header keyword
+:xairmass	[value]		Airmass value (number)
+:filter		[string]	Filter image header keyword
+:ifilter	[string]	Filter id string
 :datamin	[value]		Minimum good data value (counts)
 :datamax	[value]		Maximum good data value (counts)
 
@@ -165,6 +174,20 @@ PSF modelling parameters are listed or set with the following commands.
 :maxiter	[value]		Maximum number of iterations
 :kreject	[value]		Rejection limit in sigma
 :nreject	[value]		Maximum number of rejection cycles
+
+
+The following command are availalble from within the interactive setup menu.
+
+                    Interactive FITPSF Setup Menu
+
+	v	Set and verify the critical FITPSF parameters (b,f,t)
+
+	f	Set and verify the full width half maximum
+	t	Set and verify the detection threshold
+	l	Set and verify the minimum good data value
+	u	Set and verify the maximum good data value
+
+	b	Set and verify the radius of the fitting box
 .fi
 
 .ih
@@ -239,6 +262,22 @@ of gyration of the object and ellip its ellipticity.
 Quantities prefixed by an e represent the errors in the fitted parameters.
 
 .ih
+ERROR CODES
+
+If all went well in the fitting process the error code stored in the ier
+field described above is 0. Non-zero values of ier flag the following error
+conditions.
+
+.nf
+          0     # No error
+	121     # The fitting box is off the image
+	122     # The fitting box is partially off the image
+	123     # There are too few points to fit the function
+	124     # The fit is singular
+	125     # The fit did not converge
+.fi
+
+.ih
 EXAMPLES
 
 1. Compute the radial gaussian parameters for a few  stars in N4147 using
@@ -256,12 +295,12 @@ the interactive setup menu defined by the i key command.
 
 	ap> fitpsf n4147
 
-	... a short help page appears on the screen
+	... type ? to get a short help page on the screen
 
 	... move image cursor to a star
 	... type i to enter the interactive setup menu
 	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, sigma,  and threshold using the graphics
+	... set the fitting box, fwhmpsf, and threshold using the graphics
 	    cursor and the stellar radial profile plot
 	... typing <CR> leaves everything at the default value
 
@@ -294,14 +333,14 @@ setup menu defined by the i key command.
 
 	ap> fitpsf m92 display=stdgraph
 
-	... a short help page appears on the screen
+	... type ? to get a short help page on the screen
 
 	... type :.read m92.plot1 to load the contour plot on the screen
 
 	... move graphics cursor to a star
 	... type i to enter the interactive setup menu
 	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, sigma, and threshold using the graphics
+	... set the fitting box, fwhmpsf, and threshold using the graphics
 	    cursor and the stellar radial profile plot
 	... typing <CR> leaves everything at the default value
 
@@ -350,7 +389,7 @@ saved in example 1.
 
 	ap> fitpsf m92 coords=m92.coo.1 display=stdgraph
 
-	... a short help menu appears
+	... type ? to get a short help page on the screen
 
 	... type :.read m92.plot2 to read in the contour plot
 
@@ -410,23 +449,20 @@ device coordinates.
 	... type the F6 key to enter cursor readback mode
 
 	... move the image cursor to the stars of interest, press the
-	    left mouse button 
-	... a number will appear beside each star measured
-	... the x and y coordinates of each star will be written to the
-	    file m92.coo.2
+	    left mouse button and a number will appear beside each star
+	    measured
 
 	ap> fitpsf m92 coords=m92.coo.2
 
-	... a short help page appears on the screen followed by the
-	    cursor prompt
+	... type ? to get a short help page on the screen
 
 	... type :m 3 to set the coordinates to the third star
 	    in the list
 
 	... type i to enter the interactive setup menu
 	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf and threshold using the graphics cursor and
-	    the stellar radial profile plot
+	... set the fitting box, fwhmpsf and threshold using the graphics
+	    cursor and the stellar radial profile plot
 	... typing <CR> leaves everything at the default value
 
 	... type r to rewind the coordinate list

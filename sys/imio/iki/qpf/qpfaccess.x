@@ -26,9 +26,12 @@ begin
 	# This is used to select a kernel given the imagefile extension.
 
 	if (acmode == NEW_IMAGE || acmode == NEW_COPY) {
-	    if (extn[1] == EOS)
-		call strcpy (qpf_extn, extn, MAX_LENEXTN)
 	    status = btoi (streq (extn, qpf_extn))
+	} else if (extn[1] == EOS) {
+	    call iki_mkfname (root, qpf_extn, Memc[fname], SZ_PATHNAME)
+	    status = qp_access (Memc[fname], acmode)
+	    if (status != NO)
+		call strcpy (qpf_extn, extn, MAX_LENEXTN)
 	} else {
 	    call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
 	    status = qp_access (Memc[fname], acmode)

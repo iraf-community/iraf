@@ -1,7 +1,7 @@
 include "../lib/apphotdef.h"
 include "../lib/finddef.h"
 
-# AP_FDINIT - Procedure to initialize the data structure.
+# AP_FDINIT - Initialize the daofind data structure.
 
 procedure ap_fdinit (ap, fwhmpsf, noise)
 
@@ -28,6 +28,9 @@ begin
 	# Setup the noise structure.
 	call ap_noisesetup (ap, noise)
 
+	# Setup the display strucuture.
+	call ap_dispsetup (ap)
+
 	# Setup the find structure.
 	call ap_fdsetup (ap)
 	    
@@ -41,7 +44,7 @@ begin
 end
 
 
-# AP_FDSETUP -- Procedure to setup the find structure.
+# AP_FDSETUP -- Initialize the find structure.
 
 procedure ap_fdsetup (ap)
 
@@ -50,8 +53,8 @@ pointer	ap		# pointer to the apphot strucuture
 pointer	fnd
 
 begin
-	call malloc (AP_FIND(ap), LEN_FIND, TY_STRUCT)
-	fnd = AP_FIND(ap)
+	call malloc (AP_PFIND(ap), LEN_FIND, TY_STRUCT)
+	fnd = AP_PFIND(ap)
 
 	AP_RATIO(fnd) = DEF_RATIO
 	AP_THETA(fnd) = DEF_RATIO

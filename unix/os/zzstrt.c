@@ -21,6 +21,24 @@
 #include <floatingpoint.h>
 #endif
 
+#ifdef apollo
+/* The following declaration is included here because this routine needs
+ * to be included in all IRAF programs, and the bootstrap can use /com/bind
+ * to post-process zzstrt.o to cause the Mem common to be aligned at higher
+ * than the default longword alignment.  If this is not done, a small fraction
+ * of the IRAF executables (at least in the m68k/68882 or -cpu,3000
+ * architecture) have Mem only 4-byte aligned, creating memory corruption
+ * problems when double precision data types are used.  The Domain extension
+ * #attribute[section(mem_)] creates an overlay section, which the loader
+ * later maps to the fortran /mem/.  Since we still don't know where the
+ * loader will load /mem/ in each executable, we also provide a reference
+ * to debug_mem(MEMCOM) so a debugger can examine the stack and get the
+ * actual runtime base address.
+ */
+#define	MEMCOM		mem_
+char			MEMCOM[]	#attribute[section(MEMCOM)];
+#endif
+
 /*
  * ZZSTRT,ZZSTOP -- Routines to perform initialization and cleanup functions
  * during process startup and shutdown, when the IRAF kernel routines are being
@@ -39,11 +57,12 @@ extern	int errno;
 
 extern	unsigned USHLIB[], VSHLIB[];	/* shared library descriptors */
 static	unsigned vshlib[8];
-#define	v_version	vshlib[0]	/* shlib version number */
+#define	v_version	vshlib[0]	/* shared image version number */
 #define	v_base		vshlib[1]	/* exported shimage addresses */
 #define	v_etext		vshlib[2]
 #define	v_edata		vshlib[3]
 #define	v_end		vshlib[4]
+#define	u_version	USHLIB[0]	/* application version number */
 #define	sh_debug	USHLIB[2]	/* map shared image writeable */
 #define	sh_machtype	USHLIB[6]	/* machine architecture */
 
@@ -88,6 +107,7 @@ ZZSTRT()
 	    unsigned b_off, b_loc, b_len;
 	    unsigned hsize;
 	    static   char envdef[SZ_FNAME];
+	    char     shimage[SZ_FNAME];
 	    char     *shlib, *arch;
 	    extern   char *getenv();
 	    caddr_t  addr;
@@ -116,7 +136,8 @@ ZZSTRT()
 		putenv (envdef);
 	
 	    /* Open the shared library file */
-	    shlib = irafpath ("S.e");
+	    sprintf (shimage, "S%d.e", u_version);
+	    shlib = irafpath (shimage);
 	    if (shlib == NULL || (fd = open (shlib, 0)) == -1) {
 		fprintf (stderr,
 		    "Error: cannot open iraf shared library %s\n", shlib);
@@ -175,8 +196,13 @@ ZZSTRT()
 	    d_loc = (v_etext + SEGSIZ-1) / SEGSIZ * SEGSIZ;
 	    d_len = v_edata - d_loc;
 
+	    /* Map the BSS segment beginning with the first hardware page
+	     * following the end of the data segment.  This need not be
+	     * the same as the PAGSIZ used for a.out.  v_edata-1 is the
+	     * address of the last byte of the data segment.
+	     */
 	    b_off = 0;				/* anywhere will do */
-	    b_loc = align (v_edata + pmask);
+	    b_loc = ((v_edata-1) & ~(getpagesize()-1)) + getpagesize();
 	    b_len = v_end - b_loc;
 #endif
 
@@ -239,7 +265,7 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	    bzero (v_edata, v_end - v_edata);
 
 	    /* Verify that the version number and base address match. */
-	    if (USHLIB[0] < VSHLIB[0] || USHLIB[1] != VSHLIB[1]) {
+	    if (USHLIB[0] != VSHLIB[0] || USHLIB[1] != VSHLIB[1]) {
 		fprintf (stderr,
 		    "Error: iraf shared library mismatch, please relink\n");
 		exit (3); }
@@ -331,6 +357,14 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	}
 #endif
 #endif
+
+#ifdef apollo
+	/* Call debug_mem() so a debugger can find the base address of the
+	 * mem common at runtime.
+	 */
+	debug_mem(MEMCOM);
+#endif
+
 	/* Place a query call to ZAWSET to set the process working set limit
 	 * to the IRAF default value, in case we did not inherit a working set
 	 * limit value from the parent process.
@@ -345,3 +379,13 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 /* ZZSTOP -- Clean up prior to process shutdown.
  */
 ZZSTOP(){}
+
+
+#ifdef apollo
+/* DEBUG_MEM -- Provide so a debugger can get base address of mem common
+ * at runtime.
+ */
+debug_mem(mem)
+char	mem[];
+{}
+#endif

@@ -3,7 +3,11 @@
 #
 # NOTE: Changes to this file may not take effect immediately.  The entries
 # for selected devices are precompiled.  See the sources in sys$tty.
-# ___________________________________________________________________________
+# ---------------------------------------------------------------------------
+# START of site local additions.
+#	(add local termcap device entries here)
+# END of site local additions.
+# ---------------------------------------------------------------------------
 
 text|output device has no capabilities:co#80:li#24:
 textw|wide format text device:co#132:li#60:
@@ -21,14 +25,14 @@ apple4|lw4|		:tc=sapple4:
 nlw|lw5|		:tc=sapple5:
 apple7|lw7|tops|	:tc=sapple7:
 vmsprint|vmslp|		:tc=svprint:
-lpr|			:tc=g-lpr:
-enscript|		:tc=g-enscript:
+lpr|			:tc=glpr:
+enscript|		:tc=genscript:
 
 # AOSVS temporary entries
 laserup|		:DD=solpl!laser,@laser:tc=laser:
 laserdown|		:DD=cti!laser,@laser:tc=laser:
 laser|			:li#63:tc=talaris:
-printronix|		:co#132:li#63:os:DD=solpl!lpt,@lpt:
+printronix|px|		:co#132:li#63:os:DD=solpl!lpt,@lpt:
 datasouth|		:co#132:li#63:os:DD=cti!lpt,@lpt:
 talaris|		:co#98:li#66:os:DD=laser,@laser:
 laserjet|		:co#76:li#66:os:DD=laser,@laser:
@@ -66,6 +70,9 @@ uapple4|Fourth Apple laser writer on a UNIX node running Transcript Software:\
 uapple5|Apple laser writer NT on ORION running Transcript Software:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=apple,/tmp/asfXXXXXX,!{ lpr -Plw5 $F; rm $F; }:
+uapple7|Apple laser writer in the Solar office:\
+	:co#80:li#66:os:pt:ta^I:\
+	:DD=apple,/tmp/asfXXXXXX,!{ lpr -Plw7 $F; rm $F; }:
 
 # The following 2 entries were submitted by Joe Harrington, MIT Planetary
 # Science Group.  <jh@athena.mit.edu> 7 March 1989.  The first sends the
@@ -73,11 +80,11 @@ uapple5|Apple laser writer NT on ORION running Transcript Software:\
 # the setenv PRINTER variable.  The second sends PostScript output generated
 # by the UNIX enscript program to the default printer.  
 
-g-lpr|Generic Unix line printer, default output device: \
+glpr|Generic Unix line printer, default output device: \
         :co#80:li#66:os:pt:ta^I:\
         :DD=lpr,/tmp/asfXXXXXX,!{ lpr $F; rm $F; }:
 
-g-enscript|Postscript printed via enscript program to default printer:\
+genscript|Postscript printed via enscript program to default printer:\
         :co#80:li#66:os:pt:ta^I:\
         :DD=enscript,/tmp/asfXXXXXX,!{ enscript $F; rm $F; }:
 
@@ -212,7 +219,7 @@ Gb|gterm34|:li#34:qs@:gd=gterm:tc=sun:
 Gc|gterm40|:li#40:qs@:gd=gterm:tc=sun:
 Gc|gterm54|:li#54:qs@:gd=gterm:tc=sun:
 Gz|gterm|:gd=gterm:tc=sun:
-Gx|gterm-nqs|gterm with no autosize:qs@:gd=gterm:tc=sun:
+Gx|gtermnqs|gterm with no autosize:qs@:gd=gterm:tc=sun:
 Mu|sun|Sun Microsystems Workstation console:\
 	:li#34:co#80:cl=^X^L:cm=^X\E[%i%d;%dH:nd=\E[C:up=\E[A:\
 	:qs=\E[18t:wh=\E\[8;%H;%Wt:\
@@ -254,7 +261,7 @@ k4|selanar|selanar hirez 100xl:\
 # Default xterm, gd=xtermr, has status line in graphics window; see graphcap.
 # Note:  users preferring the status-line-in-text window model should change
 # this xtermr to an xtermjh.
-xterm|:tc=xtermr:
+xterm|:am@:tc=xtermr:
 
 # Alternate xterm has status line in text window (see Joe Harrington entries
 # in graphcap).

@@ -4,8 +4,8 @@ include "../lib/apphot.h"
 
 define	ID_NSTR	"#N%4tIMAGE%24tXINIT%34tYINIT%44tID%49tCOORDS%69tLID%80t\\\n"
 define	ID_USTR	"#U%4timagename%24tpixels%34tpixels%44t##%49tfilename%69t##%80t\\\n"
-define	ID_FSTR	"#F%4t%%-23s%24t%%-10.2f%34t%%-10.2f%44t%%-5d%49t%%-20d%69t%%-5d%80t \n"
-define	ID_WSTR "%-23s%24t%-10.2f%34t%-10.2f%44t%-5d%49t%-20s%69t%-5d%80t%c\n"
+define	ID_FSTR	"#F%4t%%-23s%24t%%-10.2f%34t%%-10.2f%44t%%-5d%49t%%-20s%69t%%-5d%80t \n"
+define	ID_WSTR "%-23.23s%24t%-10.2f%34t%-10.2f%44t%-5d%49t%-20.20s%69t%-5d%80t%c\n"
 
 
 # AP_IDHDR -- Print the id header banner strings.

@@ -63,6 +63,9 @@ begin
 	    inline = inline + 1
 	}
 
+	# Flush the output image.
+	call imflush (im2)
+
 	# Free the image buffer pointers.
 	call sfree (sp)
 end

@@ -62,8 +62,14 @@ begin
 
 	    # Boxcar smooth an image
 	    iferr {
-		if (IM_NDIM(im1) > 2)
-		    call error (0, "T_CONVOLVE: Image dimensions too large.")
+		switch (IM_NDIM(im1)) {
+		case 1:
+		    kydim = 1
+		case 2:
+		    ;
+		default:
+		    call error (0, "T_CONVOLVE: Image dimension > 2.")
+		}
 		call cnv_boxcar (im1, im2, kxdim, kydim, boundary, constant)
 	    } then {
 		call eprintf ("Error smoothing image: %s\n")

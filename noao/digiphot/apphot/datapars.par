@@ -1,7 +1,7 @@
 # DATAPARS
 
 fwhmpsf,r,h,1.0,0.0,,FWHM of the PSF in scale units
-emission,b,h,y,,,Features are positive
+emission,b,h,y,,,Features are positive?
 noise,s,h,"poisson","|constant|poisson|",,Noise model
 threshold,r,h,0.0,,,Detection threshold in counts above background
 cthreshold,r,h,0.0,,,Centering threshold in counts above background
@@ -12,7 +12,11 @@ readnoise,r,h,INDEF,,,CCD readout noise in electrons
 gain,s,h,"",,,CCD gain image header keyword
 epadu,r,h,1.0,,,Gain in electrons per count
 exposure,s,h,"",,,Exposure time image header keyword
-itime,r,h,INDEF,,,Integration time
+itime,r,h,INDEF,,,Exposure time
+airmass,s,h,"",,,Airmass image header keyword
+xairmass,r,h,INDEF,,,Airmass
+filter,s,h,"",,,Filter image header keyword
+ifilter,s,h,"INDEF",,,Filter
 datamin,r,h,INDEF,,,Minimum good data value
 datamax,r,h,INDEF,,,Maximum good data value
 mode,s,h,'ql'

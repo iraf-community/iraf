@@ -29,6 +29,8 @@ task	stdplot,
 	sgikern,
 	sgidecode	= "plot$x_sgikern.e"
 
+task	imdkern		= "plot$x_imdkern.e"
+
 task	nsppkern	= "plot$x_nsppkern.e"
 task	calcomp		= "plot$x_calcomp.e"
 

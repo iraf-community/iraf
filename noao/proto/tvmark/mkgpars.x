@@ -12,6 +12,7 @@ pointer	sp, str
 real	ratio
 bool	clgetb()
 int	clgwrd(), clgeti(), nscan(), btoi(), mk_stati()
+real	clgetr()
 
 begin
 	# Allocate working space.
@@ -58,6 +59,7 @@ begin
 	call mk_seti (mk, GRAYLEVEL, clgeti ("color"))
 	call mk_seti (mk, NXOFFSET, clgeti ("nxoffset"))
 	call mk_seti (mk, NYOFFSET, clgeti ("nyoffset"))
+	call mk_setr (mk, TOLERANCE, clgetr ("tolerance"))
 
 	call sfree (sp)
 end

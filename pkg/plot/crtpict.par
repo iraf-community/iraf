@@ -1,20 +1,20 @@
 # Parameter file for the CRTPICT task
-input,f,a,,,,Input images
-output,f,h,"",,,Output metacode file name
-device,s,h,"dicomed",,,Output device
-auto_fill,b,h,yes,,,Fill output area?
-replicate,b,h,yes,,,Block replicate to fill device area?
-xmag,r,h,1.0,,,X magnification factor
-ymag,r,h,1.0,,,Y magnification factor
-ztrans,s,h,"auto",,,Type of transfer function
-lutfile,f,h,"",,,Input file containing user transfer function
-contrast,r,h,0.25,,,Contrast factor
-nsample_lines,i,h,25,,,Number of lines to sample
-z1,r,h,0.0,,,Intensity mapped to minimum greyscale value
-z2,r,h,0.0,,,Intensity mapped to maximum greyscale value
-perimeter,b,h,yes,,,Draw annotated perimeter?
+input,f,a,,,,input images
+output,f,h,"",,,output metacode file name
+device,s,h,"dicomed",,,output device
+auto_fill,b,h,yes,,,fill output area?
+replicate,b,h,yes,,,block replicate to fill device area?
+xmag,r,h,1.0,,,x magnification factor
+ymag,r,h,1.0,,,y magnification factor
+ztrans,s,h,"auto",,,type of transfer function
+lutfile,f,h,"",,,input file containing user transfer function
+contrast,r,h,0.25,,,contrast factor
+nsample_lines,i,h,25,,,number of lines to sample
+z1,r,h,0.0,,,intensity mapped to minimum greyscale value
+z2,r,h,0.0,,,intensity mapped to maximum greyscale value
+perimeter,b,h,yes,,,draw annotated perimeter?
 graphics_fraction,r,h,0.20,,,
 image_fraction,r,h,0.72,,,
 greyscale_fraction,r,h,0.04,,,
-x_blk_average,r,h,1.0,,,Block average output device in x by this amount
-y_blk_average,r,h,1.0,,,Block average output device in y by this amount
+x_blk_average,r,h,1.0,,,block average output device in x by this amount
+y_blk_average,r,h,1.0,,,block average output device in y by this amount

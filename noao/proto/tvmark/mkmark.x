@@ -1,3 +1,4 @@
+include <fset.h>
 include <imhdr.h>
 include "tvmark.h"
 
@@ -5,26 +6,28 @@ define	HELPFILE	"proto$tvmark/tvmark.key"
 
 # MK_MARK -- Procedure to mark symbols in the frame buffer interactively.
 
-procedure mk_mark (mk, im, iw, cl, log, fnt, autolog, interactive)
+int procedure mk_mark (mk, im, iw, cl, dl, log, fnt, autolog, interactive)
 
 pointer	mk		# pointer to the mark structure
 pointer	im		# frame image descriptor
 pointer	iw		# pointer to the wcs structure
 int	cl		# coordinate file descriptor
+int	dl		# pointer to the deletions file
 int	log		# output log file descriptor
 int	fnt		# font file descriptor
 int	autolog		# automatic logging enabled
 int	interactive	# interactive mode
 
 int	ncmd, ncols, nlines, nc, nr
-int	wcs, bkey, skey, vkey, ekey, okey, key
-int	ltid, req_num, lreq_num, prev_num, newlist
+int	wcs, bkey, skey, vkey, ekey, fkey, okey, key
+int	id, ltid, ndelete, req_num, lreq_num, prev_num, newlist
 pointer	sim, sp, scratchim, cmd, str, keepcmd, label
 real	cwx, cwy, wx, wy, owx, owy, fx, fy, ofx, ofy
-real	xlist, ylist, oxlist, oylist
-real	rmax
+real	xlist, ylist, oxlist, oylist, rmax
 
-int	imd_gcur(), mk_stati(), strdic(), mk_gscur(), nscan(), mknew()
+int	imd_gcur(), mk_stati(), strdic(), mk_gscur(), nscan(), mk_new()
+int	mk_find(), fstati()
+real	mk_statr()
 
 begin
 	# Allocate working memory.
@@ -42,20 +45,18 @@ begin
 
 	# Reinitialize.
 	ekey = ' '
+	fkey = ' '
 	okey = ' '
 	skey = ' '
 	vkey = ' '
 	bkey = ' '
 	ltid = 0
+	ndelete = 0
 	newlist = NO
 	owx = INDEFR
 	owy = INDEFR
 	Memc[cmd] = EOS
 	Memc[keepcmd] = EOS
-
-	# Print a short help page.
-	if (interactive == YES)
-	    call pagefile (HELPFILE, "Type ? for help, q to quit")
 
 	while (imd_gcur ("commands", wx,wy,wcs,key,Memc[cmd],SZ_LINE) != EOF) {
 
@@ -191,7 +192,14 @@ begin
 
 	    # Append to the coordinate list.
 	    case 'a':
-		if (cl != NULL) {
+		if (cl == NULL) {
+		    if (interactive == YES)
+		        call printf ("Coordinate file is undefined.\n")
+		} else if (fstati (cl, F_MODE) != READ_WRITE) {
+		    if (interactive == YES)
+			call printf (
+			"No write permission on coordinate file.\n")
+		} else  {
 
 		    # Move to the end of the list.
 		    prev_num = ltid
@@ -213,8 +221,31 @@ begin
 		    call mk_onemark (mk, im, iw, wx, wy, oxlist, oylist,
 		        Memc[label], ltid)
 
-		} else if (interactive == YES)
-		    call printf ("Coordinate file is undefined.\n")
+		} 
+
+	    # Delete an object.
+	    case 'u':
+		if (cl == NULL) {
+		    if (interactive == YES)
+		        call printf ("Coordinate file is undefined.\n")
+		} else if (fstati (cl, F_MODE) != READ_WRITE) {
+		    if (interactive == YES)
+			call printf (
+			"No write permission on coordinate file.\n")
+		} else {
+
+		    # Find the nearest object to the cursor and delete.
+		    if (mk_find (cl, wx, wy, xlist, ylist, Memc[label], id,
+		        ltid, mk_statr (mk, TOLERANCE)) > 0) {
+		        call fprintf (dl, "%d\n")
+			    call pargi (id)
+		        ndelete = ndelete + 1
+		        call mk_onemark (mk, im, iw, xlist, ylist, oxlist,
+			    oylist, Memc[label], ltid)
+		    } else if (interactive == YES)
+			call printf ("Object not in coordinate list.\n")
+
+		}
 
 	    # Draw a dot.
 	    case 'd':
@@ -232,7 +263,7 @@ begin
 	    case 'e':
 		if (sim != NULL) {
 		    if ((key == ekey) && (okey == 'e' || okey == 'k')) {
-			call mk_imsection (sim, im, nint (ofx), nint (fx),
+			call mk_imsection (mk, sim, im, nint (ofx), nint (fx),
 			    nint (ofy), nint (fy))
 			ekey = ' '
 		    } else {
@@ -245,6 +276,19 @@ begin
 		} else if (interactive == YES)
 		    call printf ("Define a scratch image with :save.\n")
 
+	    # Fill region
+	    case 'f':
+		if ((key == fkey) && (okey == 'f' || okey == 'k')) {
+		    call mk_imsection (mk, NULL, im, nint (ofx), nint (fx),
+			nint (ofy), nint (fy))
+		    fkey = ' '
+		} else {
+		    if (interactive == YES)
+		        call printf ("Type f again to define region.\n")
+		    fkey = key
+		    ofx = fx
+		    ofy = fy
+		}
 
 	    # Mark a single circle.
 	    case 'v':
@@ -306,7 +350,8 @@ begin
 		ncmd = strdic (Memc[str], Memc[str], SZ_LINE, MKCMDS2)
 
 		if (ncmd <= 0)
-		    call mk_colon (mk, Memc[cmd], im, iw, sim, log, cl, ltid)
+		    call mk_colon (mk, Memc[cmd], im, iw, sim, log, cl, ltid,
+		        dl)
 
 		else if (ncmd == MKCMD2_WTEXT) {
 		    call gargstr (Memc[str], SZ_LINE)
@@ -398,6 +443,8 @@ begin
 	}
 
 	call sfree (sp)
+
+	return (ndelete)
 end
 
 

@@ -29,9 +29,9 @@
 # indent text to the first tab stop, one blank line between bug entries.
 # ----------------------------------------------------------------------------
 
-unalias	rm set
+unalias	rm set find echo sleep tail sed cmp echo cat mail
 
-set	bugfile	= "$iraf/local/bugs.log"
+set	bugfile	= "${iraf}local/bugs.log"
 set	tmpfile	= "/tmp/bug."
 set	lokfile = "/tmp/bug.lok"
 
@@ -39,7 +39,7 @@ set	number	= 1
 set	module	= "$1"
 set	from	= "`whoami`"
 set	date	= "`date`"
-set	system	= "V2.7"
+set	system	= "V2.8"
 set	irafmail = "iraf@lyra"
 
 # Get exclusive access to the bugfile.
@@ -96,6 +96,7 @@ echo "DATE:	$date"   >> $tmpfile
 echo "FROM:	$from"   >> $tmpfile
 echo ""		         >> $tmpfile
 echo "BUG:	..."     >> $tmpfile
+echo ""		         >> $tmpfile
 echo "STATUS:	..."     >> $tmpfile
 
 editbug:

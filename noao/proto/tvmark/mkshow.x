@@ -27,7 +27,7 @@ begin
 	    call pargstr (Memc[str])
 
 	# Print the output info.
-	call printf ("    %s: %d  %s: %s  %s: %b\n")
+	call printf ("    %s: %s  %s: %s  %s: %b\n")
 	    call pargstr (KY_OUTIMAGE)
 	    call mk_stats (mk, OUTIMAGE, Memc[str], SZ_FNAME)
 	    call pargstr (Memc[str])
@@ -37,6 +37,14 @@ begin
 	    call pargstr (KY_AUTOLOG)
 	    call pargb (itob (mk_stati (mk, AUTOLOG)))
 	    
+	# Print the deletions file info.
+	call printf ("    %s: %s  %s: %g\n")
+	    call pargstr (KY_DELETIONS)
+	    call mk_stats (mk, DELETIONS, Memc[str], SZ_FNAME)
+	    call pargstr (Memc[str])
+	    call pargstr (KY_TOLERANCE)
+	    call pargr (mk_statr (mk, TOLERANCE))
+
 	# Print the font info.
 	call printf ("    %s: %s  %s: %d\n")
 	    call pargstr (KY_FONT)
@@ -64,7 +72,7 @@ begin
 
 	call printf ("    %s: %d  %s: %d\n")
 	    call pargstr (KY_SZPOINT)
-	    call pargi (mk_stati (mk, SZPOINT))
+	    call pargi (2 * mk_stati (mk, SZPOINT) + 1)
 	    call pargstr (KY_SIZE)
 	    call pargi (mk_stati (mk, SIZE))
 

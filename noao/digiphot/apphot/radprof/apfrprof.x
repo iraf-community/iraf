@@ -1,36 +1,33 @@
+include <mach.h>
 include <gset.h>
 include <math/curfit.h>
 include <math/iminterp.h>
 include "../lib/apphotdef.h"
+include "../lib/noisedef.h"
+include "../lib/fitskydef.h"
 include "../lib/photdef.h"
 include "../lib/radprofdef.h"
-include "../lib/noise.h"
-include "../lib/apphot.h"
-include "../lib/center.h"
 include "../lib/phot.h"
 include "../lib/radprof.h"
 
 # AP_FRPROF -- Procedure to compute the radial profile of an object.
 
-int procedure ap_frprof (ap, im, wx, wy, sky_mode, sky_sig, nsky, pier)
+int procedure ap_frprof (ap, im, wx, wy, pier)
 
 pointer	ap		# pointer to the apphot structure
 pointer	im		# pointer to the IRAF image
 real	wx, wy		# object coordinates
-real	sky_mode	# sky value
-real	sky_sig		# sky sigma
-int	nsky		# number of sky pixels
 int	pier		# photometry error
 
 int	i, ier, fier, nxpts, nypts, nrpts, order
-pointer	rprof, phot, sp, aperts, cv, asi
-real	xc, yc, step, rmin, rmax, inorm, tinorm, zmag
-int	apstati(), ap_rpbuf(), ap_rpmeasure(), ap_rpiter()
-real	apstatr(), asigrl(), cveval(), ap_rphalf()
+pointer	sky, rprof, cv, asi
+real	datamin, datamax, step, rmin, rmax, inorm, tinorm
+int	ap_rpbuf(), ap_rmag(), ap_rpmeasure(), ap_rpiter()
+real	asigrl(), cveval(), ap_rphalf()
 
-errchk	cvinit, cvfit, cvvector, cveval, cvfree
-errchk	asinit, asifit, asigrl, asifree
-errchk	ap_rpmeasure, ap_rpiter
+errchk	cvinit(), cvfit(), cvvector(), cveval(), cvfree()
+errchk	asinit(), asifit(), asigrl(), asifree()
+errchk	ap_rpmeasure(), ap_rpiter()
 
 begin
 	# Initialize.
@@ -38,77 +35,65 @@ begin
 	call apsetr (ap, RPYCUR, wy)
 	call ap_rpindef (ap)
 
-	# Check for defined center.
-	if (IS_INDEFR(wx) || IS_INDEFR(wy)) {
-	    pier = AP_NOAPERT
-	    return (AP_NOPROFILE)
-	}
-
-	# Return if the sky value is undefined.
-	if (IS_INDEFR(sky_mode)) {
-	    pier = AP_NOSKYMODE
-	    return (AP_RPNOSKYMODE)
-	}
+	# Set up some apphot pointers.
+	sky = AP_PSKY(ap)
+	rprof = AP_RPROF(ap)
 
 	# Get the pixels.
-	ier = ap_rpbuf (ap, im, wx, wy)
-	if (ier == AP_NOPROFILE) {
-	    pier = AP_NOAPERT
-	    return (AP_NOPROFILE)
+	# Check for error conditions.
+	if (IS_INDEFR(wx) || IS_INDEFR(wy)) {
+	    pier = AP_APERT_NOAPERT
+	    return (AP_RP_NOPROFILE)
+	} else if (IS_INDEFR(AP_SKY_MODE(sky))) {
+	    pier = AP_APERT_NOSKYMODE
+	    return (AP_RP_NOSKYMODE)
+	} else {
+	    if (ap_rpbuf (ap, im, wx, wy) == AP_RP_NOPROFILE) {
+	        pier = AP_APERT_NOAPERT
+	        return (AP_RP_NOPROFILE)
+	    }
 	}
-	call ap_maxap (ap, pier)
 
-	# Allocate working space and intialize.
-	call smark (sp)
-	call salloc (aperts, apstati (ap, NAPERTS), TY_REAL)
-	rprof = AP_RPROF(ap)
-	phot = AP_PPHOT(ap)
-	xc = AP_RPXC(rprof)
-	yc = AP_RPYC(rprof)
+	# Do the photometry.
+	pier = ap_rmag (ap, im, wx, wy)
+
+	# Initialize some common variables.
 	nxpts = AP_RPNX(rprof)
 	nypts = AP_RPNY(rprof)
-
-	# Perform the photometry.
-	call aparrays (ap, APERTS, Memr[aperts])
-	call amulkr (Memr[aperts], apstatr (ap, SCALE), Memr[aperts], 
-	    apstati (ap, NAPERTS))
-	call ap_rmmeasure (Memr[AP_RPIX(rprof)], nxpts, nypts, xc, yc,
-	    Memr[aperts], Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
-	    AP_NMAXAP(phot))
-	zmag = apstatr (ap, ZMAG) + 2.5 * log10 (apstatr (ap, ITIME))
-	if (apstati (ap, POSITIVE) == YES) {
-	    call apcopmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
-	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], AP_NMAXAP(phot),
-		sky_mode, sky_sig, nsky, zmag, apstati (ap, NOISEFUNCTION),
-		apstatr (ap, EPADU))
-	} else {
-	    call apconmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
-	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], AP_NMAXAP(phot),
-		sky_mode, sky_sig, nsky, zmag, apstati (ap, NOISEFUNCTION),
-		apstatr (ap, EPADU), apstatr (ap, READNOISE))
-	}
+	nrpts = AP_RPNPTS(rprof)
 
 	# Initialize the radial profile curve fitting.
-	nrpts = AP_RPNPTS(rprof)
-	step = apstatr (ap, SCALE) * apstatr (ap, RPSTEP)
+	step = AP_SCALE(ap) * AP_RPSTEP(rprof)
 	order = max (1, min (AP_RPORDER(rprof), nxpts * nypts - 3))
 	rmin = 0.0
 	rmax = (nrpts - 1) * step
-	call cvinit (cv, SPLINE3, order, rmin, rmax) 
+	if (IS_INDEFR(AP_DATAMIN(ap)))
+	    datamin = -MAX_REAL
+	else
+	    datamin = AP_DATAMIN(ap) - AP_SKY_MODE(sky)
+	if (IS_INDEFR(AP_DATAMAX(ap)))
+	    datamax = MAX_REAL
+	else
+	    datamax = AP_DATAMAX(ap) - AP_SKY_MODE(sky)
 
 	# Fit the curve.
-	call asubkr (Memr[AP_RPIX(rprof)], sky_mode, Memr[AP_RPIX(rprof)],
-	    nxpts * nypts)
+	call cvinit (cv, SPLINE3, order, rmin, rmax) 
+	call asubkr (Memr[AP_RPIX(rprof)], AP_SKY_MODE(sky),
+	    Memr[AP_RPIX(rprof)], nxpts * nypts)
 	fier = ap_rpmeasure (cv, Memr[AP_RPIX(rprof)], nxpts, nypts,
-	    xc, yc, rmax, AP_RPNDATA(rprof))
+	    AP_RPXC(rprof), AP_RPYC(rprof), datamin, datamax, rmax,
+	    AP_RPNDATA(rprof), AP_RPNBAD(rprof))
 
 	# Perform the rejection cycle.
-	if (fier != NO_DEG_FREEDOM && apstati (ap, RPNREJECT) > 0 &&
-	    apstatr (ap, RPKSIGMA) > 0.0) {
+	if (fier != NO_DEG_FREEDOM && AP_RPNREJECT(rprof) > 0 &&
+	    AP_RPKSIGMA(rprof) > 0.0)
 	    AP_RPNDATAREJ(rprof) = ap_rpiter (cv, Memr[AP_RPIX(rprof)], nxpts,
-	        nypts, xc, yc, rmax, apstati (ap, RPNREJECT), apstatr (ap,
-		RPKSIGMA), fier)
-	}
+	        nypts, AP_RPXC(rprof), AP_RPYC(rprof), rmax, datamin, datamax,
+		AP_RPNREJECT(rprof), AP_RPKSIGMA(rprof), fier)
+	else
+	    AP_RPNDATAREJ(rprof) = 0
+	AP_RPNDATA(rprof) = AP_RPNDATA(rprof) - AP_RPNDATAREJ(rprof)
+	AP_RPNDATAREJ(rprof) = AP_RPNDATAREJ(rprof) + AP_RPNBAD(rprof)
 
 	# Evaluate the fit.
 	if (fier != NO_DEG_FREEDOM) {
@@ -148,30 +133,153 @@ begin
 	# Set the error code and return.
 	call cvfree (cv)
 	if (fier == NO_DEG_FREEDOM)
-	    ier = AP_NRP_TOO_SMALL
+	    ier = AP_RP_NPTS_TOO_SMALL
 	else if (fier == SINGULAR)
 	    ier = AP_RP_SINGULAR
 
 	# Free space.
+	return (ier)
+end
+
+
+# AP_RMAG -- Compute the magnitudes for the radial profile
+
+int procedure ap_rmag (ap, im, wx, wy)
+
+pointer	ap		# pointer to the apphot structure
+pointer	im		# pointer to the input image
+real	wx		# x center of the radial profile
+real	wy		# y center of the radial profile
+
+int	pier
+pointer	sp, nse, sky, phot, rprof, aperts
+real	datamin, datamax, zmag
+
+begin
+	# Initialize some apphot pointers.
+	nse = AP_NOISE(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	rprof = AP_RPROF(ap)
+
+	# Allocate working space.
+	call smark (sp)
+	call salloc (aperts, AP_NAPERTS(phot), TY_REAL)
+
+	# Check for out of bounds apertures.
+	call ap_maxap (ap, pier)
+
+	# Define the good data minimum and maximum for photometry.
+	if (IS_INDEFR(AP_DATAMIN(ap)))
+	    datamin = -MAX_REAL
+	else
+	    datamin = AP_DATAMIN(ap)
+	if (IS_INDEFR(AP_DATAMAX(ap)))
+	    datamax = MAX_REAL
+	else
+	    datamax = AP_DATAMAX(ap)
+
+	# Compute the sums.
+	call aparrays (ap, APERTS, Memr[aperts])
+	call amulkr (Memr[aperts], AP_SCALE(ap), Memr[aperts], AP_NAPERTS(phot))
+	if (IS_INDEFR(AP_DATAMIN(ap)) && IS_INDEFR(AP_DATAMAX(ap))) {
+	    call ap_rmmeasure (Memr[AP_RPIX(rprof)], AP_RPNX(rprof),
+	        AP_RPNY(rprof), AP_RPXC(rprof), AP_RPYC(rprof), Memr[aperts],
+		Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+	    AP_NMINAP(phot) = AP_NMAXAP(phot) + 1
+	} else
+	    call ap_brmmeasure (Memr[AP_RPIX(rprof)], AP_RPNX(rprof),
+	        AP_RPNY(rprof), AP_RPXC(rprof), AP_RPYC(rprof), datamin,
+		datamax, Memr[aperts], Memr[AP_SUMS(phot)],
+		Memr[AP_AREA(phot)], AP_NMAXAP(phot), AP_NMINAP(phot))
+
+	# Check for bad pixels.
+	if (pier == AP_OK && AP_NMINAP(phot) <= AP_NMAXAP(phot))
+	    pier = AP_APERT_BADDATA
+
+	# Compute the magnitudes.
+	zmag = AP_ZMAG(phot) + 2.5 * log10 (AP_ITIME(ap))
+	if (AP_POSITIVE(ap) == YES)
+	    call apcopmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
+	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], AP_NMAXAP(phot),
+		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_NSKY(sky), zmag,
+		AP_NOISEFUNCTION(nse), AP_EPADU(nse))
+	else
+	    call apconmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
+	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], AP_NMAXAP(phot),
+		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_NSKY(sky), zmag,
+		AP_NOISEFUNCTION(nse), AP_EPADU(nse), AP_READNOISE(nse))
+
 	call sfree (sp)
+
+	return (pier)
+end
+
+
+# AP_RPMEASURE -- Procedure to measure the flux and effective area in a set of
+# apertures and accumulate the fit to the radial profile.
+
+int procedure ap_rpmeasure (cv, pixels, nx, ny, wx, wy, datamin, datamax,
+	rmax, ndata, nbad)
+
+pointer	cv			# pointer to curfit structure
+real	pixels[nx,ARB]		# subraster pixel values
+int	nx, ny			# dimensions of the subraster
+real	wx, wy			# center of subraster
+real	datamin			# minimum good data value
+real	datamax			# maximum good data value
+real	rmax			# the maximum radius
+int	ndata			# the number of ok data points
+int	nbad			# the number of bad data points
+
+int	i, j, ier
+real	weight, dy2, r2, rcv
+
+begin
+	# Initialize.
+	ndata = 0
+	nbad = 0
+	call cvzero (cv)
+
+	# Loop over the pixels.
+	do j = 1, ny {
+	    dy2 = (j - wy) ** 2
+	    do i = 1, nx {
+		r2 = (i - wx) ** 2 + dy2
+		rcv = sqrt (r2)
+		if (rcv > rmax)
+		    next
+		if (pixels[i,j] < datamin || pixels[i,j] > datamax) {
+		    nbad = nbad + 1
+		} else {
+		    call cvaccum (cv, rcv, pixels[i,j], weight, WTS_UNIFORM)
+		    ndata = ndata + 1
+		}
+	    }
+	}
+
+	call cvsolve (cv, ier)
 	return (ier)
 end
 
 
 # AP_RPITER -- Procedure to reject pixels from the fit.
 
-int procedure ap_rpiter (cv, pixels, nx, ny, wx, wy, rmax, niter, ksigma, fier)
+int procedure ap_rpiter (cv, pixels, nx, ny, wx, wy, rmax, datamin, datamax,
+	niter, ksigma, fier)
 
 pointer	cv		# pointer to the curfit structure
 real	pixels[nx,ARB]	# pixel values
 int	nx, ny		# dimensions of image subraster
 real	wx, wy		# x and y coordinates of the center
 real	rmax		# maximum radius value
+real	datamin		# minimum good data value
+real	datamax		# maximum good data value
 int	niter		# maximum number of rejection cycles
 real	ksigma		# ksigma rejection limit
 int	fier		# fitting error code
 
-int	i, j, k, npts, nreject
+int	i, j, k, npts, ntreject, nreject
 pointer	sp, rtemp, w, ptr
 real	chisqr, diff, locut, hicut
 real	cveval()
@@ -184,6 +292,19 @@ begin
 	call salloc (w, nx * ny, TY_REAL)
 	call amovkr (1.0, Memr[w], nx * ny)
 
+	# Set the weights of out of range and bad data points to 0.0.
+	ptr = w
+	do j = 1, ny {
+	    call ap_ijtor (Memr[rtemp], nx, j, wx, wy)
+	    do k = 1, nx {
+		if (Memr[rtemp+k-1] > rmax || pixels[k,j] < datamin ||
+		    pixels[k,j] > datamax)
+		    Memr[ptr+k-1] = 0.0
+	    }
+	    ptr = ptr + nx
+	}
+
+	ntreject = 0
 	do i = 1, niter { 
 
 	    # Compute the chisqr.
@@ -193,7 +314,7 @@ begin
 	    do j = 1, ny {
 	    	call ap_ijtor (Memr[rtemp], nx, j, wx, wy)
 		do k = 1, nx {
-		    if (Memr[rtemp+k-1] > rmax || Memr[ptr+k-1] <= 0.0)
+		    if (Memr[ptr+k-1] <= 0.0)
 			next
 		    chisqr = chisqr + (pixels[k,j] - cveval (cv,
 		        Memr[rtemp+k-1])) ** 2
@@ -216,7 +337,7 @@ begin
 	    do j = 1, ny {
 	    	call ap_ijtor (Memr[rtemp], nx, j, wx, wy)
 		do k = 1, nx {
-		    if (Memr[rtemp+k-1] > rmax || Memr[ptr+k-1] <= 0.0)
+		    if (Memr[ptr+k-1] <= 0.0)
 			next
 		    diff = pixels[k,j] - cveval (cv, Memr[rtemp+k-1])
 		    if (diff >= locut && diff <= hicut)
@@ -228,8 +349,10 @@ begin
 		}
 		ptr = ptr + nx
 	    }
+
 	    if (nreject == 0)
 	        break
+	    ntreject = ntreject + nreject
 
 	    # Recompute the fit.
 	    call cvsolve (cv, fier)
@@ -237,8 +360,10 @@ begin
 		break
 	}
 
+
 	call sfree (sp)
-	return (nreject)
+
+	return (ntreject)
 end
 
 

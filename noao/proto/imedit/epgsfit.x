@@ -36,8 +36,11 @@ begin
 		    w[i,j] = 0.
 	    }
  
-	if (nw < 8)
+	if (nw < 8) {
+	    call eprintf ("ERROR: No background points for fit\n")
+	    gs = NULL
 	    return
+	}
  
 	i = EP_XORDER(ep)
 	j = EP_YORDER(ep)

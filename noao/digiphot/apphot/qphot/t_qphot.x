@@ -66,7 +66,12 @@ begin
 
 	# Intialize the phot structure.
 	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
-	interactive = btoi (clgetb ("interactive"))
+	if (Memc[cname] != EOS)
+	    interactive = NO
+	else if (lclist == 0)
+	    interactive = YES
+	else
+	    interactive = btoi (clgetb ("interactive"))
 	verbose = btoi (clgetb ("verbose"))
 	call ap_gqppars (ap)
 
@@ -119,9 +124,11 @@ begin
 	    # Open the image and store image parameters.
 	    im = immap (Memc[image], READ_ONLY, 0)
 	    call apsets (ap, IMNAME, Memc[image])
-	    call ap_itime (im, ap)
 	    call ap_padu (im, ap)
 	    call ap_rdnoise (im, ap)
+	    call ap_itime (im, ap)
+	    call ap_airmass (im, ap)
+	    call ap_filter (im, ap)
 
 	    # Open the coordinate file, where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -129,12 +136,29 @@ begin
 
 	    if (lclist <= 0) {
 		cl = NULL
-		call strcpy ("", Memc[coords], SZ_FNAME)
-	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF)
-		cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
-	    else
-		call seek (cl, BOF)
-	    call apsets (ap, CLNAME, Memc[coords])
+		call strcpy ("", Memc[outfname], SZ_FNAME)
+	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords]))
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+		else
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+	    } else {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords])) {
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else {
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+		    call seek (cl, BOF)
+		}
+	    }
+	    call apsets (ap, CLNAME, Memc[outfname])
 
 	    # Open the output text file, if output is "default", dir$default or
 	    # a directory specification then the extension "mag" is added to the
@@ -193,7 +217,7 @@ begin
 
 
 	# Close the coordinate, sky and output files.
-	call apfree (ap)
+	call appfree (ap)
 	if (cl != NULL && lclist == 1)
 	    call close (cl)
 	if (out != NULL && lolist == 1) {

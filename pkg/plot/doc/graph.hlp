@@ -131,40 +131,40 @@ appears extended in the x direction unless \fBfill\fR = no.
 
 .ih
 EXAMPLES
-Plot the output of a list processing filter:
+1. Plot the output of a list processing filter:
 
-	cl> ... list_filter | graph
+    cl> ... list_filter | graph
 
-Plot a graph entered interactively from the terminal:
+2. Plot a graph entered interactively from the terminal:
 
-	cl> graph STDIN
+    cl> graph STDIN
 
-Overplot two lists:
+3. Overplot two lists:
 
-	cl> graph list1,list2
+    cl> graph list1,list2
 
-Graph line 128 of image "pix":
+4. Graph line 128 of image "pix":
 
-	cl> graph pix[*,128]
+    cl> graph pix[*,128]
 
-Graph the average of columns 50 through 100:
+5. Graph the average of columns 50 through 100:
 
-	cl> graph pix[50:100,*] axis=2
+    cl> graph pix[50:100,*] axis=2
 
-Graph a list in point plot mode:
+6. Graph a list in point plot mode:
 
-	cl> graph list po+
+    cl> graph list po+
 
-Annotate a graph:
+7. Annotate a graph:
 
 .nf
-	cl> graph pix[*,10],pix[*,20] xlabel=column\
-	>>> ylabel=intensity title="lines 10 and 20 of pix"
+    cl> graph pix[*,10],pix[*,20] xlabel=column\
+    >>> ylabel=intensity title="lines 10 and 20 of pix"
 .fi
 
-Direct the graph to the standard plotter device:
+8. Direct the graph to the standard plotter device:
 
-	cl> graph list device=stdplot
+    cl> graph list device=stdplot
 .ih
 BUGS
 Indefinites are not recognized when computing image projections.

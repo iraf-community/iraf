@@ -138,28 +138,51 @@ The choice of algorithm depends on the data, the number of images,
 and the importance of rejecting cosmic rays.  The more complex the
 algorithm the more time consuming the operation.
 
-The different combining options use the remaining parameters.  Except for
-summing, the images may be scaled to a common exposure time and background
-level.  If the images don't need to be scaled then the task is faster.
-There are currently three ways to scale the images.  The images may
-be scaled to the same exposure time.  If the background, flux level, or
-detector sensitivity is variable then the images may be either scaled or
-offset (add a constant) to the same mode.  The mode is determined
-by sampling up to 10000 points within the specified mode image section.
-A scaling correction is used when the flux level or sensitivity is varying.
-The offset correction is used when the sky brightness is varying independently
-of the object brightness.
+The different combining options use the remaining parameters.  Except
+for summing, the images may be scaled to a common exposure time and
+background level.  If the images don't need to be scaled then the task
+is faster.  There are currently three ways to scale the images.  The
+images may be scaled to the same exposure time.  If the background,
+flux level, or detector sensitivity is variable then the images may be
+either scaled or offset (add a constant) to the same mode.  The mode is
+determined by sampling up to 10000 points within the specified mode
+image section.  A scaling correction is used when the flux level or
+sensitivity is varying.  The offset correction is used when the sky
+brightness is varying independently of the object brightness.  When
+scaling by the mode, the exposure time (and setting of the exposure and
+offset parameters) is ignored.  Except for medianing and summing, the
+images are combined by averaging.
 
-Except for medianing and summing, the images are combined by averaging.
-The average may be weighted by
+The relationships between the exposure time and modes determining the
+scaling, offsets, and weights used and printed in the log output are
+given below.
 
-	weight = (N * scale / mode) ** 2
+    if scale = yes:
+	scale = <M> / M
+	offset = 0.
+	weight = (N*M)**1/2 / sum {(N*M)**1/2}
 
-where N is the number of images previously combined (\fBcombine\fR
-records the number of images combined in the image header),
-scale is the multiplicative scale from the exposure or mode scaling,
-and mode is the background mode estimate used when adding a variable
-offset.
+    if exposure = yes and offset = no:
+	scale = <T> / T
+	offset = 0.
+	weight = (N*T)**1/2 / sum {(N*T)**1/2}
+
+    if exposure = no and offset = yes:
+	scale = 1
+	offset = <M> - M
+	weight = (N/M)**1/2 / sum {(N/M)**1/2}
+
+    if exposure = yes and offset = yes:
+	scale = <T> / T
+	offset = <T> * (<M/T> - M/T)
+	weight = (N*T/(M/T))**1/2 / sum {(N*T/(M/T))**1/2}
+
+where M is the mode of an image, <M> is the average mode over all
+images, N is the number of images previously combined (using the image
+header parameter NCOMBINE), T is the exposure time (with a minimum of
+0.001 imposed), and <T> is the average exposure time over all images.
+The operation **1/2 is the square root.  Note that the scales average
+to 1, the offsets sum to zero, and the weights sum to 1.
 
 The rejection parameters \fIlowreject\fR, \fIhighreject\fR, and \fIblank\fR
 are used by the "threshold", "sigclip", and "avsigclip" algorithms for rejecting

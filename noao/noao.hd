@@ -14,6 +14,12 @@ $twodspec	= "./twodspec/"
 
 # Define help files for the packages.
 
+artdata		men = artdata$artdata.men,
+		hlp = ..,
+		sys = artdata$artdata.hlp,
+		pkg = artdata$artdata.hd,
+		src = artdata$artdata.cl
+
 astutil		men = astutil$astutil.men,
 		hlp = ..,
 		sys = astutil$astutil.hlp,

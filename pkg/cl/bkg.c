@@ -67,6 +67,7 @@ extern	char *findexe();
 #define	BKGHDRSIZ	(sizeof (struct bkgfilehdr))
 #define	SZ_CMD		40		/* command in jobs table	*/
 #define	SZ_BKCMD	80		/* command in bkg file		*/
+#define	SZ_ENVDEF	1024		/* max size environment define	*/
 #define	WAIT_PERIOD	5		/* bkg_wait wait interval	*/
 #define	BKG_MAGIC	237
 #define	SZ_BKGMSG	64
@@ -538,7 +539,7 @@ char	*cmd;			/* command to be run in bkg	*/
 rbkgfile (bkgfile)
 char	*bkgfile;
 {
-	char	set[SZ_LINE];
+	char	set[SZ_ENVDEF];
 	struct	bkgfilehdr bh;
 	int	n;
 	FILE	*fp;
@@ -597,7 +598,7 @@ char	*bkgfile;
 	/* Read and restore the environment.
 	 */
 	do {
-	    if (fgets (set, SZ_LINE, fp) == NULL)
+	    if (fgets (set, SZ_ENVDEF, fp) == NULL)
 		goto abort_;
 	} while (c_envscan (set));
 

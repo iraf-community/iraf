@@ -1,7 +1,3 @@
-# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
-
-define	DUMMY	6
-
 include	<error.h>
 include	<mach.h>
 include	<gset.h>
@@ -9,6 +5,11 @@ include	<config.h>
 include	<xwhen.h>
 include	<imhdr.h>
 include	<fset.h>
+
+define	DUMMY		6
+define	SZ_TLABEL	10
+define	CSIZE		24
+
 
 # SURFACE -- Draw a perspective view of an image section.  The altitude
 # and azimuth of the viewing angle are variable.  Floor and ceiling
@@ -18,21 +19,20 @@ procedure t_surface()
 
 char	imsect[SZ_FNAME]
 char	device[SZ_FNAME], title[SZ_LINE]
-bool	label
+bool	label, sub, pre
 pointer	im, subras, work
-int	ncols, nlines, mode, wkid, subsample
+int	ncols, nlines, mode, wkid, nx, ny
 int	epa, status, old_onint, tsujmp[LEN_JUMPBUF]
-int	xres, yres, x_sample, y_sample, first
+int	xres, yres, first
 real	angh, angv, imcols, imlines
 real	floor, ceiling, vpx1, vpx2, vpy1, vpy2
 
 pointer gp, gopen()
-
 bool	clgetb(), streq()
-int	clgeti(), btoi()
+int	clgeti()
 real	clgetr()
 extern	tsu_onint()
-pointer	immap(), imgs2r()
+pointer	immap(), plt_getdata()
 common	/tsucom/ tsujmp
 common  /noaovp/ vpx1, vpx2, vpy1, vpy2
 common  /frstfg/ first
@@ -55,11 +55,18 @@ begin
 	ceiling = clgetr ("ceiling")
 	floor = min (floor, ceiling)
 	ceiling = max (floor, ceiling)
-	call clgstr ("title", title, SZ_LINE)
 	label = clgetb ("label")
+
+	call clgstr ("title", title, SZ_LINE)
+	if (streq (title, "imtitle")) {
+	    call strcpy (imsect, title, SZ_LINE)
+	    call strcat (": ", title, SZ_LINE)
+	    call strcat (IM_TITLE(im), title, SZ_LINE)
+	}
 
 	# If a label is to be drawn, don't use the full device viewport for
 	# the surface plot.  This doesn't allow room for the axes and labels.
+
 	if (label) {
 	    vpx1 = 0.10
 	    vpx2 = 0.90
@@ -78,44 +85,26 @@ begin
 
 	xres = clgeti ("xres")
 	yres = clgeti ("yres")
+	sub = clgetb ("subsample")
+	pre = clgetb ("preserve")
+	
+	# Get data with proper resolution.  Procedure plt_getdata returns a
+	# pointer to the data matrix to be contoured.  The resolution is
+	# decreased by the specified method in this procedure.  The image
+	# header pointer can be unmapped after plt_getdata is called.
 
-	# Does image resolution need to be decreasd?  It does if the number
-	# of rows or columns exceeds the x or y resolution and the user
-	# hasn't prevented subsampling by setting xres or yres to 0.
-
-	if (ncols > xres && xres != 0)
-	    # Need to decrease resolution in x
-	    x_sample = (ncols + xres - 1) / xres
-	else
-	    x_sample = 1
-
-	if (nlines > yres && yres != 0) 
-	    # Need to decrease resolution in y
-	    y_sample = (nlines + yres - 1) / yres
-	else
-	    y_sample = 1
-
-	subsample = btoi (clgetb ("subsample"))
-	if (x_sample > 1 || y_sample > 1)
-	    call plt_getdata (im, subsample, imsect, x_sample, y_sample,
-		subras, ncols, nlines, clgetb("preserve"))
-	else
-	    subras = imgs2r (im, 1, ncols, 1, nlines)
-
-	if (streq (title, "imtitle")) {
-	    call strcpy (imsect, title, SZ_LINE)
-	    call strcat (": ", title, SZ_LINE)
-	    call strcat (IM_TITLE(im), title, SZ_LINE)
-	}
+	nx = 0
+	ny = 0
+	subras = plt_getdata (im, sub, pre, xres, yres, nx, ny)
+	call imunmap (im)
 
 	# Allocate the working storage needed by EZSRFC.
-	call malloc (work, 2 * ncols * nlines + ncols + nlines, TY_REAL)
+	call malloc (work, (2 * nx * ny) + nx + ny, TY_REAL)
 
 	# Take floor and ceiling if enabled (nonzero).
-	call surf_limits (Memr[subras], ncols, nlines, floor, ceiling)
+	call surf_limits (Memr[subras], nx, ny, floor, ceiling)
 
 	# Open graphics device and make plot.
-
 	call gopks (STDERR)
 	wkid = 1
 	gp = gopen (device, mode, STDGRAPH)
@@ -131,7 +120,7 @@ begin
 
 	call zsvjmp (tsujmp, status)
 	if (status == OK)
-	    call ezsrfc (Memr[subras], ncols, nlines, angh, angv, Memr[work])
+	    call ezsrfc (Memr[subras], nx, ny, angh, angv, Memr[work])
 	else {
 	    call gcancel (gp)
 	    call fseti (STDOUT, F_CANCEL, OK)
@@ -141,18 +130,15 @@ begin
 	    # Establish plotting window in full scale image coordinates.
 	    call gswind (gp, 1.0, imcols, 1.0, imlines)
 	    call gseti (gp, G_CLIP, NO)
-	    call srf_perimeter (gp, Memr[subras], ncols, nlines, angh, angv)
+	    call srf_perimeter (gp, Memr[subras], nx, ny, angh, angv)
 	}
 
 	call gdawk (wkid)
 	call gclwk (wkid)
 	call gclks ()
-	call imunmap (im)
+	call mfree (subras, TY_REAL)
 	call mfree (work, TY_REAL)
 
-	if (subsample == NO && (x_sample > 1 || y_sample > 1))
-	    # Free space needed for scaled input routines
-	    call mfree (subras, TY_REAL)
 end
 
 
@@ -181,19 +167,59 @@ procedure surf_limits (ras, m, n, floor, ceiling)
 real	ras[m,n]
 int	m, n
 real	floor, ceiling
-int	i
+real	val1_1			# value at ras[1,1]
+int	i, k
+bool	const_val		# true if data are constant
+bool	bad_floor		# true if no value is above floor
+bool	bad_ceiling		# true if no value is below ceiling
+bool	fp_equalr()
 
 begin
+	const_val = true		# initial values
+	bad_floor = true
+	bad_ceiling = true
+	val1_1 = ras[1,1]
+
 	do i = 1, n {
-	    if (floor != 0)
-		call amaxkr (ras[1,i], floor, ras[1,i], m)
-	    if (ceiling != 0)
-		call aminkr (ras[1,i], ceiling, ras[1,i], m)
+	    if (const_val) {
+		do k = 1, m
+		    if (ras[k,i] != val1_1) {
+			const_val = false
+			break
+		    }
+	    }
+	    if (!(fp_equalr (floor, 0.0))) {
+		if (bad_floor)
+		    do k = 1, m {
+			if (ras[k,i] <= floor)
+			    ras[k,i] = floor
+			else
+			    bad_floor = false
+		    }
+		else
+		    call amaxkr (ras[1,i], floor, ras[1,i], m)
+	    }
+	    if (!(fp_equalr (ceiling, 0.0))) {
+		if (bad_ceiling)
+		    do k = 1, m {
+			if (ras[k,i] >= ceiling)
+			    ras[k,i] = ceiling
+			else
+			    bad_ceiling = false
+		    }
+		else
+		    call aminkr (ras[1,i], ceiling, ras[1,i], m)
+	    }
 	}
+
+	if (bad_floor && !(fp_equalr (floor, 0.0)))
+	    call error (1, "entire image is below (or at) specified floor")
+	if (bad_ceiling && !(fp_equalr (ceiling, 0.0)))
+	    call error (1, "entire image is above (or at) specified ceiling")
+	if (const_val)
+	    call error (1, "all data values are the same; can't plot it")
 end
 
-
-define	SZ_TLABEL	10
 
 # SRF_PERIMETER -- draw and label axes around the surface plot.
 
@@ -408,8 +434,6 @@ begin
 	call sfree (sp)
 end
 
-
-define	CSIZE		24
 
 procedure srf_label_axis (xval, yval, zval, sppstr, path, up)
 

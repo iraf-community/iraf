@@ -50,11 +50,13 @@ libpkg.a:
 	t_binfil.x	<mach.h> <error.h> <imhdr.h>
 	t_binpairs.x	
 	t_fixpix.x	<fset.h> <imhdr.h>
+	t_imctroid.x	<imhdr.h> <error.h>
 	t_imreplace.x	<imhdr.h>
 	t_imscale.x	<imhdr.h> <mach.h>
 	t_imslice.x	<imhdr.h> <fset.h> <error.h>
 	t_imstack.x	<imhdr.h>
 	t_imtitle.x	<imhdr.h>
+	t_join.x
 	t_mkhgm.x	<gset.h> <mach.h>
 	t_mpc.x		<mach.h> <error.h> <gset.h> <imhdr.h>
 	t_slitpic.x	<ctype.h> <imhdr.h> slitpic.h

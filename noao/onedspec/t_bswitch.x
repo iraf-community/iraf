@@ -425,7 +425,7 @@ begin
 		# each observation
 
 		# First convert to counts per second (CPS)
-		call adivkr (Memr[accums[beam_nr]], real(ITM(ids[def_beam])),
+		call adivkr (Memr[accums[beam_nr]], ITM(ids[def_beam]),
 		    Memr[accums[beam_nr]], last_len[beam_nr])
 
 		# Sum CPS in statistics region
@@ -475,7 +475,7 @@ begin
 	    }
 
 	    # First convert to counts per second (CPS)
-	    call adivkr (Memr[accumo[def_beam]], real(ITM(ids[def_beam])),
+	    call adivkr (Memr[accumo[def_beam]], ITM(ids[def_beam]),
 		    Memr[accumo[def_beam]], last_len[beam_nr])
 
 	    # Get counting stats

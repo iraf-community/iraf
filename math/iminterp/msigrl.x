@@ -51,7 +51,7 @@ begin
 
 	# convert the (x,y) points which describe the polygon into
 	# two arrays of x limits x1lim and x2lim and two y limits ymin and ymax
-	call find_limits (x, y, npts, Memr[x1lim+offset], Memr[x2lim+offset],
+	call ii_find_limits (x, y, npts, Memr[x1lim+offset], Memr[x2lim+offset],
 	    ymin, ymax, nylmin, nylmax)
 
 	nylmin = nylmin + offset
@@ -81,10 +81,10 @@ begin
 end
 
 
-# FIND_LIMITS -- Procedure to transform a set of (x,y)'s describing a
+# II_FIND_LIMITS -- Procedure to transform a set of (x,y)'s describing a
 # polygon into a set of limits.
 
-procedure find_limits (x, y, npts, x1lim, x2lim, ymin, ymax, nylmin, nylmax)
+procedure ii_find_limits (x, y, npts, x1lim, x2lim, ymin, ymax, nylmin, nylmax)
 
 real	x[npts]		# array of x values
 real	y[npts]		# array of y values
@@ -96,100 +96,132 @@ real	ymax		# maximum y value for integration
 int	nylmin		# minimum line number for x integration
 int	nylmax		# maximum line number for x integration
 
-int	i, j
-int	nxmin, nxmax, nymin, nymax, nlines, ny1old, ny2old
-pointer	sp, xwrap, ywrap
-real	xmin, xmax, slope
+int	i, nxmin, nxmax, nymin, nymax, ninter
+pointer	sp, xintr, yintr
+real	xmin, xmax, lx, ld
+int	ii_pyclip()
 
 begin
+	call smark (sp)
+	call salloc (xintr, npts, TY_REAL)
+	call salloc (yintr, npts, TY_REAL)
+
 	# find x and y limits and their indicess
-	call alimrix (x, npts, xmin, nxmin, xmax, nxmax)
-	call alimrix (y, npts, ymin, nymin, ymax, nymax)
+	call ii_alimrix (x, npts, xmin, nxmin, xmax, nxmax)
+	call ii_alimrix (y, npts, ymin, nymin, ymax, nymax)
 
 	# calculate the line limits for integration 
 	nylmin = int (ymin + 0.5) 
 	nylmax = int (ymax + 0.5) 
 
-	# allocate working space space
-	call smark (sp)
-	call salloc (xwrap, npts, TY_REAL)
-	call salloc (ywrap, npts, TY_REAL)
-
-	# shift x and y arrays so that y[1] = ymin and reset endpoints
-	call awrapr (x, Memr[xwrap], npts - 1, nymin - 1)
-	call awrapr (y, Memr[ywrap], npts - 1, nymin - 1)
-	Memr[xwrap+npts-1] = Memr[xwrap]
-	Memr[ywrap+npts-1] = Memr[ywrap]
-
-	nlines = abs (nymax - nymin) + 1 
-
-	ny1old = 2
-	ny2old = npts - 1
+	# initialize
+	lx = xmax - xmin
 
 	# calculate the limits
 	for (i = nylmin; i <= nylmax; i = i + 1) {
 
-	    # find x1 limit
-	    do j = ny1old, nlines {
-		if (real (i) <= Memr[ywrap+j-1]) {
-		    slope = (Memr[ywrap+j-1] - Memr[ywrap+j-2])
-		    if (abs (slope) < EPSILON)
-			x1lim[i] = Memr[xwrap+j-1]
-		    else
-			x1lim[i] = (real (i) - Memr[ywrap+j-2]) *
-			   (Memr[xwrap+j-1] - Memr[xwrap+j-2]) /
-			    slope + Memr[xwrap+j-2]
-		    ny1old = j
-		    break
-		}
-	    }
-
-	    # find x2 limit
-	    do j = ny2old, nlines, -1 {
-		if (real (i) <= Memr[ywrap+j-1]) {
-		    slope = (Memr[ywrap+j-1] - Memr[ywrap+j])
-		    if (abs (slope) < EPSILON)
-			x2lim[i] = Memr[xwrap+j]
-		    else
-			x2lim[i] = (real (i) - Memr[ywrap+j]) *
-			    (Memr[xwrap+j-1] - Memr[xwrap+j]) /
-			    slope + Memr[xwrap+j]
-		    ny2old = j
-		    break
-		}
-	    }
-	}
-
-	# finish the endpoints
-	if (real (nylmin) < ymin) {
-	    if (int (ymin) == int (ymax)) {
-		x1lim[nylmin] = xmin
-		x2lim[nylmin] = xmax
+	    ld = i * lx
+	    ninter = ii_pyclip (x, y, Memr[xintr], Memr[yintr], npts, lx, ld)
+	    if (ninter <= 0) {
+		x1lim[i] = xmin
+		x2lim[i] = xmin
 	    } else {
-		x1lim[nylmin] = x1lim[nylmin+1]
-		x2lim[nylmin] = x2lim[nylmin+1]
+		x1lim[i] = min (Memr[xintr], Memr[xintr+1])
+		x2lim[i] = max (Memr[xintr], Memr[xintr+1])
 	    }
 	}
 
-	if (real (nylmax) > ymax) {
-	    if (int (ymin) == int (ymax)) {
-		x1lim[nylmax] = xmin
-		x2lim[nylmax] = xmax
-	    } else {
-		x1lim[nylmax] = x1lim[nylmax-1]
-		x2lim[nylmax] = x2lim[nylmax-1]
-	    }
-	}
-
-	# free space
 	call sfree (sp)
 end
 
 
-# ALIMRIX -- Procedure to find the maximum and minimum of a vector and
+# II_YCLIP -- Procedure to determine the intersection points of a
+# horizontal image line with an arbitrary polygon.
+
+int procedure ii_pyclip (xver, yver, xintr, yintr, nver, lx, ld)
+
+real	xver[ARB]		# x vertex coords
+real	yver[ARB]		# y vertex coords
+real	xintr[ARB]		# x intersection coords
+real	yintr[ARB]		# y intersection coords
+int	nver			# number of vertices
+real	lx, ld 			# equation of image line
+
+int	i, nintr
+real	u1, u2, u1u2, dx, dy, dd, xa, ya, wa
+
+begin
+	nintr = 0
+	u1 = - lx * yver[1] + ld
+	do i = 2, nver {
+
+	    u2 = - lx * yver[i] + ld
+	    u1u2 = u1 * u2
+
+	    # Test whether polygon line segment intersects image line or not.
+	    if (u1u2 <= 0.0) {
+
+
+		# Compute the intersection coords.
+		if (u1 != 0.0 && u2 != 0.0) {
+
+		    dy = yver[i-1] - yver[i]
+		    dx = xver[i-1] - xver[i]
+		    dd = xver[i-1] * yver[i] - yver[i-1] * xver[i]
+		    xa = (dx * ld - lx * dd)
+		    ya = dy * ld 
+		    wa = dy * lx
+		    nintr = nintr + 1
+		    xintr[nintr] = xa / wa
+		    yintr[nintr] = ya / wa
+
+		# Test for collinearity.
+		} else if (u1 == 0.0 && u2 == 0.0) {
+
+		    nintr = nintr + 1
+		    xintr[nintr] = xver[i-1]
+		    yintr[nintr] = yver[i-1]
+		    nintr = nintr + 1
+		    xintr[nintr] = xver[i]
+		    yintr[nintr] = yver[i]
+
+		} else if (u1 != 0.0) {
+
+		    if (i == 1) {
+			dy = (yver[2] - yver[1])
+			dd = (yver[nver-1] - yver[1])
+		    } else if (i == nver) {
+			dy = (yver[2] - yver[nver])
+			dd = dy * (yver[nver-1] - yver[nver])
+		    } else {
+			dy = (yver[i+1] - yver[i])
+			dd = dy * (yver[i-1] - yver[i])
+		    }
+
+		    if (dy != 0.0) {
+			nintr = nintr + 1
+			xintr[nintr] = xver[i]
+			yintr[nintr] = yver[i]
+		    }
+
+		    if (dd > 0.0) {
+			nintr = nintr + 1
+			xintr[nintr] = xver[i]
+			yintr[nintr] = yver[i]
+		    }
+
+		}
+	    }
+
+	    u1 = u2
+	}
+
+	return (nintr)
+end
+# II_ALIMRIX -- Procedure to find the maximum and minimum of a vector and
 # the indices of these elements.
 
-procedure alimrix (x, npts, xmin, nxmin, xmax, nxmax) 
+procedure ii_alimrix (x, npts, xmin, nxmin, xmax, nxmax) 
 
 real	x[npts]		# data
 int	npts		# number of data points
@@ -216,35 +248,4 @@ begin
 		xmax = x[i]
 	    }
 	}
-end
-
-
-# AWRAPR -- Procedure to shift a vector with wrapping of the out of
-# bounds pixels. a and b must be distinct vectors.
-
-procedure awrapr (a, b, npts, shift)
-
-real	a[npts]		# input vector
-real	b[npts]		# output vector
-int	npts		# number of data points
-int	shift		# number of elements to shift
-
-int	i, ishift, ashift
-
-begin
-	ishift = mod (shift, npts)
-	ashift = abs (ishift)
-
-	if (ishift > 0) {
-	    do i = 1, npts - ashift
-		b[i] = a[i + ashift]
-	    do i = npts - ashift + 1, npts
-		b[i] = a[i - npts + shift]
-	} else if (ishift < 0) {
-	    do i = ashift + 1, npts
-		b[i] = a[i - ashift]
-	    do i = 1, ashift
-		b[i] = a[npts - ashift + i]
-	} else
-	    call amovr (a, b, npts)
 end

@@ -5,12 +5,12 @@
 int procedure fscan (fd)
 
 int	fd
-int	getline()
+int	getlline()
 include	"scan.com"
-errchk	getline
+errchk	getlline
 
 begin
-	if (getline (fd, sc_scanbuf) == EOF)
+	if (getlline (fd, sc_scanbuf, SZ_COMMAND) == EOF)
 	    return (EOF)
 	else {
 	    call reset_scan()

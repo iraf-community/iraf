@@ -17,7 +17,7 @@
  */
 
 #define	SZ_FMTSPEC	25		/* max size single format spec	*/
-#define	SZ_OBUF		512		/* sz intermediate buffer	*/
+#define	SZ_OBUF		SZ_COMMAND	/* sz intermediate buffer	*/
 #define	MAX_PREC	4		/* max "*" deferred args	*/
 #define	NOARG		(-1)		/* % spec with no data value	*/
 

@@ -15,11 +15,11 @@ pointer	im			#I image descriptor
 pointer	qp			#I QPOE descriptor
 
 int	nelem, dtype, maxelem, flags
-pointer	sp, param, text, comment, datatype, fl, qpf
+pointer	sp, param, text, comment, datatype, fl, qpf, mw, io
 
 int	qp_gnfn(), qp_queryf(), stridx(), strdic()
-errchk	qp_ofnlu, qp_gnfn, qp_queryf, imaddi, qp_geti
-pointer	qp_ofnlu()
+errchk	qp_ofnlu, qp_gnfn, qp_queryf, imaddi, qp_geti, mw_saveim
+pointer	qp_ofnlu(), qpio_loadwcs()
 
 bool	qp_getb()
 short	qp_gets()
@@ -41,6 +41,17 @@ begin
 	call imaddi (im, "AXLEN1", qp_geti(qp,"axlen[1]"))
 	call imaddi (im, "AXLEN2", qp_geti(qp,"axlen[2]"))
 	call imaddi (im, "BLOCKFACTOR", QPF_BLOCK(qpf))
+
+	# Output the QPOE filter.
+	call qpf_wfilter (qpf, im)
+
+	# Copy the WCS, if any.
+	io = QPF_IO(qpf)
+	if (io != NULL)
+	    ifnoerr (mw = qpio_loadwcs (io)) {
+		call mw_saveim (mw, im)
+		call mw_close (mw)
+	    }
 
 	# Copy general keywords.
 	fl = qp_ofnlu (qp, "*")

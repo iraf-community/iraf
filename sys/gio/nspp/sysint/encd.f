@@ -40,8 +40,7 @@ c     IF (VAL.LT.0)  NS	= NS + 1
 c +noao: replacing ftn i/o for iraf implementation
 c 102 WRITE (IFMT,'(A2,I2,A1,I1,A1)') '(F',NS,'.',ND,')'
   102 continue
-c     if (len (char (ns + ichar ('0'))) .eq. 2) then
-      if (ns .ge. 10) then
+      if (len (char (ns + ichar ('0'))) .eq. 2) then
 	 ifmt(1:7) = '(f  . )'
 	 ifmt(3:4) = char (ns + ichar ('0'))
 	 ifmt(6:6) = char (nd + ichar ('0'))

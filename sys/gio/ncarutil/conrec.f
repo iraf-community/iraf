@@ -744,8 +744,8 @@ C Y=1. AT Z(I,1), Y=FLOAT(N) AT Z(I,N). Y TAKES ON NON-INTEGER VALUES.
 C
       COMMON /CONRE2/ IX         ,IY         ,IDX        ,IDY        ,
      1                IS         ,ISS        ,NP         ,CV         ,
-     2                INX(8)     ,INY(8)     ,IR(5000)    ,NR
-c + noao:  dimension of ir array in conre2 changed from 500 to 5000 6March87
+     2                INX(8)     ,INY(8)     ,IR(20000)  ,NR
+c + noao:  dimension of ir array in conre2 changed from 500 to 20000 6March87
       COMMON /CONRE1/ IOFFP      ,SPVAL
       COMMON /CONRE3/ IXBITS     ,IYBITS
       LOGICAL         IPEN       ,IPENO
@@ -1141,8 +1141,8 @@ C CONV.
 C
       COMMON /CONRE2/ IX         ,IY         ,IDX        ,IDY        ,
      1                IS         ,ISS        ,NP         ,CV         ,
-     2                INX(8)     ,INY(8)     ,IR(5000)    ,NR
-c + noao:  dimension of ir array in conre2 changed from 500 to 5000 6March87
+     2                INX(8)     ,INY(8)     ,IR(20000)  ,NR
+c + noao:  dimension of ir array in conre2 changed from 500 to 20000 6March87
       COMMON /CONRE3/ IXBITS     ,IYBITS
 C
 C

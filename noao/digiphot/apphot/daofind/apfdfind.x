@@ -3,9 +3,8 @@ include "../lib/display.h"
 include "../lib/find.h"
 
 define	HELPFILE	"apphot$daofind/daofind.key"
-define	SHELPFILE	"apphot$daofind/sdaofind.key"
 
-# AP_FDFIND -- Procedure to find objects in an image interactively.
+# AP_FDFIND -- Find objects in an image interactively.
 
 int procedure ap_fdfind (cnvname, ap, im, gd, mgd, id, out, boundary, constant,
         save, interactive)
@@ -22,8 +21,8 @@ real	constant		# constatn for constant boundary extension
 int	save			# save convolved image
 int	interactive		# interactive mode
 
-int	wcs, key, newconv, newfit, stid, stidp
-pointer	sp, cmd, cnv
+int	wcs, key, newconv, newfit, stid
+pointer	sp, cmd, root, cnv
 real	wx, wy
 
 int	clgcur(), apgqverify(), apgtverify()
@@ -33,22 +32,18 @@ real	apstatr()
 begin
 	call smark (sp)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (root, SZ_FNAME, TY_CHAR)
 
 	# Initialize cursor command.
 	key = ' '
 	Memc[cmd] = EOS
+	call strcpy (" ", Memc[root], TY_CHAR)
 
 	# Initialize fitting parameters.
 	cnv = NULL
 	newconv = YES
 	newfit = YES
 	stid = 1
-
-	# Print a short help page.
-	if (id != NULL)
-	    call gpagefile (id, SHELPFILE, "")
-	else if (interactive == YES)
-	    call pagefile (SHELPFILE, "")
 
 	# Loop over the cursor commands.
 	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
@@ -87,8 +82,6 @@ begin
 	    # Plot a centered stellar radial profile
 	    case 'd':
 		call ap_qrad (ap, im, wx, wy, gd)
-		newconv = YES
-		newfit = YES
 
 	    # Interactively set the daofind parameters.
 	    case 'i':
@@ -112,43 +105,42 @@ begin
 
 	    # Find the stars.
 	    case 'f':
-		stidp = 1
 		if (newconv == YES) {
+		    if (cnv != NULL) {
+			call imunmap (cnv)
+		        call imdelete (cnvname)
+		    }
 		    cnv = ap_cnvmap (cnvname, im, ap, save)
-		    #if (cnv != NULL) {
-			#call imunmap (cnv)
-		        #call imdelete (cnvname)
-		    #}
-		    #cnv = immap (cnvname, NEW_COPY, im)
 		    call ap_fdstars (im, ap, cnv, NULL, id, boundary, constant,
-		        NO, stidp)
+		        NO, stid)
 		} else if (newfit == YES) {
 		    call ap_fdstars (im, ap, cnv, NULL, id, boundary, constant,
-		        YES, stidp)
+		        YES, stid)
 		} else {
 		    call printf ("Detection parameters have not changed\7\n")
 		}
+		stid = 1
 		newconv = NO; newfit = NO
 
 	    # Find the stars and store the results.
 	    case ' ':
 		if (newconv == YES) {
+		    if (cnv != NULL) {
+			call imunmap (cnv)
+			call imdelete (cnvname)
+		    }
 		    cnv = ap_cnvmap (cnvname, im, ap, save)
-		    #if (cnv != NULL) {
-			#call imunmap (cnv)
-			#call imdelete (cnvname)
-		    #}
-		    #cnv = immap (cnvname, NEW_COPY, im)
+		    call ap_outmap (ap, out, Memc[root])
 		    call ap_fdstars (im, ap, cnv, out, id, boundary, constant,
 		        NO, stid)
 		} else if (newfit == YES) {
+		    call ap_outmap (ap, out, Memc[root])
 		    call ap_fdstars (im, ap, cnv, out, id, boundary, constant,
 		        YES, stid)
 		} else {
 		    call printf ("Detection parameters have not changed\7\n\n")
-		    #call ap_fdstars (im, ap, cnv, out, id, boundary, constant,
-		        #YES, stid)
 		}
+		stid = 1
 		newconv = NO; newfit = NO
 
 	    default:

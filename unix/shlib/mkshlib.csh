@@ -79,9 +79,9 @@ if ($?IRAFULIB) then
     if ($PROC == S.e) then
 	echo "Warning: user library IRAFULIB=$IRAFULIB will be searched"
     endif
-    set dirs = "$IRAFULIB $iraf/lib $iraf/unix/hlib"
+    set dirs = "$IRAFULIB $iraf/lib $iraf/unix/bin.`mach`"
 else
-    set dirs = "$iraf/lib $iraf/unix/hlib"
+    set dirs = "$iraf/lib $iraf/unix/bin.`mach`"
 endif
 
 # In the following, the object V.o must be the first object to be linked,
@@ -147,7 +147,11 @@ link:
 
 	if (! -e Malloc.o) then
 	    if (! -e medit.e) then
-		cc medit.c -o medit.e
+		if (`mach` == mc68020) then
+		    cc -fsoft medit.c -o medit.e
+		else
+		    cc medit.c -o medit.e
+		endif
 	    endif
 	    ar x /usr/lib/libc.a malloc.o; mv malloc.o Malloc.o
 	    medit.e Malloc.o malloc Malloc realloc Realloc free Free

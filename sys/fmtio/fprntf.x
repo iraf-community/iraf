@@ -35,6 +35,6 @@ begin
 	fmt_state = FMT_START			# initialize FPRFMT state
 	ofile_type = file_type
 
-	call strcpy (format_string, format, SZ_LINE)
+	call strcpy (format_string, format, SZ_OBUF)
 	call fpradv()
 end

@@ -12,12 +12,12 @@ pointer	sp, cmd
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	call salloc (cmd, SZ_COMMAND, TY_CHAR)
 
-	call strcpy ("set ",   Memc[cmd], SZ_LINE)
-	call strcat (envvar,   Memc[cmd], SZ_LINE)
-	call strcat ("=",      Memc[cmd], SZ_LINE)
-	call strcat (valuestr, Memc[cmd], SZ_LINE)
+	call strcpy ("set ",   Memc[cmd], SZ_COMMAND)
+	call strcat (envvar,   Memc[cmd], SZ_COMMAND)
+	call strcat ("=",      Memc[cmd], SZ_COMMAND)
+	call strcat (valuestr, Memc[cmd], SZ_COMMAND)
 
 	call prupdate (pid, Memc[cmd])
 	call sfree (sp)

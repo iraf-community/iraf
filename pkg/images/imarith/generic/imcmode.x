@@ -24,11 +24,11 @@ int	x1[ARB]			# Starting pixel
 int	x2[ARB]			# Ending pixel
 int	xs[ARB]			# Step
 
-bool	fp_equalr()
 real	mode, amedr()
 real	z1, z2, zstep, zbin
 int	i, n, nx, nmax
 pointer	sp, v1, v2, dv, va, vb, data, ptr1, ptr2, ptr3, imgnlr()
+bool	fp_equalr()
 
 begin
 	call smark (sp)
@@ -107,10 +107,10 @@ begin
 
 	nmax = 0
 	repeat {
-	    for (;  ptr1 < ptr3 && Memr[ptr1] < z1;  ptr1=ptr1+1)
+	    for (; ptr1 < ptr3 && Memr[ptr1] < z1; ptr1=ptr1+1)
 		;
 	    z2 = z1 + zbin
-	    for (;  (ptr2 < ptr3) && (Memr[ptr2] < z2);  ptr2=ptr2+1)
+	    for (; ptr2 < ptr3 && Memr[ptr2] < z2; ptr2=ptr2+1)
 		;
 	    if (ptr2 - ptr1 > nmax) {
 	        nmax = ptr2 - ptr1
@@ -138,11 +138,11 @@ int	x1[ARB]			# Starting pixel
 int	x2[ARB]			# Ending pixel
 int	xs[ARB]			# Step
 
-bool	fp_equalr()
 short	mode, ameds()
 real	z1, z2, zstep, zbin
 int	i, n, nx, nmax
 pointer	sp, v1, v2, dv, va, vb, data, ptr1, ptr2, ptr3, imgnls()
+bool	fp_equalr()
 
 begin
 	call smark (sp)
@@ -223,10 +223,10 @@ begin
 
 	nmax = 0
 	repeat {
-	    for (;  ptr1 < ptr3 && Mems[ptr1] < z1;  ptr1=ptr1+1)
+	    for (; ptr1 < ptr3 && Mems[ptr1] < z1; ptr1=ptr1+1)
 		;
 	    z2 = z1 + zbin
-	    for (;  (ptr2 < ptr3) && (Mems[ptr2] < z2);  ptr2=ptr2+1)
+	    for (; ptr2 < ptr3 && Mems[ptr2] < z2; ptr2=ptr2+1)
 		;
 	    if (ptr2 - ptr1 > nmax) {
 	        nmax = ptr2 - ptr1

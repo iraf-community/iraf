@@ -2,6 +2,9 @@
 
 define	QPF_EXTN	"qp"		# image header filename extension
 define	MAX_LENEXTN	3		# max length imagefile extension
+define	SZ_KWNAME	8		# size of a FITS keyword name
+define	SZ_BIGSTR	68		# max length string per FITS card
+define	SZ_MAXFILTER	1024		# max size QPIO filter (for log only)
 
 define	LEN_QPFDES	9
 define	QPF_IM		Memi[$1]	# backpointer to image descriptor

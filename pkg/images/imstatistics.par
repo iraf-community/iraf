@@ -3,4 +3,4 @@ fields,s,h,"image,npix,mean,stddev,min,max",,,Fields to be printed
 lower,r,h,INDEF,,,Lower cutoff for pixel values
 upper,r,h,INDEF,,,Upper cutoff for pixel values
 binwidth,r,h,0.1,,,Bin width of histogram in sigma
-verbose,b,h,yes,,,Print column labels?
+format,b,h,yes,,,Format output and print column labels?

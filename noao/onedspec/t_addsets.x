@@ -24,8 +24,8 @@ char	image[SZ_FNAME]
 char	rec_numbers[SZ_LINE], ofile[SZ_FNAME]
 int	root, nfiles, start_rec, subset
 int	nrecs, records[3, MAX_RANGES]
-int	nrem, expo, ifile
-real	wt, wtsum
+int	nrem, ifile
+real	expo, wt, wtsum
 bool	weight
 pointer	ids, sp, sp1, im, cur_pix, sp_sum
 
@@ -99,7 +99,7 @@ begin
 
 	    # Apply integration time weighting
 	    if (weight)
-		wt = real (ITM(ids))
+		wt = ITM(ids)
 	    else
 		wt = 1.0
 
@@ -151,10 +151,10 @@ end
 procedure wrt_set (sp_sum, subset, ids, im, ofile, start_rec, expo, wtsum)
 
 real	sp_sum[ARB]
-int	subset, start_rec, expo
+int	subset, start_rec
 pointer	ids, im
 char	ofile[SZ_FNAME]
-real	wtsum
+real	expo, wtsum
 
 char	newfile[SZ_FNAME]
 pointer imnew, newpix

@@ -5,8 +5,8 @@ norm,r,h,INDEF,,,Normalization value
 sample_section,s,h,"[]",,,Sample section
 lower,r,h,INDEF,,,Lower limit of data values for sampling
 upper,r,h,INDEF,,,Upper limit of data values for sampling
-keeplog,b,h,)generic.keeplog,,,Keep log of processing?
-logfile,f,h,)generic.logfile,,,Log file
+keeplog,b,h,)_.keeplog,,,Keep log of processing?
+logfile,f,h,)_.logfile,,,Log file
 imlist,f,h
 meanlist,f,h
 input,f,h
@@ -14,4 +14,3 @@ imfd,*s,h
 meanfd,*s,h
 mean,r,h
 stat,i,h
-junk,s,h

@@ -57,9 +57,9 @@ begin
 
 	# type (tempfile, >> gripesfile)
 # UNIX
-	print ("!!mail iraf < ", osfn(tempfile)) | cl
+	print ("!!mail iraf@noao.edu < ", osfn(tempfile)) | cl
 # VMS
-	# print ("!mail ", osfn(tempfile), " iraf") | cl
+	# print ("!mail ", osfn(tempfile), " 5355::iraf") | cl
 
 	delete (tempfile, verify=no)
 end

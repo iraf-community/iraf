@@ -8,15 +8,15 @@ $exit
 zzdebug:
 zzdebug.e:
 	$omake	zzdebug.x <error.h> <ctype.h> <qpset.h> <qpexset.h> "qpoe.h"
-	$link	zzdebug.o
+	$link	-z zzdebug.o
 	;
 
 generic:
-	$set GFLAGS = "-k -t csilrd -p gen/"
+	$set GFLAGS = "-k -t  csilrd  -p gen/"
 	$ifolder (gen/qpgeti.x, qpget.gx) $generic $(GFLAGS) qpget.gx $endif
 	$ifolder (gen/qpputi.x, qpput.gx) $generic $(GFLAGS) qpput.gx $endif
 
-	$set GFLAGS = "-k -t b      -p gen/"
+	$set GFLAGS = "-k -t bcsilrdx -p gen/"
 	$ifolder (gen/qpaddb.x, qpadd.gx) $generic $(GFLAGS) qpadd.gx $endif
 
 	$set GFLAGS = "-k -t ird -p gen/"
@@ -78,6 +78,7 @@ libex.a:
 	qpiogetfil.x	qpio.h qpoe.h <mach.h>
 	qpiogetrg.x	qpio.h
 	qpiolmask.x	<plset.h> qpio.h qpoe.h
+	qpiolwcs.x	qpio.h
 	qpiomkidx.x	qpio.h qpoe.h <error.h> <fset.h> <mach.h>
 	qpioopen.x	qpex.h qpio.h qpoe.h <error.h> <fset.h> <mach.h>\
 			<plset.h>
@@ -91,11 +92,13 @@ libex.a:
 	qpiosync.x	qpio.h qpoe.h <fset.h> <mach.h>
 	qpiowb.x	qpio.h qpoe.h <fset.h> <mach.h>
 	qplenf.x	qpoe.h
+	qploadwcs.x	qpoe.h
 	qpmacro.x	qpex.h qpoe.h <ctype.h> <error.h> <finfo.h>
 	qpmkfname.x	qpoe.h
 	qpopen.x	qpoe.h <fmset.h>
 	qpparse.x	<ctype.h>
 	qpparsefl.x	qpex.h qpoe.h
+	qppclose.x	<fset.h>
 	qppopen.x	qpoe.h
 	qpppar.x	qpoe.h <ctype.h>
 	qppstr.x	qpoe.h
@@ -106,6 +109,7 @@ libex.a:
 	qprebuild.x	qpoe.h
 	qprename.x	qpoe.h
 	qprenamef.x	qpoe.h
+	qpsavewcs.x	qpoe.h
 	qpseti.x	qpoe.h <qpset.h>
 	qpsizeof.x	qpoe.h
 	qpstati.x	qpoe.h <qpset.h>

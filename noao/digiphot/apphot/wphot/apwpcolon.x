@@ -23,10 +23,6 @@ int	newskybuf, newsky		# new sky buffer
 int	newmagbuf, newmag		# new aperture
 
 pointer	sp, incmd, outcmd
-string	ccmds CCMDS
-string	scmds SCMDS
-string  pcmds PCMDS
-string  ncmds NCMDS
 int	strdic()
 
 begin
@@ -43,14 +39,17 @@ begin
 	}
 
 	# Process the command.
-	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, ccmds) != 0)
+	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, CCMDS) != 0)
 	    call apccolon (ap, out, stid, cmdstr, newcenterbuf, newcenter)
-	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, scmds) != 0)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, SCMDS) != 0)
 	    call apscolon (ap, out, stid, cmdstr, newskybuf, newsky)
-	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, pcmds) != 0)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, PCMDS) != 0)
 	    call ap_wmagcolon (ap, out, stid, cmdstr, newmagbuf, newmag)
-	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, ncmds) != 0)
-	    call apnscolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
+	        newcenter, newskybuf, newsky, newmagbuf, newmag)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
+	    call ap_nscolon (ap, im, out, stid, cmdstr, newcenterbuf,
 	        newcenter, newskybuf, newsky, newmagbuf, newmag)
 	else
 	    call aphimcolon (ap, out, stid, cmdstr, newcenterbuf, newcenter,

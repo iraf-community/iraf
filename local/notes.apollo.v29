@@ -1,0 +1,950 @@
+NOTES.APOLLO.V29 -- Starting new Apollo Domain/OS notes file, 1 April 1990
+		    Note existence of notes.apollo.v27 & notes.apollo.v28
+		    either in $iraf/local or in $iraf/doc[/ports].
+
+Made tar archive of $iraf minus bin.apo68k onto 6250 bpi tape (12185)
+		    $iraf/bin.apo68k			      (1208)
+		    $iraf since 277 days (since 2.8 froze) allaposince28.tar
+
+Created list of all files on tucana modified in last 277 days (_tuc_to_29)
+Created list of all files on auriga modified in last 277 days (_apo_since_28)
+Created list of all files from _tuc_to_29 not present in _apo_since_28
+	(_upd_nomerge), as list of new tucana 2.9 HSI files to import directly.
+Diff'd _upd_nomerge with _tuc_to_29 into _tomerge as list of tucana 2.9 HSI
+	files needing to be merged into auriga HSI (_tomerge)
+All these _* files are temporarily in local/apollo.
+
+Deleted everything at $iraf except the HSI.
+Replaced everything at $iraf except the HSI from tucana (16:00 4/1/90)
+
+unix/
+	Made tar archive from _upd_nomerge on tucana; unpacked on auriga;
+	this leaves only the files in _tomerge to be merged into apollo HSI.
+	(4/1/90 SRo)
+
+local/.login
+	Merged a bunch of stuff back in from saved version.  In Domain/OS,
+	it appears to be necessary to disable the WMGR in .login when logging
+	in at the console and to set up X11 things.  There are also
+	peculiarities with the Domain filesystem, like needing an explicit
+	'umask 022' in your .login if you want BSD-like ACL's (even if BSD
+	is the boot-time default environment).  Set MACH = `echo $ISP`;
+	this will be either m68k or a88k, and if m68k, checks for existence
+	of fpa version of cl.e to make m68k_fpa else m68k_f68.  (4/1/90 SRo)
+
+local/.cshrc
+	Copied much of .login into here.  In Domain/BSD, "su" and subshells
+	have very little environment propagated, consequently one needs 
+	much of it in .cshrc.  (4/1/90 SRo)
+
+bin.m68k_fpa replaces bin.apo68k
+bin.m68k_f68 [+]
+bin.a88k [+]
+unix/bin.m68k replaces unix/bin.apo68k
+unix/bin.a88k [+]
+	Though "m68k" doesn't indicate which vendor's motorola architecture it
+	is, it is the value of ISP in Domain-land, useful in differentiating
+	between motorola and prism architectures.  Since none of the other
+	IRAF bin. types exclusively indicates both manufacturer and floating
+	point architecture, this seems excusable.  We want to support both
+	fpa and mc68882 versions of motorola/apollo, plus prism.  (4/1/90)
+
+unix/hlib/mkpkg.inc
+mkpkg.sf.M68K replaces unix/hlib/mkpkg.sf.APO68K 
+	Changed apo68k to m68k_fpa, added m68k_f68 and a88k (prism), pointed
+	to renamed mkpkg.sf.M68K.  (4/1/90 SRo)
+
+unix/bin.m68k/README [+]
+unix/bin.a88k/README [+]
+	Added short README so the unwary will know that "m68k" means apollo.
+	(4/1/90 SRo)
+
+unix/bin -> bin.m68k
+unix/bin.i386 [-]
+unix/bin.m68020 [-]
+unix/bin.vax [-]
+unix/bin.sparc [-]
+	Changed symbolic link to point to renamed bin directory, and removed
+	non-apollo bin directories (a number of things will have to change
+	anyway before we have a totally merged hsi).  (4/1/90 SRo)
+
+unix/os/zfiotx.c
+	Merged v2.9 mods in; only apollo mods are in location/order of
+	system include files.  (4/1/90 SRo)
+
+unix/boot/rtar/rtar.c
+	Merged v2.9 mods; apollo mod was compiler complaining about value
+	assigned to fd never used in "fd = os_createdir()".  (4/1/90 SRo)
+
+unix/boot/spp/xc.c
+	Merged v2.9 mods (mainly FORTLIB0 & hostprog compilation).  The
+	numerous apollo ifdefs are all because in Domain/BSD, the f77 and
+	cc commands have to be applied to .f & .c files respectively (no
+	cross-compilation), and ld has to be used for linking rather than
+	f77 or cc when passing -/W0 style domain-specific conditional linking
+	flags through (Apollo seems to have really botched f77 & cc compared
+	to other BSD systems).  (4/1/90 SRo)
+
+unix/boot/mkpkg/char.c
+	Replaced with extensively modified v2.9 version; merged in single
+	apollo change, a "break;" statement right after a "goto push;"
+	statement.  The break should probably be removed in the master
+	system, but I ifdef'd it in case it was there for some other
+	compiler's quirks.  (4/1/90 SRo)
+
+unix/hlib/libc/spp.h
+	Merged single v2.9 change in (addition of SZ_COMMAND).  (4/1/90 SRo)
+
+unix/hlib/cl.csh
+	Replaced with 2.9 version, changed to "set MACH `echo $ISP`",
+	which will differentiate between m68k and a88k processor architectures
+	(but not among floating point types).  Added branches for m68k and
+	a88k, with fpa & mc68882 branches in m68k.  (4/1/90 SRo)
+
+	TODO: all I am currently doing is checking for existence of fpa
+	executables; still looking for a way to determine at runtime if we
+	really have an fpa (nothing apparent in /dev, and nothing useful at
+	all in /usr/adm).
+
+unix/hlib/mkiraf.csh
+	Replaced with 2.9 version, then changed imdir to /usr/users/iraf.
+	(4/1/90 SRo)
+
+unix/hlib/mkpkg.inc
+	Merged.  Now requires IRAFARCH to be correctly defined (apollo choices
+	are m68k_fpa, m68k_f68, a88k).  Set USE_SHLIB = no.  (4/1/90 SRo)
+
+unix/hlib/extern.pkg
+	Replaced verbatim from tucana; can mount same NFS disks from here.
+	(4/1/90 SRo)
+
+unix/hlib/mkfloat.csh
+	Replaced verbatim with 2.9 version; simple inspection indicates it
+	should work.  (4/1/90 SRo)
+
+	TODO:  try it out.
+
+unix/hlib/install	
+	Merged.  Since we haven't decided yet what to do about locating
+	SAOIMAGE, I kept the extensively modified display server section
+	I had made in 2.8, which parameterizes a bunch of stuff.  This
+	will probably change at the last minute in 2.9.  (4/1/90 SRo)
+
+	TODO: another diff/merge when tucana 2.9 install changes.
+
+unix/hlib/login.cl
+	Replaced with 2.9 version.  (4/1/90 SRo)
+
+unix/hlib/zzsetenv.def
+	Merged.  Kept nomwcs commented out, i.e. MWCS is ENABLED.
+	This is flagged as possibly causing packages not yet retrofitted
+	to support MWCS to misbehave.  (4/1/90 SRo)
+
+unix/hlib/iraf.h
+	Replaced verbatim with 2.9 version (changed ARB, SZ_COMMAND, etc.).
+	Let's see if any compile-time problems slipped through...
+	(4/1/90 SRo)
+
+unix/hlib/motd
+	Merged.  (4/1/90 SRo)
+
+unix/hlib/mach.h
+	Replaced.  Has new IEEE_SWAP etc.  Machine constants appear to 
+	be same as apollo (m68k only).  (4/1/90 SRo)
+
+unix/hlib/irafuser.csh
+	Modified MACH, `echo $ISP`, added stub for a88k.  (4/1/90 SRo)
+
+unix/mkpkg.sh
+	Replaced from tucana; commented out shlib part.  (4/1/90 SRo)
+
+unix/hlib/fc.csh
+	Added support for apollo architecture and floating point types.
+	(4/1/90 SRo)
+
+	TODO: check out!
+
+[ begin first, NOVOS bootstrap 21:30 4/1/90 ]
+
+unix/setarch.sh
+	Domain/OS does not like "test -h", wanting "test -L" instead.
+	Used "if [ ver ]" as temporary check if we are on an apollo.
+	(4/1/90 SRo)
+
+unix/boot/bootlib/mkpkg.sh
+	Hardwired cc command for osstrupk.c to avoid optimizer bug [no
+	path to statement "n = min (n, strlen(ip));"]; went to -opt,0.
+	This is the only CC compile-time optimizer bug I have seen on the
+	apollo.  Mike Burati checked it at Apollo, and determined that it
+	is not the "n = min" line but part of the conditional test line
+	before it to which there is no path:
+
+	    if (sizeof(char) != sizeof(XCHAR) || str != (char *)outstr) {
+	
+	The first test in this case is FALSE at compile-time, and the
+	optimizer treats the second test as another statement, hence finds
+	no path to it.  In either case, according to Mike, the next statement
+	is executed.  (4/2/90 SRo)
+
+unix/hlib/libos.a -> ../bin/libos.a
+unix/hlib/libboot.a -> ../bin/libboot.a
+	Made these links by hand.  In os and bootlib, mkpkg.sh automatically
+	moves its library to "../bin/libos.a" etc., but the bootstrap
+	utilities expect to link with $hlib/libos.a etc.  Perhaps the
+	$host/setarch.sh should verify or establish these links?  (4/2/90 SRo)
+
+TODO: the existing HSI_CF, HSI_FF, and HSI_XF flags do not support separate
+compilation / linking flags.  To build the kernel PIC,NBSS on the Apollo,
+we need one set of compilation flags, but to build the HSI executables
+themselves we need another.  In this case it is a harmless warning message
+at link time:
+
+    ld warning: inputs are PIC, output is ABS (use -r -a to generate PIC output)
+
+(executables are absolute rather than PIC, which is what we want), but I think
+we should add HSI_LD).  In Domain/OS, it is best to use cc for .c, f77 for .f,
+and ld to build executables.
+
+unix/boot/spp/xpp/xppcode.c
+	BAD!  The network tar archive that installed this file yesterday
+	from tucana duplicated some of the comment lines at the end of
+	the file, after the actual end of the file:
+
+	...
+	*/
+	.r file.
+	*
+	* Dec-83       Fixed bug in processing of TASK stmt which prevented
+	*              compilation of processes with many tasks.  Added many
+	*              comments and cleaned up the code a bit.
+	*/
+
+	causing a fatal compiler error.  Replaced the file, but this is not
+	a good sign.  I believe I created the archive on tucana, then unpacked
+	it over the net, using no NFS, though I can't be 100% certain now.
+	Rebuilt xppcode in its directory using mkpkg.sh.  (4/2/90 SRo)
+
+[ Ran hlib$install to correct the localbindir links. ]
+
+[ Begin first 2.9 sysgen, 11:50 4/2/90 ]
+
+unix/hlib/cl.csh
+unix/hlib/fc.csh
+local/.login
+local/.cshrc
+	Added test for presence of an fpa (on advice from Mike Burati at
+	Apollo:  scans output from /etc/nodestat -c, lacking anything better).
+	(4/2/90 SRo)
+
+[ Arrggh.  Must have forgotten to use wtar -o or rmbin on the portable
+  system, as there were Sun x_thing.o files lying around that of course
+  wouldn't link.  Interestingly, the package libraries were updated,
+  apparently OK.  Decided to start over anyway in the packages by rmbinning
+  local noao math sys pkg and restarting the sysgen. ]
+
+bin/libmain.o
+	Manually compiled os$zmain.c.  The sys$mkpkg uses xc with $HSI_XF to
+	compile zmain.c; but on the apollo, HSI_XF contains the domain/ftn
+	-save flag, on which domain/cc barfs, so zmain.c was never built in
+	the first sysgen.  Rather than modify anything in the standard system
+	(the sys/mkpkg) I just hand-compiled os$zmain.c and moved it to
+	$iraf/bin/libmain.o.
+
+	TODO:  Find some way to avoid this, or else anyone doing a fresh
+	bootstrap/sysgen will run into it.
+
+bin.m68k_fpa/cl.e
+	Touched dummy file, as I am using its existence to set the
+	architecture to m68k_fpa rather than m68k_f68 in the IRAF
+	.login/.cshrc files.  Have to find a better way (remember,
+	no 'mach' in Domain/OS).  (4/2/90 SRo)
+
+[ Fresh sysgen.  Should now be no prior *.[ao] in the system. ]
+
+sys/etc/main.x
+	Module sys_redirect() contains a function declaration for fredir(),
+	which in other modules is called as a subroutine.  Domain/f77
+	refuses to compile this routine at all.  Removed function declararion.
+	(Same as under previous apollo versions; merged of course).
+	(4/3/90 SRo)
+
+sys/plio/plp2l.gx
+sys/plio/plr2l.gx
+sys/plio/pllrop.x
+sys/plio/pllsten.x
+	f77 simply won't compile the likes of:
+
+	    ll_dst[op] = M_DH + -dv
+
+	changed to + (-dv).  (4/3/90 SRo)
+
+sys/mwcs/mwtransd.x
+	Changed "* -ltv_1[i]" to "* (-ltv_1[i])".  (4/3/90 SRo)
+
+sys/imfort/imemsg.x
+	Compiler chokes on too-long lines passed through with "%".  Made
+	lines shorter (should be merged into standard system):
+
+	%           errmsg = 'command line argument cannot be decoded as number'
+	%	    errmsg = 'imfort short integer i/o needs a type short image'
+	%	    errmsg = 'image header modified but image opened read only'
+	%	    errmsg = 'attempt to delete nonexistent im-header keyword'
+
+	(4/3/90 SRo)
+
+sys/gio/nspp/portlib/gridal.f
+	Compiler doesn't like a 2d array referenced as a 1d array in an
+	equivalence statement (ifmt(3,2) ... (mfmtx(1),ifmt(1)).  Changed
+	to ifmt(1,1).  (4/3/90 SRo)
+
+unix/hlib/libc/setjmp.h
+	Ifdef'd around extern zsvjmp_ & #pragma (wouldn't compile).
+	(4/3/90 SRo)
+
+[ New, VOS bootstrap, uneventful. ]
+
+[ New sysgen.  Should work this time. ]
+
+[ Nope.  Two problems:  earlier sysgen had left spurious T_x_*.e files
+  lying around, and Domain ld won't overwrite a .e file in -o file.e.
+  The HP had the same problem, only there ld would fail to write a .e file
+  even if there were none at all in the current directory; there I made XC
+  or MKPKG write *.E output files instead (.e is reserved for EFL files or
+  something).  Looks like we have a problem with the extension ".e".  For
+  now, just removed all *.e in pkg, sys for next sysgen.
+
+  Second problem:  
+    xc -z -/W0,-dbs cl.o globals.o opcodes.o libpkg.a -lc -lcur -lds -lstg
+    ld: Symbol zdojmp_ in /usr/iraf/unix/hlib/libos.a is multiply defined.
+	First defined in /usr/iraf/unix/hlib/libos.a
+]
+
+unix/as.m68k/README [+]
+	Added readme file, noting that this file is necessary for IRAF to
+	run, but that the Domain assembler cannot be obtained from Apollo
+	(it is not a product) except by "special dispensation"; I got ours
+	from Apollo R&D (Frank Prince) at SR10.1, which also works in 10.2.
+	(4/3/90 SRo)
+
+unix/os/mkpkg.sh
+	Added case $MACH constructs for Domain/OS:  we need to remove
+	zdojmp.o from libos.a, as this entry point is included in the
+	zsvjmp.asm supplied by Apollo/Denmark via Nordlund.  I tried to
+	hack it to use the C zdojmp but was unsuccessful; there is no
+	documentation available on this Domain assembler.  Executed the
+	file, OK, zdojmp.o now out of libos.a.  (4/3/90 SRo)
+
+[ Begin new sysgen, which should be relink-only.  FPA, full optimization
+  AND full symbol table for source debugging AND all .f source files preserved
+  throughout system.  Very difficult on apollo to do any debugging without
+  this (can't set breakpoints, can't look at stack arguments, etc.).
+
+  Success this time.  Preliminary tests OK.
+]
+
+unix/hlib/motd
+	Updated system banner.  (4/3/90 SRo)
+
+unix/os/alloc.c
+unix/os/mkpkg.sh
+unix/bin.m68k/alloc.e
+	Disabled call to uid_executing() if apollo, since we cannot read
+	kmem in Domain and there is no other apparent way to get a list
+	of UNIX uid's executing.  Added apollo branch in mkpkg.sh to 
+	avoid getproc.c.  (4/3/90 SRo)
+
+unix/os/irafpath.c
+	Added ifdef apollo branch in setting value of HBIN, to m68k or a88k
+	using _ISP__M68K or _ISP__A88K.  (4/3/90 SRo)
+
+[ testing; various problems debugging enormous executables, out of disk, ...]
+
+hlib/mkpkg.inc
+	Well, it was nice having source-debugging built into IRAF, but the
+	executables were so large I had to move the noaobin to tucana, and
+	it could easily take 10 minutes to dbx, run, and break on the first
+	routine during debugging, so I went back to normal symbol-table
+	(-W0,-db) no-source fpa executables.  (4/12/90 SRo)
+
+[ New, no-source-debug, entry-point-only symbol table fpa executables ]
+
+sys/mkpkg
+	Enough of this!  Edited to branch around using "$omake zmain.c" if
+	MACH is any of the Apollo architectures.  $omake uses $HSI_XF, which
+	has the "-save" flag set for FTN.  But if the target is a .c file,
+	the CC compiler aborts when it sees "-save", meaning no libmain.o
+	is placed into bin after an rmbin.  We really cannot assume that
+	a generic C compiler can call F77 or vice versa, so there should
+	probably be "HSI_XF77, HSI_XCC, HSI_XLD".  (4/13/90 SRo)
+
+dev/cacheg.dat
+dev/cachet.dat
+sys/tty/ttygdes.x	[no change, but note problem]
+	A bug in the FTN compiler with all compiler option combinations
+	causes 'out of memory' errors when a cached graphcap/termcap
+	entry is returned from g_ttyload().  In ttygdes.x, g_ttyload
+	is declared external, then the function itself is defined later
+	in the same source file as "integer function ...".  The compiler
+	is forcing the return value of g_ttyload to be floating point,
+	which results in bad "nchars = g_ttyload()", and later in the
+	out of memory error.  The only workaround I could find would be
+	to carve the function out of the ttygdes source file, which I won't
+	do.  So I generated cache[gt].dat files with zero devices cached.
+	(4/16/90 SRo)
+
+[ Another sysgen, let's see if dependencies for dev$cache[gt].dat are caught. ]
+
+[   STRANGE bogus errors coming from preprocessor, e.g.:
+
+	gstrcpy.x:
+	   gstrcpy:
+	Error on line 12 of gstrcpy.x: unbalanced parentheses
+	Error on line 12 of gstrcpy.x: unbalanced parentheses
+	Error on line 14 of gstrcpy.x: unexpected EOF
+
+    Rerunning XC with exactly the same arguments as in the sysgen & spoolfile,
+    there is no problem.  Nor did f77 have any problem with the .f produced,
+    and the .o file in libsys.a appears fine.  There were 5 occurrences of
+    these bogus error messages in the spoolfile.  Never saw this before in
+    previous sysgens.  Manually recompiled and replaced into their libraries
+    each file to be on the safe side.  Some degenerative memory thing on
+    this workstation??  (4/17/90 SRo)
+]
+
+dev/graphcap
+dev/cacheg.dat
+	FTN aborts on declarations of size (0).  Added bogus graphcap
+	device entry ("bogus") to cache list.  (4/17/90 SRo)
+
+sys/fmtio/evexpr.x:	int	xev_gettok()
+sys/plio/plbox.x:	bool	pl_ubox()
+sys/plio/plcircle.x:	bool	pl_ucircle()
+sys/plio/plpolygon.x:	bool	pl_upolygon()
+sys/tty/ttygdes.x:	int	g_ttyload()
+pkg/softools/mktags.x:	int	tg_compare()
+	Each of these routines declared an identifier "extern" without
+	also declaring its type.  Later in the same source file the typed
+	function was declared (either int or bool).  A nasty bug in the
+	Domain f77 compiler caused floating point values to be returned
+	as the function return value, rather than the correct type.  This
+	bug does not occur if the typed function is declared in a separate
+	source file.  Though this is the only iraf system on which this
+	problem occurs, there would seem to be no reason not to add the
+	proper type declaration before "extern" (in numerous other places
+	in the VOS, such functions are so declared).  (4/18/90 SRo)
+
+[ new sysgen, successful; out of memory problems are gone. ]
+
+FINAL V2.9 UPDATE from tucana (edited find for last 20 days).  Just the file
+entries of those files actually imported to apollo in update are listed here;
+see the standard notes.v29 file for actual entries, between Apr 1 and Apr 15.
+(4/19/90)
+
+doc/news.v29.hlp
+doc/newsfile
+doc/v29revs.ms
+local/notes.v29
+noao/digiphot/apphot/Revisions
+noao/imred/dtoi/dtoi.hd
+noao/lib/helpdb.mip
+noao/proto/Revisions
+noao/proto/doc/imalign.hlp
+noao/proto/doc/imcentroid.hlp
+noao/proto/imalign.cl
+noao/proto/imalign.par
+noao/proto/imcentroid.par
+noao/proto/mkpkg
+noao/proto/proto.cl
+noao/proto/proto.hd
+noao/proto/proto.men
+noao/proto/t_imctroid.x
+noao/proto/x_proto.x
+noao/twodspec/apextract/Revisions
+noao/twodspec/apextract/exsum.x
+pkg/cl/cl.par
+pkg/cl/prcache.c
+pkg/dataio/doc/rfits.hlp
+pkg/dataio/doc/wfits.hlp
+pkg/images/Revisions
+pkg/images/doc/imslice.hlp
+pkg/plot/Revisions
+pkg/plot/crtpict.par
+pkg/plot/doc/calcomp.hlp
+pkg/plot/doc/contour.hlp
+pkg/plot/doc/crtpict.hlp
+pkg/plot/doc/gkidecode.hlp
+pkg/plot/doc/gkidir.hlp
+pkg/plot/doc/gkiextract.hlp
+pkg/plot/doc/gkimosaic.hlp
+pkg/plot/doc/graph.hlp
+pkg/plot/doc/hafton.hlp
+pkg/plot/doc/implot.hlp
+pkg/plot/doc/nsppkern.hlp
+pkg/plot/doc/pcol.hlp
+pkg/plot/doc/pcols.hlp
+pkg/plot/doc/prow.hlp
+pkg/plot/doc/prows.hlp
+pkg/plot/doc/pvector.hlp
+pkg/plot/doc/sgidecode.hlp
+pkg/plot/doc/sgikern.hlp
+pkg/plot/doc/showcap.hlp
+pkg/plot/doc/stdgraph.hlp
+pkg/plot/doc/stdplot.hlp
+pkg/plot/doc/surface.hlp
+pkg/plot/doc/velvect.hlp
+pkg/plot/getdata.x
+pkg/plot/gkidir.par
+pkg/plot/gkiextract.par
+pkg/plot/gkimosaic.par
+pkg/plot/hafton.par
+pkg/plot/imdkern.par
+pkg/plot/mkpkg
+pkg/plot/pcol.par
+pkg/plot/pcols.par
+pkg/plot/prow.par
+pkg/plot/prows.par
+pkg/plot/pvector.par
+pkg/plot/t_contour.x
+pkg/plot/t_hafton.x
+pkg/plot/t_pcol.x
+pkg/plot/t_pcols.x
+pkg/plot/t_prow.x
+pkg/plot/t_prows.x
+pkg/plot/t_pvector.x
+pkg/plot/t_surface.x
+pkg/plot/x_ncar.x
+pkg/plot/x_plot.x
+sys/osb/ieee.gx
+sys/osb/ieeed.x
+sys/osb/ieeer.x
+sys/qpoe/qpiolmask.x
+sys/qpoe/qpiolwcs.x
+sys/qpoe/qploadwcs.x
+sys/qpoe/qpqueryf.x
+sys/qpoe/qpsavewcs.x
+sys/qpoe/zzdebug.x
+unix/as.vax/ieeed.s
+unix/as.vax/ieeer.s
+unix/shlib/S.nm.f68881
+unix/shlib/S.nm.ffpa
+unix/shlib/S.nm.sparc
+unix/hlib/login.cl
+
+unix/hlib/motd
+	Updated to V2.9EXPORT.  (4/19/90 SRo)
+
+unix/hlib/zzsetenv.def
+	Changed to nomwcs for testing and compatibility with standard release.
+	(4/19/90 SRo)
+
+unix/hlib/irafuser.csh
+	Removed -pic from compilation flags (no point unless trying to
+	build native apollo shared library, which experiments show will
+	not work in iraf environment).  Changed -dbs to -db to cut down
+	symbol table size.  (4/19/90 SRo)
+
+[ Another bootstrap to recompile with new flags (VOS bootstrap of course) ]
+
+[ "Final" sysgen for v2.9export, to pick up changes since Apr 1. ]
+
+[ About 3/4 of the *.x files brought over in the tucana update had scrambled
+  text, so would not compile.  Manually brought them over again with tar over
+  the net, this time OK.  This never used to happen, even at SR10.2; 
+  something getting corrupted?  Should boot soon.
+]
+
+pkg/plot/getdata.x
+	This completely rewritten routine declares nxrows as int in
+	module plt_blkaverage(), but later references it as a bool.  Changed
+	to "if (nxrows > 0)" from "if (nxrows)", made entry in tucana
+	sysbugs file.  (4/20/90 SRo)
+
+pkg/dataio/fits/fits_read.x
+pkg/dataio/fits/fits_wheader.x
+pkg/dataio/fits/fits_write.x
+pkg/dataio/Revisions
+	Updated from tucana, as these changes made it into outgoing 2.9.
+	(4/25/90 SRo)
+
+[ Final, FINAL update & sysgen; bad FITS bug fixed, patches made to outgoing
+  v2.9 systems; apollo/iraf is still == canonical v2.9 iraf. ]
+
+noao/lib/mkpkg.sf.M68K
+	Added onedspec/identify/idlinelist.x to the special file list due
+	to an optimizer bug; recompiled with opt,0 and rebuilt x_ondespec.e.
+	Bug found by Frank Valdes.  (5/7/90 SRo)
+
+unix/boot/spp/xpp/decl.c
+	Updated from tucana, to pick up fix for ARB bug.  Rebuilt xpp.e,
+	and hand-deleted the six object files in noao that triggered that
+	ARB bug (dim>2 char arrays), then started an noao sysgen.
+
+	noao/imred/ccdred/src/t_combine.x
+	noao/onedspec/splot/deblend.x
+	noao/onedspec/t_bswitch.x
+	noao/twodspec/longslit/transform/igsfit/igsfit.x
+	noao/twodspec/longslit/transform/igsfit/igsgraph.x
+	noao/twodspec/longslit/transform/fcgetcoords.x
+
+	(5/7/90 SRo)
+
+unix/os/zfiobf.c
+	For apollo, modified to open blocking.  In Domain/OS BSD fifo's are
+	broken when opened O_NDELAY (they don't block and i/o returns errno
+	EWOULDBLOCK, even if fcntl'd to be blocking sometime after the open).
+	This was the only way SAOIMAGE could be made to communicate through
+	the fifo's used by IRAF, and follows many days of other attempts to
+	get around the problem.  (6/4/90 SRo)
+
+[ relink sysgen in $iraf and $noao/proto to pick up zfiobf.c changes ]
+
+pkg/dataio/fits/fits_wheader.x
+	Had to recopy this from another system, as THE FILE HAD BECOME
+	TRASHED since the last sysgen (last half missing).  No sign of
+	anything wrong in /sys/node_data.  (6/5/90 SRo)
+
+$iraf/mkpkg
+	Added entries for m68k_fpa, m68k_f68, a88k.  (6/5/90 SRo)
+
+[ mkpkg m68k_f68; made archive of OBJS.arc, all m68k_fpa directories. ]
+
+bin.m68k_fpa/*.e
+noao/bin.m68k_fpa/*.e
+	Stripped all executables, saving 14 Mb of disk.  (6/8/90 SRo)
+
+NOTE on IEEE floating point on the Apollo:  
+	In the course of investigating a memory corruption bug in the
+	68882 code, ran across a set of Domain system calls for setting
+	and examining the state of the floating point hardware.  I called
+	fpp_$get_trap_enables() (see /usr/include/apollo/fpp.h), and found
+	that the following exceptions are enabled by default, the ones we
+	want anyway:
+
+	    fpp_$enable_divide_by_zero
+	    fpp_$enable_overflow
+	    fpp_$enable_invalid_operation
+	    fpp_$enable_signaling_nan
+	    fpp_$enable_branch_unordered		(6/13/90 SRo)
+
+os/zzstrt.c
+os/mkpkg.sh
+	In debugging a memory corruption problem in x_images.e for the
+	68882 architecture only, I found that the Mem common was only
+	longword aligned.  Tried numerous experiments to find a compile-
+	time way to do this, including #attribute[section(mem_), address...]
+	but could find no way to accomplish the alignment or absolute
+	address positioning while also overlaying with the fortran /mem/.
+
+	Added an overlay reference to the Mem common in zzstrt.c, so that
+	mkpkg.sh can execute /com/bind to align mem_ after the object file
+	is produced (chose page alignment, since I had the choice).  This
+	generates a compiler warning about "size of mem_ was zero", which
+	appears harmless.
+
+	LINKING ANY IRAF EXECUTABLE NOW GENERATES 100's OF LINKER WARNINGS OF
+	THE FORM:
+
+	ld warning: mem_: mixing kinds of alignment in sections (SECALIGN1)
+	ld warning: mem_: mixing kinds of alignment in sections (SECALIGN2)
+
+	These are harmless, and can be turned off with the cc or f77 "-w"
+	option, which I'm now adding to mkpkg.inc.  (6/15/90 SRo)
+
+unix/hlib/mkpkg.inc
+	Added "-/w" to default link flag, to turn off the 1600 or so ld 
+	warnings due to linking with zzstrt.o, which now has mem_ page-aligned.
+	This is a bit risky for developers, so a note should be included in
+	the motd and/or cover letter.  (6/15/90 SRo)
+
+noao/imred/ccdred/src/t_combine.x
+noao/imred/ccdred/src/Revisions
+	This is the one file that Frank had modified on tucana on 3/30/90
+	as it later turned out to work around a new bug which had been
+	introduced by a change to decl.c in spp/xpp.  Doug had replaced
+	t_combine.x on tucana with the Jun '89 version after he fixed
+	decl.c, so when I did my incremental update on 5/7/90, it didn't
+	get picked up, and caused some of Jeannette's test scripts to
+	fail that used combine.  (6/18/90 SRo)
+
+unix/hlib/spy.cl
+	Changed !!w to !!who, as "w" does not exist in Domain/BSD.
+	(6/19/90 SRo)
+
+mkpkg m68k_fpa; rmbin the usual; same in noao.
+New m68k_fpa sysgen, to pick up page-aligned /mem/ common.  Could have
+kept old object modules, but had forgotten to save old spool files, which
+contain some useful compiler warnings we should attend to in the master
+system.  (6/19/90 SRo)
+
+noao/lib/mkpkg.inc
+	I had forgotten to edit this file when I added mkpkg.sf.M68K...
+	(6/21/90 SRo)
+
+noao/lib/mkpkg.sf.M68K -> mkpkg.sf.M68K6
+noao/lib/mkpkg.sf.M68KF
+noao/lib/mkpkg.inc
+	Split special file list into separate versions for 68882 & fpa, as
+	the ONLY way to get the Domain compilers to use any floating point
+	at all is to include the Domain-specific extension -cpu flag, and
+	idlinelist.x does use double precision arithmetic.  (6/21/90 SRo)
+
+Rebuilt onedspec for both 68882 & fpa.
+
+unix/os/mkpkg.sh
+	Merged a88k additions from dn10000 port.  (6/23 SRo)
+
+unix/boot/bootlib/mkpkg.sh
+	Made no-optimization hack for osstrupk.c conditional on m68k
+	rather than hard-coding it; added check for VOS or NOVOS.  (6/23 SRo)
+
+unix/os/zmain.c
+	Merged a88k changes in that affected pointer alignment.  Now using:
+	"int (*epaptr)();", and not casting the function names in the
+	assignment statements: "epaptr = ZGETTY;".  Rebuilt lib$libmain.o
+	and test linked x_plot.e, no problem.  (6/23)
+
+sys/mkpkg
+	Added $echo warnings about having to manually recompile zmain.c/
+	libmain.o; mkpkg builds zmain.c using $HSI_XF, which according to
+	Doug is correct for XC to use when building a C source file.  The
+	problem is that Domain/CC barfs when it sees the -save flag in
+	$HSI_XF, which is needed for .x,.f compilation, and refuses to
+	compile zmain.c.  Seems like we need another $HSI_XCF or something.
+	(6/23)
+
+unix/hlib/install
+	Replaced mach = m68k with mach = $MACH, merged from a88k port.  (6/24)
+
+------------------------- DN-10000 notes.a88k.v29 ----------------------------
+| The following notes were imported verbatim from the a88k port, and until
+| the end of the |'d portion do not reflect any changes in the master system.
+| 
+| NOTES.A88K -- Domain/IRAF Mini-port to the PRISM architecture, DN-10000
+| 
+| Node "jaws", a 4-processor DN-10000 demo machine at HP/Apollo Phoenix, AZ.
+| 
+| Read IRAF archive of 20 June 1990 from NOAO/auriga.
+| 
+| /usr/include/iraf.h -> /local_user/stever/iraf/unix/hlib/libc/iraf.h
+| 	Had Chris DeVita set up link, as he is leaving town for a week.
+| 
+| local/.login
+| local/.cshrc
+| 	Configured for local environment.  (6/22/90 SRo)
+| 
+| unix/hlib/libc/iraf.h
+| 	Reset iraf path.  (6/22/90 SRo)
+| 
+| unix/os/mkpkg.sh
+| 	Disabled as zsvjmp.asm for a88k.  Will have to use Nordlund's trick
+| 	for calling setjmp/longjmp directly from fortran.  There is no
+| 	assembler on this machine, and no asm output from compilers, so it
+| 	would be difficult to write the thing anyway.  (6/22 SRo)
+| 
+| unix/hlib/libos.a	-> unix/bin.a88k/libos.a
+| unix/hlib/libboot.a	-> unix/bin.a88k/libboot.a
+| 	Established these symbolic links.  (6/22)
+| 
+| unix/os/zmain.c	[ NO CHANGE -- see below ]
+| 	Statements like the following were required on the DN-3500 to
+| 	prevent stack mangling in any routine in which the epa was passed.
+| 	On the 10000, we get this warning, which is not documented in the
+| 	hardcopy or online documentation (which ends at #241).  Notheing
+| 	in the cc release notes.
+| 
+| 	(0085)         epaptr = (int *)        zgetty_;
+| 
+| 	******** Line 85 of "zmain.c": [Warning #242]  Conversion of "zgetty_"
+| 	to pointer of stricter alignment can cause serious performance
+| 	degradation.  (6/23/90 SRo)
+| 
+| unix/hlib/iraf.h
+| 	Added "define	zsvjmp	_setjmp($1); $2=$1(LEN_JUMPBUF)"; we are
+| 	using Aake Nordlund's solution that avoids use of an assembler, which
+| 	is not an available product from Apollo, and there is no assembler
+| 	on this dn-10000.  An SPP call to zsvjmp(jumpbuf, status) results
+| 	in "call _setjmp(jumpbuf); status=jumpbuf(60)".  (6/23)
+| 
+| /usr/local/bin
+| 	Established the usual symbolic links here, as XC really wants to find
+| 	xpp & rpp here.  (6/23)
+| 
+| /usr/local/bin/rpp
+| 	This is a script, to brute-force post-process every xpp source to
+| 	replace the leading underscore on any setjmp call from fortran:
+| 
+| 	#!/bin/csh
+| 	/local_user/stever/bin/rpp.e $1 | sed -e 's+setjmp+_setjmp+'
+| 	(6/23)
+| 
+| unix/hlib/setjmp.h
+| 	If a88k, define setjmp&longjmp to be _setjmp, _longjmp.  I could find
+| 	no way in the documentation to differentiate at compile time between
+| 	M68K and A88K; both _ISP__M68K and _ISP__A88K evaluate true on both
+| 	the dn10000 and dn3500.  (6/23)
+| 
+| unix/hlib/irafuser.csh
+| unix/hlib/mkpkg.inc
+| 	Added -DA88K in support of the above.  (6/23)
+| 
+| unix/os/mkpkg.sh
+| 	Added a88k branch to remove zdojmp.o from libos.a as for m68k.  (6/23)
+| 
+| unix/boot/bootlib/mkpkg.sh
+| 	Replaced dn3500 no-optimization compile for osstrupk.c with one 
+| 	conditional on m68k; also added check for VOS bootstrap to get the
+| 	right -DNOVOS flag.  (6/24)
+| 
+| unix/os/zmain.c
+| 	Resolved the earlier reported pointer to function alignment warnings
+| 	by declaring "int	(*epaptr)();", and not casting the function
+| 	names in the assignment statement: "epaptr = ZGETTY;".  (6/23)
+| 
+| Begin first sysgen.
+| 
+| Completed in 4hr, 17min with unsuccessful links due to lack of zdojmp 
+| symbol, since I had forgotten to re-enable zdojmp.o in os$mkpkg.sh.
+| 
+| unix/os/mkpkg.sh
+| 	If a88k, don't remove zdojmp.o from libos.a.  (6/24/90 SRo)
+| 
+| unix/os/zdojmp.c
+| 	If a88k, set the status to the LAST word of jumpbuf, and call
+| 	_longjmp with jmp_buf[0] rather than [1].  (6/24)
+| 
+| unix/hlib/mkpkg.inc
+| 	Removed -/w, inserted on dn3500 to defeat 1000's of ld warnings
+| 	about mixing alignment of /mem/; no such warnings on dn10000.  (6/24)
+| 
+| unix/hlib/mkpkg.sf.A88K
+| 	Created dummy file to keep mkpkg quiet.  (6/24)
+| 
+| [ Full relink sysgen took 6min 40sec, no errors or warnings. ]
+| 
+| unix/hlib/install
+| 	Changed hardcoded "mach = m68k" to "mach = $MACH".  Requires having
+| 	MACH correctly set prior to executing (note in cover letter).  Also
+| 	added conditional if a88k, do NOT remove rpp link; it has to be that
+| 	script which executes rpp.e, the real link to $hbin/rpp.e.  (6/24)
+| 
+| [ CL dies at startup:
+| 
+| 	% cl
+| 	<no name>cl$cl.par%
+| 
+| [ No DBX on this machine!  Tried fruitlessly for 2 hours to get DDE to work
+|   in non-window mode, never could set a single breakpoint, even after stepping
+|   laboriously down into IRAF routines (which showed reasonable names).  This
+|   was compiled with "-cq -/W0,-opt,2,-db,-cpu,a88k -DA88K".  Also rebuilt
+|   CL with -dbs and a -dbs zmain.o, still no luck.  Decided to rebuild whole
+|   system with "-cqFg -/W0,-opt,2,-dbs,-cpu,a88k -DA88K" to see if DDE really
+|   needs full symbolic compilation.  Left mail to try to get DBX installed. ]
+|   ** turns out DBX was never ported to the a88k.  DDE is all there is. **
+| 
+| unix/hlib/mkpkg.inc
+| 	Reset FLAGS for full symbolic compilation (well, with optimization
+| 	-- -opt,2,-dbs).  (6/24)
+| 
+| [ New sysgen started at 19:04 6/24.  Finished 00:04. ]
+| 
+| DDE no-symbol-taable problem goes away if you put a copy of the executable in
+| the cwd, and invoke dde with no arguments, then give the command
+| "dde> debug cl.e".
+| 
+| CL dying in mysterious ways.  What little I can tell with command-mode DDE
+| shows nothing wrong at the time of the dump, implying a stack problem.  This
+| sounds like what Nordlund ran into, so I'll try following his recipe from a
+| year ago under an earlier version of Domain & cc.
+| 
+| #sys/etc/main.x
+| #	Added sp to zzfakecom 'to defeat optimizer across zsvjmp calls'
+| #	ala nordlund (magic -- must verify later if solves problems).  (6/27/90)
+| #REMOVED -- this was not necessary.
+| 
+| pkg/cl/stack.c
+| 	Nordlund said the fact that pushop was declared struct opcode,
+| 	and returns struct value, and that all calls were made without
+| 	assigning a value, caused the runtime stack to be consistently
+| 	messed up.  Redeclared void pushop() if a88k, and return no arg,
+| 	but this should be fixed anyway in the master system.  Note that
+| 	I had once recompiled with "-nansi", but that made no difference;
+| 	could be an a88k compiler bug for non-ansi C code?  (6/27)
+| 
+| pkg/cl/builtin.c
+| pkg/cl/param.c
+| pkg/cl/scan.c
+| 	Converted all naked popop()'s to 'junk = popop()'.  This will have
+| 	to be done anyway for ANSI compliance, and seems like a good idea
+| 	now, whether or not it solves the a88k cl stack problems at startup.
+| 	Note that -nansi did not solve the startup stack problem.  (6/27)
+| 
+| unix/hlib/mkpkg.sf.A88K
+| 	Uncommented main.c globals.c opcodes.c from XNBSS, to pick up
+| 	#attribute definition.  (6/27)
+| 
+| pkg/cl/operand.h
+| 	Had to void pushop() here as well.  (6/27)
+| 
+| Success!  After subsequent recompilation, it appears the only problem before
+| was the pushop() references that did not assign a return value.
+| 
+| hlib/mkpkg.sf.A88K
+| 	Uncommented conrec no-optimization after a segmentation violation
+| 	that looked like the one on the dn-3500, which solved the problem.
+| 	(6/27)
+| 
+| hlib/mkpkg.inc
+| 	Reset FLAGS for entry-point-only symbol table, opt level 2 for
+| 	everything except VOPS, which is opt 3, no source debugging.  (6/27)
+| 
+| [ RMBIN & full sysgen of iraf & noao.  Core system took 4:43, noao took 2:00
+|   to complete.  No apparent problems.  Ran a mandelbrot test (diam1600),
+|   which took 0:13:01 cpu time, compared to 1:25:26 on orion, or 6.7x faster
+|   on jaws, about right for a rated 6 MFLOPS machine. ]
+| 
+| [ Jeannette did full script testing, many hours, comparing output etc. -- 
+|   virtually no bugs were found.  I used the system extensively with SAOIMAGE
+|   on the dn10k monitor, with XTERM, and likewise no bugs.  This port is done!]
++------------------------------------------------------------------------------
+
+July 6, 1990:  merge a88k modifications into dn3500 master apollo system.
+
+pkg/cl/builtin.c
+pkg/cl/operand.h
+pkg/cl/param.c
+pkg/cl/scan.c
+pkg/cl/stack.c
+unix/boot/bootlib/mkpkg.sh
+unix/hlib/irafuser.csh
+unix/hlib/libc/setjmp.h
+unix/hlib/mkpkg.inc
+unix/os/mkpkg.sh
+unix/os/zdojmp.c
+noao/lib/mkpkg.inc
+	Replaced with a88k versions; will have to recompile & test dn3500
+	versions.  (7/6/90)
+
+unix/hlib/iraf.h replaced by iraf.h.m68k
+unix/hlib/iraf.h.a88k
+unix/hlib/iraf.h -> iraf.h.$(MACH)
+	Used the Domain runtime file environment variable translation
+	mechanism to get the right iraf.h for either m68k or a88k.  Requires
+	that anyone programming in SPP in Domain/IRAF have MACH properly
+	set.  (7/6/90)
+
+unix/hlib/mkpkg.sf.A88K
+noao/lib/mkpkg.sf.A88K
+	Added from a88k port.  (7/6/90)
+
+unix/boot/spp/rpp.template
+	Made a template rpp script for a88k, in which the $hbin path
+	will be inserted at install time, and the script copied into
+	localbindir.  (7/6/90)
+
+unix/hlib/install
+	Merged from a88k version, then added code to edit that template
+	rpp script and copy it to $lbin if a88k (had already removed rpp from
+	LINKFILES).  Disabled old saoimage installation stuff.  (7/6/90)
+
+--- this completes the merge of the a88k port.
+

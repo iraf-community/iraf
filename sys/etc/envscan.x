@@ -4,7 +4,9 @@ include	<syserr.h>
 include	<ctype.h>
 include	"environ.h"
 
-define	MAXLEV	8		# max nesting of includes
+define	MAXLEV	8			# max nesting of includes
+define	SZ_LBUF	(SZ_COMMAND+SZ_LINE)	# max length SET on a single line
+
 
 # ENVSCAN -- Parse one or more SET or RESET declarations and enter them into
 # the environment list.
@@ -22,15 +24,15 @@ char	cmd[ARB]		# command text to begin scan
 char	ch
 int	fd, in, nset, lev, sv_fd[MAXLEV]
 pointer	sp, ip, op, op_top, lbuf, name, value
-int	open(), stropen(), getline(), strmatch(), nowhite()
-errchk	open, stropen, getline, syserrs
+int	open(), stropen(), getlline(), strmatch(), nowhite()
+errchk	open, stropen, getlline, syserrs
 string	s_reset "^#reset#"
 string	s_set "^#set#"
 define	again_ 91
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	call salloc (lbuf, SZ_LBUF, TY_CHAR)
 	call salloc (name, MAX_SZKEY, TY_CHAR)
 	call salloc (value, MAX_SZVALUE, TY_CHAR)
 
@@ -60,7 +62,7 @@ begin
 	    # Get the next SET statement into lbuf, leave IN at index of first
 	    # char of the name field.
 
-	    if (getline (fd, Memc[lbuf]) == EOF) {
+	    if (getlline (fd, Memc[lbuf], SZ_LBUF) == EOF) {
 		if (lev > 0) {
 		    call close (fd)
 		    fd = sv_fd[lev]
@@ -116,7 +118,7 @@ begin
 			break
 
 		    } else if (ch == '\\' && Memc[ip+1] == '\n') {
-again_			if (getline (fd, Memc[lbuf]) == EOF)
+again_			if (getlline (fd, Memc[lbuf], SZ_LBUF) == EOF)
 			    break
 
 			# Skip leading whitespace on the continuation line.

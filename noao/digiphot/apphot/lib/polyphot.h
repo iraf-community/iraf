@@ -16,13 +16,15 @@ define	PYZMAG			151
 define	PYMAG			152
 define	PYMAGERR		153
 define	PYNAME			154
+define	PYBADPIX		155
 
 # polyphot error codes (# 141 - 160)
 
 define	PY_NOPOLYGON		141
 define	PY_OUTOFBOUNDS		142
 define	PY_NOPIX		143
-define	PY_NO_SKY_MODE		144
+define	PY_NOSKYMODE		144
+define	PY_BADDATA		145
 define	PY_OK			0
 
 # polyphot keywords

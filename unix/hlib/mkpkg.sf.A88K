@@ -1,0 +1,38 @@
+# Mkpkg special file list for Domain/OS, SR10.1, PRISM architecture.
+
+# All files needing special processing for the local host operating system,
+# e.g., to permit host dependent optimization or to work around compiler bugs,
+# should be listed here.
+
+# Files optimized for the local host system.
+# -----------------------------------------
+
+# C source files outside the HSI requiring compilation with -nbss; by default
+# cc passes -bss to /com/cc, which puts all C uninitialized globals into bss,
+# which causes segmentation violations for those globals that are also fortran
+# common block names.
+# ---------------------------------------------
+
+$set	XNBSS	= '& "$xc -cq -/W0,-opt,2,-dbs,-nbss -/DA88K -/DATTRIBUTE &"'
+
+$special "pkg$cl/":
+	main.c		$(XNBSS)
+	exec.c		$(XNBSS)
+	opcodes.c	$(XNBSS)
+	globals.c	$(XNBSS)
+	;
+
+# Files requiring special compilation due to host compiler bugs.
+# -------------------------------------------------------------
+
+$set	XNO	= '& "$xc -cq -/W0,-opt,0,-db,-cpu,a88k &"'
+
+$special "sys$gio/ncarutil/":
+	conrec.f	$(XNO)
+	;
+
+#$special "sys$vops/lz/":
+#	amuld.x	$(XNO)
+#	amulkd.x	$(XNO)
+#	;
+

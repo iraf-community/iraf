@@ -44,13 +44,15 @@ begin
 	call salloc (z, nfit, TY_DOUBLE)
 	call salloc (w, nfit, TY_DOUBLE)
 
-	do i = 1, nfit {
+	nfit = 0
+	do i = 1, EC_NFEATURES(ec) {
 	    if (IS_INDEFD (PIX(ec,i)) || IS_INDEFD (USER(ec,i)))
 		next
-	    Memd[x+i-1] = PIX(ec,i)
-	    Memd[y+i-1] = AP(ec,i)
-	    Memd[z+i-1] = USER(ec,i)
-	    Memd[w+i-1] = 1.
+	    Memd[x+nfit] = PIX(ec,i)
+	    Memd[y+nfit] = AP(ec,i)
+	    Memd[z+nfit] = USER(ec,i)
+	    Memd[w+nfit] = 1.
+	    nfit = nfit + 1
 	}
 
 	# Initialize fit limits.
@@ -81,21 +83,29 @@ begin
 	j = 0
 	k = 0
 	do i = 1, EC_NFEATURES(ec) {
-    	    if (IS_INDEFD (PIX(ec,j+1)) || IS_INDEFD (USER(ec,j+1))) {
+	    if (IS_INDEFD (PIX(ec,i)) || IS_INDEFD (USER(ec,i))) {
 		j = j + 1
-		next
-	    }
-	    k = k + 1
-	    if (Memd[w+k-1] != 0.) {
-	        j = j + 1
-    	        AP(ec,j) = AP(ec,k)
-    	        LINE(ec,j) = LINE(ec,k)
-    	        ORDER(ec,j) = ORDER(ec,k)
-    	        PIX(ec,j) = PIX(ec,k)
-    	        FIT(ec,j) = FIT(ec,k)
-    	        USER(ec,j) = USER(ec,k)
-    	        FWIDTH(ec,j) = FWIDTH(ec,k)
-    	        FTYPE(ec,j) = FTYPE(ec,k)
+    	        AP(ec,j) = AP(ec,i)
+    	        LINE(ec,j) = LINE(ec,i)
+    	        ORDER(ec,j) = ORDER(ec,i)
+    	        PIX(ec,j) = PIX(ec,i)
+    	        FIT(ec,j) = FIT(ec,i)
+    	        USER(ec,j) = USER(ec,i)
+    	        FWIDTH(ec,j) = FWIDTH(ec,i)
+    	        FTYPE(ec,j) = FTYPE(ec,i)
+	    } else {
+		if (Memd[w+k] != 0.) {
+		    j = j + 1
+    	            AP(ec,j) = AP(ec,i)
+    	            LINE(ec,j) = LINE(ec,i)
+    	            ORDER(ec,j) = ORDER(ec,i)
+    	            PIX(ec,j) = PIX(ec,i)
+    	            FIT(ec,j) = FIT(ec,i)
+    	            USER(ec,j) = USER(ec,i)
+    	            FWIDTH(ec,j) = FWIDTH(ec,i)
+    	            FTYPE(ec,j) = FTYPE(ec,i)
+		}
+		k = k + 1
 	    }
 	}
 	EC_NFEATURES(ec) = j

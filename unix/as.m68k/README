@@ -1,0 +1,7 @@
+README -- as.m68k directory.  Contains zsvjmp.asm, a Domain/OS assembler
+source file supplied by Apollo in Denmark via Aake Nordlund.  Requires
+Domain assembler to build, not generally available at all from Apollo.
+Had to get ours from Apollo R&D at SR10.1, and there is no documentation
+available for it at all, either printed or online.  Appears to work fine
+under SR10.2 as well.
+

@@ -7,10 +7,10 @@ include	<mach.h>
 
 procedure miipak32 (spp, mii, nelems, spp_datatype)
 
-int	spp[ARB]		# input array of SPP integers
-int	mii[ARB]		# output MII format array
-int	nelems			# number of integers to be converted
-int	spp_datatype		# SPP datatype code
+int	spp[ARB]		#I input array of SPP integers
+int	mii[ARB]		#O output MII format array
+int	nelems			#I number of integers to be converted
+int	spp_datatype		#I SPP datatype code
 
 begin
 	switch (spp_datatype) {

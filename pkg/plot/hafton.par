@@ -1,11 +1,9 @@
-# Parameter file for the NCAR GKS utility hafton
-
 image,s,a,,,,image or image section to be plotted
 z1,r,h,0,,,minimum intensity to be mapped (0 if zmin)
 z2,r,h,0,,,maximum intensity to be mapped (0 if zmax)
 nlevels,i,h,0,,,number of levels to be drawn (0 for default)
 mapping_function,s,h,"linear",,,type of mapping 
-contrast,i,h,1,,,positive or negative contrast [+/-1]?
+contrast,r,h,0.25,,,positive or negative contrast [+/-1]?
 perimeter,b,h,yes,,,draw perimeter around plot?
 device,s,h,stdgraph,,,output device
 title,s,h,"imtitle",,,optional title

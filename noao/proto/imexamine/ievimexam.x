@@ -112,7 +112,6 @@ begin
 	    nzvals)
        
         # Finish up
-	call clcpset (pp)
 	call mfree (x_vec, TY_REAL)
 	call mfree (y_vec, TY_REAL)
 	call sfree (sp)

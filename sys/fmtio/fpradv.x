@@ -57,8 +57,8 @@ begin
 	    } else
 		ip = ip + 1
 
-	    call putci (fd, ch)				# output ordinary chars
-	    if (IS_PRINT (ch))				# keep track of column
+	    call putc (fd, cch)				# output ordinary chars
+	    if (IS_PRINT (cch))				# keep track of column
 		col = col + 1
 	    else
 		call fmt_setcol (cch, col)

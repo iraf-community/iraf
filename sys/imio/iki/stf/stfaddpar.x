@@ -25,6 +25,7 @@ long	lval			# added to allow i*2 values from RSDP
 pointer	pp, stf
 int	ival, ip, junk
 int	ctoi(), ctor(), ctod()
+errchk	imadds, imaddl, imaddr, imaddd, imastr
 
 begin
 	stf = IM_KDES(im)

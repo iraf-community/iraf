@@ -2,7 +2,7 @@
 
 include	"qpoe.h"
 
-# QP_ELEMENTSIZE -- Determine the size in chars of a QPOE datatype.  This may
+# QP_SIZEOF -- Determine the size in chars of a QPOE datatype.  This may
 # be one of the special datatypes (user defined record types), or a primitive
 # type.  In the case of a special type, the REFTYPE flag specifies whether
 # the size of the value of the type variable itself (always SZ_CHAR) is to be

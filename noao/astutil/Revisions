@@ -1,5 +1,14 @@
 .help revisions Jun88 noao.astutil
 .nf
+astutil$setairmass.par
+astutil$t_setairmass.x
+    The task now precesses the coordinates to the epoch of the
+    observation.  (2/2/90, Seaman)
+
+astutil$astutil.hd
+    The path to the sources to PDM was not defined correctly.
+    Changed src=pdm/t_pdm.x to src=pdm$t_pdm.x. (1/28/90 Lytle)
+
 astutil$t_setairmass.x +
 astutil$setairmass.par +
 astutil$doc/setairmass.hlp +

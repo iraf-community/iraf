@@ -18,7 +18,7 @@ define	IS_SKEW		Memr[$1+16]
 define	IS_KURTOSIS	Memr[$1+17]
 define	IS_NPIX		Memi[$1+18]
 
-define  IS_FIELDS  "|image|npix|min|max|mean|median|mode|stddev|skew|kurtosis|"
+define  IS_FIELDS  "|image|npix|min|max|mean|midpt|mode|stddev|skew|kurtosis|"
 
 define	NFIELDS		10
 
@@ -27,7 +27,7 @@ define	IS_KNPIX	"NPIX"
 define	IS_KMIN		"MIN"
 define	IS_KMAX		"MAX"
 define	IS_KMEAN	"MEAN"
-define	IS_KMEDIAN	"MEDIAN"
+define	IS_KMEDIAN	"MIDPT"
 define	IS_KMODE	"MODE"
 define	IS_KSTDDEV	"STDDEV"
 define	IS_KSKEW	"SKEW"
@@ -44,7 +44,6 @@ define	IS_FSTDDEV	8
 define	IS_FSKEW	9
 define	IS_FKURTOSIS	10
 
-define	IS_FICOLUMN	"#%19s"
 define	IS_FCOLUMN	"%10d"
 define	IS_FINTEGER	"%10d"
 define	IS_FREAL	"%10.4g"

@@ -51,7 +51,7 @@ COLON COMMANDS
 				   hline, vline, hebar, vebar, circle)
 :/title	string		Title
 :/transpose		Transpose the graph axes
-:/type string		Type of graph (line or mark)
+:/type string		Type of graph (line, hist, or mark)
 :/redraw		Redraw the graph
 :/xlabel string		Label for X axis
 :/xsize size		Size of marks along the X axis

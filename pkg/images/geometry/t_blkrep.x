@@ -14,10 +14,12 @@ include	<imhdr.h>
 procedure t_blkrep()
 
 int	i, list1, list2
-pointer	sp, image1, image2, image3, blkfac, im1, im2
+pointer	sp, image1, image2, image3, blkfac, im1, im2, mw
+real	shifts[IM_MAXDIM], mags[IM_MAXDIM]
 
-pointer	immap()
+bool	envgetb()
 int	imtopenp(), imtgetim(), imtlen(), clgeti()
+pointer	immap(), mw_openim()
 string	blk_param	"bX"
 
 begin
@@ -68,6 +70,17 @@ begin
 		call blkrpd (im1, im2, Memi[blkfac])
 	    default:
 		call blkrpr (im1, im2, Memi[blkfac])
+	    }
+
+	    if (!envgetb ("nomwcs")) {
+		mw = mw_openim (im1)
+		call achtir (Memi[blkfac], mags, IM_NDIM(im1))
+		call mw_scale (mw, mags, 0)
+		call anegr (mags, shifts, IM_NDIM(im1))
+		call aaddkr (shifts, 1.0, shifts, IM_NDIM(im1))
+		call mw_shift (mw, shifts, 0)
+		call mw_saveim (mw, im2)
+		call mw_close (mw)
 	    }
 
 	    call imunmap (im2)

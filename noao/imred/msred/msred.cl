@@ -17,6 +17,7 @@ task	calibrate,
 	splot,
 	standard	= "msred$x_onedspec.e"
 task	msreidentify	= "msred$msreidentify.cl"
+task	msbplot		= "msred$msbplot.cl"
 task	dispcor1	= "msred$dispcor1.par"
  
 # Apextract tasks

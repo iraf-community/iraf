@@ -35,10 +35,13 @@ begin
 	}
 
 	# Process the command.
-	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, CCMDS) != 0)
+	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, CCMDS) != 0)
 	    call apccolon (ap, out, stid, cmdstr, newbuf, newfit)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newbuf,
+	        newfit, junk, junk, junk, junk)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
-	    call apnscolon (ap, im, cl, out, stid, ltid, cmdstr, newbuf, newfit,
+	    call ap_nscolon (ap, im, out, stid, cmdstr, newbuf, newfit,
 		junk, junk, junk, junk)
 	else
 	    call apcimcolon (ap, out, stid, cmdstr, newbuf, newfit)

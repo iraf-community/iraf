@@ -544,8 +544,9 @@ int	fd, stream, verbose, gkiunits
 common	/gkpcom/ fd, stream, verbose, gkiunits
 
 begin
-	call fprintf (fd, "set_polymarker mtype=%d, color=%d\n")
+	call fprintf (fd, "set_polymarker mtype=%d, mwidth=%0.2f, color=%d\n")
 	    call pargs (gki[GKI_PMSET_MT])
+	    call pargr (GKI_UNPACKREAL (gki[GKI_PMSET_MW]))
 	    call pargs (gki[GKI_PMSET_CI])
 end
 

@@ -246,7 +246,14 @@ begin
 	# Scale values to density and calculate fog and std deviation
 
 	if (nfog > 0) {
-	    call amulkr (Memr[pix], scale / real (nfog), Memr[pix], total_pix)
+# 7 Sept 1989, S. Rooke:  in Suzanne's absence, made following bugfix after
+# bug reported by Steve Majewski that fog values are off by 1/n images where
+# multiple fog images are used in a single run.  The total_pix already contains
+# the sum of all pixel values, so the fog pixel values should not be divided
+# by nfog.  This should be verified by Suzanne on her return, and these comments
+# removed.
+#	    call amulkr (Memr[pix], scale / real (nfog), Memr[pix], total_pix)
+	    call amulkr (Memr[pix], scale, Memr[pix], total_pix)
 	    if (strncmp (option, "median", 3) == 0) {
 		fog = amedr (Memr[pix], total_pix)
 		fngpix = total_pix

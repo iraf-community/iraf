@@ -29,6 +29,7 @@
  *	    d_newproc (name, type)	process procedure declaration
  *	d_declaration (typestr)		process typed declaration statement
  *	    d_codegen (fp)		output declarations for sym table
+ *	    d_runtime (fp)		output any runtime initialization
  *
  *	*symbol =  d_enter (symbol, dtype, flags)
  *	*symbol = d_lookup (symbol)
@@ -182,17 +183,39 @@ int	dtype;			/* data type			*/
 		    ndim = 1;
 
 		    while ((ch = yy_input()) != ']' && ch > 0) {
-			if (ch == ',') {
-			    /* Add one char for the EOS in a char array. */
-			    if (dtype == TY_CHAR)
-				*nextch++ = '+', *nextch++ = '1';
-			    *nextch++ = ',';
-			    ndim++;
-			} else if (ch == '\n') {
+			if (ch == '\n') {
 			    yy_unput (ch);
 			    error (XPP_SYNTAX,
 				"missing right bracket in array declaration");
 			    break;
+			} else if (ch == ',') {
+			    /* Add one char for the EOS in the first axis of
+			     * a multidimensional char array.
+			     */
+			    if (ndim == 1 && dtype == TY_CHAR)
+				*nextch++ = '+', *nextch++ = '1';
+			    *nextch++ = ',';
+			    ndim++;
+			} else if (ch == 'A') {
+			    /* Turn [ARB] into [*] for array arguments. */
+			    if ((ch = yy_input()) == 'R') {
+				if ((ch = yy_input()) == 'B') {
+				    *nextch++ = '*';
+				    ndim++;
+				    if (!(sp->s_flags & S_ARGUMENT)) {
+					error (XPP_SYNTAX,
+					    "local variable dimensioned ARB");
+					break;
+				    }
+				} else {
+				    *nextch++ = 'A';
+				    *nextch++ = 'R';
+				    yy_unput (ch);
+				}
+			    } else {
+				*nextch++ = 'A';
+				yy_unput (ch);
+			    }
 			} else
 			    *nextch++ = ch;
 		    }
@@ -221,8 +244,10 @@ int	dtype;			/* data type			*/
 		if (ch != '\n')
 		    yy_unput (ch);
 
-	    } else
+	    } else if (sp && (sp->s_flags & S_ARGUMENT)) {
 		error (XPP_SYNTAX, "bad syntax in procedure argument list");
+	    } else
+		error (XPP_SYNTAX, "declaration syntax error");
 	}
 
 	yy_unput ('\n');
@@ -289,6 +314,27 @@ register FILE	*fp;
 	for (sp=sym;  sp <= top;  sp++)
 	    if (!(sp->s_flags & S_ARGUMENT))
 		d_makedecl (sp, fp);
+}
+
+
+/* D_RUNTIME -- Output any runtime procedure initialization statements,
+ * i.e., statements to be executed at runtime when a procedure is entered.
+ */
+d_runtime (fp)
+FILE	*fp;
+{
+	/* For certain types of functions, ensure that the function value
+	 * is initialized to a legal value, in case the procedure is exited
+	 * without returning a value (e.g., during error processing).
+	 */
+	switch (proctype) {
+	case XTY_REAL:
+	case XTY_DOUBLE:
+	    fprintf (fp, "\t%s = 0\n", procname);
+	    break;
+	default:
+	    break;
+	}
 }
 
 

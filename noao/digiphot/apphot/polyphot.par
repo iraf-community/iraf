@@ -14,5 +14,6 @@ commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
 cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
 interactive,b,h,yes,,,Interactive mode
 verify,b,h,yes,,,Verify critical parameters in non interactive mode
+update,b,h,yes,,,Update critical parameters in on interactive mode
 verbose,b,h,no,,,Print messages in non interactive mode
 mode,s,h,'ql'

@@ -1,6 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
-include	<pkg/gtools.h>
+include	"gtools.h"
 
 # GT_COPY -- Copy values of one structure to another.
 

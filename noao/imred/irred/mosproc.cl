@@ -16,11 +16,11 @@ bool	flatten		{yes, prompt="Flatten images before mosaicing"}
 string	flat		{"", prompt="Flat field image"}
 bool	transpose	{no,  prompt="Transpose images before mosaicing?"}
 
-string  section         {"[*,*]", prompt="Input image section"}
+string  trim_section    {"[*,*]", prompt="Input image section to be extracted"}
 string	corner          {"lr", prompt="Starting corner for the mosaic"}
 string  direction       {"row", prompt="Starting direction for the mosaic"}
 bool	raster          {no, prompt="Raster scan?"}
-bool    median          {no, prompt="Compute the median of each subraster?"}
+string  median_section  {"", prompt="Input subraster section for median ?"}
 bool    subtract        {no, prompt="Substract median from each subraster?"}
 real	oval		{-1.0, prompt="Mosaic border pixel values"}
 
@@ -147,10 +147,12 @@ begin
 
 	print ("\nIRMOSAIC: Mosaic images", >> logfile)
 	time (, >> logfile)
-	irmosaic ("@"//tmpred, out, "db"//out, nx, ny, section=section,
-	    unobserved="", corner=corner, direction=direction, raster=raster,
-	    nxover=-1, nyover=-1, nimcols=INDEF, nimrows=INDEF, oval=oval,
-	    med=median, sub=subtract, opixtype="r", verbose+, >> logfile)
+	irmosaic ("@"//tmpred, out, "db"//out, nx, ny,
+	    trim_section=trim_section, null_input="", corner=corner,
+	    direction=direction, raster=raster, nxover=-1, nyover=-1,
+	    nimcols=INDEF, nimrows=INDEF, oval=oval,
+	    median_section=median_section, sub=subtract, opixtype="r",
+	    verbose+, >> logfile)
 	time (, >> logfile)
 	print ("IRMOSAIC: done", >> logfile)
  

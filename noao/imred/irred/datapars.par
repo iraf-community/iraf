@@ -1,17 +1,22 @@
 # DATAPARS
 
-fwhmpsf,r,h,1.0,0.0,,FWHM of the PSF
-emission,b,h,y,,,Emission features
+fwhmpsf,r,h,1.0,0.0,,FWHM of the PSF in scale units
+emission,b,h,y,,,Features are positive?
 noise,s,h,"poisson","|constant|poisson|",,Noise model
-threshold,r,h,0.0,,,Detection threshold for find
-cthreshold,r,h,0.0,,,Threshold intensity for centering
-sigma,r,h,INDEF,,,Standard deviation in ADU of background level
-ccdread,s,h,"",,,CCD read noise keyword
+threshold,r,h,0.0,,,Detection threshold in counts above background
+cthreshold,r,h,0.0,,,Centering threshold in counts above background
+sigma,r,h,INDEF,,,Standard deviation of background in counts
+scale,r,h,1.0,0.0,,Image scale in units per pixel
+ccdread,s,h,"",,,CCD readout noise image header keyword
 readnoise,r,h,INDEF,,,CCD readout noise in electrons
-gain,s,h,"",,,CCD gain keyword
-epadu,r,h,1.0,,,Electrons per ADU
+gain,s,h,"",,,CCD gain image header keyword
+epadu,r,h,1.0,,,Gain in electrons per count
 exposure,s,h,"",,,Exposure time image header keyword
-itime,r,h,INDEF,,,Integration time
-datamin,r,h,INDEF,,,Minimum good data pixel
-datamax,r,h,INDEF,,,Maximum good data pixel
+itime,r,h,INDEF,,,Exposure time
+airmass,s,h,"",,,Airmass image header keyword
+xairmass,r,h,INDEF,,,Airmass
+filter,s,h,"",,,Filter image header keyword
+ifilter,s,h,"INDEF",,,Filter
+datamin,r,h,INDEF,,,Minimum good data value
+datamax,r,h,INDEF,,,Maximum good data value
 mode,s,h,'ql'

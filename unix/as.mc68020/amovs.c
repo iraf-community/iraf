@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #define import_spp
 #define import_knames
 #include <iraf.h>
@@ -9,5 +12,6 @@ AMOVS (a, b, n)
 XSHORT	*a, *b;
 XINT	*n;
 {
-	bcopy ((char *)a, (char *)b, *n * sizeof(*a));
+	if (a != b)
+	    bcopy ((char *)a, (char *)b, *n * sizeof(*a));
 }

@@ -73,8 +73,8 @@ begin
 
 	} else {
 	    IE_INDEX(ie) = 1
-	    IE_DFRAME(ie) = 0
-	    IE_NEWFRAME(ie) = 0
+	    IE_DFRAME(ie) = 1
+	    IE_NEWFRAME(ie) = 1
 	}
  
 	# Set the logfile and graphics.
@@ -119,7 +119,8 @@ begin
 	    # Check to see if the user has changed frames on us while in
 	    # examine-image-list mode.
 
-	    if (IE_LIST(ie) != NULL && IE_NEWFRAME(ie) != IE_MAPFRAME(ie)) {
+	    if (IE_USEDISPLAY(ie) == YES && IE_LIST(ie) != NULL &&
+		IE_NEWFRAME(ie) != IE_MAPFRAME(ie)) {
 		call ie_imname (IE_DS(ie), IE_NEWFRAME(ie), Memc[imname],
 		    SZ_FNAME)
 		call ie_addimage (ie, Memc[imname], imlist)

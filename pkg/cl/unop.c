@@ -145,7 +145,10 @@ int	opcode;
 	    break;
 	case OT_REAL:
 	    rval = o.o_val.v_r;
-	    ival = (long)rval;
+	    if (rval > MAX_LONG)
+		ival = INDEFL;
+	    else
+		ival = (long)rval;
 	    break;
 	case OT_STRING:
 	    sval = o.o_val.v_s;

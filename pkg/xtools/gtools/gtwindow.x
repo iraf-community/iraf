@@ -1,6 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
-include	<pkg/gtools.h>
+include	"gtools.h"
 
 define	HELP	"lib$scr/gtwindow.key"
 define	PROMPT	"window options"

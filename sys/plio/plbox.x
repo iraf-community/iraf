@@ -23,6 +23,7 @@ int	x2,y2			#I upper right corner of box
 int	rop			#I rasterop
 
 pointer	sp, ufd
+bool	pl_ubox()
 extern	pl_ubox()
 
 begin

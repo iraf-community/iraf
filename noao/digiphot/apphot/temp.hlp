@@ -1,0 +1,7 @@
+Davis, Mar 29, 1980
+apphot/daofind/apconvolve.x
+    1. Added an imflush after the last write in apconolve which cured
+    a "pixel file is truncated error". This error showed up when
+    daofind was run on an image that was 641 by 1025 but not on
+    one that was 640 by 1024. Apparently this problem has been there
+    all along but only occurs very rarely.

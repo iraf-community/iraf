@@ -11,7 +11,7 @@ task	table,
 	unique,
 	lintran,
 	$rgcursor,
-	$rimcursor,
+	rimcursor,
 	words		= "lists$x_lists.e"
 
 task	average		= "lists$average.cl"

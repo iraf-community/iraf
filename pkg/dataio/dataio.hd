@@ -20,4 +20,4 @@ wcardimage	hlp=doc$wcardimage.hlp,		src=cardimage$t_wcardimage.x
 wfits		hlp=doc$wfits.hlp,		src=fits$t_wfits.x
 wtextimage	hlp=doc$wtextimage.hlp,		src=imtext$t_wtextimage.x
 t2d		hlp=doc$t2d.hlp,		src=t2d$t_t2d.x
-revisions	hlp=Revisions
+revisions	sys=Revisions

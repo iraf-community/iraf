@@ -2,7 +2,7 @@
 
 include	<gset.h>
 include <mach.h>
-include	<pkg/gtools.h>
+include	"gtools.h"
 	
 # GT_SWIND -- Set graphics window.
 

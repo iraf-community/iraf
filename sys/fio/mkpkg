@@ -84,6 +84,7 @@ libsys.a:
 	getci.x		<config.h> <fio.com> <fio.h>
 	getline.x	<config.h> <fio.com> <fio.h>
 	getlline.x	
+	glongline.x	
 	mktemp.x	
 	note.x		<config.h> <fio.com> <fio.h>
 	nowhite.x	<ctype.h>

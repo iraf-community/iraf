@@ -35,12 +35,15 @@ The choices are given below.  They may be abbreviated to one character.
 .le
 .ls ""
 \fICalctype\fR defaults to the highest precedence operand datatype.
-\fIPixtype\fR defaults to \fIcalctype\fR.
+If the highest precedence operator is type "ushort", \fIcalctype\fR
+will default to "long".
+\fIPixtype\fR defaults to \fIcalctype\fR. Users who want type "ushort"
+images on output will need to set \fIpixtype\fR to "ushort" explicitly.
 .le
 .ls "1", "2"
 The pixel datatype of the first or second operand.
 .le
-.ls "short", "integer", "long", "real", "double"
+.ls "short", "ushort", "integer", "long", "real", "double"
 Allowed IRAF pixel datatypes.
 .le
 .le

@@ -161,15 +161,14 @@ host system to dispose of the output metacode file or bitmap file to the
 plotter device.
 .ih
 EXAMPLES
-
 1. Convert the GIO/GKI metacode file "dev$mc" into an SGI format metacode file.
 
-	cl> sgikern dev$mc device=sgimc
+    cl> sgikern dev$mc device=sgimc
 
 2. The same GIO/GKI metacode file read in the previous example ("dev$mc") can
 be plotted on the SGI device "qms_sgi".
 
-	cl> sgikern dev$mc device=qms_sgi
+    cl> sgikern dev$mc device=qms_sgi
 .ih
 SEE ALSO
 "The IRAF Simple Graphics Interface (SGI)", August 1986

@@ -39,6 +39,7 @@ begin
 	    for (nleft=nelem;  nleft > 0;  nleft=nleft-nelem) {
 		nelem = qp_read (o_qp,o_param, Memc[buf], chunk,first, Memc[dp])
 		call   qp_write (n_qp,n_param, Memc[buf], nelem,first, Memc[dp])
+		first = first + nelem
 	    }
 	}
 

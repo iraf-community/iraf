@@ -8,8 +8,8 @@ photpars
 .ih
 PARAMETERS
 .ls weighting = "none"
-The type of weighting for the wphot task. The weighting parameter is
-ignored by the phot and qphot tasks. The options are:
+The type of weighting for the WPHOT task. The weighting parameter is
+ignored by the PHOT and QPHOT tasks. The options are:
 .ls none
 Uniform weights of 1 for each pixel are used.
 .le
@@ -42,10 +42,51 @@ approximations are summed.  The zero point of the magnitude
 scale is determined by \fIzmag\fR.
 
 \fRApertures\fR are specified in units of the image scale. If \fIscale\fR
-is specified in units of the half width at half maximum of the points
+is specified in units of the half-width at half-maximum of the point
 spread function the aperture which maximizes the signal to noise once
 chosen will work well on images of different seeing and noise
 charactersitics.
+
+.ih
+EXAMPLES
+
+1. List the PHOTPARS parameters.
+
+.nf
+    da> lpar photpars
+.fi
+
+2. Edit the PHOTPARS parameters.
+
+.nf
+    da> photpars
+.fi
+
+3. Edit the PHOTPARS parameters from within the PHOT task.
+
+.nf
+    da> epar phot
+
+	... edit a few phot parameters
+
+	... move to the photpars parameter and type :e
+
+	... edit the photpars parameters and type :q
+
+	... finish editing the phot parameters and type ^Z
+.fi
+
+4. Save the current PHOTPARS parameter set in a text file photnite1.par.
+This can also be done from inside a higher level task as in the
+above example.
+
+.nf
+    da> photpars
+
+	... edit some parameters
+
+	... type ":w photnite1.par"  from within epar
+.fi
 
 .ih
 TIME REQUIREMENTS
@@ -53,5 +94,5 @@ TIME REQUIREMENTS
 BUGS
 .ih
 SEE ALSO
-datapars, phot, qphot, wphot, radprof
+phot,wphot,radprof
 .endhelp

@@ -5,10 +5,10 @@
 
 procedure miiupk8 (mii, spp, nelems, spp_datatype)
 
-int	mii[ARB]		# output MII format array
-int	spp[ARB]		# input array of SPP integers
-int	nelems			# number of integers to be converted
-int	spp_datatype		# SPP datatype code
+int	mii[ARB]		#I input MII format array
+int	spp[ARB]		#O output SPP format array
+int	nelems			#I number of integers to be converted
+int	spp_datatype		#I SPP datatype code
 
 begin
 	call achtb (mii, spp, nelems, spp_datatype)

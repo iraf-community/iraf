@@ -9,10 +9,10 @@ include	<mach.h>
 
 int procedure miilen (nelems, mii_datatype)
 
-int	nelems
-int	mii_datatype
+int	nelems			#I number of MII data elements
+int	mii_datatype		#I datatype of MII data
 
 begin
-	return (((nelems * mii_datatype / NBITS_BYTE + SZB_CHAR - 1) /
+	return (((nelems * abs(mii_datatype) / NBITS_BYTE + SZB_CHAR - 1) /
 	    SZB_CHAR + SZ_INT - 1) / SZ_INT)
 end

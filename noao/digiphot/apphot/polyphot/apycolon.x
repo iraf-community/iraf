@@ -10,7 +10,7 @@ include "../lib/polyphot.h"
 # AP_YCOLON -- Process polyphot task colon commands
 
 procedure ap_ycolon (ap, im, pl, cl, out, stid, ptid, ltid, cmdstr,
-    newcenterbuf, newcenter, newskybuf, newsky, newmagbuf, newmag)
+        newcenterbuf, newcenter, newskybuf, newsky, newmagbuf, newmag)
 
 pointer	ap				# pointer to the apphot structure
 pointer	im				# pointer to the iraf image
@@ -26,10 +26,6 @@ int	newskybuf, newsky		# new sky buffer, fit
 int	newmagbuf, newmag		# new aperture buffer, fit
 
 pointer	sp, incmd, outcmd
-string	ccmds CCMDS
-string  ncmds NCMDS
-string	scmds SCMDS
-string  pycmds PYCMDS
 int	strdic()
 
 begin
@@ -46,14 +42,17 @@ begin
 	}
 
 	# Set the command to the appropriate routine.
-	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, ccmds) != 0)
+	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, CCMDS) != 0)
 	    call apccolon (ap, out, stid, cmdstr, newcenterbuf, newcenter)
-	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, scmds) != 0)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, SCMDS) != 0)
 	    call apscolon (ap, out, stid, cmdstr, newskybuf, newsky)
-	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, ncmds) != 0)
-	    call apnscolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, newcenterbuf,
 	        newcenter, newskybuf, newsky, newmagbuf, newmag)
-	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, pycmds) != 0)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
+	    call ap_nscolon (ap, im, out, stid, cmdstr, newcenterbuf,
+	        newcenter, newskybuf, newsky, newmagbuf, newmag)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, PYCMDS) != 0)
 	    call ap_yycolon (ap, pl, out, stid, ptid, ltid, cmdstr, newmagbuf,
 	        newmag)
 	else

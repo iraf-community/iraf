@@ -33,7 +33,7 @@ begin
 	}
 
 	# Copy image title
-	call strcpy (IM_TITLE(im), Memc[str2], 32)
+	call strcpy (IM_TITLE(im), Memc[str2], SZ_LINE)
 	call strcat (Memc[str2], Memc[str1], SZ_LINE)
 
 	# Load exposure time and aperture number
@@ -41,8 +41,8 @@ begin
 	    beamnr = BEAM(ids)
 	else
 	    beamnr = 0
-	call sprintf (Memc[str2], SZ_LINE, " %5ds ap:%1d")
-	    call pargi (ITM(ids))
+	call sprintf (Memc[str2], SZ_LINE, " %7.2fs ap:%1d")
+	    call pargr (ITM(ids))
 	    call pargi (beamnr)
 	call strcat (Memc[str2], Memc[str1], SZ_LINE)
 

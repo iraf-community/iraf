@@ -3,4 +3,4 @@
 $doc = "./doc/"
 
 mosproc		hlp=doc$mosproc.hlp,	src=mosproc.cl
-revisions	hlp=Revisions
+revisions	sys=Revisions

@@ -97,7 +97,7 @@ begin
 
 	} else if (IE_USEDISPLAY(ie) == YES) {
 	    # Map the new display frame.
-	    if (IE_NEWFRAME(ie) != 0 && IE_NEWFRAME(ie) != IE_MAPFRAME(ie)) {
+	    if (IE_NEWFRAME(ie) != IE_MAPFRAME(ie)) {
 		if (IE_DS(ie) != NULL)
 		    call imunmap (IE_DS(ie))
 		IE_DS(ie) = imd_mapframe (IE_NEWFRAME(ie), READ_WRITE, select)

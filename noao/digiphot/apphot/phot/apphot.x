@@ -7,7 +7,6 @@ include "../lib/center.h"
 include "../lib/fitsky.h"
 
 define	HELPFILE	"apphot$phot/phot.key"
-define	SHELPFILE	"apphot$phot/sphot.key"
 
 # APPHOT -- Procedure to compute magnitudes for a list of objects
 
@@ -59,12 +58,6 @@ begin
 	# Intialize the sequencing.
 	newlist = NO
 	ltid = 0
-
-	# Print short help page.
-	if (id != NULL)
-	    call gpagefile (id, SHELPFILE, "")
-	else if (interactive == YES)
-	    call pagefile (SHELPFILE, "")
 
 	# Loop over the coordinate file.
 	while (clgcur ("commands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
@@ -254,14 +247,14 @@ begin
 
 	    # Verify the critical PHOT parameters.
 	    case 'v':
-		call ap_pconfirm (ap)
+		call ap_pconfirm (ap, out, stid)
 
 	    # Fit the center around the cursor position.
 	    case 'c':
 		if (newcenterbuf == YES)
 		    cier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
-		    cier = aprefitcenter (ap)
+		    cier = aprefitcenter (ap, cier)
 		call apmark (ap, id, apstati (ap, MKCENTER), NO, NO)
 		call apcplot (ap, stid, cier, gd, apstati (ap, RADPLOTS))
 		if (interactive == YES)
@@ -309,7 +302,7 @@ begin
 		    pier = apmag (ap, im, wx, wy, apstati (ap, POSITIVE),
 		    apstatr (ap, SKY_MODE), apstatr (ap, SKY_SIGMA),
 		    apstati (ap, NSKY))
-		else if (newmag == YES)
+		else
 		    pier = apremag (ap, apstati (ap, POSITIVE), apstatr (ap,
 		        SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
 		call apmark (ap, id, NO, NO, apstati (ap, MKAPERT))
@@ -318,48 +311,12 @@ begin
 		newmagbuf = NO
 		newmag = NO
 
-	    # Center, fit the sky, and compute magnitudes.
-	    case 'f':
-		if (newcenterbuf == YES)
-		    cier = apfitcenter (ap, im, wx, wy)
-		else if (newcenter == YES)
-		    cier = aprefitcenter (ap)
-	        if (newskybuf == YES || ! fp_equalr (apstatr (ap, XCENTER),
-		    apstatr (ap, SXCUR)) || ! fp_equalr (apstatr (ap,
-		    SYCUR), apstatr (ap, YCENTER)))
-		    sier = apfitsky (ap, im, apstatr (ap, XCENTER),
-		        apstatr (ap, YCENTER), sd, gd)
-		else if (newsky == YES)
-		    sier = aprefitsky (ap, gd)
-	        if (newmagbuf == YES || ! fp_equalr (apstatr (ap, XCENTER),
-		    apstatr (ap, PXCUR)) || ! fp_equalr (apstatr (ap, PYCUR),
-		    apstatr (ap, YCENTER)))
-		    pier = apmag (ap, im, apstatr (ap, XCENTER), apstatr (ap,
-		        YCENTER), apstati (ap, POSITIVE), apstatr (ap,
-			SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
-		else if (newmag == YES)
-		    pier = apremag (ap, apstati (ap, POSITIVE), apstatr (ap,
-		        SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
-
-		call appplot (ap, im, stid, cier, sier, pier, gd, apstati (ap,
-		    RADPLOTS))
-		if (interactive == YES)
-		    call ap_qpmag (ap, cier, sier, pier)
-		call apmark (ap, id, apstati (ap, MKCENTER), apstati (ap,
-		    MKSKY), apstati (ap, MKAPERT))
-		newcenterbuf = NO
-		newcenter = NO
-		newskybuf = NO
-		newsky = NO
-		newmagbuf = NO
-		newmag = NO
-
 	    # Compute the center, sky, and magnitudes and save the results.
-	    case ' ':
+	    case 'f', ' ':
 		if (newcenterbuf == YES)
 		    cier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
-		    cier = aprefitcenter (ap)
+		    cier = aprefitcenter (ap, cier)
 		if (newskybuf == YES || ! fp_equalr (apstatr (ap, XCENTER),
 		    apstatr (ap, SXCUR)) || ! fp_equalr (apstatr (ap, YCENTER),
 		    apstatr (ap, SYCUR)))
@@ -374,7 +331,7 @@ begin
 		        apstatr (ap, YCENTER), apstati (ap, POSITIVE),
 			apstatr (ap, SKY_MODE), apstatr (ap, SKY_SIGMA),
 			apstati (ap, NSKY))
-		else if (newmag == YES)
+		else
 		    pier = apremag (ap, apstati (ap, POSITIVE), apstatr (ap,
 		        SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
 
@@ -385,21 +342,20 @@ begin
 		if (interactive == YES)
 		    call ap_qpmag (ap, cier, sier, pier)
 
-		if (stid == 1)
-		    call ap_param (ap, out, "phot")
-		if (newlist == YES)
-		    call ap_pmag (ap, out, stid, ltid, cier, sier, pier)
-		else
-		    call ap_pmag (ap, out, stid, 0, cier, sier, pier)
-		call appplot (ap, im, stid, cier, sier, pier, mgd, YES)
+		newcenterbuf = NO; newcenter = NO
+		newskybuf = NO; newsky = NO
+		newmagbuf = NO; newmag = NO
 
-		stid = stid + 1
-		newcenterbuf = NO
-		newcenter = NO
-		newskybuf = NO
-		newsky = NO
-		newmagbuf = NO
-		newmag = NO
+		if (key == ' ') {
+		    if (stid == 1)
+		        call ap_param (ap, out, "phot")
+		    if (newlist == YES)
+		        call ap_pmag (ap, out, stid, ltid, cier, sier, pier)
+		    else
+		        call ap_pmag (ap, out, stid, 0, cier, sier, pier)
+		    call appplot (ap, im, stid, cier, sier, pier, mgd, YES)
+		    stid = stid + 1
+		}
 
 	    default:
 		call printf ("Unknown or ambiguous keystroke command\7\n")

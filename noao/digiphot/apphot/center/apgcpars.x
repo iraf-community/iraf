@@ -63,6 +63,13 @@ begin
 	call clgpset (np, "exposure", Memc[str], SZ_LINE)
 	call apsets (ap, EXPOSURE, Memc[str])
 	call apsetr (ap, ITIME, clgpsetr (np, "itime"))
+	call clgpset (np, "airmass", Memc[str], SZ_LINE)
+	call apsets (ap, AIRMASS, Memc[str])
+	call apsetr (ap, XAIRMASS, clgpsetr (np, "xairmass"))
+	call clgpset (np, "filter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTER, Memc[str])
+	call clgpset (np, "ifilter", Memc[str], SZ_LINE)
+	call apsets (ap, FILTERID, Memc[str])
 
 	# Make radial plots on stdgraph.
 	call apseti (ap, RADPLOTS, btoi (clgetb ("radplots")))

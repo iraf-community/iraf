@@ -87,7 +87,8 @@ begin
 	    call apsetr (ap, WX, wx)
 	    call apsetr (ap, WY, wy)
 	    if (stdin == YES) {
-		call printf ("Type object x and y coordinates (^Z or ^D to end): ")
+		call printf (
+		    "Type object x and y coordinates (^Z or ^D to end): ")
 		call flush (STDOUT)
 	    }
 	}

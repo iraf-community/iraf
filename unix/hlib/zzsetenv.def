@@ -1,23 +1,31 @@
 # Global IRAF base environment list.
 
+# The following should be commented out or reset to "no" to enable world
+# coordinate support (MWCS) in V2.9.  Note however that the IRAF packages
+# have not yet been modified to use MWCS, and enabling MWCS may cause these
+# packages to misbehave.
+
+set	nomwcs		= yes
+
+# Local system defaults.
 set	clobber		= no
 set	editor		= vi
 set	filewait	= yes
 set	graphcap	= dev$graphcap
 set	imdir		= tmp$
 set	multversions	= no
-set	printer		= lpr
-set	stdgraph	= none
+set	printer		= versatec
+set	stdgraph	= xterm
 set	stdimage	= imt512
 set	stdimcur	= stdimage
-set	stdplot		= qms
+set	stdplot		= lw5
 set	stdvdm		= uparm$vdm
 set	termcap		= dev$termcap
-set	terminal	= vt100
+set	terminal	= xterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
-set	ttynlines	= 24
-set	version		= "NOAO/IRAF V2.8EXPORT"
+set	ttynlines	= 54
+set	version		= "NOAO/IRAF V2.9EXPORT"
 
 # System directories.
 
@@ -49,6 +57,7 @@ set	ki		= "sys$ki/"
 set	libc		= "sys$libc/"
 set	memio		= "sys$memio/"
 set	mtio		= "sys$mtio/"
+set	mwcs		= "sys$mwcs/"
 set	plio		= "sys$plio/"
 set	pmio		= "sys$pmio/"
 set	qpoe		= "sys$qpoe/"

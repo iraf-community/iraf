@@ -9,7 +9,7 @@ pointer	ids	# Pointer to program data structure
 pointer	im	# Pointer to image
 
 begin
-	call ids_addi (im, "EXPTIME", ITM(ids))
+	call ids_addr (im, "EXPTIME", ITM(ids))
 	call ids_addi (im, "OFLAG", OFLAG(ids))
 	call ids_addi (im, "BEAM-NUM", BEAM(ids))
 	call ids_addi (im, "NP1", NP1(ids))
@@ -18,6 +18,7 @@ begin
 	call ids_addr (im, "CRPIX1", 1.)
 	call ids_addr (im, "CRVAL1", W0(ids))
 	call ids_addr (im, "CDELT1", WPC(ids))
+	call ids_addr (im, "CD1_1", WPC(ids))
 	call ids_addr (im, "W0", W0(ids))
 	call ids_addr (im, "WPC", WPC(ids))
 

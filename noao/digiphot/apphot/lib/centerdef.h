@@ -36,7 +36,7 @@ define	AP_XSHIFT		Memr[$1+23]	# total x shift
 define	AP_YSHIFT		Memr[$1+24]	# total y shift
 define	AP_XERR			Memr[$1+25]	# x error
 define	AP_YERR			Memr[$1+26]	# y error
-define	AP_DATALIMIT		Memr[$1+27]	# min (max) of subraster
+define	AP_CDATALIMIT		Memr[$1+27]	# min (max) of subraster
 define	AP_CSTRING		Memc[P2C($1+28)]# centering algorithm id
 
 # default setup values for centering parameters

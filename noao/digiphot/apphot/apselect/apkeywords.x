@@ -334,7 +334,7 @@ begin
 	if (key == 1)
 	    vp = 1
 	else
-	    vp = ptrs[key] - ptrs[key-1] + 1
+	    vp = ptrs[key] - ptrs[1] + 1
 
 	# Insert the new value.
 	for (ip = 1; ip <= maxch && vstr[ip] != EOS; ip = ip + 1) {

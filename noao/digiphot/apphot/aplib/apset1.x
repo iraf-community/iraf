@@ -63,6 +63,12 @@ begin
 	    call strcpy (str, AP_EXPOSURE(ap), SZ_FNAME)
 	case OUTNAME:
 	    call strcpy (str, AP_OUTNAME(ap), SZ_FNAME)
+	case AIRMASS:
+	    call strcpy (str, AP_AIRMASS(ap), SZ_FNAME)
+	case FILTER:
+	    call strcpy (str, AP_FILTER(ap), SZ_FNAME)
+	case FILTERID:
+	    call strcpy (str, AP_FILTERID(ap), SZ_FNAME)
 	default:
 	    call error (0, "APSETS: Unknown apphot parameter")
 	}
@@ -141,8 +147,8 @@ begin
 	psf = AP_PPSF(ap)
 
 	switch (param) {
-	case DATALIMIT:
-	    AP_DATALIMIT(cen) = rval
+	case CDATALIMIT:
+	    AP_CDATALIMIT(cen) = rval
 	case XSHIFT:
 	    AP_XSHIFT(cen) = rval
 	case YSHIFT:
@@ -227,6 +233,8 @@ begin
 	    AP_DATAMIN(ap) = rval
 	case DATAMAX:
 	    AP_DATAMAX(ap) = rval
+	case XAIRMASS:
+	    AP_XAIRMASS(ap) = rval
 	default:
 	    call error (0, "APSETR: Unknown apphot parameter")
 	}

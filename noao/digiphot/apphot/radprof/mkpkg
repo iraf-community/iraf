@@ -14,15 +14,12 @@ libpkg.a:
 			../lib/noise.h		../lib/radprof.h	\
 			../lib/apphot.h
 	approfcolon.x	../lib/radprof.h
-	approfsetup.x	../lib/apphot.h		../lib/phot.h		\
-			../lib/center.h		../lib/fitsky.h         \
-			../lib/radprof.h	../lib/apphotdef.h	\
-			../lib/photdef.h	../lib/fitskydef.h	\
-			../lib/noise.h
+	approfsetup.x	../lib/center.h		../lib/fitsky.h         \
+			../lib/display.h
 	apprprof.x	../lib/apphotdef.h	../lib/apphot.h         \
 			../lib/center.h		../lib/fitsky.h         \
 			../lib/photdef.h	../lib/phot.h		\
-			../lib/radprof.h	../lib/radprofdef.h
+			../lib/radprof.h
 	apradprof.x	<ctype.h>		<gset.h>		\
 			../lib/apphot.h		../lib/center.h         \
 			../lib/fitsky.h		../lib/radprof.h	\
@@ -32,10 +29,7 @@ libpkg.a:
 			../lib/phot.h           ../lib/radprof.h
 	aprferrors.x	../lib/phot.h		../lib/radprof.h
 	aprmmeasure.x
-	aprpars.x	../lib/apphot.h		../lib/center.h         \
-			../lib/fitsky.h		../lib/phot.h		\
-			../lib/noise.h		../lib/display.h	\
-			../lib/radprof.h
+	aprpars.x	../lib/radprof.h	../lib/display.h 
 	aprpbuf.x	<imhdr.h>		../lib/apphotdef.h	\
 			../lib/radprofdef.h	../lib/radprof.h
 	aprpcolon.x	../lib/apphot.h		../lib/fitsky.h         \
@@ -48,14 +42,13 @@ libpkg.a:
 			../lib/phot.h
 	aprpinit.x	../lib/apphotdef.h	../lib/radprofdef.h	\
 			../lib/phot.h
-	aprpmeasure.x	<math/curfit.h>
 	aprpplot.x	<gset.h>		<pkg/gtools.h>		\
 			../lib/apphotdef.h	../lib/photdef.h	\
 			../lib/radprof.h	../lib/phot.h		\
 			../lib/fitsky.h		../lib/radprofdef.h	\
 			../lib/center.h		../lib/apphot.h
 	apfrprof.x	<math/curfit.h>		<math/iminterp.h>	\
-			<gset.h>		../lib/apphot.h         \
+			<gset.h>		../lib/fitskydef.h      \
 			../lib/apphotdef.h	../lib/radprofdef.h	\
 			../lib/phot.h		../lib/photdef.h	\
 			../lib/radprof.h

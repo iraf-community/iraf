@@ -5,7 +5,12 @@ include <imhdr.h>
 include <imset.h>
 include <math/iminterp.h>
 
-# T_IMSHIFT -- Shift a 2-D image in x and y
+define	NMARGIN		3	# number of boundary pixels required	
+define	NYOUT		16	# number of lines output at once
+
+
+# T_IMSHIFT -- Shift a 2-D image by an arbitrary amount in X and Y, using
+# boundary extension to preserve the image size.
 
 procedure t_imshift()
 
@@ -16,19 +21,16 @@ pointer	image1			# Input image
 pointer	image2			# Output image
 pointer imtemp			# Temporary file
 pointer	sfile			# Text file containing list of shifts
-pointer	database		# Name of geomap database
-pointer	records			# Name of geomap transforms
-pointer	recname			# Transform name
 
 int	list1, list2, interp_type, boundary_type, ixshift, iyshift, nshifts
-pointer	sp, str, xs, ys, im1, im2, sf
-real	txshift, tyshift, xshift, yshift, constant
+pointer	sp, str, xs, ys, im1, im2, sf, mw
+real	txshift, tyshift, xshift, yshift, constant, shifts[2]
 
-bool	fp_equalr()
-int	imtopen(), imtgetim(), imtlen(), clgwrd(), open(), ish_rshifts()
+bool	fp_equalr(), envgetb()
+int	imtgetim(), imtlen(), clgwrd(), open(), ish_rshifts()
+pointer	immap(), imtopen(), mw_openim()
 real	clgetr()
-pointer	immap()
-errchk	ish_ishiftxy, ish_gshiftxy
+errchk	ish_ishiftxy, ish_gshiftxy, mw_openim, mw_saveim, mw_shift
 
 begin
 	call smark (sp)
@@ -38,9 +40,6 @@ begin
 	call salloc (image2, SZ_LINE, TY_CHAR)
 	call salloc (imtemp, SZ_LINE, TY_CHAR)
 	call salloc (sfile, SZ_FNAME, TY_CHAR)
-	call salloc (database, SZ_FNAME, TY_CHAR)
-	call salloc (records, SZ_FNAME, TY_CHAR)
-	call salloc (recname, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get task parameters.
@@ -56,12 +55,13 @@ begin
 	if (boundary_type == BT_CONSTANT)
 	    constant = clgetr ("constant")
 
+	# Open the input and output image lists.
 	list1 = imtopen (Memc[imtlist1])
 	list2 = imtopen (Memc[imtlist2])
 	if (imtlen (list1) != imtlen (list2)) {
 	    call imtclose (list1)
 	    call imtclose (list2)
-	    call error (0, "Number of input and output images not the same.")
+	    call error (1, "Number of input and output images not the same.")
 	}
 
 	# Determine the source of the shifts.
@@ -71,7 +71,7 @@ begin
 	    call salloc (ys, imtlen (list1), TY_REAL)
 	    nshifts = ish_rshifts (sf, Memr[xs], Memr[ys], imtlen (list1))
 	    if (nshifts != imtlen (list1))
-		call error (0,
+		call error (2,
 		    "The number of input images and shifts are not the same.")
 	} else {
 	    txshift = clgetr ("xshift")
@@ -82,7 +82,7 @@ begin
 	# Do each set of input and output images.
 	nshifts = 0
 	while ((imtgetim (list1, Memc[image1], SZ_FNAME) != EOF) &&
-	      (imtgetim (list2, Memc[image2], SZ_FNAME) != EOF)) {
+	       (imtgetim (list2, Memc[image2], SZ_FNAME) != EOF)) {
 	    
 	    call xt_mkimtemp (Memc[image1], Memc[image2], Memc[imtemp],
 	        SZ_FNAME)
@@ -102,18 +102,29 @@ begin
 	    iyshift = int (yshift)
 
 	    iferr {
-		if (interp_type == II_NEAREST)
-		    call ish_ishiftxy (im1, im2, nint (xshift), nint (yshift),
+		# Perform the shift.
+		if (interp_type == II_NEAREST) {
+		    call ish_ishiftxy (im1, im2, nint(xshift), nint(yshift),
 		        interp_type, boundary_type, constant)
-		else if (fp_equalr (xshift, real (ixshift)) &&
-		    fp_equalr (yshift, real (iyshift)))
+		} else if (fp_equalr (xshift, real(ixshift)) &&
+		    fp_equalr (yshift, real(iyshift))) {
 		    call ish_ishiftxy (im1, im2, ixshift, iyshift, interp_type,
 			boundary_type, constant)
-		else
+		} else {
 		    call ish_gshiftxy (im1, im2, xshift, yshift, interp_type,
 			boundary_type, constant)
-	    } then {
+		}
 
+		# Update the image WCS to reflect the shift.
+		if (!envgetb ("nomwcs")) {
+		    mw = mw_openim (im1)
+		    shifts[1] = xshift;  shifts[2] = yshift
+		    call mw_shift (mw, shifts, 03B)
+		    call mw_saveim (mw, im2)
+		    call mw_close (mw)
+		}
+
+	    } then {
 		call eprintf ("Error shifting image: %s\n")
 		    call pargstr (Memc[image1])
 		call erract (EA_WARN)
@@ -122,12 +133,10 @@ begin
 		call imdelete (Memc[image2])
 
 	    } else {
-
-	        # finish up
+	        # Finish up.
 	        call imunmap (im1)
 	        call imunmap (im2)
 	        call xt_delimtemp (Memc[image2], Memc[imtemp])
-
 	    }
 
 	    nshifts = nshifts + 1
@@ -141,29 +150,29 @@ begin
 end
 
 
-# ISH_ISHIFTXY -- Procedure to shift a 2-D image by integral pixels in x and y.
+# ISH_ISHIFTXY -- Shift a 2-D image by integral pixels in x and y.
 
 procedure ish_ishiftxy (im1, im2, ixshift, iyshift, interp_type, boundary_type,
-    constant)
+	constant)
 
-pointer	im1		# pointer to the input image
-pointer	im2		# pointer to the output image
-int	ixshift		# shift in x and y
-int	iyshift		#
-int	interp_type	# type of interpolant
-int	boundary_type	# type of boundary extension
-real	constant	# constant for boundary extension
+pointer	im1		#I pointer to the input image
+pointer	im2		#I pointer to the output image
+int	ixshift		#I shift in x and y
+int	iyshift		#I
+int	interp_type	#I type of interpolant
+int	boundary_type	#I type of boundary extension
+real	constant	#I constant for boundary extension
 
-int	i, x1col, x2col, yline
-int	ncols, nlines, nbpix
-long	v[IM_MAXDIM]
 pointer	buf1, buf2
+long	v[IM_MAXDIM]
+int	ncols, nlines, nbpix
+int	i, x1col, x2col, yline
 
 int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 pointer	imgs2s(), imgs2i(), imgs2l(), imgs2r(), imgs2d(), imgs2x()
-
 errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
 errchk	imgs2s, imgs2i, imgs2l, imgs2r, imgs2d, imgs2x
+string	wrerr "ISHIFTXY: Error writing in image."
 
 begin
 	ncols = IM_LEN(im1,1)
@@ -171,9 +180,9 @@ begin
 
 	# Cannot shift off image.
 	if (ixshift < -ncols || ixshift > ncols)
-	    call error (0, "ISHIFTXY: X shift out of bounds.")
+	    call error (3, "ISHIFTXY: X shift out of bounds.")
 	if (iyshift < -nlines || iyshift > nlines)
-	    call error (0, "ISHIFTXY: Y shift out of bounds.")
+	    call error (4, "ISHIFTXY: Y shift out of bounds.")
 
 	# Calculate the shift.
 	switch (boundary_type) {
@@ -193,7 +202,7 @@ begin
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Get column boundaries in the input image.
-	x1col= max (-ncols + 1, - ixshift + 1) 
+	x1col = max (-ncols + 1, - ixshift + 1) 
 	x2col = min (2 * ncols,  ncols - ixshift)
 
 	call amovkl (long (1), v, IM_MAXDIM)
@@ -203,97 +212,95 @@ begin
 	case TY_SHORT:
 	    do i = 1, nlines {
 	        if (impnls (im2, buf2, v) == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (5, wrerr)
 		yline = i - iyshift
 		buf1 = imgs2s (im1, x1col, x2col, yline, yline)
 		if (buf1 == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (5, wrerr)
 		call amovs (Mems[buf1], Mems[buf2], ncols)
 	    }
 	case TY_INT:
 	    do i = 1, nlines {
 	        if (impnli (im2, buf2, v) == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (5, wrerr)
 		yline = i - iyshift
 		buf1 = imgs2i (im1, x1col, x2col, yline, yline)
 		if (buf1 == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (5, wrerr)
 		call amovi (Memi[buf1], Memi[buf2], ncols)
 	    }
 	case TY_LONG:
 	    do i = 1, nlines {
 	        if (impnll (im2, buf2, v) == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (5, wrerr)
 		yline = i - iyshift
 		buf1 = imgs2l (im1, x1col, x2col, yline, yline)
 		if (buf1 == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (5, wrerr)
 		call amovl (Meml[buf1], Meml[buf2], ncols)
 	    }
 	case TY_REAL:
 	    do i = 1, nlines {
 	        if (impnlr (im2, buf2, v) == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (5, wrerr)
 		yline = i - iyshift
 		buf1 = imgs2r (im1, x1col, x2col, yline, yline)
 		if (buf1 == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (5, wrerr)
 		call amovr (Memr[buf1], Memr[buf2], ncols)
 	    }
 	case TY_DOUBLE:
 	    do i = 1, nlines {
 	        if (impnld (im2, buf2, v) == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (0, wrerr)
 		yline = i - iyshift
 		buf1 = imgs2d (im1, x1col, x2col, yline, yline)
 		if (buf1 == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (0, wrerr)
 		call amovd (Memd[buf1], Memd[buf2], ncols)
 	    }
 	case TY_COMPLEX:
 	    do i = 1, nlines {
 	        if (impnlx (im2, buf2, v) == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (0, wrerr)
 		yline = i - iyshift
 		buf1 = imgs2x (im1, x1col, x2col, yline, yline)
 		if (buf1 == EOF)
-		    call error (0, "ISHIFTXY: Error writing in image.")
+		    call error (0, wrerr)
 		call amovx (Memx[buf1], Memx[buf2], ncols)
 	    }
 	default:
-	    call error (0, "ISHIFTXY: Unknown IRAF type.")
+	    call error (6, "ISHIFTXY: Unknown IRAF type.")
 	}
 end
 
-define	NMARGIN		3	# number of boundary pixels required	
-define	NYOUT		16	# number of lines output at once
 
-# ISH_GSHIFTXY -- Procedure to shift an image by fractional pixels in x and y.
+# ISH_GSHIFTXY -- Shift an image by fractional pixels in x and y.
+# Unfortunately, this code currently performs the shift only on single
+# precision real, so precision is lost if the data is of type double,
+# and the imaginary component is lost if the data is of type complex.
 
 procedure ish_gshiftxy (im1, im2, xshift, yshift, interp_type, boundary_type,
-    constant)
+	constant)
 
-pointer		im1		# pointer to input image
-pointer		im2		# pointer to output image
-real		xshift		# shift in x direction
-real		yshift		# shift in y direction
-int		interp_type	# type of interpolant
-int		boundary_type	# type of boundary extension
-real		constant	# value of constant for boundary extension
+pointer	im1		#I pointer to input image
+pointer	im2		#I pointer to output image
+real	xshift		#I shift in x direction
+real	yshift		#I shift in y direction
+int	interp_type	#I type of interpolant
+int	boundary_type	#I type of boundary extension
+real	constant	#I value of constant for boundary extension
 
-int	i
-int	ncols, nlines, nbpix, fstline, lstline
-int	cin1, cin2, nxin, lin1, lin2, nyin
 int	lout1, lout2, nyout
+int	cin1, cin2, nxin, lin1, lin2, nyin, i
+int	ncols, nlines, nbpix, fstline, lstline
 real	xshft, yshft, deltax, deltay, dx, dy, cx, ly
 pointer	sp, x, y, msi, sinbuf, soutbuf
 
-bool	fp_equalr()
 pointer	imps2r()
-
-errchk	imgs2r, imps2r
+bool	fp_equalr()
 errchk	msiinit, msifree, msifit, msigrid
-errchk	smark, salloc, sfree
+errchk	imgs2r, imps2r
 
 begin
 	ncols = IM_LEN(im1,1)
@@ -301,9 +308,9 @@ begin
 
 	# Check for out of bounds shift.
 	if (xshift < -ncols || xshift > ncols)
-	    call error (0, "GSHIFTXY: X shift out of bounds.")
+	    call error (7, "GSHIFTXY: X shift out of bounds.")
 	if (yshift < -nlines || yshift > nlines)
-	    call error (0, "GSHIFTXY: Y shift out of bounds.")
+	    call error (8, "GSHIFTXY: Y shift out of bounds.")
 
 	# Get the real shift.
 	if (boundary_type == BT_WRAP) {
@@ -338,6 +345,7 @@ begin
 	    deltax = 1. - dx + NMARGIN
 	else
 	    deltax = dx + NMARGIN
+
 	do i = 1, ncols
 	    Memr[x+i-1] = i + deltax
 
@@ -388,35 +396,39 @@ begin
 	    # Output the section.
 	    soutbuf = imps2r (im2, 1, ncols, lout1, lout2)
 	    if (soutbuf == EOF)
-		call error (0, "GSHIFTXY: Error writing output image.")
+		call error (9, "GSHIFTXY: Error writing output image.")
 
 	    # Evaluate the interpolant.
 	    call msigrid (msi, Memr[x], Memr[y], Memr[soutbuf], ncols, nyout,
 		ncols)
 	}
 
+	if (sinbuf != NULL)
+	    call mfree (sinbuf, TY_REAL)
 	call msifree (msi)
 	call sfree (sp)
 end
 
-# ISH_BUF -- Procedure to provide a buffer of image lines with minimum reads.
+
+# ISH_BUF -- Provide a buffer of image lines with minimum reads.
 
 procedure ish_buf (im, col1, col2, line1, line2, buf)
 
-pointer	im		# pointer to input image
-int	col1, col2	# column range of input buffer
-int	line1, line2	# line range of input buffer
-pointer	buf		# buffer
+pointer	im		#I pointer to input image
+int	col1, col2	#I column range of input buffer
+int	line1, line2	#I line range of input buffer
+pointer	buf		#U buffer
 
-int	i, ncols, nlines, nclast, llast1, llast2, nllast
 pointer	buf1, buf2
-
+int	i, ncols, nlines, nclast, llast1, llast2, nllast
+errchk	malloc, realloc
 pointer	imgs2r()
 
 begin
 	ncols = col2 - col1 + 1
 	nlines = line2 - line1 + 1
 
+	# Make sure the buffer is large enough.
 	if (buf == NULL) {
 	    call malloc (buf, ncols * nlines, TY_REAL)
 	    llast1 = line1 - nlines
@@ -427,6 +439,7 @@ begin
 	    llast2 = line2 - nlines
 	}
 
+	# The buffers  must be contiguous.
 	if (line1 < llast1) {
 	    do i = line2, line1, -1 {
 		if (i > llast1)
@@ -454,14 +467,14 @@ begin
 end
 
 
-# ISH_RSHIFTS -- Procedure to read shifts from a file.
+# ISH_RSHIFTS -- Read shifts from a file.
 
 int procedure ish_rshifts (fd, x, y, max_nshifts)
 
-int	fd		# pointer to shifts file descriptor
-real	x[ARB]		# x array
-real	y[ARB]		# y array
-int	max_nshifts	# the maximum number of shifts
+int	fd		#I shifts file
+real	x[ARB]		#O x array
+real	y[ARB]		#O y array
+int	max_nshifts	#I the maximum number of shifts
 
 int	nshifts
 int	fscan(), nscan()

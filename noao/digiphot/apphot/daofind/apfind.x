@@ -1,15 +1,18 @@
 include <mach.h>
 include <imhdr.h>
+include <gset.h>
 
 # AP_FIND -- Detect images in the convolved image and then compute image
-# statistics using the original image.
+# characteristics using the original image.
 
-int procedure ap_find (im, cnv, out, ker1x, ker1y, skip, nxk, nyk, threshold,
-    emission, sharplo, sharphi, roundlo, roundhi, interactive, stid)
+int procedure ap_find (im, cnv, out, id, ker1x, ker1y, skip, nxk, nyk,
+	threshold, emission, sharplo, sharphi, roundlo, roundhi, interactive,
+	stid, mkdetections)
 
 pointer	im			# pointer to the input image
 pointer	cnv			# pointer to the output image
 pointer	out			# pointer to the output text file
+pointer	id			# pointer to the display stream
 real	ker1x[ARB]		# 1D X Gaussian kernel
 real	ker1y[ARB]		# 1D Y Gaussian kernel
 int	skip[nxk,ARB]		# 2D Gaussian kernel
@@ -20,11 +23,11 @@ real	sharplo, sharphi	# sharpness limits
 real	roundlo,roundhi		# roundness parameter limits
 int	interactive		# interactive mode
 int	stid			# sequence number
+int	mkdetections		# mark detections
 
 int	inline, i, j, ncols, col1, col2, line1, line2, index, pos
 int	xmiddle, ymiddle, nonzero, nobjs, nstars, ntotal
-pointer	sp, bufptrs, imlbuf, cnvlbuf, imbuf, cnvbuf, cols, sharp, round
-pointer	x, y
+pointer	sp, bufptrs, imlbuf, cnvlbuf, imbuf, cnvbuf, cols, sharp, round, x, y
 int	ap_detect(), ap_test()
 pointer	imgs2r()
 errchk	imgs2r()
@@ -41,6 +44,7 @@ begin
 
 	# Compute find the number of defined elements in the kernel.
 	nonzero = 0
+	skip[xmiddle,ymiddle] = NO
 	do j = 1, nyk {
 	    do i = 1, nxk {
 		if (skip[i,j] == NO)
@@ -122,8 +126,8 @@ begin
 		next
 
 	    # Compute the sharpness parameter.
-	    call ap_sharp (Memr[imbuf], Memr[cnvbuf], Memi[bufptrs], ncols, skip,
-	        nxk, nyk, Memi[cols], Memr[sharp], nobjs, nonzero) 
+	    call ap_sharp (Memr[imbuf], Memr[cnvbuf], Memi[bufptrs], ncols,
+	        skip, nxk, nyk, Memi[cols], Memr[sharp], nobjs, nonzero) 
 
 	    # Compute the roundness parameters.
 	    call ap_round (Memr[imbuf], Memi[bufptrs], ncols, ker1x, nxk,
@@ -148,6 +152,15 @@ begin
 	        Memi[cols], Memr[x], Memr[y], Memr[sharp], Memr[round],
 		nstars, ntotal, threshold, stid)
 
+	    # Mark the stars on the display.
+	    if ((nstars > 0) && (interactive == YES) && (id != NULL) &&
+	        (mkdetections == YES)) {
+		call greactivate (id, 0)
+		do j = 1, nstars
+		    call gmark (id, Memr[x+j-1], Memr[y+j-1], GM_PLUS, 1.0, 1.0)
+		call gdeactivate (id, 0)
+	    }
+
 	    ntotal = ntotal + nstars
 
 	}
@@ -159,9 +172,9 @@ begin
 end
 
 
-# AP_DETECT -- Procedure to stars objects in an image line. In order to be
-# detected as a star the candidate object must be above threshold and be
-# greater than any pixels within nsigma * sigma.
+# AP_DETECT -- Detec stellar objects in an image line. In order to be
+# detected as a star the candidate object must be above threshold and have
+# a maximum pixel value greater than any pixels within nsigma * sigma.
 
 int procedure ap_detect (density, ptrs, ncols, skip, nxk, nyk, threshold, cols)
 
@@ -216,13 +229,13 @@ nextpix_
 end
 
 
-# AP_SHARP -- Procedure to compute an estimate of the sharpness of the detected
-# objects. The sharpness parameters is defined as the ratio of the difference
+# AP_SHARP -- Compute an estimate of the sharpness of the detected
+# objects. The sharpness parameter is defined as the ratio of the difference
 # between the height of the central pixel and the mean of the surrounding
 # pixels to the density enhancement of the central pixel.
 
 procedure ap_sharp (data, density, ptrs, ncols, skip, nxk, nyk, cols, sharps,
-    nobjs, nonzero) 
+        nobjs, nonzero) 
 
 real	data[ncols,ARB]		# image data
 real	density[ncols,ARB]	# density enhancements
@@ -264,10 +277,10 @@ begin
 end
 
 
-# AP_ROUND -- Procedure to measure the roundness of the detected objects.
+# AP_ROUND -- Estimate the roundness of the detected objects.
 # The height of the equivalent Gaussian function in x and y is fit by
 # least squares to the marginals. If either of these of these heights
-# is negative set the roundess characteristics to -MAX_REAL. Otherwise
+# is negative set the roundess characteristic to -MAX_REAL. Otherwise
 # compute a roundness characteristic
 
 procedure ap_round (data, ptrs, ncols, ker1x, nxk, ker1y, nyk, cols, rounds,
@@ -313,7 +326,7 @@ end
 
 # AP_XYPOSS -- Compute the x and y centroids of the star. The computation
 # is done using an nx * (ny - 2) box to determine the x center and
-# an (nx - 2) * ny to determine the y center. The (nx(y) - 2) pixels
+# an (nx - 2) * ny box to determine the y center. The (nx(y) - 2) pixels
 # in the perpendicular direction are added together and adjacent pixels
 # in the parallel direction are subtracted to yield (nx(y) - 1) numerical
 # first derivatives at positions delta x (or delta y) = - (nx(y) - 2) / 2, ...,
@@ -420,7 +433,8 @@ begin
 end
 
 
-# AP_TEST -- Procedure  to test the parameters of the detected images
+# AP_TEST -- Test the characteristic of the detected images for roundness
+# and sharpness.
 
 int procedure ap_test (cols, x, y, rounds, sharps, nobjs, sharplo, sharphi,
         roundlo, roundhi)

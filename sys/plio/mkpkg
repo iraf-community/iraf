@@ -27,7 +27,7 @@ zzdebug:
 zzdebug.e:
 	$set	XFLAGS = "$(XFLAGS) -q"
 	$omake	zzdebug.x <error.h> <ctype.h> <fset.h> <plset.h> <plio.h>
-	$link	zzdebug.o -o zzdebug.e
+	$link	-z zzdebug.o -o zzdebug.e
 	;
 
 libex.a:
@@ -71,10 +71,12 @@ libex.a:
 	plpoint.x	<plio.h> <plset.h>
 	plpolygon.x	<plio.h> <plset.h>
 	plregrop.x	<plio.h> <plset.h>
+	plrio.x		<plio.h>
 	plrop.x		<plio.h> <plset.h>
 	plsave.x	<plio.h> <plset.h>
 	plsavef.x	<plio.h> <plset.h>
 	plsaveim.x	<imhdr.h> <mach.h> <plio.h> <plset.h>
+	plsectnc.x	<plio.h> pllseg.h <plset.h>
 	plsectne.x	<plio.h> pllseg.h <plset.h>
 	plseti.x	<plio.h> <plset.h>
 	plsplane.x	<plio.h>

@@ -111,13 +111,13 @@ int	maxch		# maximum number of characters
 
 begin
     	switch (ier) {
-	case AP_NOPROFILE:
+	case AP_RP_NOPROFILE:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("Off_image")
-	case AP_RPOUTOFBOUNDS:
+	case AP_RP_OUTOFBOUNDS:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("Out_of_bounds")
-	case AP_NRP_TOO_SMALL:
+	case AP_RP_NPTS_TOO_SMALL:
 	    call sprintf (str, maxch, "%s")
 	        call pargstr ("Too_few_points")
 	case AP_RP_SINGULAR:

@@ -16,11 +16,12 @@ int	ier
 
 int	status
 pointer	sp, im, ip
-pointer	root, extn
+pointer	root, extn, osfn
 pointer	old_hfn, new_hfn
 pointer	old_pfn, new_pfn
 
-int	stridxs(), fnroot(), imgdirx()
+bool	strne()
+int	stridxs()
 define	quit_ 91
 
 begin
@@ -31,6 +32,7 @@ begin
 	call salloc (new_hfn, SZ_PATHNAME, TY_CHAR)
 	call salloc (old_pfn, SZ_PATHNAME, TY_CHAR)
 	call salloc (new_pfn, SZ_PATHNAME, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
 	ier = OK
 
@@ -38,11 +40,43 @@ begin
 	call f77upk (nimage, Memc[new_hfn], SZ_PATHNAME)
 	call imf_parse (Memc[new_hfn], Memc[root], Memc[extn])
 	if (Memc[extn] == EOS)
-	    call strcpy (OIF_EXTN, Memc[extn], SZ_FNAME)
+	    call strcpy (OIF_HDREXTN, Memc[extn], SZ_FNAME)
 
 	call strcpy (Memc[root], Memc[new_hfn], SZ_FNAME)
 	call strcat (".", Memc[new_hfn], SZ_FNAME)
 	call strcat (Memc[extn], Memc[new_hfn], SZ_FNAME)
+
+	# Open existing image, make sure that it exists.
+	call imopen (oimage, RW, im, ier)
+	if (ier != OK) {
+	    ier = IE_IMRNAMNEXIM
+	    goto quit_
+	}
+
+	# Perform clobber checking and delete any old image with the new
+	# name, if clobber is enabled.
+
+	if (strne (oimage, nimage)) {
+	    call strpak (Memc[new_hfn], Memc[osfn], SZ_PATHNAME)
+	    call zfacss (Memc[osfn], 0, 0, status)
+	    if (status == YES) {
+		call strpak ("clobber", Memc[osfn], SZ_FNAME)
+		call zgtenv (Memc[osfn], Memc[osfn], SZ_FNAME, status)
+		if (status != ERR) {
+		    call imdelx (nimage, ier)
+		    if (ier != OK) {
+			ier = IE_IMRENAME
+			goto quit_
+		    }
+		} else {
+		    ier = IE_CLOBBER
+		    call f77upk (nimage, Memc[osfn], SZ_PATHNAME)
+		    call im_seterrop (ier, Memc[osfn])
+		    call sfree (sp)
+		    return
+		}
+	    }
+	}
 
 	# Our task here is nontrivial as the pixel file must be renamed as
 	# well as the header file, e.g., since renaming the header file may
@@ -51,46 +85,35 @@ begin
 	# as the header.  Must open image, get pixfile name from the header,
 	# and generate the new pixfile name.
 
-	call imopen (oimage, RW, im, ier)
+	call strcpy (IM_HDRFILE(im), Memc[old_hfn], SZ_PATHNAME)
 
-	if (ier != OK) {
-	    ier = IE_IMRNAMNEXIM
-	    goto quit_
+	if (IM_PIXFILE(im) != EOS) {
+	    # Get old pixel file name.
+	    call imf_gpixfname (IM_PIXFILE(im), IM_HDRFILE(im),
+		Memc[old_pfn], SZ_PATHNAME)
+	    ip = old_pfn + stridxs ("!", Memc[old_pfn])
+	    call strcpy (Memc[ip], Memc[old_pfn], SZ_PATHNAME)
 
-	} else {
-	    call strcpy (IM_HDRFILE(im), Memc[old_hfn], SZ_PATHNAME)
-
-	    if (IM_PIXFILE(im) != EOS) {
-		call imf_gpixfname (IM_PIXFILE(im), IM_HDRFILE(im),
-		    Memc[old_pfn], SZ_PATHNAME)
-		ip = old_pfn + stridxs ("!", Memc[old_pfn])
-		call strcpy (Memc[ip], Memc[old_pfn], SZ_PATHNAME)
-
-		# Construct the new pixel file name.
-		status = imgdirx (IM_PIXFILE(im), SZ_IMPIXFILE)
-		status = fnroot (Memc[new_hfn], Memc[root], SZ_FNAME)
-		call strcat (Memc[root], IM_PIXFILE(im), SZ_IMPIXFILE)
-		call strcat (".", IM_PIXFILE(im), SZ_IMPIXFILE)
-		call strcat ("pix", IM_PIXFILE(im), SZ_IMPIXFILE)
-
-		call strcpy (Memc[new_hfn], IM_HDRFILE(im), SZ_PATHNAME)
-		call imf_gpixfname (IM_PIXFILE(im), IM_HDRFILE(im),
-		    Memc[new_pfn], SZ_PATHNAME)
-		ip = new_pfn + stridxs ("!", Memc[new_pfn])
-		call strcpy (Memc[ip], Memc[new_pfn], SZ_PATHNAME)
-
-		# Update the image header (save new pixel file name).
-		IM_UPDATE(im) = YES
-
-	    } else {
-		call strcpy (Memc[new_hfn], IM_HDRFILE(im), SZ_PATHNAME)
-		Memc[old_pfn] = EOS
-	    }
-
-	    call imclos (im, ier)
+	    # Construct the new pixel file name.
+	    call strcpy (Memc[new_hfn], IM_HDRFILE(im), SZ_PATHNAME)
+	    call imf_mkpixfname (im, Memc[new_pfn], SZ_PATHNAME, ier)
 	    if (ier != OK)
 		goto quit_
+
+	    ip = new_pfn + stridxs ("!", Memc[new_pfn])
+	    call strcpy (Memc[ip], Memc[new_pfn], SZ_PATHNAME)
+
+	    # Update the image header (save new pixel file name).
+	    IM_UPDATE(im) = YES
+
+	} else {
+	    call strcpy (Memc[new_hfn], IM_HDRFILE(im), SZ_PATHNAME)
+	    Memc[old_pfn] = EOS
 	}
+
+	call imclos (im, ier)
+	if (ier != OK)
+	    goto quit_
 
 	call strpak (Memc[old_hfn], Memc[old_hfn], SZ_PATHNAME)
 	call strpak (Memc[old_pfn], Memc[old_pfn], SZ_PATHNAME)

@@ -17,7 +17,8 @@ pointer	graphics		# pointer to graphics device name
 pointer	display			# pointer to display device name
 int	interactive		# mode of use
 int	verify			# verify critical parameters
-int	verbose
+int	update			# update the critical parameters
+int	verbose			# print messages
 
 int	limlist, lplist, lolist, lclist, sid, lid, pid, pl, cl, out, root, stat
 pointer	sp, outfname, cname, imlist, plist, olist, clist, im, py, id, gd
@@ -83,6 +84,7 @@ begin
 	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
 	interactive = btoi (clgetb ("interactive"))
 	verify = btoi (clgetb ("verify"))
+	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
 	# Open the plot files.
@@ -120,8 +122,11 @@ begin
 
 	# Get polygon fitting parameters.
 	call ap_gypars (py)
-	if (verify == YES && interactive == NO)
-	    call ap_yconfirm (py)
+	if (verify == YES && interactive == NO) {
+	    call ap_yconfirm (py, NULL, 1)
+	    if (update == YES)
+		call ap_pypars (py)
+	}
 
 	# Measure flux in a polygon.
 	sid = 1
@@ -131,28 +136,64 @@ begin
 	    im = immap (Memc[image], READ_ONLY, 0)
 	    call apsets (py, IMNAME, Memc[image])
 	    call ap_padu (im, py)
-	    call ap_itime (im, py)
 	    call ap_rdnoise (im, py)
+	    call ap_itime (im, py)
+	    call ap_airmass (im, py)
+	    call ap_filter (im, py)
 
 	    # Open the polygons file.
 	    if (lplist <= 0) {
 		pl = NULL
 		call strcpy ("", Memc[polygon], SZ_FNAME)
-	    } else if (clgfil (plist, Memc[polygon], SZ_FNAME) != EOF)
-		pl = open (Memc[polygon], READ_ONLY, TEXT_FILE)
-	    else
-		call seek (pl, BOF)
-	    call apsets (py, PYNAME, Memc[polygon])
+	    } else if (clgfil (plist, Memc[polygon], SZ_FNAME) != EOF) {
+		root = fnldir (Memc[polygon], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[polygon+root], 7) == 0 || root ==
+		    strlen (Memc[polygon]))
+		    call ap_inname (Memc[image], "", "ply", Memc[outfname],
+			SZ_FNAME)
+		else
+		    call strcpy (Memc[polygon], Memc[outfname], SZ_FNAME)
+		pl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+	    } else {
+		root = fnldir (Memc[polygon], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[polygon+root], 7) == 0 || root ==
+		    strlen (Memc[polygon])) {
+		    call ap_inname (Memc[image], "", "ply", Memc[outfname],
+			SZ_FNAME)
+	            pl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else {
+		    call strcpy (Memc[polygon], Memc[outfname], SZ_FNAME)
+		    call seek (pl, BOF)
+		}
+	    }
+	    call apsets (py, PYNAME, Memc[outfname])
 
 	    # Open the coordinates file.
 	    if (lclist <= 0) {
 		cl = NULL
-		call strcpy ("", Memc[coords], SZ_FNAME)
-	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF)
-		cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
-	    else
-		call seek (cl, BOF)
-	    call apsets (py, CLNAME, Memc[coords])
+		call strcpy ("", Memc[outfname], SZ_FNAME)
+	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF) {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords]))
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+		else
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+	        cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+	    } else {
+		root = fnldir (Memc[coords], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[coords+root], 7) == 0 || root ==
+		    strlen (Memc[coords])) {
+		    call ap_inname (Memc[image], "", "coo", Memc[outfname],
+			SZ_FNAME)
+	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
+		} else {
+		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
+		    call seek (cl, BOF)
+		}
+	    }
+	    call apsets (py, CLNAME, Memc[outfname])
 
 	    # Set output file name.
 	    if (lolist == 0) {

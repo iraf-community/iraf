@@ -55,6 +55,7 @@ begin
 	    call printf ("\n")
 	    call ap_qshow (ap)
 	    call printf ("\n")
+
 	case QCMD_CBOXWIDTH:
 	    call gargr (rval)
 	    if (nscan() == 1) {
@@ -70,6 +71,7 @@ begin
 		newcbuf = YES
 		newcenter = YES
 	    }
+
 	case QCMD_ANNULUS:
 	    call gargr (rval)
 	    if (nscan() == 1) {
@@ -85,6 +87,7 @@ begin
 		newsbuf = YES
 		newsky = YES
 	    }
+
 	case QCMD_DANNULUS:
 	    call gargr (rval)
 	    if (nscan() == 1) {
@@ -100,6 +103,7 @@ begin
 		newsbuf = YES
 		newsky = YES
 	    }
+
 	case QCMD_APERTURES:
 	    call gargwrd (Memc[cmd], SZ_LINE)
 	    if (Memc[cmd] == EOS) {
@@ -116,6 +120,7 @@ begin
 		newmag = YES
 		newmagbuf = YES
 	    }
+
 	case QCMD_ZMAG:
 	    call gargr (rval)
 	    if (nscan() == 1) {
@@ -129,6 +134,7 @@ begin
 			"zero point of magnitude scale")
 		newmag = YES
 	    }
+
 	case QCMD_EPADU:
 	    call gargr (rval)
 	    if (nscan() == 1) {
@@ -141,6 +147,7 @@ begin
 		    call ap_rparam (out, KY_EPADU, rval, UN_EPADU, "gain")
 		newmag = YES
 	    }
+
 	case QCMD_EXPOSURE:
 	    call gargstr (Memc[cmd], SZ_LINE)
 	    if (Memc[cmd] == EOS) {
@@ -158,6 +165,43 @@ begin
 		    call ap_sparam (out, KY_EXPOSURE, Memc[str],
 		        UN_EXPOSURE, "exposure time keyword")
 	    }
+
+	case QCMD_AIRMASS:
+	    call gargstr (Memc[cmd], SZ_LINE)
+	    if (Memc[cmd] == EOS) {
+		call apstats (ap, AIRMASS, Memc[str], SZ_FNAME)
+		call printf ("%s = %s\n")
+		    call pargstr (KY_AIRMASS)
+		    call pargstr (Memc[str])
+	    } else {
+		ip = 1
+		nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_FNAME)
+		call apsets (ap, AIRMASS, Memc[str])
+		if (im != NULL)
+		    call ap_airmass (im, ap)
+		if (stid > 1)
+		    call ap_sparam (out, KY_AIRMASS, Memc[str],
+		        UN_AIRMASS, "airmass keyword")
+	    }
+
+	case QCMD_FILTER:
+	    call gargstr (Memc[cmd], SZ_LINE)
+	    if (Memc[cmd] == EOS) {
+		call apstats (ap, FILTER, Memc[str], SZ_FNAME)
+		call printf ("%s = %s\n")
+		    call pargstr (KY_FILTER)
+		    call pargstr (Memc[str])
+	    } else {
+		ip = 1
+		nchars = ctowrd (Memc[cmd], ip, Memc[str], SZ_FNAME)
+		call apsets (ap, FILTER, Memc[str])
+		if (im != NULL)
+		    call ap_filter (im, ap)
+		if (stid > 1)
+		    call ap_sparam (out, KY_FILTER, Memc[str],
+		        UN_FILTER, "filter keyword")
+	    }
+
 	case QCMD_RADPLOTS:
 	    call gargb (bval)
 	    if (nscan () == 1) {
@@ -192,6 +236,8 @@ begin
 		    call ap_itime (im, ap)
 		    call ap_padu (im, ap)
 		    call ap_rdnoise (im, ap)
+		    call ap_airmass (im, ap)
+		    call ap_filter (im, ap)
 		    newcbuf = YES; newcenter = YES
 		    newsbuf = YES; newsky = YES
 		    newmagbuf = YES; newmag = YES

@@ -86,9 +86,16 @@ char *fname;			/* simple filename, no dirs */
 #else
 #ifdef vax
 	strcat (pathname, "vax");
+#else
+/* Domain/OS: Apollo motorola architectures:  */
+#ifdef _ISP__M68K
+	strcat (pathname, "m68k");
+#else
+/* Domain/OS: Apollo PRISM architecture:  */
+#ifdef _ISP__A88K
+	strcat (pathname, "a88k");
 #endif
-#ifdef CONVEX
-	strcat (pathname, "convex");
+#endif
 #endif
 #endif
 #endif

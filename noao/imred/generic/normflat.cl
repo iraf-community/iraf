@@ -12,7 +12,6 @@
 # tmp,f,h
 # rlist,*s,h
 # mean,r,h
-# junk,s,h
 # stat,i,h
 
 {
@@ -36,10 +35,10 @@
 	if (norm == INDEF) {
 	    # Determine the mean of the sample region.
 
-	    imstatistics (img // sample_section, lower=minflat, upper=INDEF,
-		verbose=no, > tmp)
+	    imstatistics (img // sample_section, fields="mean",
+		lower=minflat, upper=INDEF, format=no, > tmp)
 	    rlist = tmp
-	    stat = fscan (rlist, junk, junk, mean)
+	    stat = fscan (rlist, mean)
 	    rlist = ""
 	    delete (tmp, verify=no)
 	} else
@@ -51,10 +50,9 @@
 	# Replace low values by the mean and normalize.
 	if (mean != 0.) {
 	    if (minflat != INDEF) {
-		imcopy (img, tmp, verbose=no)
-	        imreplace (tmp, mean, upper=minflat)
-	        imarith (tmp, "/", mean, flt, pixtype="real")
-		imdelete (tmp, verify=no)
+		imcopy (img, flt, verbose=no)
+	        imreplace (flt, mean, upper=minflat)
+	        imarith (flt, "/", mean, flt, pixtype="real")
 	    } else
 	        imarith (img, "/", mean, flt, pixtype="real")
 	} else

@@ -43,44 +43,51 @@ is particularly useful for decoding the binary encoder entries used by the
 graphics kernels.  See the examples below.
 .ih
 EXAMPLES
-Examine the graphcap entry for the Retrographics vt640.
-.nf
+1. Examine the graphcap entry for the Retrographics vt640.
 
+.nf
 	cl> showcap
 	  * set vt640		(dumps vt640 entry)
+.fi
 
-Decode the sequence sent to the terminal for setting text height 2.
+2. Decode the sequence sent to the terminal for setting text height 2.
 
+.nf
 	  * TH 2
 		    program:  ^[(1#47+.
 		    encoding: ^[1
+.fi
 
-Decode the sequence sent to the terminal to set line type 3.
+3. Decode the sequence sent to the terminal to set line type 3.
 
+.nf
 	  * LT 3
 		    program:  LT=\E/(1$0)1d\E`($1-5)0d\E(1_+.$D)0d\E`($$:\
 		    encoding: ^[/0d^[b
+.fi
 
-Set environment variable "graphcap" to your local test graphcap file, 
+4. Set environment variable "graphcap" to your local test graphcap file, 
 set device to vt240 and examine the write-cursor (WC) command for
 x-coordinate 150, y-coordinate 350, and cursor 1.
 
+.nf
 	cl> set graphcap = "mytest.graphcap"
 	cl> showcap
 	  * set vt240		(dumps vt240 entry)
 	  * WC 150 350 1
 		    program:  P[(1)%d,(2)%d]
 		    encoding: P[150,350]
+.fi
 
-Examine the scan-cursor function returned when the user types key `a'
+5. Examine the scan-cursor function returned when the user types key `a'
 from coordinate x=150, y=350 after a read-cursor request.
 
+.nf
 	  * SC a[150,350]
 		    program:  (#0!1#0!2,!3,#0!8,#48-!99$0-91#10*9+!1#1!8
 			      $$8#1=#-39;#0!8,#48-!99$0-92#10*9+!2#1!8
 			      $$8#1=#-39;);
 		    X(R1)=150 Y(R2)=350, key = a
-
 .fi
 .ih
 BUGS

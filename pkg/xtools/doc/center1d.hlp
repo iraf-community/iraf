@@ -27,8 +27,9 @@ Pixel data vector.
 Number of points in the data vector.
 .le
 .ls width
-Width used to define the convolution function.  If the width specified
-is less than three then the width used in the algorithm is three.
+Width used to define the convolution function.  If the width is 1 or less
+then the nearest minimum or maximum is returned.  If the width is greateer
+than 1 then a minimum with of 3 is used in the algorithm.
 .le
 .ls type
 Type of feature.  The feature types are defined in the file <xtools/center1d.h>.
@@ -43,6 +44,10 @@ region around the initial guess allowed for detecting a feature.
 .le
 .ih
 DESCRIPTION
+If the width is 1 or less then the nearest minimum or maximum is found.
+The centering radius is still applied as is the threshold.  If the width
+is greater than 1 then a minimum width of 3 is used in the algorithm.
+
 The one dimensional position of a feature is determined by solving the equation
 
 	(1)	integral {(I-I0) f(X-XC) dX} = 0

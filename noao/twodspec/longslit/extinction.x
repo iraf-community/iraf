@@ -174,7 +174,12 @@ begin
 	crpix = imgetr (im1, field)
 	call sprintf (field, SZ_FIELD, "cdelt%d")
 	    call pargi (dispaxis)
-	cdelt = imgetr (im1, field)
+	iferr (cdelt = imgetr (im1, field)) {
+	    call sprintf (field, SZ_FIELD, "cd%d_%d")
+	        call pargi (dispaxis)
+	        call pargi (dispaxis)
+	    cdelt = imgetr (im1, field)
+	}
 	dcflag = imgeti (im1, "dc-flag")
 
 	# Determine the airmass.

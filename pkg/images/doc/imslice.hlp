@@ -1,4 +1,4 @@
-.help imslice Mar89 images
+.help imslice Feb90 images
 .ih
 NAME
 imslice -- slice an image into images of lower dimension
@@ -17,7 +17,7 @@ image m (n-1)-dimensional images will be created, where m is the
 length of the axis to be sliced. The sequence number m will
 be appended to the output image name.
 .le
-.ls slicedim
+.ls slice_dimension
 The dimension to be sliced.
 .le
 .ls verbose = yes
@@ -52,6 +52,9 @@ TIME REQUIREMENTS
 BUGS
 If the image to be sliced is an image section, the images slices will
 refer to the section not the original image.
+
+IMSLICE does not currently update the world coordinate system of the image
+after a slice operation.
 .ih
 SEE ALSO
 imstack, imcopy

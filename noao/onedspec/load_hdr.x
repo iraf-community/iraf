@@ -60,11 +60,13 @@ begin
 	    call ids_hdri (im, "NP2", NP2(ids))
 	}
 	LINE(ids) = line
+	NP1(ids) = max (NP1(ids), 1)
+	NP2(ids) = min (NP2(ids), IM_LEN(im,1))
 
 	call ids_hdri (im, "OFLAG", OFLAG(ids))
-	call ids_hdri (im, "EXPOSURE", ITM(ids))
-	call ids_hdri (im, "ITIME", ITM(ids))
-	call ids_hdri (im, "EXPTIME", ITM(ids))
+	call ids_hdrr (im, "EXPOSURE", ITM(ids))
+	call ids_hdrr (im, "ITIME", ITM(ids))
+	call ids_hdrr (im, "EXPTIME", ITM(ids))
 	call ids_hdrr (im, "UT", UT(ids))
 	call ids_hdrr (im, "ST", ST(ids))
 	call ids_hdrr (im, "RA", RA(ids))
@@ -88,6 +90,8 @@ begin
 	}
 	if (IS_INDEF (WPC(ids)))
 	    call ids_hdrr (im, "CDELT1", WPC(ids))
+	if (IS_INDEF (WPC(ids)))
+	    call ids_hdrr (im, "CD1_1", WPC(ids))
 	
 	# Change to a reference pixel of 1 and Angstrom units.
 	if (!IS_INDEF (W0(ids)) && (crpix != 1.))
@@ -120,12 +124,11 @@ pointer	im
 char	field[ARB]
 int	ival
 
-int	ival1, imgeti()
+int	imaccf(), imgeti()
 
 begin
-	iferr (ival1 = imgeti (im, field))
-	    ival1 = ival
-	ival = ival1
+	if (imaccf (im, field) == YES)
+	    ival = imgeti (im, field)
 end
 
 # IDS_HDRR -- Load a real value from the header
@@ -136,12 +139,12 @@ pointer	im
 char	field[ARB]
 real	rval
 
-real	rval1, imgetr()
+int	imaccf()
+real	imgetr()
 
 begin
-	iferr (rval1 = imgetr (im, field))
-	    rval1 = rval
-	rval = rval1
+	if (imaccf (im, field) == YES)
+	    rval = imgetr (im, field)
 end
 
 
@@ -152,10 +155,13 @@ real procedure get_hdrr (im, field)
 pointer	im
 char	field[ARB]
 
+int	imaccf()
 real	rval, imgetr()
 
 begin
-	iferr (rval = imgetr (im, field))
+	if (imaccf (im, field) == YES)
+	    rval = imgetr (im, field)
+	else
 	    rval = INDEF
 	return (rval)
 end
@@ -189,7 +195,7 @@ begin
 	NP1(ids) = 0
 	NP2(ids) = IM_LEN(im, 1)
 
-	ITM(ids) = INDEFI
+	ITM(ids) = INDEFR
 	UT(ids) = INDEFR
 	ST(ids) = INDEFR
 	RA(ids) = INDEFR

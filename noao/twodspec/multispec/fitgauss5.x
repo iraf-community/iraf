@@ -378,17 +378,18 @@ procedure g5_set_verbose (verbose)
 bool	verbose
 bool	flag
 
-char	image[ARB]
+# entry g5_prnt1 (image, naverage, track, start)
+char	image[1]
 int	naverage
 bool	track
 int	start
 
+# entry g5_prnt2 (line, data, len_data)
 int	line, len_data
-real	data[ARB]
+real	data[1]
 real	rms, data_rms
 
 real	armsr()
-
 include	"fitgauss5.com"
 
 begin

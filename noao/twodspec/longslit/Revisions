@@ -1,5 +1,16 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
+longslit$transform/igsfit
+longslit$transform/t_transform.x
+longslit$fluxcalib.x
+longslit$extinction.x
+    Added use of CD keywords in addition to CDELT.  (3/8/90, Valdes)
+
+longslit$transform/igsfit/igsfit.x
+    1.  Changed incorrect usage of abscissa/ordinate.
+    2.  Cleared prompts after input.
+    (3/6/90, Valdes)
+
 longslit$transform/fcgetcoords.x
     Fixed problem in which database files where opened within a loop but
     only closed once outside a loop.  (5/6/89, Valdes - reported by Schaller)

@@ -31,7 +31,7 @@ char	*argv[];
 {
 	char	tpath[SZ_PATHNAME+1];
 	char	translator[SZ_PATHNAME+1];
-	int	ip, status, maxch=SZ_PATHNAME;
+	int	ip, status;
 
 	/* Do nothing if called with no arguments.
 	 */

@@ -5,7 +5,7 @@ include "../lib/find.h"
 
 define	FWHM_TO_SIGMA		0.42467
 
-# AP_BFDFIND -- Procedure to find stars in an image using a pattern matching
+# AP_BFDFIND -- Find stars in an image using a pattern matching
 # technique.
 
 procedure ap_bfdfind (im, cnv, out, ap, boundary, constant, verbose)
@@ -58,8 +58,7 @@ begin
 	# function centered in the subarray which best represents the data
 	# within a circle of nsigma * sigma of the Gaussian.
 
-	if (IM_PIXFILE(cnv) == EOS)
-	    call ap_convolve (im, cnv, Memr[ker2d], nxk, nyk)
+	call ap_convolve (im, cnv, Memr[ker2d], nxk, nyk)
 
 	# Save the task parameters in the database file if the savepars
 	# switch is enabled, otherwise a simple list of detected objects
@@ -80,10 +79,10 @@ begin
 		call pargr (apstatr (ap, NSIGMA))
 	}
 
-	nstars = apfind (im, cnv, out, Memr[ker1x], Memr[ker1y], Memi[skip],
-	    nxk, nyk, apstatr (ap, THRESHOLD), apstati (ap, POSITIVE),
-	    apstatr (ap, SHARPLO), apstatr (ap, SHARPHI), apstatr (ap,
-	    ROUNDLO), apstatr (ap, ROUNDHI), verbose, stid)
+	nstars = apfind (im, cnv, out, NULL, Memr[ker1x], Memr[ker1y],
+	    Memi[skip], nxk, nyk, apstatr (ap, THRESHOLD), apstati (ap,
+	    POSITIVE), apstatr (ap, SHARPLO), apstatr (ap, SHARPHI),
+	    apstatr (ap, ROUNDLO), apstatr (ap, ROUNDHI), verbose, stid, NO)
 
 	if (verbose == YES) {
 	    call printf (

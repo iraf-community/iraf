@@ -8,7 +8,8 @@ include	<fset.h>
 include	<plset.h>
 include	<plio.h>
 
-task	pltest	= t_pltest
+task	pltest	= t_pltest,
+	script	= t_script
 
 .help pltest
 .nf -------------------------------------------------------------------------
@@ -1227,4 +1228,47 @@ begin
 	call fprintf (fd, "rtest mask1 mask2%48t# range list conversion test\n")
 	call fprintf (fd,
 	"ptest mask1 mask2%48t# pixel array conversion test\n")
+end
+
+
+# SCRIPT -- Make a PLIO drawing script suitable to input to PLTEST above.
+
+procedure t_script()
+
+int	ncmds, seed, i
+int	xo, yo, xs, ys, x, y, r
+int	clgeti()
+real	urand()
+
+begin
+	ncmds = clgeti ("ncmds")
+
+	xo = 50;  xs = 1024 - 100
+	yo = 50;  ys = 1024 - 100
+
+	seed = 5
+
+	do i = 1, ncmds {
+	    x = urand(seed) * xs + xo
+	    y = urand(seed) * ys + yo
+	    r = urand(seed) * 40
+
+	    call printf ("circle %d %d %d %d\n")
+		call pargi (x)
+		call pargi (y)
+		call pargi (r)
+		call pargi (PIX_SET + PIX_VALUE(mod(i,256)))
+
+	    call printf ("box %d %d %d %d %d\n")
+		call pargi (x - r)
+		call pargi (y - r)
+		call pargi (x + r)
+		call pargi (y + r)
+		call pargi (or(PIX_SRC,PIX_DST) + PIX_VALUE(mod(i*2,256)))
+
+	    call printf ("point %d %d %d\n")
+		call pargi (x)
+		call pargi (y)
+		call pargi (PIX_CLR + PIX_VALUE(mod(i*4,256)))
+	}
 end

@@ -245,8 +245,11 @@ begin
 	# Process the command.
 	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, SCMDS) != 0)
 	    call apscolon (ap, out, stid, cmdstr, newskybuf, newsky)
+	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0)
+	    call ap_apcolon (ap, im, cl, out, stid, ltid, cmdstr, junk, junk,
+	        newskybuf, newsky, junk, junk)
 	else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0)
-	    call apnscolon (ap, im, cl, out, stid, ltid, cmdstr, junk, junk,
+	    call apnscolon (ap, im, out, stid, cmdstr, junk, junk,
 	        newskybuf, newsky, junk, junk)
 	else
 	    call apsimcolon (ap, out, stid, cmdstr, newskybuf, newsky)

@@ -17,15 +17,31 @@ begin
 	call ap_serrors (ap, sier)
 
 	# Print the photometry error message.
+	call ap_merrors (ap, pier)
+
+end
+
+
+# AP_MERRORS -- Print the photometry errors.
+
+procedure ap_merrors (ap, pier)
+
+pointer	ap			# pointer to the apphot structure
+int	pier			# photometry error
+
+begin
+	# Print the photometry error message.
 	switch (pier) {
-	case AP_NOAPERT:
-	    call printf ("Photometry apertures are outside of the image\n")
+	case AP_APERT_NOAPERT:
+	    call printf ("Photometry apertures are outside of the image.\n")
 	case AP_APERT_OUTOFBOUNDS:
-	 call printf ("Photometry apertures are partially outside the image\n")
-	case AP_NOSKYMODE:
-	    call printf ("The sky value is undefined\n")
-	case AP_NEGMAG:
-	    call printf ("The total flux inside the aperture is negative\n")
+	 call printf ("Photometry apertures are partially outside the image.\n")
+	case AP_APERT_NOSKYMODE:
+	    call printf ("The sky value is undefined.\n")
+	case AP_APERT_NEGMAG:
+	    call printf ("The total flux inside the aperture is negative.\n")
+	case AP_APERT_BADDATA:
+	    call printf ("Bad data in the aperture(s).\n")
 	default:
 	    call printf ("")
 	}

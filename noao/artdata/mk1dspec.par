@@ -1,0 +1,20 @@
+input,s,a,,,,"List of input spectra"
+output,s,h,"",,,"List of output spectra
+
+IF NEW SPECTRUM"
+title,s,h,"",,,"Title of spectrum"
+ncols,i,h,512,1,,"Number of columns"
+wstart,r,h,4000.,,,"Starting wavelength (Angstroms)"
+wend,r,h,8000,,,"Ending wavelength (Angstroms)
+
+CONTINUUM"
+continuum,r,h,1000.,,,"Continuum at first pixel"
+slope,r,h,0.,,,"Continuum slope per pixel"
+temperature,r,h,5700,0.,,"Blackbody temperture (Kelvin)
+
+LINES"
+lines,s,h,"",,,"List of files containing lines"
+nlines,i,h,0,0,,"Number of random lines (if new line list)"
+peak,r,h,-0.5,,,"Peak of lines (relative to continuum)"
+sigma,r,h,10.,,,"Sigma of lines (Angstroms)"
+seed,i,h,1,,,"Random number seed"

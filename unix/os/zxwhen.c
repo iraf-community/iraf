@@ -16,7 +16,13 @@
 int	debug_sig = 0;
 
 /* The following definition has intimate knowledge of the STDIO structures. */
+#ifdef apollo
+/* Apollo: _bufsiz(p) defined; not a member of "structure".
+ */
+#define	fcancel(fp)	((fp)->_cnt=_bufsiz(fp),(fp)->_ptr=(fp)->_base)
+#else
 #define	fcancel(fp)	((fp)->_cnt=(fp)->_bufsiz,(fp)->_ptr=(fp)->_base)
+#endif
 
 
 /* Exception handling:  ZXWHEN (exception, handler, old_handler)
@@ -102,6 +108,7 @@ struct	_hwx hwx_exception[] = {
 	ILL_PRIVIN_FAULT,	"privileged instruction fault",
 	ILL_RESOP_FAULT,	"reserved operand fault",
 #endif vax
+#ifndef apollo
 #ifdef mc68000
 	ILL_ILLINSTR_FAULT,	"illegal instruction fault",
 	ILL_PRIVVIO_FAULT,	"privilege violation fault",
@@ -121,15 +128,24 @@ struct	_hwx hwx_exception[] = {
 	ILL_TRAP13_FAULT,	"trap #13 fault",
 	ILL_TRAP14_FAULT,	"trap #14 fault",
 #endif mc68000
+#endif apollo
 #ifdef sparc
 	ILL_STACK,		"bad stack",
 	ILL_ILLINSTR_FAULT,	"illegal instruction fault",
 	ILL_PRIVINSTR_FAULT,	"privileged instruction fault",
 #endif sparc
+#ifdef apollo
+#ifdef mc68000
+	ILL_RESAD_FAULT,	"reserved addressing fault",
+	ILL_PRIVIN_FAULT,	"privileged instruction fault",
+	ILL_RESOP_FAULT,	"reserved operand fault",
+#endif mc68000
+#else
 #ifdef mc68000
 	EMT_EMU1010,		"line 1010 emulator trap",
 	EMT_EMU1111,		"line 1111 emulator trap",
 #endif mc68000
+#endif
 #ifdef sparc
 	EMT_TAG,		"tag overflow",
 #endif sparc
@@ -145,6 +161,7 @@ struct	_hwx hwx_exception[] = {
 	FPE_FLTDIV_FAULT,	"divide by zero floating fault",
 	FPE_FLTUND_FAULT,	"floating underflow fault",
 #endif vax
+#ifndef apollo
 #ifdef mc68000
 	FPE_INTDIV_TRAP,	"integer divide by zero",
 	FPE_CHKINST_TRAP,	"CHK [CHK2] instruction",
@@ -161,6 +178,7 @@ struct	_hwx hwx_exception[] = {
 	FPE_FPA_ERROR,		"[FPA arithmetic exception]",
 #endif sun
 #endif mc68000
+#endif apollo
 #ifdef sparc
 	FPE_INTOVF_TRAP,	"integer overflow",
 	FPE_INTDIV_TRAP,	"integer divide by zero",
@@ -185,25 +203,27 @@ struct	_hwx hwx_exception[] = {
 	FPE_FPA_ENABLE,		"[FPA not enabled]",
 	FPE_FPA_ERROR,		"[FPA arithmetic exception]",
 #endif i386
+#ifdef apollo
+#ifdef mc68000
+	FPE_INTOVF_TRAP,	"integer overflow",
+	FPE_INTDIV_TRAP,	"integer divide by zero",
+	FPE_FLTOVF_TRAP,	"floating overflow",
+	FPE_FLTDIV_TRAP,	"floating/decimal divide by zero",
+	FPE_FLTUND_TRAP,	"floating underflow",
+	FPE_DECOVF_TRAP,	"decimal overflow",
+	FPE_SUBRNG_TRAP,	"subscript out of range",
+	FPE_FLTOVF_FAULT,	"floating overflow fault",
+	FPE_FLTDIV_FAULT,	"divide by zero floating fault",
+	FPE_FLTUND_FAULT,	"floating underflow fault",
+	FPE_FLTNAN_FAULT,	"signalling NAN  fault",
+#endif mc68000
+#endif apollo
 #ifdef SUNOS4
 	BUS_HWERR,		"misc hardware error (e.g. timeout)",
 	BUS_ALIGN,		"hardware alignment error",
 	SEGV_NOMAP,		"no mapping at the fault address",
 	SEGV_PROT,		"access exceeded protections",
 	SEGV_OBJERR,		"object returned errno value",
-#endif
-#ifdef CONVEX
-	FPE_INTOVF_TRAP,	"integer overflow",
-	FPE_INTDIV_TRAP,	"integer divide by zero",
-	FPE_FLTOVF_TRAP,	"floating overflow",
-	FPE_FLTDIV_TRAP,	"floating divide by zero",
-	FPE_FLTUND_TRAP,	"floating underflow",
-	FPE_RESOP_TRAP,		"Reserved Operand trap",
-	FPE_SQRT_TRAP,		"square root negative argument",
-	FPE_EXP_TRAP,		"exp overflow",
-	FPE_LN_TRAP,		"ln arg less than or equal zero",
-	FPE_SIN_TRAP,		"sin: arg too large",
-	FPE_COS_TRAP,		"cos: arg too large",
 #endif
 	EOMAP,			""
 };

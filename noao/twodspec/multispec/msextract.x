@@ -14,7 +14,7 @@ include "ms.h"
 # per spectrum otherwise output the strip spectra profiles.
 
 procedure ex_out (im_out, line_out, spectra, lower, upper, ranges, profiles,
-    len_profile, nspectra, ex_integral)
+	len_profile, nspectra, ex_integral)
 
 pointer	im_out				# Output image file descriptor
 int	line_out			# Output line
@@ -102,8 +102,12 @@ end
 procedure ex_set_verbose (verbose)
 
 bool	verbose
-char	image_in[ARB]
-char	image_out[ARB]
+
+#entry ex_prnt1 (image_in, image_out)
+char	image_in[1]
+char	image_out[1]
+
+# entry ex_prnt2 (line_in, line_out)
 int	line_in, line_out, nreplaced
 
 bool	flag

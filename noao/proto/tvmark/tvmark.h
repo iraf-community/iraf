@@ -34,14 +34,17 @@ define	MK_Y1		Memi[$1+23]	# LL corner y coord
 define	MK_X2		Memi[$1+24]	# UR corner x coord
 define	MK_Y2		Memi[$1+25]	# UR corner y coord
 
+define	MK_TOLERANCE	Memr[$1+26]	# Tolerance for deleting objects
+
 define	MK_IMAGE	Memc[P2C($1+40)]		# Image name
 define	MK_OUTIMAGE	Memc[P2C($1+40+SZ_FNAME+1)]	# Output image
 define	MK_COORDS	Memc[P2C($1+40+2*SZ_FNAME+2)]	# Coordinate file
-define	MK_LOGFILE	Memc[P2C($1+40+3*SZ_FNAME+3)]	# Log file
-define	MK_FONT		Memc[P2C($1+40+4*SZ_FNAME+4)]	# Font
-define	MK_MARK		Memc[P2C($1+40+5*SZ_FNAME+5)]	# Default mark
-define	MK_CSTRING	Memc[P2C($1+40+6*SZ_FNAME+6)]	# Default circles
-define	MK_RSTRING	Memc[P2C($1+40+7*SZ_FNAME+7)]	# Default rectangles
+define	MK_DELETIONS	Memc[P2C($1+40+3*SZ_FNAME+3)]	# Deletions files
+define	MK_LOGFILE	Memc[P2C($1+40+4*SZ_FNAME+4)]	# Log file
+define	MK_FONT		Memc[P2C($1+40+5*SZ_FNAME+5)]	# Font
+define	MK_MARK		Memc[P2C($1+40+6*SZ_FNAME+6)]	# Default mark
+define	MK_CSTRING	Memc[P2C($1+40+7*SZ_FNAME+7)]	# Default circles
+define	MK_RSTRING	Memc[P2C($1+40+8*SZ_FNAME+8)]	# Default rectangles
 
 # define IMMARK ID's
 
@@ -79,6 +82,8 @@ define	Y2		32
 define	NXOFFSET	33
 define	NYOFFSET	34
 define	LABEL		35
+define	TOLERANCE	36
+define	DELETIONS	37
 
 # define mark types
 
@@ -119,6 +124,8 @@ define	MKCMD_NYOFFSET		18
 define	MKCMD_SAVE		19
 define	MKCMD_RESTORE		20
 define	MKCMD_LABEL		21
+define	MKCMD_TOLERANCE		22
+define	MKCMD_DELETIONS		23
 
 define	MKCMD2_WTEXT		1
 define	MKCMD2_MOVE		2
@@ -145,9 +152,11 @@ define	KY_NXOFFSET		"nxoffset"
 define	KY_NYOFFSET		"nyoffset"
 define	KY_RATIO		"ratio"
 define	KY_LABEL		"label"
+define	KY_TOLERANCE		"tolerance"
+define	KY_DELETIONS		"deletions"
 
 
-define	MKCMDS	"|junk|outimage|coords|logfile|autolog|frame|font|number|color|txsize|pointsize|mark|radii|lengths|show|write|nxoffset|nyoffset|save|restore|label|"
+define	MKCMDS	"|junk|outimage|coords|logfile|autolog|frame|font|number|color|txsize|pointsize|mark|radii|lengths|show|write|nxoffset|nyoffset|save|restore|label|tolerance|deletions|"
 
 define	MKCMDS2 "|text|move|next|"
 

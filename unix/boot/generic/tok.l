@@ -29,6 +29,11 @@ TY_PIXEL			output_upper ("TY_");
 $PIXEL				outstr ("PIXEL");
 $INDEF				outstr ("INDEF");
 
+[A-Z][A-Z_]*PIXEL		{
+					yytext[strlen(yytext)-5] = '\0';
+					output_upper (yytext);
+				}
+
 "$t"				{	if (isupper (type_char))
 					    output (tolower (type_char));
 					else

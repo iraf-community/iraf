@@ -41,7 +41,7 @@ begin
 	    if (strmatch ("^center", task) > 0) {
 	        call ap_pcpars (ap)
 	    } else if (strmatch ("^fitsky", task) > 0) {
-		call ap_sppars (ap)
+		call ap_pspars (ap)
 	    } else if (strmatch ("^phot", task) > 0) {
 		call ap_ppars (ap)
 	    } else if (strmatch ("^wphot", task) > 0) {

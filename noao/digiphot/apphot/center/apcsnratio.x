@@ -39,15 +39,17 @@ int	nx, ny			# dimensions of the centering buffer
 real	sky			# mean sky value of the data in ADU
 real	noise			# estimate of sky noise in ADU
 
+int	npts
 real	signal, tnoise
 real	asumr()
 
 begin
-	signal = asumr (array, nx * ny) - sky * nx * ny
+	npts = nx * ny
+	signal = asumr (array, npts) - npts * sky
 	if (IS_INDEFR(noise))
 	    tnoise = 0.0
 	else
-	    tnoise = sqrt (nx * ny * noise ** 2)
+	    tnoise = sqrt (npts * noise ** 2)
 	if (signal <= 0.0)
 	    return (0.0)
 	else if (tnoise <= 0.0)
@@ -70,15 +72,17 @@ real	sky			# mean sky value of the data in ADU
 real	noise			# estimate of sky noise in ADU
 real	padu			# photons per adu
 
+int	npts
 real	signal, tnoise
 real	asumr()
 
 begin
-	signal = asumr (array, nx * ny) - sky * nx * ny
+	npts = nx * ny
+	signal = asumr (array, npts) - npts * sky
 	if (IS_INDEFR(noise))
 	    tnoise = sqrt (abs (signal / padu))
 	else
-	    tnoise = sqrt (abs (signal / padu) + nx * ny * noise ** 2)
+	    tnoise = sqrt (abs (signal / padu) + npts * noise ** 2)
 	if (signal <= 0.0)
 	    return (0.0)
 	else if (tnoise <= 0.0)

@@ -21,6 +21,7 @@
 	   news - Page through the system news file
            page - Page through a file
       pathnames - Expand a file template into a list of OS pathnames
+	  phelp - Paged HELP: collects and pages the output of HELP
         protect - Protect a file from deletion
      references - Find all help database references for a given topic
          rename - Rename a file

@@ -15,6 +15,7 @@ int	ier
 pointer	sky, nse, gt
 int	ap_mode(), ap_centroid(), ap_histplot(), ap_median()
 int	ap_radplot(), ap_gauss(), ap_lgsky(), ap_crosscor()
+int	ap_mean()
 pointer	ap_gtinit()
 
 begin
@@ -31,6 +32,16 @@ begin
 
 	switch (AP_SKYFUNCTION(sky)) {
 
+	case AP_MEAN:
+
+	    ier = ap_mean (Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
+	        AP_NSKYPIX(sky), AP_SNX(sky), AP_SNY(sky), AP_K2(sky),
+		AP_RGROW(sky) * AP_SCALE(ap), AP_SNREJECT(sky),
+		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
+		AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
+	    return (ier)
+
 	case AP_MEDIAN:
 
 	    ier = ap_median (Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
@@ -38,6 +49,7 @@ begin
 		AP_K2(sky), AP_RGROW(sky) * AP_SCALE(ap), AP_SNREJECT(sky),
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
 		AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
 	    return (ier)
 
 	case AP_MODE:
@@ -47,6 +59,7 @@ begin
 		AP_K2(sky), AP_RGROW(sky) * AP_SCALE(ap), AP_SNREJECT(sky),
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
 		AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
 	    return (ier)
 
 	case AP_CENTROID:
@@ -57,6 +70,7 @@ begin
 		AP_RGROW(sky) * AP_SCALE(ap), AP_SMAXITER(sky),
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
 		AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
 	    return (ier)
 
 	case AP_CONSTANT:
@@ -77,7 +91,7 @@ begin
 	    if (gd == NULL)
 		return (AP_NOGRAPHICS)
 	    call gactivate (gd, 0)
-	    gt = ap_gtinit (AP_IMNAME(ap), AP_WX(sky), AP_WY(sky))
+	    gt = ap_gtinit (AP_IMNAME(ap), AP_SXCUR(sky), AP_SYCUR(sky))
 	    ier = ap_radplot (gd, gt, Memr[AP_SKYPIX(sky)],
 	        Memi[AP_COORDS(sky)], AP_NSKYPIX(sky), AP_SXC(sky),
 		AP_SYC(sky), AP_SNX(sky), AP_SNY(sky), AP_SCALE(ap), AP_K2(sky),
@@ -97,6 +111,7 @@ begin
 	        AP_K1(sky), AP_SKYSIGMA(nse), AP_BINSIZE(sky), AP_SMOOTH(sky),
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
 		AP_NSKY(sky), AP_NSKY_REJECT(sky))	
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
 	    call ap_gtfree (gt)
 	    call gdeactivate (gd, 0)
 	    return (ier)
@@ -109,6 +124,7 @@ begin
 		AP_RGROW(sky) * AP_SCALE(ap), AP_SMAXITER(sky),
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
 		AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
 	    return (ier)
 
 	case AP_GAUSS:
@@ -119,6 +135,7 @@ begin
 		AP_K2(sky), AP_RGROW(sky) * AP_SCALE(ap), AP_SNREJECT(sky),
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
 		AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
 	    return (ier)
 
 	case AP_CROSSCOR:
@@ -129,6 +146,7 @@ begin
 		AP_RGROW(sky) * AP_SCALE(sky), AP_SMAXITER(sky),
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_SKY_SKEW(sky),
 		AP_NSKY(sky), AP_NSKY_REJECT(sky))
+	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + AP_NSKY_REJECT(sky) 
 	    return (ier)
 
 	default:

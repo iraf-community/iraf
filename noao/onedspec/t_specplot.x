@@ -337,6 +337,17 @@ begin
 		}
 	    case 'w': # Window the graph
 		call gt_window (gt, gp, "cursor", redraw)
+	    case 'x': # No layout
+		if (nspec == 0)
+		    goto nospec_
+
+		do i = 1, nspec {
+		    sp = Memi[sps+i-1]
+		    SP_SCALE(sp) = 1.
+		    SP_OFFSET(sp) = 0.
+		}
+	        call sp_scale (Memi[sps], nspec, step)
+		redraw = YES
 	    case 'y': # Layout the spectra offsets to common mean
 		if (nspec == 0)
 		    goto nospec_
@@ -1166,9 +1177,12 @@ begin
 		iferr (w0 = imgetr (im, "crval1"))
 		    w0 = 1.
 	    }
-	    iferr (wpc = imgetr (im, "wpc"))
-	        iferr (wpc = imgetr (im, "cdelt1"))
-		    wpc = 1.
+	    iferr (wpc = imgetr (im, "wpc")) {
+	        iferr (wpc = imgetr (im, "cdelt1")) {
+	            iferr (wpc = imgetr (im, "cd1_1"))
+		        wpc = 1.
+		}
+	    }
 	    
 	    w0 = w0 - wpc * (w1 - 1.)
 	    if (abs (w0) < 0.001) {

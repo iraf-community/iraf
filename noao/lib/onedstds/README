@@ -53,12 +53,17 @@ kpnoextinct.dat -  KPNO extinction table for ONEDSPEC (in Angstroms)
 		   These stars are from the IRS or the IIDS directory but
 		   have data extending as far out into the red as the
 		   literature permits.   
-   spechayescal -  Spectrophotometric standards at the Hayes flux points,
-                   Table IV, Spectrophotometric Standards, Massey et al.,
-                   1988, Ap. J., Vol. 328, p. 315.
-      spec50cal -  Spectrophotometric standards at 50 A intervals, Table V,
-                   Spectrophotometric Standards, Massey et al., 1988,
+   spechayescal -  The KPNO spectrophotometric standards at the Hayes flux
+                   points, Table IV, Spectrophotometric Standards, Massey
+                   et al., 1988, Ap. J., Vol. 328, p. 315.
+      spec50cal -  The KPNO spectrophotometric standards at 50 A intervals,
+                   Table V, Spectrophotometric Standards, Massey et al., 1988,
                    Ap. J., Vol. 328, p. 315.
+   spec50redcal -  The KPNO spectrophotometric standards at 50 A intervals.
+                   These stars are a subset of the spec50cal stars extended out
+                   to 1 micron, Table 3, The Kitt Peak Spectrophotometric
+                   Standards: Extension to 1 micron, Massey and Gronwall,
+                   Ap. J., July 20, 1990.
 
 			MISCELLANEOUS
 
