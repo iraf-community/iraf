@@ -23,7 +23,7 @@ set	SNML = S.nm.$BMACH
 set	SVER = S.ver.$BMACH
 set	OMIT = omit.$BMACH
 set	EXCL = "zshlib.o zzstrt.o"
-set	ADDR = 0e000000		# default base address of shared region
+set	ADDR = 0a000000		# default base address of shared region
 set	PGSZ = 0x2000		# page size
 
 set	FIOCOMSZ = 0x1560	# exported commons
@@ -44,7 +44,7 @@ while ("$1" != "")
 	set ADDR = $1
 	# I couldn't get a direct !~ csh pattern match test to work here.
 	if ("`echo $ADDR | grep '[0-9][0-9a-f]*'`" == "") then
-	    set ADDR = 0e000000
+	    set ADDR = 0a000000
 	    echo -n "Warning: shared library base address not given,"
 	    echo " defaults to $ADDR"
 	endif

@@ -15,7 +15,7 @@ relink:
 Relink:
 	$set	rebuild = yes
 relink_:
-	$set	ADDR = 0e000000
+	$set	ADDR = 0a000000
 	$set	VV = "$$(@S.ver.$(MACH))"
 	$set	SI = bin$$S$(VV).e
 

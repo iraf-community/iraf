@@ -2457,3 +2457,46 @@ doc/newsfile
 doc/news.v29.hlp	+
 doc/v29revs.ms		+
 	Installed the revisions summary or release notes for IRAF V2.9. (4/15)
+
+-------------------------
+The V2.9 distribution was made and placed into distribution sometime back.
+The following bugs are being fixed retroactively, with patches for the
+original V2.9 distribution.  (5/5)
+
+unix/spp/boot/spp/xpp/decl.c
+	This code was not processing multidimensional char array declarations
+	properly.  There were actually three problems: for a multidimensional
+	array passed as an argument, [1] +1 was not being added to the first
+	axis to allow for the EOS, and [2] the axis was not being counted,
+	causing +1 to be added to the *final* axis later in the code.
+	[3] for all multidimensional char arrays the code was not checking to
+	see which axis it was on before adding the +1, so +1 would be added
+	to each axis, instead of only the first axis as it should be.  (these
+	bugs were contstrained to only several lines of code, it takes more
+	lines to describe them here!).  Note that ONLY multidimensional char
+	arrays were affected by these bugs, and for char arrays of ndim=2,
+	ONLY arrays declared as arguments to procedures.  (5/5)
+
+unix/shlib/mkshlib.csh
+unix/shlib/S.ver.f68881
+unix/shlib/S.ver.ffpa
+unix/shlib/S.ver.sparc
+unix/shlib/S.ver.i386
+	Sun release SunOS 4.1 about a week after Sun/IRAF V2.9, built on
+	SunOS 4.0.3, was frozen and prepared for distribution.  We subsequently
+	found that V2.9 would not run under SunOS 4.1, failing with a "cannot
+	map shared image" error during process startup.  This was traced to
+	an overlap of the region of virtual memory used by the hardware stack
+	and the IRAF shared image; in OS 4.1, Sun has moved the hardware
+	stack to a lower address.  The following changes were made to deal
+	with this.
+
+	1. The base address of the IRAF shared image was changed from
+	0x0e000000 to 0x0a000000.  The base address of the shared image
+	is arbitrary so long as the region of process virtual memory occupied
+	by the shared image does not conflict with anything else, so this
+	change should not affect the functioning of V2.9.
+	2. The shared image version number was incremented to 5, i.e., the
+	new shared image is S5.e.  This was necessary because with a different
+	base address, the new shared image cannot be used with applications
+	linked with the old shared image.  (5/5)
