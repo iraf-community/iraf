@@ -240,13 +240,13 @@ libvops.a:
 	aselkr.x	
 	aselks.x	
 	aselkx.x	
-	asokc.x	
-	asokd.x	
-	asoki.x	
-	asokl.x	
-	asokr.x	
-	asoks.x	
-	asokx.x	
+	asokc.x		<mach.h>
+	asokd.x		<mach.h>
+	asoki.x		<mach.h>
+	asokl.x		<mach.h>
+	asokr.x		<mach.h>
+	asoks.x		<mach.h>
+	asokx.x		<mach.h>
 	asqrd.x	
 	asqri.x	
 	asqrl.x	

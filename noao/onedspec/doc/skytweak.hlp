@@ -304,6 +304,7 @@ log the processing:
 REVISIONS
 .ls SKYTWEAK V2.11
 This task is new in this version.
+.le
 .ih
 SEE ALSO
 telluric

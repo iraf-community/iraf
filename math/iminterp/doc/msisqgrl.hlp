@@ -1,4 +1,4 @@
-.help msisqgrl Apr1985 "Image Interpolation Package"
+.help msisqgrl Dec98 "Image Interpolation Package"
 .ih
 NAME
 msisqgrl -- integrate the interpolant over a rectangular region 
@@ -7,11 +7,11 @@ SYNOPSIS
 y = msisqgrl (msi, x1, x2, y1, y2)
 
 .nf
-    pointer	msi		# interpolant descriptor
-    real	x1		# lower x limit, 1 <= x1 <= nxpix
-    real	x2		# upper x limit, 1 <= x2 <= nxpix
-    real	y1		# lower y limit, 1 <= y1 <= nypix
-    real	y2		# upper y limit, 1 <= y2 <= nypix
+    pointer	msi		#I interpolant descriptor
+    real	x1		#I lower x limit, 1 <= x1 <= nxpix
+    real	x2		#I upper x limit, 1 <= x2 <= nxpix
+    real	y1		#I lower y limit, 1 <= y1 <= nypix
+    real	y2		#I upper y limit, 1 <= y2 <= nypix
 .fi
 .ih
 ARGUMENTS
@@ -34,5 +34,5 @@ Checking for out of bound integration regimes is the responsibility of
 the user. MSIFIT must be called before using MSISQGRL.
 .ih
 SEE ALSO
-msisqgrl
+msigrl
 .endhelp

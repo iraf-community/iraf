@@ -32,12 +32,11 @@
 *         case where ANGLE is very nearly 2pi and rounds up to 360 deg,
 *         by testing for IDMSF(1)=360 and setting IDMSF(1-4) to zero.
 *
-*  Called:
-*     slCDTF
+*  Called:  slCDTF
 *
-*  P.T.Wallace   Starlink   11 September 1990
+*  P.T.Wallace   Starlink   18 March 1999
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

@@ -54,4 +54,6 @@ begin
 
 	if (jobcode != ERR)
 	    jobcode = ki_getchan (server, jobcode)
+
+	call sfree (sp)
 end

@@ -16,9 +16,9 @@ pointer	io			#I QPIO descriptor
 char	outstr[maxch]		#O where to put the filter text
 int	maxch			#I max chars out
 
-int	op
 pointer	sp, buf, bp
-int	gstrcpy(), qpex_getfilter()
+int	op, dtype[2], offset[2], i
+int	sizeof(), gstrcpy(), qpex_getfilter()
 define	ovfl_ 91
 
 begin
@@ -37,29 +37,37 @@ begin
 	    goto ovfl_
 
 	# Coordinate system.
+	dtype[1] = IO_EVXTYPE(io);  dtype[2] = IO_EVYTYPE(io)
+	offset[1] = IO_EVXOFF(io);  offset[2] = IO_EVYOFF(io)
+
 	call sprintf (Memc[buf], SZ_TEXTBUF, "key=(%c%d,%c%d),")
-	    if (IO_EVXTYPE(io) == TY_INT) {
-		call pargi ('i')
-		call pargi (IO_EVXOFF(io) * SZ_INT * SZB_CHAR)
-	    } else {
+	do i = 1, 2 {
+	    switch (dtype[i]) {
+	    case TY_SHORT:
 		call pargi ('s')
-		call pargi (IO_EVXOFF(io) * SZ_SHORT * SZB_CHAR)
-	    }
-	    if (IO_EVYTYPE(io) == TY_INT) {
+	    case TY_INT:
 		call pargi ('i')
-		call pargi (IO_EVYOFF(io) * SZ_INT * SZB_CHAR)
-	    } else {
-		call pargi ('s')
-		call pargi (IO_EVYOFF(io) * SZ_SHORT * SZB_CHAR)
+	    case TY_LONG:
+		call pargi ('l')
+	    case TY_REAL:
+		call pargi ('r')
+	    case TY_DOUBLE:
+		call pargi ('d')
+	    default:
+		call pargi ('?')
 	    }
+
+	    call pargi (offset[i] * sizeof(dtype[i]) * SZB_CHAR)
+	}
+
 	op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
 	if (op > maxch)
 	    goto ovfl_
 
 	# Blocking factor for generating pixels.
-	call sprintf (Memc[buf], SZ_TEXTBUF, "block=%dx%d, ")
-	    call pargi (IO_XBLOCK(io))
-	    call pargi (IO_YBLOCK(io))
+	call sprintf (Memc[buf], SZ_TEXTBUF, "block=%0.4gx%0.4g, ")
+	    call pargr (IO_XBLOCK(io))
+	    call pargr (IO_YBLOCK(io))
 	op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
 	if (op > maxch)
 	    goto ovfl_

@@ -52,7 +52,7 @@
 *                used to signal the end of the number and terminate
 *                decoding.
 *
-*             .  Comma is recognised by FLOTIN as a special case;  it
+*             .  Comma is recognized by FLOTIN as a special case;  it
 *                is skipped, leaving the pointer on the next character.
 *                See 13, below.
 *
@@ -106,7 +106,7 @@
 *
 *     18    See also DFLTIN and INTIN
 *
-*  P.T.Wallace   Starlink   14 April 1995
+*  P.T.Wallace   Starlink   23 November 1995
 *
 *  Copyright (C) 1995 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.

@@ -1,6 +1,5 @@
 include <imhdr.h>
 include <error.h>
-include <ctotok.h>
 
 # SETAIRMASS -- Compute the airmass for a series of images and optionally
 # store these in the image header.
@@ -229,19 +228,15 @@ double	ut		#O universal time
 double	exptime		#O exposure time (hours)
 
 pointer	date, sp
-double	ra1, dec1, epoch1, ra2, dec2, epoch2, st2, ut2
-int	day, month, year, token1, token2
-char	tokstr[SZ_TOKEN]
+double	ra1, dec1, epoch1, ra2, dec2, epoch2, st2, ut2, time
+int	day, month, year, flags
 bool	precess, ut_ok
 
 bool	fp_equald()
-int	nscan()
+int	dtm_decode()
 double	imgetd()
 
 errchk	imgetd, imgstr
-
-data	token1	/NULL/
-data	token2	/NULL/
 
 begin
 	call smark (sp)
@@ -266,23 +261,13 @@ begin
 	    # only precess coords if both are valid
 	    precess = false
 	    if (! (fp_equald (epoch1, double(0.)) || IS_INDEFD(epoch1))) {
-		iferr (call imgstr (im, dkey, Memc[date], SZ_LINE))
-		    Memc[date] = EOS
-
-		call sscan (Memc[date])
-		    call gargi (day)
-		    call gargtok (token1, tokstr, SZ_TOKEN)
-		    call gargi (month)
-		    call gargtok (token2, tokstr, SZ_TOKEN)
-		    call gargi (year)
-
-		if (nscan() == 5 &&
-		    (token1 == TOK_OPERATOR || token1 == TOK_PUNCTUATION) &&
-		    (token2 == TOK_OPERATOR || token2 == TOK_PUNCTUATION)) {
-
-		    call ast_date_to_epoch (year, month, day, ut2, epoch2)
-		    precess = true
-		}
+		call imgstr (im, dkey, Memc[date], SZ_LINE)
+		if (dtm_decode (Memc[date],year,month,day,time,flags) == ERR)
+		    call error (1, "Error in date keyword")
+		if (!IS_INDEFD(time))
+		    ut2 = time
+		call ast_date_to_epoch (year, month, day, ut2, epoch2)
+		precess = true
 	    }
 
 	    if (precess)

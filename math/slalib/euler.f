@@ -32,16 +32,17 @@
 *  axis labelling/numbering conventions apply;  the xyz (=123)
 *  triad is right-handed.  Thus, the 'ZXZ' example given above
 *  could be written 'zxz' or '313' (or even 'ZxZ' or '3xZ').  ORDER
-*  is terminated by length or by the first unrecognised character.
+*  is terminated by length or by the first unrecognized character.
 *
 *  Fewer than three rotations are acceptable, in which case the later
-*  angle arguments are ignored.  Zero rotations produces a unit RMAT.
+*  angle arguments are ignored.  If all rotations are zero, the
+*  identity matrix is produced.
 *
 *  Called:  slDEUL
 *
-*  P.T.Wallace   Starlink   November 1988
+*  P.T.Wallace   Starlink   23 May 1997
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1997 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

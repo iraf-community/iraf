@@ -450,7 +450,7 @@ multispec format.
 2.  To sum and extract every set of 10 columns:
 
 .nf
-	cl> nsum = 10
+	cl> nsum = 10  (or epar the package parameters)
 	cl> scopy longslit1 sum10 apertures=5-500x10
 	longslit1[5]  -->  sum10[5]
 	longslit1[15]  -->  sum10[15]
@@ -462,7 +462,7 @@ multispec format.
 of 2D images:
 
 .nf
-	cl> nsum = 10
+	cl> nsum = 10  (or epar the package parameters)
 	cl> scopy longslit* %longslit%c250.%* aperture=250
 	longslit1[250]  -->  c250.1[250]
 	longslit2[250]  -->  c250.2[250]
@@ -474,7 +474,7 @@ of 2D images:
 2D images and merge them into a single, renumbered output image:
 
 .nf
-	cl> nsum = 10
+	cl> nsum = 10  (or epar the package parameters)
 	cl> scopy longslit* c250 aperture=250 renum+
 	longslit1[250]  -->  c250[1]
 	longslit2[250]  -->  c250[2]

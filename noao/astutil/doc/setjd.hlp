@@ -24,10 +24,12 @@ parameters set in the \fBobservatory\fR task.  See \fBobservatory\fR for
 additional information.
 .le
 .ls date = "date-obs"
-Date of observation keyword.  The usual format
-is DD/MM/YY though other delimiters may be used and the year may also
-include the century.  The date may be a local date or a
-Greenwich date as selected by the \fIutdate\fR parameter.
+Date of observation keyword.  The value must be in FITS format.
+This is one of DD/MM/YY (old FITS format), YYYY-MM-DD (new FITS format),
+or YYYY-MM-DDTHH:MM:SS (new FITS format with time).  The date should be
+in universal time though the \fIutdate\fR parameter can be used if
+this is not the case.  If a time is included it is used in preference
+to the \fItime\fR value.
 .le
 .ls time = "ut"
 Time of observation keyword with value given in decimal hours or HH:MM:SS.S
@@ -35,7 +37,8 @@ format.  The date may be a local time or universal time as selected by the
 \fIuttime\fR parameter.  The time is used as is
 unless an exposure time keyword is specified, in which case
 the time will be corrected to the midpoint of the exposure from the
-beginning or end of the exposure.
+beginning or end of the exposure.  This time is not used if a time
+is given in the date keyword.
 .le
 .ls exposure = "exptime"
 Exposure time keyword with value in seconds.  If specified the time
@@ -104,21 +107,22 @@ there is no allowance made for exposures which are interrupted.
 See also the task \fBsetairmass\fR which may be used to compute a
 universal time midexposure value.
 
-The date and time of observations may be given either in universal time or
-in local standard time (there is no provisions for daylight savings
-times).  Conversion between the two, as well as the computation of the
-local integer date, requires the time zone in (positive) hours behind
-Greenwich or (negative) hours ahead of Greenwich.  This information is
-determined from the observatory at which the observations were made.  If
-the observatory is specified in the image header under the keyword OBSERVAT
-with a value which has an entry in the NOAO, local, or user observatory
-database then the value from the database is used.  This is the safest
-way since the observatory is tied to the actual image.  Otherwise, the
-\fIobservatory\fR parameter defines the observatory.  The special value
-"observatory" allows defining a default observatory with an environment
-variable or the \fBobservatory\fR task.  Explicitly use the parameter
-\fIobservatory.timezone\fR use the value "obspars".  For more information
-see help under \fBobservatory\fR.
+The date and time of observations should be given either in universal
+time.  However, if they are given in local standard time (there is no
+provisions for daylight savings times) the \fIutdate\fR and \fIuttime\fR
+parameters may be used.  Conversion between local and universal times, as
+well as the computation of the local integer date, requires the time zone
+in (positive) hours behind Greenwich or (negative) hours ahead of
+Greenwich.  This information is determined from the observatory at which
+the observations were made.  If the observatory is specified in the image
+header under the keyword OBSERVAT with a value which has an entry in the
+NOAO, local, or user observatory database then the value from the database
+is used.  This is the safest way since the observatory is tied to the
+actual image.  Otherwise, the \fIobservatory\fR parameter defines the
+observatory.  The special value "observatory" allows defining a default
+observatory with an environment variable or the \fBobservatory\fR task.
+Explicitly use the parameter \fIobservatory.timezone\fR use the value
+"obspars".  For more information see help under \fBobservatory\fR.
 
 The heliocentric Julian date is computed by defining a keyword for
 this value and also defining the keywords for the right ascension (in hours)
@@ -199,6 +203,11 @@ the Julian date may change during the observations.
 .fi
 .ih
 REVISIONS
+.ls SETJD V2.11.2
+Y2K update:  Updated to use the new FITS format for the date.  If the
+time is given in the date keyword it is used in preference to the
+time keyword.
+.le
 .ls SETJD V2.11
 The checking of the epoch keyword value was improved.  Previously if
 there was a problem with the keyword value (missing or malformed) the

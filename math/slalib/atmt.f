@@ -31,9 +31,9 @@
 *
 *  Note that in the optical case C5 and C6 are zero.
 *
-*  P.T.Wallace   Starlink   17 September 1995
+*  P.T.Wallace   Starlink   30 May 1997
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1997 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -45,7 +45,7 @@
       DOUBLE PRECISION TT0,TT0GM2,TT0DM2
 
 
-      T = MAX(MIN(T0-ALPHA*(R-R0),320D0),200D0)
+      T = MAX(MIN(T0-ALPHA*(R-R0),320D0),100D0)
       TT0 = T/T0
       TT0GM2 = TT0**GAMM2
       TT0DM2 = TT0**DELM2

@@ -191,6 +191,7 @@ real	insz[npts]		# Standard deviations in WCS units
 real	outsz[npts]		# Output size array in NDC units
 int	npts			# Number of points in arrays
 
+int	gt_geti()
 char	tplot[SZ_TPLOT]
 real	dx, dy
 bool	streq()
@@ -221,7 +222,7 @@ begin
 
 	# Need to scale standard deviation from density to NDC units
         call ggscale (gp, 0.0, 0.0, dx, dy)
-	if (GT_TRANSPOSE(gt) == NO)
+	if (gt_geti (gt, GTTRANSPOSE) == NO)
 	    call adivkr (insz, dx, outsz, npts)
 	else
 	    call adivkr (insz, dy, outsz, npts)

@@ -234,6 +234,8 @@
 944 FMIO: lfile cache overflow
 945 FMIO: attempt to obtain a lock on an already active lfile
 
+948 QPIO: blocking factor is out of range
+949 QPIO: illegal event coordinate type
 950 QPOE: too many macro definition files in list
 951 QPOE: header parameter has bad datatype code
 952 Error reading QPOE file header
@@ -260,7 +262,7 @@
 973 QPOE: attempt to use getparam to fetch value of struct type parameter
 974 QPOE: attempt to redefine an existing header parameter
 975 QPOE: unknown parameter
-976 QPIO: coordinate fields used for index must be type short or int
+976 QPIO: coordinate fields used for index must be a numeric type
 977 QPOE file does not have a default WCS
 978 QPIO expression syntax
 979 QPEX: errors encountered while compiling expression

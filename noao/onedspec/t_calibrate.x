@@ -216,8 +216,8 @@ begin
 					    nout = nout + 1
 					ical = max (1., min (real(n), ical))
 				    }
-				    dw = shdr_lw (sh, double(k+0.5)) -
-					shdr_lw (sh, double(k-0.5))
+				    dw = abs (shdr_lw (sh, double(k+0.5)) -
+					shdr_lw (sh, double(k-0.5)))
 				    fcor = asieval (asi, ical) / dw / time
 				}
 				Memr[data] = Memr[y] * ext * fcor
@@ -242,8 +242,8 @@ begin
 					nout = nout + 1
 				    ical = max (1., min (real(n), ical))
 				}
-				dw = shdr_lw (sh, double(k+0.5)) -
-				    shdr_lw (sh, double(k-0.5))
+				dw = abs (shdr_lw (sh, double(k+0.5)) -
+				    shdr_lw (sh, double(k-0.5)))
 				fcor = asieval (asi, ical) / dw / time
 			    }
 			    call amulkr (Memr[y], ext * fcor, Memr[data],
@@ -279,8 +279,8 @@ begin
 					nout = nout + 1
 				    ical = max (1., min (real(n), ical))
 				}
-				dw = shdr_lw (sh, double(k+0.5)) -
-				    shdr_lw (sh, double(k-0.5))
+				dw = abs (shdr_lw (sh, double(k+0.5)) -
+				    shdr_lw (sh, double(k-0.5)))
 				fcor = asieval (asi, ical) / dw / time
 			    }
 			    Memr[data] = Memr[y] * ext * fcor

@@ -1,6 +1,6 @@
 READ.ME
 
-Revision date 14 Novemer 1995                      SLALIB Version 1.6-3
+Revision date 31 May 1999                          SLALIB Version 2.3-0
 
 -----------------------------------------------------------------------
 
@@ -14,7 +14,9 @@ FILES IN THE ORIGINAL SOURCE DIRECTORY (VAX)
    *.CNVX            Fortran source for Convex
    *.MIPS            Fortran source for DECstation
    *.SUN4            Fortran source for Sun SPARCstation
+   *.LNX             Fortran source for Linux
    *.PCM             Microsoft Fortran source for PC
+   *.C               C functions needed for Linux version
    PC.BAT            rebuilds PC version
    REP.BAT           on PC, compiles one module and updates library
    CREATE.COM        complete rebuild of VAX and Unix releases
@@ -65,11 +67,11 @@ INSTRUCTIONS FOR SAVING SPACE
 
 -----------------------------------------------------------------------
 
-PORTING SLALIB TO OTHER SYSTEMS
+PORTING FORTRAN SLALIB TO OTHER SYSTEMS
 
-SLALIB runs on VAX (VMS), PC (Microsoft FORTRAN), Convex (ConvexOS),
-DECstation (Ultrix), DEC Alpha (OSF-1) and Sun SPARCstation (SunOS
-and Solaris).
+FORTRAN SLALIB runs on VAX (VMS), PC (Linux+f2c), PC (Microsoft FORTRAN),
+Convex (ConvexOS), DECstation (Ultrix), DEC Alpha (OSF-1) and Sun
+SPARCstation (SunOS and Solaris).
 
 For most platforms, the required changes are confined to these routines:
 
@@ -79,9 +81,9 @@ For most platforms, the required changes are confined to these routines:
 
 VAX, CONVEX, DECSTATION/ALPHA, SUN & PC
 
-Versions suitable for the above four platforms are supplied in the
-development directory as *.VAX, *,CNVX, *.MIPS, *.SUN4 and *.PCM
-respectively.
+Versions suitable for the above platforms are supplied in the
+development directory as *.VAX, *,CNVX, *.MIPS, *.SUN4, *.PCM and
+*.LNX respectively.
 
 
 -----------------------------------------------------------------------
@@ -305,6 +307,126 @@ at the end):
 
 *  The first UTC leap-second date in the DAT routine was one day early.
    This will have had no effect on the results for more recent epochs.
+
+*  The C version of OBS had some problems related to character string
+   handling.  A call using the "number" option retured an invalid
+   station ID, and station ID and name strings of the stipulated 10
+   and 40 character lengths were improperly terminated.
+
+*  A new routine, POLMO has been added.  This is a specialist tool
+   to do with Earth polar motion.
+
+*  DC62S and CC62S could give floating point errors if vectors in
+   unlikely units were supplied.  The handling of difficult cases
+   has been improved.
+
+*  Support for Linux has been added.
+
+*  The C version of REFRO was not re-entrant.  It is now;  there has
+   been a small (4%) speed penalty.
+
+*  RANDOM, GRESID and WAIT have been dropped from the C version.  They
+   could not easily be made re-entrant and posed perennial platform-
+   dependency problems.
+
+*  The value for the arcsec to radians factor in several routines
+   had an incorrect (and superfluous) 19th digit, which has been
+   removed.
+
+*  There was a minor bug in DV2TP and V2TP, to do with protection
+   against the special case where the tangent point is the pole.
+
+*  In OBS, the position of the Parkes radiotelescope has been revised,
+   and the ATNF Mopra observatory has been added.
+
+*  Two new routines have been added.  PAV (single precision) and DPAV
+   (double precision) are like BEAR and DBEAR but start with direction
+   cosines rather than spherical coordinates - they return the position
+   angle of one point with respect to the other.
+
+*  The C version of REFRO still wasn't re-entrant, but is now.
+
+*  The C version of DTF2D used to accept 60.0 in the seconds field;
+   this has been corrected.
+
+*  The PLANET and RDPLAN routines now include Pluto.  The ephemeris
+   is accurate (sub-arcsecond) but covers the 20th and 21st centuries
+   only.
+
+   !!!  IMPORTANT NOTE  !!!
+
+   RDPLAN used to interpret any planet number outside the range 1-8
+   as meaning the Sun.  The new version uses planet number 9.  Existing
+   programs using 9 for the Sun should be changed to use 0.  The rule
+   has not been changed, except that the range is now 1-9 instead of
+   1-8, as it is unlikely that the equivalent problem will arise in the
+   future.
+
+*  Two new routines have been added, PLANEL and PLANTE.  They are
+   analogues of PLANET and RDPLAN but for the case where orbital
+   elements are available.  They can be used for predicting the
+   positions of asteroids and comets, and, if up-to-date osculating
+   elements are supplied, more accurate positions for the major
+   planets than can be provided through the PLANET and RDPLAN
+   routines.
+
+*  The REFRO routine could give inaccurate results for low temperatures
+   (subzero C).  This was caused by over-cautious defensive programming,
+   which prevented the tropospheric temperature falling below 200 K.
+
+*  A new routine has been added, REFCOQ.  This calculates the coefficients
+   of a two-term refraction model.  It complements the existing REFCO
+   routine, being much faster at the expense of some accuracy.
+
+*  The 1997 July 1 UTC leap second has been added to the DAT routine.
+
+*  A bug in the C version of SVD (slaSvd) caused occasional false
+   indications of ill-conditioning.  The results of least-squares
+   fits do not seem to have been affected.  The Fortran version
+   (sla_SVD) did not have the bug.
+
+*  The Subaru telescope (Japanese National 8-metre telescope, Mauna Kea)
+   has been added to the OBS routine.
+
+*  The DAT routine has been extended back to the inception of UTC in
+   1960.
+
+*  The "earliest date possible" in DJCL was two days out (disagreeing
+   with DJCAL, which had the correct value).
+
+*  The GMSTA code has been improved.
+
+*  A new routine, PV2EL, takes a heliocentric J2000 equatorial position
+   and velocity and produces the equivalent set of osculating elements.
+
+*  The 1999 January 1 UTC leap second has been added to the DAT routine.
+
+*  Four new routines have been introduced which transform between the
+   FK5 system and the ICRS (Hipparcos) system.  FK52H and H2FK5 transform
+   star positions and proper motions from FK5 coordinates to Hipparcos
+   coordinates and vice versa.  FK5HZ and HFK5Z do the same but for the
+   case where the Hipparcos proper motions are zero.
+
+*  Six new routines have been introduced for dealing with orbital elements.
+   Four of them (sla_EL2UE, sla_PV2UE, sla_UE2EL and sla_UE2PV) provide
+   applications with direct access to the "universal variables" method
+   that was already being used internally.  Compared with using conventional
+   (angular) elements and solving Kepler's equation, the universal variables
+   approach has a number of advantages, including better handling of near-
+   parabolic orbits and greater efficiency.  The remaining two routines
+   (sla_PERTEL and sla_PERTUE) generate updated elements by applying
+   major-planet perturbations.  The new elements can then be used to
+   predict positions that are much more accurate.  For minor planets,
+   sub-arcsecond accuracy over a decade is achievable.
+
+*  Several observatory sites have been added to the OBS routine:  CFHT,
+   Keck 2, Gemini North, FCRAO, IRTF and CSO.  The coordinates for all
+   the Mauna Kea sites have been updated in accordance with recent aerial
+   photography results made available by the Institute for Astronomy,
+   University of Hawaii.
+
+*  A coding error in DAT produced incorrect results for dates in the
+   first 54 days of 1972.
 
 -----------------------------------------------------------------------
 

@@ -13,14 +13,14 @@ pointer	database		# the shifts database
 int	dformat			# use the database format for the shifts file ?
 int	interactive		# interactive mode ?
 int	verbose			# verbose mode
-int	interp			# interpolant type
+pointer	interpstr		# interpolant type
 int	boundary		# boundary extension type
 real	constant		# constant for boundary extension
 
 int	list1, listr, list2, reglist, reflist, reclist, tfd, stat, nregions
 int	c1, c2, l1, l2, ncols, nlines
 pointer	sp, image1, image2, imtemp, str, coords
-pointer	gd, id, imr, im1, im2, sdb, xc, mw 
+pointer	gd, id, imr, im1, im2, sdb, xc, mw
 real	shifts[2]
 bool	clgetb()
 int	imtopen(), imtlen(), imtgetim(), fntopnb(), clgwrd(), btoi()
@@ -43,6 +43,7 @@ begin
 	call salloc (imtemp, SZ_FNAME, TY_CHAR)
 	call salloc (database, SZ_FNAME, TY_CHAR)
 	call salloc (coords, SZ_FNAME, TY_CHAR)
+	call salloc (interpstr, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get task parameters and open lists.
@@ -144,8 +145,7 @@ begin
 	call rg_xsets (xc, DATABASE, Memc[database])
 
 	# Get the boundary extension parameters for the image shift.
-	interp = clgwrd ("interp_type", Memc[str], SZ_LINE,
-	    "|nearest|linear|poly3|poly5|spline3|")
+	call clgstr ("interp_type", Memc[interpstr], SZ_FNAME)
 	boundary = clgwrd ("boundary_type", Memc[str], SZ_LINE,
 	   "|constant|nearest|reflect|wrap|")
 	constant = clgetr ("constant")
@@ -282,7 +282,8 @@ begin
 		}
 
 		call rg_xshiftim (im1, im2, rg_xstatr (xc, TXSHIFT),
-		    rg_xstatr (xc, TYSHIFT), interp, boundary, constant)
+		    rg_xstatr (xc, TYSHIFT), Memc[interpstr], boundary,
+		        constant)
 		mw = mw_openim (im1)
 		shifts[1] = rg_xstatr (xc, TXSHIFT)
 		shifts[2] = rg_xstatr (xc, TYSHIFT)

@@ -1,0 +1,56 @@
+.help fk52h Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slFK5H (R5,D5,DR5,DD5,RH,DH,DRH,DDH)
+
+     - - - - - -
+      F K 5 H
+     - - - - - -
+
+  Transform FK5 (J2000) star data into the Hipparcos frame.
+
+  (double precision)
+
+  This routine transforms FK5 star positions and proper motions
+  into the frame of the Hipparcos catalogue.
+
+  Given (all FK5, equinox J2000, epoch J2000):
+     R5        d      RA (radians)
+     D5        d      Dec (radians)
+     DR5       d      proper motion in RA (dRA/dt, rad/Jyear)
+     DD5       d      proper motion in Dec (dDec/dt, rad/Jyear)
+
+  Returned (all Hipparcos, epoch J2000):
+     RH        d      RA (radians)
+     DH        d      Dec (radians)
+     DRH       d      proper motion in RA (dRA/dt, rad/Jyear)
+     DDH       d      proper motion in Dec (dDec/dt, rad/Jyear)
+
+  Called:  slDSC6, slDAVM, slDMXV, slDVXV, slDC6S
+
+  Notes:
+
+  1)  The proper motions in RA are dRA/dt rather than
+      cos(Dec)*dRA/dt, and are per year rather than per century.
+
+  2)  The FK5 to Hipparcos transformation consists of a pure
+      rotation and spin;  zonal errors in the FK5 catalogue are
+      not taken into account.
+
+  3)  The published orientation and spin components are interpreted
+      as "axial vectors".  An axial vector points at the pole of the
+      rotation and its length is the amount of rotation in radians.
+
+  4)  See also slHFK5, slF5HZ, slHF5Z.
+
+  Reference:
+
+     M.Feissel & F.Mignard, Astron. Astrophys. 331, L33-L36 (1998).
+
+  P.T.Wallace   Starlink   7 October 1998
+
+  Copyright (C) 1998 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

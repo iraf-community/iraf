@@ -51,8 +51,6 @@ the image dimensions are stored in the IRAF image header.
 Finally the PRINT_HEADER is called to print a long or short version of the
 header.
 .le
-.le
-.le
 .ls read_image
 The PDS image pixels are converted to an IRAF image file.
 The image file header is set.
@@ -80,5 +78,8 @@ an MII type. READ_SCAN returns the number of data points per scan or EOF.
 READ_SCAN  calls APDP8S to convert the 10 or 12 bit data values to short
 integers and calls AFLIPS to flip every other scan if the PDS scan
 is a raster scan.
+.le
+.le
+.le
 .le
 .endhelp

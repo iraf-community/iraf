@@ -232,7 +232,7 @@ begin
 		if (RV_TEMPNUM(rv) < RV_NTEMPS(rv) ||
 		    CURAPNUM(rv) < NUMAPS(rv) ||
 		    RV_IMNUM(rv) < RV_NOBJS(rv))
-		    	call rv_do_save (rv, written, MOVE)
+		    	call rv_do_save (rv, written)
 
 		# Now do the "next" operation as specified. The logic sequence
 		# is complicated but handles all cases.
@@ -295,7 +295,7 @@ begin
 		# Go to the previous (template --> aperture --> object) after 
 		# saving results.
 		if (RV_TEMPNUM(rv) > 1 || CURAPNUM(rv) > 1 || RV_IMNUM(rv) > 1)
-		    call rv_do_save (rv, written, MOVE)
+		    call rv_do_save (rv, written)
 
 		# Now do the "previous" operation as specified. The logic 
 		# sequence is complicated but handles all cases.
@@ -453,11 +453,10 @@ end
 # RV_DO_SAVE - Check that a write is called for, and prompt for a filename
 # if necessary.
 
-procedure rv_do_save (rv, written, type)
+procedure rv_do_save (rv, written)
 
 pointer	rv				#I RV struct pointer
 bool	written				#U Data write flag
-int	type				#I Type of save
 
 begin
 	if (RV_AUTOWRITE(rv) == YES && (!written || RV_UPDATE(rv) == YES))

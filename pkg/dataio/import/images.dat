@@ -163,6 +163,16 @@ iraf:
 		"Image data type not supported." : "okay"
 
 
+mcidas:                                         # Unidata McIDAS file
+    image_id = (geti4(5) == 4)
+    id_string = "McIDAS"
+    dims = (str(geti4(37)) // "," // str(geti4(33)))
+    pixtype = "b1"
+    hskip = geti4(133)
+    lskip = geti4(57)
+    yflip = 1
+
+
 miff:						# ImageMagick MIFF format
 mif:
     image_id = (locate(1,"id=ImageMagick") < locate (1,":\n"))

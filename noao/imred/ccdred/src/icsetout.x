@@ -10,10 +10,10 @@ pointer	out[3]			# Output images
 int	offsets[nimages,ARB]	# Offsets
 int	nimages			# Number of images
 
-int	i, j, indim, outdim, a, b, amin, bmax, fd
+int	i, j, indim, outdim, mwdim, a, b, amin, bmax, fd
 real	val
 bool	reloff, streq()
-pointer	sp, fname, lref, wref, coord, shift, axno, axval
+pointer	sp, fname, lref, wref, cd, coord, shift, axno, axval
 pointer	mw, ct, mw_openim(), mw_sctran()
 int	open(), fscan(), nscan(), mw_stati()
 errchk	mw_openim, mw_sctran(), mw_ctrand(), open
@@ -26,6 +26,7 @@ begin
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 	call salloc (lref, IM_MAXDIM, TY_DOUBLE)
 	call salloc (wref, IM_MAXDIM, TY_DOUBLE)
+	call salloc (cd, IM_MAXDIM*IM_MAXDIM, TY_DOUBLE)
 	call salloc (coord, IM_MAXDIM, TY_DOUBLE)
 	call salloc (shift, IM_MAXDIM, TY_REAL)
 	call salloc (axno, IM_MAXDIM, TY_INT)
@@ -45,15 +46,12 @@ begin
 		}
 	}
 
-	# Set the reference coordinates as the center of the first image.
+	# Set the reference point to that of the first image.
 	mw = mw_openim (in[1])
-	ct = mw_sctran (mw, "logical", "world", 0)
-	do i = 1, outdim
-	    Memd[lref+i-1] = nint (IM_LEN(in[1],i) / 2.)
+	mwdim = mw_stati (mw, MW_NPHYSDIM)
+	call mw_gwtermd (mw, Memd[lref], Memd[wref], Memd[cd], mwdim)
 	if (project)
 	    Memd[lref+outdim] = 1
-	call mw_ctrand (ct, Memd[lref], Memd[wref], indim)
-	call mw_ctfree (ct)
 
 	# Parse the user offset string.  If "none" then there are no offsets.
 	# If "wcs" then set the offsets based on the image WCS.
@@ -158,16 +156,10 @@ newscan_	if (fscan (fd) == EOF)
 	    call mw_close (mw)
 	    mw = mw_openim (out[1])
 	    if (!aligned || !reloff) {
-		ct = mw_sctran (mw, "logical", "world", 0)
-		do i = 1, outdim
-		    Memd[lref+i-1] = Memd[lref+i-1] - offsets[1,i]
-		call mw_ctrand (ct, Memd[lref], Memd[coord], outdim)
-		do i = 1, outdim
-		    Memr[shift+i-1] = Memd[wref+i-1] - Memd[coord+i-1]
-		if (project)
-		    Memr[shift+outdim] = 0.
-		call mw_shift (mw, Memr[shift], 0)
-		call mw_ctfree (ct)
+		call mw_gwtermd (mw, Memd[lref], Memd[wref], Memd[cd], indim)
+		do i = 1, indim
+		    Memd[lref+i-1] = Memd[lref+i-1] + offsets[1,i]
+		call mw_swtermd (mw, Memd[lref], Memd[wref], Memd[cd], indim)
 	    }
 	    if (project) {
 		# Apply dimensional reduction.

@@ -6,10 +6,10 @@ define	LAST_FD		256		# number of file descriptors
 define	PSIOCTRL	9		# the last pseudofile (see etc$prpsio.x)
 define	FBUF_ALLOC	vmalloc		# call to allocate file buffer
 define	LEN_DEVTBL	150		# FIO device table (7 cells/device)
-define	LEN_RANDBUF	1		# bufsize = LEN_RANDBUF * blksize
+define	LEN_RANDBUF	8		# bufsize = LEN_RANDBUF * blksize
 define	LEN_SEQBUF	8		# bufsize = LEN_SEQBUF * optbufsize
 define	SZ_STDIOBUF	1024		# size of STDIN/STDOUT buffers
-define	SZ_PBBUF	512		# default size of FIO pushback buf
+define	SZ_PBBUF	1024		# default size of FIO pushback buf
 
 define	SZ_MEM		1		# size of Mem common
 define	SZ_MEMALIGN	SZ_DOUBLE	# alignment criteria for malloc

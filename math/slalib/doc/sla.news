@@ -1,46 +1,35 @@
-SLALIB_Version_1.6-3                                         Expiry 1 Feb 96
+SLALIB_Version_2.3-0                                  Expiry 30 September 1999
 
 The latest releases of SLALIB include the following changes:
 
-*  The UTC leap second at the end of 1995 has been added to sla_DAT.
+*  The 1999 January 1 UTC leap second has been added to the DAT routine.
 
-*  The refraction routine REFRO has been extensively revised.  The
-   principal motivation was to improve the radio predictions by
-   introducing better humidity models.  The models previously in
-   use had been entirely adequate for the optical case, for which
-   they had been devised, but improved models were required for
-   the radio case.  None of the changes significantly affects the
-   optical results with respect to the earlier version of the REFRO
-   routine.  For example, at 70 deg zenith distance the new version
-   agrees with the old version to better than 0.05 arcsec for any
-   reasonable combination of parameters.  However, the improved
-   water-vapour expressions do make a significant difference in the
-   radio band, at 70 deg zenith distance reaching almost 4 arcsec
-   for a hot, humid, low-altitude site during a period of low pressure.
+*  Four new routines have been introduced which transform between the
+   FK5 system and the ICRS (Hipparcos) system.  FK52H and H2FK5 transform
+   star positions and proper motions from FK5 coordinates to Hipparcos
+   coordinates and vice versa.  FK5HZ and HFK5Z do the same but for the
+   case where the Hipparcos proper motions are zero.
 
-*  A new routine has been added, GMSTA.  This gives greater numerical
-   precision than the existing GMST function by allowing the date and
-   time to be specified separately rather than as a single MJD.
+*  Six new routines have been introduced for dealing with orbital elements.
+   Four of them (sla_EL2UE, sla_PV2UE, sla_UE2EL and sla_UE2PV) provide
+   applications with direct access to the "universal variables" method
+   that was already being used internally.  Compared with using conventional
+   (angular) elements and solving Kepler's equation, the universal variables
+   approach has a number of advantages, including better handling of near-
+   parabolic orbits and greater efficiency.  The remaining two routines
+   (sla_PERTEL and sla_PERTUE) generate updated elements by applying
+   major-planet perturbations.  The new elements can then be used to
+   predict positions that are much more accurate.  For minor planets,
+   sub-arcsecond accuracy over a decade is achievable.
 
-*  Measures taken some time ago in MAPQK to avoid trouble when processing
-   Solar positions had not been carried through into MAPQKZ.  The two
-   routines now use the same strategy.
-
-*  In REFRO, at zenith distances well beyond 90 deg and under some
-   conditions, it was possible to encounter arithmetic errors due to
-   failure of the tropospheric model-atmosphere to deliver sensible
-   temperatures.  This is inherent in the published algorithm.  To
-   avoid the problem, the temperature delivered by the model has been
-   constrained to the range 200 to 320 deg K.
-
-*  A new routine has been added, ATMDSP, for rapidly recalculating
-   the A,B refraction coefficients for different wavelengths.
-
-*  The first UTC leap-second date in the DAT routine was one day early.
-   This will have had no effect on the results for more recent epochs.
-
+*  Several observatory sites have been added to the OBS routine:  CFHT,
+   Keck 2, Gemini North, FCRAO, IRTF and CSO.  The coordinates for all
+   the Mauna Kea sites have been updated in accordance with recent aerial
+   photography results made available by the Institute for Astronomy,
+   University of Hawaii.
+ 
  P.T.Wallace
- 14 November 1995
+ 21 April 1999
 
  ptw@star.rl.ac.uk
  +44-1235-44-5372

@@ -1,4 +1,4 @@
-.help dvxv Nov95 "Slalib Package"
+.help dvxv Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDVXV (VA, VB, VC)

@@ -1,5 +1,18 @@
 .help revisions May91 noao.digiphot.photcal
 .nf
+photcal/catalogs/nlandolt.dat
+    Replaced the existing catalog which was an early version I got off a tape
+    given to us by Arlo Landolt with a new version in which the positions
+    are upgraded to agree with the table as published in the literature.
+
+    (Davis, May 10, 1999)
+
+photcal/photcal.cl
+    Modified the package cl script to check and see if the tables package is
+    already loaded before checking to see whether it is defined or not.
+
+    (Davis, August 1, 1998)
+
 photcal/evaluate/phinvert.x
 photcal/evaluate/phminv.f
     Modified the inversion routines to fit systems of equations which are

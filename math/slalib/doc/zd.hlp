@@ -1,4 +1,4 @@
-.help zd Nov95 "Slalib Package"
+.help zd Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slZD (HA, DEC, PHI)

@@ -1,4 +1,4 @@
-.help preces Nov95 "Slalib Package"
+.help preces Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slPRCE (SYSTEM, EP0, EP1, RA, DC)

@@ -24,12 +24,13 @@ int	sz_filter		#U allocated buffer size
 char	mask[sz_mask]		#O new mask name (not reallocatable)
 int	sz_mask			#I max chars out
 
+real	rval
 pointer	qp, sp, keyword, vp, in
-int	assignop, byte_offset, sz_field, ival
+int	assignop, byte_offset, sz_field
 int	level, zlevel, status, start, value, token, op, kw, tokno
 
 pointer	qp_opentext()
-int	qp_gettok(), gstrcpy(), strlen(), strdic(), ctoi()
+int	qp_gettok(), gstrcpy(), strlen(), strdic(), ctoi(), ctor()
 errchk	qp_opentext, malloc, realloc, qp_gettok, qp_ungettok, syserrs
 
 define	F Memc[filter+($1)-1]
@@ -159,28 +160,28 @@ begin
 		# Set the XY blocking factor for pixelation.
 		if (value == NULL)
 		    goto noval_
-		else if (ctoi (Memc, vp, ival) <= 0)
+		else if (ctor (Memc, vp, rval) <= 0)
 		    goto badval_
-		IO_XBLOCK(io) = ival
-		IO_YBLOCK(io) = ival
+		IO_XBLOCK(io) = rval
+		IO_YBLOCK(io) = rval
 		op = start
 
 	    case KW_XBLOCK:
 		# Set the X blocking factor for pixelation.
 		if (value == NULL)
 		    goto noval_
-		else if (ctoi (Memc, vp, ival) <= 0)
+		else if (ctor (Memc, vp, rval) <= 0)
 		    goto badval_
-		IO_XBLOCK(io) = ival
+		IO_XBLOCK(io) = rval
 		op = start
 
 	    case KW_YBLOCK:
 		# Set the Y blocking factor for pixelation.
 		if (value == NULL)
 		    goto noval_
-		else if (ctoi (Memc, vp, ival) <= 0)
+		else if (ctor (Memc, vp, rval) <= 0)
 		    goto badval_
-		IO_YBLOCK(io) = ival
+		IO_YBLOCK(io) = rval
 		op = start
 
 	    case KW_DEBUG:
@@ -209,21 +210,32 @@ badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
 		# Set the offsets of the event attribute fields to be used
 		# for the event coordinates during extraction.  The typical
 		# syntax of the key value is, e.g.,  key=(s10,s8).  Fields
-		# used for event coordinate keys may be short or int.
+		# used for event coordinate keys must be a numeric type.
 
 		call strlwr (Memc[vp])
 		while (Memc[vp] == ' ' || Memc[vp] == '(')
 		    vp = vp + 1
 
 		# Get the X field offset and type.
-		if (Memc[vp] == 'i') {
-		    IO_EVXTYPE(io) = TY_INT
-		    sz_field = SZ_INT
-		} else if (Memc[vp] == 's') {
+		switch (Memc[vp]) {
+		case 's':
 		    IO_EVXTYPE(io) = TY_SHORT
 		    sz_field = SZ_SHORT
-		} else
+		case 'i':
+		    IO_EVXTYPE(io) = TY_INT
+		    sz_field = SZ_INT
+		case 'l':
+		    IO_EVXTYPE(io) = TY_LONG
+		    sz_field = SZ_LONG
+		case 'r':
+		    IO_EVXTYPE(io) = TY_REAL
+		    sz_field = SZ_REAL
+		case 'd':
+		    IO_EVXTYPE(io) = TY_DOUBLE
+		    sz_field = SZ_DOUBLE
+		default:
 		    goto badkey_
+		}
 
 		vp = vp + 1
 		if (ctoi (Memc, vp, byte_offset) <= 0)
@@ -235,14 +247,25 @@ badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
 		    vp = vp + 1
 
 		# Get the Y field offset.
-		if (Memc[vp] == 'i') {
-		    IO_EVYTYPE(io) = TY_INT
-		    sz_field = SZ_INT
-		} else if (Memc[vp] == 's') {
+		switch (Memc[vp]) {
+		case 's':
 		    IO_EVYTYPE(io) = TY_SHORT
 		    sz_field = SZ_SHORT
-		} else
+		case 'i':
+		    IO_EVYTYPE(io) = TY_INT
+		    sz_field = SZ_INT
+		case 'l':
+		    IO_EVYTYPE(io) = TY_LONG
+		    sz_field = SZ_LONG
+		case 'r':
+		    IO_EVYTYPE(io) = TY_REAL
+		    sz_field = SZ_REAL
+		case 'd':
+		    IO_EVYTYPE(io) = TY_DOUBLE
+		    sz_field = SZ_DOUBLE
+		default:
 		    goto badkey_
+		}
 
 		vp = vp + 1
 		if (ctoi (Memc, vp, byte_offset) <= 0) {

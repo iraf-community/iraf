@@ -1,4 +1,4 @@
-.help kbj Nov95 "Slalib Package"
+.help kbj Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slKBJ (JB, E, K, J)

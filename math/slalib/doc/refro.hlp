@@ -1,4 +1,4 @@
-.help refro Nov95 "Slalib Package"
+.help refro Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slRFRO (ZOBS, HM, TDK, PMB, RH, WL, PHI, TLR,
@@ -8,7 +8,7 @@
       R F R O
      - - - - - -
 
-  Atmospheric refraction for radio and optical wavelengths
+  Atmospheric refraction for radio and optical/IR wavelengths.
 
   Given:
     ZOBS    d  observed zenith distance of the source (radian)
@@ -40,10 +40,10 @@
      and Sinclair (NAO Technical Notes 59 and 63, subsequently adopted
      in the Explanatory Supplement, 1992 edition - see section 3.281).
 
-  4  The code is a modified form of the optical refraction subroutine
+  4  The code is a development of the optical/IR refraction subroutine
      AREF of C.Hohenkerk (HMNAO, September 1984), with extensions to
      support the radio case.  Apart from merely cosmetic changes, the
-     following modifications to the original HMNAO optical refraction
+     following modifications to the original HMNAO optical/IR refraction
      code have been made:
 
      .  The angle arguments have been changed to radians.
@@ -69,11 +69,11 @@
         communication 1989), based on the Essen & Froome
         refractivity formula adopted in Resolution 1 of the
         13th International Geodesy Association General Assembly
-        (Bulletin Geodesique 1963 p390).
+        (Bulletin Geodesique 70 p390, 1963).
 
      .  Various small changes have been made to gain speed.
 
-     None of the changes significantly affects the optical results
+     None of the changes significantly affects the optical/IR results
      with respect to the algorithm given in the 1992 Explanatory
      Supplement.  For example, at 70 deg zenith distance the present
      routine agrees with the ES algorithm to better than 0.05 arcsec
@@ -114,9 +114,9 @@
 
   Called:  slDA1P, slATMT, slATMS
 
-  P.T.Wallace   Starlink   19 September 1995
+  P.T.Wallace   Starlink   3 June 1997
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1997 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

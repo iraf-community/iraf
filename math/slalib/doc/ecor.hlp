@@ -1,4 +1,4 @@
-.help ecor Nov95 "Slalib Package"
+.help ecor Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slECOR (RM, DM, IY, ID, FD, RV, TL)

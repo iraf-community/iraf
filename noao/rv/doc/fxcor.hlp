@@ -821,22 +821,24 @@ respectively) will be computed.
 In short form, here are the equations:
 .nf
 
-    ref_rvobs = catalogue_vel_of_template - H(temp) # obs. vel. of temp.
-    VREL = C * (10 ** (wpc * shift) - 1.)	    # relative vel.
-    VOBS = ((1+ref_rvobs/C)*(10**(wpc*shift)-1) * C # observed vel.
-    VHELIO = VOBS + H(object)			    # heliocentric vel.
+    ref_rvobs = catalogue_vel_of_template - H(temp)  # obs. vel. of temp.
+    VREL = C * (10 ** (wpc * shift) - 1.)	     # relative vel.
+    VOBS = ((1+ref_rvobs/C)*(10**(wpc*shift)-1)) * C # observed vel.
+    VHELIO = VOBS + H(object)			     # heliocentric vel.
 
 .fi
-where H() is the heliocentric correction for that observation.  The equation
-used for the relative velocity is derived from the standard (1+z), and the
-VOBS equation reflects that the observed velocty is the product of (1+z)
-values for the object and template (this allows for high redshift templates
-to be used).  The date,
-time, and position of each spectrum is found from the image header via the
-keywords defined in \fIkeywpars\fR.  In the case of the time the task first
-looks for a keyword defining the UT mid-point of the observation 
-(\fIkeywpars.utmiddle\fR).  If that is not found then the mid-point UT 
-is computed from the exposure time (\fIkeywpars.exptime\fR) and UT of 
+where H() is the heliocentric correction for that observation.  The
+equation used for the relative velocity is derived from the standard
+(1+z), and the VOBS equation reflects that the observed velocty is the
+product of (1+z) values for the object and template (this allows for high
+redshift templates to be used).  The date, time, and position of each
+spectrum is found from the image header via the keywords defined in
+\fIkeywpars\fR.  In the case of the time the task first looks for a
+keyword defining the UT mid-point of the observation
+(\fIkeywpars.utmiddle\fR).   If that is not found any time present in the
+header DATE-OBS (\fIkeywpars.date_obs\fR) keyword is used at the UT start
+point, if there is no time in the keyword value then the mid-point UT is
+computed from the exposure time (\fIkeywpars.exptime\fR) and UT of
 observation (\fIkeywpars.ut\fR) keywords.
 
 The keyword added to the template header (as defined by the

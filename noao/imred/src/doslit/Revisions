@@ -1,6 +1,10 @@
 .help revisions Dec94 noao.imred.src.doslit
 .nf
 doslit$sarcrefs.cl
+    The test on CRVAL and CDELT would not work with header keywords.
+    (9/22/98, Valdes)
+
+doslit$sarcrefs.cl
 doslit$sbatch.cl
 doslit$sdoarcs.cl
 doslit$sfluxcal.cl

@@ -73,8 +73,8 @@ t_grow,r,h,)aptrace.grow,,,">aptrace.grow
 
 # EXTRACTION PARAMETERS
 "
-background,s,h,)apflat.background,,,>apflat.background
-skybox,i,h,)apflat.skybox,,,>apflat.skybox
+background,s,h,"none",,,>apflat.background
+skybox,i,h,1,,,>apflat.skybox
 weights,s,h,"none",,,Extraction weights (none|variance)
 pfit,s,h,)apflat.pfit,,,>apflat.pfit
 clean,b,h,)apflat.clean,,,>apflat.clean
@@ -85,7 +85,7 @@ readnoise,s,h,)apflat.readnoise,,,>apflat.readnoise
 gain,s,h,)apflat.gain,,,>apflat.gain
 lsigma,r,h,)apflat.lsigma,,,>apflat.lsigma
 usigma,r,h,)apflat.usigma,,,>apflat.usigma
-polysep,r,h,0.95,0.1,0.95,Marsh algorithm polynomial spacing
+polysep,r,h,0.90,0.1,0.90,Marsh algorithm polynomial spacing
 polyorder,i,h,10,1,,Marsh algorithm polynomial order
 nsubaps,i,h,1,,,"Number of subapertures per aperture
 

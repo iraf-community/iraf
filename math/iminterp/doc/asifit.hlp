@@ -1,4 +1,4 @@
-.help asifit Jul84 "Image Interpolator Package"
+.help asifit Dec98 "Image Interpolator Package"
 .ih
 NAME
 asifit - fit the interpolant to data
@@ -7,9 +7,9 @@ SYNOPSIS
 asifit (asi, datain, npix)
 
 .nf
-    pointer	asi		# interpolant descriptor
-    real	datain[npix]	# input data
-    int		npix		# the number of data points
+    pointer	asi		#I interpolant descriptor
+    real	datain[npix]	#I input data
+    int		npix		#I the number of data points
 .fi
 .ih
 ARGUMENTS
@@ -25,19 +25,16 @@ Number of data points.
 .ih
 DESCRIPTION
 The datain array is checked for size, memory is allocated for the coefficient
-array and the end conditions are specified.
-The interior polynomial interpolants are saved as the data points. The
-polynomial coefficients are calculated directly from the data points in
-the evaluation
-stage. The B-spline coefficients are calculated in ASIFIT as they depend
-on the entire data array.  The sinc interpolation type simple stores
-the data points.
+array, and the end conditions are specified.  The interior polynomial, sinc and
+drizzle interpolants are saved as the data points. The polynomial coefficients
+are calculated directly from the data points in the evaluation stage. The
+B-spline coefficients are calculated in ASIFIT as they depend on the entire
+data array. 
 .ih
 NOTES
 Checking for INDEF valued and out of bounds pixels is the responsibility
-of the user.
-ASIINIT and ASIFIT must be called before using ASIEVAL, ASIVECTOR, ASIDER or
-ASIGRL.
+of the user. ASIINIT or ASISINIT and ASIFIT must be called before using
+ASIEVAL, ASIVECTOR, ASIDER or ASIGRL.
 .ih
 SEE ALSO
 .endhelp

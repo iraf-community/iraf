@@ -430,6 +430,7 @@ earlier.
    current sensitivity function.
 9. Additional flexibility is provided for treating apertures.
 .fi
+.le
 .ih
 BUGS
 If the flux points do not span the wavelength range, set by the

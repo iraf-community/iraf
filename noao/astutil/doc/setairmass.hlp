@@ -36,7 +36,9 @@ The output time stamp desired for the airmass.  The choices are the
 .le
 .ls date = "date-obs"
 The name of the keyword that contains the date of the observation.
-The format should be `DD/MM/YY'.
+The format should be `DD/MM/YY' (old FITS format), YYYY-MM-DD (new
+FITS format), or YYYY-MM-DDTHH:MM:SS (new FITS format with time).
+If there is a time it takes precedence over the UT keyword.
 .le
 .ls exposure = "exptime"
 The name of the keyword that contains the exposure time (in seconds) of
@@ -74,8 +76,8 @@ The RA and Dec will be precessed from the given epoch to
 the date of observation.  The RA, Dec, epoch, and ST keywords are
 assumed to have the names "RA", "DEC", "EPOCH", and "ST".  The name of
 the exposure time and date keywords can be specified as parameters.
-These should express the exposure time in seconds and the date in the
-format `DD/MM/YY'.  If any of the required keywords are missing from
+These should express the exposure time in seconds and the date in
+FITS format.  If any of the required keywords are missing from
 the image headers, they can be added using the hedit task.
 
 Before using this task, you will need to know the "time stamp" of the
@@ -92,11 +94,11 @@ control the header keyword output.
 
 SETAIRMASS will also calculate the universal time of the middle of the
 exposure and place the value in the header keyword specified by the
-\fIutmiddle\fR parameter.  This assumes that the value for the UT is in
-the keyword "UT", with the same time stamp as the sidereal time.
-The mid-observation UT is useful for interpolating calibration arc
-dispersion solutions using REFSPECTRA, especially when the exposure
-time is long.
+\fIutmiddle\fR parameter.  This assumes that the value for the UT is in the
+the date keyword or "UT" keyword, with the same time stamp as the sidereal
+time.  The mid-observation UT is useful for interpolating calibration arc
+dispersion solutions using REFSPECTRA, especially when the exposure time is
+long.
 .ih
 ALGORITHMS
 The mean airmass is calculated uses the formula described in "Some
@@ -145,11 +147,13 @@ Siderial time in hours at the beginning, middle, or end of the observation.
 .le
 .ls UT
 Universal time in hours at the beginning, middle, or end of the observation.
+This is used if the time is not in the date keyword.
 .le
 .ls \fIdate\fR
 The value of the date parameter is the keyword name to be used for the
-date of the observation.  The format is anything reasonably close to
-`DD/MM/YY'.
+date of the observation.  The date must be in either the old or new
+FITS format.  If the new FITS format includes the time this is used
+in preference to the UT keyword.
 .le
 .ls \fIexposure\fR
 The value of the exposure parameter is the keyword name to be used for the
@@ -176,6 +180,11 @@ Note that the test picture does not have the correct coordinate epoch
 listed in its header, so no precession will be performed.  Also the
 default value of the update parameter is no, so that only a listing of
 the calculated airmasses is generated.
+.ih
+REVISIONS
+.ls SETAIRMASS V2.11.2
+Y2K update: This task was updated to use the new FITS date format.
+.le
 .ih
 SEE ALSO
 airmass, hedit, refspectra, observatory

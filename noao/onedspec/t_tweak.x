@@ -11,7 +11,7 @@ include	<pkg/xtanswer.h>
 
 # Tweak data object definitions.
 define	TWK_SLEN	999		# Length of sample region string
-define	TWK_LEN		573		# Length of data object
+define	TWK_LEN		574		# Length of data object
 
 define	TWK_TYPE	Memc[P2C($1)]	# Tweak type (maxchars=19)
 define	TWK_SH		Memi[$1+11]	# Spectrum pointer
@@ -25,8 +25,9 @@ define	TWK_RG		Memi[$1+18]	# Range pointer
 define	TWK_RMS		Memr[$1+19]	# RMS in sample regions
 define	TWK_OFFSET	Memr[$1+20]	# Offset in graphs
 define	TWK_BOX		Memi[$1+21]	# Boxcar smoothing size
-define	TWK_SAMPLE	Memc[P2C($1+22)]# Sample regions (maxchars=999)
-define	TWK_HELP	Memc[P2C($1+522)]# Help file (maxchars=99)
+define	TWK_THRESH	Memr[$1+22]	# Calibration threshold
+define	TWK_SAMPLE	Memc[P2C($1+23)]# Sample regions (maxchars=999)
+define	TWK_HELP	Memc[P2C($1+523)]# Help file (maxchars=99)
 
 # Tweak types.
 define	SKYTWEAK	1		# Sky subtraction
@@ -114,6 +115,8 @@ begin
 	outlist = imtopenp ("output")
 	callist = imtopenp ("cal")
 	ignoreaps = clgetb ("ignoreaps")
+	if (TWK_TYPE(twk) == 'T')
+	    TWK_THRESH(twk) = clgetr ("threshold")
 	TWK_SHIFT(twk) = clgetr ("shift")
 	TWK_SCALE(twk) = clgetr ("scale")
 	xcorr = clgetb ("xcorr")
@@ -241,7 +244,8 @@ begin
 			    ical = max (1., min (real(SN(cal)), ical))
 			}
 			if (TWK_TYPE(twk) == 'T') {
-			    fcor = asieval (IM(cal),ical) ** scale
+			    fcor = max (TWK_THRESH(twk),
+				asieval (IM(cal),ical)) ** scale
 			    Memr[data] = Memr[y] / fcor
 			    mean = mean + fcor
 			} else {
@@ -776,7 +780,7 @@ real	scale		#I Scale
 char	type
 pointer	sh, cal, asi, x, y, ycal, z, rg, temp
 int	i, j, k, n, ncal, nstat, box, rg_inrange()
-real	amratio, norm, sum1, sum2, xcal, xcal1, zval, asieval()
+real	thresh, amratio, norm, sum1, sum2, xcal, xcal1, zval, asieval()
 double	shdr_wl()
 
 begin
@@ -792,6 +796,7 @@ begin
 	n = SN(sh)
 	ncal = SN(cal)
 	rg = TWK_RG(twk)
+	thresh = TWK_THRESH(twk)
 	amratio = AM(sh) / AM(cal)
 
 	# Evaluate the calibrated spectrum and the statistics.
@@ -807,8 +812,10 @@ begin
 	    #Memr[z+i] = Memr[y+i] / (Memr[ycal+i]
 	    Memr[ycal+i] = asieval (asi, xcal1)
 	    if (type == 'T') {
+		Memr[ycal+i] = max (thresh, Memr[ycal+i])
 		if (Memr[ycal+i] <= 0.)
-		    call error (1, "Calibration spectrum negative or zero")
+		    call error (1,
+	    "Calibration spectrum negative or zero (set threshold parameter)")
 		Memr[z+i] = Memr[y+i] / (Memr[ycal+i] ** (amratio * scale))
 	    } else
 		Memr[z+i] = Memr[y+i] - (Memr[ycal+i] * scale)
@@ -927,8 +934,7 @@ begin
 	    case ':':
 		call twk_colon (Memc[cmd], twk, gp, gt, wcs, newdata, newgraph)
 	    case '?':
-		call twk_colon ("help", twk, gp, gt, wcs, graph2, newdata,
-		    newgraph)
+		call twk_colon ("help", twk, gp, gt, wcs, newdata, newgraph)
 	    case 'a':
 		call twk_rmsmin (twk)
 		newdata = YES
@@ -1051,15 +1057,20 @@ begin
 		    scale[2] = TWK_SCALE(twk)
 		    scale[3] = TWK_SCALE(twk) * (1 + TWK_DSCALE(twk))
 		}
-		TWK_SPEC(twk) = z[1]
-		call twk_spec (twk, shift[1], scale[1])
-		call asubkr (Memr[z[1]], TWK_OFFSET(twk), Memr[z[1]], n)
-		TWK_SPEC(twk) = z[3]
-		call twk_spec (twk, shift[3], scale[3])
-		call aaddkr (Memr[z[3]], TWK_OFFSET(twk), Memr[z[3]], n)
-		TWK_SPEC(twk) = z[2]
-		call twk_spec (twk, shift[2], scale[2])
-		newdata = NO
+		iferr {
+		    TWK_SPEC(twk) = z[1]
+		    call twk_spec (twk, shift[1], scale[1])
+		    call asubkr (Memr[z[1]], TWK_OFFSET(twk), Memr[z[1]], n)
+		    TWK_SPEC(twk) = z[3]
+		    call twk_spec (twk, shift[3], scale[3])
+		    call aaddkr (Memr[z[3]], TWK_OFFSET(twk), Memr[z[3]], n)
+		    TWK_SPEC(twk) = z[2]
+		    call twk_spec (twk, shift[2], scale[2])
+		    newdata = NO
+		} then {
+		    TWK_SPEC(twk) = z[2]
+		    call erract (EA_ERROR)
+		}
 
 		call sprintf (Memc[str], SZ_LINE, "scale = %5g")
 		    call pargr (TWK_SCALE(twk))

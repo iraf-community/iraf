@@ -352,7 +352,6 @@ begin
 
 	    call ic_copy (ID_IC(sid), ID_IC(id))
 
-	    ID_SHIFT(id) = ID_SHIFT(sid)
 	    ID_NEWCV(id) = ID_NEWCV(sid)
 	    ID_NEWDBENTRY(id) = ID_NEWDBENTRY(sid)
 
@@ -365,6 +364,7 @@ begin
 	ID_LINE(id,2) = ID_LINE(sid,2)
 	ID_AP(id,1) = ID_AP(sid,1)
 	ID_AP(id,2) = ID_AP(sid,2)
+	ID_SHIFT(id) = ID_SHIFT(sid)
 
 	return (OK)
 end

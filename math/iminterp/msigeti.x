@@ -16,6 +16,8 @@ begin
 	    return (MSI_TYPE(msi))
 	case II_MSINSAVE:
 	    return (MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi) + MSI_SAVECOEFF)
+	case II_MSINSINC:
+	    return (MSI_NSINC(msi))
 	default:
 	    call error (0, "MSIGETI: Unknown MSI parameter.")
 	}

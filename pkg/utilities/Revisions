@@ -1,5 +1,20 @@
 .help revisions Jun88 pkg.utilities
 .nf
+utilities$surfit.par
+utilities$t_surfit.x
+utilities$doc/surfit.hlp
+    Added support for the half cross-terms option to the surfit task. This
+    involved changing the type of the xterms parameter from boolen (yes/no)
+    to string (none,half,full) but involved no other interface changes.
+    (7/6/99, Davis)
+
+utilities$doc/surfit.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+=======
+V2.11.1
+=======
+
 utilities$urand.x
 utilities$doc/urand.hlp
     If the "seed" parameter is set to INDEF then the clock time (integer

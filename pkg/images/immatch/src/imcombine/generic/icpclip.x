@@ -180,12 +180,12 @@ begin
 		median[i] = med
 
 	    # Reorder if pixels only if necessary.
-	    if (nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		k = max (nl, n4 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Mems[d[l]+j] = Mems[d[k]+j]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + j
 			    mp2 = m[k] + j
 			    id = Memi[mp1]
@@ -398,12 +398,12 @@ begin
 		median[i] = med
 
 	    # Reorder if pixels only if necessary.
-	    if (nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		k = max (nl, n4 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Memi[d[l]+j] = Memi[d[k]+j]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + j
 			    mp2 = m[k] + j
 			    id = Memi[mp1]
@@ -616,12 +616,12 @@ begin
 		median[i] = med
 
 	    # Reorder if pixels only if necessary.
-	    if (nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		k = max (nl, n4 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Memr[d[l]+j] = Memr[d[k]+j]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + j
 			    mp2 = m[k] + j
 			    id = Memi[mp1]
@@ -834,12 +834,12 @@ begin
 		median[i] = med
 
 	    # Reorder if pixels only if necessary.
-	    if (nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		k = max (nl, n4 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Memd[d[l]+j] = Memd[d[k]+j]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + j
 			    mp2 = m[k] + j
 			    id = Memi[mp1]

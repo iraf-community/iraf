@@ -62,11 +62,11 @@
 *     slDVDV        dot product
 *     slDMXV        matrix x vector
 *     slDC2S       Cartesian to spherical
-*     slDA2P      normalise angle 0-2Pi
+*     slDA2P      normalize angle 0-2Pi
 *
-*  P.T.Wallace   Starlink   16 September 1995
+*  P.T.Wallace   Starlink   23 August 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -76,7 +76,7 @@
 
 *  Arc seconds to radians
       DOUBLE PRECISION AS2R
-      PARAMETER (AS2R=0.4848136811095359949D-5)
+      PARAMETER (AS2R=0.484813681109535994D-5)
 
 *  Km/s to AU/year
       DOUBLE PRECISION VF
@@ -112,7 +112,7 @@
       EM(2) =  PR*Q(1)-PD*SIN(RM)*SIN(DM)+W*Q(2)
       EM(3) =          PD*COS(DM)        +W*Q(3)
 
-*  Geocentric direction of star (normalised)
+*  Geocentric direction of star (normalized)
       DO I=1,3
          P(I) = Q(I)+PMT*EM(I)-PXR*EB(I)
       END DO

@@ -44,6 +44,7 @@ The minimum and maximum logical x and logical y coordinates used to generate
 the grid of control points if \fIcoords\fR = "grid". Xmin, xmax, ymin, and
 ymax default to 1, the number of columns in the reference image, 1, and the
 number of lines in the reference image, respectively.
+.le
 .ls nx = 10, ny = 10
 The number of points in x and y used to generate the coordinate grid
 if \fIcoords\fR = "grid".
@@ -203,7 +204,8 @@ observation (the time when the mean place was correct), in addition to the
 equinox. The epoch is specified, in order of precedence, by the values of the
 keywords MJD-WCS or MJD-OBS (which contain the modified Julian date, JD -
 2400000.5, of the coordinate system), or the DATE-OBS keyword (which contains
-the date of the observation in the form DD/MM/YY). As the latter quantity is
+the date of the observation in the form DD/MM/YY, CCYY-MM-DD,
+CCYY-MM-DDTHH:MM:SS.S). As the latter quantity is
 only accurate to a day, the MJD-WCS or MJD-OBS specification is preferred.
 If all 3 keywords are absent the epoch defaults to the value of equinox.
 Equatorial coordinates in the GAPPT system require only the specification

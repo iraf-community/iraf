@@ -171,8 +171,12 @@ begin
 
 	    # Define the polygon interactively.
 	    case 'g':
-		nvertices = ap_ymkpoly (py, id, Memr[x], Memr[y],
-		    MAX_NVERTICES)
+		if (id == gd)
+		    nvertices = ap_ymkpoly (py, id, Memr[x], Memr[y],
+		        MAX_NVERTICES, NO)
+		else
+		    nvertices = ap_ymkpoly (py, id, Memr[x], Memr[y],
+		        MAX_NVERTICES, YES)
 		xmean = apstatr (py, PYXMEAN)
 		ymean = apstatr (py, PYYMEAN)
 		if (nvertices == EOF) {

@@ -881,6 +881,8 @@ procedure stf_widths (sf, sfd)
 pointer	sf			#I Main data structure
 pointer	sfd			#I Star data structure
 
+errchk	stf_radius, stf_dfwhm, stf_fit
+
 begin
 	call stf_radius (sf, sfd, SF_LEVEL(sf), SFD_R(sfd))
 	call stf_dfwhm (sf, sfd)
@@ -1154,9 +1156,9 @@ begin
 	j = 0
 	do i = 1, np {
 	    z = 1. - max (0., asieval (asi, real(i)))
-	    if (z < 0.8)
+	    if (n > np/3 && z < 0.5)
 		break
-	    if (z > 0.5)
+	    if (n < np/3 || z > 0.5)
 		j = n
 
 	    Memr[x+n] = stf_i2r (real(i)) * SF_SCALE(sf)
@@ -1167,7 +1169,7 @@ begin
 
 	# Gaussian.
 	np = 1
-	params[2] = Memr[x+j] / sqrt (2. * log (1./Memr[y+j]))
+	params[2] = Memr[x+j] / sqrt (2. * log (1./min(0.99,Memr[y+j])))
 	params[1] = 1
 	call nlinitr (nl, locpr (stf_gauss1), locpr (stf_gauss2),
 	    params, params, 2, pfit, np, .001, 100)
@@ -1175,12 +1177,18 @@ begin
 	if (i != SINGULAR && i != NO_DEG_FREEDOM) {
 	    call nlpgetr (nl, params, i)
 	    if (params[2] < 0.)
-		params[2] = Memr[x+j] / sqrt (2. * log (1./Memr[y+j]))
+		params[2] = Memr[x+j] / sqrt (2. * log (1./min(0.99,Memr[y+j])))
 	}
 	SFD_SIGMA(sfd) = params[2]
 	SFD_GFWHM(sfd) = 2 * SFD_SIGMA(sfd) * sqrt (2. * log (2.))
 
 	# Moffat.
+	if (SF_BETA(sf) < 1.1) {
+	    call nlfreer (nl)
+	    call sfree (sp)
+	    call error (1, "Cannot measure FWHM - Moffat beta too small")
+	}
+
 	beta = SF_BETA(sf)
 	if (IS_INDEFR(beta)) {
 	    beta = 2.5
@@ -1189,7 +1197,7 @@ begin
 	    np = 1
 	}
 	params[3] = 1 - beta
-	params[2] = Memr[x+j] / sqrt (Memr[y+j]**(1./params[3]) - 1.)
+	params[2] = Memr[x+j] / sqrt (min(0.99,Memr[y+j])**(1./params[3]) - 1.)
 	params[1] = 1
 	call nlinitr (nl, locpr (stf_moffat1), locpr (stf_moffat2),
 	    params, params, 3, pfit, np, .001, 100)
@@ -1199,7 +1207,7 @@ begin
 	    if (params[2] < 0.) {
 		params[3] = 1. - beta
 		params[2] = Memr[x+j] /
-		    sqrt (Memr[y+j]**(1./params[3]) - 1.)
+		    sqrt (min(0.99,Memr[y+j])**(1./params[3]) - 1.)
 	    }
 	}
 	SFD_ALPHA(sfd) = params[2]

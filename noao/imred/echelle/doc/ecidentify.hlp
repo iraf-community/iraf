@@ -688,6 +688,7 @@ REVISIONS
 .ls ECIDENTIFY V2.11
 The dispersion units are now determined from a user parameter,
 the coordinate list, or the database entry.
+.le
 .ih
 SEE ALSO
 apsum, center1d, gtools, ecreidentify, identify

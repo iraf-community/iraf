@@ -13,7 +13,8 @@ int procedure force_rebin (rv)
 pointer	rv					#I RV struct pointer
 
 pointer sp, dy
-int     npts, dcflag, which, force_which()
+int     npts, dcflag, which, status
+int	force_which(), rv_getim()
 real    w0, wpc, w2
 errchk  realloc
 
@@ -66,9 +67,9 @@ begin
 	w2 = 10.0 ** w2
 	w0 = 10.0 ** w0
 	if (which == OBJECT_SPECTRUM)
-            call rv_getim (rv, IMAGE(rv), OBJECT_SPECTRUM, w0, w2, npts)
+            status = rv_getim (rv, IMAGE(rv), OBJECT_SPECTRUM, w0, w2, npts)
 	else 
-	    call rv_getim (rv, RIMAGE(rv), REFER_SPECTRUM, w0, w2, npts)
+	    status = rv_getim (rv, RIMAGE(rv), REFER_SPECTRUM, w0, w2, npts)
 
 	if (DEBUG(rv)) {
 	    call d_printf (DBG_FD(rv), "\tend: w0,wpc,w2,npts = %g,%g,%g,%d\n")

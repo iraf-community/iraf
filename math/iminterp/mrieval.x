@@ -11,8 +11,8 @@ include <math/iminterp.h>
 
 real procedure mrieval (x, y, datain, nxpix, nypix, len_datain, interp_type)
 
-real	x				# x value
-real	y				# y value
+real	x[ARB]				# x value
+real	y[ARB]				# y value
 real	datain[len_datain,ARB]		# data array
 int	nxpix				# number of x data points
 int	nypix				# number of y data points
@@ -34,15 +34,15 @@ begin
 	switch (interp_type) {
 
 	case II_BINEAREST:
-	    return (datain[int (x+0.5), int (y+0.5)])
+	    return (datain[int (x[1]+0.5), int (y[1]+0.5)])
 
 	case II_BILINEAR:
-	    nx = x
-	    sx = x - nx
+	    nx = x[1]
+	    sx = x[1] - nx
 	    tx = 1. - sx
 
-	    ny = y
-	    sy = y - ny
+	    ny = y[1]
+	    sy = y[1] - ny
 	    ty = 1. - sy
 
 	    # protect against the case where x = nxpix and/or y = nypix
@@ -70,11 +70,16 @@ begin
 
 	    return (value)
 
+	case II_BIDRIZZLE:
+	    call ii_bidriz1 (datain, 0, len_datain, x, y, value, 1, BADVAL)
+
+	    return (value)
+
 	case II_BIPOLY3:
 	    row_length = SPLPTS + 3
 	    nterms = 4
-	    nx = x
-	    ny = y
+	    nx = x[1]
+	    ny = y[1]
 
 	    # major problem is that near the edge the interior polynomial
 	    # must be defined
@@ -145,8 +150,8 @@ begin
 
 
 	    # center the x value and call evaluation routine
-	    xval = 2 + (x - nx)
-	    yval = 2 + (y - ny)
+	    xval = 2 + (x[1] - nx)
+	    yval = 2 + (y[1] - ny)
 	    call ii_bipoly3 (coeff, 0, row_length, xval, yval, value, 1)
 
 	    return (value)
@@ -154,8 +159,8 @@ begin
 	case II_BIPOLY5:
 	    row_length = SPLPTS + 3
 	    nterms = 6
-	    nx = x
-	    ny = y
+	    nx = x[1]
+	    ny = y[1]
 
 	    # major problem is to define interior polynomial near the edge
 
@@ -224,16 +229,16 @@ begin
 	    }
 
 	    # call evaluation routine
-	    xval = 3 + (x - nx)
-	    yval = 3 + (y - ny)
+	    xval = 3 + (x[1] - nx)
+	    yval = 3 + (y[1] - ny)
 	    call ii_bipoly5 (coeff, 0, row_length, xval, yval, value, 1)
 
 	    return (value)
 
 	case II_BISPLINE3:
 	    row_length = SPLPTS + 3
-	    nx = x
-	    ny = y
+	    nx = x[1]
+	    ny = y[1]
 
 	    # allocate space for temporary array and 0 file
 	    call calloc (tmp, row_length * row_length, TY_REAL)
@@ -280,12 +285,18 @@ begin
 	    		      row_length)
 
 	    # evaluate spline
-	    xval = xindex + 1 + (x - nx)
-	    yval = yindex + 1 + (y - ny)
+	    xval = xindex + 1 + (x[1] - nx)
+	    yval = yindex + 1 + (y[1] - ny)
 	    call ii_bispline3 (coeff, 0, row_length, xval, yval, value, 1)
 
 	    # free space
 	    call mfree (tmp, TY_REAL)
+
+	    return (value)
+
+	case II_BISINC, II_BILSINC:
+	    call ii_bisinc (datain, 0, len_datain, nypix, x, y, value, 1,
+	        NSINC, DX, DY)
 
 	    return (value)
 	}

@@ -21,9 +21,9 @@
 *      chairman P.K.Seidelmann, 1980.
 *     Kaplan,G.H., 1981, USNO circular no. 163, pA3-6.
 *
-*  P.T.Wallace   Starlink   September 1987
+*  P.T.Wallace   Starlink   23 August 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -44,7 +44,7 @@
 *  Turns to arc seconds
       PARAMETER (T2AS=1296000D0)
 *  Arc seconds to radians
-      PARAMETER (AS2R=0.4848136811095359949D-05)
+      PARAMETER (AS2R=0.484813681109535994D-5)
 *  Units of 0.0001 arcsec to radians
       PARAMETER (U2R=AS2R/1D4)
 
@@ -58,19 +58,19 @@
 *  FUNDAMENTAL ARGUMENTS in the FK5 reference system
 *
 
-*  Mean longitude of the moon minus mean longitude of the moon's perigee
+*  Mean longitude of the Moon minus mean longitude of the Moon's perigee
       EL=AS2R*(485866.733D0+(1325D0*T2AS+715922.633D0
      :         +(31.310D0+0.064D0*T)*T)*T)
 
-*  Mean longitude of the sun minus mean longitude of the sun's perigee
+*  Mean longitude of the Sun minus mean longitude of the Sun's perigee
       ELP=AS2R*(1287099.804D0+(99D0*T2AS+1292581.224D0
      :         +(-0.577D0-0.012D0*T)*T)*T)
 
-*  Mean longitude of the moon minus mean longitude of the moon's node
+*  Mean longitude of the Moon minus mean longitude of the Moon's node
       F=AS2R*(335778.877D0+(1342D0*T2AS+295263.137D0
      :         +(-13.257D0+0.011D0*T)*T)*T)
 
-*  Mean elongation of the moon from the sun
+*  Mean elongation of the Moon from the Sun
       D=AS2R*(1072261.307D0+(1236D0*T2AS+1105601.328D0
      :         +(-6.891D0+0.019D0*T)*T)*T)
 

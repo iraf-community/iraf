@@ -70,14 +70,10 @@ begin
 	radius = C_RADIUS(ufd)
 
 	dy = abs (C_YCEN(ufd) - y)
-	if (dy < radius) {
-	    if (dy < 0.001)
-		dx = radius
-	    else
-		dx = sqrt (radius**2 - dy**2)
-
-	    x1 = nint (C_XCEN(ufd) - dx)
-	    x2 = nint (C_XCEN(ufd) + dx)
+	if (dy <= radius) {
+	    dx = sqrt (radius**2 - dy**2)
+	    x1 = C_XCEN(ufd) - int(dx)
+	    x2 = C_XCEN(ufd) + int(dx)
 	    x1_clipped = max(1, min(axlen, x1))
 	    x2_clipped = max(1, min(axlen, x2))
 

@@ -110,4 +110,6 @@ noquery_
 	    width = ttystati (tty, TTY_NCOLS)
 	if (height <= 0)
 	    height = ttystati (tty, TTY_NLINES)
+
+	call sfree (sp)
 end

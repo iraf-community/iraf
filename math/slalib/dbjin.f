@@ -9,7 +9,7 @@
 *
 *  The purpose of the syntax extensions is to help cope with mixed
 *  FK4 and FK5 data.  In addition to the syntax accepted by DFLTIN,
-*  the following two extensions are recognised by DBJIN:
+*  the following two extensions are recognized by DBJIN:
 *
 *     1)  A valid non-null field preceded by the character 'B'
 *         (or 'b') is accepted.
@@ -40,7 +40,7 @@
 *
 *  For details of the basic syntax, see slDFLI.
 *
-*  P.T.Wallace   Starlink   November 1984
+*  P.T.Wallace   Starlink   23 November 1995
 *
 *  Copyright (C) 1995 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.

@@ -34,7 +34,7 @@ begin
 	ndim = max (IM_NDIM(im), IM_NPHYSDIM(im))
 	copy = (mode == RF_COPY)
 
-	# Allocate FITS-WCS descriptor.
+	# Allocate and initialize the FITS-WCS descriptor.
 	call calloc (iw, LEN_IMWCS, TY_STRUCT)
 	call calloc (IW_CBUF(iw), LEN_CDES * DEF_MAXCARDS, TY_STRUCT)
 

@@ -1,6 +1,6 @@
 # FITS.H -- IKI/FITS internal definitions.
 
-define	FITS_ORIGIN	"NOAO-IRAF FITS Image Kernel Aug 1 1997"
+define	FITS_ORIGIN	"NOAO-IRAF FITS Image Kernel July 1999"
 
 define	FITS_LENEXTN	4		# max length imagefile extension
 define	SZ_DATATYPE	16		# size of datatype string (eg "REAL*4")
@@ -27,70 +27,75 @@ define	DEF_CACHE	10		# default number of cache entries.
 define	DEF_HDREXTN	"fits"		# default header file extension
 define	ENV_FKINIT	"fkinit"	# FITS kernel initialization
 
+define	DEF_ISOCUTOVER	0		# date when ISO format dates kick in
+define	ENV_ISOCUTOVER	"isodates"	# environment override for default
+
 # FITS image descriptor, used internally by the FITS kernel.  The required
 # header parameters are maintained in this descriptor, everything else is
 # simply copied into the user area of the IMIO descriptor.
 
-define	LEN_FITDES	338
-define	LEN_FITBASE	287
+define	LEN_FITDES	348
+define	LEN_FITBASE	297
 
 define	FIT_ACMODE	Memi[$1]	# image access mode
 define	FIT_PFD		Memi[$1+1]	# pixel file descriptor
 define	FIT_PIXOFF	Memi[$1+2]	# pixel offset
 define	FIT_TOTPIX	Memi[$1+3]	# size of image in pixfile, chars
 define	FIT_IO		Memi[$1+4]	# FITS I/O channel
-define	FIRST_TIMER	Memi[$1+5]	# First time FITZRD is called?
-define	FIT_BSCALE	Memd[P2D($1+6)]
-define	FIT_BZERO	Memd[P2D($1+8)]
-define	FIT_BITPIX	Memi[$1+10]	# bits per pixel
-define	FIT_NAXIS	Memi[$1+11]	# number of axes in image
-define	FIT_LENAXIS	Memi[$1+12+$2-1]# 35:41 = [7] max
-define	FIRST_TIMEW	Memi[$1+20]	# First time FITZWR is called?
-define	FIT_HFD		Memi[$1+21]	# Header file descriptor
-define	FIT_PIXTYPE	Memi[$1+22]
-define	FIT_CACHEHDR	Memi[$1+23]	# Cached main header unit's address.
-define	FIT_CACHEHLEN	Memi[$1+24]	# Lenght of the above.
-define	FIT_IM		Memi[$1+25]	# Has the 'im' descriptor value 
-define	FIT_GROUP	Memi[$1+26]
-define	FIT_NEWIMAGE	Memi[$1+27]	# Newimage flag
-define	FIT_HDRPTR	Memi[$1+28]	# Header data Xtension pointer
-define	FIT_PIXPTR	Memi[$1+29]	# Pixel data Xtension pointer
-define	FIT_NUMOFFS	Memi[$1+30]	# Number of offsets in cache header.
-define	FIT_EOFSIZE	Memi[$1+31]	# Size in char of file before append.
-define	FIT_XTENSION	Memi[$1+32]	# Yes, if an Xtension has been read.
-define	FIT_INHERIT	Memi[$1+33]	# INHERIT header keyword value.
-define	FIT_EXTVER	Memi[$1+34]	# EXTVER value (integer only)
-define	FIT_EXPAND	Memi[$1+35]	# Expand the header?
-define	FIT_MIN		Memr[$1+36]	# Minimum pixel value
-define	FIT_MAX		Memr[$1+37]	# Maximum pixel value
-define	FIT_MTIME	Meml[$1+38]	# Time of last mod. for FITS unit 
-define	FIT_SVNANR	Memr[$1+39]
-define	FIT_SVNAND	Memd[P2D($1+40)]
-define	FIT_SVMAPRIN	Memi[$1+42]
-define	FIT_SVMAPROUT	Memi[$1+43]
-define	FIT_SVMAPDIN	Memi[$1+44]
-define	FIT_SVMAPDOUT	Memi[$1+45]
-define	FIT_EXTEND	Memi[$1+46]	  # FITS extend keyword
-define	FIT_EXTTYPE	Memc[P2C($1+47)]  # extension type
-define	FIT_FILENAME	Memc[P2C($1+87)]  # FILENAME value 
-define	FIT_EXTNAME	Memc[P2C($1+127)] # EXTNAME value 
-define	FIT_DATATYPE	Memc[P2C($1+167)] # datatype string
-define	FIT_TITLE	Memc[P2C($1+207)] # datatype string
-define	FIT_OBJECT	Memc[P2C($1+247)] # datatype string
+define	FIT_ZCNV	Memi[$1+5]	# Set if on-the-fly conversion needed
+define	FIT_IOSTAT	Memi[$1+6]	# I/O status for zfio routines
+			# extra space
+define	FIT_BSCALE	Memd[P2D($1+16)]
+define	FIT_BZERO	Memd[P2D($1+18)]
+define	FIT_BITPIX	Memi[$1+20]	# bits per pixel
+define	FIT_NAXIS	Memi[$1+21]	# number of axes in image
+define	FIT_LENAXIS	Memi[$1+22+$2-1]# 35:41 = [7] max
+define	FIT_ZBYTES	Memi[$1+30]	# Status value for FIT_ZCNV mode
+define	FIT_HFD		Memi[$1+31]	# Header file descriptor
+define	FIT_PIXTYPE	Memi[$1+32]
+define	FIT_CACHEHDR	Memi[$1+33]	# Cached main header unit's address.
+define	FIT_CACHEHLEN	Memi[$1+34]	# Lenght of the above.
+define	FIT_IM		Memi[$1+35]	# Has the 'im' descriptor value 
+define	FIT_GROUP	Memi[$1+36]
+define	FIT_NEWIMAGE	Memi[$1+37]	# Newimage flag
+define	FIT_HDRPTR	Memi[$1+38]	# Header data Xtension pointer
+define	FIT_PIXPTR	Memi[$1+39]	# Pixel data Xtension pointer
+define	FIT_NUMOFFS	Memi[$1+40]	# Number of offsets in cache header.
+define	FIT_EOFSIZE	Memi[$1+41]	# Size in char of file before append.
+define	FIT_XTENSION	Memi[$1+42]	# Yes, if an Xtension has been read.
+define	FIT_INHERIT	Memi[$1+43]	# INHERIT header keyword value.
+define	FIT_EXTVER	Memi[$1+44]	# EXTVER value (integer only)
+define	FIT_EXPAND	Memi[$1+45]	# Expand the header?
+define	FIT_MIN		Memr[$1+46]	# Minimum pixel value
+define	FIT_MAX		Memr[$1+47]	# Maximum pixel value
+define	FIT_MTIME	Meml[$1+48]	# Time of last mod. for FITS unit 
+define	FIT_SVNANR	Memr[$1+49]
+define	FIT_SVNAND	Memd[P2D($1+50)]
+define	FIT_SVMAPRIN	Memi[$1+52]
+define	FIT_SVMAPROUT	Memi[$1+53]
+define	FIT_SVMAPDIN	Memi[$1+54]
+define	FIT_SVMAPDOUT	Memi[$1+55]
+define	FIT_EXTEND	Memi[$1+56]	  # FITS extend keyword
+define	FIT_EXTTYPE	Memc[P2C($1+57)]  # extension type
+define	FIT_FILENAME	Memc[P2C($1+97)]  # FILENAME value 
+define	FIT_EXTNAME	Memc[P2C($1+137)] # EXTNAME value 
+define	FIT_DATATYPE	Memc[P2C($1+177)] # datatype string
+define	FIT_TITLE	Memc[P2C($1+217)] # datatype string
+define	FIT_OBJECT	Memc[P2C($1+257)] # datatype string
 
 # The FKS terms carry the fkinit or kernel section arguments.
-define	FKS_APPEND	Memi[$1+287]	 # YES, NO append an extension
-define	FKS_INHERIT	Memi[$1+288]	 # YES, NO inherit the main header
-define	FKS_OVERWRITE	Memi[$1+289]	 # YES, NO overwrite an extension
-define	FKS_DUPNAME	Memi[$1+290]	 # YES, NO allow duplicated EXTNAME
-define	FKS_EXTVER	Memi[$1+291]	 # YES, NO allow duplicated EXTNAME
-define	FKS_EXPAND	Memi[$1+292]	 # YES, NO expand the header
-define	FKS_PHULINES	Memi[$1+293]	 # Allocated lines in PHU
-define	FKS_EHULINES	Memi[$1+294]	 # Allocated lines in EHU
-define	FKS_PADLINES	Memi[$1+295]	 # Additional lines for HU
-define	FKS_NEWFILE	Memi[$1+296]	 # YES, NO force newfile
-define	FKS_CACHESIZE	Memi[$1+297]	 # size of header cache
-define	FKS_EXTNAME	Memc[P2C($1+298)]     # EXTNAME value
+define	FKS_APPEND	Memi[$1+297]	 # YES, NO append an extension
+define	FKS_INHERIT	Memi[$1+298]	 # YES, NO inherit the main header
+define	FKS_OVERWRITE	Memi[$1+299]	 # YES, NO overwrite an extension
+define	FKS_DUPNAME	Memi[$1+300]	 # YES, NO allow duplicated EXTNAME
+define	FKS_EXTVER	Memi[$1+301]	 # YES, NO allow duplicated EXTNAME
+define	FKS_EXPAND	Memi[$1+302]	 # YES, NO expand the header
+define	FKS_PHULINES	Memi[$1+303]	 # Allocated lines in PHU
+define	FKS_EHULINES	Memi[$1+304]	 # Allocated lines in EHU
+define	FKS_PADLINES	Memi[$1+305]	 # Additional lines for HU
+define	FKS_NEWFILE	Memi[$1+306]	 # YES, NO force newfile
+define	FKS_CACHESIZE	Memi[$1+307]	 # size of header cache
+define	FKS_EXTNAME	Memc[P2C($1+308)]     # EXTNAME value
 
 
 # Reserved FITS keywords known to this code.

@@ -15,8 +15,9 @@ int	keycode[MAX_OPTIONS]
 int	oplen, key, ip, match
 int	strlen(), strncmp()
 
-string	keywords "help|sources|sysdoc|alldoc|files|summary|directory|"
-data	keycode /O_HELP,O_SOURCE,O_SYSDOC,O_ALLDOC,O_FILES,O_SUMMARY,O_DIR/
+string	keywords "help|sources|sysdoc|alldoc|files|summary|directory|references"
+data	keycode /O_HELP,O_SOURCE,O_SYSDOC,O_ALLDOC,O_FILES,O_SUMMARY,O_DIR,
+		 O_REFERENCES/
 
 begin
 	oplen = strlen (opstr)

@@ -13,6 +13,7 @@ int	stream			# graphics stream (for grc_command)
 
 int	ip, ch
 string	keys KEYSTROKES
+errchk	malloc
 
 begin
 	if (rc == NULL)

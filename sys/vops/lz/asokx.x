@@ -1,5 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <mach.h>
+
 # ASOK -- Select the Kth smallest element from a vector.  The algorithm used
 # is selection by tail recursion (Gonnet 1984).  In each iteration a pivot key
 # is selected (somewhat arbitrarily) from the array.  The array is then split
@@ -14,6 +16,10 @@
 # N.B.: Behaviour is O(N) if the input array is sorted.
 # N.B.: The cases ksel=1 and ksel=npix, i.e., selection of the minimum and
 # maximum values, are more efficiently handled by ALIM which is O(2N).
+#
+# Jul99 - The above algorithm was found to be pathologically slow in cases
+# where many or all elements of the array are equal.  The version of the
+# algorithm below, from Wirth, appears to avoid this problem.
 
 complex procedure asokx (a, npix, ksel)
 
@@ -21,8 +27,8 @@ complex	a[ARB]			# input array
 int	npix			# number of pixels
 int	ksel			# element to be selected
 
-int	lo, up, i, j, k
-complex	temp
+int	lo, up, i, j, k, dummy
+complex	temp, wtemp
 real	abs_temp
 
 begin
@@ -30,28 +36,29 @@ begin
 	up = npix
 	k  = max (lo, min (up, ksel))
 
-	while (up >= k && k >= lo) {
-	    i = lo
-	    j = up
-	    temp = a[k];  a[k] = a[lo];  a[lo] = temp
+	# while (lo < up)
+	do dummy = 1, MAX_INT {
+	    if (! (lo < up))
+		break
+
+	    temp = a[k];  i = lo;  j = up
 	    abs_temp = abs (temp)
 
-	    # Split array into two.
-	    while (i < j) {
-		while (abs (a[j]) > abs_temp)
-		    j = j - 1
-		a[i] = a[j]
-		while (i < j && abs (a[i]) <= abs_temp)
+	    repeat {
+		while (abs (a[i]) < abs_temp)
 		    i = i + 1
-		a[j] = a[i]
-	    }
-	    a[i] = temp
+		while (abs_temp < abs (a[j]))
+		    j = j - 1
+		if (i <= j) {
+		    wtemp = a[i];  a[i] = a[j];  a[j] = wtemp
+		    i = i + 1;  j = j - 1
+		}
+	    } until (i > j)
 
-	    # Select the subarray containing the Kth element.
+	    if (j < k)
+		lo = i
 	    if (k < i)
-		up = i - 1
-	    else
-		lo = i + 1
+		up = j
 	}
 
 	return (a[k])

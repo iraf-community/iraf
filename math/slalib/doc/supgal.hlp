@@ -1,4 +1,4 @@
-.help supgal Nov95 "Slalib Package"
+.help supgal Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slSUGA (DSL, DSB, DL, DB)

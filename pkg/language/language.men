@@ -49,6 +49,7 @@ Builtin Commands and Functions:
       flprcache - Flush the process cache
 	 fprint * Print a line into a parameter
 	  fscan * Scan a list
+	 fscanf * Formatted read from a file, or another parameter
 	 gflush - Flush any buffered graphics output
        hidetask - Make a task invisible to the user
         history - Display  commands previously executed
@@ -62,12 +63,14 @@ Builtin Commands and Functions:
 	   osfn - Return the host system equivalent of an IRAF filename
         package - Define a new package, or print the current package names
         prcache - Show process cache, or lock a process into the cache
-	  print - Format and print a line on the standard output
+	  print - Print a line on the standard output
+	 printf - Formatted print to the standard output
          putlog - Put a message to the logfile
 	  radix - Encode a number in the specified radix
        redefine - Redefine a task
 	  reset - Reset the value of an environment variable
 	   scan * Scan the standard input
+	  scanf * Formatted read from the standard input
         service - Service a query from a background job
 	    set - Set an environment variable
            show - Show an environment variable

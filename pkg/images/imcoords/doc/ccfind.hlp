@@ -1,4 +1,4 @@
-.help ccfind Jun97 images.imcoords
+.help ccfind Jun99 images.imcoords
 .ih
 NAME
 ccfind -- locate objects in an image given a celestial coordinate list and
@@ -40,9 +40,9 @@ supergalactic systems.
 The input celestial coordinate system. The \fIinsystem\fR parameter
 sets the preferred units for the input celestial coordinates, and
 tells CCFIND how to transform the input celestial coordinates 
-the input image celestial coordinate system. The two systems of most
-interest to users are "j2000" and "b1950".  The full set of options are
-the following:
+the input image celestial coordinate system. The systems of most
+interest to users are "icrs", "j2000", and "b1950".  The full set
+of options are the following:
 
 .ls equinox [epoch]
 The equatorial mean place post-IAU 1976 (FK5) system if equinox is a
@@ -56,6 +56,17 @@ epoch, a Besselian epoch, or a Julian date. Julian epochs
 are prefixed by a J or j, Besselian epochs by a B or b.
 Epochs without the J / j or B / b prefix default to the epoch type of
 equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls icrs [equinox] [epoch]
+The Internaltion Celestial Refernce System (ICRS) where equinox is
+a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
+Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
+The default value of equinox is J2000.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
 a Julian date.  If undefined epoch defaults to equinox.
 .le
 .ls fk5 [equinox] [epoch]
@@ -134,9 +145,9 @@ a Julian date. The default value of epoch is B1950.0.
 .le
 
 In all the above cases fields in [] are optional with the defaults as
-described. The epoch field for the fk5, galactic, and supergalactic
+described. The epoch field for the icrs, fk5, galactic, and supergalactic
 coordinate systems is only used if the input coordinates are in the
-equatorial fk4, noefk4, or fk5 systems and proper motions are supplied.
+equatorial fk4, noefk4, fk5, or icrs systems and proper motions are supplied.
 Since CCFIND does not currently support proper motions these fields are
 not required.
 .le
@@ -190,7 +201,7 @@ the celestial coordinate system of the reference point defaults to the
 celestial coordinate system of the input coordinates \fIinsystem\fR.
 .le
 .ls projection = "tan"
-The sky projection geometry. The most commonly used projections in
+The sky projection geometry. The most comnonly used projections in
 astronomy are "tan", "arc", "sin", and "lin". Other supported projections
 are "ait", "car", "csc", "gls", "mer", "mol", "par", "pco", "qsc", "stg",
 "tsc", and "zea".
@@ -254,8 +265,9 @@ The input celestial coordinate system is set by the \fIinsystem\fR parameter,
 and must be one of the following: equatorial, ecliptic, galactic, or
 supergalactic.  The equatorial coordinate systems must be one of: 1) FK4,
 the mean place pre-IAU 1976 system, 2) FK4-NO-E, the same as FK4 but without
-the E-terms, 3) FK5, the mean place post-IAU 1976 system, 4) GAPPT, the
-geocentric apparent place in the post-IAU 1976 system.
+the E-terms, 3) FK5, the mean place post-IAU 1976 system, 4) ICRS the
+International Celestial Reference System, 5) GAPPT, the geocentric apparent
+place in the post-IAU 1976 system.
 
 The \fIlngunits\fR and \fIlatunits\fR parameters set the units of the input
 celestial coordinates. If undefined, lngunits and latunits assume sensible

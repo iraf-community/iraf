@@ -17,8 +17,8 @@
 *     XI,ETA    d       tangent plane coordinates of star
 *     J         i       status:   0 = OK
 *                                 1 = error, star too far from axis
-*                                 2 = error, antistar too far from axis
-*                                 3 = error, antistar on tangent plane
+*                                 2 = error, antistar on tangent plane
+*                                 3 = error, antistar too far from axis
 *
 *  Notes:
 *
@@ -30,9 +30,9 @@
 *
 *  3  This routine is the Cartesian equivalent of the routine slDSTP.
 *
-*  P.T.Wallace   Starlink   11 February 1995
+*  P.T.Wallace   Starlink   27 November 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -57,7 +57,7 @@
       R=SQRT(R2)
       IF (R.EQ.0D0) THEN
          R=1D-20
-         X=R
+         X0=R
       END IF
       W=X*X0+Y*Y0
       D=W+Z*Z0

@@ -82,9 +82,10 @@ long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
  * the file system, etc. is initialized.  When we exit we signal that the
  * interpreter be skipped, proceeding directly to process shutdown.
  */
-c_main (prtype, bkgfile)
+c_main (prtype, bkgfile, cmd)
 int	*prtype;		/* process type (connected, detached)	*/
 PKCHAR	*bkgfile;		/* bkgfile filename if detached		*/
+PKCHAR	*cmd;			/* host command line			*/
 {
 	int	bp;
 
@@ -112,7 +113,7 @@ PKCHAR	*bkgfile;		/* bkgfile filename if detached		*/
 	    clkstart = c_clktime (0L);
 	    execute (BACKGROUND);
 	} else {
-	    login();
+	    login ((char *) cmd);
 	    execute (FOREGROUND);
 	    logout();
 	    execute (FOREGROUND);
@@ -323,14 +324,18 @@ bkg:
  * Add the builtin function ltasks.  Run the startup file as the stdin of cl.
  * If any of this fails, we die.
  */
-login ()
+login (cmd)
+char *cmd;
 { 
 	register struct task *tp;
+	register char *ip, *op;
 	struct	ltask *ltp;
 	struct	operand o;
 	char	*loginfile = LOGINFILE;
+	char	alt_loginfile[SZ_PATHNAME];
 	char	clstartup[SZ_PATHNAME];
 	char	clprocess[SZ_PATHNAME];
+	char	*arglist;
 
 	strcpy (clstartup, HOSTLIB);
 	strcat (clstartup, CLSTARTUP);
@@ -408,9 +413,48 @@ login ()
 	if (setjmp (jumpcom))
 	    onerr();
 
-	if (c_access (loginfile,0,0) == NO)
+	/* Nondestructively decompose the host command line into the startup
+	 * filename and/or the argument string.
+	 */
+	if (strncmp (cmd, "-f", 2) == 0) {
+	    for (ip=cmd+2;  *ip && isspace(*ip);  ip++)
+		;
+	    for (op=alt_loginfile;  *ip && ! isspace(*ip);  *op++ = *ip++)
+		;
+	    *op = EOS;
+
+	    for (  ;  *ip && isspace(*ip);  ip++)
+		;
+	    arglist = ip;
+
+	} else {
+	    *alt_loginfile = EOS;
+	    arglist = cmd;
+	}
+
+	/* Copy any user supplied host command line arguments into the
+	 * CL parameter $args to use in the startup script (for instance).
+	 */
+	o.o_type = OT_STRING;
+	strcpy (o.o_val.v_s, arglist);
+	compile (PUSHCONST, &o);
+	compile (ASSIGN, "args");
+
+	if (alt_loginfile[0]) {
+	    if (c_access (alt_loginfile,0,0) == NO)
+		printf ("Warning: script file %s not found\n", alt_loginfile);
+	    else {
+		o.o_val.v_s = alt_loginfile;
+		compile (CALL, "cl");
+		compile (PUSHCONST, &o);
+		compile (REDIRIN);
+		compile (EXEC);
+	    }
+
+	} else if (c_access (loginfile,0,0) == NO) {
 	    printf ("Warning: no login.cl found in login directory\n");
-	else {
+
+	} else {
 	    o.o_val.v_s = loginfile;
 	    compile (CALL, "cl");
 	    compile (PUSHCONST, &o);

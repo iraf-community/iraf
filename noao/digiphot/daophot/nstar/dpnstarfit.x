@@ -341,6 +341,8 @@ begin
 		    sigmasq = pred_pixval / DP_PHOTADU (dao) + read_noise + 
 		        (perr * pred_pixval) ** 2 + (peakerr *
 		        (pred_pixval - sky_value)) ** 2
+		    if (sigmasq <= 0.0)
+			next
 		    relerr = abs (ds) / sqrt (sigmasq)
 
 		    # Add this residual into the weighted sum of the

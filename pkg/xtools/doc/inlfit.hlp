@@ -140,7 +140,6 @@ typing "help gtools".
 .ls I
 Interrupt the task immediately without saving the current fit.
 .le
-.le
 
 Colon commands are used to show or set the values of parameters.
 The application program calling \fBinlfit\fR can add more commands.

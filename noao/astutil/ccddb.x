@@ -130,41 +130,76 @@ end
 
 # DBGETD -- Get double database parameter.
 
-double procedure dbgetd (db, param)
+double procedure dbgetd (db, param, arg1, arg2)
 
 pointer	db			# Database symbol table pointer
 char	param[ARB]		# Database parameter
+char	arg1[ARB], arg2[ARB]	# Optional arguments
 
+char	str[SZ_LINE]
 int	ip, ctod()
 double	dval
-pointer	sym, stfind()
-errchk	dberror
+errchk	dbgstr
 
 begin
-	sym = stfind (db, param)
-	if (sym == NULL)
-	    call dberror ("DBGETD: Database parameter not found", param)
+	call dbgstr (db, param, arg1, arg2, str, SZ_LINE)
+
 	ip = 1
-	if (ctod (DBVAL(sym), ip, dval) <= 0)
+	if (ctod (str, ip, dval) <= 0)
 	    call dberror ("DBGETD: Database parameter not double", param)
 	return (dval)
 end
 
 
-# DBGSTR -- Get string valued observatory parameter.
+# DBGSTR -- Get string valued parameter.
 
-procedure dbgstr (db, param, str, maxchar)
+procedure dbgstr (db, param, arg1, arg2, str, maxchar)
 
 pointer	db			# Database symbol table pointer
 char	param[ARB]		# Database parameter
+char	arg1[ARB], arg2[ARB]	# Optional arguments
 char	str[maxchar]		# Database parameter value
 int	maxchar			# Maximum characters for string
 
-pointer	sym, stfind()
+pointer	sp, param1, sym, stfind()
 errchk	dberror
 
 begin
-	sym = stfind (db, param)
+	call smark (sp)
+	call salloc (param1, SZ_LINE, TY_CHAR)
+
+	sym = NULL
+	if (arg1[1] != EOS && arg2[1] != EOS) {
+	    call sprintf (Memc[param1], SZ_LINE, "%s(%s,%s)")
+		call pargstr (param)
+		call pargstr (arg1)
+		call pargstr (arg2)
+	    sym = stfind (db, Memc[param1])
+	    if (sym == NULL) {
+		call sprintf (Memc[param1], SZ_LINE, "%s(%s,%s)")
+		    call pargstr (param)
+		    call pargstr (arg2)
+		    call pargstr (arg1)
+		sym = stfind (db, Memc[param1])
+	    }
+	}
+	if (sym == NULL && arg1[1] != EOS) {
+	    call sprintf (Memc[param1], SZ_LINE, "%s(%s)")
+		call pargstr (param)
+		call pargstr (arg1)
+	    sym = stfind (db, Memc[param1])
+	}
+	if (sym == NULL && arg2[1] != EOS) {
+	    call sprintf (Memc[param1], SZ_LINE, "%s(%s)")
+		call pargstr (param)
+		call pargstr (arg2)
+	    sym = stfind (db, Memc[param1])
+	}
+	if (sym == NULL)
+	    sym = stfind (db, param)
+
+	call sfree (sp)
+
 	if (sym == NULL)
 	    call dberror ("DBGSTR: Database parameter not found", param)
 	call strcpy (DBVAL(sym), str, maxchar)

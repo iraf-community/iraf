@@ -1,4 +1,4 @@
-.help fk425 Nov95 "Slalib Package"
+.help fk425 Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slFK45 (R1950,D1950,DR1950,DD1950,P1950,V1950,

@@ -86,4 +86,5 @@ value =	mct_get[csilrdxp] (table, row, col)	    Get value randomly
 
 	mct_sput[csilrdxp] (table, value)	    Put value sequentialy
 stat  = mct_sget[csilrdxp] (table, value)	    Get value sequentialy
+.fi
 .endhelp

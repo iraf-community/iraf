@@ -512,6 +512,7 @@ fractional part) but with varying magnitudes is desired then by
 putting the word "yes" as the eighth field the model will be saved
 the first time and reused subsequent times.  This speeds up the execution.
 There may certain algorithm testing situations where this might be useful. 
+.le
 .ih
 EXAMPLES
 1. Create a galaxy cluster with a power law distribution of field galaxies

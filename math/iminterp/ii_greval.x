@@ -1,5 +1,8 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <math.h>
+include <math/iminterp.h>
+
 # II_GRNEAREST -- Procedure to evaluate the nearest neighbour interpolant on
 # a rectangular grid. The procedure assumes that 1 <= x <= nxpix and
 # that 1 <= y <= nypix. The x and y vectors must be sorted in increasing
@@ -206,10 +209,14 @@ begin
 		xindex= row_index + Memi[nx+i-1]
 
 		if (Memi[nx+i-1] != nxold) {
-		    cd20x = 1./6. * (coeff[xindex+1] - 2. * coeff[xindex] +
-		           coeff[xindex-1])
-		    cd21x = 1./6. * (coeff[xindex+2] - 2. * coeff[xindex+1] +
-			    coeff[xindex])
+		    #cd20x = 1./6. * (coeff[xindex+1] - 2. * coeff[xindex] +
+		           #coeff[xindex-1])
+		    #cd21x = 1./6. * (coeff[xindex+2] - 2. * coeff[xindex+1] +
+			    #coeff[xindex])
+		    cd20x = (coeff[xindex+1] - 2. * coeff[xindex] +
+		           coeff[xindex-1]) / 6.
+		    cd21x = (coeff[xindex+2] - 2. * coeff[xindex+1] +
+			    coeff[xindex]) / 6.0
 		}
 
 		Memr[lbuf+i-1] = Memr[sx+i-1] * (coeff[xindex+1] +
@@ -241,12 +248,16 @@ begin
 	    do i = 1, nxpts {
 
 		# calculate central differences in y
-		if (nyold != ny) {
-		    cd20y = 1./6. * (Memr[lbufp1+i-1] - 2. * Memr[lbuf+i-1] +
-			    Memr[lbufm1+i-1])
-		    cd21y = 1./6. * (Memr[lbufp2+i-1] - 2. *
-		    	    Memr[lbufp1+i-1] + Memr[lbuf+i-1])
-		}
+		#if (nyold != ny) {
+		    #cd20y = 1./6. * (Memr[lbufp1+i-1] - 2. * Memr[lbuf+i-1] +
+			    #Memr[lbufm1+i-1])
+		    #cd21y = 1./6. * (Memr[lbufp2+i-1] - 2. *
+		    	    #Memr[lbufp1+i-1] + Memr[lbuf+i-1])
+		    cd20y = (Memr[lbufp1+i-1] - 2. * Memr[lbuf+i-1] +
+			    Memr[lbufm1+i-1]) / 6.0
+		    cd21y = (Memr[lbufp2+i-1] - 2. * Memr[lbufp1+i-1] +
+		    	    Memr[lbuf+i-1]) / 6.0
+		#}
 
 		# interpolate in y
 		zfit[i,j] =  sy * (Memr[lbufp1+i-1] + sy2m1 * cd21y) +
@@ -254,7 +265,7 @@ begin
 
 	    }
 
-	    nyold = ny
+	    #nyold = ny
 	}
 
 	# free work space
@@ -337,16 +348,26 @@ begin
 		xindex = row_index + Memi[nx+i-1]
 
 		if (Memi[nx+i-1] != nxold) {
-		    cd20x = 1./6. * (coeff[xindex+1] - 2. * coeff[xindex] +
-		            coeff[xindex-1])
-		    cd21x = 1./6. * (coeff[xindex+2] - 2. * coeff[xindex+1] +
-			    coeff[xindex])
-		    cd40x = 1./120. * (coeff[xindex-2] - 4. * coeff[xindex-1] +
+		    #cd20x = 1./6. * (coeff[xindex+1] - 2. * coeff[xindex] +
+		            #coeff[xindex-1])
+		    #cd21x = 1./6. * (coeff[xindex+2] - 2. * coeff[xindex+1] +
+			    #coeff[xindex])
+		    cd20x = (coeff[xindex+1] - 2. * coeff[xindex] +
+		            coeff[xindex-1]) / 6.0
+		    cd21x = (coeff[xindex+2] - 2. * coeff[xindex+1] +
+			    coeff[xindex]) / 6.0
+		    #cd40x = 1./120. * (coeff[xindex-2] - 4. * coeff[xindex-1] +
+			    #6. * coeff[xindex] - 4. * coeff[xindex+1] +
+			    #coeff[xindex+2])
+		    #cd41x = 1./120. * (coeff[xindex-1] - 4. * coeff[xindex] +
+			    #6. * coeff[xindex+1] - 4. * coeff[xindex+2] +
+			    #coeff[xindex+3])
+		    cd40x = (coeff[xindex-2] - 4. * coeff[xindex-1] +
 			    6. * coeff[xindex] - 4. * coeff[xindex+1] +
-			    coeff[xindex+2])
-		    cd41x = 1./120. * (coeff[xindex-1] - 4. * coeff[xindex] +
+			    coeff[xindex+2]) / 120.0
+		    cd41x = (coeff[xindex-1] - 4. * coeff[xindex] +
 			    6. * coeff[xindex+1] - 4. * coeff[xindex+2] +
-			    coeff[xindex+3])
+			    coeff[xindex+3]) / 120.0
 		}
 
 		Memr[lbuf+i-1] = Memr[sx+i-1] * (coeff[xindex+1] +
@@ -386,18 +407,28 @@ begin
 	    do i = 1, nxpts {
 
 		# calculate central differences
-		if (nyold != ny) {
-		    cd20y = 1./6. * (Memr[lbufp1+i-1] - 2. * Memr[lbuf+i-1] +
-			    Memr[lbufm1+i-1])
-		    cd21y = 1./6. * (Memr[lbufp2+i-1] - 2. *
-		    	    Memr[lbufp1+i-1] + Memr[lbuf+i-1])
-		    cd40y = 1./120. * (Memr[lbufm2+i-1] -
+		#if (nyold != ny) {
+		    #cd20y = 1./6. * (Memr[lbufp1+i-1] - 2. * Memr[lbuf+i-1] +
+			    #Memr[lbufm1+i-1])
+		    #cd21y = 1./6. * (Memr[lbufp2+i-1] - 2. *
+		    	    #Memr[lbufp1+i-1] + Memr[lbuf+i-1])
+		    cd20y = (Memr[lbufp1+i-1] - 2. * Memr[lbuf+i-1] +
+			    Memr[lbufm1+i-1]) / 6.
+		    cd21y = (Memr[lbufp2+i-1] - 2. *
+		    	    Memr[lbufp1+i-1] + Memr[lbuf+i-1]) / 6.
+		    #cd40y = 1./120. * (Memr[lbufm2+i-1] -
+		    	    #4. * Memr[lbufm1+i-1] + 6. * Memr[lbuf+i-1] -
+			    #4. * Memr[lbufp1+i-1] + Memr[lbufp2+i-1])
+		    #cd41y = 1./120. * (Memr[lbufm1+i-1] - 4. * 
+		    	    #Memr[lbuf+i-1] + 6. * Memr[lbufp1+i-1] - 4. *
+			    #Memr[lbufp2+i-1] + Memr[lbufp3+i-1])
+		    cd40y = (Memr[lbufm2+i-1] -
 		    	    4. * Memr[lbufm1+i-1] + 6. * Memr[lbuf+i-1] -
-			    4. * Memr[lbufp1+i-1] + Memr[lbufp2+i-1])
-		    cd41y = 1./120. * (Memr[lbufm1+i-1] - 4. * 
+			    4. * Memr[lbufp1+i-1] + Memr[lbufp2+i-1]) / 120.
+		    cd41y = (Memr[lbufm1+i-1] - 4. * 
 		    	    Memr[lbuf+i-1] + 6. * Memr[lbufp1+i-1] - 4. *
-			    Memr[lbufp2+i-1] + Memr[lbufp3+i-1])
-		}
+			    Memr[lbufp2+i-1] + Memr[lbufp3+i-1]) / 120.0
+		#}
 
 		# interpolate in y
 		zfit[i,j] = sy * (Memr[lbufp1+i-1] + sy2m1 *
@@ -407,7 +438,7 @@ begin
 
 	    }
 
-	    nyold = ny
+	    #nyold = ny
 	}
 
 	# release work space
@@ -514,5 +545,315 @@ begin
 	}
 
 	# release working space
+	call sfree (sp)
+end
+
+# II_GRSINC -- Procedure to evaluate the sinc interpolant on a rectangular
+# grid. The procedure assumes that 1 <= x <= nxpix and  that 1 <= y <= nypix.
+# The x and y vectors must be sorted in increasing value of x and y such that
+# x[i] < x[i+1] and y[i] < y[i+1]. The routine outputs a grid of nxpix by
+# nypix points using the coeff array where coeff[1+first_point] = datain[1,1]
+# The sinc truncation length is nsinc. The taper is a cosine bell function
+# which is approximated by a quartic polynomial which is valid for 0  <= x
+# <= PI / 2 (Abramowitz and Stegun 1972, Dover Publications, p 76). If the
+# point to be interpolated is less than mindx and mindy from a data point
+# no interpolation is done and the data point itself is returned.
+
+procedure ii_grsinc (coeff, first_point, len_coeff, len_array, x, y, zfit,
+		nxpts, nypts, len_zfit, nsinc, mindx, mindy)
+
+real	coeff[ARB]		# 1D coefficient array
+int	first_point		# offset of first data point
+int	len_coeff		# row length of coeff 
+int	len_array		# column length of coeff 
+real	x[nxpts]		# array of x values
+real	y[nypts]		# array of y values
+real	zfit[len_zfit,ARB]	# array of interpolatedvalues
+int	nxpts			# number of x values
+int	nypts			# number of y values
+int	len_zfit		# row length of zfit
+int	nsinc			# sinc interpolant truncation length
+real	mindx, mindy		# the precision of the interpolant.
+
+int	i, j, k, nconv, nymin, nymax, nylines
+int	ixy, index, minj, maxj, offj
+pointer	sp, taper, ac, ixn, work, pac, pwork, ppwork
+real	sconst, a2, a4, dxy, dxyn, dx2, axy, pxy, sumxy, fdxy
+
+begin
+	# Compute the limits of the convolution in y.
+	nconv = 2 * nsinc + 1
+	nymin = max (1, nint (y[1]) - nsinc)
+	#nymin = max (1, int (y[1]) - nsinc)
+	nymax = min (len_array, nint (y[nypts]) + nsinc)
+	#nymax = min (len_array, int (y[nypts]) + nsinc)
+	nylines = nymax - nymin + 1
+
+	# Allocate working space.
+	call smark (sp)
+	call salloc (taper, nconv, TY_REAL)
+	call salloc (ac, nconv * max (nxpts, nypts), TY_REAL)
+	call salloc (ixn, max (nxpts, nypts), TY_INT)
+	call salloc (work, nxpts * nylines, TY_REAL)
+
+	# Compute the parameters of the cosine bell taper.
+	sconst = (HALFPI / nsinc) ** 2
+	a2 = -0.49670
+	a4 = 0.03705
+	if (mod (nsinc, 2) == 0)
+	    fdxy = 1.0
+	else
+	    fdxy = -1.0
+	do i = -nsinc, nsinc {
+	    dx2 = sconst * i * i
+	    Memr[taper+i+nsinc] = fdxy * (1.0 + a2 * dx2 + a4 * dx2 * dx2) ** 2
+	    fdxy = -fdxy
+	}
+
+	# Compute the x interpolants for each shift in x.
+	pac = ac
+	do i = 1, nxpts {
+	    ixy = nint (x[i])
+	    Memi[ixn+i-1] = ixy
+	    dxy = x[i] - ixy
+	    #dxyn = -1 - nsinc - dxy
+	    dxyn = 1 + nsinc + dxy
+	    sumxy = 0.0
+	    do j = 1, nconv {
+		#axy = j + dxyn
+		axy = dxyn - j
+		if (axy == 0.0)
+		    pxy = 1.0
+		else if (dxy == 0.0)
+		    pxy = 0.0
+		else
+		    pxy = Memr[taper+j-1] / axy 
+		Memr[pac+j-1] = pxy
+		sumxy = sumxy + pxy
+	    }
+	    call adivkr (Memr[pac], sumxy, Memr[pac], nconv)
+	    pac = pac + nconv
+	}
+
+	# Do the convolutions in the x direction.
+	pwork = work
+	do k = nymin, nymax {
+	    index = first_point + (k - 1) * len_coeff
+	    pac = ac
+	    do i = 1, nxpts {
+		sumxy = 0.0
+		ixy = Memi[ixn+i-1]
+		minj = max (1, ixy - nsinc)
+		maxj = min (len_coeff, ixy + nsinc)
+		offj = -ixy + nsinc 
+		do j = ixy - nsinc, minj - 1
+		    sumxy = sumxy + Memr[pac+j+offj] * coeff[index+1] 
+		do j = minj, maxj
+		    sumxy = sumxy + Memr[pac+j+offj] * coeff[index+j] 
+		do j = maxj + 1, ixy + nsinc
+		    sumxy = sumxy + Memr[pac+j+offj] * coeff[index+len_coeff] 
+	        Memr[pwork+i-1] = sumxy
+		pac = pac + nconv
+	    }
+	    pwork = pwork + nxpts
+	}
+
+	# Compute the y interpolants for each shift in y.
+	pac = ac
+	do i = 1, nypts {
+	    ixy = nint (y[i])
+	    dxy = y[i] - ixy
+	    Memi[ixn+i-1] = ixy - nsinc - nymin + 1
+	    #dxyn = -1 - nsinc - dxy
+	    dxyn = 1 + nsinc + dxy
+	    sumxy = 0.0
+	    do j = 1, nconv {
+		#axy = j + dxyn
+		axy = dxyn - j
+		if (axy == 0.0)
+		    pxy = 1.0
+		else if (dxy == 0.0)
+		    pxy = 0.0
+		else
+		    pxy = Memr[taper+j-1] / axy 
+		Memr[pac+j-1] = pxy
+		sumxy = sumxy + pxy
+	    }
+	    call adivkr (Memr[pac], sumxy, Memr[pac], nconv)
+	    pac = pac + nconv
+	}
+
+	# Do the interpolation in y.
+	do k = 1, nxpts {
+	    pwork = work + k - 1
+	    pac = ac
+	    do i = 1, nypts {
+		ixy = min (nylines, max (1, Memi[ixn+i-1]))
+		ppwork = pwork + (ixy - 1) * nxpts
+		sumxy = 0.0
+		do j = 1, nconv {
+		    sumxy = sumxy + Memr[pac+j-1] * Memr[ppwork]
+		    ppwork = ppwork + nxpts
+		}
+		pac = pac + nconv
+		zfit[k,i] = sumxy 
+	    }
+	}
+
+	call sfree (sp)
+end
+
+
+# II_GRLSINC -- Procedure to evaluate the sinc interpolant on a rectangular
+# grid. The procedure assumes that 1 <= x <= nxpix and  that 1 <= y <= nypix.
+# The x and y vectors must be sorted in increasing value of x and y such that
+# x[i] < x[i+1] and y[i] < y[i+1]. The routine outputs a grid of nxpix by
+# nypix points using the coeff array where coeff[1+first_point] = datain[1,1]
+# The sinc truncation length is nsinc. The taper is a cosine bell function
+# which is approximated by a quartic polynomial which is valid for 0  <= x
+# <= PI / 2 (Abramowitz and Stegun 1972, Dover Publications, p 76). If the
+# point to be interpolated is less than mindx and mindy from a data point
+# no interpolation is done and the data point itself is returned.
+
+procedure ii_grlsinc (coeff, first_point, len_coeff, len_array, x, y, zfit,
+		nxpts, nypts, len_zfit, ltable, nconv, nxincr, nyincr,
+		mindx, mindy)
+
+real	coeff[ARB]				# 1D coefficient array
+int	first_point				# offset of first data point
+int	len_coeff				# row length of coeff 
+int	len_array				# column length of coeff 
+real	x[nxpts]				# array of x values
+real	y[nypts]				# array of y values
+real	zfit[len_zfit,ARB]			# array of interpolated values
+int	nxpts					# number of x values
+int	nypts					# number of y values
+int	len_zfit				# row length of zfit
+real	ltable[nconv,nconv,nxincr,nyincr]	# pre-computed sinc lut
+int	nconv					# sinc trunction full-width
+int	nxincr, nyincr				# resolution of look-up table
+real	mindx, mindy				# the precision of interpolant
+
+int	j
+pointer	sp, ytmp
+
+begin
+	# Allocate working space.
+	call smark (sp)
+	call salloc (ytmp, nxpts, TY_REAL)
+
+	do j = 1, nypts {
+	    call amovkr (y[j], Memr[ytmp], nxpts)
+	    call ii_bilsinc (coeff, first_point, len_coeff, len_array, x,
+	        Memr[ytmp], zfit[1,j], nxpts, ltable, nconv, nxincr, nyincr,
+		mindx, mindy)
+	}
+
+	call sfree (sp)
+end
+
+
+# II_GRDRIZ -- Procedure to evaluate the drizzle interpolant on a rectangular
+# grid. The procedure assumes that the x and y intervals are ordered from
+# smallest to largest
+
+procedure ii_grdriz (coeff, first_point, len_coeff, len_array, x, y, zfit,
+	nxpts, nypts, len_zfit, xfrac, yfrac, badval)
+
+real	coeff[ARB]		# 1D coefficient array
+int	first_point		# offset of first data point
+int	len_coeff		# row length of coeff 
+int	len_array		# column length of coeff 
+real	x[ARB]			# array of x values
+real	y[ARB]			# array of y values
+real	zfit[len_zfit,ARB]	# array of interpolatedvalues
+int	nxpts			# number of x values
+int	nypts			# number of y values
+int	len_zfit		# row length of zfit
+real	xfrac, yfrac		# the x and y pixel fractions
+real	badval			# bad value
+
+int	i, j, jj, nylmin, nylmax, nylines
+int	cindex, neara, nearb
+pointer	sp, work, xindex
+real	ymin, ymax, dy, accum, waccum, hyfrac
+
+begin
+	ymin = min (y[1], y[2])
+	ymax = max (y[2*nypts-1], y[2*nypts])
+	nylmin = int (ymin + 0.5) 
+	nylmax = int (ymax + 0.5)
+	nylines = nylmax - nylmin + 1
+
+	call smark (sp)
+	call salloc (work, nxpts * nylines, TY_REAL)
+
+	# For each in range y integrate in x.
+	cindex = 1 + first_point + (nylmin - 1) * len_coeff
+	xindex = work
+	do j = nylmin, nylmax {
+	    if (xfrac >= 1.0)
+	        call ii_driz1 (x, Memr[xindex], nxpts, coeff[cindex], badval)
+	    else
+	        call ii_driz (x, Memr[xindex], nxpts, coeff[cindex], xfrac,
+		    badval)
+	    xindex = xindex + nxpts
+	    cindex = cindex + len_coeff
+	}
+
+	# For each range in x integrate in y. This may need to be vectorized?
+	hyfrac = yfrac / 2.0
+	do i = 1, nxpts {
+
+	    xindex = work + i - 1
+
+	    do j = 1, nypts {
+
+		ymin = min (y[2*j-1], y[2*j])
+		ymax = max (y[2*j-1], y[2*j])
+		neara = ymin + 0.5
+		nearb = ymax + 0.5
+
+		accum = 0.0
+		waccum = 0.0
+		if (neara == nearb) {
+
+		    dy = min (ymax, nearb + hyfrac) - max (ymin,
+		       neara - hyfrac)
+		    if (dy > 0.0) {
+			accum = accum + dy * Memr[xindex+(neara-nylmin)*nxpts]
+			waccum = waccum + dy
+		    }
+
+		} else {
+
+		    # First segment.
+		    dy = neara + hyfrac - max (ymin, neara - hyfrac)
+		    if (dy > 0.0) {
+			accum = accum + dy * Memr[xindex+(neara-nylmin)*nxpts]
+			waccum = waccum + dy
+		    }
+
+		    # Interior segments.
+		    do jj = neara + 1, nearb - 1 {
+			accum = accum + yfrac * Memr[xindex+(jj-nylmin)*nxpts]
+			waccum = waccum + yfrac
+		    }
+
+		    # Last segment.
+		    dy = min (ymax, nearb + hyfrac) - (nearb - hyfrac)
+		    if (dy > 0.0) {
+			accum = accum + dy * Memr[xindex+(nearb-nylmin)*nxpts]
+			waccum = waccum + dy
+		    }
+		}
+
+		if (waccum <= 0.0)
+		    zfit[i,j] = 0.0
+		else
+		    zfit[i,j] = accum / waccum
+	    }
+	}
+
 	call sfree (sp)
 end

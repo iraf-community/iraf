@@ -1,4 +1,4 @@
-.help pdq2h Nov95 "Slalib Package"
+.help pdq2h Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slPDQH (P, D, Q, H1, J1, H2, J2)

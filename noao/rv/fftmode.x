@@ -5,6 +5,7 @@ include "rvcomdef.h"
 include "rvplots.h"
 include "rvfilter.h"
 
+
 # FFT_COLON - Procedure to process the colon commands defined below.  Most
 # commands are for interactive editing of parameters to the task.
 
@@ -103,9 +104,10 @@ begin
 	rfnpts = fft_pow2 (RV_RNPTS(rv))
 	gp = RV_GP(rv)
 
-	if (RVF_LASTKEY(rv) == 'p' && RV_FILTER(rv) != NONE)
-	    key = RVF_LASTKEY(rv)
-	else
+
+#	if (RVF_LASTKEY(rv) == 'p' && RV_FILTER(rv) != NONE)
+#	    key = 'p'
+#	else
 	    key = 'b'
 	repeat {
 
@@ -173,8 +175,8 @@ replot_     RV_NEWGRAPH(rv) = NO
 		    } else {
 		        call malloc (filt, ofnpts, TY_REAL)
 		        call gclear (gp)
-		        if (RV_CONTINUUM(rv) == BOTH || 
-			    RV_CONTINUUM(rv) == OBJ_ONLY) {
+		        if (RV_CONTINUUM(rv)==BOTH || 
+			    RV_CONTINUUM(rv)==OBJ_ONLY) {
 		        	call amovr (OCONT_DATA(rv,1), Memr[filt], 
 				    RV_NPTS(RV))
 		                call split_plot (rv, gp, TOP, OCONT_DATA(rv,1),
@@ -241,8 +243,8 @@ replot_     RV_NEWGRAPH(rv) = NO
 		    } else {
 		        call malloc (filt, rfnpts, TY_REAL)
 		        call gclear (gp)
-		        if (RV_CONTINUUM(rv) == BOTH || 
-			    RV_CONTINUUM(rv) == TEMP_ONLY) {
+		        if (RV_CONTINUUM(rv)==BOTH || 
+			    RV_CONTINUUM(rv)==TEMP_ONLY) {
 		                call amovr (RCONT_DATA(rv,1), Memr[filt], 
 				    RV_RNPTS(rv))
 		                call split_plot (rv, gp, TOP, RCONT_DATA(rv,1),
@@ -300,21 +302,21 @@ pointer	rv				#I RV struct pointer
 int	flags				#I Type of plot to draw
 
 begin
-	# Get the graphics pointer and clear the workstation.
-	if (RV_GP(rv) != NULL)
-	    call gclear (RV_GP(rv))				
-	else
-	    return
+        # Get the graphics pointer and clear the workstation.
+        if (RV_GP(rv) != NULL)
+            call gclear (RV_GP(rv))                             
+        else
+            return
 
-	# Call the plot primitives.
-	switch (flags) {
-	case AMPLITUDE_PLOT:
-	    call fft_fplot (rv, SPLIT_PLOT)
-	case POWER_PLOT:
-	    call fft_pplot (rv, SPLIT_PLOT)
-	default:
-	    call error (0, "Invalid FFT plot specification.")
-	}
+        # Call the plot primitives.
+        switch (flags) {
+        case AMPLITUDE_PLOT:
+            call fft_fplot (rv, RVP_SPLIT_PLOT(rv))
+        case POWER_PLOT:
+            call fft_pplot (rv, RVP_SPLIT_PLOT(rv))
+        default:
+            call error (0, "Invalid FFT plot specification.")
+        }
 end
 
 
@@ -421,7 +423,7 @@ begin
 end
 
 
-# FFT_OVERLAY - Plot the filter function overlayed on the FFT plot.
+# PLOT_OVERLAY - Plot the filter function overlayed on the FFT plot.
 
 procedure fft_fltoverlay (rv, gp, fnpts, y2)
 
@@ -449,7 +451,7 @@ begin
 	call salloc (filt, fnpts, TY_REAL)
 
 	# Get the filter to be plotted.
-	y2 = y2 - (0.05 * y2)
+	y2 = y2 - (0.075 * y2)
 	call fft_gfilter (rv, Memr[filt], fnpts, y2)
 
 	# Compute the endpoint.
@@ -499,12 +501,22 @@ begin
 	call gclear (gp)
 
 	if (flag == SINGLE_PLOT) {
-	    if (RV_CONTINUUM(rv) != NONE) {
-	        call get_fft (rv, OCONT_DATA(rv,1), RV_NPTS(rv), Memr[rfft], 
-		    fnpts)
+	    if (RVP_ONE_IMAGE(rv) == OBJECT_SPECTRUM) {
+	        if (RV_CONTINUUM(rv) != NONE) {
+	            call get_fft (rv,OCONT_DATA(rv,1), RV_NPTS(rv), Memr[rfft],
+		        fnpts)
+	        } else {
+	            call get_fft (rv,OBJPIXY(rv,1), RV_NPTS(rv), Memr[rfft], 
+		        fnpts)
+	        }
 	    } else {
-	        call get_fft (rv, OBJPIXY(rv,1), RV_NPTS(rv), Memr[rfft], 
-		    fnpts)
+	        if (RV_CONTINUUM(rv) != NONE) {
+	            call get_fft (rv,RCONT_DATA(rv,1), RV_RNPTS(rv), Memr[rfft],
+		        fnpts)
+	        } else {
+	            call get_fft (rv,REFPIXY(rv,1), RV_RNPTS(rv), Memr[rfft], 
+		        fnpts)
+	        }
 	    }
 
 	    # Draw the plot to the screen
@@ -552,7 +564,10 @@ begin
 	    # Lastly, annotate ther plot so we know what we're looking at.
 	    call gctran (gp, 0.73, 0.73, x1, y1, 0, 1)
 	    call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
-	    call gtext (gp, x1, y1, "Object FFT", "")
+	    if (RVP_ONE_IMAGE(rv) == OBJECT_SPECTRUM)
+	        call gtext (gp, x1, y1, "Object FFT", "")
+	    else
+	        call gtext (gp, x1, y1, "Template FFT", "")
 	    call gctran (gp, 0.73, 0.69, x1, y1, 0, 1)
             if (RV_FILTER(rv) == BOTH || RV_FILTER(rv) == OBJ_ONLY) {
 	        call fft_fltoverlay (rv, gp, fnpts*2, y2)
@@ -662,12 +677,22 @@ begin
 	call gclear (gp)
 
 	if (flag == SINGLE_PLOT) {
-	    if (RV_CONTINUUM(rv) != NONE) {
-	        call get_pspec (rv, OCONT_DATA(rv,1), RV_NPTS(rv), Memr[rfft],
-		    fnpts)
+	    if (RVP_ONE_IMAGE(rv) == OBJECT_SPECTRUM) {
+	        if (RV_CONTINUUM(rv) != NONE) {
+	            call get_fft (rv,OCONT_DATA(rv,1), RV_NPTS(rv), Memr[rfft],
+		        fnpts)
+	        } else {
+	            call get_fft (rv,OBJPIXY(rv,1), RV_NPTS(rv), Memr[rfft], 
+		        fnpts)
+	        }
 	    } else {
-	        call get_pspec (rv, OBJPIXY(rv,1), RV_NPTS(rv), Memr[rfft],
-		    fnpts)
+	        if (RV_CONTINUUM(rv) != NONE) {
+	            call get_fft (rv,RCONT_DATA(rv,1), RV_RNPTS(rv), Memr[rfft],
+		        fnpts)
+	        } else {
+	            call get_fft (rv,REFPIXY(rv,1), RV_RNPTS(rv), Memr[rfft], 
+		        fnpts)
+	        }
 	    }
 
             # Draw the plot to the screen
@@ -715,7 +740,10 @@ begin
 	    # Lastly, annotate the plot so we know what we're looking at.
 	    call gctran (gp, 0.73, 0.73, x1, y1, 0, 1)
 	    call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
-	    call gtext (gp, x1, y1, "Object PS", "")
+	    if (RVP_ONE_IMAGE(rv) == OBJECT_SPECTRUM)
+	        call gtext (gp, x1, y1, "Object PS", "")
+	    else
+	        call gtext (gp, x1, y1, "Template PS", "")
 	    call gctran (gp, 0.73, 0.69, x1, y1, 0, 1)
             if (RV_FILTER(rv) == BOTH || RV_FILTER(rv) == OBJ_ONLY) {
 	        call fft_fltoverlay (rv, gp, fnpts*2, y2)

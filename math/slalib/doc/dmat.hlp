@@ -1,4 +1,4 @@
-.help dmat Nov95 "Slalib Package"
+.help dmat Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDMAT (N, A, Y, D, JF, IW)

@@ -769,7 +769,7 @@ begin
         if (IP_NBANDS(ip) > 1)
             IM_NDIM(im) = 3
         else
-            IM_NDIM(im) = 2
+            IM_NDIM(im) = IP_NDIM(ip)
 
 	call sfree (sp)
 

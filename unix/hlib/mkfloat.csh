@@ -44,11 +44,13 @@ if ("$1" == "-d") then
     end
 endif
 
-echo "delete any dreg .e files left lying about in the source directories"
+echo -n \
+"deleting any dreg .e files left lying about in the source directories... "
 rmbin -n -o .a .o .e .E $DIRS > $TFL;  grep '\.[eE]$' $TFL | tee _.e_files
 rm -f `cat _.e_files` _.e_files; grep -v '\.[eE]$' $TFL > $DFL; rm $TFL
+echo "done"
 
-echo "archive and delete $float objects"
+echo -n "archiving and deleting $float objects... "
 if (-e bin.$float) then
     if (! -z $DFL) then
 	tar -cf bin.$float/OBJS.arc `cat $DFL`
@@ -60,7 +62,8 @@ if (-e bin.$float) then
 	    rm $DFL $TFL bin.$float/OBJS.arc
 	    exit 1
 	else
-	    echo -n "compress bin.$float/OBJS.arc "
+	    echo "done"
+	    echo -n "compressing bin.$float/OBJS.arc "
 	    nice compress -f bin.$float/OBJS.arc &
 	    rm -f $TFL
 	endif
@@ -71,15 +74,17 @@ endif
 rm -f `cat $DFL` $DFL
 
 if ($ARCH != generic) then
-    echo "restore archived $ARCH objects"
+    echo -n "restoring archived $ARCH objects... "
     if (-e bin.$ARCH/OBJS.arc.Z) then
 	if ({ (zcat bin.$ARCH/OBJS.arc.Z | tar $TARXFLGS -) }) then
 	    rm -f bin.$ARCH/OBJS.arc.Z
 	endif
+	echo "done"
     else if (-e bin.$ARCH/OBJS.arc) then
 	if ({ (cat bin.$ARCH/OBJS.arc | tar $TARXFLGS -) }) then
 	    rm -f bin.$ARCH/OBJS.arc
 	endif
+	echo "done"
     else
 	echo "no object archive found; full sysgen will be needed"
     endif

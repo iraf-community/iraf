@@ -16,6 +16,14 @@ Output combined image or list of images.  If the \fIproject\fR parameter is
 no then there will be one output image while if it is yes there will be one
 output image for each input image.
 .le
+.ls rejmask = "" (optional)
+Output mask file to contain identifications of which pixels in which input
+images were rejected or excluded.  The pixel mask will be the size of the
+output image and identified pixels will be in the output image pixel
+coordinate system.  There is on extra dimension with length equal to the
+number of input images.  Each element of this dimension contains the mask
+of the input image.  The order is the order of the input images.
+.le
 .ls plfile = "" (optional)
 Output pixel list file or list of files.  If no name is given or the
 list ends prematurely then no file is produced.  The pixel list file
@@ -210,7 +218,16 @@ median value for rejecting pixels.  The lower sigma is ignored for the
 CCD readout noise in electrons, gain in electrons/DN, and sensitivity noise
 as a fraction.  These parameters are used with the "ccdclip" and "crreject"
 algorithms.  The values may be either numeric or an image header keyword
-which contains the value.
+which contains the value.  The noise model for a pixel is:
+
+.nf
+    variance in DN = (rdnoise/gain)^2 + DN/gain + (snoise*DN)^2
+    variance in e- = (rdnoise)^2 + (gain*DN) + (snoise*(gain*DN))^2
+		   = rdnoise^2 + Ne + (snoise * Ne)^2
+.fi
+
+where DN is the data number and Ne is the number of electrons.  Sensitivity
+noise typically comes from noise introduced during flat fielding.
 .le
 .ls sigscale = 0.1 (ccdclip, crreject, sigclip, avsigclip)
 This parameter determines when poisson corrections are made to the
@@ -234,10 +251,11 @@ above the median and a negative value selects a point below the median.
 The default of -0.5 selects approximately the quartile point.
 See the DESCRIPTION section for further details.
 .le
-.ls grow = 0
-Number of pixels to either side of a rejected pixel along image lines
-to also be rejected.  This applies only to pixels rejected by one of
-the rejection algorithms and not the masked or threshold rejected pixels.
+.ls grow = 0.
+Radius in pixels for additional pixel to be rejected in an image with a
+rejected pixel from one of the rejection algorithms.  This applies only to
+pixels rejected by one of the rejection algorithms and not the masked or
+threshold rejected pixels.
 .le
 .ih
 DESCRIPTION
@@ -247,7 +265,8 @@ may be rejected from the combining by using pixel masks, threshold levels,
 and rejection algorithms.  The images may be scaled multiplicatively or
 additively based on image statistics, image header keywords, or text files
 before rejection.  The images may be combined with integer pixel coordinate
-offsets to produce an image bigger than any of the input images.
+offsets, possibly determined using the world coordinate system of the
+images, to produce an image bigger than any of the input images.
 
 The input images to be combined are specified by a list.  If the
 \fBproject\fR parameter is yes then the highest dimension elements of each
@@ -268,14 +287,28 @@ under the keyword BPM.  The output pixel type is set by the parameter
 is used.  If there is a mixture of short and unsigned short images then
 the highest precision is integer.
 
-In addition to one or more output combined images there may also be a pixel
-list image containing the number of pixels rejected at each point in the
-output image, an image containing the sigmas of the pixels combined about
-the final output combined pixels, and a log file.  The pixel list image is
-in the compact pixel list format which can be used as an image in other
-programs.  The sigma computation is the standard deviation corrected for a
+In addition to one or more output combined images there are some optional
+output files which may be specified.  A pixel mask identifying each pixel
+rejected or excluded may be created.  This mask will match the output
+image in size except there is one extra dimension.  The extra dimension
+indexes the input images in the order in which they are specified and
+combined.  What this means is that each element of the extra dimension
+is a mask of the pixel rejected in a particular input image (or lower
+dimensional element in the case of projection) but in the offset and
+sized to the output image.  For example, if the input consists of
+two dimensional images then the rejected pixel mask will be three
+dimensional and each plane will be for a particular input image.
+If one wants to separate this file the task \fBimslice\fR may be used.
+If there are no offsets then the masks will also be registered with the
+input image.  If there are offsets then the masks will be offset
+also.
+
+Another pixel mask may be produced giving just the total number of pixels
+rejected at each output pixel.  An image containing the sigmas of the
+pixels combined about the final output combined pixels may also be
+created.  The sigma computation is the standard deviation corrected for a
 finite population (the n/(n-1) factor) including weights if a weighted
-average is used.
+average is used.  Finally a log file may be produced.
 
 An outline of the steps taken by the program is given below and the
 following sections elaborate on the steps.
@@ -296,7 +329,7 @@ o   Reject pixels using the specified algorithm
 o   Reject neighboring pixels along each line
 o   Combine remaining pixels using the weighted average or median
 o   Compute sigmas of remaining pixels about the combined values
-o   Write the output image line, rejected pixel list, and sigmas
+o   Write the output image line, rejected pixel masks, and sigmas
 .fi
 
 
@@ -471,10 +504,12 @@ Because the scale and zero levels are adjusted only the relative
 values are important.
 
 If both an intensity scaling and zero point shift are selected the
-multiplicative scaling is done first.  Use of both makes sense
-if the intensity scaling is the exposure time to correct for
-different exposure times and then the zero point shift allows for
-sky brightness changes.
+zero point is added first and the the scaling is done.  This is
+important if the scale and offset values are specified by
+header keywords or from a file of values.  However,
+in the log output the zero values are given as the scale times
+the offset hence those numbers would be interpreted as scaling
+first and zero offset second.
 
 The image statistics and scale factors are recorded in the log file
 unless they are all equal, which is equivalent to no scaling.  The
@@ -613,9 +648,8 @@ currently how the task works.
 When the number of input images exceeds the maximum number of open files
 allowed by IRAF (currently about 115 or 57 .hhh images) the input images
 are stacked and combined with the \fIproject\fR option.  \fBNote\fR that
-this means that the
-bad pixel mask from the first input image will be applied to all the
-images.
+this means that the bad pixel mask from the first input image will be
+applied to all the images.
 
 
 THRESHOLD REJECTION
@@ -906,20 +940,12 @@ the clipping thresholds.
 .in -4
 GROW REJECTION
 
-Neighbors of pixels rejected by the rejection algorithms along image lines
-may also be rejected.  The number of neighbors to be rejected on either
-side is specified by the \fIgrow\fR parameter.  The rejection only
-applies to neighbors along each image line.  This is because the
-task operates independently on each image line and does not have the
-ability to go back to previous lines or maintain a list of rejected
-pixels to later lines.
-
-This rejection step is also checked against the \fInkeep\fR parameter
-and only as many pixels as would not violate this parameter are
-rejected.  Unlike it's application in the rejection algorithms at
-this stage there is no checking on the magnitude of the residuals
-and the pixels retained which would otherwise be rejected are randomly
-selected.
+Neighbors of pixels rejected by the rejection algorithms
+may also be rejected.  The number of neighbors to be rejected
+is specified by the \fIgrow\fR parameter which is a radius in pixels.
+If too many pixels are rejected in one of the grown pixels positions
+(as defined by the \fInkeep\fR parameter) then the value of that pixel
+without growing will be used.
 
 COMBINING
 
@@ -972,88 +998,16 @@ sky brightness and make a weighted average:
 	>>> scale=exp zero=mode weight=exp  expname=exptime
 .fi
 .ih
-TIME REQUIREMENTS
-The following times were obtain with a Sun 4/470.  The tests combine
-1000x200 images consisting of Poisson noise and cosmic rays generated
-with the \fBartdata\fR package.  The times, especially the total time,
-are approximate and depend on user loads.
-
-.nf
-IMAGES:   Number of images (1000x200) and datatype (R=real, S=short)
-COMBINE:  Combine option
-REJECT:   Rejection option with grow = 0
-	      minmax:    nlow = 1, nhigh = 1
-	      ccdclip:   lsigma = 3., hsigma = 3, sigscale = 0.
-	      sigclip:   lsigma = 3., hsigma = 3, sigscale = 0.
-	      avsigclip: lsigma = 3., hsigma = 3, sigscale = 0.
-	      pclip:     lsigma = 3., hsigma = 3, pclip = -0.5
-	      /a:        mclip = no  (clip about the average)
-	      /m:        mclip = yes (clip about the median)
-O M T S:  Features used (Y=yes, N=no)
-O:        offset = "grid 5 10 2 10"
-M:        masktype = goodval, maskval = 0
-	      Pixel mask has 2 bad lines and 20 bad columns 
-T:        lthreshold = INDEF, hthreshold = 1100.
-S:        scale = mode, zero = none, weight = mode
-TIME:     cpu time in seconds, total time in minutes and seconds
-
-
-IMAGES  COMBINE  REJECT        O M T S     TIME
-
-  10R   average  none          N N N N    1.3 0:08
-  10R   average  minmax        N N N N    4.3 0:10
-  10R   average  pclip         N N N N   17.9 0:32
-  10R   average  ccdclip/a     N N N N   11.6 0:21
-  10R   average  crreject/a    N N N N   11.4 0:21
-  10R   average  sigclip/a     N N N N   13.6 0:29
-  10R   average  avsigclip/a   N N N N   15.9 0:35
-  10R   average  ccdclip/m     N N N N   16.9 0:32
-  10R   average  crreject/m    N N N N   17.0 0:28
-  10R   average  sigclip/m     N N N N   19.6 0:42
-  10R   average  avsigclip/m   N N N N   20.6 0:43
-
-  10R   median   none          N N N N    6.8 0:17
-  10R   median   minmax        N N N N    7.8 0:15
-  10R   median   pclip         N N N N   16.9 1:00
-  10R   median   ccdclip/a     N N N N   18.0 0:34
-  10R   median   crreject/a    N N N N   17.7 0:30
-  10R   median   sigclip/a     N N N N   21.1 1:13
-  10R   median   avsigclip/a   N N N N   23.1 0:41
-  10R   median   ccdclip/m     N N N N   16.1 0:27
-  10R   median   crreject/m    N N N N   16.0 0:27
-  10R   median   sigclip/m     N N N N   18.1 0:29
-  10R   median   avsigclip/m   N N N N   19.6 0:32
-
-  10R   average  none          N N N Y    6.1 0:36
-  10R   median   none          N N N Y   10.4 0:49
-  10R   median   pclip         N N N Y   20.4 1:10
-  10R   median   ccdclip/m     N N N Y   19.5 0:36
-  10R   median   avsigclip/m   N N N Y   23.0 1:06
-
-  10R   average  none          N Y N N    3.5 0:12
-  10R   median   none          N Y N N    8.9 0:21
-  10R   median   pclip         N Y N N   19.9 0:45
-  10R   median   ccdclip/m     N Y N N   18.0 0:44
-  10R   median   avsigclip/m   N Y N N   20.9 0:28
-
-  10R   average  none          Y N N N    4.3 0:13
-  10R   median   none          Y N N N    9.6 0:21
-  10R   median   pclip         Y N N N   21.8 0:54
-  10R   median   ccdclip/m     Y N N N   19.3 0:44
-  10R   median   avsigclip/m   Y N N N   22.8 0:51
-
-  10R   average  none          Y Y Y Y   10.8 0:22
-  10R   median   none          Y Y Y Y   16.1 0:28
-  10R   median   pclip         Y Y Y Y   27.4 0:42
-  10R   median   ccdclip/m     Y Y Y Y   25.5 0:39
-  10R   median   avsigclip/m   Y Y Y Y   28.9 0:44
-
-  10S   average  none          N N N N    2.2 0:06
-  10S   average  minmax        N N N N    4.6 0:12
-  10S   average  pclip         N N N N   18.1 0:33
-.fi
-.ih
 REVISIONS
+.ls IMCOMBINE V2.11.2
+The grow algorithm was improved to give a 2D growing radius.
+
+An optional output mask file contains the identifications of which pixel
+in which input image was rejected or excluded.
+
+The internal calculation type was changed to be the highest precedence
+of the input and output types.  Previously it was only the input types.
+.le
 .ls IMCOMBINE V2.11
 The limit of the number of images that may be combined has been removed.
 If the number of images exceeds the maximum number of open images permitted

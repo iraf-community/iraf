@@ -102,7 +102,7 @@ begin
 	GIF_LNUM(gif) = GIF_HEIGHT(gif)
 
 	# Write the header information.
-	call gif_wheader (ex, gif, EX_FD(ex))
+	call gif_wheader (ex, EX_FD(ex))
 
 	# Start processing the expressions and write compressed image data.
 	call gif_compress (ex, gif, EX_FD(ex))
@@ -138,10 +138,9 @@ end
 # global file header but all the preliminary stuff up until the actual image
 # data
 
-procedure gif_wheader (ex, gif, fd)
+procedure gif_wheader (ex, fd)
 
 pointer	ex				#i tast struct pointer
-pointer	gif				#i GIF struct pointer
 int	fd				#i output file descriptor
 
 char	sig[7]				# GIF signature
@@ -215,6 +214,8 @@ begin
 	    stmp = ori (shifti(INTERLACE,8), 8)
 	else
 	    stmp = 8
+        if (BYTE_SWAP2 == YES)
+            call bswap2 (stmp, 1, stmp, 1, 2)
 	call write (fd, stmp, 1)
 end
 
@@ -497,7 +498,7 @@ begin
 	        GIF_CUR_BITS(gif) = GIF_CUR_BITS(gif) - 8
 	    }
 
-	    call flush_char (fd, gif)
+	    call flush_char (gif)
 	    call flush (fd)
 	}
 end
@@ -536,13 +537,12 @@ begin
 	ACCUM(gif,GIF_A_COUNT(gif)) = c
 	GIF_A_COUNT(gif) = GIF_A_COUNT(gif) + 1
 	if (GIF_A_COUNT(gif) >= 254)
-	    call flush_char (fd, gif)
+	    call flush_char (gif)
 end
 
 
-procedure flush_char (fd, gif)
+procedure flush_char (gif)
 
-int	fd				#i output file descriptor
 pointer	gif				#i gif struct pointer
 
 begin

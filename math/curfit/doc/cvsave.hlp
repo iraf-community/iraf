@@ -19,7 +19,6 @@ The pointer to the curve descriptor structure.
 Array containing the fit parameters.
 Fit must contain at least 7 + order elements, where order is the order of the
 fit as set in CVINIT.
-.fi
 .le
 .ih
 DESCRIPTION

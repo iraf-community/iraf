@@ -10,20 +10,27 @@ define	NMARGIN_SPLINE3	16	# number of spline boundary pixels required
 # RG_XSHIFTIM - Shift a 1 or 2D image by a fractional pixel amount
 # x and y
 
-procedure rg_xshiftim (im1, im2, xshift, yshift, interp_type, boundary_type,
+procedure rg_xshiftim (im1, im2, xshift, yshift, interpstr, boundary_type,
         constant)
 
 pointer		im1		#I pointer to input image
 pointer		im2		#I pointer to output image
 real		xshift		#I shift in x direction
 real		yshift		#I shift in y direction
-int		interp_type	#I type of interpolant
+char		interpstr[ARB]	#I type of interpolant
 int		boundary_type	#I type of boundary extension
 real		constant	#I value of constant for boundary extension
 
+int	interp_type
+pointer	sp, str
 bool	fp_equalr()
+int	strdic()
 
 begin
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+	interp_type = strdic (interpstr, Memc[str], SZ_FNAME, II_BFUNCTIONS)
+
 	if (interp_type == II_NEAREST)
 	    call rg_xishiftim (im1, im2, nint (xshift), nint (yshift),
 	        interp_type, boundary_type, constant)
@@ -32,8 +39,9 @@ begin
 	    call rg_xishiftim (im1, im2, int (xshift), int (yshift),
 	        interp_type, boundary_type, constant)
 	else
-	    call rg_xfshiftim (im1, im2, xshift, yshift, interp_type,
+	    call rg_xfshiftim (im1, im2, xshift, yshift, interpstr,
 		boundary_type, constant)
+	call sfree (sp)
 end
 
 
@@ -169,24 +177,25 @@ end
 # RG_XFSHIFTIM -- Shift a 1 or 2D image by a fractional pixel amount
 # in x and y.
 
-procedure rg_xfshiftim (im1, im2, xshift, yshift, interp_type, boundary_type,
+procedure rg_xfshiftim (im1, im2, xshift, yshift, interpstr, boundary_type,
         constant)
 
 pointer		im1		#I pointer to input image
 pointer		im2		#I pointer to output image
 real		xshift		#I shift in x direction
 real		yshift		#I shift in y direction
-int		interp_type	#I type of interpolant
+char		interpstr[ARB]	#I type of interpolant
 int		boundary_type	#I type of boundary extension
 real		constant	#I value of constant for boundary extension
 
-int	i
+int	i, interp_type, nsinc, nincr
 int	ncols, nlines, nbpix, fstline, lstline, nxymargin
 int	cin1, cin2, nxin, lin1, lin2, nyin
 int	lout1, lout2, nyout
 real	xshft, yshft, deltax, deltay, dx, dy, cx, ly
 pointer	sp, x, y, msi, sinbuf, soutbuf
 bool	fp_equalr()
+int	msigeti()
 pointer	imps2r()
 
 errchk	imgs2r, imps2r
@@ -212,9 +221,41 @@ begin
 	    yshft = yshift
 	}
 
+	# Allocate temporary space.
+	call smark (sp)
+	call salloc (x, 2 * ncols, TY_REAL)
+	call salloc (y, 2 * nlines, TY_REAL)
+	sinbuf = NULL
+
+	# Define the x and y interpolation coordinates.
+	dx = abs (xshft - int (xshft))
+	if (fp_equalr (dx, 0.0))
+	    deltax = 0.0
+	else if (xshft > 0.)
+	    deltax = 1. - dx
+	else
+	    deltax = dx
+	dy = abs (yshft - int (yshft))
+	if (fp_equalr (dy, 0.0))
+	    deltay = 0.0
+	else if (yshft > 0.)
+	    deltay = 1. - dy
+	else
+	    deltay = dy
+
+	# Initialize the 2-D interpolation routines.
+	call msitype (interpstr, interp_type, nsinc, nincr, cx)
+	if (interp_type == II_BILSINC || interp_type == II_BISINC)
+	    call msisinit (msi, interp_type, nsinc, 1, 1,
+	        deltax - nint (deltax), deltay - nint (deltay), 0.0)
+	else
+	    call msisinit (msi, interp_type, nsinc, 1, 1, cx, cx, 0.0)
+
 	# Set boundary extension parameters.
-	if (interp_type == II_SPLINE3)
+	if (interp_type == II_BISPLINE3)
 	    nxymargin = NMARGIN_SPLINE3
+	else if (interp_type == II_BISINC || interp_type == II_BILSINC)
+	    nxymargin = msigeti (msi, II_MSINSINC)
 	else
 	    nxymargin = NMARGIN
 	nbpix = max (int (abs(xshft)+1.0), int (abs(yshft)+1.0)) + nxymargin
@@ -223,36 +264,29 @@ begin
 	if (boundary_type == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
-	# Allocate temporary space.
-	call smark (sp)
-	call salloc (x, ncols, TY_REAL)
-	call salloc (y, nlines, TY_REAL)
-	sinbuf = NULL
-
-	# Initialize the 2-D interpolation routines.
-	call msiinit (msi, interp_type)
-
 	# Define the x interpolation coordinates.
-	dx = abs (xshft - int (xshft))
-	if (fp_equalr (dx, 0.0))
-	    deltax = nxymargin
-	else if (xshft > 0.)
-	    deltax = 1. - dx + nxymargin
-	else
-	    deltax = dx + nxymargin
-	do i = 1, ncols
-	    Memr[x+i-1] = i + deltax
+	deltax = deltax + nxymargin
+        if (interp_type == II_BIDRIZZLE) {
+            do i = 1, ncols {
+                Memr[x+2*i-2] = i + deltax - 0.5
+                Memr[x+2*i-1] = i + deltax + 0.5
+            }
+        } else {
+	    do i = 1, ncols
+	        Memr[x+i-1] = i + deltax
+	}
 
 	# Define the y interpolation coordinates.
-	dy = abs (yshft - int (yshft))
-	if (fp_equalr (dy, 0.0))
-	    deltay = nxymargin
-	else if (yshft > 0.)
-	    deltay = 1. - dy +  nxymargin
-	else
-	    deltay = dy + nxymargin
-	do i = 1, NYOUT
-	    Memr[y+i-1] = i + deltay
+	deltay = deltay + nxymargin
+        if (interp_type == II_BIDRIZZLE) {
+            do i = 1, NYOUT {
+                Memr[y+2*i-2] = i + deltay - 0.5
+                Memr[y+2*i-1] = i + deltay + 0.5
+            }
+        } else {
+	    do i = 1, NYOUT
+	        Memr[y+i-1] = i + deltay
+	}
 
 	# Define column range in the input image.
 	cx = 1. - nxymargin - xshft

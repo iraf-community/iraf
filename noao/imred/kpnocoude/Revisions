@@ -1,5 +1,12 @@
 .help revisions Dec94 noao.imred.kpnocoude
 .nf
+iimred$kpnocoude/doc/do3fiber.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+=======
+V2.11.1
+=======
+
 imred$kpnocoude/demos/mkdo3fiber.cl
 imred$kpnocoude/demos/mkdoslit.cl
     Made the ARTDATA package parameters explicit (4/15/97, Valdes)

@@ -229,6 +229,7 @@ begin
 	call fprintf (fd, "\n")
 
 	# Clean up
+	call flush (fd)
 	call sfree (sp)
 end
 
@@ -294,7 +295,7 @@ begin
 	    do i = 2, DBL_NSHIFTS(rv) {
 		call fprintf (fd, "%37t[%d] = %.4f Km/s\n")
 		    call pargi (i)
-	            call pargd (rv_shift2vel(rv,DBL_SHIFT(rv,1)))
+	            call pargd (rv_shift2vel(rv,DBL_SHIFT(rv,i)))
 	    }
 	    call fprintf (fd, "\tObserved velocity[1] = %.4f Km/s\n")
 	        call pargr (DBL_VOBS(rv,1))
@@ -313,6 +314,7 @@ begin
 		    call pargr (DBL_VERR(rv,i))
 	    }
 	}
+	call flush (fd)
 end
 
 
@@ -365,6 +367,7 @@ begin
 		call pargr (COEFF(rv,3))
 		call pargr (ECOEFF(rv,3))
 	}
+	call flush (fd)
 end
 
 
@@ -401,4 +404,5 @@ begin
 	            call pargr (DBL_COEFFS(rv,3*i+2))
 		    call pargi (i)
 	}
+	call flush (fd)
 end

@@ -636,6 +636,7 @@ Coordinate mapping parameters
 
                         Input Coordinate Listing
    X      Y        Ra         Dec        Ra(fit)    Dec(fit)    Dra    Ddec
+.fi
 
 
 3. Repeat example 1 but use the "tolerance" matching algorithm and apriori

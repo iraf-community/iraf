@@ -1,290 +1,249 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<imhdr.h>
+include	<pmset.h>
 include	"../icombine.h"
 
+# IC_GROW --  Mark neigbors of rejected pixels.
+# The rejected pixels (original plus grown) are saved in pixel masks.
 
-# IC_GROW --  Reject neigbors of rejected pixels.
-# The rejected pixels are marked by having nonzero ids beyond the number
-# of included pixels.  The pixels rejected here are given zero ids
-# to avoid growing of the pixels rejected here.  The unweighted average
-# can be updated but any rejected pixels requires the median to be
-# recomputed.  When the number of pixels at a grow point reaches nkeep 
-# no further pixels are rejected.  Note that the rejection order is not
-# based on the magnitude of the residuals and so a grow from a weakly
-# rejected image pixel may take precedence over a grow from a strongly
-# rejected image pixel.
+procedure ic_grow (out, v, m, n, buf, nimages, npts, pms)
 
-procedure ic_grows (d, m, n, nimages, npts, average)
-
-pointer	d[ARB]			# Data pointers
+pointer	out			# Output image pointer
+long	v[ARB]			# Output vector
 pointer	m[ARB]			# Image id pointers
-int	n[npts]			# Number of good pixels
+int	n[ARB]			# Number of good pixels
+int	buf[npts,nimages]	# Working buffer
 int	nimages			# Number of images
 int	npts			# Number of output points per line
-real	average[npts]		# Average
+pointer	pms			# Pointer to array of pixel masks
 
-int	i1, i2, j1, j2, k1, k2, l, is, ie, n2, maxkeep
-pointer	mp1, mp2
+int	i, j, k, l, line, nl, rop, igrow, nset, or()
+real	grow2, i2
+pointer	mp, pm, pm_newmask()
+errchk	pm_newmask()
 
 include	"../icombine.com"
 
 begin
-	if (dflag == D_NONE)
+	if (dflag == D_NONE || grow == 0.)
 	    return
 
-	do i1 = 1, npts {
-	    k1 = i1 - 1
-	    is = max (1, i1 - grow)
-	    ie = min (npts, i1 + grow)
-	    do j1 = n[i1]+1, nimages {
-		l = Memi[m[j1]+k1]
-		if (l == 0)
-		    next
-		if (combine == MEDIAN)
-		    docombine = true
+	line = v[2]
+	nl = IM_LEN(out,2)
+	rop = or (PIX_SRC, PIX_DST)
 
-		do i2 = is, ie {
-		    if (i2 == i1)
+	igrow = grow
+	grow2 = grow**2
+	do l = 0, igrow {
+	    i2 = grow2 - l * l
+	    call aclri (buf, npts*nimages)
+	    nset = 0
+	    do j = 1, npts {
+		do k = n[j]+1, nimages {
+		    mp = Memi[m[k]+j-1]
+		    if (mp == 0)
 			next
-		    k2 = i2 - 1
-		    n2 = n[i2]
-		    if (nkeep < 0)
-			maxkeep = max (0, n2 + nkeep)
-		    else
-			maxkeep = min (n2, nkeep)
-		    if (n2 <= maxkeep)
-			next
-		    do j2 = 1, n2 {
-			mp1 = m[j2] + k2
-			if (Memi[mp1] == l) {
-			    if (!docombine && n2 > 1)
-				average[i2] =
-				    (n2*average[i2] - Mems[d[j2]+k2]) / (n2-1)
-			    mp2 = m[n2] + k2
-			    if (j2 < n2) {
-				Mems[d[j2]+k2] = Mems[d[n2]+k2]
-				Memi[mp1] = Memi[mp2]
-			    }
-			    Memi[mp2] = 0
-			    n[i2] = n2 - 1
-			    break
+		    do i = 0, igrow {
+			if (i**2 > i2)
+			    next
+			if (j > i)
+			    buf[j-i,mp] = 1
+			if (j+i <= npts)
+			    buf[j+i,mp] = 1
+			nset = nset + 1
+		    }
+		}
+	    }
+	    if (nset == 0)
+		return
+
+	    if (pms == NULL) {
+		call malloc (pms, nimages, TY_POINTER)
+		do i = 1, nimages
+		    Memi[pms+i-1] = pm_newmask (out, 1)
+	    }
+	    do i = 1, nimages {
+		pm = Memi[pms+i-1]
+		v[2] = line - l
+		if (v[2] > 0)
+		    call pmplpi (pm, v, buf[1,i], 1, npts, rop)
+		v[2] = line + l
+		if (v[2] <= nl)
+		    call pmplpi (pm, v, buf[1,i], 1, npts, rop)
+	    }
+	}
+	v[2] = line
+end
+
+
+
+# IC_GROW$T --  Reject pixels.
+
+procedure ic_grows (v, d, m, n, buf, nimages, npts, pms)
+
+long	v[ARB]			# Output vector
+pointer	d[ARB]			# Data pointers
+pointer	m[ARB]			# Image id pointers
+int	n[ARB]			# Number of good pixels
+int	buf[ARB]		# Buffer of npts
+int	nimages			# Number of images
+int	npts			# Number of output points per line
+pointer	pms			# Pointer to array of pixel masks
+
+int	i, j, k
+pointer	pm
+bool	pl_linenotempty()
+
+include	"../icombine.com"
+
+begin
+	do k = 1, nimages {
+	    pm = Memi[pms+k-1]
+	    if (!pl_linenotempty (pm, v))
+		next
+	    call pmglpi (pm, v, buf, 1, npts, PIX_SRC)
+	    do i = 1, npts {
+		if (buf[i] == 0)
+		    next
+		for (j = 1; j <= n[i]; j = j + 1) {
+		    if (Memi[m[j]+i-1] == k) {
+			if (j < n[i]) {
+			    Mems[d[j]+i-1] = Mems[d[n[i]]+i-1]
+			    Memi[m[j]+i-1] = Memi[m[n[i]]+i-1]
 			}
+			n[i] = n[i] - 1
+			dflag = D_MIX
+			break
 		    }
 		}
 	    }
 	}
 end
 
-# IC_GROW --  Reject neigbors of rejected pixels.
-# The rejected pixels are marked by having nonzero ids beyond the number
-# of included pixels.  The pixels rejected here are given zero ids
-# to avoid growing of the pixels rejected here.  The unweighted average
-# can be updated but any rejected pixels requires the median to be
-# recomputed.  When the number of pixels at a grow point reaches nkeep 
-# no further pixels are rejected.  Note that the rejection order is not
-# based on the magnitude of the residuals and so a grow from a weakly
-# rejected image pixel may take precedence over a grow from a strongly
-# rejected image pixel.
+# IC_GROW$T --  Reject pixels.
 
-procedure ic_growi (d, m, n, nimages, npts, average)
+procedure ic_growi (v, d, m, n, buf, nimages, npts, pms)
 
+long	v[ARB]			# Output vector
 pointer	d[ARB]			# Data pointers
 pointer	m[ARB]			# Image id pointers
-int	n[npts]			# Number of good pixels
+int	n[ARB]			# Number of good pixels
+int	buf[ARB]		# Buffer of npts
 int	nimages			# Number of images
 int	npts			# Number of output points per line
-real	average[npts]		# Average
+pointer	pms			# Pointer to array of pixel masks
 
-int	i1, i2, j1, j2, k1, k2, l, is, ie, n2, maxkeep
-pointer	mp1, mp2
+int	i, j, k
+pointer	pm
+bool	pl_linenotempty()
 
 include	"../icombine.com"
 
 begin
-	if (dflag == D_NONE)
-	    return
-
-	do i1 = 1, npts {
-	    k1 = i1 - 1
-	    is = max (1, i1 - grow)
-	    ie = min (npts, i1 + grow)
-	    do j1 = n[i1]+1, nimages {
-		l = Memi[m[j1]+k1]
-		if (l == 0)
+	do k = 1, nimages {
+	    pm = Memi[pms+k-1]
+	    if (!pl_linenotempty (pm, v))
+		next
+	    call pmglpi (pm, v, buf, 1, npts, PIX_SRC)
+	    do i = 1, npts {
+		if (buf[i] == 0)
 		    next
-		if (combine == MEDIAN)
-		    docombine = true
-
-		do i2 = is, ie {
-		    if (i2 == i1)
-			next
-		    k2 = i2 - 1
-		    n2 = n[i2]
-		    if (nkeep < 0)
-			maxkeep = max (0, n2 + nkeep)
-		    else
-			maxkeep = min (n2, nkeep)
-		    if (n2 <= maxkeep)
-			next
-		    do j2 = 1, n2 {
-			mp1 = m[j2] + k2
-			if (Memi[mp1] == l) {
-			    if (!docombine && n2 > 1)
-				average[i2] =
-				    (n2*average[i2] - Memi[d[j2]+k2]) / (n2-1)
-			    mp2 = m[n2] + k2
-			    if (j2 < n2) {
-				Memi[d[j2]+k2] = Memi[d[n2]+k2]
-				Memi[mp1] = Memi[mp2]
-			    }
-			    Memi[mp2] = 0
-			    n[i2] = n2 - 1
-			    break
+		for (j = 1; j <= n[i]; j = j + 1) {
+		    if (Memi[m[j]+i-1] == k) {
+			if (j < n[i]) {
+			    Memi[d[j]+i-1] = Memi[d[n[i]]+i-1]
+			    Memi[m[j]+i-1] = Memi[m[n[i]]+i-1]
 			}
+			n[i] = n[i] - 1
+			dflag = D_MIX
+			break
 		    }
 		}
 	    }
 	}
 end
 
-# IC_GROW --  Reject neigbors of rejected pixels.
-# The rejected pixels are marked by having nonzero ids beyond the number
-# of included pixels.  The pixels rejected here are given zero ids
-# to avoid growing of the pixels rejected here.  The unweighted average
-# can be updated but any rejected pixels requires the median to be
-# recomputed.  When the number of pixels at a grow point reaches nkeep 
-# no further pixels are rejected.  Note that the rejection order is not
-# based on the magnitude of the residuals and so a grow from a weakly
-# rejected image pixel may take precedence over a grow from a strongly
-# rejected image pixel.
+# IC_GROW$T --  Reject pixels.
 
-procedure ic_growr (d, m, n, nimages, npts, average)
+procedure ic_growr (v, d, m, n, buf, nimages, npts, pms)
 
+long	v[ARB]			# Output vector
 pointer	d[ARB]			# Data pointers
 pointer	m[ARB]			# Image id pointers
-int	n[npts]			# Number of good pixels
+int	n[ARB]			# Number of good pixels
+int	buf[ARB]		# Buffer of npts
 int	nimages			# Number of images
 int	npts			# Number of output points per line
-real	average[npts]		# Average
+pointer	pms			# Pointer to array of pixel masks
 
-int	i1, i2, j1, j2, k1, k2, l, is, ie, n2, maxkeep
-pointer	mp1, mp2
+int	i, j, k
+pointer	pm
+bool	pl_linenotempty()
 
 include	"../icombine.com"
 
 begin
-	if (dflag == D_NONE)
-	    return
-
-	do i1 = 1, npts {
-	    k1 = i1 - 1
-	    is = max (1, i1 - grow)
-	    ie = min (npts, i1 + grow)
-	    do j1 = n[i1]+1, nimages {
-		l = Memi[m[j1]+k1]
-		if (l == 0)
+	do k = 1, nimages {
+	    pm = Memi[pms+k-1]
+	    if (!pl_linenotempty (pm, v))
+		next
+	    call pmglpi (pm, v, buf, 1, npts, PIX_SRC)
+	    do i = 1, npts {
+		if (buf[i] == 0)
 		    next
-		if (combine == MEDIAN)
-		    docombine = true
-
-		do i2 = is, ie {
-		    if (i2 == i1)
-			next
-		    k2 = i2 - 1
-		    n2 = n[i2]
-		    if (nkeep < 0)
-			maxkeep = max (0, n2 + nkeep)
-		    else
-			maxkeep = min (n2, nkeep)
-		    if (n2 <= maxkeep)
-			next
-		    do j2 = 1, n2 {
-			mp1 = m[j2] + k2
-			if (Memi[mp1] == l) {
-			    if (!docombine && n2 > 1)
-				average[i2] =
-				    (n2*average[i2] - Memr[d[j2]+k2]) / (n2-1)
-			    mp2 = m[n2] + k2
-			    if (j2 < n2) {
-				Memr[d[j2]+k2] = Memr[d[n2]+k2]
-				Memi[mp1] = Memi[mp2]
-			    }
-			    Memi[mp2] = 0
-			    n[i2] = n2 - 1
-			    break
+		for (j = 1; j <= n[i]; j = j + 1) {
+		    if (Memi[m[j]+i-1] == k) {
+			if (j < n[i]) {
+			    Memr[d[j]+i-1] = Memr[d[n[i]]+i-1]
+			    Memi[m[j]+i-1] = Memi[m[n[i]]+i-1]
 			}
+			n[i] = n[i] - 1
+			dflag = D_MIX
+			break
 		    }
 		}
 	    }
 	}
 end
 
-# IC_GROW --  Reject neigbors of rejected pixels.
-# The rejected pixels are marked by having nonzero ids beyond the number
-# of included pixels.  The pixels rejected here are given zero ids
-# to avoid growing of the pixels rejected here.  The unweighted average
-# can be updated but any rejected pixels requires the median to be
-# recomputed.  When the number of pixels at a grow point reaches nkeep 
-# no further pixels are rejected.  Note that the rejection order is not
-# based on the magnitude of the residuals and so a grow from a weakly
-# rejected image pixel may take precedence over a grow from a strongly
-# rejected image pixel.
+# IC_GROW$T --  Reject pixels.
 
-procedure ic_growd (d, m, n, nimages, npts, average)
+procedure ic_growd (v, d, m, n, buf, nimages, npts, pms)
 
+long	v[ARB]			# Output vector
 pointer	d[ARB]			# Data pointers
 pointer	m[ARB]			# Image id pointers
-int	n[npts]			# Number of good pixels
+int	n[ARB]			# Number of good pixels
+int	buf[ARB]		# Buffer of npts
 int	nimages			# Number of images
 int	npts			# Number of output points per line
-double	average[npts]		# Average
+pointer	pms			# Pointer to array of pixel masks
 
-int	i1, i2, j1, j2, k1, k2, l, is, ie, n2, maxkeep
-pointer	mp1, mp2
+int	i, j, k
+pointer	pm
+bool	pl_linenotempty()
 
 include	"../icombine.com"
 
 begin
-	if (dflag == D_NONE)
-	    return
-
-	do i1 = 1, npts {
-	    k1 = i1 - 1
-	    is = max (1, i1 - grow)
-	    ie = min (npts, i1 + grow)
-	    do j1 = n[i1]+1, nimages {
-		l = Memi[m[j1]+k1]
-		if (l == 0)
+	do k = 1, nimages {
+	    pm = Memi[pms+k-1]
+	    if (!pl_linenotempty (pm, v))
+		next
+	    call pmglpi (pm, v, buf, 1, npts, PIX_SRC)
+	    do i = 1, npts {
+		if (buf[i] == 0)
 		    next
-		if (combine == MEDIAN)
-		    docombine = true
-
-		do i2 = is, ie {
-		    if (i2 == i1)
-			next
-		    k2 = i2 - 1
-		    n2 = n[i2]
-		    if (nkeep < 0)
-			maxkeep = max (0, n2 + nkeep)
-		    else
-			maxkeep = min (n2, nkeep)
-		    if (n2 <= maxkeep)
-			next
-		    do j2 = 1, n2 {
-			mp1 = m[j2] + k2
-			if (Memi[mp1] == l) {
-			    if (!docombine && n2 > 1)
-				average[i2] =
-				    (n2*average[i2] - Memd[d[j2]+k2]) / (n2-1)
-			    mp2 = m[n2] + k2
-			    if (j2 < n2) {
-				Memd[d[j2]+k2] = Memd[d[n2]+k2]
-				Memi[mp1] = Memi[mp2]
-			    }
-			    Memi[mp2] = 0
-			    n[i2] = n2 - 1
-			    break
+		for (j = 1; j <= n[i]; j = j + 1) {
+		    if (Memi[m[j]+i-1] == k) {
+			if (j < n[i]) {
+			    Memd[d[j]+i-1] = Memd[d[n[i]]+i-1]
+			    Memi[m[j]+i-1] = Memi[m[n[i]]+i-1]
 			}
+			n[i] = n[i] - 1
+			dflag = D_MIX
+			break
 		    }
 		}
 	    }

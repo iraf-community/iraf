@@ -650,6 +650,7 @@ original data, with possible loss of dynamic range.
 Values exceeding the maximum value implied by the bitpix
 parameter will be set to the maximum representable value.
 (default = yes)
+.le
 
 
 .sh
@@ -1135,6 +1136,7 @@ the newvalue instead of the newidentifier.
 .ls 4 = weight
 As for option = id except that the nput format contains the newweight
 instead of the newidentifier.
+.le
 .le
 
 .sh

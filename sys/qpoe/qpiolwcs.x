@@ -30,16 +30,16 @@ begin
 	# Solve for Vx :==  1.0 - (1 / block) * ((block + 1) / 2)
 	#	       -->  0.5 - 1 / (2 * block)
 
-	ltv_2[1] = 0.5d0 - 1.0d0 / double (max (1, IO_XBLOCK(io))) / 2.0d0
-	ltv_2[2] = 0.5d0 - 1.0d0 / double (max (1, IO_YBLOCK(io))) / 2.0d0
+	ltv_2[1] = 0.5d0 - 1.0d0 / double (max (1.0, IO_XBLOCK(io))) / 2.0d0
+	ltv_2[2] = 0.5d0 - 1.0d0 / double (max (1.0, IO_YBLOCK(io))) / 2.0d0
 
 	do j = 1, ndim
 	    do i = 1, ndim
 		if (i == j) {
 		    if (i == 1)
-			ltm[i,j] = 1.0D0 / max (1, IO_XBLOCK(io))
+			ltm[i,j] = 1.0D0 / max (1.0, IO_XBLOCK(io))
 		    else
-			ltm[i,j] = 1.0D0 / max (1, IO_YBLOCK(io))
+			ltm[i,j] = 1.0D0 / max (1.0, IO_YBLOCK(io))
 		} else
 		    ltm[i,j] = 0
 

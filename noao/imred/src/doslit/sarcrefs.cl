@@ -60,7 +60,7 @@ begin
 	if (i < 1 || dc == -1) {
 	    print ("Determine dispersion solution for ", arcref) | tee (log1)
 	    #delete (database//"/id"//arcref//".ms*", verify=no)
-	    if (real(crval) == INDEF && real(cdelt) == INDEF)
+	    if (crval == "INDEF" && cdelt == "INDEF")
 		identify (arcrefms, section="middle line", database=database,
 		    coordlist=sparams.coordlist, nsum=1, match=sparams.match,
 		    maxfeatures=50, zwidth=100., ftype="emission",

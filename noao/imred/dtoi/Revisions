@@ -1,5 +1,20 @@
 .help revisions Jun88 noao.imred.dtoi
 .nf
+imred$dtoi/doc/hdfit.hlp
+imred$dtoi/doc/hdshift.hlp
+imred$dtoi/doc/hdtoi.hlp
+imred$dtoi/doc/spotlist.hlp
+	Fixed minor formating problems.  (4/22/99, Valdes)
+
+imred$dtoi/hdicggraph.x
+imred$dtoi/hdicebars.x
+	Replace direct access to GTOOLS structure with GTOOLS interface.
+	(12/18/98, Valdes)
+
+=======
+V2.11.1
+=======
+
 imred$dtoi/spotlist.x	7 Sept, 1989 SRo
 	In Suzanne's absence, removed the divide by nfog fog images in
 	hd_fogcalc() after a bug report by Steve Majewski that when multiple

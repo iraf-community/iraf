@@ -96,11 +96,15 @@
 *      slAOPT routine may be used to perform the requisite
 *      partial recomputation of AOPRMS.
 *
+*  8) The azimuths etc used by the present routine are with respect
+*     to the celestial pole.  Corrections from the terrestrial pole
+*     can be computed using slPLMO.
+*
 *  Called:  slDS2C, slDC2S, slRFRO, slDA2P
 *
-*  P.T.Wallace   Starlink   17 May 1990
+*  P.T.Wallace   Starlink   23 June 1997
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -173,7 +177,11 @@
       END IF
 
 *  Azimuth (S=0,E=90)
-      AZ = ATAN2(YAEO,XAEO)
+      IF (XAEO.NE.0D0.OR.YAEO.NE.0D0) THEN
+         AZ = ATAN2(YAEO,XAEO)
+      ELSE
+         AZ = 0D0
+      END IF
 
 *  Sine of observed ZD, and observed ZD
       SZ = SQRT(XAEO*XAEO+YAEO*YAEO)

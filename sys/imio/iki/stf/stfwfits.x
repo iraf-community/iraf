@@ -142,4 +142,6 @@ begin
 
 	if (IM_HFD(im) != NULL)
 	    IM_HFD(im) = open (IM_HDRFILE(im), READ_ONLY, TEXT_FILE)
+
+	call sfree (sp)
 end

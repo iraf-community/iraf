@@ -56,7 +56,7 @@ begin
 		call malloc (ASI_COEFF(asi), ASI_NCOEFF(asi), TY_REAL)
 	    }
 
-	case II_LINEAR:
+	case II_DRIZZLE, II_LINEAR:
 	    if (npix < 2)
 		call error (0, "ASIFIT: too few points for LINEAR")
 	    else {
@@ -67,7 +67,7 @@ begin
 	        call malloc (ASI_COEFF(asi), ASI_NCOEFF(asi), TY_REAL)
 	    }
 
-	case II_SINC:
+	case II_SINC, II_LSINC:
 	    if (npix < 1)
 		call error (0, "ASIFIT: too few points for SINC")
 	    else {
@@ -119,10 +119,10 @@ begin
 	    call ii_spline (COEFF(ASI_COEFF(asi)), TEMP(temp), npix)
 	    call mfree (temp, TY_REAL)
 
-	case II_NEAREST, II_SINC:
+	case II_NEAREST, II_SINC, II_LSINC:
 	    # No end conditions required.
 
-	case II_LINEAR:
+	case II_LINEAR, II_DRIZZLE:
 	    COEFF(cnptr + 1) = 2. * COEFF(cdataptr + npix) -	# if x = npts
 	    		       COEFF(cdataptr + npix - 1)
 

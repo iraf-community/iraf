@@ -450,8 +450,10 @@ int	status			#O status flag
 
 char    blank[1]	
 pointer sp, path, spp, mii, pn, n
-int	fd, nblanks, size_rec
-int	strlen(), open()
+int	iso_cutover, fd, nblanks, size_rec
+
+int	strlen(), open(), envgeti()
+long	clktime()
 
 begin
 	call smark (sp)
@@ -478,7 +480,13 @@ begin
         call fxf_akwc ("ORIGIN", FITS_ORIGIN,
 	    strlen(FITS_ORIGIN), "FITS file originator", pn)
 
-        call fxf_encode_date (Memc[path], LEN_CARD)
+	# Dates after iso_cutover use ISO format dates.
+	iferr (iso_cutover = envgeti (ENV_ISOCUTOVER))
+	    iso_cutover = DEF_ISOCUTOVER
+
+	# Encode the DATE keyword.
+        call fxf_encode_date (clktime(long(0)), Memc[path], LEN_CARD,
+	    "ISO", 2000)
 	call fxf_akwc ("DATE", Memc[path],
 	    strlen(Memc[path]), "Date FITS file was generated", pn)
 

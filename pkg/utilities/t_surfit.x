@@ -27,14 +27,13 @@ double	zmin, zmax		# Data limits
 int	ncols			# Number of image columns
 int	nlines			# Number of image lines
 
-int	i, j, k, fd, n, ncoeff
+int	i, j, k, fd, n, ncoeff, maxorder, xincr
 double	r[8], dx, dy, chisqr
 pointer	sf, im, mw
-pointer sp, x, y, z, w, c, e, f, xvec, yvec, ptr
+pointer sp, x, y, z, w, c, e, f, xvec, yvec, ptr, xtype
 
-bool	clgetb()
 int	clgeti(), clgwrd()
-int	open(), fscan(), nscan(), nowhite(), btoi(), dgsgeti()
+int	open(), fscan(), nscan(), nowhite(), dgsgeti()
 double	clgetd(), dgseval()
 pointer	immap(), impl2d(), mw_open()
 errchk	open, malloc, realloc, immap, impl2d, mw_open
@@ -48,6 +47,7 @@ begin
 	call salloc (coords, SZ_FNAME, TY_CHAR)
 	call salloc (fit, SZ_FNAME, TY_CHAR)
 	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (xtype, SZ_FNAME, TY_CHAR)
 
 	x = NULL
 	y = NULL
@@ -138,7 +138,7 @@ begin
 	    i = clgwrd ("function", Memc[func], SZ_FNAME, GS_FUNCTIONS)
 	    xorder = clgeti ("xorder")
 	    yorder = clgeti ("yorder")
-	    xterms = btoi (clgetb ("xterms"))
+	    xterms = clgwrd ("xterms", Memc[xtype], SZ_FNAME, GS_XTYPES) - 1
 
 	    # Set the weights.
 	    j = clgwrd ("weighting", Memc[wttype], SZ_FNAME,
@@ -174,10 +174,10 @@ begin
 	    call printf ("Surface parameters:\n")
 	    call printf ("  function = %s\n")
 		call pargstr (Memc[func])
-	    call printf ("  xorder = %d\n  yorder = %d\n  xterms = %b\n")
+	    call printf ("  xorder = %d\n  yorder = %d\n  xterms = %s\n")
 		call pargi (xorder)
 		call pargi (yorder)
-		call pargi (xterms)
+		call pargstr (Memc[xtype])
 	    call printf ("  weighting = %s\n")
 		call pargstr (Memc[wttype])
 	    call printf ("  xmin = %8.6g\n  xmax = %8.6g\n")
@@ -193,7 +193,7 @@ begin
 	    call printf ("\nSurface coefficients:\n")
 	    call printf ("   x  y    coeff    error\n")
 	    i = 0
-	    if (xterms == YES) {
+	    if (xterms == GS_XFULL) {
 		do k = 1, yorder {
 		    do j = 1, xorder {
 			call printf ("  %2d %2d %8.6g %8.6g\n")
@@ -203,6 +203,21 @@ begin
 			    call pargd (Memd[e+i])
 			i = i + 1
 		    }
+		}
+	    } else if (xterms == GS_XHALF) {
+		maxorder = max (xorder+1, yorder+1)
+		xincr = xorder
+		do k = 1, yorder {
+		    do j = 1, xincr {
+			call printf ("  %2d %2d %8.6g %8.6g\n")
+			    call pargi (j-1)
+			    call pargi (k-1)
+			    call pargd (Memd[c+i])
+			    call pargd (Memd[e+i])
+			i = i + 1
+		    }
+		    if ((k + xorder + 1) > maxorder)
+			xincr = xincr - 1
 		}
 	    } else {
 		do j = 1, xorder {

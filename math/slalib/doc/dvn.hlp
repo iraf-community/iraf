@@ -1,4 +1,4 @@
-.help dvn Nov95 "Slalib Package"
+.help dvn Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDVN (V, UV, VM)
@@ -7,7 +7,7 @@
       D V N
      - - - -
 
-  Normalises a 3-vector also giving the modulus (double precision)
+  Normalizes a 3-vector also giving the modulus (double precision)
 
   Given:
      V       dp(3)      vector
@@ -18,7 +18,7 @@
 
   If the modulus of V is zero, UV is set to zero as well
 
-  P.T.Wallace   Starlink   November 1984
+  P.T.Wallace   Starlink   23 November 1995
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.

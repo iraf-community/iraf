@@ -5,11 +5,12 @@ include	"../icombine.h"
 
 # IC_MEDIAN -- Median of lines
 
-procedure ic_medians (d, n, npts, median)
+procedure ic_medians (d, n, npts, doblank, median)
 
 pointer	d[ARB]			# Input data line pointers
 int	n[npts]			# Number of good pixels
 int	npts			# Number of output points per line
+int	doblank			# Set blank values?
 real	median[npts]		# Median
 
 int	i, j1, j2, j3, k, n1
@@ -20,8 +21,10 @@ include	"../icombine.com"
 
 begin
 	if (dflag == D_NONE) {
-	    do i = 1, npts
-		median[i]= blank
+	    if (doblank == YES) {
+		do i = 1, npts
+		    median[i]= blank
+	    }
 	    return
 	}
 
@@ -54,7 +57,7 @@ begin
 			    median[i] = (val1 + val2) / 2.
 			} else
 			    median[i] = Mems[d[j1]+k]
-		    } else
+		    } else if (doblank == YES)
 			median[i] = blank
 		}
 	    }
@@ -133,18 +136,19 @@ begin
 		median[i] = (val1 + val2) / 2
 	    } else if (n1 == 1)
 		median[i] = Mems[d[1]+k]
-	    else
+	    else if (doblank == YES)
 		median[i] = blank
 	}
 end
 
 # IC_MEDIAN -- Median of lines
 
-procedure ic_mediani (d, n, npts, median)
+procedure ic_mediani (d, n, npts, doblank, median)
 
 pointer	d[ARB]			# Input data line pointers
 int	n[npts]			# Number of good pixels
 int	npts			# Number of output points per line
+int	doblank			# Set blank values?
 real	median[npts]		# Median
 
 int	i, j1, j2, j3, k, n1
@@ -155,8 +159,10 @@ include	"../icombine.com"
 
 begin
 	if (dflag == D_NONE) {
-	    do i = 1, npts
-		median[i]= blank
+	    if (doblank == YES) {
+		do i = 1, npts
+		    median[i]= blank
+	    }
 	    return
 	}
 
@@ -189,7 +195,7 @@ begin
 			    median[i] = (val1 + val2) / 2.
 			} else
 			    median[i] = Memi[d[j1]+k]
-		    } else
+		    } else if (doblank == YES)
 			median[i] = blank
 		}
 	    }
@@ -268,18 +274,19 @@ begin
 		median[i] = (val1 + val2) / 2
 	    } else if (n1 == 1)
 		median[i] = Memi[d[1]+k]
-	    else
+	    else if (doblank == YES)
 		median[i] = blank
 	}
 end
 
 # IC_MEDIAN -- Median of lines
 
-procedure ic_medianr (d, n, npts, median)
+procedure ic_medianr (d, n, npts, doblank, median)
 
 pointer	d[ARB]			# Input data line pointers
 int	n[npts]			# Number of good pixels
 int	npts			# Number of output points per line
+int	doblank			# Set blank values?
 real	median[npts]		# Median
 
 int	i, j1, j2, j3, k, n1
@@ -290,8 +297,10 @@ include	"../icombine.com"
 
 begin
 	if (dflag == D_NONE) {
-	    do i = 1, npts
-		median[i]= blank
+	    if (doblank == YES) {
+		do i = 1, npts
+		    median[i]= blank
+	    }
 	    return
 	}
 
@@ -324,7 +333,7 @@ begin
 			    median[i] = (val1 + val2) / 2.
 			} else
 			    median[i] = Memr[d[j1]+k]
-		    } else
+		    } else if (doblank == YES)
 			median[i] = blank
 		}
 	    }
@@ -403,18 +412,19 @@ begin
 		median[i] = (val1 + val2) / 2
 	    } else if (n1 == 1)
 		median[i] = Memr[d[1]+k]
-	    else
+	    else if (doblank == YES)
 		median[i] = blank
 	}
 end
 
 # IC_MEDIAN -- Median of lines
 
-procedure ic_mediand (d, n, npts, median)
+procedure ic_mediand (d, n, npts, doblank, median)
 
 pointer	d[ARB]			# Input data line pointers
 int	n[npts]			# Number of good pixels
 int	npts			# Number of output points per line
+int	doblank			# Set blank values?
 double	median[npts]		# Median
 
 int	i, j1, j2, j3, k, n1
@@ -425,8 +435,10 @@ include	"../icombine.com"
 
 begin
 	if (dflag == D_NONE) {
-	    do i = 1, npts
-		median[i]= blank
+	    if (doblank == YES) {
+		do i = 1, npts
+		    median[i]= blank
+	    }
 	    return
 	}
 
@@ -459,7 +471,7 @@ begin
 			    median[i] = (val1 + val2) / 2.
 			} else
 			    median[i] = Memd[d[j1]+k]
-		    } else
+		    } else if (doblank == YES)
 			median[i] = blank
 		}
 	    }
@@ -538,7 +550,7 @@ begin
 		median[i] = (val1 + val2) / 2
 	    } else if (n1 == 1)
 		median[i] = Memd[d[1]+k]
-	    else
+	    else if (doblank == YES)
 		median[i] = blank
 	}
 end

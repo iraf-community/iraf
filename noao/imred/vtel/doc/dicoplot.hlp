@@ -15,6 +15,7 @@ Second image to plot on the output.
 .le
 .ls rot_number
 Carrington rotation number.
+.le
 .ih
 DESCRIPTION
 Dicoplot produces plots on the Dicomed.

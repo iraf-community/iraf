@@ -1,6 +1,20 @@
 .help revisions Jun88 noao.imred.generic
 .nf
 generic$normalize.cl
+generic$normalize.par	-
+    Rewrote as modern cl procedure script with possiblity to extend to
+    MEF extensions.  (5/13/99, Valdes)
+
+generic$flatten.cl
+generic$normalize.cl
+    Changed use of FILES for image list expansion to SECTIONS.
+    (5/13/99, Valdes)
+
+=======
+V2.11.1
+=======
+
+generic$normalize.cl
 generic$normflat.cl
     Added CCDMEAN = 1 to final image header.  (4/16/93, Valdes)
 

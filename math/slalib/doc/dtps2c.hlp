@@ -1,4 +1,4 @@
-.help dtps2c Nov95 "Slalib Package"
+.help dtps2c Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDPSC (XI, ETA, RA, DEC, RAZ1, DECZ1,

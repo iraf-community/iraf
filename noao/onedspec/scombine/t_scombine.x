@@ -189,7 +189,7 @@ begin
 		    if (ggain)
 			DEC(shin) = imgetr (im, Memc[gain])
 		    if (gsn)
-			UT(shin) = imgetr (im, Memc[gain])
+			UT(shin) = imgetr (im, Memc[snoise])
 		    if (!rng_elementi (aps, AP(shin)))
 			next
 		    if (group == GRP_APERTURES) {
@@ -528,6 +528,16 @@ begin
 	    dtype = DCLINEAR
 	z = 0.
 	coeff[1] = EOS
+
+	# Dispersion type
+	if (dtype == DCLINEAR) {
+	    do i = 1, ns {
+		if (DC(shdr[i]) == DCNO) {
+		    dtype = DCNO
+		    break
+		}
+	    }
+	}
 
 	# Starting wavelength
 	if (IS_INDEFD (w1)) {

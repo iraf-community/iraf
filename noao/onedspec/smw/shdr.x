@@ -143,6 +143,7 @@ begin
 		call sprintf (Memc[key], SZ_FNAME, "cunit%d")
 		    call pargi (i)
 		iferr (call imgstr (im, Memc[key], UNITS(sh), LEN_SHDRS)) {
+		    call strlwr (LABEL(sh))
 		    if (LABEL(sh) == EOS)
 			call strcpy ("", UNITS(sh), LEN_SHDRS)
 		    else if (streq (LABEL(sh), "lambda"))
@@ -151,12 +152,14 @@ begin
 			call strcpy ("hertz", UNITS(sh), LEN_SHDRS)
 		    else if (strncmp (LABEL(sh), "velo", 4) == 0)
 			call strcpy ("m/s 21 centimeters", UNITS(sh), LEN_SHDRS)
-		    else if (streq (LABEL(sh), "wavelength"))
+		    else if (streq (LABEL(sh), "waveleng"))
 			call strcpy ("meters", UNITS(sh), LEN_SHDRS)
 		    else
 			call strcpy ("", UNITS(sh), LEN_SHDRS)
 		}
 	    }
+	    if (UNITS(sh) == EOS && DC(sh) != DCNO)
+		call strcpy ("Angstroms", UNITS(sh), LEN_SHDRS)
 	    MWUN(sh) = un_open (UNITS(sh))
 	    call un_copy (MWUN(sh), UN(sh))
 
@@ -458,9 +461,10 @@ data_	# Set the coordinate and data arrays if desired otherwise free them.
 		call strcpy (FUN_UNITS(FUN(sh)), FUNITS(sh), LEN_SHDRS)
 	    }
 	}
-	iferr (call fun_ctranr (FUNIM(sh), FUN(sh), UN(sh), Memr[SX(sh)],
-	    Memr[SY(sh)], Memr[SY(sh)], SN(sh)))
-	    ;
+	if (SPEC(sh,mode) != 0)
+	    iferr (call fun_ctranr (FUNIM(sh), FUN(sh), UN(sh), Memr[SX(sh)],
+		Memr[SPEC(sh,mode)], Memr[SPEC(sh,mode)], SN(sh)))
+		;
 
 	call sfree (sp)
 end
@@ -499,7 +503,7 @@ begin
 	call salloc (key, SZ_LINE, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
-	do i = 1, 4 {
+	do i = 1, 5 {
 	    call sprintf (Memc[key], SZ_LINE, "BANDID%d")
 		call pargi (i)
 	    ifnoerr (call imgstr (im, Memc[key], Memc[str], SZ_LINE)) {
@@ -516,7 +520,7 @@ begin
 	    }
 	}
 	call sfree (sp)
-	if (i == 5) {
+	if (i == 6) {
 	    if (SID(sh,type) != NULL)
 		call mfree (SID(sh,type), TY_CHAR)
 	    if (SPEC(sh,type) != NULL)

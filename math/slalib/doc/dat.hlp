@@ -1,4 +1,4 @@
-.help dat Nov95 "Slalib Package"
+.help dat Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slDAT (UTC)
@@ -23,7 +23,16 @@
      fractional part, correct behaviour on the day of a leap second
      can only be guaranteed up to the end of the second 23:59:59.
 
-  2  Pre 1972 January 1 a fixed value of 10 sec is returned.
+  2  For epochs from 1961 January 1 onwards, the expressions from the
+     file ftp://maia.usno.navy.mil/ser7/tai-utc.dat are used.
+
+  3  The 5ms timestep at 1961 January 1 is taken from 2.58.1 (p87) of
+     the 1992 Explanatory Supplement.
+
+  4  UTC began at 1960 January 1.0 (JD 2436934.5) and it is improper
+     to call the routine with an earlier epoch.  However, if this
+     is attempted, the TAI-UTC expression for the year 1960 is used.
+
 
      :-----------------------------------------:
      :                                         :
@@ -33,13 +42,13 @@
      :     occasion that a leap second is      :
      :                announced                :
      :                                         :
-     :  Latest leap second:  1996 January 1    :
+     :  Latest leap second:  1999 January 1    :
      :                                         :
      :-----------------------------------------:
 
-  P.T.Wallace   Starlink   14 November 1995
+  P.T.Wallace   Starlink   31 May 1999
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1999 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

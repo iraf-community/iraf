@@ -53,10 +53,10 @@ begin
 	# Print data parameters.
 	if (GM_PROJECTION(fit) == GM_NONE)
 	    call sprintf (Memc[params], MAX_PARAMS,
-	        "GEOMAP: function = %s npts = %d sigrej = %g nrej = %d\n")
+	        "GEOMAP: function = %s npts = %d reject = %g nrej = %d\n")
 	else
 	    call sprintf (Memc[params], MAX_PARAMS,
-	        "CCMAP: function = %s npts = %d sigrej = %g nrej = %d\n")
+	        "CCMAP: function = %s npts = %d reject = %g nrej = %d\n")
 
 	    switch (GM_FUNCTION(fit)) {
 	    case GS_LEGENDRE:

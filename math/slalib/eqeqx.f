@@ -21,9 +21,9 @@
 *               
 *  Called:  slNUTC
 *
-*  Patrick Wallace   Starlink   21 November 1994
+*  Patrick Wallace   Starlink   23 August 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -34,7 +34,7 @@
 *  Turns to arc seconds and arc seconds to radians
       DOUBLE PRECISION T2AS,AS2R
       PARAMETER (T2AS=1296000D0,
-     :           AS2R=0.4848136811095359949D-05)
+     :           AS2R=0.484813681109535994D-5)
 
       DOUBLE PRECISION T,OM,DPSI,DEPS,EPS0
 

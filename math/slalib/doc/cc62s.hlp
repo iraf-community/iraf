@@ -1,4 +1,4 @@
-.help cc62s Nov95 "Slalib Package"
+.help cc62s Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slC62S (V, A, B, R, AD, BD, RD)
@@ -11,19 +11,19 @@
   to spherical coordinates (single precision)
 
   Given:
-     V     r(6)   Cartesian position & velocity vector
+     V      r(6)   Cartesian position & velocity vector
 
   Returned:
-     A     r      longitude (radians)
-     B     r      latitude (radians)
-     R     r      radial coordinate
-     AD    r      longitude derivative (radians per unit time)
-     BD    r      latitude derivative (radians per unit time)
-     RD    r      radial derivative
+     A      r      longitude (radians)
+     B      r      latitude (radians)
+     R      r      radial coordinate
+     AD     r      longitude derivative (radians per unit time)
+     BD     r      latitude derivative (radians per unit time)
+     RD     r      radial derivative
 
-  P.T.Wallace   Starlink   June 1989
+  P.T.Wallace   Starlink   28 April 1996
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

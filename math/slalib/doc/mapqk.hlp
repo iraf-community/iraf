@@ -1,4 +1,4 @@
-.help mapqk Nov95 "Slalib Package"
+.help mapqk Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slMAPQ (RM, DM, PR, PD, PX, RV, AMPRMS, RA, DA)
@@ -65,11 +65,11 @@
      slDVDV        dot product
      slDMXV        matrix x vector
      slDC2S       Cartesian to spherical
-     slDA2P      normalise angle 0-2Pi
+     slDA2P      normalize angle 0-2Pi
 
-  P.T.Wallace   Starlink   16 September 1995
+  P.T.Wallace   Starlink   23 August 1996
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

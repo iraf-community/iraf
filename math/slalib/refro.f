@@ -5,7 +5,7 @@
 *      R F R O
 *     - - - - - -
 *
-*  Atmospheric refraction for radio and optical wavelengths
+*  Atmospheric refraction for radio and optical/IR wavelengths.
 *
 *  Given:
 *    ZOBS    d  observed zenith distance of the source (radian)
@@ -37,10 +37,10 @@
 *     and Sinclair (NAO Technical Notes 59 and 63, subsequently adopted
 *     in the Explanatory Supplement, 1992 edition - see section 3.281).
 *
-*  4  The code is a modified form of the optical refraction subroutine
+*  4  The code is a development of the optical/IR refraction subroutine
 *     AREF of C.Hohenkerk (HMNAO, September 1984), with extensions to
 *     support the radio case.  Apart from merely cosmetic changes, the
-*     following modifications to the original HMNAO optical refraction
+*     following modifications to the original HMNAO optical/IR refraction
 *     code have been made:
 *
 *     .  The angle arguments have been changed to radians.
@@ -66,11 +66,11 @@
 *        communication 1989), based on the Essen & Froome
 *        refractivity formula adopted in Resolution 1 of the
 *        13th International Geodesy Association General Assembly
-*        (Bulletin Geodesique 1963 p390).
+*        (Bulletin Geodesique 70 p390, 1963).
 *
 *     .  Various small changes have been made to gain speed.
 *
-*     None of the changes significantly affects the optical results
+*     None of the changes significantly affects the optical/IR results
 *     with respect to the algorithm given in the 1992 Explanatory
 *     Supplement.  For example, at 70 deg zenith distance the present
 *     routine agrees with the ES algorithm to better than 0.05 arcsec
@@ -111,9 +111,9 @@
 *
 *  Called:  slDA1P, slATMT, slATMS
 *
-*  P.T.Wallace   Starlink   19 September 1995
+*  P.T.Wallace   Starlink   3 June 1997
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1997 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -160,11 +160,11 @@
 
 
 
-*  Transform ZOBS into the normal range
+*  Transform ZOBS into the normal range.
       ZOBS1 = slDA1P(ZOBS)
       ZOBS2 = MIN(ABS(ZOBS1),D93)
 
-*  Keep other arguments within safe bounds
+*  Keep other arguments within safe bounds.
       HMOK = MIN(MAX(HM,-1D3),10D3)
       TDKOK = MIN(MAX(TDK,100D0),500D0)
       PMBOK = MIN(MAX(PMB,0D0),10000D0)
@@ -172,13 +172,13 @@
       WLOK = MAX(WL,0.1D0)
       ALPHA = MIN(MAX(ABS(TLR),0.001D0),0.01D0)
 
-*  Tolerance for iteration
-      TOL = MIN(ABS(EPS),0.1D0)/2D0
+*  Tolerance for iteration.
+      TOL = MIN(MAX(ABS(EPS),1D-12),0.1D0)/2D0
 
-*  Decide whether optical or radio case - switch at 100 micron
+*  Decide whether optical/IR or radio case - switch at 100 microns.
       OPTIC = WLOK.LE.100D0
 
-*  Set up model atmosphere parameters defined at the observer
+*  Set up model atmosphere parameters defined at the observer.
       WLSQ = WLOK*WLOK
       GB = 9.784D0*(1D0-0.0026D0*COS(PHI+PHI)-0.00000028D0*HMOK)
       IF (OPTIC) THEN
@@ -216,14 +216,14 @@
          C6 = C5*DELM2*ALPHA/(TDKOK*TDKOK)
       END IF
 
-*  Conditions at the observer
+*  Conditions at the observer.
       R0 = S+HMOK
       CALL slATMT(R0,TDKOK,ALPHA,GAMM2,DELM2,C1,C2,C3,C4,C5,C6,
      :                                              R0,TEMPO,DN0,RDNDR0)
       SK0 = DN0*R0*SIN(ZOBS2)
       F0 = REFI(R0,DN0,RDNDR0)
 
-*  Conditions in the troposphere at the tropopause
+*  Conditions in the troposphere at the tropopause.
       RT = S+HT
       CALL slATMT(R0,TDKOK,ALPHA,GAMM2,DELM2,C1,C2,C3,C4,C5,C6,
      :                                                 RT,TT,DNT,RDNDRT)
@@ -231,13 +231,13 @@
       ZT = ATAN2(SINE,SQRT(MAX(1D0-SINE*SINE,0D0)))
       FT = REFI(RT,DNT,RDNDRT)
 
-*  Conditions in the stratosphere at the tropopause
+*  Conditions in the stratosphere at the tropopause.
       CALL slATMS(RT,TT,DNT,GAMAL,RT,DNTS,RDNDRP)
       SINE = SK0/(RT*DNTS)
       ZTS = ATAN2(SINE,SQRT(MAX(1D0-SINE*SINE,0D0)))
       FTS = REFI(RT,DNTS,RDNDRP)
 
-*  Conditions at the stratosphere limit
+*  Conditions at the stratosphere limit.
       RS = S+HS
       CALL slATMS(RT,TT,DNT,GAMAL,RS,DNS,RDNDRS)
       SINE = SK0/(RS*DNS)
@@ -246,21 +246,21 @@
 
 *
 *  Integrate the refraction integral in two parts;  first in the
-*  troposphere (K=1), then in the stratosphere (K=2)
+*  troposphere (K=1), then in the stratosphere (K=2).
 *
 
-*  Initialize previous refraction to ensure at least two iterations
+*  Initialize previous refraction to ensure at least two iterations.
       REFOLD = 1D6
 
 *  Start off with 8 strips for the troposphere integration, and then
 *  use the final troposphere value for the stratosphere integration,
-*  which tends to need more strips
+*  which tends to need more strips.
       IS = 8
 
-*  Troposphere then stratosphere
+*  Troposphere then stratosphere.
       DO K = 1,2
 
-*     Start Z, Z range, and start and end values
+*     Start Z, Z range, and start and end values.
          IF (K.EQ.1) THEN
             Z0 = ZOBS2
             ZRANGE = ZT-Z0
@@ -273,34 +273,34 @@
             FF = FS
          END IF
 
-*     Sums of odd and even values
+*     Sums of odd and even values.
          FO = 0D0
          FE = 0D0
 
-*     First time through loop we have to do every point
+*     First time through the loop we have to do every point.
          N = 1
 
-*     Start of iteration loop (terminates at specified precision)
+*     Start of iteration loop (terminates at specified precision).
          LOOP = .TRUE.
          DO WHILE (LOOP)
 
-*        Strip width
+*        Strip width.
             H = ZRANGE/DBLE(IS)
 
-*        Initialize distance from Earth centre for quadrature pass
+*        Initialize distance from Earth centre for quadrature pass.
             IF (K.EQ.1) THEN
                R = R0
             ELSE
                R = RT
             END IF
 
-*        One pass (no need to compute evens after first time)
+*        One pass (no need to compute evens after first time).
             DO I=1,IS-1,N
 
-*           Sine of observed zenith distance
+*           Sine of observed zenith distance.
                SZ = SIN(Z0+H*DBLE(I))
 
-*           Find R (to nearest metre, maximum four iterations)
+*           Find R (to the nearest metre, maximum four iterations).
                IF (SZ.GT.1D-20) THEN
                   W = SK0/SZ
                   RG = R
@@ -320,7 +320,7 @@
                   R = RG
                END IF
 
-*           Find refractive index and integrand at R
+*           Find the refractive index and integrand at R.
                IF (K.EQ.1) THEN
                   CALL slATMT(R0,TDKOK,ALPHA,GAMM2,DELM2,
      :                                   C1,C2,C3,C4,C5,C6,R,T,DN,RDNDR)
@@ -329,7 +329,7 @@
                END IF
                F = REFI(R,DN,RDNDR)
 
-*           Accumulate odd and (first time only) even values
+*           Accumulate odd and (first time only) even values.
                IF (N.EQ.1.AND.MOD(I,2).EQ.0) THEN
                   FE = FE+F
                ELSE
@@ -337,38 +337,38 @@
                END IF
             END DO
 
-*        Evaluate the integrand using Simpson's Rule
+*        Evaluate the integrand using Simpson's Rule.
             REFP = H*(FB+4D0*FO+2D0*FE+FF)/3D0
 
 *        Has the required precision been achieved?
             IF (ABS(REFP-REFOLD).GT.TOL) THEN
 
-*           No: prepare for next iteration
+*           No: prepare for next iteration.
 
-*           Save current value for convergence test
+*           Save current value for convergence test.
                REFOLD = REFP
 
-*           Double the number of strips
+*           Double the number of strips.
                IS = IS+IS
 
-*           Sum of all current values = sum of next pass's even values
+*           Sum of all current values = sum of next pass's even values.
                FE = FE+FO
 
-*           Prepare for new odd values
+*           Prepare for new odd values.
                FO = 0D0
 
-*           Skip even values next time
+*           Skip even values next time.
                N = 2
             ELSE
 
-*           Yes: save troposphere component and terminate loop
+*           Yes: save troposphere component and terminate the loop.
                IF (K.EQ.1) REFT = REFP
                LOOP = .FALSE.
             END IF
          END DO
       END DO
 
-*  Result
+*  Result.
       REF = REFT+REFP
       IF (ZOBS1.LT.0D0) REF = -REF
 

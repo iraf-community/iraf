@@ -520,6 +520,7 @@ The apertures are defined using the specified aperture reference image
 which is usually a flat field in which both the object and arc fibers are
 illuminated.  The specified number of fibers are found automatically and
 sequential apertures assigned.
+.le
 .ls [5]
 A query is given allowing the apertures to be interactively reviewed.
 In this mode one may adjust the aperture widths as desired either

@@ -40,8 +40,8 @@ begin
 	call imaddi (im, "NAXES",  qp_geti(qp,"naxes"))
 	call imaddi (im, "AXLEN1", qp_geti(qp,"axlen[1]"))
 	call imaddi (im, "AXLEN2", qp_geti(qp,"axlen[2]"))
-	call imaddi (im, "XBLOCK", QPF_XBLOCK(qpf))
-	call imaddi (im, "YBLOCK", QPF_YBLOCK(qpf))
+	call imaddr (im, "XBLOCK", QPF_XBLOCK(qpf))
+	call imaddr (im, "YBLOCK", QPF_YBLOCK(qpf))
 
 	# Output the QPOE filter.
 	iferr (call qpf_wfilter (qpf, im))

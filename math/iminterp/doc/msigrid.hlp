@@ -1,4 +1,4 @@
-.help msigrid Apr1985 "Image Interpolation Package"
+.help msigrid Dec98 "Image Interpolation Package"
 .ih
 NAME
 msigrid -- evaluate the interpolant on a grid of points
@@ -7,13 +7,13 @@ SYNOPSIS
 msigrid (msi, x, y, zfit, nx, ny, len_zfit)
 
 .nf
-    pointer	msi			# interpolant descriptor
-    real	x[nx]			# x values, 1 <= x <= nxpix
-    real	y[ny]			# y values, 1 <= y <= nypix
-    real	zfit[len_zfit,ARB]	# grid of interpolated values
-    int		nx			# number of x points
-    int		ny			# number of y points
-    int		len_zfit		# length zfit, len_zfit >= nx
+    pointer	msi			#I interpolant descriptor
+    real	x[2*nx]			#I x values, 1 <= x[i] <= nx
+    real	y[2*ny]  		#I y values, 1 <= y[i] <= ny
+    real	zfit[len_zfit,ARB]	#O grid of interpolated values
+    int		nx			#I number of x points
+    int		ny			#I number of y points
+    int		len_zfit		#I length zfit, len_zfit >= nx
 .fi
 .ih
 ARGUMENTS
@@ -21,9 +21,9 @@ ARGUMENTS
 Pointer to the interpolant descriptor structure.
 .le
 .ls x, y
-The x and y arrays of points to be evaluated.
-The x and y arrays must be ordered in increasing values of x and y
-respectively.
+The x and y arrays of points to be evaluated, or in the case of the drizzle
+interpolant the x and y ranges over which the points are to be evaluated.
+The x and y arrays must be ordered in increasing values of x and y respectively.
 .le
 .ls zfit
 The array of interpolated points.
@@ -37,8 +37,9 @@ The row length of the zfit array. Len_zfit >= nx.
 .ih
 DESCRIPTION
 MSIGRID evaluates the interpolant at a set of x and y values on a
-rectangular grid. It is most efficient for evaluating the interpolant
-at may values which are closely spaced in x and y. For widely spaced
+rectangular grid or in the case of the drizzle interpolant within
+rectangular regions. It is most efficient for evaluating the interpolant
+at many values which are closely spaced in x and y. For widely spaced
 points MSIVECTOR should be used.
 .ih
 NOTES
@@ -46,5 +47,5 @@ Checking for out of bounds and INDEF valued pixels is the responsibility
 of the user.
 .ih
 SEE ALSO
-msieval, msivector, mrieval
+msieval, msivector, msider, mrieval, mrider
 .endhelp

@@ -12,8 +12,8 @@ include <math/iminterp.h>
 procedure mrider (x, y, datain, nxpix, nypix, len_datain, der, nxder, nyder,
 		    len_der, interp_type)
 
-real	x				# x value
-real	y				# y value
+real	x[ARB]				# x value
+real	y[ARB]				# y value
 real	datain[len_datain,ARB]		# data array
 int	nxpix				# number of x data points
 int	nypix				# number of y data points
@@ -26,13 +26,12 @@ int	interp_type			# interpolant type
 
 int	nx, ny, nxterms, nyterms, row_length
 int	index, xindex, yindex, first_row, last_row
-int	kx, ky
-int	i, j, ii, jj
+int	i, j, ii, jj, kx, ky
 pointer	tmp
 real	coeff[SPLPTS+3,SPLPTS+3], pcoeff[MAX_NTERMS,MAX_NTERMS]
 real	pctemp[MAX_NTERMS,MAX_NTERMS], sum[MAX_NTERMS]
-real	hold21, hold12, hold22, accum
-real	sx, sy, tx, ty
+real	hold21, hold12, hold22, accum, deltax, deltay, tmpx[4], tmpy[4]
+real	xmin, xmax, ymin, ymax, sx, sy, tx, ty
 
 errchk	malloc, calloc, mfree
 
@@ -50,18 +49,25 @@ begin
 
 	case II_BINEAREST:
 
-	    der[1,1] = datain[int (x+.5), int (y+.5)]
+	    der[1,1] = datain[int (x[1]+.5), int (y[1]+.5)]
+
+	    return
+
+	case II_BISINC, II_BILSINC:
+
+	    call ii_bisincder (x[1], y[1], der, nxder, nyder, len_der, datain,
+		0, len_datain, nypix, NSINC, DX, DY)
 
 	    return
 
 	case II_BILINEAR:
 
-	    nx = x
-	    sx = x - nx
+	    nx = x[1]
+	    sx = x[1] - nx
 	    tx = 1. - sx
 
-	    ny = y
-	    sy = y - ny
+	    ny = y[1]
+	    sy = y[1] - ny
 	    ty = 1. - sy
 
 	    # protect against the case where x = nxpix and/or y = nypix
@@ -98,6 +104,55 @@ begin
 
 	    return
 
+	case II_BIDRIZZLE:
+            call ii_bidriz1 (datain, 0, len_datain, x, y, der[1,1], 1, BADVAL)
+            if (nxder > 1) {
+                xmax = max (x[1], x[2], x[3], x[4])
+                xmin = min (x[1], x[2], x[3], x[4])
+                ymax = max (y[1], y[2], y[3], y[4])
+                ymin = min (y[1], y[2], y[3], y[4])
+                deltax = xmax - xmin
+                if (deltax == 0.0)
+                    der[2,1] = 0.0
+                else {
+                    tmpx[1] = xmin; tmpy[1] = ymin
+                    tmpx[2] = (xmax - xmin) / 2.0; tmpy[2] = ymin
+                    tmpx[3] = (xmax - xmin) / 2.0; tmpy[3] = ymax
+                    tmpx[4] = xmin; tmpy[4] = ymax
+                    call ii_bidriz1 (datain, 0, len_datain, tmpx, tmpy,
+			accum, 1, BADVAL)
+                    tmpx[1] = (xmax - xmin) / 2.0; tmpy[1] = ymin
+                    tmpx[2] = xmax; tmpy[2] = ymin
+                    tmpx[3] = xmax; tmpy[3] = ymax
+                    tmpx[4] = (xmax - xmin) / 2.0; tmpy[4] = ymax
+                    call ii_bidriz1 (datain, 0, len_datain, tmpx, tmpy,
+			der[2,1], 1, BADVAL)
+                    der[2,1] = 2.0 * (der[2,1] - accum) / deltax
+                }
+	    }
+            if (nyder > 1) {
+                deltay = ymax - ymin
+                if (deltay == 0.0)
+                    der[1,2] = 0.0
+                else {
+                    tmpx[1] = xmin; tmpy[1] =  ymin
+                    tmpx[2] = xmax; tmpy[2] = ymin
+                    tmpx[3] = xmax; tmpy[3] = (ymax - ymin) / 2.0
+                    tmpx[4] = xmin; tmpy[4] = (ymax - ymin) / 2.0
+                    call ii_bidriz1 (datain, 0, len_datain, tmpx, tmpy,
+		        accum, 1, BADVAL)
+                    tmpx[1] = xmin; tmpy[1] = (ymax - ymin) /  2.0
+                    tmpx[2] = xmax; tmpy[2] = (ymax - ymin) / 2.0
+                    tmpx[3] = xmax; tmpy[3] = ymax
+                    tmpx[4] = xmin; tmpy[4] = ymax
+                    call ii_bidriz1 (datain, 0, len_datain, tmpx, tmpy,
+			der[1,2], 1, BADVAL)
+                    der[1,2] = 2.0 * (der[1,2] - accum) / deltay
+                }
+            }
+
+	    return
+
 	case II_BIPOLY3:
 
 	    row_length = SPLPTS + 3
@@ -105,11 +160,11 @@ begin
 	    nxterms = 4
 	    nyterms = 4
 
-	    nx = x
-	    ny = y
+	    nx = x[1]
+	    ny = y[1]
 
-	    sx = x - nx
-	    sy = y - ny
+	    sx = x[1] - nx
+	    sy = y[1] - ny
 
 	    # use boundary projection to extend the data rows
 	    yindex = 1
@@ -183,11 +238,11 @@ begin
 	    nxterms = 6
 	    nyterms = 6
 
-	    nx = x
-	    ny = y
+	    nx = x[1]
+	    ny = y[1]
 
-	    sx = x - nx
-	    sy = y - ny
+	    sx = x[1] - nx
+	    sy = y[1] - ny
 
 	    # extend rows of data
 	    yindex = 1
@@ -263,11 +318,11 @@ begin
 	    nxterms = 4
 	    nyterms = 4
 
-	    nx = x
-	    ny = y
+	    nx = x[1]
+	    ny = y[1]
 
-	    sx = x - nx
-	    sy = y - ny
+	    sx = x[1] - nx
+	    sy = y[1] - ny
 
 	    # allocate space for temporary array and 0 file
 	    call calloc (tmp, row_length * row_length, TY_REAL)

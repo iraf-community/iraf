@@ -9,12 +9,17 @@ include <math/iminterp.h>
 # 2D interpolation package. Therefore the SINC function interpolator has
 # not been implemented, although it has been blocked in.
 
-real procedure ii_1dinteg (coeff, a, b, interp_type)
+real procedure ii_1dinteg (coeff, len_coeff, a, b, interp_type, nsinc, dx,
+	pixfrac)
 
 real	coeff[ARB]	# 1D array of coefficients
+int	len_coeff	# length of coefficient array (used in sinc only)
 real	a		# lower limit for integral
 real	b		# upper limit for integral
 int	interp_type	# type of 1D interpolant
+int	nsinc		# width of sinc function
+real	dx		# sinc precision
+real	pixfrac		# drizzle pixel fraction
 
 int	neara, nearb, i, j, nterms
 real	deltaxa, deltaxb, accum, xa, xb, pcoeff[MAX_NDERIVS]
@@ -36,16 +41,18 @@ begin
 	switch (interp_type) {
 	case II_NEAREST:
 	    nterms = 0
-	#case II_SINC:
-	    #nterms = 0
 	case II_LINEAR:
 	    nterms = 1
+	case II_DRIZZLE:
+	    nterms = 0
 	case II_POLY3:
 	    nterms = 4
 	case II_POLY5:
 	    nterms = 6
 	case II_SPLINE3:
 	    nterms = 4
+	case II_SINC, II_LSINC:
+	    nterms = 0
 	}
 
 	switch (interp_type) {
@@ -118,10 +125,18 @@ begin
 			(coeff[nearb+1] - coeff[nearb]) * deltaxb * deltaxb
 	    }
 
-	# SINC -- Note that to get ncoeff an interface change is required. 
-	#case II_SINC:
-	    #call ii_sincigrl (xa, xb, accum, coeff, ncoeff, NSINC, NTAPER,
-		#STAPER, DX)
+	# DRIZZLE-- Note that to get get pixfrac an interface change was
+	# required.
+	case II_DRIZZLE:
+	    if (pixfrac >= 1.0)
+		call ii_dzigrl1 (a, b, accum, coeff)
+	    else
+		call ii_dzigrl (a, b, accum, coeff, pixfrac)
+
+	# SINC -- Note that to get ncoeff, nsinc, and dx,  an interface change
+	# was required. 
+	case II_SINC, II_LSINC:
+	    call ii_sincigrl (xa, xb, accum, coeff, len_coeff, nsinc, dx)
 
 	# A higher order interpolant.
 	default:
@@ -226,20 +241,18 @@ begin
 end
 
 
-# II_SINCIGRL -- Evaluate integral of sinc interpolator
+# II_SINCIGRL -- Evaluate integral of sinc interpolator.
 # The integral is computed by dividing interval into a number of equal
 # size subintervals which are at most one pixel wide.  The integral
 # of each subinterval is the central value times the interval width.
 
-procedure ii_sincigrl (a, b, sum, data, npix, nsinc, ntaper, staper, mindx)
+procedure ii_sincigrl (a, b, sum, data, npix, nsinc, mindx)
 
 real	a, b			# integral limits
 real	sum			# output integral value
 real	data[npix]		# input data array
 int	npix			# number of pixels
 int	nsinc			# sinc truncation length
-int	ntaper			# start of triangular taper
-real	staper			# slope of triangular taper
 real	mindx			# interpolation minimum
 
 int	n
@@ -253,7 +266,107 @@ begin
 
 	sum = 0.
 	for (x = x1 + dx / 2; x < x2; x = x + dx) {
-	    call ii_sinc (x, y, 1, data, npix, nsinc, ntaper, staper, mindx)
+	    call ii_sinc (x, y, 1, data, npix, nsinc, mindx)
 	    sum = sum + y * dx
 	}
+end
+
+
+# II_DZIGRL -- Procedure to integrate the drizzle interpolant.
+
+procedure ii_dzigrl (a, b, sum, data, pixfrac)
+
+real    a, b         	# x start and stop values, must be within [1,npts]
+real    sum		# integgral value returned to the user
+real    data[ARB]       # data to be interpolated
+real    pixfrac         # the drizzle pixel fraction
+
+int     j, neara, nearb
+real    hpixfrac, xa, xb, dx, accum
+
+begin
+        hpixfrac = pixfrac / 2.0
+
+        # Define the interval of integration.
+        xa = min (a, b)
+        xb = max (a, b)
+        neara = xa + 0.5
+        nearb = xb + 0.5
+
+        # Initialize the integration
+        accum = 0.0
+        if (neara == nearb) {
+
+            dx = min (xb, nearb + hpixfrac) - max (xa, neara - hpixfrac)
+            if (dx > 0.0)
+                accum = accum + dx * data[neara]
+
+        } else {
+
+            # first segement
+            dx = neara + hpixfrac - max (xa, neara - hpixfrac)
+            if (dx > 0.0)
+                accum = accum + dx * data[neara]
+
+            # interior segments.
+            do j = neara + 1, nearb - 1
+                accum = accum + pixfrac * data[j]
+
+            # last segment
+            dx = min (xb, nearb + hpixfrac) - (nearb - hpixfrac)
+            if (dx > 0.0)
+                accum = accum + dx * data[nearb]
+        }
+
+        if (a > b)
+            sum = -accum
+        else
+            sum = accum 
+end
+
+
+# II_DZIGRL1 -- Procedure to integrate the drizzle interpolant in the case
+# where pixfrac = 1.0.
+
+procedure ii_dzigrl1 (a, b, sum, data)
+
+real    a, b            # x start and stop values, must be within [1,npts]
+real    sum		# integgral value returned to the user
+real    data[ARB]       # data to be interpolated
+
+int     j, neara, nearb
+real    xa, xb, deltaxa, deltaxb, accum
+
+begin
+        # Define the interval of integration.
+        xa = min (a, b)
+        xb = max (a, b)
+        neara = xa + 0.5
+        nearb = xb + 0.5
+        deltaxa = xa - neara
+        deltaxb = xb - nearb
+
+        # Only one segment involved.
+        accum = 0.0
+        if (neara == nearb) {
+
+            accum = accum + (deltaxb - deltaxa) * data[neara]
+
+        } else {
+
+            # First segment.
+            accum = accum + (0.5 - deltaxa) * data[neara]
+
+            # Middle segment.
+            do j = neara + 1, nearb - 1
+                accum = accum + data[j]
+
+            # Last segment.
+            accum = accum + (deltaxb + 0.5) * data[nearb]
+        }
+
+        if (a > b)
+           sum = -accum 
+        else
+           sum = accum
 end

@@ -29,7 +29,7 @@ function,s,h,"centroid","|none|centroid|sawtooth|parabola|mark|",,Correlation pe
 xcbox,i,h,5,3,,X box width for centering correlation peak
 ycbox,i,h,5,3,,Y box width for fitting correlation peak
 
-interp_type,s,h,"linear","|nearest|linear|poly3|poly5|spline3|",,'Interpolant (nearest,linear,poly3,poly5,spline3)'
+interp_type,s,h,"linear",,,'Interpolant'
 boundary_type,s,h,"nearest","|constant|nearest|reflect|wrap|",,'Boundary (constant,nearest,reflect,wrap)'
 constant,r,h,0.0,,,Constant for constant boundary extension
 

@@ -62,7 +62,6 @@ dimensional spectral reductions.  Only a fraction of the functionality
 required is specific to the reduction of spectral data and is therefore
 provided by the \fBonedspec\fR package itself.
 
-.ls
 .ls Transport
 Provided by the \fBdataio\fR package, although we do not currently have a
 reader for REDUCER format data tapes.  Readers for all standard format

@@ -158,7 +158,7 @@ Determine and correct for a slowly varying background.
 Reliably and accurately trace spectra in the presence of geometric
 distortions (pincushion, s, shear, etc.).
 .le
-.ls o
+
 Extract spectra by one of:
 .ls a.
 Strips of constant width about the located spectra.  The width may be specified
@@ -440,7 +440,7 @@ or a residual image may be calculated and displayed.
                 Multi-Spectra image  image = 
 		        Model image  model =
                                     (mode = ql)
-.nf
+.fi
 .le
 .ke
 .ks
@@ -609,7 +609,6 @@ Subsequent images are extracted starting from the initial solution image.
                                     (mode = ql)
 .fi
 .le
-.ke
 .sh
 5.  Outline of a MULTISPEC Reduction
 

@@ -183,6 +183,18 @@ dmip:					# install DECstation MIPS-Fortran bins
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh dmip -d $(DIRS)
 	;
+irix:					# install SGI IRIX binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh irix -d $(DIRS)
+	;
+rs6000:					# install IBM AIX binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh rs6000 -d $(DIRS)
+	;
 mips:					# install MIPS workstation binaries
 	$verbose off
 	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
@@ -204,13 +216,13 @@ freebsd:				# install FREEBSD binaries
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh freebsd -d $(DIRS)
 	;
-linux:					# install LINUX (Slackware) binaries
+linux:					# install Slackwkare Linux binaries
 	$verbose off
 	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh linux -d $(DIRS)
 	;
-redhat:					# install REDHAT Linux binaries
+redhat:					# install Redhat Linux binaries
 	$verbose off
 	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
 		     nobsolete rv surfphot twodspec"
@@ -221,4 +233,10 @@ linuz:					# install LINUZ binaries
 	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
 		     nobsolete rv surfphot twodspec"
 	!$(hlib)/mkfloat.csh linuz -d $(DIRS)
+	;
+sunos:					# install SUNOS (Solaris x86) binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh sunos -d $(DIRS)
 	;

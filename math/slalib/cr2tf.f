@@ -32,12 +32,11 @@
 *      case where ANGLE is very nearly 2pi and rounds up to 24 hours,
 *      by testing for IHMSF(1)=24 and setting IHMSF(1-4) to zero.
 *
-*  Called:
-*     slCDTF
+*  Called:  slCDTF
 *
-*  P.T.Wallace   Starlink   11 September 1990
+*  P.T.Wallace   Starlink   18 March 1999
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

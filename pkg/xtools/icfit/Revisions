@@ -1,5 +1,52 @@
 .help revisions Jun88 pkg.xtools.icfit
 .nf
+=======
+V2.11.2
+=======
+
+icggraph.gx
+    Moved smark to after an initial return.  (7/11/99, Valdes)
+
+icgfit.x
+    This routine is called with a graphics descriptor for interactive
+    fitting.  The descriptor is set in an internal structure.  Other
+    procedures, which may be called both for interactive and
+    non-interactive fitting, check if the descriptor is not NULL
+    before sending GUI messages.  The problem occurs if this procedure is
+    first called interactively and then the non-interactive fitting
+    routine is called later (maybe after a deactivate workstation or
+    closing the descriptor) resulting in GUI messages being sent
+    when not in interactive mode.  The solution is to return the
+    internal descriptor value to NULL after finishing the interactive
+    fitting and returning from this procedure. (7/22/99, Valdes)
+
+icgui.x
+    Fixed bug in behavior when there is no gui.  (4/2/99, Valdes)
+
+icfit.h
+names.h
+icgfit.gx
+icparams.x
+icggraph.gx
+icgcolon.gx
+icgui.x
+icferrors.gx
+icshow.x
+icerrors.gx
+icvshow.gx
+icguishow.gx
+icfvshow.gx
+mkpkg
+    Added support for GUIs.  (12/7/98, Valdes)
+
+=======
+V2.11.1
+=======
+
+=======
+V2.11.0
+=======
+
 pkg$xtools/icfit/icfit.hlp
     Changed the order of the task name and version number in the revisions
     section.  (4/22/97, Valdes)

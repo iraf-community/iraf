@@ -25,7 +25,7 @@ include	"gtr.com"
 string	stdgraph "stdgraph"
 string	stdimage "stdimage"
 string	stdplot  "stdplot"
-errchk	syserrs, gtr_openws, gki_openws
+errchk	syserrs, gtr_openws, gki_openws, gtr_init
 
 begin
 	call smark (sp)

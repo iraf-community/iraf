@@ -314,42 +314,47 @@ begin
 	                call ima_maxd (im1, im2, im3, double(c1), double(c2))
 	            }
 		}
-	    }
 
-	    # Do the header parameters.
-	    iferr {
-		ifnoerr (dval1 = imgetd (im3, "CCDMEAN"))
-		    call imdelf (im3, "CCDMEAN")
+	        # Do the header parameters.
+	        iferr {
+		    ifnoerr (dval1 = imgetd (im3, "CCDMEAN"))
+		        call imdelf (im3, "CCDMEAN")
 
-	        hlist = imofnlu (im3, Memc[hparams])
-		while (imgnfn (hlist, Memc[field], SZ_FNAME) != EOF) {
-	            if (im1 != NULL)
-	                dval1 = imgetd (im1, Memc[field])
-		    else
-			dval1 = c1
-	            if (im2 != NULL)
-	                dval2 = imgetd (im2, Memc[field])
-		    else
-			dval2 = c2
+	            hlist = imofnlu (im3, Memc[hparams])
+		    while (imgnfn (hlist, Memc[field], SZ_FNAME) != EOF) {
+	                if (im1 != NULL)
+	                    dval1 = imgetd (im1, Memc[field])
+		        else
+			    dval1 = c1
+	                if (im2 != NULL)
+	                    dval2 = imgetd (im2, Memc[field])
+		        else
+			    dval2 = c2
 
-		    switch (op) {
-	            case ADD:
-			call imputd (im3, Memc[field], dval1 + dval2)
-	            case SUB:
-			call imputd (im3, Memc[field], dval1 - dval2)
-	            case MUL:
-			call imputd (im3, Memc[field], dval1 * dval2)
-	            case DIV:
-			call imputd (im3, Memc[field], dval1 / dval2)
-	            case MIN:
-			call imputd (im3, Memc[field], min (dval1, dval2))
-	            case MAX:
-			call imputd (im3, Memc[field], max (dval1, dval2))
+		        switch (op) {
+	                case ADD:
+			    call imputd (im3, Memc[field], dval1 + dval2)
+	                case SUB:
+			    call imputd (im3, Memc[field], dval1 - dval2)
+	                case MUL:
+			    call imputd (im3, Memc[field], dval1 * dval2)
+	                case DIV:
+			    if (dval2 == 0.) {
+				call eprintf (
+		    "WARNING: Division by zero in header keyword (%s)\n")
+				    call pargstr (Memc[field])
+			    } else
+				call imputd (im3, Memc[field], dval1 / dval2)
+	                case MIN:
+			    call imputd (im3, Memc[field], min (dval1, dval2))
+	                case MAX:
+			    call imputd (im3, Memc[field], max (dval1, dval2))
+		        }
 		    }
-		}
-		call imcfnl (hlist)
-	    } then
-		call erract (EA_WARN)
+		    call imcfnl (hlist)
+	        } then
+		    call erract (EA_WARN)
+	    }
 
 	    # Unmap images and release the temporary output image.
 	    if (im1 != NULL)

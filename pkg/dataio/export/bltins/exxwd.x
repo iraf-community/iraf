@@ -58,7 +58,7 @@ procedure ex_xwd (ex)
 pointer	ex				#i task struct pointer
 
 pointer	xwd, cmap
-char	cflags, cpad, fname[SZ_FNAME]
+char	cflags, fname[SZ_FNAME]
 int	i, fd, flags
 long	pixel
 short	r, g, b, val
@@ -146,7 +146,9 @@ begin
 
 	# See if we need to byte swap in order to get MSB byte ordering.
 	if (BYTE_SWAP4 == YES) 
-	    call bswap4 (Meml[xwd], Meml[xwd], SZ_XWDHEADER)
+	    call bswap4 (Meml[xwd], 1, Meml[xwd], 1, SZ_XWDHEADER)
+	if (EX_BSWAP(ex) == S_I4) 
+	    call bswap4 (Meml[xwd], 1, Meml[xwd], 1, SZ_XWDHEADER)
 	call write (fd, Meml[xwd], SZ_XWDHEADER/SZB_CHAR)
 	call strpak ("xwddump\0", fname, 8)
 	call write (fd, fname, 4)
@@ -155,28 +157,27 @@ begin
 	if (bitset (flags, OF_CMAP)) {
 	    cmap = EX_CMAP(ex)
 	    cflags = 0
-	    cpad = 0
 	    do i = 1, EX_NCOLORS(ex) {
 		pixel = i - 1
 		r = CMAP(cmap,EX_RED,i) * 65535 / 256
 		g = CMAP(cmap,EX_GREEN,i) * 65535 / 256
 		b = CMAP(cmap,EX_BLUE,i) * 65535 / 256
 
-		call xwd_putlong (fd, pixel)
-		call xwd_putword (fd, r)
-		call xwd_putword (fd, g)
-		call xwd_putword (fd, b)
-		call xwd_putword (fd, cflags)
+		call xwd_putlong (ex, fd, pixel)
+		call xwd_putword (ex, fd, r)
+		call xwd_putword (ex, fd, g)
+		call xwd_putword (ex, fd, b)
+		call xwd_putword (ex, fd, cflags)
 	    }
 	} else if (EX_NEXPR(ex) < 3) {
 	    do i = 0, 255 {
 		val = i * 65535 / 256
-		call xwd_putlong (fd, long(i))
-		call xwd_putword (fd, val)
-		call xwd_putword (fd, val)
-		call xwd_putword (fd, val)
+		call xwd_putlong (ex, fd, long(i))
+		call xwd_putword (ex, fd, val)
+		call xwd_putword (ex, fd, val)
+		call xwd_putword (ex, fd, val)
 		val = 0 #shifti (7, 8)
-		call xwd_putword (fd, val)
+		call xwd_putword (ex, fd, val)
 	    }
 	}
 
@@ -208,8 +209,9 @@ end
 
 # XWD_PUTWORD - Writes a 16-bit integer in XWD order (MSB first).
 
-procedure xwd_putword (fd, w)
+procedure xwd_putword (ex, fd, w)
 
+pointer	ex				#i task struct pointer
 int	fd
 short	w
 
@@ -218,9 +220,11 @@ short 	val
 begin
 	# If this is a MSB-first machine swap the bytes before output.
 	if (BYTE_SWAP2 == YES)
-	    call bswap2 (w, val, 1)
+	    call bswap2 (w, 1, val, 1, (SZ_SHORT * SZB_CHAR))
 	else
 	    val = w
+	if (EX_BSWAP(ex) == S_I2)
+	    call bswap2 (val, 1, val, 1, (SZ_SHORT * SZB_CHAR))
 
 	call write (fd, val, SZ_SHORT/SZ_CHAR)
 end
@@ -228,8 +232,9 @@ end
 
 # XWD_PUTLONG - Writes a 32-bit integer in XWD order (MSB first).
 
-procedure xwd_putlong (fd, w)
+procedure xwd_putlong (ex, fd, w)
 
+pointer	ex				#i task struct pointer
 int	fd
 long	w
 
@@ -238,9 +243,11 @@ long 	val
 begin
 	# If this is a MSB-first machine swap the bytes before output.
 	if (BYTE_SWAP4 == YES)
-	    call bswap4 (w, val, 1)
+	    call bswap4 (w, 1, val, 1, (SZ_LONG * SZB_CHAR))
 	else
 	    val = w
+	if (EX_BSWAP(ex) == S_I4)
+	    call bswap4 (val, 1, val, 1, (SZ_LONG * SZB_CHAR))
 
 	call write (fd, val, SZ_LONG/SZ_CHAR)
 end

@@ -25,6 +25,7 @@ real	mx, my
 real	ct[LEN_CT]
 int	grc_selectwcs()
 pointer	gtr_init()
+errchk	gtr_init
 
 begin
 	tr = gtr_init (stream)

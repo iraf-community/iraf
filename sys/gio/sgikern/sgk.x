@@ -398,6 +398,7 @@ begin
 		call eprintf ("metafile device\n")
 	}
 
+	call sfree (sp)
 	return (mf_fd)
 end
 

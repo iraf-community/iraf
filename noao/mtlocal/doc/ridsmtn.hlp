@@ -71,6 +71,7 @@ generating output filenames.  Filenames are of the form
 .fi
 The offset parameter can be used to create a sequence of output IRAF 
 filenames with continuous, sequential suffixes over more than one night's data.
+.le
 .ih
 DESCRIPTION
 The IDS records from either a raw or reduced IDS mountain tape are read and

@@ -1,4 +1,4 @@
-.help rvgalc Nov95 "Slalib Package"
+.help rvgalc Jun99 "Slalib Package"
 .nf
 
       REAL FUNCTION slRVGA (R2000, D2000)

@@ -1,3 +1,4 @@
+include	<ctype.h>
 include	<error.h>
 include	<funits.h>
 
@@ -89,7 +90,7 @@ char	funits1[sz_funits1]	# Secondary funits string to return
 int	sz_funits1		# Size of secondary funits string
 
 int	funmod, funtype
-int	i, j,  nscan(), strdic()
+int	i, j, k, nscan(), strdic(), strlen()
 real	funscale
 pointer	sp, str
 
@@ -113,6 +114,10 @@ begin
 		break
 
 	    j = strdic (Memc[str], Memc[str], SZ_FNAME, FUN_DIC)
+	    for (k=strlen(Memc[str]); k>0 &&
+		(IS_WHITE(Memc[str+k-1]) || Memc[str+k-1]=='\n'); k=k-1)
+		Memc[str+k-1] = EOS
+
 	    if (j > FUN_NUNITS) {
 		if (funmod != 0)
 		    break

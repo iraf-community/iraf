@@ -15,7 +15,7 @@ bool	old_ap			# YES indicates old APPHOT file
 
 int	nstars
 pointer	apsel
-int	dp_goldap(), dp_gtabphot()
+int	tbpsta(), dp_goldap(), dp_gtabphot()
 
 begin
 	# Get APSEL pointer.
@@ -27,13 +27,17 @@ begin
 	Memi[DP_APRESULT(apsel)+2] = DP_PAPYCEN
 	Memi[DP_APRESULT(apsel)+3] = DP_PAPMAG1
 	Memi[DP_APRESULT(apsel)+4] = DP_PAPSKY
-	call dp_memapsel (dao, Memi[DP_APRESULT(apsel)], NAPRESULT, max_nstars)
 
 	# Get the results.
-	if (old_ap)
-	    nstars = dp_goldap (apd, apsel, max_nstars)
-	else
-	    nstars = dp_gtabphot (apd, apsel, max_nstars)
+	if (old_ap) {
+	    call dp_memapsel (dao, Memi[DP_APRESULT(apsel)], NAPRESULT,
+	        max_nstars)
+	    nstars = dp_goldap (apd, dao, max_nstars)
+	} else {
+	    call dp_memapsel (dao, Memi[DP_APRESULT(apsel)], NAPRESULT,
+	        tbpsta (apd, TBL_NROWS))
+	    nstars = dp_gtabphot (apd, dao, tbpsta (apd, TBL_NROWS))
+	}
 
 	# Reallocate to save space if appropopriate.
 	if (nstars < max_nstars)
@@ -116,17 +120,20 @@ end
 
 # DP_GOLDAP -- Read in the photometry from an old style APPHOT file
 
-int procedure  dp_goldap (apd, apsel, max_nstars)
+int procedure  dp_goldap (apd, dao, max_nstars)
 
 int	apd		# the input file descriptor
-pointer	apsel		# pointer to the apsel structure
+pointer	dao		# pointer to the daophot structure
 int	max_nstars	# maximum number of stars
 
-int	nstars
-pointer	apkey, sp, fields
+int	nstars, bufsize, stat
+pointer	apsel, apkey, sp, fields
 int	dp_apsel()
 
 begin
+	# Define the point to the apselect structure.
+	apsel = DP_APSEL (dao)
+
 	# Allocate some temporary space.
 	call smark (sp)
 	call salloc (fields, SZ_LINE, TY_CHAR)
@@ -139,13 +146,29 @@ begin
 
 	# Now read in the results.
 	nstars = 0
-	while (nstars < max_nstars) {
-	    if (dp_apsel (apkey, apd, Memc[fields],
-	    Memi[DP_APRESULT(apsel)], Memi[DP_APID(apsel)+nstars],
-	    Memr[DP_APXCEN(apsel)+nstars], Memr[DP_APYCEN(apsel)+nstars],
-	    Memr[DP_APMSKY(apsel)+nstars], Memr[DP_APMAG(apsel)+nstars]) == EOF)
+	bufsize = max_nstars
+	repeat {
+
+	    # Read in a group of stars.
+	    while (nstars < bufsize) {
+	        stat = dp_apsel (apkey, apd, Memc[fields],
+		    Memi[DP_APRESULT(apsel)], Memi[DP_APID(apsel)+nstars],
+	            Memr[DP_APXCEN(apsel)+nstars],
+		    Memr[DP_APYCEN(apsel)+nstars],
+	            Memr[DP_APMSKY(apsel)+nstars],
+		    Memr[DP_APMAG(apsel)+nstars])
+		if (stat == EOF)
+		    break
+	        nstars = nstars + 1
+	    }
+
+	    # Check the buffer size.
+	    if (stat == EOF)
 		break
-	    nstars = nstars + 1
+	    bufsize = bufsize + max_nstars
+	    call dp_rmemapsel (dao, Memi[DP_APRESULT(apsel)], NAPRESULT,
+	        bufsize)
+
 	}
 	DP_APNUM(apsel) = nstars
 
@@ -159,18 +182,21 @@ end
 
 # DP_GTABPHOT -- Read in the complete photometry from an ST table.
 
-int procedure dp_gtabphot (tp, apsel, max_nstars)
+int procedure dp_gtabphot (tp, dao, max_nstars)
 
 pointer	tp			# table descriptor
-pointer	apsel			# pointer to apselect structure
+pointer	dao			# pointer to daophot structure
 int	max_nstars		# maximum number of stars
 
 bool	nullflag
 int	record, index, nrow
-pointer	idpt, xcenpt, ycenpt, magpt, skypt
+pointer	apsel, idpt, xcenpt, ycenpt, magpt, skypt
 int	tbpsta()
 
 begin
+	# Define the point to the apselect structure.
+	apsel = DP_APSEL (dao)
+
 	# Find the column pointers
 	call tbcfnd (tp, ID, idpt, 1)
 	if (idpt == NULL)

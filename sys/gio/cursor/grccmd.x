@@ -62,7 +62,7 @@ int	strdic(), grc_boolval(), ttygeti(), ttystati()
 real	grc_realval()
 string	keywords "|axes|case|clear|cursor|gflush|help|init|markcur|off|on|page|\
 read|show|snap|txquality|txset|viewport|write|xres|yres|zero|"
-errchk	gtr_redraw, gki_flush
+errchk	gtr_redraw, gki_flush, gtr_init
 define	exit_ 91
 
 begin

@@ -1,4 +1,4 @@
-.help invf Nov95 "Slalib Package"
+.help invf Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slINVF (FWDS,BKWDS,J)

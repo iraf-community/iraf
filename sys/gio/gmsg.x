@@ -36,34 +36,37 @@ pointer	gp			#I graphics descriptor
 char	object[ARB]		#I object name
 char	message[ARB]		#I message text
 
-int	flushnl
+int	flushnl, control_stream
 int	fstati()
 bool	ttygetb()
 
 begin
 	call gflush (gp)
 	call flush (STDOUT)
+	call flush (STDERR)
+
+	control_stream = STDERR
 
 	if (ttygetb (GP_TTY(gp), "EM")) {
-	    flushnl = fstati (STDOUT, F_FLUSHNL)
+	    flushnl = fstati (control_stream, F_FLUSHNL)
 	    if (flushnl == YES)
-		call fseti (STDOUT, F_FLUSHNL, NO)
+		call fseti (control_stream, F_FLUSHNL, NO)
 
-	    call putci (STDOUT, EM)
-	    call putline (STDOUT, object)
-	    call putci (STDOUT, ' ')
-	    call putline (STDOUT, "setValue ")
+	    call putci (control_stream, EM)
+	    call putline (control_stream, object)
+	    call putci (control_stream, ' ')
+	    call putline (control_stream, "setValue ")
 
-	    call putci (STDOUT, '{')
-	    call putline (STDOUT, message)
-	    call putci (STDOUT, '}')
+	    call putci (control_stream, '{')
+	    call putline (control_stream, message)
+	    call putci (control_stream, '}')
 
-	    call putci (STDOUT, GS)
-	    call putci (STDOUT, US)
-	    call flush (STDOUT)
+	    call putci (control_stream, GS)
+	    call putci (control_stream, US)
+	    call flush (control_stream)
 
 	    if (flushnl == YES)
-		call fseti (STDOUT, F_FLUSHNL, YES)
+		call fseti (control_stream, F_FLUSHNL, YES)
 	}
 end
 

@@ -33,7 +33,6 @@ and byteswapping and/or wordswapping the data.
 The routine terminates when an EOF is encountered on a read.
 READ_FILE calls SKIPOVER to find the the first data byte of interest and
 RECORD_PAD and BLOCK_PAD to pad records and blocks respectively.
-.le
 .ls skipover
 SKIPOVER seeks to the first char containing data of interest and calculates
 the offset in that char of the first byte of interest. Returns the offset
@@ -45,5 +44,7 @@ szb_outrecord long.
 .le
 .ls block_pad
 Pads short blocks to size szb_outblock.
+.le
+.le
 .le
 .endhelp

@@ -1,5 +1,9 @@
 .help revisions Jan97 images.imutil
 .nf
+pkg/images/imutil/src/t_imarith.x
+    Added a check for division by zero in the header keywords.
+    (8/10/99, Valdes)
+
 pkg/images/imutil/src/t_imreplace.x
 pkg/images/imutil/src/imrep.gx
 pkg/images/imutil/imreplace.par

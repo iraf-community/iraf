@@ -36,10 +36,6 @@ begin
 	fit = IM_KDES(im)
 	FIT_IM(fit) = im
 	FIT_OBJECT(fit) = EOS
-
-	# The keyword NEXTEND will have the maximum number of groups
-	# (extensions) in FITS file. We equate this to IM_CLSIZE.
-
 	IM_CLSIZE(im) = 0
 
 	# Read the header unit number 'group', setting the values of the 
@@ -74,6 +70,7 @@ begin
 	bfloat = !(lscale && lzero)
 
 	FIT_PIXTYPE(fit) = NULL
+	FIT_ZCNV(fit) = NO
 
 	switch (FIT_BITPIX(fit)) {
 	case  8:
@@ -81,18 +78,21 @@ begin
 	    if (bfloat)
 		impixtype = TY_REAL
 	    else
-		impixtype = TY_SHORT              # Convert from byte to short
+		impixtype = TY_SHORT              # convert from byte to short
+	    FIT_ZCNV(fit) = YES
 	case 16:
 	    FIT_PIXTYPE(fit) = TY_SHORT
-	    if (bfloat)
+	    if (bfloat) {
 		impixtype = TY_REAL
-	    else
+	        FIT_ZCNV(fit) = YES
+	    } else
 		impixtype = TY_SHORT
 
-	    if (strncmp("USHORT", FIT_DATATYPE(fit), 6) == 0)
+	    if ((strncmp ("USHORT", FIT_DATATYPE(fit), 6) == 0) ||
+		    (lscale && fxf_fpl_equald (32768.0d0, FIT_BZERO(fit),4))) {
 		impixtype = TY_USHORT
-	    if (lscale && fxf_fpl_equald (32768.0d0, FIT_BZERO(fit),4))
-		impixtype = TY_USHORT
+	        FIT_ZCNV(fit) = NO
+	    }
 	case 32:
 	    FIT_PIXTYPE(fit) = TY_LONG
 	    if (bfloat)

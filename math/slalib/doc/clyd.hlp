@@ -1,4 +1,4 @@
-.help clyd Nov95 "Slalib Package"
+.help clyd Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slCLYD (IY, IM, ID, NY, ND, JSTAT)

@@ -507,12 +507,12 @@ begin
 
 	    # Only set median and reorder if needed
 	    n[i] = n1
-	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		j = max (nl, n1 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Mems[d[l]+k] = Mems[d[j]+k]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + k
 			    mp2 = m[j] + k
 			    id = Memi[mp1]
@@ -1055,12 +1055,12 @@ begin
 
 	    # Only set median and reorder if needed
 	    n[i] = n1
-	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		j = max (nl, n1 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Memi[d[l]+k] = Memi[d[j]+k]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + k
 			    mp2 = m[j] + k
 			    id = Memi[mp1]
@@ -1603,12 +1603,12 @@ begin
 
 	    # Only set median and reorder if needed
 	    n[i] = n1
-	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		j = max (nl, n1 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Memr[d[l]+k] = Memr[d[j]+k]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + k
 			    mp2 = m[j] + k
 			    id = Memi[mp1]
@@ -2151,12 +2151,12 @@ begin
 
 	    # Only set median and reorder if needed
 	    n[i] = n1
-	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		j = max (nl, n1 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Memd[d[l]+k] = Memd[d[j]+k]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + k
 			    mp2 = m[j] + k
 			    id = Memi[mp1]

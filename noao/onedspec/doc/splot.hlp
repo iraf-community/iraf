@@ -229,16 +229,15 @@ a scrolling help on the status line with the '/' key.
 Modifications to the spectra being analyzed may be saved using the 'i' key
 in a new, the current, or other existing spectra.  A new image is created
 as a new copy of the current spectrum and so if the current spectrum is
-part of a multiple spectrum image the other spectra are copied.  If other
-spectra in the same image is then modified and saved use the overwrite
-option to replace then in the new output image.  If the current spectrum is
-a long slit image or other 2D image a 1D spectrum output image is created.
-It is not possible to write into a 2D image.  If the output spectrum
-already exists then the \fIoverwrite\fR flag must be set to allow modifying
-the data.  This includes the case when the output spectrum is the same as
-the input spectrum.  The only odd case here is when the input spectrum is
-one dimensional and the output spectrum is two dimensional.  In this case
-the user is queried for the line to be written.
+part of a multiple spectrum image (including a long slit spectrum) the
+other spectra are copied.  If other spectra in the same image are then
+modified and saved use the overwrite option to replace then in the new
+output image.  If the output spectrum already exists then the
+\fIoverwrite\fR flag must be set to allow modifying the data.  This
+includes the case when the output spectrum is the same as the input
+spectrum.  The only odd case here is when the input spectrum is one
+dimensional and the output spectrum is two dimensional.  In this case the
+user is queried for the line to be written.
 
 The other form of output, apart from that produced on the terminal, are
 measurements of equivalent widths, and other analysis functions.  This
@@ -579,6 +578,14 @@ Enable/disable the flipped coordinates option
 .le
 .ls :overplot [yes|no]
 Enable/disable the permanent overplot option
+.le
+
+
+.ls :/help
+Get help on GTOOLS options.
+.le
+.ls :.help
+Get help on standard cursor mode options
 .le
 .ih
 PROFILE FITTING AND DEBLENDING

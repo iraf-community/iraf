@@ -40,8 +40,6 @@ EXAMPLES
     cl> Delete file \fI'fits2'\fR ? (yes): yes
     cl> Delete file \fI'fits3'\fR ? (yes): yes
 .fi
-.fi
-.fi
 
 .ih
 TIME REQUIREMENTS

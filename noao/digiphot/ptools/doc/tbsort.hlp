@@ -28,7 +28,7 @@ is sorted in descending order, with the largest value first.
 If \fIcasesens\fR = yes, sorts on character columns are case sensitive,
 with upper case letters preceding lower case in the sort.
 Otherwise, the sort is case insensitive.
-.ls
+.le
 .ih
 DESCRIPTION
 TBSORT sorts an APPHOT/DAOPHOT STDAS table database.

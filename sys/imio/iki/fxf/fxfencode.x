@@ -7,7 +7,7 @@ include "fxf.h"
 # a FITS card.
 #
 #	fxf_encode_axis (root, keyword, axisno)
-#	fxf_encode_date (datestr, szdate)
+#	fxf_encode_date (ctime, datestr, szdate, format, cutover)
 #
 #	    fxf_encodeb (keyword, param, card, comment)
 #	    fxf_encodei (keyword, param, card, comment)
@@ -171,26 +171,58 @@ begin
 end
 
 
-# FXF_ENCODE_DATE -- Encode the current date in the form dd/mm/yy.
-# (Year 2000 values wrap around to 00, 01, etc.).
+# FXF_ENCODE_DATE -- Encode the current date as a string value.
+#
+# New Y2K format:	yyyy-mm-ddThh:mm:sec
+# Old FITS format:	dd/mm/yy
+# Old TLM format:	hh:mm:ss (dd/mm/yyyy)
+#
+# We still write the old format for dates 1999 or less.
 
-procedure fxf_encode_date (datestr, szdate)
+procedure fxf_encode_date (ctime, datestr, maxch, format, cutover)
 
-char	datestr[ARB]		# string containing the date
-int	szdate			# number of chars in the date string
+long	ctime			#I time value to be encoded
+char	datestr[ARB]		#O string containing the date
+int	maxch			#I number of chars in the date string
+char	format[ARB]		#I desired date format for old dates
+int	cutover			#I write new format for years >= cutover
 
-long	ctime
-int	time[LEN_TMSTRUCT]
-long	clktime()
+int	tm[LEN_TMSTRUCT], nchars
+int	dtm_encode_hms()
+long	lsttogmt()
+bool	streq()
 
 begin
-	ctime = clktime (long (0))
-	call brktime (ctime, time)
+	# Find out what year it is.
+	call brktime (ctime, tm)
 
-	call sprintf (datestr, szdate, "%02s/%02s/%02s")
-	    call pargi (TM_MDAY(time))
-	    call pargi (TM_MONTH(time))
-	    call pargi (mod (TM_YEAR(time), 100))
+	# Encode in ISO format for years >= cutover year.
+
+	if (TM_YEAR(tm) >= cutover) {
+	    # ISO format is used for all new date stamps.
+	    call brktime (lsttogmt(ctime), tm)
+	    nchars = dtm_encode_hms (datestr, maxch,
+		TM_YEAR(tm), TM_MONTH(tm), TM_MDAY(tm),
+		TM_HOUR(tm), TM_MIN(tm), double(TM_SEC(tm)), 0, 0)
+
+	} else if (streq (format, "TLM")) {
+	    # TLM format is for old-format DATE-TLM keywords.
+	    call sprintf (datestr, maxch, "%02d:%02d:%02d (%02d/%02d/%d)")
+		call pargi (TM_HOUR(tm))
+		call pargi (TM_MIN(tm))
+		call pargi (TM_SEC(tm))
+		call pargi (TM_MDAY(tm))
+		call pargi (TM_MONTH(tm))
+		call pargi (TM_YEAR(tm))
+
+	} else {
+	    # The default otherwise is the old FITS format.
+	    call sprintf (datestr, maxch, "%02d/%02d/%02d")
+		call pargi (TM_MDAY(tm))
+		call pargi (TM_MONTH(tm))
+		call pargi (mod(TM_YEAR(tm),100))
+
+	}
 end
 
 

@@ -1,4 +1,4 @@
-.help mapqkz Nov95 "Slalib Package"
+.help mapqkz Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slMAPZ (RM, DM, AMPRMS, RA, DA)
@@ -57,16 +57,11 @@
       about 1.85 arcsec at this radius, and decreases to zero as
       the centre of the disc is approached.
 
-  Called:
-     slDS2C       spherical to Cartesian
-     slDVDV        dot product
-     slDMXV        matrix x vector
-     slDC2S       Cartesian to spherical
-     slDA2P      normalise angle 0-2Pi
+  Called:  slDS2C, slDVDV, slDMXV, slDC2S, slDA2P
 
-  P.T.Wallace   Starlink   16 September 1995
+  P.T.Wallace   Starlink   18 March 1999
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1999 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

@@ -12,9 +12,11 @@ include	"gtr.h"
 procedure gtr_backup (stream)
 
 int	stream				# graphics stream
+
 int	opcode
 pointer	tr, op, bp, sp, ap
 pointer	gtr_init()
+errchk	gtr_init
 include	"gtr.com"
 
 begin

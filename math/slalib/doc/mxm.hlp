@@ -1,4 +1,4 @@
-.help mxm Nov95 "Slalib Package"
+.help mxm Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slMXM (A, B, C)

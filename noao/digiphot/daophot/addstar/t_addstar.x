@@ -142,8 +142,8 @@ begin
 	    root = fnldir (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[psfimage+root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[psfimage]))
-	        call dp_iimname (Memc[image], "", "psf", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_iimname (Memc[image], Memc[outfname], "psf",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    psffd = immap (Memc[outfname], READ_ONLY, 0)
@@ -151,7 +151,6 @@ begin
 	    call dp_readpsf (dao, psffd)
 
 	    # Open the input photometry file.
-
 	    if (lplist <= 0 ) {
 	    	ifd = NULL
 	    	call strcpy ("", Memc[photfile], SZ_FNAME)
@@ -176,8 +175,8 @@ begin
 		root = fnldir (Memc[addimage], Memc[outfname], SZ_FNAME)
 		if (strncmp (DEF_DEFNAME, Memc[addimage+root],
 		    DEF_LENDEFNAME) == 0 || root == strlen (Memc[addimage])) {
-		    call dp_oimname (Memc[image], "", "add", Memc[outfname],
-			SZ_FNAME)
+		    call dp_oimname (Memc[image], Memc[outfname], "add",
+		        Memc[outfname], SZ_FNAME)
 		    oim = immap (Memc[outfname], NEW_COPY, im)
 		} else {
 		    call strcpy (Memc[addimage], Memc[outfname], SZ_FNAME)
@@ -197,8 +196,8 @@ begin
 		root = fnldir (Memc[addimage], Memc[outfname], SZ_FNAME)
 		if (strncmp (DEF_DEFNAME, Memc[addimage+root],
 		    DEF_LENDEFNAME) == 0 || root == strlen (Memc[addimage])) {
-		    call dp_outname (Memc[image], "", "art", Memc[outfname],
-		        SZ_FNAME)
+		    call dp_outname (Memc[image], Memc[outfname], "art",
+		        Memc[outfname], SZ_FNAME)
 		    if (DP_TEXT(dao) == YES)
 		        ofd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 		    else

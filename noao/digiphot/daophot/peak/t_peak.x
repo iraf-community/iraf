@@ -144,8 +144,8 @@ begin
 	    root = fnldir (Memc[photfile], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[photfile+root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[photfile]))
-	        call dp_inname (Memc[image], "", "mag", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_inname (Memc[image], Memc[outfname], "mag",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[photfile], Memc[outfname], SZ_FNAME)
 	    ap_text =  itob (access (Memc[outfname], 0, TEXT_FILE))
@@ -161,8 +161,8 @@ begin
 	    root = fnldir (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[psfimage+root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[psfimage]))
-	        call dp_iimname (Memc[image], "", "psf", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_iimname (Memc[image], Memc[outfname], "psf",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    psfim = immap (Memc[outfname], READ_ONLY, 0)
@@ -179,8 +179,8 @@ begin
 	    root = fnldir (Memc[peakfile], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[peakfile + root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[peakfile]))
-	        call dp_outname (Memc[image], "", "pk", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_outname (Memc[image], Memc[outfname], "pk",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[peakfile], Memc[outfname], SZ_FNAME)
 	    if (DP_TEXT(dao) == YES)
@@ -203,8 +203,8 @@ begin
 	        root = fnldir (Memc[rejfile], Memc[outfname], SZ_FNAME)
 	        if (strncmp (DEF_DEFNAME, Memc[rejfile+root],
 		    DEF_LENDEFNAME) == 0 || root == strlen (Memc[rejfile]))
-	            call dp_outname (Memc[image], "", "prj", Memc[outfname],
-		        SZ_FNAME)
+	            call dp_outname (Memc[image], Memc[outfname], "prj",
+		        Memc[outfname], SZ_FNAME)
 	        else
 	            call strcpy (Memc[rejfile], Memc[outfname], SZ_FNAME)
 	        if (DP_TEXT(dao) == YES)

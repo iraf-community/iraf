@@ -330,6 +330,8 @@ begin
 		sigmasq = pred_pixval / DP_PHOTADU (dao) +  read_noise +
 		    (pererr * pred_pixval) ** 2 + (peakerr *
 		    (pred_pixval - sky)) ** 2
+		if (sigmasq <= 0.0)
+		    next
 		sigma = sqrt (sigmasq)
 		relerr = abs (d_pixval / sigma)
 

@@ -367,7 +367,7 @@ The name of the binary file.  In expressions this operand has a character
 datatype.  As a last resort for images without any identifying features the
 file name may possibly be used to determine the format from a file name
 extension.
-.fi
+.le
 
 
 .ih

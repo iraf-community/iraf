@@ -56,4 +56,6 @@ begin
 	    call strcpy (Memc[defnode], n_defaultnode, SZ_ALIAS)
 	    n_default = ki_findnode (n_defaultnode)
 	}
+
+	call sfree (sp)
 end

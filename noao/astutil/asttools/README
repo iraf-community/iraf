@@ -84,7 +84,14 @@ Helocentric Parameters:
     astdsun.x:
 	AST_DSUN - Distance to Sun in AU.
 
-Misc
+Misc:
 
     astlvac.x:
 	AST_LVAC - Convert air wavelengths to vacuum wavelengths (Angstroms)
+
+Y2K:
+    Most routines work in Julian days or epochs.  If they have an input
+    year it is converted to one of these forms by calling
+    ast_date_to_julday.  This is the only routine that has a Y2K
+    connection.  It assumes two digit years are 20th century.  These
+    routines are Y2K correct.

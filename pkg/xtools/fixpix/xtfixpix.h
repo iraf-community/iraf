@@ -1,5 +1,5 @@
 # XT_FIXPIX data structure.
-define	FP_LEN		12		# Length of FP structure
+define	FP_LEN		13		# Length of FP structure
 define	FP_PM		Memi[$1]	# Pixel mask pointer
 define	FP_LVAL		Memi[$1+1]	# Mask value for line interpolation
 define	FP_CVAL		Memi[$1+2]	# Mask value for column interpolation
@@ -12,6 +12,7 @@ define	FP_PV2		Memi[$1+8]	# Pointer to end values
 define	FP_LMIN		Memi[$1+9]	# Minimum line
 define	FP_LMAX		Memi[$1+10]	# Maximum line
 define	FP_PIXTYPE	Memi[$1+11]	# Pixel type for values
+define	FP_DATA		Memi[$1+12]	# Data values
 
 define	FP_COL		Memi[FP_PCOL($1)+$2-1]
 define	FP_L1		Memi[FP_PL1($1)+$2-1]

@@ -22,48 +22,59 @@ pointer	sx1, sy1		#I pointers to linear surfaces
 pointer	sx2, sy2		#I pointers to higher order surfaces
 int	nxblock, nyblock	#I working block size
 
-int	ncols, nlines, l1, l2, c1, c2
+int	l1, l2, c1, c2, nincr
 pointer	sp, xref, yref, msi
+real	shift
 real	gsgetr()
 
 begin
+	# Initialize the interpolant.
+	if (IM_NDIM(input) == 1) {
+	    call asitype (GT_INTERPSTR(geo), GT_INTERPOLANT(geo), GT_NSINC(geo),
+	        nincr, shift)
+	    call asisinit (msi, GT_INTERPOLANT(geo), GT_NSINC(geo), nincr,
+	        shift, 0.0)
+	} else {
+	    call msitype (GT_INTERPSTR(geo), GT_INTERPOLANT(geo),
+	        GT_NSINC(geo), nincr, shift)
+	    call msisinit (msi, GT_INTERPOLANT(geo), GT_NSINC(geo), nincr,
+	        nincr, shift, shift, 0.0)
+	}
+	call geo_margset (sx1, sy1, sx2, sy2, GT_XMIN(geo), GT_XMAX(geo),
+	    GT_NCOLS(geo), GT_YMIN(geo), GT_YMAX(geo), GT_NLINES(geo),
+	    GT_INTERPOLANT(geo), GT_NSINC(geo),  GT_NXYMARGIN(geo))
+
 	# Allocate working space.
 	call smark (sp)
 	call salloc (xref, GT_NCOLS(geo), TY_REAL)
 	call salloc (yref, GT_NLINES(geo), TY_REAL)
 
-	# Initialize the interpolant.
-	if (IM_NDIM(input) == 1)
-	    call asiinit (msi, GT_INTERPOLANT(geo))
-	else
-	    call msiinit (msi, GT_INTERPOLANT(geo))
+	# Compute the reference coordinates corresponding to the center of
+	# the output image pixels.
+	call geo_ref (geo, Memr[xref], 1, GT_NCOLS(geo), GT_NCOLS(geo),
+	    Memr[yref], 1, GT_NLINES(geo), GT_NLINES(geo), gsgetr (sx1,
+	    GSXMIN), gsgetr (sx1, GSXMAX), gsgetr (sx1, GSYMIN), gsgetr (sx1,
+	    GSYMAX), GT_ONE)
 
-	# Calculate the reference coordinates of the output image pixels.
-	call geo_ref (geo, Memr[xref], GT_NCOLS(geo), Memr[yref],
-	    GT_NLINES(geo), gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
-	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX))
-
-	# Setup input image boundary extension parameters.
+	# Configure the out-of-bounds pixel references for the input image.
 	call geo_imset (input, geo, sx1, sy1, sx2, sy2, Memr[xref],
-	    GT_NCOLS(geo), Memr[yref], GT_NLINES(geo))
+	        GT_NCOLS(geo), Memr[yref], GT_NLINES(geo))
 
 	# Loop over the line blocks.
 	for (l1 = 1; l1 <= GT_NLINES(geo); l1 = l1 + nyblock) {
 
 	    # Set line limits in the output image.
 	    l2 = min (l1 + nyblock - 1, GT_NLINES(geo)) 
-	    nlines = l2 - l1 + 1
 
 	    # Loop over the column blocks
 	    for (c1 = 1; c1 <= GT_NCOLS(geo); c1 = c1 + nxblock) {
 
 		# Set column limits in the output image.
 		c2 = min (c1 + nxblock - 1, GT_NCOLS(geo))
-		ncols = c2 - c1 + 1
 
 		# Interpolate
 		call geo_gsvector (input, output, geo, msi, Memr[xref],
-		    Memr[yref], c1, c2, l1, l2, sx1, sy1, sx2, sy2)
+		    c1, c2, Memr[yref], l1, l2, sx1, sy1, sx2, sy2)
 	    }
 	}
 
@@ -89,10 +100,10 @@ pointer	sx2, sy2		#I pointers to higher order surfaces
 int	nxblock, nyblock	#I working block size
 
 int	nxsample, nysample, ncols, nlines, l1, l2, c1, c2
-int	line1, line2, llast1, llast2
+int	line1, line2, llast1, llast2, nincr
 pointer	sp, xsample, ysample, xinterp, yinterp
 pointer	xmsi, ymsi, jmsi, msi, xbuf, ybuf, jbuf
-
+real	shift
 real	gsgetr()
 
 begin
@@ -117,30 +128,41 @@ begin
 	if (IM_NDIM(input) == 1) {
 	    call asiinit (xmsi, II_LINEAR)
 	    call asiinit (ymsi, II_LINEAR)
-	    call asiinit (msi, GT_INTERPOLANT(geo))
+	    call asitype (GT_INTERPSTR(geo), GT_INTERPOLANT(geo),
+	        GT_NSINC(geo), nincr, shift)
+	    call asisinit (msi, GT_INTERPOLANT(geo), GT_NSINC(geo), nincr,
+	        shift, 0.0)
 	    if (GT_FLUXCONSERVE(geo) == YES)
 	        call asiinit (jmsi, II_LINEAR)
 	} else {
 	    call msiinit (xmsi, II_BILINEAR)
 	    call msiinit (ymsi, II_BILINEAR)
-	    call msiinit (msi, GT_INTERPOLANT(geo))
+	    call msitype (GT_INTERPSTR(geo), GT_INTERPOLANT(geo),
+	        GT_NSINC(geo), nincr, shift)
+	    call msisinit (msi, GT_INTERPOLANT(geo), GT_NSINC(geo), nincr,
+	        nincr, shift, shift, 0.0)
 	    if (GT_FLUXCONSERVE(geo) == YES)
 	        call msiinit (jmsi, II_BILINEAR)
 	}
+	call geo_margset (sx1, sy1, sx2, sy2, GT_XMIN(geo), GT_XMAX(geo),
+	    GT_NCOLS(geo), GT_YMIN(geo), GT_YMAX(geo), GT_NLINES(geo),
+	    GT_INTERPOLANT(geo), GT_NSINC(geo),  GT_NXYMARGIN(geo))
 
 	# Setup input image boundary extension parameters.
-	call geo_ref (geo, Memr[xsample], GT_NCOLS(geo), Memr[ysample],
-	    GT_NLINES(geo), gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
-	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX))
+	call geo_ref (geo, Memr[xsample], 1, GT_NCOLS(geo), GT_NCOLS(geo),
+	    Memr[ysample], 1, GT_NLINES(geo), GT_NLINES(geo), gsgetr (sx1,
+	    GSXMIN), gsgetr (sx1, GSXMAX), gsgetr (sx1, GSYMIN), gsgetr (sx1,
+	    GSYMAX), GT_ONE)
 	call geo_imset (input, geo, sx1, sy1, sx2, sy2, Memr[xsample],
 	    GT_NCOLS(geo), Memr[ysample], GT_NLINES(geo))
 
 	# Calculate the sampled reference coordinates and the interpolated
 	# reference coordinates.
-	call geo_ref (geo, Memr[xsample], nxsample, Memr[ysample],
-	    nysample, gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
-	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX))
-	call geo_sample (geo, Memr[xinterp], Memr[yinterp], nxsample, nysample)
+	call geo_ref (geo, Memr[xsample], 1, nxsample, nxsample, Memr[ysample],
+	    1, nysample, nysample, gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
+	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX), GT_ONE)
+	call geo_sample (geo, Memr[xinterp], 1, GT_NCOLS(geo), nxsample,
+	    Memr[yinterp], 1, GT_NLINES(geo), nysample, GT_ONE)
 
 	# Initialize the buffers.
 	xbuf = NULL
@@ -189,8 +211,8 @@ begin
 		# Calculate the coordinates of the output pixels in the input
 		# image.
 		call geo_msivector (input, output, geo, xmsi, ymsi, jmsi, msi, 
-		    sx1, sy1, sx2, sy2, Memr[xinterp], Memr[yinterp], c1, c2,
-		    l1, l2, 1, line1)
+		    sx1, sy1, sx2, sy2, Memr[xinterp], c1, c2, nxsample,
+		    Memr[yinterp], l1, l2, nysample, 1, line1)
 	    }
 	}
 
@@ -219,86 +241,333 @@ end
 # GEO_REF -- Determine the x and y coordinates at which the coordinate
 # surface will be subsampled.
 
-procedure geo_ref (geo, x, nx, y, ny, xmin, xmax, ymin, ymax)
+procedure geo_ref (geo, x, c1, c2, nx, y, l1, l2, ny, xmin, xmax, ymin, ymax,
+	cmode)
 
 pointer	geo		#I pointer to the geotran structure
-real	x[nx]		#O output x sample coordinates
-int	nx		#I size of sampled x array
-real	y[ny]		#O output y sample coordinates
-int	ny		#O number of output y coordinates
+real	x[ARB]		#O output x sample coordinates
+int	c1, c2, nx	#I the column limits of the sampled array
+real	y[ARB]		#O output y sample coordinates
+int	l1, l2, ny	#I the line limits of the output coordinates
 real	xmin, xmax	#I limits on x coordinates
 real	ymin, ymax	#I limits on y coordinates
+int	cmode		#I coordinate computation mode
 
 int	i
-real	dx, dy
+real	xtempmin, xtempmax, ytempmin, ytempmax, dx, dy
 
 begin
 
-	if (nx == 1)
-	    x[1] = min (xmax, max (xmin, (GT_XMIN(geo) + GT_XMAX(geo)) / 2.0))
-	else if (nx == GT_NCOLS(geo)) {
-	    if (GT_XMIN(geo) > GT_XMAX(geo))
-		dx = -GT_XSCALE(geo)
-	    else
-		dx = GT_XSCALE(geo)
-	    do  i = 1, nx
-	        x[i] = min (xmax, max (xmin, GT_XMIN(geo) + (i - 1) * dx))
-	} else {
-	    if (GT_XMIN(geo) > GT_XMAX(geo))
-		dx = -GT_XSCALE(geo) * (GT_NCOLS(geo) - 1.0) / (nx - 1.0)
-	    else
-		dx = GT_XSCALE(geo) * (GT_NCOLS(geo) - 1.0) / (nx - 1.0)
-	    do  i = 1, nx
-	        x[i] = min (xmax, max (xmin, GT_XMIN(geo) + (i - 1) * dx))
+	switch (cmode) {
+	case GT_FOUR:
+	    if (nx == 1) {
+	        xtempmin = min (xmax, max (xmin, GT_XMIN(geo)))
+	        xtempmax = min (xmax, max (xmin, GT_XMAX(geo)))
+		x[1] = xtempmin
+		x[2] = xtempmax
+		x[3] = xtempmax
+		x[4] = xtempmin
+	    } else if (nx == GT_NCOLS(geo)) {
+	        if (GT_XMIN(geo) > GT_XMAX(geo))
+		    dx = -GT_XSCALE(geo)
+	        else
+		    dx = GT_XSCALE(geo)
+	        do  i = c1, c2 {
+	            xtempmin = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 1.5) * dx))
+	            xtempmax = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 0.5) * dx))
+		    x[4*(i-c1)+1] = xtempmin
+		    x[4*(i-c1)+2] = xtempmax
+		    x[4*(i-c1)+3] = xtempmax
+		    x[4*(i-c1)+4] = xtempmin
+		}
+	    } else {
+	        if (GT_XMIN(geo) > GT_XMAX(geo))
+		    dx = -GT_XSCALE(geo) * (GT_NCOLS(geo) - 1.0) / (nx - 1.0)
+	        else
+		    dx = GT_XSCALE(geo) * (GT_NCOLS(geo) - 1.0) / (nx - 1.0)
+	        do  i = c1, c2 {
+	            xtempmin = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 1.5) * dx))
+	            xtempmax = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 0.5) * dx))
+		    x[4*(i-c1)+1] = xtempmin
+		    x[4*(i-c1)+2] = xtempmax
+		    x[4*(i-c1)+3] = xtempmax
+		    x[4*(i-c1)+4] = xtempmin 
+		}
+	    }
+
+	case GT_TWO:
+	    if (nx == 1) {
+	        xtempmin = min (xmax, max (xmin, GT_XMIN(geo)))
+	        xtempmax = min (xmax, max (xmin, GT_XMAX(geo)))
+		x[1] = xtempmin
+		x[2] = xtempmax
+	    } else if (nx == GT_NCOLS(geo)) {
+	        if (GT_XMIN(geo) > GT_XMAX(geo))
+		    dx = -GT_XSCALE(geo)
+	        else
+		    dx = GT_XSCALE(geo)
+	        do  i = c1, c2 {
+	            xtempmin = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 1.5) * dx))
+	            xtempmax = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 0.5) * dx))
+		    x[2*(i-c1)+1] = xtempmin
+		    x[2*(i-c1)+2] = xtempmax
+		}
+	    } else {
+	        if (GT_XMIN(geo) > GT_XMAX(geo))
+		    dx = -GT_XSCALE(geo) * (GT_NCOLS(geo) - 1.0) / (nx - 1.0)
+	        else
+		    dx = GT_XSCALE(geo) * (GT_NCOLS(geo) - 1.0) / (nx - 1.0)
+	        do  i = c1, c2 {
+	            xtempmin = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 1.5) * dx))
+	            xtempmax = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 0.5) * dx))
+		    x[2*(i-c1)+1] = xtempmin
+		    x[2*(i-c1)+2] = xtempmax
+		}
+	    }
+
+	case GT_ONE:
+	    if (nx == 1) {
+	        x[1] = min (xmax, max (xmin,
+		    (GT_XMIN(geo) + GT_XMAX(geo)) / 2.0))
+	    } else if (nx == GT_NCOLS(geo)) {
+	        if (GT_XMIN(geo) > GT_XMAX(geo))
+		    dx = -GT_XSCALE(geo)
+	        else
+		    dx = GT_XSCALE(geo)
+	        do  i = c1, c2
+	            x[i-c1+1] = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 1) * dx))
+	    } else {
+	        if (GT_XMIN(geo) > GT_XMAX(geo))
+		    dx = -GT_XSCALE(geo) * (GT_NCOLS(geo) - 1.0) / (nx - 1.0)
+	        else
+		    dx = GT_XSCALE(geo) * (GT_NCOLS(geo) - 1.0) / (nx - 1.0)
+	        do  i = c1, c2
+	            x[i-c1+1] = min (xmax, max (xmin, GT_XMIN(geo) +
+		        (i - 1) * dx))
+	    }
+
 	}
 
-	if (ny == 1)
-	    y[1] = min (ymax, max (ymin, (GT_YMIN(geo) + GT_YMAX(geo)) / 2.0))
-	else if (ny == GT_NLINES(geo)) {
-	    if (GT_YMIN(geo) > GT_YMAX(geo))
-		dy = -GT_YSCALE(geo)
-	    else
-		dy = GT_YSCALE(geo)
-	    do i = 1, ny
-	        y[i] = min (ymax, max (ymin, GT_YMIN(geo) + (i - 1) * dy))
-	} else {
-	    if (GT_YMIN(geo) > GT_YMAX(geo))
-		dy = -GT_YSCALE(geo) * (GT_NLINES(geo) - 1.0) / (ny - 1.0)
-	    else
-		dy = GT_YSCALE(geo) * (GT_NLINES(geo) - 1.0) / (ny - 1.0)
-	    do i = 1, ny
-	        y[i] = min (ymax, max (ymin, GT_YMIN(geo) + (i - 1) * dy))
+	switch (cmode) {
+	case GT_FOUR:
+	    if (ny == 1) {
+	        ytempmin = min (ymax, max (ymin, GT_YMIN(geo)))
+	        ytempmax = min (ymax, max (ymin, GT_YMAX(geo)))
+		y[1] = ytempmin
+		y[2] = ytempmin
+		y[3] = ytempmax
+		y[4] = ytempmax
+	    } else if (ny == GT_NLINES(geo)) {
+	        if (GT_YMIN(geo) > GT_YMAX(geo))
+		    dy = -GT_YSCALE(geo)
+	        else
+		    dy = GT_YSCALE(geo)
+	        do i = l1, l2 {
+	            ytempmin = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 1.5) * dy))
+	            ytempmax = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 0.5) * dy))
+		    y[4*(i-l1)+1] = ytempmin
+		    y[4*(i-l1)+2] = ytempmin
+		    y[4*(i-l1)+3] = ytempmax
+		    y[4*(i-l1)+4] = ytempmax
+		}
+	    } else {
+	        if (GT_YMIN(geo) > GT_YMAX(geo))
+		    dy = -GT_YSCALE(geo) * (GT_NLINES(geo) - 1.0) / (ny - 1.0)
+	        else
+		    dy = GT_YSCALE(geo) * (GT_NLINES(geo) - 1.0) / (ny - 1.0)
+	        do i = l1, l2 {
+	            ytempmin = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 1.5) * dy))
+	            ytempmax = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 0.5) * dy))
+		    y[4*(i-l1)+1] = ytempmin
+		    y[4*(i-l1)+2] = ytempmin
+		    y[4*(i-l1)+3] = ytempmax
+		    y[4*(i-l1)+4] = ytempmax
+		}
+	    }
+
+	case GT_TWO:
+	    if (ny == 1) {
+	        ytempmin = min (ymax, max (ymin, GT_YMIN(geo)))
+	        ytempmax = min (ymax, max (ymin, GT_YMAX(geo)))
+		y[1] = ytempmin
+		y[2] = ytempmax
+	    } else if (ny == GT_NLINES(geo)) {
+	        if (GT_YMIN(geo) > GT_YMAX(geo))
+		    dy = -GT_YSCALE(geo)
+	        else
+		    dy = GT_YSCALE(geo)
+	        do i = l1, l2 {
+	            ytempmin = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 1.5) * dy))
+	            ytempmax = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 0.5) * dy))
+		    y[2*(i-l1)+1] = ytempmin
+		    y[2*(i-l1)+2] = ytempmax
+		}
+	    } else {
+	        if (GT_YMIN(geo) > GT_YMAX(geo))
+		    dy = -GT_YSCALE(geo) * (GT_NLINES(geo) - 1.0) / (ny - 1.0)
+	        else
+		    dy = GT_YSCALE(geo) * (GT_NLINES(geo) - 1.0) / (ny - 1.0)
+	        do i = l1, l2 {
+	            ytempmin = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 1.5) * dy))
+	            ytempmax = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 0.5) * dy))
+		    y[2*(i-l1)+1] = ytempmin
+		    y[2*(i-l1)+2] = ytempmax
+		}
+	    }
+	case GT_ONE:
+	    if (ny == 1) {
+	        y[1] = min (ymax, max (ymin,
+		    (GT_YMIN(geo) + GT_YMAX(geo)) / 2.0))
+	    } else if (ny == GT_NLINES(geo)) {
+	        if (GT_YMIN(geo) > GT_YMAX(geo))
+		    dy = -GT_YSCALE(geo)
+	        else
+		    dy = GT_YSCALE(geo)
+	        do i = l1, l2
+	            y[i-l1+1] = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 1) * dy))
+	    } else {
+	        if (GT_YMIN(geo) > GT_YMAX(geo))
+		    dy = -GT_YSCALE(geo) * (GT_NLINES(geo) - 1.0) / (ny - 1.0)
+	        else
+		    dy = GT_YSCALE(geo) * (GT_NLINES(geo) - 1.0) / (ny - 1.0)
+	        do i = l1, l2
+	            y[i-l1+1] = min (ymax, max (ymin, GT_YMIN(geo) +
+		        (i - 1) * dy))
+	    }
+
 	}
 end
 
 
 # GEO_SAMPLE -- Calculate the sampled reference points.
 
-procedure geo_sample (geo, xref, yref, nxsample, nysample)
+procedure geo_sample (geo, xref, c1, c2, nxsample, yref, l1, l2, nysample,
+	cmode)
 
-pointer	geo		#I pointer to geotran structure
-real	xref[ARB]	#O x reference values
-real	yref[ARB]	#O y reference values
-int	nxsample	#I number of sample points in x
-int	nysample	#I number of sample points in y
+pointer	geo			#I pointer to geotran structure
+real	xref[ARB]		#O x reference values
+int	c1, c2, nxsample	#I limits and number of sample points in x
+real	yref[ARB]		#O y reference values
+int	l1, l2, nysample	#I limits and number of sample points in y
+int	cmode			#I coordinate computation mode
 
 int	i
+real	xtempmin, xtempmax, ytempmin, ytempmax
 
 begin
-	if (GT_NCOLS(geo) == 1)
-	    xref[1] = 1.0
-	else {
-	    do i = 1, GT_NCOLS(geo)
-	        xref[i] = min (real (nxsample), max (1., real ((nxsample - 1) *
-		    i + (GT_NCOLS(geo) - nxsample)) / (GT_NCOLS(geo) - 1)))
+	switch (cmode) {
+	case GT_FOUR:
+	    if (GT_NCOLS(geo) == 1) {
+	        xref[1] = 0.5
+		xref[2] = 1.5
+		xref[3] = 1.5
+		xref[4] = 0.5
+	    } else {
+		do i = c1, c2 {
+	            xtempmin = min (real (nxsample), max (1.,
+		        real ((nxsample - 1) * (i - 0.5) + (GT_NCOLS(geo) -
+			nxsample)) / (GT_NCOLS(geo) - 1)))
+	            xtempmax = min (real (nxsample), max (1.,
+		        real ((nxsample - 1) * (i + 0.5) + (GT_NCOLS(geo) -
+			nxsample)) / (GT_NCOLS(geo) - 1)))
+		    xref[4*(i-c1)+1] = xtempmin
+		    xref[4*(i-c1)+2] = xtempmax
+		    xref[4*(i-c1)+3] = xtempmax
+		    xref[4*(i-c1)+4] = xtempmin
+		}
+
+	    }
+	case GT_TWO:
+	    if (GT_NCOLS(geo) == 1) {
+	        xref[1] = 0.5
+		xref[2] = 1.5
+	    } else {
+		do i = c1, c2 {
+	            xtempmin = min (real (nxsample), max (1.,
+		        real ((nxsample - 1) * (i - 0.5) + (GT_NCOLS(geo) -
+			nxsample)) / (GT_NCOLS(geo) - 1)))
+	            xtempmax = min (real (nxsample), max (1.,
+		        real ((nxsample - 1) * (i + 0.5) + (GT_NCOLS(geo) -
+			nxsample)) / (GT_NCOLS(geo) - 1)))
+		    xref[2*(i-c1)+1] = xtempmin
+		    xref[2*(i-c1)+2] = xtempmax
+		}
+	    }
+	case GT_ONE:
+	    if (GT_NCOLS(geo) == 1)
+	        xref[1] = 1.0
+	    else {
+	        do i = c1, c2
+	            xref[i-c1+1] = min (real (nxsample), max (1.,
+		        real ((nxsample - 1) * i + (GT_NCOLS(geo) -
+			nxsample)) / (GT_NCOLS(geo) - 1)))
+	    }
 	}
 
-	if (GT_NLINES(geo) == 1)
-	    yref[1] = 1.0
-	else {
-	    do i = 1, GT_NLINES(geo)
-	        yref[i] = min (real (nysample), max (1., real ((nysample - 1) *
-		    i + (GT_NLINES(geo) - nysample)) / (GT_NLINES(geo) - 1)))
+	switch (cmode) {
+	case GT_FOUR:
+	    if (GT_NLINES(geo) == 1) {
+	        yref[1] = 0.5
+		yref[2] = 0.5
+		yref[3] = 1.5
+		yref[4] = 1.5
+	    } else {
+	        do i = l1, l2 {
+	            ytempmin = min (real (nysample), max (1.,
+		        real ((nysample - 1) * (i - 0.5) + (GT_NLINES(geo) -
+			nysample)) / (GT_NLINES(geo) - 1)))
+	            ytempmax = min (real (nysample), max (1.,
+		        real ((nysample - 1) * (i + 0.5) + (GT_NLINES(geo) -
+			nysample)) / (GT_NLINES(geo) - 1)))
+		    yref[4*(i-l1)+1] = ytempmin
+		    yref[4*(i-l1)+2] = ytempmin
+		    yref[4*(i-l1)+3] = ytempmax
+		    yref[4*(i-l1)+4] = ytempmax
+		}
+	    }
+	case GT_TWO:
+	    if (GT_NLINES(geo) == 1) {
+	        yref[1] = 0.5
+		yref[2] = 1.5
+	    } else {
+	        do i = l1, l2 {
+	            ytempmin = min (real (nysample), max (1.,
+		        real ((nysample - 1) * (i - 0.5) + (GT_NLINES(geo) -
+			nysample)) / (GT_NLINES(geo) - 1)))
+	            ytempmax = min (real (nysample), max (1.,
+		        real ((nysample - 1) * (i + 0.5) + (GT_NLINES(geo) -
+			nysample)) / (GT_NLINES(geo) - 1)))
+		    yref[2*(i-l1)+1] = ytempmin
+		    yref[2*(i-l1)+2] = ytempmax
+		}
+	    }
+	case GT_ONE:
+	    if (GT_NLINES(geo) == 1)
+	        yref[1] = 1.0
+	    else {
+	        do i = l1, l2
+	            yref[i-l1+1] = min (real (nysample), max (1.,
+		        real ((nysample - 1) * i + (GT_NLINES(geo) -
+			nysample)) / (GT_NLINES(geo) - 1)))
+	    }
 	}
 end
 
@@ -605,7 +874,7 @@ end
 # GEO_MSIVECTOR -- Procedure to interpolate the surface coordinates
 
 procedure geo_msivector (in, out, geo, xmsi, ymsi, jmsi, msi, sx1, sy1, sx2,
-        sy2, xref, yref, c1, c2, l1, l2, x0, y0)
+        sy2, xref, c1, c2, nxsample, yref, l1, l2, nysample, x0, y0)
 
 pointer	in		#I pointer to input image
 pointer	out		#I pointer to output image
@@ -616,13 +885,16 @@ pointer	msi		#I pointer to interpolation surface
 pointer	sx1, sy1	#I pointers to linear surfaces
 pointer	sx2, sy2	#I pointer to higher order surfaces
 real	xref[ARB]	#I x reference coordinates
-real	yref[ARB]	#I y reference coordinates
 int	c1, c2		#I column limits in output image
+int	nxsample	#I the x sample size
+real	yref[ARB]	#I y reference coordinates
 int	l1, l2		#I line limits in output image
+int	nysample	#I the y sample size
 int	x0, y0		#I zero points of interpolation coordinates
 
-int	j, ncols, nlines, imc1, imc2, iml1, iml2, nicols, nxymargin
-pointer	sp, x, y, xin, yin, inbuf, outbuf 
+int	j, ncols, nlines, ncols4, nlines4
+int	imc1, imc2, iml1, iml2, nicols, nilines
+pointer	sp, txref, tyref, x, y, xin, yin, inbuf, outbuf 
 real	xmin, xmax, ymin, ymax, factor
 pointer	imgs1r(), imgs2r(), imps1r(), imps2r()
 real	geo_jfactor()
@@ -630,12 +902,6 @@ real	geo_jfactor()
 begin
 	ncols = c2 - c1 + 1
 	nlines = l2 - l1 + 1
-
-	call smark (sp)
-	call salloc (x, ncols, TY_REAL)
-	call salloc (y, ncols, TY_REAL)
-	call salloc (xin, ncols, TY_REAL)
-	call salloc (yin, ncols, TY_REAL)
 
 	# Find min max of interpolation coords.
 	if (IM_NDIM(in) == 1)
@@ -645,56 +911,63 @@ begin
 	    call geo_iminmax (xref, yref, c1, c2, l1, l2, x0, y0,
 	        xmsi, ymsi, xmin, xmax, ymin, ymax)
 
-	# Get the appropriate image section.
-	if (GT_INTERPOLANT(geo) == II_SPLINE3)
-	    nxymargin = NMARGIN_SPLINE3
-	else
-	    nxymargin = NMARGIN
-	imc1 = xmin - nxymargin
-	if (imc1 < 0)
+	# Get the appropriate image section and fit the interpolant.
+	imc1 = int(xmin) - GT_NXYMARGIN(geo)
+	if (imc1 <= 0)
 	    imc1 = imc1 - 1
-	imc2 = int (xmax) + nxymargin + 1
+	imc2 = nint (xmax) + GT_NXYMARGIN(geo) + 1
 	nicols = imc2 - imc1 + 1
 	if (IM_NDIM(in) == 1) {
+	    ncols4 = 2 * ncols
+	    nlines4 = 2 * nlines
 	    iml1 = 1
 	    iml2 = 1
+	    nilines = 1
+	    inbuf = imgs1r (in, imc1, imc2)
+	    if (inbuf == EOF)
+	        call error (0, "Error reading image")
+	    call asifit (msi, Memr[inbuf], nicols)
 	} else {
-	    iml1 = ymin - nxymargin
-	    if (iml1 < 0)
+	    ncols4 = 4 * ncols
+	    nlines4 = 4 * nlines
+	    iml1 = int(ymin) - GT_NXYMARGIN(geo)
+	    if (iml1 <= 0)
 	        iml1 = iml1 - 1
-	    iml2 = int (ymax) + nxymargin + 1
+	    iml2 = nint (ymax) + GT_NXYMARGIN(geo) + 1
+	    nilines = iml2 - iml1 + 1
+	    inbuf = imgs2r (in, imc1, imc2, iml1, iml2)
+	    if (inbuf == EOF)
+	        call error (0, "Error reading image")
+	    call msifit (msi, Memr[inbuf], nicols, nilines, nicols)
 	}
 
-	# Fit the interpolant.
-	if (IM_NDIM(in) == 1) 
-	    inbuf = imgs1r (in, imc1, imc2)
-	else
-	    inbuf = imgs2r (in, imc1, imc2, iml1, iml2)
-	if (inbuf == EOF)
-	    call error (0, "Error reading image")
-	if (IM_NDIM(in) == 1) 
-	    call asifit (msi, Memr[inbuf], (imc2 - imc1 + 1))
-	else
-	    call msifit (msi, Memr[inbuf], (imc2 - imc1 + 1),
-	        (iml2 - iml1 + 1), (imc2 - imc1 + 1))
+	# Allocate working space.
+	call smark (sp)
+	if (GT_INTERPOLANT(geo) == II_DRIZZLE || GT_INTERPOLANT(geo) ==
+	    II_BIDRIZZLE) {
+	    call salloc (txref, ncols4, TY_REAL)
+	    call salloc (tyref, nlines4, TY_REAL)
+	    call salloc (x, ncols4, TY_REAL)
+	    call salloc (y, ncols4, TY_REAL)
+	    call salloc (xin, ncols4, TY_REAL)
+	    call salloc (yin, ncols4, TY_REAL)
+	    if (IM_NDIM(in) == 1)
+	        call geo_sample (geo, Memr[txref], c1, c2, nxsample,
+		    Memr[tyref], l1, l2, nysample, GT_TWO)
+	    else
+	        call geo_sample (geo, Memr[txref], c1, c2, nxsample,
+		    Memr[tyref], l1, l2, nysample, GT_FOUR)
+	    call aaddkr (Memr[txref], real (-x0 + 1), Memr[x], ncols4)
+	} else {
+	    call salloc (x, ncols, TY_REAL)
+	    call salloc (y, ncols, TY_REAL)
+	    call salloc (xin, ncols, TY_REAL)
+	    call salloc (yin, ncols, TY_REAL)
+	    call aaddkr (xref[c1], real (-x0 + 1), Memr[x], ncols)
+	}
 
 	# Compute the output buffer.
-	call aaddkr (xref[c1], real (-x0 + 1), Memr[x], ncols)
 	do j = l1, l2 {
-
-	    # Compute coordinates.
-	    if (IM_NDIM(in) == 1) {
-		call asivector (xmsi, Memr[x], Memr[xin], ncols)
-		call amovkr (1.0, Memr[yin], ncols)
-	    } else {
-	        call amovkr (yref[j] + real (-y0 + 1), Memr[y], ncols)
-	        call msivector (xmsi, Memr[x], Memr[y], Memr[xin], ncols)
-	        call msivector (ymsi, Memr[x], Memr[y], Memr[yin], ncols)
-	    }
-	    if (imc1 != 1)
-		call aaddkr (Memr[xin], real (-imc1 + 1), Memr[xin], ncols)
-	    if (iml1 != 1)
-		call aaddkr (Memr[yin], real (-iml1 + 1), Memr[yin], ncols)
 
 	    # Write the output image.
 	    if (IM_NDIM(in) == 1)
@@ -703,6 +976,40 @@ begin
 	        outbuf = imps2r (out, c1, c2, j, j)
 	    if (outbuf == EOF)
 		call error (0, "Error writing output image")
+
+	    # Compute the interpolation coordinates.
+	    if (GT_INTERPOLANT(geo) == II_DRIZZLE || GT_INTERPOLANT(geo) ==
+	        II_BIDRIZZLE) {
+	        if (IM_NDIM(in) == 1) {
+		    call asivector (xmsi, Memr[x], Memr[xin], ncols4)
+		    call amovkr (1.0, Memr[yin], ncols4)
+	        } else {
+	            #call amovkr (yref[j] + real (-y0 + 1), Memr[y], ncols)
+		    call geo_repeat (Memr[tyref+4*(j-l1)], 4, Memr[y], ncols)
+		    call aaddkr (Memr[y], real(-y0 + 1), Memr[y], ncols4)
+	            call msivector (xmsi, Memr[x], Memr[y], Memr[xin], ncols4)
+	            call msivector (ymsi, Memr[x], Memr[y], Memr[yin], ncols4)
+	        }
+	        if (imc1 != 1)
+		    call aaddkr (Memr[xin], real (-imc1 + 1), Memr[xin], ncols4)
+	        if (iml1 != 1)
+		    call aaddkr (Memr[yin], real (-iml1 + 1), Memr[yin], ncols4)
+	    } else {
+	        if (IM_NDIM(in) == 1) {
+		    call asivector (xmsi, Memr[x], Memr[xin], ncols)
+		    call amovkr (1.0, Memr[yin], ncols)
+	        } else {
+	            call amovkr (yref[j] + real (-y0 + 1), Memr[y], ncols)
+	            call msivector (xmsi, Memr[x], Memr[y], Memr[xin], ncols)
+	            call msivector (ymsi, Memr[x], Memr[y], Memr[yin], ncols)
+	        }
+	        if (imc1 != 1)
+		    call aaddkr (Memr[xin], real (-imc1 + 1), Memr[xin], ncols)
+	        if (iml1 != 1)
+		    call aaddkr (Memr[yin], real (-iml1 + 1), Memr[yin], ncols)
+	    }
+
+	    # Interpolate in the input image.
 	    if (IM_NDIM(in) == 1)
 	        call asivector (msi, Memr[xin], Memr[outbuf], ncols)
 	    else
@@ -738,7 +1045,7 @@ end
 # GEO_GSVECTOR -- Evaluate the output image pixels using fitted coordinate
 # values and image interpolation.
 
-procedure geo_gsvector (input, output, geo, msi, xref, yref, c1, c2, l1, l2,
+procedure geo_gsvector (input, output, geo, msi, xref, c1, c2, yref, l1, l2,
         sx1, sy1, sx2, sy2)
 
 pointer	input			#I pointer to input image
@@ -746,67 +1053,84 @@ pointer	output			#I pointer to output image
 pointer	geo			#I pointer to geotran structure
 pointer	msi			#I pointer to interpolant
 real	xref[ARB]		#I x reference array
-real	yref[ARB]		#I y reference array
 int	c1, c2			#I columns of interest in output image
+real	yref[ARB]		#I y reference array
 int	l1, l2			#I lines of interest in the output image
 pointer	sx1, sy1		#I linear surface descriptors
 pointer	sx2, sy2		#I distortion surface descriptors
 
-int	j, ncols, nicols, nlines, imc1, imc2, iml1, iml2, nxymargin
-pointer	sp, y, xin, yin, temp, inbuf, outbuf
+int	j, ncols, nlines, ncols4, nlines4, nicols, nilines
+int	imc1, imc2, iml1, iml2
+pointer	sp, txref, tyref, y, xin, yin, temp, inbuf, outbuf
 real	xmin, xmax, ymin, ymax, factor
 pointer	imgs1r(), imgs2r(), imps1r(), imps2r()
-real	geo_jfactor()
+real	gsgetr(), geo_jfactor()
 
 begin
+	# Compute the number of columns.
 	ncols = c2 - c1 + 1
 	nlines = l2 - l1 + 1
 
-	# Allocate working space.
-	call smark (sp)
-	call salloc (y, ncols, TY_REAL)
-	call salloc (xin, ncols, TY_REAL)
-	call salloc (yin, ncols, TY_REAL)
-	call salloc (temp, ncols, TY_REAL)
-
 	# Compute the maximum and minimum coordinates.
-	call geo_minmax (xref, yref, c1, c2, l1, l2, sx1, sy1, sx2, sy2, xmin,
-	    xmax, ymin, ymax)
+	call geo_minmax (xref, yref, c1, c2, l1, l2, sx1, sy1, sx2, sy2,
+	    xmin, xmax, ymin, ymax)
 
-	# Get the appropriate image section.
-	if (GT_INTERPOLANT(geo) == II_SPLINE3)
-	    nxymargin = NMARGIN_SPLINE3
-	else
-	    nxymargin = NMARGIN
-	imc1 = xmin - nxymargin
-	if (imc1 < 0)
+	# Get the appropriate image section and fill the buffer.
+	imc1 = int(xmin) - GT_NXYMARGIN(geo)
+	if (imc1 <= 0)
 	    imc1 = imc1 - 1
-	imc2 = int (xmax) + nxymargin + 1
+	imc2 = nint (xmax) + GT_NXYMARGIN(geo) + 1
+	nicols = imc2 - imc1 + 1
 	if (IM_NDIM(input) == 1) {
 	    iml1 = 1
 	    iml2 = 1
-	} else {
-	    iml1 = ymin - nxymargin
-	    if (iml1 < 0)
-	        iml1 = iml1 - 1
-	    iml2 = int (ymax) + nxymargin + 1
-	}
-	nicols = imc2 - imc1 + 1
-
-	# Fill the buffer.
-	if (IM_NDIM(input) == 1)
+	    nilines = 1
+	    ncols4 = 2 * ncols
+	    nlines4 = 2 * nlines
 	    inbuf = imgs1r (input, imc1, imc2)
-	else
+	    if (inbuf == EOF)
+	        call error (0, "Error reading image")
+	    call asifit (msi, Memr[inbuf], nicols)
+	} else {
+	    iml1 = int(ymin) - GT_NXYMARGIN(geo)
+	    if (iml1 <= 0)
+	        iml1 = iml1 - 1
+	    iml2 = nint (ymax) + GT_NXYMARGIN(geo) + 1
+	    nilines = iml2 - iml1 + 1
+	    ncols4 = 4 * ncols
+	    nlines4 = 4 * nlines
 	    inbuf = imgs2r (input, imc1, imc2, iml1, iml2)
-	if (inbuf == EOF)
-	    call error (0, "Error reading image")
+	    if (inbuf == EOF)
+	        call error (0, "Error reading image")
+	    call msifit (msi, Memr[inbuf], nicols, nilines, nicols)
+	}
 
-	# Fit the interpolant.
-	if (IM_NDIM(input) == 1)
-	    call asifit (msi, Memr[inbuf], (imc2 - imc1 + 1))
-	else
-	    call msifit (msi, Memr[inbuf], (imc2 - imc1 + 1), (iml2 - iml1 + 1),
-	        (imc2 - imc1 + 1))
+	# Allocate working space.
+	call smark (sp)
+	if (GT_INTERPOLANT(geo) == II_DRIZZLE || GT_INTERPOLANT(geo) ==
+		II_BIDRIZZLE) {
+	    call salloc (txref, ncols4, TY_REAL)
+	    call salloc (tyref, nlines4, TY_REAL)
+	    call salloc (y, ncols4, TY_REAL)
+	    call salloc (xin, ncols4, TY_REAL)
+	    call salloc (yin, ncols4, TY_REAL)
+	    call salloc (temp, ncols4, TY_REAL)
+	    if (IM_NDIM(input) == 1)
+	        call geo_ref (geo, Memr[txref], c1, c2, GT_NCOLS(geo),
+	            Memr[tyref], l1, l2, GT_NLINES(geo), gsgetr (sx1, GSXMIN),
+	            gsgetr (sx1, GSXMAX), gsgetr (sx1, GSYMIN), gsgetr (sx1,
+	            GSYMAX), GT_TWO)
+	    else
+	        call geo_ref (geo, Memr[txref], c1, c2, GT_NCOLS(geo),
+	            Memr[tyref], l1, l2, GT_NLINES(geo), gsgetr (sx1, GSXMIN),
+	            gsgetr (sx1, GSXMAX), gsgetr (sx1, GSYMIN), gsgetr (sx1,
+	            GSYMAX), GT_FOUR)
+	} else {
+	    call salloc (y, ncols, TY_REAL)
+	    call salloc (xin, ncols, TY_REAL)
+	    call salloc (yin, ncols, TY_REAL)
+	    call salloc (temp, ncols, TY_REAL)
+	}
 
 	# Compute the pixels.
 	do j = l1, l2 {
@@ -819,25 +1143,59 @@ begin
 	    if (output == EOF)
 		call error (0, "Error writing output image")
 
-	    call amovkr (yref[j], Memr[y], ncols)
+	    # Compute the interpolation coordinates.
+	    if (GT_INTERPOLANT(geo) == II_DRIZZLE || GT_INTERPOLANT(geo) ==
+		II_BIDRIZZLE) {
 
-	    # Fit x coords.
-	    call gsvector (sx1, xref[c1], Memr[y], Memr[xin], ncols)
-	    if (sx2 != NULL) {
-		call gsvector (sx2, xref[c1], Memr[y], Memr[temp], ncols)
-		call aaddr (Memr[xin], Memr[temp], Memr[xin], ncols)
-	    }
-	    if (imc1 != 1)
-		call aaddkr (Memr[xin], real (-imc1 + 1), Memr[xin], ncols)
+		# Set the y coordinate.
+	        if (IM_NDIM(input) == 1)
+	            call geo_repeat (Memr[tyref+2*(j-l1)], 2, Memr[y], ncols)
+		else
+	            call geo_repeat (Memr[tyref+4*(j-l1)], 4, Memr[y], ncols)
 
-	    # Fit y coords.
-	    call gsvector (sy1, xref[c1], Memr[y], Memr[yin], ncols)
-	    if (sy2 != NULL) {
-		call gsvector (sy2, xref[c1], Memr[y], Memr[temp], ncols)
-		call aaddr (Memr[yin], Memr[temp], Memr[yin], ncols)
+	        # Fit x coords.
+	        call gsvector (sx1, Memr[txref], Memr[y], Memr[xin], ncols4)
+	        if (sx2 != NULL) {
+		    call gsvector (sx2, Memr[txref], Memr[y], Memr[temp],
+		        ncols4)
+		    call aaddr (Memr[xin], Memr[temp], Memr[xin], ncols4)
+	        }
+	        if (imc1 != 1)
+		    call aaddkr (Memr[xin], real (-imc1 + 1), Memr[xin], ncols4)
+
+	        # Fit y coords.
+	        call gsvector (sy1, Memr[txref], Memr[y], Memr[yin], ncols4)
+	        if (sy2 != NULL) {
+		    call gsvector (sy2, Memr[txref], Memr[y], Memr[temp],
+		        ncols4)
+		    call aaddr (Memr[yin], Memr[temp], Memr[yin], ncols4)
+	        }
+	        if (iml1 != 1)
+		    call aaddkr (Memr[yin], real (-iml1 + 1), Memr[yin], ncols4)
+
+	    } else {
+
+		# Set the y coordinate.
+	        call amovkr (yref[j], Memr[y], ncols)
+
+	        # Fit x coords.
+	        call gsvector (sx1, xref[c1], Memr[y], Memr[xin], ncols)
+	        if (sx2 != NULL) {
+		    call gsvector (sx2, xref[c1], Memr[y], Memr[temp], ncols)
+		    call aaddr (Memr[xin], Memr[temp], Memr[xin], ncols)
+	        }
+	        if (imc1 != 1)
+		    call aaddkr (Memr[xin], real (-imc1 + 1), Memr[xin], ncols)
+
+	        # Fit y coords.
+	        call gsvector (sy1, xref[c1], Memr[y], Memr[yin], ncols)
+	        if (sy2 != NULL) {
+		    call gsvector (sy2, xref[c1], Memr[y], Memr[temp], ncols)
+		    call aaddr (Memr[yin], Memr[temp], Memr[yin], ncols)
+	        }
+	        if (iml1 != 1)
+		    call aaddkr (Memr[yin], real (-iml1 + 1), Memr[yin], ncols)
 	    }
-	    if (iml1 != 1)
-		call aaddkr (Memr[yin], real (-iml1 + 1), Memr[yin], ncols)
 
 	    # Interpolate in input image.
 	    if (IM_NDIM(input) == 1)
@@ -1037,6 +1395,76 @@ begin
 end
 
 
+# GEO_MARGSET -- Set up interpolation margin
+
+procedure geo_margset (sx1, sy1, sx2, sy2, xmin, xmax, ncols, ymin, ymax,
+	nlines, interpolant, nsinc, nxymargin)
+
+pointer	sx1, sy1		#I linear surface descriptors
+pointer	sx2, sy2		#I distortion surface descriptors
+real	xmin, xmax		#I the reference coordinate x limits
+int	ncols			#I the number of output image columns
+real	ymin, ymax		#I the reference coordinate y limits
+int	nlines			#I the number of output image lines
+int	interpolant		#I the interpolant type
+int	nsinc			#I the sinc width
+int	nxymargin		#O the interpolation margin
+
+int	dist1, dist2, dist3, dist4, dist5, dist6
+pointer	newsx, newsy
+real	x1, y1, x2, y2
+real	gseval()
+
+begin
+	if (interpolant == II_SPLINE3 || interpolant == II_BISPLINE3) {
+	    nxymargin = NMARGIN_SPLINE3
+	} else if (interpolant == II_LSINC || interpolant == II_BILSINC) {
+	    nxymargin = nsinc
+	} else if (interpolant == II_SINC || interpolant == II_BISINC) {
+	    nxymargin = nsinc
+	} else if (interpolant == II_DRIZZLE || interpolant == II_BIDRIZZLE) {
+	    if (sx2 == NULL)
+		call gscopy (sx1, newsx)
+	    else
+		call gsadd (sx1, sx2, newsx)
+	    if (sy2 == NULL)
+		call gscopy (sy1, newsy)
+	    else
+		call gsadd (sy1, sy2, newsy)
+	    x1 = gseval (newsx, xmin, ymin)
+	    y1 = gseval (newsy, xmin, ymin)
+	    x2 = gseval (newsx, xmax, ymin)
+	    y2 = gseval (newsy, xmax, ymin)
+	    dist1 = sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2) / ncols
+	    x1 = gseval (newsx, xmax, ymax)
+	    y1 = gseval (newsy, xmax, ymax)
+	    dist2 = sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2) / nlines
+	    x2 = gseval (newsx, xmin, ymax)
+	    y2 = gseval (newsy, xmin, ymax)
+	    dist3 = sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2) / ncols
+	    x1 = gseval (newsx, xmin, ymin)
+	    y1 = gseval (newsy, xmin, ymin)
+	    dist4 = sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2) / nlines
+	    x1 = gseval (newsx, xmin, (ymin + ymax) / 2.0)
+	    y1 = gseval (newsy, xmin, (ymin + ymax) / 2.0)
+	    x2 = gseval (newsx, xmax, (ymin + ymax) / 2.0)
+	    y2 = gseval (newsy, xmax, (ymin + ymax) / 2.0)
+	    dist5 = sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2) / ncols
+	    x1 = gseval (newsx, (xmin + xmax) / 2.0, ymin)
+	    y1 = gseval (newsy, (xmin + xmax) / 2.0, ymin)
+	    x2 = gseval (newsx, (xmin + xmax) / 2.0, ymax)
+	    y2 = gseval (newsy, (xmin + xmax) / 2.0, ymax)
+	    dist6 = sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2) / nlines
+	    nxymargin = max (NMARGIN, dist1, dist2, dist3, dist4,
+	        dist5, dist6)
+	    call gsfree (newsx)
+	    call gsfree (newsy)
+	} else {
+	    nxymargin = NMARGIN
+	}
+end
+
+
 # GEO_IMSET -- Set up input image boundary conditions.
 
 procedure geo_imset (im, geo, sx1, sy1, sx2, sy2, xref, nx, yref, ny)
@@ -1050,7 +1478,7 @@ int	nx			#I number of x reference coordinates
 real	yref[ARB]		#I y reference coordinates
 int	ny			#I number of y reference coordinates
 
-int	bndry, npts, nxymargin
+int	bndry, npts
 pointer	sp, x1, x2, y1, y2, xtemp, ytemp
 real	xn1, xn2, xn3, xn4, yn1, yn2, yn3, yn4, xmin, xmax, ymin, ymax
 real	gseval()
@@ -1147,6 +1575,7 @@ begin
 	    call sfree (sp)
 	}
 
+	# Compute the out-of-bounds limit.
 	if (IM_NDIM(im) == 1) {
 	    if (xmin < 1.0 || xmax > real (IM_LEN(im,1)))
 	        bndry = max (1.0 - xmin, xmax - IM_LEN(im,1)) + 1
@@ -1161,11 +1590,7 @@ begin
 	        bndry = 1
 	}
 
-	if (GT_INTERPOLANT(geo) == II_SPLINE3)
-	    nxymargin = NMARGIN_SPLINE3
-	else
-	    nxymargin = NMARGIN
-	call imseti (im, IM_NBNDRYPIX, bndry + nxymargin)
+	call imseti (im, IM_NBNDRYPIX, bndry + GT_NXYMARGIN(geo) + 1)
 	call imseti (im, IM_TYBNDRY, GT_BOUNDARY(geo))
 	call imsetr (im, IM_BNDRYPIXVAL, GT_CONSTANT(geo))
 end
@@ -1304,4 +1729,24 @@ begin
 	}
 
 	return (abs (xx * yy - xy * yx))
+end
+
+
+# GEO_REPEAT -- Copy a small repeated pattern into the output buffer.
+
+procedure geo_repeat (pat, npat, output, ntimes)
+
+real	pat[ARB]	#I the input pattern to be repeated 
+int	npat		#I the size of the pattern
+real	output[ARB]	#O the output array
+int	ntimes		#I the number of times the pattern is to be repeated
+
+int	j, i, offset
+
+begin
+	do j = 1, ntimes {
+	    offset = npat * j - npat
+	    do i = 1, npat
+		output[offset+i] = pat[i]
+	}
 end

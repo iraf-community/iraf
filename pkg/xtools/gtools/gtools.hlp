@@ -72,7 +72,7 @@ COLON COMMANDS
 :/xlabel string		Label for X axis
 :/xunits string		Units for X axis
 :/xsize size		Size of marks along the X axis
-:/xtransform type	X coordinate transform type (linear or logrithmic)
+:/xtransform type	X coordinate transform type (linear or logarithmic)
 :/xwindow x1 x2		X graph window (INDEF defaults to min or max)
 :/xflip [yes|no]	Flip X axis
 
@@ -80,7 +80,7 @@ COLON COMMANDS
 :/ylabel string		Label for Y axis
 :/yunits string		Units for Y axis
 :/ysize size		Size of marks along the Y axis
-:/ytransform type	Y coordinate transform type (linear or logrithmic)
+:/ytransform type	Y coordinate transform type (linear or logarithmic)
 :/ywindow y1 y2		Y graph window (INDEF defaults to min or max)
 :/yflip [yes|no]	Flip Y axis
 

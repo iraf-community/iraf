@@ -1,5 +1,17 @@
 .help revisions Jan90 noao.digiphot.ptools
 .nf
+ptools$mkpkg
+    Modified the build procedures to support picking up user compile and
+    link flags.
+
+    (Davis, June 17, 1999)
+
+ptools$ptools.cl
+    Modified the package cl script to check and see if the tables package is
+    already loaded before checking to see if it exists and then loading it.
+
+   (Davis, August 1, 1998)
+
 ptools$pdump.cl
     Modified the way the pdump script handles the tdump pwidth parameter
     to work around a change made to the tables.ttools.tdump task. The solution

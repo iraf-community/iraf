@@ -341,7 +341,7 @@ XINT	*chan;			/* file number (output) */
 	    if (np->domain == INET) {
 		/* Server side Internet domain connection. */
 		struct sockaddr_in sockaddr;
-		int s;
+		int s, reuse=1;
 
 		/* Get socket. */
 		if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0)
@@ -352,6 +352,13 @@ XINT	*chan;			/* file number (output) */
 		sockaddr.sin_family = AF_INET;
 		sockaddr.sin_port = host_port;
 		sockaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+		if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&reuse,
+			sizeof(reuse)) < 0) {
+		    close (s);
+		    goto err;
+		}
+
 		if (bind (s,
 			(struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
 		    close (s);
@@ -557,7 +564,7 @@ XLONG	*offset;		/* 1-indexed file offset to read at */
 	 * restore blocking i/o after the open.
 	 */
 	if (np->domain == FIFO && np->datain < MAXSEL) {
-#ifdef POSIX
+#ifdef SOLARIS
 	    fd_set readfds;
 	    FD_ZERO (&readfds);
 	    FD_SET (np->datain, &readfds);

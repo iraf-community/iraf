@@ -335,7 +335,7 @@ begin
 	case PY_OUTOFBOUNDS:
 	    call strcpy ("EdgeImage", str, maxch)
 	case PY_NOPIX:
-	    call strcpy ("OffImage", str, maxch)
+	    call strcpy ("NoPixels", str, maxch)
 	case PY_NOSKYMODE:
 	    call strcpy ("NoSky", str, maxch)
 	case PY_BADDATA:

@@ -466,7 +466,7 @@ begin
 	call gethost (Memc[outstr], SZ_LINE)
 	call dp_sparam (tp, "HOST", Memc[outstr], "computer", "")
 	call dp_date (Memc[date], Memc[time], SZ_DATE)
-	call dp_sparam (tp, "DATE", Memc[date], "mm-dd-yr", "")
+	call dp_sparam (tp, "DATE", Memc[date], "yyyy-mm-dd", "")
 	call dp_sparam (tp, "TIME", Memc[time], "hh:mm:ss", "") 
 
 	# Define the package and task.
@@ -553,7 +553,7 @@ int	psf_star		# the psf star index
 int	nei1_star, nei2_star	# the first and last neighbor star indices
 int	group			# current group
 
-int	i, j, nrows
+int	i, nrows
 pointer	apsel, sp, colpoint
 int	tbpsta()
 
@@ -589,12 +589,16 @@ begin
 	# Now write out the group.
 	do i = nei1_star, nei2_star {
 	    nrows = nrows + 1
-	    call tbrpti (tp, Memi[colpoint], Memi[DP_APID(apsel)+i-1], 1, j)
-	    call tbrpti (tp, Memi[colpoint+1], group, 1, j)
-	    call tbrptr (tp, Memi[colpoint+2], Memr[DP_APXCEN(apsel)+i-1], 1, j)
-	    call tbrptr (tp, Memi[colpoint+3], Memr[DP_APYCEN(apsel)+i-1], 1, j)
-	    call tbrptr (tp, Memi[colpoint+4], Memr[DP_APMAG(apsel)+i-1], 1, j)
-	    call tbrptr (tp, Memi[colpoint+5], Memr[DP_APMSKY(apsel)+i-1], 1, j)
+	    call tbrpti (tp, Memi[colpoint], Memi[DP_APID(apsel)+i-1], 1, nrows)
+	    call tbrpti (tp, Memi[colpoint+1], group, 1, nrows)
+	    call tbrptr (tp, Memi[colpoint+2], Memr[DP_APXCEN(apsel)+i-1], 1,
+	        nrows)
+	    call tbrptr (tp, Memi[colpoint+3], Memr[DP_APYCEN(apsel)+i-1], 1,
+	        nrows)
+	    call tbrptr (tp, Memi[colpoint+4], Memr[DP_APMAG(apsel)+i-1], 1,
+	        nrows)
+	    call tbrptr (tp, Memi[colpoint+5], Memr[DP_APMSKY(apsel)+i-1], 1,
+	        nrows)
 	}
 
 	call sfree (sp)

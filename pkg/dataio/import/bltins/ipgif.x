@@ -537,6 +537,7 @@ begin
 		        call pargstr (Memc[buf])
 	        }
 	    }
+	    call sfree (sp)
 	    return
 	case GE_GCONTROL:			# Graphic Control Extension
 	    # Process the graphic control block.
@@ -549,6 +550,8 @@ begin
 
 	    while (gif_get_data_block (gif, Memc[buf]) != 0)
 	        ;
+
+	    call sfree (sp)
 	    return
 	default:
 	    call eprintf ("Warning: Unknown extension label (0x%02x).\n")
@@ -560,6 +563,8 @@ begin
 	# eat the data blocks.
 	while (gif_get_data_block (gif, Memc[buf]) != 0)
 	    ;
+
+	call sfree (sp)
 end
 
 

@@ -1,4 +1,4 @@
-.help eqecl Nov95 "Slalib Package"
+.help eqecl Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slEQEC (DR, DD, DATE, DL, DB)

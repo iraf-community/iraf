@@ -22,9 +22,9 @@
 
 #define TX_OPTBUFSIZE	SZ_LINE	/* optimum buffer size for text file	*/
 #define TX_MAXBUFSIZE	0	/* maximum buffer size for text file	*/
-#define BF_OPTBUFSIZE	4096	/* optimum buffer size for binary file	*/
+#define BF_OPTBUFSIZE	32768	/* optimum buffer size for binary file	*/
 #define BF_MAXBUFSIZE	0	/* maximum buffer size for binary file	*/
-#define SF_OPTBUFSIZE	4096	/* optimum buffer size for static file	*/
+#define SF_OPTBUFSIZE	32768	/* optimum buffer size for static file	*/
 #define SF_MAXBUFSIZE	0	/* maximum buffer size for static file	*/
 #define	KS_OPTBUFSIZE	4096	/* optimal buffer size for KS i/o	*/
 #define	KS_MAXBUFSIZE	0	/* maximum buffer size for KS i/o	*/

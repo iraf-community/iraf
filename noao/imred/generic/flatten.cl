@@ -35,7 +35,7 @@
 	}
 
 	# Generate image list.
-	files (images, sort-, >imlist)
+	sections (images, option="fullname", >imlist)
 	imfd = imlist
 
 	while (fscan (imfd, input) != EOF) {

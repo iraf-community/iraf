@@ -119,13 +119,14 @@ end
 
 # AP_YMKPOLY -- Mark the coordinates of a polygon on the display device.
 
-int procedure ap_ymkpoly (py, id, x, y, max_nvertices)
+int procedure ap_ymkpoly (py, id, x, y, max_nvertices, idflush)
 
 pointer	py		# polyphot structure
 pointer	id		# display pointer
 real	x[ARB]		# x coords of vertices
 real	y[ARB]		# y coords of vertices
 int	max_nvertices	# maximum number of vertices
+int	idflush		# flush the imd device
 
 int	i, nvertices, stat, wcs, key
 pointer	sp, cmd
@@ -163,8 +164,13 @@ begin
 		if (id != NULL) {
 		    if (nvertices == 1)
 		        call gamove (id, x[1], y[1])
-		    else
+		    else {
 		        call gadraw (id, x[nvertices], y[nvertices])
+			if (idflush == YES)
+			    call gframe (id)
+			else
+			    call gflush (id)
+		    }
 		}
 	    } else
 		break

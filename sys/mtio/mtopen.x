@@ -81,8 +81,10 @@ begin
 	}
 
 	# If regular binary file, we are done.
-	if (mtfile(mtname) == NO)
+	if (mtfile(mtname) == NO) {
+	    call sfree (sp)
 	    return (open (mtname, acmode, BINARY_FILE))
+	}
 
 	# Get mtio file descriptor slot, but do not allocate it until
 	# we are ready to open the file.
@@ -180,5 +182,7 @@ begin
 	}
 
 	call mt_savepos (mt)
+
+	call sfree (sp)
 	return (fd)
 end

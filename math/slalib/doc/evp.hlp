@@ -1,4 +1,4 @@
-.help evp Nov95 "Slalib Package"
+.help evp Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slEVP (DATE, DEQX, DVB, DPB, DVH, DPH)
@@ -57,9 +57,9 @@
   that one of Stumpff's precession constants differs by 0.001 arcsec
   from the value given in the Explanatory Supplement to the A.E.
 
-  P.T.Wallace   Starlink   21 November 1994
+  P.T.Wallace   Starlink   21 March 1999
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1999 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

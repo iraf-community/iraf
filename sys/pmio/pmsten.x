@@ -24,20 +24,34 @@ long	v5[PM_MAXDIM], v6[PM_MAXDIM]
 include	"pmio.com"
 
 begin
+	# If an image section is in use on any of the input mask operands,
+	# perform a coordination transformation into physical mask space
+	# before performing the stencil operation.
+
 	if (PM_MAPXY(pm_src) == YES || PM_MAPXY(pm_dst) == YES ||
 	    PM_MAPXY(pm_stn) == YES) {
 
-	    # Source mask.
+	    # Compute the geometry V1:V3 of the source mask.
 	    call imaplv (PM_REFIM(pm_src), vs_src, v1, PM_MAXDIM)
+
 	    call aaddl (vs_src, vn, v2, PM_MAXDIM)
+	    call asubkl (v2, 1, v2, PM_MAXDIM)
 	    call aminl (v2, IM_LEN(PM_REFIM(pm_src),1), v2, PM_MAXDIM)
 	    call imaplv (PM_REFIM(pm_src), v2, v3, PM_MAXDIM)
+
+	    # Swap V1 and V3 if necessary.
 	    call aminl (v1, v3, v1, PM_MAXDIM)
 
-	    # Destination mask.
+	    # Compute the geometry V2:V4 of the destination mask.
 	    call imaplv (PM_REFIM(pm_dst), vs_dst, v2, PM_MAXDIM)
+
 	    call aaddl (vs_dst, vn, v3, PM_MAXDIM)
+	    call asubkl (v3, 1, v3, PM_MAXDIM)
+	    call aminl (v3, IM_LEN(PM_REFIM(pm_dst),1), v3, PM_MAXDIM)
 	    call imaplv (PM_REFIM(pm_dst), v3, v4, PM_MAXDIM)
+
+	    # Compute v3 = vn for rasterop.  Input: SRC=v1:v3, DST=v2:v4
+	    # This also swaps v2 and v4 if necessary.
 
 	    do i = 1, PM_MAXDIM
 		if (v2[i] > v4[i]) {
@@ -46,12 +60,15 @@ begin
 		} else
 		    v3[i] = v4[i] - v2[i] + 1
 
-	    # Stencil mask.
+	    # Compute the start vector V4 of the stencil mask.
 	    call imaplv (PM_REFIM(pm_stn), vs_stn, v4, PM_MAXDIM)
 	    call aaddl (vs_stn, vn, v5, PM_MAXDIM)
+	    call asubkl (v5, 1, v5, PM_MAXDIM)
+	    call aminl (v5, IM_LEN(PM_REFIM(pm_stn),1), v5, PM_MAXDIM)
 	    call imaplv (PM_REFIM(pm_stn), v5, v6, PM_MAXDIM)
 	    call aminl (v4, v6, v4, PM_MAXDIM)
 
+	    # Perform the rasterop operation.
 	    call pl_stencil (pm_src, v1, pm_dst, v2, pm_stn, v4, v3, rop)
 
 	} else

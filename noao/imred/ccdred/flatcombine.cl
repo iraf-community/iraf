@@ -35,7 +35,7 @@ begin
 
 	# Process images first if desired.
 	if (process == YES)
-	    ccdproc (ims, ccdtype=ccdtype, noproc=no)
+	    ccdproc (ims, output="", ccdtype=ccdtype, noproc=no)
 
 	# Combine the flat field images.
 	combine (ims, output=output, plfile="", sigma="", combine=combine,

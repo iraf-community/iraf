@@ -40,6 +40,9 @@
 *        velocities * (2pi/86400)*(360/2pi) -> degree/sec
 *        accelerations * ((2pi/86400)**2)*(360/2pi) -> degree/sec/sec
 *
+*      Note that the seconds here are sidereal rather than SI.  One
+*      sidereal second is about 0.99727 SI seconds.
+*
 *      The velocity and acceleration factors assume the sidereal
 *      tracking case.  Their respective numerical values are (exactly)
 *      1/240 and (approximately) 1/3300236.9.
@@ -64,11 +67,12 @@
 *      as sine and cosine of latitude, and (for tracking a star)
 *      sine and cosine of declination.
 *
-*  P.T.Wallace   Starlink   6 October 1994
+*  P.T.Wallace   Starlink   14 March 1997
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1997 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
+
       IMPLICIT NONE
 
       DOUBLE PRECISION HA,DEC,PHI,AZ,AZD,AZDD,EL,ELD,ELDD,PA,PAD,PADD

@@ -117,7 +117,7 @@ begin
 
 	    tv = s * Memr[v+index] - ref
 
-	    if ((tu <= 0) != (tv <= 0)) {
+	    if (! ((tu <= 0 && tv <= 0) || (tu > 0 && tv > 0))) {
 		# Edge crosses plane; add intersection point to P2.
 		t = tu / (tu - tv)
 		Memr[op+0] = Memr[u+0] + t * (Memr[v+0] - Memr[u+0])

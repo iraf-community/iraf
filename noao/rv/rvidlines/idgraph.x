@@ -126,10 +126,10 @@ begin
 
 	call gclear (gp)
 	call gswind (gp, xmin, xmax, ymin - .2 * dy, ymax + .2 * dy)
-	if (ID_GT(id) != NULL) {
-	    call gseti (gp, G_XTRAN, GT_XTRAN(ID_GT(id)))
-	    call gseti (gp, G_YTRAN, GT_YTRAN(ID_GT(id)))
-	}
+#	if (ID_GT(id) != NULL) {
+#	    call gseti (gp, G_XTRAN, GT_XTRAN(ID_GT(id)))
+#	    call gseti (gp, G_YTRAN, GT_YTRAN(ID_GT(id)))
+#	}
 	if (ID_TASK(id) == RVIDLINES && ID_REDSHIFT(id) != 0D0) {
 	    call salloc (str, SZ_LINE, TY_CHAR)
 	    if (ID_ZHELIO(id) == 0D0)

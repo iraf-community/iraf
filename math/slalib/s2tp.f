@@ -16,12 +16,12 @@
 *     XI,ETA      real  rectangular coordinates on tangent plane
 *     J           int   status:   0 = OK, star on tangent plane
 *                                 1 = error, star too far from axis
-*                                 2 = error, antistar too far from axis
-*                                 3 = error, antistar on tangent plane
+*                                 2 = error, antistar on tangent plane
+*                                 3 = error, antistar too far from axis
 *
-*  P.T.Wallace   Starlink   March 1986
+*  P.T.Wallace   Starlink   18 July 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

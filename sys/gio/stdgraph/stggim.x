@@ -541,6 +541,7 @@ procedure sgm_writecmap (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+short	mask
 pointer	sp, bp, op
 int	ncells, nchars, ip, i
 include	"stdgraph.com"
@@ -559,9 +560,10 @@ begin
 	ip = GIM_WRITECMAP_DATA
 	op = bp
 
+	mask = 017B
 	do i = 1, ncells*3 {
 	    Memc[op] =      gim[ip] / 16   + 040B;  op = op + 1
-	    Memc[op] = and (gim[ip], 017B) + 040B;  op = op + 1
+	    Memc[op] = and (gim[ip], mask) + 040B;  op = op + 1
 	    ip = ip + 1
 	}
 
@@ -642,6 +644,7 @@ procedure sgm_iomapwrite (gim)
 
 short	gim[ARB]			#I encoded instruction
 
+short	mask
 pointer	sp, bp, op
 int	ncells, nchars, ip, i
 include	"stdgraph.com"
@@ -662,9 +665,10 @@ begin
 	ip = GIM_WRITEIOMAP_DATA
 	op = bp
 
+	mask = 017B
 	do i = 1, ncells {
 	    Memc[op] =      gim[ip] / 16   + 040B;  op = op + 1
-	    Memc[op] = and (gim[ip], 017B) + 040B;  op = op + 1
+	    Memc[op] = and (gim[ip], mask) + 040B;  op = op + 1
 	    ip = ip + 1
 	}
 

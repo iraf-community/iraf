@@ -537,6 +537,10 @@ begin
 
 	dz1 = IM_MIN(ds)
 	dz2 = IM_MAX(ds)
+	if (fp_equalr (z1, z2)) {
+	    z1 = z1 - 1
+	    z2 = z2 + 1
+	}
 
 	# If the user specifies the transfer function, verify that the
 	# intensity and greyscale are in range.
@@ -565,12 +569,16 @@ begin
 	    unitary_greyscale_transformation = true
 	} else if (zt == W_LINEAR) {
 	    unitary_greyscale_transformation =
-		((fp_equalr(z1,dz1) && fp_equalr(z2,dz2)) || fp_equalr(z1,z2))
+		(fp_equalr(z1,dz1) && fp_equalr(z2,dz2))
 	} else
 	    unitary_greyscale_transformation = false
 
 	if (IM_PIXTYPE(im) == TY_SHORT && zt != W_LOG) {
 	    z1_s = z1;  z2_s = z2
+	    if (z1_s == z2_s) {
+		z1_s = z1_s - 1
+		z2_s = z2_s + 1
+	    }
 
 	    for (wy=wy1;  wy <= wy2;  wy=wy+1) {
 		in  = sigm2s (si, wy - wy1 + 1)

@@ -1,8 +1,8 @@
       PROGRAM SLA_TEST
 *+
-*  - - - - -
-*   T E S T
-*  - - - - -
+*     - - - - -
+*      T E S T
+*     - - - - -
 *
 *  Simple test of SLALIB library - checks that a program can be
 *  linked and a correct result returned from at least one subprogram.

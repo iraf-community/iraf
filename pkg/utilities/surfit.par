@@ -6,7 +6,7 @@ fit,f,h,"",,,"Text file for output evaluated fit
 function,s,h,"polynomial","chebyshev|legendre|polynomial",,Surface function
 xorder,i,h,2,1,,X order of surface
 yorder,i,h,2,1,,Y order of surface
-xterms,b,h,yes,,,Include cross-terms?
+xterms,s,h,"full","|none|full|half|",,Cross-terms type
 weighting,s,h,"user","uniform|user|statistical|instrumental",,Weighting type
 xmin,r,h,INDEF,,,Minimum X value over which surface is defined
 xmax,r,h,INDEF,,,Maximum X value over which surface is defined

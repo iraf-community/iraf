@@ -1,5 +1,6 @@
-# Observatory Parameters.  Taken from the Almanac.
+# Observatory Parameters.
 #
+# Some were taken from the Almanac and others have been submitted.
 # Observatories wishing to be added or make changes in the default
 # distributed database should send information to iraf@noao.edu.
 
@@ -168,8 +169,7 @@ observatory = "keck"
 	altitude = 4160
 	timezone = 10
 
-# Padova Astronomical Observatory, Asiago, Italy.
-# Submitted by Lina Tomasella 6/11/96
+# Submitted by Lina Tomasella 6/11/96:  Padova Astronomical Obs., Asiago, Italy.
 observatory = "ekar"
 	name = "Mt. Ekar 182 cm. Telescope"
 	longitude = 348:25:07.92
@@ -225,3 +225,74 @@ observatory = "lna"
         altitude = 1864
         timezone = 3
 
+# Submitted by James Stevens 3/25/98
+observatory = "saao"
+	name = "South African Astronomical Observatory"
+	longitude = 339:11:21.5
+	latitude =  -32:22:46
+	altitude =  1759
+	timezone = 2
+
+# Submitted by Jorge Federico Gonzalez 12/10/98
+observatory = "casleo"
+        name = "Complejo Astronomico El Leoncito, San Juan"
+        longitude = 69:18:00 
+        latitude = -31:47:57
+        altitude = 2552
+        timezone = 3
+
+# Submitted by Jorge Federico Gonzalez 12/10/98
+observatory = "bosque"
+        name = "Estacion Astrofisica Bosque Alegre, Cordoba"
+        longitude = 64:32:45
+        latitude = -31:35:54
+        altitude = 1250
+        timezone = 3
+
+# Submitted by Ilian Iliev 1/19/99
+observatory = "rozhen"
+        name = "National Astronomical Observatory Rozhen - Bulgaria"
+	longitude = 335:15:22
+	latitude = 41:41:35
+	altitude = 1759
+	timezone = -2
+
+# Submitted by Bill Vacca 7/14/99
+observatory = "irtf"
+	name        = "NASA Infrared Telescope Facility"
+	longitude   = 155.471999
+	latitude    = 19.826218
+	altitude    = 4168
+	timezone    = 10
+
+# Submitted by Andy Layden 7/16/99
+observatory = "bgsuo"
+        name = "Bowling Green State Univ Observatory"
+        longitude = 83:39:33
+        latitude = 41:22:42
+        altitude = 225.
+        timezone = 5
+
+# Submitted by Oliver-Mark Cordes 8/5/99
+observatory = "DSAZ"
+        name = "Deutsch-Spanisches Observatorium Calar Alto - Spain"
+        longitude = 2:32:46.5
+        latitude = 37:13:25
+        altitude = 2168
+        timezone = -1
+
+# Submitted by Matilde Fernandez 2/2/99
+observatory = "ca"
+	name = "Calar Alto Observatory"
+	longitude = 2:32:46.5
+	latitude = 37:13:25
+	altitude = 2168
+	timezone = -1
+
+# Submitted by Oliver-Mark Cordes 8/5/99
+observatory = "holi"
+        name = "Observatorium Hoher List (Universitaet Bonn) - Germany"
+        longitude = 6.85
+        latitude = 50.16276
+        altitude = 541
+        timezone = -1

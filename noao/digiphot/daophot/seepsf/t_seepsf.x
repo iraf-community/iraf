@@ -31,8 +31,10 @@ begin
 	call clgstr ("psfimage", Memc[psfimage], SZ_FNAME)
 	call clgstr ("image", Memc[image], SZ_FNAME)
 	dimen = clgeti ("dimension")
-	if (mod (dimen, 2) == 0)
-	    dimen = dimen + 1
+	if (! IS_INDEFI(dimen)) {
+	    if (mod (dimen, 2) == 0)
+	        dimen = dimen + 1
+	}
 	xpsf = clgetr ("xpsf")
 	ypsf = clgetr ("ypsf")
 	magnitude = clgetr ("magnitude")

@@ -10,10 +10,12 @@ int procedure qp_stati (qp, param)
 pointer	qp			#I QPOE descriptor
 int	param			#I parameter to be queried
 
+bool	fp_equalr()
+
 begin
 	switch (param) {
 	case QPOE_BLOCKFACTOR:			# standard params
-	    if (QP_XBLOCK(qp) == QP_YBLOCK(qp))
+	    if (fp_equalr (QP_XBLOCK(qp), QP_YBLOCK(qp)))
 		return (QP_XBLOCK(qp))
 	    else
 		return (ERR)

@@ -1,4 +1,4 @@
-.help asieval Jul84 "Image Interpolator Package"
+.help asieval Dec98 "Image Interpolator Package"
 .ih
 NAME
 asieval -- procedure to evaluate interpolant at x
@@ -7,8 +7,8 @@ SYNOPSIS
 y = asieval (asi, x)
 
 .nf
-    pointer	asi	# interpolant descriptor
-    real	x	# x value, 1 <= x <= npts
+    pointer	asi	#I interpolant descriptor
+    real	x[2]	#I x value, 1 <= x[1-2] <= npts
 .fi
 .ih
 ARGUMENTS
@@ -16,22 +16,28 @@ ARGUMENTS
 Pointer to the sequential interpolant descriptor structure.
 .le
 .ls x    
-X value.
+Single X value, or pair of X values defining a range in the case of the
+drizzle interpolant.
 .le
 .ih
 DESCRIPTION
 The polynomial coefficients are calculated directly from the data points
-or the B-spline coefficients. The
-actual calculation is done by adding and multiplying terms
-according to Everett's central difference interpolation formula.
+for the polynomial interpolants, and from the B-spline coefficients for
+the cubic spline interpolant. The actual calculation is done by adding and
+multiplying terms according to Everett's central difference interpolation
+formula. The boundary extension algorithm is projection.
 
-The sinc interpolation is computed using a range of data points around
-the desired position.
+The sinc interpolant is computed using a range of data points around
+the desired position. Look-up table sinc interpolation is computed
+using the most appropriate entry in a precomputed look-up table.
+The boundary extension algorithm is nearest neighbor.
+
+The drizzle interpolant is computed by summing the data over the user
+supplied X interval.
 .ih
 NOTES
-Checking for out of bounds and INDEF valued pixels is the
-responsibility of the user. ASIINIT and ASIFIT must be called before using
-ASIEVAL.
+Checking for out of bounds and INDEF valued pixels is the responsibility of
+the user. ASIINIT or ASISINIT and ASIFIT must be called before using ASIEVAL.
 .ih
 SEE ALSO
 asivector, arieval

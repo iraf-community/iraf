@@ -84,8 +84,10 @@ begin
 	if (status == ERR) {
 	    call strupk (osfn, Memc[fname], SZ_FNAME)
 	    call syserrs (SYS_FNOWRITEPERM, Memc[fname])
-	} else if (os_has_file_locking)
+	} else if (os_has_file_locking) {
+	    call sfree (sp)
 	    return (clktime (long(0)))
+	}
 
 	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
 	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
@@ -165,10 +167,10 @@ long	clktime()
 data	os_has_file_locking /OS_FILELOCKING/
 
 begin
-	call smark (sp)
 	if (os_has_file_locking)
 	    return (FILELOCK_PERIOD)
 
+	call smark (sp)
 	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
 	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
 	call salloc (timelock2, SZ_PATHNAME, TY_CHAR)
@@ -213,10 +215,10 @@ int	osfn_timeleft()
 data	os_has_file_locking /OS_FILELOCKING/
 
 begin
-	call smark (sp)
 	if (os_has_file_locking)
 	    return (FILELOCK_PERIOD)
 
+	call smark (sp)
 	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
 	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
 	call salloc (timelock2, SZ_PATHNAME, TY_CHAR)
@@ -246,10 +248,10 @@ pointer	sp, lockfile, timelock1, timelock2
 data	os_has_file_locking /OS_FILELOCKING/
 
 begin
-	call smark (sp)
 	if (os_has_file_locking)
 	    return
 
+	call smark (sp)
 	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
 	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
 	call salloc (timelock2, SZ_PATHNAME, TY_CHAR)
@@ -279,10 +281,10 @@ pointer	sp, lockfile, timelock1, timelock2
 data	os_has_file_locking /OS_FILELOCKING/
 
 begin
-	call smark (sp)
 	if (os_has_file_locking)
 	    return
 
+	call smark (sp)
 	call salloc (lockfile,  SZ_PATHNAME, TY_CHAR)
 	call salloc (timelock1, SZ_PATHNAME, TY_CHAR)
 	call salloc (timelock2, SZ_PATHNAME, TY_CHAR)

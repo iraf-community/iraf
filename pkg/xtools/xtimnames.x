@@ -5,6 +5,7 @@
 
 
 # XT_IMROOT -- Get root name of an image minus it's image kernel extention
+# This calls the IKI routines which is an interface violation.
 
 procedure xt_imroot (image, root, maxchar)
 
@@ -12,31 +13,27 @@ char	image[ARB]		# Full image name
 char	root[maxchar]		# Root name
 int	maxchar			# Size of root name string
 
-int	i, strlen()
+int	i, fnextn(), iki_validextn(), strlen()
+pointer	sp, extn
 
 begin
+	call smark (sp)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
+
 	call imgimage (image, root, maxchar)
-	i = strlen (root)
-	switch (root[i]) {
-	case 'h':							# .??h
-	    if (i > 3 && root[i-3] == '.')
-		root[i-3] = EOS
-	case 'l':							# .pl
-	    if (i > 2 && root[i-2] == '.' && root[i-1] == 'p')
-		root[i-2] = EOS
-	case 's':							# .fits
-	    if (i > 4 && root[i-4] == '.' && root[i-3] == 'f' &&
-		root[i-2] == 'i' && root[i-1] == 't')
-		root[i-4] = EOS
-	case 't':							# .fit
-	    if (i > 3 && root[i-3] == '.' && root[i-2] == 'f' &&
-		root[i-1] == 'i')
-		root[i-3] = EOS
+	i = fnextn (root, Memc[extn], SZ_FNAME)
+	if (i > 0) {
+	    call iki_init()
+	    if (iki_validextn (0, Memc[extn]) != 0)
+		root[strlen(root)-i] = EOS
 	}
+
+	call sfree (sp)
 end
 
 
 # XT_IMEXT -- Get image kernel extension with the period.
+# This calls the IKI routines which is an interface violation.
 
 procedure xt_imext (image, ext, maxchar)
 
@@ -44,33 +41,24 @@ char	image[ARB]		# Full image name
 char	ext[maxchar]		# Extension
 int	maxchar			# Size of extension
 
-int	i, strlen()
+int	i, fnextn(), iki_validextn()
 pointer	sp, root
 
 begin
 	call smark (sp)
 	call salloc (root, SZ_FNAME, TY_CHAR)
 
+	ext[1] = EOS
+
 	# Get root and extension
 	call imgimage (image, Memc[root], SZ_LINE)
-	ext[1] = EOS
-	i = strlen (Memc[root])
-	switch (Memc[root+i-1]) {
-	case 'h':							# .??h
-	    if (i > 3 && Memc[root+i-4] == '.')
-		call strcpy (Memc[root+i-4], ext, maxchar)
-	case 'l':							# .pl
-	    if (i > 2 && Memc[root+i-3] == '.' && Memc[root+i-2] == 'p')
-		call strcpy (Memc[root+i-3], ext, maxchar)
-	case 's':							# .fits
-	    if (i > 4 && Memc[root+i-5] == '.' && Memc[root+i-4] == 'f' &&
-		Memc[root+i-3] == 'i' && Memc[root+i-2] == 't')
-		call strcpy (Memc[root+i-5], ext, maxchar)
-	case 't':							# .fit
-	    if (i > 3 && Memc[root+i-4] == '.' && Memc[root+i-3] == 'f' &&
-		Memc[root+i-2] == 'i')
-		call strcpy (Memc[root+i-5], ext, maxchar)
+	i = fnextn (Memc[root], ext[2], maxchar-1)
+	if (i > 0) {
+	    call iki_init()
+	    if (iki_validextn (0, ext[2]) != 0)
+		ext[1] = '.'
 	}
+
 	call sfree (sp)
 end
 

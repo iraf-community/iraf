@@ -1,4 +1,4 @@
-.help dtf2d Nov95 "Slalib Package"
+.help dtf2d Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDTFD (IHOUR, IMIN, SEC, DAYS, J)

@@ -760,14 +760,14 @@ begin
 	# Setup initial estimates.
 	do i = 1, ng {
 	    Memr[xg+i-1] = pos[i]
-	    Memr[yg+i-1] = peaks[i] / scale
 	    Memr[sg+i-1] = gfwhms[i]
 	    Memr[lg+i-1] = lfwhms[i]
 	    Memi[pg+i-1] = ptypes[i]
 	    if (IS_INDEF(peaks[i])) {
 		j = max (1, min (nfit, nint (shdr_wl(sh,double(pos[i])))-i1+1))
 		Memr[yg+i-1] = Memr[yd+j-1]
-	    }
+	    } else
+		Memr[yg+i-1] = peaks[i] / scale
 	}
 	z1 = 0.
 	dz = 0.

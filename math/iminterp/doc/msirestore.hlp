@@ -1,4 +1,4 @@
-.help msirestore Aug84 "Image Interpolator Package"
+.help msirestore Dec98 "Image Interpolator Package"
 .ih
 NAME
 msirestore -- restore interpolant
@@ -7,8 +7,8 @@ SYNOPSIS
 msirestore (msi, interpolant)
 
 .nf
-    pointer	msi		# interpolant descriptor
-    real	interpolant[]	# array containing interpolant
+    pointer	msi		#U interpolant descriptor
+    real	interpolant[]	#I array containing interpolant
 .fi
 .ih
 ARGUMENTS
@@ -27,8 +27,7 @@ can be determined by a call to msigeti.
 DESCRIPTION
 MSIRESTORE allocates space for the interpolant descriptor and restores the
 parameters and coefficients stored in the interpolant array to the
-interpolant structure
-for use by MSIEVAL, MSIVECTOR, MSIDER and MSIGRL.
+interpolant structure for use by MSIEVAL, MSIVECTOR, MSIDER and MSIGRL.
 .ih
 NOTES
 .ih

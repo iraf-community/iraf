@@ -232,7 +232,16 @@ median value for rejecting pixels.  The lower sigma is ignored for the
 CCD readout noise in electrons, gain in electrons/DN, and sensitivity noise
 as a fraction.  These parameters are used with the "ccdclip" and "crreject"
 algorithms.  The values may be either numeric or an image header keyword
-which contains the value.
+which contains the value.  The noise model for a pixel is:
+
+.nf
+    variance in DN = (rdnoise/gain)^2 + DN/gain + (snoise*DN)^2
+    variance in e- = (rdnoise)^2 + (gain*DN) + (snoise*(gain*DN))^2
+		   = rdnoise^2 + Ne + (snoise * Ne)^2
+.fi
+
+where DN is the data number and Ne is the number of electrons.  Sensitivity
+noise typically comes from noise introduced during flat fielding.
 .le
 .ls sigscale = 0.1 (ccdclip, crreject, sigclip, avsigclip)
 This parameter determines when poisson corrections are made to the

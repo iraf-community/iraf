@@ -173,7 +173,7 @@ newim_
 		    if (ID_REDSHIFT(id) != 0.) {
 			call printf ("%10.8g ")
 			    call pargd (
-				id_zshiftd (id, FIT(id,ID_CURRENT(id), 0)))
+				id_zshiftd (id, FIT(id,ID_CURRENT(id)), 0))
 		    }
 		    call printf ("(%10.8g %s): ")
 			call pargd (USER(id,ID_CURRENT(id)))

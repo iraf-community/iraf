@@ -7,7 +7,12 @@ include "im1interpdef.h"
 # the interpolation of a few isolated points without the storage required for
 # the sequential version. With the exception of the sinc function, the
 # interpolation code is expanded directly in this routine to avoid the
-# overhead of an aditional function call.
+# overhead of an aditional function call. The precomputed sinc function is
+# not supported and is aliased to the regular sinc function. The default
+# sinc function width and precision limits are hardwired to the builtin
+# constants NSINC and DX. The default drizzle function pixel fraction is
+# hardwired to the builtin constant PIXFRAC. If PIXFRAC is 1.0 then the
+# drizzle results are identical to the linear interpolation results.
 
 real procedure arieval (x, datain, npts, interp_type)
 
@@ -130,9 +135,13 @@ begin
 	    return (pcoeff[1] + deltax * (pcoeff[2] + deltax *
 	    	   (pcoeff[3] + deltax * pcoeff[4])))
 
-	case II_SINC:
-	    call ii_sinc (x, hold, 1, datain, npts, NSINC, NTAPER, STAPER,
-		DX)
+	case II_SINC, II_LSINC:
+	    call ii_sinc (x, hold, 1, datain, npts, NSINC, DX)
 	    return (hold)
+
+	case II_DRIZZLE:
+	    call ii_driz1 (x, hold, 1, datain, BADVAL)
+	    return (hold)
+
 	}
 end

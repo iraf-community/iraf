@@ -116,7 +116,7 @@ pointer	refim			#I Reference image pointer
 
 int	i, j, k, nc, nl, ncpm, nlpm, c1, c2, l1, l2, nref, npm
 int	steptype, xoffset, xstep, yoffset, ystep
-real	x1, x2, y1, y2
+double	x1, x2, y1, y2
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
 pointer	mwref, mwpm, ctref, ctpm, pm, pmnew, imnew, bufref, bufpm
 
@@ -147,50 +147,52 @@ begin
 	steptype = 1
 	ctref = mw_sctran (mwref, "logical", "physical", 3)
 	ctpm = mw_sctran (mwpm, "physical", "logical", 3)
-	call mw_c2tranr (ctref, 1., 1., x1, y1) 
-	call mw_c2tranr (ctpm, x1, y1, x1, y1) 
-	call mw_c2tranr (ctref, 2., 1., x2, y2) 
-	call mw_c2tranr (ctpm, x2, y2, x2, y2) 
+	call mw_c2trand (ctref, 1D0, 1D0, x1, y1) 
+	call mw_c2trand (ctpm, x1, y1, x1, y1) 
+	call mw_c2trand (ctref, 2D0, 1D0, x2, y2) 
+	call mw_c2trand (ctpm, x2, y2, x2, y2) 
 	if (abs(x2-x1) < 1.) {
 	    steptype = 2
 	    call mw_ctfree (ctref)
 	    call mw_ctfree (ctpm)
 	    ctref = mw_sctran (mwref, "physical", "logical", 3)
 	    ctpm = mw_sctran (mwpm, "logical", "physical", 3)
-	    call mw_c2tranr (ctpm, 1., 1., x1, y1) 
-	    call mw_c2tranr (ctref, x1, y1, x1, y1) 
-	    call mw_c2tranr (ctpm, 2., 1., x2, y2) 
-	    call mw_c2tranr (ctref, x2, y2, x2, y2) 
+	    call mw_c2trand (ctpm, 1D0, 1D0, x1, y1) 
+	    call mw_c2trand (ctref, x1, y1, x1, y1) 
+	    call mw_c2trand (ctpm, 2D0, 1D0, x2, y2) 
+	    call mw_c2trand (ctref, x2, y2, x2, y2) 
 	}
 	x2 = x2 - x1
-	if (abs(y1-y2) > EPSILONR)
+	if (abs(y1-y2) > 10*EPSILONR)
 	    call error (0, "Image and mask have a relative rotation")
-	if (abs(x1-nint(x1)) > EPSILONR  && abs(x1-nint(x1))-0.5 > EPSILONR)
+	if (abs(x1-nint(x1)) > 10*EPSILONR  &&
+	    abs(x1-nint(x1))-0.5 > 10*EPSILONR)
 	    call error (0, "Image and mask have non-integer relative offsets")
-	if (abs(x2-nint(x2)) > EPSILONR)
+	if (abs(x2-nint(x2)) > 10*EPSILONR)
 	    call error (0, "Image and mask have non-integer relative steps")
-	xoffset = nint (x1 - 1.)
+	xoffset = nint (x1 - 1D0)
 	xstep = nint (x2)
 
 	if (steptype == 1) {
-	    call mw_c2tranr (ctref, 1., 1., x1, y1) 
-	    call mw_c2tranr (ctpm, x1, y1, x1, y1) 
-	    call mw_c2tranr (ctref, 1., 2., x2, y2) 
-	    call mw_c2tranr (ctpm, x2, y2, x2, y2) 
+	    call mw_c2trand (ctref, 1D0, 1D0, x1, y1) 
+	    call mw_c2trand (ctpm, x1, y1, x1, y1) 
+	    call mw_c2trand (ctref, 1D0, 2D0, x2, y2) 
+	    call mw_c2trand (ctpm, x2, y2, x2, y2) 
 	} else {
-	    call mw_c2tranr (ctpm, 1., 1., x1, y1) 
-	    call mw_c2tranr (ctref, x1, y1, x1, y1) 
-	    call mw_c2tranr (ctpm, 1., 2., x2, y2) 
-	    call mw_c2tranr (ctref, x2, y2, x2, y2) 
+	    call mw_c2trand (ctpm, 1D0, 1D0, x1, y1) 
+	    call mw_c2trand (ctref, x1, y1, x1, y1) 
+	    call mw_c2trand (ctpm, 1D0, 2D0, x2, y2) 
+	    call mw_c2trand (ctref, x2, y2, x2, y2) 
 	}
 	y2 = y2 - y1
-	if (abs(x1-x2) > EPSILONR)
+	if (abs(x1-x2) > 10*EPSILONR)
 	    call error (0, "Image and mask have a relative rotation")
-	if (abs(y1-nint(y1)) > EPSILONR  && abs(y1-nint(y1))-0.5 > EPSILONR)
+	if (abs(y1-nint(y1)) > 10*EPSILONR  &&
+	    abs(y1-nint(y1))-0.5 > 10*EPSILONR)
 	    call error (0, "Image and mask have non-integer relative offsets")
-	if (abs(y2-nint(y2)) > EPSILONR)
+	if (abs(y2-nint(y2)) > 10*EPSILONR)
 	    call error (0, "Image and mask have non-integer relative steps")
-	yoffset = nint (y1 - 1.)
+	yoffset = nint (y1 - 1D0)
 	ystep = nint (y2)
 
 	call mw_ctfree (ctref)

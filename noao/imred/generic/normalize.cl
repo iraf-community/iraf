@@ -1,45 +1,50 @@
-#{ NORMALIZE -- Compute the average of a sample region and normalize.
+# NORMALIZE -- Compute the average of a sample region and normalize.
 
-#images,s,a,,,,Images to be normalized
-#norm,r,h,INDEF,,,Normalization value
-#sample_section,s,h,"[]",,,Sample section
-#lower,r,h,INDEF,,,Lower limit of data values for sampling
-#upper,r,h,INDEF,,,Upper limit of data values for sampling
-#keeplog,b,h,@generic.keeplog,,,Keep log of processing?
-#logfile,f,h,@generic.logfile,,,Log file
-#imlist,f,h
-#meanlist,f,h
-#input,f,h
-#imfd,*s,h
-#meanfd,*s,h
-#mean,r,h
-#stat,i,h
+procedure normalize (images)
 
-{
+string	images			{prompt="Images to be normalized"}
+real	norm = INDEF		{prompt="Normalization value"}
+string	sample_section = "[]"	{prompt="Sample section"}
+real	lower = INDEF	{prompt="Lower limit of data values for sampling"}
+real	upper = INDEF	{prompt="Upper limit of data values for sampling"}
+bool	keeplog = ")_.keeplog"	{prompt="Keep log of processing?"}
+file	logfile = ")_.logfile"	{prompt="Log file"}
+
+struct	*imfd
+
+begin
+	file	imlist, input, tmp
+	real	mean
+	int	stat
+	bool	mef
+
+	mef = no
+
+	# Query parameters.
+	input = images
+
+	# Set temporary files.
+	imlist = mktemp ("tmp$ims")
+	tmp = mktemp ("tmp")
+
 	# Startup message.
 	if (keeplog) {
 	    time (>> logfile)
 	    print ("  NORMALIZE: Normalize images.", >> logfile)
 	}
 
-	# Set temporary files.
-	imlist = mktemp ("tmp$ims")
-	meanlist = mktemp ("tmp$ims")
-
 	# Generate image list.
-	files (images, sort-, >imlist)
-	imfd = imlist
+	sections (input, option="fullname", >imlist)
 
+	# Process list.
+	imfd = imlist
 	while (fscan (imfd, input) != EOF) {
 
+	    # Determine normalization.
 	    if (norm == INDEF) {
 	        # Determine the mean of the sample region.
 	        imstatistics (input // sample_section, fields="mean",
-		    lower=lower, upper=upper, format=no, >meanlist)
-	        meanfd = meanlist
-	        stat = fscan (meanfd, mean)
-		meanfd = ""			# close list file
-	        delete (meanlist, verify=no)
+		    lower=lower, upper=upper, format=no) | scan (mean)
 	    } else
 		mean = norm
 
@@ -50,23 +55,25 @@
 	    }
 
 	    if (mean != 0.) {
-    
 	        # Normalize the image by the mean.
-
-	        imarith (input, "/", mean, input, pixtype="real",
-		    calctype="real")
+		if (mef) {
+		    imarith (input, "/", mean, tmp, pixtype="real",
+			calctype="real")
+		    imcopy (tmp, input//"[]", verbose-)
+		    imdelete (tmp, verify-)
+		} else
+		    imarith (input, "/", mean, input, pixtype="real",
+			calctype="real")
 		hedit (input, "ccdmean", 1., add=yes, verify=no, show=no,
 		    update=yes)
 	    } else
 		print ("  WARNING: Cannot normalize ", input, ".")
 	}
-
-
-	delete (imlist, verify=no)
+	imfd = ""; delete (imlist, verify=no)
 
 	# Ending message.
 	if (keeplog) {
 	    time (>> logfile)
 	    print ("  NORMALIZE: Done.", >> logfile)
 	}
-}
+end

@@ -1,4 +1,4 @@
-.help cc2s Nov95 "Slalib Package"
+.help cc2s Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slCC2S (V, A, B)

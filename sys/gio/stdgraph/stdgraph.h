@@ -1,10 +1,10 @@
 # STDGRAPH definitions.
 
 define	MAX_CHARSIZES	10			# max discreet device char sizes
-define	SZ_SBUF		1024			# initial string buffer size
+define	SZ_SBUF		2048			# initial string buffer size
 define	SZ_MEMORY	1024			# encoder memory size
-define	SZ_GDEVICE	31			# force output to named device
-define	SZ_UIFNAME	99			# user interface file name
+define	SZ_GDEVICE	256			# force output to named device
+define	SZ_UIFNAME	199			# user interface file name
 define	SZ_MSGBUF	4096			# default size message buffer
 define	FLUSH_MEMORY	117			# time to flush encoded polyline
 define	LEN_STACK	20			# encoder stack size

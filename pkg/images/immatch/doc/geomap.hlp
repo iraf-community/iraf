@@ -1,4 +1,4 @@
-.help geomap Feb96 images.immatch
+.help geomap Jun99 images.immatch
 .ih
 NAME
 geomap -- compute one or more spatial transformation functions
@@ -62,7 +62,7 @@ distortion term are computed separately. The linear term includes an x and y
 shift, an x and y scale factor, a rotation and a skew.  Axis flips are also
 allowed for in the linear portion of the fit. The distortion term consists
 of a polynomial fit to the residuals of the linear term. By default the
-distortion terms is set to zero.
+distortion term is set to zero.
 .le
 
 For all the fitting geometries except "general" no distortion term is fit,
@@ -102,13 +102,13 @@ powers of both.
 .le
 .ls half
 The individual polynomial terms contain powers of x and powers of y, whose
-maximum combined power is MAX (xxorder - 1, xyorder - 1) for the x fit and
-MAX (yxorder - 1, yyorder - 1) for the y fit. 
+maximum combined power is max (xxorder - 1, xyorder - 1) for the x fit and
+max (yxorder - 1, yyorder - 1) for the y fit. 
 .le
 .ls full
 The individual polynomial terms contain powers of x and powers of y, whose
-maximum combined power is MAX (xxorder - 1 + xyorder - 1) for the x fit and
-MAX (yxorder - 1 + yyorder - 1) for the y fit.
+maximum combined power is max (xxorder - 1 + xyorder - 1) for the x fit and
+max (yxorder - 1 + yyorder - 1) for the y fit.
 .le
 
 The "shift", "xyscale", "rotation", "rscale", and "rxyscale" fitting
@@ -125,8 +125,8 @@ The rejection limit in units of sigma. The default is no rejection.
 The precision of coordinate transformation calculations. The options are real
 and double.
 .le
-.ls verbose
-Print messages about the actions taken by the task ?
+.ls verbose = yes
+Print messages about actions taken by the task ?
 .le
 .ls interactive = yes
 In interactive mode the user may interact with the fitting process, e.g.
@@ -144,18 +144,28 @@ DESCRIPTION
 GEOMAP computes the transformation required to map the reference coordinate
 system to the input coordinate system.  The coordinates of points in common
 to the two systems are listed in the input text file(s) \fIinput\fR input
-one per line in the following format: "xref yref yin yin". The computed
-transforms are stored in the text database file \fIdatabase\fR in records
-with names specified by the parameter \fItransforms\fR. If the transforms
-parameter is undefined the records are assigned the name of the input 
-coordinate files.
+one per line in the following format: "xref yref yin yin.
 
-The computed transformation has the following form.
+The computed transforms are stored in the text database file \fIdatabase\fR
+in records with names specified by the parameter \fItransforms\fR. If the
+transforms parameter is undefined the records are assigned the name of
+the input coordinate files.
+
+The computed transformation has the form shown below, where the reference
+coordinates must be defined in the coordinate system of the reference image
+system if the user intends to resample an image with register or geotran, or
+transform coordinates from the reference coordinate system to the input
+image coordinate system. 
 
 .nf
     xin = f (xref, yref)
     yin = g (xref, yref)
 .fi
+
+If on the other hand the user wishes to transform coordinates from the
+input image coordinate system to the reference coordinate system then he or she
+must reverse the roles of the reference and input coordinates as defined above, and compute the inverse transformation.
+
 
 The functions f and g are either a power series polynomial or a Legendre or
 Chebyshev polynomial surface of order \fIxxorder\fR and \fIxyorder\fR in x
@@ -379,7 +389,25 @@ field taken with a different instrument, and display the original
 	cl> display m51.500.out 2 fi+
 .fi
 
-4. Compute 3 different transforms, store them in the same database file,
+4. Use the above transform to transform a list of object pixel coordinates
+in the m51.800 image to their pixel coordinates in the m51.500 system.
+
+.nf
+	cl> geoxytran m51.800.xy m51.500.xy database m51.coo
+.fi
+
+5. Transform object pixel coordinates in the m51.500 image to their
+pixel coordinates in the m51.800 image. Note that to do this the roles
+of the reference and input coordinates defined in example 3 must be
+reversed and the inverse transform must be computed.
+
+.nf
+	cl> fields m51.coo 3,4,1,2 > m51.coo.inv
+	cl> geomap m51.coo.inv database 1.0 512.0 1.0 512.0
+	cl> geoxytran m51.512.xy m51.800.xy database m51.coo.inv
+.fi
+
+6. Compute 3 different transforms, store them in the same database file,
 and use them to transform 3 different images.  Use the original image names as
 the database record names.
 

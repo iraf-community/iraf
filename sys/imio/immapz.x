@@ -14,16 +14,18 @@ char	imspec[ARB]		# image specification
 int	acmode			# image access mode
 int	hdr_arg			# length of user fields, or header pointer
 
-pointer	sp, cluster, ksection, section, im
+pointer	sp, imname, root, cluster, ksection, section, im
 int	min_lenuserarea, len_imhdr, cl_index, cl_size, i
 errchk	im_make_newcopy, im_init_newimage, malloc
-int	btoi(), ctoi(), envfind()
+int	btoi(), ctoi(), envfind(), fnroot(), strlen()
 
 begin
 	call smark (sp)
+	call salloc (imname, SZ_PATHNAME, TY_CHAR)
 	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
 	call salloc (ksection, SZ_FNAME, TY_CHAR)
 	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (root, SZ_FNAME, TY_CHAR)
 
 	# The user or system manager can specify the minimum user area size
 	# as an environment variable, if the IRAF default is too small.
@@ -100,15 +102,30 @@ begin
 	}
 
 	# Format a full image name specification if we have a cl_index format
-	# image.
+	# image.  IM_NAME is used mainly as an image identifier in error
+	# messages, so truncate the string by omitting some of the leading
+	# pathname information if the resultant string would be excessively
+	# long.
 
 	if (IM_CLSIZE(im) > 1) {
-	    call sprintf (IM_NAME(im), SZ_IMNAME, "%s[%d/%d]%s%s")
+	    call sprintf (Memc[imname], SZ_PATHNAME, "%s[%d/%d]%s%s")
 		call pargstr (Memc[cluster])
 		call pargi (IM_CLINDEX(im))
 		call pargi (IM_CLSIZE(im))
 		call pargstr (Memc[ksection])
 		call pargstr (Memc[section])
+
+	    if (strlen (Memc[imname]) > SZ_IMNAME) {
+		i = fnroot (Memc[cluster], Memc[root], SZ_FNAME)
+		call sprintf (Memc[imname], SZ_PATHNAME, "%s[%d/%d]%s%s")
+		    call pargstr (Memc[root])
+		    call pargi (IM_CLINDEX(im))
+		    call pargi (IM_CLSIZE(im))
+		    call pargstr (Memc[ksection])
+		    call pargstr (Memc[section])
+	    }
+
+	    call strcpy (Memc[imname], IM_NAME(im), SZ_IMNAME)
 	}
 
 	# Save those image header fields that get modified if an image section

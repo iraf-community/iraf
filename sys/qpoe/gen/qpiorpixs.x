@@ -1,5 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <mach.h>
+include <syserr.h>
 include	"../qpio.h"
 
 # QPIO_READPIX -- Sample the event list within the indicated rectangular
@@ -16,56 +18,128 @@ pointer	io			#I QPIO descriptor
 short	obuf[ARB]		#O output pixel buffer
 int	vs[ndim], ve[ndim]	#I vectors defining region to be extracted
 int	ndim			#I should be 2 for QPOE
-int	xblock, yblock		#I blocking factors
+real	xblock, yblock		#I blocking factors
 
-bool	xint, yint
-pointer	sp, evl, ev, ev_i
-int	maxpix, maskval, xoff, yoff, xw, nev, totev, x, y, pix, i
-errchk	qpio_getevents, qpio_setrange
+double	x, y
+pointer	sp, evl, ev_p
+int	evtype, maxpix, maskval, xoff, yoff, xw, yw, nev, totev, pix, i, j
+errchk	qpio_getevents, qpio_setrange, syserr
 int	qpio_getevents()
 
 begin
 	# Verify arguments.
 	if (xblock <= 0 || xblock > (ve[1] - vs[1] + 1))
-	    return (0)
+	    call syserr (SYS_QPBLOCKOOR)
 	if (yblock <= 0 || yblock > (ve[2] - vs[2] + 1))
-	    return (0)
-	xw = (ve[1] - vs[1]) / xblock + 1
-	if (xw <= 0 || ve[2] < vs[2])
+	    call syserr (SYS_QPBLOCKOOR)
+
+	# Compute the size of the output matrix in integer pixels.  This
+	# truncates the last partially filled pixel in each axis.
+
+	xw = int ((ve[1] - vs[1] + 1) / xblock + (EPSILOND * 1000))
+	yw = int ((ve[2] - vs[2] + 1) / yblock + (EPSILOND * 1000))
+	if (xw <= 0 || yw <= 0)
 	    return (0)
 
 	call smark (sp)
 	call salloc (evl, SZ_EVLIST, TY_POINTER)
 
-	maxpix = xw * (ve[2] - vs[2] + 1)
 	xoff = IO_EVXOFF(io)
 	yoff = IO_EVYOFF(io)
-	xint = (IO_EVXTYPE(io) == TY_INT)
-	yint = (IO_EVYTYPE(io) == TY_INT)
+	maxpix = xw * yw
 	totev = 0
+
+	evtype = IO_EVXTYPE(io)
+	if (IO_EVXTYPE(io) != IO_EVYTYPE(io))
+	    call syserr (SYS_QPINVEVT)
 
 	# Define the region from which we wish to read events.
 	call qpio_setrange (io, vs, ve, ndim)
 
 	# Read the events.
 	while (qpio_getevents (io, Memi[evl], maskval, SZ_EVLIST, nev) > 0) {
-	    # Process a sequence of neighbor events.
-	    do i = 1, nev {
-		ev = Memi[evl+i-1]
-		ev_i = (ev - 1) * SZ_SHORT / SZ_INT + 1
+	    switch (evtype) {
 
-		if (xint)
-		    x = Memi[ev_i+xoff]  
-		else
-		    x = Mems[ev+xoff]  
-		if (yint)
-		    y = Memi[ev_i+yoff]
-		else
-		    y = Mems[ev+yoff]
+	    case TY_SHORT:
+		# Process a sequence of neighbor events.
+		do i = 1, nev {
+		    ev_p = (Memi[evl+i-1] - 1) * SZ_SHORT / SZ_SHORT + 1
 
-		pix = (y - vs[2]) / yblock * xw + (x - vs[1]) / xblock + 1
-		if (pix > 0 && pix <= maxpix)
-		    obuf[pix] = obuf[pix] + 1
+		    x = Mems[ev_p+xoff]  
+		    y = Mems[ev_p+yoff]
+
+		    j = int ((y - vs[2]) / yblock + (EPSILOND * 1000))
+		    if (j >= 0 && j < yw) {
+			pix = j * xw + (x - vs[1]) / xblock + 1
+			if (pix > 0 && pix <= maxpix)
+			    obuf[pix] = obuf[pix] + 1
+		    }
+		}
+
+	    case TY_INT:
+		# Process a sequence of neighbor events.
+		do i = 1, nev {
+		    ev_p = (Memi[evl+i-1] - 1) * SZ_SHORT / SZ_INT + 1
+
+		    x = Memi[ev_p+xoff]  
+		    y = Memi[ev_p+yoff]
+
+		    j = int ((y - vs[2]) / yblock + (EPSILOND * 1000))
+		    if (j >= 0 && j < yw) {
+			pix = j * xw + (x - vs[1]) / xblock + 1
+			if (pix > 0 && pix <= maxpix)
+			    obuf[pix] = obuf[pix] + 1
+		    }
+		}
+
+	    case TY_LONG:
+		# Process a sequence of neighbor events.
+		do i = 1, nev {
+		    ev_p = (Memi[evl+i-1] - 1) * SZ_SHORT / SZ_LONG + 1
+
+		    x = Meml[ev_p+xoff]  
+		    y = Meml[ev_p+yoff]
+
+		    j = int ((y - vs[2]) / yblock + (EPSILOND * 1000))
+		    if (j >= 0 && j < yw) {
+			pix = j * xw + (x - vs[1]) / xblock + 1
+			if (pix > 0 && pix <= maxpix)
+			    obuf[pix] = obuf[pix] + 1
+		    }
+		}
+
+	    case TY_REAL:
+		# Process a sequence of neighbor events.
+		do i = 1, nev {
+		    ev_p = (Memi[evl+i-1] - 1) * SZ_SHORT / SZ_REAL + 1
+
+		    x = Memr[ev_p+xoff]  
+		    y = Memr[ev_p+yoff]
+
+		    j = int ((y - vs[2]) / yblock + (EPSILOND * 1000))
+		    if (j >= 0 && j < yw) {
+			pix = j * xw + (x - vs[1]) / xblock + 1
+			if (pix > 0 && pix <= maxpix)
+			    obuf[pix] = obuf[pix] + 1
+		    }
+		}
+
+	    case TY_DOUBLE:
+		# Process a sequence of neighbor events.
+		do i = 1, nev {
+		    ev_p = (Memi[evl+i-1] - 1) * SZ_SHORT / SZ_DOUBLE + 1
+
+		    x = Memd[ev_p+xoff]  
+		    y = Memd[ev_p+yoff]
+
+		    j = int ((y - vs[2]) / yblock + (EPSILOND * 1000))
+		    if (j >= 0 && j < yw) {
+			pix = j * xw + (x - vs[1]) / xblock + 1
+			if (pix > 0 && pix <= maxpix)
+			    obuf[pix] = obuf[pix] + 1
+		    }
+		}
+
 	    }
 
 	    totev = totev + nev

@@ -1,4 +1,4 @@
-.help imlintran Jun88 images.imgeom
+.help imlintran Dec98 images.imgeom
 .ih
 NAME
 imlintran -- shift, scale, rotate a list of images
@@ -23,7 +23,7 @@ making the angle between xrotation and yrotation other than a
 multiple of 90 degrees.
 .le
 .ls xmag, ymag
-The number of output pixels per input pixel in x and y. The magnifications
+The number of input pixels per output pixel in x and y. The magnifications
 must always be positive numbers. Numbers less than 1 magnify the image;
 numbers greater than one reduce the image.
 .le
@@ -59,6 +59,33 @@ Fifth order interior polynomial in x and y.
 .ls spline3
 Bicubic spline.
 .le
+.ls sinc
+2D sinc interpolation. Users can specify the sinc interpolant width by
+appending a width value to the interpolant string, e.g. sinc51 specifies
+a 51 by 51 pixel wide sinc interpolant. The sinc width will be rounded up to
+the nearest odd number.  The default sinc width is 31 by 31.
+.le
+.ls lsinc
+Look-up table sinc interpolation. Users can specify the look-up table sinc
+interpolant width by appending a width value to the interpolant string, e.g.
+lsinc51 specifies a 51 by 51 pixel wide look-up table sinc interpolant. The user
+supplied sinc width will be rounded up to the nearest odd number. The default
+sinc width is 31 by 31 pixels. Users can specify the resolution of the lookup
+table sinc by appending the look-up table size in square brackets to the
+interpolant string, e.g. lsinc51[20] specifies a 20 by 20 element sinc
+look-up table interpolant with a pixel resolution of 0.05 pixels in x and y.
+The default look-up table size and resolution are 20 by 20 and 0.05 pixels
+in x and y respectively.
+.le
+.ls drizzle
+2D drizzle resampling. Users can specify the drizzle pixel fraction in x and y
+by appending a value between 0.0 and 1.0 in square brackets to the
+interpolant string, e.g. drizzle[0.5]. The default value is 1.0.
+The value 0.0 is increased internally to 0.001. Drizzle resampling
+with a pixel fraction of 1.0 in x and y is equivalent to fractional pixel
+rotated block summing (fluxconserve = yes) or averaging (flux_conserve = no)  if
+xmag and ymag are > 1.0.
+.le
 .le
 .ls boundary = "nearest"
 The choices are:
@@ -91,18 +118,19 @@ DESCRIPTION
 
 IMLINTRAN linearly transforms a the list of images in input using rotatiion
 angles and magnification factors supplied by the user and writes the output
-images into output. The coordinate transformation is described below.
+images into output. The coordinate transformation from input to output
+image is described below.
 
 .nf
     1. subtract the origin
 
-    xt = x - xin
-    yt = y - yin
+    xt = x(input) - xin
+    yt = y(input) - yin
 
     2. scale the image
 
-    xt = xmag * xt + ymag * yt
-    yt = xmag * xt + ymag * yt
+    xt = xt / xmag + yt / ymag
+    yt = xt / xmag + yt / ymag
 
     3. rotate the image
 
@@ -111,13 +139,14 @@ images into output. The coordinate transformation is described below.
 
     4. new orgin
 
-    xt = x + xout
-    yt = y + yout
+    x(output) = xt + xout
+    y(output) = yt + yout
 
 .fi
 
 The output image gray levels are determined by interpolating in the input
-image at the positions of the transformed output pixels.
+image at the positions of the transformed output pixels using the inverse
+of the above transformation.
 IMLINTRAN uses the routines in the 2-D interpolation package.
 
 .ih

@@ -141,6 +141,7 @@ The FITS integers are converted directly to the output IRAF data type
 without scaling (BSCALE = 1.0 and BZERO = 0.0).
 .le
 .le
+.le
 
 .sh
 WFITS Structure Chart

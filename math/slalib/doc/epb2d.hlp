@@ -1,4 +1,4 @@
-.help epb2d Nov95 "Slalib Package"
+.help epb2d Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slEB2D (EPB)

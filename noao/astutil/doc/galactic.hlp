@@ -18,6 +18,7 @@ Type of input coordinates.  May be either "equatorial" (RA and DEC) or
 .ls print_coords = yes
 If \fBprint_coords\fR = yes, the RA, DEC and epoch (as well as lII and bII) 
 will be listed on the output file.
+.le
 .ih
 DESCRIPTION
 Program \fBgalactic\fR is used to convert between equatorial and

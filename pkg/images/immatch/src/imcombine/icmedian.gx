@@ -5,11 +5,12 @@ include	"../icombine.h"
 $for (sird)
 # IC_MEDIAN -- Median of lines
 
-procedure ic_median$t (d, n, npts, median)
+procedure ic_median$t (d, n, npts, doblank, median)
 
 pointer	d[ARB]			# Input data line pointers
 int	n[npts]			# Number of good pixels
 int	npts			# Number of output points per line
+int	doblank			# Set blank values?
 $if (datatype == sil)
 real	median[npts]		# Median
 $else
@@ -28,8 +29,10 @@ include	"../icombine.com"
 
 begin
 	if (dflag == D_NONE) {
-	    do i = 1, npts
-		median[i]= blank
+	    if (doblank == YES) {
+		do i = 1, npts
+		    median[i]= blank
+	    }
 	    return
 	}
 
@@ -62,7 +65,7 @@ begin
 			    median[i] = (val1 + val2) / 2.
 			} else
 			    median[i] = Mem$t[d[j1]+k]
-		    } else
+		    } else if (doblank == YES)
 			median[i] = blank
 		}
 	    }
@@ -170,7 +173,7 @@ begin
 		median[i] = (val1 + val2) / 2
 	    } else if (n1 == 1)
 		median[i] = Mem$t[d[1]+k]
-	    else
+	    else if (doblank == YES)
 		median[i] = blank
 	}
 end

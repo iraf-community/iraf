@@ -455,7 +455,8 @@ begin
 		else
 	            call gpline (gp, xdata, pldata, RV_RNPTS(rv))
 	    } else if (RV_DTYPE(rv) == SUMMARY_PLOT) {
-	        call gvline (gp, pldata, RV_NPTS(rv), x1, x2)
+	        call gpline (gp, xdata, pldata, RV_NPTS(rv))
+	        #call gvline (gp, pldata, RV_NPTS(rv), x1, x2)
 	    }
 	default:
 	    call gvline (gp, pldata, fnpts, x1, x2)

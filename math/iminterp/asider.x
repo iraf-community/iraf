@@ -9,13 +9,13 @@ include "im1interpdef.h"
 procedure asider (asi, x, der, nder)
 
 pointer	asi		# interpolant descriptor
-real	x		# x value
+real	x[ARB]		# x value
 real	der[ARB]	# derivatives, der[1] is value der[2] is f prime 
 int	nder		# number items returned = 1 + number of derivatives
 
 int	nearx, i, j, k, nterms, nd
 pointer	c0ptr, n0
-real	deltax, accum, pcoeff[MAX_NDERIVS], diff[MAX_NDERIVS]
+real	deltax, accum, tmpx[2], pcoeff[MAX_NDERIVS], diff[MAX_NDERIVS]
 
 begin
 	# Return zero for derivatives that are zero.
@@ -31,21 +31,54 @@ begin
 	switch (ASI_TYPE(asi))	{
 
 	case II_NEAREST:
-	    der[1] = COEFF(c0ptr + int(x + 0.5))
+	    der[1] = COEFF(c0ptr + int(x[1] + 0.5))
 	    return
 
 	case II_LINEAR:
-	    nearx = x
-	    der[1] = (x - nearx) * COEFF(c0ptr + nearx + 1) +
-		     (nearx + 1 - x) * COEFF(c0ptr + nearx)
+	    nearx = x[1]
+	    der[1] = (x[1] - nearx) * COEFF(c0ptr + nearx + 1) +
+		     (nearx + 1 - x[1]) * COEFF(c0ptr + nearx)
 	    if (nder > 1)
 		der[2] = COEFF(c0ptr + nearx + 1) - COEFF(c0ptr + nearx)
 	    return
 
-	case II_SINC:
-	    call ii_sincder (x, der, nder,
+	case II_SINC, II_LSINC:
+	    call ii_sincder (x[1], der, nder,
 		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
-		NSINC, NTAPER, STAPER, DX)
+		ASI_NSINC(asi), DX)
+	    return
+
+	case II_DRIZZLE:
+	    if (ASI_PIXFRAC(asi) >= 1.0)
+	        call ii_driz1 (x, der[1], 1, COEFF(ASI_COEFF(asi) +
+	            ASI_OFFSET(asi)), ASI_BADVAL(asi))
+	    else
+	        call ii_driz (x, der[1], 1, COEFF(ASI_COEFF(asi) +
+	            ASI_OFFSET(asi)), ASI_PIXFRAC(asi), ASI_BADVAL(asi))
+	    if (nder > 1) {
+		deltax = x[2] - x[1]
+		if (deltax == 0.0)
+		    der[2] = 0.0
+		else {
+		    tmpx[1] = x[1]
+		    tmpx[2] = (x[1] + x[2]) / 2.0
+	    	    if (ASI_PIXFRAC(asi) >= 1.0)
+	                call ii_driz1 (tmpx, accum, 1, COEFF(ASI_COEFF(asi) +
+	                    ASI_OFFSET(asi)), ASI_BADVAL(asi))
+		    else
+	                call ii_driz (tmpx, accum, 1, COEFF(ASI_COEFF(asi) +
+	                    ASI_OFFSET(asi)), ASI_PIXFRAC(asi), ASI_BADVAL(asi))
+		    tmpx[1] = tmpx[2]
+		    tmpx[2] = x[2]
+	    	    if (ASI_PIXFRAC(asi) >= 1.0)
+	                call ii_driz1 (tmpx, der[2], 1, COEFF(ASI_COEFF(asi) +
+	                    ASI_OFFSET(asi)), ASI_BADVAL(asi))
+		    else
+	                call ii_driz (tmpx, der[2], 1, COEFF(ASI_COEFF(asi) +
+	                    ASI_OFFSET(asi)), ASI_PIXFRAC(asi), ASI_BADVAL(asi))
+		    der[2] = 2.0 * (der[2] - accum) / deltax
+		}
+	    }
 	    return
 
 	case II_POLY3:
@@ -64,9 +97,9 @@ begin
 	# Routines falls through to this point if the interpolant is one of
 	# the higher order polynomial types or a third order spline.
 
-	nearx = x
+	nearx = x[1]
 	n0 = c0ptr + nearx
-	deltax = x - nearx
+	deltax = x[1] - nearx
 
 	# Compute the number of derivatives needed.
 	nd = nder

@@ -1,6 +1,32 @@
 .help revisions May93 noao.lib
 .nf
 noaolib$obsdb.dat
+    Added DDSAZ and HOLI observatories upon request.  (8/5/99, Valdes)
+
+noaolib$obsdb.dat
+    Added IRTF upon request.  (7/14/99, Valdes)
+
+noaolib$ccdtime/kpno.dat
+noaolib$ccdtime/ctio.dat
+    New versions with entries set by KPNO/CTIO staff and used in the
+    Web version starting in fall of 1998.  (6/25/99, Valdes)
+
+noaolib$obsdb.dat
+    # SAAO: Submitted by James Stevens 3/25/98
+    # CASLEO:  Submitted by Jorge Federico Gonzalez 12/10/98
+    # BOSQUE: Submitted by Jorge Federico Gonzalez 12/10/98
+    # ROZHEN: Submitted by Ilian Iliev 1/19/99
+
+noaolib$onedstds/bstdscal/names.men	+
+noaolib$onedstds/bstdscal/standards.men
+noaolib$onedstds/spec16cal/names.men
+noaolib$onedstds/spec16cal/standards.men
+noaolib$onedstds/ctionewcal/standards.men
+noaolib$onedstds/READMEN
+    Added some name aliases and fixed some typo problems.
+    (9/26/98, Valdes)
+
+noaolib$obsdb.dat
     Added Laboratorio Nacional de Astrofisica - Brazil as submitted by
     Claudia Vilega Rodrigues.  (12/12/97, Valdes)
 

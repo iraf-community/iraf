@@ -1,68 +1,48 @@
-# Graphics tools definitions.
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
-define	GTXMIN		0	# WCS X minimum
-define	GTXMAX		1	# WCS X maximum
-define	GTYMIN		2	# WCS Y minimum
-define	GTYMAX		3	# WCS Y maximum
-define	GTXTRAN		4	# WCS X transform
-define	GTYTRAN		5	# WCS Y transform
-define	GTXSIZE		6	# X Mark size
-define	GTYSIZE		7	# Y Mark size
+# Public Definitions
 
-define	GTDRAWTITLE	26	# Draw title?
-define	GTDRAWXLABELS	27	# Draw X labels?
-define	GTDRAWYLABELS	28	# Draw Y labels?
-define	GTSYSID		22	# Add SYSID?
-define	GTPARAMS	8	# Graph parameters
-define	GTTITLE		9	# Graph title
-define	GTSUBTITLE	10	# Graph subtitle
-define	GTCOMMENTS	11	# Comments
-define	GTXLABEL	12	# X label
-define	GTYLABEL	13	# Y label
-define	GTXUNITS	14	# X units
-define	GTYUNITS	15	# Y units
+define	GTVXMIN			0	# Viewport X minimum
+define	GTVXMAX			1	# Viewport X maximum
+define	GTVYMIN			2	# Viewport Y minimum
+define	GTVYMAX			3	# Viewport Y maximum
+define	GTXMIN			4	# WCS X minimum
+define	GTXMAX			5	# WCS X maximum
+define	GTYMIN			6	# WCS Y minimum
+define	GTYMAX			7	# WCS Y maximum
 
-define	GTXBUF		16	# Autoscaling buffer factor
-define	GTYBUF		17	# Autoscaling buffer factor
-define	GTTYPE		18	# Graph type
-define	GTMARK		19	# Mark type
-define	GTLINE		20	# Line type
-define	GTCOLOR		23	# Color
-define	GTXFLIP		24	# Flip X axis
-define	GTYFLIP		25	# Flip X axis
-define	GTTRANSPOSE	21	# Transpose X and Y axes?
+define	GTSYSID			8	# Add SYSID?
+define	GTPARAMS		9	# Graph parameters
+define	GTTITLE			10	# Graph title
+define	GTSUBTITLE		11	# Graph subtitle
+define	GTCOMMENTS		12	# Comments
+define	GTXLABEL		13	# X label
+define	GTYLABEL		14	# Y label
+define	GTXUNITS		15	# X units
+define	GTYUNITS		16	# Y units
 
-define	LEN_GT		29	# Length of graphics tools extension
+define	GTDRAWTITLE		17	# Draw title block?
+define	GTDRAWXLABELS		18	# Draw x axis label block?
+define	GTDRAWYLABELS		19	# Draw y axis label block?
 
-define	GT_XMIN		Memr[$1+GTXMIN]
-define	GT_XMAX		Memr[$1+GTXMAX]	
-define	GT_YMIN		Memr[$1+GTYMIN]
-define	GT_YMAX		Memr[$1+GTYMAX]
-define	GT_XTRAN	Memi[$1+GTXTRAN]
-define	GT_YTRAN	Memi[$1+GTYTRAN]
-define	GT_XSIZE	Memr[$1+GTXSIZE]
-define	GT_YSIZE	Memr[$1+GTYSIZE]
-define	GT_DRAWTITLE	Memi[$1+GTDRAWTITLE]
-define	GT_DRAWXLABELS	Memi[$1+GTDRAWXLABELS]
-define	GT_DRAWYLABELS	Memi[$1+GTDRAWYLABELS]
-define	GT_SYSID	Memi[$1+GTSYSID]
-define	GT_PARAMS	Memi[$1+GTPARAMS]
-define	GT_TITLE	Memi[$1+GTTITLE]
-define	GT_SUBTITLE	Memi[$1+GTSUBTITLE]
-define	GT_COMMENTS	Memi[$1+GTCOMMENTS]
-define	GT_XLABEL	Memi[$1+GTXLABEL]
-define	GT_YLABEL	Memi[$1+GTYLABEL]
-define	GT_XUNITS	Memi[$1+GTXUNITS]
-define	GT_YUNITS	Memi[$1+GTYUNITS]
-define	GT_XBUF		Memr[$1+GTXBUF]
-define	GT_YBUF		Memr[$1+GTYBUF]
-define	GT_TYPE		Memi[$1+GTTYPE]
-define	GT_MARK		Memi[$1+GTMARK]
-define	GT_LINE		Memi[$1+GTLINE]
-define	GT_COLOR	Memi[$1+GTCOLOR]
-define	GT_XFLIP	Memi[$1+GTXFLIP]
-define	GT_YFLIP	Memi[$1+GTYFLIP]
-define	GT_TRANSPOSE	Memi[$1+GTTRANSPOSE]
+define	GTTYPE			20	# Graph type
+define	GTMARK			21	# Mark type
+define	GTLINE			22	# Line type
+define	GTXSIZE			23	# X Mark size
+define	GTYSIZE			24	# Y Mark size
+define	GTCOLOR			25	# Color
 
-define	GTTYPES		"|mark|line|histogram"
-define	GTMARKS	"|point|box|plus|cross|diamond|hline|vline|hebar|vebar|circle|"
+define	GTXTRAN			26	# WCS X transform
+define	GTYTRAN			27	# WCS Y transform
+define	GTXFLIP			28	# Flip X axis
+define	GTYFLIP			29	# Flip Y axis
+define	GTTRANSPOSE		30	# Transpose X and Y axes?
+
+define	GTXFORMAT		31	# X format
+define	GTYFORMAT		32	# Y format
+
+define	GTXBUF			33	# Autoscaling buffer factor
+define	GTYBUF			34	# Autoscaling buffer factor
+define	GTLCLIP			35	# Low clipping factor
+define	GTHCLIP			36	# High clipping factor
+

@@ -8,12 +8,12 @@
 *  (double precision)
 *
 *  Given:
-*     NDP       int      number of decimal places of arcseconds
-*     ANGLE     dp       angle in radians
+*     NDP      i      number of decimal places of arcseconds
+*     ANGLE    d      angle in radians
 *
 *  Returned:
-*     SIGN      char     '+' or '-'
-*     IDMSF     int(4)   degrees, arcminutes, arcseconds, fraction
+*     SIGN     c      '+' or '-'
+*     IDMSF    i(4)   degrees, arcminutes, arcseconds, fraction
 *
 *  Notes:
 *
@@ -32,10 +32,9 @@
 *         case where ANGLE is very nearly 2pi and rounds up to 360 deg,
 *         by testing for IDMSF(1)=360 and setting IDMSF(1-4) to zero.
 *
-*  Called:
-*     slDDTF
+*  Called:  slDDTF
 *
-*  P.T.Wallace   Starlink   11 September 1990
+*  P.T.Wallace   Starlink   19 March 1999
 *
 *  Copyright (C) 1995 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.

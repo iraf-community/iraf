@@ -102,9 +102,9 @@ begin
 		    call close (fd)
 		    # Print header only if there is more than a single list
 		    # element.
-		    if (H_LENTL(ctrl) > 1)
+		    if (H_LENTL(ctrl) > 1 && H_OPTION(ctrl) != O_REFERENCES)
 			call pr_modname (ctrl, pakname, modname)
-		    call pr_file (fname, ctrl)
+		    call pr_file (fname, ctrl, pakname)
 		    call sfree (sp)
 		    return
 		} else if (nblocks == 0) {

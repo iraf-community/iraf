@@ -1,4 +1,4 @@
-.help earth Nov95 "Slalib Package"
+.help earth Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slERTH (IY, ID, FD, PV)

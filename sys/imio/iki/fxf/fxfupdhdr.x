@@ -15,8 +15,7 @@ include	"fxf.h"
 # FXFUPDHDR.X -- Routines to update the header of an image extension on
 # disk.
 
-define  SZ_DATE       10
-define  SZ_TIMEDATE   21
+define  SZ_DATESTR    24
 
 
 # FXF_UPDHDR -- Update the FITS header file.  This is done by writing an
@@ -199,7 +198,6 @@ begin
 		call strcpy (Memc[outname], IM_PIXFILE(im), SZ_FNAME)
 	    }		
 
-	    call imgcluster (IM_NAME(im), Memc[tempfile], SZ_PATHNAME)
 	    in_fd = open (IM_HDRFILE(im), READ_ONLY, BINARY_FILE)
 	    group = FIT_GROUP(fit)
 
@@ -397,15 +395,14 @@ begin
 	if (strcmp (IM_TITLE(im), FIT_TITLE(fit)) != 0)
 	    call strcpy (IM_TITLE(im), FIT_OBJECT(fit), LEN_CARD)
 	else {
-	    iferr (call imgstr(im, "OBJECT", temp, LEN_CARD))
+	    iferr (call imgstr (im, "OBJECT", temp, LEN_CARD)) {
 	        temp[1] = EOS
+                # If there is no OBJECT keyword, don't create one.
+		nheader_cards = nheader_cards - 1
+	    }
 	    if (strcmp (FIT_OBJECT(fit), temp) != 0)
 	        call strcpy (temp, FIT_OBJECT(fit), LEN_CARD)
 	}
-
-	# If there is no OBJECT keyword, don't create one.
-	if (FIT_OBJECT(fit) == EOS)
-	    nheader_cards = nheader_cards - 1
 
 	# Too many mandatory cards if we are using the PHU in READ_WRITE mode.
 	# Because fxf_mandatory_cards gets call with FIT_NEWIMAGE set to NO,
@@ -486,12 +483,14 @@ pointer	 fit     		#I fits structure
 int	 hdr_fd  		#I FITS header file descriptor
 int	 diff			#I header size difference opix -> wrhdr time
 
-pointer	sp, spp, mii, rp, uap
 char	temp[SZ_FNAME] 
-char    card[LEN_CARD], blank, keyword[SZ_KEYWORD], datestr[SZ_DATE] 
-int	imaccf(), strlen(), fxf_ua_card(), idb_findrecord()
-int	n, i, sz_rec, up, nblanks, acmode, tm[LEN_TMSTRUCT], nbk
 bool	xtension, ext_append
+pointer	sp, spp, mii, rp, uap
+char    card[LEN_CARD], blank, keyword[SZ_KEYWORD], datestr[SZ_DATESTR] 
+int	iso_cutover, n, i, sz_rec, up, nblanks, acmode, nbk, len
+
+long	clktime()
+int	imaccf(), strlen(), fxf_ua_card(), idb_findrecord(), envgeti()
 bool	fxf_fpl_equald()
 errchk  write 
 
@@ -598,38 +597,41 @@ begin
 		    FIT_INHERIT(fit), "Inherits global header", n)
 	}
 
-	call fxf_encode_date (datestr, SZ_DATE)
+	# Dates after iso_cutover use ISO format dates.
+	iferr (iso_cutover = envgeti (ENV_ISOCUTOVER))
+	    iso_cutover = DEF_ISOCUTOVER
+
+	# Encode the "DATE" keyword (records create time of imagefile).
+	call fxf_encode_date (clktime(long(0)), datestr, SZ_DATESTR,
+	    "ISO", iso_cutover)
+	len = strlen (datestr)
+
 	if (idb_findrecord (im, "DATE", rp) == 0) {
 	    call fxf_akwc ("DATE",
-		datestr, SZ_DATE, "Date FITS file was generated", n)
+		datestr, len, "Date FITS file was generated", n)
 	} else { 
 	    # See if the keyword is out of order.
 	    if (rp - uap > 12*81) {  
 		call fxf_filter_keyw (im, "DATE")
 		call fxf_akwc ("DATE",
-		    datestr, SZ_DATE, "Date FITS file was generated", n)
+		    datestr, len, "Date FITS file was generated", n)
 	    } else
 	        call impstr (im, "DATE", datestr) 
 	}
 
-	call brktime (IM_MTIME(im), tm)
-	call sprintf (temp, LEN_CARD, "%02d:%02d:%02d (%02d/%02d/%d)")
-	    call pargi (TM_HOUR(tm))
-	    call pargi (TM_MIN(tm))
-	    call pargi (TM_SEC(tm))
-	    call pargi (TM_MDAY(tm))
-	    call pargi (TM_MONTH(tm))
-	    call pargi (TM_YEAR(tm))
+	# Encode the "IRAF_TLM" keyword (records time of last modification).
+	call fxf_encode_date (IM_MTIME(im), datestr, SZ_DATESTR, "TLM", 2010)
+	len = strlen (datestr)
 
 	if (idb_findrecord (im, "IRAF-TLM", rp) == 0) {
 	    call fxf_akwc ("IRAF-TLM",
-		temp, SZ_TIMEDATE, "Time of last modification", n)
+		datestr, len, "Time of last modification", n)
 	} else if (rp - uap > 13*81) {  
 	    call fxf_filter_keyw (im, "IRAF-TLM")
 	    call fxf_akwc ("IRAF-TLM",
-		temp, SZ_TIMEDATE, "Time of last modification", n)
+		datestr, len, "Time of last modification", n)
 	} else 
-	    call impstr (im, "IRAF-TLM", temp) 
+	    call impstr (im, "IRAF-TLM", datestr) 
 
 	# Create DATA(MIN,MAX) keywords only if they have the real 
 	# min and max of the data.
@@ -773,16 +775,16 @@ begin
 
 	switch (datatype) {
 	case TY_SHORT, TY_USHORT:
-	   FIT_BITPIX(fit) = FITS_SHORT
+	    FIT_BITPIX(fit) = FITS_SHORT
 	case TY_INT, TY_LONG:
-	   FIT_BITPIX(fit) = FITS_LONG
+	    FIT_BITPIX(fit) = FITS_LONG
 	case TY_REAL:
-	   FIT_BITPIX(fit) = FITS_REAL
+	    FIT_BITPIX(fit) = FITS_REAL
 	case TY_DOUBLE:
-	   FIT_BITPIX(fit) = FITS_DOUBLE
+	    FIT_BITPIX(fit) = FITS_DOUBLE
 	default:
-	   call flush (STDOUT)
-	   call syserr (SYS_FXFUPHBTYP)
+	    call flush (STDOUT)
+	    call syserr (SYS_FXFUPHBTYP)
 	}
 end
 

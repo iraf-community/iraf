@@ -41,6 +41,7 @@ The minimum and maximum logical x and logical y coordinates used to generate
 the grid of control points if \fIcoords\fR = "grid". Xmin, xmax, ymin, and
 ymax default to 1, the number of columns in the reference image, 1, and the
 number of lines in the reference image, respectively.
+.le
 .ls nx = 10, ny = 10
 The number of points in x and y used to generate the coordinate grid
 if \fIcoords\fR = "grid".

@@ -1,4 +1,4 @@
-.help aopqk Nov95 "Slalib Package"
+.help aopqk Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slAOPQ (RAP, DAP, AOPRMS, AOB, ZOB, HOB, DOB, ROB)
@@ -44,14 +44,14 @@
    2)  The accuracy of the result is limited by the corrections for
        refraction.  Providing the meteorological parameters are
        known accurately and there are no gross local effects, the
-       predicted apparent RA,Dec should be within about 0.1 arcsec
-       for a zenith distance of less than 70 degrees.  Even at a
-       topocentric zenith distance of 90 degrees, the accuracy in
-       elevation should be better than 1 arcmin;  useful results
-       are available for a further 3 degrees, beyond which the
-       slRFRO routine returns a fixed value of the refraction.
-       The complementary routines slAOP (or slAOPQ) and slOAP
-       (or slOAPQ) are self-consistent to better than 1 micro-
+       observed RA,Dec predicted by this routine should be within
+       about 0.1 arcsec for a zenith distance of less than 70 degrees.
+       Even at a topocentric zenith distance of 90 degrees, the
+       accuracy in elevation should be better than 1 arcmin;  useful
+       results are available for a further 3 degrees, beyond which
+       the slaRefro routine returns a fixed value of the refraction.
+       The complementary routines slaAop (or slaAopqk) and slaOap
+       (or slaOapqk) are self-consistent to better than 1 micro-
        arcsecond all over the celestial sphere.
 
    3)  It is advisable to take great care with units, as even
@@ -116,11 +116,15 @@
        source was well below the elevation limits for a particular
        telescope.
 
+  9)   The azimuths etc produced by the present routine are with
+       respect to the celestial pole.  Corrections to the terrestrial
+       pole can be computed using slPLMO.
+
   Called:  slDS2C, slREFZ, slRFRO, slDC2S, slDA2P
 
-  P.T.Wallace   Starlink   19 September 1995
+  P.T.Wallace   Starlink   22 February 1996
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

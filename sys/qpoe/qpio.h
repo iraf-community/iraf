@@ -36,8 +36,8 @@ define	IO_MODE		Memi[$1+1]	# read_only or new_file
 define	IO_DEBUG	Memi[$1+2]	# debug level
 define	IO_NLINES	Memi[$1+3]	# number of image lines (physical)
 define	IO_NCOLS	Memi[$1+4]	# number of image columns (physical)
-define	IO_XBLOCK	Memi[$1+5]	# blocking factor for qpio_readpix
-define	IO_YBLOCK	Memi[$1+6]	# blocking factor for qpio_readpix
+define	IO_XBLOCK	Memr[$1+5]	# blocking factor for qpio_readpix
+define	IO_YBLOCK	Memr[$1+6]	# blocking factor for qpio_readpix
 define	IO_OPTBUFSIZE	Memi[$1+7]	# optbufsize for FIO (qpio_readpix)
 define	IO_NOINDEX	Memi[$1+8]	# don't use indexed extraction
 define	IO_NODEFFILT	Memi[$1+9]	# disable use of default filter

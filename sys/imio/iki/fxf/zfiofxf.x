@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  
+include <syserr.h>
 include <mach.h>
 include <knet.h>
 include <fio.h>
@@ -88,50 +89,38 @@ int	boffset			#I file offset at which read commences
 
 pointer fit, im
 int	ip, pixtype, nb
-int	status, offset, totpix, npix
+int	status, totpix, npix
 int	datasizeb, pixoffb, nb_skipped, i
 int	sizeof()
 
 begin
 	fit = chan
 	im = FIT_IM(fit)
+	FIT_IOSTAT(fit) = OK
 
 	totpix = IM_PHYSLEN(im,1)
 	do i = 2, IM_NPHYSDIM(im)
 	    totpix = totpix * IM_PHYSLEN(im,i)
 
+	if (FIT_ZCNV(fit) == YES) {
+	    call fxf_cnvpx (im, totpix, obuf, nbytes, boffset)
+	    return
+	}
+
 	pixtype = IM_PIXTYPE(im)
 	datasizeb = totpix * (sizeof(pixtype) * SZB_CHAR)
 	pixoffb = (FIT_PIXOFF(fit) - 1) * SZB_CHAR + 1
-
-	### Comments set off by "###" are not code comments but meta-comments
-	### about what we may want to do with the code later (once it is fixed
-	### these comments should be removed).
-
-	### I don't think the TY_UBYTE branch of this code ever gets used due
-	### to the fxf_byte_short code.  If the offset conversion were being
-	### used it needs to scaled by SZB_CHAR as shown since it is 1-indexed.
-	### Also, use a local variable such as offset instead of modifying 
-	### boffset directly, as boffset is a readonly input argument.  We
-	### have no idea here what the calling code does with boffset and 
-	### whether it relies on the value being unchanged after the call.
-	### The kernel binary file drives spec says that it is an Input arg.
-	### Also, if we need to scale the file offset by 2 we probably need to
-	### scale nbytes by 2 as well.
-
-	if (FIT_PIXTYPE(fit) == TY_UBYTE)
-	    offset = (boffset - 1) / SZB_CHAR + 1
-	else
-	    offset = boffset
 
 	# We can read the data directly into the caller's output buffer as 
 	# any FITS kernel input conversions are guaranteed to not make the
 	# data smaller.  
 
-	call zardbf (FIT_IO(fit), obuf, nbytes, offset)
+	call zardbf (FIT_IO(fit), obuf, nbytes, boffset)
 	call zawtbf (FIT_IO(fit), status)
-
-	### status is not error checked here
+	if (status == ERR) {
+	    FIT_IOSTAT(fit) = ERR
+	    return
+	}
 
 	### boffset is 1-indexed, so one would expect (boffset/SZB_CHAR) to
 	### be ((boffset - 1) * SZB_CHAR + 1).  This is off by one from what
@@ -153,13 +142,8 @@ begin
 	    nb = min (status, datasizeb - nb_skipped)
 	npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
 
-	# Calculate the number of pixels to convert.
-	if (FIT_PIXTYPE(fit) == TY_UBYTE)
-	    call achtbs (obuf[ip], obuf[ip], npix)
-	else {
-	    call fxf_unpack_data (obuf[ip],
-		npix, pixtype, FIT_BSCALE(fit), FIT_BZERO(fit)) 
-	}
+	call fxf_unpack_data (obuf[ip],
+	    npix, pixtype, FIT_BSCALE(fit), FIT_BZERO(fit)) 
 end
 
  
@@ -175,12 +159,14 @@ int	boffset			#I file offset
 bool	noconvert
 pointer fit, im, sp, obuf
 int	ip, op, pixtype, npix, totpix, nb, nchars, i
-int	datasizeb, pixoffb, nb_skipped, status
+int	datasizeb, pixoffb, nb_skipped
 int	sizeof()
+errchk  syserrs
 
 begin
 	fit = chan
 	im = FIT_IM(fit)
+	FIT_IOSTAT(fit) = OK
 
 	# We don't have to pack the data if it is integer and we don't need
 	# to byte swap; the data buffer can be written directly out.
@@ -191,9 +177,17 @@ begin
 
 	if (noconvert) {
 	    call zawrbf (FIT_IO(fit), ibuf, nbytes, boffset)
-	    call zawtbf (FIT_IO(fit), status)
 	    return
 	}
+
+	# Writing pixel data to an image is currently illegal if on-the-fly
+	# conversion is in effect, as on-the-fly conversion is currently only
+	# available for reading.
+
+	if (FIT_ZCNV(fit) == YES) {
+	    FIT_IOSTAT(fit) = ERR
+	    return
+        }		
 
 	# Convert any pixel data in the input buffer to the binary format
 	# required for FITS and write it out.  Any non-pixel data in the
@@ -226,6 +220,11 @@ begin
 	    nb = min (nbytes, datasizeb - nb_skipped)
 	npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
 
+	if (npix == 0) {
+	    call sfree (sp)
+	    return
+	}
+
 	# We don't do scaling (e.g. BSCALE/BZERO) when writing.  All the
 	# generated FITS files in this interface are ieee fits standard.
 	### I didn't look into it but I don't understand this; when accessing
@@ -253,7 +252,6 @@ begin
 
 	# Write out the data.
 	call zawrbf (FIT_IO(fit), Memc[obuf], nbytes, boffset)
-	call zawtbf (FIT_IO(fit), status)
 
 	call sfree (sp)
 end
@@ -266,11 +264,30 @@ procedure fxfzwt (chan, status)
 int	chan			#I QPF i/o channel
 int	status			#O i/o channel status
 
-pointer fit
+pointer fit, im
 
 begin
 	fit = chan
-	call zawtbf (FIT_IO(fit), status)
+	im = FIT_IM(fit)
+
+	# A file driver returns status for i/o only in the AWAIT routine;
+	# hence any i/o errors occurring in the FK itself are indicated by
+	# setting FIT_IOSTAT.  Otherwise the actual i/o operation must have
+	# been submitted, and we call zawtbf to wait for i/o, and get status.
+
+	if (FIT_IOSTAT(fit) != OK)
+	    status = FIT_IOSTAT(fit)
+	else
+	    call zawtbf (FIT_IO(fit), status)
+
+	if (status > 0) {
+	    if (FIT_PIXTYPE(fit) == TY_SHORT && IM_PIXTYPE(im) == TY_REAL)
+		status = FIT_ZBYTES(fit)
+	    else if (FIT_PIXTYPE(fit) == TY_UBYTE && IM_PIXTYPE(im) == TY_SHORT)
+		status = status * SZB_CHAR		# to short
+	    else if (FIT_PIXTYPE(fit) == TY_UBYTE && IM_PIXTYPE(im) == TY_REAL)
+		status = status * SZB_CHAR * SZ_REAL	# to real
+	}
 end
 
 
@@ -282,9 +299,154 @@ int	chan			#I FIT i/o channel
 int	param			#I parameter to be returned
 int	value			#O parameter value
 
-pointer fit
+pointer fit, im
+int	i, totpix, szb_pixel, szb_real
+int	sizeof()
 
 begin
 	fit = chan
+	im = FIT_IM(fit)
+
+    	totpix = IM_PHYSLEN(im,1)
+	do i = 2, IM_NPHYSDIM(im)
+	    totpix = totpix * IM_PHYSLEN(im,i)
+
+        szb_pixel = sizeof(IM_PIXTYPE(im)) * SZB_CHAR
+	szb_real = SZ_REAL * SZB_CHAR
+
 	call zsttbf (FIT_IO(fit), param, value)
+
+	if (param == FSTT_FILSIZE) {
+	    switch (FIT_PIXTYPE(fit)) {
+	    case TY_SHORT:
+		if (IM_PIXTYPE(im) == TY_REAL) {
+		    value = value + int ((totpix * SZ_SHORT * SZB_CHAR) /
+			2880. + .5) * 2880
+		}
+	    case TY_UBYTE:
+		if (IM_PIXTYPE(im) == TY_SHORT)
+		    value = value + int (totpix/2880. + 0.5)*2880
+	        else if (IM_PIXTYPE(im) == TY_REAL)
+		    value = value + int(totpix*(szb_real-1)/2880. + 0.5) * 2880
+            }
+	}
+end
+
+
+# FXF_CNVPX -- Convert FITS type BITPIX = 8 to SHORT or REAL depending
+# on the value of BSCALE, BZERO (1, 32768 is already iraf supported as ushort
+# and is not treated in here). If BITPIX=16 and BSCALE and BZERO are 
+# non-default then the pixels are converted to REAL.
+
+procedure fxf_cnvpx (im, totpix, obuf, nbytes, boffset)
+
+pointer im			#I image descriptor
+int	totpix			#I total number of pixels		
+char    obuf[ARB]		#O output data buffer
+int	nbytes			#I size in bytes of the output buffer
+int	boffset			#I byte offset into the virtual image
+
+pointer sp, buf, fit, op
+double	bscale, bzero
+int	status, offset, npix
+int	pixtype, nb, buf_size
+int	ip, nelem, ubytes, pfactor
+int	datasizeb, pixoffb, nb_skipped
+int	sizeof()
+
+begin
+	fit = IM_KDES(im)
+	bscale = FIT_BSCALE(fit)
+	bzero  = FIT_BZERO(fit)
+
+	ip = FIT_PIXOFF(fit) - boffset/SZB_CHAR
+	if (ip <= 0)
+	    ip = 1
+
+	# The beginning of the data portion in bytes.
+	pixoffb = (FIT_PIXOFF(fit)-1) * SZB_CHAR + 1
+	
+	# Determine the factor to applied: size(im_pixtype)/size(fit_pixtype).
+	if (FIT_PIXTYPE(fit) == TY_UBYTE) {
+	    if (IM_PIXTYPE(im) == TY_REAL)
+		pfactor = SZ_REAL * SZB_CHAR
+	    else  					# TY_SHORT
+		pfactor = SZB_CHAR
+	    datasizeb = totpix
+	} else if (FIT_PIXTYPE(fit) == TY_SHORT) {
+	    pfactor = SZ_REAL / SZ_SHORT
+	    pixtype = TY_SHORT
+	    datasizeb = totpix * (sizeof(pixtype) * SZB_CHAR)
+	} else {
+	    FIT_IOSTAT(fit) = ERR
+	    return
+	}
+
+	# We need to map the virtual image of type im_pixtype to the actual
+	# file of type fit_pixtype. 'nbytes' is the number of bytes to read
+	# from the virtual image. To find out how many fit_pixtype bytes 
+	# we need to read from disk we need to subtract the FITS
+	# header size (if boffset is 1) from nbytes and then divide
+	# the resultant value by the convertion factor.
+	# We then add the size of the header if necessary.
+
+	nelem = nbytes - pixoffb
+	nelem = nelem / pfactor
+	buf_size = nelem + pixoffb
+	if (buf_size*pfactor > nbytes && ip == 1)
+	    buf_size = (nbytes - 1) / pfactor + 1 
+
+	# Determine the offset into the pixel area.
+	ubytes = boffset - pixoffb
+	if (ubytes > 0) {
+	    nelem = ubytes / pfactor
+	    offset = nelem + pixoffb
+	} else 
+	    offset = boffset
+
+	# Allocate space for TY_SHORT.
+	call smark (sp)
+	call salloc (buf, buf_size/SZB_CHAR, TY_SHORT)
+	    
+	call zardbf (FIT_IO(fit), Mems[buf], buf_size, offset)
+	call zawtbf (FIT_IO(fit), status)
+	if (status == ERR) {
+	    FIT_IOSTAT(fit) = ERR
+	    call sfree (sp)
+	    return
+	}
+
+	# Map the number of bytes of datatype FIT_PIXTYPE to 
+	# IM_PIXTYPE for use in zfxfwt().
+	     
+	if (status*pfactor >= nbytes)
+	    FIT_ZBYTES(fit) = nbytes
+	else
+	    FIT_ZBYTES(fit) = status * pfactor
+
+	nb_skipped = offset - pixoffb
+	if (nb_skipped <= 0)
+	    nb = min (status + nb_skipped, datasizeb)
+	else
+	    nb = min (status, datasizeb - nb_skipped)
+
+	switch (FIT_PIXTYPE(fit)) {
+	case TY_UBYTE:
+	    npix = max (0, nb)
+	    if (IM_PIXTYPE(im) == TY_SHORT)
+		call achtbs (Mems[buf+ip-1], obuf[ip], npix)
+	    else {
+		# Scaled from byte to REAL.
+		call achtbl (Mems[buf+ip-1], obuf[ip], npix)
+		call fxf_altmr (obuf[ip], obuf[ip], npix, bscale, bzero)
+	    }
+	case TY_SHORT:
+	    npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
+	    op = buf + ip - 1
+	    if (BYTE_SWAP2 == YES)
+		call bswap2 (Mems[op], 1, Mems[op], 1, npix*SZB_CHAR)
+	    call fxf_astmr (Mems[op], obuf[ip], npix, bscale, bzero)
+	}
+
+	call sfree (sp)
 end

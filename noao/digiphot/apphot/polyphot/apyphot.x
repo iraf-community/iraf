@@ -119,8 +119,12 @@ begin
 	    # Define a polygon interactively.
 	    case 'g':
 		if (interactive == YES) {
-		    nvertices = ap_ymkpoly (py, id, Memr[x], Memr[y],
-		        MAX_NVERTICES)
+		    if (id == gd)
+		        nvertices = ap_ymkpoly (py, id, Memr[x], Memr[y],
+		            MAX_NVERTICES, NO)
+		    else
+		        nvertices = ap_ymkpoly (py, id, Memr[x], Memr[y],
+		            MAX_NVERTICES, YES)
 		    if (id != NULL) {
 			if (id == gd)
 			    call gflush (id)

@@ -1,4 +1,4 @@
-.help ampqk Nov95 "Slalib Package"
+.help ampqk Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slAMPQ (RA, DA, AMPRMS, RM, DM)

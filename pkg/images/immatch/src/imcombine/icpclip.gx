@@ -188,12 +188,12 @@ begin
 		median[i] = med
 
 	    # Reorder if pixels only if necessary.
-	    if (nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		k = max (nl, n4 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Mem$t[d[l]+j] = Mem$t[d[k]+j]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + j
 			    mp2 = m[k] + j
 			    id = Memi[mp1]

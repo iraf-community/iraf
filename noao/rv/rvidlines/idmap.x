@@ -224,6 +224,8 @@ begin
 	else
 	    im = immap (Memc[ID_IMAGE(id)], READ_ONLY, 0)
 	IM(ID_SH(id)) = im
+
+	call sfree (sp)
 end
 
 

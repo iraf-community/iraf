@@ -155,8 +155,8 @@ begin
 	    root = fnldir (Memc[groupfile], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[groupfile+root],
 	        DEF_LENDEFNAME) == 0 || (root == strlen (Memc[groupfile])))
-	        call dp_inname (Memc[image], "", "grp", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_inname (Memc[image], Memc[outfname], "grp",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	    	call strcpy (Memc[groupfile], Memc[outfname], SZ_FNAME)
 	    ap_text = itob (access (Memc[outfname], 0, TEXT_FILE))
@@ -172,8 +172,8 @@ begin
 	    root = fnldir (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[psfimage+root],
 	        DEF_LENDEFNAME) == 0 || (root == strlen (Memc[psfimage])))
-	        call dp_iimname (Memc[image], "", "psf", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_iimname (Memc[image], Memc[outfname], "psf",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    psfim = immap (Memc[outfname], READ_ONLY, 0)
@@ -190,8 +190,8 @@ begin
 	    root = fnldir (Memc[nstarfile], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[nstarfile+root],
 	        DEF_LENDEFNAME) == 0 || (root == strlen (Memc[nstarfile]))) {
-	        call dp_outname (Memc[image], "", "nst", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_outname (Memc[image], Memc[outfname], "nst",
+		    Memc[outfname], SZ_FNAME)
 	    } else
 	        call strcpy (Memc[nstarfile], Memc[outfname], SZ_FNAME)
 	    if (DP_TEXT(dao) == YES)
@@ -209,8 +209,8 @@ begin
 	        root = fnldir (Memc[rejfile], Memc[outfname], SZ_FNAME)
 	        if (strncmp (DEF_DEFNAME, Memc[rejfile+root],
 		    DEF_LENDEFNAME) == 0 || (root == strlen (Memc[rejfile])))
-	            call dp_outname (Memc[image], "", "nrj", Memc[outfname],
-		        SZ_FNAME)
+	            call dp_outname (Memc[image], Memc[outfname], "nrj",
+		        Memc[outfname], SZ_FNAME)
 	        else
 	            call strcpy (Memc[rejfile], Memc[outfname], SZ_FNAME)
 	        if (DP_TEXT(dao) == YES)

@@ -1,4 +1,4 @@
-.help svd Nov95 "Slalib Package"
+.help svd Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slSVD (M, N, MP, NP, A, W, V, WORK, JSTAT)

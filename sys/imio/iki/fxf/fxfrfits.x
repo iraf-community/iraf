@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  
 include <syserr.h>
+include <time.h>
 include <ctype.h>
 include <imhdr.h>
 include <imio.h>
@@ -655,9 +656,6 @@ begin
 	    case KW_EXTEND:
 		call putline (spool, Memc[lbuf])
 		call fxf_getb (Memc[lbuf], FIT_EXTEND(fit)) 
-	    case KW_NEXTEND:
-		call fxf_geti (Memc[lbuf], IM_CLSIZE(im))
-		call putline (spool, Memc[lbuf])
 	    case KW_XTENSION:
 		FIT_XTENSION(fit) = YES 
 		call fxf_gstr (Memc[lbuf], FIT_EXTTYPE(fit), SZ_EXTTYPE)
@@ -872,31 +870,60 @@ begin
 end
 
 
-# FXF_DATE2LIMTIME -- Convert the string "hh:mm:ss (dd/mm/yyyy)" into a long
-# integer limtime compatible with routine cnvtime().  The year must be older
-# than 1980.
+# FXF_DATE2LIMTIME -- Convert the IRAF_TLM string (used to record the IMIO
+# time of last modification of the image) into a long integer limtime
+# compatible with routine cnvtime().  The year must be 1980 or later.
+# The input date string has one of the following forms:
+#
+# Old format:			"hh:mm:ss (dd/mm/yyyy)"
+# New (Y2K/ISO) format:		"YYYY-MM-DDThh:mm:ss
 
-procedure fxf_date2limtime (str, limtime)
+procedure fxf_date2limtime (datestr, limtime)
 
-char	str[ARB]	#I fixed format string "hh:mm:ss (dd/mm/yyyy)"
-int	limtime		#O Output limtime
+char	datestr[ARB]	#I fixed format date string
+long	limtime		#O output limtime (LST seconds from 1980.0)
 
-int	hr,mn,sec,days,month,year, ip, days_per_year, i
-int	month_to_days[12], adays
-int	ctoi()
+double	dsec
+int	hours,minutes,seconds,day,month,year, days_per_year
+int     month_to_days[12], adays, status, iso, flags, ip, i
+int	dtm_decode_hms(), btoi(), ctoi()
+long    gmttolst()
 
-data	month_to_days / 0,31,59,90,120,151,181,212,243,273,304,334/
+data    month_to_days / 0,31,59,90,120,151,181,212,243,273,304,334/
 
 begin
-	ip = 1;  ip = ctoi (str, ip, hr)
-	ip = 1;  ip = ctoi (str[4], ip, mn)
-	ip = 1;  ip = ctoi (str[7], ip, sec)
+	iso = btoi (datestr[3] != ':')
+	status = OK
 
-	sec = sec + mn * 60 + hr * 3600
+	if (iso == YES) {
+	    status = dtm_decode_hms (datestr,
+		year,month,day, hours,minutes,dsec, flags)
 
-	ip = 1;  ip = ctoi (str[11], ip, days)
-	ip = 1;  ip = ctoi (str[14], ip, month)
-	ip = 1;  ip = ctoi (str[17], ip, year)
+	    # If the decoded date string is old style FITS then the HMS
+	    # values are indefinite, and we need to set them to zero.
+
+	    if (and(flags,TF_OLDFITS) != 0) {
+		hours = 0
+		minutes = 0
+		seconds = 0
+	    } else
+		seconds = nint(dsec)
+
+	} else {
+	    ip = 1;  ip = ctoi (datestr,     ip, hours)
+	    ip = 1;  ip = ctoi (datestr[4],  ip, minutes)
+	    ip = 1;  ip = ctoi (datestr[7],  ip, seconds)
+	    ip = 1;  ip = ctoi (datestr[11], ip, day)
+	    ip = 1;  ip = ctoi (datestr[14], ip, month)
+	    ip = 1;  ip = ctoi (datestr[17], ip, year)
+	}
+
+	if (status == ERR || year < 1980) {
+	    limtime = 0
+	    return
+	}
+
+	seconds = seconds + minutes * 60 + hours * 3600
 
 	days_per_year = 0
 	do i = 1, year - 1980
@@ -906,8 +933,11 @@ begin
 	if (month > 2)
 	    adays = adays + 1
 
-	days = adays + days-1 + days_per_year + month_to_days[month]
-	limtime = sec + days * 86400
+	day = adays + day-1 + days_per_year + month_to_days[month]
+
+	limtime = seconds + day * 86400
+	if (iso == YES)
+	    limtime = gmttolst (limtime)
 end
 
 

@@ -1,4 +1,4 @@
-.help epj Nov95 "Slalib Package"
+.help epj Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slEPJ (DATE)

@@ -42,12 +42,12 @@ f/<-5\s\s\s\s/=(.\s=\r
 q/<-5\s\s\s\s/=(.\s=\r
 q/<-5\s\s\s\s/=(.\s=\r
 \n
-reid\sdemoarc1\sdemoarc1,demoarc2\ssec="mid\scol"\sv+\n
+reid\sdemoarc1\sdemoarc1,demoarc2\ssec="mid\scol"\snlost=5\sv+\n
 iden\sdemostd\ssec="mid\sline"\n
 m/<-;\s\s\s\s/=(-94\r 50\r
 q/<-5\s\s\s\s/=(.\s=\r
 \n
-reid\sdemostd\sdemostd\ssec="mid\sline"\sv+\n
+reid\sdemostd\sdemostd\ssec="mid\sline"\snlost=5\sv+\n
 fitcoords\scombine+\sfitname=demoarcfit\n
 demoarc1,demoarc2\n
 \n

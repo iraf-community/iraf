@@ -1,4 +1,4 @@
-.help sregister Dec96 images.immatch
+.help sregister Dec98 images.immatch
 .ih
 NAME
 sregister -- register a list of images to a reference image using celestial
@@ -185,8 +185,7 @@ surface is of high order setting these numbers to some reasonably high
 value is recommended.
 .le
 .ls interpolant = "linear"
-The interpolant used for rebinning the image.
-The choices are the following.
+The interpolant used for rebinning the image.  The choices are the following.
 .ls nearest
 Nearest neighbour.
 .le
@@ -201,6 +200,33 @@ Fifth order polynomial in x and y.
 .le
 .ls spline3
 Bicubic spline.
+.le
+.ls sinc
+2D sinc interpolation. Users can specify the sinc interpolant width by
+appending a width value to the interpolant string, e.g. sinc51 specifies
+a 51 by 51 pixel wide sinc interpolant. The sinc width will be rounded up to
+the nearest odd number.  The default sinc width is 31 by 31.
+.le
+.ls lsinc
+Look-up table sinc interpolation. Users can specify the look-up table sinc
+interpolant width by appending a width value to the interpolant string, e.g.
+lsinc51 specifies a 51 by 51 pixel wide look-up table sinc interpolant. The user
+supplied sinc width will be rounded up to the nearest odd number. The default
+sinc width is 31 by 31 pixels. Users can specify the resolution of the lookup
+table sinc by appending the look-up table size in square brackets to the
+interpolant string, e.g. lsinc51[20] specifies a 20 by 20 element sinc
+look-up table interpolant with a pixel resolution of 0.05 pixels in x and y.
+The default look-up table size and resolution are 20 by 20 and 0.05 pixels
+in x and y respectively.
+.le
+.ls drizzle
+2D drizzle resampling. Users can specify the drizzle pixel fraction in x and y
+by appending a value between 0.0 and 1.0 in square brackets to the
+interpolant string, e.g. drizzle[0.5]. The default value is 1.0.
+The value 0.0 is increased internally to 0.001. Drizzle resampling
+with a pixel fraction of 1.0 in x and y is equivalent to fractional pixel
+rotated block summing (fluxconserve = yes) or averaging (flux_conserve = no)  if
+xmag and ymag are > 1.0.
 .le
 .le
 .ls boundary = "nearest"
@@ -710,6 +736,37 @@ residuals.
 
             ... type q to quit, save the fit, and compute the registered
 		image
+.fi
+
+
+3. Mosaic a set of 9 images convering a ~ 1 degree field into a single image
+centered at  12:32:53.1 +43:13:03. Set the output image scale to 0.5
+arc-seconds / pixel which is close the detector scale of 0.51 arc-seconds
+per pixel. Set the orientation to be north up and east to the left.
+The 9 images all have accurate world coordinate information in their headers.
+
+.nf
+        # Create a dummy reference image big enough to cover 1 square degree
+
+        cl> mkpattern refimage ncols=7200 nlines=7200 ...
+
+        # Give the dummy reference image the desired coordinate system
+
+        cl> ccsetwcs refimage "" xref=3600.5 yref=3600.5 xmag=-0.5 \ 
+        ymag=0.5 lngref=12:32:53.1 latref=43:13:03 ...
+
+        # Register the images using constant boundary extension and set
+	# uservalue to some reasonable value outside the good data range.
+        # It may be possible to improve performance by increasing nxblock 
+        # and nyblock.
+
+        cl> sregister @inlist refimage @outlist boundary=constant \
+        constant=<uservalue> nxblock=7200 nyblock=1024 ...
+
+        # Combine the images using imcombine
+
+        cl> imcombine @outlist mosaic lthreshold=<uservalue> ...
+
 .fi
 
 .ih

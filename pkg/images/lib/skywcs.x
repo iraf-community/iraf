@@ -50,6 +50,7 @@ begin
 	# Decode the user wcs.
 	} then {
 
+	    # Initialize.
 	    mw = NULL
 	    if (imcoo == NULL) {
 	        SKY_NLNGAX(coo) = 2048
@@ -77,6 +78,8 @@ begin
 	        SKY_WTYPE(coo) = SKY_WTYPE(imcoo)
 	    }
 	    SKY_PTYPE(coo) = PIXTYPE_WORLD
+
+	    # Decode the actual wcs.
 	    stat = sk_strwcs (instr, SKY_CTYPE(coo), SKY_RADECSYS(coo),
 	        SKY_EQUINOX(coo), SKY_EPOCH(coo))
 	    switch (SKY_CTYPE(coo)) {
@@ -135,6 +138,8 @@ begin
 
 	# Set up a dummy wcs.
 	} then {
+
+	    #Initialize.
 	    SKY_CTYPE(coo) = 0
 	    SKY_RADECSYS(coo) = 0
 	    SKY_EQUINOX(coo) = INDEFD
@@ -224,7 +229,11 @@ end
 
 
 # SK_STRWCS -- Decode the sky coordinate system from an input string.
-# The string syntax is [ctype] equinox [epoch].
+# The string syntax is [ctype] equinox [epoch]. The various options
+# have been placed case statements. Although there is considerable
+# duplication of code in the case statements, there are minor differences
+# and I found it clearer to write it out rather than trying to be
+# concise. I might want to clean this up a bit later.
 
 int procedure sk_strwcs (instr, ctype, radecsys, equinox, epoch)
 
@@ -278,6 +287,9 @@ begin
 	    case FTYPE_FK5:
 	        ctype = CTYPE_EQUATORIAL
 		radecsys = EQTYPE_FK5
+	    case FTYPE_ICRS:
+	        ctype = CTYPE_EQUATORIAL
+		radecsys = EQTYPE_ICRS
 	    case FTYPE_GAPPT:
 	        ctype = CTYPE_EQUATORIAL
 		radecsys = EQTYPE_GAPPT
@@ -295,9 +307,10 @@ begin
 	sctype = ctype
 	sradecsys = radecsys
 
-	# Decode the ra/dec system and equinox
+	# Decode the coordinate system.
 	switch (sctype) {
 
+	# Decode the equatorial system, equinox, and epoch.
 	case CTYPE_EQUATORIAL:
 
 	    switch (sradecsys) {
@@ -314,7 +327,6 @@ begin
 
 	        call gargwrd (Memc[str2], SZ_LINE)
 	        if (nscan() <= nitems)
-		    #epoch = equinox
 		    epoch = sl_eb2d (equinox)
 		else {
 		    if (Memc[str2] == 'J' || Memc[str2] == 'j' ||
@@ -323,20 +335,17 @@ begin
 		    else
 		        ip = 1
 		    if (ctod (Memc[str2], ip, epoch) <= 0)
-		        #epoch = equinox
 		        epoch = sl_eb2d (equinox)
 		    else if (epoch <= 3000.0d0 && (Memc[str2] == 'J' ||
 		        Memc[str2] == 'j'))
-		        #epoch = sl_epb (sl_ej2d (epoch))
 		        epoch = sl_ej2d (epoch)
 		    else if (epoch > 3000.0d0)
-		        #epoch = sl_epb (epoch - 2400000.5d0)
 		        epoch = epoch - 2400000.5d0
 		    else
 			epoch = sl_eb2d (epoch)
 		}
 
-	    case EQTYPE_FK5:
+	    case EQTYPE_FK5, EQTYPE_ICRS:
 		if (Memc[str1] == 'J' || Memc[str1] == 'j' ||
 		    Memc[str1] == 'B' || Memc[str1] == 'b')
 		    ip = 2
@@ -349,7 +358,6 @@ begin
 
 	        call gargwrd (Memc[str2], SZ_LINE)
 	        if (nscan() <= nitems)
-		    #epoch = equinox
 		    epoch = sl_ej2d (equinox)
 		else {
 		    if (Memc[str2] == 'J' || Memc[str2] == 'j' ||
@@ -358,14 +366,11 @@ begin
 		    else
 		        ip = 1
 		    if (ctod (Memc[str2], ip, epoch) <= 0)
-		        #epoch = equinox
 		        epoch = sl_ej2d (equinox)
 		    else if (epoch <= 3000.0d0 && (Memc[str2] == 'B' ||
 		        Memc[str2] == 'b'))
-		        #epoch = sl_epj (sl_eb2d (epoch))
 		        epoch = sl_eb2d (epoch)
 		    else if (epoch > 3000.0d0)
-		        #epoch = sl_epj (epoch - 2400000.5d0)
 		        epoch = epoch - 2400000.5d0
 		    else
 			epoch = sl_ej2d (epoch)
@@ -403,7 +408,6 @@ begin
 
 	            call gargwrd (Memc[str2], SZ_LINE)
 	            if (nscan() <= nitems)
-			#epoch = equinox
 		        epoch = sl_eb2d (equinox)
 		    else {
 		        if (Memc[str2] == 'J' || Memc[str2] == 'j')
@@ -413,14 +417,11 @@ begin
 		        else
 		            ip = 1
 		        if (ctod (Memc[str2], ip, epoch) <= 0)
-		            #epoch = equinox
 		            epoch = sl_eb2d (equinox)
 		        else if (epoch <= 3000.0d0 && (Memc[str2] == 'J' ||
 			    Memc[str2] == 'j'))
-		            #epoch = sl_epb (sl_ej2d (epoch))
 		            epoch = sl_ej2d (epoch)
 		        else if (epoch > 3000.0d0)
-		            #epoch = sl_epb (epoch - 2400000.5d0)
 		            epoch = epoch - 2400000.5d0
 			else
 			    epoch = sl_eb2d (epoch)
@@ -434,7 +435,6 @@ begin
 
 	            call gargwrd (Memc[str2], SZ_LINE)
 	            if (nscan() <= nitems)
-		        #epoch = equinox
 		        epoch = sl_ej2d (equinox)
 		    else {
 		        if (Memc[str2] == 'J' || Memc[str2] == 'j' ||
@@ -443,14 +443,11 @@ begin
 		        else
 		            ip = 1
 		        if (ctod (Memc[str2], ip, epoch) <= 0)
-		            #epoch = equinox
 		            epoch = sl_ej2d (equinox)
 		        else if (epoch <= 3000.0d0 && (Memc[str2] == 'B' ||
 			    Memc[str2] == 'b'))
-		            #epoch = sl_epj (sl_eb2d (epoch))
 		            epoch = sl_eb2d (epoch)
 		        else if (epoch > 3000.0d0)
-		            #epoch = sl_epj (epoch - 2400000.5d0)
 		            epoch = epoch - 2400000.5d0
 			else
 			    epoch = sl_ej2d (epoch)
@@ -466,7 +463,6 @@ begin
 		    radecsys = EQTYPE_FK4
 	            call gargwrd (Memc[str2], SZ_LINE)
 	            if (nscan() <= nitems)
-		        #epoch = equinox
 		        epoch = sl_eb2d (equinox)
 		    else {
 		        if (Memc[str2] == 'J' || Memc[str2] == 'j' ||
@@ -475,14 +471,11 @@ begin
 		        else
 		            ip = 1
 		        if (ctod (Memc[str2], ip, epoch) <= 0)
-		            #epoch = equinox
 		            epoch = sl_eb2d (equinox)
 		        else if (epoch <= 3000.0d0 && (Memc[str2] == 'J' ||
 			    Memc[str2] == 'j'))
-		            #epoch = sl_epb (sl_ej2d (epoch))
 		            epoch = sl_ej2d (epoch)
 		        else if (epoch > 3000.0d0)
-		            #epoch = sl_epb (epoch - 2400000.5d0)
 		            epoch = epoch - 2400000.5d0
 			else
 			    epoch = sl_eb2d (epoch)
@@ -492,7 +485,6 @@ begin
 		    radecsys = EQTYPE_FK5
 	            call gargwrd (Memc[str2], SZ_LINE)
 	            if (nscan() <= nitems)
-		        #epoch = equinox
 		        epoch = sl_ej2d (equinox)
 		    else {
 		        if (Memc[str2] == 'J' || Memc[str2] == 'j' ||
@@ -501,14 +493,11 @@ begin
 		        else
 		            ip = 1
 		        if (ctod (Memc[str2], ip, epoch) <= 0)
-		            #epoch = equinox
 		            epoch = sl_ej2d (equinox)
 		        else if (epoch <= 3000.0d0 && (Memc[str2] == 'B' ||
 			    Memc[str2] == 'b'))
-		            #epoch = sl_epj (sl_eb2d (epoch))
 		            epoch = sl_eb2d (epoch)
 		        else if (epoch > 3000.0d0)
-		            #epoch = sl_epj (epoch - 2400000.5d0)
 		            epoch = epoch - 2400000.5d0
 			else
 			    epoch = sl_ej2d (epoch)
@@ -516,6 +505,7 @@ begin
 		}
 	    }
 
+	# Decode the ecliptic coordinate system.
 	case CTYPE_ECLIPTIC:
 	    if (Memc[str1] == 'J' || Memc[str1] == 'j' ||
 	        Memc[str1] == 'B' || Memc[str1] == 'b')
@@ -537,6 +527,7 @@ begin
 		epoch = epoch - 2400000.5d0
 	    }
 
+	# Decode the galactic and supergalactic coordinate system.
 	case CTYPE_GALACTIC, CTYPE_SUPERGALACTIC:
 	    if (Memc[str1] == 'J' || Memc[str1] == 'j' ||
 		Memc[str1] == 'B' || Memc[str1] == 'b')
@@ -550,7 +541,7 @@ begin
 		    epoch = sl_ej2d (epoch)
 	        else if (Memc[str1] == 'B' || Memc[str1] == 'b')
 		    epoch = sl_eb2d (epoch)
-	        else if (epoch < 1980.0d0) 
+	        else if (epoch < 1984.0d0) 
 		    epoch = sl_eb2d (epoch)
 		else
 		    epoch = sl_ej2d (epoch)
@@ -593,10 +584,11 @@ int	radecsys		#O the output equatorial reference system
 double	equinox			#O the output equinox
 double	epoch			#O the output epoch of the observation
 
-int	i, ndim, axtype, token, day, month, year, ier
+int	i, ndim, axtype, day, month, year, ier, oldfits
 pointer	sp, atval
+double	hours
 double	imgetd(), sl_eb2d(), sl_ej2d()
-int	mw_stati(), strdic()
+int	mw_stati(), strdic(), dtm_decode()
 errchk	mw_gwattrs(), imgstr(), imgetd()
 
 begin
@@ -709,47 +701,32 @@ begin
 	                call imgstr (im, "DATE-OBS", Memc[atval], SZ_LINE)
 		    } then {
 		        epoch = INDEFD
-		    } else {
-		        call sscan (Memc[atval])
-			    call gargi (day)
-			    call gargtok (token, Memc[atval], SZ_DMYTOKEN)
-			    call gargi (month)
-			    call gargtok (token, Memc[atval], SZ_DMYTOKEN)
-			    call gargi (year)
+		    } else if (dtm_decode (Memc[atval], year, month, day,
+			hours, oldfits) == OK) {
 		        call sl_cadj (year, month, day, epoch, ier)
 		        if (ier != 0)
 			    epoch = INDEFD
-		    }
+			else if (! IS_INDEFD(hours) && hours >= 0.0d0 &&
+			    hours <= 24.0d0)
+			    epoch = epoch + hours / 24.0d0
+		    } else
+		        epoch = INDEFD
 	        }
 	    }
 
 	    # Set the default equinox and epoch appropriate for each
 	    # equatorial system if these are undefined.
 	    switch (radecsys) {
-	    case EQTYPE_FK4:
+	    case EQTYPE_FK4, EQTYPE_FK4NOE:
 		if (IS_INDEFD(equinox))
 		    equinox = 1950.0d0
 		if (IS_INDEFD(epoch))
-		    #epoch = 1950.0d0
 		    epoch = sl_eb2d (1950.0d0)
-		#else
-		    #epoch = sl_epb (epoch)
-	    case EQTYPE_FK4NOE:
-		if (IS_INDEFD(equinox))
-		    equinox = 1950.0d0
-		if (IS_INDEFD(epoch))
-		    #epoch = 1950.0d0
-		    epoch = sl_eb2d (1950.0d0)
-		#else
-		    #epoch = sl_epb (epoch)
-	    case EQTYPE_FK5:
+	    case EQTYPE_FK5, EQTYPE_ICRS:
 		if (IS_INDEFD(equinox))
 		    equinox = 2000.0d0
 		if (IS_INDEFD(epoch))
-		    #epoch = 2000.0d0
 		    epoch = sl_ej2d (2000.0d0)
-		#else
-		    #epoch = sl_epj (epoch)
 	    case EQTYPE_GAPPT:
 		equinox = 2000.0d0
 		;
@@ -779,17 +756,16 @@ begin
 	                call imgstr (im, "DATE-OBS", Memc[atval], SZ_LINE)
 		    } then {
 		        epoch = INDEFD
-		    } else {
-		        call sscan (Memc[atval])
-			    call gargi (day)
-			    call gargtok (token, Memc[atval], SZ_DMYTOKEN)
-			    call gargi (month)
-			    call gargtok (token, Memc[atval], SZ_DMYTOKEN)
-			    call gargi (year)
+		    } else if (dtm_decode (Memc[atval], year, month, day,
+			hours, oldfits) == OK) {
 		        call sl_cadj (year, month, day, epoch, ier)
 		        if (ier != 0)
 			    epoch = INDEFD
-		    }
+			else if (! IS_INDEFD(hours) && hours >= 0.0d0 &&
+			    hours <= 24.0d0)
+			    epoch = epoch + hours / 24.0d0
+		    } else
+		        epoch = INDEFD
 	        }
 	    }
 
@@ -815,21 +791,22 @@ begin
 	                call imgstr (im, "DATE-OBS", Memc[atval], SZ_LINE)
 		    } then {
 		        epoch = sl_eb2d (1950.0d0)
-		    } else {
-		        call sscan (Memc[atval])
-			    call gargi (day)
-			    call gargtok (token, Memc[atval], SZ_DMYTOKEN)
-			    call gargi (month)
-			    call gargtok (token, Memc[atval], SZ_DMYTOKEN)
-			    call gargi (year)
+		    } else if (dtm_decode (Memc[atval], year, month, day,
+		        hours, oldfits) == OK) {
 		        call sl_cadj (year, month, day, epoch, ier)
 		        if (ier != 0)
 			    epoch = sl_eb2d (1950.0d0)
-			else if (epoch < 1984.0d0)
-		    	    epoch = sl_eb2d (epoch)
-			else
-		    	    epoch = sl_ej2d (epoch)
-		    }
+			else {
+			    if (! IS_INDEFD(hours) && hours >= 0.0d0 &&
+				hours <= 24.0d0)
+			        epoch = epoch + hours / 24.0d0
+			    if (epoch < 1984.0d0)
+		    	        epoch = sl_eb2d (epoch)
+			    else
+		    	        epoch = sl_ej2d (epoch)
+			}
+		    } else
+		        epoch = sl_eb2d (1950.0d0)
 	        }
 	    }
 	}
@@ -913,31 +890,25 @@ begin
 	    case EQTYPE_FK4:
 		call imastr (im, "radecsys", "FK4")
 		call imaddd (im, "equinox", SKY_EQUINOX(coo))
-		#iferr (call imdelf (im, "epoch"))
-		    #;
-		#call imaddd (im, "mjd-wcs", sl_eb2d (SKY_EPOCH(coo)))
 		call imaddd (im, "mjd-wcs", SKY_EPOCH(coo))
 	    case EQTYPE_FK4NOE:
 		call imastr (im, "radecsys", "FK4NOE")
 		call imaddd (im, "equinox", SKY_EQUINOX(coo))
-		#iferr (call imdelf (im, "epoch"))
-		    #;
-		#call imaddd (im, "mjd-wcs", sl_eb2d (SKY_EPOCH(coo)))
 		call imaddd (im, "mjd-wcs", SKY_EPOCH(coo))
 	    case EQTYPE_FK5:
 		call imastr (im, "radecsys", "FK5")
 		call imaddd (im, "equinox", SKY_EQUINOX(coo))
-		#iferr (call imdelf (im, "epoch"))
-		    #;
 	        iferr (call imdelf (im, "mjd-wcs"))
 		    ;
-		#call imaddd (im, "mjd-wcs", SKY_EPOCH(coo))
+	    case EQTYPE_ICRS:
+		call imastr (im, "radecsys", "ICRS")
+		call imaddd (im, "equinox", SKY_EQUINOX(coo))
+	        iferr (call imdelf (im, "mjd-wcs"))
+		    ;
 	    case EQTYPE_GAPPT:
 		call imastr (im, "radecsys", "GAPPT")
 		iferr (call imdelf (im, "equinox"))
 		    ;
-		#iferr (call imdelf (im, "epoch"))
-		    #;
 		call imaddd (im, "mjd-wcs", SKY_EPOCH(coo))
 	    }
 
@@ -948,8 +919,6 @@ begin
 		;
 	    iferr (call imdelf (im, "equinox"))
 		;
-	    #iferr (call imdelf (im, "epoch"))
-		#;
 	    call imaddd (im, "mjd-wcs", SKY_EPOCH(coo))
 
 	case CTYPE_GALACTIC:
@@ -959,11 +928,8 @@ begin
 		;
 	    iferr (call imdelf (im, "equinox"))
 		;
-	    #iferr (call imdelf (im, "epoch"))
-		#;
 	    iferr (call imdelf (im, "mjd-wcs"))
 		;
-	    #call imaddd (im, "mjd-wcs", SKY_EPOCH(coo))
 
 	case CTYPE_SUPERGALACTIC:
 	    call mw_swattrs (mw, SKY_PLNGAX(coo), "axtype", "slon")
@@ -972,11 +938,8 @@ begin
 		;
 	    iferr (call imdelf (im, "equinox"))
 		;
-	    #iferr (call imdelf (im, "epoch"))
-		#;
 	    iferr (call imdelf (im, "mjd-wcs"))
 		;
-	    #call imaddd (im, "mjd-wcs", SKY_EPOCH(coo))
 	}
 end
 
@@ -1319,7 +1282,7 @@ begin
 		        call pargd (sl_epj (epoch))
 		        call pargd (sl_epb (epoch))
 		    }
-	    case EQTYPE_FK5:
+	    case EQTYPE_FK5, EQTYPE_ICRS:
 		call printf ("    Equinox: J%0.3f Epoch: J%0.8f MJD: %0.5f\n")
 		    call pargd (equinox)
 		    call pargd (sl_epj(epoch))
@@ -1411,7 +1374,7 @@ begin
 		        call pargd (sl_epj(epoch))
 		        call pargd (sl_epb(epoch))
 		    }
-	    case EQTYPE_FK5:
+	    case EQTYPE_FK5, EQTYPE_ICRS:
 		call fprintf (fd,
 		    "#     Equinox: J%0.3f Epoch: J%0.8f MJD: %0.5f\n")
 		    call pargd (equinox)
@@ -1527,7 +1490,7 @@ begin
 		        call pargd (sl_epj(epoch))
 		        call pargd (sl_epb(epoch))
 		    }
-	    case EQTYPE_FK5:
+	    case EQTYPE_FK5, EQTYPE_ICRS:
 	        call printf ("    Coordinates: equatorial %s Equinox: J%0.3f\n")
 		    call pargstr (Memc[radecstr])
 		    call pargd (equinox)
@@ -1664,7 +1627,7 @@ begin
 		        call pargd (sl_epj(epoch))
 		        call pargd (sl_epb(epoch))
 		    }
-	    case EQTYPE_FK5:
+	    case EQTYPE_FK5, EQTYPE_ICRS:
 	        call fprintf (fd,
 		    "#     Coordinates: equatorial %s Equinox: J%0.3f\n")
 		    call pargstr (Memc[radecstr])
@@ -1902,6 +1865,19 @@ begin
 		if (SKY_EQUINOX(cooin) != 2000.0d0)
 		    call sl_prcs (2, SKY_EQUINOX(cooin), 2000.0d0, olng, olat) 
 
+	    case EQTYPE_ICRS:
+	        if (pmflag == YES) {
+		    call sl_pm (ilng, ilat, ipmlng, ipmlat, px, rv,
+		        sl_epj (SKY_EPOCH(cooin)), sl_epj(SKY_EPOCH(cooout)),
+			olng, olat)
+	        } else {
+	            olng = ilng
+	            olat = ilat
+		}
+		if (SKY_EQUINOX(cooin) != 2000.0d0)
+		    call sl_prcs (2, SKY_EQUINOX(cooin), 2000.0d0, olng, olat) 
+		call sl_hf5z (olng, olat, 2000.0d0, olng, olat, pmr, pmd)
+
 	    case EQTYPE_GAPPT:
 		call sl_amp (ilng, ilat, SKY_EPOCH(cooin), 2000.0d0, olng, olat)
 
@@ -1935,7 +1911,7 @@ begin
 
 	    # The output coordinate system is equatorial.
 	    case CTYPE_EQUATORIAL:
-		#call sl_eceq (ilng, ilat, SKY_EPOCH(cooin), olng, olat)
+
 		switch (SKY_RADECSYS(cooout)) {
 		case EQTYPE_FK4, EQTYPE_FK4NOE:
 		    call sl_f54z (olng, olat, sl_epb(SKY_EPOCH(cooout)),
@@ -1947,10 +1923,20 @@ begin
 		    if (SKY_RADECSYS(cooout) == EQTYPE_FK4)
 		        call sl_adet (olng, olat, SKY_EQUINOX(cooout),
 			    olng, olat)
+
 		case EQTYPE_FK5:
 		    if (SKY_EQUINOX(cooout) != 2000.0d0)
 			call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout),
 			    olng, olat) 
+
+		case EQTYPE_ICRS:
+		    #call sl_f5hz (olng, olat, sl_epj(SKY_EPOCH(cooin)),
+		        #olng, olat)
+		    call sl_f5hz (olng, olat, 2000.0d0, olng, olat)
+		    if (SKY_EQUINOX(cooout) != 2000.0d0)
+			call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout),
+			    olng, olat) 
+
 		case EQTYPE_GAPPT:
 		    call sl_map (olng, olat, 0.0d0, 0.0d0, px, 0.0d0,
 			2000.0d0, SKY_EPOCH(cooout), olng, olat)
@@ -1958,12 +1944,10 @@ begin
 
 	    # The output coordinate system is galactic.
 	    case CTYPE_GALACTIC:
-		#call sl_eceq (ilng, ilat, SKY_EPOCH(cooin), olng, olat)
 		call sl_eqga (olng, olat, olng, olat)
 
 	    # The output system is supergalactic.
 	    case CTYPE_SUPERGALACTIC:
-		#call sl_eceq (ilng, ilat, SKY_EPOCH(cooin), olng, olat)
 		call sl_eqga (olng, olat, olng, olat)
 		call sl_gasu (olng, olat, olng, olat)
 
@@ -1980,6 +1964,7 @@ begin
 	    # The output coordinate system is equatorial.
 	    case CTYPE_EQUATORIAL:
 	        call sl_gaeq (ilng, ilat, olng, olat)
+
 		switch (SKY_RADECSYS(cooout)) {
 		case EQTYPE_FK4, EQTYPE_FK4NOE:
 		    call sl_f54z (olng, olat, sl_epb(SKY_EPOCH(cooout)),
@@ -1991,10 +1976,18 @@ begin
 		    if (SKY_RADECSYS(cooout) == EQTYPE_FK4)
 		        call sl_adet (olng, olat, SKY_EQUINOX(cooout),
 			    olng, olat)
+
 		case EQTYPE_FK5:
 		    if (SKY_EQUINOX(cooout) != 2000.0d0)
 			call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout),
 			    olng, olat) 
+
+		case EQTYPE_ICRS:
+		    call sl_f5hz (olng, olat, 2000.0d0, olng, olat)
+		    if (SKY_EQUINOX(cooout) != 2000.0d0)
+			call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout),
+			    olng, olat) 
+
 		case EQTYPE_GAPPT:
 		    call sl_map (olng, olat, 0.0d0, 0.0d0, px, 0.0d0,
 			2000.0d0, SKY_EPOCH(cooout), olng, olat)
@@ -2021,7 +2014,9 @@ begin
 
 	    case CTYPE_EQUATORIAL:
 		call sl_suga (ilng, ilat, olng, olat)
+
 		switch (SKY_RADECSYS(cooout)) {
+
 		case EQTYPE_FK4:
 		    call sl_gaeq (olng, olat, olng, olat)
 		    call sl_f54z (olng, olat, sl_epb (SKY_EPOCH(cooout)),
@@ -2031,6 +2026,7 @@ begin
 			call sl_prcs (1, 1950.0d0, SKY_EQUINOX(cooout),
 			    olng, olat) 
 		    call sl_adet (olng, olat, SKY_EQUINOX(cooout), olng, olat)
+
 		case EQTYPE_FK4NOE:
 		    call sl_gaeq (olng, olat, olng, olat)
 		    call sl_f54z (olng, olat, sl_epb (SKY_EPOCH(cooout)),
@@ -2039,11 +2035,20 @@ begin
 		    if (SKY_EQUINOX(cooout) != 1950.0d0)
 			call sl_prcs (1, 1950.0d0, SKY_EQUINOX(cooout),
 			    olng, olat) 
+
 		case EQTYPE_FK5:
 		    call sl_gaeq (olng, olat, olng, olat)
 		    if (SKY_EQUINOX(cooout) != 2000.0d0)
 			call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout),
 			    olng, olat) 
+
+		case EQTYPE_ICRS:
+		    call sl_gaeq (olng, olat, olng, olat)
+		    call sl_f5hz (olng, olat, 2000.0d0, olng, olat)
+		    if (SKY_EQUINOX(cooout) != 2000.0d0)
+			call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout),
+			    olng, olat) 
+
 		case EQTYPE_GAPPT:
 		    call sl_gaeq (olng, olat, olng, olat)
 		    call sl_map (olng, olat, 0.0d0, 0.0d0, px, 0.0d0,
@@ -2133,7 +2138,7 @@ begin
 
 	    switch (SKY_RADECSYS(cooout)) {
 
-	    # The output coordinate system if FK4 with and without the E terms.
+	    # The output coordinate system is FK4 with and without the E terms.
 	    case EQTYPE_FK4, EQTYPE_FK4NOE:
 		call sl_f54z (olng, olat, sl_epb (SKY_EPOCH(cooout)),
 		    olng, olat, pmr, pmd)
@@ -2144,12 +2149,18 @@ begin
 		if (SKY_RADECSYS(cooout) == EQTYPE_FK4)
 	            call sl_adet (olng, olat, SKY_EQUINOX(cooout), olng, olat)
 
-	    # The output coordinate system if FK5.
+	    # The output coordinate system is FK5.
 	    case EQTYPE_FK5:
 		if (SKY_EQUINOX(cooout) != 2000.0d0)
 		    call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout), olng, olat) 
 
-	    # The output coordinate system if geocentric apparent.
+	    # The output coordinate system is ICRS (Hipparcos).
+	    case EQTYPE_ICRS:
+		call sl_f5hz (olng, olat, 2000.0d0, olng, olat)
+		if (SKY_EQUINOX(cooout) != 2000.0d0)
+		    call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout), olng, olat) 
+
+	    # The output coordinate system is geocentric apparent.
 	    case EQTYPE_GAPPT:
 		call sl_map (olng, olat, 0.0d0, 0.0d0, px, 0.0d0, 2000.0d0,
 		    SKY_EPOCH(cooout), olng, olat)
@@ -2190,6 +2201,14 @@ begin
 		    call sl_prcs (2, SKY_EQUINOX(cooin), SKY_EQUINOX(cooout),
 		        olng, olat) 
 
+	    # The output coordinate system is ICRS.
+	    case EQTYPE_ICRS:
+	        if (SKY_EQUINOX(cooin) != 2000.0d0)
+		    call sl_prcs (2, SKY_EQUINOX(cooin), 2000.0d0, olng, olat) 
+		call sl_f5hz (olng, olat, sl_epj(SKY_EPOCH(cooin)), olng, olat)
+	        if (SKY_EQUINOX(cooout) != 2000.0d0)
+		    call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout), olng, olat) 
+
 	    # The output coordinate system is geocentric apparent.
 	    case EQTYPE_GAPPT:
 	        if (SKY_EQUINOX(cooin) != 2000.0d0)
@@ -2197,5 +2216,60 @@ begin
 		call sl_map (olng, olat, 0.0d0, 0.0d0, px, 0.0d0, 2000.0d0,
 		    SKY_EPOCH(cooout), olng, olat)
 	    }
+
+	# The input coordinate system is ICRS.
+	case EQTYPE_ICRS:
+
+	    if (pmflag == YES) {
+		call sl_pm (ilng, ilat, ipmlng, ipmlat, px, rv,
+		    sl_epj (SKY_EPOCH(cooin)), sl_epj (SKY_EPOCH(cooout)),
+		    olng, olat)
+	    } else {
+	        olng = ilng
+	        olat = ilat
+	    }
+
+	    switch (SKY_RADECSYS(cooout)) {
+
+	    # The output coordinate system is FK4 with or without the E terms.
+	    case EQTYPE_FK4, EQTYPE_FK4NOE:
+	        if (SKY_EQUINOX(cooin) != 2000.0d0)
+		    call sl_prcs (2, SKY_EQUINOX(cooin), 2000.0d0, olng, olat) 
+		call sl_hf5z (olng, olat, 2000.0d0, olng, olat,
+		    pmr, pmd)
+		call sl_f54z (olng, olat, sl_epb(SKY_EPOCH(cooout)), olng, olat,
+		    pmr, pmd)
+		call sl_suet (olng, olat, 1950.0d0, olng, olat)
+		if (SKY_EQUINOX(cooout) != 1950.0d0)
+		    call sl_prcs (1, 1950.0d0, SKY_EQUINOX(cooout), olng, olat) 
+		if (SKY_RADECSYS(cooout) == EQTYPE_FK4)
+	            call sl_adet (olng, olat, SKY_EQUINOX(cooout), olng, olat)
+
+	    # The output coordinate system is FK5.
+	    case EQTYPE_FK5:
+	        if (SKY_EQUINOX(cooin) != 2000.0d0)
+		    call sl_prcs (2, SKY_EQUINOX(cooin), 2000.0d0, olng, olat) 
+		call sl_hf5z (olng, olat, sl_epj(SKY_EPOCH(cooout)),
+		    olng, olat, pmr, pmd)
+	        if (SKY_EQUINOX(cooout) != 2000.0d0)
+		    call sl_prcs (2, 2000.0d0, SKY_EQUINOX(cooout), olng, olat) 
+
+	    # The output coordinate system is ICRS.
+	    case EQTYPE_ICRS:
+		if (SKY_EQUINOX(cooin) != SKY_EQUINOX(cooout))
+		    call sl_prcs (2, SKY_EQUINOX(cooin), SKY_EQUINOX(cooout),
+		        olng, olat) 
+
+	    # The output coordinate system is geocentric apparent.
+	    case EQTYPE_GAPPT:
+	        if (SKY_EQUINOX(cooin) != 2000.0d0)
+		    call sl_prcs (2, SKY_EQUINOX(cooin), 2000.0d0, olng, olat) 
+		call sl_hf5z (olng, olat, sl_epj(SKY_EPOCH(cooout)),
+		    olng, olat, pmr, pmd)
+		call sl_map (olng, olat, 0.0d0, 0.0d0, px, 0.0d0, 2000.0d0,
+		    SKY_EPOCH(cooout), olng, olat)
+
+	    }
+
 	}
 end

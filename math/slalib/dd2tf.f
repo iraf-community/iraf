@@ -8,12 +8,12 @@
 *  (double precision)
 *
 *  Given:
-*     NDP       int      number of decimal places of seconds
-*     DAYS      dp       interval in days
+*     NDP      i      number of decimal places of seconds
+*     DAYS     d      interval in days
 *
 *  Returned:
-*     SIGN      char     '+' or '-'
-*     IHMSF     int(4)   hours, minutes, seconds, fraction
+*     SIGN     c      '+' or '-'
+*     IHMSF    i(4)   hours, minutes, seconds, fraction
 *
 *  Notes:
 *
@@ -32,9 +32,9 @@
 *         case where DAYS is very nearly 1D0 and rounds up to 24 hours,
 *         by testing for IHMSF(1)=24 and setting IHMSF(1-4) to zero.
 *
-*  P.T.Wallace   Starlink   11 September 1990
+*  P.T.Wallace   Starlink   19 March 1999
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

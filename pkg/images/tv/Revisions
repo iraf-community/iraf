@@ -1,5 +1,37 @@
 .help revisions Jun88 images.tv
 .nf
+images$tv/display/sigm2.x
+    An argument to sigm2_setup was being changed by the routine and this
+    changed argument was then incorrectly used by the calling program.
+    The argument was made input only.  (6/15/99, Valdes)
+
+images$tv/imexamine/iepos.x
+    The output of the 'x' and 'y' keys was not being written to the log
+    file because of a typo.  (5/7/99, Valdes)
+
+images$tv/display/t_display.x
+    Added checks for a data range of zero, or which rounds to zero for
+    short data, to avoid floating divide by zero errors.  Rather than
+    resort to a unitary transformation in this case the requested
+    data range minimum is decreased by one and the maximum is increased
+    by one.  (8/11/98, Valdes)
+
+images$tv/imexamine/stfmeasure.x
+    The logic in STF_FIT for determining the points to fit and the point
+    to use for the initial width estimate was faulty allowing some bad
+    cases to get through.  (7/31/98, Valdes)
+
+images$tv/imedit/epix.h
+images$tv/imedit/t_imedit.x
+images$tv/imedit/epcolon.x
+images$tv/doc/imedit.hlp
+    The temporary editing buffer image was made into a unique temporary
+    image rather than the fixed name of "epixbuf".  (6/30/98, Valdes)
+
+=======
+V2.11.1
+=======
+
 images$tv/imexamine/iepos.x
      Added missing argument in fprintf call.  (8/29/97, Valdes)
 

@@ -9,7 +9,11 @@ procedure ap_otime (im, ap)
 pointer	im		# pointer to IRAF image
 pointer	ap		# pointer to apphot structure
 
+char	timechar
+int	index
 pointer	sp, key, otime
+bool	streq()
+int	strldx()
 
 begin
 	call smark (sp)
@@ -30,10 +34,19 @@ begin
 		    call pargstr (Memc[key])
 	    }
 	}
-	if (Memc[otime] == EOS)
+	if (Memc[otime] == EOS) {
 	    call apsets (ap, OTIME, "INDEF")
-	else
+	} else if (streq ("DATE-OBS", Memc[key]) || streq ("date-obs",
+	    Memc[key])) {
+	    timechar = 'T'
+	    index = strldx (timechar, Memc[otime])
+	    if (index > 0)
+		call apsets (ap, OTIME, Memc[otime+index])
+	    else
+	        call apsets (ap, OTIME, "INDEF")
+	} else {
 	    call apsets (ap, OTIME, Memc[otime])
+	}
 
 	call sfree (sp)
 end

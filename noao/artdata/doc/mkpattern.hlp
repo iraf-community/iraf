@@ -173,6 +173,7 @@ REVISIONS
 Now allows ndim=0 to create dataless header.
 
 Now allows type ushort pixel type.
+.le
 .ih
 SEE ALSO
 imcopy, imreplace

@@ -1,4 +1,4 @@
-.help rcc Nov95 "Slalib Package"
+.help rcc Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slRCC (TDB, UT1, WL, U, V)

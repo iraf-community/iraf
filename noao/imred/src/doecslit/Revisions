@@ -1,5 +1,15 @@
 .help revisions Dec94 noao.imred.src.doecslit
 .nf
+
+doecslit$sproc.cl
+    The arcref and arcrefs variables were not initialized if dispcor=no
+    and if the user goes directly to batch mode there is an undefined
+    local variable error.  Added initialization.  (1/27/98, Valdes)
+
+=======
+V2.11.1
+=======
+
 doecslit$sarcrefs.cl
 doecslit$sbatch.cl
 doecslit$sfluxcal.cl

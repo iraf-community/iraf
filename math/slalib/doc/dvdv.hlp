@@ -1,4 +1,4 @@
-.help dvdv Nov95 "Slalib Package"
+.help dvdv Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slDVDV (VA, VB)

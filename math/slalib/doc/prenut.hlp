@@ -1,4 +1,4 @@
-.help prenut Nov95 "Slalib Package"
+.help prenut Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slPRNU (EPOCH, DATE, RMATPN)

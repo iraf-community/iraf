@@ -1,5 +1,12 @@
 .help revisions Jul91 noao.imred.hydra
 .nf
+imred$hydra/doc/dohydra.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+=======
+V2.11.1
+=======
+
 imred$hydra/doc/dohdydra.hlp
 imred$hydra/doc/dohdydra.ms
     Updated for change where if both crval and cdelt are INDEF then the

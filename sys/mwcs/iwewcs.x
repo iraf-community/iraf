@@ -24,6 +24,7 @@ bool	have_ltm, have_ltv, have_wattr
 int	axes[2], axis, npts, ch, ip, raax, decax, ax1, ax2, i, j
 pointer	sp, r, o_r, cd, ltm, cp, rp, bufp, pv, wv, o_cd, o_ltm, str
 
+bool	streq()
 pointer	iw_gbigfits(), iw_findcard()
 int	strncmp(), ctod(), strldxs()
 errchk	mw_swtermd, iw_gbigfits, malloc, mw_swtype, mw_swsampd
@@ -64,10 +65,10 @@ begin
 	    ctype[i] = EOS
 
 	    # Determine the type of function on this axis.
-	    if (strncmp (ctype, "linear", 6) == 0) {
+	    if (streq (ctype, "linear")) {
 		;   # Linear is the default.
 
-	    } else if (strncmp (ctype, "sampled", 7) == 0) {
+	    } else if (streq (ctype, "sampled")) {
 		# A sampled WCS is an array of [P,W] points.
 
 		bufp = iw_gbigfits (iw, TY_WSVDATA, axis)
@@ -136,7 +137,7 @@ samperr_		call eprintf (
 	    } else if (strncmp (ctype, "dec-", 4) == 0) {
 		;   # This case is handled when RA-- is seen.
 
-	    } else if (strncmp (ctype[2], "lon", 3) == 0) {
+	    } else if (strncmp (ctype[2], "lon-", 4) == 0) {
 		# The projections are restricted to two axes and are indicated
 		# by CTYPEi values such as, e.g., "xLON-TAN" and "xLAT-TAN"
 		# for the TAN projection. The letter x may be any character
@@ -183,7 +184,7 @@ samperr_		call eprintf (
 		    call pargc (ctype[1])
 		call mw_swtype (mw, axes, 2, ctype[ip], Memc[str])
 
-	    } else if (strncmp (ctype[2], "lat", 3) == 0) { 
+	    } else if (strncmp (ctype[2], "lat-", 4) == 0) { 
 		;   # This case is handled when xLON is seen.
 
 	    } else if (strncmp (ctype, "multispec", 8) == 0) {

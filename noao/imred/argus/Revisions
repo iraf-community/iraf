@@ -1,5 +1,8 @@
 .help revisions Jul91 noao.imred.argus
 .nf
+imred$argus/doc/doargus.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
 imred$argus/doc/dohdydra.hlp
 imred$argus/doc/dohdydra.ms
     Updated for change where if both crval and cdelt are INDEF then the

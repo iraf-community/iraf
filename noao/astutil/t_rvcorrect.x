@@ -1,4 +1,5 @@
 include	<error.h>
+include	<time.h>
 
 # T_RVCORRECT -- Compute the radial velocity components of an observer.
 #
@@ -133,13 +134,13 @@ int	year, month, day		# Date of observation
 double	ut				# Time of observation
 double	vobs				# Observed velocity
 
-int	ip
+int	flags
 bool	newobs, obshead
 double	hjd, vrot, vorb, vbary, vsol
 pointer	sp, observatory, image, date, im, obs
 pointer	kp, datop, utp, rap, decp, epochp, vobp
 
-int	imtgetim(), ctoi()
+int	imtgetim(), dtm_decode()
 double	imgetd(), obsgetd()
 pointer	immap(), clopset()
 
@@ -190,17 +191,13 @@ begin
 		}
 
 	        call imgstr (im, Memc[datop], Memc[date], SZ_LINE)
-	        ip = 1
-	        if (ctoi (Memc[date], ip, day) == 0)
-		    next
-	        ip = ip + 1
-	        if (ctoi (Memc[date], ip, month) == 0)
-		    next
-	        ip = ip + 1
-	        if (ctoi (Memc[date], ip, year) == 0)
-		    next
+		if (dtm_decode (Memc[date], year, month, day, ut, flags) == ERR)
+		    call error (1, "Error parsing DATE-OBS keyword")
+		if (and (flags, TF_OLDFITS) != 0)
+		    year = year + 1900
 
-	        ut = imgetd (im, Memc[utp])
+		if (IS_INDEFD(ut))
+		    ut = imgetd (im, Memc[utp])
 	        ra = imgetd (im, Memc[rap])
 	        dec = imgetd (im, Memc[decp])
 	        ep = imgetd (im, Memc[epochp])

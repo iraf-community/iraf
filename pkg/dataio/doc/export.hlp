@@ -1032,5 +1032,5 @@ BUGS
 	Output of bitmap images is currently not supported.
 .ih
 SEE ALSO
-import, tvmark
+import, tvmark, imexpr
 .endhelp

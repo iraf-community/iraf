@@ -1,7 +1,116 @@
 .help revisions May92 noao.rv
 .nf
+rv.cl
+rv.hd
+x_rv.x
+rvcorrect.par           -
+t_rvcorrect.x           -
+doc/rvcorrect.x         -
+        The RVCORRECT task was a duplicate of the ASTUTIL package.  To
+        avoid code confusion sources were removed from the RV package and
+        the task is now defined to be the ASTUTIL version.
+	(5/27/99)
+
+Revisions
+rvpackage.spc
+keywpars.par
+rvflags.h
+keywpars.x
+        Files were reviewed for Y2K compliance, no changes necessary.
+	(5/27/99)
+
+keywpars.hlp
+        Documentation updated about use of dtm_decode.
+	(5/27/99)
+
+rvwparam.x
+        The timestamp string written for the output log header was changed
+        to use a 4-digit year.  Does not affect formatting of output tables.
+	(5/27/99)
+
+rvrvcor.x
+doc/fxcor.hlp
+        Changed to use dtm_decode to parse date-obs field.  If a time is
+	included in the date string it has precedence over UT when computing
+	observation midpoint and not using UTMIDDLE keyword. (5/27/99)
+
+Time from
+        date-obs is used (if available) as the beginning time of the obs-
+        ervation if there is no UT keyword present and we're not using the
+        UTMIDDLE keyword to get the midpoint time.  Documentation updated.
+	(5/27/99)
+
+rvidlines/idvhelio.x
+rvidlines/rvidlines.hlp
+	Modified to use dtm_decode to decode both the old and new
+	FITS date string.  If a time is included in the date string
+	it has precedence over UT.  (5/19/99, Valdes)
+
+rvwrite.x
+	Fixed a bug in the output of the HJD to screen and txt (5/4/99)
+
+fftutil.x
+	Increased max allowable exponent from 15 to 31 (5/3/99)
+
+rvvfit.x
+        Fixed a bug in the output of deblended velocities (4/22/99)
+
+deblend.x
+	Fixed a prompt error for the 't' keystroke.  (4/8/99)
+
+t_rvcorrect.x
+    	Added code the catch a bad DATE-OBS keyword and print an informative
+    	error (2/21/99)
+
+fftmode.x
+	Fixed a bug in the one-plot options. (2/21/99)
+
+rv.hd
+	Modified to remove the 'rv' definition which was interfering
+	with selecting the package help (1/27/99)
+
+rvcorrect.par
+	Removed the KEYPARS pset from the parameter file.  The pset is
+ 	still available to the task, but it's presence interferes with
+	the task when used in CL mode since the 'ut' parameter is no
+	longer queried and the pset value is used, resulting in an 
+	illegal number error when getting the value (4/22/98)
+
+rvgetim.x
+        When pixcorr was set the data were still being rebinned in the
+        SMW code, fixed this.  (4/2/98)
+
+splitplot.x
+	Fixed a bug in the plotting of object spectrum in the summary
+	plot (4/2/98)
+
+rvcursor.x
+	calls to rv_do_save() had an unused 'type' arg which conflicted
+	with usage in coloncmds.x.  Since this was unused it was removed
+	(3/27/98)
+
+rvrebin.x
+	rv_getim() was being used as a subroutine, should be an int
+	function.   (3/27/98)
+
+deblend.x
+	Fixed a type conversion problems causing an overflow when the
+	computed velocities are INDEF  (2/17/98)
+
+rvidlines/ididentify.x
+	There was a parenthesis placement error in an id_zshift call.
+	(2/5/98, Valdes)
+
+rvwrite.x
+	Fixed HJD output as an offset from 2450000 for more recent dates.
+	(1/5/98)
+
++======
+V2.11.1
++======
+
 rvdrawfit.x
-	Fixed a typo causing an incorrectly array allocation (8/25/97)
+	Fixed a typo causing an incorrect array allocation (8/25/97)
 
 rvplot.x
 fftmode.x

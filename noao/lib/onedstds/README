@@ -7,6 +7,20 @@ IMRED packages.
                 (eg extinction = onedstds$kpnoextinct.dat)
 
 ctioextinct.dat -  CTIO extinction table for ONEDSPEC (in Angstroms)
+    The CTIO extinction curve distributed with IRAF comes from the work of
+    Stone & Baldwin (1983 MN 204, 347) and Baldwin & Stone (1984 MN 206,
+    241).  The first of these papers lists the points from 3200-8370A while
+    the second extended the flux calibration from 6056 to 10870A but the
+    derived extinction curve was not given in the paper.  The IRAF table
+    follows SB83 out to 6436, the redder points presumably come from BS84
+    with averages used in the overlap region.
+
+    More recent CTIO extinction curves are shown as Figures in Hamuy 
+    et al (92, PASP 104, 533 ; 94 PASP 106, 566).
+
+    Steve Heathcote, Mon, 19 Jul 1999
+
+
 kpnoextinct.dat -  KPNO extinction table for ONEDSPEC (in Angstroms)
 
                               MISCELLANEOUS
@@ -80,8 +94,10 @@ kpnoextinct.dat -  KPNO extinction table for ONEDSPEC (in Angstroms)
 --------------------------------------------------------------------------------
 Standard stars in onedstds$bstdscal/
 
-hr3454       hr4468       hr5191       hr7001       hr7596       hr8634    
-hr3982       hr4534       hr5511       hr718        hr7950       hr9087    
+hr718        hr3454       hr3982       hr4468       hr4534
+hr5191       hr5511       hr7001       hr7596       hr7950
+hr8634       hr9087       hd15318      hd74280      hd100889
+hd188350     hd198001     hd214923     hd224926
 
 --------------------------------------------------------------------------------
 Standard stars in onedstds$ctiocal/
@@ -105,24 +121,24 @@ Standard stars in onedstds$ctionewcal/:
 
 Combined red and blue 3300A-10000A:
 
-cd32.dat        f56.dat         l2415.dat       l4364.dat       l7987.dat
-eg21.dat        h600.dat        l3218.dat       l4816.dat       l9239.dat
-eg274.dat       l1020.dat       l377.dat        l6248.dat       l9491.dat
-f110.dat        l1788.dat       l3864.dat       l7379.dat       l745.dat
+cd32            f56             l2415           l4364           l7987    
+eg21            h600            l3218           l4816           l9239    
+eg274           l1020           l377            l6248           l9491    
+f110            l1788           l3864           l7379           l745    
 
 Blue 3300A-7550A:
 
-cd32blue.dat    f56blue.dat     l2415blue.dat   l4364blue.dat   l7987blue.dat
-eg21blue.dat    h600blue.dat    l3218blue.dat   l4816blue.dat   l9239blue.dat
-eg274blue.dat   l1020blue.dat   l377blue.dat    l6248blue.dat   l9491blue.dat
-f110blue.dat    l1788blue.dat   l3864blue.dat   l7379blue.dat
+cd32blue        f56blue         l2415blue       l4364blue       l7987blue    
+eg21blue        h600blue        l3218blue       l4816blue       l9239blue    
+eg274blue       l1020blue       l377blue        l6248blue       l9491blue    
+f110blue        l1788blue       l3864blue       l7379blue    
 
 Red 6050A-10000A:
 
-cd32red.dat     f56red.dat      l2415red.dat    l4364red.dat    l7987red.dat
-eg21red.dat     h600red.dat     l3218red.dat    l4816red.dat    l9239red.dat
-eg274red.dat    l1020red.dat    l377red.dat     l6248red.dat    l9491red.dat
-f110red.dat     l1788red.dat    l3864red.dat    l7379red.dat    l745red.dat
+cd32red         f56red          l2415red        l4364red        l7987red    
+eg21red         h600red         l3218red        l4816red        l9239red    
+eg274red        l1020red        l377red         l6248red        l9491red    
+f110red         l1788red        l3864red        l7379red        l745red    
 
 --------------------------------------------------------------------------------
 Standard stars in onedstds$iidscal/
@@ -182,18 +198,24 @@ Standard stars in onedstds$spec16cal/:
 
 Combined red and blue 3300A-10300A:
 
-hr1544.dat   hr4468.dat   hr5501.dat   hr7596.dat   hr8634.dat   
-hr3454.dat   hr4963.dat   hr718.dat    hr7950.dat   hr9087.dat
+hd15318      hd74280      hd114330     hd188350     hd214923
+hd30739      hd100889     hd129956     hd198001     hd224926
+hr1544       hr4468       hr5501       hr7596       hr8634       
+hr3454       hr4963       hr718        hr7950       hr9087    
 
 Blue 3300A-7550A:
 
-hr1544blue.dat  hr4468blue.dat  hr5501blue.dat  hr7596blue.dat  hr8634blue.dat
-hr3454blue.dat  hr4963blue.dat  hr718blue.dat   hr7950blue.dat  hr9087blue.dat
+hd15318blue     hd74280blue     hd114330blue    hd188350blue    hd214923blue
+hd30739blue     hd100889blue    hd129956blue    hd198001blue    hd224926blue
+hr1544blue      hr4468blue      hr5501blue      hr7596blue      hr8634blue    
+hr3454blue      hr4963blue      hr718blue       hr7950blue      hr9087blue    
 
 Red 6020A-10300A:
 
-hr1544red.dat   hr4468red.dat   hr5501red.dat   hr7596red.dat   hr8634red.dat
-hr3454red.dat   hr4963red.dat   hr718red.dat    hr7950red.dat   hr9087red.dat
+hd15318red      hd74280red      hd114330red     hd188350red     hd214923red
+hd30739red      hd100889red     hd129956red     hd198001red     hd224926red
+hr1544red       hr4468red       hr5501red       hr7596red       hr8634red    
+hr3454red       hr4963red       hr718red        hr7950red       hr9087red    
 
 --------------------------------------------------------------------------------
 Standard stars in onedstds$spec50cal/  (3200A - 8100 A)

@@ -184,8 +184,8 @@ begin
 	    root = fnldir (Memc[photfile], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[photfile+root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[photfile]))
-	        call dp_inname (Memc[image], "", "mag", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_inname (Memc[image], Memc[outfname], "mag",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[photfile], Memc[outfname], SZ_FNAME)
 	    ap_text = itob (access (Memc[outfname], 0, TEXT_FILE))
@@ -202,8 +202,8 @@ begin
 	    root = fnldir (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[psfimage+root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[psfimage]))
-	        call dp_iimname (Memc[image], "", "psf", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_iimname (Memc[image], Memc[outfname], "psf",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    psffd = immap (Memc[outfname], READ_ONLY, 0)
@@ -220,8 +220,8 @@ begin
 	    root = fnldir (Memc[allstarfile], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[allstarfile+root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[allstarfile]))
-	        call dp_outname (Memc[image], "", "als", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_outname (Memc[image], Memc[outfname], "als",
+		    Memc[outfname], SZ_FNAME)
 	    else 
 	        call strcpy (Memc[allstarfile], Memc[outfname], SZ_FNAME)
 	    if (DP_TEXT(dao)  == YES)
@@ -239,8 +239,8 @@ begin
 	        root = fnldir (Memc[rejfile], Memc[outfname], SZ_FNAME)
 	        if (strncmp (DEF_DEFNAME, Memc[rejfile+root],
 		    DEF_LENDEFNAME) == 0 || root == strlen (Memc[rejfile]))
-	            call dp_outname (Memc[image], "", "arj", Memc[outfname],
-		        SZ_FNAME)
+	            call dp_outname (Memc[image], Memc[outfname], "arj",
+		        Memc[outfname], SZ_FNAME)
 	        else 
 	            call strcpy (Memc[rejfile], Memc[outfname], SZ_FNAME)
 	        if (DP_TEXT(dao)  == YES)
@@ -257,13 +257,15 @@ begin
 	    root = fnldir (Memc[subimage], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[subimage+root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[subimage])) {
-	        call dp_oimname (Memc[image], "", "sub", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_oimname (Memc[image], Memc[outfname], "sub",
+		    Memc[outfname], SZ_FNAME)
 	        subim = immap (Memc[outfname], NEW_COPY, im)
+		IM_NDIM(subim) = 2
 	        IM_PIXTYPE(subim) = TY_REAL
 	    } else {
 	        call strcpy (Memc[subimage], Memc[outfname], SZ_FNAME)
 	        subim = immap (Memc[outfname], NEW_COPY, im)
+		IM_NDIM(subim) = 2
 	        IM_PIXTYPE(subim) = TY_REAL
 	    }
 	    call dp_sets (dao, OUTIMAGE, Memc[outfname])

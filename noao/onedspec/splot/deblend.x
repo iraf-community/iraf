@@ -171,11 +171,19 @@ begin
 	    Memr[b+1] = xp[i] - Memr[a+5]
 	    switch (tp[i]) {
 	    case GAUSS:
+		if (Memr[a+6] == 0.)
+		    Memr[a+6] = gp[i]
 		Memr[b+2] = gp[i] / Memr[a+6]
 	    case LORENTZ:
+		if (Memr[a+7] == 0.)
+		    Memr[a+7] = lp[i]
 		Memr[b+3] = lp[i] / Memr[a+7]
 	    case VOIGT:
+		if (Memr[a+6] == 0.)
+		    Memr[a+6] = gp[i]
 		Memr[b+2] = gp[i] / Memr[a+6]
+		if (Memr[a+7] == 0.)
+		    Memr[a+7] = lp[i]
 		Memr[b+3] = lp[i] / Memr[a+7]
 	    }
 	    Memr[b+4] = tp[i]

@@ -161,7 +161,7 @@ begin
 	call gethost (Memc[outstr], SZ_LINE)
 	call dp_sparam (tp, "HOST", Memc[outstr], "computer", "")
 	call dp_date (Memc[date], Memc[time], SZ_DATE)
-	call dp_sparam (tp, "DATE", Memc[date], "mm-dd-yy", "")
+	call dp_sparam (tp, "DATE", Memc[date], "yyyy-mm-dd", "")
 	call dp_sparam (tp, "TIME", Memc[time], "hh:mm:ss", "")
 	call dp_sparam (tp, "PACKAGE", "daophot", "name", "")
 	call dp_sparam (tp, "TASK", "addstar", "name", "")

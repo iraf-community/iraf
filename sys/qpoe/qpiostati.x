@@ -10,10 +10,12 @@ int procedure qpio_stati (io, param)
 pointer	io			#I QPIO descriptor
 int	param			#I parameter code
 
+bool	fp_equalr()
+
 begin
 	switch (param) {
 	case QPIO_BLOCKFACTOR:
-	    if (IO_XBLOCK(io) == IO_YBLOCK(io))
+	    if (fp_equalr (IO_XBLOCK(io), IO_YBLOCK(io)))
 		return (IO_XBLOCK(io))
 	    else
 		return (ERR)
@@ -77,4 +79,6 @@ begin
 	case QPIO_QP:
 	    return (IO_QP(io))			# QPOE descriptor
 	}
+
+	return (ERR)
 end

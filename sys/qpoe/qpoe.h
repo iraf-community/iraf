@@ -1,7 +1,7 @@
 # QPOE.H -- QPOE data definitions (private to the package).
 
 # Size limiting definitions.
-define	DEF_BLOCKFACTOR	1		# default block factor for image matrix
+define	DEF_BLOCKFACTOR	1.0		# default block factor for image matrix
 define	DEF_BUCKETLEN	1024		# def nevents per bucket
 define	DEF_FMMAXLFILES 128		# def maxlfile per datafile
 define	DEF_FMMAXPTPAGES 256		# def maxptpages per datafile
@@ -61,8 +61,8 @@ define	QP_STSBUFSIZE	Memi[$1+22]	# SYMTAB sbuf size (start)
 define	QP_STOFFSET	Memi[$1+23]	# lfile offset of stored symbol table
 define	QP_MODIFIED	Memi[$1+24]	# QPOE descriptor has been modified
 define	QP_DEBUG	Memi[$1+25]	# global debug level (debug messages)
-define	QP_XBLOCK	Memi[$1+26]	# default X blocking factor for QPIO
-define	QP_YBLOCK	Memi[$1+27]	# default Y blocking factor for QPIO
+define	QP_XBLOCK	Memr[$1+26]	# default X blocking factor for QPIO
+define	QP_YBLOCK	Memr[$1+27]	# default Y blocking factor for QPIO
 define	QP_OPTBUFSIZE	Memi[$1+28]	# optimum buffer size for IMIO/QPF/FIO
 define	QP_NODEFFILT	Memi[$1+29]	# disable use of default filter
 define	QP_NODEFMASK	Memi[$1+30]	# disable use of default mask

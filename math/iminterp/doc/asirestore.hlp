@@ -1,4 +1,4 @@
-.help asirestore Aug84 "Image Interpolator Package"
+.help asirestore Dec98 "Image Interpolator Package"
 .ih
 NAME
 asirestore -- restore interpolant
@@ -7,8 +7,8 @@ SYNOPSIS
 asirestore (asi, interpolant)
 
 .nf
-    pointer	asi		# interpolant descriptor
-    real	interpolant[]	# array containing interpolant
+    pointer	asi		#O interpolant descriptor
+    real	interpolant[]	#I array containing interpolant
 .fi
 .ih
 ARGUMENTS
@@ -17,7 +17,7 @@ Pointer to the interpolant descriptor structure.
 .le
 .ls interpolant
 Array containing the interpolant. The length of interpolant can be determined
-by a call to asiget.
+by a call to ASIGETI.
 .le
 
 .nf
@@ -26,8 +26,8 @@ by a call to asiget.
 .ih
 DESCRIPTION
 ASIRESTORE allocates space for the interpolant descriptor and restores the
-parameters and coefficients stored in the interpolant array to the structure
-for use by ASIEVAL, ASIVECTOR, ASIDER and ASIGRL.
+parameters and coefficients stored in the interpolant array to a structure
+for use with ASIEVAL, ASIVECTOR, ASIDER and ASIGRL.
 .ih
 NOTES
 .ih

@@ -11,7 +11,7 @@ update:
 relink:
 	$omake x_daophot.x
 	$ifdef (tables)
-	    !mkpkg -p noao -p tables trelink
+	    !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	$else
 	    $call tundefined
 	$endif
@@ -19,7 +19,7 @@ relink:
 
 linkonly:
 	$ifdef (tables)
-	    !mkpkg -p noao -p tables trelink
+	    !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	$else
 	    $call tundefined
 	$call install
@@ -31,6 +31,8 @@ install:
 
 trelink:
 	$set LIBS = "-lncar -lgks -ltbtables -lxtools"
+        $set XFLAGS = "$(XFLAGS) $(XF)"
+        $set LFLAGS = "$(LFLAGS) $(LF)"
 	$update libpkg.a
 	$link x_daophot.o libpkg.a ../lib/libpttables.a $(LIBS) -o xx_daophot.e
 	;

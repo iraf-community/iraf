@@ -1,5 +1,261 @@
 .help revisions Jan97 images
 .nf
+pkg/images/imutil/src/t_imarith.x
+    Added a check for division by zero in the header keywords.  A warning
+    is printed, the keyword is not updated, and task completes without
+    aborting.  (8/10/99, Valdes)
+
+pkg/images/imcoords/src/t_ccsetwcs.x
+pkg/images/imcoords/src/ccxytran.x
+    Update the ccsetwcs and cctran tasks so they can deal correctly with the
+    zpx transformation. These tasks had been updated in immatchx but the
+    updates did not make it into the images versions of the tasks.
+    (Davis, June 26, 1999)
+
+pkg/images/imcoords/src/t_starfind.x
+    Modified the default output file naming code to deal rationally with
+    fits image extension names.
+    (Davis, June 26, 1999)
+
+pkg/images/lib/skywcs.h
+pkg/images/lib/skywcs.x
+pkg/images/imcoords/src/ttycur.key
+pkg/images/imcoords/src/skycur.key
+pkg/images/imcoords/doc/ccfind.hlp
+pkg/images/imcoords/doc/ccmap.hlp
+pkg/images/imcoords/doc/ccsetwcs.hlp
+pkg/images/imcoords/doc/skyctran.hlp
+pkg/images/imcoords/doc/imcctran.hlp
+    Added support for the ICRS system to the images.imcoords package.
+    (Davis, June 24, 1999)
+
+pkg/images/immatch/doc/geomap.hlp
+    Added some notes and an example to explain and illustrate the role of the
+    reference and input coordinates for different applicatons. i.e. image
+    resampling and coordinate transformation.
+    (Davis, June 18, 1999)
+
+pkg/images/immatch/src/geometry/t_geotran.x
+    Fixed a bug in the transform list decoding routine that was preventing
+    geotran from using the same transform for all the input images.
+    (Davis, June 18, 1999)
+
+pkg/images/immatch/src/imcombine/icsetout.x
+    Changed to better parse the offset types.  The WCS correction for
+    offsets was incorrect.  (6/17/99, Valdes)
+
+pkg/images/imcoords/src/t_wcsctran.x
+    Fixed a bug in the units initialization code. (Davis, June 3, 1999)
+
+pkg/images/imcoords/src/t_ccsetwcs.x
+    Improved the error message handling in the case when a database
+    records either not be found or could not be successfully decoded
+    in the ccsetwcs task. (Davis, June 3, 1999)
+
+pkg/images/immatch/src/geometry/geotran.x
+    Fixed a type mismatch problem in a call to max that was causing compilation
+    errors on the Dec Station. (Davis, June 2, 1999)
+ 
+pkg/images/immatch/doc/imcombine.hlp
+    Clarified whether the offset is done before scaling or afterword.
+    (5/18/99, Valdes)
+
+pkg/images/imcoords/doc/ccsetwcs.hlp
+pkg/images/imcoords/doc/imcctran.hlp
+pkg/images/imcoords/doc/skyctran.hlp
+pkg/images/immatch/doc/skyxymatch.hlp
+    Added some information about the new DATE-OBS format to the help
+    pages for the ccsetwcs, imctran, skyctran, and skyxymatch tasks.
+
+    (Davis, May 13, 1999)
+
+pkg/images/lib/skywcs.x
+    Added support for the new DATE-OBS format to the mwcs decoding routines.
+    All tasks in the imcoords and immatch packages which read the image wcs
+    will pick up the change.
+
+    (Davis, May 13, 1999)
+
+pkg/images/immatch/src/listmatch/t_xyxymatch.x
+pkg/images/imcoords/src/t_ccxymatch.x
+    Fixed the xyxymatch and ccxymatch tasks so that they work properly when
+    the number of reference files is greater than 1 and equal to the
+    number of input files. In that case xyxymatch and ccxymatch are supposed
+    to pair up the input and reference files one to one instead of using the
+    last file in the reference file list.
+
+    (Davis, February 22, 1999)
+
+pkg/images/immatch/src/wcsmatch/t_wcscopy.x
+    Modified wcscopy to update the RADECSYS, EQUINOX, and MJD-WCS keywords
+    as well as the mwcs keywords.
+    (1/7/99, Davis)
+
+pkg/images/immatch/gregister.par
+pkg/images/immatch/sregister.cl
+pkg/images/immatch/wregister.cl
+pkg/images/immatch/doc/gregister.hlp
+pkg/images/immatch/doc/sregister.hlp
+pkg/images/immatch/doc/wregister.hlp
+    Installed new versions of the gregister, sregister, and wregister tasks
+    (these tasks are scripts which call geotran) which support 1D and 2D
+    sinc and look-up table sinc interpolation and 2D drizzle resampling.
+    (12/29/98, Davis)
+
+pkg/images/imgeom/rotate.par
+pkg/images/imgeom/imlintran.par
+pkg/images/imgeom/doc/rotate.hlp
+pkg/images/imgeom/doc/imlintran.hlp
+    Installed new versions of the rotate and imlintran tasks (these tasks are
+    scripts which call geotran) which support 2D sinc and look-up table sinc
+    interpolation and 2D drizzle resampling.
+    (12/29/98, Davis)
+
+pkg/images/immmatch/geotran.par
+pkg/images/immatch/src/geometry/geotran.h
+pkg/images/immatch/src/geometry/t_geotran.x
+pkg/images/immatch/src/geometry/geotran.x
+pkg/images/immatch/src/geometry/geotimtran.x
+pkg/images/immatch/doc/geotran.hlp
+    Installed a new version of the geotran task which supports 1D and 2D
+    sinc and look-up table sinc interpolation and 1D and 2D drizzle resampling.
+    Simplified the code and modified the out-of-bounds pixel handling algorithm
+    to conform to the other image resampling tasks. Corrected a couple of bugs
+    in the 1D image resampling code.
+    (12/29/98, Davis)
+
+pkg/images/immatch/xregister.par
+pkg/images/immatch/src/t_xregister.x
+pkg/images/immatch/src/rgximshift.x
+pkg/images/imgeom/doc/xregister.hlp
+    Installed a new version of the xregister task which supports 2D sinc and
+    look-up table sinc interpolation and 2D drizzle resampling.
+    (12/29/98, Davis)
+
+pkg/images/imgeom/shiftlines.par
+pkg/images/imgeom/src/t_shiftlines.x
+pkg/images/imgeom/src/shiftlines.x
+pkg/images/imgeom/doc/shiftlines.hlp
+    Installed a new version of the shiftlines task which supports 1D sinc and
+    look-up table sinc interpolation and 1D drizzle resampling.
+    (12/28/98, Davis)
+
+pkg/images/imgeom/imshift.par
+pkg/images/imgeom/src/t_imshift.x
+pkg/images/imgeom/doc/imshift.hlp
+    Installed a new version of the imshift task which supports 2D sinc and
+    look-up table sinc interpolation and 2D drizzle resampling.
+    (12/28/98, Davis)
+
+pkg/images/imgeom/magnify.par
+pkg/images/imgeom/src/t_magnify.x
+pkg/images/imgeom/doc/magnify.hlp
+    Installed a new version of the magnify task which supports 1D and 2D
+    sinc and look-up table sinc interpolation and 1D and 2D drizzle resampling.
+    Modified the out-of-bounds pixel handling algorithm to conform to the
+    other image resampling tasks.
+    (12/28/98, Davis)
+
+pkg/images/immatch/src/imcombine/icsetout.x
+    Fixed a problem with input images that have dimensional reduction.
+    (10/6/98, Valdes)
+
+pkg/images/imutil/src/t_imarith.x
+    If noact = yes, IMARITH would fail with a segmentation violation. This
+    was occuring because the header updating code was trying to access
+    the output image which did not exist. (9/16/98, Davis)
+
+pkg/images/tv/imexamine/stfmeasure.x
+    The logic in STF_FIT for determining the points to fit and the point
+    to use for the initial width estimate was faulty allowing some bad
+    cases to get through.  (7/31/98, Valdes)
+
+pkg/images/immatch/src/imcombine/icgdata.gx
+    Needed to initialize the number of pixels combined for the case where
+    there is initially no data.  (7/29/98, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+pkg/images/immatch/doc/imcombine.hlp
+    The internal calculation type was changed from the highest precedence
+    type of the input images to the highest of the input and output.
+    This allows setting the output type to be real to force computation
+    in real for integer input images.  Not doing this could cause severe
+    truncation errors if the users specify there own scaling values.
+    (7/14/98, Valdes)
+
+pkg/images/tv/imedit/epix.h
+pkg/images/tv/imedit/t_imedit.x
+pkg/images/tv/imedit/epcolon.x
+pkg/images/tv/doc/imedit.hlp
+    The temporary editing buffer image was made into a unique temporary
+    image rather than the fixed name of "epixbuf".  (6/30/98, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+    The steps to check if an image and mask have an integer relationship
+    (integer sampling and integer offsets) in their physical coordinate
+    systems could fail because real precision was not high enough
+    in MWCS transformation calls.  Changed variables and MWCS calls
+    to double.  (5/29/98, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+pkg/images/immatch/src/imcombine/icombine.gx
+pkg/images/immatch/src/imcombine/ic_rmasks.x	+
+pkg/images/immatch/src/imcombine/ic_log.x
+pkg/images/immatch/src/imcombine/mkpkg
+pkg/images/immatch/imcombine.par
+pkg/images/immatch/doc/imcombine.hlp
+    Added a new output which is a pixel mask identifying which pixel in which
+    input image is rejected or not included in the final output.
+    (5/15/98, Valdes)
+
+pkg/lib/geograph.gx
+pkg/lib/geograph.x
+    Modifed the plot labels to say "reject =" instead of "sigrej = " to
+    maintain naming consistency with the reject parameter.
+    (2/23/98 LED)
+
+pkg/images/immatch/src/imcombine/icsetout.x
+    The updating of the WCS for offset images was not being done correctly.
+    (2/5/98, Valdes)
+
+pkg/images/immatch/src/imcombine/icgrow.gx
+pkg/images/immatch/src/imcombine/icombine.gx
+    Modified algorithm for efficiency.  (1/28/98, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+pkg/images/immatch/src/imcombine/icaclip.gx
+pkg/images/immatch/src/imcombine/iccclip.gx
+pkg/images/immatch/src/imcombine/icgdata.gx
+pkg/images/immatch/src/imcombine/icgrow.gx
+pkg/images/immatch/src/imcombine/iclog.x
+pkg/images/immatch/src/imcombine/icmm.gx
+pkg/images/immatch/src/imcombine/icombine.com
+pkg/images/immatch/src/imcombine/icombine.gx
+pkg/images/immatch/src/imcombine/icpclip.gx
+pkg/images/immatch/src/imcombine/icsclip.gx
+pkg/images/immatch/imcombine.par
+    Changed the grow parameter to a real radius.  (12/30/97, Valdes)
+
+pkg/images/immatch/src/imcombine/icgrow.gx
+pkg/images/immatch/src/imcombine/icombine.gx
+pkg/images/immatch/doc/imcombine.hlp
+    Added 2D grow capability.  (12/30/97, Valdes)
+
+pkg/images/immatch/src/imcombine/icaverage.gx
+pkg/images/immatch/src/imcombine/icmedian.gx
+pkg/images/immatch/src/imcombine/icombine.gx
+pkg/images/immatch/src/imcombine/generic/mkpkg
+    Added new argument to select whether to set values with no data to
+    a blank value.  This allows the calling task to set values without
+    having them overridden with the blank value.  (12/30/97, Valdes)
+
+pkg/images/immatch/src/imcombine/icmm.gx
+    Fixed a bug where the image IDs were not being kept.  (12/30/97, Valdes)
+
+=======
+V2.11.1
+=======
+
 pkg/images/immatch/src/linmatch/lsqfit.h
 pkg/images/immatch/src/linmatch/rglscale.x
 pkg/images/immatch/src/linmatch/rgliscale.x

@@ -23,6 +23,7 @@ define	CACHEUNIT	1000000.	# Units of max_cache parameter
 procedure t_ccdproc ()
 
 int	list			# List of CCD images to process
+int	outlist			# LIst of output images
 int	ccdtype			# CCD image type
 int	interactive		# Fit overscan interactively?
 int	max_cache		# Maximum image cache size
@@ -40,10 +41,15 @@ begin
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
-	# Get the list and instrument translation file.  Open the translation
+	# Get input and output lists and check they make sense.
+	list = imtopenp ("images")
+	outlist = imtopenp ("output")
+	if (imtlen (outlist) > 0 && imtlen (outlist) != imtlen (list))
+	    call error (1, "Input and output lists do not match")
+
+	# Get instrument translation file.  Open the translation
 	# file.  Initialize the interactive flag and the calibration images.
 
-	list = imtopenp ("images")
 	call clgstr ("instrument", Memc[input], SZ_FNAME)
 	call hdmopen (Memc[input])
 	call set_interactive ("", interactive)
@@ -64,10 +70,11 @@ begin
 	    if (in == NULL)
 		next
 
-	    # Use a temporary image for output which will replace the input
-	    # image after processing.
-
-	    call mktemp ("tmp", Memc[output], SZ_FNAME)
+	    # Set output image.
+	    if (imtlen (outlist) == 0)
+		call mktemp ("tmp", Memc[output], SZ_FNAME)
+	    else if (imtgetim (outlist, Memc[output], SZ_FNAME) == EOF)
+		call error (1, "Premature end of output list")
 	    call set_output (in, out, Memc[output])
 
 	    # Set processing parameters applicable to all images.
@@ -118,17 +125,19 @@ begin
 		call doproc (ccd)
 		call set_header (ccd)
 
-		# Replace the input image by the corrected image.
 	        call imunmap (in)
 	        call imunmap (out)
-		iferr (call ccddelete (Memc[input])) {
-		    call imdelete (Memc[output])
-		    call error (1,
-			"Can't delete or make backup of original image")
+		if (imtlen (outlist) == 0) {
+		    # Replace the input image by the corrected image.
+		    iferr (call ccddelete (Memc[input])) {
+			call imdelete (Memc[output])
+			call error (1,
+			    "Can't delete or make backup of original image")
+		    }
+		    call imrename (Memc[output], Memc[input])
 		}
-	        call imrename (Memc[output], Memc[input])
 	    } else {
-		# Delete the temporary output image leaving the input unchanged.
+		# Delete the output image.
 	        call imunmap (in)
 	        iferr (call imunmap (out))
 		    ;
@@ -138,17 +147,27 @@ begin
 	    call free_proc (ccd)
 
 	    # Do special processing on certain image types.
-	    switch (ccdtype) {
-	    case ZERO:
-		call readcor (Memc[input])
-	    case FLAT:
-		call ccdmean (Memc[input])
+	    if (imtlen (outlist) == 0) {
+		switch (ccdtype) {
+		case ZERO:
+		    call readcor (Memc[input])
+		case FLAT:
+		    call ccdmean (Memc[input])
+		}
+	    } else {
+		switch (ccdtype) {
+		case ZERO:
+		    call readcor (Memc[output])
+		case FLAT:
+		    call ccdmean (Memc[output])
+		}
 	    }
 	}
 
 	# Finish up.
 	call hdmclose ()
 	call imtclose (list)
+	call imtclose (outlist)
 	call cal_close ()
 	call ccd_close ()
 	call sfree (sp)

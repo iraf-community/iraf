@@ -53,7 +53,7 @@ begin
 		call malloc (MSI_COEFF(msi), nxpix * nypix, TY_REAL)
 	    }
 
-	case II_BILINEAR:
+	case II_BILINEAR, II_BIDRIZZLE:
 
 	    if (nxpix < 2 || nypix < 2) {
 		call error (0, "MSIFIT: Too few data points.")
@@ -112,6 +112,21 @@ begin
 		call calloc (MSI_COEFF(msi),
 			     MSI_NXCOEFF(msi) * MSI_NYCOEFF(msi), TY_REAL)
 	    }
+
+	case II_BISINC, II_BILSINC:
+
+	    if (nxpix < 1 || nypix < 1) {
+		call error (0, "MSIFIT: Too few data points.")
+		return
+	    } else {
+		MSI_NXCOEFF(msi) = nxpix
+		MSI_NYCOEFF(msi) = nypix
+		MSI_FSTPNT(msi) = 0
+		if (MSI_COEFF(msi) != NULL)
+		    call mfree (MSI_COEFF(msi), TY_REAL)
+		call calloc (MSI_COEFF(msi), nxpix * nypix, TY_REAL)
+	    }
+
 	}
 
 	# index the coefficient pointer so that COEFF(fptr+1) points to the
@@ -130,11 +145,11 @@ begin
 
 	switch (MSI_TYPE(msi)) {
 
-	case II_BINEAREST:
+	case II_BINEAREST, II_BISINC, II_BILSINC:
 
 	    # no end conditions necessary, coefficients stored as data
 
-	case II_BILINEAR:
+	case II_BILINEAR, II_BIDRIZZLE:
 
 	    # extend the rows
 	    rptr = fptr + nxpix

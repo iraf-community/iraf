@@ -24,7 +24,7 @@ begin
 	case PY_OUTOFBOUNDS:
 	    call printf ("The polygon is partially outside the image.\n")
 	case PY_NOPIX:
-	    call printf ("The polygon is outside the image.\n")
+	    call printf ("The polygon has no effective area.\n")
 	case PY_NOSKYMODE:
 	    call printf ("The sky value is undefined.\n")
 	case PY_BADDATA:

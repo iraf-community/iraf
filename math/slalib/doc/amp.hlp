@@ -1,4 +1,4 @@
-.help amp Nov95 "Slalib Package"
+.help amp Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slAMP (RA, DA, DATE, EQ, RM, DM)

@@ -2,21 +2,21 @@ Standard stars in onedstds$ctionewcal/:
 
 Combined red and blue 3300A-10000A:
 
-cd32.dat        f56.dat         l2415.dat       l4364.dat       l7987.dat
-eg21.dat        h600.dat        l3218.dat       l4816.dat       l9239.dat
-eg274.dat       l1020.dat       l377.dat        l6248.dat       l9491.dat
-f110.dat        l1788.dat       l3864.dat       l7379.dat       l745.dat
+cd32            f56             l2415           l4364           l7987    
+eg21            h600            l3218           l4816           l9239    
+eg274           l1020           l377            l6248           l9491    
+f110            l1788           l3864           l7379           l745    
 
 Blue 3300A-7550A:
 
-cd32blue.dat    f56blue.dat     l2415blue.dat   l4364blue.dat   l7987blue.dat
-eg21blue.dat    h600blue.dat    l3218blue.dat   l4816blue.dat   l9239blue.dat
-eg274blue.dat   l1020blue.dat   l377blue.dat    l6248blue.dat   l9491blue.dat
-f110blue.dat    l1788blue.dat   l3864blue.dat   l7379blue.dat
+cd32blue        f56blue         l2415blue       l4364blue       l7987blue    
+eg21blue        h600blue        l3218blue       l4816blue       l9239blue    
+eg274blue       l1020blue       l377blue        l6248blue       l9491blue    
+f110blue        l1788blue       l3864blue       l7379blue    
 
 Red 6050A-10000A:
 
-cd32red.dat     f56red.dat      l2415red.dat    l4364red.dat    l7987red.dat
-eg21red.dat     h600red.dat     l3218red.dat    l4816red.dat    l9239red.dat
-eg274red.dat    l1020red.dat    l377red.dat     l6248red.dat    l9491red.dat
-f110red.dat     l1788red.dat    l3864red.dat    l7379red.dat    l745red.dat
+cd32red         f56red          l2415red        l4364red        l7987red    
+eg21red         h600red         l3218red        l4816red        l9239red    
+eg274red        l1020red        l377red         l6248red        l9491red    
+f110red         l1788red        l3864red        l7379red        l745red    

@@ -48,9 +48,8 @@ pointer	ex				#i task struct pointer
 int	expnum				#i expression number to fix
 
 pointer	sp, exp, func
-int	ip, pp, explen
+int	ip, pp
 
-int	strlen()
 bool	streq()
 
 begin
@@ -92,7 +91,6 @@ begin
             if (streq(Memc[func],"zscale")) {
                 iferr (call ex_edit_zscale (ex, Memc[exp], ip+1))
                     call erract (EA_FATAL)
-                explen = strlen (Memc[exp])
                 ip = ip + 1
             }
         }
@@ -413,8 +411,6 @@ pointer	sp, flat, badpix, normx
 int	ex_reject_pixels(), ex_compute_sigma()
 
 begin
-	call smark (sp)
-
 	if (npix <= 0)
 	    return (0)
 	else if (npix == 1) {
@@ -427,6 +423,7 @@ begin
 	# Allocate a buffer for data minus fitted curve, another for the
 	# normalized X values, and another to flag rejected pixels.
 
+	call smark (sp)
 	call salloc (flat, npix, TY_REAL)
 	call salloc (normx, npix, TY_REAL)
 	call salloc (badpix, npix, TY_SHORT)

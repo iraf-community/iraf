@@ -44,7 +44,8 @@ begin
 
 	# Get mask file name.
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
-	call strcpy (Memc[fname], IM_NAME(im), SZ_IMNAME)
+	call aclrc (IM_HDRFILE(im), SZ_IMHDRFILE)
+	call strcpy (Memc[fname], IM_HDRFILE(im), SZ_IMHDRFILE)
 
 	# Open an empty mask.
 	pl = pl_open (NULL)

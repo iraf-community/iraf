@@ -53,6 +53,7 @@ sla_DMAT	slDMAT
 sla_DMOON	slDMON   
 sla_DMXM	slDMXM   
 sla_DMXV	slDMXV   
+sla_DPAV	slDPAV   
 sla_DR2AF	slDRAF   
 sla_DR2TF	slDRTF   
 sla_DRANGE	slDA1P   
@@ -79,6 +80,7 @@ sla_ECLEQ	slECEQ
 sla_ECMAT	slECMA   
 sla_ECOR	slECOR   
 sla_EG50	slEG50   
+sla_EL2UE       slELUE   
 sla_EPB		slEPB   
 sla_EPB2D	slEB2D   
 sla_EPCO	slEPCO   
@@ -95,7 +97,9 @@ sla_FITXY	slFTXY
 sla_FK425	slFK45   
 sla_FK45Z	slF45Z   
 sla_FK524	slFK54   
+sla_FK52H	slFK5H   
 sla_FK54Z	slF54Z   
+sla_FK5HZ	slF5HZ   
 sla_FLOTIN	slRFLI   
 	
 sla_GALEQ	slGAEQ   
@@ -107,6 +111,8 @@ sla_GMSTA	slGMSA
 sla_GRESID	slGRES   
 	
 sla_H2E		slH2E   
+sla_H2FK5       slHFK5   
+sla_HFK5Z       slHF5Z      
 	
 sla__IDCHI	slICHI   
 sla__IDCHF	slICHF   
@@ -133,16 +139,24 @@ sla_OAP		slOAP
 sla_OAPQK	slOAPQ   
 	
 sla_PA		slPA   
+sla_PAV		slPAV   
 sla_PCD		slPCD   
 sla_PDA2H	slPDAH   
 sla_PDQ2H	slPDQH   
+sla_PERTEL      slPRTL   
+sla_PERTUE      slPRTE   
+sla_PLANEL      slPLNE   
 sla_PLANET	slPLNT   
+sla_PLANTE      slPLTE   
 sla_PM		slPM   
+sla_POLMO       slPLMO
 sla_PREBN	slPRBN   
 sla_PREC	slPREC   
 sla_PRECES	slPRCE   
 sla_PRECL	slPREL   
 sla_PRENUT	slPRNU   
+sla_PV2EL       slPVEL   
+sla_PV2UE       slPVUE   
 sla_PVOBS	slPVOB   
 sla_PXY		slPXY   
 	
@@ -152,6 +166,7 @@ sla_RANORM	slRA2P
 sla_RCC		slRCC   
 sla_RDPLAN	slRDPL   
 sla_REFCO	slRFCO   
+sla_REFCOQ	slRFCQ   
 sla_REFRO	slRFRO   
 sla_REFV	slREFV   
 sla_REFZ	slREFZ   
@@ -175,6 +190,8 @@ sla_TP2V	slTP2V
 sla_TPS2C	slTPSC   
 sla_TPV2C	slTPVC   
 	
+sla_UE2EL       slUEEL   
+sla_UE2PV       slUEPV   
 sla_UNPCD	slUPCD   
 	
 sla_V2TP	slV2TP   

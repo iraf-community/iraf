@@ -1,8 +1,8 @@
       SUBROUTINE slATMD (TDK, PMB, RH, WL1, A1, B1, WL2, A2, B2)
 *+
-*  - - - - - - -
-*   A T M D
-*  - - - - - - -
+*     - - - - - - -
+*      A T M D
+*     - - - - - - -
 *
 *  Apply atmospheric-dispersion adjustments to refraction coefficients.
 *
@@ -68,6 +68,7 @@
 *  Copyright (C) 1995 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
+
       IMPLICIT NONE
 
       DOUBLE PRECISION TDK,PMB,RH,WL1,A1,B1,WL2,A2,B2

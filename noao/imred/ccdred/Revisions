@@ -1,5 +1,40 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
+ccdred$src/t_ccdlist.x
+    Date accidentally changed.  File not modified.  (5/13/99, Valdes)
+
+ccdred$doc/ccdproc.hlp
+ccdred$doc/mkskyflat.hlp
+    Fixed minor formating problems. (4/22/99, Valdes)
+
+ccdred$src/imcombine/icsetout.x
+    The updating of the WCS for offset images was not being done correctly.
+    (10/6/98, Valdes)
+
+ccdred$src/t_ccdmask.x
+    The overlapping of groups of columns was not quite working because
+    you can't overlap imp... calls.  (9/10/98, Valdes)
+
+ccdred$src/t_ccdproc.x
+ccdred$ccdproc.par
+ccdred$doc/ccdproc.hlp
+ccdred$darkcombine.cl
+ccdred$flatcombine.cl
+ccdred$zerocombine.cl
+    1.  Added output image option to CCDPROC.
+    2.  The combine scripts all still do in place processing.
+    (6/19/98, Valdes)
+
+ccdred$doc/ccdproc.hlp
+    Fixed font change typo in Revisions section.  (6/16/98, Valdes)
+
+ccdred$src/t_ccdmask.x
+    The test for a bad pixel used && instead of ||.  (4/24/98, Valdes)
+
+=======
+V2.11.1
+=======
+
 ccdred$src/icscale.x
 ccdred$doc/combine.hlp
     When zero offsets or weights are specified in a file the weights

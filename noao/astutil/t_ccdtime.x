@@ -1,6 +1,6 @@
 define	NF		5		# Maximum number of filters
 define	SZ_FILTER	7		# Maximum length of filter name
-define	TOL		0.01		# Convergence tolerance
+define	TOL		0.0001		# Convergence tolerance
 
 
 # T_CCDTIME -- Compute the time, magnitude, and signal-to-noise for CCD
@@ -22,9 +22,11 @@ real	seeing			# Seeing (arcsec)
 real	phase			# Moon phase (0-28)
 real	airmass			# Airmass
 
-int	i, n
-real	aper, scale, trans, nread, dark, pixsize, lum, p, t1
+int	i, j, n
+real	a, b, c
+real	aper, scale, trans, nread, dark, pixsize, lum, p
 real	star[NF], sky[NF], t, m, s, nstar, nsky, ndark, noise, npix
+real	dqe, ext, starmag, counts, sky0, sky1, sky2
 pointer	sp, tdb, ddb, fdb[NF]
 
 int	clgeti()
@@ -62,12 +64,16 @@ begin
 	airmass = clgetr ("airmass")
 
 	i = 0
-	if (IS_INDEFR(time))
+	if (IS_INDEFR(time) || time <= 0.) {
+	    time = INDEFR
 	    i = i + 1
+	}
 	if (IS_INDEFR(mag))
 	    i = i + 1
-	if (IS_INDEFR(snr))
+	if (IS_INDEFR(snr) || snr <= 0.) {
+	    snr = INDEFR
 	    i = i + 1
+	}
 	if (i > 1) {
 	    call sfree (sp)
 	    call error (1,
@@ -98,25 +104,40 @@ begin
 	if (tdb == NULL || ddb == NULL || n == 0)
 	    goto done_
 
-	# Get telescope and detector parameters.
-	aper = dbgetd (tdb, "aperture")
-	scale = dbgetd (tdb, "scale")
-	trans = dbgetd (tdb, "transmission")
-	nread = dbgetd (ddb, "rdnoise")
-	dark = dbgetd (ddb, "dark")
-	pixsize = dbgetd (ddb, "pixsize") * (scale / 1000) * sum
-	npix  =  1.4 * (seeing / pixsize)**2
-
 	# Get star and sky rates for telescope/detector/filter combination.
 	# Convert to a standard rate at 20th magnitude at the given airmass.
 
 	do i = 1, n {
-	    lum = 10. ** (0.4 * (dbgetd (fdb[i], "mag") - 20.))
-	    star[i] = dbgetd (fdb[i], "star") * lum * aper ** 2 * trans *
-		10 ** (0.4 * (1 - airmass))
-	    star[i] = star[i] * dbgetd (ddb, Memc[filter[i]])
-	    sky[i] = dbgetd (fdb[i], "sky0") + dbgetd (fdb[i], "sky1") * p +
-		dbgetd (fdb[i], "sky2") * p * p
+	    # Get telescope parameters.
+	    aper = dbgetd (tdb, "aperture", Memc[filter[i]], Memc[detector])
+	    scale = dbgetd (tdb, "scale", Memc[filter[i]], Memc[detector])
+	    trans = dbgetd (tdb, "transmission", Memc[filter[i]],
+		Memc[detector])
+
+	    # Get detector parameters.
+	    dqe = dbgetd (ddb, Memc[filter[i]], Memc[filter[i]],
+		Memc[telescope])
+	    nread = dbgetd (ddb, "rdnoise", Memc[filter[i]], Memc[telescope])
+	    dark = dbgetd (ddb, "dark", Memc[filter[i]], Memc[telescope])
+	    pixsize = dbgetd (ddb,"pixsize",Memc[filter[i]],Memc[telescope]) *
+		(scale / 1000) * sum
+	    npix  =  max (9, nint (1.4 * (seeing / pixsize)**2+0.5))
+
+	    # Get filter parameters.
+	    iferr (ext = dbgetd (fdb[i], "extinction", Memc[telescope],
+		Memc[detector]))
+		ext = 1
+	    starmag = dbgetd (fdb[i], "mag", Memc[telescope], Memc[detector])
+	    counts = dbgetd (fdb[i], "star", Memc[telescope], Memc[detector])
+	    sky0 = dbgetd (fdb[i], "sky0", Memc[telescope], Memc[detector])
+	    sky1 = dbgetd (fdb[i], "sky1", Memc[telescope], Memc[detector])
+	    sky2 = dbgetd (fdb[i], "sky2", Memc[telescope], Memc[detector])
+
+	    lum = 10. ** (0.4 * (starmag - 20.))
+	    star[i] = counts * lum * aper ** 2 * trans *
+		10 ** (0.4 * (1 - airmass) * ext)
+	    star[i] = star[i] * dqe
+	    sky[i] = sky0 + sky1 * p + sky2 * p * p
 	    sky[i] = star[i] * pixsize ** 2 * 10. ** ((20. - sky[i]) / 2.5)
 	}
 	if (!IS_INDEFR(mag))
@@ -149,28 +170,24 @@ begin
 	    call pargstr ("CCD")
 
 	# Compute exposure time through each filter.
-	# Use resubstitution to iterate for exposure time.
 
 	if (!IS_INDEFR(mag) && !IS_INDEFR(snr)) {
 	    call printf ("\n")
 	    do i = 1, n {
-		t  = 10.
-		t1 = 0.0
-		while (abs(t-t1) > TOL) {
-		    t = t1
-		    m = mag
-		    nstar = star[i] * lum
-		    nsky  = sky[i] * t
-		    ndark = dark * t
-		    noise = sqrt(nstar * t + npix * (nsky + ndark + nread**2))
-		    s = nstar / noise
-		    t1 = snr / s
-		}
-		nstar = nstar * t
-		s = s * t 
+		a = ((star[i] * lum) / snr) ** 2
+		b = -(star[i] * lum + npix * (sky[i] + dark))
+		c = -npix * nread ** 2
+		t = (-b + sqrt (b**2 - 4 * a * c)) / (2 * a)
+
+		nstar = star[i] * lum * t
+		nsky  = sky[i] * t
+		ndark = dark * t
+		noise = sqrt(nstar + npix * (nsky + ndark + nread**2))
+		s = nstar / noise
+		m = mag
 
 		call printf (
-		    "%7s %7.1f %7.1f %7.1f %7.1f %7.1f %7.2f %7.2f %7.2f\n")
+		    "%7s %7.2f %7.1f %7.1f %7.1f %7.1f %7.2f %7.2f %7.2f\n")
 		    call pargstr (Memc[filter[i]])
 		    call pargr (t)
 		    call pargr (m)
@@ -191,7 +208,7 @@ begin
 	    do i = 1, n {
 		m = 20
 		s = 0
-		while (abs(snr-s) > TOL) {
+		do j = 1, 100 {
 		    t = time
 		    nstar = star[i] * 10**(0.4*(20.0-m)) * t
 		    nsky  = sky[i] * t
@@ -199,10 +216,12 @@ begin
 		    noise = sqrt(nstar + npix * (nsky + ndark + nread**2))
 		    m = 20 - 2.5 * log10 (snr * noise / (t * star[i]))
 		    s = nstar / noise
+		    if (abs(1-s/snr) <= TOL)
+			break
 		}
 
 		call printf (
-		    "%7s %7.1f %7.1f %7.1f %7.1f %7.1f %7.2f %7.2f %7.2f\n")
+		    "%7s %7.2f %7.1f %7.1f %7.1f %7.1f %7.2f %7.2f %7.2f\n")
 		    call pargstr (Memc[filter[i]])
 		    call pargr (t)
 		    call pargr (m)
@@ -229,7 +248,7 @@ begin
 		s = nstar / noise
 
 		call printf (
-		    "%7s %7.1f %7.1f %7.1f %7.1f %7.1f %7.2f %7.2f %7.2f\n")
+		    "%7s %7.2f %7.1f %7.1f %7.1f %7.1f %7.2f %7.2f %7.2f\n")
 		    call pargstr (Memc[filter[i]])
 		    call pargr (t)
 		    call pargr (m)

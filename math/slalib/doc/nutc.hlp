@@ -1,4 +1,4 @@
-.help nutc Nov95 "Slalib Package"
+.help nutc Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slNUTC (DATE, DPSI, DEPS, EPS0)
@@ -24,9 +24,9 @@
       chairman P.K.Seidelmann, 1980.
      Kaplan,G.H., 1981, USNO circular no. 163, pA3-6.
 
-  P.T.Wallace   Starlink   September 1987
+  P.T.Wallace   Starlink   23 August 1996
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

@@ -22,12 +22,12 @@ bool	streq()
 errchk	immap, swm_openim, imaccess, rv_aplist, realloc, rv_verify_aps
 
 begin
-	call smark (sp)
-
 	if (streq(apnum,"") || streq(apnum," ")) {
 	    call rv_errmsg ("Aperture list specified as a NULL string")
 	    return (ERR_READ)
 	}
+
+	call smark (sp)
 
 	# If a wildcard template is given read the image otherwise
 	# expand the template list.

@@ -1,4 +1,4 @@
-.help pcd Nov95 "Slalib Package"
+.help pcd Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slPCD (DISCO,X,Y)

@@ -14,15 +14,12 @@ libex.a:
 	qpaddr.x	../qpoe.h
 	qpadds.x	../qpoe.h
 	qpaddx.x	../qpoe.h
-	qpexattrld.x	../qpex.h <mach.h>
-	qpexattrli.x	../qpex.h <mach.h>
-	qpexattrlr.x	../qpex.h <mach.h>
+	qpexattrld.x	../qpex.h <ctype.h> <mach.h>
+	qpexattrli.x	../qpex.h <ctype.h> <mach.h>
+	qpexattrlr.x	../qpex.h <ctype.h> <mach.h>
 	qpexcoded.x	../qpex.h <mach.h>
 	qpexcodei.x	../qpex.h <mach.h>
 	qpexcoder.x	../qpex.h <mach.h>
-	qprlmerged.x	../qpex.h <mach.h>
-	qprlmergei.x	../qpex.h <mach.h>
-	qprlmerger.x	../qpex.h <mach.h>
 	qpexparsed.x	../qpex.h <ctype.h> <mach.h>
 	qpexparsei.x	../qpex.h <ctype.h> <mach.h>
 	qpexparser.x	../qpex.h <ctype.h> <mach.h>
@@ -35,12 +32,16 @@ libex.a:
 	qpgetl.x	../qpoe.h
 	qpgetr.x	../qpoe.h
 	qpgets.x	../qpoe.h
-	qpiorpixi.x	../qpio.h
-	qpiorpixs.x	../qpio.h
+	qpiogetev.x	../qpio.h <pmset.h>
+	qpiorpixi.x	../qpio.h <mach.h>
+	qpiorpixs.x	../qpio.h <mach.h>
 	qpputc.x	../qpoe.h
 	qpputd.x	../qpoe.h
 	qpputi.x	../qpoe.h
 	qpputl.x	../qpoe.h
 	qpputr.x	../qpoe.h
 	qpputs.x	../qpoe.h
+	qprlmerged.x	../qpex.h <mach.h>
+	qprlmergei.x	../qpex.h <mach.h>
+	qprlmerger.x	../qpex.h <mach.h>
 	;

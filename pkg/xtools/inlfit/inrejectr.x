@@ -34,15 +34,15 @@ begin
 #	    call pargi (npts)
 #	    call pargi (nvars)
 
-	call smark (sp)
-	call salloc (wts1, npts, TY_REAL)
-	call amovr (w, Memr[wts1], npts)
-
 	# Get number of reject iterations, and return if they
 	# are less than one.
 	niter = in_geti (in, INLNREJECT)
 	if (niter < 1)
 	    return
+
+	call smark (sp)
+	call salloc (wts1, npts, TY_REAL)
+	call amovr (w, Memr[wts1], npts)
 
 	# Get rejection parameters, and rejected point list.
 	low    = in_getr (in, INLLOW)

@@ -125,7 +125,7 @@
  * with a negative file number and the driver will rewind to reestablish a
  * known position.
  *
- * The devpos structure (struct _mtpos) has the following fields:
+ * The devpos structure (struct mtpos) has the following fields:
  *
  *	int	filno		file number
  *	int	recno		record number
@@ -172,7 +172,7 @@ typedef unsigned int U_int;
 /* Tape position information (must agree with client struct).  This is input
  * by the client at open time and is only modified locally by the driver.
  */
-struct _mtpos {
+struct mtpos {
 	int	filno;			/* current file (1=first) */
 	int	recno;			/* current record (1=first) */
 	int	nfiles;			/* number of files on tape */
@@ -220,7 +220,7 @@ struct mtdesc {
 	int	mtbsr, mtfsr;		/* BSR,FSR ioctl codes */
 	int	mtbsf, mtfsf;		/* BSF,FSF ioctl codes */
 	U_int	mtioctop;		/* MTIOCTOP code */
-	struct	_mtpos mtpos;		/* position information */
+	struct	mtpos mtpos;		/* position information */
 	struct	mtdev mtdev;		/* drive type information */
 	char	iodev[SZ_FNAME];	/* i/o device */
 	char	nr_device[SZ_FNAME];	/* no-rewind-on-close device */
@@ -295,7 +295,7 @@ static struct mtchar {
 	int	pname;		/* 2 byte parameter name code */
 	int	pcode;		/* parameter number */
 	int	bitflag;	/* flag bit */
-	int	isset;		/* value has been set */
+	int	valset;		/* value has been set */
 } devpar[] = {
 	{ PNAME('a','l'), P_AL, 0, 0 },
 	{ PNAME('b','f'), P_BF, 0, 0 },
@@ -358,11 +358,11 @@ XINT	*chan;		/* OS channel of opened file */
 {
 	register int fd;
 	register struct	mtdesc *mp;
-	struct	_mtpos *pp;
+	struct	mtpos *pp;
 
 	/* Open the main device descriptor. */
 	mp = zmtdesc ((char *)device, *acmode, (char *)devcap,
-	    (struct _mtpos *)devpos);
+	    (struct mtpos *)devpos);
 	if (mp == NULL) {
 	    *chan = XERR;
 	    return;
@@ -490,7 +490,7 @@ XINT	*o_status;
 {
 	register int fd;
 	register struct mtdesc *mp;
-	register struct _mtpos *pp;
+	register struct mtpos *pp;
 	int	status, eof_seen, eor_seen, eot_seen;
 
 	/* Since open files are closed during error recovery and an interrupt
@@ -625,7 +625,7 @@ XINT	*o_status;
 	zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
 	zmtfls (mp);
 
-	*((struct _mtpos *)devpos) = *pp;
+	*((struct mtpos *)devpos) = *pp;
 	*o_status = status ? XERR : XOK;
 	zmtfree (mp);
 }
@@ -645,7 +645,7 @@ XLONG	*offset;		/* fixed block devices only */
 {
 	register int fd = *chan, mb = (int)*maxbytes;
 	register struct mtdesc *mp = get_mtdesc(fd);
-	register struct _mtpos *pp = &mp->mtpos;
+	register struct mtpos *pp = &mp->mtpos;
 	int	status;
 
 	if (mp->mtdev.blksize && (mb % mp->mtdev.blksize)) {
@@ -756,7 +756,7 @@ XINT	*o_status;
 {
 	register int fd = *chan;
 	register struct mtdesc *mp = get_mtdesc(fd);
-	register struct _mtpos *pp = &mp->mtpos;
+	register struct mtpos *pp = &mp->mtpos;
 	register int flags = mp->flags;
 	int	status, eof_seen, eor_seen, eot_seen;
 
@@ -832,7 +832,7 @@ XINT	*o_status;
 	    zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
 	}
 
-	*((struct _mtpos *)devpos) = *pp;
+	*((struct mtpos *)devpos) = *pp;
 	*o_status = (status < 0) ? XERR : status;
 	zmtfls (mp);
 }
@@ -847,7 +847,7 @@ XLONG   *lvalue;
 {
 	register int fd = *chan;
 	register struct mtdesc *mp = get_mtdesc(fd);
-	register struct _mtpos *pp = &mp->mtpos;
+	register struct mtpos *pp = &mp->mtpos;
 
         switch (*param) {
         case FSTT_BLKSIZE:
@@ -895,7 +895,7 @@ XINT	*o_status;
 	int	status;
 
 	/* Open the main device descriptor. */
-	mp = zmtdesc ((char *)device, READ_ONLY, (struct _mtpos *)devcap, NULL);
+	mp = zmtdesc ((char *)device, READ_ONLY, (struct mtpos *)devcap, NULL);
 	if (mp == NULL) {
 	    *o_status = ERR;
 	    return;
@@ -1057,7 +1057,7 @@ zmtdesc (device, acmode, devcap, devpos)
 char	*device;		/* host device to be used for i/o */
 int	acmode;			/* iraf file access mode code */
 char	*devcap;		/* tapecap entry for device */
-struct	_mtpos *devpos;	/* device position info (or NULL ptr) */
+struct	mtpos *devpos;		/* device position info (or NULL ptr) */
 {
 	register struct mtdesc *mp;
 	register struct mtdev *dp;
@@ -1091,7 +1091,7 @@ struct	_mtpos *devpos;	/* device position info (or NULL ptr) */
 
 	/* Prepare to scan tapecap entry. */
 	for (pp=devpar;  pp->pname;  pp++)
-	    pp->isset = 0;
+	    pp->valset = 0;
 
 	/* Process the tapecap entry.  This is a sequence of entries of the
 	 * form "nn=value", where the NN is a two character name, the "=" is
@@ -1116,7 +1116,7 @@ struct	_mtpos *devpos;	/* device position info (or NULL ptr) */
 		    /* If multiple entries are given for the parameter ignore
 		     * all but the first.
 		     */
-		    if (pp->isset)
+		    if (pp->valset)
 			continue;
 		    else
 			mp->flags |= pp->bitflag;
@@ -1124,7 +1124,7 @@ struct	_mtpos *devpos;	/* device position info (or NULL ptr) */
 		    /* Check for a negated entry (e.g., ":ir@:"). */
 		    if (*ip == '@') {
 			mp->flags &= ~pp->bitflag;
-			pp->isset++;
+			pp->valset++;
 			continue;
 		    }
 
@@ -1153,7 +1153,7 @@ struct	_mtpos *devpos;	/* device position info (or NULL ptr) */
 				*op++ = *ip;
 			}
 			*op = EOS;
-			pp->isset++;
+			pp->valset++;
 
 			/* Default if no string value given but entry was
 			 * found, e.g., ":so:".
@@ -1192,7 +1192,7 @@ struct	_mtpos *devpos;	/* device position info (or NULL ptr) */
 			    ;
 			}
 
-			pp->isset++;
+			pp->valset++;
 			break;
 		    }
 		}
@@ -1231,7 +1231,7 @@ zmtfpos (mp, newfile)
 register struct mtdesc *mp;
 int	newfile;		/* file we want to position to */
 {
-	register struct _mtpos *pp = &mp->mtpos;
+	register struct mtpos *pp = &mp->mtpos;
 	register int flags = mp->flags;
 	int	oldfile, oldrec, maxrec;
 	char	*buf = NULL;
@@ -1707,7 +1707,7 @@ struct	mtdesc *mp;
 	/* Ignore signal generated if server goes away unexpectedly. */
 	nsockets++;
 	if (!sigpipe)
-	    sigpipe = signal (SIGPIPE, SIG_IGN);
+	    sigpipe = (SIGFUNC) signal (SIGPIPE, SIG_IGN);
 
 	mp->mtdev.statusout = fp;
 	zmtdbg1 (mp, "iodev = %s", mp->iodev);

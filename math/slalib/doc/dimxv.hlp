@@ -1,4 +1,4 @@
-.help dimxv Nov95 "Slalib Package"
+.help dimxv Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDIMV (DM, VA, VB)

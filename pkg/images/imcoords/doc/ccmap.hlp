@@ -1,4 +1,4 @@
-.help ccmap Dec96 images.imcoords
+.help ccmap Jun99 images.imcoords
 .ih
 NAME
 ccmap -- compute plate solutions using matched pixel and celestial coordinate lists
@@ -64,10 +64,10 @@ sets the preferred units for the input celestial coordinates,
 tells CCMAP how to transform the celestial coordinates of the reference
 point from the reference point coordinate system to the input coordinate
 system, and sets the correct values of the image header keywords CTYPE,
-RADECSYS, EQUINOX, and MJD-WCS if the image header wcs is updated. The two
-systems of most interest to users are "j2000" and "b1950" which stand for the
-FK5 J2000.0 and FK4 B1950.0 celestial coordinate systems respectively.
-The full set of options are the following:
+RADECSYS, EQUINOX, and MJD-WCS if the image header wcs is updated. The 
+systems of most interest to users are "icrs", "j2000", and "b1950" which
+stand for the ICRS J2000.0, FK5 J2000.0 and FK4 B1950.0 celestial coordinate
+systems respectively.  The full set of options are the following:
 
 .ls equinox [epoch]
 The equatorial mean place post-IAU 1976 (FK5) system if equinox is a
@@ -81,6 +81,17 @@ epoch, a Besselian epoch, or a Julian date. Julian epochs
 are prefixed by a J or j, Besselian epochs by a B or b.
 Epochs without the J / j or B / b prefix default to the epoch type of
 equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls icrs [equinox] [epoch]
+The Internaltion Celestial Refernce System where equinox is
+a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
+Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
+The default value of equinox is J2000.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
 a Julian date.  If undefined epoch defaults to equinox.
 .le
 .ls fk5 [equinox] [epoch] 
@@ -159,9 +170,9 @@ a Julian date. The default value of epoch is B1950.0.
 .le
 
 In all the above cases fields in [] are optional with the defaults as
-described. The epoch field for the fk5, galactic, and supergalactic
+described. The epoch field for the icrs, fk5, galactic, and supergalactic
 coordinate systems is only used if the input coordinates are in the
-equatorial fk4, noefk4, or fk5 systems and proper motions are supplied.
+equatorial fk4, noefk4, fk5, or icrs systems and proper motions are supplied.
 Since CCMAP does not currently support proper motions these fields are
 not required.
 .le
@@ -534,7 +545,7 @@ If the input celestial coordinate system is equatorial, the value of the
 RADECSYS keyword specifies the fundamental equatorial system, EQUINOX
 specifies the epoch of the mean place, and MJD-WCS specifies the epoch 
 for which the mean place is correct. The permitted values of
-RADECSYS are FK4, FK4-NO-E, FK5, and GAPPT. EQUINOX is entered in years
+RADECSYS are FK4, FK4-NO-E, FK5, ICRS, and GAPPT. EQUINOX is entered in years
 and interpreted as a Besselian epoch for the FK4 system, a Julian epoch
 for the FK5 system. The epoch of the wcs MJD-WCS is entered as 
 a modified Julian date. Only those keywords necessary to defined the

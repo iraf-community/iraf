@@ -108,6 +108,7 @@ The fit is performed on a circular region whose parameters are specified by
 The fit is performed on a region exterior to the circular region whose
 parameters are specified by \fIcircle\fR.
 .le
+.le
 .ls rows = "*"
 When \fIregion_type\fR = 'rows', the string parameter \fIrows\fR specifies
 the rows to be fit.

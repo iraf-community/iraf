@@ -1,5 +1,160 @@
 .help revisions Jun88 noao.onedspec
 .nf
+smw/units.x
+smw/funits.x
+    Stripped trailing whitespace from units label.  (8/5/99, Valdes)
+
+identify/t_reidentify.x
+    File date changed but no changes made to the file.  (7/22/99, Valdes)
+
+rspectext.cl
+    Added explicit add and del parameters to all the HEDIT calls.
+    (7/15/99, Valdes)
+
+t_sarith.x
+    The option to have a single second operand to work on a set of
+    first operands was not working.  (5/28/99, Valdes)
+
+splot/splot.key
+doc/splot.hlp
+    Added a reference to :.help and :/help.  (5/12/99, Valdes)
+
+doc/sys/1and2dspec.hlp
+doc/sys/Onedspec.hlp
+doc/sys/Review.hlp
+doc/fitprofs.hlp
+doc/reidentify.hlp
+doc/sensfunc.hlp
+doc/aidpars.hlp
+doc/autoidentify.hlp
+doc/skytweak.hlp
+doc/telluric.hlp
+irsiids/doc/powercor.hlp
+irsiids/doc/widstape.hlp
+    Fixed minor formating problems.  (4/22/99, Valdes)
+
+identify/idlinelist.x
+    The call to id_peak was using physical pixels while the subroutine
+    expects logical pixels.  A conversion from physical to logical was
+    added before calling id_peak.  (3/8/99, Valdes)
+
+scombine/t_scombine.x
+    Changed  UT(shin) = imgetr (im, Memc[gain -> snoise]).
+    (1/29/99, Valdes)
+
+identify/idgraph.x
+    Removed violation of GTOOLS data structure.  (12/18/98, Valdes)
+
+identify/t_reidentify.x
+    1.	When interactive=yes and ans is not NO when starting on a new
+	image in ri_image, the curfit descriptor was initialized to the
+	defaults rather than to reference solution.  This was because
+	of a missing ic_copy.
+    2.  When the reference and image names are the same the task will now
+	skip the reidentify,
+    (12/3/98, Valdes)
+
+shdr.x
+    Needed to check if data is defined for associated types before trying
+    to set flux units.  (11/27/98, Valdes)
+
+shdr.x
+    Improved the recognition of CTYPE values.  Most notably WAVELENGTH
+    is converted to "waveleng" by MWCS in making the label attribute.
+    (11/25/98, Valdes)
+
+doc/splot.hlp
+    Fixed help that said the output of a long slit or ND image would be
+    a 1D image.  (11/18/98, Valdes)
+
+dispcor/dispcor.x
+dispcor/refspectra.x
+    The weights when weighting multiple dispersion solutions were only
+    being recorded in the WCS attributes to 3 significant digits.  This
+    could cause the weights to become unnormalized and cause small
+    shifts.  Now whenever the weights are converted to strings the
+    format is %.8g.  (11/17/98, Valdes)
+
+t_fitprofs.x
+    When the input peak value was INDEF the task would fail with a
+    floating overflow value if scale < 1.  This was caused by not checking
+    for INDEF before dividing by the scale.  (11/5/98, Valdes)
+
+smw/smwnewcopy.x
+    The structure copy was wrong.  (10/28/98, Valdes)
+
+sensfunc/sfimage.x
+t_calibraate.x
+    The flux calibration gets the wrong sign if dw<0.  (9/25/98, Valdes)
+
+smw/shdr.x
+    Default units of Angstroms was added if DC-FLAG is dispersion corrected.
+    (9/24/98, Valdes)
+
+dispcor/dcio.x
+    The weights are now adjusted to produce weighted average rather than
+    weighted sum.  (8/25/98, Valdes)
+
+splot/wrspect.x
+    The filling in of data outside of NP1/NP2 was done incorrectly.
+    Normally NP1/NP2 cover the entire image line but in echelle data
+    it is common for NP2 to be less than the full line.  In this case
+    the result of saving an image was loss of the last valid point.
+    (7/14/98, Valdes)
+ 
+identify/idinit.x
+    When restoring a solution without a dispersion function the shift
+    failed to be restored.  This causes a problem with REIDENTIFY when
+    working on long slit data with a significant systematic tilt and
+    measuring the spatial distortion.  (6/1/98, Valdes)
+
+t_tweak.x
+telluric.par
+doc/telluric.hlp
+    If the calibration is < 0 it is detected but there was an error in
+    the error clean up giving a "memory corruption" error.  This error
+    was fixed and a new threshold parameter was added to allow the task
+    to continue if the calibration data has low values.
+    (4/21/98, Valdes)
+
+t_sarith.x
+    When rebinning non-linear spectra the dispersion type was not be reset
+    to linear resulting in an incorrect spectral WCS.  See buglog 400.
+    (4/17/98, Valdes)
+
+doc/scopy.hlp
+    Added a note about using epar to set nsum to examples in section III
+    as suggested by Ivan King on 4/3/98.  (4/8/98, Valdes)
+
+scombine/t_scombine.x
+    If the input spectra are not dispersion corrected and first=no the
+    task was incorrectly setting the dispersion correction flag.
+    (3/3/98, Valdes)
+
+splot/deblend.x
+    The dorefit code was not handling the case of a mixture of profile types.
+    (2/12/98, Valdes)
+
+t_tweak.x
+    The extra argument in a twk_colon call was removed.
+    (2/5/98, Valdes)
+
+dispcor/t_dispcor.x
+    Added some errchk declarations.
+    (1/26/98, Valdes)
+
+identify/idlinelist.x
+doc/autoidentify.hlp
+doc/identify.hlp
+doc/reidentify.hlp
+    When a coordinate list is read it will be sorted and identical
+    entries will be eliminated.  Thus, line lists no longer need to
+    be sorted.  (1/12/98, Valdes)
+
+=======
+V2.11.1
+=======
+
 doc/splot.hlp
     Added another paragraph and a correction to the flux calculation
     done by 'e'.  (12/22/97, Valdes)

@@ -145,7 +145,10 @@ begin
 	        call pargstr (comment)
 	} else {
 	    nblanks = LEN_OBJECT - maxchar
-            call sprintf (card, LEN_CARD, "%-8.8s= '%*.*s'  /  %*.*s")
+	    if (comment[1] == EOS)
+                call sprintf (card, LEN_CARD, "%-8.8s= '%*.*s'     %*.*s")
+	    else
+                call sprintf (card, LEN_CARD, "%-8.8s= '%*.*s'  /  %*.*s")
 	        call pargstr (keyword)
 	        call pargi (-maxchar)
 	        call pargi (maxchar)
@@ -184,19 +187,23 @@ int	szdate		# number of chars in the date string
 
 long	ctime
 int	time[LEN_TMSTRUCT]
-long	clktime()
+long	clktime(), lsttogmt()
 
 begin
 	ctime = clktime (long (0))
+	ctime = lsttogmt (ctime)
 	call brktime (ctime, time)
 
 	if (TM_YEAR(time) >= NEW_CENTURY) {
-	    call sprintf (datestr, szdate, "%04s-%02s-%02s")
+	    call sprintf (datestr, szdate, "%04d-%02d-%02dT%02d:%02d:%02d")
 	        call pargi (TM_YEAR(time))
 	        call pargi (TM_MONTH(time))
 	        call pargi (TM_MDAY(time))
+	        call pargi (TM_HOUR(time))
+	        call pargi (TM_MIN(time))
+	        call pargi (TM_SEC(time))
 	} else {
-	    call sprintf (datestr, szdate, "%02s-%02s-%02s")
+	    call sprintf (datestr, szdate, "%02d-%02d-%02d")
 	        call pargi (TM_MDAY(time))
 	        call pargi (TM_MONTH(time))
 	        call pargi (mod (TM_YEAR(time), CENTURY))

@@ -408,12 +408,13 @@ double	coeff[ARB]			#I coefficients
 double	xin				#I physical coordinate for evaluation
 
 int	i, j, k, ncoeff, type, order
-double	xval, x, y, w, ysum, a, b, c	
+double	xval, x, y, w, ysum, wsum, a, b, c	
 
 begin
 	ncoeff = nint (coeff[1])
 	xval = max (coeff[2], min (coeff[3], xin))
 	ysum = 0.
+	wsum = 0.
 	j = 6
 	while (j < ncoeff) {
 	    type = nint (coeff[j+2])
@@ -497,7 +498,9 @@ begin
 		j = j + 5 + order
 	    }
 	    ysum = ysum + w * y
+	    wsum = wsum + w
 	}
+	ysum = ysum / wsum
 
 	return (ysum)
 end

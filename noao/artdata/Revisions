@@ -1,5 +1,20 @@
 .help revisions Jan90 noao.artdata
 .nf
+stdheader.dat
+mkexamples/archdr.dat
+mkexamples/objhdr.dat
+    Changed DATE-OBS to new FITS format.  (5/19/99, Valdes)
+    
+
+doc/mkobjects.hlp
+doc/mkpattern.hlp
+doc/mkechelle.hlp
+    Fixed minor formating problems.  (4/22/99, Valdes)
+
+doc/mkechelle.hlp
+    Modified to indicate the input list is not exactly the same as MK1DSPEC
+    since that task was modified to support different profile types.
+    (3/16/98, Valdes)
 
 =====
 V2.11

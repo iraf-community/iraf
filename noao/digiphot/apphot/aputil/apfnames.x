@@ -12,20 +12,30 @@ char	ext[ARB]		# extension
 char	name[ARB]		# input name
 int	maxch			# maximum size of name
 
-int	ndir
-pointer	sp, root
-int	fnldir(), strlen(), apimroot()
+int	ndir, nimdir, clindex, clsize
+pointer	sp, root, str
+int	fnldir(), strlen()
 
 begin
 	call smark (sp)
 	call salloc (root, SZ_FNAME, TY_CHAR)
-	call strcpy (image, Memc[root], maxch)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	ndir = fnldir (input, name, maxch)
 	if (strlen (input) == ndir) {
-	    ndir = ndir + apimroot (Memc[root], name[ndir+1], maxch)
-	    call sprintf (name[ndir+1], maxch, ".%s.*")
-		call pargstr (ext)
+            call imparse (image, Memc[root], SZ_FNAME, Memc[str], SZ_FNAME,
+                Memc[str], SZ_FNAME, clindex, clsize)
+            nimdir = fnldir (Memc[root], Memc[str], SZ_FNAME)
+            if (clindex >= 0) {
+                call sprintf (name[ndir+1], maxch, "%s%d.%s.*")
+                    call pargstr (Memc[root+nimdir])
+                    call pargi (clindex)
+                    call pargstr (ext)
+            } else {
+                call sprintf (name[ndir+1], maxch, "%s.%s.*")
+                    call pargstr (Memc[root+nimdir])
+                    call pargstr (ext)
+            }
 	    call apiversion (name, name, maxch)
 	} else
 	    call strcpy (input, name, maxch)
@@ -47,20 +57,30 @@ char	ext[ARB]		# extension
 char	name[ARB]		# output name
 int	maxch			# maximum size of name
 
-int	ndir
-pointer	sp, root
-int	fnldir(), strlen(), apimroot()
+int	ndir, nimdir, clindex, clsize
+pointer	sp, root, str
+int	fnldir(), strlen()
 
 begin
 	call smark (sp)
 	call salloc (root, SZ_FNAME, TY_CHAR)
-	call strcpy (image, Memc[root], maxch)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	ndir = fnldir (output, name, maxch)
 	if (strlen (output) == ndir) {
-	    ndir = ndir + apimroot (Memc[root], name[ndir+1], maxch)
-	    call sprintf (name[ndir+1], maxch, ".%s.*")
-		call pargstr (ext)
+            call imparse (image, Memc[root], SZ_FNAME, Memc[str], SZ_FNAME,
+                Memc[str], SZ_FNAME, clindex, clsize)
+            nimdir = fnldir (Memc[root], Memc[str], SZ_FNAME)
+            if (clindex >= 0) {
+                call sprintf (name[ndir+1], maxch, "%s%d.%s.*")
+                    call pargstr (Memc[root+nimdir])
+                    call pargi (clindex)
+                    call pargstr (ext)
+            } else {
+                call sprintf (name[ndir+1], maxch, "%s.%s.*")
+                    call pargstr (Memc[root+nimdir])
+                    call pargstr (ext)
+            }
 	    call apoversion (name, name, maxch)
 	} else
 	    call strcpy (output, name, maxch)
@@ -80,8 +100,9 @@ char	tmp[ARB]		# user supplied temporary root
 char	name[ARB]		# output name
 int	maxch			# max number of chars
 
-int	npref, ndir
-int	fnldir(), apimroot(), strlen()
+int	npref, ndir, nimdir, clindex, clsize
+pointer sp, root, str
+int	fnldir(), strlen()
 
 begin
 	npref = strlen (prefix)
@@ -90,9 +111,22 @@ begin
 	    call mktemp (tmp, name[ndir+1], maxch)
 	    return (NO)
 	} else {
+	    call smark (sp)
+	    call salloc (root, SZ_FNAME, TY_CHAR)
+	    call salloc (str, SZ_FNAME, TY_CHAR)
 	    call strcpy (prefix, name, npref)
-	    if (apimroot (image, name[npref+1], maxch) <= 0)
-		;
+	    call imparse (image, Memc[root], SZ_FNAME, Memc[str], SZ_FNAME,
+	        Memc[str], SZ_FNAME, clindex, clsize)
+		nimdir = fnldir (Memc[root], Memc[str], SZ_FNAME)
+	    if (clindex >= 0) {
+	        call sprintf (name[npref+1], maxch, "%s%d")
+		    call pargstr (Memc[root+nimdir])
+		    call pargi (clindex)
+	    } else {
+	        call sprintf (name[npref+1], maxch, "%s")
+		    call pargstr (Memc[root+nimdir])
+	    }
+	    call sfree (sp)
 	    return (YES)
 	}
 end

@@ -34,10 +34,7 @@ begin
 	call salloc (fn, SZ_PATHNAME, TY_CHAR)
 
 	status = OK
-
 	fit = IM_KDES(im)
-	FIRST_TIMER(fit) = YES
-	FIRST_TIMEW(fit) = YES
 
 	compress = YES
 	blklen   = 1
@@ -86,27 +83,16 @@ begin
 	        goto err_
 	    }
 
-	    if (FIT_PIXTYPE(fit) == TY_UBYTE || 
-		(FIT_PIXTYPE(fit) == TY_SHORT && IM_PIXTYPE(im) == TY_REAL)) {
-
-		iferr (call fxf_byte_short (im, pathname))
-		    goto err_
-
-	    } else {
-	        iferr (IM_PFD(im) = fopnbf (pathname, IM_ACMODE(im),
-			fxfzop, fxfzrd, fxfzwr, fxfzwt, fxfzst, fxfzcl)) {
-	            IM_PFD(im) = NULL
-	            goto err_
-	        }
+	    FIT_IM(fit) = im
+	    iferr (IM_PFD(im) = fopnbf (pathname, IM_ACMODE(im),
+		    fxfzop, fxfzrd, fxfzwr, fxfzwt, fxfzst, fxfzcl)) {
+	        IM_PFD(im) = NULL
+	        goto err_
 	    }
 	    
 	    FIT_TOTPIX(fit) = fxf_totpix(im)
 	    IM_FILESIZE(im) = fstatl (IM_PFD(im), F_FILESIZE)
 	    FIT_PFD(fit) = IM_PFD(im)
-
-	    # fitrdhdr.x set pixoff to 1 (for the temporary byte-->short file)
-	    if (FIT_PIXTYPE(fit) == TY_UBYTE)
-	       call imioff (im, FIT_PIXOFF(fit), compress, blklen)
 
 	case NEW_COPY, NEW_IMAGE, APPEND:
 	    # See if the apllication has set the number of dimensions.
@@ -274,144 +260,16 @@ begin
 end
 
 
-# FXF_BYTE_SHORT -- Procedure to read BYTE data and convert to TY_SHORT.
-# It will also convert TY_SHORT data with BSCALE != 1.0 and/or BZERO != 0.0
-# to TY_REAL while scaling.
+# FXF_BYTE_SHORT -- This routine is obsolete and has been deleted, but is
+# being preserved for the V2.11.2 patch so that a new shared library version
+# does not have to be created.  It can be deleted in the next major release.
 
 procedure fxf_byte_short (im, fname)
 
-pointer im                		#I Image descriptor
-char	fname[ARB]			#I Fits filename
-
-pointer sp,buf, fit
-double	bscale, bzero
-int	ip, l1, l2, l3, in, out
-char	outname[SZ_PATHNAME], temp[SZ_PATHNAME], ext[FITS_LENEXTN]
-int	i, pixcount, sz_pix, n, npix_read, nchars, buf_size
-int	fstati(), open(), read(), fnroot(), sizeof(), strldx()
-errchk open, syserr, syserrs
+pointer	im
+char	fname[ARB]
 
 begin
-	fit = IM_KDES(im)
-
-	temp[1] = '_'
-	ip = strldx (temp[1],fname)
-	fname[ip] = EOS
-
-	# Open input file.
-	in = open (fname, READ_ONLY, BINARY_FILE)
-	call seek (in, FIT_PIXOFF(fit))
-
-	# Create a temporary output file to contain the converted data.
-	call vfn_translate (fname, outname, l1, temp, l2, ext, l3)
-	i = fnroot (outname, temp, SZ_FNAME)
-	call mktemp (temp, outname, SZ_PATHNAME)
-	call strcat (".fits", outname, SZ_PATHNAME)
-	call strcpy ("tmp$", temp, SZ_FNAME)
-	call strcat (outname, temp, SZ_PATHNAME)
-	
-	pixcount = IM_PHYSLEN(im,1)
-	do i = 2, IM_NPHYSDIM(im)
-	    pixcount = pixcount*IM_PHYSLEN(im,i)
-
-	sz_pix = sizeof(TY_SHORT)
-	if (FIT_PIXTYPE(fit) == TY_UBYTE) {
-	    sz_pix = sizeof(TY_SHORT)
-	    if (IM_PIXTYPE(im) == TY_REAL)
-		sz_pix = sizeof(TY_REAL)
-	} else if (FIT_PIXTYPE(fit) == TY_SHORT)
-	    sz_pix = sizeof(TY_REAL)
-
-	call falloc (temp, pixcount*sz_pix)
-	out = open (temp, READ_WRITE, BINARY_FILE)
-
-        # Set up file buffers, intermediate buffer for efficient
-        # sequential i/o (advice is ignored if text file).  Local buffer
-        # is made same size as FIO buffer.
-	
-	call fseti (out, F_ADVICE, SEQUENTIAL)
-
-	switch (FIT_PIXTYPE(fit)) {
-	case TY_UBYTE:
-	    call smark (sp)
-
-	    buf_size = max (MIN_BUFSIZE, fstati (in, F_BUFSIZE))
-	    buf_size = min (buf_size, pixcount)
-
-	    if (IM_PIXTYPE(im) == TY_SHORT)
-		call salloc (buf, buf_size, TY_SHORT)
-	    else {
-		# Allocate space for REAL.
-		call salloc (buf, buf_size*2, TY_SHORT)
-		bscale = FIT_BSCALE(fit)
-		bzero  = FIT_BZERO(fit)
-	    }
-
-	    npix_read = 0
-	    while (npix_read < pixcount) {
-		n = min (buf_size/2, pixcount - npix_read)
-		nchars = read (in, Mems[buf], n)
-
-		if (IM_PIXTYPE(im) == TY_SHORT) {
-		    call achtbs (Mems[buf], Mems[buf], nchars*2)
-		    call write (out, Mems[buf], nchars*2)
-		    npix_read = npix_read + n
-
-		} else {
-		    # Scaled from byte to REAL.
-		    call achtbl (Mems[buf], Mems[buf], nchars*2)
-		    call fxf_altmr (Mems[buf], Mems[buf], nchars*2, 
-							bscale, bzero)
-		    call write (out, Mems[buf], nchars*4)
-		    npix_read = npix_read + n * 2
-		}
-	    }
-	    call sfree (sp)
-
-	case TY_SHORT:
-	    call smark(sp)
-
-	    bscale = FIT_BSCALE(fit)
-	    bzero  = FIT_BZERO(fit)
-	    buf_size = max (MIN_BUFSIZE, fstati (in, F_BUFSIZE)) / 2
-	    buf_size = min (buf_size, pixcount)
-	    call salloc (buf, buf_size*2, TY_SHORT)
-
-	    npix_read = 0
-	    while (npix_read < pixcount) {
-		n = min (buf_size, pixcount - npix_read)
-		nchars = read (in, Mems[buf], n)
-		if (BYTE_SWAP2 == YES)
-		    call bswap2 (Mems[buf], 1, Mems[buf], 1,
-			n * (NBITS_SHORT / NBITS_BYTE))
-		call achtsl (Mems[buf], Mems[buf], n)
-		call fxf_altmr (Mems[buf], Mems[buf], n, bscale, bzero)
-		call write (out, Mems[buf], nchars*2)
-		npix_read = npix_read + n
-	    }
-
-	    call sfree (sp)
-
-	default:
-	    call syserr (SYS_FXFBSDTY)
-	}
-	
-	# Close input file and pass the new temporary descriptor
-	# to the upper level calls.
-
-	call close (in)
-	call seek (out, BOF)
-
-	IM_PFD(im) = out
-	IM_PIXOFF(im) = 1
-	call strcpy (temp, IM_HDRFILE(im), SZ_FNAME)
-
-	# Now change the PIXTYPE to a delete flag such that
-	# fxf_close would recognized and delete this temporary
-	# file rather that a valid one when the image has been
-	# read only and only the header information is needed.
-	
-	FIT_PIXTYPE(fit) = 99
 end
 
 
@@ -781,7 +639,7 @@ end
 # FXF_CKH_NDIM -- Check that the application has indeed set the number
 # of dimension, otherwise count the axes.
 
-procedure fxf_chk_ndim(im)
+procedure fxf_chk_ndim (im)
 
 pointer im		#I imio descriptor
 int	ndim		#I number of dimension for image

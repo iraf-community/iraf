@@ -198,11 +198,12 @@ double  lngref, latref          #O the reference point world coordinates
 pointer sx1, sy1                #O pointer to the linear x and y fits
 pointer sx2, sy2                #O pointer to the distortion x and y fits
 
-int     i, ncoeff, junk, rec, coostat, lngunits, latunits
-pointer mw, xcoeff, ycoeff
+int     i, op, ncoeff, junk, rec, coostat, lngunits, latunits
+pointer mw, xcoeff, ycoeff, sp, projpar, projvalue
 double  dtgetd()
-int     dtlocate(), dtgeti(), dtscan(), sk_decwcs(), strdic()
-errchk	dgsrestore
+int     dtlocate(), dtgeti(), dtscan(), sk_decwcs(), strdic(), strlen()
+int	gstrcpy()
+errchk	dgsrestore(), dtgstr(), dtdgetd(), dtgeti()
 
 begin
         # Locate the appropriate records.
@@ -285,6 +286,27 @@ begin
             sx2 = NULL
             sy2 = NULL
         }
+
+        # Get the projection parameters if any.
+        call smark (sp)
+        call salloc (projpar, SZ_FNAME, TY_CHAR)
+        call salloc (projvalue, SZ_FNAME, TY_CHAR)
+        op = strlen (projection) + 1
+        do i = 0, 9 {
+            call sprintf (Memc[projpar], SZ_FNAME, "projp%d")
+                call pargi (i)
+            iferr (call dtgstr (dt, rec, Memc[projpar], Memc[projvalue],
+                SZ_FNAME))
+                next
+            op = op + gstrcpy (" ", projection[op], SZ_LINE - op + 1)
+            op = op + gstrcpy (Memc[projpar], projection[op],
+                SZ_LINE - op + 1)
+            op = op + gstrcpy (" = ", projection[op], SZ_LINE - op + 1)
+            op = op + gstrcpy (Memc[projvalue], projection[op],
+                SZ_LINE - op + 1)
+        }
+        call sfree (sp)
+
 
 	call mfree (xcoeff, TY_DOUBLE)
 	call mfree (ycoeff, TY_DOUBLE)

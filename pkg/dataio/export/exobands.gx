@@ -173,7 +173,7 @@ end
 
 procedure ex_obfcn (ex, fcn, args, nargs, o)
 
-pointer ex                              #i task struct pointer
+pointer	ex				#i package pointer
 char    fcn[ARB]                        #i function to be executed
 pointer args[ARB]                       #i argument list
 int     nargs                           #i number of arguments

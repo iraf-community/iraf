@@ -258,5 +258,7 @@ begin
 	    call mfree (FP_PV1(fp), FP_PIXTYPE(fp))
 	if (FP_PV2(fp) != NULL)
 	    call mfree (FP_PV2(fp), FP_PIXTYPE(fp))
+	if (FP_DATA(fp) != NULL)
+	    call mfree (FP_DATA(fp), FP_PIXTYPE(fp))
 	call mfree (fp, TY_STRUCT)
 end

@@ -32,7 +32,7 @@
 *     P and H.
 *
 *     If the station parameters are not available, either because
-*     the station identifier C is not recognised, or because an
+*     the station identifier C is not recognized, or because an
 *     N value greater than the number of stations supported is
 *     given, a name of '?' is returned and C, W, P and H are left
 *     in their current states.
@@ -71,9 +71,9 @@
 *         better station identifiers or names
 *         additional stations
 *
-*  P.T.Wallace   Starlink   20 February 1995
+*  P.T.Wallace   Starlink   21 April 1999
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -89,10 +89,10 @@
       DOUBLE PRECISION AS2R,WEST,NORTH,EAST,SOUTH
       INTEGER ID,IAM
       REAL AS
-      PARAMETER (AS2R=0.4848136811095359949D-05)
+      PARAMETER (AS2R=0.484813681109535994D-5)
 
 *  Table of station identifiers
-      PARAMETER (NMAX=67)
+      PARAMETER (NMAX=75)
       CHARACTER*10 CTAB(NMAX)
       DATA CTAB  (1) /'AAT       '/
       DATA CTAB  (2) /'LPO4.2    '/
@@ -161,6 +161,14 @@
       DATA CTAB (65) /'KISO      '/
       DATA CTAB (66) /'ESOSCHM   '/
       DATA CTAB (67) /'ATCA      '/
+      DATA CTAB (68) /'MOPRA     '/
+      DATA CTAB (69) /'SUBARU    '/
+      DATA CTAB (70) /'CFHT      '/
+      DATA CTAB (71) /'KECK2     '/
+      DATA CTAB (72) /'GEMININ   '/
+      DATA CTAB (73) /'FCRAO     '/
+      DATA CTAB (74) /'IRTF      '/
+      DATA CTAB (75) /'CSO       '/
 
 *  Degrees, arcminutes, arcseconds to radians
       WEST(ID,IAM,AS)=AS2R*(DBLE(60*(60*ID+IAM))+DBLE(AS))
@@ -210,7 +218,8 @@
      :       310,320,330,340,350,360,370,380,390,400,
      :       410,420,430,440,450,460,470,480,490,500,
      :       510,520,530,540,550,560,570,580,590,600,
-     :       610,620,630,640,650,660,670) M
+     :       610,620,630,640,650,660,670,680,690,700,
+     :       710,720,730,740,750) M
       GO TO 9000
 
 *  AAT (Observer's Guide)                                            AAT
@@ -253,10 +262,10 @@
       H=1290D0
       GO TO 9999
 
-*  MMT (1984 Almanac)                                                MMT
+*  MMT 6.5m conversion (MMT Observatory website)                     MMT
  60   CONTINUE
-      NAME='MMT, Mt Hopkins'
-      W=WEST(110,53,04.3)
+      NAME='MMT 6.5m, Mt Hopkins'
+      W=WEST(110,53,04.4)
       P=NORTH(31,41,19.6)
       H=2608D0
       GO TO 9999
@@ -429,20 +438,21 @@
       H=2428D0
       GO TO 9999
 
-*  Mauna Kea 88 inch (1981 Almanac)                             MAUNAK88
+*  Mauna Kea 88 inch                                            MAUNAK88
+*  (IfA website, Richard Wainscoat)
  280  CONTINUE
       NAME='Mauna Kea 88 inch'
-      W=WEST(155,28,20.)
-      P=NORTH(19,49,34.)
-      H=4215D0
+      W=WEST(155,28,09.96)
+      P=NORTH(19,49,22.77)
+      H=4213.6D0
       GO TO 9999
 
-*  UKIRT (1981 Almanac)                                            UKIRT
+*  UKIRT (IfA website, Richard Wainscoat)                          UKIRT
  290  CONTINUE
       NAME='UK Infra Red Telescope'
-      W=WEST(155,28,18.)
-      P=NORTH(19,49,35.)
-      H=4200D0
+      W=WEST(155,28,13.18)
+      P=NORTH(19,49,20.75)
+      H=4198.5D0
       GO TO 9999
 
 *  Quebec 1.6m (1981 Almanac)                                  QUEBEC1.6
@@ -621,12 +631,13 @@
       H=78D0
       GO TO 9999
 
-*  Parkes 64m (1981 Almanac)                                      PARKES
+*  Australia Telescope Parkes Observatory                         PARKES
+*  (Peter te Lintel Hekkert, private comm)
  520  CONTINUE
       NAME='Parkes 64 metre'
-      W=EAST(148,15,44.15)
-      P=SOUTH(33,00,00.0)
-      H=392D0
+      W=EAST(148,15,44.3591)
+      P=SOUTH(32,59,59.8657)
+      H=391.79D0
       GO TO 9999
 
 *  VLA (1981 Almanac)                                                VLA
@@ -661,11 +672,12 @@
       H=1350D0
       GO TO 9999
 
-*  James Clerk Maxwell 15 metre mm telescope, Mauna Kea (I.Coulson) JCMT
+*  James Clerk Maxwell 15 metre mm telescope, Mauna Kea             JCMT
+*  (IfA website, Richard Wainscoat, height from I.Coulson)
  570  CONTINUE
       NAME='JCMT 15 metre'
-      W=WEST(155,28,47.)
-      P=NORTH(19,49,33.)
+      W=WEST(155,28,37.20)
+      P=NORTH(19,49,22.11)
       H=4111D0
       GO TO 9999
 
@@ -693,11 +705,12 @@
       H=2809D0
       GO TO 9999
 
-*  W.M.Keck Observatory, Telescope 1 (site survey)                 KECK1
+*  W.M.Keck Observatory, Telescope 1                               KECK1
+*  (William Lupton, private comm)
  610  CONTINUE
       NAME='Keck 10m Telescope #1'
-      W=WEST(155,28,39.0)
-      P=NORTH(19,49,44.4)
+      W=WEST(155,28,28.99)
+      P=NORTH(19,49,33.41)
       H=4160D0
       GO TO 9999
 
@@ -741,7 +754,7 @@
       H=2347D0
       GO TO 9999
 
-*  Australia Telescope Compact Array                             ATCA
+*  Australia Telescope Compact Array                                ATCA
 *  (WGS84 coordinates of Station 35, Mark Calabretta, private comm)
  670  CONTINUE
       NAME='Australia Telescope Compact Array'
@@ -750,7 +763,79 @@
       H=236.9D0
       GO TO 9999
 
-*  Unrecognised station
+*  Australia Telescope Mopra Observatory                           MOPRA
+*  (Peter te Lintel Hekkert, private comm)
+ 680  CONTINUE
+      NAME='ATNF Mopra Observatory'
+      W=EAST(149,05,58.732)
+      P=SOUTH(31,16,04.451)
+      H=850D0
+      GO TO 9999
+
+*  Subaru telescope, Mauna Kea                                     SUBARU
+*  (IfA website, Richard Wainscoat)
+ 690  CONTINUE
+      NAME='Subaru 8m telescope'
+      W=WEST(155,28,33.67)
+      P=NORTH(19,49,31.81)
+      H=4163D0
+      GO TO 9999
+
+*  Canada-France-Hawaii Telescope, Mauna Kea                         CFHT
+*  (IfA website, Richard Wainscoat)
+ 700  CONTINUE
+      NAME='Canada-France-Hawaii 3.6m Telescope'
+      W=WEST(155,28,07.95)
+      P=NORTH(19,49,30.91)
+      H=4204.1D0
+      GO TO 9999
+
+*  W.M.Keck Observatory, Telescope 2                                KECK2
+*  (William Lupton, private comm)
+ 710  CONTINUE
+      NAME='Keck 10m Telescope #2'
+      W=WEST(155,28,27.24)
+      P=NORTH(19,49,35.62)
+      H=4159.6D0
+      GO TO 9999
+
+*  Gemini North, Mauna Kea                                        GEMININ
+*  (IfA website, Richard Wainscoat)
+ 720  CONTINUE
+      NAME='Gemini North 8-m telescope'
+      W=WEST(155,28,08.57)
+      P=NORTH(19,49,25.69)
+      H=4213.4D0
+      GO TO 9999
+
+*  Five College Radio Astronomy Observatory                        FCRAO
+*  (Tim Jenness, private comm)
+ 730  CONTINUE
+      NAME='Five College Radio Astronomy Obs'
+      W=WEST(72,20,42.0)
+      P=NORTH(42,23,30.0)
+      H=314D0
+      GO TO 9999
+
+*  NASA Infra Red Telescope Facility                                IRTF
+*  (IfA website, Richard Wainscoat)
+ 740  CONTINUE
+      NAME='NASA IR Telescope Facility, Mauna Kea'
+      W=WEST(155,28,19.20)
+      P=NORTH(19,49,34.39)
+      H=4168.1D0
+      GO TO 9999
+
+*  Caltech Submillimeter Observatory                                 CSO
+*  (IfA website, Richard Wainscoat; height estimated)
+ 750  CONTINUE
+      NAME='Caltech Sub-mm Observatory, Mauna Kea'
+      W=WEST(155,28,31.79)
+      P=NORTH(19,49,20.78)
+      H=4080D0
+      GO TO 9999
+
+*  Unrecognized station
  9000 CONTINUE
       NAME='?'
 

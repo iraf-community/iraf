@@ -508,14 +508,16 @@ stagen(){ /* generate the states */
 	register struct wset *p, *q;
 
 	/* initialize */
-
 	nstate = 0;
-	/* THIS IS FUNNY from the standpoint of portability */
-	/* it represents the magic moment when the mem0 array, which has
-	/* been holding the productions, starts to hold item pointers, of a
-	/* different type... */
-	/* someday, alloc should be used to allocate all this stuff... for now, we
-	/* accept that if pointers don't fit in integers, there is a problem... */
+
+	/* THIS IS FUNNY from the standpoint of portability
+	 * it represents the magic moment when the mem0 array, which has
+	 * been holding the productions, starts to hold item pointers, of a
+	 * different type...
+	 * someday, alloc should be used to allocate all this stuff...
+	 * for now, we accept that if pointers don't fit in integers,
+	 * there is a problem...
+	 */
 
 	pstate[0] = pstate[1] = (struct item *)mem;
 	aryfil( clset.lset, tbitset, 0 );

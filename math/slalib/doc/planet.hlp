@@ -1,4 +1,4 @@
-.help planet Nov95 "Slalib Package"
+.help planet Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slPLNT (DATE, NP, PV, JSTAT)
@@ -8,20 +8,21 @@
      - - - - - - -
 
   Approximate heliocentric position and velocity of a specified
-  major planet (Mercury, Venus, EMB, Mars, Jupiter, Saturn, Uranus
-  or Neptune).
+  major planet.
 
   Given:
      DATE      d      Modified Julian Date (JD - 2400000.5)
-     NP        i      planet (1=Mercury, 2=Venus, 3=EMB ... 8=Neptune)
+     NP        i      planet (1=Mercury, 2=Venus, 3=EMB ... 9=Pluto)
 
   Returned:
      PV        d(6)   heliocentric x,y,z,xdot,ydot,zdot, J2000
                                            equatorial triad (AU,AU/s)
-     JSTAT     i      status: -1 = illegal NP (outside 1-8)
+     JSTAT     i      status: +1 = warning: date out of range
                                0 = OK
-                              +1 = warning: date outside 1000-3000
-                              +2 = warning: solution didn't converge
+                              -1 = illegal NP (outside 1-9)
+                              -2 = solution didn't converge
+
+  Called:  slPLNE
 
   Notes
 
@@ -31,12 +32,15 @@
   2  The reference frame is equatorial and is with respect to the
      mean equinox and ecliptic of epoch J2000.
 
-  3  If an NP value outside the range 1-8 is supplied, an error
+  3  If an NP value outside the range 1-9 is supplied, an error
      status (JSTAT = -1) is returned and the PV vector set to zeroes.
 
-  4  The algorithm is due to J.L. Simon, P. Bretagnon, J. Chapront,
-     M. Chapront-Touze, G. Francou and J. Laskar (Bureau des
-     Longitudes, Paris, France).
+  4  The algorithm for obtaining the mean elements of the planets
+     from Mercury to Neptune is due to J.L. Simon, P. Bretagnon,
+     J. Chapront, M. Chapront-Touze, G. Francou and J. Laskar
+     (Bureau des Longitudes, Paris).  The (completely different)
+     algorithm for calculating the ecliptic coordinates of Pluto
+     is by Meeus.
 
   5  Comparisons of the present routine with the JPL DE200 ephemeris
      give the following RMS errors over the interval 1960-2025:
@@ -51,6 +55,7 @@
         Saturn          199000              19.4
         Uranus          564000              16.4
         Neptune         158000              14.4
+        Pluto            36400               0.137
 
      From comparisons with DE102, Simon et al quote the following
      longitude accuracies over the interval 1800-2200:
@@ -64,40 +69,45 @@
         Uranus                 86"
         Neptune                11"
 
-     Over the interval 1000-3000, the accuracy is better than 1.5
-     times that over 1800-2200.  Outside the interval 1000-3000 the
-     accuracy declines.
+     In the case of Pluto, Meeus quotes an accuracy of 0.6 arcsec
+     in longitude and 0.2 arcsec in latitude for the period
+     1885-2099.
 
-  6  The present SLALIB implementation differs from the original
-     Simon et al Fortran code in the following respects.  None of
-     the changes affects the result significantly.
+     For all except Pluto, over the period 1000-3000 the accuracy
+     is better than 1.5 times that over 1800-2200.  Outside the
+     period 1000-3000 the accuracy declines.  For Pluto the
+     accuracy declines rapidly outside the period 1885-2099.
+     Outside these ranges (1885-2099 for Pluto, 1000-3000 for
+     the rest) a "date out of range" warning status (JSTAT=+1)
+     is returned.
 
-       *  The date is supplied as a Modified Julian Date rather
-          than a Julian Date (MJD = JD - 2400000.5).
+  6  The algorithms for (i) Mercury through Neptune and (ii) Pluto
+     are completely independent.  In the Mercury through Neptune
+     case, the present SLALIB implementation differs from the
+     original Simon et al Fortran code in the following respects.
 
-       *  The result is returned only in equatorial Cartesian form;
-          the ecliptic longitude, latitude and radius vector are not
-          returned.
+     *  The date is supplied as a Modified Julian Date rather
+        than a Julian Date (MJD = JD - 2400000.5).
 
-       *  The result is in the J2000 equatorial frame, not ecliptic.
+     *  The result is returned only in equatorial Cartesian form;
+        the ecliptic longitude, latitude and radius vector are not
+        returned.
 
-       *  The velocity is in AU per second, not AU per day.
+     *  The velocity is in AU per second, not AU per day.
 
-       *  Everything is done in-line:  there are no calls to other
-          routines.
+     *  Different error/warning status values are used.
 
-       *  Different error/warning status values are used.
+     *  Kepler's equation is not solved inline.
 
-       *  A different Kepler's-equation-solver is used (avoiding
-          use of COMPLEX*16).
+     *  Polynomials in T are nested to minimize rounding errors.
 
-       *  Polynomials in T are nested to minimize rounding errors.
+     *  Explicit double-precision constants are used to avoid
+        mixed-mode expressions.
 
-       *  Explicit double-precision constants are used to avoid
-          mixed-mode expressions.
+     *  There are other, cosmetic, changes to comply with
+        Starlink/SLALIB style guidelines.
 
-       *  There are other, cosmetic, changes to comply with
-          Starlink/SLALIB style guidelines.
+     None of the above changes affects the result significantly.
 
   7  For NP=3 the result is for the Earth-Moon Barycentre.  To
      obtain the heliocentric position and velocity of the Earth,
@@ -108,15 +118,12 @@
      be omitted for modern epochs without introducing significant
      inaccuracy.)
 
-  8  The status, JSTAT, indicates the most serious condition
-     encountered, where illegal NP is considered the most serious,
-     followed by failure to converge, then remote epoch.
+  References:  Simon et al., Astron. Astrophys. 282, 663 (1994).
+               Meeus, Astronomical Algorithms, Willmann-Bell (1991).
 
-  Reference:  Astron. Astrophys. 282, 663 (1994).
+  P.T.Wallace   Starlink   27 May 1997
 
-  P.T.Wallace   Starlink   24 November 1994
-
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1997 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

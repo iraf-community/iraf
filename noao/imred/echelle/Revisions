@@ -1,5 +1,12 @@
 .help revisions Jun88 noao.imred.echelle
 .nf
+imred$echelle/doc/ecidentify.hlp
+    Fixed minor formating problem. (4/22/99, Valdes)
+
+=====
+V2.11
+=====
+
 imred$echelle/echelle.cl
 imred$echelle/echelle.men
     Added sapertures to the pacakge.  (12/4/97, Valdes)

@@ -169,7 +169,7 @@ begin
 	call gethost (Memc[outstr], SZ_LINE)
 	call dp_sparam (nst, "HOST", Memc[outstr], "computer", Memc[comment])
 	call dp_date (Memc[date], Memc[time], SZ_DATE)
-	call dp_sparam (nst, "DATE", Memc[date], "mm-dd-yy", Memc[comment])
+	call dp_sparam (nst, "DATE", Memc[date], "yyyy-mm-dd", Memc[comment])
 	call dp_sparam (nst, "TIME", Memc[time], "hh:mm:ss", Memc[comment])
 	call dp_sparam (nst, "PACKAGE", "daophot", "name", Memc[comment])
 	call dp_sparam (nst, "TASK", "nstar", "name", Memc[comment])

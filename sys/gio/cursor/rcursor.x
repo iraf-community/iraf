@@ -65,6 +65,10 @@ int	envfind(), ctocc(), oscmd(), gtr_readcursor(), grc_readtty()
 int	grc_cursor(), grc_command(), grc_selectwcs(), grc_mapkey(), ttstati()
 real	ttygetr()
 
+errchk	grc_text, grc_readtty, grc_writecursor
+errchk	grc_init, grc_open, grc_command, grc_cursor, grc_message
+errchk	grc_readcursor, grc_mapkey, grc_redraw, envfind
+
 data	xroam /1,0,-1,1,0,-1,1,0,-1/
 data	yroam /1,1,1,0,0,0,-1,-1,-1/
 data	rc /NULL/
@@ -454,9 +458,10 @@ int	speed
 int	xdir, ydir, nukey
 real	xstep, ystep, newx, newy
 
-int	gtr_readcursor(), grc_mapkey()
-pointer	gtr_gtty()
 bool	ttygetb()
+pointer	gtr_gtty()
+int	gtr_readcursor(), grc_mapkey()
+errchk	gtr_readcursor, gtr_writecursor
 
 begin
 	# Reset the cursor step size to the default.

@@ -139,15 +139,15 @@ begin
 		call geo_colon (gd, fit, gfit, Memc[cmd], newgraph)
 		switch (GG_PLOTTYPE(gfit)) {
 		case FIT:
-		    call gt_colon (Memc[cmd], gt1, newgraph)
+		    call gt_colon (Memc[cmd], gd, gt1, newgraph)
 		case XXRESID:
-		    call gt_colon (Memc[cmd], gt2, newgraph)
+		    call gt_colon (Memc[cmd], gd, gt2, newgraph)
 		case XYRESID:
-		    call gt_colon (Memc[cmd], gt3, newgraph)
+		    call gt_colon (Memc[cmd], gd, gt3, newgraph)
 		case YXRESID:
-		    call gt_colon (Memc[cmd], gt4, newgraph)
+		    call gt_colon (Memc[cmd], gd, gt4, newgraph)
 		case YYRESID:
-		    call gt_colon (Memc[cmd], gt5, newgraph)
+		    call gt_colon (Memc[cmd], gd, gt5, newgraph)
 		}
 
 	    case 'l':

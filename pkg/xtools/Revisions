@@ -1,5 +1,73 @@
 .help revisions Jun88 pkg.xtools
 .nf
+=======
+V2.11.2
+=======
+xtools$fixpix/xtpmmap.x
+    Removed extra argument to imgl1i.  (8/11/99, Valdes)
+
+xtools$imtools.x
+    fnext is a function not a subroutine.  (8/11/99, Valdes)
+
+xtools$xtanswer.x
+    Fixed incorrect number of arguments in getline call.  (8/11/99, Valdes)
+
+xtools$nlfit/inreject.x
+xtools$nlfit/inrejectr.x
+xtools$nlfit/inrejectd.x
+    Rearranged the code to remove a missing sfree statement problem
+    detected by spplint. (8/10/99, Davis)
+
+xtools$center1d.x
+    The step of finding a local maxima was not correct.  (4/19/99, Valdes)
+
+xtools$fixpix/xtfp.gx
+    If there was no column interpolation the pixel type for the allocated
+    data array was not set resulting in an error during xt_fpfree.
+    (7/20/98, Valdes)
+
+xtools$%xtimnames.x
+    Modified extension testing code to use iki_validextn.
+    (7/13/98, Valdes)
+
+xtools$fixpix/xtfp.gx
+    Fixed a bug allowing out-of-bounds reference to FP_COL.
+    (6/6/98, Valdes)
+
+xtools$fixpix/xtpmmap.x
+    The steps to check if an image and mask have an integer relationship
+    (integer sampling and integer offsets) in their physical coordinate
+    systems could fail because real precision was not high enough
+    in MWCS transformation calls.  Changed variables and MWCS calls
+    to double.  (5/29/98, Valdes)
+
+xtools$fixpix/xtpmmap.x
+    The XT_PMINVERT function has a bug in using the range list.
+    (4/22/98, Valdes)
+
+xtools$fixpix/xtfixpix.h
+xtools$fixpix/xtfixpix.x
+xtools$fixpix/xtfp.gx
+    The modified data buffer returned by xt_fps$t used the imgl2$t buffer
+    which might be invalidated by subsequent imio activity such as
+    impl2$t.  This was found with proto.fixpix.  The routines were modified
+    to allocate and use a separate line buffer.  Note that this only
+    applies to lines which are modified.  If the requested line does
+    not have any bad pixels to fix then the input buffer is still returned.
+    (1/29/98, Valdes)
+
+xtools$fixpix/xtfp.gx
+    When a segment of bad pixels contains a mixture of column and line
+    interpolations and the first pixel is column interpolation then the
+    line interpolations could be wrong because interpolation coefficients are
+    not initialized.  A second minor fix is that the column interpolation
+    endpoints printed in pixel listing mode could be incorrect.
+    (1/29/98, Valdes)
+
+=======
+V2.11.1
+=======
+
 xtools$imtools.x
      XT_MKIMTEMP was modified to append the same extension as the input
      image when creating a temporary image name.  (10/30/97, Valdes)

@@ -4,6 +4,7 @@ include	<imhdr.h>
 include	<error.h>
 include	<syserr.h>
 include	<mach.h>
+include	<pmset.h>
 include	"icombine.h"
 
 
@@ -13,12 +14,12 @@ include	"icombine.h"
 
 procedure t_imcombine ()
 
-pointer	sp, input, output, sigma, plfile, logfile
-int	ilist, olist, slist, plist
+pointer	sp, input, output, rmask, sigma, plfile, logfile
+int	ilist, olist, rlist, slist, plist, n
 
 bool	clgetb()
 real	clgetr()
-int	clgwrd(), clgeti(), imtopenp(), imtgetim()
+int	clgwrd(), clgeti(), imtopenp(), imtgetim(), imtlen()
 
 include	"icombine.com"
 
@@ -26,6 +27,7 @@ begin
 	call smark (sp)
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (rmask, SZ_FNAME, TY_CHAR)
 	call salloc (plfile, SZ_FNAME, TY_CHAR)
 	call salloc (sigma, SZ_FNAME, TY_CHAR)
 	call salloc (gain, SZ_FNAME, TY_CHAR)
@@ -36,6 +38,7 @@ begin
 	# Get task parameters.  Some additional parameters are obtained later.
 	ilist = imtopenp ("input")
 	olist = imtopenp ("output")
+	rlist = imtopenp ("rejmask")
 	plist = imtopenp ("plfile")
 	slist = imtopenp ("sigma")
 	call clgstr ("logfile", Memc[logfile], SZ_FNAME)
@@ -55,9 +58,33 @@ begin
 	flow = clgetr ("nlow")
 	fhigh = clgetr ("nhigh")
 	nkeep = clgeti ("nkeep")
-	grow = clgeti ("grow")
+	grow = clgetr ("grow")
 	mclip = clgetb ("mclip")
 	sigscale = clgetr ("sigscale")
+
+	# Check lists.
+	n = imtlen (ilist)
+	if (n == 0)
+	    call error (1, "No input images to combine")
+	if (project) {
+	    if (imtlen (olist) != n)
+		call error (1, "Wrong number of images in output list")
+	    if (imtlen (rlist) != 0 && imtlen (rlist) != n)
+		call error (1, "Wrong number of masks in rejection mask list")
+	    if (imtlen (plist) > 0 && imtlen (plist) != n)
+		call error (1, "Wrong number of masks in output mask list")
+	    if (imtlen (slist) > 0 && imtlen (slist) != n)
+		call error (1, "Wrong number of images in output sigma list")
+	} else {
+	    if (imtlen (olist) != 1)
+		call error (1, "Wrong number of images in output list")
+	    if (imtlen (rlist) > 1)
+		call error (1, "Wrong number of masks in rejection mask list")
+	    if (imtlen (plist) > 1)
+		call error (1, "Wrong number of masks in output mask list")
+	    if (imtlen (slist) > 1)
+		call error (1, "Wrong number of images in output sigma list")
+	}
 
 	# Check parameters, map INDEFs, and set threshold flag
 	if (pclip == 0. && reject == PCLIP)
@@ -74,8 +101,8 @@ begin
 	    flow = 0
 	if (IS_INDEFR (fhigh))
 	    fhigh = 0
-	if (IS_INDEFI (grow))
-	    grow = 0
+	if (IS_INDEFR (grow))
+	    grow = 0.
 	if (IS_INDEF (sigscale))
 	    sigscale = 0.
 
@@ -90,7 +117,7 @@ begin
 	}
 
 	# Loop through image lists.  Note that if not projecting then
-	# the input list will be exhausted by IMCOMBINE.
+	# the input and rejmask lists will be exhausted by IMCOMBINE.
 
 	while (imtgetim (ilist, Memc[input], SZ_FNAME) != EOF) {
 	    if (imtgetim (olist, Memc[output], SZ_FNAME) == EOF) {
@@ -104,18 +131,21 @@ begin
 		    break
 		}
 	    }
+	    if (imtgetim (rlist, Memc[rmask], SZ_FNAME) == EOF)
+		Memc[rmask] = EOS
 	    if (imtgetim (plist, Memc[plfile], SZ_FNAME) == EOF)
 		Memc[plfile] = EOS
 	    if (imtgetim (slist, Memc[sigma], SZ_FNAME) == EOF)
 		Memc[sigma] = EOS
 
 	    iferr (call icombine (ilist, Memc[input], Memc[output],
-		Memc[plfile], Memc[sigma], Memc[logfile], NO))
+		Memc[rmask], Memc[plfile], Memc[sigma], Memc[logfile], NO))
 		call erract (EA_WARN)
 	}
 
 	call imtclose (ilist)
 	call imtclose (olist)
+	call imtclose (rlist)
 	call imtclose (plist)
 	call imtclose (slist)
 	call sfree (sp)
@@ -127,24 +157,26 @@ end
 # opens the logfile, and sets IMIO parameters.  It attempts to adjust
 # buffer sizes and memory requirements for maximum efficiency.
 
-procedure icombine (list, input, output, plfile, sigma, logfile, stack)
+procedure icombine (list, input, output, rmask, plfile, sigma,
+	logfile, stack)
 
 int	list			# List of input images
 char	input[ARB]		# Input image
 char	output[ARB]		# Output image
+char	rmask[ARB]		# Rejection mask
 char	plfile[ARB]		# Output pixel list file
 char	sigma[ARB]		# Sigma image (optional)
 char	logfile[ARB]		# Logfile (optional)
 int	stack			# Stack input images?
 
 int	i, j, nimages, intype, bufsize, maxsize, memory, oldsize, stack1, err
-pointer	sp, in, out[3], icm, offsets, key, tmp
+pointer	sp, in, out[4], icm, offsets, key, tmp
 
 char	clgetc()
-int	imtlen(), imtgetim(), getdatatype()
+int	imtlen(), imtgetim(), imtrgetim(), getdatatype()
 int	begmem(), errcode(), open(), ty_max(), sizeof()
-pointer	immap(), ic_plfile()
-errchk	ic_imstack, immap, ic_plfile, ic_setout
+pointer	immap(), ic_pmmap()
+errchk	ic_imstack, immap, ic_pmmap, ic_setout
 
 include	"icombine.com"
 
@@ -160,9 +192,11 @@ retry_
 	iferr {
 	    call smark (sp)
 
+	    in = NULL
 	    out[1] = NULL
 	    out[2] = NULL
 	    out[3] = NULL
+	    out[4] = NULL
 	    icm = NULL
 	    logfd = NULL
 
@@ -181,10 +215,11 @@ retry_
 		if (IM_NDIM(out[1]) == 1)
 		    call error (1, "Can't project one dimensional images")
 		nimages = IM_LEN(out[1],IM_NDIM(out[1]))
-		call calloc (in, nimages, TY_POINTER)
+		call salloc (in, nimages, TY_POINTER)
 		call amovki (out[1], Memi[in], nimages)
 	    } else {
-		call calloc (in, imtlen(list), TY_POINTER)
+		call salloc (in, imtlen(list), TY_POINTER)
+		call amovki (NULL, Memi[in], imtlen(list))
 		call imtrew (list)
 		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
 		    tmp = immap (input, READ_ONLY, 0)
@@ -250,9 +285,27 @@ retry_
 	    if (IM_PIXTYPE(out[1]) == ERR)
 		IM_PIXTYPE(out[1]) = intype
 
+	    # Open rejection masks
+	    if (rmask[1] != EOS) {
+		tmp = ic_pmmap (rmask, NEW_COPY, out[1]); out[4] = tmp
+		IM_NDIM(out[4]) = IM_NDIM(out[4]) + 1
+		IM_LEN(out[4],IM_NDIM(out[4])) = nimages
+		if (!project) {
+		    if (key == NULL)
+			call salloc (key, SZ_FNAME, TY_CHAR)
+		    do i = 1, nimages {
+			j = imtrgetim (list, i, input, SZ_FNAME)
+			call sprintf (Memc[key], SZ_FNAME, "mask%04d")
+			    call pargi (i)
+			call imastr (out[4], Memc[key], input)
+		    }
+		}
+	    } else
+		out[4] = NULL
+
 	    # Open pixel list file if given.
 	    if (plfile[1] != EOS) {
-		tmp = ic_plfile (plfile, NEW_COPY, out[1]); out[2] = tmp
+		tmp = ic_pmmap (plfile, NEW_COPY, out[1]); out[2] = tmp
 	    } else
 		out[2] = NULL
 
@@ -302,7 +355,7 @@ retry_
 	    # again.  The integer types are not support because scaling is
 	    # done on  the input data vectors.
 
-	    switch (intype) {
+	    switch (ty_max (intype, IM_PIXTYPE(out[1]))) {
 	    case TY_SHORT:
 		call icombines (Memi[in], out, Memi[offsets], nimages, bufsize)
 	    case TY_USHORT, TY_INT, TY_LONG:
@@ -319,18 +372,19 @@ retry_
 	    if (icm != NULL)
 		call ic_mclose (nimages)
 	    if (!project) {
-		do j = 2, nimages
+		do j = 2, nimages {
 		    if (Memi[in+j-1] != NULL)
 			call imunmap (Memi[in+j-1])
+		}
 	    }
-	   if (out[2] != NULL) {
+	   if (out[2] != NULL)
 		call imunmap (out[2])
-		call imdelete (plfile)
-	    }
 	    if (out[3] != NULL) {
 		call imunmap (out[3])
 		call imdelete (sigma)
 	    }
+	   if (out[4] != NULL)
+	       call imunmap (out[4])
 	   if (out[1] != NULL) {
 	       call imunmap (out[1])
 	       call imdelete (output)
@@ -379,6 +433,8 @@ retry_
 	    call imunmap (out[2])
 	if (out[3] != NULL)
 	    call imunmap (out[3])
+	if (out[4] != NULL)
+	    call imunmap (out[4])
 	if (out[1] != NULL)
 	    call imunmap (out[1])
 	if (Memi[in] != NULL)
@@ -430,39 +486,32 @@ begin
 end
 
 
-# IC_PLFILE -- Map pixel list file
-# This routine strips any image extensions and then adds .pl.
+# IC_PMMAP -- Map pixel mask.
 
-pointer procedure ic_plfile (plfile, mode, refim)
+pointer procedure ic_pmmap (fname, mode, refim)
 
-char	plfile[ARB]		# Pixel list file name
+char	fname[ARB]		# Mask name
 int	mode			# Image mode
 pointer	refim			# Reference image
-pointer	pl			# IMIO pointer (returned)
+pointer	pm			# IMIO pointer (returned)
 
-int	i, strlen()
-bool	streq
-pointer	sp, str, immap()
+int	i, fnextn()
+pointer	sp, extn, immap()
+bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
 
-	call imgimage (plfile, Memc[str], SZ_FNAME)
-
-	# Strip any existing extensions
-	i = strlen(Memc[str])
-	switch (Memc[str+i-1]) {
-	case 'h':
-	    if (i > 3 && Memc[str+i-4] == '.')
-		Memc[str+i-4] = EOS
-	case 'l':
-	    if (i > 2 && streq (Memc[str+i-3], ".pl"))
-		Memc[str+i-3] = EOS
+	i = fnextn (fname, Memc[extn], SZ_FNAME)
+	if (streq (Memc[extn], "pl"))
+	    pm = immap (fname, mode, refim)
+	else {
+	    call strcpy (fname, Memc[extn], SZ_FNAME)
+	    call strcat (".pl", Memc[extn], SZ_FNAME)
+	    pm = immap (Memc[extn], mode, refim)
 	}
 
-	call strcat (".pl", Memc[str], SZ_FNAME)
-	pl = immap (Memc[str], NEW_COPY, refim)
 	call sfree (sp)
-	return (pl)
+	return (pm)
 end

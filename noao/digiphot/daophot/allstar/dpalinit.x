@@ -12,7 +12,7 @@ procedure dp_setwt (dao, im)
 pointer	dao				# pointer to daophot structure
 pointer	im				# input image decriptor
 
-int	ncol
+int	i, ncol, nline
 pointer	sp, v1, v2, v3, v4, line1, line2, line3, line4
 pointer	allstar, wtim, dataim, subtim
 real	rdnoise, mingdata, maxgdata
@@ -43,13 +43,18 @@ begin
 	wtim = DP_WEIGHTS (allstar)
 	dataim = DP_DATA(allstar)
 	subtim = DP_SUBT(allstar)
-	ncol = IM_LEN (im, 1)
+	ncol = IM_LEN (im,1)
+	nline = IM_LEN(im,2)
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
 	call amovkl (long(1), Meml[v3], IM_MAXDIM)
 	call amovkl (long(1), Meml[v4], IM_MAXDIM)
-	while (imgnlr (im, line1, Meml[v1]) != EOF) {
+	do i = 1, nline {
+
+	    # Get the next line
+	    if (imgnlr (im, line1, Meml[v1]) == EOF) 
+		break
 
 	    # Initialize the subtracted image.
 	    if (DP_CACHE(allstar, A_DCOPY) == YES) {

@@ -1,4 +1,4 @@
-.help bear Nov95 "Slalib Package"
+.help bear Jun99 "Slalib Package"
 .nf
 
       REAL FUNCTION slBEAR (A1, B1, A2, B2)

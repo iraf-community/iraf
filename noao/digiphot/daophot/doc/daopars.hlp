@@ -195,11 +195,10 @@ where PAR1 and PAR2 are the half-width at half-maximum along the major and
 minor axes of the psf model. Merging can be turned off altogether by setting
 mergerad to 0.0.
 .le
-.ls maxnstar = 3000 (psf, allstar, substar)
-The maximum number of stars which PSF, PEAK, ALLSTAR and SUBSTAR
-will process.
-This should be set to a value somewhat larger than the
-number of stars in the input photometry file.
+.ls maxnstar = 10000 (pstselect, psf, group, allstar, substar)
+The initial star list buffer size. If there are more than maxnstar stars in the
+input photometry file buffer, daophot will resize the buffers as needed.
+The only limitation is the memory and configuration of the host computer.
 .le
 .ls maxgroup = 60 (nstar, allstar)
 The maximum numbers of stars that the multiple star fitting tasks

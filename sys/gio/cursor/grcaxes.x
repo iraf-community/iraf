@@ -33,6 +33,8 @@ real	yb, ye, y1, dy, aspect_ratio, xticklen, yticklen
 int	gt_ndigits()
 pointer	gtr_init()
 real	ttygetr()
+
+errchk	gtr_init, ttygetr, realloc, gax_start
 include	"gtr.com"
 
 begin
@@ -339,6 +341,8 @@ procedure gax_start (wx, wy)
 
 real	wx, wy			# world or log-world coords to draw to
 pointer	polyline, op
+
+errchk	malloc
 common	/gaxdcm/ polyline, op
 
 begin
@@ -375,6 +379,7 @@ int	vjustify		# vertical justification
 
 pointer	tr, tx
 int	save_tx[LEN_TX]
+errchk	gtr_init
 pointer	gtr_init()
 
 begin

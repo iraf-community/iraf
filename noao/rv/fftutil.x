@@ -219,7 +219,7 @@ int 	i, nn
 
 begin
 	nn = 0
-	do i = 1, 15 {
+	do i = 1, 31 {
 	    nn = 2 ** i
 	    if (nn >= N) 	    	# return 2**i > N
 		return (nn)

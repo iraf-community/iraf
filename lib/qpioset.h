@@ -1,6 +1,8 @@
 # QPIOSET.H -- QPIO User accessible interface parameters.
 
-define	qpio_stati	qpiost		# (name collision with qpio_seti)
+define	qpio_stati	qpiost		# (name collision)
+define	qpio_statr	qpiovr		# (name collision)
+define	qpio_setr	qpiour		# (name collision)
 
 # Read-Write Parameters.
 define	QPIO_BLOCKFACTOR	1	# blocking factor for image matrices

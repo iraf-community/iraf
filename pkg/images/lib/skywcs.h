@@ -23,16 +23,17 @@ define	S_STATUS	20
 
 # Define the list of supported fundamental coordinate systems.
 
-define	FTYPE_LIST	"|fk4|noefk4|fk5|apparent|ecliptic|galactic|\
+define	FTYPE_LIST	"|fk4|noefk4|fk5|icrs|apparent|ecliptic|galactic|\
 supergalactic|"
 
 define	FTYPE_FK4		1
 define	FTYPE_FK4NOE		2
 define	FTYPE_FK5		3
-define	FTYPE_GAPPT		4
-define	FTYPE_ECLIPTIC		5
-define	FTYPE_GALACTIC		6
-define	FTYPE_SUPERGALACTIC	7
+define	FTYPE_ICRS		4
+define	FTYPE_GAPPT		5
+define	FTYPE_ECLIPTIC		6
+define	FTYPE_GALACTIC		7
+define	FTYPE_SUPERGALACTIC	8
 
 # Define the list of supported coordinate systems.
 
@@ -45,12 +46,13 @@ define	CTYPE_SUPERGALACTIC	4
 
 # Define the supported equatoral reference systems.
 
-define  EQTYPE_LIST     "|fk4|fk4-no-e|fk5|gappt|"
+define  EQTYPE_LIST     "|fk4|fk4-no-e|fk5|icrs|gappt|"
 
 define	EQTYPE_FK4	1
 define	EQTYPE_FK4NOE	2
 define	EQTYPE_FK5	3
-define	EQTYPE_GAPPT	4
+define	EQTYPE_ICRS	4
+define	EQTYPE_GAPPT	5
 
 # Define the input coordinate file longitude latitude units.
 
@@ -116,4 +118,3 @@ define  PIXTYPE_LOGICAL		1
 define  PIXTYPE_TV		2
 define  PIXTYPE_PHYSICAL	3
 define  PIXTYPE_WORLD		4
-

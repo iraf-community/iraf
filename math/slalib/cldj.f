@@ -22,9 +22,9 @@
 *  The algorithm is derived from that of Hatcher 1984
 *  (QJRAS 25, 53-55).
 *
-*  P.T.Wallace   Starlink   December 1985
+*  P.T.Wallace   Starlink   11 March 1998
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1998 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -36,7 +36,7 @@
 
 *  Month lengths in days
       INTEGER MTAB(12)
-      DATA MTAB/31,28,31,30,31,30,31,31,30,31,30,31/
+      DATA MTAB / 31,28,31,30,31,30,31,31,30,31,30,31 /
 
 
 
@@ -64,10 +64,10 @@
             IF (ID.LT.1.OR.ID.GT.MTAB(IM)) J=3
 
 *        Modified Julian Date
-               DJM=DBLE((1461*(IY-(12-IM)/10+4712))/4
-     :                  +(306*MOD(IM+9,12)+5)/10
-     :                  -(3*((IY-(12-IM)/10+4900)/100))/4
-     :                  +ID-2399904)
+            DJM=DBLE((1461*(IY-(12-IM)/10+4712))/4
+     :               +(306*MOD(IM+9,12)+5)/10
+     :               -(3*((IY-(12-IM)/10+4900)/100))/4
+     :               +ID-2399904)
 
 *        Bad month
          ELSE

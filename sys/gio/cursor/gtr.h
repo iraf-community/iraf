@@ -7,12 +7,12 @@ define	INC_LENFRAMEBUF		4096
 define	DEF_LENSCRATCHBUF	256
 define	INC_LENSCRATCHBUF	256
 define	MAX_PSEUDOFILES		10
-define	SZ_TRDEVNAME		29
-define	SZ_KERNFNAME		59
+define	SZ_TRDEVNAME		229
+define	SZ_KERNFNAME		259
 define	LEN_GTRCOM		28		# see "gtr.com"
 define	KSHIFT			100		# encode pr ("etc$prpsio.x")
 
-define	LEN_TRSTRUCT	(164+187)
+define	LEN_TRSTRUCT	(564+187)
 
 define	TR_PID		Memi[$1]		# process id of kernel
 define	TR_IN		Memi[$1+1]		# input from process
@@ -42,6 +42,6 @@ define	TR_INTERACTIVE	Memi[$1+23]		# the user graphics terminal?
 define	TR_TXAP		($1+30)			# text drawing attributes
 define	TR_PLAP		($1+40)			# text drawing attributes
 define	TR_DEVNAME	Memc[P2C($1+44)]	# device name
-define	TR_KERNFNAME	Memc[P2C($1+74)]	# name of kernel file (or "cl")
-define	TR_GTRCOM	Memi[$1+134]		# storage for the gtr common
-define	TR_WCSPTR	(($1)+164+($2)*LEN_WCS)	# WCS storage (0=not used)
+define	TR_KERNFNAME	Memc[P2C($1+274)]	# name of kernel file (or "cl")
+define	TR_GTRCOM	Memi[$1+534]		# storage for the gtr common
+define	TR_WCSPTR	(($1)+564+($2)*LEN_WCS)	# WCS storage (0=not used)

@@ -112,7 +112,9 @@ begin
 		if (keepids) {
 		    if (jmin < n1) {
 			Mems[kmin] = d1
+			k = Memi[m[jmin]+i1]
 			Memi[m[jmin]+i1] = Memi[m[n1]+i1]
+			Memi[m[n1]+i1] = k
 		    }
 		} else {
 		    if (jmin < n1)
@@ -136,7 +138,9 @@ begin
 		if (keepids) {
 		    if (jmax < n1) {
 			Mems[kmax] = d1
+			k = Memi[m[jmax]+i1]
 			Memi[m[jmax]+i1] = Memi[m[n1]+i1]
+			Memi[m[n1]+i1] = k
 		    }
 		} else {
 		    if (jmax < n1)
@@ -260,7 +264,9 @@ begin
 		if (keepids) {
 		    if (jmin < n1) {
 			Memi[kmin] = d1
+			k = Memi[m[jmin]+i1]
 			Memi[m[jmin]+i1] = Memi[m[n1]+i1]
+			Memi[m[n1]+i1] = k
 		    }
 		} else {
 		    if (jmin < n1)
@@ -284,7 +290,9 @@ begin
 		if (keepids) {
 		    if (jmax < n1) {
 			Memi[kmax] = d1
+			k = Memi[m[jmax]+i1]
 			Memi[m[jmax]+i1] = Memi[m[n1]+i1]
+			Memi[m[n1]+i1] = k
 		    }
 		} else {
 		    if (jmax < n1)
@@ -408,7 +416,9 @@ begin
 		if (keepids) {
 		    if (jmin < n1) {
 			Memr[kmin] = d1
+			k = Memi[m[jmin]+i1]
 			Memi[m[jmin]+i1] = Memi[m[n1]+i1]
+			Memi[m[n1]+i1] = k
 		    }
 		} else {
 		    if (jmin < n1)
@@ -432,7 +442,9 @@ begin
 		if (keepids) {
 		    if (jmax < n1) {
 			Memr[kmax] = d1
+			k = Memi[m[jmax]+i1]
 			Memi[m[jmax]+i1] = Memi[m[n1]+i1]
+			Memi[m[n1]+i1] = k
 		    }
 		} else {
 		    if (jmax < n1)
@@ -556,7 +568,9 @@ begin
 		if (keepids) {
 		    if (jmin < n1) {
 			Memd[kmin] = d1
+			k = Memi[m[jmin]+i1]
 			Memi[m[jmin]+i1] = Memi[m[n1]+i1]
+			Memi[m[n1]+i1] = k
 		    }
 		} else {
 		    if (jmin < n1)
@@ -580,7 +594,9 @@ begin
 		if (keepids) {
 		    if (jmax < n1) {
 			Memd[kmax] = d1
+			k = Memi[m[jmax]+i1]
 			Memi[m[jmax]+i1] = Memi[m[n1]+i1]
+			Memi[m[n1]+i1] = k
 		    }
 		} else {
 		    if (jmax < n1)

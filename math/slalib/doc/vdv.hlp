@@ -1,4 +1,4 @@
-.help vdv Nov95 "Slalib Package"
+.help vdv Jun99 "Slalib Package"
 .nf
 
       REAL FUNCTION slVDV (VA, VB)

@@ -78,9 +78,10 @@ The source of graphics cursor input.
 .le
 .ih
 DESCRIPTION
-Pdm applies a phase dispersion minimization algorithm to lightcurve
-data to determine periodicities in the data.  It also calculates
-amplitude and epoch information.
+Pdm applies a phase dispersion minimization algorithm (R. F. Stellingwerf,
+"Period Determination by Phase Dispersion Minimization", ApJ 224, 1978,
+953) to lightcurve data to determine periodicities in the data.  It also
+calculates amplitude and epoch information.
 
 Pdm can be used in batch or interactive mode.  In batch
 mode the

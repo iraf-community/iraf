@@ -13,6 +13,9 @@ ZGHOST (outstr, maxch)
 PKCHAR	*outstr;		/* receives host name		*/
 XINT	*maxch;
 {
-	gethostname ((char *)outstr, *maxch);
+	char namebuf[SZ_FNAME];
+
+	gethostname (namebuf, SZ_FNAME);
+	strncpy ((char *)outstr, namebuf, *maxch);
 	((char *)outstr)[*maxch] = EOS;
 }

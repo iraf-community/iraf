@@ -38,6 +38,7 @@ lines.
 .ls (2)
 Use an apply a 1-D arithmetic correction to a 2-D image operator.
 Alternatively, expand a 1-D correction to a 2-D correction.
+.le
 .ls (3)
 Convert the 2-D image to a group of 1-D images and provide the 1-D operators
 with the ability to perform averaging or summation.

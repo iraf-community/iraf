@@ -114,6 +114,7 @@ define	KEY_IRAFBP	14		# Bits per pixel in IRAF image
 define	KEY_IRAFTYPE	15		# IRAF image data type
 
 define	LEN_STRING	8		# Minimum length of a string parameter
+define	LEN_DATE	19		# Length of the new date string
 define	LEN_OBJECT	63		# Maximum length of string parameter
 define	LEN_ALIGN	18		# Maximum length for aligning parameter
 define	LEN_ORIGIN	9		# Length of origin string

@@ -58,6 +58,9 @@ begin
 
 	call icg_sampler (ic, gp, gt, x, npts, 1)
 
+	# Send the wcs to the gui.
+	call ic_gui (ic, "wcs")
+
 	call mfree (xout, TY_REAL)
 	call mfree (yout, TY_REAL)
 end
@@ -185,10 +188,10 @@ int	i
 real	dx
 
 begin
-	call smark (sp)
-
 	if (IC_FITERROR(ic) == YES)
 	    return
+
+	call smark (sp)
 
 	call salloc (xr, npts, TY_REAL)
 	call salloc (yr, npts, TY_REAL)

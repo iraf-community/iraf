@@ -11,7 +11,7 @@ update:
 relink:
 	$omake x_ptools.x
 	$ifdef (tables)
-	    !mkpkg -p noao -p tables trelink
+            !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	$else
 	    $call tundefined
 	$endif
@@ -19,7 +19,7 @@ relink:
 
 linkonly:
 	$ifdef (tables)
-	    !mkpkg -p noao -p tables trelink
+            !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	$else
 	    $call tundefined
 	$endif
@@ -32,6 +32,8 @@ install:
 
 trelink:
 	$set LIBS = "-lds -lncar -lgks -lxtools -ltbtables"
+        $set XFLAGS = "$(XFLAGS) $(XF)"
+        $set LFLAGS = "$(LFLAGS) $(LF)"
 	$update libpkg.a
 	$link x_ptools.o libpkg.a ../lib/libpttables.a $(LIBS) -o xx_ptools.e
 	;

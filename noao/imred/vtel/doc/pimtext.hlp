@@ -58,6 +58,7 @@ image header and write it into the image.
 .le
 .ls text
 Text string to write into image.
+.le
 .ih
 DESCRIPTION
 Pimtext writes either the date and/or time or the indicated text string into

@@ -54,16 +54,11 @@
 *      about 1.85 arcsec at this radius, and decreases to zero as
 *      the centre of the disc is approached.
 *
-*  Called:
-*     slDS2C       spherical to Cartesian
-*     slDVDV        dot product
-*     slDMXV        matrix x vector
-*     slDC2S       Cartesian to spherical
-*     slDA2P      normalise angle 0-2Pi
+*  Called:  slDS2C, slDVDV, slDMXV, slDC2S, slDA2P
 *
-*  P.T.Wallace   Starlink   16 September 1995
+*  P.T.Wallace   Starlink   18 March 1999
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -73,7 +68,7 @@
 
       INTEGER I
 
-      DOUBLE PRECISION GR2E,AB1,EB(3),EHN(3),ABV(3),
+      DOUBLE PRECISION GR2E,AB1,EHN(3),ABV(3),
      :                 P(3),PDE,PDEP1,W,P1(3),P1DV,
      :                 P1DVP1,P2(3),P3(3)
 
@@ -86,7 +81,6 @@
       GR2E = AMPRMS(8)
       AB1 = AMPRMS(12)
       DO I=1,3
-         EB(I) = AMPRMS(I+1)
          EHN(I) = AMPRMS(I+4)
          ABV(I) = AMPRMS(I+8)
       END DO

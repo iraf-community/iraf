@@ -1,4 +1,4 @@
-.help fk524 Nov95 "Slalib Package"
+.help fk524 Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slFK54 (R2000,D2000,DR2000,DD2000,P2000,V2000,

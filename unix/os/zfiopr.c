@@ -220,7 +220,7 @@ XLONG	*loffset;		/* not used */
 	register int fd, nbytes;
 	int	record_length, status;
 	short	temp;
-#ifdef POSIX
+#ifdef SOLARIS
 	sigset_t sigmask_save, set;
 #else
 	int	sigmask_save;
@@ -295,7 +295,7 @@ XLONG	*loffset;		/* not used */
 	 * entire record.  This is implemented as a critical section to
 	 * prevent corruption of the IPC protocol when an interrupt occurs.
 	 */
-#ifdef POSIX
+#ifdef SOLARIS
 	sigemptyset (&set);
 	sigaddset (&set, SIGINT);
 	sigaddset (&set, SIGTERM);
@@ -334,7 +334,7 @@ XLONG	*loffset;		/* not used */
 	    if (read (fd, &temp, 1) <= 0)
 		break;
 reenab_:
-#ifdef POSIX
+#ifdef SOLARIS
 	sigprocmask (SIG_SETMASK, &sigmask_save, NULL);
 #else
 	sigsetmask (sigmask_save);
@@ -353,7 +353,7 @@ XLONG	*loffset;
 {
 	register int fd;
 	short	temp;
-#ifdef POSIX
+#ifdef SOLARIS
 	sigset_t sigmask_save, set;
 #else
 	int	sigmask_save;
@@ -380,7 +380,7 @@ XLONG	*loffset;
 
 	/* Write IPC block header.
 	 */
-#ifdef POSIX
+#ifdef SOLARIS
 	sigemptyset (&set);
 	sigaddset (&set, SIGINT);
 	sigaddset (&set, SIGTERM);
@@ -404,7 +404,7 @@ XLONG	*loffset;
 	if (ipc_out > 0)
 	    write (ipc_out, (char *)buf, (int)*nbytes);
 
-#ifdef POSIX
+#ifdef SOLARIS
 	sigprocmask (SIG_SETMASK, &sigmask_save, NULL);
 #else
 	sigsetmask (sigmask_save);

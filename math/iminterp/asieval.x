@@ -9,7 +9,7 @@ include "im1interpdef.h"
 real procedure asieval (asi, x)
 
 pointer	asi		# interpolator descriptor
-real x			# x value
+real x[ARB]		# x value
 
 real value
 
@@ -42,9 +42,25 @@ begin
 	case II_SINC:
 	    call ii_sinc (x, value, 1,
 		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
-		NSINC, NTAPER, STAPER, DX)
+		ASI_NSINC(asi), DX)
 	    return (value)
 	
+	case II_LSINC:
+	    call ii_lsinc (x, value, 1,
+		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
+		LTABLE(ASI_LTABLE(asi)), 2 * ASI_NSINC(asi) + 1,
+		ASI_NINCR(asi), DX)
+	    return (value)
+
+	case II_DRIZZLE:
+	    if (ASI_PIXFRAC(asi) >= 1.0)
+	        call ii_driz1 (x, value, 1, COEFF(ASI_COEFF(asi) +
+		    ASI_OFFSET(asi)), ASI_BADVAL(asi))
+	    else
+	        call ii_driz (x, value, 1, COEFF(ASI_COEFF(asi) +
+		    ASI_OFFSET(asi)), ASI_PIXFRAC(asi), ASI_BADVAL(asi))
+	    return (value)
+
 	default:
 	    call error (0, "ASIEVAL: Unknown interpolator type.")
 	}

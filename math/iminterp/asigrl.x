@@ -32,7 +32,7 @@ begin
 	accum = 0.
 
 	switch (ASI_TYPE(asi)) {
-	case II_NEAREST, II_SINC:
+	case II_NEAREST, II_SINC, II_LSINC, II_DRIZZLE:
 	    nterms = 0
 	case II_LINEAR:
 	    nterms = 1
@@ -44,9 +44,9 @@ begin
 	    nterms = 4
 	}
 
-	# NEAREST_NEIGHBOR, LINEAR and SINC are handled differently because of
-	# storage.  Also probably good for speed in the case of LINEAR and
-	# NEAREST_NEIGHBOUR.
+	# NEAREST_NEIGHBOR, LINEAR, SINC and LSINC are handled differently
+	# because of storage.  Also probably good for speed in the case of
+	# LINEAR and NEAREST_NEIGHBOUR.
 
 	# NEAREST_NEIGHBOR
 	switch (ASI_TYPE(asi)) {
@@ -125,10 +125,18 @@ begin
 	    }
 
 	# SINC
-	case II_SINC:
-	    call ii_sincigrl (xa, xb, accum,
-		COEFF(ASI_COEFF(asi) + ASI_OFFSET(asi)), ASI_NCOEFF(asi),
-		NSINC, NTAPER, STAPER, DX)
+	case II_SINC, II_LSINC:
+	    call ii_sincigrl (xa, xb, accum, COEFF(ASI_COEFF(asi) +
+	        ASI_OFFSET(asi)), ASI_NCOEFF(asi), ASI_NSINC(asi), DX)
+
+	# DRIZZLE
+	case II_DRIZZLE:
+	    if (ASI_PIXFRAC(asi) >= 1.0)
+	        call ii_dzigrl1 (xa, xb, accum, COEFF(ASI_COEFF(asi) +
+	            ASI_OFFSET(asi)))
+	    else
+	        call ii_dzigrl (xa, xb, accum, COEFF(ASI_COEFF(asi) +
+	            ASI_OFFSET(asi)), ASI_PIXFRAC(asi))
 
 	# A higher order interpolant.
 	default:

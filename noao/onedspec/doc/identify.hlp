@@ -44,7 +44,7 @@ is not a sufficient abbreviation.
 Database in which the feature data and coordinate functions are recorded.
 .le
 .ls coordlist = "linelists$idhenear.dat"
-User coordinate list consisting of an ordered list of line coordinates.  A
+User coordinate list consisting of an list of line coordinates.  A
 comment line of the form "# units <units>", where <units> is one of the
 understood units names, defines the units of the line list.  If no units
 are specified then Angstroms are assumed.  Some standard line lists are

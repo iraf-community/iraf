@@ -1,4 +1,4 @@
-.help dt Nov95 "Slalib Package"
+.help dt Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slDT (EPOCH)

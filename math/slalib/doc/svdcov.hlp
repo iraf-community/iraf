@@ -1,4 +1,4 @@
-.help svdcov Nov95 "Slalib Package"
+.help svdcov Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slSVDC (N, NP, NC, W, V, WORK, CVM)

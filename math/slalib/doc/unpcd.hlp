@@ -1,4 +1,4 @@
-.help unpcd Nov95 "Slalib Package"
+.help unpcd Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slUPCD (DISCO,X,Y)

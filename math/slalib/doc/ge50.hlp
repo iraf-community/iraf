@@ -1,4 +1,4 @@
-.help ge50 Nov95 "Slalib Package"
+.help ge50 Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slGE50 (DL, DB, DR, DD)

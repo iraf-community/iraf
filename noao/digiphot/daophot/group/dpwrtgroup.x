@@ -103,7 +103,7 @@ begin
 	call gethost (Memc[outstr], SZ_LINE)
 	call dp_sparam (tp, "HOST", Memc[outstr], "computer", "")
 	call dp_date (Memc[date], Memc[time], SZ_DATE)
-	call dp_sparam (tp, "DATE", Memc[date], "mm-dd-yy", "")
+	call dp_sparam (tp, "DATE", Memc[date], "yyyy-mm-dd", "")
 	call dp_sparam (tp, "TIME", Memc[time], "hh:mm:ss", "")
 	call dp_sparam (tp, "PACKAGE", "daophot", "name", "")
 	call dp_sparam (tp, "TASK", "group", "name", "")
@@ -132,7 +132,7 @@ begin
 	call dp_rparam (tp, "PSFMAG", DP_PSFMAG(psffit), "magnitude", "")
 	call dp_rparam (tp, "CRITSNRATIO", DP_CRITSNRATIO(dao), "sigma", "")
 	call dp_iparam (tp, "MAXGROUP", DP_MAXGROUP(dao), "number", "")
-	call dp_iparam (tp, "MAXNSTAR", DP_MAXNSTAR(dao), "number", "")
+	#call dp_iparam (tp, "MAXNSTAR", DP_MAXNSTAR(dao), "number", "")
 
 	# Write out the group size parameters.
 	# call dp_iparam (tp, "MINSZGROUP", 1, "number", "")
@@ -201,7 +201,7 @@ begin
 	call tbhadr (tp, "PSFMAG", DP_PSFMAG(psffit))
 	call tbhadr (tp, "CRITSNRATIO", DP_CRITSNRATIO(dao))
 	call tbhadi (tp, "MAXGROUP", DP_MAXGROUP(dao))
-	call tbhadi (tp, "MAXNSTAR", DP_MAXNSTAR(dao))
+	#call tbhadi (tp, "MAXNSTAR", DP_MAXNSTAR(dao))
 
 	# call tbhadi (tp, "MINSZGROUP", 1)
 	# call tbhadi (tp, "MAXSZGROUP", MAX_INT)

@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <math.h>
 include <math/iminterp.h>
 include "im1interpdef.h"
 
@@ -13,7 +14,7 @@ procedure arbpix (datain, dataout, npts, interp_type, boundary_type)
 
 real	datain[ARB]		# input data array
 real	dataout[ARB]		# output data array - cannot be same as datain
-int	npts			# no. of data points
+int	npts			# number of data points
 int	interp_type		# interpolator type
 int	boundary_type		# boundary type, at present must be BOUNDARY_EXT
 
@@ -46,9 +47,8 @@ begin
 	}
 
 	# If sinc interpolator use a special routine.
-	if (interp_type == II_SINC) {
-	    call ii_badsinc (datain, dataout, npts, NSINC, NTAPER, STAPER,
-	        MIN_BDX)
+	if (interp_type == II_SINC || interp_type == II_LSINC) {
+	    call ii_badsinc (datain, dataout, npts, NSINC, MIN_BDX)
 	    return
 	}
 	
@@ -116,6 +116,8 @@ begin
 		ngood = 3
 	    case II_SPLINE3:
 		ngood = SPLPTS / 2
+	    case II_DRIZZLE:
+		ngood = 1
 	    }
 
 	    # Search down.
@@ -151,8 +153,11 @@ begin
 end
 
 
-# II_NEWPIX -- This procedure interpolates the temporary arrays.
-# Ii_newpix does not represent a general puprpose routine because the
+# II_NEWPIX -- This procedure interpolates the temporary arrays. For the
+# purposes of bad pixel replacement the drizzle replacement algorithm is
+# equated with the linear interpolation replacement algorithm, an equation
+# which is exact if the drizzle integration interval is exactly 1.0 pixels.
+# II_NEWPIX does not represent a general puprpose routine because the
 # previous routine has determined the proper indices.
 
 real procedure ii_newpix (x, xarray, data, npts, index, interp_type)
@@ -177,7 +182,7 @@ begin
 	     else
 		return (data[1])
 
-	case II_LINEAR :
+	case II_LINEAR, II_DRIZZLE:
 	    return (data[1] + (x - xarray[1]) *
 		    (data[2] - data[1]) / (xarray[2] - xarray[1]))
 
@@ -220,23 +225,27 @@ end
 
 # II_BADSINC -- Procedure to evaluate bad pixels with a sinc interpolant
 # This is the average of interpolation to points +-0.05 from the bad pixel.
-# Sinc interpolation exactly at a pixel is undefined.
+# Sinc interpolation exactly at a pixel is undefined. Since this routine
+# is intended to be a bad pixel replacement routine, no attempt has been
+# made to optimize the routine by precomputing the sinc function.
 
-procedure ii_badsinc (datain, dataout, npts, nsinc, ntaper, staper, min_bdx)
+procedure ii_badsinc (datain, dataout, npts, nsinc, min_bdx)
 
 real	datain[ARB]	# input data including bad pixels with INDEF values
 real	dataout[ARB]	# output data 
 int	npts		# number of data values
 int	nsinc		# sinc truncation length
-int	ntaper		# start of triangular taper
-real	staper		# slope of triangular taper
 real	min_bdx		# minimum  distance from interpolation point
 
 int	i, j, k, xc
-real	w, d, z
-real	w1, u1, v1, u1a, v1a
+real	sconst, a2, a4, dx, dx2, dx4
+real	w, d, z, w1, u1, v1
 
 begin
+	sconst = (HALFPI / nsinc) ** 2
+	a2 = -0.49670
+	a4 = 0.03705
+
 	do i = 1, npts {
 
 	    if (! IS_INDEFR(datain[i])) {
@@ -253,66 +262,76 @@ begin
 
 		# Get the taper.
 		w = -w
-		if (j > ntaper) {
-		    if (w < 0.0)
-			w = min (0.0, w + staper)
-		    else
-			w = max (0.0, w - staper)
-		    if (w == 0.0)
-			break
-		}
-
-		# Store the previous value.
-		u1a = u1; v1a = v1
 
 		# Sum the low side.
 		k = xc - j
-		if (k >= 1) {
+		if (k >= 1)
 		    d = datain[k]
-		    if (! IS_INDEFR(d)) {
-			z = 1. / (min_bdx + j)
-			w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
-			z = 1. / (-min_bdx + j)
-			w1 = -w * z; u1 = u1 + d * w1; v1 = v1 + w1
-		    }
+		else
+		    d = datain[1]
+		if (! IS_INDEFR(d)) {
+		    dx = min_bdx + j
+		    dx2 = sconst * j * j
+		    dx4 = dx2 * dx2
+		    z = 1. / dx
+		    w1 = w * z * (1.0 + a2 * dx2 + a4 * dx4) ** 2
+		    u1 = u1 + d * w1
+		    v1 = v1 + w1
+		    dx = -min_bdx + j
+		    dx2 = sconst * j * j
+		    dx4 = dx2 * dx2
+		    z = 1. / dx
+		    w1 = -w * z * (1.0 + a2 * dx2 + a4 * dx4) ** 2
+		    u1 = u1 + d * w1
+		    v1 = v1 + w1
 		}
 
 		# Sum the high side.
 		k = xc + j
-		if (k <= npts) {
+		if (k <= npts)
 		    d = datain[k]
-		    if (! IS_INDEFR(d)) {
-			z = 1. / (min_bdx - j)
-			w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
-			z = 1. / (-min_bdx - j)
-			w1 = -w * z; u1 = u1 + d * w1; v1 = v1 + w1
-		    }
+		else
+		    d = datain[npts]
+		if (! IS_INDEFR(d)) {
+		    dx = min_bdx - j
+		    dx2 = sconst * j * j
+		    dx4 = dx2 * dx2
+		    z = 1. / dx
+		    w1 = w * z * (1.0 + a2 * dx2 + a4 * dx4) ** 2
+		    u1 = u1 + d * w1
+		    v1 = v1 + w1
+		    dx = -min_bdx - j
+		    dx2 = sconst * j * j
+		    dx4 = dx2 * dx2
+		    z = 1. / dx
+		    w1 = -w * z * (1.0 + a2 * dx2 + a4 * dx4) ** 2
+		    u1 = u1 + d * w1
+		    v1 = v1 + w1
 		}
 	    }
 
 	    # Compute the result.
 	    if (v1 != 0.) {
-		if (v1a != 0.)
-		    dataout[i] = (u1 / v1 + u1a / v1a) / 2.
-		else
-		    dataout[i] = u1 / v1
+		dataout[i] = u1 / v1
 	    } else {
 		do j = 1, npts {
 		    k = xc - j
-		    if (k >= 1) {
+		    if (k >= 1)
 			d = datain[k]
-			if (!IS_INDEFR(d)) {
-			    dataout[i] = d
-			    break
-			}
+		    else
+			d = datain[1]
+		    if (!IS_INDEFR(d)) {
+			dataout[i] = d
+			break
 		    }
 		    k = xc + j
-		    if (k <= npts) {
+		    if (k <= npts)
 			d = datain[k]
-			if (!IS_INDEFR(d)) {
-			    dataout[i] = d
-			    break
-			}
+		    else
+			d = datain[npts]
+		    if (!IS_INDEFR(d)) {
+			dataout[i] = d
+			break
 		    }
 		}
 	    }

@@ -1,4 +1,4 @@
-.help mxv Nov95 "Slalib Package"
+.help mxv Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slMXV (RM, VA, VB)

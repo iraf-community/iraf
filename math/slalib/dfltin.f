@@ -16,8 +16,6 @@
 *     DRESLT     d      result
 *     JFLAG      i      status: -1 = -OK, 0 = +OK, 1 = null, 2 = error
 *
-*  Called:  slICHF
-*
 *  Notes:
 *
 *     1     The reason DFLTIN has separate OK status values for +
@@ -52,7 +50,7 @@
 *                used to signal the end of the number and terminate
 *                decoding.
 *
-*             .  Comma is recognised by DFLTIN as a special case;  it
+*             .  Comma is recognized by DFLTIN as a special case;  it
 *                is skipped, leaving the pointer on the next character.
 *                See 13, below.
 *
@@ -106,9 +104,11 @@
 *
 *     18    See also FLOTIN and INTIN
 *
-*  P.T.Wallace   Starlink   14 April 1995
+*  Called:  slICHF
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  P.T.Wallace   Starlink   18 March 1999
+*
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

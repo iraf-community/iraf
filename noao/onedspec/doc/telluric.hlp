@@ -64,6 +64,13 @@ dispersion units otherwise they are in pixel coordinates.  The string "*"
 selects the entire spectrum.  The sample regions may be changed
 interactively either with the cursor or with a colon command.
 .le
+.ls threshold = 0.
+Since the calibration consists of division by the scaled calibration data
+it is possible for totally saturated lines to have zero or negative values.
+The task will quit if detects negative or zero calibration values.  The
+\fIthreshold\fR allows applying a minimum threshold to the calibration
+values so the task may continue.
+.le
 .ls lag = 10
 The cross-correlation lag to use when \fIxcorr\fR = yes.  The lag
 is given in pixels.   This is the distance to either side of the
@@ -132,12 +139,17 @@ spectrum to give J(x).  The shifted and scaled calibration function
 is then
 
 .nf
-    (1)  J'(x) = J(x+dx) ** (A / A_cal * scale)
+    (1)  J'(x) = max (threshold, J(x+dx)) ** (A / A_cal * scale)
 .fi
 
 where dx is the pixel shift parameter, A is the airmass of the input
 spectrum, A_cal is the airmass of the calibration spectrum, and
 scale is the scale parameter.  The operator "**" is exponentiation.
+The max operation limits the calibration spectrum to be greater
+than or equal to the specified threshold value.  If the calibration
+value is ever less than or equal to zero then the task will quit
+with a warning error.
+
 The output corrected spectrum is then computed as
 
 .nf
@@ -322,8 +334,12 @@ log the processing:
 .fi
 .ih
 REVISIONS
+.ls TELLURIC V2.11.2
+Threshold parameter added.
+.le
 .ls TELLURIC V2.11
 This task is new in this version.
+.le
 .ih
 SEE ALSO
 skytweak

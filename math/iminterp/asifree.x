@@ -9,6 +9,9 @@ procedure asifree (asi)
 pointer	asi	# interpolant descriptor
 
 begin
-	call mfree (ASI_COEFF(asi), TY_REAL)
+	if (ASI_COEFF(asi) != NULL)
+	    call mfree (ASI_COEFF(asi), TY_REAL)
+	if (ASI_LTABLE(asi) != NULL)
+	    call mfree (ASI_LTABLE(asi), TY_REAL)
 	call mfree (asi, TY_STRUCT)
 end

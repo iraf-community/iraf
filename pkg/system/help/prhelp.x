@@ -62,7 +62,7 @@ begin
 	if (option == O_MENU) {
 	    if (hd_getname (hp, modnum, TY_MEN, Memc[fname], SZ_PATHNAME) == 0)
 		goto exit_
-	    iferr (call pr_file (Memc[fname], ctrl))
+	    iferr (call pr_file (Memc[fname], ctrl, "test"))
 		call erract (EA_WARN)
 	    else
 		not_found = false
@@ -81,7 +81,7 @@ begin
 	    # Print source file, if given.
 	    if (hd_getname (hp, modnum, TY_SRC, Memc[fname], SZ_PATHNAME) == 0)
 		goto exit_
-	    iferr (call pr_file (Memc[fname], ctrl))
+	    iferr (call pr_file (Memc[fname], ctrl, "test"))
 		call erract (EA_WARN)
 	    else
 		not_found = false
@@ -110,7 +110,7 @@ begin
 	    }
 
 	    # Print full helpblock (default action).
-	    if (option == O_HELP || option == O_ALLDOC)
+	    if (option == O_HELP || option == O_ALLDOC || option==O_REFERENCES)
 		if (hd_getname (hp,modnum,TY_HLP,Memc[fname],SZ_PATHNAME) > 0)
 		    ifnoerr {
 			call pr_helpblock (Memc[fname],

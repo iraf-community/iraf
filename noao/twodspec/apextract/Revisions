@@ -1,5 +1,60 @@
 .help revisions Jun88 noao.twodspec.apextract
 .nf
+apextract.x
+    Added a keyword SUBAP when using echelle output with subapertures.
+    (3/26/99, Valdes)
+
+apflatten.par
+apflat1.par
+    Removed background subtraction as an option.  (12/11/98, Valdes)
+
+apskyeval.x
+    If the background sample region does not have explicit regions then
+    the xmin/xmax region is used for the background.  (12/11/98, Valdes)
+
+apfit.x
+    Added errchk for ic_fit and ic_gfit.  (12/8/98, Valdes)
+
+apflat1.par
+    Reduced the polysep because it can go wrong.  (12/8/98, Valdes)
+
+apextract.x
+    Added check to fix cases with the lower and upper aperture limits
+    are reversed.
+    (7/13/98, Valdes)
+
+apgetim.x
+    Changed to call xtools routine that strips extensions.
+    (7/13/98, Valdes)
+
+approfile.x
+    In the Horne algorithm the weights for rejected points were set to zero
+    to eliminate them from the fit.  But if large regions are rejected
+    this leaves the fit unconstrained and can lead to bad results.  A
+    change was made to set the weights for the rejected points to 1/10
+    of the minimum weight for the good data.
+    (2/6/98, Valdes)
+
+apextract.x
+    For "echelle" format with "extras" the header was not setup properly
+    resulting in WCSDIM=2 instead of 3.  (2/6/98, Valdes)
+
+apids.x
+    1.  Fix bug in IDS structure which pointed outside of allocated memory.
+    2.  Variables ra/dec in ap_gids were being used both as pointers and
+	double.  The ra/dec pointer usage was removed.
+    3.	The realloc step at the end of ap_gids had the wrong check so it
+	would never be done.
+    (1/13/98, Valdes)
+
+=======
+V2.11.1
+=======
+=====
+V2.11
+=====
+
+doc/apsum.hlp
 doc/apsum.hlp
     Added missing task name in revisions section.  (4/22/97, Valdes)
 

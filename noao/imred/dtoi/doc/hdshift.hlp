@@ -32,7 +32,6 @@ shifted to the zero point shift of the first database in the list.  The
 log exposure records are now aligned and it would be appropriate
 to run task \fIhdfit\fR on the modified \fBdatabase\fR list and
 determine the common solution.
-.fi
 .ih
 EXAMPLES
 .nf

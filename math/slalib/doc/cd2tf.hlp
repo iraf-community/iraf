@@ -1,4 +1,4 @@
-.help cd2tf Nov95 "Slalib Package"
+.help cd2tf Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slCDTF (NDP, DAYS, SIGN, IHMSF)

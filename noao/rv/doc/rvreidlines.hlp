@@ -399,7 +399,6 @@ This task will now work in the units of the input spectra.
 .ls RVREIDLINES V2.10.3
 This task in new in the version.
 .le
-.le
 .ih
 SEE ALSO
 center1d, fxcor, keywpars, observatory, rvcorrect, rvidlines

@@ -57,6 +57,7 @@ Print each keyword added or modified?
 Use the old style syntax of this task from versions prior to V2.11.  This
 parameter allows backward compatability for command files previously
 developed.  Some aspects of the new syntax are still available.
+.le
 .ih
 DESCRIPTION
 \fBAsthedit\fR evaluates expressions using image header keywords, column
@@ -116,12 +117,16 @@ with an alphabetic character or '$' followed by an alphabetic character and
 may use alphabetic characters, digits, or the characters '_', '$', or '.'.
 Keyword names are case insensitive.  Because some additional characters are
 allowed in the FITS definition of keyword names, such names may be
-referenced with the special '@' operator descirbed below.  One may also use
-internal variables which have the same identifier rules but begin with
-'$'.  Note that these variables are case sensitive (as are function
-names).  There are a few special predefined variables: "$I" contains the
-current image name, "$D" contains the current local date, and "$T" contains
-the current local time.
+referenced with the special '@' operator descirbed below.
+
+One may also use internal variables which have the same identifier rules
+but begin with '$'.  Note that these variables are case sensitive (as are
+function names).  There are a few special predefined variables: "$I"
+contains the current image name, "$D" contains the current local date (in
+old FITS DD/MM/YY format), "$T" contains the current local time, "$GMD"
+contains the current Greenwich meridian date (in FITS YYYY-MM-DD format),
+"$GMT" contains the current Greenwich meridian time, and "$GMDT" containts
+the current date and time in FITS YYYY-MM-DDTHH:MM:SS format.
 
 Before the commands are interpreted for each image a line of a text
 file may be read.  This occurs when a file is specified by the
@@ -276,13 +281,14 @@ The set of functions currently supported is shown below.
 
 
 .nf
-        abs     acos    asin    atan    atan2   bool    cos
-        exp     int     log     log10   max     min     mod
-        nint    real    sin     sqrt    str     tan     
+	abs     atan2   deg     log     min     real    sqrt
+	acos    bool    double  log10   mod     short   str
+	asin    cos     exp     long    nint    sin     tan
+	atan    cosh    int     max     rad     sinh    tanh
 .fi
 
 
-The trigonometric functions operate in units of degrees rather than radians.
+The trigonometric functions operate in units of radians.
 The \fImin\fR and \fImax\fR functions may have any number of arguments up
 to a maximum of sixteen or so (configurable).  The arguments need not all
 be of the same datatype.
@@ -322,20 +328,22 @@ Convert a number to a sexagesimal string in the format X:MM:SS.SS.  There
 is an optional second argument (the default is 0) which is the number of
 decimal digits in the seconds field.
 .le
-.ls epoch (date, ut)
+.ls epoch (date[, ut])
 Compute an epoch given a date and time.  The date is a string in the
-format DD/MM/YY.  Typically this argument with be the standard FITS
+format DD/MM/YY, YYYY-MM-DD, or YYYY-MM-DDTHH:MM:SS.
+Typically this argument will be the standard FITS
 keyword DATE-OBS.  Because of possible confusion of the hyphen with
 subtraction this keyword would be specified as @"date-obs".  The time
-is specified in hours and is generally a universal time.
+argument is optional.  If it is not given the time from the date
+string will be used and if absent a time of 0h is used.
 .le
-.ls julday (date, ut)
+.ls julday (date[, ut])
 Compute a Julian day given a date and time.  The date and time are
 specified as described previously.
 .le
-.ls mst (date, ut, longitude)
+.ls mst (date[, ut], longitude)
 Compute a mean siderial time given a date, time, and longitude in degrees.  The
-date and time are specified as described previously.  The longitude
+date and (optional) time are specified as described previously.  The longitude
 may be given as a constant or using the observatory database function
 as shown in the examples.  The returned value is a sexagesimal
 string with two decimals in the seconds.
@@ -753,6 +761,13 @@ and a null image name, and interactive command input.
 
 .ih
 REVISIONS
+.ls ASTHEDIT V2.11.2
+Y2K update:  The epoch, julday, and mst functions now take either the old
+or new FITS style date strings.  The time argument is optional and if
+it is not specified the time from the date string is used and if neither
+time is present a value of 0h is used.  New internal variables $GMD,
+$GMT, and $GMDT for the current time Greenwich time are defined.
+.le
 .ls ASTHEDIT V2.11
 There are new astronomical functions and input/output functions.
 

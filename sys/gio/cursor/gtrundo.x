@@ -13,7 +13,9 @@ procedure gtr_undo (stream)
 int	stream				# graphics stream
 int	opcode
 pointer	tr, op, new_op, old_op, sp, ap
+
 pointer	gtr_init()
+errchk	gtr_init
 include	"gtr.com"
 
 begin

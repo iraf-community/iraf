@@ -6,7 +6,7 @@
 #define	import_kernel
 #include <iraf.h>
 
-#define	SZ_PROCNAME	32
+#define	SZ_PROCNAME	256
 
 /* Allocate ZFD, the global data structure for the kernel file i/o system.
  * Also allocate a buffer for the process name, used by the error handling

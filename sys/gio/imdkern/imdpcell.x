@@ -3,7 +3,7 @@
 include	<gki.h>
 include	"imd.h"
 
-define	DEF_YRES	2048	# default height of device pixel in GKI units
+define	DEF_YRES	8192	# default height of device pixel in GKI units
 define	ZSTEP		4	# bit to be tested (step function width)
 
 

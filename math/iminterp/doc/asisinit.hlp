@@ -1,0 +1,60 @@
+.help asisinit Dec98 "Image Interpolator Package"
+.ih
+NAME
+asisinit -- initialize the sequential interpolant descriptor using user parameters
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+asisinit (asi, interp_type, nsinc, nincr, rparam, badval)
+
+.nf
+    pointer	asi		#O interpolant descriptor
+    int		interp_type	#I interpolant type
+    int		nsinc		#I sinc interpolant width in pixels
+    int		nincr		#I sinc look-up table resolution
+    real	pixfrac         #I sinc shift or drizzle pixel fraction 
+    real	badval		#I drizzle undefined pixel value
+.fi
+
+.ih
+ARGUMENTS
+.ls asi   
+Pointer to sequential interpolant descriptor.
+.le
+.ls interp_type
+Interpolant type. The options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5,
+II_SPLINE3, II_SINC, II_LSINC, and II_DRIZZLE for the nearest neighbour, linear,
+3rd order polynomial, 5th order polynomial, cubic spline, sinc, look-up
+table sinc, and drizzle interpolants respectively. The interpolant type
+definitions are found in the package header file math/iminterp.h.
+.le
+.ls nsinc
+The sinc and look-up table sinc interpolant width in pixels. Nsinc is
+rounded up internally to the nearest odd number.
+.le
+.ls nincr
+The look-up table sinc resolution in number of entries. Nincr = 10 implies
+a pixel resolution of 0.1 pixels, nincr = 20 a pixel resolution of 0.05
+pixels, etc.
+.le
+.ls pixfrac
+The look-up table sinc fractional pixel shift if nincr = 1 in which case
+-0.5 <= pixfrac <= 0.5 , or the drizzle pixel fraction in which case
+0.0 <= pixfrac <= 1.0. A minimum value of 0.001 is imposed on pixfrac.
+.le
+.ls badval
+The undefined pixel value for the drizzle interpolant. Pixels within
+the boundaries of the input image which do not overlap the input image
+pixels are assigned a value of badval.
+.le
+.ih
+DESCRIPTION
+The interpolant descriptor is allocated and initialized. The pointer asi is
+returned by ASISINIT.
+.ih
+NOTES
+ASIINIT or ASISINIT must be called before using any other ASI routines.
+.ih
+SEE ALSO
+asisinit, asifree

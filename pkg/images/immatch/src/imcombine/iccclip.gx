@@ -423,12 +423,12 @@ begin
 
 	    # Only set median and reorder if needed
 	    n[i] = n1
-	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow > 0)) {
+	    if (n1 > 0 && nl > 1 && (combine != MEDIAN || grow >= 1.)) {
 		j = max (nl, n1 + 1)
 		if (keepids) {
 		    do l = 1, min (n1, nl-1) {
 			Mem$t[d[l]+k] = Mem$t[d[j]+k]
-			if (grow > 0) {
+			if (grow >= 1.) {
 			    mp1 = m[l] + k
 			    mp2 = m[j] + k
 			    id = Memi[mp1]

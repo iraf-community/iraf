@@ -16,7 +16,6 @@ List of output sky corrected flat field calibration images (called
 sky flats).  If none is specified or if the name is the same as the
 input image then the output image replaces the input image.
 .le
-.le
 .ls ccdtype = ""
 CCD image type to select from the input images.
 .le

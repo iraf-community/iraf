@@ -15,7 +15,7 @@ procedure ex_rgb (ex)
 
 pointer	ex				#i task struct pointer
 
-int	i, fd, flags
+int	i, fd
 short	imagic, type, dim		# stuff saved on disk
 short	xsize, ysize, zsize, pad
 long	min, max
@@ -24,7 +24,6 @@ char	name[80]
 begin
         # Check to see that we have the correct number of expressions to
         # write this format.
-        flags = EX_OUTFLAGS(ex)
         if (EX_NEXPR(ex) != 3)
             call error (7, "Invalid number of expressions for SGI RGB.")
 

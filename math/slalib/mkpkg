@@ -1,4 +1,4 @@
-# Starlink positional astronomy library
+# SLALIB library routines
 
 $checkout libslalib.a lib$
 $update   libslalib.a
@@ -58,6 +58,7 @@ libslalib.a:
 	dmoon.f   
 	dmxm.f   
 	dmxv.f   
+	dpav.f
 	dr2af.f   
 	dr2tf.f   
 	drange.f   
@@ -83,6 +84,7 @@ libslalib.a:
 	ecmat.f   
 	ecor.f   
 	eg50.f   
+	el2ue.f
 	epb.f   
 	epb2d.f   
 	epco.f   
@@ -99,6 +101,8 @@ libslalib.a:
 	fk45z.f   
 	fk524.f   
 	fk54z.f   
+	fk52h.f
+	fk5hz.f
 	flotin.f   
 	galeq.f   
 	galsup.f   
@@ -107,6 +111,8 @@ libslalib.a:
 	gmst.f   
 	gmsta.f   
 	h2e.f   
+	h2fk5.f
+	hfk5z.f
 	idchf.f   
 	idchi.f   
 	imxv.f   
@@ -127,17 +133,25 @@ libslalib.a:
 	oapqk.f   
 	obs.f   
 	pa.f   
+	pav.f
 	pcd.f   
 	pda2h.f   
 	pdq2h.f   
+	pertel.f
+	pertue.f
+	planel.f
 	planet.f   
+	plante.f
 	pm.f   
+	polmo.f
 	prebn.f   
 	prec.f   
 	preces.f   
 	precl.f   
 	precss.f	# preces.f with an integer system argument
 	prenut.f   
+	pv2ue.f
+	pv2el.f
 	pvobs.f   
 	pxy.f   
 	range.f   
@@ -145,6 +159,7 @@ libslalib.a:
 	rcc.f   
 	rdplan.f   
 	refco.f   
+	refcoq.f
 	refro.f   
 	refv.f   
 	refz.f   
@@ -165,6 +180,8 @@ libslalib.a:
 	tp2v.f   
 	tps2c.f   
 	tpv2c.f   
+	ue2el.f
+	ue2pv.f
 	unpcd.f   
 	v2tp.f   
 	vdv.f   

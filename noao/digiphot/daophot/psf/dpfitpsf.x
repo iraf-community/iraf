@@ -545,7 +545,8 @@ begin
 	    do i = 1, nx {
 	        dx = real ((lx + i) - 1) - x
 		wt = (dx ** 2 + dy ** 2) / rsq
-		if (wt >= 1.0)
+		#if (wt >= 1.0)
+		if (wt >= 0.999998)
 		    next
 		p = dp_profile (psftype, dx, dy, params, dhdxc, dhdyc, junk, 0)
 		dp = data[i,j] - h * p - sky
@@ -612,7 +613,8 @@ begin
 	    do i = 1, nx {
 	        dx = real ((lx + i) - 1) - x
 		wt = (dx ** 2 + dy ** 2) / rsq
-		if (wt >= 1.0)
+		#if (wt >= 1.0)
+		if (wt >= 0.999998)
 		    next
 		p = dp_profile (psftype, dx, dy, params, dhdxc, dhdyc, temp, 1) 
 		dp = data[i,j] - h * p - sky

@@ -199,7 +199,7 @@ begin
 	call tbhadr (tp, "DANNULUS", DP_SDANNULUS(dao))
 	call tbhadi (tp, "MAXITER", DP_MAXITER(dao))
 	call tbhadi (tp, "MAXGROUP", DP_MAXGROUP(dao))
-	call tbhadi (tp, "MAXNSTAR", DP_MAXNSTAR(dao))
+	#call tbhadi (tp, "MAXNSTAR", DP_MAXNSTAR(dao))
 	call tbhadr (tp, "FLATERROR", DP_FLATERR(dao))
 	call tbhadr (tp, "PROFERROR", DP_PROFERR(dao))
 	call tbhadi (tp, "CLIPEXP", DP_CLIPEXP(dao))
@@ -243,7 +243,7 @@ begin
 	call gethost (Memc[outstr], SZ_LINE)
 	call dp_sparam (tp, "HOST", Memc[outstr], "computer", Memc[dummy])
 	call dp_date (Memc[date], Memc[time], SZ_DATE)
-	call dp_sparam (tp, "DATE", Memc[date], "mm-dd-yy", Memc[dummy])
+	call dp_sparam (tp, "DATE", Memc[date], "yyyy-mm-dd", Memc[dummy])
 	call dp_sparam (tp, "TIME", Memc[time], "hh:mm:ss", Memc[dummy])
 	call dp_sparam (tp, "PACKAGE", "daophot", "name", Memc[dummy])
 	call dp_sparam (tp, "TASK", "allstar", "name", Memc[dummy])
@@ -296,7 +296,8 @@ begin
 	    Memc[dummy])
 	call dp_iparam (tp, "MAXITER", DP_MAXITER(dao), "number", Memc[dummy])
 	call dp_iparam (tp, "MAXGROUP", DP_MAXGROUP(dao), "number", Memc[dummy])
-	call dp_iparam (tp, "MAXNSTAR", DP_MAXNSTAR(dao), "number", Memc[dummy])
+	#call dp_iparam (tp, "MAXNSTAR", DP_MAXNSTAR(dao), "number",
+	    #Memc[dummy])
 	call dp_rparam (tp, "FLATERROR", DP_FLATERR(dao), "percentage",
 	    Memc[dummy])
 	call dp_rparam (tp, "PROFERROR", DP_PROFERR(dao), "percentage",

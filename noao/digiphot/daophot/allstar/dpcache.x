@@ -56,11 +56,13 @@ begin
 	    # The scratch image.
 	    call mktemp ("subt", Memc[temp], SZ_FNAME]
 	    DP_SUBT (allstar) = immap (Memc[temp], NEW_COPY, im)
+	    IM_NDIM(DP_SUBT(allstar)) = 2
 	    IM_PIXTYPE(DP_SUBT(allstar)) = TY_REAL
 
 	    # The weights image.
 	    call mktemp ("wt", Memc[temp], SZ_FNAME]
 	    DP_WEIGHTS (allstar) = immap (Memc[temp], NEW_COPY, im)
+	    IM_NDIM(DP_WEIGHTS(allstar)) = 2
 	    IM_PIXTYPE(DP_WEIGHTS(allstar)) = TY_REAL
 
 	    # Set the type of caching to be used.
@@ -93,6 +95,7 @@ begin
 		        call mfree (subt, TY_REAL)
 		    call mktemp ("subt", Memc[temp], SZ_FNAME)
 		    subt = immap (Memc[temp], NEW_COPY, im)
+		    IM_NDIM(subt) = 2
 		    IM_PIXTYPE(subt) = TY_REAL
 		    DP_SUBT(allstar) = subt
 		    DP_CACHE(allstar,A_SUBT) = NO
@@ -101,6 +104,7 @@ begin
 	    } else {
 		call mktemp ("subt", Memc[temp], SZ_FNAME)
 		subt = immap (Memc[temp], NEW_COPY, im)
+		IM_NDIM(subt) = 2
 		IM_PIXTYPE(subt) = TY_REAL
 		DP_SUBT(allstar) = subt
 	    }
@@ -115,6 +119,7 @@ begin
 		        call mfree (weights, TY_REAL)
 		    call mktemp ("wt", Memc[temp], SZ_FNAME)
 		    weights = immap (Memc[temp], NEW_COPY, im)
+		    IM_NDIM(weights) = 2
 		    IM_PIXTYPE(weights) = TY_REAL
 		    DP_WEIGHTS(allstar) = weights
 		    DP_CACHE(allstar,A_WEIGHT) = NO
@@ -123,6 +128,7 @@ begin
 	    } else {
 		call mktemp ("wt", Memc[temp], SZ_FNAME)
 		weights = immap (Memc[temp], NEW_COPY, im)
+		IM_NDIM(weights) = 2
 		IM_PIXTYPE(weights) = TY_REAL
 		DP_WEIGHTS(allstar) = weights
 	    }

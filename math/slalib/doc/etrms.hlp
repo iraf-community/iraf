@@ -1,4 +1,4 @@
-.help etrms Nov95 "Slalib Package"
+.help etrms Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slETRM (EP, EV)
@@ -26,9 +26,9 @@
      1  Smith, C.A. et al., 1989.  Astr.J. 97, 265.
      2  Yallop, B.D. et al., 1989.  Astr.J. 97, 274.
 
-  P.T.Wallace   Starlink   10 April 1990
+  P.T.Wallace   Starlink   23 August 1996
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

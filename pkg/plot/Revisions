@@ -1,5 +1,19 @@
 .help revisions Aug90 pkg.plot
 .nf
+pkg/plot/doc/implot.hlp
+pkg/plot/doc/surface.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+pkg/plot/t_implot.x
+    If glabax is called with log axis scaling then it will reset the
+    graph limits which invalidates the previously saved limits from
+    ggwind.  Therefore ggwind was moved to follow the glabax call.
+    (1/26/98, Valdes)
+
+=======
+V2.11.1
+=======
+
 pkg/plot/phistogram.x
     Phistogram was producing a segmentation violation error for text file input
     due to an error in the bug fix described below. (4/10/97, Davis)

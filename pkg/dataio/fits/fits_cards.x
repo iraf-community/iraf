@@ -61,7 +61,7 @@ pointer	fits		# pointer to FITS structure
 int	optiono		# number of the option card
 char	card[ARB]	# FITS card image
 
-char	datestr[LEN_STRING+2]
+char	datestr[LEN_DATE]
 int	len_object, stat
 int	strlen()
 errchk	wft_encoded, wft_encodec, wft_encode_blank, wft_encoder, wft_encodei
@@ -121,7 +121,7 @@ begin
 	case KEY_ORIGIN:
 	    call wft_encodec ("ORIGIN", "KPNO-IRAF", LEN_ORIGIN, card, "")
 	case KEY_DATE:
-	    call wft_encode_date (datestr, LEN_STRING + 2)
+	    call wft_encode_date (datestr, LEN_DATE)
 	    len_object = max (min (LEN_OBJECT, strlen (datestr)), LEN_STRING)
 	    call wft_encodec ("DATE", datestr, len_object, card, "")
 	case KEY_IRAFNAME:
@@ -252,6 +252,8 @@ begin
 	        } else if (strmatch (card, "^IRAF-BPX") != 0) {
 		    stat = NO
 	        } else if (strmatch (card, "^FILENAME") != 0) {
+		    stat = NO
+	        } else if (strmatch (card, "^IRAFNAME") != 0) {
 		    stat = NO
 	        } else if (strmatch (card, "^EXTEND  ") != 0) {
 		    stat = NO

@@ -43,6 +43,8 @@ endif
 
 # Use name server if installed?
 if ($MACH != i386 && -e /lib/libresolv.a) then
+    # -l44bsd is needed for some (non-Sun) enhanced versions of libresolv.
+    #set RESOLV = "-lresolv -l44bsd"
     set RESOLV = -lresolv
 else
     set RESOLV = ""

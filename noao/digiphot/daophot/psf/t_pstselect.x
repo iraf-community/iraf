@@ -177,8 +177,8 @@ begin
 	    root = fnldir (Memc[photfile], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[photfile+root], DEF_LENDEFNAME) ==
 	        0 || root == strlen (Memc[photfile]))
-	        call dp_inname (Memc[image], "", "mag", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_inname (Memc[image], Memc[outfname], "mag",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[photfile], Memc[outfname], SZ_FNAME)
 	    ap_text =  itob (access (Memc[outfname], 0, TEXT_FILE))
@@ -199,8 +199,8 @@ begin
 	    root = fnldir (Memc[pstfile], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[pstfile + root], DEF_LENDEFNAME) ==
 	        0 || root == strlen (Memc[pstfile]))
-	        call dp_outname (Memc[image], "", "pst", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_outname (Memc[image], Memc[outfname], "pst",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[pstfile], Memc[outfname], SZ_FNAME)
 	    if (ap_text)
@@ -262,6 +262,7 @@ begin
 	    call close (pmgd)
 
 	# Close the image/file lists.
+	call imtclose (imlist)
 	call fntclsb (alist)
 	call fntclsb (olist)
 

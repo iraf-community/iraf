@@ -191,7 +191,8 @@ char	*osfn;
 			break;
 
 		    } else {
-			char *fname = ++ip;
+			char *fname;
+			fname = ++ip;
 
 			while (*ip)
 			    if (isspace(*ip)) {

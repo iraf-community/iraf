@@ -23,7 +23,7 @@ begin
 	bp = NULL
 	iferr {
 	    nchars = im_pmsvhdr (im, bp, sz_buf)
-	    call pl_savef (IM_PL(im), IM_NAME(im), Memc[bp], flags)
+	    call pl_savef (IM_PL(im), IM_HDRFILE(im), Memc[bp], flags)
 	} then
 	    status = ERR
 	call mfree (bp, TY_CHAR)

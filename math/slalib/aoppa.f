@@ -11,7 +11,7 @@
 *  Given:
 *     DATE   d      UTC date/time (modified Julian Date, JD-2400000.5)
 *     DUT    d      delta UT:  UT1-UTC (UTC seconds)
-*     ELONGM d      mean longitude of the observer (radians, East +ve)
+*     ELONGM d      mean longitude of the observer (radians, east +ve)
 *     PHIM   d      mean geodetic latitude of the observer (radians)
 *     HM     d      observer's height above sea level (metres)
 *     XP     d      polar motion x-coordinate (radians)
@@ -79,14 +79,15 @@
 *       the pressure in millibars, is available, an adequate
 *       estimate of HM can be obtained from the expression
 *
-*             HM ~ -8149.9415D0*LOG(P/1013.25D0).
+*             HM ~ -29.3D0*TSL*LOG(P/1013.25D0).
 *
-*       (See Astrophysical Quantities, C.W.Allen, 3rd edition,
+*       where TSL is the approximate sea-level air temperature in
+*       deg K (see Astrophysical Quantities, C.W.Allen, 3rd edition,
 *       section 52.)  Similarly, if the pressure P is not known,
 *       it can be estimated from the height of the observing
 *       station, HM as follows:
 *
-*             P ~ 1013.25D0*EXP(-HM/8149.9415D0).
+*             P ~ 1013.25D0*EXP(-HM/(29.3D0*TSL)).
 *
 *       Note, however, that the refraction is proportional to the
 *       pressure and that an accurate P value is important for
@@ -101,9 +102,9 @@
 *
 *  Called:  slGEOC, slRFCO, slEQEX, slAOPT
 *
-*  P.T.Wallace   Starlink   27 December 1994
+*  P.T.Wallace   Starlink   9 June 1998
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1998 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

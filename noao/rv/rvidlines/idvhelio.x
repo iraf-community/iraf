@@ -10,13 +10,13 @@ double	hjd			#O Heliocentric Julian Date
 int	fd			#I Log file descriptor
 
 bool	newobs, obshead
-int	i, j, k, ip, year, month, day
+int	year, month, day, flags
 double	ra, dec, ep, ut, lt
 double	epoch, vrot, vbary, vorb
 double	latitude, longitude, altitude
 pointer	sp, str1, str2, tmp, obs, kp
 
-int	ctoi()
+int	dtm_decode()
 double	imgetd(), obsgetd()
 pointer	clopset()
 
@@ -48,17 +48,13 @@ begin
 	    kp = clopset ("keywpars")
 	    call clgpset (kp, "date_obs", Memc[str1], SZ_LINE)
 	    call imgstr (im, Memc[str1], Memc[str2], SZ_LINE)
-	    ip = 1
-	    i = ctoi (Memc[str2], ip, day)
-	    ip = ip + 1
-	    j = ctoi (Memc[str2], ip, month)
-	    ip = ip + 1
-	    k = ctoi (Memc[str2], ip, year)
-	    if (i==0 || j==0 || k==0)
+	    if (dtm_decode (Memc[str2],year,month,day,ut,flags) == ERR)
 		call error (1, "Error in date string")
 
-	    call clgpset (kp, "ut", Memc[str1], SZ_LINE)
-	    ut = imgetd (im, Memc[str1])
+	    if (IS_INDEFD(ut)) {
+		call clgpset (kp, "ut", Memc[str1], SZ_LINE)
+		ut = imgetd (im, Memc[str1])
+	    }
 	    call clgpset (kp, "ra", Memc[str1], SZ_LINE)
 	    ra = imgetd (im, Memc[str1])
 	    call clgpset (kp, "dec", Memc[str1], SZ_LINE)

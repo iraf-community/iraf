@@ -31,7 +31,10 @@ real	ap_crgrow(), ap_crclean(), ap_crclip()
 
 begin
 	# Mark the polygon interactively.
-	nvertices = ap_ymkpoly (ap, id, x, y, max_nvertices)
+	if (id == gd)
+	    nvertices = ap_ymkpoly (ap, id, x, y, max_nvertices, NO)
+	else
+	    nvertices = ap_ymkpoly (ap, id, x, y, max_nvertices, YES)
 	if (nvertices <= 0)
 	    return (nvertices)
 	if (id != NULL) {

@@ -61,7 +61,6 @@ the independent variable is the density.  Other choices are the log
 opacitance or a Kaiser transform with alpha = 0.50 or 0.75.  The
 default choice is to fit log exposure as a function of the log opacitance; 
 this is traditionally known as the Baker-Seidel function.
-.fi
 .ih
 EXAMPLES
 .nf

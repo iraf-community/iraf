@@ -73,7 +73,6 @@ to this upper limit.  The precision of the transformation is unaffected by
 this parameter, although caution must be used if the output image pixel
 type is an integer.  The user is responsible for choosing
 a \fBceiling\fR that avoids the truncation of significant digits.
-.fi
 .ih
 EXAMPLES
 Convert three density images to intensity images as described in database db1.

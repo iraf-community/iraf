@@ -7,29 +7,30 @@ include	<fset.h>
 include	"qpoe.h"
 include	"qpio.h"
 
+define	SZ_CODE		7
+
+
 # QPIO_MKINDEX -- Make an index for the event list associated with the QPIO
 # descriptor.  The event list must have been already written out, in sorted
 # order according to the given key.  Once an event list is indexed it cannot
-# be further extended or otherwise modified.  In QPOE, only short and int
-# coordinate fields can be used to construct an index.  The key fields are
-# specified as, e.g., "s10,s8" or "(s10,s8)" (Y // X), where the field name
-# is the datatype code (s for short, i for int) followed by the decimal byte
-# offset of the field in the event struct.  Both fields do not have to be
-# the same datatype.
+# be further extended or otherwise modified.  The key fields are specified
+# as, e.g., "s10,s8" or "(s10,s8)" (Y // X), where the field name is the
+# datatype code (silrd for short, int, long, real, or double) followed by the
+# decimal byte offset of the field in the event struct.
 
 procedure qpio_mkindex (io, key)
 
 pointer	io			#I QPIO descriptor
 char	key[ARB]		#I list of key fields
 
-bool	xint, yint, isint
-pointer	sp, tokbuf, ip, in, ev, ev_i, ov, lv, oo, bp
-int	ox, line, nevents, szs_event, ncols, nlines, nout, x, y, i
+pointer	sp, tokbuf, ip, in, ev, ev_p, ov, lv, oo, bp
+int	ox, line, nevents, szs_event, ncols, nlines, nout, x, y, i, ch
 int	token, offset, xoff, yoff, len_index, nev, fd, sv_evi, firstev
+int	dtype, ntype
 
 long	note()
 pointer	qp_opentext()
-int	qp_gettok(), ctoi(), qpio_rbucket(), pl_p2li()
+int	qp_gettok(), ctoi(), qpio_rbucket(), pl_p2li(), sizeof()
 errchk	qp_opentext, qpio_rbucket, qpio_sync, write, calloc, syserrs
 define	nosort_ 91
 
@@ -45,8 +46,7 @@ begin
 	# Key defaults to sort x/y.
 	xoff = IO_EVXOFF(io)
 	yoff = IO_EVYOFF(io)
-	xint = (IO_EVXTYPE(io) == TY_INT)
-	yint = (IO_EVYTYPE(io) == TY_INT)
+	dtype = IO_EVXTYPE(io)
 
 	# Parse key list (macro references are permitted) to get offsets of
 	# the X and Y coordinate fields to be used as the index key.
@@ -54,31 +54,43 @@ begin
 	in = qp_opentext (IO_QP(io), key)
 
 	do i = 1, 2 {
+	    # Get next field token.
 	    repeat {
 		token = qp_gettok (in, Memc[tokbuf], SZ_TOKBUF)
 	    } until (token == EOF || token == TOK_IDENTIFIER)
 	    if (token == EOF)
 		break
 
+	    # Determine field type.
 	    call strlwr (Memc[tokbuf])
-	    if (Memc[tokbuf] == 'i')
-		isint = true
-	    else if (Memc[tokbuf] == 's')
-		isint = false
-	    else
+	    ch = Memc[tokbuf]
+
+	    switch (ch) {
+	    case 's':
+		ntype = TY_SHORT
+	    case 'i':
+		ntype = TY_INT
+	    case 'l':
+		ntype = TY_LONG
+	    case 'r':
+		ntype = TY_REAL
+	    case 'd':
+		ntype = TY_DOUBLE
+	    default:
 		call syserrs (SYS_QPXYFNS, key)
+	    }
+
+	    # Both X and Y must be the same type.
 	    if (i == 1)
-		xint = isint
-	    else
-		yint = isint
+		dtype = ntype
+	    else if (ntype != dtype)
+		call syserrs (SYS_QPINVEVT, key)
 
 	    ip = tokbuf + 1
 	    if (ctoi (Memc, ip, offset) <= 0)
 		call syserrs (SYS_QPBADKEY, key)
-	    else if (isint)
-		offset = offset / (SZ_INT * SZB_CHAR)
 	    else
-		offset = offset / (SZ_SHORT * SZB_CHAR)
+		offset = offset / (sizeof(dtype) * SZB_CHAR)
 
 	    if (i == 1)
 		yoff = offset
@@ -107,15 +119,9 @@ begin
 	    call eprintf ("nevents=%d, evsize=%d, xkey=%c%d, ykey=%c%d\n")
 		call pargi (IO_NEVENTS(io))
 		call pargi (szs_event)
-		if (xint)
-		    call pargc ('i')
-		else
-		    call pargc ('s')
+		call pargi (ch)
 		call pargi (xoff)
-		if (yint)
-		    call pargc ('i')
-		else
-		    call pargc ('s')
+		call pargi (ch)
 		call pargi (yoff)
 	}
 
@@ -146,17 +152,25 @@ begin
 	    nout = 0
 
 	    do i = 1, nev {
-		ev_i = (ev - 1) * SZ_SHORT / SZ_INT + 1
+		ev_p = (ev - 1) * SZ_SHORT / sizeof(dtype) + 1
 
-		if (xint)
-		    x = Memi[ev_i+xoff]
-		else
-		    x = Mems[ev+xoff]
-
-		if (yint)
-		    y = Memi[ev_i+yoff]
-		else
-		    y = Mems[ev+yoff]
+		switch (dtype) {
+		case TY_SHORT:
+		    x = Mems[ev_p+xoff]
+		    y = Mems[ev_p+yoff]
+		case TY_INT:
+		    x = Memi[ev_p+xoff]
+		    y = Memi[ev_p+yoff]
+		case TY_LONG:
+		    x = Meml[ev_p+xoff]
+		    y = Meml[ev_p+yoff]
+		case TY_REAL:
+		    x = Memr[ev_p+xoff] + 0.5
+		    y = Memr[ev_p+yoff] + 0.5
+		case TY_DOUBLE:
+		    x = Memd[ev_p+xoff] + 0.5
+		    y = Memd[ev_p+yoff] + 0.5
+		}
 
 		x = max(1, min(ncols,  x))
 		y = max(1, min(nlines, y))
@@ -247,15 +261,8 @@ begin
 
 	IO_IXXOFF(io) = xoff
 	IO_IXYOFF(io) = yoff
-
-	if (xint)
-	    IO_IXXTYPE(io) = TY_INT
-	else
-	    IO_IXXTYPE(io) = TY_SHORT
-	if (yint)
-	    IO_IXYTYPE(io) = TY_INT
-	else
-	    IO_IXYTYPE(io) = TY_SHORT
+	IO_IXXTYPE(io) = dtype
+	IO_IXYTYPE(io) = dtype
 
 	if (IO_DEBUG(io) > 1) {
 	    call eprintf ("index.offv %d words at offset %d\n")

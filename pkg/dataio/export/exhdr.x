@@ -114,7 +114,7 @@ begin
 	call fprintf (fd, "date = '%d/%d/%d'\n")
 	    call pargi (TM_MDAY(tm))
 	    call pargi (TM_MONTH(tm))
-	    call pargi (TM_YEAR(tm) - 1900)	
+	    call pargi (TM_YEAR(tm))
 
 	# ... and the rest of the header
 	call fprintf (fd, "ncols = %d\n")	# image dimensions

@@ -1,4 +1,4 @@
-.help fitxy Nov95 "Slalib Package"
+.help fitxy Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slFTXY (ITYPE,NP,XYE,XYM,COEFFS,J)

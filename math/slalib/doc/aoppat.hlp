@@ -1,4 +1,4 @@
-.help aoppat Nov95 "Slalib Package"
+.help aoppat Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slAOPT (DATE, AOPRMS)

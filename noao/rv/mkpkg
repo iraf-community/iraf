@@ -63,7 +63,8 @@ libpkg.a:
 	rvparam.x	rvpackage.h rvflags.h rvsample.h
 	rvplot.x	rvpackage.h rvflags.h rvplots.h rvsample.h <gset.h> 
 	rvrebin.x	rvpackage.h rvflags.h rvcont.h  <error.h>
-	rvrvcor.x	rvpackage.h rvflags.h rvkeywords.h <imio.h> <error.h>
+	rvrvcor.x	rvpackage.h rvflags.h rvkeywords.h <imio.h> <error.h> \
+			<time.h>
 	rvsample.x	rvpackage.h rvflags.h rvsample.h <gset.h> <ctype.h>
 	rvsinc.x	rvpackage.h rvflags.h rvsinc.com <math.h> <mach.h>
 	rvstrings.x	rvpackage.h rvflags.h rvfilter.h rvcont.h rvplots.h
@@ -78,7 +79,6 @@ libpkg.a:
 	splitplot.x	rvpackage.h rvflags.h rvplots.h rvsample.h <gset.h> 
 	t_fxcor.x 	rvcomdef.h rvpackage.h rvflags.h rvsample.h <ctype.h> \
 			<fio.h> <gset.h> <imhdr.h> <error.h>
-	t_rvcorrect.x	<error.h>
 	titles.x	rvpackage.h rvflags.h <gset.h> 
 	wrtccf.x	rvpackage.h rvflags.h rvcont.h rvfilter.h <imhdr.h>
 	zzdebug.x	rvpackage.h rvflags.h <imhdr.h> <error.h>

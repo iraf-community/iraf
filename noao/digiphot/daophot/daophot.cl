@@ -1,16 +1,20 @@
 # Package script task for the DAOPHOT package.
 #{ DAOPHOT -- Point Spread Function photometry package.
 
-if (deftask ("tables")) {
-    if (defpar ("tables.motd")) {
-	tables.motd = no
-	tables
+if (! defpac ("tables")) {
+    if (deftask ("tables")) {
+        if (defpar ("tables.motd")) {
+	    tables.motd = no
+	    tables
+        } else {
+            tables
+        }
     } else {
-        tables
+        type "daophot$lib/warning.dat"
     }
-} else {
-    type "daophot$lib/warning.dat"
 }
+
+# Load other packages
 
 dataio			# rfits task is required for the daotest script
 ;

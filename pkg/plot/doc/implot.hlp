@@ -196,7 +196,6 @@ case %H and %M convert degrees to hours.  Some images have a recommended x
 coordinate format defined as a WCS attribute.  If the format value is ""
 (the default) the WCS attribute format will be used.  Any other value will
 override the image attribute.
-.le
 .ih
 EXAMPLES
 1. Enter cursor mode, plotting line 240 of the 300x480 image 'crab':

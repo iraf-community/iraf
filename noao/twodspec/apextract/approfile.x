@@ -1,3 +1,4 @@
+include	<mach.h>
 include	<gset.h>
 include	<math/curfit.h>
 include	"apertures.h"
@@ -360,7 +361,7 @@ int	order			# Order of curfit function.
 real	rdnoise			# Readout noise in RMS data numbers.
 
 int	ix, iy, ix1, ix2, ierr
-real	p, s, sk, var, vmin, var0
+real	p, s, sk, var, vmin, var0, wmin
 pointer	sp, y, w, cv, dbuf1, data, sky
 
 #int	apgeti()
@@ -405,6 +406,7 @@ begin
 	    data = dbuf1 + ix
 	    if (sbuf != NULL)
 		sky = sbuf - nx - 1 + ix
+	    wmin = MAX_REAL
 	    do iy = 1, ny {
 	        s = spec[iy]
 	        if (s > 0. && reject[ix,iy]) {
@@ -414,11 +416,14 @@ begin
 		    }
 		    p = profile[iy,ix]
 		    var = max (vmin, var0 + max (0., s * p + sk))
-		    Memr[w+iy-1] = (s ** 2) / var
+		    var = (s ** 2) / var
+		    wmin = min (wmin, var)
+		    Memr[w+iy-1] = var
 		    profile[iy,ix] = (Memr[data+iy*nc+xs[iy]] - sk) / s
 		} else
 		    Memr[w+iy-1] = 0.
 	    }
+	    call amaxkr (Memr[w], wmin / 10., Memr[w], ny)
 	    call cvfit (cv, Memr[y], profile[1,ix], Memr[w], ny, WTS_USER, ierr)
 	    call cvvector (cv, Memr[y], profile[1,ix], ny)
 	}

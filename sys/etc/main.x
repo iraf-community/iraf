@@ -548,8 +548,10 @@ begin
 	    # Check for continuation.
 	    ch = Memc[ip]
 	    if (ch == '\\' && (Memc[ip+1] == '\n' || Memc[ip+1] == EOS)) {
-		if (getlline (cmdin, Memc[args], SZ_CMDBUF) == EOF)
+		if (getlline (cmdin, Memc[args], SZ_CMDBUF) == EOF) {
+		    call sfree (sp)
 		    return
+		}
 		ip = args
 		next
 	    } else if (ch == '\n' || ch == EOS)

@@ -36,16 +36,28 @@ as the coordinate file to create a separate output.
 Surface function type to fit.  The choices are a chebyshev, legendre,
 or simple power series bidimensional polynomial.
 .le
-.ls xorder = 2, yorder = 2, xterms = yes
-The polynomial orders in x and y and whether to include cross terms.
-The orders are given as the number of terms which is equal to the
-highest power of x or y plus one.
+.ls xorder = 2, yorder = 2
+The polynomial orders in x and y.
+.le
+.ls xterms = "full"
+The options are:
+.ls none
+The individual polynomial terms contain powers of x or powers of y but not
+powers of both.
+.le
+.ls half
+The individual polynomial terms contain powers of x and powers of y, whose
+maximum combined power is max (xorder - 1, yorder - 1).
+.le
+.ls full
+The individual polynomial terms contain powers of x and powers of y, whose
+maximum combined power is max (xorder - 1 + yorder - 1).
+.le
 .le
 .ls weighting = "user" (uniform|user|statistical|instrumental)
 The type of weighting for the fit. The options are:
 .ls uniform
 All weights are 1.  Any input weights are ignored.
-.le
 .le
 .ls user
 The weights in the fourth input column are used.  If no weight is given
@@ -105,6 +117,31 @@ cross terms.  The orders are the number of coefficients which
 is the highest polynomial power plus 1.  For example the default
 values of 2 in each coordinate define a linear sloped plane.
 All computations are done in double precision.
+
+Several polynomial cross terms options are avaible. Options "none",
+"half", and "full" are illustrated below for a quadratic polynomial in
+x and y.
+
+.nf
+xterms = "none"
+xorder = 3, yorder = 3
+
+   z = a11 + a21 * x + a12 * y + a31 * x ** 2 + a13 * y ** 2
+
+xterms = "half"
+xorder = 3, yorder = 3
+
+   z = a11 + a21 * x + a12 * y + a31 * x ** 2 + a22 * x * y + a13 * y ** 2
+
+xterms = "full"
+xorder = 3, yorder = 3
+
+   z = a11 + a21 * x + a31 * x ** 2 +
+         a12 * y + a22 * x * y +  a32 * x ** 2 * y +
+         a13 * y ** 2 + a23 * x *  y ** 2 +
+         a33 * x ** 2 * y ** 2
+.fi
+
 
 The fit results are written to the standard output; the terminal unless
 redirected.  It consists of the input parameters, the coefficients and
@@ -174,7 +211,7 @@ random numbers.
       function = polynomial
       xorder = 2
       yorder = 2
-      xterms = YES
+      xterms = full
       weighting = user
       xmin =    0.684
       xmax =    89.74

@@ -141,8 +141,9 @@ begin
  
 	# Do the operations.
 	while (imtgetim (inlist1, Memc[input1], SZ_LINE) != EOF) {
-	    if (imtgetim (inlist2, Memc[input2], SZ_LINE) == EOF)
-		;
+	    if (imtgetim (inlist2, Memc[output], SZ_LINE) == EOF)
+		call strcpy (Memc[input2], Memc[output], SZ_LINE)
+	    call strcpy (Memc[output], Memc[input2], SZ_LINE)
 
 	    if (imtlen (outlist) > 1) {
 		list1 = imtopen (Memc[input1])
@@ -351,7 +352,7 @@ begin
 		    call realloc (inaps, ninaps+10, TY_INT)
 		Memi[inaps+ninaps] = ap
 
-		call sa_sextract (sh1, w1, w2, rebin, w, dw, nw)
+		call sa_sextract (sh1, w1, w2, rebin, dtype, w, dw, nw)
 		if (ninaps == 0) {
 		    l1 = w
 		    dl = dw
@@ -620,11 +621,11 @@ begin
 		}
 
 		call shdr_open (in1, mwin1, i, 1, INDEFI, SHDATA, sh1)
-		call sa_sextract (sh1, w1, w2, rebin, w, dw, nw)
+		call sa_sextract (sh1, w1, w2, rebin, dtype, w, dw, nw)
 
 		# Copy and adjust dispersion info
 		call smw_gwattrs (mwin1, i, 1, AP(sh1), beam,
-		    dtype, w, dw, nw, z, aplow, aphigh, coeff)
+		    j, w, dw, nw, z, aplow, aphigh, coeff)
 
 		w = shdr_lw (sh1, 1D0)
 		wb = shdr_lw (sh1, double (SN(sh1)))
@@ -657,7 +658,7 @@ begin
 		    k = k + 1
 		    if (j != 1) {
 			call shdr_open (in1, mwin1, i, j, INDEFI, SHDATA, sh1)
-			call sa_sextract (sh1, w1, w2, rebin, w, dw,nw)
+			call sa_sextract (sh1, w1, w2, rebin, dtype, w, dw,nw)
 		    }
 
 		    if (Memc[SID(sh1,1)] != EOS) {
@@ -943,7 +944,7 @@ begin
 		    call mw_gltermd (mwout, Memd[ltm2], Memd[ltv2], 1)
 		    Memd[ltv2] = Memd[ltv1+(k-1)]
 		    Memd[ltm2] = Memd[ltm1+(j+1)*(k-1)]
-		    call sa_sextract (sh1, w1, w2, rebin, w, dw, nw)
+		    call sa_sextract (sh1, w1, w2, rebin, dtype, w, dw, nw)
 		    IM_LEN(out,1) = nw + NP1(sh1) - 1
 		    Memd[ltv2] = (Memd[ltv1] - w) / dw + 1
 		    Memd[ltm2] = dw * Memd[ltm1]
@@ -952,7 +953,7 @@ begin
 
 		    # Copy and adjust dispersion info
 		    call smw_gwattrs (mwin1, i, band, AP(sh1),
-			beam, dtype, w, dw, nw, z, aplow, aphigh, coeff)
+			beam, j, w, dw, nw, z, aplow, aphigh, coeff)
 		    w = shdr_lw (sh1, 1D0)
 		    wb = shdr_lw (sh1, double(SN(sh1)))
 		    if (rebin)
@@ -1322,12 +1323,13 @@ end
 
 # SA_SEXTRACT -- Extract a specific wavelength region
 
-procedure sa_sextract (sh, w1, w2, rebin, l1, dl, n)
+procedure sa_sextract (sh, w1, w2, rebin, dtype, l1, dl, n)
 
 pointer	sh			#U SHDR structure
 double	w1			#I Starting wavelength
 double	w2			#I Ending wavelength
 bool	rebin			#I Rebin wavelength region?
+int	dtype			#O Dispersion type
 double	l1			#O Starting logical pixel
 double	dl			#O Logical pixel increment
 int	n			#O Number of logical pixels
@@ -1343,6 +1345,7 @@ begin
 	    l1 = 1.
 	    dl = 1.
 	    n = SN(sh)
+	    dtype = DC(sh)
 	    return
 	}
 
@@ -1373,4 +1376,5 @@ begin
 
 	if (SY(sh) != NULL)
 	    call shdr_extract (sh, real(a), real(b), rebin)
+	dtype = DC(sh)
 end

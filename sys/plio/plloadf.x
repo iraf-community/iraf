@@ -17,7 +17,7 @@ int	maxch			#I max chars out
 
 int	fd, nchars
 pointer	sp, bp, sv, text, fname, extn
-int	open(), read(), mii_readc(), mii_readi(), fnextn()
+int	open(), read(), miireadc(), miireadi(), fnextn()
 errchk	open, read, syserrs
 
 begin
@@ -35,7 +35,7 @@ begin
 
 	# Get savefile header.
 	call salloc (sv, LEN_SVDES, TY_STRUCT)
-	if (mii_readi (fd, Memi[sv], LEN_SVDES) != LEN_SVDES)
+	if (miireadi (fd, Memi[sv], LEN_SVDES) != LEN_SVDES)
 	    call syserrs (SYS_PLBADSAVEF, Memc[fname])
 
 	# Verify file type.
@@ -44,7 +44,7 @@ begin
 
 	# Get descriptive text.
 	call salloc (text, SV_TITLELEN(sv), TY_CHAR)
-	if (mii_readc (fd, Memc[text], SV_TITLELEN(sv)) != SV_TITLELEN(sv))
+	if (miireadc (fd, Memc[text], SV_TITLELEN(sv)) != SV_TITLELEN(sv))
 	    call syserrs (SYS_PLBADSAVEF, Memc[fname])
 	else
 	    call strcpy (Memc[text], title, maxch)

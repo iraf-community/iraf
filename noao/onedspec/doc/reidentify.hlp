@@ -172,10 +172,9 @@ when tracing.  Care should be exercised that misidentified features
 are not introduced.
 .le
 .ls coordlist = "linelists$idhenear.dat"
-User coordinate list consisting of an ordered list of line coordinates.
+User coordinate list consisting of a list of line coordinates.
 Some standard line lists are available in the directory "linelists$".
 The standard line lists are described under the topic \fIlinelists\fR.
-.le
 .le
 .ls match = -3.
 The maximum difference for a match between the feature coordinate function

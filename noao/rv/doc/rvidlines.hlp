@@ -330,7 +330,8 @@ image header or by the "rv.observatory" package parameter.  For a
 discussion of how an observatory is defined and used see the help
 for \fBobservatory\fR.  In addition to the observatory the right
 ascension, declination, coordinate epoch, and date and time of the
-observation are required.  This information is sought in the image
+observation are required.  If the time is in the date string it has
+precedence over the time keyword.  This information is sought in the image
 header using the keywords defined in the \fBkeywpars\fR parameter
 file.  If there is insufficient information for the heliocentric
 velocity correction only the observed velocity will be given.  The

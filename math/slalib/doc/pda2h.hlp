@@ -1,4 +1,4 @@
-.help pda2h Nov95 "Slalib Package"
+.help pda2h Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slPDAH (P, D, A, H1, J1, H2, J2)

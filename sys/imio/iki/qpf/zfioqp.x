@@ -73,7 +73,8 @@ int	boffset			#I file offset at which read commences
 
 pointer	qpf, im, io
 int	vs[2], ve[2]
-int	szb_pixel, ncols, pixel, nev, xblock, yblock, xoff, yoff
+real	xblock, yblock
+int	szb_pixel, ncols, pixel, nev, xoff, yoff
 int	sizeof(), qpio_readpixs(), qpio_readpixi()
 
 begin

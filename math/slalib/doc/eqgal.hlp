@@ -1,4 +1,4 @@
-.help eqgal Nov95 "Slalib Package"
+.help eqgal Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slEQGA (DR, DD, DL, DB)
@@ -29,9 +29,9 @@
   Reference:
      Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
 
-  P.T.Wallace   Starlink   November 1988
+  P.T.Wallace   Starlink   21 September 1998
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1998 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

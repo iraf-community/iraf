@@ -17,12 +17,14 @@ int procedure onentry (prtype, bkgfile, cmd)
 
 int	prtype			# process type flag (not used)
 char	bkgfile[ARB]		# bkgfilename if detached process (not used)
-char	cmd[ARB]		# optional command
+char	cmd[ARB]		# optional host command line
 
 char	pk_bkgfile[SZ_PATHNAME]
+char	pk_cmd[SZ_COMMAND]
 int	c_main()
 
 begin
 	call strpak (bkgfile, pk_bkgfile, SZ_PATHNAME)
-	return (c_main (prtype, pk_bkgfile))
+	call strpak (cmd, pk_cmd, SZ_COMMAND)
+	return (c_main (prtype, pk_bkgfile, pk_cmd))
 end

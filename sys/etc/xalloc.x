@@ -43,6 +43,7 @@ pointer	sp, devlist
 int	status, onedev
 int	xgdevlist(), mtfile()
 errchk	xgdevlist, mtallocate
+define	done_ 91
 
 begin
 	call smark (sp)
@@ -52,7 +53,7 @@ begin
 	onedev = NO
 	status = xgdevlist (device, Memc[devlist], SZ_DEVLIST, onedev)
 	if (status != OK)
-	    return (status)
+	    goto done_
 
 	# Attempt to allocate the device at the host system level.
 	call strpak (Memc[devlist], Memc[devlist], SZ_DEVLIST)
@@ -63,7 +64,7 @@ begin
 
 	if (status == OK && mtfile (device) == YES)
 	    call mtallocate (device)
-
+done_
 	call sfree (sp)
 	return (status)
 end
@@ -80,6 +81,7 @@ int	status, onedev
 pointer	sp, devlist, osdev, owner
 int	xgdevlist(), mtfile()
 errchk	xgdevlist, syserrs
+define	done_ 91
 
 begin
 	call smark (sp)
@@ -91,7 +93,7 @@ begin
 	onedev = YES
 	status = xgdevlist (device, Memc[osdev], SZ_FNAME, onedev)
 	if (status != OK)
-	    return (status)
+	    goto done_
 
 	# Verify that the device is actually allocated.  If the device is a
 	# magtape, call MTIO to conditionally rewind the drive and deallocate
@@ -108,12 +110,12 @@ begin
 	onedev = NO
 	status = xgdevlist (device, Memc[devlist], SZ_DEVLIST, onedev)
 	if (status != OK)
-	    return (status)
+	    goto done_
 
 	# Physically deallocate the device.
 	call strpak (Memc[devlist], Memc[devlist], SZ_DEVLIST)
 	call zdvall (Memc[devlist], DEALLOCATE, status)
-
+done_
 	call sfree (sp)
 	return (status)
 end
@@ -173,6 +175,7 @@ pointer	sp, devlist
 int	status, onedev
 int	xgdevlist()
 errchk	xgdevlist
+define	done_ 91
 
 begin
 	call smark (sp)
@@ -182,13 +185,13 @@ begin
 	onedev = YES
 	status = xgdevlist (device, Memc[devlist], SZ_DEVLIST, onedev)
 	if (status != OK)
-	    return (status)
+	    goto done_
 
 	# Query device allocation.
 	call strpak (Memc[devlist], Memc[devlist], SZ_DEVLIST)
 	call zdvown (Memc[devlist], owner, maxch, status)
 	call strupk (owner, owner, maxch)
-
+done_
 	call sfree (sp)
 	return (status)
 end

@@ -26,9 +26,9 @@
 *  The algorithm is derived from that of Hatcher 1984
 *  (QJRAS 25, 53-55).
 *
-*  P.T.Wallace   Starlink   6 October 1994
+*  P.T.Wallace   Starlink   27 April 1998
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1998 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -48,13 +48,14 @@
       IF (DJM.LE.-2395520D0.OR.DJM.GE.1D9) THEN
          J=-1
       ELSE
+         J=0
 
 *     Denominator of fraction
          NFD=10**MAX(NDP,0)
          FD=DBLE(NFD)
 
 *     Round date and express in units of fraction
-         DF=NINT(DJM*FD)
+         DF=ANINT(DJM*FD)
 
 *     Separate day and fraction
          F=MOD(DF,FD)
@@ -71,8 +72,6 @@
          IYMDF(2)=MOD(ND10/306+2,12)+1
          IYMDF(3)=MOD(ND10,306)/10+1
          IYMDF(4)=NINT(F)
-
-         J=0
 
       END IF
 

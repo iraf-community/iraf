@@ -1,4 +1,4 @@
-.help dv2tp Nov95 "Slalib Package"
+.help dv2tp Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDVTP (V, V0, XI, ETA, J)
@@ -20,8 +20,8 @@
      XI,ETA    d       tangent plane coordinates of star
      J         i       status:   0 = OK
                                  1 = error, star too far from axis
-                                 2 = error, antistar too far from axis
-                                 3 = error, antistar on tangent plane
+                                 2 = error, antistar on tangent plane
+                                 3 = error, antistar too far from axis
 
   Notes:
 
@@ -33,9 +33,9 @@
 
   3  This routine is the Cartesian equivalent of the routine slDSTP.
 
-  P.T.Wallace   Starlink   11 February 1995
+  P.T.Wallace   Starlink   27 November 1996
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

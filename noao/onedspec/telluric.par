@@ -8,6 +8,7 @@ xcorr,b,h,yes,,,Cross correlate for shift?
 tweakrms,b,h,yes,,,Tweak to minimize RMS?
 interactive,b,h,yes,,,Interactive tweaking?
 sample,s,h,"*",,,Sample ranges
+threshold,r,h,0.,,,Threshold for calibration
 lag,i,h,10,0,,Cross correlation lag (pixels)
 shift,r,h,0.,,,Initial shift of calibration spectrum (pixels)
 scale,r,h,1.,1e-10,,Initial scale factor multiplying airmass ratio

@@ -62,8 +62,13 @@ begin
 	# All errors will hopefully have been trapped and reported by now.
 
 	npts = SN(sh)
-	w0 = log10 (W0(sh))
-	wpc = (log10 (W1(sh)) - w0) / (npts - 1)
+	if (RV_PIXCORR(rv) == YES) {
+	    w0 = 1
+	    wpc = 1
+	} else {
+	    w0 = log10 (W0(sh))
+	    wpc = (log10 (W1(sh)) - w0) / (npts - 1)
+	}
 
 	if (type == OBJECT_SPECTRUM) {
 	    call realloc (RV_OPIXX(rv), npts, TY_REAL)
@@ -199,6 +204,8 @@ begin
 
 	# Get data.
 	call shdr_open (im, smw, 1, 1, RV_APNUM(rv), SHDATA, sh)
+	if (RV_PIXCORR(rv) == YES)
+	    DC(sh) = DCNO
 	if (DC(sh) != DCNO)
 	    call shdr_units (sh, "Angstroms")
 

@@ -26,6 +26,7 @@ pointer	tr, sp, devname, gki_out
 int	flags, mode, nwords, fd, p_fd
 int	prstati(), pr_getredir()
 pointer	gtr_init(), coerce()
+errchk	gtr_init, gtr_openws, write, flush, gki_write
 include	"gtr.com"
 
 begin

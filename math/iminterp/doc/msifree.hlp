@@ -1,4 +1,4 @@
-.help msifree Apr1985 "Image Interpolation Package"
+.help msifree Dec98 "Image Interpolation Package"
 .ih
 NAME
 msifree -- free sequential interpolant descriptor
@@ -7,7 +7,7 @@ SYNOPSIS
 msifree (msi)
 
 .nf
-    pointer	msi		# interpolant descriptor
+    pointer	msi		#U interpolant descriptor
 .fi
 .ih
 ARGUMENTS
@@ -22,5 +22,5 @@ MSIFREE should be called when interpolation is complete.
 NOTES
 .ih
 SEE ALSO
-msiinit
+msiinit, msisinit
 .endhelp

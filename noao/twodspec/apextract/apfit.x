@@ -18,6 +18,7 @@ real	clgetr()
 pointer	sp, str, x, wts, cv, gp, gt, ic, ic1, gt_init()
 bool	ap_answer()
 data	ic1 /NULL/
+errchk	icg_fit, ic_fit
 
 common	/apn_com/ ic, gt
 

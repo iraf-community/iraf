@@ -1,4 +1,4 @@
-.help mappa Nov95 "Slalib Package"
+.help mappa Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slMAPA (EQ, DATE, AMPRMS)
@@ -57,10 +57,10 @@
   Called:
      slEPJ         MDJ to Julian epoch
      slEVP         earth position & velocity
-     slDVN         normalise vector
+     slDVN         normalize vector
      slPRNU      precession/nutation matrix
 
-  P.T.Wallace   Starlink   21 July 1994
+  P.T.Wallace   Starlink   23 November 1995
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.

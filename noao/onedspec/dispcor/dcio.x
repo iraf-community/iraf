@@ -176,13 +176,13 @@ begin
 	call salloc (pshift1, naps1, TY_DOUBLE)
 	call amovd (Memd[pshift], Memd[pshift1], naps1)
 	if (fd1 != NULL) {
-	    call fprintf (fd1, "%s: REFSPEC1 = '%s %.3g'\n")
+	    call fprintf (fd1, "%s: REFSPEC1 = '%s %.8g'\n")
 		call pargstr (Memc[spec])
 		call pargstr (Memc[str1])
 		call pargd (wt1)
 	}
 	if (fd2 != NULL) {
-	    call fprintf (fd2, "%s: REFSPEC1 = '%s %.3g'\n")
+	    call fprintf (fd2, "%s: REFSPEC1 = '%s %.8g'\n")
 		call pargstr (Memc[spec])
 		call pargstr (Memc[str1])
 		call pargd (wt1)
@@ -204,13 +204,13 @@ begin
             call salloc (pshift2, naps2, TY_DOUBLE)
             call amovd (Memd[pshift], Memd[pshift2], naps2)
 	    if (fd1 != NULL) {
-		call fprintf (fd1, "%s: REFSPEC2 = '%s %.3g'\n")
+		call fprintf (fd1, "%s: REFSPEC2 = '%s %.8g'\n")
 		    call pargstr (Memc[spec])
 		    call pargstr (Memc[str1])
 		    call pargd (wt2)
 	    }
 	    if (fd2 != NULL) {
-		call fprintf (fd2, "%s: REFSPEC2 = '%s %.3g'\n")
+		call fprintf (fd2, "%s: REFSPEC2 = '%s %.8g'\n")
 		    call pargstr (Memc[spec])
 		    call pargstr (Memc[str1])
 		    call pargd (wt2)
@@ -221,6 +221,11 @@ begin
 	        ;
 	} then
 	    wt2 = 0.
+
+	# Adjust weights to unit sum.
+	dval = wt1 + wt2
+	wt1 = wt1 / dval
+	wt2 = wt2 / dval
 
 	# Enter dispersion function in the MWCS.
 	do i = 1, naps {
@@ -259,7 +264,7 @@ begin
 		    call realloc (DC_CF(ap,i), l, TY_CHAR)
 		    call aclrc (Memc[DC_CF(ap,i)], l)
 		    sfd = stropen (Memc[DC_CF(ap,i)], l, NEW_FILE)
-		    call fprintf (sfd, "%.3g %g")
+		    call fprintf (sfd, "%.8g %g")
 			call pargd (wt1)
 			call pargd (Memd[pshift1+k1])
 		    dval = DC_DW(ap,i) * (DC_NW(ap,i) - 1) / 2.
@@ -276,7 +281,7 @@ begin
 		call realloc (DC_CF(ap,i), l, TY_CHAR)
 		call aclrc (Memc[DC_CF(ap,i)], l)
 		sfd = stropen (Memc[DC_CF(ap,i)], l, NEW_FILE)
-		call fprintf (sfd, "%.3g %g %d %d")
+		call fprintf (sfd, "%.8g %g %d %d")
 		    call pargd (wt1)
 		    call pargd (Memd[pshift1+k1])
 		    call pargi (nint (Memd[coeffs+1]))
@@ -325,7 +330,7 @@ begin
 			    (wt1 + wt2)
 			call sshift1 (dval, DC_CF(ap,i))
 		    } else {
-			call fprintf (sfd, " %5.3g %g")
+			call fprintf (sfd, " %.8g %g")
 			    call pargd (wt2)
 			    call pargd (Memd[pshift2+k2])
 			dval = DC_DW(ap,i) * (DC_NW(ap,i) - 1) / 2.
@@ -335,7 +340,7 @@ begin
 			    call pargd (dval)
 		    }
 		} else {
-		    call fprintf (sfd, " %5.3g %g %d %d")
+		    call fprintf (sfd, " %.8g %g %d %d")
 			call pargd (wt2)
 			call pargd (Memd[pshift2+k2])
 			call pargi (nint (Memd[coeffs+1]))
@@ -699,7 +704,7 @@ pointer	ap		#O Aperture data structure
 int	fd1		#I Logfile descriptor
 int	fd2		#I Logfile descriptor
 
-double	wt1, wt2
+double	wt1, wt2, dval
 int	i, j, k, l, dc, sfd, axis[2], naps, ncoeffs, offset, slope
 pointer	sp, spec, str1, str2, coeff, coeffs, ct1, ct2, un1, un2, un3
 pointer	pshift1, pshift2, pshift3, pcoeff1, pcoeff2, pcoeff3
@@ -783,13 +788,13 @@ begin
 	    call erract (EA_ERROR)
 	}
 	if (fd1 != NULL) {
-	    call fprintf (fd1, "%s: REFSPEC1 = '%s %.3g'\n")
+	    call fprintf (fd1, "%s: REFSPEC1 = '%s %.8g'\n")
 		call pargstr (Memc[spec])
 		call pargstr (Memc[str1])
 		call pargd (wt1)
 	}
 	if (fd2 != NULL) {
-	    call fprintf (fd2, "%s: REFSPEC1 = '%s %.3g'\n")
+	    call fprintf (fd2, "%s: REFSPEC1 = '%s %.8g'\n")
 		call pargstr (Memc[spec])
 		call pargstr (Memc[str1])
 		call pargd (wt1)
@@ -829,13 +834,13 @@ begin
 	    call dc_gecdb (Memc[str1], stp, ap, un2, Memd[pshift2],
 		Memi[pcoeff2], naps, offset, slope)
 	    if (fd1 != NULL) {
-		call fprintf (fd1, "%s: REFSPEC2 = '%s %.3g'\n")
+		call fprintf (fd1, "%s: REFSPEC2 = '%s %.8g'\n")
 		    call pargstr (Memc[spec])
 		    call pargstr (Memc[str1])
 		    call pargd (wt2)
 	    }
 	    if (fd2 != NULL) {
-		call fprintf (fd2, "%s: REFSPEC2 = '%s %.3g'\n")
+		call fprintf (fd2, "%s: REFSPEC2 = '%s %.8g'\n")
 		    call pargstr (Memc[spec])
 		    call pargstr (Memc[str1])
 		    call pargd (wt2)
@@ -865,6 +870,11 @@ begin
 	} then
 	    wt2 = 0.
 
+	# Adjust weights to unit sum.
+	dval = wt1 + wt2
+	wt1 = wt1 / dval
+	wt2 = wt2 / dval
+
 	# Enter dispersion function in the MWCS.
 	do i = 1, naps {
 	    coeffs = Memi[pcoeff1+i-1]
@@ -875,14 +885,14 @@ begin
 	    call realloc (coeff, l, TY_CHAR)
 	    call aclrc (Memc[coeff], l)
 	    sfd = stropen (Memc[coeff], l, NEW_FILE)
-	    call fprintf (sfd, "%.3g %g")
+	    call fprintf (sfd, "%.8g %g")
 		call pargd (wt1)
 		call pargd (Memd[pshift1+i-1])
 
 	    # The following assumes some knowledge of the data structure in
 	    # order to shortten the the attribute string.
 
-	    call fprintf (sfd, " %d %d %.3g %.3g")
+	    call fprintf (sfd, " %d %d %.8g %.8g")
 		call pargi (nint (Memd[coeffs+1]))
 		call pargi (nint (Memd[coeffs+2]))
 		call pargd (Memd[coeffs+3])
@@ -895,10 +905,10 @@ begin
 	    if (wt2 > 0.) {
 		coeffs = Memi[pcoeff2+i-1]
 		ncoeffs = nint (Memd[coeffs])
-		call fprintf (sfd, "%5.3g %g")
+		call fprintf (sfd, "%.8g %g")
 		    call pargd (wt2)
 		    call pargd (Memd[pshift2+i-1])
-		call fprintf (sfd, " %d %d %.3g %.3g")
+		call fprintf (sfd, " %d %d %.8g %.8g")
 		    call pargi (nint (Memd[coeffs+1]))
 		    call pargi (nint (Memd[coeffs+2]))
 		    call pargd (Memd[coeffs+3])

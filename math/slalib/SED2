@@ -21,7 +21,6 @@
 
 1,$s/D A F 2 R/D A F R/g
 1,$s/D A F I N/D A F N/g
-
 1,$s/D A V 2 M/D A V M/g
 1,$s/D B E A R/D B E R/g
 1,$s/D B J I N/D B J I/g
@@ -53,6 +52,7 @@
 1,$s/E A R T H/E R T H/g
 1,$s/E C L E Q/E C E Q/g
 1,$s/E C M A T/E C M A/g
+1,$s/E L 2 U E/E L U E/g
 1,$s/E P B 2 D/E B 2 D/g
 1,$s/E P J 2 D/E J 2 D/g
 1,$s/E Q E C L/E Q E C/g
@@ -65,13 +65,19 @@
 1,$s/F K 4 2 5/F K 4 5/g
 1,$s/F K 4 5 Z/F 4 5 Z/g
 1,$s/F K 5 2 4/F K 5 4/g
+1,$s/F K 5 2 H/F K 5 H/g
 1,$s/F K 5 4 Z/F 5 4 Z/g
+1,$s/F K 5 H Z/F 5 H Z/g
+
 1,$s/F L O T I N/R F L I/g
 
 1,$s/G A L E Q/G A E Q/g
 1,$s/G A L S U P/G A S U/g
 1,$s/G M S T A/G M S A/g
 1,$s/G R E S I D/G R E S/g
+
+1,$s/H 2 F K 5/H F K 5/g
+1,$s/H F K 5 Z/H F 5 Z/g
 
 1,$s/I D C H I/I C H I/g
 1,$s/I D C H F/I C H F/g
@@ -85,17 +91,25 @@
 
 1,$s/P D A 2 H/P D A H/g
 1,$s/P D Q 2 H/P D Q H/g
+1,$s/P E R T E L/P R T L/g
+1,$s/P E R T U E/P R T E/g
+1,$s/P L A N E L/P L N L/g
 1,$s/P L A N E T/P L N T/g
+1,$s/P L A N T E/P L T E/g
+1,$s/P O L M O/P L M O/g
 1,$s/P R E B N/P R B N/g
 1,$s/P R E C E S/P R C E/g
 1,$s/P R E C L/P R E L/g
 1,$s/P R E N U T/P R N U/g
+1,$s/P V 2 U E/P V U E/g
+1,$s/P V 2 E L/P V E L/g
 1,$s/P V O B S/P V O B/g
 
 1,$s/R A N D O M/R N D M/g
 1,$s/R A N G E/R A 1 P/g
 1,$s/R A N O R M/R A 2 P/g
 1,$s/R D P L A N/R D P L/g
+1,$s/R E F C O Q/R F C Q/g
 1,$s/R E F C O/R F C O/g
 1,$s/R E F R O/R F R O/g
 1,$s/R V E R O T/R V E R/g
@@ -111,6 +125,8 @@
 1,$s/T P S 2 C/T P S C/g
 1,$s/T P V 2 C/T P V C/g
 
+1,$s/U E 2 E L/U E E L/g
+1,$s/U E 2 P V/U E P V/g
 1,$s/U N P C D/U P C D/g
 
 1,$s/X Y 2 X Y/X Y X Y/g

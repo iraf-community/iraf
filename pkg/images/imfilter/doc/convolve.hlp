@@ -95,7 +95,6 @@ image with \fIykernel\fR, is operationally equivalent to convolving
 each point in the entire image  with the full 2D kernel \fIkernel\fR.
 Radially symmetric kernels are those which are symmetric about some
 central point.
-.le
 
 .ih
 EXAMPLES

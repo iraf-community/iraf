@@ -58,6 +58,5 @@ The following example corrects a series of IIDS spectra:
 	cl> powercor nite1 1-250 output=nite1cc start_rec=1
 .ih
 SEE ALSO
-.nf
 coincor
 .endhelp

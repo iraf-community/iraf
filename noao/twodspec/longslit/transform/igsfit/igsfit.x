@@ -96,6 +96,7 @@ int	wcs, key
 char	cmd[SZ_LINE]
 
 int	clgcur(), gt_gcur(), igs_nearest(), igs_nearestd(), igs_nearestu()
+errchk	igs_solve
 
 begin
 	# Compute a solution and set the residuals.

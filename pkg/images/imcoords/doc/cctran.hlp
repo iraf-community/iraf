@@ -282,7 +282,6 @@ Examples
 .ih
 EXAMPLES
 
-.nf
 1. Compute the plate solution and evaluate the forward transformation for
 the following input coordinate list.
 

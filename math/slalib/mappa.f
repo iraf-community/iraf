@@ -54,10 +54,10 @@
 *  Called:
 *     slEPJ         MDJ to Julian epoch
 *     slEVP         earth position & velocity
-*     slDVN         normalise vector
+*     slDVN         normalize vector
 *     slPRNU      precession/nutation matrix
 *
-*  P.T.Wallace   Starlink   21 July 1994
+*  P.T.Wallace   Starlink   23 November 1995
 *
 *  Copyright (C) 1995 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
@@ -89,7 +89,7 @@
 *  Get Earth barycentric and heliocentric position and velocity
       CALL slEVP(DATE,EQ,EBD,AMPRMS(2),EHD,EH)
 
-*  Heliocentric direction of earth (normalised) and modulus
+*  Heliocentric direction of earth (normalized) and modulus
       CALL slDVN(EH,AMPRMS(5),E)
 
 *  Light deflection parameter

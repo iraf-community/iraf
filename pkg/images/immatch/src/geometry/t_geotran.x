@@ -88,14 +88,16 @@ begin
 	yrotation = clgetr ("yrotation")
 
 	# Get the interpolation parameters.
-	GT_INTERPOLANT(geo) = clgwrd ("interpolant", Memc[str], SZ_LINE, 
-	    ",nearest,linear,poly3,poly5,spline3,")
+	call clgstr ("interpolant", GT_INTERPSTR(geo), SZ_FNAME)
+	#GT_INTERPOLANT(geo) = clgwrd ("interpolant", Memc[str], SZ_LINE, 
+	    #",nearest,linear,poly3,poly5,spline3,")
 	GT_BOUNDARY(geo) = clgwrd ("boundary", Memc[str], SZ_LINE,
 	    ",constant,nearest,reflect,wrap,")
 	GT_CONSTANT(geo) = clgetr ("constant")
 	GT_XSAMPLE(geo) = clgetr ("xsample")
 	GT_YSAMPLE(geo) = clgetr ("ysample")
 	GT_FLUXCONSERVE(geo) = btoi (clgetb("fluxconserve"))
+
 	nxblock = clgeti ("nxblock")
 	nyblock = clgeti ("nyblock")
 	verbose = clgetb ("verbose")
@@ -204,8 +206,8 @@ begin
 		    call flush (STDOUT)
 		}
 	    } else { 
-		if (imtgetim (tflist, Memc[record], SZ_FNAME) != EOF)
-		    ;
+		if (imtgetim (tflist, Memc[str], SZ_FNAME) != EOF)
+		    call strcpy (Memc[str], Memc[record], SZ_FNAME)
 	        call geo_dformat (in, out, geo, Memc[database], Memc[record],
 		    sx1, sy1, sx2, sy2)
 		if (verbose) {
@@ -374,16 +376,24 @@ pointer	sx2, sy2	#O pointer to distortion surfaces
 real	xmax, ymax
 
 begin
-	# Get the rotation and scale transformation parameters.
+	# Get the scale transformation parameters.
 	if (IS_INDEFR(GT_XMAG(geo)))
 	    GT_XMAG(geo) = 1.
-	if (IS_INDEFR(GT_YMAG(geo)))
+	if (IM_NDIM(in) == 1)
 	    GT_YMAG(geo) = 1.
-	if (IS_INDEFR(GT_XROTATION(geo)))
+	else if (IS_INDEFR(GT_YMAG(geo)))
+	    GT_YMAG(geo) = 1.
+
+	# Get the rotate transformation parameters.
+	if (IM_NDIM(in) == 1)
+	    GT_XROTATION(geo) =  DEGTORAD(0.)
+	else if (IS_INDEFR(GT_XROTATION(geo)))
 	    GT_XROTATION(geo) =  DEGTORAD(0.)
 	else
 	    GT_XROTATION(geo) =  DEGTORAD(GT_XROTATION(geo))
-	if (IS_INDEFR(GT_YROTATION(geo)))
+	if (IM_NDIM(in) == 1)
+	    GT_YROTATION(geo) =  DEGTORAD(0.)
+	else if (IS_INDEFR(GT_YROTATION(geo)))
 	    GT_YROTATION(geo) =  DEGTORAD(0.)
 	else
 	    GT_YROTATION(geo) =  DEGTORAD(GT_YROTATION(geo))
@@ -408,6 +418,7 @@ begin
 	if (IS_INDEF(GT_XMAX(geo)))
 	    GT_XMAX(geo) = IM_LEN(in,1)
 	else if (GT_XMAX(geo) <= 0.0)
+	    #GT_XMAX(geo) = int (xmax + 1.0)
 	    GT_XMAX(geo) = xmax
 
 	# Set up the y reference coordinate limits.
@@ -418,7 +429,8 @@ begin
 	if (IS_INDEF(GT_YMAX(geo)))
 	    GT_YMAX(geo) = IM_LEN(in, 2)
 	else if (GT_YMAX(geo) <= 0.0)
-	    GT_YMAX(geo) = ymax 
+	    #GT_YMAX(geo) = int (ymax + 1.0) 
+	    GT_YMAX(geo) = ymax
 
 	# Set the number of columns and rows.
 	if (IS_INDEFI(GT_NCOLS(geo)))
@@ -444,10 +456,17 @@ begin
 	IM_LEN(out, 2) = GT_NLINES(geo)
 
 	# Set up the surfaces, distortion surfaces are NULL.
-	call gsinit (sx1, GS_POLYNOMIAL, 2, 2, GS_XNONE, GT_XMIN(geo),
-	    GT_XMAX(geo), GT_YMIN(geo), GT_YMAX(geo))
-	call gsinit (sy1, GS_POLYNOMIAL, 2, 2, GS_XNONE, GT_XMIN(geo),
-	    GT_XMAX(geo), GT_YMIN(geo), GT_YMAX(geo))
+	if (IM_NDIM(in) == 1) {
+	    call gsinit (sx1, GS_POLYNOMIAL, 2, 2, GS_XNONE, GT_XMIN(geo),
+	        GT_XMAX(geo), 0.5, 1.5)
+	    call gsinit (sy1, GS_POLYNOMIAL, 2, 2, GS_XNONE, GT_XMIN(geo),
+	        GT_XMAX(geo), 0.5, 1.5)
+	} else {
+	    call gsinit (sx1, GS_POLYNOMIAL, 2, 2, GS_XNONE, GT_XMIN(geo),
+	        GT_XMAX(geo), GT_YMIN(geo), GT_YMAX(geo))
+	    call gsinit (sy1, GS_POLYNOMIAL, 2, 2, GS_XNONE, GT_XMIN(geo),
+	        GT_XMAX(geo), GT_YMIN(geo), GT_YMAX(geo))
+	}
 	sx2 = NULL
 	sy2 = NULL
 

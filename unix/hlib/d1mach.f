@@ -1,273 +1,463 @@
-c
-c----------------------------------------------------------------------
-c  function:  d1mach
-c  this routine is from the port mathematical subroutine library
-c  it is described in the bell laboratories computing science
-c  technical report #47 by p.a. fox, a.d. hall and n.l. schryer
-c  a modification to the "i out of bounds" error message
-c  has been made by c. a. mcgonegal - april, 1978
-c----------------------------------------------------------------------
-c
-      double precision function d1mach(i)
-c
-c  double-precision machine constants
-c
-c  d1mach( 1) = b**(emin-1), the smallest positive magnitude.
-c
-c  d1mach( 2) = b**emax*(1 - b**(-t)), the largest magnitude.
-c
-c  d1mach( 3) = b**(-t), the smallest relative spacing.
-c
-c  d1mach( 4) = b**(1-t), the largest relative spacing.
-c
-c  d1mach( 5) = log10(b)
-c
-c  to alter this function for a particular environment,
-c  the desired set of data statements should be activated by
-c  removing the c from column 1.
-c
-c  where possible, octal or hexadecimal constants have been used
-c  to specify the constants exactly which has in some cases
-c  required the use of equivalent integer arrays.
-c
-      integer small(4)
-      integer large(4)
-      integer right(4)
-      integer diver(4)
-      integer log10(4)
-c
-      double precision dmach(5)
-c
-      equivalence (dmach(1),small(1))
-      equivalence (dmach(2),large(1))
-      equivalence (dmach(3),right(1))
-      equivalence (dmach(4),diver(1))
-      equivalence (dmach(5),log10(1))
-c
-c     machine constants for the burroughs 1700 system.
-c
-c     data small(1) / zc00800000 /
-c     data small(2) / z000000000 /
-c
-c     data large(1) / zdffffffff /
-c     data large(2) / zfffffffff /
-c
-c     data right(1) / zcc5800000 /
-c     data right(2) / z000000000 /
-c
-c     data diver(1) / zcc6800000 /
-c     data diver(2) / z000000000 /
-c
-c     data log10(1) / zd00e730e7 /
-c     data log10(2) / zc77800dc0 /
-c
-c     machine constants for the burroughs 5700 system.
-c
-c     data small(1) / o1771000000000000 /
-c     data small(2) / o0000000000000000 /
-c
-c     data large(1) / o0777777777777777 /
-c     data large(2) / o0007777777777777 /
-c
-c     data right(1) / o1461000000000000 /
-c     data right(2) / o0000000000000000 /
-c
-c     data diver(1) / o1451000000000000 /
-c     data diver(2) / o0000000000000000 /
-c
-c     data log10(1) / o1157163034761674 /
-c     data log10(2) / o0006677466732724 /
-c
-c     machine constants for the burroughs 6700/7700 systems.
-c
-c     data small(1) / o1771000000000000 /
-c     data small(2) / o7770000000000000 /
-c
-c     data large(1) / o0777777777777777 /
-c     data large(2) / o7777777777777777 /
-c
-c     data right(1) / o1461000000000000 /
-c     data right(2) / o0000000000000000 /
-c
-c     data diver(1) / o1451000000000000 /
-c     data diver(2) / o0000000000000000 /
-c
-c     data log10(1) / o1157163034761674 /
-c     data log10(2) / o0006677466732724 /
-c
-c     machine constants for the cdc 6000/7000 series.
-c
-c     data small(1) / 00604000000000000000b /
-c     data small(2) / 00000000000000000000b /
-c
-c     data large(1) / 37767777777777777777b /
-c     data large(2) / 37167777777777777777b /
-c
-c     data right(1) / 15604000000000000000b /
-c     data right(2) / 15000000000000000000b /
-c
-c     data diver(1) / 15614000000000000000b /
-c     data diver(2) / 15010000000000000000b /
-c
-c     data log10(1) / 17164642023241175717b /
-c     data log10(2) / 16367571421742254654b /
-c
-c     machine constants for the cray 1
-c
-c     data small(1) / 200004000000000000000b /
-c     data small(2) / 000000000000000000000b /
-c
-c     data large(1) / 577767777777777777777b /
-c     data large(2) / 000007777777777777776b /
-c
-c     data right(1) / 376424000000000000000b /
-c     data right(2) / 000000000000000000000b /
-c
-c     data diver(1) / 376434000000000000000b /
-c     data diver(2) / 000000000000000000000b /
-c
-c     data log10(1) / 377774642023241175717b /
-c     data log10(2) / 000007571421742254654b /
-c
-c     machine constants for the data general eclipse s/200
-c
-c     note - it may be appropriate to include the following card -
-c     static dmach(5)
-c
-c     data small/20k,3*0/,large/77777k,3*177777k/
-c     data right/31420k,3*0/,diver/32020k,3*0/
-c     data log10/40423k,42023k,50237k,74776k/
-c
-c     machine constants for the harris slash 6 and slash 7
-c
-c     data small(1),small(2) / '20000000, '00000201 /
-c     data large(1),large(2) / '37777777, '37777577 /
-c     data right(1),right(2) / '20000000, '00000333 /
-c     data diver(1),diver(2) / '20000000, '00000334 /
-c     data log10(1),log10(2) / '23210115, '10237777 /
-c
-c     machine constants for the honeywell 600/6000 series.
-c
-c     data small(1),small(2) / o402400000000, o000000000000 /
-c     data large(1),large(2) / o376777777777, o777777777777 /
-c     data right(1),right(2) / o604400000000, o000000000000 /
-c     data diver(1),diver(2) / o606400000000, o000000000000 /
-c     data log10(1),log10(2) / o776464202324, o117571775714 /
-c
-c     machine constants for the ibm 360/370 series,
-c     the xerox sigma 5/7/9 and the sel systems 85/86.
-c
-c     data small(1),small(2) / z00100000, z00000000 /
-c     data large(1),large(2) / z7fffffff, zffffffff /
-c     data right(1),right(2) / z33100000, z00000000 /
-c     data diver(1),diver(2) / z34100000, z00000000 /
-c     data log10(1),log10(2) / z41134413, z509f79ff /
-c
-c     machine constants for the pdp-10 (ka processor).
-c
-c     data small(1),small(2) / "033400000000, "000000000000 /
-c     data large(1),large(2) / "377777777777, "344777777777 /
-c     data right(1),right(2) / "113400000000, "000000000000 /
-c     data diver(1),diver(2) / "114400000000, "000000000000 /
-c     data log10(1),log10(2) / "177464202324, "144117571776 /
-c
-c     machine constants for the pdp-10 (ki processor).
-c
-c     data small(1),small(2) / "000400000000, "000000000000 /
-c     data large(1),large(2) / "377777777777, "377777777777 /
-c     data right(1),right(2) / "103400000000, "000000000000 /
-c     data diver(1),diver(2) / "104400000000, "000000000000 /
-c     data log10(1),log10(2) / "177464202324, "476747767461 /
-c
-c     machine constants for pdp-11 fortran's supporting
-c     32-bit integers (expressed in integer and octal).
-c
-c     data small(1),small(2) /    8388608,           0 /
-c     data large(1),large(2) / 2147483647,          -1 /
-c     data right(1),right(2) /  612368384,           0 /
-c     data diver(1),diver(2) /  620756992,           0 /
-c     data log10(1),log10(2) / 1067065498, -2063872008 /
-c
-c     data small(1),small(2) / o00040000000, o00000000000 /
-c     data large(1),large(2) / o17777777777, o37777777777 /
-c     data right(1),right(2) / o04440000000, o00000000000 /
-c     data diver(1),diver(2) / o04500000000, o00000000000 /
-c     data log10(1),log10(2) / o07746420232, o20476747770 /
-c
-c     machine constants for pdp-11 fortran's supporting
-c     16-bit integers (expressed in integer and octal).
-c
-c     data small(1),small(2) /    128,      0 /
-c     data small(3),small(4) /      0,      0 /
-c
-c     data large(1),large(2) /  32767,     -1 /
-c     data large(3),large(4) /     -1,     -1 /
-c
-c     data right(1),right(2) /   9344,      0 /
-c     data right(3),right(4) /      0,      0 /
-c
-c     data diver(1),diver(2) /   9472,      0 /
-c     data diver(3),diver(4) /      0,      0 /
-c
-c     data log10(1),log10(2) /  16282,   8346 /
-c     data log10(3),log10(4) / -31493, -12296 /
-c
-c     data small(1),small(2) / o000200, o000000 /
-c     data small(3),small(4) / o000000, o000000 /
-c
-c     data large(1),large(2) / o077777, o177777 /
-c     data large(3),large(4) / o177777, o177777 /
-c
-c     data right(1),right(2) / o022200, o000000 /
-c     data right(3),right(4) / o000000, o000000 /
-c
-c     data diver(1),diver(2) / o022400, o000000 /
-c     data diver(3),diver(4) / o000000, o000000 /
-c
-c     data log10(1),log10(2) / o037632, o020232 /
-c     data log10(3),log10(4) / o102373, o147770 /
-c
-c     machine constants for the univac 1100 series.
-c
-c     data small(1),small(2) / o000040000000, o000000000000 /
-c     data large(1),large(2) / o377777777777, o777777777777 /
-c     data right(1),right(2) / o170540000000, o000000000000 /
-c     data diver(1),diver(2) / o170640000000, o000000000000 /
-c     data log10(1),log10(2) / o177746420232, o411757177572 /
-c
-c     machine constants for the vax-11 with
-c     fortran iv-plus compiler
-c
-c     data small(1),small(2) / z00000080, z00000000 /
-c     data large(1),large(2) / zffff7fff, zffffffff /
-c     data right(1),right(2) / z00002480, z00000000 /
-c     data diver(1),diver(2) / z00002500, z00000000 /
-c     data log10(1),log10(2) / z209a3f9a, zcffa84fb /
-c
-c     machine constants for IEEE floating point standard on 68000.  First
-c     expressed as hex constants, then as two word integer.
-c
-c     data small(1), small(2)	/ x'00080000', x'00000000' /
-c     data large(1), large(2)	/ x'7FDFFFFF', x'FFFFFFFF' /
-c     data right(1), right(2)  	/ x'3CA00000', x'00000000' /
-c     data diver(1), diver(2)	/ x'3CB00000', x'00000000' /
-c     data log10(1), log10(2)	/ x'3FE62E42', x'FEFA39EF' /
-c
-c     These IEEE values are written as integer constants below -
-c
-      data small(1),small(2)	/524288,	0/
-      data large(1),large(2)	/2145386495,   -1/
-      data right(1),right(2)	/970,		0/
-      data diver(1),diver(2)	/971,		0/
-      data log10(1),log10(2)	/1072049730,	-17155601/
-c
-c     if (i .lt. 1  .or.  i .gt. 5) goto 100
-c
-      d1mach = dmach(i)
-      return
-c
-c100  iwunit = i1mach(4)
-c     write(iwunit, 99)
-c 99  format(24hd1mach - i out of bounds)
-c     stop
-      end
+      DOUBLE PRECISION FUNCTION D1MACH(I)
+C
+C  DOUBLE-PRECISION MACHINE CONSTANTS
+C
+C  D1MACH( 1) = B**(EMIN-1), THE SMALLEST POSITIVE MAGNITUDE.
+C
+C  D1MACH( 2) = B**EMAX*(1 - B**(-T)), THE LARGEST MAGNITUDE.
+C
+C  D1MACH( 3) = B**(-T), THE SMALLEST RELATIVE SPACING.
+C
+C  D1MACH( 4) = B**(1-T), THE LARGEST RELATIVE SPACING.
+C
+C  D1MACH( 5) = LOG10(B)
+C
+C  TO ALTER THIS FUNCTION FOR A PARTICULAR ENVIRONMENT,
+C  THE DESIRED SET OF DATA STATEMENTS SHOULD BE ACTIVATED BY
+C  REMOVING THE C FROM COLUMN 1.
+C  ON RARE MACHINES A STATIC STATEMENT MAY NEED TO BE ADDED.
+C  (BUT PROBABLY MORE SYSTEMS PROHIBIT IT THAN REQUIRE IT.)
+C
+C  FOR IEEE-ARITHMETIC MACHINES (BINARY STANDARD), ONE OF THE FIRST
+C  TWO SETS OF CONSTANTS BELOW SHOULD BE APPROPRIATE.  IF YOU DO NOT
+C  KNOW WHICH SET TO USE, TRY BOTH AND SEE WHICH GIVES PLAUSIBLE
+C  VALUES.
+C
+C  WHERE POSSIBLE, DECIMAL, OCTAL OR HEXADECIMAL CONSTANTS ARE USED
+C  TO SPECIFY THE CONSTANTS EXACTLY.  SOMETIMES THIS REQUIRES USING
+C  EQUIVALENT INTEGER ARRAYS.  IF YOUR COMPILER USES HALF-WORD
+C  INTEGERS BY DEFAULT (SOMETIMES CALLED INTEGER*2), YOU MAY NEED TO
+C  CHANGE INTEGER TO INTEGER*4 OR OTHERWISE INSTRUCT YOUR COMPILER
+C  TO USE FULL-WORD INTEGERS IN THE NEXT 5 DECLARATIONS.
+C
+C  COMMENTS JUST BEFORE THE END STATEMENT (LINES STARTING WITH *)
+C  GIVE C SOURCE FOR D1MACH.
+C
+      INTEGER SMALL(2)
+      INTEGER LARGE(2)
+      INTEGER RIGHT(2)
+      INTEGER DIVER(2)
+      INTEGER LOG10(2)
+      INTEGER I
+C/6S
+C/7S
+      SAVE SMALL, LARGE, RIGHT, DIVER, LOG10
+C/
+      DOUBLE PRECISION DMACH(5)
+C
+      EQUIVALENCE (DMACH(1),SMALL(1))
+      EQUIVALENCE (DMACH(2),LARGE(1))
+      EQUIVALENCE (DMACH(3),RIGHT(1))
+      EQUIVALENCE (DMACH(4),DIVER(1))
+      EQUIVALENCE (DMACH(5),LOG10(1))
+C
+C     MACHINE CONSTANTS FOR BIG-ENDIAN IEEE ARITHMETIC (BINARY FORMAT)
+C     MACHINES IN WHICH THE MOST SIGNIFICANT BYTE IS STORED FIRST,
+C     SUCH AS THE AT&T 3B SERIES, MOTOROLA 68000 BASED MACHINES (E.G.
+C     SUN 3), AND MACHINES THAT USE SPARC, HP, OR IBM RISC CHIPS.
+C
+      DATA SMALL(1),SMALL(2) /    1048576,          0 /
+      DATA LARGE(1),LARGE(2) / 2146435071,         -1 /
+      DATA RIGHT(1),RIGHT(2) / 1017118720,          0 /
+      DATA DIVER(1),DIVER(2) / 1018167296,          0 /
+      DATA LOG10(1),LOG10(2) / 1070810131, 1352628735 /
+C
+C     MACHINE CONSTANTS FOR LITTLE-ENDIAN (BINARY) IEEE ARITHMETIC
+C     MACHINES IN WHICH THE LEAST SIGNIFICANT BYTE IS STORED FIRST,
+C     E.G. IBM PCS AND OTHER MACHINES THAT USE INTEL 80X87 OR DEC
+C     ALPHA CHIPS.
+C
+C      DATA SMALL(1),SMALL(2) /          0,    1048576 /
+C      DATA LARGE(1),LARGE(2) /         -1, 2146435071 /
+C      DATA RIGHT(1),RIGHT(2) /          0, 1017118720 /
+C      DATA DIVER(1),DIVER(2) /          0, 1018167296 /
+C      DATA LOG10(1),LOG10(2) / 1352628735, 1070810131 /
+C
+C     MACHINE CONSTANTS FOR AMDAHL MACHINES.
+C
+C      DATA SMALL(1),SMALL(2) /    1048576,          0 /
+C      DATA LARGE(1),LARGE(2) / 2147483647,         -1 /
+C      DATA RIGHT(1),RIGHT(2) /  856686592,          0 /
+C      DATA DIVER(1),DIVER(2) /  873463808,          0 /
+C      DATA LOG10(1),LOG10(2) / 1091781651, 1352628735 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE BURROUGHS 1700 SYSTEM.
+C
+C      DATA SMALL(1) / ZC00800000 /
+C      DATA SMALL(2) / Z000000000 /
+C
+C      DATA LARGE(1) / ZDFFFFFFFF /
+C      DATA LARGE(2) / ZFFFFFFFFF /
+C
+C      DATA RIGHT(1) / ZCC5800000 /
+C      DATA RIGHT(2) / Z000000000 /
+C
+C      DATA DIVER(1) / ZCC6800000 /
+C      DATA DIVER(2) / Z000000000 /
+C
+C      DATA LOG10(1) / ZD00E730E7 /
+C      DATA LOG10(2) / ZC77800DC0 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE BURROUGHS 5700 SYSTEM.
+C
+C      DATA SMALL(1) / O1771000000000000 /
+C      DATA SMALL(2) / O0000000000000000 /
+C
+C      DATA LARGE(1) / O0777777777777777 /
+C      DATA LARGE(2) / O0007777777777777 /
+C
+C      DATA RIGHT(1) / O1461000000000000 /
+C      DATA RIGHT(2) / O0000000000000000 /
+C
+C      DATA DIVER(1) / O1451000000000000 /
+C      DATA DIVER(2) / O0000000000000000 /
+C
+C      DATA LOG10(1) / O1157163034761674 /
+C      DATA LOG10(2) / O0006677466732724 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE BURROUGHS 6700/7700 SYSTEMS.
+C
+C      DATA SMALL(1) / O1771000000000000 /
+C      DATA SMALL(2) / O7770000000000000 /
+C
+C      DATA LARGE(1) / O0777777777777777 /
+C      DATA LARGE(2) / O7777777777777777 /
+C
+C      DATA RIGHT(1) / O1461000000000000 /
+C      DATA RIGHT(2) / O0000000000000000 /
+C
+C      DATA DIVER(1) / O1451000000000000 /
+C      DATA DIVER(2) / O0000000000000000 /
+C
+C      DATA LOG10(1) / O1157163034761674 /
+C      DATA LOG10(2) / O0006677466732724 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR FTN4 ON THE CDC 6000/7000 SERIES.
+C
+C      DATA SMALL(1) / 00564000000000000000B /
+C      DATA SMALL(2) / 00000000000000000000B /
+C
+C      DATA LARGE(1) / 37757777777777777777B /
+C      DATA LARGE(2) / 37157777777777777774B /
+C
+C      DATA RIGHT(1) / 15624000000000000000B /
+C      DATA RIGHT(2) / 00000000000000000000B /
+C
+C      DATA DIVER(1) / 15634000000000000000B /
+C      DATA DIVER(2) / 00000000000000000000B /
+C
+C      DATA LOG10(1) / 17164642023241175717B /
+C      DATA LOG10(2) / 16367571421742254654B /, SC/987/
+C
+C     MACHINE CONSTANTS FOR FTN5 ON THE CDC 6000/7000 SERIES.
+C
+C      DATA SMALL(1) / O"00564000000000000000" /
+C      DATA SMALL(2) / O"00000000000000000000" /
+C
+C      DATA LARGE(1) / O"37757777777777777777" /
+C      DATA LARGE(2) / O"37157777777777777774" /
+C
+C      DATA RIGHT(1) / O"15624000000000000000" /
+C      DATA RIGHT(2) / O"00000000000000000000" /
+C
+C      DATA DIVER(1) / O"15634000000000000000" /
+C      DATA DIVER(2) / O"00000000000000000000" /
+C
+C      DATA LOG10(1) / O"17164642023241175717" /
+C      DATA LOG10(2) / O"16367571421742254654" /, SC/987/
+C
+C     MACHINE CONSTANTS FOR CONVEX C-1
+C
+C      DATA SMALL(1),SMALL(2) / '00100000'X, '00000000'X /
+C      DATA LARGE(1),LARGE(2) / '7FFFFFFF'X, 'FFFFFFFF'X /
+C      DATA RIGHT(1),RIGHT(2) / '3CC00000'X, '00000000'X /
+C      DATA DIVER(1),DIVER(2) / '3CD00000'X, '00000000'X /
+C      DATA LOG10(1),LOG10(2) / '3FF34413'X, '509F79FF'X /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE CRAY 1, XMP, 2, AND 3.
+C
+C      DATA SMALL(1) / 201354000000000000000B /
+C      DATA SMALL(2) / 000000000000000000000B /
+C
+C      DATA LARGE(1) / 577767777777777777777B /
+C      DATA LARGE(2) / 000007777777777777776B /
+C
+C      DATA RIGHT(1) / 376434000000000000000B /
+C      DATA RIGHT(2) / 000000000000000000000B /
+C
+C      DATA DIVER(1) / 376444000000000000000B /
+C      DATA DIVER(2) / 000000000000000000000B /
+C
+C      DATA LOG10(1) / 377774642023241175717B /
+C      DATA LOG10(2) / 000007571421742254654B /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE DATA GENERAL ECLIPSE S/200
+C
+C     SMALL, LARGE, RIGHT, DIVER, LOG10 SHOULD BE DECLARED
+C     INTEGER SMALL(4), LARGE(4), RIGHT(4), DIVER(4), LOG10(4)
+C
+C     NOTE - IT MAY BE APPROPRIATE TO INCLUDE THE FOLLOWING LINE -
+C     STATIC DMACH(5)
+C
+C      DATA SMALL/20K,3*0/,LARGE/77777K,3*177777K/
+C      DATA RIGHT/31420K,3*0/,DIVER/32020K,3*0/
+C      DATA LOG10/40423K,42023K,50237K,74776K/, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE HARRIS SLASH 6 AND SLASH 7
+C
+C      DATA SMALL(1),SMALL(2) / '20000000, '00000201 /
+C      DATA LARGE(1),LARGE(2) / '37777777, '37777577 /
+C      DATA RIGHT(1),RIGHT(2) / '20000000, '00000333 /
+C      DATA DIVER(1),DIVER(2) / '20000000, '00000334 /
+C      DATA LOG10(1),LOG10(2) / '23210115, '10237777 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE HONEYWELL DPS 8/70 SERIES.
+C
+C      DATA SMALL(1),SMALL(2) / O402400000000, O000000000000 /
+C      DATA LARGE(1),LARGE(2) / O376777777777, O777777777777 /
+C      DATA RIGHT(1),RIGHT(2) / O604400000000, O000000000000 /
+C      DATA DIVER(1),DIVER(2) / O606400000000, O000000000000 /
+C      DATA LOG10(1),LOG10(2) / O776464202324, O117571775714 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE IBM 360/370 SERIES,
+C     THE XEROX SIGMA 5/7/9 AND THE SEL SYSTEMS 85/86.
+C
+C      DATA SMALL(1),SMALL(2) / Z00100000, Z00000000 /
+C      DATA LARGE(1),LARGE(2) / Z7FFFFFFF, ZFFFFFFFF /
+C      DATA RIGHT(1),RIGHT(2) / Z33100000, Z00000000 /
+C      DATA DIVER(1),DIVER(2) / Z34100000, Z00000000 /
+C      DATA LOG10(1),LOG10(2) / Z41134413, Z509F79FF /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE INTERDATA 8/32
+C     WITH THE UNIX SYSTEM FORTRAN 77 COMPILER.
+C
+C     FOR THE INTERDATA FORTRAN VII COMPILER REPLACE
+C     THE Z'S SPECIFYING HEX CONSTANTS WITH Y'S.
+C
+C      DATA SMALL(1),SMALL(2) / Z'00100000', Z'00000000' /
+C      DATA LARGE(1),LARGE(2) / Z'7EFFFFFF', Z'FFFFFFFF' /
+C      DATA RIGHT(1),RIGHT(2) / Z'33100000', Z'00000000' /
+C      DATA DIVER(1),DIVER(2) / Z'34100000', Z'00000000' /
+C      DATA LOG10(1),LOG10(2) / Z'41134413', Z'509F79FF' /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE PDP-10 (KA PROCESSOR).
+C
+C      DATA SMALL(1),SMALL(2) / "033400000000, "000000000000 /
+C      DATA LARGE(1),LARGE(2) / "377777777777, "344777777777 /
+C      DATA RIGHT(1),RIGHT(2) / "113400000000, "000000000000 /
+C      DATA DIVER(1),DIVER(2) / "114400000000, "000000000000 /
+C      DATA LOG10(1),LOG10(2) / "177464202324, "144117571776 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE PDP-10 (KI PROCESSOR).
+C
+C      DATA SMALL(1),SMALL(2) / "000400000000, "000000000000 /
+C      DATA LARGE(1),LARGE(2) / "377777777777, "377777777777 /
+C      DATA RIGHT(1),RIGHT(2) / "103400000000, "000000000000 /
+C      DATA DIVER(1),DIVER(2) / "104400000000, "000000000000 /
+C      DATA LOG10(1),LOG10(2) / "177464202324, "047674776746 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR PDP-11 FORTRANS SUPPORTING
+C     32-BIT INTEGERS (EXPRESSED IN INTEGER AND OCTAL).
+C
+C      DATA SMALL(1),SMALL(2) /    8388608,           0 /
+C      DATA LARGE(1),LARGE(2) / 2147483647,          -1 /
+C      DATA RIGHT(1),RIGHT(2) /  612368384,           0 /
+C      DATA DIVER(1),DIVER(2) /  620756992,           0 /
+C      DATA LOG10(1),LOG10(2) / 1067065498, -2063872008 /, SC/987/
+C
+C      DATA SMALL(1),SMALL(2) / O00040000000, O00000000000 /
+C      DATA LARGE(1),LARGE(2) / O17777777777, O37777777777 /
+C      DATA RIGHT(1),RIGHT(2) / O04440000000, O00000000000 /
+C      DATA DIVER(1),DIVER(2) / O04500000000, O00000000000 /
+C      DATA LOG10(1),LOG10(2) / O07746420232, O20476747770 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR PDP-11 FORTRANS SUPPORTING
+C     16-BIT INTEGERS (EXPRESSED IN INTEGER AND OCTAL).
+C
+C     SMALL, LARGE, RIGHT, DIVER, LOG10 SHOULD BE DECLARED
+C     INTEGER SMALL(4), LARGE(4), RIGHT(4), DIVER(4), LOG10(4)
+C
+C      DATA SMALL(1),SMALL(2) /    128,      0 /
+C      DATA SMALL(3),SMALL(4) /      0,      0 /
+C
+C      DATA LARGE(1),LARGE(2) /  32767,     -1 /
+C      DATA LARGE(3),LARGE(4) /     -1,     -1 /
+C
+C      DATA RIGHT(1),RIGHT(2) /   9344,      0 /
+C      DATA RIGHT(3),RIGHT(4) /      0,      0 /
+C
+C      DATA DIVER(1),DIVER(2) /   9472,      0 /
+C      DATA DIVER(3),DIVER(4) /      0,      0 /
+C
+C      DATA LOG10(1),LOG10(2) /  16282,   8346 /
+C      DATA LOG10(3),LOG10(4) / -31493, -12296 /, SC/987/
+C
+C      DATA SMALL(1),SMALL(2) / O000200, O000000 /
+C      DATA SMALL(3),SMALL(4) / O000000, O000000 /
+C
+C      DATA LARGE(1),LARGE(2) / O077777, O177777 /
+C      DATA LARGE(3),LARGE(4) / O177777, O177777 /
+C
+C      DATA RIGHT(1),RIGHT(2) / O022200, O000000 /
+C      DATA RIGHT(3),RIGHT(4) / O000000, O000000 /
+C
+C      DATA DIVER(1),DIVER(2) / O022400, O000000 /
+C      DATA DIVER(3),DIVER(4) / O000000, O000000 /
+C
+C      DATA LOG10(1),LOG10(2) / O037632, O020232 /
+C      DATA LOG10(3),LOG10(4) / O102373, O147770 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE PRIME 50 SERIES SYSTEMS
+C     WITH 32-BIT INTEGERS AND 64V MODE INSTRUCTIONS,
+C     SUPPLIED BY IGOR BRAY.
+C
+C      DATA SMALL(1),SMALL(2) / :10000000000, :00000100001 /
+C      DATA LARGE(1),LARGE(2) / :17777777777, :37777677775 /
+C      DATA RIGHT(1),RIGHT(2) / :10000000000, :00000000122 /
+C      DATA DIVER(1),DIVER(2) / :10000000000, :00000000123 /
+C      DATA LOG10(1),LOG10(2) / :11504046501, :07674600177 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE SEQUENT BALANCE 8000
+C
+C      DATA SMALL(1),SMALL(2) / $00000000,  $00100000 /
+C      DATA LARGE(1),LARGE(2) / $FFFFFFFF,  $7FEFFFFF /
+C      DATA RIGHT(1),RIGHT(2) / $00000000,  $3CA00000 /
+C      DATA DIVER(1),DIVER(2) / $00000000,  $3CB00000 /
+C      DATA LOG10(1),LOG10(2) / $509F79FF,  $3FD34413 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE UNIVAC 1100 SERIES.
+C
+C      DATA SMALL(1),SMALL(2) / O000040000000, O000000000000 /
+C      DATA LARGE(1),LARGE(2) / O377777777777, O777777777777 /
+C      DATA RIGHT(1),RIGHT(2) / O170540000000, O000000000000 /
+C      DATA DIVER(1),DIVER(2) / O170640000000, O000000000000 /
+C      DATA LOG10(1),LOG10(2) / O177746420232, O411757177572 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE VAX UNIX F77 COMPILER
+C
+C      DATA SMALL(1),SMALL(2) /        128,           0 /
+C      DATA LARGE(1),LARGE(2) /     -32769,          -1 /
+C      DATA RIGHT(1),RIGHT(2) /       9344,           0 /
+C      DATA DIVER(1),DIVER(2) /       9472,           0 /
+C      DATA LOG10(1),LOG10(2) /  546979738,  -805796613 /, SC/987/
+C
+C     MACHINE CONSTANTS FOR THE VAX-11 WITH
+C     FORTRAN IV-PLUS COMPILER
+C
+C      DATA SMALL(1),SMALL(2) / Z00000080, Z00000000 /
+C      DATA LARGE(1),LARGE(2) / ZFFFF7FFF, ZFFFFFFFF /
+C      DATA RIGHT(1),RIGHT(2) / Z00002480, Z00000000 /
+C      DATA DIVER(1),DIVER(2) / Z00002500, Z00000000 /
+C      DATA LOG10(1),LOG10(2) / Z209A3F9A, ZCFF884FB /, SC/987/
+C
+C     MACHINE CONSTANTS FOR VAX/VMS VERSION 2.2
+C
+C      DATA SMALL(1),SMALL(2) /       '80'X,        '0'X /
+C      DATA LARGE(1),LARGE(2) / 'FFFF7FFF'X, 'FFFFFFFF'X /
+C      DATA RIGHT(1),RIGHT(2) /     '2480'X,        '0'X /
+C      DATA DIVER(1),DIVER(2) /     '2500'X,        '0'X /
+C      DATA LOG10(1),LOG10(2) / '209A3F9A'X, 'CFF884FB'X /, SC/987/
+C
+C  ***  ISSUE STOP 779 IF ALL DATA STATEMENTS ARE COMMENTED...
+C      IF (SC .NE. 987) THEN
+C         DMACH(1) = 1.D13
+C         IF (      SMALL(1) .EQ. 1117925532
+C     *       .AND. SMALL(2) .EQ. -448790528) THEN
+C*           *** IEEE BIG ENDIAN ***
+C            SMALL(1) = 1048576
+C            SMALL(2) = 0
+C            LARGE(1) = 2146435071
+C            LARGE(2) = -1
+C            RIGHT(1) = 1017118720
+C            RIGHT(2) = 0
+C            DIVER(1) = 1018167296
+C            DIVER(2) = 0
+C            LOG10(1) = 1070810131
+C            LOG10(2) = 1352628735
+C         ELSE IF ( SMALL(2) .EQ. 1117925532
+C     *       .AND. SMALL(1) .EQ. -448790528) THEN
+C*           *** IEEE LITTLE ENDIAN ***
+C            SMALL(2) = 1048576
+C            SMALL(1) = 0
+C            LARGE(2) = 2146435071
+C            LARGE(1) = -1
+C            RIGHT(2) = 1017118720
+C            RIGHT(1) = 0
+C            DIVER(2) = 1018167296
+C            DIVER(1) = 0
+C            LOG10(2) = 1070810131
+C            LOG10(1) = 1352628735
+C         ELSE IF ( SMALL(1) .EQ. -2065213935
+C     *       .AND. SMALL(2) .EQ. 10752) THEN
+C*               *** VAX WITH D_FLOATING ***
+C            SMALL(1) = 128
+C            SMALL(2) = 0
+C            LARGE(1) = -32769
+C            LARGE(2) = -1
+C            RIGHT(1) = 9344
+C            RIGHT(2) = 0
+C            DIVER(1) = 9472
+C            DIVER(2) = 0
+C            LOG10(1) = 546979738
+C            LOG10(2) = -805796613
+C         ELSE IF ( SMALL(1) .EQ. 1267827943
+C     *       .AND. SMALL(2) .EQ. 704643072) THEN
+C*               *** IBM MAINFRAME ***
+C            SMALL(1) = 1048576
+C            SMALL(2) = 0
+C            LARGE(1) = 2147483647
+C            LARGE(2) = -1
+C            RIGHT(1) = 856686592
+C            RIGHT(2) = 0
+C            DIVER(1) = 873463808
+C            DIVER(2) = 0
+C            LOG10(1) = 1091781651
+C            LOG10(2) = 1352628735
+C         ELSE
+C               WRITE(*,*)'Adjust D1MACH by uncommenting'
+C               WRITE(*,*)'data statements appropriate for your machine.'
+C            STOP 779
+C            END IF
+C         SC = 987
+C         END IF
+C
+C  ***  ISSUE STOP 778 IF ALL DATA STATEMENTS ARE OBVIOUSLY WRONG...
+C      IF (DMACH(4) .GE. 1.0D0) STOP 778
+C*C/6S
+C*C     IF (I .LT. 1  .OR.  I .GT. 5)
+C*C    1   CALL SETERR(24HD1MACH - I OUT OF BOUNDS,24,1,2)
+C*C/7S
+C*      IF (I .LT. 1  .OR.  I .GT. 5)
+C*     1   CALL SETERR('D1MACH - I OUT OF BOUNDS',24,1,2)
+C*C/
+C      IF (I .LT. 1 .OR. I .GT. 5) THEN
+C         WRITE(*,*) 'D1MACH(I): I =',I,' is out of bounds.'
+C         STOP
+C         END IF
+      IF (I .LT. 1 .OR. I .GT. 5) THEN
+	  D1MACH = 0.0
+	  RETURN
+      END IF
+      D1MACH = DMACH(I)
+      RETURN
+C
+C* /* C source for D1MACH -- remove the * in column 1 */
+C*#include <stdio.h>
+C*#include <float.h>
+C*#include <math.h>
+C*
+C*double d1mach_(long *i)
+C*{
+C*	switch(*i){
+C*	  case 1: return DBL_MIN;
+C*	  case 2: return DBL_MAX;
+C*	  case 3: return DBL_EPSILON/FLT_RADIX;
+C*	  case 4: return DBL_EPSILON;
+C*	  case 5: return log10(FLT_RADIX);
+C*	  }
+C*
+C*	fprintf(stderr, "invalid argument: d1mach(%ld)\n", *i);
+C*	exit(1);
+C*	return 0; /* for compilers that complain of missing return values */
+C*	}
+      END

@@ -4,7 +4,6 @@ include	<time.h>
 
 define	SZ_WEEKDAY		3
 define	SZ_MONTH		3
-define	CENTURY			1900
 
 # CNVDATE -- Convert a time in integer seconds since midnight on Jan 1, 1980
 # into a short string such as "May 15 18:24".  The length of the output
@@ -13,8 +12,8 @@ define	CENTURY			1900
 
 procedure cnvdate (ltime, outstr, maxch)
 
-long	ltime			# seconds since 00:00:00 10-Jan-80
-char	outstr[maxch]
+long	ltime			# seconds since 00:00:00 10-Jan-1980
+char	outstr[ARB]
 int	maxch
 
 long	one_year_ago

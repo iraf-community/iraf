@@ -1,4 +1,4 @@
-.help rvlsrd Nov95 "Slalib Package"
+.help rvlsrd Jun99 "Slalib Package"
 .nf
 
       REAL FUNCTION slRVLD (R2000, D2000)

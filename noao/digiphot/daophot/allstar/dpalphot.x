@@ -607,6 +607,8 @@ begin
 		sigmasq = weights[dix+wxdiff,diy+wydiff] + delta / 
 		    DP_PHOTADU(dao) + (pererr * delta) ** 2 +
 		    (peakerr * (delta - sky_value)) ** 2
+		if (sigmasq <= 0.0)
+		    next
 		relerr = abs (d) / sqrt (sigmasq)
 
 		if (clip && (relerr > MAX_RELERR))

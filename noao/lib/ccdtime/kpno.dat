@@ -2,6 +2,8 @@
 # Revised on the basis of drawings (true aperture size) and
 # improved count rates. Agrees with KPNO Direct Imaging Manual 
 # 1 May 1997 --- plm
+# 22 Jul 1998 --- dj
+# 12 Aug 1998 --- gj
 
 
 
@@ -23,9 +25,24 @@ telescope = "4m"
 	scale = 17.5
 	transmission = 1.0
 
+telescope = "4mf8"
+	aperture = 3.42
+	scale = 6.67
+	transmission = 1.0
+
+telescope = "4mf15"
+	aperture = 3.42
+	scale = 3.75
+	transmission = 1.0
+
 telescope = "2.1m"
 	aperture = 1.94
 	scale = 12.7
+	transmission = 1.0
+
+telescope = "2.1mf15"
+	aperture = 1.94
+	scale = 6.5
 	transmission = 1.0
 
 telescope = "Schmidt"
@@ -34,7 +51,7 @@ telescope = "Schmidt"
 	transmission = 0.7
 
 telescope = "WIYN"
-	aperture = 3.185
+ 	aperture = 3.185
 	scale = 9.4
 	transmission = 1.0
 
@@ -47,13 +64,15 @@ end
 # sky = sky0 + sky1 * phase + sky2 * phase**2 (phase=0-14)
 
 filter = "U"
+        extinction = 0.55
 	mag = 20
 	star = 8.0
 	sky0 = 22.0
 	sky1 = -0.2666
-	sky2 = -.00760
+ 	sky2 = -.00760
 
 filter = "B"
+        extinction = 0.25
 	mag = 20
 	star = 34.5
 	sky0 = 22.7 
@@ -61,6 +80,7 @@ filter = "B"
 	sky2 = -0.00953
 
 filter = "V"
+        extinction = 0.14
 	mag = 20
 	star = 36.2
 	sky0 = 21.8 
@@ -68,24 +88,68 @@ filter = "V"
 	sky2 = -0.00838
 
 filter = "R"
+        extinction = 0.10
 	mag = 20
-	star = 36.8
-	sky0 = 20.9 
+ 	star = 36.8
+ 	sky0 = 20.9 
 	sky1 = -0.0211
-	sky2 = -0.00364
-
+ 	sky2 = -0.00364
+ 
 filter = "I"
+        extinction = 0.05
 	mag = 20
 	star = 26.7
 	sky0 = 19.9 
 	sky1 = -0.0086
 	sky2 = -0.00311
 
+filter = "J"
+        extinction = 0.08
+	mag = 20
+ 	star = 36.5
+ 	sky0 = 16.2
+ 	sky1 = 0.
+ 	sky2 = 0.
+
+filter = "H"
+        extinction = 0.04
+	mag = 20
+	star = 21.8
+	sky0 = 14.2
+	sky1 = 0.
+	sky2 = 0.
+
+filter = "K"
+        extinction = 0.07
+	mag = 20
+	star = 14.6
+	sky0 = 13.3
+	sky1 = 0.
+	sky2 = 0.
+
+filter = "K'"
+        extinction = 0.05
+	mag = 20
+	star = 11.7
+	sky0 = 13.6
+	sky1 = 0.
+	sky2 = 0.
+
 end
 
 # Detector information:
 # rdnoise in photons, dark rate in photons per second, pixel size in microns,
 # and the effective DQE for each filter.
+
+detector = "MOSAIC1"
+        rdnoise = 5.0
+        dark = 0.0015
+        pixsize = 15
+        U = 0.48
+        B = 0.68
+        V = 0.81
+        R = 0.86
+        I = 0.63
 
 detector = "T1KA"
 	rdnoise = 3.5
@@ -157,3 +221,20 @@ detector = "S2KB"
 	R = 0.82
 	I = 0.60
 
+detector = "IRIM"
+	rdnoise = 35
+	dark = 1
+	pixsize = 167
+	J = 0.23
+	H = 0.33
+	K = 0.31
+	K' = 0.38
+
+detector = "ONIS"
+	rdnoise = 35
+ 	dark = 0.75
+	pixsize = 27
+	J = 0.18
+	H = 0.28
+ 	K = 0.22
+	K' = 0.34

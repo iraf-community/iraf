@@ -245,6 +245,8 @@ begin
 			RG_REFFILE)
 	        else
 	            nreftie = 0
+
+		break
 	    }
 
 	    # Fetch the input tie points and compute the coefficients.

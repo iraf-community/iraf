@@ -1,4 +1,4 @@
-.help asisave Jul84 "Image Interpolator Package"
+.help asisave Dec98 "Image Interpolator Package"
 .ih
 NAME
 asisave -- save interpolant
@@ -7,8 +7,8 @@ SYNOPSIS
 asisave (asi, interpolant)
 
 .nf
-    pointer	asi		# interpolant descriptor
-    real	interpolant[]	# array containing the interpolant
+    pointer	asi		#I interpolant descriptor
+    real	interpolant[]	#O array containing the interpolant
 .fi
 .ih
 ARGUMENTS
@@ -26,9 +26,10 @@ determined by a call to asigeti.
 .ih
 DESCRIPTION
 The interpolant type, number of coefficients and the position of
-the first data point in the
-coefficient array  are stored in the first
-three elements of the interpolant array. The remaining elements contain
+the first data point in the coefficient array, along with various
+parameters such as the sinc interpolant width, sinc look-up table
+resolution, and drizzle pixel fraction, are stored in the first
+7 elements of the interpolant array. The remaining elements contain
 the coefficients calculated by ASIFIT.
 .ih
 NOTES

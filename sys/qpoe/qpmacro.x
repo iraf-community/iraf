@@ -117,8 +117,8 @@ define	PS_STSTABLEN	Memi[$1+13]	# SYMTAB stab len (start)
 define	PS_STSBUFSIZE	Memi[$1+14]	# SYMTAB sbuf size (start)
 define	PS_NODEFFILT	Memi[$1+15]	# Disable use of default filter
 define	PS_NODEFMASK	Memi[$1+16]	# Disable use of default mask
-define	PS_XBLOCK	Memi[$1+17]	# QPIO blocking factor in X
-define	PS_YBLOCK	Memi[$1+18]	# QPIO blocking factor in Y
+define	PS_XBLOCK	Memr[$1+17]	# QPIO blocking factor in X
+define	PS_YBLOCK	Memr[$1+18]	# QPIO blocking factor in Y
 define	PS_DEBUG	Memi[$1+19]	# debug level
 define	PS_OPTBUFSIZE	Memi[$1+20]	# QPIO/QPF FIO optimum buffer size 
 
@@ -524,11 +524,13 @@ char	param[ARB]		#I parameter to be set
 char	valstr[ARB]		#I parameter value
 
 pointer	ps
+double	dval
 int	value, ip, pp
-int	qp_ctoi(), strncmp()
+int	qp_ctoi(), qp_ctod(), strncmp()
 pointer	stfind()
 bool	streq()
 errchk	stfind
+define	err_ 91
 
 begin
 	ps = stfind (QM_ST(qm), PSETKW)
@@ -540,13 +542,32 @@ begin
 	if (strncmp (param, "qp_", 3) == 0)
 	    pp = 4
 
-	# Decode the parameter value - only integer parameters at present,
-	# except for "nodeffilt" and "nodefmask" which do not have a value.
+	# Decode the parameter value - mostly integer parameters at present,
+	# except for "nodeffilt" and "nodefmask" which do not have a value,
+	# and the blocking factors, which are floating point.
 
-	if (strncmp (param[pp], "nodef", 5) != 0) {
-	    ip = 1
+	ip = 1
+	if (strncmp (param[pp], "nodef", 5) == 0) {
+	    return
+	} else if (strncmp (param[pp], "block", 5) == 0) {
+	    if (qp_ctod (valstr, ip, dval) <= 0)
+		goto err_
+	    PS_XBLOCK(ps) = dval
+	    PS_YBLOCK(ps) = dval
+	    return
+	} else if (strncmp (param[pp], "xblock", 6) == 0) {
+	    if (qp_ctod (valstr, ip, dval) <= 0)
+		goto err_
+	    PS_XBLOCK(ps) = dval
+	    return
+	} else if (strncmp (param[pp], "yblock", 6) == 0) {
+	    if (qp_ctod (valstr, ip, dval) <= 0)
+		goto err_
+	    PS_YBLOCK(ps) = dval
+	    return
+	} else {
 	    if (qp_ctoi (valstr, ip, value) <= 0) {
-		call eprintf ("bad value `%s' for QPOE parameter `%s'\n")
+err_		call eprintf ("bad value `%s' for QPOE parameter `%s'\n")
 		    call pargstr (valstr)
 		    call pargstr (param)
 		return
@@ -616,7 +637,8 @@ pointer	qp			#I QPOE descriptor
 
 pointer	ps
 pointer	stfind()
-int	qm_setpar()
+int	qm_spari()
+real	qm_sparr()
 errchk	stfind
 
 begin
@@ -625,31 +647,31 @@ begin
 	    return
 
 	# Interface parameters.
-	QP_EXPBLEN(qp) = qm_setpar (PS_EXPBLEN(ps), DEF_PROGBUFLEN)
-	QP_EXDBLEN(qp) = qm_setpar (PS_EXDBLEN(ps), DEF_DATABUFLEN)
-	QP_EXMAXFRLLEN(qp) = qm_setpar (PS_EXMAXFRLLEN(ps), DEF_MAXFRLUTLEN)
-	QP_EXMAXRRLLEN(qp) = qm_setpar (PS_EXMAXRRLLEN(ps), DEF_MAXRRLUTLEN)
-	QP_EXLMINRANGES(qp) = qm_setpar (PS_EXLMINRANGES(ps), DEF_LUTMINRANGES)
-	QP_EXLSCALE(qp) = qm_setpar (PS_EXLSCALE(ps), DEF_LUTSCALE)
-	QP_SZPBBUF(qp) = qm_setpar (PS_SZPBBUF(ps), DEF_MAXPUSHBACK)
-	QP_FMCACHESIZE(qp) = qm_setpar (PS_FMCACHESIZE(ps), DEF_FMCACHESIZE)
+	QP_EXPBLEN(qp) = qm_spari (PS_EXPBLEN(ps), DEF_PROGBUFLEN)
+	QP_EXDBLEN(qp) = qm_spari (PS_EXDBLEN(ps), DEF_DATABUFLEN)
+	QP_EXMAXFRLLEN(qp) = qm_spari (PS_EXMAXFRLLEN(ps), DEF_MAXFRLUTLEN)
+	QP_EXMAXRRLLEN(qp) = qm_spari (PS_EXMAXRRLLEN(ps), DEF_MAXRRLUTLEN)
+	QP_EXLMINRANGES(qp) = qm_spari (PS_EXLMINRANGES(ps), DEF_LUTMINRANGES)
+	QP_EXLSCALE(qp) = qm_spari (PS_EXLSCALE(ps), DEF_LUTSCALE)
+	QP_SZPBBUF(qp) = qm_spari (PS_SZPBBUF(ps), DEF_MAXPUSHBACK)
+	QP_FMCACHESIZE(qp) = qm_spari (PS_FMCACHESIZE(ps), DEF_FMCACHESIZE)
 
 	# Datafile parameters.
-	QP_BUCKETLEN(qp) = qm_setpar (PS_BUCKETLEN(ps), DEF_BUCKETLEN)
-	QP_FMMAXLFILES(qp) = qm_setpar (PS_FMMAXLFILES(ps), DEF_FMMAXLFILES)
-	QP_FMMAXPTPAGES(qp) = qm_setpar (PS_FMMAXPTPAGES(ps), DEF_FMMAXPTPAGES)
-	QP_FMPAGESIZE(qp) = qm_setpar (PS_FMPAGESIZE(ps), DEF_FMPAGESIZE)
-	QP_STINDEXLEN(qp) = qm_setpar (PS_STINDEXLEN(ps), DEF_STINDEXLEN)
-	QP_STSTABLEN(qp) = qm_setpar (PS_STSTABLEN(ps), DEF_STSTABLEN)
-	QP_STSBUFSIZE(qp) = qm_setpar (PS_STSBUFSIZE(ps), DEF_STSBUFSIZE)
+	QP_BUCKETLEN(qp) = qm_spari (PS_BUCKETLEN(ps), DEF_BUCKETLEN)
+	QP_FMMAXLFILES(qp) = qm_spari (PS_FMMAXLFILES(ps), DEF_FMMAXLFILES)
+	QP_FMMAXPTPAGES(qp) = qm_spari (PS_FMMAXPTPAGES(ps), DEF_FMMAXPTPAGES)
+	QP_FMPAGESIZE(qp) = qm_spari (PS_FMPAGESIZE(ps), DEF_FMPAGESIZE)
+	QP_STINDEXLEN(qp) = qm_spari (PS_STINDEXLEN(ps), DEF_STINDEXLEN)
+	QP_STSTABLEN(qp) = qm_spari (PS_STSTABLEN(ps), DEF_STSTABLEN)
+	QP_STSBUFSIZE(qp) = qm_spari (PS_STSBUFSIZE(ps), DEF_STSBUFSIZE)
 
 	# Other parameters.
-	QP_NODEFFILT(qp) = qm_setpar (PS_NODEFFILT(ps), NO)
-	QP_NODEFMASK(qp) = qm_setpar (PS_NODEFMASK(ps), NO)
-	QP_XBLOCK(qp) = qm_setpar (PS_XBLOCK(ps), DEF_BLOCKFACTOR)
-	QP_YBLOCK(qp) = qm_setpar (PS_YBLOCK(ps), DEF_BLOCKFACTOR)
-	QP_OPTBUFSIZE(qp) = qm_setpar (PS_OPTBUFSIZE(ps), DEF_OPTBUFSIZE)
-	QP_DEBUG(qp) = qm_setpar (PS_DEBUG(ps), 0)
+	QP_NODEFFILT(qp) = qm_spari (PS_NODEFFILT(ps), NO)
+	QP_NODEFMASK(qp) = qm_spari (PS_NODEFMASK(ps), NO)
+	QP_XBLOCK(qp) = qm_sparr (PS_XBLOCK(ps), DEF_BLOCKFACTOR)
+	QP_YBLOCK(qp) = qm_sparr (PS_YBLOCK(ps), DEF_BLOCKFACTOR)
+	QP_OPTBUFSIZE(qp) = qm_spari (PS_OPTBUFSIZE(ps), DEF_OPTBUFSIZE)
+	QP_DEBUG(qp) = qm_spari (PS_DEBUG(ps), 0)
 end
 
 
@@ -660,6 +682,36 @@ int procedure qm_setpar (userval, defval)
 
 int	userval			#I user specified value, or zero
 int	defval			#I interface default
+int	qm_spari()
+
+begin
+	return (qm_spari (userval, defval))
+end
+
+
+# QM_SPARI -- Return the given int parameter value, if set in the user's macro
+# files, otherwise return the interface default.
+
+int procedure qm_spari (userval, defval)
+
+int	userval			#I user specified value, or zero
+int	defval			#I interface default
+
+begin
+	if (userval != 0)
+	    return (userval)
+	else
+	    return (defval)
+end
+
+
+# QM_SPARR -- Return the given real parameter value, if set in the user's macro
+# files, otherwise return the interface default.
+
+real procedure qm_sparr (userval, defval)
+
+real	userval			#I user specified value, or zero
+real	defval			#I interface default
 
 begin
 	if (userval != 0)

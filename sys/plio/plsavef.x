@@ -49,8 +49,8 @@ begin
 	# Write the savefile.
 	fd = open (Memc[fullname], NEW_FILE, BINARY_FILE)
 
-	call mii_writei (fd, Memi[sv], LEN_SVDES)
-	call mii_writec (fd, title, SV_TITLELEN(sv))
+	call miiwritei (fd, Memi[sv], LEN_SVDES)
+	call miiwritec (fd, title, SV_TITLELEN(sv))
 	call write (fd, Mems[bp], masklen * SZ_SHORT)
 	call mfree (bp, TY_SHORT)
 

@@ -24,7 +24,7 @@ libpkg.a:
 	@generic
 
 	blkcomp.x	<imhdr.h>
-	shiftlines.x	<imhdr.h> <imset.h>
+	shiftlines.x	<imhdr.h> <imset.h> <math/iminterp.h>
 	t_blkavg.x	<imhdr.h>
 	t_blkrep.x	<imhdr.h>
 	t_imshift.x	<error.h> <imhdr.h> <imset.h> <math/iminterp.h>

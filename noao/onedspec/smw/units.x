@@ -1,3 +1,4 @@
+include	<ctype.h>
 include	<error.h>
 include	<units.h>
 
@@ -106,7 +107,7 @@ char	units1[sz_units1]	# Secondary units string to return
 int	sz_units1		# Size of secondary units string
 
 int	unlog, uninv, untype
-int	i, j,  nscan(), strdic()
+int	i, j, k, nscan(), strdic(), strlen()
 pointer	sp, str
 pointer	stp, sym, stfind(), strefsbuf()
 
@@ -144,6 +145,10 @@ begin
 		break
 
 	    j = strdic (Memc[str], Memc[str], SZ_FNAME, UN_DIC)
+	    for (k=strlen(Memc[str]); k>0 &&
+		(IS_WHITE(Memc[str+k-1]) || Memc[str+k-1]=='\n'); k=k-1)
+		Memc[str+k-1] = EOS
+
 	    if (j > UN_NUNITS) {
 	        j = j - UN_NUNITS
 	        if (j == 1) {

@@ -1,4 +1,4 @@
-.help obs Nov95 "Slalib Package"
+.help obs Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slOBS (N, C, NAME, W, P, H)
@@ -35,7 +35,7 @@
      P and H.
 
      If the station parameters are not available, either because
-     the station identifier C is not recognised, or because an
+     the station identifier C is not recognized, or because an
      N value greater than the number of stations supported is
      given, a name of '?' is returned and C, W, P and H are left
      in their current states.
@@ -74,9 +74,9 @@
          better station identifiers or names
          additional stations
 
-  P.T.Wallace   Starlink   20 February 1995
+  P.T.Wallace   Starlink   21 April 1999
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1999 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

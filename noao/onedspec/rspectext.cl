@@ -37,8 +37,8 @@ begin
     files (input, sort=no, > specin)
     files (output, sort=no, > specout)
     join (specin, specout, output=spec, delim=" ", shortest=yes, verbose=yes)
-    delete (specin, verify=no)
-    delete (specout, verify=no)
+    delete (specin, verify-)
+    delete (specout, verify-)
 
     # Go through each input and check for an existing output.
     fd2 = spec
@@ -56,59 +56,60 @@ begin
 	# Create the image from the header and flux values.
 	rtextimage (temp1, specout, otype="real", header=header, pixels=yes,
 	    nskip=0, dim=dim)
-	fd1 = ""; delete (temp1, verify=no)
+	fd1 = ""; delete (temp1, verify-)
 
 	# If there is no header setup the title, dispersion and flux.
 	# The dispersion may require using DISPCOR for nonlinear or
 	# resampled dispersion functions.
 
 	if (!header) {
-	    hedit (specout, "title", title, update=yes, verify=no, show=no)
+	    hedit (specout, "title", title,
+		add+, del-, update+, verify-, show-)
 	    if (dtype == "linear") {
 		hedit (specout, "dc-flag", 0,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 		hedit (specout, "crpix1", 1.,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 		hedit (specout, "crval1", crval1,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 		hedit (specout, "cdelt1", cdelt1,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 	    } else if (dtype == "log") {
 		hedit (specout, "dc-flag", 1,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 		hedit (specout, "crpix1", 1.,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 		hedit (specout, "crval1", crval1,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 		hedit (specout, "cdelt1", cdelt1,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 	    } else if (dtype == "nonlinear") {
 		hedit (specout, "refspec1", temp3,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 		dispcor (specout, "", linearize=no, database="tmp$",
 		    table="", w1=INDEF, w2=INDEF, dw=INDEF, nw=INDEF, log=log,
 		    flux=no, samedisp=no, global=no, ignoreaps=no, confirm=no,
 		    listonly=no, verbose=no, logfile="")
 		hedit (specout, "dclog1",
-		    delete=yes, update=yes, verify=no, show=no)
+		    add-, del+, update+, verify-, show-)
 	    } else if (dtype == "interp") {
 		hedit (specout, "refspec1", temp3,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 		dispcor (specout, "", linearize=yes, database="tmp$",
 		    table="", w1=INDEF, w2=INDEF, dw=INDEF, nw=INDEF, log=log,
 		    flux=no, samedisp=no, global=no, ignoreaps=no, confirm=no,
 		    listonly=no, verbose=no, logfile="")
 		hedit (specout, "dclog1",
-		    delete=yes, update=yes, verify=no, show=no)
+		    add-, del+, update+, verify-, show-)
 	    }
 	    if (flux) {
 		hedit (specout, "ca-flag", 0,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 		hedit (specout, "ex-flag", 0,
-		    add=yes, update=yes, verify=no, show=no)
+		    add+, del-, update+, verify-, show-)
 	    }
 	}
-	delete (temp2, verify=no)
+	delete (temp2, verify-)
     }
-    fd2=""; delete (spec, verify=no)
+    fd2=""; delete (spec, verify-)
 end

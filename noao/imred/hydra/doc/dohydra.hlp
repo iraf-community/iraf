@@ -672,6 +672,7 @@ the scattered light function smoothing and subtraction.
 
 If there is a throughput image then this is corrected for scattered light
 noninteractively using the previous fitting parameters.
+.le
 .ls [7]
 If flat fielding is to be done the flat field spectra are extracted.  The
 average spectrum over all fibers is determined and a function is fit

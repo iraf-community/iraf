@@ -1,4 +1,4 @@
-.help pa Nov95 "Slalib Package"
+.help pa Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slPA (HA, DEC, PHI)

@@ -1,5 +1,5 @@
-    NOAO PC-IRAF Revision 2.11.1 EXPORT Mon Jan 26 13:32:19 MST 1998
-    This is the EXPORT version of PC-IRAF V2.11 supporting most PC systems.
+    NOAO Sun/IRAF Revision 2.11.2 Wed Aug 11 13:24:18 MST 1999
+    This is the EXPORT version of Sun/IRAF V2.11 for SunOS 4 and Solaris 2.7
 
     Welcome to IRAF.  To list the available commands, type ? or ??.  To get
     detailed information about a command, type `help command'.   To  run  a

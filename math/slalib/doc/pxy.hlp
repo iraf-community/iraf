@@ -1,4 +1,4 @@
-.help pxy Nov95 "Slalib Package"
+.help pxy Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slPXY (NP,XYE,XYM,COEFFS,XYP,XRMS,YRMS,RRMS)
@@ -47,9 +47,9 @@
 
   Called:  slXYXY
 
-  P.T.Wallace   Starlink   15 July 1993
+  P.T.Wallace   Starlink   22 May 1996
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

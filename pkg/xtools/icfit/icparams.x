@@ -20,6 +20,16 @@ begin
 	call malloc (IC_UNITS(ic,2), SZ_LINE, TY_CHAR)
 	call malloc (IC_HELP(ic), SZ_FNAME, TY_CHAR)
 
+	# Initialize parameters
+	IC_OVERPLOT(ic) = NO
+	IC_RG(ic) = NULL
+	IC_XFIT(ic) = NULL
+	IC_YFIT(ic) = NULL
+	IC_WTSFIT(ic) = NULL
+	IC_REJPTS(ic) = NULL
+	IC_GP(ic) = NULL
+	IC_GT(ic) = NULL
+
 	# Set defaults
 	call ic_pstr (ic, "function", "spline3")
 	call ic_puti (ic, "order", 1)
@@ -42,14 +52,6 @@ begin
 	call ic_pkey (ic, 3, 'x', 'r')
 	call ic_pkey (ic, 4, 'x', 'd')
 	call ic_pkey (ic, 5, 'x', 'n')
-
-	# Initialize other parameters
-	IC_OVERPLOT(ic) = NO
-	IC_RG(ic) = NULL
-	IC_XFIT(ic) = NULL
-	IC_YFIT(ic) = NULL
-	IC_WTSFIT(ic) = NULL
-	IC_REJPTS(ic) = NULL
 end
 
 
@@ -177,6 +179,8 @@ begin
 	    call strcpy (str, Memc[IC_HELP(ic)], SZ_LINE)
 	else
 	    call error (0, "ICFIT: Unknown parameter")
+
+	call ic_gui (ic, "params")
 end
 
 
@@ -205,6 +209,8 @@ begin
 	    IC_MARKREJ(ic) = ival
 	else
 	    call error (0, "ICFIT: Unknown parameter")
+
+	call ic_gui (ic, "params")
 end
 
 
@@ -219,8 +225,13 @@ int	xaxis			# X axis type
 int	yaxis			# Y axis type
 
 begin
-	IC_AXES(ic, key, 1) = xaxis
-	IC_AXES(ic, key, 2) = yaxis
+	if (key >= 1 && key <= 5) {
+	    IC_AXES(ic, key, 1) = xaxis
+	    IC_AXES(ic, key, 2) = yaxis
+
+	    if (key == IC_GKEY(ic))
+		call ic_gui (ic, "graph")
+	}
 end
 
 
@@ -262,6 +273,8 @@ begin
 	    IC_GROW(ic) = rval
 	else
 	    call error (0, "ICFIT: Unknown parameter")
+
+	call ic_gui (ic, "params")
 end
 
 

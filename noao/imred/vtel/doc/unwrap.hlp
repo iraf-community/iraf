@@ -35,6 +35,7 @@ reconstruct, fixlines).
 .le
 .ls verbose = yes
 If set, program produces progress reports, etc.
+.le
 .ih
 DESCRIPTION
 Unwrap checks for binary wraparound in IRAF images.

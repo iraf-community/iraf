@@ -66,7 +66,7 @@ begin
 	# Print to logfile if needed.
 	if (IE_LOGFD(ie) != NULL) { 
 	    switch (key) {
-	    case 't':
+	    case 'x':
 	        call fprintf (IE_LOGFD(ie), "%7.2f %7.2f %7g")
 	            call pargr (x)
 	            call pargr (y)
@@ -86,6 +86,12 @@ begin
 	                call pargr (t)
 	        }
 	        call fprintf (IE_LOGFD(ie), "\n")
+	    case 'y':	# Set new origin
+		IE_XORIGIN(ie) = x
+		IE_YORIGIN(ie) = y
+		call fprintf (IE_LOGFD(ie), "Origin: %.2f %.2f\n")
+		    call pargr (IE_XORIGIN(ie))
+		    call pargr (IE_YORIGIN(ie))
 	    }
 	}
 
@@ -135,7 +141,7 @@ begin
 	# Print to logfile if needed.
 	if (IE_LOGFD(ie) != NULL) { 
 	    switch (key) {
-	    case 't':
+	    case 'x':
 		if (IE_XFORMAT(ie) == '%')
 		    call fprintf (IE_LOGFD(ie), IE_XFORMAT(ie))
 		else
@@ -165,6 +171,10 @@ begin
 	                call pargr (t)
 	        }
 	        call fprintf (IE_LOGFD(ie), "\n")
+	    case 'y':	# Set new origin
+		call fprintf (IE_LOGFD(ie), "Origin: %7g %7g\n")
+		    call pargr (xo)
+		    call pargr (yo)
 	    }
 	}
 end

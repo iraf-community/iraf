@@ -112,7 +112,6 @@ bool	is_gray				#i is this a grayscale cmap?
 pointer	op, bop, out, cm
 int	i, j, k, line, percent
 int	len, orow, type
-short	zero
 
 pointer	ex_evaluate(), ex_chtype()
 
@@ -121,7 +120,6 @@ begin
         type = EX_OUTTYPE(ex)
         percent = 0
         orow = 0
-        zero = 0
 	cm = EX_CMAP(ex)
 	call malloc (out, EX_OCOLS(ex)+2, TY_SHORT)
         do i = 1, EX_NEXPR(ex) {
@@ -190,7 +188,6 @@ int	fd				#i output file descriptor
 
 pointer	op, bop, out
 int	i, j, k, line, percent, orow, type
-short	zero
 
 pointer	ex_evaluate(), ex_chtype()
 
@@ -199,7 +196,6 @@ begin
         type = EX_OUTTYPE(ex)
         percent = 0
         orow = 0
-	zero = 0
 	call malloc (out, EX_OCOLS(ex)+2, TY_SHORT)
         do j = 1, EX_NLINES(ex) {
 

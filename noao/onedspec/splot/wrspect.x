@@ -214,9 +214,9 @@ begin
 		outbuf = impl3r (out, i, j)
 		call amovr (Memr[SY(sh1)], Memr[outbuf+np1-1], SN(sh1))
 		if (np1 > 1)
-		    call amovkr (Memr[outbuf], Memr[outbuf+np1-1], np1-1)
+		    call amovkr (Memr[outbuf+np1-1], Memr[outbuf], np1-1)
 		if (np2 < IM_LEN(out,1))
-		    call amovkr (Memr[outbuf+np2], Memr[outbuf+np2-1],
+		    call amovkr (Memr[outbuf+np2-1], Memr[outbuf+np2],
 			IM_LEN(out,1)-np2)
 	    }
 

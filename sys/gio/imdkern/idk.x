@@ -49,9 +49,9 @@ The following graphcap fields apply:
 # mf_obuf array must therefore be >= PX.
 
 define	mf_physbit	mf_obuf		# union these two arrays [[[NOTE]]]
-define	BPW		8		# nbits in an integer
-define	LEN_FBUF	(2048*2048/BPW)	# max size bitmap / frame buffer
-define	LEN_OBUF	2048		# max size of buffer line
+define	BPW		32		# nbits in an integer
+define	LEN_FBUF	(8192*8192/BPW)	# max size bitmap / frame buffer
+define	LEN_OBUF	8192		# max size of buffer line
 define	SZ_DDSTR	256		# max size graphcap.DD
 define	SZ_OSCMD	256		# OS dispose command from graphcap.DD
 define	IOLINES		64		# image lines per i/o transfer

@@ -4,7 +4,7 @@ define	DEF_PIXTYPE		TY_REAL		# pixel type on disk
 define	DEF_HGMLEN		512		# length of histogram
 define	DEF_COMPRESS		NO		# align lines on blk boundaries
 define	DEF_ADVICE		SEQUENTIAL	# type of access to optimize for
-define	DEF_FIOBUFSIZE		65536		# default FIO buffer size
+define	DEF_FIOBUFSIZE		262144		# default FIO buffer size
 define	MAX_HGMLEN		2048		# maximum size histogram
 define	IM_MAXSTEP		64		# step size breakpoint
 define	MIN_LENUSERAREA		64000		# user area size (chars)

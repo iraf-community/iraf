@@ -150,7 +150,7 @@ are specified.  The output images are only created if the input image
 is modified (except by an explicit "write" command).  If no output
 list is specified (an empty list given by "") then the modified images
 are written back to the input images.  The images are edited in
-a temporary buffer image called "epixbuf".
+a temporary buffer image beginning with "imedit".
  
 Commands are given via a cursor list.  When the task is run
 interactively this will normally be the standard image cursor
@@ -420,6 +420,10 @@ EXAMPLES
 .fi
 .ih
 REVISIONS
+.ls IMEDIT V2.11.2
+The temporary editor image was changed to use a unique temporary image
+name beginning with "imedit" rather than the fixed name of "epixbuf".
+.le
 .ls IMEDIT V2.11
 If xorder or yorder are zero then a median background is computed
 for the 'a' and 'b' keys.

@@ -48,6 +48,7 @@
     dmoon - compute approximate geocentric position/velocity of moon (d.p.)
      dmxm - compute the product of two 3X3 matrices (d.p.)
      dmxv - multiple a 3-vector by a rotation matrix (d.p.)
+     dpav - compute the bearing of a point on a sphere w.r.t. another (d.p.)
     dr2af - convert radians to degrees, arcminutes, and arcseconds (d.p)
     dr2tf - convert radians to hours, minutes, and seconds (d.p.)
    drange - normalize an angle to the range -pi <= angle <= pi (d.p.)
@@ -73,6 +74,7 @@
     ecmat - compute the equatorial FK5 to ecliptic coordinates rotation matrix
      ecor - compute rv of earth and time correction to sun in given direction
      eg50 - convert equatorial FK4 to IAU 1958 galactic coordinates 
+    el2ue - convert osculating orbital elements into universal form
       epb - convert an MJD to a Besselian epoch
     epb2d - convert a Besselian epoch to an MJD
      epco - convert a Besselian/Julian epoch to match a given epoch
@@ -89,6 +91,8 @@
     fk45z - convert equatorial FK4 to FK5 coordinates excluding proper motion 
     fk524 - convert equatorial FK5 to FK4 coordinates
     fk54z - convert equatorial FK5 to FK4 coordinates excluding proper motion
+    fk52h - convert equatorial FK5 to ICRS coordinates
+    fk5hz - Convert equatorial FK5 to ICRS coordinates (0 ICRS proper motions)
    flotin - convert a character string to a floating point number
     galeq - convert IAU 1958 galactic to equatorial FK5 coordinates
    galsup - convert IAU 1958 galactic to deVaucouleurs supergalactic coordinates
@@ -97,6 +101,8 @@
      gmst - convert from UT1 to GMST 
     gmsta - convert from UT1 to GMST while minimizing rounding errors
       h2e - convert azimuth and elevation to hour angle and declination (s.p.)
+    h2fk5 - Convert equatorial ICRS to FK5 coordinates
+    hfk5z - Convert equatorial ICRS to FK5 coordinates (0 ICRS proper motions)
      imxv - apply a 3D reverse rotation to a 3-vector (s.p.) 
     intin - convert a character string into an integer
      invf - invert the linear model computed from 2 sets of [x,y] coordinates 
@@ -115,17 +121,25 @@
     oapqk - convert from observed to apparent place
       obs - look up an entry in a list of groundbased observing stations 
        pa - compute the parallactic angle from the hour angle and declination
+      pav - compute the bearing of a point on a sphere w.r.t. another
       pcd - apply pincushion/barrel distortion to tangent plane coordinates 
     pda2h - compute the hour angle corresponding to a given azimuth 
     pdq2h - compute the hour angle corresponding to a given parallactic angle 
+   pertel - update osculating orbital elements by applying perturbations
+   pertue - update universal elements by applying perturbations
+   planel - compute the approximate heliocentric position/velocity of a planet 
    planet - compute the approximate heliocentric position/velocity of a planet 
+   plante - compute approximate topocentric apparent position of a planet 
        pm - apply the correction for proper motion to a star 
+    polmo - correct site longitude and latitude for polar motion
     prebn - compute the FK4 matrix of precession between two epochs
      prec - compute the FK5 matrix of precession between two epochs 
    preces - precess coordinates in either the FK4 or FK5 systems 
     precl - compute the longterm matrix of precession between two epochs 
    precss - precess coordinates in either the FK4 or FK5 systems
    prenut - compute the FK5 matrix of precession and nutation 
+    pv2el - convert J2000 position and velocity to osculating elements
+    pv2ue - convert instantaneous position and velocity to universal element set
     pvobs - compute the geocentric position / velocity of an observing station 
       pxy - apply a linear model to a set of expected and measured [x,y] 
     range - normalize an angle to the range -pi <= angle <= pi (s.p.) 
@@ -133,6 +147,7 @@
       rcc - compute the difference between TDB and TT in seconds 
    rdplan - compute approximate topocentric apparent position of a planet 
     refco - compute the refraction coefficients 
+   refcoq - compute the refraction coefficients (fast version)
     refro - compute the atmospheric refraction for optical and radio wavelengths
      refv - apply the refraction correction to a Cartesian 3-vector 
      refz - apply the refraction correction to a zenith distance 
@@ -153,6 +168,8 @@
      tp2v - convert tangent plane coordinates to direction cosines (s.p.) 
     tps2c - compute the spherical coordinates of the tangent point (s.p.)
     tpv2c - compute the direction cosines of the tangent point (s.p.) 
+    ue2el - convert universal elements into heliocentric osculating elements
+    ue2pv - compute heliocentric position and velocity from universal form
     unpcd - remove pincushion/barrel distortion from distorted coordinates 
      v2tp - convert direction cosines to tangent plane coordinates (s.p.) 
       vdv - convert the scale production of two 3-vectors (s.p.)

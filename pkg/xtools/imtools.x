@@ -83,7 +83,7 @@ char	original[ARB]			#O Root of original output image
 int	sz_fname			#I Maximum size of image names
 
 pointer	sp, inname, outname, extn
-int	i, j, k, gstrmatch(), strncmp() 
+int	i, j, k, gstrmatch(), strncmp(), fnextn()
 bool	xt_imnameeq()
 
 begin
@@ -116,8 +116,7 @@ begin
 	if (i == j && strncmp (Memc[inname], Memc[outname], i-1) == 0) {
 	    if (xt_imnameeq (Memc[inname], Memc[outname])) {
 		call mktemp ("tmp", output, sz_fname)
-		call fnextn (original, Memc[extn], SZ_FNAME)
-		if (Memc[extn] != EOS) {
+		if (fnextn (original, Memc[extn], SZ_FNAME) > 0) {
 		    call strcat (".", output, sz_fname)
 		    call strcat (Memc[extn], output, sz_fname)
 		}

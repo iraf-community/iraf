@@ -13,7 +13,7 @@ int	xs			#I starting index in pixbuf
 PIXEL	rl[3,ARB]		#O destination range list
 int	npix			#I number of pixels to convert
 
-PIXEL	hi, pv
+PIXEL	hi, pv, zero
 int	xe, x1, np, rn, nv, ip
 define	done_ 91
 
@@ -29,7 +29,8 @@ begin
 	# the pixel list for successive ranges of pixels of constant nonzero
 	# value, where each range is described as follows:
 
-	pv = max(0,px_src[xs])	# pixel value of current range
+	zero = 0
+	pv = max (zero, px_src[xs])	# pixel value of current range
 	x1 = xs			# start index of current range
 	hi = 1			# current high value
 
@@ -37,7 +38,7 @@ begin
 	do ip = xs, xe {
 	    if (ip < xe) {
 		# Get the next pixel value, loop again if same as previous one.
-		nv = max (0, px_src[ip+1])
+		nv = max (zero, px_src[ip+1])
 		if (nv == pv)
 		    next
 

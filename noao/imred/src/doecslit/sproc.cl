@@ -217,12 +217,13 @@ begin
 	# the arc lists.  The processing of the reference arcs is done
 	# by the task ARCREFS.
 
+	arcref = ""
+	arcrefs = ""
 	if (dispcor) {
 	    if (arctable == "")
 		arcrefs = "@"//arcs
 	    else
 		arcrefs = arctable
-	    arcref = ""
 
 	    fd1 = arcs
 	    if (fscan (fd1, arcref) == EOF)

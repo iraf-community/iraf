@@ -89,7 +89,7 @@ begin
 	    nunits = nunits + 1
 	}
 	do i = nunits + 1, IM_MAXDIM
-	    Memi[units+nunits-1] = WT_UNATIVE
+	    Memi[units+i-1] = WT_UNATIVE
 
 	# Get the input and output transform.
 	call clgstr ("inwcs", Memc[iwcs], SZ_FNAME)

@@ -22,13 +22,14 @@ pointer	image1			# Input image
 pointer	image2			# Output image
 pointer imtemp			# Temporary file
 pointer	sfile			# Text file containing list of shifts
+pointer	interpstr		# Interpolant string
 
-int	list1, list2, interp_type, boundary_type, ixshift, iyshift, nshifts
+int	list1, list2, boundary_type, ixshift, iyshift, nshifts, interp_type
 pointer	sp, str, xs, ys, im1, im2, sf, mw
 real	txshift, tyshift, xshift, yshift, constant, shifts[2]
 
 bool	fp_equalr(), envgetb()
-int	imtgetim(), imtlen(), clgwrd(), open(), ish_rshifts()
+int	imtgetim(), imtlen(), clgwrd(), strdic(), open(), ish_rshifts()
 pointer	immap(), imtopen(), mw_openim()
 real	clgetr()
 errchk	ish_ishiftxy, ish_gshiftxy, mw_openim, mw_saveim, mw_shift
@@ -41,6 +42,7 @@ begin
 	call salloc (image2, SZ_LINE, TY_CHAR)
 	call salloc (imtemp, SZ_LINE, TY_CHAR)
 	call salloc (sfile, SZ_FNAME, TY_CHAR)
+	call salloc (interpstr, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get task parameters.
@@ -49,8 +51,9 @@ begin
 	call clgstr ("shifts_file", Memc[sfile], SZ_FNAME)
 
 	# Get the 2-D interpolation parameters.
-	interp_type = clgwrd ("interp_type", Memc[str], SZ_LINE,
-	    ",nearest,linear,poly3,poly5,spline3,")
+	call clgstr ("interp_type", Memc[interpstr], SZ_FNAME)
+	interp_type = strdic (Memc[interpstr], Memc[str], SZ_LINE,
+	    II_BFUNCTIONS)
 	boundary_type = clgwrd ("boundary_type", Memc[str], SZ_LINE,
 	    ",constant,nearest,reflect,wrap,")
 	if (boundary_type == BT_CONSTANT)
@@ -105,16 +108,16 @@ begin
 
 	    iferr {
 		# Perform the shift.
-		if (interp_type == II_NEAREST) {
+		if (interp_type == II_BINEAREST) {
 		    call ish_ishiftxy (im1, im2, nint(xshift), nint(yshift),
-		        interp_type, boundary_type, constant)
+		        boundary_type, constant)
 		} else if (fp_equalr (xshift, real(ixshift)) &&
 		    fp_equalr (yshift, real(iyshift))) {
-		    call ish_ishiftxy (im1, im2, ixshift, iyshift, interp_type,
-			boundary_type, constant)
+		    call ish_ishiftxy (im1, im2, ixshift, iyshift,
+		        boundary_type, constant)
 		} else {
-		    call ish_gshiftxy (im1, im2, xshift, yshift, interp_type,
-			boundary_type, constant)
+		    call ish_gshiftxy (im1, im2, xshift, yshift,
+		        Memc[interpstr], boundary_type, constant)
 		}
 
 		# Update the image WCS to reflect the shift.
@@ -155,14 +158,13 @@ end
 
 # ISH_ISHIFTXY -- Shift a 2-D image by integral pixels in x and y.
 
-procedure ish_ishiftxy (im1, im2, ixshift, iyshift, interp_type, boundary_type,
+procedure ish_ishiftxy (im1, im2, ixshift, iyshift, boundary_type,
 	constant)
 
 pointer	im1		#I pointer to the input image
 pointer	im2		#I pointer to the output image
 int	ixshift		#I shift in x and y
 int	iyshift		#I
-int	interp_type	#I type of interpolant
 int	boundary_type	#I type of boundary extension
 real	constant	#I constant for boundary extension
 
@@ -283,27 +285,28 @@ end
 # precision real, so precision is lost if the data is of type double,
 # and the imaginary component is lost if the data is of type complex.
 
-procedure ish_gshiftxy (im1, im2, xshift, yshift, interp_type, boundary_type,
+procedure ish_gshiftxy (im1, im2, xshift, yshift, interpstr, boundary_type,
 	constant)
 
 pointer	im1		#I pointer to input image
 pointer	im2		#I pointer to output image
 real	xshift		#I shift in x direction
 real	yshift		#I shift in y direction
-int	interp_type	#I type of interpolant
+char	interpstr[ARB]	#I type of interpolant
 int	boundary_type	#I type of boundary extension
 real	constant	#I value of constant for boundary extension
 
-int	lout1, lout2, nyout, nxymargin
+int	lout1, lout2, nyout, nxymargin, interp_type, nsinc, nincr
 int	cin1, cin2, nxin, lin1, lin2, nyin, i
 int	ncols, nlines, nbpix, fstline, lstline
 real	xshft, yshft, deltax, deltay, dx, dy, cx, ly
 pointer	sp, x, y, msi, sinbuf, soutbuf
 
 pointer	imps2r()
+int	msigeti()
 bool	fp_equalr()
-errchk	msiinit, msifree, msifit, msigrid
-errchk	imgs2r, imps2r
+errchk	msisinit(), msifree(), msifit(), msigrid()
+errchk	imgs2r(), imps2r()
 
 begin
 	ncols = IM_LEN(im1,1)
@@ -324,9 +327,41 @@ begin
 	    yshft = yshift
 	}
 
+	# Allocate temporary space.
+	call smark (sp)
+	call salloc (x, 2 * ncols, TY_REAL)
+	call salloc (y, 2 * nlines, TY_REAL)
+	sinbuf = NULL
+
+	# Define the x and y shifts for the interpolation.
+	dx = abs (xshft - int (xshft))
+	if (fp_equalr (dx, 0.0))
+	    deltax = 0.0
+	else if (xshft > 0.)
+	    deltax = 1. - dx
+	else
+	    deltax = dx
+	dy = abs (yshft - int (yshft))
+	if (fp_equalr (dy, 0.0))
+	    deltay = 0.0
+	else if (yshft > 0.)
+	    deltay = 1. - dy
+	else
+	    deltay = dy
+
+	# Initialize the 2-D interpolation routines.
+	call msitype (interpstr, interp_type, nsinc, nincr, cx)
+	if (interp_type == II_BILSINC || interp_type == II_BISINC )
+	    call msisinit (msi, II_BILSINC, nsinc, 1, 1,
+	        deltax - nint (deltax), deltay - nint (deltay), 0.0)
+	else
+	    call msisinit (msi, interp_type, nsinc, nincr, nincr, cx, cx, 0.0)
+
 	# Set boundary extension parameters.
-	if (interp_type == II_SPLINE3)
+	if (interp_type == II_BISPLINE3)
 	    nxymargin = NMARGIN_SPLINE3
+	else if (interp_type == II_BISINC || interp_type == II_BILSINC)
+	    nxymargin = msigeti (msi, II_MSINSINC) 
 	else
 	    nxymargin = NMARGIN
 	nbpix = max (int (abs(xshft)+1.0), int (abs(yshft)+1.0)) + nxymargin
@@ -335,37 +370,29 @@ begin
 	if (boundary_type == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
-	# Allocate temporary space.
-	call smark (sp)
-	call salloc (x, ncols, TY_REAL)
-	call salloc (y, nlines, TY_REAL)
-	sinbuf = NULL
-
-	# Initialize the 2-D interpolation routines.
-	call msiinit (msi, interp_type)
-
-	# Define the x interpolation coordinates.
-	dx = abs (xshft - int (xshft))
-	if (fp_equalr (dx, 0.0))
-	    deltax = nxymargin
-	else if (xshft > 0.)
-	    deltax = 1. - dx + nxymargin
-	else
-	    deltax = dx + nxymargin
-
-	do i = 1, ncols
-	    Memr[x+i-1] = i + deltax
+	# Define the x interpolation coordinates
+	deltax = deltax + nxymargin
+	if (interp_type == II_BIDRIZZLE) {
+	    do i = 1, ncols {
+	        Memr[x+2*i-2] = i + deltax - 0.5
+	        Memr[x+2*i-1] = i + deltax + 0.5
+	    }
+	} else {
+	    do i = 1, ncols
+	        Memr[x+i-1] = i + deltax
+	}
 
 	# Define the y interpolation coordinates.
-	dy = abs (yshft - int (yshft))
-	if (fp_equalr (dy, 0.0))
-	    deltay = nxymargin
-	else if (yshft > 0.)
-	    deltay = 1. - dy + nxymargin
-	else
-	    deltay = dy + nxymargin
-	do i = 1, NYOUT
-	    Memr[y+i-1] = i + deltay
+	deltay = deltay + nxymargin
+	if (interp_type == II_BIDRIZZLE) {
+	    do i = 1, NYOUT {
+	        Memr[y+2*i-2] = i + deltay - 0.5
+	        Memr[y+2*i-1] = i + deltay + 0.5
+	    }
+	} else {
+	    do i = 1, NYOUT
+	        Memr[y+i-1] = i + deltay
+	}
 
 	# Define column ranges in the input image.
 	cx = 1. - nxymargin - xshft
@@ -385,7 +412,7 @@ begin
 
 	    # Define correspoding range of input lines.
 	    ly = lout1 - nxymargin - yshft
-	    if ((ly <= 0) && (! fp_equalr (dy, 0.0)))
+	    if ((ly <= 0.0) && (! fp_equalr (dy, 0.0)))
 	        lin1 = int (ly) - 1
 	    else
 		lin1 = int (ly)
@@ -412,6 +439,7 @@ begin
 
 	if (sinbuf != NULL)
 	    call mfree (sinbuf, TY_REAL)
+
 	call msifree (msi)
 	call sfree (sp)
 end

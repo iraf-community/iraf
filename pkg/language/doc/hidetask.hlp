@@ -4,7 +4,7 @@ NAME
 hidetask -- hide a task from the user
 .ih
 USAGE
-hidetask task [task ...]
+hidetask task,[task,...]
 .ih
 PARAMETERS
 .ls task

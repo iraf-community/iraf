@@ -1,5 +1,25 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
+longslit$transform/fcgetcoords.x
+    Added an error check for there only being one line or column measured.
+    (7/21/99, Valdes)
+
+longslit$transform/igsfit/igsfit.x
+    Added an error check for an error in the fitting.  (7/21/99, Valdes)
+
+transform/t_transform.x
+    Updated for new interpolation types.  (1/4/99, Valdes)
+
+=======
+V2.11.1
+=======
+
+transform/fcgetcoords.x
+    Add an errchk on immap.  Without this the task would give a segmentation
+    violation if for some reason it could not open the image section given
+    in the identify database.  For example if the image was not present.
+    (11/20/98, Valdes)
+
 longslit.cl
     aidpars was incorrectly defined to be aidpars.cl instead of aidpars.par.
     (11/18/97, Valdes)

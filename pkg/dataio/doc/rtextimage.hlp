@@ -70,7 +70,6 @@ crab001, crab002, crab003, etc.
 3. Read a file with a non-standard header.  The header is 5 cardimages long.
 
     cl> rcard mta[5] | rtext out=spect.1 head- nskip=5 dim=1024
-.fi
 .ih
 TIME REQUIREMENTS
 Task \fIrtextimage\fR requires about 145 cp seconds to write a 512 square

@@ -1,4 +1,4 @@
-.help epco Nov95 "Slalib Package"
+.help epco Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slEPCO (K0, K, E)

@@ -1,5 +1,14 @@
 include	<imhdr.h>
+include	<imset.h>
 include <mwset.h>
+
+define	OFFTYPES	"|none|wcs|world|physical|grid|"
+define	FILE		0
+define	NONE		1
+define	WCS		2
+define	WORLD		3
+define	PHYSICAL	4
+define	GRID		5
 
 # IC_SETOUT -- Set output image size and offsets of input images.
 
@@ -10,22 +19,25 @@ pointer	out[3]			# Output images
 int	offsets[nimages,ARB]	# Offsets
 int	nimages			# Number of images
 
-int	i, j, indim, outdim, a, b, amin, bmax, fd
+int	i, j, indim, outdim, mwdim, a, b, amin, bmax, fd, offtype
 real	val
-bool	reloff, streq()
-pointer	sp, fname, lref, wref, coord, shift, axno, axval
-pointer	mw, ct, mw_openim(), mw_sctran()
-int	open(), fscan(), nscan(), mw_stati()
-errchk	mw_openim, mw_sctran(), mw_ctrand(), open
+bool	reloff, flip, streq(), fp_equald()
+pointer	sp, str, fname
+pointer	pref, lref, wref, cd, ltm, coord, shift, axno, axval, section
+pointer	mw, ct, mw_openim(), mw_sctran(), immap()
+int	open(), fscan(), nscan(), mw_stati(), strlen(), strdic()
+errchk	mw_openim, mw_sctran, mw_ctrand, open, immap
 
 include	"icombine.com"
 define	newscan_ 10
 
 begin
 	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 	call salloc (lref, IM_MAXDIM, TY_DOUBLE)
 	call salloc (wref, IM_MAXDIM, TY_DOUBLE)
+	call salloc (cd, IM_MAXDIM*IM_MAXDIM, TY_DOUBLE)
 	call salloc (coord, IM_MAXDIM, TY_DOUBLE)
 	call salloc (shift, IM_MAXDIM, TY_REAL)
 	call salloc (axno, IM_MAXDIM, TY_INT)
@@ -45,28 +57,37 @@ begin
 		}
 	}
 
-	# Set the reference coordinates as the center of the first image.
+	# Set the reference point to that of the first image.
 	mw = mw_openim (in[1])
-	ct = mw_sctran (mw, "logical", "world", 0)
-	do i = 1, outdim
-	    Memd[lref+i-1] = nint (IM_LEN(in[1],i) / 2.)
+	mwdim = mw_stati (mw, MW_NPHYSDIM)
+	call mw_gwtermd (mw, Memd[lref], Memd[wref], Memd[cd], mwdim)
 	if (project)
 	    Memd[lref+outdim] = 1
-	call mw_ctrand (ct, Memd[lref], Memd[wref], indim)
-	call mw_ctfree (ct)
 
 	# Parse the user offset string.  If "none" then there are no offsets.
-	# If "wcs" then set the offsets based on the image WCS.
+	# If "world" or "wcs" then set the offsets based on the world WCS.
+	# If "physical" then set the offsets based on the physical WCS.
 	# If "grid" then set the offsets based on the input grid parameters.
 	# If a file scan it.
 
 	call clgstr ("offsets", Memc[fname], SZ_FNAME)
 	call sscan (Memc[fname])
 	call gargwrd (Memc[fname], SZ_FNAME)
-	if (nscan() == 0 || streq (Memc[fname], "none")) {
+	if (nscan() == 0)
+	    offtype = NONE
+	else {
+	    offtype = strdic (Memc[fname], Memc[str], SZ_FNAME, OFFTYPES)
+	    if (offtype > 0 && !streq (Memc[fname], Memc[str]))
+		offtype = 0
+	}
+	if (offtype == 0)
+	    offtype = FILE
+
+	switch (offtype) {
+	case NONE:
 	    call aclri (offsets, outdim*nimages)
 	    reloff = true
-	} else if (streq (Memc[fname], "wcs")) {
+	case WORLD, WCS:
 	    do j = 1, outdim
 		offsets[1,j] = 0
 	    if (project) {
@@ -91,7 +112,72 @@ begin
 		}
 	    }
 	    reloff = true
-	} else if (streq (Memc[fname], "grid")) {
+	case PHYSICAL:
+	    call salloc (pref, IM_MAXDIM, TY_DOUBLE)
+	    call salloc (ltm, IM_MAXDIM*IM_MAXDIM, TY_DOUBLE)
+	    call salloc (section, SZ_FNAME, TY_CHAR)
+
+	    call mw_gltermd (mw, Memd[ltm], Memd[coord], indim)
+	    do i = 2, nimages {
+		call mw_close (mw)
+		mw = mw_openim (in[i])
+		call mw_gltermd (mw, Memd[cd], Memd[coord], indim)
+		call strcpy ("[", Memc[section], SZ_FNAME)
+		flip = false
+		do j = 0, indim*indim-1, indim+1 {
+		    if (Memd[ltm+j] * Memd[cd+j] >= 0.)
+			call strcat ("*,", Memc[section], SZ_FNAME)
+		    else {
+			call strcat ("-*,", Memc[section], SZ_FNAME)
+			flip = true
+		    }
+		}
+		Memc[section+strlen(Memc[section])-1] = ']'
+		if (flip) {
+		    call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_FNAME)
+		    call strcat (Memc[section], Memc[fname], SZ_FNAME)
+		    call imunmap (in[i])
+		    in[i] = immap (Memc[fname], READ_ONLY, TY_CHAR) 
+		    call mw_close (mw)
+		    mw = mw_openim (in[i])
+		    call mw_gltermd (mw, Memd[cd], Memd[coord], indim)
+		    do j = 0, indim*indim-1
+			if (!fp_equald (Memd[ltm+j], Memd[cd+j]))
+			    call error (1,
+				"Cannot match physical coordinates")
+		}
+	    }
+
+	    call mw_close (mw)
+	    mw = mw_openim (in[1])
+	    ct = mw_sctran (mw, "logical", "physical", 0)
+	    call mw_ctrand (ct, Memd[lref], Memd[pref], indim)
+	    call mw_ctfree (ct)
+	    do j = 1, outdim
+		offsets[1,j] = 0
+	    if (project) {
+		ct = mw_sctran (mw, "physical", "logical", 0)
+		do i = 2, nimages {
+		    Memd[pref+outdim] = i
+		    call mw_ctrand (ct, Memd[pref], Memd[coord], indim)
+		    do j = 1, outdim
+			offsets[i,j] = nint (Memd[lref+j-1] - Memd[coord+j-1])
+		}
+		call mw_ctfree (ct)
+		call mw_close (mw)
+	    } else {
+		do i = 2, nimages {
+		    call mw_close (mw)
+		    mw = mw_openim (in[i])
+		    ct = mw_sctran (mw, "physical", "logical", 0)
+		    call mw_ctrand (ct, Memd[pref], Memd[coord], indim)
+		    do j = 1, outdim
+			offsets[i,j] = nint (Memd[lref+j-1] - Memd[coord+j-1])
+		    call mw_ctfree (ct)
+		}
+	    }
+	    reloff = true
+	case GRID:
 	    amin = 1
 	    do j = 1, outdim {
 		call gargi (a)
@@ -103,7 +189,7 @@ begin
 		amin = amin * a
 	    }
 	    reloff = true
-	} else {
+	case FILE:
 	    reloff = true
 	    fd = open (Memc[fname], READ_ONLY, TEXT_FILE)
 	    do i = 1, nimages {
@@ -158,16 +244,10 @@ newscan_	if (fscan (fd) == EOF)
 	    call mw_close (mw)
 	    mw = mw_openim (out[1])
 	    if (!aligned || !reloff) {
-		ct = mw_sctran (mw, "logical", "world", 0)
-		do i = 1, outdim
-		    Memd[lref+i-1] = Memd[lref+i-1] - offsets[1,i]
-		call mw_ctrand (ct, Memd[lref], Memd[coord], outdim)
-		do i = 1, outdim
-		    Memr[shift+i-1] = Memd[wref+i-1] - Memd[coord+i-1]
-		if (project)
-		    Memr[shift+outdim] = 0.
-		call mw_shift (mw, Memr[shift], 0)
-		call mw_ctfree (ct)
+		call mw_gltermd (mw, Memd[cd], Memd[lref], indim)
+		do i = 1, indim
+		    Memd[lref+i-1] = Memd[lref+i-1] + offsets[1,i]
+		call mw_sltermd (mw, Memd[cd], Memd[lref], indim)
 	    }
 	    if (project) {
 		# Apply dimensional reduction.

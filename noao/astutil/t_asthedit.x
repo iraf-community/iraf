@@ -35,7 +35,7 @@ int	imtopenp(), imtlen(), imtgetim(), immap()
 int	open(), fscan(), fstati(), nowhite(), ctowrd(), ctotok()
 int	strlen(), stridxs(), strdic()
 bool	clgetb(), streq()
-long	note(), clktime()
+long	note(), clktime(), lsttogmt()
 errchk	open, stopen, immap
 
 begin
@@ -104,7 +104,8 @@ begin
 	call sprintf (Memc[expr], sz_cmd, "\"%s\"")
 	    call pargstr (Memc[image])
 	call ah_evaluate (ast, "$I", Memc[expr], eval, verbose)
-	call brktime (clktime(0), tm)
+	pos = clktime(0)
+	call brktime (pos, tm)
 	call sprintf (Memc[expr], sz_cmd, "\"%02d/%02d/%02d\"")
 	    call pargi (TM_MDAY(tm))
 	    call pargi (TM_MONTH(tm))
@@ -115,6 +116,25 @@ begin
 	    call pargi (TM_MIN(tm))
 	    call pargi (TM_SEC(tm))
 	call ah_evaluate (ast, "$T", Memc[expr], eval, verbose)
+	call brktime (lsttogmt(pos), tm)
+	call sprintf (Memc[expr], sz_cmd, "\"%04d-%02d-%02d\"")
+	    call pargi (TM_YEAR(tm))
+	    call pargi (TM_MONTH(tm))
+	    call pargi (TM_MDAY(tm))
+	call ah_evaluate (ast, "$GMD", Memc[expr], eval, verbose)
+	call sprintf (Memc[expr], sz_cmd, "\"%02d:%02d:%02d\"")
+	    call pargi (TM_HOUR(tm))
+	    call pargi (TM_MIN(tm))
+	    call pargi (TM_SEC(tm))
+	call ah_evaluate (ast, "$GMT", Memc[expr], eval, verbose)
+	call sprintf (Memc[expr], sz_cmd, "\"%04d-%02d-%02dT%02d:%02d:%02d\"")
+	    call pargi (TM_YEAR(tm))
+	    call pargi (TM_MONTH(tm))
+	    call pargi (TM_MDAY(tm))
+	    call pargi (TM_HOUR(tm))
+	    call pargi (TM_MIN(tm))
+	    call pargi (TM_SEC(tm))
+	call ah_evaluate (ast, "$GMDT", Memc[expr], eval, verbose)
 
 	# Open the table file, get the column names, and insert
 	# fscan in commands.
@@ -253,7 +273,7 @@ begin
                 ip = ip + 1
             call strcpy (Memc[cmd+ip-1], Memc[expr], sz_cmd)
 
-            if (streq (Memc[expr], "quit"))
+            if (streq (Memc[key], "quit"))
                 break
 
 	    # Save command.
@@ -342,10 +362,10 @@ begin
 	call smark (sp)
 
         # Check conditional evaluation.
-        if (streq (expr, "endif")) {
+        if (streq (key, "endif")) {
             eval = TRUE
             return
-        } else if (streq (expr, "else")) {
+        } else if (streq (key, "else")) {
             eval = (!eval)
             return
         }

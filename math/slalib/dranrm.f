@@ -4,7 +4,7 @@
 *      D A 2 P
 *     - - - - - - -
 *
-*  Normalise angle into range 0-2 pi  (double precision)
+*  Normalize angle into range 0-2 pi  (double precision)
 *
 *  Given:
 *     ANGLE     dp      the angle in radians
@@ -12,7 +12,7 @@
 *  The result is ANGLE expressed in the range 0-2 pi (double
 *  precision).
 *
-*  P.T.Wallace   Starlink   10 December 1993
+*  P.T.Wallace   Starlink   23 November 1995
 *
 *  Copyright (C) 1995 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.

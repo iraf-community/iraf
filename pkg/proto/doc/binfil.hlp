@@ -19,6 +19,7 @@ pixels to the dynamic range of the output 16-bit signed integer,
 .le
 .ls header = no
 Prepend a short descriptive header to the output binary raster file?
+.le
 .ih
 DESCRIPTION
 BINFIL generates a simple signed 16-bit binary raster file

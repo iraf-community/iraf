@@ -24,6 +24,7 @@ libsys.a:
 	cnvdate.x	<time.h>
 	cnvtime.x	<time.h>
 	cputime.x	
+	dtmcnv.x	<time.h>
 	envgetb.x	
 	envgetd.x	<mach.h>
 	envgeti.x	<mach.h>
@@ -43,6 +44,7 @@ libsys.a:
 	gethost.x	
 	getpid.x	
 	getuid.x	
+	gmtcnv.x
 	gqsort.x	
 	intr.x		<xwhen.h>
 	itob.x	

@@ -15,7 +15,10 @@ begin
 	case II_ASITYPE:
 	    return (ASI_TYPE(asi))
 	case II_ASINSAVE:
-	    return (ASI_NCOEFF(asi) + ASI_SAVECOEFF)
+	    return (ASI_NSINC(asi) * ASI_NINCR(asi) + ASI_NCOEFF(asi) +
+	        ASI_SAVECOEFF)
+	case II_ASINSINC:
+	    return (ASI_NSINC(asi))
 	default:
 	    call error (0, "ASIGETI: Unknown ASI parameter.")
 	}

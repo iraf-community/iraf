@@ -8,19 +8,19 @@
 *  to spherical coordinates (single precision)
 *
 *  Given:
-*     V     r(6)   Cartesian position & velocity vector
+*     V      r(6)   Cartesian position & velocity vector
 *
 *  Returned:
-*     A     r      longitude (radians)
-*     B     r      latitude (radians)
-*     R     r      radial coordinate
-*     AD    r      longitude derivative (radians per unit time)
-*     BD    r      latitude derivative (radians per unit time)
-*     RD    r      radial derivative
+*     A      r      longitude (radians)
+*     B      r      latitude (radians)
+*     R      r      radial coordinate
+*     AD     r      longitude derivative (radians per unit time)
+*     BD     r      latitude derivative (radians per unit time)
+*     RD     r      radial derivative
 *
-*  P.T.Wallace   Starlink   June 1989
+*  P.T.Wallace   Starlink   28 April 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -32,7 +32,7 @@
 
 
 
-*  Components of vector
+*  Components of position/velocity vector
       X=V(1)
       Y=V(2)
       Z=V(3)
@@ -40,23 +40,44 @@
       YD=V(5)
       ZD=V(6)
 
-*  Component of R in XY plane squared (with crude precaution
-*   against polar problems and daft units)
-      RXY2=MAX(X*X+Y*Y,(XD*XD+YD*YD+ZD*ZD)/1E30)
+*  Component of R in XY plane squared
+      RXY2=X*X+Y*Y
 
-*  Other useful functions
-      RXY=SQRT(RXY2)
+*  Modulus squared
       R2=RXY2+Z*Z
+
+*  Protection against null vector
+      IF (R2.EQ.0.0) THEN
+         X=XD
+         Y=YD
+         Z=ZD
+         RXY2=X*X+Y*Y
+         R2=RXY2+Z*Z
+      END IF
+
+*  Position and velocity in spherical coordinates
+      RXY=SQRT(RXY2)
       XYP=X*XD+Y*YD
-
-*  Position in spherical coordinates
-      A=ATAN2(Y,X)
-      B=ATAN2(Z,RXY)
+      IF (RXY2.NE.0.0) THEN
+         A=ATAN2(Y,X)
+         B=ATAN2(Z,RXY)
+         AD=(X*YD-Y*XD)/RXY2
+         BD=(ZD*RXY2-Z*XYP)/(R2*RXY)
+      ELSE
+         A=0.0
+         IF (Z.NE.0.0) THEN
+            B=ATAN2(Z,RXY)
+         ELSE
+            B=0.0
+         END IF
+         AD=0.0
+         BD=0.0
+      END IF
       R=SQRT(R2)
-
-*  Velocity in spherical coordinates
-      AD=(X*YD-Y*XD)/RXY2
-      BD=(ZD*RXY2-Z*XYP)/(R2*RXY)
-      RD=(XYP+Z*ZD)/R
+      IF (R.NE.0.0) THEN
+         RD=(XYP+Z*ZD)/R
+      ELSE
+         RD=0.0
+      END IF
 
       END

@@ -40,11 +40,11 @@ define	GF_WSACTIVE	4		# workstation is activated
 # attributes and the GLABAX parameters for the X and Y axes are stored
 # in the descriptor as substructures.
 
-define	LEN_GDES	452
+define	LEN_GDES	552
 define	LEN_WCS		11
 define	LEN_WCSARRAY	(LEN_WCS*MAX_WCS)
 define	SZ_DEVNAME	29
-define	SZ_UIFNAME	99
+define	SZ_UIFNAME	199
 define	SZ_TICKFORMAT	9
 
 define	GP_FD		Memi[$1]		# graphics stream
@@ -75,9 +75,9 @@ define	GP_XAP		($1+65)			# glabax parameters for X axis
 define	GP_YAP		($1+100)		# glabax parameters for Y axis
 define	GP_DEVNAME	Memc[P2C($1+135)]	# gopen device name
 define	GP_UIFNAME	Memc[P2C($1+165)]	# UI file name
-define	GP_WCSPTR	(($2)*LEN_WCS+$1+265)	# pointer to WCS substructure
-			# (265:451 wcs storage, 17*11=187 units)
-			# (next=452)
+define	GP_WCSPTR	(($2)*LEN_WCS+$1+365)	# pointer to WCS substructure
+			# (365:551 wcs storage, 17*11=187 units)
+			# (next=552)
 
 # Substructure definitions.
 

@@ -12,7 +12,7 @@ procedure ic_log (in, out, ncombine, exptime, sname, zname, wname,
 	dozero, nout, expname, exposure)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output images
+pointer	out[4]			# Output images
 int	ncombine[nimages]	# Number of previous combined images
 real	exptime[nimages]	# Exposure times
 char	sname[ARB]		# Scale name
@@ -123,9 +123,9 @@ begin
 		call pargr (lsigma)
 		call pargr (hsigma)
 	}
-	if (reject != NONE && grow > 0) {
-	    call fprintf (logfd, "  grow = %d\n")
-		call pargi (grow)
+	if (reject != NONE && grow >= 1.) {
+	    call fprintf (logfd, "  grow = %g\n")
+		call pargr (grow)
 	}
 	if (dothresh) {
 	    if (lthresh > -MAX_REAL && hthresh < MAX_REAL) {
@@ -360,6 +360,12 @@ begin
 		call pargr (exposure)
 	}
 	call fprintf (logfd, "\n")
+
+	if (out[4] != NULL) {
+	    call imstats (out[4], IM_IMAGENAME, Memc[fname], SZ_LINE)
+	    call fprintf (logfd, "  Rejection mask = %s\n")
+		call pargstr (Memc[fname])
+	}
 
 	if (out[2] != NULL) {
 	    call imstats (out[2], IM_IMAGENAME, Memc[fname], SZ_LINE)

@@ -25,7 +25,7 @@ int	nchars			# nchars to reserve at end of buffer
 
 pointer	tr, bufp, top, segp
 int	blen, nwords, ip_offset, op_offset
-errchk	syserr
+errchk	syserr, realloc
 include	"gtr.com"
 
 begin

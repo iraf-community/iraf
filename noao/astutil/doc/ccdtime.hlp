@@ -1,4 +1,4 @@
-.help ccdtime Aug93 noao.astutil
+.help ccdtime Aug98 noao.astutil
 .ih
 NAME
 ccdtime -- compute time, magnitude, and signal-to-noise for CCDs
@@ -56,7 +56,8 @@ Airmass for observation.
 .le
 .ls phase = 0.
 Moon phase in days (0-28) for the estimation of sky brightness.  A
-phase of zero is new moon or dark sky conditions.
+phase of zero is new moon or dark sky conditions and a phase of 14
+is full moon.
 .le
 
 .ls f1 = "U", f2 = "B", f3 = "V", f4 = "R", f5 = "I"
@@ -99,6 +100,24 @@ separated by whitespace.  An entry begins with one of the keywords
 "telescope", "detector", or "filter" and ends with the beginning of
 a new entry or the "end" separator.
 
+A keyword is one of the words shown in the example below.  These keywords
+can also be indexed by the name of a telescope, filter, and/or detector
+entry.  This allows having different transmissions in different filters
+due to correctors, different scales for different detectors which may
+have fore-optics, etc.
+
+Specifically a keyword in the telescope section may have arguments
+from the filter or detector entries, a keyword in the filter section may
+have arguments from the telescope and detector entries, and a keyword
+in the detector section may have arguments from the telescope and filter
+entries.  The formats are keyword, keyword(arg), and keyword(arg,arg).
+The arg fields must match an entry name exactly (without the quotes)
+and there can be no whitespace between the keyword and (, between (
+and the argument, between the arguments and the comma, and between the
+last argument and the closing ).  The software will first look for
+keywords with both arguments in either order, then for keywords with
+one argument, and then for keywords with no arguments.
+
 Below is an example of each type of entry:
 
 .nf
@@ -106,10 +125,13 @@ Below is an example of each type of entry:
 	    aperture = 0.91
 	    scale = 30.2
 	    transmission = 1.0
+	    transmission(U) = 0.8
+	    transmission(U,T1KA) = 0.7
 
     filter = "U"
 	    mag = 20
 	    star = 18.0
+	    extinction = 0.2
 	    sky0 = 22.0
 	    sky1 = -0.2666
 	    sky2 = -.00760
@@ -125,6 +147,10 @@ Below is an example of each type of entry:
 	    I = 0.60
 .fi
 
+In the example, a transmission of 0.7 will be used if the filter is U
+and the detector is T1KA, a value of 0.8 if the filter is U and the
+detector is not T1KA, and a value of 1 for all other cases.
+
 The telescope entry contains the aperture diameter in meters, the
 scale in arcsec/mm, and a transmission factor.  The transmission factor is
 mostly a fudge factor but may be useful if a telescope has various
@@ -132,11 +158,15 @@ configurations with additional mirrors and optics.
 
 The filter entry contains a fiducial magnitude and the total photon count
 rate for a star of that magnitude.  The units are photons per second
-per square meter of aperture.  The sky is defined by a quadratic
+per square meter of aperture.  An effective extinction in magnitudes/airmass is
+given here.  The sky is defined by a quadratic
 function of lunar phase in days:
 
 .nf
-	sky = sky0 + sky1 * phase + sky2 * phase**2
+	if (phase < 14)
+	    sky = sky0 + sky1 * phase + sky2 * phase**2
+	else
+	    sky = sky0 + sky1 * (14 - phase) + sky2 * (14 - phase)**2
 .fi
 
 One may set the higher order terms to zero if the moon contribution
@@ -156,15 +186,15 @@ star count rates for the specified telescope/detector/filter are:
 
 .nf
 	r(star) = star * aperture**2 * transmission *
-	    10**(0.4*(1-airmass) * dqe
+	    10**(0.4*(1-airmass)*extinction) * dqe
 .fi
 
-where the "star", "aperture", "transmission" are those in the database
-and the "dqe" is the appropriate filter value.  The sky rate per
-pixel is:
+where the "star", "aperture", "transmission", "extinction", are those
+in the database and the "dqe" is the appropriate filter value.  The sky
+rate per pixel is:
 
 .nf
-	r(sky) = r(star) * 10 ** (0.4 * (mag - sky * pixel**2))
+	r(sky) = r(star) * 10 ** (0.4 * (mag - sky)) * pixel**2
 	pixel = pixsize * scale * sum
 .fi
 
@@ -180,8 +210,9 @@ The number of pixels per star is computed from the seeing as:
 	npix = 1.4 * (seeing / pixel) ** 2
 .fi
 
-This number is a compromise between a large aperture for high SNR
-stars and a smaller aperture for fainter stars.  
+where the number is rounded up to the next integer and a minimum of 9
+pixels is enforced.  This number is a compromise between a large aperture
+for high SNR stars and a smaller aperture for fainter stars.
 
 The number of star photons/electrons per star of magnitude m,
 the number of sky photons per pixel, and the number of dark current
@@ -297,4 +328,19 @@ mode.  In the following example we want to change the magnitude.
     cl> ccdtime 22
     ...
 .fi
+.ih
+REVISIONS
+.ls CCDTIME V2.11.2
+The incorrect usage of a 1 mag/airmass extinction was fixed by adding an
+expected "extinction" entry in the filter entries.  Note that old files
+will still give the same result by using an extinction of 1 if the keyword
+is not found.
+
+The database keywords can not be indexed by telescope, filter, and/or
+detector.
+
+The number of pixels per aperture now has a minimum of 9 pixels.
+.le
+.ih
+SEE ALSO
 .endhelp

@@ -1,4 +1,4 @@
-.help dtt Nov95 "Slalib Package"
+.help dtt Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slDTT (UTC)

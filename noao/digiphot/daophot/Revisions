@@ -1,5 +1,144 @@
 .help revisions Jan90 noao.digiphot.daophot
 .nf
+daophot/mkpkg
+    Modified the mkpkg scripts in order to support important command line 
+    compile and relink flags.
+
+    Davis, June 17, 1999
+
+daophot/daolib/dpotime.x
+    Modified the code which reads the time of observation value from the image
+    header to extract the time field from the date-obs keyword if it is
+    present.
+
+    Davis, May 11, 1999
+
+daophot/daolib/dpdate.x
+    Modified the date and time photometry file keyword encoding tasks to
+    write the date and time in the proper fits format and in units of GMT.
+    Note that GMT is deactivated in digiphotx because the necessary routine
+    is not yet in the system.
+
+    Davis, May 11, 1999
+
+
+daophot/psf/dppwrtgrp.x
+    The row number in the psf star group file writing code was not being
+    correctly initialized results in an "invalid row number error" if
+    the psf task was run with daophot.text = no.
+    
+    Davis May 10, 1999
+
+daophot/psf/dpgetapert.x
+daophot/allstar/dpalwrite.x
+daophot/group/dpwrtgroup.x
+daophot/doc/daopars.hlp
+    Removed the restriction on the number of stars imposed by the maxnstars
+    parameter and in the process fixed a segmentation violation that occurred
+    when the number for stars in the files was > maxnstars. Maxnstars is
+    now used only for setting the initial buffer size.
+
+    Removed the code which writes MAXNSTARS to the output photometry files.
+
+    Davis May 8, 1999
+
+
+daophot/psf/t_pstselect.x
+    Added a missing imtclose statement.
+
+    Davis, May 4, 1999
+
+
+daophot/psf/dpfitpsf.x
+    Changed the test for the radial weighting function from wt >= 1.0 to
+    wt >= 0.999998 to avoid floating point errors (division by a very small
+    number) under Linux and possibly other systems as well.
+
+    Davis, April 19, 1999
+
+
+daophot/peak/dppkfit.x
+daophot/nstar/dpnstarfit.x
+daophot/allstar/dpalphot.x
+    Added a check to make sure that the predicted error computation can
+    never be <= 0.0, thus causing a floating point exception error. This
+    condition can occur, if the model prediction is exactly <= 0, the
+    readout noise is 0.0, and proferr is 0.0. The workaround is to make sure
+    the readout noise > 0.0.
+    
+    Davis, April 12, 1999
+
+
+daophot/daolib/dpnames.x
+    Modified the automatic input and output image and file naming code
+    to behave more gracefully in the case where the input images have
+    kernel sections and cluster indices and sizes.
+
+    Davis, January 17, 1999
+
+daophot/daolib/dpdate.x
+daophot/addstar/dpnaddstar.x
+daophot/addstar/dpalwrite.x
+daophot/group/dpwrtgroup.x
+daophot/nstar/dpntwrite.x
+daophot/peak/dppkwrite.x
+daophot/psf/dppwrtgrp.x
+    Modified the daophot output file writing routines to write the DATE
+    header keyword in the new Y2k format even though the output files
+    are not FITS files.
+
+    Davis, Dec 29, 1998
+
+daophot/allstar/t_allstar.x
+daophot/allstar/dpcache.x
+daophot/allstar/dpalinit.x
+    Modified the allstar task to ensure that all the output and scratch
+    images and scratch space are 2D even if the input image is greater than
+    2D to avoid a non-obvious memory error. 
+
+    Davis, Aug 3, 1998
+
+daophot/daophot.cl
+    Modified the package cl script to check whether the tables package is
+    already loaded before checking whether it is defined and loading it.
+
+    Davis, Aug 1, 1998
+
+daophot/psf/t_psf.x
+    The psf task psf image list reading code was using the fntgfnb routine
+    instead of the imtgetim routine to read image names from the psf image list.
+    Although the code functioned correctly, if the input psf image list was
+    an @ file, a control character (^P) was being written into the PSFIMAGE
+    keyword value in the output *.psg.* and *.pst.* files. This caused an error
+    in the nstar, allstar, etc task photometry file reading code. 
+
+    Davis, Apr 1, 1998
+
+
+daophot/addstar/t_addstar.x
+daophot/allstar/t_allstar.x
+daophot/group/t_group.x
+daophot/nstar/t_nstar.x
+daophot/nstar/t_peak.x
+daophot/psf/t_pstselect.x
+daophot/psf/t_psf.x
+daophot/substar/t_substar.x
+    Modified the addstar, allstar, group, nstar, peak, pstselect, psf,
+    and substar tasks to be able to read and write default images and files 
+    from and to directories other than the current directory just as the
+    daophot tasks daofind and phot do.
+
+    Davis, Feb 14, 1998
+
+
+daophot/seepsf/t_seepsf.x
+daophot/seepsf/dpmkimage.x
+    Modified the seepsf task so it explicity sets the pixel type of the
+    output psf image to real to avoid a problem with stf image kernel
+    and dataless stf images.
+
+    Davis, Jan 20, 1998
+
 daophot/allstar/dpalinit.x
     Fixed an uninitialized memory problem that was occurring on the Dec
     ALPHA if cache=no and readnoise=0.0. This part of memory was never

@@ -270,8 +270,8 @@ begin
 		if (imaccess (Memc[cmd], READ_ONLY) == YES)
 		    call imdelete (Memc[cmd])
 		call imunmap (EP_IM(ep))
-	        call ep_imcopy (EPIXBUF, Memc[cmd])
-		EP_IM(ep) = immap (EPIXBUF, READ_WRITE, 0)
+	        call ep_imcopy (EP_WORK(ep), Memc[cmd])
+		EP_IM(ep) = immap (EP_WORK(ep), READ_WRITE, 0)
 	    }
 	case XORDER:
 	    call gargi (ival)

@@ -22,6 +22,7 @@ int	npts		# Number of points
 pointer	sp, xr, yr, sz
 int	orig_mark, i, xaxis, yaxis, mark, added_mark
 real	size, dx, dy, szmk
+int	gt_geti()
 bool	fp_equald()
 include	"hdic.com"
 
@@ -74,7 +75,7 @@ begin
 
 	do i = 1, npts {
 	    size = Memr[sz+i-1]		# Sizes are WCS units; transform them
-	    if (GT_TRANSPOSE(gt) == NO) {
+	    if (gt_geti (gt, GTTRANSPOSE) == NO) {
 	        size = size / dx
 		mark = orig_mark
 		szmk = size

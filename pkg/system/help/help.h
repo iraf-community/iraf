@@ -52,7 +52,8 @@ define	O_ALLDOC	4		# print all documentation (!source)
 define	O_FILES		5		# print file names
 define	O_DIR		6		# print directory of help blocks
 define	O_SUMMARY	7		# summarize contents of help file
-define	MAX_OPTIONS	7
+define	O_REFERENCES	8		# keyword search output format
+define	MAX_OPTIONS	8
 
 define	O_PARAM		7		# output text for single parameter
 define	O_SECTION	8		# output text for single section

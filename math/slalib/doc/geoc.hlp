@@ -1,4 +1,4 @@
-.help geoc Nov95 "Slalib Package"
+.help geoc Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slGEOC (P, H, R, Z)

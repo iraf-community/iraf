@@ -933,7 +933,6 @@ begin
 	} else
 	    call gswind (gp, INDEF, INDEF, y1, y2)
 
-	# Save window for next time in case rescale is disabled.
 	call ggwind (gp, x1, x2, y1, y2)
 
 	# If the image is two dimensional plot the position within the image
@@ -951,6 +950,7 @@ begin
 	    call glabax (gp, Memc[plot_title], xlabel, "")
 
 	    # Draw right axis (pixel scale)
+	    call ggwind (gp, x1, x2, y1, y2)
 	    call gswind (gp, 1., real (nx), 1., real (ny))
 	    call gseti (gp, G_XDRAWAXES, 0)
 	    call gseti (gp, G_YDRAWAXES, 2)
@@ -960,8 +960,10 @@ begin
 	    # Mark position on Y axis.
 	    if (abs(y) > .001)
 		call imp_markpos (gp, nint(y), ny)
-	} else
+	} else {
 	    call glabax (gp, Memc[plot_title], xlabel, "")
+	    call ggwind (gp, x1, x2, y1, y2)
+	}
 
 	# Draw data vector.
 	call gpline (gp, xv, yv, nx)

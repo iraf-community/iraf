@@ -26,9 +26,9 @@
 *  Reference:
 *     Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
 *
-*  P.T.Wallace   Starlink   November 1988
+*  P.T.Wallace   Starlink   21 September 1998
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1998 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -50,8 +50,8 @@
 *  P,Q,R are degrees
 *
 *  Equatorial to galactic rotation matrix (J2000.0), obtained by
-*  applying the standard FK4 to FK5 transformation, for inertially
-*  zero proper motion, to the columns of the B1950 equatorial to
+*  applying the standard FK4 to FK5 transformation, for zero proper
+*  motion in FK5, to the columns of the B1950 equatorial to
 *  galactic rotation matrix:
 *
       DOUBLE PRECISION RMAT(3,3)

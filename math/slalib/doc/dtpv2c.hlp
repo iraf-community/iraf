@@ -1,4 +1,4 @@
-.help dtpv2c Nov95 "Slalib Package"
+.help dtpv2c Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDPVC (XI, ETA, V, V01, V02, N)

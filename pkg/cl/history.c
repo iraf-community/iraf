@@ -38,7 +38,7 @@ extern	int cldebug;
 
 #define	EOS		'\0'
 #define	NOCLOSURE	">>"	/* parser needs more input (pprompt)	*/
-#define	MAX_SHOWHIST	100	/* maximum history cmds to show		*/
+#define	MAX_SHOWHIST	800	/* maximum history cmds to show		*/
 
 /* History, command block, yy_getc, logfile database.
  */
@@ -303,6 +303,7 @@ input_:
 	    ;
 	if (*ip == EOS) {
 	    cmdblk_line = 0;
+	    execute = 1;
 	    goto input_;
 	}
 

@@ -5,7 +5,7 @@
 *     - - - - - -
 *
 *  Convert B1950.0 FK4 star data to J2000.0 FK5 assuming zero
-*  proper motion in an inertial frame (double precision)
+*  proper motion in the FK5 frame (double precision)
 *
 *  This routine converts stars from the old, Bessel-Newcomb, FK4
 *  system to the new, IAU 1976, FK5, Fricke system, in such a
@@ -34,7 +34,7 @@
 *      2000.0 only is provided for.  Conversions involving other
 *      epochs will require use of the appropriate precession,
 *      proper motion, and E-terms routines before and/or
-*      after FK425 is called.
+*      after FK45Z is called.
 *
 *  3)  In the FK4 catalogue the proper motions of stars within
 *      10 degrees of the poles do not embody the differential
@@ -71,9 +71,9 @@
 *
 *  Called:  slDS2C, slEPJ, slEB2D, slDC2S, slDA2P
 *
-*  P.T.Wallace   Starlink   24 December 1992
+*  P.T.Wallace   Starlink   21 September 1998
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1998 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

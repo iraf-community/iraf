@@ -707,6 +707,50 @@ define	EV_TIME		Memd[($1+4-1)/SZ_DOUBLE+1]
 define	EV_DX		Mems[$1+8]
 define	EV_DY		Mems[$1+9]
 
+# Define an event structure with short coordinates
+define	S_FIELDLIST	"{s:x,s:y,s,s,d,s,s}"
+define	S_SZ_EVENT	10
+define	S_EV_X		Mems[$1]
+define	S_EV_Y		Mems[$1+1]
+define	S_EV_PHA	Mems[$1+2]
+define	S_EV_PI		Mems[$1+3]
+define	S_EV_TIME	Memd[($1+4-1)/SZ_DOUBLE+1]
+define	S_EV_DX		Mems[$1+8]
+define	S_EV_DY		Mems[$1+9]
+
+# Define an event structure with integer coordinates
+define	I_FIELDLIST	"{d,i:x,i:y,i,i,s,s}"
+define	I_SZ_EVENT	14
+define	I_EV_TIME	Memd[($1-1)/SZ_DOUBLE+1]
+define	I_EV_X		Memi[($1+4-1)/SZ_INT+1]
+define	I_EV_Y		Memi[($1+6-1)/SZ_INT+1]
+define	I_EV_DX		Memi[($1+8-1)/SZ_INT+1]
+define	I_EV_DY		Memi[($1+10-1)/SZ_INT+1]
+define	I_EV_PHA	Mems[$1+12]
+define	I_EV_PI		Mems[$1+13]
+
+# Define an event structure with real coordinates
+define	R_FIELDLIST	"{d,r:x,r:y,r,r,s,s}"
+define	R_SZ_EVENT	14
+define	R_EV_TIME	Memd[($1-1)/SZ_DOUBLE+1]
+define	R_EV_X		Memr[($1+4-1)/SZ_REAL+1]
+define	R_EV_Y		Memr[($1+6-1)/SZ_REAL+1]
+define	R_EV_DX		Memr[($1+8-1)/SZ_REAL+1]
+define	R_EV_DY		Memr[($1+10-1)/SZ_REAL+1]
+define	R_EV_PHA	Mems[$1+12]
+define	R_EV_PI		Mems[$1+13]
+
+# Define an event structure with double coordinates
+define	D_FIELDLIST	"{d,d:x,d:y,d,d,s,s}"
+define	D_SZ_EVENT	22
+define	D_EV_TIME	Memd[($1-1)/SZ_DOUBLE+1]
+define	D_EV_X		Memd[($1+4-1)/SZ_DOUBLE+1]
+define	D_EV_Y		Memd[($1+8-1)/SZ_DOUBLE+1]
+define	D_EV_DX		Memd[($1+12-1)/SZ_DOUBLE+1]
+define	D_EV_DY		Memd[($1+16-1)/SZ_DOUBLE+1]
+define	D_EV_PHA	Mems[$1+20]
+define	D_EV_PI		Mems[$1+21]
+
 
 # MKPOE -- Write out a new POEFILE, taking a CFA POE file as input.
 # The input file uses big-endian format for integers, and IEEE for floats.
@@ -953,14 +997,12 @@ procedure t_testpoe()
 char	outfile[SZ_FNAME]		# output QPOE-format poefile
 
 pointer	sp, ev, qp, io, evl[1]
-int	nevents, naxes, axlen[2], i
+int	nevents, naxes, axlen[2], i, datatype
 pointer	qp_open(), qpio_open()
 int	clgeti()
+char	clgetc()
 
 begin
-	call smark (sp)
-	call salloc (ev, SZ_EVENT / SZ_SHORT, TY_SHORT)
-
 	# Open the output file.
 	call clgstr ("outfile", outfile, SZ_FNAME)
 	iferr (call qp_delete (outfile))
@@ -970,6 +1012,7 @@ begin
 	naxes = 2
 	axlen[1] = clgeti ("ncols")
 	axlen[2] = clgeti ("nlines")
+	datatype = clgetc ("datatype")
 
 	# Setup the QPOE file header.
 	call qp_addf (qp, "naxes", "i", 1, "number of image axes", 0)
@@ -978,7 +1021,22 @@ begin
 	call qp_write (qp, "axlen", axlen, 2, 1, "i")
 
 	# Define the event structure for the QPOE output file.
-	call qp_addf (qp, EVTYPE, FIELDLIST, 1, "event record type", 0)
+	call smark (sp)
+	switch (datatype) {
+	case 's':
+	    call salloc (ev, S_SZ_EVENT / SZ_SHORT, TY_SHORT)
+	    call qp_addf (qp, EVTYPE, S_FIELDLIST, 1, "event record type", 0)
+	case 'i':
+	    call salloc (ev, I_SZ_EVENT / SZ_SHORT, TY_SHORT)
+	    call qp_addf (qp, EVTYPE, I_FIELDLIST, 1, "event record type", 0)
+	case 'r':
+	    call salloc (ev, R_SZ_EVENT / SZ_SHORT, TY_SHORT)
+	    call qp_addf (qp, EVTYPE, R_FIELDLIST, 1, "event record type", 0)
+	case 'd':
+	    call salloc (ev, D_SZ_EVENT / SZ_SHORT, TY_SHORT)
+	    call qp_addf (qp, EVTYPE, D_FIELDLIST, 1, "event record type", 0)
+	}
+
 
 	# Copy the event (photon) list.
 	call qp_addf (qp, "events", "event", 0, "main event list", 0)
@@ -990,18 +1048,65 @@ begin
 
 	# Hack this to generate different types of test files.
 	do i = 1, nevents {
-	    EV_TIME(ev) = 1.0D0 + double(i) / 10.0D0
-	    if (mod(i,2) == 0) {
-		EV_X(ev) = (i - 1) * 10 + 1
-		EV_Y(ev) = (i - 1) * 10 + 1
-	    } else {
-		EV_X(ev) = axlen[1] - ((i - 1) * 10 + 1)
-		EV_Y(ev) = axlen[2] - ((i - 1) * 10 + 1)
+	    switch (datatype) {
+
+	    case 's':
+	        S_EV_TIME(ev) = 1.0D0 + double(i) / 10.0D0
+	        if (mod(i,2) == 0) {
+		    S_EV_X(ev) = (i - 1) * 10 + 1
+		    S_EV_Y(ev) = (i - 1) * 10 + 1
+	        } else {
+		    S_EV_X(ev) = axlen[1] - ((i - 1) * 10 + 1)
+		    S_EV_Y(ev) = axlen[2] - ((i - 1) * 10 + 1)
+	        }
+	        S_EV_PHA(ev)  = mod (nint(i * 11.1111), 20)
+	        S_EV_PI(ev)   = i / 2
+	        S_EV_DX(ev)   = nevents - i + 1
+	        S_EV_DY(ev)   = nevents - i + 1
+
+	    case 'i':
+	        I_EV_TIME(ev) = 1.0D0 + double(i) / 10.0D0
+	        if (mod(i,2) == 0) {
+		    I_EV_X(ev) = (i - 1) * 10 + 1
+		    I_EV_Y(ev) = (i - 1) * 10 + 1
+	        } else {
+		    I_EV_X(ev) = axlen[1] - ((i - 1) * 10 + 1)
+		    I_EV_Y(ev) = axlen[2] - ((i - 1) * 10 + 1)
+	        }
+	        I_EV_PHA(ev)  = mod (nint(i * 11.1111), 20)
+	        I_EV_PI(ev)   = i / 2
+	        I_EV_DX(ev)   = nevents - i + 1
+	        I_EV_DY(ev)   = nevents - i + 1
+
+	    case 'r':
+	        R_EV_TIME(ev) = 1.0D0 + double(i) / 10.0D0
+	        if (mod(i,2) == 0) {
+		    R_EV_X(ev) = (i - 1) * 10 + 1
+		    R_EV_Y(ev) = (i - 1) * 10 + 1
+	        } else {
+		    R_EV_X(ev) = axlen[1] - ((i - 1) * 10 + 1)
+		    R_EV_Y(ev) = axlen[2] - ((i - 1) * 10 + 1)
+	        }
+	        R_EV_PHA(ev)  = mod (nint(i * 11.1111), 20)
+	        R_EV_PI(ev)   = i / 2
+	        R_EV_DX(ev)   = nevents - i + 1
+	        R_EV_DY(ev)   = nevents - i + 1
+
+	    case 'd':
+	        D_EV_TIME(ev) = 1.0D0 + double(i) / 10.0D0
+	        if (mod(i,2) == 0) {
+		    D_EV_X(ev) = (i - 1) * 10 + 1
+		    D_EV_Y(ev) = (i - 1) * 10 + 1
+	        } else {
+		    D_EV_X(ev) = axlen[1] - ((i - 1) * 10 + 1)
+		    D_EV_Y(ev) = axlen[2] - ((i - 1) * 10 + 1)
+	        }
+	        D_EV_PHA(ev)  = mod (nint(i * 11.1111), 20)
+	        D_EV_PI(ev)   = i / 2
+	        D_EV_DX(ev)   = nevents - i + 1
+	        D_EV_DY(ev)   = nevents - i + 1
+
 	    }
-	    EV_PHA(ev)  = mod (nint(i * 11.1111), 20)
-	    EV_PI(ev)   = i / 2
-	    EV_DX(ev)   = nevents - i + 1
-	    EV_DY(ev)   = nevents - i + 1
 
 	    call qpio_putevents (io, evl, 1)
 	}

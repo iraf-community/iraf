@@ -1,6 +1,6 @@
 # GEOTRAN Structure
 
-define	LEN_GEOSTRUCT	30
+define	LEN_GEOSTRUCT	(30 + SZ_FNAME)
 
 # output picture formatting parameters
 
@@ -31,9 +31,12 @@ define	GT_YROTATION		Memr[$1+18]	# scale angle
 define	GT_XSAMPLE		Memr[$1+19]	# x surface subsampling
 define	GT_YSAMPLE		Memr[$1+20]	# y surface subsampling
 define	GT_INTERPOLANT		Memi[$1+21]	# image interpolant
-define	GT_BOUNDARY		Memi[$1+22]	# boundary extension
-define	GT_CONSTANT		Memr[$1+23]	# constant boundary extension
-define	GT_FLUXCONSERVE		Memi[$1+24]	# conserve total flux
+define	GT_NSINC		Memi[$1+22]	# sinc width half-width
+define	GT_NXYMARGIN		Memi[$1+23]	# the interpolation margin
+define	GT_BOUNDARY		Memi[$1+24]	# boundary extension
+define	GT_CONSTANT		Memr[$1+25]	# constant boundary extension
+define	GT_FLUXCONSERVE		Memi[$1+26]	# conserve total flux
+define	GT_INTERPSTR		Memc[P2C($1+27)] # interpolation string
 
 # GEOTRAN MODES
 
@@ -41,3 +44,9 @@ define	GT_NONE		1		# parameters defined by user
 define	GT_LINEAR	2		# use linear transformation
 define	GT_DISTORT	3		# distortion transformation only
 define	GT_GEOMETRIC	4               # use full transformation
+
+# GEOTRAN COORDINATE MODES
+
+define	GT_ONE		1
+define	GT_TWO		2
+define	GT_FOUR		3

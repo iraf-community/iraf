@@ -1,5 +1,112 @@
 .help revisions Jun88 math
 .nf
+slalib
+	Upgraded slalib from Version 1.6.3 to Version 2.3.0. Seventeen
+	new routines were added including 4 dealing with FK5 to ICRS
+	coordinate conversions (17/6/99 LED).
+
+arbpix.x
+arider.x
+arieval.x
+asider.x
+asieval.x
+asifit.x
+asifree.x
+asigeti.x
+asigetr.x
+asigrl.x
+asiinit.x
+asirestore.x
+asisave.x
+asisinit.x
+asitype.x
+asivector.x
+ii_1dinteg.x
+ii_bieval.x
+ii_cubspl.f
+ii_eval.x
+ii_greval.x
+ii_pc1deval.x
+ii_pc2deval.x
+ii_polterp.x
+ii_sinctable.x
+ii_spline.x
+ii_spline2d.x
+im1interpdef.h
+im2interpdef.h
+mkpkg
+mrider.x
+mrieval.x
+msider.x
+msieval.x
+msifit.x
+msifree.x
+msigeti.x
+msigetr.x
+msigrid.x
+msigrl.x
+msiinit.x
+msirestore.x
+msisave.x
+msisinit.x
+msisqgrl.x
+msitype.x
+msivector.x
+	The 1D interpolation routines were replaced with new versions which
+	support look-up table since and drizzle interpolation. Minor
+	modifications were also made to the existing 1D sinc routines. The 2D
+	image interpolation routines were replaced with new versions modified
+	which support sinc, look-up table sinc and drizzle interpolation.
+	(12/28/98 Davis)
+
+iminterp.hd
+iminterp.men
+iminterp.spc
+arbpix.hlp
+arider.hlp
+arieval.hlp
+asider.hlp
+asieval.hlp
+asifit.hlp
+asifree.hlp
+asigeti.hlp
+asigetr.hlp
+asigrl.hlp
+asiinit.hlp
+asirestore.hlp
+asisave.hlp
+asisinit.hlp
+asitype.hlp
+asivector.hlp
+iminterp.hlp
+mrider.hlp
+mrieval.hlp
+msider.hlp
+msieval.hlp
+msifit.hlp
+msifree.hlp
+msigeti.hlp
+msigetr.hlp
+msigrid.hlp
+msigrl.hlp
+msiinit.hlp
+msirestore.hlp
+msisave.hlp
+msisinit.hlp
+msisqgrl.hlp
+msitype.hlp
+msivector.hlp
+	The 1D and 2D image interpolation routines help pages were updated
+	to reflect the changes in both packages. (12/28/98 Davis)
+
+math$nlfit/nlchomat.gx
+math$nlfit/nlchomatr.x
+math$nlfit/nlchomatd.x
+	Modified the singular matrix test to make a comparison against
+	EPSILON instead of 0.0 to avoid floating point problems.
+
+	(8/1/98 Davis)
+
 math$gsurfit/
 	Installed a completely new version of gsurfit which support "half"
 	or "diagonal" cross terms. All the .gx and .x files were replaced.

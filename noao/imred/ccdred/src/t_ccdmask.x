@@ -71,6 +71,7 @@ begin
 	nl = IM_LEN(in,2)
 	ncstep = max (1, MAXBUF / nl - ncmed)
 
+	outbuf = NULL
 	do i = 1, nc, ncstep {
 	    c1 = i
 	    c2 = min (nc, i + ncstep - 1)
@@ -78,14 +79,20 @@ begin
 	    c4 = min (nc, c2 + ncmed / 2)
 	    nc1 = c4 - c3 + 1
 	    inbuf = imgs2r (in, c3, c4, 1, nl)
-	    outbuf = imps2s (out, c3, c4, 1, nl)
-	    do j = 1, nl
-		call aclrs (Mems[outbuf+(j-1)*nc1+c1-c3], c2-c1+1)
+	    if (outbuf == NULL)
+		call malloc (outbuf, nc1*nl, TY_SHORT)
+	    else
+		call realloc (outbuf, nc1*nl, TY_SHORT)
+	    call aclrs (Memc[outbuf], nc1*nl)
 	    call cm_mask (Memr[inbuf], Mems[outbuf], nc1, nl, c1-c3+1,
 		c2-c3+1, ncmed, nlmed, ncsig, nlsig, lsig, hsig, ngood, ngood)
 	    call cm_interp (Mems[outbuf], nc1, nl, c1-c3+1, c2-c3+1, nc,
 		linterp, cinterp, eqinterp)
+	    do j = 1, nl
+		call amovs (Mems[outbuf+(j-1)*nc1+c1-c3],
+		    Mems[imps2s(out,c1,c2,j,j)], c2-c1+1)
 	}
+	call mfree (outbuf, TY_SHORT)
 
 	call imunmap (out)
 	call imunmap (in)
@@ -195,7 +202,7 @@ begin
 		    sigma = sqrt (Memr[sig+jsig])
 		    low = back - lsig * sigma
 		    high = back + hsig * sigma
-		    if (data[i,j] < low && data[i,j] > high) {
+		    if (data[i,j] < low || data[i,j] > high) {
 			bp[i,j] = 1
 			k = k + 1
 		    }

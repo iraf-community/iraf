@@ -1,4 +1,4 @@
-.help ds2c6 Nov95 "Slalib Package"
+.help ds2c6 Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDSC6 (A, B, R, AD, BD, RD, V)

@@ -132,9 +132,19 @@ begin
 	call salloc (cleanstr, SZ_FNAME, TY_CHAR)
 	call salloc (apsex, napsex, TY_POINTER)
 
-	# Select apertures to extract.
+	# Select apertures to extract and fix possible limit error.
 	napsex = 0
 	do i = 1, naps {
+	    if (AP_LOW(aps[i],1) > AP_HIGH(aps[i],1)) {
+		xmax = AP_LOW(aps[i],1)
+		AP_LOW(aps[i],1) = AP_HIGH(aps[i],1)
+		AP_HIGH(aps[i],1) = xmax
+	    }
+	    if (AP_LOW(aps[i],2) > AP_HIGH(aps[i],2)) {
+		xmax = AP_LOW(aps[i],2)
+		AP_LOW(aps[i],2) = AP_HIGH(aps[i],2)
+		AP_HIGH(aps[i],2) = xmax
+	    }
 	    if (AP_SELECT(aps[i]) == NO)
 		next
 	    Memi[apsex+napsex] = aps[i]
@@ -1019,6 +1029,10 @@ begin
 			}
 		    }
 
+		    # Write keyword to allow matching by subaperture.
+		    if (nsubaps > 1)
+			call imaddi (out, "SUBAP", l)
+
 		    do k = 1, naps {
 			low = AP_CEN(aps[k],apaxis) + AP_LOW(aps[k],apaxis)
 			high = AP_CEN(aps[k],apaxis) + AP_HIGH(aps[k],apaxis)
@@ -1034,8 +1048,6 @@ begin
 				Memc[AP_TITLE(aps[k])])
 			}
 		    }
-		    call apmw_saveim (apmw, out, fmt)
-		    call apmw_close (apmw)
 		} else {
 		    if (l == 1)
 			out = outsave
@@ -1065,6 +1077,10 @@ begin
 		    }
 		}
 
+		if (iap == 1) {
+		    call apmw_saveim (apmw, out, fmt)
+		    call apmw_close (apmw)
+		}
 		if (l != 1 || iap == naps)
 		    call imunmap (out)
 		if (l == 1)

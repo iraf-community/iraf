@@ -218,7 +218,7 @@ pointer	im			# Image
 pointer	dates			# Pointer to date strings
 int	ndates			# Number of dates
 
-int	i, nalloc
+int	i, nalloc, stridxs()
 pointer	sp, date, ptr
 bool	streq()
 errchk	hdmgstr
@@ -227,6 +227,11 @@ begin
 	call smark (sp)
 	call salloc (date, SZ_LINE, TY_CHAR)
 	call hdmgstr (im, "date-obs", Memc[date], SZ_LINE)
+
+	# Strip time if present.
+	i = stridxs ("T", Memc[date])
+	if (i > 0)
+	    Memc[date+i-1] = EOS
 
 	for (i=1; i<=ndates; i=i+1) {
 	    ptr = dates + (i - 1) * SZ_LINE

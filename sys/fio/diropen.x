@@ -166,6 +166,7 @@ int	vfnptr[MAX_OPENDIR]
 int	vfnunmap(), vfn_is_hidden_file()
 errchk	vfnunmap, vfn_is_hidden_file
 common	/dircom/ dirmode, oschan, vfnptr
+define	done_ 91
 
 begin
 	call smark (sp)
@@ -173,9 +174,9 @@ begin
 
 	status = ERR
 	if (chan < 1 || chan > MAX_OPENDIR)
-	    return
+	    goto done_
 	if (oschan[chan] == 0)
-	    return
+	    goto done_
 	vp = vfnptr[chan]
 
 	repeat {
@@ -201,6 +202,7 @@ begin
 	    status = 0
 	else
 	    status = nchars
+done_
 	call sfree (sp)
 end
 

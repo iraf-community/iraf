@@ -23,7 +23,11 @@ begin
 	    print ("generating new quick-reference file " // fname // "...")
 	    if (access (fname))
 		delete (fname, verify-)
-	    help ("[a-z]*.") |& match ("-") | sort(ignore+) | unique ( > fname)
+	    #help ("[a-z]*.", section="all", option="ref", curpack="AsckCL",
+	    #	helpdb="helpdb") | sort(ignore+) | unique ( > fname)
+	    help ("[a-z]*.", option="ref", curpack="AsckCL", helpdb="helpdb") \
+		|& match ("-", metacharacters=yes) \
+		| sort(ignore+) | unique ( > fname)
 	    references.quickref = fname
 	    references.usequick = yes
 
@@ -33,15 +37,16 @@ begin
 
 	    # If the user has prepared a quick-search file (e.g., by running
 	    # this task with topic=* and saving the output to make the quick
-	    # file), search that, otherwise perform a runtime search of the
-	    # package menu files for the entire help database.
+	    # file), search that if it exists, otherwise perform a runtime
+	    # search of the package menu files for the entire help database.
 
-	    if (usequick)
-		match (pattern, quick)
+	    if (usequick && access (quickref))
+		match (pattern, quickref, metacharacters=yes)
 	    else {
 		print ("searching the help database...")
-		help ("[a-z]*.") |& match ("-") | sort(ignore+) | unique |
-		    match (pattern)
+		help ("[a-z]*.", section="all", option="ref", curpack="AsckCL",
+		    helpdb="helpdb") | sort(ignore+) | unique |
+		    match (pattern, metacharacters=yes)
 	    }
 	}
 end

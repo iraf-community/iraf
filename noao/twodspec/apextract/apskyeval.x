@@ -115,6 +115,12 @@ begin
 	    }
 	}
 
+	if (nsample == 0) {
+	    Memr[as] = xmin
+	    Memr[bs] = xmax
+	    nsample = 1
+	}
+
 	if (bkg == B_MEDIAN)
 	    call salloc (y, nfit, TY_REAL)
 	else if (bkg == B_FIT) {
@@ -127,6 +133,7 @@ begin
 	call asiinit (asi, II_LINEAR)
 
 	# Determine sky at each dispersion point.
+	call aclrr (svar, ny)
 	do iy = 1, ny {
 
 	    # Fit image interpolation function including extra points

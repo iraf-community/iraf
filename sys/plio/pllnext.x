@@ -38,6 +38,7 @@ begin
 
 	    case I_SH:
 		ip = ip + 1
+		ld_ip(ld) = ip + 1
 		ld_hi(ld) = (int(ll[ip]) * I_SHIFT) + data
 	    case I_IH:
 		ld_hi(ld) = ld_hi(ld) + data

@@ -1,4 +1,4 @@
-.help vxv Nov95 "Slalib Package"
+.help vxv Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slVXV (VA, VB, VC)

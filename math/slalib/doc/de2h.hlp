@@ -1,4 +1,4 @@
-.help de2h Nov95 "Slalib Package"
+.help de2h Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDE2H (HA, DEC, PHI, AZ, EL)

@@ -16,12 +16,6 @@ begin
 	    return (GT_LINE(gt))
 	case GTTRANSPOSE:
 	    return (GT_TRANSPOSE(gt))
-	case GTDRAWTITLE:
-	    return (GT_DRAWTITLE(gt))
-	case GTDRAWXLABELS:
-	    return (GT_DRAWXLABELS(gt))
-	case GTDRAWYLABELS:
-	    return (GT_DRAWYLABELS(gt))
 	case GTSYSID:
 	    return (GT_SYSID(gt))
 	case GTCOLOR:
@@ -30,6 +24,12 @@ begin
 	    return (GT_XFLIP(gt))
 	case GTYFLIP:
 	    return (GT_YFLIP(gt))
+	case GTDRAWTITLE:
+	    return (GT_DRWTITLE(gt))
+	case GTDRAWXLABELS:
+	    return (GT_DRWXLABELS(gt))
+	case GTDRAWYLABELS:
+	    return (GT_DRWYLABELS(gt))
 	}
 end
 
@@ -43,6 +43,14 @@ int	param			# Parameter to set
 
 begin
 	switch (param) {
+	case GTVXMIN:
+	    return (GT_VXMIN(gt))
+	case GTVXMAX:
+	    return (GT_VXMAX(gt))
+	case GTVYMIN:
+	    return (GT_VYMIN(gt))
+	case GTVYMAX:
+	    return (GT_VYMAX(gt))
 	case GTXMIN:
 	    if (GT_XFLIP(gt) == NO)
 		return (GT_XMIN(gt))
@@ -63,6 +71,14 @@ begin
 		return (GT_YMAX(gt))
 	    else
 		return (GT_YMIN(gt))
+	case GTXBUF:
+	    return (GT_XBUF(gt))
+	case GTYBUF:
+	    return (GT_YBUF(gt))
+	case GTLCLIP:
+	    return (GT_LCLIP(gt))
+	case GTHCLIP:
+	    return (GT_HCLIP(gt))
 	case GTXSIZE:
 	    return (GT_XSIZE(gt))
 	case GTYSIZE:
@@ -107,28 +123,65 @@ begin
 	case GTYUNITS:
 	    if (GT_YUNITS(gt) != NULL)
 	        call strcpy (Memc[GT_YUNITS(gt)], str, sz_str)
+	case GTXFORMAT:
+	    if (GT_XFORMAT(gt) != NULL)
+	        call strcpy (Memc[GT_XFORMAT(gt)], str, sz_str)
+	case GTYFORMAT:
+	    if (GT_YFORMAT(gt) != NULL)
+	        call strcpy (Memc[GT_YFORMAT(gt)], str, sz_str)
 	case GTXTRAN:
 	    switch (GT_XTRAN(gt)) {
-	    case 1:
+	    case GW_LINEAR:
 	        call strcpy ("linear", str, sz_str)
-	    case 2:
-	        call strcpy ("logrithmic", str, sz_str)
+	    case GW_ELOG:
+	        call strcpy ("logarithmic", str, sz_str)
 	    }
 	case GTYTRAN:
 	    switch (GT_YTRAN(gt)) {
-	    case 1:
+	    case GW_LINEAR:
 	        call strcpy ("linear", str, sz_str)
-	    case 2:
-	        call strcpy ("logrithmic", str, sz_str)
+	    case GW_ELOG:
+	        call strcpy ("logarithmic", str, sz_str)
 	    }
 	case GTTYPE:
+	    #switch (GT_TYPE(gt)) {
+	    #case 1:
+	    #    call strcpy ("mark", str, sz_str)
+	    #case 2:
+	    #    call strcpy ("line", str, sz_str)
+	    #case 3:
+	    #    call strcpy ("histogram", str, sz_str)
+	    #}
 	    switch (GT_TYPE(gt)) {
 	    case 1:
-	        call strcpy ("mark", str, sz_str)
+		switch (GT_MARK(gt)) {
+		case GM_POINT:
+		    call strcpy ("point", str, sz_str)
+		case GM_BOX:
+		    call strcpy ("box", str, sz_str)
+		case GM_PLUS:
+		    call strcpy ("plus", str, sz_str)
+		case GM_CROSS:
+		    call strcpy ("cross", str, sz_str)
+		case GM_DIAMOND:
+		    call strcpy ("diamond", str, sz_str)
+		case GM_HLINE:
+		    call strcpy ("hline", str, sz_str)
+		case GM_VLINE:
+		    call strcpy ("vline", str, sz_str)
+		case GM_HEBAR:
+		    call strcpy ("hebar", str, sz_str)
+		case GM_VEBAR:
+		    call strcpy ("vebar", str, sz_str)
+		case GM_CIRCLE:
+		    call strcpy ("circle", str, sz_str)
+		}
 	    case 2:
-	        call strcpy ("line", str, sz_str)
+		call sprintf (str, sz_str, "line%d")
+		    call pargi (GT_LINE(gt))
 	    case 3:
-		call strcpy ("histogram", str, sz_str)
+		call sprintf (str, sz_str, "hist%d")
+		    call pargi (GT_LINE(gt))
 	    }
 	case GTMARK:
 	    switch (GT_MARK(gt)) {

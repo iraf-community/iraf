@@ -47,7 +47,7 @@
 *                used to signal the end of the number and terminate
 *                decoding.
 *
-*             .  Comma is recognised by INTIN as a special case;  it
+*             .  Comma is recognized by INTIN as a special case;  it
 *                is skipped, leaving the pointer on the next character.
 *                See 9, below.
 *
@@ -78,9 +78,9 @@
 *
 *     12    See also FLOTIN and DFLTIN.
 *
-*  P.T.Wallace   Starlink   2 August 1993
+*  P.T.Wallace   Starlink   27 April 1998
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1998 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -142,7 +142,7 @@
       J=-1
       DRES=-DRES
  1620 CONTINUE
-      IRESLT=INT(DNINT(DRES))
+      IRESLT=NINT(DRES)
 
 *  Skip to end of field
  1630 CONTINUE

@@ -188,6 +188,8 @@ begin
 		    reftri = NULL
 		    reftrirat = NULL
 		}
+
+		break
 	    }
 
 	    # Fetch the input tie points and compute the coefficients.

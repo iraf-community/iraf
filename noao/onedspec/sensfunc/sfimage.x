@@ -126,7 +126,8 @@ begin
 	if (FC(sh) == FCNO) {
 	    do i = 1, SN(sh) {
 	        w = Memr[SX(sh)+i-1]
-		dw = shdr_lw (sh, double (i+0.5)) - shdr_lw (sh, double (i-0.5))
+		dw = abs (shdr_lw (sh, double (i+0.5)) -
+		    shdr_lw (sh, double (i-0.5)))
 	        sens = cveval (cv, w)
 	        Memr[SY(sh)+i-1] = Memr[SY(sh)+i-1] / t / dw / 10.**(0.4*sens)
 	    }

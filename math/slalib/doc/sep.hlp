@@ -1,4 +1,4 @@
-.help sep Nov95 "Slalib Package"
+.help sep Jun99 "Slalib Package"
 .nf
 
       REAL FUNCTION slSEP (A1, B1, A2, B2)

@@ -19,6 +19,7 @@ pointer	tr, tx, ap, w
 bool	first_time
 int	btoi(), envgeti()
 data	first_time /true/
+errchk	calloc, malloc
 include	"gtr.com"
 
 begin

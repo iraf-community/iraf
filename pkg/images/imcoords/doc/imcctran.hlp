@@ -1,4 +1,4 @@
-.help imcctran Apr96 images.imcoords
+.help imcctran Jun99 images.imcoords
 .ih
 NAME
 imcctran -- convert between image celestial coordinate systems 
@@ -10,7 +10,7 @@ PARAMETERS
 .ls image
 The list of images whose celestial coordinate systems are to be converted. The
 image celestial coordinate system must be one of the standard FITS celestial
-coordinate systems: equatorial (FK4, FK4-NO-E, FK5, or GAPPT), ecliptic,
+coordinate systems: equatorial (FK4, FK4-NO-E, FK5, ICRS, or GAPPT), ecliptic,
 galactic, or supergalactic.
 .le
 .ls outsystem
@@ -38,6 +38,17 @@ epoch, a Besselian epoch, or a Julian date. Julian epochs
 are prefixed by a J or j, Besselian epochs by a B or b.
 Epochs without the J / j or B / b prefix default to the epoch type of
 equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls icrs [equinox] [epoch]
+The Internaltion Celestial Refernce System where equinox is
+a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
+Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
+The default value of equinox is J2000.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
 a Julian date.  If undefined epoch defaults to equinox.
 .le
 .ls fk5 [equinox] [epoch] 
@@ -116,9 +127,9 @@ a Julian date. The default value of epoch is B1950.0.
 .le
 
 In all the above cases fields in [] are optional with the defaults as
-described. The epoch field for fk5, galactic, and supergalactic
+described. The epoch field for the fk5, icrs, galactic, and supergalactic
 coordinate systems is required only if the input coordinates are in the
-equatorial fk4, noefk4, or fk5 systems and proper motions are defined.
+equatorial fk4, noefk4, fk5, or icrs systems and proper motions are defined.
 .le
 .ls nx = 10, ny = 10
 The dimensions of the coordinate grid used to compute the rotation angle and,
@@ -142,7 +153,8 @@ and output celestial coordinate systems must be one of the following:
 equatorial, ecliptic, galactic, or supergalactic. The equatorial coordinate
 systems must be one of: 1) FK4, the mean place pre-IAU 1976 system, 2) FK4-NO-E,
 the same as FK4 but without the E-terms, 3) FK5, the mean place post-IAU 1976
-system, 4) GAPPT, the geocentric apparent place in the post-IAU 1976 system. 
+system, 4), ICRS, the International Celestial Reference System, 5) GAPPT,
+the geocentric apparent place in the post-IAU 1976 system. 
 
 The input celestial coordinate system is read from the input image header.
 IMCCTRAN assumes that the celestial coordinate system is specified by the FITS
@@ -161,24 +173,25 @@ system.
 
 The second four characters of the values of the ra / longitude and dec /
 latitude axis CTYPE keywords specify the sky projection geometry. IRAF
-supports the TAN, SIN, ARC, GLS, STG, ZEA, CAR, PCO, PAR, AIT, MOL,
-CSC, QSC, and TSC geometries, and consequently the currently permitted
-values of CTYPE[5:8] are -TAN, -ARC, -SIN, and -GLS, -STG, -ZEA, -CAR,
--PCO, -PAR, -AIT, -MOL, -CSC, -QSC, and -TSC.
+currently supports the TAN, SIN, ARC, and GLS geometries, and consequently the
+currently permitted values of CTYPE[5:8] are -TAN, -ARC, -SIN, and -GLS.
+IM
+support the GLS projection.
 
 If the input image celestial coordinate system is equatorial, the value of the
 RADECSYS keyword specifies which fundamental equatorial system is to be
-considered. The permitted values of RADECSYS are FK4, FK4-NO-E, FK5, and GAPPT.
-If the RADECSYS keyword is not present in the image header, the values of the
-EQUINOX / EPOCH keywords (in that order of precedence) are used to determine
-the fundamental equatorial coordinate system. EQUINOX or EPOCH contain the
-epoch of the mean place and equinox for the FK4, FK4-NO-E, and FK5 systems
-(e.g 1950.0 or 2000.0). The default equatorial system is FK4 if EQUINOX or
-EPOCH < 1984.0, FK5 if EQUINOX or EPOCH >= 1984.0, and FK5 if RADECSYS, EQUINOX,
-and EPOCH are undefined. If RADECSYS is defined but EQUINOX and EPOCH are not,
-the equinox defaults to 1950.0 for the FK4 and FK4-NO-E systems, and 2000.0 for
-the FK5 system. The equinox value is interpreted as a Besselian epoch for the
-FK4 and FK4-NO-E systems, and as a Julian epoch for the FK5 system. Users are
+considered. The permitted values of RADECSYS are FK4, FK4-NO-E, FK5, ICRS,
+and GAPPT.  If the RADECSYS keyword is not present in the image header, the
+values of the EQUINOX / EPOCH keywords (in that order of precedence) are used
+to determine the fundamental equatorial coordinate system. EQUINOX or EPOCH
+contain the epoch of the mean place and equinox for the FK4, FK4-NO-E, FK5,
+and ICRS systems (e.g 1950.0 or 2000.0). The default equatorial system is
+FK4 if EQUINOX or EPOCH < 1984.0, FK5 if EQUINOX or EPOCH >= 1984.0, and FK5
+if RADECSYS, EQUINOX, and EPOCH are undefined. If RADECSYS is defined but
+EQUINOX and EPOCH are not, the equinox defaults to 1950.0 for the FK4 and
+FK4-NO-E systems, and 2000.0 for the FK5 and ICRS systems. The equinox value is
+interpreted as a Besselian epoch for the FK4 and FK4-NO-E systems, and as a
+Julian epoch for the FK5 and ICRS systems.  Users are
 strongly urged to use the EQUINOX keyword in preference to the EPOCH keyword,
 if they must enter their own equinox values into the image header. The FK4 and
 FK4-NO-E systems are not inertial and therefore also require the epoch of the
@@ -186,8 +199,9 @@ observation (the time when the mean place was correct), in addition to the
 equinox. The epoch is specified, in order of precedence, by the values of the
 keywords MJD-WCS or MJD-OBS (which contain the modified Julian date, JD -
 2400000.5, of the coordinate system), or the DATE-OBS keyword (which contains
-the date of the observation in the form DD/MM/YY). As the latter quantity is
-only accurate to a day, the MJD-WCS or MJD-OBS specification is preferred.
+the date of the observation in the form DD/MM/YY, CCYY-MM-DD, or
+CCYY-MM-DDTHH:MM:SS.S). As the latter quantity may
+only be accurate to a day, the MJD-WCS or MJD-OBS specification is preferred.
 If all 3 keywords are absent the epoch defaults to the value of equinox.
 Equatorial coordinates in the GAPPT system require only the specification
 of the epoch of observation which is supplied via the MJD-WCS, MJD-OBS,
@@ -551,6 +565,20 @@ TIME REQUIREMENTS
 
 .ih
 BUGS
+
+IMCCTRAN can write correct FITS celestial coordinate systems for all
+the non-equatorial coordinate system listed here. However IRAF v 2.10
+tasks will not be able to read the non-equatorial coordinate systems
+correctly; IRAF 2.11 tasks will be able to read these correctly.
+
+IRAF 2.10 supports the TAN, SIN, ARC, and GLS projections. IMCCTRAN
+accurately supports the TAN, SIN, and ARC projections . However attempting
+to transform a GLS projected image will produce incorrect results. The GLS
+function driver as currently coded is limited to the declination or latitude
+equals 0 case. Since transforming the coordinate system by definition includes
+shifting the reference point, the GLS projection becomes invalid. The 2.11
+version of this function driver will be able to handle full spherical
+coordinate transformations correctly.
 
 .ih
 SEE ALSO

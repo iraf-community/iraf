@@ -78,9 +78,9 @@
 *
 *  Called:  slDFLI
 *
-*  P.T.Wallace   Starlink   13 September 1990
+*  P.T.Wallace   Starlink   1 August 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -146,7 +146,7 @@
      :               ARCMIN.GE.60D0) THEN
                JF=-2
 *        Arcseconds
-            ELSE IF (JS.LT.0.OR.ARCSEC.GE.60D0) THEN
+            ELSE IF (ARCSEC.GE.60D0) THEN
                JF=-3
             END IF
          END IF

@@ -46,6 +46,7 @@ achieving the resolution specified by \fBxres\fR and \fByres\fR.
 .ls subsample = no
 The resolution specified by \fBxres\fR, \fByres\fR is achieved by block
 averaging unless \fBsubsample\fR = yes.
+.le
 .ih
 DESCRIPTION
 \fBSurface\fR draws a pseudo-three dimensional perspective of an image

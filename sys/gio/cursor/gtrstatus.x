@@ -49,6 +49,7 @@ pointer	tr, tx
 int	bufsize
 int	fstati()
 pointer	gtr_init()
+errchk	gtr_init
 
 begin
 	tr = gtr_init (stream)

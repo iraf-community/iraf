@@ -1,4 +1,4 @@
-.help calyd Nov95 "Slalib Package"
+.help calyd Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slCAYD (IY, IM, ID, NY, ND, J)

@@ -20,10 +20,11 @@ pointer o_qp			#I reference file, if NEW_COPY
 int	fmmode, fd, n
 pointer sp, qph, qp, fname, fm
 
+real	qp_getr()
 pointer fm_open(), strestore(), qm_access()
-int	fm_fopen(), read(), fm_stati(), qp_geti(), qp_accessf()
+int	fm_fopen(), read(), fm_stati(), qp_accessf()
 errchk	fm_open, strestore, fm_fopen, seek, read
-errchk	calloc, syserrs, qm_access, qp_geti
+errchk	calloc, syserrs, qm_access
 
 string	s_defblock DEF_BLOCK
 string	s_defxblock DEF_XBLOCK
@@ -110,13 +111,13 @@ begin
 
 	    # See if the default block factor is set in the datafile header.
 	    if (qp_accessf (qp, s_defblock) == YES) {
-		QP_XBLOCK(qp) = qp_geti (qp, s_defblock)
+		QP_XBLOCK(qp) = qp_getr (qp, s_defblock)
 		QP_YBLOCK(qp) = QP_XBLOCK(qp)
 	    }
 	    if (qp_accessf (qp, s_defxblock) == YES)
-		QP_XBLOCK(qp) = qp_geti (qp, s_defxblock)
+		QP_XBLOCK(qp) = qp_getr (qp, s_defxblock)
 	    if (qp_accessf (qp, s_defyblock) == YES)
-		QP_YBLOCK(qp) = qp_geti (qp, s_defyblock)
+		QP_YBLOCK(qp) = qp_getr (qp, s_defyblock)
 
 	    call close (fd)
 	}

@@ -100,6 +100,8 @@ dranrm --  d = slda2p (angle)
 
   bear --  s = slbear (a1, b1, a2, b2)
  dbear --  d = sldber (a1, b1, a2, b2)
+   pav --  s = slpav (v1, v2)
+  dpav --  d = sldpav (v1, v2)
        Direction of one point on a sphere seen from another
 
  euler --  call subroutine sleulr (order, phi, theta, psi, rmat)
@@ -236,7 +238,7 @@ PROPER MOTION
        Adjust for proper motion
 .fi
 .ih
-FK4/5 CONVERSIONS
+FK4/5/ICRS CONVERSIONS
 .nf
  fk425 --  call subroutine slfk45 (r1950, d1950, dr1950, dd1950,
            p1950, v1950, r2000, d2000, dr2000, dd2000, p2000, v2000)
@@ -254,6 +256,20 @@ FK4/5 CONVERSIONS
 	   dr1950, dd1950)
        Convert J2000.0 FK5 star data to B1950.0 FK4 assuming zero proper
 	   motion in an inertial frame and no parallax
+
+ fk52h --  call subroutine slfk5h (r5, d5, dr5, dd5, rh, dh, drh, ddh)
+       Convert J2000.0 FK5 star data to ICRS J2000.0 data
+
+ fk5hz --  call subroutine slf5hz (r5, d5, epoch, rh, dh)
+       Convert J2000.0 FK5 star data to ICRS J2000.0 data  assuming
+       no Hipparcos proper motion.
+
+ h2fk5 -- call subroutine slhfk5 (rh, dh, drh, ddh, r5, d5, dr5, dd5)
+       Convert ICRS J2000.0 data to J2000.0 Fk5 star data.
+
+ hfk5z -- call subroutine slhf5z (rh, dh, epoch, r5, d5)
+       Convert ICRS J2000.0 data to J2000.0 Fk5 star data assuming no
+       Hipparchos proper motion.
 
  dbjin --  call subroutine sldbji (string, nstrt, dreslt, j1, j2)
        Like dfltin but with extensions to accept leading 'B' and 'J'
@@ -330,6 +346,9 @@ aoppat --  call subroutine slaopt (date, aoprms)
 
  oapqk --  call subroutine sloapq (type, ob1, ob2, aoprms, rap, dap)
        Observed to apparent using precomputed parameters
+
+ polmo -- call subroutine slplmo (elongim, phim, xp, yp, elong, phi, daz)
+       Correct site longitude and latitude for polar motion
 .fi
 .ih
 AZIMUTH AND ELEVATION
@@ -367,6 +386,9 @@ REFRACTION AND AIR MASS
  refco --  call subroutine slrfco (hm, tdk, pmb, rh, wl, phi, tlr, eps,
 	   refa, refb)
        Constants for simple refraction model
+
+refcoq --  call subroutine slrfcq (tdk, pmb, rl, wl, refa, refb)
+       Constants for simple refraction model (quick version)
 
 atmdsp --  call subroutine slatmd (tdk, pmb, rh, wl1, a1, b1, wl2, a2, b2)
        Adjust refraction constants for color
@@ -437,6 +459,49 @@ planet --  call subroutine slplnt (date, np, pv, jstat)
 rdplan --  call subroutine slrdpl (date, np, elong, phi, ra, dec, diam)
        Approximate topocentric apparent place of a planet
 
+planel --  call subroutine slplnl (date, jform, epoch, orbinc, anode,
+           perih, aorg, e, aorl, dm, pv, jstat)
+       Approximate heliocentric position and velocity of planet
+
+plante --  call subroutine slplte (date, elong, phi, jform, epoch, orbinc,
+	   anode, perih, aorq, e, aorl, dm, ra, dec, r, jstat)
+       Approximate topocentric apparent place of a planet
+
+ pv2el -- call subroutine slpvel (pv, date, pmass, jformr, jform, epoch,
+	  orbinc, anode, perih, aorg, e, aorl, dm, jstat) 
+       Convert J2000 position and velocity to equivalent osculating elements
+
+ el2ue -- call subroutine slelue (date, jform, epoch, orbinc, anode, perih,
+	  aorq, e, aorl, dm, u, jstat)
+       Convert conventional osculating orbital elements into universal
+       form.
+
+ ue2el -- call subroutine slueel (u, jformr, jform, epoch, orbinc, anode,
+	  perih, aorq, e, aorl, dm, jstat)
+       Convert universal elements into conventional heliocentric osculating
+       form.
+
+ pv2ue -- call subroutine slpvue (pv, date, pmass, u, jstat)
+       Construct a universal element set based on instantaneous position
+       and velocity.
+
+ ue2pv -- call subroutine sluepv (date, u, pv, jstat)
+       Compute heliocentric position and velocity of a planet, asteroid, or
+       comet, starting from orbital elements in the "universal variables"
+       form.
+
+pertel -- call subroutine slprtl (jform, date0, date1, epoch0, epoch1,
+	  orbi0, anode0, perih0, aorq0, e0, am0, epoch1, orbi1, anode1,
+	  perih1, aorq1m e1, am1, jstat)
+       Update the osculating elements of a comet or asteroid by applying
+       planetary perturbations.
+
+pertue -- call subroutine slprue (date, u, jstat)
+       Update universal elements of a comet or asteroid by applying planetary
+       perturbations.
+.fi
+.ih
+RADIAL VELOCITIES
 rverot --  s = slrver (phi, ra, da, st)
        Velocity component due to rotation of the earth
 
@@ -457,7 +522,7 @@ rvgalc --  r = slrvga (r2000, d2000)
            relative to the mean motion of the local group
 .fi
 .ih
-SYNOPSIS
+ASTROMETRY
 .nf
   s2tp --  call subroutine sls2tp (ra, dec, raz, decz, xi, eta, j)
  ds2tp --  call subroutine sldstp (ra, dec, raz, decz, xi, eta, j)

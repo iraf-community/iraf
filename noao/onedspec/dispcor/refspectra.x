@@ -104,11 +104,11 @@ begin
 	# Confirm assignments.
 	if (confirm) {
 	    if (wt1 < 0.995) {
-	        call printf ("[%s] refspec1='%s %5.3g'\n")
+	        call printf ("[%s] refspec1='%s %.8g'\n")
 	            call pargstr (image)
 	            call pargstr (ref1)
 		    call pargr (wt1)
-	        call printf ("[%s] refspec2='%s %5.3g'   ")
+	        call printf ("[%s] refspec2='%s %.8g'   ")
 	            call pargstr (image)
 	            call pargstr (ref2)
 		    call pargr (wt2)
@@ -134,11 +134,11 @@ begin
 		next
 	    fd = open (Memc[str], APPEND, TEXT_FILE)
 	    if (wt1 < 0.995) {
-	        call fprintf (fd, "[%s] refspec1='%s %5.3g'\n")
+	        call fprintf (fd, "[%s] refspec1='%s %.8g'\n")
 	            call pargstr (image)
 	            call pargstr (ref1)
 		    call pargr (wt1)
-	        call fprintf (fd, "[%s] refspec2='%s %5.3g'\n")
+	        call fprintf (fd, "[%s] refspec2='%s %.8g'\n")
 	            call pargstr (image)
 	            call pargstr (ref2)
 		    call pargr (wt2)
@@ -157,12 +157,12 @@ begin
 
 	if (clgetb ("assign")) {
 	    im = immap (image, READ_WRITE, 0)
-	    if (wt1 < 0.995) {
-	        call sprintf (Memc[str], SZ_LINE, "%s %5.3g")
+	    if (wt1 < 0.9999995D0) {
+	        call sprintf (Memc[str], SZ_LINE, "%s %.8g")
 	            call pargstr (ref1)
 		    call pargr (wt1)
 	        call imastr (im, "refspec1", Memc[str])
-	        call sprintf (Memc[str], SZ_LINE, "%s %5.3g")
+	        call sprintf (Memc[str], SZ_LINE, "%s %.8g")
 	            call pargstr (ref2)
 		    call pargr (wt2)
 	        call imastr (im, "refspec2", Memc[str])

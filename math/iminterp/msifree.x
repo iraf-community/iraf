@@ -13,6 +13,8 @@ begin
 	# free coefficient array
 	if (MSI_COEFF(msi) != NULL)
 	    call mfree (MSI_COEFF(msi), TY_REAL)
+	if (MSI_LTABLE(msi) != NULL)
+	    call mfree (MSI_LTABLE(msi), TY_REAL)
 
 	# free interpolant descriptor
 	call mfree (msi, TY_STRUCT)

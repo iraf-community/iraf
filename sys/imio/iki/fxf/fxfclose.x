@@ -35,12 +35,6 @@ begin
 	if (IM_PFD(im) != NULL) 
 	    call close (IM_PFD(im))
 	
-	# This flag has been setup in fxf_opix to delete only
-	# the temporary file.
-
-	if (FIT_PIXTYPE(fit) == 99)
-	    call delete (IM_HDRFILE(im))
-
 	# Deallocate the FIT descriptor.
 	call mfree (fit, TY_STRUCT)
 

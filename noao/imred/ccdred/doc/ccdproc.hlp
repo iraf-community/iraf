@@ -11,6 +11,12 @@ PARAMETERS
 List of input CCD images to process.  The list may include processed
 images and calibration images.
 .le
+.ls output = ""
+List of output images.  If no list is given then the processing will replace
+the input images with the processed images.  If a list is given it must
+match the input image list.  \fINote that any dependent calibration images
+still be processed in-place with optional backup.\fR
+.le
 .ls ccdtype = ""
 CCD image type to select from the input image list.  If no type is given
 then all input images will be selected.  The recognized types are described
@@ -320,16 +326,17 @@ makes a modest decrease in the execution time.  It is not dramatic
 because the actual processing is fairly CPU intensive.
 
 Once the processing parameters and calibration images have been determined
-the input image is processed for all the desired operations in one
-step; i.e. there are no intermediate results or images.  This makes
-the task efficient.  The corrected image is output as a temporary image
-until the entire image has been processed.  When the image has been
-completely processed then the original image is deleted (or renamed
-using the specified backup prefix) and the corrected image replaces
-the original image.  Using a temporary image protects the data in the
-event of an abort or computer failure.  Keeping the original image name
-eliminates much of the record keeping and the need to generate new
-image names.
+the input image is processed for all the desired operations in one step;
+i.e. there are no intermediate results or images.  This makes the task
+efficient.  If a matching list of output images is given then the processed
+image is written to the specified output image name.  If no output image
+list is given then the corrected image is output as a temporary image until
+the entire image has been processed.  When the image has been completely
+processed then the original image is deleted (or renamed using the
+specified backup prefix) and the corrected image replaces the original
+image.  Using a temporary image protects the data in the event of an abort
+or computer failure.  Keeping the original image name eliminates much of
+the record keeping and the need to generate new image names.
 .sh
 1. Fixpix
 Regions of bad lines and columns may be replaced by linear
@@ -784,6 +791,12 @@ Caching:     271.2u 50.9s 7:00 76% 28+173K 4487+3613io  51pf+0w
 .fi
 .ih
 REVISIONS
+.ls CCDPROC V2.11.2
+A new "output" parameter is available to specify an output image leaving
+the input image unchanged.  If this parameter is not specified then
+the previous behavior of "in-place" operation with an optional backup
+occurs.
+.le
 .ls CCDPROC V2.11
 The bad pixel fixing was modified to allow use of pixel masks,
 images, or the text file description.  Bad pixel masks are the
@@ -796,7 +809,7 @@ three simple algorithms.
 .le
 .ls CCDPROC: V2.10.3
 The output pixel datatypes (specified by the package parameter
-\fIpixeltype\R have been extended to include unsigned short
+\fIpixeltype\fR have been extended to include unsigned short
 integers.  Also it was previously possible to have the output
 pixel datatype be of lower precision than the input.  Now the
 output pixel datatype is not allowed to lose precision; i.e.
@@ -819,4 +832,5 @@ SEE ALSO
 .nf
 instruments, ccdtypes, flatfields, icfit, ccdred, guide, mkillumcor,
 mkskycor, mkfringecor
+.fi
 .endhelp

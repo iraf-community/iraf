@@ -104,6 +104,7 @@
 #define	ZGETTY		zgetty_
 #define	ZGFDIR		zgfdir_
 #define	ZGHOST		zghost_
+#define	ZGMTCO		zgmtco_
 #define	ZGTENV		zgtenv_
 #define	ZGTIME		zgtime_
 #define	ZGTPID		zgtpid_

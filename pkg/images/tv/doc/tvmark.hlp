@@ -97,7 +97,6 @@ length and width / length ratio "l1,l2,...lN ratio" are drawn around
 each selected point.  If ratio is not supplied, it defaults to 1.0
 and squares are drawn.
 .le
-.le
 .ls font = "raster"
 The name of the font.  At present only a simple raster font is supported.
 .le

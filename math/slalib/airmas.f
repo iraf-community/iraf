@@ -38,9 +38,10 @@
 *        Berlin, Julius Springer, 2, 268.
 *
 *  Original code by P.W.Hill, St Andrews
-*  Adapted by P.T.Wallace, Starlink, 5 December 1990
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  P.T.Wallace   Starlink   18 March 1999
+*
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

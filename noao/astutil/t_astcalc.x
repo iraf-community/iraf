@@ -29,7 +29,7 @@ pointer	stopen(), immap()
 int	open(), fscan(), fstati(), nowhite(), ctotok()
 int	imtopenp(), imtlen(), imtgetim()
 int	strlen(), stridxs()
-long	note(), clktime()
+long	note(), clktime(), lsttogmt()
 bool	clgetb(), streq()
 errchk	open, stopen, immap
 
@@ -85,7 +85,8 @@ begin
 	}
 
 	# Set special operands.
-	call brktime (clktime(0), tm)
+	pos = clktime(0)
+	call brktime (pos, tm)
 	call sprintf (Memc[expr], sz_cmd, "\"%02d/%02d/%02d\"")
 	    call pargi (TM_MDAY(tm))
 	    call pargi (TM_MONTH(tm))
@@ -96,6 +97,25 @@ begin
 	    call pargi (TM_MIN(tm))
 	    call pargi (TM_SEC(tm))
 	call ac_evaluate (ast, "$T", Memc[expr], eval, verbose)
+	call brktime (lsttogmt(pos), tm)
+	call sprintf (Memc[expr], sz_cmd, "\"%04d-%02d-%02d\"")
+	    call pargi (TM_YEAR(tm))
+	    call pargi (TM_MONTH(tm))
+	    call pargi (TM_MDAY(tm))
+	call ac_evaluate (ast, "$GMD", Memc[expr], eval, verbose)
+	call sprintf (Memc[expr], sz_cmd, "\"%02d:%02d:%02d\"")
+	    call pargi (TM_HOUR(tm))
+	    call pargi (TM_MIN(tm))
+	    call pargi (TM_SEC(tm))
+	call ac_evaluate (ast, "$GMT", Memc[expr], eval, verbose)
+	call sprintf (Memc[expr], sz_cmd, "\"%04d-%02d-%02dT%02d:%02d:%02d\"")
+	    call pargi (TM_YEAR(tm))
+	    call pargi (TM_MONTH(tm))
+	    call pargi (TM_MDAY(tm))
+	    call pargi (TM_HOUR(tm))
+	    call pargi (TM_MIN(tm))
+	    call pargi (TM_SEC(tm))
+	call ac_evaluate (ast, "$GMDT", Memc[expr], eval, verbose)
 
 	# Read and evaluate commands.
 	repeat {

@@ -105,9 +105,12 @@ begin
                 call fprintf (fd,
 	           "HJD=%9.4f  FWHM=%.2f  Zr=%.5f  Zo=%.5f  Zh=%.5f +/- %.3f\n")
 	    }
-	            if (RV_HJD(rv) > 0.0)
-	                call pargd (RV_HJD(rv)-2440000.0)
-		    else
+	            if (RV_HJD(rv) > 0.0) {
+	                if (RV_HJD(rv) > 2450000.0)
+	                    call pargd (RV_HJD(rv)-2450000.0)
+			else
+	                    call pargd (RV_HJD(rv)-2440000.0)
+		    } else
 	                call pargr (INDEF)
 	            call pargr (RV_DISP(rv))
 		    if (RV_PRINTZ(rv) == NO) {
@@ -182,9 +185,12 @@ begin
 		        call pargstr (IMAGE(rv))
 		        #call pargi (RV_TEMPCODE(rv))
 		        call pargstr (tc)
-		        if (!IS_INDEF(DBL_VHELIO(rv,i)) && RV_HJD(rv) > 0)
-		            call pargd (RV_HJD(rv)-2440000.0)
-		        else
+		        if (!IS_INDEF(DBL_VHELIO(rv,i)) && RV_HJD(rv) > 0) {
+	                    if (RV_HJD(rv) > 2450000.0)
+	                        call pargd (RV_HJD(rv)-2450000.0)
+			    else
+	                        call pargd (RV_HJD(rv)-2440000.0)
+		        } else
 		            call pargr (INDEF)
 		        call pargi (RV_APNUM(rv))
 		        call pargr (DBL_SHIFT(rv,i))
@@ -213,9 +219,12 @@ begin
 	            #call pargi (RV_TEMPCODE(rv))
 	            call pargstr (tc)
 	            if (!IS_INDEFD(RV_VCOR(rv)) && RV_ERRCODE(rv) == OK && 
-		        RV_HJD(rv) > 0.)
-	                    call pargd (RV_HJD(rv)-2440000.0)
-	            else
+		        RV_HJD(rv) > 0.) {
+	                    if (RV_HJD(rv) > 2450000.0)
+	                        call pargd (RV_HJD(rv)-2450000.0)
+			    else
+	                        call pargd (RV_HJD(rv)-2440000.0)
+	            } else
 	                call pargr (INDEF)
 	            call pargi (RV_APNUM(rv))
 		    if (RV_ERRCODE(rv) == OK) {
@@ -291,9 +300,12 @@ begin
 	    	        call pargstr (OBJNAME(rv))
 	    	        call pargstr (IMAGE(rv))
 	    	        call pargstr (tc)
-		        if (!IS_INDEF(DBL_VHELIO(rv,i)) && RV_HJD(rv) > 0.0)
-	    	            call pargd (RV_HJD(rv)-2440000.0)
-		        else
+		        if (!IS_INDEF(DBL_VHELIO(rv,i)) && RV_HJD(rv) > 0.0) {
+	                    if (RV_HJD(rv) > 2450000.0)
+	                        call pargd (RV_HJD(rv)-2450000.0)
+			    else
+	                        call pargd (RV_HJD(rv)-2440000.0)
+		        } else
 	    	            call pargr (INDEF)
 	    	        call pargi (RV_APNUM(rv))
 	    	        call pargstr (Memc[cp])
@@ -340,7 +352,10 @@ begin
 	            call pargstr (tc)
 		    if (!IS_INDEFD(RV_VCOR(rv)) && RV_ERRCODE(rv) == OK &&
 		        RV_HJD(rv) > 0.0)
-	                    call pargd (RV_HJD(rv)-2440000.0)
+	                    if (RV_HJD(rv) > 2450000.0)
+	                        call pargd (RV_HJD(rv)-2450000.0)
+			    else
+	                        call pargd (RV_HJD(rv)-2440000.0)
 		    else
 	                call pargr (INDEF)
 	            call pargi (RV_APNUM(rv))

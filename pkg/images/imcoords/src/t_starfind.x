@@ -124,20 +124,30 @@ char    ext[ARB]                #I extension
 char    name[ARB]               #O output name
 int     maxch                   #I maximum size of name
 
-int     ndir
-pointer sp, root
-int     fnldir(), strlen(), sf_imroot()
+int     ndir, nimdir, clindex, clsize
+pointer sp, root, str
+int     fnldir(), strlen()
 
 begin
         call smark (sp)
         call salloc (root, SZ_FNAME, TY_CHAR)
-        call strcpy (image, Memc[root], maxch)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
         ndir = fnldir (output, name, maxch)
         if (strlen (output) == ndir) {
-            ndir = ndir + sf_imroot (Memc[root], name[ndir+1], maxch)
-            call sprintf (name[ndir+1], maxch, ".%s.*")
-                call pargstr (ext)
+	    call imparse (image, Memc[root], SZ_FNAME, Memc[str], SZ_FNAME,
+		Memc[str], SZ_FNAME, clindex, clsize)
+            nimdir = fnldir (Memc[root], Memc[str], SZ_FNAME)
+	    if (clindex >= 0) {
+                call sprintf (name[ndir+1], maxch, "%s%d.%s.*")
+                    call pargstr (Memc[root+nimdir])
+                    call pargi (clindex)
+                    call pargstr (ext)
+	    } else {
+                call sprintf (name[ndir+1], maxch, "%s.%s.*")
+		    call pargstr (Memc[root+nimdir])
+                    call pargstr (ext)
+	    }
             call sf_oversion (name, name, maxch)
         } else
             call strcpy (output, name, maxch)
@@ -146,30 +156,30 @@ begin
 end
 
 
-# SF_IMROOT -- Fetch the root image name minus the directory specification
-# and the section notation. The length of the root name is returned.
-
-int procedure sf_imroot (image, root, maxch)
-
-char    image[ARB]              #I image specification
-char    root[ARB]               #O rootname
-int     maxch                   #I maximum number of characters
-
-int     nchars
-pointer sp, str
-int     fnldir(), strlen()
-
-begin
-        call smark (sp)
-        call salloc (str, SZ_FNAME, TY_CHAR)
-
-        call imgimage (image, root, maxch)
-        nchars = fnldir (root, Memc[str], maxch)
-        call strcpy (root[nchars+1], root, maxch)
-
-        call sfree (sp)
-        return (strlen (root))
-end
+## SF_IMROOT -- Fetch the root image name minus the directory specification
+## and the section notation. The length of the root name is returned.
+#
+#int procedure sf_imroot (image, root, maxch)
+#
+#char    image[ARB]              #I image specification
+#char    root[ARB]               #O rootname
+#int     maxch                   #I maximum number of characters
+#
+#int     nchars
+#pointer sp, str
+#int     fnldir(), strlen()
+#
+#begin
+#        call smark (sp)
+#        call salloc (str, SZ_FNAME, TY_CHAR)
+#
+#        call imgimage (image, root, maxch)
+#        nchars = fnldir (root, Memc[str], maxch)
+#        call strcpy (root[nchars+1], root, maxch)
+#
+#        call sfree (sp)
+#        return (strlen (root))
+#end
 
 
 # SF_OVERSION -- Compute the next available version number of a given file
@@ -212,4 +222,3 @@ begin
         call fntclsb (list)
         call sfree (sp)
 end
-

@@ -1,4 +1,4 @@
-.help rvlsrk Nov95 "Slalib Package"
+.help rvlsrk Jun99 "Slalib Package"
 .nf
 
       REAL FUNCTION slRVLK (R2000, D2000)

@@ -1,6 +1,9 @@
-# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.  
 
-# II_NEAREST -- Procedure to evaluate the nearest neighbour interpolant
+include <math.h>
+
+
+# II_NEAREST -- Procedure to evaluate the nearest neighbour interpolant.
 
 procedure ii_nearest (x, y, npts, data)
 
@@ -17,7 +20,7 @@ begin
 end
 
 
-# II_LINEAR -- Procedure to evaluate a linear interpolant
+# II_LINEAR -- Procedure to evaluate the linear interpolant.
 
 procedure ii_linear (x, y, npts, data)
 
@@ -36,7 +39,7 @@ begin
 end
 
 
-# II_POLY3 -- Procedure to evaluate a cubic polynomial interpolant
+# II_POLY3 -- Procedure to evaluate the cubic polynomial interpolant.
 
 procedure ii_poly3 (x, y, npts, data)
 
@@ -68,7 +71,7 @@ begin
 end
 
 
-# II_POLY5 -- Procedure to evaluate a fifth order polynomial interpolant
+# II_POLY5 -- Procedure to evaluate the fifth order polynomial interpolant.
 
 procedure ii_poly5 (x, y, npts, data)
 
@@ -106,9 +109,9 @@ begin
 end
 
 
-# II_SPLINE3 -- Procedure to evaluate a cubic spline interpolant
+# II_SPLINE3 -- Procedure to evaluate the cubic spline interpolant.
 
-procedure ii_spline3 (x, y, npts, bcoeff)   # cubic spline evaluator
+procedure ii_spline3 (x, y, npts, bcoeff)
 
 real	x[ARB]		# x values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
@@ -139,13 +142,14 @@ begin
 end
 
 
-# II_SINC -- Evaluate the sinc interpolant at an array of points.
-# The sinc truncation length is nsinc. The taper is a triangle function of
-# slope staper which begins at ntaper. If the point to be interpolated
-# is less than mindx from a data point no interpolation is done and the
-# data point itself is returned.
+# II_SINC -- Procedure to evaluate the sinc interpolant. The sinc
+# truncation length is nsinc. The taper is a cosbell function which is
+# approximated by a quartic polynomial which is valid for 0 <= x <= PI / 2
+# (Abramowitz and Stegun, 1972, Dover Publications, p 76). If the point to
+# be interpolated is less than mindx from a data point no interpolation is
+# done and the data point itself is returned.
 
-procedure ii_sinc (x, y, npts, data, npix, nsinc, ntaper, staper, mindx)
+procedure ii_sinc (x, y, npts, data, npix, nsinc, mindx)
 
 real	x[ARB]		# x values, must be within [1,npts]
 real	y[ARB]		# interpolated values returned to user
@@ -153,15 +157,32 @@ int	npts		# number of x values
 real	data[ARB]	# data to be interpolated
 int	npix		# number of data pixels
 int	nsinc		# sinc truncation length
-int	ntaper		# start of triangular taper
-real	staper		# slope of triangular taper
 real	mindx		# interpolation minimum
 
-int	i, j, k, xc
-real	dx, w, d, z
-real	w1, u1, v1, u1a, v1a
+int	i, j, xc, minj, maxj, offj
+pointer	sp, taper
+real	dx, dxn, dx2, w1, sconst, a2, a4, sum, sumw
 
 begin
+	# Compute the constants for the cosine bell taper. 
+	sconst = (HALFPI / nsinc) ** 2
+	a2 = -0.49670
+	a4 = 0.03705
+
+	# Pre-compute the taper array. Incorporate the sign change portion
+	# of the sinc interpolator into the taper array.
+	call smark (sp)
+	call salloc (taper, 2 * nsinc + 1, TY_REAL)
+	if (mod (nsinc, 2) == 0)
+	    w1 = 1.0
+	else
+	    w1 = -1.0
+	do j = -nsinc,  nsinc {
+	    dx2 = sconst * j * j
+	    Memr[taper+j+nsinc] = w1 * (1.0 + a2 * dx2 + a4 * dx2 * dx2) ** 2
+	    w1 = -w1
+	}
+
 	do i = 1, npts {
 
 	    # Return zero outside of data.
@@ -171,53 +192,239 @@ begin
 		next
 	    }
 
-	    # Return the data value if x is tool close to x[i].
+	    # Return the data value if x is too close to x[i].
 	    dx = x[i] - xc
 	    if (abs (dx) < mindx) {
 		y[i] = data[xc]
 		next
 	    }
 
-	    # Initialize.
-	    w = 1.
-	    d = data[xc]
-	    z = 1. / dx
-	    w1 = w * z; u1 = d * w1; v1 = w1
+	    # Compute the limits of the true convolution.
+	    minj = max (1, xc - nsinc)
+	    maxj = min (npix, xc + nsinc)
+	    offj = -xc + nsinc
 
-	    do j = 1, nsinc {
+	    # Do the convolution.
+	    sum = 0.0
+	    sumw = 0.0
+	    dxn = dx + xc
+	    do j = xc - nsinc, minj - 1 {
+		w1 = Memr[taper+j+offj] / (dxn - j) 
+		sum = sum + w1 * data[1]
+		sumw = sumw + w1
+	    }
+	    do j = minj, maxj {
+		w1 = Memr[taper+j+offj] / (dxn - j) 
+		sum = sum + w1 * data[j]
+		sumw = sumw + w1
+	    }
+	    do j = maxj + 1, xc + nsinc {
+		w1 = Memr[taper+j+offj] / (dxn - j) 
+		sum = sum + w1 * data[npix]
+		sumw = sumw + w1
+	    }
 
-		# Get the taper.
-		w = -w
-		if (j > ntaper) {
-		    if (w < 0.)
-			w = min (0., w + staper)
-		    else
-			w = max (0., w - staper)
-		    if (w == 0.)
-			break
+	    # Compute value.
+	    y[i] = sum / sumw
+	}
+
+	call sfree (sp)
+end
+
+
+# II_LSINC -- Procedure to evaluate the sinc interpolant using a
+# precomputed look-up table. The sinc truncation length is nsinc. The taper
+# is a cosbell function which is  approximated by a quartic polynomial which
+# is valid for 0 <= x <= PI / 2 (Abramowitz and Stegun, 1972, Dover
+# Publications, p 76). If the point to be interpolated is less than mindx
+# from a data point no interpolation is done and the data point itself is
+# returned.
+
+procedure ii_lsinc (x, y, npts, data, npix, ltable, nconv, nincr, mindx)
+
+real	x[ARB]			# x values, must be within [1,npix]
+real	y[ARB]			# interpolated values returned to user
+int	npts			# number of x values
+real	data[ARB]		# data to be interpolated
+int	npix			# number of data pixels
+real	ltable[nconv,nincr]	# the sinc look-up table
+int	nconv			# sinc truncation length
+int	nincr			# the number of look-up table entries
+real	mindx			# interpolation minimum (don't use)
+
+int	i, j, nsinc, xc, lut, minj, maxj, offj
+real	dx, sum
+
+begin
+	nsinc = (nconv - 1) / 2
+	do i = 1, npts {
+
+	    # Return zero outside of data.
+	    xc = nint (x[i])
+	    if (xc < 1 || xc > npix) {
+		y[i] = 0.
+		next
+	    }
+
+	    # Return data point if dx is too small.
+	    dx = x[i] - xc
+	    if (abs (dx) < mindx) {
+		y[i] = data[xc]
+		next
+	    }
+
+	    # Find the correct look-up table entry.
+	    if (nincr == 1)
+		lut = 1
+	    else 
+		lut = nint ((-dx + 0.5) * (nincr - 1)) + 1
+		#lut = int ((-dx + 0.5) * (nincr - 1) + 0.5) + 1
+
+	    # Compute the convolution limits.
+	    minj = max (1, xc - nsinc)
+	    maxj = min (npix, xc + nsinc)
+	    offj = -xc + nsinc + 1
+
+	    # Do the convolution.
+	    sum = 0.0
+	    do j = xc - nsinc, minj - 1
+		sum = sum + ltable[j+offj,lut] * data[1]
+	    do j = minj, maxj
+		sum = sum + ltable[j+offj,lut] * data[j]
+	    do j = maxj + 1, xc + nsinc
+		sum = sum + ltable[j+offj,lut] * data[npix]
+
+	    # Compute the value.
+	    y[i] = sum
+	}
+end
+
+
+# II_DRIZ -- Procedure to evaluate the drizzle interpolant. 
+
+procedure ii_driz (x, y, npts, data, pixfrac, badval)
+
+real	x[ARB]		# x start and stop values, must be within [1,npts]
+real	y[ARB]		# interpolated values returned to user
+int	npts		# number of x values
+real	data[ARB]	# data to be interpolated
+real	pixfrac		# the drizzle pixel fraction
+real	badval		# value for undefined pixels
+
+int	i, j, neara, nearb
+real	hpixfrac, xa, xb, dx, accum, waccum
+
+begin
+	hpixfrac = pixfrac / 2.0
+	do i = 1, npts {
+
+	    # Define the interval of integration.
+	    xa = min (x[2*i-1], x[2*i])
+	    xb = max (x[2*i-1], x[2*i])
+	    neara = xa + 0.5
+	    nearb = xb + 0.5
+
+	    # Initialize the integration
+	    accum = 0.0
+	    waccum = 0.0
+	    if (neara == nearb) {
+
+	        dx = min (xb, nearb + hpixfrac) - max (xa, neara - hpixfrac)
+
+		if (dx > 0.0) {
+		    accum = accum + dx * data[neara]
+		    waccum = waccum + dx
 		}
 
-		# Store previous value.
-		u1a = u1; v1a = v1
+	    } else {
 
-		# Sum the low side.
-		k = xc - j
-		if (k >= 1) {
-		    d = data[k]
-		    z = 1. / (dx + j)
-		    w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
+		# first segement
+		dx = neara + hpixfrac - max (xa, neara - hpixfrac)
+
+		if (dx > 0.0) {
+		    accum = accum + dx * data[neara]
+		    waccum = waccum + dx
 		}
 
-		# Sum the high side.
-		k = xc + j
-		if (k <= npix) {
-		    d = data[k]
-		    z = 1. / (dx - j)
-		    w1 = w * z; u1 = u1 + d * w1; v1 = v1 + w1
+		# interior segments.
+		do j = neara + 1, nearb - 1 {
+		    accum = accum + pixfrac * data[j]
+		    waccum = waccum + pixfrac
+		}
+
+		# last segment
+	        dx = min (xb, nearb + hpixfrac) - (nearb - hpixfrac)
+
+		if (dx > 0.0) {
+		    accum = accum + dx * data[nearb]
+		    waccum = waccum + dx
 		}
 	    }
 
-	    # Average current and previous value.
-	    y[i] = (u1 / v1 + u1a / v1a) / 2.
+	    if (waccum == 0.0)
+		y[i] = badval
+	    else
+		y[i] = accum / waccum
+	}
+end
+
+
+# II_DRIZ1 -- Procedure to evaluate the drizzle interpolant in the case where
+# pixfrac = 1.0. 
+
+procedure ii_driz1 (x, y, npts, data, badval)
+
+real	x[ARB]		# x start and stop values, must be within [1,npts]
+real	y[ARB]		# interpolated values returned to user
+int	npts		# number of x values
+real	data[ARB]	# data to be interpolated
+real	badval		# undefined pixel value
+
+int	i, j, neara, nearb
+real	xa, xb, deltaxa, deltaxb, dx, accum, waccum
+
+begin
+	do i = 1, npts {
+
+	    # Define the interval of integration.
+	    xa = min (x[2*i-1], x[2*i])
+	    xb = max (x[2*i-1], x[2*i])
+	    neara = xa + 0.5
+	    nearb = xb + 0.5
+	    deltaxa = xa - neara
+	    deltaxb = xb - nearb
+
+	    # Only one segment involved.
+	    accum = 0.0
+	    waccum = 0.0
+	    if (neara == nearb) {
+
+		dx = deltaxb - deltaxa
+		accum = accum + dx * data[neara]
+		waccum = waccum + dx
+
+	    } else {
+
+		# First segment.
+		dx = 0.5 - deltaxa
+		accum = accum + dx * data[neara]
+		waccum = waccum + dx
+
+		# Middle segment.
+		do j = neara + 1, nearb - 1 {
+		    accum = accum + data[j]
+		    waccum = waccum + 1.0
+		}
+
+		# Last segment.
+		dx = deltaxb + 0.5
+		accum = accum + dx * data[nearb]
+		waccum = waccum + dx
+	    }
+
+	    if (waccum == 0.0)
+		y[i] = badval
+	    else
+		y[i] = accum / waccum
 	}
 end

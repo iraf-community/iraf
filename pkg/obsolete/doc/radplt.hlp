@@ -24,6 +24,7 @@ the size of the extraction box to be used for the radial profile. The
 profile will extend to sqrt(2) * rboxsize / 2. This is the length
 of the diagonal from the box center to a corner, and corresponds to about
 14 pixels for the default value.
+.le
 .ih
 DESCRIPTION
 Given the approximate coordinates of the center of a star, (x_init, y_init),

@@ -34,7 +34,8 @@ real	clgetr()
 pointer	immap()
 errchk	open()
 
-data	itypes /II_BINEAREST, II_BILINEAR, II_BIPOLY3, II_BIPOLY5, II_BISPLINE3/
+data	itypes /II_BINEAREST, II_BILINEAR, II_BIPOLY3, II_BIPOLY5,
+	II_BISPLINE3, II_SINC, II_LSINC, II_DRIZZLE/
 
 include	"transform.com"
 
@@ -59,7 +60,7 @@ begin
 
 	fitnames = clpopnu ("fitnames")
 	call clgstr ("database", Memc[database], SZ_FNAME)
-	itype = itypes[clgwrd ("interptype", interp, 10, ITYPES)]
+	itype = itypes[clgwrd ("interptype", interp, 10, II_FUNCTIONS)]
 	logfiles = clpopnu ("logfiles")
 
 	u1 = clgetr ("x1")

@@ -4,6 +4,7 @@
 # integer(i,j,k);   real(x,y,z).
 
 # Variables effecting cl operation.
+args,s,h,,,,CL command line arguments
 gcur,*gcur,a,,,,Graphics cursor
 imcur,*imcur,a,,,,Image cursor
 ukey,*ukey,a,,,,Global user terminal keyboard keylist

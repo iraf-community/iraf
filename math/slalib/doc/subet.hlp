@@ -1,4 +1,4 @@
-.help subet Nov95 "Slalib Package"
+.help subet Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slSUET (RC, DC, EQ, RM, DM)

@@ -1,5 +1,9 @@
 .help revisions Nov90 noao.imred.src.fibers
 .nf
+doslit$arcrefs.cl
+    The test on CRVAL and CDELT would not work with header keywords.
+    (9/22/98, Valdes)
+
 srcfibers$arcrefs.cl
 srcfibers$batch.cl
 srcfibers$doarcs.cl

@@ -1,4 +1,4 @@
-.help dafin Nov95 "Slalib Package"
+.help dafin Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDAFN (STRING, IPTR, A, J)
@@ -81,9 +81,9 @@
 
   Called:  slDFLI
 
-  P.T.Wallace   Starlink   13 September 1990
+  P.T.Wallace   Starlink   1 August 1996
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1996 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

@@ -167,7 +167,7 @@ begin
 	    ;
 	for (j=x+.5; (j>1) && (data[j]<=data[j-1]); j=j-1)
 	    ;
-	for (; (j>npts) && (data[j]<=data[j+1]); j=j+1)
+	for (; (j<npts) && (data[j]<=data[j+1]); j=j+1)
 	    ;
 
 	if (abs(i-x) < abs(x-j))

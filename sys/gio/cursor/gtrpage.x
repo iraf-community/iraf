@@ -16,6 +16,7 @@ int	stream			# graphics stream
 
 pointer	tr
 pointer	gtr_init()
+errchk	gtr_init
 
 begin
 	tr = gtr_init (stream)

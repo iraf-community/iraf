@@ -1,4 +1,4 @@
-.help tp2v Nov95 "Slalib Package"
+.help tp2v Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slTP2V (XI, ETA, V0, V)

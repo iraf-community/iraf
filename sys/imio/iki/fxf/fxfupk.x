@@ -10,6 +10,7 @@ include "fxf.h"
 #	      fxf_altmr (a, b, npix, bscale, bzero)
 #	      fxf_altmd (a, b, npix, bscale, bzero)
 #	      fxf_altmu (a, b, npix)
+#	      fxf_astmr (a, b, npix, bscale, bzero)
 
 define	NBITS_DOU	(SZB_CHAR * SZ_DOUBLE)
 define	IOFF		1
@@ -132,3 +133,22 @@ begin
 	call achtlu (Memi[ip+1], b, npix)
 	call sfree (sp)
 end
+
+
+# FXF_ASTMR -- Scale an input short array into a real.
+
+procedure fxf_astmr (a, b, npix, bscale, bzero)
+
+short	a[ARB]			#I input array
+real	b[ARB]			#O output array
+int	npix			#I number of pixels
+double	bscale, bzero		#I scaling parameters
+
+int	i
+
+begin
+	do i = npix, 1, -1
+	    b[i] = a[i] * bscale + bzero
+end
+			       
+

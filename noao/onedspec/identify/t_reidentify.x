@@ -38,7 +38,7 @@ pointer	sp, logfile, str, id, logfd, pd
 
 int	clscan(), clgeti(), clpopnu(), clgfil(), clgwrd()
 int	nscan(), open(), btoi(), nowhite(), imtopenp(), imtgetim()
-bool	clgetb()
+bool	clgetb(), strne()
 double	clgetd()
 pointer	gopen(), gt_init()
 
@@ -140,8 +140,9 @@ begin
 
 	# Expand the image template and reidentify features.
 	while (imtgetim (list, ID_IMAGE(id), ID_LENSTRING) != EOF)
-	    call ri_image (id, Memc[reference], ID_IMAGE(id), crsearch, ans,
-		Memi[logfd], nlogfd, pd)
+	    if (strne (Memc[reference], ID_IMAGE(id)))
+		call ri_image (id, Memc[reference], ID_IMAGE(id), crsearch, ans,
+		    Memi[logfd], nlogfd, pd)
 
 	# Finish up.
 	if (nlogfd > 0) {
@@ -619,8 +620,10 @@ begin
 	ic = ID_IC(id)
 	if (ans[1] == 'N')
 	    ic1 = ic
-	else
+	else {
 	    call ic_open (ic1)
+	    call ic_copy (ic, ic1)
+	}
 
 	loghdr = 2
 	shift = clgetd ("shift")

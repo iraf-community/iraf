@@ -15,8 +15,10 @@ procedure grc_close (fd, rc)
 
 int	fd			# graphics stream
 pointer	rc			# rcursor descriptor
+
 pointer	tr
 pointer	gtr_init()
+errchk	gtr_init
 
 begin
 	tr = gtr_init (fd)

@@ -221,10 +221,13 @@ procedure oif_trim (s, nchars)
 char	s[ARB]
 int	nchars
 
-int	n
+int	n, ntrim
 int	strlen()
 
 begin
 	n = strlen(s) + 1
-	call aclrc (s[n], nchars - n)
+	ntrim = nchars - n
+
+	if (ntrim > 0)
+	    call aclrc (s[n], ntrim)
 end

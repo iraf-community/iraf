@@ -43,6 +43,7 @@ and observation types.
 .ls robust = no
 Flag to signal program that it should ignore a wrong observation type in the
 image header.
+.le
 .ih
 DESCRIPTION
 Readvt reads any one of the grams on a vacuum telescope tape and puts the

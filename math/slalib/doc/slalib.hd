@@ -52,6 +52,7 @@ dmat		hlp=dmat.hlp,		src=slalib$dmat.f
 dmoon		hlp=dmoon.hlp,		src=slalib$dmoon.f
 dmxm		hlp=dmxm.hlp,		src=slalib$dmxm.f
 dmxv		hlp=dmxv.hlp,		src=slalib$dmxv.f
+dpav		hlp=dpav.hlp,		src=slalib$dpav.f
 dr2af		hlp=dr2af.hlp,		src=slalib$dr2af.f
 dr2tf		hlp=dr2tf.hlp,		src=slalib$dr2tf.f
 drange		hlp=drange.hlp,		src=slalib$drange.f
@@ -77,6 +78,7 @@ ecleq		hlp=ecleq.hlp,		src=slalib$ecleq.f
 ecmat		hlp=ecmat.hlp,		src=slalib$ecmat.f
 ecor		hlp=ecor.hlp,		src=slalib$ecor.f
 eg50		hlp=eg50.hlp,		src=slalib$eg50.f
+el2ue		hlp=el2ue.hlp,		src=slalib$el2ue.f
 epb		hlp=epb.hlp,		src=slalib$epb.f
 epb2d		hlp=epb2d.hlp,		src=slalib$epb2d.f
 epco		hlp=epco.hlp,		src=slalib$epco.f
@@ -93,6 +95,8 @@ fk425		hlp=fk425.hlp,		src=slalib$fk425.f
 fk45z		hlp=fk45z.hlp,		src=slalib$fk45z.f
 fk524		hlp=fk524.hlp,		src=slalib$fk524.f
 fk54z		hlp=fk54z.hlp,		src=slalib$fk54z.f
+fk52h		hlp=fk52h.hlp,		src=slalib$fk52h.f
+fk5hz		hlp=fk5hz.hlp,		src=slalib$fk5hz.f
 flotin		hlp=flotin.hlp,		src=slalib$flotin.f
 galeq		hlp=galeq.hlp,		src=slalib$galeq.f
 galsup		hlp=galsup.hlp,		src=slalib$galsup.f
@@ -101,6 +105,8 @@ geoc		hlp=geoc.hlp,		src=slalib$geoc.f
 gmst		hlp=gmst.hlp,		src=slalib$gmst.f
 gmsta		hlp=gmsta.hlp,		src=slalib$gmsta.f
 h2e		hlp=h2e.hlp,		src=slalib$h2e.f
+h2fk5		hlp=h2fk5.hlp,		src=slalib$h2fk5.f
+hfk5z		hlp=hfk5z.hlp,		src=slalib$hfk5z.f
 imxv		hlp=imxv.hlp,		src=slalib$imxv.f
 intin		hlp=intin.hlp,		src=slalib$intin.f
 invf		hlp=invf.hlp,		src=slalib$invf.f
@@ -119,17 +125,25 @@ oap		hlp=oap.hlp,		src=slalib$oap.f
 oapqk		hlp=oapqk.hlp,		src=slalib$oapqk.f
 obs		hlp=obs.hlp,		src=slalib$obs.f
 pa		hlp=pa.hlp,		src=slalib$pa.f
+pav		hlp=pav.hlp,		src=slalib$pav.f
 pcd		hlp=pcd.hlp,		src=slalib$pcd.f
 pda2h		hlp=pda2h.hlp,		src=slalib$pda2h.f
 pdq2h		hlp=pdq2h.hlp,		src=slalib$pdq2h.f
+pertel		hlp=pertel.hlp,         src=slalib$pertel.f
+pertue		hlp=pertue.hlp,         src=slalib$pertue.f
+planel		hlp=planel.hlp,		src=slalib$planel.f
 planet		hlp=planet.hlp,		src=slalib$planet.f
+plante		hlp=plante.hlp,		src=slalib$plante.f
 pm		hlp=pm.hlp,		src=slalib$pm.f
+polmo		hlp=polmo.hlp,		src=slalib$polmo.f
 prebn		hlp=prebn.hlp,		src=slalib$prebn.f
 prec		hlp=prec.hlp,		src=slalib$prec.f
 preces		hlp=preces.hlp,		src=slalib$preces.f
 precl		hlp=precl.hlp,		src=slalib$precl.f
 precss		hlp=precss.hlp,		src=slalib$precss.f
 prenut		hlp=prenut.hlp,		src=slalib$prenut.f
+pv2ue		hlp=pv2ue.hlp,		src=slalib$pv2ue.f
+pv2el		hlp=pv2el.hlp,		src=slalib$pv2el.f
 pvobs		hlp=pvobs.hlp,		src=slalib$pvobs.f
 pxy		hlp=pxy.hlp,		src=slalib$pxy.f
 range		hlp=range.hlp,		src=slalib$range.f
@@ -137,6 +151,7 @@ ranorm		hlp=ranorm.hlp,		src=slalib$ranorm.f
 rcc		hlp=rcc.hlp,		src=slalib$rcc.f
 rdplan		hlp=rdplan.hlp,		src=slalib$rdplan.f
 refco		hlp=refco.hlp,		src=slalib$refco.f
+refcoq		hlp=refcoq.hlp,		src=slalib$refcoq.f
 refro		hlp=refro.hlp,		src=slalib$refro.f
 refv		hlp=refv.hlp,		src=slalib$refv.f
 refz		hlp=refz.hlp,		src=slalib$refz.f
@@ -157,6 +172,8 @@ tp2s		hlp=tp2s.hlp,		src=slalib$tp2s.f
 tp2v		hlp=tp2v.hlp,		src=slalib$tp2v.f
 tps2c		hlp=tps2c.hlp,		src=slalib$tps2c.f
 tpv2c		hlp=tpv2c.hlp,		src=slalib$tpv2c.f
+ue2el		hlp=ue2el.hlp,		src=slalib$ue2el.f
+ue2pv		hlp=ue2pv.hlp,		src=slalib$ue2pv.f
 unpcd		hlp=unpcd.hlp,		src=slalib$unpcd.f
 v2tp		hlp=v2tp.hlp,		src=slalib$v2tp.f
 vdv		hlp=vdv.hlp,		src=slalib$vdv.f

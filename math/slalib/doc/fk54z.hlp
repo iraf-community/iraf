@@ -1,4 +1,4 @@
-.help fk54z Nov95 "Slalib Package"
+.help fk54z Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slF54Z (R2000,D2000,BEPOCH,

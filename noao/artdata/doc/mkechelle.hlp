@@ -236,8 +236,10 @@ This task creates or adds to artificial extracted (one dimensional
 (before modification by the spectrograph model) may be a combination of
 doppler shifted blackbody or constant continuum and emission and absorption
 gaussian profile spectral lines.  The lines may have randomly selected
-parameters or be taken from an input file.  The parameters and method is
-the same as that in the task \fBmk1dspec\fR.  The input spectrum is then
+parameters or be taken from an input file.  Note that the parameters and
+method is similar to the task \fBmk1dspec\fR except that the input line list
+cannot specify a profile type and only Gaussian profiles are currently
+allowed.  The input spectrum is then
 separated out into echelle orders and either recorded as extracted one
 dimensional orders or convolved with a spatial profile and crossdispersed
 into a two dimensional image.  The properties of the echelle grating,
@@ -573,7 +575,6 @@ the extracted spectrum is not given dispersion information so that the
 nonlinear behavior of the dispersion can be applied by \fBecidentify\fR and
 \fBdispcor\fR.  As with example 3, the noise is different since it is added
 after extraction and dispersion correction.
-.fi
 .ih
 REVISIONS
 .ls MKECHELLE V2.10.3

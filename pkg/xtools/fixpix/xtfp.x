@@ -47,7 +47,7 @@ int	fd			#I File descriptor for pixel list
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, c1, c2, l1, l2
+int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
 long	v[IM_MAXDIM]
 real	a, b, c, d, val
 short	indef
@@ -65,17 +65,18 @@ begin
 	pm = FP_PM(fp)
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
+	ncols = FP_NCOLS(fp)
 	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
-	if (FP_NCOLS(fp) > 0 && FP_PV1(fp) == NULL) {
+	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_SHORT
-	    call malloc (FP_PV1(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFS
-	    call amovks (indef, Mems[FP_V1(fp,1)], FP_NCOLS(fp))
-	    call amovks (indef, Mems[FP_V2(fp,1)], FP_NCOLS(fp))
+	    call amovks (indef, Mems[FP_V1(fp,1)], ncols)
+	    call amovks (indef, Mems[FP_V2(fp,1)], ncols)
 	}
 
 	# If there are no bad pixels in the line and the line contains
@@ -103,9 +104,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFS(Mems[FP_V1(fp,j)]))
 				data = xt_fpvals (fp, im, FP_L1(fp,j))
@@ -118,7 +119,12 @@ begin
 	}
 
 	# Fix pixels by column or line interpolation.
-	data = xt_fpvals (fp, im, line)
+	if (FP_DATA(fp) == NULL) {
+	    FP_PIXTYPE(fp) = TY_SHORT
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
+	}
+	data = FP_DATA(fp)
+	call amovs (Mems[xt_fpvals(fp,im,line)], Mems[data], nc)
 	j = 1
 	for (c1=col1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 	    ;
@@ -126,22 +132,23 @@ begin
 	    c1 = c1 - 1
 	    for (c2=c1+2; c2<=col2 && Mems[bp+c2]!=0; c2=c2+1)
 		;
-	    if (Mems[bp+c1+1] == FP_LVAL(fp)) {
-		if (c1 < col1 && c2 > col2) {
-		    c1 = c2 + 1
-		    next
-		}
-		if (c1 >= col1)
-		    a = Mems[data+c1-1]
-		else
-		    a = Mems[data+c2-1]
-		if (c2 <= col2)
-		    b = (Mems[data+c2-1] - a) / (c2 - c1)
-		else
-		    b = 0.
-	    }
+	    a = INDEFS
 	    do i = c1+1, c2-1 {
 		if (Mems[bp+i] == FP_LVAL(fp)) {
+		    if (IS_INDEFS(a)) {
+			if (c1 < col1 && c2 > col2) {
+			    c1 = c2 + 1
+			    next
+			}
+			if (c1 >= col1)
+			    a = Mems[data+c1-1]
+			else
+			    a = Mems[data+c2-1]
+			if (c2 <= col2)
+			    b = (Mems[data+c2-1] - a) / (c2 - c1)
+			else
+			    b = 0.
+		    }
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
@@ -162,9 +169,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -179,6 +186,8 @@ begin
 				val = c + d * (line - l1)
 			    } else
 				val = c
+			    l3 = l1
+			    l4 = l2
 			}
 		    }
 		    if (fd != NULL) {
@@ -190,12 +199,12 @@ begin
 			if (l1 >= line1) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l1)
+			    call pargi (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l2)
+			    call pargi (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -291,7 +300,7 @@ int	fd			#I File descriptor for pixel list
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, c1, c2, l1, l2
+int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
 long	v[IM_MAXDIM]
 real	a, b, c, d, val
 int	indef
@@ -309,17 +318,18 @@ begin
 	pm = FP_PM(fp)
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
+	ncols = FP_NCOLS(fp)
 	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
-	if (FP_NCOLS(fp) > 0 && FP_PV1(fp) == NULL) {
+	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_INT
-	    call malloc (FP_PV1(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFI
-	    call amovki (indef, Memi[FP_V1(fp,1)], FP_NCOLS(fp))
-	    call amovki (indef, Memi[FP_V2(fp,1)], FP_NCOLS(fp))
+	    call amovki (indef, Memi[FP_V1(fp,1)], ncols)
+	    call amovki (indef, Memi[FP_V2(fp,1)], ncols)
 	}
 
 	# If there are no bad pixels in the line and the line contains
@@ -347,9 +357,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFI(Memi[FP_V1(fp,j)]))
 				data = xt_fpvali (fp, im, FP_L1(fp,j))
@@ -362,7 +372,12 @@ begin
 	}
 
 	# Fix pixels by column or line interpolation.
-	data = xt_fpvali (fp, im, line)
+	if (FP_DATA(fp) == NULL) {
+	    FP_PIXTYPE(fp) = TY_INT
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
+	}
+	data = FP_DATA(fp)
+	call amovi (Memi[xt_fpvali(fp,im,line)], Memi[data], nc)
 	j = 1
 	for (c1=col1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 	    ;
@@ -370,22 +385,23 @@ begin
 	    c1 = c1 - 1
 	    for (c2=c1+2; c2<=col2 && Mems[bp+c2]!=0; c2=c2+1)
 		;
-	    if (Mems[bp+c1+1] == FP_LVAL(fp)) {
-		if (c1 < col1 && c2 > col2) {
-		    c1 = c2 + 1
-		    next
-		}
-		if (c1 >= col1)
-		    a = Memi[data+c1-1]
-		else
-		    a = Memi[data+c2-1]
-		if (c2 <= col2)
-		    b = (Memi[data+c2-1] - a) / (c2 - c1)
-		else
-		    b = 0.
-	    }
+	    a = INDEFI
 	    do i = c1+1, c2-1 {
 		if (Mems[bp+i] == FP_LVAL(fp)) {
+		    if (IS_INDEFI(a)) {
+			if (c1 < col1 && c2 > col2) {
+			    c1 = c2 + 1
+			    next
+			}
+			if (c1 >= col1)
+			    a = Memi[data+c1-1]
+			else
+			    a = Memi[data+c2-1]
+			if (c2 <= col2)
+			    b = (Memi[data+c2-1] - a) / (c2 - c1)
+			else
+			    b = 0.
+		    }
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
@@ -406,9 +422,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -423,6 +439,8 @@ begin
 				val = c + d * (line - l1)
 			    } else
 				val = c
+			    l3 = l1
+			    l4 = l2
 			}
 		    }
 		    if (fd != NULL) {
@@ -434,12 +452,12 @@ begin
 			if (l1 >= line1) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l1)
+			    call pargi (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l2)
+			    call pargi (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -535,7 +553,7 @@ int	fd			#I File descriptor for pixel list
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, c1, c2, l1, l2
+int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
 long	v[IM_MAXDIM]
 real	a, b, c, d, val
 long	indef
@@ -553,17 +571,18 @@ begin
 	pm = FP_PM(fp)
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
+	ncols = FP_NCOLS(fp)
 	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
-	if (FP_NCOLS(fp) > 0 && FP_PV1(fp) == NULL) {
+	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_LONG
-	    call malloc (FP_PV1(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFL
-	    call amovkl (indef, Meml[FP_V1(fp,1)], FP_NCOLS(fp))
-	    call amovkl (indef, Meml[FP_V2(fp,1)], FP_NCOLS(fp))
+	    call amovkl (indef, Meml[FP_V1(fp,1)], ncols)
+	    call amovkl (indef, Meml[FP_V2(fp,1)], ncols)
 	}
 
 	# If there are no bad pixels in the line and the line contains
@@ -591,9 +610,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFL(Meml[FP_V1(fp,j)]))
 				data = xt_fpvall (fp, im, FP_L1(fp,j))
@@ -606,7 +625,12 @@ begin
 	}
 
 	# Fix pixels by column or line interpolation.
-	data = xt_fpvall (fp, im, line)
+	if (FP_DATA(fp) == NULL) {
+	    FP_PIXTYPE(fp) = TY_LONG
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
+	}
+	data = FP_DATA(fp)
+	call amovl (Meml[xt_fpvall(fp,im,line)], Meml[data], nc)
 	j = 1
 	for (c1=col1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 	    ;
@@ -614,22 +638,23 @@ begin
 	    c1 = c1 - 1
 	    for (c2=c1+2; c2<=col2 && Mems[bp+c2]!=0; c2=c2+1)
 		;
-	    if (Mems[bp+c1+1] == FP_LVAL(fp)) {
-		if (c1 < col1 && c2 > col2) {
-		    c1 = c2 + 1
-		    next
-		}
-		if (c1 >= col1)
-		    a = Meml[data+c1-1]
-		else
-		    a = Meml[data+c2-1]
-		if (c2 <= col2)
-		    b = (Meml[data+c2-1] - a) / (c2 - c1)
-		else
-		    b = 0.
-	    }
+	    a = INDEFL
 	    do i = c1+1, c2-1 {
 		if (Mems[bp+i] == FP_LVAL(fp)) {
+		    if (IS_INDEFL(a)) {
+			if (c1 < col1 && c2 > col2) {
+			    c1 = c2 + 1
+			    next
+			}
+			if (c1 >= col1)
+			    a = Meml[data+c1-1]
+			else
+			    a = Meml[data+c2-1]
+			if (c2 <= col2)
+			    b = (Meml[data+c2-1] - a) / (c2 - c1)
+			else
+			    b = 0.
+		    }
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
@@ -650,9 +675,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -667,6 +692,8 @@ begin
 				val = c + d * (line - l1)
 			    } else
 				val = c
+			    l3 = l1
+			    l4 = l2
 			}
 		    }
 		    if (fd != NULL) {
@@ -678,12 +705,12 @@ begin
 			if (l1 >= line1) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l1)
+			    call pargi (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l2)
+			    call pargi (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -779,7 +806,7 @@ int	fd			#I File descriptor for pixel list
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, c1, c2, l1, l2
+int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
 long	v[IM_MAXDIM]
 real	a, b, c, d, val
 real	indef
@@ -797,17 +824,18 @@ begin
 	pm = FP_PM(fp)
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
+	ncols = FP_NCOLS(fp)
 	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
-	if (FP_NCOLS(fp) > 0 && FP_PV1(fp) == NULL) {
+	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_REAL
-	    call malloc (FP_PV1(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFR
-	    call amovkr (indef, Memr[FP_V1(fp,1)], FP_NCOLS(fp))
-	    call amovkr (indef, Memr[FP_V2(fp,1)], FP_NCOLS(fp))
+	    call amovkr (indef, Memr[FP_V1(fp,1)], ncols)
+	    call amovkr (indef, Memr[FP_V2(fp,1)], ncols)
 	}
 
 	# If there are no bad pixels in the line and the line contains
@@ -835,9 +863,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFR(Memr[FP_V1(fp,j)]))
 				data = xt_fpvalr (fp, im, FP_L1(fp,j))
@@ -850,7 +878,12 @@ begin
 	}
 
 	# Fix pixels by column or line interpolation.
-	data = xt_fpvalr (fp, im, line)
+	if (FP_DATA(fp) == NULL) {
+	    FP_PIXTYPE(fp) = TY_REAL
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
+	}
+	data = FP_DATA(fp)
+	call amovr (Memr[xt_fpvalr(fp,im,line)], Memr[data], nc)
 	j = 1
 	for (c1=col1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 	    ;
@@ -858,22 +891,23 @@ begin
 	    c1 = c1 - 1
 	    for (c2=c1+2; c2<=col2 && Mems[bp+c2]!=0; c2=c2+1)
 		;
-	    if (Mems[bp+c1+1] == FP_LVAL(fp)) {
-		if (c1 < col1 && c2 > col2) {
-		    c1 = c2 + 1
-		    next
-		}
-		if (c1 >= col1)
-		    a = Memr[data+c1-1]
-		else
-		    a = Memr[data+c2-1]
-		if (c2 <= col2)
-		    b = (Memr[data+c2-1] - a) / (c2 - c1)
-		else
-		    b = 0.
-	    }
+	    a = INDEFR
 	    do i = c1+1, c2-1 {
 		if (Mems[bp+i] == FP_LVAL(fp)) {
+		    if (IS_INDEFR(a)) {
+			if (c1 < col1 && c2 > col2) {
+			    c1 = c2 + 1
+			    next
+			}
+			if (c1 >= col1)
+			    a = Memr[data+c1-1]
+			else
+			    a = Memr[data+c2-1]
+			if (c2 <= col2)
+			    b = (Memr[data+c2-1] - a) / (c2 - c1)
+			else
+			    b = 0.
+		    }
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
@@ -894,9 +928,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -911,6 +945,8 @@ begin
 				val = c + d * (line - l1)
 			    } else
 				val = c
+			    l3 = l1
+			    l4 = l2
 			}
 		    }
 		    if (fd != NULL) {
@@ -922,12 +958,12 @@ begin
 			if (l1 >= line1) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l1)
+			    call pargi (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l2)
+			    call pargi (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -1023,7 +1059,7 @@ int	fd			#I File descriptor for pixel list
 int	col1, col2		#I Section of interest
 int	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, c1, c2, l1, l2
+int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
 long	v[IM_MAXDIM]
 double	a, b, c, d, val
 double	indef
@@ -1041,17 +1077,18 @@ begin
 	pm = FP_PM(fp)
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
+	ncols = FP_NCOLS(fp)
 	call amovkl (long(1), v, IM_MAXDIM)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
-	if (FP_NCOLS(fp) > 0 && FP_PV1(fp) == NULL) {
+	if (ncols > 0 && FP_PV1(fp) == NULL) {
 	    FP_PIXTYPE(fp) = TY_DOUBLE
-	    call malloc (FP_PV1(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
-	    call malloc (FP_PV2(fp), FP_NCOLS(fp), FP_PIXTYPE(fp))
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
 	    indef = INDEFD
-	    call amovkd (indef, Memd[FP_V1(fp,1)], FP_NCOLS(fp))
-	    call amovkd (indef, Memd[FP_V2(fp,1)], FP_NCOLS(fp))
+	    call amovkd (indef, Memd[FP_V1(fp,1)], ncols)
+	    call amovkd (indef, Memd[FP_V2(fp,1)], ncols)
 	}
 
 	# If there are no bad pixels in the line and the line contains
@@ -1079,9 +1116,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFD(Memd[FP_V1(fp,j)]))
 				data = xt_fpvald (fp, im, FP_L1(fp,j))
@@ -1094,7 +1131,12 @@ begin
 	}
 
 	# Fix pixels by column or line interpolation.
-	data = xt_fpvald (fp, im, line)
+	if (FP_DATA(fp) == NULL) {
+	    FP_PIXTYPE(fp) = TY_DOUBLE
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
+	}
+	data = FP_DATA(fp)
+	call amovd (Memd[xt_fpvald(fp,im,line)], Memd[data], nc)
 	j = 1
 	for (c1=col1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 	    ;
@@ -1102,22 +1144,23 @@ begin
 	    c1 = c1 - 1
 	    for (c2=c1+2; c2<=col2 && Mems[bp+c2]!=0; c2=c2+1)
 		;
-	    if (Mems[bp+c1+1] == FP_LVAL(fp)) {
-		if (c1 < col1 && c2 > col2) {
-		    c1 = c2 + 1
-		    next
-		}
-		if (c1 >= col1)
-		    a = Memd[data+c1-1]
-		else
-		    a = Memd[data+c2-1]
-		if (c2 <= col2)
-		    b = (Memd[data+c2-1] - a) / (c2 - c1)
-		else
-		    b = 0.
-	    }
+	    a = INDEFD
 	    do i = c1+1, c2-1 {
 		if (Mems[bp+i] == FP_LVAL(fp)) {
+		    if (IS_INDEFD(a)) {
+			if (c1 < col1 && c2 > col2) {
+			    c1 = c2 + 1
+			    next
+			}
+			if (c1 >= col1)
+			    a = Memd[data+c1-1]
+			else
+			    a = Memd[data+c2-1]
+			if (c2 <= col2)
+			    b = (Memd[data+c2-1] - a) / (c2 - c1)
+			else
+			    b = 0.
+		    }
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
@@ -1138,9 +1181,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -1155,6 +1198,8 @@ begin
 				val = c + d * (line - l1)
 			    } else
 				val = c
+			    l3 = l1
+			    l4 = l2
 			}
 		    }
 		    if (fd != NULL) {
@@ -1166,12 +1211,12 @@ begin
 			if (l1 >= line1) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l1)
+			    call pargi (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, "%4d %4d")
 			    call pargi (i)
-			    call pargi (l2)
+			    call pargi (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -1222,3 +1267,5 @@ begin
 
 	return (data)
 end
+
+

@@ -185,10 +185,14 @@ begin
 	# name, we also stop at another non-blank char incase they didn't
 	# use quotes.  If we find a comma, back up one so it's handled below.
 	ip = 1
-	while (expstr[ip] != EOS  && 
-	       expstr[ip] != '"'  &&
-	       expstr[ip] != '\'')
-	    	   ip = ip + 1
+        while (expstr[ip] != EOS  &&
+               expstr[ip] != '"'  &&
+               expstr[ip] != '\'') {
+                   if (expstr[ip] == '@')
+                       for (ip=ip+2; expstr[ip] != '"'; ip=ip+1)
+                           ;
+                   ip = ip + 1
+        }
 	tp = ip - 1
 
 	if (expstr[ip+1] == '"' || (expstr[ip+1]==' ' && expstr[ip+2]=='"') ||

@@ -1,5 +1,6 @@
 include	<evvexpr.h>
 include	<lexnum.h>
+include	<time.h>
 include	<mach.h>
 include	<imset.h>
 include	"astfunc.h"
@@ -7,12 +8,12 @@ include	"astfunc.h"
 define	KEYWORDS "|sexstr|epoch|julday|mst|precess|ra_precess|dec_precess|\
 		  |airmass|eairmass|obsdb|arcsep|\
 		  |if|format|print|printf|error|clget|clput|scan|fscan|\
-		  |imget|imput|imde|"
+		  |imget|imput|imdel|"
 
 define	F_SEXSTR		1	# sexstr (value)
-define	F_EPOCH			2	# epoch (date, ut)
-define	F_JULDAY		3	# julday (date, ut)
-define	F_MST			4	# mst (date, ut, longitude)
+define	F_EPOCH			2	# epoch (date[, ut])
+define	F_JULDAY		3	# julday (date[, ut])
+define	F_MST			4	# mst (date[, ut], longitude)
 define	F_PRECESS		5	# precess (ra, dec, epoch1, epoch2)
 define	F_RAPRECESS		6	# ra_precess (ra, dec, epoch1, epoch2)
 define	F_DECPRECESS		7	# dec_precess (ra, dec, epoch1, epoch2)
@@ -52,13 +53,13 @@ double	time, epoch, ra, dec, longitude, latitude
 double	ast_julday(), ast_mst(), airmass()
 
 double	dresult
-int	iresult, optype, oplen, opcode, v_nargs, i, ip
+int	iresult, optype, oplen, opcode, v_nargs, i, ip, flags
 pointer	sp, buf, dval, obs
 
 bool	strne()
 pointer	obsopen()
 double	ast_arcsep()
-int	strdic(), ctoi(), ctod(), btoi()
+int	strdic(), ctod(), btoi(), dtm_decode()
 errchk	malloc, obsopen, obsgstr
 
 begin
@@ -85,9 +86,9 @@ begin
 	case F_SEXSTR:
 	    v_nargs = -1
 	case F_EPOCH, F_JULDAY:
-	    v_nargs = 2
+	    v_nargs = -1
 	case F_MST:
-	    v_nargs = 3
+	    v_nargs = -2
 	case F_PRECESS, F_RAPRECESS, F_DECPRECESS:
 	    v_nargs = 4
 	case F_AIRMASS:
@@ -129,16 +130,20 @@ begin
 	# Expand date and time.
 	switch (opcode) {
 	case F_EPOCH, F_JULDAY, F_MST:
-	    ip = 1
-	    if (ctoi (O_VALC(args[1]), ip, day) == 0)
+	    if (dtm_decode (O_VALC(args[1]), yr, mo, day, time, flags) == ERR)
 		call xvv_error ("unrecognized date format")
-	    ip = ip + 1
-	    if (ctoi (O_VALC(args[1]), ip, mo) == 0)
-		call xvv_error ("unrecognized date format")
-	    ip = ip + 1
-	    if (ctoi (O_VALC(args[1]), ip, yr) == 0)
-		call xvv_error ("unrecognized date format")
-	    time = Memd[dval+1]
+	    if (and (flags, TF_OLDFITS) != 0)
+		yr = yr + 1900
+	    switch (opcode) {
+	    case F_EPOCH, F_JULDAY:
+		if (nargs > 1)
+		    time = Memd[dval+1]
+	    case F_MST:
+		if (nargs > 2)
+		    time = Memd[dval+1]
+	    }
+	    if (IS_INDEFD(time))
+		time = 0.
 	    call ast_date_to_epoch (yr, mo, day, time, epoch)
 	}
 
@@ -164,7 +169,7 @@ begin
 	    dresult = ast_julday (epoch)
 
 	case F_MST:
-	    longitude = Memd[dval+2]
+	    longitude = Memd[dval+nargs-1]
 	    dresult = ast_mst (epoch, longitude)
 
 	case F_PRECESS:

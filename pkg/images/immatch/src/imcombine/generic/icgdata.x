@@ -8,14 +8,14 @@ include	"../icombine.h"
 # IC_GDATA -- Get line of image and mask data and apply threshold and scaling.
 # Entirely empty lines are excluded.  The data are compacted within the
 # input data buffers.  If it is required, the connection to the original
-# image index is keeped in the returned m data pointers.
+# image index is kept in the returned m data pointers.
 
 procedure ic_gdatas (in, out, dbuf, d, id, n, m, lflag, offsets, scales,
 	zeros, nimages, npts, v1, v2)
 
 pointer	in[nimages]		# Input images
 pointer	out[3]			# Output images
-pointer	dbuf[nimages]		# Data buffers for nonaligned images
+pointer	dbuf[nimages]		# Data buffers
 pointer	d[nimages]		# Data pointers
 pointer	id[nimages]		# ID pointers
 int	n[npts]			# Number of good pixels
@@ -37,15 +37,17 @@ include	"../icombine.com"
 begin
 	# Get masks and return if there is no data
 	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
-	if (dflag == D_NONE)
+	if (dflag == D_NONE) {
+	    call aclri (n, npts)
 	    return
+	}
 
 	# Get data and fill data buffers.  Correct for offsets if needed.
 	ndim = IM_NDIM(out[1])
 	do i = 1, nimages {
 	    if (lflag[i] == D_NONE)
 		next
-	    if (aligned) {
+	    if (dbuf[i] == NULL) {
 		call amovl (v1, v2, IM_MAXDIM)
 		if (project)
 		    v2[ndim+1] = i
@@ -194,7 +196,7 @@ begin
 			mp = mp + 1
 		    }
 		}
-		if (grow > 0) {
+		if (grow >= 1.) {
 		    do j = 1, npts {
 			do i = n[j]+1, nimages
 			    Memi[id[i]+j-1] = 0
@@ -234,14 +236,14 @@ end
 # IC_GDATA -- Get line of image and mask data and apply threshold and scaling.
 # Entirely empty lines are excluded.  The data are compacted within the
 # input data buffers.  If it is required, the connection to the original
-# image index is keeped in the returned m data pointers.
+# image index is kept in the returned m data pointers.
 
 procedure ic_gdatai (in, out, dbuf, d, id, n, m, lflag, offsets, scales,
 	zeros, nimages, npts, v1, v2)
 
 pointer	in[nimages]		# Input images
 pointer	out[3]			# Output images
-pointer	dbuf[nimages]		# Data buffers for nonaligned images
+pointer	dbuf[nimages]		# Data buffers
 pointer	d[nimages]		# Data pointers
 pointer	id[nimages]		# ID pointers
 int	n[npts]			# Number of good pixels
@@ -263,15 +265,17 @@ include	"../icombine.com"
 begin
 	# Get masks and return if there is no data
 	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
-	if (dflag == D_NONE)
+	if (dflag == D_NONE) {
+	    call aclri (n, npts)
 	    return
+	}
 
 	# Get data and fill data buffers.  Correct for offsets if needed.
 	ndim = IM_NDIM(out[1])
 	do i = 1, nimages {
 	    if (lflag[i] == D_NONE)
 		next
-	    if (aligned) {
+	    if (dbuf[i] == NULL) {
 		call amovl (v1, v2, IM_MAXDIM)
 		if (project)
 		    v2[ndim+1] = i
@@ -420,7 +424,7 @@ begin
 			mp = mp + 1
 		    }
 		}
-		if (grow > 0) {
+		if (grow >= 1.) {
 		    do j = 1, npts {
 			do i = n[j]+1, nimages
 			    Memi[id[i]+j-1] = 0
@@ -460,14 +464,14 @@ end
 # IC_GDATA -- Get line of image and mask data and apply threshold and scaling.
 # Entirely empty lines are excluded.  The data are compacted within the
 # input data buffers.  If it is required, the connection to the original
-# image index is keeped in the returned m data pointers.
+# image index is kept in the returned m data pointers.
 
 procedure ic_gdatar (in, out, dbuf, d, id, n, m, lflag, offsets, scales,
 	zeros, nimages, npts, v1, v2)
 
 pointer	in[nimages]		# Input images
 pointer	out[3]			# Output images
-pointer	dbuf[nimages]		# Data buffers for nonaligned images
+pointer	dbuf[nimages]		# Data buffers
 pointer	d[nimages]		# Data pointers
 pointer	id[nimages]		# ID pointers
 int	n[npts]			# Number of good pixels
@@ -489,15 +493,17 @@ include	"../icombine.com"
 begin
 	# Get masks and return if there is no data
 	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
-	if (dflag == D_NONE)
+	if (dflag == D_NONE) {
+	    call aclri (n, npts)
 	    return
+	}
 
 	# Get data and fill data buffers.  Correct for offsets if needed.
 	ndim = IM_NDIM(out[1])
 	do i = 1, nimages {
 	    if (lflag[i] == D_NONE)
 		next
-	    if (aligned) {
+	    if (dbuf[i] == NULL) {
 		call amovl (v1, v2, IM_MAXDIM)
 		if (project)
 		    v2[ndim+1] = i
@@ -646,7 +652,7 @@ begin
 			mp = mp + 1
 		    }
 		}
-		if (grow > 0) {
+		if (grow >= 1.) {
 		    do j = 1, npts {
 			do i = n[j]+1, nimages
 			    Memi[id[i]+j-1] = 0
@@ -686,14 +692,14 @@ end
 # IC_GDATA -- Get line of image and mask data and apply threshold and scaling.
 # Entirely empty lines are excluded.  The data are compacted within the
 # input data buffers.  If it is required, the connection to the original
-# image index is keeped in the returned m data pointers.
+# image index is kept in the returned m data pointers.
 
 procedure ic_gdatad (in, out, dbuf, d, id, n, m, lflag, offsets, scales,
 	zeros, nimages, npts, v1, v2)
 
 pointer	in[nimages]		# Input images
 pointer	out[3]			# Output images
-pointer	dbuf[nimages]		# Data buffers for nonaligned images
+pointer	dbuf[nimages]		# Data buffers
 pointer	d[nimages]		# Data pointers
 pointer	id[nimages]		# ID pointers
 int	n[npts]			# Number of good pixels
@@ -715,15 +721,17 @@ include	"../icombine.com"
 begin
 	# Get masks and return if there is no data
 	call ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
-	if (dflag == D_NONE)
+	if (dflag == D_NONE) {
+	    call aclri (n, npts)
 	    return
+	}
 
 	# Get data and fill data buffers.  Correct for offsets if needed.
 	ndim = IM_NDIM(out[1])
 	do i = 1, nimages {
 	    if (lflag[i] == D_NONE)
 		next
-	    if (aligned) {
+	    if (dbuf[i] == NULL) {
 		call amovl (v1, v2, IM_MAXDIM)
 		if (project)
 		    v2[ndim+1] = i
@@ -872,7 +880,7 @@ begin
 			mp = mp + 1
 		    }
 		}
-		if (grow > 0) {
+		if (grow >= 1.) {
 		    do j = 1, npts {
 			do i = n[j]+1, nimages
 			    Memi[id[i]+j-1] = 0

@@ -398,7 +398,7 @@ int	ndim				#o dimensionality of images
 int	type				#o datatype of images
 
 pointer	im, sp, imname
-int	dim, xd1, yd1, xd, yd
+int	dim
 
 pointer	immap()
 int	imtlen(), imtgetim(), clplen()
@@ -414,8 +414,6 @@ begin
 	if (imtgetim (images, Memc[imname], SZ_FNAME) != EOF) {
 	    im = immap (Memc[imname], READ_ONLY, 0)
 	    ndim = IM_NDIM(im)
-	    xd1 = IM_LEN(im,1)
-	    yd1 = IM_LEN(im,2)
 	    type = IM_PIXTYPE(im)
 	    call imunmap (im)
 	} else
@@ -425,8 +423,6 @@ begin
 	while (imtgetim (images, Memc[imname], SZ_FNAME) != EOF) {
 	    im = immap (Memc[imname], READ_ONLY, 0)
 	    dim = IM_NDIM(im)
-	    xd = IM_LEN(im,1)
-	    yd = IM_LEN(im,2)
 	    call imunmap (im)
 	    if (dim != ndim)
 		call error (0, "Images must all be the same dimension.\n")
@@ -717,9 +713,8 @@ pointer	ex				#i task struct pointer
 char	outbands[ARB]			#i outbands expression string
 
 pointer	sp, exp, expr
-int	fd, nchars, nexpr, nimops
-int	j, ip, plevel, len_exprbuf
-bool 	saw_image, saw_band
+int	fd, nchars, nexpr
+int	j, ip, plevel
 
 int	open(), fstatl(), strlen()
 char	getc()
@@ -741,7 +736,6 @@ begin
 
 	# If the outbands parameter is an @-file read in the expression from
 	# the file, otherwise just copy the param to the working buffer.
-	len_exprbuf = 0
         if (outbands[1] == '@') {
             fd = open (outbands[2], READ_ONLY, TEXT_FILE)
             nchars = fstatl (fd, F_FILESIZE) + 1
@@ -758,9 +752,6 @@ begin
 	}
 
 	nexpr = 0			# initialize variables
-	nimops = 0
-	saw_image = false
-	saw_band = false
 
 	# Preprocess the expression string to strip out functions that aren't
 	# really evaluated for each line in the image.  The processing is

@@ -1,4 +1,4 @@
-.help nut Nov95 "Slalib Package"
+.help nut Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slNUT (DATE, RMATN)

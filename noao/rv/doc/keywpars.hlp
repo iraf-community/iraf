@@ -29,7 +29,8 @@ Epoch of coordinates keyword. (Value in Years).
 .le
 .ls date_obs = "DATE-OBS"
 Date of observation keyword.  Format for this field should be
-dd/mm/yy, delimited by either a '-' or a '/'.
+dd/mm/yy, (old FITS format), yyyy-mm-dd (new FITS format), or
+yyyy-mm-ddThh:mm:ss.sss (new FITS format with time).
 .le
 
 .ce 

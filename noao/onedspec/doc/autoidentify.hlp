@@ -33,7 +33,7 @@ parameters are specified as INDEF the search for a solution will be slower
 and more likely to fail.
 .le
 .ls coordlist = ""
-Coordinate list consisting of an ordered list of spectral line coordinates.
+Coordinate list consisting of an list of spectral line coordinates.
 A comment line of the form "# units <units>", where <units> is one of the
 understood units names, defines the units of the coordinate list.  If no units
 are specified then Angstroms are assumed.
@@ -363,6 +363,7 @@ the middle fiber of an extracted multispec image.
 REVISIONS
 .ls AUTOIDENTIFY V2.11
 This task is new in this version.
+.le
 .ih
 SEE ALSO
 identify, reidentify, aidpars, linelists, center1d, icfit, gtools

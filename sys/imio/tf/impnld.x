@@ -4,8 +4,8 @@ include	<imhdr.h>
 include	<imio.h>
 
 # IMPNL -- Put the next line to an image of any dimension or datatype.
-# This is a sequential operator.  The index vector V should be initialized
-# to the first line to be read before the first call.  Each call increments
+# This is a sequential operator.  The index vector V should be initialized 
+# before the first call to the first line to be written.  Each call increments 
 # the leftmost subscript by one, until V equals IM_LEN, at which time EOF
 # is returned.  Subsequent writes are ignored.
 

@@ -1,5 +1,15 @@
 This is the vacuum telescope package revisions file.
 
+doc/dicoplot.hlp
+doc/readvt.hlp
+doc/unwrap.hlp
+doc/pimtext.hlp
+    Fixed minor formating problems.  (4/22/99, Valdes)
+
+=======
+V2.11.1
+=======
+
 May 16, 1989 by Dyer Lytle mods to 'readvt', 'syndico', and 'mscan'
 
 Fixed readvt to work with tape drives over the network [(if (mtfile(...].

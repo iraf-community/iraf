@@ -1,4 +1,4 @@
-.help dr2tf Nov95 "Slalib Package"
+.help dr2tf Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDRTF (NDP, ANGLE, SIGN, IHMSF)
@@ -11,12 +11,12 @@
   (double precision)
 
   Given:
-     NDP       int      number of decimal places of seconds
-     ANGLE     dp       angle in radians
+     NDP      i      number of decimal places of seconds
+     ANGLE    d      angle in radians
 
   Returned:
-     SIGN      char     '+' or '-'
-     IHMSF     int(4)   hours, minutes, seconds, fraction
+     SIGN     c      '+' or '-'
+     IHMSF    i(4)   hours, minutes, seconds, fraction
 
   Notes:
 
@@ -35,10 +35,9 @@
          case where ANGLE is very nearly 2pi and rounds up to 24 hours,
          by testing for IHMSF(1)=24 and setting IHMSF(1-4) to zero.
 
-  Called:
-     slDDTF
+  Called:  slDDTF
 
-  P.T.Wallace   Starlink   11 September 1990
+  P.T.Wallace   Starlink   19 March 1999
 
   Copyright (C) 1995 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.

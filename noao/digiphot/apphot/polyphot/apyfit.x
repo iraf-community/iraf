@@ -51,6 +51,8 @@ begin
 
 	if (ier == PY_NOPOLYGON)
 	    return (PY_NOPOLYGON)
+	else if (ier == PY_NOPIX)
+	    return (PY_NOPIX)
 
 	# Store the results.
 	call apsetd (py, PYFLUX, flux)

@@ -1,7 +1,7 @@
-.help shiftlines Jan87 images.imgeom
+.help shiftlines Dec98 images.imgeom
 .ih
 NAME
-shiftlines -- shift image lines
+shiftlines -- shift lines in a list of images
 .ih
 USAGE	
 .nf
@@ -20,21 +20,36 @@ image name then the shifted image replaces the input image.
 Shift in pixels.
 .le
 .ls interp_type = "linear"
-Interpolation function.  The minimum match abbreviated choices are:
-.ls "nearest"
-Nearest neighbor interpolation.
+The interpolant type use to computed the output shifted image.
+The choices are the following:
+.ls nearest
+nearest neighbor interpolation.
 .le
-.ls "linear"
-Linear interpolation.
+.ls linear
+linear interpolation in x.
 .le
-.ls "poly3"
-Third order divided differences.
+.ls poly3
+third order interior polynomial in x.
 .le
-.ls "poly5"
-Fifth order divided differences.
+.ls poly5
+fifth order interior polynomial in x.
 .le
-.ls "spline3"
-Cubic spline interpolation.
+.ls spline3
+cubic spline in x.
+.le
+.ls sinc
+sinc interpolation in x. Users can specify the sinc interpolant width by
+appending a width value to the interpolant string, e.g. sinc51 specifies
+a 51 pixel wide sinc interpolant. The sinc width input by the user will
+be rounded up to the nearest odd number. The default sinc width
+is 31 pixels.
+.le
+.ls drizzle
+1D drizzle resampling. Users can specify the drizzle pixel fraction
+by appending a value between 0.0 and 1.0 in square brackets to the
+interpolant string, e.g. drizzle[0.5]. The default value is 1.0. The
+value 0.0 is increased to 0.001. Drizzle resampling with a pixel fraction
+of 1.0 is identical to linear interpolation.
 .le
 .le
 .ls boundary_type = "nearest"

@@ -68,11 +68,13 @@ begin
 	# we are not going to be referencing out of bounds, and the pixel
 	# data is properly aligned in the pixel file, then FAST i/o (directly
 	# into the FIO buffer) is possible provided no datatype conversion
-	# is desired.  If all these criteria are true enable fast i/o.
+	# or byte swapping is desired or required.  If all these criteria
+	# are true enable fast i/o.
 
 	if ((bufsize / szline >= 2 && IM_SECTUSED(im) == NO) &&
 	    (IM_VNBUFS(im) == 1 && IM_VNBNDRYPIX(im) == 0) &&
-	    (mod (IM_PIXOFF(im), sizeof(IM_PIXTYPE(im)))) == 1) {
+	    (mod (IM_PIXOFF(im), sizeof(IM_PIXTYPE(im)))) == 1 &&
+	    IM_SWAP(im) == NO) {
 
 	    IM_FAST(im) = YES
 	}

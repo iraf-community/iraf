@@ -1,5 +1,32 @@
 .help revisions Jun88 pkg.xtools.gtools
 .nf
+=======
+V2.11.2
+=======
+
+pkg$xtools/gtools/gtcolon.x
+    Corrected definition of btoi.  (8/11/99, Valdes)
+
+pkg$xtools/gtools/gtreset.x
+    This routine was declared as a function rather than a subroutine
+    as it should be.  (7/21/99, Valdes)
+
+pkg$xtools/gtools/gtlabax.x
+    Gmsg call is only made if there is a GUI.  (7/14/99, Valdes)
+
+*
+pkg$xtools/gtools/gthelp.x -
+pkg$xtools/gtools/gtpage.x -
+    New version with access to most of the GIO parameters and with
+    GUI messages.  (5/11/99, Valdes)
+
+=======
+V2.11.1
+=======
+
+=====
+V2.11
+=====
 lib$pkg/gtools.h
 pkg$xtools/gtools/gtools.h
 pkg$xtools/gtools/gtcolon.x

@@ -115,7 +115,7 @@ begin
 	    } else {
 		if (npts[i] == 1) {
 		    tau[i] = 0.
-		    blksize[i] = int (p2[i] - p1[i] + 1)
+		    blksize[i] = int (p2[i] - p1[i] + 1 + SI_TOL)
 	        } else {
 	            tau[i] = (p2[i] - p1[i]) / (npts[i] - 1)
 	    	    if (tau[i] >= 2.0) {
@@ -126,7 +126,7 @@ begin
 			# block averaged pixels will be replicated as necessary
 			# to fill the last block out to this size.  
 
-			blksize[i] = int (tau[i])
+			blksize[i] = int (tau[i] + SI_TOL)
 			npix = p2[i] - p1[i] + 1
 			noldpix = (npix+blksize[i]-1) / blksize[i] * blksize[i]
 			nbavpix = noldpix / blksize[i]
@@ -143,10 +143,10 @@ begin
 	SI_BAVG(si,1) = blksize[1]
 	SI_BAVG(si,2) = blksize[2]
 
-	if (IS_INDEFI (xblk))
-	    xblk = blksize[1]
-	if (IS_INDEFI (yblk))
-	    yblk = blksize[2]
+#	if (IS_INDEFI (xblk))
+#	    xblk = blksize[1]
+#	if (IS_INDEFI (yblk))
+#	    yblk = blksize[2]
 
 	# Allocate and initialize the grid arrays, specifying the X and Y
 	# coordinates of each pixel in the output image, in units of pixels
@@ -162,8 +162,8 @@ begin
 	    # given by XOFF.
 
 	    if (i == 1) {
-		SI_XOFF(si) = int (p1[i])
-		start = p1[1] - int (p1[i]) + 1.0
+		SI_XOFF(si) = int (p1[i] + SI_TOL)
+		start = p1[1] - int (p1[i] + SI_TOL) + 1.0
 	    } else
 	    	start = p1[i]
 
@@ -179,7 +179,7 @@ begin
 	    SI_GRID(si,i) = gp
 	    if (SI_ORDER(si) <= 0) {
 		do j = 0, npts[i]-1
-		    Memr[gp+j] = int (start + (j * tau[i]) + 0.5)
+		    Memr[gp+j] = int (start + (j * tau[i]) + 0.5 + SI_TOL)
 	    } else {
 		do j = 0, npts[i]-1
 		    Memr[gp+j] = start + (j * tau[i])
@@ -398,7 +398,7 @@ begin
 	ncols  = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
 	xoff   = (x1 - 1) * xbavg + 1
-	npix   = min (ncols, xoff + (x2 - x1 + 1) * xbavg - 1)
+	npix   = min (ncols, xoff + (x2 - x1 + 1) * xbavg - 1) - xoff + 1
 
 	if ((xbavg < 1) || (ybavg < 1))
 	    call error (1, "si_blmavg: illegal block size")
@@ -692,7 +692,7 @@ begin
 	ncols  = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
 	xoff   = (x1 - 1) * xbavg + 1
-	npix   = min (ncols, xoff + (x2 - x1 + 1) * xbavg - 1)
+	npix   = min (ncols, xoff + (x2 - x1 + 1) * xbavg - 1) - xoff + 1
 
 	if ((xbavg < 1) || (ybavg < 1))
 	    call error (1, "si_blmavg: illegal block size")

@@ -1,4 +1,5 @@
 images,s,a,"",,,List of CCD images to correct
+output,s,h,"",,,List of output CCD images
 ccdtype,s,h,"object",,,CCD image type to correct
 max_cache,i,h,0,0,,Maximum image caching memory (in Mbytes)
 noproc,b,h,no,,,"List processing steps only?

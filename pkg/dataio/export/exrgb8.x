@@ -986,5 +986,9 @@ begin
 	    }
 	}
 
+        # Flush the pixels to the output image, otherwise we end up with an
+        # odd line which may or may not be actual pixels.
+        call imflush (oim)
+
 	call sfree (sp)
 end

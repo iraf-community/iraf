@@ -20,5 +20,7 @@ begin
 	call mfree (GT_YLABEL(gt), TY_CHAR)
 	call mfree (GT_XUNITS(gt), TY_CHAR)
 	call mfree (GT_YUNITS(gt), TY_CHAR)
+	call mfree (GT_XFORMAT(gt), TY_CHAR)
+	call mfree (GT_YFORMAT(gt), TY_CHAR)
 	call mfree (gt, TY_STRUCT)
 end

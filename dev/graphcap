@@ -68,6 +68,10 @@ lw19|                   :tc=uapl19:
 lw19s|                  :PW#1.2:tc=uapl19:
 lw20|                   :tc=uapl20:
 lw20s|                  :PW#1.2:tc=uapl20:
+lw29|                   :tc=uapl29:
+lw29s|                  :PW#1.2:tc=uapl29:
+lwdp|                   :tc=uapldp:
+lwdp|                   :PW#1.2:tc=uapldp:
 printronix|ptx|		:tc=uptx:
 solitaire2k|solitaire|  :tc=usolitaire2k:
 solitaire4k|            :tc=usolitaire4k:
@@ -77,6 +81,10 @@ epsfl|epsl|             :tc=uepsfl:
 epshalf|epsh|           :XO#300:YO#1650:tc=uepsf:
 clp|clpl|		:tc=uclpl:
 clpp|			:tc=uclpp:
+clp2|clp2l|		:tc=uclp2l:
+clp2p|			:tc=uclp2p:
+clp2t|clp2tl|		:tc=uclp2tl:
+clp2tp|			:tc=uclp2tp:
 
 lpr|lp|lw|		:tc=g-lpr:
 psdump|			:tc=g-psdump:
@@ -223,7 +231,7 @@ imddicomed|imddic|imdd|    :CI#202:LO#1:LS#2:tc=imd:
 
 imd|imdkern|Image device kernel:\
 	:kf=bin$x_imdkern.e:tn=imdkern:cw#.0125:ch#.0294:\
-	:ar#1.0:xs#0.263:ys#0.263:xr#2048:yr#2048:ip#4:gp#4:ca:in:nc#1:\
+	:ar#1.0:xs#0.263:ys#0.263:xr#8192:yr#8192:ip#4:gp#4:ca:in:nc#1:\
 	:z0#1:zr#200:LC:LO#1:LS#1:CI#205:FN#0:
 
 
@@ -236,6 +244,18 @@ uclp|uclpl|UNIX interface to Tektronix Phaser 200e color printer (landscape):\
 uclpp|UNIX interface to Tektronix Phaser 200e color printer (portrait):\
         :xr#2464:yr#2792:ar#1.13:ys#0.2214:\
         :DD=psi_def,tmp$psk,!{ lpr -Pclp $F ; rm $F ; }&:tc=psi_port:
+uclp2|uclp2l|UNIX interface to Tek Phaser 360 color printer (landscape):\
+        :xr#2464:yr#2792:ar#1.13:xs#0.2214:\
+        :DD=psi_def,tmp$psk,!{ lpr -Pclp2 $F ; rm $F ; }&:tc=psi_land:
+uclp2p|UNIX interface to Tek Phaser 360 color printer (portrait):\
+        :xr#2464:yr#2792:ar#1.13:ys#0.2214:\
+        :DD=psi_def,tmp$psk,!{ lpr -Pclp2 $F ; rm $F ; }&:tc=psi_port:
+uclp2t|uclp2tl|UNIX interface to Tek Phaser 360 color printer (landscape):\
+        :xr#2464:yr#2792:ar#1.13:xs#0.2214:\
+        :DD=psi_def,tmp$psk,!{ lpr -Pclp2t $F ; rm $F ; }&:tc=psi_land:
+uclp2tp|UNIX interface to Tek Phaser 360 color printer (portrait):\
+        :xr#2464:yr#2792:ar#1.13:ys#0.2214:\
+        :DD=psi_def,tmp$psk,!{ lpr -Pclp2t $F ; rm $F ; }&:tc=psi_port:
 
 # Generic PSIKERN devices.
 g-psiland|PostScript Kernel output to default printer, (landscape):\
@@ -351,6 +371,14 @@ uapl20|UNIX generic interface to Hewlett-Packard LaserJet 4:\
         :xs#0.265:ys#0.202:ar#0.760:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
         -h$(YW) -p$(PW) | lpr -Plw20; rm $F; }&:tc=sgi_apl:
+uapl29|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw29; rm $F; }&:tc=sgi_apl:
+uapldp|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
+        :xs#0.265:ys#0.202:ar#0.760:MF#2:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plwdp; rm $F; }&:tc=sgi_apl:
 ulwti|UNIX generic interface to TI Turbo laser printer on lepus, via SLIP:\
 	:xs#0.269:ys#0.210:ar#0.781:\
 	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
@@ -371,6 +399,25 @@ uepsfl|uepsl|Encapsulated Postscript file (landscape) UNIX:\
         :XO#300:XW#1950:YO#300:YW#2700:RO:YF:\
         :RO:YF:DD=eps,tmp$sgk,!{ sgidispatch sgi2ueps $F -l$(XO) \
         -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgi$$.eps; rm $F; }&:tc=sgi_apl:
+
+
+# Generic entries for SGI bitmap rasters to other image formats.
+
+g-gif|UNIX generic interface to multi-frame GIF file generator:\
+	:DD=ugif,tmp$sgk,!{ sgidispatch sgi2gif -w $(PX) -h $(PY) \
+	-bg 255 255 255 -fg 0 0 0 -root sgi$$ $F.[1-8] ; \
+	rm $F.[1-8]; }&:MF#8:NF:tc=sgi_image_format:
+
+g-xbm|UNIX generic interface to multi-frame XBM file generator:\
+	:DD=uxbm,tmp$sgk,!{ sgidispatch sgi2xbm -w $(PX) -h $(PY) \
+	$F.[1-8]  > sgi$$.xbm; rm $F.[1-8]; }&:\
+	:MF#8:NF:tc=sgi_image_format:
+
+sgi_image_format|Generic raster file format specification:\
+	:kf=bin$x_sgikern.e:tn=sgikern:\
+	:ar#.75:xr#640:yr#480:PX#640:PY#480:XW#640:YW#480:\
+	:BI:MF#1:YF:NB#8:LO#1:LS#0:XO#0:YO#0:
+
 
 # The following 2 entries submitted by Joe Harrington, MIT Planetary
 # Science Group <jh@athena.mit.edu>.  The first entry writes a PostScript
@@ -642,6 +689,8 @@ nas_solitaire|Common parameters for above different resolutions:\
 
 xgtermb|XGterm graphics terminal emulator for the X window system:\
 	:tc=gterm:
+xgtermd|xgterm-nogui|XGterm with GUI messaging disabled:\
+	:EM@:tc=xgterm:
 xgtermc|xgterm|XGterm with imaging and color enabled:\
 	:EM=^]^Y:ED=lib$scr/xgterm.gui:\
 	:EZ=^]\Esre[\EP%s\E\\]:ER=^]\Essz[%s]:\

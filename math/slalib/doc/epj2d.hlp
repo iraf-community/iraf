@@ -1,4 +1,4 @@
-.help epj2d Nov95 "Slalib Package"
+.help epj2d Jun99 "Slalib Package"
 .nf
 
       DOUBLE PRECISION FUNCTION slEJ2D (EPJ)

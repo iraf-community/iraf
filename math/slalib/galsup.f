@@ -16,7 +16,7 @@
 *  (all arguments are radians)
 *
 *  Called:
-*     slDS2C, slDIMV, slDC2S, slDA2P, slDA1P
+*     slDS2C, slDMXV, slDC2S, slDA2P, slDA1P
 *
 *  References:
 *
@@ -31,9 +31,9 @@
 *     longitude of the supergalactic origin.  Both are wrong;  the
 *     correct value is L2=137.37.)
 *
-*  P.T.Wallace   Starlink   March 1986
+*  P.T.Wallace   Starlink   25 January 1999
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

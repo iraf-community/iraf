@@ -26,16 +26,16 @@
 *  Called:
 *     slDS2C       spherical to Cartesian
 *     slDC2S       Cartesian to spherical
-*     slDA2P      normalise angle 0-2Pi
+*     slDA2P      normalize angle 0-2Pi
 *
 *  Note:
 *     The proper motions in RA are dRA/dt rather than
 *     cos(Dec)*dRA/dt, and are in the same coordinate
 *     system as R0,D0.
 *
-*  P.T.Wallace   Starlink   12 April 1990
+*  P.T.Wallace   Starlink   23 August 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -45,7 +45,7 @@
 
 *  Km/s to AU/year multiplied by arc seconds to radians
       DOUBLE PRECISION VFR
-      PARAMETER (VFR=0.21094502D0*0.4848136811095359949D-05)
+      PARAMETER (VFR=0.21094502D0*0.484813681109535994D-5)
 
       INTEGER I
       DOUBLE PRECISION slDA2P

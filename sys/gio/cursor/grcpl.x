@@ -20,6 +20,7 @@ pointer	tr, sp, p, pl, op, last_op
 int	nwords, fd, save1, save2, i
 int	stropen()
 pointer	gtr_init(), gtr_writep()
+errchk	gtr_init, gtr_writep, gki_redir
 
 begin
 	call smark (sp)

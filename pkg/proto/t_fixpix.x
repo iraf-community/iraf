@@ -97,24 +97,24 @@ begin
 			    next
 			switch (IM_PIXTYPE(im)) {
 			case TY_SHORT:
-			    buf = impl2s (im, i)
 			    tmp = xt_fps (fp, im, i, fd)
+			    buf = impl2s (im, i)
 			    call amovs (Mems[tmp], Mems[buf], nc)
 			case TY_INT:
-			    buf = impl2i (im, i)
 			    tmp = xt_fpi (fp, im, i, fd)
+			    buf = impl2i (im, i)
 			    call amovi (Memi[tmp], Memi[buf], nc)
 			case TY_USHORT, TY_LONG:
-			    buf = impl2l (im, i)
 			    tmp = xt_fpl (fp, im, i, fd)
+			    buf = impl2l (im, i)
 			    call amovl (Meml[tmp], Meml[buf], nc)
 			case TY_REAL, TY_COMPLEX:
-			    buf = impl2r (im, i)
 			    tmp = xt_fpr (fp, im, i, fd)
+			    buf = impl2r (im, i)
 			    call amovr (Memr[tmp], Memr[buf], nc)
 			case TY_DOUBLE:
-			    buf = impl2d (im, i)
 			    tmp = xt_fpd (fp, im, i, fd)
+			    buf = impl2d (im, i)
 			    call amovd (Memd[tmp], Memd[buf], nc)
 			}
 		    }

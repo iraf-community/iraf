@@ -1,4 +1,4 @@
-.help caldj Nov95 "Slalib Package"
+.help caldj Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slCADJ (IY, IM, ID, DJM, J)

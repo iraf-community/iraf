@@ -76,7 +76,6 @@ The second half of the CAMERA header information is formated and printed.
 .le
 .le
 .le
-.le
 .ls read_image
 The CAMERA image pixels are converted to an IRAF image file.
 The image file header is set.
@@ -98,6 +97,8 @@ The pixels are read into a record buffer.  Data conversion is accomplished
 with an initial byte swap to put the input in most significant byte first
 form and then the MII routines are called.   The
 specified number of pixels is returned in the specified buffer.
+.le
+.le
 .le
 .le
 .endhelp

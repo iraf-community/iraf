@@ -35,6 +35,7 @@ Type of weighting. The options are WTS_USER, WTS_UNIFORM or WTS_SPACING.
 If wtflag equals WTS_USER the weight for each point is supplied by the user.
 If wtflag is either WTS_UNIFORM or WTS_SPACING the routine sets weight
 to one.
+.le
 .ih
 DESCRIPTION
 Calculate the non-zero basis functions for the given value of x.

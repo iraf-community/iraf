@@ -1,4 +1,4 @@
-.help cldj Nov95 "Slalib Package"
+.help cldj Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slCLDJ (IY, IM, ID, DJM, J)
@@ -25,9 +25,9 @@
   The algorithm is derived from that of Hatcher 1984
   (QJRAS 25, 53-55).
 
-  P.T.Wallace   Starlink   December 1985
+  P.T.Wallace   Starlink   11 March 1998
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1998 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

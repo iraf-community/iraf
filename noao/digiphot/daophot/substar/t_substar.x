@@ -141,8 +141,8 @@ begin
 	    root = fnldir (Memc[subimage], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[subimage + root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[subimage])) {
-	        call dp_oimname (Memc[image], "", "sub", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_oimname (Memc[image], Memc[outfname], "sub",
+		    Memc[outfname], SZ_FNAME)
 	        output = immap (Memc[outfname], NEW_COPY, input)
 	    } else {
 	        call strcpy (Memc[subimage], Memc[outfname], SZ_FNAME)
@@ -156,8 +156,8 @@ begin
 	    root = fnldir (Memc[photfile], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[photfile+root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[photfile]))
-	        call dp_inname (Memc[image], "", "nst", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_inname (Memc[image], Memc[outfname], "nst",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[photfile], Memc[outfname], SZ_FNAME)
 	    ap_text = itob (access (Memc[outfname], 0, TEXT_FILE))
@@ -178,8 +178,8 @@ begin
 	        root = fnldir (Memc[exfile], Memc[outfname], SZ_FNAME)
 	        if (strncmp (DEF_DEFNAME, Memc[exfile+root],
 	            DEF_LENDEFNAME) == 0 || root == strlen (Memc[exfile]))
-	            call dp_inname (Memc[image], "", "pst", Memc[outfname],
-		        SZ_FNAME)
+	            call dp_inname (Memc[image], Memc[outfname], "pst",
+		        Memc[outfname], SZ_FNAME)
 	        else
 	            call strcpy (Memc[exfile], Memc[outfname], SZ_FNAME)
 	        ex_text = itob (access (Memc[outfname], 0, TEXT_FILE))
@@ -196,8 +196,8 @@ begin
 	    root = fnldir (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    if (strncmp (DEF_DEFNAME, Memc[psfimage+root],
 	        DEF_LENDEFNAME) == 0 || root == strlen (Memc[psfimage]))
-	        call dp_iimname (Memc[image], "", "psf", Memc[outfname],
-		    SZ_FNAME)
+	        call dp_iimname (Memc[image], Memc[outfname], "psf",
+		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    psffd = immap (Memc[outfname], READ_ONLY, 0)

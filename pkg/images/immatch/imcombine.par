@@ -1,8 +1,9 @@
-# ICOMBINE -- Image combine parameters
+# IMCOMBINE -- Image combine parameters
 
 input,s,a,,,,List of images to combine
 output,s,a,,,,List of output images
-plfile,s,h,"",,,List of output pixel list files (optional)
+rejmask,s,h,"",,,List of rejection masks (optional)
+plfile,s,h,"",,,List of pixel list files (optional)
 sigma,s,h,"",,,List of sigma images (optional)
 logfile,s,h,"STDOUT",,,"Log file
 "
@@ -34,4 +35,4 @@ gain,s,h,"1.",,,ccdclip: CCD gain (electrons/DN)
 snoise,s,h,"0.",,,ccdclip: Sensitivity noise (fraction)
 sigscale,r,h,0.1,0.,,Tolerance for sigma clipping scaling corrections
 pclip,r,h,-0.5,,,pclip: Percentile clipping parameter
-grow,i,h,0,,,Radius (pixels) for 1D neighbor rejection
+grow,r,h,0.,0.,,Radius (pixels) for neighbor rejection

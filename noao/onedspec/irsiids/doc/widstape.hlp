@@ -31,6 +31,7 @@ The tape block size in bytes. This must be an integral factor of 80.
 .ls ebcdic = no
 The default character code is ASCII, but if this parameter is set to yes,
 the output character will be in EBCDIC.
+.le
 .ih
 DESCRIPTION
 The specified spectra are copied to the output file in a card-image format

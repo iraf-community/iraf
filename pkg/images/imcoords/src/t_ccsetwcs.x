@@ -37,7 +37,7 @@ begin
 	call salloc (record, SZ_FNAME, TY_CHAR)
 	call salloc (insystem, SZ_FNAME, TY_CHAR)
 	call salloc (projstr, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	imlist = imtopenp ("images")
 	call clgstr ("database", Memc[database], SZ_FNAME)
@@ -206,11 +206,14 @@ begin
 		    tlngref, tlatref, sx1, sy1, sx2, sy2, txref, tyref, txscale,
 		    tyscale, txrot, tyrot)
 		if (recstat == ERR) {
-		    if (verbose)
-			call printf ("    Error decoding database record %s\n")
-			    call pargstr (Memc[record])
+                    call printf ("    Cannot find or decode ")
+                    call printf ("record %s in database file %s\n")
+                        call pargstr (Memc[record])
+                        call pargstr (Memc[database])
 		} else {
-	    	    proj = strdic (Memc[projstr], Memc[projstr], SZ_FNAME,
+		    call sscan (Memc[projstr])
+			call gargwrd (Memc[str], SZ_FNAME)
+	    	    proj = strdic (Memc[str], Memc[str], SZ_FNAME,
 		        WTYPE_LIST)
 	    	    if (proj <= 0 || proj == WTYPE_LIN)
 			Memc[projstr] = EOS

@@ -366,8 +366,8 @@ begin
 	    Memc[newoutname] = EOS
         } else if (strmatch (Memc[outname], "\.coo\.") > 0) {
 	    findex = fnldir (Memc[outname], Memc[newoutname], SZ_FNAME)
-	    call apoutname (Memc[image], "", "coo", Memc[newoutname],
-		SZ_FNAME)
+	    call apoutname (Memc[image], Memc[newoutname], "coo",
+	        Memc[newoutname], SZ_FNAME)
 	} else if (gstrmatch (Memc[outname], root, findex, lindex) > 0) {
 	    repeat {
 	        version = version + 1

@@ -48,6 +48,7 @@ begin
 	    IM_LEN(im_out, 2) = dimen
 	    im_size = dimen
 	}
+	IM_PIXTYPE(im_out) = TY_REAL
 
 	if (IS_INDEFR(xpsf)) {
 	    dx = DP_PSFX(psffit)

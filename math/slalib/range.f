@@ -4,7 +4,7 @@
 *      R A 1 P
 *     - - - - - -
 *
-*  Normalise angle into range +/- pi  (single precision)
+*  Normalize angle into range +/- pi  (single precision)
 *
 *  Given:
 *     ANGLE     dp      the angle in radians
@@ -12,7 +12,7 @@
 *  The result is ANGLE expressed in the +/- pi (single
 *  precision).
 *
-*  P.T.Wallace   Starlink   December 1984
+*  P.T.Wallace   Starlink   23 November 1995
 *
 *  Copyright (C) 1995 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.

@@ -4,8 +4,7 @@
 *      V N
 *     - - -
 *
-*  Normalises a 3-vector also giving the modulus
-*  (single precision)
+*  Normalizes a 3-vector also giving the modulus (single precision)
 *
 *  Given:
 *     V       real(3)      vector
@@ -16,7 +15,7 @@
 *
 *  If the modulus of V is zero, UV is set to zero as well
 *
-*  P.T.Wallace   Starlink   November 1984
+*  P.T.Wallace   Starlink   23 November 1995
 *
 *  Copyright (C) 1995 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
@@ -39,7 +38,7 @@
       W1=SQRT(W1)
       VM=W1
 
-*  Normalise the vector
+*  Normalize the vector
       IF (W1.LE.0.0) W1=1.0
       DO I=1,3
          UV(I)=V(I)/W1

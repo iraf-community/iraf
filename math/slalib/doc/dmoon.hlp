@@ -1,4 +1,4 @@
-.help dmoon Nov95 "Slalib Package"
+.help dmoon Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDMON (DATE, PV)
@@ -28,7 +28,10 @@
      distance).  Comparison with JPL DE200 over the interval
      1960-2025 gives RMS errors of 3.7 arcsec and 83 mas/hour in
      longitude, 2.3 arcsec and 48 mas/hour in latitude, 11 km
-     and 81 mm/s in distance.
+     and 81 mm/s in distance.  The maximum errors over the same
+     interval are 18 arcsec and 0.50 arcsec/hour in longitude,
+     11 arcsec and 0.24 arcsec/hour in latitude, 40 km and 0.29 m/s
+     in distance. 
 
   3  The original algorithm is expressed in terms of the obsolete
      timescale Ephemeris Time.  Either TDB or TT can be used, but
@@ -46,9 +49,9 @@
   Reference:
      Meeus, l'Astronomie, June 1984, p348.
 
-  P.T.Wallace   Starlink   7 December 1994
+  P.T.Wallace   Starlink   22 January 1998
 
-  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1998 Rutherford Appleton Laboratory
   Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 
 .fi

@@ -22,9 +22,9 @@
 *
 *  Called:  slDEUL
 *
-*  P.T.Wallace   Starlink   6 April 1990
+*  P.T.Wallace   Starlink   23 August 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -34,7 +34,7 @@
 
 *  Arc seconds to radians
       DOUBLE PRECISION AS2R
-      PARAMETER (AS2R=0.4848136811095359949D-05)
+      PARAMETER (AS2R=0.484813681109535994D-5)
 
       DOUBLE PRECISION T,EPS0
 

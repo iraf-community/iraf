@@ -30,14 +30,14 @@ bool	listonly		# List only?
 pointer	observatory		# Observatory
 
 bool	newobs, obshead
-int	i, year, month, day
+int	i, year, month, day, flags
 double	zone, exp, time, ra, dec, ep, epoch, ujd, hjd, ljd, lt
 pointer	im, obs, sp, input, date, ep_str
 
 bool	clgetb()
-int	nowhite(), imtgetim(), ctoi()
+int	nowhite(), imtgetim(), ctod(), dtm_decode()
 pointer	imtopenp(), immap()
-double	imgetd(), ctod(), obsgetd(), ast_julday()
+double	imgetd(), obsgetd(), ast_julday()
 errchk	immap, obsobpen, obsgetd, obsimopen, imgstr, imgetd
 
 begin
@@ -122,20 +122,10 @@ begin
 		# Determine the date and time of observation.
 
 		call imgstr (im, Memc[date_key], Memc[date], SZ_LINE)
-		for (i=0; Memc[date+i]!=EOS; i=i+1)
-		    if (!IS_DIGIT(Memc[date+i]))
-			Memc[date+i] = ' '
-		i = 1
-		if (ctoi (Memc[date], i, day) == 0)
-		    day = 0
-		if (ctoi (Memc[date], i, month) == 0)
-		    month = 0
-		if (ctoi (Memc[date], i, year) == 0)
-		    year = 0
-		if (day == 0 || month == 0 || year == 0)
+		if (dtm_decode (Memc[date],year,month,day,time,flags) == ERR)
 		    call error (1, "Error in date keyword")
-
-		time = imgetd (im, Memc[time_key])
+		if (IS_INDEFD(time))
+		    time = imgetd (im, Memc[time_key])
 
 		# Correct to midexposure if desired.
 		if (Memc[exp_key] != EOS) {

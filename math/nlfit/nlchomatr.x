@@ -37,8 +37,8 @@ begin
 	do n = 1, nrows {
 
 	    # Test to see if matrix is singular.
-	    #if (((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= EPSILON$T) {
-	    if (((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= real(0.0)) {
+	    if (((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= EPSILONR) {
+	    #if (((matfac[1,n] + matrix[1,n]) - matrix[1,n]) <= PIXEL(0.0)) {
 		do j = 1, nbands
 		    matfac[j,n] = real (0.0)
 		ier = SINGULAR

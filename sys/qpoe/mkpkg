@@ -39,6 +39,8 @@ generic:
 	$set GFLAGS = "-k -t si -p gen/"
 	$ifolder (gen/qpiorpixi.x, qpiorpix.gx)
 	    $generic $(GFLAGS) qpiorpix.gx		$endif
+	$ifolder (gen/qpiogetev.x, qpiogetev.gx)
+	    $generic -k -o gen/qpiogetev.x qpiogetev.gx	$endif
 	;
 
 libex.a:
@@ -84,7 +86,6 @@ libex.a:
 	qpgstr.x	qpoe.h
 	qpinherit.x	qpoe.h <error.h>
 	qpioclose.x	qpio.h
-	qpiogetev.x	qpio.h <pmset.h>
 	qpiogetfil.x	qpio.h qpoe.h <mach.h>
 	qpiogetrg.x	qpio.h
 	qpiolmask.x	<plset.h> qpio.h qpoe.h
@@ -97,8 +98,10 @@ libex.a:
 	qpiorb.x	qpio.h
 	qpiosetfil.x	qpex.h qpio.h
 	qpioseti.x	qpio.h <plset.h> <qpioset.h>
+	qpiosetr.x	qpio.h <qpioset.h>
 	qpiosetrg.x	qpio.h
 	qpiostati.x	qpio.h <qpioset.h>
+	qpiostatr.x	qpio.h <qpioset.h>
 	qpiosync.x	qpio.h qpoe.h <fset.h> <mach.h>
 	qpiowb.x	qpio.h qpoe.h <fset.h> <mach.h>
 	qplenf.x	qpoe.h
@@ -121,8 +124,10 @@ libex.a:
 	qprenamef.x	qpoe.h
 	qpsavewcs.x	qpoe.h
 	qpseti.x	qpoe.h <qpset.h>
+	qpsetr.x	qpoe.h <qpset.h>
 	qpsizeof.x	qpoe.h
 	qpstati.x	qpoe.h <qpset.h>
+	qpstatr.x	qpoe.h <qpset.h>
 	qpsync.x	qpoe.h
 	qpwrite.x	qpoe.h
 	;

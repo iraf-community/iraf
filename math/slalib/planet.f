@@ -5,20 +5,21 @@
 *     - - - - - - -
 *
 *  Approximate heliocentric position and velocity of a specified
-*  major planet (Mercury, Venus, EMB, Mars, Jupiter, Saturn, Uranus
-*  or Neptune).
+*  major planet.
 *
 *  Given:
 *     DATE      d      Modified Julian Date (JD - 2400000.5)
-*     NP        i      planet (1=Mercury, 2=Venus, 3=EMB ... 8=Neptune)
+*     NP        i      planet (1=Mercury, 2=Venus, 3=EMB ... 9=Pluto)
 *
 *  Returned:
 *     PV        d(6)   heliocentric x,y,z,xdot,ydot,zdot, J2000
 *                                           equatorial triad (AU,AU/s)
-*     JSTAT     i      status: -1 = illegal NP (outside 1-8)
+*     JSTAT     i      status: +1 = warning: date out of range
 *                               0 = OK
-*                              +1 = warning: date outside 1000-3000
-*                              +2 = warning: solution didn't converge
+*                              -1 = illegal NP (outside 1-9)
+*                              -2 = solution didn't converge
+*
+*  Called:  slPLNE
 *
 *  Notes
 *
@@ -28,12 +29,15 @@
 *  2  The reference frame is equatorial and is with respect to the
 *     mean equinox and ecliptic of epoch J2000.
 *
-*  3  If an NP value outside the range 1-8 is supplied, an error
+*  3  If an NP value outside the range 1-9 is supplied, an error
 *     status (JSTAT = -1) is returned and the PV vector set to zeroes.
 *
-*  4  The algorithm is due to J.L. Simon, P. Bretagnon, J. Chapront,
-*     M. Chapront-Touze, G. Francou and J. Laskar (Bureau des
-*     Longitudes, Paris, France).
+*  4  The algorithm for obtaining the mean elements of the planets
+*     from Mercury to Neptune is due to J.L. Simon, P. Bretagnon,
+*     J. Chapront, M. Chapront-Touze, G. Francou and J. Laskar
+*     (Bureau des Longitudes, Paris).  The (completely different)
+*     algorithm for calculating the ecliptic coordinates of Pluto
+*     is by Meeus.
 *
 *  5  Comparisons of the present routine with the JPL DE200 ephemeris
 *     give the following RMS errors over the interval 1960-2025:
@@ -48,6 +52,7 @@
 *        Saturn          199000              19.4
 *        Uranus          564000              16.4
 *        Neptune         158000              14.4
+*        Pluto            36400               0.137
 *
 *     From comparisons with DE102, Simon et al quote the following
 *     longitude accuracies over the interval 1800-2200:
@@ -61,40 +66,45 @@
 *        Uranus                 86"
 *        Neptune                11"
 *
-*     Over the interval 1000-3000, the accuracy is better than 1.5
-*     times that over 1800-2200.  Outside the interval 1000-3000 the
-*     accuracy declines.
+*     In the case of Pluto, Meeus quotes an accuracy of 0.6 arcsec
+*     in longitude and 0.2 arcsec in latitude for the period
+*     1885-2099.
 *
-*  6  The present SLALIB implementation differs from the original
-*     Simon et al Fortran code in the following respects.  None of
-*     the changes affects the result significantly.
+*     For all except Pluto, over the period 1000-3000 the accuracy
+*     is better than 1.5 times that over 1800-2200.  Outside the
+*     period 1000-3000 the accuracy declines.  For Pluto the
+*     accuracy declines rapidly outside the period 1885-2099.
+*     Outside these ranges (1885-2099 for Pluto, 1000-3000 for
+*     the rest) a "date out of range" warning status (JSTAT=+1)
+*     is returned.
 *
-*       *  The date is supplied as a Modified Julian Date rather
-*          than a Julian Date (MJD = JD - 2400000.5).
+*  6  The algorithms for (i) Mercury through Neptune and (ii) Pluto
+*     are completely independent.  In the Mercury through Neptune
+*     case, the present SLALIB implementation differs from the
+*     original Simon et al Fortran code in the following respects.
 *
-*       *  The result is returned only in equatorial Cartesian form;
-*          the ecliptic longitude, latitude and radius vector are not
-*          returned.
+*     *  The date is supplied as a Modified Julian Date rather
+*        than a Julian Date (MJD = JD - 2400000.5).
 *
-*       *  The result is in the J2000 equatorial frame, not ecliptic.
+*     *  The result is returned only in equatorial Cartesian form;
+*        the ecliptic longitude, latitude and radius vector are not
+*        returned.
 *
-*       *  The velocity is in AU per second, not AU per day.
+*     *  The velocity is in AU per second, not AU per day.
 *
-*       *  Everything is done in-line:  there are no calls to other
-*          routines.
+*     *  Different error/warning status values are used.
 *
-*       *  Different error/warning status values are used.
+*     *  Kepler's equation is not solved inline.
 *
-*       *  A different Kepler's-equation-solver is used (avoiding
-*          use of COMPLEX*16).
+*     *  Polynomials in T are nested to minimize rounding errors.
 *
-*       *  Polynomials in T are nested to minimize rounding errors.
+*     *  Explicit double-precision constants are used to avoid
+*        mixed-mode expressions.
 *
-*       *  Explicit double-precision constants are used to avoid
-*          mixed-mode expressions.
+*     *  There are other, cosmetic, changes to comply with
+*        Starlink/SLALIB style guidelines.
 *
-*       *  There are other, cosmetic, changes to comply with
-*          Starlink/SLALIB style guidelines.
+*     None of the above changes affects the result significantly.
 *
 *  7  For NP=3 the result is for the Earth-Moon Barycentre.  To
 *     obtain the heliocentric position and velocity of the Earth,
@@ -105,17 +115,15 @@
 *     be omitted for modern epochs without introducing significant
 *     inaccuracy.)
 *
-*  8  The status, JSTAT, indicates the most serious condition
-*     encountered, where illegal NP is considered the most serious,
-*     followed by failure to converge, then remote epoch.
+*  References:  Simon et al., Astron. Astrophys. 282, 663 (1994).
+*               Meeus, Astronomical Algorithms, Willmann-Bell (1991).
 *
-*  Reference:  Astron. Astrophys. 282, 663 (1994).
+*  P.T.Wallace   Starlink   27 May 1997
 *
-*  P.T.Wallace   Starlink   24 November 1994
-*
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1997 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
+
       IMPLICIT NONE
 
       DOUBLE PRECISION DATE
@@ -123,32 +131,40 @@
       DOUBLE PRECISION PV(6)
       INTEGER JSTAT
 
-*  Maximum number of iterations allowed to solve Kepler's equation
-      INTEGER KMAX
-      PARAMETER (KMAX=10)
-
-*  2Pi, arcsec to radians
-      DOUBLE PRECISION D2PI,AS2R
+*  2Pi, deg to radians, arcsec to radians
+      DOUBLE PRECISION D2PI,D2R,AS2R
       PARAMETER (D2PI=6.283185307179586476925286766559D0,
+     :           D2R=0.017453292519943295769236907684886D0,
      :           AS2R=4.848136811095359935899141023579D-6)
 
+*  Gaussian gravitational constant (exact)
+      DOUBLE PRECISION GCON
+      PARAMETER (GCON=0.01720209895D0)
+
+*  Seconds per Julian century
+      DOUBLE PRECISION SPC
+      PARAMETER (SPC=36525D0*86400D0)
+
 *  Sin and cos of J2000 mean obliquity (IAU 1976)
-      DOUBLE PRECISION SINEPS,COSEPS
-      PARAMETER (SINEPS=0.3977771559319137D0,
-     :           COSEPS=0.9174820620691818D0)
+      DOUBLE PRECISION SE,CE
+      PARAMETER (SE=0.3977771559319137D0,
+     :           CE=0.9174820620691818D0)
 
-*  Gaussian constant / seconds per day
-      DOUBLE PRECISION GKS
-      PARAMETER (GKS=0.017202098950D0/86400D0)
-
-      INTEGER I,J,K
+      INTEGER I,J,IJSP(3,43)
       DOUBLE PRECISION AMAS(8),A(3,8),DLM(3,8),E(3,8),
      :                 PI(3,8),DINC(3,8),OMEGA(3,8),
-     :                 KP(9,8),CA(9,8),SA(9,8),
-     :                 KQ(10,8),CL(10,8),SL(10,8),
-     :                 T,DA,DL,DE,DP,DI,DO,DMU,ARGA,ARGL,AM,AE,
-     :                 DAE,AE2,AT,R,V,SI2,XQ,XP,TL,XSW,XCW,XM2,
-     :                 XF,CI2,XMS,XMC,XPXQ2,X,Y,Z
+     :                 DKP(9,8),CA(9,8),SA(9,8),
+     :                 DKQ(10,8),CLO(10,8),SLO(10,8),
+     :                 T,DA,DE,DPE,DI,DO,DMU,ARGA,ARGL,DM,
+     :                 AB(2,3,43),DJ0,DS0,DP0,DL0,DLD0,DB0,DR0,
+     :                 DJ,DS,DP,DJD,DSD,DPD,WLBR(3),WLBRD(3),
+     :                 WJ,WS,WP,AL,ALD,SAL,CAL,
+     :                 AC,BC,DL,DLD,DB,DBD,DR,DRD,
+     :                 SL,CL,SB,CB,SLCB,CLCB,X,Y,Z,XD,YD,ZD
+
+*  -----------------------
+*  Mercury through Neptune
+*  -----------------------
 
 *  Planetary inverse masses
       DATA AMAS / 6023600D0,408523.5D0,328900.5D0,3098710D0,
@@ -227,7 +243,7 @@
 *  Tables for trigonometric terms to be added to the mean elements
 *  of the semi-major axes.
 *
-      DATA KP /
+      DATA DKP /
      : 69613, 75645, 88306, 59899, 15746, 71087, 142173,  3086,    0,
      : 21863, 32794, 26934, 10931, 26250, 43725,  53867, 28939,    0,
      : 16002, 21863, 32004, 10931, 14529, 16368,  15318, 32794,    0,
@@ -260,7 +276,7 @@
 *  Tables giving the trigonometric terms to be added to the mean
 *  elements of the mean longitudes.
 *
-      DATA KQ /
+      DATA DKQ /
      :  3086, 15746, 69613, 59899, 75645, 88306, 12661, 2658,  0,   0,
      : 21863, 32794, 10931,    73,  4387, 26934,  1473, 2157,  0,   0,
      :    10, 16002, 21863, 10931,  1473, 32004,  4387,   73,  0,   0,
@@ -270,7 +286,7 @@
      :     4,   204,   177,     8,    31,   200,  1265,  102,  4, 204,
      :     4,   102,   106,     8,    98,  1367,   487,  204,  4, 102 /
 *
-      DATA CL /
+      DATA CLO /
      :     21,   -95, -157,   41,   -5,   42,   23,   30,     0,    0,
      :   -160,  -313, -235,   60,  -74,  -76,  -27,   34,     0,    0,
      :   -325,  -322,  -79,  232,  -52,   97,   55,  -41,     0,    0,
@@ -280,7 +296,7 @@
      :-135245,-14594, 4197,-4030,-5630,-2898, 2540, -306,  2939, 1986,
      :  89948,  2103, 8963, 2695, 3682, 1648,  866, -154, -1963, -283 /
 *
-      DATA SL /
+      DATA SLO /
      :   -342,   136,  -23,   62,   66,  -52,  -33,   17,     0,    0,
      :    524,  -149,  -35,  117,  151,  122,  -71,  -62,     0,    0,
      :   -105,  -137,  258,   35, -116,  -88, -112,  -80,     0,    0,
@@ -290,104 +306,403 @@
      :  71234,-41116, 5334,-4935,-1848,   66,  434,-1748,  3780, -701,
      : -47645, 11647, 2166, 3194,  679,    0, -244, -419, -2531,   48 /
 
+*  -----
+*  Pluto
+*  -----
+
+*
+*  Coefficients for fundamental arguments:  mean longitudes
+*  (degrees) and mean rate of change of longitude (degrees per
+*  Julian century) for Jupiter, Saturn and Pluto
+*
+      DATA DJ0, DJD / 34.35D0, 3034.9057D0 /
+      DATA DS0, DSD / 50.08D0, 1222.1138D0 /
+      DATA DP0, DPD / 238.96D0, 144.9600D0 /
+
+*  Coefficients for latitude, longitude, radius vector
+      DATA DL0,DLD0 / 238.956785D0, 144.96D0 /
+      DATA DB0 / -3.908202D0 /
+      DATA DR0 / 40.7247248D0 /
+
+*
+*  Coefficients for periodic terms (Meeus's Table 36.A)
+*
+*  The coefficients for term n in the series are:
+*
+*    IJSP(1,n)     J
+*    IJSP(2,n)     S
+*    IJSP(3,n)     P
+*    AB(1,1,n)     longitude sine (degrees)
+*    AB(2,1,n)     longitude cosine (degrees)
+*    AB(1,2,n)     latitude sine (degrees)
+*    AB(2,2,n)     latitude cosine (degrees)
+*    AB(1,3,n)     radius vector sine (AU)
+*    AB(2,3,n)     radius vector cosine (AU)
+*
+      DATA (IJSP(I, 1),I=1,3),((AB(J,I, 1),J=1,2),I=1,3) /
+     :                             0,  0,  1,
+     :            -19798886D-6,  19848454D-6,
+     :             -5453098D-6, -14974876D-6,
+     :             66867334D-7,  68955876D-7 /
+      DATA (IJSP(I, 2),I=1,3),((AB(J,I, 2),J=1,2),I=1,3) /
+     :                             0,  0,  2,
+     :               897499D-6,  -4955707D-6,
+     :              3527363D-6,   1672673D-6,
+     :            -11826086D-7,   -333765D-7 /
+      DATA (IJSP(I, 3),I=1,3),((AB(J,I, 3),J=1,2),I=1,3) /
+     :                             0,  0,  3,
+     :               610820D-6,   1210521D-6,
+     :             -1050939D-6,    327763D-6,
+     :              1593657D-7,  -1439953D-7 /
+      DATA (IJSP(I, 4),I=1,3),((AB(J,I, 4),J=1,2),I=1,3) /
+     :                             0,  0,  4,
+     :              -341639D-6,   -189719D-6,
+     :               178691D-6,   -291925D-6,
+     :               -18948D-7,    482443D-7 /
+      DATA (IJSP(I, 5),I=1,3),((AB(J,I, 5),J=1,2),I=1,3) /
+     :                             0,  0,  5,
+     :               129027D-6,    -34863D-6,
+     :                18763D-6,    100448D-6,
+     :               -66634D-7,    -85576D-7 /
+      DATA (IJSP(I, 6),I=1,3),((AB(J,I, 6),J=1,2),I=1,3) /
+     :                             0,  0,  6,
+     :               -38215D-6,     31061D-6,
+     :               -30594D-6,    -25838D-6,
+     :                30841D-7,     -5765D-7 /
+      DATA (IJSP(I, 7),I=1,3),((AB(J,I, 7),J=1,2),I=1,3) /
+     :                             0,  1, -1,
+     :                20349D-6,     -9886D-6,
+     :                 4965D-6,     11263D-6,
+     :                -6140D-7,     22254D-7 /
+      DATA (IJSP(I, 8),I=1,3),((AB(J,I, 8),J=1,2),I=1,3) /
+     :                             0,  1,  0,
+     :                -4045D-6,     -4904D-6,
+     :                  310D-6,      -132D-6,
+     :                 4434D-7,      4443D-7 /
+      DATA (IJSP(I, 9),I=1,3),((AB(J,I, 9),J=1,2),I=1,3) /
+     :                             0,  1,  1,
+     :                -5885D-6,     -3238D-6,
+     :                 2036D-6,      -947D-6,
+     :                -1518D-7,       641D-7 /
+      DATA (IJSP(I,10),I=1,3),((AB(J,I,10),J=1,2),I=1,3) /
+     :                             0,  1,  2,
+     :                -3812D-6,      3011D-6,
+     :                   -2D-6,      -674D-6,
+     :                   -5D-7,       792D-7 /
+      DATA (IJSP(I,11),I=1,3),((AB(J,I,11),J=1,2),I=1,3) /
+     :                             0,  1,  3,
+     :                 -601D-6,      3468D-6,
+     :                 -329D-6,      -563D-6,
+     :                  518D-7,       518D-7 /
+      DATA (IJSP(I,12),I=1,3),((AB(J,I,12),J=1,2),I=1,3) /
+     :                             0,  2, -2,
+     :                 1237D-6,       463D-6,
+     :                  -64D-6,        39D-6,
+     :                  -13D-7,      -221D-7 /
+      DATA (IJSP(I,13),I=1,3),((AB(J,I,13),J=1,2),I=1,3) /
+     :                             0,  2, -1,
+     :                 1086D-6,      -911D-6,
+     :                  -94D-6,       210D-6,
+     :                  837D-7,      -494D-7 /
+      DATA (IJSP(I,14),I=1,3),((AB(J,I,14),J=1,2),I=1,3) /
+     :                             0,  2,  0,
+     :                  595D-6,     -1229D-6,
+     :                   -8D-6,      -160D-6,
+     :                 -281D-7,       616D-7 /
+      DATA (IJSP(I,15),I=1,3),((AB(J,I,15),J=1,2),I=1,3) /
+     :                             1, -1,  0,
+     :                 2484D-6,      -485D-6,
+     :                 -177D-6,       259D-6,
+     :                  260D-7,      -395D-7 /
+      DATA (IJSP(I,16),I=1,3),((AB(J,I,16),J=1,2),I=1,3) /
+     :                             1, -1,  1,
+     :                  839D-6,     -1414D-6,
+     :                   17D-6,       234D-6,
+     :                 -191D-7,      -396D-7 /
+      DATA (IJSP(I,17),I=1,3),((AB(J,I,17),J=1,2),I=1,3) /
+     :                             1,  0, -3,
+     :                 -964D-6,      1059D-6,
+     :                  582D-6,      -285D-6,
+     :                -3218D-7,       370D-7 /
+      DATA (IJSP(I,18),I=1,3),((AB(J,I,18),J=1,2),I=1,3) /
+     :                             1,  0, -2,
+     :                -2303D-6,     -1038D-6,
+     :                 -298D-6,       692D-6,
+     :                 8019D-7,     -7869D-7 /
+      DATA (IJSP(I,19),I=1,3),((AB(J,I,19),J=1,2),I=1,3) /
+     :                             1,  0, -1,
+     :                 7049D-6,       747D-6,
+     :                  157D-6,       201D-6,
+     :                  105D-7,     45637D-7 /
+      DATA (IJSP(I,20),I=1,3),((AB(J,I,20),J=1,2),I=1,3) /
+     :                             1,  0,  0,
+     :                 1179D-6,      -358D-6,
+     :                  304D-6,       825D-6,
+     :                 8623D-7,      8444D-7 /
+      DATA (IJSP(I,21),I=1,3),((AB(J,I,21),J=1,2),I=1,3) /
+     :                             1,  0,  1,
+     :                  393D-6,       -63D-6,
+     :                 -124D-6,       -29D-6,
+     :                 -896D-7,      -801D-7 /
+      DATA (IJSP(I,22),I=1,3),((AB(J,I,22),J=1,2),I=1,3) /
+     :                             1,  0,  2,
+     :                  111D-6,      -268D-6,
+     :                   15D-6,         8D-6,
+     :                  208D-7,      -122D-7 /
+      DATA (IJSP(I,23),I=1,3),((AB(J,I,23),J=1,2),I=1,3) /
+     :                             1,  0,  3,
+     :                  -52D-6,      -154D-6,
+     :                    7D-6,        15D-6,
+     :                 -133D-7,        65D-7 /
+      DATA (IJSP(I,24),I=1,3),((AB(J,I,24),J=1,2),I=1,3) /
+     :                             1,  0,  4,
+     :                  -78D-6,       -30D-6,
+     :                    2D-6,         2D-6,
+     :                  -16D-7,         1D-7 /
+      DATA (IJSP(I,25),I=1,3),((AB(J,I,25),J=1,2),I=1,3) /
+     :                             1,  1, -3,
+     :                  -34D-6,       -26D-6,
+     :                    4D-6,         2D-6,
+     :                  -22D-7,         7D-7 /
+      DATA (IJSP(I,26),I=1,3),((AB(J,I,26),J=1,2),I=1,3) /
+     :                             1,  1, -2,
+     :                  -43D-6,         1D-6,
+     :                    3D-6,         0D-6,
+     :                   -8D-7,        16D-7 /
+      DATA (IJSP(I,27),I=1,3),((AB(J,I,27),J=1,2),I=1,3) /
+     :                             1,  1, -1,
+     :                  -15D-6,        21D-6,
+     :                    1D-6,        -1D-6,
+     :                    2D-7,         9D-7 /
+      DATA (IJSP(I,28),I=1,3),((AB(J,I,28),J=1,2),I=1,3) /
+     :                             1,  1,  0,
+     :                   -1D-6,        15D-6,
+     :                    0D-6,        -2D-6,
+     :                   12D-7,         5D-7 /
+      DATA (IJSP(I,29),I=1,3),((AB(J,I,29),J=1,2),I=1,3) /
+     :                             1,  1,  1,
+     :                    4D-6,         7D-6,
+     :                    1D-6,         0D-6,
+     :                    1D-7,        -3D-7 /
+      DATA (IJSP(I,30),I=1,3),((AB(J,I,30),J=1,2),I=1,3) /
+     :                             1,  1,  3,
+     :                    1D-6,         5D-6,
+     :                    1D-6,        -1D-6,
+     :                    1D-7,         0D-7 /
+      DATA (IJSP(I,31),I=1,3),((AB(J,I,31),J=1,2),I=1,3) /
+     :                             2,  0, -6,
+     :                    8D-6,         3D-6,
+     :                   -2D-6,        -3D-6,
+     :                    9D-7,         5D-7 /
+      DATA (IJSP(I,32),I=1,3),((AB(J,I,32),J=1,2),I=1,3) /
+     :                             2,  0, -5,
+     :                   -3D-6,         6D-6,
+     :                    1D-6,         2D-6,
+     :                    2D-7,        -1D-7 /
+      DATA (IJSP(I,33),I=1,3),((AB(J,I,33),J=1,2),I=1,3) /
+     :                             2,  0, -4,
+     :                    6D-6,       -13D-6,
+     :                   -8D-6,         2D-6,
+     :                   14D-7,        10D-7 /
+      DATA (IJSP(I,34),I=1,3),((AB(J,I,34),J=1,2),I=1,3) /
+     :                             2,  0, -3,
+     :                   10D-6,        22D-6,
+     :                   10D-6,        -7D-6,
+     :                  -65D-7,        12D-7 /
+      DATA (IJSP(I,35),I=1,3),((AB(J,I,35),J=1,2),I=1,3) /
+     :                             2,  0, -2,
+     :                  -57D-6,       -32D-6,
+     :                    0D-6,        21D-6,
+     :                  126D-7,      -233D-7 /
+      DATA (IJSP(I,36),I=1,3),((AB(J,I,36),J=1,2),I=1,3) /
+     :                             2,  0, -1,
+     :                  157D-6,       -46D-6,
+     :                    8D-6,         5D-6,
+     :                  270D-7,      1068D-7 /
+      DATA (IJSP(I,37),I=1,3),((AB(J,I,37),J=1,2),I=1,3) /
+     :                             2,  0,  0,
+     :                   12D-6,       -18D-6,
+     :                   13D-6,        16D-6,
+     :                  254D-7,       155D-7 /
+      DATA (IJSP(I,38),I=1,3),((AB(J,I,38),J=1,2),I=1,3) /
+     :                             2,  0,  1,
+     :                   -4D-6,         8D-6,
+     :                   -2D-6,        -3D-6,
+     :                  -26D-7,        -2D-7 /
+      DATA (IJSP(I,39),I=1,3),((AB(J,I,39),J=1,2),I=1,3) /
+     :                             2,  0,  2,
+     :                   -5D-6,         0D-6,
+     :                    0D-6,         0D-6,
+     :                    7D-7,         0D-7 /
+      DATA (IJSP(I,40),I=1,3),((AB(J,I,40),J=1,2),I=1,3) /
+     :                             2,  0,  3,
+     :                    3D-6,         4D-6,
+     :                    0D-6,         1D-6,
+     :                  -11D-7,         4D-7 /
+      DATA (IJSP(I,41),I=1,3),((AB(J,I,41),J=1,2),I=1,3) /
+     :                             3,  0, -2,
+     :                   -1D-6,        -1D-6,
+     :                    0D-6,         1D-6,
+     :                    4D-7,       -14D-7 /
+      DATA (IJSP(I,42),I=1,3),((AB(J,I,42),J=1,2),I=1,3) /
+     :                             3,  0, -1,
+     :                    6D-6,        -3D-6,
+     :                    0D-6,         0D-6,
+     :                   18D-7,        35D-7 /
+      DATA (IJSP(I,43),I=1,3),((AB(J,I,43),J=1,2),I=1,3) /
+     :                             3,  0,  0,
+     :                   -1D-6,        -2D-6,
+     :                    0D-6,         1D-6,
+     :                   13D-7,         3D-7 /
 
 
-*  Validate the planet number
-      IF (NP.LT.1.OR.NP.GT.8) THEN
+*  Validate the planet number.
+      IF (NP.LT.1.OR.NP.GT.9) THEN
          JSTAT=-1
          DO I=1,6
             PV(I)=0D0
          END DO
       ELSE
 
-*     Time: Julian millennia since J2000
-         T=(DATE-51544.5D0)/365250D0
+*     Separate algorithms for Pluto and the rest.
+         IF (NP.NE.9) THEN
 
-*     OK status unless remote epoch
-         IF (ABS(T).LE.1D0) THEN
-            JSTAT=0
+*        -----------------------
+*        Mercury through Neptune
+*        -----------------------
+
+*        Time: Julian millennia since J2000.
+            T=(DATE-51544.5D0)/365250D0
+
+*        OK status unless remote epoch.
+            IF (ABS(T).LE.1D0) THEN
+               JSTAT=0
+            ELSE
+               JSTAT=1
+            END IF
+
+*        Compute the mean elements.
+            DA=A(1,NP)+(A(2,NP)+A(3,NP)*T)*T
+            DL=(3600D0*DLM(1,NP)+(DLM(2,NP)+DLM(3,NP)*T)*T)*AS2R
+            DE=E(1,NP)+(E(2,NP)+E(3,NP)*T)*T
+            DPE=MOD((3600D0*PI(1,NP)+(PI(2,NP)+PI(3,NP)*T)*T)*AS2R,D2PI)
+            DI=(3600D0*DINC(1,NP)+(DINC(2,NP)+DINC(3,NP)*T)*T)*AS2R
+            DO=MOD((3600D0*OMEGA(1,NP)
+     :                        +(OMEGA(2,NP)+OMEGA(3,NP)*T)*T)*AS2R,D2PI)
+
+*        Apply the trigonometric terms.
+            DMU=0.35953620D0*T
+            DO J=1,8
+               ARGA=DKP(J,NP)*DMU
+               ARGL=DKQ(J,NP)*DMU
+               DA=DA+(CA(J,NP)*COS(ARGA)+SA(J,NP)*SIN(ARGA))*1D-7
+               DL=DL+(CLO(J,NP)*COS(ARGL)+SLO(J,NP)*SIN(ARGL))*1D-7
+            END DO
+            ARGA=DKP(9,NP)*DMU
+            DA=DA+T*(CA(9,NP)*COS(ARGA)+SA(9,NP)*SIN(ARGA))*1D-7
+            DO J=9,10
+               ARGL=DKQ(J,NP)*DMU
+               DL=DL+T*(CLO(J,NP)*COS(ARGL)+SLO(J,NP)*SIN(ARGL))*1D-7
+            END DO
+            DL=MOD(DL,D2PI)
+
+*        Daily motion.
+            DM=GCON*SQRT((1D0+1D0/AMAS(NP))/(DA*DA*DA))
+
+*        Make the prediction.
+            CALL slPLNE(DATE,1,DATE,DI,DO,DPE,DA,DE,DL,DM,PV,J)
+            IF (J.LT.0) JSTAT=-2
+
          ELSE
-            JSTAT=1
+
+*        -----
+*        Pluto
+*        -----
+
+*        Time: Julian centuries since J2000.
+            T=(DATE-51544.5D0)/36525D0
+
+*        OK status unless remote epoch.
+            IF (T.GE.-1.15D0.AND.T.LE.1D0) THEN
+               JSTAT=0
+            ELSE
+               JSTAT=1
+            END IF
+
+*        Fundamental arguments (radians).
+            DJ=(DJ0+DJD*T)*D2R
+            DS=(DS0+DSD*T)*D2R
+            DP=(DP0+DPD*T)*D2R
+
+*        Initialize coefficients and derivatives.
+            DO I=1,3
+               WLBR(I)=0D0
+               WLBRD(I)=0D0
+            END DO
+
+*        Term by term through Meeus Table 36.A.
+            DO J=1,43
+
+*           Argument and derivative (radians, radians per century).
+               WJ=DBLE(IJSP(1,J))
+               WS=DBLE(IJSP(2,J))
+               WP=DBLE(IJSP(3,J))
+               AL=WJ*DJ+WS*DS+WP*DP
+               ALD=(WJ*DJD+WS*DSD+WP*DPD)*D2R
+
+*           Functions of argument.
+               SAL=SIN(AL)
+               CAL=COS(AL)
+
+*           Periodic terms in longitude, latitude, radius vector.
+               DO I=1,3
+
+*              A and B coefficients (deg, AU).
+                  AC=AB(1,I,J)
+                  BC=AB(2,I,J)
+
+*              Periodic terms (deg, AU, deg/Jc, AU/Jc).
+                  WLBR(I)=WLBR(I)+AC*SAL+BC*CAL
+                  WLBRD(I)=WLBRD(I)+(AC*CAL-BC*SAL)*ALD
+               END DO
+            END DO
+
+*        Heliocentric longitude and derivative (radians, radians/sec).
+            DL=(DL0+DLD0*T+WLBR(1))*D2R
+            DLD=(DLD0+WLBRD(1))*D2R/SPC
+
+*        Heliocentric latitude and derivative (radians, radians/sec).
+            DB=(DB0+WLBR(2))*D2R
+            DBD=WLBRD(2)*D2R/SPC
+
+*        Heliocentric radius vector and derivative (AU, AU/sec).
+            DR=DR0+WLBR(3)
+            DRD=WLBRD(3)/SPC
+
+*        Functions of latitude, longitude, radius vector.
+            SL=SIN(DL)
+            CL=COS(DL)
+            SB=SIN(DB)
+            CB=COS(DB)
+            SLCB=SL*CB
+            CLCB=CL*CB
+
+*        Heliocentric vector and derivative, J2000 ecliptic and equinox.
+            X=DR*CLCB
+            Y=DR*SLCB
+            Z=DR*SB
+            XD=DRD*CLCB-DR*(CL*SB*DBD+SLCB*DLD)
+            YD=DRD*SLCB+DR*(-SL*SB*DBD+CLCB*DLD)
+            ZD=DRD*SB+DR*CB*DBD
+
+*        Transform to J2000 equator and equinox.
+            PV(1)=X
+            PV(2)=Y*CE-Z*SE
+            PV(3)=Y*SE+Z*CE
+            PV(4)=XD
+            PV(5)=YD*CE-ZD*SE
+            PV(6)=YD*SE+ZD*CE
          END IF
-
-*     Compute the mean elements
-         DA=A(1,NP)+(A(2,NP)+A(3,NP)*T)*T
-         DL=(3600D0*DLM(1,NP)+(DLM(2,NP)+DLM(3,NP)*T)*T)*AS2R
-         DE=E(1,NP)+(E(2,NP)+E(3,NP)*T)*T
-         DP=MOD((3600D0*PI(1,NP)+(PI(2,NP)+PI(3,NP)*T)*T)*AS2R,D2PI)
-         DI=(3600D0*DINC(1,NP)+(DINC(2,NP)+DINC(3,NP)*T)*T)*AS2R
-         DO=MOD((3600D0*OMEGA(1,NP)+(OMEGA(2,NP)+OMEGA(3,NP)*T)*T)*AS2R,
-     :          D2PI)
-
-*     Apply the trigonometric terms
-         DMU=0.35953620D0*T
-         DO J=1,8
-            ARGA=KP(J,NP)*DMU
-            ARGL=KQ(J,NP)*DMU
-            DA=DA+(CA(J,NP)*COS(ARGA)+SA(J,NP)*SIN(ARGA))*1D-7
-            DL=DL+(CL(J,NP)*COS(ARGL)+SL(J,NP)*SIN(ARGL))*1D-7
-         END DO
-         ARGA=KP(9,NP)*DMU
-         DA=DA+T*(CA(9,NP)*COS(ARGA)+SA(9,NP)*SIN(ARGA))*1D-7
-         DO J=9,10
-            ARGL=KQ(J,NP)*DMU
-            DL=DL+T*(CL(J,NP)*COS(ARGL)+SL(J,NP)*SIN(ARGL))*1D-7
-         END DO
-         DL=MOD(DL,D2PI)
-
-*     Iterative solution of Kepler's equation to get eccentric anomaly
-         AM=DL-DP
-         AE=AM+DE*SIN(AM)
-         DAE=1D0
-         K=0
-         DO WHILE (K.LT.KMAX.AND.ABS(DAE).GT.1D-12)
-            DAE=(AM-AE+DE*SIN(AE))/(1D0-DE*COS(AE))
-            AE=AE+DAE
-            K=K+1
-            IF (K.GE.KMAX) JSTAT=2
-         END DO
-
-*     True anomaly
-         AE2=AE/2D0
-         AT=2D0*ATAN2(SQRT((1D0+DE)/(1D0-DE))*SIN(AE2),COS(AE2))
-
-*     Distance (AU) and speed (radians per second)
-         R=DA*(1D0-DE*COS(AE))
-         V=GKS*SQRT((1D0+1D0/AMAS(NP))/(DA*DA*DA))
-
-         SI2=SIN(DI/2D0)
-         XQ=SI2*COS(DO)
-         XP=SI2*SIN(DO)
-         TL=AT+DP
-         XSW=SIN(TL)
-         XCW=COS(TL)
-         XM2=2D0*(XP*XCW-XQ*XSW)
-         XF=DA/SQRT(1D0-DE*DE)
-         CI2=COS(DI/2D0)
-         XMS=(DE*SIN(DP)+XSW)*XF
-         XMC=(DE*COS(DP)+XCW)*XF
-         XPXQ2=2D0*XP*XQ
-
-*     Position (J2000 ecliptic x,y,z in AU)
-         X=R*(XCW-XM2*XP)
-         Y=R*(XSW+XM2*XQ)
-         Z=R*(-XM2*CI2)
-
-*     Rotate to equatorial
-         PV(1)=X
-         PV(2)=Y*COSEPS-Z*SINEPS
-         PV(3)=Y*SINEPS+Z*COSEPS
-
-*     Velocity (J2000 ecliptic xdot,ydot,zdot in AU/s)
-         X=V*((-1D0+2D0*XP*XP)*XMS+XPXQ2*XMC)
-         Y=V*((1D0-2D0*XQ*XQ)*XMC-XPXQ2*XMS)
-         Z=V*(2D0*CI2*(XP*XMS+XQ*XMC))
-
-*     Rotate to equatorial
-         PV(4)=X
-         PV(5)=Y*COSEPS-Z*SINEPS
-         PV(6)=Y*SINEPS+Z*COSEPS
-
       END IF
 
       END

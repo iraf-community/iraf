@@ -97,10 +97,10 @@ begin
 
 	call gclear (ID_GP(id))
 	call gswind (ID_GP(id), xmin, xmax, ymin - .2 * dy, ymax + .2 * dy)
-	if (ID_GT(id) != NULL) {
-	    call gseti (ID_GP(id), G_XTRAN, GT_XTRAN(ID_GT(id)))
-	    call gseti (ID_GP(id), G_YTRAN, GT_YTRAN(ID_GT(id)))
-	}
+#	if (ID_GT(id) != NULL) {
+#	    call gseti (ID_GP(id), G_XTRAN, GT_XTRAN(ID_GT(id)))
+#	    call gseti (ID_GP(id), G_YTRAN, GT_YTRAN(ID_GT(id)))
+#	}
 	call gt_labax (ID_GP(id), ID_GT(id))
 	call gt_plot (ID_GP(id), ID_GT(id), Memr[x], Memr[y], n)
 

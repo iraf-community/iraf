@@ -95,8 +95,10 @@ begin
 
 		if (access (fname,0,0) == NO)
 		    call filerr (fname, SYS_FOPNNEXFIL)
-		else if (access (fname,FMODE(fp),0) == YES)
+		else if (access (fname,FMODE(fp),0) == YES) {
+		    call sfree (sp)
 		    return
+		}
 		
 		# Verify that the file is still locked.
 		if (finfo (fname, fi) == ERR)

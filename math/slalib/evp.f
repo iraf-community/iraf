@@ -54,9 +54,9 @@
 *  that one of Stumpff's precession constants differs by 0.001 arcsec
 *  from the value given in the Explanatory Supplement to the A.E.
 *
-*  P.T.Wallace   Starlink   21 November 1994
+*  P.T.Wallace   Starlink   21 March 1999
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -272,7 +272,7 @@
       TWOE = E+E
       TWOG = G+G
       PHI = TWOE*((1.0-ESQ*0.125)*SIN(G)+E*0.625*SIN(TWOG)
-     :          +ESQ*0.5416667*SIN(G+TWOG) )
+     :          +ESQ*0.54166667*SIN(G+TWOG) )
       F = G+PHI
       SINF = SIN(F)
       COSF = COS(F)

@@ -1,5 +1,53 @@
 .help revisions Jun88 pkg.dataio
 .nf
+dataio$export/exrgb8.x
+   Fixed a bug causing the cmap() function to write a garbage line at the
+   top or bottom of the output image. (8/20/99 MJF)
+
+dataio$export/exzscale.x
+dataio$import/t_import.x
+dataio$import/bltins/ipgif.x
+    Cleaned up some missing sfree() calls.  (7/28/99 MJF)
+
+dataio$fits/wfits.h
+dataio$fits/fits_cards.x
+dataio$fits/fits_params.x
+    Modified wfits to write the DATE keyword value in the new format (including
+    a time field) and in units of GMT. (5/8/99 LED)
+
+dataio$export/bltins/exhdr.x
+    Changed the binary file header to use a 4-digit year (5/5/99, er..1999 MJF))
+
+dataio$export/bltins/exras.x
+dataio$export/bltins/exxwd.x
+    Fixed a bug in which rasterfiles and XWD file aren't swapped on LSB
+    machines when requested by the user. (12/14/98 MJF)
+
+dataio$import/t_import.x
+dataio$import/ipproc.gx
+    Fixed a bug preventing 1-D data from being converted.  (12/10/98 MJF))
+
+dataio$import/t_import.x
+    Modified to initialize the 'use_cmap' flag to on by default so 8-bit
+    colormap images will be converted correctly.  (7/14/98 MJF)
+
+dataio$fits/fits_cards.x
+    Added a check for pre-existing IRAFNAME keywords to the wfits task
+    (6/18/98 LED)
+
+dataio$export/exzscale.x
+dataio$export/t_export.x
+dataio$export/exobands.gx
+dataio$export/bltins/exeps.x
+dataio$export/bltins/exgif.x
+dataio$export/bltins/exrgb.x
+dataio$export/bltins/exxwd.x
+    Removed some unused variable and fixed type clashes (3/28/98  MJF)
+
+dataio$export/expreproc.x
+    Fixed a bug where the setcmap function was finding the colormap name
+    incorrectly when '@' params were used in a zscale function (2/2/98  MJF)
+
 dataio$import/t_import.x
 dataio$import/ipobands.gx
     Fixed a bug in which use of the red()/green()/blue() functions caused

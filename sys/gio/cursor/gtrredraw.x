@@ -12,6 +12,7 @@ int	stream			# graphics stream to be redrawn
 
 pointer	tr, ip_save, op_save
 pointer	gtr_init()
+errchk	gtr_init
 
 begin
 	tr = gtr_init (stream)

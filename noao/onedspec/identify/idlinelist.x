@@ -10,15 +10,16 @@ procedure id_mapll (id)
 
 pointer	id		# Identify structure
 
-int	fd, nalloc, nlines
-pointer	ll, lll
+int	i, j, fd, nalloc, nlines
+pointer	ll, lll, ill
 pointer	sp, str, units
 double	value
 
-bool	streq()
-int	open(), fscan(), nscan(), nowhite()
+bool	streq(), fp_equald()
+int	open(), fscan(), nscan(), nowhite(), id_compare()
 pointer	un_open()
 errchk	open, fscan, malloc, realloc, un_open
+extern	id_compare()
 
 begin
 	call id_unmapll (id)
@@ -77,13 +78,32 @@ begin
 	}
 	call close (fd)
 
+	# Sort the lines, eliminate identical lines, and convert units.
 	if (nlines > 0) {
-	    call realloc (ll, nlines + 1, TY_DOUBLE)
-	    call realloc (lll, nlines + 1, TY_POINTER)
-	    Memd[ll+nlines] = INDEFD
-	    ID_LL(id) = ll
-	    ID_LLL(id) = lll
-	    ID_NLL(id) = nlines
+	    call malloc (ID_LL(id), nlines + 1, TY_DOUBLE)
+	    call malloc (ID_LLL(id), nlines + 1, TY_POINTER)
+
+	    call malloc (ill, nlines, TY_INT)
+	    do i = 0, nlines-1
+		Memi[ill+i] = i
+	    call gqsort (Memi[ill], nlines, id_compare, ll)
+
+	    Memd[ID_LL(id)] = Memd[ll+Memi[ill]]
+	    Memi[ID_LLL(id)] = Memi[lll+Memi[ill]]
+	    j = 1
+	    do i = 1, nlines-1 {
+		if (fp_equald (Memd[ll+Memi[ill+i]], Memd[ID_LL(id)+j-1]))
+		    next
+		Memd[ID_LL(id)+j] = Memd[ll+Memi[ill+i]]
+		Memi[ID_LLL(id)+j] = Memi[lll+Memi[ill+i]]
+		j = j + 1
+	    }
+	    Memd[ID_LL(id)+j] = INDEFD
+	    ID_NLL(id) = j
+
+	    call mfree (ll, TY_DOUBLE)
+	    call mfree (lll, TY_POINTER)
+	    call mfree (ill, TY_INT)
 
 	    if (ID_UN(id) == NULL && Memc[units] != EOS)
 		ID_UN(id) = un_open (Memc[units])
@@ -233,7 +253,7 @@ int	i, nfound, nextpix, lastpix, cursave
 double	cd, pix, fit, fit1, fit2, user, peak, minval, diff, diff1
 pointer	sp, pixes, fits, users, labels, ll, lll, label
 
-double	id_center(), fit_to_pix(), id_fitpt(), id_peak()
+double	id_center(), fit_to_pix(), id_fitpt(), id_peak(), smw_c1trand()
 
 int	ncandidate, nmatch1, nmatch2
 common	/llstat/ ncandidate, nmatch1, nmatch2
@@ -298,7 +318,7 @@ begin
 		}
 
 		nmatch2 = nmatch2 + 1
-		peak = abs (id_peak (id, pix))
+		peak = abs (id_peak (id, smw_c1trand (ID_PL(id), pix)))
 		if (nfound < ID_MAXFEATURES(id)) {
 		    nfound = nfound + 1
 		    if (peak < minval) {
@@ -320,6 +340,7 @@ begin
 		    minval = MAX_REAL
 		    do i = 1, nfound {
 			pix = Memd[pixes+i-1]
+			peak = abs (id_peak (id, smw_c1trand (ID_PL(id), pix)))
 			peak = abs (id_peak (id, pix))
 			if (peak < minval) {
 			    nextpix = i
@@ -343,4 +364,22 @@ begin
 	ID_CURRENT(id) = cursave
 
 	call sfree (sp)
+end
+
+
+# ID_COMPARE - Routine to compare line list coordinates for sorting.
+# Zero indexing is used.
+
+int procedure id_compare (ll, x1, x2)
+
+pointer	ll		#I Pointer to array of line list coordinates
+int	x1, x2		#I Indices to array of line list coordinates
+
+begin
+	if (Memd[ll+x1] < Memd[ll+x2])
+	    return (-1)
+	else if (Memd[ll+x1] > Memd[ll+x2])
+	    return (1)
+	else
+	    return (0)
 end

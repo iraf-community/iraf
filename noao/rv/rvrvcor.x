@@ -1,5 +1,6 @@
 include <imio.h>
 include <error.h>
+include <time.h>
 include "rvpackage.h"
 include "rvflags.h"
 include "rvkeywords.h"
@@ -169,17 +170,15 @@ double	ra, dec, ep			#O position info
 double  ut				#O UT of observation
 int	day, month, year		#O Date of observation
 
-double	ut_start, int_time, imgetd()
-int	code
+double	ut_start, int_time, time, imgetd()
+int	code, flags
 int	rv_parse_date(), rv_parse_timed(), imaccf()
 errchk 	imgetd()
 
-define	utmid_			99
-
 begin
 	code = OK
-	if (rv_parse_date (rv, im, KW_DATE_OBS(rv), is_obj, day, month, year)
-	    == ERR_RVCOR) {
+	if (rv_parse_date (rv, im, KW_DATE_OBS(rv), is_obj, day, month, year,
+	    time, flags) == ERR_RVCOR) {
 	        code = ERR_RVCOR
 	}
 	if (rv_parse_timed (rv, im, is_obj, KW_RA(rv), ra) == ERR_RVCOR)
@@ -191,6 +190,9 @@ begin
 	    call rv_err_comment (rv, "ERROR: Missing EPOCH keyword.", "")
 	    code = ERR_RVCOR
 	}
+
+	# If we have a UTMIDDLE keyword use that as the midpoint of the
+	# observation.
 
 	if (imaccf(im,KW_UTMID(rv)) == YES) {
 	    iferr (ut = imgetd (im, KW_UTMID(rv))) {
@@ -207,12 +209,28 @@ begin
 	        ut = double (ut_start + (int_time/3600.0)/2.0)
 	    }
 	} else {
-utmid_	    if (rv_parse_timed (rv, im, is_obj,KW_UT(rv),ut_start) == ERR_RVCOR)
-	        code = ERR_RVCOR
+
+	    # No UTMIDDLE keyword, so compute it from the UT and EXPTIME.
+	    # Time specified in the DATE-OBS keyword, if present, takes
+	    # precedence over UT keyword value.
+
+	    if (flags != TF_OLDFITS) {
+		# Use the DATE-OBS time value as the UT.
+		ut_start = time
+
+	    } else if (imaccf(im,KW_UT(rv)) == YES) {
+	        if (rv_parse_timed (rv, im, is_obj, KW_UT(rv),
+		    ut_start) == ERR_RVCOR) {
+	                code = ERR_RVCOR
+			ut_start = 0.0d0
+		}
+	    }
+
 	    iferr (int_time = imgetd (im, KW_EXPTIME(rv))) {
 	        call rv_err_comment (rv, 
 		    "ERROR: Missing exposure time keyword.", "")
 	        code = ERR_RVCOR
+		int_time = 0.0d0
 	    }
 	    ut = double (ut_start + (int_time/3600.0)/2.0)
 	}
@@ -335,16 +353,19 @@ end
 
 # RV_PARSE_DATE - Parse a date string and return components
 
-int procedure rv_parse_date (rv, im, param, is_obj, day, month, year)
+int procedure rv_parse_date (rv, im, param, is_obj, day, month, year, tm, flags)
 
-pointer	rv				#I RV struct pointer
-pointer	im		 		#I Image pointer
-char	param[SZ_LINE]			#I Image parameter to get
-int	is_obj				#I Is image object image?
-int	day, month, year		#O Date components
+pointer	rv				#I rv struct pointer
+pointer	im		 		#I image pointer
+char	param[SZ_LINE]			#I image parameter to get
+int	is_obj				#I is image object image?
+int	day, month, year		#O date components
+double	tm				#O time string
+int	flags				#O flags
 
 char	date[SZ_FNAME]
-int	ip, ctoi()
+
+int	dtm_decode()
 errchk  imgstr()
 
 begin
@@ -357,34 +378,17 @@ begin
 	    	    "ERROR: Error getting '%s' from temp image header.",param)
 	    }
 	    call flush (STDERR)
-	    call tsleep (2)
 	    return (ERR_RVCOR)
 	}
 
-        ip = 1
-        if (ctoi (date, ip, day) == 0) {
+	# Decode the keyword.  We ignore any time information since this
+	# is obtained from other keywords.
+        if (dtm_decode (date, year, month, day, tm, flags) == ERR) {
 	    call rv_err_comment (rv, 
-		"ERROR: Error parsing day from image header.", "")
+		"ERROR: Error parsing date keyword.", "")
 	    return (ERR_RVCOR)
 	}
-        ip = ip + 1
-        if (ctoi (date, ip, month) == 0) {
-	    call rv_err_comment (rv, 
-		"ERROR: Error parsing month from image header.", "")
-	    return (ERR_RVCOR)
-	}
-	if (month > 12) {
-	    call rv_err_comment (rv, "ERROR: Date format should be dd/mm/yy.", 
-		"")
-	    return (ERR_RVCOR)
-	}
-        ip = ip + 1
-        if (ctoi (date, ip, year) == 0) {
-	    call rv_err_comment (rv, 
-		"ERROR: Error parsing year from image header.", "")
-	    return (ERR_RVCOR)
-	}
-	
+
 	return (OK)
 end
 
@@ -420,7 +424,6 @@ begin
 	    	    "ERROR: Error getting '%s' from temp image header.", param)
 	    }
 	    call sfree (sp)
-	    call tsleep (2)
 	    call flush (STDERR)
 	    return (ERR_RVCOR)
 	}

@@ -1,4 +1,4 @@
-.help dmxm Nov95 "Slalib Package"
+.help dmxm Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDMXM (A, B, C)

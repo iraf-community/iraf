@@ -4,6 +4,8 @@ include "rvflags.h"
 include "rvcont.h"
 include "rvcomdef.h"
 
+define	SZ_DATEBUF		16
+
 # RV_PARAM -- Procedure to write the rv parameters to a text file.
 
 procedure rv_param (rv, out, task)
@@ -23,8 +25,8 @@ begin
 	# Allocate working space.
 	call smark (sp)
 	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	call salloc (date, SZ_DATEBUF, TY_CHAR)
+	call salloc (time, SZ_DATEBUF, TY_CHAR)
 
 	# Write the id.
 	nchars = envfind ("version", Memc[outstr], SZ_LINE)
@@ -37,8 +39,8 @@ begin
 	call gethost (Memc[outstr], SZ_LINE)
 	call rv_sparam (out, "HOST", Memc[outstr], "computer",
 	    "IRAF host machine")
-	call rv_date (Memc[date], Memc[time], SZ_DATE)
-	call rv_sparam (out, "DATE", Memc[date], "mm-dd-yr", "date")
+	call rv_date (Memc[date], Memc[time], SZ_DATEBUF)
+	call rv_sparam (out, "DATE", Memc[date], "yyyy-mm-dd", "date")
 	call rv_sparam (out, "TIME", Memc[time], "hh:mm:ss", "time")
 	call rv_sparam (out, "PACKAGE", "rv", "name",
 	    "name of IRAF package")
@@ -59,14 +61,12 @@ int	maxch		# the maximum number of character in the string
 int	tm[LEN_TMSTRUCT]
 long	clktime()
 
-define	CENTURY		1900
-
 begin
 	call brktime (clktime (long(0)), tm)
-	call sprintf (date, maxch, "%02d/%02d/%02d")
+	call sprintf (date, maxch, "%04d-%02d-%02d")
+	    call pargi (TM_YEAR(tm))
 	    call pargi (TM_MONTH(tm))
 	    call pargi (TM_MDAY(tm))
-	    call pargi (TM_YEAR(tm) - CENTURY)
 	call sprintf (time, maxch, "%02d:%02d:%02d")
 	    call pargi (TM_HOUR(tm))
 	    call pargi (TM_MIN(tm))

@@ -101,4 +101,5 @@ int	number			# Number to check againts ranges
 
 A boolean value is returned indicating whether number is covered by
 the ranges.
+.le
 .endhelp

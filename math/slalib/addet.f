@@ -15,10 +15,8 @@
 *  Returned:
 *     RC,DC     dp     RA,Dec (radians) with E-terms included
 *
-*  Called:
-*     slETRM, slDS2C, slDC2S, slDA2P, slDA1P
+*  Note:
 *
-*  Explanation:
 *     Most star positions from pre-1984 optical catalogues (or
 *     derived from astrometry using such stars) embody the
 *     E-terms.  If it is necessary to convert a formal mean
@@ -30,9 +28,11 @@
 *     Explanatory Supplement to the Astronomical Ephemeris,
 *     section 2D, page 48.
 *
-*  P.T.Wallace   Starlink   July 1986
+*  Called:  slETRM, slDS2C, slDC2S, slDA2P, slDA1P
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  P.T.Wallace   Starlink   18 March 1999
+*
+*  Copyright (C) 1999 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

@@ -61,9 +61,8 @@ begin
 	    }
  
 	    # The editing takes place in a temporary editing image buffer.
-newim_	    if (imaccess (EPIXBUF, READ_ONLY) == YES)
-		call imdelete (EPIXBUF)
-	    iferr (call ep_imcopy (EP_INPUT(ep), EPIXBUF)) {
+newim_	    call mktemp ("imedit", EP_WORK(ep), EP_SZFNAME)
+	    iferr (call ep_imcopy (EP_INPUT(ep), EP_WORK(ep))) {
 		call erract (EA_WARN)
 		next
 	    }
@@ -76,10 +75,10 @@ newim_	    if (imaccess (EPIXBUF, READ_ONLY) == YES)
 	    if (EP_DISPLAY(ep) == YES) {
 		key = '0'
 		call ep_zoom (ep, xa, ya, xb, yb, key, erase)
-	        call ep_command (ep, EPIXBUF, erase)
+	        call ep_command (ep, EP_WORK(ep), erase)
 	    }
  
-	    EP_IM(ep) = immap (EPIXBUF, READ_WRITE, 0)
+	    EP_IM(ep) = immap (EP_WORK(ep), READ_WRITE, 0)
 	    EP_INDATA(ep) = NULL
 	    EP_OUTDATA(ep) = NULL
  
@@ -199,7 +198,7 @@ newim_	    if (imaccess (EPIXBUF, READ_ONLY) == YES)
 		    case 'Q':	# Quit and no save
 			changes = 0
 		    case 'I':	# Immediate interrupt
-			    call imdelete (EPIXBUF)
+			    call imdelete (EP_WORK(ep))
 			call fatal (1, "Interrupt")
 		    default:
 			call printf ("\007")
@@ -216,7 +215,7 @@ newim_	    if (imaccess (EPIXBUF, READ_ONLY) == YES)
 		if (change == YES && EP_AUTODISPLAY(ep) == YES)
 		    newdisplay = YES
 		if (newdisplay == YES && EP_DISPLAY(ep) == YES)
-		    call ep_display (ep, EPIXBUF, erase)
+		    call ep_display (ep, EP_WORK(ep), erase)
  
 		# Log certain commands.  Note that this is done after
 		# centering.
@@ -259,10 +258,10 @@ newim_	    if (imaccess (EPIXBUF, READ_ONLY) == YES)
 		if (imaccess (EP_OUTPUT(ep), READ_ONLY) == YES)
 		    call imdelete (EP_OUTPUT(ep))
 	        call imunmap (EP_IM(ep))
-	        call imrename (EPIXBUF, EP_OUTPUT(ep))
+	        call imrename (EP_WORK(ep), EP_OUTPUT(ep))
 	    } else {
 	        call imunmap (EP_IM(ep))
-	        call imdelete (EPIXBUF)
+	        call imdelete (EP_WORK(ep))
 	    }
  
 	    # Check for a new image based on a colon command.  This case

@@ -2,16 +2,19 @@
 
 include	<finfo.h>
 include	<time.h>
+include <ctype.h>
 include	"help.h"
 
 # PR_FILE -- Print a file.  Called to print menu files and source files.
 # Do not print block header, but do page output if enabled by user.
 
-procedure pr_file (fname, ctrl)
+procedure pr_file (fname, ctrl, pakname)
 
 char	fname[ARB]
 pointer	ctrl
-int	center_col
+char	pakname[ARB]
+
+int	center_col, ip
 long	fi[LEN_FINFO]
 pointer	sp, lbuf, time
 int	open(), hinput(), strlen(), finfo()
@@ -57,8 +60,24 @@ begin
 	# paginated.
 	H_IN(ctrl) = open (fname, READ_ONLY, TEXT_FILE)
 
-	while (hinput (ctrl, Memc[lbuf]) != EOF)
-	    call houtput (ctrl, Memc[lbuf])
+	while (hinput (ctrl, Memc[lbuf]) != EOF) {
+	    if (H_OPTION(ctrl) == O_REFERENCES) {
+		# Replace the newline character.
+		ip = strlen (Memc[lbuf]) - 1
+		Memc[lbuf+ip] = ' '
+
+		# Append the package name.
+		call strcat (" [", Memc[lbuf], SZ_LINE)
+		call strcat (pakname, Memc[lbuf], SZ_LINE)
+		call strcat ("]\n", Memc[lbuf], SZ_LINE)
+
+		# Strip leading whitespace.
+		for (ip=0; IS_WHITE(Memc[lbuf+ip]); ip=ip+1)
+		    ;
+	        call houtput (ctrl, Memc[lbuf+ip])
+	    } else
+	        call houtput (ctrl, Memc[lbuf])
+	}
 
 	call close (H_IN(ctrl))
 	call sfree (sp)

@@ -8,17 +8,22 @@ procedure t_wcscopy()
 
 bool	verbose
 int	ilist, rlist
-pointer	sp, image, refimage, str, imr, mwr, im
+pointer	sp, image, refimage, value, str, imr, mwr, im
+real	rval
+double	dval
 bool	clgetb()
 int	imtopen(), imtlen(), imtgetim(), mw_stati(), rg_samesize()
 pointer	immap(), mw_openim()
-errchk	mw_openim()
+real	imgetr()
+double	imgetd()
+errchk	mw_openim(), imgstr(), imgetr(), imgetd(), imdelf()
 
 begin
 	# Get some temporary working space.
 	call smark (sp)
 	call salloc (refimage, SZ_FNAME, TY_CHAR)
 	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (value, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the input image and reference image lists.
@@ -106,6 +111,49 @@ begin
 		#call mw_saveim (mw, im)
 		#call mw_close (mw)
 		call mw_saveim (mwr, im)
+
+		# Copy the RADECSYS keyword to the input image header.
+		ifnoerr {
+		    call imgstr (imr, "RADECSYS", Memc[value], SZ_FNAME)
+		} then {
+		    call imastr (im, "RADECSYS", Memc[value])
+		} else {
+		    iferr (call imdelf (im, "RADECSYS"))
+			;
+		}
+
+		# Copy the EQUINOX or EPOCH keyword to the input image header
+		# EQUINOX keyword.
+		ifnoerr {
+		    rval = imgetr (imr, "EQUINOX")
+		} then {
+		    call imaddr (im, "EQUINOX", rval)
+		    iferr (call imdelf (im, "EPOCH"))
+			;
+		} else {
+		    ifnoerr {
+		        rval = imgetr (imr, "EPOCH")
+		    } then {
+		        call imaddr (im, "EQUINOX", rval)
+		        iferr (call imdelf (im, "EPOCH"))
+			    ;
+		    } else {
+		        iferr (call imdelf (im, "EQUINOX"))
+			    ;
+		        iferr (call imdelf (im, "EPOCH"))
+			    ;
+		    }
+		}
+
+		# Copy the MJD-WCSkeyword to the input image header.
+		ifnoerr {
+		    dval = imgetd (imr, "MJD-WCS")
+		} then {
+		    call imaddd (im, "MJD-WCS", dval)
+		} else {
+		    iferr (call imdelf (im, "MJD-WCS"))
+			;
+		}
 	    }
 
 	    # Close the input image.

@@ -1,4 +1,4 @@
-.help asider Jul84 "Image Interpolator Package"
+.help asider Dec98 "Image Interpolator Package"
 .ih
 NAME
 asider -- evaluate the interpolant derivatives at x
@@ -7,10 +7,10 @@ SYNOPSIS
 asider (asi, x, der, nder)
 
 .nf
-    pointer	asi	# interpolant descriptor
-    real	x	# x value, 1 <= x <= npix
-    real	der[]	# der[1] = interpolant, der[2] = 1st derivative
-    int		nder	# number of derivatives 
+    pointer	asi	#I interpolant descriptor
+    real	x[2]	#I x value, 1 <= x[1-2] <= npix
+    real	der[]	#O der[1] = interpolant, der[2] = 1st derivative
+    int		nder	#I number of derivatives 
 .fi
 .ih
 ARGUMENTS
@@ -18,7 +18,8 @@ ARGUMENTS
 Pointer to the sequential interpolant descriptor.
 .le
 .ls x   
-X value.
+Single X value, or pair of X values defining a range in the case of
+the drizzle interpolant.
 .le
 .ls der  
 Array containing the derivatives. Der[1] = interpolant at x, der[2] the
@@ -26,22 +27,26 @@ first derivative of the interpolant at x and so on.
 .le
 .ls nder
 Number of derivatives. Nder = 1 + order of the maximum desired derivative.
-ASIDER checks that nder is reasonable.  Only the function value and
-first two derivatives are provided for the SINC interpolant.
+ASIDER checks that nder is reasonable.  The sinc interpolant returns the
+interpolant value and first two derivatives. The drizzle interpolant returns
+the interpolant value and the first derivative.
 .le
 .ih
 DESCRIPTION
-The polynomial coefficients are evaluated directly from the data  points
-in the case of the polynomial interpolants and from the B-spline coefficients
-in the case of the bicubic spline. The derivatives are evaluated from
+The polynomial coefficients are evaluated directly from the data points
+for the polynomial interpolants and from the B-spline coefficients
+for the cubic spline interpolant. The derivatives are evaluated from
 the polynomial coefficients using nested multiplication.  The sinc
 derivatives are analytic but are defined only for the first two derivatives.
+The drizzle derivative is an approximation  defined  for the first derivative
+only.
 .ih
 NOTES
 ASIDER checks that the number of derivatives requested is reasonable.
-Checking for out of bounds and INDEF valued pixels is the
-responsibility of the user. ASIINIT and ASIFIT must be called before using
-ASIDER.
+Checking for out of bounds and INDEF valued pixels is the responsibility
+of the user. ASIINIT or ASISINIT and ASIFIT must be called before ASIDER
+is called.
 .ih
 SEE ALSO
+asieval, asivector, arieval, arider
 .endhelp

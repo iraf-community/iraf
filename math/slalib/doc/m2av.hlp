@@ -1,4 +1,4 @@
-.help m2av Nov95 "Slalib Package"
+.help m2av Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slM2AV (RMAT, AXVEC)

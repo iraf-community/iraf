@@ -15,7 +15,7 @@ real	hsigma			# High sigma cutoff
 real	pclip			# Number or fraction of pixels from median
 real	flow			# Fraction of low pixels to reject
 real	fhigh			# Fraction of high pixels to reject
-int	grow			# Grow radius
+real	grow			# Grow radius
 bool	mclip			# Use median in sigma clipping?
 real	sigscale		# Sigma scaling tolerance
 int	logfd			# Log file descriptor

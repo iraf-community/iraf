@@ -11,7 +11,7 @@ char	prompt[ARB]		# Prompt to be issued
 int	answer			# Answer
 
 int	nwrd
-char	word[4]
+char	word[SZ_LINE]
 
 int	getline(), strdic(), strlen()
 
@@ -26,7 +26,7 @@ begin
 	    }
 	    call flush (STDOUT)
 
-	    if (getline (STDIN, word, 4) != EOF) {
+	    if (getline (STDIN, word) != EOF) {
 		word[strlen(word)] = EOS
 	        nwrd = strdic (word, word, 4, XT_ANSWERS)
 		switch (nwrd) {

@@ -423,6 +423,15 @@ transposed 1D image.
     operand a: dev$pix[256:512,*]
     operand b: dev$pix[1:255,*]
 .fi
+
+8. Create a circular mask of a given radius about a user-defined center.
+
+.nf
+    cl> type expr
+    (sqrt((I-b)**2 + (J-c)**2) <= d)
+    cl> imexpr @expr mask.pl a=pix b=256 c=256 d=100
+.fi
+
 .ih
 BUGS
 The input and output images cannot be the same.

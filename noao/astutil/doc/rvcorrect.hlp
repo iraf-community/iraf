@@ -106,34 +106,35 @@ barycenter about the center of the Sun (annual velocity), and the
 motion of the Sun (solar velocity) relative to some specified standard
 of rest.
 
-The input parameters consist of the date and time of the observation,
-the direction of observation, the location of the observation, the
-direction and magnitude of the solar motion relative to some standard
-of rest, and the observed radial velocity.  The observatory for the
-observations defaults to that specified by the environment variable
-"observatory" if defined or that set for the task \fBobservatory\fR.
-If the input consists of images the observatory is defined by the
-OBSERVAT image header parameter if present.  See \fBovservatory\fR for
-additional information.  The solar motion defaults to that relative to
-the galactic local standard of rest (LSR).  Note that one can make the
-local standard of rest velocity be equivalent to the heliocentric
-velocity by setting the velocity of the solar motion to zero.
+The input parameters consist of the date and time of the observation, the
+direction of observation, the location of the observation, the direction
+and magnitude of the solar motion relative to some standard of rest, and
+the observed radial velocity.  In all cases years between 0 and 99 are
+treated as 20th century years.  The observatory for the observations
+defaults to that specified by the environment variable "observatory" if
+defined or that set for the task \fBobservatory\fR.  If the input consists
+of images the observatory is defined by the OBSERVAT image header parameter
+if present.  See \fBovservatory\fR for additional information.  The solar
+motion defaults to that relative to the galactic local standard of rest
+(LSR).  Note that one can make the local standard of rest velocity be
+equivalent to the heliocentric velocity by setting the velocity of the
+solar motion to zero.
 
 The observed velocity, date, time, and direction of observation may be
-specified in three ways; from files, images, or the task parameters.
-If a list of files is given then the files are read for the observation
-parameters.  The format of the files is lines containing the
-year, month (as an integer), day, universal time, right ascension,
-declination, (optional) coordinate epoch, and (optional) observed radial
-velocity.  If no file list is specified but a list of images is given
-then the observation parameters are determined from the image header
-parameters DATE-OBS, UT, RA, DEC, and VOBS.  Finally,
-if no list of files or images is given then the task parameters are
-used.  If no observed radial velocity is given in the file list or
-found in the image header then a value of zero is assumed.  In this
-case the corrected velocities are interpreted as the corrections to be
-added to a measured velocity to correct to the desired standard of
-rest.
+specified in three ways; from files, images, or the task parameters.  If a
+list of files is given then the files are read for the observation
+parameters.  The format of the files is lines containing the year, month
+(as an integer), day, universal time, right ascension, declination,
+(optional) coordinate epoch, and (optional) observed radial velocity.  If
+no file list is specified but a list of images is given then the
+observation parameters are determined from the image header parameters
+specified through the keywpars parameters.  If the observation date
+includes the time then it is used in preference to universal time keyword.
+Finally, if no list of files or images is given then the task parameters
+are used.  If no observed radial velocity is given in the file list or
+found in the image header then a value of zero is assumed.  In this case
+the corrected velocities are interpreted as the corrections to be added to
+a measured velocity to correct to the desired standard of rest.
 
 The results of the radial velocity calculations are output in three
 ways.  The velocities are always printed on the standard output with an
@@ -352,6 +353,12 @@ cl> type rv.dat
 .fi
 
 Note that this does not work when the task is run as a background job!
+.ih
+REVISIONS
+.ls RVCORRECT V2.11
+Y2K update: The date keyword can be in the full format with full
+year and time.  The time takes precedence over a time keyword.
+.le
 .ih
 ACKNOWLEDGEMENTS
 Some of the formulas used were obtained by inspection of the code

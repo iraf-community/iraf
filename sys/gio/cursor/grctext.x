@@ -19,6 +19,7 @@ pointer	tr, op, last_op
 int	fd, save1, save2, nwords
 int	stropen(), strlen()
 pointer	gtr_init(), gtr_writep()
+errchk	gtr_init, stropen, gki_redir
 
 begin
 	tr = gtr_init (stream)

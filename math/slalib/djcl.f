@@ -22,9 +22,9 @@
 *  The algorithm is derived from that of Hatcher 1984
 *  (QJRAS 25, 53-55).
 *
-*  P.T.Wallace   Starlink   23 November 1994
+*  P.T.Wallace   Starlink   27 April 1998
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1998 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -41,7 +41,7 @@
 
 
 *  Check if date is acceptable
-      IF (DJM.LE.-2395522D0.OR.DJM.GE.1D9) THEN
+      IF (DJM.LE.-2395520D0.OR.DJM.GE.1D9) THEN
          J=-1
       ELSE
          J=0
@@ -49,7 +49,7 @@
 *     Separate day and fraction
          F=MOD(DJM,1D0)
          IF (F.LT.0D0) F=F+1D0
-         D=NINT(DJM-F)
+         D=ANINT(DJM-F)
 
 *     Express day in Gregorian calendar
          JD=NINT(D)+2400001

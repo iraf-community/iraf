@@ -1,5 +1,68 @@
 .help revisions Jun88 noao.digiphot.apphot
 .nf
+apphot/polyphot/apyfit.x
+apphot/polyphot/appyerrors.x
+apphot/aplib/apwres2.x
+    Improved the error reports for polyphot in the case where the effective
+    aperture is 0, which may occur if the polygon is off the image or due
+    to fractional pixel effects.
+
+    Davis, August 10, 1999
+
+
+apphot/polyphot/apyget.x
+apphot/polyphot/apmkpylist.x
+apphot/polyphot/ayphot.x
+apphot/polyphot/apyradsetup.x
+    Modified the polygon drawing code (the g keystroke command) to flush
+    the graphics buffer after every polygon segement is drawn instead
+    of after the polygon is complete.
+
+    Davis, July 9, 1999
+
+apphot/aputil/apotime.x
+    Modified the code which reads the time of observation value from the image
+    header to extract the time field from the date-obs keyword if it is
+    present.
+
+    Davis, May 11, 1999
+
+
+apphot/aputil/apdate.x
+    Modified the date and time photometry file keyword encoding tasks to
+    write the date and time in the proper fits format and in units of GMT.
+    Note that GMT is deactivated in digiphotx because the necessary routine
+    is not yet in the system.
+
+    Davis, May 11, 1999
+
+apphot/aputil/apfnames.x
+    Modified the default input and output file nameing routines to handle
+    input images with kernel sections and cluster indices more gracefully.
+
+    Davis, January 17, 1999
+
+apphot/aplib/apwparam1.x
+apphot/aputil/apdate.x
+    Modified the apphot output file writing routines to write the "DATE"
+    keyword in the new FITS standard format, eg. yyyy-mm-dd instead of
+    mm-dd-yy.
+
+    Davis, December 29, 1998
+
+apphot/daofind/t_daofind.x
+    Modified the default output file naming code to support names of the
+    form "directory/default" as well as "default" in interactive mode
+    as well as non-interactive mode.
+
+    Davis, February 13, 1998
+
+apphot/daofind/apfind.x
+    Modified the centering routines to protect against a rare floating
+    divide by 0 condition.
+
+    Davis, June 24, 1997
+
 apphot/aptest.cl
     Modified the rfits calling sequence so that the test script will work
     with the new version of rfits.

@@ -164,11 +164,11 @@ begin
 	            # Calculate the size of output image and number of bands.
 		    IM_LEN(im,1) = IP_AXLEN(ip,1)
 		    IM_LEN(im,2) = IP_AXLEN(ip,2)
-		    IM_LEN(im,3) = IP_NBANDS(ip,3)
+		    IM_LEN(im,3) = IP_NBANDS(ip)
 		    if (IP_NBANDS(ip) > 1)
 		        IM_NDIM(im) = 3
 		    else
-		        IM_NDIM(im) = 2
+		        IM_NDIM(im) = IP_NDIM(ip)
 		    IM_PIXTYPE(im) = IP_OUTTYPE(ip)
 		}
 
@@ -512,6 +512,8 @@ begin
             for (ch=dims[sp];  IS_WHITE(ch) || ch == ',';  ch=dims[sp])
                 sp = sp + 1
         }
+	if (ndim == 1)
+	    IP_AXLEN(ip,2) = 1
         IP_NDIM(ip) = ndim
 end
 
@@ -652,12 +654,9 @@ int	i, op, nbands, level
 int	strsearch()
 
 begin
-	call smark (sp)
-	call salloc (buf, SZ_EXPR, TY_CHAR)
-	call aclrc (Memc[buf], SZ_EXPR)
-
 	# If there is no outbands parameter specified, warn the user, we'll
 	# make something up later.
+	IP_USE_CMAP(ip) = YES
 	if (outbands[1] == EOS && IP_OUTPUT(ip) != IP_INFO) {
 	    call eprintf ("Warning: No 'outbands' parameter specified: ")
 	    call eprintf ("Converting all pixels.\n")
@@ -665,11 +664,14 @@ begin
 	    return
 	}
 
+	call smark (sp)
+	call salloc (buf, SZ_EXPR, TY_CHAR)
+	call aclrc (Memc[buf], SZ_EXPR)
+
 	if (DEBUG) { call eprintf("outbands='%s'\n");call pargstr(outbands) }
 
 	op = 1
 	nbands = 0
-	IP_USE_CMAP(ip) = YES
 	while (outbands[op] != EOS) {
 	    level = 0
 	    nbands = nbands + 1
@@ -709,6 +711,7 @@ begin
 	    }
 	}
 	IP_NBANDS(ip) = nbands
+	IP_AXLEN(ip,3) = nbands
 
 	call sfree (sp)
 end

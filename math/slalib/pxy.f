@@ -44,9 +44,9 @@
 *
 *  Called:  slXYXY
 *
-*  P.T.Wallace   Starlink   15 July 1993
+*  P.T.Wallace   Starlink   22 May 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 
@@ -61,7 +61,7 @@
 
 
 
-*  Initialise summations
+*  Initialize summations
       SDX2=0D0
       SDY2=0D0
 

@@ -26,7 +26,7 @@
 *  3)  HA is returned in the range +/-pi.  Declination is returned
 *      in the range +/-pi/2.
 *
-*  4)  The returned latitude is (in principle) geodetic.  In critical
+*  4)  The latitude is (in principle) geodetic.  In critical
 *      applications, corrections for polar motion should be applied.
 *
 *  5)  In some applications it will be important to specify the
@@ -46,9 +46,9 @@
 *      use inline code, having previously computed fixed terms such
 *      as sine and cosine of latitude.
 *
-*  P.T.Wallace   Starlink   9 July 1994
+*  P.T.Wallace   Starlink   21 February 1996
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright (C) 1996 Rutherford Appleton Laboratory
 *  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
 *-
 

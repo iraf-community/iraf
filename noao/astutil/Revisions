@@ -1,5 +1,118 @@
 .help revisions Jun88 noao.astutil
 .nf
+t_asthedit.x
+t_astcalc.x
+astfunc.x
+doc/asthedit.hlp
+doc/astcalc.hlp
+    The epoch, julday, and mst functions now take either the old or new
+    FITS style date strings.  The time argument is optional and if it is
+    not specified the time from the date string is used and if neither time
+    is present a value of 0h is used.  New internal variables $GMD, $GMT,
+    and $GMDT for the current time Greenwich time are defined.
+    (5/19/99, Valdes)
+
+t_rvcorrect.x
+t_setairmss.x
+t_setjd.x
+doc/rvcorrect.hlp
+doc/setairmass.hlp
+doc/setjd.hlp
+doc/keywpars.hlp
+    Converted to use dtm_decode.  Documentation updated.
+    (5/19/99, Valdes)
+
+astcalc.par
+asthedit.par
+asttimes.par
+doc/asttimes.hlp
+galactic.par
+galactic.x
+keywpars.par
+precess.par
+precess.x
+rvcorrect.par
+setairmass.par
+setjd.par
+    These files were checked for Y2K correctness.  No changes were required.
+    (5/19/99, Valdes)
+
+asttools/*
+    All routines checked for Y2K correctness.  No changes were required.
+    The README file had the following statement added:
+
+    Y2K:
+	Most routines work in Julian days or epochs.  If they have an input
+	year it is converted to one of these forms by calling
+	ast_date_to_julday.  This is the only routine that has a Y2K
+	connection.  It assumes two digit years are 20th century.  These
+	routines are Y2K correct.
+
+    (5/19/99, Valdes)
+
+doc/pdm.hlp
+    Added a journal reference to the algorithm.  (4/26/99, Valdes)
+
+astfunc.x
+    The imdel function name was incorrectly set as imde.  (4/22/99, Valdes)
+
+doc/galactic.hlp
+doc/asthedit.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+doc/ccdtime.hlp
+    In the formula for r(sky) was pixel area term was in the wrong place.
+    (3/9/99, Valdes)
+
+t_rvcorrect.x
+    Improved error catching.  (3/5/99, Valdes)
+
+t_rvcorrect.x
+    Added code the catch a bad DATE-OBS keyword and print an informative
+    error (2/21/99 MJF)
+
+t_ccdtime.x
+    For the case where SNR is very large and a time is specified the
+    iteration on the magnitude might not complete.  The iteration is now
+    capped at 100 and the test for convergence is now normalized.
+    (11/6/98, Valdes)
+
+t_ccdtime.x
+doc/ccdtime.hlp
+    1.  The calculation of exposure time given a SNR was changed from an
+	interative solution to an analytic solution.
+    2.  The times are printed to 0.01s.
+    3.  The photometry aperture is now the rounded-up integer with a minimum
+	of 9 pixels.
+    (9/8/98, Valdes)
+
+t_ccdtime.x
+ccddb.x
+doc/ccdtime.hlp
+    1.	The database keywords can now be index by reference to the telescope,
+	filter, and/or telescope.
+    2.  A new filter keyword, "extinction", was added to specify the
+	extinction.
+    3.	The extinction is now used to fixe the previous incorrect behavior
+	that used 1 mag/airmass extinction.  The old results are preserved
+	by making the default extinction be 1 if missing.  However the
+	database files should be updated to have correct extinctions.
+    (8/19/98, Valdes)
+
+rvcorrect.par
+        Removed the KEYPARS pset from the parameter file.  The pset is
+        still available to the task, but it's presence interferes with
+        the task when used in CL mode since the 'ut' parameter is no
+        longer queried and the pset value is used, resulting in an 
+        illegal number error when getting the value (4/22/98 MJF)
+
+t_setjd.x
+    The ctod function was incorrectly declared double.  (3/10/98, Valdes)
+
+=======
+V2.11.1
+=======
+
 pdm/pdmdelete.x
     The statement "r2min = MAX_DOUBLE" was changed to "r2min=MAX_REAL"
     since r2min is declared and used as real.  (10/6/97, Valdes)

@@ -1,4 +1,5 @@
 include	<imio.h>
+include	<mach.h>
 include	<pkg/dttext.h>
 include	<pkg/igsfit.h>
 
@@ -19,7 +20,7 @@ char	labels[SZ_LINE,IGSPARAMS]	# Axis labels
 pointer	un				# Units pointer
 
 char	image1[SZ_FNAME], image2[SZ_FNAME], root[SZ_FNAME], units[SZ_FNAME]
-int	i, j, rec, index, nfeatures, ntotal
+int	i, j, rec, index, imin, imax, nfeatures, ntotal
 real	value, ltm[2,2], ltv[2]
 pointer	dt, im, mw, ct, x, y, user
 
@@ -28,13 +29,15 @@ real	mw_c1tranr()
 bool	strne()
 pointer	dtmap1(), immap(), mw_openim(), mw_sctran(), un_open()
 
-errchk	dtmap1, dtgstr
+errchk	dtmap1, dtgstr, immap
 
 begin
 	x = NULL
 	ncoords = 0
 	ntotal = 0
 	axis = 0
+	imin = MAX_INT
+	imax = -MAX_INT
 	un = NULL
 
 	while (fc_getim (list, image1, SZ_FNAME) != EOF) {
@@ -64,6 +67,8 @@ begin
 		case 2:
 		    index = IM_VOFF (im, 1) + 1
 		}
+		imin = min (imin, index)
+		imax = max (imax, index)
 
 		xmin = 1.
 		xmax = IM_SVLEN (im, 1)
@@ -148,6 +153,9 @@ begin
 	}
 
 	# Set coordinates.  Take error action if no features are found.
+
+	if (imin == imax)
+	    call error (2, "Only one line or column measured")
 
 	if (ncoords > 0) {
 	    call xt_sort3 (Memr[user], Memr[x], Memr[y], ncoords)

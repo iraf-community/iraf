@@ -1,4 +1,4 @@
-.help xy2xy Nov95 "Slalib Package"
+.help xy2xy Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slXYXY (X1,Y1,COEFFS,X2,Y2)

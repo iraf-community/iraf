@@ -1,4 +1,4 @@
-.help map Nov95 "Slalib Package"
+.help map Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slMAP (RM, DM, PR, PD, PX, RV, EQ, DATE, RA, DA)

@@ -1,4 +1,4 @@
-.help dcmpf Nov95 "Slalib Package"
+.help dcmpf Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slDCMF (COEFFS,XZ,YZ,XS,YS,PERP,ORIENT)

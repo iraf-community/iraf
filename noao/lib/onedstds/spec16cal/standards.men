@@ -2,15 +2,21 @@ Standard stars in onedstds$spec16cal/:
 
 Combined red and blue 3300A-10300A:
 
-hr1544.dat   hr4468.dat   hr5501.dat   hr7596.dat   hr8634.dat   
-hr3454.dat   hr4963.dat   hr718.dat    hr7950.dat   hr9087.dat
+hd15318      hd74280      hd114330     hd188350     hd214923
+hd30739      hd100889     hd129956     hd198001     hd224926
+hr1544       hr4468       hr5501       hr7596       hr8634       
+hr3454       hr4963       hr718        hr7950       hr9087    
 
 Blue 3300A-7550A:
 
-hr1544blue.dat  hr4468blue.dat  hr5501blue.dat  hr7596blue.dat  hr8634blue.dat
-hr3454blue.dat  hr4963blue.dat  hr718blue.dat   hr7950blue.dat  hr9087blue.dat
+hd15318blue     hd74280blue     hd114330blue    hd188350blue    hd214923blue
+hd30739blue     hd100889blue    hd129956blue    hd198001blue    hd224926blue
+hr1544blue      hr4468blue      hr5501blue      hr7596blue      hr8634blue    
+hr3454blue      hr4963blue      hr718blue       hr7950blue      hr9087blue    
 
 Red 6020A-10300A:
 
-hr1544red.dat   hr4468red.dat   hr5501red.dat   hr7596red.dat   hr8634red.dat
-hr3454red.dat   hr4963red.dat   hr718red.dat    hr7950red.dat   hr9087red.dat
+hd15318red      hd74280red      hd114330red     hd188350red     hd214923red
+hd30739red      hd100889red     hd129956red     hd198001red     hd224926red
+hr1544red       hr4468red       hr5501red       hr7596red       hr8634red    
+hr3454red       hr4963red       hr718red        hr7950red       hr9087red    

@@ -25,8 +25,7 @@ real	serr, shift, fwhm
 bool	fit
 pointer	sp, cmd, x, y, anti
 
-int	clgcur(), clgkey(), rv_rvcorrect()
-real	clgetr()
+int	scan(), clgcur(), clgkey(), rv_rvcorrect()
 errchk	dofit
 
 include "fitcom.com"
@@ -92,9 +91,15 @@ begin
 		call gctran (gp, wx, wy, wx, wy, wc, 2)
 	    case 't':
 		if (RV_DCFLAG(rv) == -1) {
-		    wx = clgetr ("shift")
+		    call printf ("shift: ")
+		    call flush (STDOUT)
+		    if (scan() != EOF)
+		        call gargr (wx)
 		} else {
-		    wx = clgetr ("velocity")
+		    call printf ("velocity: ")
+		    call flush (STDOUT)
+		    if (scan() != EOF)
+		        call gargr (wx)
 		    wx = wx / RV_DELTAV(rv)
 		}
 		call printf ("Lines ('m' to mark, 't' to type, 'q' to quit):")
@@ -336,9 +341,18 @@ begin
                     fwhm = 2.35482 * sigma
                     call rv_antisym (rv, w, height, fwhm, WRKPIXY(rv,1),
                         RV_CCFNPTS(rv), Memr[anti], ccfvar, verr, DBL_R(rv,i))
-                    DBL_VOBS(rv,i) = real (vobs)
-                    DBL_VHELIO(rv,i) = real (vhelio)
-                    DBL_VERR(rv,i) = real (verr)
+                    if (IS_INDEFD(vobs))
+                        DBL_VOBS(rv,i) = INDEFR
+                    else
+                        DBL_VOBS(rv,i) = real (vobs)
+                    if (IS_INDEFD(vhelio))
+                        DBL_VHELIO(rv,i) = INDEFR
+                    else
+                        DBL_VHELIO(rv,i) = real (vhelio)
+                    if (IS_INDEFD(verr))
+                        DBL_VERR(rv,i) = INDEFR
+                    else
+                        DBL_VERR(rv,i) = real (verr)
                     DBL_FWHM(rv,i) = 2.35482 * sigma * RV_DELTAV(rv)
                 } else {
                     DBL_VOBS(rv,i) = INDEFR

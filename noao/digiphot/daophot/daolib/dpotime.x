@@ -8,7 +8,11 @@ procedure dp_otime (im, dao)
 pointer	im		# pointer to IRAF image
 pointer	dao		# pointer to the daophot structure
 
+char	timechar
+int	index
 pointer	sp, key, otime
+bool	streq()
+int	strldx()
 
 begin
 	call smark (sp)
@@ -29,10 +33,19 @@ begin
 		    call pargstr (Memc[key])
 	    }
 	}
-	if (Memc[otime] == EOS)
+	if (Memc[otime] == EOS) {
 	    call dp_sets (dao, OTIME, "INDEF")
-	else
+        } else if (streq ("DATE-OBS", Memc[key]) || streq ("date-obs",
+            Memc[key])) {
+            timechar = 'T'
+            index = strldx (timechar, Memc[otime])
+            if (index > 0)
+                call dp_sets (dao, OTIME, Memc[otime+index])
+            else
+                call dp_sets (dao, OTIME, "INDEF")
+	} else {
 	    call dp_sets (dao, OTIME, Memc[otime])
+	}
 
 	call sfree (sp)
 end

@@ -1,4 +1,4 @@
-.help tp2s Nov95 "Slalib Package"
+.help tp2s Jun99 "Slalib Package"
 .nf
 
       SUBROUTINE slTP2S (XI, ETA, RAZ, DECZ, RA, DEC)

@@ -17,14 +17,13 @@ char	imtlist1[SZ_LINE]		# Input image list
 char	imtlist2[SZ_LINE]		# Output image list
 real	shift				# Amount of pixel shift
 int	boundary			# Type of boundary extension
-int	interpolation			# Type of image interpolation
 real	constant			# Constant for boundary extension
 
 char	image1[SZ_FNAME]		# Input image name
 char	image2[SZ_FNAME]		# Output image name
 char	imtemp[SZ_FNAME]		# Temporary file
 
-char	str[SZ_LINE]
+char	str[SZ_LINE], interpstr[SZ_FNAME]
 int	list1, list2, ishift
 pointer	im1, im2, mw
 
@@ -41,8 +40,7 @@ begin
 
 	# Get the shift, interpolation type, and boundary condition.
 	shift = clgetr ("shift")
-	interpolation = clgwrd ("interp_type", str, SZ_LINE,
-	    ",nearest,linear,poly3,poly5,spline3,")
+	call clgstr ("interp_type", interpstr, SZ_LINE)
 	boundary = clgwrd ("boundary_type", str, SZ_LINE,
 	    ",constant,nearest,reflect,wrap,")
 	constant = clgetr ("constant")
@@ -74,7 +72,7 @@ begin
 		    call sh_linesi (im1, im2, ishift, boundary, constant)
 		else
 	            call sh_lines (im1, im2, shift, boundary, constant,
-			interpolation)
+			interpstr)
 
 		# Update the image WCS to reflect the shift.
 		if (!envgetb ("nomwcs")) {

@@ -89,8 +89,14 @@ begin
 	    header[RAS_MAPLENGTH] = long (0)
 	}
 
-	# Write the header to the file.
-	call write (EX_FD(ex), header, (SZ_RASHDR * SZ_LONG))
+        # Write the header to the file.  First swap it to Sun byte order if
+        # needed (although the format doesn't require this), then swap it
+        # if requested by the user.
+        if (BYTE_SWAP4 == YES) 
+            call bswap4 (header, 1, header, 1, (SZ_RASHDR * SZ_LONG * SZB_CHAR))
+        if (EX_BSWAP(ex) == S_I4) 
+            call bswap4 (header, 1, header, 1, (SZ_RASHDR * SZ_LONG * SZB_CHAR))
+        call write (EX_FD(ex), header, (SZ_RASHDR * SZ_LONG))
 
 	# If we have a colormap write that out now.
 	if (bitset(flags, OF_CMAP)) {

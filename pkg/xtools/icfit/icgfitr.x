@@ -49,11 +49,17 @@ begin
 	call amovr (wts, Memr[userwts], n)
 
 	# Initialize
+	IC_GP(ic) = gp
+	IC_GT(ic) = gt
 	IC_OVERPLOT(ic) = NO
 	IC_NEWX(ic) = YES
 	IC_NEWY(ic) = YES
 	IC_NEWWTS(ic) = YES
 	IC_NEWFUNCTION(ic) = YES
+
+	# Send the GUI the current task values.
+	call ic_gui (ic, "open")
+	call ic_gui (ic, "graph")
 
 	# Read cursor commands.
 
@@ -66,7 +72,7 @@ begin
 	repeat {
 	    switch (key) {
 	    case '?': # Print help text.
-		call gpagefile (gp, Memc[IC_HELP(ic)], IC_PROMPT)
+		call ic_gui (ic, "help")
 
 	    case ':': # List or set parameters
 		if (Memc[cmd] == '/')
@@ -150,6 +156,7 @@ begin
 		else
 		    call icg_deleter (ic, gp, gt, cv, Memr[x1], Memr[y1],
 			Memr[w1], Memr[userwts], n, wx, wy)
+		call ic_gui (ic, "refit YES")
 
 	    case 'f': # Fit the function and reset the flags.
 		iferr {
@@ -167,6 +174,8 @@ begin
 		    IC_NEWFUNCTION(ic) = NO
 		    IC_FITERROR(ic) = NO
 		    newgraph = YES
+
+		    call  ic_gui (ic, "refit NO")
 		} then {
 		    IC_FITERROR(ic) = YES
 		    call erract (EA_WARN)
@@ -223,30 +232,35 @@ begin
 		if (IC_GKEY(ic) != 1) {
 		    IC_GKEY(ic) = 1
 		    newgraph = YES
+		    call ic_gui (ic, "graph")
 		}
 
 	    case 'i':
 		if (IC_GKEY(ic) != 2) {
 		    IC_GKEY(ic) = 2
 		    newgraph = YES
+		    call ic_gui (ic, "graph")
 		}
 
 	    case 'j':
 		if (IC_GKEY(ic) != 3) {
 		    IC_GKEY(ic) = 3
 		    newgraph = YES
+		    call ic_gui (ic, "graph")
 		}
 
 	    case 'k':
 		if (IC_GKEY(ic) != 4) {
 		    IC_GKEY(ic) = 4
 		    newgraph = YES
+		    call ic_gui (ic, "graph")
 		}
 
 	    case 'l':
 		if (IC_GKEY(ic) != 5) {
 		    IC_GKEY(ic) = 5
 		    newgraph = YES
+		    call ic_gui (ic, "graph")
 		}
 
 	    case 't': # Initialize the sample string and erase from the graph.
@@ -254,7 +268,7 @@ begin
 		    call icg_sampler (ic, gp, gt, x, n, 0)
 		else
 		    call icg_sampler (ic, gp, gt, Memr[x1], n, 0)
-		call sprintf (Memc[IC_SAMPLE(ic)], IC_SZSAMPLE, "*")
+		call ic_pstr (ic, "sample", "*")
 		IC_NEWX(ic) = YES
 
 	    case 'o': # Set overplot flag
@@ -323,6 +337,7 @@ begin
 			call icg_sampler (ic, gp, gt, x, n, 1)
 		    else
 			call icg_sampler (ic, gp, gt, Memr[x1], n, 1)
+		    call ic_pstr (ic, "sample",  Memc[IC_SAMPLE(ic)])
 		    IC_NEWX(ic) = YES
 		}
 
@@ -333,6 +348,7 @@ begin
 		else
 		    call icg_undeleter (ic, gp, gt, cv, Memr[x1], Memr[y1],
 			Memr[w1], Memr[userwts], n, wx, wy)
+		call ic_gui (ic, "refit YES")
 
 	    case 'w':  # Window graph
 		call gt_window (gt, gp, cursor, newgraph)
@@ -350,6 +366,7 @@ begin
 			    if (nscan() == 1) {
 				if (!IS_INDEF (px1)) {
 				    wts[i] = px1
+				    call ic_gui (ic, "refit YES")
 				    IC_NEWWTS(ic) = YES
 				}
 			    }
@@ -374,6 +391,7 @@ begin
 					    y[j] == Memr[y1+i-1])
 					    wts[j] = px1
 				    Memr[w1+i-1] = px1
+				    call ic_gui (ic, "refit YES")
 				    IC_NEWWTS(ic) = YES
 				}
 			    }
@@ -394,6 +412,7 @@ begin
 			    if (nscan() == 1) {
 				if (!IS_INDEF (px1)) {
 				    x[i] = px1
+				    call ic_gui (ic, "refit YES")
 				    IC_NEWX(ic) = YES
 				}
 			    }
@@ -418,6 +437,7 @@ begin
 					    y[j] == Memr[y1+i-1])
 					    x[j] = px1
 				    Memr[x1+i-1] = px1
+				    call ic_gui (ic, "refit YES")
 				    IC_NEWX(ic) = YES
 				}
 			    }
@@ -438,6 +458,7 @@ begin
 			    if (nscan() == 1) {
 				if (!IS_INDEF (px1)) {
 				    y[i] = px1
+				    call ic_gui (ic, "refit YES")
 				    IC_NEWY(ic) = YES
 				}
 			    }
@@ -462,6 +483,7 @@ begin
 					    y[j] == Memr[y1+i-1])
 					    y[j] = px1
 				    Memr[y1+i-1] = px1
+				    call ic_gui (ic, "refit YES")
 				    IC_NEWY(ic) = YES
 				}
 			    }
@@ -474,6 +496,7 @@ begin
 		    call icg_dsampler (wx, wy, ic, gp, gt, x, n)
 		else
 		    call icg_dsampler (wx, wy, ic, gp, gt, Memr[x1], n)
+		call ic_pstr (ic, "sample", Memc[IC_SAMPLE(ic)])
 
 	    case 'I': # Interrupt
 		call fatal (0, "Interrupt")
@@ -505,6 +528,9 @@ begin
 		break
 	} until (gt_gcur1 (gt, cursor, wx, wy, wcs, key, Memc[cmd],
 	    IC_SZSAMPLE) == EOF)
+
+	call ic_gui (ic, "close")
+	IC_GP(ic) = NULL
 
 	if (x1 != NULL) {
 	    call mfree (x1, TY_REAL)

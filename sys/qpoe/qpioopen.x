@@ -154,19 +154,15 @@ iferr {
 		call syserrs (SYS_QPNOXYF, Memc[name])
 
 	    switch (DD_FTYPE(dd,i)) {
-	    case TY_INT, TY_LONG:
-		IO_EVXTYPE(io) = TY_INT
-	    case TY_SHORT:
-		IO_EVXTYPE(io) = TY_SHORT
+	    case TY_SHORT, TY_INT, TY_LONG, TY_REAL, TY_DOUBLE:
+		IO_EVXTYPE(io) = DD_FTYPE(dd,i)
 	    default:
 		call syserrs (SYS_QPXYFNS, Memc[name])
 	    }
 
 	    switch (DD_FTYPE(dd,j)) {
-	    case TY_INT, TY_LONG:
-		IO_EVYTYPE(io) = TY_INT
-	    case TY_SHORT:
-		IO_EVYTYPE(io) = TY_SHORT
+	    case TY_SHORT, TY_INT, TY_LONG, TY_REAL, TY_DOUBLE:
+		IO_EVYTYPE(io) = DD_FTYPE(dd,j)
 	    default:
 		call syserrs (SYS_QPXYFNS, Memc[name])
 	    }

@@ -100,11 +100,13 @@ operr_	    call sfree (sp)
 
 	call strcpy ("imhdr", IM_MAGIC(im), SZ_IMMAGIC)
 	call amovi (axlen, IM_LEN(im,1), naxis)
+	IM_ACMODE(im) = NEW_IMAGE
 	IM_NDIM(im) = naxis
 	IM_PIXTYPE(im) = pixtype
 	IM_HDRLEN(im) = LEN_IMHDR
 	IM_CTIME(im) = clktime
 	IM_MTIME(im) = clktime
+	Memc[IM_USERAREA(im)] = EOS
 	call imf_initoffsets (im, SZ_DEVBLK)
 	pfsize = IM_HGMOFF(im) - 1
 

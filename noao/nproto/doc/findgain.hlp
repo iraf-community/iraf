@@ -33,6 +33,7 @@ The default case of center=\fBmean\fR does not use this parameter.
 .ls verbose = yes
 Label the gain and readnoise on output, rather than print them two per
 line?
+.le
 .ih
 DESCRIPTION
 FINDGAIN uses Janesick's method for determining the gain and read noise
