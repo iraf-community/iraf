@@ -1,0 +1,26 @@
+.help rewind Nov84 system
+.ih
+NAME
+rewind -- rewind a previously allocated device
+.ih
+USAGE
+rewind device
+.ih
+PARAMETERS
+.ls device
+The device to be rewound.
+.le
+.ih
+DESCRIPTION
+\fIRewind\fR rewinds the specified device, which is most likely
+a magnetic tape, and which has been previously allocated to the user.
+.ih
+EXAMPLES
+
+1. Rewind logical tape drive a.
+
+	cl> rewind mta
+.ih
+SEE ALSO
+allocate, deallocate, devstatus
+.endhelp

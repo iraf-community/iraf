@@ -1,0 +1,523 @@
+.help revisions Jun88 noao.twodspec.longslit
+.nf
+longslit$transform/fcgetcoords.x
+    Fixed problem in which database files where opened within a loop but
+    only closed once outside a loop.  (5/6/89, Valdes - reported by Schaller)
+
+longslit$illumination.x
+    1.  Added error checking to handle missing DISPAXIS keyword.
+    2.  Changed to dynamically allocated strings.
+    (2/28/89, Valdes)
+ 
+longslit$ilsetbins.x
+    1.  The "bins" string is now checked for null after stripping any
+	leading whitespace with xt_stripwhite.
+    2.  The ":bins" command with no argument will not clear the bins now.
+    3.  An error message is printed if two many sky bins are defined
+	using the cursor.
+    (1/26/89, Valdes)
+ 
+longslit$fluxcalib.x
+    1.  Changed CRPIXn keyword and variable to type real.
+    2.  Added the ONEDSPEC flag for flux calibration.
+    (1/26/89, Valdes)
+ 
+longslit$response.x
+longslit$illumination.x
+    Added header keywords CCDMEAN and MKILLUM for compatibility with CCDRED.
+    (12/14/88 Valdes)
+
+longslit$transform/t_transform.x
+    Changed the computation of x1, x2 and y1, y2 to natural units if logx and
+    logy were set to yes. These numbers were being erroneously computed in
+    log units leading to an erroneous transformation if the user specified the
+    coordinate limits with x1,nx,dx and y1,ny,dy. (10/26/88 Davis)
+
+longslit$t_longslit.x
+    Changed the units of w0 to be log (w0) if log=yes. (9/21/88 Davis)
+
+longslit$ilsetbins.x
+longslit$transform/igsfit/igsfit.x
+noao$lib/scr/ilsetbins.key
+noao$lib/scr/igsfit.key
+    Added 'I' interrupt key.  (4/20/88 Valdes)
+
+longslit$mkpkg
+longslit$longslit.cl
+longslit$x_longslit.x
+longslit$transform/mkpkg
+longslit$transform/igsfit/mkpkg
+longslit$transform/x_transform.x -
+longslit$transform/libpkg.a -
+longslit$transform/fitcoords.par -> longslit$fitcoords.par
+longslit$transform/transform.par -> longslit$transform.par
+    Merged tranform executable with the longslit executable.  (4/7/88 Valdes)
+
+longslit$transform/extinction.x
+    Was incorrectly doing in place correction.  (3/24/88 Valdes)
+
+longslit$ilsetbins.x
+    Increased bin string from SZ_LINE to 2048 chars.  Some users have attempted
+    to define a large number of bins which fails when the string limit is
+    reached. (1/4/88 Valdes)
+
+longslit$transform/fluxcalib.x
+    Was incorrectly doing in place correction.  (11/5/87 Valdes)
+
+longslit$transform/transform.x -
+longslit$transform/trtransform.x -
+longslit$transform/trgetsurface.x -
+longslit$transform/trsftomsi.x -
+longslit$transform/trsetoutput.x -
+longslit$transform/t_transform.x +
+longslit$doc/transform.hlp
+    The task TRANSFORM in  the  LONGSLIT  package  is  used  to
+    interpolate images  onto a user defined coordinate system given as
+    surface functions U(X,Y)  and  V(X,Y)  where  (X,Y)  are  the
+    untransformed  image  pixel coordinates  and  (U,V) are the user
+    coordinates.  The surface functions are derived from a set of measured
+    points  using  the  task  FITCOORDS.  With  Version  2.6  of  IRAF
+    the  algorithm  used  to  invert  the user coordinate surfaces, U(X,Y)
+    and V(X,Y) --> X(U,V) and Y(U,V),  has  been changed.   Previously,
+    surfaces  function  of  comparable  order to the original surfaces were
+    fit to a grid of points,  i.e.  (U(X,Y),  V(X,Y), X)  and (U(X,Y),
+    V(X,Y), Y), with the same surface fitting routines used in FITCOORDS to
+    obtain the input user coordinate surfaces.  This  method of  inversion
+    worked  well in all cases in which reasonable distortions and
+    dispersions were used.  It was selected because  it  was  relatively
+    fast.   However,  it  cannot  be  proved  to  work  in all cases; in
+    one instance in  which  an  invalid  surface  was  used  the
+    inversion  was actually  much poorer than expected.  Therefore, a more
+    direct iterative inversion algorithm is  now  used.   This  is
+    guaranteed  to  give  the correct  inversion  to  within a set error
+    (0.05 of a pixel in X and Y).  It is slightly slower than the previous
+    algorithm but it  is  still  not as major a factor as the image
+    interpolation itself.
+
+    The  event  which  triggered  this  change was when a user
+    misidentified some arc lines.  The dispersion function which was
+    forced  to  fit  the misidentified   lines   required  curvatures  of
+    a  couple  of  hundred angstroms over 100 pixels at a dispersion of
+    10  angstroms  per  pixel.  It  was  possible  to do this to the user's
+    satisifaction with a surface function of xorder=6 and yorder=7.
+    TRANSFORM inverts  this  surface  by fitting  a  function  with the
+    same orders (it uses a minimum of order 6 and the order of the  input
+    surface  function).   The  transformed  arc image  was  then examined
+    and found to have residual wavelength errors 5 times larger expected
+    from the residuals  in  the  dispersion  solution.  With  such  a
+    large  curvature  in  the  dispersion surface function it turned out
+    that to  maintain  errors  at  the  same  level  the  fitting function
+    required  orders of 12.  (To determine this required a special version
+    of TRANSFORM  and  the  new  double  precision  surface  fitting
+    routines).   When  the  lines  were  correctly identified the
+    dispersion function had much lower curvatures and required lower orders
+    in the  fit and  gave a good transformation of the arc image.  The
+    conclusions drawn from this event are:
+
+    1. An incorrect dispersion solution can appear  to  be  correct  if
+    the misidentified lines are at the end and a high enough order is
+    used.
+
+    2.   This  requires  high  order  surface  functions  in  FITCOORDS
+    and TRANSFORM.
+
+    3.  The algorithm used in TRANSFORM  in  V2.5  and  earlier,  while
+    not failing,  does  give  unexpectly  large  residuals in the
+    linearized arc spectrum in this case.  A cautious user should transform
+    arc images  and examine them.
+
+    4.   In  the  future  a more direct inversion algorithm is guaranteed
+    to give residuals in the transform consistent with  the  residuals  in
+    the dispersion solution even when the dispersion function is not
+    realistic.
+    (9/14/87 Valdes)
+
+longslit$transform/trgetsurface.x
+longslit$transform/fcfitcoords.x
+longslit$transform/fcdbio.x
+longslit$transform/trsftomsi.x
+longslit$transform/trsetoutput.x
+longslit$transform/igsfit/igsfit.x
+longslit$transform/igsfit/igscolon.x
+longslit$transform/igsfit/igssolve.x
+longslit$transform/igsfit/igsget.x
+longslit$transform/igsfit/xgs.x +
+    Modified routines using the GSURFIT routines to call an interface routine
+    which allows calling the double precision versions of these procedures
+    without changing the single precision data arrays (a double precision
+    copy is made within the interface).  Thus, FITCOORDS and TRANSFORM now
+    use double precision arithmetic when doing surface fitting and evaluating.
+    This removes the problems experienced with high order surfaces.
+    (8/14/87 Valdes)
+
+longslit$transform/igsfit/igsfit.x
+longslit$transform/igsfit/igsget.x
+longslit$transform/igsfit/igscolon.x
+longslit$doc/fitcoords.hlp
+noao$lib/scr/igsfit.key
+    Added a listing of the fitted surface values at the corners of the
+    image.  This allows evaluating the fit. (8/8/87 Valdes)
+
+longslit$transform/fitcoords.x
+    Added check against using blanks in fitname prefix instead of null
+    file. (7/3/87 Valdes)
+
+====
+V2.5
+====
+
+longslit$extinction.x
+longslit$extinction.par
+longslit$doc/extinction.hlp
+    Valdes, May 26, 1987
+    1.  EXTINCTION now uses the same extinction files used by the ONEDSPEC
+	package.
+    2.  The parameter name for the extinction file has been changed from
+	"table" to "extinction" to be consistent with the ONEDSPEC parameter.
+    3.  The help page was updated.
+
+longslit$longslit.cl
+longslit$identify.par +
+longslit$reidentify.par +
+    Valdes, April 16, 1986
+    1.  Parameters for IDENTIFY and REIDENTIFY are now separate for the
+	LONGSLIT package.
+
+longslit$fluxcalib.x
+    Valdes, March 16, 1987
+    1.  A reference off the end of the sensitivity image due to an error
+	in a do loop index was fixed.
+
+longslit$transform/trtransform.x
+    Valdes, February 26, 1987
+    1.  Add a warning if the header parameter DISPAXIS is not found.  This
+	affects whether coordinate information for ONEDSPEC is produced.
+
+longslit$*.x
+    Valdes, February 17, 1987
+    1.  Required GIO changes.
+
+longslit$transform/igsfit/igsdelete.x
+longslit$transform/igsfit/igsundelete.x
+    Valdes, October 16, 1986
+    1.  Real line type specified in gseti call changed to integer.
+	This caused a crash on AOS/IRAF.
+
+longslit$doc/fluxcalib.hlp
+    Valdes, October 8, 1986
+    1.  Added a short paragraph discussing calibration of logarithmicly
+	binned spectra.
+
+longslit$response.x
+longslit$response.par
+longslit$doc/response.hlp
+    Valdes, August 18, 1986
+    1.  RESPONSE was modified to allow separately specifying the image
+	section to be used to determine the response (the numerator)
+	and the image section used to derive the normalization spectrum
+	(the denominator).  The help page was also modified.
+
+====================================
+Version 2.3 Release, August 18, 1986
+====================================
+
+longslit$doc:  Valdes, July 9, 1986
+    1.  Help page and menu file (noao$lib/scr/ilsetbins.key) for ILLUMINATION
+	were updated since they mention colon commands which do not exist.
+    2.  Help page for EXTINCTION updated to reflect new name for extinction
+	file.
+    3.  Date of help page for FITCOORDS updated to because of new window
+	command.
+
+longslit$fitcoords.x:  Valdes, July 7, 1986
+    1.  Keys 'a' and 'e' replaced with the general 'w' window package.
+    2.  Help page updated.
+
+longslit$response.x, illumination.x:  Valdes, July 3, 1986
+    1.  RESPONSE and ILLUMINATION modified to use new ICFIT package.
+
+transform/fitcoords.x,fcgetcoords.x,fcgetim.x: Valdes, July 1, 1986
+    1.  Added routine to remove image extensions.  This was necessary
+	to prevent having two legal image names and to avoid creating
+	database files with the image extensions.
+
+=====================================
+STScI Pre-release and SUN 2.3 Release
+=====================================
+
+longslit$illumination.x:  Valdes, June 17, 1986:
+    1.  It was possible to request a higher order image interpolator
+	than the number of bins being interpolated causing an error.
+	A check was added to use a lower order interpolator if the
+	number of bins is too small.
+
+longslit$*.ext; Valdes June 2, 1986
+    1.  Moved the extinction data files to "noao$lib/onedstds/".
+	Modified the parameter file for EXTINCTION appropriately.
+
+longslit$fluxcalib.x:  Valdes, May 13, 1986
+    1.  Modified FLUXCALIB to allow any combination of log or linear wavelength
+	coordinates for the input image and the sensitivity image.
+
+longslit$fluxcalib.x:  Valdes, May 1, 1986
+    1.  Modified FLUXCALIB to use image templates instead of file templates.
+
+longslit$tranform/transform.par: Valdes, May 1, 1986
+    1.  Changed default value of parameter database to "database" from
+	"identify.db"
+    2.  Changed help page to reflect change in default parameter.
+
+longslit$tranform/transform.x: Valdes, April 21, 1986
+    1.  Task TRANSFORM crashed when flux conservation was turned off.  This
+	was caused at the end by attempting to free memory allocated for
+	flux conservation.  The transformed image is still ok.  This
+	bug has been fixed.
+    2.  Help page for TRANSFORM updated to include timing information.
+
+longslit$ilsetbins.x: Valdes, April 7, 1986
+    1.  Fixed use of STRIDX with a character constant to STRIDXS.
+
+longslit: Valdes, Mar 24, 1986
+    1.  RESPONSE, ILLUMINATION, EXTINCTION, and FLUXCALIB modified to
+	fix history writing bug.
+
+longslit: Valdes, Mar 21, 1986
+    1.  APDEFINE, APEXTRACT, and SETIMHDR removed from this package.
+    2.  APDEFINE, APEXTRACT, and SETIMHDR help pages removed.
+    3.  LONGSLIT menu revised.
+
+longslit$response.x: Valdes, Mar 20, 1986
+    1.  There was a bug in RESPONSE which turned the interactive fitting
+	off if the answer was only "no" instead of "NO".  This has been
+	fixed.
+    
+longslit$illumination.x:  Valdes, Mar 11, 1986
+    1.  ILLUMINATION has a new parameter for the interpolation type.
+    2.  The help page for ILLUMINATION has been updated
+
+===========
+Release 2.2
+===========
+From Valdes Feb 11, 1986:
+
+1.  APEXTRACT sets the BEAM_NUM beam number to zero for all extractions.
+The aperture numbers are used to generate the record extensions.
+------
+From Valdes Feb 7, 1986:
+
+1.  Images package loaded with longslit.
+------
+From Valdes Feb 3, 1986:
+
+1.  Fixed bug in setting the aperture number in APDEFINE.  It was interpreting
+the input value as a real number and storing it in an integer variable.
+------
+From Valdes Jan 23, 1986:
+
+1.  Buffering limits removed in TRANSFORM.
+
+2.  Bug fixed in coordinate setting in TRANSFORM.
+
+3.  Bug fixed in undeleting points in FITCOORDS.
+------
+From Valdes Jan 3, 1986:
+
+1.  FITCOORDS has been modified.  The 'z' zoom option now queries for
+the type of zoom.  The types are feature, constant x, constant y, and
+constant z.  This allows examining dispersion solutions at different
+columns or lines.
+------
+From Valdes Nov 20, 1985:
+
+1.  TRANSFORM now exits with an error if a database record is not found
+rather than giving a warning and continuing on.
+------
+From Valdes Nov 15, 1985:
+
+1.  FITCOORDS and TRANSFORM modified to use directory/text databases
+rather than single text databases.  This new database structure is what
+is now created by IDENTIFY and REIDENTIFY.
+------
+From Valdes Nov 7, 1985:
+
+1.  The task MKSCRIPT has been made a basic system task.  It is no longer
+loaded in the LONGSLIT package but is always available.
+------
+From Valdes Nov 1, 1985:
+
+1.  New task MKSCRIPT has been added.  It is loaded out of the IMRED.GENERIC
+package.  See the help page for the task and the revisions for GENERIC.
+
+2.  Task FITCOORDS has been modified in several ways:
+	a.  The images in a list of images can be fit separately or
+	    combined into a single fit based on the value of the parameter
+	    COMBINE.
+	b.  Points delete interactively are recorded in a deletion list
+	    and may be used in subsequent fits.
+	c.  The last interactive plot or a default non-interactive plot
+	    is recorded in a plotfile (if specified).  The plots in the
+	    plot file can be spool or examined after the fact.
+
+See the new help for this task.
+------
+From Valdes Oct 22, 1985:
+
+1.  New parameter "exposure" in FLUXCALIB.  This parameter specifies the
+image header keyword corresponding to the exposure time to be used in
+calibrating the images.
+
+2.  FLUXCALIB and EXTINCTION have been changed to take a list of input
+images and a list of output images.  The output images may be the same
+as the input images.
+------
+From Valdes Oct 4, 1985:
+
+1.  Response and illumination modified to include the parameters for
+low and high rejection and rejection iteration.
+------
+From Valdes Oct 1, 1985:
+
+1.  The package has been reorganized.  Task extract has been moved to
+a new package twodspec.echelle.  The source code for identify and reidentify,
+which are actually one dimensional tools, have been moved to the onedspec
+package though they are still loaded with the twodspec package.
+
+2.  New task fluxcalib flux calibrates long slit images using the flux
+calibration file produced by onedspec.sensfunc.
+
+3.  Illumination can now handle using a single illumination bin.
+
+4.  Task revisions renamed to revs.  Note that this is a temporary task.
+------
+From Valdes September 25, 1985:
+
+1.  New task setimages added.  This task sets parameters in the image headers
+defining the dispersion axis and, optionally, strings for the coordinate
+types and coordinate units.  This strings, if defined, are used in other
+tasks for identifying and labeling graphs.
+
+2.  Because the dispersion axis is now defined in the header the axis
+parameter in tasks response and illumination have been removed.
+
+3.  Task transform now adds coordinate information to the image headers.
+
+4.  New task extinction corrects images for extinction.
+
+------
+From Valdes September 23, 1985:
+
+1.  Reidentify has been significantly speeded up when tracing a 2D image
+by eliminating most database accesses.
+------
+From Valdes August 6, 1985:
+
+1.  A bug in the absorption feature centering was fixed.
+2.  Numerous cosmetic changes in the graphics are being made.  These will
+be documented later.
+------
+From Valdes August 1, 1985:
+
+1.  The icfit package has been modified to allow resetting the x and
+y fitting points with keys 'x' and 'y'.  This is useful in identify
+to reset the user coordinates directly in the fitting package.
+
+2.  The :features command in identify now takes an (optional) file name
+directing the feature information to the specified file.  Without a
+file the terminal is cleared and the information written to the terminal
+with a pause at the end.  With a file name the information is appended to
+the specified file.
+
+3.  A couple of small bugs in the handling of INDEF user coordinates in
+identify have been fixed.
+
+4.  The default pixel range in the icfit package when called from identify
+is now the full image range rather than the range of points to be fit.
+
+5.  The image section in identify is now used with :image just as it is
+used for images given as arguments to the task.  Explicit image sections
+must be given, however, in database :read and :write because the optional
+names to these commands need not be image names.
+------
+From Valdes July 30, 1985:
+
+1.  The tasks lsmap, lstrans, and reidentify have been changed so that
+the user may specify a list of log files instead of just one logfile.
+Now it is possible to have log output be written to the terminal
+as well as a disk file.  This is now the default.
+------
+From Valdes July 27, 1985:
+
+1.  The default user coordinate when marking a feature in identify
+is the pixel coordinate if there is no coordinate function.
+
+2.  When entering a user coordinate in identify after a (m)ark or
+(u)ser key the coordinate typed by the user is matched against the
+line list and the line list value substituted if a match is found.
+Thus, for wavelengths the user only needs to enter the wavelength to
+the nearest Angstrom and the decimal part will be found from the 
+coordinate list.
+
+3.  Response and illumination have been modified to work along either
+image axis.  A new parameter "axis" has been added to select the
+axis.  For response the axis should be along the dispersion (default
+is along the columns) and in illumination the axis is that slit position
+axis (the default is along the lines).  These changes in conjunction
+with the new flat1d, fit1d, and background make the orientation of the
+longslit images arbitrary!
+
+4.  The values in the default parameter files for response, illumination,
+identify, reidentify, lsmap, and lstrans have been changed.  This will
+cause user parameter files to be out of date.  Sorry about that.
+------
+From Valdes July 26, 1985:
+
+1.  Background has been modified to use new fit1d task.  It now does
+column backgrounds without transposes and allows image sections.
+------
+From Valdes July 23, 1985:
+
+1.  Task lsrevisions has been renamed to revisions.  The intent is that
+each package will have a revisions task.  Note that this means there may
+be multiple tasks named revisions loaded at one time.  Typing revisions
+alone will give the revisions for the current package.  To get the system
+revisions type system.revisions.
+
+2.  Background now does both line and column backgrounds.
+______
+July 18, 1985:
+
+1.  Help page for extract is available.
+2.  Help page for lsrevisions is available.
+______
+July 17, 1985:
+
+1.  Extract has been modified to allow interactively setting the
+extraction limits for each trace.  If this is not needed then answer
+NO to the query.  Any changes made in lower and upper remain
+in effect to subsequent traces.  The lower and upper limits are written
+to the database.  Older database tracings are still useable as before.
+______
+July 16, 1985:
+
+1. A new task, lsrevisions, has been added to record revisions to the
+beta test version of the package.
+
+2. A help page for identify is now available!
+
+3. A default one dimensional image section is available in the tasks
+identify, reidentify, and extract.  This allows use of two dimensional
+images (without an image section) to be used without bothering with
+the image section.  It is also a little more general than regular image
+sections in that a special format in terms of lines or columns can be given.
+The default section is the "middle line".
+
+4. Extract has been changed to allow:
+
+	a. Recording the traced curves.
+	b. Using the traced curves from one image to extract from another image.
+    
+This is done by having three query parameters giving the name of the
+image to be traced or which was previously traced, a list of input
+images from which to extract, and a list of output rootnames
+one for each input image.
+.endhelp

@@ -1,0 +1,47 @@
+.help sflip May86 noao.onedspec
+.ih
+NAME
+sflip -- Flip the dispersion direction of spectra
+.ih
+USAGE
+sflip input records output start_rec
+.ih
+PARAMETERS
+.ls input
+The root file name for the input records to be flipped.
+.le
+.ls records
+The range of spectra to be included in the flip operation.
+Each range item will be appended to the root name to form an
+image file name.
+.le
+.ls output
+Root name of the output flipped spectra.
+.le
+.ls start_rec
+Each new spectrum created has "output" has its root name and a 
+trailing number appended starting with "start_rec". Subsequent
+output images will have an incremented trailing number.
+.le
+.ih
+DESCRIPTION
+The order of the pixels in the input spectra is reversed so that the
+last pixel becomes the first and the first pixel becomes the last.
+The header parameters describing the dispersion are also modified to
+maintain the dispersion coordinates of the pixels.  This task is used
+to flip spectra which have decreasing wavelength with increasing pixel
+coordinate to the standard orientation of increasing wavelength
+required by many of the tasks in the \fBonedspec\fR package and to
+flip processed spectra to the the wavelength orientation desired by
+user.
+.ih
+EXAMPLES
+The following example flips the spectra pds.0001 to pds.0005 which have
+been dispersion corrected with \fBdispcor\fR such that wavelength decreases
+with increasing pixel coordinate.
+
+	cl> sflip pds 1-5 pdsflip 1
+.ih
+SEE ALSO
+dispcor, rebin
+.endhelp

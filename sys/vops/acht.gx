@@ -1,0 +1,36 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ACHTxy -- Change datatype of vector from "x" to "y" (doubly generic).
+# The operation is performed in such a way that the output vector can be
+# the same as the input vector without overwriting data.
+
+procedure acht$t$$t (a, b, npix)
+
+PIXEL	a[ARB]
+$PIXEL	b[ARB]
+int	npix
+$$if (datatype != $t)
+int	i
+$$endif
+
+begin
+	$$if (datatype == $t)
+	call amov$t (a, b, npix)
+	$$else
+	    $$if (sizeof(t) <= sizeof($t))
+		do i = 1, npix
+		    $$if (datatype == x)
+			b[i] = complex(real(a[i]),0.0)
+		    $$else
+			b[i] = a[i]
+		    $$endif
+	    $$else
+		do i = npix, 1, -1
+		    $$if (datatype == x)
+			b[i] = complex(real(a[i]),0.0)
+		    $$else
+			b[i] = a[i]
+		    $$endif
+	    $$endif
+	$$endif
+end

@@ -1,0 +1,48 @@
+.help revisions Jun88 pkg.xtools.gtools
+.nf
+pkg$xtools/gtools/gtascale.x +
+    Added a procedure to complement GSCALE to scale data only within
+    a GTOOLS window.  (11/30/87 Valdes)
+
+pkg$xtools/gtools/gtvplot.x +
+    Added a vector version of GT_PLOT.  (11/5/87 Valdes)
+
+====
+V2.5
+====
+
+pkg$xtools/gtools/*.x
+    Valdes, February 17, 1987
+    1.  Requires GIO changes.
+    2.  Eliminated GT_PAGE, GT_HELP, GT_WAITPAGE.
+    3.  Argument change to GT_COLON.
+
+pkg$xtools/gtools/gtset.x
+    Valdes, January 30, 1987
+    1.  In gtsets if the specified value string is not recognized an
+	error message is printed to STDERR.
+
+pkg$xtools/gtools/gthelp.x
+pkg$xtools/gtools/gtwindow.x
+pkg$xtools/gtools/gtcolon.x
+    Valdes, January 13, 1987
+    1.  GT_HELP now calls the system PAGEFILE procedure.  This procedure
+	should now be obsolete.
+    2.	Modified GT_WINDOW and GT_COLON to call PAGEFILE instead of GT_HELP.
+
+gtools$gtwindow.x:  Valdes, June 11, 1986
+    1.  Added new procedure gt_window.  It is a cursor driven procedure
+	for windowing graphs using the gtools pointer.  The help
+	page for gtools was also modified to show the windowing options.
+
+gtools$gtcur.x:  Valdes, May 10, 1986
+    1.  Took out "Confirm:" prompt so that cursor input from a file does
+	not cause anything to be printed.  Two EOF's (carriage return or
+	actual EOF) or a 'q' are required to exit thus protecting the user
+	from an inadvertent carriage return.
+
+From Valdes Oct 29, 1985:
+
+Added call to gmftitle in gtlabax.  This insures that graphics written to
+a metacode file can use the metacode tools locate graphics.
+.endhelp

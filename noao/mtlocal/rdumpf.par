@@ -1,0 +1,9 @@
+#RDUMPF parameters
+dumpf_file,f,a,mta,,,DUMPF data source
+file_list,s,a,,,,file list
+iraf_file,f,a,,,,IRAF filename
+raster_list,s,h,"1-999",,,raster list
+make_image,b,h,yes,,,create IRAF image?
+print_header,b,h,yes,,,print IPPS headers?
+data_type,s,h,,,,IRAF data type
+mode,s,h,ql,,,

@@ -1,0 +1,6 @@
+infile,s,q,,,,Input file descriptor
+outfile,s,q,,,,Output image file descriptor
+files,s,q,,,,Tape files to read
+verbose,b,h,no,,,Print out header data and give progress reports
+headeronly,b,h,no,,,Print out the header data and quit
+robust,b,h,no,,,Ignore wrong observation type in header

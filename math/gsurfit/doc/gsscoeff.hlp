@@ -1,0 +1,35 @@
+.help gsscoeff Aug85 "Gsurfit Package"
+.ih
+NAME
+gsscoeff -- Procedure to set a coefficient
+.ih
+SYNOPSIS
+gsscoeff (sf, xorder, yorder, coeff)
+
+.nf
+    pointer	sf	# surface descriptor	
+    int		xorder	# x order of desired coefficient
+    int		yorder	# y order of desired coefficient
+    real	coeff	# coefficient value
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface descriptor.
+.le
+.ls xorder, yorder
+The x and y order of the desired coefficient.
+.le
+.ls coeff
+The value of the coefficient to be set.
+.le
+.ih
+DESCRIPTION
+GSSCOEFF sets the coefficient of x ** (xorder - 1) * y ** (yorder - 1).
+GSSCOEFF returns if xorder and yorder are out of range.
+.ih
+NOTES
+.ih
+SEE ALSO
+gsgcoeff
+.endhelp

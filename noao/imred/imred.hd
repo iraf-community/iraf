@@ -1,0 +1,87 @@
+# Help directory for the IMRED package.
+
+$bias		= "noao$imred/bias/"
+$ccdred		= "noao$imred/ccdred/"
+$coude		= "noao$imred/coude/"
+$dtoi		= "noao$imred/dtoi/"
+$echelle	= "noao$imred/echelle/"
+$generic	= "noao$imred/generic/"
+$iids		= "noao$imred/iids/"
+$irred		= "noao$imred/irred/"
+$irs		= "noao$imred/irs/"
+$msred		= "noao$imred/msred/"
+$specphot	= "noao$imred/specphot/"
+$vtel		= "noao$imred/vtel/"
+
+observatory	hlp=observatory.hlp,	src=observatory.cl
+#tutor		hlp=tutor.hlp,		src=tutor.cl
+
+bias		men=bias$bias.men,
+		hlp=..,
+		pkg=bias$bias.hd,
+		src=bias$bias.cl
+
+ccdred		men=ccdred$ccdred.men,
+		hlp=..,
+		sys=ccdred$ccdred.hlp,
+		pkg=ccdred$ccdred.hd,
+		src=ccdred$ccdred.cl
+
+coude		men=coude$coude.men,
+		hlp=..,
+		sys=coude$coude.hlp,
+		pkg=coude$coude.hd,
+		src=coude$coude.cl
+
+dtoi		men=dtoi$dtoi.men,
+		hlp=..,
+		pkg=dtoi$dtoi.hd,
+		src=dtoi$dtoi.cl
+
+echelle		men=echelle$echelle.men,
+		hlp=..,
+		sys=echelle$echelle.hlp,
+		pkg=echelle$echelle.hd,
+		src=echelle$echelle.cl
+
+generic		men=generic$generic.men,
+		hlp=..,
+		sys=generic$generic.hlp,
+		pkg=generic$generic.hd,
+		src=generic$generic.cl
+
+iids		men=iids$iids.men,
+		hlp=..,
+		sys=iids$iids.hlp,
+		pkg=iids$iids.hd,
+		src=iids$iids.cl
+
+irred		men=irred$irred.men,
+		hlp=..,
+		sys=irred$irred.hlp,
+		pkg=irred$irred.hd,
+		src=irred$irred.cl
+
+irs		men=irs$irs.men,
+		hlp=..,
+		sys=irs$irs.hlp,
+		pkg=irs$irs.hd,
+		src=irs$irs.cl
+
+msred		men=msred$msred.men,
+		hlp=..,
+		sys=msred$msred.hlp,
+		pkg=msred$msred.hd,
+		src=msred$msred.cl
+
+specphot	men=specphot$specphot.men,
+		hlp=..,
+		sys=specphot$specphot.hlp,
+		pkg=specphot$specphot.hd,
+		src=specphot$specphot.cl
+
+vtel		men=vtel$vtel.men,
+		hlp=..,
+		sys=vtel$vtel.hlp,
+		pkg=vtel$vtel.hd,
+		src=vtel$vtel.cl

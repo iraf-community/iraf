@@ -1,0 +1,34 @@
+# Make the ASTUTIL package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools -lcurfit -lbev"
+
+	$update	libpkg.a
+	$omake	x_astutil.x
+	$link	x_astutil.o libpkg.a $(LIBS) -o xx_astutil.e
+	;
+
+install:
+	$move	xx_astutil.e noaobin$x_astutil.e
+	;
+
+libpkg.a:
+	@asttools
+	@pdm
+
+	airmass.x	
+	ccdtime.x	
+	galactic.x	<fset.h>
+	precess.x	<fset.h>
+	t_setairmass.x	<imhdr.h> <error.h>
+	t_asttimes.x	<error.h>
+	t_rvcorrect.x	rvcorrect.com <error.h>
+	;

@@ -1,0 +1,9 @@
+# MODELLIST
+
+image,f,a,,,,Image
+lines,s,a,,,,Sample image lines to be listed
+model,s,h,"gauss5",,,Model to be listed
+columns,s,h,"*",,,Image columns to be listed
+naverage,i,h,20,,,Number of image lines to average
+lower,r,h,-10,,,Lower limit of model profiles
+upper,r,h,10,,,Upper limit of model profiles

@@ -1,0 +1,20 @@
+# External (non core-system) packages.  To install a new package, add the
+# two statements to define the package root directory and package task,
+# then add the package helpdb to the `helpdb' list.
+
+reset	noao		= iraf$noao/
+task	noao.pkg	= noao$noao.cl
+
+reset	local		= iraf$local/
+#reset	local		= /u2/kpnolocal/
+task	local.pkg	= local$src/local.cl
+
+#reset	stsdas		= /tmp2/stsdas/
+#task	stsdas.pkg	= stsdas$stsdas.cl
+
+reset	helpdb		= "lib$helpdb.mip\
+			  ,noao$lib/helpdb.mip\
+			  ,local$lib/helpdb.mip\
+#			  ,stsdas$lib/helpdb.mip\
+			  "
+keep

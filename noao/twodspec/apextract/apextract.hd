@@ -1,0 +1,16 @@
+# Help directory for the APEXTRACT package.
+
+$doc = "./doc/"
+
+apdefault	hlp=doc$apdefault.hlp
+apedit		hlp=doc$apedit.hlp
+apfind		hlp=doc$apfind.hlp
+apio		hlp=doc$apio.hlp
+apnormalize	hlp=doc$apnormalize.hlp
+apscatter	hlp=doc$apscatter.hlp
+aptrace		hlp=doc$aptrace.hlp
+apstrip		hlp=doc$apstrip.hlp
+apsum		hlp=doc$apsum.hlp
+Tutorial	hlp=doc$Tutorial.hlp
+
+revisions	hlp=Revisions

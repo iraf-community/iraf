@@ -1,0 +1,92 @@
+# APEXTRACT
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	apextract
+	;
+
+install:
+	$move	xx_apextract.e noaobin$x_apextract.e
+	;
+
+apextract:
+	$omake	x_apextract.x
+	$link	x_apextract.o libpkg.a -lxtools -lcurfit -liminterp\
+		-o xx_apextract.e
+	;
+
+libpkg.a:
+	apalloc.x	apertures.h
+	apanswer.x	<pkg/xtanswer.h>
+	apapertures.x	apertures.h
+	apcenter.x	<pkg/center1d.h>
+	apcolon.x	<error.h> <gset.h> <pkg/xtanswer.h> <imhdr.h>
+	apcopy.x	apertures.h
+	apcvset.x	apertures.h <math/curfit.h>
+	apdb.x		apertures.h <math/curfit.h> <pkg/dttext.h>\
+			<pkg/xtanswer.h>
+	apdefault.x	apertures.h <imhdr.h>
+	apdelete.x	
+	apedit.x	apertures.h extract.h <gset.h> <imhdr.h> <mach.h>\
+			<pkg/gtools.h> <pkg/xtanswer.h>
+	apextract.x	apertures.h <error.h> <imhdr.h> <pkg/gtools.h>\
+			<pkg/xtanswer.h>
+	apfind.x	apertures.h <imhdr.h> <pkg/xtanswer.h>
+	apfindnew.x	apertures.h
+	apgapid.x	
+	apgbeam.x	
+	apgetdata.x	<imhdr.h>
+	apgetim.x	
+	apgmark.x	apertures.h
+	apgraph.x	
+	apgscur.x	apertures.h
+	apicset.x	apertures.h <mach.h>
+	apimmap.x	<imhdr.h>
+	apinfo.x	apertures.h
+	apio.x		<time.h>
+	apnearest.x	apertures.h <mach.h>
+	apnew.x		apertures.h
+	applot.x	apertures.h <pkg/gtools.h>
+	apprint.x	apertures.h
+	aprecenter.x	apertures.h <pkg/xtanswer.h>
+	apshow.x	
+	apsort.x	apertures.h
+	apupdate.x	apertures.h <gset.h>
+	apvalues.x	apertures.h
+	apylevel.x	
+	exapstrip.x	apertures.h extract.h
+	exapsum.x	apertures.h extract.h
+	exfit.x		extract.h
+	exgmodaps.x	apertures.h
+	exgprofs.x	apertures.h exio.h extract.h
+	exgraph.x	
+	exio.x		exio.h <error.h> <imhdr.h>
+	exmvsum.x	apertures.h extract.h <imhdr.h>
+	exrecen.x	extract.h
+	exstrip.x	apertures.h exio.h extract.h <error.h> <imhdr.h>
+	exsum.x		apertures.h exio.h extract.h <error.h> <imhdr.h>\
+			<pkg/gtools.h> <pkg/xtanswer.h>
+	peaks.x	
+	t_apedit.x	<pkg/xtanswer.h>
+	t_apfind.x	<pkg/xtanswer.h>
+	t_apnorm.x	apertures.h exio.h extract.h <error.h> <imhdr.h>\
+			<imset.h> <pkg/gtools.h> <pkg/xtanswer.h>
+	t_apscatter.x	apertures.h <error.h> <imhdr.h> <imset.h>\
+			<pkg/gtools.h> <pkg/xtanswer.h>
+	t_apstrip.x	<pkg/xtanswer.h>
+	t_apsum.x	<pkg/xtanswer.h>
+	t_aptrace.x	<pkg/xtanswer.h>
+	trctrace.x	apertures.h <imhdr.h> <math/curfit.h> <pkg/center1d.h>\
+			<pkg/gtools.h> <pkg/xtanswer.h>
+	trltrace.x	apertures.h <imhdr.h> <math/curfit.h> <pkg/center1d.h>\
+			<pkg/gtools.h> <pkg/xtanswer.h>
+	trtrace.x	<imhdr.h> <pkg/xtanswer.h>
+	;

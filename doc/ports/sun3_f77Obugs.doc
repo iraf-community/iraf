@@ -1,0 +1,1666 @@
+# f77 source programs and corresponding assembler code generated with 
+# "f77 -S -O -f68881" that cause run-time failure, where the corresponding
+# unoptimized code does not.
+#===============================================================================
+# fprfmt.f:
+      integer function fprfmt (ival)
+      integer ival
+      logical ivalad
+      integer ctoi
+      integer stridx
+      integer*2 ch
+      integer*2 chrlwr
+      integer fd
+      integer ip
+      integer width
+      integer decpl
+      integer col
+      integer leftjy
+      integer radix
+      integer fmtste
+      integer ofilee
+      integer formar
+      integer*2 fillcr
+      integer*2 format(161 +1)
+      integer*2 obuf(1024+1)
+      integer sw0001
+      common /fmtcom/ fd,ip,width,decpl,col,leftjy,radix,fmtste, ofilee,
+     *formar,fillcr,format,obuf
+      integer*2 st0001(17)
+      integer*2 st0002(35)
+      integer*2 st0003(1)
+      save
+      integer iyy
+      data (st0001(iyy),iyy= 1, 8) / 98, 99,100,101,102,103,104,109/
+      data (st0001(iyy),iyy= 9,16) /111,114,115,116,117,119,120,122/
+      data (st0001(iyy),iyy=17,17) / 0/
+      data (st0002(iyy),iyy= 1, 8) / 87, 97,114,110,105,110,103, 58/
+      data (st0002(iyy),iyy= 9,16) / 32, 85,110,107,110,111,119,110/
+      data (st0002(iyy),iyy=17,24) / 32,102,111,114,109, 97,116, 32/
+      data (st0002(iyy),iyy=25,32) /116,121,112,101, 32, 99,104, 97/
+      data (st0002(iyy),iyy=33,35) /114, 10, 0/
+      data st0003 / 0/
+         sw0001=(fmtste)
+         goto 110
+120      continue
+            ivalad = .false.
+         goto 111
+130      continue
+            goto 2
+140      continue
+            goto 3
+150      continue
+            goto 4
+160      continue
+            goto 5
+170      continue
+            goto 6
+180      continue
+            goto 7
+110      continue
+            if (sw0001.lt.1.or.sw0001.gt.7) goto 111
+            goto (120,130,140,150,160,170,180),sw0001
+111      continue
+         if (.not.(format(ip) .eq. 0 .or. format(ip) .ne. 37 )) goto 190
+            width = (-999)
+            decpl = (-999)
+            formar = (-999)
+            fillcr = 32
+            leftjy = 0
+            fmtste = 1
+            fprfmt = (1)
+            goto 100
+190      continue
+            ip = ip + 1
+191      continue
+         if (.not.(format(ip) .eq. 42 )) goto 200
+            ip = ip + 1
+            if (.not.(ivalad)) goto 210
+               fmtste = 2
+               fprfmt = (0 )
+               goto 100
+210         continue
+2           ivalad = .true.
+            if (.not.(ival .lt. 0)) goto 220
+               leftjy = 1
+               goto 221
+220         continue
+               leftjy = 0
+221         continue
+            fillcr = 32
+            width = abs (ival)
+            goto 201
+200      continue
+            if (.not.(format(ip) .eq. 45)) goto 230
+               leftjy = 1
+               ip = ip + 1
+               goto 231
+230         continue
+               leftjy = 0
+231         continue
+            fillcr = 32
+            if (.not.(format(ip) .eq. 48)) goto 240
+               if (.not.((format(ip+1).ge.48.and.format(ip+1).le.57) .or
+     *         . format(ip+1) .eq. 42 )) goto 250
+                  fillcr = 48
+                  ip = ip + 1
+                  goto 251
+250            continue
+                  fillcr = 32
+251            continue
+240         continue
+            if (.not.(format(ip) .eq. 42 )) goto 260
+               ip = ip + 1
+               if (.not.(ivalad)) goto 270
+                  fmtste = 3
+                  fprfmt = (0 )
+                  goto 100
+270            continue
+3              ivalad = .true.
+               if (.not.(ival .lt. 0)) goto 280
+                  leftjy = 1
+                  goto 281
+280            continue
+                  leftjy = 0
+281            continue
+               width = abs (ival)
+               goto 261
+260         continue
+            if (.not.(ctoi (format, ip, width) .le. 0)) goto 290
+               width = (-999)
+290         continue
+261         continue
+201      continue
+         if (.not.(width .eq. 0)) goto 300
+            width = (-999)
+300      continue
+         if (.not.(format(ip) .eq. 46)) goto 310
+            ip = ip + 1
+            if (.not.(format(ip) .eq. 42 )) goto 320
+               ip = ip + 1
+               if (.not.(ivalad)) goto 330
+                  fmtste = 4
+                  fprfmt = (0 )
+                  goto 100
+330            continue
+4              ivalad = .true.
+               decpl = ival
+               goto 321
+320         continue
+            if (.not.(ctoi (format, ip, decpl) .le. 0)) goto 340
+               decpl = (-999)
+340         continue
+321         continue
+            goto 311
+310      continue
+            decpl = (-999)
+311      continue
+         if (.not.(format(ip) .eq. 42 )) goto 350
+            ip = ip + 1
+            if (.not.(ivalad)) goto 360
+               fmtste = 5
+               fprfmt = (0 )
+               goto 100
+360         continue
+5           ivalad = .true.
+            formar = ival
+            goto 351
+350      continue
+            formar = format(ip)
+            ip = ip + 1
+351      continue
+         if (.not.((formar.ge.65.and.formar.le.90))) goto 370
+            formar = (formar+97-65)
+370      continue
+         ch = formar
+         if (.not.(stridx (ch, st0001) .le. 0)) goto 380
+            call putlie (5, st0002)
+            call fmterr (st0003, format, ip-1)
+            formar = (-999)
+            goto 381
+380      continue
+         if (.not.(formar .eq. 114 )) goto 390
+            ch = chrlwr (format(ip))
+            ip = ip + 1
+            if (.not.(ch .eq. 42 )) goto 400
+               if (.not.(ivalad)) goto 410
+                  fmtste = 6
+                  fprfmt = (0 )
+                  goto 100
+410            continue
+6              ivalad = .true.
+               radix = ival
+               goto 401
+400         continue
+            if (.not.((ch.ge.48.and.ch.le.57))) goto 420
+               radix = (ch-48)
+               goto 421
+420         continue
+            if (.not.((ch.ge.97.and.ch.le.122))) goto 430
+               radix = ch - 97 + 10
+               goto 431
+430         continue
+               radix = 10
+               ip = ip - 1
+431         continue
+421         continue
+401         continue
+            goto 391
+390      continue
+         if (.not.(formar .eq. 119 .or. formar .eq. 116 )) goto 440
+            ivalad = .false.
+440      continue
+391      continue
+381      continue
+         if (.not.(ivalad)) goto 450
+            fmtste = 7
+            fprfmt = (0 )
+            goto 100
+450      continue
+7        ivalad = .true.
+         fmtste = 1
+         fprfmt = (1)
+         goto 100
+100      return
+      end
+c     leftjy  left_justify
+c     fmterr  fmt_err
+c     fmtste  fmt_state
+c     ivalad  ival_already_used
+c     fillcr  fill_char
+c     putlie  putline
+c     ofilee  ofile_type
+c     formar  format_char
+#-------------------------------------------------------------------------------
+# fprfmt.s:
+	.data
+	.data1
+	.bss
+	.data
+	.globl	_fprfmt_
+	.comm	_fmtcom_,2416
+	.globl	_ctoi_
+	.globl	_stridx_
+	.globl	_putlie_
+	.globl	_fmterr_
+	.globl	_chrlwr_
+	.align 4
+	.text
+|#PROC# 07
+
+	.bss
+	.align	4
+VAR_SEG1:
+	.skip	10
+	.data1
+	.align	2
+L1D186:
+	.long	5
+	LF1	=	228
+	LS1	=	8432
+	LFF1	=	208
+	LSS1	=	0
+	LP1	=	20
+	.text
+	.globl	_fprfmt_
+_fprfmt_:
+	link	a6,#-228
+	moveml	#8432,sp@
+	movl	a6@(8),a5
+	movl	_fmtcom_+4,d4
+	movl	VAR_SEG1+4,d5
+	cmpl	#1,_fmtcom_+28
+	jge	L77020
+	jra	L77005
+L77007:
+	moveq	#1,d5
+	movl	a5@,d7
+	jge	L77043
+	movl	d5,_fmtcom_+20
+	jra	L77044
+L77009:
+	moveq	#1,d5
+	movl	a5@,d7
+	jge	L77078
+	movl	d5,_fmtcom_+20
+	jra	L77079
+L77011:
+	moveq	#1,d5
+	movl	a5@,_fmtcom_+12
+	jra	L77109
+L77013:
+	moveq	#1,d5
+	movl	a5@,d7
+	jra	L77118
+L77015:
+	moveq	#1,d5
+	movl	a5@,_fmtcom_+24
+	jra	LY00019
+L77017:
+	moveq	#1,d5
+	jra	LY00006
+L77018:
+	movl	_fmtcom_+28,d0
+	moveq	#8,d7
+	cmpl	d7,d0
+	bcc	L77005
+	addw	d0,d0
+	movw	pc@(6,d0:w),d0
+	jmp	pc@(2,d0:w)
+L1I1:
+	.word	L77023-L1I1
+	.word	L77004-L1I1
+	.word	L77007-L1I1
+	.word	L77009-L1I1
+	.word	L77011-L1I1
+	.word	L77013-L1I1
+	.word	L77015-L1I1
+	.word	L77017-L1I1
+	jra	L77005
+L77020:
+	cmpl	#7,_fmtcom_+28
+	jle	L77018
+	jra	L77005
+L77023:
+	jra	L77005
+L77030:
+	addql	#1,d4
+	movl	d4,d7
+	lea	_fmtcom_+40,a0
+	movw	a0@(0,d7:l:2),d0
+	extl	d0
+	moveq	#42,d6
+	cmpl	d6,d0
+	jne	L77035
+	addql	#1,d7
+	movl	d7,d4
+	tstl	d5
+	jeq	L77007
+	moveq	#2,d6
+	jra	LY00016
+L77024:
+	movl	#-999,_fmtcom_+8
+	movl	#-999,_fmtcom_+12
+	movl	#-999,_fmtcom_+36
+	movw	#32,_fmtcom_+40
+	clrl	_fmtcom_+20
+LY00006:
+	moveq	#1,d6
+	moveq	#1,d7
+	jra	LY00010
+L77129:
+	movl	d4,_fmtcom_+4
+	asll	#1,d4
+	addl	#_fmtcom_+40,d4
+	movl	d4,sp@-
+	jbsr	_chrlwr_
+	addqw	#4,sp
+	movl	_fmtcom_+4,d4
+	addql	#1,d4
+	extl	d0
+	movl	d0,d7
+	moveq	#42,d6
+	cmpl	d6,d7
+	jne	L77136
+	tstl	d5
+	jeq	L77015
+	moveq	#6,d6
+	jra	LY00016
+L77136:
+	moveq	#48,d6
+	cmpl	d6,d7
+	jlt	L77146
+	moveq	#57,d6
+	cmpl	d6,d7
+	jgt	L77146
+	moveq	#-48,d6
+	addl	d6,d7
+	movl	d7,_fmtcom_+24
+	jra	LY00019
+L77146:
+	moveq	#97,d6
+	cmpl	d6,d7
+	jlt	L77152
+	moveq	#122,d6
+	cmpl	d6,d7
+	jgt	L77152
+	moveq	#-87,d6
+	addl	d6,d7
+	movl	d7,_fmtcom_+24
+	jra	LY00019
+L77152:
+	moveq	#10,d7
+	movl	d7,_fmtcom_+24
+	moveq	#-1,d7
+	addl	d7,d4
+	jra	LY00019
+LY00020:
+	movl	d4,_fmtcom_+4
+	pea	v.17
+	pea	L1D186
+	jbsr	_putlie_
+	addqw	#8,sp
+	movl	_fmtcom_+4,d0
+	moveq	#-1,d7
+	addl	d7,d0
+	movl	d0,a6@(-20)
+	pea	a6@(-20)
+	pea	_fmtcom_+42
+	pea	v.18
+	jbsr	_fmterr_
+	lea	sp@(12),sp
+	movl	_fmtcom_+4,d4
+	movl	#-999,_fmtcom_+36
+LY00019:
+	tstl	d5
+	jeq	L77017
+	moveq	#7,d6
+	jra	LY00016
+L77110:
+	addql	#1,d4
+	tstl	d5
+	jeq	L77013
+	moveq	#5,d6
+	jra	LY00016
+L77096:
+	addql	#1,d7
+	movl	d7,d4
+	tstl	d5
+	jeq	L77011
+	moveq	#4,d6
+LY00016:
+	moveq	#0,d7
+LY00010:
+	movl	d7,d0
+	movl	d6,_fmtcom_+28
+	movl	d4,_fmtcom_+4
+	movl	d5,VAR_SEG1+4
+	moveml	a6@(-228),#8432
+	unlk	a6
+	rts
+L77004:
+	moveq	#0,d5
+L77005:
+	lea	_fmtcom_+40,a0
+	movw	a0@(0,d4:l:2),d0
+	extl	d0
+	movl	d0,d7
+	jeq	L77024
+	moveq	#37,d6
+	cmpl	d6,d7
+	jeq	L77030
+	jra	L77024
+L77035:
+	moveq	#45,d4
+	cmpl	d4,d6
+	jne	L77052
+	moveq	#1,d6
+	movl	d6,_fmtcom_+20
+	addql	#1,d7
+	jra	L77053
+L77043:
+	clrl	_fmtcom_+20
+L77044:
+	movw	#32,_fmtcom_+40
+	tstl	d7
+	jlt	L77046
+	jra	LY00023
+L77088:
+	movl	#-999,_fmtcom_+8
+	jra	L77091
+L77052:
+	clrl	_fmtcom_+20
+L77053:
+	movw	#32,_fmtcom_+40
+	movl	d7,d6
+	asll	#1,d6
+	lea	_fmtcom_+40,a0
+	movw	a0@(0,d6:l),d0
+	extl	d0
+	moveq	#48,d4
+	cmpl	d4,d0
+	jne	L77057
+	lea	_fmtcom_+42,a0
+	movw	a0@(0,d6:l),d0
+	extl	d0
+	movl	d0,d4
+	moveq	#48,d6
+	cmpl	d6,d4
+	jlt	L77061
+	moveq	#57,d6
+	cmpl	d6,d4
+	jgt	L77061
+	jra	L77058
+L77057:
+	lea	_fmtcom_+40,a0
+	movw	a0@(0,d7:l:2),d0
+	extl	d0
+	moveq	#42,d6
+	cmpl	d6,d0
+	jne	L77070
+	addql	#1,d7
+	movl	d7,d4
+	tstl	d5
+	jeq	L77009
+	moveq	#3,d6
+	jra	LY00016
+L77065:
+	movw	#32,_fmtcom_+40
+	jra	L77057
+L77058:
+	movw	#48,_fmtcom_+40
+	addql	#1,d7
+	jra	L77057
+L77061:
+	moveq	#42,d6
+	cmpl	d6,d4
+	jne	L77065
+	jra	L77058
+L77070:
+	movl	d7,_fmtcom_+4
+	movl	d7,_fmtcom_+4
+	pea	_fmtcom_+8
+	pea	_fmtcom_+4
+	pea	_fmtcom_+42
+	jbsr	_ctoi_
+	lea	sp@(12),sp
+	moveq	#0,d1
+	tstl	d0
+	sle	d1
+	negb	d1
+	movl	d1,a6@(-52)
+	movl	_fmtcom_+4,d4
+	tstl	d1
+	jeq	LY00002
+	movl	#-999,_fmtcom_+8
+	jra	LY00002
+L77078:
+	clrl	_fmtcom_+20
+L77079:
+	tstl	d7
+	jge	LY00023
+L77046:
+	negl	d7
+LY00023:
+	movl	d7,_fmtcom_+8
+LY00002:
+	tstl	_fmtcom_+8
+	jeq	L77088
+L77091:
+	lea	_fmtcom_+40,a0
+	movw	a0@(0,d4:l:2),d0
+	extl	d0
+	moveq	#46,d7
+	cmpl	d7,d0
+	jne	L77105
+	addql	#1,d4
+	movl	d4,d7
+	lea	_fmtcom_+40,a0
+	movw	a0@(0,d7:l:2),d0
+	extl	d0
+	moveq	#42,d6
+	cmpl	d6,d0
+	jeq	L77096
+	movl	d7,_fmtcom_+4
+	movl	d7,_fmtcom_+4
+	pea	_fmtcom_+12
+	pea	_fmtcom_+4
+	pea	_fmtcom_+42
+	jbsr	_ctoi_
+	lea	sp@(12),sp
+	moveq	#0,d1
+	tstl	d0
+	sle	d1
+	negb	d1
+	movl	d1,a6@(-48)
+	movl	_fmtcom_+4,d4
+	tstl	d1
+	jeq	L77109
+L77105:
+	movl	#-999,_fmtcom_+12
+L77109:
+	lea	_fmtcom_+40,a0
+	movw	a0@(0,d4:l:2),d0
+	extl	d0
+	movl	d0,d6
+	moveq	#42,d7
+	cmpl	d7,d6
+	jeq	L77110
+	movl	d6,d7
+	addql	#1,d4
+L77118:
+	moveq	#65,d6
+	cmpl	d6,d7
+	jlt	L77123
+	moveq	#90,d6
+	cmpl	d6,d7
+	jgt	L77123
+	moveq	#32,d6
+	addl	d6,d7
+L77123:
+	movw	d7,VAR_SEG1+8
+	movl	d7,_fmtcom_+36
+	movl	d4,_fmtcom_+4
+	pea	v.16
+	pea	VAR_SEG1+8
+	jbsr	_stridx_
+	addqw	#8,sp
+	moveq	#0,d1
+	tstl	d0
+	sle	d1
+	negb	d1
+	movl	d1,a6@(-44)
+	movl	_fmtcom_+4,d4
+	tstl	d1
+	jne	LY00020
+	cmpl	#114,_fmtcom_+36
+	jeq	L77129
+	cmpl	#119,_fmtcom_+36
+	jeq	L77017
+	cmpl	#116,_fmtcom_+36
+	jne	LY00019
+	jra	L77017
+	.globl	f68881_used
+	.data1
+	.align 4
+v.16:
+	.long	0x620063,0x640065
+	.long	0x660067,0x68006d
+	.long	0x6f0072,0x730074
+	.long	0x750077,0x78007a
+	.word	0x0
+	.align 4
+v.17:
+	.long	0x570061,0x72006e
+	.long	0x69006e,0x67003a
+	.long	0x200055,0x6e006b
+	.long	0x6e006f,0x77006e
+	.long	0x200066,0x6f0072
+	.long	0x6d0061,0x740020
+	.long	0x740079,0x700065
+	.long	0x200063,0x680061
+	.long	0x72000a
+	.word	0x0
+	.align 4
+v.18:
+	.skip	2
+#===============================================================================
+#     ==========================
+#     FORTRAN for get_next_image
+#     ==========================
+      integer function getnee (infile, recors, nrecs, image, szname)
+      integer infile
+      integer nrecs
+      integer szname
+      integer recors(3,100)
+      integer*2 image(szname+1)
+      integer nextnm
+      integer stat
+      logical flag1
+      logical flag2
+      logical flag3
+      integer*2 image0(63 +1)
+      integer clgfil
+      integer getney
+      integer xstrln
+      common /gnicom/ flag1, flag2
+      integer*2 st0001(6)
+      save
+      data st0001 / 46, 37, 48, 52,100, 0/
+      data flag3/.true./
+         if (.not.(flag1 .or. flag3)) goto 110
+            nextnm = -1
+            call rstgey ()
+110      continue
+         if (.not.(nrecs .eq. 2147483647)) goto 120
+            stat = clgfil (infile, image, szname)	#<--- Never executed
+            goto 121
+120      continue
+            if (.not.(flag1)) goto 130
+               stat = clgfil (infile, image0, szname)
+               if (.not.(stat .eq. -2)) goto 140
+                  getnee = (stat)
+                  goto 100
+140            continue
+130         continue
+            stat = getney (recors, nextnm)
+            if (.not.(stat .ne. -2)) goto 150
+               call xstrcy(image0, image, szname)
+               call sprinf (image(xstrln(image)+1), szname, st0001)
+               call pargi (nextnm)
+150         continue
+121      continue
+         flag1 = .false.
+         flag3 = .false.
+         getnee = (stat)
+         goto 100
+100      return
+      end
+
+#====================================================================
+#Optimized assembly
+#====================================================================
+
+_getnee_+4:		moveml	d4/d5/d6/d7,sp@
+			tstl	_gnicom_
+			beqs	_getnee_+0x30
+			bras	_getnee_+0x20
+_getnee_+0x12:		movl	d7,d0
+			moveml	a6@(-0x50),d4/d5/d6/d7
+			unlk	a6
+			rts
+			bras	_getnee_+0x38
+			moveq	#-1,d6
+			movl	d6,ARR_SEG5+0x294
+			jsr	_rstgey_
+			bras	_getnee_+0x38
+			tstl	v.150+0x90
+			bnes	_getnee_+0x20
+			movl	a6@(8),d4
+			movl	a6@(0x18),d5
+			movl	a6@(0x14),d6
+			movl	a6@(0x10),a0
+			cmpl	#0x7fffffff,a0@		<--------
+			beq	_getnee_+0xd4		<-------- Causes return
+			tstl	_gnicom_
+			beqs	_getnee_+0x76
+			movl	d5,sp@-
+			pea	ARR_SEG5+0x298
+			movl	d4,sp@-
+			bsrl	_clgfil_
+			lea	sp@(0xc),a7
+			movl	d0,d7
+			moveq	#-2,d4
+			cmpl	d4,d7
+			beqs	_getnee_+0x12
+			pea	ARR_SEG5+0x294
+			movl	a6@(0xc),sp@-
+			jsr	_getney_
+			addqw	#8,sp
+			movl	d0,d7
+			moveq	#-2,d4
+			cmpl	d4,d7
+			beqs	_getnee_+0xd4
+			movl	d5,sp@-
+			movl	d6,sp@-
+			pea	ARR_SEG5+0x298
+			bsrl	_xstrcy_
+			lea	sp@(0xc),a7
+			pea	v.150+0x84
+			movl	d5,sp@-
+			movl	d6,sp@-
+			bsrl	_xstrln_
+			addqw	#4,sp
+			asll	#1,d0
+			addl	d6,d0
+			movl	d0,sp@-
+			bsrl	_sprinf_
+			lea	sp@(0xc),a7
+			pea	ARR_SEG5+0x294
+			bsrl	_pargi_
+			addqw	#4,sp
+_getnee_+0xd4:		clrl	_gnicom_
+			clrl	v.150+0x90
+			bra	_getnee_+0x12
+
+_resete_:		linkw	a6,#0
+			movl	#1,_gnicom_
+			unlk	a6
+			rts
+
+_addspc_:		linkw	a6,#-0xec
+			moveml	d3/d4/d5/d6/d7/a3/a4/a5,sp@
+			fmovex	fp7,a6@(-0xcc)
+			moveq	#0,d6
+			movl	a6@(0x14),a0
+			movl	a0@,a5
+			tstl	a5
+			bnes	_addspc_+0x8e
+			moveq	#-1,d6
+			bras	_addspc_+0x8e
+			moveq	#1,d4
+			movl	a4@,d7
+			subl	d4,d7
+			tstl	d7
+			blt	_addspc_+0xb4
+
+
+#===============================================================================
+# grcwcs.f:
+      subroutine grcscs (stream, sx, sy, wx, wy, wcs)
+      integer stream
+      real sx
+      real sy
+      real wx
+      real wy
+      integer wcs
+      logical Memb(1)
+      integer*2 Memc(1)
+      integer*2 Mems(1)
+      integer Memi(1)
+      integer*4 Meml(1)
+      real Memr(1)
+      double precision Memd(1)
+      complex Memx(1)
+      equivalence (Memb, Memc, Mems, Memi, Meml, Memr, Memd, Memx)
+      common /Mem/ Memd
+      integer w
+      integer tr
+      real mx
+      real my
+      real ct(2,4)
+      integer grcses
+      integer gtrint
+      save
+         tr = gtrint (stream)
+         call grcscc (sx, sy, mx, my)
+         if (.not.(memi(tr+16) .eq. 0)) goto 110
+            wcs = grcses (tr, mx, my)
+            goto 111
+110      continue
+            wcs = memi(tr+16)
+111      continue
+         w = ((tr)+154+(wcs)*11)
+         call grcsen (w, ct)
+         call grcnds (ct, mx, my, wx, wy)
+100      return
+      end
+      subroutine grcsen (w, ct)
+      logical Memb(1)
+      integer*2 Memc(1)
+      integer*2 Mems(1)
+      integer Memi(1)
+      integer*4 Meml(1)
+      real Memr(1)
+      double precision Memd(1)
+      complex Memx(1)
+      equivalence (Memb, Memc, Mems, Memi, Meml, Memr, Memd, Memx)
+      common /Mem/ Memd
+      integer w
+      real ct(2,4)
+      real worign
+      real scale
+      real m1
+      real m2
+      real w1
+      real w2
+      integer transn
+      integer ax
+      real elogr
+      save
+         do 110 ax = 1, 2 
+            if (.not.(ax .eq. 1)) goto 120
+               transn = memi(w+8)
+               w1 = memr(w)
+               w2 = memr(w+1)
+               m1 = memr(w+4)
+               m2 = memr(w+5)
+               goto 121
+120         continue
+               transn = memi(w+9)
+               w1 = memr(w+2)
+               w2 = memr(w+3)
+               m1 = memr(w+6)
+               m2 = memr(w+7)
+121         continue
+            if (.not.(transn .eq. 0 )) goto 130
+               worign = w1
+               scale = (m2 - m1) / (w2 - w1)
+               goto 131
+130         continue
+            if (.not.(transn .eq. 1 .and. w1 .gt. 0 .and. w2 .gt. 0)) 
+     *      goto 140
+               worign = log10 (w1)
+               scale = (m2 - m1) / (log10(w2) - worign)
+               goto 141
+140         continue
+               worign = elogr (w1)
+               scale = (m2 - m1) / (elogr(w2) - worign)
+141         continue
+131         continue
+            ct(ax,1) = transn
+            ct(ax,2) = scale
+            ct(ax,3) = worign
+            ct(ax,4) = m1
+110      continue
+111      continue
+100      return
+      end
+      subroutine grcwcc (ct, wx, wy, mx, my)
+      real wx
+      real wy
+      real mx
+      real my
+      real ct(2,4)
+      real v
+      integer transn
+      integer ax
+      real elogr
+      save
+         do 110 ax = 1, 2 
+            transn = nint (ct(ax,1))
+            if (.not.(ax .eq. 1)) goto 120
+               v = wx
+               goto 121
+120         continue
+               v = wy
+121         continue
+            if (.not.(transn .eq. 0 )) goto 130
+               goto 131
+130         continue
+            if (.not.(transn .eq. 1)) goto 140
+               v = log10 (v)
+               goto 141
+140         continue
+               v = elogr (v)
+141         continue
+131         continue
+            v = ((v - ct(ax,3)) * ct(ax,2)) + ct(ax,4)
+            if (.not.(ax .eq. 1)) goto 150
+               mx = v
+               goto 151
+150         continue
+               my = v
+151         continue
+110      continue
+111      continue
+100      return
+      end
+      subroutine grcnds (ct, mx, my, wx, wy)
+      real mx
+      real my
+      real wx
+      real wy
+      real ct(2,4)
+      real v
+      integer transn
+      integer ax
+      real aelogr
+      save
+         do 110 ax = 1, 2 
+            transn = nint (ct(ax,1))
+            if (.not.(ax .eq. 1)) goto 120
+               v = mx
+               goto 121
+120         continue
+               v = my
+121         continue
+            v = ((v - ct(ax,4)) / ct(ax,2)) + ct(ax,3)
+            if (.not.(transn .eq. 0 )) goto 130
+               goto 131
+130         continue
+            if (.not.(transn .eq. 1)) goto 140
+               v = 10.0 ** v
+               goto 141
+140         continue
+               v = aelogr (v)
+141         continue
+131         continue
+            if (.not.(ax .eq. 1)) goto 150
+               wx = v
+               goto 151
+150         continue
+               wy = v
+151         continue
+110      continue
+111      continue
+100      return
+      end
+      integer function grcses (tr, mx, my)
+      logical Memb(1)
+      integer*2 Memc(1)
+      integer*2 Mems(1)
+      integer Memi(1)
+      integer*4 Meml(1)
+      real Memr(1)
+      double precision Memd(1)
+      complex Memx(1)
+      equivalence (Memb, Memc, Mems, Memi, Meml, Memr, Memd, Memx)
+      common /Mem/ Memd
+      integer tr
+      real mx
+      real my
+      integer w
+      integer wcs
+      integer closes
+      real tol
+      real sx1
+      real sx2
+      real sy1
+      real sy2
+      real distae
+      real olddie
+      real xcen
+      real ycen
+      integer nin
+      integer in(16 )
+      save
+         nin = 0
+         closes = 1
+         olddie = 1.0
+         tol = (1.192e-7) * 10.0
+         do 110 wcs = 1, 16 
+            w = ((tr)+154+(wcs)*11)
+            sx1 = memr(w+4)
+            sx2 = memr(w+5)
+            sy1 = memr(w+6)
+            sy2 = memr(w+7)
+            xcen = (sx1 + sx2) / 2.0
+            ycen = (sy1 + sy2) / 2.0
+            if (.not.(abs ((sx2-sx1) - 1.0) .lt. tol .and. abs ((sy2-sy1
+     *      ) - 1.0) .lt. tol)) goto 120
+               goto 110
+120         continue
+            distae = ((mx - xcen) ** 2) + ((my - ycen) ** 2)
+            if (.not.(distae .le. olddie)) goto 130
+               closes = wcs
+               olddie = distae
+130         continue
+            if (.not.(mx .ge. sx1 .and. mx .le. sx2 .and. my .ge. sy1 .
+     *      and. my .le. sy2)) goto 140
+               nin = nin + 1
+               in(nin) = wcs
+140         continue
+110      continue
+111      continue
+         if (.not.(nin .eq. 1)) goto 150
+            grcses = (in(1))
+            goto 100
+150      continue
+         grcses = (closes)
+         goto 100
+100      return
+      end
+c     gtrint  gtr_init
+c     grcses  grc_selectwcs
+c     grcscs  grc_scrtowcs
+c     olddie  old_distance
+c     grcsen  grc_settran
+c     transn  transformation
+c     distae  distance
+c     grcscc  grc_scrtondc
+c     closes  closest_wcs
+c     grcnds  grc_ndctowcs
+c     grcwcc  grc_wcstondc
+c     worign  worigin
+#-------------------------------------------------------------------------------
+# grcwcs.s:
+	.data
+	.data1
+	.bss
+	.data
+	.data1
+	.bss
+	.data
+	.data1
+	.bss
+	.data
+	.data1
+	.bss
+	.data
+	.data1
+	.bss
+	.data
+	.globl	_grcscs_
+	.comm	_mem_,8
+	.globl	_gtrint_
+	.globl	_grcscc_
+	.globl	_grcses_
+	.globl	_grcsen_
+	.globl	_grcnds_
+	.globl	_elogr_
+	.globl	_grcwcc_
+	.globl	_i_nint
+	.globl	_aelogr_
+	.align 4
+	.text
+|#PROC# 07
+
+	.bss
+	.align	4
+VAR_SEG1:
+	.skip	16
+	.bss
+	.align	4
+ARR_SEG1:
+	.skip	32
+	LF1	=	20
+	LS1	=	128
+	LFF1	=	16
+	LSS1	=	0
+	LP1	=	28
+	.text
+	.globl	_grcscs_
+_grcscs_:
+	link	a6,#-20
+	movl	d7,sp@
+	movl	a6@(8),sp@-
+	jbsr	_gtrint_
+	addqw	#4,sp
+	movl	d0,VAR_SEG1+4
+	pea	VAR_SEG1+12
+	pea	VAR_SEG1+8
+	movl	a6@(16),sp@-
+	movl	a6@(12),sp@-
+	jbsr	_grcscc_
+	lea	sp@(16),sp
+	movl	VAR_SEG1+4,d0
+	lea	_mem_+60,a0
+	movl	a0@(0,d0:l:4),d7
+	jne	L77006
+	pea	VAR_SEG1+12
+	pea	VAR_SEG1+8
+	pea	VAR_SEG1+4
+	jbsr	_grcses_
+	lea	sp@(12),sp
+	movl	a6@(28),a0
+	movl	d0,a0@
+	jra	L77007
+L77006:
+	movl	a6@(28),a0
+	movl	d7,a0@
+L77007:
+	movl	a6@(28),a0
+	movl	a0@,d0
+	movl	d0,d1
+	addl	d1,d1
+	addl	d1,d0
+	asll	#2,d1
+	addl	d1,d0
+	movl	VAR_SEG1+4,d1
+	addl	#154,d1
+	addl	d1,d0
+	movl	d0,VAR_SEG1
+	pea	ARR_SEG1
+	pea	VAR_SEG1
+	jbsr	_grcsen_
+	addqw	#8,sp
+	movl	a6@(24),sp@-
+	movl	a6@(20),sp@-
+	pea	VAR_SEG1+12
+	pea	VAR_SEG1+8
+	pea	ARR_SEG1
+	jbsr	_grcnds_
+	lea	sp@(20),sp
+	movl	a6@(-20),d7
+	unlk	a6
+	rts
+|#PROC# 07
+
+	.bss
+	.align	4
+VAR_SEG2:
+	.skip	32
+	.data1
+	.align	2
+L2D24:
+	.long	0
+	.data1
+	.align	2
+L2D22:
+	.long	0
+	LF2	=	432
+	LS2	=	15612
+	LFF2	=	392
+	LSS2	=	63
+	LP2	=	12
+	.text
+	.globl	_grcsen_
+_grcsen_:
+	link	a6,#-432
+	moveml	#15612,sp@
+	fmovem	#63,a6@(-392)
+	moveq	#1,d7
+	movl	d7,VAR_SEG2+20
+	movl	a6@(12),d0
+	moveq	#20,d7
+	addl	d7,d0
+	movl	d0,a6@(-4)
+	movl	a6@(12),d0
+	moveq	#12,d7
+	addl	d7,d0
+	movl	d0,a6@(-8)
+	movl	a6@(12),d0
+	addql	#4,d0
+	movl	d0,a6@(-12)
+	movl	a6@(12),d0
+	moveq	#-4,d7
+	addl	d7,d0
+	movl	d0,a6@(-16)
+	movl	a6@(8),a0
+	movl	a0@,d7
+	asll	#2,d7
+	movl	#_mem_+16,d0
+	addl	d7,d0
+	movl	d0,a6@(-20)
+	movl	#_mem_+12,d0
+	addl	d7,d0
+	movl	d0,a6@(-24)
+	movl	#_mem_,d0
+	addl	d7,d0
+	movl	d0,a6@(-28)
+	movl	#_mem_+-4,d0
+	addl	d7,d0
+	movl	d0,a6@(-32)
+	movl	#_mem_+28,d0
+	addl	d7,d0
+	movl	d0,a6@(-36)
+	movl	#_mem_+24,d0
+	addl	d7,d0
+	movl	d0,a6@(-40)
+	movl	#_mem_+20,d2
+	addl	d7,d2
+	movl	#_mem_+8,d3
+	addl	d7,d3
+	movl	#_mem_+4,d4
+	addl	d7,d4
+	movl	#_mem_+32,d5
+	addl	d7,d5
+	movl	VAR_SEG2+20,d6
+	asll	#2,d6
+	movl	d6,a2
+	addl	a6@(-4),a2
+	movl	d6,a3
+	addl	a6@(-16),a3
+	movl	d6,a4
+	addl	a6@(-12),a4
+	movl	d6,d0
+	addl	a6@(-8),d0
+	movl	d0,a5
+L77011:
+	moveq	#4,d7
+	cmpl	d7,d6
+	jne	L77015
+	movl	a6@(-36),a0
+	movl	a0@,d7
+	movl	a6@(-32),a0
+	fmoves	a0@,fp3
+	movl	a6@(-28),a0
+	fmoves	a0@,fp2
+	movl	a6@(-24),a0
+	fmoves	a0@,fp7
+	movl	a6@(-20),a0
+	jra	LY00000
+L77015:
+	movl	d5,a0
+	movl	a0@,d7
+	movl	d4,a0
+	fmoves	a0@,fp3
+	movl	d3,a0
+	fmoves	a0@,fp2
+	movl	d2,a0
+	fmoves	a0@,fp7
+	movl	a6@(-40),a0
+LY00000:
+	fmoves	a0@,fp5
+	tstl	d7
+	jne	L77020
+	fmovex	fp3,fp6
+	fmovex	fp5,fp0
+	fsubx	fp7,fp0
+	fmovex	fp2,fp1
+	fsubx	fp3,fp1
+	jra	LY00001
+L77020:
+	cmpl	#1,d7
+	jne	L77027
+	fcmps	L2D24,fp3
+	fjngt	L77027
+	fcmps	L2D22,fp2
+	fjngt	L77027
+	flog10x	fp3,fp0
+	fmovex	fp0,fp6
+	fmovex	fp5,fp0
+	fsubx	fp7,fp0
+	flog10x	fp2,fp1
+	fsubx	fp6,fp1
+LY00001:
+	fdivx	fp1,fp0
+	fmovex	fp0,fp4
+L77021:
+	fmovel	d7,fp0
+	fmoves	fp0,a3@+
+	fmoves	fp4,a4@+
+	fmoves	fp6,a5@+
+	fmoves	fp7,a2@+
+	addql	#4,d6
+	moveq	#8,d7
+	cmpl	d7,d6
+	jle	L77011
+	fmovem	a6@(-392),#63
+	moveml	a6@(-432),#15612
+	unlk	a6
+	rts
+L77027:
+	fmoves	fp3,VAR_SEG2+12
+	pea	VAR_SEG2+12
+	jbsr	_elogr_
+	addqw	#4,sp
+	fmoves	d0,fp6
+	fmoves	fp2,VAR_SEG2+16
+	pea	VAR_SEG2+16
+	jbsr	_elogr_
+	addqw	#4,sp
+	fmoves	d0,fp0
+	fsubx	fp6,fp0
+	fsubx	fp7,fp5
+	fdivx	fp0,fp5
+	fmovex	fp5,fp4
+	jra	L77021
+|#PROC# 07
+
+	.bss
+	.align	4
+VAR_SEG3:
+	.skip	12
+	LF3	=	264
+	LS3	=	15608
+	LFF3	=	228
+	LSS3	=	7
+	LP3	=	12
+	.text
+	.globl	_grcwcc_
+_grcwcc_:
+	link	a6,#-264
+	moveml	#15608,sp@
+	fmovem	#7,a6@(-228)
+	moveq	#1,d7
+	movl	a6@(20),a2
+	movl	a6@(24),d3
+	movl	a6@(8),d6
+	movl	d6,d0
+	moveq	#20,d5
+	addl	d5,d0
+	movl	d0,a6@(-4)
+	movl	d6,d0
+	addql	#4,d0
+	movl	d0,a6@(-8)
+	movl	d6,d0
+	moveq	#12,d5
+	addl	d5,d0
+	movl	d0,a6@(-12)
+	movl	a6@(12),a0
+	fmoves	a0@,fp5
+	movl	a6@(16),a0
+	fmoves	a0@,fp6
+	moveq	#-4,d5
+	addl	d5,d6
+	movl	d6,a6@(-24)
+	asll	#2,d7
+	movl	d7,a3
+	addl	a6@(-4),a3
+	movl	d7,d4
+	addl	d6,d4
+	movl	d7,a4
+	addl	d0,a4
+	movl	d7,a5
+	addl	a6@(-8),a5
+L77034:
+	movl	d4,sp@-
+	jbsr	_i_nint
+	addqw	#4,sp
+	movl	d0,d6
+	moveq	#0,d0
+	moveq	#4,d5
+	cmpl	d5,d7
+	seq	d0
+	negb	d0
+	movl	d0,d5
+	jeq	L77038
+	fmovex	fp5,fp7
+	jra	L77039
+L77038:
+	fmovex	fp6,fp7
+L77039:
+	tstl	d6
+	jeq	LY00002
+	cmpl	#1,d6
+	jne	L77048
+	flog10x	fp7,fp0
+	fmovex	fp0,fp7
+	jra	LY00002
+L77050:
+	fmoves	fp7,a2@
+	jra	L85
+L77048:
+	fmoves	fp7,VAR_SEG3
+	pea	VAR_SEG3
+	jbsr	_elogr_
+	addqw	#4,sp
+	fmoves	d0,fp7
+LY00002:
+	fsubs	a4@,fp7
+	fmuls	a5@,fp7
+	fadds	a3@,fp7
+	tstl	d5
+	jne	L77050
+	movl	d3,a0
+	fmoves	fp7,a0@
+L85:
+	addql	#4,d7
+	addqw	#4,a5
+	addqw	#4,a4
+	addql	#4,d4
+	addqw	#4,a3
+	moveq	#8,d6
+	cmpl	d6,d7
+	jle	L77034
+	fmovem	a6@(-228),#7
+	moveml	a6@(-264),#15608
+	unlk	a6
+	rts
+|#PROC# 07
+
+	.bss
+	.align	4
+VAR_SEG4:
+	.skip	12
+	LF4	=	264
+	LS4	=	15608
+	LFF4	=	228
+	LSS4	=	7
+	LP4	=	12
+	.text
+	.globl	_grcnds_
+_grcnds_:
+	link	a6,#-264
+	moveml	#15608,sp@
+	fmovem	#7,a6@(-228)
+	moveq	#1,d7
+	movl	a6@(20),a2
+	movl	a6@(24),d3
+	movl	a6@(8),d6
+	movl	d6,d0
+	moveq	#12,d5
+	addl	d5,d0
+	movl	d0,a6@(-4)
+	movl	d6,d0
+	addql	#4,d0
+	movl	d0,a6@(-8)
+	movl	d6,d0
+	moveq	#20,d5
+	addl	d5,d0
+	movl	d0,a6@(-12)
+	movl	a6@(12),a0
+	fmoves	a0@,fp5
+	movl	a6@(16),a0
+	fmoves	a0@,fp6
+	moveq	#-4,d5
+	addl	d5,d6
+	movl	d6,a6@(-24)
+	asll	#2,d7
+	movl	d7,a3
+	addl	a6@(-4),a3
+	movl	d7,d4
+	addl	d6,d4
+	movl	d7,a4
+	addl	d0,a4
+	movl	d7,a5
+	addl	a6@(-8),a5
+L77060:
+	movl	d4,sp@-
+	jbsr	_i_nint
+	addqw	#4,sp
+	movl	d0,d6
+	moveq	#0,d0
+	moveq	#4,d5
+	cmpl	d5,d7
+	seq	d0
+	negb	d0
+	movl	d0,d5
+	jeq	L77064
+	fmovex	fp5,fp7
+	jra	L77065
+L77064:
+	fmovex	fp6,fp7
+L77065:
+	fsubs	a4@,fp7
+	fdivs	a5@,fp7
+	fadds	a3@,fp7
+	tstl	d6
+	jeq	LY00004
+	cmpl	#1,d6
+	jne	L77074
+	ftentoxx	fp7,fp0
+	fmovex	fp0,fp7
+	jra	LY00004
+L77076:
+	fmoves	fp7,a2@
+	jra	L121
+L77074:
+	fmoves	fp7,VAR_SEG4
+	pea	VAR_SEG4
+	jbsr	_aelogr_
+	addqw	#4,sp
+	fmoves	d0,fp7
+LY00004:
+	tstl	d5
+	jne	L77076
+	movl	d3,a0
+	fmoves	fp7,a0@
+L121:
+	addql	#4,d7
+	addqw	#4,a5
+	addqw	#4,a4
+	addql	#4,d4
+	addqw	#4,a3
+	moveq	#8,d6
+	cmpl	d6,d7
+	jle	L77060
+	fmovem	a6@(-228),#7
+	moveml	a6@(-264),#15608
+	unlk	a6
+	rts
+|#PROC# 07
+
+	.bss
+	.align	4
+VAR_SEG5:
+	.skip	52
+	.bss
+	.align	4
+ARR_SEG5:
+	.skip	64
+	.data1
+	.align	2
+L5D70:
+	.single	0r1.00000000000000000e+00
+	.data1
+	.align	2
+L5D68:
+	.single	0r1.00000000000000000e+01
+	.data1
+	.align	2
+L5D67:
+	.single	0r1.19200000000000000e-07
+	.data1
+	.align	2
+L5D49:
+	.single	0r2.00000000000000000e+00
+	.data1
+	.align	2
+L5D41:
+	.single	0r-1.00000000000000000e+00
+	LF5	=	356
+	LS5	=	8444
+	LFF5	=	328
+	LSS5	=	63
+	LP5	=	8
+	.text
+	.globl	_grcses_
+_grcses_:
+	link	a6,#-356
+	moveml	#8444,sp@
+	fmovem	#63,a6@(-328)
+	moveq	#0,d3
+	moveq	#1,d2
+	movl	L5D70,VAR_SEG5+4
+	fmoves	L5D68,fp0
+	fmuls	L5D67,fp0
+	fmoves	fp0,VAR_SEG5+40
+	moveq	#1,d6
+	movl	a6@(16),a0
+	movl	a0@,a6@(-60)
+	movl	a6@(12),a0
+	fmoves	a0@,fp2
+	movl	a6@(8),a0
+	movl	a0@,d0
+	addl	#154,d0
+	movl	d0,a6@(-36)
+	movl	d3,d0
+	asll	#2,d0
+	movl	d6,d5
+	movl	d5,d1
+	addl	d1,d1
+	addl	d1,d5
+	asll	#2,d1
+	addl	d1,d5
+	addl	#ARR_SEG5+-4,d0
+	movl	d0,a5
+	movl	d5,d4
+	addl	a6@(-36),d4
+	jra	L77087
+LY00009:
+	moveq	#1,d7
+	cmpl	d7,d3
+	jne	L77108
+	movl	ARR_SEG5,d7
+LY00008:
+	movl	d7,d0
+	fmovem	a6@(-328),#63
+	moveml	a6@(-356),#8444
+	unlk	a6
+	rts
+LY00006:
+	addql	#1,d6
+	moveq	#11,d7
+	addl	d7,d5
+	addl	d7,d4
+	cmpl	#176,d5
+	jgt	LY00009
+L77087:
+	movl	d4,d7
+	asll	#2,d7
+	lea	_mem_+12,a0
+	fmoves	a0@(0,d7:l),fp6
+	lea	_mem_+16,a0
+	fmoves	a0@(0,d7:l),fp4
+	lea	_mem_+20,a0
+	fmoves	a0@(0,d7:l),fp5
+	lea	_mem_+24,a0
+	fmoves	a0@(0,d7:l),fp3
+	fmovex	fp6,fp0
+	faddx	fp4,fp0
+	fdivs	L5D49,fp0
+	fmoves	fp0,VAR_SEG5+28
+	fmovex	fp5,fp0
+	faddx	fp3,fp0
+	fdivs	L5D49,fp0
+	fmoves	fp0,VAR_SEG5+32
+	fmovex	fp4,fp7
+	fsubx	fp6,fp7
+	fadds	L5D41,fp7
+	fabsx	fp7,fp0
+	fcmps	VAR_SEG5+40,fp0
+	fjnlt	L77092
+	fmovex	fp3,fp7
+	fsubx	fp5,fp7
+	fadds	L5D41,fp7
+	fabsx	fp7,fp0
+	fcmps	VAR_SEG5+40,fp0
+	fjlt	LY00006
+L77092:
+	fmovex	fp2,fp7
+	fsubs	VAR_SEG5+28,fp7
+	fmoves	fp7,a6@(-20)
+	fmoves	a6@(-60),fp7
+	fsubs	VAR_SEG5+32,fp7
+	fmoves	fp7,a6@(-24)
+	fmoves	a6@(-20),fp7
+	fmulx	fp7,fp7
+	fmoves	a6@(-24),fp1
+	fmulx	fp1,fp1
+	faddx	fp1,fp7
+	fcmps	VAR_SEG5+4,fp7
+	fjnle	L77096
+	movl	d6,d2
+	fmoves	fp7,VAR_SEG5+4
+L77096:
+	fcmpx	fp6,fp2
+	fjnge	LY00006
+	fcmpx	fp4,fp2
+	fjnle	LY00006
+	fcmps	a6@(-60),fp5
+	fjnle	LY00006
+	fcmps	a6@(-60),fp3
+	fjnge	LY00006
+	addql	#1,d3
+	addqw	#4,a5
+	movl	d6,a5@
+	jra	LY00006
+L77108:
+	movl	d2,d7
+	jra	LY00008
+	.globl	f68881_used
+	.data1
+#===============================================================================

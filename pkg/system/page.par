@@ -1,0 +1,6 @@
+files,s,a,,,,Files to be paged
+map_cc,b,h,yes,,,Map control characters into printable sequences?
+clear_screen,b,h,yes,,,Clear screen between pages?
+first_page,i,h,1,1,,First page of file to be displayed
+prompt,s,h,"",,,Prompt string if not filename
+device,s,h,"terminal",,,Output device

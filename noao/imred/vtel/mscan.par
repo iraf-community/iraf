@@ -1,0 +1,8 @@
+input,s,a,,,,Input file descriptor
+verbose,b,h,yes,,,Print out header data 
+files,s,a,,,,List of files to be examined
+makeimage,b,h,yes,,,Make images?
+brief,b,h,y,,,short output image names
+select,b,h,y,,,make select image
+bright,b,h,y,,,make brightness image
+velocity,b,h,y,,,make velocity image

@@ -1,0 +1,9 @@
+      SUBROUTINE SKIPBL(LIN, I)
+      INTEGER LIN(100)
+      INTEGER I
+23000 IF (.NOT.(LIN (I) .EQ. 32 .OR. LIN (I) .EQ. 9))GOTO 23001
+      I = I + 1
+      GOTO 23000
+23001 CONTINUE
+      RETURN
+      END

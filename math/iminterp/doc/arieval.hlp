@@ -1,0 +1,45 @@
+.help arieval Jul84 "Image Interpolator Package"
+.ih
+NAME
+arieval -- evaluate the interpolant at x
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+y = arieval (x, datain, npix, interp_type)
+
+.nf
+    real	x		# x value, 1 <= x <= npix
+    real	datain[npix]	# data values
+    int		npix		# number of data values
+    int		interp_type	# interpolant type
+.fi
+.ih
+ARGUMENTS
+.ls x      
+X value.
+.le
+.ls datain  
+Array of input data.
+.le
+.ls npix
+Number of data points.
+.le
+.ls interp_type
+Interpolant type. Options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5
+and II_SPLINE3 for
+nearest neighbour, linear, 3rd and fifth order polynomials and the cubic
+spline. The interpolant type definitions are contained in the package
+header file math/iminterp.h
+.le
+.ih
+DESCRIPTION
+ARIEVAL allows the evaluation of a few interpolated points without the
+computing and storage required for the sequential interpolant.
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the responsibility of
+the user.
+.ih
+SEE ALSO
+asieval, asivector

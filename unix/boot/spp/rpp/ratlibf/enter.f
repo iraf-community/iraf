@@ -1,0 +1,34 @@
+      SUBROUTINE ENTER (SYMBOL, INFO, ST)
+      INTEGER SYMBOL (100)
+      INTEGER INFO (100)
+      INTEGER ST
+      INTEGER MEM( 1)
+      COMMON/CDSMEM/MEM
+      INTEGER I, NODSIZ, J
+      INTEGER STLU, LENGTH
+      INTEGER NODE, PRED
+      INTEGER DSGET
+      NODSIZ = MEM (ST)
+      IF (.NOT.(STLU (SYMBOL, NODE, PRED, ST) .EQ. 0))GOTO 23000
+      NODE = DSGET (1 + NODSIZ + LENGTH (SYMBOL) + 1)
+      MEM (NODE + 0) = 0
+      MEM (PRED + 0) = NODE
+      I = 1
+      J = NODE + 1 + NODSIZ
+23002 IF (.NOT.(SYMBOL (I) .NE. -2))GOTO 23003
+      MEM (J) = SYMBOL (I)
+      I = I + 1
+      J = J + 1
+      GOTO 23002
+23003 CONTINUE
+      MEM (J) = -2
+23000 CONTINUE
+      I = 1
+23004 IF (.NOT.(I .LE. NODSIZ))GOTO 23006
+      J = NODE + 1 + I - 1
+      MEM (J) = INFO (I)
+23005 I = I + 1
+      GOTO 23004
+23006 CONTINUE
+      RETURN
+      END

@@ -1,0 +1,10 @@
+      SUBROUTINE REPCOD (LAB)
+      INTEGER LAB
+      INTEGER LABGEN
+      CALL OUTCON (0)
+      LAB = LABGEN (3)
+      CALL OUTCON (LAB)
+      LAB = LAB + 1
+      CALL INDENT (1)
+      RETURN
+      END

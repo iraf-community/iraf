@@ -1,0 +1,6 @@
+.help revisions Jun88 noao.imred.irred
+.nf
+Davis, April 1, 1989
+    The IRRED package was added to the imred package menu. The current
+    tasks are bscale, center, irmosaic, iralign, irmatch1d, and irmatch2d.
+.endhelp

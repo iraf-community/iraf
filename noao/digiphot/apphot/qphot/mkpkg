@@ -1,0 +1,34 @@
+# QPHOT task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	apgqppars.x	"../lib/apphot.h"	"../lib/display.h"	\
+			"../lib/noise.h"	"../lib/center.h"	\
+			"../lib/fitsky.h"	"../lib/phot.h"
+	apqppars.x	"../lib/apphot.h"	"../lib/display.h"	\
+			"../lib/noise.h"	"../lib/center.h"	\
+			"../lib/fitsky.h"	"../lib/phot.h"
+	apqphot.x	<ctype.h>		<gset.h>		\
+			"../lib/apphot.h"	"../lib/display.h"	\
+			"../lib/center.h"	"../lib/fitsky.h"	\
+			"../lib/phot.h"
+	apqradphot.x	<gset.h>		<pkg/gtools.h>		\
+			<math.h>		"../lib/apphot.h"	\
+			"../lib/noise.h"	"../lib/display.h"	\
+			"../lib/phot.h"		"../lib/fitsky.h"	\
+			"../lib/center.h"
+	apqcolon.x	"../lib/apphot.h"	"../lib/display.h"	\
+			"../lib/noise.h"	"../lib/center.h"	\
+			"../lib/fitsky.h"	"../lib/phot.h"         \
+			<error.h>
+	apqshow.x	"../lib/apphot.h"	"../lib/display.h"	\
+			"../lib/noise.h"	"../lib/center.h"	\
+			"../lib/fitsky.h"	"../lib/phot.h"
+	t_qphot.x	<fset.h>		<gset.h>		\
+			<lexnum.h>		../lib/apphot.h   	\
+			../lib/fitsky.h
+	;

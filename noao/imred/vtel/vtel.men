@@ -1,0 +1,23 @@
+       destreak - Destreak He 10830 grams.
+      destreak5 - First pass processing CL script for 10830 grams.
+       dicoplot - Make dicomed plots of carrington maps.
+       fitslogr - Make a log of certain header parameters from a FITS tape.
+	getsqib - Extract the squibby brightness image from a full disk scan.
+     makehelium - Cl script for processing destreaked 10830 grams(second pass).
+     makeimages - Cl script for processing magnetograms into projected maps
+	  merge - Merge daily grams into a Carrington map.
+       mrotlogr - Log some header parameters from a FITS rotation map tape.
+	  mscan - Read all sector scans on a tape and put them into images.
+	pimtext - Put text directly into images using a pixel font.
+	putsqib - Merge a squibby brightness image into a full disk image.
+       quickfit - Fit an ellipse to the solar limb.
+	 readvt - Read a full disk tape and produce an IRAF image.
+	   rmap - Map a full disk image into a 180 by 180 flat image.
+	syndico - Make dicomed print of daily grams 18 cm across.
+	  tcopy - Tape to tape copy routine.
+	   trim - Set all pixels outside the limb to 0.0 (use sqib for limb).
+	 unwrap - Remove effects of data wraparound on continuum scans.
+	vtblink - Blink daily grams on the IIS to check for registration.
+      vtexamine - Examine a vacuum telescope tape, print headers and profile.
+      writetape - Cl script to write 5 full disk grams to tape.
+	writevt - Write an IRAF image to tape in vacuum telescope format.

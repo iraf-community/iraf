@@ -1,0 +1,20 @@
+# PHOT parameters
+
+image,f,a,,,,Input image
+datapars,pset,h,"",,,Data dependent parameters
+centerpars,pset,h,"",,,Centering parameters
+fitskypars,pset,h,"",,,Sky fitting parameters
+photpars,pset,h,"",,,Photometry parameters
+coords,f,h,"",,,Coordinate list
+skyfile,f,a,"",,,Sky file
+output,f,h,"default",,,Results file
+plotfile,f,h,"",,,File of plot metacode
+graphics,s,h,"stdgraph",,,Graphics device
+display,s,h,"stdimage",,,Display device
+commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+radplots,b,h,no,,,Plot the radial profiles
+interactive,b,h,yes,,,Mode of use
+verify,b,h,yes,,,Verify critical parameters in non interactive mode
+verbose,b,h,no,,,Print messages in non interactive mode
+mode,s,h,'ql'

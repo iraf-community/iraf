@@ -1,0 +1,135 @@
+.help contour Jun86 plot
+.ih
+NAME
+contour -- draw a contour plot of an image
+.ih
+USAGE
+contour image
+.ih
+PARAMETERS
+.ls image
+Two dimensional image or image section to be contoured.
+.le
+.ls floor = 0
+Minimum value to be contoured.  If \fBfloor = 0\fR, a value rounded up 
+from the image minimum will be used.
+.le
+.ls ceiling = 0
+Maximum value to be contoured.  If \fBceiling = 0\fR, a value rounded down
+from the image maximum will be used.
+.le
+.ls zero = 0
+Greyscale value of the zero contour, i.e., the value of a zero point shift
+to be applied to the image data before plotting.  Does not affect the values
+of the floor and ceiling parameters.
+.le
+.ls ncontours = 0
+Number of contours to be drawn.  If 0, the contour interval may be specified,
+otherwise 20-30 nicely spaced contours are drawn.  A maximum of 40 contours
+can be drawn.
+.le
+.ls interval = 0
+Contour interval.  If 0, a contour interval is chosen which places 20 to 30
+contours spanning the intensity range of the image.
+.le
+.ls nhi = -1
+If -1, highs and lows are not marked.  If 0, highs and lows are marked
+on the plot.  If 1, the intensity of each pixel is marked on the plot.
+.le
+.ls dashpat = 528
+Dash pattern for negative contours.
+.le
+.ls device = "stdgraph"
+Output device (\fBstdgraph\fR, \fBstdplot\fR, or the name of a physical
+device).
+.le
+.ls xres = 64, yres = 64
+The input image is block averaged or subsampled to this resolution.
+.le
+.ls preserve = yes
+If \fBpreserve\fR = yes, the aspect ratio of the image is preserved when 
+achieving the resolution specified by \fBxres\fR and \fByres\fR.
+.le
+.ls subsample = no
+The resolution specified by \fBxres\fR, \fByres\fR is achieved by block 
+averaging unless \fBsubsample = yes\fR.
+.le
+.ls perimeter = yes
+A \fIcrtpict\fR perimeter is drawn around the contour plot with labelled
+tickmarks.
+.le
+.ls label= yes
+By default, the value of each major contour is embedded in the contour
+line.  This can be disabled by setting \fBlabel=no\fR.
+.le
+.ls vx1 = 0.0, vx2 = 0.0, vy1 = 0.0, vy2 = 0.0
+The device viewport, in normalized device coordinates (from 0.0 to 1.0
+inclusive).  If not specified by the user,
+\fBcontour\fR automatically centers the plot on the device viewport.
+.le
+.ls fill = no
+Fill the output viewport regardless of the device aspect ratio?
+.le
+.ls title = "imtitle"
+A title to be centered above the plot.  The user can specify a title string;
+the default string is the image title.
+.le
+.ih
+DESCRIPTION
+Contours are traced, smoothed with splines under tension, and optionally printed
+with embedded intensity labels.  Positive contours are printed as solid
+lines and negative contours as dashed lines.  The plot is generated
+by the NCAR \fBconrec\fR utility, using \fBdashsmth\fR to smooth the
+contours and draw dashed lines.  
+
+To speed up the contouring, the resolution of the image to be plotted can
+be decreased to \fBxres\fR by \fByres\fR.
+When \fBpreserve\fR = yes, \fBcontour\fR 
+automatically reduces the image in both directions by the same factor, which
+is the larger of [ncolumns / xres or nlines / yres]. If the
+aspect ratio is not being preserved, the x and y dimensions are independently
+reduced to the specified resolution.
+No reduction is done if \fBxres\fR and \fByres\fR = 0, if the input image is 
+an image section, or if the image is smaller than \fBxres\fR by \fByres\fR.
+
+If the device viewport is not set by the user, \fIcontour\fR automatically
+sets a viewport centered on the output device.  The default value of
+\fBfill=no\fR means the viewport will be adjusted so that equal
+numbers of image pixels in x and y will occupy equal lengths when plotted.
+That is, when \fBfill = no\fR, a unity aspect ratio is enforced, and square 
+images are represented as square plots regardless of the device aspect ratio.
+On devices with non square full device viewports (e.g., the vt640), a 
+square image will appear extended when \fBfill\fR = yes.
+
+.ih
+EXAMPLES
+Draw a contour plot of a 512 square image on the graphics terminal.
+With the default values for \fBxres\fR and \fByres\fR, the image
+would automatically be block averaged by a factor of 8 in x and y.
+
+	cl> contour crab.5009
+
+The plot could be output to the plotter as a background job:
+
+	cl> contour crab.5009 device=stdplot &
+
+Place a ceiling at an intensity value of 500 to cut out a noise spike.  The
+plot has been moved to the lower left corner of the display.
+
+	cl> cont crab.5009 ceil=500 vx1=.1 vx2=.6 vy1=.1 vy2=.6
+.ih
+TIME REQUIREMENTS
+The time required for \fIcontour\fR depends on the number of coutours
+being drawn - that is, the size and smoothness of the intensity array.
+A 512 square image of "average" smoothness, with x and y resolution equal to
+64, requires about 22 cp seconds with block averaging.  Using subsampling
+rather than block averaging, \fIcontour\fR takes 16 seconds.  A noisy
+picture will be plotted more quickly if block averaged rather than
+subsampled.
+.ih
+BUGS
+It should be possible to have list input as well as image section input.
+.ih
+SEE ALSO
+surface
+.endhelp

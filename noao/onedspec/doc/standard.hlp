@@ -1,0 +1,318 @@
+.help standard Jun88 noao.onedspec
+.ih
+NAME
+standard -- Add standard stars to sensitivity file
+.ih
+USAGE
+standard input [records] output
+.ih
+PARAMETERS
+.ls input
+List of input standard star spectra or root names if using the record number
+extension format.  All spectra of the same aperture must be of the same
+standard star.  In beam switch mode or when the same star parameter is set
+all spectra must be of the same standard star regardless of aperture number.
+.le
+.ls records
+List of records or ranges of records to be appended to the input spectra
+names when using record number extension format.  The
+syntax of this list is comma separated record numbers or ranges of record
+numbers.  A range consists of two numbers separated by a hyphen.
+A null list may be used if no record number extensions are
+desired.  This is a positional query parameter only if the record
+format is specified.
+.le
+.ls output
+The name of a text file which will contain the output from \fBstandard\fR.
+Each execution of \fBstandard\fR appends to this file information about the
+standard stars, the calibration bandpasses, and observed counts (see the
+DESCRIPTION section for more details).  The output must be explicitly
+deleted by the user if the filename is to be reused.
+.le
+.ls recformat = yes
+Use record number extension format?  If \fIyes\fR the record numbers
+specified by the parameter \fIrecords\fR will be appended to each input
+root name.
+.le
+.ls samestar = yes
+Is the same star in all apertures?  If set to no then each aperture may
+contain a different standard star the the standard star name is queried
+each time a new aperture is encountered.  Note that this occurs only
+once per aperture and multiple spectra with the same aperture number
+must be of the same star.  If set to yes the standard star name is only
+queried once.  When in beam switch mode this parameter is ignored since
+all apertures must contain the same star.
+.le
+.ls beam_switch = no
+Beam switch the spectra?  If yes then a beam switch mode is used for the spectra
+in which successive pairs of object and sky observations from the same aperture
+are sky subtracted.  This requires that the object type flag OFLAG be present
+and that the spectra are appropriately ordered.  All object observations must be
+of the same standard star and the \fIsamestar\fR parameter is ignored.
+.le
+.ls apertures = ""
+List of apertures to be selected from the input list of spectra.  If no list
+is specified then all apertures are selected.  The syntax is the same as the
+record number extensions.
+.le
+.ls bandwidth = INDEF, bandsep = INDEF
+Bandpass widths and separations in wavelength units.  If INDEF then the
+default bandpasses are those given in the standard star calibration
+file.  If values for these parameters are specified then a default set
+of bandpasses of equal width and separation are defined over the range
+of the input spectrum.  In both cases the default bandpasses can be
+changed interactively if desired.
+.le
+.ls fnuzero = 3.68e-20
+The absolute flux per unit frequency at a magnitude of zero.  This is used
+to convert the calibration  magnitudes to absolute flux by the formula
+
+	Flux = fnuzero * 10. ** (-0.4 * magnitude)
+
+The flux units are also determined by this parameter.  However, the
+frequency to wavelength interval conversion assumes frequency in hertz.
+The default value is based on a calibration of Vega at 5556 Angstroms of
+3.52e-20 ergs/cm2/s/hz for a magnitude of 0.048.  This default value
+is that used in earlier versions of this task which did not allow the
+user to change this calibration.
+.le
+.ls extinction = ")_.extinction"
+Extinction file used to make second order extinction corrections across
+the bandpasses.  The default value is  redirected to the package
+parameter of the same name.  See \fBlcalib\fR for a list of standard
+extinction files.
+.le
+.ls caldir = ")_.caldir"
+Calibration directory containing standard star data.  The default is
+redirected to the package parameter of the same name.  A list of
+standard calibration directories may be obtained by listing the file
+"onedstds$README"; for example:
+
+	cl> page onedstds$README
+
+The user may copy or create their own calibration files and specify
+the directory.  The directory "" refers to the current working directory.
+.le
+.ls latitude = )observatory.latitude
+This is the observatory latitude. If the airmass of the observation
+must be calculated, this information is required.  The default
+value is obtained from the parameter for the task \fBobservatory\fR.
+.le
+.ls interact = no
+If set to no, then the default wavelength set (either that from the star
+calibration file or the set given by the \fIbandwidth\fR and \fIbandsep\fR
+parameters) is used to select wavelength points along the spectrum where the
+sensitivity is measured. If set to yes, the spectra may be plotted
+and the bandpasses adjusted.
+.le
+.ls graphics = "stdgraph"
+Graphics output device for use with the interactive mode.  Normally this is
+the user's graphics terminal.
+.le
+.ls cursor = ""
+Graphics cursor input for use with the interactive mode.  When null the
+standard graphics cursor is used otherwise the specified file is used.
+.le
+.ls star_name
+The name of the star observed in the current series of spectra.  Calibration
+data for the star must be in the specified calibration directory "caldir".
+This is normally a interactive query parameter and should not be specified on
+the command line unless all spectra are of the same standard star.
+.le
+.ls answer
+Interactive query parameter.
+.le
+.ih
+CURSOR KEYS
+.nf
+?  Display help page
+a  Add a new band by marking the endpoints
+d  Delete band nearest the cursor in wavelength
+r  Redraw current plot
+q  Quit with current bandpass definitions
+w  Window plot  (follow with '?' for help)
+I  Interrupt task immediately
+
+:show	Show current bandpass data
+.fi
+.ih
+DESCRIPTION
+Observations of standard stars are integrated over calibration
+bandpasses and written to an output file along with the associated
+calibration fluxes from tablulated calibration data.  The output data
+is used by the task \fBsensfunc\fR to determine the detector
+sensitivity function and possibly the extinction.  The spectra are
+required to be dispersion corrected.  The input spectra may be in
+either "onedspec" or "echelle" format and may have many different
+observation apertures.  The spectra may also be beam switched and use
+the a record number extension format.
+
+The input spectra are specified by a list of names or root names if using
+the record number extension format.  In the latter case each name in the
+list has each of the specified record numbers appended.  A subset of the
+input spectra may be selected by their aperture numbers using the parameter
+\fIapertures\fR.  The spectrum name, aperture number, and title are printed
+to the standard output.  The airmass is required but if absent from the image
+header it may be computed from the observation header parameters and the
+latitude task parameter (normally obtained from the \fBobservatory\fR task).
+
+The name of the standard star is obtained by querying the user.  If the
+parameter \fIsamestar\fR is yes or beam switch mode is selected then
+all spectra are assumed to be of the same standard star and the query
+is made once.  If the parameter is no then a query is made for each
+aperture.  This allows each aperture to contain a different standard
+star.  Note however that multiple observations with the same aperture
+number must be of the same standard star.
+
+The standard star names must map to a file containing tabulated
+calibration data.  The calibration filename is formed from the star
+name with blanks, "+",and "-" removed and converted to lower case and
+the extension ".dat" added.  This name is appended to a calibration
+directory, so the directory name must have an appropriate directory
+delimiter such as "$" or "/".  Generally one of the system calibration
+directories is used but one may copy and modify or create new
+calibration files in a personal directory.  For the current working
+directory the calibration directory is either null or "./".
+
+The calibration files consist of lines with wavelengths in Angstroms,
+calibration magnitudes, and bandpass widths in Angstroms.  The
+magnitudes are converted to absolute flux per unit frequency using the
+parameter \fIfnuzero\fR defined by
+
+	Fnu = fnuzero * 10. ** (-0.4 * magnitude)
+
+Thus, \fIfnuzero\fR is the flux at magnitude zero.  The flux units are
+determined by this number.  The default value was chosen such that Vega
+at 5556 Angstroms has a magnitude of 0.048 and a flux of 3.52e-20
+ergs/cm2/s/hz.  This is the same value that was used by all previous
+versions of this task.
+
+The beam switch mode is selected with the \fIbeam_switch\fR parameter.
+This mode requires that all apertures are of the same star, the header
+keyword OFLAG be present to identify object and sky spectra, and that
+the sequence of spectra specified are paired such that if an object
+spectrum is encountered first the next spectrum for that aperture
+(spectra from other apertures may appear in between) is a sky spectrum
+or the reverse.  These restrictions are not fundamental but are made so
+that this mode behaves the same as with the previous version of this
+task.  The sky spectrum is subtracted from the object spectrum and the
+result is then used in generating the observed intensities in the calibration
+bandpasses.
+
+If the spectra have been extinction corrected (EX-FLAG = 0) the
+extinction correction is removed.  The specified extinction file is
+used for this operation and so must be the same as that used when the
+extinction correction was made.  The airmass is also required in this step
+and, if needed to compute the airmass, the latitude parameter is used.  The
+treatment of extinction in this task is subtle.  The aim of this task
+is to produce observed integrated instrumental intensities without
+extinction correction.  Thus, the extinction correction is removed from
+extinctionn corrected spectra.  However, a correction is made for an
+extinction gradient across the bandpasses.  This is done by applying an
+extinction correction, integrating across the bandpass, and then
+correcting the integrated intensity for the extinction at the center of
+the bandpass.  An alternative way to look at this is that the integral
+is weighted by the ratio of the extinction correction at each pixel to
+the extinction correction at the center of the bandpass.  This
+correction or weighting is why the extinction file and latitude are
+parameters in this task even though for nonextinction corrected spectra
+they appear not to be needed.
+
+The observed instrumental intensities are integrated within a set of
+bandpasses by summing the pixels using partial pixels at the bandpass
+edges.  Initial bandpasses are defined in one of two ways.  A set of
+evenly spaced bandpasses of constant width covering the range of the
+input spectrum may be specified using the parameters \fIbandwidth\fR
+and \fIbandsep\fR in the same units as the spectrum dispersion.  If
+these parameters have the value INDEF then the bandpasses from the
+calibration file which are entirely within the spectrum are selected.
+Generally these bandpasses are the actual measured bandpasses though
+one is free to make calibration files using estimated points.  The
+calibration bandpasses are preferable because they have been directly
+measured and they have been placed to avoid troubles with spectral
+lines.  However, when the coverage or resolution is such that these
+bandpasses do not allow a good determination of the instrumental
+response the evenly spaced bandpasses may be needed.  The calibration
+fluxes are linearly interpolated (or extrapolated) from the calibration
+data points to the defined bandpasses.
+
+Each spectrum adds a line to the output file containing the spectrum
+image name, the sky spectrum image name if beam switching, the aperture
+or beam number, the number of points in the spectrum, the exposure
+time, airmass, wavelength range, and title.  If the airmass is not
+found in the image header it is computed using the latitude parameter
+and observation information from the header.
+
+Following the spectrum information, calibration data is added for each
+bandpass.  The bandpass wavelength, absolute flux (per Angstrom),
+bandpass width, and observed instrumental intensity in the bandpass are
+added to the output file.  As discussed above, the observed intensity
+does not include an extinction term but does apply a small correction
+or weighting for the variation of the extinction across the bandpass.
+
+The setting and editing of the bandpasses may be performed
+interactively if the \fIinteract\fR flag is set.  In this case the user
+is queried for each spectrum.  The answers to this query may be "no" or
+"yes" to skip editing or edit the bandpasses for this spectrum, "NO" or
+"YES" to skip or not skip editing all spectra of the same aperture with
+no further queries for this aperture, and "NO!" or "YES!" to skip
+editing or edit all spectra with no further queries.
+
+When editing the bandpasses a graph of the spectrum is made with the
+bandpasses plotted at the computed intensity per pixel.  The cursor and
+colon commands available are summarized in the section CURSOR KEYS.
+Basically bandpasses may be added or deleted and the current bandpass
+data may be examined.  Additional keys allow the usual windowing and
+cursor mode operations.  When satisfied with the bandpasses exit with
+'q'.  The edited bandpasses for that aperture remain in effect until
+changed again by the user.  Thus if there are many spectra from the
+same aperture one may reply with "NO" to queries for the next spectra
+to accept the current bandpasses for all other spectra of the same
+aperture.
+.ih
+EXAMPLES
+1.  To compile observations of three standard stars using a beam switched
+instrument like the IIDS:
+
+.nf
+	cl> standard.recformat=yes
+	cl> standard nite1 1001-1008 std beam_switch+ interact-
+	[nite1.1001][0]: HZ 44 - Night 1
+	[nite1.1004][0]: HZ 44 - Night 1
+	[nite1.1005][0]: HZ 44 - Night 1
+	[nite1.1008][0]: HZ 44 - Night 1
+	Star name in calibration list: hz 44
+	cl> standard nite1 1009-1016 std beam_switch+ interact-
+		...
+	cl> standard nite1 1017-1024 std beam_switch+ interact-
+		...
+.fi
+
+This will create a file "std" which will contain sensitivity measurements
+from the beam-switched observations of the three standard stars given.
+Note that \fBstandard\fR is run separately for each standard star.
+
+The spectra will be from the images: nite1.1001, nite.1002 ... nite1.1024,
+and the default calibration file, "onedstds$irscal.dat" will be used.
+
+2.  For echelle spectra all apertures, the orders, are of the same star and
+so the samestar parameter is set.  Usually the resolution is much higher than
+the calibration data so in order to get sufficient coverage bandpasses must
+be interpolated from the calibration data.  Therefore the evenly spaced
+bandpasses are used.
+
+.nf
+	cl> standard.recformat=no
+	cl> standard.samestar=yes
+	cl> standard ech001.ec std bandwidth=10 bandsep=15
+	[ech001.ec][0]: Feige 110
+	Star name in calibration list: feige 110
+	[ech001.ec][0]: Edit bandpasses? (no|yes|NO|YES|NO!|YES!): yes
+	[ech001.ec][1]: Edit bandpasses? (no|yes|NO|YES|NO!|YES!): yes
+	[ech001.ec][2]: Edit bandpasses? (no|yes|NO|YES|NO!|YES!): NO!
+.fi
+
+.ih
+SEE ALSO
+observatory, lcalib, sensfunc
+.endhelp

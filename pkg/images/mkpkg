@@ -1,0 +1,33 @@
+# Make the IMAGES package
+
+$call	relink
+$exit
+
+update:
+	@imdebug
+	@tv
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-liminterp -lxtools -lcurfit -lsurfit -lgsurfit"
+
+	$update	libpkg.a
+	$omake	x_images.x
+	$link	x_images.o libpkg.a $(LIBS) -o xx_images.e
+	;
+
+install:
+	$move	xx_images.e bin$x_images.e
+	;
+
+libpkg.a:
+	@lib
+	@imarith
+	@filters
+	@geometry
+	@imfit
+	@imutil
+	@iminfo
+	;

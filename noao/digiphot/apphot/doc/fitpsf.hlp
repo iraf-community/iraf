@@ -1,0 +1,466 @@
+.help fitpsf May89 noao.digiphot.apphot
+.ih
+NAME
+fitpsf -- model the point spread function with an analytic function
+.ih
+USAGE
+fitpsf image box
+.ih
+PARAMETERS
+.ls image
+The list of images containing the objects to be measured.
+.le
+.ls box    
+The width of the rectangular fitting region in scale.
+.le
+.ls function = "radgauss"
+The function to be fit. The options are:
+.ls radgauss
+A 2D radial Gaussian function is fit. The parameters of the fitting function
+are: x and y center, sigma of the Gaussian, amplitude of the Gaussian and
+the local sky value.
+.le
+.ls elgauss
+A 2D elliptical Gaussian function is fit. The parameters of the fitting
+function are: x and y center, x and y sigma of the Gaussian, amplitude of
+the Gaussian and the local sky value.
+.le
+.ls moments
+The 0th, 1st and 2nd order moments are computed and used to derive
+estimates of the
+x and y center values, radius of gyration, ellipticity and position
+angle of the object.
+.le
+.le
+.ls maxiter = 50
+The maximum number of iterations that the non-linear fitting routines will
+perform in an attempt to find a satisfactory fit.
+.le
+.ls kreject = 0.0
+The k-sigma rejection limit in units of sigma. The default is no rejection.
+.le
+.ls nreject = 0
+The maximum number of rejection cycles after the non-linear least squares fit.
+.le
+.ls datapars = ""
+The parameter file containing the data dependent parameters.
+These include the first guess at the fwhmpsf of the point spread function,
+noise model information and the scale of the image.
+.le
+.ls coords = ""
+The name of the text file(s) containing the coordinates of the objects
+to be processed, 1 object per line with the x and y coordinates in
+columns 1 and 2 respectively. If coords is the null string FITPSF will either
+read the image cursor (default) or read cursor commands from a file
+(image cursor is redirected to a text cursor command file created with
+say rimcursor). If coords is defined FITPSF will activate the image cursor
+and accept coordinate input from either the cursor or the coordinate list
+(interactive mode) or compute parameters using the initial positions in the
+coords file if defined or the cursor command file (batch mode).
+If coords is defined the number of coord files
+must be 1 or equal to the number of input images.
+.le
+.ls output = "default"
+The name of the results file or results directory.
+If output is "default", "dir$default" or a directory specification
+then an output name of the form dir$root.extension.version
+is constructed, where dir is the directory, root is the root image name,
+extension is "psf" and version is the current version of the file.
+If the output string is null then no output file is created.
+If output is specified the number of output files must either be one, or be
+equal to the number of input images.
+In both interactive and batch mode full results are sent to output. In
+interactive mode a subset of the results is printed on the standard output.
+.le
+.ls graphics = "stdgraph"
+The graphics device.
+.le
+.ls display = "stdimage"
+The image display device. For the time being display can be set to stdgraph
+in order for FITPSF to work off of a contour plot.
+.le
+.ls commands = ""
+The image cursor.
+.le
+.ls cursor = ""
+The graphics cursor.
+.le
+.ls interactive = yes
+Interactive or batch mode.
+.le
+.ls verify = yes
+Verify the critical parameters in non interactive mode.
+.le
+.ls verbose = no
+Print messages on the terminal in non interactive mode.
+.le
+
+.ih
+DESCRIPTION
+
+FITPSF models the stellar brightness distribution of objects in the IRAF image
+\fIimage\fR using non-linear least squares techniques and produces a
+list of model parameters and associated errors as output. Pixels in a
+subraster of width \fIbox * scale\fR are extracted and used in the fit.
+
+FITPSF can be run either interactively or in batch mode by setting the
+parameter \fIinteractive\fR. In interactive mode starting x and y positions
+can either be read directly from the image cursor or read directly from the text
+file specified by \fIcoords\fR. In batch mode the estimated
+positions can be read from the text file \fIcoords\fR or the image cursor
+parameter \fIcommands\fR can be redirected to a text file containing
+a list of cursor commands.
+
+.ih
+CURSOR COMMANDS
+
+The currently available cursor commands are listed below.
+
+.nf
+	Interactive PSF Fitting Commands
+
+?	Print help for FITPSF commands
+:	FITPSF colon escape commands (see below)
+e	Print FITPSF error messages
+d	Plot a centered stellar radial profile
+i	Setup FITPSF parameters using a stellar radial profile plot
+v	Verify critical psf parameters
+w	Store current FITPSF parameters in the pset files
+l	Model remainder of the stars in the list, output results
+r	Rewind the coordinate list
+f	Model PSF at position of current star (cursor or list)
+spbar	Model PSF at position of current star (cursor or list),
+	output results
+q	Exit 
+
+:m [n]	Move to the next [nth] star in the coordinate list
+:n [n]	Model PSF of the next [nth] star in list, output results
+
+PSF modelling parameters are listed or set with the following commands.
+
+
+:image		[string]	Image name
+:coords		[string]	Coordinate file name
+:output		[string]	Output file name
+:show		[data/fit]	List the parameters
+
+:scale	        [value]		Scale factor (units per pixel)
+:fwhmpsf	[value]		Full width half max of psf (scale units)
+:emission	[y/n]		Emission feature (y), absorption (n)
+:noise		[string]	Noise model (constant|poisson)
+:threshold	[value]		Detection intensity (counts)
+:cthreshold	[value]		Threshold for moment analysis (counts)
+:sigma		[value]		Standard deviation of sky (counts)
+:gain		[string]	Gain image header keyword
+:epadu		[value]		Gain (electrons  per adu)
+:ccdread	[string]	Readout noise image header keyword
+:readnoise	[value]		Readnoise (electrons)
+:exposure	[string]	Exposure time image header keyword
+:itime		[value]		Exposure time (time units)
+:datamin	[value]		Minimum good data value (counts)
+:datamax	[value]		Maximum good data value (counts)
+
+:function	[string]	PSF model (radgauss|elgauss|moments)
+:box		[value]		Width of the fitting box
+:maxiter	[value]		Maximum number of iterations
+:kreject	[value]		Rejection limit in sigma
+:nreject	[value]		Maximum number of rejection cycles
+.fi
+
+.ih
+ALGORITHMS
+
+The fitting parameters
+are \fIfunction\fR, the functional form of the model, \fImaxiter\fR, the
+maximum number of iterations per fit, \fIkreject\fR, the K-sigma rejection
+limit and \fInreject\fR, the maximum number of rejection cycles. The
+currently available functions are a 2D moments analysis, a 2D radial
+Gaussian and a 2D elliptical Gaussian.
+
+The weighting of the fit is determined by the parameter \fInoise\fR in the 
+\fIdatapars\fR file. The two options are \fIconstant\fR, in which all the
+weights are set to 1 and \fIpoisson\fR in which the weights are equal to
+square of the counts plus the square of the readout noise \fIreadnoise\fR.
+If \fIfunction\fR is either "radguass" or "ellgauss" then the parameter
+\fIfwhmpsf\fR is used to determine the initial guess for sigma.
+The parameter \fIthreshold\fR determines the intensity threshold above
+which the moment analysis is performed.
+
+.ih
+OUTPUT
+
+In interactive mode the following quantities are printed on the
+terminal as shown below for the radial gaussian, elliptical gaussian and
+moments functions respectively.
+
+.nf
+    image  xcenter  ycenter  rsigma  amplitude  sky  err
+
+    image  xcenter  ycenter  xsigma  ysigma rot  amplitude  sky  err
+
+    image  xcenter  ycenter  rgyrat  ellip  pa amplitude  sky  err
+
+.fi
+
+In both interactive and batch mode the full output is written to the
+text file \fIoutput\fR. At the beginning of each file is a header
+listing the current values of the parameters wwhen the first stellar
+record was written. These parameters can be subsequently altered.
+For each star measured the following record is written for the radial
+gaussian, elliptical gaussian and moments functions respectively.
+
+.nf
+        image  xinit  yinit  id  coords  lid
+    	    xcenter  ycenter  rsigma  amplitude  sky
+	    excenter eycenter ersigma eamplitude esky  ier  error
+
+        image  xinit  yinit  id  coords  lid
+    	    xcenter  ycenter  xsigma  ysigma  rot  amplitude  sky
+	    excenter eycenter exsigma eysigma erot eamplitude esky  ier  error
+
+        image  xinit  yinit  id  coords  lid
+	    xcenter  ycenter  rgyrat  ellip  pa amplitude  sky
+	    excenter eycenter ergyrat eellip epa eamplitude esky  ier  error
+.fi
+
+Image and coords are the name of the image and coordinate files respectively.
+Id and lid are the sequence numbers of stars in the output and coordinate
+files respectively and xinit and yinit are the initial positions.
+Xcenter and ycenter are the computed x and y
+positions of the object. Rsigma, xsigma and ysigma are the distance from
+the center of the Gaussian at which the Gaussian is equal to e ** -0.5
+of its central value. Xsigma and ysigma refer to values along the x
+and y axes respectively. The amplitude and sky refer to the amplitude of
+the Gaussian function and a constant background value respectively.
+If function = "moments" amplitude and sky refer to the total intensity
+above threshold and sky is the threshold value. Rot and pa are position angles
+measured counterclockwise with respect to the x axis. Rgyrat is the radius
+of gyration of the object and ellip its ellipticity.
+Quantities prefixed by an e represent the errors in the fitted parameters.
+
+.ih
+EXAMPLES
+
+1. Compute the radial gaussian parameters for a few  stars in N4147 using
+the display and the image cursor. Setup the task parameters using
+the interactive setup menu defined by the i key command.
+
+.nf
+	ap> set stdimcur = stdimage
+
+	... define the image cursor
+
+	ap> display n4147 1 fi+
+
+	... display the image
+
+	ap> fitpsf n4147
+
+	... a short help page appears on the screen
+
+	... move image cursor to a star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile
+	... set the fwhmpsf, sigma,  and threshold using the graphics
+	    cursor and the stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+
+	... type the v key to verify the parameters
+
+	... type the w key to save the parameters in the parameter files
+
+	... move the image cursor to the stars of interest and tap
+	    the space bar
+
+	... a one line summary of the fitted parameters will appear on the
+	    standard output for each star measured
+
+	... the output will appear in n4147.psf.1
+.fi
+
+2. Compute the radial gaussian parameters for a few  stars in M92 using the
+contour plot
+and the graphics cursor. Setup the task parameters using the interactive
+setup menu defined by the i key command.
+
+.nf
+	ap> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+	ap> contour m92 >G m92.plot1
+
+	... store the contour plot of m92 in the file m92.plot
+
+	ap> fitpsf m92 display=stdgraph
+
+	... a short help page appears on the screen
+
+	... type :.read m92.plot1 to load the contour plot on the screen
+
+	... move graphics cursor to a star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile
+	... set the fwhmpsf, sigma, and threshold using the graphics
+	    cursor and the stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+
+	... type the v key to verify critical parameters
+
+	... type the w key to save the parameters in the parameter files
+
+	... retype :.read m92.plot1 to reload the contour plot
+
+	... move the graphics cursor to the stars of interest and tap
+	    the space bar
+
+	... a one line summary of the fitted parameters will appear on the
+	    standard output for each star measured
+
+	... full output will appear in the text file m92.psf.1 
+.fi
+
+3. Setup and run FITPSF interactively on a list of objects,
+using a contour plot as the image display and the parameters defined and
+saved in example 1.
+
+.nf
+	ap> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+	ap> contour m92
+
+	... adjust plot parameters until the contour plot is satisfactory
+
+	ap> =gcur
+
+	... enter cursor mode
+
+	... type :.write m92.plot2 to save the plot in a metacode file
+
+	... type any key to quit cursor mode
+
+	ap> daofind m92
+
+	... make a coordinate list by searching for objects with  the
+	    fwhmpsf and threshold defined in example 1
+
+	... the output will appear in the text file m92.coo.1
+
+	ap> fitpsf m92 coords=m92.coo.1 display=stdgraph
+
+	... a short help menu appears
+
+	... type :.read m92.plot2 to read in the contour plot
+
+	... move the graphics cursor to the stars and tap space bar
+
+				or
+
+	... use :m and/or :n, l, r commands to measure objects in the
+	    coordinate list
+
+	... a one line summary of results will appear on the standard output
+	    for each star measured
+
+	... the output will appear in m92.psf.2 ...
+.fi
+
+
+4. Run FITPSF in batch mode using the coordinate file and the previously
+saved parameters. Verify the critical parameters.
+
+.nf
+	ap> fitpsf m92 coords=m92.coo.1 verify+ inter-
+
+	... output will appear in m92.psf.3
+.fi
+
+
+5. Run FITPSF in batch mode using the coordinate file and the previously
+saved parameters. The task can be submitted to the background by
+appending an ampersand to the command line listed below.
+
+.nf
+	ap> fitpsf m92 coords=m92.coo.1 verify- inter-
+
+	... output will appear in m92.psf.4
+.fi
+
+6. Run FITPSF interactively on the sun workstation using the imtool window,
+a coordinate list and the current set of parameters. This example assumes
+knowledge of the imtool functions, and that
+the image cursor is reading back positions in image pixel coordinates not
+device coordinates.
+
+.nf
+	ap> set stdimcur = text
+
+	... set the image cursor to the standard input
+
+	ap> display m92 1
+
+	... display the image in the imtool window and put the mouse
+	    in the imtool window
+
+	... use the imtool setup window to enter the coordinate file name
+	    m92.coo.2
+
+	... type the F6 key to enter cursor readback mode
+
+	... move the image cursor to the stars of interest, press the
+	    left mouse button 
+	... a number will appear beside each star measured
+	... the x and y coordinates of each star will be written to the
+	    file m92.coo.2
+
+	ap> fitpsf m92 coords=m92.coo.2
+
+	... a short help page appears on the screen followed by the
+	    cursor prompt
+
+	... type :m 3 to set the coordinates to the third star
+	    in the list
+
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile
+	... set the fwhmpsf and threshold using the graphics cursor and
+	    the stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+
+	... type r to rewind the coordinate list
+
+	... type l to measure all the stars in the coordinate list
+
+	... a one line summary of the answers will appear on the standard
+	    output for each star measured
+
+	... full output will appear in the text file m92.psf.4 
+.fi
+
+.ih
+BUGS
+
+In interactive mode the user should not change the type function to be fit
+after the first record is written to the output file. In this case the file
+header and record structure will not match.
+
+It is currently the responsibility of the user to make sure that the
+image displayed in the frame is the same as that specified by the image
+parameter.
+
+Commands which draw to the image display are currently disabled.
+The TVMARK task in the proto package  can be used to draw simple marks
+on the display. All the APPHOT marking commands will however function
+if a contour plot is used in lieu of the image display.
+
+Users should not be confused by the normally enabled markcur option in the
+SUN/IMTOOL setup window. This feature is under the control of the
+IMTOOL window and the APPHOT package has no control over it.
+
+.ih
+SEE ALSO
+
+datapars, radprof
+.endhelp

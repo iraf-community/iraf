@@ -1,0 +1,55 @@
+.help zopntx May84 "System Interface"
+.ih
+NAME
+zopntx -- open a text file
+.ih
+SYNOPSIS
+.nf
+zopntx (osfn, mode, chan)
+
+packed	char osfn[]		# OS filename
+int	mode			# access mode
+int	chan			# OS channel assigned to file
+.fi
+.ih
+DESCRIPTION
+The text file \fIosfn\fR is opened with access mode \fImode\fR and
+assigned the channel \fIchan\fR.  The legal access modes for text files
+are as follows:
+
+.nf
+	READ_ONLY	1	open existing file for reading
+	READ_WRITE	2    ** NOT SUPPORTED FOR TEXT FILES **
+	WRITE_ONLY	3	same as append mode
+	APPEND		4	open or create for appending
+	NEW_FILE	5	create for appending
+.fi
+
+If a nonexistent text file is opened for appending the file is created,
+i.e., appending to a nonexistent file is equivalent to mode NEW_FILE.
+READ_WRITE mode is not supported for text files since text file i/o is
+sequential.
+.ih
+RETURN VALUE
+ERR is returned if the named file does not exist, cannot be opened with the
+specified access mode, cannot be created, or if an illegal mode is specified.
+If the operation is successful the nonegative magic channel number assigned
+by the kernel to the file is returned in \fIchan\fR.
+.ih
+NOTES
+FIO will not call \fBzopntx\fR to open a new file if a file with the same
+name already exists.  FIO will instead either delete the file (if file clobber
+is enabled) or take an error action.  FIO does not assume anything about the
+file position at open time; \fBzsektx\fR is called shortly after \fBzopntx\fR
+to position the file to either BOF or EOF depending on the access mode.
+
+The file access permissions (owner, group, world permissions) of a new file
+are set by the kernel to either host system default values or to user definable
+values when the file is created.  The technique by which this is done is machine
+dependent.  Many systems provide an automatic system default set of
+permissions, e.g., read permission for everyone but write permission only
+for the owner, but give the user the option of globally overriding the default.
+.ih
+SEE ALSO
+zclstx, zfiotx, zopnbf
+.endhelp

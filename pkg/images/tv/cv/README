@@ -1,0 +1,3 @@
+CV -- Control video package.  This is a prototype package, used to load images
+into the image display (currently only the IIS), as well as to control the
+display and read the display memory.

@@ -1,0 +1,6 @@
+	dematch - Match a list of density values to exposure values
+	  hdfit - Fit a curve to density, log exposure values
+	hdshift - Align related HD curves
+          hdtoi - Apply DTOI transformation to density image
+       selftest - Self test program to check DTOI transformation
+       spotlist - Generate a list of calibration spot values

@@ -1,0 +1,69 @@
+# Make IMARITH.
+
+$checkout libpkg.a pkg$images/
+$update   libpkg.a
+$checkin  libpkg.a pkg$images/
+$exit
+
+generic:
+	$set	GEN = "$$generic -k"
+
+        $ifolder (generic/imcasigclip.x, imcasigclip.gx)
+	    $(GEN) imcasigclip.gx -o generic/imcasigclip.x $endif
+        $ifolder (generic/imcaverage.x, imcaverage.gx)
+	    $(GEN) imcaverage.gx -o generic/imcaverage.x $endif
+        $ifolder (generic/imccopy.x, imccopy.gx)
+	    $(GEN) imccopy.gx -o generic/imccopy.x $endif
+        $ifolder (generic/imcmaxrej.x, imcmaxrej.gx)
+	    $(GEN) imcmaxrej.gx -o generic/imcmaxrej.x $endif
+        $ifolder (generic/imcmedian.x, imcmedian.gx)
+	    $(GEN) imcmedian.gx -o generic/imcmedian.x $endif
+        $ifolder (generic/imcminrej.x, imcminrej.gx)
+	    $(GEN) imcminrej.gx -o generic/imcminrej.x $endif
+        $ifolder (generic/imcmmrej.x, imcmmrej.gx)
+	    $(GEN) imcmmrej.gx -o generic/imcmmrej.x $endif
+        $ifolder (generic/imcmode.x, imcmode.gx)
+	    $(GEN) imcmode.gx -o generic/imcmode.x $endif
+        $ifolder (generic/imcsigclip.x, imcsigclip.gx)
+	    $(GEN) imcsigclip.gx -o generic/imcsigclip.x $endif
+        $ifolder (generic/imcsum.x, imcsum.gx)
+	    $(GEN) imcsum.gx -o generic/imcsum.x $endif
+        $ifolder (generic/imcthresh.x, imcthresh.gx)
+	    $(GEN) imcthresh.gx -o generic/imcthresh.x $endif
+        $ifolder (generic/imcombine.x, imcombine.gx)
+	    $(GEN) imcombine.gx -o generic/imcombine.x $endif
+        $ifolder (generic/sigma.x, sigma.gx)
+	    $(GEN) sigma.gx -o generic/sigma.x $endif
+
+        $ifolder (generic/imsum.x, imsum.gx)
+	    $(GEN) imsum.gx  -o generic/imsum.x  $endif
+        $ifolder (generic/imaadd.x, imaadd.gx)
+	    (GEN) imaadd.gx -o generic/imaadd.x $endif
+        $ifolder (generic/imadiv.x, imadiv.gx)
+	    (GEN) imadiv.gx -o generic/imadiv.x $endif
+        $ifolder (generic/imamax.x, imamax.gx)
+	    (GEN) imamax.gx -o generic/imamax.x $endif
+        $ifolder (generic/imamin.x, imamin.gx)
+	    (GEN) imamin.gx -o generic/imamin.x $endif
+        $ifolder (generic/imamul.x, imamul.gx)
+	    (GEN) imamul.gx -o generic/imamul.x $endif
+        $ifolder (generic/imasub.x, imasub.gx)
+	    (GEN) imasub.gx -o generic/imasub.x $endif
+        $ifolder (generic/imanl.x, imanl.gx)
+	    (GEN) imanl.gx -o generic/imanl.x $endif
+        $ifolder (generic/imsum.h, imsum.h)
+	    $copy imsum.h generic/imsum.h $endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+	@generic
+
+	imclogsum.x	<imhdr.h> <imset.h> <time.h>
+	imcscales.x	<imhdr.h> <imset.h> <time.h>
+	imcsection.x	<ctype.h>
+	t_imarith.x	<imhdr.h> <error.h> <lexnum.h>
+	t_imcombine.x	<imhdr.h> <error.h>
+	t_imdivide.x	<imhdr.h>
+	t_imsum.x	<imhdr.h>
+	;

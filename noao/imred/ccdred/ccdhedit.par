@@ -1,0 +1,4 @@
+images,s,a,,,,CCD images
+parameter,s,a,,,,Image header parameter
+value,s,a,,,,Parameter value
+type,s,h,"string","string|real|integer",,Parameter type (string|real|integer)

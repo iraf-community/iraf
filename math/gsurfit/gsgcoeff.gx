@@ -1,0 +1,41 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+$if (datatype == r)
+include "gsurfitdef.h"
+$else
+include "dgsurfitdef.h"
+$endif
+
+# GSGCOEFF -- Procedure to fetch a particular coefficient.
+# If the requested coefficient is undefined then INDEF is returned.
+
+$if (datatype == r)
+real procedure gsgcoeff (sf, xorder, yorder)
+$else
+double procedure dgsgcoeff (sf, xorder, yorder)
+$endif
+
+pointer	sf		# pointer to the surface fitting descriptor
+int	xorder		# X order of desired coefficent
+int	yorder		# Y order of desired coefficent
+
+int	n
+
+begin
+	if ((xorder > GS_XORDER(sf)) || (yorder > GS_YORDER(sf)))
+	    return (INDEF)
+
+	switch (GS_XTERMS(sf)) {
+	case NO:
+	    if (yorder == 1)
+		n = xorder
+	    else if (xorder == 1)
+		n = GS_NXCOEFF(sf) + yorder - 1
+	    else
+		return (INDEF)
+	case YES:
+	    n = xorder + (yorder - 1) * GS_NXCOEFF(sf)
+	}
+
+	return (COEFF(GS_COEFF(sf) + n - 1))
+end

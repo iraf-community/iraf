@@ -1,0 +1,186 @@
+.help apnormalize Apr87 noao.twodspec.apextract
+.ih
+NAME
+apnormalize -- Normalize 2D apertures by 1D functions
+.ih
+USAGE
+apnormalize input output
+.ih
+PARAMETERS
+.ls input
+List of input images to be normalized.  The list may be a combination of
+comma delimited image names, image templates, or "@" files.  The
+dispersion axis must be defined in the image headers using \fBsetdisp\fR
+or \fBhedit\fR.
+.le
+.ls output
+List of output image names for the normalized input images.  If the null
+string ("") is given or the end of the output list is reached before the end 
+of the input list then the output image will overwrite the input image.
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supercedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+The special image "last" may be used to specify the last set of
+apertures written to the database.
+.le
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing, trace
+fitting, and normalization spectrum fitting are disabled.  Note that you
+do not have to change the parameter values for these purely interactive
+options.  When run interactively queries may be suppressed by responding
+with "NO" or "YES".
+.le
+.ls recenter = yes
+Recenter the reference apertures in the input image?
+.le
+.ls find = yes
+Find the apertures automatically?  In order for apertures to be found
+automatically there must be no apertures for the input image or reference
+image defined in the database and the parameter \fIapfind.nfind\fR must
+be greater than zero.
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls trace = yes
+Trace the apertures?
+.le
+.ls fittrace = yes
+Fit the traced points interactively using the ICFIT package?
+.le
+.ls normalize = yes
+Normalize the input aperture spectra?
+.le
+.ls normedit = yes
+Edit the apertures defining the normalization spectra?  By default the
+normalization spectra are defined by the input image apertures.  However,
+they can be modified independently of the image apertures through this
+option.
+.le
+.ls normfit = yes
+Fit the normalization spectra interactively?
+.le
+.ls threshold = 10.
+Threshold for normalization spectra.  All values below this threshold in
+the normalization spectrum are replaced by this value before division into
+the aperture data.
+.le
+.ih
+ICFIT PARAMETERS FOR FITTING THE NORMALIZATION SPECTRA
+.ls function = "legendre"
+Fitting function for the normalization spectra.  The choices are "legendre"
+polynomial, "chebyshev" polynomial, linear spline ("spline1"), and
+cubic spline ("spline3").
+.le
+.ls order = 1
+Number of polynomial terms or number of spline pieces for the fitting function.
+.le
+.ls sample = "*"
+Sample regions for fitting points.  Intervals are separated by "," and an
+interval may be one point or a range separated by ":".
+.le
+.ls naverage = 1
+Number of points within a sample interval to be subaveraged or submedian to
+form fitting points.  Positive values are for averages and negative points
+for medians.
+.le
+.ls niterate = 0
+Number of sigma clipping rejection iterations.
+.le
+.ls low_reject = 3. , high_reject = 3.
+Lower and upper sigma clipping rejection threshold in units of sigma determined
+from the RMS sigma of the data to the fit.
+.le
+.ls grow = 0.
+Growing radius for rejected points (in pixels).  That is, any rejected point
+also rejects other points within this distance of the rejected point.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters are taken from the task \fBapio\fR, the default aperture
+parameters are taken from the task \fBapdefault\fR, parameters used
+when finding apertures are taken from \fBapfind\fR, editing and
+centering parameters are taken from \fBapedit\fR, and tracing parameters
+are taken from \fBaptrace\fR.
+.ih
+DESCRIPTION
+For each image in the input image list the two dimensional spectra
+defined by a set of apertures are normalized by a one dimensional
+normalization function derived by extraction of a spectrum from an
+associated normalization aperture.  The normalization aperture
+(defaulting to the same aperture) is used to extract a one dimensional
+spectrum with profile weighting and no cleaning, i.e. simple sum across
+the aperture).  This spectrum is fit by a function.  The value of the
+fitting function at each point along the dispersion direction is
+divided into the two dimensional input aperture.  All points outside
+the apertures are set to unity.
+
+The purpose of this task is to remove a general shape from the aperture
+spectra.  If low order (order = 1 for instance) functions are used then
+only the amplitude of the spectra is affected shifting each aperture
+to approximately unit intensity per pixel.  If high order functions are
+used only the small spatial scale variations are preserved.  This
+is useful for making flat field images with the spectra signature of the
+continuum source removed or for producing two dimensional normalized
+spectra similar to the task \fBonedspec.continuum\fR.
+Another related task is \fBtwodspec.longslit.response\fR which works
+on rectangular image sections only while this tasks work on the more
+general apertures.
+
+The organization of the task is like the other tasks in the package
+which has options for defining apertures using a
+reference image, defining apertures
+through an automatic finding algorithm (see \fBapfind\fR),
+interactively editing the apertures (see \fBapedit\fR), and tracing the
+positions of the spectra as a function of dispersion position (see
+\fBaptrace\fR).  Though unlikely, the actual normalization operations
+may be suppressed when the parameter \fInormalize\fR is no.
+If the normalization is done interactively (the \fIinteractive\fR
+parameter set to yes) then the user is queried
+whether or not to normalize each image.  The responses are "yes",
+"no", "YES", or "NO", where the the upper case queries suppress this
+query for the following images.
+
+When the normalization operation is done interactively the user may
+edit the normalization apertures used to extract the normalization
+spectrum.  By default the normalization aperture is the same as the
+aperture to be normalized.  Note that the editing procedure is the same as
+that used to define the image apertures so one must not become confused with
+which aperture set is being edited.  The normal use of this option
+is to define normalization apertures with narrower limits than
+the aperture to be normalized, particularly if the aperture to be
+normalized extends beyond the edge of the data.  In this case set
+the all flag with 'a' to change the widths of all apertures at the same
+time.  The other interactive option is to fit the extracted normalization
+apertures using the ICFIT package.  The types of things
+one wants to do is set the type and order of the function and adjust
+the sigma clipping rejection parameters.  This may be done in such
+a way as to normalize to the continuum of a spectrum by rejecting
+the absorption (or emission lines).  This might be done for one
+spectrum and the same parameters used noninteractively by responding
+with "no" or "NO" for the rest of the fits.
+
+The parameter \fIthreshold\fR defines a minimum value for the normalization
+function to avoid dividing by very small numbers.  The normalization
+operations is done on each pixel within an aperture.  The edges of the
+aperture are rounded down for the lower edge and up for the upper edge.
+The final image may have a jagged edge which is normal.
+
+The output normalized two dimensional image with have the same dimension
+as the input image but will always have a real pixel datatype.  It is
+possible to replace the input image by the output image if no output
+image is given.
+.ih
+EXAMPLES
+To make a flat field image which leaves the total counts of the object
+images approximately unchanged from a quartz echelle or slitlet image:
+
+	cl> apnormalize qtz001,qtz002 flat001,flat002
+.ih
+SEE ALSO
+apio, apfind, apedit, aptrace, apsum, onedspec.continuum, longslit.response
+.endhelp

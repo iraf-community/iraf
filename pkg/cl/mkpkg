@@ -1,0 +1,132 @@
+# Make the CL.
+
+$call	relink				# make cl.e in current directory
+$exit
+
+update:					# make cl.e and install in bin$
+	$call	relink
+	$call	install
+	;
+
+relink:
+	# [MACHDEP] The following is machine dependent, but is exercised only
+	# on our software development system when changes are made to the
+	# grammar of the CL.  On other systems the files lexyy.c, ytab.c, and
+	# ytab.h may be used without modification.
+
+	$ifeq (hostid, unix)
+	    $ifolder (lexyy.c, grammar.l)
+		$echo "rebuilding lexyy.c"
+		!lex -t grammar.l | sed -f lex.sed > lexyy.c
+	    $endif
+	    $ifolder (ytab.c,  grammar.y)
+		$echo "rebuilding ytab.c"
+		!yacc -vd grammar.y; mv y.tab.c ytab.c; mv y.tab.h ytab.h
+	    $endif
+	$endif
+
+	$ifeq (siteid, stsci)
+	$ifeq (hostid, vms)
+	    $ifolder (lexyy.c, grammar.l)
+		$echo "rebuilding lexyy.c"
+		!lex grammar.l
+		!@lex.com
+	    $endif
+	    $ifolder (ytab.c,  grammar.y)
+		$echo "rebuilding ytab.c"
+		!yacc -vd grammar.y
+	    $endif
+	$endif
+	$endif
+
+	$update libpkg.a
+	$omake  cl.x
+	$omake	globals.c <libc/libc.h> <libc/stdio.h> <libc/spp.h>\
+		construct.h eparam.h operand.h param.h task.h
+	$omake	opcodes.c <libc/libc.h> <libc/spp.h> <libc/stdio.h> config.h\
+		construct.h errs.h grammar.h mem.h opcodes.h operand.h\
+		param.h task.h
+link:
+	$set	LIBS = "-lc -lcur -lds -lstg"
+	$link	cl.o globals.o opcodes.o libpkg.a $(LIBS)
+	;
+
+install:
+	$move	cl.e bin$
+	;
+
+libpkg.a:
+	binop.c		<libc/ctype.h> <libc/libc.h> <libc/math.h>\
+			<libc/spp.h> <libc/xnames.h> config.h errs.h operand.h
+	bkg.c		<libc/ctype.h> <libc/knames.h> <libc/libc.h>\
+			<libc/spp.h> <libc/stdio.h> <libc/xwhen.h>\
+			clmodes.h config.h errs.h mem.h operand.h param.h task.h
+	builtin.c	<libc/libc.h> <libc/spp.h> <libc/stdio.h>\
+			<libc/error.h> <libc/ttset.h> config.h errs.h\
+			mem.h operand.h param.h task.h 
+	clprintf.c	<libc/libc.h> <libc/spp.h> <libc/stdio.h>\
+			config.h errs.h operand.h param.h task.h
+	clsystem.c	<libc/libc.h> <libc/spp.h> <libc/stdio.h> errs.h
+	compile.c	<libc/libc.h> <libc/spp.h> config.h errs.h mem.h\
+			opcodes.h operand.h
+	debug.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h> config.h\
+			grammar.h mem.h opcodes.h operand.h param.h task.h
+	decl.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h> clmodes.h\
+			config.h construct.h errs.h grammar.h mem.h opcodes.h\
+			operand.h param.h task.h ytab.h
+	edcap.c		<libc/ctype.h> <libc/fset.h> <libc/libc.h> <libc/spp.h>\
+			<libc/stdio.h> config.h eparam.h operand.h param.h\
+			task.h
+	eparam.c	<libc/ctype.h> <libc/fset.h> <libc/libc.h> <libc/spp.h>\
+			<libc/stdio.h> <libc/ttset.h> <libc/error.h> config.h\
+			eparam.h errs.h grammar.h mem.h operand.h param.h task.h
+	errs.c		<libc/spp.h> <libc/stdio.h> <libc/xnames.h>\
+			<libc/knames.h> <libc/libc.h> <libc/setjmp.h>\
+			config.h construct.h errs.h grammar.h mem.h operand.h\
+			param.h task.h
+	exec.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h>\
+			<libc/xwhen.h> config.h errs.h grammar.h mem.h\
+			opcodes.h operand.h param.h task.h
+	gquery.c	<libc/libc.h> <libc/spp.h> <libc/stdio.h> clmodes.h\
+			config.h grammar.h operand.h param.h task.h
+	gram.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h> clmodes.h\
+			config.h construct.h errs.h grammar.h mem.h opcodes.h\
+			operand.h param.h task.h ytab.h
+	history.c	<libc/ctype.h> <libc/libc.h> <libc/spp.h>\
+			<libc/stdio.h> clmodes.h config.h errs.h grammar.h\
+			mem.h operand.h param.h task.h
+	lists.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h> config.h\
+			errs.h mem.h operand.h param.h task.h
+	main.c		<libc/error.h> <libc/fset.h> <libc/knames.h>\
+			<libc/libc.h> <libc/main.h> <libc/prtype.h>\
+			<libc/setjmp.h> <libc/spp.h> <libc/stdio.h>\
+			<libc/xwhen.h> <libc/xnames.h> clmodes.h config.h\
+			errs.h grammar.h mem.h opcodes.h operand.h param.h\
+			task.h
+	modes.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h>\
+			<libc/ttset.h> clmodes.h config.h construct.h errs.h\
+			grammar.h mem.h operand.h param.h task.h
+	operand.c	<libc/libc.h> <libc/spp.h> <libc/stdio.h> config.h\
+			construct.h eparam.h errs.h grammar.h mem.h operand.h\
+			param.h task.h
+	param.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h> clmodes.h\
+			config.h construct.h errs.h grammar.h mem.h operand.h\
+			param.h task.h
+	pfiles.c	<libc/ctype.h> <libc/finfo.h> <libc/libc.h>\
+			<libc/spp.h> <libc/stdio.h> config.h errs.h grammar.h\
+			mem.h operand.h param.h task.h
+	prcache.c	<libc/error.h> <libc/libc.h> <libc/prstat.h>\
+			<libc/spp.h> <libc/stdio.h> config.h errs.h task.h
+	scan.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h> config.h\
+			errs.h grammar.h operand.h param.h task.h
+	stack.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h> config.h\
+			errs.h mem.h operand.h param.h task.h
+	task.c		<libc/libc.h> <libc/spp.h> <libc/stdio.h> clmodes.h\
+			config.h errs.h mem.h operand.h param.h task.h
+	unop.c		<libc/libc.h> <libc/math.h> <libc/spp.h> <libc/stdio.h>\
+			<libc/xnames.h> config.h errs.h operand.h param.h task.h
+	ytab.c		<libc/ctype.h> <libc/lexnum.h> <libc/libc.h>\
+			<libc/spp.h> <libc/stdio.h> <libc/xnames.h> clmodes.h\
+			config.h construct.h errs.h grammar.h lexicon.c lexyy.c\
+			mem.h opcodes.h operand.h param.h task.h
+	;

@@ -1,0 +1,9 @@
+# Help directory for the DIGIPHOT package.
+
+$apphot		= "noao$digiphot/apphot/"
+
+apphot		men=apphot$apphot.men,
+		hlp=..,
+		sys=apphot$apphot.hlp,
+		pkg=apphot$apphot.hd,
+		src=apphot$apphot.cl

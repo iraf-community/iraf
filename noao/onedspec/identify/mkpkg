@@ -1,0 +1,35 @@
+# IDENTIFY Task
+
+$checkout libpkg.a ..
+$update   libpkg.a
+$checkin  libpkg.a ..
+$exit
+
+libpkg.a:
+	idcenter.x	identify.h
+	idcolon.x	identify.h <error.h> <gset.h> <pkg/center1d.h>
+	iddb.x		identify.h <math/curfit.h>
+	iddelete.x	identify.h
+	iddofit.x	identify.h
+	iddoshift.x	identify.h
+	identify.x	identify.h <mach.h> <pkg/center1d.h> <pkg/gtools.h>
+	idfitdata.x	identify.h
+	idgdata.x	identify.h <imhdr.h> <imio.h> <pkg/gtools.h>
+	idgetim.x	
+	idgraph.x	identify.h <gset.h> <pkg/gtools.h>
+	ididentify.x	identify.h <error.h> <gset.h> <imhdr.h>
+	idinit.x	identify.h <gset.h>
+	idlinelist.x	identify.h <error.h> <mach.h>
+	idlog.x		identify.h <time.h>
+	idmark.x	identify.h <gset.h> <pkg/center1d.h>
+	idnearest.x	identify.h
+	idnewfeature.x	identify.h <mach.h>
+	idpeak.x	identify.h
+	idreidentify.x	identify.h <error.h> <time.h>
+	idreplot.x	identify.h <pkg/gtools.h>
+	idrms.x		identify.h
+	idshift.x	identify.h
+	idshow.x	identify.h <pkg/center1d.h>
+	peaks.x	
+	reidentify.x	identify.h <fset.h> <imhdr.h> <imio.h> <pkg/dttext.h>
+	;

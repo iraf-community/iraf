@@ -1,0 +1,146 @@
+.help page Nov86 system
+.ih
+NAME
+page -- display a file or files one page at a time
+.ih
+USAGE
+page files
+.ih
+PARAMETERS
+.ls files
+The list of files.  If omitted, text is read from the standard input.
+.le
+.ls map_cc = yes
+Map non-printing control characters into printable form, e.g., BEL
+(ctrl/G, ASCII 7) is printed as "^G".
+.le
+.ls clear_screen = no
+If set, the screen is cleared before each page is written.
+.le
+.ls first_page = 1
+The first page to be printed.  Pages are defined by form feed characters
+embedded in the text.
+.le
+.ls prompt = ""
+Optional prompt string for the end-of-page prompt.  If no prompt string is
+given the name of the file being paged is used.
+.le
+.ls device = "terminal"
+The output device.  The special device \fItext\fR may be specified to
+represent standout mode with upper case rather than reverse video characters.
+.le
+.ih
+DESCRIPTION
+\fIPage\fR displays a file on the terminal, one page of text at a time,
+pausing between successive pages of output until a key is typed on the
+terminal.  Pages are normally broken when the screen fills, but may also
+be delimited by form feed characters embedded in the input text.
+A prompt is printed after each page of text naming the current file,
+showing the percentage of the file which has been displayed, and the numeric
+order of the file within the file list if a file template was given.
+
+When the end of page prompt is displayed any of the following command
+keystrokes may be entered.  Command keystrokes are input in raw mode,
+i.e., no carriage return is required to pass the command to the program.
+
+.ks
+.nf
+	.		go to the beginning of the current file    [BOF]
+	:		colon escape (see below)
+	?		display a one-line command summary
+	G		go to the end of the current file          [EOF]
+	N,<ctrl/n>	go to the next file
+	P,<ctrl/p>	go back to the previous file
+	b		back up one page
+	d		scroll down half a page of text
+	e		edit the current file
+	f,space		advance to the next page
+	j,return	scroll down one line
+	k		back up one line
+	n		search for the next occurrence of a pattern
+	q		quit
+	u		back up half a screen
+
+	<ctrl/c>	quit (interrupt)
+	<ctrl/z>	quit (EOF)
+	<ctrl/d>	quit (EOF)
+.fi
+.ke
+
+If an unrecognized keystroke is entered the terminal will beep.  The following
+colon commands are recognized in addition to the single keystroke commands
+described above.
+
+.ks
+.nf
+	:!<clcmd>	send a command to the CL (:!! for host command)
+	:/<pattern>	advance to line matching the given pattern
+	:file <fname>	display file "fname" (may be abbreviated)
+	:help		print summary of colon commands
+	:line [+/-]N	goto line N (relative move if +/- given)
+	:spool <fname>	spool output to the named file
+.fi
+.ke
+
+The \fI:clcmd\fR facility is used to send commands to the CL from within
+the context of the pager.  For example, ":!cl" will temporarily suspend the
+pager, allowing CL commands to be entered until the command "bye" is entered,
+causing execution of the pager to resume.  Note that since the \fIpage\fR
+task resides in the system process \fIx_system.e\fR, it will be necessary
+for the CL to connect a second system process if the command issued calls
+another task in the system package, since the first system process will
+still be running, i.e., executing the \fIpage\fR task.  This is harmless,
+but the second process may be removed from the process cache with
+\fIflprcache\fR if desired, after exiting the original \fIpage\fR task.
+
+The sequence ":/" followed by a pattern will cause the current input stream
+to be searched for the next occurrence of the pattern given.  A pattern once
+entered is retained indefinitely and may be used in subsequent searches by
+typing the single keystroke `n', without need to reenter the pattern.
+Searching stops at the end of the current file, requiring a `.' to wrap back
+around to the beginning of the file, or a `N' to advance to the next file.
+
+The \fI:file\fR command is used to change the current position within the
+file list specified by \fIfiles\fR, and may not be used to page a file not
+specified in the initial template.  Note that the filename may be abbreviated,
+and that searching stops with the first file lexically greater than or equal
+to the given string (hence ":file x" might return file "y").
+
+The \fI:line N\fR command may be used to randomly position to the indicated line
+within the current file.  If the line number argument N is preceded by a plus
+or minus the argument is taken to be an offset from the current position.
+
+The \fI:spool\fR command is used to spool output to a file.  Each time a
+file line is printed on the screen, it is appended to the named file as well.
+One can interactively position to the desired line of the file and then turn
+on spooling to extract a portion of the file or stream being displayed.
+A subsequent \fI:spool\fR command with no filename will turn spooling off.
+Issuing a \fI:spool\fR to begin spooling on a new file when already spooling
+to some other file will cause the old spool file to be closed.
+.ih
+EXAMPLES
+
+1. Page through all of the files in the directory "lib" which have
+the extension ".h".
+
+	cl> page lib$*.h
+
+2. Use \fIhelp\fR to format the text in the file "doc$spp.hlp", displaying
+the formatted document beginning on page 5 (the entire document has to be
+formatted first so it takes a minute or so to get any output).
+
+	cl> help doc$spp.hlp fi+ | page first=5
+
+3. Run \fIrfits\fR to print a long format listing of the headers of a series
+of FITS images from a magnetic tape, directing the output through \fIpage\fR
+so that it does not flash by when you aren't looking.
+
+	cl> rfits mta make- long+ | page
+.ih
+BUGS
+Since \fIpage\fR does not currently buffer any input text, backwards motions
+and absolute line positioning are not permitted when paging the standard input.
+.ih
+SEE ALSO
+type, match, head, tail
+.endhelp

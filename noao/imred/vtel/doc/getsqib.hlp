@@ -1,0 +1,33 @@
+.help getsqib Jan85 noao.imred.vtel
+.ih
+NAME
+getsqib -- Extract a full disk squibby brightness image from a full disk image
+.ih
+USAGE
+getsqib inputimage outputimage
+.ih
+PARAMETERS
+.ls inputimage
+Name of image to get squibby brightness from.
+.le
+.ls outputimage
+Name of new output squibby brightness image.
+.le
+.ih
+DESCRIPTION
+Getsqib takes as input any full disk image and extracts the lower four bits
+from each pixel and stores this information in a new output image the same
+size as the input image.
+.ih
+EXAMPLES
+1. To extract the squibby brightness image from the image "test1" and store
+it in an image called "test1.sqib" the command would be:
+
+.nf
+	vt> getsqib test1 test1.sqib
+.fi
+
+.ih
+SEE ALSO
+putsqib
+.endhelp

@@ -1,0 +1,61 @@
+.help newextraction Jul84 noao.twodspec.multispec
+.ih
+NAME
+newextraction -- Initialize a new MULTISPEC extraction
+.ih
+USAGE
+newextraction image template
+.ih
+PARAMETERS
+.ls image
+Image to be extracted.
+.le
+.ls template
+The previously created database for the template image is used to initialize
+the new database.  If the null string is given then the database is not
+initialized.
+.le
+.ls sample_lines = "10x50"
+Sample image lines in which the spectra positions are to be determined and,
+optionally, modeled.  This parameter is not used if a template image is given.
+.le
+.ih
+DESCRIPTION
+To extract the spectra from a multi-spectra image a database must be created
+and associated with the image.  This task creates the database with a name
+formed by adding the extension '.db' and initializes some of the database
+entries.
+
+The sample lines are used to track the spectra positions and, if an analytic
+profile model is to be fit to the spectra, to map profile shape changes.
+The image lines only need be sampled enough to track \fInon-linear\fR position
+distortions and significant profile shape changes since interpolation
+is used between the sample lines.  Though specifying just one sample
+line is allowed using at least two sample lines is recommended to allow for
+any slope in the position of the spectra.  Specifying all the image lines
+will greatly increase the processing time and is never justified.
+
+Using a previous database to initialize the new database is useful if the
+new image is only slightly different in the positions and profiles of the
+spectra.  In some cases extraction may proceed immediately without any
+further position determination and modeling.  Further modeling
+and spectra position determinations will refine the previously determined
+parameters with an increase in execution time.  Using a template image is
+particularly important if the first image extracted has strong spectra
+and subsequent images have much weaker spectra since the automatic spectra
+position location and profile modeling may yield poor results for very weak
+spectra.
+.ih
+EXAMPLES
+To initialize a MULTISPEC database for extracting the spectra in
+the image \fIimage1\fR:
+
+	cl> newextraction image1 ""
+
+To create a new MULTISPEC database for extracting the spectra in
+the image \fIimage2\fR  using \fIimage1\fR as a template image:
+
+.nf
+	cl> newextraction image2 image1
+.fi
+.endhelp

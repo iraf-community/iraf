@@ -1,0 +1,194 @@
+.help aptrace Jan88 noao.twodspec.apextract
+.ih
+NAME
+aptrace -- Trace spectra for aperture extraction
+.ih
+USAGE
+.nf
+aptrace images
+.fi
+.ih
+PARAMETERS
+.ls input
+List of input images to be traced.  The list may be
+an image template including image sections and concatenations or an
+"@" file.  The dispersion axis must be defined in the image headers
+using \fBsetdisp\fR or \fBhedit\fR.
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supercedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+The special image "last" may be used to specify the last set of
+apertures written to the database.
+.le
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing, trace
+fitting, and sum extraction reviews are disabled.  When run interactively
+queries may be suppressed by responding with "NO" or "YES".
+.le
+.ls recenter = yes
+Recenter the reference apertures in the input image?
+.le
+.ls find = yes
+Find the apertures automatically?  In order for apertures to be found
+automatically there must be no apertures for the input image or reference
+image defined in the database and the parameter \fIapfind.nfind\fR must
+be greater than zero.
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls trace = yes
+Trace the apertures?
+.le
+.ls fittrace = yes
+Interactively fit the traced positions by a function?  The \fIinteractive\fR
+parameter must also be yes.
+.le
+.ls line = INDEF
+The starting dispersion line (line or column perpendicular to the dispersion
+axis) for the tracing.  A value of INDEF starts at the middle of the image.
+.le
+.ls nsum = 1
+Number of dispersion lines to be summed at each step along the dispersion.
+.le
+.ls step = 10
+Step along the dispersion axis between determination of the spectrum
+positions.
+.le
+
+
+The following parameters are the defaults used to fit the traced positions
+by a function of the dispersion line.  These parameters are those used by
+the ICFIT package.
+.ls function = "legendre"
+Default trace fitting function.  The fitting function types are
+"chebyshev" polynomial, "legendre" polynomial, "spline1" linear spline, and
+"spline3" cubic spline.
+.le
+.ls order = 2
+Default trace function order.  The order refers to the number of
+terms in the polynomial functions or the number of spline pieces in the spline
+functions.
+.le
+.ls sample = "*"
+Default fitting sample.  The sample is given by a set of colon separated
+ranges each separated by either whitespace or commas.  The string "*" refers
+to all points.
+.le
+.ls naverage = 1
+Default number of points to average or median.  Positive numbers
+average that number of sequential points to form a fitting point.
+Negative numbers median that number, in absolute value, of sequential
+points.  A value of 1 does no averaging and each data point is used in the
+.le
+.ls niterate = 0
+Default number of rejection iterations.  If greater than zero the fit is
+used to detect deviant traced positions and reject them before repeating the
+fit.  The number of iterations of this process is given by this parameter.
+.le
+.ls low_reject = 3., high_reject = 3.
+Default lower and upper rejection sigma.  If greater than zero traced
+points deviating from the fit below and above the fit by more than this
+number of times the sigma of the residuals are rejected before refitting.
+.le
+.ls grow = 0.
+Default reject growing radius.  Traced points within a distance given by this
+parameter of any rejected point are also rejected.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters are taken from the task \fBapio\fR, the default aperture
+parameters are taken from the task \fBapdefault\fR, parameters used
+when finding apertures are taken from \fBapfind\fR, and editing and
+centering parameters are taken from \fBapedit\fR.
+.ih
+DESCRIPTION
+For each image in the input image list the positions of the spectrum
+within each aperture are determined at a number of points along the
+dispersion axis and a smooth function is fit to these positions.  The
+fitted curve defines a shift to be added to the aperture center at each
+wavelength.  Other options allow defining apertures using a reference
+image, defining apertures through
+an automatic finding algorithm (see \fBapfind\fR), and interactively
+editing the apertures prior to tracing (see \fBapedit\fR).  Tracing is
+selected with the parameter \fItrace\fR.  If the tracing is done
+interactively (the \fIinteractive\fR parameter set to yes) then the
+user is queried whether or not to trace each image.  The responses are
+"yes", "no", "YES", or "NO", where the the upper case queries suppress
+this query for the following images.
+
+The tracing begins with the specified dispersion line.  A dispersion
+line is a line or column of the image perpendicular to the dispersion
+axis.  The dispersion axis must be defined in the image header.  If the
+starting dispersion line is INDEF then the middle dispersion line of
+the image is used.  The positions of the spectra are determined using
+the \fBcenter1d\fR algorithm and the centering parameters from the
+\fBapedit\fR task.  (See help under \fBcenter1d\fR for a
+description of the one dimensional position measuring algorithm.) The
+positions are redetermined at other points along the dispersion axis by
+stepping from the starting line in steps specified by the user.  A
+number of dispersion lines around each dispersion line to be measured
+may be summed to improve the position determinations, particularly for
+weak profiles.  This number usually is set equal to the tracing step.
+
+It is important to understand how to set the step size and the
+relationship between the step size and the centering error radius.
+Larger steps reduce the computational time, which is an important
+consideration.  However, if the step is too large then the tracing may
+fail to follow the systematic changes in the positions of the
+spectrum.  The centering error radius, \fIapedit.radius\fR, is used to limit
+the maximum position change between two successive steps.  If the
+positions of a spectrum changes by more than the specified amount in
+one step then that position is assumed to be bad and is not used.  An
+attempt is made to recover the trace in the next step starting from
+the last valid position.  If the new position changes again by more
+than \fIradius\fR then tracing for that aperture in that direction is
+terminated.  The centering radius should be large enough to follow
+changes in the spectrum positions from point to point but small enough
+to detect an error in the tracing by a sudden abrupt change in position,
+such as caused by crowding with other spectra or by the disappearance
+of the spectrum.
+
+The parameter \fIapedit.threshold\fR checks for the
+vanishing of a spectrum by requiring a minimum range in the data used for
+centering.  If the tracing fails when the spectra are strong and
+well defined the problem is usually that the step size is too large
+and/or the centering error radius is too small.
+
+The traced positions of a spectrum include some measurement variation
+from point to point.  Since the actual position of the spectrum in the
+image should be a smooth curve, a function of the dispersion line is fit
+to the measured points.  The fitted function is stored as part of the
+aperture description.  It is an offset to be added to the aperture's
+center as a function of the dispersion line.  Even if the fitting is not
+done interactively plots of the trace and the fit are recorded in the
+plot file or device specified by the paramter \fIapio.plots\fR.
+
+Fitting the traced spectrum positions with a smooth function may be
+performed interactively when parameters \fIfittrace\fR and
+\fIinteractive\fR are yes.  This allows changing the default fitting
+parameters.  The function fitting is done with the interactive curve
+fitting tools described under the help topic \fBicfit\fR.  There are
+two levels of queries when fitting the spectrum positions
+interactively; prompts for each image and prompts for each aperture in
+an image.  These prompts may be answered individually with the lower
+case responses "yes" or "no" or answered for all further prompts with
+the responses "YES" or "NO".  Responding with "yes" or "YES" to the
+image prompt allows interactive fitting of the traced positions for the
+spectra.  Prompts are then given for each aperture in the image.  When
+an spectrum is not fit interactively the last set of fitting parameters
+are used (initally the default function and order given by the task
+parameters).  Note that answering "YES" or "NO" to a aperture prompt
+applies to all further aperture in the current image only.  Responding
+with "no" or "NO" to the image prompt fits the spectrum positions for
+all apertures in all images with the last set of fitting parameters.
+.ih
+EXAMPLES
+.ih
+SEE ALSO
+apfind, apedit, center1d, icfit
+.endhelp

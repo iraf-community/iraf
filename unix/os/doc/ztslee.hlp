@@ -1,0 +1,31 @@
+.help ztslee May84 "System Interface"
+.ih
+NAME
+ztslee -- suspend process execution (sleep)
+.ih
+SYNOPSIS
+.nf
+ztslee (nseconds)
+
+int	nseconds		# number of seconds to sleep
+.fi
+.ih
+DESCRIPTION
+Process execution is suspended for \fInseconds\fR seconds.
+If \fInseconds\fR is negative or zero control returns immediately.
+.ih
+RETURN VALUE
+None.
+.ih
+NOTES
+The maximum number of seconds that a process can be put to sleep is
+given by the machine constant MAX_INT.
+.ih
+BUGS
+There is currently no way to generate a delay of less than a second.
+An applications program cannot reliably slice time that fine on a
+multiuser timesharing operating system.
+.ih
+SEE ALSO
+zgtime
+.endhelp

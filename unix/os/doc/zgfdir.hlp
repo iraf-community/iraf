@@ -1,0 +1,37 @@
+.help zgfdir May84 "System Interface"
+.ih
+NAME
+zgfdir -- get next filename from a directory
+.ih
+SYNOPSIS
+.nf
+zgfdir (chan, osfn, maxch, status)
+
+int	chan			# OS channel of directory file
+packed	char osfn[maxch]	# output filename
+int	maxch, status
+.fi
+.ih
+DESCRIPTION
+The next machine dependent filename is returned from the directory file
+connected to \fIchan\fR.  Filenames are not returned in any particular order.
+The filename is returned as an EOS delimited packed string with no newline.
+.ih
+RETURN VALUE
+The number of characters in the filename excluding the EOS delimiter is
+returned for a successful read.  EOF is returned when the directory is
+exhausted.  ERR is returned if there is something wrong with \fIchan\fR,
+if a read error occurs, or if the output string overflows.
+.ih
+NOTES
+Although this primitive returns simple, raw host filenames, it will not
+necessarily return all of the filenames in a directory.  On a UNIX system
+for example, filenames which begin with the character "." are skipped over
+when reading from a directory.  On a VMS system only the most recent version
+of a file should be returned (with the version label stripped).  The kernel
+may employ hidden files for special purposes; normally these should be
+hidden from the high level code and from the user.
+.ih
+SEE ALSO
+zopdir, zcldir, zfinfo, zfacss
+.endhelp

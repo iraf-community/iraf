@@ -1,0 +1,20 @@
+# Library for making IMAGE UTILITIES tasks
+
+$checkout libpkg.a pkg$images/
+$update libpkg.a
+$checkin libpkg.a pkg$images/
+$exit
+
+libpkg.a:
+	t_chpix.x	<error.h> <imhdr.h> <fset.h>
+	t_imcopy.x	<imhdr.h>
+	t_imrename.x
+	t_imslice.x	<error.h> <imhdr.h> <fset.h> <ctype.h>
+	t_imstack.x	<imhdr.h>
+	imcopy.x	<imhdr.h>
+	imdelete.x	<imhdr.h> <error.h>
+	hedit.x		<error.h> <evexpr.h> <imset.h> <ctype.h> <lexnum.h>
+	t_minmax.x	<error.h> <imhdr.h> <imset.h>
+	minmax.x	<imhdr.h>
+	imminmax.x	<imhdr.h>
+	;

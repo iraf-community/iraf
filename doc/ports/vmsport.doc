@@ -1,0 +1,1271 @@
+> From stsci Mon Dec 17 06:37:53 1984
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA15814; Mon, 17 Dec 84 06:37:48 mst
+> Date: Mon, 17 Dec 84 06:37:48 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8412171337.AA15814@lyra.noao.UUCP>
+> To: tody
+> Subject: VMS .dir files
+> Status: R
+> 
+> Doug,
+> 
+> Had some questions on how you handle directory files, especially in VMS.
+> The filename mapping stuff takes a ".DIR" file on VMS and strips it off
+> for IRAF.  Is there a need to go the other way, and if so, how do you do
+> it ?  Do you keep a flag that says that a particular file is a DIRECTORY_FILE?
+> The reason I ask, is that ZFINFO is supposed to tell whether a file is
+> a directory file.  Before, for VMS, zfinfo just looked for the ".DIR"
+> extension.  I have since modified it to do an additional check on files
+> with null extensions, if it doesn't find the file in the 1st place.
+> (since testing the single directory bit in the file header on VMS takes
+> about 100 lines of code!!)  I guess my overall question here is do you map
+> the names back, somehow, for the case of zfinfo, or should I just keep my
+> extra little check in there in case a file with a null extension comes in?
+
+The directory files are unique in the filename mapping scheme because they
+have no extension in IRAF form, as when listing a directory (this is controlled
+by the extension mapping string in config.h).  This is necessary for
+compatibility with UNIX and to ease pathname generation, e.g., "a/b/c" is
+easy to generate if directory filenames are returned as "a", "b", etc.,
+but no so easy if they are "a.d", "b.d", and so on.  If we used the second
+form with the ".d" extension, and tried to add the ability to generate the
+extension on UNIX via an FSTAT call on each file, listing a directory on UNIX
+would be prohibitively expensive.  If we put the ".d" extension explicitly
+in the directory name on UNIX, then it would have to appear explicitly in
+all UNIX pathnames and other directory file references.
+
+For these and other reasons, it seemed that the simplest solution was to
+omit the extension for directory references.  Directory files are almost always
+referenced in a context where it is known that the file is a directory,
+hence the kernel can add the extension if it needs to.  Normally the kernel
+will receive a directory filename with a null extension.  ZFINFO should
+definitely make an explicit check to see if a file is a directory, rather
+than merely looking at the filename.  As far as I can remember, all other
+kernel primitives know if they are dealing with a directory file.  Note that
+ZFACSS was recently modified to add the DIRECTORY_FILE file type, used when
+checking for the existence of a directory file (the new filetype tells the
+kernel to add the ".dir" extension).
+
+The high level code does not maintain any flags telling which files are
+directory files.  In no case is a directory extension appended, except in
+a machine dependent name entered by the user.
+
+> Also, re filename mapping, it seems that filenames without extensions
+> (including
+> directory files once they've been mapped on VMS) don't get listed correctly
+> by the directory task in /pkg/system/.  It seems to be a problem with
+> /sys/clio/fntgfn.x, but I'm not sure - I'll see if I can locate it and fix it.
+> It does the following:
+> 
+> 	Files  --> File
+> 	Makefile  -->  Makefi
+> 	README   -->  READM
+
+The function of FNTGFN is to expand filename templates, i.e., read VFN's from
+a directory or directories using DIROPEN, select all filenames which match a
+pattern, returning a list of filenames as output.  It is unlikely that this
+code could perturb a filename in the manner described.  I recommend writing
+an SPP test program which calls DIROPEN to verify that VFN's are being read
+from the directory correctly, before doing anything to FNTGFN.  The latter
+package should be machine independent.
+ 
+By the way, the DIRECTORY task has bugs (machine independent) which are
+annoying, but should not affect the basic operation of the routine.
+These will be fixed eventually with a new version of DIRECTORY, but this
+is not a high priority item at present.
+
+> Other than that, things are coming along; the system and help packages are up
+> and running standalone, and the CL is coming along -- we had to backtrack a 
+> little and redo the old fixes for VMS...
+> 
+> Jay.
+
+
+> From stsci Mon Dec 17 13:58:50 1984
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA22347; Mon, 17 Dec 84 13:58:44 mst
+> Date: Mon, 17 Dec 84 13:58:44 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8412172058.AA22347@lyra.noao.UUCP>
+> To: tody
+> Subject: iraf
+> Status: R
+> 
+> Doug,
+>   I hope you didn't get that last letter. I got hugh up on. Any way, I have a
+> couple of iraf questions. I will start with the simple one first.
+> How long should
+> EOF last in the terminal driver?? Currently I return EOF once for each time it
+> is typed. THis could be changed to only happening at beginning of line, or so
+> that EOF is given for every call to zgetty after the first EOF is typed.
+
+Treat EOF like a character, except that EOF is not returned if there is any
+data left to return.  An input line, delimited by EOF but not newline, is
+returned as a line of text not delimited by newline, followed by EOF in the
+next read.  The next read after that will return the next line of text from
+the terminal, i.e., EOF does not "stick".
+
+>   Also I got my problem fixed with task definitions. I had a tp = tp + TASKSIZ
+> instead of tp = tp + TASKSIZ * BPI. We had to changed to this format since
+> TASKSIZ * BPI is different from the actual size of the task structure in
+> VMS. I changed all of the tp++ and tp + 1 to this format. Also I decided to
+> use a macro instead to get to the next task structure so I didn't run into
+> the problem again.
+
+Right, I recognize that as one of the more subtle bugs that Jim discovered
+working with the prototype version of the system.  Sorry that the bugfix did
+not get into the version of the CL that you received.
+
+>   Now for a couple of problems. The cl currently gets up on its own, but will
+> not talk to any subprocesses. What happens is that it sends the one piece
+> of data to the subprocess, and then the subprocess kind of takes off and reads
+> millions of bytes of data instead of just 4 (internal length of data package).
+> It apears from the debugs that I get that zardpr is not being used to get
+> the data??? I don't know if you have seen this before.
+
+You might have a look at the UNIX version of ZFIOPR.  This driver contains
+support for debugging IPC.  Debugging IPC with the OS debugger is difficult
+or impossible.  I instead put a debugging switch in the driver (an external
+variable named debug_ipc, settable with the debugger before or during
+execution), which causes debugging information to be printed during task
+execution.  There is also a "-C" flag on the UNIX IRAF Main which causes
+the task to run standalone in CONNECTED mode, using the IPC driver, but packs
+and unpacks char data so that I can run in IPC mode from a terminal.
+Installing something similar in the VMS IPC driver would make it easier to
+debug problems involving IPC.
+
+If ZARDPR is not being called to read from CLIN it may be because the integer
+entry point address of ZARDPR, as returned by ZLOCPR, is not being passed
+correctly to the IRAF Main by the ZMAIN.
+
+I am not sure what the 4 byte quantity referred to is.  The 4 byte record
+header used in the UNIX IPC driver is peculiar to UNIX and is not necessary
+on a system which supports record level IPC i/o.  UNIX pipes are byte streams,
+causing record boundaries to be lost, and I had to use the 4 byte header to keep
+records intact across the pipe.  All knowledge of the 4 byte record header
+is concentrated into the UNIX IPC driver.  The high level code merely
+calls ZARDPR, ZAWRPR, and ZAWTPR to read and write headerless records.
+
+> Opps got hung up on again... 
+>   Another problem I had was with the -c flag. It seems that irafmain redirects
+> i/o to the null device on task startup and shutdown. After redirecting
+> STDOUT and STDERR, it sets them with fseti so that they are no longerT
+> 
+> Hung up again...
+> redirected, but does not swap the fd's back again. Then on task shutdown, it
+> does through and closes the users files that weren't kept and manages to
+> close the redirected stdout and stderr because they were copeid into a file
+> descriptor greater than last_fd. Have you seen this before??. This also
+> may be my problem with subprocess also.
+>                                 fred.
+> 
+
+The STDOUT and STDERR streams are redirected to the null file during
+process startup when in CONNECTED mode (when process is spawned by CL).
+Redirection is effected with FREDIR and cancelled with CLOSE, not FSETI.
+FSETI is used to set the redirect flag in FIO if the stream has been
+redirected remotely by the CL.
+
+The redirection to dev$null during startup and shutdown is a new wrinkle
+added to the IPC protocol since the Sys.Int.Ref.Man was written.  What
+happens is:
+
+	cl spawns subprocess
+					subprocess runs IRAF Main
+					Main redirs STDOUT,STDERR -> dev$null
+	cl sends envlist (sequence of
+	    SET statements)
+	cl sends chdir curdir
+	cl sends "_go_"
+					Main cancels redirection
+
+The CL (actually, etc$propen.x) must send the "_go_" command to the subproc
+to tell it that process startup is complete.  Output is discarded during
+startup to avoid deadlock due to two processes writing to the IPC at the
+same time.
+
+Redirection is cancelled when the "_go_" is received by closing the affected
+files.  The FD's are swapped back at CLOSE time.  If the redirection during
+startup is not being cancelled it is probably because the Main is not seeing
+the "_go_" command.
+> From stsci Thu Dec 20 09:05:22 1984
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA05472; Thu, 20 Dec 84 09:05:17 mst
+> Date: Thu, 20 Dec 84 09:05:17 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8412201605.AA05472@lyra.noao.UUCP>
+> To: tody
+> Subject: help db
+> Status: R
+> 
+> Doug,
+> 
+> Jay here; having a bit of trouble with the help database.  Running help
+> standalone, I can do a mkhelpdb on lib$root.hd and it gets all the way to
+> the end before dying.  It seems to die when it tries to make the root/index
+> entry, though I'm a little shaky on what's actually going on there.
+> 
+> Does it read back the entire help db and then try to make a full index ?
+> If so, then the problem is probably in our binary file driver.  That's what
+> it looks like to me, anyway.  Any ideas, suggestions on where to look?...
+
+I could help more if I knew more about how it is dying.  On UNIX one usually
+gets a fault which can be caught by the debugger, after which one does a
+stack trace to find out where the crash occurred.  The most common cause of
+faults are memory violations of various flavors.  Unfortunately any bugs
+having to do with memory violations are usually hard to track down, because
+the fault is often not remotely related to the bug which caused memory to be
+overwritten.  In the event of a memory violation of unknown origin I usually
+take the brute force debugging approach, i.e., I first find out what region
+of memory is getting clobbered and then repeatedly rerun the program, doing
+a binary search for the code which is causing memory to be clobbered by
+setting breakpoints in time sequence.  This always works but requires intimate
+knowledge of the code and a good debugger.  Probably you should try to avoid
+this and check the low level routines first.
+
+From what you are saying it sounds like the problem is most likely in
+hdb_make_rhd() in helpdb.x.  I agree that the most likely cause of the problem
+is the binary file driver.  During compilation compiled help directories are
+appended to the help database.  This is done as follows:
+
+	NOTE is called to note the one-indexed XCHAR offset at which
+	    the next segment will be written.  FIO keeps track of this
+	    itself (not the kernel) hence this should not be the problem.
+	WRITE is called twice to append the two parts of a compiled help
+	    directory to the output file.  Since output is buffered there
+	    may or may not be a corresponding call to ZAWRBF.
+
+This sequence is repeated for each help directory in the system.  When the
+tree has been exhausted the file position is NOTEd and used to compute the
+length of the data area.  HDB_MAKE_RHD is then called to make the root
+help directory, taking the following FIO operations:
+
+	SEEK to the beginning of the data area.  This will lead to a file
+	    fault to the file buffer containing the seek offset, i.e.,
+	    ZARDBF will be called to read in a file buffer somewhere back
+	    toward the beginning of the file.  This is something to check
+	    since it is a random access and most or all file accesses thus
+	    far tested have been sequential.
+
+	READ is called to read in the entire data area.  The resulting kernel
+	    level operations are likely to be the following:
+
+		- ZAWRBF to flush the buffer at the end of the file
+		- a sequence of ZARDBF calls to read the file buffers
+		    containing the data segment (which is large, about 70KB).
+		- for each ZARDBF there will be one or more calls to AMOVC,
+		    which is optimized in assembler calling the VAX MOVC3
+		    instruction (check that).
+
+The memory allocation routines are absolutely crucial to all of this (and to
+the whole system), and are another possible source of trouble.  In particular,
+you might check ZRALOC, which is rarely used but is definitely used here.
+The things to check are the pointer (if the buffer moves, is the returned
+pointer a pointer to XCHAR) and the data alignment (if the buffer moves, the
+buffer contents should be simply copied as a byte array with no byte shifts;
+the high level code will shift the data to correct any alignment problems).
+
+> Also, the help tasks like lroff, mkhelpdb, and hdbexamine - can they be
+> run from under the CL ?  I can't seem to get them to work there , so I'm
+> just running them standalone...
+> 
+> Jay
+> 
+
+These tasks are available in the package SOFTOOLS and are nothing special.
+They should run just like any other task.  It is misleading because the
+source is in pkg$help and the task declarations are in pkg$softools.
+I will put a comment in the README.
+
+--Doug
+> From stsci Thu Dec 20 11:32:09 1984
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA06285; Thu, 20 Dec 84 11:32:02 mst
+> Date: Thu, 20 Dec 84 11:32:02 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8412201832.AA06285@lyra.noao.UUCP>
+> To: tody
+> Subject: file name mapping
+> Status: R
+> 
+> Doug,
+>   I am running into a couple of small problems. I am trying to use VFNDEL
+> from xc. I have a file name t_rcardimage.x. I generate t_rcardimage.r and
+> then t_rcardimage.f. At this point t_rcardimage.f maps to tj8rcarde.for
+> which I would guess is correct. I then delete the entry for t_rcardimage.r
+> the mapping for t_rcardimage.f then changes to t_widsout.r. Have you
+> seen this before? Also from the cl if i delete a file in a directory and
+> then try to do a directory listing of that directory I get:
+> "Cannot open file drb4:[...]zzfnmap.zvf". May question is does the
+> filename mapping still have the mapping file open for write or read_write
+> access?? VMS has a tendancy to lock files against read if someone else is
+> writing it.
+>                                  fred.
+
+Fred--
+
+    This one is a bug in the high level code.  The filename mapping code could
+not delete files with long filenames properly.  There were two independent
+bugs, for which I have included fixes below.  I have tested this on UNIX
+after compilation with the VMS file parameters in config.h (that's the best
+I can do without going to a lot of trouble).
+
+The bug was such that file deletion of a file with a long filenames will have
+corrupted your zzfnmap.zvf mapping file (the first long filename will have
+been overwritten).  After the bug fix, however, the mapping file will again
+be readable and can probably be patched up with a rename or something.
+
+FIO knows whether or not the OS locks files opened for writing, as is the case
+for VMS.  If the file is locked by another process FIO will wait for it to
+become available.  FIO is careful to open the mapping file for as brief a time
+as possible to minimize contention problems.  Care is taken to avoid deadlock
+between concurrent processes in cases such as a rename where it may be
+necessary to open two different mapping files (what a pain that was...).
+This sort of thing should not be a source of problems unless there is a bug.
+See fio$doc/vfn.hlp if you want to know the nasty details.
+
+By the way, if a file such as "t_rcardimage.x" should appear as "t_rcarde.x"
+in a directory listing, that is a sign that FIO could not find an entry for
+the file in the mapping file.  You reported something like this a while back.
+Let me know if the problem should recur.
+
+	--Doug.
+
+
+[1] VFNMAP.X line 115, old ......................................:
+
+    define	FN_VFN		Memc[M_FNMAP($1)+($2*2-2)*LEN_FN]
+    define	FN_OSFN		Memc[M_FNMAP($1)+($2*2-1)*LEN_FN]
+
+[1] VFNMAP.X line 115, new
+
+    define	FN_VFN		Memc[M_FNMAP($1)+(($2)*2-2)*LEN_FN]
+    define	FN_OSFN		Memc[M_FNMAP($1)+(($2)*2-1)*LEN_FN]
+
+
+[2] VFNMAP.X line 729, old ......................................:
+
+    # entire MFD is written to the mapping file.
+
+    checksum = vvfn_checksum (Memi[mfd+1], (len_file - 1) * SZ_INT)
+    ntrys = ntrys + 1
+
+[2] VFNMAP.X line 729, new
+
+    # entire MFD is written to the mapping file.  Note that the
+    # file will contain garbage at the end following a file
+    # deletion (the file list gets shorter but the file does not).
+    # Compute checksum using only the valid file data, since that
+    # is how it is computed when the file is updated.
+
+    len_file = LEN_MFD - (MAX_LONGFNAMES - M_NFILES(mfd)) *
+	(SZ_FNPAIR / SZ_STRUCT)
+    checksum = vvfn_checksum (Memi[mfd+1], (len_file-1) * SZ_INT)
+
+    ntrys = ntrys + 1
+Re: file not closed when filename mapping --
+
+    I fixed the same bug in the version here, so you won't see it next time
+around.
+
+> From stsci Wed Jan  2 06:42:10 1985
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA26294; Wed, 2 Jan 85 06:42:05 mst
+> Date: Wed, 2 Jan 85 06:42:05 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8501021342.AA26294@lyra.noao.UUCP>
+> To: tody
+> Subject: file i/o
+> Status: R
+> 
+> Doug,
+>   We had a problem with the interaction between iraf file i/o and the
+> zroutines. The problem seems to be with the asynchronousity. If we do the
+> same thing as unix everything flys, but if we make it asychronous, it falls
+> apart. The file name mapping works just fine, and so have our tests with it
+> running asychronously [[synchronously?]].  Is it possible that the iraf fio
+> plays with the buffer before the operation has completed??
+
+The FIO code was written to call ZAWTBF after every i/o request, before using
+the buffer, but this mode of operation has never been tested since UNIX is not
+asynchronous.  My feeling is that it is not worthwhile to test this mode of
+operation until FIO supports more than one buffer per file.  The current
+interface still supports only one buffer internally, so you have to wait on
+every i/o operation in any case, and having asynchronous primitives does not
+make much difference (I just use very large buffers when I want it to go fast).
+Unless you can find the bug in FIO without spending a lot of time, it might
+be best to leave this until I modifiy FIO to support multiple buffers,
+at which time the bug will certainly disappear.  For the moment it is
+sufficient to test the asynchronous features of the zroutines outside FIO.
+
+>   Has anything happened with the new process caching. We do the impression
+> (oops got) that there would be more changes in the cl. Something about having
+> a bunch of processes loaded but not having the nesting and always being at
+> the cl prompt? You had mentioned something about this before, and we were
+> wondering if it might have got lost somewhere in getting the tape.
+
+All of the process caching code is brand new, written to use the new process
+control code accessed via LIBC.  The CL process cache code is a package
+contained wholly within the file "prcache.c".  This version supports nesting
+of calls from one process to another (although deadlock will occur if the
+cache fills up).  The newest parts of the CL are the files "prcache.c",
+"main.c", and "bkg.c".
+
+>   Also with the text i/o the file size may not represent the actual size
+>   (in characters) of the file, due to VMS standard record files. Will this
+>   be a problem. Any Iraf created files will have the correct size since
+>   they are stream_lf.
+> 			  Fred & Jay
+
+This is ok, the file size need be known accurately only for binary files.
+For text files the file size is not used for anything serious (see the
+description of FSTT_FILSIZE in the manual page for ZFIOTX).
+
+Glad to hear that the filename mapping code is working well.  It is crucial
+to the port, and I was concerned about bugs since it is such a complex
+package.
+		Doug
+Fred and Jay:
+
+    Answers to recent questions follow.  Is the system ready yet for me to
+look at over the modem?  When you get it to a state where you feel it is
+working fairly well, I would like to fire it up and try a few things.
+
+	Doug.
+
+> From stsci Thu Jan 17 08:30:15 1985
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA10600; Thu, 17 Jan 85 08:30:03 mst
+> Date: Thu, 17 Jan 85 08:30:03 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8501171530.AA10600@lyra.noao.UUCP>
+> To: tody
+> Status: R
+> 
+> Doug,
+> 
+> 	Here is a list of bugs, changes, suggestions, etc. compiled during
+> the port of IRAF to VMS.
+> 
+> 	Some of the bugs have the bug fixes listed here; others were too
+> elusive and/or time-consuming to try to figure out at this time.  When you 
+> get the latest, greatest VMS version of IRAF, what changes we made will 
+> certainly be there;  we'll probably send along RCS files as well so you could
+> easily update some of your files.  However, most of the changes are
+> just a few lines here and there.
+> 
+> 	We await any comments or any bug fixes you have there...
+> 
+> 				Jay and Fred
+
+Thanks a lot for the bug reports.  I will wait and install these bug fixes
+during the upcoming system integration period when I get the new VMS version
+of the system back from you guys.
+
+I have been working on some of the more subtle bugs here and will send you
+a bug list and/or code updates at some point.  I have a few hard to catch
+bugs to track down yet before this will be worthwhile.
+
+> P.S.
+> 	We were discussing using mapped sections such as sdas
+> uses for static files. There is one major difference in the way that
+> iraf and sdas handle static (image) files. In the sdas routine
+> a pointer is passed back to where the image resides in memory. This
+> is due to the way the mapped sections work in VMS. In Iraf the zroutine
+> is given a pointer to where the data is to reside, so we have to do
+> a memory copy for each image reference, and may not be more efficient
+> than just writing to or reading from disk. Can you see any easy
+> way around this problem, or maybe an additional flag to zopnsf which
+> indicates that a pointer is to be passed back from zardsf or zawrsf
+> for the data rather than a passing in a pointer to where the data is to
+> be read to or written from?    (fred)
+
+My impression from a glance at the VMS system services was that the create
+and map section function could be broken into smaller functions.  The idea
+was that ZARDSF, when requested to read/map file segment A onto memory
+segment M, could unmap M (from the paging file) and remap it onto A.
+A subsequent ZARDSF on the same M would unmap from file segment A and
+remap onto file segment B.  ZCLSSF would unmap file segment B (etc.)
+and remap onto the paging file.  When using the static file driver, the
+high level system code will see to it that M is always aligned on a virtual
+memory page boundary and is an integral number of pages.
+
+Will that work?  If not something can be done, but at least conceptually
+it makes sense to me, and it would eliminate artifical distinctions between
+the two types of i/o.
+
+> From stsci Tue Jan 22 12:44:59 1985
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA22373; Tue, 22 Jan 85 12:44:51 mst
+> Date: Tue, 22 Jan 85 12:44:51 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8501221944.AA22373@lyra.noao.UUCP>
+> To: tody
+> Subject: vfn mapping
+> Status: RO
+> 
+> Doug,
+>   We are having a problem with degenerate directory names. It appears that the
+> filename mapping handles degenerate filenames, but no directory names
+> contained within the path to that file. Is this correct? I would guess that
+> the translation should be done in vfn_translate some where.
+>                                      fred.
+
+The mapping file is not used for directory names for performance reasons.
+First, OS filenames are not mapped at all.  An OS filename is any filename
+for which ZFXDIR returns an OS directory prefix (the test is necessarily
+machine dependent).  Pathnames containing directory names are parsed by
+VFN_TRANSLATE, extracting successive directory names.  Each directory name
+is processed through VFN_ENCODE to map illegal characters, then through
+VFN_SQUEEZE to make it fit in an OS filename.  It is possible that multiple
+directory names will map to the same internal name.
+
+It is possible to modify the mapping code to use the mapfile for long
+directory names, but I would prefer to make everyone use short names.
+Is the problem with names in the system you got from us?  We will change
+the directory names if so.  Long directory names will also lead to problems
+with truncation of pathnames, hence should be avoided in any case.
+> From stsci Wed Jan 23 10:40:52 1985
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA05645; Wed, 23 Jan 85 10:06:56 mst
+> Date: Wed, 23 Jan 85 10:06:56 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8501231706.AA05645@lyra.noao.UUCP>
+> To: tody
+> Status: RO
+> 
+> DIFFERENCES /MERGED=1/OUTPUT=DISK$USER1:[IRAF.FRED]DOUG.TXT;1-
+>     DISK$USER1:[IRAFX.SYS.FIO]VFNTRANS.X;5-
+>     DISK$USER1:[IRAFX.SYS.FIO]VFNTRANS.X;4
+> 
+>   Also, back to the static file driver. There are a number of hitches with
+> mapping the file into the user's buffer. One problem with mapped sections
+> is that we may run into the working set limit or paging file limit when
+> mapping a file. Another is that the buffer pointer must point to a virtual
+> address which has not been "created", so the pages in the user's buffer
+> must be freed. The users buffer must be on a virtual page boundry.
+> Also remote files cannot be used in a mapped section due
+> to DECNET and RMS restrictions. Also in writting an image out to disk, the
+> create mapped section cannot be into the users buffer, since the data would
+> be lost, So a memory copy would be necessary. Also should a mapping be
+> undone after a wait, so that the buffer can be reused, and what should
+> be done about requests which overlap in some of the pages? Do you see any
+> easy ways around these? In sdas a pointer to where the data is to be read
+> or written is returned. This removes the problems of page overlap, memory
+> copies, and page allignment.
+>                                    fred.
+
+I think I need to go into more detail on the scheme I had in mind for the 
+static file driver, including more information on how FIO works.  The file
+i/o zroutines are designed to be called only by FIO under carefully controlled
+circumstances.
+
+FIO works internally by "paging" file segments the size of a FIO buffer into
+the FIO buffer.  A file is a series of logical pages, each the size of the
+FIO buffer, which is in turn an integral number of disk blocks in size.
+FIO guarantees that these logical pages will not overlap; if this were not
+the case, ordinary i/o would not work properly, let alone static file i/o.
+
+A "file fault" occurs when i/o is done to a file segment not currently
+mapped into a FIO buffer.  If the file is open for RW access the file segment
+will be read into the FIO buffer.  This is true for both reads and writes.
+A write causes the file segment to be faulted into the buffer, followed by
+modification of the buffer contents.  Nothing is actually written to the
+file until another file fault occurs, causing the modified buffer to be updated
+on disk.  There is one exception to this scheme: when a write occurs which
+would write the entire file segment, the read is skipped to save i/o.
+
+All of the above discussion concerns only FIO, and is independent of whether
+the file is a static file, an ordinary disk file, a DECNET file, or whatever.
+A static file is by definition a file which does not change in size while
+i/o is in progress.  At open time file space has already been allocated and
+the system knows exactly where the file blocks are, making optimization
+possible.  A static file is never created by ZOPNST.  It either already
+exists or is preallocated by ZFALOC.
+
+FIO buffer space for a static file is allocated before i/o occurs (before
+any sections are mapped) by the MEMIO procedure VMALLOC, which ensures that
+the buffer is allocated on a virtual memory page boundary.  VMALLOC calls
+ZMALOC to allocate a conventional buffer larger than necessary, computes
+the offset of the first page boundary, and returns a pointer to that page
+to the caller.  On VMS, VMALLOC would therefore allocate a potentially
+large segment of storage in the paging file.  The paging file space would
+probably be freed very shortly therafter, but it is possible to run out
+of space in the paging file if very large buffers are to be allocated.
+The virtual page count limit of the process must be large enough to
+accommodate the buffer, but since no i/o will be incurred the working set
+size should not matter.  If I understand VMS correctly, the principal
+expense in allocating a large, say 1 MB buffer will be the expense of
+initializing the associated 16 pages of process page table space.  This will
+likely incur several page faults (to fault in the pages of the page table),
+plus .1 second or so to initialize the page table entries.
+
+The initial operations required to map an entire section into memory for FIO
+are thus the following:
+
+	open calls ZOPNST to assign a channel for the section file
+	VMALLOC calls ZMALOC to allocate a buffer the size of the section
+	    (i.e., the size of the pixel storage file).  Pages are
+	    initially allocated from the system paging file.
+
+The next operation will almost certainly be a ZARDST to "fault" the file
+into the FIO buffer, which is probably the size of the entire image.  ZAWTST
+would be called next to get the status of the read.  No further FIO faults
+would be incurred while accessing the image, since all of the data is
+effectively accessible in memory.  Eventually ZCLSST or possibly ZAWRST,
+ZAWTST, ZCLSST would be called when the file is closed.
+
+I see the functions of the static file i/o routines in terms of VMS system
+service calls as follows:
+
+	ZOPNST	Assign file to a channel.
+
+	ZARDST	Unmap buffer pages with $DELTVA.  Map buffer pages onto
+		new section with $CRMPSC.
+
+	ZAWRST	Call $UPDSEC to update the section on disk.  Do non unmap
+		pages as they may be reused.  If the pages are not mapped
+		(very unlikely) perform a map and copy operation or just
+		return ERR.
+
+	ZAWTST	Static file i/o is not really asynchronous.  Just return
+		status.
+
+	ZSTTST	Easy.
+
+	ZCLSST	Unmap all sections associated with the file.  It may be
+		necessary to remap sections back onto the paging file to
+		keep the VMS memory allocator happy, but it is not necessary
+		for IRAF reasons since file buffer space is freed when the
+		file is closed.
+
+
+Response to specific questions:
+
+> The users buffer must be on a virtual page boundry.
+
+Alignment on virtual page boundaries is not a serious problem; the
+current VMALLOC procedure already does so.
+
+> Also remote files cannot be used in a mapped section due to DECNET and
+> RMS restrictions.
+
+The static file driver scheme works well here because it makes it possible
+to access files via DECNET if we wish to do so, by copying the data rather
+than mapping it.  This would be slow if the entire image were being mapped,
+but might be worthwhile in some cases, since the software would at least
+function.
+
+> In writting an image out to disk, the create mapped section cannot be into
+> the users buffer, since the data would be lost, So a memory copy would
+> be necessary.
+
+The buffer is mapped by a ZARDST call onto the section file, hence no
+copy operation is necessary.  ZAWRST merely updates any modified pages.
+
+> Also should a mapping be undone after a wait, so that the buffer can
+> be reused..
+
+I/o to mapped sections would not be asyncronous.  The wait primitive would
+only return a status value.  Pages would be unmapped only at close time
+and when the buffer is faulted (in a FIO sense) onto another section.
+
+> what should be done about requests which overlap in some of the pages?
+
+FIO does not permit such overlaps.  FIO divides a file into a series of
+logical pages the size of a FIO buffer.  All i/o is initiated on logical
+page boundaries.  The FIO buffer is an integral number of disk blocks in
+size.
+
+If there are serious problems with the scheme I have described (e.g.,
+because it does not fit the real VMS) then let me know and there are probably
+things we can do.  For example, VMALLOC could have a special kernel routine
+instead of calling ZMALOC, and might only allocate virtual space without
+mapping it, not using the VMS memory allocator at all to avoid conflicts.
+
+
+> From stsci@aquila.noao Wed Jan 30 11:21:12 1985
+> Received: from aquila.noao.UUCP by lyra.noao.UUCP (4.12/4.7)
+> 	id AA00912; Wed, 30 Jan 85 11:21:09 mst
+> Received: by aquila.noao.UUCP (4.12/4.7)
+> 	id AA21711; Wed, 30 Jan 85 07:28:33 mst
+> Date: Wed, 30 Jan 85 07:28:33 mst
+> From: stsci@aquila.noao (Space Telescope )
+> Message-Id: <8501301428.AA21711@aquila.noao.UUCP>
+> To: tody@lyra.noao
+> Subject: fortran hex values
+> Status: RO
+> 
+> Doug,
+>   We have just run into a non-protable problem. In VMS fortran hex values look
+> like '111111'x and in unix fortran they look like x'111111'. Neither compiler
+> will accept the other. (oops portable above). Do you know which is supposed to
+> be standard??. The other way around it would be to run all fortran files
+> through the cpp on our end, so that we can use ifdefs as you can under unix.
+>                              fred.
+
+
+The Fortran standard permits only decimal integer constants.  The octal and
+hex forms noted are both nonstandard exceptions and cannot be used in portable
+Fortran code.  There are many other things just like this, e.g., ! comments,
+byte, integer*N, logical*N, etc. datatypes, nonstandard intrinsic functions,
+do while, identifiers which are nonalphanumeric or which are longer than
+six characters, continuation longer than a few lines, inclusion of character
+in common blocks, use of normal data statement to initialize data in common
+blocks, passing an integer*2 to a function which expects an integer
+or vice versa, use of ichar for byte operations, and so on.  A simple
+preprocessor like cpp is a big help but will not solve problems like the !
+comments and identifiers longer than six chars, and I don't think it does
+anything about octal, hex, character, etc. constants.
+
+
+> ZGTENV (new kernel procedure)
+
+    I changed the specifications trivially to make it consistent with the
+other kernel procedures.  See the code in the new version of IRAF I recently
+sent you on tape.  I also modifed TTY to permit device unit specs etc in
+device names.  The ZMKDIR primitive has not been specified because it is not
+yet proven that we need it (I started to add it for making subdirectories
+off UPARM in the CL).
+
+
+From stsci Fri Feb 15 06:37:12 1985
+Received: by lyra.noao.UUCP (4.12/4.7)
+	id AA15277; Fri, 15 Feb 85 06:37:06 mst
+Date: Fri, 15 Feb 85 06:37:06 mst
+From: stsci (Space Telescope )
+Message-Id: <8502151337.AA15277@lyra.noao.UUCP>
+To: tody
+Subject: IRAF things...
+Status: RO
+
+Doug,
+
+Got the tape read on to VMS with rtar;  had to make some small mods to read
+from tape.  Seems the C lib read() function can't handle it.  We found all
+the different files and new files, and are remaking the entire system.
+
+Some thoughts and questions:
+
+> 1.  Fred was wondering whether there exists some documentation on XC and Mklib
+>     other than what's in the source files.
+
+There is no additional documentation at present.  XC is however much
+like the UNIX cc and f77 commands.
+
+> 2.  In much of the GIO, FIO, IMIO source files, you have 2 conventions for
+>     include files, namely  include "gio.h" and include <gio.h>.  This works
+>     fine in UNIX because you have linked files to iraf$lib/, but on VMS this
+>     means we have to have 2 copies of the .h files.  We are taking it upon
+>     ourselves to change all the "fio.h", "gio.h" etc. to <fio.h>, <gio.h>,...
+>     It makes more sense to us, and to IRAF in general, it seems.  Is this
+>     okay with you?
+
+I agree that it is best to avoid links for portability reasons, but sometimes
+they make things much easier.  Regarding the "file" and <file> problem, I agree
+that it is desirable to have only one copy of an include file (and of course
+the link provides this on UNIX).  To eliminate the possibility of error on VMS
+we will have to get rid of the "file" references, but only in cases where the
+named file is global, i.e., referenced in more than one directory.  Whenever
+possible I use local include files rather than global ones to reduce the
+coupling between different parts of the system, and this should not be changed.
+
+This problem with eliminating the local copy of a global include file is
+that the package source is no longer self contained.  When a package is
+listed or moved the included file may be omitted.
+
+Include files are not the only linked files.  There are also linked libraries
+and executables.  In all cases I have tried to restrict the number of links
+to 2 to make it obvious where the second entry is.  The use of links for
+libraries and executables can be eliminated by use of file moves or copies,
+e.g., with a "make install" in the package Makefile (see pkg$cl/).  This
+solution works fine for executables, but there are problems with libraries.
+Probably the best solution is to modify Mklib to permit library names like
+"lib$libsys.a".
+
+> 3.  Some of the VOPS routines have .s versions as well as .x ones.  The 
+>     Makelib files don't always use the .s files, but they're there.  We've
+>     been converting your .s files to VMS .mar files (added to the filename
+>     mapping pairs), and using them instead of the .x files, updating the
+>     Makelib files appropriately.  Some of the .s files (e.g. /vops/AK/aadd*.x)
+>     are simply output from the fortran compiler, possibly w/ a few things
+>     taken out.
+
+Sounds good.  It seems to me that we can have both the unix and vms assembler
+sources in the same directory with the filename mapping selecting the file to
+be used when the extension is mapped (on VMS, the UNIX files should appear
+as "file\.s" in directory listings).  Assembler sources which appear in
+directories but which are not referenced in the Makelib are garbage and
+should probably be deleted.  In some cases, e.g., AADD, there may be no
+advantage in having a VMS assembler version since the VMS Fortran compiler
+is better than the UNIX one.
+
+> By the way, we changed the IPC routines on VMS to use shared memory regions
+> instead of mailboxes.  This was due to lots of problems we had with ^C
+> interrupts and the mailbox I/O.  Shared memory regions helped a lot,
+> but are still prone to the problems occasionally.  Your latest changes
+> dealing with interrupts look they will help us a lot too.  In any event,
+> the shared memory IPC is much faster and seems a lot more reliable than
+> mailboxes.
+> 
+> 			Jay and Fred
+
+The bug fixes I made should help a lot but do not yet fully solve the problem.
+Also, in the UNIX IPC driver I had to disable interrupts while writing a record
+to ensure that the data structures would not be corrupted.  You might need to
+do something similar.
+
+What is your schedule for converting to VMS version 4.0?  We are still
+running 3.7, and should coordinate the conversion to 4.0 between the
+observatories.  The 8600 will run 4.0, and should arrive sometime in May.
+We should convert to 4.0 sometime before then.
+
+Do not waste time trying to get the new GIO stuff working yet.  We are still
+actively working on the many pieces of the graphics subsystem and it is not
+yet completely installed nor user tested.  The GIO/NSPP kernel should be
+completed later this week or next and then we will complete the installation.
+I can send you a tape containing only the affected files at that time if you
+wish.
+			Doug
+> From stsci Wed Mar  6 14:00:12 1985
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA29984; Wed, 6 Mar 85 13:59:45 mst
+> Date: Wed, 6 Mar 85 13:59:45 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8503062059.AA29984@lyra.noao.UUCP>
+> To: tody
+> Subject: IRAF
+> Status: RO
+> 
+> Doug,
+> 
+> Jay here... IRAF VMS is coming along.  Having some difficulties dealing with
+> 4.0 though, asI'm sure Peter has told you about.  The filename mapping
+> stuff in particlular - we're keeping it as 3.x filenames even though
+> it would be possible to convert to the nice longer ones in 4.0.
+> But then it's not possible to go back very easily.  W    Something we have
+> to think about some more and which Peter may talk with you about.
+ 
+At some point we should reconfigure the system to use the long filenames.
+This requires reloading the system with RTAR, editing the filename parameters
+in the <config.h> file, and recompiling the system.  Any system dependent
+makefiles or VMS .com files you guys have added would also have to be changed.
+I am considering renaming some files in the directories for the core system
+to minimize these sorts of problems, allowing us to get the basic system up
+and running and then use the system to handle the filename mapping required
+for the applications directories.  This does not solve the Make problem unless
+we add an IRAF Make to the SOFTOOLS package, which is probably the thing to do.
+
+> Your ideas on using mapped sections for the VMS static file driver look
+> okay, thou and should work, with some slight mods,
+> but we haven't gotten around
+> to it yet (may be lots of line noise here...).
+> Also some other enhandcements
+> are in the queue for VMS, time allowallowing...
+> 
+> Had a question re Help and Help dtaatabases.
+> In SDAS, we have 2 choices for
+> Help under IRAF - 1) use 1 big Help db with IRAF and SDAS help combined, or
+> 2) have a separate SDAS help db.  I've done some simple tests with 2
+> separate dbs and it doesn't look to good.  If you've run help in IRAF and 
+> then turn around and specify a new db, does  the new database get read
+> in entirely?  One can envision an SDASHELP script that does:
+> 		set helpdb=sdas$sdas.db
+> 		help ...
+> 		set helpdb=dev$help.db
+> But this method can be terribly slow if you go back and forth between IRAF
+> and SDAS help and requires a separater task , SDASHELP, to invoke it.
+> 
+> Maybe I'm not  don't fully understand the details of the
+> helpdb stuff...would it be
+> possible to have a couple of helpdb's loaded in memory at the same time, or
+> a list of helpdb's to search in the event of a 'help'.?  Or, should we
+> just use one huge helpdb for IRAF and SDAS and avoid all these problems??
+
+          Jay
+
+I think the best solution is for each system to have one big help database
+for all packages.  I see no problem with this, but the current help database
+facilities are probably not up to the task and will have to be replaced
+eventually possibly with a DBIO based version.
+
+
+> From stsci Sat Apr  6 07:52:33 1985
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA07328; Sat, 6 Apr 85 07:52:27 mst
+> Date: Sat, 6 Apr 85 07:52:27 mst
+> From: stsci (Space Telescope )
+> Message-Id: <8504061452.AA07328@lyra.noao.UUCP>
+> To: tody
+> Subject: Mapped sections on VMS
+> Status: RO
+> 
+> Doug,
+> 
+> Finally got around to implementing a static file driver for VMS using mapped
+> sections.  Your ideas were partially used here, as well as the stuff I threw
+> together for the IPC driver using shared global sections.  However, there
+> are 2 problems which don't want to be solved very easily.
+> 
+> 	1.  When closing a static file (mapped section file), the pages must
+> 	    be unmapped.  Since they are mapped within the IMIO via VMALLOC,
+> 	    I can't unmap them at the Z-routine level because of the way ZMALOC
+> 	    works (puts the count in the longword ahead of the returned buffer
+> 	    address).  So the pages must be unmapped before the call to ZCLSSF.
+> 
+> 	    However, I have not been able to get this to work.  That is, even
+> 	    unmapping the pages and then closing the file doesn't work very well
+> 	    This may be due to some incompatabilities between the $CRMSPC
+>	    ssystem
+> 	    service and the LIB$GET_VM() routine used by ZMALOC to get virtual
+> 	    memory.  Seems that using the $CREVTA (create virt address space)
+> 	    doesn't work too well with the LIB$GET_VM - in fact, DEC warns about
+> 	    using them together, since they don't communicate with each other.
+> 
+> 	    The effect of this is that the image file remains open until your
+> 	    executable image exits - the close doesn't really close...
+> 
+> 	    The only way I see around this is to rewrite ZMALOC/ZRALOC/ZMFREE
+> 	    to use $CREVTA/$DELVTA and then hope for the best, or possibly
+> 	    use another idea you had, of having a special Z-routine for a
+> 	    allocating virtual memory on page boundaries w/out mapping it...
+> 	    maybe that would work, as long as the pixel-file buffers were
+> 	    unmapped before the call to ZCLSSF.
+
+I thought the memory allocation might be a problem, in which case the best
+solution is probably to add two new kernel procedures (sigh) to be used to
+allocate and free pages of virtual memory independently of the ZMALOC allocation
+facilities.  The pages would initially be unmapped and would not get mapped
+until a ZARDSF call was made.  Since we would then be able to package the
+virtual memory allocator and static file driver together in a self contained
+unit, we should be able to do whatever needs to be done to make it all work.
+If this looks reasonable I will have to generate some specifications for the
+kernel procedures and work out the details of the high level code (not a big
+task).
+ 
+> 	2.  If you open an image file w/ READ_WRITE access, any changes made
+> 	    to the buffer will be made in the file, whether or not a call to
+> 	    ZAWRSF is made.  This is the way mapped sections work on VMS and
+> 	    I haven't found a way around it yet.  This could be a potentially
+> 	    major obstacle...
+ 
+I don't see any problem here.  If FIO writes into a buffer opened on a file
+with read write access, the file is expected to be modified.  The only
+difference between this and normal i/o is that the write may occur sooner
+and cannot be cancelled, but there is no software in the system which depends
+upon such subtle semantics.
+
+> Peter probably talked to you a few times about device specifications within
+> IRAF, possibly of the form   set stdimage=(iis,image_unit_2)  or something of
+> the sort.  Support for this is definitely needed at some higher level than
+> the kernel.  For the line printer driver, I had to play all kinds of games to
+> map the printer names without having to recompile the ZFIOLP source and relink
+> the system package.  Basically, I used some VMS means to find out where 
+> iraf$dev/ was and then read a file called "lprtable.vms" which had things like
+> 
+> qms	LCA0
+> printronix  SYS$PRINT
+> 
+> By setting printer=qms for example, 'qms' would be looked up in termcap and
+> satisfy all that stuff, then at the ZFIOLP level, qms would be mapped to
+> the VMS queue LCA0.
+> 
+> For things like this, it would be nice to have some system-dependent device
+> mapping table that is read at a level higher than the kernel, that would
+> map a device-type (for termcap/graphcap/printcap/...)
+> into an OS/system-dependent
+> name or queue_name.  For example:
+> 
+> 		qms    LCA0
+> 		deanza ABC0:	(i.e. some VMS device name)
+> 			...
+> 
+> I know it's easy in UNIX to have these tables built into the kernel, so all
+> you do is a 'make' and IRAF is remade.  In VMS, this is not so easy, and we
+> would like to be able to distribute executables.  Also, our RCSMake hasn't
+> worked since VMS V4.0 came along -- we're using Mklib and DCL command
+> procedures everywhere.
+> 
+> I think this kind of device mapping would not be hard and would make it easy
+> to add devices without remaking part of the system. 
+
+I agree that a runtime table lookup would be nicer in some cases than a
+compiled table.  I suspect however that the structure and contents of the table
+may be too machine dependent to be worth trying to standardize.  The easiest
+solution may be to have the kernel read the table, rather than IRAF.  In that
+case it may be more appropriate to put the table in the OS directory, rather
+than in DEV.  It would not be difficult to call to the ZFIOTX primitives
+directly to read such a table.
+
+Some information can now be included in the device specification in the
+CL environment.  Peter mentioned a syntax such as
+
+	deanza!unit=2
+
+or some such.  Anything can follow the ! and is assumed to be system
+dependent.  The high level code will ignore the ! and all that follows
+in the termcap and graphcap access, but will pass the full string on to
+the kernel to parse as it wishes.
+
+
+> From stsci Thu May  9 05:41:11 1985
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA17243; Thu, 9 May 85 05:41:06 mst
+> Date: Thu, 9 May 85 05:41:06 mst
+> From: stsci (Space Telescope)
+> Message-Id: <8505091241.AA17243@lyra.noao.UUCP>
+> To: tody
+> Subject: IRAF
+> Status: RO
+> 
+> Doug,
+> 
+> Jay here;  have had a hell of a time trying to login to your system, though I
+> think it's a problem with our phone system - which means you're probably
+> having trouble getting in to ours as you did before.  
+ 
+I have been having lots of trouble getting modem access, but have not tried
+it for a week or so.  The next test will be trying to send this mail.
+
+> In any event, a few items/questions...
+> 
+> Peter talked to you about the filename mapping and using actual VMS names in
+> the CL.  We initially thought it was a filename mapping problem, but you were
+> right in that it is already handled quite well.  The problem, as we quickly
+> discovered, is that most of the tasks which open files, handle lists of files
+> and templates.  The template matching code is the problem with respect to
+> VMS names, since things like  "[a-zA-Z0-9]*"  can be used as a filename, and
+> using a VMS name like  [iraf.jay.cl]file.dat  is processed as a template.
+> I don't see a real easy way around it - Peter's suggestion about quoting all
+> OS-dependent entities with !'s may be the answer, meaning VMS names would
+> be   ![iraf.jay.cl]file.dat!  on the command line...  Sorry if you went about
+> the filename mapping code looking for this non-existent bug...  If !'s are
+> used, some higher-level decoding must be done, but I'm not sure exactly where,
+> probably in the template stuff and the filename mapping...
+
+I see the problem now and of course you are right, the template expansion code
+is at fault.  It is not out of the question to consider changing the logical
+directory metacharacter to something less troublesome, e.g., one of "!@%^".
+It should be a character which satisifes the following criteria:
+
+	not routinely used in filenames on any of our target systems
+	not an operator character when "lexmodes=yes"
+
+Unfortunately the $ fails criteria number one.  Let me know what you think of
+such a change and I will discuss it with my group in a meeting on Wednesday.
+It is not too late to make such a change if it will make life significantly
+easier on VMS.
+
+> Sometimes (a lot less now than before) we have a situation where a connected
+> subprocess gets astray and is running while we are back at the CL, i.e. doing
+> a 'prcache' shows a state of 'R' for the process.  'Flprcache' can't kill it,
+> and on logout, the CL will hang forever for what is seemingly a running
+> process.  Is there a way we can just kill these guys off, especially on
+> logout?  Seems to
+> me that connected subprocesses should never be asynchronous anyway, so being
+> in this state is really an error, though maybe there are future ideas I'm not
+> aware of.  In any event, sometimes an interrupt at a certain time can put a
+> subprocess in this sort of state and making logging out hang the process, and
+> the user will need to type ^Y to get out on VMS.  Have you seen this type of
+> occurence on Unix, and if so, have you any ideas on how we might combat this
+> portably?  If you don't see it there, we can just do some "#if vms" sections
+> in the CL to make sure subprocesses die on logout, but I'm hoping for a more
+> portable method.
+
+We also sometimes get hung processes with state R (apparently running).  This
+happens rarely but is evidently a bug in the system independent code, which
+I will fix eventually.  I may not be able to prevent processes from getting
+into such a state, but I should be able to make the system detect such a state
+and recover automatically.
+
+	- Doug
+	13 April 85
+> From stsci Thu May 23 06:16:18 1985
+> Received: by lyra.noao.UUCP (4.12/4.7)
+> 	id AA11890; Thu, 23 May 85 06:16:14 mst
+> Date: Thu, 23 May 85 06:16:14 mst
+> From: stsci (Space Telescope)
+> Message-Id: <8505231316.AA11890@lyra.noao.UUCP>
+> To: tody
+> Subject: major portability problem in fortran
+> Status: R
+> 
+> Doug,
+>   We have run into a snag up here. The problem is with fortran integer
+> constants. We currently have iraf moved over to the Sun and I was working
+> at getting it up and running. It seems that all integer constants are
+> passed as I*4. This causes problems for functions that expect I*2 values
+> (xpp character constants). Due to the byte ordering the value which
+> gets to the other end is the high bytes rather than the low bytes of the
+> I*4. This problem would also exist going from I*2 to I*4. Do you know
+> of any easy (portable) way to type cast constants in fortran. The other
+> method I considered was putting he character constants into the string
+> array that gets created by either rpp or xpp (I can't remember which). This
+> would solve the problem for xpp characters, but would not solve any
+> problems for xpp routines expecting short parameters and getting an I*4
+> constant.
+>                                fred.
+> 
+
+1. Discussion
+
+    I knew this would be a problem but could see no easy way to address the
+problem until we had access to a non-DEC machine with the bytes in an integer
+reversed.  It is considered an error in SPP if the programmer declares an
+argument as I*2 and passes an I*2, or vice versa.  Similar problems occur if
+the mismatched types are int and long or int and bool, or if a procedure is
+passed the wrong number of arguments.  Such bugs will go unnoticed on a DEC
+machine because of the architecture (or Fortran implementation).  The first
+port of IRAF to a non-DEC machine will require finding all such bugs.
+
+I had always planned that my group would do this kind of debugging, but have
+no objection if you wish to push ahead and find the bugs for us.  The rule is
+that an integer constant appearing in an argument list must be declared as
+an integer argument in the called procedure.  If a short, char, or long is
+required than an explicit type coercion must be used, e.g., "(a,long(1),b)".
+A character constant, e.g., 'a', is defined as an operand of type char.
+
+It is up to the programmer to use explicit type coercion where necessary to
+match the datatypes of actual and dummy arguments.  In the case of the
+character constant I expected that we would have to add a switch to the
+preprocessor to automatically add a call to a I*2 coercion function when
+a character constant is used as an argument to a procedure.  Of course
+Fortran does not define such a function since I*2 is itself non standard
+Fortran.  The VAX/UNIX Fortran compiler does not provide such a function,
+but then none is required since I*2 and I*4 are interchangeable as arguments
+on the VAX.  Compilers for machines where this is not the case would hopefully
+provide such functions.  The AOS compiler does, but I never checked the
+UNIX implementation on non-Dec machines.  It does not surprise me if the
+SUN/UNIX Fortran compiler omits the INT2 and INT4 (or whatever) intrinsic
+functions.
+
+My plan if the host compiler did not provide INT2 and INT4 intrinsic functions
+was for the compiler to generate a Fortran temporary variable of the necessary
+type.  This will always work but requires care to implement in the current
+preprocessor due to the complications of statement labels, error checking, etc.
+If the time has come then I can do this or perhaps you would like to have a
+go.  An easier, but less attractive solution might be to add the intrinsic
+functions to the Fortran compiler itself and report the extension to SUN.
+If this were done the Fortran generated for 'a' would be 'int2(97)' when the
+paren level is greater than zero, skip the INT2 otherwise.
+
+In retrospect I think it would have been better to define character constants
+as integer rather than char values.  It is not too late to make such a change
+to the language definition but doing so will introduce bugs into existing code.
+Since we have not already debugged such code, this is not a great problem.
+Rather than find such bugs at run time, I would do a pattern search of the
+entire system looking for occurrences of ' within parens, then examine each
+such occurence interactively.  We should really do this ourselves for our
+own code, rather than having you guys do it.
+
+
+2. Conclusions
+
+    Having thought all this through, I think the best course of action is the
+following:
+
+    [1] Change the SPP language definition to define a character constant as an
+	integer, rather than char value, e.g., 'a' would be exactly equivalent
+	to 97 in all contexts.
+
+    [2] Modify XPP to declare and initialize hidden Fortran I*2 and I*4
+	intermediate variables whenever the coercion functions "short", "char",
+	or "long" appear in SPP code within the body of a procedure.
+
+It would be best for NOAO to do this since we are responsible for the code
+which is causing the problem.  There is a big merge coming up with the
+installation of VMS IRAF at NOAO, and that would be an appropriate time to
+address the problem.  If you cannot wait and wish to forge ahead, feel free
+to do so, but please keep notes on the changes required (I would expect there
+will be only a few dozen such occurrences).
+
+
+3. Other
+
+    We are in the process of submitting a request to NSF to purchase a SUN
+system for delivery this fall to Tucson.  I plan to port IRAF to the SUN,
+including special performance enhacements for disk access and an interface
+for the Sky Warrior array processor.  Anything you guys (or JPL) do in the
+interim will of course help make this easier.
+
+The JPL port to the JUPITER running the ISI version of 4.2BSD UNIX has run
+into serious problems with the ISI Fortran compiler, which turns out to be
+untested and quite buggy.  An AOS port has also begun, with Steward doing
+most of the work.  I would like to eliminate this type of bugs from the system
+before these sites really attempt to bring the system up.
+
+By the way, in the process of trying to compile IRAF on the JPL system we
+found two bugs in the SPP compiler, both caused by the wrong number of
+arguments to a procedure.  One was in XPP (xppcode.c) and can be found with
+LINT.  The other was in RPP in the file "rpprat/errchk.r", in the call to the
+procedure GNBTOK.  Presumably you have already found both of these problems
+since you have already succeeded in compiling the system.
+
+Other bugs were found in OSB in the same port.  Some of the ACHT procedures
+had bugs, the Makelib file had a bug.  In OS in the ZCALL file, "pointer to
+function" was being used where "function" was required; the UNIX/C compiler
+does not complain about such usage.  If you have not already found these
+I can supply notes (they will be fixed on the next tape you receive in any
+case).
+> From stsci Thu Jul 11 05:33:23 1985
+> 
+> Doug, a few short notes...
+> 
+> 1. XPP
+> 
+> The 'lexyy.c' file for the new XPP (output of 'xpp.l') causes the VMS C V1.5
+> compiler to bomb of a symbol table overflow, so we're still using the old
+> XPP. I tried the C V2.0 compiler (on our 8600) and it fixes this problem,
+> but spouts out other warnings; I'll have to check them out when it gets
+> installed on our machine.  This is just a warning;  I don't know which
+> version you're running. 
+
+I have had the V2.0 C compiler installed on the 8600 and that is what I will
+be using when I recompile the CL etc., hope it does not give serious problems.
+
+> 2. RPP
+> 
+> The file  '...imdis/cv/load.x'  causes RPP to stop somewhere and say it's
+> got a storage overflow.  I split the file into 2 files (load1.x and load2.x)
+> and things work okay.  Don't know if you have this problem, too.
+ 
+Just want to make sure you know (I already told Peter) that the CV code is
+preliminary and will be changed significantly.  I am not happy with it yet
+and it will be reworked considerably before being installed (ideally the
+display interface subroutines Starlink is working on would come along in time
+to prevent a third major revision).  On the other hand, either the old display
+using the IMIO interface or the new CVL (to eventually replace "display" and
+inherit the same name) are both infinitely faster than the infamous SDAS image
+load code I have been hearing about.  PLEASE SPEED THAT THING UP!!  I have
+been overhearing comments from the astronomical community about how slow "IRAF"
+is, following the recent SDAS/IRAF demo.  People do not understand that IRAF
+and SDAS are quite different things, or that SDAS is not using IRAF yet for
+anything having to do with image display or vector graphics.
+
+The IRAF image load software runs 12 clock seconds on an unloaded 750, and
+should run twice as fast as that on a 780 with its faster cpu and faster,
+asynchronous i/o system (512 square by 16 bit image).  Note that only standard
+hight level IRAF interface software is being used and the DISPLAY program is
+a sophisticated program with lots of fancy options.  This proves that is it
+possible to have features and speed, too.
+
+> 3. VMS Kernel 
+> 
+> I wrote an assembler version of the str*() routines for VMS last year to
+> remove dependencies on the VMS C libraries (str.mar).  There are 2
+> "phantoms" in there that have been known to cause access violations at
+> randomly spaced intervals and disappear when you try to throw in extra
+> code to debug them. The two lines containing the 'DECB' instruction should
+> be changed to 'DECL' instead; subtracting 1 from an address can have strange
+> effects when only the low-order byte is changed!  This is an old phantom
+> which has finally been killed, but as we all know, phantoms have brothers... 
+> 
+> 				Jay
+
+Unless it can be demonstrated that the assembler versions of the string
+routines are a good deal faster than the C versions in LIBC, I do not plan
+to use them.  I will look at the /mach output for the C versions before
+deciding.  If the assembler versions used (already use?) the VMS string
+instructions that would be different.
+

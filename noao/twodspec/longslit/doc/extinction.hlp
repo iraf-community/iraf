@@ -1,0 +1,66 @@
+.help extinction May87 noao.twodspec.longslit
+.ih
+NAME
+extinction -- Apply atmospheric extinction corrections
+.ih
+USAGE
+extinction images
+.ih
+PARAMETERS
+.ls input
+List of input images to be extinction corrected.
+.le
+.ls output
+List of output extinction corrected images.  Output images may be the
+same as the input images.
+.le
+.ls extinction = "onedstds$kpnoextinct.dat"
+Extinction file to be used.  The standard extinction files:
+
+.nf
+	onedstds$kpnoextinct.dat - KPNO standard extinction
+	onedstds$ctioextinct.dat - CTIO standard extinction
+.fi
+.le
+.ih
+DESCRIPTION
+The specified images are corrected for atmospheric extinction according
+to the formula
+
+    correction factor = 10 ** (0.4 * airmass * extinction)
+
+where the extinction is a tabulated function of the wavelength.  The
+extinction file contains lines of wavelength and extinction at that
+wavelength.  The units of the wavelength must be the same as those of
+the dispersion corrected images; i.e. Angstroms.   If the image is
+dispersion corrected in logrithmic wavelength intervals (DC-FLAG = 1)
+the task will convert to wavelength and so the extinction file must
+still be wavelength.  The table values are interpolated
+to the wavelengths of the image pixels and the correction applied to
+the pixel values.  Note that the image pixel values are modifed.
+
+The airmass is sought in the image header under the name AIRMASS.  If the
+airmass is not found then it is computed from the zenith distance (ZD in hours)
+using the approximation formula from Allen's "Astrophysical Quantities", 1973,
+page125 and page 133
+
+	AIRMASS = sqrt (cos (ZD) ** 2 + 2 * scale + 1)
+
+where the atmospheric scale height is set to be 750.  If the parameter ZD
+is not found then it must be computed from the hour angle (HA in hours),
+the declination (DEC in degrees), and the observation latitude (LATITUDE
+in degress).   The hour angle may be computed from the right ascension
+(RA in hours) and siderial time (ST in hours).  Computed quantities are
+recorded in the image header.  Flags indicating extinction correction are
+also set in the image header.
+.ih
+EXAMPLES
+A set of dispersion corrected images is extinction corrected in-place as
+follows:
+
+	cl> extinction img* img*
+
+To keep the uncorrected image:
+
+	cl> extinction nite1.004 nite1ext.004
+.endhelp

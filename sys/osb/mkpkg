@@ -1,0 +1,127 @@
+# Make the OSB (bit and byte primitives) portion of the VOPS library.
+
+$checkout libvops.a lib$
+$update   libvops.a
+$checkin  libvops.a lib$
+$exit
+
+tfiles:
+	# Convert the generic files into typed files.
+	$set GFLAGS = "-k -t UBcsilrdx"
+	$ifolder (achtiu.c, achtzu.gc)
+	    $generic $(GFLAGS) achtzu.gc -o acht\$$tu.c		$endif
+	$ifolder (achtib.c, achtzb.gc)
+	    $generic $(GFLAGS) achtzb.gc -o acht\$$tb.c		$endif
+	$ifolder (achtui.c, achtu.gc)
+	    $generic $(GFLAGS) achtu.gc				$endif
+	$ifolder (achtbi.c, achtb.gc)
+	    $generic $(GFLAGS) achtb.gc				$endif
+	;
+
+libvops.a:
+	# Generic preprocessing is normally done only on the development system,
+	# and need not be available on all systems.
+
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	# The following contain machine dependent constants.
+	hlib$i1mach.f
+	hlib$d1mach.f
+	hlib$r1mach.f
+
+	# The following should normally be optimized in assembler (see the
+	# special file list in "hlib$mkpkg.sf").
+
+	$ifeq (USE_CCOMPILER, yes)
+	    bytmov.c
+	$else
+	    bytmov.f
+	$end
+
+	bitfields.c
+	aclrb.c			# see also vops/ak/aclr*.x
+
+	# The operation of the following depends upon integer overflow, which
+	# may result in an exception on some hosts.
+
+	urand.x		<mach.h>
+
+	# If a C compiler is not available for the following they will have
+	# to be written in assembler or some other low level language, and
+	# added to the special file list.
+
+	achtbb.c
+	achtbc.c
+	achtbd.c
+	achtbi.c
+	achtbl.c
+	achtbr.c
+	achtbs.c
+	achtbu.c
+	achtbx.c
+	achtcb.c
+	achtcu.c
+	achtdb.c
+	achtdu.c
+	achtib.c
+	achtiu.c
+	achtlb.c
+	achtlu.c
+	achtrb.c
+	achtru.c
+	achtsb.c
+	achtsu.c
+	achtub.c
+	achtuc.c
+	achtud.c
+	achtui.c
+	achtul.c
+	achtur.c
+	achtus.c
+	achtuu.c
+	achtux.c
+	achtxb.c
+	achtxu.c
+	and.c
+	not.c
+	or.c
+	shift.c
+
+	# Both C and Fortran versions of the following are provided.
+	# The C versions are normally preferred and are the most portable.
+
+	$ifeq (USE_CCOMPILER, yes)
+	    bswap2.c
+	    bswap4.c
+	    chrpak.c
+	    chrupk.c
+	    strpak.c
+	    strupk.c
+	$else
+	    bswap2.f
+	    bswap4.f
+	    chrpak.f
+	    chrupk.f
+	    strpak.f
+	    strupk.f
+	$endif
+
+	# The following are fairly portable, but potentially machine dependent.
+
+	miilen.x	<mach.h>
+	miinelem.x	<mach.h>
+	miipak.x	<mii.h>
+	miipak16.x	<mach.h>
+	miipak32.x	<mach.h>
+	miipak8.x	
+	miipksize.x	<mach.h>
+	miiupk.x	<mii.h>
+	miiupk16.x	<mach.h>
+	miiupk32.x	<mach.h>
+	miiupk8.x	
+
+	f77pak.f
+	f77upk.f
+	bitmov.x	<mach.h>
+	xor.x
+	;

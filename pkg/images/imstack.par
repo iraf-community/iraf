@@ -1,0 +1,7 @@
+
+# Parmeter file for IMSTACK
+
+images,s,a,,,,Images to be stacked
+output,f,a,,,,Output image
+title,s,h,'*',,,Title of output image
+pixtype,s,h,'*',,,Pixel datatype of output image

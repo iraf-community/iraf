@@ -1,0 +1,31 @@
+.help asigeti Aug85 asigeti.hlp
+.ih
+NAME
+asigeti -- fetch an asi integer parameter
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+value = asigeti (asi, param)
+
+.nf
+    pointer	asi		# interpolant descriptor
+    int		param		# parameter
+.fi
+.ih
+ARGUMENTS
+.ls asi      
+Pointer to the sequential interpolant descriptor structure.
+.le
+.ls param
+The parameter to be fetched. The choices are: II_ASITYPE, the interpolant
+type and II_ASINSAVE, the length of the saved coefficient array. The parameter
+definitions are contained in the package header file math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+.ih
+NOTES
+.ih
+SEE ALSO
+.endhelp

@@ -1,0 +1,17 @@
+# Package parameter file for the ONEDSPEC package.
+
+coordlist,s,h,"onedstds$henear.dat",,,Wavelength coordinate list
+extinction,s,h,,,,Extinction file
+caldir,s,h,,,,Directory containing calibration data
+coincor,b,h,,,,Apply coincidence correction to flats
+ccmode,s,h,,,,Correction mode (photo|iids|power)
+deadtime,r,h,,0,,Deadtime in seconds
+power,r,h,,,,Power law coefficient
+version,s,h,"Apr 1988"
+
+std_file,s,a,std,,,File for sensitivity values (output from STANDARD)
+sens_file,s,a,sens,,,Image root for sensitivity spectra
+output,s,a,,,,Output file root name for new spectra
+disp_db,s,a,,,,Database file containing wavelength solutions
+flat_file,s,a,,,,Image root name for output flat field spectra
+next_rec,i,h,1,0,9999,Next starting spectral record

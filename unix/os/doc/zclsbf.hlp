@@ -1,0 +1,32 @@
+.help zclsbf May84 "System Interface"
+.ih
+NAME
+zclsbf -- close a binary file
+.ih
+SYNOPSIS
+.nf
+zclsbf (chan, status)
+
+int	chan			# OS channel of binary file
+int	status
+.fi
+.ih
+DESCRIPTION
+The binary file associated with the channel \fIchan\fR is closed, i.e.,
+the file is disassociated from the process which opened it and freed for
+access by some other process, and the channel is freed for use with another
+file.  A binary file must be closed before process termination or the integrity
+of the file is not guaranteed.
+.ih
+RETURN VALUE
+ERR is returned in \fIstatus\fR for an illegal \fIchan\fR.  OK is returned
+if the operation is successful.
+.ih
+NOTES
+The IRAF Main guarantees that all files will be closed prior to process
+shutdown.  The Main will also close all open files at program termination
+unless the program explicitly indicates that a file is to be left open.
+.ih
+SEE ALSO
+zopnbf, zfiobf
+.endhelp

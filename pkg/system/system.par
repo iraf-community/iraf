@@ -1,0 +1,4 @@
+# Package parameter file for SYSTEM.
+
+version,s,h,"12-Nov-83"
+mode,s,h,ql

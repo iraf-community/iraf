@@ -1,0 +1,74 @@
+.help bplot May86 noao.onedspec
+.ih
+NAME
+bplot -- Plot a series of spectral images in batch mode
+.ih
+USAGE
+bplot fname
+.ih
+PARAMETERS
+.ls images
+A list of images to be plotted.
+.le
+.ls graphics = "stdplot"
+The graphics device to be used for the plots.  This may be "stdplot", "stdvdm",
+or "stdgraph".  The values of these environment variables are set with
+the "set" command.
+.le
+.ls cursor = "onedspec$gcurval"
+File containing cursor commands for the task \fBsplot\fR.  The default
+file contains only the 'q' command.  More complex commands may be
+created by the user.
+.le
+.ih
+DESCRIPTION
+The images in the input list are successively manipulated by the
+task \fBsplot\fR and the output sent to the specified graphics device.
+The hidden parameters from \fBsplot\fR apply.  In particular to
+set the display window to fixed values the parameters \fIxmin,
+xmax, ymin\fR, and \fIymax\fR may be set.
+
+If the image specified is two-dimensional, then the first image line
+is used. Image section specifications in the image list are allowed
+to specify other lines.
+
+The cursor file consist of lines of the form
+
+	x y 1 key [command]
+
+where x and y are the position of the cursor (may be zero if the
+cursor position is irrelevant) and key is one of the keys understood
+by \fBsplot\fR.  If the key is ":" then the \fIcolon\fR command
+string follows.  The default cursor file consists of the single line
+
+	0 0 1 q
+
+The cursor commands are repeated for each input image.
+.ih
+EXAMPLES
+The following example plots all the spectral images indicated by the
+file "nite1.lst" on the default versatec and submits the processing
+as a batch job:
+
+	cl> bplot @nite1.lst&
+
+To preview the plots
+
+	cl> bplot @nite1.lst graphics=stdgraph
+
+To produce plots with four spectra per page
+
+.nf
+	cl> bplot @nite1.lst >G bplot.mc
+	cl> gkimosaic bplot.mc
+.fi
+
+The first command redirects the output of the graphics
+to the metacode file bplot.mc.  The task \fBgkimosaic\fR is used
+to make multiple plots per page.  Other tasks in the \fBplot\fR
+package may be used to manipulate and redisplay the contents of
+the metacode file.
+.ih
+SEE ALSO
+splot
+.endhelp

@@ -1,0 +1,18 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<mach.h>
+
+# MIILEN -- Determine the number of SPP integers to store nelems of type
+# mii_type.  The mii_type are defined in mii.h.
+#
+# THIS PROCEDURE HAS BEEN OBSOLETED BY MIIPAKLEN.
+
+int procedure miilen (nelems, mii_datatype)
+
+int	nelems
+int	mii_datatype
+
+begin
+	return (((nelems * mii_datatype / NBITS_BYTE + SZB_CHAR - 1) /
+	    SZB_CHAR + SZ_INT - 1) / SZ_INT)
+end

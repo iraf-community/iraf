@@ -1,0 +1,41 @@
+# Help directory for the ONEDSPEC package.
+
+$defdir		= "noao$onedspec/"
+$doc		= "noao$onedspec/doc/"
+
+addsets		hlp=doc$addsets.hlp,		src=t_addsets.x
+batchred	hlp=doc$batchred.hlp,		src=batchred.cl
+bswitch		hlp=doc$bswitch.hlp,		src=t_bswitch.x
+calibrate	hlp=doc$calibrate.hlp,		src=t_calibrate.x
+coincor		hlp=doc$coincor.hlp,		src=t_coincor.x
+dispcor		hlp=doc$dispcor.hlp,		src=dispcor/dispcor.x
+flatfit		hlp=doc$flatfit.hlp,		src=t_flatfit.x
+flatdiv		hlp=doc$flatdiv.hlp,		src=t_flatdiv.x
+identify	hlp=doc$identify.hlp
+continuum	hlp=doc$continuum.hlp,		src=continuum.cl
+onedspec	hlp=doc$onedspec.hlp,		src=onedspec.cl
+powercor	hlp=doc$powercor.hlp,		src=powercor.cl
+process		hlp=doc$process.hlp,		src=process.cl
+reidentify	hlp=doc$reidentify.hlp
+refspectra	hlp=doc$refspectra.hlp,		src=dispcor/refspectra.x
+revisions	hlp=Revisions
+sensfunc	hlp=doc$sensfunc.hlp,		src=sensfunc/t_sensfunc.x
+setdisp		hlp=doc$setdisp.hlp,		src=setdisp.x
+shedit		hlp=doc$shedit.hlp,		src=t_shedit.x
+slist		hlp=doc$slist.hlp,		src=t_slist.x
+specplot	hlp=doc$specplot.hlp,		src=t_specplot.x
+splot		hlp=doc$splot.hlp,		src=splot/splot.x
+standard	hlp=doc$standard.hlp,		src=t_standard.x
+subsets		hlp=doc$subsets.hlp,		src=t_subsets.x
+lcalib		hlp=doc$lcalib.hlp,		src=t_lcalib.x
+mkspec		hlp=doc$mkspec.hlp,		src=x_mkspec.x
+widstape	hlp=doc$widstape.hlp,		src=x_widstape.x
+rebin		hlp=doc$rebin.hlp,		src=t_rebin.x
+combine		hlp=doc$combine.hlp,		src=t_combine.x
+names		hlp=doc$names.hlp,		src=t_names.x
+coefs		hlp=doc$coefs.hlp,		src=t_coefs.x
+sinterp		hlp=doc$sinterp.hlp,		src=t_sinterp.x
+bplot		hlp=doc$bplot.hlp,		src=bplot.cl
+sums		hlp=doc$sums.hlp,		src=t_sums.x
+sflip		hlp=doc$sflip.hlp,		src=sflip.x
+sextract	hlp=doc$sextract.hlp,		src=sextract.cl

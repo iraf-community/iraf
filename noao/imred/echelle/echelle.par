@@ -1,0 +1,5 @@
+# PARAMETERS FOR KPNO ECHELLE SPECTRAL REDUCTION PACKAGE
+
+extinction,s,h,"onedstds$kpnoextinct.dat",,,Extinction file
+caldir,s,h,,,,Directory containing calibration data
+version,s,h,"Apr 1988"

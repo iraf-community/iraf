@@ -1,0 +1,17 @@
+.help revisions Jun88 noao.imred.msred
+.nf
+imred$msred/apnormalize.par +
+imred$msred/msred.cl
+imred$msred/msred.men
+    Added APNORMALIZE to the package. (6/1/89, Valdes)
+
+imred$msred/standard.par
+    Removed ennumerated list.  (4/10/89, Valdes)
+
+imred$msred/* +
+imred$msred/doc/* +
+    New package specialized for reducing spectra in "multispec" format.
+    It includes new tasks for doing dispersion solutions in multispec
+    format spectra.  (3/29/89, Valdes)
+
+.endhelp

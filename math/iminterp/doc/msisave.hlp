@@ -1,0 +1,38 @@
+.help msisave Jul84 "Image Interpolator Package"
+.ih
+NAME
+msisave -- save interpolant
+.ih
+SYNOPSIS
+msisave (msi, interpolant)
+
+.nf
+    pointer	msi		# interpolant descriptor
+    real	interpolant[]	# array containing the interpolant
+.fi
+.ih
+ARGUMENTS
+.ls msi   
+Pointer to the interpolant descriptor structure.
+.le
+.ls interpolant
+Array where the interpolant is stored. The necessary length of interpolant
+required can be determined by a call to msigeti.
+.le
+
+.nf
+	    len_interpolant = msigeti (msi, II_MSINSAVE)
+.fi
+.ih
+DESCRIPTION
+The interpolant type, number of coefficients in x and y and the position of
+the first data point in the
+coefficient array  are stored in the first
+four elements of interpolant. The remaining elements contain
+the coefficients calculated by MSIFIT.
+.ih
+NOTES
+.ih
+SEE ALSO
+msirestore
+.endhelp

@@ -1,0 +1,44 @@
+.help zfiotx May84 "System Interface"
+.ih
+NAME
+zfiotx -- text file driver
+.ih
+SYNOPSIS
+.nf
+zopntx (osfn, mode, chan)		# open or create text file
+zclstx (chan, status)			# close text file
+zgettx (chan, text, maxch,  status)	# get next record
+zputtx (chan, text, nchars, status)	# put record
+zflstx (chan, status)			# flush output
+znottx (chan, loffset)			# note file position
+zsektx (chan, loffset, status)		# seek to a line
+zstttx (chan, param, lvalue)		# get file status
+
+packed	char osfn[]
+char	text[]
+int	mode, chan, maxch, nchars, status, param
+long	loffset, lvalue
+.fi
+.ih
+DESCRIPTION
+All text file i/o is via these primitives.  The detailed specifications
+of the individual routines are given in separate manual pages.
+A text file must be opened or created with \fBzopntx\fR before any i/o
+can take place.  Text file i/o is record (line) oriented and is sequential
+in nature.  Character data is maintained in ASCII SPP chars above the kernel
+and in the host character format below the kernel.
+The newline character delimits each line of text.
+Seeking is permitted prior to a write but only to the beginning of a line
+or to BOF or EOF.  The seek offset of a line may only be determined by a
+prior call to \fBznottx\fR when actually reading or writing the file.
+Writing is permitted only at EOF.  Output is assumed to be buffered.
+.ih
+RETURN VALUES
+Once a file is opened all references to the file are by the channel number
+\fIchan\fR, a magic integer.  A file may not be accessed by name while it
+is open.  The i/o primitives return the number of characters read or written
+as the status value; 0 is returned when reading at EOF.
+.ih
+SEE ALSO
+zfioty, the manual pages for the individual routines
+.endhelp

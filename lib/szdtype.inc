@@ -1,0 +1,5 @@
+define	MAX_DTYPE	11
+
+short	ty_size[MAX_DTYPE]
+data	ty_size /SZ_BOOL, SZ_CHAR, SZ_SHORT, SZ_INT, SZ_LONG, SZ_REAL,
+	         SZ_DOUBLE, SZ_COMPLEX, SZ_POINTER, SZ_STRUCT, SZ_USHORT/

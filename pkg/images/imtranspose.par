@@ -1,0 +1,3 @@
+input,s,a,,,,Images to be transposed
+output,s,a,,,,Output image names
+len_blk,i,h,512,,,Size in pixels of internal subraster

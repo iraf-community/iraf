@@ -1,0 +1,141 @@
+.help setairmass May89 astutil
+.ih
+NAME
+setairmass -- update image headers with the effective airmass 
+.ih
+USAGE
+setairmass images
+.ih
+PARAMETERS
+.ls images
+The list of images for which to calculate the airmass.  The image
+headers may optionally be updated with the airmass and the mid-UT of
+the exposure.
+.le
+.ls intype = "beginning"
+The time stamp of the observation as recorded at the telescope for the
+time dependent header keywords.  The choices are the "beginning",
+"middle" or "end" of the observation.
+.le
+.ls outtype = "effective"
+The output time stamp desired for the airmass.  The choices are the
+"effective" airmass, or the airmass at the "beginning", "middle" or
+"end" of the observation.
+.le
+.ls exposure = "exptime"
+The name of the keyword that contains the exposure time (in seconds) of
+the image.
+.le
+.ls latitude = ")observatory.latitude"
+The latitude of the observatory.  The default value is for Kitt Peak
+and is obtained from the parameters of the observatory task.
+.le
+.ls show = yes
+Print the airmasses and mid-UT's for each image?
+.le
+.ls update = no
+Update the image headers with the airmasses and the mid-UT's?
+.le
+.ls override = yes
+If updating the image headers, override values that were previously
+recorded?
+.le
+.ih
+DESCRIPTION
+SETAIRMASS will calculate the effective airmass of an astronomical image,
+as described below under "ALGORITHMS".  The task requires the
+instantaneous zenith distance at the beginning, middle and end of the
+exposure.  These are calculated using the right ascension, declination,
+sidereal time and exposure time from the image header, in addition to
+the value of the \fBlatitude\fR parameter.  The RA, Dec and ST keywords
+are assumed to have the names "RA", "DEC" and "ST".  The name of the
+exposure time keyword can be specified as a parameter.  This keyword
+should express the exposure time in seconds.  If any of the required
+keywords are missing from the image headers, they can be added using
+the hedit task.
+
+Before using this task, you will need to know the "time stamp" of the
+time varying header quantities (e.g. sidereal time).  Do the recorded
+values represent the beginning, the middle or the end of the exposure?
+This should be set in the \fBintype\fR parameter.
+
+If for some reason the effective airmass is not desired, the value of
+the airmass at the beginning, middle or end of the exposure can be
+recorded in the "AIRMASS" keyword in the header.  The \fBshow\fR
+parameter can be used to control the output to the terminal.  The
+\fBupdate\fR and \fBoverride\fR parameters control the header keyword
+output.
+
+AIRMASS will also calculate the universal time of the middle of the
+exposure and place the value in a keyword "UTMIDDLE", in the image
+header.  This assumes that the value for the UT is in the keyword "UT",
+with the same time stamp as the sidereal time.  UTMIDDLE is useful for
+interpolating calibration arc dispersion solutions using REFSPECTRA,
+especially when the exposure time is long.
+.ih
+ALGORITHMS
+The mean airmass is calculated uses the formula described in "Some
+Factors Affecting the Accuracy of Stellar Photometry with CCDs" by P.
+Stetson, DAO preprint, September 1988.  This simple formula is:
+
+.nf
+	    AM (eff) = [AM (beginning) + 4*AM (middle) + AM (end)] / 6
+.fi
+
+and is derived by using Simpson's 1/3 rule to approximate the imtegral
+that represents the mean airmass.
+
+The beginning, middle and end airmasses are calculated using the
+relation between airmass and elevation (or zenith distance) in John
+Ball's book on Algorithms for the HP-45:
+
+.nf
+	    AM = sqrt (x**2 + 2*scale + 1) - x, where
+
+	     x = scale * sin(elevation) = scale * cos(ZD)
+.fi
+
+The atmospheric scaling parameter is chosen to be 750 (see
+"Astrophysical Quantities" by Allen, 1973 p.125,133).
+.ih
+KEYWORDS
+The required input keywords are:
+.ls RA
+Right ascension in hours at the beginning, middle, or end of the observation.
+.le
+.ls DEC
+Declination in degrees at the beginning, middle, or end of the observation.
+.le
+.ls ST
+Siderial time in hours at the beginning, middle, or end of the observation.
+.le
+.ls UT
+Universal time in hours at the beginning, middle, or end of the observation.
+.le
+.ls \fIexposure\fR
+The value of the exposure parameter is the keyword name to be used for the
+exposure time in seconds.
+.le
+
+The output keywords are:
+.ls AIRMASS
+The computed airmass at either the beginning, middle, end, or weighted
+effective value over the exposure.
+.le
+.ls UTMIDDLE
+The universal time at the middle of the exposure.
+.le
+.ih
+EXAMPLES
+Calculate the effective airmass of the IRAF test picture, dev$pix:
+
+.nf
+	airmass dev$pix exposure=itime
+.fi
+
+Note that the default value of the update parameter is no, so that only
+a listing of the calculated airmasses is generated.
+.ih
+SEE ALSO
+airmass, hedit, refspectra
+.endhelp

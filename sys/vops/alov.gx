@@ -1,0 +1,35 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ALOV -- Compute the low value (minimum) of a vector.
+
+PIXEL procedure alov$t (a, npix)
+
+PIXEL	a[ARB]
+int	npix
+PIXEL	low, pixval
+$if (datatype == x)
+real	abs_low
+$endif
+int	i
+
+begin
+	low = a[1]
+	$if (datatype == x)
+	abs_low = abs (low)
+	$endif
+
+	do i = 1, npix {
+	    pixval = a[i]
+	    $if (datatype == x)
+	    if (abs (pixval) < abs_low) {
+		low = pixval
+		abs_low = abs (low)
+	    }
+	    $else
+	    if (pixval < low)
+		low = pixval
+	    $endif
+	}
+
+	return (low)
+end

@@ -1,0 +1,82 @@
+.help revisions Jun88 noao.astutil
+.nf
+astutil$t_setairmass.x +
+astutil$setairmass.par +
+astutil$doc/setairmass.hlp +
+astutil$x_astutil.x
+astutil$mkpkg
+astutil$astutil.cl
+astutil$astutil.men
+astutil$astutil.hd
+    Added a new task to compute and update airmass and universal time
+    in image headers based on the exposure.  (5/19/89, Valdes)
+
+astutil$asttools/asttimes.x
+    The leap year was not handled correctly for the centuries in
+    ast_day_of_year.  (5/11/89, Valdes)
+
+astutil$rvcorrect.par
+astutil$t_rvcorrect.x
+astutil$doc/rvcorrect.hlp
+     Added 'imupdate' parameter to make updating image headers with
+     computed corrections an option.  (5/5/89, Fitzpatrick)
+
+astutil$galactic.x
+astutil$galactic.par
+astutil$doc/galactic.hlp
+astutil$asttools/astgaltoeq.x +
+    GALACTIC now can transform in either direction.  (2/14/89, Valdes)
+
+noao$astutil/t_rvcorrect.x
+noao$astutil/doc/rvcorrect.hlp
+    Changed the keywords and output when using images.  The observed
+    velocity must now be VOBS.  The output is HJD, VHELIO, VLSR, and
+    VSUN (a record of the Sun's velocity used for VLSR).  (12/14/88 Valdes)
+
+noao$astutil/asttools/ast_galactic.x
+    The galactic task was not precessing the input coordinates before
+    computing the galactic coordinates.
+
+    I changed the single precision defined constants to double precision
+    and the in line constant 15 to 15.0d0.
+    (9/15/88 Davis)
+
+noao$astutil/astvorbit.x
+noao$astutil/astvbary.x
+noao$astutil/asthjd.x
+    The calls to AST_COORD needed double precision arguments.  (7/26/88 Valdes)
+
+noao$astutil/astutil.cl
+    Added OBSERVATORY task to this package.  (4/12/88 Valdes)
+
+noao$astutil/galactic.x
+    The double precision variables lii and bii where being printed with
+    PARGR which gives wrong results on the SUNS. (11/6/87 Valdes)
+
+noao$astutil/*
+noao$astutil/t_asttimes.x +
+noao$astutil/asttimes.par +
+noao$astutil/doc/asttimes.help +
+noao$astutil/t_rvcorrect.x +
+noao$astutil/rvcorrect.par +
+noao$astutil/doc/rvcorrect.help +
+noao$astutil/asttools/* +
+    The package was reorganized to put algorithm procedures in the subdirectory
+    asttools.  A README file describes the contents of this directory.
+
+    New tasks ASTTIMES and RVCORRECT have been added for computing astronomical
+    dates and times and radial velocity corrections.  Tools used by these
+    tasks were added to the asttools library.
+    (10/29/87)
+
+noao$astutil/precess.x
+    Replaced use of preces.f with new ast_precess.x.  This also involved
+    changing years to double precession internally. (10/28/87 Valdes)
+
+noao$astutil/Revisions
+    Valdes, May 26, 1987
+    1.  Revisions file started.
+
+    Lytle, May 28, 1987
+    2. Installed PDM in astutil.
+.endhelp

@@ -1,0 +1,25 @@
+# Help directory for the GSURFIT (surface fitting) package.
+
+$gsurfit	= "math$gsurfit/"
+
+gsaccum		hlp = gsaccum.hlp,	src = gsurfit$gsaccum.x
+gsacpts		hlp = gsacpts.hlp,	src = gsurfit$gsacpts.x
+gsadd		hlp = gsadd.hlp,	src = gsurfit$gsadd.x
+gscoeff		hlp = gscoeff.hlp,	src = gsurfit$gscoeff.x
+gscopy		hlp = gscopy.hlp,	src = gsurfit$gscopy.x
+gsder		hlp = gsder.hlp,	src = gsurfit$gsder.x
+gserrors	hlp = gserrors.hlp,	src = gsurfit$gserrors.x
+gseval		hlp = gseval.hlp,	src = gsurfit$gseval.x
+gsinit		hlp = gsinit.hlp,	src = gsurfit$gsinit.x
+gsfit		hlp = gsfit.hlp,	src = gsurfit$gsfit.x
+gsfree		hlp = gsfree.hlp,	src = gsurfit$gsfree.x
+gsrefit		hlp = gsrefit.hlp,	src = gsurfit$gsrefit.x
+gsreject	hlp = gsreject.hlp,	src = gsurfit$gsreject.x
+gsrestore	hlp = gsrestore.hlp,	src = gsurfit$gsrestore.x
+gssave		hlp = gssave.hlp,	src = gsurfit$gssave.x
+gssolve		hlp = gssolve.hlp,	src = gsurfit$gssolve.x
+gsstati		hlp = gsstati.hlp,	src = gsurfit$gsstat.x
+gsstatr		hlp = gsstatr.hlp,	src = gsurfit$gsstat.x
+gssub		hlp = gssub.hlp,	src = gsurfit$gssub.x
+gsvector	hlp = gsvector.hlp,	src = gsurfit$gsvector.x
+gszero		hlp = gszero.hlp,	src = gsurfit$gszero.x

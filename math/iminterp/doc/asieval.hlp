@@ -1,0 +1,35 @@
+.help asieval Jul84 "Image Interpolator Package"
+.ih
+NAME
+asieval -- procedure to evaluate interpolant at x
+.ih
+SYNOPSIS
+y = asieval (asi, x)
+
+.nf
+    pointer	asi	# interpolant descriptor
+    real	x	# x value, 1 <= x <= npts
+.fi
+.ih
+ARGUMENTS
+.ls asi   
+Pointer to the sequential interpolant descriptor structure.
+.le
+.ls x    
+X value.
+.le
+.ih
+DESCRIPTION
+The polynomial coefficients are calculated directly from the data points
+or the B-spline coefficients. The
+actual calculation is done by adding and multiplying terms
+according to Everett's central difference interpolation formula.
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the
+responsibility of the user. ASIINIT and ASIFIT must be called before using
+ASIEVAL.
+.ih
+SEE ALSO
+asivector, arieval
+.endhelp

@@ -1,0 +1,103 @@
+include <mach.h>
+include "../lib/apphot.h"
+include "../lib/center.h"
+
+define	RADIUS	15.0
+define	CRADIUS	3
+
+# AP_QRAD -- Simple radial profile plotter.
+
+procedure ap_qrad (ap, im, wx, wy, gd)
+
+pointer	ap			# pointer to apphot structure
+pointer	im			# pointero to the IRAF image
+real	wx, wy			# cursor coordinates
+pointer	gd			# pointer to graphics stream
+
+int	 maxpix, npix, nx, ny, wcs, key
+pointer	gt, sp, pix, coords, r, cmd
+real	gwx, gwy, xcenter, ycenter, xc, yc, radius, rmin, rmax, imin, imax
+real	u1, u2, v1, v2, x1, x2, y1, y2
+
+int	ap_skypix(), clgcur(), apstati()
+int	nscan(), scan()
+pointer	ap_gtinit()
+real	apstatr()
+
+begin
+	# Check for open graphics stream.
+	if (gd == NULL)
+	    return
+	call greactivate (gd, 0)
+	call gclear (gd)
+
+	# Fit the center.
+	call ap_ictr (im, wx, wy, CRADIUS, apstati (ap, POSITIVE), xcenter,
+	    ycenter)
+
+	# Get the radius of the extraction region.
+	call printf ("Half width of extraction box (%4.1f) pixels:")
+	    call pargr (RADIUS)
+	call flush (STDOUT)
+	if (scan () == EOF)
+	    radius = RADIUS
+	else {
+	    call gargr (radius)
+	    if (nscan () < 1)
+	        radius = RADIUS
+	}
+	maxpix = (2 * int (radius) + 1) ** 2
+	    
+	# Allocate temporary space.
+	call smark (sp)
+	call salloc (coords, maxpix, TY_INT)
+	call salloc (pix, maxpix, TY_REAL)
+	call salloc (r, maxpix, TY_REAL)
+	call salloc (cmd, SZ_LINE, TY_CHAR)
+
+	# Fetch the radial profile and reset the sky.
+	npix = ap_skypix (im, xcenter, ycenter, 0.0, radius, Memr[pix],
+	    Memi[coords], xc, yc, nx, ny)
+	if (npix <= 0) {
+	    call gdeactivate (gd, 0)
+	    call sfree (sp)
+	    return
+	}
+
+	# Store old viewport and window coordinates.
+	call ggview (gd, u1, u2, v1, v2)
+	call ggwind (gd, x1, x2, y1, y2)
+
+	# Initialize the plot and store the viewport and window limits.
+	call apstats (ap, IMNAME, Memc[cmd], SZ_FNAME)
+	gt = ap_gtinit (Memc[cmd], xcenter, ycenter)
+
+	# Compute the radius values.
+	call ap_xytor (Memi[coords], Memr[r], npix, xc, yc, nx)
+	call alimr (Memr[r], npix, rmin, rmax)
+	call alimr (Memr[pix], npix, imin, imax)
+
+	# Plot radial profiles.
+	call gclear (gd)
+	call ap_rset (gd, gt, 0.0, rmax, imin, imax, apstatr (ap, SCALE))
+	call ap_plotrad (gd, gt, Memr[r], Memr[pix], npix, "plus")
+
+	# Go into cursor mode.
+	call printf ("Waiting for cursor mode command: [:.help=help,q=quit]")
+	while (clgcur ("cursor", gwx, gwy, wcs, key, Memc[cmd], SZ_LINE) !=
+	    EOF) {
+	    if (key == 'q')
+		break
+	    call printf (
+	        "Waiting for cursor mode command: [:.help=help,q=quit]")
+	}
+
+	# Restore old window and viewport coordinates.
+	call gsview (gd, u1, u2, v1, v2)
+	call gswind (gd, x1, x2, y1, y2)
+
+	# Free plots and working space.
+	call ap_gtfree (gt)
+	call sfree (sp)
+	call gdeactivate (gd, 0)
+end

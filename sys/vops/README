@@ -1,0 +1,10 @@
+VOPS -- Vector OPerators
+
+This directory contains the (generic) source for the vector operators (VOPS).
+These generic procedures are expanded into a set of type specific procedures
+by the GENERIC preprocessor, before compilation by XC.  Documentation for
+the vector operators and for the GENERIC preprocessor is in Vops.hlp.
+
+The subdirectory "achtgen" contains code for generalized datatype conversion
+of vectors.  The highest level routine, "acht" implements a full 9 by 9
+type conversion matrix (BUcsilrdx) (the BU are in OSB).

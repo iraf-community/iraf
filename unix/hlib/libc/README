@@ -1,0 +1,25 @@
+LIBC (C library) include files
+
+	ctype		character classes, conversions
+	error		c_erract actions
+	finfo		c_finfo data structure
+	fset		FIO set/stat parameter
+	knames		external kernel names
+	libc		must be included by all files which use libc
+	math		UNIX math functions
+	spp		SPP language definitions
+	stdio		UNIX standard i/o
+	xnames		SPP external names
+	xwhen		c_xwhen (exception handling)
+	kernel		kernel constants, tables
+	protect		file protection
+	prtype		process types
+	setjmp		non-local goto
+	zfstat		FIO driver file status codes
+
+The file "iraf.h" is referenced as <iraf.h> in IRAF C source files, and is used
+to load all other IRAF/LIBC C header files via "#define import_XXX" defines in
+these files.  In order for the C compiler to find <iraf.h>, one should either
+[1] add the directory $hlib/libc to the list of directories to be searched by
+the C compiler for include files, or [2] make a link to, or copy of,
+libc/iraf.h in the system directory /usr/include.

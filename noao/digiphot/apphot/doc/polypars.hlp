@@ -1,0 +1,42 @@
+.help polypars May88 noao.digiphot.apphot
+.ih
+NAME
+polypars -- edit the polyphot photometry parameters
+.ih
+USAGE
+polypars
+.ih
+PARAMETERS
+.ls zmag = 26.00
+The zero point offset for the magnitude scale.
+.le
+.ls mkpolygon = no
+Draw the polygons on the screen.
+.le
+.ih
+DESCRIPTION
+The zero point of the magnitude scale is determined by \fIzmag\fR.
+If the \fImkpolygon\fR switch enabled polygons are marked on the screen.
+.ih
+EXAMPLES
+
+1. List the polyphot photometry parameters.
+
+.nf
+	ap> lpar polypars
+.fi
+
+2. Edit the polyphot photometry parameters.
+
+.nf
+	ap> polypars
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+polyphot
+.endhelp

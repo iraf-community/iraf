@@ -1,0 +1,39 @@
+# Update the generically expanded files in libqpoe.a.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	qpaddb.x	
+	qpaddc.x	
+	qpaddd.x	
+	qpaddi.x	
+	qpaddl.x	
+	qpaddr.x	
+	qpadds.x	
+	qpexcoded.x	../qpex.h <mach.h>
+	qpexcodei.x	../qpex.h <mach.h>
+	qpexcoder.x	../qpex.h <mach.h>
+	qpexparsed.x	../qpex.h <ctype.h> <mach.h>
+	qpexparsei.x	../qpex.h <ctype.h> <mach.h>
+	qpexparser.x	../qpex.h <ctype.h> <mach.h>
+	qpexsubd.x	../qpex.h <mach.h>
+	qpexsubi.x	../qpex.h <mach.h>
+	qpexsubr.x	../qpex.h <mach.h>
+	qpgetc.x	../qpoe.h
+	qpgetd.x	../qpoe.h
+	qpgeti.x	../qpoe.h
+	qpgetl.x	../qpoe.h
+	qpgetr.x	../qpoe.h
+	qpgets.x	../qpoe.h
+	qpiorpixi.x	../qpio.h
+	qpiorpixs.x	../qpio.h
+	qpputc.x	../qpoe.h
+	qpputd.x	../qpoe.h
+	qpputi.x	../qpoe.h
+	qpputl.x	../qpoe.h
+	qpputr.x	../qpoe.h
+	qpputs.x	../qpoe.h
+	;

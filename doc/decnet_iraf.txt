@@ -1,0 +1,365 @@
+Notes on networking with DECNET in VMS/IRAF V2.3 - V2.5
+-------------------------------------------------------
+
+VMS/IRAF networking using DECNET is supported in a limited way in IRAF
+releases 2.3 - 2.5.  As IRAF networking may change somewhat after V2.5, we
+are currently providing these notes only in an informal manner upon request.
+Warning: we have not had the opportunity to verify these procedures in all
+possible environments, so they may be inaccurate or incomplete.
+
+IRAF networking is the preferred way to gain access to peripherals on a
+remote computer, on systems for which IRAF supports networking internally
+(i.e. TCP/IP at present).  These peripherals might include printers, 
+plotters, supported image display devices and large disks.  The decnet
+network interface does not, at present, permit access to tape drives on
+a remote machine.  At present, if tape drive access is needed, it will be
+necessary to perform a normal IRAF installation on the remote and use the
+tape reading facilities on that machine directly (once installed, the
+system may be stripped considerably, though).
+
+If your system uses only DECNET, it may or may not be necessary to use IRAF
+networking, depending upon what peripherals it is desired to access on the
+remote node.  Early testing with a minimal `kernel server' configuration
+on the remote is promising and very easy to implement.  However, if for some
+reason it is not possible to use IRAF networking in this manner, IRAF can be
+set up to use DCL command procedures to send printer and plotter output to
+the remote node.  Contact us to find out if this will work on your system.
+Read on if you would like to set up IRAF networking with DECNET.
+
+The default network protocol on the distributed systems is TCP/IP, because
+that is what we use in the local NOAO network.  In its present form, the
+choice of network protocol is a compile-time option.  In IRAF V2.3 one would
+edit a file or two, compile with the DEC C compiler, and perform a
+relink-sysgen.  In IRAF V2.5 the appropriate object file is supplied
+automatically (unless you have a source-only distribution or have stripped
+all object files from the system), but you would still need to rebuild the
+shared library and perform a sysgen.
+
+There are two ways to use internal IRAF networking:  between two fully-
+installed IRAF systems, and between one fully-installed system and a
+`kernel server' system.  The steps below under `Configuring IRAF networking
+for DECNET' apply to a fully-installed system, and would have to be taken
+for at least one node in an IRAF network.  See the section below under
+"Server Nodes" if you are using the remote purely for access to peripheral
+devices, but not for running IRAF.  In node name references in these notes
+we will use the convention HOMENODE = fully-installed system, and SERVERNODE =
+the server-only node.
+
+
+---------------------------------------------------------------------------
+Configuring IRAF networking for DECNET on a fully-installed system:
+This is a summary of the steps you will take:
+
+    o   build a decnet version of zfioks.obj and load it into a library
+    o   rebuild the shared library
+    o   relink all the IRAF executables
+    o   edit dev$hosts
+    o   create .irafhosts files in IRAF home directories on home node
+    o   create irafks.com files in VMS login directories on server node
+
+[1] Get into the directory os$net ([iraf.vms.os.net]).  Check to see if there
+    is a file zfioks_obj.dna (distributed in IRAF V2.5).  If there is not, go
+    to step [2].  If there is, copy it:
+
+    $ copy zfioks_obj.dna zfioks.obj
+
+    ...and proceed to step [3].
+
+[2] (There was no zfioks_obj.dna file in [iraf.vms.os.net], so we will
+    attempt to create one.)
+
+    [a] If you do not have a DEC C compiler, contact us to see about getting
+	a copy of zfioks.obj built for DECNET; you will not be able to proceed
+	further until you do.
+
+    [b] You do have a DEC C compiler, so edit zfioks.c and compile it:
+
+	$ edit zfioks.c
+	    change from:
+		#define DECNET  0
+		#define TCP     1
+	    to:
+		#define DECNET  1
+		#define TCP     0
+
+	$ cc/nolist zfioks.c
+
+[3] Load the zfioks object file into the IRAF kernel library:
+
+    $ lib/replace [iraf.vms.hlib]libos.olb zfioks.obj
+    $ delete zfioks.obj;*
+
+[4] Make sure the system is configured for IRAF networking.  Examine
+    the file [iraf.vms.hlib]mkpkg.inc, and make sure USE_KNET = yes:
+
+    $set	USE_KNET	= yes		# use the KI (network interface)
+
+[5] Assuming you are using the shared library, the default, you now
+    need to regenerate that library.  If for some reason you are not
+    using the shared library, you may proceed to step [6].  To rebuild
+    the shared library, carry out the steps in section 5.1.3 of the
+    "VMS/IRAF Installation and Maintenance Guide", July 1987, then 
+    proceed to step [6].
+
+[6] Relink the main IRAF system.  To do this, carry out the instructions
+    in section 5.1.4 of the Installation Guide.
+
+[7] Edit two files in dev$:
+
+	hosts			set up node names for your site
+	hostlogin		(optional) set up default public logins if any
+
+[8] Create .irafhosts files in the IRAF login directories of users who plan
+    to use networking on HOMENODE.  The file's format is a series of lines
+    of the form:
+ 
+ 	alias1 alias2 ... aliasN : loginname password
+ 
+    If the same login name and password are used on several nodes, an "*" may
+    be used as the alias.  The file should be read protected; also, a `?' may
+    be used in place of the password (you will be prompted).  For example:
+
+	# .irafhosts file
+	node1 node3 : mylogin mypassword
+	* : otherlogin ?
+
+[9] Place a DCL command file called "irafks.com" in the VMS login directories
+    of all IRAF network users on SERVERNODE (or on both nodes for two-way
+    network traffic):
+
+	$! IRAFKS.COM -- DCL command file to run the IRAF/DECNET kernel server.
+	$! Note:  the path to the server directory MUST be fully specified
+	$! below (i.e. substitute your actual disk name for "DISK").
+	$!
+	$! set verify							!*debug*
+	$! netserver$verify = 1						!*debug*
+	$!
+	$  set default DISK:[irafserve]
+	$  @irafuser.com
+	$  run irafks.exe
+	$  logout
+
+    where DISK is of course the IRAF disk; the decnet server has no access
+    to globally defined IRAF symbols or logicals like IRAFDISK until it can
+    execute irafuser.com.
+
+
+This completes the basic installation; the steps are the same for both
+nodes if two-way IRAF network traffic is desired.
+
+
+------------------------------------------------------------------------------
+Server Nodes:
+This is a summary of the steps you will take:
+
+    o   build non-shared library version of irafks.exe
+    o   install and edit the following files in [irafserve] on server node:
+
+	o   irafks.exe
+	o   irafuser.com
+	o   irafks.com
+	o   login.com
+	o   zzsetenv.def
+
+If a remote node is to be used purely for access to peripherals (you don't
+plan to actually run anything in IRAF on the remote node directly), you need
+only install a tiny subset of the IRAF system on it.
+
+[a] (On the existing fully-installed IRAF system, HOMENODE)
+    Get into the directory [iraf.sys.ki] and link a copy of the IRAF
+    kernel server executable without the shared library.  Note that you
+    must have first followed the steps above for creating a DECNET version
+    of this system.
+
+	$ xc -z irafks.o
+
+    You will need the executable file IRAFKS.EXE resulting from this step
+    shortly, but it may be deleted after being copied to the remote system.
+
+[b] (On the remote, or `kernel server' system, SERVERNODE)
+    Ask the system manager to create an IRAF account as was done for the
+    the main IRAF installation, as in section 2.1 of the 1987 VMS/IRAF
+    Installation Guide.  Although it is not strictly necessary to have an
+    actual account for IRAF on this machine, it would be helpful should
+    it ever be necessary for us to debug anything on it.  Have its default
+    directory set to [IRAFSERVE] rather than [iraf.local], and create the
+    directory [irafserve] (this could be put elsewhere; you would simply
+    change all references to [irafserve] in these notes).
+
+    Also have the system manager insert the following global symbol definition
+    into the system-wide login file (e.g. sys$manager:sylogin.com):
+
+	$  irafserve :== @DISK:[irafserve]irafuser.com
+
+    If this is not done, then each user must explicitly execute that `@'
+    command in their own login.com files.
+
+[c] (On the remote, or `kernel server' system, SERVERNODE)
+    Log in as IRAF.  You should be in the [irafserve] directory.
+    Copy the newly-created kernel server executable and some other files
+    from the fully-installed system onto the kernel server system.
+    The file irafks.com was discussed in step [9] above; if you do not
+    have one on HOMENODE, just create it here.
+
+	$ set def [irafserve]
+	$ copy HOMENODE"account password"::DISK:[iraf.sys.ki]irafks.exe []
+	$ copy HOMENODE"account password"::DISK:[iraf.vms.hlib]irafuser.com []
+	$ copy HOMENODE"account password"::DISK:[iraf.vms.hlib]zzsetenv.def []
+	$ copy HOMENODE"account password"::DISK:[iraf.local]login.com []
+	$ copy HOMENODE"account password"::DISK:[iraf.local]irafks.com []
+
+    with the appropriate substitutions of course.
+
+    Edit irafuser.com to set the logical name definitions IRAFDISK, 
+    IMDIRDISK, and TEMPDISK for the server node.
+
+	$ edit irafuser.com		(etc.)
+
+    Make sure the first executable lines in login.com are as below:
+
+	$ edit login.com
+
+	    "$  set prot=(s:rwd,o:rwd,g:rwd,w:r)/default"
+	    "$  if (f$mode() .eqs. "NETWORK") then exit"
+
+    Change the DISK specification for the server system in irafks.com to
+    be the actual disk (or a system-wide logical name for it) -- see
+    step [9].
+
+	$ edit irafks.com		(etc.)
+
+[d] Insert irafks.com files into the VMS login directories on the server
+    node of any IRAF users wanting access to this node.  If plotter
+    access is desired, it is essential that the users' login.com files
+    explicitly execute the [irafserve]irafuser.com file, and desirable
+    that they exit if mode = NETWORK (to avoid lots of error messages
+    in NETSERVER.LOG files).  For example (in user's login.com):
+     
+	$  set prot=(s:rwd,o:rwd,g:rwd,w:r)/default
+	$  if (f$mode() .eqs. "NETWORK") then exit
+	...
+	$  irafserve		! define IRAF logicals for plotting
+
+    (The global symbol "irafserve" was defined in the system-wide login
+    file in step [b] above.)
+	
+This completes the basic network configuration.  Although setting up plotting
+devices in a network environment can be complicated, here are some guidelines
+for installing SGI translators on a kernel server node.
+
+
+--------------------------------------------------------------------------------
+Guidelines for installing SGI translators on kernel server node:
+This is a summary of the steps needed:
+
+    o   on home node, edit dev$graphcap (and dev$hosts if necessary)
+    o   copy hlib$sgiqueue.com to server and edit it
+    o   copy hlib$sgi2XXXX.exe to server (one for each SGI translator)
+
+[e] On the home node, edit the graphcap file (dev$graphcap) to insert the
+    server node prefix into the device name part of the DD string.  For
+    example, if device `vver' lives on SERVERNODE, and the DD string for
+    that device begins with:
+
+	:DD=vver,tmp$sgk,...
+
+    change it to:
+
+	:DD=SERVERNODE!vver,tmp$sgk,...
+
+    with appropriate substitution for SERVERNODE.  If all the plotters to
+    which you want access are on the same node, you can use the `plot'
+    alias; just make sure `plot' is an alias for SERVERNODE in dev$hosts
+    (see `Configuring IRAF networking for DECNET' above).  Also make sure
+    the printer queue names in the DD string are appropriate for SERVERNODE
+    or "none" if the devices are not spooled.  E.g.:
+
+	:DD=plot!vver,tmp$sgk,submit/que=fast/noprint/nolog \
+	/para=\050"vver","$F","$(PX) $(PY) VERSAQUEUE","$F.ras"\051 \
+	irafhlib\072sgiqueue.com:tc=sgi_versatec:
+
+
+[f] Copy the home node's hlib$sgiqueue.com file to the [irafserve] directory
+    on SERVERNODE and edit it for the local printer queue names, etc.
+    Also replace the "irafhlib" in the VMS task definitions, as the translators
+    on SERVERNODE reside in the same directory as sgiqueue.com, i.e.
+    [irafserve].  E.g.:
+
+	$  sgi2vver	:= $DISK:[irafserve]sgi2vver	!  versatec interface
+
+[g] Copy the home node's SGI translators to the [irafserve] directory on 
+    SERVERNODE.
+
+There are many different ways of interfacing plotters in VMS environments,
+so these notes will not work in all cases.  Call the IRAF Hotline if you 
+have any trouble at all [(602) 323-4160].
+
+
+------------------------------------------------------------------------
+Using the network:
+
+User summary:  each user desiring IRAF network access should have the
+following files, as described above:
+
+    on HOMENODE:	.irafhosts in IRAF home directory
+    on SERVERNODE:	irafks.com in VMS login directory
+    on SERVERNODE:	"irafserve" command in VMS login.com file
+
+In some cases, for example where the local node is a MicroVAX with
+comparatively slow disk drives and the remote is a big VAX with very
+fast disk drives, an image may actually be accessed faster on the remote
+over the IRAF network than it can be locally.
+
+When working on images across the network, it is best to store the pixel
+files in the same directory as the image headers, or in a subdirectory.
+This is done by "set imdir = HDR$".  Or, to cut the size of the directory
+in half by placing the pixel files in a subdirectory called "pixels",
+"set imdir = HDR$pixels/".  To cut down on typing, you might also define
+a logical directory for your data area on the remote, "dd" for example.
+Thus you could place the following lines in your login.cl file:
+
+	set imdir = HDR$pixels/
+	set dd    = bigvax!mydisk:\[mydir.iraf.data]
+
+Suppose you are now in the CL on the HOMENODE, and you want to run IMPLOT
+on an image called test001 on the remote node BIGVAX, in directory
+[mydir.iraf.data], and then copy it to your current directory on node A:
+
+	pl> implot dd$test001
+	pl> imcopy dd$test001 test001
+
+The logical directory dd$ may be used in most of the normal fashions (you
+won't be able to "chdir" to it).  Both IRAF virtual file names may be used
+(including all the usual system logical directories) and host file names.
+As usual in VMS/IRAF, any "$" and "[" in HOST-system pathnames must be
+escaped with "\", and lowercase filenames should only be used in IRAF
+virtual filenames.  Various file access examples follow:
+
+    Use of environment variable (see above)to cut down on typing:
+
+	cl> set dd = bigvax!mydisk\$1:\[mydir.iraf.data]
+	cl> dir dd$
+	cl> page dd$README
+	im> imhead dd$*.imh
+
+    Use of IRAF virtual filenames explicitly:  (this will only work on
+    systems where bigvax is a fully-installed system; the IRAF virtual
+    directories may not be present on a server-only system)
+
+	cl> count bigvax!local$notes
+	cl> tail bigvax!local$notes nl=100 | page
+	cl> dir bigvax!hlib$*.com long+
+	cl> dir bigvax!sys$gio/R* long+
+	cl> page bigvax!sys$gio/README
+	cl> page bigvax!home$login.cl
+	cl> dir bigvax!tmp$sgk* long+
+
+    Use of host-system pathnames:
+
+	cl> dir bigvax!usr\$0:\[mydir.iraf]*.imh
+	cl> copy bigvax!usr\$0:\[mydir.doc]letter.txt newletter.txt
+	cl> history 100 > bigvax!usr1:\[mydir]test.his
+
+Please remember that this is a developing interface, and that it has not
+yet been tested as extensively as we would like.  We would appreciate being
+contacted about any problems you uncover.

@@ -1,0 +1,19 @@
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	iralign.x	<imhdr.h>   <pkg/dttext.h>
+	irdbio.x	"iralign.h"
+	irimisec.x	<ctype.h>
+	irimzero.x
+	irmatch1d.x	"iralign.h" <imhdr.h> <pkg/dttext.h>   
+	irmatch2d.x	"iralign.h" <imhdr.h>
+	irmedr.x
+	irshifts.x	"iralign.h"
+	t_iralign.x	"iralign.h" <imhdr.h> <fset.h>
+	t_irmatch1d.x	"iralign.h" <imhdr.h> <fset.h> <pkg/dttext.h> 
+	t_irmatch2d.x	"iralign.h" <imhdr.h> <fset.h> <pkg/dttext.h> 
+	t_irmosaic.x	"iralign.h" <imhdr.h> <fset.h>
+	;

@@ -1,0 +1,12 @@
+The PROTO package provides a place in the system where users can put their
+programs for others to conveniently use, without modifying the IRAF system
+itself (see also LOCAL).  A program or package must meet a strict set of
+standards to be installed in the IRAF system as a fully supported program;
+PROTO provides a way for users to get software into the system without having
+to meet the mainline IRAF standards.  Programs or packages installed in PROTO
+are automatically candidates for eventual migration into the main system.
+Tasks installed in PROTO are generally expected to go away after a while.
+
+Only portable IRAF software should be installed in the PROTO package.
+Nonportable programs should be placed in LOCAL and will not be exported with
+the system.

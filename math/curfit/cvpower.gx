@@ -1,0 +1,281 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<math/curfit.h>
+
+$if (datatype == r)
+include	"curfitdef.h"
+$else
+include	"dcurfitdef.h"
+$endif
+
+# CVPOWER -- Convert legendre or chebyshev coeffecients to power series.
+
+$if (datatype == r)
+procedure cvpower (cv, ps_coeff, ncoeff)
+$else
+procedure dcvpower (cv, ps_coeff, ncoeff)
+$endif
+
+pointer	cv				# Pointer to curfit structure
+int	ncoeff				# Number of coefficients in fit
+PIXEL	ps_coeff[ncoeff]		# Power series coefficients (output)
+
+pointer	sp, cf_coeff, elm
+int	function
+$if (datatype == r)
+int	cvstati()
+$else
+int	dcvstati()
+$endif
+
+begin
+	call smark (sp)
+	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
+	$if (datatype == r)
+	call salloc (cf_coeff, ncoeff, TY_REAL)
+	function = cvstati (cv, CVTYPE)
+	$else
+	call salloc (cf_coeff, ncoeff, TY_DOUBLE)
+	function = dcvstati (cv, CVTYPE)
+	$endif
+	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
+
+	if (function != LEGENDRE && function != CHEBYSHEV) {
+	    call eprintf ("Cannot convert coefficients - wrong function type\n")
+	    call amovk$t (INDEFR, ps_coeff, ncoeff)
+	    call sfree (sp)
+	    return
+	}
+
+	# Get existing coefficients
+	$if (datatype == r)
+	call cvcoeff (cv, Memr[cf_coeff], ncoeff)
+	$else
+	call dcvcoeff (cv, Memd[cf_coeff], ncoeff)
+	$endif
+
+	switch (function){
+	case (LEGENDRE):
+	    call $tcv_legen (Memd[elm], Mem$t[cf_coeff], ps_coeff, ncoeff)
+	case (CHEBYSHEV):
+	    call $tcv_cheby (Memd[elm], Mem$t[cf_coeff], ps_coeff, ncoeff)
+	}
+
+	# Normalize coefficients
+	call $tcv_normalize (cv, ps_coeff, ncoeff)
+
+	call sfree (sp)
+end
+
+
+# CV_LEGEN -- Convert legendre coeffecients to power series coefficients.
+# Scaling the coefficients from -1,+1 to the full data range is done in a 
+# seperate procedure (cf_normalize).  Summation notation for Legendre series
+# taken from Arfken, page 536, equation 12.8.
+
+procedure $tcv_legen (matrix, cf_coeff, ps_coeff, ncoeff)
+
+int	ncoeff
+double	matrix[ncoeff, ncoeff]
+PIXEL	cf_coeff[ncoeff]
+PIXEL	ps_coeff[ncoeff]
+
+int	s, n, r, i
+double	sum
+
+double	$tcv_legcoeff()
+
+begin
+	# Calculate matrix elements.
+	do s = 0, ncoeff - 1 {
+	    if (mod (s, 2) == 0) 
+	        r = s / 2
+	    else 
+	        r = (s - 1) / 2
+
+	    do n = 0, r
+		matrix[s+1, (s+1) - (2*n)] = $tcv_legcoeff (n, s)
+	}
+
+	# Multiply matrix columns by curfit coefficients and sum.
+	do n = 1, ncoeff {
+	    sum = 0.0
+	    do i = 1, ncoeff
+	        sum = sum + (matrix[i,n] * cf_coeff[i])
+	    ps_coeff[n] = sum
+	}
+end
+
+
+# CV_LEGCOEFF -- calculate matrix elements for converting legendre coefficients
+# to powers of x.
+
+double procedure $tcv_legcoeff (k, n)
+
+int	k
+int	n
+
+double	fcn, sum1, divisor
+
+double	$tcv_factorial()
+
+begin
+	sum1 = ((-1) ** k) * $tcv_factorial (2 * n - 2 * k)
+	divisor = (2**n) * $tcv_factorial (k) * $tcv_factorial (n-k) * 
+	    $tcv_factorial (n - 2*k)
+	fcn = sum1 / divisor
+
+	return (fcn)
+end
+
+
+# CV_CHEBY -- Convert chebyshev coeffecients to power series coefficients.
+# Scaling the coefficients from -1,+1 to the full data range is done in a 
+# seperate procedure (cf_normalize).  Summation notation for Chebyshev series 
+# from Arfken, page 628, equation 13.83
+
+procedure $tcv_cheby (matrix, cf_coeff, ps_coeff, ncoeff)
+
+int	ncoeff				# Number of coefficients
+double	matrix[ncoeff, ncoeff]		# Work array for matrix elements
+PIXEL	cf_coeff[ncoeff]		# Input curfit coefficients
+PIXEL	ps_coeff[ncoeff]		# Output power series coefficients
+
+int	s, n, m, i
+double	sum
+
+double	$tcv_chebcoeff()
+
+begin
+	# Set first matrix element.
+	matrix[1,1] = 1.0d0
+
+	# Calculate remaining matrix elements.
+	do s = 1, ncoeff - 1 {
+	    if (mod (s, 2) == 0)
+	        n = s / 2
+	    else 
+	        n = (s - 1) / 2
+
+	    do m = 0, n
+		matrix[(s+1),(s+1)-(2*m)] = (PIXEL(s)/2.0) *
+		    $tcv_chebcoeff (m, s)
+	}
+
+	# Multiply matrix columns by curfit coefficients and sum.
+	do n = 1, ncoeff {
+	    sum = 0.0
+	    do i = 1, ncoeff
+	        sum = sum + (matrix[i,n] * cf_coeff[i])
+	    ps_coeff[n] = sum
+	}
+end
+
+
+# CV_CHEBCOEFF -- calculate matrix elements for converting chebyshev 
+# coefficients to powers of x.
+
+double procedure $tcv_chebcoeff (m, n)
+
+int	m	# Summation notation index
+int	n	# Summation notation index
+
+double	fcn, sum1, divisor
+double	$tcv_factorial()
+
+begin
+	sum1 = ((-1) ** m) * $tcv_factorial (n - m - 1) * (2 ** (n - (2*m)))
+	divisor = $tcv_factorial (n - (2*m)) * $tcv_factorial (m)
+	fcn = sum1 / divisor
+
+	return (fcn)
+end
+
+
+# CV_NORMALIZE -- Return coefficients scaled to full data range.
+
+procedure $tcv_normalize (cv, ps_coeff, ncoeff)
+
+pointer	cv			# Pointer to curfit structure
+int	ncoeff			# Number of coefficients in fit
+PIXEL	ps_coeff[ncoeff]	# Power series coefficients
+
+pointer	sp, elm, index
+int	n, i, k
+double	k1, k2, bc, sum
+
+double	$tcv_bcoeff()
+
+begin
+	# Need space for ncoeff**2 matrix elements
+	call smark (sp)
+	call salloc (elm, ncoeff ** 2, TY_DOUBLE)
+
+	k1 = CV_RANGE(cv)
+	k2 = k1 * CV_MAXMIN(cv)
+
+	# Fill matrix, after zeroing it 
+	call amovkd (0.0d0, Memd[elm], ncoeff ** 2)
+	do n = 1, ncoeff {
+	    k = n - 1
+	    do i = 0, k {
+		bc = $tcv_bcoeff (k, i)
+		index = elm + k * ncoeff + i
+		Memd[index] =  bc * ps_coeff[n] * (k1 ** i) * (k2 ** (k-i))
+	    }
+	}
+
+	# Now sum along matrix columns to get coefficient of individual 
+	# powers of x.
+	do n = 1, ncoeff {
+	   sum = 0.0d0
+	   do i = 1, ncoeff {
+	       index = elm + (n-1) + (i-1) * ncoeff
+	       sum = sum + Memd[index]
+	    }
+	    ps_coeff[n] = sum
+	}
+
+	call sfree (sp)
+end
+
+
+# CV_BCOEFF -- calculate and return binomial coefficient as function value.
+
+double procedure $tcv_bcoeff (n, i)
+
+int	n
+int	i
+
+double	$tcv_factorial()
+
+begin
+	if (i == 0)
+	    return (1.0d0)
+	else if (n == i)
+	    return (1.0d0)
+	else
+	    return ($tcv_factorial (n) / ($tcv_factorial (n - i) *
+	        $tcv_factorial (i)))
+end
+
+
+# CV_FACTORIAL -- calculate factorial of argument and return as function value.
+
+double procedure $tcv_factorial (n)
+
+int	n
+
+int	i
+double	fact
+
+begin
+	if (n == 0)
+	    return (1.0d0)
+	else {
+	    fact = 1.0d0
+	    do i = n, 1, -1
+	        fact = fact * double (i)
+	    return (fact)
+	}
+end

@@ -1,0 +1,30 @@
+# Make the BIAS package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	bias
+	;
+
+install:
+	$move	x_bias1.e noaobin$x_bias.e
+	;
+
+bias:
+	$omake	x_bias.x
+	$link	x_bias.o libpkg.a -lxtools -lcurfit -o x_bias1.e
+	;
+
+libpkg.a:
+	colbias.x	<imhdr.h> <imio.h> <pkg/xtanswer.h>\
+			<pkg/gtools.h>
+	linebias.x	<imhdr.h> <imio.h> <pkg/xtanswer.h>\
+			<pkg/gtools.h>
+	;

@@ -1,0 +1,48 @@
+# DEVICES.HLP -- Edit this file to describe the devices available on your
+# local host or network.
+
+.help devices Jun89 "NOAO/Tucson Device Information"
+.nf
+    \fBDevice      Aliases 	Description+Location\fR
+
+    lw1		apl|lw		Laserwriter, Rm B-50
+    lw2		apl2		Laserwriter, Xerox Rm (Rm 135)
+    lw3		apl3		Laserwriter, Engineering Mezzanine
+    lw4		apl4		Laserwriter, GONG lab (B-14)
+    lw5		apl5|nlw	Laserwriter NT, Rm 72
+    lw7		apl7|tops	Laserwriter, Solar Office, Rm 152
+    imagen	i240		240 dpi imagen, Rm 105
+    imagend	i300		300 dpi imagen, Rm 113
+    versatec	vup|ver         Versatec V-80, fan-fold, Rm 72
+    calcomp	ccp		Calcomp pen plotter, Rm 101
+    vmsprint	vmslp	        VMS cluster lineprinter, Rm 101
+    lpr				Direct output to Unix `lpr' program*
+
+    *This device is available on UNIX systems only.  A specific output
+    device may be selected by defining PRINTER in the user environment.
+
+    The following devices can be specified as shown with a trailing `s' 
+    to indicate a finer linewidth will be used, intended for small, dense
+    plots: lw1s, lw2s, lw3s, lw4s, lw5s, lw7s, i240s, i300s.
+
+    tucana!mta  [1600|6250]*    Fujitsu 1/2" tapedrive, Rm B-50
+    tucana!mtb  [4|9]		Sun QIC 1/4" cartridge,  Rm B-50
+    orion!mta   [1600|6250]	Fujitsu 1/2" tapedrive, Rm 101
+    orion!mtb	[1600|6250]	Fujitsu 1/2" tapedrive, Rm 101
+    aquila!mta  [1600]		DEC TU80 1/2" tapedrive, Rm B-49
+    aquila!mtb  [1600|6250]    	Kennedy 1/2" tapedrive,  Rm B-49
+    aquila!mtc	[1600|6250]    	Kennedy 1/2" tapedrive, Rm B-49
+    noao!mta	[1600|800]    	Kennedy 1/2" tapedrive, Rm 101
+    noao!mtb	[1600|800]    	Kennedy 1/2" tapedrive, Rm 101
+    draco!mta	[1600|6250]	TU78 1/2" tapedrive, Rm 101 [DRACO/VELA only]
+    draco!mtb	[1600|6250]	TU78 1/2" tapedrive, Rm 101 [DRACO/VELA only]
+    draco!mtc	[1600|800]+    	Kennedy 1/2" tapedrive, Rm 101   [DRACO only]
+    draco!mtd	[1600|800]+ 	Kennedy 1/2" tapedrive, Rm 101   [DRACO only]
+    draco!mte	[1600]		TS11 1/2" tapedrive, Rm B-49 	  [VELA only]
+    draco!mtg	[1600|800]+ 	Kennedy 1/2" tapedrive, Rm 101   [DRACO only]
+    draco!mth	[1600|6250]	TU78 1/2" tapedrive, Rm 101 [DRACO/VELA only]
+
+    *Default tape densities listed first.
+    +The Kennedy drives on VMS nodes do not have a default density;
+    the density must be set manually with the switch on the tape drive.
+.endhelp

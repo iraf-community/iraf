@@ -1,0 +1,32 @@
+# Help directory for the APPHOT package
+
+$doc		= "noao$digiphot/apphot/doc/"
+$apselect	= "noao$digiphot/apphot/apslect/"
+$center		= "noao$digiphot/apphot/center/"
+$daofind	= "noao$digiphot/apphot/daofind/"
+$fitpsf		= "noao$digiphot/apphot/fitpsf/"
+$fitsky		= "noao$digiphot/apphot/fitsky/"
+$phot		= "noao$digiphot/apphot/phot/"
+$polymark	= "noao$digiphot/apphot/polymark/"
+$polyphot	= "noao$digiphot/apphot/polyphot/"
+$qphot		= "noao$digiphot/apphot/qphot/"
+$radprof	= "noao$digiphot/apphot/radprof/"
+$wphot		= "noao$digiphot/apphot/wphot/"
+
+apselect	hlp=doc$apselect.hlp,		src=apselect$t_apselect.x
+center		hlp=doc$center.hlp,		src=center$t_center.x
+centerpars	hlp=doc$centerpars.hlp
+daofind		hlp=doc$daofind.hlp,		src=daofind$t_daofind.x
+datapars	hlp=doc$datapars.hlp
+fitpsf		hlp=doc$fitpsf.hlp,		src=fitpsf$t_fitpsf.x
+fitsky		hlp=doc$fitsky.hlp,		src=fitsky$t_fitsky.x
+fitskypars	hlp=doc$fitskypars.hlp
+phot		hlp=doc$phot.hlp,		src=phot$t_phot.x
+photpars	hlp=doc$photpars.hlp
+polymark	hlp=doc$polymark.hlp,		src=polymark$t_polymark.x
+polyphot	hlp=doc$polyphot.hlp,		src=polyphot$t_polyphot.x
+polypars	hlp=doc$polypars.hlp
+qphot		hlp=doc$qphot.hlp,		src=qphot$t_qphot.x
+radprof		hlp=doc$radprof.hlp,		src=radprof$t_radprof.x
+revisions	hlp=Revisions
+wphot		hlp=doc$wphot.hlp,		src=wphot$t_wphot.x

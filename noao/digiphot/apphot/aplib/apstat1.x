@@ -1,0 +1,219 @@
+include "../lib/apphotdef.h"
+include "../lib/apphot.h"
+include "../lib/centerdef.h"
+include "../lib/center.h"
+include "../lib/fitskydef.h"
+include "../lib/fitsky.h"
+include "../lib/photdef.h"
+include "../lib/phot.h"
+include "../lib/fitpsfdef.h"
+include "../lib/fitpsf.h"
+
+# AP1STATS -- Procedure to fetch an apphot string parameter.
+
+procedure ap1stats (ap, param, str, maxch)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+char	str[ARB]	# string
+int	maxch		# maximum number of characters
+
+pointer	cen, sky, phot, psf
+
+begin
+	cen = AP_PCENTER(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	psf = AP_PPSF(ap)
+
+	switch (param) {
+	case IMNAME:
+	    call strcpy (AP_IMNAME(ap), str, maxch)
+	case CLNAME:
+	    call strcpy (AP_CLNAME(ap), str, maxch)
+	case CSTRING:
+	    call strcpy (AP_CSTRING(cen), str, maxch)
+	case SSTRING:
+	    call strcpy (AP_SSTRING(sky), str, maxch)
+	case APSTRING:
+	    call strcpy (AP_APSTRING(phot), str, maxch)
+	case APERTS:
+	    call strcpy (AP_APSTRING(phot), str, maxch)
+	case EXPOSURE:
+	    call strcpy (AP_EXPOSURE(ap), str, maxch)
+	case PWSTRING:
+	    call strcpy (AP_PWSTRING(phot), str, maxch)
+	case PLOTFILE:
+	    call strcpy (AP_PLOTFILE(ap), str, maxch)
+	case PSFSTRING:
+	    call strcpy (AP_PSFSTRING(psf), str, maxch)
+	case OUTNAME:
+	    call strcpy (AP_OUTNAME(ap), str, maxch)
+	default:
+	    call error (0, "APSTATS: Unknown apphot string parameter")
+	}
+end
+
+
+# AP1STATI -- Procedure to set an integer apphot parameter.
+
+int procedure ap1stati (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+pointer cen, sky, phot, psf
+
+begin
+	cen = AP_PCENTER(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	psf = AP_PPSF(ap)
+
+	switch (param) {
+	case POSITIVE:
+	    return (AP_POSITIVE(ap))
+	case CENTERFUNCTION:
+	    return (AP_CENTERFUNCTION(cen))
+	case CLEAN:
+	    return (AP_CLEAN(cen))
+	case SKYFUNCTION:
+	    return (AP_SKYFUNCTION(sky))
+	case SMAXITER:
+	    return (AP_SMAXITER(sky))
+	case SNREJECT:
+	    return (AP_SNREJECT(sky))
+	case CMAXITER:
+	    return (AP_CMAXITER(cen))
+	case SMOOTH:
+	    return (AP_SMOOTH(sky))
+	case MAXNPARS:
+	    return (AP_MAXNPARS(psf))
+	case NPARS:
+	    return (AP_PSFNPARS(psf))
+	case NAPERTS:
+	    return (AP_NAPERTS(phot))
+	case PWEIGHTS:
+	    return (AP_PWEIGHTS(phot))
+	case NSKY:
+	    return (AP_NSKY(sky))
+	case NSKY_REJECT:
+	    return (AP_NSKY_REJECT(sky))
+	case PMAXITER:
+	    return (AP_PMAXITER(psf))
+	case PSFUNCTION:
+	    return (AP_PSFUNCTION(psf))
+	case PNREJECT:
+	    return (AP_PNREJECT(psf))
+	default:
+	    call error (0, "APSTATI: Unknown apphot parameter")
+	}
+end
+
+
+# AP2STATR -- Procedure to set a real apphot parameter.
+
+real procedure ap1statr (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+pointer	cen, sky, phot, psf
+
+begin
+	cen = AP_PCENTER(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	psf = AP_PPSF(ap)
+
+	switch (param) {
+	case DATALIMIT:
+	    return (AP_DATALIMIT(cen))
+	case XSHIFT:
+	    return (AP_XSHIFT(cen))
+	case YSHIFT:
+	    return (AP_YSHIFT(cen))
+	case CXCUR:
+	    return (AP_CXCUR(cen))
+	case CYCUR:
+	    return (AP_CYCUR(cen))
+	case CAPERT:
+	    return (AP_CAPERT(cen))
+	case SXCUR:
+	    return (AP_SXCUR(sky))
+	case SYCUR:
+	    return (AP_SYCUR(sky))
+	case PXCUR:
+	    return (AP_PXCUR(phot))
+	case PYCUR:
+	    return (AP_PYCUR(phot))
+	case MAXSHIFT:
+	    return (AP_MAXSHIFT(cen))
+	case MINSNRATIO:
+	    return (AP_MINSNRATIO(cen))
+	case RCLEAN:
+	    return (AP_RCLEAN(cen))
+	case RCLIP:
+	    return (AP_RCLIP(cen))
+	case SIGMACLEAN:
+	    return (AP_SIGMACLEAN(cen))
+	case ANNULUS:
+	    return (AP_ANNULUS(sky))
+	case DANNULUS:
+	    return (AP_DANNULUS(sky))
+	case FWHMPSF:
+	    return (AP_FWHMPSF(ap))
+	case SCALE:
+	    return (AP_SCALE(ap))
+	case K1:
+	    return (AP_K1(sky))
+	case K2:
+	    return (AP_K2(sky))
+	case BINSIZE:
+	    return (AP_BINSIZE(sky))
+	case RGROW:
+	    return (AP_RGROW(sky))
+	case WX:
+	    return (AP_WX(ap))
+	case WY:
+	    return (AP_WY(ap))
+	case SKY_BACKGROUND:
+	    return (AP_SKYBACKGROUND(sky))
+	case ZMAG:
+	    return (AP_ZMAG(phot))
+	case ITIME:
+	    return (AP_ITIME(ap))
+	case XCENTER:
+	    return (AP_XCENTER(cen))
+	case YCENTER:
+	    return (AP_YCENTER(cen))
+	case XERR:
+	    return (AP_XERR(cen))
+	case YERR:
+	    return (AP_YERR(cen))
+	case SKY_MODE:
+	    return (AP_SKY_MODE(sky))
+	case SKY_SIGMA:
+	    return (AP_SKY_SIG(sky))
+	case SKY_SKEW:
+	    return (AP_SKY_SKEW(sky))
+	case PSFAPERT:
+	    return (AP_PSFAPERT(psf))
+	case PK2:
+	    return (AP_PK2(psf))
+	case CWX:
+	    return (AP_CWX(ap))
+	case CWY:
+	    return (AP_CWY(ap))
+	case PFXCUR:
+	    return (AP_PFXCUR(psf))
+	case PFYCUR:
+	    return (AP_PFYCUR(psf))
+	case DATAMIN:
+	    return (AP_DATAMIN(ap))
+	case DATAMAX:
+	    return (AP_DATAMAX(ap))
+	default:
+	    call error (0, "APSTATR: Unknown apphot parameter")
+	}
+end

@@ -1,0 +1,12 @@
+
+MTIO mods:
+
+    (1)	Install error checking in MTOPEN ("errchk open").
+
+    (2) Attempt to position to a file beyond EOT for reading should not
+	cause an error, rather EOF should be returned at the first read,
+	indicating a zero length file (i.e., EOT).
+
+    (3) ZARDMT should zero-fill to an integral number of chars, provided
+	space is available at end of buffer (see ZARDBF, which I had to
+	modify to provide zero-fill).

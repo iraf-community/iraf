@@ -1,0 +1,96 @@
+.help apfind Jan88 noao.twodspec.apextract
+.ih
+NAME
+apfind -- Find spectra and define apertures automatically
+.ih
+USAGE
+apfind input
+.ih
+PARAMETERS
+.ls input
+List of input images in which spectra are to be identified and
+apertures defined automatically.  The list may be an image template
+including image sections and concatenations or an "@" file.  The
+dispersion axis must be defined in the image headers using
+\fBsetdisp\fR or \fBhedit\fR.
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supercedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+The special image "last" may be used to specify the last set of
+apertures written to the database.
+.le
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing, trace
+fitting, and sum extraction reviews are disabled.  When run interactively
+queries may be suppressed by responding with "NO" or "YES".
+.le
+.ls recenter = yes
+Recenter the reference apertures in the input image?
+.le
+.ls find = yes
+Find the apertures automatically?  In order for apertures to be found
+automatically there must be no apertures for the input image or reference
+image defined in the database and the parameter \fInfind\fR must
+be greater than zero.
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls nfind = 1
+Maximum number of apertures to be defined.
+.le
+.ls line = INDEF
+The dispersion line (line or column perpendicular to the dispersion axis) to
+be used in finding the spectra.  A value of INDEF selects the middle of the
+image.
+.le
+.ls nsum = 1
+Number of dispersion lines to be summed.  The lines are taken around the
+specified dispersion line.
+.le
+.ls minsep = 5.
+Minimum separation between spectra.  Weaker spectra or noise within this
+distance of a stronger spectrum are rejected.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters are taken from the task \fBapio\fR, the default aperture
+parameters are taken from the task \fBapdefault\fR, and parameters used
+for centering and editing the apertures are taken from \fBapedit\fR.
+.ih
+DESCRIPTION
+For each image in the input image list spectra are identified and
+default apertures centered on the spectra are defined.  The apertures
+may also be edited (see \fBapedit\fR).  The automatic aperture finding
+is performed only if
+1) there are no apertures defined for the reference image,
+2) there are no apertures defined for the input image,
+3) the parameter \fIfind\fR is yes, and 4) the parameter \fInfind\fR is
+greater than zero.
+
+If the task is interactive the user is queried whether the apertures
+are to be found for each image in the input list.  The queries may be
+answered with one of the four values "yes", "no", "YES" and "NO", where
+an upper case response suppresses all further queries to this question.
+
+The automatic algorithm uses the following steps.  First, all local
+maxima are found.  The maxima are sorted by peak value and the weaker
+of two peaks separated by less than the value given by the parameter
+\fIminsep\fR are rejected.  Finally, at most the \fInfind\fR strongests
+peaks are kept.  After the peaks have been found the \fBcenter1d\fR
+algorithm is used to refine the centers of the profiles.  Apertures
+having the default parameters set with the task \fBapdefault\fR are
+defined at each center.  This algorithm is also used with the 'f' key
+in the task \fBapedit\fR with the change that existing apertures are
+kept and count toward the maximum number specified by \fBnfind\fR.
+.ih
+EXAMPLES
+	cl> apfind image nfind=10
+.ih
+SEE ALSO
+apdefault, apeidt, apio, center1d
+.endhelp

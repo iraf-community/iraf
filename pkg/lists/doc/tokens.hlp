@@ -1,0 +1,55 @@
+.help tokens Jan86 lists
+.ih
+NAME
+tokens -- break input into stream of tokens
+.ih
+USAGE
+tokens files
+.ih
+PARAMETERS
+.ls files
+The list of files to be converted into a stream of tokens.
+.le
+.ls ignore_comments = yes
+Ignore comments in the input string?
+.le
+.ls begin_comment = "#"
+The string marking the start of a comment
+.le
+.ls end_comment = "eol"
+The string marking the end of a comment.  The value \fBend_comment\fR = "eol"
+means the end of a line terminates a comment.
+.le
+.ls newlines = yes
+Is newline a legal token?
+.le
+.ih
+DESCRIPTION
+Task \fItokens\fR breaks the input up into a series of tokens.
+The makeup of the
+various tokens is defined by the FMTIO primitive ctotok, which is not very 
+sophisticated, and does not claim to recognize the tokens for any particular
+language (though it does reasonably well for most modern languages).  Comments
+can be deleted if desired, and newlines may be passed on to the output as
+tokens.
+
+Comments are delimited by user specified strings.  Only strings which are also
+recognized by ctotok() as legal tokens may be used as comment delimiters.
+If newline marks the end of a comment, the end_comment string should be given
+as "eol".  Examples of acceptable comment conventions are ("#", eol),
+("/*", "*/"), ("{", "}"), and ("!", eol).  Fortran style comments ("^{c}",eol)
+can be stripped by filtering with match beforehand.
+
+Each token is passed to the output on a separate line.  Multiple newline
+tokens are compressed to a single token (a blank line).  If newline is not
+desired as an output token, it is considered whitespace and serves only to
+delimit tokens.
+.ih
+EXAMPLES
+Break up the source file for this task into tokens:
+
+	cl> tokens tokens.x
+.ih
+SEE ALSO
+words
+.endhelp

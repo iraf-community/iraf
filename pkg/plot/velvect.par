@@ -1,0 +1,6 @@
+u_image,s,a,,,,image or image section to be plotted
+v_image,s,a,,,,image or image section to be plotted
+device,s,h,stdgraph,,,output device
+title,s,h,"imtitle",,,optional title
+append,b,h,no,,,append to an old plot
+verbose,b,h,yes,,,print warning messages

@@ -1,0 +1,7 @@
+# IMSLICE
+
+input,f,a,,,,Input images
+output,f,a,,,,Output images
+slice_dimension,i,a,,,,Dimension to be sliced
+verbose,b,h,y,,,Verbose mode
+mode,s,h,'ql'

@@ -1,0 +1,34 @@
+include <gset.h>
+include	"apertures.h"
+
+# AP_UPDATE -- Update an aperture.
+
+procedure ap_update (gp, ap, line, apid, apbeam, center, low, high)
+
+pointer	gp		# GIO pointer
+pointer	ap		# Aperture pointer
+int	line		# Dispersion line
+int	apid		# New aperture ID
+int	apbeam		# New aperture beam
+real	center		# New center at dispersion line
+real	low		# New lower limit
+real	high		# New upper limit
+
+real	cveval()
+
+begin
+	# Erase the current aperture.
+	call gseti (gp, G_PLTYPE, 0)
+	call ap_gmark (gp, line, ap, 1)
+
+	# Update the aperture.
+	AP_ID(ap) = apid
+	AP_ID(ap) = apbeam
+	AP_CEN(ap, AP_AXIS(ap)) = center - cveval (AP_CV(ap), real (line))
+        AP_LOW(ap, AP_AXIS(ap)) = min (low, high)
+        AP_HIGH(ap, AP_AXIS(ap)) = max (low, high)
+
+	# Mark the new aperture.
+	call gseti (gp, G_PLTYPE, 1)
+	call ap_gmark (gp, line, ap, 1)
+end

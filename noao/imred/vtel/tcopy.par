@@ -1,0 +1,5 @@
+inputfile,s,q,,,,Input file descriptor
+files,s,q,,,,List of files to be examined
+outputfile,s,q,,,,Output file descriptor
+new_tape,b,q,,,,Are you using a new tape?
+verbose,b,h,no,,,Print out header data and give progress reports

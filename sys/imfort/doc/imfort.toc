@@ -1,0 +1,54 @@
+.LP
+.ps +2
+.ce
+\fBContents\fR
+.ps
+.sp 3
+.sp
+1.\h'|0.4i'\fBIntroduction\fP\l'|5.6i.'\0\01
+.br
+\h'|0.4i'1.1.\h'|0.9i'Who Should Use IMFORT\l'|5.6i.'\0\01
+.sp
+2.\h'|0.4i'\fBGetting Started\fP\l'|5.6i.'\0\03
+.br
+\h'|0.4i'2.1.\h'|0.9i'Example 1:  Plotting a function\l'|5.6i.'\0\03
+.br
+\h'|0.4i'2.2.\h'|0.9i'Example 2:  Compute the range of pixel values in an image\l'|5.6i.'\0\06
+.br
+\h'|0.4i'2.3.\h'|0.9i'Example 3:  Copy an image\l'|5.6i.'\0\07
+.sp
+3.\h'|0.4i'\fBThe IMFORT Programming Environment\fP\l'|5.6i.'\0\09
+.br
+\h'|0.4i'3.1.\h'|0.9i'The FC Compile/Link Utility\l'|5.6i.'\0\09
+.br
+\h'|0.4i'3.2.\h'|0.9i'Host Level Linking to the IMFORT Libraries\l'|5.6i.'\0\11
+.br
+\h'|0.4i'3.3.\h'|0.9i'Calling Host Programs from the CL\l'|5.6i.'\0\11
+.br
+\h'|0.9i'3.3.1.\h'|1.5i'Example 1 Revisited\l'|5.6i.'\0\13
+.br
+\h'|0.4i'3.4.\h'|0.9i'Debugging IMFORT Programs\l'|5.6i.'\0\14
+.br
+\h'|0.4i'3.5.\h'|0.9i'Calling IMFORT from Languages other than Fortran\l'|5.6i.'\0\15
+.br
+\h'|0.4i'3.6.\h'|0.9i'Avoiding Library Name Collisions\l'|5.6i.'\0\15
+.sp
+4.\h'|0.4i'\fBThe IMFORT Library\fP\l'|5.6i.'\0\16
+.br
+\h'|0.4i'4.1.\h'|0.9i'Command Line Access\l'|5.6i.'\0\17
+.br
+\h'|0.4i'4.2.\h'|0.9i'Image Access\l'|5.6i.'\0\17
+.br
+\h'|0.9i'4.2.1.\h'|1.5i'General Image Access Procedures\l'|5.6i.'\0\18
+.br
+\h'|0.9i'4.2.2.\h'|1.5i'Image Header Keyword Access\l'|5.6i.'\0\19
+.br
+\h'|0.9i'4.2.3.\h'|1.5i'Image Pixel Access\l'|5.6i.'\0\20
+.br
+\h'|0.4i'4.3.\h'|0.9i'Error Handling\l'|5.6i.'\0\22
+.br
+\h'|0.4i'4.4.\h'|0.9i'Vector Operators\l'|5.6i.'\0\22
+.br
+\h'|0.4i'4.5.\h'|0.9i'Binary File I/O (BFIO)\l'|5.6i.'\0\26
+.sp
+\h'|0.4i'\fBAppendix A:\fR  Manual Pages for the IMFORT Procedures\l'|5.6i.'\0\28

@@ -1,0 +1,36 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<error.h>
+include	<imhdr.h>
+include	"stf.h"
+
+# STF_DELETE -- Delete an image.  A special operator is required since the
+# image is stored as two files.
+
+procedure stf_delete (root, extn, status)
+
+char	root[ARB]		# root filename
+char	extn[ARB]		# header file extension
+int	status
+
+pointer	sp
+pointer	hdr_fname, pix_fname
+
+begin
+	call smark (sp)
+	call salloc (hdr_fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (pix_fname, SZ_PATHNAME, TY_CHAR)
+
+	# Generate filename.
+	call iki_mkfname (root, extn, Memc[hdr_fname], SZ_PATHNAME)
+	call stf_mkpixfname (root, extn, Memc[pix_fname], SZ_PATHNAME)
+
+	# If the header cannot be deleted, leave the pixfile alone.
+	iferr (call delete (Memc[hdr_fname]))
+	    call erract (EA_WARN)
+	else iferr (call delete (Memc[pix_fname]))
+	    call erract (EA_WARN)
+
+	call sfree (sp)
+	status = OK
+end

@@ -1,0 +1,35 @@
+# SPLOT task.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	anssave.x	
+	autoexp.x	<pkg/gtools.h>
+	avgsnr.x	
+	conflam.x	
+	confnu.x	
+	deblend.x	
+	eqwidth.x	
+	eqwidthcp.x	
+	fcont.x
+	fixx.x	
+	flatten.x	
+	fudgept.x	
+	fudgex.x	
+	getimage.x	<imhdr.h> ../idsmtn.h
+	mktitle.x	../idsmtn.h <imhdr.h> <pkg/gtools.h>
+	pixind.x	
+	plotstd.x	<error.h> <gset.h>
+	replot.x	
+	smooth.x	../idsmtn.h
+	splot.x		<error.h> <gset.h> <imhdr.h> <pkg/gtools.h>\
+			../idsmtn.h ../oned.h
+	splotfun.x	<mach.h> ../idsmtn.h ../oned.h
+	stshelp.x	
+	sumflux.x	
+	usercoord.x	
+	wrspect.x	../idsmtn.h <imhdr.h> <pkg/xtanswer.h>
+	;

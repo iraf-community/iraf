@@ -1,0 +1,330 @@
+.help GIO Feb85 "Graphics I/O"
+.nh
+Graphics I/O Dataflow
+
+    The GIO procedures are resident in an external applications task which
+does graphics.  GIO writes a GKI instruction stream which, if not sent directly
+to a metafile, is sent to one of the standard graphics streams STDGRAPH,
+STDIMAGE, or STDPLOT, much as output is sent to STDOUT or STDERR.
+The procedure \fBprfilbuf\fR (directory etc$), which reads the command
+stream from a subprocess, is resident in the CL and executes all pseudofile
+i/o instructions from a subprocess.  Note that \fBprfilbuf\fR is part of the
+i/o system of IRAF and operates transparently to the CL.
+
+
+.ks
+.nf
+	     GIO(task) ---ipc--> PRFILBUF(CL) --> file (or pipe)
+				     |
+				     v             external
+				   GIOTR ---ipc--> graphics
+				     |              kernel
+				     v
+			       stdgraph kernel
+				     |
+				     v
+				  (zfioty)
+			      graphics terminal
+
+
+		   task     |        cl       |     task
+.fi
+
+.ce
+Graphics Output Dataflow
+.ke
+
+
+The \fBprfilbuf\fR procedure passes record read or write requests for the
+pseudofiles STDIN, STDOUT or STDERR on to file descriptors assigned by the
+CL with the \fBprredir\fR procedure at task execution time.  The sole function
+of the CL in graphics i/o is to control the redirection of the graphics
+i/o streams with \fBprredir\fR.  The CL may redirect any of the graphics
+streams, i.e., the user may redirect any graphics stream on the command line
+when a command is entered, but by default output is directed to a filter
+resident in the CL process.  This filter is a procedure named \fBgiotr\fR.
+
+	giotr (stream, buffer, nchars)
+
+The primary function of GIOTR is to pass metacode instructions on to a kernel.
+The instruction stream is scanned and special actions are taken for some of
+the GKI control instructions.  In particular, GIOTR must spawn graphics kernel
+subprocesses upon demand.  GIOTR is also capabable of performing an
+additional transformation upon the drawing instructions before they are passed
+to the kernel.  This transformation, known as the \fBworkstation
+transformation\fR, maps a rectangular portion of the NDC space into the full
+device screen, clipping at the boundary of the viewport into NDC space.
+The workstation transformation provides a zoom and pan capability and is
+controlled interactively by the user in \fBcursor mode\fR (section 3.3).
+
+As noted earlier, the \fBstdgraph kernel\fR ("fast" kernel) is resident in
+the CL process.  This is necessary for efficiency reasons and is desirable
+in any case because the CL process owns the graphics device, i.e., the
+graphics terminal.  All devices except the user's graphics terminal are
+controlled by external graphics kernel processes.  The STDGRAPH kernel is
+itself available as an external process and may be called as such to drive
+a graphics terminal other than the user terminal (or even to drive the user
+terminal if one is willing to shuffle output back through IPC).  A graphics
+kernel may support an arbitrary number of devices, and may write to more
+than one device simultaneously.  In addition to being called by GIOTR,
+a graphics kernel may be called directly as a CL task to process metacode from
+either a file or the standard input, e.g., from a pipe.  This offers
+additional flexibility as the CL parameter mechanism may then be used to
+gain control over metacode translation.
+
+.nh 2
+Graphics Stream I/O
+
+    The functions performed by GIOTR are summarized in pseudocode below.
+GIOTR maintains a separate descriptor for each of the three graphics streams
+and is capable of servicing intermixed i/o requests for all streams
+simultaneously.  The information stored in the descriptor
+includes the workstation name, process information, WCS storage for
+the SETWCS and GETWCS instructions, the workstation transformation,
+and the frame buffer, used to spool GKI instructions for cursor mode.
+
+
+.tp 6
+.nf
+procedure giotr (fd, buffer, nchars)
+
+fd		graphics stream (STDGRAPH, etc.)
+buffer[]	buffer containing GKI metacode instructions
+nchars		number of chars to be read or written
+
+begin
+	# Note that a GKI instruction may span a buffer boundary.
+	# The code which gets the next instruction from the buffer
+	# must always return a full instruction, hence some local
+	# buffering is required therein to reconstruct instructions.
+
+	while (get next instruction != buffer empty) {
+
+	    # Handle special instructions.
+	    switch (instruction) {
+
+	    case GKI_OPENWS:
+		if (device not already open) {
+		    read graphcap entry for device
+		    get process name from graphcap entry
+		    if (process not already connected) {
+			if (some other process is connected)
+			    disconnect current kernel process
+			connect new kernel process
+		    }
+		}
+		output instruction
+		flush output
+		clear frame buffer
+
+	    case GKI_CLOSEWS, GKI_FLUSH:
+		output instruction
+		flush output
+
+	    case GKI_CANCEL:
+		output instruction
+		flush output
+		clear frame buffer
+
+	    case GKI_SETWCS:
+		save WCS in descriptor
+
+	    case GKI_GETWCS:
+		write saved WCS to fd
+		flush (fd)
+
+	    default:
+		append unmodified instruction to frame buffer
+		perform workstation transformation upon instruction
+		output transformed instruction
+	    }
+	}
+end
+.fi
+
+
+The action implied by "output instruction" above is the following:
+
+
+.ks
+.nf
+	if (kernel is resident in this process)
+	    call gki_execute to execute the instruction
+	else
+	    call write (process, instruction, nchars)
+.fi
+.ke
+
+
+The frame buffer (required for cursor mode) will be dynamically allocated and
+will be no larger than it has to be, but will have a fixed (user defined)
+upper limit, e.g., 128Kb.  The median size for a plot is typically 5-10Kb.
+Instructions will be silently discarded if the buffer grows too large.
+Buffering can be turned off completely if desired, and will always be turned
+off for STDPLOT.
+
+.nh 2
+Cursor Mode Details
+
+    Most of the functionality required to implement cursor mode is provided
+by GIOTR.  The primary functions of the cursor mode code are to read the
+cursor and keystroke, modify the workstation transformation, and redraw the
+contents of the frame buffer subject to the new workstation transformation.
+Cursor mode does not modify the contents of the frame buffer, except for
+possibly appending new graphics instructions to the frame buffer.
+A workstation transformation set with cursor mode remains in effect until
+the frame buffer is cleared, hence any additional graphics output from the
+task which initiated the cursor read (and cursor mode) will undergo the
+workstation transformation when drawn.
+
+
+.nf
+# PR_FILBUF -- Fill FIO buffer from an IPC channel subject to the CL/IPC
+# protocol for multiplexing pseudofile data streams with the command stream.
+# Each process has an associated set of pseudofile streams.  Each pseudofile
+# stream is connected to one, and only one, file or pseudofile of another
+# process.  I/O requests to XMIT or XFER to an ordinary file are straightforward
+# to satisfy.  An i/o request from one pseudofile to another is satisfied
+# by posting the request (pushing it on a stack) and redirecting our input
+# to the process owning the pseudofile being read or written.  Pseudofile
+# requests are then processed from the second process until a request is
+# received which satisfies the posted request from the original process.
+# When the original request is satisfied it is popped from the stack and input
+# will again be taken from the original process.  Note that we cannot write
+# directly to the output process since that would violate the IPC protocol
+# (the second process may wish to write to its stdout or stderr rather than
+# read, etc.: the process must be allowed to complete the original request
+# itself).
+#
+# Request Packet (pushed onto stack for IPC to IPC i/o).
+# 
+# 	pr		process slot number of process placing the request
+# 	iomode		request is a read or a write
+# 	count		number of chars to be transferred
+# 	ps_server	pseudofile number in server process
+# 	ps_receiver	pseudofile number in receiver process
+#
+# The request packet describes a pending pseudofile i/o request.  The named
+# pseudofile in the server process is either reading from or writing to the
+# named pseudofile in the receiver process.
+
+int procedure pr_filbuf (fd)
+
+begin
+	input = fd (the IPC input channel of a process)
+
+	repeat {
+	    get a line from the input file
+	    if (neither XMIT nor XFER directive)
+		if (request pending)
+		    error: IPC protocol corrupted
+		else
+		    return command
+
+	    if (line is an XMIT directive) {
+		if (destination is a file) {
+		    # Write from pseudofile to an ordinary file.
+		    get data record from input
+		    write data record to file
+
+		} else {
+		    # Write from pseudofile to another pseudofile.
+		    if (XMIT satisfies XFER request on top of stack)
+			get data record from input
+			write record to stacked process
+			restore input to stacked process
+			pop request from stack
+
+		    } else {
+			# If writing to local kernel GIOTR will return a null
+			# length record and we are done.
+
+			get data record from input
+			if (writing to a graphics stream)
+			    call giotr filter to transform record
+			if (anything left to output) {
+			    push request on stack
+			    switch input to IPC input of receiver process
+			}
+		    }
+		}
+
+	    } else if (line is an XFER directive) {
+		if (source is an ordinary file) {
+		    # Read from a file.
+		    read data record from file
+		    write to active process
+
+		} else if (source is another process) {
+		    # Read from another pseudofile.
+		    if (XFER satisfies XMIT request on top of stack) {
+			read record from stacked process
+			write to active process
+			restore input to stacked process
+			pop request from stack
+		    } else {
+			push request on stack
+			switch input to IPC input channel of receiver process
+		    }
+		}
+	    }
+	}
+end
+
+
+# GIOTR -- Graphics i/o filter.
+
+procedure giotr (fd, buffer, nchars)
+
+fd		graphics stream (STDGRAPH, etc.)
+buffer[]	buffer containing GKI metacode instructions
+nchars		number of chars to be read or written
+
+begin
+	# Note that a GKI instruction may span a buffer boundary.
+	# The code which gets the next instruction from the buffer
+	# must always return a full instruction, hence some local
+	# buffering is required therein to reconstruct instructions.
+
+	while (buffer not empty) {
+
+	    # Handle special instructions.
+	    switch (next_instruction) {
+
+	    case GKI_OPENWS:
+		if (device not already open) {
+		    read graphcap entry for device
+		    get process name from graphcap entry
+		    if (process not already connected) {
+			if (some other process is connected)
+			    disconnect current kernel process
+			connect new kernel process
+		    }
+		}
+		output instruction
+		flush output
+		clear frame buffer
+
+	    case GKI_CLOSEWS, GKI_FLUSH:
+		output instruction
+		flush output
+
+	    case GKI_CANCEL:
+		output instruction
+		flush output
+		clear frame buffer
+
+	    case GKI_SETWCS:
+		save WCS in descriptor
+
+	    case GKI_GETWCS:
+		write saved WCS to fd
+		flush (fd)
+
+	    default:
+		append unmodified instruction to frame buffer
+		perform workstation transformation upon instruction
+		output transformed instruction
+	    }
+	}
+end

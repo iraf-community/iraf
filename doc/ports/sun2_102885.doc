@@ -1,0 +1,190 @@
+SUN/IRAF V2.0 Installation, 28 October 1985	Sun-2, software floating point
+------------------------------------------------------------------------------
+
+find . \! -type d -print > _files	# get list of nondirectory files
+grep '\.[aoe]$' _files > _bin		# find binaries
+grep '\.s$' _files > _mach		# find assembler files
+ls _bin | grep '[2-9] iraf' > _links	# find binary files with links
+rm _bin					# delete binary files
+
+deleted all .[aoe] files (22 Mb)
+not necessary to edit Makefiles
+
+/usr/include/iraf.h
+	Made symbolic link in pointing to /iraf/lib/libc/iraf.h; necessary
+	before compiling any C programs.
+
+built mklib.e
+built preprocessor: xc.e, xpp.e, rpp.e
+built generic.e	(had to do this manually; no Makefile)
+	lex generic.l; cc lex.yy.c -lln -o generic.e
+
+/usr/bin
+	Made symbolic links for unix tasks cl, xc, mklib, mkiraf
+
+lib/*.e
+	Made symbolic links for xc.e, xpp.e, rpp.e, mklib.e generic.e
+
+lib/libc/spp.h
+lib/mach.h
+	Changed defn of machine epsilon (use Fort program in osb).
+	Set byte swap flags to NO.
+
+sys/os/zsvjmp.s
+	Replaced VAX version with MC68000 version.
+
+sys/osb/bitpak.s
+sys/osb/bitupk.s
+sys/osb/bytmov.s
+	Edited Makelib to replace bitpak.s and bitupk.s with the portable
+	version in bitfields.c.  Likewise replaced bytmov.s with bytmov.c.
+
+sys/vops/ak/Makelib
+sys/vops/lz/Makelib
+	Commented out the VAX .s optimized files in the Makelib, and
+	uncommented the portable .x versions.
+
+cd sys; make >& spool &			# start sysgen of system libraries
+	(pass c2 of f77 hung in infinite loop on fio$fstati.f; optimizer bug)
+
+cd libc; mklib -O >& spool &		# make libc.a (C runtime library)
+
+
+(peruse output from sysgen and fix compile time bugs)
+----------------------------------
+
+sys/gio/gki/gkigetwcs.x
+	Array 'ret' no longer used, deleted.
+
+sys/vops/achtXY
+	When datatype X is the same as Y, the loop variable I is not used
+	(no action taken).
+
+pkg/softools/boot/spp/xpp/decl.c
+	The XPP declarations code which output the argument list for a
+	procedure could sometimes generate an output line too long for RPP to
+	handle.  The code was breaking the argument list after 8 arguments
+	had been output, a simplistic technique which would fail when the
+	identifiers were too large.  Changed to keep track of the output
+	column and break lines that are close to 80 cols in length.
+
+sys/libc/ckimapc.c
+	Local variable maxch redefines argument; argument maxch not used to
+	control length of output string.
+
+pkg/system/x_systest.x
+pkg/system/system.cl
+	Procedure mtdevlist was still being referenced in this package.
+
+(system package, cl came up with no problems)
+
+
+cd math; make >& spool &
+-------------------------------------
+
+math/Makefile
+math/Makelib
+	Added a Makelib to the math directory, with an entry for each math
+	package.  Set up Makefile to make all the libraries.  Must still 
+	be linked to lib when done, if not already.
+
+math/bevington/matinv.f
+	Apparent optimizer failure in matinv.f.  Recompiled successfully
+	without optimization.
+
+(all other math libraries compiled successfully; linked em all into /iraf/lib)
+
+
+cd /iraf; csh -x Mkpkg.sh >& spool &
+-----------------------------------------------
+
+pkg/*/Mkpkg.sh
+	The "rm -f *.e" causes the script to abort without doing anything if
+	there is no .o or .e file to delete.  Got around this with a temporary
+	fix, i.e, making a junk.e in each directory before doing the rm.
+
+As expected, the links failed due to the following libraries not being present
+in lib$ yet:
+
+	all math libraries		math/
+	xtools				pkg/xtools
+	nspp				sys/gio/nspp
+	ncar				sys/gio/ncarutil
+	gks				sys/gio/gks
+	calcomp				local UNIX (not IRAF) library
+
+sys/gio/ncarutil/ishift.s
+sys/gio/nspp/ishift.s
+	Wrote SUN/MC68000 version.
+
+sys/gio/nspp/*
+	The usual complaints about questionable or nonportable constructs
+	in the NCAR fortran.
+
+sys/gio/nspp/nspp/gridal.f
+	Optimizer failure.
+
+sys/gio/nspp/utilities/conrec.f
+	Invalid hollerith specification on line 387; count is incorrect due
+	to continuation.  Changed to quoted string.
+
+pkg/Mkpkg.sh
+	Reordered packages to make the lower level packages first.
+	In particular, imred cannot be made until after onedspec.
+
+pkg/softools/boot/spp/xc.c
+pkg/softools/boot/spp/xpp/xppmain.c
+	Added a fflush(stderr) after each write to stderr.  On the SUN stderr
+	appears not to be flushed automatically when i/o is redirected to an
+	ordinary file.
+
+pkg/dataio/lib/cyboow.s
+	Wrote a stubbed out SPP version of these procedures so that the DATAIO
+	package can be linked.
+
+pkg/images/tv/display/t_mkdisplay.x
+	Changed the obsolete IM_PIXELS to IM_PIXOFF.
+
+pkg/twodspec/longslit/Makefile
+	Would not make the library before linking, causing a rebuild to fail.
+	x_aperture.e was made first, but mklib was called only for x_longslit.e.
+
+ADB usage note:
+	Breakpoints should be set at procedure+4 to get a correct stack trace
+	showing the arguments to the procedure (vs. +2 on the VAX).
+
+pkg/twodspec/longslit/Makefile (etc. in subdirs)
+	Turned off the -F -g; this is for debugging and should NOT be turned
+	on in an installed package (the images are larger and there is no
+	optimization).  Also, the f77 compiler aborted with a DBX error
+	related to a call to an external procedure passed as an argument to
+	a procedure (file igsfit.f).  I did not investigate further; hand
+	compilation of the procedure worked.
+
+sys/libc/cfpath.c
+	The third (maxch) argument was being passed to FPATHNAME by value
+	rather than by reference.
+
+dev/uhosts
+dev/hosts
+dev/hostlogin
+	Added more machines to the network tables.
+
+pkg/images/Mkpkg.sh
+	Added entry for subpackage imdebug.
+
+pkg/images/imdebug/Mkpkg.sh
+	New file.
+
+dev/helpdb
+	Recompiled the help database (in the CL using the mkhelp task in the
+	softools package).
+
+sys/libc/cfmapfn.c
+	The third (maxch) argument was being passed to FPATHNAME by value
+	rather than by reference.
+
+pkg/system/allocate.cl
+	As a temporary fix, commented out the call to UNIX to allocate a
+	device.  Removed the enumerated device names from the parameter file
+	since device names are not constant strings (this was never correct).

@@ -1,0 +1,25 @@
+.help sleep Feb86 language
+.ih
+NAME
+sleep -- suspend process execution for the specified interval
+.ih
+USAGE
+sleep [nsec]
+.ih
+PARAMETERS
+.ls nsec
+The number of seconds to sleep.  Defaults to 0.
+.le
+.ih
+DESCRIPTION
+The \fIsleep\fR command causes the task to hibernate for the specified
+amount of time.
+.ih
+EXAMPLES
+1. Sleep for 10 seconds, and then ring the bell.
+
+	cl> sleep 10; beep
+.ih
+SEE ALSO
+wait
+.endhelp

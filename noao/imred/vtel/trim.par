@@ -1,0 +1,2 @@
+image,s,q,,,,Image name
+threshold,i,q,,0,15,Squibby brightness threshold for limb

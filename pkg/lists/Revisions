@@ -1,0 +1,12 @@
+.help revisions Jun88 pkg.lists
+.nf
+columns.x
+	The columns task has been reinstalled.  The default value of
+	outroot was changed, source code cleaned up and manual page
+	updated.  (ShJ 12-NOV-88)
+
+Davis, October 5, 1988
+    1. I replaced the data_value ** 2 and sum ** 2 constructs in the
+    average script to get around a SUN problem with raising 0.0 to any
+    power. This is probably good programming practice in any case.
+.endhelp

@@ -1,0 +1,8 @@
+# Parameter file for imscale.
+
+input,f,a,,,,Input image
+output,f,a,,,,Output image
+mean,r,a,1.,,,Mean of output image
+lower,r,h,INDEF,,,Lower limit for calculating mean
+upper,r,h,INDEF,,,Upper limit for calculating mean
+verbose,b,h,no,,,Verbose output?

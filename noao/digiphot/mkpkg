@@ -1,0 +1,6 @@
+# Make the DIGIPHOT package.
+
+update:
+	$echo "---------------- DIGIPHOT.APPHOT-----------------"
+	$call update@apphot
+	;

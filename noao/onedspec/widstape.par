@@ -1,0 +1,8 @@
+# IDSOUT parameter file -- write a CYBER style IDSOUT tape
+
+idsout,s,a,,,,Output file or magtape
+input,s,a,,,,Image root name to write
+records,s,a,,,,Records to write
+block_size,i,h,3200,80,10640,Tape block size in bytes
+new_tape,b,h,no,,,Is this a new (blank) tape
+ebcdic,b,h,no,,,Convert character code to ebcdic

@@ -1,0 +1,42 @@
+# Mkpkg special file list for SUN/IRAF.
+# SunOS Release Sys4GAMMA (HERCULES) #1: Fri Sep 18 10:15:21 PDT 1987
+# SunOS Release Sys4BETA1 (ORION) #1: Fri Oct 23 13:09:29 PDT 1987
+
+$special "sys$osb/":		aclrb.c		as$aclrb.c
+				bytmov.c	as$bytmov.c
+				;
+
+$special "sys$vops/ak/":	aclrc.x		as$aclrc.c
+				aclrs.x		as$aclrs.c
+				aclri.x		as$aclri.c
+				aclrl.x		as$aclrl.c
+				aclrr.x		as$aclrr.c
+				aclrd.x		as$aclrd.c
+				;
+
+$special "sys$vops/lz/":	amovc.x		as$amovc.c
+				amovs.x		as$amovs.c
+				amovi.x		as$amovi.c
+				amovl.x		as$amovl.c
+				amovr.x		as$amovr.c
+				amovd.x		as$amovd.c
+				;
+
+# All files needing special processing for the local host operating system,
+# e.g., to permit host dependent optimization or to work around compiler bugs,
+# should be listed here.
+
+$special "$(sys)osb/":			f77pak.f & "$xc -cq &";
+$special "$(sys)imfort/":		imemsg.x & "$xc -cq &";
+
+# Partial optimization needed to prevent infinite loop in iropt.
+$special "$(pkg)bench/xctest/":		unique.x & "$xc -cq -P &";
+$special "$(pkg)lists/":		unique.x & "$xc -cq -P &";
+
+# Ditto for ytab.c.  In main.c and errs.c, no optimization is needed to
+# avoid an optimizer problem associated with ZSVJMP (setjmp).  I tried using
+# a #pragma to fix this but it didn't work.
+
+$special "$(pkg)cl/":			ytab.c   & "$xc -cq -/O2 &"
+					main.c   & "$xc -cq &"
+					errs.c   & "$xc -cq &";

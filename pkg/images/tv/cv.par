@@ -1,0 +1,4 @@
+# Package parameters for CV.
+
+snap_file,f,a,,,,output file for snap image
+textsize,r,a,1.0,,,character size

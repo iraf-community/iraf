@@ -1,0 +1,81 @@
+This is the home directory for the Kitt Peak vacuum telescope
+reduction programs.
+
+README		this file
+Revisions	revisions file
+asciilook	lookup table for ascii values into the pixelfont
+d1900.x		calculate number of days since turn of century
+decodeheader.x	decode/print vacuum telescope tape header
+destreak.par	
+destreak.x	destreak 10830 full disk helium grams
+destreak5.cl	script for processing 10830 tape containing 5 grams
+destreak5.par
+dicoplot.h	header file containing defines for DICOPLOT
+dicoplot.par
+dicoplot.x	program to make Carrington rotation mape on the Dicomed
+doc		documentation directory
+ephem.x		program to calculate solar ephemeris data
+fitslogr.cl	script, make a log file of a fits tape (daily grams)
+fitslogr.par
+getsqib.par
+getsqib.x	get the squibby brightness image from a full disk gram
+gryscl.dico	greyscale lookup table for use with DICOPLOT
+imfglexr.x	Get Line with EXtension Real for use with IMFilt
+imfilt.x	convolve an image with gaussian kernel, used in destreak
+imratio.x	find the ratio between two images, used in merge
+imtext.x	subroutine to load text into an image by overwriting pixels
+lstsq.x		least squares fitting subroutine
+makehelium.cl	script to process a helium 10830 tape into daily grams (180)
+makehelium.par
+makeimages.cl	script to process a magnetogram tape into daily grams (180)
+makeimages.par
+merge.par
+merge.x		program to merge daily grams into Carrington rotation maps
+mkpkg		make the package
+mrotlogr.cl	script, make a log file of a fits tape (Carrington rotations)
+mrotlogr.par
+mscan.par
+mscan.x		read vacuum telescope area scan tapes
+numeric.h	header file for numeric subroutine
+numeric.x	subroutine to calculate derivitives of latitude and longitude
+		with respect to x and y respectively (used in rmap)
+pimtext.par
+pimtext.x	program to put text into images by overwriting pixels
+pixbit.x	subroutine that looks up text pixel format in pixelfont
+pixelfont	pixel font for use with pimtext (no lower case, no decenders)
+putsqib.par
+putsqib.x	program to put the squibby brightness back in a full disk gram
+quickfit.par
+quickfit.x	fit an ellipse to the limb of the sun
+readheader.x    read a vacuum telescope header
+readss1.x	subroutine to read a type 1 area scan
+readss2.x	subroutine to read a type 2 area scan
+readss3.x	subroutine to read a type 3 area scan
+readss4.x	subroutine to read a type 4 area scan
+readsubswath.x	subroutine to read a sub-swath
+readvt.par
+readvt.x	read full disk grams from tape
+rmap.par
+rmap.x		map full disk grams into daily grams (180x180)
+syndico.x	Make dicomed print of daily grams 18 cm across.
+tcopy.par
+tcopy.x		tape to tape copy program
+trim.par
+trim.x		trim a full disk gram using squibby brightness info
+unwrap.par
+unwrap.x	program to remove binary wrap-around from images
+vt.h
+vtblink.cl	script to blink images on the IIS to check registration
+vtblink.par
+vtel.cl		load the vacuum telescope package
+vtel.hd		info about locations of various files
+vtel.men	menu for package
+vtel.par
+vtexamine.par
+vtexamine.x	program to examine a vacuum telescope tape (tell about record
+		lengths, header info, number of files, etc.)
+writetape.cl	script to write five full disk grams to tape
+writetape.par
+writevt.par
+writevt.x	program to write a full disk gram to tape in mountain format
+x_vtel.x	package parent program

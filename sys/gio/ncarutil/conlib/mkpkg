@@ -1,0 +1,37 @@
+# Update the CONCOM and CONTERP contributions to LIBNCAR.
+
+$checkout libncar.a lib$
+$update   libncar.a
+$checkin  libncar.a lib$
+$exit
+
+libncar.a:
+	concal.f
+	concld.f
+	concls.f
+	concom.f
+	condet.f
+	condrw.f
+	condsd.f
+	conecd.f
+	congen.f
+	conint.f
+	conlcm.f
+	conlin.f
+	conloc.f
+	conlod.f
+	conop1.f
+	conop2.f
+	conop3.f
+	conop4.f
+	conot2.f
+	conout.f
+	conpdv.f
+	conreo.f
+	consld.f
+	conssd.f
+	constp.f
+	contlk.f
+	contng.f
+	conxch.f
+	;

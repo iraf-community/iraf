@@ -1,0 +1,43 @@
+.help zsektx May84 "System Interface"
+.ih
+NAME
+zsektx -- seek on a text file
+.ih
+SYNOPSIS
+.nf
+zsektx (chan, loffset, status)
+
+int	chan			# OS channel of text file
+long	loffset			# magic seek offset
+int	status
+.fi
+.ih
+DESCRIPTION
+Text files are normally accessed sequentially, but random access is possible
+when reading if \fBzsektx\fR is used to adjust the file position.
+The primitive \fBzsektx\fR may be used to set the file position to BOF, EOF,
+or to the beginning of any line in the file provided the offset of the line
+was determined in a prior call to \fBznottx\fR while reading or writing the
+file.
+.ih
+RETURN VALUE
+ERR is returned if there is something wrong with \fIchan\fR or if seeks are
+illegal on the device and the seek is to a file position other than BOF or
+EOF.  If seeks are illegal on the device a request to seek to BOF or EOF is
+ignored.  OK is returned if the seek is successful.
+.ih
+NOTES
+Depending on the host system, \fIloffset\fR might be a zero indexed byte
+offset, the logical record number, the file block number and char offset
+within the block packed into a long integer, or some other machine dependent
+quantity.  The high level code must do nothing with \fIloffset\fR but
+request it with \fBznottx\fR and pass the value on to \fBzsektx\fR to perform
+a seek.  The only way to generate a seek offset for a text file (other than
+to BOF or EOF) is to note the file position while reading or writing the file.
+
+A note followed by a seek while reading or writing a line (newline not yet
+seen) rewinds the line.
+.ih
+SEE ALSO
+znottx, zfiotx
+.endhelp

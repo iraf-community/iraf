@@ -1,0 +1,36 @@
+# STRIP.IRAF -- Rmfiles command script, used to strip the IRAF system down to
+# its bare essentials (for a production version of the system).  The RMFILES
+# program which reads this must be run from the IRAF root directory.
+
+  unix/as	-all
+  unix/boot	-allbut .hlp .hd
+# unix/gdev
+# unix/hlib
+# unix/hlib/share -all
+  unix/os	-all
+# unix/share
+
+# bin
+  dev		-only .dat
+  doc		-all
+# lib
+  math		-all
+  pkg		-allbut .hlp .hd .men .cl .par .key .dat .mip
+  sys		-all
+
+-file unix/hlib/libcalcomp.a
+-file pkg/dataio/fits/structure.hlp
+-file pkg/images/imcalc/Imcalc.hlp
+-file pkg/images/tv/cv/ids/Imdis.hlp
+-file pkg/images/tv/doc/Cv.hlp
+-file pkg/images/tv/doc/Tv.hlp
+-file pkg/lists/doc/Lcalc.hlp
+-file pkg/lists/doc/Lists.hlp
+-file pkg/system/doc/Sys.hlp
+-file pkg/system/doc/Sys_intro.hlp
+-file pkg/system/help/design.hlp
+
+# Sun/IRAF only.
+# ---------------
+-file bin.68881/OBJS.arc
+-file bin.ffpa/OBJS.arc

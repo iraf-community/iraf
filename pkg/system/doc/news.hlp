@@ -1,0 +1,25 @@
+.help news Feb85 system
+.ih
+NAME
+news -- print news about IRAF
+.ih
+USAGE
+news
+.ih
+DESCRIPTION
+Print IRAF news items in reverse chronological order (most recent news first).
+The \fInews\fR script pages the system newsfile \fIdoc$newsfile\fR.
+.ih
+BUGS
+The newsfile is infrequently updated nowadays, detailed technical revision
+notes are used instead.
+.ih
+EXAMPLES
+
+1. Print the system news.
+
+	cl> news
+.ih
+SEE ALSO
+revisions
+.endhelp

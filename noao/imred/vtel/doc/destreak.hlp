@@ -1,0 +1,50 @@
+.help destreak Dec84 noao.imred.vtel
+.ih
+NAME
+destreak -- Remove streaks from Helium 10830 grams
+.ih
+USAGE
+destreak input_image output_image
+.ih
+PARAMETERS
+.ls input_image
+Image to be destreaked.
+.le
+.ls output_image
+Name to give destreaked output image (must be a separate image).
+.le
+.ls tempim
+Temporary image used for pixel storage between destreak passes.
+.le
+.ls verbose=no
+Flag to signal program that it should produce verbose output.
+.le
+.ls threshold = 4
+Squibby brightness threshold to use in determining limb points.
+.le
+.ih
+DESCRIPTION
+The helium 10830 grams as taken by the vacuum telescope have horizontal
+streaks caused by the detecting apparatus.  Destreak removes these streaks
+and the limb darkening
+using a two pass procedure.  First, for each diode, a function of the form
+'a + b*r**4', where r is the radius from disk center and a, b are parameters,
+is fit to the intensity distribution and is then subtracted from the data.
+Then a spatial filter is applied to the result and the final image is
+written to disk.  The full disk images are 2048 x 2048 and are taken using
+a 512 diode array which is scanned from west to east across the solar disk
+4 times.  Thus, data from a particular diode consists of four lines of the 
+image.
+.ih
+EXAMPLES
+1. To destreak "image1", put the output in "image2", put the temporary image in
+"temp2", and see verbose output, the command would be:
+
+.nf
+	vt> destreak image1 image2 temp2 v+
+.fi
+
+.ih
+SEE ALSO
+readvt, writevt, quickfit, getsqib, putsqib
+.endhelp

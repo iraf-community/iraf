@@ -1,0 +1,7 @@
+      SUBROUTINE DOSTAT (LAB)
+      INTEGER LAB
+      CALL INDENT (-1)
+      CALL OUTCON (LAB)
+      CALL OUTCON (LAB + 1)
+      RETURN
+      END

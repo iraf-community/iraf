@@ -1,0 +1,38 @@
+.help zcldpr May84 "System Interface"
+.ih
+NAME
+zcldpr -- close a detached process
+.ih
+SYNOPSIS
+.nf
+zcldpr (jobcode, killflag, exit_status)
+
+int	jobcode			# code by which job is known to system
+int	killflag		# if YES, kill bkg job
+int	exit_status		# exit status of bkg job
+.fi
+.ih
+DESCRIPTION
+If \fIkillflag\fR is NO, process execution will be suspended until
+the background job terminates.  If \fIkillflag\fR is YES the background
+job is dequeued if it has not yet been run, or is killed if it is currently
+executing.  The integer \fIjobcode\fR is the magic number assigned the
+job by the \fBzopdpr\fR primitive.
+.ih
+RETURN VALUE
+ERR is returned for an illegal \fIjobcode\fR or for an attempt to kill
+a job without the necessary permissions.  If the operations completes
+successfully the exit status of the process, i.e., OK or a positive integer
+error code, is returned in \fIexit_status\fR.
+.ih
+NOTES
+The CL calls this procedure whenever it detects that a background job has
+terminated, since a background job may be run as a subprocess on some systems
+and since it may be necessary to perform special actions after a subprocess has
+terminated.  The CL also calls this procedure whenever the user \fBkills\fR a
+background job, or when the user wishes to \fBwait\fR for a background job to
+terminate.
+.ih
+SEE ALSO
+zopdpr
+.endhelp

@@ -1,0 +1,295 @@
+.help revisions Jun88 pkg.xtools
+.nf
+pkg$xtools/logfiles.x
+    Added these routines to open and to close a list of logfiles.
+    (6/2/89, Seaman)
+
+pkg$xtools/ranges.x
+    Fixed a bunch of bugs in the zero handling, the MAX_INT handling and
+    that made the step notation flaky.  Made a comma a hard separator
+    between two ranges rather than mere whitespace.  (6/2/89, Seaman)
+
+pkg$xtools/xtmksections.x
+    A 2D image with second dimension length of 1 is returned without
+    an image section from xt_mk1d and xt_mksection.  (1/31/89, Valdes)
+ 
+pkg$xtools/xtsort.x
+    Added a double precision version of the three vector sorter, named
+    xt_sort3d.  It required a double precision version of xts_compared.
+    This change was to support the utilities.curfit task, which now
+    sorts its input list data before fitting.  (6/24/88 ShJ)
+
+pkg$xtools/xtsums.x
+    When the number of lines or columns is 1 and the line or column is the
+    same as a previous call and a data is null then a new vector is not read
+    causing uninitialized data to be returned.  Added l1=0 and c1=0 to fix
+    problem.  This problem appeared in proto.toonedspec.  (2/12/88 Valdes)
+
+pkg$xtools/mksection.x
+    User specified section strings of the form "column 051" are now
+    converted to [51,*] instead of [051,*]. (11/9/87 Valdes)
+
+====
+V2.5
+====
+
+pkg$xtools/center1d.x
+pkg$xtools/doc/center1d.hlp
+    Valdes, April 2, 1987:
+    1.  A bug with testing the right edge of the data was fixed.  This caused
+	FPE errors on AOS/IRAF.
+    2.  The centering fails if the maximum number of iterations is reached
+	or the changes do not continue to decrease within 3 iterations of
+	the last minimum change.
+    3.  Defined parameters replaced constants used in the code.
+
+pkg$xtools/center1d.x
+pkg$xtools/doc/center1d.hlp
+    Valdes, March 5, 1987:
+    1.  A silent minimum of 3 is imposed on the width parameter.  If there
+	is ever a need to allow smaller widths then the procedure can
+	be changed and the application relinked.
+    2.  The help page was modified to reflect this change.
+
+pkg$xtools/center1d.x
+    Valdes, October 29, 1986:
+    1.  The first use of threshold was only as a data range limit.
+	Now it is used to eliminate all peaks less than threshold from
+	the continuum.  This fixes ever finding weak features less
+	than threshold.
+
+pkg$xtools/center1d.x
+    Valdes, August 18, 1986:
+    1.  Added a detection threshold parameter to CENTER1D.
+
+====================================
+Version 2.3 Release, August 18, 1986
+====================================
+
+cogetr.x: Valdes, July 3, 1986
+    1.  Error in initializing the procedure cogetr fixed.
+
+icfit$: Valdes, July 3, 1986
+    1.  ICFIT package replaced by a new version.
+
+=====================================
+STScI Pre-release and SUN 2.3 release
+=====================================
+
+icfit$icgfuncs.gx:  Valdes, June 18, 1986
+    1.  DCVEVAL was being called in ICGFUNCS with a real argument when
+	selecting the nonlinear plot (key 'l').  This caused an error
+	on the SUN.  Changed "real" to PIXEL.
+
+gtools$gtwindow.x:  Valdes, June 11, 1986
+    1.  Added new procedure gt_window.  It is a cursor driven procedure
+	for windowing graphs using the gtools pointer.  The help
+	page for gtools was also modified to show the windowing options.
+
+gtools$gtcur.x:  Valdes, May 10, 1986
+    1.  Took out "Confirm:" prompt so that cursor input from a file does
+	not cause anything to be printed.  Two EOF's (carriage return or
+	actual EOF) or a 'q' are required to exit thus protecting the user
+	from an inadvertent carriage return.
+
+imt.x:  Valdes April 29, 1986
+    1.  Modified the image template package to sort wildcard expansions.
+
+icfit$icgfit.gx,icgfit2.x,icgcolon.x:  Valdes, April 7, 1986
+    1.  Fixed use of STRIDX with a character constant to STRIDXS.
+    2.  Fixed problem with colon usage for ":sample" and ":function"
+
+xtools:  Valdes, March 24, 1985
+    1.  Added XT_PHISTORY to put dated history string.
+
+pkg$xtools/imtools.x:  Valdes, March 18, 1985
+    1.  XT_MKIMTEMP modified to create the temporary image header in the
+	user current directory with the prefix "tmp".
+    2.  XT_DELIMTEMP modified to call IMRENAME instead of RENAME.
+
+From Valdes March 13, 1986:
+
+1.  Added procedure dtgad (database get array double) to dttext tools.
+It's purpose is to accomodate double precisions curve fits.
+
+2.  Added COGETR procedures for efficient column access.  A help page
+is available.
+
+3.  Added XTSUMS procedures for buffered sums (both column and line).
+They are particularly useful for moving sums type of operations.  A help
+page is available
+
+4.  Added help pages for COGETR and XTSUMS procedures to help database.
+------
+From Valdes March 10, 1986:
+
+1.  Added IMTREW rewind procedure to image template tools.
+
+2.  Added IMTGIM procedure to get an image from the template by index number.
+------
+From Valdes March 5, 1986:
+
+1.  Modified dttext to allow deleting a database.
+===========
+Release 2.2
+===========
+From Valdes Feb. 8, 1986:
+
+1.  Modified XT_DELIMTEMP and DEL_IMTEMP to update the pixel header
+file so that it correctly points to the header file after the header
+file is renamed.
+------
+From Valdes Jan. 13, 1986:
+
+1.  Changes in DTTEXT.X:
+	a.  Size of OS filename in DTMAP1 extended from SZ_FNAME to
+	    SZ_PATHNAME + SZ_FNAME.
+	b.  Database directories do not allow periods in the names when
+	    created.
+2.  XTMKSECTION was computing the middle line (or column) as
+len / 2 which gave zero for an image of length 1.  Changed to
+(len + 1) / 2.
+------
+From Valdes Dec. 31, 1985:
+
+1.  A bug in imt.x due to incorrect indexing in a string has been fixed.
+------
+From Valdes Nov. 22, 1985:
+
+1.  A new procedure XT_GIDS has been added to find identifier tokens in a
+string and match the identifiers against a dictionary string.  An array
+of YES/NO values for each dictionary entry, up to a maximum of maxids,
+is returned.  This procedure is useful for parsing an option string.
+It is nice because identifiers can be abbreviated and delimiters can be
+anything which is not an identifier token (whitespace, commas, colons,
+semicolons, etc).
+-----
+From Valdes Nov. 15, 1985:
+
+1.  Added DTMAP1 to DTTEXT.X text database package.  This procedure
+takes a directory name as the database and stores or access text database
+files in the directory under the file name key.  It maps the name
+"database/key" and calls DTMAP.  This allows better organization of
+database information into subfiles of a database rather than one massive
+text file.  It calls DTMAP with the database name directly if the database
+name is a regular file and not a directory.  Thus, it is backwards
+compatible with older single file text databases.
+
+2.  Added ISDIRECTORY.  This procedure tests a virtual file name to see
+if it is a directory and returns the os pathname suitable for concatentation.
+The function value is the number of characters in the pathname which is
+0 for a nondirectory file.
+cogetr.x: Valdes, July 3, 1986
+    1.  Error in initializing the procedure cogetr fixed.
+
+icfit$: Valdes, July 3, 1986
+    1.  ICFIT package replaced by a new version.
+
+=====================================
+STScI Pre-release and SUN 2.3 release
+=====================================
+
+icfit$icgfuncs.gx:  Valdes, June 18, 1986
+    1.  DCVEVAL was being called in ICGFUNCS with a real argument when
+	selecting the nonlinear plot (key 'l').  This caused an error
+	on the SUN.  Changed "real" to PIXEL.
+
+gtools$gtwindow.x:  Valdes, June 11, 1986
+    1.  Added new procedure gt_window.  It is a cursor driven procedure
+	for windowing graphs using the gtools pointer.  The help
+	page for gtools was also modified to show the windowing options.
+
+gtools$gtcur.x:  Valdes, May 10, 1986
+    1.  Took out "Confirm:" prompt so that cursor input from a file does
+	not cause anything to be printed.  Two EOF's (carriage return or
+	actual EOF) or a 'q' are required to exit thus protecting the user
+	from an inadvertent carriage return.
+
+imt.x:  Valdes April 29, 1986
+    1.  Modified the image template package to sort wildcard expansions.
+
+icfit$icgfit.gx,icgfit2.x,icgcolon.x:  Valdes, April 7, 1986
+    1.  Fixed use of STRIDX with a character constant to STRIDXS.
+    2.  Fixed problem with colon usage for ":sample" and ":function"
+
+xtools:  Valdes, March 24, 1985
+    1.  Added XT_PHISTORY to put dated history string.
+
+pkg$xtools/imtools.x:  Valdes, March 18, 1985
+    1.  XT_MKIMTEMP modified to create the temporary image header in the
+	user current directory with the prefix "tmp".
+    2.  XT_DELIMTEMP modified to call IMRENAME instead of RENAME.
+
+From Valdes March 13, 1986:
+
+1.  Added procedure dtgad (database get array double) to dttext tools.
+It's purpose is to accomodate double precisions curve fits.
+
+2.  Added COGETR procedures for efficient column access.  A help page
+is available.
+
+3.  Added XTSUMS procedures for buffered sums (both column and line).
+They are particularly useful for moving sums type of operations.  A help
+page is available
+
+4.  Added help pages for COGETR and XTSUMS procedures to help database.
+------
+From Valdes March 10, 1986:
+
+1.  Added IMTREW rewind procedure to image template tools.
+
+2.  Added IMTGIM procedure to get an image from the template by index number.
+------
+From Valdes March 5, 1986:
+
+1.  Modified dttext to allow deleting a database.
+===========
+Release 2.2
+===========
+From Valdes Feb. 8, 1986:
+
+1.  Modified XT_DELIMTEMP and DEL_IMTEMP to update the pixel header
+file so that it correctly points to the header file after the header
+file is renamed.
+------
+From Valdes Jan. 13, 1986:
+
+1.  Changes in DTTEXT.X:
+	a.  Size of OS filename in DTMAP1 extended from SZ_FNAME to
+	    SZ_PATHNAME + SZ_FNAME.
+	b.  Database directories do not allow periods in the names when
+	    created.
+2.  XTMKSECTION was computing the middle line (or column) as
+len / 2 which gave zero for an image of length 1.  Changed to
+(len + 1) / 2.
+------
+From Valdes Dec. 31, 1985:
+
+1.  A bug in imt.x due to incorrect indexing in a string has been fixed.
+------
+From Valdes Nov. 22, 1985:
+
+1.  A new procedure XT_GIDS has been added to find identifier tokens in a
+string and match the identifiers against a dictionary string.  An array
+of YES/NO values for each dictionary entry, up to a maximum of maxids,
+is returned.  This procedure is useful for parsing an option string.
+It is nice because identifiers can be abbreviated and delimiters can be
+anything which is not an identifier token (whitespace, commas, colons,
+semicolons, etc).
+-----
+From Valdes Nov. 15, 1985:
+
+1.  Added DTMAP1 to DTTEXT.X text database package.  This procedure
+takes a directory name as the database and stores or access text database
+files in the directory under the file name key.  It maps the name
+"database/key" and calls DTMAP.  This allows better organization of
+database information into subfiles of a database rather than one massive
+text file.  It calls DTMAP with the database name directly if the database
+name is a regular file and not a directory.  Thus, it is backwards
+compatible with older single file text databases.
+
+2.  Added ISDIRECTORY.  This procedure tests a virtual file name to see
+if it is a directory and returns the os pathname suitable for concatentation.
+The function value is the number of characters in the pathname which is
+0 for a nondirectory file.
+.endhelp

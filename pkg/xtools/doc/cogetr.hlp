@@ -1,0 +1,88 @@
+.help cogetr.hlp Feb86 xtools
+.ih
+NAME
+.nf
+comap   -- Initialize buffered image column access
+cogetr  -- Get buffered image columns from 2D image
+counmap -- Free memory used in image column access
+.fi
+.ih
+SYNOPSIS
+.nf
+pointer	im		# IMIO pointer
+pointer	co		# COGETR pointer
+int	maxbuf		# Maximum buffer size
+int	col		# Column
+int	line1		# First image line of column vector
+int	line2		# Last image line of column vector
+pointer	buf		# Returned pointer
+
+pointer	immap()		# Map the image
+pointer	comap()		# Map the column access
+pointer	cogetr()	# Get columns
+
+	im = immap (image, mode, 0)
+	co = comap (im, maxbuf)
+	buf = cogetr (co, col, line1, line2)
+	call counmap (co)
+.fi
+.ih
+DESCRIPTION
+A pointer to a real image column vector between the limits \fIline1\fR
+and \fIline2\fR is returned.  Internally the image data is buffered as
+a scrolled two dimensional section to minimize the number of image
+reads.  This interface is designed to be efficient when:
+
+.nf
+(1) The columns are accessed sequentially.
+(2) The number of lines does not change.
+(3) The first and last lines change slowly with the column accessed.
+.fi
+
+The column access interface is initialized with the procedure
+\fBcomap\fR.  At this time the maximum size of the internal buffer is
+set.  The buffer should be reasonably large.
+
+When the first column
+access is made with \fBcogetr\fR a buffer is created containing the
+number of lines requested and as many columns as will fit within the
+maximum buffer size.  When the number of lines is small then the number
+of columns buffered will be large (as large as the image if possible).
+When the number of lines is large then the columns may be buffered in
+blocks across the image.  A pointer to the real column vector requested is
+returned.  Subsequent calls to \fBcogetr\fR will return columns from the
+buffer without reading the image until a new buffer is required
+provided that the line limits do not change.  If the columns are
+accessed sequentially (usually from the first column to
+the last column) then the image will be accessed a minimum number of
+times consistent with the buffer size.
+
+One type of application accesses entire columns from the image
+so that the first and last lines do not change.  Another type allows
+the line limits to change in such a way that the total number of lines
+does not change and the changes are only a few lines between calls.
+In this case only the new lines are added to the scrolled buffer
+without the entire buffer needing to be filled.
+Applications of this type occur when following a feature across an
+image such as objects in long slit spectra or echelle orders.
+
+The buffer is created and initialized when the buffer pointer
+is null or when the number of lines requested is changed.  Both the
+buffer and the column data pointer are allocated by \fBcogetr\fR.
+The user must free the buffers with the procedure \fBcounmap\fR.
+.ih
+RETURNED VALUES
+\fBComap\fR returns a pointer to a structure internal to the interface.
+\fBCogetr\fR returns a pointer to a real vector containing the requested
+image column.
+.ih
+TIMINGS
+When used in applications requiring sequential column access with
+the line limits changing slowly or not at all this interface provides
+access nearly as efficiently as accessing lines.  The actual difference
+with the same application applied to lines depends on the number of
+buffer reads required (i.e. on the size of the image).
+.ih
+SEE ALSO
+xtsums
+.endhelp

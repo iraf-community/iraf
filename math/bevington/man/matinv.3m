@@ -1,0 +1,25 @@
+.TH MATINV 3M
+.SH NAME
+matinv
+.SH DESCRIPTION
+subroutine matinv.f 
+
+source
+  Bevington, pages 302-303.
+
+purpose
+  invert a symmetric matrix and calculate its determinant
+
+usage 
+  call matinv (array, norder, det)
+
+description of parameters
+  array  - input matrix which is replaced by its inverse
+  norder - degree of matrix (order of determinant)
+  det    - determinant of input matrix
+
+subroutines and function subprograms required 
+  none
+
+comments
+  valid for norder up to 10

@@ -1,0 +1,20 @@
+      INTEGER FUNCTION SDUPL (STR)
+      INTEGER STR (100)
+      INTEGER MEM( 60000)
+      COMMON/CDSMEM/MEM
+      INTEGER I
+      INTEGER LENGTH
+      INTEGER J
+      INTEGER DSGET
+      J = DSGET (LENGTH (STR) + 1)
+      SDUPL = J
+      I = 1
+23000 IF (.NOT.(STR (I) .NE. -2))GOTO 23002
+      MEM (J) = STR (I)
+      J = J + 1
+23001 I = I + 1
+      GOTO 23000
+23002 CONTINUE
+      MEM (J) = -2
+      RETURN
+      END

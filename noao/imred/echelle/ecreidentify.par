@@ -1,0 +1,11 @@
+# Parameters for ECREIDENTIFY task.
+
+images,s,a,,,,Spectra to be reidentified
+reference,f,a,,,,Reference spectrum
+shift,r,h,0.,,,Shift to add to reference features
+cradius,r,h,5.,,,Centering radius
+threshold,r,h,10.,0.,,Feature threshold for centering
+refit,b,h,yes,,,Refit coordinate function?
+
+database,f,h,database,,,Database
+logfiles,s,h,"STDOUT,logfile",,,List of log files

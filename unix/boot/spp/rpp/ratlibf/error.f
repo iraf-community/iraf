@@ -1,0 +1,5 @@
+      SUBROUTINE ERROR (LINE)
+      INTEGER LINE (100)
+      CALL REMARK (LINE)
+      CALL ENDST
+      END

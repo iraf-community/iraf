@@ -1,0 +1,7 @@
+
+# NAMES parameter file
+
+input,s,a,,,,List of root file names
+records,s,a,,,,Range of spectral records
+append,s,h,"",,,String to append to generated image names
+check,b,h,no,,,Verify that image header exists

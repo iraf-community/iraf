@@ -1,0 +1,44 @@
+# XTOOLS Programming tools library.
+
+update:
+	$checkout libxtools.a lib$
+	$update	  libxtools.a
+	$checkin  libxtools.a lib$
+	$purge    lib$
+	;
+
+libxtools.a:
+	@ranges		# Range tools "1:10,5:20,30"
+	@gtools		# Graphics tools
+	@icfit		# Interactive curfit package
+
+	center1d.x	<math/iminterp.h> <pkg/center1d.h>
+	clgcurfit.x	<math/curfit.h>
+	clginterp.x	<math/iminterp.h>
+	clgsec.x	<ctype.h> <imhdr.h> <mach.h>
+	cogetr.x	cogetr.h <imhdr.h>
+	dttext.x	<ctotok.h> <ctype.h> <finfo.h> <pkg/dttext.h> <time.h>
+	extrema.x	
+	getdatatype.x	
+	gstrdetab.x	
+	gstrentab.x	
+	gstrsettab.x	
+	imtools.x	<ctype.h> <imhdr.h>
+	intrp.f
+	isdir.x		<ctype.h> <finfo.h>
+	peaks.x	
+	ranges.x	<ctype.h> <mach.h>
+	strdetab.x	
+	strentab.x	
+	xt21imsum.x	<imhdr.h>
+	xtanswer.x	<pkg/xtanswer.h>
+	xtgids.x	<ctotok.h>
+	xtimleneq.x	<imhdr.h>
+	xtimtgetim.x	
+	xtlogfiles.x
+	xtmksection.x	<imhdr.h>
+	xtphistory.x	<imhdr.h>
+	xtsort.x	
+	xtstripwhite.x	<ctype.h>
+	xtsums.x	
+	;

@@ -1,0 +1,9 @@
+# Parameter file for MSPLOT
+
+image,f,a,,,,Image to be plotted
+line,i,a,,,,Image line to be plotted
+naverage,i,h,20,,,Number of image lines to average
+lower,r,h,-10,,,Lower limit of model profiles
+upper,r,h,10,,,Upper limit of model profiles
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input

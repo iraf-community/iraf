@@ -1,0 +1,51 @@
+# Make the NCAR utilities library libncar.a.
+
+$checkout libncar.a lib$
+$update   libncar.a
+$checkin  libncar.a lib$
+$exit
+
+libncar.a:
+	@sysint
+	@autograph
+	@conlib
+
+	conran.f    # blockdata for the conrec utility
+	conbdn.f    # blockdata for the conran utility
+	#conraq.f   - Conran, conraq and conras form the "conran" family.
+	#conras.f   - Conran is the only one of the 3 included in "libncar.a";
+	#	    - the others contain duplicate entry points and blockdatas
+	#           - and are not included.
+	#
+	conrec.f
+	conbd.f
+	#conrcqck.f - Conrcqck, conrcspr and conrec form the "conrec" family.
+	#conrcspr.f - Conrec is the only one of the 3 included in "libncar.a";
+	#           - the others contain duplicate entry points and blockdatas
+	#           - and are not included.
+	#dashchar.f
+	#dashline.f - Like the "conrec" family above, the "dash" family contains
+	dashsmth.f  #- duplicate entry points and blockdatas.  Only dashsmth is
+		    #- included in "libncar.a".  The others are redundant.
+	dashbd.f    #  blockdata for the dashsmth utility
+	#dashsupr.f
+	#ezmapg.f
+	gridal.f
+	gridt.f     #- blockdata for the gridal utility
+	hafton.f
+	hfinit.f    #- blockdata for the hafton utility
+	isosrf.f 
+	isosrb.f    #- blockdata for the isosrf utility
+ 	kurv.f	    #- support routines for dashsmth and isosrf
+	pwrity.f
+	pwrzi.f
+	pwrzs.f
+	pwrzt.f
+	srface.f
+	srfabd.f    #- blockdata for the srface utility
+	#strmln.f
+	threed.f
+	threbd.f    #- blockdata for the threed utility
+	velvct.f
+	veldat.f    #- blockdata for the velvct utility
+	;

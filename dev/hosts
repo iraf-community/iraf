@@ -1,0 +1,17 @@
+# HOSTS -- Nodes on the local network.  The special logical node aliases
+# "lpnode" and "plnode", if specified, will direct line printer and plotter
+# output to the indicated node.
+
+cholla                  : cholla!/iraf/iraf/bin.ieee/irafks.e
+yucca                   : yucca!/iraf/iraf/bin.ieee/irafks.e
+vsun1                   : vsun1!/usr2/iraf/bin.f68881/irafks.e
+tecate                  : tecate!/yucca/isis/iraf/iraf/bin.f68881/irafks.e
+negra                   : negra!/yucca/isis/iraf/iraf/bin.f68881/irafks.e
+dosequis                : dosequis!/yucca/isis/iraf/iraf/bin.f68881/irafks.e
+
+# NOAO hosts.
+noao.edu		: noao.edu!/iraf/iraf/bin.vax/irafks.e
+tucana			: tucana!/usr/iraf/bin.f68881/irafks.e
+orion			: tucana!/local/iraf/bin.sparc/irafks.e
+pisces			: pisces!/usr/iraf/bin.f68881/irafks.e
+pegasus			: pegasus!/files/vol/iraf/bin.i386/irafks.e

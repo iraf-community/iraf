@@ -1,0 +1,98 @@
+.help lcalib Sep87 noao.onedspec
+.ih
+NAME
+lcalib -- List information about the spectral calibration data
+.ih
+USAGE
+lcalib option star_name
+.ih
+PARAMETERS
+.ls option
+Chooses calibration data to be listed.  Option
+may be: "bands" to list the bandpasses at each wavelength, "ext" to
+list the extinction at each wavelength, "mags", "fnu", or "flam"
+to list the magnitude, or flux of
+the star (selected by the star_name parameter) at each wavelength, or
+"stars" to list the star names available in the calibration directory.
+.le
+.ls star_name
+Selects which star's magnitude list is chosen if the option parameter
+is "mags", "fnu", "flam", or "bands".
+.le
+.ls extinction
+Extinction file.  The current standard extinction files:
+.nf
+	onedstds$kpnoextinct.dat - KPNO standard extinction
+	onedstds$ctioextinct.dat - CTIO standard extinction
+.fi
+.le
+.ls caldir
+Calibration directory containing standard star data.  The current
+calibration directories are:
+.nf
+	onedstds$irscal/   - IRS standard stars
+	onedstds$iidscal/  - IIDS standard stars
+	onedstds$ctiocal/  - CTIO standard stars
+	onedstds$bstdscal/ - Bright standard stars
+	onedstds$redcal/   - IRS and IIDS extended red standard stars
+.fi
+.le
+.ls fnuzero = 3.68e-20
+The absolute flux per unit frequency at a magnitude of zero.  This is used
+to convert the calibration  magnitudes to absolute flux by the formula
+
+	Flux = fnuzero * 10. ** (-0.4 * magnitude)
+
+The flux units are also determined by this parameter.  However, the
+frequency to wavelength interval conversion assumes frequency in hertz.
+The default value is based on a calibration of Vega at 5556 Angstroms of
+3.52e-20 ergs/cm2/s/hz for a magnitude of 0.048.  This default value
+is that used in earlier versions of this task which did not allow the
+user to change this calibration.
+.le
+.ih
+DESCRIPTION
+LCALIB provides a means of checking the flux calibration data.  The calibration
+data consists of extinction, bandpasses, and stellar magnitudes.
+
+The extinction is given in an extinction file consisting of lines with
+wavelength and extinction.  The wavelengths must be order in increasing
+wavelength and the wavelengths must be in Angstroms.  There are two
+standard extinction files currently available, "onedstds$kpnoextinct.dat",
+and "onedstds$ctioextinct.dat".
+
+The standard star data are in files in a calibration
+directory specified with the parameter \fIcaldir\fR.  A standard star
+file is selected by taking the star name given, by the parameter
+\fIstar_name\fR, removing blanks, +'s and -'s, appending ".dat", and converting
+to lower case.  This file name is appended to the specified calibration
+directory.  A calibration file consists of lines containing a wavelength,
+a stellar magnitude, and a bandpass full width.  The wavelengths are in
+Angstroms.  Comment lines beginning with # may be included in the file.
+The star names printed by this task are just the first line of each file
+in the calibration directory with the first character (#) removed.
+The calibration files may be typed, copied, and printed.  \fBLcalib\fR
+may also be used to list data from the calibration files.
+.ih
+EXAMPLES
+
+.nf
+	# List the extinction table
+	cl> lcalib ext
+	# Plot the extinction table
+	cl> lcalib ext | graph
+	# Plot the energy distribution
+	cl> lcalib mags "bd+28 4211" | graph
+	# List the names of all the stars
+	cl> lcalib stars caldir=onedstds$irscal/
+	# As above but for IIDS file
+	cl> lcalib stars calib_file=onedstds$iidscal/
+.fi
+.ih
+SEE ALSO
+.nf
+standard, sensfunc, onedstds$irscal/, onedstds$iidscal/, onedstds$ctiocal/,
+onedstds$bstdscal/, onedstds$redcal/, onedstds$kpnoextinct.dat,
+onedstds$ctioextinct.dat
+.fi
+.endhelp

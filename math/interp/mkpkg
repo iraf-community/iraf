@@ -1,0 +1,21 @@
+# Old image interpolator tools library.
+
+$checkout libinterp.a lib$
+$update   libinterp.a
+$checkin  libinterp.a lib$
+$exit
+
+libinterp.a:
+	arbpix.x	interpdef.h asidef.h
+	arider.x	interpdef.h
+	arival.x	interpdef.h
+	asider.x	interpdef.h asidef.h
+	asieva.x	interpdef.h asidef.h
+	asifit.x	interpdef.h asidef.h
+	asigrl.x	interpdef.h asidef.h
+	asiset.x	interpdef.h asidef.h
+	asival.x	interpdef.h asidef.h
+	iieval.x        
+	iif_spline.x    
+	iipol_terp.x
+	;

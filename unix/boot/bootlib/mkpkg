@@ -1,0 +1,49 @@
+# Update the BOOTLIB library.  The Makefile is used to bootstrap the library,
+# but once MKPKG is up it is easier to maintain the library with MKPKG.
+
+$checkout libboot.a hlib$
+$update   libboot.a
+$checkin  libboot.a hlib$
+$exit
+
+libboot.a:
+	$set XFLAGS = "-c $(HSI_XF)"
+	$iffile (as$bytmov.s)  as$bytmov.s  $else  _bytmov.c  $endif
+	osamovb.c
+
+	index.c
+	rindex.c
+	envinit.c
+
+	osaccess.c	bootlib.h
+	oschdir.c	bootlib.h
+	osclose.c	bootlib.h
+	oscmd.c		bootlib.h
+	oscreatedir.c	bootlib.h
+	oscrfile.c	bootlib.h
+	osdelete.c	bootlib.h
+	osdir.c		bootlib.h
+	osfcopy.c	bootlib.h
+	osfdate.c	bootlib.h
+	osfiletype.c
+	osfpathname.c	bootlib.h
+	osgetenv.c	bootlib.h
+	osgetowner.c	bootlib.h
+	osopen.c
+	osputenv.c	bootlib.h
+	osread.c
+	ossetfmode.c	bootlib.h
+	ossetowner.c	bootlib.h
+	ossettime.c	bootlib.h
+	osstrpak.c
+	osstrupk.c
+	ossymlink.c
+	ossubdir.c	bootlib.h
+	ossysfile.c	bootlib.h
+	ostime.c
+	oswrite.c	bootlib.h
+
+	vfn2osfn.c	bootlib.h
+	osfn2vfn.c	bootlib.h
+	tape.c
+	;

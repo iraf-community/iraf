@@ -1,0 +1,32 @@
+.help keep Feb86 language
+.ih
+NAME
+keep -- keep memory after task termination
+.ih
+USAGE
+keep
+.ih
+DESCRIPTION
+Normally when a script task terminates any tasks, packages, environment
+variables, etc. defined during the execution of that task are discarded
+(in other words, the memory used by the task is freed).
+The \fIkeep\fR command instructs the CL to retain the definitions after
+script termination.  Only one level of "keep" is achieved, e.g.,
+if a script with a keep is called from a higher level script, then when
+the higher level script terminates the task definitions will still be lost
+(unless this higher level script also uses \fIkeep\fR).
+.ih
+EXAMPLE
+1. The most common use for \fIkeep\fR is to retain a set of definitions
+in a script task.
+
+.nf
+	set	pkdir = "home$hebrew/"
+	task	aleph, beth, kaph = hebrew.cl
+
+	keep
+.fi
+.ih
+SEE ALSO
+task, package
+.endhelp

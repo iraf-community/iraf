@@ -1,0 +1,66 @@
+.help revisions Jun88 pkg.utilities
+.nf
+utilities$t_curfit.x
+    For list input only, curfit now sorts the input array before fitting.
+    Sorted data is required by the rg_ranges procedure (even in the
+    default case of sample=*) or else data points will be ommitted from
+    the fit.  (24/6/88 ShJ)
+
+utilities$t_curfit.x,curfit.gx
+    Davis, December 2, 1987
+    1. Added a new parameter weighting to the curfit task. The four weighting
+    options are uniform, user, statistical and instrumental. The weights in
+    the four cases are 1.0, user input, 1/y and 1/sigmay ** 2. In the latter
+    case the weight that the user supplies is interpreted as sigmay. All
+    four options are available if input is from a list or STDIN. If input
+    is from an image section only the uniform and statistical options are
+    available.
+
+utilities$t_polyfit.x
+    Davis, November 23, 1987.
+    1. Added a new parameter weighting to the polyfit task. The three
+    weighting options are instrumental, uniform and statistical. The
+    weights in the three cases are 1./sigy ** 2, 1.0 and 1/y consistent
+    with the Bevington definitions. If the weighting is instrumental
+    the user must supply the error in y as well as x and y.
+
+utilities$*x
+    Valdes, February 17, 1987
+    1.  Required GIO changes.
+
+utilities$t_curfit.x, curfit.gx:  Valdes, July 3, 1986
+    1.  Modified CURFIT to use new ICFIT package.
+
+________________________________________
+
+From:  Valdes	Mar 14, 1986
+Task:  Curfit
+
+1.  The CURFIT task has been modified to allow switching between single
+and double precision calculations.  Generally double precision is used
+but this task provides a convenient test facility for testing changes
+in the mathematical routines or which precision is appropriate for a
+new task being developed.
+
+2.  The help page was updated.
+
+________________________________________
+
+From:  Hammond	Jan 6, 1986
+Task:  Curfit
+
+1. A new task, Curfit, has been installed.  It is the cl interface to
+   the curfit package and allows for interactive fitting of functions
+   to list or image data.  The function types supported are Legendre
+   or Chebyshev polynomials and linear or cubic splines.
+
+__________________________________________
+
+From:	Hammond	Dec 19, 1985
+Task:	Polyfit
+
+1.  Polyfit no longer gets a floating divide by zero when a linear fit
+    has a correlation = 1.  The problem was in the error calculation (ftest)
+    portion of the Bevington routine regres.  This problem was reported
+    by ST.
+.endhelp

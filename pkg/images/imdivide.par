@@ -1,0 +1,10 @@
+# Parameters for task imdivide.
+
+numerator,f,a,,,,Numerator image
+denominator,f,a,,,,Denominator image
+resultant,f,a,,,,Resultant image
+title,s,h,'*',,,Title for the resultant image
+constant,r,h,0,,,Constant replacement for zero division
+rescale,s,h,numerator,,,"Rescale resultant mean (norescale, mean, numerator)"
+mean,s,h,1,,,Mean for rescaling
+verbose,b,h,no,,,Verbose output?

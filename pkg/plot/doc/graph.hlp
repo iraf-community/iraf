@@ -1,0 +1,174 @@
+.help graph Mar88 plot
+.ih
+NAME
+graph -- graph one or more lists or image sections
+.ih
+USAGE
+graph input
+.ih
+PARAMETERS
+.ls input
+List of operands to be graphed.  May be STDIN, or one or more image sections 
+or lists.
+.le
+.ls wx1=0., wx2=0., wy1=0., wy2=0.
+The range of user coordinates spanned by the plot.  If the range of values
+in x or y = 0, the plot is automatically scaled from the minimum to
+maximum data value along the degenerate dimension.
+.le
+.ls vx1=0., vx2=0., vy1=0., vy2=0.
+NDC coordinates (0-1) of the device plotting viewport.  If not set by 
+the user, a suitable viewport which allows sufficient room for all labels 
+is used.
+.le
+.ls pointmode = no
+If \fBpointmode\fR = yes, plot points or markers at data values, rather than 
+connected lines.
+.le
+.ls marker = "box"
+Marker to be drawn if \fBpointmode\fR = yes.  Markers are "point", "box", 
+"cross", "plus", "circle", "hebar", "vebar", "hline", "vline" or "diamond".
+.le
+.ls szmarker = 0.005
+The size of a marker in NDC coordinates (0 to 1 spans the screen).
+If zero and the input operand is a list, marker sizes are taken individually
+from the third column of each list element.  If positive, all markers are
+of size \fBszmarker\fR.  If negative and the input operand is a list,
+the size of a marker is the third column of each list element times the
+absolute value of \fBszmarker\fR.
+.le
+.ls xlabel = "", ylabel = ""
+Label for the X-axis or Y-axis.
+.le
+.ls title = "imtitle"
+Plot title.  If \fBtitle\fR  = "imtitle"
+and the first operand in \fBinput\fR is an image, the image title is used
+as the plot title.
+.le
+.ls box = yes
+Draw axes at the perimeter of the plotting window.
+.le
+.ls fill = yes
+Fill the output viewport regardless of the device aspect ratio?
+.le
+.ls axis = 1
+Axis along which the projection is to be computed, if an input operand is
+an image section of dimension 2 or higher.  Axis 1 is X (line average),
+2 is Y (column average), and so on.
+.le
+.ls transpose = no
+Swap the X and Y axes of the plot.  If enabled, the axes are transposed 
+after the optional linear transformation of the X-axis.
+.le
+.ls logx = no, logy = no
+Log scale the X or Y axis.  Zero or negative values are indefinite and
+will not be plotted, but are tolerated.
+.le
+.ls ticklabels = yes
+Label the tick marks.
+.le
+.ls majrx=5, minrx=5, majry=5, minry=5
+Number of major tick marks on each axis; number of minor tick marks between
+major tick marks.  Ignored if log scaling is in effect for an axis.
+.le
+.ls lintran = no
+Perform a linear transformation of the X-axis upon input.  Used to assign
+logical coordinates to the indices of pixel data arrays (image sections).
+.le
+.ls p1=0, p2=0, q1=0, q2=1
+If \fBlintran\fR is enabled, pixel index P1 is mapped to Q1, and P2 to Q2.
+If P1 and P2 are zero, P1 is set to 1 and P2 to the number of pixels in
+the input array.
+.le
+.ls round = no
+Extend the axes up to "nice" values.
+.le
+.ls append = no
+Append to an existing plot.  
+.le
+.ls device = "stdgraph"
+The output device.
+.le
+.ih
+DESCRIPTION
+\fBGraph\fR graphs one or more lists or image sections; lists and image
+sections may be mixed in the input list at will.  If the curves are not
+all the same length the plot will be scaled to the longest curve and all
+curves will be plotted left justified.  If an image section operand has
+more than one dimension the projection (average) along a designated axis
+will be computed and plotted.  By default, a unique dash pattern is used
+for each curve, up to a maximum of 4.
+
+List input may be taken from the standard input or from a file,
+and consists of a sequence of Y values, X and Y values, or X, Y,
+and marker size values, one pair of coordinates per line in the list.
+If the third column of a list contains positive numbers, they are
+interpreted as NDC marker sizes, optionally scaled by the absolute
+value of \fIszmarker\fR.  If you want the third column of a list to
+be interpreted as WCS coordinates, indicating errors for example, the
+marker sizes should be entered as negative numbers.
+Blank lines, comment lines, and extra columns are ignored.
+The first element in the list determines whether the list is a Y list
+or and X,Y list; it is an error if an X,Y list has fewer than two
+coordinates in any element.  INDEF valued elements appear as gaps
+in the plot.
+
+If \fBappend\fR is enabled, previous values for \fBbox\fR,
+\fBfill\fR, \fBround\fR, the plotting viewport (\fBvx1\fR, \fBvx2\fR, 
+\fBvy1\fR, \fBvy2\fR), and the plotting window (\fBwx1\fR, \fBwx2\fR, 
+\fBwy1\fR, \fBwy2\fR) are used.
+
+By default, the plot drawn will fill the device viewport, if the viewport
+was either specified by the user or automatically calculated by 
+\fIgraph\fR.  Setting
+the value of \fBfill\fR  to "no" means the viewport will be adjusted so 
+that equal numbers of data values in x and y will occupy equal lengths 
+when plotted.  That is, when \fBfill = no\fR, a unity aspect ratio is 
+enforced, and plots
+appear square regardless of the device aspect ratio.  On devices with non 
+square full device viewports (e.g., the vt640), a plot drawn by \fIgraph\fR
+appears extended in the x direction unless \fBfill\fR = no.
+
+.ih
+EXAMPLES
+Plot the output of a list processing filter:
+
+	cl> ... list_filter | graph
+
+Plot a graph entered interactively from the terminal:
+
+	cl> graph STDIN
+
+Overplot two lists:
+
+	cl> graph list1,list2
+
+Graph line 128 of image "pix":
+
+	cl> graph pix[*,128]
+
+Graph the average of columns 50 through 100:
+
+	cl> graph pix[50:100,*] axis=2
+
+Graph a list in point plot mode:
+
+	cl> graph list po+
+
+Annotate a graph:
+
+.nf
+	cl> graph pix[*,10],pix[*,20] xlabel=column\
+	>>> ylabel=intensity title="lines 10 and 20 of pix"
+.fi
+
+Direct the graph to the standard plotter device:
+
+	cl> graph list device=stdplot
+.ih
+BUGS
+Indefinites are not recognized when computing image projections.
+.ih
+SEE ALSO
+pcol, pcols, prow, prows
+.endhelp

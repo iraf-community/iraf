@@ -1,0 +1,11 @@
+# Help directory for the ECHELLE package.
+
+$doc	=	"./doc/"
+
+revisions	hlp=Revisions
+ecbplot		hlp=doc$ecbplot.hlp
+eccontinuum	hlp=doc$eccontinuum.hlp
+ecdispcor	hlp=doc$ecdispcor.hlp
+ecidentify	hlp=doc$ecidentify.hlp
+ecreidentify	hlp=doc$ecreidentify.hlp
+ecselect	hlp=doc$ecselect.hlp

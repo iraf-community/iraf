@@ -1,0 +1,150 @@
+.help calibrate May88 noao.onedspec
+.ih
+NAME
+calibrate -- Apply extinction corrections and flux calibrations
+.ih
+USAGE
+calibrate input output [records]
+.ih
+PARAMETERS
+.ls input
+List of input spectra to be calibrated.  When using record format
+extensions the root names are specified, otherwise full image names
+are used.
+.le
+.ls output
+List of calibrated spectra.  If no output list is specified then the
+input spectra are modified.  Also the output name may be the same as
+the input name to replace the input spectra by the calibrated spectra.
+When using record format extensions the output names consist of root
+names to which the appropriate record number extension is added.
+The record number extension will be the same as the input record number
+extension.
+.le
+.ls records
+The set of record number extensions to be applied to each input and output
+root name when using record number extension format.  The syntax consists
+of comma separated numbers or ranges of numbers.  A range consists of
+two numbers separated by a hyphen.  This parameter is not queried
+when record number formats are not used.
+.le
+.ls recformat = yes
+Apply record number extensions to the list of input and output spectra
+root names?
+.le
+.ls apertures = ""
+List of apertures to be selected from the input spectra to be calibrated.
+If no list is specified then all apertures are calibrated.  The syntax
+is the same as the record number extensions.  The aperture selection
+is independent of whether the apertures are to be ignored when selecting
+a sensitivity function spectrum.
+.le
+.ls extinct = yes
+Apply extinction correction if a spectrum has not been previously
+corrected?  When applying an extinction correction an extinction file
+is required.
+.le
+.ls flux = yes
+Apply a flux calibration if a spectrum has not been previously calibrated?
+When applying a flux calibration sensitivity spectra are required.
+.le
+.ls extinction = ")_.extinction"
+Extinction file for the observation.  By default this parameter is taken
+from the package parameter of the same name.  Standard extinction files
+are available in the "onedstds$" directory.
+.le
+.ls latitude = ")observatory.latitude"
+The latitude of the observatory at which the spectra were obtained is required
+if the AIRMASS keyword is not found in the image header.  In this case the
+airmass is calculated from the observation keywords if present.  The default
+is taken from the parameter of the same name in the task \fBobservatory\fR.
+.le
+.ls ignoreaps = no
+Ignore the aperture numbers and apply a single flux calibration to all
+apertures?  Normally multi-aperture instruments have separate sensitivity
+functions.  The sensitivity spectrum is obtained by adding the aperture
+as an extension to the sensitivity spectrum root name.  When apertures
+are ignored the sensitivity spectrum is used without adding an extension
+and applied to all apertures.
+.le
+.ls sensitivity = "sens"
+The root name for the sensitivity spectra produced by \fBsensfunc\fR.
+Normally with multi-aperture instruments, \fBsensfunc\fR will produce a
+spectrum appropriate to each aperture with an aperture number extension.
+If the apertures are ignored (\fIignoreaps\fR = yes) then the sensitivity
+spectrum specified is used for all apertures and no aperture number is
+appended automatically.
+.le
+.ls fnu = no
+The default calibration is into units of F-lambda. If \fIfnu\fR = yes then
+the calibrated spectrum will be in units of F-nu.
+.le
+.ih
+DESCRIPTION
+The input spectra are corrected for extinction and calibrated to a flux
+scale using sensitivity spectra produced by the task \fBsensfunc\fR.
+One or both calibrations may be performed by selecting the appropriate
+parameter flags.  It is an error if no calibration is specified.  Normally
+the spectra must be extinction corrected if also flux calibrating.
+The image header keywords DC-FLAG, EX-FLAG, and CA-FLAG are checked for
+dispersion solution (required), previous extinction correction, and
+previous flux calibration.  If previously calibrated the spectrum is
+skipped and a new output image is not created.
+
+The input spectra are specified by a list of root names (when using
+record extension format) or full image names.  Specific apertures may
+be selected from the input spectra, skipping those not selected,
+using the \fIapertures\fR parameter.  The output calibrated spectra may
+replace the input spectra if no output spectra list is specified or if
+the output name is the same as the input name.  When using record number
+extensions the output spectra will have the same extensions applied
+to the root names as those used for the input spectra.
+
+The spectra may be in either "onedspec" or "echelle" format.  In the latter
+case the extinction correction and/or the flux calibration is applied
+to each order based on wavelength and aperture number.  The input
+format is retained on output.
+
+When applying an extinction correction the AIRMASS keyword is checked.
+If the keyword is not present then the airmass is computed using the
+specified latitude and observation parameters in the image header.  If
+this fails an error results.  Currently a single airmass is used and no
+correction for changing extinction during the observation is made.
+The extinction correction is given by the factor
+
+		10. ** (0.4 * airmass * extinction)
+
+where the extinction is the value interpolated from the specified
+extinction file for the wavelength of each pixel.  After extinction
+correction the EX-FLAG is set to 0.
+
+When applying a flux calibration the spectra are divided by the
+aperture sensitivity which is represented by a spectrum produced by
+the task \fBsensfunc\fR.  The sensitivity spectrum is in units of:
+
+	2.5 * Log10 [counts/sec/Ang / ergs/cm2/sec/Ang].
+
+A new spectrum is created in "F-lambda" units - ergs/cm2/sec/Angstrom
+or "F-nu" units -ergs/cm2/sec/Hz.  The sensitivity must span the range of
+wavelengths in the spectrum and interpolation is used if the wavelength
+coordinates are not identical.  Multi-aperture instruments typically have
+a separate aperture sensitivity function for each aperture.  The appropriate
+sensitivity function for each input spectrum is selected based on the
+spectrum's aperture by appending this number to the root sensitivity function
+spectrum name.  If the \fIignoreaps\fR flag is set, however, the aperture
+number relation is ignored and the single sensitivity spectrum (without
+extension) is applied.
+.ih
+EXAMPLES
+1.  To flux calibrates a series of spectra replacing the
+input spectra by the calibrated spectra:
+
+	cl> calibrate nite1 "" 1201-1220
+
+2.  To only extinction correct echelle spectra:
+
+	cl> calibrate ccd*.ec.imh new//ccd*.ec.imh recformat- flux-
+.ih
+SEE ALSO
+standard, sensfunc
+.endhelp

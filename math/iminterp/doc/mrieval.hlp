@@ -1,0 +1,51 @@
+.help mrieval Apr1985 "Image Interpolation Package"
+.ih
+NAME
+mrieval -- evaluate the interpolant at x and y
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+y = mrieval (x, y, datain, nxpix, nypix, len_datain, interp_type)
+
+.nf
+    real	x			# x value, 1 <= x <= nxpix
+    real	y			# y value, 1 <= y <= nypix
+    real	datain[len_datain, ARB]	# data array
+    int		nxpix			# number of x values
+    int		nypix			# number of y values
+    int		len_datain		# length datain, len_datain >= nxpix
+    int		interp_type		# interpolant type
+.fi
+.ih
+ARGUMENTS
+.ls x, y
+The x and y values at which the interpolant is to be evaluated.
+.le
+.ls datain
+The array of data values.
+.le
+.ls nxpix, nypix
+The number of data pixels in x and y.
+.le
+.ls len_datain
+The row length of datain. Len_datain must be >= nxpix.
+.le
+.ls interp_type
+Interpolant type. The options are II_BINEAREST, II_BILINEAR, II_BIPOLY3,
+II_BIPOLY5, and II_BISPLINE3. The interpolant type definitions are found
+in the package header file math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+MRIEVAL is useful for evaluating the interpolant at a few selected points
+in the datain array without the storage overhead required for the sequential
+version.
+.ih
+NOTES
+Checking for INDEF valued or out of bounds pixels is the
+responsibility of the user.
+.ih
+SEE ALSO
+msieval, msivector
+.endhelp

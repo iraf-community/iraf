@@ -1,0 +1,22 @@
+# Make the GLABAX axis drawing and labelling package.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	glabax.x	glabax.h <gio.h> <gset.h> <mach.h>
+	glbencode.x	glabax.h <mach.h>
+	glbfind.x	glabax.h <gio.h> <mach.h>
+	glbgrid.x	glabax.h <gio.h> <gset.h> <mach.h>
+	glbgtick.x	glabax.h <gio.h> <mach.h>
+	glblabel.x	glabax.h <gio.h> <gset.h> <mach.h>
+	glbloglab.x	glabax.h <gio.h> <gset.h> <mach.h>
+	glbsetax.x	glabax.h <gio.h> <mach.h>
+	glbsetup.x	<gio.h>
+	glbsview.x	glabax.h <gio.h> <mach.h>
+	glbticlen.x	glabax.h <gio.h> <mach.h>
+	glbtitle.x	glabax.h <gio.h> <gset.h> <mach.h>
+	glbverify.x	glabax.h <gio.h> <gset.h> <mach.h>
+	;

@@ -1,0 +1,95 @@
+include	"identify.h"
+
+# ID_DOFIT -- Fit a function to the features.  Eliminate INDEF points.
+
+procedure id_dofit (id, interactive)
+
+pointer	id			# ID pointer
+int	interactive		# Interactive fit?
+
+int	i, j, k, nfit, ic_geti()
+pointer	gt1, sp, x, y, wts, rejpts, str, gt_init()
+
+begin
+	if (ID_NFEATURES(id) == 0) {
+	    if (ID_CV(id) != NULL) {
+	        call dcvfree (ID_CV(id))
+		ID_SHIFT(id) = 0.
+	        ID_NEWGRAPH(id) = YES
+	        ID_NEWCV(id) = YES
+	    }
+	    return
+	}
+	    
+	call smark (sp)
+	call salloc (x, ID_NFEATURES(id), TY_DOUBLE)
+	call salloc (y, ID_NFEATURES(id), TY_DOUBLE)
+	call salloc (wts, ID_NFEATURES(id), TY_DOUBLE)
+
+	nfit = 0
+	do i = 1, ID_NFEATURES(id) {
+	    if (IS_INDEFD (PIX(id,i)) || IS_INDEFD (USER(id,i)))
+		next
+	    Memd[x+nfit] = PIX(id,i)
+	    Memd[y+nfit] = USER(id,i)
+	    Memd[wts+nfit] = 1.
+	    nfit = nfit + 1
+	}
+
+	if (nfit > 1) {
+	    if (interactive == YES) {
+		call salloc (str, SZ_LINE, TY_CHAR)
+		gt1 = gt_init()
+#		call gt_copy (ID_GT(id), gt1)
+#	        call icg_f1d (ID_GP(id), gt1, ID_CV(id), 5, Memd[x], Memd[y],
+#		    Memd[wts], nfit, PIXDATA(id,1), IMDATA(id,1), ID_NPTS(id))
+		call icg_fitd (ID_IC(id), ID_GP(id), "cursor", gt1, ID_CV(id),
+		    Memd[x], Memd[y], Memd[wts], nfit)
+		call gt_free (gt1)
+	    } else
+		call ic_fitd (ID_IC(id), ID_CV(id), Memd[x], Memd[y], Memd[wts],
+		    nfit, YES, YES, YES, YES)
+
+	    if (ic_geti (ID_IC(id), "nreject") > 0 &&
+		ic_geti (ID_IC(id), "nfit") == nfit)
+		rejpts = ic_geti (ID_IC(id), "rejpts")
+	    else
+		rejpts = NULL
+
+	    j = 0
+	    k = 0
+	    do i = 1, ID_NFEATURES(id) {
+	    	if (IS_INDEFD (PIX(id,j+1)) || IS_INDEFD (USER(id,j+1))) {
+		    j = j + 1
+		    next
+		}
+		k = k + 1
+		if (Memd[wts+k-1] != 0.) {
+		    j = j + 1
+	    	    PIX(id,j) = Memd[x+k-1]
+	    	    FIT(id,j) = FIT(id,k)
+	    	    USER(id,j) = Memd[y+k-1]
+		    if (rejpts != NULL && Memi[rejpts+k-1] == YES)
+			WTS(id,j) = 0.
+		    else
+	    	        WTS(id,j) = Memd[wts+k-1]
+	    	    FWIDTH(id,j) = FWIDTH(id,k)
+	    	    FTYPE(id,j) = FTYPE(id,k)
+		}
+	    }
+	    ID_NFEATURES(id) = j
+
+	    ID_SHIFT(id) = 0.
+	    ID_NEWCV(id) = YES
+	    ID_NEWGRAPH(id) = YES
+	} else {
+	    if (ID_CV(id) != NULL) {
+	        call dcvfree (ID_CV(id))
+		ID_SHIFT(id) = 0.
+	        ID_NEWCV(id) = YES
+	        ID_NEWGRAPH(id) = YES
+	    }
+	}
+
+	call sfree (sp)
+end

@@ -1,0 +1,30 @@
+include	"apertures.h"
+
+# AP_ALLOC -- Allocate and initialize an aperture structure.
+
+procedure ap_alloc (ap)
+
+pointer	ap		# Aperture
+
+begin
+	call malloc (ap, AP_LEN, TY_STRUCT)
+	AP_CV(ap) = NULL
+	AP_IC(ap) = NULL
+end
+
+
+# AP_FREE -- Free an aperture structure and related CURFIT structures.
+
+procedure ap_free (ap)
+
+pointer	ap		# Aperture
+
+begin
+	if (ap != NULL) {
+	    if (AP_CV(ap) != NULL)
+	        call cvfree (AP_CV(ap))
+	    if (AP_IC(ap) != NULL)
+	        call ic_closer (AP_IC(ap))
+	    call mfree (ap, TY_STRUCT)
+	}
+end

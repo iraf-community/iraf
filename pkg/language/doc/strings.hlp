@@ -1,0 +1,47 @@
+.help "strings,substr,stridx,str" Jun86 language
+.ih
+NAME
+strings -- string manipulation functions available in the CL
+.ih
+USAGE
+.nf
+str    (x)
+substr (str, start, end)
+stridx (test, str)
+strlen (str)
+.fi
+.ih
+DESCRIPTION
+The following functions are available for the manipulation of strings
+within the CL.  
+
+.ls str (x)
+Converts its argument into a string.  The argument may be
+boolean, integer or real.
+.le
+.ls substr (str, first, last)
+Extracts a substring from string \fIstr\fR.
+The first character in the string is at index 1.
+.le
+.ls stridx (test, str)
+Finds the position of the first occurence of any character found in \fItest\fR
+in the string \fIstr\fR, returning 0 if the match fails.
+.le
+.ls strlen (str)
+Returns the current length of a string.  Note that the maximum length may be
+obtained as the value of the expression `param.p_length'.
+.le
+.ih
+EXAMPLES
+1. Simple function calls.
+
+.nf
+	s = str(y)			# convert y to a string.
+	s = substr ("abcdefg", 2, 4)	# s = "bcd"
+	i = stridx ("abc", " eeboq")	# i = 4
+	i = strlen ("abc")		# i = 3
+.fi
+.ih
+SEE ALSO
+scan, radix
+.endhelp

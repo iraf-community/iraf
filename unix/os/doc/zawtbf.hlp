@@ -1,0 +1,34 @@
+.help zawtbf May84 "System Interface"
+.ih
+NAME
+zawtbf -- wait for an asynchronous i/o transfer to complete
+.ih
+SYNOPSIS
+.nf
+zawtbf (chan, status)
+
+int	chan			# OS channel assigned to file
+int	status			# number of bytes read or written
+.fi
+.ih
+DESCRIPTION
+If a transfer is in progress on the channel \fIchan\fR, process execution
+is suspended until the transfer completes.  If the channel is inactive
+control returns immediately.
+.ih
+RETURN VALUE
+ERR is returned if an i/o error occurred during the last transfer.
+If the transfer was successful the number of bytes read or written is
+returned.  A read at EOF returns a status value of zero.
+Repeated calls to \fBzawtbf\fR following a single i/o request continue
+to return the same value.
+.ih
+NOTES
+FIO guarantees that \fBzawtbf\fR will be called after every asynchronous
+i/o transfer and that only a single i/o request will be posted to a channel
+at a time.  If an i/o error occurs on the channel it should be cleared by
+the next request, i.e., errors should not "stick".
+.ih
+SEE ALSO
+zardbf, zawrbf, zfiobf
+.endhelp

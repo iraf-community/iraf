@@ -1,0 +1,363 @@
+.help apedit Jan88 noao.twodspec.apextract
+.ih
+NAME
+apedit -- Edit apertures
+.ih
+USAGE
+apedit input
+.ih
+PARAMETERS
+.ls input
+List of input images for which apertures are to be edited.  The list
+may be an image template including image sections and concatenations
+or an "@" file.  The dispersion axis must be defined in the image headers
+using \fBsetdisp\fR or \fBhedit\fR.
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supercedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+If the reference image list is shorter than the input image list the
+last reference image is used for the remaining input images.
+The special image "last" may be used to specify the last set of
+apertures written to the database.
+.le
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing, trace
+fitting, and sum extraction reviews are disabled.  When run interactively
+queries may be suppressed by responding with "NO" or "YES".
+.le
+.ls recenter = yes
+Recenter the reference apertures in the input image?
+.le
+.ls find = yes
+Find the apertures automatically?  In order for apertures to be found
+automatically there must be no apertures for the input image or reference
+image defined in the database and the parameter \fIapfind.nfind\fR must
+be greater than zero.
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls line = INDEF
+The dispersion line (line or column perpendicular to the dispersion axis) to
+be graphed.  A value of INDEF uses the middle of the image.
+.le
+.ls nsum = 10
+Number of dispersion lines to be summed.  The lines are taken around the
+specified dispersion line.
+.le
+.ls width = 5.
+Width of profiles to be edited.  This parameter is used for the profile
+centering algorithm.
+.le
+.ls radius = 5.
+The profile centering error radius for the centering algorithm.
+.le
+.ls threshold = 0.
+Centering threshold for the centering algorithm.  The range of pixel intensities
+near the inital centering position must exceed this threshold.
+.le
+
+.ce
+Interactive query parameters
+.ls output
+Output spectra rootname which is queried when interactively extracting
+spectra (the 'e' or 'g' keys).  This overrides any setting of this
+parameter in \fBapsum\fR and \fBapstrip\fR.
+.le
+.ls sky
+Output sky spectra rootname which is queried when interactively extracting
+spectra (the 'e' key) with simultaneous sky subtraction and extraction.
+This overrides any setting of this parameter in \fBapsum\fR.
+.le
+.ls profiles
+Profile reference image which is queried when interactively extracting
+spectra (the 'e' or 'g' keys) with profile fitting.  This overrides any
+setting of this parameter in \fBapsum\fR or \fBapstrip\fR.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters are taken from the task \fBapio\fR, the default aperture
+parameters are taken from the task \fBapdefault\fR, and parameters used
+when finding apertures are taken from \fBapfind\fR.
+.ih
+CURSOR KEYS
+When editing the apertures interactively the following cursor keys are
+available.
+
+.nf
+?    Print help
+a    Toggle the ALL flag
+b an Set ICFIT background fitting parameters
+c an Center aperture(s) nearest the cursor
+d an Delete aperture(s) nearest the cursor
+e ac Extract 1D aperture sum(s) for the apertures nearest the cursor
+f    Find apertures up to the number set by NFIND
+g ac Extract 2D aperture strips(s) for the apertures nearest the cursor
+i  c Print extra aperture information
+j  n Set aperture ID for the current aperture
+k  n Set aperture beam number for the current aperture
+l ac Set lower aperture limit(s) of the current aperture at the
+	cursor position
+m    Define and center a new aperture on the profile near the cursor
+n    Define a new aperture centered at the cursor
+o    Reorder the aperture ID and beam number sequentially
+q    Quit
+r    Redraw the graph
+s an Shift the center(s) of the current aperture to the cursor
+	position
+t ac Trace the spectrum positions of aperture(s) nearest the cursor
+u ac Set upper aperture limit(s) of the current aperture at the
+	cursor position
+w    Window the graph using the window cursor keys
+x an Delete background fitting parameters for aperture(s) nearest
+	the cursor
+y an Set aperture limits to intercept the data at the cursor y
+	position
+.  n Select the aperture nearest the cursor to be the current
+	aperture
++  c Select the next aperture (in ID) to be the current aperture
+-  c Select the previous aperture (in ID) to be the current aperture
+.fi
+
+The letter a following the key indicates if all apertures are affected when
+the ALL flag is set.  The letter c indicates that the key affects the
+current aperture while the letter n indicates that the key affects the
+aperture whose center is nearest the cursor.
+.ih
+COLON COMMANDS
+The colon commands may be abbreviated.  They take an optional argument.
+If no argument is given then the current value is printed or a default
+file or image is used.
+
+.nf
+:apertures [file]  Print a list of the apertures (default file is
+			STDOUT)
+:apfind            Set parameters for \fBapfind\fR
+:apio              Set parameters for \fBapio\fR
+:apstrip           Set parameters for \fBapstrip\fR
+:apsum             Set parameters for \fBapsum\fR
+:aptrace           Set parameters for \fBaptrace\fR
+:center [value]    Show or set the center of the current aperture
+:image [image]     Show or change current image
+:line [value]      Show or set the dispersion line graphed
+:lower [value]     Show or set the lower limit of the current
+			aperture
+:nsum [value]      Show or set the number of dispersion lines summed
+:radius [value]    Show or set the profile centering radius
+:read [image]      Read apertures from database (default to the
+			current image)
+:show [file]       Show the current parameters (default file is
+			STDOUT)
+:upper [value]     Show or set the upper limit of the current
+			aperture
+:width [value]     Show or set profile centering width
+:write [image]     Write apertures to database (default to the
+			current image)
+.fi
+.ih
+DESCRIPTION
+For each image in the input image list apertures are defined and edited
+interactively.  Other options allow defining apertures using reference
+images and through an automatic finding algorithm (see \fBapfind\fR).
+The aperture editor is invoked when the parameters \fIinteractive\fR
+and \fIedit\fR are both yes.  When this is the case the task will query
+whether to edit each image.  The responses are "yes", "no", "YES", and
+"NO", where the upper case reponses suppress queries for all following
+images.
+
+When the aperture editor is entered a graph of the image lines or
+columns specified by the parameters \fIline\fR and \fInsum\fR is
+drawn.  In the \fBapextract\fR package a dispersion line is either a
+line or column in the image at one point along the dispersion axis.
+The dispersion axis must be defined in the image header under the
+keyword DISPAXIS (see \fBsetdisp\fR).  The parameter \fBnsum\fR
+determines how many dispersion lines surrounding the specified
+dispersion line are summed.  This improves the signal in the profiles
+of weaker spectra.  Once the graph is drawn an interactive cursor loop
+is entered.  The set of cursor keys and colon commands is given above
+and may be printed when the task is running using the '?' key.  The
+CURSOR MODE keys and graph formating options are also available (see
+\fBcursor\fR, \fBgtools\fR, and \fBgtwindow\fR).
+
+A status line, usually at the bottom of the graphics terminal,
+indicates the current aperture and shows the ALL flag if set.  The
+concept of the current aperture is used by several of the aperture
+editing commands.  Other commands operate on the aperture whose center
+is nearest the cursor.  It is important to know which commands operate
+on the current aperture and which operate on the nearest aperture to
+the cursor.
+
+The cursor keys and colon commands are used to define new apertures,
+delete existing apertures, modify the aperture id, center, and limits,
+set background fitting parameters, trace the positions of the spectra
+in the apertures, and extract one and two dimensional aperture
+spectra.  When creating new apertures default parameters are supplied
+in two ways; if no apertures are defined then the default parameters
+are taken from the task \fBapdefault\fR while if there is a current
+aperture then a copy of its parameters are made.  The aperture beam,
+which is recorded in the extracted spectra, and the aperture ID, which
+is used as the extraction extension, defaults to either 1 or one
+greater than the highest aperture ID currently defined.  The aperture
+ID for the aperture \fInearest\fR the cursor is changed with the 'j'
+key and the beam number is changed with the 'k' key.  The user is
+prompted for a new aperture number or beam number.  The key 'o' will
+reorder the aperture identification and beam number sequentially
+beginning with 1.  This is used after apertures have been interactively
+deleted and added leaving the apertures numbered in a nonsequential
+order.
+
+The keys for creating a new aperture are 'm' and 'n' and 'f'.  The key
+'m' marks a new aperture and centers the aperture on the profile
+nearest the cursor.  The centering algorithm is described under the
+name \fBcenter1d\fR and the parameters controling the centering are
+\fIwidth\fR, \fIradius\fR, and \fIthreshold\fR.  The key 'n' defines a
+new aperture at the position of the cursor without centering.  This is
+used if there is no spectrum profile such as when defining sky apertures
+or when defining apertures in extended profiles.  The 'f' key finds new
+apertures using the algorithm described in the task \fBapfind\fR.  The
+number of apertures found in this way is limited by the parameter
+\fBapfind.nfind\fR and the number includes any previously defined
+apertures.  The paramters used by \fBapfind\fR may be set with the
+":apfind" colon command which runs \fBeparam\fR.
+
+After defining a new aperture it becomes the current aperture.  The
+current aperture is indicated on the status line and the '.', '+', and
+'-' keys are used to select a new current aperture.  Additional
+information about the current aperture may be printed with the 'i'
+key.
+
+Apertures are deleted with 'd' key.  The aperture \fInearest\fR the
+cursor is deleted.
+
+The aperture center may be changed with the 'c' and 's' keys and the
+":center value" colon command.  The 'c' key applies the centering algorithm
+to the aperture \fInearest\fR the colon.  The 's' key shifts the center
+of the \fIcurrent\fR aperture to the position of the cursor.  The
+":center" command sets the center of the \fIcurrent\fR aperture to the
+value specified.
+
+The aperture limits are defined relative to the aperture center.  The
+limits may be changed with the 'l', 'u', and 'y' keys and with the
+":lower value" and ":upper value" commands.  The 'l' and 'u' keys set
+the lower and upper limits of the \fIcurrent\fR aperture at the position
+of the cursor.  The colon commands allow setting the limits explicitly.
+The 'y' key defines both limits for the \fInearest\fR aperture as
+points at which the y cursor position intercepts the data profile.
+This requires that the aperture include a spectrum profile and that
+the y cursor value lie below the peak of the profile.
+
+The keys 'b' and 'x' allow background fitting parameters to be set or
+deleted for the aperture \fInearest\fR the cursor.  The default
+background parameters are specified by the task \fBapdefault\fR.  Note
+that even though background parameters are defined background
+subtraction is not performed during extraction unless specified.  The
+\fBicfit\fR procedures are used for background fitting.  The background
+parameters to be defined are the fitting function and order (which
+means the number of polynomial coefficients or number of spline
+pieces), the background points to be used, whether to average or median
+subsets of the background points, and whether to apply iterative
+rejection of deviant points.  The background sample points are defined
+relative to the aperture center.  Thus, when the background is
+subtracted during aperture extraction the background regions will
+follow changes in the position of the aperture described by the offset
+curve determined by the task \fBaptrace\fR.  Each aperture may have
+different background fitting parameters but newly defined apertures
+inherit the background fitting parameters of the last current
+aperture.  This will usually be satisfactory since the background
+regions are defined relative to the aperture center rather than in
+absolute coordinates.
+
+The algorithms used in the tasks \fBaptrace, apsum\fR, and
+\fBapstrip\fR are available from the editor with the keys 't', 'e', and
+'g' respectively.  If the ALL flag is not set then the nearest aperture
+to the cursor is used.  This allows selective tracing and extracting.
+If the ALL flag is set then all apertures are traced or extracted.  The
+output spectra rootnames and the profile image used when profile
+fitting are queried and the values of these parameters in the parameter
+sets for these tasks is ignored.  Naturally, the input image list is
+also ignored.  All other parameters may be examined and modified using
+the \Beparam\fR task with the commands ":aptrace", ":apsum", and
+":apstrip".
+
+Some general purpose keys window the graph 'w' using the \fBgtwindow\fR
+procedure, redraw the graph 'r', and quit 'q'.
+
+The final cursor key is the 'a' key.  The cursor keys which modify the
+apertures were defined as operating on either the aperture nearest the
+cursor or the current aperture.  The 'a' key allows these keys to
+affect all the apertures simultaneously.  The 'a' key sets a flag which
+is shown on the status line when it is set.  When set the operation on
+one aperture is duplicated on the remaining apertures.  The operations
+which apply to all apertures are set background 'b', center 'c', delete
+'d', extract 1D sum 'e', extract 2D strip 'g', set lower limit 'l',
+shift 's', trace 't', set upper limit 'u', delete background parameters
+'x', and set limits at the y cursor 'y'.  The 'b', 'l', 's', and 'u'
+keys first set the background, aperture limits, or shift for the
+appropriate aperture and then are applied to the other apertures
+relative to their centers.
+
+In addition to the ":center", ":lower", ":upper", ":apfind",
+":apstrip", ":apsum", and ":aptrace" colon commands mentioned above
+there are colon commands to show the values of the current parameters,
+":show", show the current apertures, ":apertures", read or write
+database aperture records, ":read" and ":write", change the image,
+":image", modify the dispersion line, ":line" and ":nsum", and set the
+values of the parameters affecting the centering algorithm.  The
+commands have optional arguments.  For the commands which show
+information the argument specifies a file to which the information is
+to be written.  The default is the standard output.  The database read
+and write and the change image commands take an image name.  If an
+image name is not one is not given for the read and write commands the
+current image name is used.  The change image command default is to
+print the current image name.  The remaining commands take a value.  If
+a value is not given then the current value is printed.
+.ih
+EXAMPLES
+The aperture editor is a very flexible and interactive tool
+for which it is impossible illustrate all likely uses.  The following
+give some simple examples.
+
+1.  To define and edit apertures for image "n1.001":
+
+	cl> apedit n1.001
+
+2.  To define and edit apertures for a list of images:
+
+.nf
+	cl> apedit n1*
+	cl> apedit @nite1
+	cl> apedit n1.001[21:40],n1.001[53:72],n1.001[97:116]
+.fi
+
+Note the use of image templates, "@" files, and image sections.
+
+3.  To define apertures for one image and then apply them to several other
+images:
+
+.nf
+	cl> apedit n1.* ref=n1.001
+	Edit apertures for n1.001? (yes)
+	Edit apertures for n1.002? (yes) NO
+.fi
+
+Answer "yes" to the first query for editing n1.001.  To
+the next query (for n1.002) respond with "NO".  The remaining
+images then will not be edited interactively.  Note that after
+defining the apertures for n1.001 they are recorded in the database
+and subsequent images will be able to use them as reference apertures.
+
+4.  Using the ":image name" and ":read image" colon commands and the
+'f', 't' and 'e' keys the user can perform all the functions available
+in the package without ever leaving the editor.  The 'a' key to set the
+ALL flag is very useful when dealing with many spectra in a single image.
+.ih
+SEE ALSO
+.nf
+apfind, apstrip, apsum, aptrace
+center1d, cursor, gtools, gtwindow, icfit, setdisp
+.fi
+.endhelp

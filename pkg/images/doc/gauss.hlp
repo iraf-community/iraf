@@ -1,0 +1,85 @@
+.help gauss Nov85 images
+.ih
+NAME
+gauss -- convolve a list of images with an elliptical gaussian
+.ih
+USAGE
+gauss input output sigma
+.ih
+PARAMETERS
+.ls input
+List of images to be convolved.
+.le
+.ls output
+List of output images. The number of output images must equal the number of
+input images. If the input images name equals the output image name the
+convolved image will replace the input image.
+.le
+.ls sigma
+The sigma of the Gaussian in pixels along the x direction.
+.le
+.ls ratio = 1.
+The ratio of the sigma in the y direction to the sigma in the x direction.
+Ratio defaults to 1 in which case the image is convolved with a circular
+Gaussian.
+.le
+.ls theta = 0.
+The postion of the major axis of the elliptical Gaussian. Theta is measured
+counter-clockwise from the x axis.
+.le
+.ls nsigma = 4.0
+GAUSS calculates the kernel size in x and y necessary to reach nsigma.
+Kernel elements outside the nsigma limit are set to zero.
+.le
+.ls boundary = "nearest"
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate a value by reflecting around the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ls constant = 0.
+The constant for constant-valued boundary extension.
+.le
+
+.ih
+DESCRIPTION
+GAUSS convolves the list of images specified by \fIinput\fR with the
+Gausian kernel specified by \fIsigma\fR, \fIratio\fR, \fItheta\fR and
+\fInsigma\fR and places the convolved images in \fIoutput\fR.
+The Gaussian kernel has an elliptical cross-section and Gaussian
+profile.  The default kernel is circularly symmetric. The type of boundary
+extension is optional and set by the \fIboundary\fR parameter.
+
+.ih
+EXAMPLES
+
+1. Convolve an image with a circular Gaussian kernel of sigma 1.5, extent
+of 4.0 sigma using nearest neighbour boundary extension.
+
+    cl> gauss m83 m83.gau 1.5
+
+2. Convolve an image with an elliptical Gaussian kernel with sigmas in the x
+and y directions of 2.0 and 1.5 respectively, a position angle of 45
+degrees, using wrap around boundary extension.
+
+    cl> gauss m84 m84.gau 2.0 ratio=.75 theta=45. bound=wrap
+
+.ih
+TIME REQUIREMENTS
+GAUSS requires approximately 40, 95, and 500  cpu seconds respectively to
+convolve a 512 square real image with a 3 by 3, 5 by 5, and
+11 by 11 kernel respectively (VAX 11/750 with fpa).
+.ih
+BUGS
+.ih
+SEE ALSO
+convolve, gradient, laplace, boxcar
+.endhelp

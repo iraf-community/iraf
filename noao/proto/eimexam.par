@@ -1,0 +1,24 @@
+banner,b,h,yes,,,"Standard banner"
+title,s,h,"",,,"Title"
+xlabel,s,h,"Column",,,"X-axis label"
+ylabel,s,h,"Line",,,"Y-axis label"
+
+ncolumns,i,h,21,2,,Number of columns
+nlines,i,h,21,2,,Number of lines
+floor,r,h,INDEF,,,"minimum value to be contoured (0 if none)"
+ceiling,r,h,INDEF,,,"maximum value to be contoured (0 if none)"
+zero,r,h,0.,,,"greyscale value of zero contour"
+ncontours,i,h,5,,,"number of contours to be drawn (0 for default)"
+interval,r,h,0.,,,"contour interval (0 for default)"
+nhi,i,h,-1,,,"hi/low marking option: -1=omit, 0=mark h/l, 1=mark each pix"
+dashpat,i,h,528,,,"bit pattern for generating dashed lines"
+label,b,h,no,,,"label major contours with their values?"
+
+box,b,h,yes,,,draw box around periphery of window
+ticklabels,b,h,yes,,,label tick marks
+majrx,i,h,5,,,number of major divisions along x grid
+minrx,i,h,5,,,number of minor divisions along x grid
+majry,i,h,5,,,number of major divisions along y grid
+minry,i,h,5,,,number of minor divisions along y grid
+round,b,h,no,,,round axes to nice values?
+fill,b,h,no,,,fill viewport vs enforce unity aspect ratio?

@@ -1,0 +1,102 @@
+.help ridsfile Jun87 noao.mtlocal
+.ih
+NAME
+ridsfile -- convert DUMPF format IDSFILE to IRAF images
+.ih
+USAGE
+ridsfile dumpf_file file_number iraf_file
+.ih
+PARAMETERS
+.ls dumpf_file
+The dumpf data source, i.e., the name of a magtape device.
+.le
+.ls file_number
+The ordinal of the DUMPF permanent file containing the IDSFILE to
+be read.  A listing of permanent files on the DUMPF tape can be
+obtained with the \fBldumpf\fR task.
+.le
+.ls iraf_file
+The IRAF file which will receive the data if the \fImake_image\fR parameter
+is set.  If multiple records are being read, the output
+filename is concatenated from this parameter and the IDS record number.
+That is, images with these names would be created if \fIiraf_file\fR = "ids":
+ids.1001, ids.1002, ids.1003, ..., ids.2001, ids.2002, ..., ids.3001 ....
+.le
+.ls record_numbers = "1001-9999"
+A string listing the IDS records to be read from the IDSFILE.  
+.le
+.ls make_image = yes
+This switch determines whether the IDS records are converted to IRAF images.
+When \fImake_image\fR = no, only a listing of the headers is produced, 
+no output image is written.
+.le
+.ls print_pixels = no
+When this parameter is set to yes, the values of the ids pixels are printed.
+.le
+.ls long_header = no
+This parameter determines whether a long or short header is printed.  When
+\fIlong_header\fR = no, a short header is printed.  The
+short header contains only the record number and ID string; the long header
+contains all information available 
+including the RA, Dec, HA, ST, UT, reduction flags, airmass, integration time,
+starting wavelength and wavelength per channel information.
+.le
+.ls data_type = "r"
+The data type of the output IRAF image.  If an incorrect data_type or null
+string is entered, the default data type \fIreal\fR is used.
+.le
+.ih
+DESCRIPTION
+The IDS records in an IDSFILE are read from a Cyber DUMPF tape and optionally
+converted to a sequence of one dimensional IRAF images.  The records to be
+read from the IDSFILE can be 
+specified.  The IDS header information is printed in either a short or long 
+form.  The pixels values can be listed as well.
+.ih
+EXAMPLES
+[1] Convert all records in the IDSFILE to IRAF images, with the root image name
+being "aug83".  From running task LDUMPF, it is known that the IDSFILE is the 
+fourth permanent file on the DUMPF tape.  The DUMPF tape is mounted on mtb.
+	
+	cl> ridsfile mtb 4 aug83
+
+[2] List the headers from the same IDSFILE read in example 1, but don't make
+output images.  A \fBlong_header\fR will be listed; sample output is shown.
+
+	cl> ridsfile mtb 4 make_image=no long_header=yes
+
+.nf
+RECORD = 2317, label = "CALLISTO  2297/2298  CLEAR/2.5ND",
+oflag = OBJECT, beam_number = 0,   alpha_ID = NEW,   companion = 2318,
+airmass = 1.524,        W0 = 3430.735,    WPC = 1.032,      ITM = 960,
+NP1 = 0, NP2 = 1024,    UT = 3:36:20.0,    ST = 15:36:43.0,
+HA = 1:39:48.5,         RA = 13:56:55.5,  DEC = -10:42:37.1,
+df = -1, sm = -1, qf = -1, dc = 0, qd = 0, ex = 0, bs = 1, ca = 0, co = -1
+.fi
+
+[3] Print the pixel values for records 5086 and 5087.  No output image will
+be written, and only the short header listed.  Again, the IDSFILE is the 
+fourth permanent file on the DUMPF tape, which is mounted on mtb.
+
+	cl> ridsfile mtb 4 make_im- rec=5086,5087 print+
+.ih
+BUGS
+The current version of IRAF magtape I/O does not read beyond the first
+volume of a multivolume tape.
+.sp
+The record structure of a DUMPF tape is used to
+filter out noise records and extraneous bits that fill out a tape byte;
+this tape structure information is lost when the tape is copied to disk,
+and so \fBridsfile\fR may not be able to convert some DUMPF format disk files.
+.sp
+Task \fBridsfile\fR allows for converting only one IDSFILE per execution.
+If you wish to read more than one IDSFILE
+from a DUMPF tape, \fBridsfile\fR must be executed more than once.
+.ih
+BUGS
+The Cyber format readers, including \fIridsfile\fR, have not been implemented
+on SUN/IRAF and AOS/IRAF.
+.ih
+SEE ALSO
+ldumpf, ridsout, ridsmtn
+.endhelp

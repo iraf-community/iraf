@@ -1,0 +1,42 @@
+.help flatten Sep84 noao.imred.generic
+.ih
+NAME
+flatten -- Flatten images by dividing by a flat field
+.ih
+USAGE	
+flatten images flatfield
+.ih
+PARAMETERS
+.ls images
+Images to be flattened.
+.le
+.ls flatfield
+Flat field image to be divided into the images.
+.le
+.ls minflat = INDEF
+All flat field pixels less than or equal to this value are replaced by
+unit response.  If INDEF all the flat field pixels are used.
+.le
+.ls pixtype = "real"
+The pixel datatype of the flattened image.  The null string ("") defaults
+the pixel datatype to that of the original image before flattening.
+The other choices are "short", "integer", "long", and "real".
+.le
+.ih
+DESCRIPTION
+Each of the \fIimages\fR is flatten by dividing by the \fIflatfield\fR
+flat field image.  The flattened images replace the original images.
+The pixel datatype of the flattened images is specified by the
+\fIpixtype\fR.  The null string ("") leaves the datatype of the images
+unchanged.  Low values in the flat field may be replaced by unit response
+by specifying a \fIminflat\fR value.  All pixels in the flat field less
+than or equal to \fIminflat\fR are given unit response.
+.ih
+EXAMPLES
+To flatten a set of two dimensional images excluding pixels below
+.2 in the flat field:
+
+.nf
+	cl> flatten frame* flat minflat=0.2
+.fi
+.endhelp

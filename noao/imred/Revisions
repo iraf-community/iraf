@@ -1,0 +1,57 @@
+.help revisions Jun88 noao.imred
+.nf
+noao$imred/irred
+    Valdes, June 2, 1989
+    Added the SETAIRMASS task.
+
+noao$imred/irred
+    Davis, April 1, 1989
+    1. Installed the IRRED package. At present this is simply a collection
+    of tasks useful for IR observers.
+
+noao$imred/cryomap -
+noao$mkpkg
+noao$imred.cl
+noao$imred.men
+noao$imred.hd
+    Valdes, February 27, 1987
+    1.  The CRYOMAP (Cryogenic Camera Multi-Aperture Plate) package was
+	archived (Tape 2977 - J. Barnes) and removed.  It was never used
+	and data has not been taken with this system in many years.  The
+	APEXTRACT pacakge is better anyway.  The MULTISPEC package remains.
+    2.  The IMRED package was modified to delete the CRYOMAP package.
+
+noao$imred/dtoi
+    Hammond, February 13. 1987
+    1. Installed the DTOI package
+
+noao$imred/observatory.cl
+    Valdes, October 6, 1986
+    1.  The OBSERVATORY task now calls EPARAM to edit the parameters.
+    2.  The help page was modified.
+
+noao$imred/specphot/* +
+    Valdes/Barnes, October 6, 1986
+    1.  New IMRED package called SPECPHOT added.  The focus of the package
+	is extraction of 1D spectra from 2D detectors and spectrophotometric
+	reduction of the spectra.
+      
+noao$imred/tutor.cl +
+noao$imred/tutor.hlp +
+noao$imred/imred.cl
+noao$imred/imred.men
+noao$imred/imred.hd
+    Valdes, August 18, 1986:
+    1. Added experimental online TUTOR task.
+
+====================================
+Version 2.3 Release, August 18, 1986
+====================================
+
+imred$imred.cl:  Valdes, April 30, 1986
+    1.  Removed the commands to load plot and images since this is now
+	done when the NOAO package is loaded.
+
+imred$observatory.cl:  Valdes, April 7, 1986
+    1.  Task OBSERVATORY added to contain observatory parameters.
+.endhelp

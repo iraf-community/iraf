@@ -1,0 +1,123 @@
+# Update the type specific (generically expanded) IMIO procedures.
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	imflsd.x	<imhdr.h> <imio.h>
+	imflsi.x	<imhdr.h> <imio.h>
+	imflsl.x	<imhdr.h> <imio.h>
+	imflsr.x	<imhdr.h> <imio.h>
+	imflss.x	<imhdr.h> <imio.h>
+	imflsx.x	<imhdr.h> <imio.h>
+	imggsd.x	<imhdr.h>
+	imggsi.x	<imhdr.h>
+	imggsl.x	<imhdr.h>
+	imggsr.x	<imhdr.h>
+	imggss.x	<imhdr.h>
+	imggsx.x	<imhdr.h>
+	imgl1d.x	<imhdr.h> <imio.h>
+	imgl1i.x	<imhdr.h> <imio.h>
+	imgl1l.x	<imhdr.h> <imio.h>
+	imgl1r.x	<imhdr.h> <imio.h>
+	imgl1s.x	<imhdr.h> <imio.h>
+	imgl1x.x	<imhdr.h> <imio.h>
+	imgl2d.x	<imhdr.h> <imio.h>
+	imgl2i.x	<imhdr.h> <imio.h>
+	imgl2l.x	<imhdr.h> <imio.h>
+	imgl2r.x	<imhdr.h> <imio.h>
+	imgl2s.x	<imhdr.h> <imio.h>
+	imgl2x.x	<imhdr.h> <imio.h>
+	imgl3d.x	<imhdr.h> <imio.h>
+	imgl3i.x	<imhdr.h> <imio.h>
+	imgl3l.x	<imhdr.h> <imio.h>
+	imgl3r.x	<imhdr.h> <imio.h>
+	imgl3s.x	<imhdr.h> <imio.h>
+	imgl3x.x	<imhdr.h> <imio.h>
+	imgnld.x	<imhdr.h>
+	imgnli.x	<imhdr.h>
+	imgnll.x	<imhdr.h>
+	imgnlr.x	<imhdr.h>
+	imgnls.x	<imhdr.h>
+	imgnlx.x	<imhdr.h>
+	imgs1d.x	<imhdr.h>
+	imgs1i.x	<imhdr.h>
+	imgs1l.x	<imhdr.h>
+	imgs1r.x	<imhdr.h>
+	imgs1s.x	<imhdr.h>
+	imgs1x.x	<imhdr.h>
+	imgs2d.x	<imhdr.h>
+	imgs2i.x	<imhdr.h>
+	imgs2l.x	<imhdr.h>
+	imgs2r.x	<imhdr.h>
+	imgs2s.x	<imhdr.h>
+	imgs2x.x	<imhdr.h>
+	imgs3d.x	<imhdr.h>
+	imgs3i.x	<imhdr.h>
+	imgs3l.x	<imhdr.h>
+	imgs3r.x	<imhdr.h>
+	imgs3s.x	<imhdr.h>
+	imgs3x.x	<imhdr.h>
+	impakd.x	
+	impaki.x	
+	impakl.x	
+	impakr.x	
+	impaks.x	
+	impakx.x	
+	impgsd.x	<imhdr.h> <imio.h>
+	impgsi.x	<imhdr.h> <imio.h>
+	impgsl.x	<imhdr.h> <imio.h>
+	impgsr.x	<imhdr.h> <imio.h>
+	impgss.x	<imhdr.h> <imio.h>
+	impgsx.x	<imhdr.h> <imio.h>
+	impl1d.x	<imhdr.h> <imio.h>
+	impl1i.x	<imhdr.h> <imio.h>
+	impl1l.x	<imhdr.h> <imio.h>
+	impl1r.x	<imhdr.h> <imio.h>
+	impl1s.x	<imhdr.h> <imio.h>
+	impl1x.x	<imhdr.h> <imio.h>
+	impl2d.x	<imhdr.h> <imio.h>
+	impl2i.x	<imhdr.h> <imio.h>
+	impl2l.x	<imhdr.h> <imio.h>
+	impl2r.x	<imhdr.h> <imio.h>
+	impl2s.x	<imhdr.h> <imio.h>
+	impl2x.x	<imhdr.h> <imio.h>
+	impl3d.x	<imhdr.h> <imio.h>
+	impl3i.x	<imhdr.h> <imio.h>
+	impl3l.x	<imhdr.h> <imio.h>
+	impl3r.x	<imhdr.h> <imio.h>
+	impl3s.x	<imhdr.h> <imio.h>
+	impl3x.x	<imhdr.h> <imio.h>
+	impnld.x	<imhdr.h> <imio.h>
+	impnli.x	<imhdr.h> <imio.h>
+	impnll.x	<imhdr.h> <imio.h>
+	impnlr.x	<imhdr.h> <imio.h>
+	impnls.x	<imhdr.h> <imio.h>
+	impnlx.x	<imhdr.h> <imio.h>
+	imps1d.x	<imhdr.h>
+	imps1i.x	<imhdr.h>
+	imps1l.x	<imhdr.h>
+	imps1r.x	<imhdr.h>
+	imps1s.x	<imhdr.h>
+	imps1x.x	<imhdr.h>
+	imps2d.x	<imhdr.h>
+	imps2i.x	<imhdr.h>
+	imps2l.x	<imhdr.h>
+	imps2r.x	<imhdr.h>
+	imps2s.x	<imhdr.h>
+	imps2x.x	<imhdr.h>
+	imps3d.x	<imhdr.h>
+	imps3i.x	<imhdr.h>
+	imps3l.x	<imhdr.h>
+	imps3r.x	<imhdr.h>
+	imps3s.x	<imhdr.h>
+	imps3x.x	<imhdr.h>
+	imupkd.x	
+	imupki.x	
+	imupkl.x	
+	imupkr.x	
+	imupks.x	
+	imupkx.x	
+	;

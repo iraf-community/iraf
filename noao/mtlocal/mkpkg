@@ -1,0 +1,29 @@
+# Make the MTLOCAL package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools"
+	$update	libpkg.a
+	$omake	x_mtlocal.x
+	$link	x_mtlocal.o libpkg.a $(LIBS) -o xx_mtlocal.e
+	;
+
+install:
+	$move	xx_mtlocal.e noaobin$x_mtlocal.e
+	;
+
+libpkg.a:
+	@lib
+	@idsmtn
+	@cyber
+	@camera
+	@pds
+	@r2df
+	;

@@ -1,0 +1,30 @@
+# Make the MTIO routines.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+libsys.a:
+	mtalloc.x	mtio.h <time.h>
+	mtcache.x	mtcache.com mtio.com mtio.h <config.h> <error.h>
+	mtdealloc.x	mtio.h <error.h>
+	mtdevall.x	<knet.h> <xalloc.h>
+	mtfile.x	
+	mtlocknam.x	mtio.h
+	mtopen.x	mtio.com mtio.h <config.h> <fset.h> <knet.h>
+	mtosdev.x	<xalloc.h>
+	mtparse.x	mtio.h <config.h> <ctype.h>
+	mtpos.x		mtio.h
+	mtrdlock.x	mtio.com mtio.h <config.h>
+	mtrewind.x	mtio.com mtio.h <config.h> <knet.h>
+	mtskip.x	<config.h> <fset.h> <mach.h>
+	mtstatus.x	mtio.h <error.h>
+	mtupdlock.x	mtio.com mtio.h <config.h> <knet.h> <mach.h>
+	zardmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zawrmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zawtmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zclsmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zopnmt.x	mtio.com mtio.h <config.h> <knet.h>
+	zsttmt.x	mtio.com mtio.h <config.h> <fio.h> <mach.h>
+	;

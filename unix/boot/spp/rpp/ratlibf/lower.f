@@ -1,0 +1,5 @@
+      SUBROUTINE LOWER (TOKEN)
+      INTEGER TOKEN (100)
+      CALL FOLD (TOKEN)
+      RETURN
+      END

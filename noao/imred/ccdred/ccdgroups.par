@@ -1,0 +1,5 @@
+images,s,a,,,,CCD images to group
+output,s,a,,,,Output root group filename
+group,s,h,"ccdtype","position|title|date|ccdtype|subset",,Group type
+radius,r,h,"60",,,Group position radius (arc sec)
+ccdtype,s,h,"",,,CCD image types to select

@@ -1,0 +1,16 @@
+	  clcmd - Send a command to the CL (restricted)
+clget[bcsilrdx] - Get the value of a CL parameter
+        clpopni - Open a sorted input filename template
+        clpopns - Open a sorted filename template or namelist
+        clpopnu - Open an unsorted filename template or namelist
+	 clplen - Number of elements in a list opened with clpopn[isu]
+	 clgfil - Get a file from a list opened with clpopn[isu]
+	 clpcls - Close a list opened with clpopn[isu]
+clglp[bcsilrdx] - Get the next value from a list-structured CL parameter
+	clglstr - Get the next value from a string list-structured CL parameter
+	 clgstr - Get the value of a CL string type parameter
+	 clgwrd - Get the first word from a string valued CL parameter
+	 clpstr - Set the value of a string valued CL parameter
+clput[bcsilrdx] - Set the value of a CL parameter
+	 clseti - Set the value of a CLIO parameter
+	clstati - Get the value of a CLIO parameter

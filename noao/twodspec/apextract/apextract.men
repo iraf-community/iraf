@@ -1,0 +1,9 @@
+      apdefault - Set the default aperture parameters
+         apedit - Edit apertures interactively
+	 apfind - Automatically find spectra and define apertures
+ 	   apio - Set the I/O parameters for the APEXTRACT tasks
+    apnormalize - Normalize 2D apertures by 1D functions
+      apscatter - Fit and subtract scattered light
+        apstrip - Extract two dimensional aperture strips
+          apsum - Extract one dimensional aperture sums
+	aptrace - Trace positions of spectra

@@ -1,0 +1,4 @@
+ccd             CTIO generic CCD
+epi5		CTIO EPI5 CCD
+cfccd           CTIO generic CF/CCD
+csccd           CTIO generic CS/CCD

@@ -1,0 +1,55 @@
+.help gsrefit Aug85 "Gsurfit Package"
+.ih
+NAME
+gsrefit -- refit with new z vector using old x, y and weight vector
+.ih
+SYNOPSIS
+include < math/gsurfit.h>
+
+gsrefit (sf, x, y, z, w, ier)
+
+.nf
+pointer	sf		# surface descriptor
+real	x[ARB]		# x array, xmin <= x[i] <= xmax
+real	y[ARB]		# y array, ymin <= y[i] <= ymax
+real	z[ARB]		# array of data values
+real	w[ARB]		# array of weights
+int	ier		# error code
+.fi
+.ih
+ARGUMENTS
+.ls sf          
+Pointer to the surface descriptor structure.
+.le
+.ls x, y
+Array of x and y values.
+.le
+.ls z    
+Array of data values.
+.le
+.ls w    
+Array of weights.
+.le
+.ls ier    
+Error code. The options are OK, SINGULAR and NO_DEG_FREEDOM. If ier =
+SINGULAR a solution is computed but one or more coefficients may be zero.
+If ier equals NO_DEG_FREEDOM, there are insufficient data points to
+compute a solution and GSREFIT returns without solving for the coefficients.
+.le
+.ih
+DESCRIPTION
+In some applications the x, y and weight values remain unchanged from fit
+to fit and only the z values vary. In this case it is redundant to
+reaccumulate the matrix and perform the Cholesky factorization. GSREFIT
+zeros and reaccumulates the vector on the right hand side of the matrix
+equation and performs the forward and back substitution phase to fit for
+a new coefficient vector.
+.ih
+NOTES
+In the first call to GSREFIT space is allocated for the non-zero basis
+functions. Subsequent calls to GSREFIT reference this array to avoid
+recalculating basis functions at every call.
+.ih
+SEE ALSO
+gsfit, gsaccum, gsacpts, gssolve
+.endhelp

@@ -1,0 +1,32 @@
+.help ucase Jan85 utilities
+.ih
+NAME
+ucase -- convert text files to upper case
+.ih
+USAGE
+ucase files
+.ih
+PARAMETERS
+.ls files
+The list of text files to be converted to upper case. If more than one
+text file is specified as input the suffix .uc is appended to the input
+file name to create the output file name.
+.le
+.ih
+DESCRIPTION
+UCASE takes input from a list of text files or the standard input, converts
+the text to upper case and prints the result on the standard output.
+If multiple files are specified as input, the suffix .uc is appended to
+the input file name to create the output file name.
+.ih
+EXAMPLES
+1. Convert a list of files to upper case
+
+.nf
+	cl> ucase *.x
+.fi
+
+.ih
+SEE ALSO
+lcase
+.endhelp

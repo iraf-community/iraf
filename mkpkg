@@ -1,0 +1,140 @@
+# Root MKPKG for IRAF.  The bootstrap utilities and libraries in the HOST
+# subdirectory must be made before this can be run.
+
+$verbose
+$call	mkall			# make everything
+$exit
+
+mkall:
+	$ifeq (hostid, unix)  !(clear;date)  $endif
+	$echo "==================== MAKE IRAF! ========================="
+	$echo "+"
+	$call syslibs
+	$call mathlibs
+	$ifeq (USE_SHLIB, yes) $call shlib $endif
+	# (fall through)
+relink:
+	$call sysexe
+	$call packages
+	$echo "====================== (done) ==========================="
+	$ifeq (hostid, unix)  !(date)  $endif
+	;
+
+update:
+	$call sysexe
+	$call packages
+	;
+
+syslibs:
+	$echo "====================== SYSLIBS =========================="
+	$echo "+"
+	$set XFLAGS = "$(XSFLAGS)"
+	$call sysgen@sys
+	$echo "+" $echo "+"
+	;
+
+sysexe:
+	$echo "====================== SYSEXE ==========================="
+	$echo "+" $echo "+"
+	$call update@sys
+	$echo "+" $echo "+"
+	;
+
+mathlibs:
+	$echo "====================== MATHLIBS ========================="
+	$echo "+" $echo "+"
+	$call mathgen@math
+	$echo "+" $echo "+"
+	;
+
+packages:
+	$echo "====================== PACKAGES ========================="
+	$echo "+" $echo "+"
+
+	# On the UNIX distribution, the BIN directory is excluded from the
+	# tar tape in a "you relink" distribution.  Lets make sure we have
+	# the directory before proceeding to relink all the packages.
+
+	$ifeq (hostid, unix)  !(mkdir $(iraf)bin >& /dev/null)  $endif
+
+	$call update@pkg
+	$echo "+" $echo "+"
+	;
+
+shlib:
+	$echo "====================== SHLIB ============================"
+	$echo "+" $echo "+"
+	$call update@host$shlib/
+	$echo "+" $echo "+"
+	;
+
+# SUMMARY -- [UNIX] mkpkg summary: output a summary of the spooled mkpkg
+# output, omitting most of the mundane chatter.  Used to scan large spool
+# files for errors.
+
+summary:
+	$ifeq (HOSTID, unix)
+	    ! grep -v ':$$' spool | grep -v '^xc' | grep -v '^ar'\
+	    | grep -v '^check file'
+	$else
+	    $echo "mkpkg summary only available on a UNIX system"
+	$endif
+	;
+
+# STRIP -- Strip the system of all sources and other files not required to
+# run the system, or for user programming.
+
+strip:
+	!rmfiles -f $(hlib)strip.iraf
+	;
+
+# SRCARC -- Make a source archive (TAR format) of the system.
+
+srcarc:
+	!wtar -of $(?tarfile) README mkpkg lib sys math pkg doc
+	;
+
+
+# SUN/IRAF Stuff.
+# ------------------------
+
+showfloat:				# show current float option
+	$verbose off
+	!$(hlib)/mkfloat.csh
+	;
+generic:				# make architecture indep. (no bins)
+	$verbose off
+	!$(hlib)/mkfloat.csh generic
+	;
+f68881:					# install f68881 binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh f68881
+	;
+ffpa:					# install ffpa binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh ffpa
+	;
+fswitch:				# install fswitch binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh fswitch
+	;
+fsoft:					# install fsoft binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh fsoft
+	;
+pg:					# install profiled binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh pg
+	;
+sparc:					# install sparc binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh sparc
+	;
+ieee:					# install ieee binaries (CONVEX)
+	$verbose off
+	!$(hlib)/mkfloat.csh ieee
+	;
+native:					# install native binaries (CONVEX)
+	$verbose off
+	!$(hlib)/mkfloat.csh native
+	;

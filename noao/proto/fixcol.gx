@@ -1,0 +1,45 @@
+include	<imhdr.h>
+include	<imset.h>
+
+$for (silrdx)
+
+# FIXCOL -- Linearly interpolate columns across a region.
+
+procedure fixcol$t (image, x1, x2, y1, y2)
+
+pointer	image				# Image pointer
+int	x1, x2, y1, y2			# Region to be fixed
+
+int	i, j, nx, ny
+real	f1, f2, scale
+pointer	a, b, c
+pointer	imgs2$t(), imps2$t()
+
+begin
+	c = imps2$t (image, x1, x2, y1, y2)
+
+	nx = x2 - x1 + 1
+	ny = y2 - y1 + 1
+	if (x1 == 1) {
+	    a = imgs2$t (image, x2 + 1, x2 + 1, y1, y2)
+	    do i = 1, ny
+		call amovk$t (Mem$t[a + i - 1], Mem$t[c + (i - 1) * nx], nx)
+	} else if (x2 == IM_LEN (image, 1)) {
+	    a = imgs2$t (image, x1 - 1, x1 - 1,  y1, y2)
+	    do i = 1, ny
+		call amovk$t (Mem$t[a + i - 1], Mem$t[c + (i - 1) * nx], nx)
+	} else {
+	    call imseti (image, IM_NBUFS, 2)
+	    a = imgs2$t (image, x1 - 1, x1 - 1, y1, y2)
+	    b = imgs2$t (image, x2 + 1, x2 + 1, y1, y2)
+	    do i = 1, ny {
+		f1 = Mem$t[a + i - 1]
+		f2 = Mem$t[b + i - 1]
+		scale = (f2 - f1) / (nx + 1)
+		do j = 1, nx
+		    Mem$t[c + (i - 1) * nx + j - 1] = j * scale + f1
+	    }
+	}
+end
+
+$endfor

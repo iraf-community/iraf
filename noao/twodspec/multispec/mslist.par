@@ -1,0 +1,7 @@
+# MSLIST
+
+image,f,a,,,,Image to be listted
+keyword,s,a,,,,Keyword for data to be listed
+lines,s,a,,,,Images lines to be listed
+spectra,s,a,,,,Spectra to be listed
+titles,b,h,no,,,Print additional titles?

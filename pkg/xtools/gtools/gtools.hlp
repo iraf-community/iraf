@@ -1,0 +1,70 @@
+.help gtools Jun86 xtools.gtools
+.ih
+NAME
+gtools -- Graphics tools
+.ih
+SYNOPSIS
+A number of application tasks use the graphics tools in the \fBgtools\fR
+package.  The graphics tools control labeling and titling of graphs and
+interactive formatting.  The user changes the defaults via colon commands
+and with the gt_window cursor keys.  The windowing options are usually
+entered with the 'w' key from an application program but other keys
+may be used instead.  Also not all of the formating options may be available
+in a particular application; for example the graph type and mark type
+options.  Check the documentation for the application program.
+.ih
+WINDOW COMMANDS
+The following keystroke cursor commands are available through the
+gt_window procedure.
+
+.nf
+	SET GRAPH WINDOW
+
+a  Autoscale x and y axes
+b  Set bottom edge of window
+c  Center window at cursor position
+d  Shift window down
+e  Expand window (mark lower left and upper right of new window)
+f  Flip x axis
+g  Flip y axis
+j  Set left edge of window
+k  Set right edge of window
+l  Shift window left
+m  Autoscale x axis
+n  Autoscale y axis
+p  Pan x and y axes about cursor
+r  Shift window right
+t  Set top edge of window
+u  Shift window up
+x  Zoom x axis about cursor
+y  Zoom y axis about cursor
+z  Zoom x and y axes about cursor
+.fi
+.ih
+COLON COMMANDS
+.nf
+		GRAPH FORMAT OPTIONS
+
+:/comments string	Comments
+:/help			Print this menu
+:/mark string		Mark type (point, box, plus, cross, diamond,
+				   hline, vline, hebar, vebar, circle)
+:/title	string		Title
+:/transpose		Transpose the graph axes
+:/type string		Type of graph (line or mark)
+:/redraw		Redraw the graph
+:/xlabel string		Label for X axis
+:/xsize size		Size of marks along the X axis
+:/xtransform type	X coordinate transform type (linear or logrithmic)
+:/xunits string		Units for X axis
+:/xwindow x1 x2		X graph window (INDEF defaults to min or max)
+:/ylabel string		Label for Y axis
+:/ysize size		Size of marks along the Y axis
+:/ytransform type	Y coordinate transform type (linear or logrithmic)
+:/yunits string		Units for Y axis
+:/ywindow y1 y2		Y graph window (INDEF defaults to min or max)
+
+Format changes do not take effect until the graph is redrawn.  If the
+application does not do this automatically the redraw command may be given.
+.fi
+.endhelp

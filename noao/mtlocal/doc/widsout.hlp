@@ -1,0 +1,113 @@
+.help widsout Oct84 noao.mtlocal
+.ih
+NAME
+widsout -- Convert an IRAF image to IDSOUT text format
+.ih
+USAGE
+widsout image idsout
+.ih
+PARAMETERS
+.ls image
+Image to be converted to IDSOUT text format.
+.le
+.ls idsout
+IDSOUT filename for single file output and IDSOUT root name for multiple
+file output.
+.le
+.ls type_output = "multiple"
+Type of output to be created.  The options are "single" and "multiple".
+In type "single"  the IDSOUT records, one for each image line, are
+appended to the file given by the parameter \fIidsout\fR.
+In type "multiple" the IDSOUT record for each line is appended to a different
+file.  The files have names formed from the root name, given by \fIidsout\fR,
+with the extensions .001, .002, etc, where the extension is the image line.
+.001, .002, etc.
+.le
+.ls label =
+List structured string parameter for the record labels.
+.le
+.ls uttime = 0
+Universal time in integer seconds.
+.le
+.ls utdate = 0
+Universal date given in the integer format yymmdd.
+.le
+.ls siderial = 0.
+Siderial time in hours.
+.le
+.ls ra = 0.
+Right Ascension in hours.
+.le
+.ls dec = 0.
+Declination in degrees.
+.le
+.ls ha = 0.
+Hour angle in hours.
+.le
+.ls airmass = 1.
+Air mass.
+.le
+.ls integration = 0
+Integration time in integer seconds.
+.le
+.ls wavelen1 = 4000.
+Wavelength of the first bin.
+.le
+.ls dispersion = 1.
+Dispersion per pixel.
+.le
+.ih
+DESCRIPTION
+The \fIimage\fR containing one spectrum per image line is converted to the
+IDSOUT card format described below.  There are two types of output selected by
+the parameter \fItype_output\fR.  The options for this parameter are "single"
+and "multiple".  In type "single"  the IDSOUT records, one for each image line,
+are appended to the file given by the parameter \fIidsout\fR.
+In type "multiple" the IDSOUT record for each line is appended to a different
+file.  The files have names formed from the root name, given by \fIidsout\fR,
+with the extensions .001, .002, etc, where the extension is the image line.
+Each record contains a record label which is read from the list structured
+parameter \fIlabel\fR.  If \fIlabel\fR is not specified the user is prompted
+for the label for each image line.  Otherwise the file specified is read
+for the labels.  The remaining parameters are general record header information
+whose meanings are apparent.
+
+The IDSOUT text format consists of 133 80 character lines.  The format of these
+lines is:
+
+.nf
+ Line	Column	Type
+    1	   1-5	Integer	  Record number within IDSOUT text file
+	  6-10	Integer	  Integration time
+	 11-25	Real	  Wavelength of first bin
+	 26-40	Real	  Dispersion
+	 41-45	Integer	  0 (Index of first pixel)
+	 46-50  Integer	  Line length - 1 (Index of last pixel)
+	 71-80	Integer	  UT time
+    2	  1-10	Real	  Siderial time
+	 11-25	Real	  Right Ascension
+	 26-40	Real	  Declination
+    3	 21-35	Real	  Hour Angle
+	 36-50	Real	  Air mass
+	 51-58	Integer	  UT date
+	 60-76	String	  Image title
+	 78-80	String	  END
+    4	  1-64	String	  Record label
+	 78-80	String	  END
+5-132		Real	  1024 pixel values, 8 per line
+  133			  Blank line
+.fi
+
+The data of type real are in exponent format; i.e FORTRAN 'E' format (1.234e3).
+.ih
+EXAMPLES
+To convert an two dimensional image containing three spectra to the
+output file "idsout":
+
+	cl> widsout image idsout type_output=single label=file
+
+where file contains three strings to be used for the record labels.
+.ih
+SEE ALSO
+ridsout
+.endhelp

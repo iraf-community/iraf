@@ -1,0 +1,9 @@
+# Make the TV package.
+
+$call	update
+$exit
+
+update:
+	@display
+	@cv
+	;

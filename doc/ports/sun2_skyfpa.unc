@@ -1,0 +1,168 @@
+SUN/IRAF installation U. North Carolina, Sun-3 UNIX on Sun-2 hardware.
+Beginning 24 September 1986, dct.
+----------------------------------------------------
+
+unix/...
+	Deleted all binary files (should have been done before distribution).
+	(9/24)
+
+local/.login
+unix/hlib/mkiraf.csh
+unix/hlib/mkpkg.inc
+	Changed the -f68881 flags to -fsky.  (9/24)
+
+cd unix; sh -x mkpkg.csh >& spool &
+	Started up the first bootstrap.  (9/24)
+
+-------------------------
+(Resume 27 Sept)
+Bootstrap succeeded without any apparent problems, except that there were
+still binaries in lib, so the mkpkg in gdev did not recompile the IIS
+interface into libsys.a.  
+
+	- Ran RMBIN on the non-HSI directories to get rid of the binaries.
+	  Worked fine, except that it also deleted the .login file which
+	  contained some control codes which fooled RMBIN into thinking it
+	  was a binary file.
+
+Next, tried mkpkg again in GDEV.  This failed immediately with RPP generating
+an error message something like `unknown x$type directive'.  Traced this to
+a Fortran optimizer bug in rpp/ratlibf/enter.f.  Compiled that module and
+tried again.  Failed again: this time it ran, but some of the symbols came
+out with all the characters set to the | character.  Traced this one to yet
+another (very similar) optimizer bug in spp/rppfor/ludef.f.  Fixed that one
+and relinked, and this time was able to compile GDEV, although by this time
+I have little confidence in the quality of the compiled objects!!
+
+local/bugs/unc/enter.[fs]
+local/bugs/unc/ludef.[fs]
+	Generated the assembler for these bugs and captured it with tip so
+	that we can send it to the place where bugs go at SUN.  (9/27)
+
+unix/hlib/SUN_kludge/precomp.csh
+	Changed the -f68881 switches to -fsky.  (9/27)
+
+-----------------------------------------------
+Started the first full sysgen.
+	cd $hlib/SUN_kludge; precomp.csh
+	cd $iraf
+	mkpkg >& spool &		(9/27)
+
+unix/hlib/mkiraf.csh
+	Set root imdir to /usr/tmp.  (9/28)
+
+Sysgen Progress:  (9/28)
+	There were a couple of problems with the sysgen, but mostly it seems to
+	be running ok.  This machine is very slow, the Sun-3 is MUCH faster.
+
+	[1] When I rebuilt gdev manually (due to the problems with the SPP),
+	    I was in a subdirectory hence did not make everything.  This caused
+	    some of the links in the main sysgen to come up short.  This is
+	    not unusual; probably a mkpkg gdev should be included in the
+	    main sysgen, just in case it was missed in the bootstrap, or in
+	    case libsys.a was deleted.
+
+	[2] There were some f77 failures in VOPS, despite the reduction in the
+	    command line lenth to 400.  This is almost certainly a bug in the
+	    f77 program itself.  The error message is
+
+	    Compiler error on line 0 of (null): invalid flag c
+
+	    Where c is some character.  This always happens to a file at or
+	    near the end of the file list (maybe 384 would be a good length?).
+	    The workaround until Sun gets this fixed is simply to  mkpkg
+	    again, that will recompile the remaining files.
+
+	    NOTE - NOTE - NOTE - I just discovered some Sun docs noting bugs
+	    in the V3.1 f77.  One is "f77 cannot handle more than about forty
+	    source files in a single command".  This is the problem we have
+	    here.
+
+	(fixed these items and restarted sysgen, keeping libraries thus far
+	(compiled intact.)
+
+unix/boot/mkpkg/host.c
+	Decreased the size of the host command line to 320 characters to
+	avoid the above mentioned f77 40-file bug.  (9/28)
+
+---------------------------------------
+Begin testing, x_system.e, cl.e,...
+	We have very serious problems here.  x_system.e runs, but most of
+	the tasks misbehave in one way or another.  The cl just hangs up
+	during startup.
+
+unix/os/zmain.c
+unix/os/zopdpr.c
+unix/os/zfiopr.c
+unix/os/zoscmd.c
+	The runtime problem mentioned above turned out to be due to the Sky
+	floating point board ignoring all floating point instructions; the
+	last operand sent would be the one read back, with no operation
+	being performed.  Took a while to figure this one out: everything
+	was being compiled and linked correctly with the -fsky option,
+	and indeed the skyboard startup code was being called during process
+	startup.
+
+	What it finally turned out to be was the series of close() cy{alls in
+	the IRAF main.  These were used to close the unwanted file
+	descriptors inherited from the parent process via the usual UNIX
+	convention of passing all open files on to the child.  Unfortunately,
+	the sky board is opened as a file during process startup, before the
+	IRAF main is entered, hence the IRAF main would immediately close
+	it down and all floating point would thereafter fail miserably.
+
+	The solution was to use the new 4.2BSD `fcntl' to set the close-on-exec
+	flag on the unwanted file descriptors (3 on) before calling execl().
+	It is conceivable there might be problems with using this in
+	conjunction with vfork (don't want to affect parents file descriptors,
+	e.g., if execl fails), but I think it will probably work; more
+	testing is warranted later.  (^R
+{9/28)
+
+--------------------------------------------
+With this fix and a relink, CL runs, spawning system process, etc.
+Sysgen resumed at its incredibly slow pace; will check back later for further
+tests.  (9/28)
+
+Sysgen completed normally (Monday 29 September)
+Begin testing.
+
+sys/gio/gascale.x
+	IMPLOT failed immediately on the first attempt.  The problem was traced
+	to a Fortran optimizer bug in this routine - very straightforward code,
+	too.  My confidence in this compiler is pretty low this point.
+	A few more of these, and we should recompile the entire system without
+	optimization; it is probably already justified.  (9/28)
+
+	Moved sample bug file into in local/bugs/unc.  It is a register
+	allocation bug in a case statement; the code is testing the value of
+	a register that was never loaded with the value it is supposed to
+	be testing.
+
+image templates
+	The image template code is returning garbage image names; imheader,
+	imstat, etc., fail on dev$pix.
+
+----------------------------------------
+That does it, we recompile everything without optimization.  The bootstrap
+appears to be ok, so we will not redo that.  Probably VOPS can be compiled
+with optimization, that would gain back much of the speed for image operators.
+I will leave the executables in case anyone wants to use them; they will be
+replaced automatically when the sysgen reaches the link stage.  (9/29)
+
+unix/hlib/mkpkg.inc
+	Remove -O flag.  (9/29)
+
+cd $hlib/SUN_kludge; precomp.csh
+	This step not necessary since we are not using the optimizer,
+	nor the -f68881 switch, which gave problems with complex.  (9/29)
+
+cd $iraf; rmbin lib pkg noao		(except keep the optimized VOPS)
+cd gdev; mkpkg
+cd $iraf; mkpkg >& spool &		(and renice it)
+
+---------------------------------
+Sysgen completed; ran a few tests and things?`[5'4llright.  (9/30)
+
+	TODO:	as root, `chown 0 $hlib$alloc.e'
+		backup system, strip it to save space (probably)

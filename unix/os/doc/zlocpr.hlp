@@ -1,0 +1,35 @@
+.help zlocpr May84 "System Interface"
+.ih
+NAME
+zlocpr -- get the entry point address of a procedure
+.ih
+SYNOPSIS
+.nf
+zlocpr (procedure, address)
+
+extern	procedure()		# external procedure
+int	address			# address of the procedure
+.fi
+.ih
+DESCRIPTION
+The entry point address (EPA) of \fIprocedure\fR is returned in the integer
+variable or integer array element \fIaddress\fR.
+.ih
+RETURN VALUE
+The EPA of a procedure is a magic integer value.  Two EPA values may be
+compared for equality to determine if they refer to the same procedure,
+and a procedure referenced by an EPA may be executed by passing the EPA
+and any arguments to a \fBzcall\fR primitive.
+.ih
+NOTES
+A legal EPA may not have the value NULL, which is reserved for flagging
+uninitialized EPA variables.  The Fortran 77 alternate return from subroutine
+feature may not be used with \fBzlocpr\fR and \fBzcall\fR because it involves
+an extra hidden argument on some systems.  The alternate return feature is
+inadvisable for other reasons as well and is forbidden in SPP programs.
+Only untyped procedures are permitted, i.e., \fBzlocpr\fR may not be used
+with functions.
+.ih
+SEE ALSO
+zcall, zlocva
+.endhelp

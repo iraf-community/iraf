@@ -1,0 +1,3 @@
+input,f,a,,,,"input file"
+output,f,a,,,,"output file"
+wordswap,b,h,no,,,"swap every 4 bytes rather than every 2 bytes"

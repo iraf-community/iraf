@@ -1,0 +1,23 @@
+# Update Lawson's and Hanson's linear least squares package (LIBLLSQ).
+
+$checkout libllsq.a lib$
+$update   libllsq.a
+$checkin  libllsq.a lib$
+$exit
+
+libllsq.a:
+	bndacc.f
+	bndsol.f
+	diff.f
+	g1.f
+	g2.f
+	gen.f
+	h12.f
+	hfti.f
+	ldp.f
+	mfeout.f
+	nnls.f
+	qrbd.f
+	sva.f
+	svdrs.f
+	;

@@ -1,0 +1,17 @@
+input,s,a,,,,List of images to combine
+output,s,a,,,,Output image
+sigma,s,h,"",,,Output sigma image (optional)
+logfile,s,h,"STDOUT",,,Log file
+option,s,h,"average",,,"Type of combine operation:
+    sum, average, median, minreject, maxreject,
+    minmaxrej, threshold, sigclip, avsigclip"
+outtype,s,h,"",,,Output image pixel datatype
+expname,s,h,"",,,Image header exposure time keyword
+exposure,b,h,no,,,Scale by the exposure times?
+scale,b,h,no,,,Scale by the mode?
+offset,b,h,no,,,Add offset determined from the mode?
+weight,b,h,no,,,Use a weighted average?
+modesec,s,h,"",,,Image section for computing mode
+lowreject,r,h,3.,,,Lower sigma clipping factor
+highreject,r,h,3.,,,Upper sigma clipping factor
+blank,r,h,0.,,,Value if all pixel are rejected

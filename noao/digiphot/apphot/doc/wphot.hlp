@@ -1,0 +1,499 @@
+.help wphot May89 noao.digiphot.apphot
+.ih
+NAME
+wphot -- perform weighted aperture photometry on a list of stars
+.ih
+USAGE
+wphot image
+.ih
+PARAMETERS
+.ls image
+The list of images containing the objects to be measured.
+.le
+.ls datapars = ""
+The name of the text file containing the data dependent parameters.
+.le
+.ls centerpars = ""
+The name of the text file containing the centering parameters.
+.le
+.ls fitskypars = ""
+The name of the text file containing the sky fitting parameters.
+.le
+.ls photpars = ""
+The name of the text file containing the photometry parameters.
+.le
+.ls coords = ""
+The name of the text files containing the initial coordinates of the objects to
+be measured, one object per line with the x and y coordinates in columns
+one and two respectively. If \fIcoords\fR is null, WPHOT will either read the
+image cursor (default) or read the image cursor commands
+from a file (the image cursor has been redirected to a text file containing
+image cursor commands).
+If \fIcoords\fR is defined, WPHOT will activate the cursor and read the 
+coordinates from either the cursor or the coordinate list (interactive
+mode) or process the objects in the coordinate list automatically
+(batch mode). The number of coordinate files must either be 1 or equal
+to the number of image files.
+.le
+.ls skyfile = ""
+The name of the text file containing the sky values, of the measured objects,
+one object per line with x, y, the sky value, sky sigma and sky skew in columns
+one to seven respectively. This method can only be used
+if WPHOT is run in batch.
+.le
+.ls output = "default"
+The name of the results file or results directory. If output is "default",
+"dir$default", or a directory specification then an output name of the form
+dir$root.extension.version is constructed, where dir is the directory,
+root is the root image name, extension is "wmag" and version is the current
+version of the file. If the output string is null then no output file is
+written. The number of output files mut be either 1 or
+equal to the number of image files. In both batch and interactive mode
+full results are written to output. In interactive mode a subset
+of commands is written to the standard output.
+.le
+.ls plotfile = ""
+The name of the file containing radial plots for the stars written to the
+output file. If plotfile is not equal to null then a single radial plot
+is written to plotfile for every record written to output.
+.le
+.ls graphics = "stdgraph"
+The default graphics device.
+.le
+.ls display = "stdimage"
+The default display device. For the time being display can be set to
+stdgraph and WPHOT may be run off the graphics device.
+.le
+.ls commands = ""
+The image cursor.
+.le
+.ls cursor = ""
+The graphics cursor.
+.le
+.ls radplots = no
+If radplots is yes and phot is run in interactive mode then a radial profile
+of each measured star is plotted on stdgraph.
+.le
+.ls interactive = yes
+Interactive or batch mode.
+.le
+.ls verify = yes
+Verify the critical parameters in non interactive mode.
+.le
+.ls verbose = yes
+Print messages on the terminal about actions taken.
+.le
+
+.ih
+DESCRIPTION
+
+WPHOT computes accurate centers, sky values, and weighted magnitudes for a
+list of objects in the IRAF image
+\fIimage\fR whose coordinates are listed in the text file \fIcoords\fR,
+or are marked on the image display interactively with the image
+cursor,
+and writes the computed x and y coordinates, sky values and
+magnitudes to the text file \fIoutput\fR.
+
+In interactive mode the user may either define the list of objects
+interactively or create an object list prior to entering WPHOT.
+In either case the user may adjust the
+centering, sky fitting and photometry parameters
+until a satisfactory fit is achieved and optionally store the final results in
+\fIoutput\fR.
+In batch
+mode the initial positions are read from the text file \fIcoords\fR
+or the image cursor parameter \fIcommands\fR can be redirected to a text
+file containing a list of cursor commands. Cursor command lists can easily
+In the batch case the current set of photometry parameters is used.
+
+.ih
+CURSOR COMMANDS
+
+The following list of cursor commands are currently available.
+
+.nf
+	Interactive Weighted Photometry Commands
+
+?	Print help for WPHOT commands
+:	WPHOT colon escape commands (see below)
+e	Print WPHOT error messages
+i	Setup WPHOT parameters using a stellar radial profile plot
+v	Verify critical WPHOT parameters
+d	Plot a centered stellar radial profile
+w	Store current WPHOT parameters in the pset files
+l	Compute magnitudes for remainder of the stars in the
+	coordinate list, output results
+r	Rewind the coordinate list
+c	Fit center around the current star (cursor or list)
+t	Fit sky around the current star (cursor or list)
+s	Fit sky around the current centered star
+p	Compute magnitudes around current star (cursor or list),
+	using current sky
+f	Fit center, sky and compute magnitudes of current star
+	(cursor or list)
+spbar	Fit center, sky, compute magnitudes of current star
+	(cursor or list), output results
+q	Exit
+
+:m [n]	Move to next [nth] star in the coordinate list
+:n [n]	Measure next [nth] star in the coordinate list, output results
+
+Photometry parameters are listed or set with the following commands.
+
+:image		[string]	Image name
+:coords		[string]	Coordinate file name
+:output		[string]	Output file name
+:show	[data/center/sky/phot]	List the parameters
+
+:scale		[value]		Image scale (units per pixel)
+:fwhmpsf	[value]		Full width half maximum of PSF (scale units)
+:emission	[y/n]		Emission feature (y), absorption (n)
+:noise		[string]	Noise model (constant|poisson)
+:threshold	[value]		Detection intensity threshold (counts)
+:cthreshold	[value]		Centering intensity threshold (counts)
+:sigma	        [value]		Standard deviation of sky (counts)
+:gain		[string]	Gain image header keyword
+:epadu		[value]		Gain (electrons  per adu)
+:ccdread	[string]	Readout noise image header keyword
+:readnoise	[value]		Readout noise (electrons)
+:exposure	[string]	Exposure time image header keyword
+:itime 		[value]		Integration time (time units)
+:datamin	[value]		Minimum good data value (counts)
+:datamax	[value]		Maximum good data value (counts)
+
+:calgorithm	[string]	Centering algorithm (centroid|gauss|
+				none|ofilt)
+:cbox		[value]		Width of the centering box (scale units)
+:cmaxiter	[value]		Maximum number of iterations
+:maxshift	[value]		Maximum center shift (scale units)
+:minsnratio	[value]		Minimum signal to noise ratio for
+				centering
+:clean		[y/n]		Clean subraster before centering
+:rclean		[value]		Cleaning radius (scale units)
+:rclip		[value]		Clipping radius (scale units)
+:kclean		[value]		Clean K-sigma rejection limit (sigma)
+:mkcenter	[y/n]		Mark computed centers on display
+
+:salgorithm	[string]	Sky fitting algorithm (constant|file|
+				median|mode|centroid|gauss|crosscor|
+				histplot|radplot)
+:skyvalue	[value]		User supplied sky value (counts)
+:annulus	[value]		Inner radius of sky annulus (scale units)
+:dannulus	[value]		Width of sky annulus (scale units)
+:khist		[value]		Sky histogram extent (+/- sky sigma)
+:smooth		[y/n]		Lucy smooth the sky histogram
+:binsize	[value]		Resolution of sky histogram (sky sigma)
+:smaxiter	[value]		Maximum number of iterations
+:skreject	[value]		Pixel rejection limits (sky sigma)
+:snreject	[value]		Maximum number of rejection cycles
+:rgrow		[value]		Region growing radius (scale units)
+:mksky		[y/n]		Mark the sky annuli on the display
+
+:weighting	[string]	Weighting function (constant|cone|gauss)
+:apertures	[string]	List of aperture radii (scale units)
+:zmag		[value]		Zero point of magnitude scale
+:mkapert	[y/n]		Mark apertures on the display
+:radplot	[y/n]		Plot radial profile of object
+.fi
+
+.ih
+ALGORITHMS
+
+WPHOT computes accurate centers for each object using the centering
+parameters defined in
+\fIcenterpars\fR, computes an accurate sky value for each object using
+the sky fitting
+parameters defined in \fIfitskypars\fR and computes magnitudes using the
+photometry parameters defined in \fIphotpars\fR. The noise characteristics
+of the data are defined in \fIdatapars\fR.
+
+Three weighting functions are currently available constant, cone and gauss.
+Constant weighting, the default, gives identical results to the phot task.
+Pixels are weighted by the fraction of their area inside the circular
+aperture. For cone and gauss weighting an additional  triangular or gaussian
+weighting
+function of full width half maximum equal to \fIfwhmpsf\fR is applied to
+the pixels before aperture summing.
+
+This task is currently experimental. Further algorithm work is to be
+expected.
+
+.ih
+OUTPUT
+
+In interactive mode the following quantities are printed on the standard
+output as each object is measured. Error is a simple string which
+indicates whether the task encountered any errors in the
+the centering algorithm, the sky fitting algorithm or the photometry
+algorithm. Mag and merr are the mangnitudes and errors in
+apertures 1 through N respectively and xcenter, ycenter and msky are the
+x and y centers and the sky value respectively.
+
+.nf
+    image  xcenter  ycenter  msky  mag[1 ... N]   error
+.fi
+
+In both interactive and batch mode full output is written to the text file
+\fIoutput\fR. At the beginning of each file is a header listing the
+current values of the parameters when the first stellar record was written.
+These parameters can be subsequently altered. For each star measured the
+following record is written
+
+.nf
+	image  xinit  yinit  id  coords  lid
+	   xcenter  ycenter  xshift  yshift  xerr  yerr  cier error
+	   msky  stdev  sskew  nsky  nsrej  sier  serror
+	   rapert  sum  area  mag  merr  pier  perr
+.fi
+
+Image and coords are the name of the image and coordinate file respectively.
+Id and lid are the sequence numbers of stars in the output and coordinate
+files respectively. Cier and cerror are the error code and accompanying
+error message respectively.  Xinit, yinit, xcenter, ycenter, xshift, yshift,
+and xerr, yerr are self explanatory and output in pixel units. The sense of
+the xshift and yshift definitions is the following.
+
+.nf
+	xshift = xcenter - xinit
+	yshift = ycenter - yinit
+.fi
+
+Sier and serror are the error code and accompanying error message respectively.
+Msky, stdev and sskew are the sky value,
+standard deviation and skew respectively. Nsky and nsrej are the number of
+sky pixels and the number of sky pixels rejected respectively.
+
+Rapert, sum, and area are the radius of the aperture in pixels, the total
+number of counts including sky in the aperture and the area of the aperture
+in square pixels. Mag and merr are the magnitude and error in the magnitude
+in the aperture. Pier and perror are photometry error code and accompanying
+error message.
+
+.ih
+EXAMPLES
+
+1. Compute the weighted magnitdues for a few  stars in N4147 using the
+display and the image cursor. Setup the task parameters using the
+interactive setup menu defined by the i key command and the radial
+profile plot.
+
+.nf
+	ap> set stdimcur = stdimage
+
+	... define the image cursor
+
+	ap> display n4147 1 fi+
+
+	... display the image
+
+	ap> wphot n4147
+
+	... a short help page appears on the screen
+
+	... move display cursor to a star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile
+	... set the fwhmpsf, centering radius, inner and outer sky annuli,
+	    apertures, sigma, and threshold using the graphics cursor and the
+            stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+
+	... type the w key to save the parameters in the parameter files
+
+	... type the v key to verify critical parameters
+
+	... retype :.read m92.plot1 to reload the contour plot
+
+	... move the image cursor to the stars of interest and tap
+	    the space bar
+
+	... a one line summary of the fitted parameters will appear on the
+	    standard output for each star measured
+
+	... the output appears in n4147.omag.1
+.fi
+
+2. Compute the weighted magnitdues for a few  stars in M92 using the
+contour plot
+and the graphics cursor. Setup the task parameters using the interactive
+setup menu defined by the i key command.
+
+.nf
+	ap> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+	ap> contour m92 >G m92.plot1
+
+	... store the contour plot of m92 in the file m92.plot
+
+	ap> wphot m92
+
+	... a short help page appears on the screen
+
+	... type :.read m92.plot1 to load the contour plot on the screen
+
+	... move graphics cursor to a star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile
+	... set the fwhmpsf, centering radius, inner and outer sky annuli,
+	    apertues, sigma, and threshold using the graphics cursor and the
+            stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+
+	... type the w key to save the parameters in the parameter files
+
+	... type the v key to verify the critical parameters
+
+	... retype :.read m92.plot1 to reload the contour plot
+
+	... move the graphics cursor to the stars of interest and tap
+	    the space bar
+
+	... a one line summary of the fitted parameters will appear on the
+	    standard output for each star measured
+
+	... full output will appear in the text file m92.omag.1 
+.fi
+
+3. Setup and run WPHOT interactively on a list of objects,
+using a contour plot as the image display and the parameters defined and
+saved in example 1.
+
+.nf
+	ap> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+	ap> contour m92
+
+	... adjust plot parameters until the contour plot is satisfactory
+
+	ap> =gcur
+
+	... enter cursor mode
+
+	... type :.write m92.plot2 to save the plot in a metacode file
+
+	... type any key to quit cursor mode
+
+	ap> daofind m92
+
+	... make a coordinate list by searching for objects with  the
+	    fwhmpsf and threshold defined in example 1
+
+	... the output will appear in the text file m92.coo.1
+
+	ap> wphot m92 coords=m92.coo.1
+
+	... a short help menu appears
+
+	... type :.read m92.plot2 to read in the contour plot
+
+	... move the graphics cursor to the stars and tap space bar
+
+				or
+
+	... use :m and/or :n, l, r commands to measure objects in the
+	    coordinate list
+
+	... a one line summary of results will appear on the standard output
+	    for each star measured
+
+	... the output will appear in m92.omag.2 ...
+.fi
+
+
+4. Run WPHOT in batch mode using the coordinate file and the previously
+saved parameters. Verify the critical parameters.
+
+.nf
+	ap> wphot m92 coords=m92.coo.1 inter- verify+
+
+	... output will appear in m92.omag.3
+.fi
+
+
+5. Run WPHOT in batch mode using the coordinate file and the previously
+saved parameters. The task can be submitted to the background by
+appending an ampersand to the command line listed below.
+
+.nf
+	ap> wphot m92 coords=m92.coo.1 inter- verify-
+
+	... output will appear in m92.wmag.4
+.fi
+
+6. Run WPHOT interactively on the sun workstation using the imtool window,
+a coordinate list and the current set of parameters. This example assumes
+knowledge of the imtool functions, and that
+the image cursor is reading back positions in image pixel coordinates not
+device coordinates.
+
+.nf
+	ap> set stdimcur = text
+
+	... set the image cursor to the standard input
+
+	ap> display m92 1
+
+	... display the image in the imtool window and put the mouse
+	    in the imtool window
+
+	... use the imtool setup window to enter the coordinate file name
+	    m92.coo.2
+
+	... type the F6 key to enter cursor readback mode
+
+	... move the image cursor to the stars of interest, press the
+	    left mouse button
+	... a number will appear beside each star measured
+	... the x and y coordinates will be written in m92.coo.2
+
+	ap> wphot m92 coords=m92.coo.2
+
+	... a short help page appears on the screen followed by
+	    the cursor command prompt
+
+	... type :m 3 to set the coordinates to the third star
+	    in the list
+
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile
+	... set the fwhmpsf, centering radius, inner and outer sky annulus,
+	    apertures, sigma and threshold using the graphics cursor and
+	    the stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+
+	... type r to rewind the coordinate list
+
+	... type l to measure all the stars in the coordinate list
+
+	... a one line summary of the answers will appear on the standard
+	    output for each star measured
+
+	... full output will appear in the text file m92.wmag.4 
+.fi
+
+.ih
+BUGS
+This task is experimental and will undergo changes in the future.
+
+It is currently the responsibility of the user to make sure that the
+image displayed in the frame is the same as that specified by the image
+parameter.
+
+Commands which draw to the image display are currently disabled.
+The TVMARK task in the proto package  can be used to draw simple marks
+on the display. All the APPHOT marking commands will however function
+if a contour plot is used in lieu of the image display.
+
+Users should not be confused by the normally enabled markcur option in the
+SUN/IMTOOL setup window. This feature is under the control of the
+IMTOOL window and the APPHOT package has no control over it.
+
+.ih
+SEE ALSO
+datapars, centerpars, fitskypars, photpars, phot, polyphot
+.endhelp

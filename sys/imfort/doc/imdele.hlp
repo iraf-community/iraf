@@ -1,0 +1,29 @@
+.help imdele Sep86 imfort
+.ih
+NAME
+imdele -- delete an image
+.ih
+SYNOPSIS
+.nf
+subroutine imdele (image, ier)
+
+character*(*)	image		#I host name of image to be deleted
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimdele\fR procedure deletes an image, i.e., the both the header file
+and the pixel file (if any).
+.ih
+RETURN VALUE
+A zero status is returned if the image exists and was successfully deleted.
+It is not an error if there is no pixel file.
+
+.nf
+IE_IMDELNEXIM:	attempt to delete a nonexistent image
+IE_IMDELETE:	cannot delete image
+.fi
+.ih
+SEE ALSO
+imrnam, imcrea
+.endhelp

@@ -1,0 +1,47 @@
+.help copy Nov84 system
+.ih
+NAME
+copy -- copy a file, or a set of files to a directory
+.ih
+USAGE
+copy input output
+.ih
+PARAMETERS
+.ls input
+The input file or list of files to be copied.
+.le
+.ls output
+The (new) output file when copying one file to another, or the destination
+directory when copying a set of files.
+.le
+.ls verbose = no
+If set to "yes", a line of the type " from -> to " is printed on the
+terminal for each file copied to a directory.  This parameter is not
+used when copying one file to another.
+.le
+.ih
+DESCRIPTION
+Copy makes a copy of a single file, or it copies a set of files to a different
+directory.
+.ih
+EXAMPLES
+
+1. Copy all files in the current directory with extension ".x" to the
+directory "home$src".  As each copy is made, the user is informed.
+
+	cl> copy *.x home$src ver+
+
+2. Make a copy "fred.BAK" of the file "fred".
+
+	cl> copy fred fred.BAK
+
+3. Copy the "graphcap" file from the remote node "lyra" to the current node,
+without changing the name of the file.  Note that "." is a synonym for the
+current directory.
+
+	cl> copy lyra!dev$graphcap .
+
+.ih
+SEE ALSO
+concatenate, movefiles
+.endhelp

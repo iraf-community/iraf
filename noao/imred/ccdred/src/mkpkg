@@ -1,0 +1,101 @@
+# Make CCDRED Package.
+
+$checkout libpkg.a ..
+$update   libpkg.a
+$checkin  libpkg.a ..
+$exit
+
+generic:
+	$set	GEN = "$$generic -k"
+
+        $ifolder (generic/cor.x,  cor.gx)
+	    $(GEN) cor.gx -o generic/cor.x $endif
+        $ifolder (generic/proc.x,  proc.gx)
+	    $(GEN) proc.gx -o generic/proc.x $endif
+        $ifolder (generic/imcasigclip.x, imcasigclip.gx)
+	    $(GEN) imcasigclip.gx -o generic/imcasigclip.x $endif
+        $ifolder (generic/imcaverage.x, imcaverage.gx)
+	    $(GEN) imcaverage.gx -o generic/imcaverage.x $endif
+        $ifolder (generic/imcombine.x, imcombine.gx)
+	    $(GEN) imcombine.gx -o generic/imcombine.x $endif
+        $ifolder (generic/imccopy.x, imccopy.gx)
+	    $(GEN) imccopy.gx -o generic/imccopy.x $endif
+        $ifolder (generic/imcmaxrej.x, imcmaxrej.gx)
+	    $(GEN) imcmaxrej.gx -o generic/imcmaxrej.x $endif
+        $ifolder (generic/imcmedian.x, imcmedian.gx)
+	    $(GEN) imcmedian.gx -o generic/imcmedian.x $endif
+        $ifolder (generic/imcminrej.x, imcminrej.gx)
+	    $(GEN) imcminrej.gx -o generic/imcminrej.x $endif
+        $ifolder (generic/imcmmrej.x, imcmmrej.gx)
+	    $(GEN) imcmmrej.gx -o generic/imcmmrej.x $endif
+        $ifolder (generic/imcmode.x, imcmode.gx)
+	    $(GEN) imcmode.gx -o generic/imcmode.x $endif
+        $ifolder (generic/imcsigclip.x, imcsigclip.gx)
+	    $(GEN) imcsigclip.gx -o generic/imcsigclip.x $endif
+        $ifolder (generic/imcsum.x, imcsum.gx)
+	    $(GEN) imcsum.gx -o generic/imcsum.x $endif
+        $ifolder (generic/imcthresh.x, imcthresh.gx)
+	    $(GEN) imcthresh.gx -o generic/imcthresh.x $endif
+        $ifolder (generic/corinput.x,  corinput.gx)
+	    $(GEN) corinput.gx -o generic/corinput.x $endif
+        $ifolder (generic/sigma.x, sigma.gx)
+	    $(GEN) sigma.gx -o generic/sigma.x $endif
+        $ifolder (generic/ccdred.h, ccdred.h)
+	    $copy ccdred.h generic/ccdred.h $endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+	@generic
+	@cosmic
+
+	calimage.x	ccdtypes.h <imset.h>
+	ccdcmp.x
+	ccdcopy.x	<imhdr.h>
+	ccdcache.x	ccdtypes.h ccdcache.h ccdcache.com <imhdr.h> <imset.h>\
+			<mach.h>
+	ccdcheck.x	ccdtypes.h
+	ccddelete.x	
+	ccdflag.x	
+	ccdlog.x	<imset.h>
+	ccdmean.x	<imhdr.h>
+	ccdproc.x	ccdred.h ccdtypes.h <error.h>
+	ccdsection.x	<ctype.h> <imhdr.h>
+	ccdsubsets.x
+	ccdtypes.x	ccdtypes.h
+	imclogsum.x	<imhdr.h>
+	imcscales.x	<imhdr.h> <imset.h> <time.h>
+	imcsection.x	<ctype.h>
+	doproc.x	ccdred.h
+	hdrmap.x	hdrmap.com
+	readcor.x	<imhdr.h>
+	scancor.x	<imhdr.h> <imset.h>
+	setdark.x	ccdred.h ccdtypes.h <imhdr.h>
+	setfixpix.x	ccdred.h <imhdr.h>
+	setflat.x	ccdred.h ccdtypes.h <imhdr.h>
+	setfringe.x	ccdred.h ccdtypes.h <imhdr.h>
+	setheader.x	ccdred.h <imhdr.h>
+	setillum.x	ccdred.h ccdtypes.h <imhdr.h>
+	setinput.x	ccdtypes.h <error.h>
+	setinteract.x	<pkg/xtanswer.h>
+	setoutput.x	<imhdr.h>
+	setoverscan.x	ccdred.h <imhdr.h> <imset.h> <pkg/xtanswer.h>\
+			<pkg/gtools.h>
+	setproc.x	ccdred.h <imhdr.h>
+	setsections.x	ccdred.h <imhdr.h>
+	settrim.x	ccdred.h <imhdr.h>
+	setzero.x	ccdred.h ccdtypes.h <imhdr.h>
+	t_badpixim.x	<imhdr.h>
+	t_ccdgroups.x	<error.h> <math.h>
+	t_ccdhedit.x	<error.h>
+	t_ccdlist.x	ccdtypes.h <error.h> <imhdr.h>
+	t_ccdproc.x	ccdred.h ccdtypes.h <error.h> <imhdr.h>
+	t_combine.x	ccdred.h <syserr.h> <error.h> <imhdr.h>
+	t_mkfringe.x	ccdred.h <imhdr.h>
+	t_mkillumcor.x	ccdred.h <imhdr.h>
+	t_mkillumft.x	ccdred.h <imhdr.h>
+	t_mkskycor.x	ccdred.h <imhdr.h> <imset.h>
+	t_mkskyflat.x	ccdred.h <imhdr.h>
+	t_skyreplace.x	<imhdr.h>
+	timelog.x	<time.h>
+	;

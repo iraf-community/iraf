@@ -1,0 +1,139 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# CV_B1LEG -- Procedure to evaluate all the non-zero Legendrefunctions for
+# a single point and given order.
+
+procedure $tcv_b1leg (x, order, k1, k2, basis)
+
+PIXEL	x		# array of data points
+int	order		# order of polynomial, order = 1, constant
+PIXEL	k1, k2		# normalizing constants
+PIXEL	basis[ARB]	# basis functions
+
+int	i
+PIXEL	ri, xnorm
+
+begin
+	$if (datatype == r)
+	basis[1] = 1.0
+	$else
+	basis[1] = 1.0d0
+	$endif
+	if (order == 1)
+	    return
+
+	xnorm = (x + k1) * k2 
+	basis[2] = xnorm
+	if (order == 2)
+	    return
+
+	do i = 3, order {
+	    ri = i
+	    $if (datatype == r)
+	    basis[i] = ((2.0 * ri - 3.0) * xnorm * basis[i-1] -
+		       (ri - 2.0) * basis[i-2]) / (ri - 1.0)	
+	    $else
+	    basis[i] = ((2.0d0 * ri - 3.0d0) * xnorm * basis[i-1] -
+		       (ri - 2.0d0) * basis[i-2]) / (ri - 1.0d0)	
+	    $endif
+	}
+end
+
+
+# CV_B1CHEB -- Procedure to evaluate all the non zero Chebyshev function
+# for a given x and order.
+
+procedure $tcv_b1cheb (x, order, k1, k2, basis)
+
+PIXEL	x		# number of data points
+int	order		# order of polynomial, 1 is a constant
+PIXEL	k1, k2		# normalizing constants
+PIXEL	basis[ARB]	# array of basis functions
+
+int	i
+PIXEL	xnorm
+
+begin
+	$if (datatype == r)
+	basis[1] = 1.0
+	$else
+	basis[1] = 1.0d0
+	$endif
+
+	if (order == 1)
+	    return
+
+	xnorm = (x + k1) * k2
+	basis[2] = xnorm
+	if (order == 2)
+	    return
+
+	do i = 3, order
+	    $if (datatype == r)
+	    basis[i] = 2.0 * xnorm * basis[i-1] - basis[i-2]
+	    $else
+	    basis[i] = 2.0d0 * xnorm * basis[i-1] - basis[i-2]
+	    $endif
+end
+
+
+# CV_B1SPLINE1 -- Evaluate all the non-zero spline1 functions for a
+# single point.
+
+procedure $tcv_b1spline1 (x, npieces, k1, k2, basis, left)
+
+PIXEL	x		# set of data points
+int	npieces		# number of polynomial pieces minus 1
+PIXEL	k1, k2		# normalizing constants
+PIXEL	basis[ARB]	# basis functions
+int	left		# index of the appropriate spline functions
+
+PIXEL	xnorm
+
+begin
+	xnorm = (x + k1) * k2
+	left = min (int (xnorm), npieces)
+
+	basis[2] = xnorm - left
+	$if (datatype == r)
+	basis[1] = 1.0 - basis[2]
+	$else
+	basis[1] = 1.0d0 - basis[2]
+	$endif
+end
+
+
+# CV_B1SPLINE3 --  Procedure to evaluate all the non-zero basis functions
+# for a cubic spline.
+
+procedure $tcv_b1spline3 (x, npieces, k1, k2, basis, left)
+
+PIXEL	x		# array of data points
+int	npieces		# number of polynomial pieces
+PIXEL	k1, k2		# normalizing constants
+PIXEL	basis[ARB]	# array of basis functions
+int	left		# array of indices for first non-zero spline
+
+PIXEL	sx, tx
+
+begin
+	sx = (x + k1) * k2
+	left = min (int (sx), npieces)
+
+	sx = sx - left
+	$if (datatype == r)
+	tx = 1.0 - sx
+	$else
+	tx = 1.0d0 - sx
+	$endif
+
+	basis[1] = tx * tx * tx
+	$if (datatype == r)
+	basis[2] = 1.0 + tx * (3.0 + tx * (3.0 - 3.0 * tx))
+	basis[3] = 1.0 + sx * (3.0 + sx * (3.0 - 3.0 * sx))
+	$else
+	basis[2] = 1.0d0 + tx * (3.0d0 + tx * (3.0d0 - 3.0d0 * tx))
+	basis[3] = 1.0d0 + sx * (3.0d0 + sx * (3.0d0 - 3.0d0 * sx))
+	$endif
+	basis[4] = sx * sx * sx
+end

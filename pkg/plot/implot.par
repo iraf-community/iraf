@@ -1,0 +1,4 @@
+image,s,a,,,,image to be plotted
+line,i,a,,,,line to be plotted
+coords,*gcur,h,,,,graphics cursor input
+device,s,h,"stdgraph",,,graphics device for plots

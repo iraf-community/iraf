@@ -1,0 +1,55 @@
+.help imcrea Nov86 imfort
+.ih
+NAME
+imcrea -- create a new image
+.ih
+SYNOPSIS
+.nf
+subroutine imcrea (image, axlen, naxis, dtype, ier)
+
+character*(*)	image		#I host name of the new image
+integer		axlen(7)	#I length of each axis
+integer		naxis		#I number of axes
+integer		dtype		#I pixel datatype
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimcrea\fR procedure is used to create a new image from scratch,
+using only the information passed via the command line arguments.
+The image name \fIimname\fR is the host system filename of the new image,
+although the extension (".imh") may be omitted if desired.  The dimensionality
+of the new image is given by \fInaxis\fR, and the length in pixels of each
+axis is given by the first few elements of the array \fIaxlen\fR.
+In the current implementation of IMFORT the dimensionality of an image
+should not exceed three.  There are no restrictions on the size of an image.
+
+The datatype to be used to store the pixels in the new image is given by
+the integer code \fIdtype\fR.  Only two pixel datatypes are currently
+supported, i.e., \fIdtype\fR=3 for short integer pixels, and \fIdtype\fR=6
+for type real pixels.
+
+Both the image header file and the pixel file are created, and storage is
+allocated for the pixel array in the pixel file.  A subsequent call to
+\fIimopen\fR is required to access the new image.  The size, dimensionality,
+and datatype of the new image cannot be changed once the image has been
+created.
+.ih
+RETURN VALUE
+A nonzero error code is returned if either the header file or the pixel
+file cannot be created for some reason, or if any of the input arguments
+are invalid.
+
+.nf
+IE_NAXIS:	wrong number of axes on image
+IE_AXLEN:	length of each image axis must be .ge. 1
+IE_PIXTYPE:	image pixel type must be short or real
+IE_CREHDR:	cannot create image
+IE_WRHDR:	error writing to image header file
+IE_ALCPIX:	cannot create or allocate space for pixel file
+IE_ACCPIX:	error writing into pixel file during image create
+.fi
+.ih
+SEE ALSO
+imopen, imopnc, imdele, imrnam
+.endhelp

@@ -1,0 +1,26 @@
+.help cvfree Jun84 "Curfit Package"
+.ih
+NAME
+cvfree -- free the curve descriptor structure
+.ih
+SYNOPSIS
+cvfree (cv)
+
+.nf
+pointer	cv	# curve descriptor
+.fi
+.ih
+ARGUMENTS
+.ls cv     
+Pointer to the curve descriptor structure.
+.le
+.ih
+DESCRIPTION
+Frees the curve descriptor structure.
+.ih
+NOTES
+CVFREE should be called after each curve fit.
+.ih
+SEE ALSO
+cvinit
+.endhelp

@@ -1,0 +1,311 @@
+.help revisions Jun88 noao.imred.ccdred
+.nf
+ccdred$src/ccdproc.x
+ccdred$src/ccddelete.x
+ccdred$src/t_ccdproc.x
+ccdred$src/t_mkfringe.x
+ccdred$src/t_mkskyflat.x
+ccdred$src/t_mkskycor.x
+ccdred$src/t_mkillumft.x
+ccdred$src/t_mkillumcor.x
+ccdred$src/t_combine.x
+ccdred$src/scancor.x
+ccdred$src/readcor.x
+    1. Added error checking for procedure ccddelete.
+    2. Made workaround for error handling problem with procedure imrename
+       so that specifying a bad backup prefix would result in an abort
+       with an error message.  (6/16/89, Valdes)
+
+ccdred$src/imcombine.gx
+   Made same changes made to image.imcombine to recover from too many VOS
+   file description error.  (6/14/89, Valdes)
+
+ccdred$setinstrument.cl
+ccdred$setinstrument.hlp
+   Incorrect instrument names are now reported to the user, a menu is
+   printed if there is one, and a second opportunity is given.
+   (6/14/89, Valdes)
+
+ccdred$ccdred.par
+   Added an ennumerated subset for the output datatype.  (5/12/89, Valdes)
+
+ccdred$src/imcombine.gx
+   Because a file descriptor was not reserved for string buffer operations
+   and a call to stropen in cnvdate was not error checked the task would
+   hang when more than 115 images were combined.  Better error checking
+   was added and now an error message is printed when the maximum number
+   of images that can be combined is exceeded.  (5/9/89, Valdes)
+
+ccdred$src/sigma.gx
+ccdred$src/imcaverage.gx
+    1.  Weighted sigma was being computed incorrectely.
+    2.  Added errchk to imcaverage.gx.
+    (5/6/89, Valdes)
+
+ccdred$src/setdark.x
+ccdred$src/setflat.x
+ccdred$src/setfringe.x
+ccdred$src/setillum.x
+ccdred$src/setoverscan.x
+ccdred$src/settrim.x
+ccdred$src/setzero.x
+    Made the trimsec, biassec, datasec, and ccdsec error messages more
+    informative.  (3/13/89, Valdes)
+ 
+ccdred$src/imcmode.gx
+    For short data a short variable was wraping around when there were
+    a significant number of saturated pixels leading to an infinite loop.
+    The variables were made real regardless of the image datatype.
+    (3/1/89, Valdes)
+ 
+ccdred$src/t_mkskyflat.x
+ccdred$src/t_mkskycor.x
+    1.  Added warning if images have not been flat fielded.
+    2.  Allowed flat field image to be found even if flatcor=no.
+    (2/24/89, Valdes)
+ 
+ccdred$src/imcthresh.gx
+ccdred$combine.par
+ccdred$doc/combine.hlp
+ccdred$src/imcscales.x
+    1.  Added provision for blank value when all pixels are rejected by the
+        threshold.
+    2.  Fixed a bug that improperly scaled images in the threshold option.
+    3.  The offset printed in the log now has the opposite sign so that it
+	is the value "added" to bring images to a common level.
+    (2/16/89, Valdes)
+
+ccdred$src/proc.gx
+    When the data section had fewer lines than the output image (which occurs
+    when not trimming and the overscan being along lines) pixel out of
+    bounds errors occured.  This bug was due to a sign error when reading
+    the non-trimmed overscan lines.  (2/13/89, Valdes)
+
+ccdred$src/setoverscan.gx
+    The overscan buffer for readaxis=column was not initialized yielding
+    unpredictable and incorrect overscan data.
+    (3/13/89, Valdes)
+
+ccdred$src/imcmode.gx
+    Added test for nx=1.  (2/8/89, Valdes)
+ 
+ccdred$darkcombine.cl
+ccdred$flatcombine.cl
+    Changed the default parameters to use "avsigclip" combining and
+    no scaling or weighting.  (1/27/89, Valdes)
+ 
+ccdred$src/ccdcheck.x
+ccdred$src/setillum.x
+ccdred$src/t_ccdproc.x
+    1.  If the illumination image does not have CCDMEAN in its header
+	it is calculated.
+    2.  If an error occurs in setting up for illumination or fringe
+	correction during processing a warning is issued and these
+	processing steps are skipped.  They can be done later if
+	desired.  Previously this caused an abort.
+    (1/27/89, Valdes)
+ 
+ccdred$ccdgroups.par
+ccdred$src/t_ccdgroups.x
+ccdred$doc/ccdgroups.hlp
+    Added two new group types; ccdtype and subset.  (1/26/89, Valdes)
+ 
+ccdred$src/t_ccdlist.x
+ccdred$doc/ccdlist.hlp
+    The exposure time and dark time are now printed in long format.  This
+    is useful to allow verifying the header translation is working
+    correctly.  (1/26/89, Valdes)
+ 
+ccdred$src/setfixpix.x
+ccdred$src/t_badpixim.x
+    The magic word "untrimmed" no longer needs whitespace preceding it.
+    (1/24/89, Valdes)
+ 
+imred$ccdred/src/imcscales.x
+    Valdes, Dec 8, 1988
+    1.  COMBINE now prints the scale as a multiplicative quantity.
+    2.  The combined exposure time was not being scaled by the scaling
+	factors resulting in a final exposure time inconsistent with the
+	data.
+
+imred$ccdred/src/t_mkskyflat.x
+imred$ccdred/src/t_mkillumft.x
+imred$ccdred/src/t_mkskycor.x
+imred$ccdred/src/t_mkskyflat.x
+imred$ccdred/src/t_mkfringe.x
+imred$ccdred/doc/mkillumcor.hlp
+imred$ccdred/doc/mkillumflat.hlp
+imred$ccdred/mkillumflat.par
+imred$ccdred/mkillumflat.par
+    1.  Minor typo in declaration (calimage.x) which had no effect.
+    2.  Missing include file (t_mkskyflat.x) caused "Cannot open image"
+	when using MKSKYFLAT.
+    3.  Added checks for division by zero which are reported at the end as
+	the number of divisions by zero and the replacement value.
+	The replacement value was added as a parameter value in MKILLUMCOR
+	and MKILLUMFLAT.
+    4.	Updated the help pages to reflect the new division by zero parameter.
+    5.	Modified the log strings to be more informative about what
+	was done and which images were used.
+	(10/20/88 Valdes)
+
+imred$ccdred/src/imcombine.gx
+    A vops clear routine was not called generically causing a crash with
+    double images.  (10/19/88 Valdes)
+
+imred$ccdred/src/t_mkskycor.x
+    Replaced calls to recipricol vops procedure to one with zero checking.
+    (10/13/88 Valdes)
+
+imred$ccdred/src/imcscales.x
+    It is now an error if the mode is not positive for mode scaling or
+    weighting.  (9/28/88 Valdes)
+
+imred$ccdred/ccdred.par
+imred$ccdred/doc/ccdred.hlp
+    The plotfile parameter was changed to reflect the "" character
+    as the new default.  (9/23/88 jvb)
+
+imred$ccdred/src/imcmedian.gx
+    The median option was selecting the n/2 value instead of (n+1)/2.  Thus,
+    for an odd number of images the wrong value was being determined for the
+    median. (8/16/88 Valdes)
+
+imred$ccdred/src/scancor.x
+imred$ccdred/src/calimage.x
+imred$ccdred/src/ccdcmp.x +
+imred$ccdred/src/mkpkg
+    1.  The shortscan correction was incorrectly writing to the input image
+	rather than the output image causing a cannot write to file error.
+    2.  It is now a trapped error if the input image is the same as a
+	calibration image.  (4/18/88 Valdes)
+
+imred$ccdred/src/imcmode.gx
+    The use of a mode sections was handled incorrectly.  (4/11/88 Valdes)
+
+noao$imred/ccdred/src/setoverscan.x
+    Minor bug fix:
+	gt_setr (gt, GTXMIN, 1.) -> gt_setr (gt, GTXMIN, x[1])
+	gt_setr (gt, GTXMAX, real(npts)) -> gt_setr (gt, GTXMAX, x[npts])
+    (2/11/88 Valdes)
+
+noao$imred/ccdred/src/t_mkillumflat.x -> t_mkillumft.x
+noao$imred/ccdred/src/t_mkfringecor.x -> t_mkfringe.x
+noao$imred/ccdred/src/t_badpiximage.x -> t_badpixim.x
+noao$imred/ccdred/src/imcthreshold.gx -> imcthresh.gx
+noao$imred/ccdred/src/generic/imcthresh.x -> imcthresh.x
+noao$imred/ccdred/src/mkpkg
+noao$imred/ccdred/src/generic/mkpkg
+    Shortened long names. (2/10/88 Valdes)
+
+noao$imred/ccdred/src/t_mkskycor.x
+noao$imred/ccdred/doc/mkskycor.hlp
+noao$imred/ccdred/doc/mkillumcor.hlp
+noao$imred/ccdred/doc/mkskyflat.hlp
+noao$imred/ccdred/doc/mkillumflat.hlp
+noao$imred/ccdred/doc/mkfringecor.hlp
+    1. 	When not clipping the first 3 lines of the illumination were always
+	zero.
+    2.  The clipping algorithm had several errors.
+    3.  It was unclear what a box size of 1. meant and whether one could
+	specify the entire image as the size of the box.
+    4.  The smoothing box has been generalize to let the user chose the minimum
+	and maximum box size.  This lets the user do straight box smoothing
+	and the growing box smoothing. (2/2/88 Valdes)
+
+noao$imred/ccdred/src/ccdtypes.h
+    Added the comparison CCD image type. (1/21/88 Valdes)
+
+noao$imred/ccdred/src/t_mkskycor.x
+noao$imred/ccdred/src/t_mkillumcor.x
+noao$imred/ccdred/src/t_mkskyflat.x
+noao$imred/ccdred/src/t_mkillumflat.x
+noao$imred/ccdred/src/t_mkfringecor.x
+    Calling sequences to the set_ procedures were wrong. (1/20/88 Valdes)
+
+noao$imred/ccdred/src/imcscales.x
+    The exposure time is now read as real. (1/15/88 Valdes)
+
+noao$imred/ccdred/src/corinput.gx
+    Discovered an initialization bug which caused the fixing of bad lines
+    to fail after the first image.  (11/12/87 Valdes)
+
+noao$imred/ccdred/ccdtest/observe.cl
+noao$imred/ccdred/ccdtest/subsection.cl
+noao$imred/ccdred/ccdtest/demo.dat
+    Made modification to allow the demo to work with STF format images.
+    The change was in being more explicit with image extensions; i.e.
+    obs* --> obs*.??h.  (11/12/87 Valdes)
+
+noao$imred/ccdred/src/mkpkg
+noao$imred/ccdred/src/ccdmean.x		 +
+noao$imred/ccdred/src/ccdcache.h	 +
+noao$imred/ccdred/src/ccdcache.com
+noao$imred/ccdred/src/ccdcache.x
+noao$imred/ccdred/src/t_ccdproc.x
+noao$imred/ccdred/src/ccdproc.x
+noao$imred/ccdred/src/ccdcheck.x
+noao$imred/ccdred/src/setflat.x
+noao$imred/ccdred/src/setdark.x
+noao$imred/ccdred/src/setzero.x
+noao$imred/ccdred/src/setfixpix.x
+noao$imred/ccdred/src/setillum.x
+noao$imred/ccdred/src/setfringe.x
+noao$imred/ccdred/src/t_ccdlist.x
+    1.  There was a recursion problem caused by the absence of the CCDPROC
+	flag in a zero level image which did not need any processing
+	because there was no trimming, overscan subtraction, or bad
+	pixel correction.  The procedure CCDPROC left the image
+	unmodified (no CCDPROC flag) which meant that later another unprocessed
+	calibration image would again try to process it leading to
+	recursion.  Since I was uncomfortable with relying on the
+	CCDPROC flag I added the routine CCDCHECK to actually check
+	each processing flag against the defined operations.  This will
+	also allow additional automatic processing of calibration
+	images if the users sets new flags after an initial pass
+	through the data.  The CCDPROC flag is still set in the data
+	but it is not used.
+    2.  It is possible in data which has no object types for the flat
+	field image never to have its mean computed for later scaling.
+	There were two modifications to address this problem.  If an
+	image is processed without a ccdtype then the mean will be
+	computed at a very small cost in time.  If the image is later
+	used as a flat field this information will then be present.
+	Second, if a flat field calibration image does not have the
+	mean value, even if it has been processed, the mean value
+	will still be calculated.
+    3.  In looking at the recursion problem I realized that some of
+	the calibration images could be opened more than once, though
+	READ_ONLY, once for the image being processed and later if the
+	task has to backtrack to process a another calibration frame.  I
+	was surprise that this was not found on VMS until I realized
+	that for OIF format images the image header is read and the
+	file is then closed.  No file is actually left open until pixel
+	I/O is done.  However, this should cause STF images to fail on
+	VMS because VMS does not allow a file to be open more than once
+	and the STF image header is kept open.  I rewrote the image
+	caching interface to cache the IMIO pointer even if the pixel
+	data was not cached.  This will insure any calibration image
+	is only opened once even if it is accessed independently from
+	different parts of the program.
+    4.  The error message when using fringe and illumination correction
+	images which have not been processed by MKFRINGECOR and
+	MKILLUMCOR was misleading when refering to the absence of the
+	MKFRINGE and MKILLUM flag.  A user thought that the missing
+	flag was FRINGCOR which refers to an image being fringe corrected.
+	The message was made a little more clear.
+    5.  The CCDLIST listing for fringe correction in long format was wrong.
+    (11/12/87 Valdes)
+
+noao$imred/ccdred/src/t_combine.x
+noao$imred/ccdred/src/t_ccdhedit.x
+noao$imred/ccdred/src/setoverscan.x
+noao$imred/ccdred/src/setinput.x
+noao$imred/ccdred/src/imcscales.x
+noao$imred/ccdred/src/imclogsum.x
+noao$imred/ccdred/src/ccdlog.x
+noao$imred/ccdred/src/ccddelete.x
+    Added calls to XT_STRIPWHITE to allow null strings to be recognized
+    with whitespace.  It should probably use NOWHITE but this would make
+    it incompatible with V2.5.  (11/6/87 Valdes)
+.endhelp

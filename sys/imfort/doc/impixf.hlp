@@ -1,0 +1,53 @@
+.help impixf Sep86 imfort
+.ih
+NAME
+impixf -- get the physical attributes of the pixel file
+.ih
+SYNOPSIS
+.nf
+subroutine impixf (im, pixfd, pixfil, pixoff, szline, ier)
+
+integer		im		#I image descriptor of open image
+integer		pixfd		#O BFIO file descriptor of pixel file
+character*(*)	pixfil		#O host filename of pixel file
+integer		pixoff		#O 1-indexed "char" offset of pixels
+integer		szline		#O "chars" per physical image line
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimpixf\fR procedure is used to obtain information describing the
+physical layout of the pixel segment of an image in a binary disk file.
+The pixel array of an image accessible via the IMFORT interface is stored
+externally in the host file \fIpixfil\fR in line storage mode (as in a
+Fortran array).  Each line of the image is stored as a contiguous array of
+pixels accessible via a BFIO \fIbfread\fR or \fIbfwrit\fR request at the
+offset of the first pixel in the line.  The first image line (beginning at
+pixel [1,1,1,...]) is stored at the file offset given by \fIpixoff\fR.
+Each line consumes exactly \fIszline\fR chars of storage; lines may be
+blocked to fill an integral number of disk blocks for more efficient access,
+hence \fIszline\fR is not directly computable from \fIaxlen(1)\fR.
+
+Since \fIimpixf\fR is called on an open image, the pixel file will already
+have been opened for random access buffered binary file i/o via the BFIO
+interface.  The BFIO file descriptor of the open pixel file is returned in
+\fIpixfd\fR.  This may be used in conjunction with BFIO to directly access
+the pixel data.  If the pixel data is to be accessed via explicit calls
+to lower level host system facilities, the image should first be closed
+with \fIimclos\fR to avoid possible problems with having the same file
+opened multiple times.
+.ih
+RETURN VALUE
+A zero status is returned for any image which has a valid image descriptor.
+
+IE_MAGIC:	illegal imfort image descriptor
+.ih
+NOTES
+Programs which make use of the information provided by \fIimpixf\fR have
+explicit knowledge of the physical image storage format and hence may not
+work with future versions of the IMFORT interface supporting new physical
+image storage formats.
+.ih
+SEE ALSO
+imgsiz, imgs, imps, imgl, impl, bfread, bfwrit
+.endhelp

@@ -1,0 +1,37 @@
+.help zzrdmt May84 "System Interface"
+.ih
+NAME
+zzrdmt -- asynchronous read from a magtape file
+.ih
+SYNOPSIS
+.nf
+zzrdmt (chan, buf, maxbytes)
+
+int	chan			# OS channel of magtape file
+char	buf[maxbytes]		# output buffer to receive data
+int	maxbytes		# capacity of buffer
+.fi
+.ih
+DESCRIPTION
+Initiate a read of at most \fImaxbytes\fR bytes from channel \fIchan\fR into
+the buffer \fIbuf\fR.  If the physical file block is larger than \fImaxbytes\fR
+bytes the additional data will be discarded.  Each call to \fBzzrdmt\fR reads
+one tape block.  Successive tape blocks may vary in size.
+.ih
+RETURN VALUE
+The wait primitive \fBzzwtmt\fR must be called after every asynchronous read
+to get the transfer status.  ERR is returned if a read error occurs or if the
+channel number is illegal.  If the read operation is successful the actual
+number of bytes read is returned; zero is returned for a read at EOF.
+.ih
+NOTES
+The transfer is NOT guaranteed to be asynchronous and the calling program
+must not assume that \fBzzrdmt\fR will return immediately.
+The \fBzzwtmt\fR primitive must be called and the status checked before
+issuing another i/o request to the channel.  Only a single request may be
+pending on a channel at a time.  A request to read zero bytes is considered
+to be an error to avoid confusion with a read at EOF.
+.ih
+SEE ALSO
+zzopmt, zzwtmt, zfiomt
+.endhelp

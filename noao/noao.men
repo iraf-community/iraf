@@ -1,0 +1,11 @@
+        artdata - Artificial data generation package
+     astrometry - Astrometry package
+        astutil - Astronomical utilities package			[up]
+       digiphot - Digital stellar photometry package                    [up]
+          focas - Faint object classification and analysis package
+          imred - Image reductions package				[up]
+        mtlocal - Magtape i/o for special NOAO format tapes		[up]
+       onedspec - One dimensional spectral red & analysis package	[up]
+	  proto - Prototype (temporary, contributed) tasks		[up]
+       surfphot - Galaxy isophotal analysis package
+       twodspec - Two dimensional spectral red & analysis package	[up]

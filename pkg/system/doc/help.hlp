@@ -1,0 +1,201 @@
+.help help Jun86 system
+.ih
+NAME
+help -- print online documentation for the named modules or packages
+.ih
+USAGE
+help [template]
+.ih
+PARAMETERS
+.ls template
+A string listing the modules or packages for which help is desired.
+Each list element may be a simple name or a pattern matching template.
+Abbreviations are permitted.  If \fItemplate\fR is omitted a long format
+menu will be printed for the current package, listing each task (or
+subpackage) and describing briefly what it is.
+.le
+.ls file_template = no
+If this switch is set the template is interpreted as a filename matching
+template, and all help blocks found in the named files are output.  The help
+database is not searched, hence manual pages can be printed or documents
+may be formatted without entering the files into a help database.
+In other words, "help file.hlp fi+" makes it possible to use \fIhelp\fR as
+a conventional text formatter.
+.le
+.ls parameter = "all"
+If the value of this parameter is not "all", only the help text
+for the given parameter will be printed.
+.le
+.ls section = "all"
+If the value of this parameter is not "all", only the help text for the
+given section (e.g. "usage", "description", "examples") will be printed.
+.le
+.ls option = help
+The option parameter specifies the type of help desired, chosen from
+the following:
+.ls
+.ls help
+Print the full help block for the named module.
+.le
+.ls source
+Print the source code for the module (which often contains additional
+detailed comments).
+.le
+.ls sysdoc
+Print the technical system documentation for the named module.
+.le
+.ls directory
+Print a directory of all help blocks available for the named package.
+.le
+.ls alldoc
+Print all help blocks in the file containing the help block for
+the named procedure (i.e., both the user and system documentation).
+.le
+.ls files
+Print the names of all help files associated with the named modules or
+packages.
+.le
+.ls summary
+Print only the titles and sizes of help blocks in referenced help files.
+The contents of the blocks are skipped.  Titles are printed for \fIall\fR
+help blocks found in the file containing the help block for the named module.
+.le
+.le
+.le
+.ls page = yes
+Pause after every page of output text.  Turning this off for large documents
+speeds up output considerably.
+.le
+.ls nlpp = 59
+The number of lines per page if output is redirected, e.g., to \fIlprint\fR.
+.le
+.ls lmargin = 1
+Left margin on output.
+.le
+.ls rmargin = 72
+Right margin on output.
+.le
+.ls helpdb = "helpdb"
+The filename of the help database to be searched.  If the \fIvalue\fR of the
+parameter is the reserved string "helpdb", the actual filename is the value
+of the CL environment variable \fIhelpdb\fR.
+.le
+.ls device = "terminal"
+Output device if the standard output is not redirected.  If the \fIvalue\fR of
+the parameter is the reserved string "terminal",  the actual device name is
+the value of the CL environment variable \fIterminal\fR.  Only terminal
+devices are permitted; \fBhelp\fR will not write directly to a printer device.
+The special device \fItext\fR should be specified if the output is to be
+saved in a text file for use outside of IRAF (otherwise, \fIhelp\fR inserts
+control codes into the text for pagination, figures, standout mode, etc.).
+.le
+.ih
+BASIC USAGE
+Despite the complex appearing hidden parameters, \fBhelp\fR is easy to use
+for simple tasks.  \fBHelp\fR is most commonly used to get help on the current
+package, and to get help on a program named in a CL menu.  To get help on
+the current package one need only type \fBhelp\fR without any arguments.
+For example, if the current package is \fBplot\fR, the command and its output
+might appear as follows:
+
+.nf
+	pl> help
+		contour - Make a contour plot of an image
+		  graph - Graph one or more image sections or lists
+		   pcol - Plot a column of an image
+		  pcols - Plot the average of a range of image columns
+		   prow - Plot a line (row) of an image
+		  prows - Plot the average of a range of image lines
+		surface - Make a surface plot of an image
+	pl>
+.fi
+
+To get help on a module one supplies the module name as an argument,
+
+	pl> help graph
+
+and the manual page for the \fBplot.graph\fR program will be printed on the
+terminal.  To get a hardcopy of the manual page on the printer, the output
+may be redirected to the line printer, as follows:
+
+	pl> help graph | lprint
+.ih
+DESCRIPTION
+The function of the \fBhelp\fR program is to perform a depth first search
+of the help database \fIhelpdb\fR, printing help for all packages and modules
+matching the template.  By default the standard IRAF help database is searched,
+but any other help database may be searched if desired.  A help database is
+precompiled with the \fBmkhelpdb\fR program to speed up runtime searches for
+help modules.  The standard IRAF help database contains the documentation and
+source for all CL programs and system and math library procedures installed
+in IRAF.
+
+A help template is a string type parameter to the CL.  The form of a template
+is a list of patterns delimited by commas, i.e.,
+
+	"pattern1, pattern2, ..., patternN"
+
+The form of a pattern is
+
+	package_pattern.module_pattern
+
+If the "." is omitted \fImodule_pattern\fR is assumed.  The standard pattern
+matching metacharacters, i.e., "*?[]", are permitted in patterns.
+Simple patterns are assumed to be abbreviations.
+.ih
+EXAMPLES
+
+1. Print the help text for the program \fIdelete\fR in the package
+\fIsystem\fR (output will be directed to the terminal):
+
+.nf
+	cl> help system.delete
+or
+	cl> help delete
+or
+	cl> help del
+.fi
+
+2. Print the help text on the line printer:
+
+	cl> help delete | lprint
+
+3. Print help for the current package:
+
+	cl> help
+
+4. Print the usage section of all modules in the package \fBimages\fR:
+
+	cl> help images.* section=usage
+
+5. Print a directory of all help blocks in the packages \fBclpackage\fR
+and \fBclio\fR (and any others whose names begin with the string "cl"):
+
+	cl> help cl* op=dir
+
+6. Print a directory of each package in the database (useful for getting an
+overview of the contents of a help database):
+
+	cl> help * op=dir
+
+7. Print the source for all of the string utilities in the system library
+package \fBfmtio\fR:
+
+	cl> help fmtio.str* op=source
+
+8. Find all tasks that delete something:
+
+	cl> help * | match delete
+
+9. Print the manual pages for the \fIhelp\fR and \fIlprint\fR tasks on the
+default printer device:
+
+	cl> help help,lprint | lpr
+.ih
+BUGS
+On some systems, typing the next command keystroke before the end-of-page
+prompt is printed may result in the character being echoed (messing up the
+output) and then ignored when raw mode is enabled for the prompt.
+.ih
+SEE ALSO
+mkhelpdb, hdbexamine, mkmanpage, lroff

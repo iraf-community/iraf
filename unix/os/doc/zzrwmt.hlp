@@ -1,0 +1,31 @@
+.help zzrwmt May84 "System Interface"
+.ih
+NAME
+zzrwmt -- rewind magtape
+.ih
+SYNOPSIS
+.nf
+zzrwmt (chan, status)
+
+int	chan			# OS channel of magtape
+int	status
+.fi
+.ih
+DESCRIPTION
+A rewind of the magnetic tape opened on channel \fIchan\fR is initiated.
+.ih
+RETURN VALUE
+ERR is returned if the tape is offline or if \fIchan\fR is illegal.
+OK is returned if the operation is successful.
+.ih
+NOTES
+The rewind is not guaranteed to be asynchronous.  There is no wait primitive
+for the rewind operation; it is assumed that the host driver or the kernel
+will automatically suspend any further tape motion commands issued before
+the rewind is completed.  If the host system does not have the ability to
+asynchronously rewind a magtape then \fBzzrwmt\fR is equivalent to a call
+to \fBzzopmt\fR to open file 1 on a tape.
+.ih
+SEE ALSO
+zzopmt, zfiomt
+.endhelp

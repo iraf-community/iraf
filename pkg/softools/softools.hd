@@ -1,0 +1,19 @@
+# Help directory for the SOFTOOLS (software tools) package.
+
+$help		= "pkg$system/help/"
+$lroff		= "pkg$system/help/lroff/"
+
+generic		hlp = host$boot/generic/generic.hlp
+hdbexamine	hlp = help$hdbexamine.hlp
+lroff		hlp = lroff$lroff.hlp
+mkhelpdb	hlp = help$mkhelpdb.hlp
+mkmanpage	hlp = mkmanpage.hlp
+mkpkg		hlp = host$boot/mkpkg/mkpkg.hlp
+mktags		hlp = mktags.hlp
+mkttydata	hlp = mkttydata.hlp
+rmbin		hlp = host$boot/rmbin/rmbin.hlp"
+rmfiles		hlp = host$boot/rmfiles/rmfiles.hlp"
+rtar		hlp = host$boot/rtar/rtar.hlp"
+wtar		hlp = host$boot/wtar/wtar.hlp"
+xc		hlp = host$boot/spp/xc.hlp"
+xyacc		hlp = host$boot/xyacc/README"

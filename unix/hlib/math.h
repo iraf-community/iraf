@@ -1,0 +1,29 @@
+# MATH.H -- Definitions of various mathematical constants.
+# Values are given to 20 decimal places.
+# From Abramowitz & Stegun, Handbook of Mathematical Functions, Ch. 1.
+# LN	denotes	natural logarithm
+# LOG	denote	base 10 logarithm
+
+define	SQRTOF2		1.4142135623730950488
+
+define	E		2.7182818284590452353
+define	EXP_PI		23.140692632779269006
+
+define	LN_2		.69314718055994530942
+define	LN_10		2.3025850929940456840
+define	LN_PI		1.1447298858494001741
+define	LOG_E		.43429448190325182765
+
+define	PI		3.1415926535897932385
+define	TWOPI		6.2831853071795864769
+define	FOURPI		12.566370614359172953
+define	HALFPI		1.5707963267948966192
+define	SQRTOFPI	1.7724538509055160273
+
+define	RADIAN		57.295779513082320877
+define	RADTODEG	(($1)*RADIAN)
+define	DEGTORAD	(($1)/RADIAN)
+
+define	GAMMA		.57721566490153286061	# Euler's Constant.
+define	LN_GAMMA	-.54953931298164482234
+define	EXP_GAMMA	1.7810724179901979852

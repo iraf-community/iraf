@@ -1,0 +1,6 @@
+XPP -- First pass of the SPP preprocessor.
+
+    This directory contains the Lex and C sources for the first pass of the
+preprocessor for the IRAF SPP (subset preprocessor) language.  XPP takes as
+input an SPP source file and produces as output a text file which is further
+processed by RPP (the second pass) to produce Fortran.

@@ -1,0 +1,17 @@
+NOAO -- A suite of IRAF based packages for the reduction and analysis of
+Optical Astronomy data.
+
+    artdata	artificial data generation
+    astrometry	astrometric routines
+    astutil	general astronomy oriented utilities
+    digiphot	digital stellar photometry
+    filterphot	filter photometry reductions
+    focas	faint object classification and analysis
+    imred	image reductions
+    mtlocal	data i/o programs for custom NOAO data formats
+    onedspec	one dimensional spectra
+    proto	miscellaneous prototype quality tasks
+    surfphot	surface photometry package
+    twodspec	two dimensional spectra
+
+Not all of these packages are necessarily implemented.

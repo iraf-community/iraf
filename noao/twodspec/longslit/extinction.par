@@ -1,0 +1,5 @@
+# Parameter file for task extinct.
+
+input,s,a,,,,Images to be extinction corrected
+output,s,a,,,,Extinction corrected images
+extinction,f,h,onedstds$kpnoextinct.dat,,,Extinction file

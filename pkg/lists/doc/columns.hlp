@@ -1,0 +1,38 @@
+.help columns Nov88 lists
+.ih
+NAME
+columns -- break a multicolumn list into multiple single column lists
+.ih
+USAGE
+columns filename numcols 
+.ih
+PARAMETERS
+.ls filename
+Name of the input table file.
+.le
+.ls numcols
+The number of columns in the input file.
+.le
+.ls outroot = "col."
+Root name of the output column files.
+.le
+.ih
+DESCRIPTION
+Task \fIcolumns\fR is used to reformat a multicolumn list file into separate
+files, such that one output file is created for each column in the input
+file.  It is used to break multicolumn tables into simple CL lists.
+Comment lines beginning with  the character "#" are ignored.  All data
+is transferred as text.  One file \fBoutroot\fRn is produced for each
+column in the input table.
+.ih
+EXAMPLES
+Make 3 files named datacol.1, datacol.2 and datacol.3 from the 3 column
+table dtable:
+.nf
+
+    cl> columns dtable 3 outroot=datacol.
+.fi
+.ih
+SEE ALSO
+fields
+.endhelp

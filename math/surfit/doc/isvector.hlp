@@ -1,0 +1,41 @@
+.help isvector Aug85 "Surfit Package"
+.ih
+NAME
+isvector -- evaluate the fitted surface at a set of points
+.ih
+SYNOPSIS
+isvector (sf, x, y, zfit, npts)
+
+.nf
+pointer	sf		# surface grid descriptor
+real	x[npts]		# x array, 1 <= x[i] <= ncols
+real	y[npts]		# y array, 1 <= y[i] <= nlines
+real	zfit[npts]	# data values
+int	npts		# number of data points
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface grid descriptor structure.
+.le
+.ls x, y
+Arrays of x and y values.
+.le
+.ls zfit
+Array of fitted values.
+.le
+.ls npts
+The number of points to be fit.
+.le
+.ih
+DESCRIPTION
+Fit the surface to an array of x and y values. ISVECTOR uses the coefficients
+stored in the surface descriptor structure.
+.ih
+NOTES
+Checking for out of bounds x and y values is the responsibility of the
+calling program.
+.ih
+SEE ALSO
+iseval
+.endhelp

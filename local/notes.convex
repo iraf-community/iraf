@@ -1,0 +1,761 @@
+Begin V2.8 CONVEX/IRAF BETA port, 6-8 August 1989.
+See also notes from October 1987 ALPHA port (appended).
+-------------------------------------------------------
+
+Summary:
+	Installation of V2.8 was straightforward except for a nasty bug
+	involving the host routine BCOPY.  I originally tried to use the
+	C code versions of AMOVC etc. (installed in AS).  This caused the
+	system environment list to become mangled, due to BCOPY modifying
+	the data it was copying during a copy used to shift by one char
+	to align the buffer in a REALLOC of the environment buffer.  The
+	speculation is that the BCOPY uses vector instructions, and if the
+	input and output arrays are aligned to within less than one vector
+	register length data can be corrupted due to the whole vector
+	segment being copied at once.
+
+	Aside from that, things came up fine.  There were several compiler
+	crashes with core dumps, but all but one of these were a result of
+	problems with the IRAF code or system configuration.  In general
+	the compiler seems to be in much better shape than during the
+	alpha port.
+
+	The final system is configured as follows: the HSI is generic (no
+	floating point, can run on any Convex), and two architectures are
+	supported, IEEE and NATIVE, corresponding to the two floating point
+	architecture options available for the Convex.
+
+	Detailed notes on the modifications made to port V2.8 BSD/IRAF follow.
+
+unix/as.convex/
+unix/as.convex/zsvjmp.s
+unix/bin.convex/
+	Added AS and BIN directories to the HSI for the Convex.  Installed
+	the zsvjmp.s written for the alpha port.
+
+unix/boot/bootlib/osputenv.c
+	Commented out the call to putenv() - there is no comparable facility
+	on the Convex.
+
+unix/boot/spp/mkxc.sh
+	Fixed a bug - the call to CC was not referencing $HSI_CF.
+
+unix/boot/spp/rpp/rppfor/declco.f
+	Replaced by a version that enables IMPLICIT NONE, which is how
+	undeclared variable detection is handled by the Convex compiler.
+
+unix/boot/spp/rpp/ratlibf/mkpkg.sh
+unix/boot/spp/rpp/rppfor/mkpkg.sh
+	Replaced the F77 by FC, the Convex fortran compiler.  There is no
+	F77 on the Convex.
+
+unix/boot/spp/xc.c
+	1. Replaced all F77 references by FC.
+	2. The link library list for the Convex is
+		-lF77 -lI77 -lD77 -lm -lmathC1
+	3. Modified the list of directories searched by sys() (for XPP and
+	RPP) to include /local/bin, /usr/local/bin, and /iraf/local/bin.
+	Merely another hack until the problem is fixed properly.
+	4. Modified the list of directories searched by run() (for FC) to
+	include /usr/convex, which is where FC resides on the Convex
+	(another hack until the problem is properly resolved).
+
+unix/boot/spp/xpp/xppcode.c
+	This HSI file turned out to have code in it (for converting HMS to
+	decimal floating) that used floating point.  Replaced by an
+	equivalent routine which uses only integer calculations.
+
+unix/hlib/iraf.h
+	The bitwise intrinsics for the Convex are IAND, IOR, IEOR, and NOT.
+
+unix/hlib/i1mach.f
+unix/hlib/r1mach.f
+unix/hlib/d1mach.f
+	Replaced by the Sun versions.
+
+unix/hlib/mkpkg.sf.CX
+noao/lib/mkpkg.sf.CX
+	Added special file lists for the Convex.  At present there is only
+	one special file, images$geometry/geofit.x, which has to be compiled
+	at O1 due to a fortran compiler bug.
+
+unix/hlib/irafuser.csh
+unix/hlib/libc/iraf.h
+unix/hlib/libc/libc.h
+unix/hlib/mkiraf.csh
+unix/hlib/mkpkg.inc
+unix/hlib/motd
+	Routine changes for the Convex.  Added a #define CONVEX to <iraf.h>.
+	MACH is set to `convex' in the irafuser.csh.  The HSI flags are
+
+	    setenv	HSI_CF	"-O -fx"
+	    setenv	HSI_FF	"-sa -fx -O0 -na -nv -nw"
+	    setenv	HSI_XF	"-q -/sa -/fx -/O0 -/na -/nv -/nw -z"
+
+	The MKPKG flags for the IEEE architecture are
+
+	    $set	FLOAT	= "fi"
+	    $set	XFLAGS	= "-c -q -/sa -/fi -/O2 -/na -/nw -/nv"
+	    $set	XSFLAGS	= "-c -q -/sa -/fi -/O1 -/na -/nw -/nv"
+	    $set	XVFLAGS	= "-c -q -/sa -/fi -/O2 -/na -/nw"
+	    $set	LFLAGS	= "-z -/fi"
+
+	and similarly for the NATIVE (Convex floating point) architecture.
+
+unix/os/getproc.c
+	This file, part of the tape drive allocation code, would not compile
+	on the Convex (it reads the kernel process table which is fairly
+	system dependent).  Commented out the offending code (a status value
+	is returned indicating that the user does not have any processes)
+	until the tape drive allocation problem can be resolved for the
+	Convex.
+
+unix/os/irafpath.c
+	Modified to look for files in unix/bin.convex if the machine type
+	is convex.
+
+unix/os/zxwhen.c
+	Added FPE hardware signal codes from <signal.h>.
+
+mkpkg
+noao/mkpkg
+bin.ieee/
+bin.native/
+noao/bin.ieee/
+noao/bin.native/
+noao/lib/mkpkg.inc
+unix/hlib/cl.csh
+unix/hlib/mkpkg.inc
+	Configured the system for two architectures, IEEE and NATIVE,
+	corresponding to the two floating point options on the Convex.
+	The HSI is compiled generic (no floating point dependencies),
+	hence is runnable on either type of Convex.
+
+dev/pix.imh
+dev/pix.pix
+dev/vdm.gki
+	Installed versions for the Convex (IEEE architecture only!).
+
+sys/gio/nspp/sysint/encd.f
+	Fixed a bug in this file - this was fixed once before but evidently
+	never got merged back into the master system.  The problem is the
+	statement
+
+	    if (len (char (ns + ichar ('0'))) .eq. 2) then
+
+	which is evidently unnecessary and which makes an illegal or at
+	least very questionable use of CHAR.
+
+sys/gio/ncarutil/sysint/ishift.x
+sys/gio/nspp/sysint/ishift.x
+	Commented out the code for IAND and IOR, since these are intrinsic
+	functions in Convex/Fortran.
+
+unix/hlib/install
+	Changed the machine type from `vax' to `convex'.
+
+----------
+Basic BETA port completed.  (8/8)
+
+----------
+August 8-10: on site at the VLA testing IRAF on the VLA system, which
+includes two Convexes (plus some Suns and VAXes).
+
+dev/devices
+	Configured for the Convex.  (8/11)
+
+unix/hlib/login.cl
+	Added EDT and EMACS as foreign tasks to the default USER package.
+	(8/11)
+
+unix/as/zsvjmp.s
+	An IMAGES task failed during testing while trying to create a type
+	DOUBLE image, indicating that the MEM common was not double word
+	aligned.  I was able to fix this by setting the symbol __mem_ (the
+	mem common) to the absolute value 0, which not only double word
+	aligns the common, it aligns it to any size, and simplifies 
+	debugging by arranging for SPP pointers to directly index process
+	virtual memory.  This technique (setting __mem_ to zero) did not
+	work for the Convex back when the alpha port was attempted.  (8/12)
+
+	[Postscript]  Setting mem to zero evidently was the cause of a
+	number of mysterious program crashes that occurred once the system
+	was relinked with the new zsvjmp.o with mem=0.  The problems went
+	away when things were relinked with the mem=0 commented out,
+	indicating that the mem=0 was the problem.  There was not time
+	to check this out, but my guess is that since on the Convex program
+	memory begins at 0x80000000, setting mem=0 causes very large pointer
+	offsets which can overflow to negative integer values.  I changed
+	zsvjmp.s to set mem=0x80000000 and the problems seem to have gone
+	away, and we still get double word alignment.  (8/13)
+
+unix/hlib/ic.csh +
+unix/hlib/install
+unix/hlib/login.cl
+unix/boot/spp/xc.c
+	Had problems getting IMFORT programs to link.
+	1. The solution was to modify XC (FC) to link against the Convex
+	library -lU77 when linking a host program.  This can only be done
+	when XC is called with the -h flag as the library will result in
+	a multiply defined loader error message if searched when linking
+	an SPP program.
+	2. The iraf foreign task FC now calls a new cshell script ic.csh,
+	which calls XC after first determining the floating point option
+	switch required to link IMFORT programs so that they are consistent
+	with IRAFARCH.  For example, if Convex/IRAF is running the IEEE
+	binaries, XC will be called with -/fi.
+	3. Modified the install script to make a link for ic.csh.  The new
+	task name stands for imfort-compile, and is not called FC because
+	that is the Convex Fortran compiler.  Possibly FC should not be
+	used as the command name in the USER package either, but I did
+	not want to change that as it is shown as FC in all the user
+	documentation.  (8/12)
+
+unix/hlib/cl.csh
+	Modified to define IRAFARCH if not already defined.  (8/12)
+
+unix/os/alloc.c
+	Modified to support the Convex tape allocation facilities.  Uses
+	the Convex TPALLOC and TPDEALLOC utilities to perform the actual
+	tape allocate/deallocate.  As a result, alloc.e no longer needs
+	to have suid-root, although the install script will still install
+	it that way.  Verified that local as well as remote network
+	allocation works.  (8/12)
+
+pkg/images/imarith/imcmode.gx
+	IMCOMBINE would fail when presented with a section containing pixels
+	that all had the same value.  The program would go into an infinite
+	loop in the code at the end of imcmode.gx.  Modified to avoid a
+	floating point equality test, and to add some limit checking in
+	a couple of places to avoid infinite looping.  (8/13)
+
+unix/hlib/mkfloat.csh
+	1. While using "mkpkg [ieee|generic]" etc. on teh Convex, the message
+	"usage: rm -[rif]" would sometimes appear.  This turned out to be due
+	to calling rm with a null file list when restoring from generic.
+	The fix was to to delete the file list file in the same command
+	which deletes the listed files, ensuring that there is at least
+	one file in the command.
+	2. Also reorganized the code somewhat to use only one RMBIN rather
+	than two, which speeds it up by a factor of two.  (8/14)
+
+unix/os/zmaloc.c
+	IMFORT programs would die on a memory allocator error: this was
+	traced to the fact that the custom memory allocator used for
+	BSD4.3/IRAF was still present in Convex/IRAF (which was built from
+	the BSD version).  Commented out the memory debug code in zmaloc.c
+	and all was well.  We will leave the applications relinked with the
+	custom memory allocator in for now, since they have already been
+	tested and did not show any problems.  (8/14)
+
+----------
+ALPHA port notes follow.
+
+CONVEX/IRAF Port.  D.Tody, beginning 26 October 1987.
+Using machine in Greenbelt, MD, as follows:
+-----------------------------------------------------------------------------
+	*********************************************************
+                        WELCOME  TO  C1EAST
+	*********************************************************
+	SYSTEM MANAGERS:  BRIAN CHRISTIANSON & DALE LANCASTER
+
+C1EAST  IS  A  CONVEX  C1-XP  MINI-SUPERCOMPUTER.
+
+	-  128 MEGABYTES OF PHYSICAL MEMORY 
+	-  1.5 GIGABYTES OF DISK SPACE
+	-  40 MFLOPS PEAK PERFORMANCE
+
+C1EAST IS CONFIGURED WITH:
+
+	-  25.6 MEGABYTES OF DISK BUFFER CACHE
+	-  64 USER SYSTEM
+	-  ETHERNET
+	-  IMAGEN LASER PRINTER
+
+	-  4.2 BSD UNIX, CONVEX RELEASE 6.1.1
+	-  VECTORIZING FORTRAN VERSION 3.0 
+	-  VECTORIZING C VERSION Beta 2.0 (vc 1.0 is still around)
+	-  ANSYS VERSION 4.2
+-----------------------------------------------------------------------------
+
+Snapshot of V2.6 IRAF restored to disk (/extra/iraf) by Convex.  (10/26)
+Logged in via modem, took a look at Convex/UNIX, configured the IRAF login.
+
+unix/as -> unix/as.vax
+unix/as/zsvjmp.s
+	Renamed the VAX assembler directory, and set up a new one for the
+	Convex.  Wrote ZSVJMP/ZDOJMP for the Convex.  This took a while,
+	and was one of the harder ones I have done, as the architecture and
+	the C setjmp/longmp are complex.  The machine has a RISC architecture
+	but nonetheless is fairly complex (and fast and expensive).  (11/2)
+
+unix/os/zxwhen.c
+	Modified the hardware specific exception codes table for the Convex.
+	In the process of doing this, discovered that the old code assumed
+	that hardware codes were distinct, while in fact they can be
+	numbered similarly for different signals.  Modified the ZXGMES
+	routine to work with hardware codes of the form SIGNAL+HWCODE rather
+	than the old HWCODE.  (11/2)
+
+unix/boot/spp/rpp/ratlibf/mkpkg.sh
+unix/boot/spp/rpp/rppfor/mkpkg.sh
+	Replaced "f77" by "fc".  (11/2)
+
+unix/hlib/irafuser.csh
+	Added an "-sa" flag for fc (the Convex Fortran compiler).  This flag
+	prevents static compilation of argument lists and is necessary if C
+	code is to be called from Fortran.  (11/2)
+
+unix/hlib/libc/spp.h
+unix/hlib/libc/libc.h
+unix/hlib/libc/iraf.h
+	Replaced the vax spp.h by the Sun version, which should be good
+	enough for now, and may even be correct (Convex evidently supports
+	IEEE floating as well as their native (Cray?) format).  Modified
+	the Fortran COMMON external names in libc.h to add the extra
+	leading underscore, used by the Convex Fortran compiler to make
+	common external names distinct from other Forran externals.
+	Edited the iraf.h file for the new $iraf (= /extra/iraf).  (11/2)
+
+unix/hlib/motd
+	Modified logo for the Convex.  (11/2)
+
+-------------------------------------
+Started up a bootstrap of the HSI.  This completed without incident, except
+for a great many copies of the following warning messages from FC:
+
+	Obsolete flag '-O' - flag '-no' assumed.
+	fc: Warning on line X of Y.f: label defined but never referenced.
+
+Modified HSI_FF (fc flags) in hlib$irafuser.csh to "-O1 -sa -nw" and repeated
+the bootstrap starting in the SPP directory.  This worked, but now the
+optimizer was enabled, and it helpfully produced a zillion of the following
+advisory messages:
+
+	fc: Advisory on line X of Y.f: more optimization is possible if this
+	function call has no side effects.
+
+Changed the flags to "-O1 -sa -nw -na" to fix this.  Tested the main HSI
+tasks (rmbin, rtar, wtar, mkpkg, xpp, rpp) and they all passed basic tests!.
+(11/2)
+
+unix/hlib/i1mach.f
+unix/hlib/d1mach.f
+unix/hlib/r1mach.f
+	Installed the versions for the Sun (IEEE floating etc.) for now.
+	This will probably need to be tweaked later.  (11/3)
+
+unix/hlib/iraf.h
+	Modified the name mappings for the bitwise intrinsic functions (and,
+	or, etc.).  For the Convex they are the same as in VMS Fortran.
+	Set values of INDEFR and INDEFD, as below.  (11/3)
+
+unix/boot/spp/xpp/xppcode.c
+	Changed the Fortran mappings of the SPP "char" and "short" type
+	coercion functions to "int2", which is implemented on the Convex.
+	(11/3)
+
+unix/boot/spp/xpp/decl.c
+	Convex Fortran supports IMPLICIT NONE, so I modified the code which
+	processes a procedure declaration to output this statement.  (11/3)
+
+unix/hlib/mach.h
+	Modified the values of various numeric constants.  The max exponent
+	for real is 38, for double is 307.  The INDEF values were modified
+	slightly.  The EPSILON values were very similar to those for the Sun.
+	Byte swapping is no - most significant byte first.  (11/3)
+
+unix/hlib/mkpkg.inc
+	Set the default compiler flags as follows:
+
+		XFLAGS	= "-cq -/O2 -/nw -/na -/nv"
+		XSFLAGS	= "-cq -/O1 -/nw -/na -/sa"
+		XVFLAGS	= "-cq -/O2"
+
+	I have added a new global flag variable XSFLAGS, to be used for the
+	VOS routines, i.e., for pure system code.  XFLAGS is for normal
+	scientific applications code, which is pure SPP or SPP/Fortran code,
+	and which would often benefit from vectorization.  System code may
+	call C routines (e.g., the kernel routines), and rarely involves
+	vector operations.  Distinguishing between the two broad classes
+	of codes is necessary on the Convex in order to permit static
+	allocation of procedure argument lists in Fortran (SPP) code.
+	If Fortran code is to call C routines, all arguments must be pushed
+	on the stack, hence this optimization option cannot be used in VOS
+	code (flag -sa disables static allocation of argument lists).
+
+	Optimization level O2 includes vectorization, O1 provides only local
+	and global scalar optimization but no vectorization.  The -n flags
+	turn off various compiler informative and warning messages, which one
+	normally will not want to see (except perhaps once during development).
+	These messages are enabled by default only for the VOPS routines.
+	(11/3)
+
+iraf$mkpkg
+sys/*/mkpkg
+	Added the line '$set XFLAGS = "$(XSFLAGS)"' to each VOS mkpkg file,
+	to override the default xflags with the xsflags.  In the root mkpkg,
+	added the $set to the "syslibs" program.  (11/3)
+
+unix/boot/spp/xc.c
+unix/boot/spp/mkxc.csh -> mkxc.sh
+	Modified XC to use "fc" rather than "f77" as the compiler; omitted
+	the -u flag, since this is done differently for Convex Fortran.
+	To the "run" code, added /usr/convex to the search path, since that
+	is where fc is located (a better solution would probably be to put
+	the path in the #define).  (11/3)
+
+local/bin/ +
+local/bin/xc -> $hlib/xc.e (etc.)
+	Only for the purposes of the port, set up a local/bin directory for
+	iraf, and put it on PATH in the .login.  This will work only for iraf,
+	but avoids having to make a request to the local system manager.
+	(11/3)
+
+------------------------------------
+Started up the first full sysgen.  (11/3)
+
+Summary of results of first full sysgen:
+	The sysgen ran to completion, but not without problems.  The spool file
+	was 19305 lines, 7205 lines when summarized (the extra stuff was
+	mostly advisory information about vectorizing the VOPS routines).
+	There were 23 serious runtime compiler errors of the form:
+
+	    fc: >>>>>   C O M P I L E R   E R R O R    <<<<<
+	    >>>>> See your system manager for help <<<<<
+	    Error : Compiler error on line X of Y.c.
+
+	These were distributed as follows:
+
+	  #times		Error Message
+
+	    16	Error : Compiler error on line 396 of misc.c.
+	     6	Error : Compiler error on line 155 of allocSReg.c.
+	     1	Error : Compiler error on line 584 of callintr.c.
+
+	Note that these are errors in the Fortran compiler, not errors in
+	the Fortran source.  The compiler routine which generated the error
+	is given in the message.  These errors prevented compilation of the
+	affected source file.
+
+	Other errors in the sysgen were [1] fc cannot compile .c files,
+	hence xc will have to be modified to call cc directly, and [2] in
+	sys/gio/ncarutil/sysint/ishift.x, functions IAND and IOR are defined
+	which appear to call themselves recursively, when the macros AND and
+	OR are expanded.  These are dealt with further below.  (11/4)
+
+local/bugs/
+local/bugs/spool.full
+local/bugs/spool.bugs
+	Created a BUGS directory for the Convex and stored therein copies of
+	all the Fortran sources which cause compiler time compiler failures,
+	plus copies of the full spooled output from the first sysgen, and an
+	edited digest of the same containing only the compiler error messages.
+	Verified that the files cannot be compiled even at optimization level 0.
+	All files compiled with optimization turned off EXCEPT one, the
+	sysint/support.f file from gio/ncarutil.  (11/4)
+
+sys/gio/ncarutil/sysint/support.f
+	The subroutine ENCD in this file contained a statement which would
+	cause the compiler to crash even with all optimization turned off.
+	The culprit is as follows:
+
+	    if (len (char (ns + ichar ('0'))) .eq. 2) then
+
+	This is a pretty strange statement, and after staring at it for
+	a while I decided that it would always be false (NS can take on
+	values only between 4 and 6) and commented it out.  Of course it
+	should not cause the complier to bomb, and I will report it to
+	Convex, but I think the code is incorrect and should be fixed.  (11/4)
+
+sys/gio/ncarutil/ishift.x
+	This file contains source for the functions IAND and IOR, written in
+	SPP and defined in terms of the SPP intrinsics AND and OR, which are
+	implemented as macro defines in hlib$iraf.h.  On the Convex these are
+	defined as the Fortran intrinsics IAND and IOR, but they are declared
+	as external functions, hence the Fortran compiler quite correctly
+	flags them as recursive references and fails to compiler the file.
+	A simple fix is to replace the calls to AND and OR by calls to the
+	OSB library functions ANDI and ORI; this is inefficient, but on the
+	Convex the calls in the NCAR code map directly to the Fortran
+	intrinsics anyhow, and if this were not the case the routines should
+	be encoded in assembler and put on the special file list.  (11/4)
+
+unix/hlib/mkpkg.sf
+	Added the 22 or so files with runtime compiler failures to the special
+	file list for CONVEX/IRAF.  Specifically:
+
+	$set	noao	= "iraf$noao/"
+	$set	XCP	= '& "$xc -cq -/no -/nw -/na &"'
+	$set	XCS	= '& "$xc -cq -/no -/sa -/nw -/na &"'
+
+	$special "sys$fio/":			fseti.x		$(XCS);
+	$special "math$iminterp/":		msifit.x	$(XCP);
+	$special "pkg$dataio/fits/":		fits_rheader.x	$(XCP)
+						fits_wheader.x	$(XCP);
+	$special "pkg$images/imarith/generic/":	imcmode.x	$(XCP);
+	$special "pkg$images/filters/":		t_convolve.x	$(XCP);
+	$special "pkg$plot/":			prows.x		$(XCP);
+	$special "pkg$utilities/":		t_curfit.x	$(XCP);
+	$special "$(noao)proto/":		t_bscale.x	$(XCP)
+						t_imscale.x	$(XCP);
+	$special "$(noao)onedspec/":		t_addsets.x	$(XCP)
+						t_bswitch.x	$(XCP)
+						t_dispcor.x	$(XCP)
+						t_flatfit.x	$(XCP)
+						t_sums.x	$(XCP)
+						t_widstape.x	$(XCP);
+	$special "$(noao)twodspec/apextract/":	excextract.x	$(XCP)
+						excstrip.x	$(XCP)
+						t_apnormalize.x	$(XCP);
+	$special "$(noao)twodspec/longslit/":	ilsetbins.x	$(XCP);
+	$special "$(noao)imred/ccdred/src/generic/":	imcmode.x $(XCP);
+	$special "$(noao)imred/dtoi/":		hdtoi.x		$(XCP);
+	(11/4)
+
+unix/boot/spp/xc.c
+	Modified to sort out .c source files and compile these separately
+	with CC (the original XC used f77, which would accept anything). (11/4)
+
+unix/as/zsvjmp.s
+	This file contains the code which attempts to set the address assigned
+	by the linker to the symbol __mem_ (the MEM common in Fortran) to 0.
+	This is not yet working on the Convex; get multiply defined symbol
+	errors.  I have commented this out for the moment in order to proceed.
+	(11/4)
+
+------------------------------------
+Second attempt at a sysgen.  Special files all compiled ok, but got loader
+errors as noted above, hence no executables.  After fixing zsvjmp.s I was
+able to successfully link an executable.  Tried running it, and wonder of
+wonders, it actually ran and produced a prompt!  The process did not quite
+run correctly, but most of the iraf main stuff was evidently working if we
+got that far, so this is encouraging.  (11/4)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf
+	I just remembered that there are a number of VOPS routines coded in
+	C in the OSB directory, which can be called by any applications code.
+	Fortran code compiled with static argument lists enabled cannot be
+	call C routines directly, so until the OSB routines can be recoded
+	in Fortran for Convex, I have added the -sa switch for applications
+	code as well as VOS code.  (11/4)
+
+----------------------------
+Third attempt at a sysgen.  Deleted all non-HSI binaries and started up a full
+sysgen.  Should work this time with all the above bug fixes.  (11/4)
+
+The sysgen completed normally, and this time suceeded in producing most of
+the executables.  The cl runs and most basic things work ok!  There are a
+number of runtime problems however, which need to be checked out.  Looking
+over the spooled output I find four more files that caused the compiler to
+crash, this time with a core dump, without even a compiler error message.
+The message from FC (indicating abnormal termination of a subprocess) is
+
+	fc: System error in /usr/convex/fskel
+
+The files causing the problem were t_imarith.x in images, and in math,
+gsaccum.x, gsrejectd.x, and isresolve.x.  Dale, my contact at Convex,
+says that there is a major new version of the Convex Fortran compiler,
+currently in beta test, and that I should try that.  I will proceed a bit
+further with the current binaries before starting up another full sysgen,
+as these have been running 8-9 hours.  (11/5)
+
+unix/hlib/mkpkg.sf
+	Added the above four files to the special file list, to be compiled
+	with optimization level -O1 rather than -O2 (no vectorization). (11/5)
+
+unix/hlib/mkpkg.sf
+	After adding the above files to the special file list and resuming
+	the compile of the gsurfit and surfit packages, more files requiring
+	special treatment were uncovered.  The total is now 34.  (11/5)
+
+-----------------------------
+With the math libraries now built, I was able to finish building the IMAGES
+package and tried out a few things - IMSTATR was about 3.5 cpusec, IMSHIFTR
+around 6+ cpusec.  Interactive plotting is not yet working due to some
+problem in the CL.  Error recovery in the CL is not yet working due to a
+problem in ZDOJMP, which has not yet been debugged.  Until this is fixed,
+any error will cause the CL to die.  (11/5)
+
+unix/boot/spp/xc.c
+	Modified to use version 4.0 of the Convex Fortran compiler.  (11/5)
+
+------------------------------------
+Sysgen 4.  Archived (local/oldfc.arc) and deleted all the old non-HSI binaries.
+Ready to start a full sysgen with the new compiler.  Will do this in such a
+way that the current executables remain intact for people to play with
+tomorrow.  (11/5)
+
+local/bugs.newfc +
+local/bugs -> local/bugs.oldfc
+	Set up separate bug directories for the old and new FC.  (11/5)
+
+unix/hlib/sf +
+unix/hlib/sf/main.x +
+unix/hlib/mkpkg.sf
+	The new sysgen has thus far compiled all the system libraries without
+	any compile time errors, hence looks much better (sysgen still in
+	progress; stay tuned).  Even with the new compiler, however, I am still
+	getting an incorrect warning message "illegal transfer out of IFERR
+	block" from the iraf main.  This was traced to the following code in
+	the main:
+
+		iferr (...)
+		    ;
+	or
+		call xerpsh
+		    ...
+		if (.not.xerpop()) then goto NN
+	    NN  continue
+
+	Even with the optimizer turned completely off, FC is chucking out the
+	call to XERPOP, causing the error message noted above.  Since this is
+	not an optimizer problem, the only way to fix it was to hack on the
+	source file.  The hacked version is in hlib$sf, and the file has been
+	added to the special file list for the new-fc.  This is a particularly
+	worrisome bug, as there may be cases such as this scattered all over
+	the system.  (11/5)
+
+-----------------------------
+Sysgen with new FC looks pretty good.  There was one fskel coredump (vectorizer
+evidently) which I will check out below.  (11/6)
+
+noao/onedspec/sensfunc/mkpkg
+noao/onedspec/sensfunc/sfgraphs.x -
+	Deleted this zero length junk file and fixed up the mkpkg.  (11/6)
+
+unix/hlib/mkpkg.sf
+	Added an entry for file dataio$reblock/reblock_file.x, which causes
+	fskel to coredump when compiled with level O2 optimization.  Entered
+	in special file list for level O1 optimization.  (11/6)
+
+unix/as/zsvjmp.s
+	Finished debugging ZSVJMP/ZDOJMP (this was the cause of the CL crashing
+	upon logout and during error recovery).  The Convex version of this
+	routine was easily the most complex I have thus far encountered.
+	The Convex architecture and instruction set is simple, no problem;
+	the problem here as the complexity of the longjmp() code used to
+	make ZDOJMP.  Instead of saving and restoring the machine context,
+	the routine actually pops successive stack frames off the machine
+	stack until it gets back to the stack frame of the ZSVJMP.  There
+	are special cases, e.g., the stack frame pushed by the OS for an
+	interrupt handler.  Twas a mess!   (11/12)
+
+-------------------------------------------------
+Resumed work on Convex port on 5 March - don't know how much time I have to
+spend on this, but a little anyhow, and maybe the compiler is better.
+
+	Cleaned up the some somewhat; moved some files to a save directory,
+	    deleted a lot of junk test files scattered about the system.
+	Redid the bootstrap without incident.
+	Deleted all binaries and started a full sysgen.  As of now (5 March
+	    5 pm) this is still in progress.  The CL and x_system.e are up
+	    and look fine.
+
+Here is the /etc/motd for the current Convex system:
+-------------------
+	*********************************************************
+                        WELCOME  TO  C1EAST
+	*********************************************************
+	SYSTEM WINGNUTS:  BRIAN CHRISTIANSON & DALE LANCASTER
+
+C1EAST  IS  A  CONVEX  C1-XP  MINI-SUPERCOMPUTER.
+	-  128 MEGABYTES OF PHYSICAL MEMORY 
+	-  1.5 GIGABYTES OF DISK SPACE
+	-  40 MFLOPS PEAK PERFORMANCE
+
+C1EAST IS CONFIGURED WITH:
+	-  12.8 MEGABYTES OF DISK BUFFER CACHE
+	-  64 USER SYSTEM
+	-  ETHERNET
+	-  IMAGEN LASER PRINTER
+	-  4.2 BSD UNIX, CONVEX RELEASE 6.1
+	-  VECTORIZING FORTRAN VERSION 4.0 with In-Lining
+	-  VECTORIZING C VERSION Beta 2.0 (vc 1.0 is still around)
+	-  ANSYS VERSION 4.2
+
+	CONVEX COVUEshell V7.0 installed. Look in /usr/doc for
+	new release notices.
+
+
+----------------------------------------------
+Resume testing yet again, this time with a new version of the Fortran
+compiler.
+
+unix/boot/spp/xc.c
+unix/hlib/mkpkg.inc
+	1. Added a new flag "-N" to XC.  Setting this flag causes XC to try to
+	use the beta test Fortran compiler, which is called as
+
+		/usr/convex/newfc/fc -B/usr/convex/newfc ...  
+
+	2. Added the -N flag to the flag macros in mkpkg.inc. (4/16)
+
+unix/as/zsvjmp.s
+unix/os/zdojmp.c +
+unix/os/mkpkg
+	Replaced the nativ ZSVJMP/ZDOJMP I originally wrote for the Convex
+	with a much simpler version which "piggybacks" on the C setjmp/longjmp.
+	The old file is zsvjmp.CONVEX.  (4/16)
+
+----------------------
+Deleted the main system binaries and started a new sysgen.  Will use the old
+HSI for now.  (4/16)
+
+	The sysgen ran to completion with minor problems.  One was the
+	appearance of the following warning message for every file, regardless
+	of the fact that none of our code uses any Convex Fortran preprocessor
+	facilities:
+
+	    fpp: WARNING: Use of fpp is being phased out; please update
+	    your program by removing uses of #define, #if, #ifdef
+
+	The second problem, more serious, what that a number of modules failed
+	to compile due to the IMPLICIT NONE statement being out of order; in
+	pointer functions, the Mem declarations were being output before the
+	IMPLICIT NONE (see below).  (4/17)
+
+unix/boot/spp/xpp/decl.c
+unix/boot/spp/rpp/rpprat/defs
+unix/boot/spp/rpp/rpprat/declco.r
+unix/boot/spp/rpp/rppfor/declco.f
+	1. In decl.c, deleted the code previously added to generate the
+	implicit none statement.  This is not the right place for it, as it
+	doesn't work for pointer functions.
+	2. In declco.r, added code to output theIMPLICIT NONE immediately
+	after a function or subroutine statement.
+	3. In defs, added a switch IMPNONE, which if defined, causes the
+	IMPLICIT NONE statements to be output.
+	4. Processed the fortran for declco.r and put it in rppfor/declco.f.
+	The defs and declco.r files were not updated on the Convex; I made
+	the changes on lyra since this is a generally useful mod, and only
+	copied the processed Fortran to the Convex.  (4/17)
+
+	... incremental sysgen now in progress...
+
+[Ran all benchmarks except [24]USER, networking, and IMLOADs.  No errors.]
+[4/18 SRo]
+[Ran all test procedures except magtape i/o; no errors.  4/27 SRo]
+
+hlib/mkpkg.sf
+	Added the following files to the special file list, to be compiled
+	with the old fc compiler, to avoid a fatal bug in the new 4.1 fc.
+
+	sys/imfort/clargs.x
+	sys/imfort/imemsg.x
+	sys/imfort/imokwl.x
+	sys/imfort/impixf.x
+	sys/imfort/imtypk.x
+	sys/gio/ncarutil/conlib/congen.f
+	sys/gio/ncarutil/conran.f
+	sys/gio/ncarutil/conrec.f
+	sys/gio/ncarutil/isosrf.f
+	sys/gio/ncarutil/threed.f
+	sys/gio/ncarutil/velvct.f
+	noao/onedspec/t_standard.x
+
+	(5/13 SRo)
+
+[Relink sysgen to replace the missing executables in bin$ prior to having ]
+[a tape cut for mailing to NOAO. (5/13 SRo)				  ]

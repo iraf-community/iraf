@@ -1,0 +1,13 @@
+# Library for the IMAGES package
+
+$checkout libpkg.a pkg$images/
+$update libpkg.a
+$checkin libpkg.a pkg$images/
+$exit
+
+libpkg.a:
+	pixlist.x	pixlist.h
+	ranges.x	<ctype.h> <mach.h>
+	setbins.x
+	sigl2.x		<imhdr.h> <error.h>
+	;

@@ -1,0 +1,38 @@
+# LONGSLIT Package
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	longslit
+	;
+
+install:
+	$move	xx_longslit.e noaobin$x_longslit.e
+	;
+
+longslit:
+	$omake	x_longslit.x
+	$link	x_longslit.o libpkg.a -lxtools -lcurfit -liminterp -lgsurfit\
+		-o xx_longslit.e
+	;
+
+libpkg.a:
+	@transform
+
+	illumination.x	<imhdr.h> <math/iminterp.h> <pkg/gtools.h>\
+			<pkg/rg.h> <pkg/xtanswer.h>
+	ilsetbins.x	<gset.h> <imhdr.h> <pkg/gtools.h> <pkg/rg.h>\
+			<pkg/xtanswer.h>
+	lstools.x	<imhdr.h>
+	response.x	<imhdr.h> <pkg/gtools.h> <pkg/xtanswer.h>
+	extinction.x	<imhdr.h> <error.h>
+	fluxcalib.x	<imhdr.h> <error.h> <math/iminterp.h>
+	airmass.x	<math.h>
+	;

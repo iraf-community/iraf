@@ -1,0 +1,36 @@
+      INTEGER FUNCTION STLU (SYMBOL, NODE, PRED, ST)
+      INTEGER SYMBOL (100)
+      INTEGER NODE, PRED, ST
+      INTEGER MEM( 1)
+      COMMON/CDSMEM/MEM
+      INTEGER HASH, I, J, NODSIZ
+      NODSIZ = MEM (ST)
+      HASH = 0
+      I = 1
+23000 IF (.NOT.(SYMBOL (I) .NE. -2))GOTO 23002
+      HASH = HASH + SYMBOL (I)
+23001 I = I + 1
+      GOTO 23000
+23002 CONTINUE
+      HASH = MOD (HASH, 43) + 1
+      PRED = ST + HASH
+      NODE = MEM (PRED)
+23003 IF (.NOT.(NODE .NE. 0))GOTO 23004
+      I = 1
+      J = NODE + 1 + NODSIZ
+23005 IF (.NOT.(SYMBOL (I) .EQ. MEM (J)))GOTO 23006
+      IF (.NOT.(SYMBOL (I) .EQ. -2))GOTO 23007
+      STLU=(1)
+      RETURN
+23007 CONTINUE
+      I = I + 1
+      J = J + 1
+      GOTO 23005
+23006 CONTINUE
+      PRED = NODE
+      NODE = MEM (PRED + 0)
+      GOTO 23003
+23004 CONTINUE
+      STLU=(0)
+      RETURN
+      END

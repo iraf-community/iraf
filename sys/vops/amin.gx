@@ -1,0 +1,20 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AMIN -- Compute the minimum of two vectors (generic).
+
+procedure amin$t (a, b, c, npix)
+
+PIXEL	a[ARB], b[ARB], c[ARB]
+int	npix, i
+
+begin
+	do i = 1, npix
+	    $if (datatype == x)
+		if (abs(a[i]) <= abs(b[i]))
+		    c[i] = a[i]
+		else
+		    c[i] = b[i]
+	    $else
+		c[i] = min (a[i], b[i])
+	    $endif
+end

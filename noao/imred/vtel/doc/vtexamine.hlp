@@ -1,0 +1,50 @@
+.help vtexamine Jan86 noao.imred.vtel
+.ih
+NAME
+vtexamine -- examine the headers and record structure of vacuum telescope files
+.ih
+USAGE
+mtexamine tape_file
+.ih
+PARAMETERS
+.ls tape_file
+Tape file, e.g. "mta1600[2]" or "mta1600".
+.le
+.ls files
+List of tape file numbers or
+ranges delimited by commas, e.g. "1-3,5-8".
+File_list is requested only if no file number is given in tape_file.
+Files will be read in ascending order, regardless of the order of the list.
+Reading
+will terminate if EOT is reached, thus a list such as "1-999"
+may be used to read all the files on the tape.
+.le
+.ls headers=yes
+Decode and print header information from each file examined.
+.le
+.ih
+DESCRIPTION
+By default, vtexamine decodes and prints header and record
+structure information for each file examined.  The header
+information can be turned off by setting headers=no.
+.ih
+EXAMPLES
+1. To see the header information and determine the record structure of all the
+files on a vacuum telescope tape and send the result to the file vtdump:
+
+.nf
+	vt> vtexamine mtb1600 1-999 > vtdump
+.fi
+
+2. To just get the record structure for the third file on a vacuum telescope
+tape the command would be:
+
+.nf
+	vt> vtexamine mtb1600[3] headers=no
+.fi
+.ih
+BUGS
+The IRAF magtape i/o routines do not permit data beyond a double EOF
+to be accessed. Therefore vtexamine cannot be used to examine tapes with
+embedded double EOFs.
+.endhelp

@@ -1,0 +1,8 @@
+# Make the SGI device host level translation programs [MACHDEP].
+
+$call	update
+$exit
+
+update:
+	! sh -x mkpkg.sh
+	;

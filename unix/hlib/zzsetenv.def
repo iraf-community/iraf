@@ -1,0 +1,75 @@
+# Global IRAF base environment list.
+
+set	clobber		= no
+set	editor		= vi
+set	filewait	= yes
+set	graphcap	= dev$graphcap
+set	imdir		= tmp$
+set	multversions	= no
+set	printer		= lpr
+set	stdgraph	= none
+set	stdimage	= imt512
+set	stdimcur	= stdimage
+set	stdplot		= qms
+set	stdvdm		= uparm$vdm
+set	termcap		= dev$termcap
+set	terminal	= vt100
+set	ttybaud		= 9600
+set	ttyncols	= 80
+set	ttynlines	= 24
+set	version		= "NOAO/IRAF V2.8EXPORT"
+
+# System directories.
+
+set	as		= "host$as/"
+set	bin		= "iraf$bin(arch)/"
+set	boot		= "host$boot/"
+set	dev		= "iraf$dev/"
+set	doc		= "iraf$doc/"
+set	hlib		= "host$hlib/"
+set	lib		= "iraf$lib/"
+set	math		= "iraf$math/"
+set	os		= "host$os/"
+set	osb		= "sys$osb/"
+set	pkg		= "iraf$pkg/"
+set	sys		= "iraf$sys/"
+
+set	clio		= "sys$clio/"
+set	dbio		= "sys$dbio/"
+set	debug		= "sys$debug/"
+set	etc		= "sys$etc/"
+set	fio		= "sys$fio/"
+set	flib		= "sys$flib/"
+set	fmio		= "sys$fmio/"
+set	fmtio		= "sys$fmtio/"
+set	gio		= "sys$gio/"
+set	imfort		= "sys$imfort/"
+set	imio		= "sys$imio/"
+set	ki		= "sys$ki/"
+set	libc		= "sys$libc/"
+set	memio		= "sys$memio/"
+set	mtio		= "sys$mtio/"
+set	plio		= "sys$plio/"
+set	pmio		= "sys$pmio/"
+set	qpoe		= "sys$qpoe/"
+set	tty		= "sys$tty/"
+set	vops		= "sys$vops/"
+
+# System package directories.
+
+set	cl		= "pkg$cl/"
+set	clpackage	= "hlib$"
+set	dataio		= "pkg$dataio/"
+set	dbms		= "pkg$dbms/"
+set	images		= "pkg$images/"
+set	language	= "pkg$language/"
+set	lists		= "pkg$lists/"
+set	plot		= "pkg$plot/"
+set	softools	= "pkg$softools/"
+set	system		= "pkg$system/"
+set	utilities	= "pkg$utilities/"
+set	xtools		= "pkg$xtools/"
+
+# Load definitions for any locally added external packages.
+
+set	@hlib$extern.pkg

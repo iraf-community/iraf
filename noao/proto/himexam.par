@@ -1,0 +1,29 @@
+banner,b,h,yes,,,"Standard banner"
+title,s,h,"",,,"Title"
+xlabel,s,h,"Pixel Bin",,,"X-axis label"
+ylabel,s,h,"Count",,,"Y-axis label"
+
+ncolumns,i,h,21,2,,Number of columns
+nlines,i,h,21,2,,Number of lines
+nbins,i,h,512,1,,Number of bins in histogram
+z1,r,h,INDEF,,,Minimum histogram intensity
+z2,r,h,INDEF,,,Maximum histogram intensity
+autoscale,b,h,yes,,,Adjust nbins and z2 for integer data?
+top_closed,b,h,no,,,Include z2 in the top bin?
+
+x1,r,h,INDEF,,,X-axis window limit
+x2,r,h,INDEF,,,X-axis window limit
+y1,r,h,0.,,,Y-axis window limit
+y2,r,h,INDEF,,,Y-axis window limit
+pointmode,b,h,no,,,plot points instead of lines?
+marker,s,h,"plus",,,point marker character?
+szmarker,r,h,1.,,,marker size
+logx,b,h,no,,,log scale x-axis
+logy,b,h,yes,,,log scale y-axis
+box,b,h,yes,,,draw box around periphery of window
+ticklabels,b,h,yes,,,label tick marks
+majrx,i,h,5,,,number of major divisions along x grid
+minrx,i,h,5,,,number of minor divisions along x grid
+majry,i,h,5,,,number of major divisions along y grid
+minry,i,h,5,,,number of minor divisions along y grid
+round,b,h,no,,,round axes to nice values?

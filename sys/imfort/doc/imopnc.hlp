@@ -1,0 +1,49 @@
+.help imopnc Sep86 imfort
+.ih
+NAME
+imopnc -- open a new copy of an existing image
+.ih
+SYNOPSIS
+.nf
+imopnc (nimage, oim, nim, ier)
+
+character*(*)	nimage		#I host name of the new image
+integer		oim		#I image descriptor of existing image
+integer		nim		#O image descriptor of the new image
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimopnc\fR procedure is used to open a new copy of an existing image,
+copying the non-pixel fields of the old image header to the new image.
+The new image must be the same size and datatype as the old image.
+The new image is created, the header information is copied, and the pixel
+file is allocated, but no pixel data is copied, and the \fIdatamin\fR and
+\fIdatamax\fR fields of the image header are reset to zero.  The new image
+is opened for read-write access and the image descriptor of the new image
+is returned in \fInim\fR.
+.ih
+RETURN VALUE
+A zero status value is returned if the operation is successful, i.e., if
+\fIoim\fR is a valid image descriptor of an existing image already opened
+with \fIimopen\fR or \fIimopnc\fR, the new image was successfully created,
+and the header was successfully copied.
+
+.nf
+IE_ACCPIX:	error writing into pixel file during image create
+IE_ALCPIX:	cannot create or allocate space for pixel file
+IE_CREHDR:	cannot create image
+IE_MAGIC:	illegal imfort image descriptor
+IE_OPEN:	cannot open image
+IE_OPNPIX:	cannot open pixel file
+IE_UPDHDR:	error updating image header file
+.fi
+.ih
+NOTES
+If it is desired that the new image be of a different size or datatype than
+the old image, the new image must be explicitly created with \fIimcrea\fR,
+opened with \fIimopen\fR, and the old header copied with \fIimhcpy\fR.
+.ih
+SEE ALSO
+imcrea, imopen, imgsiz, imhcpy, imclos
+.endhelp

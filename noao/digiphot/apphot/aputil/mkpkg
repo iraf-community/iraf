@@ -1,0 +1,44 @@
+# Miscellaneous Routines used by the APPHOT Package
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	apaboxr.x
+	apalimr.x
+	apamaxel.x
+	apcgauss1d.x		<math.h> 		<mach.h>
+	apcgauss2d.x		<math.h> 		<mach.h>
+	apdate.x		<time.h>
+	apdiverr.x
+	apellgauss.x
+	apgauss1d.x		<math.h>		<mach.h>
+	apgflags.x		<gio.h>
+	apgrowhist.x
+	apgscur.x		<gset.h>		<fset.h>
+	apgtools.x		<pkg/gtools.h>		<gset.h>
+	aphgmr.x
+	aphgmsub.x
+	apictr.x
+	apijtor.x
+	apijtor2.x
+	apimroot.x
+	aplim2dr.x
+	aplucy.x
+	apmapr.x
+	apmeds.x
+	apmoments.x
+	apoutname.x
+	apqsort.x
+	apqzero.x		<mach.h>
+	apreciprocal.x
+	aprgrow.x
+	apskewgauss.x		<math.h> <mach.h>
+	aptmpimage.x
+	aptopt.x		<math.h> <mach.h>
+	apversion.x
+	apwssqr.x
+	apxytor.x
+	;

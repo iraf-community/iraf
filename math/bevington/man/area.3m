@@ -1,0 +1,25 @@
+.TH AREA 3M
+.SH NAME
+area
+.SH DESCRIPTION
+function area.f
+
+source
+  Bevington, pages 272-273.
+
+purpose
+  integrate the area beneath a set of data points
+
+usage
+  result = area (x, y, npts, nterms)
+
+description of parameters
+  x      - array of data points for independent variable
+  y      - array of data points for dependent variable
+  npts   - number of pairs of data points
+  nterms - number of terms in fitting polynomial
+
+subroutines and function subprograms required
+  integ (x, y, nterms, i1, x1, x2 sum)
+    fits a polynomial with nterms starting at i1
+      and integrates area from x1 to x2

@@ -1,0 +1,90 @@
+.help merge Dec84 noao.imred.vtel
+.ih
+NAME
+merge -- Merge together daily synoptic grams into a complete Carrington map
+.ih
+USAGE
+merge outimage outweight outabs outratio month day year
+.ih
+PARAMETERS
+.ls outimage
+Name of output image.
+.le
+.ls outweight
+Output image containing weights, number of pixels per pixel.
+.le
+.ls outabs
+Output image containing the sums of the absolute values of the flux.
+Not used when merging 10830 maps.
+.le
+.ls outratio
+Output image containing the ratio of outimage/outabs.
+Not used when merging 10830 maps.
+.le
+.ls month, day, year
+Date of the center of this Carrington rotation.
+.le
+.ls longout = 180
+Longitude of the center of this Carrington rotation.
+.le
+.ls mergelist = "mergelist"
+File containing list of files to be merged.
+.le
+.ih
+DESCRIPTION
+Merge adds up daily synoptic grams to produce a Carrington rotation map.
+the input images are 180x180 and the output images are 360x180.  The input
+images are read from the file mergelist.  Merge then weights the input
+image as cos**4 in x where the center of the image corresponds to zero angle
+and the left and right edges of the image correspond to -90 and +90 degrees
+respectively. The input image consists of an unweighted "data" image,
+a weight image, and an absolute value image.  The summing is done on the
+"data" image, on the weight image, and on the absolute value image
+separately to produce three output images.  Finally the "data" image is
+divided by the absolute value image to produce a 4th output image.
+If 10830 data is being merged there are only two(2) images per day, the
+"data" image and the "weight" image.  Also there are only two(2) output images,
+the "data" merged image and the "weights" merged image.
+A note about the mergelist file, the three grams for each day must be stored
+in the following sequence (data, absolute value, weight) for magnetograms
+and the two grams for each day must be stored as (data, weight) for 10830.
+The filenames must be one file name per line in the mergelist and files
+for different days must be grouped together, for example mergelist might look
+like:
+
+.nf
+	MAG01                                  MAG01
+	MAG01a                                 MAG01w
+	MAG01w     for magnetograms or         MAG02      for 10830 grams
+	MAG02                                  MAG02w
+	MAG02a
+	MAG02w
+.fi
+
+for merging only two days of data where the first day is MAG01 and the second
+is MAG02. The 'a' extension stands for absolute value and the 'w' for weights.
+.ih
+EXAMPLES
+1. To merge a number of images on disk into output images called "im",
+"imweight", "imabs", and "imratio", where the date corresponding to the
+center of the Carrington map is 3/20/84 the command would be (magnetograms):
+
+.nf
+	vt> merge im imweight imabs imratio 3 20 84
+.fi
+
+The same command used for 10830 grams would be:
+
+.nf
+	vt> merge im imweight 3 20 84
+.fi
+
+2. If you have the list of files to be merged listed in a file called "mlist"
+instead of "mergelist" the command would be modified to read:
+
+.nf
+	vt> merge im imweight 3 20 84 mergelist="mlist"
+.fi
+.ih
+SEE ALSO
+.endhelp

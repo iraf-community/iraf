@@ -1,0 +1,94 @@
+# T_RIDSMTN -- Semicode for the IDS mountain format tape reader.  IDS
+# records in raw or mountain reduced format can be read into a series of
+# one dimensional IRAF images.  The first record on each mtn tape is a
+# dummy record and is ignored.  Each IDS header is read and compared
+# against the "record_numbers" list.  Depending on the user's request,
+# the header can be printed in long or short form, an IRAF image can
+# be written and the pixel values listed.  All IDS records are in a 
+# single file; an EOF implies EOT.  Procedure terminates when EOF is
+# encountered or all requested records havs been read.
+
+procedure t_ridsmtn (ids_file, iraf_file)
+
+begin
+	get control parameters from cl
+	if (output image is to be made)
+	    get root output name
+	
+	fd = open input file
+
+	while (all requested records haven't been read) {
+
+	    # Code has been revised to accomodate the apparent fact that
+	    # the data matrix is imbedded in the header information.  The
+	    # entire record (header + data) is now read in at one time.
+
+	    if (read (fd, ids_record, length_of_record) == EOF) 
+	        quit
+	    else {
+		current_record = unpack current record from buffer
+	        if (current_record is to be read) 
+		    call idsm_read_record (ids_record, header_struct, cp_struct)
+	    }
+	}
+end
+
+
+# IDSM_READ_RECORD -- is called once for each IDS record that appears in
+# the "record_numbers" range.   The header is printed and the IDS pixels
+# converted, printed or skipped depending on user request.
+
+procedure idsm_read_record (ids_record, header_struct, control_param)
+
+begin
+	stat = idsm_read_header  (ids_record, header_struct)
+	if (stat == DUMMY) {
+	    report dummy record encountered
+	    return
+	}
+	call idsm_print_header (header_struct, long_header)
+
+	if (make_image or print_pixels == YES)  {
+	    # First unpack pixels into a pixel buffer
+	    if (reduced data)
+	        call red_ids_unpk (fd, pixels)
+	    else
+	        call raw_ids_unpk (fd, pixels)
+
+	    if (output image is to be written) {
+	        generate output filename
+	        call idsm_write_image (pixels, data_type, out_fname, 
+		    header_struct)
+	    }
+
+	    if (pixels values are to be listed)
+	        call isdm_print_pixels (pixels)
+
+end
+
+
+# IDSM_READ_HEADER -- Read an IDS header and fill the program data
+# structure with header values.  Returns DUMMY or OK.
+
+int procedure idsm_read_header (ids_buffer, header_structure)
+
+begin
+	unpack header words into header structure
+	if record is DUMMY record
+	    return (DUMMY)
+	else
+	    return (OK)
+end
+
+
+# IDSM_WRITE_IMAGE -- Write a one dimensional IRAF image of an IDS record.
+
+procedure idsm_write_image (pixels, data_type, out_fname, header_struct)
+
+begin
+	map output image
+
+	move pixel_buffer into row vector
+
+	store IDS header values in image user area
+end

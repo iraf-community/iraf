@@ -1,0 +1,32 @@
+      INTEGER FUNCTION SLSTR (FROM, TO, FIRST, CHARS)
+      INTEGER FROM (100), TO (100)
+      INTEGER FIRST, CHARS
+      INTEGER LEN, I, J, K
+      INTEGER LENGTH
+      LEN = LENGTH (FROM)
+      I = FIRST
+      IF (.NOT.(I .LT. 1))GOTO 23000
+      I = I + LEN + 1
+23000 CONTINUE
+      IF (.NOT.(CHARS .LT. 0))GOTO 23002
+      I = I + CHARS + 1
+      CHARS = - CHARS
+23002 CONTINUE
+      J = I + CHARS - 1
+      IF (.NOT.(I .LT. 1))GOTO 23004
+      I = 1
+23004 CONTINUE
+      IF (.NOT.(J .GT. LEN))GOTO 23006
+      J = LEN
+23006 CONTINUE
+      K = 0
+23008 IF (.NOT.(I .LE. J))GOTO 23010
+      TO (K + 1) = FROM (I)
+      I = I + 1
+23009 K = K + 1
+      GOTO 23008
+23010 CONTINUE
+      TO (K + 1) = -2
+      SLSTR=(K)
+      RETURN
+      END

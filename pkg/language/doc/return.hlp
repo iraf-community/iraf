@@ -1,0 +1,31 @@
+.help return Feb86 language
+.ih
+NAME
+return -- exit a procedure
+.ih
+USAGE
+return [value]
+.ih
+PARAMETERS
+.ls value
+An optional value returned to the invoking procedure.
+.le
+.ih
+DESCRIPTION
+The \fIreturn\fR statement terminates a script and optionally returns a
+value to the invoking routine.  Any number of \fIreturn\fR statements
+may be present in a script.  A \fIreturn\fR statement without a value
+is equivalent to a \fIbye\fR.
+.ih
+EXAMPLES
+.nf
+return
+return (j+3)
+.fi
+.ih
+BUGS
+The return value cannot currently be utilized by the invoking procedure.
+.ih
+SEE ALSO
+bye
+.endhelp

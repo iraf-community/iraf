@@ -1,0 +1,72 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<error.h>
+include	<pmset.h>
+include	<imhdr.h>
+include	<imio.h>
+
+# IM_PMMAP -- Map a pixel list as a virtual mask image.  If the mask name
+# given is "BPM" (upper case) the bad pixel list for the reference image is
+# opened, if the mask name is "EMPTY" an empty mask is opened, otherwise the
+# mask name is taken to be the name of the file in which the mask is stored.
+# If there is no bad pixel list for the image an empty mask is opened.
+# If a more specialized mask is needed it should be opened or generated via
+# explicit calls to the PMIO package, and then mapped onto an image descriptor
+# with IM_PMMAPO.
+
+pointer procedure im_pmmap (mask, mode, ref_im)
+
+char	mask[ARB]		#I mask file name or "BPM"
+int	mode			#I mode and flag bits
+pointer	ref_im			#I reference image
+
+pointer	sp, cluster, ksection, section, pl, im, title
+int	cl_index, cl_size, acmode, flags
+pointer	im_pmmapo(), im_pmopen()
+errchk	im_pmopen
+int	btoi()
+
+begin
+	call smark (sp)
+	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
+	call salloc (ksection, SZ_FNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (title, SZ_LINE, TY_CHAR)
+
+	acmode = PL_ACMODE(mode)
+	flags  = PL_FLAGS(mode)
+
+	# Parse the full image specification into its component parts.
+	call imparse (mask, Memc[cluster],SZ_PATHNAME,
+	    Memc[ksection],SZ_FNAME, Memc[section],SZ_FNAME, cl_index,cl_size)
+
+	# Open the mask.
+	pl = im_pmopen (Memc[cluster], flags,  Memc[title], SZ_LINE, ref_im)
+
+	# Map the mask onto an image descriptor.
+	iferr (im = im_pmmapo (pl, ref_im)) {
+	    call pl_close (pl)
+	    call erract (EA_ERROR)
+	} else {
+	    call strcpy (mask, IM_NAME(im), SZ_IMNAME)
+	    call strcpy (Memc[title], IM_TITLE(im), SZ_IMTITLE)
+	}
+
+	# Set flag to close PL descriptor at IMUNMAP time.
+	IM_PLFLAGS(im) = or (IM_PLFLAGS(im), PL_CLOSEPL)
+
+	# Set access mode for mask, and mask update at unmap flag.
+	IM_ACMODE(im) = acmode
+	IM_UPDATE(im) = btoi (acmode != READ_ONLY)
+
+	IM_NPHYSDIM(im) = IM_NDIM(im)
+	call amovl (IM_LEN(im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
+	call amovl (IM_LEN(im,1), IM_SVLEN(im,1),   IM_MAXDIM)
+
+	# Set up section transformation.
+	if (ref_im == NULL && Memc[section] != EOS)
+	    call imisec (im, Memc[section])
+
+	call sfree (sp)
+	return (im)
+end

@@ -1,0 +1,28 @@
+# DISPCOR Task
+
+$checkout libpkg.a ..
+$update   libpkg.a
+$checkin  libpkg.a ..
+$exit
+
+libpkg.a:
+	dcio.x		dispcor.com <error.h>
+	dispcor.x	"disptable.h" <error.h> <imhdr.h> <math/iminterp.h>
+	disptable.x	"disptable.h" <mach.h>
+	ecdispcor.x	"disptable.h" ecdispcor.com <error.h> <imhdr.h> <mach.h>
+	ecio.x		ecdispcor.com <error.h> <imhdr.h>
+	msdispcor.x	msdispcor.com disptable.h <error.h> <imhdr.h> <mach.h>
+	msio.x		msdispcor.com <error.h> <imhdr.h>
+	odr.x		<ctype.h>
+	ranges.x	<ctype.h> <mach.h>
+	refaverage.x	refspectra.h
+	reffollow.x	refspectra.h <mach.h>
+	refgspec.x	refspectra.com refspectra.h <error.h>
+	refinterp.x	refspectra.h <mach.h>
+	refmatch.x	
+	refmsgs.x	refspectra.com refspectra.h
+	refnearest.x	refspectra.h <mach.h>
+	refprecede.x	refspectra.h <mach.h>
+	refspectra.x	refspectra.com refspectra.h
+	reftable.x	refspectra.h <error.h>
+	;

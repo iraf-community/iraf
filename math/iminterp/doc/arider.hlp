@@ -1,0 +1,55 @@
+.help arider Jul84 "Image Interpolator Package"
+.ih
+NAME
+arider -- calculate the interpolant derivatives at x
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+arider (x, datain, npix, der, nder, interp_type)
+
+.nf
+    real	x		# x value, 1 <= x <= npts 
+    real	datain[npix]	# array of data points
+    int		npix		# number of data points
+    real	der[nder]	# derivatives, derivs[1] = function value
+    int		nder		# number of derivatives, 1 + max order
+    int		interp_type	# interpolant type
+.fi
+.ih
+ARGUMENTS
+.ls x     
+X value.
+.le
+.ls datain
+Array of data values.
+.le
+.ls npix  
+Number of data points.
+.le
+.ls der     
+Array of derivatives. Der[1] contains the function value, der[2] the
+first derivative and so on.
+.le
+.ls nder
+Number of derivatives. ARIDER checks that the requested number of derivatives
+is sensible.
+.le
+.ls interp_type
+Interpolant type. The options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5
+and II_SPLINE3.
+The interpolant type definitions are found in the package header file
+math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+ARIDER permits the evaluation of the interpolant at a few randomly spaced
+points within datain without the storage requirements of the sequential
+version.
+.ih
+NOTES
+Checking for INDEF valued or out of bounds pixels is the responsibility
+of the user.
+.ih
+SEE ALSO
+asider

@@ -1,0 +1,29 @@
+.help zfdele May84 "System Interface"
+.ih
+NAME
+zfdele -- delete a file
+.ih
+SYNOPSIS
+.nf
+zfdele (osfn, status)
+
+packed	char osfn[]		# host filename
+int	status
+.fi
+.ih
+DESCRIPTION
+The named file is deleted.
+.ih
+RETURN VALUE
+ERR is returned if the file does not exist or cannot be deleted.
+OK is returned if the operation is successful.
+.ih
+NOTES
+A protected file cannot be deleted.  FIO checks for file protection before
+calling the kernel to delete a file.  FIO will not attempt to delete a file
+while the file is open by the current process.  If an attempt is made to
+delete a file which is open by another process the result is system dependent.
+.ih
+SEE ALSO
+zfprot
+.endhelp

@@ -1,0 +1,9 @@
+# PARAMETERS FOR KPNO IIDS SPECTRAL REDUCTION PACKAGE
+
+extinction,s,h,"onedstds$kpnoextinct.dat",,,Extinction file
+caldir,s,h,"iidscal$",,,Directory containing calibration data
+coincor,b,h,yes,,,Apply detector correction to flats
+ccmode,s,h,"iids",,,Correction mode (photo|iids)
+deadtime,r,h,1.424e-3,0,,Deadtime in seconds
+power,r,h,0.975,,,IIDS power law coefficient
+version,s,h,"Oct 1985"

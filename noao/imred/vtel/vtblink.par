@@ -1,0 +1,4 @@
+imname1,s,a,,,,Name of first image
+imname2,s,a,,,,Name of next image
+z1,r,h,-3000.0,,,Minimum graylevel to be displayed.
+z2,r,h,3000.0,,,Minimum graylevel to be displayed.

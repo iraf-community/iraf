@@ -1,0 +1,44 @@
+.help while Feb86 language
+.ih
+NAME
+while -- while loop construct
+.ih
+SYNTAX
+while (expression) statement
+.ih
+ELEMENTS
+.ls while
+Required keyword.
+.le
+.ls expression
+A boolean valued expression tested before each iteration.
+.le
+.ls statement
+A statement (possibly compound) to be executed in each iteration of the loop.
+.le
+.ih
+DESCRIPTION
+The \fIwhile\fR loop executes the enclosed statements while the specified
+condition is true.
+.ih
+EXAMPLES
+1. An infinite loop.
+
+.nf
+	while (yes) {
+	    sleep 30
+	    time
+	}
+.fi
+
+2. Type a file.
+
+.nf
+	list = "home$login.cl"
+	while (fscan (list, line) != EOF)
+	    print (line)
+.fi
+.ih
+SEE ALSO
+for, case, break, next
+.endhelp

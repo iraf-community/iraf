@@ -1,0 +1,45 @@
+.help asivector Jul84 "Image Interpolator Package"
+.ih
+NAME
+asivector -- evaluate the interpolant
+.ih
+SYNOPSIS
+asivector (asi, x, y, npix)
+
+.nf
+    pointer	asi	# interpolator descriptor
+    real	x[npix]	# x array, 1 <= x[i] <= npix
+    real	y[npix]	# array of interpolated values
+    int		npix	# number of x values
+.fi
+.ih
+ARGUMENTS
+.ls asi  
+Pointer to the sequential interpolator descriptor structure.
+.le
+.ls x   
+Array of x values.
+.le
+.ls y
+Array of interpolated values.
+.le
+.ls npix   
+The number of x values.
+.le
+.ih
+DESCRIPTION
+The polynomial coefficients are calculated directly from the data points. The
+actual computation is done by adding and multiplying terms
+according to Everett's central difference formula.
+The spline interpolant uses the B-spline
+coefficients calculated by the ASIFIT routine.
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the
+responsibility of the user. ASIINIT and ASIFIT must be called before using
+ASIVECTOR.
+.ih
+SEE ALSO
+asieval, arieval
+.endhelp
+

@@ -1,0 +1,45 @@
+.help znottx May84 "System Interface"
+.ih
+NAME
+znottx -- note position in text file for a later seek
+.ih
+SYNOPSIS
+.nf
+znottx (chan, loffset)
+
+int	chan			# OS channel of text file
+long	loffset			# magic seek offset
+.fi
+.ih
+DESCRIPTION
+The absolute seek offset of the "current line" is returned in the long integer
+variable \fIloffset\fR.  If the file is opened for reading the offset
+of the line which was just read or which is currently being read is returned.
+If the file is opened for writing the offset of the next line to be written
+or of the line currently being written is returned.  In all cases the
+offset points to the first character in a line, i.e., the first character
+following the newline line delimiter character.
+.ih
+RETURN VALUE
+If the operation is successful a magic integer describing the current file
+offset is returned in \fIloffset\fR.  If seeking is illegal on the device
+associated with \fIchan\fR the return value is undefined.  It is not an error
+to call \fIznottx\fR on a file which does not permit seeks; if no seek is
+ever performed no error has occurred.
+.ih
+NOTES
+Depending on the host system, \fIloffset\fR might be a zero indexed byte
+offset, the logical record number, the file block number and char offset
+within the block packed into a long integer, or some other machine dependent
+quantity.  The high level code must do nothing with \fIloffset\fR but
+request it with \fBznottx\fR and pass the value on to \fBzsektx\fR to perform
+a seek.  Seek offsets may be compared for equality but no other arithmetic
+or logical operations are permissible.  For example, if the offset of line A
+is numerically less than the offset of line B, one \fIcannot\fR conclude that
+line A is nearer the beginning of file than line B.
+The only way to generate a seek offset for a text file (other than
+to BOF or EOF) is to note the file position while reading or writing the file.
+.ih
+SEE ALSO
+zsektx, zfiotx
+.endhelp

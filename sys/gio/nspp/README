@@ -1,0 +1,9 @@
+NSPP -- The NCAR System Plot Package.
+
+	portlib		portable NSPP modules
+	sysint		the system interface
+
+Usage:
+	The user must supply a subroutine called WRITEB to use the library.
+	See gio$nsppkern for an example.  The subroutine Z8ZPII should be
+	called before using NSPP to initialize the internal variables.

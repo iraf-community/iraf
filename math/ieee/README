@@ -1,0 +1,8 @@
+     This directory contians programs and subroutines from the
+text "Programs for Digital Signal Processing" by the IEEE Press.
+Directories of the name "chap*" correspond to each chapter of
+the text.
+     The files "*mach*" are the machine dependent routines which
+should be edited for the hardware which you are going to run the
+routines on.  The file "uni.c" is a uniform random number generator,
+not the one from the text, but one which uses the UNIX generator.

@@ -1,0 +1,202 @@
+SUN/IRAF V2.3 Installation, 12 June 1986	Sun-3, MC68881 floating point
+------------------------------------------------------------------------------
+
+/usr/iraf/local/notes
+	Began this new notes file.  All subsequent pathnames assume
+	"/usr/iraf/" preceding them.  (6/12)
+
+unix/
+	Made a tar backup in /tmp2/iraf/tuc_unix.arc.  (6/12)
+
+local/
+	Made a tar backup in /tmp2/iraf/tuc_local.arc.  (6/12)
+
+bin/
+lib/
+pkg/
+sys/
+unix/
+	Ran rmbin to remove all binary files.  (6/12)
+
+/usr/iraf/
+	Unpacked new "wtar -o" source-only archive from lyra.  (6/12)
+
+unix/as/
+unix/mc68000
+	Replaced VAX contents of as/ with those from mc68000; renamed
+	.SUN's to .s's.  (6/12)
+
+unix/mkpkg.csh
+	Replaced with the one from the archive; contains SUN_kludge
+	mkpkg.csh command.  (6/12)
+
+unix/hlib/[dir]1mach.f
+	Replaced with those from archive for 68000; using MC68000
+	versions of machine-independent stuff for nspp software.  (6/12)
+
+unix/hlib/mach.h
+	Compared with archive and replaced with archive version to pick
+	up BYTE_SWAP[24] = NO, and to use the 68000 fp epsilons.  (6/12)
+
+unix/hlib/motd
+	Short message about SUN/IRAF system testing.  (6/12)
+
+unix/hlib/mkpkg.inc
+	Ran diff; replaced from archive to pick up 68000 compiler
+	and linker switches for this SUN-3, which has MC 68881 floating
+	point (XFLAGS -c -O -f68881; LFLAGS -f68881).  Set USE_CALCOMP
+	to NO.  (6/12)
+
+unix/hlib/mkiraf.csh
+	Replaced iraf root definition.  (6/12)
+
+unix/hlib/libc/iraf.h
+	Changed root directory to /usr/iraf/, added "#define SUN3".  (6/12)
+
+unix/hlib/libc/kernel.h
+	Commented out DEBUGMEM so that the normal UNIX malloc() is
+	used.  This was and probably still is necessary in order to
+	link with SUNCGI.  (6/12)
+
+unix/hlib/libc/spp.h
+	Ran diff; replaced with archive version to pick up MC68000
+	fp epsilons.  (6/12)
+
+unix/boot/mkpkg/host.c
+	Changed SZ_CMD from 512 to 400 to get around SUN-3 f77 command-
+	line bug.  (6/12)
+
+unix/boot/spp/xc.c
+	Ran diff; replaced with archive version to pick up all the
+	extra Fortran library definitions and command-line args.  (6/12)
+
+unix/os/zxwhen.c
+	Ran diff; replaced with archive version to pick up Sun floating
+	point exception definitions.  (6/12)
+
+local/notes
+	Renamed to notes.vax.  (6/12)
+
+local/login.cl
+	Renamed root directory in "home"; aliased "xc" to "xc -f68881".  (6/12)
+
+/usr/include/iraf.h	-> $hlib/libc/iraf.h
+	Made sure this symbolic link existed.  (6/12)
+
+unix/	[BOOTSTRAP]
+	Attempted bootstrap ("sh -x mkpkg.csh").  (6/12)
+
+unix/boot/bootlib/mkpkg.csh
+	This time the bootstrap failed because of the "unexpected end of
+	file" error and did NOT create libboot.a.  Resolved by inserting
+	"#! /bin/csh -f" as the first line.  (6/13)
+
+unix/	[BOOTSTRAP]
+	Successful bootstrap this time.  (6/13)
+	
+unix/hlib/alloc.e
+	Changed ownership to root in order to allocate devices at runtime.
+	(6/13)
+
+/usr/bin/alloc		-> $hlib/alloc.e
+/usr/bin/generic	-> $hlib/generic.e
+/usr/bin/mkpkg		-> $hlib/mkpkg.e
+/usr/bin/rmbin		-> $hlib/rmbin.e
+/usr/bin/rmfiles	-> $hlib/rmfiles.e
+/usr/bin/rtar		-> $hlib/rtar.e
+/usr/bin/wtar		-> $hlib/wtar.e
+/usr/bin/xc		-> $hlib/xc.e
+/usr/bin/cl		-> $hlib/cl.e
+	Made sure these symbolic links existed.  (6/13)
+
+sys/fmtio/gctod.f				F77 compile-time
+sys/fmtio/xtoc.f				F77 compile-time
+sys/vops/ak/abeqkx.f				F77 compile-time
+sys/vops/ak/abeqx.f				F77 compile-time
+sys/vops/ak/abgekx.f				F77 compile-time
+sys/vops/ak/abgtkx.f				F77 compile-time
+sys/vops/ak/ablekx.f				F77 compile-time
+sys/vops/ak/abltkx.f				F77 compile-time
+sys/vops/ak/abnekx.f				F77 compile-time
+sys/vops/ak/abnex.f				F77 compile-time
+sys/vops/ak/advzx.f				F77 compile-time
+sys/vops/lz/allnx.f				F77 compile-time
+sys/vops/lz/alogx.f				F77 compile-time
+sys/vops/lz/arcpx.f				F77 compile-time
+sys/vops/lz/arczx.f				F77 compile-time
+	Hand-compiled without "-f68881" switch (but with optimization);
+	otherwise the compiler fails due to complex datatype expressions.
+	This will be the case until the next Sun f77 release.  (6/13)
+
+sys/fmtio/fprfmt.x				F77 run-time
+	Hand-compiled without optimization (but with "-f68881").  Have not
+	yet determined source of problem (symptom was garbage appearing
+	in text files) -- pursue shortly.  (6/13)
+
+$iraf
+	Started sysgen at 10:22.  (6/13)
+
+dev/devices
+	Replaced with version from suntest!, since we now have a 1/2 inch
+	tape drive on tucana.  Added mtb entry for the 1/4 inch drive.  (6/13)
+
+noao$onedspec/getnimage.x			F77 run-time
+	There is a bug in the optimizer which seems to be caused by a
+	logical comparison to MAX_INT.  To get around the problem do the
+	following after a full sysgen.  (6/19)
+
+		touch getnimage.x; mkpkg xflags=-c fluxcal; mkpkg install
+
+$iraf
+	Unpacked an incremental archive from lyra to bring tucana up
+	to current as of 09:15 June 20, 1986.  Performed an incremental
+	sysgen.  (6/20)
+
+noao/twodspec/apextract/*
+	The preceding MKPKG found the entire contents of icfit/* missing
+	except for 3 source files.  To be safe, I (sr) made a complete
+	archive of lyra!/...apextract/* and unpacked it here, followed
+	by another root sysgen.  (6/20)
+
+noao/twodspec/apexold/*
+	Because this directory was created by renaming the directory
+	apextract after the full archive of June 12, it had old file
+	dates and the incremental archives this week didn't pick it
+	up.  Unpacked a full archive and MKPKG'd.  (6/20)
+
+sys/gio/cursor/grcwcs.x				F77 run-time
+	Apparent f77 optimizer bug; hand-compiling w/o optimization
+	and relinking the CL clears up the problem of IMPLOT's "l"
+	and "c" commands returning bad pixel rows/columns.  Before,
+	clgcur was sometimes returning the y coordinate in pixel, 
+	rather than data, units -- i.e. in WCS 1 rather than 2.  Haven't
+	had time to try to isolate the source of the optimizer bug.  (6/21)
+
+$iraf
+	Unpacked an incremental archive from lyra! current to 14:40 June
+	21; performed an incremental sysgen.  (6/21)
+
+noao/mtlocal/r2df/r2df.com
+	The preceding sysgen died because this file was missing; it had 
+	a date earlier than the incremental archive, so was missed.
+	Added it and rebuilt mtlocal.  (6/21)
+
+$iraf
+	Unpacked an incremental archive from lyra! current to 08:15 June
+	23; performed an incremental sysgen.  (6/23)
+
+noao/lib/scr/*
+noao/twodspec/apextract/*
+noao/twodspec/apexold/*
+	Unpacked full, not incremental, archives from lyra! to pick up any
+	files missed during the incremental archives as a result of renaming
+	rather than copying files since the June 12 full archive.  mkpkg
+	updates in both apextract directories.  (6/23)
+
+pkg/cl/unop.c
+	Changed call to sscanf (sval, "%f", &rresult) in case OP_REAL to
+	sscanf (sval, "%lf", &rresult) because "rresult" is declared type
+	"double", and on the SUNs, sscanf was only writing into the first
+	four bytes of rresult, giving erroneous answers to REAL coercion,
+	as in "cl> =real(imgets.value)".  Should be changed on master system
+	as well.  (6/23)

@@ -1,0 +1,310 @@
+Semicode for Cyber RCOPY Reader; Frozen at "detailed semicode" stage, Jan 84.
+
+
+#  rcopy tape descriptor
+
+struct rcopy {
+
+    real   data_min     # minimum data value
+    real   data_max     # maximum data value
+    int    nrows        # number of rows in ipps raster
+    int    ncols        # number of columns in ipps raster
+    int    data_type    # number of bits per pixel in the ipps raster
+    int    pru_eor      # pru position of level zero eor
+    int    wrds_per_row # number of 60-bit words per row; each row
+                        # occupies an integral number of 64word pru's.
+    int    pru_row_one  # relative pru ordinal of the first row of raster.
+    char   ipps_id      # id string of the ipps raster
+}
+
+procedure t_rrcopy (rcopy_file, raster_list, iraf_file)
+
+
+begin
+        # get input filename and open tape drive
+        rcopy_fd = open (rcopy_file)
+
+        # get output filename if it will be needed
+        if (make_image = yes) 
+            outfile = fetch root name of output file
+
+        # expand list of rasters to be read from tape
+        if (decode_ranges (raster_list, range, MAX_RANGES, nfiles) == ERR)
+            call error (0, "Illegal raster number list")
+
+        raster_number = 0
+        tape_pos = 1
+        while (get_next_number (range, raster_number, != EOF) {
+            # position tape to first record of raster_number
+            if (tape_pos != raster_number) {
+                iferr {
+                stat = position_rcopy (rcopy_fd, tape_pos ,raster_number)
+                    if (stat = EOF)
+                        return
+                } then
+                    call ERRACT (EA_FATAL)
+            }
+            iraffile = generate output filename from root
+            iferr { 
+                (stat = read_rcopy(rcopy_fd, iraffile, tape_pos)) 
+                if (stat = EOF)
+                    return
+            }           then {
+                call ERRACT (EA_WARN)
+                skip over rcopy raster
+            }
+        }
+        
+end
+
+int procedure position_rcopy (rcopy_fd, tape_pos, raster_number)
+
+begin
+
+        nrasters_skip = raster_number - tape_pos
+        for (i=1; i<=nrasters_skip; i=i+1) {
+            stat = read_header (rcopy_fd, rcopy)
+            if (stat = EOF)
+                return (EOF)    
+            call read_header (rcopy_fd, rcopy)
+            call skip_image (rcopy_fd, rcopy)
+    }
+end
+
+int procedure read_rcopy (rcopy_fd, iraffile, tape_pos)
+
+begin
+
+        # Read ipps raster header from rcopy tape
+        stat = read_header (rcopy_fd, rcopy)
+        if (stat = EOF)
+            return (EOF)
+
+        # Print header information from rcopy tape
+        if (print_header)
+            call print_header (rcopy)
+
+        # read image data if desired
+        if (make_image) 
+            call read_image(rcopy_fd, iraffile, rcopy)
+
+        # skip image if not to be read
+        else
+            call skip_image (rcopy_fd, rcopy)
+            
+        # increment tape position marker
+        tape_pos = tape_pos + 1
+
+
+end
+
+int procedure read_header(rcopy_fd, rcopy)
+
+begin
+        # structure rcopy contains decoded header
+        # Read ipps header (64 60-bit words = 240 chars) as a
+        # bit stream into temp.
+        NBITS_CHAR = SZB_CHAR * NBITS_BYTE
+        NBITS_CYBER_WORD = 60
+        NWORDS_CYBER_PRU = 64
+        SZ_HEADER = 240
+        stat = read_tape (rcopy_fd, raw_header, SZ_HEADER)
+        if (stat = EOF)) 
+            return (EOF)
+
+        # Unpack bit stream and fill structure rcopy
+        call unpack_header (raw_header, rcopy)
+
+        # skip to first row of raster
+        if (rcopy.pru_row_one not equal to 1) {
+            nchars_to_skip = (rcopy.pru_row_one - 1) * NWORDS_CYBER_PRU
+                * NBITS_CYBER_WORD / NBITS_CHAR
+            call skip_chars (rcopy_fd, nchars_to_skip)
+        }
+end
+
+procedure read_image (rcopy_fd, iraffile, rcopy)
+
+begin
+
+        # map new iraf image and set up image header
+        im = immap (iraffile, NEW_IMAGE)
+        im.im_len[1] = rcopy.ncols
+        im.im_len[2] = rcopy.nrows
+        im.im_title = rcopy.ipps_id
+        im.im_min = rcopy.data_min
+        im.im_max = rcopy.data_max
+
+        if (user hasn's supplied data type) {
+            switch (rcopy.data_type) {
+                case 12 :
+                    im.im_pixtype = short
+                case 20 :
+                    im.im_pixtype = real
+                case 30 :
+                    im.im_pixtype = real
+                default:
+                    call error (0, "error in data_type")
+            }
+        }
+
+        # Calculate number of chars per row; this will always be an
+        # integral number of chars because rcopy.words_per_row
+        # is always divisible by 64.
+        NBITS_CHAR = SZB_CHAR * NBITS_BYTE
+        NBITS_CYBER_WORD = 60
+        NWORDS_CYBER_PRU = 64
+        num_chars_per_row = rcopy.wrds_per_row * NBITS_CYBER_WORD / NBITS_CHAR
+
+        # Loop to read rcopy raster line by line into buf1, then
+        # convert ipps pixels to iraf pixels.
+        for(i=1; i<=rcopy.nrows; i=i+1) {
+            stat = read a single row from the internal buffer
+            if (stat = EOF) {
+                close imagefile already accumulated
+                call error (0, "unexpected EOF at row# ")
+            }
+            call ipps_to_iraf (buf1, Memr[impl2r(im,i)], rcopy)
+        }
+        
+        # Read until header of next raster into dummy buffer.
+        # Calculate offset in chars from present position to eor
+        nchars_to_skip = (((rcopy.eor - rcopy.pru_row_one) * NWORDS_CYBER_PRU
+         + (rcopy.words_per_row * rcopy.nrows)) * NBITS_CYBER_WORD + 48)
+         / NBITS_CHAR
+
+        call skip_chars (rcopy_fd, nchars_to_skip)
+end
+
+procedure ipps_to_iraf (buf1, buf2, rcopy)
+
+begin
+
+        # convert (rcopy.ncols * rcopy.data_type ) bits from buf1.
+        # This is the number of bits per row that actually represent
+        # pixels. buf1 contains pixels plus filler.
+        
+        switch (rcopy.data_type) {
+            case 12: 
+                call unpack12 (buf1, bit_offset, buf2, npix)
+            case 20:
+                call unpack20 (buf1, bit_offset, buf2, npix)
+            case 30:
+                call unpack30 (buf1, bit_offset, buf2, npix)
+            default:
+                call error (0, "illegal ipps #b/p")
+        }
+end
+
+procedure skip_image(rcopy_fd, rcopy)
+
+begin
+
+        # Calculate number of chars in image
+        nchars_to_skip = ((rcopy.eor - rcopy.pru_row_one ) * NWORDS_CYBER_PRU *
+           NBITS_CYBER_WORD + 48 ) / NBITS_CHAR
+        call skip_chars (rcopy_fd, nchars_to_skip)
+
+end
+
+procedure print_header (rcopy)
+
+begin
+        # print header information from rcopy tape
+        print, rcopy.ipps_id, rcopy.ncols, rcopy.nrows, rcopy.data_min,
+           rcopy.data_max, rcopy.ipps_data_type
+end
+
+procedure unpack_header (raw_header, rcopy)
+
+begin
+
+        get from raw_header: nrows, ncols, data_type, ipps_id, pru_eor,
+        wrds_per_row, pru_row_one, data_min, data_max
+
+        if (rcopy.data_type != 12, 20, or 30) 
+            call error (0, "invalid ipps #b/p")
+        if (nrows or ncols or pru_row_one !> 0) 
+            call error (0, "invalid ipps raster")
+        if (wrds_per_row not divisible by 64) 
+            call error (0, "invalid ipps raster")
+
+end
+
+procedure skip_chars (rcopy_fd, nchars_to_skip)
+
+begin
+
+    # calculate the number of chars in a tape block = (512 * 60) / 16   
+    # This is the number of chars to be read at one time.
+    SZ_TAPE_BLK = 1920
+
+    # calculate number of blocks to skip (type int)
+    nblks_read = nchars_to_skip / SZ_TAPE_BLK
+    nchars_remaining = mod (nchars_to_skip, SZ_TAPE_BLK)
+
+    # read chars into dummy buffer
+    for (i=1; i<=nblks_read; i=i+1) 
+        stat = read_tape (rcopy_fd, dummy, SZ_TAPE_BLK)
+    
+    stat = read_tape (rcopy_fd, dummy, nchars_remaining)
+
+    # confirm reaching eor
+    if (searching for eor) {
+        reread last 3 chars and compare with level zero eor marker
+        if (eor not confirmed)
+            call error (0, "attempted skip to eor unsuccessful")
+    }
+
+end
+
+
+.help rrcopy 2 "Program Structure"
+.sh
+RCOPY Structure Chart
+
+.nf
+procedure t_rrcopy ()
+# Returns when file list is satisfied or if EOT is encountered
+
+    int procedure read_header (rcopy_fd, rcopy)
+    #returns EOF, ERR or OK
+
+	int procedure read (rcopy_fd, raw_header, SZ_HEADER)
+	#returns EOF or OK
+
+	int procedure unpack_header (raw_header, rcopy)
+	#returns ERR or OK
+
+    int procedure skip_image (rcopy_fd, rcopy)
+    #returns ERR, EOF or OK
+
+	int procedure skip_chars (rcopy_fd, nchars_to_skip)
+	#returns EOF, ERR or OK
+    
+    procedure read_rcopy (rcopy_fd, iraffile)
+    #aborts if output filename exists and noclobber is set
+
+	int procedure read_header (rcopy_fd, rcopy)
+	#returns EOF, ERR or OK
+
+	    int procedure read (rcopy_fd, raw_header, SZ_HEADER)
+	    #returns EOF or OK
+
+	    int procedure unpack_header (raw_header, rcopy)
+	    #returns ERR or OK
+
+	procedure print_header (rcopy)
+
+	procedure read_image (rcopy_rd, iraffile, rcopy)
+	#returns EOF, or OK
+
+	    int procedure read (rcopy_rd, buf1, num_chars_per_row)
+	    #returns EOF or OK
+
+	    int procedure ipps_to_iraf
+	    #returns ERR or OK
+
+	int procedure skip_image (rcopy_rd, rcopy)
+	#returns EOF, ERR or OK
+.endhelp

@@ -1,0 +1,16 @@
+images,s,a,,,,List of images to combine
+output,s,a,,,,Output image
+sigma,s,h,"",,,Output sigma image (optional)
+ccdtype,s,h,"",,,CCD image type to combine (optional)
+subsets,b,h,no,,,Combine images by subset parameter?
+combine,s,h,"avsigclip",,,Type of combine operation
+delete,b,h,no,,,Delete input images after combining?
+clobber,b,h,no,,,Clobber existing output image?
+exposure,b,h,yes,,,Scale by the exposure times?
+scale,b,h,no,,,Scale by the mode?
+offset,b,h,no,,,Add offset determined from the mode?
+weight,b,h,yes,,,Use a weighted average?
+modesec,s,h,"",,,Image section for computing mode
+lowreject,r,h,3.,,,Lower sigma clipping factor
+highreject,r,h,3.,,,Upper sigma clipping factor
+blank,r,h,0.,,,Value when all pixels are rejected

@@ -1,0 +1,13 @@
+# Cardimage library
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	t_rcardimage.x	rcardimage.com
+	t_wcardimage.x	wcardimage.com
+	conversion.x
+	tabs.x
+	;

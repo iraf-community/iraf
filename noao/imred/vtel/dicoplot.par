@@ -1,0 +1,4 @@
+image1,s,q,,,,Image1
+image2,s,q,,,,Image2
+rotnum,i,q,,,,carrington rotation number
+device,s,h,dicomed,,,plot device

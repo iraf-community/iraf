@@ -1,0 +1,14 @@
+    NOAO CONVEX/IRAF Revision 2.8BETA Sun Aug 13 15:33:43 MDT 1989
+    Copy of the TUCANA V2.8EXPORTsystem as of 8 July 1989.
+
+	[] ------------------------------------------------------- []
+	[] Read the NEWS for important information on this version []
+	[] of the system (type "news").                            []
+	[] ------------------------------------------------------- []
+
+    Welcome to the IRAF.  To list the available commands, type ? or  ??.
+    To  get  detailed  information about a command, type `help command'.
+    To run a command or load a package, type its name.   Type  `bye'  to
+    exit a package.  Type `logout' to get out of the CL.   The following
+    commands or packages are now defined:
+

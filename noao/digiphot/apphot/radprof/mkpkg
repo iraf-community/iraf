@@ -1,0 +1,67 @@
+RADPROF Fitting Task Routines
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	apbradprof.x	<fset.h>		../lib/apphot.h         \
+			../lib/center.h		../lib/fitsky.h         \
+			../lib/display.h
+	apgrpars.x	../lib/center.h		../lib/fitsky.h         \
+			../lib/phot.h		../lib/display.h	\
+			../lib/noise.h		../lib/radprof.h	\
+			../lib/apphot.h
+	approfcolon.x	../lib/radprof.h
+	approfsetup.x	../lib/apphot.h		../lib/phot.h		\
+			../lib/center.h		../lib/fitsky.h         \
+			../lib/radprof.h	../lib/apphotdef.h	\
+			../lib/photdef.h	../lib/fitskydef.h	\
+			../lib/noise.h
+	apprprof.x	../lib/apphotdef.h	../lib/apphot.h         \
+			../lib/center.h		../lib/fitsky.h         \
+			../lib/photdef.h	../lib/phot.h		\
+			../lib/radprof.h	../lib/radprofdef.h
+	apradprof.x	<ctype.h>		<gset.h>		\
+			../lib/apphot.h		../lib/center.h         \
+			../lib/fitsky.h		../lib/radprof.h	\
+			../lib/display.h
+	aprconfirm.x	../lib/apphot.h		../lib/noise.h          \
+			../lib/center.h         ../lib/fitsky.h         \
+			../lib/phot.h           ../lib/radprof.h
+	aprferrors.x	../lib/phot.h		../lib/radprof.h
+	aprmmeasure.x
+	aprpars.x	../lib/apphot.h		../lib/center.h         \
+			../lib/fitsky.h		../lib/phot.h		\
+			../lib/noise.h		../lib/display.h	\
+			../lib/radprof.h
+	aprpbuf.x	<imhdr.h>		../lib/apphotdef.h	\
+			../lib/radprofdef.h	../lib/radprof.h
+	aprpcolon.x	../lib/apphot.h		../lib/fitsky.h         \
+			../lib/center.h		../lib/phot.h		\
+			../lib/radprof.h	../lib/noise.h	        \
+			../lib/display.h
+	aprpfree.x	../lib/apphotdef.h	../lib/radprofdef.h
+	aprpindef.x	../lib/apphotdef.h	../lib/radprofdef.h	\
+			../lib/radprof.h	../lib/photdef.h	\
+			../lib/phot.h
+	aprpinit.x	../lib/apphotdef.h	../lib/radprofdef.h	\
+			../lib/phot.h
+	aprpmeasure.x	<math/curfit.h>
+	aprpplot.x	<gset.h>		<pkg/gtools.h>		\
+			../lib/apphotdef.h	../lib/photdef.h	\
+			../lib/radprof.h	../lib/phot.h		\
+			../lib/fitsky.h		../lib/radprofdef.h	\
+			../lib/center.h		../lib/apphot.h
+	apfrprof.x	<math/curfit.h>		<math/iminterp.h>	\
+			<gset.h>		../lib/apphot.h         \
+			../lib/apphotdef.h	../lib/radprofdef.h	\
+			../lib/phot.h		../lib/photdef.h	\
+			../lib/radprof.h
+	rprofshow.x	../lib/display.h
+	rppshow.x	../lib/radprof.h
+	rpshow.x	../lib/display.h
+	t_radprof.x	<fset.h>		<gset.h>		\
+			../lib/apphot.h
+	;

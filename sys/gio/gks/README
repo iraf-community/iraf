@@ -1,0 +1,50 @@
+GKS - This directory contains code for a partial implementation of the Fortran
+binding of GKS level OA.  The GKS functions are layered upon GIO.  The functions
+provided are:
+
+	gacwk	---	activate workstation
+	gca	---	output (integer) cell array
+	gcas	---	output (short) cell array
+	gclks	---	close GKS
+	gclrwk	---	clear workstation
+	gclwk	---	close workstation
+	gdawk	---	deactivate workstation
+	gfa	---	fill area
+	gopks	---	open GKS
+	gopwk	---	open workstation
+	gpl	---	polyline
+	gpm	---	polymarker
+	gqasf	---	query aspect source flag
+	gqchh	---	query character height
+	gqchup	---	query character up vector
+	gqcntn	---	query current transformation number
+	gqnt	---	query normalization transformation (window and viewport)
+	gqopwk	---	query open workstations
+	gqplci	---	query polyline color index
+	gqpmi   ---     query polymarker index
+	gqtxal	---	query text alignment
+	gqtxci	---	query text color index
+	gqtxp	---	query text path
+	gqwks	---	query workstation state
+	qsasf	--- 	query aspect source flag
+	gschh	---	set character height
+	gschup	---	set character up vector
+	gscr    ---     set color representation
+	gselnt	---	set normalization transformation
+	gsfaci  ---     set fill area color index
+	gsfais	---	set fill area interior style
+	gslwsc  ---     set line width scale factor
+	gsmk	---	set marker type
+	gsplci	---	set polyline color index
+	gspmci	---	set polymarker color index
+	gspmi   ---     set polymarker index
+	gstxal	---	set text alignment
+	gstxci	---	set text color index
+	gstxp	---	set text path
+	gsvp	---	set viewport
+	gswn	---	set window
+	gtx	---	text (gtx.f, gxgtx.x)
+
+Two functions were added 8Sep86:
+	gsclip	---	set clipping flag
+	gqclip	---	query clipping flag

@@ -1,0 +1,259 @@
+# System error message file.  Messages may appear in any order; error
+# codes must be left justified and must agree with those defined in
+# <syserr.h>.  System error codes start at 500; 1-499 are reserved for
+# applications and user programs.  It is wise to reserve a lot of extra
+# error codes for each package.
+
+# Exceptions (501-503)
+501 Access violation
+502 Arithmetic exception
+503 Interrupt
+504 Write to IPC (to a subprocess) with no reader
+
+# SYSTEM, TTY, MEMIO (550-599)
+550 ONERROR: Too many procedures to remember
+551 ONEXIT: Too many procedures to remember
+552 Environment variable not found or not integer
+553 Environment variable not found
+554 Illegal cursor coordinates passed to 'ttymov'
+555 Too many capabilities in termcap entry
+556 No entry in device capabilities file for device
+557 Attempt to set unknown parameter in ttyset
+558 Attempt to read unknown parameter in ttystat
+559 Excessive nesting in termcap; recursive tc reference?
+560 Internal error: termcap caplist index is faulty, search fails
+561 Attempt to open too many graphics devices at once
+562 Invalid or null tty descriptor
+570 Memory has been corrupted
+571 STROPEN: String not aligned with Mem
+572 Out of memory
+573 System stack underflow (invalid SFREE)
+574 Too many child processes
+575 Cannot open connected subprocess
+576 Process PID not found in process table
+577 Cannot send signal to child process
+578 Invalid IPC syntax or protocol
+579 Background job not found in job table
+580 Cannot kill background job
+581 Too many background jobs
+582 Cannot open detached process
+583 Prstat: unrecognized parameter code
+584 Unsolicited command input from a subprocess
+585 This stty parameter requires a numeric argument
+586 Stdgraph device not recorded in stty playback file
+
+# CLIO (600-649)
+598 Task has too many psets
+599 Out of space for pset name storage
+600 EOF while reading non list structured parameter
+601 Parameter not a legal boolean (try 'yes' or 'no')
+602 Parameter not a legal character constant
+603 Parameter not a legal number
+606 Illegal argument to CLSTATUS
+607 CLSET: Attempt to set unknown option
+608 CLGWRD: No match, or ambiguous abbreviation
+609 Commands can only be sent to the CL from a connected subprocess
+
+610 Bad file name template descriptor
+611 Illegal file name template
+612 Too many concatenatable sublists in filename template
+613 Too many string replacements in filename template
+614 Cannot edit a string constant filename template
+
+# FIO (700-799)
+720 Cannot preallocate space for file
+721 AREAD transfer not aligned on a device block boundary
+722 Attempt to read out of bounds on file
+723 AWRITE transfer not aligned on a device block boundary
+724 Attempt to write out of bounds on file
+725 Cannot clobber file
+726 Operation would overwrite existing file
+727 Attempt to clobber a file which is already open
+728 Cannot delete file
+729 Attempt to delete a protected file
+730 Attempt to open file on a device not known to FIO
+731 Cannot read status of device
+732 FIO device table has overflowed
+733 Illegal file descriptor (bad fd or file not open)
+734 Illegal file access mode parameter to OPEN
+735 Illegal file type parameter to OPEN
+736 Missing AWAIT after an AREAD or AWRITE
+737 FINIT may only be called during process startup
+738 Cannot make unique temporary file name
+739 No read permission on file
+740 No write permission on file
+741 Cannot open file
+742 Cannot open device
+743 OPEN: File does not exist
+744 Cannot protect file
+745 Attempt to alter or query protection of a nonexistent file
+746 File read error
+747 Attempt to delete a nonexistent file
+748 Cannot rename file
+749 Rename would clobber existing file
+750 Illegal file access mode parameter to REOPEN
+751 Illegal file type parameter to REOPEN
+752 Seek error on file
+753 Attempt to set an unknown file parameter
+754 SYS_FSTAT
+755 Attempt to get file status for unknown parameter
+756 SYS_FSTRFILOVFL
+757 Too many open files
+758 Cannot remove file protection
+759 File write error
+760 Cannot access file
+761 Cannot open file
+762 Buffer overflow in ZMAPFN
+763 Overflow in ZMAPFN (recursion in logical name defn?)
+764 Cannot determine pathname of file
+765 Cannot determine pathname of the current working directory
+766 Can only seek to EOF on a text file opened for writing
+767 Attempt to get file status for non-integer value
+768 Cannot get info on file
+769 No write perm on directory; cannot lock file
+770 Illegal VFN database access mode
+771 Invalid checksum reading VFN mapping file
+772 Maximum filename degeneracy exceeded
+773 Long filename storage exceeded
+774 Broken directory protection lock
+775 Cannot close file
+776 Attempt to redirect an stream which is not open
+777 Attempt to redirect a stream which is already redirected
+778 Cannot change directory
+779 Cannot open directory
+780 Cannot access file
+781 Pushback buffer overflow (recursive macro?)
+782 Out of bounds or misaligned FREADP call
+783 Out of bounds or misaligned FWRITEP call
+784 Cannot make directory
+785 Directory name is too long
+786 Cannot access directory
+787 Cannot access template file or cannot make copy file
+788 Static files cannot be opened NEW_FILE - use falloc
+789 Illegal filename operand (null string)
+790 FSETI: The F_CLOSEFD option is not supported for text files
+791 FSETI: The F_CLOSEFD option cannot be used with files opened NEW_FILE
+
+# IMIO (800-899)
+800 Cannot read pixel storage file
+801 Cannot update image header
+802 Illegal image access mode
+803 Image is illegally dimensioned
+804 Negative or zero length dimension
+805 New copy of a non-image
+806 Not a legal imagefile
+807 Pixel storage file is truncated
+808 Pixel subscript out of bounds
+809 Cannot read image header
+810 Cannot specify section for a new image
+811 Invalid image section
+812 Wrong number of subscripts in image section
+813 Wrong sign on step size in image section
+814 IMSET: Attempt to set unknown option
+815 IMSTAT: Attempt to read unknown option
+816 Cannot create a new image on a special image device
+817 Too many field names in image header field name template
+818 Group format images must all be the same size
+819 Range list too large to fit in image buffer
+
+820 Operation would overwrite existing image
+821 Cannot close image
+822 Cannot copy image
+823 Cannot delete image
+824 Illegal image type (extension)
+825 Cannot access image
+826 IKI image kernel table overflow
+827 Cannot open image
+828 Cannot open pixel file
+829 Cannot rename image
+830 Cannot update image header
+
+835 Image header parameter not found
+836 Out of space in image header
+837 Attempt to redefine an image header parameter
+838 Impossible type conversion when accessing image header parameter
+839 Cannot delete image header parameter
+840 Attempt to delete a nonexistent image parameter
+
+# GIO (850-899)
+850 Cannot read graphics cursor
+851 Cannot restore graphics world coordinate systems
+852 Entire graphics vector is indefinite
+853 Illegal axis number passed to gscale (must be x=1 or y=2)
+854 Unknown GIO parameter referenced in gset call
+855 Unknown GIO parameter referenced in gstat call
+856 Invalid graphics window: no range in X
+857 Invalid graphics window: no range in Y
+858 Cannot read cell array from graphics device
+859 I/O on uninitialized graphics stream
+860 Unknown parameter request from graphics kernel subprocess
+861 Terminal does not support vector graphics
+862 No stdimage device has been specified 
+863 No stdplot device has been specified
+864 No GIO kernel specified for graphics device
+
+# MTIO (900-949)
+900 Illegal magtape unit specification
+901 Illegal magtape access mode
+902 Magtape unit already allocated to
+903 Attempt to multiply open magtape unit
+904 Magtape unit not allocated
+905 Magtape unit allocated to someone else
+906 Current position of magtape unit is undefined
+907 Attempt to position magtape to record beyond EOF
+908 Cannot rewind device
+909 Magtape device not found
+
+920 PLIO: range list overflow
+921 PLIO: bad mask save file
+922 PLIO: i/o to inactive descriptor
+923 PLIO: invalid descriptor
+924 PLIO: source raster required but not specified
+925 PLIO: reference out of bounds on mask
+926 PMIO: null reference image
+927 PMIO: mask must be the same size as reference image
+
+930 SYS_FMBADMAGIC
+931 SYS_FMCLOSE
+932 SYS_FMCOPYO
+933 SYS_FMLFCOPY
+934 SYS_FMLFNOOB
+935 SYS_FMOOF
+936 SYS_FMOPEN
+937 SYS_FMPTIOVFL
+938 SYS_FMRERR
+939 SYS_FMTRUNC
+940 SYS_FMWRERR
+941 SYS_FMBLKCHSZ
+942 SYS_FMFSINUSE
+943 SYS_FMLFLOCKED
+944 SYS_FMFCFULL
+945 SYS_FMLOKACTLF
+
+950 SYS_QMNFILES
+951 SYS_QPBADCONV
+952 SYS_QPBADFILE
+953 SYS_QPBADIX
+954 SYS_QPBADKEY
+955 SYS_QPBADVAL
+956 SYS_QPCLOBBER
+957 SYS_QPEVNSORT
+958 SYS_QPEXBADRNG
+959 SYS_QPEXDBOVFL
+960 SYS_QPEXLEVEL
+961 SYS_QPEXMLP
+962 SYS_QPEXPBOVFL
+963 SYS_QPEXRPAREN
+964 SYS_QPINDXOOR
+965 SYS_QPINVDD
+966 SYS_QPMRECUR
+967 SYS_QPNEVPAR
+968 SYS_QPNOEH
+969 SYS_QPNOVAL
+970 SYS_QPNOXYF
+971 SYS_QPPLSIZE
+972 SYS_QPPOPEN
+973 SYS_QPPVALOVF
+974 SYS_QPREDEF
+975 SYS_QPUKNPAR
+976 SYS_QPXYFNS

@@ -1,0 +1,28 @@
+.help zgtime May84 "System Interface"
+.ih
+NAME
+zgtime -- get clock and cpu times
+.ih
+SYNOPSIS
+.nf
+zgtime (clock_time, cpu_time)
+
+long	clock_time		# LST, long integer seconds
+long	cpu_time		# cpu time consumed, milliseconds
+.fi
+.ih
+DESCRIPTION
+The \fBzgtime\fR primitive returns the local standard time (clock time)
+in long integer seconds since midnight on January 1, 1980, and the
+cpu time consumed by the calling process and all subproceses since process
+creation in milliseconds.  No allowance is made for time zones or daylight
+savings time.
+.ih
+BUGS
+When daylight savings time goes into effect there is a one hour interval
+during which the time base is ambiguous.  A different time base whould have
+to be used for a distributed system spanning several time zones.
+.ih
+SEE ALSO
+ztslee
+.endhelp

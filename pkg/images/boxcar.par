@@ -1,0 +1,9 @@
+# BOXCAR FILTER
+
+input,f,a,,,,Input images to be fit
+output,f,a,,,,Output images
+xwindow,i,a,,,,X dimension of box
+ywindow,i,a,,,,Y dimension of box
+boundary,s,h,'nearest',,,'Boundary (constant,nearest,reflect,wrap)'
+constant,r,h,0,,,Constant for boundary extension
+mode,s,h,'ql'

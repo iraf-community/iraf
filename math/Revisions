@@ -1,0 +1,44 @@
+.help revisions Jun88 math
+.nf
+math$interp/asigrl.x: Davis, Jan 27, 1988
+    1. The routine ii_getpcoeff was duplicated in the files asigrl.x and
+    ii_1dinteg.x. I removed the copy in asigrl.x and rebuilt the library.
+
+math$interp/arider.x: Davis, February 10, 1988
+    1. The routines iidr_poly3, iidr_poly5 and iidr_spine3 were declared
+    as functions but called everywhere as subroutines. I removed the
+    function declarations.
+
+math$gsurfit/gsder.gx: Davis, October 16, 1987
+    1. changed a real type conversion call to double in the gsder routine.
+    This error was causing the derivative evaluations to fail on the sun.
+
+math$gsurfit/gsder.gx: Davis, August 11, 1987
+    1. A call in gsder to gscoeff was not being set to double precision.
+
+math$gsurfit: Davis, January 22, 1986
+    1. A new version of the gsurfit package was installed. A double precision
+    gsurfit has  been added. The double precision calls are the same as
+    the single precision calls but prefixed by a d. Some of the evaluation
+    routines were vectorized and run significantly faster than the old version.
+    A power series polynomial function was added to the package for convenience
+    in evaluating the simple rotation transformation functions.
+
+math$iminterp/arider.x: Davis, September 7, 1986
+    1. The routines ii_pcpoly3, ii_pcpoly5 and ii_pcspline3 were declared
+    as functions but called everywhere as subroutines. Removed the function
+    declaration. I also moved these routines into a file of their own
+    ii_pc1deval.x and changed the prefix to ia_ from ii_ to avoid conflict
+    with the 2D equivalents.
+
+math$interp/arider.x: Davis, September 7, 1986
+    1. The routines ii_pcpoly3, ii_pcpoly5 and ii_pcspline3 were declared
+    as functions but called everywhere as subroutines. Removed the function
+    declaration.
+
+From Davis Jan 8, 1986
+
+1. Added documentation for surfit package.
+
+----------------------------------------------------------------------------
+.endhelp

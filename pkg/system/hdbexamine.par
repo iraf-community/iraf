@@ -1,0 +1,2 @@
+helpdb,s,h,"helpdb",,,"name of help database to be examined"
+verbose,b,h,no,,,"long form output"

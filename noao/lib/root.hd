@@ -1,0 +1,5 @@
+# Root help directory for the NOAO packages.  This dummy package is necessary
+# in order to have `noao' appear as a module in some package, so that the user
+# can type "help noao" (with the `noao' given as a task).
+
+_noao		pkg = noao$lib/rootnoao.hd

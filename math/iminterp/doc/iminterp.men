@@ -1,0 +1,27 @@
+	 arbpix	- Replace bad pixels in an array
+	 arider	- Calculate derivatives for a few points in an array
+        arieval	- Evaluate the interpolant at a few points in an array
+         asider	- Evaluate derivatives at x 
+	asieval	- Evaluate the interpolant at x
+	 asifit	- Fit the interpolant
+	asifree - Free space allocated by asiinit
+	asigeti - Fetch an integer parameter
+	 asigrl	- Calculate the integral under an array
+	asiinit - Get ready to fit interpolant; set up parameters of interpolant
+     asirestore - Restore interpolant parameters and coefficients
+	asisave - Save interpolant parameters and coefficients
+      asivector - Evaluate interpolant at an array of x
+
+         mrider	- Calculate derivatives for a few points in a 2-D array
+        mrieval	- Evaluate the interpolant at a few points in a 2-D array
+         msider	- Evaluate derivatives at x and y
+        msieval	- Evaluate the interpolant at x and y
+         msifit	- Fit the 2-D interpolant
+        msifree	- Free space allocated by msiinit
+	msigeti - Fetch an integer parameter
+         msigrl	- Calculate the integral inside a polygon
+       msisqgrl - Calculate the integral in a rectangle
+        msiinit	- Get ready to fit 2-D interpolant; set up parameters
+     msirestore	- Restore interpolant parameters and coefficients
+        msisave	- Save 2-D interpolant parameters and coefficients
+      msivector - Evaluate interpolant at an array of x and y

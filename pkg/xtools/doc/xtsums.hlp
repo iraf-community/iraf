@@ -1,0 +1,83 @@
+.help xtsums Feb86 xtools
+.ih
+NAME
+.nf
+xt_lsum  -- Sum image lines
+xt_csum  -- Sum image columns
+xt_lsumb -- Sum image lines with buffering
+xt_csumb -- Sum image columns with buffering
+.fi
+.ih
+SYNOPSIS
+.nf
+pointer	im		# IMIO pointer
+pointer	co		# COGETR pointer
+int	col1, col2	# Column limits of the sum
+int	line1, line2	# Line limits
+pointer	data		# Data pointer returned
+
+	call xt_lsum (im, col1, col2, line1, line2, data)
+	call xt_csum (co, col1, col2, line1, line2, data)
+	call xt_lsumb (im, col1, col2, line1, line2, data)
+	call xt_csumb (co, col1, col2, line1, line2, data)
+.fi
+.ih
+DESCRIPTION
+The specified lines or columns in a 2D images are summed and a pointer to
+the real sum vector is returned.  For \fBxt_lsum\fR and \fBxt_lsumb\fR the
+lines between \fIline1\fR and \fIline2\fR are summed and a pointer to the summed
+vector between \fIcol1\fR and \fIcol2\fR is returned.  Similarly, for
+\fBxt_csum\fR and \fBxt_csumb\fR the columns between \fIcol1\fR and \fIcol2\fR
+are summed and a pointer to the summed vector between \fIline1\fR and
+\fIline2\fR is returned.  The data pointer is to a real vector.  The column
+sums use the efficient column access procedures described in \fBcogetr\fR.
+
+The procedures without the 'b' suffix read the set of lines or columns
+in the sum from the image every time.  The 'b' suffix procedures buffer
+the lines or columns such that if only a few lines or columns are different
+from the preceding sum then only those lines or columns are read.  Thus the
+"buffered" sums are used for moving sums while the unbuffered procedures are
+used when there is no overlap between the sums.
+.ih
+RETURN VALUE
+The returned pointer \fIdata\fR is to a vector of type real.
+.ih
+EXAMPLES
+Suppose a sum of "nsum" lines or columns is required through the image
+in steps of "nstep".  The following code fragment illustrates the usage.
+
+.nf
+	im = immap (image, READ_ONLY, 0)
+	switch (axis) {
+	case 1:
+	    col1 = 1
+	    col2 = IM_LEN(im, 1)
+	    for i = 1, IM_LEN(im, 2), nstep {
+	        if (nstep < nsum)
+		    call xt_lsumb (co, col1, col2, i, i+nsum-1, data)
+	        else
+		    call xt_lsum (co, i, i+nsum-1, line1, line2, data)
+
+	        # Do operations on vector Memr[data]
+	    }
+	case 2:
+	    co = comap (im, maxbuf)
+
+	    line1 = 1
+	    line2 = IM_LEN(im, 2)
+	    for i = 1, IM_LEN(im, 1), nstep {
+	        if (nstep < nsum)
+		    call xt_csumb (co, i, i+nsum-1, line1, line2, data)
+	        else
+		    call xt_csum (co, i, i+nsum-1, line1, line2, data)
+
+	        # Do operations on vector Memr[data]
+	    }
+	    call counmap (co)
+	}
+	call imunmap (im)
+.fi
+.ih
+SEE ALSO
+cogetr
+.endhelp

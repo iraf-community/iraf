@@ -1,0 +1,52 @@
+.help revisions Jun89 math.curfit
+.nf
+From Davis, July 14, 1988:
+
+The calling sequence for the cverrors routine as been changed to include
+an npts argument. This edition removesd the possibility for error when
+points have been rejected by setting w[i] = 0.
+
+-----------------------------------------------------------------------------
+
+From Davis, April 30, 1986:
+
+1. Several bugs involving double precision constants in the double precision
+version of curfit detected on the SUN have been fixed.
+
+-----------------------------------------------------------------------------
+
+From Davis, March 13, 1986:
+
+1. A double precision version of CURFIT has been installed in IRAF. The entry
+points for the double precision version are identical to those of the real
+version with the addition of a preceeding d (e.g. cveval and dcveval). All
+internal arithmetic is done in double and the data is entered in double.
+
+2. A user function facility has been added to CURFIT. The user may enter
+any linear function in the following manner.
+
+	extern func
+
+	...
+
+	call cvinit (cv, USERFNC, nterms, xmin, xmax)
+	call cvuser (cv, func)
+	call cvfit (cv, x, y, w, npts, WTS_USER, ier)
+	call cvvector (cv, x, yfit, npts)
+	call cvfree (cv)
+
+	...
+
+The user function must have the following form.
+
+	procedure func (x, nterms, k1, k2, basis)
+
+where
+
+	real	x		x value
+	int	nterms		number of basis functions
+	real	k1, k2		optional normalization parameters
+	real	basis[ARB]	computed basis functions
+
+-------------------------------------------------------------------------------
+.endhelp

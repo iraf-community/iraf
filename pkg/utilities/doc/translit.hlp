@@ -1,0 +1,49 @@
+.help translit Mar84 utilities
+.ih
+NAME
+translit -- replace or delete specified characters in a file
+.ih
+USAGE
+translit infile from_string [to_string]
+.ih
+PARAMETERS
+.ls infile
+The input file name or template, e.g. "abc" or "abc.*".
+.le
+.ls from_string
+String containing characters to be mapped. 
+If delete is yes then the characters in from_string are deleted from the input
+file(s). The from_string may specify a range of characters, e.g. "a-z" or "A-Z".
+If the first character of from_string is ^ then the program will operate
+on all but the specified characters, e.g. "^a-z" means all but lower case
+alphabetic characters.
+.le
+.ls to_string
+Requested if delete is no, otherwise set to the null string.
+Characters in from_string are mapped into characters in to_string.
+When to_string is short with respect to from_string, it is padded
+by duplicating the last character.
+.le
+.ls delete = no
+If delete is yes the characters in from_string are deleted from the input
+file(s) and no to_string is requested.
+.le
+.ls collapse = no
+If this switch is set all strings of repeatedly mapped output characters
+are squeezed to a single character.
+.le
+.ih
+EXAMPLES
+To change all the alphabetic characters in a file from lower to upper
+case, writing the result on the standard output:
+
+    cl> translit filename a-z A-Z
+
+To delete the letters a, b, and c from a file:
+
+    cl> translit filename abc de=yes
+
+To replace all but the letters abc in a file with A:
+
+    cl> translit filename ^abc A
+.endhelp

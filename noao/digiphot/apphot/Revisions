@@ -1,0 +1,467 @@
+.help revisions Jun88 noao.digiphot.apphot
+.nf
+apphot
+    Davis, June 20, 1989
+    1. The inverse of the scale was being incorrectly printed out by
+    the :show command.
+    2. Fwhmpsf is in scale units not pixels as listed in datapars.
+    3. Exposure, ccdread and gain were not being updated correctly
+    in interactive mode.
+
+    Davis, May 27, 1989
+    1. A new parameter scale has been added to datapars and integrated into
+    the apphot tasks. All the radial profile plots will now display
+    units of scale and of pixels. The .hlp. .key and : commands
+    have all be changed appropritately. Testing is complete.
+
+    2. Some minor changes have been made to the quick look output formats.
+
+    3. A verbose and verify switch have been added to all the appropriate
+    tasks.
+
+     4. Daofind has been modifed so that the convolved image is automatically
+     up to date if any of the convolution kernel parameters have been
+     modified.
+
+apphot
+    Davis, May 17, 1989
+    1. Add the verify switch to radprof and wphot.
+    2. Began separation of the scale and fwhmpsf parameter.
+       Scale was added to the apphot structure.
+
+apphot
+    Davis, Mar 20, 1989
+    1. Fixed an error in the definition of the skyfile format in phot.hlp
+    and wphot.hlp. The are seven columns not five with the x and y position
+    in columns 1 and 2.
+    2. Added the verify switch to the center, fitsky, fitpsf and polyphot tasks.
+
+apphot
+    Davis, Mar 15, 1989
+    1. Modified the prompts in datapars.par, centerpars.par, fitskypars.par
+    and photpars.par.
+    2. Added a confirm switch to the phot task.
+
+apphot
+    Davis, Mar 14, 1989
+    1. Changed the interactive setup routine in daofind so that the radial
+    profile is centered before the interactive setup menu is entered.
+    2. A confirm switch has been added to the daofind task so that in batch
+    mode (the default) the user can check/confirm/modify the critical
+    task parameters. A similar 'v' for verify key has been added to 
+    the list of interactive menu setup commands.
+
+apphot
+    1. Davis, Mar 13, 1989
+    Edited the daofind parameter file to make the prompts more illuminating.
+    2. Changed all the daofind subdirectory procedure names beginning with
+    ap to ap_. This continues the apphot cleanup begun in January.
+    3. Fixed a bug in the interactive daofind code. If no convolution image
+    was opened daofind was trying to delete a nonexistent image at 
+    task termination.
+
+apphot
+    1. Davis, Mar 3, 1989
+    I changed all the apselect subdirectory procedure names to begin with
+    ap_. This continues the cleanup begun in January. Moved the apkeysdef.h
+    file into the aplib subdirectory with all the other .h files.
+
+apphot
+    1. Davis, Feb 3, 1989
+    I changed all the .keys and .skeys file extensions to .key extensions.
+    This removes a problem with installations which do a strip operation.
+
+apphot
+    1. Davis, Jan 30, 1989
+    I fixed a potential problem in polyphot. If a user specified a concave
+    polygon and the image line intersected the polygon exactly on a vertex
+    polyphot might not be able to tell whether a line segment was inside
+    or outside the polygon, causing a error in the total flux computation.
+    The affected routine was ap_yclip in apyfit.x
+
+apphot
+    1. Davis, Jan 23, 1989
+    All the tasks doing interactive setup using a radial profile now
+    center the profile before plotting. This facilitates marking the full
+    width half maximum of the psf on the plot.
+
+apphot
+    1. Davis, Jan 21, 1989
+    Began cleanup of file and procedure names. All file names now begin with
+    ap. All procedure names begin with ap. Eventually I will clean up
+    the ap to ap_ convention. The subdirectories polyphot and polymark
+    have been completely overhauled. Note caution about updates is in order.
+
+apphot
+    1. Davis, Nov 11, 1988
+    Removed a call to imparse in apimroot.x and a call to iki_parse in
+    apoutname.x. The calls were changed to imgimage.
+
+apphot
+    1. Davis, Nov 3, 1988
+    Daofind was outputing an incorrect magnitude estimate due to an indexing
+    problem. The correct stellar position was being output.
+
+apphot
+    1. Davis, Oct 27, 1988
+    The :aperts coomand in qphot.keys, phot.keys and wphot.keys was changed
+    to the correct :apertures command. The corresponding help pages were
+    also modified.
+
+apphot
+    1. Davis, Oct 4, 1988
+    The statement z = z + p[4] was out of order in the routine cdgauss1d
+    in cgauss1d.x. The evaluation of the derivative with respect to sigma
+    was in error. This bug would not be noticed in the apphot code as 
+    sigma was being held constant whenever this routine was called.
+
+apphot
+    1. Davis, Sept 12, 1988
+    The APPHOT package was installed in the apphot subdirectory of the
+    digiphot package.
+
+apphot
+    1. Davis, Aug 15, 1988
+    If the i key (interactive setup option) was used after the first object
+    record was written to the database file then the changed parameters
+    were not being updated in the database file. The : commands were
+    being updated correctly. This problem has been fixed in all the
+    interactive tasks.
+
+apphot
+    1. Davis, Aug 18, 1988
+    Apselect will now accept a list of text files as input. 
+
+apphot
+    1. Davis, Aug 16, 1988
+    The apphot tasks now save the apertures string as well as the list
+    of apertures. The phot, qphot and wphot phot tasks will noe accept
+    a ranges syntax of the form ap1:apn:apstep. This syntax can be
+    mixed with the former syntax. In addition it is know possible to read
+    the apertures from a text file.
+
+apphot
+    1. Davis, Aug 11, 1988
+    Fixed a bug in the angle computation for the elliptical Gaussian fitting
+    routine in fitpsf. Positive angles from 0 to 90 were correct, the
+    rest were being forced to be positive.
+
+    2. It is now possible to change the image, coordinate file and output
+    file name from apphot interactive mode.
+
+apphot
+    Davis, Aug 4, 1988
+    1. Changed the maximum number of apertures from 15 to 100.
+    2. Changed apwparam to allocate astring of SZ_LINE long.
+
+apphot
+    Davis, Jul 29, 1988
+    1. Fixed a bug in polyget.x. The program was hanging in batch mode when
+    one tried to read a polygons file created by the imtool cursor readback
+    facility. I removed an incorrectly placed next statement.
+
+apphot
+    Davis, Jun 1, 1988
+    1. Added id strings to all the parameter files which request
+    algorithm names etc.
+
+apphot
+    Davis, Apr29, 1988
+    1. I fixed a potentially serious problem in the way daofind handles
+    out of bounds regions. Daofind was accessing an out of bounds array
+    which accasionally would fail with divide by zeros NaNs etc.
+    The positions of stars near the edge of the image could be affected.
+
+apphot$
+    Davis, Apr22, 1988
+    1. Added a new parameter threshold and changed old parameter threshold
+    to cthreshold.
+
+    2. Daofind now reads the datapars file. It can now work on both emission
+    and absorption features.
+
+    3. Cleaned up the output and integrated with rest of apphot.
+
+apphot$
+    Davis, Apr12, 1988
+    1. Removed redundant MISC string definitions.
+
+    2. Added the DATAMIN and DATAMAX parameters required by daophot. This
+    required changes to the apphot structure, the get and put pars routines
+    and the set and stat calls.
+
+apphot$
+    Davis, Apr4, 1988
+    1. Added correct error code handling for the case where cbox <= 0.0
+    or dannulus = 0.0. The correct action but incorrect error code was
+    being returned.
+
+    2. Fixed the same bug in the code for fitpsf.
+
+apphot$
+    Davis, Apr4, 1988
+    1. Fixed a bug in decoding the apertures string. If a nonsensical
+    apertures string was given then the apertures could be decoded into
+    some strange number.
+
+apphot$apselect.x
+    Davis, Apr1, 1988
+    1. I fixed a bug in the apselect task which occurred when the user
+    requested all the output fields with the * command and the output
+    records contained array valued fields. The select buffer
+    was being allocated space equal to the number of unique keys, not
+    space for the total number of elements causing memory overflow
+    problems.
+
+apphot$
+    Davis, Mar31, 1988
+    1. Added a needed gdeactivate command to i setup key menus when they
+    terminate prematurely. Otherwise the terminal is left in graphics
+    mode.
+
+    2. A bug in the batch mode of running apphot tasks occurred if a single
+    output file was specified and there were no stars in the first file.
+    The header could be written several times and cause and error in apselect.
+
+apphot$fitpsf/
+    Davis, Mar15,1988
+    1. I changed the initial guess for the sigma to be the fwhmpsf instead
+    of a small fraction of the fitting box as before. This affects both the
+    radial Gaussian and the elliptical Gaussian.
+
+apphot$
+    Davis, Mar8,1988
+    1. Floating divide by 0 errors weere occurring in daofind when the threshold
+    was set to zero. These were arising in two different places. The
+    magnitude estimate is based on a ratio with respect to threshold
+    and the sharpness computation can blow up when the peak pixel is zero.
+
+    2. I have added a warning message to aptime.x, appadu.x and aprdnoise.x
+    so that they will print an error message if the header parameter
+    keyword cannot be found in the image header.
+
+apphot$
+    Davis, Feb23,1988
+    The graphics and image device opens have been moved outside of the
+    image loop in interactive mode.
+
+apphot$
+    Davis, Feb18,1988
+    1. All the next now print out a short help page at startup time if they
+    are run in interactive mode.
+
+    2. I changed the task termination sequence.  q from inside the cursor
+    loop calls up a verification sequence, return goes back into the cursor
+    loop, n exits the cursor loop and asks for the next image, q quits the
+    task and w quits the task and writes to the pset parameter files.
+
+    3. I have added the bell character to the end of all warning messages.
+    More specific error messages were added to tell people that they are
+    at the end of a coordinate lists etc.
+
+apphot$
+    Davis, Feb9, 1988
+    I switched the exposure and itime parameters from the photpars and
+    polypars psets to the datapars pset where they more properly belong.
+
+apphot$
+    Davis, Feb 6, 1988
+    If salgorithm = constant then the algorithm which computes the magnitude
+    errors will try to use the value of the sigma parameter to estimate the
+    random noise inside the aperture. If sigma is INDEFR it will use only the
+    poisson statistics of the star.
+
+apphot$
+    Davis, Feb 5, 1988
+    Moved the pfeature parameter from centerpars and placed it in datapars
+    where it logically belongs.
+
+    Corrected a radprof error in which the extracted pixel array was being
+    call out of bounds even when it wasn't.
+
+    Polyphot was centering on the cursor position even when no polygon
+    had been defined.
+
+apphot$radprof/,apphot$apselect/
+    Davis, Feb 2, 1988
+    Fixed a minor bug in apselect. If string parameters were exactly equal
+    to their formatted lengths then a single extra character would get
+    printed at the end of each selected field. This happened for example
+    when the photometry parameter was out of bounds.
+
+    In the radprof task the sky subtracted sums were being printed out
+    instead of the total sums. The mangnitudes were being computed
+    correctly.
+
+apphot$
+    Davis, Jan 25, 1988
+    Made extensive changes to the keyword and units string maintenance
+    facilities, mostly to make the package easier to maintain.
+
+    Changed the pfeature keyword to emission which makes more sense.
+
+apphot$t_apselect.x
+    Davis, Jan 20, 1988
+    Corrected a bug in the apselect program in which the package would
+    crash if the fields string was set to NULL. I included a check for
+    the null string in the t_apselect.x procedure.
+
+apphot$
+    Davis, Jan 20, 1988
+    I made the task lintran part of the apphot package. This allows the
+    user to manipulate the coordinate lists.
+
+apphot$polyphot/pyprint
+    Davis, Jan 9, 1988
+    I corrected an error in the format string for the polyphot magnitude
+    error which was shifting the number over 2 columns.
+
+apphot$daofind/apfind.x
+    Davis, Jan 6, 1988
+    A bug in the way daofind computed the convolution kernel for very
+    small kernels was discovered and corrected. The kernel is supposed to
+    be defined for all pixels < 2.0 pixels from the center. For small
+    kernels these elements were being left at zero. IN most cases this
+    causes no problems except for the fact that the sharpness parameter
+    was lower than seen from daofind and that the nomalization for the
+    magnitudes is different. Workarounds are to increase nsigma from the
+    default of 1.5.
+
+apphot$polyphot/polyfit.x
+    Davis, Dec 31, 1987
+    The itime normalization was not working correctly in the polyphot
+    task. The time was being picked up correctly but the zero-point
+    correction was not being made to the magnitude.
+
+apphot$polyphot/pybphot.x
+    Davis, Dec 30, 1987
+    I fixed a bug in the polyphot batch mode processing routine. An
+    "illegal file descriptor" error was occurring when polyphot was run
+    in batch mode with a null coordinate file list and a polygons list.
+
+apphot$
+    Davis, Dec 22, 1987
+    I continued the clean up of apphot output files. Some of these
+    bugs could cause problems for potential users of apselect.
+    Changed the units string for CERROR, SERROR, PERROR and RERROR to
+    "cerrors", "serrors", "rerrors" and "perrors" from "cerror",
+    "serror", "perror" and "rerror" respectively to make things consistent
+    with the other tasks.
+
+    I changed to polyphot units string for ZMAGNITUDE and EXPOSURE to
+    "zeropoint" and "keyword" respectively for consistency with the phot
+    bug.
+
+    Fixed a bug in the polyphot output file where a # was missing in front
+    of the line beginning with XCENTER.
+
+    Fixed a bug in the output of fitpsf with function = radgauss where
+    the SIGMA keyword was used for two different quantities and only the
+    first one was being output.
+
+    I changed the order of the output table headers from for example
+    #N#N#N #U#U#U and #F#F#F to #N#U#F #N#U#F and #N#U#F. I rechecked 
+    apselect on all this.
+
+apphot$
+    Davis, Dec 21, 1987
+    I added a comment about the definition of box in the fitpsf parameter
+    file.
+
+    Changed the output format of the center task slightly. The units for
+    HOST are now "computer". Similarly the units string for GAIN and
+    CCDREAD are now "keyword" and "keyword". These changes will affect
+    all tasks in the apphot package which use the datapars parameter set.
+
+    Changed the units string for SALGORITHM to "algorithm". I also corrected
+    an error in the COORDS keyword by changing it from CCORDS to COORDS.
+    I added an s to the ERROR units string, changing it from error to
+    errors.
+
+    I corrected a bug in the output file for the wphot task. The record
+    names, units and formats were not being written to the output file.
+    The problem was that the task name in the batch program had not
+    been changed from ophot to wphot. See also that the task statement
+    was incorrect.
+
+apphot$radplot parameter
+    Davis, Dec 21, 1987
+    I changed the default mode for the binary version of the  plotfile from
+    NEW_FILE to append. This avoids annoying cannot open plotfile
+    information when phot is run many times. The user must be aware
+    however that very long plot files can be generated. The affected
+    tasks are center, fitsky, phot, wphot, and radprof.
+
+apphot$apselect/apselect.x
+    Davis, Dec 21, 1987
+    I installed the new apselect in apphot. In the process I fixed the last
+    memory allocation bug which only showed up in the output of the radprof
+    program where the records were unusually long.
+
+apphot$radprof/apprprof.x
+    Davis, Dec 21, 1987
+    I fixed some minor bugs in the output format of radprof which were
+    causing apselect errors. First the records PRADIUS, INTENSITY, INTENSITY
+    should read PRADIUS, INTENSITY and TINTENSITY. The total intensity
+    record was never being read. I added a trailing slash at the end of the
+    magnitude record to indicate that the record continued on to include
+    the radial profile. If the radial profile was long > 20 records a
+    segmentation violation would occur as the program was not reallocating
+    extra memory correctly.
+
+apphot$radprof/aprpinit.x
+Davis, Dec 15, 1987
+    Radprof was not reading multiple appertures from the photpars parameter
+    file correctly. The problem was that the napert and weight arguments
+    were reversed in the call to ap_photsetup making napert always equal
+    to  1.
+
+apphot$apselect
+Davis, Dec 15, 1987
+    Array subscripts in the apselect task were not being handled correctly
+    on the sun machines. The problem was in the call to the stridx routine.
+    A character constant was being placed in the first argument which is
+    interpreted as an integer. This wa ok on Vax machines with their reverse
+    byte order but did not work on the Suns. I set up some character
+    constants and taht removed the problem.
+
+    Arrays and array elements were not always being handled correctly by the
+    expression parser. In fact arrays are curently illegal in expression.
+    The program will now abort with a more informative error message if
+    it detects an array in an expression. Array elements are permitted
+    however.
+
+    I added  some missing mfree statements which were causing random
+    segmentation violation errors from time to time.
+
+    Finally I made some changes for the sake of efficiency. For example
+    I call the routine apchoose only once instead of once for each record
+    in the output file.
+
+apphot$apphot.hd
+Davis, Dec 15, 1987
+    Changed the name of the wphot help page from ophot.hlp to wphot.hlp
+    and the same of the source code file from t_ophot.x to t_wphot.x.
+    Ophot was the historical name of this package.
+
+    Corrected an error in the installation guide instructions on installing
+    the help database. The help apphot command was not functioning
+    correctly. The problem was a missing apphot defintion infront of the
+    .men, .sys etc commands.
+    
+apphot$apimroot.x
+Davis, Dec 10, 1987
+    Fixed a bug in the output file name generating code. If output = default
+    and the image name specification included an image section then apphot
+    tasks would try to create an output file name of the form .extension.
+    version. The left square brackett made the image name appear like a
+    directory to fio. I included code to strip the image section off the
+    image name before constructing the output file name. The image
+    section information is however preserved in the output file.
+
+---------------------------------------------------------------------------
+
+    October 27, 1987 Alpha Test Version Released
+
+--------------------------------------------------------------------------
+.endhelp

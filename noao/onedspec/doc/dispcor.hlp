@@ -1,0 +1,310 @@
+.help dispcor May88 noao.onedspec
+.ih
+NAME
+dispcor -- Dispersion correct to linear wavelength coordinates
+.ih
+USAGE
+dispcor input output [records]
+.ih
+PARAMETERS
+.ls input
+List of input spectra or root names to be dispersion corrected.
+When using the record number extension format, record number extensions
+will be appended to each root name in the list.
+.le
+.ls output
+List of dispersion corrected output spectra or root names.
+When using the record number extension format, record number extensions
+will be appended to each root name in the list.  The output extension
+will be the same as the input extension.  If no output list is specified
+then the output spectrum will replace the input spectrum after
+dispersion correction.
+.le
+.ls records
+List of records or ranges of records to be appended to the input and
+output root names when using record number extension format.  The
+syntax of this list is comma separated record numbers or ranges of record
+numbers.  A range consists of two numbers separated by a hyphen.
+A null list may be used if no record number extensions are
+desired.  This is a positional query parameter only if the record
+format is specified.
+.le
+.ls recformat = yes
+Use record number extension format?  If \fIyes\fR the record numbers
+specified by the parameter \fIrecords\fR will be appended to each input
+root name.
+.le
+.ls database = "database"
+Database containing dispersion solutions created by \fBidentify\fR.
+.le
+.ls table = ""
+Wavelength coordinate table.  Elements in this optional table override
+the wavelength coordinates given below for specified apertures.  See the
+DISCUSSION for additional information.
+.le
+.ls apertures = ""
+List of apertures to be selected from the input list of spectra.  If no list
+is specified then all apertures are selected.  The syntax is the same as the
+record number extensions.
+.le
+.ls w1 = INDEF, w2 = INDEF, dw = INDEF, nw = INDEF
+The starting wavelength, ending wavelength, wavelength interval per pixel,
+and the number of pixels in the output spectra.  Any combination of these
+parameters may be used to restrict the wavelength coordinates of the output
+spectra.  If two or more have the value INDEF then suitable defaults
+based on the number of input pixels and the wavelength range of the
+reference dispersion solutions are used.  These defaults may either
+come from all spectra, all spectra of the same aperture, or individually
+for each spectrum depending on the values of the \fIglobal\fR and
+\fIignoreaps\fR parameters.  Note that if a logarithmic
+wavelength scale is selected then \fIw1\fR, \fIw2\fR, and \fIdw\fR
+must be specified logarithmically.  These values may be overridden for
+specified apertures by a wavelength table.  Otherwise these values apply
+to all apertures.
+.le
+.ls interpolation = "poly5"
+Interpolation type.  The interpolation types are "linear" for linear,
+"poly3" for cubic polynomial, "poly5", for quintic polynomial, and
+"spline3" for cubic spline.
+.le
+.ls log = no
+Use linear logarithmic wavelength coordinates?  Linear logarithmic
+wavelength coordinates have wavelength intervals which are constant
+in the logarithm of the wavelength.
+.le
+.ls flux = yes
+Conserve the total flux during interpolation?  If \fIno\fR the output
+spectrum is interpolated from the input spectrum at each output
+wavelength coordinate.  If \fIyes\fR the input spectrum is integrated
+over the extent of each output pixel.  This is slower than
+simple interpolation.
+.le
+.ls global = no
+Apply global wavelength defaults?  Defaults for the INDEF wavelength
+coordinate parameters are determined if two or less of the wavelength
+parameters are specified.  The defaults are based on the number of
+pixels and the wavelengths of the first and last pixel as given by the
+dispersion solution.  If this parameter is \fIno\fR this is done
+independently for each input spectrum.  If this parameter is \fIyes\fR
+then the maximum number of pixels and the minimum and maximum
+wavelengths of all the input spectra or those of the same aperture are
+used to provide defaults for the spectra.  The parameter
+\fIignoreaps\fR determines whether the global coordinates are over all
+spectra or only those with the same aperture number.  The global option
+is used to have all the dispersion corrected spectra have the same
+wavelength coordinates without actually specifying the wavelength
+parameters.
+.le
+.ls ignoreaps = no
+Ignore aperture numbers in determining global wavelength defaults?  If the
+parameter \fIglobal\fR is set then the wavelength defaults are determined
+for each aperture from all spectra of the same aperture if \fIignoreaps\fR
+is no and from all spectra regardless of aperture if yes.
+.le
+.ls confirm = no
+Confirm the wavelength parameters for each spectrum?  If \fIyes\fR
+the wavelength parameters will be printed and the user will be asked
+whether to accept them.  If the parameters are not acceptable the
+user will be queried for new values.  The confirmation and parameter
+changes are repeated until an acceptable set of parameters is obtained.
+When the \fIglobal\fR parameter is \fIyes\fR changes to the wavelength
+parameters will remain in effect until changed again.
+.le
+.ls rebin = no
+Rebin previous dispersion corrections?  If not set then spectra which have
+been dispersion corrected are ignored.  If set then the spectra which have
+not been dispersion corrected are ignored and dispersion corrected spectra
+are reinterpolated to new wavelength coordinates.
+.le
+.ls listonly = no
+List the dispersion coordinates only?  If set then the dispersion coordinates
+are listed but the spectra are not dispersion corrected.  This may be used
+to determine what the default wavelengths would be based on the dispersion
+solutions.
+.le
+.ih
+DESCRIPTION
+The input spectra are dispersion corrected to a linear wavelength
+coordinate system (possibly linear in the logarithm of the wavelength)
+by interpolation using the dispersion solutions of the reference
+spectra specified in the image header.  Generally the spectra are
+one dimensional but for two dimensional images each line is treated
+as a spectrum and linearized.  The input spectra must have one
+or both of the reference spectra definitions REFSPEC1 and REFSPEC2 in
+the image header.  When there are two reference spectra the
+spectrum names may be followed by a weighting factor (assumed to be 1
+if missing).  The wavelength of a pixel is then the weighted average of
+the wavelengths from the reference spectra dispersion solutions.  The
+task \fBrefspectra\fR provides a number of ways to assign reference
+spectra.  Note, however, that these assignments may be made directly
+using the task \fBhedit\fR or with some other task or script if none of
+the methods are suitable.  The reference spectra must have dispersion
+solutions in the specified \fIdatabase\fR produced by the task
+\fBidentify\fR.  If the reference spectrum is two dimensional then
+the last dispersion function defined in the database is used.
+
+Optional numeric record format extensions may be appended to each name
+(used as a root name) in the input list by selecting the
+\fIrecformat\fR parameter and specifying a list of records with the
+\fIrecords\fR parameter.  The records are specified by a list of comma
+separated numbers or ranges (two numbers separated by a hyphen).  The
+extensions are appended as a four digit number.  The input spectra may
+be restricted to a particular aperture numbers by the parameter
+\fIapertures\fR; the spectra not in the list are skipped.
+If no list is specified (by the null string "") then all apertures
+are selected.
+
+If the \fIrebin\fR parameter is not set then dispersion corrected
+spectra (header flag DC-FLAG is not -1) are skipped.  If it is set then
+dispersion corrected spectra are reinterpolated to a new linear
+coordinate system from the old linear coordinate system and
+non-dispersion corrected spectra are skipped.  Note that the database
+dispersion solutions are ignored for rebinning.
+ 
+The output spectra are specified by a matching list of names, or
+root names if using the record number extension format.  If no
+output list is given then the input spectrum names are used as
+output names thus replacing the spectrum by the dispersion corrected
+spectrum.  The input spectrum will also be replaced if the output
+name is the same as the input name.  Note that the record number
+extensions, if used, will also apply to the output spectra list.
+
+The linear wavelength coordinate system is specified by a starting
+wavelength, an ending wavelength, a wavelength interval per pixel, and
+the number of pixels.  These four parameters actually overspecify the
+coordinate system and only three of these values are needed to define
+it.  The output coordinate system is specified by giving a set or
+subset of these parameters using the parameters \fIw1\fR, \fIw2\fR,
+\fIdw\fR, and \fInw\fR.  When the \fIlog\fR option is used these
+parameters are interpreted as logarithmic; i.e. the starting value is
+the log of the wavelength of the first pixel and the interval is the
+interval in the log of the wavelength.  Default values for any
+parameters which are not specified, by using the value INDEF, are
+supplied based on the wavelengths of the first and last pixel as given
+by the dispersion function and the number of pixels in the input
+image.  The defaults may either be determined separately for each
+spectrum (\fIglobal\fR = \fIno\fR), from all spectra with the same
+aperture (\fIglobal\fR = \fIyes\fR and \fIignoreaps\fR = \fIno\fR),
+or from all the spectra (\fIglobal\fR = \fIyes\fR and
+\fIignoreaps\fR = \fIyes\fR).  As indicated the parameter \fIignoreaps\fR
+determines whether global defaults are determined independently for
+each aperture or not.
+
+Another way to specify the wavelengths when there are many apertures is
+to use a wavelength table.  This table consists of lines containing
+an aperture number, the starting wavelength, the ending wavelength,
+the wavelength interval per pixel, and the number of output pixels.
+Any of these values may be specified as INDEF (though usually the aperture
+number is not).  The name of the table file is specified by the
+parameter \fItable\fR.  One way to view this is that an entry in the
+wavelength table overrides the values of the parameters \fIw1\fR,
+\fIw2\fR, \fIdw\fR, and \fInw\fR, which normally apply to all apertures,
+for the specified aperture.  The wavelength table is used to specify
+explicit independent values for apertures.  The global mechanism can
+supply independent values for the INDEF parameters when the \fIignoreaps\fR
+parameter is no.
+
+The input spectrum name and the wavelength parameters are printed
+on the standard output.  If one wishes to verify and possibly
+change the defaults assigned, either globally or
+individually, the \fIconfirm\fR flag may be set.  The user
+is asked whether to accept these values.  By responding with no
+the user is given the chance to change each parameter value.
+Then the new parameters are printed and the user is again asked
+to confirm the parameters.  This is repeated until the
+desired parameters are set.  When the defaults are not global
+the changed parameters will not be used for the next spectrum.
+When the global option is used any changes made are retained
+(either for all apertures or independently for each aperture)
+until changed again.
+
+When adjusting the wavelengths the user should specify which parameter
+is free to change by entering INDEF.  If none of the parameters are
+specified as INDEF then those values which were not changed, i.e. by
+accepting the current value, are the first to be changed.
+
+Once the wavelength scale has been defined the input spectrum is
+interpolated for each output pixel.  Output wavelengths outside
+the range of the input spectrum are set to zero.  The interpolation
+function is selected by the user.  When it is desired to conserve
+flux, particularly when the dispersion is significantly reduced,
+the output pixel value is obtained by integrating the interpolation
+function across the wavelength limits of the output pixel.
+
+The wavelength coordinate system is entered in the output spectrum
+image header.  The starting wavelength is recorded in the
+parameters W0 and CRVAL1 and the wavelength interval per pixel is
+recorded in the parameters WPC and CDELT1.  Also the parameter
+CRPIX1 is set to 1; i.e. the pixel to which the value of CRVAL1
+refers is the first pixel.  The dispersion correction flag
+DC-FLAG is set to 0 if the coordinates are in linear wavelength
+and 1 if they are linear in logarithm of the wavelength.
+
+If one wishes to only check what wavelengths will be determined for the
+defaults without actually dispersion correcting the spectra the
+\fIlistonly\fR flag may be set.
+.ih
+EXAMPLES
+1.  Dispersion correct spectra so that they have the same number of pixels
+and the wavelengths limits are set by the reference spectra.
+
+.nf
+cl> dispcor irs new 9-10,447-448
+new.0009: ap = 0, w1 = 5078.84, w2 = 6550.54, dw = 1.797, nw = 820
+new.0010: ap = 1, w1 = 5078.71, w2 = 6552.81, dw = 1.800, nw = 820
+new.0447: ap = 0, w1 = 5082.57, w2 = 6551.45, dw = 1.794, nw = 820
+new.0448: ap = 1, w1 = 5082.03, w2 = 6553.66, dw = 1.797, nw = 820
+.fi
+
+2.  Confirm and change assignments.
+
+.nf
+cl> dispcor irs* %irs%new%* "" confirm+
+new.0009: ap = 0, w1 = 5078.84, w2 = 6550.54, dw = 1.797, nw = 820
+  Change wavelength coordinate assignments? (yes):
+  Starting wavelength (5078.8421234): 5070
+  Ending wavelength (6550.535123):
+  Wavelength interval per pixel (1.79693812):
+  Number of output pixels (820): INDEF
+new.0009: ap = 0, w1 = 5070., w2 = 6550.53, dw = 1.795, nw = 826
+  Change wavelength coordinate assignments? (yes): no
+new.0010: ap = 1, w1 = 5078.71, w2 = 6552.81, dw = 1.800, nw = 820
+  Change wavelength coordinate assignments? (no): yes
+  Starting wavelength (5078.7071234): 5100
+  Ending wavelength (6550.805123): 6500
+  Wavelength interval per pixel (1.79987512): INDEF
+  Number of output pixels (820): INDEF
+new.0010: ap = 1, w1 = 5100., w2 = 6500., dw = 1.797, nw = 780
+  Change wavelength coordinate assignments? (yes): no
+new.0447: ap = 0, w1 = 5082.57, w2 = 6551.45, dw = 1.793, nw = 820
+  Change wavelength coordinate assignments? (yes): no
+new.0448: ap = 1, w1 = 5082.03, w2 = 6553.66, dw = 1.797, nw = 820
+  Change wavelength coordinate assignments? (no):
+.fi
+
+3. Confirm global assignments, do dispersion correction in place, and don't use
+record format.
+
+.nf
+cl> dispcor.recformat=no
+cl> dispcor irs "" confirm+ global+ ignoreaps+
+irs.0009: ap = 0, w1 = 5078.71, w2 = 6553.66, dw = 1.801, nw = 820
+  Change wavelength coordinate assignments? (yes):
+  Starting wavelength (5078.7071234): 5100
+  Ending wavelength (6553.664123): 6500
+  Wavelength interval per pixel (1.80092412):
+  Number of output pixels (820):
+irs.0009: ap = 0, w1 = 5100., w2 = 6500., dw = 1.799, nw = 779
+  Change wavelength coordinate assignments? (yes): no
+irs.0010: ap = 1, w1 = 5100., w2 = 6500., dw = 1.799, nw = 779
+  Change wavelength coordinate assignments? (no):
+irs.0447: ap = 0, w1 = 5100., w2 = 6500., dw = 1.799, nw = 779
+  Change wavelength coordinate assignments? (no):
+irs.0448: ap = 1, w1 = 5100., w2 = 6500., dw = 1.799, nw = 779
+  Change wavelength coordinate assignments? (no):
+.fi
+
+.ih
+SEE ALSO
+refspectra
+.endhelp

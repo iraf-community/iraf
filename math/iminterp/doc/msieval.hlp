@@ -1,0 +1,36 @@
+.help msieval Apr1985 "Image Interpolation Package"
+.ih
+NAME
+msieval -- procedure to evaluate the interpolant at x and y
+.ih
+SYNOPSIS
+y = msieval (msi, x, y)
+
+.nf
+pointer		msi		# interpolant descriptor
+real		x		# x value, 1 <= x <= nxpix
+real		y		# y value, 1 <= y <= nypix
+.fi
+.ih
+ARGUMENTS
+.ls msi    
+The pointer to the sequential interpolant descriptor structure.
+.le
+.ls x, y
+The x and y values of the point to be evaluated.
+.le
+.ih
+DESCRIPTION
+The polynomial coefficients are calculated from the data points in the
+case of the polynomial interpolants and the B-spline coefficients in
+the case of the spline interpolant. The polynomial interpolants
+are evaulated using Everett's central difference formula.
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the
+responsibility of the user. MSIINIT and MSIFIT must be called before using
+MSIEVAL.
+.ih
+SEE ALSO
+msivector, mrieval
+.endhelp

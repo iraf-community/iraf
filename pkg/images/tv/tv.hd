@@ -1,0 +1,18 @@
+# Help directory for the TV package
+
+$doc		= "./doc/"
+$display	= "./display/"
+
+blink		hlp=doc$blink.hlp,		src=blink.cl
+cv		hlp=doc$cv.hlp
+cvl		hlp=doc$cvl.hlp
+_dcontrol	hlp=doc$dcontrol.hlp,		sys=..
+display		hlp=doc$display.hlp,		src=display$t_display.x
+erase		hlp=doc$erase.hlp,		src=erase.cl
+frame		hlp=doc$frame.hlp,		src=frame.cl
+lumatch		hlp=doc$lumatch.hlp,		src=lumatch.cl
+monochrome	hlp=doc$monochrome.hlp,		src=monochrome.cl
+pseudocolor	hlp=doc$pseudocolor.hlp,	src=pseudocolor.cl
+rgb		hlp=doc$rgb.hlp,		src=rgb.cl
+window		hlp=doc$window.hlp,		src=window.cl
+zoom		hlp=doc$zoom.hlp,		src=zoom.cl

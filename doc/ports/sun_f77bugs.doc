@@ -1,0 +1,15 @@
+Different problems were encountered in both Sun-2's and Sun-3's
+with the f77 compiler.  On the Sun-2, the problems were in the
+optimizer.  See the "sun2*.doc" files for documentation on which
+IRAF source files generated compile-time and run-time problems.
+
+On the Sun-3, the worst problem was that Sun forgot about complex
+datatypes after Sun V2.0.  See the notes in the "sun3*.doc" files.
+Sun still (June 24) has not solved the problem, but Doug Tody came
+up with workarounds; look for the string "kludge" in "sun3_042586.doc"
+and in the directory $iraf/unix/hlib/SUN_kludge/.
+
+There were also three IRAF source files that generated run-time
+errors on the Sun-3 due to bugs in the "-f68881" version of the f77
+optimizer; these files are documented in "sun3_f77Obugs.doc".
+

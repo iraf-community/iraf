@@ -1,0 +1,34 @@
+GIO Calcomp kernel
+
+This directory contains source for the IRAF calcomp graphics kernel.
+Specifications may be found in ccpspecs.hlp.  Installation involves
+building the kernel task, which is accomplished using "make" (Makefile)
+with argument "install" to move the executable into lib$.
+
+In addition to the kernel task routines, the vttest.x routine contains code 
+to simulate calcomp software on standard gio graphics devices.  vttest.x
+contains all the source for the simulation, using parameter file vttest.par.
+Here, the calcomp routines "plot", "plots", "newpen", and "symbol" are
+replaced with appropriate gio calls (violating interfaces) and to be used
+mainly for testing text fonts, line type and width simulation.
+
+TODO:
+
+- super-bold font
+- bold + italic
+
+- multiples of dash, dot for linetypes numbered higher than 4
+
+--------------------------------------------------------------------------------
+FUTURE ENHANCEMENTS (much work):
+
+1)  Sophisticated parallel-tracing algorithm that looks at entire array
+    and merges intersections so that all adjacent segments are parallel
+    to each other and do not cross the acute bisector.  Implemented by
+    parallel array segments rather than drawing each parallel segment
+    individually, to avoid pen overtravel on short choppy lines.
+
+2)  Panelling: when plot width exceeds available paper width, wrap graphics
+    to beyond maximum x so that paper can be cut and pasted.
+
+3)  Versatec extension with area-fill.

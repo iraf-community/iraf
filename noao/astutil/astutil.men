@@ -1,0 +1,9 @@
+	airmass - Compute the airmass at a given elevation above the horizon
+       asttimes - Compute UT, Julian day, epoch, and siderial time
+	ccdtime	- Compute time required to observe star of given magnitude
+       galactic - Convert ra, dec to galactic coordinates
+	    pdm - Find periods in light curves by Phase Dispersion Minimization
+	precess - Precess a list of astronomical coordinates
+    observatory - Parameter set defining observatory parameters
+      rvcorrect - Compute radial velocity corrections
+     setairmass - Compute effective airmass and middle UT for an exposure

@@ -1,0 +1,42 @@
+# DAOFIND task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	apbfdfind.x	<imhdr.h>		"../lib/apphot.h"	\
+			"../lib/noise.h"	"../lib/find.h"
+	apconvolve.x	<imhdr.h> <imset.h>
+	apegkernel.x	<math.h>
+	apfcolon.x	"../lib/apphot.h"	"../lib/display.h"	\
+			"../lib/noise.h"	"../lib/find.h"
+	apfdcolon.x	"../lib/apphot.h"	"../lib/noise.h"	\
+			"../lib/find.h"
+	apfdconfirm.x	"../lib/apphot.h"	"../lib/noise.h"
+	apfdfind.x	"../lib/apphot.h"	"../lib/display.h"	\
+			"../lib/find.h"		"../lib/noise.h"
+	apfdfree.x	"../lib/apphotdef.h"
+	apfdgpars.x	"../lib/apphot.h"	"../lib/noise.h"	\
+			"../lib/find.h"
+	apfdinit.x	"../lib/apphotdef.h"	"../lib/finddef.h"
+	apfdpars.x	"../lib/apphot.h"	"../lib/noise.h"	\
+			"../lib/display.h"	"../lib/find.h"
+	apfdradsetup.x	<pkg/gtools.h>		<math.h>		\
+			"../lib/apphot.h"	"../lib/noise.h"	\
+			"../lib/find.h"
+	apfdshow.x
+	apfdstars.x	<imhdr.h>		"../lib/apphot.h"	\
+			"../lib/noise.h"	"../lib/find.h"
+	apfind.x	<imhdr.h>		<imset.h>
+	apfshow.x	"../lib/apphot.h"	"../lib/noise.h"	\
+			"../lib/find.h"
+	apimset.x	<imset.h>
+	#aprdfind.x	<gset.h>		<pkg/gtools.h>		\
+			#<math.h>		"../lib/apphot.h"	\
+			#"../lib/noise.h"
+	t_daofind.x	<fset.h> 		 <imhdr.h>		\
+			<gset.h>		"../lib/apphot.h"	\
+			"../lib/noise.h"	"../lib/find.h"
+	;

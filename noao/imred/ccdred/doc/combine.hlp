@@ -1,0 +1,302 @@
+.help combine Jun87 noao.imred.ccdred
+.ih
+NAME
+combine -- Combine CCD images
+.ih
+USAGE	
+combine images output
+.ih
+PARAMETERS
+.ls images
+List of CCD images to combine.  Images of a particular CCD image type may be
+selected with the parameter \fIccdtype\fR with the remaining images being
+ignored.
+.le
+.ls output
+Output image.  If the input images are combined into subsets
+then the subset identifier is appended to the output name.
+.le
+.ls sigma = ""
+Optional sigma image.  If an image name is specified then a image consisting
+of the sigmas of the images combined is also produced.  If the input images
+are combined into subsets then the subset identifier is appended to the
+sigma image name.
+.le
+.ls ccdtype = ""
+CCD image type to combine.  If specified only input images of the specified
+type are combined.  See \fBccdtypes\fR for the possible image types.
+.le
+.ls subsets = no
+Combine images by subset parameter?  If yes then the input images are
+grouped by subset parameter and each group combined into a separate output
+image.  The subset identifier is appended to the output and sigma image
+names.  See \fBsubsets\fR for more on the subset parameter.
+.le
+.ls combine = "avsigclip"
+Type of combining algorithm.  The combining algorithms are:
+
+.nf
+      sum - Sum the input images
+  average - Average the input images
+   median - Median the input images
+minreject - Reject the minimum value at each pixel
+maxreject - Reject the maximum value at each pixel
+minmaxrej - Reject the min and max values at each pixel
+threshold - Reject pixels above and below thresholds
+  sigclip - Apply a sigma clipping algorithm to each pixel
+avsigclip - Apply a sigma clipping algorithm to each pixel
+.fi
+.le
+.ls delete = no
+Delete input images after combining?  Only those images combined are deleted.
+.le
+.ls clobber = no
+Clobber existing output images?
+.le
+.ls exposure = yes
+Scale the input images by the exposure times?
+.le
+.ls scale = no
+Scale the input images by the mode within the mode image section?
+If yes this overrides any offset correction.
+.le
+.ls offset = no
+Add an offset determined from the mode?  If yes then offsets are determined
+to shift the modes of the input images to the same value.
+.le
+.ls weight = yes
+Use a weighted average?  The weights are based on the number of images
+previously combined, the exposure time, and any scaling or offset.
+.le
+.ls modesec = ""
+Image section for computing the mode for scaling or offset corrections.
+If no image section is given then the entire image is sampled.
+.le
+.ls lowreject = 3., highreject = 3.
+Lower and upper sigma clipping factors used by the sigma clipping algorithms
+or the actual reject thresholds for threshold combining.
+.le
+.ls blank = 0.
+Value of output pixels when all input pixels are rejected by the "threshold"
+algorithm.
+.le
+.ih
+DESCRIPTION
+The task \fBcombine\fR combines many images into a single, higher
+quality image.  It corrects for variations between the images,
+combines the images using a number of algorithms, and weights the
+contribution of each image by statistical weights.  Currently the
+task does not register the images or account for varying extinction.
+It does account for differing exposure times and varying sky backgrounds.
+The combining algorithms are useful for detecting and rejecting
+cosmic ray events.
+
+The input images are given by a list.  A subset or subsets of the
+input list may be selected using the parameters \fIccdtype\fR and
+\fIsubsets\fR.  The \fIccdtype\fR parameter selects only images of a
+specified standard CCD image type.  The \fIsubsets\fR parameter breaks
+up the input list into sublists of common subset parameter (filter,
+grating, etc.).  For more information see \fBccdtypes\fR and \fBsubsets\fR.
+This selection process is useful with wildcard templates to combine,
+for example, the flat field images for each filter in
+one step (see \fBflatcombine\fR).  When subsets of the input list are used
+the output image and optional sigma image are given by root names with
+a subset identifier appended by the task.  The output image pixel datatype
+is set by the package parameter \fIccdred.pixeltype\fR.
+
+The sigma image, which is produced if a sigma image name is given, is the
+standard deviation of the input images about the output image.  Two or
+more images are required.
+
+Other input/output parameters are \fIdelete\fR and \fIclobber\fR.  The
+\fIdelete\fR parameter may be set to "yes" to delete the input images
+used in producing an output image after it has been created.  This is
+useful for minimizing disk space, particularly with large
+sets of calibration images needed to achieve high statistical accuracy
+in the final calibration image.  The \fBclobber\fR parameter allows
+the output image names to be existing images which are overwritten (at
+the end of the operation).
+
+The \fIcombine\fR parameter is the heart of the task.  It selects from
+one of a number of algorithms for combining the images.  The list
+below summarizes the algorithms.
+
+.nf
+	    sum - Sum the input images
+	average - Average the input images
+	 median - Median the input images
+      minreject - Reject the minimum value at each pixel
+      maxreject - Reject the maximum value at each pixel
+      minmaxrej - Reject both the min. and max. values at each pixel
+      threshold - Reject pixels above and below specified thresholds
+	sigclip - Apply a sigma clipping algorithm to each pixel
+      avsigclip - Apply a sigma clipping algorithm to each pixel
+.fi
+
+These algorithms are described in detail in the following sections.
+The choice of algorithm depends on the data, the number of images,
+and the importance of rejecting cosmic rays.  The more complex the
+algorithm the more time consuming the operation.
+
+The different combining options use the remaining parameters.  Except for
+summing, the images may be scaled to a common exposure time and background
+level.  If the images don't need to be scaled then the task is faster.
+There are currently three ways to scale the images.  The images may
+be scaled to the same exposure time.  If the background, flux level, or
+detector sensitivity is variable then the images may be either scaled or
+offset (add a constant) to the same mode.  The mode is determined
+by sampling up to 10000 points within the specified mode image section.
+A scaling correction is used when the flux level or sensitivity is varying.
+The offset correction is used when the sky brightness is varying independently
+of the object brightness.
+
+Except for medianing and summing, the images are combined by averaging.
+The average may be weighted by
+
+	weight = (N * scale / mode) ** 2
+
+where N is the number of images previously combined (\fBcombine\fR
+records the number of images combined in the image header),
+scale is the multiplicative scale from the exposure or mode scaling,
+and mode is the background mode estimate used when adding a variable
+offset.
+
+The rejection parameters \fIlowreject\fR, \fIhighreject\fR, and \fIblank\fR
+are used by the "threshold", "sigclip", and "avsigclip" algorithms for rejecting
+deviant pixels.
+
+Log information is printed and recorded in a log file based on the package
+parameters \fIccdred.verbose\fR and \fIccdred.logfile\fR.
+.ih
+SUM
+The input images are combined by summing.  Care must be taken
+not to exceed the range of the short datatype when summing if the
+output datatype is "short".  Summing is the only algorithm in which
+scaling and weighting are not used.  Also no sigma image is produced.
+.ih
+AVERAGE
+The input images are combined by averaging.  The images may be scaled
+and weighted.  There is no pixel rejection.  A sigma image is produced
+if there is more than one combined.
+.ih
+MEDIAN
+The input images are combined by medianing each pixel.  Unless the images
+are at the same exposure level they should be scaled.  The sigma image
+is based on all the input images and is only an approximation to the
+uncertainty in the median estimates.  The median of N images
+is defined to be the (N+1)/2 th value of the sorted pixel values at each
+point in the images.  Note that this is lower of the two middle values for
+an even number of images.
+.ih
+MINREJECT, MAXREJECT, MINMAXREJ
+At each pixel the minimum, maximum, or both are excluded from the
+average.  The images should be scaled and the average may be
+weighted.  The sigma image requires at least two pixels after rejection
+of the extreme values.  These are relatively fast algorithms and are
+a good choice if there are many images (>15).
+.ih
+THRESHOLD
+The input images are combined with pixels above and below specified
+threshold values (before scaling) excluded.  The images may scaled
+and the average weighted.  If all pixels are rejected the specified
+\fIblank\fR value is output.  The sigma image also has the rejected
+pixels excluded.
+.ih
+SIGCLIP
+The input images are combined by applying a sigma clipping algorithm
+at each pixel.  The images should be scaled.  This only rejects highly
+deviant points and so
+includes more of the data than the median or minimum and maximum 
+algorithms.  It requires many images (>10-15) to work effectively.
+Otherwise the bad pixels bias the sigma significantly.  The mean
+used to determine the sigmas is based on the "minmaxrej" algorithm
+to eliminate the effects of bad pixels on the mean.  Only one
+iteration is performed and at most one pixel is rejected at each
+point in the image.  After the deviant pixels are rejected the final
+mean is computed from all the data.  The sigma image excludes the
+rejected pixels.
+.ih
+AVSIGCLIP
+The input images are combined with a variant of the sigma clipping
+algorithm which works well with only a few images.  The images should
+be scaled.  For each line the mean is first estimated using the
+"minmaxrej" algorithm.  The sigmas at each point in the line are scaled
+by the square root of the mean, that is a Poisson scaling of the noise
+is assumed.  These sigmas are averaged to get a line estimate of the
+sigma.  Then the sigma at each point in the line is estimated by
+muliplying the line sigma by the square root of the mean at that point.  As
+with the sigma clipping algorithm only one iteration is performed and
+at most one pixel is rejected at each point.  After the deviant pixels
+are rejected the file mean is computed from all the data.  The sigma
+image excludes the rejected pixels.
+
+The "avsigclip" algorithm is the best algorithm for rejecting cosmic
+rays, especially with a small number of images, but it is also the most
+time consuming.  With many images (>10-15) it might be advisable to use
+one of the other algorithms ("maxreject", "median", "minmaxrej") because
+of their greater speed.
+.ih
+EXAMPLES
+1. To combine the images listed in the file "group1" the command is:
+
+.nf
+    cl> combine @group1 group1
+    Jun  1 14:26 combine: avsigclip
+            Images      N    Exp   Mode  Scale Offset Weight
+        ccd045.imh      1   50.0  INDEF  1.000     0.  0.048
+        ccd046.imh      1   50.0  INDEF  1.000     0.  0.048
+        [... list of files ...]
+        ccd065.imh      1   50.0  INDEF  1.000     0.  0.048
+        ----------- ------ ------
+        group1.imh     21   50.0
+.fi
+
+This output is printed when verbose mode is set.  The same information
+is recorded in the log file.  In this case the images are combined with
+the average sigma clipping algorithm.  The images are scaled by the
+exposure times, which are all the same in this example.  The mode is
+not evaluated for exposure scaling and the relative weights are the
+same because the exposure times are the same.  The example only shows
+part of the output.
+.ih
+TIME REQUIREMENTS
+.nf
+o Vax 11/750 with FPA
+o Number of images = 10
+o Size of images = 544 x 512
+o Input datatype = short
+o Output datatype = real
+o No sigma image output
+
+o CPU times (seconds):
+		      No scaling   Exposure scaling [1]
+	sum		 54.583		 54.917 [2]
+	average		 48.750		 78.033
+	minreject	 67.617		122.116
+	maxreject	 67.200		131.300
+	minmaxrej	 83.150		143.033
+	threshold	 94.767		146.750
+	median		238.450		324.717
+	sigclip		248.750		386.717
+	avsigclip	293.300		447.917
+
+	[1] Exposure scaling does not do mode calculation.
+	    Mode scaling adds 30 CPU seconds for 10000 point mode.
+	[2] No scaling is done when summing.
+	[3] Clock time is load dependent but on a lightly loaded
+	    system CPU time to clock time ranges from 50% to 85%
+	    with the higher numbers for the more complex algorithms.
+.fi
+.ih
+LIMITATIONS
+Though this task is essentially not limited by the physical limits of the
+host (number of open files, amount of memory) there is a software limit
+in the IRAF virtual operating system of about 120 images which may be
+combined.
+.ih
+SEE ALSO
+.nf
+instruments, ccdtypes, icfit, ccdred, guide, darkcombine, flatcombine,
+zerocombine
+.fi
+.endhelp

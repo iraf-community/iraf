@@ -1,0 +1,10 @@
+      SUBROUTINE PUTINT (N, W, FD)
+      INTEGER N, W
+      INTEGER FD
+      INTEGER CHARS (20)
+      INTEGER JUNK
+      INTEGER ITOC
+      JUNK = ITOC (N, CHARS, 20)
+      CALL PUTSTR (CHARS, W, FD)
+      RETURN
+      END

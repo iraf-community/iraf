@@ -1,0 +1,108 @@
+.help ccdhedit Jun87 noao.imred.ccdred
+.ih
+NAME
+ccdhedit -- CCD image header editor
+.ih
+USAGE
+ccdhedit images parameter value
+.ih
+PARAMETERS
+.ls images
+List of CCD images to be edited.
+.le
+.ls parameter
+Image header parameter.  The image header parameter will be translated by
+the header translation file for the images.
+.le
+.ls value
+The parameter value.  If the null string ("") is specified then the
+parameter is deleted from the image header, otherwise it is added or
+modified.  If the parameter is "imagetyp" then the value string giving
+the CCD image type is translated from the package CCD type to the
+instrument specific string.
+.le
+.ls type = "string"
+The parameter type.  The parameter types are "string", "real", or "integer".
+.le
+.ih
+DESCRIPTION
+The image headers of the specified CCD images are edited to add, modify,
+or delete a parameter.  The parameters may be those used by the \fBccdred\fR
+package.  The parameter name is translated to an image header parameter by the
+instrument translation file (see \fBinstruments\fR) if a translation is
+given.  Otherwise the parameter is that in the image header.  If the parameter
+is "imagetyp" the parameter value for the CCD image type may be that
+used by the package; i.e. dark, object, flat, etc.  The value string will be
+translated to the instrument image string in this case.  The translation
+facility allows use of this task in an instrument independent way.
+
+The value string is used to determine whether to delete or modify the
+image parameter.  If the null string, "", is given the specified parameter
+is deleted.  If parameters are added the header type must be specified
+as a string, real, or integer parameter.  The numeric types convert the
+value string to a number.
+.ih
+EXAMPLES
+The \fBccdred\fR package is usable even with little image header information.
+However, if desired the header information can be added to images which
+lack it.  In all the examples the parameters used are those of the package
+and apply equally well to any image header format provided there is an
+instrument translation file.
+
+.nf
+1.   cl> ccdhedit obj* imagetyp object
+2.   cl> ccdhedit flat* imagetyp flat
+3.   cl> ccdhedit zero* imagetyp zero
+4.   cl> ccdhedit obj0![1-3]* subset "V filter"
+5.   cl> ccdhedit obj0![45]* subset "R filter"
+6.   cl> ccdhedit flat001 subset "R filter"
+7.   cl> ccdhedit obj* exptime 500 type=integer
+.fi
+
+8. The following is an example of a CL script which sets the CCD image type,
+the subset, and the exposure time simultaneously.  The user may expand
+on this example to include other parameters or other initialization
+operations.
+
+.nf
+    cl> edit ccdheader.cl
+
+    ----------------------------------------------------------------
+    # Program to set CCD header parameters.
+
+    procedure ccdheader (images)
+
+    string	images			{prompt="CCD images"}
+    string	imagetyp		{prompt="CCD image type"}
+    string	subset			{prompt="CCD subset"}
+    string	exptime			{prompt="CCD exposure time"}
+
+    begin
+	    string	ims
+
+	    ims = images
+	    ccdhedit (ims, "imagetyp", imagetyp, type="string")
+	    ccdhedit (ims, "subset", subset, type="string")
+	    ccdhedit (ims, "exptime", exptime, type="real")
+    end
+    ----------------------------------------------------------------
+
+    cl> task ccdheader=ccdheader.cl
+    cl> ccdheader obj* imagetyp=object subset="V" exptime=500
+.fi
+
+9. The image header may be changed to force processing a calibration image
+as an object.  For example to flatten a flat field:
+
+.nf
+    cl> ccdhedit testflat imagetyp other
+    cl> ccdproc testflat
+.fi
+
+10. To delete processing flags:
+
+    cl> ccdhedit obj042 flatcor ""
+.ih
+SEE ALSO
+hedit, instruments, ccdtypes, subsets
+.endhelp

@@ -1,0 +1,22 @@
+      SUBROUTINE OUTNUM (N)
+      INTEGER N
+      INTEGER CHARS (20)
+      INTEGER I, M
+      M = IABS (N)
+      I = 0
+23000 CONTINUE
+      I = I + 1
+      CHARS (I) = MOD (M, 10) + 48
+      M = M / 10
+23001 IF (.NOT.(M .EQ. 0 .OR. I .GE. 20))GOTO 23000
+23002 CONTINUE
+      IF (.NOT.(N .LT. 0))GOTO 23003
+      CALL OUTCH (45)
+23003 CONTINUE
+23005 IF (.NOT.(I .GT. 0))GOTO 23007
+      CALL OUTCH (CHARS (I))
+23006 I = I - 1
+      GOTO 23005
+23007 CONTINUE
+      RETURN
+      END

@@ -1,0 +1,421 @@
+.help fitsky May89 noao.digiphot.apphot
+.ih
+NAME
+fitsky - determine the mode, sigma and skew of the sky pixels
+.ih
+USAGE
+fitsky image
+.ih
+PARAMETERS
+.ls image
+The list of images containing the sky regions to be measured.
+.le
+.ls datapars = ""
+The name of the file containing the data dependent parameters.
+.le
+.ls fitskypars = ""
+The name of the file containing the sky fitting algorithm parameters.
+.le
+.ls coords = ""
+The name of the text file(s) containing the coordinates of the objects to
+be processed, one object per line with the x and y coordinates in the
+columns one and two respectively. If coords is null, FITSKY reads
+the image cursor
+directly (default) or the image cursor commands are read from
+a text file (image cursor is redirected to a text cursor command file 
+created with say rimcursor).
+If coords is defined, FITSKY activates the image cursor and accepts
+coordinate input from either the image cursor or the list (interactive
+mode), or processes the list directly without intervention from the
+user (batch mode). The number of coordinate files is either 1 or equal to
+the number of input images.
+.le
+.ls output = "default"
+The results file or directory. If output is "default", "dir$default",
+or a directory specification then fitsky constructs an output 
+name of the form dir$root.extension.version, where dir
+is the directory, root is the root of the image name, extension is
+"sky" and version is an appropriate version number. If the output string
+is null then no output file is written. The number of output
+files is either 1 or equal to the number input images.
+.le
+.ls plotfile = ""
+The name of the file containing radial profile plots for stars written
+to the output file. If
+plotfile is not equal to null then a radial profile plot is written to
+plotfile every time a record is written to the output file.
+.le
+.ls graphics = "stdgraph"
+The graphics device.
+.le
+.ls display = "stdimage"
+The image display device. For the time being the display device may be set
+to stdgraph so that fitsky can work off a contour plot in interactive
+mode.
+.le
+.ls cursor = ""
+The graphics cursor.
+.le
+.ls commands = ""
+The image display cursor.
+.le
+.ls radplots = no
+If radplots is set to yes and fitsky is run in interactive mode then a radial
+profile plot of the sky region is plotted on stdgraph.
+.le
+.ls interactive = yes
+Interactive or batch mode.
+.le
+.ls verify = yes
+Verify the critical parameters in non interactive mode.
+.le
+.ls verbose = no
+Print messages on the terminal in non interactive mode.
+.le
+
+.ih
+DESCRIPTION
+
+FITSKY computes accurate sky values for a set of objects in the IRAF image
+\fIimage\fR, whose coordinates are listed in the text file \fIcoords\fR or
+are marked on the terminal interactively with the image cursor, and writes
+the computed sky values to the text file \fIoutput\fR.
+
+FITSKY can be run either interactively or in batch mode by setting the parameter
+\fIinteractive\fR. In interactive mode starting x and y positions can either be
+read directly from the image cursor or read from the text file \fIcoords\fR.
+The user can adjust
+the parameters of the fitting algorithm until a satisfactory set is found,
+change objects interactively
+or query for the next object in the list and finally fit the entire
+coordinate list with that set of parameters.
+In batch mode the estimated positions can be
+read from the text file \fIcoords\fR or the image cursor parameter
+\fIimcursor\fR can be redirected to a text file containing a list of cursor
+commands.
+
+.ih
+CURSOR COMMANDS
+
+The following cursor commands are currently available.
+
+.nf
+	Interactive Sky Fitting Commands
+
+?	Print help for FITSKY commands
+:	FITSKY colon escape commands (see below)
+e	Print FITSKY error messages
+d	Plot a centered stellar radial profile
+i	Setup FITSKY parameters using a stellar radial profile plot
+v	Verify the critical FITSKY parameters
+w	Store current FITSKY parameters in the pset files
+l	Fit sky for the remainder of stars in the list,
+	output results
+r	Rewind the coordinate list
+f	Fit sky at position of current star (cursor or list)
+spbar	Fit sky at position of current star (cursor or list),
+	output results
+q	Exit
+
+
+:m [n]	Move to the next [nth] star in the coordinate list
+:n [n]	Fit sky to next [nth] star in the coordinate list,
+	output results
+
+Fitsky parameters are listed or set with the following commands.
+
+:image		[string]	Image name
+:coords		[string]	Coordinate file name
+:output		[string]	Output file name
+:show		[data/sky]	List the parameters
+
+:scale		[value]		Image scale (units per pixel)
+:fwhmpsf	[value]		Full width half maximum PSF (scale units)
+:emission	[y/n]		Emission feature (y), absorption (n)
+:noise		[string]	Noise model (constant|poisson)
+:threshold	[value]		Detection intensity threshold (counts)
+:cthreshold	[value]		Centering intensity threshold (counts)
+:sigma		[value]		Standard deviation of sky (counts)
+:gain		[string]	Gain image header keyword
+:epadu		[value]		Gain (electrons per adu)
+:ccdread	[string]	Readout noise image header keyword
+:readnoise	[value]		Readout noise (electrons)
+:exposure	[string]	Exposure time image header keyword
+:itime		[value]		Exposure time (time units)
+:datamin	[value]		Minimum good pixel value (counts)
+:datamax	[value]		Maximum good pixel value (counts)
+
+:salgorithm	[string]	Sky fitting algorithm (constant|median|
+				mode|centroid|gauss| crosscor|histplot|
+				radplot)
+:skyvalue	[value]		User supplied sky value (counts)
+:annulus 	[value]		Inner radius of sky annulus (scale units)
+:dannulus	[value]		Width of sky annulus (scale units)
+:khist		[value]		Sky histogram extent (+/- sky sigma)
+:smooth		[y/n]		Lucy smooth the sky histogram 
+:binsize	[value]		Resolution of sky histogram (sky sigma)
+:smaxiter	[value]		Maximum number of iterations
+:skreject	[value]		Pixel rejection limits (sky sigma)
+:snreject	[value]		Maximum number of rejection cycles
+:rgrow		[value]		Region growing radius (scale units)
+:mksky		[y/n]		Mark sky annuli on the display
+:radplot	[y/n]		Plot radial profile of sky pixels
+.fi
+
+.ih
+ALGORITHMS
+
+A brief description of the data dependent parameters and the sky fitting
+parameters can be found in the online manual pages for \fIdatapars\fR
+and \fIfitskypars\fR. A full description of the algorithms can be
+found in the document \fISpecifications for the Apphot Package\fR.
+
+.ih
+OUTPUT
+
+In interactive mode the following quantities are printed on the standard
+output as each object is measured.
+
+.nf
+    image  xinit  yinit  msky  stdev  sskew  nsky  nsrej  error
+.fi
+
+In both interactive and batch mode full output is written to the 
+text file \fIoutput\fR. At the beginning of each file is a header listing
+the current values of the parameters when the first stellar record was
+written. These parameters can be subsequently altered. For each star
+measured the following record is written.
+
+.nf
+    image  xinit  yinit  id  coords  lid
+	msky  stdev  sskew  nsky  nsrej  sier  error
+.fi
+
+Image and coords are the name of the image and coordinate file respectively.
+Id and lid are the sequence numbers of stars in the output and coordinate
+files respectively. Sier and error are the error code and accompanying
+error message respectively. Xinit and yinit are the center coordinates
+of the sky annulus in pixels. Msky, stdev and sskew are the sky value,
+standard deviation and skew respectively. Nsky and nsrej are the number of
+sky pixels and the number of sky pixels rejected respectively.
+
+.ih
+EXAMPLES
+
+1. Compute the sky statistics for a few  stars in N4147 using the display
+and the image cursor. Setup the task parameters using the interactive
+setup menu defined by the i key command and a radial profile plot.
+
+.nf
+	ap> set stdimcur = stdimage
+
+	... define the image cursor
+
+	ap> display n4147 1 fi+
+
+	... display the image
+
+	ap> fitsky n4147 
+
+	... a short help page appears on the screen
+
+	... move the image cursor to a star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile
+	... set the annulus, dannulus, sigma, and threshold
+	    using the graphics cursor and the stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+
+	... type the w key to save the parameters in the parameter files
+
+	... type the v key to verify critical parameters
+
+	... move the image cursor to the stars of interest and tap
+	    the space bar
+
+	... the output will appear in n4147.sky.1
+.fi
+
+2. Compute the sky statistics for a few  stars in M92 using a 
+contour plot
+and the graphics cursor. Setup the task parameters using the interactive
+setup menu defined by the i key command.
+
+.nf
+	ap> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+	ap> contour m92 >G m92.plot1
+
+	... store the contour plot of m92 in the file m92.plot
+
+	ap> fitsky m92 display=stdgraph
+
+	... a short help page appears on the screen
+
+	... type :.read m92.plot1 to load the contour plot on the screen
+
+	... move graphics cursor to a star
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile
+	... set the annulus, dannulus, sigma, and threshold
+	    using the graphics cursor and the stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+
+	... type the w key to save the parameters in the parameter files
+
+	... type the v key to verify the parameters
+
+	... retype :.read m92.plot1 to reload the contour plot
+
+	... move the graphics cursor to the stars of interest and tap
+	    the space bar
+
+	... a one line summary of the sky statistics will appear on the
+	    standard output for each star measured
+
+	... full output will appear in the text file m92.sky.1 
+.fi
+
+3. Setup and run FITSKY interactively  on a list of objects,
+using a contour plot as the image display and the parameters defined and
+saved in example 1.
+
+.nf
+	ap> set stdimcur = stdgraph
+
+	... define the image cursor to be the graphics cursor
+
+	ap> contour m92
+
+	... adjust plot parameters until the contour plot is satisfactory
+
+	ap> =gcur
+
+	... enter cursor mode
+
+	... type :.write m92.plot2 to save the plot in a metacode file
+
+	... type any key to quit cursor mode
+
+	ap> daofind m92 fwhmpsf=2.0 thresh=30.0
+
+	... make a coordinate list by searching for objects with  the
+	    given fwhmpsf and threshold
+
+	... the output will appear in the text file m92.coo.1
+
+	ap> fitsky m92 coords=m92.coo.1 display=stdgraph
+
+	... a short help menu appears
+
+	... type :.read m92.plot2 to read in the contour plot
+
+	... move the graphics cursor to the stars and tap space bar
+
+				or
+
+	... use :m and/or :n, l, r commands to measure objects in the
+	    coordinate list
+
+	... a one line summary of results will appear on the standard output
+	    for each star measured
+
+	... the output will appear in m92.sky.2 ...
+.fi
+
+4. Run FITSKY in batch mode using the coordinate file and the previously
+saved parameters. Verify the critical parameters.
+
+.nf
+	ap> fitsky m92 coords=m92.coo.1 verify+ inter-
+
+	... output will appear in m92.sky.3
+.fi
+
+
+5. Run FITSKY in batch mode using the coordinate file and the previously
+saved parameters. The task can be submitted to the background by
+appending an ampersand to the command line listed below.
+
+.nf
+	ap> fitsky m92 coords=m92.coo.1 inter- verify+
+
+	... output will appear in m92.sky.4
+.fi
+
+6. Run FITSKY interactively on the sun workstation using the imtool window,
+a coordinate list and the current set of parameters. This example assumes
+knowledge of the imtool functions, and that
+the image cursor is reading back positions in image pixel coordinates not
+device coordinates.
+
+.nf
+	ap> set stdimcur = text
+
+	... set the image cursor to the standard input
+
+	ap> display m92 1
+
+	... display the image in the imtool window and put the mouse
+	    in the imtool window
+
+	... use the imtool setup window to enter the coordinate file name
+	    m92.coo.2
+
+	... type the F6 key to enter cursor readback mode
+
+	... move the image cursor to the stars of interest, press the
+	    left mouse button
+	... a number will appear beside each star measured
+	... the x and y coordinates of each star will be written to
+	    m92.coo.2
+
+	ap> fitsky m92 coords=m92.coo.2
+
+	... a short help page appears on the screen followed by a cursor
+	    prompt 
+
+	... type :m 3 to set the coordinates to the third star
+	    in the list
+
+	... type i to enter the interactive setup menu
+	... enter maximum radius in pixels of the radial profile
+	... set the fwhmpsf, annulus, dannulus, sigma, and threshold using
+	    the graphics cursor and the stellar radial profile plot
+	... typing <CR> leaves everything at the default value
+
+	... type r to rewind the coordinate list
+
+	... type l to measure all the stars in the coordinate list
+
+	... a one line summary of the answers will appear on the standard
+	    output for each star measured
+
+	... full output will appear in the text file m92.sky.5 
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+
+It is currently the responsibility of the user to make sure that the
+image displayed in the frame is the same as that specified by the image
+parameter.
+
+Commands which draw to the image display are currently disabled.
+The TVMARK task in the proto package  can be used to draw simple marks
+on the display. All the APPHOT marking commands will however function
+if a contour plot is used in lieu of the image display.
+
+Users should not be confused by the normally enabled markcur option in the
+SUN/IMTOOL setup window. This feature is under the control of the
+IMTOOL window and the APPHOT package has no control over it.
+
+.ih
+SEE ALSO
+datapars, fitskypars, phot, polyphot, radprof
+.endhelp

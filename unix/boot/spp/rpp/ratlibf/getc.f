@@ -1,0 +1,6 @@
+      INTEGER FUNCTION GETC (C)
+      INTEGER C
+      INTEGER GETCH
+      GETC = GETCH (C, 0)
+      RETURN
+      END

@@ -1,0 +1,21 @@
+# QPHOT parameters
+
+image,f,a,,,,Input image
+cbox,r,a,5.0,,,Centering box width in pixels
+annulus,r,a,,0.0,,Inner radius of sky annulus in pixels
+dannulus,r,a,,1.0,,Width of the sky annulus in pixels
+apertures,s,a,"3.0",,,List of apertures
+zmag,r,h,26.0,,,Zero point of magnitude scale
+coords,s,h,"",,,Name of coordinate file
+exposure,s,h,"",,,Exposure time image header keyword
+epadu,r,h,1.0,,,Instrument gain
+output,f,h,"default",,,Results
+plotfile,f,h,"",,,File of plot metacode
+graphics,s,h,"stdgraph",,,Graphics device
+display,s,h,"stdimage",,,Display device
+commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+radplots,b,h,no,,,Plot the radial profiles
+interactive,b,h,yes,,,Interactive mode
+verbose,b,h,no,,,Print messages if commands is redirected to a file
+mode,s,h,'ql'

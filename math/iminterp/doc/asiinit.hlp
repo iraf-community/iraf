@@ -1,0 +1,37 @@
+.help asiinit Jul84 "Image Interpolator Package"
+.ih
+NAME
+asiinit -- initialize the sequential interpolant descriptor
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+asiinit (asi, interp_type)
+
+.nf
+    pointer	asi		# interpolant descriptor
+    int		interp_type	# interpolant type
+.fi
+
+.fi
+.ih
+ARGUMENTS
+.ls asi   
+Pointer to sequential interpolant descriptor.
+.le
+.ls interp_type
+Interpolant type. The options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5 and
+II_SPLINE3 for nearest neighbour, linear, 3rd order polynomial, 5th order
+polynomial and cubic spline respectively. The interpolant type
+definitions are found in the package header file math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+The interpolant descriptor is allocated and initialized. The pointer asi is
+returned by ASIINIT.
+.ih
+NOTES
+ASIINIT must be called before using any other ASI routines.
+.ih
+SEE ALSO
+asifree

@@ -1,0 +1,8 @@
+# Root task entry for the noao package help tree.  Defines `noao' as both a
+# task and a package in the noao help database.
+
+noao		men  = noao$noao.men,
+		hlp  = noao$noao.men,
+		sys  = noao$noao.hlp,
+		pkg  = noao$noao.hd,
+		src  = noao$noao.cl

@@ -1,0 +1,93 @@
+.help flatcombine Jun87 noao.imred.ccdred
+.ih
+NAME
+flatcombine -- Combine and process flat field images
+.ih
+USAGE
+flatcombine images
+.ih
+PARAMETERS
+.ls images
+List of flat field images to combine.  The \fIccdtype\fR parameter
+may be used to select the flat field images from a list containing all
+types of data.
+.le
+.ls output = "Flat"
+Output flat field root image name.  The subset ID is appended.
+.le
+.ls sigma = ""
+Output optional sigma image root name.  The subset ID is appended.
+.le
+.ls combine = "maxreject"
+Type of combining algorithm.  See \fBcombine\fR for details.
+.le
+.ls ccdtype = "flat"
+CCD image type to combine.  If no image type is given then all input images
+are combined.
+.le
+.ls process = no
+Process the input images before combining?
+.le
+.ls subsets = yes
+Combine images by subset parameter?  If yes then the input images are
+grouped by subset parameter and each group combined into a separate output
+image.  The subset identifier is appended to the output and sigma image
+names.  See \fBsubsets\fR for more on the subset parameter.  This is generally
+used with flat field images.
+.le
+.ls delete = no
+Delete input images after combining?  Only those images combined are deleted.
+.le
+.ls clobber = no
+Clobber existing output images?
+.le
+.ls exposure = yes
+Scale the input images by the exposure times?
+.le
+.ls scale = no
+Scale the input images by the mode within the mode image section?
+If yes this overrides any offset correction.
+.le
+.ls offset = no
+Add an offset determined from the mode?  If yes then offsets are determined
+to shift the modes of the input images to the same value.
+.le
+.ls weight = yes
+Use a weighted average?  The weights are based on the number of images
+previously combined, the exposure time, and any scaling or offset.
+.le
+.ls modesec = ""
+Image section for computing the mode for scaling or offset corrections.
+If no image section is given then the entire image is sampled.
+.le
+.ls lowreject = 3., highreject = 3.
+Lower and upper sigma clipping factors used by the sigma clipping algorithms
+or the actual reject thresholds for threshold combining.
+.le
+.ih
+DESCRIPTION
+The flat field images in the input image list are combined.  If there
+is more than one subset (such as a filter or grating) then the input
+flat field images are grouped by subset and an combined separately.
+The input images may be processed first if desired.  However if all
+zero level bias effects are linear then this is not necessary and some
+processing time may be saved.  The original images may be deleted
+automatically if desired.
+
+This task is a script which applies \fBccdproc\fR and \fBcombine\fR.
+The parameters and combining algorithms are described in detail in
+the help for \fBcombine\fR.  This script has default parameters
+specifically set for flat field images.
+.ih
+EXAMPLES
+1. The image data contains four flat field images for three filters.
+To automatically select them and combine them as a background job
+using the default combining algorithm:
+
+    cl> flatcombine ccd*.imh&
+
+The final images are "FlatV", "FlatB", and "FlatR".
+.ih
+SEE ALSO
+ccdproc, combine, subsets
+.endhelp

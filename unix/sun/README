@@ -1,0 +1,120 @@
+GTERM/IMTOOL installation instructions for SUN/IRAF V2.5
+------------------------------------------------------
+
+To save memory, GTERM is linked with the other, standard SUN tools in the
+executable /usr/bin/suntools.  A copy of this file with GTERM linked in is
+in $iraf/local/suntools.  To install it, do the following.
+
+	% cd $hlib
+	% su
+	% install
+
+or, if you don't have the IRAF 'install' script or are not installing IRAF,
+
+	% su
+	% cd /usr/bin
+	% mv suntools suntools.ORIG
+	% cp $iraf/local/suntools .
+	% ln -s /usr/bin/suntools gterm
+	% ln -s /usr/bin/suntools imtool
+	%
+	% cd /usr/lib
+	% (add entries for gterm, imtool to the default rootmenu)
+	% 
+	% cd /usr/man/manl
+	% ln -s $iraf/sun/gterm.man gterm.l
+	% ln -s $iraf/sun/imtool.man imtool.l
+	% #(you may also with to run catman)
+
+There is little reason not to go ahead and replace the standard 'suntools'
+executable with the one we supply, since all the old tools are still available,
+and the new executable is only slightly larger than the old one.  If you do
+not want to do this however, no problem, just install the executable with a
+different name and use the -s option when bringing up suntools to specify the
+name of the custom executable.  Since full sources and binaries are also
+supplied, it is also possible for the knowledgeable user to link their own
+custom suntools executable containing other custom tools.
+
+This suffices to install GTERM in SUN/UNIX.  Before using it, it is also
+desirable to configure some setup files in the user's login directory.
+This is best done by copying the following files to your login directory,
+and modifying them:
+
+	$iraf/local/.defaults
+	$iraf/local/.suntools
+	$iraf/local/.ttyswrc
+
+These should actually work without modification, but you might want to
+comment out (# ...) the final two "perfmeter" windows in the .suntools file.
+The .suntools provided should serve only as an example; the window layout
+generally needs to be customized for every application and every user.
+
+# There is no GTERM manual page yet.  [THERE IS NOW - gterm.man]
+# Contact us for instructions on using GTERM. 
+Very briefly, GTERM is a tektronix compatible virtual graphics terminal with
+independent text and graphics planes.  There is nothing in GTERM which ties it
+to IRAF, and indeed it is upwards compatible with SHELLTOOL (with many added
+features such as graphics), and can be used in place of SHELLTOOL.  Note that
+there is a special frame menu which can be used to enter 'setup' mode, or to
+make hardcopies of various windows or the full screen on an Apple Laserwriter
+(or other Postscript driven device).  Setup mode can be used to change the size
+of the graphics window and other options.  Virtually all of the options can
+also be set on the command line when the tool is started; a -G separates the
+frameargs for the text window from those for the graphics window.  For the
+names of the special GTERM options, page the gterm.c source file.
+
+The .ttyswrc file defines a number of function keys (F8,F9,R1,R2,R3) which are
+recognized by the GTERM text window, and also by the standard shelltool.
+R[1-3] are used to size the GTERM text window to 24, 34, or 40 lines; e.g.,
+R3 will set the window size to 40 lines, and a 'stty gterm40' should be typed
+into the CL to tell it that the window size has changed.  There are also
+entries for 'gterm24' and 'gterm34'; other sizes are possible if you
+explicitly set 'ncols' and 'nlines' in STTY.  F8 clears the graphics plane
+and leaves the terminal in graphics mode; subsequent text will come out in the
+graphics plane.  F9 restores the terminal to text mode, or if already in text
+mode, clears the text window.  When using GTERM with arbitrary (non-IRAF)
+graphics programs, it may be necesssary to manually place the terminal in
+graphics mode with F8 before drawing a plot, to get everything to work right.
+
+When reading the cursor in graphics mode, note that after typing a key in
+response to a cursor request, you can 'alias' that key to a mouse button by
+holding down the control key and tapping the desired mouse button twice.
+Thereafter, the mouse button may be used in place of the keyboard key to
+terminate a cursor read, transparently to the applications program.  This is
+very useful for repetitively marking object positions in a graphics cursor
+loop.
+
+
+IMTOOL installation instructions.
+-------------------------------------
+
+A crude early version of the IMTOOL prototype image display server is included
+in the suntools executable.  This is a very limited program at present, however
+it can display an image.  Lookup table adjustment (tap the right mouse button
+a couple times and hold it down while moving the mouse) and linear and random
+pseudocolor (settable in 'setup' mode) are also provided.  PLEASE NOTE THAT
+THIS IS A CRUDE EARLY VERSION OF THE SUNVIEW DISPLAY SERVER, AND A MUCH MORE
+CAPABLE PROGRAM IS PLANNED FOR LATER THIS YEAR.  In particular, we are well
+aware of the need for interactive cursor readback, which is not yet available
+for imaging devices.
+
+Installation is the same as for GTERM, except for the following additional
+steps:
+
+	% su
+	% cd /dev
+	% /etc/mknod imt1 p
+	% chmod 777 imt1
+	%
+	% cd /usr/bin
+	% ln -s /usr/bin/suntools imtool
+
+There is no entry for IMTOOL in the default .suntools provided; to start up
+IMTOOL use the mouse, or type the 'imtool' command into the cshell.  The IRAF
+DISPLAY program in the TV package may be used to display images (device=imtool).
+CVL cannot be used, nor can anything else in the TV package except DISPLAY.
+DISPLAY can only be used to write full image frames.  If a laserwriter is
+available, pseudo-greyscale hardcopy is available via frame menu selection.
+Note that it takes the laserwriter about 5 minutes to render a pseudo-greyscale
+hardcopy, but it only takes a few seconds to capture the screen and queue the
+job to the laserwriter.

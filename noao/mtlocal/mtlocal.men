@@ -1,0 +1,10 @@
+	 ldumpf - List the permanent files on a Cyber DUMPF tape
+	   r2df - Convert a CTIO 2-d frutti image into an IRAF image
+        rcamera - Convert a CAMERA image into an IRAF image
+	 rdumpf - Convert IPPS rasters from a DUMPF tape to IRAF images
+       ridsfile - Convert IDSFILES from a DUMPF tape to IRAF images
+	ridsmtn - Convert mountain format IDS/IRS data to IRAF images
+        ridsout - Convert a text file in IDSOUT format to IRAF images
+           rpds - Convert a PDS image into an IRAF image
+	 rrcopy - Convert IPPS rasters from an RCOPY tape to IRAF images
+       widstape - Convert ONEDSPEC spectra to IDSOUT text format

@@ -1,0 +1,3 @@
+input_file,f,a,,,,file containing help text
+lmargin,i,h,1,1,160,left margin
+rmargin,i,h,72,1,160,right margin

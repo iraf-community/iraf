@@ -1,0 +1,42 @@
+.help pathnames Nov84 system
+.ih
+NAME
+pathnames -- print the host pathnames for a set of files
+.ih
+USAGE
+pathnames [template]
+.ih
+PARAMETERS
+.ls template
+A filename template specifying the set of files for which pathnames
+are desired.  If omitted, the pathname of the current working or default
+directory is printed.  The list of file names can come from the standard input.
+.le
+.ls sort = yes
+Sort the output in ASCII collating sequence.
+.le
+.ih
+DESCRIPTION
+\fIPathnames\fR converts a list of IRAF virtual file names into their host
+system equivalents.  When called with no arguments, the function of
+\fIpathnames\fR is to print the current default directory.
+.ih
+EXAMPLES
+
+1. Print the pathname of the current default directory (sample output for
+a VMS host system).
+
+.nf
+	cl> path
+	draco!DRB1:[IRAF.SYS.FIO]
+.fi
+
+2. Translate the file "vfiles", containing a list of virtual filenames, into
+the equivalent list of host system filenames, e.g., for use as input to a
+foreign task.
+
+	cl> path @vfiles > hfiles
+.ih
+SEE ALSO
+directory, files
+.endhelp

@@ -1,0 +1,43 @@
+.help writevt Dec84 noao.imred.vtel
+.ih
+NAME
+writevt -- Write vacuum telescope full disk grams to tape
+.ih
+USAGE
+writevt input_image output_fd
+.ih
+PARAMETERS
+.ls input_image
+Name of input image.
+.le
+.ls output_fd
+File or device name, e.g. "mta1600[1]" or "mtb800"  If a file number is not
+given the user will be asked whether or not this is a new tape.  If it is
+a new tape the file number "1" will be used.  If it is not a new tape, i.e. 
+it already has data on it, then file number "EOT" will be used.
+.le
+.ls verbose = no
+Flag to signal program that it should produce verbose output.  This includes
+header information and progress reports.
+.le
+.ls new_tape = no
+New tape flag.  Usage is described above.
+.le
+.ih
+DESCRIPTION
+Writevt writes a full disk vacuum telescope gram in IRAF image format to tape.
+The IRAF image is 2048x2048 short integers.  The tape format is the same as
+that used to write original data tapes on the mountain.
+.ih
+EXAMPLES
+1. To write the image "image1" to mta at 1600 bpi at file number 3 and
+see verbose output the command would be:
+
+.nf
+	vt> writevt image1 mta1600[3] v+
+.fi
+
+.ih
+SEE ALSO
+readvt
+.endhelp

@@ -1,0 +1,11 @@
+calgorithm,s,h,"centroid","|centroid|gauss|none|ofilter|",,Centering algorithm
+cbox,r,h,5.0,,,Centering box width in fwhmpsf
+maxshift,r,h,1.0,,,Maximum center shift in fwhmpsf
+minsnratio,r,h,1.0,0.0,,Minimum SNR ratio for centering
+cmaxiter,i,h,10,,,Maximum iterations for centering
+clean,b,h,no,,,Symmetry clean before centering
+rclean,r,h,1.0,,,Cleaning radius in fwhmpsf
+rclip,r,h,2.0,,,Clipping radius in fwhmpsf
+kclean,r,h,3.0,,,K-sigma rejection criterion in skysigma
+mkcenter,b,h,no,,,Mark the computed center
+mode,s,h,'ql'

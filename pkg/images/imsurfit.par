@@ -1,0 +1,24 @@
+# IMSURFIT
+
+input,f,a,,,,Input images to be fit
+output,f,a,,,,Output images
+xorder,i,a,2,1,,Order of function in x
+yorder,i,a,2,1,,Order of function in y
+type_output,s,h,'fit',,,'Type of output (fit,residual,response,clean)'
+function,s,h,'leg',,,'Function to be fit (legendre,chebyshev,spline3)'
+cross_terms,b,h,y,,,Include cross-terms for polynomials?
+xmedian,i,h,1,1,,X length of median box
+ymedian,i,h,1,1,,Y length of median box
+median_percent,r,h,50.,,,Minimum fraction of pixels in median box
+lower,r,h,0.0,0.0,,Lower limit for residuals
+upper,r,h,0.0,0.0,,Upper limit for residuals
+ngrow,i,h,0,0,,Radius of region growing circle
+niter,i,h,0,0,,Maximum number of rejection cycles
+regions,s,h,'all',,, 'Good regions (all,rows,columns,border,sections,circle,invcircle)'
+rows,s,h,'*',,,Rows to be fit
+columns,s,h,'*',,,Columns to be fit
+border,s,h,'50',,,Width of border to be fit
+sections,s,h,,,,File name for sections list
+circle,s,h,,,,Circle specifications
+div_min,r,h,INDEF,,,Division minimum for response output
+mode,s,h,'ql'

@@ -1,0 +1,63 @@
+.help iscoeff Apr85 "Surfit Package"
+.ih
+NAME
+iscoeff - get the number and values of the surface coefficients
+.ih
+SYNOPSIS
+iscoeff (sf, coeff, ncoeff)
+
+.nf
+pointer	sf		# surface descriptor
+real	coeff[ncoeff]	# coefficient array
+int	ncoeff		# number of coefficients
+.fi
+.ih
+ARGUMENTS
+.ls sf   
+Pointer to the surface descriptor.
+.le
+.ls coeff
+Array of coefficients.
+.le
+.ls ncoeff
+The number of coefficients.
+.le
+
+.ih
+DESCRIPTION
+ISCOEFF fetches the coefficient array and the number of coefficients from
+the surface descriptor structure. A 1-D array ncoeff elements long
+is required to hold the coefficients where ncoeff is defined as follows:
+
+.nf
+	SF_LEGENDRE:		nxcoeff = xorder
+				nycoeff = yorder
+				ncoeff = xorder * yorder        xterms = yes
+				ncoeff = nycoeff + nxcoeff - 1  xterms = no
+
+	SF_CHEBYSHEV:		nxcoeff = xorder
+				nycoeff = yorder
+				ncoeff = xorder * yorder        xterms = yes
+				ncoeff = nycoeff + nxcoeff - 1  xterms = no
+
+	SF_SPLINE3:		nxcoeff = xorder + 3
+				nycoeff = yorder + 3
+				ncoeff = (xorder + 3) * (yorder + 3)
+
+	SF_SPLINE1:		nxcoeff = xorder + 1
+				nycoeff = yorder + 1
+				ncoeff = (xorder + 1) * (yorder + 1)
+
+.fi
+
+The coefficient of basis function B(i,x) * B(j,y) will be stored in
+element (i - 1) *
+nycoeff + j of the array coeff if the xterms parameter was set
+to yes by ISINIT. Otherwise the nycoeff y-term coefficients will be output
+first followed by the (nxcoeff - 1) x-term coefficients.
+
+.ih
+NOTES
+.ih
+SEE ALSO
+.endhelp

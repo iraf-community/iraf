@@ -1,0 +1,24 @@
+# RADPROF
+
+image,f,a,,,,Input image
+radius,r,a,,,,Maximum radial profile radius in scale units
+step,r,a,,,,Step size for radial profile in scale units
+order,i,h,5,1,,Order of spline fit
+kreject,r,h,3.0,,,K-sigma rejection limit
+nreject,i,h,1,,,Maximum number of rejection cycles
+datapars,pset,h,"",,,Noise model parameters
+centerpars,pset,h,"",,,Centering parameters
+fitskypars,pset,h,"",,,Sky fitting parameters
+photpars,pset,h,"",,,Photometry parameters
+coords,f,h,"",,,Coordinate list
+plotfile,f,h,"",,,Plot metacode file
+output,f,h,"",,,Results
+graphics,s,h,"stdgraph",,,Graphics device
+display,s,h,"stdimage",,,Image display device
+commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+radplots,b,h,yes,,,Plot radial profiles in interactive mode
+interactive,b,h,yes,,,Mode of use
+verify,b,h,yes,,,Verify critical parameters in non interactive mode
+verbose,b,h,yes,,,Print messages in non interactive mode
+mode,s,h,'ql'

@@ -1,0 +1,36 @@
+.help protect Nov84 system
+.ih
+NAME
+protect -- protect files from deletion
+.ih
+USAGE
+protect files
+.ih
+PARAMETERS
+.ls files
+A template specifying the file or files to be protected.
+.le
+.ih
+DESCRIPTION
+\fIProtect\fR asserts protection from deletion for the specified files.
+A protected file can be deleted only by first "unprotecting" it.
+File protection is preserved when a file is copied or renamed,
+even when copied or renamed to a remote network node,
+but may be lost when a file is backed up on tape and later restored
+(depending upon what utility one uses).  Note that imagefiles are
+automatically protected to prevent accidental deletion of the header
+file, leaving a "zombie" pixel file somewhere on disk.
+.ih
+EXAMPLES
+
+1. Protect the file "paper.ms" from deletion, accidental or otherwise.
+
+	cl> protect paper.ms
+
+2. Protect all the ".ms" files from deletion.
+
+	cl> protect *.ms
+.ih
+SEE ALSO
+unprotect, delete
+.endhelp

@@ -1,0 +1,339 @@
+FMIO -- BINARY FILE MANAGER (Jul88 DCT)
+----------------------------------------------
+
+    This directory contains the sources for a general low level binary file
+manager (FMIO).  The purpose of this file manager is to manage a fixed number
+of "lightweight files", or LFILES, maintained within a single variable length
+binary file.  This facility is used by higher level interfaces such as
+database interfaces to store variable length objects efficiently in a single
+host binary file.
+
+
+1. INTERFACE PROCEDURES
+
+1.1 General Procedures
+
+    The main FMIO interface procedures are summarized in the table below.
+Most access to lfile data is intended to be via the FIO binary file driver
+procedures (beginning with fm_lfopen in the figure).
+
+	yes|no = fm_acccess (datafile, mode)
+		  fm_rename (datafile, newname)
+		    fm_copy (datafile, newname)
+		  fm_delete (datafile)
+		 fm_rebuild (datafile)
+
+	       fm = fm_open (datafile, mode)
+		    fm_seti (fm, param, ival)
+	    ival = fm_stati (fm, param)
+		   fm_debug (fm, out, what)
+		   fm_copyo (fm, fm_to)
+		    fm_sync (fm)
+		   fm_close (fm)
+
+       lfile = fm_nextlfile (fm)
+		  fm_lfname (fm, lfile, type, lfname, maxch)
+        ERR|OK = fm_lfparse (lfname, fm, lfile, type)
+		  fm_lfcopy (fm_src, lfile_src, fm_dst, lfile_dst)
+		   fm_fopen (fm, lfile, mode, type)
+
+		  fm_lfopen (lfname, mode, lf)
+		 fm_lfstati (lf, param, ival)
+		 fm_lfaread (lf, buf, nbytes, offset, status)
+		fm_lfawrite (lf, buf, nbytes, offset, status)
+		 fm_lfawait (lf, status)
+		 fm_lfclose (lf, status)
+
+		  fm_lfstat (fm, lfile, statbuf)
+		fm_lfdelete (fm, lfile)
+	      fm_lfundelete (fm, lfile)
+
+
+1.2 Buffer Cache
+
+    To avoid excessive disk i/o when randomly accessing the datafile, it is
+desirable to maintain a cache of several lfile data buffers, e.g., so that
+accesses to a series of objects stored in a single lfile, or repeated accesses
+to portions of several lfiles should incur minimal disk accesses.  A simple
+way to implement such a buffer cache is to simply open each lfile as a file
+under FIO, leaving it up to FIO to manage the file buffer, and maintaining
+a LRU cache of open lfiles.  The number of buffers (open lfiles) is easily
+parameterized.  The buffer cache procedures are summarized in the figure
+below.
+
+              fd = fm_getfd (fm, lfile, mode, type)
+                   fm_retfd (fm, lfile)
+                 fm_lockout (fm, lfile)
+                 fm_debugfd (fm, out)
+
+The fm_getfd routine maps an lfile onto a file descriptor.  A file descriptor
+is opened on the lfile only when necessary.  Once opened, an lfile remains in
+the cache until forced out by the LRU replacement algorithm, or the datafile
+is closed.  While the datafile remains open, removal of an lfile from the
+cache (closing the associated file descriptor) is permitted only after a call
+to fm_retfd; calling this routine does not immediately close the file, it only
+permits it to be closed.  Repeated to fm_getfd should return a file descriptor
+immediately, with very little overhead, with an already active file buffer,
+hence repeated calls to the cache manager and FIO may often be made without
+incurring any disk accesses.
+
+Note that lfiles may be opened on file descriptors via direct calls to the
+file manager, regardless of whether these lfiles are already open in the
+buffer cache (e.g., with fm_fopen).  This allows two or more independent
+file buffers to be simultaneously active on the same lfile, but opens the
+possibility of loss of data if the buffers overlap.  If this is a problem,
+the routine fm_lockoutfd may be called to prevent inadvertent use of an lfile
+by the cache.  This should be followed by a call to fm_retfd to clear the
+lockout bit once the reason for the lockout (usually a noncached lfile open)
+is gone.  The routine fm_debugfd will print information on stream 'out'
+describing the status of the buffer cache.
+
+
+2. FILE STRUCTURE
+
+The layout of a datafile is as follows:
+
+	    +   +-------------------------+
+	    |   |     datafile header     |     (fixed size)
+     stored |   |  +-------------------+  |
+       as - +   |        file table       |     (configurable)
+      unit  |   |  +-------------------+  |
+	    |   |      page table index   |     (configurable)
+	    +   +-------------------------+
+                             |
+                         data pages             (dynamic)
+                             |
+                             v
+
+The datafile header is a fixed format binary structure.  The file table
+contains one entry for each lfile stored in the datafile; the maximum number
+of lfiles is fixed at datafile creation time.  Each lfile is known by its
+lfile number, ranging from zero to MAXLFILES.  Lfile zero is the PAGE TABLE,
+used to map each data page in the datafile to the lfile to which it is
+allocated.  The first user lfile is hence number 1.  Lfiles may by any size;
+storage is allocated in units of PAGES.  The page size is fixed at datafile
+creation time.	There are two types of files, binary (opaque) files, and
+text files.  Both file types appear as binary files to the high level code,
+i.e., both are accessed by a FIO binary file driver, the only difference
+being that for a text file, data blocks are assumed to contain text and are
+packed/unpacked during i/o (saving storage and rendering the file machine
+independent).
+
+It is important to realize that lfiles are referred to only by FILE NUMBER
+in this interface; any association with symbolic names must be made at a
+higher level (lfiles are by no means necessarily associated with "files" at
+the higher level, i.e., they might be used to store variable length parameters,
+relations, or whatever).  All lfiles exist, in a sense, as zero length files
+at datafile creation time.  To open a new lfile, one first calls fm_nextlfile
+to get the file number of an empty lfile.  Lfiles can be deleted, but storage
+is never deallocated; new pages are always allocated at the end of file.
+Hence deleted lfiles can be undeleted, and the entire datafile must normally
+be copied (or "rebuilt") to reclaim unused space and coalesce file segments
+for more efficient i/o.  (There are cases where a deleted lfile can be reused
+without rebuilding the lfile: fm_nextlfile will begin reusing deleted lfiles
+after it wraps around, and the client software can always open an lfile
+NEW_FILE, overwriting the pages already allocated to the lfile).
+
+The FMIO datafile itself, and any text files stored therein, is maintained in
+a machine indepenent format.  Binary file data is merely copied to and from
+the datafile, hence it is up to the client software to store binary data in
+a machine independent format, if desired.
+
+
+2.1 Recovery
+
+    Since new data pages are always allocated at the end of file (next
+available PTE), and the datafile state is always sync-ed as a unit, protected
+as a critical section (ignoring modifications to lfile data), a datafile
+should always be recoverable after a crash, with loss only of data written
+since the last sync.  The datafile is sync-ed automatically every several
+minutes.  Applications wishing to protect newly written lfile data can sync
+the datafile manually if desired.
+
+
+3. RUNTIME DATA STRUCTURES
+
+The internal runtime data structures are summarized below.  The terminology
+used is as follows:
+
+	FM		file manager
+	FT		file table
+	FTE		file table entry
+	LFILE		lightweight file
+	PAGE		unit of datafile file storage
+	PT		page table
+	PTE		page table entry
+	PTI		page table index
+
+
+# FMDES -- Main FM descriptor.
+struct fmdes {
+	int	fm_magic		# identifies file/descriptor type
+	int	fm_active		# set once descriptor is initialized
+	int	fm_chan			# host i/o channel for datafile
+	int	fm_mode			# datafile access mode
+	int	fm_dfversion		# datafile file version
+	int	fm_szpage		# datafile page size, bytes
+	int	fm_nlfiles		# number of lfiles
+	int	fm_datastart		# file offset of first data page
+	int	fm_devblksize		# device block size
+	int	fm_optbufsize		# default file buffer size
+	int	fm_maxbufsize		# maximum file buffer size
+	int	fm_lsynctime		# time descriptor last updated on disk
+	int	fm_dhmodified		# set if header needs to be updated
+
+	int	fm_ftoff		# offset (su) of FT in datafile
+	int	fm_ftlastnf		# file number of last lfile allocated
+	struct	fte (*fm_ftable)[]	# file table storage
+
+	int	fm_ptioff		# offset (su) of PTI in datafile
+	int	fm_ptilen		# allocated length of PTI
+	int	fm_ptinpti		# number of PTI entries in use
+	int	fm_ptindex[]		# PTI storage
+
+	int	fm_ptlen		# allocated length of page table array
+	int	fm_ptnpte		# number of PTE's in use (#data pages)
+	int	fm_ptlupte		# highest PTE updated on disk
+	short	fm_ptable[]		# runtime page table array
+
+	struct	lfcache *fm_lfcache;	# lfile cache descriptor
+	int	fm_errcode		# error code of posted error
+	char	fm_erropstr[]		# operand string of posted error
+	char	fm_dfname[]		# datafile name, for error messages
+}
+
+
+3.1 Page Table
+
+    During runtime access to the datafile, the page table is a vector mapping
+each datafile page to an lfile.  Each page is allocated to a single lfile, and
+lfile storage is allocated in units of pages.  As the datafile is extended by
+writing to lfiles, elements are the in-core page table array.
+
+When an lfile is first accessed, the in-core page table is scanned to find
+those pages belonging to the lfile, building up a vector mapping offsets in
+the lfile into datafile page numbers, i.e., to offsets in the physical
+datafile.  As new pages are allocated to an lfile by writing at end of file,
+both the lfile page vector and datafile page table are extended.
+
+Assume the datafile page size is 512 bytes.  Since a PTE is 2 bytes, each PT
+page holds 256 PTEs, representing 128 Kb of file space.  1 Mb of file space
+(2048 pages) therefore requires 8 pages of page table space.  If we allocate
+a default PT index of 256 slots, this gives us (for a 512 byte page) a 32 Mb
+default maximum file size.
+
+Only the PT index, stored in the datafile header, and the PT pages mapping
+datafile page to lfile, are physically stored in the datafile.  The PT index
+size is fixed.  The PT pages may be stored anywhere in the data pages and
+are pointed to by the PT index.  The PT is stored as lfile zero.
+
+This scheme is not intended for use with extremely large datafiles, or with
+datafiles containing a very large number of lfiles.  A datafile of 32-256 Mb,
+page size 512-4096, containing up to several hundred lfiles is the design
+limit.  Of course, each datafile is a single host file, and there can be any
+number of datafiles.
+
+
+3.2 File Table
+
+    The file table (FT) describes each lfile in the datafile.  Each lfile
+has an entry in the file table, regardless of whether the lfile has ever been
+accessed or contains any data.	As stored in the datafile, the FT is an array
+of file table entries (FTEs) containing two longwords of data each, i.e.,
+
+	FTE.1:	file size, bytes
+	FTE.2:	flag bits (text, deleted, etc.)
+
+Additional information must be maintained while an lfile is being accessed
+at runtime.  The full runtime FTE is as follows.
+
+	struct fte {
+		struct	fmdes *lf_fm	# backpointer to FMIO descriptor
+		int	lf_fsize	# file size, bytes
+		int	lf_flags	# flag bits
+		int	lf_status	# runtime i/o status (byte count)
+		int	lf_ltsize	# logical byte size of last transfer
+		int	lf_npages	# npages in lfile (pagemap size)
+		int	*lf_pagemap	# pagemap array for lfile
+		int	lf_pmlen	# pagemap array length (allocated)
+	}
+
+flag bits:
+	
+	LF_DELETED		set if the lfile is deleted
+	LF_TEXTFILE		set if the lfile data is byte-packed text
+	LF_IOINPROGRESS		set when i/o transfer is in progress
+
+Deleting an lfile merely causes the FT_DELETED bit to be set; the actual
+data will be lost only if the lfile is reused or explicitly overwritten,
+or in a copy or rebuild operation.  Lfile space, once allocated, is never
+freed, i.e., new pages are always allocated at the end of the datafile,
+but lfile space can be *reused* by opening the lfile NEW_FILE and writing
+into it.
+
+Space for all lfile descriptors is preallocated in the FTE array at datafile
+open time.  When an lfile is first accessed the pagemap for that lfile is
+filled in; subsequent accesses to the lfile (lfile opens) while the datafile
+remains open require very little overhead, since the lfile descriptor is
+accessible via a vectored array reference, and will already have been activated.
+
+
+4. EXAMPLE
+
+    The following dialogue is from the debug tasks in ZZDEBUG.  A datafile Q
+containing four textfiles has been created, and we print out the contents of
+this with SHOW.  Next we copy the datafile to Q, and "show" that.  Note that
+the page table file is moved to the beginning of the data pages area (which
+will avoid an extra disk access during the datafile open), and all lfiles
+have been rendered contiguous (lfile 5 was not stored in two segments in the
+original datafile).
+
+> ?
+    create   wfile    pfile    show     copy     rebuild  
+> 
+> show
+datafile: q
+FMIO V1.1: datafile=q, pagesize=512, nlfiles=128
+nlfinuse=5, nlfdeleted=0, nlffree=123, ftoff=13, ftlastnf=0
+headersize=2560, filesize=20992, freespace=1408 bytes (6%)
+fm=15AE9X, chan=4, mode=2, time since last sync=1 seconds
+datastart=2561, devblksize=512, optbufsize=2048, maxbufsize=0
+ptioff=271, ptilen=256, npti=1, ptlen=512, npte=36, lupte=36
+====================== file table =======================
+    0 size=72 [page table]
+    1 size=1114 textfile
+    2 size=7037 textfile
+    5 size=4422 textfile
+    6 size=4379 textfile
+=================== page table index ====================
+    4
+====================== page table =======================
+    1    1    1    0    2    2    2    2    2    2    2    2    2    2    2
+    2    2    2    5    5    6    6    6    6    6    6    6    6    6    5
+    5    5    5    5    5    5
+> 
+> copy
+source: q
+destination: p
+> 
+> show
+datafile: p
+FMIO V1.1: datafile=p, pagesize=512, nlfiles=128
+nlfinuse=5, nlfdeleted=0, nlffree=123, ftoff=13, ftlastnf=0
+headersize=2560, filesize=20992, freespace=1408 bytes (6%)
+fm=15AE9X, chan=4, mode=2, time since last sync=0 seconds
+datastart=2561, devblksize=512, optbufsize=2048, maxbufsize=0
+ptioff=271, ptilen=256, npti=1, ptlen=512, npte=36, lupte=36
+====================== file table =======================
+    0 size=72 [page table]
+    1 size=1114 textfile
+    2 size=7037 textfile
+    5 size=4422 textfile
+    6 size=4379 textfile
+=================== page table index ====================
+    1
+====================== page table =======================
+    0    1    1    1    2    2    2    2    2    2    2    2    2    2    2
+    2    2    2    5    5    5    5    5    5    5    5    5    6    6    6
+    6    6    6    6    6    6
+> 

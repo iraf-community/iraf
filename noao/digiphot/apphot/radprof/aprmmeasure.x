@@ -1,0 +1,41 @@
+include <math/curfit.h>
+
+# AP_RMMEASURE -- Procedure to compute the sums and areas inside the apertures.
+
+procedure ap_rmmeasure (pixels, nx, ny, wx, wy, aperts, sums, areas, naperts)
+
+real	pixels[nx,ARB]		# subraster pixel values
+int	nx, ny			# dimensions of the subraster
+real	wx, wy			# center of subraster
+real	aperts[ARB]		# array of apertures
+real	sums[ARB]		# array of sums
+real	areas[ARB]		# aperture areas
+int	naperts			# number of apertures
+
+int	i, j, k
+real	apmaxsq, dy2, r2, r, fctn
+
+begin
+	# Initialize.
+	apmaxsq = (aperts[naperts] + 0.5) ** 2
+	call aclrr (sums, naperts)
+	call aclrr (areas, naperts)
+
+	# Loop over the pixels.
+	do j = 1, ny {
+	    dy2 = (j - wy) ** 2
+	    do i = 1, nx {
+		r2 = (i - wx) ** 2 + dy2
+		if (r2 > apmaxsq)
+		    next
+		r = sqrt (r2) - 0.5
+		do k = 1, naperts {
+		    if (r > aperts[k])
+			next
+		    fctn = max (0.0, min (1.0, aperts[k] - r))
+		    sums[k] = sums[k] + fctn * pixels[i,j]
+		    areas[k] = areas[k] + fctn
+		}
+	    }
+	}
+end

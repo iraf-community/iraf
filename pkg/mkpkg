@@ -1,0 +1,59 @@
+# Make the IRAF system packages.
+
+$ifeq (hostid, unix)  !(clear;date)  $endif
+$call update
+$ifeq (hostid, unix)  !(date)  $endif
+$exit
+
+update:
+	$call cl
+	$call system
+	$call softools
+	$call xtools
+	$call dataio
+	$call images
+	$call lists
+	$call plot
+	$call utilities
+
+	$ifeq (HOSTID, vms) $purge [...] $endif
+	$purge bin$
+	;
+
+cl:
+	$echo "--------------------- CL --------------------------"
+	$call update@cl
+	;
+system:
+	$echo "--------------------- SYSTEM ----------------------"
+	$call update@system
+	;
+softools:
+	$echo "--------------------- SOFTOOLS --------------------"
+	$call update@softools
+	;
+
+dataio:
+	$echo "--------------------- DATAIO ----------------------"
+	$call update@dataio
+	;
+images:
+	$echo "--------------------- IMAGES ----------------------"
+	$call update@images
+	;
+lists:
+	$echo "--------------------- LISTS -----------------------"
+	$call update@lists
+	;
+plot:
+	$echo "--------------------- PLOT ------------------------"
+	$call update@plot
+	;
+utilities:
+	$echo "--------------------- UTILITIES -------------------"
+	$call update@utilities
+	;
+xtools:
+	$echo "--------------------- XTOOLS ----------------------"
+	$call update@xtools
+	;

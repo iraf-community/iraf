@@ -1,0 +1,52 @@
+.help cvrefit Jun84 "Curfit Package"
+.ih
+NAME
+cvrefit -- refit new y vector using old x vector and weights
+.ih
+SYNOPSIS
+cvrefit (cv, x, y, w, ier)
+
+.nf
+pointer	cv		# curve descriptor
+real	x[]		# array of x values
+real	y[]		# array of y values
+real	weight[]	# array of weights
+int	ier		# error code
+.fi
+.ih
+ARGUMENTS
+.ls cv
+Pointer to the curve descriptor
+.le
+.ls x  
+Array of x values.
+.le
+.ls y    
+Array of y values.
+.le
+.ls weight
+Array of weights.
+.le
+.ls ier  
+Error code. The options are OK, SINGULAR and NO_DEG_FREEDOM. If ier equals
+singular a solution is computed but one or more of the coefficients may
+be zero. If ier equals NO_DEG_FREEDOM, there are insufficient data points
+to compute a solution and CVREFIT returns without solving for the coefficients.
+.le
+.ih
+DESCRIPTION
+In some application the x and weight values remain unchanged from fit to fit
+and only the y values vary. In this case it is redundant to reaccumulate
+the matrix and perform the Cholesky factorization. CVREFIT zeros and
+reaccumulates the vector on the right hand side of the matrix equation
+and performs the forward and back substitution phase to fit for a new
+coefficient vector.
+.ih
+NOTES
+In the first call to CVREFIT space is allocated for the non-zero basis
+functions. Subsequent call to CVREFIT reference this array to avoid
+recaculating basis functions at every call.
+.ih
+SEE ALSO
+cvfit, cvaccum, cvsolve, cvchoslv
+.endhelp

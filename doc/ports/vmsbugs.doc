@@ -1,0 +1,328 @@
+From stsci Thu Jan 17 08:30:15 1985
+Received: by lyra.noao.UUCP (4.12/4.7)
+	id AA10600; Thu, 17 Jan 85 08:30:03 mst
+Date: Thu, 17 Jan 85 08:30:03 mst
+From: stsci (Space Telescope )
+Message-Id: <8501171530.AA10600@lyra.noao.UUCP>
+To: tody
+Status: R
+
+Doug,
+
+	Here is a list of bugs, changes, suggestions, etc. compiled during
+the port of IRAF to VMS.
+
+	Some of the bugs have the bug fixes listed here; others were too
+elusive and/or time-consuming to try to figure out at this time.  When you 
+get the latest, greatest VMS version of IRAF, what changes we made will 
+certainly be there;  we'll probably send along RCS files as well so you could
+easily update some of your files.  However, most of the changes are
+just a few lines here and there.
+
+	We await any comments or any bug fixes you have there...
+
+				Jay and Fred
+
+P.S.
+	We were discussing using mapped sections such as sdas
+uses for static files. There is one major difference in the way that
+iraf and sdas handle static (image) files. In the sdas routine
+a pointer is passed back to where the image resides in memory. This
+is due to the way the mapped sections work in VMS. In Iraf the zroutine
+is given a pointer to where the data is to reside, so we have to do
+a memory copy for each image reference, and may not be more efficient
+than just writing to or reading from disk. Can you see any easy
+way around this problem, or maybe an additional flag to zopnsf which
+indicates that a pointer is to be passed back from zardsf or zawrsf
+for the data rather than a passing in a pointer to where the data is to
+be read to or written from?    (fred)
+
+
+----------------------------------------------------------------------------
+
+
+			------------------------
+			NOTES file for IRAF (VMS)
+			------------------------
+
+
+Contents:
+		1.	Bugs 
+
+		2.	Portability Considerations
+
+		3.	Source file name changes
+
+
+-------------------------------------------------------------------------------
+
+
+1.	Bugs 
+
+	/pkg/cl/bkg.c
+		In rbkgfile(), following fix:
+			... fgets (set, fp) ...    	TO
+			... fgets (set, SZ_LINE, fp) ...
+
+	/sys/libc/qsort.c	--	qcmp()    -->  (*qcmp)()
+	/sys/libc/cfilbuf.c	--	filbuf()  -->  (*filbuf)()
+
+	/sys/vops/advz.x	--	'$t' missing for generic function
+	/sys/vops/advz*.x	--	procedure advz[idx...]
+
+						(extra files ?)
+	/sys/vops/ak/aif*.x	--	aiftrrr.x
+	/sys/vops/ak/aff*.x	--	afftrxx.x,  afftxrr.x,  afftxxx.x
+	/sys/vops/ak/acjgx.x	--	acjgxx.x
+
+	/sys/fio/fdebug.x	--	"int and()" statement missing
+	/sys/fio/fputtx.x	--	"int and()" statement missing
+	/sys/fio/fgetfd.x	--	"int or()"  statement missing
+
+	/pkg/cl/pfiles.c	--	pfcopyback()
+		'pt' was going NULL before 'pf' in a for loop check;
+		was changed to check for 'pt' being NULL instead of 'pf'
+
+	/pkg/cl/builtin.c, binop.c, bkg.c, history.c, lexicon.c,
+		debug.c, errs.c, exec.c, pfiles.c
+
+		problem getting to next task by doing  'tp++'; due to VMS
+		alignment of structures.  Fixed with a macro definition in
+		/pkg/cl/task.h  for "next_task()", namely:
+
+		#define  next_task(tp)  \
+			((struct task *)((unsigned)tp + (TASKSIZ * BPI)))
+		#define  prevtask  next_task(currentask)
+
+
+	/pkg/help/lroff/output.x --	references constant MAX_INT
+					"include <mach.h>" statement missing
+
+	/pkg/lists/tokens.x	--	last_nscan() --> last_nscan
+
+	SPP/RPP compiler bug	--
+
+			define  and  jiand	(e.g. in <iraf.h>)
+
+			if (x == FIVE  &&  y == SIX) ...	(SPP)
+			if (x == FIVE  &   y == SIX) ...	(RPP)
+			if (x .eq. 5  .jiand.  y .eq. 6) ...	(FORTRAN)
+
+		only occurs when a macro is replaced before the '&&', 
+		in this case FIVE.
+
+	/sys/fio/vfnmap.x
+		vfnunmap() -- when an OS extension was (un)mapped to a null
+			      IRAF extension, the character count returned
+			      was not right:
+				(e.g.)	doc.dir --> doc   but nchars = 7
+                              This caused problems later on in the directory
+	                      task of the system package.
+			The fix:
+					...   {
+				vfn[extn_offset-1] = EOS
+				op = extn_offset - 1		<-- was missing
+			        }	...
+
+	/sys/fio/vfntrans.x
+		filename mapping for directories sometimes doesn't work;
+			sys$  -->  drb4:[irafx.sys]sys   instead of
+				   drb4:[irafx.sys]
+		made a quick fix in zopdir() and zfchdr() to deal with this
+		for now; can't seem to locate the exact problem in vfntrans.x
+
+	/sys/fio/vfnmap.x
+		When deleting a file and the parameter subfiles=yes, and
+		no mapping file is currently in directory, a null mapping
+		file is (sometimes) created.  Then doing a system.directory 
+		fails when trying to read this null mapping file.
+
+		E.g.  cl> delete aaabbb.ccc
+			subfiles=yes (default .par file)
+
+			delete() is called with 'aaabbb.ccc' and then
+				'aaabbb.ccc.zsf', which is degenerate;
+				therefore, if a mapping file doesn't 
+				exist, it is created.
+
+		Haven't fixed this yet; not sure about the best way to go.
+		Some simple suggestions:
+
+		  --	Could somehow figure out whether the file is being
+			added or deleted (i.e. was vfnmap() called from 
+			vfnadd() or vfndel()?).  
+
+		  --	Or, whenever a mapping file is created, it has the 
+			appropriate header info in it rather than being null?  
+
+		  --	Or, some special case of reading null mapping files?
+
+
+	/sys/etc/environ.x
+		env_hash()  
+			return (sum**2 / CONSTANT)
+
+		causes integer overflow on VMS; changed to:  (for now)
+			return ( int( float(sum) / CONSTANT * float(sum) ) )
+
+	arithmetic overflows:
+		/sys/etc/urand.x  and  others...
+
+		These seem to occur in a few places, sometimes purposely.
+		An easy VMS fix is to use "FORTRAN/NOCHECK file", but it's
+		a pain to have to remember which files need this special
+		treatment.
+
+	/sys/fio/
+		Seems to be a bug in the file i/o related to writing 
+		asynchronously to binary files.  In VMS, this is REALLY
+		asynchronous, and it caused problems when trying to write
+		the help database;  making VMS do it synchronously (like
+		UNIX) fixed the problem, for now anyway.
+
+		It may be that a single buffer is being played with between
+		the write and the wait;  at least that's what it looks like
+		in some of the binary files that were written -- there were
+		missing blocks and misaligned data, which were there when
+		displayed on the terminal.  
+
+		I don't think it's a problem with RMS, since double buffering
+		was used to test the binary file driver, with success.
+
+
+	/pkg/system/directory.x
+		- call strcat ("$", Memc[template])    -->
+ 		  call strcat ("$", Memc[template], SZ_FNAME)
+
+		- should sort and output the file name list ONLY 
+				if (nfiles > 0)
+		  otherwise, an "adjustable array error" occurs in qsort()
+		  (i.e. an array with dimension of 0 is passed to qsort,
+		        causing VMS to complain)
+
+
+-------------------------------------------------------------------------------
+
+
+2.	Portability Considerations
+
+
+	(life would be easier if most source files and include files did
+	 not need to be mapped ... especially C source files)
+	
+			--	no underscores
+			--	only alphanumeric
+			--	case insensitive (i.e. lower case)
+			--	(9 chars).(3 chars)
+
+	(Notes: Some source file names and references to include files
+		had to be changed to create the filename mapping in the 
+		first place, see list below.  
+
+		This is not so crucial now, since XC and XPP have been
+		written/modified to handle filename mapping.  But, it
+		still does cause problems when making bug fixes to source
+		files with degenerate names and trying to keep track of
+		them with RCS.  Of course, 99% of the mapping problems will
+		disappear with VMS V4.0.)
+
+	also, directories should be case insensitive:
+		/sys/vops/AK	-->  ak
+		/sys/vops/LZ	-->  lz
+
+
+	sys/libc/cfilbuf.c	--	filbuf  -->  vfilbuf (VMS)
+					since 'FILBUF' gets translated to
+					'filbuf' on VMS, not 'filbuf_', 
+					which causes a conflict:
+						FILBUF and (*filbuf)()
+
+
+	SPP coding conventions that cause problems for VMS FORTRAN compiler:
+
+	a)  multiple declarations, e.g.
+
+			int  ip
+			   ...
+			int  ip, this, that
+
+	    files:	/sys/fmtio/ctoi.x
+			/sys/fmtio/sscan.x
+			/sys/fmtio/chdeposit.x
+			/pkg/system/sort.x
+
+	b)  'real' function, e.g.
+
+		real (dval, 0)  -->  real (dval, 0.0)
+			/sys/fmtio/gctod.x
+
+	c)  array declarations in procedures, e.g.
+
+		procedure proc1 (array, count)
+		type  array (count)
+		int   count		# should be BEFORE array declaration
+					# (tries to use 'count' as a REAL)
+			/sys/fmtio/patmatch.x
+			/pkg/utilities/t_translit.x
+						makeset(), filset()
+
+
+	and(), or(), not()  -->  andi(), ori(), noti() ???
+		lots of references in /sys/fio/ to these procedures 
+		(added them for VMS, using andi(),...)
+	xor()  referenced in  /sys/vops/...axorki.x
+		(added xor() for VMS, using xori())
+
+	FIO
+		file mode "APPEND" -- create the file if non-existent??
+		UNIX (and now VMS) do this automatically, but system
+		reference document isn't clear about this.  Without this
+		feature,  /pkg/system/bugmail.cl and revisions.cl  don't work.
+
+	I/O drivers
+		ZMAIN passes the EPA of the read driver to IRAF_MAIN() ...
+
+		This is OK in UNIX (and VMS, for now), but may have cases 
+		where I/O is to different devices and the drivers are NOT 
+		compatible.  (I don't know enough of the internals of 
+		other operating systems to say for sure that this is a
+		problem, but it seems like it could be.)
+
+		Eg.   STDIN from a file and STDOUT to terminal
+
+		If the file and terminal drivers are incompatible, then
+		things won't work.  We may eventually have some problems
+		in this area with VMS, especially if we start to support
+		some network I/O access.  Eventually, we may store the
+		actual read/write function in the channel structure and 
+		check it whenever a read/write function is called; that is,
+		override the higher level IRAF I/O at the kernel level.
+
+	zardlp() function referenced in  /sys/etc/lpopen.x ??
+		(added dummy function for VMS)
+
+
+	modf()  function used in  /pkg/cl/unop.c
+		was missing from /sys/libc/
+		(added  modf.mar  to /sys/os/ for VMS)
+
+
+-------------------------------------------------------------------------------
+
+
+3.	Source file name changes
+
+
+	/pkg/softools/boot/spp/xpp/xpp_main.c  -->  xppmain.c
+
+	Necessary for file name mapping:
+
+		/sys/memio/ty_size.dat  -->  tysize.dat
+
+		/sys/memio/coerce.x, salloc.x, sizeof.x
+			include "ty_size.dat"  -->  include "tysize.dat"
+
+
+-------------------------------------------------------------------------------
+
+

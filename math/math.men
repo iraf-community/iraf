@@ -1,0 +1,9 @@
+      bevington - P.R. Bevington's statistical analysis package
+	 curfit - IRAF curve fitting package
+	 deboor - C.DeBoor's spline package
+	   ieee - IEEE signal processing routines
+       iminterp	- IRAF image interpolation package
+	 interp - Old 1D image interpolation routines
+	   llsq - Lawson's & Hanson's linear least squares package
+	 surfit - IRAF image surface fitting package
+	gsurfit - IRAF general surface fitting package

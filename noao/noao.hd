@@ -1,0 +1,57 @@
+# Help directory for the NOAO packages.
+
+$artdata	= "./artdata/"
+$astrometry	= "./astrometry/"
+$astutil	= "./astutil/"
+$digiphot	= "./digiphot/"
+$focas		= "./focas/"
+$imred		= "./imred/"
+$mtlocal	= "./mtlocal/"
+$onedspec	= "./onedspec/"
+$proto		= "./proto/"
+$surfphot	= "./surfphot/"
+$twodspec	= "./twodspec/"
+
+# Define help files for the packages.
+
+astutil		men = astutil$astutil.men,
+		hlp = ..,
+		sys = astutil$astutil.hlp,
+		pkg = astutil$astutil.hd,
+		src = astutil$astutil.cl
+
+digiphot	men = digiphot$digiphot.men,
+		hlp = ..,
+		sys = digiphot$digiphot.hlp,
+		pkg = digiphot$digiphot.hd,
+		src = digiphot$digiphot.cl
+
+imred		men = imred$imred.men,
+		hlp = ..,
+		sys = imred$imred.hlp,
+		pkg = imred$imred.hd,
+		src = imred$imred.cl
+
+mtlocal		men = mtlocal$mtlocal.men,
+		hlp = ..,
+		sys = mtlocal$mtlocal.hlp,
+		pkg = mtlocal$mtlocal.hd,
+		src = mtlocal$mtlocal.cl
+
+onedspec	men = onedspec$onedspec.men,
+		hlp = ..,
+		sys = onedspec$onedspec.hlp,
+		pkg = onedspec$onedspec.hd,
+		src = onedspec$onedspec.cl
+
+proto		men = proto$proto.men,
+		hlp = ..,
+		sys = proto$proto.hlp,
+		pkg = proto$proto.hd,
+		src = proto$proto.cl
+
+twodspec	men = twodspec$twodspec.men,
+		hlp = ..,
+		sys = twodspec$twodspec.hlp,
+		pkg = twodspec$twodspec.hd,
+		src = twodspec$twodspec.cl

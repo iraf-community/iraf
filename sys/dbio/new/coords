@@ -1,0 +1,73 @@
+.nh 4
+World Coordinates
+
+    In general, an image may simultaneously have any number of world coordinate
+systems associated with it.  It would be quite awkward to try to store an
+arbitrary number of WCS descriptors in the image header, so a separate WCS
+relation is used instead.  If world coordinates are not used no overhead is
+incurred.
+
+Maintenance of the WCS descriptor, transformations of the WCS itself (e.g.,
+when an image changes spatially), and coordinate transformations using the WCS
+are all managed by the WCS package.  This will be a general purpose package
+usable not only in IMIO but also in GIO and other places.  IMIO will be
+responsible for copying the WCS records for an image when a new image is
+created, as well as for correcting the WCS for the effects of subsampling,
+etc. when a section of an image is mapped.
+
+The WCS package will include support for both linear and nonlinear coordinate
+systems.  Each WCS is described by a mapping from pixel space to WCS space
+consisting of a general nonlinear transformation followed by a linear
+transformation.  Either or both of the transformations may be unitary if
+desired, e.g., the simple linear transformation is supported as a special case.
+.ls 4
+.ls 12 image
+The name (value of the \fIimage\fR key in the image header) of the image
+for which the WCS is defined.
+.le
+.ls nlnterm
+A flag specifying whether the WCS includes a nonlinear term.
+.le
+.ls invterm
+A flag specifying whether the WCS includes an inverse nonlinear term.
+If a forward nonlinear transformation is defined but no inverse transformation
+is given, coordinate transformations from WCS space to pixel space may be
+inefficient or impossible.
+.le
+.ls linterm
+A flag specifying whether the WCS includes a linear term.
+.le
+.ls fwdtran
+The interpreter program for the forward nonlinear transformation.
+.le
+.ls invtran
+The interpreter program for the inverse nonlinear transformation.
+.le
+.ls lintran
+A floating point array describing the linear transformation.
+.le
+.le
+
+
+Nonlinear transformations are described by small user supplied \fIprograms\fR
+written in a simple RPN language entered as a variable length character string.
+The RPN language will include builtin intrinsic functions for all the standard
+trigonometric and hyperbolic functions, plus builtin functions for the common
+nonlinear transformations as well.  The advantage of this scheme is that the
+standard transformations are supported very efficiently without sacrificing
+generality.  Even nonstandard nonlinear functions can be computed quite
+efficiently since the runtime overhead of an RPN interpreter can be made quite
+small compared to the time required to evaluate the trigonometric and other
+functions typically used in a nonlinear function.
+
+Implementation of the WCS as a nonlinear function plus a linear function
+makes it trivial for IMIO to automatically update the WCS when a linear
+transformation is applied to the image (the nonlinear term of the WCS will
+not be affected by a linear transformation of the image).
+Implementation of the nonlinear term as a program encoded as a character
+string permits modification of the nonlinear term by \fIconcatentation\fR
+of another nonlinear function, also represented as a character string.
+In other words, the final mapping is given by successive application of
+a series of nonlinear transformations, followed by the linear transformation.
+Hence the WCS may be updated to reflect a subsequent linear or nonlinear
+transformation of the image, regardless of the nature of the original WCS.

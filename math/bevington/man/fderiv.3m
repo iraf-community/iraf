@@ -1,0 +1,27 @@
+.TH FDERIV 3M
+.SH NAME
+fderiv
+.SH DESCRIPTION
+subroutine fderiv.f (non-analytical)
+
+source
+  Bevington, page 242.
+
+purpose
+  evaluate derivatives of function for least-squares search
+    for arbitrary function given by functn
+
+usage
+  call fderiv (x, i, a, deltaa, nterms, deriv)
+
+description of parameters
+  x      - array of data points for independent variable
+  i      - index of data points
+  a      - array of parameters
+  deltaa - array of parameter increments
+  nterms - number of parameters
+  deriv  - derivatives of function
+
+subroutines and function subprograms required
+  functn (x, i, a)
+    evaluates the fitting function for the ith term

@@ -1,0 +1,26 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ASSQ -- Vector sum of squares.
+
+$if (datatype == csir)
+real procedure assq$t (a, npix)
+real	sum
+$else $if (datatype == ld)
+double procedure assq$t (a, npix)
+double	sum
+$else
+PIXEL procedure assq$t (a, npix)
+PIXEL	sum
+$endif $endif
+
+PIXEL	a[ARB]
+int	npix
+int	i
+
+begin
+	sum = 0$f
+	do i = 1, npix
+	    sum = sum + (a[i] ** 2)
+	
+	return (sum)
+end

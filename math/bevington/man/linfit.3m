@@ -1,0 +1,33 @@
+.TH LINFIT 3M
+.SH NAME
+linfit
+.SH DESCRIPTION
+subroutine linfit.f
+
+source
+  Bevington, pages 104-105.
+
+purpose
+  make least-squares fit to a data set with a straight line
+
+usage
+  call linfit (x, y, sigmay, npts, mode, a, sigmaa,
+    b, sigmab, r)
+
+description of parameters
+  x      - array of data points for independent variable
+  y      - array of data points for dependent variable
+  sigmay - array of standard deviations for y data points
+  npts   - number of pairs of data points
+  mode   - determines method of weighting least-squares fit
+           +1 (instrumental) weight(i) = 1./sigmay(i)**2
+            0 (no weighting) weight(i) = 1.
+           -1 (statistical)  weight(i) = 1./y(i)
+  a      - y intercept of fitted straight line
+  sigmaa - standard deviation of a
+  b      - slope of fitted straight line
+  sigmab - standard deviation of b
+  r      - linear correlation coefficient
+
+subroutines and function subprograms required
+  none

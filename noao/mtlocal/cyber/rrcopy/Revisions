@@ -1,0 +1,15 @@
+.help revisions Jun88 noao.mtlocal.cyber.rrcopy
+.nf
+noao$mtlocal/cyber/rrcopy/t_rrcopy.x, rcrheader.x
+	Fixed two places in t_rrcopy where the procedure was returning 
+	without closing the mt file.  Procedure rc_read_header was
+	not returning the value (OK) when NOT at EOF.  These two errors,
+	while present all along, had not been seen until rrcopy was modified
+	to read tapes with more then one datafile; see below.  (4-AUG-88 ShJ)
+
+noao$mtlocal/cyber/rrcopy/t_rrcopy.x
+	Added a hidden parameter "datafile" to the rrcopy task.  This 
+	allows more than one file of rcopy format data per tape.  With
+	this "extension" to the rcopy format, many rcopy files can be
+	archived on a single tape.  (26-JULY-88 ShJ)
+.endhelp

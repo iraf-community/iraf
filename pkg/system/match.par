@@ -1,0 +1,5 @@
+pattern,s,a,,,,text pattern to be matched
+files,s,a,,,,files to be searched for the pattern
+stop,b,h,no,,,"stop, rather than pass, matched lines?"
+print_file_names,b,h,yes,,,print file names if multiple files?
+metacharacters,b,h,yes,,,recognize pattern matching metacharacters?

@@ -1,0 +1,17 @@
+# FITSKY
+
+image,f,a,,,,Input image
+datapars,pset,h,"",,,Data dependent parameters
+fitskypars,pset,h,"",,,Sky fitting parameters
+coords,f,h,"",,,Coordinate list
+output,f,h,"default",,,Results
+plotfile,f,h,"",,,Metacode plot file
+graphics,s,h,"stdgraph",,,Graphics device
+display,s,h,"stdimage",,,Display device
+commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+cursor,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+radplots,b,h,no,,,Plot radial profiles in interactive mode
+interactive,b,h,yes,,,Mode of use
+verify,b,h,yes,,,Verify critical parameters in non interactive mode
+verbose,b,h,no,,,Print messages in non interactive mode
+mode,s,h,'ql'

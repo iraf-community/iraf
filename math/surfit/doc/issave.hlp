@@ -1,0 +1,55 @@
+.help issave Apr85 "Surfit Package"
+.ih
+NAME
+issave - save the surface fit
+.ih
+SYNOPSIS
+issave (sf, fit)
+
+.nf
+pointer	sf		# surface descriptor
+real	fit[ARB]	# fit array
+.fi
+.ih
+ARGUMENTS
+.ls sf   
+Pointer to the surface grid descriptor.
+.le
+.ls fit
+Array for storing the fit. The fit array must be at least SAVE_COEFF + ncoeff
+elements long.
+.le
+
+.ih
+DESCRIPTION
+ISSAVE stores the surface parameters and coefficient array
+in the 1-D reall array fit. Fit must be at least ncoeff + SAVE_COEFF
+elements long where ncoeff is defined as follows.
+
+.nf
+	SF_LEGENDRE:		nxcoeff = xorder
+				nycoeff = yorder
+				ncoeff = xorder * yorder        xterms = yes
+				ncoeff = nycoeff + nxcoeff - 1  xterms = no
+
+	SF_CHEBYSHEV:		nxcoeff = xorder
+				nycoeff = yorder
+				ncoeff = xorder * yorder        xterms = yes
+				ncoeff = nycoeff + nxcoeff - 1  xterms = no
+
+	SF_SPLINE3:		nxcoeff = xorder + 3
+				nycoeff = yorder + 3
+				ncoeff = (xorder + 3) * (yorder + 3)
+
+	SF_SPLINE1:		nxcoeff = xorder + 1
+				nycoeff = yorder + 1
+				ncoeff = (xorder + 1) * (yorder + 1)
+
+.fi
+
+.ih
+NOTES
+.ih
+SEE ALSO
+isreplace
+.endhelp

@@ -1,0 +1,40 @@
+# Help directory for the CLIO (command language i/o) system package.
+
+$clio	= "sys$clio/"
+
+clcmd		hlp = clcmd.hlp,		src = clio$clcmd.x
+clgetb		hlp = clget.hlp,		src = clio$clgetb.x
+clgetc		hlp = clget.hlp,		src = clio$clgetc.x
+clgetd		hlp = clget.hlp,		src = clio$clgetd.x
+clgeti		hlp = clget.hlp,		src = clio$clgeti.x
+clgetl		hlp = clget.hlp,		src = clio$clgetl.x
+clgetr		hlp = clget.hlp,		src = clio$clgetr.x
+clgets		hlp = clget.hlp,		src = clio$clgets.x
+clgetx		hlp = clget.hlp,		src = clio$clgetx.x
+clgfil		hlp = clgfil.hlp,		src = clio$clgfil.x
+clglpb		hlp = clglp.hlp,		src = clio$clglpb.x
+clglpc		hlp = clglp.hlp,		src = clio$clglpc.x
+clglpd		hlp = clglp.hlp,		src = clio$clglpd.x
+clglpi		hlp = clglp.hlp,		src = clio$clglpi.x
+clglpl		hlp = clglp.hlp,		src = clio$clglpl.x
+clglpr		hlp = clglp.hlp,		src = clio$clglpr.x
+clglps		hlp = clglp.hlp,		src = clio$clglps.x
+clglpx		hlp = clglp.hlp,		src = clio$clglpx.x
+clglstr		hlp = clglp.hlp,		src = clio$clglstr.x
+clgstr		hlp = clget.hlp,		src = clio$clgstr.x
+clgwrd		hlp = clget.hlp,		src = clio$clgwrd.x
+clpcls		hlp = clgfil.hlp,		src = clio$clgfil.x
+clplen		hlp = clgfil.hlp,		src = clio$clgfil.x
+clpopni		hlp = clgfil.hlp,		src = clio$clgfil.x
+clpopns		hlp = clgfil.hlp,		src = clio$clgfil.x
+clpopnu		hlp = clgfil.hlp,		src = clio$clgfil.x
+clprew		hlp = clgfil.hlp,		src = clio$clgfil.x
+clpstr		hlp = clput.hlp,		src = clio$clpstr.x
+clputb		hlp = clput.hlp,		src = clio$clputb.x
+clputc		hlp = clput.hlp,		src = clio$clputc.x
+clputd		hlp = clput.hlp,		src = clio$clputd.x
+clputi		hlp = clput.hlp,		src = clio$clputi.x
+clputr		hlp = clput.hlp,		src = clio$clputr.x
+clputx		hlp = clput.hlp,		src = clio$clputx.x
+clseti		hlp = clseti.hlp,		src = clio$clseti.x
+clstati		hlp = clstati.hlp,		src = clio$clstati.x

@@ -1,0 +1,8 @@
+images,s,a,,,,images to be examined
+force,b,h,no,,,force recomputation of extreme values
+update,b,h,yes,,,update the image header
+verbose,b,h,yes,,,print computed values
+minval,r,h,,,,minimum pixel value in image (output)
+maxval,r,h,,,,maximum pixel value in image (output)
+minpix,s,h,,,,minimum pixel (section notation)
+maxpix,s,h,,,,Maximum pixel (section notation)

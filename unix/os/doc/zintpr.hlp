@@ -1,0 +1,34 @@
+.help zintpr May84 "System Interface"
+.ih
+NAME
+zintpr -- interrupt a process
+.ih
+SYNOPSIS
+.nf
+zintpr (pid, exception, status)
+
+int	pid		# process id of process to be interrupted
+int	exception	# exception to be raised
+int	status
+.fi
+.ih
+DESCRIPTION
+The indicated virtual exception is raised in the process associated with
+the process-id \fIpid\fR.  Currently only the interrupt exception X_INT
+may be sent to a process.
+.ih
+RETURN VALUE
+ERR is returned for a bad process-id.  OK is returned if the operation
+is successful.
+.ih
+NOTES
+The exception X_INT is also raised by the host terminal driver when
+the interrupt control sequence is typed by the user at the terminal.
+If the identical exception cannot be raised by a user process it may
+be possible to use a different exception and have the kernel map both
+to X_INT.  In principle it should be possible for a process to interrupt
+itself, though this capability may be machine dependent.
+.ih
+SEE ALSO
+zxwhen
+.endhelp

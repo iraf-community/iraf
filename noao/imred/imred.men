@@ -1,0 +1,14 @@
+	   bias - General bias subtraction tools
+	 ccdred - CCD reductions
+	  coude - Coude reductions
+	   dtoi - Density to Intensity reductions for photographic plates
+	echelle - Echelle spectra reductions
+        generic - Generic image reductions tools
+	   iids - KPNO IIDS spectral reductions
+	  irred - KPNO IR camera reductions
+	    irs - KPNO IRS spectral reductions
+	  msred - Reduction package for multiple spectra data
+    observatory - Print observatory parameters
+     setairmass - Set midtime airmass and universal time
+       specphot - Spectrophotometric reductions
+	   vtel - Solar vacuum telescope image reductions

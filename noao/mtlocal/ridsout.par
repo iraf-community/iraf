@@ -1,0 +1,9 @@
+#Parameter file for the IDSOUT reader
+idsout_file,f,a,,,,text file of IDSOUT data
+iraf_file,f,a,,,,IRAF filename
+record_numbers,s,h,"1-9999",,,record numbers
+make_image,b,h,yes,,,create IRAF image?
+print_pixels,b,h,no,,,print_pixels?
+long_header,b,h,yes,,,print complete IDS headers?
+data_type,s,h,r,,,IRAF data type
+mode,s,h,ql,,,

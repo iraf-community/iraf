@@ -1,0 +1,161 @@
+.help centerpars May89 noao.digiphot.apphot
+.ih
+NAME
+centerpars -- edit the centering algorithm parameters
+.ih
+USAGE
+centerpars
+.ih
+PARAMETERS
+.ls calgorithm = "centroid"
+The centering algorithm to be employed. the gauss and ofilter options
+depend on an accurate estimate of the fwhmpsf.
+The centering options are:
+.ls none
+The initial positions are assumed to be the true centers. The user may
+wish to use this option to save time if the daofind task was used to
+detect objects.
+.le
+.ls centroid
+The object centers are determined by computing the
+intensity weighted means of the marginal profiles in x and y.
+.le
+.ls gauss
+The object centers are computed by fitting a Gaussian of fixed fwhmpsf to
+the marginal profiles in x and y using non-linear least squares techniques.
+.le
+.ls ofilter
+The object centers are computed using optimal filtering techniques,
+a triangular weighting function of half width equal to fwhmpsf and
+the marginal distributions in x and y.
+.le
+.le
+.ls cbox = 5.0  (scale units)
+The width of the subraster used for object centering in units of the
+scale parameter.
+.le
+.ls cmaxiter = 10
+The maximum number of iterations performed by the centering algorithm.
+All the centering algorithms use this parameter.
+.le
+.ls maxshift = 1.0  (scale units)
+The maximum permissible shift of the center with respect to the initial
+coordinates in units of the scale parameter.
+If the shift produced by the centering algorithm is
+larger than this, the computed center is returned with an error flag.
+.le
+.ls minsnratio = 1.0
+The minimum signal to noise ratio required for object centering. If
+the estimated signal to noise ratio is less than this number the
+computed center will be returned with an error estimate.
+.le
+.ls clean = no
+A switch to determine whether or not symmetry-cleaning is to
+be performed on the image subraster before centering.
+.le
+.ls rclean = 1.0  (scale units)
+The cleaning radius for the symmetry-clean algorithm in units of
+the scale parameter.
+.le
+.ls rclip = 2.0  (scale units)
+The clipping radius for the symmetry-clean algorithm in units of
+the scale parameter.
+.le
+.ls kclean = 3.0  (sigma)
+The number of standard sky deviations for the symmetry-clean algorithm.
+.le
+.ih
+DESCRIPTION
+
+The centering algorithm parameters control the action of the centering
+algorithms.  The default
+values have been chosen for efficiency and to give reasonable results in
+the majority of cases.
+Note that many of the centering parameters scale with two quantities which
+are data dependent, the scale of the image,
+\fIscale\fR, and the standard deviation of the sky pixels \fIsigma\fR.
+
+Using an initial position and \fIscale\fR supplied by the user,
+a subraster of data
+\fIcbox\fR / \fIscale\fR pixels wide around the initial position
+is extracted from the IRAF image.
+If scale is defined in terms of the half width half maximum
+of the psf then a single value of cbox once chosen 
+will work well for centering objects in images of different seeing and
+detector characteristics.
+
+The symmetry-clean algorithm of may be optionally applied
+to the image subraster prior to centering. The cleaning algorithm attempts
+to correct defects in the image subraster by assuming that the image has radial
+symmetry and comparing pixels on opposite sides of the center of symmetry.
+The center of symmetry is assumed to be the maximum pixel in the subraster.
+However if the maximum pixel
+is more than \fImaxshift / scale\fR from the initial center, the initial
+center is used as the center of symmetry.  Pixels which are inside the
+cleaning radius are not edited.
+Pairs of pixels in the cleaning region, r > \fIrclean / scale\fR
+and r <= \fIrclip / scale\fR
+and diammetrically opposed about the center of symmetry are tested for
+equality.  If the difference between the pixels
+is greater than kclean * sigma, the larger value is replaced by the smaller.
+In the cleaning region the sigma is determined by the
+noise model assumed for the data.
+Pairs of pixels in the clipping region, r > \fIrclip / scale\fR
+are tested in the same manner
+as those in the cleaning region. However the sigma employed is the sigma
+of the sky background.
+
+Next the signal to noise ratio of the subraster is estimated. 
+If the SNR < \fIminsnratio\fR, the new center is still computed but an error
+flag is associated with that object.
+
+New centers are computed using the centering algorithm specified by
+\fIcalgorithm\fR, the data specified by \fIcbox / scale\fR, and points
+that are \fIcthreshold\fR above the local minimum.
+Unless the data is very noisy it is recommended that cthreshold be
+left at the default value.
+The default algorithm is \fIcentroid\fR. This centering algorithm
+computes the marginal distributions in x and y of the extracted subraster.
+The intensity weighted mean and mean error of the x and y marginal
+distributions is computed using only points in the marginal array above
+the minimum data pixel plus a threshold value which is either the mean
+or \fIcthreshold\fR if cthreshold is greater than zero.
+This algorithm is similar to that used in MPC (Mountain Photometry Code).
+Note that this is the only centering algorithm for which the choice of
+\fIdatapars.fwhmpsf\fR is not crucial.
+The centering algorithm \fIgauss\fR computes the new
+centers by fitting a 1D Gaussian function to the marginal distributions
+in x and y using a fixed \fIdatapars.fwhmpsf\fR.
+Initial guesses for the fit parameters are made from the data
+values. The routines then iterate until a best fit solution is achieved.
+The final choice \fIofilter\fR employ a variation of the optimal filtering
+technique in which the profile is simulated by a triangle function of
+width \fIdatapars.fwhmpsf\fR.
+Detailed descriptions of all the centering algorithms
+can be found in the Apphot Specifications Document.
+
+If the computed shift
+in either coordinate < \fImaxshift\fR / \fIscale\fR, the new center is
+returned but an error flag is set.
+
+.ih
+EXAMPLES
+1. List the centering parameters.
+
+.nf
+	ap> lpar centerpars
+.fi
+
+2. Edit the centering parameters
+
+.nf
+	ap> centerpars
+.fi
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+center, phot, qphot, wphot, polyphot, radprof
+.endhelp

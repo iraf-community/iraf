@@ -1,0 +1,12 @@
+# Help directory for the LONGSLIT package.
+
+$doc		= "./doc/"
+$identify	= "noao$onedspec/doc/"
+
+extinction	hlp=doc$extinction.hlp
+fitcoords	hlp=doc$fitcoords.hlp
+fluxcalib	hlp=doc$fluxcalib.hlp
+illumination	hlp=doc$illumination.hlp
+response	hlp=doc$response.hlp
+revisions	hlp=Revisions
+transform	hlp=doc$transform.hlp

@@ -1,0 +1,4 @@
+input_files,s,a,,,,list of files to be concatenated
+output_file,f,a,,,,name of output file
+out_type,s,h,"in_type",,,output file type (text|binary)
+append,b,h,no,,,append to output file?

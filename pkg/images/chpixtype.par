@@ -1,0 +1,8 @@
+# CHPIXTYPE
+
+input,f,a,,,,Input images
+output,f,a,,,,Output images
+newpixtype,s,a,,"|ushort|short|int|long|real|double|complex|",,Output pixel type
+oldpixtype,s,h,"all","|all|ushort|short|int|long|real|double|complex|",,Input pixel type
+verbose,b,h,y,,,Verbose mode
+mode,s,h,'ql'

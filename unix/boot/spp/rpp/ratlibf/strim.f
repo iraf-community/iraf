@@ -1,0 +1,16 @@
+      INTEGER FUNCTION STRIM (STR)
+      INTEGER STR (100)
+      INTEGER LNB, I
+      LNB = 0
+      I = 1
+23000 IF (.NOT.(STR (I) .NE. -2))GOTO 23002
+      IF (.NOT.(STR (I) .NE. 32 .AND. STR (I) .NE. 9))GOTO 23003
+      LNB = I
+23003 CONTINUE
+23001 I = I + 1
+      GOTO 23000
+23002 CONTINUE
+      STR (LNB + 1) = -2
+      STRIM=(LNB)
+      RETURN
+      END

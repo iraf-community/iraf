@@ -1,0 +1,74 @@
+# Make the Sun/IRAF shared library.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	$iffile (V.o) $call clean $endif
+	;
+
+relink:
+	$set	rebuild = no
+	$goto	relink_
+Relink:
+	$set	rebuild = yes
+relink_:
+	$set	ADDR = 0e000000
+
+	$set	L1 = <libos.a>
+	$set	L2 = <libex.a>
+	$set	L3 = <libsys.a>
+	$set	L4 = <libvops.a>
+
+	$ifnfile (bin$S.e, lib$libshare.a)
+	    $set rebuild = yes
+	$else $ifolder (bin$S.e: $(L1), $(L2), $(L3), $(L4), Slib.c)
+	    $set rebuild = yes
+	$end
+
+	$ifeq (rebuild, yes)
+	    !mkshlib.csh -a $(ADDR)
+	    $call libshare
+	$else
+	    $echo "shared library is up to date"
+	$endif
+	;
+
+install:
+	$iffile (S.e)
+	    $iffile (bin$S.e.2) $move bin$S.e.2 bin$S.e.3 $endif
+	    $iffile (bin$S.e.1) $move bin$S.e.1 bin$S.e.2 $endif
+	    $iffile (bin$S.e  ) $move bin$S.e   bin$S.e.1 $endif
+	    $move S.e bin$
+	    $move libshare.a bin$
+	    $iffile (bin$S.e.1, bin$S.e.2, bin$S.e.3)
+		!(find $(iraf)bin/S.e.[123] -atime +1 -exec rm {} \;)
+	    $endif
+	$endif
+	;
+
+libshare:
+libshare.a:
+	$set	SYSF = onentry.o
+	$omake	S.s
+	!ar xv $(iraf)lib/libsys.a $(SYSF)
+	!ar rv libshare.a S.o $(SYSF); ranlib libshare.a; rm $(SYSF)
+	;
+
+coff:
+coff.e:
+	$omake	coff.c
+	!cc coff.o -o coff.e
+	;
+
+edsym:
+edsym.e:
+	$omake	edsym.c
+	!cc edsym.o -o edsym.e
+	;
+
+clean:
+	!mkshlib.csh -c
+	;

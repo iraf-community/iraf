@@ -1,0 +1,14 @@
+      INTEGER FUNCTION CTOC (FROM, TO, LEN)
+      INTEGER LEN
+      INTEGER FROM (100), TO (LEN)
+      INTEGER I
+      I = 1
+23000 IF (.NOT.(I .LT. LEN .AND. FROM (I) .NE. -2))GOTO 23002
+      TO (I) = FROM (I)
+23001 I = I + 1
+      GOTO 23000
+23002 CONTINUE
+      TO (I) = -2
+      CTOC=(I - 1)
+      RETURN
+      END

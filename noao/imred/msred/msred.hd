@@ -1,0 +1,9 @@
+# Help directory for the MSRED package.
+ 
+$doc	=	"./doc/"
+ 
+revisions	hlp=Revisions
+msdispcor	hlp=doc$msdispcor.hlp
+msreidentify	hlp=doc$msreidentify.hlp
+msselect	hlp=doc$msselect.hlp
+

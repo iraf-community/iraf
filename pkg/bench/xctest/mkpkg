@@ -1,0 +1,25 @@
+# Make the LISTS package
+
+$call	relink
+$exit
+
+relink:
+	$set	LIBS = "-lxtools"
+
+	$update	libpkg.a
+	$omake	x_lists.x
+	$link	x_lists.o libpkg.a $(LIBS)
+	;
+
+clean:
+	$delete	libpkg.a x_lists.o x_lists.e
+	;
+
+libpkg.a:
+	table.x		<ctype.h>
+	words.x
+	tokens.x	<ctotok.h>
+	unique.x
+	lintran.x	<pattern.h> <ctype.h>
+	columns.x	<ctype.h> <chars.h> <error.h>
+	;

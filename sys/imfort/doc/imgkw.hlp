@@ -1,0 +1,41 @@
+.help imgkw Sep86 imfort
+.ih
+NAME
+imgkw -- get the value of an image header keyword
+.ih
+SYNOPSIS
+.nf
+subroutine imgkwb (im, keyw, bval, ier)
+subroutine imgkwc (im, keyw, cval, ier)
+subroutine imgkwi (im, keyw, ival, ier)
+subroutine imgkwr (im, keyw, rval, ier)
+subroutine imgkwd (im, keyw, dval, ier)
+
+integer		im		#I image descriptor of open image
+character*(*)	keyw		#I name of the keyword to be set
+integer		ier		#O status return
+
+logical		bval		#O logical (boolean) keyword value
+character*(*)	cval		#O character string keyword value
+integer		ival		#O integer keyword value
+real		rval		#O real keyword value
+doubleprecision	dval		#O double precision keyword value
+.fi
+.ih
+DESCRIPTION
+The \fIimgkw\fR procedures are used to get the values of image header keywords.
+Automatic datatype conversion is provided, hence the datatype requested need
+not be an exact match to the actual datatype of the keyword.
+.ih
+RETURN VALUE
+A zero status is returned if the named keyword exists and if the datatype
+coercion implied is permissible.
+
+.nf
+SYS_IDBKEYNF:	image header keyword not found
+SYS_IDBTYPE:	illegal header parameter data type conversion
+.fi
+.ih
+SEE ALSO
+impkw, imaddk, imacck
+.endhelp

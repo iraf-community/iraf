@@ -1,0 +1,249 @@
+include <gset.h>
+include <fset.h>
+include "../lib/apphot.h"
+include "../lib/polyphot.h"
+
+define	MAX_NVERTICES	100
+
+# T_POLYPHOT -- Measure the total magnitudes inside a list of polygons.
+
+procedure t_polyphot()
+
+pointer	image			# pointer to name of image
+pointer	output			# pointer to the results file
+pointer	coords			# pointer to file of coordinates
+pointer	polygon			# pointer to file containing polygon
+pointer	graphics		# pointer to graphics device name
+pointer	display			# pointer to display device name
+int	interactive		# mode of use
+int	verify			# verify critical parameters
+int	verbose
+
+int	limlist, lplist, lolist, lclist, sid, lid, pid, pl, cl, out, root, stat
+pointer	sp, outfname, cname, imlist, plist, olist, clist, im, py, id, gd
+
+bool	clgetb(), streq()
+int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), strncmp()
+int	fnldir(), strlen(), ap_yphot()
+pointer	immap(), open(), imtopenp(), clpopnu(), gopen()
+errchk	gopen
+
+begin
+	# Allocate working space.
+	call smark (sp)
+	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (coords, SZ_FNAME, TY_CHAR)
+	call salloc (polygon, SZ_FNAME, TY_CHAR)
+	call salloc (graphics, SZ_FNAME, TY_CHAR)
+	call salloc (display, SZ_FNAME, TY_CHAR)
+	call salloc (outfname, SZ_FNAME, TY_CHAR)
+	call salloc (cname, SZ_FNAME, TY_CHAR)
+
+	# Set STDOUT.
+	call fseti (STDOUT, F_FLUSHNL, YES)
+
+	# Get input and output file lists.
+	imlist = imtopenp ("image")
+	limlist = imtlen (imlist)
+	plist = clpopnu ("polygons")
+	lplist = clplen (plist)
+	olist = clpopnu ("output")
+	lolist = clplen (olist)
+	clist = clpopnu ("coords")
+	lclist = clplen (clist)
+
+	# Check that image and polygon list lengths match.
+	if (limlist < 1 || (lplist > 1 && lplist != limlist)) {
+	    call imtclose (imlist)
+	    call clpcls (plist)
+	    call clpcls (olist)
+	    call clpcls (clist)
+	    call error (0, "Imcompatible image and polygon list lengths")
+	}
+
+	# Check that image and coordinates list lengths match. 
+	if (limlist < 1 || (lclist > 1 && lclist != limlist)) {
+	    call imtclose (imlist)
+	    call clpcls (plist)
+	    call clpcls (olist)
+	    call clpcls (clist)
+	    call error (0, "Imcompatible image and coordinate list lengths")
+	}
+
+	# Check that image input and output list lengths match.
+	if (lolist > 1 && lolist != limlist) {
+	    call imtclose (imlist)
+	    call clpcls (plist)
+	    call clpcls (olist)
+	    call clpcls (clist)
+	    call error (0, "Imcompatible image and output list lengths")
+	}
+
+	call clgstr ("commands.p_filename", Memc[cname], SZ_FNAME)
+	interactive = btoi (clgetb ("interactive"))
+	verify = btoi (clgetb ("verify"))
+	verbose = btoi (clgetb ("verbose"))
+
+	# Open the plot files.
+	if (interactive == YES) {
+	    call clgstr ("graphics", Memc[graphics], SZ_FNAME)
+	    call clgstr ("display", Memc[display], SZ_FNAME)
+	    if (Memc[graphics] == EOS)
+		gd = NULL
+	    else {
+		iferr {
+		    gd = gopen (Memc[graphics], APPEND+AW_DEFER, STDGRAPH)
+		} then {
+		    call eprintf (
+			"Warning: Error opening graphics device.\n")
+		    gd = NULL
+		}
+	    }
+	    if (Memc[display] == EOS)
+		id = NULL
+	    else if (streq (Memc[graphics], Memc[display]))
+		id = gd
+	    else {
+		iferr {
+		    id = gopen (Memc[display], APPEND, STDIMAGE)
+		} then {
+		    call eprintf (
+		"Warning: Graphics overlay not available for display device.\n")
+		    id = NULL
+		}
+	    }
+	} else {
+	    gd = NULL
+	    id = NULL
+	}
+
+	# Get polygon fitting parameters.
+	call ap_gypars (py)
+	if (verify == YES && interactive == NO)
+	    call ap_yconfirm (py)
+
+	# Measure flux in a polygon.
+	sid = 1
+	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
+	    
+	    # Open image.
+	    im = immap (Memc[image], READ_ONLY, 0)
+	    call apsets (py, IMNAME, Memc[image])
+	    call ap_padu (im, py)
+	    call ap_itime (im, py)
+	    call ap_rdnoise (im, py)
+
+	    # Open the polygons file.
+	    if (lplist <= 0) {
+		pl = NULL
+		call strcpy ("", Memc[polygon], SZ_FNAME)
+	    } else if (clgfil (plist, Memc[polygon], SZ_FNAME) != EOF)
+		pl = open (Memc[polygon], READ_ONLY, TEXT_FILE)
+	    else
+		call seek (pl, BOF)
+	    call apsets (py, PYNAME, Memc[polygon])
+
+	    # Open the coordinates file.
+	    if (lclist <= 0) {
+		cl = NULL
+		call strcpy ("", Memc[coords], SZ_FNAME)
+	    } else if (clgfil (clist, Memc[coords], SZ_FNAME) != EOF)
+		cl = open (Memc[coords], READ_ONLY, TEXT_FILE)
+	    else
+		call seek (cl, BOF)
+	    call apsets (py, CLNAME, Memc[coords])
+
+	    # Set output file name.
+	    if (lolist == 0) {
+		out = NULL
+		call strcpy ("", Memc[outfname], SZ_FNAME)
+	    } else {
+	        stat = clgfil (olist, Memc[output], SZ_FNAME)
+		if (stat != EOF)
+		    root = fnldir (Memc[output], Memc[outfname], SZ_FNAME)
+		if (strncmp ("default", Memc[output+root], 7) == 0 || root ==
+		    strlen (Memc[output])) {
+		    call apoutname (Memc[image], "", "ply", Memc[outfname],
+		        SZ_FNAME)
+		    out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+		    lolist = limlist
+		} else if (stat != EOF) {
+		    call strcpy (Memc[output], Memc[outfname], SZ_FNAME)
+		    out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
+		}
+	    }
+	    call apsets (py, OUTNAME, Memc[outfname])
+
+	    # Do the photometry.
+	    if (interactive == NO) {
+		if (Memc[cname] != EOS)
+		    stat = ap_yphot (py, im, cl, pl, NULL, NULL, out, sid, NO)
+		else if (pl != NULL) {
+		    lid = 0
+		    pid = 0
+		    call ap_ybphot (py, im, cl, pl, out, sid, lid, pid, NULL,
+		        verbose)
+		    stat = NO
+		} else
+		    stat = NO
+	    } else
+		stat = ap_yphot (py, im, cl, pl, gd, id, out, sid, YES)
+
+	    # Unmap the input image.
+	    call imunmap (im)
+
+	    # Close the polygon file.
+	    if (pl != NULL) {
+		if (lplist > 1)
+		    call close (pl)
+	    }
+
+	    # Close the coordinate file.
+	    if (cl != NULL) {
+		if (lclist > 1)
+		    call close (cl)
+	    }
+
+	    # Close the output file.
+	    if (out != NULL && lolist != 1) {
+		call close (out)
+		if (sid <= 1)
+		    call delete (Memc[outfname])
+		sid = 1
+	    }
+	}
+
+	# Close up the files.
+	call ap_yfree (py)
+
+	# Close plot files.
+	if (id == gd && id != NULL)
+	    call gclose (id)
+	else {
+	    if (gd != NULL)
+		call gclose (gd)
+	   if (id != NULL)
+	        call gclose (id)
+	}
+
+	# Close the single coords and polygon file.
+	if (pl != NULL && lplist == 1)
+	    call close (pl)
+	if (cl != NULL && lclist == 1)
+	    call close (cl)
+
+	# Close the singled output file.
+        if (out != NULL && lolist == 1) {
+	    call close (out)
+	    if (sid <= 1)
+		call delete (Memc[outfname])
+	}
+
+	# Close image, coord and shift lists.
+	call imtclose (imlist)
+	call clpcls (plist)
+	call clpcls (clist)
+	call clpcls (olist)
+	call sfree (sp)
+end

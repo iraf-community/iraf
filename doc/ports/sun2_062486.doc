@@ -1,0 +1,134 @@
+SUN/IRAF V2.3 Installation, 13 June 1986.	Sun-2, software floating point
+--------------------------------------------------------------------------------
+
+/usr/iraf/
+	Ran rmbin on bin, sys, pkg, math, lib, local, unix.  Unpacked
+	source-only archive from master VAX/UNIX system "lyra" of
+	12-June-86 17:00.  (6/13)
+
+unix/as/
+unix/as/ishift.s
+unix/as/zsvjmp.s
+	Deleted VAX contents of as/, copied mc68000/ishift.SUN and
+	zsvjmp.SUN to as/*.s.  (6/13)
+
+unix/hlib/[dir]1mach.f
+	Commented out pdp (vax) data statements and uncommented IEEE
+	statements.  (6/13)
+
+unix/hlib/mach.h
+unix/hlib/libc/spp.h
+	Replaced EPSILONR and EPSILOND with values from unix/mc68000/README.
+	Set both BYTE_SWAPs to NO in mach.h.  (6/13)
+
+unix/hlib/mkiraf.csh
+	Edited iraf root to new pathname.  (6/13)
+
+unix/hlib/mkpkg.inc
+	Set USE_CALCOMP to "no".  (6/13)
+
+unix/hlib/libc/iraf.h
+	Changed iraf root pathname.  (6/13)
+
+unix/hlib/libc/kernel.h
+	Commented out DEBUGMEM (i.e. use standard UNIX malloc())
+	in order that spp programs can call SunCGI.  (6/13)
+
+unix/
+	Bootstrap (sh -x mkpkg.csh); no problems.  (6/13)
+
+unix/hlib/alloc.e
+	As su, "/etc/chown 0 alloc.e" so it can allocate devices.  (6/13)
+
+/usr/bin/alloc		-> $hlib/alloc.e
+/usr/bin/generic	-> $hlib/generic.e
+/usr/bin/mkpkg		-> $hlib/mkpkg.e
+/usr/bin/rmbin		-> $hlib/rmbin.e
+/usr/bin/rmfiles	-> $hlib/rmfiles.e
+/usr/bin/rtar		-> $hlib/rtar.e
+/usr/bin/wtar		-> $hlib/wtar.e
+/usr/bin/xc		-> $hlib/xc.e
+/usr/bin/cl		-> $hlib/cl.e
+	Made sure these symbolic links existed.  (6/13)
+	
+--------------------------------------------------------------------------------
+Bootstrap is complete.  Hand-compile the Sun f77 optimizer-bug routines before
+performing the full recompile sysgen.
+
+sys/fio/fstati.x					F77 runtime
+math/bevington/matinv.f					F77 runtime
+sys/gio/nspp/portlib/gridal.f				F77 runtime
+sys/ki/irafks.x						F77 runtime
+noao/twodspec/longslit/transform/igsfit/igsfit.f	F77 runtime
+	All these files have to be hand-compiled without optimization 
+	from previous experience with the Sun V2.0 f77 compiler; none
+	of these files nor their .x parents have changed since last
+	built on a Sun-2.  (6/13)
+
+iraf/
+	Began full compile & link sysgen at 16:33.  (6/13)
+
+fio/fioclean.x
+	Fixed null pointer bug.  (6/14)
+
+bin/x_display.e
+bin/x_cv.e
+images/tv/cv/libpkg.a
+images/tv/display/libpkg.a
+	Removed to free up disk space.  (6/14)
+
+$iraf
+	Unpacked an incremental archive from lyra! to bring us current
+	to 09:15 June 20, 1986.  Performed an incremental sysgen from
+	the root.  (6/20)
+
+noao/twodspec/apextract/*
+	The preceding sysgen failed to find all files in icfit/* except
+	for 3 source files.  To be safe, I (sr) made a complete archive
+	of apextract from lyra at 10:20, unpacked it, and did a "mkpkg
+	update" from here.  (6/20)
+
+pkg/images/geometry/t_imtranspose.x			F77 runtime
+	f77 optimizer bug was causing "Pixel subscript out of bounds"
+	in imtranspose.  Compiled without optimization from cl with
+	"cl> !mkpkg xflags=-c; cd ..; mkpkg update".  (6/20)
+
+noao/twodspec/apexold/*
+	Because of old file dates and because this directory on lyra
+	was created only by renaming the directory itself, it didn't
+	get copied in the incremental tar earlier this week.  Made
+	a fresh archive on lyra and a "mkpkg update".  (6/20)
+
+$iraf
+	Unpacked a lyra! incremental archive taken at 14:40 June 21;
+	performed a root incremental sysgen.  (6/21)
+
+$iraf
+	Unpacked a lyra! incremental archive taken at 08:10 June 23;
+	performed a root incremental sysgen.  (6/23)
+
+noao/lib/scr/*
+noao/twodspec/apexold/*
+noao/twodspec/apextract/*
+	Replaced with full archives from lyra! to attempt to clear up bugs
+	possibly related to renaming, rather than copying, files on lyra!
+	since the June 12 full archive -- these could be missed by the
+	incremental archives (find . -mtime -N).  MKPKG updates in both
+	apextract directories.  (6/23)
+
+pkg/cl/unop.c
+	Changed call to sscanf (sval, "%f", &rresult) in case OP_REAL to
+	sscanf (sval, "%lf", &rresult) because on SUNs, only the first
+	four bytes starting at rresult were being written into (rresult
+	is declared "double").  Should be changed on master system as well.
+	(6/23)
+
+--------------------------------------------------------------------------------
+June 24, 1986:  Extensive testing for several days has revealed no further
+bugs particular to the SUN-2 in its implementation at NOAO (SUN V2.0, no
+fpa, no array processor).  Although we do not have a 1/2" tape drive on the
+SUN-2, the SUN-3's have a known bug which appears to be SUN's problem --
+I/O error when trying to backspace-record when the drive is positioned between
+the two EOF marks written at close time.  It is probable we will have a
+workaround for this bug in early July.
+--------------------------------------------------------------------------------

@@ -1,0 +1,4 @@
+OSB -- Bit and byte primitives.
+
+	zzeps.f - a program to compute the machine epsilon.
+		  (not part of the library)

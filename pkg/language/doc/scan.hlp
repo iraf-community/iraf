@@ -1,0 +1,77 @@
+.help "scan,fscan,nscan" Feb86 language
+.ih
+NAME
+.nf
+scan  -- read parameters from standard input
+fscan -- read parameters from file, or another parameter
+nscan -- get number of parameters scanned
+.fi
+.ih
+USAGE
+.nf
+scan  (p1, p2, p3 ... pn)
+fscan (param, p1, p2, p3, ... pn)
+
+n = nscan()
+.fi
+.ih
+PARAMETERS
+.ls pN
+The name of an output parameter, to receive a scanned value.
+.le
+.ls param
+The name of the input parameter whose \fIvalue\fR is to be scanned to
+produce the output values.
+.le
+.ih
+DESCRIPTION
+\fIScan\fR and \fIfscan\fR permit the user to read in values from the
+standard input, a file, or a parameter and assign them to the listed parameters.
+\fIFscan\fR may also be used to read a string already in core.
+It is useful to consider these functions as performing two disjoint actions:
+acquiring a string, where \fIscan\fR and \fIfscan\fR differ; and parsing the
+string, where they are identical.
+
+\fIScan\fR acquires its string by reading exactly one line from the standard
+input.  The action of \fIfscan\fR depends on \fIparam\fR.  If \fIparam\fR is
+a string, or a struct, then the string is simply the value of \fIparam\fR.
+If, however, \fIparam\fR is a list-directed struct, a call to \fIfscan\fR
+will get the next line from the file pointed to by \fIparam\fR.
+The file can be rewound by assigning a file name to \fIparam\fR.
+If either scan or fscan reach an EOF, they return with the value EOF and
+do not change any parameters.
+
+Once the string has been acquired it is parsed into segments delimited by
+spaces or tabs.  Scan and fscan do not recognize quoted strings, nor do they
+view ',' as a delimiter.  Each token is then assigned in turn to p1 through
+pn.  If there are too many tokens they are discarded, if there are too
+few, the corresponding parameters are not affected by the call.
+Any conversion error terminates the scan, but parameters already scanned
+retain their new values.  An assignment to a struct terminates the scan
+because the entire unscanned portion of the string is assigned to the
+struct.  Thus any struct should be the last parameter in a scan or
+fscan call.
+
+Scan and fscan are intrinsic functions returning either EOF if end of 
+file on the input list is sensed, or the number of parameters successfully
+scanned.  The function \fInscan\fR also returns the number of parameters
+successfully scanned in the last call to scan or fscan.
+.ih
+EXAMPLES
+1. Print a list of radii, given a list of coordinates.
+
+.nf
+	list = coords
+	while (fscan (list, x, y) != EOF)
+	    print (sqrt (x**2 + y**2))
+.fi
+.ih
+BUGS
+The syntax of scan and fscan is peculiar, in that they are the only
+functions where parameters are effectively passed by reference rather than by
+value.  Thus p1, ... pn must be parameters whereas in similar contexts an
+arbitrary expression can be used wherever a parameter can.
+.ih
+SEE ALSO
+string
+.endhelp

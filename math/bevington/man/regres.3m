@@ -1,0 +1,49 @@
+.TH REGRES 3M
+.SH NAME
+regres
+.SH DESCRIPTION
+subroutine regres.f
+
+source
+  Bevington, pages 172-175.
+
+purpose
+  make mulitple linear regression fit to data with specified
+    function which is linear in coefficients
+
+usage
+  call regres (x, y, sigmay, npts, nterms, m, mode, yfit,
+    a0, a, sigma0, sigmaa, r, rmul, chisqr, ftest)
+
+description of parameters
+  x      - array of points for independent variable
+  y      - array of points for dependent variable
+  sigmay - array of standard deviations for y data points
+  npts   - number of pairs of data points
+  nterms - number of coefficients
+  m      - array of inclusion/rejection criteria for fctn
+  mode   - determines method of weighting least-squares fit
+           +1 (instrumental) weight(i) = 1./sigmay(i)**2
+            0 (no weighting) weight(i) = 1.
+           -1 (statistical)  weight(i) = 1./y(i)
+  yfit   - array of calculated values of y
+  a0     - constant term
+  a      - array of coefficients
+  sigma0 - standard deviation of a0
+  sigmaa - array of standard deviations for coefficients
+  r      - array of linear correlation coefficients
+  rmul   - multiple linear correlation coefficient
+  chisqr - reduced chi square for fit
+  ftest  - value of f for test of fit
+
+subroutines and function subprograms required
+  fctn (x, i, j, m)
+    evaluates function for the jth term and the ith data
+      point using array m to specify terms in function
+  matinv (array, nterms, det)
+    inverts symmetric two-dimension matrix of degree nterms
+      and calculates its determinant
+
+comments
+  valid for npts up to 100 and nterms up to 10
+  one source line modified - sigmaa substituted for sigmaag

@@ -1,0 +1,37 @@
+.help listpixels Feb89 images
+.ih
+NAME
+listpixels -- print the pixel values for a list of images
+.ih
+USAGE
+listpixels images
+.ih
+PARAMETERS
+.ls images
+Images or list of image sections whose pixels are to be printed.
+.le
+.ls verbose = no
+Print a title line for each image whose pixels are to be listed.
+.le
+.ih
+DESCRIPTION
+The pixel coordinates and values are printed on the standard output.
+.ih
+EXAMPLES
+1. List the pixels of an image on the standard output.
+
+	cl> listpix m81
+
+2. List a subraster.
+
+	cl> listpix dev$pix[51:55,155:151]
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+Pixel coordinates of image subsections refer to the coordinate system of
+the subsection not the coordinate system of the original image.
+.ih
+SEE ALSO
+imheader, imgets, imhistogram
+.endhelp

@@ -1,0 +1,65 @@
+.help "fprint,print" Feb86 language
+.ih
+NAME
+.nf
+fprint -- print to a parameter
+print  -- print to the standard output
+.fi
+.ih
+USAGE
+.nf
+print  expr [expr ...]
+fprint param expr [expr ...]
+.fi
+.ih
+PARAMETERS
+.ls expr
+Any expression, the string value of which is to be printed.
+.le
+.ls param
+\fIFprint\fR will deposit the output string in the value field of this
+parameter.
+.le
+.ih
+DESCRIPTION
+The \fIprint\fR and \fIfprint\fR commands format a line of text and write
+it to either the standard output or in the case of \fIfprint\fR,
+the p_value field of the named parameter.  The output is free format although
+spaces may be specifically inserted (as quoted string constants) to make the
+output easier to read.  One space is automatically inserted after each
+numeric argument; this can be defeated by coercing the argument to a string
+with the \fIstr\fR intrinsic function.  A newline is automatically output
+at the end of the output line.  I/O redirection may be used with \fIprint\fR
+to write to a file.
+
+Compute mode (a parenthesized argument list) is recommended for this task
+to avoid surprises.
+.ih
+EXAMPLES
+1. Print the name of the current terminal.
+
+	cl> print ("terminal = ", envget ("terminal"))
+
+2. Output a blank line on the standard output, e.g., in a script.
+
+	print ("")
+
+3. Format a command and send it to the host system.  In this example,
+"fname" is a string valued parameter.
+
+	cl> print ("!dir/full ", fname) | cl
+
+4. Write to a file.
+
+.nf
+	for (x=1.;  x < 1E5;  x *= 10) 
+	    print ("the sqrt of ", x, "is ", sqrt(x), >> "output")
+.fi
+.ih
+BUGS
+The \fIfprint\fR task is not very useful since the same thing can be
+accomplished by string concatenation and assignment.
+.ih
+SEE ALSO
+scan, fscan
+.endhelp

@@ -1,0 +1,66 @@
+This directory contains standard calibration data, such as line lists and
+sensitivity calibration, for use in the ONEDSPEC, TWODSPEC, and the various
+IMRED packages.
+
+		       	       LINE LISTS
+                  (ie coordlist = onedstds$henear.dat)
+
+ ctiohenear.dat -  HENEAR list used at CTIO
+   ctiohear.dat -  HEAR list used at CTIO
+     henear.dat -  Selected list of HENEAR lines to be used for 
+		   KPNO IIDS/IRS reductions - this list is identical to 
+		   that in the KPNO mountain reduction software for these 
+		   instruments.  Source of wavelengths:  1982 MIT
+		   Wavelength Tables Vol. 2.  Multiplet numbers from
+		   Charlotte Moore's A Multiplet Table of Astrophysical
+		   Interest 1972.
+   idhenear.dat -  Extended list of HENEAR lines for general use.
+		   Source of wavelengths:  1982 MIT Wavelength Tables Vol. 2.
+		   Multiplet numbers from Charlotte Moore's A Multiplet Table
+		   of Astrophysical Interest 1972.
+vacidhenear.dat -  The idhenear.dat list converted to vacuum wavelengths
+                   using the equation: (n-1) x 10**8 = 8342.13 + 2406030
+                   (130 - sigma**2)**-1 + 15997(38.9 - sigma**2)**-1
+                   where sigma = 1/lambda(air). (See B. Edlen, 1966
+                   Metrologia, Vol. 2, p. 71).
+    thorium.dat -  List of thorium-argon lines (3180 - 9540),
+                   A CCD Atlas of Comparison Spectra: Thorium-Argon Hollow
+                   Cathode 3180 A - 9540 A, July 1987, Daryl Willmarth.
+ vacthorium.dat -  The thorium.dat list converted to vacuum wavelengths
+                   using the equation: (n-1) x 10**8 = 8342.13 + 2406030
+                   (130 - sigma**2)**-1 + 15997(38.9 - sigma**2)**-1
+                   where sigma = 1/lambda(air). (See B. Edlen, 1966
+                   Metrologia, Vol. 2, p. 71).
+
+	        	    EXTINCTION TABLES
+                (ie extinction = onedstds$kpnoextinct.dat)
+
+ctioextinct.dat -  CTIO extinction table for ONEDSPEC (in Angstroms)
+kpnoextinct.dat -  KPNO extinction table for ONEDSPEC (in Angstroms)
+
+			   FLUX STANDARD DIRECTORIES
+                        (ie caldir = onedstds$iidscal/)
+
+       bstdscal -  Directory of the brighter KPNO IRS standards (i.e. those 
+		   with HR numbers) at 29 bandpasses
+        ctiocal -  Directory of CTIO standards
+        iidscal -  Directory of the KPNO IIDS standards (29 bandpasses)
+	 irscal -  Directory of the KPNO IRS standards at 78 bandpasses
+		   (note that in this directory the brighter standards
+		   have no values - the `bstdscal' directory must be 
+		   used for these standards at this time )
+         redcal -  Directory of standard stars with flux data beyond 8370A.
+		   These stars are from the IRS or the IIDS directory but
+		   have data extending as far out into the red as the
+		   literature permits.   
+   spechayescal -  Spectrophotometric standards at the Hayes flux points,
+                   Table IV, Spectrophotometric Standards, Massey et al.,
+                   1988, Ap. J., Vol. 328, p. 315.
+      spec50cal -  Spectrophotometric standards at 50 A intervals, Table V,
+                   Spectrophotometric Standards, Massey et al., 1988,
+                   Ap. J., Vol. 328, p. 315.
+
+			MISCELLANEOUS
+
+	   ctio -  Directory containing CTIO decker comb positions and
+		   neutral density filter curves (used with proto.ndprep).

@@ -1,0 +1,110 @@
+.help convolve May88 images
+.ih
+NAME
+convolve -- convolve an image with an arbitrary rectangular kernel
+.ih
+USAGE
+convolve input output kernel
+.ih
+PARAMETERS
+.ls input
+List of images to be convolved.
+.le
+.ls output
+List of output images. The number of output images must equal the number of
+input images. If the input image name equals the output image name the
+convolved image will replace the input image.
+.le
+.ls kernel
+\fIKernel\fR is either a text file name or a string listing the kernel
+elements.
+The kernel elements are separated by whitespace or commas and the kernel rows
+are separated by \fIrow_delimiter\fR.
+In string entry mode the elements are assumed to be in row order.
+In text file entry mode the \fIlast\fR row of the
+kernel is the the \fIfirst\fR row of the text file.
+.le
+.ls radsym = no
+Is the kernel radially symmetric? If the kernel has an odd number of elements
+in the x direction as determined by the convolve task and the user sets
+radsym to yes, then a more efficient convolution algorithm is used.
+.le
+.ls boundary = "nearest"
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate a value by reflecting around the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ls constant = 0.
+The constant for constant-valued boundary extension.
+.le
+.ls row_delimiter = ";"
+.le
+
+.ih
+DESCRIPTION
+
+CONVOLVE convolves the list of images specified by \fIinput\fR with an
+arbitrary user supplied rectangular \fIkernel\fR
+and places the convolved images in \fIoutput\fR. The type of boundary
+extension is optional and set by the \fIboundary\fR parameter.
+
+\fIKernel\fR is either a text file name or a string listing the kernel
+elements. 
+The kernel elements are separated by whitespace or commas and the kernel rows
+are separated by \fIrow_delimiter\fR. 
+In string entry mode the elements are assumed to be in row order.
+In text file entry mode the \fIlast\fR row of the
+kernel is the the \fIfirst\fR row of the text file.
+.le
+
+.ih
+EXAMPLES
+For the following kernel where -1 is element 1 of row 1.
+
+.nf
+	 1.  1.  1.
+	 0.  0.  0.
+	-1. -1. -1.
+.fi
+
+1. Convolve an image with the above kernel using string entry mode and wrap
+around boundary extension.
+
+.nf
+    cl> convolve m82 m82.cnv "-1. -1. -1.; 0. 0. 0.; 1. 1. 1." bound=wrap
+.fi
+
+2. Type the contents of the kernel file fdy on the terminal. Convolve an image
+with the kernel in fdy using nearest neighbour boundary extension.
+
+.nf
+    cl> type fdy
+
+        1. 1. 1.;
+        0. 0. 0.;
+        -1. -1. -1.;
+
+    cl> convolve m74 m74.cnv fdy
+.fi
+.ih
+TIME REQUIREMENTS
+CONVOLVE requires approximately 40, 95, and 500 cpu seconds to convolve a
+512 square real image with a 3 by 3, 5 by 5 and 11 by 11 kernel respectively
+(VAX 11/750 with fpa).
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+gauss, laplace, gradient, boxcar
+.endhelp

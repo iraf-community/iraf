@@ -1,0 +1,5 @@
+# Root help directory for the SYS branch of the help database.
+
+sys		sys = sys$README, 
+		hlp = sys$sys.men,
+		pkg = sys$sys.hd

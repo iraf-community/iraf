@@ -1,0 +1,70 @@
+# Make the PLOT package
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	linkplot
+	$call	linkncar
+	;
+
+install:
+	$move	xx_plot.e   bin$x_plot.e
+	$move   xx_ncar.e   bin$x_ncar.e
+	;
+
+ncar:
+	$update	libpkg.a
+	$call	linkncar
+	;
+linkncar:
+	$set	LIBS = "-lncar -lgks -lxtools"
+	$omake  x_ncar.x
+	$link	x_ncar.o libpkg.a $(LIBS) -o xx_ncar.e
+	;
+
+plot:
+	$update	libpkg.a
+	$call	linkplot
+	;
+linkplot:
+	$set	LIBS = "-lncar -lgks -lxtools -liminterp"
+	$omake	x_plot.x
+	$link	x_plot.o libpkg.a $(LIBS) -o xx_plot.e
+	;
+
+libpkg.a:
+	@crtpict
+	t_hafton.x	<config.h> <error.h> <fset.h>   <gset.h> <imhdr.h>\
+			<mach.h>   <xwhen.h>
+	t_contour.x	<config.h> <error.h> <fset.h>   <gset.h> <imhdr.h>\
+			<mach.h>   <xwhen.h>
+	t_gkidir.x	<gki.h>
+	t_gkixt.x	<gki.h>
+	t_gkimos.x	<error.h>  <fset.h>  <gio.h>   <gki.h>   <gset.h>\
+			<mach.h>   <math.h>
+	t_graph.x	<config.h> <ctype.h> <error.h> <fset.h>  <gset.h>\
+			<imhdr.h>  <mach.h>  <xwhen.h>
+	t_implot.x	<ctype.h>  <error.h> <gset.h>  <imhdr.h> <mach.h>
+	improject.x	<imhdr.h>
+	initmarker.x	<gset.h>
+	t_pcol.x	<gset.h>   <imhdr.h> <mach.h>
+	t_pcols.x	<gset.h>   <imhdr.h> <mach.h>
+	perim.x		<gset.h>   <mach.h>
+	getdata.x	<imhdr.h>
+	t_prow.x	<gset.h>   <imhdr.h> <mach.h>
+	t_prows.x	<gset.h>   <imhdr.h> <mach.h>
+	t_surface.x	<config.h> <error.h> <fset.h>  <gset.h>  <imhdr.h>\
+			<mach.h>   <xwhen.h>
+	t_pvector.x	<gset.h>   <mach.h>  <math.h>  <imhdr.h> <imset.h>\
+			<math/iminterp.h>
+	t_velvect.x	<config.h> <error.h> <fset.h>  <gset.h>  <imhdr.h>\
+			<mach.h>   <xwhen.h>
+	vport.x		<gset.h>
+	;

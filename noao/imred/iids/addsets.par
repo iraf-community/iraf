@@ -1,0 +1,8 @@
+# ADDSETS parameter file
+
+input,s,a,,,,Input image root file name
+records,s,a,,,,Range of spectral records
+output,s,a,,,,Output file root name for new spectra
+start_rec,i,a,1,0,9999,Next starting spectral record
+subset,i,h,2,1,,Number of spectra to add together within string
+weighting,b,h,yes,,,Apply integration time weighting to calibrated data

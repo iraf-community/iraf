@@ -1,0 +1,77 @@
+include "../lib/apphot.h"
+include "../lib/fitsky.h"
+
+# AP_PSSKY -- Procedure to write the results of the fitsky task to
+# the output file.
+
+procedure ap_pssky (ap, fd, id, ld, ier)
+
+pointer	ap		# pointer to apphot structure
+int	fd		# output file descriptor
+int	id		# sequence number of star
+int	ld		# list number of star
+int	ier		# error code
+
+real	apstatr()
+
+begin
+	# Return if NULL file descriptor.
+	if (fd == NULL)
+	    return
+
+	# Print the object id and computed sky values.
+	call ap_wid (ap, fd, apstatr (ap, SXCUR), apstatr (ap, SYCUR), id,
+	    ld, '\\')
+	call ap_wsres (ap, fd, ier, ' ')
+end
+
+
+# AP_QSPSKY -- Procedure to print a quick summary of the fitsky task on the
+# standard output.
+
+procedure ap_qspsky (ap, ier)
+
+pointer	ap		# pointer to apphot structure
+int	ier		# error code
+
+pointer	sp, imname
+int	apstati()
+real	apstatr()
+
+begin
+	# Print out the results on the standard output.
+	call smark (sp)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
+	call printf ( "%s x: %0.2f y: %0.2f s: %0.2f sd: %0.2f ") 
+	    call pargstr (Memc[imname])
+	    call pargr (apstatr (ap, SXCUR))
+	    call pargr (apstatr (ap, SYCUR))
+	    call pargr (apstatr (ap, SKY_MODE))
+	    call pargr (apstatr (ap, SKY_SIGMA))
+	call printf ("sk: %0.2f n: %d nr: %d e: %s\n")
+	    call pargr (apstatr (ap, SKY_SKEW))
+	    call pargi (apstati (ap, NSKY))
+	    call pargi (apstati (ap, NSKY_REJECT))
+	    if (ier != AP_OK)
+		call pargstr ("err")
+	    else
+		call pargstr ("ok")
+	call sfree (sp)
+end
+
+
+# AP_SPHDR -- Procedure to write the banner for the fitsky task to the
+# output file.
+
+procedure ap_sphdr (ap, fd)
+
+pointer	ap		# pointer to apphot structure
+pointer	fd		# output file descriptor
+
+begin
+	if (fd == NULL)
+	    return
+	call ap_idhdr (ap, fd)
+	call ap_shdr (ap, fd)
+end

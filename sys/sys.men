@@ -1,0 +1,14 @@
+	  mkpkg - Rebuild the system libraries
+	   clio - Command Language i/o
+	   dbio - Database i/o
+	    etc - Miscellaneous system procedures
+	    fio - File i/o
+	  fmtio - Formatted i/o
+	    gio - Graphics i/o
+	   imio - Image i/o (bulk data arrays)
+	     ki - Kernel interface (networking)
+	  memio - Memory i/o (dynamic memory allocation)
+	   mtio - Magtape i/o
+	    osb - Bit and byte primitives
+	    tty - Device independent terminal control
+	   vops - Vector operators

@@ -1,0 +1,24 @@
+.TH AGAUSS 3M
+.SH NAME
+agauss 
+.SH DESCRIPTION
+function agauss.f
+
+source
+  Bevington, page 48.
+
+purpose
+  evaluate integral of Gaussian probability function
+
+usage
+  result = agauss (x, averag, sigma)
+
+description of parameters
+  x      - limit for integral
+  averag - mean of distribution
+  sigma  - standard deviation of distribution
+    integration range is averag +/- z*sigma
+      where z = abs(x-averag)/sigma
+
+subroutines and function subprograms required
+  none

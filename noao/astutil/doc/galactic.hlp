@@ -1,0 +1,59 @@
+.help galactic Oct87 noao.astutil
+.ih
+NAME
+galactic -- convert between equatorial and galactic coordinates
+.ih
+USAGE
+galactic files
+.ih
+PARAMETERS
+.ls files
+The name of a file (or a file list or template) containing the coordinates
+to be converted.
+.le
+.ls in_coords = "equatorial"
+Type of input coordinates.  May be either "equatorial" (RA and DEC) or
+"galactic" (l and b).
+.le
+.ls print_coords = yes
+If \fBprint_coords\fR = yes, the RA, DEC and epoch (as well as lII and bII) 
+will be listed on the output file.
+.ih
+DESCRIPTION
+Program \fBgalactic\fR is used to convert between equatorial and galactic 
+oordinates.  It converts in either direction based on the specified
+input coordinates.  Coordinates are read from the input file as
+RA and DEC or galactic longitude and latitude pairs,
+one pair per input line.  Each coordinate pair may optionally be followed
+by the epoch of the equatorial coordinates, in which case the coordinates
+are precessed to 1950.0 before conversion for equatorial to galactic
+or to the specified epoch for galactic to equatorial.  The galactic
+coordinates are always 1950.0.  Coordinates may be entered in either
+decimal or sexagesimal notation.
+.ih
+EXAMPLES
+Convert the given RA and DEC coordinates to galactic coordinates.  When
+the epoch is specified as other than 1950.0, precess before converting.
+The lines input by the user are marked:
+
+.nf
+	cl> galactic STDIN 	         		[input]
+	12:30:10.12 10:18:27.5 1930.			[input]
+  	12:30:10.12   10:18:27.5  1930.00     288.4695   72.2884
+	12:30 10:18					[input]
+  	12:30:00.00   10:18:00.0  1950.00     287.4598   72.3202
+	12.5  10:18                                     [input]
+  	12:30:00.00   10:18:00.0  1950.00     287.4598   72.3202
+	(eof=<ctrl/z>)					[input]
+.fi
+
+The following is equivalent, except that coordinate input is taken from
+the file "coords", rather than from the terminal:
+
+.nf
+	cl> galactic coords 				[input]
+  	12:30:10.12   10:18:27.5  1930.00     288.4695   72.2884
+  	12:30:00.00   10:18:00.0  1950.00     287.4598   72.3202
+  	12:30:00.00   10:18:00.0  1950.00     287.4598   72.3202
+.fi
+.endhelp

@@ -1,0 +1,73 @@
+# APPHOT Library Tools
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	aparrays.x	../lib/phot.h	        ../lib/photdef.h       \
+			../lib/apphotdef.h
+	apfdres.x	../lib/apphot.h		../lib/find.h
+	apfree.x	../lib/apphotdef.h
+	apgaperts.x	<lexnum.h>		<ctype.h>
+	apgqverify.x	<ttyset.h>		<fset.h>
+	apgtverify.x	
+	apinit.x	../lib/apphotdef.h	../lib/displaydef.h     \
+			../lib/noisedef.h	../lib/noise.h
+	apitime.x	../lib/apphot.h		<imhdr.h>
+	apmark.x	<gset.h>		../lib/center.h         \
+			../lib/fitsky.h		../lib/apphot.h         \
+			../lib/phot.h		../lib/polyphot.h	\
+			../lib/radprof.h	../lib/fitpsf.h
+	apnew.x		../lib/apphot.h
+	apnscolon.x	<error.h>		../lib/apphot.h	        \
+			../lib/noise.h
+	apnshow.x	../lib/apphot.h		../lib/noise.h
+	apqrad.x	../lib/apphot.h		../lib/center.h
+	appadu.x	../lib/noise.h		<imhdr.h>
+	aprcursor.x	../lib/apphot.h		../lib/noise.h          \
+			../lib/center.h		../lib/fitsky.h         \
+			../lib/phot.h		../lib/radprof.h        \
+			../lib/fitpsf.h
+	aprdnoise.x	../lib/noise.h		<imhdr.h>
+	apset.x
+	apset1.x	../lib/center.h		../lib/centerdef.h      \
+			../lib/fitsky.h		../lib/apphot.h         \
+			../lib/apphotdef.h	../lib/fitskydef.h	\
+			../lib/phot.h		../lib/photdef.h        \
+			../lib/fitpsfdef.h	../lib/fitpsf.h
+	apset2.x	../lib/apphot.h		../lib/apphotdef.h      \
+			../lib/display.h	../lib/polyphot.h       \
+			../lib/radprofdef.h	../lib/radprof.h	\
+			../lib/polyphotdef.h	../lib/noisedef.h       \
+			../lib/noise.h		../lib/finddef.h        \
+			../lib/find.h		../lib/displaydef.h
+	apstat.x
+	apstat1.x	../lib/center.h		../lib/centerdef.h      \
+			../lib/fitsky.h		../lib/apphot.h         \
+			../lib/apphotdef.h	../lib/fitskydef.h	\
+			../lib/phot.h		../lib/photdef.h        \
+			../lib/fitpsfdef.h	../lib/fitpsf.h
+	apstat2.x	../lib/apphot.h		../lib/apphotdef.h      \
+			../lib/display.h	../lib/polyphot.h       \
+			../lib/radprofdef.h	../lib/radprof.h	\
+			../lib/polyphotdef.h	../lib/noisedef.h       \
+			../lib/noise.h		../lib/finddef.h        \
+			../lib/find.h		../lib/displaydef.h
+	apwcres.x	../lib/center.h
+	apwfres.x	../lib/apphotdef.h	../lib/fitpsfdef.h      \
+			../lib/fitpsf.h
+	apwid.x		../lib/apphot.h
+	apwlres.x	../lib/polyphot.h
+	apwmres.x	../lib/apphotdef.h	../lib/photdef.h	\
+			../lib/phot.h
+	apwparam.x	<time.h>		../lib/apphot.h	        \
+			../lib/noise.h		../lib/center.h         \
+			../lib/fitsky.h		../lib/phot.h		\
+			../lib/radprof.h	../lib/apphotdef.h      \
+			../lib/polyphot.h	../lib/fitpsf.h
+	apwrres.x	../lib/apphotdef.h	../lib/radprofdef.h     \
+			../lib/radprof.h
+	apwsres.x	../lib/fitsky.h
+	;

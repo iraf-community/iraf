@@ -1,0 +1,49 @@
+.help impl Sep86 imfort
+.ih
+NAME
+.nf
+impl -- put (rewrite) an image line
+.fi
+.ih
+SYNOPSIS
+.nf
+subroutine impl1r (im, rbuf, ier)
+subroutine impl1s (im, sbuf, ier)
+subroutine impl2r (im, rbuf, lineno, ier)
+subroutine impl2s (im, sbuf, lineno, ier)
+subroutine impl3r (im, rbuf, lineno, bandno, ier)
+subroutine impl3s (im, sbuf, lineno, bandno, ier)
+
+integer		im		#I image descriptor of open image
+real		rbuf(*)		#I output pixel buffer, type real
+integer*2	sbuf(*)		#I output pixel buffer, type short
+integer		lineno		#I line (row) number (1:axlen(2))
+integer		bandno		#I band number (1:axlen(3))
+integer		ier		#O status return
+.fi
+.ih
+DESCRIPTION
+The \fIimpl\fR procedures are used to rewrite a line (row) of an image.
+Procedures are provided for images of from one to three dimensions,
+of pixel type short integer or real.  The type real procedures may be
+applied to images of either type, but the type short procedures may only
+be used to access images of type short.  The input buffer should contain
+\fIaxlen(1)\fR pixels ready to be written to the image when the \fIimpl\fR
+procedure is called.
+.ih
+RETURN VALUE
+A zero status is returned if the referenced image line is in-bounds and
+the actual pixel datatype of the image is one of the types permitted by
+the particular operator called.
+
+.nf
+IE_NOTSHORT:	imfort short integer i/o requires a type short image
+IE_PIXTYPE:	image pixel type must be short or real
+IE_WRPIX:	error writing image pixel file
+IE_YOOB:	image y coordinates out of range
+IE_ZOOB:	image z coordinates out of range
+.fi
+.ih
+SEE ALSO
+imgl, imgs, imps
+.endhelp
