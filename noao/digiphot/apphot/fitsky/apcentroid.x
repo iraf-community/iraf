@@ -215,7 +215,7 @@ begin
 	if (smooth == NO) 
 	    hmean = asumr (hgm, nbins) / nbins
 	else {
-	    call alimr (hgm, nbins, x, hmean)
+	    call alimr (hgm, nbins, dz, hmean)
 	    hmean = 2.0 * hmean / 3.0
 	}
 

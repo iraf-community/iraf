@@ -3,6 +3,7 @@
 #include <sys/ioctl.h>
 #include <sys/mtio.h>
 #include <ctype.h>
+#include <unistd.h>
 
 #ifdef sun
 #include <sundev/tmreg.h>
@@ -321,11 +322,11 @@ quit:		if (in != stdin)
 		    }
 
 		    if (fwd)
-			status = lseek (tape, (long)i, 1);
+			status = lseek (tape, (off_t)i, 1);
 		    else if (bak)
-			status = lseek (tape, -(long)i, 1);
+			status = lseek (tape, -(off_t)i, 1);
 		    else
-			status = lseek (tape, (long)i, 0);
+			status = lseek (tape, (off_t)i, 0);
 		    pstatus();
 
 		} else {

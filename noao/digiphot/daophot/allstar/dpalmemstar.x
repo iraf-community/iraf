@@ -180,4 +180,3 @@ begin
 
 	call mfree (allstar, TY_STRUCT)
 end
-

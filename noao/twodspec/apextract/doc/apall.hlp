@@ -92,7 +92,7 @@ Extract the one dimensional aperture sums?
 .le
 .ls extras = no
 Extract the raw spectrum (if variance weighting is used), the sky spectrum
-(if background subtraction is used), and variance spectrum (if variance
+(if background subtraction is used), and sigma spectrum (if variance
 weighting is used)?  This information is extracted to the third dimension
 of the output image.
 .le

@@ -159,8 +159,8 @@ begin
 		        call mw_close (mw)
 		    }
 	        } else {
-	            call imunmap (in)
 	            call imunmap (out)
+	            call imunmap (in)
 	            call xt_delimtemp (Memc[image2], Memc[image3])
 		    if (logfd != NULL) {
 		        call fprintf (logfd, "\n%s\n")
@@ -190,8 +190,8 @@ begin
 			call pargstr (Memc[errmsg])
 		 }
 		 call imdelete (Memc[image3])
-	         call imunmap (in)
 	         call imunmap (out)
+	         call imunmap (in)
 	         call xt_delimtemp (Memc[image2], Memc[image3])
 	    } else {
 
@@ -226,8 +226,8 @@ begin
 		    }
 	        }
 
-	        call imunmap (in)
 	        call imunmap (out)
+	        call imunmap (in)
 	        call xt_delimtemp (Memc[image2], Memc[image3])
 	    }
 
@@ -475,12 +475,12 @@ begin
 	    # Compute the y values.
 	    if (itype == II_BIDRIZZLE) {
 	        do i = l1out, l2out {
-		    Memr[y+2*(i-l1out)] = y1 + (i - 1.5) * dy - l1in + 1
-		    Memr[y+2*(i-l1out)+1] = y1 + (i - 0.5) * dy - l1in + 1
+		    Memr[y+2*(i-l1out)] = y1 + (i - 1.5) * dy - fstline + 1
+		    Memr[y+2*(i-l1out)+1] = y1 + (i - 0.5) * dy - fstline + 1
 		}
 	    } else {
 	        do i = l1out, l2out
-		    Memr[y+i-l1out] = y1 + (i - 1) * dy - l1in + 1
+		    Memr[y+i-l1out] = y1 + (i - 1) * dy - fstline + 1
 	    }
 
 	    # Evaluate the interpolant.

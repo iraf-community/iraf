@@ -57,7 +57,7 @@ begin
 	if (IS_INDEFI(linei))
 	    x = smw_c1trand (cti, w)
 	else {
-	    y2 = linei
+	    #y2 = linei
 	    call smw_c2trand (cti, w, y2, x, y1)
 	}
 	ofb_b = (x < xmin || x > xmax)
@@ -75,7 +75,7 @@ begin
 	    if (IS_INDEFI(linei))
 		x = smw_c1trand (cti, w)
 	    else {
-		y2 = linei
+		#y2 = linei
 		call smw_c2trand (cti, w, y2, x, y1)
 	    }
 	    ofb_b = (x < xmin || x > xmax)

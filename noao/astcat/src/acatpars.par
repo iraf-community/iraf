@@ -1,0 +1,65 @@
+# The AICATPARS parameter file
+
+# The input catalog format parameter set.
+
+# Global parameters. The only global parameter at present is the
+# input catalog celestial coordinate system parameter icatsystem.  
+# This is overridden by the contents of the icoosystem field.
+
+# Standard column / field definitions ...
+#
+# The column / field definitions are strings containing the following
+# quantities in the case of type = text files.
+#
+#        "column [units [format]]".
+#
+# The column is a required quantity. A column value of 0 means that the
+# standard column is not present in the input catalog. If absent
+# the units and format fields default to reasonable expected values.
+#
+# In the case of type = btext files the column / field definitions have
+# the following format.
+#
+#        "coloffset colsize [units [format]]"
+#
+# The coloffset and colsize are required quantities. An offset of 0 means
+# that the standard column is not present in the input catalog. If absent
+# The units and format fields default to reasonable expected values.
+
+ftype,s,h,"stext","|stext|btext|",,"The file format type"
+csystem,s,h,"J2000",,,"The catalog coordinate system"
+
+id,s,h,"",,,"The id field"
+
+ra,s,h,"1 hours",,,"The ra / longitude field"
+dec,s,h,"2 degrees",,,"The dec / latitude field"
+era,s,h,"",,,"The ra / longitude error field"
+edec,s,h,"",,,"The dec / latitude error field"
+
+pmra,s,h,"",,,"The ra / longitude proper motion field"
+pmdec,s,h,"",,,"The dec / latitude proper motion field"
+epmra,s,h,"",,,"The ra / longitude proper motion error field"
+epmdec,s,h,"",,,"The dec / latitude proper motion error field"
+
+catsystem,s,h,"",,,"The catalog coordinate system field"
+equinox,s,h,"",,,"The epoch of the equinox field"
+epoch,s,h,"",,,"The epoch of the observation field"
+
+px,s,h,"",,,"The parallax field"
+rv,s,h,"",,,"The radial velocity field"
+epx,s,h,"",,,"The parallax error field"
+erv,s,h,"",,,"The radial error velocity field"
+
+mag,s,h,"",,,"The magnitude field(s)"
+color,s,h,"",,,"The color indices field(s)"
+emag,s,h,"",,,"The magnitude error field(s)"
+ecolor,s,h,"",,,"The color indices error field(s)"
+
+xp,s,h,"",,,"The predicted x coordinate field"
+yp,s,h,"",,,"The predicted y coordinate field"
+xc,s,h,"",,,"The measured x coordinate field"
+yc,s,h,"",,,"The measured y coordinate field"
+exc,s,h,"",,,"The measured x coordinate error field"
+eyc,s,h,"",,,"The measured y coordinate error field"
+imag,s,h,"",,,"The instrumental magnitude field(s)"
+eimag,s,h,"",,,"The instrumental magnitude error field(s)"

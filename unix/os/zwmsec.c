@@ -11,6 +11,8 @@
 #define USE_USLEEP
 
 #ifdef USE_USLEEP
+#define ONEHOUR (60 * 60 * 1000)
+
 
 /* ZWMSEC -- Suspend task execution (sleep) for the specified number
  * of milliseconds.
@@ -21,7 +23,10 @@ XINT	*msec;
 	/* Usleep doesn't really appear to be a standard, but it is
 	 * available on most platforms.
 	 */
-	(void) usleep (*msec * 1000);
+	if (*msec > ONEHOUR)
+	    sleep (*msec / 1000);
+	else
+	    (void) usleep ((unsigned int)(*msec) * 1000);
 }
 
 

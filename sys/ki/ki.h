@@ -1,6 +1,6 @@
 # KI.H -- IRAF Kernel Interface definitions.
 
-define	MAX_NODES	320		# max nodes known to KI
+define	MAX_NODES	512		# max nodes known to KI
 define	MAX_CHANNELS	LAST_FD		# requires <config.h>
 define	MAX_INDIRECT	20		# max indirection in a route
 define	MAX_ALIAS	6		# maximum number of aliases per node

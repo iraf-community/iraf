@@ -12,6 +12,17 @@ Optional list of images to be examined.  If specified, images are examined
 in turn, displaying them automatically.  If no images are specified the
 images currently loaded into the image display are examined.
 .le
+.ls output = ""
+Rootname for output images created with the 't' key.  If no name is specified
+then the name of the input image is used.  A three digit number is appended
+to the rootname, such as ".001", starting with 1 until no image is found with
+that name.  Thus, succesive output images with the same rootname will be
+numbered sequentially.
+.le
+.ls ncoutput = 101, nloutput = 101
+Size of the output image created with the 't' key which is centered on the
+position of the cursor.
+.le
 .ls frame = 1
 During program execution, a query parameter specifiying the frame to be loaded.
 May also be specified on the command line when \fIimexamine\fR is used as a
@@ -724,6 +735,12 @@ line, column, and histogram plots.
 .ls q
 Quit the task.
 .le
+.ls t
+Output an image centered on the cursor position with name and size set
+by the \fIoutput\fR, \fIncoutput\fR and \fInloutput\fR parameters.
+Note that the cursor input might be from a contour, surface, or other
+plot as well as from the image display.
+.le
 .ls w
 Toggle output to the logfile.  If no logfile is specified this has no
 effect except to print a message.  If the logfile is specified a message
@@ -830,6 +847,7 @@ p	Previous frame or image
 q	Quit
 r	Radial profile plot with fit and aperture sum values
 s	Surface plot
+t	Output image centered on cursor (parameters output, ncoutput, nloutput)
 u	Centered vector plot from two cursor positions
 v	Vector plot between two cursor positions
 w	Toggle write to logfile
@@ -900,10 +918,13 @@ naverage    cjkluv      Number of columns, lines, vectors to average
 nbins       h           Number of histogram bins
 ncolumns    ehs         Number of columns in contour, histogram, or surface plot
 ncontours   e           Number of contours (0 for default)
+ncoutput                Number of columns in output image
 ncstat                  Number of columns in statistics box
 nhi         e           hi/low marking option for contours
 nlines      ehs         Number of lines in contour, histogram, or surface plot
+nloutput                Number of lines in output image
 nlstat                  Number of lines in statistics box
+output			Output image root name
 pointmode   chjkluv     Plot points instead of lines?
 radius      r           Radius of object aperture for radial plot and photmetry
 round       cehjklruv   Round axes to nice values?
@@ -990,6 +1011,9 @@ window.  In the future colon command input will be entered without moving
 the mouse out of the image window, which will avoid the problem.
 .ih
 REVISIONS
+.ls IMEXAMINE V2.11.4
+('t'): A new cursor key to create an output image.
+.le
 .ls IMEXAMINE V2.11
 ('a' and 'r'): The fit to the radial profile points now includes both a
 Gaussian and a Moffat profile.  The Moffat profile exponent parameter,

@@ -1,0 +1,22 @@
+.help revisions Jun88 noao.imred.quadred
+.nf
+
+=======
+V2.12.1
+=======
+
+quad/qproc.cl
+    For some reason the quadsplit call was commented out.  So when quadproc
+    is run the pieces are not split and then the quadjoin call results in
+    a divide by zero error.  The call was uncommented.  Due to my lack
+    of understanding with QUAD and that multipiece CCDPROC is used which
+    does not support trims, the quadsplit with trimming is not used.
+    (7/5/02, Valdes)
+
+=====
+V2.12
+=====
+
+New package consisting of XCCDRED and ARED.QUAD was added.
+
+.endhelp

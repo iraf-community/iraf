@@ -17,7 +17,11 @@ task	binfil,
 	irafil,
 	joinlines,
 	$mask2text,
+	mimstatistics,
+	mskexpr,
+	mskregions,
 	suntoiraf,
+	rskysub,
 	text2mask = proto$x_proto.e
 
 

@@ -17,7 +17,7 @@ int	nvars				# Number of variables
 int	wtflag				# Type of weighting
 int	stat				# Error code (output)
 
-int	i
+int	i, ndeleted
 pointer	sp, wts1, str
 int	in_geti()
 double	in_getd
@@ -30,13 +30,6 @@ begin
 #	    call pargi (nl)
 #	    call pargi (npts)
 #	    call pargi (nvars)
-
-	# Check number of data points. If no points are present
-	# set the error flag to the appropiate value, and return.
-	if (npts == 0) {
-	    call in_puti (in, INLFITERROR, NO_DEG_FREEDOM)
-	    return
-	}
 
 	# Allocate string, and rejection weight space. The latter are
 	# are used to mark rejected points with a zero weight before
@@ -54,8 +47,32 @@ begin
 	# Set independent variable limits.
 	call in_limitd (in, x, npts, nvars)
 
-	# Reinitialize and call NLFIT.
+	# Reinitialize.
 	call in_nlinitd (in, nl)
+
+	# Check number of data points. If no points are present
+	# set the error flag to the appropiate value, and return.
+	if (npts == 0) {
+	    stat = NO_DEG_FREEDOM
+	    call in_puti (in, INLFITERROR, NO_DEG_FREEDOM)
+	    call sfree (sp)
+	    return
+	}
+
+	# Check the number of deleted points.
+	ndeleted = 0
+	do i = 1, npts {
+	    if (wts[i] <= double(0.0))
+		ndeleted = ndeleted + 1
+	}
+	if ((npts - ndeleted) < in_geti (in, INLNFPARAMS)) {
+	    stat = NO_DEG_FREEDOM
+	    call in_puti (in, INLFITERROR, NO_DEG_FREEDOM)
+	    call sfree (sp)
+	    return
+	}
+
+	# Call NLFIT.
 	call nlfitd (nl, x, y, wts, npts, nvars, wtflag, stat)
 
 	# Update fit status into the INLFIT structure.
@@ -76,7 +93,6 @@ begin
 	    stat = in_geti (in, INLFITERROR)
 	} else
 	    call in_puti (in, INLNREJPTS, 0)
-
 
 	# Free memory.
 	call sfree (sp)

@@ -28,6 +28,8 @@ int	ap_ynextobj()
 real	apstatr()
 data	delim /';'/
 
+define	endswitch_  99
+
 begin
 	# Allocate temporary space.
 	call smark (sp)
@@ -46,6 +48,8 @@ begin
 	newpoly = NO
 	ptid = 0
 	ltid = 0
+	xmean = INDEFR
+	ymean = INDEFR
 
 	# Loop over the polygon file.
 	nvertices = 0
@@ -53,6 +57,7 @@ begin
 	    EOF) {
 
 	    # Set the current cursor coordinates.
+	    call ap_vtol (im, wx, wy, wx, wy, 1)
 	    call apsetr (py, CWX, wx)
 	    call apsetr (py, CWY, wy)
 
@@ -85,66 +90,91 @@ begin
 
 		switch (colonkey) {
 		case 'm':
+
+		    # Decode a polymark colon command.
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
 		        call printf (
-			    "Unknown or ambigous keystroke command.\7\n")
-		    } else if (pl != NULL) {
-			ip = ip + 1
-			prev_num = ltid
-			if (ctoi (Memc[cmd], ip, req_num) <= 0)
-			    req_num = ltid + 1
-			nvertices = ap_ynextobj (py, id, pl, cl, delim,
-			    Memr[xshift], Memr[yshift], MAX_NVERTICES,
-			    prev_num, req_num, ltid, ptid)
-			if (nvertices == EOF) {
-			    call printf (
-			    "End of polygon list, use r key to rewind.\7\n")
-			} else if (nvertices < 3) {
-			    call printf (
-			    "The polygon has fewer than 3 vertices.\7\n")
-			} else {
-		    	    call appymark (py, id, Memr[xshift], Memr[yshift],
-		        	nvertices + 1, NO, NO, YES)
-		    	    if (id != NULL) {
-				if (gd == id)
-			    	    call gflush (id)
-				else
-			    	    call gframe (id)
-		    	    }
-			}
-		    } else
-			call printf ("The polygon list is undefined.\7\n")
+			    "Unknown or ambigous keystroke command\n")
+			goto endswitch_
+		    }
+
+		    # The polygon file is undefined.
+		    if (pl == NULL) {
+			call printf ("The polygon list is undefined\n")
+			goto endswitch_
+		    }
+
+		    # Read the next polygon.
+		    ip = ip + 1
+		    prev_num = ltid
+		    if (ctoi (Memc[cmd], ip, req_num) <= 0)
+			req_num = ltid + 1
+		    nvertices = ap_ynextobj (py, im, id, pl, cl, delim,
+			Memr[xshift], Memr[yshift], MAX_NVERTICES, prev_num,
+			req_num, ltid, ptid)
+		    if (nvertices == EOF) {
+			call printf (
+			    "End of polygon list, use r key to rewind\n")
+			goto endswitch_
+		    }
+
+		    # The polygon is undefined.
+		    if (nvertices < 3) {
+			call printf ("The polygon has fewer than 3 vertices\n")
+			goto endswitch_
+		    }
+
+		   # Mark the polygon.
+		   if (id != NULL) {
+		        call appymark (py, id, Memr[xshift], Memr[yshift],
+		           nvertices + 1, NO, NO, YES)
+			if (gd == id)
+			    call gflush (id)
+			else
+		    	    call gframe (id)
+		    }
 
 		default:
-		    call printf ("Unknown or ambigous keystroke command.\7\n")
+		    call printf ("Unknown or ambigous keystroke command\n")
 		}
 
 	    # Draw the next polygon in the list.
 	    case 'm':
-		if (pl != NULL) {
-		    prev_num = ltid
-		    req_num = ltid + 1
-		    nvertices = ap_ynextobj (py, id, pl, cl, delim,
-		        Memr[xshift], Memr[yshift], MAX_NVERTICES, prev_num,
-			req_num, ltid, ptid)
-		    if (nvertices == EOF) {
-			call printf (
-			    "End of polygon list, use r key to rewind.\7\n")
-		    } else if (nvertices < 3) {
-			call printf (
-			    "The polygon has fewer than 3 vertices.\7\n")
-		    } else {
-		    	call appymark (py, id, Memr[xshift], Memr[yshift],
-		            nvertices + 1, NO, NO, YES)
-		    	if (id != NULL) {
-			    if (gd == id)
-			    	call gflush (id)
-			    else
-			    	call gframe (id)
-		    	}
-		    }
-		} else
-		    call printf ("The polygon list is undefined.\7\n")
+
+		# No polygon file.
+		if (pl == NULL) {
+		    call printf ("The polygon list is undefined\n")
+		    goto endswitch_
+		}
+
+		# Read the next polygon.
+		prev_num = ltid
+		req_num = ltid + 1
+		nvertices = ap_ynextobj (py, im, id, pl, cl, delim,
+		    Memr[xshift], Memr[yshift], MAX_NVERTICES, prev_num,
+		    req_num, ltid, ptid)
+
+		# The polygon is undefined.
+		if (nvertices == EOF) {
+		    call printf ("End of polygon list, use r key to rewind\n")
+		    goto endswitch_
+	        }
+
+		# The polygon is ill-defined.
+		if (nvertices < 3) {
+		    call printf ("The polygon has fewer than 3 vertices\n")
+		    goto endswitch_
+		}
+
+		# Mark the polygon.
+		if (id != NULL) {
+		    call appymark (py, id, Memr[xshift], Memr[yshift],
+		        nvertices + 1, NO, NO, YES)
+		    if (gd == id)
+		    	call gflush (id)
+		    else
+		    	call gframe (id)
+		}
 
 	    # Rewind the polygon and coordinate lists.
 	    case 'r':
@@ -155,14 +185,14 @@ begin
 		    ptid = 0
 		    ltid = 0
 		} else 
-		    call printf ("The polygon list is undefined.\7\n")
+		    call printf ("The polygon list is undefined\n")
 
 	    # Draw the remaining polygons on the display.
 	    case 'l':
 		if (pl == NULL) {
-		    call printf ("The polygon list is undefined.\7\n")
+		    call printf ("The polygon list is undefined\n")
 		} else if (id != NULL) {
-		    call ap_ydraw (py, cl, pl, ltid, ptid, id)
+		    call ap_ydraw (py, im, cl, pl, ltid, ptid, id)
 		    if (gd == id)
 		        call gflush (id)
 		    else
@@ -171,21 +201,21 @@ begin
 
 	    # Define the polygon interactively.
 	    case 'g':
-		if (id == gd)
-		    nvertices = ap_ymkpoly (py, id, Memr[x], Memr[y],
+		if (gd == id)
+		    nvertices = ap_ymkpoly (py, im, id, Memr[x], Memr[y],
 		        MAX_NVERTICES, NO)
 		else
-		    nvertices = ap_ymkpoly (py, id, Memr[x], Memr[y],
+		    nvertices = ap_ymkpoly (py, im, id, Memr[x], Memr[y],
 		        MAX_NVERTICES, YES)
 		xmean = apstatr (py, PYXMEAN)
 		ymean = apstatr (py, PYYMEAN)
 		if (nvertices == EOF) {
 		    newpoly = NO
-		    call printf ("The polygon is undefined.\7\n")
+		    call printf ("The polygon is undefined\n")
 		} else if (nvertices <= 2) {
 		    newpoly = NO
 		    call printf (
-		        "The polygon has fewer then 3 vertices.\7\n")
+		        "The polygon has fewer then 3 vertices\n")
 		} else { 
 		    newpoly = YES
 		    if (id != NULL) {
@@ -211,14 +241,14 @@ begin
 			else
 			    call gframe (id)
 		    } else
-			call printf ("The polygon is undefined.\7\n")
+			call printf ("The polygon is undefined\n")
 		}
 
 
 	    # Mark the current polygon on the display and write to file.
 	    case ' ':
 		if (! IS_INDEFR(xmean) && ! IS_INDEFR(ymean)) {
-		    call ap_ywrite (py, cl, pl, Memr[x], Memr[y], nvertices,
+		    call ap_ywrite (py, im, cl, pl, Memr[x], Memr[y], nvertices,
 		        cid, pid, firstpoly, newpoly)
 		    if (id != NULL) {
 		        call aaddkr (Memr[x], wx - xmean, Memr[xshift],
@@ -233,12 +263,13 @@ begin
 			    call gframe (id)
 		    }
 		} else
-		    call printf ("The polygon is undefined.\7\n")
+		    call printf ("The polygon is undefined\n")
 
 	    default:
-		call printf ("Unknown or ambigous keystroke command.\7\n")
+		call printf ("Unknown or ambigous keystroke command\n")
 	    }
 
+endswitch_
 	    # Reset the keystroke and command defaults.
 	    call apsetr (py, WX, apstatr (py, CWX))
 	    call apsetr (py, WY, apstatr (py, CWY))

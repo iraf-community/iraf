@@ -43,6 +43,8 @@ endif
 
 # Use name server if installed?
 if ($MACH != i386 && -e /lib/libresolv.a) then
+    # -l44bsd is needed for some (non-Sun) enhanced versions of libresolv.
+    #set RESOLV = "-lresolv -l44bsd"
     set RESOLV = -lresolv
 else
     set RESOLV = ""
@@ -55,11 +57,11 @@ set	OMIT = omit.$BMACH
 set	EXCL = "zshlib.o zzstrt.o"
 set	ADDR = 10000000		# default base address of shared region (hex)
 set	PGSZ = 0x2000		# page size
-set	CMSZ = 0x4000		# common area - 2 pages (must be > TOTCOMSZ)
+set	CMSZ = 0x26000		# common area (must be N*PGSZ > TOTCOMSZ)
 
-set	FIOCOMSZ = 0x2a60	# exported commons
+set	FIOCOMSZ = 0x24660	# exported commons
 set	XERCOMSZ = 0x810
-set	TOTCOMSZ = 0x3270
+set	TOTCOMSZ = 0x24e70
 
 if (`mach` == i386) then
     set	FHSZ = 0xd0		# .e file header size

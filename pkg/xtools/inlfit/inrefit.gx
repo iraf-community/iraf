@@ -18,9 +18,10 @@ int	npts				# Number of points
 int	nvars				# Number of variables
 int	wtflag				# Type of weighting
 
-int	i, ier
+int	i, ndeleted, ier
 pointer	rejpts
 pointer	in_getp()
+int	in_geti()
 
 begin
 #	# Debug
@@ -30,11 +31,6 @@ begin
 #	    call pargi (npts)
 #	    call pargi (nvars)
 
-	# Check number of data points.
-	if (npts == 0) {
-	    call in_puti (in, INLFITERROR, NO_DEG_FREEDOM)
-	    return
-	}
 
 	# Assign a zero weight to each rejected point.
 	rejpts = in_getp (in, INLREJPTS)
@@ -43,8 +39,27 @@ begin
 		wts[i] = PIXEL (0.0)
 	}
 
-	# Reinitialize NLFIT and refit.
+	# Reinitialize NLFIT.
 	call in_nlinit$t (in, nl)
+
+	# Check number of data points.
+	if (npts == 0) {
+	    call in_puti (in, INLFITERROR, NO_DEG_FREEDOM)
+	    return
+	}
+
+	# Check number of deleted points.
+	ndeleted = 0
+	do i = 1, npts {
+	    if (wts[i] <= PIXEL(0.0))
+		ndeleted = ndeleted + 1
+	}
+	if ((npts - ndeleted) < in_geti(in, INLNFPARAMS)) {
+	    call in_puti (in, INLFITERROR, NO_DEG_FREEDOM)
+	    return
+	}
+
+	# Refit.
 	call nlfit$t (nl, x, y, wts, npts, nvars, wtflag, ier)
 
 	# Store fit status in the INLFIT structure.

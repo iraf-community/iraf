@@ -288,8 +288,17 @@ int	opcode;
 		break;
 
 	case OP_DIV:
-		if (typecode)	dresult = VALU(&o1) / VALU(&o2); 
-			else	iresult = o1.o_val.v_i / o2.o_val.v_i;
+		if (typecode) {
+		    if (VALU(&o2) == 0.0)
+			cl_error (E_UERR, e_fdivzero, opcode, "binop()");
+		    else
+			dresult = VALU(&o1) / VALU(&o2); 
+		} else {
+		    if (o2.o_val.v_i == 0)
+			cl_error (E_UERR, e_idivzero, opcode, "binop()");
+		    else
+			iresult = o1.o_val.v_i / o2.o_val.v_i;
+		}
 		break;
 
 	case OP_POW:

@@ -19,7 +19,8 @@ xxterms,s,h,"half","|none|half|full|",,X fit cross terms type
 yxorder,i,h,2,2,,Order of y fit in x
 yyorder,i,h,2,2,,Order of y fit in y
 yxterms,s,h,"half","|none|half|full|",,Y fit cross terms type
-reject,r,h,INDEF,,,Rejection limit in sigma units
+maxiter,i,h,0,,,Maximum number of rejection iterations
+reject,r,h,3.0,,,Rejection limit in sigma units
 calctype,s,h,"real",|real|double|,,'Computation type'
 
 # Output and graphics parameters

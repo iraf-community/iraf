@@ -12,7 +12,7 @@ procedure t_rimcursor()
 
 double	px, py, wx, wy
 pointer gp, ct, mw, sp, wcs, rest, format[2], fmt[2]
-int	axis, frame, newframe, ntokens
+int	axis, frame, newframe, ntokens, wcscode
 pointer	gopen(), rim_getctran()
 int	clscan(), nscan()
 errchk	gopen, rim_getctran
@@ -44,8 +44,8 @@ begin
 	    # Get cursor value.
 	    call gargd (px)
 	    call gargd (py)
-	    call gargi (newframe)
-	    newframe = newframe / 100
+	    call gargi (wcscode)
+	    newframe = wcscode / 100
 	    call gargstr (Memc[rest], SZ_LINE)
 
 	    # Get coordinate transformation.
@@ -99,8 +99,8 @@ begin
 
 	    # Output WCS field if present in input.
 	    if (ntokens > 2) {
-		call fprintf (STDOUT, "%d01")
-		    call pargi (frame)
+		call fprintf (STDOUT, "%d")
+		    call pargi (wcscode)
 	    }
 
 	    # Output rest of cursor value if present in input.

@@ -18,7 +18,7 @@ int	header, pixels, nskip, nfiles, ntext, format, data_type, tf, i, input
 int	fd_dim, junk, ndim, ip
 
 bool	clgetb()
-char	clgetc()
+#char	clgetc()
 pointer	immap()
 int	btoi(), clgeti(), clpopni(), clplen(), clgfil(), get_data_type()
 int	open(), rt_skip_lines(), clpopnu(), ctoi()
@@ -29,7 +29,9 @@ begin
 	call clgstr ("output", output, SZ_FNAME)
 
 	# Get hidden parameters from cl. 
-	data_type = get_data_type (clgetc ("otype"))
+	# data_type = get_data_type (clgetc ("otype"))
+	call clgstr ("otype", out_fname, SZ_FNAME)
+	data_type = get_data_type (out_fname[1])
 	header = btoi (clgetb ("header"))
 	pixels = btoi (clgetb ("pixels"))
 	if (header == NO)

@@ -1260,7 +1260,6 @@ begin
 
 	call qpio_seti (io, QPIO_EX, ex)
 	while (qpio_getevents (io, Memi[evl], mval, LEN_EVBUF, nev) != EOF) {
-call fprintf ("nev = %d\n"); call pargi (nev)
 	    do i = 1, nev {
 		ev = Memi[evl+i-1]
 		Mems[x1+nev1] = EV_X(ev)

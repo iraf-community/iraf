@@ -23,8 +23,14 @@ begin
 	if (npix <= 0 || nr <= 0)
 	    return (0)
 
+	# Initialize the linelist header.
+	LL_VERSION(ll_dst) = LL_CURVERSION
+	LL_HDRLEN(ll_dst) = LL_CURHDRLEN
+	LL_NREFS(ll_dst) = 0
+	LL_SETBLEN(ll_dst,0)
+
 	xe = xs + npix - 1
-	op = LL_FIRST
+	op = LL_CURHDRLEN + 1
 	iz = xs
 	hi = 1
 
@@ -119,6 +125,6 @@ done_
 	    iz = x2 + 1
 	}
 
-	LL_LEN(ll_dst) = op - 1
+	LL_SETLEN(ll_dst, op - 1)
 	return (op - 1)
 end

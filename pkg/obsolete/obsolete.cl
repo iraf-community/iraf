@@ -4,8 +4,9 @@ package obsolete
 
 task	imtitle,
 	mkhistogram,
-	odisplay,
 	ofixpix,
+	oimcombine,
+	oimstatistics,
 	orfits,
 	owfits,
 	radplt		= obsolete$x_obsolete.e

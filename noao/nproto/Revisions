@@ -1,5 +1,30 @@
 .help revisions Jun88 noao.nproto
 .nf
+=====
+V2.12
+=====
+noao$nproto/ace/xtmaskname.x
+    Added check for optional environment variable "masktype" to force
+    pl files if the value is "pl".  (3/1/02, Valdes)
+
+noao$nproto/ace/xtpmmap.x
+    Needed to add a new error code to catch.  (2/27/02, Valdes)
+
+noao$nproto/ace		+
+noao$nproto/x_nproto.x
+noao$nproto/mkpkg
+noao$nproto/nproto.cl
+noao$nproto/nproto.men
+noao$nproto/nproto.hd
+    Added a prototype version of ACE with the only task being OBJMASKS.
+    (1/25/02, Valdes)
+
+noao$nproto/nproto.cl
+noao$nproto/nproto.men
+noao$nproto/nproto.hd
+    Removed FINDGAIN since a new version is in OBSUTIL.  The source and
+    help are still in the directory for now.  (11/14/01, Valdes)
+
 noao$nproto/t_irmosaic.x
     Modified the irmosaic task to avoid a potential divide by zero error
     in the range decoding software. This error was actually due to

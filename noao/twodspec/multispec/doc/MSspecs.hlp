@@ -656,3 +656,4 @@ program.
 Finally, the extracted spectra are formatted for the ONEDSPEC package
 using TO_ONEDSPEC with the extracted images specified.
 .le
+.endhelp

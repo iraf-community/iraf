@@ -20,7 +20,7 @@ begin
 	    return
 
 	# Print the object id and computed sky values.
-	call ap_wid (ap, fd, apstatr (ap, SXCUR), apstatr (ap, SYCUR), id,
+	call ap_wid (ap, fd, apstatr (ap, OSXCUR), apstatr (ap, OSYCUR), id,
 	    ld, '\\')
 	call ap_wsres (ap, fd, ier, ' ')
 end
@@ -42,11 +42,11 @@ begin
 	# Print out the results on the standard output.
 	call smark (sp)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
+	call apstats (ap, IMROOT, Memc[imname], SZ_FNAME)
 	call printf ( "%s  %8.2f %8.2f  %8g %8g ") 
 	    call pargstr (Memc[imname])
-	    call pargr (apstatr (ap, SXCUR))
-	    call pargr (apstatr (ap, SYCUR))
+	    call pargr (apstatr (ap, OSXCUR))
+	    call pargr (apstatr (ap, OSYCUR))
 	    call pargr (apstatr (ap, SKY_MODE))
 	    call pargr (apstatr (ap, SKY_SIGMA))
 	call printf ("%8g  %5d %5d  %s\n")

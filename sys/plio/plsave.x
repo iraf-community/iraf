@@ -31,7 +31,7 @@ errchk	malloc, realloc, pl_compress
 begin
 	call smark (sp)
 	call salloc (ex, LEN_PLEXTERN, TY_STRUCT)
-	call salloc (index, PL_NLP(pl) * 2, TY_SHORT)
+	call salloc (index, PL_NLP(pl) * 3 + LL_CURHDRLEN, TY_SHORT)
 
 	# Eliminate any wasted space in the mask, and compute the amount
 	# of space needed to store the compressed mask.  Compress the index

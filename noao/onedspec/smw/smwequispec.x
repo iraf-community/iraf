@@ -54,7 +54,10 @@ begin
 	call smw_open (smw, NULL, im)
 	do i = 1, SMW_NSPEC(smw) {
 	    call smw_mw (smw, i, 1, mw, j, k)
-	    call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
+	    if (j < 1000)
+		call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
+	    else
+		call sprintf (Memc[key], SZ_FNAME, "AP%d")
 		call pargi (j)
 	    call imgstr (im, Memc[key], Memc[val], SZ_LINE)
 	    k = 1

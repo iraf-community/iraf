@@ -11,7 +11,6 @@ string	section="all"		{prompt="section for which help is desired"}
 string	option="help"		{prompt="type of help desired"}
 int	lmargin=1		{min=1, prompt="left margin"}
 int	rmargin=72		{min=2, prompt="right margin"}
-string	device="terminal"	{prompt="output device"}
 string	helpdb="helpdb"		{prompt="help database to be used"}
 
 begin
@@ -31,7 +30,7 @@ begin
 	    option = option,
 	    lmargin = lmargin,
 	    rmargin = rmargin,
-	    device = device,
+	    device = "terminal",
 	    helpdb = helpdb)
 
 	# Page saved text output.

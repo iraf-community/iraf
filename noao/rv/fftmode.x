@@ -401,6 +401,7 @@ real	tmp
 begin
 	call smark (sp)
 	call salloc (buf, 2*npts, TY_REAL)
+	call aclrr (Memr[buf], 2*npts)
 
 	npts2 = 2 * npts 			# initializations
 	if (RVP_LOG_SCALE(rv) == YES)
@@ -434,7 +435,7 @@ real	y2				#I Current Y2 of window
 
 pointer	sp, filt
 real	startp, endp
-int	rv_chk_filter()
+int	rv_chk_filter(), fft_pow2()
 
 begin
 	if (gp == NULL || RVP_OVERLAY(rv) == NO)
@@ -446,27 +447,40 @@ begin
 	if (RV_WHERE(rv) == BOTTOM && rv_chk_filter(rv,REFER_SPECTRUM) != OK)
 	    return
 
+	fnpts = max (fft_pow2 (RV_NPTS(rv)), fft_pow2 (RV_RNPTS(rv)) ) / 2
+
 	# Allocate working space.
 	call smark (sp)			
-	call salloc (filt, fnpts, TY_REAL)
+	call salloc (filt, 2*fnpts, TY_REAL)
 
 	# Get the filter to be plotted.
 	y2 = y2 - (0.075 * y2)
-	call fft_gfilter (rv, Memr[filt], fnpts, y2)
+	call fft_gfilter (rv, Memr[filt], 2*fnpts, y2)
 
 	# Compute the endpoint.
 	if (RV_WHERE(rv) == BOTTOM) {
 	    startp = 1.
-	    endp = real(fnpts) / RVP_FFT_ZOOM(rv) / 2.
+	    endp = real(fnpts) / RVP_FFT_ZOOM(rv)
 	} else {
 	    startp = 0.
 	    endp = (real(fnpts) / RVP_FFT_ZOOM(rv)) / (2. * real(fnpts))
 	}
+	fnpts = fnpts * 2
 
 	# Now plot the filter function.
 	call gseti (gp, G_PLCOLOR, C_RED)
 	call gvline (gp, Memr[filt], int(fnpts/RVP_FFT_ZOOM(rv)), startp, endp)
 	call gseti (gp, G_PLCOLOR, C_FOREGROUND)
+
+        if (DEBUG(rv)) {
+            call d_printf (DBG_FD(rv),"flt_overlay:\tstart=%g end=%g\n")
+		call pargr (startp) ; call pargr (endp)
+            call d_printf (DBG_FD(rv),"\t\tnew=%d np=%d rnp=%d fnp=%d\n")
+		call pargi (fnpts) ;call pargi (RV_NPTS(rv))
+		call pargi (RV_RNPTS(rv)) ; call pargi (RV_FFTNPTS(rv)) 
+	    call flush (DBG_FD(rv))
+	}
+
 
 	call sfree (sp)
 end
@@ -520,7 +534,7 @@ begin
 	    }
 
 	    # Draw the plot to the screen
-	    fnpts = fnpts / 2
+	    fnpts = max (RV_FFTNPTS(rv), fnpts) / 2
 	    call gascale (gp, Memr[rfft], int(fnpts/RVP_FFT_ZOOM(rv)), 2)
 	    call ggwind (gp, x1, x2, y1, y2)
 
@@ -696,7 +710,7 @@ begin
 	    }
 
             # Draw the plot to the screen
-            fnpts = fnpts / 2
+            fnpts = max (RV_FFTNPTS(rv), fnpts) / 2
             call gascale (gp, Memr[rfft], int(fnpts/RVP_FFT_ZOOM(rv)), 2)
             call ggwind (gp, x1, x2, y1, y2)
 

@@ -1,0 +1,19 @@
+# Make the SPECFOCUS task.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+standalone:
+	$update	libpkg.a
+	$omake	x_specfocus.x
+	$link	x_specfocus.o libpkg.a -lxtools -lcurfit -liminterp\
+	    -o xx_specfocus.e
+	;
+
+libpkg.a:
+	spfgraph.x	specfocus.h <gset.h> <mach.h>
+	t_specfocus.x	specfocus.h <error.h> <imhdr.h> <mach.h> <math.h>\
+			<math/curfit.h> <math/iminterp.h>
+	;

@@ -2,7 +2,7 @@
 # specified.
 
 define	FIRST_FD	10		# first open file descriptor
-define	LAST_FD		256		# number of file descriptors
+define	LAST_FD		4096		# number of file descriptors
 define	PSIOCTRL	9		# the last pseudofile (see etc$prpsio.x)
 define	FBUF_ALLOC	vmalloc		# call to allocate file buffer
 define	LEN_DEVTBL	150		# FIO device table (7 cells/device)
@@ -19,7 +19,7 @@ define	SZ_STKHDR	(4*SZ_POINTER)	# size of stack segment header
 define	SZ_VMEMALIGN	SZ_VMPAGE	# alignment criterium for vmalloc
 define	VMEM_BASE	0		# fwa to align with, vmalloc
 define	SZ_WORKSET	100000		# tasks normal working set size
-define	LEN_JUMPBUF	64		# buffer for ZSVJMP
+define	LEN_JUMPBUF	(2*(84+1))	# buffer for ZSVJMP
 define	JUMPCOM		zjucom		# IRAF Main ZDOJMP common
 
 define	MAX_ONEXIT	10		# max onexit procedures

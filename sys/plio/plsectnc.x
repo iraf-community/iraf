@@ -21,8 +21,8 @@ int	ll_src, lval, i
 long	v[PL_MAXDIM], vs[PL_MAXDIM], ve[PL_MAXDIM], vn[PL_MAXDIM]
 
 bool	pll_const()
-int	pl_access(), plloop()
-errchk	plvalid, plsslv, pl_access
+int	pl_reference(), plloop()
+errchk	plvalid, plsslv, pl_reference
 
 begin
 	call plvalid (pl_src)
@@ -48,7 +48,7 @@ begin
 	# Test each line segment in the section.
 	repeat {
 	    # Determine if line segment is complex, or is all set to lval.
-	    ll_src = pl_access (pl_src, v)
+	    ll_src = pl_reference (pl_src, v)
 	    if (ll_src == PL_EMPTYLINE)
 		lval = 0
 	    else {

@@ -1,5 +1,17 @@
 .help revisions Jun88 noao.imred.kpnoslit
 .nf
+
+=====
+V2.12
+=====
+
+imred$kpnoslit/standard.par
+    Added blackbody query parameters.  (5/2/02, Valdes)
+
+========
+V2.11.3b
+========
+
 imred$kpnoslit/demos/mkdoslit.cl
     Made the ARTDATA package parameters explicit (4/15/97, Valdes)
 

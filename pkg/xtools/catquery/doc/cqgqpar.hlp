@@ -1,0 +1,72 @@
+.help cqgqpar Mar00 "Catquery Package"
+.ih
+NAME
+cqgqpar -- get a query parameter description by name
+.ih
+SYNOPSIS
+
+parno = cq_gqpar (cq, pname, qpname, max_qpname, qpvalue, max_qpvalue, qpunits,
+		  max_qpunits, qpformat, max_qpformat)
+
+.nf
+pointer	cq		# the configuration file descriptor
+char	pname		# the name of the requested query parameter 
+char	qpname		# the returned query parameter name
+int	max_qpname	# the maximum size of the returned parameter name
+char	qpvalue		# the returned query parameter value
+int	max_qpvalue	# the maximum size of the returned parameter value
+char	qpunits		# the returned query parameter units
+int	max_qpunits	# the maximum size of the returned parameter units
+char	qpformat	# the returned query parameter format
+int	max_qpformat	# the maximum size of the returned parameter format
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ls pname
+The name of the requested query parameter.
+.le
+.ls qpname
+The returned query parameter name.
+.le
+.ls max_qpname
+The maximum size of the returned query parameter name.
+.le
+.ls qpvalue
+The returned query parameter value.
+.le
+.ls max_qpvalue
+The maximum size of the returned query parameter value.
+.le
+.ls qpunits
+The returned query parameter units.
+.le
+.ls max_qpunits
+The maximum size of the returned query parameter units.
+.le
+.ls qpformat
+The returned query parameter format.
+.le
+.ls max_qpformat
+The maximum size of the returned query parameter format.
+.le
+.ih
+DESCRIPTION
+Cq_gqpar returns the name, value, units, and format of the requested query
+parameter. Cq_gpar is an integer function  which returns the sequence number
+of the query parameter as its function value. Zero is returned if the requested
+query parameter is not found.
+.ih
+NOTES
+Cq_setcat or cq_setcatn must be called before a query parameter 
+request can be made.
+
+The defined constants CQ_SZ_QPNAME, CQ_SZ_QPVALUE, CQ_SZ_QPUNITS, and
+CQ_SZ_QPFMTS in the cq.h file can be used to assign values to the
+max_qpname, max_qpvalue, max_qpunits, and max_qpformat paramters.
+.ih
+SEE ALSO
+cqnqpars, cqgqparn, cqsqpar, cqsqparn
+.endhelp

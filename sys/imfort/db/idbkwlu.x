@@ -35,8 +35,10 @@ begin
 	if (key[ip] == 'n')
 	    if (strncmp (key[ip], "naxis", 5) == 0) {
 		ch = key[ip+5]
-		if (ch == EOS || IS_DIGIT(ch))
+		if (ch == EOS || IS_DIGIT(ch)) {
+		    call sfree (sp)
 		    return (I_NAXIS)
+		}
 	    }
 
 	# Look up keyword in dictionary.  Abbreviations are not permitted.

@@ -19,16 +19,20 @@ real    tx, ty                  #I x, y offsets.
 real	z1, z2			#I min and maximum grey scale values.
 int	ztr			#I greyscale transformation code.
 
-pointer	sp, textbuf, dir, fname, ftemp, device
+pointer	sp, old_wcs, mapping, wcstext, dir, fname, ftemp, device
 int	wcsfile, server, chan[MAXCHAN]
 int	fstati(), imstati(), envfind(), open(), strncmp()
 
+include "iis.com"
+
 begin
 	call smark (sp)
-	call salloc (textbuf, SZ_WCSTEXT, TY_CHAR)
+	call salloc (old_wcs, SZ_WCSTEXT, TY_CHAR)
+	call salloc (mapping, SZ_WCSTEXT, TY_CHAR)
+	call salloc (wcstext, SZ_WCSTEXT, TY_CHAR)
 
         # Format the WCS text.
-        call sprintf (Memc[textbuf], SZ_WCSTEXT,
+        call sprintf (Memc[old_wcs], SZ_WCSTEXT,
             "%s - %s\n%g %g %g %g %g %g %g %g %d\n")
             call pargstr (str1)
             call pargstr (str2)
@@ -42,6 +46,29 @@ begin
             call pargr (z2)
             call pargi (ztr)
 
+        # Add the mapping information if it's valid and we have a capable
+	# server.
+	if (iis_version > 0 && iis_valid == YES) {
+	    call sprintf (Memc[mapping], SZ_WCSTEXT,
+	        "%s %g %g %d %d %d %d %d %d\n%s\n")
+		call pargstr (iis_region)
+		call pargr (iis_sx)
+		call pargr (iis_sy)
+		call pargi (iis_snx)
+		call pargi (iis_sny)
+		call pargi (iis_dx)
+		call pargi (iis_dy)
+		call pargi (iis_dnx)
+		call pargi (iis_dny)
+		call pargstr (iis_objref)
+
+	    call sprintf (Memc[wcstext], SZ_WCSTEXT, "%s%s")
+		call pargstr (Memc[old_wcs])
+		call pargstr (Memc[mapping])
+        } else
+            call strcpy (Memc[old_wcs], Memc[wcstext], SZ_OLD_WCSTEXT)
+
+
         # If we are writing to a display server (device has the logical
         # cursor capability), output the WCS text via the datastream,
         # else use a text file.  The datastream set-WCS is also used to
@@ -52,7 +79,10 @@ begin
 	if (server == YES) {
             chan[1] = fstati (imstati (ds, IM_PIXFD), F_CHANNEL)
 	    chan[2] = MONO
-	    call imd_setwcs (chan, Memc[textbuf])
+	    call imd_setwcs (chan, Memc[wcstext])
+
+	    # Invalidate the mapping once it's been sent.
+	    iis_valid = NO
 
         } else {
 	    # Construct the WCS filename, "dir$device_frame.wcs".
@@ -96,7 +126,7 @@ begin
                     ;
 
                 # Output the file version.
-                call putline (wcsfile, Memc[textbuf])
+                call putline (wcsfile, Memc[wcstext])
                 call close (wcsfile)
 
                 # Install the new file.

@@ -26,7 +26,7 @@ begin
 	if (! IS_INDEFR (apstatr (py, XCENTER)) && ! IS_INDEFR (apstatr (py,
 	    YCENTER)) && ! IS_INDEFR (apstatr (py, PYCX)) &&
 	    ! IS_INDEFR (apstatr (py, PYCY)))
-	    call ap_yshift (py, x, y, nver, apstatr (py, XCENTER),
+	    call ap_yshift (py, im, x, y, nver, apstatr (py, XCENTER),
 	        apstatr (py, YCENTER))
 
 	return (cier)
@@ -36,9 +36,10 @@ end
 # AP_YRECENTER -- Recenter the polygon using the existing buffer of pixels
 # and the centering package routines.
 
-int procedure ap_yrecenter (py, x, y, nver, cier)
+int procedure ap_yrecenter (py, im, x, y, nver, cier)
 
 pointer	py		# pointer to polyphot structure
+pointer	im		# the input image descriptor
 real	x[ARB]		# x coordinates of the polygon
 real	y[ARB]		# y coordinates of the polygon
 int	nver		# number of vertices
@@ -48,11 +49,11 @@ int	aprefitcenter()
 real	apstatr()
 
 begin
-	cier = aprefitcenter (py, cier)
+	cier = aprefitcenter (py, im, cier)
 	if (! IS_INDEFR (apstatr (py, XCENTER)) && ! IS_INDEFR (apstatr (py,
 	    YCENTER)) && ! IS_INDEFR (apstatr (py, PYCX)) && !
 	    IS_INDEFR (apstatr (py, PYCY)))
-	    call ap_yshift (py, x, y, nver, apstatr (py, XCENTER),
+	    call ap_yshift (py, im, x, y, nver, apstatr (py, XCENTER),
 	        apstatr (py, YCENTER))
 	return (cier)
 end

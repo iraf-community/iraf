@@ -114,7 +114,11 @@ XINT	*chan;			/* file number (output)		*/
 	    fd = ERR;
 	}
 
-	if ((*chan = fd) == ERR) {
+	/* Don't set *chan until we have successfully finished opening the
+	 * file, otherwise any error occuring during the open will try to
+	 * close the partially opened file.
+	 */
+	if (fd == ERR) {
 	    *chan = XERR;
 	} else if (fd >= MAXOFILES) {
 	    close (fd);
@@ -122,11 +126,14 @@ XINT	*chan;			/* file number (output)		*/
 		unlink ((char *)osfn);
 	    *chan = XERR;
 	} else {
-	    zfd[fd].fp     = NULL;
-	    zfd[fd].fpos   = 0L;
+	    zfd[fd].fp = NULL;
+	    zfd[fd].fpos = 0L;
 	    zfd[fd].nbytes = 0;
-	    zfd[fd].flags  = (filstat.st_mode & S_IFCHR) ? KF_NOSEEK : 0;
+	    zfd[fd].flags = (filstat.st_mode & S_IFCHR) ? KF_NOSEEK : 0;
 	    zfd[fd].filesize = filstat.st_size;
+	    if (!vm_access ((char *)osfn, *mode))
+		zfd[fd].flags |= KF_DIRECTIO;
+	    *chan = fd;
 	}
 }
 
@@ -162,26 +169,38 @@ XINT	*maxbytes;		/* max bytes to read			*/
 XLONG	*offset;		/* 1-indexed file offset to read at	*/
 {
 	register struct	fiodes *kfp;
-	register int	fd;
-	register long block_offset;
-	off_t	lseek();
+	register int fd;
+	off_t fileoffset;
+	int aligned;
+	off_t lseek();
 
 	fd = *chan;
 	kfp = &zfd[fd];
-	block_offset = *offset - 1L;
+	fileoffset = *offset - 1L;
 
 	/* If reading from a device on which seeks are illegal, offset should
 	 * be zero (as when called by ZARDCL).  Otherwise, we must seek to
 	 * the desired position.
 	 */
-	if (*offset > 0 && kfp->fpos != block_offset)
-	    if ((kfp->fpos = lseek(fd,block_offset,0)) == ERR) {
+	if (*offset > 0 && kfp->fpos != fileoffset)
+	    if ((kfp->fpos = lseek(fd,fileoffset,0)) == ERR) {
 		kfp->nbytes = ERR;
 		return;
 	    }
 
+	/* Disable direct i/o if transfers are not block aligned. */
+	aligned = (!(fileoffset % SZ_DISKBLOCK) && !(*maxbytes % SZ_DISKBLOCK));
+	if ((kfp->flags & KF_DIRECTIO) && !aligned)
+	    kfp->flags &= ~KF_DIRECTIO;
+
+	if (kfp->flags & KF_DIRECTIO)
+	    vm_directio (fd, 1);
+
 	if ((kfp->nbytes = read (fd, (char *)buf, *maxbytes)) > 0)
 	    kfp->fpos += kfp->nbytes;
+
+	if (kfp->flags & KF_DIRECTIO && aligned)
+	    vm_directio (fd, 0);
 }
 
 
@@ -197,25 +216,43 @@ XLONG	*offset;		/* 1-indexed file offset	*/
 {
 	register int fd;
 	register struct	fiodes *kfp;
-	register long block_offset;
-	off_t	lseek();
+	off_t fileoffset;
+	off_t lseek();
+	int aligned;
 
 	fd = *chan;
 	kfp = &zfd[fd];
-	block_offset = *offset - 1L;
+	fileoffset = *offset - 1L;
 
 	/* If writing to a device on which seeks are illegal, offset should
 	 * be zero (as when called by ZAWRCL).  Otherwise, we must seek to
 	 * the desired position.
 	 */
-	if (*offset > 0 && kfp->fpos != block_offset)
-	    if ((kfp->fpos = lseek(fd,block_offset,0)) == ERR) {
+	if (*offset > 0 && kfp->fpos != fileoffset)
+	    if ((kfp->fpos = lseek(fd,fileoffset,0)) == ERR) {
 		kfp->nbytes = ERR;
 		return;
 	    }
 
+	/* Disable direct i/o if transfers are not block aligned. */
+	aligned = (!(fileoffset % SZ_DISKBLOCK) && !(*nbytes % SZ_DISKBLOCK));
+	if ((kfp->flags & KF_DIRECTIO) && !aligned)
+	    kfp->flags &= ~KF_DIRECTIO;
+
+	if (kfp->flags & KF_DIRECTIO) {
+	    vm_directio (fd, 1);
+	} else if (vm_largefile(offset) || vm_largefile(*nbytes)) {
+	    /* Reserve VM space if writing at EOF. */
+	    struct stat st;
+	    if (!fstat(fd,&st) && fileoffset >= st.st_size)
+		vm_reservespace (fileoffset + *nbytes - st.st_size);
+	}
+
 	if ((kfp->nbytes = write (fd, (char *)buf, *nbytes)) > 0)
 	    kfp->fpos += kfp->nbytes;
+
+	if (kfp->flags & KF_DIRECTIO)
+	    vm_directio (fd, 0);
 
 	/* Invalidate cached file size, forcing a UNIX system call to determine
 	 * the file size the next time ZSTTBF is called.
@@ -310,4 +347,519 @@ _u_fmode (mode)
 int	mode;
 {
 	return (mode);
+}
+
+
+/*
+ * VMcache client interface
+ * 
+ *	      vm_access (fname, mode)
+ *	vm_reservespace (nbytes)
+ *	    vm_directio (fd, flag)
+ *
+ * This small interface implements a subset of the client commands provided
+ * by the VMcache daemon (virtual memory cache controller).  The client
+ * interface handles connection to the VMcache daemon (if any) transparently
+ * within the interface.
+ */
+#include <signal.h>
+
+#ifdef LINUX
+#define USE_SIGACTION
+#endif
+
+#define	DEF_ACCESSVAL	1
+#define	ENV_VMPORT	"VMPORT"
+#define	ENV_VMCLIENT	"VMCLIENT"
+#define	DEF_VMTHRESH	(1024*1024*8)
+#define	DEF_DIOTHRESH	(1024*1024*8)
+#define	DEF_VMPORT	8677
+#define	SZ_CMDBUF	2048
+#define	SZ_CNAME	32
+
+static int vm_debug = 0;
+static int vm_dioenabled = 0;
+static int vm_enabled = 1;
+static int vm_initialized = 0;
+static int vm_server = 0;
+static int vm_threshold = DEF_VMTHRESH;
+static int dio_threshold = DEF_DIOTHRESH;
+static int vm_port = DEF_VMPORT;
+static char vm_client[SZ_CNAME+1];
+
+extern char *getenv();
+extern char *realpath();
+static void vm_initialize();
+static void vm_shutdown();
+static void vm_identify();
+static int vm_write();
+static int vm_connect();
+static int getstr();
+
+
+/* VM_ACCESS -- Access a file via the VM subsystem.  A return value of 1
+ * indicates that the file is (or will be) "cached" in virtual memory, i.e.,
+ * that normal virtual memory file system (normal file i/o) should be used
+ * to access the file.  A return value of 0 indicates that direct i/o should
+ * be used to access the file, bypassing the virtual memory file system.
+ */
+vm_access (fname, mode)
+char *fname;
+int mode;
+{
+	struct stat st;
+	char *modestr, buf[SZ_COMMAND];
+	char pathname[SZ_PATHNAME];
+	int status;
+
+	/* One-time process initialization. */
+	if (!vm_initialized)
+	    vm_initialize();
+
+	if (stat (fname, &st) < 0) {
+	    status = DEF_ACCESSVAL;
+	    goto done;
+	}
+
+	/* If directio is enabled and the file exceeds the directio threshold
+	 * use directio to access the file (access=0).  If vmcache is
+	 * disabled use normal VM-based i/o to access the file (access=1).
+	 * If VMcache is enabled we still only use it if the file size
+	 * exceeds vm_threshold.
+	 */
+	if (vm_dioenabled) {
+	    status = (st.st_size >= dio_threshold) ? 0 : 1;
+	    goto done;
+	} else if (!vm_enabled || st.st_size < vm_threshold) {
+	    status = DEF_ACCESSVAL;
+	    goto done;
+	}
+
+	/* Use of VMcache is enabled and the file equals or exceeds the 
+	 * minimum size threshold.  Initialization has already been performed.
+	 * Open a VMcache daemon server connection if we don't already have
+	 * one.  If the server connection fails we are done, but we will try
+	 * to open a connection again in the next file access.
+	 */
+	if (!vm_server)
+	    if (vm_connect() < 0) {
+		status = DEF_ACCESSVAL;
+		goto done;
+	    }
+
+	/* Compute the mode string for the server request. */
+	switch (mode) {
+	case READ_ONLY:
+	    modestr = "ro";
+	    break;
+	case NEW_FILE:
+	case READ_WRITE:
+	case APPEND:
+	    modestr = "rw";
+	    break;
+	}
+
+	/* Format and send the file access directive to the VMcache daemon.
+	 * The status from the server is returned as an ascii integer value
+	 * on the same socket.
+	 */
+	sprintf (buf, "access %s %s\n", realpath(fname,pathname), modestr);
+	if (vm_write (vm_server, buf, strlen(buf)) < 0) {
+	    vm_shutdown();
+	    status = DEF_ACCESSVAL;
+	    goto done;
+	}
+	if (read (vm_server, buf, SZ_CMDBUF) <= 0) {
+	    if (vm_debug)
+		fprintf (stderr,
+		    "vmclient (%s): server not responding\n", vm_client);
+	    vm_shutdown();
+	    status = DEF_ACCESSVAL;
+	    goto done;
+	}
+
+	status = atoi (buf);
+done:
+	if (vm_debug)
+	    fprintf (stderr, "vmclient (%s): access `%s' -> %d\n",
+		vm_client, fname, status);
+
+	return (status < 0 ? DEF_ACCESSVAL : status);
+}
+
+
+/* VM_DELETE -- Delete any VM space used by a file, e.g., because the file
+ * is being physically deleted.  This should be called before the file is
+ * actually deleted so that the cache can determine its device and inode
+ * values.
+ */
+vm_delete (fname, force)
+char *fname;
+int force;
+{
+	struct stat st;
+	char buf[SZ_COMMAND];
+	char pathname[SZ_PATHNAME];
+	int status = 0;
+
+	/* One-time process initialization. */
+	if (!vm_initialized)
+	    vm_initialize();
+
+	if (stat (fname, &st) < 0) {
+	    status = -1;
+	    goto done;
+	}
+
+	/* If VMcache is not being used we are done. */
+	if (vm_dioenabled && (st.st_size >= dio_threshold))
+	    goto done;
+	else if (!vm_enabled || st.st_size < vm_threshold)
+	    goto done;
+
+	/* Don't delete the VM space used by the file if it has hard links
+	 * and only a link is being deleted (force flag will override).
+	 */
+	if (st.st_nlink > 1 && !force)
+	    goto done;
+
+	/* Connect to the VMcache server if not already connected. */
+	if (!vm_server)
+	    if (vm_connect() < 0) {
+		status = -1;
+		goto done;
+	    }
+
+	/* Format and send the delete directive to the VMcache daemon.
+	 * The status from the server is returned as an ascii integer value
+	 * on the same socket.
+	 */
+	sprintf (buf, "delete %s\n", realpath(fname,pathname));
+	if (vm_write (vm_server, buf, strlen(buf)) < 0) {
+	    vm_shutdown();
+	    status = -1;
+	    goto done;
+	}
+	if (read (vm_server, buf, SZ_CMDBUF) <= 0) {
+	    if (vm_debug)
+		fprintf (stderr,
+		    "vmclient (%s): server not responding\n", vm_client);
+	    vm_shutdown();
+	    status = -1;
+	    goto done;
+	}
+
+	status = atoi (buf);
+done:
+	if (vm_debug)
+	    fprintf (stderr, "vmclient (%s): delete `%s' -> %d\n",
+		vm_client, fname, status);
+
+	return (status < 0 ? -1 : status);
+}
+
+
+/* VM_RESERVESPACE -- Reserve VM space for file data.  This directive is
+ * useful if VM is being used but the VM space could not be preallocated
+ * at file access time, e.g., when opening a new file.
+ */
+vm_reservespace (nbytes)
+long nbytes;
+{
+	char buf[SZ_CMDBUF];
+	int status;
+
+	if (!vm_initialized)
+	    vm_initialize();
+	if (!vm_enabled || vm_dioenabled)
+	    return (-1);
+	if (vm_connect() < 0)
+	    return (-1);
+
+	/* Format and send the file access directive to the VMcache daemon.
+	 * The status from the server is returned as an ascii integer value
+	 * on the same socket.
+	 */
+	sprintf (buf, "reservespace %d\n", nbytes);
+	if (vm_debug)
+	    fprintf (stderr, "vmclient (%s): %s", vm_client, buf);
+
+	if (vm_write (vm_server, buf, strlen(buf)) < 0) {
+	    vm_shutdown();
+	    return (-1);
+	}
+	if (read (vm_server, buf, SZ_CMDBUF) <= 0) {
+	    if (vm_debug)
+		fprintf (stderr,
+		    "vmclient (%s): server not responding\n", vm_client);
+	    vm_shutdown();
+	    return (-1);
+	}
+
+	status = atoi (buf);
+	return (status);
+}
+
+
+/* VM_IDENTIFY -- Identify the current process to the VM cache server when
+ * opening a new client connection.
+ */
+static void
+vm_identify()
+{
+	char buf[SZ_CMDBUF];
+	int status;
+
+	if (vm_write (vm_server, vm_client, strlen(vm_client)) < 0)
+	    vm_shutdown();
+
+	if (read (vm_server, buf, SZ_CMDBUF) <= 0) {
+	    if (vm_debug)
+		fprintf (stderr,
+		    "vmclient (%s): server not responding\n", vm_client);
+	    vm_shutdown();
+	}
+}
+
+
+/* VM_LARGEFILE -- Test if the given offset or file size exceeds the VMcache
+ * threshold.  Zero (false) is returned if the offset is below the threshold
+ * or if VMcache is disabled.
+ */
+vm_largefile (nbytes)
+long nbytes;
+{
+	return (vm_enabled && nbytes >= vm_threshold);
+}
+
+
+/* VM_DIRECTIO -- Turn direct i/o on or off for a file.  Direct i/o is raw
+ * i/o from the device to process memory, bypassing system virtual memory.
+ */
+vm_directio (fd, flag)
+int fd;
+int flag;
+{
+#ifdef SOLARIS
+	/* Currently direct i/o is implemented only for Solaris. */
+	if (vm_debug > 1)
+	    fprintf (stderr, "vmclient (%s): directio=%d\n", vm_client, flag);
+	return (directio (fd, flag));
+#else
+	return (-1);
+#endif
+}
+
+
+/* VM_INITIALIZE -- Called once per process to open a connection to the
+ * vmcache daemon.  The connection is kept open and is used for all
+ * subsequent vmcache requests by the process.
+ */
+static void
+vm_initialize()
+{
+	register int ch;
+	register char *ip, *op;
+	XINT acmode = READ_WRITE;
+	char token[SZ_FNAME], value[SZ_FNAME];
+	extern char os_process_name[];
+	char *argp, buf[SZ_FNAME];
+	int fd;
+
+	/* Extract the process name minus the file path. */
+	for (ip=os_process_name, op=vm_client;  *op++ = ch = *ip;  ip++)
+	    if (ch == '/')
+		op = vm_client;
+
+	/* Get the server socket port if set in the user environment. */
+	if (argp = getenv (ENV_VMPORT))
+	    vm_port = atoi (argp);
+
+	/* Get the VM client parameters if an initialization string is
+	 * defined in the user environment.
+	 */
+	if (argp = getenv (ENV_VMCLIENT)) {
+	    while (getstr (&argp, buf, SZ_FNAME, ',') > 0) {
+		char *modchar, *cp = buf;
+		int haveval;
+
+		/* Parse "token[=value]" */
+		if (getstr (&cp, token, SZ_FNAME, '=') <= 0)
+		    continue;
+		haveval = (getstr (&cp, value, SZ_FNAME, ',') > 0);
+
+		if (strcmp (token, "enable") == 0) {
+		    vm_enabled = 1;
+		} else if (strcmp (token, "disable") == 0) {
+		    vm_enabled = 0;
+
+		} else if (strcmp (token, "debug") == 0) {
+		    vm_debug = 1;
+		    if (haveval)
+			vm_debug = strtol (value, &modchar, 10);
+
+		} else if (strcmp (token, "threshold") == 0 && haveval) {
+		    vm_threshold = strtol (value, &modchar, 10);
+		    if (*modchar == 'k' || *modchar == 'K')
+			vm_threshold *= 1024;
+		    else if (*modchar == 'm' || *modchar == 'M')
+			vm_threshold *= (1024 * 1024);
+
+		} else if (strcmp (token, "directio") == 0) {
+		    vm_dioenabled = 1;
+		    if (haveval) {
+			dio_threshold = strtol (value, &modchar, 10);
+			if (*modchar == 'k' || *modchar == 'K')
+			    dio_threshold *= 1024;
+			else if (*modchar == 'm' || *modchar == 'M')
+			    dio_threshold *= (1024 * 1024);
+		    }
+		}
+	    }
+	}
+
+	if (vm_debug) {
+	    fprintf (stderr, "vmclient (%s): vm=%d dio=%d ",
+		vm_client, vm_enabled, vm_dioenabled);
+	    fprintf (stderr, "vmth=%d dioth=%d port=%d\n",
+		vm_threshold, dio_threshold, vm_port);
+	}
+
+	/* Attempt to open a connection to the VMcache server.  */
+	if (vm_enabled && !vm_dioenabled)
+	    vm_connect();
+
+#ifdef SUNOS
+	on_exit (vm_shutdown, NULL);
+#else
+	atexit (vm_shutdown);
+#endif
+	vm_initialized++;
+}
+
+
+/* VM_CONNECT -- Connect to the VMcache server.
+ */
+static int
+vm_connect()
+{
+	XINT acmode = READ_WRITE;
+	char osfn[SZ_FNAME];
+	int fd, status = 0;
+
+	/* Already connected? */
+	if (vm_server)
+	    return (0);
+
+	sprintf (osfn, "inet:%d::", vm_port);
+	if (vm_debug)
+	    fprintf (stderr,
+		"vmclient (%s): open server connection `%s' -> ",
+		vm_client, osfn);
+
+	ZOPNND (osfn, &acmode, &fd);
+	if (fd == XERR) {
+	    if (vm_debug)
+		fprintf (stderr, "failed\n");
+	    status = -1;
+	} else {
+	    vm_server = fd;
+	    if (vm_debug)
+		fprintf (stderr, "fd=%d\n", fd);
+	    vm_identify();
+	}
+
+	return (status);
+}
+
+
+/* VM_SHUTDOWN -- Called at process exit to shutdown the VMcached server
+ * connection.
+ */
+static void
+vm_shutdown()
+{
+	int status;
+
+	if (vm_server) {
+	    if (vm_debug)
+		fprintf (stderr,
+		    "vmclient (%s): shutdown server connection\n", vm_client);
+	    vm_write (vm_server, "bye\n", 4);
+	    ZCLSND (&vm_server, &status);
+	}
+	vm_server = 0;
+}
+
+
+/* VM_WRITE -- Write to the server.  We need to encapsulate write so that
+ * SIGPIPE can be disabled for the duration of the write.  We don't want the
+ * calling process to abort if the VMcache server goes away.
+ */
+static int
+vm_write (fd, buf, nbytes)
+int fd;
+char *buf;
+int nbytes;
+{
+	int status;
+#ifdef USE_SIGACTION
+	struct sigaction oldact;
+#else
+	SIGFUNC oldact;
+#endif
+
+	if (vm_debug > 1) {
+	    fprintf (stderr, "vmclient (%s):: %s", vm_client, buf);
+	    if (buf[nbytes-1] != '\n')
+		fprintf (stderr, "\n");
+	}
+
+#ifdef USE_SIGACTION
+        sigaction (SIGPIPE, NULL, &oldact);
+	status = write (fd, buf, nbytes);
+        sigaction (SIGPIPE, &oldact, NULL);
+#else
+	oldact = (SIGFUNC) signal (SIGPIPE, SIG_IGN);
+	status = write (fd, buf, nbytes);
+        signal (SIGPIPE, oldact);
+#endif
+
+	if (vm_debug && status < 0)
+	    fprintf (stderr,
+		"vmclient (%s): server not responding\n", vm_client);
+
+	return (status);
+}
+
+
+/* GETSTR -- Internal routine to extract a metacharacter delimited substring
+ * from a formatted string.  The metacharacter to be taken as the delimiter
+ * is passed as an argument.  Any embedded whitespace between the tokens is
+ * stripped.  The number of characters in the output token is returned as 
+ * the function value, or zero if EOS or the delimiter is reached.
+ */
+static int
+getstr (ipp, obuf, maxch, delim)
+char **ipp;
+char *obuf;
+int maxch, delim;
+{
+	register char *op, *ip = *ipp;
+	register char *otop = obuf + maxch;
+
+	while (*ip && isspace(*ip))
+	    ip++;
+	for (op=obuf;  *ip;  ip++) {
+	    if (*ip == delim) {
+		ip++;
+		break;
+	    } else if (op < otop && !isspace(*ip))
+		*op++ = *ip;
+	}
+
+	*op = '\0';
+	*ipp = ip;
+
+	return (op - obuf);
 }

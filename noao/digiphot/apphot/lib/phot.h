@@ -18,11 +18,13 @@ define	MAGS		304
 define	MAGERRS		305
 define	PXCUR		306
 define	PYCUR		307
-define	AREAS		308
-define	SUMS		309
-define	PWEIGHTS	310
-define	PWSTRING	311
-define	APSTRING	312
+define	OPXCUR		308
+define	OPYCUR		309
+define	AREAS		310
+define	SUMS		311
+define	PWEIGHTS	312
+define	PWSTRING	313
+define	APSTRING	314
 
 # define the phot keywords
 

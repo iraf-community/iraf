@@ -20,23 +20,26 @@ begin
 	call fprintf (fd, "\n# %s\n")
 	    call pargstr (Memc[str])
 
-	# The title may contain new lines so we have to put comments
-	# in front of each line.
-	call gt_gets (IC_GT(ic), GTTITLE, Memc[str], SZ_LINE)
-	call putline (fd, "# ")
-	for (ptr=str; Memc[ptr]!=EOS; ptr=ptr+1) {
-	    call putc (fd, Memc[ptr])
-	    if (Memc[ptr] == '\n') {
-		call putline (fd, "# ")
+	if (IC_GT(ic) != NULL) {
+	    # The title may contain new lines so we have to put comments
+	    # in front of each line.
+	    call gt_gets (IC_GT(ic), GTTITLE, Memc[str], SZ_LINE)
+	    call putline (fd, "# ")
+	    for (ptr=str; Memc[ptr]!=EOS; ptr=ptr+1) {
+		call putc (fd, Memc[ptr])
+		if (Memc[ptr] == '\n') {
+		    call putline (fd, "# ")
+		}
+	    }
+	    call putline (fd, "\n")
+
+	    call gt_gets (IC_GT(ic), GTYUNITS, Memc[str], SZ_LINE)
+	    if (Memc[str] != EOS) {
+		call fprintf (fd, "# fit units = %s\n")
+		    call pargstr (Memc[str])
 	    }
 	}
-	call putline (fd, "\n")
 
-	call gt_gets (IC_GT(ic), GTYUNITS, Memc[str], SZ_LINE)
-	if (Memc[str] != EOS) {
-	    call fprintf (fd, "# fit units = %s\n")
-	        call pargstr (Memc[str])
-	}
 	call ic_gstr (ic, "function", Memc[str], SZ_LINE)
 	call fprintf (fd, "# function = %s\n")
 	    call pargstr (Memc[str])

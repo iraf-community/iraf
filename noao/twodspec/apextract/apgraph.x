@@ -28,6 +28,8 @@ begin
 	call gvline (gp, imdata, npts, x1, x2)
 
 	call ap_gmark (gp, imvec, aps, naps)
+	if (naps == 1)
+	    call ap_gmarkb (gp, imvec, aps, naps)
 end
 
 

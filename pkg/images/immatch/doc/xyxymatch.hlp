@@ -400,6 +400,7 @@ and reference coordinate lists can be generated.
 	cl> daofind lpix fwhm=2.5 sigma=5.0 threshold=100.0
 
 	cl> xyxymatch lpix.coo.1 pix.coo.1 xymatch toler=3     \
+	    matching=triangles
 
 	cl> geomap xymatch geodb 1.0 512.0 1.0 512.0
 .fi

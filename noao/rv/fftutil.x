@@ -17,11 +17,10 @@ int	fnpts				#O No. pts in output array.
 
 pointer	sp, tp, cpr, cpi, fft
 int	i, last, ishift
-int	fft_pow2()
 real	xtmp, cx_abs()
 
 begin
-	fnpts = fft_pow2 (npts)			# Get FFT size
+	fnpts = RV_FFTNPTS (rv)			# Get FFT size
 
 	call smark (sp)
 	call salloc (tp, fnpts, TY_REAL)	# Allocate temp vector
@@ -42,7 +41,7 @@ begin
 	    call prep_spec (rv, RV_RSAMPLE(rv), npts, fnpts, RV_RNPTS(rv), 
 		tp, cpr, ishift, YES)
 	}
-	call afftrr (Memr[tp], Memr[cpi], Memr[cpr], Memr[cpi], fnpts)	
+	call afftrr (Memr[cpr], Memr[cpi], Memr[cpr], Memr[cpi], fnpts)	
 	if (RVP_WHEN(rv) == AFTER) {
 	    if (RV_WHERE(rv) == TOP) {
 		if (RV_FILTER(rv) == OBJ_ONLY || RV_FILTER(rv) == BOTH) {
@@ -90,11 +89,10 @@ int	fnpts				#O No. pts in output array.
 
 pointer	sp, tp, cpr, cpi, fft
 int	i, j, ishift
-int	fft_pow2()
 real	xtmp
 
 begin
-	fnpts = fft_pow2 (npts)			# Get FFT size
+	fnpts = RV_FFTNPTS (rv)			# Get FFT size
 
 	call smark (sp)
 	call salloc (tp, fnpts, TY_REAL)	# Allocate temp vector
@@ -115,7 +113,7 @@ begin
 	    call prep_spec (rv, RV_RSAMPLE(rv), npts, fnpts, RV_RNPTS(rv), 
 		tp, cpr, ishift, YES)
 	}
-	call afftrr (Memr[tp], Memr[cpi], Memr[cpr], Memr[cpi], fnpts)	
+	call afftrr (Memr[cpr], Memr[cpi], Memr[cpr], Memr[cpi], fnpts)	
 	if (RVP_WHEN(rv) == AFTER) {
 	    if (RV_WHERE(rv) == TOP) {
 		if (RV_FILTER(rv) == OBJ_ONLY || RV_FILTER(rv) == BOTH) {

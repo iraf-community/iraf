@@ -4572,3 +4572,3198 @@ pkg/images/imfilter/src/frmode.x
 
 ---------------------------------
 V2.11.3 patch frozen.  (12/03)
+
+---------------------------------
+From here on PC-IRAF revisions will be recorded here as well as those for
+the reference Sun port.  Both the Sun and PC-IRAF ports are equally reference
+systems now and it is long past time to start recording revisions formally
+for PC-IRAF.
+
+unix/hlib/install [pcix]
+	Fixed a typo in the install script.  (12/09)
+
+dev/tapecap.linux [pcix]
+dev/tapecap.freebsd [pcix]
+	The tapecap.linux file had a entry which referred to a
+	"generic-exabyte" entry, but this entry was named "generic-exb"
+	later in the file.  Changed the later reference to generic-exabyte".
+	Modified tapecap.freebsd to use the same name, although the entry
+	is not used in tapecap.freebsd.  (12/10)
+
+pkg/proto/t_bscale.x
+	Changed the type declarations for the functions imgnld/imgnlx
+	and impnld/impnlx from double/complex to int to fix a hangup
+	or floating point errors generated when bscale is run on double
+	or complex images. (12/11 LED)
+
+pkg/dataio/import/ipdb.gx
+pkg/dataio/import/bltins/ipgif.x
+	Fixed a string overflow bug causing segvios on PC system, also
+	commented out an unneeded evvfree() (12/13 MJF)
+
+noao/mkpkg
+	The entries for the HP archiectures (hp700 etc.) were missing the
+	-d $(DIRS) argument listing the noao directories to be processed
+	for an architecture change.  (12/14)
+
+dev/hosts
+	Added ssun machine zathras (12/14 MJF)
+
+pkg/images/immatch/src/fmcombine/icsetout.x
+	Fixed error with MWCS dimension mismatch when using offsets on
+	input images which have been dimensionally reduced.  (1/12, FV)
+
+pkg/images/immatch/src/imcombine/icgdata.gx
+pkg/images/immatch/src/imcombine/iclog.x
+pkg/images/immatch/src/imcombine/icmask.x
+pkg/images/immatch/src/imcombine/icombine.gx
+pkg/images/immatch/src/imcombine/icscale.x
+pkg/images/immatch/src/imcombine/icsetout.x
+	Changed declarations for the array "out" to be ARB rather than 3 in
+	some places (because it was not changed when another element was
+	added) or 4.  This will insure that any future output elements
+	added will not require changing these arguments for the sake of
+	cosmetic correctness.  (1/13, FV)
+
+pkg/images/tv/imedit/t_imedit.x
+pkg/images/tv/imedit/epimcopy.x
+	Added some errchks.  In particular, even though the output and working
+	images can be mapped without an error there could be an error in the
+	first I/O as when the imdir directory is not available/writeable.
+	(1/18, FV)
+
+pkg/images/immatch/doc/imcombine.hlp
+pkg/images/immatch/imcombine.par
+	The "outtype" parameter can take the value "none" in addition to one
+	of the standard datatypes.  The help page was incorrect/unclear what
+	was meant by not specifying an output type.
+	(1/18, FV)
+
+pkg/images/lib/skywcs.x
+        Incorrect values for the epoch of observation were being computed
+        and printed by tasks like skyctran and imcctran if: 1) the input
+	coordinate system was being read from an image,  and 2) the input
+	coordinate system was galactic. The problem was that the epoch was
+	being converted to MJD twice instead of once resulting in strange
+	epoch values. Unless a proper motion correction was being computed
+	this problem should have little practical effect although it is
+        disturbing to odd units in the file headers. (1/31/00, LED)
+
+pkg/dataio/reblock/t_reblock.x
+pkg/dataio/reblock/reblock_file.x
+	Fixed a bug in the block writing error checking code that could cause
+	problems if an write error occurred. Also modified the code to
+	open the output file only after the first non-zero byte read in
+	order to avoid a magtape driver problem with opening and closing
+	an empty magtape file for writing. In the process of doing this
+	noticed a potential initialization problem that could when switching
+	between record copy, record trim, or record pad modes. (2/10/00 LED).
+
+pkg/images/immatch/wregister.cl
+pkg/images/immatch/sregister.cl
+	Changed the boundary option "refect" to the correct value "reflect".
+	(2/29/00 LED)
+
+pkg/images/imgeom/imlintran.cl
+	Changed the nrows argument names to nlines which is what it is 
+	supposed to be. 
+	(4/11/00 LED)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+       After incrementing the header size, the old header and pixel offset
+       were still in memory causing data to be overwritten.  The solution was
+       to change the modification date of the file to invalidate the cache
+       so that next time the header is read it will be done from disk.
+       From testing Gemini IRAF scripts. (nz feb.24.00)  (04/11)
+
+sys/imio/iki/fxf/zfiofxf.x
+       BITPIX = 8 was not handled correctly.  The number of bytes read needs
+       to be returned to awaitb() (which calls the FXF driver) for correctly
+       keeping the file offset.  Also BITPIX = 16 with scaling that converts
+       the file to 4 bytes had the same problem.  (04/11)
+
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfopix.x
+sys/imio/iki/fxf/fxfrfits.x
+sys/imio/iki/fxf/fxfupdhdr.x
+	1. The OBJECT keyword was causing havoc with some applications.
+	It was disappearing from an extension when it had the same
+	value as the global header.  Now it will remain on the extension
+	regardless of its value and what INHERIT is.
+	2. Clean up keywords from the PHU that belong to an extension only.
+	3. Clean up EXTEND from an extension as well. (nz feb.24.00)
+	(04/11)
+
+sys/mwcs/wftsc.x
+sys/mwcs/wfqsc.x
+sys/mwcs/wfpco.x
+sys/mwcs/wfpar.x
+sys/mwcs/wfmol.x
+sys/mwcs/wfmer.x
+sys/mwcs/wfgls.x
+sys/mwcs/wfcsc.x
+sys/mwcs/wfcar.x
+sys/mwcs/wfait.x
+	The car, mer, pco, gls, par, ait, csc, qsc, and tsc MWCS function
+	drivers were modified to correct a radian/degree conversion error
+	that would cause troubles for images with RA/LON < 180 and DEC > 0.0.
+	(04/11)
+
+pkg/images/imutil/src/imexpr.gx
+	Changed the offset of the IM_OP (operand value) field of the operand
+	structure to double align it.  Increased the size of the structure to
+	reflex the increase in size.  Also modified the main IMEXPR descriptor
+	to double align the IE_IMOP array of operands.  (04/11)
+
+sys/imio/imt.x
+	The heuristic used to estimate the length of the internal array "fnt",
+	used to hold the edited image template string, could fail to produce
+	a long enough buffer in some cases.  Modified the heuristic to be
+	more generous in estimating the maximum buffer size required.  (04/11)
+
+qpgpar.x
+	The code which parses the input string and extracts a parameter name
+	was not checking for EOS and could cause a buffer overflow in some
+	circumstances.  (04/14)
+
+dev/graphcap
+	Commented out the 'xtermold' entry which contained an unescaped colon
+	character and could cause parsing errors.  (04/17  MJF)
+
+pkg/images/immatch/src/imcombine/icmedian.gx
+	Replaced with the faster Wirth algorithm as used in vops$asok.gx.
+	(5/16 FV)
+
+pkg/images/tv/display/dspmmap.x
+	When a pixel mask (overlay or bad pixel) needed to be matched to
+	the data in physical coordinates the internal generation of a
+	new mask was being doing in short integers.  This would truncate
+	any masks with values greater than 16 bits.  All uses of short
+	where changed to integer.  (5/16 FV)
+
+pkg/dataio/export.par
+    	Made the 'format' parameter automatic mode (5/16 MJF)
+
+pkg/dataio/export/expreproc.x
+    	Modified so that the 'overlay' colors are not scaled.  (5/16 MJF)
+
+pkg/proto/fields.x
+	Added 2 missing close statements and a missing sfree statement
+	that results in a "too many open files" error when the fields
+	task tries to process a long ~> 59 file list. (5/19 LED)
+
+imio/sys/iki/fxf/fxfupdhdr.x
+	When making a newcopy of an image and requesting a minimum number of
+	blanks lines using the PADLINES parameter in the output header, a
+	segmentation violation occurred.  The problem was that at header
+	update time, the header and pixel offset arrays were not set, hence
+	we could nod determine the header size before adding the padline
+	amount.  The solution was to use the 'diff' variable which has the
+	correct amount of blank characters to add to the output header to
+	insure padline.  (5/29 NZ,DCT)
+
+imio/sys/iki/fxf/fxfrfits.x
+	With inheritance if an extension header keyword was also in the
+	global header but with a different value, the hedit task would get
+	the global header value and not the value from the requested
+	extension.  The problem was that a previous problem with HIERARCH
+	keyword we started to compare the whole 80 characters rather than
+	the old SZ_KEYWORD.  The solution is to compare the strings up to
+	the '=' sign.  (5/29 NZ,DCT)
+
+unix/boot/spp/xc.c [sun, pcix]
+	This code contained some old hardcoded file path buffers which were
+	too small and could overflow.  Updated these to use SZ_PATHNAME.
+	(5/30)
+
+unix/os/zfiolp.c [sun, pcix]
+unix/os/zfiopl.c
+	Modified these routines to use the newer routine mkstemp instead of
+	the old mktemp.  mkstemp not only generates a unique name but
+	atomically creates the file, avoiding a possible race condition.
+	(5/31)
+
+pkg/images/immatch/src/imcombine/t_imcombine.
+pkg/images/immatch/src/imcombine/icimstack.x
+pkg/images/immatch/src/imcombine/iclog.x
+pkg/images/immatch/doc/imcombine.hlp
+	When there are a large number of images with bad pixel masks both the   
+	input images and the bad pixel masks are stacked for combining.  The
+	addition of stacking the masks allows for independent bad pixel masks
+	for each input image which was not supported previously.
+	(6/21 FV)
+
+pkg/dataio/export/bltins/expgm.x
+pkg/dataio/export/bltins/exppm.x
+    	Fixed a bug in writing the format header under PCIX. (6/23/00 MJF)
+
+sys/fio/filopn.x
+	Added some error handling to catch any errors from the internal
+	system routine ftwacc and map them to SYS_FOPEN (cannot open file).
+	This affects only standard disk files; a failure to open a special
+	device will result in a different error (SYS_FOPENDEV).  (7/03)
+
+sys/imio/iki/ikiclose.x
+sys/imio/iki/ikiopix.x
+sys/imio/iki/ikiupdhdr.x
+	In each of these routines, added an IFERR handler for the called
+	image kernel routine, to catch any low level errors and map them to
+	the error action posted by the IKI routine.  For example, any file
+	open or other system problems occurring in iki_opix will now ensure
+	that the SYS_IKIOPIX error is posted.  The routines were already
+	trying to do this, but the IF-test employed could fail if an error
+	action was taken by the kernel routine.  (7/03)
+
+dev/hosts
+	Added SunOS machine bruckner. (08/07 MJF)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+	When there is an output mask or sigma image and the number of images
+	exceeds the maximum number allowed by the number of logical file
+	descriptors the task failed to delete the files when starting over
+	using the stacked image approach.  This would result in an image
+	already exists error.  This was fixed by deleting the files upon
+	error recovery.  (8/09, FV)
+
+sys/imio/iki/fxf/fxfrfits.x
+	When reading a FITS file with PHU having NAXIS = 0 and no extensions
+	the FK would not record the PHU as already been read, leading to
+	further reading, which would result in and EOF error message.
+	(8/09 NZ/DCT)
+
+./sys/imio/mkpkg
+./sys/imio/imopsf.x
+	imopsf (open pixel file) could be called more than once when
+	accessing a pixel mask as an image.  The pixel mask code in this
+	file was not prepared for this, and could execute twice, causing
+	dev$null to be multiply opened.  At image close time only one file
+	descriptor would be closed, causing a file descriptor leak.  The
+	imopsf code was changed so that the pixel mask initialization code
+	is only executed once for an image.  Note however that imopsf can
+	nonetheless be called more than once on an image in some cases,
+	e.g. the system does this to ensure that imsetbuf is called, so it
+	would not be correct to modify imopsf so that it simply returns
+	if called on an already open image.  (8/16)
+
+./sys/imio/impmopen.x
+./sys/plio/plloadf.x
+	Improved the error recovery in these routines so that all open files
+	are closed and buffers freed if a blatant error occurs, such as
+	trying to open a non-pixel mask file as a pixel mask image.  (8/16)
+
+./lib/plio.h
+./sys/plio/PLIO.hlp
+./sys/plio/pll2p.gx
+./sys/plio/pll2r.gx
+./sys/plio/pllseg.h
+./sys/plio/plupdate.x
+./sys/plio/plopen.x
+./sys/plio/plload.x
+./sys/plio/plpoint.x
+./sys/plio/plleq.x
+./sys/plio/pllpr.x
+./sys/plio/pldebug.x
+./sys/plio/plssize.x
+./sys/plio/plcmpress.x
+./sys/plio/plclear.x
+./sys/plio/plr2l.gx
+./sys/plio/plp2l.gx
+./sys/plio/pllrop.x
+./sys/plio/pllsten.x
+./sys/plio/zzlib.x
+	The LEN and BLEN fields of the encoded line list (LL) descriptor
+	would limit the length of a pixel area (and hence the size of a
+	pixel mask) to the max size of a signed short, 32768.  This was due
+	to the use of a simple array of type short to encode the line list
+	(which simplifies handling considerably).  Nonetheless the limit to
+	32K was unacceptable.  The fix adopted was to increase the LL header
+	from 3 to 7 words.  Two 16 bit words are now used to encode each of
+	LEN and BLEN.  A "version" word was added to allow the old, new, and
+	future encodings to be distinguished.  A "hdrlen" word was added to
+	parameterize the length of the LL header, rather than fix it at
+	compile time as in the initial version.  With this change, the
+	maximum length of an image line under PLIO is increased from 32768
+	to 1073741824 (32768*32768).  All the higher level PLIO code is
+	integer, so should already support larger masks.
+
+	This was done in such a way that old line lists can still be read,
+	although PLIO will always write out new format line lists (pixel
+	mask files and images, QPOE, and MWCS all store encoded line lists
+	in external storage, so backwards compatibility is important; also
+	existing complied programs will continue to generate the old
+	format).  The cost is 8 bytes per encoded line list.  For most masks
+	this should only increase the size of the mask by a few percent at
+	most.  (8/16)
+
+unix/os/zfiond.c
+	In the server-side code for a unix socket, "addrlen" was being
+	computed using an obsolete heuristic which was only correct for
+	older versions of the BSD socket interface.  On newer systems this
+	could cause an "address already in use" error when opening a server
+	socket, due to the socket pathname getting truncated.  (8/18)
+
+sys/fio/reopen.x
+	The FIO reopen routine, used to open an existing host file descriptor
+	on a new FIO file descriptor (e.g. providing indepedent buffered
+	streams for a single host file) had a bug which would cause it to
+	set up the new file descriptor incorrectly.  (8/18)
+
+unix/os/zfiond.c
+	The ND driver supports a "text" mode which assumes that all program
+	data is XCHAR and converts to and from 1 byte chars on output.  This
+	is useful for an IRAF program which communicates with an external
+	host program using only text.  A FIO binary stream can be used, but
+	the external program sees only packed ASCII text while the SPP
+	program sees only normal SPP text.  The :text mode was working for
+	reads, but broken for writes.  On output zawrnd, given a buffer
+	containing say 128 SPP chars (256 bytes), would compress the data as
+	it should, but still write out 256 bytes.  While incorrect, this
+	would actually work in many cases (especially when conversing with
+	external host programs) since the output would be a null terminated
+	128 char string followed by 127 bytes of junk.  (8/18)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+	When a "cannot open image" error occurs for some other reason than
+	running out of file descriptors the task would go into an infinite
+	loop or given a segmentation error.  The checking was improved to
+	avoid this.  (8/31/00, Valdes)
+
+pkg/images/tv/imexamine/t_imexam.x
+pkg/images/tv/imexamine/timexam.x	+
+pkg/images/tv/imexamine/iecolon.x
+pkg/images/tv/imexamine/mkpkg
+pkg/images/tv/imexamine.par
+pkg/images/tv/doc/imexamine.hlp
+lib/scr/imexamine.key
+	Added new key 't' to ouput an image section centered on the cursor.
+	(9/02/00, Valdes)
+
+dev/hosts
+	Added Buell Jannuzi's new ssun machine 'climber'. 
+	Added Michael Brown's new ssun machine 'bunyip'. (9/5/00 MJF)
+
+pkg/cl/cl.par
+	Added the new CL parameter "release".  This is a string valued
+	parameter with values such as "2.11.3a", "2.11.4", "3.0" etc.
+	This differs from "version" which is a descriptive string such
+	as "NOAO/IRAF V2.11.3 EXPORT".  There can be multiple releases
+	of one version of the software, and "release" specifies exactly
+	what build the software is.  The release strings are composed in
+	such a way that they can be used in expressions, e.g. (release >=
+	2.11.3) would be true for IRAF V2.11.3 and all subsequent
+	releases and versions.  (9/09)
+
+---------------------------------
+V2.11.3b limited patch release.  (9/10 2000)
+
+pkg/images/immatch/src/imcombine/icombine.gx
+pkg/images/immatch/src/imcombine/icgdata.gx
+	Additional errchk declarations were needed to catch out of memory
+	during image reading which were not caught during the initial
+	pass at reading the images.  (9/11/00, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+pkg/images/immatch/src/imcombine/icimstack.x
+	Error handling when running out of memory with immap (due to a very
+	large min_lenuserarea) and when trying to stack was fixed up to
+	report reasonable error messages and to not go into an infinite loop
+	trying to manage memory.  (9/13/00, Valdes)
+
+pkg/images/imcoords/src/sffind.x
+pkg/images/imcoords/doc/starfind.hlp
+	Modified the way starfind computes the background estimate used to
+	compute the first and second order moments so that it does not depend
+	on the value and density of the central pixel. (10/9/00, Davis)
+
+pkg/images/immatch/imcentroid.par
+pkg/images/immatch/imalign.par
+pkg/images/immatch/imalign.cl
+pkg/images/immatch/doc/imcentroid.hlp
+pkg/images/immatch/doc/imalign.hlp
+pkg/images/immatch/src/listmatch/t_imctroid.x
+pkg/images/immatch/src/listmatch/mkpkg
+	Added a new parameter maxshift to the imcentroid and imalign tasks.
+	Maxshift is the maximum permitted difference between the computed
+	and predicted shifts. Maxshift can be used to reject objects whose
+	centers have wandered too far from the expected center. By default
+	maxshift is undefined. (10/9/00, Davis)
+
+pkg/xtools/mkpkg
+pkg/xtools/doc/xtools.men
+pkg/xtools/doc/xtools.hd
+pkg/xtools/skywcs/mkpkg
+pkg/xtools/skywcs/skdecode.x
+pkg/xtools/skywcs/sksavim.x
+pkg/xtools/skywcs/skset.x
+pkg/xtools/skywcs/skstat.x
+pkg/xtools/skywcs/sktransform.x
+pkg/xtools/skywcs/skwrdstr.x
+pkg/xtools/skywcs/skwrite.x
+pkg/xtools/skywcs/skywcs.h
+pkg/xtools/skywcs/skywcsdef.h
+pkg/xtools/skywcs/doc/ccsystems.hlp
+pkg/xtools/skywcs/doc/skclose.hlp
+pkg/xtools/skywcs/doc/skcopy.hlp
+pkg/xtools/skywcs/doc/skdecim.hlp
+pkg/xtools/skywcs/doc/skdecwcs.hlp
+pkg/xtools/skywcs/doc/skdecwstr.hlp
+pkg/xtools/skywcs/doc/skenwcs.hlp
+pkg/xtools/skywcs/doc/skequatorial.hlp
+pkg/xtools/skywcs/doc/skiiprint.hlp
+pkg/xtools/skywcs/doc/skiiwrite.hlp
+pkg/xtools/skywcs/doc/sklltran.hlp
+pkg/xtools/skywcs/doc/sksaveim.hlp
+pkg/xtools/skywcs/doc/sksetd.hlp
+pkg/xtools/skywcs/doc/skseti.hlp
+pkg/xtools/skywcs/doc/sksets.hlp
+pkg/xtools/skywcs/doc/skstatd.hlp
+pkg/xtools/skywcs/doc/skstati.hlp
+pkg/xtools/skywcs/doc/skstats.hlp
+pkg/xtools/skywcs/doc/skultran.hlp
+pkg/xtools/skywcs/doc/skywcs.hd
+pkg/xtools/skywcs/doc/skywcs.hlp
+pkg/xtools/skywcs/doc/skywcs.men
+	Added the skywcs library to the xtools package. Skywcs is a
+	repackaging of code already used in the images.imcoords package
+	(10/12/00, Davis).
+
+pkg/images/lib/coomap.key
+pkg/images/lib/geofit.gx
+pkg/images/lib/geofit.x
+pkg/images/lib/geogmap.gx
+pkg/images/lib/geogmap.x
+pkg/images/lib/geogmap.h
+pkg/images/lib/geograph.gx
+pkg/images/lib/geograph.x
+pkg/images/lib/geomap.key
+pkg/images/lib/liststr.gx
+pkg/images/lib/liststr.x
+pkg/images/lib/mkpkg
+pkg/images/lib/rgccwcs.x
+pkg/images/lib/rglltran.x
+	Added support for a :order command to the geomap task so that the
+	user can change all the fitting orders simultaneously.  Fixed an
+	error checking bug in the geomap and ccmap tasks that could cause a
+	segmentation violation if there were too few points for a good fit
+	and the verbose switch disabled. Added a couple of new routines to
+	the list decoding tasks. Modified the code and mkpkg to use the new
+	version of skywcs (10/12/00, Davis).
+
+pkg/images/immatch/src/geometry/t_geomap.gx
+pkg/images/immatch/src/geometry/t_geomap.x
+	Improved the error checking in the geomap tasks (10/12/00, Davis).
+
+pkg/images/immatch/src/wcsmatch/t_skyxymatch.x
+pkg/images/immatch/src/wcsmatch/mkpkg
+	Modified the skyxymatch task to use the new skywcs library
+	(10/12/00, Davis).
+
+pkg/images/imcoords/imcctran.par
+pkg/images/imcoords/doc/imcctran.hlp
+pkg/images/imcoords/src/ccfunc.x
+pkg/images/imcoords/src/ccxytran.x
+pkg/images/imcoords/src/skyctran.x
+pkg/images/imcoords/src/t_ccfind.x
+pkg/images/imcoords/src/t_ccmap.x
+pkg/images/imcoords/src/t_ccsetwcs.x
+pkg/images/imcoords/src/t_cctran.x
+pkg/images/imcoords/src/t_ccxymatch.x
+pkg/images/imcoords/src/t_imcctran.x
+pkg/images/imcoords/src/t_skyctran.x
+pkg/images/imcoords/src/mkpkg
+	Modified the imcoords tasks to use the new skywcs library.
+        Added support for doing coordinate transformations accurately on
+        images with non-zenithal projections where rotating the CD matrix
+        does not work accurately. Added a new parameter longpole to the
+	imcctran  task. If longpole =yes then coordinate transformations
+	with zenithal projections will be rotated using longpole rather
+	than the CD matrix. (10/12/00, Davis)
+
+pkg/images/x_images.x
+pkg/images/imcoords/imcoords.cl
+pkg/images/imcoords/imcoords.men
+pkg/images/imcoords/imcoords.hd
+pkg/images/imcoords/ccget.par
+pkg/images/imcoords/ccstd.par
+pkg/images/imcoords/doc/ccget.hlp
+pkg/images/imcoords/doc/ccstd.hlp
+pkg/images/imcoords/src/mkpkg
+pkg/images/imcoords/src/t_ccget.x
+pkg/images/imcoords/src/t_ccstd.x
+pkg/images/imcoords/src/ccstd.x
+	Added the ccget and ccstd tasks to the imcoords package.
+	(10/12/00, Davis)
+
+dev/hosts
+	Added RedHat machine camille (11/23/00, MJF)
+
+pkg/images/tv/display/t_display.x
+	Changes to detect and use new WCS strings (12/04/00, MJF)
+
+pkg/images/tv/display/gwindow.h
+	Added struct element W_WCSVER (12/04/00, MJF)
+
+pkg/images/tv/display/iis.h
+	Added definitions for 16-frame support, increased the size of
+	the SZ_WCSTEXT to 1024 (12/04/00, MJF)
+
+pkg/images/tv/display/mkpkg
+pkg/images/tv/display/imdwcsver.x     +
+	Added a routine which does a WCS query with the X register set
+	to check whether the server can handle the new WCS strings.  If
+	the reply is "version=<num>" we use the new stuff, otherwise it's
+	a no-op and we use the old format strings. (12/04/00, MJF)
+
+sys/imio/imunmap.x
+	Added a test to see if the image being closed is a pixel mask image
+	(as opened by impmmap) with the IM_PLCLOSE flag set.  If so, the
+	mask file must be closed at imunmap time.  (12/12)
+
+pkg/images/lib/geomap.h
+pkg/images/lib/geogmap.h
+pkg/images/lib/geofit.gx
+pkg/images/lib/geofit.x
+pkg/images/lib/geogmap.gx
+pkg/images/lib/geogmap.x
+pkg/images/lib/geograph.gx
+pkg/images/lib/geograph.x
+pkg/images/lib/geomap.key
+pkg/images/lib/coomap.key
+pkg/images/immatch/geomap.par
+pkg/images/immatch/doc/geomap.hlp
+pkg/images/immatch/src/geometry/t_geomap.gx
+pkg/images/immatch/src/geometry/t_geomap.x
+pkg/images/imcoords$ccmap.par
+pkg/images/imcoords/src/t_ccmap.x
+pkg/images/imcoords/doc/ccmap.hlp
+	Added a new parameter maxiter to the geomap and ccmap tasks. Maxiter
+	defines the maximum number of rejection iterations and has a default
+	value of 0 for no rejection.  Changed the default value of the ccmap
+	and geomap parameter reject from INDEF to 3.0.  (05/01/01 LED)
+
+pkg/dataio/fits/fits_rheader.x
+	Fixed a bug in the MEF file reading error recovery code that could
+	case a segvio due to a too many open file descriptors conditions.
+	(05/01/01 LED)
+
+pkg/images/immatch/immatch.hd
+	Fixed a typo in the 'source' definition of imalign.cl (01/31/01 MJF)
+
+xtools$inlfit.gx
+xtools$inlfitr.x
+xtools$inlfitd.x
+xtools$inlrefit.gx
+xtools$inlreffitr.x
+xtools$inlrefitd.x
+        Added a check for the condition case where the number of data points
+        minus the number of deleted points (i.e. those with weights of 0.0)
+        is less than the number of fitting parameters. The previous checks did
+        not task into account the number of deleted points and could produce
+        solutions that were correct but non-physical. (1/2/01, Davis)
+
+pkg/images/imcoords/doc/ccmap.hlp
+	Fixed an error in ccmap help page package definition. (02/09/01 LED)
+
+pkg/images/tv/display/t_display.x
+	Removed the code which stripped the path-prefix and section from the
+	image name displayed in the title string.  This was originally done
+	to save space but confuses tasks like IMEXAM which rely on this to
+	map the image.  (02/26/01, MJF)
+
+pkg/images/tv/display/iis.h
+	Somehow the SZ_WCSTEXT value got reset to 320, this was causing a
+	problem with TVMARK redrawing the display, reset to 1024.
+	(02/26/01, MJF)
+
+pkg/images/immatch/src/imcombine/icsetout.x
+	The physical coordinates of the output WCS are now reset.
+	(3/1/01, Valdes)
+
+pkg/images/imgeom/src/t_im3dtran.x
+pkg/images/imgeom/src/t_imtrans.x
+pkg/images/imgeom/src/t_imshift.x
+pkg/images/imgeom/src/t_magnify.x
+        Modified the im3dtran, imtranspose, imshift, and magnify tasks so that
+        the output image, which is mapped NEW_COPY, is unmapped before the
+	input image. To the best of my knowledge this has not caused problems
+	to date but ... (3/1/01 Davis)
+
+sys/imio/impmhdr.x
+	When expanding the text version of the header stored in the PL image, 
+	the newline in column 81 would not be seen when processing a full
+	line of exactly 80 characters, causing a blank line to be added
+	to the output image header.  (3/05/01 LD,NZ,DT)
+
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/imdgetwcs.x
+pkg/images/tv/display/imdwcsver.x
+pkg/images/tv/display/iis.h
+	Compatability fixes for the new WCS strings and "old" servers.  The
+	WCS version query is now carried out with a read request using the
+	old WCS data size (320) to avoid blocked reads from old servers not
+	sending the 1024-char data.  imd_getwcs() was modified to query the
+	server for the version before the actual wcs query and the request
+	is made with the appropriate size.  In the case of a WCS query the
+	IIS 'x' register is used to signal that the new format is being
+	used, the WCS version is passed back if the 'y' register is
+	non-zero.  Neither of these registers was used by the old protocol,
+	the new ximtool checks these registers and responds by using the
+	correct WCS buffer size.  (03/12/01, MJF)
+
+sys/fio/zzdebug.x
+	Added new versions (written Aug 2000) of the "server" and "client"
+	debug tasks, which use the ND driver for fully streaming bidirectional
+	socket communications.  (03/27)
+
+sys/mwcs/wfsamp.x
+	Fixed a couple minor bugs having to do with endpoint handling and
+	saving the last position to speed subsequent searches.  Generalized
+	the code to remove the restriction that both arrays increase in
+	the same direction.  (03/31 FV/DT)
+
+sys/etc/main.x
+	Modified the way command line arguments are parsed to make it easier
+	to set the value of a string parameter to the null string.  If a
+	string parameter is set on the command line, e.g., "param=value",
+	whitespace is no longer permitted between the = and the value
+	string.  Hence, in command line such as [a=foo b= c=bar] will be
+	treated the same as [a=foo b="" c=bar].  Whitespace is still
+	skipped in @par files as before.  (03/31)
+
+sys/clio/clcache.x
+sys/fmtio/clscan.x
+	1. Modified the private internal system routine clc_fetch, which
+	fetches parameters from the in-task parameter cache, to return ERR if
+	a parameter is not found rather than zero.  This makes it possible
+	to discriminate between parameters that have not been set, and ones
+	which have had the value string set to the null string.
+	2. Modified clscan (called whenever a task gets a string-valued
+	parameter) to check the status returned by clc_fetch for ERR rather
+	than <=0 and to prompt for the parameter only if ERR (value not set)
+	is returned.
+
+	Note - These changes have some risk and could affect existing
+	scripts.  Only tasks with parameters that have null string or
+	uninitialized values should be impacted.  Testing using irafx is
+	required.  (03/31)
+
+sys/imio/db/imgnfn.x
+	The code which scans a header looking for keywords which match a
+	pattern was not skipping to the next card correctly when skipping
+	non-keyword cards (blank cards, COMMENT, HISTORY, etc.).  (03/31)
+
+pkg/images/tv/display/dspmmap.x
+	Fixed problems with ds_match.  The new version is more robust and
+	correct.  A bad pixel for the displayed image is the maximum of all
+	pixels in the pixel mask which fall within the display pixel.   This
+	version still does not allow any relative rotations but does allow
+	non-integer offsets.  (4/24/01, FV)
+
+images$imutil/hedit.par
+images$imutil/doc/hedit.hlp
+images$imutil/src/hedit.hlp
+        Added a new addonly parameter to the hedit task. If addonly is set
+        a new field will only be added to the image header if it does not
+        already exist. (4/30/01, Davis)
+
+images$immatch/src/psfmatch/rgpfilter.x
+images$immatch/src/psfmatch/rgpconvolve.x
+        Fixed a floating point error in the replace algorithm gaussian fitting
+        routine that can occurs if the FFT of the reference image is exactly
+	zero. Also fixed a symmetry error in the psfmatch convolve routine
+	that would results in a corrected psf that is flipped in x and y if
+	the psf matching kernel does not have mirror symmetry. The workaround
+	and bug fix is to rotate the convolution kernel 180 degrees before
+	applying it to the input image in that case. The matching kernel is
+	is correctly oriented and can be used directly with the fconvolve
+	task.  (5/15/01 Davis)
+
+dataio$fits/t_rfits.x
+dataio$imtext/t_rtextimage.x
+        Changed the clgetc calls o clgstr calls for the datatype parameter
+        (rfits task) and otype parameter (rtextimage. task) This change is
+	required to avoid an "ERROR: Parameter not a legal character constant
+	(parname)" error introduced by recent changes to the CL. "" is no
+	longer a legal argument for clgetc. (6/15/01 LED)
+
+images$immatch/src/imcombine/t_combine.x
+images$immatch/src/imcombine/icombine.gx
+images$immatch/src/imcombine/icgdata.gx
+images$immatch/src/imcombine/icscale.x
+images$immatch/src/imcombine/xtimmap.x	+
+images$immatch/src/imcombine/mkpkgx
+	When combining more images than there are IRAF FIO descriptors the
+	additional images are mapped and unmapped as needed.  There is no
+	limit now on the number of images or that they be capable of being
+	stacked into a single image for combining by projection.  The creation
+	of a temporary stack image is no longer done.  (6/16/01, Valdes)
+
+images$imgeom/src/t_magnify.x
+	Fixed a bug in the magnify task that could cause a previous block
+	of lines to be repeated instead of a new block computed. This bug
+    	was introduced when magnify was upgraded to use the new sinc / drizzle
+    	interpolation code and to use imio boundary extension (IRAF 2.11.2). A
+    	typo was made in the update which results the above error in the case
+    	where the buffer does not update. Normally the buffer is supposed to
+    	update for each group of lines but occasionally may not to integer
+    	conversions, especially in the case that the magnification factors are
+    	greater than the internal buffer size of 16 output image lines.
+    	(6/21/01, Davis)
+
+pkg/images/tv/display/imdgetwcs.x
+pkg/images/tv/display/imdputwcs.x
+pkg/images/tv/display/imdsetwcs.x
+        Modified to allow read/write of the additional mapping information
+    	during WCS i/o.  If the iis_version flag is non-zero and a valid
+	mapping exists, the set/put wcs routines will automatically format
+	the WCS text to include this information, otherwise it writes the old
+	WCS text. If iis_version is non-zero and a server query returns mapping 	information this will be stored in the iis common for later retrieval
+	by the imd_getmapping() routine.  (06/21/01, MJF)
+
+pkg/images/tv/display/imdwcsver.x
+        Removed 'frame' number argument form the procedure.  The procedure
+    	will now map frame one if no connection is already opened and query
+	the WCS. Returns non-zero if the server is capable of using the new
+	mapping structures.  Required to be called explicitly by programs
+	using mappings to initialize the imd interface for this functionality.
+	A "disable_wcs_maps" boolean environment variable may be defined to
+	force this procedure to return zero if the old behavior is desired or
+	to workaround bugs in the new code.  (06/21/01, MJF)
+
+pkg/images/tv/display/t_display.x
+        Removed earlier addition of ds_setwcs() function since this is now
+    	handled by the standard imd_putwcs() interface.  Mapping information
+    	is set prior to the WCS write with imd_setmapping().  (06/21/01, MJF)
+
+pkg/images/tv/display/mkpkg
+        Updated dependencies (06/21/01, MJF)
+
+pkg/images/tv/display/imdmapping.x              +
+        New routines imd_[sg]etmapping() allow a program to set the
+    	mapping to be sent with the next imd_putwcs() call, or retrieve the
+    	mapping info sent by the server with the last wcs query.  The calls
+    	are no-ops if the connected server doesn't know about the new
+    	mappings, imd_getmapping() is an integer function which returns
+    	non-zero if a valid mapping is available.  A new imd_query_map() is
+    	available to return the mapping information for a given WCS number.
+    	The intent is that the mapping can be obtained for a wcs returned by a
+    	cursor read, e.g. to get the image name associated with the mapping.
+    	(6/21/01, MJF)
+
+pkg/images/tv/display/iis.com
+        Added new variables to the IIS common to hold the mapping
+    	information for each WCS write.  In order to preserve the imd inter-
+	faces it was necessary to save the mappings in the common, along with
+	a flag indicating whether the connected server can use them.
+	(06/21/01, MJF)
+
+pkg/images/tv/display/iisopn.x
+    	Added initialization of the iis_version value at device open time
+    	(6/21/01, MJF)
+
+pkg/images/tv/display/gwindow.h
+    	Removed struct element W_WCSVER added earlier, no longer needed.
+    	(6/21/01, MJF)
+
+pkg/images/tv/display/mkpkg
+pkg/images/tv/display/t_display.x
+    	Removed unused include files leftover from debugging. (7/2/01, MJF)
+
+pkg/lists/rimcursor.x
+	Modified to return actual WCS code.  Previously hardwired with '01'
+	following the frame number. (7/3/01, MJF)
+
+dev/hosts
+	Changed equuleus to be a Solaris machine, added entry for it's
+	new incarnation as 'new-equuleus'.  (7/6/01, MJF)
+
+pkg/system/cmdstr.x
+	Modified to handle the case of a redirected parameter value in 
+	the input stream.  (7/11/01, MJF)
+
+pkg/images/imcoords/src/t_ccmap.x
+	Fixed a bug in the ccmap task refpoint = "coords" option that could
+	produce a totally inaccurate tangent point estimate if the input
+	coordinate list spanned ra = 0.0 hours. (7/20/01, LED)
+
+pkg/images/tv/tvmark/t_tvmark.x
+	Added a call to imd_wcsver() to reset the 'frame' parameter max so
+	task can use all 16 frames (8/9/01, MJF)
+
+pkg/images/tv/display/imdgetwcs.x
+	Fixed a small bug in parsing the WCS return string, could sometimes
+	cause the WCS to be reset.  (8/9/01, MJF)
+
+pkg/images/tv/display/imdwcsver.x
+	Initialized the iis_valid variable (8/9/01, MJF)
+
+pkg/plot/doc/contour.hlp
+    	Clarified the use of the 'fill' parameter in the example when
+	overlaying contours to an image display. (08/10/01, MJF)
+
+pkg/images/tv/imexamine/mkpkg
+pkg/images/tv/imexamine/x_imexam.x	+
+pkg/images/tv/imexamine/imexamine.par	+
+	Added a mkpkg target to compile standalone; i.e. mkpkg standalone.
+	(8/13/01, Valdes)
+
+pkg/images/tv/imexamine/iecimexam.x
+pkg/images/tv/imexamine/ieeimexam.x
+pkg/images/tv/imexamine/iegcur.x
+pkg/images/tv/imexamine/iegimage.x
+pkg/images/tv/imexamine/iegnfr.x
+pkg/images/tv/imexamine/iehimexam.x
+pkg/images/tv/imexamine/ieimname.x
+pkg/images/tv/imexamine/iejimexam.x
+pkg/images/tv/imexamine/ielimexam.x
+pkg/images/tv/imexamine/ieopenlog.x
+pkg/images/tv/imexamine/ieqrimexam.x
+pkg/images/tv/imexamine/ierimexam.x
+pkg/images/tv/imexamine/iesimexam.x
+pkg/images/tv/imexamine/ietimexam.x
+pkg/images/tv/imexamine/ievimexam.x
+pkg/images/tv/imexamine/imexam.h
+pkg/images/tv/imexamine/t_imexam.x
+	IMEXAMINE has been modified to use multiple WCS mappings.  The
+	full WCS number is now used.  Based on the WCS number the image
+	associated with the mapping determines the image to examine.
+	This requires a display server which supports multiple mappings,
+	such as XIMTOOL V1.3, and a display tasks which uses
+	multiple mappings, such as MSCRED V4.5.  For single displays and
+	other display servers it behaves as before.
+	(8/13/01, Valdes)
+
+pkg/obsolete/obsolete.cl
+pkg/obsolete/obsolete.men
+pkg/obsolete/obsolete.hd
+pkg/obsolete/x_obsolete.x
+pkg/obsolete/mkpkg
+pkg/obsolete/odisplay.par	-
+pkg/obsolete$doc/odisplay.hlp	-
+pkg/obsolete$display/		-
+	Removed ODISPLAY task.  (8/17/01, Valdes)
+
+pkg/obsolete/obsolete.cl
+pkg/obsolete/obsolete.men
+pkg/obsolete/obsolete.hd
+pkg/obsolete/x_obsolete.x
+pkg/obsolete/mkpkg
+pkg/obsolete/oimcombine.par	+
+pkg/obsolete$doc/oimcombine.hlp	+
+pkg/obsolete$imcombine/		+
+	Added OIMCOMBINE from V2.11.3b.  (8/17/01, Valdes)
+
+pkg/images/immatch/src/imcombine
+pkg/imagess/immatch/imcombine.par
+pkg/imagess/immatch/doc/imcombine.hlp
+	1.  New parameters "headers", "bpmasks", "rejmasks",  "nrejmasks",
+	    and "expmasks" provide additional types of output.  The old
+	    parameters "rejmask" and "plfile" were removed.  The new
+	    "nrejmasks" parameter corresponds to the old "plfile" and the
+	    new "rejmasks" parameter corresponds to the old "rejmask".
+	2.  There is a new "combine" type "sum" for summing instead of
+	    averaging the final set of offset, scaled, and weighted
+	    pixels.
+	3.  There is a new parameter "outlimits" to allow output of a
+	    subregion of the full output.  This is useful for raster
+	    surveys with large numbers of images.
+	4.  Additional keywords may appear in the output headers.
+	5.   The scaling is now done relative to the first image rather than
+	    an average over the images.  This is done so that flux related
+	    keywords such as exposure time and airmass remain
+	    representative.
+	6.  The environment parmaeter "imcombine_option" allows using an
+	    algorithm that opens and closes images.  This is very slow but
+	    allows combining large numbers of images which are not the same
+	    size.
+	7.  New help page.
+	(8/17/01, Valdes)
+
+lig/pkg/cq.h
+pkg/xtools/catquery/
+pkg/xtools/mkpkg
+pkg/xtools/cq.h
+pkg/xtools/cqdef.h
+pkg/xtools/cqdb.x
+pkg/xtools/cqdtype.x
+pkg/xtools/cqget.x
+pkg/xtools/cqgfields.x
+pkg/xtools/cqgqpars.x
+pkg/xtools/cqgrecords.x
+pkg/xtools/cqiminfo.x
+pkg/xtools/cqimquery.x
+pkg/xtools/cqistat.x
+pkg/xtools/cqlocate.x
+pkg/xtools/cqmap.x
+pkg/xtools/cqnqpars.x
+pkg/xtools/cqquery.x
+pkg/xtools/cqrinfo.x
+pkg/xtools/cqrstat.x
+pkg/xtools/cqsetcat.x
+pkg/xtools/cqsqpars.x
+pkg/xtools/cqstat.x
+pkg/xtools/cqwrdstr.x
+pkg/xtools/doc/*.hlp
+	Added the catalog and image survey access tools and documentation to
+	the XTOOLS package.  (8/27/01, Davis)
+
+pkg/obsolete/obsolete.cl
+pkg/obsolete/obsolete.men
+pkg/obsolete/obsolete.hd
+pkg/obsolete/x_obsolete.x
+pkg/obsolete/mkpkg
+pkg/obsolete/oimstatistics.par
+pkg/obsolete/oimstat.h
+pkg/obsolete/t_oimstat.x
+pkg/obsolete/doc/oimstat.hlp
+	Added OIMSTATISTCS from V2.11.3b.  (8/30/01, Davis)
+
+pkg/images/imutil/imstatistics.par
+pkg/images/imutil/doc/imstatistics.hlp
+pkg/images/imutil/src/imstat.h
+pkg/images/imutil/src/t_imstat.x
+	Added an interative rejection capability to the imstatistics task. Also
+	added a cacheing option that may speed up the performance of the task
+	if the midpt/mode statistic is computed or if iterative rejection
+	is enabled.  (8/30/01, Davis)
+
+pkg/xtools/catquery/cqgfields.x
+pkg/xtools/catquery/cqquery.x
+	Fixed an incorrect function  and data type declaration in the
+	catquery library which showed up when compiling on Linux.
+	(9/17/01, Davis)
+
+pkg/images/imutil/src/t_imjoin.x
+        Changed the clgetc call to clgstr calls for the pixtype parameter in
+        imjoin. This change is required to avoid an "ERROR: Parameter not a
+	legal character constant (parname)" error introduced by recent changes
+	to the CL.  Basically "" is no longer a legal argument for clgetc.
+	(9/17/01 LED)
+
+pkg/proto/mimstatistics.par
+pkg/proto/doc/mimstat.hlp
+pkg/proto/masks/mimstat.h
+pkg/proto/masks/t_mimstat.h
+pkg/proto/masks/mstcache.x
+pkg/proto/masks/mimstat.x
+pkg/proto/masks/mptools.x
+        Installed the new statistics through a mask task mimstatistics in the
+	proto package. (09/17/01, Davis)
+
+lib/pkg/pstools.h                       +
+pkg/xtools/pstools/Notes                +
+pkg/xtools/pstools/font.com             +
+pkg/xtools/pstools/mkpkg                +
+pkg/xtools/pstools/psbreak.x            +
+pkg/xtools/pstools/pscenter.x           +
+pkg/xtools/pstools/psclose.x            +
+pkg/xtools/pstools/psdeposit.x          +
+pkg/xtools/pstools/psfont.x             +
+pkg/xtools/pstools/psjustify.x          +
+pkg/xtools/pstools/psopen.x             +
+pkg/xtools/pstools/psoutput.x           +
+pkg/xtools/pstools/pspos.x              +
+pkg/xtools/pstools/psprolog.x           +
+pkg/xtools/pstools/pssetup.x            +
+pkg/xtools/pstools/pswidth.x            +
+	Added a new interface library for doing Postscript text output.
+	This is used by the lroff conversion code but is useful for any
+	application which needs to output blocks of text in a similar
+	manner.  Because of the var- iable-width font used in the prolog it
+	is not that useful for producing tabular output. (09/17/01, MJF)
+
+pkg/proto/rskysub.par
+pkg/proto/doc/rskysub.hlp
+pkg/proto/masks/rskysub.h
+pkg/proto/masks/t_rskysub.x
+pkg/proto/masks/rsstats.x
+pkg/proto/masks/rsmean.x
+pkg/proto/masks/rsmmean.x
+pkg/proto/masks/rscache.x
+pkg/proto/masks/rsfnames.x
+pkg/proto/masks/rsreject.x
+        Installed the new running mean or median sky subtraction task rskysub
+        in the proto package. (9/18/01, LED)
+
+pkg/images/imcoords/src/t_skyctran.x
+pkg/images/imcoords/src/t_sffind.x
+pkg/images/imfilter/src/mode.x
+pkg/images/imutil/doc/hedit.hlp
+pkg/images/imutil/doc/imdivide.hlp
+pkg/images/tv/doc/Tv.hlp
+pkg/images/tv/iis/doc/Cv.hlp
+pkg/images/tv/iis/doc/cv.hlp
+pkg/mage/tv/iis/ids/doc/Imdis.hlp
+        Fixed various missing/extra argument problems in the images package
+        code that were found with spplint. Also fixed miscellaneous images
+	package help page formatting problems. (9/19/01 Davis)
+
+pkg/plot/crtpic/t_crtpict.x
+pkg/plot/crtpic/plotimage.x
+pkg/plot/t_graph.x
+pkg/plot/t_implot.x
+        Fixed various missing/extra argument and function/subroutine mismatch
+        problems in the plot package that were found by running spplint.
+        (9/19/01, Davis)
+
+pkg/proto/t_suntoiraf.x
+pkg/proto/t_binfil.x
+pkg/proto/t_hfix.x
+pkg/proto/t_joinlines.x
+pkg/proto/doc/irafil.hlp
+        Fixed various extra/missing argument, function declaration, and
+        subroutine/function mismatchs in the proto package that were
+	found with spplint. Also fixed an irafil task help page formatting
+	problem. (9/19/01, Davis)
+
+pkg/xtools/skywcs/doc/skdecim.hlp
+pkg/xtools/skywcs/doc/skequatorial.hlp
+pkg/xtools/skywcs/doc/sklltran.hlp
+pkg/xtools/skywcs/doc/skultran.hlp
+pkg/xtools/skywcs/doc/skywcs.hlp
+pkg/xtools/catquery/doc/catquery.hlp
+pkg/xtools/catquery/doc/cqsqpar.hlp
+pkg/xtools/catquery/doc/cqsqparn.hlp
+        Fixed various formatting problems in the skywcs and catquery library
+        help pages. (19/09/01, Davis)
+
+pkg/lists/doc/Lcalc.hlp
+pkg/lists/doc/Lcalc.hlp
+pkg/lists/doc/Lists.hlp
+pkg/lists/doc/unique.hlp
+pkg/lists/doc/average.hlp
+        Fixed various formatting problems in the lists package help files.
+        (19/09/01, Davis)
+
+mkpkg
+	Added architecture entries for LinuxPPC (linuxppc) and MacOSX
+	(macosx) to the root iraf mkpkg file.  (9/25)
+
+unix/hlib/libc/iraf.h
+unix/hlib/libc/stdarg.h		+
+	Added a new LIBC include <stdarg.h>.  This is the successor to
+	<varargs.h>, which is no longer supported on all platforms
+	(MacOSX).  If a C file defines "import_stdarg" then <stdarg.h> will
+	be included.  If this file defines USE_STDARG then the stdargs
+	mechanism for handling variable arguments lists should be used in
+	the code, otherwise the older varargs mechanism should be used (they
+	are NOT the same).  Unfortunately it is necessary to #ifdef the code
+	to do this as variable argument handling has to be done at compile
+	time and only one version can be used; nonetheless the code will be
+	just as portable and platform independent as always.  (9/25)
+
+pkg/cl/errs.c
+pkg/cl/clprintf.c
+	Modified these files to use STDARG.  (9/25)
+
+sys/libc/scanf.c
+sys/libc/printf.c
+sys/libc/sprintf.c
+sys/libc/eprintf.c
+	Modified these files to use STDARG.  (9/25)
+
+unix/mkpkg [pcix]
+	Added some comments on what version of F2C is used and where the
+	sources are maintained.  (9/25)
+
+unix/as.macosx [pcix]			+
+unix/boot.macosx [pcix]			+
+	Added AS and HBIN directories for the MacOSX port.  (9/25)
+
+unix/boot/bootlib/ostime.c [pcix]
+unix/os/gmttolst.c [pcix]
+	These routines were modified to use the cmtime.gmtime routine
+	to get the GMT offset.  Required for MacOSX.  ftime() is
+	normally used: while MacOSX has a manpage for this and says it
+	is in libcompat.a, there is no libcompat.a.  gmtime() is probably
+	the more modern routine anyway, and perhaps we should move to
+	it for most platforms.  (9/25)
+
+unix/boot/mkpkg/host.c [pcix]
+	In h_rebuildlibrary, added a call to resolvefname() so that
+	ranlib is passed an actual filename rather than a symbolic
+	link.  (9/25)
+
+unix/boot/spp/xc.c [pcix]
+	Various changes to support MacOSX.  (9/25)
+
+unix/boot/spp/xpp/xppcode.c
+	Added explicit initialization for the variable nstrings to fix a
+	runtime SPP compiliation problem seen on MacOSX.  (9/25)
+
+unix/hlib/install [pcix]
+unix/hlib/cl.csh [pcix]
+unix/hlib/fc.csh [pcix]
+unix/hlib/irafuser.csh [pcix]
+unix/hlib/mkpkg.inc [pcix]
+unix/hlib/mkpkg.sf.MACX [pcix]
+unix/os/irafpath.c [pcix]
+	The usual minor changes to support a new platform, in this case
+	MacOSX.  (9/25)
+
+
+unix/os/zfchdr.c [pcix]
+unix/os/zfgcwd.c [pcix]
+unix/os/zglobl.c [pcix]
+	Moved the global variable oscwd to zglobl.c to avoid a linker
+	problem seen on MacOSX.  (9/25)
+
+unix/os/zfioks.c [pcix]
+	MacOSX does not provide REXEC (it is in libcompat.a) so the KS
+	driver was modified to conditionally use RCMD instead.  This routine
+	replaces the very old REXEC and should probably be used on most
+	platforms in any case.  A USE_RCMD define was added at the top
+	of the file to select which routine is used on each platform.
+	(/9/25)
+
+unix/os/zxwhen.c [pcix]
+	Added support for MacOSX, which does not fully support the 
+	modern sigaction, used for signal handling on most platforms
+	these days.  (9/25)
+
+pkg/images/tv/imedit/epimcopy.x
+	Added a missing TY_USHORT branch to the image copy case statement.
+	(10/10 LED)
+
+pkg/system/help/hinput.x
+	Added a missing sfree before return. (10/10/01, MJF)
+
+pkg/system/help/houtput.x
+	ttyclear() was being called as a function, changed to call as a
+	subroutine. (10/10/01, MJF)
+
+pkg/system/help/prhelp.x
+	Added some extra braces around complex if statements. (10/10/01, MJF)
+
+pkg/system/help/help.h
+pkg/system/help/t_help.x
+pkg/system/help/t_lroff.x
+pkg/system/help/prblkhdr.x
+pkg/system/help/prhlpblk.x
+	Added new code to permit text/html/ps output options.  Additional
+	code to handle standout mode properly. (10/10/01, MJF)
+
+pkg/xtools/mkpkg
+lib/pkg/pstools.h			+
+pkg/xtools/pstools/Notes		+
+pkg/xtools/pstools/font.com		+
+pkg/xtools/pstools/mkpkg		+
+pkg/xtools/pstools/psbreak.x		+
+pkg/xtools/pstools/pscenter.x		+
+pkg/xtools/pstools/psclose.x		+
+pkg/xtools/pstools/psdeposit.x		+
+pkg/xtools/pstools/psfont.x		+
+pkg/xtools/pstools/psjustify.x		+
+pkg/xtools/pstools/psopen.x		+
+pkg/xtools/pstools/psoutput.x		+
+pkg/xtools/pstools/pspos.x		+
+pkg/xtools/pstools/psprolog.x		+
+pkg/xtools/pstools/pssetup.x		+
+pkg/xtools/pstools/pswidth.x		+
+	Added a new interface library for doing Postscript text output.
+	This is used by the lroff conversion code but is useful for any
+	application which needs to output blocks of text in a similar
+	manner.  (10/10/01, MJF)
+
+pkg/system/help/t_lroff.x
+pkg/system/help/lroff.par
+	Added a new 'format' parameter and code to permit output of HTML
+	or Postscript. (10/10/01, MJF)
+
+pkg/system/help/lroff/mkpkg
+pkg/system/help/lroff/lroff.h
+pkg/system/help/lroff/lroff.x
+pkg/system/help/lroff/nofill.x
+pkg/system/help/lroff/nextcmd.x
+pkg/system/help/lroff/lroff2ps.x	+
+pkg/system/help/lroff/lroff2html.x	+
+	Added new converter code to create HTML or formatted Postscript from
+	lroff source. (10/10/01, MJF)
+
+pkg/system/help/t_help.x
+	Task was modified to call the XHELP code to run the GUI version of
+	the task if requested.  Task output is the same if the device
+	remains the default 'terminal' value, however resetting the 'device'
+	parameter to one of 'gui', 'html', or 'ps' will either spawn the GUI
+	task under xgterm or print the converted help page to the stdout.
+	(10/10/01, MJF)
+
+lib/pkg/help.gui			+
+lib/pkg/help.html			+
+pkg/system/help/mkpkg
+pkg/system/help/xhelp/			+
+pkg/system/help/xhelp/help.gui		+
+pkg/system/help/xhelp/mkpkg		+
+pkg/system/help/xhelp/xhcmds.x		+
+pkg/system/help/xhelp/xhdir.x		+
+pkg/system/help/xhelp/xhelp.h		+
+pkg/system/help/xhelp/xhelp.par		+
+pkg/system/help/xhelp/xhelp.x		+
+pkg/system/help/xhelp/xhfiles.x		+
+pkg/system/help/xhelp/xhhelp.x		+
+pkg/system/help/xhelp/xhinit.x		+
+pkg/system/help/xhelp/xhofile.x		+
+pkg/system/help/xhelp/xhpkg.x		+
+pkg/system/help/xhelp/xhprint.x		+
+pkg/system/help/xhelp/xhqref.x		+
+pkg/system/help/xhelp/xhroot.x		+
+pkg/system/help/xhelp/xhsave.x		+
+pkg/system/help/xhelp/xhsearch.x	+
+pkg/system/help/xhelp/xhsort.x		+
+pkg/system/help/xhelp/zzdebug.x		+
+	Installed GUI help support code.  Slight modifications from the
+	stand-alone XHELP task were required, almost entirely in the task
+	main.  Various bugs were fixed in the task initialization which
+	prevented repeated executions from displaying the correct package
+	information.  (10/10/01, MJF)
+
+pkg/system/help/houtput.x
+	Removed an unused 'junk' variable. (10/10/01, MJF)
+
+pkg/system/phelp.cl
+pkg/system/references.cl
+	Hardwired the 'device' parameter to be 'terminal' (10/10/01, MJF)
+
+lib/pkg/scr/help.gui
+	Numerous bug fixes and consistency tweaks to the GUI file.
+	(10/10/01, MJF)
+
+pkg/system/help/xhelp/xhsave.x
+	Added missing file descriptors to fprintf() calls.  (10/10/01, MJF)
+
+pkg/system/help/xhelp.x
+	Removed an unused clgeti() declaration.  (10/10/01, MJF)
+
+pkg/system/pathnames.x
+	Added a missing SZ_LINE arg to a gargstr() call.  (10/10/01, MJF)
+
+pkg/system/protect.x
+pkg/system/unprotect.x
+	protect() was being called as a subroutine, changed to be a call to
+	an int function as defined.  (10/10/01, MJF)
+
+pkg/system/help/prhlpblk.x
+	Fixed a Postscript initialization bug which was preventing files from
+	being formatted as PS with the proper header.  (10/10/01, MJF)
+
+pkg/system/help/lroff/lroff.x
+	Fixed a bug in the new .hr directive preventing the text from being 
+	passed through to the output in the case of non-HTML.  (10/10/01, MJF)
+
+pkg/xtools/mkpkg
+lib/pkg/pstools.h		-
+pkg/xtools/pstools/Notes	-
+pkg/xtools/pstools/font.com	-
+pkg/xtools/pstools/mkpkg	-
+pkg/xtools/pstools/psbreak.x	-
+pkg/xtools/pstools/pscenter.x	-
+pkg/xtools/pstools/psclose.x	-
+pkg/xtools/pstools/psdeposit.x	-
+pkg/xtools/pstools/psfont.x	-
+pkg/xtools/pstools/psjustify.x	-
+pkg/xtools/pstools/psopen.x	-
+pkg/xtools/pstools/psoutput.x	-
+pkg/xtools/pstools/pspos.x	-
+pkg/xtools/pstools/psprolog.x	-
+pkg/xtools/pstools/pssetup.x	-
+pkg/xtools/pstools/pswidth.x	-
+	The XTOOLS library is not built until after the SYSTEM executable
+	and so the PSTOOLS library that the new HELP depends upon was not
+	being found.  PSTOOLS was elevated to be a new SYS interface, PSIO,
+	and so was deleted from the XTOOLS library.  (10/12/01, MJF)
+
+lib/psio.h			+
+sys/psio/			+
+sys/psio/README			+
+sys/psio/font.com		+
+sys/psio/mkpkg			+
+sys/psio/psbreak.x		+
+sys/psio/pscenter.x		+
+sys/psio/psclose.x		+
+sys/psio/psdeposit.x		+
+sys/psio/psfont.x		+
+sys/psio/psio.h			+
+sys/psio/psjustify.x		+
+sys/psio/psopen.x		+
+sys/psio/psoutput.x		+
+sys/psio/pspos.x		+
+sys/psio/psprolog.x		+
+sys/psio/pssetup.x		+
+sys/psio/pswidth.x		+
+sys/psio/zzdebug.x		+
+	Added a new interface library for doing Postscript text output.
+	This is formerly the PSTOOLS library and is used by the lroff
+	conversion code but is useful for any application which needs to
+	output blocks of text.  The README file explains the interface.
+	(10/12/01, MJF)
+
+pkg/system/mkpkg
+pkg/system/help/lroff/mkpkg
+pkg/system/help/lroff/lroff2ps.x
+	Removed the -lxtools flag from the system link line, small code
+	modification to make use of <psio.h>  (10/12/01, MJF)
+
+unix/hlib/zzsetenv.def
+	Added a new 'pspage' variable which is used by the PSIO interface to
+	set the default page size.  Acceptable values include "letter" (the
+	default) for US Letter, "legal" for US Legal, and "a4" and "b5" for
+	the most common European sizes.  Pspage can be used by the new HELP
+	and LROFF tasks to automatically set the desired Postscript page
+	size.  (10/12/01, MJF)
+
+lib/psio.h			-
+lib/psset.h			+
+sys/psio/psio.h			+
+sys/psio/*
+	Various minor tweaks to the PSIO code for consistency.  The private
+	and public parts of the interface were split into a psio.h include
+	for the interface, and psset.h for applications.  (10/14/01, MJF)
+
+pkg/system/help/lroff/mkpkg
+pkg/system/help/lroff/lroff2ps.x
+	Changed <psio.h> to <psset.h>.  (10/14/01, MJF)
+
+lib/scr/help.gui
+	Minor bug fixes to the HELP GUI.  (10/14/01, MJF)
+
+dev/hosts
+	Updated hohokam's irafks path for GONG. (10/15/01, MJF)
+
+sys/mkpkg
+	Added an entry for PSIO.  (10/15)
+
+pkg/images/immatch/src/xregister/rgxicorr.x
+pkg/images/immatch/src/xregister/rgxcolon.x
+pkg/images/immatch/src/xregister/rgxtools.x
+        Fixed a bug in the xregister multiple region handling code that was 
+        preventing xregister from computing x-correlations on regions beyond
+        the first in interactive mode. (10/17/01, LED)
+
+dev/hosts
+	Added solaris machines nebula and bobcat. (10/30/01, MJF)
+
+pkg/images/imutil/src/imheader.x
+        Fixed imheader so it prints out an image size of 0 if IM_NDIM(im) is
+        is 0 instead of the contents of the first element of the IM_LEN(im,1)
+        vector which may be non-zero. (11/05/01, Davis)
+
+pkg/images/imutil/src/hedit.x
+pkg/images/imutil/doc/hedit.hlp
+	For backwards compatability modified the precedence of the operator
+	switches from addonly / add / delete to add / addonly / delete.
+	Addonly is a new switch which adds a keyword only if it is not
+	already there.  Also clarified the switch precedence rules in the
+	help page.  (11/13/01, Davis)
+
+lib/plset.h
+sys/plio/README
+sys/plio/mkpkg
+sys/plio/plsten.x
+sys/plio/plsectne.x
+sys/plio/plsectnc.x
+sys/plio/plrop.x
+sys/plio/plrio.x
+sys/plio/plregrop.x
+sys/plio/plpoint.x
+sys/plio/plplr.gx
+sys/plio/plplp.gx
+sys/plio/plplls.x
+sys/plio/pllinene.x
+sys/plio/plglr.gx
+sys/plio/plglp.gx
+sys/plio/plglls.x
+sys/plio/placcess.x
+sys/pmio/pmaccess.x
+sys/pmio/pmplls.x
+	The pl_access routine (which is private to the PLIO interface)
+	was changed to return a pointer to the line list rather than an
+	offset into the PLIO data buffer.  A new routine pl_reference()
+	was added to do what pl_access used to do.  All the affected 
+	PLIO and PMIO code was updated (nearly all instances wanted the
+	pointer instead of the buffer offset).  
+
+	This change makes pl_access usable by external code, which has
+	no (legal) way to do anything with internal references to the
+	PLIO descriptor.  (12/03)
+
+sys/plio/pllen.x
+	Added a new PLIO routine pl_llen(), which returns the length of
+	an encoded line list.  (12/03)
+
+sys/plio/plemptyline.x
+	Added a new routine to return a pointer to the "emptyline" line
+	list for a mask.  This can be used in conjunction with the newly
+	modified pl_access to check for a pointer to the empty line.
+	Applications should rarely need to do this, but it is needed in the
+	FITS kernel to compress empty lines, i.e., make the lines in the
+	FITS verfsion of the mask all point to the same "emptyline" line
+	list.  (12/03)
+
+sys/fmtio/evvexpr.gy
+	Added support for the bitwise boolean operators: '&' (and), '|' (or),
+	'^' (xor), and '~' (not/complement).  These can be used only with
+	integer type operands (short, int, long) and will return a result
+	of the same type, like an arithmetic operator, with the usual type
+	promotion semantics.  (12/03)
+
+pkg/images/imutil/doc/imexpr.hlp
+	Added the new bitwise boolean operators to the operator list. (12/04)
+
+sys/ki/ki.h
+	Increased MAX_NODES (the max nodes in a local network for IRAF
+	networking) from 320 to 512.  (12/04)
+
+sys/ki/kbzstt.x
+	Fixed some typos; no functional changes.  (12/04)
+
+pkg/images/immatch/src/imcombine/src/icscale.x
+	Fixed a normalization bug.  (12/04])
+
+unix/hlib/config.h
+unix/hlib/libc/libc.h
+	Increased FIO_MAXFD (the max number of open files in FIO) from 
+	256 to 4096.  This is the "hard limit" on the maximum number of
+	open files in an IRAF process.
+
+	Analysis of the FIO code indicates that there isn't any serious
+	efficiency issue here: there are only a few cases where a linear
+	search of the file list is performed, and these do not impact normal
+	usage.  During i/o to a file there is no affect all since access via
+	a file descriptor is direct.  The is some impact on file descriptor
+	allocation at file open time, however this only has an impact in
+	cases where there are many open files (if 4000 files are open 4001
+	file descriptors may have to be examined to find the next open
+	slot).  Such cases are unusual however, and in such a case however,
+	performance is likely to be governed by much more important
+	factors.
+
+	The biggest impact of increasing the number of FIO descriptors is
+	static allocation of BSS storage (data memory space allocated when a
+	process is spawned).  This is only about 100KB per process for 4096
+	descriptors.  This would have been an issue once, but is not
+	important today where even everyday PCs have hundreds of megabytes
+	of memory.  (12/04)
+
+unix/shlib/mkshlib.sos4
+unix/shlib/mkshlib.ssol
+	It turns out that the FIO common (FIOCOM) is explicitly referenced
+	in the Sun/IRAF shared image.  The parameters FIOCOMSZ, XERCOMSZ,
+	TOTCOMSZ, and CMSZ (rouned up to an integral number of pages) must
+	all agree with the actual commons.  The new values are as follows:
+
+	    FIOCOMSZ = 0x24660
+	    XERCOMSZ = 0x810
+	    TOTCOMSZ = 0x24e70
+	    CMSZ = 0x26000
+
+	(12/04)
+
+sys/vops/awvg.gx
+	Changed the way the computation was done so that the value MEAN
+	is not forced to float when working on float data.  It is replaced
+	by the expression (sum/ngpix) so that the computation is all done
+	in double precision internally.  (12/04)
+
+unix/hlib/libc/kernel.h
+	1. Increased MAXOFILES, the maximum number of host level open files,
+	from 64 to 256.  This is the maximum number of files that can be
+	simultaneously open at the host level.  It determines the maximum
+	number of files that can be simultaneously open by an IRAF process
+	in the usual case - that is, when FCLOSEFD is not explicitly set on
+	open files by the IRAF task (if FCLOSEFD is used, up to FIO_MAXFD
+	files may be open at the IRAF level).  The actual maximum number
+	open files may be less if the host system imposes a lower limit.
+	For example, the default limit is 64 on SUNOS and Solaris systems.
+	On PC Unix systems it is much higher.  Even on systems that impose
+	a lower limit by default, the "limit" shell command may often be
+	used to increase the limit.
+
+	2. Increased the following "optimum" buffer sizes:
+
+	    BF_OPTBUFSIZE	32768	->  65536  (binary files)
+	    SF_OPTBUFSIZE	32768	->  65536
+	    KS_OPTBUFSIZE	 4096	->  65536  (iraf networking)
+	    PR_OPTBUFSIZE	 4096	->  65536  (interprocess comm.)
+	    ND_OPTBUFSIZE	 4096	->  65536  (network driver)
+
+	3. Removed the maximum buffer size limits for the PR and ND
+	devices.  These were formerly set to 4096.  4K used to be the
+	system buffer size for devices like pipes, however that was a
+	long time ago and I don't know if it is still the case.  Probably
+	not, and it doesn't matter anyway so long as a pipe doesn't
+	circle back on itself.  This probably won't affect performance
+	much, but it could, especially for ND connections which can carry
+	a lot of traffic.
+
+	The KS limit was already set to 0.  Since the KI and binary device
+	limits are already 0, this means that large transfers can be used on
+	IRAF networking connections, e.g., for image access.  Large transfers
+	(100K or larger) are needed to achieve the high bandwidth provided
+	by modern Fast Ethernet or Gigabit Ethernet network interfaces.
+	We should do some tests at some point to see if we can get high
+	performance for remote kernel server image access using fast
+	networking and the new version of IRAF.  Potentially, accessing
+	images in this way could be as fast or faster than accessing them
+	on a local hard disk.  (12/04)
+
+lib/imio.h
+lib/imset.h
+sys/imio/immapz.x
+sys/imio/imsetbuf.x
+sys/imio/imseti.x
+sys/imio/imstati.x
+	The following changes were made to enable IMIO to use larger
+	buffer sizes to optimize i/o for large images.
+
+	The default file buffer size set by IMIO is unchanged: it is still
+	about 512 MB, the value set for V2.11.2.  However, a new parameter
+	IM_BUFFRAC was added.  Both IM_BUFSIZE and IM_BUFFRAC are used to
+	help determine the FIO buffer size set when an image is opened.
+	The logic for this is implemented in imsetbuf.x.
+
+	Backwards compatibility.  If you do nothing about IMIO/FIO buffers
+	in your program, the system may transparently use a larger buffer
+	for larger images.  If you set BUFSIZE in your program, the system
+	will by default use the value you give, or possibly a larger value,
+	if the image you are accessing is very large.  If you set BUFSIZE
+	and you want to guarantee that the value you set is used (even
+	for very large images) then you should also set BUFFRAC=0 to ensure
+	that only BUFSIZE is used.
+
+	How it works.  BUFFRAC specifies the default FIO buffer size used to
+	access an image, expressed as a percentage of the size of the
+	image.  For example, the builtin default value of BUFFRAC=10 will
+	try to make a FIO buffer 10% of the size of the image.  The actual
+	value used will be given by BUFFRAC, but will be at least BUFSIZE,
+	and no more than a builtin default maximum value, currently 32 MB.
+	Given the builtin defaults, the buffer size will range from 0.5 to
+	32 MB depending upon the size of the image being accessed.  As noted
+	above, BUFSIZE and BUFFRAC can be set to force the buffer size to a
+	specific value if desired.
+
+	Environment variables for both parameters are provided.  The names
+	are "IMIO_BUFSIZE" and "IMIO_BUFFRAC".  If specified, these override
+	(at image open time) the builtin default values for both
+	parameters.  An IMSET call by the application will override all such
+	defaults.
+
+	The FIO buffer allocated will not be larger than the size of the
+	image.  The FIO buffer will also not exceed the maximum size set by
+	the file driver being accessed.  For example, for PLIO images the
+	file buffer will not exceed about 2KB, even for a very large mask.
+	This is because the "pixel file" for a PLIO image is dev$null, the
+	driver for which specifies a maximum i/o buffer size of 2K (the real
+	file to load or save the mask will use a different descriptor).
+
+	The intent here is to provide an adaptive mechanism for setting the
+	FIO buffer size used to access an image, which automatically adapts
+	to the size of the image being accessed.  If you access a lot of
+	small images you will get smaller buffers - everything will be as
+	before.  If you access very large images, you may get large buffers
+	up to the builtin maximum value of (currently) 32 MB.
+
+	Using large buffers could cause a machine to run out of memory.
+	However, it is likely that if someone is working on 300 MB images
+	that they are using a machine which has a memory at least that
+	large - probably larger.  If there are problems, the environment
+	variable overrides can be used to tune IMIO.
+
+	The reason for large file buffers is to limit the number of disk
+	data transfers, and hence the number of disk seeks.  Using buffers
+	larger than a certain amount (32 MB is generous) is probably
+	counterproductive.  If the i/o system provides 20 MB/sec i/o
+	transfers, 32 MB will take 1.6 seconds.  This should be more than a
+	large enough granularity to provide efficient i/o, hence is a
+	reasonable limit (at this point paging effects are likely to
+	dominate).  (12/04)
+
+unix/boot/spp/xc.c
+unix/boot/spp/xc.c [pcix]
+	The findexe() routine can modify the PATH variable in the program
+	environment to add IRAF HSI directories to the path (so that
+	stuff like f2c.e can be found).  The buffer used to compute a new
+	PATH environment variable was dimensioned SZ_PATHNAME, which is
+	too small for PATH since it may contain many directory pathnames.
+	Changed the buffer dimension used here to 8192.  (12/04)
+
+sys/plio/plgsize.x
+sys/plio/plstati.x
+sys/plio/plloadim.x
+	Changed the code which computes the mask depth from PL_MAXVAL so
+	that it will return a value of zero for a newly created but
+	unitialized mask (naxes, axlen, and depth will hence all be zero
+	for a newly created mask).  (12/04)
+
+sys/vops/awvg.gx
+	Changed the way the computation was done so that the value MEAN is
+	not forced to float when working on float data.  It is replaced by
+	the expression (sum/ngpix) so that the computation of SIGMA is all
+	done in double precision internally.  (12/04)
+
+sys/imio/imopsf.x
+sys/imio/iki/fxf/fxfopen.x
+	Both of these routines had code such as "IM_PFD(im) = open (...)".
+	If the OPEN call should take an error exit, IM_PFD could get set
+	to a garbage value.  The code was changed to break the assignment
+	into two statements so that IM_PFD is not set if the file open
+	fails.  (12/04)
+
+sys/vops/alork.gx		+
+sys/vops/alor.gx		+
+sys/vops/alank.gx		+
+sys/vops/alan.gx		+
+sys/vops/vops.syn
+sys/vops/vops.men
+sys/vops/vops.calls
+sys/vops/mkpkg
+sys/vops/lz/mkpkg
+	Added new vector operators alan, alank (logical AND) and alor, alork
+	(logical OR).  These take any integer data as input (short, int,
+	long) and return a logical (expressed as int) result.  (12/05)
+
+sys/fmtio/evvexpr.gy
+	The code for the logical AND and OR operations was modified to use
+	the new VOPS alan/alor routines.  The old code was based on the
+	bitwise boolean operators: it would work if the input data had only
+	logical values (zero or one), but not if the input data was any
+	arithmetic integer value.  The new routines will treat all input
+	integer data values as either zero (false) or non-zero (true).
+	Finally if a logical operation is performed the result image will
+	be type int rather than short as before.  This is just to be
+	consistent in the treatment of TY_BOOL as int.  The old code was
+	trying to save space by storing the 1-bit logical result in a
+	short image.  (12/05)
+
+sys/vops/awvg.gx
+	The usage of INDEF to set mean/sigma was incorrect.  The generic
+	code would use the INDEF appropriate for the target datatype, but
+	the datatypes of the internal variables mean/sigma were being
+	explicitly set.  Changed the INDEF usage to explicitly match the
+	INDEF type to the datatype of the mean/sigma variables.  (12/05)
+
+sys/imio/iki/ikiextn.x
+	Removed the call to strlwr() made when processing filename extensions
+	in IMEXTN, e.g., imextn = "oif:imh fxf:fits,fit,FITS plf:pl" should
+	now do what one would expect.  (12/05)
+
+pkg/proto/proto.cl
+pkg/proto/proto.men
+pkg/proto/proto.hd
+pkg/proto/x_proto.x
+pkg/proto/mskexpr.par
+pkg/proto/mskregions.par
+pkg/proto/doc/mskexpr.hlp
+pkg/proto/doc/mskregions.hlp
+pkg/proto/maskexpr/t_mskexpr.x
+pkg/proto/maskexpr/memkmask.x
+pkg/proto/maskexpr/t_mskregions.x
+pkg/proto/maskexpr/mesetreg.x
+pkg/proto/maskexpr/mesetexpr.x
+pkg/proto/maskexpr/meregmask.x
+pkg/proto/maskexpr/peregfuncs.x
+pkg/proto/maskexpr/megeom.x
+pkg/proto/maskexpr/meregfuncs.x
+pkg/proto/maskexpr/mskexpand.x
+pkg/proto/maskexpr/gettok.x
+pkg/proto/maskexpr/gettok.h
+        Installed the mskexpr and mskregions tasks in the proto package.
+        (12/06/01, Davis)
+
+pkg/images/imcoords/src/t_wcsctran.x
+pkg/images/imcoords/src/rgstr.gx
+pkg/images/imcoords/src/rgstr.x
+	Fixed a string_file error in the wcsctran task which may occur
+	if the input image is dimensionally reduced. The bug is due to
+	an uninitialized array error. The bug does not occur if by
+	chance the array values are 0. (12/06/01, Davis)
+
+sys/imio/imsetbuf.x
+	Changed the way the buffer size is calculated slightly to avoid
+	overflowing a 32 bit integer when calculating the buffer size as
+	a fraction of a very large (e.g. 1 GB) image.  (12/10)
+
+sys/imio/immapz.x
+	Tweaked the handling of "IMIO_BUFSIZE" so that the value can be
+	input in bytes, rather than the SPP char units used internally
+	for the buffer size calculations.  MB would be more convenient
+	for the user but would prevent the use of "small" buffers (e.g.
+	the default buffer size is "small" - 0.5MB).  (12/10)
+
+pkg/images/imutil/src/t_imstat.x
+        Added a call setting IM_BUFFRAC to 0 to the memory caching code in
+	the imstatistics task in order to force the imio buffer to be the
+	size of the input image.
+	(12/10/01, Davis)
+
+pkg/proto/masks/mstcache.x
+pkg/proto/masks/rsscache.x
+        Added a call setting IM_BUFFRAC to 0 to the memory caching code in
+	the mimstatistics and rskysub tasks in order to force the imio buffer
+	to be the size of the input image.
+	(12/10/01, Davis)
+
+lib/imio.h
+lib/imset.h
+sys/imio/imsetbuf.x
+sys/imio/imstati.x
+sys/imio/imseti.x
+sys/imio/immapz.x
+	Added another IMIO parameter BUFMAX for tuning buffer size
+	allocation.  This allows the builtin value of the maximum FIO buffer
+	size (DEF_MAXFIOBUFSIZE, currently set to about 32 MB) to be easily
+	overridden at the application or environment level, like BUFSIZE and
+	BUFFRAC.
+
+	If you set BUFFRAC=0 then BUFSIZE alone determines the FIO buffer
+	size (subject to storage device limits if any).  BUFMAX is not a
+	"hard" limit, it is just a parameter used in the BUFFRAC heuristic
+	to automatically tune the buffer size.  If BUFFRAC is allowed to
+	automatically tune the buffer size for the image to be accessed
+	(the default), then BUFMAX specifies the largest buffer which IMIO
+	will create.  (12/10)
+
+sys/imio/iki/fxf/mkpkg
+sys/imio/iki/fxf/fxf.h
+sys/imio/iki/fxf/fxfaccess.x
+sys/imio/iki/fxf/fxfctype.x
+sys/imio/iki/fxf/fxfdelete.x
+sys/imio/iki/fxf/fxfencode.x
+sys/imio/iki/fxf/fxfksection.x
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfopix.x
+sys/imio/iki/fxf/fxfplread.x	+
+sys/imio/iki/fxf/fxfplwrite.x	+
+sys/imio/iki/fxf/fxfrfits.x
+sys/imio/iki/fxf/fxfupdhdr.x
+sys/imio/iki/fxf/zfiofxf.x
+	The FITS kernel was modified to add support for storing images in
+	extensions as compressed pixel masks.  The mask is stored as a
+	binary table using the "ZIMAGE" (compressed image) convention
+	proposed by White, Greenfield, Pence, and Tody in 1999:
+
+	    http://heasarc.gsfc.nasa.gov
+	    /docs/software/fitsio/compression/compress_image.html
+
+	In the current implementation only the "PLIO_1" compression
+	algorithm is implemented.  Mask extensions may be read or written
+	directly by the kernel.  When writing a new extension it will be
+	appended to the MEF file.  To append an image to a MEF file as
+	a mask, include "type=mask" in the image kernel section when the
+	output image is opened.
+
+	Masks are interfaced to the system as images and may be read and
+	written like any other image via IMIO.  They have a normal image
+	header and can be manipulated with any program that deals with
+	images.  The pixel type is INT.
+
+	It is also possible to access a mask image as a PLIO mask.  An
+	IMSTATI query for IM_PLDES parameter will return the PLIO mask
+	descriptor.  While a mask extension is opened under IMIO it is
+	represented as a PLIO mask and may be accessed in this form like
+	any other mask.
+
+	The mask image is stored in the FITS binary table (BINTABLE)
+	extension when the image is closed, and is loaded from the extension
+	when the image is opened.  The compression representation used to
+	store the mask in the binary table is the same as is used within
+	PLIO.  The new (V2.12) encoding is used, allowing very large masks
+	to be stored.  Currently masks up to 3D are supported.  Data on
+	each 2D mask plane will be compressed in both X and Y as with PLIO.
+	The depth of the mask is preserved.
+
+	Although a mask is stored as a binary table the format of the
+	table is not completely general.  In the current implementation
+	there can be only one column in the table (COMPRESSED_DATA).
+	This is an integer-valued variable length array column containing,
+	for each line of the N-dimensional image, the PLIO compressed
+	version of that image line.  The actual compressed data is stored
+	in the heap area of the table.  Multiple image lines may point to
+	the same compressed line list, e.g., to store the empty line or to
+	provide compression in Y.  
+	(12/10 NZ+DT)
+
+sys/imio/iki/fxf/fxfrdhdr.x
+	Changes to fix and inconsistancy between the creation and modification
+	time of an image. The DATE keyword contains the creation date and time
+	and IRAF-TLM the modification date and time.  (12/10 NZ+DT)
+
+sys/imio/iki/fxf/fxfexpandh.x	+
+sys/imio/iki/fxf/fxfupdhdr.x
+	The update header code was changed so that if a header has to be
+	expanded (hence forcing a rewrite of the full file) then all the
+	other extension headers will be expanded at the same time to
+	include at least "nlines" of blank cards.  (12/10 NZ+DT)
+
+pkg/xtools/catquery/mkpkg
+pkg/xtools/gtools/mkpkg
+	Added a missing "cq.h" file dependency to the cqsetcat.x declaration.
+	Added a missing <gio.h> file dependency to the gtlabax.x declaration.
+	(12/13/01 LED)
+
+pkg/proto/masks/mptools.x
+	Removed an unnecesary include <error.h> statement from the mptools.x
+	file. (12/13/01 LED)
+
+pkg/utilities/mkpkg
+        Removed an unnecessary mkpkg <ttyset.h> file dependency from the
+	curfit.x declaration.
+	(12/13/01 LED)
+
+pkg/images/immatch/src/imcombine/mkpkg
+	Added a missing <imhdr.h> file dependency to the timcombine.x
+	declaration.  (12/13/01 LED)
+
+sys/imio/imwrite.x
+	In some cases (FIO block size less than the length of an image
+	line), when appending to an existing image, it could be possible for
+	data at the end of the file to be overwritten.  The code which
+	extends an imagefile was made more rigorous.  (12/13)
+
+unix/gdev/mkpkg
+unix/gdev/iism75/mkpkg
+sys/fmio/mkpkg
+sys/fmtio/mkpkg
+sys/memdbg/mkpkg
+pkg/softools/mkpkg
+	Added missing mkpkg dependencies to sources.  (12/13)
+
+sys/gio/stdgraph/stgrcur.x
+	The int function stg_encode was being called as a subroutine.  (12/13)
+
+sys/gio/cursor/grcinit.x
+	Deleted the unused argument 'stream'.  All calls to grc_init
+	(there was only one, in rcursor.x) already omit the argument.
+	This is an internal function, hence this is not an interface
+	change.  (12/13)
+
+sys/gio/gmprintf.x
+	Added a missing argument to a sprintf call in this (currently unused)
+	routine.  (12/13)
+
+sys/mtio/mtclean.x
+	Removed an extra argument from a getline() call.  (12/13)
+
+sys/mwcs/mwsctran.x
+	Fixed a problem in mw_sctran that would occur where there is a
+	mixture of axes with and without world functions.  When transforming
+	between logical and world this would have the effect of transposing
+	one of the function axes with one of the non-function axes.  (12/13)
+
+sys/proto/maskexpr/peregfuncs.x
+	Removed an extraneous argument that was no longer necessary and was
+	being used incorrectly in the pe_polygon function. (12/14/01 LED)
+
+unix/os/zwmsec.c
+unix/os/zwmsec.c [pcix]
+	This code uses usleep() to implement the millisecond sleep, which
+	limits the maximum time delay to just over an hour.  Changed the
+	code to use sleep() for delays longer than one hour (with a
+	precision of at most 1 second), and usleep() for shorter time
+	delays.  (12/15)
+
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfplread.x
+sys/imio/iki/fxf/fxfupdhdr.x
+	Added support for creating a pixel mask extension in NEW_IMAGE mode.
+	(12/15 NZ+DT)
+
+unix/hlib/install
+unix/hlib/install.old
+unix/hlib/uninstall
+unix/hlib/sysinfo
+unix/hlib/install [pcix]
+unix/hlib/install.old [pcix]
+unix/hlib/uninstall [pcix]
+unix/hlib/sysinfo [pcix]
+	Installed the new version of the install script, and the companion
+	uninstall and sysinfo scripts.  The old install script is still
+	present as install.old.  The new version of INSTALL is a major new
+	version which does a much more through job of checking the integrity
+	of the system during an install; it also has some post-install
+	capabilities for performing basic system configuration.  The 
+	SYSINFO script can be used after an install to verify the integrity
+	of a system.  (12/14)
+
+lib/pmset.h
+sys/pmio/miostati.x
+sys/pmio/mioseti.x
+	Added a new parameter P_PMCLOSE to mio_seti and mio_stati.  This
+	provides access to the already existing flag used to automatically
+	close an associated PMIO mask if the MIO object is closed.  (12/16)
+
+sys/pmio/mkpkg
+sys/pmio/pmstati.x
+	Added the routine pm_stati to PMIO.  This was in the interface as
+	a redefinition of pl_stati, but this was confusing enough to warrant
+	a separate routine.  (12/16)
+
+lib/syserr.h
+lib/syserrmsg
+sys/pmio/pmseti.x
+sys/plio/plseti.x
+sys/plio/plstati.x
+	Added a default: branch to all the PLIO and PMIO set/stat calls to
+	call syserr(SYS_PLINVPAR) (invalid mask parameter) if a bad parameter
+	code is referenced.  (12/16)
+
+unix/os/zmain.c
+unix/os/zmain.c [pcix]
+	Modified zmain (the host main for an IRAF task) to call exit() instead
+	of _exit().  This is necessary to flush the output streams and to
+	call any exit functions posted with atexit().  Most notably this is
+	required for profiling (-pg/gprof) to work for an IRAF process.
+	The ability of an IRAF task to return a exit status is unaffected.
+	(12/16)
+
+sys/imio/db/impstr.x
+	This code is used to edit an existing header keyword to replace the
+	value string (either a quoted string or a numeric/logical string
+	value) with a new value.  It would replace only the text in the
+	usual value fields through column 30.  In rare cases where an old
+	numeric value extended beyond column 30 this could result in a
+	malformed value being generated.  The code was modified to clear the
+	old text in this case, up to an optional comment or end of line.
+	(12/18 LD+DT)
+
+sys/imfort/imrdhdr.x
+	Fixed several instances of the function bfseek() being called as
+	a procedure.  (12/19)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+sys/imio/iki/fxf/fxfrfits.x
+sys/imio/iki/fxf/fxfplwrite.x
+sys/imio/iki/fxf/fxfplread.x
+sys/imio/iki/fxf/fxfopix.x
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxf.h
+	Fixed several FITS kernel bugs found during alpha testing.  (12/21)
+
+unix/hlib/install
+unix/hlib/uninstall
+unix/hlib/sysinfo
+unix/hlib/install [pcix]
+unix/hlib/uninstall [pcix]
+unix/hlib/sysinfo [pcix]
+	Installed the latest versions of these scripts.  (12/21)
+
+sys/imio/iki/fxf/fxf.h
+sys/imio/iki/fxf/fxfopix.x
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfplwrite.x
+sys/imio/iki/fxf/fxfupdhdr.x
+	Fixes for further minor FK bugs found during testing.  (12/26)
+
+sys/ki/kfiosf.x
+	Changed the kopnsf routine to use a "server" variable like the
+	other KI file device drivers.  This does not change the function
+	of the routine.  (12/28)
+
+unix/hlib/cl.csh
+unix/hlib/cl.csh [pcix]
+	Modified the CL startup script to check that, if $iraf is defined,
+	it is valid (or at least, whatever directory or link it points to
+	exists).  If $iraf is defined but is invalid a warning is printed
+	and $iraf will be set to the default value of /iraf/iraf/ for the
+	current session.  (12/28)
+
+unix/os/zfiond.c
+unix/os/zfiond.c [pcix]
+sys/fio/ndopen.x
+	The ND driver was modified to provide better support for writing
+	network servers.  A new open modifier "nonblock" was added.  If this
+	is used when opening a server connection to a port then the
+	connection will open a server socket on the indicated port and
+	return immediately, without waiting for a client connection.  Later,
+	when a client tries to connect to the server, the server can open
+	the port with a special pseudo-filename syntax to accept the client
+	connection and set it up on a new socket.  This allows a server to
+	listen for client connections and open each on a separate socket.
+	Multiple client connections may simultaneously be open (we still
+	need to add a "select" type function to allow IRAF network servers
+	to be written which can service multiple simultaneous clients).
+
+	For example, to open a server socket on port 5697 on the localhost
+	to be used for client connections:
+
+		server = ndopen ("inet:5697::nonblock", NEW_FILE)
+
+	A client would subsequently connect to server port 5697 to get a i/o
+	connection to the server.  To accept the client connection on port
+	5697 and open an i/o stream to the client on a new file descriptor:
+		
+		fd = ndopen ("sock:<server>", NEW_FILE)
+
+	where <server> is the ascii representation of the server file
+	descriptor returned in the first ndopen.  Note this second ndopen
+	_will_ block if a client connection is not pending; usually some
+	external means will be used to avoid opening the client connection
+	until a client has made a connection attempt.  Once the NDOPEN
+	returns, a second file descriptor can be opened with REOPEN to get
+	separate buffered streams for reading and writing to the client.
+	Note that if we repeat the second NDOPEN for additional client
+	connections, each call will return a new file descriptor (the
+	private connection to the new client), although the "file name"
+	"sock:<server>" will be the same in each call.  (01/01/2002)
+
+unix/os/zfiobf.c
+unix/os/zfiobf.c [pcix]
+unix/hlib/libc/kernel.h
+unix/hlib/libc/kernel.h [pcix]
+	The binary file driver was modified to add VMcache client support.
+	This adds two new capabilities to the driver: 1) built-in support
+	for direct i/o (on systems that support it), and 2) a client 
+	interface to the VMcache daemon to permit the daemon to optimally
+	manage binary file i/o if a VMcache daemon is present.
+
+	Direct i/o is file i/o which transfers data directly between the
+	disk and process memory, bypassing system virtual memory.  For small
+	files or usage patterns which do not involve heavy i/o, direct i/o
+	will usually provide lower performance than allowing the system to
+	buffer data in virtual memory.  For large files or usage pattern
+	which involve very heavy i/o, however, use of direct i/o can prevent
+	paging and will avoid cluttering up system virtual memory with data
+	that will be only accessed once.  A limitation of direct i/o is
+	it is only possible when i/o transfers are block aligned and are
+	an integral number of device blocks in size - this means that
+	direct i/o cannot be used with the current version of the FITS
+	kernel, which currently uses a host device block size of 2880.
+	Direct i/o is currently only available on Solaris systems (versions
+	2.6/5.6 or greater - 5.5.1 is not supported).
+
+	Use of the VMcache daemon allows the daemon to control how file data
+	is cached in virtual memory.  This makes it possible to optimize
+	file access to avoid excessive paging (by freeing space used by low
+	priority files when new VM cache space is needed), and makes it
+	possible to cache images in memory for very fast access even by
+	separate processes (even including non-IRAF programs in many
+	cases).  The VMcache daemon can manage direct i/o on the behalf of
+	clients, telling the client whether to use normal (VM buffered) i/o
+	or direct i/o.  VMcache can also pre-fetch files so that they are
+	memory resident by the time the application references them.
+
+	The VMcache daemon is a separate system-level program outside of
+	IRAF.  This is necessary to provide a central system-wide cache
+	controller.  It also provides flexibility, allowing multiple
+	versions of the daemon to exist, e.g., to allow experimentation with
+	different types of caching algorithms.  It also allows easy
+	customization of the daemon independently of the IRAF applications
+	using the VMcache client interface.
+
+	The VMcache client interface was added to the BF driver (rather
+	than SF) because VMcache is a general low-level file i/o facility,
+	useful for all file i/o.  FMIO files for example (used for QPOE
+	images) are large binary files but FMIO uses BF and not SF.
+
+	For the moment the VMcache client interface has been added to
+	zfiobf.c since this is the only system component which uses it.
+	We may move it out to a separate file later.  Two environment
+	variables have been provided for customizing the behavior of the
+	client interface:
+
+	VMPORT		The tcp/ip socket to be used.  The built-in default
+			is 8677.  Both IRAF and vmcached will respond to
+			this environment variable if defined.
+
+	VMCLIENT        Initialization of the VMCLIENT interface.  The
+			string value should be a comma-delimited list of
+			keywords or keyword=value terms.  For example,
+			VMCLIENT="disable" or VMCLIENT="debug,threshold=8m".
+
+	The keywords currently recognized by VMCLIENT are the following:
+
+	enable		Enable use of the VMcache daemon, if any.  Used 
+			without the "=value".
+
+	disable		Disable use of the VMcache daemon.  Used without
+			the "=value".
+
+	debug		Set the debug level.  Can be used as either "debug"
+			or "debug=value".   Higher values generate more
+			detailed debugging messages.
+
+	threshold       The file size threshold for use of the VMcache
+			daemon.  Even if use of VMcache is enabled, the
+			daemon will be used only if the size of the file
+			being accessed equals or exceed the specified file
+			size threshold.  Smaller files are handled using
+			normal i/o and do not result in any communication
+			with the daemon.  Values may be specified in bytes
+			or in kilobytes (k or K suffix) or megabytes (m or M
+			suffix).
+
+	directio        Use of this keyword enables directio and disables
+			VMcache.  The value specifies the file size
+			threshold for use of direct i/o to access a file.
+			Files smaller than this value use normal (VM
+			buffered) i/o.  If directio is specified for a
+			client then use of VMcache is disabled, and no
+			communication with the daemon will occur.  Values
+			may be specified in bytes or in kilobytes (k or K
+			suffix) or megabytes (m or M suffix).
+
+	The builtin defaults are VMCLIENT="enable,threshold=8m".
+
+	Normally there will be no VMcache daemon running on a system.  If
+	the VMcache client is enabled a connection attempt will be made each
+	time a file larger than the threshold is accessed.  This is harmless
+	if no daemon is present, and does not measurably affect execution
+	time.  If a daemon is started after a process is already running,
+	the process will detect the daemon automatically in the next
+	connection attempt.  If a process is connected to a daemon and the
+	daemon dies or is killed, the process will silently detect this and
+	close the connection to the server.  If the daemon is subsequently
+	restarted the client will reconnect.  (01/01)
+
+unix/boot/vmcached/README +
+unix/boot/vmcached/notes +
+unix/boot/vmcached/vmcache.c +
+unix/boot/vmcached/vmcache.h +
+unix/boot/vmcached/vmcached.c +
+unix/boot/vmcached/README [pcix] +
+unix/boot/vmcached/notes [pcix] +
+unix/boot/vmcached/vmcache.c [pcix] +
+unix/boot/vmcached/vmcache.h [pcix] +
+unix/boot/vmcached/vmcached.c [pcix] +
+	The source for the developmental version of the VMcache library and
+	the VMcache daemon (vmcached) have been installed in BOOT.  There
+	are no build files as this version is still under development.
+	The code is complete but only enough debug/test was done to support
+	development of the VMcache client interface for IRAF (the vmcached
+	code is debugged but the new version of the vmcache library code has
+	not been tested).  Since the daemon can be worked with outside
+	the normal IRAF release we do not have to fully develop it for the
+	release.
+
+	It should be stressed that VMcache is only useful or warranted for
+	systems that are very data intensive.  The standard host operating
+	system file access heuristics are best for "normal" processing where
+	either the system is not really busy, or the datafiles are not
+	excessively large.  On systems with very large physical memories
+	where massive amounts of data are being processed, VMcache can make
+	a significant difference in overall system performance.
+
+	VMcache is too complex to document here.  Without going into the
+	details, its function is to manage a cache of files in system
+	virtual memory.  Files can be explicitly cached or uncached, or they
+	can be "accessed", and VMcache will decide whether or not to cache
+	the file in virtual memory.  This is what the VMcache client
+	interface does: every time it accesses (opens or extends) a file
+	larger then the VM threshold it sends an "access" directive to the
+	VMcache daemon.  The daemon sends back a response of 0 (file not
+	cached; use direct i/o to access the file), or 1 (file cached in VM;
+	use normal VM-buffered i/o to access the file).  Even if a file is
+	not cached the daemon keeps track of all accesses.  Files which are
+	frequently accessed will have a higher prority and are more likely
+	to be cached in memory.
+
+	IRAF uses only the access directive to interact with VMcache since
+	a general IRAF task cannot know how it is being used.  Higher level
+	clients may more explicitly control the cache: for example, the
+	Mosaic DHS will explicitly cache new images as they are read out,
+	and will cause other file accesses to be given a lower priority.
+	Any client code can connect to the VMcache daemon.  For example we
+	could add a unix-level task to be called from scripts for explicit
+	cache control, or a GUI to dynamically display the operation of
+	the cache and the utilization of system memory.
+
+	The builtin-default cache algorithm implemented in the new version
+	of VMcache uses the following heuristics to determine whether a file
+	is cached:
+
+	Factors determining if a file is cached:
+
+	    user-assigned priority (0=nocache; 1-N=cache priority)
+	    number of references
+	    time since last access (degrades nref)
+	    amount of available memory (cutoff point)
+
+	Cache priority
+
+	    priority = userpri * max(0,
+		(nref-refbase - ((time - last_access) / tock)) )
+
+	Tunable parameters
+
+	    userpri         User defined file priority.  Files with a higher
+			    priority stay in the cache longer.  A zero
+			    priority prevents a file from being cached.
+
+	    refbase         The number of file references has to exceed
+			    refbase before the file will be cached.  For
+			    example, if refbase=0 the file will be cacheable
+			    on the first reference.  If refbase=1 a file
+			    will only become cacheable if accessed two or
+			    more times.  Refbase can be used to exclude
+			    files from the cache that are only referenced
+			    once and hence are not worth caching.
+
+	    tock            While the number of accesses increases the cache
+			    priority of a file, the time interval since the
+			    last access likewise decreases the cache
+			    priority of the file.  A time interval of "tock"
+			    seconds will cancel out one file reference.  In
+			    effect, tock=N means that a file reference
+			    increases the cache priority of a file for N
+			    seconds.  A frequently referenced file will be
+			    relatively unaffected by tock, but tock will
+			    cause infrequently referenced files to age out
+			    of the cache within a few tocks.
+
+	For example, the cache could be configured to not cache a file the
+	first time it is accessed, causing direct i/o to be used for a file
+	which is only accessed once.  The second time a file is accessed
+	it would be cached in memory.  Files which are frequently accessed
+	would accumulate a high nref value and would stay in memory longer
+	than files which are only accessed once or twice.  Files which are
+	explicitly given a high priority (userpri) would stick around even
+	longer (or could be prevented from ever being cached).  Files which
+	have not been accessed for a long time will age out of the cache
+	unless they are given a very high priority.
+
+	VMcache is not IRAF-specific.  It is a stand-alone facility which
+	is well integrated with IRAF.  IRAF is one possible client.  (01/01)
+
+unix/os/mkpkg
+unix/os/mkpkg.sh
+unix/os/dio.c	+
+unix/boot/spp/xc.c
+unix/hlib/irafuser.csh
+unix/shlib/mkshlib.ssol-sc34
+	Use of direct i/o for Solaris proved more difficult than expected
+	as the system routine required to control this feature (called
+	"directio") is only available in Solaris 5.6 and later.  A 5.5.1
+	system will fail to link if directio is used.  To get around this
+	I had to add a compatibility library libcompat.a in HBIN.  This
+	is linked after libc.a and can be used to provide versions of 
+	any system routines not present in libc.a.  If libc.a does contain
+	the routine then this is the version used.  (01/01)
+
+unix/hlib/cl.csh
+	The logical expression to check for the definition of a $iraf and
+	it's validity was broken up into separate statements.  On some
+	systems the full expression was being evaluated even if the first
+	test failed, leading to an 'undefined variable' message when checking
+	the path validity if it wasn't already defined.  (01/02, MJF)
+
+sys/imoi/iki/fxf/fxfdelete.x
+	Adding a missing access mode argument to the call to fxf_access.
+	(01/02)
+
+lib/syserr.h
+lib/syserrmsg
+sys/imoi/iki/fxf/fxfplread.x
+	The miiread routines, which are integer functions, were being called
+	as procedures.  Modified the code to use the return value to check
+	for a read error.  Added call to syserrs and added a new FXF error
+	message to syserr for a read error on a mask extension.  (01/02)
+
+sys/imio/impmmap.x
+sys/imio/impmopen.x
+	These routines, used to map a pixel mask onto an image descriptor,
+	were modified to support mapping a mask stored as an image (e.g.,
+	a mask extension in a FITS MEF file).  im_pmmap was also modified
+	to fix a bug that would occur when the BOOLEAN_MASK and INVERT_MASK
+	flags were both set.  (01/03)
+
+sys/plio/plsaveim.x
+sys/plio/plloadim.x
+	These routines were modified to use PLIO to copy the image section
+	when saving a mask to an image or loading a mask from an image, and
+	the image is using a mask internally (e.g., a mask extension in a
+	FITS MEF file).  (01/03)
+
+pkg/xtools/catquery/cqquery.x
+	Fixed a couple of typos in the code which detects the end of the
+	http header. (01/03 LED)
+
+unix/os/zfdele.c
+unix/os/zfiobf.c
+unix/boot/vmcached/vmcached.c
+unix/os/zfdele.c [pcix]
+unix/os/zfiobf.c [pcix]
+unix/boot/vmcached/vmcached.c [pcix]
+	Added code to the VMcache client interface for a vm_delete method.
+	Modified zfdele (the delete file primitive) to call this function.
+	The purpose is to notify the VMcache daemon when a file is deleted
+	so that it can free the associated VM memory used and cache info,
+	if the file is cached.  The usual VM client heuristics apply here,
+	e.g., nothing is done unless VMcache is enabled and the file size
+	exceeds the threshold.  Also tested the VMcache code on Solaris
+	(it was tested on FreeBSD earlier) and made some more tweaks.  (01/03)
+
+pkg/images/imutil/src/t_minmax.x
+	Removed extra aguments from the calls to clpstr. (01/07 LED)
+
+pkg/xtools/rngranges.x
+	Added missing rstr argument to 2 rng_error calls. (01/07/ LED)
+
+sys/ki/irafks.x
+	Fixed a couple of typos in the server-side code for ZOPDPR.  (01/07)
+
+sys/tty/zzdebug.x
+sys/plio/zzdebug.x
+sys/pmio/zzinterp.x
+sys/qpoe/zzdebug.x
+math/interp/bench.x
+	Minor fixes to make spplint happy.  (01/07)
+
+lib/syserrmsg
+sys/imio/iki/fxf/fxfksection.x
+	Changed the system error SYS_FXFKSINVAL to read:
+	    FXF: invalid value for kernel section parameter (<param>)
+	Also fixed a bug in the TYPE case of the kernel section parsing
+	code; it was identifying the parameter name in the error message
+	as "mask" when it should have been "type" (as in type=mask).  (01/07)
+
+sys/imio/iki/fxf/fxfrfits.x
+	The computed calendar day was of off by one day.  (01/07 NZ+DT)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+sys/imio/iki/fxf/fxfplwrite.x
+sys/imio/iki/fxf/fxfopen.x
+	Fixes installed for problems involving copying an image section.
+	Also fixed another case of mask code that was limited to 2 dimensions.
+	(01/07 NZ+DT)
+
+unix/shlib/S.ver.sparc
+	Incremented the shared image version number to 8 (S8.e).  (01/07)
+
+unix/shlib/S.ver.ssun
+	Incremented the shared image version number to 12 (S12_5.5.e,
+	S12_5.6.e, etc.).  Installed the released (V2.11.3) versions of
+	the older shared images (S7.e in sparc, S11_5[567].e).  (01/07)
+
+sys/imio/iki/fxf/fxfplwrite.x
+sys/imio/iki/fxf/fxfopen.x
+	Fixed a bug affecting copying a section of a mask to a section of
+	a mask in a FITS extension.  (01/08)
+
+unix/boot/mkpkg/tok.c
+unix/boot/mkpkg/tok.c [pcix]
+	The MKPKG special file list facility was extended to add support
+	for custom platform-dependent linking of executables.  In the
+	$special directive if the target is a ".e" file the "make object"
+	command string will be used to link the executable, instead of
+	whatever command is given in the mkpkg file in the source directory.
+	Special link directives are only recognized for files linked with
+	the $link directive in a mkpkg file.  (01/09)
+
+unix/hlib/libc/kernel.h
+	Increased SZ_DEFWORKSET from 8m to 64m.  SZ_MAXWORKSET will be
+	determined automatically on many recent systems so I did not change
+	the current default value, which is 256m.  (01/10)
+
+unix/os/zawset.c
+	This routine (used by BEGMEM to try to get the maximum amount of
+	physical memory available on a particular computer) was modified to
+	automatically detect the physical size of system memory.  The 
+	technique used should work on most recent POSIX systems, including
+	Solaris and Linux.  The maximum amout of memory that ZAWSET will
+	return is limited to 2GB even on machines with a larger physical
+	memory.  (01/10)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+sys/imio/iki/fxf/fxfplwrite.x
+sys/imio/iki/fxf/fxfopen.x
+	Installed a bug fix for the case of copying a section of an existing
+	mask to a mask extension where the dimensionality of the mask is
+	reduced.  (01/11)
+
+unix/os/zawset.c
+unix/os/zawset.c [pcix]
+	Made some more enhancements to this routine and tested it.  To aid
+	testing, the routine now recognizes the environment variable
+	ZAWSET_DEBUG: if this variable is defined, debug messages will be
+	printed when zawset is called to indicate the total system memory
+	argument values, and other memory-related parameters.  If the total
+	system physical memory can be determined the routine will
+	automatically reserve some fraction of the space for the system
+	to minimize swapping.  (01/11)
+
+unix/hlib/mkpkg.sf.SSUN
+	Added a special file entry to link x_images.e nonshared (-z) for
+	Solaris.  We probably don't need to do this for the SunOS version,
+	as any computers still running SunOS are older systems unlikely to
+	require more than 268 MB per process, and the shared version will
+	be smaller, use less memory and start up a little faster.  (01/12)
+
+unix/boot/mkpkg/tok.c
+unix/boot/mkpkg/tok.c [pcix]
+unix/hlib/mkpkg.sf.SSUN
+	The special file list link support was further enhanced to allow
+	replacing LFLAGS (the link flags variable) as well as the entire
+	link line.  Replacing LFLAGS is much easier than replacing the 
+	entire link line in cases where all we want to do is change a
+	link flag (like adding -z to link nonshared), and it avoids 
+	needless duplication of package information in the special file
+	entry.  The SSUN mkpkg special file list of updated to use this
+	new syntax.  (01/15)
+
+unix/os/zawset.c [pcix]
+	Installed the new version of ZAWSET on PC/IRAF.  (01/15)
+
+sys/imio/imsetbuf.x
+sys/imio/iki/fxf/zfiofxf.x
+	1. Modified the FITS image kernel to respect (pass-through) the
+	device block size of the low level file driver.  This is usually
+	a device sector (512 bytes), the physical storage unit of the
+	low level storage device.  Formerly the FK was setting a pseudo
+	block size of 2880 bytes, however blocking and deblocking should
+	be done at the FIO level; if we try to do this in an IRAF file
+	driver then the host system is required to do blocking/deblocking.
+	Using transfers which are physically aligned at the hardware level
+	makes certain optimizations possible, such as direct i/o.
+
+	2. The imsetbuf routine in IMIO was modified to be a little smarter
+	in aligning the first file buffer for a pixel file.  Formerly it
+	would only set the offset of the first file buffer if image lines
+	were aligned to device blocks.  This is overly restrictive, and
+	doesn't work for FITS files.  The code was changed to always set the
+	first file buffer offset for a pixel file, setting it to the offset
+	of the device block _containing_ the first image line.  If the first
+	image line is not block aligned the FIO buf size is made larger by
+	the amount of the intra-block offset to ensure that it is big enough
+	to contain the computed number of image lines for which the buffer
+	was sized.  (The point of all this is to minimize the number of file
+	reads or writes and the total i/o needed to span an image).  (01/16)
+
+unix/os/zfiobf.c
+unix/os/zfiobf.c [pcix.x]
+	Added another debug level 2 message to the directio directive, to
+	print debug messages whenever directio is turned on or off for a
+	file.  Directio was tested for FITS files on Solaris and it appears
+	to be working now.  (01/16)
+
+unix/hlib/cl.csh
+unix/hlib/cl.csh [pcix]
+	Changed the "setenv d_iraf" to "set d_iraf =" since d_iraf is an
+	internal variable within the script and doesn't need to be exported
+	to the global environment.  (01/19)
+
+unix/hlib/buglog.csh
+unix/hlib/zzsetenv.def
+unix/hlib/buglog.csh [pcix]
+unix/hlib/zzsetenv.def [pcix]
+	Changed a couple of ID strings to read V2.12BETA.  (01/19)
+
+unix/os/dio.c + [pcix]
+unix/hlib/zzsetenv.def [pcix]
+unix/hlib/libc/kernel.h [pcix]
+unix/hlib/libc/iraf.h [pcix]
+unix/hlib/cl.csh [pcix]
+unix/gdev/mkpkg [pcix]
+unix/gdev/iism75/mkpkg [pcix]
+unix/boot/bootlib/envinit.c [pcix]
+	A diff/merge of the Sun/IRAF and PC-IRAF HSI was performed and the
+	following files were updated to merge in various changes from the
+	V2.12 Sun/IRAF revisions.  (01/19)
+
+sys/mkpkg
+lib/libmain.o -
+	The libmain entry in the system mkpkg was modified to check file
+	dates against bin$libmain.o instead of lib$libmain.o.  It builds
+	directly into bin anyway so there is no need for the link entry
+	in lib.  (01/19)
+
+../irafbin/bin.redhat-5.2 [pcix]
+../irafbin/noao.bin.redhat-5.2 [pcix]
+unix/bin.redhat-5.2 [pcix]
+	Deleted the RedHat 5.2 binaries.  IRAF V2.12 no longer supports 
+	RedHat 5.2.  (01/19)
+
+cl/cl.par
+images/images.cl
+unix/hlib/login.cl
+unix/hlib/login.cl [pcix]
+	Update cl.version (cl.par) and cl.logver (hlib/login.cl, images.cl)
+	to "IRAF V2.12 December 2001".  hlib$login.cl was updated slightly
+	as well, adding entries for imextn and pspage, and some more unix-
+	oriented foreign tasks.  Updating cl.version would normally force
+	the user to update login.cl.  This is often not required for a new
+	release (as is the case this time) so I added a new cl.par parameter
+	cl.logregen which, if set to "yes" causes a message to be printed
+	whenever an IRAF session is started with an out of date login.cl.
+	With this change we can update cl.version and cl.logver in each
+	IRAF release and still control separately whether a new mkiraf
+	is required.  (01/21)
+
+unix/os/zfiotx.c [pcix]
+	Modified the terminal driver code to use sigaction instead of signal
+	for signal handling on Linux systems.  Use of signal was causing
+	a problem where ctrl/c would fail after using epar/ehist (raw terminal
+	i/o) on a Linux system.  (01/21)
+
+dev/vdm.gki [pcix]
+	Replaced with an equivalent but byte-swapped version of the file
+	which is compatible with the PC architecture.  (01/22)
+
+local/.xinitrc - [pcix]
+local/.login [pcix]
+	Deleted the .xinitrc - there are two many optional desktop
+	configurations available for PC systems these days to make it 
+	worthwhile trying to retain this.  Updated the "win" and "win8"
+	aliases for compatiblity with recent versions of XFree86.  (01/22)
+
+pkg/images/imutil/src/gettok.x
+	IMEXPR was incorrectly parsing numbers with exponents like "5.8503E-6".
+	(01/23)
+
+pkg/proto/maskexpr/gettok.x
+	MSKEXPR was incorrectly parsing numbers with exponents like "5.8503E-6"
+	(see above). At present it uses a private copy of images macro
+	expansion library.  This library should probably be made a system or
+	xtools library at some point.  (01/23 LED)
+
+----------------------------------------
+Cut V2.12 BETA release.  (01/25/2002)
+
+unix/hlib/extern.pkg
+	Changed definition of NSO package to use /shared/iraf/extern.  The
+	previous version pointed to a non-existant directory and broke the
+	package when the system was updated to the servers.  (1/29/02, MJF)
+
+pkg/images/immatch/src/imcombine/src/xtimmap.gx
+pkg/images/immatch/src/imcombine/src/icomb.gx
+pkg/images/immatch/src/imcombine/src/icgdata.gx
+	The code to close unused images when they are not needed had an error
+	when there were y offsets.  Rather than closing each image when it not
+	longer contributed to an output line due to an offset, it was instead
+	closing all images on every line and then mapping them again.
+	(1/29/02, Valdes)
+
+pkg/images/immatch/src/imcombine/src/icombine.x
+pkg/images/immatch/src/imcombine/src/icomb.gx
+pkg/images/immatch/src/imcombine/src/xtimmap.gx
+pkg/images/immatch/src/imcombine/src/icombine.h
+	The buffer size management calculation based on the number of input
+	images was no longer working because unless IM_BUFFRAC is explicitly
+	set to 0, the requested buffer size is just a lower limit.  The buffer
+	size calculation was modified and calls to set IM_BUFFRAC to zero were
+	added.  (1/30/02, Valdes)
+
+unix/hlib/extern.pkg
+	Added definitions for the GRASP and GRASPO packages needed by 
+	GONG.  Also added NSO to helpd string.  (1/31/02, MJF)
+
+pkg/images/immactch/doc/ccmap.hlp
+	Fixed a type in the ccmap help page package definition.
+	(02/01/02 LED)
+
+dev/hosts
+	Added solaris machine gongxx (2/1/02, MJF)
+
+unix/boot/spp/xc.c
+	Modified for Solaris systems to link the socket libraries dynamic
+	(at the Solaris level) when linking the IRAF executable nonshared
+	(at the IRAF level).  This is necessary as the socket libraries
+	are incompatible in different versions of Solaris.  (02/02)
+
+sys/imio/iki/fxf/fxfrfits.x
+	Modified to correctly handle the case where an embedded BINTABLE
+	extension is something other than a PLIO_1 pixel mask.  (02/02)
+
+sys/imio/iki/fxf/mkpkg
+sys/imio/iki/fxf/fxfplwrite.x
+	Removed the unused <plio.h> reference from fxfplwrite.x, and added
+	<imhdr.h> and <pmset.h> to the mkpkg file entry as dependencies.
+	(02/02)
+
+sys/plio/mkpkg
+	Added <imset.h> as include dependencies to the mkpkg file entries
+	for plloadim.x and plsaveim.x.  (02/02)
+
+unix/hlib/cl.csh [pcix]
+	Fixed a couple of obscure variable referencing errors.  (02/02)
+
+----------------------------------------
+Updated V2.12 BETA release; public BETA release.  (02/02/2002)
+
+
+pkg/images/tv/display/sigm2.x
+	The routine to compute the maximum value as the interpolated quantity
+	was incorrect because the size of the input and output arrays were
+	treated as the same when they are not.  This is used for overlay
+	display which produced the symptom of horizontal lines.
+	(2/5/02, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+	Added the feature that the bad pixel mask or overlay mask may be
+	specified by a keyword value with the syntax !<keyword>.  This is
+	important for multiextension files where various masks are set
+	as keywords.  The new task OBJMASKS also writes the object mask name
+	that is created for an image in the header.  Use of !objmask then
+	allows the object mask to be used for the bad pixel mask (to set
+	the scaling using only sky pixels) and for overlay.
+	(2/5/02, Valdes)
+
+pkg/images/immatch/src/imcombine/src/icmask.x
+	If pl_loadf fails then pl_loadim is tried.  This adds support for
+	masks in FITS extensions.  (2/5/02, Valdes)
+
+pkg/images/immatch/src/imcombine/src/icmask.x
+pkg/images/immatch/src/imcombine/src/icmask.h
+pkg/images/immatch/src/imcombine/src/iclog.h
+pkg/images/immatch/src/imcombine/imcombine.par
+pkg/images/immatch/imcombine.par
+pkg/images/immatch/doc/imcombine.hlp
+	The masktype parameter may now specify !<keyword> to select the keyword
+	to use for a mask.  When this option is selected the mask value
+	interpretation is "goodval".  (2/5/02, Valdes)
+
+pkg/images/immatch/src/imcombine/src/icaverage.gx
+pkg/images/immatch/src/imcombine/src/icsigma.gx
+pkg/images/immatch/src/imcombine/src/icomb.gx
+pkg/images/immatch/src/imcombine/src/icscale.x
+pkg/images/immatch/src/imcombine/src/icemask.x
+pkg/images/immatch/doc/imcombine.hlp
+	If weights of zero are given for an image then that image will not
+	contribute to the output weighted average unless all of the
+	non-excluded images have zero weight.   In that case the unweighted
+	average is output.  The exposure mask is the sum of the exposure times
+	of the images with non-zero weights.  These changes allow combining
+	only data which is considered good (photometric or good seeing) as
+	specified by the weights but still including non-good data in the
+	final image when there is no good data.  The combinined zero weight
+	data will have an exposure time mask value of zero.  (2/8/02, Valdes)
+
+sys/fio/close.x
+	This routine was supporting the F_CLOSEFD option incorrectly and
+	could attempt to close an already closed file in the special case
+	where F_CLOSEFD is enabled but later disabled, leaving the file
+	closed since it is not reopened until the next i/o occurs.  (02/17)
+
+pkg/images/lib/imcopy.x
+	Added a missing sfree to the img_imcopy.x routine which fixed a segvio
+	error seen in the imcopy routine. (02/18, Davis)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+	The FITS kernel would fail to expand the header in the case of a
+	single FITS file when there are more keywords in the IMUSERAREA than
+	space in the FITS header.   (02/18)
+
+sys/imio/iki/fxf/fxfplwrite.x
+sys/imio/iki/ikiaccess.x
+sys/imfort/db/idbkwlu.x
+sys/gio/nsppkern/zzdebug.x
+	Fixed some minor instances of mismatched or missing salloc/sfree
+	pairs.  (02/19)
+
+pkg/images/lib/rgmerge.x
+pkg/images/imutil/src/t_imstack.x
+pkg/images/imutil/src/t_imsum.x
+	Fixed some minor instances of mismatched or missing salloc/sfree
+	pairs.  (02/19 LED)
+
+pkg/images/tv/imexamine/iegimage.x
+	The changes to support multiple WCS per frame involved keeping track of
+	the full WCS frame id (i.e. 101) rather than just the frame number.
+	There was a minor error in this bookkeeping when incrementing the
+	the next display frame to be used.  (2/19/02, Valdes)
+
+pkg/images/imutil/src/t_minmax.x
+	Fixed a floating overflow error in minmax which occurs when the
+	update parameter is set to yes but the input image has a dimensionality
+	of 0. In this case the min and max values are set to INDEFD but
+	must be converted to INDEFR before being stored in the image header.
+	(2/19/02, Davis)
+
+sys/plio/plsave.x
+	pl_save uses pl_p2li to encode the line index for a PLIO mask.
+	For a very large mask the integer values (which are indices into
+	the line list storage buffer) can be quite large, and will be
+	incompressible by PLIO unless the image contains zero lines or
+	duplicated lines.  In the worst case it takes a "set high value
+	absolute) instruction for each index value, and 3 line list words
+	(6 bytes) to represent 1 integer index value in the encoded line
+	list.  The line list buffer used was not sized for this worst
+	case value and could overflow.  (02/19)
+
+sys/mwcs/mwsave.x
+sys/qpoe/qpiomkidx.x
+	These routines use pl_p2li in a similar way to pl_save, so I made a
+	buffer size change as for pl_save above.  (02/19)
+
+pkg/images/immatch/src/imcombine/src/icstat.gx
+pkg/images/immatch/src/imcombine/src/xtimmap.gx
+	asum$t declared incorrectly as type PIXEL rather than real.  xt_cpix
+	incorrectly defined as pointer function instead of a subroutine.
+	(2/20/02, Valdes)
+
+pkg/images/immatch/src/imcombine/src/xtimmap.gx
+	The header keywords were not being fully copied.  (2/20/02, Valdes)
+
+pkg/images/tv/imexamine/iegimage.x
+	The 'p' was not properly updated for the multiple WCS changes.
+	(2/26/02, Valdes)
+
+pkg/xtools/fixpix/xtpmmap.x
+	The change to IMIO for mapping bad pixel files in FITS extensions
+	resulted in a different error code when failing to open the file.
+	This code needed to be recognized by this routine in order to
+	continue on to try other possible formats.  (2/27/02, Valdes)
+
+pkg/images/imcoords/src/t_wcsctran.x
+        Fixed a bug the logical to tv coordinate mapping which could occur
+	if the section subsmapling parameter was > 1, the input image was a
+	section of a higher dimensioned image, and the first dimension was
+	not one of those extracted. (3/1/02, Davis)
+
+pkg/images/tv/imexamine/iegimage.x
+pkg/images/tv/imexamine/t_imexam.x
+	When the frame buffer is used as the image source (when the image name
+	in the display frame cannot be mapped) the final imunmap would
+	attempt to unmap the same descriptor twice.  (3/1/02, Valdes)
+
+pkg/images/tv/imexamine/iegimage.x
+    	When imexmaine fails to map the image name returned by the display
+	server it uses the frame buffer.  Previously there was no warning
+	message about failing to map the image.  Now there is a warning.
+	This is only given once until there is no error or the error message
+	changes either by going to a new frame buffer or doing a new display.
+	(3/4/02, Valdes)
+
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/imdmapping.x
+	Added a check for the image name being "dev$pix" and if so added the
+	".imh" extension to the full node!prefix pathname to avoid an ambiguous
+	image name error in clients like IMEXAM which need to readback the
+	image name with a WCS query.  The expansion was left in place to allow
+	iraf networking access to the image.  (3/4/02, MJF)
+
+sys/imio/iki/fxf/fxfplwrite.x
+	Masks containing empty lines were not being handled correctly. (3/05)
+
+sys/imio/iki/fxf/fxfrfits.x
+	A FITS MEF containing an embedded binary table not recognized by
+	the FK (i.e., anything other than an embedded PLIO mask) would cause
+	a failure to read the file.  Moved the code which detects this
+	condition so that the FK will skip over FITS extensions it doesn't
+	recognize, so long as it is not asked to read them.  (3/05)
+
+unix/hlib/mkpkg.sf.SSUN
+	In addition to x_images.e, x_plot.e and x_tv.e are now linked -z
+	to avoid the 268 MB per-process memory limitation imposed by the
+	solaris/iraf shared image.  In the case of plot and tv, this was
+	needed to deal with excessively large PLIO masks used for NDWFS
+	images.  (3/05)
+
+pkg/images/imutil/src/hedit.x
+pkg/images/imutil/src/hselect.x
+        Added missing xev_freeop calls to the hedit and hselect tasks and a
+	missing mfree call to the hselect task. (3/5/02, Davis)
+
+sys/plio/plloadim.x
+sys/plio/plsaveim.x
+sys/plio/zzdebug.x
+sys/pmio/zzinterp.x
+	[INTERFACE CHANGE] Modified these two routines to add the
+	arguments title,maxch so that they can save and restore image
+	headers encoded in the "title" string, as for a PLIO mask
+	saved in a .pl file.  If a mask is being created from an
+	image with pl_loadim then the "title" string will be encoded
+	and returned.  If an image is being writen from a mask and
+	encoded "title" string with pl_saveim then the image header
+	is populated from the encoded title string.  This was
+	necessary to handle image headers uniformly in im_pmmap (see
+	the discussion under im_pmopen below).  These are obscure
+	routines which are currently only used by the system code in
+	IMIO (so far as I can tell) hence the interface change should
+	be a minor risk.  (3/05)
+
+sys/imio/impmmap.x
+	Deleted the unused stack variables ksection and title.  (3/05)
+
+sys/imio/impmopen.x
+	Modified im_pmopen (called by im_pmmap) to add the title,maxch
+	args to the call to pl_loadim, used to load a mask from an image.
+	The call to pl_loadf, used to load a mask from a .pl mask file,
+	already sets title,maxch, which is used by im_pmmap to load the
+	image header of the image it creates from the stored mask.  (3/05)
+
+pkg/images/immatch/src/imcombine/src/iclog.x
+pkg/images/immatch/src/imcombine/src/icmask.x
+pkg/images/immatch/src/imcombine/src/icstat.gx
+	Rather than open all the masks at the beginning the masks are now
+	opened and closed as needed.  For situations with offsets this
+	can reduce the amount of memory required for the masks.
+	(3/6/02, Valdes)
+
+pkg/images/immatch/src/imcombine/src/icombine.x
+	Added error checks for imunmap of the output files.  In the final
+	stage of closing the output if an error occurs, principally in
+	writing mask, this will at least allow the primary combined output
+	image to be written.  This is useful when an extremely large combining
+	operation is performed.  (3/6/02, Valdes)
+
+unix/hlib/install
+	Fixed an error in the pathname prompts when the defaults values are
+	not accepted.  (3/6/02, MJF)
+
+unix/hlib/install
+	Modified to permit setuid, setgid, and sticky-bit permissions in 
+	the iraf directory files when doing validity checks. (3/6/02, MJF)
+
+unix/hlib/install
+	More small fixes and added checks found when building PC-IRAF systems.
+	(3/7/02, MJF)
+
+lib/syserr.h
+lib/syserrmsg
+sys/plio/plcmpress.x
+	Modified the pl_compress code slightly to add a sanity check for the
+	mask being compressed.  We had a case where this code went into an
+	infinite loop in a process that was nearing the 2GB memory limit,
+	probably as a result of a pointer going negative. (3/10)
+
+unix/as.linux/zsvjmp.s [pcix]
+unix/as.linux/zsvjmp.s.SL40 [pcix]	+
+	Newer versions of Slackware require use of __sigsetjmp, like most
+	modern Linux versions (RedHat etc.).  (3/10)
+
+unix/boot/mkpkg/host.c [pcix]
+	The resolvefname code could fail in some cases where the pathname
+	was a simple file name.  (3/10)
+
+unix/hlib/install [pcix]
+	Various minor changes to support the PC-IRAF platforms.  (3/10)
+
+unix/os/zgtime.c [pcix]
+	Added an include for <time.h> to pick up the CLK_TCK definition
+	to get things to build correctly on some PC-IRAF platforms.  (3/10)
+
+unix/bin.linux/f2c.e [pcix]
+unix/bin.linux/f2c.e.SL40 [pcix]	+
+	Replaced the LNUX f2c.e by the RHUX version, required by Slackware 8
+	which uses glibc2.  (3/10)
+
+unix/os/zopdir.c [pcix]
+	Added a new ifdef check for LINUX to the dirfd() usage as required
+	for newer Linux/IRAF (Slackware) systems.  (3/11)
+
+----------------------------------------
+Updated V2.12 BETA release; second public BETA release.  (3/12/2002)
+
+
+dev/imtoolrc
+dev/graphcap
+	Added new stdimage devices imt45-imt49 submitted by Gemini for
+	GMOS CCD displays at various sizes.  (3/14/2002, MJF)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+	When copying an extension or subsection of an extension to a new
+	file some of the header keywords could be duplicated at the end
+	of the header.  (3/15)
+
+sys/imio/iki/plf/plfupdhdr.x
+	If an error occurred while writing the header to a pixel mask
+	image the error handler in this routine would mask the error and
+	no error was being reported to the caller. (3/15)
+
+doc/newsfile
+doc/v212revs.hlp			+
+	Installed the V2.12 Revisions Summary and updated the 'news' command
+	files.  (3/15/02, MJF)
+
+dev/hosts
+	Aliased 'ndws' to 'archive'  (3/18/02, MJF)
+
+dev/hosts
+	Added new NDWFS RedHat machine 'dropbear'  (3/19/02, MJF)
+
+pkg/images/tv/display/t_display.x
+	If an image section of a higher dimensional image is displayed the
+	image section is included in the image name sent to the display
+	server.  Previously the section was stripped and so it was not
+	possible to know the 2D section displayed.  For now we keep backwards
+	compatibility by stripping any section from 2D parent images.
+	(3/20/02, Valdes)
+
+pkg/images/tv/imexamine/iegimage.x
+	Image sections in the image name retrieved from the display server
+	are now handled more intelligently.  In particular, 2D sections of
+	higher dimensional images will now examine the correct 2D section
+	rather than just the lowest 2D plane.  (3/20/02, Valdes)
+
+pkg/dataio/export/export.h
+    	Changed the zscale sampling parameters to use more points spread out
+    	over more of the image.  The old values would sometimes find an
+    	innappropriate z1/z2 range causing problems when doing many images in
+    	batch mode.  (3/20/02, MJF)
+
+unix/hlib/install
+unix/hlib/install [pcix]
+	A previous change that added a check for write permission on the iraf
+	tree (to edit paths) proved to be too restrictive when installing on
+	an NFS client node.  The check was modified to allow the install to
+	continue without editing files if the user wanted, this would create
+	the local command links and device files but not edit the paths in
+	the iraf files.  A '-noedit' option to force this behavior was also
+	added.  (3/20/02, MJF)
+
+sys/imio/iki/fxf/fxfrfits.x
+	The limtime value calculated was off by a day after Feb 2002 and as
+	a result DATAMIN and DATAMAX were not being updated in headers.
+	Replaced the code which calculates limtime by a more robust calculation
+	based on the Julian day taken from asttools.  (3/21)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+	The update header code was modified to delete BSCALE and BZERO for
+	floating point images, just in case they are added to the header
+	by the application after the image has already been opened.
+	We may as well do this since the FK does not support use of scaling
+	when reading floating point images, and the presence of these
+	keywords in the header could cause an i/o error when the image is
+	later opened for reading (as seen in ST HSTIO code during testing
+	of V2.12).  (3/21 NZ+DT)
+
+pkg/images/tv/tvmark/mkoutname.x
+pkg/images/tv/tvmark/mktools.x
+        Fixed a bug in the default output image name code that would result
+	in hidden images with names like .snap.1, .snap.2, etc being written
+        if the display image name included a kernel or pixel section.
+        (3/21 LED)
+
+dev/hosts
+	Added redhat machines cholla and pym, removed pyxis (3/24/02, MJF)
+
+dev/hosts
+	Added the MacOS X host cetus.  (3/24)
+
+doc/newsfile
+doc/v212revs.hlp
+	Fixed some typos and formatting problems with the revisions (3/25, MJF)
+
+pkg/system/help/t_help.x
+	Fixed a bug with dev=text where the standout flags weren't being
+	properly disabled. (3/25/02, MJF)
+
+unix/hlib/install
+unix/hlib/install [pcix]
+	Small change to allow a "no-edit" install to skip the configuration
+	stage (all of which require edit permissions). (3/25, MJF)
+
+noao/mkpkg
+	Added an entry for MACOSX.  (4/02)
+
+pkg/images/imcoords/src/t_wcsctran.x
+	Added an error check for INDEF valued input coordinates. (4/04, LED)
+
+pkg/images/immatch/src/imcombine/src/icmask.x
+	There was a bug in the recent change to open and close masks as needed
+	where a possibly null filename pointer was being checked for being
+	a null string.  (4/8/02, Valdes)
+
+pkg/lists/doc/Lintran.hlp
+pkg/images/tv/iis/doc/Cv.hlp
+        The above files were rename to Lintran.spc.hlp and Cv.spc.hlp
+	respectively in order to work around upper / lower case file name
+	ambiguities in MACOSX. (4/11, LED)
+
+pkg/images/imcoords/src/t_ccget.x
+	Ccget was not transforming the units and applying the user supplied
+	formatting parameters if the input or output coordinate system, e.g.
+	ICRS, was the same as the catalog coordinate system. This bug does
+	not affect released code. (04/16/02, Davis)
+
+unix/hlib/install
+unix/hlib/sysinfo
+unix/hlib/install [pcix]
+unix/hlib/sysinfo [pcix]
+	Mods and bug fixes needed for OS X (04/16/02, MJF)
+
+pkg/images/immatch/src/imcombine/src/icsetout.x
+	When computing offsets the registration point was the reference pixel
+	returned by mw_gwterm for the first image.  The code then went on to
+	assume this was a logical pixel when comparing with the other images,
+	which is not true when there is a physical coordinate system.  The
+	algorithm was fixed by converting the reference point to logical
+	coordinates.  (4/18/02, Valdes)
+
+pkg/cl/main.c
+	The routines startup() and shutdown() in the CL main conflicted
+	with host library routines of the same name on MacOSX.  Changed
+	these two routines plus login() and logout() to static functions.
+	Added a new external function cl_shutdown to allow the error
+	recovery code to get at the now static shutdown().  (4/21)
+
+pkg/cl/errs.c
+pkg/cl/errs.h
+pkg/cl/binop.c
+	Modified the interpreter binary divide operator to check for a
+	zero divisor and call cl_error if a divide by zero is attempted.
+	Added two new error actions for integer and floating divide by
+	zero.  (4/21)
+
+unix/hlib/config.h  [pcix]
+unix/hlib/libc/spp.h  [pcix]
+	Increased LEN_JUMPBUF to 1024 for this platform to allow for the
+	worst case jmpbuf for MacOSX (not sure why this can be so big but
+	it may be the altivec vector registers).  (4/21)
+
+unix/boot/bootlib/rindex.c  [pcix]
+unix/boot/bootlib/index.c  [pcix]
+	These functions conflicted with the host system versions due to
+	the dynamic libraries used on MacOSX.  Redefined the names for
+	this platform to avoid the conflict (this is new since the initial
+	10.0 port).  (4/21)
+
+unix/os/zzstrt.c  [pcix]
+	Minor modifications for MacOSX.  Normally process startup exception
+	handling initialization is done in this file.  For MacOSX nothing
+	is done at the moment (since the exception handling is mostly
+	done in software) but the LinuxPPC code had to be reworked somewhat
+	for MacOSX to build on both platforms.  (4/21)
+
+unix/bin.macosx/mach.h  [pcix]	+
+	Installed a byteswap=NO version of <mach.h> in HBIN for MacOSX.
+	This allows the same PC-IRAF HSI to be used for both Intel and
+	PowerPC, which are byte swapped with respect to each other.  The
+	default <mach.h> in HLIB is for Intel.  Note that any versions
+	of the global system includes in the HBIN for a platform will
+	override the global HLIB versions.  (4/21)
+
+unix/os/zzepro.c  [pcix]	+
+unix/hlib/libc/knames.h  [pcix]
+unix/os/mkpkg  [pcix]
+	Added a new routine ZZEPRO (ZZ End PROcedure) to the PC-IRAF OS.
+	This is present on all PC-IRAF platforms, but is a no-op (for now)
+	except on MacOSX.  On MacOSX it calls an assembler routine to
+	read the PowerPC floating point status and control register (FPSCR)
+	to check if any floating point "exceptions" have occurred.
+	Currently the floating point exceptions are not enabled for MacOSX,
+	but the hardware will nonetheless set a bit in the FPSCR if one
+	of the IEEE-defined exception conditions occur.  The ZZEPRO code
+	will check for a divide by zero, overflow, or invalid operand
+	exception condition, and if any of these have occurred, execute
+	a "software exception" by calling the exception handler in ZXWHEN.
+	The result is exactly the same as a real hardware exception, with
+	all the same semantics and error actions, except that the
+	exception condition is not detected until some time after the
+	instruction which caused it is executed.  (4/21)
+
+unix/boot/spp/rpp/rpprat/endcod.r  [pcix]
+unix/boot/spp/rpp/rppfor/endcod.f  [pcix]
+	Modified the SPP compiler to insert a call to ZZEPRO (see above)
+	to every SPP function or procedure.  The call is made just before
+	the function exits.  Note that since the check is only made at
+	the exit from a function, the exception condition often will be
+	detected in a routine called by the routine in which the
+	exception condition occurred.  For example, if A does a 5.0/0,
+	then calls B, then B exits, the exception conditition will be
+	detected by the ZZEPRO call at the end of B.  In all cases however,
+	it won't be very long before the exception condition is detected.
+	If external C or Fortran code is called an exception will not be
+	detected until execution resumes in an SPP function.  (4/21)
+
+unix/os/zxwhen.c  [pcix]
+	Added exception handling support for MacOSX.  Also, ex_handler
+	(the exception handler) was changed from static to public so that
+	it could be called from ZZEPRO.  (4/21)
+
+unix/as.macosx/zsvjmp.s  [pcix]
+	1. New version of ZSVJMP for MacOSX.  This was very tricky to
+	implement for this platform but it appears to be working now.
+	ZSVJMP was difficult as it needs to call the host "setjmp" to
+	do the real work, but MacOSX has only dynamic libraries, so
+	the routine has to invoke setjmp from the system shared library
+	from the assembler code!  (I think we need to do away with the
+	assembler version of ZSVJMP - might be possible by adding some
+	C code generation to e.g. F2C, so that the PC-IRAF implementations
+	at least could avoid assembler).
+	2. New routines GFPSCR and SFPSCR added to get and set the FPSCR
+	register on MacOSX.  (4/21)
+
+unix/as.macosx/ieee.gx  [pcix]
+	Modified the invalid exception masking support for MacOSX.
+	Normally floating invalid exceptions are enabled, meaning that if
+	a NaN or Inf is encountered the invalid operand exception is
+	invoked.  The invalid exception has to be masked in the IEEE
+	handling code, to allow IEEE NaN/Inf to be detected and replaced
+	when reading in floating data.  (4/21)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+pkg/images/immatch/src/imcombine/src/icombine.x
+pkg/images/immatch/src/imcombine/src/icsetout.x
+pkg/images/immatch/src/imcombine/src/icmask.x
+pkg/images/immatch/src/imcombine/src/iclog.x
+	The projection option was no longer working.  There was a typo in
+	t_imcombine.x, the dimensionality of the image was not set
+	properly in icombine.x and icsetout.x, and the masks for projected
+	images was not correct.  (4/22/02, Valdes)
+
+unix/hlib/install
+unix/hlib/install [pcix]
+	Fixed a typo ('MAG' -> 'MSG' on line 1023).  (4/22/02, MJF)
+
+unix/hlib/install
+unix/hlib/install [pcix]
+	Modified to skip the /dev fifo and iraf user login checks which
+	aren't appropriate for OS X.  (4/23/02, MJF)
+
+unix/boot/spp/xc.c
+	We had reports of XC not working properly with long filenames.
+	Changed a 256 char buffer in sys() to SZ_PATHNAME, and also
+	found a call to symlink() that was dimensioned 128 on the output
+	buffer even though the actual buffer was SZ_PATHNAME.  (4/23)
+
+images$imutil/src/imadiv.gx
+images$imutil/src/generic/imadiv.x
+        Fixed an error in the imarith code which evaluates an expression of the
+        form "inimage / 0". This was causing a bus error on the OSX but
+        apparently not on any other platform. (4/24/02, LED)
+
+local/.login [pcix]
+local/.cshrc [pcix]
+	Modified to set proper environment for OS X (4/24/02, MJF)
+
+pkg/images/immatch/src/imcombine/src/icmask.x
+	The fix of 4/8/02 had been inadvertently undone.  (4/25/02, Valdes)
+
+sys/imio/impmhdr.x
+	The im_pmldhdr code could go into an infinite loop when reading
+	a malformed PL imio save header.  (4/25)
+
+sys/imio/iki/fxf/zfiofxf.x
+	The fxfzop routine had some invalid code at the end of the routine
+	which was incorrectly trying to set FPKOSFN in what it thought was
+	the parent file descriptor.  (4/25)
+
+unix/hlib/install
+unix/hlib/install [pcix]
+	1) Not all failed tests were properly incrementing the error
+	counter leading to a confusing "successful" install.  2) Added a
+	new procedure to install symlinks to the .login/.cshrc files for
+	OS X installs where it's not easy to change the iraf user login
+	directory.  Once the iraf path is edited into the files symlinks
+	are made in the account directory, which is normally /Users/iraf,
+	so the iraf user still have the proper environment.  (4/26/02, MJF)
+
+unix/hlib/install
+unix/hlib/install [pcix]
+	1) The OS X csh didn't like if-stmts without a then/endif when the
+	test failed, changed all such occurrances.  2)  Fixed small problem
+	with SunOS constructing the recommended hosts file entry.  3) Changed
+	the file ownership check from a fatal error to a warning. (4/30, MJF)
+
+pkg/images/imtuil/src/t_imstat.x
+pkg/proto/masks/t_mimstat.x
+pkg/proto/masks/rsstats.x
+	If nclip > 0 and the initial mean and standard deviation are INDEF
+        (a very unlikely occurence unless there is an input mask) the ksigma
+        limit computation in the imstatistics, mimstatistics, and rskysub
+	tasks could overflow. This does not affect released code. (5/01/02,
+	Davis)
+
+local/notes.solaris -
+local/notes.linux [pcix] -
+local/notes.freebsd [pcix] -
+doc/ports/notes.linux +
+doc/ports/notes.freebsd +
+doc/ports/notes.solaris +
+	Moved these old platform porting files to doc/ports.  (5/02)
+
+local/notes.v212 +
+	Created a new system notes file for V2.12.  (5/02)
+
+----------------------------------------
+V2.12 EXPORT release.  (May 2, 2002)

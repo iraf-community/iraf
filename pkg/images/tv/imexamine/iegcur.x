@@ -47,10 +47,7 @@ begin
 		    x = x1
 		if (IS_INDEF(y))
 		    y = y1
-		if (wcs >= 100)
-		    IE_NEWFRAME(ie) = wcs / 100
-		else if (wcs >= 1)
-		    IE_NEWFRAME(ie) = wcs
+		IE_NEWFRAME(ie) = wcs
 		if (IE_DFRAME(ie) <= 0)
 		    IE_DFRAME(ie) = IE_NEWFRAME(ie)
 

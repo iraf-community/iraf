@@ -105,14 +105,14 @@ begin
  
 	    skyframe = out // ".sky"
 
-	    imcombine ("@"//tmptmp, skyframe, plfile="", sigma="",
+	    imcombine ("@"//tmptmp, skyframe, rejmask="", plfile="", sigma="",
 	        logfile=logfile, combine="median", reject="none", project=no,
-		outtype="", offsets="none", masktype="none", maskvalue=0.0,
+		outtype="real", offsets="none", masktype="none", maskvalue=0.0,
 		blank=-1.0, scale="exposure", zero="none", weight="exposure",
 		statsec="", expname=expname, lthreshold=INDEF,
-		hthreshold=INDEF, nlow=1, nhigh=1, mclip=yes, lsigma=3.0,
-		hsigma=3.0, rdnoise="0.0", gain="1.0", sigscale=0.1,
-    		pclip=-0.5, grow=0)
+		hthreshold=INDEF, nlow=1, nhigh=1, nkeep=1, mclip=yes,
+		lsigma=3.0, hsigma=3.0, rdnoise="0.0", gain="1.0", snoise="0.0",
+		sigscale=0.1, pclip=-0.5, grow=0)
 	    print ("\n", >> logfile)
 	    imarith ("@"//tmpimg, "-", skyframe, "@"//tmpred, title="",
 	        divzero=0., hparams="", pixtype="", calctype="", verbose+,

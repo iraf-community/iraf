@@ -41,10 +41,9 @@ with the conversion to photons determined by the \fIgain\fR parameter.
 
 OBJECT PARAMETERS
 .ls objects = ""
-List of object files.  If the list of object files is shorter than the
-list of input images then the last object file is reused.  The object
-files contain lines of object coordinates, magnitudes, and shape
-parameters (see the DESCRIPTION section).
+List of object files.  The number of object files must match the number of
+input images.  The object files contain lines of object coordinates,
+magnitudes, and shape parameters (see the DESCRIPTION section).
 .le
 .ls xoffset = 0.,  yoffset = 0.
 X and Y coordinate offset to be added to the object list coordinates.

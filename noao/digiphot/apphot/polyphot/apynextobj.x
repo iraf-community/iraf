@@ -1,13 +1,15 @@
 include <fset.h>
+include "../lib/apphot.h"
 include "../lib/polyphot.h"
 
 # AP_YNEXTOBJ -- Read the next polygon from the list polygon and/or coordinate
 # list.
 
-int procedure ap_ynextobj (py, id, pl, cl, delim, x, y, maxnver, prev_num,
+int procedure ap_ynextobj (py, im, id, pl, cl, delim, x, y, maxnver, prev_num,
     req_num, ld, pd)
 
 pointer	py		# pointer to the apphot structre
+pointer	im		# the input image descriptor
 pointer	id		# pointer to image display stream
 int	pl		# polygons file descriptor
 int	cl		# coordinates file descriptor
@@ -20,11 +22,11 @@ int	req_num		# requested object
 int	ld		# current object
 int	pd		# current polygon
 
-int	stdin, nskip, ncount, nver, stat
-pointer	sp, fname
 real	xshift, yshift
-int	strncmp(), ap_yget(), ap_ycoords()
+pointer	sp, fname
+int	stdin, nskip, ncount, nver, stat
 real	apstatr()
+int	strncmp(), ap_yget(), ap_ycoords(), apstati()
 errchk	greactivate, gdeactivate, gscur
 
 begin
@@ -58,7 +60,7 @@ begin
 
 		call apsetr (py, PYX, apstatr (py, PYCX))
 		call apsetr (py, PYY, apstatr (py, PYCY))
-		nver = ap_yget (py, pl, delim, x, y, maxnver)
+		nver = ap_yget (py, im, pl, delim, x, y, maxnver)
 
 		if (nver == EOF) {
 		    ncount = EOF
@@ -127,7 +129,7 @@ begin
 		} else if (stat == NEXT_POLYGON || pd == 0) {
 		    call apsetr (py, PYX, apstatr (py, PYCX))
 		    call apsetr (py, PYY, apstatr (py, PYCY))
-		    nver = ap_yget (py, pl, delim, x, y, maxnver)
+		    nver = ap_yget (py, im, pl, delim, x, y, maxnver)
 		    if (nver == EOF)
 		        ncount = EOF
 		    else if (nver > 0)
@@ -136,10 +138,28 @@ begin
 
 		# Shift the polygon coordinates.
 		if (stat == THIS_OBJECT && ncount != EOF && nver > 0) {
+            	    switch (apstati(py,WCSIN)) {
+            	    case WCS_WORLD, WCS_PHYSICAL:
+                	call ap_itol (py, xshift, yshift, xshift, yshift, 1)
+            	    case WCS_TV:
+                	call ap_vtol (im, xshift, yshift, xshift, yshift, 1)
+            	    default:
+                	;
+            	    }
 		    call aaddkr (x, (xshift - apstatr (py, PYCX)), x, nver + 1)
 		    call aaddkr (y, (yshift - apstatr (py, PYCY)), y, nver + 1)
 		    call apsetr (py, PYCX, xshift)
 		    call apsetr (py, PYCY, yshift)
+                    switch (apstati(py,WCSOUT)) {
+            	    case WCS_WORLD, WCS_PHYSICAL:
+                	call ap_ltoo (py, xshift, yshift, xshift, yshift, 1)
+            	    case WCS_TV:
+                	call ap_ltov (im, xshift, yshift, xshift, yshift, 1)
+            	    default:
+    			;
+            	    }
+		    call apsetr (py, OPYCX, xshift)
+		    call apsetr (py, OPYCY, yshift)
 		    ncount = ncount + 1
 		    ld = ld + 1
 		}

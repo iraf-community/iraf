@@ -1,5 +1,25 @@
 .help revisions Jun88 noao.imred
 .nf
+=====
+V2.12
+=====
+
+imred$quadred/	+
+imred$imred.cl
+imred$imred.par
+imred$imred.hd
+imred$imred.men
+imred$mkpkg
+    Added new package QUADRED.  (8/24/01, Valdes)
+
+imred$crutil/	+
+imred$imred.cl
+imred$imred.par
+imred$imred.hd
+imred$imred.men
+imred$mkpkg
+    Added new package CRUTIL.  (8/22/01, Valdes)
+
 imred$argus/argus.cl
 imred$argus/hydra.cl
 imred$argus/echelle.cl

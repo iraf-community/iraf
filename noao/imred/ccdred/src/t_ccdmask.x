@@ -85,7 +85,7 @@ begin
 		call realloc (outbuf, nc1*nl, TY_SHORT)
 	    call aclrs (Memc[outbuf], nc1*nl)
 	    call cm_mask (Memr[inbuf], Mems[outbuf], nc1, nl, c1-c3+1,
-		c2-c3+1, ncmed, nlmed, ncsig, nlsig, lsig, hsig, ngood, ngood)
+		c2-c3+1, ncmed, nlmed, ncsig, nlsig, lsig, hsig, ngood)
 	    call cm_interp (Mems[outbuf], nc1, nl, c1-c3+1, c2-c3+1, nc,
 		linterp, cinterp, eqinterp)
 	    do j = 1, nl
@@ -307,7 +307,7 @@ begin
 	    # Set values to column length.
 	    for (k=1; k<=nl && bp[i,k]==0; k=k+1)
 		;
-	    while (k < nl) {
+	    while (k <= nl) {
 		for (l=k+1; l<=nl && bp[i,l]!=0; l=l+1)
 		    ;
 		m = l - k
@@ -323,7 +323,7 @@ begin
 	    do j = 1, nl {
 		for (k=1; k<=nc && bp[k,j]==0; k=k+1)
 		    ;
-		while (k < nc) {
+		while (k <= nc) {
 		    for (l=k+1; l<=nc && bp[l,j]!=0; l=l+1)
 			;
 		    m = l - k

@@ -37,7 +37,7 @@ define	nosort_ 91
 begin
 	call smark (sp)
 	call salloc (tokbuf, SZ_TOKBUF, TY_CHAR)
-	call malloc (oo, IO_NLINES(io) * 2, TY_SHORT)
+	call malloc (oo, IO_NLINES(io) * 3 + 32, TY_SHORT)
 
 	ncols  = IO_NCOLS(io)
 	nlines = IO_NLINES(io)

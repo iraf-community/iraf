@@ -65,6 +65,20 @@ begin
 	apsel = DP_APSEL(dao)
 
 	switch (param) {
+	case MW:
+	    return (DP_MW(dao))
+	case WCSIN:
+	    return (DP_WCSIN(dao))
+	case WCSOUT:
+	    return (DP_WCSOUT(dao))
+	case WCSPSF:
+	    return (DP_WCSPSF(dao))
+	case CTIN:
+	    return (DP_CTIN(dao))
+	case CTOUT:
+	    return (DP_CTOUT(dao))
+	case CTPSF:
+	    return (DP_CTPSF(dao))
 	case MAXITER:
 	    return (DP_MAXITER(dao))
 	case VERBOSE:

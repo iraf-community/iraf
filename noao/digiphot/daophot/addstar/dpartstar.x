@@ -7,11 +7,12 @@ define	ADD_NINCOLUMN		4
 
 # DP_ARTSTAR -- Add artificial stars to the data frames.
 
-procedure dp_artstar (dao, im, cl, ofd, nstar, minmag, maxmag, iseed, coo_text,
-	simple, offset) 
+procedure dp_artstar (dao, iim, oim, cl, ofd, nstar, minmag, maxmag, iseed,
+	coo_text, simple, offset, cache)
 
 pointer	dao				# pointer to DAOPHOT structure
-pointer	im				# image to add stars to
+pointer	iim				# the input image descriptor
+pointer	oim				# image to add stars to
 int	cl				# fd of input photometry file
 int	ofd				# fd of output photometry file
 int	nstar				# number of stars to be added
@@ -20,14 +21,15 @@ int	iseed[ARB]			# the random number generator array
 bool	coo_text			# coordinate text file ?
 int	simple				# simple text file ?
 int	offset				# id offset for output photometry file
+int	cache				# cache the output pixels
 
-int	i, iid, id, lowx, lowy, nxpix, nypix, nrow
-pointer	sp, colpoint, psffit, subim, subim_new, indices, fields, key
 real	xmin, ymin, xwide, ywide, mwide, x, y, dxfrom_psf, dyfrom_psf, mag
-real	radius, psfradsq, rel_bright, sky
+real	radius, psfradsq, rel_bright, sky, tx, ty
+pointer	sp, colpoint, psffit, subim, subim_new, indices, fields, key
+int	i, iid, id, lowx, lowy, nxpix, nypix, nrow
 
-int	dp_gcoords(), dp_apsel()
 pointer	dp_gsubrast(), imps2r(), tbpsta()
+int	dp_gcoords(), dp_apsel()
 
 begin
 	# Get some memory.
@@ -37,11 +39,13 @@ begin
 	call salloc (colpoint, ADD_NINCOLUMN, TY_INT)
 
 	# Initialize the input photometry file.
+	key = NULL
 	if (cl != NULL) {
 	    if (! coo_text) {
 		call dp_tadinit (cl, Memi[indices])
 		nrow = tbpsta (cl, TBL_NROWS)
-	    } else if (coo_text && simple == NO) {
+	    #} else if (coo_text && simple == NO) {
+	    } else if (simple == NO) {
 	        call pt_kyinit (key)
 	        Memi[indices] = DP_PAPID
 	        Memi[indices+1] = DP_PAPXCEN
@@ -71,15 +75,15 @@ begin
 	# Get the x and y limits for the random number generator. The 
 	# magnitude limits are input by the user.
 	xmin = 1.0
-	xwide = real(IM_LEN(im,1)) - 1.0
+	xwide = real(IM_LEN(oim,1)) - 1.0
 	ymin = 1.0
-	ywide = real (IM_LEN(im,2)) - 1.0
+	ywide = real (IM_LEN(oim,2)) - 1.0
 	mwide = maxmag - minmag
 
-	if (DP_VERBOSE(dao) == YES) {
-            call printf ("OUTPUT IMAGE: %s\n")
-                call pargstr (IM_HDRFILE(im))
-        }
+	if (DP_VERBOSE (dao) == YES) {
+	    call printf ("OUTPUT IMAGE: %s\n")
+		call pargstr (IM_HDRFILE(oim))
+	}
 
 	# Add the stars.
 	i = 1
@@ -96,6 +100,7 @@ begin
 		if (i > nrow)
 		    break
 		call dp_tadread (cl, Memi[indices], iid, x, y, mag, i)
+	        call dp_win (dao, iim, x, y, x, y, 1)
 		if (iid == 0)
 		    iid = i + offset
 		else
@@ -117,51 +122,67 @@ begin
 		    else
 			id = iid
 		}
+	        call dp_win (dao, iim, x, y, x, y, 1)
 	    }
 
-	    dxfrom_psf = (x - 1.0) / DP_PSFX(psffit) - 1.0
-	    dyfrom_psf = (y - 1.0) / DP_PSFY(psffit) - 1.0
+	    # Increment the counter
+	    i = i + 1
 
-	    if (DP_VERBOSE (dao) == YES) {
-	        call printf (
-		    "    Added Star: %d - X: %6.2f  Y: %6.2f  Mag: %7.3f\n")
+	    # Compute the psf coordinates.
+	    call dp_wpsf (dao, iim, x, y, dxfrom_psf, dyfrom_psf, 1)
+	    dxfrom_psf = (dxfrom_psf - 1.0) / DP_PSFX(psffit) - 1.0
+	    dyfrom_psf = (dyfrom_psf - 1.0) / DP_PSFY(psffit) - 1.0
+
+	    # Compute output coordinates.
+	    call dp_wout (dao, iim, x, y, tx, ty, 1)
+
+	    # Read in the subraster and compute the relative x-y position.
+	    subim = dp_gsubrast (oim, x, y, radius, lowx, lowy, nxpix, nypix)
+	    if (subim == NULL) {
+	       call printf (
+	       "    Star: %d - X: %6.2f  Y: %6.2f  Mag: %7.3f off image\n")
 		    call pargi (id)
-		    call pargr (x)
-		    call pargr (y)
+		    call pargr (tx)
+		    call pargr (ty)
+		    call pargr (mag)
+		next
+	    } else if (DP_VERBOSE (dao) == YES) {
+	       call printf (
+	           "    Added Star: %d - X: %6.2f  Y: %6.2f  Mag: %7.3f\n")
+		    call pargi (id)
+		    call pargr (tx)
+		    call pargr (ty)
 		    call pargr (mag)
 	    }
 
 	    if (DP_TEXT(dao) == YES)
-		call dp_xwadd (ofd, id, x, y, mag)
+		call dp_xwadd (ofd, id, tx, ty, mag)
 	    else
-		call dp_twadd (ofd, Memi[colpoint], id, x, y, mag, id)
-
-	    # Read in the subraster and compute the relative x-y position.
-	    subim = dp_gsubrast (im, x, y, radius, lowx, lowy, nxpix, nypix)
-	    x = x - lowx + 1.0
-	    y = y - lowy + 1.0
+		call dp_twadd (ofd, Memi[colpoint], id, tx, ty, mag, id)
 
 	    # Get the relative brightness
 	    rel_bright = DAO_RELBRIGHT (psffit, mag)
 
 	    # Get the output buffer.
-	    subim_new = imps2r (im, lowx, lowx + nxpix - 1, lowy,
+	    subim_new = imps2r (oim, lowx, lowx + nxpix - 1, lowy,
 	        lowy + nypix - 1)
 
 	    # Evaluate the PSF for a single star.
+	    x = x - lowx + 1.0
+	    y = y - lowy + 1.0
 	    call dp_artone (dao, Memr[subim], nxpix, nypix, x, y, rel_bright,
 	        dxfrom_psf, dyfrom_psf, psfradsq, DP_PHOTADU(dao), iseed)
 
 	    # Make sure the image buffer is flushed. Currently this is a
 	    # very inefficient way to do the image i/o.
 	    call amovr (Memr[subim], Memr[subim_new], nxpix * nypix)
-	    call imflush (im)
+	    if (cache == NO)
+	        call imflush (oim)
 
-	    i = i + 1
 	}
 
 	# Release the text file structure.
-	if ((coo_text) && (simple == NO))
+	if (key != NULL)
 	    call pt_kyfree (key)
 
 	call sfree (sp)

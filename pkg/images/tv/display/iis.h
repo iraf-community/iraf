@@ -7,7 +7,7 @@ define  LEN_IISHDR      8               # Length of IIS header
 define  XFERID            $1[1]         # transfer id
 define  THINGCT           $1[2]         # thing count
 define  SUBUNIT           $1[3]         # subuint select
-define  CHECKSUM                  $1[4]         # check sum
+define  CHECKSUM          $1[4]         # check sum
 define  XREG              $1[5]         # x register
 define  YREG              $1[6]         # y register
 define  ZREG              $1[7]         # z register
@@ -64,10 +64,22 @@ define  CHAN1                  1B
 define  CHAN2                  2B
 define  CHAN3                  4B
 define  CHAN4                 10B
+define  CHAN5                 20B
+define  CHAN6                 40B
+define  CHAN7                100B
+define  CHAN8                200B
+define  CHAN9                400B
+define  CHAN10              1000B
+define  CHAN11              2000B
+define  CHAN12              4000B
+define  CHAN13             10000B
+define  CHAN14             20000B
+define  CHAN15             40000B
+define  CHAN16            100000B
 define  GRCHAN            100000B
 
-define  LEN_IISFRAMES           4
-define  IISFRAMES       CHAN1, CHAN2, CHAN3, CHAN4
+define  LEN_IISFRAMES          16
+define  IISFRAMES       CHAN1, CHAN2, CHAN3, CHAN4, CHAN5, CHAN6, CHAN7, CHAN8, CHAN9, CHAN10, CHAN11, CHAN12, CHAN13, CHAN14, CHAN15, CHAN16
 
 # Colors
 
@@ -99,7 +111,8 @@ define  LEN_CURSOR              3       # cursor parameters
 define  LEN_SPLIT              12       # split screen
 define  LEN_LUT               256       # look up table
 define  LEN_OFM              1024       # output function look up table
-define	SZ_WCSTEXT	      320	# max WCS text chars
+define	SZ_OLD_WCSTEXT	      320	# old max WCS text chars
+define	SZ_WCSTEXT	     1024	# max WCS text chars
 
 # IIS Status Words
 define  IIS_FILSIZE             (IIS_XDIM * IIS_YDIM * SZB_CHAR)

@@ -204,7 +204,7 @@ begin
 		    call pargi (Memi[rg_xstatp (xc,RL2)+creg-1])
 
 	    } else {
-		if (nreg < 1 || nreg > creg) {
+		if (nreg < 1 || nreg > rg_xstati (xc,NREGIONS)) {
 		    call printf ("Region %d is out of range\n")
 			call pargi (nreg)
 		} else {
@@ -215,6 +215,7 @@ begin
 			call pargi (Memi[rg_xstatp (xc,RC2)+nreg-1])
 			call pargi (Memi[rg_xstatp (xc,RL1)+nreg-1])
 			call pargi (Memi[rg_xstatp (xc,RL2)+nreg-1])
+		    call rg_xseti (xc, CREGION, nreg)
 		    newdata = YES; newcross = YES; newcenter = YES
 		}
 

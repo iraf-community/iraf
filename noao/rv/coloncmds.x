@@ -116,8 +116,8 @@ begin
 	# Get the new apertures.
 	OBJCONT(rv) = NO
 	IS_DBLSTAR(rv) = NO
-	SR_COUNT(RV_OSAMPLE(rv)) = ALL_SPECTRUM
-	SR_COUNT(RV_RSAMPLE(rv)) = ALL_SPECTRUM
+	#SR_COUNT(RV_OSAMPLE(rv)) = ALL_SPECTRUM
+	#SR_COUNT(RV_RSAMPLE(rv)) = ALL_SPECTRUM
 	if (rv_getim(rv, IMAGE(rv), OBJECT_SPECTRUM, INDEF, INDEF, INDEFI) ==
 	    ERR_READ)
 	        return

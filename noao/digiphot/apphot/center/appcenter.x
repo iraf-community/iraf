@@ -19,8 +19,8 @@ begin
 	    return
 
 	# Print description of object.
-	xpos = apstatr (ap, XCENTER) - apstatr (ap, XSHIFT)
-	ypos = apstatr (ap, YCENTER) - apstatr (ap, YSHIFT)
+	xpos = apstatr (ap, OXINIT)
+	ypos = apstatr (ap, OYINIT)
 	call ap_wid (ap, fd, xpos, ypos, id, lid, '\\')
 
 	# Print the computed centers.
@@ -36,6 +36,7 @@ procedure ap_qcenter (ap, ier)
 pointer	ap	# pointer to apphot structure
 int	ier	# comment string
 
+real	owx, owy, wx, wy
 pointer	sp, imname
 real	apstatr()
 
@@ -43,13 +44,18 @@ begin
 	call smark (sp)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
 
-	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
+	owx = apstatr (ap, OXINIT)
+	owy = apstatr (ap, OYINIT)
+	wx = apstatr (ap, OXCENTER)
+	wy = apstatr (ap, OYCENTER)
+
+	call apstats (ap, IMROOT, Memc[imname], SZ_FNAME)
 	call printf ( "%s  %7.2f %7.2f  %7.2f %7.2f  ")
 	    call pargstr (Memc[imname])
-	    call pargr ((apstatr (ap, XCENTER) - apstatr (ap, XSHIFT)))
-	    call pargr ((apstatr (ap, YCENTER) - apstatr (ap, YSHIFT)))
-	    call pargr (apstatr (ap, XCENTER))
-	    call pargr (apstatr (ap, YCENTER))
+	    call pargr (owx)
+	    call pargr (owy)
+	    call pargr (wx)
+	    call pargr (wy)
 	call printf ("%6.2f %6.2f  %s\n")
 	    call pargr (apstatr (ap, XERR))
 	    call pargr (apstatr (ap, YERR))

@@ -24,7 +24,7 @@ include	"../icombine.h"
 procedure icombines (in, out, offsets, nimages, bufsize)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output images
+pointer	out[ARB]		# Output images
 int	offsets[nimages,ARB]	# Input image offsets
 int	nimages			# Number of input images
 int	bufsize			# IMIO buffer size
@@ -130,7 +130,7 @@ procedure ic_combines (in, out, dbuf, d, id, n, m, lflag, offsets,
 	scales, zeros, wts, nimages, npts)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output image
+pointer	out[ARB]		# Output image
 pointer	dbuf[nimages]		# Data buffers for nonaligned images
 pointer	d[nimages]		# Data pointers
 pointer	id[nimages]		# Image index ID pointers
@@ -316,7 +316,7 @@ end
 procedure icombiner (in, out, offsets, nimages, bufsize)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output images
+pointer	out[ARB]		# Output images
 int	offsets[nimages,ARB]	# Input image offsets
 int	nimages			# Number of input images
 int	bufsize			# IMIO buffer size
@@ -422,7 +422,7 @@ procedure ic_combiner (in, out, dbuf, d, id, n, m, lflag, offsets,
 	scales, zeros, wts, nimages, npts)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output image
+pointer	out[ARB]		# Output image
 pointer	dbuf[nimages]		# Data buffers for nonaligned images
 pointer	d[nimages]		# Data pointers
 pointer	id[nimages]		# Image index ID pointers
@@ -604,3 +604,4 @@ begin
 
 	call sfree (sp)
 end
+

@@ -92,7 +92,7 @@ translate (in, out)
 FILE	*in;
 FILE	*out;
 {
-	register struct sgi_inst *sgi;
+	register struct sgi_inst *sgip;
 	struct	 sgi_inst inbuf[LEN_MCBUF], *buftop;
 	int	 n, curpoints = 0, swap_bytes;
 	float	x, y;
@@ -110,28 +110,30 @@ FILE	*out;
 
 	/* Process the metacode:
 	 */
-	while ((n = fread ((char *)inbuf, sizeof(*sgi), LEN_MCBUF, in)) > 0) {
+	while ((n = fread ((char *)inbuf, sizeof(*sgip), LEN_MCBUF, in)) > 0) {
 	    if (swap_bytes)
-		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgi) * n);
+		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgip) * n);
 
 	    buftop = inbuf + n;
 
-	    for (sgi = inbuf;  sgi < buftop;  sgi++) {
-		switch (sgi->opcode) {
+	    for (sgip = inbuf;  sgip < buftop;  sgip++) {
+		switch (sgip->opcode) {
 		case SGK_FRAME:
 		    fprintf (out, "%s\n", DEV_FRAME);
 		    break;
 
 		case SGK_MOVE:
-		    x = sgi->x * XSCALE;
-		    y = sgi->y * YSCALE;
-		    fprintf (out, "%s%06.0f%s%06.0f%s\n", DEV_MOVE, x, ",", y, ";");
+		    x = sgip->x * XSCALE;
+		    y = sgip->y * YSCALE;
+		    fprintf (out,
+			"%s%06.0f%s%06.0f%s\n", DEV_MOVE, x, ",", y, ";");
 		    break;
 
 		case SGK_DRAW:
-		    x = sgi->x * XSCALE;
-		    y = sgi->y * YSCALE;
-		    fprintf (out, "%s%06.0f%s%06.0f%s\n", DEV_DRAW, x, ",", y, ";");
+		    x = sgip->x * XSCALE;
+		    y = sgip->y * YSCALE;
+		    fprintf (out,
+			"%s%06.0f%s%06.0f%s\n", DEV_DRAW, x, ",", y, ";");
 		    break;
 
 		case SGK_SETLW:
@@ -140,7 +142,7 @@ FILE	*out;
 		    break;
 		default:
 		    fprintf (stderr, "sgi2uhpp: unrecognized sgi opcode %d\n",
-			sgi->opcode);
+			sgip->opcode);
 		    break;
 		}
 	    }

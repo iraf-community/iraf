@@ -1,0 +1,78 @@
+# Make QUADRED Package.
+
+$call	relink
+$exit
+
+update:
+        $call   relink
+        $call   install
+        ;
+
+relink:
+        $update libpkg.a
+        $call   quadred
+        ;
+
+install:
+        $move   xx_quadred.e noaobin$x_quadred.e
+        ;
+
+quadred:
+        $omake  x_quadred.x
+        $link   x_quadred.o libpkg.a -lxtools -lcurfit -lgsurfit -lncar -lgks\
+                -o xx_quadred.e
+        ;
+
+generic:
+	$set	GEN = "$$generic -k"
+
+        $ifolder (generic/ccdred.h, ccdred.h)
+	    $copy ccdred.h generic/ccdred.h $endif
+        $ifolder (generic/proc.x,  proc.gx)
+	    $(GEN) proc.gx -o generic/proc.x $endif
+        $ifolder (generic/cor.x,  cor.gx)
+	    $(GEN) cor.gx -o generic/cor.x $endif
+        $ifolder (generic/corinput.x,  corinput.gx)
+	    $(GEN) corinput.gx -o generic/corinput.x $endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+	@generic
+
+	calimage.x	ccdtypes.h <error.h> <imset.h>
+	ccdcache.x	ccdcache.com ccdcache.h <imhdr.h> <imset.h> <mach.h>\
+			ccdcache.com
+	ccdcheck.x	ccdtypes.h <imhdr.h>
+	ccdcmp.x	
+	ccddelete.x	
+	ccdflag.x	
+	ccdlog.x	<imhdr.h> <imset.h>
+	ccdmean.x	<imhdr.h>
+	ccdnscan.x	ccdtypes.h
+	ccdproc.x	ccdred.h ccdtypes.h <error.h>
+	ccdsection.x	<ctype.h>
+	ccdsubsets.x	
+	ccdtypes.x	ccdtypes.h
+	doproc.x	ccdred.h
+	hdrmap.x	hdrmap.com <error.h>
+	readcor.x	<imhdr.h>
+	scancor.x	<imhdr.h> <imset.h>
+	setdark.x	ccdred.h ccdtypes.h <imhdr.h>
+	setfixpix.x	ccdred.h <imhdr.h>
+	setflat.x	ccdred.h ccdtypes.h <imhdr.h>
+	setfringe.x	ccdred.h ccdtypes.h <imhdr.h>
+	setheader.x	ccdred.h <imhdr.h>
+	setillum.x	ccdred.h ccdtypes.h <imhdr.h>
+	setinput.x	ccdtypes.h <error.h>
+	setinteract.x	<pkg/xtanswer.h>
+	setoutput.x	<imhdr.h> <imset.h>
+	setoverscan.x	ccdred.h <imhdr.h> <imset.h> <pkg/xtanswer.h>\
+			<pkg/gtools.h>
+	setproc.x	ccdred.h <imhdr.h>
+	setsections.x	ccdred.h <imhdr.h>
+	settrim.x	ccdred.h <imhdr.h> <imset.h>
+	setzero.x	ccdred.h ccdtypes.h <imhdr.h>
+	t_ccdproc.x	ccdred.h ccdtypes.h <error.h> <imhdr.h>
+	timelog.x	<time.h>
+	;

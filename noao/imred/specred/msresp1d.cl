@@ -21,7 +21,8 @@ int	order = 20		{prompt="Fitting function order", min=1}
 begin
 	file	flat2d, skyflat2d, apref, resp
 	file	temp1, temp2, log1, log2
-	int	ap, naxis
+	string	imtype, mstype
+	int	i, n, ap, naxis
 	real	respval
 
 	flat2d = flat
@@ -31,6 +32,13 @@ begin
 	temp1 = mktemp ("tmp")
 	temp2 = mktemp ("tmp")
 
+	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
+	mstype = ".ms" // imtype
+	n = strlen (imtype)
+
 	# Check required input and output.
  	if (resp == "" || resp == flat2d || resp == skyflat2d)
  	    error (1, "Bad response image name")
@@ -39,25 +47,25 @@ begin
 
 	if (flat2d != "") {
 	    i = strlen (flat2d)
-	    if (i > 4 && substr (flat2d, i-3, i) == ".imh")
-		flat2d = substr (flat2d, 1, i-4)
-	    if (!access (flat2d // ".imh"))
+	    if (i > n && substr (flat2d, i-n+1, i) == imtype)
+		flat2d = substr (flat2d, 1, i-n)
+	    if (!access (flat2d // imtype))
 		error (1, "Flat field spectrum not found - " // flat2d)
 	}
 	if (skyflat2d != "") {
 	    i = strlen (skyflat2d)
-	    if (i > 4 && substr (skyflat2d, i-3, i) == ".imh")
-	        skyflat2d = substr (skyflat2d, 1, i-4)
-	    if (!access (skyflat2d // ".imh")) {
+	    if (i > n && substr (skyflat2d, i-n+1, i) == imtype)
+	        skyflat2d = substr (skyflat2d, 1, i-n)
+	    if (!access (skyflat2d // imtype)) {
 		if (!access (skyflat2d))
 		    error (1,
 			"Throughput file or image not found - " // skyflat2d)
 
 		if (flat2d == "") {
 		    i = strlen (apref)
-		    if (i > 4 && substr (apref, i-3, i) == ".imh")
-			apref = substr (apref, 1, i-4)
-		    if (!access (apref // ".imh"))
+		    if (i > n && substr (apref, i-n+1, i) == imtype)
+			apref = substr (apref, 1, i-n)
+		    if (!access (apref // imtype))
 			error (1, "Aperture reference image required")
 		}
 	    }
@@ -78,7 +86,7 @@ begin
 	# and ratio the individual apertures by an overall smooth function
 
 	if (flat2d != "") {
-	    if (!access (flat2d // ".ms.imh")) {
+	    if (!access (flat2d // mstype)) {
 		print ("Extract flat field ", flat2d) | tee (log1)
 		if (flat2d != apref)
 		    apall (flat2d, output=resp, references=apref, profiles="",
@@ -115,8 +123,8 @@ begin
 	# compute the throughput through each aperture.
 
 	if (skyflat2d != "") {
-	    if (access (skyflat2d // ".imh")) {
-		if (!access (skyflat2d // ".ms.imh")) {
+	    if (access (skyflat2d // imtype)) {
+		if (!access (skyflat2d // mstype)) {
 		    print ("Extract throughput image ", skyflat2d) | tee (log1)
 		    apall (skyflat2d, output=temp1, references=apref,
 			profiles="", interactive=yes, find=yes,
@@ -178,7 +186,7 @@ begin
 
 	    } else {
 		print ("Set aperture throughput using ", skyflat2d) | tee (log1)
-		if (!access (apref // ".ms.imh")) {
+		if (!access (apref // mstype)) {
 		    apall (apref, output=resp, references=apref,
 			profiles="", interactive=no, find=yes, recenter=no,
 			resize=no, edit=edit, trace=no, fittrace=yes,

@@ -9,7 +9,7 @@ include	"apertures.h"
 # flagged with 0 value and negative sigma if cleaning.
 
 procedure ap_variance (im, ap, dbuf, nc, nl, c1, l1, sbuf, svar, profile,
-	nx, ny, xs, ys, spec, raw, specsig, nsubaps)
+	nx, ny, xs, ys, spec, raw, specsig, nsubaps, asi)
 
 pointer	im			# IMIO pointer
 pointer	ap			# Aperture structure
@@ -25,6 +25,7 @@ real	spec[ny,nsubaps]	# Spectrum
 real	raw[ny,nsubaps]		# Raw spectrum
 real	specsig[ny,nsubaps]	# Sky variance in, spectrum sigma out
 int	nsubaps			# Number of subapertures
+pointer	asi			# Image interpolator for edge pixel weighting
 
 real	rdnoise			# Readout noise in RMS data numbers.
 real	gain			# Gain in photons per data number.
@@ -36,7 +37,7 @@ real	lsigma, usigma		# Rejection sigmas.
 bool	sat
 int	fd, iterate, niterate, nrej, irej, nreject
 int	i, ix, iy, ix1, ix2
-real	low, high, step, shift, x1, x2, s, w, dat, sk, var, var0
+real	low, high, step, shift, x1, x2, wt1, wt2, s, w, dat, sk, var, var0
 real	sum, wsum, wvsum, sum1, sum2, total1, total2
 real	vmin, resid, rrej
 pointer	cv, gp
@@ -44,7 +45,7 @@ pointer	sp, str, work, wt, xplot, yplot, eplot, fplot, data, sky, data1
 
 real	apgetr(), apgimr(), cveval()
 bool	apgetb()
-errchk	apgimr
+errchk	apgimr, asifit
 
 begin
 	# Get task parameters.
@@ -99,7 +100,7 @@ begin
 	step = (high - low) / nsubaps
 	cv = AP_CV(ap)
 
-	# For each line compute the weighted spectrum and then iterated
+	# For each line compute the weighted spectrum and then iterate
 	# to reject deviant pixels.  Rejected pixels are flagged by negative
 	# variance.
 
@@ -121,8 +122,13 @@ begin
 		var0 = rdnoise + Memr[svar+iy-1]
 	    }
 
+	    # Set pixel weights for summing.
+	    if (asi != NULL)
+		call asifit (asi, Memr[data], nc)
+	    call ap_edge (asi, x1+1, x2+1, wt1, wt2)
+
 	    # First estimate spectrum by summing across the aperture.
-	    # Accumlate the raw spectrum and set up various arrays for
+	    # Accumulate the raw spectrum and set up various arrays for
 	    # plotting and later access.
 
 	    sat = false
@@ -131,11 +137,11 @@ begin
 	    wvsum = 0.
 	    do ix = ix1, ix2 {
 		if (ix1 == ix2)
-		    w = x2 - x1
+		    w = wt1
 		else if (ix == ix1)
-		    w = ix1 - x1 + 0.5
+		    w = wt1
 		else if (ix == ix2)
-		    w = x2 - ix2 + 0.5
+		    w = wt2
 		else
 		    w = 1.
 		dat = Memr[data+ix]
@@ -150,7 +156,7 @@ begin
 		Memr[data1+ix] = dat - sk
 		Memr[wt+ix] = w
 		var = max (vmin, var0 + max (0., dat))
-		w = w * profile[iy,ix] / var
+		w = profile[iy,ix] / var
 		var = sqrt (var)
 		Memr[eplot+ix] = var
 		sum = sum + w * (dat - sk)
@@ -177,7 +183,7 @@ begin
 		sk = Memr[sky+ix]
 	        s = max (0., spec[iy,1]) * profile[iy,ix]
 	        var = max (vmin, var0 + (s + sk))
-	        w = Memr[wt+ix] * profile[iy,ix] / var
+	        w = profile[iy,ix] / var
 		var = sqrt (var)
 	        Memr[eplot+ix] = var
 	        Memr[fplot+ix] = s
@@ -240,7 +246,7 @@ begin
 		    sum1 = sum1 + Memr[wt+ix] * Memr[data1+ix]
 	            if (Memr[eplot+ix] <= 0.)
 			next
-	            w = Memr[wt+ix] * profile[iy,ix] / Memr[eplot+ix]**2
+	            w = profile[iy,ix] / Memr[eplot+ix]**2
 	            sum = sum + w * Memr[data1+ix]
 	            wsum = wsum + w * profile[iy,ix]
 	            wvsum = wvsum + (w * Memr[eplot+ix]) ** 2
@@ -275,23 +281,24 @@ begin
 		    }
 		    ix1 = nint (x1)
 		    ix2 = nint (x2)
+		    call ap_edge (asi, x1+1, x2+1, wt1, wt2)
 
 	            sum = 0.
 	            wvsum = 0.
 		    raw[iy,i] = 0.
 	            do ix = ix1, ix2 {
 			if (ix1 == ix2)
-			    w = x2 - x1
+			    w = wt1
 			else if (ix == ix1)
-			    w = ix1 - x1 + 0.5
+			    w = wt1
 			else if (ix == ix2)
-			    w = x2 - ix2 + 0.5
+			    w = wt2
 			else
 			    w = 1.
 			raw[iy,i] = raw[iy,i] + w * Memr[yplot+ix]
 	                if (Memr[eplot+ix] <= 0.)
 			    next
-	                w = w * profile[iy,ix] / Memr[eplot+ix]**2
+	                w = profile[iy,ix] / Memr[eplot+ix]**2
 	                sum = sum + w * Memr[data1+ix]
 	                wvsum = wvsum + (w * Memr[eplot+ix]) ** 2
 	            }
@@ -347,7 +354,7 @@ begin
 	    }
 	}
 
-	# To avoid any bias scale weighted extraction to same total flux
+	# To avoid any bias, scale weighted extraction to same total flux
 	# as raw spectrum (with rejected pixels replaced by fit).
 
 	if (total1 * total2 <= 0.) {

@@ -11,11 +11,12 @@ int	maxch		# the maximum number of character in the string
 
 int	tm[LEN_TMSTRUCT]
 long	ctime
-long	clktime(), lsttogmt()
+long	clktime()
+#long	lsttogmt()
 
 begin
 	ctime = clktime (long(0))
-	ctime = lsttogmt (ctime)
+	#ctime = lsttogmt (ctime)
 	call brktime (ctime, tm)
 	call sprintf (date, maxch, "%04d-%02d-%02d")
 	    call pargi (TM_YEAR(tm))

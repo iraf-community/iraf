@@ -102,4 +102,5 @@ begin
 	call imunmap (im2)
 	call imunmap (im1)
 	call xt_delimtemp (image2, Memc[imtemp])
+	call sfree (sp)
 end

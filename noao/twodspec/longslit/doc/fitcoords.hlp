@@ -1,4 +1,4 @@
-.help fitcoords Aug87 noao.twodspec.longslit
+.help fitcoords Apr00 noao.twodspec.longslit
 .ih
 NAME
 fitcoords -- Fit user coordinates to the image coordinates
@@ -90,6 +90,7 @@ w  Window the graph.  Type '?' to the "window:" prompt for more help.
 x  Select data for the x axis (x, y, z, s, r)
 y  Select data for the y axis (x, y, z, s, r)
 z  Zoom on the set of points with constant x, y, or z (x, y, z)
+   Unzoom with p
 
 :corners	Show the fitted values for the corners of the image
 :function type	Set the function for the fitted surface
@@ -156,6 +157,100 @@ is written to the the specified log files (which may include the standard
 output STDOUT).  The last interactive plot or a default non-interactive
 plot is written the specified plot file which may be examined and spooled
 at a later time.
+
+
+FITCOORDS DATABASE
+
+The FITCOORDS fits are stored in text files in the subdirectory given by
+the "database" parameter.  The name of the file is fc<fitname> where
+<fitname> is the specified fit name.  The database text file contains
+blocks of lines beginning with a time stamp followed by line with the
+"begin" keyword.  The value following "begin" is the fit name, which is
+often the name of the image used for the fit.  If there is more than one
+block with the same fit name then the last one is used.
+
+The "task" keyword will has the value "fitcoords" and the "axis" keyword
+identifies the axis to which the surface fit applies.  An axis of 1 refers
+to the first or x axis (the first dimension of the image) and 2 refers to
+the second or y axis.
+
+The "surface" keyword specifies the number of coefficients for the surface
+fit given in the following lines .  The surface fit is produced by an IRAF
+math package called "gsurfit".  The coefficients recorded in the database
+are intented to be internal to that package.  However the following
+describes how to interpret the coefficients.
+
+The first 8 lines specify:
+
+.nf
+   function - Function type (1=chebyshev, 2=legendre)
+     xorder - X "order" (highest power of x)
+     yorder - Y "order" (highest power of y)
+     xterms - Cross-term type (always 1 for FITCOORDS)
+       xmin - Minimum x over which the fit is defined
+       xmax - Maximum x over which the fit is defined
+       ymin - Minimum y over which the fit is defined
+       ymax - Maximum y over which the fit is defined
+.fi
+
+The polynomial coefficients follow in array order with the x index
+varying fastest:
+
+.nf
+	C00
+	C10
+	C20
+	...
+	C<xorder>0
+	C01
+	C11
+	C21
+	...
+	C<xorder>1
+	...
+	C<xorder><yorder>
+.fi
+
+The surface fitting functions have the form
+
+.nf
+	fit(x,y) = Cmn * Pmn
+.fi
+
+where the Cmn are the coefficients of the polynomials terms Pmn, and the Pmn
+are defined as follows:
+
+.nf
+Chebyshev: Pmn = Pm(xnorm) * Pn(ynorm)
+
+	   xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+	   ynorm = (2 * y - (ymax + ymin)) / (ymax - ymin)
+
+	   P0(xnorm) = 1.0
+	   P1(xnorm) = xnorm
+	   Pm+1(xnorm) = 2.0 * xnorm * Pm(xnorm) - Pm-1(xnorm) 
+
+	   P0(ynorm) = 1.0
+	   P1(ynorm) = ynorm
+	   Pn+1(ynorm) = 2.0 * ynorm * Pn(ynorm) - Pn-1(ynorm) 
+
+Legendre:  Pmn = Pm(xnorm) * Pn(ynorm)
+
+	   xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+	   ynorm = (2 * y - (ymax + ymin)) / (ymax - ymin)
+
+	   P0(xnorm) = 1.0
+	   P1(xnorm) = xnorm
+	   Pm+1(xnorm) = ((2m+1)*xnorm*Pm(xnorm)-m*Pm-1(xnorm))/(m+1)   
+
+	   P0(ynorm) = 1.0
+	   P1(ynorm) = ynorm
+	   Pn+1(ynorm) = ((2n+1)*ynorm*Pn(ynorm)-n*Pn-1(ynorm))/(n+1)   
+.fi
+
+Notice that the x and y values are first normalized to the interval -1 to 1
+over the range of the surface as given by the xmin, xmax, ymin, and ymax
+elements of the database description.
 .ih
 EXAMPLES
 A number of strong arc lines are identified along one column of an arc

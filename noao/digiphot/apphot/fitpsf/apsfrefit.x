@@ -1,5 +1,6 @@
 include <mach.h>
 include "../lib/apphotdef.h"
+include "../lib/apphot.h"
 include "../lib/fitpsfdef.h"
 include "../lib/fitpsf.h"
 include "../lib/noisedef.h"
@@ -7,9 +8,10 @@ include "../lib/noisedef.h"
 # APSFREFIT -- Procedure to fit a function to the data already in the
 # data buffers.
 
-int procedure apsfrefit (ap)
+int procedure apsfrefit (ap, im)
 
 pointer	ap		# pointer to the apphot structure
+pointer	im		# the input image descriptor
 
 int	ier
 pointer	psf, nse
@@ -89,6 +91,17 @@ begin
 	default:
 
 	    # do nothing gracefully
+        }
+
+        switch (AP_WCSOUT(ap)) {
+        case WCS_WORLD, WCS_PHYSICAL:
+            call ap_ltoo (ap, Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2],
+                Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], 1)
+        case WCS_TV:
+            call ap_ltov (im, Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2],
+                Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], 1)
+        default:
+            ;
         }
 
 	if (ier == AP_NPSF_TOO_SMALL) {

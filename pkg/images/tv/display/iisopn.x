@@ -31,6 +31,7 @@ define	quit_ 91
 begin
 	if (first_time) {
 	    iisnopen = 0
+	    iis_version = 0
 	    first_time = false
 	}
 

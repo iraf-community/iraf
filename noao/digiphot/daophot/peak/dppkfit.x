@@ -90,7 +90,6 @@ begin
 		if (Memr[DP_PKNORMAL(peak)+(i-1)*DP_PKNTERM(peak)+i-1] <= 0.0)
 		    return (PKERR_SINGULAR)
 	    }
-
 	    # Solve the matrix.
 
 	    call mvmul (Memr[DP_PKNORMAL(peak)], DP_PKNTERM(peak),
@@ -123,7 +122,6 @@ begin
 	    }
 
 	    # Compute the new x, y, sky, and magnitude.
-
 	    rel_bright = rel_bright + Memr[DP_PKRESULT(peak)] /
 	        (1.0 + max (Memr[DP_PKRESULT(peak)] /
 	        (MAX_DELTA_BRIGHTER * rel_bright), -Memr[DP_PKRESULT(peak)] /

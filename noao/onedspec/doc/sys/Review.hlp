@@ -509,3 +509,4 @@ should be defined for common operations such as expanding a region of
 the plot and restoring the original scale.  This will not be attempted
 until an interactive version of the GIO interface is available later this
 fall.
+.endhelp

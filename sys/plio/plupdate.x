@@ -111,8 +111,8 @@ begin
 
 	    o_len = LP_LEN(o_pp)
 	    call amovs (ll, LL(pl,o_lp), n_len)
-	    LP_NREF(o_pp) = 1
-	    LP_BLEN(o_pp) = b_len
+	    LP_NREFS(o_pp) = 1
+	    LP_SETBLEN(o_pp, b_len)
 	    PL_LLFREE(pl) = PL_LLFREE(pl) + (o_len - LP_LEN(o_pp))
 	    return
 
@@ -124,8 +124,8 @@ begin
 	    n_pp = Ref (pl, n_lp)
 	    call amovs (ll, LL(pl,n_lp), n_len)
 
-	    LP_NREF(n_pp) = 0
-	    LP_BLEN(n_pp) = n_len
+	    LP_NREFS(n_pp) = 0
+	    LP_SETBLEN(n_pp, n_len)
 	    PL_LLFREE(pl) = PL_LLFREE(pl) + n_len
 	}
 
@@ -140,12 +140,12 @@ update_
 	# If the old line buffer is freed we reclaim only LP_LEN words, since
 	# we already reclaimed LP_BLEN-LP_LEN in an earlier edit operation.
 
-	LP_NREF(o_pp) = LP_NREF(o_pp) - 1
+	LP_NREFS(o_pp) = LP_NREFS(o_pp) - 1
 	if (LP_NREF(o_pp) == 0 && o_lp != PL_EMPTYLINE)
 	    PL_LLFREE(pl) = PL_LLFREE(pl) + LP_LEN(o_pp)
 
 	# Add another reference to the new line.
-	LP_NREF(n_pp) = LP_NREF(n_pp) + 1
+	LP_NREFS(n_pp) = LP_NREFS(n_pp) + 1
 	if (LP_NREF(n_pp) == 1 && n_lp != PL_EMPTYLINE)
 	    PL_LLFREE(pl) = PL_LLFREE(pl) - LP_BLEN(n_pp)
 

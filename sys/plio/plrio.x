@@ -253,7 +253,8 @@ int	i, j			#I plane-relative coordinates of pixel
 
 pointer	pl, ll_src
 int	ii, jj, mval, np
-int	pl_l2pi(), pl_access()
+pointer	pl_access()
+int	pl_l2pi()
 errchk	pl_access
 
 begin
@@ -274,7 +275,7 @@ begin
 	if (mval == COMPLEX) {
 	    pl = PLR_PL(plr)
 	    PLR_PLANE(plr,2) = j
-	    ll_src = Ref (pl, pl_access(pl,PLR_PLANE(plr,1)))
+	    ll_src = pl_access (pl, PLR_PLANE(plr,1))
 	    np = pl_l2pi (Mems[ll_src], i, mval, 1)
 	}
 

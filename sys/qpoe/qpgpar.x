@@ -52,7 +52,7 @@ begin
 	    ch = param[ip]
 	    if (IS_WHITE(ch))
 		next
-	    else if (ch == '[')
+	    else if (ch == '[' || ch == EOS)
 		break
 	    Memc[op] = ch
 	    op = op + 1

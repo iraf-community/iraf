@@ -166,15 +166,22 @@ begin
 	call tbhadt (tp, "TASK", "allstar")
 
 	# Write out the files names.
-	call tbhadt (tp, "IMAGE", DP_INIMAGE(dao))
-	call tbhadt (tp, "PHOTFILE", DP_INPHOTFILE(dao))
-	call tbhadt (tp, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call tbhadt (tp, "ALLSTARFILE", DP_OUTPHOTFILE(dao))
-	if (DP_OUTREJFILE(dao) == EOS)
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "IMAGE", Memc[outstr])
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PHOTFILE", Memc[outstr])
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PSFIMAGE", Memc[outstr])
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "ALLSTARFILE", Memc[outstr])
+	if (DP_OUTREJFILE(dao) == EOS) {
 	    call tbhadt (tp, "REJFILE", "\"\"")
-	else
-	    call tbhadt (tp, "REJFILE", DP_OUTREJFILE(dao))
-	call tbhadt (tp, "SUBIMAGE", DP_OUTIMAGE(dao))
+	} else {
+	    call dp_froot (DP_OUTREJFILE(dao), Memc[outstr], SZ_LINE)
+	    call tbhadt (tp, "REJFILE", Memc[outstr])
+	}
+	call dp_imroot (DP_OUTIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "SUBIMAGE", Memc[outstr])
 
 	# Define the data characteristics.
 	call tbhadr (tp, "SCALE", DP_SCALE(dao))
@@ -249,21 +256,24 @@ begin
 	call dp_sparam (tp, "TASK", "allstar", "name", Memc[dummy])
 
 	# Write out the files names.
-	call dp_sparam (tp, "IMAGE", DP_INIMAGE(dao), "imagename",
-	    Memc[dummy])
-	call dp_sparam (tp, "PHOTFILE", DP_INPHOTFILE(dao), "filename",
-	    Memc[dummy])
-	call dp_sparam (tp, "PSFIMAGE", DP_PSFIMAGE(dao), "imagename",
-	    Memc[dummy])
-	call dp_sparam (tp, "ALLSTARFILE", DP_OUTPHOTFILE(dao), "filename",
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "IMAGE", Memc[outstr], "imagename", Memc[dummy])
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PHOTFILE", Memc[outstr], "filename", Memc[dummy])
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PSFIMAGE", Memc[outstr], "imagename", Memc[dummy])
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "ALLSTARFILE", Memc[outstr], "filename",
 	    Memc[dummy])
 	if (DP_OUTREJFILE(dao) == EOS)
-	    call dp_sparam (tp, "REJFILE", "\"\"", "filename",
+	    call dp_sparam (tp, "REJFILE", "\"\"", "filename", Memc[dummy])
+	else {
+	    call dp_froot (DP_OUTREJFILE(dao), Memc[outstr], SZ_LINE)
+	    call dp_sparam (tp, "REJFILE", Memc[outstr], "filename",
 	        Memc[dummy])
-	else
-	    call dp_sparam (tp, "REJFILE", DP_OUTREJFILE(dao), "filename",
-	        Memc[dummy])
-	call dp_sparam (tp, "SUBIMAGE", DP_OUTIMAGE(dao), "imagename",
+	}
+	call dp_imroot (DP_OUTIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "SUBIMAGE", Memc[outstr], "imagename",
 	    Memc[dummy])
 
 	# Define the data characteristics.

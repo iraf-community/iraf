@@ -48,8 +48,9 @@ procedure t_cap()
 
 char	ttyname[SZ_FNAME], capstr[SZ_CAPSTR]
 char	ctrlstr[SZ_CTRLSTR], tempstr[SZ_CTRLSTR], obuf[SZ_LINE]
-int	fd, args[MAX_COORDS], nargs
-int	stropen(), ttygets(), clglstr(), strlen(), nscan()
+int	fd, args[MAX_COORDS], nargs, nchars
+
+int	stropen(), ttygets(), ttysubi(), clglstr(), strlen(), nscan()
 pointer	tty, ttygdes()
 
 begin
@@ -82,11 +83,11 @@ begin
 			call gargi (args[nargs+1])
 		    nargs = nargs - 1
 		    call strcpy (ctrlstr, tempstr, SZ_CTRLSTR)
-		    call ttysubi (tempstr, ctrlstr, SZ_CTRLSTR, args, nargs)
+		    nchars = ttysubi (tempstr, ctrlstr,SZ_CTRLSTR, args,nargs)
 		} else
 		    nargs = 0
 
-		call ttyputs (fd, tty, ctrlstr)
+		call ttyputs (fd, tty, ctrlstr, 1)
 		if (nargs > 0 && args[1] != 0 || args[2] != 0) {
 		    call fprintf (fd, " residual x=%d, y=%d")
 			call pargi (args[1])

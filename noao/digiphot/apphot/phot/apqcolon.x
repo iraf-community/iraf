@@ -257,12 +257,7 @@ begin
 			call pargstr (Memc[str])
 		    im = immap (Memc[str], READ_ONLY, 0)
 		} else {
-		    call apsets (ap, IMNAME, Memc[cmd])
-		    call ap_itime (im, ap)
-		    call ap_padu (im, ap)
-		    call ap_rdnoise (im, ap)
-		    call ap_airmass (im, ap)
-		    call ap_filter (im, ap)
+		    call apimkeys (ap, im, Memc[cmd])
 		    newimage = YES
 		    newcbuf = YES; newcenter = YES
 		    newsbuf = YES; newsky = YES
@@ -288,9 +283,12 @@ begin
 		    cl = NULL
 		    call erract (EA_WARN)
 		    call apsets (ap, CLNAME, "")
+		    call apsets (ap, CLROOT, "")
 		    call printf ("Coordinate file is undefined.\n")
 		} else {
 		    call apsets (ap, CLNAME, Memc[cmd])
+		    call apfroot (Memc[cmd], Memc[str], SZ_FNAME)
+		    call apsets (ap, CLROOT, Memc[str])
 		    ltid = 0
 		}
 	    }

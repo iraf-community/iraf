@@ -1,5 +1,162 @@
 .help revisions Jun88 noao.onedspec
 .nf
+scombine/t_scombine.x
+    The rejection option is ignored when "combine=sum".  The documentation
+    did not make this clear and the output log would show whatever was
+    set for the rejection parameter.  The help was clarified and the
+    code changed to show a rejection of none.  (7/5/02, Valdes)
+
+irsiids/libpkg.a
+    Removed a stray libpkg.a link (6/5/02, MJF)
+
+identify/idcenter.x
+ecidentify/eccenter.x
+    The handling of INDEF values between reals and doubles was not done
+    correctly.  (5/28/02, Valdes)
+
+=====
+V2.12
+=====
+
+t_slist.x
+irsiids/t_slist1d.x
+    The SMW pointer was being closed without resetting the pointer in
+    the SHDR structure.  (5/30/02, Valdes)
+
+identify/iddofit.x
+identify/idinit.x
+    When deleting features during the fitting the memory allocated for
+    the labels was not being updated correctly.  Also in freeing the
+    feature memory there was no need to free labels beyond the number
+    of features.  (4/30/02, Valdes)
+
+splot/wrspect.x
+    Removed possibility of an infinite loop and make error checking
+    a little more obvious.  (2/28/02, Valdes, 3/21/02, Valdes))
+
+dispcor/dcio.x
+    Removed the special test for dispersion corrected data with no DCLOG
+    keyword which prevents re-calibration.  (2/4/02, Valdes)
+
+doc/bplot.hlp
+    Fixed a typo in the help page. (1/5/02, MJF)
+
+mkpkg
+    Added missing <mach.h> dependency to getcalib.x  (12/13/01, MJF)
+
+sensfunc/mkpkg
+    Removed unneeded dependencies for sfimage.x  (12/13/01, MJF)
+
+irsiids/t_flatfit.x
+irsiids/t_subsets.x
+irsiids/t_sums.x
+t_mkspec.x
+t_sinterp.x
+irsiids/t_bswitch.x
+    imgl1r() called with extra arg. (9/20/01, Valdes)
+
+dispcor/t_dispcor.x
+    dc_gec() missing arg. (9/20/01, Valdes)
+
+identify/autoid/aidautoid.x
+    aid_eval() called with extra arg. (9/20/01, Valdes)
+
+identify/idinit.x
+    id_gid() define as a function but should be a subroutine.
+    (9/20/01, Valdes)
+
+identify/idshift.x
+    id_getid() called as subroutine. (9/20/01, Valdes)
+
+ecidentify/ecffit/ecfshift.x
+    ecf_pshift() was incorrect. (9/20/01, Valdes)
+
+identify/iddofit.x
+    When removing lines deleted during fitting the labels were not being
+    correctly maintained.  (8/2/01, Valdes)
+
+splot/eqwidth.x
+    Instead of refusing to compute errors when there is a negative value
+    (anywhere in the spectrum and not just in the region) the routine
+    simply sets the pixel value in evaluating the sigma.
+    (5/16/01, Valdes)
+
+doc/deredden.hlp
+    Added information about the range of validity of the extinction
+    function.  (4/9/01, Valdes)
+
+t_fitprof.x
+    The input image was being unmmaped before the output image which
+    can cause problems.  (3/9/01, Valdes)
+
+splot/getimage.x
+    The nline parameter was not being set to the current line which could
+    cause the ')' and '(' to misbehave.  (2/15/01, Valdes)
+
+doc/sarith.hlp
+    The help said incorrectly that flux conservation was used.
+    (1/17/01, Valdes)
+
+smw/smwsaveim.x
+smw/smwequispec.x
+    The APNUM keywords change to AP when the aperture number is greater
+    than 999.  (11/8/00, Valdes)
+
+identify/iddb.x
+    The user units string is now recorded.  This is to allow velocity
+    units to include the reference point.  (5/4/00, Valdes)
+
+splot/eqwidthcp.x
+    When x becomes large enough the parabola fitting routine has a
+    divide by zero.  The parabola fitting routine was converted to work in
+    double, to check the x values for degeneracy, and to avoid the squares
+    of large numbers.  The calling routine was also modified to work in
+    double.  (2/15/00, Valdes)
+
+smw/smwonedspec.x
+smw/smwoldms.x
+    Put an error check on imdelf.  The list expansion should have expanded
+    to only the header keywords present but for some undiagnosed reason
+    sometimes the list expansion returned a non-existant keyword which
+    wouod cause an error.  (2/2/00)
+
+dispcor/dispcor.x
+    The input linei argument should really be the aperture number needed
+    to go back to pixel coordinates.  The change was to use this value only
+    to flag if the WCS is 1D (for long slit data) and otherwise to do
+    what the procedure did before.  (2/1/00, Valdes)
+
+dispcor/t_dispcor.x
+    During changes for 2D dispcor the arguments for a routine changed and
+    this was not reflected in the dc_global routines resulting in a
+    segmentation violation when the global option is selected.
+    (1/27/00, Valdes)
+
+dispcor/dcio.o
+    Touched but not changes.  (1/27/00, Valdes)
+
+getcalib.x
+t_standard.x
+standard.par
+lcalib.par
+splot.par
+doc/standard.hlp
+doc/lcalib.hlp
+doc/splot.hlp
+    1.  The calibration files may now be blackbody curves scaled to a
+	specified magnitude.
+    2.	STANDARD displays the data and bandpasses in the units of the
+	data rather than Angstroms.  The changes were made to allow
+	output in other untis but for now this has been disabled.
+    (1/24/00, Valdes)
+
+t_sarith.x
+    The WCS was set wrong when copying/extracting a region of a
+    log-linear spectrum.  (12/14/99, Valdes)
+
+=======
+V2.11.3
+=======
 
 t_fitprof.x
     Fixed double/int mismatch in a min call.  (11/22/99, Valdes)

@@ -74,6 +74,10 @@ begin
 	}
 
 	# Set curve fitting parameters.
+	# For polynomials define fitting range over range of data in fit
+	# and assume extrpolation is ok.  For spline functions define
+	# fitting range to be range of evaluation set by the caller
+	# since extrapolation will not make sense.
 
 	if ((newx == YES) || (newfunction == YES)) {
 	    if (cv != NULL)
@@ -82,8 +86,8 @@ begin
 	    switch (IC_FUNCTION(ic)) {
 	    case LEGENDRE, CHEBYSHEV:
 		ord = min (IC_ORDER(ic), IC_NFIT(ic))
-	        call rcvinit (cv, IC_FUNCTION(ic), ord, real (IC_XMIN(ic)),
-		    real (IC_XMAX(ic)))
+	        call rcvinit (cv, IC_FUNCTION(ic), ord, real (xmin),
+		    real (xmax))
 	    case SPLINE1:
 		ord = min (IC_ORDER(ic), IC_NFIT(ic) - 1)
 		if (ord > 0)

@@ -1,6 +1,600 @@
 .help revisions Jan97 images
 .nf
 
+=======
+V2.12.1
+=======
+
+images$immatch/src/imcombine/src/iclog.x
+    The pixel masks listed in the log output was wrong.  This only applies
+    to the log, the correct mask is used during processing.  (6/26/02, Valdes)
+
+pkg/images/src/xregister/t_xregister.x
+pkg/images/src/xregister/rgxicorr.x
+    If the xregister task parameter interactive = yes and the output images
+    are defined then the computed shifts are not applied. This occurs  because
+    the reinitialization routine triggered by the 'n' keystroke command is in
+    the wrong place. The work around is to run xregister twice, once
+    interactively to compute the shifts, and again non-interactively to
+    apply them. (6/20/02, Davis)
+
+images$immatch/src/imcombine/src/icsetout.x
+    Needed to disable axis mapping to handle cases where the input
+    images are dimensionally reduced.  (6/14/02, Valdes)
+
+images$immatch/src/imcombine/src/xtimmap.gx
+    The size of image header data structures was computed incorrectly
+    resulting in the potential for segmenation violations.  (6/14/02, Valdes)
+
+=====
+V2.12
+=====
+
+images$imutil/src/t_imstat.x
+    If nclip > 0 and the initial mean and standard deviation are INDEF
+    (a very unlikely occurence unless there is a mask) the k-sigma
+    limit computation  in the imstatistics task could overflow. This does
+    not affect released code. (5/01/02, Davis)
+
+images$immatch/src/imcombine/src/icmask.x
+    The fix of 4/8/02 had been inadvertently undone.  (4/25/02, Valdes)
+
+images$imutil/src/imadiv.gx
+images$imutil/src/generic.imadiv.x
+    Fixed an error in the code which evaluates an expression of the form
+    "inimage / 0" which was causing a bus error on the macosx but not on
+     solaris. This error has apparently been there for ever. (4/24/02, Davis)
+
+images$immatch/src/imcombine/t_imcombine.x
+images$immatch/src/imcombine/src/icombine.x
+images$immatch/src/imcombine/src/icsetout.x
+images$immatch/src/imcombine/src/icmask.x
+images$immatch/src/imcombine/src/iclog.x
+    The projection option was no longer working.  There was a typo in
+    t_imcombine.x, the dimensionality of the image was not set
+    properly in icombine.x and icsetout.x, and the masks for projected
+    images was not correct.  (4/22/02, Valdes)
+
+images$immatch/src/imcombine/src/icsetout.x
+    When computing offsets the registration point was the reference pixel
+    returned by mw_gwterm for the first image.  The code then went on to
+    assume this was a logical pixel when comparing with the other images,
+    which is not true when there is a physical coordinate system.  The
+    algorithm was fixed by converting the reference point to logical
+    coordinates.  (4/18/02, Valdes)
+
+images$imcoords/src/t_ccget.x
+    Ccget was not transforming the units and applying the user supplied
+    formatting parameters if the input or output coordinate system, e.g.
+    ICRS, was the same as the catalog coordinate system. This does not
+    affect released code. (04/16/02, Davis)
+
+images$immatch/src/imcombine/src/icmask.x
+    There was a bug in the recent change to open and close masks as needed
+    where a possibly null filename pointer was being checked for being
+    a null string.  (4/8/02, Valdes)
+
+images$imcoords/src/t_wcsctran.x
+    Added a check for INDEF valued input coordinates. (4/04/02, Davis)
+
+images$tv/imexamine/iegimage.x
+    Image sections in the image name retrieved from the display server
+    are now handled more intelligently.  In particular, 2D sections of
+    higher dimensional images will now examine the correct 2D section
+    rather than just the lowest 2D plane.  (3/20/02, Valdes)
+
+images$tv/display/t_display.x
+    If an image section of a higher dimensional image is displayed the
+    image section is included in the image name sent to the display
+    server.  Previously the section was stripped and so it was not
+    possible to know the 2D section displayed.  For now we keep backwards
+    compatibility by stripping any section from 2D parent images.
+    (3/20/02, Valdes)
+
+images$immatch/src/imcombine/src/icombine.x
+    Added error checks for imunmap of the output files.  In the final
+    staage of closing the output if an error occurs, principally in
+    writing mask, this will at least allow the primary combined output
+    image to be written.  This is useful when an extremely large combining
+    operation is performed.  (3/6/02, Valdes)
+
+images$immatch/src/imcombine/src/iclog.x
+images$immatch/src/imcombine/src/icmask.x
+images$immatch/src/imcombine/src/icstat.gx
+    Rather than open all the masks at the beginning the masks are now
+    opened and closed as needed.  For situations with offsets this
+    can reduce the amount of memory required for the masks.
+    (3/6/02, Valdes)
+
+images$/imutil/src/hselect.x
+images$/imutil/src/hedit.x
+    Added missing xev_freeop calls to the hedit and hselect tasks and a missing
+    mfree call to the hselect task. (3/5/02, Davis)
+
+images$tv/imexamine/iegimage.x
+    When imexmaine fails to map the image name returned by the display server
+    it uses the frame buffer.  Previously there was no warning message about
+    failing to map the image.  Now there is a warning.  This is only given
+    once until the image name is changed either by going to a new frame
+    buffer or doing a new display.  (3/4/02, Valdes)
+
+images$tv/imexamine/iegimage.x
+images$tv/imexamine/t_imexam.x
+    When the frame buffer is used as the image source (when the image name
+    in the display frame cannot be mapped) the final imunmap woutd
+    attempt to unmap the same descriptor twice.  (3/1/02, Valdes)
+
+images$imcoords/src/t_wcsctran.x
+    Fixed a bug the logical to tv coordinate mapping which could occur
+    if the section subsmapling parameter was > 1, the input image was a section
+    of a higher dimensioned image, and the first dimension was not one
+    of those extracted. (3/1/02, Davis)
+
+images$tv/imexamine/iegimage.x
+    The 'p' was not properly updated for the multiple WCS changes.
+    (2/26/02, Valdes)
+
+images$immatch/src/imcombine/src/xtimmap.gx
+    The header keywords were not being fully copied.  (2/20/02, Valdes)
+
+images$immatch/src/imcombine/src/icstat.gx
+images$immatch/src/imcombine/src/xtimmap.gx
+    asum$t declared incorrectly as type PIXEL rather than real.  xt_cpix
+    incorrectly defined as pointer function instead of a subroutine.
+    (2/20/02, Valdes)
+
+images$imutil/src/t_minmax.x
+    Fixed a floating overflow error in minmax which occurred if the
+    dimensionality of the input image was 0 and the update parameter
+    was set to yes. In this case the min and max values were set to
+    INDEF (min and max computation is done internally in double precision)
+    could not fit into the real valued min and max slots in imhdr.h
+    hence the conversion error. (2/19/02, Davis)
+
+images$tv/imexamine/iegimage.x
+    The changes to support multiple WCS per frame involved keeping track of
+    the full WCS frame id (i.e. 101) rather than just the frame number.
+    There was a minor error in this bookkeeping when incrementing the
+    the next display frame to be used.  (2/19/02, Valdes)
+
+images$lib/imcopy.x
+    Added a missing sfree statement to the img_imcopy routine. (2/18/02, Davis)
+
+images$immatch/src/imcombine/src/icaverage.x
+images$immatch/src/imcombine/src/icsigma.x
+images$immatch/src/imcombine/src/icomb.gx
+images$immatch/src/imcombine/src/icscale.x
+images$immatch/src/imcombine/src/icemask.x
+images$immatch/doc/imcombine.hlp
+    If weights of zero are given for an image then that image will not
+    contribute to the output weighted average unless all of the
+    non-excluded images have zero weight.   In that case the unweighted
+    average is output.  The exposure mask is the sum of the exposure times
+    of the images with non-zero weights.  These changes allow combining
+    only data which is considered good (photometric or good seeing) as
+    specified by the weights but still including non-good data in the
+    final image when there is no good data.  The combinined zero weight
+    data will have an exposure time mask value of zero.  (2/8/02, Valdes)
+
+images$immatch/src/imcombine/src/icmask.x
+images$immatch/src/imcombine/src/icmask.h
+images$immatch/src/imcombine/src/iclog.h
+images$immatch/src/imcombine/imcombine.par
+images$immatch/imcombine.par
+images$immatch/doc/imcombine.hlp
+    The masktype parameter may now specify !<keyword> to select the keyword
+    to use for a mask.  When this option is selected the mask value
+    interpretation is "goodval".  (2/5/02, Valdes)
+
+images$immatch/src/imcombine/src/icmask.x
+    If pl_loadf fails then pl_loadim is tried.  This adds support for
+    masks in FITS extensions.  (2/5/02, Valdes)
+
+images$tv/display/dspmmap.x
+    Added the feature that the bad pixel mask or overlay mask may be
+    specified by a keyword value with the syntax !<keyword>.  This is
+    important for multiextension files where various masks are set
+    as keywords.  The new task OBJMASKS also writes the object mask name
+    that is created for an image in the header.  Use of !objmask then
+    allows the object mask to be used for the bad pixel mask (to set
+    the scaling using only sky pixels) and for overlay.
+    (2/5/02, Valdes)
+
+images$tv/display/sigm2.x
+    The routine to compute the maximum value as the interpolated quantity
+    was incorrect because the size of the input and output arrays were
+    treated as the same when they are not.  This is used for overlay
+    display which produced the symptom of horizontal lines.
+    (2/5/02, Valdes)
+
+images$immatch/src/imcombine/src/icombine.x
+images$immatch/src/imcombine/src/icomb.gx
+images$immatch/src/imcombine/src/xtimmap.gx
+images$immatch/src/imcombine/src/icombine.h
+    The buffer size management calculation based on the number of input
+    images was no longer working because unless IM_BUFFRAC is explicitly
+    set to 0, the requested buffer size is just a lower limit.  The buffer
+    size calculation was modified and calls to set IM_BUFFRAC to zero were
+    added.  (1/30/02, Valdes)
+
+images$immatch/src/imcombine/src/xtimmap.gx
+images$immatch/src/imcombine/src/icomb.gx
+images$immatch/src/imcombine/src/icgdata.gx
+    The code to close unused images when they are not needed had an error
+    when there were y offsets.  Rather than closing each image when it not
+    longer contributed to an output line due to an offset, it was instead
+    closing all images on every line and then mapping them again.
+    (1/29/02, Valdes)
+
+images$imutil/src/t_minmax.x
+    Removed extra arguments from the calls to clpstr. (01/07/02, Davis)
+
+images$imutil/src/t_imstat.x
+    Added a call setting IM_BUFFRAC to 0 to the memory caching code in the
+    imstatistics task in order to force the imio buffer to be the size of
+    the input image.
+    (12/10/01, Davis)
+
+images$imcoords/src/t_wcsctran.x
+images$imcoords/src/rgstr.gx
+images$imcoords/src/rgstr.x
+    Wcsctran may produce a string_file error if the input image is
+    dimensionally reduced. The problem was caused by an uninitialized
+    array. The code works ig by chance the array is initialized to 0.
+    (12/8/01, Davis)
+
+images$immatch/src/imcombine/src/icscale.x
+    Fixed bug with normalization.  (12/4/01, Valdes)
+
+images$imutil/src/hedit.par
+images$imutil/doc/hedit.hlp
+images$imutil/src/hedit.x
+    For backwards compatability modified the precedence of the operator
+    switches from addonly / add / delete to add / addonly / delete. 
+    Also clarified the switch precedence rules in the help page.
+    (11/13/01, Davis)
+
+images$imutil/src/imheader.x
+    Fixed imheader so it prints out an image size of 0 if IM_NDIM(im) is
+    is 0 instead of the contents of the first element of the IM_LEN(im,1)
+    vector which may be non-zero. (11/05/01, Davis)
+
+images$immatch/src/xregister/rgxicorr.x
+images$immatch/src/xregister/rgxcolon.x
+images$immatch/src/xregister/rgxtools.x
+    Fixed a bug in the xregister multiple region handling code that was 
+    preventing xregister from computing x-correlations on regions beyond
+    the first in interactive mode. (10/17/01, Davis)
+
+images$imcoords/src/t_skyctran.x
+images$imcoords/src/t_sffind.x
+images$imfilter/src/mode.x
+images$imutil/doc/hedit.hlp
+images$imutil/doc/imdivide.hlp
+images$tv/doc/Tv.hlp
+images$tv/iis/doc/Cv.hlp
+images$tv/iis/doc/cv.hlp
+images$tv/iis/ids/doc/Imdis.hlp
+images$immatch/src/imcombine/t_imcombine.x
+    Fixed various missing/extra argument problems in the images package
+    code that were found with spplint. Also fixed miscellaneous help page
+    formatting problems. (9/19/01 Davis)
+
+images$imutil/src/t_imjoin.x
+    Changed the clgetc call to clgstr calls for the pixtype parameter in
+    imjoin. This change is required to avoid an "ERROR: Parameter not a legal
+    character constant (parname)" error introduced by recent changes to the CL.
+    Basically "" is no longer a legal argument for clgetc. (9/17/01 Davis)
+
+
+images$imutil/imstatistics.par
+images$imutil/doc/imstatistics.hlp
+images$imutil/src/imstat.h
+images$imutil/src/t_imstat.x
+    1. Added an interative rejection capability to the imstatistics task.
+    2. Added a cacheing option that can speed up the performance of the
+       task if the midpt/mode statistic is computed or if iterative rejection
+       is performed.
+    (8/30/01, Davis)
+
+images$immatch/src/imcombine
+images$immatch/src/imcombine/src	+
+    1. Further modifications and optimizations.
+    2. Reorganized with a subdirectory of common routines shared with
+       the CCD reduction versions.
+    (8/29/01, Valdes)
+
+images$immatch/src/imcombine
+images$immatch/imcombine.par
+images$immatch/doc/imcombine.hlp
+    1.  New parameters "headers", "bpmasks", "rejmasks",  "nrejmasks",
+	and "expmasks" provide additional types of output.  The old
+	parameters "rejmask" and "plfile" were removed.  The new
+	"nrejmasks" parameter corresponds to the old "plfile" and the
+	new "rejmasks" parameter corresponds to the old "rejmask".
+    2.  There is a new "combine" type "sum" for summing instead of
+	averaging the final set of offset, scaled, and weighted
+	pixels.
+    3.  There is a new parameter "outlimits" to allow output of a
+	subregion of the full output.  This is useful for raster
+	surveys with large numbers of images.
+    4.  Additional keywords may appear in the output headers.
+    5.   The scaling is now done relative to the first image rather than
+	an average over the images.  This is done so that flux related
+	keywords such as exposure time and airmass remain
+	representative.
+    6.  The environment parmaeter "imcombine_option" allows using an
+	algorithm that opens and closes images.  This is very slow but
+	allows combining large numbers of images which are not the same
+	size.
+    7.  New help page.
+    (8/17/01, Valdes)
+
+tv$imexamine/iecimexam.x
+tv$imexamine/ieeimexam.x
+tv$imexamine/iegcur.x
+tv$imexamine/iegimage.x
+tv$imexamine/iegnfr.x
+tv$imexamine/iehimexam.x
+tv$imexamine/ieimname.x
+tv$imexamine/iejimexam.x
+tv$imexamine/ielimexam.x
+tv$imexamine/ieopenlog.x
+tv$imexamine/ieqrimexam.x
+tv$imexamine/ierimexam.x
+tv$imexamine/iesimexam.x
+tv$imexamine/ietimexam.x
+tv$imexamine/ievimexam.x
+tv$imexamine/imexam.h
+tv$imexamine/t_imexam.x
+    Modifications to use multiple WCS mappings.  (8/13/01, Valdes)
+
+tv$imexamine/mkpkg
+tv$imexamine/x_imexam.x	+
+tv$imexamine/imexamine.par	+
+    Added a mkpkg target to compile standalone; i.e. mkpkg standalone.
+    (8/13/01, Valdes)
+
+immatchx$src/ximcoords/t_ccmap.x
+    Fixed a bug in the ccmap refpoint = "coords" option that could produce a
+    totally inaccurate reference point estimate if the image spanned 0
+    hours right ascension due to coordinate wrap around. (7/20/01 Davis)
+
+
+images$imgeom/src/t_magnify.x
+    Fixed a bug in the magnify task that can cause a previous block of lines
+    to be repeated instead of a new block computed. This bug was introduced
+    when magnify was upgraded to use the new interpolants code and to use 
+    boundary extension in imio. A typo was made in the update which produces
+    the error in the case where the buffer does not update when a new group of
+    lines is computed.  This situtation is not normally supposed to occur
+    but may in the situation where the magnification factors are greater than
+    the internal buffer size of 16 output image lines. (6/21/01, Davis)
+
+images$immatch/src/imcombine/t_combine.x
+images$immatch/src/imcombine/icombine.gx
+images$immatch/src/imcombine/icgdata.gx
+images$immatch/src/imcombine/icscale.x
+images$immatch/src/imcombine/xtimmap.x	+
+images$immatch/src/imcombine/mkpkgx
+    When combining more images than there are IRAF FIO descriptors the
+    additional images are mapped and unmapped as needed.  There is no
+    limit now on the number of images or that they be capable of being
+    stacked into a single image for combining by projection.  The creation
+    of a temporary stack image is no longer done.  (6/16/01, Valdes)
+
+images$immatch/src/psfmatch/rgpfilter.x
+images$immatch/src/psfmatch/rgpconvolve.x
+    Fixed a floating point error in the replace algorithm gaussian fitting
+    routines that occurs if the argument to the log function is exactly zero.
+    Fixed a symmetry error in the convolve routine that would produce a 
+    corrected psf that was flipped in x and y if the psf matching kernel
+    did not have mirror symmetry. The solution was simply to rotate the
+    convolution kernel 180 degrees before applying it to the input image.
+    The matching kernel itself is correctly oriented and can be used 
+    directly with the fconvolve task.  (5/15/01 Davis)
+
+images$imutil/hedit.par
+images$imutil/doc/hedit.hlp
+images$imutil/src/hedit.hlp
+    Added a new addonly parameter to the hedit task. If addonly is set
+    a new field will only be added to the image header if it does not
+    already exist. (4/30/01, Davis)
+
+images$tv/display/dspmmap.x
+    Fixed problems with ds_match.  The new version is more robust and
+    correct.  A bad pixel for the displayed image is the maximum of all
+    pixels in the pixel mask which fall within the display pixel.   This
+    version still does not allow any relative rotations but does allow
+    non-integer offsets.  (4/24/01, Valdes)
+
+images$imgeom/src/t_im3dtran.x
+images$imgeom/src/t_imtrans.x
+images$imgeom/src/t_imshift.x
+images$imgeom/src/t_magnify.x
+    Modified the im3dtran, imtranspose, imshift, and magnify tasks so that
+    the output image which is mapped NEW_COPY is closed before the input image.
+    To the best of my knowledge this has not caused problems to date but
+    it could (3/1/01 Davis)
+
+images$immatch/src/imcombine/icsetout.x
+    The physical coordinates of the output WCS are now reset.
+    (3/1/01 Valdes)
+
+images$lib/geomap.h
+images$lib/geogmap.h
+images$lib/geofit.gx
+images$lib/geofit.x
+images$lib/geogmap.gx
+images$lib/geogmap.x
+images$lib/geograph.gx
+images$lib/geograph.x
+images$lib/geomap.key
+images$lib/coomap.key
+images$immatch/geomap.par
+images$immatch/doc/geomap.hlp
+images$immatch/src/geometry/t_geomap.gx
+images$immatch/src/geometry/t_geomap.x
+images$imcoords$ccmap.par
+images$imcoords/src/t_ccmap.x
+images$imcoords/doc/ccmap.hlp
+
+    Added a new parameter maxiter to the geomap and ccmap tasks. Maxiter
+    defines the maximum number of rejection iterations and has a default
+    value of 0 for no rejection.
+
+    Changed the default value of the ccmap and geomap parameter reject from
+    INDEF to 3.0.  (05/01/01 Davis)
+
+pkg/images/imcoords/
+    Added the tasks CCGET and CCSTD to the image package. (10/12/00 Davis)
+
+pkg/images/imcoords/src/t_ccmap.x
+pkg/images/immatch/src/geometry/t_geomap.gx
+pkg/images/immatch/src/geometry/t_geomap.x
+pkg/images/lib/geomfit.gx
+pkg/images/lib/geomfit.x
+pkg/images/lib/geogmap.gx
+pkg/images/lib/geogmap.x
+pkg/images/lib/geogmap.h
+pkg/images/lib/geogragh.gx
+pkg/images/lib/geograph.x
+pkg/images/lib/geomap.key
+pkg/images/lib/coomap.key
+    Added a :order command to ccmap and geomap so that the user can change all
+    the orders at once. (10/12/00 Davis)
+
+    Modified the error checking to fix a segvio problem which occured in ccmap
+    and geomap if the number of points was too few for a good fit and verbose
+    was set to no. (10/12/00 Davis)
+
+pkg/images/imcoords/imcctran.par
+pkg/images/imcoords/src/t_imcctran.x
+pkg/images/imcoords/doc/imcctran.hlp
+    Added support for doing coordinate transformations accurately on
+    images with non-zenithal projections where rotating the CD matrix
+    does not work accurately.
+
+    Added a new parameter longpole to the imcctran  task. If longpole =yes
+    then coordinate transformations with zenithal projections will be
+    rotated using longpole rather than the CD matrix. (2/7/00 Davis)
+
+pkg/images/immatch/
+pkg/images/imcoords/
+    The immatch and imcoords packages were modified to use the new version
+    of the skywcs routines in xtools. (10/12/00, Davis)
+
+pkg/images/immatch/imcentroid.par
+pkg/images/immatch/imalign.par
+pkg/images/immatch/imalign.cl
+pkg/images/immatch/doc/imcentroid.hlp
+pkg/images/immatch/doc/imalign.hlp
+pkg/images/immatch/src/listmatch/t_imctroid.x
+pkg/images/immatch/src/listmatch/mkpkg
+    Added a new parameter maxshift to the imcentroid and imalign tasks. 
+    Maxshift is the maximum permitted difference between the computed and
+    predicted shifts. Maxshift can be used to reject objects whose centers
+    have wandered too far from the expected center. By default maxshift is
+    undefined. (10/9/00, Davis)
+
+pkg/images/imcoords/src/sffind.x
+pkg/images/imcoords/doc/starfind.hlp
+    Modified the way starfind computes the background estimate used to compute
+    the first and second order moments so that it does not depend on the
+    value and density of the central pixel. (10/9/00, Davis)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+    Modified the conversion of pclip from a fraction to a number of images
+    because for even number of images the number above/below the median
+    is one too small.  (9/26/00, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+pkg/images/immatch/src/imcombine/icimstack.x
+    Error handling when running out of memory with immap (due to a very
+    large min_lenuserarea) and when trying to stack was fixed up to
+    report reasonable error messages and to not go into an infinite loop
+    trying to manage memory.  (9/13/00, Valdes)
+
+pkg/images/immatch/src/imcombine/icombine.gx
+pkg/images/immatch/src/imcombine/icgdata.gx
+    Additional errchk declarations were needed to catch out of memory
+    during image reading which were not caught during the initial
+    pass at reading the images.  (9/11/00, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+    When a "cannot open image" error occurs for some other reason than
+    running out of file descriptors the task would go into an infinite
+    loop or given a segmentation error.  The checking was improved to
+    avoid this.  (8/31/00, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+    When there is an output mask or sigma image and the number of images
+    exceeds the maximum number allowed by the number of logical file
+    descriptors the task failed to delete the files when starting over
+    using the stacked image approach.  This would result in an image
+    already exists error.  This was fixed by deleting the files upon
+    error recovery.  (8/9/00, Valdes)
+
+pkg/images/immatch/src/imcombine/mkpkg
+pkg/images/immatch/src/imcombine/x_imcombine.x	+
+pkg/images/immatch/src/imcombine/imcombine.par	+
+    Added a mkpkg entry to allow making the IMCOMBINE task independently
+    of the entire IMAGES package for testing and debugging purposes.
+    (6/21/00, Valdes)
+
+pkg/images/immatch/src/imcombine/t_imcombine.
+pkg/images/immatch/src/imcombine/icimstack.x
+pkg/images/immatch/src/imcombine/iclog.x
+pkg/images/immatch/doc/imcombine.hlp
+    When there are a large number of images with bad pixel masks both the
+    input images and the bad pixel masks are stacked for combining.  The
+    addition of stacking the masks allows for independent bad pixel masks
+    for each input image which was not supported previously.
+    (6/21/00, Valdes)
+
+pkg/images/immatch/src/imcombine/icmedian.gx
+    Replaced median algorithm with the faster Wirth algorithm.
+    (5/16/00, Valdes)
+
+pkg/images/lib/skywcs.x
+    Incorrect values for the epoch of observations were being computed
+    and printed by tasks like skyctran and imcctran if the input coordinate
+    system was read from an image and the input coordinate system was
+    galactic. The problem was that the epoch was being converted to MJD 
+    twice instead of once. Unless a proper motion correction was being computed
+    this problem should have little practical effect although it is
+    disturbing to odd units in the file headers. (1/31/00, Davis)
+
+pkg/images/immatch/doc/imcombine.hlp
+pkg/images/immatch/imcombine.par
+    The "outtype" parameter can take the value "none" in addition to one
+    of the standard datatypes.  The help page was incorrect/unclear what
+    was meant by not specifying an output type.
+    (1/18/00, Valdes)
+
+pkg/images/immatch/src/imcombine/icgdata.gx
+pkg/images/immatch/src/imcombine/iclog.x
+pkg/images/immatch/src/imcombine/icmask.x
+pkg/images/immatch/src/imcombine/icombine.gx
+pkg/images/immatch/src/imcombine/icscale.x
+pkg/images/immatch/src/imcombine/icsetout.x
+    Changed declarations for the array "out" to be ARB rather than 3 in
+    some places (because it was not changed when another element was added)
+    or 4.  This will insure that any future output elements added will
+    no require changing these arguments for the sake of cosmetic correctness.
+    (1/13/00, Valdes)
+
+pkg/images/immatch/src/imcombine/icsetout.x
+    Fixed error with MWCS dimension mismatch when using offsets on
+    input images which have been dimensionally reduced.  (1/12/00, Valdes)
+
+========
+V2.11.3a
+========
+=======
+V2.11.3
+=======
+
 pkg/images/imfilter/src/fmedian.x
 pkg/images/imfilter/src/fmode.x
 pkg/images/imfilter/src/frmedian.x

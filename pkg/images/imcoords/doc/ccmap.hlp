@@ -1,4 +1,4 @@
-.help ccmap Jun99 images.imcoords
+.help ccmap Jan01 images.imcoords
 .ih
 NAME
 ccmap -- compute plate solutions using matched pixel and celestial coordinate lists
@@ -309,9 +309,11 @@ If either of the cross-terms parameters is set to "half" or "full" and
 \fIfitgeometry\fR is "general" then a distortion surface is fit to the
 residuals from the linear portion of the fit.
 .le
+.ls maxiter = 0
+The maximum number of rejection iterations. The default is no rejection.
+.le
 .ls reject = INDEF
-The rejection limit in units of sigma. The default is no rejection.
-Only one cycle of rejection is currently performed.
+The rejection limit in units of sigma.
 .le
 .ls update = no
 Update the world coordinate system in the input image headers ?
@@ -471,8 +473,8 @@ off by setting the \fIxxterms\fR and \fIxyterms\fR parameters. If the
 parameters assume the value 2 and the cross-terms switches assume the value
 "none", regardless of the values set by the user. All computation are done in
 double precision. Automatic pixel rejection may be enabled by setting
-\fIreject\fR to a , usually something in the range
-3.0-5.0. Only one cycle of automatic pixel rejection is currently permitted.
+\fImaxiter\fR > 0 and \fIreject\fR to a  positive value, usually something
+in the range 2.5-5.0.
 
 CCMAP may be run interactively by setting \fIinteractive\fR to "yes" and
 inputing commands by the use of simple keystrokes. In interactive mode the
@@ -510,6 +512,7 @@ commands. Typing the parameter name along will list the current value.
 :yyorder  [value]    Eta fitting function order in y
 :xxterms  [n/h/f]    The xi fit cross terms type
 :yxterms  [n/h/f]    The eta fit cross terms type
+:maxiter  [value]    Maximum number of rejection iterations
 :reject   [value]    K-sigma rejection threshold
 .fi
 

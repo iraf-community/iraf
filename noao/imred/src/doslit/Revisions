@@ -1,5 +1,29 @@
 .help revisions Dec94 noao.imred.src.doslit
 .nf
+
+=======
+V2.12.1
+=======
+
+doslit$sproc.cl
+doslit$sbatch.cl
+doslit$sarcrefs.cl
+doslit$sfluxcal.cl
+    Added a flpr after dispcor to workaround a bug with the FITS kernel
+    header caching.  (6/24/02, Valdes)
+
+=====
+V2.12
+=====
+
+doslit$sproc.cl
+    Modified code to eliminate goto.  This is for use with pyraf.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
+
 doslit$sarcrefs.cl
      The test for INDEF values on CRVAL/CDELT did not work correctly.
      (9/24/99, Valdes)

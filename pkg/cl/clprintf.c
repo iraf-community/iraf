@@ -4,7 +4,7 @@
 #define import_spp
 #define import_libc
 #define import_stdio
-#define import_varargs
+#define import_stdarg
 #include <iraf.h>
 
 #include "config.h"
@@ -20,17 +20,24 @@
 
 /* EPRINTF -- Printf that always writes to the current pseudo-file t_stderr.
  */
-/* VARARGS1 */
+#ifdef USE_STDARG
+eprintf (char *fmt, ...)
+#else
 eprintf (va_alist)
 va_dcl
+#endif
 {
 	va_list	args;
-	char	*fmt;
-	FILE	*eout;
+	FILE *eout;
 
-	eout = currentask->t_stderr;
+#ifdef USE_STDARG
+	va_start (args, fmt);
+#else
+	char *fmt;
 	va_start (args);
 	fmt = va_arg (args, char *);
+#endif
+	eout = currentask->t_stderr;
 	u_doprnt (fmt, &args, eout);
 	va_end (args);
 	fflush (eout);
@@ -39,17 +46,24 @@ va_dcl
 
 /* OPRINTF -- Printf that always writes to the current pseudo-file t_stdout.
  */
-/* VARARGS1 */
+#ifdef USE_STDARG
+oprintf (char *fmt, ...)
+#else
 oprintf (va_alist)
 va_dcl
+#endif
 {
 	va_list	args;
-	char	*fmt;
-	FILE	*sout;
+	FILE *sout;
 
-	sout = currentask->t_stdout;
+#ifdef USE_STDARG
+	va_start (args, fmt);
+#else
+	char *fmt;
 	va_start (args);
 	fmt = va_arg (args, char *);
+#endif
+	sout = currentask->t_stdout;
 	u_doprnt (fmt, &args, sout);
 	va_end (args);
 	fflush (sout);
@@ -60,21 +74,28 @@ va_dcl
  * running task.  Be a bit more careful here in case a pipe is broken or
  * something is going haywire.
  */
-/* VARARGS1 */
+#ifdef USE_STDARG
+tprintf (char *fmt, ...)
+#else
 tprintf (va_alist)
 va_dcl
+#endif
 {
 	va_list	args;
-	char	*fmt;
-	FILE	*out;
+	FILE *out;
 
 	out = currentask->t_out;
 	if (out == NULL)
 	    cl_error (E_IERR, "no t_out for currentask `%s'",
 	    currentask->t_ltp->lt_lname);
 	else {
+#ifdef USE_STDARG
+	    va_start (args, fmt);
+#else
+	    char *fmt;
 	    va_start (args);
 	    fmt = va_arg (args, char *);
+#endif
 	    u_doprnt (fmt, &args, out);
 	    va_end (args);
 	    fflush (out);

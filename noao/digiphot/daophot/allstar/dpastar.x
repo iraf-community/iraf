@@ -97,6 +97,9 @@ begin
 	    int(IM_LEN(im,2)), DP_FITRAD(dao), DP_VERBOSE(dao))
 
 	# Write out results for the rejected stars.
+	call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+nstar],
+	    Memr[DP_APYCEN(apsel)+nstar], Memr[DP_APXCEN(apsel)+nstar],
+	    Memr[DP_APYCEN(apsel)+nstar], DP_APNUM(apsel) - nstar)
 	if (DP_TEXT(dao) == YES) {
 	    call dp_xalwrite (allfd, rejfd, Memi[DP_APID(apsel)],
 		Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],

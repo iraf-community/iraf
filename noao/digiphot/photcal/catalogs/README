@@ -10,6 +10,8 @@ The following standard star catalogs are supported.
 	odewahn.dat - the Odewahn BVR cluster standards catalog        (1)
 	 porter.dat - the Porter UBVRI standards catalog               (2)
 	  ukirt.dat - the UKIRT JHK standards                          (3)
+         nicmos.dat - the NICMOS JHKKs standards catalog               (4)
+         arnica.dat - the ARNICA JHK standards catalog                 (4)
 
 Each supported catalog has an accompanying format description file which
 describes which photometric indices are stored in which column. This file is
@@ -22,6 +24,8 @@ following format files are defined.
       fodewahn.dat - format file for Odewahn BVR cluster standards
        fporter.dat - format file for Porter UBVRI cluster standards
         fukirt.dat - format file for UKIRT JHK standards
+       fnicmos.dat - format file for NICMOS JHKKs standards
+       farnica.dat - format file for ARNICA JHK standards
 
 Each supported catalog has an accompanying template transformation file
 which defines a default set of transformations equations. This file is
@@ -35,6 +39,8 @@ sets are defined.
    todewahn.dat - template transformations for Odewahn BVR cluster standards
     tporter.dat - template transformations for Porter UBVRI cluster standards
      tukirt.dat - template transformations for UKIRT JHK standards
+    tnicmos.dat - template transformations for the NICMOS JHKKs standards
+    tarnica.dat - template transformations for the ARNICA JHK standards
 
 The references for the supported catalogs are listed below.
 
@@ -46,6 +52,8 @@ The references for the supported catalogs are listed below.
 	     porter.dat - unpublished
 	      ukirt.dat - Casali, M. and Hawarden, T. 1992, JCMT-UKIRT
 			  Newsletter, 4, 33
+	     nicmos.dat - Persson et al. 1998, A.J. 116, 2475
+	     arnica.dat - Hunt et al. 1998, A.J. 115, 2594
 
 Notes:
 
@@ -96,3 +104,6 @@ Notes:
 
 (3) The UKIRT JHK catalog was formatted for use with photcal by Pat Hall
     (Steward Observatory).
+
+(1) The NICMOS and ARNICAL catalogs were kindly formatted for use with photcal
+by Pat Hall (University or Toronto).

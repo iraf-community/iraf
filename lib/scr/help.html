@@ -1,0 +1,586 @@
+<HTML>
+<BODY>
+<TITLE>IRAF Help GUI</TITLE>
+<H1>Welcome to IRAF Help GUI V1.0</H1>
+<P>
+<B>Help</B> is a prototype GUI browser providing a familiar and
+easy-to-use interface for the IRAF help system.  Other features include
+on-the-fly conversion of help documents to HTML for display and 
+fully formatted PostScript for hardcopy.
+<P>
+To begin, select a help topic from the top panel, enter a task or package
+name in the <B>Topic</B> field, or hit the <B>Search</B> button to bring up
+a panel allowing you to search the help system by keyword.  
+<P>
+<HR>
+
+<H1>Table of Contents</H1>
+
+<UL>
+<LI> <A HREF="#intro">Introduction</A>
+<LI> <A HREF="#params">Task Parameters</A>
+<LI> <A HREF="#nav">Navigating the IRAF Help System</A>
+<LI> <A HREF="#browse">Browsing a Help Document</A>
+<LI> <A HREF="#search">Searching</A> <UL>
+    <LI> <A HREF="#dbsearch">Searching the Help Database</A> </UL> <UL>
+    <LI> <A HREF="#find">Searching Within a Document</A> </UL>
+<LI> <A HREF="#help">The On-Line Help Panel</A>
+<LI> <A HREF="#homepage">User-Defined Homepages</A>
+<LI> <A HREF="#lfiles">Loading Files</A>
+<LI> <A HREF="#sfiles">Saving Files</A>
+<LI> <A HREF="#out">Hardcopy Output</A>
+<LI> <A HREF="#lroff">LROFF Directive Extensions for HTML</A>
+</UL>
+
+
+<A NAME=intro><HR><h1>Introduction</h1></A>
+The <B>Help GUI</B> task is a front-end to the IRAF 
+<A HREF="system.help"><B>help</B></A>
+task which provides on-the-fly conversion of help documents to HTML for
+presentation in the GUI or formatted PostScript for hardcopy.  
+Help pages may be loaded on the command line, through use of a
+file browser, or by navigating the help databases using a familiar CL
+package menu scheme.   It also features a search capability similar to the 
+<A HREF="system.references"><B>references</B></A>
+task and a complete <A HREF=#hist>history mechanism</A>.  
+<P>
+When invoked with no command line arguments (and the appropriate 
+<A HREF="#l_device">device</A> parameter setting of "gui") the task starts
+as a browser and the user is presented with a GUI that has the toplevel CL
+package menu in the upper navigation window.  The main display window below
+will contain any LROFF source file specified in the 
+<A HREF="#l_template">template</A>
+parameter or loaded on
+the command line by specifying the 
+<A HREF="#l_template">template</A>
+and enabling the
+<A HREF="#l_file_template">file_template</A>
+parameters. If the 
+<A HREF="#l_search">search</A>
+parameter is enabled the 
+<A HREF="#l_template">template</A>
+is taken to be a search phrase and the database is searched for tasks
+matching the keyword and the GUI will appear with the search panel mapped
+so the user can select the task help to view.  When no 
+<A HREF="#l_template">template</A>
+is given the main display window will start with the page specified by the 
+<A HREF="#l_home">home</A>
+parameter, this can be a user-defined HTML file giving links to specific tasks
+(see below for details) or if 
+<A HREF="#l_home">home</A>
+is empty the display will contain the online help for the task.
+<P>
+The first time the task is run, or whenever the help database is updated,
+a quick reference file (specified by the task 
+<A HREF="#l_quickref">quickref </A>
+parameter) and package menu file will be created in the user's <I>uparm</I>
+directory to speed up help searching and subsequent startups of the task.
+
+
+<A NAME=params><HR><h1>Task Parameters</h1></A>
+<UL>
+<DL>
+<DT><B><A NAME="l_template">template</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='template' Line='template'>
+<DD>A string listing the modules or packages for which help is desired.
+Each list element may be a simple name or a pattern matching template.
+Abbreviations are permitted.  If <I>template</I> is omitted a long format
+menu will be printed for the current package, listing each task (or
+subpackage) and describing briefly what it is.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_file_template">file_template = no</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='file_template' Line='file_template = no'>
+<DD>If this switch is set the template is interpreted as a filename matching
+template, and all help blocks found in the named files are output.  The help
+database is not searched, hence manual pages can be printed or documents
+may be formatted without entering the files into a help database.
+In other words, "<TT>help file.hlp fi+</TT>" makes it possible to use <I>help</I> as
+a conventional text formatter.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_all">all = no</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='all' Line='all = no'>
+<DD>Print help for all help modules matching <I>template</I>, rather than only the
+first one found.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_parameter">parameter = "<TT>all</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='parameter' Line='parameter = "all"'>
+<DD>If the value of this parameter is not "<TT>all</TT>", only the help text
+for the given parameter will be printed.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_section">section = "<TT>all</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='section' Line='section = "all"'>
+<DD>If the value of this parameter is not "<TT>all</TT>", only the help text for the
+given section (e.g. "<TT>usage</TT>", "<TT>description</TT>", "<TT>examples</TT>") will be printed.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_option">option = help</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='option' Line='option = help'>
+<DD>The option parameter specifies the type of help desired, chosen from
+the following:
+<DL>
+<DT><B><A NAME="l_help">help</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='help' Line='help'>
+<DD>Print the full help block for the named module.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_source">source</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='source' Line='source'>
+<DD>Print the source code for the module (which often contains additional
+detailed comments).
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_sysdoc">sysdoc</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='sysdoc' Line='sysdoc'>
+<DD>Print the technical system documentation for the named module.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_directory">directory</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='directory' Line='directory'>
+<DD>Print a directory of all help blocks available for the named package.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_alldoc">alldoc</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='alldoc' Line='alldoc'>
+<DD>Print all help blocks in the file containing the help block for
+the named procedure (i.e., both the user and system documentation).
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_files">files</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='files' Line='files'>
+<DD>Print the names of all help files associated with the named modules or
+packages.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_summary">summary</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='summary' Line='summary'>
+<DD>Print only the titles and sizes of help blocks in referenced help files.
+The contents of the blocks are skipped.  Titles are printed for <I>all</I>
+help blocks found in the file containing the help block for the named module.
+</DD>
+</DL>
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_page">page = yes</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='page' Line='page = yes'>
+<DD>Pause after every page of output text.  Turning this off for large documents
+speeds up output considerably.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_nlpp">nlpp = 59</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='nlpp' Line='nlpp = 59'>
+<DD>The number of lines per page if output is redirected, e.g., to <I>lprint</I>.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_lmargin">lmargin = 1</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='lmargin' Line='lmargin = 1'>
+<DD>Left margin on output.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_rmargin">rmargin = 72</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='rmargin' Line='rmargin = 72'>
+<DD>Right margin on output.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_search">search = no</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='search' Line='search = no'>
+<DD>If enabled the 
+<A HREF="#l_template">template</A>
+is interpreted as a search string and the task
+is started with the search panel open with the results of the search.  The
+<A HREF="#l_file_template">file_template</A>
+parameter is ignored with search turned on.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_home">home = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='home' Line='home = ""'>
+<DD>The home page for the task.  If not set and no 
+<A HREF="#l_template">template</A>
+is specified
+the task will start with the online help in the main window, otherwise it
+may be set to a filename to be displayed when the task starts.  This file
+may contain a text help block which will be formatted before display,  or
+it may be a valid HTML file.  See below for a description of the format of
+a homepage file which provides links to tasks.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_printer">printer = "<TT>printer</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='printer' Line='printer = "printer"'>
+<DD>Default hardcopy printer name. If the <I>value</I> of the parameter is the
+reserved string "<TT>printer</TT>", the actual device is the value of the CL
+environment variable <I>printer</I>.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_showtype">showtype = no</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='showtype' Line='showtype = no'>
+<DD>Add task-type suffix in package menus?
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_quickref">quickref = "<TT>uparm$quick.ref</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='quickref' Line='quickref = "uparm$quick.ref"'>
+<DD>Name of the quick-reference file used for searching.  This file is created
+the first time the task is run in GUI mode or whenever it doesn't exist, 
+or when any help database file has been updated.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_uifname">uifname = "<TT>lib$scr/help.gui</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='uifname' Line='uifname = "lib$scr/help.gui"'>
+<DD>The user interface file.   This file is what defines the look and behavior
+of all the graphical user interface elements.   Experts may create variants
+of this file.
+</DD>
+</DL>
+<P>
+<DL>
+<DT><B><A NAME="l_helpdb">helpdb = "<TT>helpdb</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='helpdb' Line='helpdb = "helpdb"'>
+<DD>The filename of the help database to be searched.  If the <I>value</I> of the
+parameter is the reserved string "<TT>helpdb</TT>", the actual filename is the value
+of the CL environment variable <I>helpdb</I>.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_device">device = "<TT>terminal</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='device' Line='device = "terminal"'>
+<DD>Output device if the standard output is not redirected.  Allowable values
+include:
+<DL>
+<DT><B><A NAME="l_terminal">terminal</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='terminal' Line='terminal'>
+<DD>If the <I>value</I> of
+the parameter is the reserved string "<TT>terminal</TT>",  the actual device name is
+the value of the CL environment variable <I>terminal</I>.  
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_text">text</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='text' Line='text'>
+<DD>Output the formatted help page as plain text.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_gui">gui</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='gui' Line='gui'>
+<DD>Invoke the GUI for browsing the help system.  This option will only work if
+the <I>stdgraph</I> environment variable is set the <I>xgterm</I>, and the
+user is running IRAF from an <I>XGterm</I> window.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_html">html</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='html' Line='html'>
+<DD>Output the formatted help page as HTML text.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_ps">ps (or postscript)</A></B></DT>
+<! Sec='PARAMETERS' Level=1 Label='ps' Line='ps (or postscript)'>
+<DD>Output the formatted help page as postscript.
+</DD>
+</DL>
+</DD>
+</DL>
+</UL>
+
+<A NAME=nav><HR><h1>Navigating the IRAF Help System</h1></A>
+
+	When run as a browser, <I>Help</I> works very much like any WWW browser.
+The top panel is a list widget that will always contain a CL package listing,
+at startup this will be the toplevel <I>"Home"</I> package menu one would see
+when first logging into the CL containing the core system packages, NOAO
+package, and any site-specific external package, or in the case of starting
+with a specific task it will be the parent package for the task.
+Additionally, system documents for the <A HREF="os"><B>os</B></A>
+HSI routines and the <A HREF="sys.imfort"><B>imfort</B></A> and
+<A HREF="math"><B>math</B></A>
+interfaces will be available in the <I>Home</I> package although
+these are programmatic interfaces and not tasks which can be executed.
+<P>
+New packages or task help pages are loaded by selecting an item from the 
+package menu list using the left mouse button.  If the requested item is a 
+package, the menu listing will change as though the package were loaded in
+the CL, and the help display panel will contain a listing of the package
+tasks with a one-line description for each task such as would be seen with 
+a <I>"help &lt;package&gt;"</I> command using the standard task.  New items
+may then be selected using either the menu list or links in the display
+panel.  If the item is a task, the help page for the task will appear in the
+display panel.  In either case new pages may be selected from the menu listing.
+<P>
+Specific help documents may also be requested by entering the task/package
+name in the <B>Topic</B> text widget above the menu list.  As when selecting
+from the package menu list, items selected this way will cause the menu
+list to change to the package menu for the parent package if the item is a
+task (displaying the help page in the display panel) or the package menu
+if the item is a package (displaying the one-liner package listing in the
+display panel).
+<P>
+Using the <B>Back</B> button will revert to the previous page in the history
+list which will either be the previously loaded package or help page.
+Similarly, selecting the <B>Forward</B> button will move the next page further
+down in the history list, either button will become insensitive when the 
+end of the list on either end is reached.  Selecting the <B>Up</B> button will
+cause the browser to immediately jump up the previous package, skipping 
+over any help pages that were loaded in between.  The <B>Home</B> button will
+cause the default homepage (either the user-defined page if specified by the
+task <I>home</I> parameter or the online help) to be displayed.  Browsing
+in this way can also be done using the navigation menu created by hitting
+the right mouse button while in the main display panel.
+<P>
+Users can also jump to specific pages in the history list using the
+<B>History</B> button on the main menubar.   The right column of the menu
+will indicate whether the item is a task, package, internal link or a text
+file.  The history list is truncated at about 40 entries in the menu but
+the user may work back incrementally by selecting the last item of the 
+menu, after which the History button will display the previous 40 entries.
+The history list may be cleared except for the current page by selecting
+the <I>Clear History</I> menu item.
+
+
+<A NAME=browse><HR><h1>Browsing a Help Document</h1></A>
+Once a help page is loaded the middle menubar above the display panel
+will change to activate widgets based on the position within the history
+list and options available for a particular page.  The left-most group
+of buttons are the standard navigation buttons described above.
+The middle group of buttons contains the <B>Sections</B> and
+<B>Parameters</B> buttons which are used to browse within a help document.
+The <I>Sections</I> button is a menu listing all of the sections found
+within a help page, allowing the user to jump to a specific section
+rather than scrolling through the entire document. The <I>Sections</I>
+menu is also available using the middle mouse button from the
+main display area.  The <I>Parameters</I> button is similarly a menu
+listing of all task parameter help sections found within the document.
+Both or either of these buttons will become insensitive when no section
+or parameter information is found in the document.
+<P>
+The right-most group of buttons represent the various help options available
+for each page.  The default is to get the task help, however help pages
+may have an associated <B>source</B> file or <B>sysdoc</B> (e.g. if the task
+is a CL script there may be a pointer to the script source itself, or a package
+may have a general overview document listed as the system document).  Once
+a help page is loaded these buttons will change become sensitive if that option
+is available, simply select the button to view the option.  Selecting the
+<B>Files</B> button will bring up a panel listing all the files associated
+with a particular help topic.  When a help topic is selected and an option is
+defined but the file does not exist, the options button will display a yellow
+diamond icon even if the button is insensitive, a green icon indicates the
+currently selected option.  This feature may be disabled by selecting the
+"<TT>Show missing files</TT>" item from the main menubar <B>Options</B> menu.
+
+
+<A NAME=search><HR><h1>Searching</h1></A>
+<A NAME=dbsearch><h1>Searching the Help Database</h1></A>
+Searching the help database is done by selecting the <B>Search</B> button
+from the main menubar to bring up the search panel.  Users may then enter 
+one or more keywords into the <B>Topic</B> field at the bottom of the panel
+and initiate the search with either a carriage return or hitting the
+<I>Search</I> button just beside it.  The panel will then show a list of all
+tasks and packages which match the search phrase along with a one-line
+description of the task.  Help pages may be displayed by selecting either the
+task or package link with the left mouse button, in both case the package
+menu list on the main help window will be updated to list the package
+contents allowing other tasks from that package to be selected in the normal
+way.
+<P>
+By default the exact phrase entered in the topic window will be used for the
+search.  This can be relaxed by toggling the  "<TT>Require exact match</TT>"
+button
+at the top of the panel.  For example,  to search for all tasks matching
+<I>either</I> the keyword "<TT>flat</TT>" or "<TT>field</TT>" turn off the
+exact match
+toggle and the search will return not only tasks matching "<TT>flat
+field</TT>" 
+but also any task description containing only one of the words such as the
+VELVECT task which plots velocity <I>field</I>s.
+<P>
+<A NAME=find><h1>Searching Within a Document</h1></A>
+Within a help document itself one can search for a string by selecting
+the <B>Find</B> button from the main menubar to bring up a panel used to
+enter the search string.  When the text is entered the main display 
+window will reposition itself and highlight the text found within the
+document.  Searches can be repeated and will wrap around the document
+automatically, searches can be done either forward or backward through
+the text and may be case insensitive.
+
+
+<A NAME=help><HR><h1>The On-Line Help Panel</h1></A>
+The help panel permits the user to view the on-line help document while
+XHELP is running. The help panel can be activated by pressing the
+help command button in any panel or by selecting the "Help ..." item from
+the main <B>File</B> menu.  The help panel consists of the the help command
+button bar and the help display window which are described below.
+<p>
+<dl>
+<dt><b>The Help Command Button Bar</b>
+<dd>The command button bar contains the following command buttons.
+<p>
+
+<dl>
+<dt><b>The Back Command Button</b>
+<dd>Pressing the Back command button moves backwards through the
+previously visited links.
+<p>
+<dt><b>The Forward Button</b>
+<dd>Pressing the Forward command button moves forward through the
+list of visited links.
+<p>
+<dt><b>The Home Button</b>
+<dd>Pressing the Home command button sets the help display window to
+the top of the help document.
+<p>
+<dt><b>The Dismiss Button</b>
+<dd>Pressing the Dismiss command button deactivates the help panel.
+<p>
+</dl>
+</dl>
+
+The bottom of the help panel contains a text search entry widget allowing
+for text searches of the documentation along with options for searching 
+in a forward or backward direction, and case sensitivity.  When a search
+phrase is entered the help document will be repositioned to the next
+occcurrance of the search string if found, otherwise a dialog box will 
+appear to say the string was not found.  Searches will wrap around the 
+document automatically.
+
+
+<A NAME=homepage><HR><h1>User-Defined Homepages</h1></A>
+By default <I>Xhelp</I> will start with the online help page displayed in the
+main help window.  The user can change this by setting the task <B>home</B>
+parameter to be a path to any valid file.  This file may be plain text, a
+help document in LROFF format which will be converted to HTML for display,
+or a native HTML document.
+<P>
+HTML files may contain URLs of the form
+<UL>
+<PRE>
+<B>&lt;a href=</B><I>[package.]task</I><B>&gt;</B><I>url_text</I><B>&lt;/a&gt;
+</PRE>
+</UL>
+<P>
+where </B><I>url_text</I> is the text to appear in the window and the URL
+itself
+consists of an optional package and task name delimited by a period.  For
+example, to create a link to the 
+<A HREF="onedspec.splot"><B>splot</B></A>
+task in a document one would use the URL
+<UL>
+<PRE>
+<TT>&lt;a href=onedspec.splot&gt;splot&lt;/a&gt;</TT>
+</PRE>
+</UL>
+<P>
+In this way users can create a homepage which serves as a <I>"bookmark"</I>
+file or index of shortcuts to the most commonly accessed help pages.
+
+
+<A NAME=lfiles><HR><h1>Loading Files</h1></A>
+Text files may be loaded on the command line when starting the task by
+specifying the filename and setting the
+<A HREF=#l_file_template>file_template</A> task parameter.  The named file
+will be searched for a <I>.help</I> LROFF directing indicating it contains
+a help block that will be converted to HTML for display.  If no help
+block is found the file will be displayed as-is, meaning existing
+HTML documents can be loaded and will be formatted correctly.
+
+Once the task is running users may load a file by selecting the <B>Open
+File...</B> menu item from the main menubar <B>File</B> menu or the 
+right-mouse-button menu from within the main display area.  This will
+open a file browser allowing users to change directories by using the
+navigation buttons at the top of the panel, or selecting items from the
+leftmost directory listing.  Selecting a file on the rightmost list will
+cause it to be loaded and automatically formatted if it contains a help
+block.  The file list may be filtered to select only those files matching
+a particular template by changing the <B>Filter</B> box at the top of
+the panel.  Filenames or directories may be entered directly using the
+<B>Selection</B> box at the bottom of the panel.
+
+
+<A NAME=sfiles><HR><h1>Saving Files</h1></A>
+Once a file has been loaded in the browser it may be saved to disk as
+either <I>source</I> (i.e. the original LROFF file if that was converted
+for the display, or whatever file is currently displayed regardless of
+format), <I>text</I> to save formatted plain text such as that produced
+by the standard <B>help</B> task, <I>HTML</I> to save the converted HTML
+used in the display, or <I>PostScript</I> to save formatted PostScript of
+the document such as that sent to the printer using the <B>Print</B>
+button.  Not all options will be available depending on the format of the
+input text, unavailable options will be insensitive in the GUI.
+
+The <B>Save</B> panel is opened by selecting the <B>Save As...</B> menu
+item from the  main menubar <B>File</B> menu or the right-mouse-button
+menu from within the main display area.   The file browser operates the
+same as when loading images, the only difference is that file selection 
+simply defines the filename to be used and does not cause the save to
+occur automatically.  Users can overwrite existing files by selecting the
+<I>Options</I> toggle at the bottom of the panel.
+
+
+<A NAME=out><HR><h1>Hardcopy Output</h1></A>
+Help pages may be output to any configured iraf printer by selecting the
+main menubar <B>Print</B> button to bring up the print panel.  Task help
+pages will be converted to formatted PostScript and may be sent to either a
+printer or saved to disk depending on the selection made in the printer 
+panel.  If the printer name is set to the special value <I>"printer"</I> then
+the device named by the CL <I>printer</I> environment variable will be used.
+When saving to disk files the default action is to save to a filename whose
+name is the task name plus a "<TT>.ps</TT>" extension.  Either of these are
+changeable within the GUI as is the default page size to be used when
+generating the PostScript.
+<P>
+The main menubar <B>File</B> button can also be used to bring up the file
+browser in order to save the current document to disk.  Help pages may be
+saved as either the origin LROFF source for the file, formatted text as you
+would get from the standard help task, HTML as is displayed in the GUI, or
+formatted PostScript.  The choice of formats is dictated by the type of file
+being displayed (e.g. you cannot save PostScript of a program source).
+
+<HR>
+<A NAME=lroff><h1>LROFF Extensions for HTML</h1></A>
+To better support HTML links within documents and to other help pages two
+new directives have been added to the LROFF text formatter.  These are
+<B>.hr</B> to specify a link (an HTML <I>HREF</I> directive) and <B>.hn</B>
+to specify a name (an HTML <I>NAME</I> directive).  The syntax for these are
+as follows:
+<PRE>
+        <B>.hn</B><I> &lt;name&gt;</I>
+        <B>.hr</B><I> &lt;link&gt; &lt;text&gt; </I>
+</PRE>
+<P>
+where <I>&lt;name&gt;</I> is the destination name of an internal link,
+<I>&lt;link&gt;</I>
+is the URL of the link to be created, and <I>&lt;text&gt;</I> is the text to
+be displayed in the HTML.  The URL syntax is either a <TT>'#'</TT> character
+followed
+by a destination name, a simple <I>task</I> name or <I>package</I> name,
+or a <I>package.task</I> pair giving a more precise task.  For internal links
+the current document is repositioned so the name is at the top of the display,
+for task help links new help pages will be loaded in the browser.  
+<P>
+These directives are ignored when converting the LROFF to either formatted
+plain text or PostScript.
+
+</BODY>
+</HTML>

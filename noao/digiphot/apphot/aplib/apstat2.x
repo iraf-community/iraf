@@ -29,6 +29,8 @@ begin
 	switch (param) {
 	case PYNAME:
 	    call strcpy (AP_PYNAME(ply), str, maxch)
+	case PYROOT:
+	    call strcpy (AP_PYROOT(ply), str, maxch)
 	case GAIN:
 	    call strcpy (AP_GAIN(nse), str, maxch)
 	case NSTRING:
@@ -121,6 +123,10 @@ begin
 	    return (AP_RPXCUR(rprof))
 	case RPYCUR:
 	    return (AP_RPYCUR(rprof))
+	case ORPXCUR:
+	    return (AP_ORPXCUR(rprof))
+	case ORPYCUR:
+	    return (AP_ORPYCUR(rprof))
 	case RPRADIUS:
 	    return (AP_RPRADIUS(rprof))
 	case RPSTEP:
@@ -143,10 +149,18 @@ begin
 	    return (AP_PYXMEAN(ply))
 	case PYYMEAN:
 	    return (AP_PYYMEAN(ply))
+	case OPYXMEAN:
+	    return (AP_OPYXMEAN(ply))
+	case OPYYMEAN:
+	    return (AP_OPYYMEAN(ply))
 	case PYCX:
 	    return (AP_PYCX(ply))
 	case PYCY:
 	    return (AP_PYCY(ply))
+	case OPYCX:
+	    return (AP_OPYCX(ply))
+	case OPYCY:
+	    return (AP_OPYCY(ply))
 	case SKYSIGMA:
 	    return (AP_SKYSIGMA(nse))
 	case EPADU:

@@ -17,8 +17,7 @@ int	status			#O status value
 
 int	cindx
 pointer	sp, fname, im, tmp
-int	fxf_access()
-pointer	immap()
+pointer	immapz()
 bool    streq()
 
 errchk  syserrs
@@ -30,10 +29,12 @@ begin
         call salloc (tmp, SZ_PATHNAME, TY_CHAR)
 
 	call fxf_init()
+	status = OK
 
 	# Get the file extension if not given.
         if (extn[1] == EOS) {
-	    if (fxf_access (kernel, root, extn, 0, status) == NO) {
+	    call fxf_access (kernel, root, extn, READ_ONLY, status)
+	    if (status == NO) {
 		call sfree (sp)
 		status = ERR
 		return
@@ -43,7 +44,7 @@ begin
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
 	call strcpy (Memc[fname], Memc[tmp], SZ_PATHNAME)
 	call strcat ("[0]", Memc[tmp], SZ_PATHNAME)
-	iferr (im = immap (Memc[tmp], READ_ONLY, 0))
+	iferr (im = immapz (Memc[tmp], READ_ONLY, 0))
 	    call syserrs (SYS_FXFDELMEF, Memc[fname])
 	else
 	    call imunmap (im)
@@ -62,6 +63,8 @@ begin
 		call mfree (rf_hdrp[cindx], TY_INT)
 		call mfree (rf_fit[cindx], TY_STRUCT)
 		call mfree (rf_hdr[cindx], TY_CHAR)
+		rf_lru[cindx] = 0
+		rf_fname[1,cindx] = EOS
 	    }
 	}
 

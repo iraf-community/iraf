@@ -44,7 +44,8 @@ zsvjmp_:
 	movl 	$0, (%eax)		# zero the value of status
 	addl	$4, %ecx		# change stack to point to &jmpbuf[1]
 	movl	%ecx, 4(%esp)		# 	...
-	jmp	__setjmp		# let setjmp do the rest
+	movl	$0, 8(%esp)		# change arg2 to zero
+	jmp	__sigsetjmp		# let sigsetjmp do the rest
 
 gfpucw_:				# Get fpucw:  gfpucw_ (&cur_fpucw)
 	pushl	%ebp

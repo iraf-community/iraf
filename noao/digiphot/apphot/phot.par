@@ -1,21 +1,24 @@
 # PHOT parameters
 
-image,f,a,,,,Input image
-skyfile,f,a,"",,,Sky file
-coords,f,h,"",,,Coordinate list
-output,f,h,"default",,,Results file
-plotfile,f,h,"",,,File of plot metacode
-datapars,pset,h,"",,,Data dependent parameters
-centerpars,pset,h,"",,,Centering parameters
-fitskypars,pset,h,"",,,Sky fitting parameters
-photpars,pset,h,"",,,Photometry parameters
-interactive,b,h,yes,,,Mode of use
-radplots,b,h,no,,,Plot the radial profiles in interactive mode
-verify,b,h,yes,,,Verify critical parameters in non-interactive mode
-update,b,h,no,,,Update critical parameters in non-interactive mode
-verbose,b,h,no,,,Print messages in non-interactive mode
-graphics,s,h,"stdgraph",,,Graphics device
-display,s,h,"stdimage",,,Display device
+image,f,a,,,,"The input image(s)"
+skyfile,f,a,"",,,"The input sky file(s)"
+coords,f,h,"",,,"The input coordinate files(s) (default: image.coo.?)"
+output,f,h,"default",,,"The output photometry file(s) (default: image.mag.?)"
+plotfile,f,h,"",,,"The output plots metacode file"
+datapars,pset,h,"",,,"Data dependent parameters"
+centerpars,pset,h,"",,,"Centering parameters"
+fitskypars,pset,h,"",,,"Sky fitting parameters"
+photpars,pset,h,"",,,"Photometry parameters"
+interactive,b,h,yes,,,"Interactive mode ?"
+radplots,b,h,no,,,"Plot the radial profiles in interactive mode ?"
 icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
 gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+wcsin,s,h,)_.wcsin,,,"The input coordinate system (logical,tv,physical,world)"
+wcsout,s,h,)_.wcsout,,,"The output coordinate system (logical,tv,physical)"
+cache,b,h,)_.cache,,,"Cache the input image pixels in memory ?"
+verify,b,h,)_.verify,,,"Verify critical parameters in non-interactive mode ?"
+update,b,h,)_.update,,,"Update critical parameters in non-interactive mode ?"
+verbose,b,h,)_.verbose,,,"Print messages in non-interactive mode ?"
+graphics,s,h,)_.graphics,,,"Graphics device"
+display,s,h,)_.display,,,"Display device"
 mode,s,h,'ql'

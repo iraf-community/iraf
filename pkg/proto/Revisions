@@ -1,5 +1,131 @@
 .help revisions Jun88 proto
 .nf
+=====
+V2.12
+=====
+
+maskexpr/peregfuncs.x
+    Fixed various min / max data type mismatch problems. (06/19/02, Davis)
+
+masks/t_mimstat.x
+masks/rsstats.x
+    If nclip > 0 and the initial mean and standard deviation are INDEF (a very
+    unlikely occurence unless there is a mask) the ksigma limit computation in
+    the mimstatistics / rskysub task could overflow. This does not affect
+    released code. (05/01/02, Davis)
+
+maskexpr/gettok.x
+    Modified the fetch number token routine to decode decimal number with
+    negative exponents correctly. (01/23/02, Davis)
+
+t_suntoiraf.x
+    The read routine was being called as a subroutine instead of as a function.
+    (01/07/02, Davis)
+
+maskexpr/peregfuncs.x
+    Fixed a typo in the salloc call. (01/07/02, Davis)
+
+maskexpr/peregfuncs.x
+    Removed argument from the pe_polygon function that was no longer necessary
+    and was being used incorrectly.
+    (12/14/01, Davis)
+
+masks/mstcache.x
+masks/rsscache.x
+    Added a call setting IM_BUFFRAC to 0 to the memory caching code in the
+    mimstatistics and rskysub tasks in order to force the imio buffer to be
+    the size of the input image.
+    (12/10/01, Davis)
+
+proto.cl
+proto.men
+proto.hd
+x_proto.x
+mskexpr.par
+mskregions.par
+doc/mskexpr.hlp
+doc/mskregions.hlp
+maskexpr/t_mskexpr.x
+maskexpr/memkmask.x
+maskexpr/t_mskregions.x
+maskexpr/mesetreg.x
+maskexpr/mesetexpr.x
+maskexpr/meregmask.x
+maskexpr/peregfuncs.x
+maskexpr/megeom.x
+maskexpr/meregfuncs.x
+maskexpr/mskexpand.x
+maskexpr/gettok.x
+maskexpr/gettok.h
+    Installed the mskexpr and mskregions tasks in the proto package.
+    (12/06/01, Davis)
+
+t_suntoiraf.x
+t_binfil.x
+t_hfix.x
+t_joinlines.x
+doc/irafil.hlp
+    Fixed various extra/missing argument, function declaration, and
+    subroutine/function mismatchs. Also fixed an irafil task help page
+    formatting problem. (9/19/01, Davis)
+
+rskysub.par
+doc/rskysub.hlp
+masks/rskysub.h
+masks/t_rskysub.x
+masks/rsstats.x
+masks/rsmean.x
+masks/rsmmean.x
+masks/rscache.x
+masks/rsfnames.x
+masks/rsreject.x
+    Installed the new running mean or median sky subtraction task rskysub
+    in the proto package. (9/18/01, Davis)
+
+mimstatistics.par
+doc/mimstat.hlp
+masks/mimstat.h
+masks/t_mimstat.x
+masks/mstcache.x
+masks/mimstat.x
+masks/mptools.x
+    Installed the new statistics through a mask task mimstatistics in the
+    proto package. (09/17/01, Davis)
+
+t_imext.x
+    The change to use a temp file was not done right.  (1/9/01, Valdes)
+
+t_fixpix.x
+    Change to call xt_pmunmap to insure pixel masks memory is released.
+    (12/13/00, Valdes)
+
+t_imext.x
+    Added logic to recognize an input specifications which has an explict
+    extension as a single image.  Previously an infinite loop would
+    result.  (9/26/00, Valdes)
+
+t_imext.x
+    Instead of expanding into a string buffer the task now uses a temp
+    file.  (9/18/00, Valdes)
+
+fields.x
+    Added two close statements and a missing sfree statement to the fields
+    task to avoid a too many open files error when processing a long list
+    of files. (5/19/00, Davis)
+
+=====
+V2.11.3
+=====
+
+t_bscale.x
+    The imio input and output pointers for type double and complex images
+    were declared as type double and complex instead of integer causing
+    a hangup on sun systems. (12/11/99, Davis)
+
+=====
+V2.11.2
+=====
+
 mkpkg
     Added missing file dependencies to the mkpkg file. (9/22/99, Davis)
 

@@ -1,5 +1,56 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
+=====
+V2.12
+=====
+
+longslit$response.x
+    Fixed argument errors in calls to ic_g* routines.  (1/7/02, Valdes)
+
+longslit$transform/mkpkg
+    Added missing <mach.h> dependency for fcdlist.x  (12/13/01, MJF)
+
+longslit$response.x
+longslit$doc/response.hlp
+    Modified to update the fitting parameters to the parameter set.
+    (9/20/01, Valdes)
+
+longslit$doc/fitcoords.hlp
+    Added that 'p' works as unzoom.  (8/15/01, Valdes)
+
+longslit$transform/fcdlist.x
+    The check between a deleted point and the values read from the IDENTIFY
+    database are no tolerance checked.  See bug 485.  (8/15/01, Valdes)
+
+longslit$transform/t_transform.x
+    1.  Instead of using 50 sample points across the image for the sampled
+    inversion points the algorithm now sets a step near 10.  In the
+    former method the sampling would become too crude with larger
+    images.
+    2.  Formerly the inversion would quit after one or two iterations if
+    the point falls off the edge.  This can lead to bad interpolation at
+    the edges if the distortion and requested output samples outside the
+    input image.  The edge check has been removed.
+    (7/5/01, Valdes)
+
+longslit$doc/fitcoords.hlp
+    Added a description of the FITCOORDS database.  (4/24/00, Valdes)
+
+igsfit.x
+igsparams.x
+igscolon.x
+igsfit.com
+mkpkg
+    Added an RMS to the graph title and the :show command.
+    (3/9/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+=========
+V2.11.3
+=========
+
 longslit$transform/mkpkg
     Added missing dependency.  (10/11/99, Valdes)
 

@@ -8,7 +8,7 @@ $exit
 libpkg.a:
 	rgmatchio.x	wcsxymatch.h
 	t_skyxymatch.x  <fset.h> <imhdr.h> <mwset.h> <math.h> \
-			"../../../lib/skywcs.h" wcsxymatch.h
+			<pkg/skywcs.h> wcsxymatch.h
 	t_wcscopy.x	<imhdr.h> <mwset.h>
 	t_wcsxymatch.x	<fset.h> <imhdr.h> <mwset.h> wcsxymatch.h
 	;

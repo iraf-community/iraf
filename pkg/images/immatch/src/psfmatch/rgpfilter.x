@@ -310,7 +310,10 @@ begin
 		    next
 
 		# Accumulate the intermediate products.
-		z = alog (sqrt (fft[j] ** 2 + fft[j+1] ** 2) / norm)
+		divisor = sqrt (fft[j] ** 2 + fft[j+1] ** 2)
+		if (divisor <= 0.0)
+		    next
+		z = log (divisor / norm)
 		x2 = x * x
 		y2 = y * y
 		wt = 1.0 / sqrt (x2 + y2)

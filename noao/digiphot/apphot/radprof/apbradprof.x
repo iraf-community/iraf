@@ -58,6 +58,16 @@ begin
 		next
 	    }
 
+            # Transform the input coordinates.
+            switch (apstati(ap,WCSIN)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_itol (ap, wx, wy, wx, wy, 1)
+            case WCS_TV:
+                call ap_vtol (im, wx, wy, wx, wy, 1)
+            default:
+                ;
+            }
+
 	    # Set the current cursor position.
 	    call apsetr (ap, CWX, wx)
 	    call apsetr (ap, CWY, wy)

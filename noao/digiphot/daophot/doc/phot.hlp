@@ -1,7 +1,7 @@
-.help phot Dec92 noao.digiphot.daophot
+.help phot May00 noao.digiphot.daophot
 .ih
 NAME
-phot -- perform aperture photometry on a list of stars
+phot -- do aperture photometry on a list of stars
 .ih
 USAGE
 phot image coords output
@@ -11,173 +11,250 @@ PARAMETERS
 The list of images containing the objects to be measured.
 .le
 .ls coords
-The name of the text files containing the initial coordinates of the objects to
-be measured, one object per line with the x and y coordinates in columns
-one and two respectively. If \fIcoords\fR is null (""), PHOT reads commands
-from the image cursor (default) or reads commands
-from a cursor command file. In the latter case the image cursor
-parameter \fIicommands\fR must be set to the name of the file containing
-the image cursor commands.
-If \fIcoords\fR is defined, PHOT reads
-coordinates from either the image cursor or the coordinate list (interactive
-mode), or reads coordinate information from the coordinate list or
-a cursor command file
-(batch mode). If \fIcoords\fR is defined the number of
-coordinate files must be 1 or equal
-to the number of image files. If \fIcoords\fR is "default"
-PHOT will search for a file called image.coo.? where '?' denotes the
-highest available version number.
+The list of text files containing initial coordinates for the objects to
+be centered. Objects are listed in coords one object per line with the
+initial coordinate values in columns one and two. The number of coordinate
+files must be zero, one, or equal to the number of images.  If coords is
+"default", "dir$default", or a directory specification then a coords file name
+of the form dir$root.extension.version is constructed and searched for,
+where dir is the directory, root is the root image name, extension is "coo"
+and version is the highest available version number for the file.
 .le
 .ls output
-The name of the results file or results directory. If output is "default",
-"dir$default", or a directory specification then an output name of the form
-dir$root.extension.version is constructed, where dir is the directory,
-root is the root image name, extension is "mag" and version is the next
-available version number of the file. If output is null (""), then no
-output file is
-written. If output is defined, the number of output files must be 1 or
-equal to the number of image files.
+The name of the results file or results directory. If output is
+"default", "dir$default", or a directory specification then an output file name
+of the form dir$root.extension.version is constructed, where dir is the
+directory, root is the root image name, extension is "mag" and version is
+the next available version number for the file. The number of output files
+must be zero, one, or equal to the number of image files.  In both interactive
+and batch mode full output is written to output. In interactive mode
+an output summary is also written to the standard output.
 .le
 .ls skyfile = ""
-The name of the text file containing the sky values of the measured objects,
+The list of text files containing the sky values, of the measured objects,
 one object per line with x, y, the sky value, sky sigma, sky skew, number of sky
-pixels and number of rejected sky pixels in columns
-one to seven respectively. This parameter is only requested
-if \fIfitskypars.salgorithm\fR is "file" and PHOT is run non-interactively.
+pixels and number of rejected sky pixels in columns one to seven respectively.
+The number of sky files must be zero, one, or equal to the number of input
+images. A skyfile value is only requested if \fIfitskypars.salgorithm\fR =
+"file" and if PHOT is run non-interactively.
 .le
 .ls plotfile = ""
-The name of the file containing radial plots for the stars written to the
-output file. If plotfile is not equal to null (""), then a single radial plot
-is written to plotfile for every record written to output.
+The name of the file containing radial profile plots of the stars written
+to the output file. If plotfile is defined then a radial profile plot
+is written to plotfile every time a record is written to \fIoutput\fR.
+The user should be aware that this can be a time consuming operation.
 .le
 .ls datapars = ""
-The name of the text file containing the data dependent parameters.
-If \fIdatapars\fR is null ("") then the default parameter set in the
-user's uparm directory is used.
-The critical parameters \fIfwhmpsf\fR and \fIsigma\fR
-are located here.
+The name of the file containing the data dependent parameters. The critical
+parameters \fIfwhmpsf\fR and \fIsigma\fR are located here. If \fIdatapars\fR
+is undefined then the default parameter set in uparm directory is used.
 .le
 .ls centerpars = ""
-The name of the text file containing the centering parameters.
-If \fIcenterpars\fR is null ("") then the default parameter set in the
-user's uparm directory is used. The critical parameters \fIcalgorithm\fR
-and \fIcbox\fR are located here.
+The name of the file containing the centering parameters. The critical
+parameters \fIcalgorithm\fR and \fIcbox\fR are located here.
+If \fIcenterpars\fR is undefined then the default parameter set in
+uparm directory is used.
 .le
 .ls fitskypars = ""
-The name of the text file containing the sky fitting parameters.
-If \fIfitskypars\fR is null ("") then the default parameter set in the
-user's uparm directory is used. The critical parameters \fIsalgorithm\fR,
-\fIannulus\fR, and \fIdannulus\fR are located here.
+The name of the text file containing the sky fitting parameters. The critical
+parameters \fIsalgorithm\fR, \fIannulus\fR, and \fIdannulus\fR are located here.
+If \fIfitskypars\fR is undefined then the default parameter set in uparm
+directory is used.
 .le
 .ls photpars = ""
-The name of the text file containing the photometry parameters.
-If \fIphotpars\fR is null ("") then the default parameter set in the
-user's uparm directory is used. The critical parameter \fIapertures\fR
-is located here.
+The name of the file containing the photometry parameters. The critical
+parameter \fIapertures\fR is located here.  If \fIphotpars\fR is undefined
+then the default parameter set in uparm directory is used.
 .le
 .ls interactive = no
-Interactive or batch mode.
+Run the task interactively ?
 .le
 .ls radplots = no
-If radplots is yes and PHOT is run in interactive mode then a radial profile
-of each measured star is plotted on stdgraph.
-.le
-.ls verify = ")_.verify"
-Verify the critical PHOT parameters in non-interactive mode.
-\fIVerify\fR can be set to the DAOPHOT package parameter value (the default),
-"yes", or "no".
-.le
-.ls verbose = ")_.verbose"
-Print results on the screen in non-interactive mode.
-\fIVerbose\fR can be set to the DAOPHOT package parameter value (the default),
-"yes", or "no".
-.le
-.ls update = ")_.update"
-Update the parameter values if \fIverify\fR is "yes" and \fIinteractive\fR
-is "no".
-\fIUpdate\fR can be set to the DAOPHOT package parameter value (the default),
-"yes", or "no".
-.le
-.ls graphics = "stdgraph"
-The default graphics device.
-.le
-.ls display = "stdimage"
-The default display device. If \fIdisplay\fR is set to "stdgraph", PHOT 
-may be run interactively from a contour plot.
+If \fIradplots\fR is "yes" and PHOT is run in interactive mode, a radial
+profile of each star is plotted on the screen after the star is measured.
 .le
 .ls icommands = ""
-The image cursor.
+The image display cursor or image cursor command file.
 .le
 .ls gcommands = ""
-The graphics cursor.
+The graphics cursor or graphics cursor command file.
+.le
+.ls wcsin = ")_.wcsin", wcsout = ")_.wcsout"
+The coordinate system of the input coordinates read from \fIcoords\fR and
+of the output coordinates written to \fIoutput\fR respectively. The image
+header coordinate system is used to transform from the input coordinate
+system to the "logical" pixel coordinate system used internally,
+and from the internal "logical" pixel coordinate system to the output
+coordinate system. The input coordinate system options are "logical", tv",
+"physical", and "world". The output coordinate system options are "logical",
+"tv", and "physical". The image cursor coordinate system is assumed to
+be the "tv" system.
+.ls logical
+Logical coordinates are pixel coordinates relative to the current image.
+The  logical coordinate system is the coordinate system used by the image
+input/output routines to access the image data on disk. In the logical
+coordinate system the coordinates of the first pixel of a  2D image, e.g.
+dev$ypix  and a 2D image section, e.g. dev$ypix[200:300,200:300] are
+always (1,1).
+.le
+.ls tv
+Tv coordinates are the pixel coordinates used by the display servers. Tv
+coordinates  include  the effects of any input image section, but do not
+include the effects of previous linear transformations. If the input
+image name does not include an image section, then tv coordinates are
+identical to logical coordinates.  If the input image name does include a
+section, and the input image has not been linearly transformed or copied from
+a parent image, tv coordinates are identical to physical coordinates.
+In the tv coordinate system the coordinates of the first pixel of a
+2D image, e.g. dev$ypix and a 2D image section, e.g. dev$ypix[200:300,200:300]
+are (1,1) and (200,200) respectively.
+.le
+.ls physical
+Physical coordinates are pixel coordinates invariant  with respect to linear
+transformations of the physical image data.  For example, if the current image
+was created by extracting a section of another image,  the  physical
+coordinates of an object in the current image will be equal to the physical
+coordinates of the same object in the parent image,  although the logical
+coordinates will be different.  In the physical coordinate system the
+coordinates of the first pixel of a 2D image, e.g. dev$ypix and a 2D
+image section, e.g. dev$ypix[200:300,200:300] are (1,1) and (200,200)
+respectively.
+.le
+.ls world
+World coordinates are image coordinates in any units which are invariant
+with respect to linear transformations of the physical image data. For
+example, the ra and dec of an object will always be the same no matter
+how the image is linearly transformed. The units of input world coordinates
+must be the same as those expected by the image header wcs, e. g.
+degrees and degrees for celestial coordinate systems.
+.le
+The wcsin and wcsout parameters default to the values of the package
+parameters of the same name. The default values of the package parameters
+wcsin and wcsout are "logical" and "logical" respectively.
+.le
+.le
+.ls cache = ")_.cache"
+Cache the image pixels in memory. Cache may be set to the value of the apphot
+package parameter (the default), "yes", or "no". By default cacheing is
+disabled.
+.le
+.ls verify = ")_.verify"
+Verify the critical PHOT parameters in non-interactive mode ? Verify can be set
+to the DAOPHOT package parameter value (the default), "yes", or "no".
+.le
+.ls update = ")_.update"
+Update the algorithm parameter values if \fIverify\fR is "yes" and
+\fIinteractive\fR is "no" ?  Update can be set to the DAOPHOT package parameter
+value (the default), "yes", or "no".
+.le
+.ls verbose = ")_.verbose"
+Print results on the screen in non-interactive mode ?  Verbose can be set to
+the DAOPHOT package parameter value (the default), "yes", or "no".
+.le
+.ls graphics = ")_.stdgraph"
+The default graphics device. Graphics may be set to the DAOPHOT package
+parameter value (the default), "yes", or "no".
+.le
+.ls display = ")_.display"
+The default display device.  Display may be set to the DAOPHOT package
+parameter value (the default), "yes", or "no". By default graphics overlay is
+disabled.  Setting display to one of "imdr", "imdg", "imdb", or "imdy" enables
+graphics overlay with the IMD graphics kernel.  Setting display to "stdgraph"
+enables PHOT to work interactively from a contour plot.
+
 .le
 
 .ih
 DESCRIPTION
 
 PHOT computes accurate centers, sky values, and magnitudes for a list of
-objects in the IRAF image
-\fIimage\fR whose coordinates are listed in the text file \fIcoords\fR
-or are marked on the image display interactively with the image
-cursor,
-and writes the computed x and y coordinates, sky values and
-magnitudes to the text file \fIoutput\fR.
-In interactive mode the user may either define the list of objects
-interactively or create an object list prior to entering PHOT.
-In either case the user may adjust the
-centering, sky fitting and photometry parameters
-until a satisfactory parameter set is achieved and optionally update the
-current parameter set.
-In non-interactive
-mode the initial positions are read from the text file \fIcoords\fR
-or the image cursor parameter \fIicommands\fR can be redirected to a text
-file containing a list of coordinates and/or cursor commands.
+objects in the IRAF image \fIimage\fR whose coordinates are read from
+the text file \fIcoords\fR or the image display cursor, and writes the
+computed x and y coordinates, sky values, and magnitudes to the text
+file \fIoutput\fR.
+
+The coordinates read from \fIcoords\fR are assumed to be in coordinate
+system defined by \fIwcsin\fR. The options are "logical", "tv", "physical",
+and "world" and the transformation from the input coordinate system to
+the internal "logical" system is defined by the image coordinate system.
+The simplest default is the "logical" pixel system. Users working on with
+image sections but importing pixel coordinate lists generated from the parent
+image must use use the "tv" or "physical" input coordinate systems.
+Users importing coordinate lists in world coordinates, e.g. ra and dec,
+must use the "world" coordinate system and may need to convert their
+equatorial coordinate units from hours and degrees to degrees and degrees first.
+
+The coordinates written to \fIoutput\fR are in the coordinate
+system defined by \fIwcsout\fR. The options are "logical", "tv",
+and "physical". The simplest default is the "logical" system. Users
+wishing to correlate the output coordinates of objects measured in
+image sections or mosaic pieces with coordinates in the parent
+image must use the "tv" or "physical" coordinate systems.
+
+In interactive mode the user may either define the list of objects to be
+measured interactively with the image curspr or create an object list prior
+to running PHOT. In either case the user may adjust the centering, sky fitting,
+ and photometry algorithm parameters until a satisfactory fit is achieved
+and optionally store the final results in \fIoutput\fR. In batch mode the
+initial positions are read from the text file \fIcoords\fR or the image
+cursor parameter \fIicommands\fR can be redirected to a text file containing
+a list of cursor commands. In batch mode the current set of algorithm
+parameters is used.
+
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input image pixels are cached in memory. If cacheing
+is enabled and PHOT is run interactively the first measurement will appear
+to take a long time as the entire image must be read in before the measurement
+is actually made. All subsequent measurements will be very fast because PHOT
+is accessing memory not disk. The point of cacheing is to speed up random
+image access by making the internal image i/o buffers the same size as the
+image itself. However if the input object lists are sorted in row order and
+sparse cacheing may actually worsen not improve the execution time. Also at
+present there is no point in enabling cacheing for images that are less than
+or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
+default image i/o buffer is exactly that size. However if the size of dev$ypix
+is doubled by converting it to a real image with the chpixtype task then the
+effect of cacheing in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halfs of the image are alternated.
+
 
 PHOT computes accurate centers for each object using the centering
-parameters defined in the CENTERPARS task,
-computes an accurate sky value for each object using
-the sky fitting
-parameters defined in the FITSKYPARS task and computes magnitudes using the
-photometry parameters defined in the PHOTPARS task. The noise characteristics
-of the data are defined in the DATAPARS task.
+parameters defined in \fIcenterpars\fR, computes an accurate sky value
+for each object using the sky fitting parameters defined in \fIfitskypars\fR,
+ and computes magnitudes using the photometry parameters defined in
+\fIphotpars\fR. The image data characteristics of the data are specified
+in \fIdatapars\fR.
 
-By default PHOT executed from within DAOPHOT does NOT center the stars.
-This is because, in most cases, the coordinate list is generated by
-the DAOFIND task which has already computed accurate centers for the stars,
-Recentering would consume additional execution
-time, for no significant gain in accuracy. However in those cases in which
-the stars are selected interactively
-with the image cursor it MAY be desirable to center the stars before
-computing magnitudes by setting the CENTERPARS task parameter 
-\fIcalgorithm\fR = "centroid". Although this is not strictly necessary as the
-PSF fitting tasks PEAK, NSTAR and ALLSTAR all compute new centers,
-it does mean that the initial magnitudes fed to these tasks will be
-more accurate.
+Unlike the APPHOT versions of PHOT the DAOPHOT version of PHOT does NOT
+recenter the stars, as the default input coordinate list is created
+by the DAOFIND task which itself computes accurate centers for the stars.
+DAOPHOT users should set the CENTERPARS task parameter \fIcalgorithm\fR
+to "centroid" if they need to measure stars interactively with the
+image display and image display cursor. The PHOT tasks centers provide
+initial guesses for the PSF modeling and fitting routines in the PSF,
+PEAK, NSTAR, and ALLSTAR tasks.
 
-PHOT from within DAOPHOT uses the default sky fitting algorithm "mode".
-This algorithm which uses the mean, and median to estimate the value
+The DAOPHOT version of PHOT sets the sky fitting algorithm to  "mode".
+This algorithm which uses the mean and median to estimate the value
 that the sky would have if the star of interest wasn't there, is in most
-cases the
-one which will give reasonable results in crowded fields in
-an automated way. Users interested in reducing small stellar groups should
-realizes that they can fix the sky by setting the FITSKYPARS parameter
-\fIsalgorithm\fR to "constant" and supplying a value, or they can
-set the sky interactively using the "radplot" or "histplot" options.
-Users with rapidly varying sky backgrounds may wish to explore
-the "median" sky fitting algorithm 
-which can be more stable than the "mode" algorithm
-against bimodal sky histograms.
-Users with very few counts in their data or with quantized data where
-the standard deviation is small with respect to the quantization level
-may wish to explore the "mean", and "centroid"  sky fitting algorithms.
+cases the one which will give the best results in crowded fields.  Users
+interested in reducing small stellar groups should realizes that they can,
+fix the sky by setting the FITSKYPARS parameter \fIsalgorithm\fR to "constant"
+and setting \fIskyvalue\fR to the desired sky value, or set the sky
+interactively using the "radplot" or "histplot" options.  Users with rapidly
+varying sky backgrounds may wish to explore the "median" or "centroid" sky
+fitting algorithm which can be more stable than the "mode" algorithm
+against complex sky pixel histograms.  Users with very few counts in their
+data or with quantized data where the standard deviation is small with
+respect to the quantization level may wish to explore the "mean",
+and "centroid"  sky fitting algorithms.
 
-The magnitudes themselves are computed using fractional pixel 
-integration of the counts within the photometry apertures, a magnitude
-scale set
-by the value of the magnitude zero point stored in the PHOTPARS task
-parameter \fIzmag\fR, and the exposure time stored in the image
-header keyword specified by the DATAPARS tasks \fIexptime\fR or the
-exposure time  specified by the DATAPARS keyword \fIitime\fR.
+The PHOT task sets the instrumental magnitude scale for all the subsequent
+DAOPHOT tasks. Users should be sure they have set the PHOTPARS \fIapertures\fR
+parameter to a reasonable value, and that they have accounted for the
+exposure time by setting either the DATAPARS \fIexposure\fR or \fIitime\fR
+parameters.
+
 
 .ih
 CURSOR COMMANDS
@@ -322,20 +399,18 @@ ALGORITHMS
 
 A brief description of the data dependent parameters, centering algorithms,
 sky fitting algorithms and photometry parameters can be found in the
-online help pages for the DATAPARS, CENTERPARS, FITSKYPARS,
-and PHOTPARS parameters. A full description of the algorithms can be found in
-the document \fISpecifications for the Apphot Package\fR.
+online help pages for the DATAPARS, CENTERPARS, FITSKYPARS, and PHOTPARS
+tasks.
 
 .ih
 OUTPUT
 
 In interactive mode the following quantities are printed on the standard
-output as each object is measured. Err is a simple string indicating
-whether or not an error was detected in
-the centering algorithm, the sky fitting algorithm or the photometry
-algorithm. Mag are the magnitudes in
-apertures 1 through N respectively and xcenter, ycenter and msky are the
-x and y centers and the sky value respectively.
+output as each object is measured. Err is a simple string indicating whether
+or not an error was detected in the centering algorithm, the sky fitting
+algorithm or the photometry algorithm. Mag are the magnitudes in apertures 1
+through N respectively and xcenter, ycenter and msky are the x and y centers
+and the sky value respectively.
 
 .nf
     image  xcenter  ycenter  msky  mag[1 ... N]  error
@@ -357,28 +432,31 @@ following record is written
 
 Image and coords are the name of the image and coordinate file respectively.
 Id and lid are the sequence numbers of stars in the output and coordinate
-files respectively. Cier and cerror are the error code and accompanying
-error message respectively.  Xinit, yinit, xcenter, ycenter, xshift, yshift,
-and xerr, yerr are self explanatory and output in pixel units. The sense of
-the xshift and yshift definitions is the following.
+files respectively. Cier and cerror are the centering algorithm error code
+and accompanying error message respectively.  Xinit, yinit, xcenter, ycenter,
+xshift, yshift, and xerr, yerr are self explanatory and output in pixel units.
+The sense of the xshift and yshift definitions is the following.
+
 
 .nf
 	xshift = xcenter - xinit
 	yshift = ycenter - yinit
 .fi
 
-Sier and serror are the sky fitting error code and accompanying
-error message respectively.  Msky, stdev and sskew are the sky value,
-standard deviation and skew respectively. Nsky and nsrej are the number of
-sky pixels and the number of sky pixels rejected respectively.
+Sier and serror are the sky fitting error code and accompanying error
+message respectively. Msky, stdev and sskew are the best estimate of the sky
+value (per pixel), standard deviation and skew respectively. Nsky and nsrej
+are the number of sky pixels and the number of sky pixels rejected respectively.
 
-Itime is the exposure time, xairmass is self-evident, ifilter is a string
-identifying the filter, and otime is a string identifying the time of
-observation.
+Itime is the exposure time, xairmass is self-evident, ifilter is an
+id string identifying the filter used in the observations, and otime is
+a string containing the time of the observation in whatever units the
+user has set up.
 
-Rapert, sum, and area are the radius of the aperture in scale units, the total
-number of counts including sky in the aperture and the area of the aperture
-in square pixels. Mag and merr are the magnitude and error in the magnitude
+Rapert, sum, area, and flux  are the radius of the aperture in scale units,
+the total number of counts including sky in the aperture, the area of the
+aperture in square pixels, and the total number of counts excluding sky
+in the aperture. Mag and merr are the magnitude and error in the magnitude
 in the aperture (see below).
 
 .nf
@@ -390,6 +468,14 @@ in the aperture (see below).
 .fi
 
 Pier and perror are photometry error code and accompanying error message.
+
+In interactive mode a radial profile of each measured object is plotted
+in the graphics window if \fIradplots\fR is "yes".
+
+In interactive and batchmode a radial profile plot is written to
+\fIplotfile\fR  if it is defined each time the result of an object
+measurement is written to \fIoutput\fR .
+
 
 .ih
 ERRORS
@@ -442,182 +528,178 @@ If no error occurs during the measurement of the magnitudes then pier is
 .ih
 EXAMPLES
 
-1. Run PHOT on the image n7790 using the default setup.
+1. Run PHOT on the image dev$ypix using the coordinate list ypix.coo.1
+created by DAOFIND and the default setup.
 
 .nf
-	da> phot n7790 default default
+        da> daofind dev$ypix default fwhmpsf=2.6 sigma=5.0 threshold=20. \
+	    verify-
+
+        ... make the coordinate list ypix.coo.1
+
+	da> phot dev$ypix default default
 
 	... answer the verify prompts
 
-	... the results will appear in n7790.mag.1
+	... the results will appear in ypix.mag.1
 .fi
 
-2.  Setup the PHOT task parameters interactively in preparation for
-a subsequent batch run with a DAOFIND output file. Use the image
-display, the interactive
-setup menu defined by the i key command and a radial profile plot.
-Save the computed parameters.
 
-.nf
-	da> set stdimcur = stdimage
-
-	... define the image cursor
-
-	da> display n2264 1 fi+
-
-	... display the image
-
-	da> phot n2264 "" "default" calgorithm="centroid"
-
-	... type ? to get help text on the screen
-
-	... move the image cursor to a star
-	... type i to enter the interactive setup menu
-	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    apertures, and sigma using the graphics cursor and the
-            stellar radial profile plot
-	... typing <CR> leaves everything at the default value
-
-	... type the w key to save the parameters in the parameter files
-
-	... type the v key to verify the parameters
-
-	... type q to quit the program
-
-	da> phot n2264 n2264.coo.1 "default" 
-
-	... run phot on the output of DAOFIND
-	... verify the parameters by answering the questions
-
-	... the output will appear in n2264.mag.1
-.fi
-
-3. Compute the magnitudes for a few  stars in N4147 using the display
+2. Compute the magnitudes for a few  stars in dev$ypix using the display
 and the image cursor. Setup the task parameters using the interactive
 setup menu defined by the i key command and a radial profile plot.
-Since there is no input coordinate file containing accurate centers
-from DAOFIND the centering algorithm must be turned back on.
 
 .nf
-	ap> set stdimcur = stdimage
+        da> display dev$ypix 1 fi+
 
-	... define the image cursor
+        ... display the image
 
-	ap> display n4147 1 fi+
+        da> phot dev$ypix "" default calgorithm=centroid interactive+
 
-	... display the image
+        ... type ? to print an optional help page
 
-	ap> phot n4147 "" "default" calgorithm="centroid"
+        ... move the image cursor to a star
+        ... type i to enter the interactive setup menu
+        ... enter maximum radius in pixels of the radial profile or hit
+            CR to accept the default
+        ... type v to enter the default menu
+        ... set the fwhmpsf, centering radius, inner and outer sky annuli,
+            photometry apertures, and sigma using the graphics cursor and
+	    the stellar radial profile plot
+        ... typing <CR> leaves everything at the default value
+        ... type q to quit the setup menu
 
-	... type ? to get help text on the screen
+        ... type the v key to verify the parameters
 
-	... move the image cursor to a star
-	... type i to enter the interactive setup menu
-	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    apertures, and sigma using the graphics cursor and the
-            stellar radial profile plot
-	... typing <CR> leaves everything at the default value
+        ... type the w key to save the parameters in the parameter files
 
-	... type the w key to save the parameters in the parameter files
+        ... move the image cursor to the stars of interest and tap
+            the space bar
 
-	... type the v key to verify the parameters
+        ... a one line summary of the fitted parameters will appear on the
+            standard output for each star measured
 
-	... move the image cursor to the stars of interest and tap
-	    the space bar
+        ... type q to quit and q again to confirm the quit
 
-	... a one line summary of the fitted parameters will appear on the
-	    standard output for each star measured
-
-	... the output will appear in n4147.mag.1
+        ... the output will appear in ypix.mag.2
 .fi
 
-4. Compute the magnitudes for a few  stars in M92 using the
-contour plot
-and the graphics cursor. Setup the task parameters using the interactive
-setup menu defined by the i key command.
-Since there is no input coordinate file containing accurate centers
-from DAOFIND the centering algorithm must be turned back on.
+
+3. Compute the magnitudes for a few stars in dev$ypix using a contour plot
+and the graphics cursor. This option is only useful for those (now very few)
+users who have access to a graphics terminal but not to an image display
+server. Setup the task parameters using the interactive setup menu defined by
+the i key command as in example 1.
 
 .nf
-	ap> set stdimcur = stdgraph
+        da> show stdimcur
 
-	... define the image cursor to be the graphics cursor
+        ... record the default value of stdimcur
 
-	ap> contour m92 >G m92.plot1
+        da> set stdimcur = stdgraph
 
-	... store the contour plot of m92 in the file m92.plot
+        ... define the image cursor to be the graphics cursor
 
-	ap> phot m92 "" "default" calgorithm="centroid"  display=stdgraph
+        da> contour dev$ypix
 
-	... type :.read m92.plot1 to load the contour plot on the screen
+        ... make a contour plot of dev$ypix
 
-	... move graphics cursor to a star
-	... type i to enter the interactive setup menu
-	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    apertures, and sigma using the graphics cursor and the
+        da> contour dev$ypix >G ypix.plot1
+
+        ... store the contour plot of dev$ypix in the file ypix.plot1
+
+        da> phot dev$ypix "" default calgorithm="centroid" interactive+ \
+            display=stdgraph
+
+        ... type ? to get an optional help page
+
+        ... move graphics cursor to a star
+        ... type i to enter the interactive setup menu
+        ... enter maximum radius in pixels of the radial profile or CR
+            to accept the default value
+        ... type v to enter the default menu
+        ... set the fwhmpsf, centering radius, inner and outer sky annuli,
+            apertures, and sigma using the graphics cursor and the
             stellar radial profile plot
-	... typing <CR> leaves everything at the default value
+        ... typing <CR> leaves everything at the default value
+        ... type q to quit the setup menu
 
-	... type the w key to save the parameters in the parameter files
+        ... type the v key to verify the critical parameters
 
-	... type the v key to verify the critical parameters
+        ... type the w key to save the parameters in the parameter files
 
-	... retype :.read m92.plot1 to reload the contour plot
+        ... retype :.read ypix.plot1 to reload the contour plot
 
-	... move the graphics cursor to the stars of interest and tap
-	    the space bar
+        ... move the graphics cursor to the stars of interest and tap
+            the space bar
 
-	... a one line summary of the fitted parameters will appear on the
-	    standard output for each star measured
+        ... a one line summary of the fitted parameters will appear on the
+            standard output for each star measured
 
-	... full output will appear in the text file m92.mag.1 
+        ... type q to quit and q again to verify
+
+        ... full output will appear in the text file ypix.mag.3
+
+        da> set stdimcur = <default>
+
+        ... reset stdimcur to its previous value
 .fi
 
-5. Setup and run PHOT interactively on a list of objects,
-using a contour plot as the image display and the parameters defined and
-saved in example 2.
+
+4. Setup and run PHOT interactively on a list of objects temporarily
+overriding the fwhmpsf, sigma, cbox, annulus, dannulus, and apertures
+parameters determined in examples 1 or 2.
 
 .nf
-	ap> set stdimcur = stdgraph
 
-	... define the image cursor to be the graphics cursor
+	da> display dev$ypix 1
 
-	ap> contour m92
+	    ... display the image
 
-	... adjust plot parameters until the contour plot is satisfactory
+        da> phot dev$ypix ypix.coo.1 default calgorithm="centroid" \
+            cbox=7.0 annulus=12.0 dannulus=5.0 apertures="3.0,5.0"  \
+            interactive+
 
-	ap> =gcur
+        ... type ? for optional help
 
-	... enter cursor mode
 
-	... type :.write m92.plot2 to save the plot in a metacode file
+        ... move the graphics cursor to the stars and tap space bar
 
-	... type any key to quit cursor mode
+                                or
 
-	ap> daofind m92 
+        ... select stars from the input coordinate list with m / :m #
+            and measure with spbar
 
-	... verify the critical parameters by answering the prompts
+        ... measure stars selected from the input coordinate list
+            with n / n #
 
-	... the output will appear in the text file m92.coo.1
+        ... a one line summary of results will appear on the standard output
+            for each star measured
 
-	ap> phot m92 m92.coo.1 "default" display=stdgraph
+        ... type q to quit and q again to confirm the quit
 
-	... type :.read m92.plot2 to read in the contour plot
+        ... the output will appear in ypix.mag.4 ...
+.fi
 
-	... move the graphics cursor to the stars and tap space bar
 
-				or
+5. Display and measure some stars in an image section and write the output
+coordinates in the coordinate system of the parent image.
 
-	... use n, :n, and/or commands to measure objects in the
-	    coordinate list
+.nf
+        da> display dev$ypix[150:450,150:450] 1
 
-	... a one line summary of results will appear on the standard output
-	    for each star measured
+        ... display the image section
 
-	... the output will appear in m92.mag.2 ...
+        da> phot dev$ypix[150:450,150:450] "" default wcsout=tv \
+            calgorithm="centroid" interactive+
+
+        ... move cursor to stars and type spbar
+
+        ... type q to quit and q again to confirm quit
+
+        ... output will appear in ypix.mag.5
+
+        da> pdump ypix.mag.5 xc,yc yes | tvmark 1 STDIN col=204
 .fi
 
 
@@ -625,63 +707,107 @@ saved in example 2.
 saved parameters. Verify the critical parameters.
 
 .nf
-	ap> phot m92 m92.coo.1 "default" verify+
+        ap> phot dev$ypix default default 
 
-	... the user will be asked to verify each critical parameter
-	    a simple return will preserve the existing value
-
-	... output will appear in m92.mag.3
+        ... output will appear in ypix.mag.6...
 .fi
 
 
-7. Run PHOT in batch mode using the coordinate file and the previously
-saved parameters. The task can be submitted to the background by
-appending an ampersand to the command line listed below.
-Be sure to turn off the verify switch in that case.
+7. Repeat example 6 but assume that the input coordinate are ra and dec
+in degrees and degrees, turn off verification, and submit the task to to
+the background.
 
 .nf
-	ap> phot m92 m92.coo.1 "default" verify-
+        da> display dev$ypix 1
 
-	... output will appear in m92.mag.4
+        ap> rimcursor wcs=world > radec.coo
+
+        ... move to selected stars and type any key
+
+        ... type ^Z to quit
+
+        da> phot dev$ypix radec.coo default wcsin=world verify- verbose- &
+
+        ... output will appear in ypix.mag.7
+
+        da> pdump ypix.mag.7 xc,yc yes | tvmark 1 STDIN col=204
+
+        ... mark the stars on the display
 .fi
 
 
-8. Run PHOT interactively on the sun workstation using the imtool window,
-a coordinate list, and the current set of parameters. This example assumes
-Since the input coordinate file does not contain accurate centers
-from DAOFIND the centering algorithm must be turned back on.
+8. Run PHOT interactively without using the image display cursor.
 
 .nf
-	ap> set stdimcur = text
+        da> show stdimcur
 
-	... set the image cursor to the standard input
+        ... record the default value of stdimcur
 
-	ap> display m92 1
+        da> set stdimcur = text
 
-	... display the image in the imtool window and put the mouse
-	    in the imtool window
+        ... set the image cursor to the standard input
 
-	ap> phot m92 m92.coo.2 "default" calgorithm="centroid"
+        da> phot dev$ypix default default interactive+ 
 
-	... type :m 3 to set the coordinates to the third star
-	    in the list
+        ... type ? for optional help
 
-	... type i to enter the interactive setup menu
-	... enter the maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, inner and outer sky annulus
-	    radii, photometry apertures, and sigma using the graphics cursor
-	    and the stellar radial profile plot
-	... typing <CR> leaves everything at the default value
+        ... type :m 3 to set the initial coordinates to those of the
+            third star in the list
 
-	... type r to rewind the coordinate list
+        ... type i to enter the interactive setup menu
+        ... enter the maximum radius in pixels for the radial profile or
+            accept the default with a CR
+        ... type v to enter the default menu
+        ... set the fwhmpsf, centering radius, inner and outer sky annuli,
+            apertures, and sigma using the graphics cursor and the
+            stellar radial profile plot
+        ... typing <CR> after the prompt leaves the parameter at its default
+            value
+        ... type q to quit the setup menu
 
-	... type l to measure all the stars in the coordinate list
+        ... type r to rewind the coordinate list
 
-	... a one line summary of the answers will appear on the standard
-	    output for each star measured
+        ... type l to measure all the stars in the coordinate list
 
-	... full output will appear in the text file m92.mag.5 
+        ... a one line summary of the answers will appear on the standard
+            output for each star measured
+
+        ... type q to quit followed by q to confirm the quit
+
+        ... full output will appear in the text file ypix.mag.8
+
+        da> set stdimcur = <default>
+
+        ... reset the value of stdimcur
+
 .fi
+
+8. Use a image cursor command file to drive the PHOT task. The cursor command
+file shown below sets the cbox, annulus, dannulus, and apertures parameters
+computes the centers, sky values, and magnitudes for 3 stars, updates the
+parameter files, and quits the task.
+
+.nf
+        da> type cmdfile
+	: calgorithm centroid
+        : cbox 9.0
+        : annulus 12.0
+        : dannulus 5.0
+        : apertures 5.0
+        442 410 101 \040
+        349 188 101 \040
+        225 131 101 \040
+        w
+        q
+
+        da> phot dev$ypix "" default icommands=cmdfile  verify-
+
+        ... full output will appear in ypix.mag.9
+.fi
+
+
+
+
 
 .ih
 TIME REQUIREMENTS
@@ -692,14 +818,13 @@ It is currently the responsibility of the user to make sure that the
 image displayed in the frame is the same as that specified by the image
 parameter.
 
-Commands which draw to the image display are currently disabled.
-The TVMARK task in the proto package  can be used to draw simple marks
-on the display. All the DAOPHOT marking commands will however function
-if a contour plot is used in lieu of the image display.
-
-Users should not be confused by the normally enabled markcur option in the
-SUN/IMTOOL setup window. This feature is under the control of the
-IMTOOL window and the DAOPHOT package has no control over it.
+Commands which draw to the image display are disabled by default.
+To enable graphics overlay on the image display, set the display
+parameter to "imdr", "imdg", "imdb", or "imdy" to get red, green,
+blue or yellow overlays and set the centerpars mkcenter switch to
+"yes", the fitskypars mksky switch to"yes", or the photpars mkapert
+switch to "yes". It may be necessary to run gflush and to redisplay the image
+to get the overlays position correctly.
 
 .ih
 SEE ALSO

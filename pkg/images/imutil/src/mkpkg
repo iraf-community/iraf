@@ -58,7 +58,7 @@ libpkg.a:
         imminmax.x      <imhdr.h>
 	listpixels.x	<error.h> <imhdr.h> <mwset.h>
         minmax.x        <imhdr.h>
-	t_imstat.x	<mach.h> <imhdr.h> "imstat.h"
+	t_imstat.x	<mach.h> <imhdr.h> <imset.h> "imstat.h"
 	t_sections.x
 	hselect.x	<error.h> <evexpr.h> <ctype.h>
 	t_imarith.x     <imhdr.h> <error.h> <lexnum.h>

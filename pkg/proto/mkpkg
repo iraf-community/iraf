@@ -35,4 +35,6 @@ libpkg.a:
 	t_mask2text.x	<imhdr.h>
 	t_suntoiraf.x	<mach.h> <error.h> <imhdr.h>
 	t_text2mask.x	<imhdr.h>
+	@masks
+	@maskexpr
 	;

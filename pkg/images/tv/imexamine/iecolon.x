@@ -15,7 +15,8 @@ define	CMDS	"|angh|angv|background|banner|boundary|box|buffer|ceiling|\
 		|pointmode|radius|round|rplot|select|szmarker|ticklabels|\
 		|title|width|x|xlabel|xorder|y|ylabel|yorder|zero|unlearn|\
 		|autoredraw|nbins|z1|z2|autoscale|top_closed|allframes|wcs|\
-		|xformat|yformat|fitplot|sigma|axes|fittype|beta|iterations|"
+		|xformat|yformat|fitplot|sigma|axes|fittype|beta|iterations|\
+		|output|ncoutput|nloutput|"
  
 define	ANGH		 1
 define	ANGV		 2
@@ -90,6 +91,10 @@ define	AXES		70
 define	FITTYPE		71
 define	BETA		72
 define	ITERATIONS	73
+
+define	OUTPUT		75
+define	NCOUTPUT	76
+define	NLOUTPUT	77
 
  
 # IE_COLON -- Respond to colon commands.
@@ -902,7 +907,7 @@ begin
 		    call pargb (clgetb ("himexam.top_closed"))
 	    } else {
 		call clputb ("himexam.top_closed", bval)
-		if (gtype == 'h' || gtype == '.')
+		if (gtype == 'h')
 		    redraw = YES
 	    }
 	case ALLFRAMES:
@@ -1001,6 +1006,29 @@ begin
 		if (gtype == 'r')
 		    redraw = YES
 	    }
+
+	case OUTPUT:
+	    call gargwrd (Memc[cmd], SZ_FNAME)
+	    if (nscan() == 1) {
+		call clgstr ("output", Memc[cmd], SZ_FNAME)
+		call printf ("output `%s'\n")
+		    call pargstr (Memc[cmd])
+	    } else
+		call clpstr ("output", Memc[cmd])
+	case NCOUTPUT:
+	    call gargi (ival)
+	    if (nscan() == 1) {
+		call printf ("ncoutput %g\n")
+		    call pargi (clgeti ("ncoutput"))
+	    } else
+		call clputi ("ncoutput", ival)
+	case NLOUTPUT:
+	    call gargi (ival)
+	    if (nscan() == 1) {
+		call printf ("nloutput %g\n")
+		    call pargi (clgeti ("nloutput"))
+	    } else
+		call clputi ("nloutput", ival)
 
 	default:
 	    call printf ("Ambiguous or unrecognized command\007\n")

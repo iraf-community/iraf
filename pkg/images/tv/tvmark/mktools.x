@@ -449,8 +449,7 @@ int	fnldir(), mk_gmarks()
 begin
 	switch (param) {
 	case IMAGE:
-	    rp = fnldir (str, MK_IMAGE(mk), SZ_FNAME)
-	    call strcpy (str[rp+1], MK_IMAGE(mk), SZ_FNAME)
+	    call strcpy (str, MK_IMAGE(mk), SZ_FNAME)
 
 	case OUTIMAGE:
 	    call strcpy (str, MK_OUTIMAGE(mk), SZ_FNAME)

@@ -1,0 +1,8 @@
+# ASTCAT package parameter file. Set this up so it can be configured for
+# a favorite catalog and / or image survey.
+
+catalogs,s,h,"usno2@noao",,,"The astrometric catalog"
+catdb,s,h,"astcat$lib/catdb.dat",,,"The astrometric catalog configuration file"
+imsurveys,s,h,"dss2@cadc",,,"The input image survey"
+imdb,s,h,"astcat$lib/imdb.dat",,,"The image survey configuration file"
+version,s,h,"Aug01"

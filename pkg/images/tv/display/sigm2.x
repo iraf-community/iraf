@@ -228,12 +228,13 @@ int	lineno
 
 pointer	rawline, tempp, gp
 int	i, new_y[2], tempi, curbuf, altbuf
-int	npix, nblks_y, ybavg, x1, x2
+int	nraw, npix, nblks_y, ybavg, x1, x2
 real	x, y, weight_1, weight_2
 pointer	si_blmavgs()
 errchk	si_blmavgs
 
 begin
+	nraw = IM_LEN(SI_IM(si),1)
 	npix = SI_NPIX(si,1)
 
 	# Determine the range of X (in pixels on the block averaged input image)
@@ -324,8 +325,8 @@ begin
 		    call si_samples (Mems[rawline], Mems[SI_BUF(si,i)],
 			Memr[SI_GRID(si,1)], npix)
 		} else if (SI_ORDER(si) == -1) {
-		    call si_maxs (Mems[rawline], Mems[SI_BUF(si,i)],
-			Memr[SI_GRID(si,1)], npix)
+		    call si_maxs (Mems[rawline], nraw,
+			Memr[SI_GRID(si,1)], Mems[SI_BUF(si,i)], npix)
 		} else {
 		    call aluis (Mems[rawline], Mems[SI_BUF(si,i)],
 			Memr[SI_GRID(si,1)], npix)
@@ -499,15 +500,19 @@ end
 
 # SI_MAXS -- Resample a line via maximum value.
 
-procedure si_maxs (a, b, x, npix)
+procedure si_maxs (a, na, x, b, nb)
 
-short	a[ARB], b[ARB]		# input, output data arrays
-real	x[ARB]			# sample grid
-int	npix, i
+short	a[na]                   # input array
+int	na                      # input size
+real	x[nb]                   # sample grid
+short	b[nb]                   # output arrays
+int	nb                      # output size
+
+int	i
 
 begin
-	do i = 1, npix
-	    b[i] = max (a[int(x[i])], a[min(npix,int(x[i]+1))])
+	do i = 1, nb
+	    b[i] = max (a[int(x[i])], a[min(na,int(x[i]+1))])
 end
 
 
@@ -523,12 +528,13 @@ int	lineno
 
 pointer	rawline, tempp, gp
 int	i, new_y[2], tempi, curbuf, altbuf
-int	npix, nblks_y, ybavg, x1, x2
+int	nraw, npix, nblks_y, ybavg, x1, x2
 real	x, y, weight_1, weight_2
 pointer	si_blmavgr()
 errchk	si_blmavgr
 
 begin
+	nraw = IM_LEN(SI_IM(si))
 	npix = SI_NPIX(si,1)
 
 	# Deterine the range of X (in pixels on the block averaged input image)
@@ -619,8 +625,8 @@ begin
 		    call si_sampler (Memr[rawline], Memr[SI_BUF(si,i)],
 			Memr[SI_GRID(si,1)], npix)
 		} else if (SI_ORDER(si) == -1) {
-		    call si_maxr (Memr[rawline], Memr[SI_BUF(si,i)],
-			Memr[SI_GRID(si,1)], npix)
+		    call si_maxr (Memr[rawline], nraw,
+			Memr[SI_GRID(si,1)], Memr[SI_BUF(si,i)], npix)
 		} else {
 		    call aluir (Memr[rawline], Memr[SI_BUF(si,i)],
 			Memr[SI_GRID(si,1)], npix)
@@ -652,7 +658,7 @@ begin
 	    return (SI_BUF(si,1))
 	else if (SI_ORDER(si) == -1) {
 	    call amaxr (Memr[SI_BUF(si,1)], Memr[SI_BUF(si,2)],
-		Memr[OUTBUF(si)], npix, weight_1, weight_2)
+		Memr[OUTBUF(si)], npix)
 	    return (OUTBUF(si))
 	} else {
 	    call awsur (Memr[SI_BUF(si,1)], Memr[SI_BUF(si,2)],
@@ -788,13 +794,17 @@ end
 
 # SI_MAXR -- Resample a line via maximum value.
 
-procedure si_maxr (a, b, x, npix)
+procedure si_maxr (a, na, x, b, nb)
 
-real	a[ARB], b[ARB]		# input, output data arrays
-real	x[ARB]			# sample grid
-int	npix, i
+real	a[na]                   # input array
+int	na                      # input size
+real	x[nb]                   # sample grid
+real	b[nb]                   # output arrays
+int	nb                      # output size
+
+int	i
 
 begin
-	do i = 1, npix
-	    b[i] = max (a[int(x[i])], a[min(npix,int(x[i]+1))])
+	do i = 1, nb
+	    b[i] = max (a[int(x[i])], a[min(na,int(x[i]+1))])
 end

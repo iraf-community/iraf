@@ -206,7 +206,7 @@ begin
 	npts = IM_LEN (im, 1)
 
 	# Map pixels and optionally correct for coincidence
-	pix = imgl1r (im, 1)
+	pix = imgl1r (im)
 	if (coincidence) {
 	    iferr (co_flag = imgeti (im, "CO-FLAG"))
 		co_flag = -1
@@ -265,7 +265,7 @@ begin
 	call strcpy (temp, IM_TITLE (imnew), SZ_LINE)
 	IM_PIXTYPE (imnew) = TY_REAL
 
-	newpix = impl1r (imnew, 1)
+	newpix = impl1r (imnew)
 	call amovr (accum, Memr[newpix], npts)
 
 	call imaddr (imnew, "EXPOSURE", expo_sum)

@@ -1,5 +1,8 @@
 .help revisions Jun88 pkg.utilities
 .nf
+=====
+V2.12
+=====
 
 utilities$mkpkg
     Added missing dependencies.  (10/11/99, Valdes)

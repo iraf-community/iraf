@@ -7,13 +7,17 @@ $exit
 
 libpkg.a:
 	dpairmass.x	<imhdr.h>		../lib/daophotdef.h
+	dpapheader.x
 	dpfilter.x	<imhdr.h>		../lib/daophotdef.h
 	dpfree.x	../lib/daophotdef.h	../lib/apseldef.h          \
 			../lib/allstardef.h
 	dpgetapert.x 	../lib/apseldef.h	../lib/daophotdef.h        \
 			<tbset.h>		../../lib/ptkeysdef.h
 	dpgppars.x 	<ctotok.h>              ../lib/daophotdef.h
+	dpgsvw.x	<imio.h>                <imhdr.h>                  \
+	                <math.h>
 	dpppars.x 	../lib/daophotdef.h
+	dpimkeys.x	../lib/daophotdef.h
 	dpinit.x	../lib/daophotdef.h	../lib/apseldef.h	   \
 			../lib/allstardef.h
 	dpreadpsf.x	<imhdr.h>		../lib/daophotdef.h        \
@@ -25,11 +29,12 @@ libpkg.a:
 	dpnames.x
 	dpotime.x	<imhdr.h>		../lib/daophotdef.h
 	dppadu.x	<imhdr.h>		../lib/daophotdef.h
+	dppcache.x	<imhdr.h>               <imset.h>
 	dprdnoise.x	<imhdr.h>		../lib/daophotdef.h
 	dprmwhite.x	<ctype.h>
 	dpverify.x	../lib/daophotdef.h
 	dpwparam.x
-	dpapheader.x
+	dpwcs.x		<imio.h>                ../lib/daophotdef.h
 	bicubic.x
 	daoran.x
 	erf.x

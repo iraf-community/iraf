@@ -12,9 +12,9 @@ xposcolumn,s,h,"xcenter",,,"Name of the x coordinate column"
 yposcolumn,s,h,"ycenter",,,"Name of the y coordinate column"
 usercolumns,s,h,"",,,"Names of additional user selected columns"
 first_star,i,h,1,1,,First star in the catalog to load
-max_nstars,i,h,5000,1,,Maximum number of stars to load
-match_radius,r,h,2.0,,,Matching radius for positional coincidence on display
-graphics,s,h,)_.graphics,,,The graphics device
+max_nstars,i,h,10000,1,,Maximum number of stars to load
 use_display,b,h,yes,,,Use the image display ?
+match_radius,r,h,2.0,,,Matching radius for positional coincidence on display
 icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
 gcommands,*gcur,h,"",,,"Graphics cursor [x y wcs] key [cmd]"
+graphics,s,h,)_.graphics,,,The graphics device

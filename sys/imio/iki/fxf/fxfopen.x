@@ -4,8 +4,10 @@ include	<syserr.h>
 include	<error.h>
 include	<imhdr.h>
 include	<imio.h>
+include <finfo.h>
 include <fset.h>
 include <mii.h>
+include <mach.h>
 include	"fxf.h"
 
 
@@ -25,14 +27,17 @@ int	gc_arg			#I [NOT USED]
 int	acmode			#I access mode
 int	status			#O status flag to calling routine
 
-pointer	sp, path,  fit_extn, ua, o_fit, fit
-int	newimage, i, gn, ksinh
-bool    pre_read, fks_extn_or_ver, dyh, fsec
-int	fxf_check_dup_extnv(), itoc(), strcmp()
-int     open(), access(), imgeti(), fstatl()
+long	fi[LEN_FINFO]
+int	newimage, i, gn, ksinh, type
+pointer	sp, path, fit_extn, ua, o_fit, fit
+bool    pre_read, fks_extn_or_ver, dyh, fsec, plio
+int	fxf_check_dup_extnv(), itoc(), strcmp(), strncmp()
+int     open(), access(), imgeti(), fstatl(), finfo(), fxf_header_size()
+pointer pl_open()
 
 errchk	fmkcopy, calloc, open, fxf_rheader, fxf_prhdr, fxf_gaccess
 errchk	fxf_fclobber, fxf_ksection, fxf_alloc, syserr, syserrs
+errchk  fxf_check_group
 define	duperr_ 91
 define	err_ 92
 
@@ -40,7 +45,6 @@ begin
 	call smark (sp)
 	call salloc (path, SZ_PATHNAME, TY_CHAR)
 	call salloc (fit_extn, FITS_LENEXTN, TY_CHAR)
-
 	call fxf_init()
 	ua = IM_USERAREA(im)
 
@@ -50,6 +54,7 @@ begin
 	IM_KDES(im) = fit
 	IM_HFD(im) = NULL
 	FIT_IM(fit) = im
+	call amovki (1, FIT_LENAXIS(fit,1), IM_MAXDIM)
 
 	# Generate full header file name.
 	if (extn[1] == EOS) {
@@ -58,6 +63,7 @@ begin
 	    call strcpy (Memc[fit_extn], extn, FITS_LENEXTN)
 	} else                                 
 	    call iki_mkfname (root, extn, Memc[path], SZ_PATHNAME)
+
 	# Header and pixel filename are the same.
 	call strcpy (Memc[path], IM_HDRFILE(im), SZ_IMHDRFILE)
 	call strcpy (IM_HDRFILE(im), IM_PIXFILE(im), SZ_IMPIXFILE)
@@ -70,12 +76,6 @@ begin
 	# Initialize kernel section default values.
 	call fxf_ksinit (fit)
 
-	# Read fkinit and ksection and check that the extension number
-	# specifications therein and the IMIO cluster index "group" are
-	# consistent.
-
-	call fxf_check_group (im, ksection, acmode, group, ksinh)
-
 	# For simplicity treat the APPEND mode as NEW_IMAGE.  For the FK
 	# is the same.
 
@@ -83,9 +83,15 @@ begin
 	    acmode = NEW_IMAGE
 	FIT_ACMODE(fit) = acmode
 
+	# Read fkinit and ksection and check that the extension number
+	# specifications therein and the IMIO cluster index "group" are
+	# consistent.
+
+	call fxf_check_group (im, ksection, acmode, group, ksinh)
+
 	fks_extn_or_ver = FKS_EXTNAME(fit) != EOS || !IS_INDEFL(FKS_EXTVER(fit))
 
-	# Check if a file section is neccessary.
+	# Check if a file section is necessary.
 	fsec = (fks_extn_or_ver || group >= 0)
 	call fxf_gaccess (im, fsec)
 
@@ -96,13 +102,31 @@ begin
 	   FIT_GROUP(fit) = -1
 
 	# See if we want to write a dummy primary unit.
+	#
+	# For PLIO, if creating a new output file and we want to create a
+	# BINTABLE, create a dummy header.  Otherwise see if a type is
+	# requested, in which case we would need to create a dummmy header
+	# if no file is present yet.
+
+	type = 0
+	if (FKS_SUBTYPE(fit) == FK_PLIO)
+	    type = FK_PLIO
+
 	dyh = false
-	if (newimage == YES && fks_extn_or_ver) {
+	if (newimage == YES && (fks_extn_or_ver || type > 0)) {
 	    call fxf_dummy_header (im, status)
 	    if (status == ERR)
 		goto err_ 
 	    newimage = NO
 	    dyh = true
+	    if (acmode == NEW_COPY && type == FK_PLIO) 
+		FIT_PIXOFF(fit) = fxf_header_size(im) + FITS_BLOCK_CHARS
+	}
+	if (newimage == NO) {
+	    if (finfo (IM_HDRFILE(im), fi) != ERR)
+		FIT_EOFSIZE(fit) = (FI_SIZE(fi)+SZB_CHAR-1)/SZB_CHAR + 1
+	    else
+		call syserrs (SYS_FOPEN, IM_HDRFILE(im))
 	}
 
 	if (newimage == YES)
@@ -164,9 +188,29 @@ begin
 	    if (FKS_INHERIT(fit) == YES)
 		FIT_INHERIT(fit) = YES
 
+	    # Initialize a new copy of a PLIO image mask.
+	    if (type == FK_PLIO) 
+		IM_PL(im) = pl_open (NULL)
+
 	case NEW_COPY:
 	    # Completely new copy of an existing image. This could mean a
 	    # new file or append a new image to an existing file.
+
+	    # Initialize a new copy of a PLIO image mask.
+	    if (type == FK_PLIO) {
+		IM_PL(im) = pl_open (NULL)
+	        if (IM_PL(o_im) != NULL)
+	            call fxf_plpf (im)
+	    }
+
+	    if (newimage == YES || FKS_APPEND(fit) == NO) 
+		call fxf_check_old_name (im)
+
+	    # For a PLIO mask, make sure there are no SUBYTPE keywords in
+	    # the UA since this will be rewritten by fxf_updhdr().
+	    
+	    if (IM_PL(o_im) != NULL)
+		call fxf_clean_pl (im)
 
 	    if (IM_KDES(o_im) != NULL && IM_KERNEL(o_im) == IM_KERNEL(im)) {
 		o_fit = IM_KDES(o_im)
@@ -235,10 +279,6 @@ begin
 		    pre_read = true
 	    }
 
-	    FIT_NAXIS(fit) = IM_NDIM(im)
-	    do i = 1, IM_NDIM(im)
-		FIT_LENAXIS(fit,i) = IM_LEN(im,i)
-
 	    if (newimage == NO && !dyh) {
 	        if (pre_read) {
 		    iferr (call fxf_prhdr (im, group))
@@ -255,6 +295,10 @@ begin
 		        goto duperr_
 		}
 	    }
+
+	    FIT_NAXIS(fit) = IM_NDIM(im)
+	    do i = 1, IM_NDIM(im)
+		FIT_LENAXIS(fit,i) = IM_LEN(im,i)
 
 	    # Inherit datatype of input template image if specified,
 	    # otherwise default datatype to real.
@@ -295,14 +339,28 @@ begin
 
 	    FIT_EOFSIZE(fit) = fstatl (IM_HFD(im), F_FILESIZE) + 1
 
-	    # We now close the header file.
+	    # PLIO.  If we read the header of a PLIO_1 compressed image file
+	    # then it is a PL file; now read the data.
+
+	    plio = (strncmp (FIT_EXTSTYPE(fit), "PLIO_1", 6) == 0)
+	    if (plio)  {
+		call fxf_plread (im)
+
+		# We need to setup the IMIO descriptor if we need to write
+		# over a section; in particular IM_PFD needs to be defined.
+
+		if (acmode == READ_WRITE)
+		    call fxf_plpf (im)
+	    }
+
+	    # Close the header file.
 	    call close (IM_HFD(im))
 	    IM_HFD(im) = NULL
 
 	    # Do not allow the user to see any non_IMAGE extensions.
 	    if (strcmp ("IMAGE", FIT_EXTTYPE(fit)) != 0 &&
-		    strcmp ("SIMPLE", FIT_EXTTYPE(fit)) != 0)
-		 call syserrs (SYS_IKIEXTN, IM_NAME(im))
+		    strcmp ("SIMPLE", FIT_EXTTYPE(fit)) != 0 && !plio)
+		call syserrs (SYS_IKIEXTN, IM_NAME(im))
 	}
 
 	FIT_HFD(fit) = IM_HFD(im)
@@ -375,10 +433,10 @@ procedure fxf_prhdr (im, group)
 pointer	im  	 		#I image descriptor
 int	group			#I maximum group number to read
 
-int	poff
+int	poff, extv
 pointer	fit, lim, lfit, sp, path
 errchk	fpathname, open, syserr, fxf_alloc, calloc
-int	open()
+int	open(), imgeti()
 
 begin
 	call smark (sp)
@@ -395,6 +453,9 @@ begin
 	FIT_ACMODE(lfit) = FIT_ACMODE(fit)
 	call strcpy (FKS_EXTNAME(fit), FKS_EXTNAME(lfit), LEN_CARD)
 	FKS_EXTVER(lfit) = FKS_EXTVER(fit)
+
+	iferr (extv = imgeti (im, "EXTVER"))
+	     extv = INDEFL
 
 	FKS_OVERWRITE(lfit) = FKS_OVERWRITE(fit)
 	FKS_DUPNAME(lfit) = FKS_DUPNAME(fit)
@@ -416,7 +477,7 @@ begin
              call mfree (lfit, TY_STRUCT)
 	     call mfree (lim, TY_STRUCT)
 	     call sfree (sp)
-	     call syserr (SYS_FXFRFEOF)
+	     call erract (EA_ERROR)
 
 	} else {
 	    call close (IM_HFD(lim))
@@ -435,9 +496,15 @@ begin
 
 	    FIT_NAXIS(fit) = FIT_NAXIS(lfit)
 	    FIT_INHERIT(fit) = FIT_INHERIT(lfit)
+	    FIT_PLMAXLEN(fit) = FIT_PLMAXLEN(lfit)
+
+	    IM_CTIME(im) = IM_CTIME(lim)
 
 	    call mfree (lfit, TY_STRUCT)
 	    call mfree (lim, TY_STRUCT)
+
+  	    if (extv != INDEFL)
+	        call imaddi (im, "EXTVER", extv)
 	}
 end
 
@@ -504,6 +571,7 @@ begin
 	call amovkc (blank[1], Memc[spp+n], nblanks)
 	call miipak (Memc[spp], Memi[mii], size_rec*2, TY_CHAR, MII_BYTE)
 	call write (fd, Memi[mii], size_rec)
+
 	call close (fd)
 
 	call sfree (sp)
@@ -778,7 +846,10 @@ int	ksinh			#O INHERIT value from the filename ksection
 pointer sp, ks, fit
 bool    fks_extn_or_ver, inherit_override	
 int	igroup, kgroup, fgroup, tgroup, sv_inherit, newimage, append
+bool    fnullfile()
 int	envgets()
+
+errchk  syserrs, fxf_ks_error
 
 begin
 	call smark (sp)
@@ -848,11 +919,13 @@ begin
 	if (fks_extn_or_ver) 
 	    tgroup = -1
 
-	if (newimage == NO) {
+	if (newimage == NO && !fnullfile (IM_HDRFILE(im))) {
 	    iferr (call fxf_prhdr (im, tgroup)) {
-		# if group does not exits and over+, is an error.
+		# If group does not exist and over+, it is an error.
 		if (FKS_OVERWRITE(fit) == YES)
 		    call syserrs (SYS_FXFEXTNF, IM_NAME(im))
+	        else
+		    call erract (EA_ERROR)
 	    }   
 	}
 
@@ -866,7 +939,6 @@ begin
 
 	# For overwrite we need to force group to be the kernel section
 	# extension number. 
-
 
 	if (FKS_OVERWRITE(fit) == YES)
 	    FIT_GROUP(fit) = max(kgroup,group)
@@ -893,4 +965,27 @@ begin
 	    FKS_INHERIT(fit) = NO
 
 	call sfree (sp)
+end
+
+
+# FXF_CLEAN_PL -- Filter PLIO keywords from the UA.
+
+procedure fxf_clean_pl (im)
+
+pointer	im	#I image descriptor
+
+begin
+	#### (This is incredibly inefficient...)
+	call fxf_filter_keyw (im, "TFORM1")
+	call fxf_filter_keyw (im, "TFIELDS")
+	call fxf_filter_keyw (im, "ZIMAGE")
+	call fxf_filter_keyw (im, "ZCMPTYPE")
+	call fxf_filter_keyw (im, "ZBITPIX")
+	call fxf_filter_keyw (im, "ZNAXIS")
+	call fxf_filter_keyw (im, "ZNAXIS1")
+	call fxf_filter_keyw (im, "ZNAXIS2")
+	call fxf_filter_keyw (im, "ZTILE1")
+	call fxf_filter_keyw (im, "ZTILE2")
+	call fxf_filter_keyw (im, "ZNAME1")
+	call fxf_filter_keyw (im, "ZVAL1")
 end

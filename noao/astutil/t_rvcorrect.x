@@ -68,11 +68,11 @@ double	vobs				# Observed velocity
 int	fd
 char	file[SZ_FNAME]
 double	hjd, vrot, vorb, vbary, vsol
-pointer	obs
+pointer	obs, ptr
 
 int	clgfil(), open(), fscan(), nscan()
 double	obsgetd()
-pointer	obsopen()
+pointer	obsopen(), immap()
 errchk	obsopen
 
 include	"rvcorrect.com"
@@ -89,6 +89,12 @@ begin
 
 	# Loop through files.
 	while (clgfil (list, file, SZ_FNAME) != EOF) {
+	    ifnoerr (ptr = immap (file, READ_ONLY, 0)) {
+		call imunmap (ptr)
+		call eprintf ("WARNING: Use 'images' parameter for (%s)\n")
+		    call pargstr (file)
+		next
+	    }
 	    iferr (fd = open (file, READ_ONLY, TEXT_FILE)) {
 		call erract (EA_WARN)
 		next
@@ -175,9 +181,16 @@ begin
 
 	# Loop through images.
 	while (imtgetim (list, Memc[image], SZ_FNAME) != EOF) {
-	    iferr (im = immap (Memc[image], READ_WRITE, 0)) {
-		call erract (EA_WARN)
-		next
+	    if (imupdate == YES) {
+		iferr (im = immap (Memc[image], READ_WRITE, 0)) {
+		    call erract (EA_WARN)
+		    next
+		}
+	    } else {
+		iferr (im = immap (Memc[image], READ_ONLY, 0)) {
+		    call erract (EA_WARN)
+		    next
+		}
 	    }
 
 	    iferr {
@@ -190,12 +203,18 @@ begin
 		    altitude = obsgetd (obs, "altitude")
 		}
 
+		# Parse UT in either date or hour formats.
+	        call imgstr (im, Memc[utp], Memc[date], SZ_LINE)
+		if (dtm_decode (Memc[date], year, month, day, ut, flags)==ERR) {
+		    iferr (ut = imgetd (im, Memc[utp]))
+			call error (1, "Error parsing UT keyword")
+		}
+
+		# Parse date.
 	        call imgstr (im, Memc[datop], Memc[date], SZ_LINE)
-		if (dtm_decode (Memc[date], year, month, day, ut, flags) == ERR)
+		if (dtm_decode (Memc[date], year, month, day, hjd, flags)==ERR)
 		    call error (1, "Error parsing DATE-OBS keyword")
 
-		if (IS_INDEFD(ut))
-		    ut = imgetd (im, Memc[utp])
 	        ra = imgetd (im, Memc[rap])
 	        dec = imgetd (im, Memc[decp])
 	        ep = imgetd (im, Memc[epochp])

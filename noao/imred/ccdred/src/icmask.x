@@ -17,7 +17,7 @@ include	"icmask.h"
 procedure ic_mopen (in, out, nimages)
 
 pointer	in[nimages]		#I Input images
-pointer	out[3]			#I Output images
+pointer	out[ARB]		#I Output images
 int	nimages			#I Number of images
 
 int	mtype			# Mask type
@@ -156,7 +156,7 @@ end
 procedure ic_mget (in, out, offsets, v1, v2, m, lflag, nimages)
 
 pointer	in[nimages]		# Input image pointers
-pointer	out[3]			# Output image pointer
+pointer	out[ARB]		# Output image pointer
 int	offsets[nimages,ARB]	# Offsets to  output image
 long	v1[IM_MAXDIM]		# Data vector desired in output image
 long	v2[IM_MAXDIM]		# Data vector in input image

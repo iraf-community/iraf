@@ -1,14 +1,16 @@
 include <gset.h>
 include <mach.h>
 include <imhdr.h>
+include "../lib/apphot.h"
 
 # AP_FIND -- Detect images in the convolved image and then compute image
 # characteristics using the original image.
 
-int procedure ap_find (im, cnv, out, id, ker2d, skip, nxk, nyk, skymode,
+int procedure ap_find (ap, im, cnv, out, id, ker2d, skip, nxk, nyk, skymode,
 	threshold, relerr, emission, xsigsq, ysigsq, datamin, datamax,
 	sharplo, sharphi, roundlo, roundhi, interactive, stid, mkdetections)
 
+pointer ap			# the apphot descriptor
 pointer	im			# pointer to the input image
 pointer	cnv			# pointer to the output image
 int	out			# the output file descriptor
@@ -33,7 +35,7 @@ int	xmiddle, ymiddle, nonzero, nobjs, nstars, ntotal
 pointer	sp, bufptrs, imlbuf, cnvlbuf, imbuf, cnvbuf, cols
 pointer	satur, sharp, round1, round2, x, y
 
-int	ap_detect(), ap_test()
+int	ap_detect(), ap_test(), apstati()
 pointer	imgs2r()
 errchk	imgs2r()
 
@@ -147,6 +149,27 @@ begin
 		Memr[round1], Memr[round2], Memr[sharp], nobjs, IM_LEN(im,1),
 		IM_LEN(im,2), sharplo, sharphi, roundlo, roundhi)
 
+	    # Mark the stars on the display.
+	    if ((nstars > 0) && (interactive == YES) && (id != NULL) &&
+	        (mkdetections == YES)) {
+		call greactivate (id, 0)
+		do j = 1, nstars {
+		    #call ap_ltov (im, Memr[x+j-1], Memr[y+j-1], xc, yc, 1)
+		    #call gmark (id, xc, yc, GM_PLUS, 1.0, 1.0)
+		    call gmark (id, Memr[x+j-1], Memr[y+j-1], GM_PLUS, 1.0, 1.0)
+		}
+		call gdeactivate (id, 0)
+	    }
+
+	    switch (apstati (ap, WCSOUT)) {
+	    case WCS_PHYSICAL:
+		call ap_ltoo (ap, Memr[x], Memr[y], Memr[x], Memr[y], nstars)
+	    case WCS_TV:
+		call ap_ltov (im, Memr[x], Memr[y], Memr[x], Memr[y], nstars)
+	    default:
+		;
+	    }
+
 	    # Print results on the standard output.
 	    if (interactive == YES)
 	        call apstdout (Memr[cnvbuf], Memi[bufptrs], ncols, nyk,
@@ -158,14 +181,6 @@ begin
 	        Memi[cols], Memr[x], Memr[y], Memr[sharp], Memr[round1],
 		Memr[round2], nstars, ntotal, relerr * threshold, stid)
 
-	    # Mark the stars on the display.
-	    if ((nstars > 0) && (interactive == YES) && (id != NULL) &&
-	        (mkdetections == YES)) {
-		call greactivate (id, 0)
-		do j = 1, nstars
-		    call gmark (id, Memr[x+j-1], Memr[y+j-1], GM_PLUS, 1.0, 1.0)
-		call gdeactivate (id, 0)
-	    }
 
 	    ntotal = ntotal + nstars
 

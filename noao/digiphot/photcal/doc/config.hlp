@@ -654,6 +654,7 @@ X3              18      # airmass of filter 3 observation
 m3              19      # filter 3 instrumental magnitude
 error(m3)       20      # error in filter 3 instrumental magnitude
 
+
 transformation
 
 set B = V + BV

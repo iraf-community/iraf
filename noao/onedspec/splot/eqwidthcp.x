@@ -26,8 +26,8 @@ pointer	xg, yg, sg, lg, pg	# Pointers to fit parameters
 int	ng			# Number of components
 
 int	i, i1, i2, isrch, icore, edge
-real	xleft, xright, rcore, rinter, yl, gfwhm, lfwhm, flux, eqw, w, w1, w2
-real	pi, xpara[3], coefs[3], xcore, ycore
+double	xleft, xright, rcore, rinter, yl, gfwhm, lfwhm, flux, eqw, w, w1, w2
+double	pi, xpara[3], ypara[3], coefs[3], xcore, ycore
 double	shdr_lw(), shdr_wl()
 
 # Initialize reasonable values
@@ -76,8 +76,11 @@ begin
 	xpara[1] = icore - 1
 	xpara[2] = icore
 	xpara[3] = icore + 1
+	ypara[1] = y[icore-1]
+	ypara[2] = y[icore]
+	ypara[3] = y[icore+1]
 
-	call para (xpara, y[icore-1], coefs)
+	call para (xpara, ypara, coefs)
 
 	# Compute pixel value at minimum
 	xcore = -coefs[2] / 2.0 / coefs[3]
@@ -145,43 +148,43 @@ begin
 
 	call printf (
 	    "center = %9.7g, eqw = %9.4g, gfwhm = %9.4g\n")
-	    call pargr (w)
-	    call pargr (eqw)
-	    call pargr (gfwhm)
+	    call pargd (w)
+	    call pargd (eqw)
+	    call pargd (gfwhm)
 
 	if (fd1 != NULL) {
 	    call fprintf (fd1, " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
-		call pargr (w)
-		call pargr (cont)
-		call pargr (flux)
-		call pargr (eqw)
-		call pargr (ycore - cont)
-		call pargr (gfwhm)
-		call pargr (lfwhm)
+		call pargd (w)
+		call pargd (cont)
+		call pargd (flux)
+		call pargd (eqw)
+		call pargd (ycore - cont)
+		call pargd (gfwhm)
+		call pargd (lfwhm)
 	}
 	if (fd2 != NULL) {
 	    call fprintf (fd2, " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
-		call pargr (w)
-		call pargr (cont)
-		call pargr (flux)
-		call pargr (eqw)
-		call pargr (ycore - cont)
-		call pargr (gfwhm)
-		call pargr (lfwhm)
+		call pargd (w)
+		call pargd (cont)
+		call pargd (flux)
+		call pargd (eqw)
+		call pargd (ycore - cont)
+		call pargd (gfwhm)
+		call pargd (lfwhm)
 	}
 
 	# Mark line computed
-	call gline (gfd, w, cont, w, ycore)
-	call gline (gfd, w1, yl, w2, yl)
+	call gline (gfd, real(w), cont, real(w), real(ycore))
+	call gline (gfd, real(w1), real(yl), real(w2), real(yl))
 
 	w1 = w - 2 * gfwhm
 	w2 = cont + rcore * exp (-(1.665109*(w1-w)/gfwhm)**2)
 	call gseti (gfd, G_PLTYPE, 2)
 	call gseti (gfd, G_PLCOLOR, 2)
-	call gamove (gfd, w1, w2)
+	call gamove (gfd, real(w1), real(w2))
 	for (; w1 <= w+2*gfwhm; w1=w1+0.05*gfwhm) {
 	    w2 = cont + rcore * exp (-(1.665109*(w1-w)/gfwhm)**2)
-	    call gadraw (gfd, w1, w2)
+	    call gadraw (gfd, real(w1), real(w2))
 	}
 	call gseti (gfd, G_PLTYPE, 1)
 	call gseti (gfd, G_PLCOLOR, 1)
@@ -212,15 +215,27 @@ end
 
 procedure para (x, y, c)
 
-real	x[ARB], y[ARB], c[3]
+double	x[3], y[3], c[3]
+double  x12, x13, x23, x213, x223, y13, y23
 
 begin
-	c[3] = (y[1]-y[2]) * (x[2]-x[3]) / (x[1]-x[2]) - (y[2]-y[3])
-	c[3] = c[3] / ((x[1]**2-x[2]**2) * (x[2]-x[3]) / (x[1]-x[2]) -
-		(x[2]**2-x[3]**2))
+        x12 = x[1] - x[2]
+        x13 = x[1] - x[3]
+        x23 = x[2] - x[3]
 
-	c[2] = (y[1] - y[2]) - c[3] * (x[1]**2 - x[2]**2)
-	c[2] = c[2] / (x[1] - x[2])
+	if (x12 == 0. || x13 == 0. || x23 == 0.)
+	    call error (1, "X points are not distinct")
 
-	c[1] = y[1] - c[2] * x[1] - c[3] * x[1]**2
+	# Compute relative to an origin at x[3]
+        x213 = x13 * x13
+        x223 = x23 * x23
+        y13 = y[1] - y[3]
+        y23 = y[2] - y[3]
+        c[3] = (y13 - y23 * x13 / x23) / (x213 - x223 * x13 / x23)
+        c[2] = (y23 - c[3] * x223) / x23
+        c[1] = y[3]
+
+	# Compute relative to an origin at 0.
+	c[1] = c[1] - x[3] * (c[2] - c[3] * x[3])
+	c[2] = c[2] - 2 * c[3] * x[3]
 end

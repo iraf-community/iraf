@@ -1,7 +1,7 @@
 include <imhdr.h>
 include <math.h>
 include <mwset.h>
-include "../../lib/skywcs.h"
+include <pkg/skywcs.h>
 
 # Define the possible pixel types
 
@@ -101,7 +101,7 @@ begin
                 pixsys = PIXTYPE_PHYSICAL
             else
                 pixsys = PIXTYPE_LOGICAL
-            call sk_seti (coo, S_PTYPE, pixsys)
+            call sk_seti (coo, S_PIXTYPE, pixsys)
 	} else {
 	    dt = dtmap (Memc[database], READ_ONLY)
 	    reclist = imtopenp ("solutions")
@@ -420,7 +420,7 @@ begin
 
         # Recompute and store the new wcs if update is enabled.
         call mw_saxmap (mwnew, Memi[axno], Memi[axval], ndim)
-        if (sk_stati (coo, S_PTYPE) == PIXTYPE_PHYSICAL) {
+        if (sk_stati (coo, S_PIXTYPE) == PIXTYPE_PHYSICAL) {
             call mw_swtermd (mwnew, Memd[nr], Memd[w], Memd[ncd], ndim)
         } else {
             call mwmmuld (Memd[ncd], Memd[ltm], Memd[cd], ndim)
@@ -437,7 +437,7 @@ begin
             call sk_seti (coo, S_PLNGAX, ax2)
             call sk_seti (coo, S_PLATAX, ax1)
         }
-        call sk_hdrsaveim (coo, mwnew, im)
+        call sk_saveim (coo, mwnew, im)
         call mw_saveim (mwnew, im)
         call mw_close (mwnew)
         call mw_close (mw)
@@ -629,7 +629,7 @@ begin
             if (pixsys != PIXTYPE_PHYSICAL)
                 pixsys = PIXTYPE_LOGICAL
         }
-        call sk_seti (coo, S_PTYPE, pixsys)
+        call sk_seti (coo, S_PIXTYPE, pixsys)
 
 
         # Get the reference point units.

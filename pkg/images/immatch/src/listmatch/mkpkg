@@ -7,6 +7,6 @@ $exit
 
 
 libpkg.a:
-	t_imctroid.x	<error.h> <imhdr.h>
+	t_imctroid.x	<error.h> <mach.h> <imhdr.h>
 	t_xyxymatch.x	<fset.h> "../../../lib/xyxymatch.h"
 	;

@@ -401,7 +401,7 @@ begin
 	if (gp != NULL) {
 	    call sprintf (Memc[title], IE_SZTITLE,
 		"%s: Radial profile at %s\n%s")
-	        call pargstr (IE_IMAGE(ie))
+	        call pargstr (IE_IMNAME(ie))
 	        call pargstr (Memc[coords])
 	        call pargstr (IM_TITLE(im))
 

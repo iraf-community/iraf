@@ -138,8 +138,9 @@ begin
 	# spectra have the same dispersion type.  Check for a
 	# reference spectrum.
 
-	if ((imaccf (im, "REFSPEC1") == NO) ||
-	    (dc > -1 && imaccf (im, "DCLOG1") == NO)) {
+	#if ((imaccf (im, "REFSPEC1") == NO) ||
+	#    (dc > -1 && imaccf (im, "DCLOG1") == NO)) {
+	if (imaccf (im, "REFSPEC1") == NO) {
 	    if (fd1 != NULL) {
 		call fprintf (fd1,
 		    "%s: Resampling using current coordinate system\n")
@@ -747,8 +748,9 @@ begin
 	# spectra have the same dispersion type.  Check for a
 	# reference spectrum.
 
-	if ((imaccf (im, "REFSPEC1") == NO) ||
-	    (dc > -1 && imaccf (im, "DCLOG1") == NO)) {
+	#if ((imaccf (im, "REFSPEC1") == NO) ||
+	#    (dc > -1 && imaccf (im, "DCLOG1") == NO)) {
+	if (imaccf (im, "REFSPEC1") == NO) {
 	    if (fd1 != NULL) {
 		call fprintf (fd1,
 		    "%s: Resampling using current coordinate system\n")

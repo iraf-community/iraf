@@ -62,8 +62,12 @@
       integer mem( 60000)
       common/cdsmem/mem
       integer sret(7)
+      integer sepro(12)
       data sret(1)/114/,sret(2)/101/,sret(3)/116/,sret(4)/117/,sret(5)/1
      *14/,sret(6)/110/,sret(7)/-2/
+      data sepro(1)/99/,sepro(2)/97/,sepro(3)/108/,sepro(4)/108/,sepro(5
+     *)/32/,sepro(6)/122/,sepro(7)/122/,sepro(8)/101/,sepro(9)/112/,sepr
+     *o(10)/114/,sepro(11)/111/,sepro(12)/-2/
       if (.not.(esp .ne. 0))goto 23000
       call synerr (36HUnmatched 'iferr' or 'then' keyword.)
 23000 continue
@@ -78,6 +82,9 @@
       if (.not.(retlab .ne. 0))goto 23004
       call outnum (retlab)
 23004 continue
+      call outtab
+      call outstr (sepro)
+      call outdon
       call outtab
       call outstr (sret)
       call outdon

@@ -1,5 +1,5 @@
 include <fset.h>
-include "../../lib/skywcs.h"
+include <pkg/skywcs.h>
 include "../../lib/xyxymatch.h"
 
 # T_CCXYMATCH -- This task computes the intersection of a set of pixel

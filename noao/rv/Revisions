@@ -1,5 +1,65 @@
 .help revisions May92 noao.rv
 .nf
+=====
+V2.12
+=====
+
+doc/rvidlines.hlp
+	Expanded on what keywords from KEYWPARS are used and how.
+	(2/12/02, Valdes)
+
+rvidlines/idvhelio.x
+	The specified UT keyword is now used rather than the time given in
+	the date keyword.  To use the time in the date keyword, the UT
+	keyword can be set to be the same as the date keyword and the
+	UT will be parsed out of the string.  So the UT keyword can be
+	either a time value or a date/time string value.  This is consistent
+	with changes in ASTUTIL.
+	(2/12/02, Valdes)
+
+splitplot.x
+	Fixed a bug in moving the correlation X data to the plotting array
+	which would sometimes cause the ccf plot to not be drawn correctly.
+	(10/18/00)
+
+rvsumplot.x
+	Move the 'fit did not converge' message to a more readable location
+	on the plot.  (10/18/00)
+
+fftutil.x
+        Fixed a typo that was causing the fftmode plots to be computed
+        using the entire spectrum instead of taking into account the
+        sample regions specified. (08/22/00)
+
+fftmode.x
+prepspec.x
+splitplot.x
+rvfftcorr.x
+        Additional fixes to the filter overlay plotting code.  Also revealed
+        a problem in the display of the FFT plots. (08/22/00)
+
+fftmode.x
+        Fixed a bug in the filter overlay plotting (8/17/00)
+
+rvwrite.x
+	Changed the output of the HJD to use modulo 10000 rather than
+	constants such as 2450000.  (3/30/00)
+
+coloncmds.x
+doc/fxcor.hlp
+	Changed the behavior of the :apnum command so that it won't reset
+	the sample regions.  This was originally done to protect against
+	bogus sample regions in echelle data where moving through orders
+	would invalidate the regions, but harms multispec users who must
+	reset the regions manually.  Updated help page (3/23/00)
+
+=======
+V2.11.3
+=======
+
+rvrvcor.x
+        Fixed a bug where the DATE-OBS in the for CCYY-MM-DD wasn't checking
+        for an INDEFD UT causing an overflow (12/23/99)
 
 rvidlines/idmap.x
 	The SFREE added earlier was in the wrong place causing 1D images

@@ -2,6 +2,7 @@
 
 include	<ctype.h>
 include	<gset.h>
+include	<gio.h>
 include	"gtools.h"
 	
 # GT_LABAX -- Set graphics axis.
@@ -123,7 +124,8 @@ begin
 		call pargr (wx2)
 		call pargr (wy1)
 		call pargr (wy2)
-	    call gmsg (gp, "gtwcs", Memc[title])
+	    if (GP_UIFNAME(gp) != EOS)
+		call gmsg (gp, "gtwcs", Memc[title])
 
 	    call mfree (title, TY_CHAR)
 	    call mfree (xlabel, TY_CHAR)

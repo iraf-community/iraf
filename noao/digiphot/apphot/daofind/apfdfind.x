@@ -1,3 +1,4 @@
+include <imhdr.h>
 include "../lib/apphot.h"
 include "../lib/display.h"
 include "../lib/find.h"
@@ -7,7 +8,7 @@ define	HELPFILE	"apphot$daofind/daofind.key"
 # AP_FDFIND -- Find objects in an image interactively.
 
 int procedure ap_fdfind (denname, skyname, ap, im, gd, id, out, boundary,
-	constant, save, skysave, interactive)
+	constant, save, skysave, interactive, cache)
 
 char	denname[ARB]		# name of density enhancement image
 char	skyname[ARB]		# name of the fitted sky image
@@ -21,14 +22,16 @@ real	constant		# constatn for constant boundary extension
 int	save			# save convolved image
 int	skysave			# save the sky image
 int	interactive		# interactive mode
+int	cache			# cache the input image pixels
 
-int	wcs, key, newimage, newden, newfit, stid
-pointer	sp, cmd, root, den, sky
 real	wx, wy
+pointer	sp, cmd, root, den, sky
+int	wcs, key, newimage, newden, newfit, stid, memstat, req_size, old_size
+int	buf_size
 
-int	clgcur(), apgqverify(), apgtverify()
-pointer	ap_immap()
 real	apstatr()
+pointer	ap_immap()
+int	clgcur(), apgqverify(), apgtverify(), sizeof(), ap_memstat()
 
 begin
 	call smark (sp)
@@ -46,6 +49,7 @@ begin
 	newimage = NO
 	newden = YES
 	newfit = YES
+	memstat = NO
 
 	# Loop over the cursor commands.
 	stid = 1
@@ -53,6 +57,7 @@ begin
 	    EOF) {
 
 	    # Store the current cursor coordinates.
+	    call ap_vtol (im, wx, wy, wx, wy, 1)
 	    call apsetr (ap, CWX, wx)
 	    call apsetr (ap, CWY, wy)
 
@@ -73,6 +78,13 @@ begin
 			call imunmap (sky)
 		    return (apgtverify (key))
 		} else {
+		    if (den != NULL) {
+	    	        call imunmap (den)
+		        if (save == NO)
+	    	            call imdelete (denname)
+		    }
+		    if (sky != NULL)
+			call imunmap (sky)
 		    call sfree (sp)
 		    return (YES)
 		}
@@ -86,13 +98,16 @@ begin
 
 	    # Plot a centered stellar radial profile
 	    case 'd':
-		call ap_qrad (ap, im, wx, wy, gd)
+		if (interactive == YES)
+		    call ap_qrad (ap, im, wx, wy, gd)
 
 	    # Interactively set the daofind parameters.
 	    case 'i':
-		call ap_fdradsetup (ap, im, wx, wy, gd, out, stid)
-		newden = YES
-		newfit = YES
+		if (interactive == YES) {
+		    call ap_fdradsetup (ap, im, wx, wy, gd, out, stid)
+		    newden = YES
+		    newfit = YES
+		}
 
 	    # Verify the critical daofind parameters.
 	    case 'v':
@@ -110,9 +125,15 @@ begin
 		    newden, newfit)
 
 		# Determine the viewport and data window of image display.
-		if ((newimage == YES) && (id != NULL) && (id != gd)) {
-		    call apstats (ap, IMNAME, Memc[cmd], SZ_LINE)
-		    call ap_gswv (id, Memc[cmd], im, 4)
+		if (newimage == YES) {
+		    if ((id != NULL) && (id != gd))
+		        call ap_gswv (id, Memc[cmd], im, 4)
+            	    req_size = MEMFUDGE * (IM_LEN(im,1) * IM_LEN(im,2) *
+                	sizeof (IM_PIXTYPE(im)) + 2 * IM_LEN(im,1) *
+			IM_LEN(im,2) * sizeof (TY_REAL))
+                    memstat = ap_memstat (cache, req_size, old_size)
+                    if (memstat == YES)
+                        call ap_pcache (im, INDEFI, buf_size)
 		}
 		newimage = NO
 
@@ -126,12 +147,16 @@ begin
 		        call imdelete (denname)
 		    }
 		    den = ap_immap (denname, im, ap, save)
+                    if (memstat == YES)
+                        call ap_pcache (den, INDEFI, buf_size)
 
 		    if (sky != NULL)
 			call imunmap (sky)
-		    if (skysave == YES)
+		    if (skysave == YES) {
 		        sky = ap_immap (skyname, im, ap, YES)
-		    else
+                        if (memstat == YES)
+                            call ap_pcache (den, INDEFI, buf_size)
+		    } else
 			sky = NULL
 		    newden = NO
 
@@ -158,7 +183,7 @@ begin
 		    }
 
 		} else {
-		    call printf ("Detection parameters have not changed\7\n")
+		    call printf ("Detection parameters have not changed\n")
 		}
 
 		if (id != NULL) {
@@ -174,7 +199,7 @@ begin
 
 	    default:
 		# do nothing
-		call printf ("Unknown or ambiguous keystroke command\7\n")
+		call printf ("Unknown or ambiguous keystroke command\n")
 	    }
 
 	    # Setup for the next object.

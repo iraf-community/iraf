@@ -3,23 +3,24 @@ include <imhdr.h>
 include <math.h>
 include <mwset.h>
 include <math/gsurfit.h>
-include "../../lib/skywcs.h"
+include <pkg/skywcs.h>
 
 procedure t_imcctran ()
 
-bool	verbose, update
 double	tilng, tilat, tolng, tolat, xscale, yscale, xrot, yrot, xrms, yrms
-int	imlist, nxgrid, nygrid, npts, instat, outstat, ndim, fitstat, axbits
-pointer	sp, imtemplate, insystem, outsystem, image
+double	olongpole, olatpole, nlongpole, nlatpole
+pointer	sp, imtemplate, insystem, outsystem, image, str
 pointer	im, mwin, cooin, mwout, cooout, ctin, ctout
 pointer	r, w, cd, ltm, ltv, iltm, nr, ncd, jr
 pointer	ix, iy, ox, oy, ilng, ilat, olng, olat
+int	imlist, nxgrid, nygrid, npts, instat, outstat, ndim, fitstat, axbits
+bool	uselp, verbose, update, usecd
 
-bool	clgetb()
 double	rg_rmsdiff()
+pointer	immap(), rg_xytoxy(), mw_newcopy()
 int	fstati(), imtopen(), imtgetim(), sk_decim(), sk_decwcs(), mw_stati()
 int	clgeti(), sk_stati(), rg_cdfit()
-pointer	immap(), rg_xytoxy(), mw_newcopy()
+bool	clgetb(), rg_longpole()
 
 begin
 	if (fstati (STDOUT, F_REDIR) == NO)
@@ -31,6 +32,7 @@ begin
 	call salloc (insystem, SZ_FNAME, TY_CHAR)
 	call salloc (outsystem, SZ_FNAME, TY_CHAR)
 	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get the list of images and output coordinate system.
 	call clgstr ("image", Memc[imtemplate], SZ_FNAME)
@@ -40,6 +42,7 @@ begin
 	nxgrid = clgeti ("nx")
 	nygrid = clgeti ("ny")
 	npts = nxgrid * nygrid
+	uselp = clgetb ("longpole")
 	verbose = clgetb ("verbose")
 	update = clgetb ("update")
 
@@ -127,13 +130,6 @@ begin
             call mwinvertd (Memd[ltm], Memd[iltm], ndim)
             call mwmmuld (Memd[cd], Memd[iltm], Memd[ncd], ndim)
 
-	    # Output the current image wcs.
-	    if (verbose && ! update) {
-	        call printf ("\n")
-	        call rg_wcsshow (mwin, "Current", Memd[ltv], Memd[ltm], Memd[w],
-		    Memd[nr], Memd[ncd], ndim)
-	    }
-
 	    # Compute the logical and world coordinates of the input image
 	    # grid points.
 	    call rg_rxyl (Memd[ix], Memd[iy], nxgrid, nygrid, 1.0d0,
@@ -148,11 +144,7 @@ begin
 	    call rg_lltransform (cooin, cooout, Memd[ilng], Memd[ilat],
 		Memd[olng], Memd[olat], npts)
 
-	    # Initialize the output transfrom.
-	    mwout = mw_newcopy (mwin)
-
-	    # Compute the new world coordinates of the reference point and
-	    # update the reference point vector.
+	    # Get the reference point.
 	    if (sk_stati(cooin, S_PLNGAX) < sk_stati(cooin, S_PLATAX)) {
 	        tilng = Memd[w+sk_stati(cooin,S_PLNGAX)-1]
 	        tilat = Memd[w+sk_stati(cooin,S_PLATAX)-1]
@@ -160,6 +152,23 @@ begin
 	        tilng = Memd[w+sk_stati(cooin,S_PLATAX)-1]
 	        tilat = Memd[w+sk_stati(cooin,S_PLNGAX)-1]
 	    }
+
+	    # Compute the value of longpole and latpole required to transform
+	    # the coordinate system.
+	    usecd = rg_longpole (mwin, cooin, cooout, tilng, tilat, olongpole,
+		olatpole, nlongpole, nlatpole) 
+	    if (uselp)
+		usecd = false
+
+	    # Output the current image wcs.
+	    if (verbose && ! update) {
+	        call printf ("\n")
+	        call rg_wcsshow (mwin, "Current", Memd[ltv], Memd[ltm], Memd[w],
+		    Memd[nr], Memd[ncd], ndim, olongpole, olatpole)
+	    }
+
+	    # Compute the new world coordinates of the reference point and
+	    # update the reference point vector.
 	    call rg_lltransform (cooin, cooout, tilng, tilat, tolng, tolat, 1)
 	    if (sk_stati(cooout, S_PLNGAX) < sk_stati(cooout, S_PLATAX)) {
 	        Memd[w+sk_stati(cooout,S_PLNGAX)-1] = tolng
@@ -169,66 +178,105 @@ begin
 	        Memd[w+sk_stati(cooout,S_PLATAX)-1] = tolng
 	    }
 	    
-	    # Set the cd matrix.
-	    #axbits = 2 ** (sk_stati (cooout, S_XLAX) - 1) +
-	        #2 ** (sk_stati (cooout, S_YLAX) - 1)
-	    #call rg_setcd (mwout, Memd[cd], Memd[cd], ndim, axbits)
+	    # Initialize the output transfrom.
+	    mwout = mw_newcopy (mwin)
 
 	    # Set the terms.
 	    call mw_swtermd (mwout, Memd[r], Memd[w], Memd[cd], ndim)
 
-	    # Compute the new x and y values.
-	    ctout = rg_xytoxy (mwout, Memd[olng], Memd[olat], Memd[ox],
-	        Memd[oy], npts, "world", "logical", sk_stati (cooout, S_XLAX),
-		sk_stati (cooout, S_YLAX))
+	    if (usecd) {
 
-	    # Subtract off the origin and compute the coordinate system
-	    # rotation angle and scale factor.
-	    call asubkd (Memd[ix], Memd[nr+sk_stati(cooin, S_XLAX)-1],
-	        Memd[ix], npts) 
-	    call asubkd (Memd[iy], Memd[nr+sk_stati(cooin, S_YLAX)-1],
-	        Memd[iy], npts) 
-	    call asubkd (Memd[ox], Memd[nr+sk_stati(cooout, S_XLAX)-1],
-	        Memd[ox], npts) 
-	    call asubkd (Memd[oy], Memd[nr+sk_stati(cooout, S_YLAX)-1],
-	        Memd[oy], npts) 
-	    fitstat = rg_cdfit (Memd[ix], Memd[iy], Memd[ox], Memd[oy], npts,
-	        xscale, yscale, xrot, yrot)
+	        # Compute the new x and y values.
+	        ctout = rg_xytoxy (mwout, Memd[olng], Memd[olat], Memd[ox],
+	            Memd[oy], npts, "world", "logical", sk_stati (cooout,
+		    S_XLAX), sk_stati (cooout, S_YLAX))
+
+	        # Subtract off the origin and compute the coordinate system
+	        # rotation angle and scale factor.
+	        call asubkd (Memd[ix], Memd[nr+sk_stati(cooin, S_XLAX)-1],
+	            Memd[ix], npts) 
+	        call asubkd (Memd[iy], Memd[nr+sk_stati(cooin, S_YLAX)-1],
+	            Memd[iy], npts) 
+	        call asubkd (Memd[ox], Memd[nr+sk_stati(cooout, S_XLAX)-1],
+	            Memd[ox], npts) 
+	        call asubkd (Memd[oy], Memd[nr+sk_stati(cooout, S_YLAX)-1],
+	            Memd[oy], npts) 
+	        fitstat = rg_cdfit (Memd[ix], Memd[iy], Memd[ox], Memd[oy],
+		    npts, xscale, yscale, xrot, yrot)
+
+	    } else {
+
+		ctout = NULL
+		xscale = 1.0d0
+		yscale = 1.0d0
+		xrot = 0.0d0
+		yrot = 0.0d0
+		fitstat = OK
+	    }
 
 	    if (fitstat == OK) {
 
 		# Modify the cd matrix.
-	        axbits = 2 ** (sk_stati (cooout, S_XLAX) - 1) +
-	            2 ** (sk_stati (cooout, S_YLAX) - 1)
-	        call rg_mwxyrot (mwout, xscale, yscale, xrot, yrot, Memd[ncd],
-		    Memd[cd], ndim, axbits)
-	        call mwmmuld (Memd[cd], Memd[ltm], Memd[ncd], ndim)
-		call mwinvertd (Memd[ltm], Memd[iltm], ndim)
-		call asubd (Memd[nr], Memd[ltv], Memd[r], ndim)
-		call mwvmuld (Memd[iltm], Memd[r], Memd[jr], ndim)
-	        call mw_swtermd (mwout, Memd[jr], Memd[w], Memd[ncd], ndim)
+		if (usecd) {
+
+	            axbits = 2 ** (sk_stati (cooout, S_XLAX) - 1) +
+	                2 ** (sk_stati (cooout, S_YLAX) - 1)
+	            call rg_mwxyrot (mwout, xscale, yscale, xrot, yrot,
+		        Memd[ncd], Memd[cd], ndim, axbits)
+	            call mwmmuld (Memd[cd], Memd[ltm], Memd[ncd], ndim)
+		    call mwinvertd (Memd[ltm], Memd[iltm], ndim)
+		    call asubd (Memd[nr], Memd[ltv], Memd[r], ndim)
+		    call mwvmuld (Memd[iltm], Memd[r], Memd[jr], ndim)
+	            call mw_swtermd (mwout, Memd[jr], Memd[w], Memd[ncd], ndim)
+
+		# Modify longpole and latpole.
+		} else {
+		    call sprintf (Memc[str], SZ_LINE, "%g")
+			call pargd (nlongpole)
+		    #call eprintf ("longpole='%s'\n")
+			#call pargstr (Memc[str])
+		    call mw_swattrs (mwout, sk_stati(cooout, S_PLNGAX),
+		        "longpole", Memc[str])
+		    call sprintf (Memc[str], SZ_LINE, "%g")
+			call pargd (nlatpole)
+		    #call eprintf ("latpole='%s'\n")
+			#call pargstr (Memc[str])
+		    call mw_swattrs (mwout, sk_stati(cooout, S_PLATAX),
+		        "latpole", Memc[str])
+		    call amovd (Memd[ncd], Memd[cd], ndim * ndim)
+		}
 
 	        # Compute and print the goodness of fit estimate.
 	        if (verbose) {
-		    call mw_ctfree (ctout)
+		    if (ctout != NULL)
+		        call mw_ctfree (ctout)
 	            ctout = rg_xytoxy (mwout, Memd[olng], Memd[olat],
 		        Memd[ox], Memd[oy], npts, "world", "logical",
 		        sk_stati (cooout, S_XLAX), sk_stati (cooout, S_YLAX))
-	    	    call aaddkd (Memd[ix], Memd[nr+sk_stati(cooout, S_XLAX)-1],
-	        	Memd[ix], npts) 
-	    	    call aaddkd (Memd[iy], Memd[nr+sk_stati(cooout, S_YLAX)-1],
-	        	Memd[iy], npts) 
+		    if (usecd) {
+	    	        call aaddkd (Memd[ix], Memd[nr+sk_stati(cooout,
+			    S_XLAX)-1], Memd[ix], npts) 
+	    	        call aaddkd (Memd[iy], Memd[nr+sk_stati(cooout,
+			    S_YLAX)-1], Memd[iy], npts) 
+		    }
 	            xrms = rg_rmsdiff (Memd[ox], Memd[ix], npts)
 	            yrms = rg_rmsdiff (Memd[oy], Memd[iy], npts)
 		}
 
 	        # Recompute and store the new wcs if update is enabled.
 	        if (update) {
-		    call sk_hdrsavim (cooout, mwout, im)
+		    call sk_saveim (cooout, mwout, im)
 		    call mw_saveim (mwout, im)
-	        } else if (verbose)
-	            call rg_wcsshow (mwin, "New", Memd[ltv], Memd[ltm], Memd[w],
-		        Memd[nr], Memd[cd], ndim)
+	        } else if (verbose) {
+		    if (usecd)
+	                call rg_wcsshow (mwin, "New", Memd[ltv], Memd[ltm],
+			    Memd[w], Memd[nr], Memd[cd], ndim, olongpole,
+			    olatpole)
+		    else
+	                call rg_wcsshow (mwin, "New", Memd[ltv], Memd[ltm],
+			    Memd[w], Memd[nr], Memd[cd], ndim, nlongpole,
+			    nlatpole)
+		}
 
 		if (verbose) {
 		    call printf (
@@ -294,7 +342,7 @@ end
 
 # RG_WCSSHOW -- Print a quick summary of the current wcs.
 
-procedure rg_wcsshow (mwin, label, ltv, ltm, w, r, cd, ndim)
+procedure rg_wcsshow (mwin, label, ltv, ltm, w, r, cd, ndim, longpole, latpole)
 
 pointer	mwin			#I pointer to the current wcs
 char	label[ARB]		#I name of the input label
@@ -304,6 +352,8 @@ double	w[ARB]			#I the fits crval parameters
 double	r[ARB]			#I the fits crpix parameters
 double	cd[ndim,ARB]		#I the fits rotation matrix
 int	ndim			#I the dimension of the wcs
+double	longpole		#I the longpole value assumed
+double	latpole			#I the latpole value assumed
 
 int	i,j
 pointer	sp, str
@@ -353,9 +403,348 @@ begin
 	    call printf ("\n")
 	}
 
+	# Print longpole / latpole
+	call printf ("    Poles  ")
+	call printf ("%10.4f  %10.4f\n")
+	    call pargd (longpole)
+	    call pargd (latpole)
+
 	call printf ("\n")
 
 	call sfree (sp)
+end
+
+
+# RG_LONGPOLE -- Compute the value of longpole and latpole required to
+# transform the input celestial coordinate system to the output celestial
+# coordinate system, and determine whether this mode of transformation
+# is required for the specified projection.
+
+bool procedure rg_longpole (mwin, incoo, outcoo, ilng, ilat, ilngpole,
+	ilatpole, olngpole, olatpole) 
+
+pointer	mwin		#I the input image coordinate system descriptor
+pointer	incoo		#I the input celestial coordinate system descriptor
+pointer	outcoo		#I the output celestial coordinate system descriptor
+double	ilng		#I the input celestial ra / longitude coordinate (deg)
+double	ilat		#I the input celestial dec / latitude coordinate (deg)
+double	ilngpole	#O the input system longpole value (deg)
+double	ilatpole	#O the input system latpole value (deg)
+double	olngpole	#O the output system longpole value (deg)
+double	olatpole	#O the output system latpole value (deg)
+
+double	tilngpole, tilatpole, thetaa, theta0, tilng, tilat, tilngp, tilatp
+double	ntilng, ntilat
+pointer	sp, str
+int	i, projection, ptype
+bool	usecd
+int	sk_stati(), rg_wrdstr(), strdic(), ctod()
+errchk	mw_gwattrs()
+
+begin
+	call smark (sp)
+	call salloc (str, SZ_LINE, TY_CHAR)
+
+	# Get the projection type
+	projection = sk_stati (incoo, S_WTYPE)
+	if (projection <= 0)
+	    projection = WTYPE_LIN
+	if (rg_wrdstr (projection, Memc[str], SZ_FNAME,
+	    PTYPE_LIST) != projection) 
+	    call strcpy ("z", Memc[str], SZ_FNAME)
+	ptype = strdic (Memc[str], Memc[str], SZ_FNAME, PTYPE_NAMES)
+	if (ptype <= 0)
+	    ptype = PTYPE_ZEN
+
+	# Get the input value of longpole if any.
+        iferr {
+            call mw_gwattrs (mwin, 1, "longpole", Memc[str], SZ_LINE)
+        } then {
+            iferr {
+                call mw_gwattrs (mwin, 2, "longpole", Memc[str], SZ_LINE)
+            } then {
+                tilngpole = INDEFD
+            } else {
+                i = 1
+                if (ctod (Memc[str], i, tilngpole) <= 0)
+                    tilngpole = INDEFD
+            }
+        } else {
+            i = 1
+            if (ctod (Memc[str], i, tilngpole) <= 0)
+                tilngpole = INDEFD
+        }
+	ilngpole = tilngpole
+
+	# Get the input value of latpole if any.
+        iferr {
+            call mw_gwattrs (mwin, 1, "latpole", Memc[str], SZ_LINE)
+        } then {
+            iferr {
+                call mw_gwattrs (mwin, 2, "latpole", Memc[str], SZ_LINE)
+            } then {
+                tilatpole = INDEFD
+            } else {
+                i = 1
+                if (ctod (Memc[str], i, tilatpole) <= 0)
+                    tilatpole = INDEFD
+            }
+        } else {
+            i = 1
+            if (ctod (Memc[str], i, tilatpole) <= 0)
+                tilatpole = INDEFD
+        }
+	ilatpole = tilatpole
+
+	# Get the input value of thetaa if any.
+        iferr {
+            call mw_gwattrs (mwin, 1, "projp1", Memc[str], SZ_LINE)
+        } then {
+            iferr {
+                call mw_gwattrs (mwin, 2, "projp1", Memc[str], SZ_LINE)
+            } then {
+                thetaa = INDEFD
+            } else {
+                i = 1
+                if (ctod (Memc[str], i, thetaa) <= 0)
+                    thetaa = INDEFD
+            }
+        } else {
+            i = 1
+            if (ctod (Memc[str], i, thetaa) <= 0)
+                thetaa = INDEFD
+	}
+
+	# Determine theta0.
+	switch (ptype) {
+	case PTYPE_ZEN:
+	    theta0 = DHALFPI
+	    usecd = true
+	case PTYPE_CYL:
+	    theta0 = 0.0d0
+	    usecd = false
+	case PTYPE_CON:
+	    if (IS_INDEFD(thetaa))
+		call error (0, "Invalid conic projection parameter thetaa")
+	    else
+	        theta0 = DDEGTORAD(thetaa)
+	    usecd = false
+	case PTYPE_EXP:
+	    theta0 = DHALFPI
+	    usecd = false
+	    #usecd = true
+	}
+
+	# Convert the input coordinates to radians.
+	tilng = DDEGTORAD (ilng)
+	tilat = DDEGTORAD (ilat)
+
+	# Determine the appropriate value of longpole and convert to radians.
+	if (IS_INDEFD(tilngpole)) {
+	    if (tilat < theta0)
+		tilngpole = DPI
+	    else
+		tilngpole = 0.0d0
+	} else
+	    tilngpole = DDEGTORAD (tilngpole)
+	if (! IS_INDEFD(tilatpole))
+	    tilatpole = DDEGTORAD (tilatpole)
+
+	# Compute the celestial coordinates of the pole in the old system
+	# and latpole.
+	switch (ptype) {
+	case PTYPE_ZEN, PTYPE_EXP:
+	    tilngp = tilng
+	    tilatp = DHALFPI - tilat
+	default:
+	    call rg_cnpole (tilng, tilat, theta0, tilngpole, tilatpole,
+	        tilngp, tilatp)
+	}
+	#call eprintf ("%0.5f %0.5f %0.5f %0.5f %0.5f %0.5f %0.5f\n")
+	    #call pargd (DRADTODEG(tilng))
+	    #call pargd (DRADTODEG(tilat))
+	    #call pargd (DRADTODEG(theta0))
+	    #call pargd (DRADTODEG(tilngpole))
+	    #if (IS_INDEFD(tilatpole))
+		#call pargd (INDEFD)
+	    #else
+	        #call pargd (DRADTODEG(tilatpole))
+	    #call pargd (DRADTODEG(tilngp))
+	    #call pargd (DRADTODEG(tilatp))
+
+	# Compute the celestial coordinates in the old celestial coordinate
+	# system of the pole of the new coordinate system.  Note that
+	# because the original coordinate system is a sky coordinate
+	# system that the input and output coordinate units are degrees.
+
+	call rg_lltransform (outcoo, incoo, 0.0d0, 90.0d0, ntilng, ntilat, 1)
+	#call eprintf ("%0.5f %0.5f\n")
+	    #call pargd (ntilng)
+	    #call pargd (ntilat)
+
+	# Compute the new longpole and latpole.
+	call rg_celtonat (DDEGTORAD(ntilng), DDEGTORAD(ntilat), tilngp, tilatp,
+	    tilngpole, olngpole, olatpole)
+	olngpole = DRADTODEG(olngpole)
+	olatpole = DRADTODEG(olatpole)
+
+	call sfree (sp)
+
+	return (usecd)
+end
+
+
+# RG_CNPOLE -- Give the celestial coordinates of the reference point, the
+# native latitude of the reference point, and the native longitude
+# of the celestial pole, compute the celestial coordinates of the native
+# pole.
+
+procedure rg_cnpole (ra, dec, theta0, longp, latp, rap, decp)
+
+double  ra              #I the reference point ra / longitude in radians
+double  dec             #I the reference point dec / latitude in radians
+double  theta0          #I the native latitude of the reference point in radians
+double  longp           #I the native longpole of the celestial pole in radians
+double  latp            #I the native latitude of the celestial pole in radians
+double  rap             #O the ra of native pole in radians (Euler angle 1)
+double  decp            #O the codec of native pole in radians (Euler angle 2)
+
+double  clat0, slat0, cphip, sphip, cthe0, sthe0, x, y, z, u, v, latp1, latp2
+double  tol, maxlat, tlatp
+data    tol /1.0d-10/
+
+begin
+        clat0 = cos (dec)
+        slat0 = sin (dec)
+        cphip = cos (longp)
+        sphip = sin (longp)
+        cthe0 = cos (theta0)
+        sthe0 = sin (theta0)
+        x = cthe0 * cphip
+        y = sthe0
+        z = sqrt (x * x + y * y)
+
+        if (z == 0.0d0) {
+
+            if (slat0 != 0.0d0)
+                call error (0, "Invalid projection parameters")
+
+            if (IS_INDEFD(latp))
+                call error (0, "Undefined latpole value")
+
+            tlatp = latp
+
+        } else {
+
+            if (abs (slat0 / z) > 1.0d0)
+                call error (0, "Invalid projection parameters")
+
+            u = atan2 (y, x)
+            v = acos (slat0 / z)
+
+            latp1 = u + v
+            if (latp1 > DPI)
+                latp1 = latp1 - DTWOPI
+            else if (latp1 < -DPI)
+                latp1 = latp1 + DTWOPI
+
+            latp2 = u - v
+            if (latp2 > DPI)
+                latp2 = latp2 - DTWOPI
+            else if (latp2 < -DPI)
+                latp2 = latp2 + DTWOPI
+
+            if (IS_INDEFD(latp))
+                maxlat = 999.0d0
+            else
+                maxlat = latp
+            if (abs(maxlat - latp1) < abs(maxlat - latp2)) {
+                if (abs(latp1) < (DHALFPI + tol))
+                    tlatp = latp1
+                else
+                    tlatp = latp2
+            } else {
+                if (abs(latp2) < (DHALFPI + tol))
+                    tlatp = latp2
+                else
+                    tlatp = latp1
+            }
+        }
+        decp = DHALFPI - tlatp
+
+        # Determine the celestial longitude of the native pole.
+        z = cos (tlatp) * clat0
+        if (abs(z) < tol) {
+            if (abs(clat0) < tol) {
+                rap = ra
+                decp = DHALFPI - theta0
+            } else if (tlatp > 0.0d0) {
+                rap = ra + longp - DPI
+                decp = 0.0d0
+            } else if (tlatp < 0.0d0) {
+                rap = ra - longp
+                decp = DPI
+            }
+        } else {
+            x = (sthe0 - sin (tlatp) * slat0) / z
+            y = sphip * cthe0 / clat0
+            if (x == 0.0d0 && y == 0.0d0)
+                call error (0, "Invalid projection parameters")
+            rap = ra - atan2 (y,x)
+        }
+        if (ra >= 0.0d0) {
+            if (rap < 0.0d0)
+                rap = rap + DTWOPI
+        } else {
+            if (rap > 0.0d0)
+                rap = rap - DTWOPI
+        }
+end
+
+
+# RG_CELTONAT - Convert celestial to native coordinates given the input Euler
+# angles coordinates of the native pole and the longitude of the celestial pole.
+
+procedure rg_celtonat (ra, dec, rap, decp, longpole, phi, theta)
+
+double  ra                      #I input ra/longitude
+double  dec                     #I input ra/longitude
+double  rap                     #I input euler angle 1 (rap)
+double  decp                    #I input euler angle 2 (90-latp)
+double  longpole                #I input euler angle 3 (longpole)
+double  phi                     #O output phi
+double theta                    #O output theta
+
+double  x, y, z, dphi
+
+begin
+        x = sin (dec) * sin (decp) - cos (dec) * cos (decp) * cos (ra - rap)
+        if (abs(x) < 1.0d-5)
+            x = -cos (dec + decp) + cos (dec) * cos(decp) * (1.0d0 -
+                cos (ra - rap))
+        y = -cos (dec) * sin (ra - rap)
+        if (x != 0.0d0 || y != 0.0d0)
+            dphi = atan2 (y,x)
+        else
+            dphi = ra - rap - DPI
+        phi = longpole + dphi
+        if (phi > DPI)
+            phi = phi - DTWOPI
+        else if (phi < -DPI)
+            phi = phi + DTWOPI
+        if (mod (ra - rap, DPI) == 0.0d0) {
+            theta = dec + cos (ra - rap) * decp
+            if (theta > DHALFPI)
+                theta = DPI - theta
+            if (theta < -DHALFPI)
+                theta = -DPI - theta
+        } else {
+            z = sin (dec) * cos (decp) + cos (dec) * sin(decp) * cos (ra - rap)
+            if (abs(z) > 0.99d0)
+                theta = sign (acos(sqrt (x*x + y*y)), z)
+            else
+                theta = asin (z)
+        }
 end
 
 

@@ -1,3 +1,4 @@
+include <gset.h>
 include <tbset.h>
 include "../lib/apseldef.h"
 include "../lib/psfdef.h"
@@ -5,7 +6,8 @@ include "../lib/psfdef.h"
 
 # DP_RPSTARS -- Read in the IDS and x and y positions of the PSF stars.
 
-procedure dp_rpstars (dao, im, pst, text_file, gd, mgd, matchbyid, showplots)
+procedure dp_rpstars (dao, im, pst, text_file, gd, mgd, id, mkstars,
+	matchbyid, showplots)
 
 pointer	dao		# pointer to the daophot structure
 pointer	im		# the input image descriptor
@@ -13,12 +15,15 @@ int	pst		# the psf star list file descriptor
 bool	text_file	# text or table file ?
 pointer	gd		# the graphics descriptor
 pointer	mgd		# the plot file descriptor
+pointer	id		# the display device descriptor
+bool	mkstars		# mark the stars added to the psf
 bool	matchbyid	# match psf stars by id or position
 bool	showplots	# show the psf star plots
 
-int	i, nrow, idno
-pointer	sp, fields, indices, key
 real	x, y, mag, rjunk
+pointer	sp, fields, indices, key
+int	i, nrow, idno
+real	dp_pstatr()
 int	tbpsta(), dp_apsel(), dp_addstar()
 
 begin
@@ -53,17 +58,34 @@ begin
 		call dp_tptread (pst, Memi[indices], idno, x, y, mag, i)
 	    }
 
+	    call dp_win (dao, im, x, y, x, y, 1)
+
 	    # Add it to the PSF star list.
 	    if (idno > 0) {
 		if (matchbyid) {
 	            if (dp_addstar (dao, im, x, y, mag, idno, gd, mgd,
 		        showplots) == OK) {
-		        ;
+			if (mkstars && id != NULL) {
+			    call gmark (id, dp_pstatr(dao, CUR_PSFX),
+			        dp_pstatr(dao, CUR_PSFY), GM_PLUS, -5.0, -5.0)
+			    if (id == gd)
+				call gflush (id)
+			    else
+				call gframe (id)
+			}
+			
 		    }
 		} else {
 	            if (dp_addstar (dao, im, x, y, INDEFR, 0, gd, mgd,
 		        showplots) == OK) {
-		        ;
+			if (mkstars && id != NULL) {
+			    call gmark (id, dp_pstatr(dao, CUR_PSFX),
+			        dp_pstatr(dao, CUR_PSFY), GM_PLUS, -5.0, -5.0)
+			    if (id == gd)
+				call gflush (id)
+			    else
+				call gframe (id)
+			}
 		    }
 		}
 	    }

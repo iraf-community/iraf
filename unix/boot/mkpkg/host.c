@@ -145,7 +145,7 @@ char	*irafdir;		/* iraf root directory		*/
 	 * Update the library.
 	 * ---------------------
 	 */
-#if defined(LINUX) || defined(BSD)
+#if defined(LINUX) || defined(BSD) || defined(MACOSX)
 	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, resolvefname(libfname));
 #else
 	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, libfname);
@@ -212,13 +212,15 @@ char	*library;		/* filename of library	*/
 	/* Skip the library rebuild if COFF format library. */
 	return (OK);
 #else
-	char	cmd[SZ_LINE+1];
-	char	libfname[SZ_PATHNAME+1];
+	char cmd[SZ_LINE+1];
+	char libfname[SZ_PATHNAME+1];
+	char *libpath;
 
 	/* Get the library file name. */
 	h_getlibname (library, libfname);
+	libpath = resolvefname (vfn2osfn(libfname,0));
 
-	sprintf (cmd, "%s %s", REBUILD, vfn2osfn(libfname,0));
+	sprintf (cmd, "%s %s", REBUILD, libpath);
 	if (verbose) {
 	    printf ("%s\n", cmd);
 	    fflush (stdout);
@@ -774,7 +776,8 @@ char *fname;
 		 * Let unix resolve any upwards references later, when the
 		 * file is accessed.
 		 */
-		strcpy (strrchr(pathname,'/') + 1, relpath);
+                char *str = strrchr(pathname,'/');
+                strcpy ((str ? (str+1) : pathname), relpath);
 	    }
 	}
 

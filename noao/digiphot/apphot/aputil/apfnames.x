@@ -133,28 +133,66 @@ end
 
 
 # APIMROOT -- Fetch the root image name minus the directory specification
-# and the section notation. The length of the root name is returned.
+# and the section notation.
 
-int procedure apimroot (image, root, maxch)
+procedure apimroot (image, root, maxch)
 
 char	image[ARB]		# image specification
-char	root[ARB]		# rootname
+char	root[ARB]		# output root name
 int	maxch			# maximum number of characters
 
-int	nchars
-pointer	sp, str
-int	fnldir(), strlen()
+pointer	sp, imroot, kernel, section, str
+int	clindex, clsize, nchars
+int	fnldir()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	call salloc (imroot, SZ_PATHNAME, TY_CHAR)
+	call salloc (kernel, SZ_FNAME, TY_CHAR)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_PATHNAME, TY_CHAR)
 
-	call imgimage (image, root, maxch)
-	nchars = fnldir (root, Memc[str], maxch)
-	call strcpy (root[nchars+1], root, maxch)
+        call imparse (image, Memc[imroot], SZ_PATHNAME, Memc[kernel], SZ_FNAME,
+            Memc[section], SZ_FNAME, clindex, clsize)
+	nchars = fnldir (Memc[imroot], Memc[str], SZ_PATHNAME)
+	if (clindex >= 0) {
+	    call sprintf (root, maxch, "%s[%d]%s%s")
+	        call pargstr (Memc[imroot+nchars])
+		call pargi (clindex)
+	        call pargstr (Memc[kernel])
+	        call pargstr (Memc[section])
+	} else {
+	    call sprintf (root, maxch, "%s%s%s")
+	        call pargstr (Memc[imroot+nchars])
+	        call pargstr (Memc[kernel])
+	        call pargstr (Memc[section])
+	}
 
 	call sfree (sp)
-	return (strlen (root))
+end
+
+
+
+# APFROOT -- Fetch the file name minus the directory specification,
+
+procedure apfroot (filename, root, maxch)
+
+char	filename[ARB]		# input file name 
+char	root[ARB]		# output root file name
+int	maxch			# maximum number of characters
+
+pointer	sp, str
+int	nchars
+int	fnldir()
+
+begin
+	call smark (sp)
+	call salloc (str, SZ_PATHNAME, TY_CHAR)
+
+	nchars = fnldir (filename, Memc[str], SZ_PATHNAME)
+	call strcpy (filename[nchars+1], root, maxch)
+
+	call sfree (sp)
 end
 
 

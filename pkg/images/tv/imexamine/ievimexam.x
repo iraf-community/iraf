@@ -100,7 +100,7 @@ begin
 
 	call sprintf (Memc[title], IE_SZTITLE, 
 	    "%s: Vector %.1f,%.1f to %.1f,%.1f naverage: %d\n%s")
-	    call pargstr (IE_IMAGE(ie))
+	    call pargstr (IE_IMNAME(ie))
 	    call pargr (x1)
 	    call pargr (y1)
 	    call pargr (x2)

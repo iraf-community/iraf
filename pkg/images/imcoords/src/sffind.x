@@ -261,7 +261,7 @@ begin
 		if (norm == YES)
 	            call sf_fconvolve (im, c1, c2, l1, l2, swidth, Memr[imbuf],
 		        Memr[denbuf], ncols, nlines, Memr[ngker2d], Memi[skip],
-			fwidth, fwidth, gsums[GAUSS_SGOP])
+			fwidth, fwidth)
 		else
 	            call sf_gconvolve (im, c1, c2, l1, l2, swidth, Memr[imbuf],
 		        Memr[denbuf], ncols, nlines, Memr[gker2d], Memi[skip],
@@ -498,7 +498,7 @@ real	xoff, yoff		#I the x and y coordinate offsets
 
 int	i, j, k, xmiddle, ymiddle, sumn
 double	pixval, sumix, sumiy, sumi, sumixx, sumixy, sumiyy, r2, dx, dy, diff
-real	mean
+double	mean
 
 begin
 	# Initialize
@@ -510,7 +510,23 @@ begin
 
 	    # Estimate the background using the input data and the
 	    # best fitting Gaussian amplitude
-	    mean = data[cols[i],ymiddle] - den[cols[i],ymiddle]
+	    sumn = 0
+	    sumi = 0.0
+	    do j = 1, nyk {
+		do k = 1, nxk {
+		    if (skip[k,j] == NO)
+			next
+		    pixval = data[cols[i]-xmiddle+k,j]
+		    if (pixval < datamin || pixval > datamax)
+			next
+		    sumi = sumi + pixval
+		    sumn = sumn + 1
+		}
+	    }
+	    if (sumn <= 0)
+	        mean = data[cols[i],ymiddle] - den[cols[i],ymiddle]
+	    else
+		mean = sumi / sumn
 
 	    # Compute the first order moments.
 	    sumi = 0.0
@@ -525,7 +541,7 @@ begin
 		    if (pixval < datamin || pixval > datamax)
 			next
 		    pixval = pixval - mean
-		    if (pixval < 0.0)
+		    if (pixval <= 0.0)
 			next
 		    sumi = sumi + pixval
 		    sumix = sumix + (cols[i] - xmiddle + k) * pixval
@@ -563,7 +579,7 @@ begin
 		    if (pixval < datamin || pixval > datamax)
 			next
 		    pixval = pixval - mean
-		    if (pixval < 0.0)
+		    if (pixval <= 0.0)
 			next
 		    dx = cols[i] - xmiddle + k - x[i]
 		    sumixx = sumixx + pixval * dx ** 2
@@ -721,4 +737,3 @@ begin
                 call pargi (stid + i - 1)
         }
 end
-

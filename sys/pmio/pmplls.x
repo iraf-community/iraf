@@ -17,7 +17,8 @@ int	rop			#I rasterop
 
 pointer	sp, ll_src, ll_dst, ll_stn, ll_out, px_src, im
 int	ll_len, step, xstep, temp, np, ip, i
-int	pl_l2pi(), pl_p2li(), pl_access()
+int	pl_l2pi(), pl_p2li()
+pointer	pl_access()
 include	"pmio.com"
 
 begin
@@ -91,7 +92,7 @@ begin
 	    call pl_plls (pl, v1, Mems[ll_src], ll_depth, np, rop)
 	else {
 	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
-	    ll_dst = Ref (pl, pl_access (pl, v1))
+	    ll_dst = pl_access (pl, v1)
 	    call pl_linestencil (Mems[ll_src],  1, MV(ll_depth),
 		Mems[ll_dst], v1, PL_MAXVAL(pl), Mems[ll_stn], 1,
 		Mems[ll_out], np, rop)

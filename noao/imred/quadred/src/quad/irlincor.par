@@ -1,0 +1,12 @@
+# irlincor parameter file
+input,s,a,"",,,Input  images
+output,s,a,"",,,Output images
+section,s,h,"",,,Image section to correct
+coeff1,r,h,1.0,,,First coefficient of correction equation
+coeff2,r,h,0.0,,,Second coefficient of correction equation
+coeff3,r,h,0.0,,,Third coefficient of correction equation
+coeff4,r,h,0.0,,,Fourth coefficient of correction equation
+coeff5,r,h,0.0,,,Fifth coefficient of correction equation
+coeff6,r,h,0.0,,,Sixth coefficient of correction equation
+coeff7,r,h,0.0,,,Seventh coefficient of correction equation
+maxadu,r,h,INDEF,0,,Maximum number of ADU

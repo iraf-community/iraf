@@ -1,6 +1,9 @@
 .help revisions Jun88 noao.imred.dtoi
 .nf
 
+imred$dtoi/hdicfit/mkpkg
+	Added missing dependencies.  (12/13/01, MJF)
+
 imred$dtoi/mkpkg
 	Added missing dependencies.  (10/11/99, Valdes)
 

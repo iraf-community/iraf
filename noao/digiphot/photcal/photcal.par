@@ -1,5 +1,5 @@
-# PHOTCAL package parameter file.
+# PHOTCALX package parameter file.
 
-catdir,s,h,"photcal$catalogs/",,,Directory containing standard star catalogs
-version,s,h,"May93"
+catdir,s,h,"photcalx$catalogs/",,,Directory containing standard star catalogs
+version,s,h,"Aug91"
 mode,s,h,ql

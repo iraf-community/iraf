@@ -15,7 +15,7 @@
 /* Compile time definitions (for C #ifdefs).
  */
 /* #define BSDUNIX */
-/* #define SUNOS */
+/* #define SUNOS4 */
 
 #define D_iraf
 #endif
@@ -175,4 +175,11 @@
 #include "/iraf/iraf/unix/hlib/libc/varargs.h"
 #endif
 #undef import_varargs
+#endif
+
+#ifdef import_stdarg
+#ifndef D_stdarg
+#include "/iraf/iraf/unix/hlib/libc/stdarg.h"
+#endif
+#undef import_stdarg
 #endif

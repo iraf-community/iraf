@@ -1,0 +1,54 @@
+.help cqrstats Mar00 "Catquery Package"
+.ih
+NAME
+cqsrtats -- get a catalog results string parameter
+.ih
+SYNOPSIS
+include <cq.h>
+
+call cq_rstats (res, parameter, str, maxch)
+
+.nf
+pointer	res		# the results descriptor
+int	parameter	# the parameter to be returned
+char	str		# the returned string parameter
+int	maxch		# the maximum size of the returned string parameter
+.fi
+.ih
+ARGUMENTS
+.ls res     
+The results descriptor.
+.le
+.ls parameter
+The catalog results parameter to be returned.  The currently supported
+catalog results parameters defined in cq.h are:
+
+.nf
+CQRCATDB	# the name of the parent configuration file
+CQRCATNAME	# the name of the parent catalog
+CQRADDRESS	# the network address used to produce the results
+CQRQUERY	# the network query used to produce the results
+CQRQPNAMES	# the results query parameter dictionary
+CQRQPVALUES	# the results query parameter values dictionary
+CQRQPUNITS	# the results query parameter units dictionary
+.fi
+.le
+.ls str
+Array containing returned string parameter value.
+.le
+.ls maxch
+The maximum size in characters of the returned string parameter value.
+.le
+.ih
+DESCRIPTION
+Cq_rstats returns the values of catalog results string parameters.
+
+.ih
+NOTES
+More information about the catalog results parameters and their relationship
+to the parent catalog is available by typing "help catalogs".
+
+.ih
+SEE ALSO
+cqrstati, cqrstatt
+.endhelp

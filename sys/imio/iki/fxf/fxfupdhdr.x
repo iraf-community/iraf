@@ -28,12 +28,13 @@ procedure fxf_updhdr (im, status)
 pointer	im			#I image descriptor
 int	status			#O return status
 
-pointer	sp, fit, mii
+pointer	sp, fit, mii, poff
 pointer	outname, fits_file, tempfile
 bool    adjust_header, overwrite, append
-int	nchars_ua, hdr_fd, group, hdr_off, size, npad, grp_pix_off
-int	acmode, junk, in_fd, diff, hdr_acmode, in_off, nchars
-int	read(), fxf_hdr_offset(), strncmp(), access()
+int	nchars_ua, hdr_fd, group, hdr_off, size
+int	npad, nlines, pixoff, grp_pix_off
+int	acmode, junk, in_fd, diff, hdr_acmode, in_off, nchars, subtype
+int	read(), fxf_hdr_offset(), access(), strncmp()
 int	open(), fnroot(), fstatl(), fnldir()
 bool	fnullfile()
 
@@ -68,10 +69,17 @@ begin
 
 	group = FIT_GROUP(fit)
 
+        subtype = 0
+	if ((FKS_SUBTYPE(fit) == FK_PLIO || 
+		(strncmp("PLIO_1", FIT_EXTSTYPE(fit), 6) == 0)) && 
+		(IM_PL(im) != NULL))
+	    subtype = FK_PLIO
+
 	if (FIT_EXTTYPE(fit) != EOS && group != -1) {
 	    if (strncmp (FIT_EXTTYPE(fit), "IMAGE", 5) != 0 &&
-		    strncmp (FIT_EXTTYPE(fit), "SIMPLE", 6) != 0) {
-	       call syserr (SYS_FXFUPHBEXTN)
+		    strncmp (FIT_EXTTYPE(fit), "SIMPLE", 6) != 0 &&
+		    subtype == 0) {
+		call syserr (SYS_FXFUPHBEXTN)
 	    }
 	}
 
@@ -85,7 +93,7 @@ begin
 	    acmode = NEW_IMAGE
 
 	    if (IM_PFD(im) == NULL) 
-	        call fxf_overwrite_unit (fit, im, status)
+	        call fxf_overwrite_unit (fit, im)
 
 	    call strcpy (IM_PIXFILE(im), Memc[fits_file], SZ_FNAME)
 
@@ -119,6 +127,10 @@ begin
 
 	call fxf_header_diff (im, group, acmode, hdr_off, diff, nchars_ua)
 
+	# PLIO
+	if (subtype == FK_PLIO && append) 
+	    diff = 0
+
 	# Adjust header only when we need to expand. We fill with trailing 
 	# blanks in case diff .gt. 0. (Reduce header size).
 
@@ -128,8 +140,7 @@ begin
 	    adjust_header = false
 	}
 
-	overwrite = ((diff < 0 || diff >= FITS_BLOCK_CHARS) &&
-	    FKS_OVERWRITE(fit) == YES)
+	overwrite = (FKS_OVERWRITE(fit) == YES)
 
 	if (adjust_header || overwrite) { 
 	    # We need to change the size of header portion in the middle of
@@ -143,20 +154,35 @@ begin
 	    in_fd = open (Memc[fits_file], READ_ONLY, BINARY_FILE)
 	    hdr_fd = open (Memc[outname], NEW_FILE, BINARY_FILE)
 
-	    if (append)
-	        grp_pix_off = FIT_PIXOFF(fit)
-	    else
-	        grp_pix_off = Memi[FIT_PIXPTR(fit)+group]
+            # Now expand the current group at least one block of 36 cards
+	    # and guarantee that the other groups in the file will have at
+	    # least 'nlines' of blank cards at the end of the header unit.
 
-	    call fxf_make_adj_copy (in_fd, hdr_fd,
-		hdr_off, grp_pix_off, nchars_ua)
+	    nlines= FKS_PADLINES(fit)
+	    IM_HFD(im) = in_fd
+	    if (adjust_header && acmode != NEW_COPY && 
+		FIT_XTENSION(fit) == YES) {
+		call fxf_expandh (in_fd, hdr_fd, nlines, group, hdr_off, pixoff)
+		poff = FIT_PIXPTR(fit)
+		Memi[poff+group] = pixoff
+	    } else {
+		if (append)
+		    grp_pix_off = FIT_PIXOFF(fit)
+		else
+		    grp_pix_off = Memi[FIT_PIXPTR(fit)+group]
 
-	    # Do not write any trailing blanks in write_header().
+		call fxf_make_adj_copy (in_fd, hdr_fd,
+		    hdr_off, grp_pix_off, nchars_ua)
+	    }
 	    diff = 0
 
+	    # Reset the time so we can read a fresh header next time.
+	    call fxf_set_cache_time (im, overwrite)
 	} else {
 	    hdr_fd = open (Memc[fits_file], hdr_acmode, BINARY_FILE)
-	    IM_PFD(im) = NULL
+	    # Do not clear if we are creating a Bintable with type PLIO_1.
+	    if (subtype != FK_PLIO)
+	        IM_PFD(im) = NULL
 	    IM_HFD(im) = NULL
 	}
 
@@ -237,11 +263,13 @@ begin
 	# be read from disk next time the file is accessed.
   
 	if (FIT_GROUP(fit) == 0 || FIT_GROUP(fit) == -1)
-	   call fxf_set_cache_time (im)
+	   call fxf_set_cache_time (im, false)
 
 	# See if we need to add or change the value of EXTEND in the PHU.
-	if (FIT_EXTEND(fit) == NO_KEYW || FIT_EXTEND(fit) == NO)
-	    call fxf_update_extend (im)
+	if (FIT_XTENSION(fit) == YES && 
+	   (FIT_EXTEND(fit) == NO_KEYW || FIT_EXTEND(fit) == NO)) {
+		call fxf_update_extend (im)
+	   }
 
 	call sfree (sp)
 end
@@ -269,7 +297,7 @@ begin
 	    hdr_off = FIT_EOFSIZE(fit)
 	} else
 	    hdr_off = Memi[FIT_HDRPTR(fit)+group]
-
+	
 	# If pixel file descriptor is empty for a newcopy or newimage
 	# in an existent image then the header offset is EOF.
 
@@ -297,7 +325,7 @@ pointer	hoff, poff, sp, pb, tb
 int	ua, fit, orig_hdr_size, pixoff, clines, ulines, len
 int     merge, usize, excess, nheader_cards, rp, inherit, kmax, kmin
 int     strlen(), imaccf(), imgeti(), strcmp(), idb_findrecord()
-int	btoi()
+int	btoi(), strncmp()
 bool    imgetb()
 
 errchk  open, fcopyo
@@ -393,21 +421,37 @@ begin
 	# Determine if OBJECT or IM_TITLE have changed. IM_TITLE has
 	# priority.
 
-	if (strcmp (IM_TITLE(im), FIT_TITLE(fit)) != 0)
-	    call strcpy (IM_TITLE(im), FIT_OBJECT(fit), LEN_CARD)
-	else {
-	    iferr (call imgstr (im, "OBJECT", temp, LEN_CARD)) {
-	        temp[1] = EOS
-#                # If there is no OBJECT keyword, don't create one.
-#		nheader_cards = nheader_cards - 1
-	    }
-	    if (strcmp (FIT_OBJECT(fit), temp) != 0)
-	        call strcpy (temp, FIT_OBJECT(fit), LEN_CARD)
+        # If FIT_OBJECT is empty, then there was no OBJECT card at read
+	# time. If OBJECT is present now, then it was added now. If OBJECT
+	# was present but not now, the keyword was deleted.
+
+	temp[1] = EOS
+	if (imaccf (im, "OBJECT") == YES) {
+	    call imgstr (im, "OBJECT", temp, LEN_CARD)
+	    # If its value is blank, then temp will be NULL
+	    if (temp[1] == EOS)
+		call strcpy ("       ", temp, LEN_CARD)
 	}
 
-	# If there is no OBJECT keyword, don't create one.
-	if (FIT_OBJECT(fit) == EOS)
+	if (temp[1] != EOS)
+	    call strcpy (temp, FIT_OBJECT(fit), LEN_CARD)
+	else
 	    nheader_cards = nheader_cards - 1
+
+	if (FIT_OBJECT(fit) == EOS) {
+	    if (strcmp (IM_TITLE(im), FIT_TITLE(fit)) != 0) {
+		call strcpy (IM_TITLE(im), FIT_OBJECT(fit), LEN_CARD)
+		# The OBJECT keyword will be added.
+		nheader_cards = nheader_cards + 1
+	    }
+	} else {
+	    # See if OBJECT has been deleted from UA.
+	    if (temp[1] == EOS)
+		FIT_OBJECT(fit) = EOS
+	    if (strcmp (IM_TITLE(im), FIT_TITLE(fit)) != 0)
+		call strcpy (IM_TITLE(im), FIT_OBJECT(fit), LEN_CARD)
+	}
+
 
 	# Too many mandatory cards if we are using the PHU in READ_WRITE mode.
 	# Because fxf_mandatory_cards gets call with FIT_NEWIMAGE set to NO,
@@ -452,6 +496,14 @@ begin
 		FIT_EXTVER(fit) = FKS_EXTVER(fit)
 	}
 
+	# Finally if we are updating a BINTABLE with a PLIO_1 mask we need
+	# to add 3 to the mandatory cards since TFIELDS, TTYPE1, nor
+	# TFORM1 are included.   ### Ugh!!
+	# Also add the Z cards.
+
+	if (strncmp ("PLIO_1", FIT_EXTSTYPE(fit), 6) == 0)
+	    nheader_cards = nheader_cards + 3 + 6 + IM_NDIM(im)*2
+
 	usize = strlen (Memc[ua]) 
 	ualen = (usize / LEN_UACARD + nheader_cards) * LEN_CARD
 	ualen = FITS_LEN_CHAR(ualen / 2)
@@ -465,8 +517,9 @@ begin
 	} else if ((hdr_off == EOF || hdr_off == 0) && 
 	    (IM_NDIM(im) == 0 || FIT_NAXIS(fit) == 0)) {
 	    diff = 0
-	} else
+	} else {
 	    diff = pixoff - ualen
+        }
 
         if (diff < 0 && FIT_EXPAND(fit) == NO) {
 	    # We need to reduce the size of the UA becuase we are not
@@ -492,17 +545,20 @@ char	temp[SZ_FNAME]
 bool	xtension, ext_append
 pointer	sp, spp, mii, rp, uap
 char    card[LEN_CARD], blank, keyword[SZ_KEYWORD], datestr[SZ_DATESTR] 
-int	iso_cutover, n, i, sz_rec, up, nblanks, acmode, nbk, len
+int	iso_cutover, n, i, sz_rec, up, nblanks, acmode, nbk, len, poff
+int     pos, group, pcount, depth, subtype, maxlen, ndim
 
 long	clktime()
-int	imaccf(), strlen(), fxf_ua_card(), idb_findrecord(), envgeti()
-bool	fxf_fpl_equald()
+int	imaccf(), strlen(), fxf_ua_card(), envgeti()
+int	idb_findrecord(), strncmp(), btoi()
+bool	fxf_fpl_equald(), imgetb()
+long	note()
 errchk  write 
 
 begin
 	call smark (sp)
-	call salloc (spp, 2880, TY_CHAR)
-	call salloc (mii, 1440, TY_INT)
+	call salloc (spp, FITS_BLOCK_CHARS*5, TY_CHAR)
+	call salloc (mii, FITS_BLOCK_CHARS, TY_INT)
 
 	# Write out the standard, reserved header parameters.
 	n = spp
@@ -515,57 +571,138 @@ begin
 	if (FIT_NEWIMAGE(fit) == YES)
 	    xtension = false
 
-	if (xtension)
-	    call fxf_akwc ("XTENSION", "IMAGE", 5, "Image extension", n)
-	else
-	    call fxf_akwb ("SIMPLE", YES, "Fits standard", n)
+	subtype =0
+	if ((FKS_SUBTYPE(fit) == FK_PLIO || 
+		(strncmp("PLIO_1", FIT_EXTSTYPE(fit), 6) == 0)) &&
+		IM_PL(im) != NULL) {
 
-	if (FIT_NAXIS(fit) == 0 || FIT_BITPIX(fit) == 0) 
-	    call fxf_setbitpix (im, fit)
-
-	call fxf_akwi ("BITPIX", FIT_BITPIX(fit), "Bits per pixel", n)
-	call fxf_akwi ("NAXIS", FIT_NAXIS(fit), "Number of axes", n)
-
-	do i = 1, FIT_NAXIS(fit) {
-	    call fxf_encode_axis ("NAXIS", keyword, i)
-	    call fxf_akwi (keyword, FIT_LENAXIS(fit,i), "Axis length", n)
+	    subtype = FK_PLIO
+	    ext_append = true
 	}
 
-	if (xtension) {
-	    call fxf_akwi ("PCOUNT", 0, "No 'random' parameters", n)
+	# PLIO.  Write BINTABLE header for a PLIO mask.
+	if (subtype == FK_PLIO) {
+
+	    if (IM_PFD(im) != NULL) {
+		call fxf_plinfo (im, maxlen, pcount, depth)
+
+		# If we old heap has change in size, we need to
+		# resize it.
+
+		if (acmode == READ_WRITE && pcount != FIT_PCOUNT(fit))
+		    call fxf_pl_adj_heap (im, hdr_fd, pcount)
+	    } else {
+		pcount = FIT_PCOUNT(fit)
+		depth = DEF_PLDEPTH
+	    }
+
+	    ndim = IM_NDIM(im)
+	    call fxf_akwc ("XTENSION", "BINTABLE", 8, "Mask extension", n)
+	    call fxf_akwi ("BITPIX", 8, "Bits per pixel", n)
+	    call fxf_akwi ("NAXIS", ndim, "Number of axes", n)
+	    call fxf_akwi ("NAXIS1", 8, "Number of bytes per line", n)
+	    do i = 2, ndim {
+		call fxf_encode_axis ("NAXIS", keyword, i)
+	        call fxf_akwi (keyword, IM_LEN(im,i), "axis length", n)
+	    }
+	    call fxf_akwi ("PCOUNT", pcount, "Heap size in bytes", n)
 	    call fxf_akwi ("GCOUNT", 1, "Only one group", n)
+
+	    if (imaccf (im, "TFIELDS") == NO)
+		call fxf_akwi ("TFIELDS", 1, "1 Column field", n)
+	    if (imaccf (im, "TTYPE1") == NO) {
+		call fxf_akwc ("TTYPE1", "COMPRESSED_DATA", 16,
+		    "Type of PLIO_1 data", n)
+	    }
+	    call sprintf (card, LEN_CARD, "PI(%d)")
+		call pargi(maxlen) 
+	    call fxf_filter_keyw (im, "TFORM1")
+	    len = strlen (card)
+	    call fxf_akwc ("TFORM1", card, len, "Variable word array", n)
+
 	} else {
-	    if (imaccf (im, "EXTEND") == NO)
-	        call fxf_akwb ("EXTEND", NO, "File may contain extensions", n)
-	    FIT_EXTEND(fit) = YES
+	    if (xtension)
+		call fxf_akwc ("XTENSION", "IMAGE", 5, "Image extension", n)
+	    else
+		call fxf_akwb ("SIMPLE", YES, "Fits standard", n)
+
+	    if (FIT_NAXIS(fit) == 0 || FIT_BITPIX(fit) == 0) 
+		call fxf_setbitpix (im, fit)
+
+	    call fxf_akwi ("BITPIX", FIT_BITPIX(fit), "Bits per pixel", n)
+	    call fxf_akwi ("NAXIS", FIT_NAXIS(fit), "Number of axes", n)
+
+	    do i = 1, FIT_NAXIS(fit) {
+		call fxf_encode_axis ("NAXIS", keyword, i)
+		call fxf_akwi (keyword, FIT_LENAXIS(fit,i), "Axis length", n)
+	    }
+	
+	    if (xtension) {
+		call fxf_akwi ("PCOUNT", 0, "No 'random' parameters", n)
+		call fxf_akwi ("GCOUNT", 1, "Only one group", n)
+	    } else {
+		if (imaccf (im, "EXTEND") == NO)
+		    i = NO
+		else {
+		   # Keyword exists but it may be in the wrong position. 
+		   # Remove it and write it now.
+
+		   i = btoi (imgetb (im, "EXTEND"))
+		   call fxf_filter_keyw (im, "EXTEND") 
+		}
+		call fxf_akwb ("EXTEND", i, "File may contain extensions", n)
+		FIT_EXTEND(fit) = YES
+	    }
 	}
 
-	     
+	# Delete BSCALE and BZERO just in case the application puts them
+	# in the UA after the pixels have been written. The keywords
+	# should not be there since the FK does not allow reading pixels
+	# with BITPIX -32 and BSCALE and BZERO. If the application
+	# really wants to circumvent this restriction the code below
+	# will defeat that. The implications are left to the application.
+	# This fix is put in here to save the ST Hstio interface to be
+	# a victim of the fact that in v2.12 the BSCALE and BZERO keywords
+	# are left in the header for the user to see or change. Previous
+	# FK versions, the keywords were deleted from the UA.
+ 
+	if ((IM_PIXTYPE(im) == TY_REAL || IM_PIXTYPE(im) == TY_DOUBLE)
+		&& FIT_TOTPIX(fit) > 0) {
+
+	     call fxf_filter_keyw (im, "BSCALE")
+	     call fxf_filter_keyw (im, "BZERO")
+	}
+
 	# Do not write BSCALE and BZERO if they have the default 
 	# values (1.0, 0.0).
 
 	if (IM_PIXTYPE(im) == TY_USHORT) {
+	    call fxf_filter_keyw (im, "BSCALE") 
 	    call fxf_akwd ("BSCALE", 1.0d0,
 		"REAL = TAPE*BSCALE + BZERO", NDEC_REAL, n)
+	    call fxf_filter_keyw (im, "BZERO") 
 	    call fxf_akwd ("BZERO", 32768.0d0,  "", NDEC_REAL, n)
-
 	} else if (FIT_PIXTYPE(fit) != TY_REAL &&
 	    FIT_PIXTYPE(fit) != TY_DOUBLE && IM_ACMODE(im) != NEW_COPY) {
+	    # Now we have TY_SHORT or TY_(INT,LONG).
+	    # Check the keywords only if they have non_default values.
 
-	    # Write the keywords only if they have non_default values.
-	    if (!fxf_fpl_equald(1.0d0, FIT_BSCALE(fit), 4) ||
-		!fxf_fpl_equald(0.0d0, FIT_BZERO(fit), 4) ) {
-
-	        if (imaccf (im, "BSCALE") == NO) {
+	    # Do not add the keywords if they have been deleted.
+	    if (!fxf_fpl_equald(1.0d0, FIT_BSCALE(fit), 4)) {
+	        if ((imaccf (im, "BSCALE") == NO) && 
+		     fxf_fpl_equald (1.0d0, FIT_BSCALE(fit), 4)) {
 		    call fxf_akwd ("BSCALE",  FIT_BSCALE(fit),
 			"REAL = TAPE*BSCALE + BZERO", NDEC_REAL, n)
 	        }
-	        if (imaccf (im, "BZERO") == NO)
+	    }
+	    if (!fxf_fpl_equald(0.0d0, FIT_BZERO(fit), 4) ) {
+	        if (imaccf (im, "BZERO") == NO &&
+		    fxf_fpl_equald (1.0d0, FIT_BZERO(fit), 4))
 		    call fxf_akwd ("BZERO", FIT_BZERO(fit),  "", NDEC_REAL, n)
 	    }
 	}
 
-	uap = IM_USERAREA(im)
+        uap = IM_USERAREA(im)
 
 	if (idb_findrecord (im, "ORIGIN", rp) == 0)  {
 	    call strcpy (FITS_ORIGIN, temp, LEN_CARD)
@@ -574,12 +711,16 @@ begin
 	} else if (rp - uap > 10*81) {
 	    # Out of place; do not change the value.
 	    call imgstr (im, "ORIGIN", temp, LEN_CARD)
-	    call fxf_filter_keyw (im, "ORIGIN") 
+	    call fxf_filter_keyw (im, "ORIGIN")
 	    call fxf_akwc ("ORIGIN",
 		temp, strlen(temp), "FITS file originator", n)
 	}
 
 	if (xtension) {
+	    # Update the cache in case these values have changed
+	    # in the UA.
+	    call fxf_set_extnv (im)
+
 	    if (FIT_EXTNAME(fit) != EOS) {
 	        call strcpy (FIT_EXTNAME(fit), temp, LEN_CARD)
 	        call fxf_akwc ("EXTNAME",
@@ -589,17 +730,18 @@ begin
 	        call fxf_akwi ("EXTVER",
 		    FIT_EXTVER(fit), "Extension version", n)
 	    }
-	    if (idb_findrecord (im, "INHERIT", rp) > 0) {
+            if (idb_findrecord (im, "INHERIT", rp) > 0) {
 		# See if keyword is at the begining of the UA
 		if (rp - uap > 11*81) {
 		    call fxf_filter_keyw (im, "INHERIT")
 		    call fxf_akwb ("INHERIT",
 			FIT_INHERIT(fit), "Inherits global header", n)
 		} else if (acmode != READ_WRITE)
-		   call imputb (im, "INHERIT", FIT_INHERIT(fit))
-	    } else
+		    call imputb (im, "INHERIT", FIT_INHERIT(fit))
+	    } else {
 		call fxf_akwb ("INHERIT",
 		    FIT_INHERIT(fit), "Inherits global header", n)
+	    }
 	}
 
 	# Dates after iso_cutover use ISO format dates.
@@ -612,12 +754,18 @@ begin
 	len = strlen (datestr)
 
 	if (idb_findrecord (im, "DATE", rp) == 0) {
+	    # Keyword is not in the UA, created with current time
 	    call fxf_akwc ("DATE",
 		datestr, len, "Date FITS file was generated", n)
 	} else { 
+	    if (acmode == READ_WRITE) {
+		# Keep the old DATE, change only the IRAF-TLM keyword value
+		call imgstr (im, "DATE", datestr, SZ_DATESTR)
+	    }
 	    # See if the keyword is out of order.
 	    if (rp - uap > 12*81) {  
 		call fxf_filter_keyw (im, "DATE")
+
 		call fxf_akwc ("DATE",
 		    datestr, len, "Date FITS file was generated", n)
 	    } else
@@ -625,7 +773,8 @@ begin
 	}
 
 	# Encode the "IRAF_TLM" keyword (records time of last modification).
-	call fxf_encode_date (IM_MTIME(im), datestr, SZ_DATESTR, "TLM", 2010)
+	call fxf_encode_date (clktime(long(0)), datestr, SZ_DATESTR,
+	    "TLM", 2010)
 	len = strlen (datestr)
 
 	if (idb_findrecord (im, "IRAF-TLM", rp) == 0) {
@@ -667,6 +816,34 @@ begin
 	        call impstr (im, "OBJECT", FIT_OBJECT(fit))
 	}
 
+	# Write Compression keywords for PLIO BINTABLE.
+#	if (subtype == FK_PLIO && IM_PFD(im) != NULL && ext_append) {
+	if (subtype == FK_PLIO) { 
+	    call fxf_akwb ("ZIMAGE", YES, "Is a compressed image", n)
+	    call fxf_akwc ("ZCMPTYPE", "PLIO_1", 6, "IRAF image masks", n) 
+	    call fxf_akwi ("ZBITPIX", 32, "BITPIX for uncompressed image",n)
+
+	    # We use IM_NDIM and IM_LEN here because FIT_NAXIS and _LENAXIS
+	    # are not available for NEW_IMAGE mode.
+
+	    ndim = IM_NDIM(im)
+	    call fxf_akwi ("ZNAXIS", ndim, "NAXIS for uncompressed image",n)
+	    do i = 1, ndim {
+	        call fxf_encode_axis ("ZNAXIS", keyword, i)
+	        call fxf_akwi (keyword, IM_LEN(im,i),  "Axis length", n)
+	    }
+	    call fxf_encode_axis ("ZTILE", keyword, 1)
+	    call fxf_akwi (keyword, IM_LEN(im,1), "Axis length", n)
+	    do i = 2, ndim {
+		call fxf_encode_axis ("ZTILE", keyword, i)
+		call fxf_akwi (keyword, 1, "Axis length", n)
+	    }
+	    call fxf_encode_axis ("ZNAME", keyword, 1)
+	    call fxf_akwc (keyword, "depth", 5, "PLIO mask depth", n)
+	    call fxf_encode_axis ("ZVAL", keyword, 1)
+	    call fxf_akwi (keyword, depth, "Parameter value", n)
+	}
+
 	# Write the UA now.
 	up = 1
 	nbk = 0
@@ -696,8 +873,19 @@ begin
 		call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
 		call write (hdr_fd, Memi[mii], sz_rec)
 	    }
-	    nbk = diff / 1440     
 
+	    group = FIT_GROUP(fit)
+	    if (group < 0) {
+		# We are writing blocks of blanks on a new_copy
+		# image which has group=-1 here. Use diff.
+
+		nbk = diff / 1440
+	    } else {
+		pos = note (hdr_fd)
+		poff = FIT_PIXPTR(fit)
+		nbk = (Memi[poff+group] - pos)
+		nbk = nbk / 1440
+	    }
 	    call amovkc (blank, Memc[spp], 2880)
 	    call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
 	    do i = 1, nbk-1
@@ -706,9 +894,15 @@ begin
 	    call amovkc (blank, Memc[spp], 2880)
 	    rp = spp+2880-LEN_CARD
 	}
+
 	call amovc ("END", Memc[rp], 3)
 	call miipak (Memc[spp], Memi[mii], sz_rec*2, TY_CHAR, MII_BYTE)
 	call write (hdr_fd, Memi[mii], sz_rec)
+	# PLIO: write the mask data to the new extension.
+	if (subtype == FK_PLIO && IM_PFD(im) != NULL) {
+	    call fxf_plwrite (im, hdr_fd)
+	    IM_PFD(im) = NULL
+	}
 
 	call flush (hdr_fd)
 	call  sfree (sp)
@@ -795,7 +989,7 @@ end
 
 
 # FXF_MAKE_ADJ_COPY -- Copy a FITS file into a new one, changing the size
-# of one header unit.
+# of a fits header.
 
 procedure fxf_make_adj_copy (in_fd, out_fd, hdr_off, pixoff, chars_ua)
 
@@ -840,7 +1034,6 @@ begin
 	call seek (in_fd, pixoff)
 	call fcopyo (in_fd, out_fd)
 	call flush (out_fd)
-
 	call sfree (sp)
 end
 
@@ -848,9 +1041,10 @@ end
 # FXF_SET_CACHE_MTIME -- Procedure to reset the modification time on the
 # cached entry for the file pointed by 'im'.
 
-procedure fxf_set_cache_time (im)
+procedure fxf_set_cache_time (im, overwrite)
 
 pointer im			#I image descriptor
+bool    overwrite		#I invalidate entry
 
 pointer sp, hdrfile
 long    fi[LEN_FINFO]
@@ -882,6 +1076,60 @@ begin
 		    # While we are appending we want to keep the cache entry
 		    # in the slot.
 		    rf_mtime[cindx] = FI_MTIME(fi)
+		    if (overwrite)
+		        rf_fname[1,cindx] = EOS
+		}
+		break
+	    }
+	}
+
+	call sfree (sp)
+end	
+
+
+# FXF_SET_EXTNV -- Procedure to write UA value of EXTNAME and EXTVER
+# into the cache slot.
+
+procedure fxf_set_extnv (im)
+
+pointer im			#I image descriptor
+
+pointer fit, sp, hdrfile
+int	cindx, ig, extn, extv
+errchk	syserr, syserrs
+bool    bxtn, bxtv
+bool    streq()
+
+include "fxfcache.com"
+
+begin
+	fit = IM_KDES(im)
+	ig = FIT_GROUP(fit)
+
+	call smark (sp)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+
+	# Search the header file cache for the named image.
+	do cindx = 1, rf_cachesize {
+	    if (rf_fit[cindx] == NULL)
+	        next
+
+	    if (streq (Memc[hdrfile], rf_fname[1,cindx])) {
+		bxtn = (FIT_EXTNAME(fit) != EOS)
+		bxtv = (!IS_INDEFL (FIT_EXTVER(fit)))
+		# Reset cache
+		if (IM_ACMODE(im) == READ_WRITE) {
+		    if (bxtn) {
+			extn = rf_pextn[cindx]
+		        # Just replace the value
+			call strcpy (FIT_EXTNAME(fit), Memc[extn+LEN_CARD*ig],
+			    LEN_CARD)
+		    }
+		    if (bxtv) {
+			extv = rf_pextv[cindx]
+		        # Just replace the value
+			Memi[extv+ig] = FIT_EXTVER(fit)
+		    }
 		}
 		break
 	    }
@@ -959,9 +1207,14 @@ procedure fxf_update_extend (im)
 
 pointer	im			#I image descriptor	
 
-int	fd, fdout, i, nch, nc
-char	line[LEN_CARD], tmp[SZ_FNAME], blank
+pointer sp, hdrfile
+int	fd, fdout, i, nch, nc, cfit
+char	line[LEN_CARD], tmp[SZ_FNAME], blank, cindx
+bool	streq()
 int	open(), naxis, read(), strncmp(), note(), fnroot()
+
+include "fxfcache.com"
+define	cfit_ 91
 
 begin
 	fd = open (IM_HDRFILE(im), READ_WRITE, BINARY_FILE)
@@ -977,7 +1230,7 @@ begin
 		call achtcb (line, line, LEN_CARD)
 		call write (fd, line, 40)
 		call close (fd)
-		return
+		goto cfit_
 	    } else if (strncmp ("END     ", line, 8) == 0) 
 		break
 	}
@@ -1032,4 +1285,26 @@ begin
 	call close (fd)
 	call close (fdout)
 	call fxf_ren_tmp (tmp, IM_HDRFILE(im))
+
+cfit_
+	# Now reset the value in the cache
+	call smark (sp)
+	call salloc (hdrfile, SZ_PATHNAME, TY_CHAR)
+
+	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
+
+	# Search the header file cache for the named image.
+	do cindx = 1, rf_cachesize {
+	    if (rf_fit[cindx] == NULL)
+	        next
+
+	    if (streq (Memc[hdrfile], rf_fname[1,cindx])) {
+		# Reset cache
+		cfit = rf_fit[cindx]
+		FIT_EXTEND(cfit) = YES
+		break
+	    }
+	}
+
+	call sfree (sp)
 end

@@ -419,9 +419,10 @@ begin
 	    sigma = 0.0
 	else
 	    sigma = (sumsq - (sum / nmatch) * sum) / (nmatch - 1)
-	if (sigma <= 0.0)
+	if (sigma <= 0.0) {
+	    call sfree (sp)
 	    return (nmatch)
-	else
+	} else
 	    sigma = sqrt (sigma)
 	call asrtd (Memd[adif], Memd[adif], nmatch)
         #if (mod (nmatch,2) == 1)

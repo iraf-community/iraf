@@ -224,7 +224,7 @@ end
 # return its value if found.  If the parameter is not found and there are
 # positional arguments, return the value of the next positional argument.
 # The number of characters in the output string is returned as the function
-# value if the parameter is found, else zero is returned.
+# value if the parameter is found, else ERR is returned.
 
 int procedure clc_fetch (param, outstr, maxch)
 
@@ -251,7 +251,7 @@ begin
 		cl_nextarg = cl_nextarg + 1
 	    } else {
 		outstr[1] = EOS
-		return (0)
+		return (ERR)
 	    }
 
 	vp = strefsbuf (cl_stp, SYM_VALUE(sym))

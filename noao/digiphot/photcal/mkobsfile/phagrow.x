@@ -326,8 +326,10 @@ begin
 	        Memd[AGR_DP(agr)], Memd[AGR_PCLAMPS(agr)], nterms, ipow)
 
 	    # Test the fit.
-	    if (sumn > 6.0)
-	        sumn = sqrt (sumd / (sumn - 6.0))
+	    #if (sumn > 6.0)
+	    if (sumn > (nterms + 1.0))
+	        #sumn = sqrt (sumd / (sumn - 6.0))
+	        sumn = sqrt (sumd / (sumn - (nterms + 1.0)))
 	    else
 		sumn = 0.0
 	    sumd = sqrt (sumd / sumw)
@@ -343,6 +345,11 @@ begin
 		break
 	}
 
+	if (niter > AGR_ITMAX) {
+	    call sfree (sp)
+	    return (ERR)
+	}
+
 	# Compute the errors.
 	do k = 1, nterms {
 	    if (Memd[AGR_U(agr)+(k-1)*lterms+k-1] > 0.0)
@@ -351,6 +358,7 @@ begin
 	    else
 	        Memd[AGR_PERRORS(agr)+k-1] = 0.0d0
 	}
+
 
 	call sfree (sp)
 	return (OK)
@@ -635,6 +643,8 @@ begin
 	            Memr[AGR_TWR(agr)], naperts)
 	    }
 	}
+
+	call sfree (sp)
 end
 
 

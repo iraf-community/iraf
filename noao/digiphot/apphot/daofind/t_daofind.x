@@ -1,6 +1,7 @@
 include <imhdr.h>
 include <gset.h>
 include <fset.h>
+include <imhdr.h>
 include "../lib/apphot.h"
 include "../lib/noise.h"
 include "../lib/find.h"
@@ -21,17 +22,19 @@ int	interactive		# interactive mode
 int	verify			# verify mode
 int	update			# update critical parameters
 int	verbose			# verbose mode
+int	cache			# cache the image pixels
 
-int	limlist, lolist, densave, skysave, out, root, stat, imlist, olist
 pointer	im, cnv, sky, sp, outfname, denname, skyname, str
 pointer	ap, cname, display, graphics, id, gd
+int	limlist, lolist, densave, skysave, out, root, stat, imlist, olist
+int	wcs, req_size, old_size, buf_size, memstat
 
-bool	clgetb(), streq()
+real	clgetr()
+pointer	gopen(), immap(), ap_immap()
 int	imtlen(), clplen(), btoi(), clgwrd(), aptmpimage()
 int	open(), strncmp(), strlen(), fnldir(), ap_fdfind()
-int	imtopenp(), clpopnu(), clgfil(), imtgetim()
-pointer	gopen(), immap(), ap_immap()
-real	clgetr()
+int	imtopenp(), clpopnu(), clgfil(), imtgetim(), ap_memstat(), sizeof()
+bool	clgetb(), streq()
 
 begin
 	# Flush STDOUT on a new line.
@@ -75,14 +78,26 @@ begin
 	verbose = btoi (clgetb ("verbose"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
+	cache = btoi (clgetb ("cache"))
 
-	# Confirm the parameters.
+	# Get the parameters.
 	call ap_fdgpars (ap)
+
+	# Confirm the algorithm parameters.
 	if (verify == YES && interactive == NO)  {
 	    call ap_fdconfirm (ap)
 	    if (update == YES)
 		call ap_fdpars (ap)
 	}
+
+	# Get the wcs info.
+	wcs = clgwrd ("wcsout", Memc[str], SZ_LINE, WCSOUTSTR)
+	if (wcs <= 0) {
+	    call eprintf (
+	        "Warning: Setting the output coordinate system to logical\n")
+	    wcs = WCS_LOGICAL
+	}
+	call apseti (ap, WCSOUT, wcs)
 
 	# Get the graphics and display devices.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
@@ -125,15 +140,19 @@ begin
 	    # Open the image and get the required keywords from the header.
 
 	    im = immap (Memc[image], READ_ONLY, 0)
-	    call ap_rdnoise (im, ap)
-	    call ap_padu (im, ap)
-	    call ap_itime (im, ap)
-	    call ap_airmass (im, ap)
-	    call ap_filter (im, ap)
-	    call ap_otime (im, ap)
-	    call apsets (ap, IMNAME, Memc[image])
+	    call apimkeys (ap, im, Memc[image])
+
+	    # Set the image display viewport.
 	    if ((id != NULL) && (id != gd))
 		call ap_gswv (id, Memc[image], im, 4)
+
+	    # Cache the input image pixels.
+            req_size = MEMFUDGE * (IM_LEN(im,1) * IM_LEN(im,2) *
+                sizeof (IM_PIXTYPE(im)) + 2 * IM_LEN(im,1) * IM_LEN(im,2) *
+		sizeof (TY_REAL))
+            memstat = ap_memstat (cache, req_size, old_size)
+            if (memstat == YES)
+                call ap_pcache (im, INDEFI, buf_size)
 
 	    # Determine the results file name. If output is a null string or
 	    # a directory name then the extension "coo" is added to the
@@ -183,12 +202,16 @@ begin
 		if (Memc[cname] != EOS) {
 		    stat = ap_fdfind (Memc[denname], Memc[skyname], ap, im,
 		        NULL, NULL, out, boundary, constant, densave,
-			skysave, NO)
+			skysave, NO, cache)
 		} else {
 	            cnv = ap_immap (Memc[denname], im, ap, densave)
-		    if (skysave == YES)
+                    if (memstat == YES)
+                	call ap_pcache (cnv, INDEFI, buf_size)
+		    if (skysave == YES) {
 			sky = ap_immap (Memc[skyname], im, ap, skysave)
-		    else
+                        if (memstat == YES)
+                	    call ap_pcache (sky, INDEFI, buf_size)
+		    } else
 			sky = NULL
 		    if (Memc[outfname] != EOS)
 		        out = open (Memc[outfname], NEW_FILE, TEXT_FILE)
@@ -206,11 +229,15 @@ begin
 
 	    } else
 		stat = ap_fdfind (Memc[denname], Memc[skyname], ap, im, gd,
-		    id, out, boundary, constant, densave, skysave, YES)
+		    id, out, boundary, constant, densave, skysave, YES,
+		    cache)
 
 	    # Clean up files.
 	    call imunmap (im)
 	    call close (out)
+
+	    # Uncache memory
+	    call fixmem (old_size)
 
 	    if (stat == YES)
 		break

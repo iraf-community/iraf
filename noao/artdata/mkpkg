@@ -25,7 +25,7 @@ artdata:
 
 libpkg.a:
 	@lists
-	mkheader.x	<ctype.h> <imhdr.h>
+	mkheader.x	<ctype.h> <imhdr.h> <imio.h>
 	mktemplates.x	mktemplates.com <error.h> <imhdr.h> <math.h>\
 			<math/iminterp.h>
 	numrecipes.x	<math.h>

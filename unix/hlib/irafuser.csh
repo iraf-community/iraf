@@ -1,12 +1,28 @@
-# IRAF definitions for the UNIX/csh user.  The additional variables iraf$ and
-# home$ should be defined in the user's .login file.
+# IRAF definitions for the UNIX/csh user.  The variable iraf$ should be
+# defined in the user's .login file.
 
-if (-f /etc/redhat-release) then
-    setenv MACH	redhat
-else if (-f /etc/SuSE-release) then
-    setenv MACH	suse
-else
-    setenv MACH	`uname -s | tr '[A-Z]' '[a-z]'`
+setenv	MACH		`uname -m`
+set	HSI_FLAGS     = "-O -DPOSIX -DOSF1 -DSHLIB"
+set	HSI_XFLAGS    = "-Inolibc -DPOSIX -DOSF1 -DSHLIB"
+setenv	HSI_LFLAGS	"-taso"
+setenv	HSI_OSLIBS	"-lots"
+setenv	CC		cc
+setenv	F77		f77
+setenv	RANLIB		ranlib
+
+# Get IRAF root directory.
+if (! $?iraf) then
+    foreach dir (/iraf/iraf /iraf /usr/iraf /opt/iraf/iraf /opt/iraf)
+	if (-d $dir) then
+	    setenv iraf ${dir}/
+	    break
+	endif
+    end
+endif
+
+if (! $?iraf || ! -d $iraf) then
+    echo "cannot find iraf root directory (\$iraf not defined)"
+    exit 1
 endif
 
 setenv	hostid	unix
@@ -15,77 +31,31 @@ setenv	hlib	${iraf}unix/hlib/
 setenv	hbin	${iraf}unix/bin.$MACH/
 setenv	tmp	/tmp/
 
+# Identify the C and Fortran compilers to be used.
+#setenv	GCC_DEFS  "-DNOSTDHDRS -DSYSV -DANSI"
+#setenv	GCC_WARN  "-W -Wunused -Wcomment"
+#setenv	GCC_COMP  "-fstrength-reduce -fpcc-struct-return"
+#setenv	HOS_DEFS  ""
+#setenv	CC	"gcc $GCC_DEFS $HOS_DEFS $GCC_WARN $GCC_COMP"
+#setenv	RANLIB	"echo ranlib"
+
+# HSI cc, f77, and xc compile/link flags [MACHDEP].
 switch ($MACH)
-case freebsd:
-    setenv HSI_CF "-O -DBSD -w -Wunused"
-    setenv HSI_XF "-Inolibc -/DBSD -w -/Wunused"
-    setenv HSI_FF "-O"
-    setenv HSI_LF "-static"
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS "-lcompat"
-    set    mkzflags = "'lflags=-z' -/static"
-    breaksw
-
-case linux:
-    setenv HSI_CF "-O -DLINUX -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -DLINUX -DPOSIX -DSYSV -w -/Wunused"
-    setenv HSI_FF "-O"
-    setenv HSI_LF "-Wl,-Bstatic"
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS ""
-    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
-    breaksw
-
-case redhat:
-    setenv HSI_CF "-O -DLINUX -DREDHAT -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -DLINUX -DREDHAT -DPOSIX -DSYSV -w -/Wunused"
-    setenv HSI_FF "-O"
-    setenv HSI_LF "-Wl,-Bstatic"
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS ""
-    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
-    breaksw
-
-case suse:
-    setenv HSI_CF "-O -DSUSE -DLINUX -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -DSUSE -DLINUX -DPOSIX -DSYSV -w -/Wunused"
-    setenv HSI_FF "-O"
-    setenv HSI_LF "-Wl,-Bstatic -specs=/iraf/iraf//unix/bin.suse/gcc-specs"
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS ""
-    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
-    breaksw
-
-case sunos:
-    setenv HSI_CF "-O -DSOLARIS -DX86 -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -DSOLARIS -DX86 -DPOSIX -DSYSV -w -/Wunused"
-    setenv HSI_FF "-O"
-    #setenv HSI_LF "-t -Wl,-Bstatic"
-    #setenv HSI_LFLAGS "-t -Wl,-Bstatic"
-    #setenv HSI_OSLIBS \
-    #	"-lsocket -lnsl -lintl -Wl,-Bdynamic -ldl -Wl,-Bstatic -lelf"
-    setenv HSI_LF "-t"
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS "-t"
-    setenv HSI_OSLIBS "-lsocket -lnsl -lintl -ldl -lelf"
-    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
-    breaksw
-
+case alpha:
+	setenv	HSI_CF	"$HSI_FLAGS"
+	setenv	HSI_FF	"-w -O3"
+	setenv	HSI_XF	"$HSI_XFLAGS"
+	setenv	HSI_LF	"$HSI_LFLAGS"
+	setenv	HSI_F77LIBS "-lUfor -lfor -lFutil -lm -lots"
+	breaksw
 default:
-    echo 'Warning in hlib$irafuser.csh: unknown platform '"$MACH"
-    exit 1
-    breaksw
+	setenv	HSI_CF	"-O"
+	setenv	HSI_FF	"-O"
+	setenv	HSI_XF	"-O"
+	setenv	HSI_LF	""
+	setenv	HSI_F77LIBS ""
+	breaksw
 endsw
-
-# Setup to use GNU gcc/f2c for compilation.
-setenv	CC	gcc
-setenv	F77	$hlib/f77.sh
-setenv	F2C	$hbin/f2c.e
-setenv	RANLIB	ranlib
 
 # The following determines whether or not the VOS is used for filename mapping.
 if (-f ${iraf}lib/libsys.a) then
@@ -100,7 +70,7 @@ setenv HSI_LIBS "$HSI_LIBS $HSI_OSLIBS"
 
 alias	mkiraf	${hlib}mkiraf.csh
 alias	mkmlist	${hlib}mkmlist.csh
-alias	mkz	${hbin}mkpkg.e "$mkzflags"
+alias	mkz	${hbin}mkpkg.e "'lflags=-z'"
 
 alias	edsym	${hbin}edsym.e
 alias	generic	${hbin}generic.e

@@ -1,0 +1,18 @@
+# The AWCSPARS parameter set
+
+wxref,s,h,"INDEF",,,"The x axis reference pixel"
+wyref,s,h,"INDEF",,,"The y axis reference pixel"
+wxmag,s,h,"INDEF",,,"The x axis image scale in arcseconds per pixel"
+wymag,s,h,"INDEF",,,"The y axis image scale in arcseconds per pixel"
+wxrot,s,h,"180.0",,,"The x axis rotation in degrees"
+wyrot,s,h,"0.0",,,"The y axis rotation in degrees"
+wraref,s,h,"RA",,,"The ra / longitude of the image reference point"
+wdecref,s,h,"DEC",,,"The dec / latitude of the image reference point"
+wraunits,s,h,"",,,The ra / longitude reference units
+wdecunits,s,h,"",,,The dec / latitude reference units
+wproj,s,h,tan,,,"The image projection geometry"
+wsystem,s,h,"EQUINOX",,,"The image coordinate system"
+#wradecsys,s,h,"RADECSYS",,,The equatorial reference frame
+#wequinox,s,h,"EQUINOX",,,The equinox in years
+#wmjdobs,s,h,"MJD-OBS",,,The MJD of the observation
+mode,s,h,"ql",,,

@@ -683,8 +683,8 @@ begin
 		next
 	    mw = smw_openim (im)
 	    iferr {
-		iferr (call dc_gms (im, mw, stp, ap, NULL, NULL)) {
-		    iferr (call dc_gec (im, mw, stp, ap, NULL, NULL)) {
+		iferr (call dc_gms (Memc[input],im,mw,stp,NO,ap,NULL,NULL)) {
+		    iferr (call dc_gec (Memc[input],im,mw,stp,ap,NULL,NULL)) {
 			call sprintf (Memc[str], SZ_LINE,
 			    "%s: Dispersion data not found")
 			    call pargstr (Memc[input])
@@ -752,8 +752,8 @@ begin
 		next
 	    mw = smw_openim (im)
 	    iferr {
-		iferr (call dc_gms (im, mw, stp, ap, NULL, NULL)) {
-		    iferr (call dc_gec (im, mw, stp, ap, NULL, NULL)) {
+		iferr (call dc_gms (Memc[input],im,mw,stp,NO,ap,NULL,NULL)) {
+		    iferr (call dc_gec (Memc[input],im,mw,stp,ap,NULL,NULL)) {
 			call sprintf (Memc[str], SZ_LINE,
 			    "%s: Dispersion data not found")
 			    call pargstr (Memc[input])

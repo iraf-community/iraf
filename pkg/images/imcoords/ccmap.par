@@ -38,7 +38,8 @@ xxterms,s,h,"half","|none|half|full|",,Xi fit cross terms type
 yxorder,i,h,2,2,,Order of eta fit in x
 yyorder,i,h,2,2,,Order of eta fit in y
 yxterms,s,h,"half","|none|half|full|",,Eta fit cross terms type
-reject,r,h,INDEF,,,Rejection limit in sigma units
+maxiter,i,h,0,,,The maximum number of rejection iterations
+reject,r,h,3.0,,,Rejection limit in sigma units
 
 # Output and graphics mode parameters
 update,b,h,no,,,Update the image world coordinate system ?

@@ -1,5 +1,5 @@
-# Package script task for the DAOPHOT package.
-#{ DAOPHOT -- Point Spread Function photometry package.
+# Package script task for the DAOPHOTX package.
+#{ DAOPHOTX -- Point Spread Function photometry package.
 
 if (! defpac ("tables")) {
     if (deftask ("tables")) {

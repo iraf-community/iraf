@@ -17,23 +17,30 @@ pointer	ctrl		# help control block
 
 char	blank
 int	n, center, offset, lmargin, rmargin
-pointer	sp, lbuf, edge, op
+pointer	sp, lbuf, edge, op, hbuf
 int	strlen(), gstrcpy()
 
 begin
 	call smark (sp)
 	call salloc (lbuf, SZ_LINE, TY_CHAR)
 	call salloc (edge, SZ_LINE, TY_CHAR)
+	call salloc (hbuf, SZ_LINE, TY_CHAR)
 
 	# Clear screen.
-	call houtput (ctrl, "\f")
+	if (H_FORMAT(ctrl) == HF_TEXT) {
+	    if (H_SOFLAG(ctrl) == YES)
+	        call houtput (ctrl, "\f")
+	} else {
+	    call sfree (sp)
+	    return
+	}
 
 	lmargin = H_LMARGIN(ctrl)
 	rmargin = min (H_RMARGIN(ctrl), SZ_LINE-1)
 
 	# Initialize the output line to blanks.
 	blank = ' '
-	call amovkc (blank, Memc[lbuf], rmargin)
+	call amovkc (blank, Memc[lbuf], SZ_LINE)
 
 	n = strlen (HB_TITLE(hb))
 	center = (lmargin + rmargin) / 2

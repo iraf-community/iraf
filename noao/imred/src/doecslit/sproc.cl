@@ -318,7 +318,27 @@ begin
 	    # If not interactive and the batch flag is set submit rest to batch.
 	    if (batch && !splot1 && !splot2) {
 		fd1 = ""
-		goto batch
+		flprcache
+		sbatch.objects = objects
+		sbatch.datamax = datamax
+		sbatch.arcs = arcs
+		sbatch.arcref = arcref
+		sbatch.arcrefs = arcrefs
+		sbatch.done = done
+		sbatch.logfile = log1
+		sbatch.redo = reextract
+		sbatch.update = update
+		sbatch.scattered = scattered
+		sbatch.arcap = arcap
+		sbatch.dispcor = dispcor
+		sbatch.fluxcal1 = fluxcal1
+		sbatch.extcor = extcor
+		sbatch.newaps = newaps
+		sbatch.newdisp = newdisp
+		sbatch.newsens = newsens
+		sbatch.newarcs = newarcs
+		dobatch = yes
+		return
 	    }
 
 	    # Process the spectrum in foreground.
@@ -457,28 +477,4 @@ begin
 
 	if (access (done))
 	    delete (done, verify=no)
-
-	bye
-
-batch:
-	flprcache
-	sbatch.objects = objects
-	sbatch.datamax = datamax
-	sbatch.arcs = arcs
-	sbatch.arcref = arcref
-	sbatch.arcrefs = arcrefs
-	sbatch.done = done
-	sbatch.logfile = log1
-	sbatch.redo = reextract
-	sbatch.update = update
-	sbatch.scattered = scattered
-	sbatch.arcap = arcap
-	sbatch.dispcor = dispcor
-	sbatch.fluxcal1 = fluxcal1
-	sbatch.extcor = extcor
-	sbatch.newaps = newaps
-	sbatch.newdisp = newdisp
-	sbatch.newsens = newsens
-	sbatch.newarcs = newarcs
-	dobatch = yes
 end

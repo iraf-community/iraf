@@ -9,6 +9,8 @@ procedure dp_free (dp)
 pointer	dp		# pointer to the daophot structure
 
 begin
+	if (DP_MW(dp) != NULL)
+	    call mw_close (DP_MW(dp))
 	call mfree (dp, TY_STRUCT)
 end
 

@@ -1,0 +1,65 @@
+.help cqwinfo Mar00 "Catquery Package"
+.ih
+NAME
+cqwinfo -- get the results wcs parameter description by name
+.ih
+SYNOPSIS
+
+wcsno = cq_winfo (imres, wname, wkname, max_wkname, wkvalue, max_wkvalue,
+	wktype, wkunits, max_wkunits)
+
+.nf
+pointer	imres		# the survey results descriptor
+char	wname		# the wcs parameter name
+char	wkname		# the default wcs keyword name (INDEF if undefined)
+int	max_wkname	# the maximum size of the returned keyword name
+char	wkvalue		# the default wcs parameter value (INDEF if undefined)
+int	max_wkvalue	# the maximum size of the parameter value
+int	wktype		# the wcs parameter data type
+char	wkunits		# the wcs parameter units (INDEF if undefined)
+int	max_wkunits	# the maximum size of the returned wcs parameter units
+.fi
+.ih
+ARGUMENTS
+.ls imres    
+The image results descriptor.
+.le
+.ls wname
+The name of the wcs parameter for which the description is to be returned.
+.le
+.ls wkname
+The returned wcs parameter keyword name. Wkname is "INDEF" if undefined. 
+.le
+.ls max_wkname
+The maximum size of the returned wcs parameter keyword name.
+.le
+.ls wkvalue
+The returned wcs parameter value. Wkvalue is "INDEF" if undefined.
+.le
+.ls max_wkvalue
+The maximum size of the returned wcs parameter value.
+.le
+.ls wktype
+The wcs parameter data type. The options are TY_DOUBLE, TY_REAL, TY_LONG,
+TY_INT, TY_SHORT, and TY_CHAR.
+.le
+.ls wkunits
+The returned wcs parameter units. Wkunits is "INDEF" if undefined.
+.le
+.ls max_wkunits
+The maximum size of the returned wcs parameter units.
+.le
+.ih
+DESCRIPTION
+Cq_winfo returns the keyword name, default value, data type, and units
+of the requested wcs parameter. Cq_winfo is an integer function
+which returns the sequence number of the wcs parameter as its function
+value. Zero is returned if the wcs parameter is not found.
+.ih
+NOTES
+For more information about the wcs parameters and their relationship
+to the image surveys configuration file type "help surveys".
+.ih
+SEE ALSO
+cqwinfon
+.endhelp

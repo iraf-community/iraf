@@ -1,0 +1,15 @@
+input,f,a,,,,Input image
+output,f,a,,,,Output image
+crmask,f,h,,,,Output cosmic ray mask
+median,f,h,,,,Output median image
+sigma,f,h,,,,Output sigma image
+residual,f,h,,,,Output residual image
+var0,r,h,0.,0.,,Variance coefficient for DN^0 term
+var1,r,h,0.,0.,,Variance coefficient for DN^1 term
+var2,r,h,0.,0.,,Variance coefficient for DN^2 term
+lsigma,r,h,10.,,,Low clipping sigma factor
+hsigma,r,h,3.,,,High clipping sigma factor
+ncmed,i,h,5,1,,Column box size for median level calculation
+nlmed,i,h,5,1,,Line box size for median level calculation
+ncsig,i,h,25,10,,Column box size for sigma calculation
+nlsig,i,h,25,10,,Line box size for sigma calculation

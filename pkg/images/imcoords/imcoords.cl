@@ -7,8 +7,10 @@ package	imcoords
 # Tasks.
 
 task	ccfind,
+	ccget,
 	ccmap,
 	ccsetwcs,
+	ccstd,
 	cctran,
 	ccxymatch,
 	imcctran,

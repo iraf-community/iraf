@@ -69,8 +69,8 @@ begin
 	    }
 
 	    # Unmap the input and output images.
-	    call imunmap (im1)
 	    call imunmap (im2)
+	    call imunmap (im1)
 
 	    call xt_delimtemp (image2, imtemp)
 	}

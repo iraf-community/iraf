@@ -5,10 +5,6 @@
 #include <ctype.h>
 #include <pwd.h>
 
-#ifdef LINUX
-#undef SOLARIS
-#endif
-
 #ifdef SOLARIS
 #include <sys/systeminfo.h>
 #endif
@@ -292,7 +288,7 @@ translate (in, out)
 FILE	*in;
 FILE	*out;
 {
-	register struct sgi_inst *sgi;
+	register struct sgi_inst *sgip;
 	struct	 sgi_inst inbuf[LEN_MCBUF], *buftop;
 	int	 n, x, y, curpoints = 0, swap_bytes;
 	float	 xscale, yscale;
@@ -317,28 +313,28 @@ FILE	*out;
 
 	/* Process the metacode:
 	 */
-	while ((n = fread ((char *)inbuf, sizeof(*sgi), LEN_MCBUF, in)) > 0) {
+	while ((n = fread ((char *)inbuf, sizeof(*sgip), LEN_MCBUF, in)) > 0) {
 	    if (swap_bytes)
-		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgi) * n);
+		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgip) * n);
 
 	    buftop = inbuf + n;
 
-	    for (sgi = inbuf;  sgi < buftop;  sgi++) {
-		switch (sgi->opcode) {
+	    for (sgip = inbuf;  sgip < buftop;  sgip++) {
+		switch (sgip->opcode) {
 		case SGK_FRAME:
 		    xy_flush (out);
 		    fprintf (out, DEV_FRAME);
 		    break;
 
 		case SGK_MOVE:
-		    x = dev_left + sgi->x * xscale;
-		    y = dev_bottom + sgi->y * yscale;
+		    x = dev_left + sgip->x * xscale;
+		    y = dev_bottom + sgip->y * yscale;
 		    xy_point (out, x, y, XY_MOVE);
 		    break;
 
 		case SGK_DRAW:
-		    x = dev_left + sgi->x * xscale;
-		    y = dev_bottom + sgi->y * yscale;
+		    x = dev_left + sgip->x * xscale;
+		    y = dev_bottom + sgip->y * yscale;
 		    xy_point (out, x, y, XY_DRAW);
 
 		    /* Limit number of points passed to Postscript between
@@ -355,7 +351,7 @@ FILE	*out;
 		case SGK_SETLW: {
 		    /* Set pen width.
 		     */
-		    int x = max (0, sgi->x - 1);
+		    int x = max (0, sgip->x - 1);
 
 		    xy_flush (out);
 		    curpoints = 0;
@@ -367,7 +363,7 @@ FILE	*out;
 		
 		default:
 		    fprintf (stderr, "sgi2uapl: unrecognized sgi opcode %d\n",
-			sgi->opcode);
+			sgip->opcode);
 		    break;
 		}
 	    }

@@ -6,21 +6,22 @@ include "../lib/polyphot.h"
 # AP_YGET -- Procedure to fetch the coordinates of the vertices of a
 # polygon from a text file.
 
-int procedure ap_yget (py, fd, delim, x, y, max_nvertices)
+int procedure ap_yget (py, im, fd, delim, x, y, max_nvertices)
 
 pointer	py		# polyphot structure
+pointer	im		# the input image descriptor
 int	fd		# polygon file descriptor
 int	delim		# delimiter character
 real	x[ARB]		# x coords of vertices
 real	y[ARB]		# y coords of vertices
 int	max_nvertices	# maximum number of vertices
 
-char	marker
-int	i, nvertices, nreal, stat
-pointer	sp, str
 real	xc, yc, r2max, r2, xtemp, ytemp
-int	fscan(), nscan(), strncmp()
+pointer	sp, str
+int	i, nvertices, nreal, stat
+char	marker
 real	asumr()
+int	fscan(), nscan(), strncmp(), apstati()
 
 begin
 	call smark (sp)
@@ -70,8 +71,12 @@ begin
 	    nvertices = EOF
 	    call apsetr (py, PYXMEAN, INDEFR)
 	    call apsetr (py, PYYMEAN, INDEFR)
+	    call apsetr (py, OPYXMEAN, INDEFR)
+	    call apsetr (py, OPYYMEAN, INDEFR)
 	    call apsetr (py, PYCX, INDEFR)
 	    call apsetr (py, PYCY, INDEFR)
+	    call apsetr (py, OPYCX, INDEFR)
+	    call apsetr (py, OPYCY, INDEFR)
 	    call apsetr (py, PYMINRAD, INDEFR)
 	    call apseti (py, PYNVER, 0)
 
@@ -79,8 +84,12 @@ begin
 
 	    call apsetr (py, PYXMEAN, INDEFR)
 	    call apsetr (py, PYYMEAN, INDEFR)
+	    call apsetr (py, OPYXMEAN, INDEFR)
+	    call apsetr (py, OPYYMEAN, INDEFR)
 	    call apsetr (py, PYCX, INDEFR)
 	    call apsetr (py, PYCY, INDEFR)
+	    call apsetr (py, OPYCX, INDEFR)
+	    call apsetr (py, OPYCY, INDEFR)
 	    call apsetr (py, PYMINRAD, INDEFR)
 	    call apseti (py, PYNVER, 0)
 	    nvertices = 0
@@ -91,6 +100,16 @@ begin
 	    x[nvertices+1] = x[1]
 	    y[nvertices+1] = y[1]
 
+            # Transform the input coordinates.
+            switch (apstati(py,WCSIN)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_itol (py, x, y, x, y, nvertices + 1)
+            case WCS_TV:
+                call ap_vtol (im, x, y, x, y, nvertices + 1)
+            default:
+                ;
+            }
+
 	    # Compute the mean polygon coordinates.
 	    xc = asumr (x, nvertices) / nvertices
 	    yc = asumr (y, nvertices) / nvertices
@@ -98,7 +117,6 @@ begin
 	    call apsetr (py, PYYMEAN, yc)
 	    call apsetr (py, PYCX, xc)
 	    call apsetr (py, PYCY, yc)
-	    call apseti (py, PYNVER, 0)
 
 	    # Set the minimum size of the sky annulus.
 	    r2max = 0.0
@@ -107,6 +125,19 @@ begin
 		if (r2 > r2max)
 		    r2max = r2
 	    }
+
+            switch (apstati(py,WCSOUT)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_ltoo (py, xc, yc, xc, yc, 1)
+            case WCS_TV:
+                call ap_ltov (im, xc, yc, xc, yc, 1)
+            default:
+    		;
+	    }
+	    call apsetr (py, OPYXMEAN, xc)
+	    call apsetr (py, OPYYMEAN, yc)
+	    call apsetr (py, OPYCX, xc)
+	    call apsetr (py, OPYCY, yc)
 
 	    call apsetr (py, PYMINRAD, (sqrt (r2max) + 1.1))
 	    call apseti (py, PYNVER, nvertices)
@@ -119,20 +150,21 @@ end
 
 # AP_YMKPOLY -- Mark the coordinates of a polygon on the display device.
 
-int procedure ap_ymkpoly (py, id, x, y, max_nvertices, idflush)
+int procedure ap_ymkpoly (py, im, id, x, y, max_nvertices, idflush)
 
 pointer	py		# polyphot structure
+pointer	im		# the input image descriptor
 pointer	id		# display pointer
 real	x[ARB]		# x coords of vertices
 real	y[ARB]		# y coords of vertices
 int	max_nvertices	# maximum number of vertices
-int	idflush		# flush the imd device
+int	idflush		# flush the imd interface ?
 
 int	i, nvertices, stat, wcs, key
 pointer	sp, cmd
 real	xtemp, ytemp, xc, yc, r2max, r2
-int	clgcur()
 real	apstatr(), asumr()
+int	clgcur(), apstati()
 errchk	gscur
 
 begin
@@ -148,6 +180,8 @@ begin
 	call printf (
 	    "Mark polygon vertex [space=mark,q=quit].\n")
 	stat = clgcur ("icommands", xtemp, ytemp, wcs, key, Memc[cmd], SZ_LINE)
+	call ap_vtol (im, xtemp, ytemp, xtemp, ytemp, 1)
+
 
 	# Fetch the polygon and draw it on the display.
 	nvertices = 0
@@ -180,6 +214,7 @@ begin
 	        "Mark polygon vertex [space=mark,q=quit].\n")
 	    stat = clgcur ("icommands", xtemp, ytemp, wcs, key, Memc[cmd],
 	        SZ_LINE)
+	    call ap_vtol (im, xtemp, ytemp, xtemp, ytemp, 1)
 	}
 	call printf ("\n")
 
@@ -190,8 +225,12 @@ begin
 
 	    call apsetr (py, PYXMEAN, INDEFR)
 	    call apsetr (py, PYYMEAN, INDEFR)
+	    call apsetr (py, OPYXMEAN, INDEFR)
+	    call apsetr (py, OPYYMEAN, INDEFR)
 	    call apsetr (py, PYCX, INDEFR)
 	    call apsetr (py, PYCY, INDEFR)
+	    call apsetr (py, OPYCX, INDEFR)
+	    call apsetr (py, OPYCY, INDEFR)
 	    call apsetr (py, PYMINRAD, INDEFR)
 	    call apseti (py, PYNVER, 0)
 	    nvertices = EOF
@@ -200,20 +239,27 @@ begin
 
 	    call apsetr (py, PYXMEAN, INDEFR)
 	    call apsetr (py, PYYMEAN, INDEFR)
+	    call apsetr (py, OPYXMEAN, INDEFR)
+	    call apsetr (py, OPYYMEAN, INDEFR)
 	    call apsetr (py, PYCX, INDEFR)
 	    call apsetr (py, PYCY, INDEFR)
+	    call apsetr (py, OPYCX, INDEFR)
+	    call apsetr (py, OPYCY, INDEFR)
 	    call apsetr (py, PYMINRAD, INDEFR)
 	    call apseti (py, PYNVER, 0)
 	    nvertices = 0
 
 	} else {
 
-	    # Add the last vertex and draw the line segment.
+	    # Add the last vertex and close the polygon.
 	    x[nvertices+1] = x[1]
 	    y[nvertices+1] = y[1]
 	    if (id != NULL) {
 	        call gadraw (id, x[1], y[1])
-	        call gflush (id)
+		if (idflush == YES)
+		    call gframe (id)
+		else
+	            call gflush (id)
 	    }
 
 	    # Compute and save the mean polygon coords.
@@ -233,6 +279,21 @@ begin
 		if (r2 > r2max)
 		    r2max = r2
 	    }
+
+	    # Compute output coordinate centers.
+            switch (apstati(py,WCSOUT)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_ltoo (py, xc, yc, xc, yc, 1)
+            case WCS_TV:
+                call ap_ltov (im, xc, yc, xc, yc, 1)
+            default:
+                ;
+            }
+            call apsetr (py, OPYXMEAN, xc)
+            call apsetr (py, OPYYMEAN, yc)
+            call apsetr (py, OPYCX, xc)
+            call apsetr (py, OPYCY, yc)
+
 	    call apseti (py, PYNVER, nvertices)
 	    call apsetr (py, PYMINRAD, (sqrt (r2max) + 1.1))
 

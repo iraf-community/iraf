@@ -485,8 +485,9 @@ begin
 		x = xcen[l] - lx + 1.0
 		lx = lx - x1 + 1
 		mx = mx - x1 + 1
-		deltax = (xcen[l] - 1.0) / DP_PSFX(psffit) - 1.0
-		deltay = (ycen[l] - 1.0) / DP_PSFY(psffit) - 1.0
+		call dp_wpsf (dao, im, xcen[l], ycen[l], deltax, deltay, 1)
+		deltax = (deltax - 1.0) / DP_PSFX(psffit) - 1.0
+		deltay = (deltay - 1.0) / DP_PSFY(psffit) - 1.0
 		call dp_alsubstar (psffit, x, dy, deltax, deltay, mag[l],
 		    Memr[subtbuf+lx-1], Memr[owtbuf+lx-1], mx - lx + 1, dysq,
 		    psfradsq)

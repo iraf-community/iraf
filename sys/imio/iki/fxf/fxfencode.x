@@ -130,9 +130,14 @@ char	root[ARB]		# FITS root keyword
 char	keyword[ARB]		# FITS keyword
 int	axisno			# FITS axis number
 
+int	len, strlen()
+
 begin
 	call strcpy (root, keyword, SZ_KEYWORD)
-	call sprintf (keyword, SZ_KEYWORD, "%-5.5s%-3.3s")
+	len = strlen (keyword)
+	call sprintf (keyword, SZ_KEYWORD, "%*.*s%d")
+	    call pargi (-len)
+	    call pargi (len)
 	    call pargstr (root)
 	    call pargi (axisno)
 end
@@ -232,10 +237,10 @@ end
 procedure fxf_akwc (keyword, value, len, comment, pn)
 
 char	keyword[SZ_KEYWORD]	# keyword name
-char	value[ARB]		# Keyword value
-int	len			# Lenght of value
-char	comment[ARB]		# Comment
-pointer pn			# Pointer to a char area
+char	value[ARB]		# keyword value
+int	len			# length of value
+char	comment[ARB]		# comment
+pointer pn			# pointer to a char area
 char	card[LEN_CARD]
 
 begin

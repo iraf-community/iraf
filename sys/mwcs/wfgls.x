@@ -78,6 +78,7 @@ begin
 
 	# Get the value of W for each axis, i.e. the world coordinates at
 	# the reference point.
+
 	wv = MI_DBUF(mw) + WCS_W(wp) - 1
 	do i = 1, 2
 	    FC_W(fc,i) = Memd[wv+CT_AXIS(ct,FC_AXIS(fc,i))-1]
@@ -108,7 +109,7 @@ begin
                 FC_LONGP(fc) = INDEFD
         }
 
-        iferr {
+	iferr {
             call mw_gwattrs (mw, FC_IRA(fc), "latpole", Memc[atvalue], SZ_LINE)
         } then {
             iferr {
@@ -223,6 +224,7 @@ begin
 
         z = cos (latp) * clat0
         if (abs(z) < tol) {
+
             # Celestial pole at the reference point.
             if (abs(clat0) < tol) {
                 FC_NATRA(fc) = DDEGTORAD(FC_W(fc,FC_IRA(fc)))
@@ -248,10 +250,10 @@ begin
 
         if (FC_W(fc,FC_IRA(fc)) >= 0.0d0) {
             if (FC_NATRA(fc) < 0.0d0)
-                FC_NATRA(fc) = FC_NATRA(fc) + 360.0d0
+                FC_NATRA(fc) = FC_NATRA(fc) + DTWOPI
         } else {
             if (FC_NATRA(fc) > 0.0d0)
-                FC_NATRA(fc) = FC_NATRA(fc) - 360.0d0
+                FC_NATRA(fc) = FC_NATRA(fc) - DTWOPI
         }
         FC_COSDEC(fc) = cos (FC_NATDEC(fc))
         FC_SINDEC(fc) = sin (FC_NATDEC(fc))
@@ -436,4 +438,5 @@ begin
 
 	p[ira] = FC_RODEG(fc) * phi * cos (theta)
 	p[idec] = FC_RODEG(fc) * theta
+
 end

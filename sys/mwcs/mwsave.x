@@ -39,7 +39,7 @@ begin
 	call aclri (MI_PHYSAX(mw,1), MAX_DIM)
 
 	# Compress the main header to save space.
-	call salloc (oo, MI_LEN(mw) * 2, TY_SHORT)
+	call salloc (oo, MI_LEN(mw) * 3 + 32, TY_SHORT)
 	olen = pl_p2li (Memi[mw], 1, Mems[oo], MI_LEN(mw))
 
 	# Determine how much space will be needed.

@@ -115,10 +115,11 @@ begin
 	    fp = fiodes[fd]
 	    if (FCHAN(fp) == ERR) {
 		iferr {
-		    if (standard_device)
-			call fwtacc (fd, fname[ip])
-		    else {
-			call syserrs (SYS_FOPENDEV, fname)
+		    if (standard_device) {
+			iferr (call fwtacc (fd, fname[ip]))
+			    call syserrs (SYS_FOPEN, fname[ip])
+		    } else {
+			call syserrs (SYS_FOPENDEV, fname[ip])
 		    }
 		} then
 		    goto cleanup_

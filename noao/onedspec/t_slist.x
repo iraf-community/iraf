@@ -45,8 +45,11 @@ begin
 		#    call error (1, "Invalid spectrum format")
 		call shdr_open (im, mw, 1, 1, INDEFI, SHHDR, sh)
 	    } then {
-		if (mw != NULL)
+		if (mw != NULL) {
 		    call smw_close (mw)
+		    if (sh != NULL)
+			MW(sh) = NULL
+		}
 		if (im != NULL)
 		    call imunmap (im)
 		call erract (EA_WARN)
@@ -89,6 +92,8 @@ begin
 	    }
 
 	    call smw_close (MW(sh))
+	    if (sh != NULL)
+		MW(sh) = NULL
 	    call imunmap (im)
 	}
 

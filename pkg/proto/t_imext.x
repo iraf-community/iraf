@@ -116,18 +116,19 @@ int	err			#I Print errors?
 int	list			#O Image list
 
 int	i, fd
-pointer	sp, fname, imname, section, extpat, rindex, rextver, ikp, str
+pointer	sp, temp, fname, imname, section, extpat, rindex, rextver, ikp, str
 int	imtopen(), imtgetim()
-int	patmake(), ix_decode_ranges(), nowhite(), stropen()
-errchk	stropen, imextensions1
+int	patmake(), ix_decode_ranges(), nowhite(), open()
+errchk	open, imextensions1, delete
 
 begin
 	call smark (sp)
+	call salloc (temp, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
 	call salloc (section, SZ_FNAME, TY_CHAR)
 	call salloc (ikp, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LIST, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Expand parameters.
 	list = imtopen (files)
@@ -148,8 +149,9 @@ begin
 	}
 	i = nowhite (ikparams, Memc[ikp], SZ_LINE)
 
-	# Expand ME files into list of image extensions in a string buffer.
-	fd = stropen (Memc[str], SZ_LIST, WRITE_ONLY)
+	# Expand ME files into list of image extensions in a temp file.
+	call mktemp ("@tmp$iraf", Memc[temp], SZ_FNAME)
+	fd = open (Memc[temp+1], NEW_FILE, TEXT_FILE)
 	while (imtgetim (list, Memc[fname], SZ_FNAME) != EOF) {
 	    call imgimage (Memc[fname], Memc[imname], SZ_FNAME)
 	    call imgsection (Memc[fname], Memc[section], SZ_FNAME)
@@ -157,10 +159,11 @@ begin
 		lindex, lname, lver, Memc[ikp], Memc[section], err)
 	}
 	call imtclose (list)
-	call strclose (fd)
+	call close (fd)
 
 	# Return list.
-	list = imtopen (Memc[str])
+	list = imtopen (Memc[temp])
+	call delete (Memc[temp+1])
 	call sfree (sp)
 	return (list)
 end
@@ -185,7 +188,7 @@ char	ikparams[ARB]		#I Image kernel parameters
 char	section[ARB]		#I Image section
 int	err			#I Print errors?
 
-int	i, ver, ix_get_next_number(), errcode(), imgeti(), patmatch()
+int	i, ver, ix_get_next_number(), errcode(), imgeti(), patmatch(), stridxs()
 pointer	sp, image, name, str, im, immap()
 bool	is_in_range()
 
@@ -197,9 +200,15 @@ begin
 
 	i = -1
 	while (ix_get_next_number (Memi[index], i) != EOF) {
-	    call sprintf (Memc[image], SZ_FNAME, "%s[%d]")
-		call pargstr (fname)
-		call pargi (i)
+	    if (stridxs ("[", fname) > 0) {
+		if (i > 0)
+		    break
+		call strcpy (fname, Memc[image], SZ_FNAME)
+	    } else {
+		call sprintf (Memc[image], SZ_FNAME, "%s[%d]")
+		    call pargstr (fname)
+		    call pargi (i)
+	    }
 	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
 		switch (errcode()) {
 		case SYS_FXFRFEOF:
@@ -290,7 +299,7 @@ begin
 	    }
 	    call fprintf (fd, "%s")
 		call pargstr (section)
-	    call fprintf (fd, ",")
+	    call fprintf (fd, "\n")
 		
 	    call imunmap (im)
 	}

@@ -17,7 +17,7 @@ libpkg.a:
 			../lib/noise.h
 	apmag.x		<mach.h>		../lib/apphotdef.h     \
 			../lib/noisedef.h	../lib/photdef.h       \
-			../lib/phot.h
+			../lib/apphot.h         ../lib/phot.h
 	apmagbuf.x	<imhdr.h>		../lib/apphotdef.h     \
 			../lib/photdef.h	../lib/phot.h
 	apmeasure.x
@@ -30,7 +30,7 @@ libpkg.a:
 	apphot.x	<ctype.h>		<gset.h>               \
 			../lib/apphot.h		../lib/display.h       \
 			../lib/center.h		../lib/fitsky.h        \
-			../lib/phot.h
+			../lib/phot.h		<imhdr.h>
 	apphotcolon.x	../lib/noise.h		../lib/apphot.h        \
 			../lib/display.h	../lib/fitsky.h        \
 			../lib/center.h		../lib/phot.h          \
@@ -49,10 +49,10 @@ libpkg.a:
 			../lib/display.h	../lib/apphot.h
 	apremag.x	<mach.h>		../lib/apphotdef.h     \
 			../lib/noisedef.h       ../lib/photdef.h       \
-			../lib/phot.h
+			../lib/apphot.h         ../lib/phot.h
 	t_phot.x	<fset.h>		<gset.h>	       \
 			<lexnum.h>		../lib/apphot.h        \
-			../lib/fitsky.h
+			../lib/fitsky.h         <imhdr.h>
 
 	# QPHOT TASK SPECIFIC ROUTINES
 
@@ -65,7 +65,7 @@ libpkg.a:
 	apqphot.x	<ctype.h>		<gset.h>		\
 			"../lib/apphot.h"	"../lib/display.h"	\
 			"../lib/center.h"	"../lib/fitsky.h"	\
-			"../lib/phot.h"
+			"../lib/phot.h"         <imhdr.h>
 	apqradsetup.x "../lib/apphot.h"		"../lib/display.h"	\
 			"../lib/center.h"	"../lib/fitsky.h"
 	apqcolon.x	"../lib/apphot.h"	"../lib/display.h"	\
@@ -77,5 +77,5 @@ libpkg.a:
 			"../lib/fitsky.h"	"../lib/phot.h"
 	t_qphot.x	<fset.h>		<gset.h>		\
 			<lexnum.h>		../lib/apphot.h   	\
-			../lib/fitsky.h
+			../lib/fitsky.h         <imhdr.h>
 	;

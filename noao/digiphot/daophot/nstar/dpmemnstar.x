@@ -156,4 +156,3 @@ begin
 
 	call mfree (nstar, TY_STRUCT)
 end
-

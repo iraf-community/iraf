@@ -7,7 +7,6 @@ proto			# Task "imreplace"
 package generic
 
 task	flat1d		= generic$x_generic.e
-task	cosmicrays	= generic$x_ccdred.e
 
 task	background	= generic$background.cl
 task	darksub		= generic$darksub.cl

@@ -36,7 +36,7 @@ The following commands are defined:
 	load [mask] fname			# load mask from file
 	save [mask] fname [title]		# save mask in file
 	loadim [mask] image			# load mask from image
-	saveim [mask] image			# save mask in image
+	saveim [mask] image [title]		# save mask in image
 	erase [mask] [vs ve]			# erase a mask or region
 	draw [mask] [vs ve] [>ofile]		# draw mask or region of mask
 
@@ -139,7 +139,9 @@ char	cmd[SZ_LINE], kwname[SZ_FNAME], title[SZ_LINE], fname[SZ_FNAME]
 int	what, rop, v_arg, x1, x2, y1, y2, ip, op, ch, i, j, cmdlog, status
 int	opcode, save_fd[MAXINCL], in, fd, o_fd, maskno, depth, naxes, npts
 int	v1[PL_MAXDIM], v2[PL_MAXDIM], v3[PL_MAXDIM], v4[PL_MAXDIM], v[PL_MAXDIM]
-int	fstati(), strdic(), open(), getline(), strncmp(), locpr(), plr_getpix()
+
+int	plr_getpix(), pl_compare()
+int	fstati(), strdic(), open(), getline(), strncmp(), locpr()
 pointer	pl_create(), ttyodes(), plr_open()
 bool	pl_sectnotempty(), pl_sectnotconst()
 extern	onint()
@@ -541,7 +543,7 @@ eof_		    if (in > 0) {
 		# Perform the operation.
 		if (timer)
 		    call sys_mtime (time)
-		call pl_compare (pl_1, pl_2, STDOUT)
+		status = pl_compare (pl_1, pl_2, STDOUT)
 		if (timer)
 		    call sys_ptime (STDOUT, "", time)
 
@@ -876,7 +878,7 @@ eof_		    if (in > 0) {
 		# Perform the operation.
 		if (timer)
 		    call sys_mtime (time)
-		iferr (call pl_loadim (pl, v_s(argno)))
+		iferr (call pl_loadim (pl, v_s(argno), title, SZ_LINE))
 		    call erract (EA_WARN)
 		if (timer)
 		    call sys_ptime (STDOUT, "", time)
@@ -894,11 +896,21 @@ eof_		    if (in > 0) {
 		# Get output image name.
 		if (argno > nargs || argtype[argno] != STRING_ARG)
 		    goto argerr_
+		else {
+		    call strcpy (v_s(argno), fname, SZ_FNAME)
+		    argno = argno + 1
+		}
+
+		# Get title string.
+		if (argno <= nargs && argtype[argno] == STRING_ARG) {
+		    call strcpy (v_s(argno), title, SZ_LINE)
+		    argno = argno + 1
+		}
 
 		# Perform the operation.
 		if (timer)
 		    call sys_mtime (time)
-		iferr (call pl_saveim (pl, v_s(argno), 0))
+		iferr (call pl_saveim (pl, fname, title, 0))
 		    call erract (EA_WARN)
 		if (timer)
 		    call sys_ptime (STDOUT, "", time)

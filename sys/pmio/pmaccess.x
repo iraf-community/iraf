@@ -3,16 +3,16 @@
 include <pmset.h>
 include <plio.h>
 
-# PM_ACCESS -- Return a pointer (llbuf offset) to the indicated mask image
-# line.  A valid offset is always returned; if the mask line is empty, the
-# offset will be that of the "empty line" linelist.
+# PM_ACCESS -- Return a pointer (type short) to the indicated mask image
+# line.  A valid pointer is always returned; if the mask line is empty, the
+# pointer will reference the "empty line" linelist.
 
-int procedure pm_access (pl, v)
+pointer procedure pm_access (pl, v)
 
 pointer	pl			#I mask descriptor
 long	v[PM_MAXDIM]		#I coordinates of desired line
 
-int	pl_access()
+pointer	pl_access()
 include	"pmio.com"
 
 begin

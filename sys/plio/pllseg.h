@@ -29,7 +29,10 @@ define	ld_next_value	$1[7]
 define	(pll_init, {			# $1=ll $2=des
 	# ld_x($2) = 1
 	ld_hi($2) = 1
-	ld_ip($2) = LL_FIRST
+	if (LL_OLDFORMAT($1))
+	    ld_ip($2) = OLL_FIRST
+	else
+	    ld_ip($2) = LL_FIRST($1)
 	ld_next_nleft($2) = 0
 	ld_nleft($2) = 0
 	call pll_nextseg ($1, $2)

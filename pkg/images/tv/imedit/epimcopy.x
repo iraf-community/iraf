@@ -17,6 +17,8 @@ int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
 int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 pointer	immap()
 errchk	immap
+errchk	imgnls, imgnli, imgnll, imgnlr, imgnld, imgnlx
+errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
  
 begin
 	# Map images.
@@ -35,7 +37,7 @@ begin
 		junk = impnls (im2, buf2, v2)
 		call amovs (Mems[buf1], Mems[buf2], npix)
 	    }
-	case TY_INT:
+	case TY_USHORT, TY_INT:
 	    while (imgnli (im1, buf1, v1) != EOF) {
 		junk = impnli (im2, buf2, v2)
 		call amovi (Memi[buf1], Memi[buf2], npix)

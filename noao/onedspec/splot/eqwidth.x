@@ -45,11 +45,8 @@ begin
 	    do i = 1, n {
 		if (y[i] > 0)
 		    Memr[s+i-1] = sqrt (sigma0  ** 2 + invgain * y[i])
-		else {
-		    invgain = INDEF
-		    call amovkr (INDEF, Memr[s], n)
-		    break
-		}
+		else
+		    Memr[s+i-1] = sqrt (sigma0  ** 2)
 	    }
 	}
 

@@ -86,6 +86,11 @@ begin
 		break
 	    DP_NNUM(nstar) = old_size
 
+	    # Convert coordinates if necessary.
+	    call dp_win (dao, im, Memr[DP_APXCEN(apsel)],
+	        Memr[DP_APYCEN(apsel)], Memr[DP_APXCEN(apsel)],
+		Memr[DP_APYCEN(apsel)], DP_NNUM(nstar))
+
 	    # Print out the group number and number of stars.
 	    if (DP_VERBOSE (dao) == YES) {
 		call printf ("Group: %4d contains %2d stars\n")
@@ -161,10 +166,10 @@ begin
 
 	    # Now write out the results.
 	    if (DP_TEXT(dao) == YES)
-	        call dp_xntwrite (dao, nst, rej, niter, old_size)
+	        call dp_xntwrite (dao, im, nst, rej, niter, old_size)
 	    else
-	        call dp_tntwrite (dao, nst, rej, niter, old_size, out_record,
-		    rout_record, Memi[ocolpoint])
+	        call dp_tntwrite (dao, im, nst, rej, niter, old_size,
+		    out_record, rout_record, Memi[ocolpoint])
 	} 
 
 	if (ap_text)

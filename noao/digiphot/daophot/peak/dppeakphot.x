@@ -16,11 +16,11 @@ int	tpout			# the ouput photometry file descriptor
 int	tprej			# the rejections file descriptor
 bool	ap_text			# which style of photometry
 
+real	rel_bright, xold, yold, x, y, dx, dy, mag, sky, errmag
+real	chi, sharp, radius, itx, ity, otx, oty
+pointer	psffit, key, sp, subim, colpoint, indices, fields, perror
 int	id, in_nrow, instar, lowx, lowy, nxpix, nypix, niter, out_nrow
 int	rout_nrow, nterm, ier, plen
-pointer	psffit, key, sp, subim, colpoint, indices, fields, perror
-real	rel_bright, xold, yold, x, y, dx, dy, mag, sky, errmag
-real	chi, sharp, radius
 
 int	tbpsta(), dp_rrphot(), dp_pkfit(), dp_gpkerr()
 pointer	dp_gsubrast()
@@ -86,16 +86,20 @@ begin
 	repeat {
 
 	    # Read in the photometry for a single star.
-	    if (dp_rrphot (tp, key, Memc[fields], Memi[indices], id, x,
-	        y, sky, mag, instar, in_nrow) == EOF)
+	    if (dp_rrphot (tp, key, Memc[fields], Memi[indices], id, itx,
+	        ity, sky, mag, instar, in_nrow) == EOF)
 		break
+
+	    # Convert to and from logical coordinates.
+	    call dp_win (dao, im, itx, ity, x, y, 1)
+	    call dp_wout (dao, im, x, y, otx, oty, 1)
 
 	    if (DP_VERBOSE(dao) == YES) {
 	        call printf (
 		    "Star: %5d X: %8.2f Y: %8.2f Mag: %8.2f Sky: %8.2f\n")
 		    call pargi (id)
-		    call pargr (x)
-		    call pargr (y)
+		    call pargr (otx)
+		    call pargr (oty)
 		    call pargr (mag)
 		    call pargr (sky)
 	    }
@@ -122,13 +126,16 @@ begin
 		next
 	    }
 
-	    # Save the old x and y values.
+	    # Save the old x and y values for use with the variable psf
+	    # option.
 	    xold = x
 	    yold = y
+	    call dp_wpsf (dao, im, xold, yold, xold, yold, 1)
 
 	    # Compute the relative centers and the relative brightness and
 	    # fit the star.
 	    if (IS_INDEFR(sky)) {
+
 		ier = PKERR_INDEFSKY
 
 	    } else {
@@ -142,10 +149,12 @@ begin
 	        rel_bright = DAO_RELBRIGHT (psffit, mag)
 	        ier = dp_pkfit (dao, Memr[subim], nxpix, nypix, DP_FITRAD(dao),
 		    x, y, dx, dy, rel_bright, sky, errmag, chi, sharp, niter)
+	        x = x + lowx - 1.0
+	        y = y + lowy - 1.0
 	    }
 
-	    x = x + lowx - 1.0
-	    y = y + lowy - 1.0
+	    call dp_wout (dao, im, x, y, otx, oty, 1)
+
 	    if (ier != PKERR_OK) {
 
 		# Set fitting parameters to INDEF.
@@ -191,8 +200,8 @@ begin
              	        call printf (
 		  "\tFIT:  Star: %5d X: %8.2f Y: %8.2f Mag: %8.2f Sky =%8.2f\n")
 	    	            call pargi (id)
-		    	    call pargr (x)
-		    	    call pargr (y)
+		    	    call pargr (otx)
+		    	    call pargr (oty)
 		   	    call pargr (mag)
 		    	    call pargr (sky)
 		}
@@ -205,20 +214,20 @@ begin
 	    # file.
 	    if (DP_TEXT(dao) == YES) {
 		if ((tprej != NULL) && (ier != PKERR_OK))
-		    call dp_xpkwrite (tprej, id, x, y, mag, errmag, sky,
+		    call dp_xpkwrite (tprej, id, otx, oty, mag, errmag, sky,
 		        niter, chi, sharp, ier, Memc[perror], plen)
 		else
-		    call dp_xpkwrite (tpout, id, x, y, mag, errmag, sky,
+		    call dp_xpkwrite (tpout, id, otx, oty, mag, errmag, sky,
 		        niter, chi, sharp, ier, Memc[perror], plen)
 	    } else {
 		if ((tprej != NULL) && (ier != PKERR_OK)) {
 	            rout_nrow = rout_nrow + 1
-		    call dp_tpkwrite (tprej, Memi[colpoint], id, x, y, mag,
+		    call dp_tpkwrite (tprej, Memi[colpoint], id, otx, oty, mag,
 		        errmag, sky, niter, chi, sharp, ier,
 			Memc[perror], plen, rout_nrow)
 		} else {
 	            out_nrow = out_nrow + 1
-		    call dp_tpkwrite (tpout, Memi[colpoint], id, x, y, mag,
+		    call dp_tpkwrite (tpout, Memi[colpoint], id, otx, oty, mag,
 		        errmag, sky, niter, chi, sharp, ier, Memc[perror],
 			plen, out_nrow)
 		}

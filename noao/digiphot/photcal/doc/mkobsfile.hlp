@@ -22,6 +22,12 @@ commas which define a complete observation.
 The output observations file suitable for input to FITPARAMS or 
 EVALFIT/INVERTFIT.
 .le
+.ls wrap = yes
+Format the output observations file for easy reading ? If wrap = yes then
+the observations for each filter are written on a separate line and the
+* character in column 1 is interpreted as a continutation character.
+Otherwise all the data for each object is written to a single line
+where the maximum size of a line is the current value of SZ_LINE.
 .ls imsets = "STDIN"
 The input/output image set file which lists the observations of each field,
 assigns a name to each field, and tells MKOBSFILE which images belong to the

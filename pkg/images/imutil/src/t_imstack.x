@@ -146,6 +146,7 @@ begin
 	# Finish up.
 	call imunmap (out)
 	call imtclose (list)
+	call sfree (sp)
 end
 
 

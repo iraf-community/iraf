@@ -9,7 +9,6 @@ ccdlist		hlp=doc$ccdlist.hlp
 ccdmask		hlp=doc$ccdmask.hlp
 ccdproc		hlp=doc$ccdproc.hlp
 combine		hlp=doc$combine.hlp
-cosmicrays	hlp=doc$cosmicrays.hlp
 darkcombine	hlp=doc$darkcombine.hlp
 flatcombine	hlp=doc$flatcombine.hlp
 mkfringecor	hlp=doc$mkfringecor.hlp

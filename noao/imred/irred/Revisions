@@ -1,5 +1,22 @@
 .help revisions Jun88 noao.imred.irred
 .nf
+irred$center.par
+irred$doc/center.hlp
+    Updated the center task parameter file to support the new cache, wcsin,
+    and wcsout parameters.
+
+    Added a copy of the center task help page so it is accessible even
+    if apphot is not loaded. Center1d gets picked up instead in that case.
+
+    Davis, April 8, 2001
+
+irred$mosproc.cl
+    Changed the outtype parameter setting in the imcombine task call from
+    "" to "real". Added default values for the rejmask, nkeep, and snoise
+    parameters.
+
+    Davis, January 18, 1999
+
 irred$irred.cl
 irred$irred.hd
 irred$irred.men

@@ -31,4 +31,4 @@ txdump		hlp=doc$txdump.hlp,		src=txtools$t_txdump.x
 txrenumber	hlp=doc$txrenumber.hlp,		src=txtools$t_txrenumber.x
 txselect	hlp=doc$txselect.hlp,		src=txtools$t_txselect.x
 txsort		hlp=doc$txsort.hlp,		src=txtools$t_txsort.x
-revisions	sys=ptools$Revisions
+revisions	sys=ptoolsx$Revisions

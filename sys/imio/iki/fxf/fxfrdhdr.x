@@ -1,11 +1,11 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  
 include	<syserr.h>
-include	<finfo.h>
 include	<imhdr.h>
 include	<imio.h>
 include	<mach.h>
 include	"fxf.h"
+
 
 # FXF_RHEADER -- Read a FITS header into the image descriptor and the 
 # internal FITS descriptor.
@@ -16,13 +16,12 @@ pointer	im			#I image descriptor
 int	group			#I group number to read
 int	acmode			#I access mode
 
+long	pixoff,	mtime
 pointer	sp, fit, lbuf, poff
-long	pixoff,	mtime, ctime
-long	fi[LEN_FINFO]
 int	compress, devblksz, i, impixtype
 bool    bfloat, lscale, lzero
 bool    fxf_fpl_equald()
-int	finfo(), strncmp()
+int	strncmp()
 
 errchk	fxf_rfitshdr, realloc, syserr, syserrs
 
@@ -30,10 +29,11 @@ begin
 	call smark (sp)
 	call salloc (lbuf, SZ_LINE, TY_CHAR)
 
-	FIT_MAX(im) = 0.0
-	FIT_MIN(im) = 0.0
-	FIT_MTIME(im) = 0.0
 	fit = IM_KDES(im)
+
+	FIT_MAX(fit) = 0.0
+	FIT_MIN(fit) = 0.0
+	FIT_MTIME(fit) = 0.0
 	FIT_IM(fit) = im
 	FIT_OBJECT(fit) = EOS
 	IM_CLSIZE(im) = 0
@@ -59,8 +59,13 @@ begin
 
 	if (acmode != NEW_COPY) {
 	    IM_NDIM(im) = FIT_NAXIS(fit)		# IM_NDIM
-	    do i = 1, IM_NDIM(im)			# IM_LEN
+	    do i = 1, IM_NDIM(im) {			# IM_LEN
 		IM_LEN(im,i) = FIT_LENAXIS(fit,i)
+		if (IM_LEN(im,i) == 0) {
+		    IM_NDIM(im) = 0
+		    break
+	        }
+	    }
 	}
 
 	lscale = fxf_fpl_equald (1.0d0, FIT_BSCALE(fit), 1)
@@ -94,41 +99,25 @@ begin
 	        FIT_ZCNV(fit) = NO
 	    }
 	case 32:
-	    FIT_PIXTYPE(fit) = TY_LONG
+	    FIT_PIXTYPE(fit) = TY_INT
 	    if (bfloat)
 		impixtype = TY_REAL
 	    else
-		impixtype = TY_LONG
+		impixtype = TY_INT
 	case -32:
 	    FIT_PIXTYPE(fit) = TY_REAL
 	    impixtype = TY_REAL
-	    if (bfloat)
-		call syserr (SYS_FXFRDHSC)
 	case -64:
 	    FIT_PIXTYPE(fit) = TY_DOUBLE
 	    impixtype = TY_DOUBLE
-	    if (bfloat)
-		call syserr (SYS_FXFRDHSC)
 	default:
 	    impixtype = ERR
 	}
 
 	IM_PIXTYPE(im) = impixtype
-	if (finfo (IM_HDRFILE(im), fi) != ERR) {
-	    mtime = FI_MTIME(fi)
-	    ctime = FI_CTIME(fi)
-	}
 
 	IM_NBPIX(im)   = 0			# no. bad pixels
-	IM_CTIME(im)   = ctime			# creation time
-
-	# If MTIME is not zero then it has been read from the value
-	# of IRAF-TLM keyword.
-
-	if (IM_MTIME(im) == 0) 
-	   IM_MTIME(im) = mtime
-	else
-	   mtime = IM_MTIME(im)
+	mtime = IM_MTIME(im)
 		
 	if (IM_MAX(im) > IM_MIN(im))
 	   IM_LIMTIME(im) = mtime + 1		# time max/min last updated

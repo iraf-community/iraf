@@ -50,5 +50,5 @@ generic:
 	;
 
 libpkg.a:
-	flat1d.x	<imhdr.h> <pkg/gtools.h>
+	flat1d.x	<imhdr.h> <pkg/gtools.h> <error.h>
 	;

@@ -190,14 +190,14 @@ begin
 		    # Terminate the search if the number of best fit values
 		    # less than 1. is equal to the specified number.
 		    do l = 1, 5 {
-			best = aid_eval (aid, ev, l, l)
+			best = aid_eval (aid, ev, l)
 			if (!IS_INDEFD(best) && best < 1.) {
 			    nbest = nbest + 1
 			    if (nbest >= AID_NBEST(aid))
 				goto done_
 			}
 			if (cdflip) {
-			    best = aid_eval (aid, evf, l, l)
+			    best = aid_eval (aid, evf, l)
 			    if (!IS_INDEFD(best) && best < 1.) {
 				nbest = nbest + 1
 				if (nbest >= AID_NBEST(aid))
@@ -215,7 +215,7 @@ begin
 	do j = 6, 20 {
 	    do i = 1, iev {
 		ev = aid_evalloc (aid, i)
-		best = aid_eval (aid, ev, j, j)
+		best = aid_eval (aid, ev, j)
 		if (!IS_INDEFD(best) && best < 1.) {
 		    nbest = nbest + 1
 		    if (nbest >= AID_NBEST(aid))

@@ -141,6 +141,9 @@ graph.  When the fitted function is satisfactory exit with a carriage
 return or 'q' and the calibration image will be created.  Changes in
 the fitted parameters are remembered from image to image within the
 task but not outside the task.
+
+When the task finishes creating a response image the fitting parameters
+are updated in the parameter file.
 .ih
 EXAMPLES
 1. To create a response image non-interactively:

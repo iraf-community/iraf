@@ -104,15 +104,15 @@ begin
                 call eprintf ("Error transposing image: %s\n")
                     call pargstr (Memc[image1])
                 call erract (EA_WARN)
-                call imunmap (im1)
                 call imunmap (im2)
+                call imunmap (im1)
                 call imdelete (Memc[image2])
 
 	    } else {
 
 	        # Finish up
-	        call imunmap (im1)
 	        call imunmap (im2)
+	        call imunmap (im1)
 	        call xt_delimtemp (Memc[image2], Memc[imtemp])
 	    }
 	}

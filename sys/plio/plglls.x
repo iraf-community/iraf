@@ -16,11 +16,11 @@ int	rop			#I rasterop
 
 int	ll_len
 pointer	sp, ll_out, ll_src
-int	pl_access()
+pointer	pl_access()
 errchk	pl_access
 
 begin
-	ll_src = Ref (pl, pl_access(pl,v))
+	ll_src = pl_access (pl,v)
 	if (!R_NEED_DST(rop) && v[1] == 1 && npix == PL_AXLEN(pl,1)) {
 	    ll_len = LP_LEN(ll_src)
 	    call amovs (Mems[ll_src], ll_dst, ll_len)

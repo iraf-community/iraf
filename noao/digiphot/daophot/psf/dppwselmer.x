@@ -59,13 +59,21 @@ real	scale			# the image scale
 real	psfrad			# the psf radius
 real	fitrad			# the fitting radius
 
+pointer	sp, str
+
 begin
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+
 	# Add the image name nad maxnpsf parameters.
-	call dp_sparam (tp, "IMAGE", image, "name", "")
+	call dp_imroot (image, Memc[str], SZ_FNAME)
+	call dp_sparam (tp, "IMAGE", Memc[str], "name", "")
 	call dp_iparam (tp, "MAXNPSF", maxnpsf, "number", "")
 	call dp_rparam (tp, "NEWSCALE", scale, "units", "")
 	call dp_rparam (tp, "PSFRAD", psfrad, "scaleunit", "")
 	call dp_rparam (tp, "FITRAD", fitrad, "scaleunit", "")
+
+	call sfree (sp)
 end
 
 
@@ -162,13 +170,21 @@ real	scale			# the image scale
 real	psfrad			# the psf radius
 real	fitrad			# the fitting radius
 
+pointer	sp, str
+
 begin
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+
 	# Add the min_group and max_group parameters.
-	call tbhadt (tp, "IMAGE", image)
+	call dp_imroot (image, Memc[str], SZ_FNAME)
+	call tbhadt (tp, "IMAGE", Memc[str])
 	call tbhadi (tp, "MAXNPSF", maxnpsf)
 	call tbhadr (tp, "SCALE", scale)
 	call tbhadr (tp, "PSFRAD", psfrad)
 	call tbhadr (tp, "FITRAD", fitrad)
+
+	call sfree (sp)
 end
 
 

@@ -165,12 +165,12 @@ begin
 			    call parg$t (val)
 			    $endif
 			if (c1 >= col1) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c1)
 			    call pargi (line)
 			}
 			if (c2 <= col2) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c2)
 			    call pargi (line)
 			}

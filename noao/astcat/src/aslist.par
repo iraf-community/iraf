@@ -1,0 +1,6 @@
+# The ASLIST parameter file.
+
+imsurveys,s,a,"*",,,"The image surveys(s)"
+verbose,b,h,no,,,"Print verbose messages ?"
+imdb,s,h,)_.imdb,,,"The image survey configuration file"
+mode,s,h,"ql",,,

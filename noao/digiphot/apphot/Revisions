@@ -1,16 +1,87 @@
-.help revisions Jun88 noao.digiphot.apphot
+.HELP revisions Jun88 noao.digiphot.apphot
 .nf
-apphot/*/mkpkg
-    Removed duplicate file dependencies from mkpkg.
+apphot/center/apcenter.x
+apphot/fitpsf/apfitpsf.x
+apphot/fitsky/apsky.x
+apphot/phot/apphot.x
+apphot/polyphot/apyhot.x
+apphot/radprof/apradprof.x
+apphot/wphot/apwphot.x
+    Fixed problems with the 'v' that can occur if the same star is measured
+    with different parameters without an intervening cursor move.
 
-    Davis, September 30, 1999
+    Davis, June 20, 2002
+
+apphot/fitsky/mkpkg
+    declaration. Added a missing <imhdr.h> file dependency to the apsky.x
+    declaration.
+
+    Davis, December 13, 2001
+
+apphot/daofind/mkpkg
+    Removed an unnecessary ../lib/display.h file dependency from the apbfdfind
+    declaration. Added a missing ../lib/display.h file dependency to the
+    apfdcolon.x declaration.
+
+    Davis, December 13, 2001
+
+apphot/aputil/appcache.x
+    Added a call setting IM_BUFFRAC to 0 to the memory caching code in the
+    apphot package tasks in order to force the imio buffer to be the size of
+    the input image.
+
+    Davis, December 10, 2001
+
+apphot/center/apcenter.x
+    Fixed a boolean / integer conversion problem in the interactive variable.
+    This bug should not be present in released code.
+    
+    Davis, September 19, 2001
+
+apphot/polyphot/apymkinit.x
+    The call to ap_defsetup was missing the fwhmpsf argument. Since
+    this is never used in the code this bug may not cause a problem.
+
+    Davis, September 19, 2001
+
+apphot/aplib/apwres2.x
+     The pargr routine was being called with a double precision constant
+     0.0d0 argument.
+
+    Davis, September 19, 2001
+
+apphot/fitsky/apcentroid.x
+    Fixed a real/double type mismatch in a call to alimr.
+
+    Davis, September 19, 2001
+
+apphot/
+    Modified all the apphot tasks to accept input coordinates in logical, tv,
+    physical, or world coordinates and to write the output coordinates in
+    logical, tv, or physical coordinates. One consequence of this is that
+    the apphot tasks will now work correctly off image sections in interactive
+    mode. Another is that users can work on image sections while preserving
+    the coordinate system of the entire image.
+
+    Davis, May 30, 2000
+
+apphot/
+    Modified all the apphot tasks to strip the directory information from
+    the input image and coordinate file names written to the output files,
+    to the terminal, and to the plot headers. The colon commands will still
+    read and write full image and coordinate file path names. This change
+    improves the likelyhood  that the full root image name will be written
+    to the output. This root image name is used by the photometric calibration
+    code to construct images sets.
+
+    Davis, April 19, 2000
 
 apphot/*/mkpkg
-    Added some missing file dependencies and deleted some unecessary ones 
+    Added some missing file dependencies and deleted some unecessary ones
     from the mkpkg files.
 
     Davis, September 20, 1999
-    
+
 apphot/polyphot/apyfit.x
 apphot/polyphot/appyerrors.x
 apphot/aplib/apwres2.x
@@ -19,7 +90,6 @@ apphot/aplib/apwres2.x
     to fractional pixel effects.
 
     Davis, August 10, 1999
-
 
 apphot/polyphot/apyget.x
 apphot/polyphot/apmkpylist.x
@@ -37,7 +107,6 @@ apphot/aputil/apotime.x
     present.
 
     Davis, May 11, 1999
-
 
 apphot/aputil/apdate.x
     Modified the date and time photometry file keyword encoding tasks to
@@ -75,24 +144,10 @@ apphot/daofind/apfind.x
     Davis, June 24, 1997
 
 apphot/aptest.cl
-    Modified the rfits calling sequence so that the test script will work
-    with the new version of rfits.
+    Modified the rfits calling sequence so that the test script will
+    run correctly with the new version of rfits.
 
     Davis, May 29, 1997
-
-apphot/photpars.par
-apphot/polypars.par
-apphot/qphot.par
-apphot/doc/photpars.hlp
-apphot/doc/polypars.hlp
-apphot/doc/qphot.hlp
-apphot/doc/qphot.hlp
-apphot/doc/photdef.h
-apphot/doc/polyphotdef.h
-    Changed the apphot package zero point from 26.0 to 25.0 so as to
-    match the daophot zero point and avoid confusion.
-
-    Davis, March 31, 1997
 
 apphot/daofind/apfind.x
     Modified the routine that computes the new roundness parameter to check
@@ -139,9 +194,17 @@ apphot/polyphot/mkpkg
     Davis, July 18, 1996
 
 apphot/doc/qphot.hlp
-    Fixed some typos and omissions in the qphot task help page.
+    Fixed some typos / omissions in the qphot help page.
 
     Davis, April 11, 1996
+
+apphot/apphot.cl
+apphot/apphot.men
+    Replaced the txdump task with the more general pdump task and added the
+    pcalc, pconvert, prenumber, pselect, and psort tasks to the apphot
+    package.
+
+    Davis, March 15, 1996
 
 apphot/aplib/apwres1.x
 apphot/daofind/apfind.x
@@ -194,12 +257,11 @@ apphot/aputil/apgtools.x
 
     Davis, Sept 29, 1995
 
-
 apphot/fitsky/apskybuf.x
     Changed the misleading error return code from AP_SKY_OUTOFBOUNDS to
     AP_NSKY_TOO_SMALL in the case when all the sky  are out of the good
     data range.
-    
+
     Davis, June 22, 1995
 
 apphot/daofind/apfind.x
@@ -254,7 +316,6 @@ apphot/wphot/t_wphot.x
 
     Davis, Oct 4, 1994
 
-
 apphot/phot/apphot.x
 apphot/phot/apqphot.x
 apphot/wphot/apwphot.x
@@ -283,13 +344,12 @@ apphot/doc/radprof.hlp
 
     Davis, Feb 10, 1994
 
-
 apphot/fitpsf/apsffit.x
 apphot/fitpsf/apsfrefit.x
 apphot/aplib/apwres4.x
     1. Modified the fitpsf task fitting routines so that the  parameter and
-    parameter error arrays are initialized to INDEF, instead of being left
-    with the values from the previous fit, in the case that the
+    parameter error arrays are initialized to INDEF (instead of being left
+    with the values from the previous fit), in the case that the
     fitting box is entirely off the image or that that there are too few
     pixels in the fitting box to fit the model psf. 
     2. Modified the output formatting routines to print the errors in 
@@ -329,7 +389,7 @@ apphot/aplib/apinpars2.x
     Davis, Sep 9, 1993
 
 apphot/center/aprefitcen.x
-    The CMAXITER parameter was incorrectly referenced in the call to
+    The CMAXITER parameter was incorrectly referenced in the call to 
     the ap_lgctr1d routine inside the routine aprefitcenter.
     This centering routine is not often used, and the bug is trigggered
     only if an object is recentered using different algorithm parameters
@@ -351,11 +411,10 @@ apphot/fitskypars.par
 apphot/doc/fitskypars.hlp
     Changed the default sky fitting algorithm for the qphot and phot tasks from
     "mode" to "centroid" with histogram smoothing, to minimize problems
-    with data taken at low light levels which have poorly sampled
+    with data taken at low light levels which have poorly sampled 
     histograms.
 
     Davis, Aug 14, 1993
-
 
 apphot$
     The sky fitting routines were revised. Two new parameters, ploclip and

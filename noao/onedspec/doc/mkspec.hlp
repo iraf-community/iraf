@@ -83,5 +83,4 @@ This task is unchanged.
 .ih
 SEE ALSO
 artdata.mk1dspec, artdata.mk2dspec, artdata.mkechelle
-ear
-endhelp
+.endhelp

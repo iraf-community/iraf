@@ -1,4 +1,5 @@
 include <imhdr.h>
+include <ctype.h>
 include <error.h>
 
 # SETAIRMASS -- Compute the airmass for a series of images and optionally
@@ -18,58 +19,62 @@ define	MIDDLE		2
 define	END		3
 define	EFFECTIVE	4
 
-# Input keywords - the date and exposure time keywords are parameters.
-
-define	RA_KEY		"RA"
-define	DEC_KEY		"DEC"
-define	EP_KEY		"EPOCH"
-define	ST_KEY		"ST"
-define	UT_KEY		"UT"
-
-define	UT_DEF		0	# for precession if the keyword is missing
+define	UT_DEF		0D0	# for precession if the keyword is missing
 
 define	SOLTOSID	(($1)*1.00273790935d0)
 
 
-# T_SETAIRMASS -- Read the parameters, loop over the images using
-# Stetson's rule, print out answers and update the header
+# T_SETAIRMASS -- Read the parameters, loop over the images using Stetson's
+# rule, print out answers and update the header
 
 procedure t_setairmass()
 
 pointer	imlist, im, obs
 pointer	sp, input, observatory, date_key, exp_key, air_key, utm_key, ut_hms
-int	intype, outtype
+pointer	ra_key, dec_key, eqn_key, st_key, ut_key, datestr
+int	intype, outtype, year, month, day, fmt
 bool	show, update, override, newobs, obshead
 
-double	dec, latitude, exptime
+double	dec, latitude, exptime, scale, jd
 double	ha, ha_beg, ha_mid, ha_end, ut, ut_mid
 double	airm_beg, airm_end, airm_mid, airm_eff
 
 bool	clgetb()
-int	imtgetim(), clgwrd(), imaccf()
+int	imtgetim(), clgwrd(), imaccf(), dtm_encode()
 pointer	imtopenp(), immap()
-double	airmass(), obsgetd()
-errchk	obsobpen, obsgetd, sa_rheader, airmass, obsimopen
+double	clgetd(), airmassx(), obsgetd(), ast_date_to_julday()
+errchk	obsobpen, obsgetd, sa_rheader, airmassx, obsimopen
 
 begin
 	call smark (sp)
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (observatory, SZ_FNAME, TY_CHAR)
+	call salloc (ra_key, SZ_FNAME, TY_CHAR)
+	call salloc (dec_key, SZ_FNAME, TY_CHAR)
+	call salloc (eqn_key, SZ_FNAME, TY_CHAR)
+	call salloc (st_key, SZ_FNAME, TY_CHAR)
+	call salloc (ut_key, SZ_FNAME, TY_CHAR)
 	call salloc (date_key, SZ_FNAME, TY_CHAR)
 	call salloc (exp_key, SZ_FNAME, TY_CHAR)
 	call salloc (air_key, SZ_FNAME, TY_CHAR)
 	call salloc (utm_key, SZ_FNAME, TY_CHAR)
 	call salloc (ut_hms, SZ_FNAME, TY_CHAR)
+	call salloc (datestr, SZ_FNAME, TY_CHAR)
 
 	# Get the parameters
 	imlist = imtopenp ("images")
 	intype = clgwrd ("intype", Memc[input], SZ_FNAME, AIR_TYPES)
 	call clgstr ("observatory", Memc[observatory], SZ_FNAME)
-
+	call clgstr ("ra", Memc[ra_key], SZ_FNAME)
+	call clgstr ("dec", Memc[dec_key], SZ_FNAME)
+	call clgstr ("equinox", Memc[eqn_key], SZ_FNAME)
+	call clgstr ("st", Memc[st_key], SZ_FNAME)
+	call clgstr ("ut", Memc[ut_key], SZ_FNAME)
 	call clgstr ("date", Memc[date_key], SZ_FNAME)
 	call clgstr ("exposure", Memc[exp_key], SZ_FNAME)
 	call clgstr ("airmass", Memc[air_key], SZ_FNAME)
 	call clgstr ("utmiddle", Memc[utm_key], SZ_FNAME)
+	scale = clgetd ("scale")
 
 	# just to be neat
 	call strupr (Memc[date_key])
@@ -108,8 +113,10 @@ begin
 	    }
 
 	    iferr {
-		call sa_rheader (im, Memc[date_key], Memc[exp_key],
-		    ha, dec, ut, exptime)
+		call sa_rheader (im, Memc[ra_key], Memc[dec_key],
+		    Memc[eqn_key], Memc[st_key], Memc[ut_key], Memc[date_key],
+		    Memc[exp_key], ha, dec, year, month, day, ut, exptime,
+		    fmt)
 
 		# Calculate the mid-UT and HA's for the various input types
 		switch (intype) {
@@ -121,7 +128,7 @@ begin
 		    if (IS_INDEFD(ut))
 			ut_mid = INDEFD
 		    else
-			ut_mid = mod (ut + exptime / 2., 24.0D0)
+			ut_mid = ut + exptime / 2.
 
 		case MIDDLE:
 		    ha_beg = ha - SOLTOSID(exptime) / 2.
@@ -131,7 +138,7 @@ begin
 		    if (IS_INDEFD(ut))
 			ut_mid = INDEFD
 		    else
-			ut_mid = mod (ut, 24.0D0)
+			ut_mid = ut
 
 		case END:
 		    ha_beg = ha - SOLTOSID(exptime)
@@ -141,11 +148,15 @@ begin
 		    if (IS_INDEFD(ut))
 			ut_mid = INDEFD
 		    else
-			ut_mid = mod (ut - exptime / 2., 24.0D0)
+			ut_mid = ut - exptime / 2.
 
 		default:
 		    call error (1, "Bad switch in t_setairmass")
 		}
+
+		# Adjust for possible change of date in ut_mid.
+		jd = ast_date_to_julday (year, month, day, ut_mid)
+		call ast_julday_to_date (jd, year, month, day, ut_mid)
 
 		# Save the mid-UT as a sexigesimal string for output
 		call sprintf (Memc[ut_hms], SZ_FNAME, "%h")
@@ -158,9 +169,9 @@ begin
 		if (newobs)
 		    call obslog (obs, "SETAIRMASS", "latitude", STDOUT)
 		latitude = obsgetd (obs, "latitude")
-		airm_beg = airmass (ha_beg, dec, latitude)
-		airm_mid = airmass (ha_mid, dec, latitude)
-		airm_end = airmass (ha_end, dec, latitude)
+		airm_beg = airmassx (ha_beg, dec, latitude, scale)
+		airm_mid = airmassx (ha_mid, dec, latitude, scale)
+		airm_end = airmassx (ha_end, dec, latitude, scale)
 
 		# Combine as suggested by P. Stetson (Simpson's rule)
 		airm_eff = (airm_beg + 4.*airm_mid + airm_end) / 6.
@@ -200,8 +211,13 @@ begin
 
 		# Should probably update a date keyword as well
 		if ((imaccf (im, Memc[utm_key]) == NO || override) &&
-		    (! IS_INDEFD(ut_mid)))
+		    (! IS_INDEFD(ut_mid))) {
+		    if (fmt == NO)
 			call imastr (im, Memc[utm_key], Memc[ut_hms])
+		    else if (dtm_encode (Memc[datestr], SZ_FNAME,
+			year, month, day, utmid, 2, 0) > 0)
+			call imastr (im, Memc[utm_key], Memc[datestr])
+		}
 	    }
 
 	    call imunmap (im)
@@ -216,25 +232,34 @@ end
 
 define	SZ_TOKEN	2
 
-procedure sa_rheader (im, dkey, ekey, ha, dec, ut, exptime)
+procedure sa_rheader (im, ra_key, dec_key, eqn_key, st_key, ut_key, dkey, ekey,
+	ha, dec, year, month, day, ut, exptime, fmt)
 
 pointer	im		#I imio pointer
-char	dkey[ARB]	#I date keyword ("DD/MM/YY")
+char	ra_key[ARB]	#I date keyword (hh.hhh or hh:mm:ss.s)
+char	dec_key[ARB]	#I date keyword (dd.ddd or dd:mm:ss.s)
+char	eqn_key[ARB]	#I date keyword (yyyy.yyy)
+char	st_key[ARB]	#I date keyword (hh.hhh or hh:mm:ss.s)
+char	ut_key[ARB]	#I date keyword (hh.hhh or hh:mm:ss.s)
+char	dkey[ARB]	#I date keyword (YYYY-MM-DDTHH:MM:SS.S or DD/MM/YY)
 char	ekey[ARB]	#I exposure keyword (seconds)
 
 double	ha		#O hour angle
 double	dec		#O current epoch declination
+int	year		#O year
+int	month		#O month
+int	day		#O day
 double	ut		#O universal time
 double	exptime		#O exposure time (hours)
+int	fmt		#O Date format?
 
 pointer	date, sp
-double	ra1, dec1, epoch1, ra2, dec2, epoch2, st2, ut2, time
-int	day, month, year, flags
-bool	precess, ut_ok
+double	ra1, dec1, epoch1, ra2, dec2, epoch2, st2, ut2
+int	ip, flags
 
-bool	fp_equald()
-int	dtm_decode()
 double	imgetd()
+int	dtm_decode(), strmatch()
+bool	fp_equald()
 
 errchk	imgetd, imgstr
 
@@ -244,41 +269,43 @@ begin
 
 	iferr {
 	    # `1' is the coordinate epoch, `2' is the observation epoch
-	    ra1  = imgetd (im, RA_KEY)
-	    dec1 = imgetd (im, DEC_KEY)
-	    st2  = imgetd (im, ST_KEY)
+	    ra1  = imgetd (im, ra_key)
+	    ip = strmatch (ra_key, "^{CRVAL}")
+	    if (ip > 0) {
+		if (IS_DIGIT(ra_key[ip]) && TO_INTEG(ra_key[ip] > 0))
+		    ra1 = ra1 / 15.0d0
+	    }
+	    dec1 = imgetd (im, dec_key)
+	    st2  = imgetd (im, st_key)
 
-	    iferr (ut2  = imgetd (im, UT_KEY)) {
-		ut2 = UT_DEF
-		ut_ok = false
-	    } else
-		ut_ok = true
-
-	    iferr (epoch1 = imgetd (im, EP_KEY))
-		epoch1 = INDEFD
-
-	    # only calculate epoch2 if epoch1 is valid
-	    # only precess coords if both are valid
-	    precess = false
-	    if (! (fp_equald (epoch1, double(0.)) || IS_INDEFD(epoch1))) {
-		call imgstr (im, dkey, Memc[date], SZ_LINE)
-		if (dtm_decode (Memc[date],year,month,day,time,flags) == ERR)
-		    call error (1, "Error in date keyword")
-		if (!IS_INDEFD(time))
-		    ut2 = time
-		call ast_date_to_epoch (year, month, day, ut2, epoch2)
-		precess = true
+	    # Parse UT keyword in either hours or date.
+	    fmt = YES
+	    call imgstr (im, ut_key, Memc[date], SZ_LINE)
+	    if (dtm_decode (Memc[date],year,month,day,ut,flags) == ERR) {
+		iferr (ut = imgetd (im, ut_key))
+		    call error (1, "Error in ut keyword")
+		fmt = NO
 	    }
 
-	    if (precess)
+	    # Parse the date.
+	    call imgstr (im, dkey, Memc[date], SZ_LINE)
+	    if (dtm_decode (Memc[date],year,month,day,ut2,flags) == ERR)
+		call error (1, "Error in date keyword")
+
+	    iferr (epoch1 = imgetd (im, eqn_key))
+		epoch1 = INDEFD
+	    if (!(fp_equald (epoch1, double(0.)) || IS_INDEFD(epoch1))) {
+		if (IS_INDEFD(ut))
+		    call ast_date_to_epoch (year, month, day, UT_DEF, epoch2)
+		else
+		    call ast_date_to_epoch (year, month, day, ut, epoch2)
 		call astprecess (ra1, dec1, epoch1, ra2, dec2, epoch2)
-	    else {
+	    } else {
 		ra2 = ra1
 		dec2 = dec1
-		call eprintf ("\tCoords not precessed for %s: check %s & %s\n")
+		call eprintf ("\tCoords not precessed for %s: check %s\n")
 		    call pargstr (IM_HDRFILE(im))
-		    call pargstr (EP_KEY)
-		    call pargstr (dkey)
+		    call pargstr (eqn_key)
 		call flush (STDERR)
 	    }
 
@@ -286,12 +313,6 @@ begin
 	    ha		= st2 - ra2
 	    dec		= dec2
 	    exptime	= imgetd (im, ekey) / 3600.d0
-
-	    if (ut_ok)
-		ut	= ut2
-	    else
-		ut	= INDEFD
-
 	} then {
 	    call sfree (sp)
 	    call eprintf ("Problem reading header for %s:\n")

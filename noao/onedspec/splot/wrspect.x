@@ -1,4 +1,5 @@
 include	<error.h>
+include	<syserr.h>
 include	<imhdr.h>
 include	<imio.h>
 include	<smw.h>
@@ -12,25 +13,46 @@ pointer	sh1		# Spectrum pointer to be written
 
 bool	overwrite
 pointer	sp, str
-int	errcode()
-bool	clgetb()
+int	nowhite(), errcode()
+bool	clgetb(), xt_imnameeq()
 
 begin
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
+	# Initially set overwrite to false in order to warn the user.
 	overwrite = false
-10	call clgstr ("new_image", Memc[str], SZ_LINE)
-20	iferr (call wrspect (sh1, Memc[str], overwrite)) {
-	    if (errcode() == 1) {
-		overwrite = clgetb ("overwrite")
-		if (overwrite)
-		    goto 20
-		else
-		    goto 10
-	    } else {
+
+	# Get new image name.
+	call clgstr ("new_image", Memc[str], SZ_LINE)
+	if (nowhite (Memc[str], Memc[str], SZ_LINE) == 0) {
+	    call sfree (sp)
+	    return
+	}
+
+	# Check for overwriting the current file.
+	if (xt_imnameeq (IMNAME(sh1), Memc[str])) {
+	    overwrite = clgetb ("overwrite")
+	    if (!overwrite) {
+		call sfree (sp)
+		return
+	    }
+	}
+
+	# Write spectrum.
+	iferr (call wrspect (sh1, Memc[str], overwrite)) {
+	    switch (errcode()) {
+	    case SYS_IKICLOB:
 		call erract (EA_WARN)
-		goto 10
+		# Try again if overwrite is requested.
+		if (!overwrite)
+		    overwrite = clgetb ("overwrite")
+		if (overwrite) {
+		    iferr (call wrspect (sh1, Memc[str], overwrite))
+			call erract (EA_WARN)
+		}
+	    default:
+		call erract (EA_WARN)
 	    }
 	}
 	call sfree (sp)
@@ -63,17 +85,18 @@ pointer	sh1		# Spectrum pointer to be written
 char	output[ARB]	# Output spectrum filename
 bool	overwrite	# Overwrite existing spectrum?
 
-char	err[SZ_LINE]
-int	i, j, np1, np2, dtype[2], nw[2]
+bool	delim
+char	errstr[SZ_LINE]
+int	i, j, np1, np2, dtype[2], nw[2], err
 real	r[2]
 double	w1[2], dw[2], z[2]
 pointer	coeff, im, in, out, mw1, mw2, sh2, outbuf, ptr
 
-int	nowhite(), imaccf()
+int	imaccf(), errget()
 bool	xt_imnameeq(), fp_equald()
 pointer immap(), smw_openim(), imgl3r(), impl3r(), imps3r()
 errchk	immap,  imgl3r, impl3r, imps3r, imdelf, shdr_open, wrspect1
-errchk	smw_openim, smw_gwattrs, smw_swattrs
+errchk	smw_openim, smw_gwattrs, smw_swattrs, smw_saveim
 
 begin
 	in = IM(sh1)
@@ -82,14 +105,15 @@ begin
 	mw2 = NULL
 	sh2 = NULL
 	ptr = NULL
+	delim = false
 
 	iferr {
 	    # Open and initialize the output image.
 	    if (xt_imnameeq (IMNAME(sh1), output)) {
 		if (!overwrite) {
-		    call sprintf (err, SZ_LINE, "Image %s already exists")
+		    call sprintf (errstr, SZ_LINE, "No overwrite set (%s)")
 			call pargstr (output)
-		    call error (1, err)
+		    call error (1, errstr)
 		}
 
 		call imunmap (in)
@@ -104,14 +128,9 @@ begin
 		sh2 = sh1
 
 	    } else {
-		if (nowhite (output, output, ARB) == 0)
-		    call error (2, "No output file specified")
 		iferr (im = immap (output, NEW_COPY, in)) {
-		    if (!overwrite) {
-			call sprintf (err, SZ_LINE, "Image %s already exists")
-			    call pargstr (output)
-			call error (1, err)
-		    }
+		    if (!overwrite)
+			call erract (EA_ERROR)
 		    im = immap (output, READ_WRITE, 0); out = im
 
 		    if (IM_LEN(out,2) == 1) {
@@ -130,12 +149,12 @@ begin
 		    switch (SMW_FORMAT(mw1)) {
 		    case SMW_ND:
 			if (SMW_FORMAT(mw2) != SMW_ND)
-			    call error (3, "Incompatible spectral formats")
+			    call error (1, "Incompatible spectral formats")
 			if (IM_NDIM(in) != IM_NDIM(out))
-			    call error (4, "Incompatible dimensions")
+			    call error (2, "Incompatible dimensions")
 			do i = 1, IM_NDIM(in)
 			    if (IM_LEN(in,i) != IM_LEN(out,i))
-				call error (4, "Incompatible dimensions")
+				call error (2, "Incompatible dimensions")
 			coeff = NULL
 			call smw_gwattrs (mw1, 1, 1, i, i,
 			    dtype[1], w1[1], dw[1], nw[1], z, r, r, coeff)
@@ -144,20 +163,21 @@ begin
 			call mfree (coeff, TY_CHAR)
 			if (dtype[1]!=dtype[2] || !fp_equald (w1[1],w1[2]) ||
 			    !fp_equald (dw[1],dw[2]))
-			    call error (5,
+			    call error (3,
 				"Incompatible dispersion coordinates")
 			call shdr_open (out, mw2, APINDEX(sh1), LINDEX(sh1,2),
 			    AP(sh1), SHHDR, ptr)
 			sh2 = ptr
 		    case SMW_ES, SMW_MS:
 			if (SMW_FORMAT(mw2) == SMW_ND)
-			    call error (3, "Incompatible spectral formats")
+			    call error (1, "Incompatible spectral formats")
 			call shdr_open (out, mw2, APINDEX(sh1), LINDEX(sh1,2),
 			    AP(sh1), SHHDR, ptr)
 			sh2 = ptr
 		    }
 
 		} else {
+		    delim = true
 		    out = im
 		    IM_PIXTYPE(out) = TY_REAL
 		    im = smw_openim (out); mw2 = im
@@ -227,15 +247,20 @@ begin
 		call imunmap (out)
 	    }
 	} then {
+	    err = errget (errstr, SZ_LINE)
 	    if (out != in) {
 		if (sh2 != NULL)
 		    call shdr_close (sh2)
 		if (mw2 != NULL)
 		    call smw_close (mw2)
-		if (out != NULL)
+		if (out != NULL) {
 		    call imunmap (out)
+		    if (delim)
+			iferr (call imdelete (output))
+			    ;
+		}
 	    }
-	    call erract (EA_ERROR)
+	    call error (err, errstr)
 	}
 
 end

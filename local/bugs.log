@@ -5995,3 +5995,984 @@ BUG:	The fast median / mode filtering tasks will overflow producing
 
 STATUS:	Fixed for 2.11.3. The workaround is to try and keep the filter size
 	< 32767 pixels in size, or to use the much slower median task.
+
+NUMBER:	451
+MODULE:	imcombine,ccdred.combine,mscred.combine,sflatcombine,flatcombine,zerocombine
+SYSTEM:	V2.11.2-V2.11.3
+DATE:	Tue Dec  7 10:33:32 MST 1999
+FROM:	valdes
+
+BUG:	The 2D grow option introduced in V2.11.2 and in MSCREDV3.2
+	does not work with "minmax" rejection.  There is no workaround.
+
+STATUS:	Fixed in later releases.
+
+NUMBER:	452
+MODULE:	mscred.msczero
+SYSTEM:	MSCRED V3.2.3 (releases between Nov 17 and Dec 2)
+DATE:	Fri Dec 10 12:14:10 MST 1999
+FROM:	valdes
+
+BUG:	A change made to allow MSCZERO to work on single images, such as
+	after resampling and stacking, introduced the error
+
+	   Warning: MWCS: dimension mismatch (mw_open)
+
+	when attempting to apply a zero point correction update.  While
+	the message says warning actually the coordinate system is
+	not updated at all.  There is no workaround and requires
+	the package to be updated.
+
+STATUS:	Fixed in the Dec. 10, 1999 release.
+
+NUMBER:	453
+MODULE:	scopy
+SYSTEM:	V2.11-V2.11.3
+DATE:	Tue Dec 14 11:48:12 MST 1999
+FROM:	valdes
+
+BUG:	When copying out a region of a spectrum which is log-linear sampled
+	(DC-FLAG=1) the coordinate system of the copied region is wrong.
+	This applies whether or not the "rebin" parameter is set.  The
+	workaround is to use DISPCOR; set "w1" and "w2" to the desired
+	limits and set "log=yes".  This will do the same thing as
+	SCOPY with "rebin=yes".  To extract a region without rebinning
+	the simplest thing is to use an image section.  The pixel limits
+	corresponding to the desired wavelength range will have to be
+	determined in some way such as with SPLOT, LISTPIX, or calculated
+	from the CRVAL/CDELT keywords (these are in log units for log-linear
+	sampled spectra.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	454
+MODULE:	proto.fixpix, ccdproc
+SYSTEM:	V2.11-V2.11.3
+DATE:	Wed Dec 15 14:30:44 MST 1999
+FROM:	valdes
+
+BUG:	Tasks which allow a text file description of bad pixels in addition
+	to a bad pixel mask, which include fixpix and ccdproc, will fail
+	with a 757 error when a large number of files are processed.  This
+	might occur with a large @file or in many repeated calls without
+	an intervening flushing of the process cache such as with flpr.
+	This problem is caused by a system error that fails to free a file
+	descriptor.  After a sufficient number of executions the number of
+	available free file descriptors is depleted and the 757 error (too
+	many open files ) is reported.  The workarounds are to either use
+	bad pixel masks or to limit the number of images in each execution
+	and to use flpr after a 50 or so images are processed.
+
+STATUS:	A system fix is under investigation for the next release.
+
+NUMBER:	455
+MODULE:	mscrfits
+SYSTEM:	MSCRED up to V3.2.3: December 10, 1999
+DATE:	Thu Dec 16 11:46:48 MST 1999
+FROM:	valdes
+
+BUG:	If the original file names include a '.' other than that for
+	the ".fits" extension it is correctly stored by MSCWFITS.  However,
+	reading the tape with MSCRFITS either to list the contents
+	or to restore the original file names will cause the part of
+	the file name following the last '.' to be stripped.  Therefore
+	the FITS tape files are correct but restoring or listing them
+	by their disk file names when the tape was written will fail.
+
+	For example, suppose the file name is "n1.abc.def.fits".  Then when
+	it is written to tape the FILENAME keyword will contain
+	"n1.abc.def".  Reading this tape file to list or restore the
+	original name will consider the original file name to be "n1.abc".
+	This bug is caused by stripping the extension (anything after the
+	last '.' including the period) both when the file is written (a
+	correct and useful behavior) and then when reading the stored
+	FILENAME keyword (the incorrect behavior).
+
+	The workarounds are 1) don't use '.' in the original file names, 2)
+	read the files to disk without restoring the original file names
+	and then use the FILENAME keyword in the primary header to identify
+	the original file name and restore the name.  There is no workaround
+	for getting a listing of the tape contents with the correct full
+	original name other than using the fixed version.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	456
+MODULE:	rv.fxcor
+SYSTEM:	V2.11.3
+DATE:	Thu Dec 23 13:43:57 MST 1999
+FROM:	fitz
+
+BUG:	Images with a DATE-OBS keyword value of the form CCYY-MM-DD with
+	no associated time information will cause and floating point 
+	exception when computing the heliocentric corrections.
+
+STATUS:	The bug is caused by an incorrect Y2K fix which didn't properly
+	check for this form of the DATE-OBS keyword in which the time
+	returned as INDEF.  Workarounds include editing the keyword to
+	include the UT time information with a command such as
+
+	    hedit *.imh date-obs '(@"date-obs"//"T"//str(@"ut"))'
+
+	A trivial code change and recompilation instructions are available
+	by contacting site support.
+
+	Fixed for the next release.
+
+NUMBER:	457
+MODULE:	crutil.crmedian
+SYSTEM:	-V1.3: Oct 19, 1999
+DATE:	Thu Jan  6 09:28:33 MST 2000
+FROM:	valdes
+
+BUG:	If the number of columns in the image is not an exact multiple
+	of the sigma block size uninitialized values is used for the
+	sigma values at the end of the lines.  This can cause floating
+	point exceptions.  The only workaround is to use an image section
+	to trim the number of columns in the image to a multiple of
+	the sigma block size and adjust the sigma block size to minimimze
+	the amount of trimming required.
+
+STATUS:	The is fixed in a new version of the CRUTIL package now available.
+
+NUMBER:	458
+MODULE:	imcombine, combine
+SYSTEM:	V2.11.3
+DATE:	Wed Jan 12 13:32:54 MST 2000
+FROM:	valdes
+
+BUG:	When combining input images that have been dimensionally reduced
+	(those have a WCSDIM keyword greater than the logical dimension
+	of the image and having a WAXMAP01 keyword) and using offsets
+	the error
+
+	    Warning: MWCS: dimension mismatch (mw_gltermd)
+
+	will appear.  Even though it says it is a warning it is really a
+	fatal error and the task will quit.  Dimensional reduction occurs
+	with copying out a lower dimensional section of an image; i.e.
+	copying a 2D plane from a 3D image.  The workaround is to reset the
+	headers of the input image to remove the dimensional reduction.
+	This is done by deleting the keywords WCSDIM and WAXMAP01.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	459
+MODULE:	apall/apsum
+SYSTEM:	V2.11.2-V2.11.3 (sparc, ssun, redhat, linux, sol7)
+DATE:	Thu Jan 20 11:16:14 MST 2000
+FROM:	valdes
+
+BUG:	The extraction tasks in APEXTRACT for the distributions of
+	Sun/SunOS, Sun/Solaris, PC-IRAF/Slackware, PC-IRAF/Redhat, and
+	PC-IRAF/Solaris7 accidentally used an older version (V2.10) of the
+	extraction code.  For most purposes this simply means a couple
+	of minor bugs fixed in V2.11 will be back.  The only significant
+	change is that the feature to allow selection of the apertures
+	to be extracted with the "aperture" parameter will be broken.
+
+	There is no workaround other than to install new executables.
+	These are available at ftp://iraf.noao.edu/misc/apextract2113/
+	(and in the misc directory in the IRAF ftp mirror sites).
+	The README file in the directory gives installation instructions.
+
+STATUS:	Fixed in future releases.
+
+NUMBER:	460
+MODULE:	dispcor
+SYSTEM:	V2.11.3
+DATE:	Thu Jan 27 13:07:38 MST 2000
+FROM:	valdes
+
+BUG:	In V2.11.3 DISPCOR was enhanced to work on 2D (long slit) data.
+	In the processes the "global" option was broken resulting
+	in a segmentation violation if selected.  There is no workaround
+	other than not to use the global option and, instead, manually
+	set the target dispersion sampling to be the same for all
+	spectra.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	461
+MODULE:	apall/apsum
+SYSTEM: V2.11.2-V2.11.3 (sparc, ssun, redhat, linux, sol7)
+DATE:	Thu Jan 27 13:32:50 MST 2000
+FROM:	valdes
+
+BUG:	This is an addendum to buglog #459.  Another aspect of the incorrect
+	source being used is that with "format=onedspec" the output names
+	will be of the form root.0001.0001 instead of root.0001 where the
+	root name and the number will differ.  The workarounds are to
+	either rename the images after extraction or extract to multispec
+	format and use SCOPY to separate the apertures into separate 1D
+	images.  As noted in the previous buglog a fixed executable may
+	be obtained and installed if desired.
+	See ftp://iraf.noao.edu/misc/apextract2113/README.
+
+STATUS:	Fixed in future releases.
+
+NUMBER:	462
+MODULE:	dispcor
+SYSTEM:	V2.11.3
+DATE:	Tue Feb  1 16:16:57 MST 2000
+FROM:	valdes
+
+BUG:	DISPCOR does not work correctly when linearizing spectra if there
+	is more than one aperture in the file (that is multispec format
+	data) and the aperture numbers are different than the line
+	numbers.  This was found in the reduction of multifiber data where
+	the aperture numbers are set to the fiber numbers.  What happens is
+	that the dispersion solution from the wrong spectrum is applied
+	during the linearizing.  There is no indication that the dispersion
+	correction is incorrect.  The workarounds are to make sure that
+	the aperture numbers correspond to the line numbers, to
+	separate the spectra into individual 1D format, or to use
+	"linearize=no".
+
+STATUS:	This is a serious bug, particularly since there is no obvious
+	indication of producing the wrong result.  A patch to V2.11.3
+	is required to fix this problem.
+
+
+NUMBER:	463
+MODULE:	splot
+SYSTEM:	V2.11-V2.11.3a
+DATE:	Tue Feb 15 15:59:39 MST 2000
+FROM:	valdes
+
+BUG:	The 'h' key method for measuring equivalent widths will produce
+	an arithmetic exception (such as divide by zero) when the pixel
+	coordinate becomes large (say > 4000).  The exact error and limit
+	value depends on the host system.  The workaround is to extract the
+	desired piece of the spectrum into a shorter piece.  If you know
+	the pixel coordinates you could use IMCOPY with an image section.
+	If you know the wavelength region then use SCOPY.
+
+	    on> imcopy longspec[5210:5310] temp
+		or
+	    on> scopy longspec temp w1=6140 w2=6143 rebin-
+
+	    on> splot temp
+	    <measure the line>
+
+	Alternatively one can use one of the other methods for measuring
+	equivalent widths such as 'e', 'k', or 'd'.
+
+STATUS:	The algorithm is revised in the next release.
+
+NUMBER:	464
+MODULE:	proto.imextensions
+SYSTEM:	V2.11-V2.11.3a
+DATE:	Thu Feb 24 12:34:36 MST 2000
+FROM:	valdes
+
+BUG:	When using IMEXTENSIONS to expand a file with many extensions and
+	including a image section or image kernel specification it is
+	possible to overrun a string resulting in either a system error or
+	an incomplete output list.  Each '[', ',', '*' character
+	contributes to the possiblity of overrunning the string.  The
+	maximum number of extensions that can be expanded without problem
+	depends on the specific "input" list.  The workarounds are to avoid
+	using image sections and image kernal specifications for large
+	lists or to expand the list in pieces using the "index" parameter.
+
+STATUS:	To be fixed in a future release.
+
+NUMBER:	465
+MODULE:	identify/reidentify
+SYSTEM:	V2.11-V2.11.3p1
+DATE:	Thu May  4 08:59:41 MST 2000
+FROM:	valdes
+
+BUG:	When using velocity units the database is written without the
+	velocity reference point.  For example, units of "km/s 1 micron"
+	will be written as "km/s".  Attempting to use the database will
+	then not work since the velocity unit is not fully specified.
+	The workarounds are either to use other units or edit the
+	database file to restore the missing reference information.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	466
+MODULE:	ared.quadproc
+SYSTEM:	V2.1
+DATE:	Tue Jun 20 13:47:03 MST 2000
+FROM:	valdes
+
+BUG:	When the imtype environment variable contains a comma, e.g.
+	when imtype="fits,inherit", the following error occurs:
+
+	ERROR on line 108: Attempt to access undefined local variable `len'
+
+	The workaround is to change imtype to only include the extension
+	being used; i.e. imtype=fits.
+
+STATUS:	Fixed in version "2.2: 20 June 2000".
+
+NUMBER:	467
+MODULE:	dataio.export
+SYSTEM:	V2.11 - V2.11.3a
+DATE:	Fri Jun 23 09:51:22 MST 2000
+FROM:	fitz
+
+BUG:	The header text for the PGM and PPM formats is incomplete (i.e.
+	missing the Y-dimension and max pixel value) for byte-swapped
+	systems such as PCIX and Dec Alpha.  There is no workaround for
+	this, contact site support for a code change or patched binary.
+
+STATUS:	Fixed for future releases.
+
+NUMBER:	468
+MODULE:	astcalc, asthedit
+SYSTEM:	-V2.11.3a
+DATE:	Thu Jun 29 11:14:56 MST 2000
+FROM:	valdes
+
+BUG:	The "clput" function does not work and results in the error:
+
+	ERROR: function `clput' requires 1 arguments
+
+	This is caused by a typo in the source such that the function
+	is not correctly interpreted.  There is no workaround other
+	than fixing the source.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	469
+MODULE:	specplot
+SYSTEM:	-V2.11.3p1
+DATE:	Mon Aug 14 11:01:13 MST 2000
+FROM:	valdes
+
+BUG:	You cannot specify units using the "units" parameter that consist
+	of more than one word.  For example "log angstroms", "inv
+	centimeter", or "km/s 4000 ang" will not work.  There is no error
+	message and instead the default display units (the "units_display"
+	attribute in the WAT keywords) are used.  The units can be set
+	interactively with the ":units" colon command.  If you want to get
+	such units running SPECPLOT non-interactively the only workaround
+	is to set the "units_display" attribute.  This can be done either
+	with careful header editing (HEDIT or HFIX) or by displaying with
+	SPLOT, setting the units, and then writing out the spectrum.
+
+STATUS:	Fixed in future releases.
+
+NUMBER:	470
+MODULE:	display / cursor readback
+SYSTEM:	V2.11-V2.11.3
+DATE:	Tue Sep  5 14:15:18 MST 2000
+FROM:	valdes
+
+BUG:	When an odd sized image is displayed into a frame buffer that is
+	smaller than the image without filling, thus letting the display
+	task trim the image to fit, the y cursor readback from the display
+	server will be off by one.  The same behavior will also occur in x
+	if the image is loaded with a flipped image section such as
+	image[-*,*].  The error can be avoided in several ways.  One is to
+	use a frame buffer size which is larger than the image, another is
+	to use an image section that 1) is smaller than the frame buffer,
+	2) is an even number of pixels in y, or 3) flips the
+	image in y.
+
+STATUS:	The is fixed in V2.11.4.
+
+NUMBER:	471
+MODULE:	mscred.mscsetwcs
+SYSTEM:	-V4.1: September 15, 2000
+DATE:	Mon Sep 18 09:32:46 MST 2000
+FROM:	valdes
+
+BUG:	This task will fail with the message
+
+	ERROR on line 81: No write permission on file (String_File)
+
+	when a long list of images is used.  The workaround is to
+	break the operation up into smaller sets of images.
+
+STATUS:	Fixed in the next release.
+
+NUMBER:	472
+MODULE:	mscred.ccdproc
+SYSTEM:	V4.0 - V4.1: September 20, 2000
+DATE:	Mon Oct  2 10:27:34 MST 2000
+FROM:	valdes
+
+BUG:	When a dependent calibration exposure, one that is not being processed
+	directly but needs to be processed to continue with the specified
+	target exposure, is processed a query
+
+	List of output bad pixel masks:
+
+	is given.  The workaround is to respond with carriage return or
+	the equivalent of a null string "".  There will be two queries
+	per calibration image.
+
+STATUS:	Fixed in the V4.1: October 2, 2000 release.
+
+NUMBER:	473
+MODULE:	rv.fxcor
+SYSTEM:	V2.11 - V2.11.3b  PC-IRAF
+DATE:	Wed Oct 18 12:39:59 MST 2000
+FROM:	fitz
+
+BUG:	The main correlation plot would sometimes not be drawn when 
+	using long spectra on a Linux system.  With spectra of ~10000
+	points or more the main plot of the task would not display
+	the ccf but would show the fit points and fit function.  This
+	was traced to a bug improperly moving data to the plotting arrays.
+	There is no reliable workaround, contact site support for a code
+	change or patched binary.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	474
+MODULE:	mscred.ccdproc
+SYSTEM:	-V4.1: December 5, 2000
+DATE:	Thu Dec  7 14:22:10 MST 2000
+FROM:	valdes
+
+BUG:	When a flat field is processed in a certain way as noted below,
+	applying it to object data with CCDPROC will cause each flat field
+	extension to be normalized differently.  This will be evident in
+	the log file where the scale factor for the flat field extensions
+	will be listed with different values rather than the same value.
+	The flat fielded object image will then appear with different gain
+	levels of the same relative magnitude as the flat field in each
+	extension.  Note that small residual gain differences are normal
+	due to dome flats not exactly matching the sky and these are
+	removed by using sky flats.
+
+	The incorrect behavior occurs when the flat field is processed
+	after combining to a master flat field followed by making a
+	new version of the flat field, such as when making a pupil ghost
+	corrected flat field.  The error occurs because a time stamp for
+	the CCDMEAN scaling keyword, the keyword CCDMEANT, is added by
+	CCDPROC and checked against the time the image was last modified.
+	After the first processing all the CCDMEAN keywords will correctly have
+	the same value.  However, any modified version of the flat field
+	will then invalidate the time stamp causing the next execution of
+	CCDPROC that applies the flat field to compute new CCDMEAN values
+	separately for each extension.  If the CCDMEANT keyword is absent
+	then CCDPROC will not recompute the normalization value.  Thus the
+	workaround is to delete the CCDMEANT keyword from all extensions
+	either before making a new version of the flat field or in the flat
+	field version to be applied by CCDPROC.
+
+	In the most common case where individual flat fields are processed
+	with scaling followed by combining to a master flat using the task
+	FLATCOMBINE the bug does not occur because the scaling and
+	combining operation eliminates the CCDMEANT keyword.  Also when the
+	flat field is not modified after it has been processed by CCDPROC
+	the error will not occur.  So almost all users will not have
+	encountered this problem.
+
+STATUS:	The MSCRED release of December 7, 2000 fixes this problem by
+	having CCDPROC eliminate the CCDMEANT keyword when the flat
+	field is first processed.
+
+NUMBER:	475
+MODULE:	mscred.ccdproc
+SYSTEM:	V4.1 for Solaris (September 20 through December 7 releases)
+DATE:	Tue Dec 12 14:28:14 MST 2000
+FROM:	valdes
+
+BUG:	Using BPM for the "fixfile" parameter when doing bad pixel mask
+	corrections does not work with the prebuilt binaries.  Symptoms
+	are that the bad pixels are not removed and the logfile, verbose
+	output, and header processing keyword will indicate an EMPTY
+	mask was used.  The workaround is to use !BPM for the value of
+	the keyword or link the package yourself.
+
+	This problem occured because the binaries were built using
+	development libraries rather than the latest IRAF release
+	libraries.  An error was introduced in the development system
+	that causes the reported bug.
+
+STATUS:	Fixed in releases after December 11.
+
+NUMBER:	476
+MODULE:	mscred: ccdproc zerocombine flatcombine darkcombine
+SYSTEM:	- V4.1: December 7, 2000
+DATE:	Wed Dec 13 09:57:43 MST 2000
+FROM:	valdes
+
+BUG:	When using bad pixel masks with fixpix=yes in CCDPROC (or when
+	CCDPROC is called in the scripts ZEROCOMBINE, DARKCOMBINE, and
+	FLATCOMBINE that do both processing and combining) the memory
+	used internally for the masks is not released.  When doing many
+	images this leads to a growing memory usage possibly resulting in
+	an out-of-memory error.  People with machines having large amounts
+	of memory may not notice this problem.  The workaround if this
+	problem is encountered is to break up the processing into small
+	groups of mosaic exposures and use "flpr" between executions of
+	CCDPROC.  Releases after December 7, 2000 fix this problem so
+	updating MSCRED is the other solution.
+
+STATUS:	There is a two stage resolution of this bug.  Until a new version
+	of IRAF is released, the current release of MSCRED.CCDPROC includes a
+	flpr between the processing of each mosaic exposure.  Under a
+	new version of IRAF the problem is also fixed at the system level.
+
+NUMBER:	477
+MODULE:	rvcorrect
+SYSTEM:	-V2.11.3p1
+DATE:	Wed Jan 31 12:15:37 MST 2001
+FROM:	valdes
+
+BUG:	If an image is specified in the "files" parameter instead of
+	the "images" parameter it can cause an exception, erroneous
+	output, or no output at all.
+
+STATUS:	In future releases the task will detect images in the "files"
+	list and print a warning.
+
+NUMBER:	478
+MODULE:	proto.fixpix
+SYSTEM:	V2.11-V2.11.3p2
+DATE:	Thu Feb  8 11:39:09 MST 2001
+FROM:	valdes
+
+BUG:	FIXPIX may report an out-of-memory error.  This is caused by an
+	inefficient use of memory (using more memory without reclaiming
+	previously used memory).  This behavior only occurs when interpolation
+	along columns is performed.  One workaround is to use multiple passes
+	with fewer regions to be fixed per pass.  Another option is to
+	use only line interpolation if that is reasonable.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	479
+MODULE:	mscred.ccdproc
+SYSTEM:	V4.2: January 30, 2001 (only)
+DATE:	Thu Feb  8 14:23:08 MST 2001
+FROM:	valdes
+
+BUG:	In V4.2 the default for CCDPROC was changed to "merge=yes" with the
+	idea being that if data did not require merging then it would not
+	affect the data.  However, the change was such that if an input
+	list includes some previously processed and some unprocessed
+	files then when a new image is processed the last skipped processed
+	image in the list will be deleted.  If you have the backup option
+	turned on the orignal data for the deleted processsed image will
+	still be available otherwise the data will need to be retrieved
+	from tape.  The workarounds are not to mix processed and
+	unprocessed data in the input list or turn off the merge option.
+
+STATUS:	Fixed in the V4.3: February 8, 2001 version.
+
+NUMBER:	480
+MODULE:	pdm
+SYSTEM:	-V2.113b
+DATE:	Thu Feb 22 16:36:42 MST 2001
+FROM:	valdes
+
+BUG:	If the input data does not begin with the minimum x value (when
+	there are two or three columns) then a memory corruption error may
+	occur.  Even if it does not occur, the theta statistic will come
+	out wrong and so all results will be invalid.  The workaround is to
+	make sure the first data point of the input file(s) is the minimum
+	value.  One could also sort the files, though if multiple files are
+	being merged they should be merged externally into one sorted file
+	or else insure the first input file has the proper minimum.
+
+STATUS:	A fix was made to fix the immediate problem.  It is not clear
+	whether there are other possible problems due to lack of a
+	sorted input.
+
+NUMBER:	481
+MODULE:	mscred.combine (flatcombine, etc.)
+SYSTEM:	V4.3: February 8, 2001 - V4.4: March 6, 2001
+DATE:	Tue Mar 20 10:20:33 MST 2001
+FROM:	valdes
+
+BUG:	When using scaling or zero offsets the normalization of the factors
+	may be incorrect.  This bug is compiler dependent and affects
+	PC-IRAF (Suse and Redhat were explicitly checked) but not Solaris
+	or Alpha.  What is intended is that the scale and zero factors be
+	normalized to the first image.  The incorrect behavior is that only
+	the first image is normalized.  What you see in the terminal and
+	logfile report on the scale factors is the first image has a
+	scaling of 1 and offset of 0 and the other images have values which
+	are not correct and usually appear grossly wrong.  There is no
+	workaround when scaling is needed.  A new version of MSCRED is
+	required.
+
+STATUS:	Fixed in V4.4: March 20, 2001.
+
+NUMBER:	482
+MODULE:	splot
+SYSTEM:	-V2.11.3p2
+DATE:	Wed May 16 10:25:49 MST 2001
+FROM:	valdes
+
+BUG:	When using the 'e' key to measure equivalent widths along with the
+	error computation, if any pixel in the spectrum is negative or zero
+	the errors will be printed as zero.  The workaround is to replace
+	all the negative or zero values with a small positive value.
+
+STATUS:	This is fixed for the next release by setting the value to zero
+	for computing the uncertainty in the pixel.
+
+NUMBER:	483
+MODULE:	immatch.psfmatch
+SYSTEM:	V2.11
+DATE:	Wed May 16 14:46:37 MST 2001
+FROM:	davis
+
+BUG:	There is a symmetry problem in the convolution step if the psf
+	matching kernel does not have 180 degree rotational symmetry, due
+	to the fact that convolution kernel is not being flipped properly 
+	before doing the convolution. The workaround is to create the
+	psf matching kernel, rotate it 180 degrees, and then apply it
+	with psfmatch or use the psfmatching kernel directly with 
+	fconvolve.
+
+	A floating point error may occur in the replace algorithm in
+	rare cases due to the input to the log function not being checked
+	for 0.0 values. The only workaround is to try the filter options
+	"none" or "model".
+
+
+STATUS:	Fixed for the next release of iraf. A fixed version of psfmatch
+	is available in the external addon package immatchx.
+
+NUMBER:	484
+MODULE: mscimage, geotran, rotate, imlintran, [g/s/w]register, imtranspose,
+	im3dtran
+SYSTEM:	V2.11
+DATE:	Fri Jun  1 11:39:39 MST 2001
+FROM:	valdes
+
+BUG:    When writing an output FITS image extension, for example,
+
+	    cl> imtranspose abc out.fits[ext2,append]
+
+	the following type of error may occur
+
+	    Attempt to write out of bounds on file (<image>.fits_NNNN)
+
+	where NNNN is some four digit number.  This occurs when the input
+	data is operated upon in subblocks where the line dimension is
+	smaller than the output dimension.  Therefore, the workaround is to
+	set the line buffer block size (e.g. nxblock or len_blk) to
+	be the size of the largest image dimension.  Alternatively one
+	can create a single image intermediate file and then append that
+	to the output with IMCOPY.
+
+	THIS ONLY APPLIES TO CREATING AN OUTPUT EXTENSION AND DOES NOT
+	APPLY TO SIMPLE SINGLE FITS OUTPUT IMAGES.  The most common case
+	where output extensions are used is when running the mosaic task
+	MSCIMAGE which calls GEOTRAN internally.  The workaround for that
+	task is to set "nxblock" to a value larger than the largest input
+	extension dimension.
+
+STATUS: This problem is under investigation.
+
+NUMBER:	485
+MODULE:	longslit.fitcoords
+SYSTEM:	-V2.11.3b
+DATE:	Mon Jun  4 11:43:22 MST 2001
+FROM:	valdes
+
+BUG:    The user coordinates from IDENTIFY are double precision and
+	are written to the database with 9 digits of precision.  FITCOORDS
+	reads and uses this data in real precision.  The deletion point
+	file with the user coordinates of the delete points is written in
+	real precision.  The comparison between the coordinates written to
+	the deletion list and later read again and the data read from the
+	IDENTIFY database is done as a direct comparison of two real
+	values.  Because of how the conversion and rounding between text
+	and floating point representations are done this can result in
+	deleted points which are in the deletion file to not be restored as
+	deleted in subsequent runs of FITCOORDS.  There is no easy
+	workaround.  The only possiblity is to match the values in the
+	deletion file with the IDENTIFY database file and make the ascii
+	representation be the same.  Working in units which require fewer
+	significant digits to represent the coordinates may improve the
+	behavior.  For example when working in the IR use microns instead
+	of Angstroms in IDENTIFY/REIDENTIFY.
+
+STATUS:	The direct equality will be replaced by a tolerance comparison in
+	a future release.
+
+NUMBER:	486
+MODULE:	images.imgeom.magnify
+SYSTEM:	V2.11.2 and later
+DATE:	Thu Jun 21 15:14:56 MST 2001
+FROM:	davis
+
+BUG:	In some circumstances the previous block of output image lines may be
+        repeated in the output image rather than a new block computed. This
+	bug affects IRAF 2.11.2 and later systems, and is the result of a typo
+	made when the task was upgraded to use the new interpolants, image
+	i/o boundary extension etc.
+
+	The problem is most likely to occur when the output image scale
+	is > than the output buffer size of 16 lines.
+
+
+STATUS:	Fixed for the next release. Work around include doing the magnify in
+	more than one step or using the imlintran task.
+
+NUMBER:	487
+MODULE:	ccdproc
+SYSTEM:	V2.11
+DATE:	Thu Jul  5 08:35:00 MST 2001
+FROM:	valdes
+
+BUG:	When applying a dark count correction, the dark count calibration
+	image is scaled to the data being calibrated using the ratio of
+	the dark times.  The dark time for an image is the "darktime"
+	keyword and if this is absent "exptime", where these may be
+	translated to other keywords if a translation is given in the
+	instrument file.  When a value for the dark time is found it
+	is used without checking for zero values.  Therefore, if the
+	dark count image has a dark time value of zero a
+	floating divide or floating exception will occur.  The
+	workaround is to edit the header to add the appropriate
+	values.
+
+STATUS:	In the next release an appropriate error message will be given.
+
+NUMBER:	488
+MODULE:	imcoords.ccmap
+SYSTEM:	V2.11
+DATE:	Fri Jul 20 08:28:08 MST 2001
+FROM:	davis
+
+BUG:	If the input coordinate list spans 0.0 hours right ascension, and
+	the refpoint parameter is set to "coords", ccmap may produce a
+	bad estimate for the reference point and a bad solution.
+
+STATUS:	Fixed for the next release of IRAF and in the external addon package
+	immatchx. The work around is to set the ccmap refpoint parameter to
+	"user", and either enter the reference coordinates manually, or read
+	them them from the associated input image header.
+
+
+NUMBER:	489
+MODULE:	identify
+SYSTEM:	V2.9-V2.11.3b
+DATE:	Thu Aug  2 09:45:58 MST 2001
+FROM:	valdes
+
+BUG:	When identified features have labels and when some features are
+	deleted during fitting the labels no longer correctly correspond
+	with the features.  This only applies to deleting during fitting
+	and there is no error when deleting features in the identify
+	window.  What happens is that when a feature is deleted during
+	fitting the internal list is compressed by shifting the higher
+	features down.  But this is not being done with the labels so that
+	the label of the deleted feature becomes the label of the next
+	feature and all subsequent features also have the wrong label.  The
+	result is incorrect labels for the features when labeling is turned
+	on for the graphs and in the database files.  There is no effect on
+	dispersion calibration.  If one does not care about the labels then
+	there is nothing to be concerned about.  There is no work around
+	other than to avoid deleting features in the fitting mode or
+	editing the database file after the fitting.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	490
+MODULE:	scombine
+SYSTEM:	-V2.113b
+DATE:	Thu Aug  9 11:22:15 MST 2001
+FROM:	valdes
+
+BUG:	If only the number of desired output pixels is given then one
+	would expect that the dispersion limits of the input data would
+	be used and the dispersion would be adjusted to give the desired
+	number of pixels.  Instead the minimum dispersion is used and the
+	ending dispersion limit is adjusted.  No combination of
+	parameters will cause the dispersion to be adjusted to satisfy
+	the other parameters.  The only workaround is to specify the
+	desired dispersion.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	491
+MODULE:	immatch.xregister
+SYSTEM:	V2.11
+DATE:	Wed Oct 17 15:01:18 MST 2001
+FROM:	davis
+
+BUG:	In interactive mode xregister is only using the first correlation
+	region to compute the shifts, rather than averaging the shifts
+	computed for all the regions.
+
+STATUS:	Fixed for the next release of IRAF and in the external addon package
+	immatchx. The woraround is to use non-interactive mode if possible. 
+
+NUMBER:	492
+MODULE:	imcoords.wcsctran
+SYSTEM:	V2.11
+DATE:	Sat Dec  8 10:32:24 MST 2001
+FROM:	davis
+
+BUG:	Wcsctran may fail with a "Cannot write to string_file" error if
+	the input image is dimensionally reduced, i.e. a section of higher
+	dimensioned parent image. The bug is caused by an uninitialized
+	array. If the array is accidentally initialized to 0 the bug will
+	not occur.
+
+STATUS:	Fixed for IRAF 2.12. There is no workaround.
+
+NUMBER:	493
+MODULE:	mscred.ccdproc
+SYSTEM:	V4.6
+DATE:	Thu Feb 21 14:31:03 MST 2002
+FROM:	valdes
+
+BUG:	When the "xtalkcor" option is selected but no corrrection is
+	performed, either because it was done previously or an error
+	occurs, then various warning messages about deleting non-existent
+	files will occur.  One way the crosstalk operation will fail is if
+	the crosstalk calibration file is not found due to a missing
+	XTALKFIL keyword, an error in specifying the file to use, or the
+	file is not available.  When the error in ccdproc happens in the
+	various combine scripts (zerocombine, flatcombine, etc.) with
+	process=yes, this will abort these scripts.
+
+	When the error occurs in running ccdproc directly, the warnings can
+	be ignored or the crosstalk option can be turned off.  When this
+	occurs in the combine scripts, causing them to abort, turn off the
+	process option or the xtalkcor option in ccdproc.
+
+STATUS:	The bug is due to a typo introduced during the last change to this
+	task.  The bug is fixed in V4.7 of mscred.
+
+NUMBER:	494
+MODULE:	ccdmask
+SYSTEM:	-V2.11.3
+DATE:	Thu Feb 28 09:09:49 MST 2002
+FROM:	valdes
+
+BUG:	If the last line or column is found to be a bad pixel but the
+	pixel has no interior neighbor which is bad, then the mask pixel
+	value will be a number corresponding to the number of contiguous
+	bad pixels along the last line or column which includes that
+	pixel.  In other words the pixel will not be set to the specified
+	linterp, cinterp, or eqinterp value.  Since the pixel is correctly
+	identified as bad the mask may be used though if control over the
+	direction of interpolation is needed the values should be reset as
+	needed.
+
+STATUS:	Fixed in V2.12.
+
+NUMBER:	495
+MODULE:	imcombine, ccdred.combine, mscred.combine
+SYSTEM:	-V2.11.3
+DATE:	Thu Apr 18 11:44:40 MST 2002
+FROM:	valdes
+
+BUG:	When combining with "offsets=wcs" or "offsets=world" and the
+	LTV/LTM keywords are different between the images the offsets are
+	incorrectly computed.  The workaround is to reset the physical
+	coordinate sysetm with "wcsreset <images> wcs=physical".
+
+STATUS:	Fixed in V2.12.  Version of combine in mscred prior to the
+	date of this report also have this bug and later releases
+	are fixed.
+
+NUMBER:	496
+MODULE:	guiapps.spectool
+SYSTEM:	All
+DATE:	Wed May 29 09:39:07 MST 2002
+FROM:	valdes
+
+BUG:	When spectool (or tutorial) is run multiple times without
+	resetting the executable with "flpr", it is possible to get a
+	segmentation violation before displaying any spectrum on the second
+	or later executions in certain situations.  The main situation
+	where this might occur is running spectool without a spectrum
+	filename argument and then using the "Read" panel to browze for a
+	spectrum to display.  The specific case where this bug was found
+	was modifying the file template.  This bug is caused by an
+	uninitialized pointer.  Note that after you have displayed a
+	spectrum any error (including a segmentation error) will not be due
+	to this bug.  The workaround is simply to use flpr between
+	executions.  If an error occurs use flpr and continue though
+	occasionally the terminal window may become locked and the xgterm
+	might need to be restarted.
+
+STATUS:	Fixed in distributions after the date of this report.
+
+NUMBER:	497
+MODULE:	imcombine, mscred.combine, mscred.mscimage
+SYSTEM:	V2.12, mscred V4.7: May 2002
+DATE:	Fri Jun 14 15:23:16 MST 2002
+FROM:	valdes
+
+BUG:	A segmentation violation (a reference to an invalid memory address)
+	is possible because of a bug in a array length calculation.  This
+	problem was seen with mscred.mscimage (which calls mscred.combine)
+	on PC-IRAF.  Whether this occurs with other systems is unknown.
+	The error occurs almost immediately.  There is no workaround if the
+	error occurs.
+
+STATUS:	A new version of mscred is available with the fix.  The next
+	patch version of IRAF will fix the problem in imcombine.
+
+NUMBER:	498
+MODULE:	nmisc.starfocus, nmisc.specfocus, nmisc.psfmeasure
+SYSTEM:	NMISC Jan 01, 2000 version for  Redhat/Linux
+DATE:	Tue Jun 18 14:48:36 MST 2002
+FROM:	valdes
+
+BUG:	Running the PSF and focus tasks in the NMISC package on some
+	systems can result in an immediate segmentation violation.  This
+	was reported on PC-IRAF for RedHat, though it will likely occur
+	on other similar systems.  There is no workaround but a new
+	June 2002 distribution corrects this problem.  Note that
+	in V2.12 these tasks are included in the package noao.obsutil
+	and it is not necessary to install the nmisc package.  The
+	bug is not present in the V2.12 obsutil version.
+
+STATUS:	Fixed in a June 2002 distributions of the NMISC external package.
+
+NUMBER:	499
+MODULE:	immatch.xregister
+SYSTEM:	V2.12
+DATE:	Thu Jun 20 13:15:59 MST 2002
+FROM:	davis
+
+BUG:	If the xregister task parameter interactive = yes and the output
+	images are defined then the computed shifts are not applied. This
+	occurs because the reinitialization routine triggered by the 'n'
+	keystroke command is in the wrong place. 
+
+STATUS:	Fixed for the next patch / release of IRAF. The work around is to
+	run xregister twice, once interactively to compute the shifts, and
+	again non-interactively to apply them.
+
+NUMBER:	500
+MODULE:	apphot package
+SYSTEM:	V2.12 and earlier
+DATE:	Fri Jun 21 09:21:08 MST 2002
+FROM:	davis
+
+BUG:	In interactive mode the v keystroke will not update the aperture
+	size or algorithm parameters correctly for the next measurement if
+	the cursor position does not change significantly.
+
+STATUS:	Fixed for the next patch / release of IRAF. The work around is to
+	use the equivalent colon commands or move the cursor significantly
+	after the last measurement.
+
+NUMBER:	501
+MODULE:	quadred.quadproc
+SYSTEM:	V2.12
+DATE:	Fri Jul  5 11:16:30 MST 2002
+FROM:	valdes
+
+BUG:	The QUADPROC task, which is essentially the same as the
+	ARED.QUAD.QUADPROC external package version, can fail with
+	a divide by zero error.  This is due to an script error where
+	the multiamp data is not split into pieces.  The workarounds
+	are to either use QUADRED.CCDPROC (which is the recommended
+	replacement for QUADPROC anyway) or to copy, edit, and
+	redefine the script subtask qproc.  For the latter workaround
+	contact iraf support (iraf@noao.edu) for instructions.
+
+STATUS:	Fixed for the next release.

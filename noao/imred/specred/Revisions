@@ -1,5 +1,22 @@
 .help revisions Jun88 noao.imred.msred
 .nf
+
+=====
+V2.12
+=====
+
+imred$specred/msresp1d.cl
+    Modified to use "imtype" rather than hardwired to "imh".  This uses
+    the same code as srcfibers$fibresponse.cl.
+    (2/29/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+=======
+V2.11.3
+=======
+
 imred$specred/doc/msresp1d.hlp
     The package was incorrect and the requirement that the unextracted
     spectrum must be present even if the extracted spectrum is present

@@ -405,6 +405,8 @@ begin
 		call fprintf (ofd, Memc[formatstr])
 		if (getid == YES)
 		    call pargstr (Memc[starname])
+		#call eprintf ("name=%s\n")
+		    #call pargstr (Memc[starname])
 
 		# Print the extra variables.
 		do i = 1, len_plist {
@@ -757,7 +759,7 @@ begin
 	sym = sthead (stable)
 	while (sym != NULL) {
 	    do i = 1, npts {
-		if (index[i] == 0.0)
+		if (index[i] == 0)
 		    next
 		data = Memr[sym+i-1]
 		if (IS_INDEFR(data))

@@ -1,0 +1,31 @@
+# Parameter set for the CCSTD Task
+
+input,s,a,,,,The input coordinate files
+output,s,a,,,,The output coordinate files
+database,s,a,,,,The input database file
+solutions,s,a,,,,The plate solutions
+geometry,s,h,"linear","|linear|geometric|",,"The solution type (linear,geometric)"
+forward,b,h,yes,,,Transform to standard coordinates ?
+polar,b,h,no,,,Work in polar standard coordinates ?
+xref,r,h,INDEF,,,The X reference coordinate
+yref,r,h,INDEF,,,The Y reference coordinate
+xmag,r,h,INDEF,,,The X axis scale in arcsec per X reference coordinate
+ymag,r,h,INDEF,,,The Y axis scale in arcsec per Y reference coordinate
+xrotation,r,h,INDEF,,,The X axis rotation angle in degrees
+yrotation,r,h,INDEF,,,The Y axis rotation angle in degrees
+lngref,r,h,INDEF,,,The ra / longitude reference coordinate in lngunits
+latref,r,h,INDEF,,,The dec / latitude reference coordinate in latunits
+lngunits,s,h,"",,,The ra / longitude coordinate units
+latunits,s,h,"",,,The dec / latitude coordinate units
+projection,s,h,"tan","",,The sky projection geometry
+xcolumn,i,h,1,1,100,Input column containing the x / standard coordinate
+ycolumn,i,h,2,1,100,Input column containing the y / standard coordinate
+lngcolumn,i,h,3,1,100,Input column containing the longitude / standard coordinate
+latcolumn,i,h,4,1,100,Input column containing the latitude / standard coordinate
+lngformat,s,h,"",,,Output format of the standard / longitude coordinate
+latformat,s,h,"",,,Output format of the standard / latitude coordinate
+xformat,s,h,"",,,Output format of the standard / x coordinate
+yformat,s,h,"",,,Output format of the standard / y coordinate
+min_sigdigits,i,h,7,,,Minimum precision of the output coordinates
+mode,s,h,'ql'
+

@@ -227,8 +227,8 @@ int	rx, ry		#O cursor raster position in GKI coords
 pointer	decodecur, delimcur, pattern, patbuf, sp, otop
 int	len_pattern, len_curval, sv_iomode, nchars, ip, op, i1, i2, ch
 
-int	getci()
 bool	ttygetb()
+int	getci(), stg_encode()
 int	ttygets(), ttygeti(), gstrcpy(), gpatmatch(), patmake(), fstati()
 include	"stdgraph.com"
 define	quit_ 91
@@ -353,7 +353,8 @@ begin
 
 	g_reg[E_IOP] = ip
 	call aclri (g_reg, 7)
-	call stg_encode (Memc[decodecur], g_mem, g_reg)
+	if (stg_encode (Memc[decodecur], g_mem, g_reg) != OK)
+	    call syserr (SYS_GGCUR)
 
 	# Multiple cursors are not implemented yet so just echo input.
 	cn  = cursor

@@ -10,7 +10,7 @@
 #include <errno.h>
 
 #ifdef SYSV
-#include <termios.h>
+#include <termio.h>
 #else
 #include <sgtty.h>
 #endif
@@ -70,15 +70,13 @@ struct ttyport {
 	int flags;			/* port flags			*/
 	char redraw;			/* redraw char, sent after susp	*/
 #ifdef SYSV
-	struct termios tc;		/* normal tty state		*/
-	struct termios save_tc;		/* saved rawmode tty state	*/
+	struct termio tc;		/* normal tty state		*/
+	struct termio save_tc;		/* saved rawmode tty state	*/
 #else
 	struct sgttyb tc;		/* normal tty state		*/
 	struct sgttyb save_tc;		/* saved rawmode tty state	*/
 #endif
 };
-
-
 
 #define	CTRLC	3
 extern	int errno;
@@ -100,20 +98,6 @@ static	tty_onsig(), tty_stop(), tty_continue();
  */
 struct ttyport ttyports[MAXOTTYS];
 struct ttyport *lastdev = NULL;
-
-/* Omit this for now; it was put in for an old Linux libc bug, and since libc
- * is completely different now the need for it has probably gone away.
- *
- * #ifdef LINUX
- * #define FCANCEL
- * #endif
- */
-#ifdef FCANCEL
-/* The following definition has intimate knowledge of the STDIO structures. */
-#define	fcancel(fp)	( \
-    (fp)->_IO_read_ptr = (fp)->_IO_read_end = (fp)->_IO_read_base,\
-    (fp)->_IO_write_ptr = (fp)->_IO_write_end = (fp)->_IO_write_base)
-#endif
 
 
 /* ZOPNTX -- Open or create a text file.  The pseudo-files "unix-stdin", 
@@ -358,10 +342,6 @@ XINT	*status;
 		while (*op++ = ch = getc(fp), ch != EOF)
 		    if (--maxch <= 0 || ch == NEWLINE)
 			break;
-#ifdef FCANCEL
-		if (errno == EINTR)
-		    fcancel (fp);
-#endif
 	    } while (errno == EINTR && op-1 == buf && --ntrys >= 0);
 
 	    *op = XEOS;
@@ -419,10 +399,6 @@ XINT	*status;
 		clearerr (fp);
 		ch = getc (fp);
 	    }
-#ifdef FCANCEL
-	    if (ch == CTRLC)
-		fcancel (fp);
-#endif
 
 	    signal (SIGINT,  sigint);
 	    signal (SIGTERM, sigterm);
@@ -638,12 +614,9 @@ XINT	*status;
 	    }
 	}
 
-	if (kfp->fpos == ERR) {
+	if (kfp->fpos == ERR)
 	    *status = XERR;
-	} else if (kfp->flags & KF_NOSEEK) {
-	    kfp->fpos = 0;
-	    *status = XOK;
-	} else {
+	else {
 	    kfp->fpos = ftell (kfp->fp);
 	    *status = XOK;
 	}
@@ -705,28 +678,21 @@ int	flags;			/* file mode control flags */
 
 	if (!(port->flags & KF_CHARMODE)) {
 #ifdef SYSV
-	    struct  termios tc;
+	    struct  termio tc;
 	    int     i;
 
-	    tcgetattr (fd, &port->tc);
+	    ioctl (fd, TCGETA, &tc);
 	    port->flags |= KF_CHARMODE;
-	    tc = port->tc;
+	    port->tc = tc;
 
 	    /* Set raw mode. */
-	    tc.c_lflag &=
-		~(0 | ICANON | ECHO | ECHOE | ECHOK | ECHONL);
-	    tc.c_iflag &=
-		~(0 | ICRNL | INLCR | IUCLC);
-	    tc.c_oflag |=
-		(0 | TAB3 | OPOST | ONLCR);
-	    tc.c_oflag &=
-		~(0 | OCRNL | ONOCR | ONLRET);
+	    tc.c_iflag &= ~(ICRNL|INLCR|IUCLC);
+	    tc.c_oflag = 0;
+	    tc.c_lflag  = ISIG;
+	    tc.c_cc[VMIN] = 2;
+	    tc.c_cc[VTIME] = 2;
 
-	    tc.c_cc[VMIN] = 1;
-	    tc.c_cc[VTIME] = 0;
-	    tc.c_cc[VLNEXT] = 0;
-
-	    tcsetattr (fd, TCSADRAIN, &tc);
+	    ioctl (fd, TCSETAW, &tc);
 #else
 	    struct  sgttyb tc;
 
@@ -777,7 +743,7 @@ struct	ttyport *port;		/* tty port */
 	register struct	fiodes *kfp;
 	register int fd;
 #ifdef SYSV
-	struct termios tc;
+	struct termio tc;
 	int i;
 #else
 	struct	sgttyb tc;
@@ -790,9 +756,20 @@ struct	ttyport *port;		/* tty port */
 	kfp = &zfd[fd];
 
 #ifdef SYSV
-	/* Restore saved port status. */
-	if (port->flags & KF_CHARMODE)
-	    tcsetattr (fd, TCSADRAIN, &port->tc);
+	if (ioctl (fd, TCGETA, &tc) == -1)
+	    return;
+
+	/* If no saved status use current tty status. */
+	if (!(port->flags & KF_CHARMODE))
+	    port->tc = tc;
+
+	/* Clear raw mode. */
+	tc = port->tc;
+	tc.c_iflag = (port->tc.c_iflag | ICRNL);
+	tc.c_oflag = (port->tc.c_oflag | OPOST);
+	tc.c_lflag = (port->tc.c_lflag | (ICANON|ISIG|ECHO));
+
+	ioctl (fd, TCSETAW, &tc);
 #else
 	if (ioctl (fd, TIOCGETP, &tc) == -1)
 	    return;
@@ -843,7 +820,7 @@ int	*scp;			/* not used */
 	register int fd = port ? port->chan : 0;
         register struct fiodes *kfp = port ? &zfd[fd] : NULL;
 #ifdef SYSV
-	struct termios tc;
+	struct termio tc;
 #else
 	struct sgttyb tc;
 #endif
@@ -852,15 +829,14 @@ int	*scp;			/* not used */
 	    return;
 
 #ifdef SYSV
-	tcgetattr (fd, &port->save_tc);
-	tc = port->tc;
-
-	/* The following should not be necessary, just to make sure. */
-	tc.c_iflag = (port->tc.c_iflag | ICRNL);
-	tc.c_oflag = (port->tc.c_oflag | OPOST);
-	tc.c_lflag = (port->tc.c_lflag | (ICANON|ISIG|ECHO));
-
-	tcsetattr (fd, TCSADRAIN, &tc);
+	if (ioctl (fd, TCGETA, &tc) != -1) {
+	    port->save_tc = tc;
+	    tc = port->tc;
+	    tc.c_iflag = (port->tc.c_iflag | ICRNL);
+	    tc.c_oflag = (port->tc.c_oflag | OPOST);
+	    tc.c_lflag = (port->tc.c_lflag | (ICANON|ISIG|ECHO));
+	    ioctl (fd, TCSETAF, &tc);
+	}
 #else
 	if (ioctl (fd, TIOCGETP, &tc) != -1) {
 	    port->save_tc = tc;
@@ -890,7 +866,7 @@ int	*scp;			/* not used */
 	    return;
 
 #ifdef SYSV
-	tcsetattr (port->chan, TCSADRAIN, &port->save_tc);
+	ioctl (port->chan, TCSETAF, &port->save_tc);
 #else
 	ioctl (port->chan, TIOCSETN, &port->save_tc);
 #endif

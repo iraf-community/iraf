@@ -27,14 +27,12 @@ include "reblock.com"
 begin
 	# Open input and output files
 	in = mtopen (in_fname, READ_ONLY, 0)
-	if (outtape == NO)
-	    out = open (out_fname, NEW_FILE, BINARY_FILE)
-	else
-	    out = mtopen (out_fname, WRITE_ONLY, 0)
+	out = NULL
 
 	# Allocate space for input buffer.
 	sz_charsin = fstati (in, F_BUFSIZE)
 	call malloc (inbuf, sz_charsin, TY_CHAR)
+	outbuf = NULL
 
 	# Skip over n input blocks (tape) or records (disk).
 	first_byte = 1
@@ -56,40 +54,10 @@ begin
 	RECS_RD(outparam) = 0
 	RECS_WRT(outparam) = 0
 
-	# Initialize reblocking parameters.
-	if (reblock == YES) {
-
-	    # Initialize block and record sizes
-	    if (IS_INDEFI(szb_inrecord))
-	        szb_inrecord = sz_charsin * SZB_CHAR
-	    if (IS_INDEFI(szb_outblock))
-	        szb_outblock = fstati (out, F_BUFSIZE) * SZB_CHAR
-	    if (IS_INDEFI(szb_outrecord))
-	        szb_outrecord = szb_outblock
-
-	    # Set pad character
-	    if (pad_record == YES || pad_block == YES) {
-		padchar = char (padvalue)
-		call chrpak (padchar, 1, padchar, 1, 1)
-	    }
-
-	    # Allocate space for the output buffer
-	    sz_charsout = reb_roundup (szb_outblock, SZB_CHAR) / SZB_CHAR
-	    call malloc (outbuf, sz_charsout, TY_CHAR)
-
-	    # Intialize the record remainder counters
-	    rem_in = szb_inrecord
-	    rem_out = szb_outrecord
-
-	    # Initialize input and output buffer pointers
-	    ip = 1
-	    op = 1
-	}
-
-	# Set up the record counter
+	# Initalize the record counter.
 	rec_count = 0
 
-	# Set of the offset in output file for asyncrhronous i/o
+	# Set of the offset in output file for asyncrhronous i/o.
 	offset = 1
 
 	# Loop over the input blocks.
@@ -110,7 +78,17 @@ begin
 		call bytmov (Memc[inbuf],first_byte, Memc[inbuf],1, bytes_read)
 	    }
 
-	    # Binary copy
+	    # Open the output file. This has been moved from the beginning 
+	    # of the routine to avoid a magtape problem.
+	    # driver problem.
+	    if (BLKS_RD(outparam) == 1) {
+		if (outtape == NO)
+	    	    out = open (out_fname, NEW_FILE, BINARY_FILE)
+		else
+	    	    out = mtopen (out_fname, WRITE_ONLY, 0)
+	    }
+
+	    # Binary copy.
 	    if (reblock == NO) {
 
 		RECS_RD(outparam) = BLKS_RD(outparam)
@@ -122,6 +100,38 @@ begin
 	    # Reblock.
 	    } else {
 
+		# Initialize reblocking parameters after first read.
+		if (BLKS_RD(outparam) == 1) {
+
+	            # Initialize block and record sizes
+	            if (IS_INDEFI(szb_inrecord))
+	                szb_inrecord = sz_charsin * SZB_CHAR
+	            if (IS_INDEFI(szb_outblock))
+	                szb_outblock = fstati (out, F_BUFSIZE) * SZB_CHAR
+	            if (IS_INDEFI(szb_outrecord))
+	                szb_outrecord = szb_outblock
+
+	            # Set pad character.
+	            if (pad_record == YES || pad_block == YES) {
+		        padchar = char (padvalue)
+		        call chrpak (padchar, 1, padchar, 1, 1)
+	            }
+
+	            # Allocate space for the output buffer.
+	            sz_charsout = reb_roundup (szb_outblock, SZB_CHAR) /
+		        SZB_CHAR
+	            call malloc (outbuf, sz_charsout, TY_CHAR)
+
+	            # Intialize the record remainder counters
+	            rem_in = szb_inrecord
+	            rem_out = szb_outrecord
+
+	            # Initialize input and output buffer pointers
+	            ip = 1
+	            op = 1
+		}
+
+		# Loop over the input buffer.
 	        repeat {
 
 		    # Calculate the number of bytes to be moved.
@@ -137,14 +147,14 @@ begin
 		    if (rem_out == 0)
 		        rem_out = szb_outrecord
 
-		    # Update pointers
+		    # Update the input and output buffer pointers.
 		    ip = ip + mov_nbytes
 		    op = op + mov_nbytes
 
-		    # Pad records
+		    # Pad records.
 		    if (pad_record == YES && rem_in == szb_inrecord) {
 
-			# Pad records.
+			# Do the padding.
 			if (mov_nbytes != 0) {
 		            RECS_RD(outparam) = RECS_RD(outparam) + 1
 		            call reb_pad_record (Memc[outbuf], op, rem_out,
@@ -171,7 +181,7 @@ begin
 		    # Trim records.
 		    if (trim_record == YES && rem_out == szb_outrecord) {
 
-			# Trim a record.
+			# Do the trimming.
 			if (mov_nbytes != 0)
 			    RECS_WRT(outparam) = RECS_WRT(outparam) + 1
 			ntrim = min (rem_in, bytes_read - ip + 1)
@@ -187,7 +197,7 @@ begin
 			    rem_out = 0
 		    }
 
-		    # Simply count the records.
+		    # Count the records.
 		    if (pad_record == NO && trim_record == NO) {
 			if (szb_inrecord == sz_charsin * SZB_CHAR)
 			    RECS_RD(outparam) = BLKS_RD(outparam)
@@ -203,11 +213,11 @@ begin
 
 	        } until (ip > bytes_read)
 
-		# reset the input pointer
+		# Reset the input buffer pointer
 	        ip = 1
 	    }
 
-	    # Reset the record counter.
+	    # Update the record counter.
 	    if (intape == YES)
 		rec_count = BLKS_RD(outparam)
 	    else
@@ -218,7 +228,7 @@ begin
 	# Output remainder of data
 	if (reblock == YES) {
 
-	    # Pad last record if short
+	    # Pad last record if short.
 	    if (pad_record == YES) {
 	        if (rem_in < szb_inrecord)
 		    RECS_RD(outparam) = RECS_RD(outparam) + 1
@@ -229,7 +239,7 @@ begin
 		        szb_outblock, szb_outrecord, padchar)
 		    if (op > szb_outblock) {
 			call reb_write_block (out, Memc[outbuf], szb_outblock,
-					  offset, byteswap, wordswap)
+			    offset, byteswap, wordswap)
 			BLKS_WRT(outparam) = BLKS_WRT(outparam) + 1
 			op = 1
 		    }
@@ -256,14 +266,15 @@ begin
 	}
 
 	call mfree (inbuf, TY_CHAR)
-	if (reblock == YES)
+	if (outbuf != NULL)
 	    call mfree (outbuf, TY_CHAR)
 	call close (in)
-	call close (out)
+	if (out != NULL)
+	    call close (out)
 end
 
 
-# REB_PAD_RECORD -- Procedure for padding records
+# REB_PAD_RECORD -- Procedure for padding records.
 
 procedure reb_pad_record (buffer, op, rem_out, szb_outblock, szb_outrecord,
 	padchar)
@@ -327,6 +338,7 @@ long	offset		# offset in chars in output file for writing
 int	byteswap	# swap every other byte before output
 int	wordswap	# swap every other word before output
 
+int	nbread
 int	awaitb()
 errchk	awriteb, awaitb
 
@@ -336,7 +348,11 @@ begin
 	if (wordswap == YES)
 	    call bswap4 (buffer, 1, buffer, 1, nbytes)
 	call awriteb (fd, buffer, nbytes, offset)
-	offset = offset + awaitb (fd)
+	nbread = awaitb (fd)
+	if (nbread == ERR)
+	    call error (3, "Error writing block data")
+	else
+	    offset = offset + nbread
 end
 
 

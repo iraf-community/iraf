@@ -37,7 +37,7 @@ begin
 	    call error (0, "Negative shift found preparing spectrum.")
 
 	if (DEBUG(rv)) {
-	    call d_printf (DBG_FD(rv), "prep_spec:\n\t")
+	    call d_printf (DBG_FD(rv), "prep_spec:\t")
 	    call d_printf (DBG_FD(rv), "ishift=%d np=%d dnp=%d fnp=%d\n")
 		call pargi (ishift); call pargi(npts)
 		call pargi (datanpts); call pargi(fftnpts)

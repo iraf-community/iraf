@@ -20,7 +20,7 @@ char	linebuf[ARB]
 int	ip, op
 char	opcode[SZ_OPCODE]
 int	command, kwp, strmatch(), strncmp()
-string	directives "finfjunjrjshihnhbrcespinlslebptpkske"
+string	directives "finfjunjrjshihnhbrcespinlslebptpkskehrhn"
 
 begin
 	if (linebuf[1] != '.')			# not a command line?

@@ -15,7 +15,7 @@ int	npix			#I number of pixels to be set
 int	rop			#I rasterop
 
 pointer	sp, ll_out, ll_dst
-int	pl_access()
+pointer	pl_access()
 errchk	pl_access
 
 begin
@@ -25,7 +25,7 @@ begin
 	    call smark (sp)
 	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 
-	    ll_dst = Ref (pl, pl_access(pl,v))
+	    ll_dst = pl_access (pl,v)
 	    call pl_linerop (ll_src, 1, PL_MAXVAL(pl), Mems[ll_dst], v[1],
 		MV(ll_depth), Mems[ll_out], npix, rop)
 	    call pl_update (pl, v, Mems[ll_out])

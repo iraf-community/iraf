@@ -151,6 +151,7 @@
 #define	ZXGMES		zxgmes_
 #define	ZXWHEN		zxwhen_
 #define	ZZCLMT		zzclmt_
+#define	ZZEPRO		zzepro_
 #define	ZZOPMT		zzopmt_
 #define	ZZRDMT		zzrdmt_
 #define	ZZRWMT		zzrwmt_

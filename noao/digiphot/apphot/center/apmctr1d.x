@@ -34,7 +34,10 @@ end
 
 
 # AP_CMMARG -- Compute the center and estimate its error given the
-# marginal distribution and the number of points.
+# marginal distribution and the number of points. The center is estimated
+# using a centroid which is an optimal solution for a gaussian star with
+# no background noise. The centering error is computing using a variance
+# estimate based on a gaussian star with no background noise.
 
 procedure ap_cmmarg (a, npts, norm, xc, err)
 

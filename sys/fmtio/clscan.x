@@ -14,7 +14,7 @@ begin
 	# cache, querying the CL for the value of the parameter only if it
 	# is not found in the cache.
 
-	if (clc_fetch (param, sc_scanbuf, SZ_SCANBUF) <= 0) {
+	if (clc_fetch (param, sc_scanbuf, SZ_SCANBUF) == ERR) {
 	    call clreqpar (param)
 	    if (getline (CLIN, sc_scanbuf) == EOF)
 		return (EOF)

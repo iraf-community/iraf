@@ -1,6 +1,25 @@
 .help revisions May93 noao.lib
 .nf
 noaolib$obsdb.dat
+    Added additional ESO entries supplied by Peter Weilbacher.
+    (1/30/02, Valdes)
+
+noaolib$src/igsfit.key
+    Added that 'p' works as unzoom.  (8/15/01, Valdes)
+
+noaolib$obsdb.dat
+    Added entries for Gemini North and South.  (9/8/00, MJF)
+
+noaolib$onedstds/blackbody	+
+noaolib$onedstds/README
+    Added new data files for blackbody flux calibration.
+    (1/25/00, Valdes)
+
+noaolib$obsdb.dat
+    Corrected entry from SAAO with information provided by John Menzies.
+    (1/5/00, Valdes)
+
+noaolib$obsdb.dat
     Added Whitin Obs upon request.  (10/14/99, Valdes)
 
 noaolib$obsdb.dat

@@ -1,0 +1,106 @@
+# Initial cut at an astrometric image survey database file. The header keywords
+# listed here are those that may be required to compute astrometric quantities,
+# evalute an existing wcs, compute an initial guess wcs, find and locate 
+# objects, compute a plate solution, and update the image header.
+
+begin imname@noao
+address
+query
+nquery 0
+type fits
+wcs none
+nwcs 0
+nkeys 0
+
+begin ndwfs@noao
+address inet:80:archive.noao.edu:text
+query  GET /ndwfs/cutout.php?ra=%-s&dec=%-s&rawidth=%-s&decwidth=%-s&filters=Bw HTTP/1.0\n\n
+nquery 5
+    ra 14:28:07.00 hours %0.2h
+    dec 34:55:00.0 degrees %0.1h
+    xwidth 10.0 minutes %0.1f
+    ywidth 10.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type fits
+hskip 0
+wcs fits
+
+begin dss1@cadc
+address inet:80:cadcwww.hia.nrc.ca:text
+query  GET /cadcbin/dss-server?ra=%-s&dec=%-s&mime-type=application/x-fits&x=%-s&y=%-s HTTP/1.0\n\n
+nquery 5
+    ra 00:00:00.00 hours %0.2h
+    dec +00:00:00.0 degrees %0.1h
+    xwidth 10.0 minutes %0.1f
+    ywidth 10.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type fits
+hskip 0
+wcs dss
+nwcs 10
+    wxref INDEF INDEF d pixels
+    wyref INDEF INDEF d pixels
+    wxmag INDEF 1.701 d arcsec/pixel
+    wymag INDEF 1.701 d arcsec/pixel
+    wxrot INDEF 180.0 d degrees
+    wyrot INDEF 0.0 d degrees
+    wraref OBJCTRA INDEF d hms
+    wdecref OBJCTDEC INDEF d dms
+    wproj INDEF tan c INDEF
+    wsystem INDEF J2000 c INDEF
+nkeys 13
+    observat INDEF Palomar c INDEF
+    esitelng INDEF +116:51:46.80 d degrees
+    esitelat INDEF +33:21:21.6 d degrees
+    esitealt INDEF 1706 r meters
+    esitetz INDEF 8 r INDEF
+    emjdobs INDEF INDEF d INDEF
+    edatamin INDEF INDEF r ADU
+    edatamax INDEF INDEF r ADU
+    egain INDEF INDEF r e-/ADU
+    erdnoise INDEF INDEF r e-
+    ewavlen INDEF INDEF r angstroms
+    etemp INDEF INDEF r degrees
+    epress INDEF INDEF r mbars
+
+
+begin dss2@cadc
+address inet:80:cadcwww.hia.nrc.ca:text
+query  GET /cadcbin/xdss-server?ra=%-s&dec=%-s&mime-type=application/x-fits&x=%-s&y=%-s HTTP/1.0\n\n
+nquery 5
+    ra 00:00:00.00 hours %0.2h
+    dec +00:00:00.0 degrees %0.1h
+    xwidth 10.0 minutes %0.1f
+    ywidth 10.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+protocol http
+type fits
+hskip 0
+wcs dss
+nwcs 10
+    wxref INDEF INDEF d pixels
+    wyref INDEF INDEF d pixels
+    wxmag INDEF 1.009 d arcsec/pixel
+    wymag INDEF 1.009 d arcsec/pixel
+    wxrot INDEF 180.0 d degrees
+    wyrot INDEF 0.0 d degrees
+    wraref OBJCTRA INDEF d hms
+    wdecref OBJCTDEC INDEF d dms
+    wproj INDEF tan c INDEF
+    wsystem INDEF J2000 c INDEF
+nkeys 13
+    observat INDEF Palomar c INDEF
+    esitelng INDEF +116:51:46.80 d degrees
+    esitelat INDEF +33:21:21.6 d degrees 
+    esitealt INDEF 1706 r meters
+    esitetz INDEF 8 r INDEF
+    emjdobs INDEF INDEF c INDEF
+    edatamin INDEF INDEF r ADU
+    edatamax INDEF INDEF r ADU
+    egain INDEF INDEF r e-/ADU
+    erdnoise INDEF INDEF r e-
+    ewavlen INDEF INDEF r angstroms
+    etemp INDEF INDEF r degrees
+    epress INDEF INDEF r mbars

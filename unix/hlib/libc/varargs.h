@@ -22,10 +22,16 @@ typedef char *va_list;
 #else
 
 #ifdef LINUX
+
+#ifdef LINUXPPC
+#include <varargs-linuxppc.h>
+#else
+
 /* Linux has one of these but it is self-referential and causes an infinite
  * loop.
  */
 #include <varargs-bsd.h>
+#endif
 
 #else
 #ifdef SOLARIS
@@ -37,6 +43,7 @@ typedef char *va_list;
 #else
 #include "/usr/include/varargs.h"
 #endif
+
 #endif
 #endif
 

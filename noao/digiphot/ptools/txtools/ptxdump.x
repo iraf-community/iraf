@@ -171,8 +171,10 @@ begin
 		    first_rec = NO
 		    recptr = 1
 		    ncontinue = 0
-		    if (o != NULL)
+		    if (o != NULL) {
+			call xev_freeop (o)
 		        call mfree (o, TY_STRUCT)
+		    }
 	        }
 	    }
 

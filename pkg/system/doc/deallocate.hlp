@@ -30,5 +30,5 @@ EXAMPLES
 
 .ih
 SEE ALSO
-allocate, devstatus, file dev$devices
+allocate, devstatus, file dev$devices, dev$tapecap
 .endhelp

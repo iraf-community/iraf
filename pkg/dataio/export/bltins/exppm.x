@@ -9,7 +9,7 @@ procedure ex_ppm (ex)
 pointer	ex					#i task struct pointer
 
 pointer	sp, hdr
-int	flags
+int	len, flags
 
 int	strlen()
 
@@ -27,11 +27,12 @@ begin
         call salloc (hdr, SZ_LINE, TY_CHAR)
         call aclrc (Memc[hdr], SZ_LINE)
 
-        call sprintf (Memc[hdr], SZ_LINE, "P6\n%4d  %4d\n255\n")
+        call sprintf (Memc[hdr], SZ_LINE, "P6\n%-6d  %-6d\n255\n")
             call pargi (EX_OCOLS(ex) - mod (EX_OCOLS(ex),2))
             call pargi (EX_OROWS(ex))
+	len = strlen (Memc[hdr])
         call strpak (Memc[hdr], Memc[hdr], SZ_LINE)
-        call write (EX_FD(ex), Memc[hdr], strlen(Memc[hdr])/SZB_CHAR)
+        call write (EX_FD(ex), Memc[hdr], len/SZB_CHAR)
         call sfree (sp)
 
 	# Fix the output pixel type to single bytes.

@@ -16,8 +16,11 @@ unalias	ls rm cat grep tar cmp diff echo ln mv zcat
 unset noclobber
 
 # Set the following to -xpf for BSD Tar and to -xof for SYSV Tar.
-set TARXFLGS = -xpf
+#set TARXFLGS = -xpf
 #set TARXFLGS = -xof
+
+# Digital Unix can't handle -p.
+set TARXFLGS = -xf
 
 # set echo
 

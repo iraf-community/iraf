@@ -6,7 +6,7 @@ $checkin  libsys.a lib$
 $exit
 
 libsys.a:
-	zfiogd.x
+	zfiogd.x	<fio.h> <mach.h>
 	@iism70
 	@iism75
 	;

@@ -187,7 +187,7 @@ begin
 
 	# Plot the profile and overplot the gaussian fit.
 	call sprintf (Memc[title], IE_SZTITLE, "%s: %s\n%s")
-	    call pargstr (IE_IMAGE(ie))
+	    call pargstr (IE_IMNAME(ie))
 	    call pargstr (Memc[avstr])
 	    call pargstr (IM_TITLE(im))
 

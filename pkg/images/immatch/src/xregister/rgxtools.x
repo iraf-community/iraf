@@ -129,29 +129,60 @@ begin
 end
 
 
-# RG_XINDEFR -- Re-initialize the background and answers regions portion of
+# RG_XCINDEFR -- Re-initialize the background and answers regions portion of
 # the cross-correlation fitting structure
 
-procedure rg_xindefr (xc)
+procedure rg_xcindefr (xc, creg)
 
 pointer	xc		#I pointer to the cross-correlation structure
+int     creg            #I the current region
 
 int	nregions
 int	rg_xstati()
 
 begin
 	nregions = rg_xstati (xc, NREGIONS)
+	if (creg < 1 || creg > nregions)
+	    return
 
 	if (nregions > 0) {
-	    call amovkr (INDEFR, Memr[XC_RZERO(xc)], nregions)
-	    call amovkr (INDEFR, Memr[XC_RXSLOPE(xc)], nregions)
-	    call amovkr (INDEFR, Memr[XC_RYSLOPE(xc)], nregions)
-	    call amovkr (INDEFR, Memr[XC_XSHIFTS(xc)], nregions)
-	    call amovkr (INDEFR, Memr[XC_YSHIFTS(xc)], nregions)
+	    Memr[XC_RZERO(xc)+creg-1] = INDEFR
+	    Memr[XC_RXSLOPE(xc)+creg-1] = INDEFR
+	    Memr[XC_RYSLOPE(xc)+creg-1] = INDEFR
+	    Memr[XC_XSHIFTS(xc)+creg-1] = INDEFR
+	    Memr[XC_YSHIFTS(xc)+creg-1] = INDEFR
 	}
 
 	XC_TXSHIFT(xc) = 0.0
 	XC_TYSHIFT(xc) = 0.0
+end
+
+
+# RG_XINDEFR -- Re-initialize the background and answers regions portion of
+# the cross-correlation fitting structure for all regions and reset the
+# current region to 1.
+
+procedure rg_xindefr (xc)
+
+pointer xc              #I pointer to the cross-correlation structure
+
+int     nregions
+int     rg_xstati()
+
+begin
+        nregions = rg_xstati (xc, NREGIONS)
+
+        if (nregions > 0) {
+            call amovkr (INDEFR, Memr[XC_RZERO(xc)], nregions)
+            call amovkr (INDEFR, Memr[XC_RXSLOPE(xc)], nregions)
+            call amovkr (INDEFR, Memr[XC_RYSLOPE(xc)], nregions)
+            call amovkr (INDEFR, Memr[XC_XSHIFTS(xc)], nregions)
+            call amovkr (INDEFR, Memr[XC_YSHIFTS(xc)], nregions)
+        }
+
+        XC_CREGION(xc) = 1
+        XC_TXSHIFT(xc) = 0.0
+        XC_TYSHIFT(xc) = 0.0
 end
 
 

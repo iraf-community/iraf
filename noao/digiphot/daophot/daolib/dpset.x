@@ -65,6 +65,20 @@ begin
 	apsel = DP_APSEL(dao)
 
 	switch (param) {
+	case MW:
+	    DP_MW(dao) = ival
+	case WCSIN:
+	    DP_WCSIN(dao) = ival
+	case WCSOUT:
+	    DP_WCSOUT(dao) = ival
+	case WCSPSF:
+	    DP_WCSPSF(dao) = ival
+	case CTIN:
+	    DP_CTIN(dao) = ival
+	case CTOUT:
+	    DP_CTOUT(dao) = ival
+	case CTPSF:
+	    DP_CTPSF(dao) = ival
 	case MAXITER:
 	    DP_MAXITER(dao) = ival
 	case VERBOSE:

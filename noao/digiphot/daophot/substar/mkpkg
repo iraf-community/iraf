@@ -12,5 +12,6 @@ libpkg.a:
 	dpgimbufr.x	<imhdr.h>
 	dprestars.x	<tbset.h>		../lib/daophotdef.h         \
 			../lib/apseldef.h
- 	t_substar.x	<fset.h>		../lib/daophotdef.h
+ 	t_substar.x	<fset.h>		<imhdr.h>                   \
+	                ../lib/daophotdef.h
 	;

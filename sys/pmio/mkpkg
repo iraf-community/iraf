@@ -62,6 +62,7 @@ libex.a:
 	pmsectnc.x	pmio.com <plio.h> <pmset.h>
 	pmsectne.x	pmio.com <plio.h> <pmset.h>
 	pmseti.x	<imio.h> <plio.h> <pmset.h>
+	pmstati.x	<imio.h> <plio.h> <pmset.h>
 	pmsplane.x	pmio.com <plio.h> <pmset.h>
 	pmsten.x	pmio.com <plio.h> <imhdr.h> <pmset.h>
 	;

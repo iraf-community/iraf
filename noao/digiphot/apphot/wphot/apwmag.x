@@ -1,5 +1,6 @@
 include <mach.h>
 include "../lib/apphotdef.h"
+include "../lib/apphot.h"
 include "../lib/noisedef.h"
 include "../lib/photdef.h"
 include "../lib/phot.h"
@@ -30,6 +31,20 @@ begin
 	nse = AP_NOISE(ap)
 	AP_PXCUR(phot) = wx
 	AP_PYCUR(phot) = wy
+        if (IS_INDEFR(wx) || IS_INDEFR(wy)) {
+            AP_OPXCUR(phot) = INDEFR
+            AP_OPYCUR(phot) = INDEFR
+        } else {
+            switch (AP_WCSOUT(ap)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_ltoo (ap, wx, wy, AP_OPXCUR(phot), AP_OPYCUR(phot), 1)
+            case WCS_TV:
+                call ap_ltov (im, wx, wy, AP_OPXCUR(phot), AP_OPYCUR(phot), 1)
+            default:
+                AP_OPXCUR(phot) = wx
+                AP_OPYCUR(phot) = wy
+            }
+        }
 	call amovkd (0.0d0, Memd[AP_SUMS(phot)], AP_NAPERTS(phot)]
 	call amovkd (0.0d0, Memd[AP_AREA(phot)], AP_NAPERTS(phot)]
 	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot)]

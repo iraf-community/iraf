@@ -100,8 +100,12 @@ begin
 	pad_block = btoi (clgetb ("pad_block"))
 	if (szb_inrecord < szb_outrecord)
 	    pad_record = YES 
+	else
+	    pad_record = NO
 	if (szb_inrecord > szb_outrecord)
 	    trim_record = YES
+	else
+	    trim_record = NO
 	if (pad_block == YES || pad_record == YES) {
 	    call clgstr ("padchar", padchar, SZ_PADCHAR)
 	    ip = 1

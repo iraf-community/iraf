@@ -1,4 +1,4 @@
-.help findpars Dec92 noao.digiphot.findpars
+.help findpars May00 noao.digiphot.daophot
 .ih
 NAME
 findpars -- edit the object detection parameters
@@ -12,16 +12,15 @@ The object detection threshold above local background in units of
 \fIdatapars.sigma\fR.
 .le
 .ls nsigma = 1.5
-The semi-major axis of the Gaussian convolution kernel used
-to computed the density enhancement and mean density images, in Gaussian sigma,
-where gsigma = min (2.0, 0.42466 * \fInsigma\fR * \fIdatapars.fwhmpsf\fR /
-\fIdatapars.scale\fR) pixels.
+The semi-major axis of the Gaussian convolution kernel used to computed the
+density enhancement and mean density images in Gaussian sigma. This semi-
+major axis is equal to min (2.0, 0.42466 * \fInsigma\fR *
+\fIdatapars.fwhmpsf\fR / \fIdatapars.scale\fR) pixels.
 .le
 .ls ratio = 1.0
 The ratio of the sigma of the Gaussian convolution kernel along the minor axis
-direction to the sigma along the major axis direction.
-\fIRatio\fR defaults to 1.0 in which case the image is convolved with a circular
-Gaussian.
+direction to the sigma along the major axis direction.  \fIRatio\fR defaults
+to 1.0 in which case the image is convolved with a circular Gaussian.
 .le
 .ls theta = 0.0
 The position of the major axis of the elliptical Gaussian. \fITheta\fR is
@@ -29,68 +28,61 @@ measured counter-clockwise from the x axis.
 .le
 .ls sharplo = .2, sharphi = 1.0
 \fISharplo\fR and \fIsharphi\fR are numerical cutoffs on the image sharpness
-statistic, designed to eliminate
-brightness maxima which are due to bad pixels, rather than to
-astronomical objects.
+statistic chosen to eliminate brightness maxima which are due to bad pixels
+rather than to astronomical objects.
 .le
 .ls roundlo = -1.0 roundhi = 1.0
 \fIRoundlo\fR and \fIroundhi\fR are numerical cutoffs on the image roundness
-statistic designed to eliminate
-brightess maxima which are due to bad rows or columns, rather
-than to astronomical objects.
+statistic chosen to eliminate brightness maxima which are due to bad rows or
+columns rather than to astronomical objects.
 .le
 .ls mkdetections = no
 Mark the positions of the detected objects on the displayed image ?
-This option does
-not currently work on images displayed on the image display, but does work
-if a contour plot is substituted for the displayed image.
 .le
 
 .ih
 DESCRIPTION
 
-The  object detection algorithm  parameters  control  the  action  of  the 
-detection algorithm.   The  default  parameter values  have  been chosen 
-to give reasonable results in the majority of  cases.
-Note   that   some of  the  detection parameters  scale  with  two 
-quantities which are data dependent, the full-width half-maxima of
-the image point spread function 
-and  the  standard deviation of the background pixels.  Both of these
-quantities are parameters in the DATAPARS task.
+DAOFIND approximates the stellar point spread function with an elliptical
+Gaussian function, whose sigma along the semi-major axis is 0.42466 *
+\fIdatapars.fwhmpsf\fR / \fIdatapars.scale\fR pixels, semi-minor to semi-major
+axis ratio is \fIratio\fR, and major axis position angle is \fItheta\fR.
+Using this model, a convolution kernel, truncated at \fInsigma\fR sigma,
+and normalized to sum to zero, is constructed.
 
-In the first step of the detection process, the detection algorithm
-computes a linear
-function of the brightness values in an 
-elliptical array of pixels within a semi-major axis of
-max (2.0, .42466 * nsigma * \fIdatapars.fwhmpsf\fR / \fIdatapars.scale\fR)
-pixels of
-the pixel of interest. The equivalent mathematical operation
-is a convolution of the original data with a truncated, lowered 
-elliptical Gaussian function, specified by \fIdatapars.fwhmpsf\fR,
-\fIratio\fR and \fItheta\fR and  computed
-in such a way as to be the mathematical equivalent of fitting a Gaussian
-stellar profile to the image data by least-squares. The coefficients of the
-linear function sum to zero so that the overall bias level (local sky)
-cancels out exactly. Since the function is
-symmetric about a single pixel, a smooth gradient in the sky brightness
-also cancels exactly. Therefore the user does not have to specify an
-absolute brightness threshold.
+The density enhancement image \fIstarmap\fR is computed by convolving the input
+image with the Gaussian kernel. This operation is mathematically equivalent to
+fitting, in the least-squares sense, the image data at each point with a
+truncated, lowered elliptical Gaussian function. After convolution each point
+in \fIstarmap\fR contains as estimate of the amplitude of the best fitting
+Gaussian function at that point. Each point in \fIskymap\fR, if the user
+chooses to compute it, contains an estimate of the best fitting sky value
+at that point.
 
-After the convolution step the detection algorithm goes through the convolved
-data looking
-for local maxima in the brightness enhancements, which are greater
-than \fIthreshold\fR * \fIdatapars.sigma\fR above background and brighter
-than any neighboring pixels which are within the bounds of the
-convolution kernel. As the algorithm finds
-potential candidates it computes a couple of shape characteristics. The
-limits on these parameters \fIroundlo\fR, \fIroundhi\fR, \fIsharplo\fR,
-\fIsharphi\fR are set to
-weed out bad pixels and brightess enhancements that are elongated in x and y.
+After image convolution DAOFIND steps through \fIstarmap\fR searching
+for density enhancements greater than \fIfindpars.threshold\fR *
+\fIdatapars.sigma\fR, and brighter than all other density enhancements
+within a semi-major axis of 0.42466 \fIfindpars.nsigma\fR *
+\fIdatapars.fwhmpsf\fR. As the program selects candidates, it computes two
+shape characteristics sharpness and roundness.  The sharpness statistic
+measures the ratio of the difference between the height of the central pixel
+and the mean of the surrounding non-bad pixels, to the height of the best
+fitting Gaussian function at that point. The roundness statistics measures
+the ratio of, the difference in the height of the best fitting Gaussian
+function in x minus the best fitting Gaussian function in y, over the average
+of the best fitting Gaussian functions in x and y. The limits on these
+parameters \fIfindpars.sharplo\fR, \fIfindpars.sharphi\fR,
+\fIfindpars.roundlo\fR, and \fIfindpars.roundhi\fR, are set to weed out
+non-astronomical objects and brightness enhancements that are elongated in
+x and y respectively.
 
-Finally the approximate x and y centroids of the the detected objects are
-computed. A rough magnitude relative to \fIthreshold\fR * \fIdatapars.sigma\fR
-is computed
-and the object is added to the output file.
+Lastly the x and y centroids of the detected objects are computed by
+estimating the x and y positions of the best fitting 1D Gaussian
+functions in x and y respectively, a rough magnitude is estimated
+by computing the ratio of the amplitude of the best fitting Gaussian at
+the object position to \fIfindpars.threshold\fR * \fIdatapars.sigma\fR,
+and the object is added to the output coordinate file.
+
 
 .ih
 EXAMPLES
@@ -116,9 +108,9 @@ EXAMPLES
 
 	    ... move to the findpars parameter and type :e
 
-	    ... edit the findpars parameter and type:q
+	    ... edit the findpars parameter and type :wq
 
-	    ... finish editing the daofind parameters and type ^Z
+	    ... finish editing the daofind parameters and type :wq
 .fi
 
 4. Save the current FINDPARS parameter set in a text file fndnite1.par.
@@ -139,4 +131,5 @@ daofind
 
 .ih
 SEE ALSO
+epar,lpar,daofind,datapars
 .endhelp

@@ -98,12 +98,15 @@ char	cmd[SZ_LINE]
 int	clgcur(), gt_gcur(), igs_nearest(), igs_nearestd(), igs_nearestu()
 errchk	igs_solve
 
+include	"igsfit.com"
+
 begin
 	# Compute a solution and set the residuals.
 
 	call igs_solve (sf, pts[1,X], pts[1,Y], pts[1,Z], pts[1,W], npts)
 	call xgsvector (sf, pts[1,X], pts[1,Y], pts[1,S], npts)
 	call asubr (pts[1,Z], pts[1,S], pts[1,R], npts)
+	call aavgr (pts[1,R], npts, mean, rms)
 	call igs_params (gt)
 
 	# Return if not interactive.
@@ -341,6 +344,7 @@ begin
 		call igs_solve (sf,pts[1,X],pts[1,Y],pts[1,Z],pts[1,W],npts)
 		call xgsvector (sf, pts[1,X], pts[1,Y], pts[1,S], npts)
 		call asubr (pts[1,Z], pts[1,S], pts[1,R], npts)
+		call aavgr (pts[1,R], npts, mean, rms)
 		call igs_params (gt)
 		newgraph = YES
 

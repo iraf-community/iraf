@@ -1,8 +1,8 @@
 # Make the LROFF line-oriented text formatter.
 
-$checkout libpkg.a pkg$system/
+$checkout libpkg.a ../../
 $update   libpkg.a
-$checkin  libpkg.a pkg$system/
+$checkin  libpkg.a ../../
 $exit
 
 libpkg.a:
@@ -13,7 +13,9 @@ libpkg.a:
 	indent.x	lroff.com lroff.h
 	input.x		lroff.com lroff.h <chars.h> <ctype.h>
 	justify.x	lroff.com lroff.h <chars.h>
-	lroff.x		lroff.com lroff.h <chars.h>
+	lroff.x		lroff.com lroff.h <chars.h> <ctype.h>
+	lroff2html.x	lroff.com lroff.h <ctype.h>
+	lroff2ps.x	lroff.com lroff.h <psset.h> <ctype.h>
 	nextcmd.x	lroff.h <ctype.h>
 	nofill.x	lroff.com lroff.h
 	output.x	lroff.com lroff.h <chars.h> <mach.h>

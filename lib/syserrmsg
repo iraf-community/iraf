@@ -41,6 +41,9 @@
 584 Unsolicited command input from a subprocess
 585 This stty parameter requires a numeric argument
 586 Stdgraph device not recorded in stty playback file
+587 PS_OPEN: cannot allocate descriptor
+588 Unrecognized postscript font
+589 Unrecognized postscript special font
 
 # CLIO (600-649)
 598 Task has too many psets
@@ -207,6 +210,7 @@
 909 Magtape device not found
 910 Bad tapecap entry for magtape device
 
+919 PLIO: mask has been corrupted
 920 PLIO: range list overflow
 921 PLIO: bad mask save file
 922 PLIO: i/o to inactive descriptor
@@ -216,6 +220,7 @@
 926 PMIO: null reference image
 927 PMIO: mask must be the same size as reference image
 928 PLIO: stack overflow
+929 PLIO: invalid mask parameter referenced
 
 930 File does not appear to be a FMIO datafile
 931 Error closing FMIO datafile
@@ -295,7 +300,7 @@
 1103 FXF: syntax error in kernel section
 1104 FXF: string value only allowed as first term in ksection
 1105 FXF: 'ext' is ambiguous in ksection
-1106 FXF: value for ksection parameter should be yes or no
+1106 FXF: invalid value for kernel section parameter
 1107 FXF: value for ksection parameter must be positive
 1108 FXF: to overwrite you need to specify [ext#] or [extname,extver]
 1109 FXF: to do this operation you need to specify overwrite mode
@@ -322,3 +327,4 @@
 1130 FXF: Fkinit extension number not equal to kernel section's
 1131 FXF: Bad extension name and extension number combination
 1132 FXF: IMAGE extension not found
+1133 FXF: Error reading mask extension

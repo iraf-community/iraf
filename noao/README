@@ -3,6 +3,7 @@ Optical Astronomy data.
 
     artdata	artificial data generation
     astrometry	astrometric routines
+    astcat      astronomical catalog and survey acess routines
     astutil	general astronomy oriented utilities
     digiphot	digital stellar photometry
     filterphot	filter photometry reductions
@@ -11,6 +12,7 @@ Optical Astronomy data.
     mtlocal	data i/o programs for custom NOAO data formats
     nobsolete	obsolete tasks
     nproto	miscellaneous prototype quality tasks
+    obsutil     observing utilities for planning and evaluation
     observatory	Set and define observatory parameters
     onedspec	one dimensional spectra
     rv          radial velocity analysis package

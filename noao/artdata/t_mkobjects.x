@@ -101,8 +101,11 @@ begin
 
 	background = exptime * background
 
-	if (imtlen (objects) == 0)
-	    call error (1, "No objects list")
+	if (imtlen (objects) != imtlen (ilist))
+	    call error (1, "Input and objects lists don't match")
+
+	# Initialize the template library.
+	call mkt_init ()
 
 	# Loop through input, output, and object lists.
 	# Missing output images take the input image name.
@@ -164,14 +167,11 @@ begin
 	    IM_MIN(out) = MAX_REAL
 	    IM_MAX(out) = -MAX_REAL
 
-	    # Read the object list.
-	    call malloc (mko, LEN_MKO, TY_STRUCT)
-	    call mkt_init ()
-
 	    # Set star and seeing templates.
 	    mkt = mkt_star (Memc[star])
 
 	    # Read the object list.
+	    call malloc (mko, LEN_MKO, TY_STRUCT)
 	    fcmmts = false
 	    nobjects = 0
 	    while (fscan (i) != EOF) {
@@ -244,7 +244,6 @@ begin
 	    irbuf = 0
 	    ipbuf = 0
 	    if (nobjects == 0) {
-		call mkt_free ()
 		call mfree (mko, TY_STRUCT)
 
 		if (new) {
@@ -465,7 +464,6 @@ begin
 	    call mfree (buf, TY_REAL)
 	    call mfree (lines, TY_INT)
 	    call mfree (newlines, TY_INT)
-	    call mkt_free ()
 	    call mfree (MKO_MKT(mko), TY_POINTER)
 	    call mfree (MKO_X(mko), TY_REAL)
 	    call mfree (MKO_Y(mko), TY_REAL)
@@ -525,6 +523,7 @@ begin
 
 	}
 
+	call mkt_free ()
 	call imtclose (ilist)
 	call imtclose (olist)
 	call sfree (sp)

@@ -85,7 +85,7 @@ readnoise,s,h,)apnorm.readnoise,,,>apnorm.readnoise
 gain,s,h,)apnorm.gain,,,>apnorm.gain
 lsigma,r,h,)apnorm.lsigma,,,>apnorm.lsigma
 usigma,r,h,)apnorm.usigma,,,>apnorm.usigma
-polysep,r,h,0.95,0.1,0.95,Marsh algorithm polynomial spacing
+polysep,r,h,0.90,0.1,0.95,Marsh algorithm polynomial spacing
 polyorder,i,h,10,1,,Marsh algorithm polynomial order
 nsubaps,i,h,1,,,"Number of subapertures per aperture
 

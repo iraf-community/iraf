@@ -9,10 +9,9 @@ update:
 	;
 
 relink:
-	$update libds.a
 	$update	libpkg.a
 	$omake	x_obsolete.x
-	$link	x_obsolete.o libpkg.a libds.a -o xx_obsolete.e
+	$link	x_obsolete.o libpkg.a -lxtools -o xx_obsolete.e
 	;
 
 install:
@@ -28,17 +27,15 @@ generic:
 	    $(GEN) fixline.gx -o generic/fixline.x $endif
         ;
 
-libds.a:
-	@display
-	;
-
 libpkg.a:
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 	@generic
 	@fits
+	@imcombine
 
 	t_fixpix.x	<fset.h> <imhdr.h>
 	t_imtitle.x	<imhdr.h>
 	t_mkhgm.x	<gset.h> <mach.h>
+	t_oimstat.x	<mach.h> <imhdr.h> "oimstat.h"
 	t_radplt.x	<imhdr.h> <error.h> <mach.h> <gset.h>
 	;

@@ -1,4 +1,4 @@
-.help hedit Feb91 images.imutil
+.help hedit Apr01 images.imutil
 .ih
 NAME
 hedit - edit or view an image header or headers
@@ -22,8 +22,16 @@ A single expression is used for all fields.  The special value "." causes the
 value of each field to be printed rather than edited.
 .le
 .ls add = no
-Change the operation of the editor from update to add new field.
-If this option is selected the field list may name only a single field.
+Change the operation of the editor from update to add new field. If the
+field already exists it is edited.  If this option is selected the field
+list may name only a single field. The add switch takes precedence
+over the addonly and delete switches.
+.le
+.ls addonly = no
+Change the operation of the editor from update to add a new field. If the
+field already exists it is not changed.  If this option is selected the field
+list may name only a single field. The addonly switch takes precedence over
+the delete switch.
 .le
 .ls delete = no
 Change the operation of the editor from update to delete field.
@@ -123,7 +131,8 @@ The major editing functions of the \fIhedit\fR task are the following:
 
 .nf
 	update		modify the value of a field or fields
-	add		add a new field (or modify an old one)
+	addonly		add a new field
+	add		add a new field or modify an old one
 	delete		delete a set of fields
 .fi
 

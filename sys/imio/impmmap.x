@@ -20,8 +20,8 @@ char	mask[ARB]		#I mask file name or "BPM"
 int	mode			#I mode and flag bits
 pointer	ref_im			#I reference image
 
-pointer	sp, cluster, ksection, section, pl, im, title, hp
-int	cl_index, cl_size, acmode, flags, sz_svhdr, ip
+pointer	sp, cluster, section, pl, im, hp
+int	acmode, flags, sz_svhdr, ip
 pointer	im_pmmapo(), im_pmopen()
 int	btoi(), ctoi(), envfind()
 errchk	im_pmopen, im_pmopen
@@ -29,9 +29,7 @@ errchk	im_pmopen, im_pmopen
 begin
 	call smark (sp)
 	call salloc (cluster, SZ_PATHNAME, TY_CHAR)
-	call salloc (ksection, SZ_FNAME, TY_CHAR)
 	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (title, SZ_LINE, TY_CHAR)
 
 	acmode = PL_ACMODE(mode)
 	flags  = PL_FLAGS(mode)
@@ -49,9 +47,10 @@ begin
 	    call salloc (hp, sz_svhdr, TY_CHAR)
 	}
 
-	# Parse the full image specification into its component parts.
-	call imparse (mask, Memc[cluster],SZ_PATHNAME,
-	    Memc[ksection],SZ_FNAME, Memc[section],SZ_FNAME, cl_index,cl_size)
+	# Parse the full image specification into a root name and an image
+	# section.
+	call imgimage (mask, Memc[cluster], SZ_PATHNAME)
+	call imgsection (mask, Memc[section], SZ_FNAME)
 
 	# Open the mask.
 	pl = im_pmopen (Memc[cluster], mode, Memc[hp], sz_svhdr, ref_im)

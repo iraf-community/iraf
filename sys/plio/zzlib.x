@@ -30,7 +30,7 @@ begin
 	    if (LP_NREF(o_lp) < 0) {
 		call eprintf ("lineoff %d, nref = %d\n")
 		    call pargi (i)
-		    call pargs (LP_NREF(o_lp))
+		    call pargi (LP_NREF(o_lp))
 		free = free + b_len
 		nfree = nfree + 1
 	    } else if (i == PL_EMPTYLINE || LP_NREF(o_lp) > 0) {

@@ -23,6 +23,7 @@ set	imextn		= "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
 set	min_lenuserarea	= 64000
 set	multversions	= no
 set	printer		= lp
+set	pspage		= "letter"
 set	stdgraph	= xgterm
 set	stdimage	= imt512
 set	stdimcur	= stdimage
@@ -34,7 +35,7 @@ set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOAO/IRAF V2.11EXPORT"
+set	version		= "NOAO/IRAF V2.12.1-EXPORT"
 
 # System directories.
 
@@ -70,6 +71,7 @@ set	mtio		= "sys$mtio/"
 set	mwcs		= "sys$mwcs/"
 set	plio		= "sys$plio/"
 set	pmio		= "sys$pmio/"
+set	psio		= "sys$psio/"
 set	qpoe		= "sys$qpoe/"
 set	tty		= "sys$tty/"
 set	vops		= "sys$vops/"

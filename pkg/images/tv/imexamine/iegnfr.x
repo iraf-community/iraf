@@ -54,7 +54,7 @@ begin
 		call imunmap (ds)
 	}
 
-	IE_NFRAMES(ie) = max (nframes, IE_DFRAME(ie))
+	IE_NFRAMES(ie) = max (nframes, IE_DFRAME(ie)/100)
 	call sfree (sp)
 
 	return (nframes)

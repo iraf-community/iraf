@@ -38,7 +38,7 @@ begin
 	while (clgfil (list, Memc[fname], SZ_FNAME) != EOF) {
 	    if (streq (Memc[fname], "STDIN")) {
 		while (fscan (STDIN) != EOF) {
-		    call gargstr (Memc[fname])
+		    call gargstr (Memc[fname], SZ_LINE)
 		    call fpathname (Memc[fname], Memc[osfname], SZ_LINE)
 		    call printf ("%s\n")
 			call pargstr (Memc[osfname])

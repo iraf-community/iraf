@@ -1,0 +1,35 @@
+skyblock.x
+    Fixed a type mismatch in a min() function.  (6/13/02, Valdes)
+
+=====
+V2.12
+=====
+
+skyblock.x
+    Changed algorithm for updating sky to do in place updates so that
+    extensions might be used.  (12/21/01, Valdes)
+
+detect.x
+    The number of sky block lines was being wrong in using nc instead of nl.
+    (12/21/01, Valdes)
+
+t_acedetect.x
+    The check on the number of catalog definitions files did not allow
+    just one file when there was input list.  (12/20/01, Valdes)
+
+t_acedetect.x
+    The default catalog output is now STSDAS.  (5/7/01, Valdes)
+
+mim.x
+    When deleting the image name returned from imstats any image section
+    needed to be stripped.  (5/7/01, Valdes)
+
+mim.x
+convolve.x
+skyfit.x
+skyimages.x
+    Added error checking for calls to mim_glr.  (5/7/01, Valdes)
+
+catdefine.x
+    The reference to acesrc$ was replaced with ace$src/ in order to run
+    standalone without additional environment definitions.  (5/7/01, Valdes)

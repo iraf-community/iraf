@@ -1,0 +1,15 @@
+.help Revisions Nov01 obsutuil
+
+=====
+V2.12
+=====
+
+New obsutil package installed.
+    1. STARFOCUS, PSFMEASURE, SPECFOCUS extracted from NMISC.
+    2. CCDTIME copied from ASTUTIL
+    3. SPTIME, SPECPARS extracted from SPECTIME.
+    4. FINDGAIN copied and modified from MSCFINDGAIN.
+    5. BITCOUNT, PAIRMASS copied from NLOCAL.
+    (11/14/01, Valdes)
+
+.endhelp

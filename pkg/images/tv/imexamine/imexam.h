@@ -1,10 +1,10 @@
 # IMEXAM.H -- IMEXAMINE global definitions.
 
-define	MAX_FRAMES	4			# max display frames
+define	MAX_FRAMES	16			# max display frames
 
 # IMEXAMINE data structure.
  
-define	IE_LEN		320			# length of IE structure
+define	IE_LEN		370			# length of IE structure
 define	IE_SZFNAME	99			# length of file name
 define	IE_SZFORMAT	9			# length of format strings
 define	IE_SZTITLE	512			# length of multiline title
@@ -45,10 +45,11 @@ define	IE_OUT		Memr[$1+38+$2-1]	# Output coordinate vector
 define	IE_WCSDIM	Memi[$1+45]		# WCS dimension
 define	IE_LASTKEY	Memi[$1+46]		# last type of keyed output
 	# (available)
-define	IE_IMAGE	Memc[P2C($1+50)]	# image name
-define	IE_LOGFILE	Memc[P2C($1+100)]	# logfile name
-define	IE_WCSNAME	Memc[P2C($1+150)]	# WCS name
-define	IE_XLABEL	Memc[P2C($1+200)]	# WCS label
-define	IE_YLABEL	Memc[P2C($1+250)]	# WCS label
-define	IE_XFORMAT	Memc[P2C($1+300)]	# WCS format
-define	IE_YFORMAT	Memc[P2C($1+310)]	# WCS format
+define	IE_IMAGE	Memc[P2C($1+50)]	# full image name
+define	IE_IMNAME	Memc[P2C($1+100)]	# short image name for labels
+define	IE_LOGFILE	Memc[P2C($1+150)]	# logfile name
+define	IE_WCSNAME	Memc[P2C($1+200)]	# WCS name
+define	IE_XLABEL	Memc[P2C($1+250)]	# WCS label
+define	IE_YLABEL	Memc[P2C($1+300)]	# WCS label
+define	IE_XFORMAT	Memc[P2C($1+350)]	# WCS format
+define	IE_YFORMAT	Memc[P2C($1+360)]	# WCS format

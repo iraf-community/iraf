@@ -1,4 +1,105 @@
+include "../lib/obsfile.h"
+
 define	LOGPTR	32			# log2(maxpts) (4e9)
+
+# PH_1C4R2ISORT -- Vector quicksort on the first and second indices arrays,
+# where the second index is used to resolve ambiguities in the first index.
+# An additional 4 input arrays are sorted as well.
+
+procedure ph_1c4r2isort (label, d1, d2, d3, d4, findex, sindex, npix)
+
+char	label[DEF_LENLABEL,ARB]	# the char array
+real	d1[ARB]			# the first input data array
+real	d2[ARB]			# the second input data array
+real	d3[ARB]			# the third input data array
+real	d4[ARB]			# the fourth input data array
+int	findex[ARB]		# first index array which is sorted on
+int	sindex[ARB]		# second index array which is sorted on
+int	npix			# number of pixels
+
+real	tempr
+int	fpivot, spivot, tempi
+int	i, j, k, p, lv[LOGPTR], uv[LOGPTR]
+char	tempc[DEF_LENLABEL]
+int	ph_2icompare()
+define	swapi {tempi=$1;$1=$2;$2=tempi}
+define	swapr {tempr=$1;$1=$2;$2=tempr}
+define	swapc {call strcpy ($1, tempc, DEF_LENLABEL);call strcpy ($2, $1, DEF_LENLABEL);call strcpy (tempc, $2, DEF_LENLABEL)}
+
+begin
+	lv[1] = 1
+	uv[1] = npix
+	p = 1
+
+	while (p > 0) {
+	    if (lv[p] >= uv[p])			# only one elem in this subset
+		p = p - 1			# pop stack
+	    else {
+		# Dummy do loop to trigger the Fortran optimizer.
+		do p = p, ARB {
+		    i = lv[p] - 1
+		    j = uv[p]
+
+		    # Select as the pivot the element at the center of the
+		    # array, to avoid quadratic behavior on an already sorted
+		    # array.
+
+		    k = (lv[p] + uv[p]) / 2
+		    swapr (d1[j], d1[k])
+		    swapr (d2[j], d2[k])
+		    swapr (d3[j], d3[k])
+		    swapr (d4[j], d4[k])
+		    swapc (label[1,j], label[1,k])
+		    swapi (findex[j], findex[k])
+		    swapi (sindex[j], sindex[k])
+		    fpivot = findex[j]			 # pivot line
+		    spivot = sindex[j]
+
+		    while (i < j) {
+			for (i=i+1; ph_2icompare (findex[i], sindex[i], fpivot,
+			    spivot) < 0; i=i+1)
+			    ;
+			for (j=j-1;  j > i;  j=j-1)
+			    if (ph_2icompare (findex[j], sindex[j], fpivot,
+			        spivot) <= 0)
+				break
+			if (i < j) {                     # switch elements
+			    swapr (d1[i], d1[j])
+			    swapr (d2[i], d2[j])
+			    swapr (d3[i], d3[j])
+			    swapr (d4[i], d4[j])
+		    	    swapc (label[1,i], label[1,j])
+			    swapi (sindex[i], sindex[j])
+			    swapi (findex[i], findex[j]) # interchange elements
+			}
+		    }
+
+		    j = uv[p]			# move pivot to position i
+		    swapr (d1[i], d1[j])
+		    swapr (d2[i], d2[j])
+		    swapr (d3[i], d3[j])
+		    swapr (d4[i], d4[j])
+		    swapc (label[1,i], label[1,j])
+		    swapi (sindex[i], sindex[j])
+		    swapi (findex[i], findex[j])	# interchange elements
+
+		    if (i-lv[p] < uv[p] - i) {	# stack so shorter done first
+			lv[p+1] = lv[p]
+			uv[p+1] = i - 1
+			lv[p] = i + 1
+		    } else {
+			lv[p+1] = i + 1
+			uv[p+1] = uv[p]
+			uv[p] = i - 1
+		    }
+
+		    break
+		}
+		p = p + 1			# push onto stack
+	    }
+	}
+end
+
 
 # PH_4R2ISORT -- Vector quicksort on the first and second indices arrays,
 # where the second index is used to resolve ambiguities in the first index.
@@ -296,7 +397,7 @@ begin
 end
 
 
-# PH_5R2ISORT -- Vector quicksort on the first and second indices arrays,
+# PH_5R3ISORT -- Vector quicksort on the first and second indices arrays,
 # where the second index is used to resolve ambiguities in the first index.
 # An additional 5 input arrays are sorted as well.
 

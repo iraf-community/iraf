@@ -138,7 +138,7 @@ begin
 	call ggwind (gp, x1, x2, y1, y2)   
 	call gseti (gp, G_TXCOLOR, RV_TXTCOLOR(rv))
 	if (RV_ERRCODE(rv) == ERR_FIT) {
-	    call gctran (gp, 0.14, 0.45, xp, yp, 0, 2)
+	    call gctran (gp, 0.14, 0.4, xp, yp, 0, 2)
 	    call gtext (gp, xp, yp, "Fit did not converge.", "")
 	    call gflush (gp)
 	    return

@@ -1,0 +1,12 @@
+# Make CCDRED Package.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	cor.x		ccdred.h
+	corinput.x	ccdred.h <imhdr.h>
+	proc.x		ccdred.h <imhdr.h>
+	;

@@ -18,6 +18,8 @@ begin
 	    call ap_skycls (ap)
 	if (AP_IMBUF(ap) != NULL)
 	    call mfree (AP_IMBUF(ap), TY_REAL)
+	if (AP_MW(ap) != NULL)
+	    call mw_close (AP_MW(ap))
 	call mfree (ap, TY_STRUCT)
 end
 

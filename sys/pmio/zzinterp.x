@@ -30,7 +30,7 @@ The following commands are defined:
 	load [mask] fname			# load mask from file
 	save [mask] fname [title]		# save mask in file
 	loadim [mask] image			# load mask from image
-	saveim [mask] image			# save mask in image
+	saveim [mask] image [title]		# save mask in image
 	erase [mask] [vs ve]			# erase a mask or region
 	draw [mask] [vs ve] [>ofile]		# draw mask or region of mask
 
@@ -530,7 +530,7 @@ eof_		    if (in > 0) {
 		# Perform the operation.
 		if (timer)
 		    call sys_mtime (time)
-		v_mask[maskno] = pm_create (naxes, v1, depth, 0)
+		v_mask[maskno] = pm_create (naxes, v1, depth)
 		def_pm = v_mask[maskno]
 		if (timer)
 		    call sys_ptime (STDOUT, "", time)
@@ -791,7 +791,7 @@ eof_		    if (in > 0) {
 		# Perform the operation.
 		if (timer)
 		    call sys_mtime (time)
-		iferr (call pm_loadim (pm, v_s(argno)))
+		iferr (call pm_loadim (pm, v_s(argno), title, 0))
 		    call erract (EA_WARN)
 		if (timer)
 		    call sys_ptime (STDOUT, "", time)
@@ -809,11 +809,21 @@ eof_		    if (in > 0) {
 		# Get output image name.
 		if (argno > nargs || argtype[argno] != STRING_ARG)
 		    goto argerr_
+		else {
+		    call strcpy (v_s(argno), fname, SZ_FNAME)
+		    argno = argno + 1
+		}
+
+		# Get title string.
+		if (argno <= nargs && argtype[argno] == STRING_ARG) {
+		    call strcpy (v_s(argno), title, SZ_LINE)
+		    argno = argno + 1
+		}
 
 		# Perform the operation.
 		if (timer)
 		    call sys_mtime (time)
-		iferr (call pm_saveim (pm, v_s(argno)))
+		iferr (call pm_saveim (pm, fname, title, 0))
 		    call erract (EA_WARN)
 		if (timer)
 		    call sys_ptime (STDOUT, "", time)

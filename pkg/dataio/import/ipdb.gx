@@ -600,7 +600,7 @@ begin
             if (O_TYPE(o) != TY_CHAR)
                 call error (0, "ip_dbstr: Expression must be a string valued")
 	    else
-		call amovc (O_VALC(o), outstr, maxch)
+                call amovc (O_VALC(o), outstr, (min(strlen(O_VALC(o)),maxch)))
          } then
              call erract (EA_WARN)
 

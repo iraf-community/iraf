@@ -366,6 +366,8 @@ begin
 
 	# Save the new aperture string.
 	call clpstr ("photpars.apertures", Memc[apstr])
+
+	call sfree (sp)
 end
 
 

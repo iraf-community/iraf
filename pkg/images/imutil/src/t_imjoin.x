@@ -20,7 +20,7 @@ int	bufsize, maxsize, memory, oldsize, outpixtype, verbose
 pointer	sp, in, out, im, im1, input, output
 
 bool	clgetb()
-char	clgetc()
+#char	clgetc()
 int	imtopenp(), imtlen(), imtgetim(), clgeti(), btoi()
 int	getdatatype(), ij_tymax(), sizeof(), begmem(), errcode()
 pointer	immap()
@@ -34,11 +34,15 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 
-	# Get the parameters.
+	# Get the parameters. Note that clgetc no longer accepts a blank
+	# string as input so clgstr is used to fetch the pixtype parameter
+	# and input is used as the temporary holding variable.
 	list = imtopenp ("input")
 	call clgstr ("output", Memc[output], SZ_FNAME)
 	joindim = clgeti ("join_dimension")
-	outpixtype = getdatatype (clgetc ("pixtype"))
+	#outpixtype = getdatatype (clgetc ("pixtype"))
+	call clgstr ("pixtype", Memc[input], SZ_FNAME)
+	outpixtype = getdatatype (Memc[input])
 	verbose = btoi (clgetb ("verbose"))
 
 	# Check to make sure that the input image list is not empty.

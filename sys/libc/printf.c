@@ -6,7 +6,7 @@
 #define	import_xnames
 #define	import_stdio
 #define	import_ctype
-#define	import_varargs
+#define	import_stdarg
 #include <iraf.h>
 
 /* PRINTF -- Emulation of the UNIX printf facilities with the IRAF FMTIO
@@ -24,15 +24,22 @@
 
 /* PRINTF -- Formatted print to the standard output.
  */
-/* VARARGS */
+#ifdef USE_STDARG
+printf (char *format, ...)
+#else
 printf (va_alist)
-va_dcl				/* pointer to arg list		*/
+va_dcl
+#endif
 {
-	va_list	argp;
-	char	*format;
+        va_list argp;
 
+#ifdef USE_STDARG
+	va_start (argp, format);
+#else
+	char *format;
 	va_start (argp);
 	format = va_arg (argp, char *);
+#endif
 	u_doprnt (format, &argp, stdout);
 	va_end (argp);
 }
@@ -40,17 +47,24 @@ va_dcl				/* pointer to arg list		*/
 
 /* FPRINTF -- Formatted print to a file.
  */
-/* VARARGS */
+#ifdef USE_STDARG
+fprintf (FILE *fp, char *format, ...)
+#else
 fprintf (va_alist)
-va_dcl				/* pointer to arg list		*/
+va_dcl
+#endif
 {
-	va_list	argp;
-	FILE	*fp;			/* output file			*/
-	char	*format;		/* format specification		*/
+        va_list argp;
 
+#ifdef USE_STDARG
+	va_start (argp, format);
+#else
+	FILE *fp;
+	char *format;
 	va_start (argp);
 	fp = va_arg (argp, FILE *);
 	format = va_arg (argp, char *);
+#endif
 	u_doprnt (format, &argp, fp);
 	va_end (argp);
 }

@@ -38,4 +38,3 @@ $special "sys$fmtio/":		evvexpr.x	$(XBIG)	;
 
 $set	XNL	= '& "$xc -c -/NL400 &"'
 $special "math$slalib/":	obs.f		$(XNL)	;
-

@@ -1,5 +1,6 @@
 include <gset.h>
 include <fset.h>
+include <imhdr.h>
 include "../lib/apphot.h"
 
 # T_FITSKY -- Procedure to fit sky values in a an annular region around
@@ -14,18 +15,20 @@ pointer	plotfile	# pointer to file of graphics metacode
 pointer graphics	# pointer to graphics display device
 pointer	display		# pointer to display device
 int	interactive	# mode of use
+int	cache		# cache the image pixels in memory
 int	verify		# verify critical parameters
 int	update		# update the critical parameter
 int	verbose		# verbose mode
 
-int	sid, lid, limlist, lclist, lolist, out, cl, pfd, root, stat
-int	imlist, clist, olist
-pointer	sp, outfname, cname, ap, im, mgd, gd, id
+pointer	sp, outfname, cname, ap, im, mgd, gd, id, str
+int	sid, lid, limlist, lclist, lolist, out, cl, pfd, root, stat, memstat
+int	imlist, clist, olist, wcs, req_size, old_size, buf_size
 
-bool	clgetb(), streq()
-int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), fnldir(), strncmp()
-int	strlen(), apsky(), imtopenp(), clpopnu(), open()
 pointer	immap(), gopen()
+int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), fnldir(), strncmp()
+int	strlen(), apsky(), imtopenp(), clpopnu(), open(), clgwrd(), ap_memstat()
+int	sizeof()
+bool	clgetb(), streq()
 errchk	gopen
 
 begin
@@ -39,6 +42,7 @@ begin
 	call salloc (display, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
 	call salloc (cname, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Set the standard output to flush on a newline.
 	call fseti (STDOUT, F_FLUSHNL, YES)
@@ -74,6 +78,7 @@ begin
 	    #interactive = YES
 	else
 	    interactive = btoi (clgetb ("interactive"))
+	cache = btoi (clgetb("cache"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
@@ -85,6 +90,22 @@ begin
 	    if (update == YES)
 		call ap_pspars (ap)
 	}
+
+        # Get the wcs information.
+        wcs = clgwrd ("wcsin", Memc[str], SZ_LINE, WCSINSTR)
+        if (wcs <= 0) {
+	    call eprintf (
+	        "Warning: Setting the input coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+	}
+        call apseti (ap, WCSIN, wcs)
+        wcs = clgwrd ("wcsout", Memc[str], SZ_LINE, WCSOUTSTR)
+        if (wcs <= 0) {
+	    call eprintf (
+	        "Warning: Setting the output coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+	}
+        call apseti (ap, WCSOUT, wcs)
 
 	# Get the graphics and display devices.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
@@ -138,15 +159,18 @@ begin
 
 	    # Open image.
  	    im = immap (Memc[image], READ_ONLY, 0)
-	    call apsets (ap, IMNAME, Memc[image])
-	    call ap_padu (im, ap)
-	    call ap_rdnoise (im, ap)
-	    call ap_itime (im, ap)
-	    call ap_otime (im, ap)
-	    call ap_airmass (im, ap)
-	    call ap_filter (im, ap)
+	    call apimkeys (ap, im, Memc[image])
+
+	    # Set the image display viewport.
 	    if ((id != NULL) && (id != gd))
 		call ap_gswv (id, Memc[image], im, 4)
+
+	    # Cache the input image pixels.
+            req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
+                sizeof (IM_PIXTYPE(im))
+            memstat = ap_memstat (cache, req_size, old_size)
+            if (memstat == YES)
+                call ap_pcache (im, INDEFI, buf_size)
 
 	    # Open the coordinate file, where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -173,6 +197,8 @@ begin
 		}
 	    }
 	    call apsets (ap, CLNAME, Memc[outfname])
+	    call apfroot (Memc[outfname], Memc[coords], SZ_FNAME)
+	    call apsets (ap, CLROOT, Memc[coords])
 
 	    # Open the output text file, if output is "default", dir$default
 	    # or a directory specification then the extension "sky" is added
@@ -204,7 +230,7 @@ begin
 	    if (interactive == NO) {
 	        if (Memc[cname] != EOS)
 		    stat =  apsky (ap, im, cl, NULL, NULL, mgd, NULL, out,
-		        sid, NO)
+		        sid, NO, cache)
 	        else if (cl != NULL) {
 		    lid = 1
 	            call apbsky (ap, im, cl, NULL, out, sid, lid, gd, mgd, id,
@@ -213,8 +239,10 @@ begin
 		} else
 		    stat = NO
 	    } else
-		stat = apsky (ap, im, cl, NULL, gd, mgd, id, out, sid, YES)
+		stat = apsky (ap, im, cl, NULL, gd, mgd, id, out, sid, YES,
+		    cache)
 
+	    # Cleanup.
 	    call imunmap (im)
 	    if (cl != NULL) {
 		if (lclist > 1)
@@ -228,6 +256,10 @@ begin
 		}
 		sid = 1
 	    }
+
+	    # Uncache memory.
+	    call fixmem (old_size)
+
 	    if (stat == YES)
 		break
 	}

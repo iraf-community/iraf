@@ -1,6 +1,78 @@
 .help revisions Jun88 noao.astutil
 .nf
 
+=====
+V2.12
+=====
+
+t_rvcorrect.x
+    If imupdate=no then the image is now opened READ_ONLY.  Previously
+    the image was always opened READ_WRITE requiring the user to have
+    write permission on the image.  (12/14/01, Valdes)
+
+t_setairmass.x
+    Previously if DATE-OBS included the UT then that time was used and
+    it was not possible to specify an alternate UT.  Now the UT keyword
+    has precedence over DATE-OBS.  To allow the keyword for UT to point
+    to DATE-OBS for the time the UT keyword may be specified in either
+    data/time format or as hours.
+
+    The UTMIDDLE output option will now be written in the same format as
+    the keyword used for the input UT.
+    (9/20/01, Valdes)
+
+t_rvcorrect.x
+    Previously if DATE-OBS included the UT then that time was used and
+    it was not possible to specify an alternate UT.  Now the UT keyword
+    has precedence over DATE-OBS.  To allow the keyword for UT to point
+    to DATE-OBS for the time the UT keyword may be specified in either
+    data/time format or as hours.
+    (9/20/01, Valdes)
+
+pdm/pdmtheta.x
+    The procedure that bins the data would compute negative bins leading
+    to memory corruption when the input x values are not sorted.  I made
+    a fix to this which solves the immediate problem.  I didn't figure
+    out the code enough to know if there is any other assumption about the
+    input data being sorted.  (2/22/01, Valdes)
+
+t_rvcorrect.x
+    Task now checks if a file specified in the "files" parameter is actually
+    and image and prints a warning.  See buglog 477.  (1/31/01, Valdes)
+
+pdm/TODO	+
+    Added a TODO file for suggestions for further work.
+    (12/11/00, Valdes)
+
+setairmass.par
+setairmass.hlp
+t_setairmass.x
+airmass.x
+mkpkg
+    The image header keyword parameters ra, dec, equinox, st, ut,
+    and the scale height parameter were added to the setairmass task. In
+    the previous version of the task ra, dec, equinox, st and ut were
+    hardwired to "RA", "DEC", "EPOCH", "ST", and "UT", and the scale
+    parameter was hardwired to 750.0. (10/31/00, Davis)
+
+t_ccdtime.x
+doc/ccdtime.hlp
+    It is now an error if time<0, time>10-000, abs(mag)>40, snr<0 or
+    snr>100000.  (8/24/00, Valdes)
+
+astfunc.x
+    There was a typo in the opcode for CLPUT.  It was 10 instead of 20.
+    This resulted in not branching to the I/O function evaluator and
+    giving a "requires 1 argument" error.
+    (6/29/00, Valdes)
+
+doc/setairmass.hlp
+    Made it clear that DATE-OBS means UT date.  (6/21/00, Valdes)
+
+========
+V2.11.3p1
+========
+
 t_setairmass.x
     Moved erract call before imunmap to avoid an incorrect error string
     (about isodate) being printed.  (10/21/99, Valdes)

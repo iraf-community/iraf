@@ -13,18 +13,20 @@ define	AP_RP_NOSKYMODE		905
 
 define	RPXCUR			901
 define	RPYCUR			902
-define	RPRADIUS		903
-define	RPSTEP			904
-define	RPKSIGMA		905
-define	RPNREJECT		906
-define	RPORDER			907
-define	INORM			908
-define	TNORM			909
-define	DNORM			910
-define	RPFWHM			911
-define	RPNPTS			912
-define	RPNDATA			913
-define	RPNDATAREJ		914
+define	ORPXCUR			903
+define	ORPYCUR			904
+define	RPRADIUS		905
+define	RPSTEP			906
+define	RPKSIGMA		907
+define	RPNREJECT		908
+define	RPORDER			909
+define	INORM			910
+define	TNORM			911
+define	DNORM			912
+define	RPFWHM			913
+define	RPNPTS			914
+define	RPNDATA			915
+define	RPNDATAREJ		916
 
 # define radprof keywords
 

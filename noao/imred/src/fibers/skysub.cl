@@ -128,6 +128,7 @@ begin
 		    hthreshold=INDEF, nlow=1, nhigh=1, nkeep=1, mclip=yes,
 		    lsigma=3., hsigma=2., rdnoise="0.", gain="1.", snoise="0.",
 		    sigscale=0., pclip=-0.5, grow=0, blank=0.)
+		flpr
 		imdelete (sky, verify=no)
 		imrename (temp3, sky, verbose=yes, >> log)
 	    }

@@ -80,7 +80,7 @@ apall1.dbwrite = "yes"
 apall1.initialize = yes
 apall1.nclean = 0.5
 apall1.niterate = 5
-apall1.polysep = 0.95
+apall1.polysep = 0.90
 apall1.polyorder = 10
 
 apall1.ansclobber = "no"

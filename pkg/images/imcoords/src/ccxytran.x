@@ -1,5 +1,5 @@
 include <math.h>
-include "../../lib/skywcs.h"
+include <pkg/skywcs.h>
 
 # Define the transform geometries
 define	GEO_LINEAR	1

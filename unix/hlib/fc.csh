@@ -3,68 +3,43 @@
 # to XC, the purpose of this script is to determine the IRAF architecture
 # and add the appropriate host compiler file to XC.
 
-# set	echo
+# set echo
 
 # Determine platform architecture.
-if (-f /etc/redhat-release) then
-    set MACH = redhat
-else if (-f /etc/SuSE-release) then
-    set MACH = suse
-else
-    set MACH = `uname -s | tr '[A-Z]' '[a-z]'`
-endif
+setenv	MACH	`uname -m`
+
+set need_outfile = 1
+set outfile = ""
 
 # Scan the argument list and concatenate all arguments.
 set args = ""
 while ("$1" != "")
+    if ($need_outfile && $1:e == "f" || $1:e == "o") then
+	set outfile = $1:r".e"
+	set need_outfile = 0
+    else if ("$1" == "-o") then
+	set need_outfile = 0
+	set outfile = ""
+    endif
     set args = "$args $1"
     shift
 end
 
+if ($outfile != "") then
+    set out = "-o $outfile"
+else
+    set out = ""
+endif
+
 # Determine the desired architecture.
 if (! $?IRAFARCH) then
-    if ("$MACH" == "convex") then
-	if (-e ${iraf}bin.ieee/cl.e) then
-	    setenv IRAFARCH "ieee"
-	else
-	    setenv IRAFARCH "native"
-	endif
-    else if ("$MACH" == "freebsd") then
-	setenv IRAFARCH "freebsd"
-    else if ("$MACH" == "linux") then
-	setenv IRAFARCH "linux"
-    else if ("$MACH" == "redhat") then
-	setenv IRAFARCH "redhat"
-    else if ("$MACH" == "suse") then
-	setenv IRAFARCH "suse"
-    else if ("$MACH" == "sunos") then
-	setenv IRAFARCH "sunos"
-    else if ("$MACH" == "ssol") then
-	setenv IRAFARCH "ssun"
-    else if ("$MACH" == "sparc") then
-	setenv IRAFARCH "sparc"
-    else if ("$MACH" == "i386") then
-	setenv IRAFARCH "i386"
-    else if (-e /dev/fpa && -e ${iraf}bin.ffpa/cl.e) then
-	setenv IRAFARCH "ffpa"
-    else
-	setenv IRAFARCH "f68881"
-    endif
+    setenv IRAFARCH "alpha"
 endif
 
 # Get float option switch.
 switch ($IRAFARCH)
-case ieee:
-    set float = "-/fi"
-    breaksw
-case native:
-    set float = "-/fn"
-    breaksw
-case f68881:
-    set float = "-/f68881"
-    breaksw
-case ffpa:
-    set float = "-/ffpa"
+case alpha:
+    set float = "/usr/lib/cmplrs/fort/for_main.o"
     breaksw
 default:
     set float = ""
@@ -72,4 +47,4 @@ default:
 endsw
 
 # Call XC with the appropriate float option.
-xc $float $args
+xc $out $float $args

@@ -1,0 +1,6 @@
+flat1,s,a,"",,,First   high level exposure
+flat2,s,a,"",,,Second  high level exposure
+zero1,s,a,"",,,First   zero level exposure
+zero2,s,a,"",,,Second  zero level exposure
+section,s,a,"",,,Image section for calculations
+print_headers,b,h,yes,,,Print column headers

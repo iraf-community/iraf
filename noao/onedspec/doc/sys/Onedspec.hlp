@@ -2216,3 +2216,4 @@ See the definition of this parameter under COIN_COR.
 .ls 4 print_header
 See the definition of this parameter under COIN_COR.
 .le
+.endhelp

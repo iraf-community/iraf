@@ -135,6 +135,28 @@ Query parameter for the standard star fluxes to be overplotted.
 Unrecognized names or a "?" will print a list of the available stars
 in the specified calibration directory.
 .le
+.ls mag
+The magnitude of the observed star in the band given by the
+\fImagband\fR parameter.  If the magnitude is not in the same band as
+the blackbody calibration file then the magnitude may be converted to
+the calibration band provided the "params.dat" file containing relative
+magnitudes between the two bands is in the calibration directory
+.le
+.ls magband
+The standard band name for the input magnitude.  This should generally
+be the same band as the blackbody calibration file.  If it is
+not the magnitude will be converted to the calibration band.
+.le
+.ls teff
+The effective temperature (deg K) or the spectral type of the star being
+calibrated.  If a spectral type is specified a "params.dat" file must exist
+in the calibration directory.  The spectral types are specified in the same
+form as in the "params.dat" file.  For the standard blackbody calibration
+directory the spectral types are specified as A0I, A0III, or A0V, where A
+can be any letter OBAFGKM, the single digit subclass is between 0 and 9,
+and the luminousity class is one of I, III, or V.  If no luminousity class
+is given it defaults to dwarf.
+.le
 .ls caldir = ")_.caldir"
 The standard star calibration directory.  The default value redirects the
 value to the parameter of the same name in the package parameters.

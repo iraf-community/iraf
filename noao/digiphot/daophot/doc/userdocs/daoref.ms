@@ -6288,5 +6288,3 @@ Faint Stars
 Stars are considered to be too faint if they are more than 12.5
 magnitudes fainter than the psf, or if after a certain number of iterations,
 they have a signal-to-noise ratio less than 2.0.
-
-

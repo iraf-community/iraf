@@ -34,7 +34,8 @@ bool	rl_new
 long	v[PL_MAXDIM]
 int	ll_len, xs, npix
 pointer	sp, ll_out, ll_reg, ll_dst, ol_dst, rl_out
-int	pl_r2li(), pl_access()
+pointer	pl_access()
+int	pl_r2li()
 bool	ufcn()
 errchk	plvalid
 
@@ -50,7 +51,7 @@ begin
 	ol_dst = 1
 
 	for (v[2]=y1;  v[2] <= y2;  v[2]=v[2]+1) {
-	    ll_dst = Ref (pl, pl_access(pl,v))
+	    ll_dst = pl_access (pl, v)
 	    rl_new = ufcn (ufd, v[2], Memi[rl_out], xs, npix)
 	    if (rl_new)
 		ll_len = pl_r2li (Memi[rl_out], 1, Mems[ll_reg], npix)

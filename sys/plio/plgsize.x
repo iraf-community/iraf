@@ -18,7 +18,7 @@ begin
 	naxes = PL_NAXES(pl)
 	call amovl (PL_AXLEN(pl,1), axlen, PL_MAXDIM)
 
-	do i = 1, ARB
+	do i = 0, ARB
 	    if (2**i > min (I_PVMAX, PL_MAXVAL(pl))) {
 		depth = i
 		break

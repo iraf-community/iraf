@@ -40,7 +40,7 @@ libpkg.a:
 	@splot
 
 	getairm.x	
-	getcalib.x	<error.h> <ctype.h>
+	getcalib.x	<error.h> <ctype.h> <mach.h>
 	getextn.x	<error.h>
 	odropenp.x	<ctype.h>
 	t_calibrate.x	<error.h> <imhdr.h> <imset.h> <math/iminterp.h> <smw.h>
@@ -54,7 +54,6 @@ libpkg.a:
 	t_sapertures.x	<error.h> <imhdr.h> <smw.h>
 	t_sarith.x	<error.h> <imhdr.h> <mach.h> <smw.h>
 	t_sbands.x	<error.h> <smw.h>
-	t_sbandsr.x	<error.h> <smw.h>
 	t_scoords.x	<error.h> <imhdr.h>
 	t_sfit.x	<error.h> <imhdr.h> <smw.h> <math/curfit.h>\
 			<pkg/gtools.h> <pkg/rg.h>

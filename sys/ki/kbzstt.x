@@ -33,13 +33,12 @@ begin
 	    lvalue = p_arg[1]
 
 	    # The maximum buffer (transfer) size for a device is determined
-	    # by the the netowork interface or by the device, whichever is
+	    # by the the network interface or by the device, whichever is
 	    # smaller.
 
 	    if (what == FSTT_MAXBUFSIZE || what == FSTT_OPTBUFSIZE) {
 		if (ks_maxbufsize < 0)
-		    call zsttks (n_kschan[server],
-			FSTT_MAXBUFSIZE, ks_maxbufsize)
+		    call zsttks (n_kschan[server], FSTT_MAXBUFSIZE, ks_maxbufsize)
 		if (lvalue == 0)
 		    lvalue = ks_maxbufsize
 		else if (ks_maxbufsize > 0)

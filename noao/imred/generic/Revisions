@@ -1,5 +1,18 @@
 .help revisions Jun88 noao.imred.generic
 .nf
+
+generic$generic.cl
+generic$generic.men
+generic$cosmicrays.par	-
+    Removed the cosmicrays task which is now in crutil.  (6/12/02, Valdes)
+
+=====
+V2.12
+=====
+
+generic$mkpkg
+    Added missing <error.h> dependency for flat1d.x  (12/13/01, MJF)
+
 generic$normalize.cl
 generic$normalize.par	-
     Rewrote as modern cl procedure script with possiblity to extend to

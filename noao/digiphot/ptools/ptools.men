@@ -7,7 +7,7 @@
   pexamine - Interactively examine and edit an apphot/daophot database
    pselect - Select records from a list of apphot/daophot databases
      psort - Sort a list of apphot/daophot databases
-    pttest - Run basic tests on the ptools package tasks
+    pttest - Run basic tests on the ptoolsx package tasks
 
    tbconcat - Concatenate a list of apphot/daophot tables databases
      tbcalc - Do arithmetic on a list of apphot/daophot tables databases

@@ -33,7 +33,7 @@ begin
 	}
 
 	if (GREYSCALE_FRACTION(cl) > EPSILON) {
-	    call crt_draw_greyscale (gp, cl, NSTEPS)
+	    call crt_draw_greyscale (gp, cl)
 	}
 
 	call sfree (sp)

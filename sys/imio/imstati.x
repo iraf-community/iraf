@@ -18,6 +18,10 @@ begin
 	    return (IM_VADVICE(im))
 	case IM_BUFSIZE:
 	    return (IM_VBUFSIZE(im))
+	case IM_BUFFRAC:
+	    return (IM_VBUFFRAC(im))
+	case IM_BUFMAX:
+	    return (IM_VBUFMAX(im))
 	case IM_NBUFS:
 	    return (IM_VNBUFS(im))
 	case IM_COMPRESS:

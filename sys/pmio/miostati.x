@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<pmset.h>
 include	"mio.h"
 
@@ -18,5 +19,9 @@ begin
 	    return (M_IM(mp))
 	case P_REGCOORDS:
 	    return (M_REGCOORDS(mp))
+	case P_PMCLOSE:
+	    return (M_PMCLOSE(mp))
+	default:
+	    call syserr (SYS_PLINVPAR)
 	}
 end

@@ -1,4 +1,5 @@
 include	<fset.h>
+include <imhdr.h>
 include <gset.h>
 include	"../lib/daophotdef.h"
 include	"../lib/apseldef.h"
@@ -17,24 +18,28 @@ pointer	groupfile			# output psf group file
 pointer	opstfile			# output psf star file
 pointer	graphics			# pointer to graphics device name
 pointer	plotfile			# pointer to plotfile name
+int	cache				# cache the input image pixels
 pointer	display				# pointer to display device name
 bool	matchbyid			# match psf stars by id or position
 bool	interactive			# the mode of task operation
 bool	showplots			# display plots of the psf stars
 pointer	plottype			# type of psf plot
+bool	mkstars				# mark deleted and accepted psf stars
 
-bool	ap_text, pst_text
-int	imlist, limlist, alist, lalist, clist, lclist, pimlist, lpimlist
-int	olist, lolist, oclist, loclist, up, verify, update
-int	root, min_lenuserarea, pltype, pfd, pst, psfgr, opst
 pointer	sp, im, apd, psfim, dao, mgd, gd, id
 pointer	outfname, curfile, str
+int	imlist, limlist, alist, lalist, clist, lclist, pimlist, lpimlist
+int	olist, lolist, oclist, loclist, up, verify, update, wcs
+int	root, min_lenuserarea, pltype, pfd, pst, psfgr, opst
+int	req_size, old_size, buf_size, memstat
+bool	ap_text, pst_text
 
-bool	streq(), clgetb(), itob(), dp_updatepsf()
-int	fnldir(), strlen(), strncmp(), btoi(), envfind(), ctoi()
+pointer	immap(), tbtopn(), gopen()
+int	fnldir(), strlen(), strncmp(), btoi(), envfind(), ctoi(), clgwrd()
 int	strdic(), open(), access(), fstati(), dp_stati(), dp_pstati()
 int	imtopen(), imtlen(), imtgetim(), fntopnb(), fntlenb(), fntgfnb()
-pointer	immap(), tbtopn(), gopen()
+int	sizeof(), dp_memstat()
+bool	streq(), clgetb(), itob(), dp_updatepsf()
 errchk 	gopen
 
 begin
@@ -65,6 +70,7 @@ begin
 	call clgstr ("psfimage", Memc[psfimage], SZ_FNAME)
 	call clgstr ("opstfile", Memc[opstfile], SZ_FNAME)
 	call clgstr ("groupfile", Memc[groupfile], SZ_FNAME)
+	cache = btoi (clgetb ("cache"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
 
@@ -157,7 +163,7 @@ begin
         }
 
 	# Initialize DAOPHOT main structure, get pset parameters. 
-	call dp_gppars (dao, NULL)	
+	call dp_gppars (dao)	
 
 	# Verify the critical parameters and update if appropriate.
 	if (verify == YES) {
@@ -165,6 +171,22 @@ begin
 	    if (update == YES)
 	        call dp_pppars (dao)
 	}
+
+        # Get the wcs information.
+        wcs = clgwrd ("wcsin", Memc[str], SZ_FNAME, WCSINSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the input coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSIN, wcs)
+        wcs = clgwrd ("wcsout", Memc[str], SZ_FNAME, WCSOUTSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the output coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSOUT, wcs)
 
 	# Initialize the photometry structure.
 	call dp_apselsetup (dao)
@@ -219,11 +241,16 @@ begin
 		    id = NULL
 	        }
 	    }
+            if (id != NULL)
+                mkstars = clgetb ("mkstars")
+            else
+                mkstars = false
 	} else {
 	    gd = NULL
 	    id = NULL
 	    call dp_seti (dao, VERBOSE, btoi (clgetb ("verbose")))
 	    showplots = false
+	    mkstars = false
 	}
 
 	# Open the plot file.
@@ -245,12 +272,19 @@ begin
 
 	    # Open input image
 	    im = immap (Memc[image], READ_ONLY, 0)		
-	    call dp_padu (im, dao)
-	    call dp_rdnoise (im, dao)
-	    call dp_otime (im, dao)
-	    call dp_filter (im, dao)
-	    call dp_airmass (im, dao)
+	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
+
+            # Set up the display coordinate system.
+            if ((id != NULL) && (id != gd))
+                call dp_gswv (id, Memc[image], im, 4)
+
+            # Cache the input image pixels.
+            req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
+                sizeof (IM_PIXTYPE(im))
+            memstat = dp_memstat (cache, req_size, old_size)
+            if (memstat == YES)
+                call dp_pcache (im, INDEFI, buf_size)
 
 	    # Open the input photometry list and store the descriptor.
 	    # PSF can read either an APPHOT PHOT file or an ST TABLE 
@@ -270,7 +304,7 @@ begin
 	        apd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
 	        apd = tbtopn (Memc[outfname], READ_ONLY, 0)
-	    call dp_getapert (dao, apd, dp_stati (dao, MAXNSTAR), ap_text)
+	    call dp_wgetapert (dao, im, apd, dp_stati (dao, MAXNSTAR), ap_text)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
 	    # Open the input photometry list and store the descriptor.
@@ -371,8 +405,8 @@ begin
 	    # Read in the PSF star list.
 	    call dp_pseti (dao, PNUM, 0)
 	    if (pst != NULL) {
-	        call dp_rpstars (dao, im, pst, pst_text, gd, mgd, matchbyid,
-		    showplots)
+	        call dp_rpstars (dao, im, pst, pst_text, gd, mgd, id, mkstars,
+		    matchbyid, showplots)
 	        if (DP_VERBOSE(dao) == YES) {
 		    call dp_stats (dao, COORDS, Memc[str], SZ_FNAME)
 		    call printf ("\n%d PSF stars read from %s\n\n")
@@ -384,10 +418,10 @@ begin
 	    # Make the PSF.
 	    if (Memc[curfile] != EOS)
 	        call dp_mkpsf (dao, im, psfim, opst, psfgr, gd, mgd, id, false,
-	            false)
+	            false, false)
 	    else if (interactive)
-	        call dp_mkpsf (dao, im, psfim, opst, psfgr, gd, mgd, id, true,
-	            true)
+	        call dp_mkpsf (dao, im, psfim, opst, psfgr, gd, mgd, id,
+		    mkstars, true, true)
 	    else if (! dp_updatepsf (dao, im, psfim, opst, psfgr, false, false,
 	        false))
 		call dp_rmpsf (dao, psfim, opst, psfgr)
@@ -430,6 +464,9 @@ begin
 	        else
 	            call tbtclo (psfgr)
 	    }
+
+            # Uncache memory.
+            call fixmem (old_size)
 	}
 
 	# Close up the graphics and display streams.

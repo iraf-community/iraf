@@ -1,12 +1,14 @@
 # Make the HELP and LROFF library modules.
 
-$checkout libpkg.a pkg$system/
+$checkout libpkg.a ../
 $update   libpkg.a
-$checkin  libpkg.a pkg$system/
+$checkin  libpkg.a ../
 $exit
 
 libpkg.a:
 	@lroff
+	@xhelp
+
 	filetemp.x	help.h <ctype.h>
 	getoption.x	help.h <ctype.h>
 	hbgetblk.x	help.h <ctype.h>

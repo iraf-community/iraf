@@ -4,7 +4,7 @@ include	"fxf.h"
 
 
 # FXF_ACCESS -- Test the accessibility or existence of an existing image, or
-# the legality of the name of a new image.
+# the legality of the name of a new image.  Returns status = YES or NO.
 
 procedure fxf_access (kernel, root, extn, acmode, status)
 
@@ -12,7 +12,7 @@ int	kernel			#I IKI kernel
 char	root[ARB]		#I root filename
 char	extn[ARB]		#I extension (SET on output if none specified)
 int	acmode			#I access mode (0 to test only existence)
-int	status			#O return value
+int	status			#O status code
 
 int	i
 pointer	sp, fname, kextn

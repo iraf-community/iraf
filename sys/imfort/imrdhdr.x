@@ -24,13 +24,14 @@ int	sulen_userarea, hdrlen, nchars, status
 
 bool	streq()
 int	miirdc(), miirdi(), miirdl(), miirdr()
-int	btoi(), bfrseq()
+int	btoi(), bfrseq(), bfseek()
 
 define	readerr_ 91
 
 begin
 	# Determine the file type.
-	call bfseek (fp, BOFL)
+	if (bfseek (fp, BOFL) == ERR)
+	    return (ERR)
 	if (bfrseq (fp, immagic, SZ_IMMAGIC) != SZ_IMMAGIC)
 	    return (ERR)
 
@@ -44,7 +45,10 @@ begin
 	    call smark (sp)
 	    call salloc (v1, LEN_V1IMHDR, TY_STRUCT)
 
-	    call bfseek (fp, BOFL)
+	    if (bfseek (fp, BOFL) == ERR) {
+		call sfree (sp)
+		return (ERR)
+	    }
 	    nchars = LEN_V1IMHDR * SZ_STRUCT
 	    if (bfrseq (fp, IM_V1MAGIC(v1), nchars) != nchars) {
 		call sfree (sp)
@@ -94,7 +98,8 @@ begin
 	}
 
 	# Check for a new format header.
-	call bfseek (fp, BOFL)
+	if (bfseek (fp, BOFL) == ERR)
+	    return (ERR)
 	if (miirdc (fp, immagic, SZ_IMMAGIC) < 0)
 	    return (ERR)
 

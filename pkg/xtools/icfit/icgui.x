@@ -57,7 +57,8 @@ begin
 		call pargr (IC_HIGH(ic))
 		call pargr (IC_GROW(ic))
 		call pargi (IC_MARKREJ(ic))
-	    call gmsg (IC_GP(ic), "icfit", Memc[msg])
+	    if (GP_UIFNAME(IC_GP(ic)) != EOS)
+		call gmsg (IC_GP(ic), "icfit", Memc[msg])
 
 	    if (GP_UIFNAME(IC_GP(ic)) != EOS) {
 		if (streq (Memc[IC_HELP(ic)], IC_DEFHELP))
@@ -69,7 +70,8 @@ begin
 		call pargi ('h'+IC_GKEY(ic)-1)
 		call pargi (IC_AXES(ic,IC_GKEY(ic),1))
 		call pargi (IC_AXES(ic,IC_GKEY(ic),2))
-	    call gmsg (IC_GP(ic), "icfit", Memc[str])
+	    if (GP_UIFNAME(IC_GP(ic)) != EOS)
+		call gmsg (IC_GP(ic), "icfit", Memc[str])
 
 	case WCS:
 	    call ggview (IC_GP(ic), vx1, vx2, vy1, vy2)
@@ -83,10 +85,12 @@ begin
 		call pargr (wx2)
 		call pargr (wy1)
 		call pargr (wy2)
-	    call gmsg (IC_GP(ic), "icfit", Memc[str])
+	    if (GP_UIFNAME(IC_GP(ic)) != EOS)
+		call gmsg (IC_GP(ic), "icfit", Memc[str])
 
 	case REFIT:
-	    call gmsg (IC_GP(ic), "icrefit", cmd)
+	    if (GP_UIFNAME(IC_GP(ic)) != EOS)
+		call gmsg (IC_GP(ic), "icrefit", cmd)
 
 	case HELP:
 	    if (GP_UIFNAME(IC_GP(ic)) != EOS)

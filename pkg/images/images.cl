@@ -4,8 +4,8 @@
 # do with IMAGES, this is just a convenient place to test for an old
 # login.cl, since IMAGES is virtually guaranteed to be loaded with IRAF.
 
-if (cl.logver != cl.version) {
-    print ("WARNING: login.cl version mismatch - rebuild with `mkiraf'")
+if (cl.logver != cl.version && cl.logregen) {
+    print ("WARNING: login.cl is outdated - rebuild with `mkiraf'")
     beep; sleep(1); beep; sleep(1); beep
 }
 

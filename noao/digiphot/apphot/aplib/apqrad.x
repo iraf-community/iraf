@@ -3,7 +3,7 @@ include "../lib/apphot.h"
 include "../lib/center.h"
 
 define	RADIUS	15.0
-define	CRADIUS	3
+define	CRADIUS	5
 
 # AP_QRAD -- Simple radial profile plotter.
 
@@ -14,15 +14,15 @@ pointer	im			# pointero to the IRAF image
 real	wx, wy			# cursor coordinates
 pointer	gd			# pointer to graphics stream
 
-int	 maxpix, npix, nx, ny, wcs, key
-pointer	gt, sp, pix, coords, index, r, cmd
 real	gwx, gwy, xcenter, ycenter, xc, yc, radius, rmin, rmax, imin, imax
-real	u1, u2, v1, v2, x1, x2, y1, y2
+real	u1, u2, v1, v2, x1, x2, y1, y2, xold, yold
+pointer	gt, sp, pix, coords, index, r, cmd
+int	maxpix, npix, nx, ny, wcs, key, niter
 
+real	apstatr()
+pointer	ap_gtinit()
 int	ap_skypix(), clgcur(), apstati()
 int	nscan(), scan()
-pointer	ap_gtinit()
-real	apstatr()
 
 begin
 	# Check for open graphics stream.
@@ -30,6 +30,7 @@ begin
 	    return
 	call greactivate (gd, 0)
 	call gclear (gd)
+	call gflush (gd)
 
 	# Get the radius of the extraction region.
 	call printf ("Half width of extraction box (%4.1f) pixels:")
@@ -52,9 +53,19 @@ begin
 	call salloc (r, maxpix, TY_REAL)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
 
-	# Fit the center.
-	call ap_ictr (im, wx, wy, CRADIUS, apstati (ap, POSITIVE), xcenter,
-	    ycenter)
+	# Fit the center using 3 iterations.
+	xold = wx
+	yold = wy
+	niter = 0
+	repeat {
+	    call ap_ictr (im, xold, yold, CRADIUS, apstati (ap,
+	        POSITIVE), xcenter, ycenter)
+	    niter = niter + 1
+	    if (abs (xcenter - xold) <= 1.0 && abs (ycenter - yold) <= 1.0)
+		break
+	    xold = xcenter
+	    yold = ycenter
+	} until (niter >= 3)
 
 	# Fetch the pixels for the radial profile.
 	npix = ap_skypix (im, xcenter, ycenter, 0.0, radius, Memr[pix],
@@ -66,12 +77,15 @@ begin
 	}
 	call ap_index (Memi[index], npix)
 
+
 	# Store old viewport and window coordinates.
 	call ggview (gd, u1, u2, v1, v2)
 	call ggwind (gd, x1, x2, y1, y2)
 
 	# Initialize the plot and store the viewport and window limits.
-	call apstats (ap, IMNAME, Memc[cmd], SZ_FNAME)
+	#call apstats (ap, IMNAME, Memc[cmd], SZ_FNAME)
+	call apstats (ap, IMROOT, Memc[cmd], SZ_FNAME)
+	call ap_ltov (im, xcenter, ycenter, xcenter, ycenter, 1)
 	gt = ap_gtinit (Memc[cmd], xcenter, ycenter)
 
 	# Compute the radius values.

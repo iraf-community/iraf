@@ -1,5 +1,6 @@
 include <mach.h>
 include "../lib/apphotdef.h"
+include "../lib/apphot.h"
 include "../lib/fitpsfdef.h"
 include "../lib/noisedef.h"
 include "../lib/fitpsf.h"
@@ -23,8 +24,22 @@ begin
 	nse = AP_NOISE(ap)
 	AP_PFXCUR(psf) = wx
 	AP_PFYCUR(psf) = wy
-	call amovkr (INDEFR, Memr[AP_PPARS(psf)], AP_MAXNPARS(psf))
-	call amovkr (INDEFR, Memr[AP_PPERRS(psf)], AP_MAXNPARS(psf))
+	if (IS_INDEFR(wx) || IS_INDEFR(wy)) {
+            AP_OPFXCUR(psf) = INDEFR
+            AP_OPFYCUR(psf) = INDEFR
+	} else {
+            switch (AP_WCSOUT(ap)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_ltoo (ap, wx, wy, AP_OPFXCUR(psf), AP_OPFYCUR(psf), 1)
+            case WCS_TV:
+                call ap_ltov (im, wx, wy, AP_OPFXCUR(psf), AP_OPFYCUR(psf), 1)
+            default:
+                AP_OPFXCUR(psf) = wx
+                AP_OPFYCUR(psf) = wy
+            }
+	}
+	call amovkr (INDEFR, Memr[AP_PPARS(psf)], AP_MAXNPARS(psf)]
+	call amovkr (INDEFR, Memr[AP_PPERRS(psf)], AP_MAXNPARS(psf)]
 
 	# Fetch the buffer of pixels.
 	ier = apfbuf (ap, im, wx, wy)
@@ -93,6 +108,17 @@ begin
 
 	    # do nothing gracefully
 
+        }
+
+        switch (AP_WCSOUT(ap)) {
+        case WCS_WORLD, WCS_PHYSICAL:
+            call ap_ltoo (ap, Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2],
+		Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], 1)
+        case WCS_TV:
+            call ap_ltov (im, Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2],
+		Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], 1)
+        default:
+	    ;
         }
 
 	# Return the appropriate error code.

@@ -15,12 +15,21 @@ int	maxcols			#I width of formatted output
 pointer	sp, buf
 bool	skipword
 int	opcode, data
-int	ll_len, col, ip, pv, x
+int	ll_len, ll_first, col, ip, pv, x
 int	strlen()
 
 begin
 	call smark (sp)
 	call salloc (buf, SZ_FNAME, TY_CHAR)
+
+	# Support old format line lists.
+	if (LL_OLDFORMAT(ll)) {
+	    ll_len = OLL_LEN(ll)
+	    ll_first = OLL_FIRST
+	} else {
+	    ll_len = LL_LEN(ll)
+	    ll_first = LL_FIRST(ll)
+	}
 
 	# Output the line label and advance to the first column.  If the label
 	# extends beyond the first column, start a new line.
@@ -30,13 +39,12 @@ begin
 	if (col > firstcol)
 	    call pl_debugout (fd, "", col, firstcol, maxcols)
 
-	ll_len = LL_LEN(ll)
 	skipword = false
 	pv = 1
 	x = 1
 
 	# Decode the line list proper.
-	do ip = LL_FIRST, ll_len {
+	do ip = ll_first, ll_len {
 	    if (skipword) {
 		skipword = false
 		next

@@ -203,6 +203,21 @@ imt43|imt2200|Mosaic block averaged by 4:cn#43:xr#2200:yr#2200:\
 imt44|imt1100|Mosaic block averaged by 8:cn#44:xr#1100:yr#1100:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1100,1100:tc=iism70:
 
+imt45|imtgmosccd|One GMOS CCD full resolution:cn#45:xr#2080:yr#4644:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,2080,4644:tc=iism70:
+imt46|imtgmos|imtgmos1|Full-frame GMOS:cn#46:xr#6400:yr#4644:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,6400,4644,tc=iism70:
+imt47|imtgmos2|GMOS blkavg by 2:cn#47:xr#3200:yr#2322:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,3200,2322:tc=iism70:
+imt48|imtgmos4|GMOS blkavg by 4:cn#48:xr#1600:yr#1161:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,1600,1161:tc=iism70:
+imt49|imtgmos8|GMOS blkavg by 8:cn#49:xr#800:yr#581:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,800,581:tc=iism70:
+
+imt50|imtwttm|WIYN Tip-Tilt CCD:cn#50:xr#2048:yr#2500:\
+        :LC:BS@:z0#1:zr#200:DD=node!imtool,,2048,2500:tc=iism70:
+
+
 iism70d|iism70c|iism70l|NOAO Draco hosted IIS model 70:\
 	:BS:DD=draco!iism70,iia0:tc=iism70:
 iism70a|NOAO Aquila hosted IIS model 70:\
@@ -875,10 +890,10 @@ xtermjh|X11R3 and X10R4 xterm status line reports in the text window:\
 
 # This obselete xterm entry makes many assumptions; it is meant to be used with
 # a temporary, hacked version of xterm supplied by NOAO (6/87).
-xtermold|Xwindows/"xterm -t" (in tektronix 4010 emulation mode):\
-	:xr#1024:yr#760:li#39:co#85:CN#5:CD=:CL=\E^L:GD=\E[39;0H\E[K:\
-	:GE=^]^_:CW=\E[39;0H\E[K:^]%t^_:LT=^]\E(1_+.):\
-	:X2#1023:Y1#20:Y2#779:tc=4012:
+#xtermold|Xwindows/"xterm -t" (in tektronix 4010 emulation mode):\
+#	:xr#1024:yr#760:li#39:co#85:CN#5:CD=:CL=\E^L:GD=\E[39;0H\E[K:\
+#	:GE=^]^_:CW=\E[39;0H\E[K:^]%t^_:LT=^]\E(1_+.):\
+#	:X2#1023:Y1#20:Y2#779:tc=4012:
 
 #vt240[ab], with >1 lw and >1 font may not always work as expected at present.
 vt240a|vt240 in ReGIS mode, "all" (2 lw's, normal + bold font); R5=lw:\

@@ -318,7 +318,30 @@ begin
 	    # If not interactive and the batch flag is set submit rest to batch.
 	    if (batch && !splot1 && !splot2 && apscript.ansedit == "NO") {
 		fd1 = ""; delete (temp1, verify=no)
-		goto batch
+		flprcache
+		batch.objects = objs
+		batch.datamax = datamax
+		batch.response = response
+		batch.arcs = arcs
+		batch.arcref = arcref
+		batch.arcrefs = arcrefs
+		batch.objaps = objaps
+		batch.arcaps = arcaps
+		batch.objbeams = objbeams
+		batch.arcbeams = arcbeams
+		batch.done = done
+		batch.logfile = log1
+		batch.redo = reextract
+		batch.update = update
+		batch.scattered = scattered
+		batch.arcap = arcap
+		batch.dispcor = dispcor
+		batch.newaps = newaps
+		batch.newresp = newresp
+		batch.newdisp = newdisp
+		batch.newarcs = newarcs
+		dobatch = yes
+		return
 	    }
 
 	    # Process the spectrum in foreground.
@@ -428,31 +451,4 @@ begin
 
 	if (access (done))
 	    delete (done, verify=no)
-
-	bye
-
-batch:
-	flprcache
-	batch.objects = objs
-	batch.datamax = datamax
-	batch.response = response
-	batch.arcs = arcs
-	batch.arcref = arcref
-	batch.arcrefs = arcrefs
-	batch.objaps = objaps
-	batch.arcaps = arcaps
-	batch.objbeams = objbeams
-	batch.arcbeams = arcbeams
-	batch.done = done
-	batch.logfile = log1
-	batch.redo = reextract
-	batch.update = update
-	batch.scattered = scattered
-	batch.arcap = arcap
-	batch.dispcor = dispcor
-	batch.newaps = newaps
-	batch.newresp = newresp
-	batch.newdisp = newdisp
-	batch.newarcs = newarcs
-	dobatch = yes
 end

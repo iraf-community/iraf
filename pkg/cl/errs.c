@@ -8,7 +8,7 @@
 #define import_setjmp
 #define import_knames
 #define	import_xnames
-#define	import_varargs
+#define	import_stdarg
 #include <iraf.h>
 
 #include "config.h"
@@ -75,6 +75,8 @@ char	*e_uopcode =	"undefined opcode %d";
 char	*e_wopen =	"cannot open `%s' for writing";
 char	*e_lookparm =	"error searching for parameter `%s'.";
 char	*e_invaldef=	"conflicting attributes in definition of `%s'.";
+char	*e_fdivzero =	"floating divide by zero";
+char	*e_idivzero =	"integer divide by zero";
 
 /* This variable is used to avoid duplicate error logging by the builtin
  * clerror() and the error function cl_error() below.  When a script or 
@@ -92,21 +94,27 @@ int	errlog = 0;
  * If we are a background task, print the task ordinal to tell the user
  * which task aborted.
  */
-
-/* VARARGS2 */
+#ifdef USE_STDARG
+cl_error (int errtype, char *diagstr, ...)
+#else
 cl_error (va_alist)
 va_dcl
+#endif
 {
 	va_list	args;
 	register struct task *tp;
 	static	int nfatal = 0;
 	static	int break_locks = 1;
-	int	errtype;
-	char	*diagstr;
 
+#ifdef USE_STDARG
+	va_start (args, diagstr);
+#else
+	int errtype;
+	char *diagstr;
 	va_start (args);
 	errtype = va_arg (args, int);
 	diagstr = va_arg (args, char *);
+#endif
 
 	/* Safety measure, in the event of error recursion.
 	 */
@@ -217,7 +225,7 @@ va_dcl
 	    pr_dumpcache (0, break_locks);
 	    clexit();
 	} else if (firstask->t_flags & T_BATCH)
-	    shutdown();
+	    clshutdown();
 
 	/* Reset state variables. */
 	/* Most of these probably needn't be reset, but we'll play

@@ -1,0 +1,29 @@
+.help revisions Jun01 spectime
+.nf
+t_sptime.x
+    Fixed a type mismatch in a max() function.  (6/13/02, Valdes)
+
+============================
+SPECTIME V1.2: June 13, 2001
+============================
+
+mkpkg
+    Added missing dependencies for t_sptime.x and tabinterp.x  (12/13/01, MJF)
+
+t_sptime.x
+sptime.par
+sptime.h
+mkpkg
+    1. Added "units" parameter to allow different dispersion units.
+       This requires linking with libsmw.a from the noao package.
+    2. Added IR bands.
+    3. Changed so that transmisions of 1 are not reported.
+    4. Added a parameter to the filter to override order overlap message.
+       The idea is that a single filter function can be used without requiring
+       the user to chose the filter.
+    (6/13/01, Valdes)
+
+================================
+SPECTIME V1.1: February 11, 2000
+================================
+.endhelp

@@ -46,15 +46,19 @@ begin
 
 	    # Get the image header data.
 	    kp = clopset ("keywpars")
+
 	    call clgpset (kp, "date_obs", Memc[str1], SZ_LINE)
 	    call imgstr (im, Memc[str1], Memc[str2], SZ_LINE)
 	    if (dtm_decode (Memc[str2],year,month,day,ut,flags) == ERR)
 		call error (1, "Error in date string")
 
-	    if (IS_INDEFD(ut)) {
-		call clgpset (kp, "ut", Memc[str1], SZ_LINE)
-		ut = imgetd (im, Memc[str1])
+	    call clgpset (kp, "ut", Memc[str1], SZ_LINE)
+	    call imgstr (im, Memc[str1], Memc[str2], SZ_LINE)
+	    if (dtm_decode (Memc[str2],year,month,day,ut,flags) == ERR) {
+		iferr (ut = imgetd (im, Memc[str1]))
+		    call error (1, "Error in UT keyword")
 	    }
+
 	    call clgpset (kp, "ra", Memc[str1], SZ_LINE)
 	    ra = imgetd (im, Memc[str1])
 	    call clgpset (kp, "dec", Memc[str1], SZ_LINE)

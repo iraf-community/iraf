@@ -21,7 +21,7 @@ begin
 	    return
 
 	# Print the stars id.
-	call ap_wid (ap, fd, apstatr (ap, PFXCUR), apstatr (ap, PFYCUR), id,
+	call ap_wid (ap, fd, apstatr (ap, OPFXCUR), apstatr (ap, OPFYCUR), id,
 	    lid, '\\')
 
 	# Print the parameters.
@@ -46,7 +46,7 @@ begin
 	psf = AP_PPSF(ap)
 
 	# Print the parameters on the standard output.
-	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
+	call apstats (ap, IMROOT, Memc[imname], SZ_FNAME)
 	switch (AP_PSFUNCTION(psf)) {
 	case AP_RADGAUSS:
 	    call printf (

@@ -15,7 +15,8 @@ int	status
 include	"iki.com"
 
 begin
-	call zcall2 (IKI_UPDHDR(IM_KERNEL(im)), im, status)
+	iferr (call zcall2 (IKI_UPDHDR(IM_KERNEL(im)), im, status))
+	    status = ERR
 	if (status == ERR)
 	    call syserrs (SYS_IKIUPDHDR, IM_NAME(im))
 end

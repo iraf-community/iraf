@@ -77,6 +77,11 @@ is achieved.
 The tolerance for convergence of the centering algorithm.  This is the
 integral shift of the centering box from one iteration to the next.
 .le
+.ls maxshift = INDEFR
+The maximum permitted difference between the predicted shift and the
+the computed shift for each object. Objects with shifts greater than
+maxshift are ignored. If maxshift is undefined no shift checking is done.
+.le
 .ls shiftimages = yes
 If shiftimages is yes, the IMSHIFT task will be used to align the
 images.  If shiftimages is no, the images will not be aligned, but

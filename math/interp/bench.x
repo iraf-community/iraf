@@ -24,7 +24,7 @@ int	clgeti()
 begin
 	npix = min (MAX_PIXELS, clgeti ("npix"))
 	nlines = npix				# square image
-	call clgetstr ("interpolant", interp_name, SZ_NAME)
+	call clgstr ("interpolant", interp_name, SZ_NAME)
 
 	if (streq (interp_name, "nearest"))
 	    interpolant = IT_NEAR

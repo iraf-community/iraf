@@ -1,3 +1,32 @@
+PC-IRAF HSI -- September 2001
+
+The old (1985) README for the Unix HSI is preserved unchanged below.
+We are not going to attempt to include updated, comprehensive documentation
+here now, but a few pointers follow.  See the Unix/IRAF or PC-IRAF system
+manager's guide for more complete documentation.
+
+    o	To build the HSI on first sets the architecture (via "mkpkg <arch>"
+	in the iraf root), then types "reboot" in this directory.  The
+	first time this is done on a platform there will be no system
+	libraries (libsys.a etc.) and the HSI will be compled with NOVOS
+	set.  This builds the HSI with certain routines stubbed-out.  It
+	is functional enough after a sucessful bootstrap to compile the
+	iraf system libraries ("mkpkg syslibs" at the iraf root).  One
+	can then do another "reboot" to re-bootstrap the HSI.  It will
+	be built this time using the iraf system libraries and will be
+	fully functional, and ready to sysgen the full iraf system.
+
+    o   The PC-IRAF HSI currently uses F2C for Fortran (SPP) to C
+	translation.  Although F2C is available as an option on many
+	platforms, we integrate it into the HSI to avoid versioning
+	problems and to avoid an external dependency.  The version of F2C
+	used is maintained in /local/src/f2c on Lepus.  The README in that
+	directory contains instructions for building f2c for a platform.
+	Once the runtime files have been generated they are copied to the
+	HBIN for the target platform.
+
+
+===============================================================================
 UNIX (a.k.a. host$) -- IRAF/UNIX System Interface (13Dec85 Dct)
 
     These directories contain those portions of the IRAF software which are

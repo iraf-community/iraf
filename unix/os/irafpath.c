@@ -70,6 +70,9 @@ char *fname;			/* simple filename, no dirs */
 	strcpy (pathname, (char *)hostdir);
 	strcat (pathname, "bin.");
 
+#ifdef LINUXPPC
+	strcat (pathname, "linuxppc");
+#else
 #ifdef SUSE
 	strcat (pathname, "suse");
 #else
@@ -82,12 +85,18 @@ char *fname;			/* simple filename, no dirs */
 #ifdef BSD
 	strcat (pathname, "freebsd");
 #else
+#ifdef MACOSX
+	strcat (pathname, "macosx");
+#else
 #ifdef SOLARIS
 #ifdef X86
 	strcat (pathname, "sunos");
 #else
 	strcat (pathname, "ssol");
 #endif
+#else
+#ifdef OSF1
+	strcat (pathname, "alpha");
 #else
 #ifdef mc68010
 	strcat (pathname, "mc68010");
@@ -106,6 +115,9 @@ char *fname;			/* simple filename, no dirs */
 #else
 #ifdef vax
 	strcat (pathname, "vax");
+#endif
+#endif
+#endif
 #endif
 #endif
 #endif

@@ -1,4 +1,5 @@
 include	<fset.h>
+include <imhdr.h>
 include "../lib/daophotdef.h"
 
 # T_SUBSTAR  -- Procedure to subtract DAOPHOT photometry from an image.
@@ -11,16 +12,17 @@ pointer	exfile				# input exclude file
 pointer	psfimage			# name of the output PSF
 pointer	subimage			# subtracted image
 
-bool	ap_text, ex_text
-int	psffd, photfd, root, verify, update
+pointer	sp, input, output, dao, outfname, str
+int	psffd, photfd, root, verify, update, wcs
 int	imlist, limlist, alist, lalist, pimlist, lpimlist, simlist, lsimlist
-int	exfd, elist, lelist
-pointer	sp, input, output, dao, outfname
+int	exfd, elist, lelist, cache, req_size, old_size, buf_size, memstat
+bool	ap_text, ex_text
 
-bool	clgetb(), itob()
+pointer	immap(), tbtopn()
 int	open(), fnldir(), strlen(), strncmp(), access(), fstati(), btoi()
 int	imtopen(), imtlen(), imtgetim(), fntopnb(), fntlenb(), fntgfnb()
-pointer	immap(), tbtopn()
+int	clgwrd(), sizeof(), dp_memstat()
+bool	clgetb(), itob()
 
 begin
 	# Set the standard output to flush on newline.
@@ -35,6 +37,7 @@ begin
 	call salloc (psfimage, SZ_FNAME, TY_CHAR)
 	call salloc (subimage, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Get the various task parameters.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -44,6 +47,7 @@ begin
 	call clgstr ("subimage", Memc[subimage], SZ_FNAME)
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
+	cache = btoi (clgetb ("cache"))
 
 	# Get the lists.
 	imlist = imtopen (Memc[image])
@@ -109,14 +113,40 @@ begin
 	        "Incompatible image and subtracted image list lengths")
 	}
 
-	# Initialize the DAOPHOT structure, and get the pset parameters.
-	call dp_gppars (dao, NULL)	
+	# Initialize the DAOPHOT structure and get the pset parameters.
+	call dp_gppars (dao)	
 	call dp_seti (dao, VERBOSE, btoi (clgetb ("verbose")))
+
+	# Verify the critical parameters.
 	if (verify == YES) {
 	    call dp_sconfirm (dao)
 	    if (update == YES)
 		call dp_pppars (dao)
 	}
+
+        # Get the wcs information.
+        wcs = clgwrd ("wcsin", Memc[str], SZ_FNAME, WCSINSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the input coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSIN, wcs)
+        wcs = clgwrd ("wcsout", Memc[str], SZ_FNAME, WCSOUTSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the output coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSOUT, wcs)
+        wcs = clgwrd ("wcspsf", Memc[str], SZ_FNAME, WCSPSFSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the psf coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSPSF, wcs)
+
 
 	# Initialize the PSF structure.
 	call dp_fitsetup (dao)
@@ -130,6 +160,13 @@ begin
 	    # Open input and output images
 	    input = immap (Memc[image], READ_ONLY, 0)		
 	    call dp_sets (dao, INIMAGE, Memc[image])
+
+            # Cache the input image pixels.
+            req_size = MEMFUDGE * (2 * IM_LEN(input,1) * IM_LEN(input,2) *
+                sizeof (IM_PIXTYPE(input)))
+            memstat = dp_memstat (cache, req_size, old_size)
+            if (memstat == YES)
+                call dp_pcache (input, INDEFI, buf_size)
 
 	    # If the output image name is DEF_DEFNAME, dir$default or a
 	    # directory specification then the extension "sub" is added to
@@ -149,6 +186,8 @@ begin
 	        output = immap (Memc[outfname], NEW_COPY, input)
 	    }
 	    call dp_sets (dao, OUTIMAGE, Memc[outfname])
+            if (memstat == YES)
+                call dp_pcache (output, INDEFI, buf_size)
 
 	    # Open input photometry table and read in the photometry.
 	    if (fntgfnb (alist, Memc[photfile], SZ_FNAME) == EOF)
@@ -165,7 +204,7 @@ begin
 	        photfd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else 
 	        photfd = tbtopn (Memc[outfname], READ_ONLY, 0)
-	    call dp_getapert (dao, photfd, DP_MAXNSTAR(dao), ap_text)
+	    call dp_wgetapert (dao, input, photfd, DP_MAXNSTAR(dao), ap_text)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
 	    # Open the input exclude file.
@@ -225,6 +264,10 @@ begin
 
 	    # Close the PSF image.
 	    call imunmap (psffd)
+
+            # Uncache memory
+            call fixmem (old_size)
+
 	}
 
 	# Close the lists.

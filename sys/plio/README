@@ -64,6 +64,7 @@ physical image matrix.
 		       pm_savef (pm, fname, title, save_flags)
 	       pm_[load|save]im (pm, imname[, save_flags])
 
+	     ptr = pm_emptyline (pm)
 		ptr = pm_access (pm, v)
          bool = pm_linenotempty (pm, v)
          bool = pm_sectnotempty (pm, vs, ve, ndim)
@@ -109,6 +110,7 @@ physical image matrix.
 		       pl_savef (pl, fname, title, save_flags)
 	       pl_[load|save]im (pl, imname[, save_flags])
 
+	     ptr = pl_emptyline (pl)
 		ptr = pl_access (pl, v)
          bool = pl_linenotempty (pl, v)
          bool = pl_sectnotempty (pl, vs, ve, ndim)
@@ -146,6 +148,8 @@ physical image matrix.
 				 ll_stn, xs, ll_out, npix, rop)
 
 	n = pl_[lrp]2[lrp][sil] (op_src, xs, op_dst, npix)
+
+		  len = pl_llen (ll)
 
 
 4. EXAMPLE

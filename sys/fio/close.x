@@ -55,7 +55,7 @@ begin
 	    default:
 		FREFCNT(fp) = FREFCNT(fp) - 1
 		if (FREFCNT(fp) <= 0) {
-		    if (FCLOSEFD(fp) == NO || FCHAN(fp) != ERR)
+		    if (FCHAN(fp) != ERR)
 			call zcall2 (ZCLSBF(fp), FCHAN(fp), status)
 
 		    if (FCD(fp) != FLCD(fp))		# separate chandes?

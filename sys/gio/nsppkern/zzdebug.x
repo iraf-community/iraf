@@ -24,8 +24,8 @@ task	grid	= t_grid,
 
 procedure t_grid ()
 
+pointer	gp
 bool	redir
-pointer	sp, gp
 char	command[SZ_LINE], image[SZ_FNAME], word[SZ_LINE]
 char	output[SZ_FNAME], output_file[SZ_FNAME], device[SZ_FNAME]
 int	cmd, input_fd, stat, fd
@@ -86,7 +86,6 @@ call eprintf ("Input has been redirected\n")
 	}
 
 	call clpcls (input_fd)
-	call sfree   (sp)
 end
 
 

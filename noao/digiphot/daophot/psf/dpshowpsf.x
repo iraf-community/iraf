@@ -8,19 +8,20 @@ define	HELPFILE   "daophot$psf/showpsf.key"
 # DP_SHOWPSF -- Interactively make surface and/or contour plots of the
 # data subraster around the current PSF star.
 
-procedure dp_showpsf (dao, subrast, ncols, nlines, x1, y1, gd, star_ok)
+procedure dp_showpsf (dao, im, subrast, ncols, nlines, x1, y1, gd, star_ok)
 
 pointer	dao			# pointer to DAOPHOT structure
+pointer	im			# the input image descriptor
 real	subrast[ncols,nlines]	# image subraster
 int	ncols, nlines		# dimensions of the subraster
 int	x1, y1			# coordinates of left hand corner
 pointer	gd			# pointer to the graphics stream
 bool	star_ok			# true if PSF star ok
 
-bool	do_replot
-int	wcs, key, ip
-pointer	sp, cmd, title, psf
 real	hibad, wx, wy, rval
+pointer	sp, cmd, title, psf
+int	wcs, key, ip
+bool	do_replot
 
 int	clgcur(), ctor()
 
@@ -47,10 +48,11 @@ begin
 	    hibad = MAX_REAL
 
 	# Create the plot title.
+	call dp_ltov (im, DP_CUR_PSFX(psf), DP_CUR_PSFY(psf), wx, wy, 1)
 	call sprintf (Memc[title], SZ_LINE, "Star: %d  X: %g  Y: %g  Mag: %g\n")
 	    call pargi (DP_CUR_PSFID(psf))
-	    call pargr (DP_CUR_PSFX(psf))
-	    call pargr (DP_CUR_PSFY(psf))
+	    call pargr (wx)
+	    call pargr (wy)
 	    call pargr (DP_CUR_PSFMAG(psf))
 
 	# Initialize plot.

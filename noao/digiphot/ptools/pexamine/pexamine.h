@@ -51,7 +51,7 @@ define	PX_HCOLNAME	Memc[P2C($1+10+9*PX_SZCOLNAME+9)] # the  hgm column
 
 define	PX_PCMDS "|photcolumns|usercolumns|xcolumn|ycolumn|hcolumn|xposcolumn|\
 yposcolumn|eparam|unlearn|x1|x2|y1|y2|marker|szmarker|grid|logx|logy|box|\
-ticklabels|majrx|minrx|majry|minry|round|fill|nbins|z1|z2|top_closed|rinnner|\
+ticklabels|majrx|minrx|majry|minry|round|fill|nbins|z1|z2|top_closed|rinner|\
 router|ncolumns|nlines|axes|angh|angv|floor|ceiling|zero|ncontours|interval|\
 nhi|dashpat|label|delete|"
 

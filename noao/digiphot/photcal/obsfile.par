@@ -5,6 +5,7 @@ incolumns,s,a,"",,,The format of the input files
 idfilters,s,a,"",,,The list of filter ids
 imsets,f,a,"",,,The image set file
 observations,f,a,"",,,The output observations file
+wrap,b,h,yes,,,Format the observation file for easy reading ?
 obsparams,f,h,"",,,The input observing parameters files
 obscolumns,s,h,"2 3 4 5",,The format of obsparams
 minmagerr,r,h,0.001,0.0,,The minimum magnitude error

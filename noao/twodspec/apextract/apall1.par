@@ -85,7 +85,7 @@ readnoise,s,h,)apall.readnoise,,,>apall.readnoise
 gain,s,h,)apall.gain,,,>apall.gain
 lsigma,r,h,)apall.lsigma,,,>apall.lsigma
 usigma,r,h,)apall.usigma,,,>apall.usigma
-polysep,r,h,0.95,0.1,0.95,Marsh algorithm polynomial spacing
+polysep,r,h,0.90,0.1,0.95,Marsh algorithm polynomial spacing
 polyorder,i,h,10,1,,Marsh algorithm polynomial order
 nsubaps,i,h,)apall.nsubaps,,,">apall.nsubaps
 

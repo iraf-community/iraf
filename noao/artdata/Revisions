@@ -1,5 +1,24 @@
 .help revisions Jan90 noao.artdata
 .nf
+=====
+V2.12
+=====
+
+t_mkobjects.x
+doc/mkobjects.hlp
+    The star templates are now created only once when there is a list
+    of input images.  There was also a bug in matching the objects
+    list to the input list which didn't work and also did not agree with
+    the help.  Now there must be a matching list.  (12/14/01, Valdes)
+
+stdheader.dat
+    The DATE-OBS had a syntax error, a ':' instead of 'T' separating the
+    date and time.  (2/11/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+
 stdheader.dat
 mkexamples/archdr.dat
 mkexamples/objhdr.dat

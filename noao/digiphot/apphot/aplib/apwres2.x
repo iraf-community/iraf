@@ -264,7 +264,7 @@ begin
 	    call pargd (apstatd (py, PYFLUX))
 	    call pargd (apstatd (py, PYNPIX))
 	    if (IS_INDEFR(sky_val))
-		call pargr (0.0d0)
+		call pargr (0.0)
 	    else
 		call pargr (real (apstatd (py, PYFLUX) - sky_val *
 		    apstatd (py, PYNPIX)))
@@ -277,17 +277,18 @@ begin
 	    call pargstr (Memc[str])
 
 	# Write the polygon characteristics
-	call apstats (py, PYNAME, Memc[pyname], SZ_FNAME)
+	#call apstats (py, PYNAME, Memc[pyname], SZ_FNAME)
+	call apstats (py, PYROOT, Memc[pyname], SZ_FNAME)
 	call fprintf (fd, PY_WSTR3)
 	    if (Memc[pyname] == EOS)
 		call pargstr ("nullfile")
 	    else
 	        call pargstr (Memc[pyname])
 	    call pargi (pid)
-	    call pargr (apstatr (py, PYXMEAN))
-	    call pargr (apstatr (py, PYYMEAN))
-	    call pargr (apstatr (py, PYCX))
-	    call pargr (apstatr (py, PYCY))
+	    call pargr (apstatr (py, OPYXMEAN))
+	    call pargr (apstatr (py, OPYYMEAN))
+	    call pargr (apstatr (py, OPYCX))
+	    call pargr (apstatr (py, OPYCY))
 	    call pargr (apstatr (py, PYMINRAD))
 	    call pargi (apstati (py, PYNVER))
 

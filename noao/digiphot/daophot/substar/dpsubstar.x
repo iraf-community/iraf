@@ -15,11 +15,11 @@ int	exfd			# exclude file descriptor
 bool	ex_text			# text or table exclude file
 pointer	outim			# pointer to the output image
 
+real	pradius, psfradsq, x, y, dxfrom_psf, dyfrom_psf, mag, tx, ty
+real	rel_bright, maxgdata
+pointer	apsel, psffit, buf, sp, index
 int	i, id, line1, line2, nline_buf, x1, x2, y1, y2
 int	lowy, highy, offset, nstars, ier
-pointer	apsel, psffit, buf, sp, index
-real	pradius, psfradsq, x, y, dxfrom_psf, dyfrom_psf, mag
-real	rel_bright, maxgdata
 int	dp_restars()
 
 begin
@@ -36,7 +36,7 @@ begin
 
 	# Check for stars to be excluded.
 	if (exfd != NULL) {
-	    if (dp_restars (dao, exfd, ex_text) <= 0)
+	    if (dp_restars (dao, inim, exfd, ex_text) <= 0)
 		;
 	}
 
@@ -77,17 +77,23 @@ begin
 	    y = Memr[DP_APYCEN(apsel)+i-1]
 	    id = Memi[DP_APID(apsel)+offset]
 	    mag = Memr[DP_APMAG (apsel)+offset]
-	    dxfrom_psf = (x - 1.0) / DP_PSFX(psffit) - 1.0
-	    dyfrom_psf = (y - 1.0) / DP_PSFY(psffit) - 1.0
+	    call dp_wpsf (dao, inim, x, y, dxfrom_psf, dyfrom_psf, 1)
+	    dxfrom_psf = (dxfrom_psf - 1.0) / DP_PSFX(psffit) - 1.0
+	    dyfrom_psf = (dyfrom_psf - 1.0) / DP_PSFY(psffit) - 1.0
 
 	    # Reject star is the magnitude is INDEF.
 	    if (IS_INDEFR(x) || IS_INDEFR(y) || IS_INDEFR(mag)) {
 	        if (DP_VERBOSE(dao) == YES) {
+		    if (IS_INDEFR(x) || IS_INDEFR(y)) {
+			tx = x
+			ty = y
+		    } else
+	                call dp_wout (dao, inim, x, y, tx, ty, 1)
 	            call printf (
 		    "REJECTING   - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
 	   	        call pargi (id)
-		        call pargr (x)
-		        call pargr (y)
+		        call pargr (tx)
+		        call pargr (ty)
 		        call pargr (mag)
  	        }
 		next
@@ -95,11 +101,12 @@ begin
 	    
 	    # Print out the verbose message.
 	    if (DP_VERBOSE(dao) == YES) {
+	        call dp_wout (dao, inim, x, y, tx, ty, 1)
 	        call printf (
 		    "SUBTRACTING - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
 	   	    call pargi (id)
-		    call pargr (x)
-		    call pargr (y)
+		    call pargr (tx)
+		    call pargr (ty)
 		    call pargr (mag)
  	    }
 

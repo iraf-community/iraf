@@ -29,7 +29,8 @@ begin
 	imcentroid (l_input, l_reference, l_coords, shifts=shifts,
 	    boxsize=boxsize, bigbox=bigbox, negative=negative,
 	    background=background, lower=lower, upper=upper,
-	    niterate=niterate, tolerance=tolerance, verbose=verbose, >& tmpfile)
+	    niterate=niterate, tolerance=tolerance, maxshift=maxshift,
+	    verbose=verbose, >& tmpfile)
 
 	# Print the centering results on the screen?
 	if (verbose)

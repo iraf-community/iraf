@@ -1,3 +1,4 @@
+       catquery - Catalog query package
          clgsec - Get and decode an image section
       clginterp - Get integer code for interpolator type
          cogetr - Efficent image column access
@@ -13,6 +14,7 @@
 	 inlfit - Interactive non-linear least squares fitting package
 	  peaks - Find peaks in x and y data points
 	 ranges - Parse a list of ranges "1,3,5-7,.."
+         skywcs - Celestial coordinates transformation package
        strdetab - Simplified detab
        strentab - Simplified entab
         xt_csum - Sum of image columns using column access procedure

@@ -18,11 +18,18 @@ observatory = "ctio"
 	altitude = 2215.
 	timezone = 4
 
-observatory = "eso"
-	name = "European Southern Observatory"
+observatory = "lasilla"
+	name = "European Southern Observatory: La Silla"
 	longitude = 70:43.8
 	latitude = -29:15.4
 	altitude = 2347
+	timezone = 4
+
+observatory = "paranal"
+	name = "European Southern Observatory: Paranal"
+	longitude = 70:24.2
+	latitude = -24:37.5
+	altitude = 2635
 	timezone = 4
 
 observatory = "lick"
@@ -208,6 +215,12 @@ observatory = "flwo"
         latitude = 31:40:51.4
         altitude = 2320
         timezone = 7
+observatory = "flwo1"
+        name = "Whipple Observatory"
+        longitude = 110:52:39
+        latitude = 31:40:51.4
+        altitude = 2320
+        timezone = 7
 
 # Submitted by Doug Mink 1/6/97
 observatory = "oro"
@@ -225,13 +238,13 @@ observatory = "lna"
         altitude = 1864
         timezone = 3
 
-# Submitted by James Stevens 3/25/98
+# Submitted by John Memzies 12/31/99
 observatory = "saao"
 	name = "South African Astronomical Observatory"
 	longitude = 339:11:21.5
 	latitude =  -32:22:46
-	altitude =  1759
-	timezone = 2
+	altitude =  1798
+	timezone = -2
 
 # Submitted by Jorge Federico Gonzalez 12/10/98
 observatory = "casleo"
@@ -320,4 +333,78 @@ observatory = "whitin"
 	latitude = 42.295
 	altitude = 32
 	timezone = 5
+
+# Submitted by Nuno Peixinho 6/7/2000
+# Parameters for the Sierra Nevada Observatory (Spain)
+observatory = "osn"
+        name = "Observatorio de Sierra Nevada"
+        longitude = 3:23:05
+        latitude = 37:03:51
+        altitude = 2896
+        timezone = -1
+
+# Gemini Observatory - Submitted by Inger Jorgensen 
+#
+# Gemini-North
+# These values are from the aerial survey made Sept 25, 1996
+#    http://www.ifa.hawaii.edu/mko/coordinates.html
+
+observatory = "gemini-north"
+        name = "Gemini North Observatory"
+        longitude = 155:28.142805
+        latitude = 19:49.42809
+        altitude = 4213.4
+        timezone = 10
+
+# Gemini-South
+# The coordinates are from GPS measurements and the elevation
+# is from the Gemini Web pages http://www.gemini.edu/public
+
+observatory = "gemini-south"
+        name = "Gemini South Observatory"
+        longitude = 70:43.4
+        latitude = -30:13.7
+        altitude = 2737.
+        timezone = 4
+
+# ESO
+
+observatory = "lasilla"
+	name = "European Southern Observatory: La Silla"
+	longitude = 70:43.8
+	latitude = -29:15.4
+	altitude = 2347
+	timezone = 4
+
+observatory = "paranal"
+	name = "European Southern Observatory: Paranal"
+	longitude = 70:24.2
+	latitude = -24:37.5
+	altitude = 2635
+	timezone = 4
+
+# The following additional entries were suppied by Peter Weilbacher
+# weilbach@uni-sw.gwdg.de on 28 Jan 2002 13:12:59 -0700.
+
+observatory = "esontt"
+	name = "European Southern Observatory, NTT, La Silla"
+	longitude = 70:43:54.272
+	latitude = -29:15:18.440
+	altitude = 2375
+	timezone = 4
+
+observatory = "eso36m"
+	name = "European Southern Observatory, 3.6m Telescope, La Silla"
+	longitude = 70:43:46.606
+	latitude = -29:15:25.814
+	altitude = 2400
+	timezone = 4
+
+observatory = "esovlt"
+	name = "European Southern Observatory, VLT, Paranal"
+	longitude = 70.4022
+	latitude = -24.6253
+	altitude = 2648
+	timezone = 4
+
 

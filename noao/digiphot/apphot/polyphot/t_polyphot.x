@@ -1,5 +1,6 @@
 include <gset.h>
 include <fset.h>
+include <imhdr.h>
 include "../lib/apphot.h"
 include "../lib/polyphot.h"
 
@@ -14,18 +15,20 @@ pointer	polygon			# pointer to file containing polygon
 pointer	graphics		# pointer to graphics device name
 pointer	display			# pointer to display device name
 int	interactive		# mode of use
+int	cache			# cache the input image pixels
 int	verify			# verify critical parameters
 int	update			# update the critical parameters
 int	verbose			# print messages
 
+pointer	sp, outfname, cname, im, py, id, gd, str
 int	limlist, lplist, lolist, lclist, sid, lid, pid, pl, cl, out, root, stat
-int	imlist, plist, olist, clist
-pointer	sp, outfname, cname, im, py, id, gd
+int	imlist, plist, olist, clist, memstat, wcs, req_size, old_size, buf_size
 
-bool	clgetb(), streq()
+pointer	immap(), gopen()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), strncmp()
 int	fnldir(), strlen(), ap_yphot(), open(), imtopenp(), clpopnu()
-pointer	immap(), gopen()
+int	clgwrd(), ap_memstat(), sizeof()
+bool	clgetb(), streq()
 errchk	gopen
 
 begin
@@ -39,6 +42,7 @@ begin
 	call salloc (display, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
 	call salloc (cname, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Set STDOUT.
 	call fseti (STDOUT, F_FLUSHNL, YES)
@@ -85,17 +89,36 @@ begin
 	    interactive = NO
 	else
 	    interactive = btoi (clgetb ("interactive"))
+	cache = btoi (clgetb ("cache"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
 	# Get polygon fitting parameters.
 	call ap_gypars (py)
+
+	# Confirm the algorithm parameters.
 	if (verify == YES && interactive == NO) {
 	    call ap_yconfirm (py, NULL, 1)
 	    if (update == YES)
 		call ap_pypars (py)
 	}
+
+        # Get the wcs information.
+        wcs = clgwrd ("wcsin", Memc[str], SZ_LINE, WCSINSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the input coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call apseti (py, WCSIN, wcs)
+        wcs = clgwrd ("wcsout", Memc[str], SZ_LINE, WCSOUTSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the output coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call apseti (py, WCSOUT, wcs)
 
 	# Get the graphics and display devices.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
@@ -138,15 +161,16 @@ begin
 	    
 	    # Open image.
 	    im = immap (Memc[image], READ_ONLY, 0)
-	    call apsets (py, IMNAME, Memc[image])
-	    call ap_padu (im, py)
-	    call ap_rdnoise (im, py)
-	    call ap_itime (im, py)
-	    call ap_otime (im, py)
-	    call ap_airmass (im, py)
-	    call ap_filter (im, py)
+	    call apimkeys (py, im, Memc[image])
 	    if ((id != NULL) && (id != gd))
 		call ap_gswv (id, Memc[image], im, 4)
+
+	    # Cache the input image pixels.
+            req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
+                sizeof (IM_PIXTYPE(im))
+            memstat = ap_memstat (cache, req_size, old_size)
+            if (memstat == YES)
+                call ap_pcache (im, INDEFI, buf_size)
 
 	    # Open the polygons file.
 	    if (lplist <= 0) {
@@ -157,7 +181,7 @@ begin
 		root = fnldir (Memc[polygon], Memc[outfname], SZ_FNAME)
 		if (strncmp ("default", Memc[polygon+root], 7) == 0 || root ==
 		    strlen (Memc[polygon])) {
-		    call ap_inname (Memc[image], Memc[outfname], "ply",
+		    call ap_inname (Memc[image], Memc[outfname], "ver",
 		        Memc[outfname], SZ_FNAME)
 		    lplist = limlist
 		    pl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
@@ -170,6 +194,8 @@ begin
 		}
 	    }
 	    call apsets (py, PYNAME, Memc[outfname])
+	    call apfroot (Memc[outfname], Memc[polygon], SZ_FNAME)
+	    call apsets (py, PYROOT, Memc[polygon])
 
 	    # Open the coordinates file.
 	    if (lclist <= 0) {
@@ -193,6 +219,8 @@ begin
 		}
 	    }
 	    call apsets (py, CLNAME, Memc[outfname])
+	    call apfroot (Memc[outfname], Memc[coords], SZ_FNAME)
+	    call apsets (py, CLROOT, Memc[coords])
 
 	    # Set output file name.
 	    if (lolist == 0) {
@@ -218,7 +246,8 @@ begin
 	    # Do the photometry.
 	    if (interactive == NO) {
 		if (Memc[cname] != EOS)
-		    stat = ap_yphot (py, im, cl, pl, NULL, NULL, out, sid, NO)
+		    stat = ap_yphot (py, im, cl, pl, NULL, NULL, out, sid, NO,
+			cache)
 		else if (pl != NULL) {
 		    lid = 0
 		    pid = 0
@@ -228,7 +257,7 @@ begin
 		} else
 		    stat = NO
 	    } else
-		stat = ap_yphot (py, im, cl, pl, gd, id, out, sid, YES)
+		stat = ap_yphot (py, im, cl, pl, gd, id, out, sid, YES, cache)
 
 	    # Unmap the input image.
 	    call imunmap (im)
@@ -254,6 +283,12 @@ begin
 		}
 		sid = 1
 	    }
+
+	    # Uncache memory.
+	    call fixmem (old_size)
+
+	    if (stat == YES)
+		break
 	}
 
 	# Close plot files.

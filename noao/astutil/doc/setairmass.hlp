@@ -1,4 +1,4 @@
-.help setairmass Nov90 astutil
+.help setairmass Nov00 astutil
 .ih
 NAME
 setairmass -- update image headers with the effective airmass 
@@ -8,48 +8,71 @@ setairmass images
 .ih
 PARAMETERS
 .ls images
-The list of images for which to calculate the airmass.  The image
-headers may optionally be updated with the airmass and the mid-UT of
-the exposure.
+The list of images for which to calculate the airmass.  The image headers may
+optionally be updated with the airmass and the mid-UT of the exposure.
 .le
 .ls observatory = ")_.observatory"
-Observatory for  which airmasses are to be computed if the observatory is
-not specified in the image header by the keyword OBSERVAT.  The default is
-a redirection to look in the parameters for the parent package for a
-value.  The observatory may be one of the observatories in the observatory
-database, "observatory" to select the observatory defined by the
-environment variable "observatory" or the parameter
-\fBobservatory.observatory\fR, or "obspars" to select the current
-parameters set in the \fBobservatory\fR task.  See help for
-\fBobservatory\fR for additional information.  If the input consists of
-images then the observatory is defined by the OBSERVAT keyword if present.
+Observatory for which airmasses are to be computed if the observatory is not
+specified in the image header by the keyword OBSERVAT. The default is a
+redirection to look in the parameters for the parent package for a value. The
+observatory may be one of the observatories in the observatory database,
+"observatory" to select the observatory defined by the environment variable
+"observatory" or the parameter \fBobservatory.observatory\fR, or "obspars" to
+select the current parameters set in the \fBobservatory\fR task. See help for
+\fBobservatory\fR for additional information. If the input consists of images
+then the observatory is defined by the OBSERVAT keyword if present.
 .le
 .ls intype = "beginning"
-The time stamp of the observation as recorded at the telescope for the
-time dependent header keywords.  The choices are the "beginning",
-"middle" or "end" of the observation.
+The time stamp of the observation as recorded at the telescope for the time
+dependent header keywords.  The choices are the "beginning", "middle" or "end"
+of the observation.
 .le
 .ls outtype = "effective"
-The output time stamp desired for the airmass.  The choices are the
-"effective" airmass, or the airmass at the "beginning", "middle" or
-"end" of the observation.
+The output time stamp desired for the airmass. The choices are the "effective"
+airmass, or the airmass at the "beginning", "middle" or "end" of the
+observation.
+.le
+.ls ra = "ra"
+The name of the keyword that contains the right acsension. The right ascension
+is assumed to be in hours unless ra is one of the standard CRVALn keywords in
+which case it is assumed to be in degrees.
+.le
+.ls dec = "dec"
+The name of the keyword that contains the declination in degrees.
+.le
+.ls equinox = "epoch"
+The name of the keyword that contains the equinox of the right ascension and
+declination coordinates in years.
+.le
+.ls st = "st"
+The name of the keyword containing the sidereal time in hours. 
+.le
+.ls ut = "ut"
+The name of the keyword containing the ut time.  This keyword can either
+be in date plus time format or in hours.  Note that this allows setting
+both the "date-obs" and "ut".  If no time is found then
+a time of 0hrs is used.
 .le
 .ls date = "date-obs"
-The name of the keyword that contains the date of the observation.
-The format should be `DD/MM/YY' (old FITS format), YYYY-MM-DD (new
-FITS format), or YYYY-MM-DDTHH:MM:SS (new FITS format with time).
-If there is a time it takes precedence over the UT keyword.
+The name of the keyword that contains the UT date of the observation. The
+format should be `DD/MM/YY' (old FITS format), YYYY-MM-DD (new FITS format),
+or YYYY-MM-DDTHH:MM:SS (new FITS format with time).  If there is a time
+and no time is found in the ut keyword then it is used for the ut.
 .le
 .ls exposure = "exptime"
-The name of the keyword that contains the exposure time (in seconds) of
-the image.
+The name of the keyword that contains the exposure time (in seconds) of the
+image.
 .le
 .ls airmass = "airmass"
 The name of the output keyword that will receive the computed airmass.
 .le
 .ls utmiddle = "utmiddle"
 The name of the output keyword that will receive the universal time for
-the middle of the observation.
+the middle of the observation.  The format of the keyword will be the same
+as that specifying the universal time.
+.le
+.ls scale = 750.0
+The atmospheric scale height.
 .le
 .ls show = yes
 Print the airmasses and mid-UT's for each image?
@@ -58,47 +81,51 @@ Print the airmasses and mid-UT's for each image?
 Update the image headers with the airmasses and the mid-UT's?
 .le
 .ls override = yes
-If updating the image headers, override values that were previously
-recorded?
+If updating the image headers, override values that were previously recorded ?
 .le
+
 .ih
 DESCRIPTION
-SETAIRMASS will calculate the effective airmass of an astronomical
-image, as described below under "ALGORITHMS".  The task requires the
-instantaneous zenith distance at the beginning, middle and end of the
-exposure.  These are calculated using the right ascension, declination,
-and epoch as well as the sidereal time, exposure time, date, and
-observatory from the image header.  If the observatory is not available
-in the image header under the keyword OBSERVAT, the observatory is
-defined by the \fIobservatory\fR parameter (see help for \observatory\fR
-for further information).
-The RA and Dec will be precessed from the given epoch to
-the date of observation.  The RA, Dec, epoch, and ST keywords are
-assumed to have the names "RA", "DEC", "EPOCH", and "ST".  The name of
-the exposure time and date keywords can be specified as parameters.
-These should express the exposure time in seconds and the date in
-FITS format.  If any of the required keywords are missing from
-the image headers, they can be added using the hedit task.
 
-Before using this task, you will need to know the "time stamp" of the
-time varying header quantities (e.g. sidereal time).  Do the recorded
-values represent the beginning, the middle or the end of the exposure?
-This should be set in the \fBintype\fR parameter.
+SETAIRMASS will calculate the effective airmass of an astronomical image, as
+described below under "ALGORITHMS".  The task requires the instantaneous
+zenith distance at the beginning, middle and end of the exposure. These are
+calculated using the right ascension, declination, and equinox as well as the
+sidereal time, exposure time, UT date, and observatory from the image header.
+If the observatory is not available in the image header under the keyword
+OBSERVAT, the observatory is defined by the \fIobservatory\fR parameter. See
+help for \observatory\fR for further information.
 
-If for some reason the effective airmass is not desired, the value of
-the airmass at the beginning, middle or end of the exposure can be
-recorded in the header keyword specified by the \fIairmass\fR
-parameter.  The \fBshow\fR parameter can be used to control the output
-to the terminal.  The \fBupdate\fR and \fBoverride\fR parameters
-control the header keyword output.
+The right ascension and declination will be precessed from the given equinox to
+the date of observation. The name of the right ascension, declination, equinox,
+sidereal time, ut time, exposure time, and date keywords can be specified as
+parameters. These keywords should express the right ascension in hours,
+the declination in degrees, the equinox in years, the sidereal time in hours,
+the universal time in hours, the exposure time in seconds, and the date in
+FITS format. If any of the required keywords are missing from the image
+headers, they can be added using the hedit or asthedit tasks.  Note that
+the universal time keyword may be in either a date plus time format or
+in hours and any output middle universal time will be in the same format.
 
-SETAIRMASS will also calculate the universal time of the middle of the
-exposure and place the value in the header keyword specified by the
-\fIutmiddle\fR parameter.  This assumes that the value for the UT is in the
-the date keyword or "UT" keyword, with the same time stamp as the sidereal
-time.  The mid-observation UT is useful for interpolating calibration arc
-dispersion solutions using REFSPECTRA, especially when the exposure time is
+Before using this task, you will need to know the "time stamp" of the time
+varying header quantities (e.g. sidereal time).  Do the recorded values
+represent the beginning, the middle or the end of the exposure ? This should
+be set in the \fBintype\fR parameter.
+
+If for some reason the effective airmass is not desired, the value of the
+airmass at the beginning, middle or end of the exposure can be recorded in the
+header keyword specified by the \fIairmass\fR parameter. The \fBshow\fR
+parameter can be used to control the output to the terminal. The \fBupdate\fR
+and \fBoverride\fR parameters control the header keyword output.
+
+SETAIRMASS will also calculate the universal time of the middle of the exposure
+and place the value in the header keyword specified by the \fIutmiddle\fR
+parameter.  This assumes that the value for the UT is in the the date keyword
+or ut keyword, with the same time stamp as the sidereal time. The
+mid-observation UT is useful for interpolating calibration arc dispersion
+solutions using REFSPECTRA, especially when the exposure time is
 long.
+
 .ih
 ALGORITHMS
 The mean airmass is calculated uses the formula described in "Some
@@ -122,8 +149,9 @@ Ball's book on Algorithms for the HP-45:
 	     x = scale * sin(elevation) = scale * cos(ZD)
 .fi
 
-The atmospheric scaling parameter is chosen to be 750 (see
-"Astrophysical Quantities" by Allen, 1973 p.125,133).
+The atmospheric scaling parameter is \fIscale\fR (see "Astrophysical
+Quantities" by Allen, 1973 p.125,133).
+
 .ih
 KEYWORDS
 The input keywords are:
@@ -131,29 +159,28 @@ The input keywords are:
 Observatory at which the data was taken.  If absent the observatory is
 determined using the \fIobservatory\fR parameter.
 .le
-.ls RA
+.ls \fIra\fR
 Right ascension in hours at the beginning, middle, or end of the observation.
+If ra is one of the CRVALn keywords it is assumed to be in degrees.
 .le
-.ls DEC
+.ls \fIdec\fR
 Declination in degrees at the beginning, middle, or end of the observation.
 .le
-.ls EPOCH
-The epoch of the coordinates.  The right ascension and declination will
+.ls \fIequinox\fR
+The equinox of the coordinates.  The right ascension and declination will
 be precessed from this epoch to the date of the observation before being
 used.
 .le
-.ls ST
+.ls \fIst\fR
 Siderial time in hours at the beginning, middle, or end of the observation.
 .le
-.ls UT
+.ls \fIut\fR
 Universal time in hours at the beginning, middle, or end of the observation.
-This is used if the time is not in the date keyword.
+This may be in either date plus time format or just in hours.  
 .le
 .ls \fIdate\fR
-The value of the date parameter is the keyword name to be used for the
-date of the observation.  The date must be in either the old or new
-FITS format.  If the new FITS format includes the time this is used
-in preference to the UT keyword.
+The value of the date parameter is the keyword name to be used for the date of
+the observation.  The date must be in either the old or new FITS format.
 .le
 .ls \fIexposure\fR
 The value of the exposure parameter is the keyword name to be used for the
@@ -170,18 +197,43 @@ exposure, or for the weighted effective value over the exposure.
 The value of the utmiddle parameter is the keyword name to be used for
 the universal time at the middle of the exposure.
 .le
+
 .ih
 EXAMPLES
-Calculate the effective airmass of the IRAF test picture, dev$pix:
 
-	setairmass dev$pix exposure=itime
+1. Calculate the effective airmass of the IRAF test picture, dev$pix.
+
+.nf
+    cl> setairmass dev$pix exposure=itime update-
+.fi
 
 Note that the test picture does not have the correct coordinate epoch
-listed in its header, so no precession will be performed.  Also the
-default value of the update parameter is no, so that only a listing of
-the calculated airmasses is generated.
+listed in its header, so no precession will be performed. 
+
+2. Calculate the effective airmass of the IRAF test picture dev$ypix in two
+ways.
+
+.nf
+    cl> setairmass dev$ypix exposure=itime update-
+
+    cl> setairmass dev$ypix ra=crval1 dec=crval2 equinox=equinox \
+        exposure=itime update-
+.fi
+
+Note the first way gives the same results as example 1. The second way
+uses the J2000 equatorial system rather then the ra and dec at the time
+of observation.
+
 .ih
 REVISIONS
+.ls SETAIRMASS V2.11.4
+The ut keyword now has precedence over any time in the date keyword
+and it can be either date plus time or hours.
+.le
+.ls SETAIRMASS V2.11.3
+The right ascension, declination, equinox, st, and ut keywords were made 
+parameters rather than being hard wired.
+.le
 .ls SETAIRMASS V2.11.2
 Y2K update: This task was updated to use the new FITS date format.
 .le

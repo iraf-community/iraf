@@ -21,7 +21,7 @@ include	"apertures.h"
 # total sky subtracted flux is negative.
 
 procedure ap_profile (im, ap, dbuf, nc, nl, c1, l1, sbuf, svar, profile, nx, ny,
-	xs, ys)
+	xs, ys, asi)
 
 pointer	im		# IMIO pointer
 pointer	ap		# Aperture structure
@@ -33,6 +33,7 @@ pointer	svar		# Sky variances
 real	profile[ny,nx]	# Profile (returned)
 int	nx, ny		# Size of profile array
 int	xs[ny], ys	# Origin of profile array
+pointer	asi		# Image interpolator for edge pixel weighting
 
 real	gain		# Gain
 real	rdnoise		# Readout noise
@@ -42,16 +43,16 @@ real	lsigma, usigma	# Rejection sigmas.
 
 int	fd, ix, iy, ix1, ix2, xs1, xs2, nsum
 int	i, niterate, ixrej, iyrej, nrej, nreject
-real	p, s, chisq, tfac, rrej, predict, var0, var, vmin, resid, dat
+real	p, s, chisq, tfac, rrej, predict, var0, var, vmin, resid, wt1, wt2, dat
 pointer	sp, str, spec, x1, x2, y, reject, xreject, data, sky, cv, gp
 
 int	apgeti()
 real	apgetr(), cveval(), apgimr()
 bool	apgetb()
-errchk	salloc, ap_horne, ap_marsh, apgimr
+errchk	salloc, ap_horne, ap_marsh, apgimr, asifit
 
 begin
-	# Allocate memory. One index pointers.
+	# Allocate memory. Adjust pointers to be one indexed.
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (spec, ny, TY_REAL)
@@ -79,7 +80,7 @@ begin
 	else
 	    niterate = 0
 
-	# Initialize
+	# Initialize.
 	if (rdnoise == 0.)
 	    vmin = 1.
 	else
@@ -90,6 +91,7 @@ begin
 	}
 	cv = AP_CV(ap)
 
+	# Set aperture limits and initialize rejection flags.
 	call alimi (xs, ny, xs1, xs2)
 	i = AP_AXIS(ap)
 	p = AP_CEN(ap,i) + AP_LOW(ap,i)
@@ -108,8 +110,10 @@ begin
 	    }
 	}
 
-	# Estimate spectrum by summing across the aperture and the profile
-	# by dividing across the dispersion by the spectrum estimate.
+	# Estimate spectrum by summing across the aperture with partial
+	# pixel estimates at the aperture edges.  The initial profile
+	# estimates are obtained by normalizing by the spectrum estimate.
+	# Profiles where the spectrum is below sky are set to zero.
 
 	nrej = 0
 	do iy = 1, ny {
@@ -123,10 +127,12 @@ begin
 	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
 	    if (sbuf != NULL)
 		sky = sbuf + (iy - 1) * nx - 1
+	    if (asi != NULL)
+	        call asifit (asi, Memr[data], nc)
+	    call ap_edge (asi, Memr[x1+iy]+1, Memr[x2+iy]+1, wt1, wt2)
 	    ix1 = nint (Memr[x1+iy])
 	    ix2 = nint (Memr[x2+iy])
 	    s = 0.
-	    p = 0.
 	    do ix = ix1, ix2 {
 		if (!IS_INDEF(saturation))
 		    if (Memr[data+ix] > saturation) {
@@ -136,24 +142,22 @@ begin
 		    }
 		dat = Memr[data+ix] - Memr[sky+ix]
 		if (ix1 == ix2)
-		    dat = (Memr[x2+iy] - Memr[x1+iy]) * dat
+		    dat = wt1 * dat
 		else if (ix == ix1)
-		    dat = (ix - Memr[x1+iy] + 0.5) * dat
+		    dat = wt1 * dat
 		else if (ix == ix2)
-		    dat = (Memr[x2+iy] - ix2 + 0.5) * dat
+		    dat = wt2 * dat
 		s = s + dat
-		if (dat > 0.)
-		    p = p + dat
 	    }
-	    Memr[spec+iy] = s
 
 	    if (s > 0.) {
 	        do ix = 1, nx
-		    profile[iy,ix] = max (0., (Memr[data+ix]-Memr[sky+ix])/p)
+		    profile[iy,ix] = max (0., (Memr[data+ix]-Memr[sky+ix])/s)
 	    } else {
 	        do ix = 1, nx
 		    profile[iy,ix] = 0.
 	    }
+	    Memr[spec+iy] = s
 	}
 
 	if (nrej == ny)
@@ -203,6 +207,9 @@ begin
 		    sky = sbuf + (iy - 1) * nx - 1
 		    var0 = rdnoise + Memr[svar+iy-1]
 		}
+		if (asi != NULL)
+		    call asifit (asi, Memr[data], nc)
+		call ap_edge (asi, Memr[x1+iy]+1, Memr[x2+iy]+1, wt1, wt2)
 		xreject = reject + (iy - 1) * nx - 1
 	        ix1 = nint (Memr[x1+iy])
 	        ix2 = nint (Memr[x2+iy])
@@ -217,11 +224,11 @@ begin
 		            if (ix < ix1 || ix > ix2)
 			        p = 0.
 			    else if (ix1 == ix2)
-		                p = Memr[x2+iy] - Memr[x1+iy]
+		                p = wt1
 		            else if (ix == ix1)
-		                p = ix1 - Memr[x1+iy] + 0.5
+		                p = wt1
 		            else if (ix == ix2)
-		                p = Memr[x2+iy] - ix2 + 0.5
+		                p = wt2
 		            else 
 			        p = 1
 		            Memr[spec+iy] = Memr[spec+iy] -
@@ -233,11 +240,11 @@ begin
 		            if (ix < ix1 || ix > ix2)
 			        p = 0.
 			    else if (ix1 == ix2)
-		                p = Memr[x2+iy] - Memr[x1+iy]
+		                p = wt1
 		            else if (ix == ix1)
-			        p = ix1 - Memr[x1+iy] + 0.5
+			        p = wt1
 		            else if (ix == ix2)
-			        p = Memr[x2+iy] - ix2 + 0.5
+			        p = wt2
 		            else 
 			        p = 1
 		            dat = p * (Memr[data+ix] - predict)
@@ -360,7 +367,7 @@ int	cvtype			# Curfit type
 int	order			# Order of curfit function.
 real	rdnoise			# Readout noise in RMS data numbers.
 
-int	ix, iy, ix1, ix2, ierr
+int	ix, iy, ierr
 real	p, s, sk, var, vmin, var0, wmin
 pointer	sp, y, w, cv, dbuf1, data, sky
 
@@ -379,7 +386,7 @@ begin
 	#order = apgeti ("e_order")
 	rdnoise = apgimr ("readnoise", im) ** 2
 
-	# Initialize
+	# Initialize.
 	call alimr (x1, ny, p, s)
 	cvtype = SPLINE3
 	order = int (s - p + 1) + max (0, cvstati (cvtrace, CVNCOEFF) - 2)
@@ -423,36 +430,13 @@ begin
 		} else
 		    Memr[w+iy-1] = 0.
 	    }
-	    call amaxkr (Memr[w], wmin / 10., Memr[w], ny)
+	    if (wmin == MAX_REAL)
+		call amovkr (1., Memr[w], ny)
+	    else
+		call amaxkr (Memr[w], wmin / 10., Memr[w], ny)
 	    call cvfit (cv, Memr[y], profile[1,ix], Memr[w], ny, WTS_USER, ierr)
 	    call cvvector (cv, Memr[y], profile[1,ix], ny)
-	}
-
-	# Make profile positive only and normalize to unit integral.
-	do iy = 1, ny {
-	    ix1 = nint (x1[iy])
-	    ix2 = nint (x2[iy])
-	    s = 0.
-	    do ix = ix1, ix2 {
-		p = profile[iy,ix]
-		if (p > 0.) {
-		    if (ix1 == ix2)
-			s = s + (x2[iy] - x1[iy]) * p
-		    else if (ix == ix1)
-			s = s + (ix - x1[iy] + 0.5) * p
-		    else if (ix == ix2)
-			s = s + (x2[iy] - ix + 0.5) * p
-		    else
-			s = s + p
-		}
-	    }
-	    if (s <= 0.) {
-		do ix = 1, nx
-		    profile[iy,ix] = 0.
-	    } else {
-		do ix = 1, nx
-		    profile[iy,ix] = max (0., profile[iy,ix] / s)
-	    }
+	    call amaxkr (profile[1,ix], 0., profile[1,ix], ny)
 	}
 
 	call cvfree (cv)
@@ -734,7 +718,7 @@ begin
 	    }
 	}
 
-	# Evaluate fit.  Make profile positive only and unit integral.
+	# Evaluate fit and make profile positive only.
 	do iy = 1, ny {
 	    ix1 = nint (x1[iy])
 	    ix2 = nint (x2[iy])
@@ -768,24 +752,6 @@ begin
 	            sum1 = sum1 + sum2 * ((real (iy)/ ny) ** jl)
 	        }
 	        profile[iy,ix] = max (0.d0, sum1)
-	        if (ix > ix1 && ix < ix2)
-	            p = 1.
-		else if (ix1 == ix2)
-	            p = x2[iy] - x1[iy]
-	        else if (ix == ix1)
-	            p = real (ix1) + 0.5 - x1[iy]
-	        else if (ix == ix2)
-	            p = x2[iy] - real (ix2) + 0.5
-	        else
-	            p = 0.
-	        s = s + p * profile[iy,ix]
-	    }
-	    if (s <= 0.) {
-		do ix = 1, nx
-		    profile[iy,ix] = 0.
-	    } else {
-		do ix = 1, nx
-		    profile[iy,ix] = max (0., profile[iy,ix] / s)
 	    }
 	}
 

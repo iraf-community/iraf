@@ -1,4 +1,4 @@
-.help imcombine May96 images.immatch
+.help imcombine Aug01 images.immatch
 .ih
 NAME
 imcombine -- Combine images using various algorithms
@@ -8,46 +8,79 @@ imcombine input output
 .ih
 PARAMETERS
 .ls input
-List of input images to combine.  All images must have the same dimensionality
-but they may be of different sizes.
+List of input images to combine.  If the \fIproject\fR parameter is "no"
+then all input images must have the same dimensionality though they may
+be of different sizes.  Otherwise each input image is handled separately
+and they may have different dimensionalities.
 .le
+
+
+When the \fIproject\fR parameter is "no" all the input images are combined
+into a single output file.  In this case the following parameters specify
+only a single file name.  Otherwise each input image is combined by
+projecting (combining across) the highest dimension to produce a lower
+dimensional image.  For this type of combining there is one output for each
+input and so the following parameters specify matching lists.
+
 .ls output
-Output combined image or list of images.  If the \fIproject\fR parameter is
-no then there will be one output image while if it is yes there will be one
-output image for each input image.
+Output combined image(s).  If there are fewer than 100 input images the
+names of the input images are recorded in header keywords IMCMBnnn.
+.le
+.ls headers = "" (optional)
+Optional output multiextension FITS file(s).  The extensions are dataless
+headers from each input image.
+.le
+.ls bpmasks = "" (optional)
+Optional output bad pixel mask(s) with good values of 0 and bad values of
+1.  Output pixels are marked as bad when no input pixels contributed to the
+output pixel.  The file name is also added to the output image header under
+the keyword BPM.
 .le
 .ls rejmask = "" (optional)
-Output mask file to contain identifications of which pixels in which input
-images were rejected or excluded.  The pixel mask will be the size of the
-output image and identified pixels will be in the output image pixel
-coordinate system.  There is on extra dimension with length equal to the
-number of input images.  Each element of this dimension contains the mask
-of the input image.  The order is the order of the input images.
+Optional output mask file(s) identifying rejected or excluded pixels.  The
+pixel mask is the size of the output image but there is one extra dimension
+with length equal to the number of input images.  Each element of the
+highest dimension is a mask corresponding to an input image with values of
+1 for rejected or excluded pixels and values of 0 for pixels which were
+used.  The order of the masks is the order of the input images and image
+header keywords, indexed by the pixel coordinate of the highest dimension
+identify the input images.  Note that the pixel positions are in the output
+pixel coordinate system.
 .le
-.ls plfile = "" (optional)
-Output pixel list file or list of files.  If no name is given or the
-list ends prematurely then no file is produced.  The pixel list file
-is a map of the number of pixels rejected or, equivalently,
-the total number of input images minus the number of pixels actually used.
-The file name is also added to the output image header under the
-keyword BPM.
+.ls nrejmasks = "" (optional)
+Optional output pixel mask(s) giving the number of input pixels rejected or
+excluded from the input images.
+.le
+.ls expmasks = "" (optional)
+Optional output exposure mask(s) giving the sum of the exposure values of
+the input images with non-zero weights that contributed to that pixel.
+Since masks are integer, the exposure values may be scaled to preserve
+dynamic range and fractional significance.  The scaling values are given in
+the header under the keywords MASKSCAL and MASKZERO.  Exposure values are
+computed from the mask values by scale * value + zero where scale is the
+value of the MASKSCAL keyword and zero is the value of the MASKZERO
+keyword.
 .le
 .ls sigma = "" (optional)
-Output sigma image or list of images.  If no name is given or the list ends
-prematurely then no image is produced.  The sigma is standard deviation,
+Optional output sigma image(s).  The sigma is the standard deviation,
 corrected for a finite population, of the input pixel values (excluding
 rejected pixels) about the output combined pixel values.
 .le
+
 .ls logfile = "STDOUT" (optional)
-Output log file.  If no file is specified then no log information is produced.
-The special filename "STDOUT" prints log information to the terminal.
+Optional output log file.  If no file is specified then no log information is
+produced.  The special filename "STDOUT" prints log information to the
+terminal.
 .le
 
-.ls combine = "average" (average|median)
+.ls combine = "average" (average|median|sum)
 Type of combining operation performed on the final set of pixels (after
 offsetting, masking, thresholding, and rejection).  The choices are
-"average" or "median".  The median uses the average of the two central
-values when the number of pixels is even.
+"average", "median", or "sum".  The median uses the average of the two central
+values when the number of pixels is even.  For the average and sum, the
+pixel values are multiplied by the weights (1 if no weighting is used)
+and summed.  The average is computed by dividing by the sum of the weights.
+If the sum of the weights is zero then the unweighted average is used.
 .le
 .ls reject = "none" (none|minmax|ccdclip|crreject|sigclip|avsigclip|pclip)
 Type of rejection operation performed on the pixels remaining after offsetting,
@@ -67,30 +100,42 @@ DESCRIPTION section.  The rejection choices are:
 .le
 .ls project = no
 Project (combine) across the highest dimension of the input images?  If
-no then all  the input images are combined to a single output image.  If
-yes then the highest dimension elements of each input image are combined to
+"no" then all  the input images are combined to a single output image.  If
+"yes" then the highest dimension elements of each input image are combined to
 an output image and optional pixel list and sigma images.  Each element of
-the highest dimension may have a separate offset but there can only be one
-mask image.
+the highest dimension may have a separate offset.
 .le
-.ls outtype = "real" (short|ushort|integer|long|real|double)
+.ls outtype = "real" (none|short|ushort|integer|long|real|double)
 Output image pixel datatype.  The pixel datatypes are "double", "real",
 "long", "integer", unsigned short "ushort", and "short" with highest
-precedence first.  If none is specified then the highest precedence
+precedence first.  If "none" is specified then the highest precedence
 datatype of the input images is used.  When there is a mixture of
 short and unsigned short images the highest precedence become integer.
-The datatypes may be abbreviated to
-a single character.
+The datatypes may be abbreviated to a single character.
 .le
-.ls offsets = "none" (none|wcs|grid|<filename>)
+.ls outlimits = ""
+Output region limits specified as pairs of whitespace separated values.
+The first two numbers are the limits along the first output image dimension,
+the next two numbers are the limits along the second dimension, and so on.
+If the higher dimension limits are not specified they default to the full
+range.  Therefore, if no limits are specified then the full output is
+created.  Note that the output size is computed from all the input images
+including offsets if specified and the coordinates are relative to that
+size.
+.le
+.ls offsets = "none" (none|wcs|world|physical|grid|<filename>)
 Integer offsets to add to each image axes.  The options are:
 .ls "none"
 No offsets are applied.
 .le
-.ls "wcs"
+.ls "wcs" or "world"
 The world coordinate system (wcs) in the image is used to derive the
 offsets.  The nearest integer offset that matches the world coordinate
 at the center of the first input image is used.
+.le
+.ls "physical"
+The physical coordinate system defined by the IRAF LTM/LTV keywords
+define the offsets.
 .le
 .ls "grid"
 A uniform grid of offsets is specified by a string of the form
@@ -109,19 +154,21 @@ of one line per image with the offsets in each dimension forming the
 columns.
 .le
 .le
-.ls masktype = "none" (none|goodvalue|badvalue|goodbits|badbits)
-Type of pixel masking to use.  If "none" then no pixel masking is done
+.ls masktype = "none" (none|goodvalue|badvalue|goodbits|badbits|!<keyword>)
+Type of pixel masking to use.  If "none" or "" then no pixel masking is done
 even if an image has an associated  pixel mask.  The other choices
 are to select the value in the pixel mask to be treated as good
 (goodvalue) or bad (badvalue) or the bits (specified as a value)
-to be treated as good (goodbits) or bad (badbits).  The pixel mask
-file name comes from the image header keyword BPM.  Note that when
-combining images by projection of the highest dimension only one
-pixel mask is applied to all the images.  \fBNote\fR, if the number of
-input images becomes too large (currently about 250 .imh or 125 .hhh
-images) then the images are temporarly stacked and combined by projection
-which also means the bad pixel mask from the first image will be used
-for all images.
+to be treated as good (goodbits) or bad (badbits).  In these cases
+the pixel mask
+file name comes from the image header keyword BPM.  If the parameter is
+given as "!<keyword>" where <keyword> is a header keyword, the mask file
+comes from the value of that keyword and the mask value interpretation
+is the same as "goodvalue".  \fBNote\fR, if the
+number of input images becomes too large (currently about 4090 .imh or 2045
+.hhh images) then the images are temporarly stacked and combined by
+projection.  This means all the images must have the same size and
+dimensionality.
 .le
 .ls maskvalue = 0
 Mask value used with the \fImasktype\fR parameter.  If the mask type
@@ -257,66 +304,70 @@ rejected pixel from one of the rejection algorithms.  This applies only to
 pixels rejected by one of the rejection algorithms and not the masked or
 threshold rejected pixels.
 .le
+
+.ce
+Environment Variables
+
+.ls imcombine_option (default = 1)
+This environment variable is used to select certain experimental or
+diagnostic options.  If this variable has the value 1, the default when the
+variable is undefined, then when the number of images exceeds the number of
+files that can be kept open under IRAF (currently this means more than 4000
+images) the images are closed and opened as needed.  This is in contrast to
+the previous method, when the variable has the value 0, which first builds
+a single stacked image of a higher dimension from the input images.  This
+method requires the images all have the same size and also that there be
+sufficient disk space for the stacked image and that the image  be less
+than 2Gb in size.
+.le
 .ih
 DESCRIPTION
-A set of images or the highest dimension elements (for example the planes
-in an image cube) are combined by weighted averaging or medianing.  Pixels
-may be rejected from the combining by using pixel masks, threshold levels,
-and rejection algorithms.  The images may be scaled multiplicatively or
-additively based on image statistics, image header keywords, or text files
-before rejection.  The images may be combined with integer pixel coordinate
-offsets, possibly determined using the world coordinate system of the
-images, to produce an image bigger than any of the input images.
+A set of images or the highest dimension elements (for example
+the planes in an image cube) are combined by weighted averaging, medianing,
+or summing.  Pixels may be rejected from the combining by using pixel
+masks, threshold levels, and rejection algorithms.  The images may be
+scaled, before rejections, multiplicatively, additively, or both based on
+image statistics, image header keywords, or text files.  The images may be
+combined with integer pixel coordinate offsets, possibly determined using
+the world coordinate system of the images, to produce an image bigger than
+any of the input images.
 
 The input images to be combined are specified by a list.  If the
-\fBproject\fR parameter is yes then the highest dimension elements of each
-input image are combined to make an output image of one lower dimension.
-There is no limit to the number of elements combined in this case.  If
-\fBproject\fR is no then the entire input list is combined to form a single
-output image.   In this case the images must all have the same
-dimensionality but they may have different sizes.  There is a software
-limit of approximately 100 images in this case.
+\fBproject\fR parameter is "yes" then the highest dimension elements of
+each input image are combined to make an output image of one lower
+dimension.  There is no limit to the number of elements combined in this
+case.  If \fBproject\fR is "no" then the entire input list is combined to
+form a single output image.   In this case the images must all have the
+same dimensionality but they may have different sizes.  There is a software
+limit of approximately 4000 images which may be open
+simultaneously.  To combine more than this number the program may either
+create a temporary stacked image, requiring the images to be of the same
+size, or repeatedly open and close the images.  See the "Environment
+Variables" in the PARAMETERS section.
 
 The output image header is a copy of the first image in the combined set.
 In addition, the number of  images combined is recorded under the keyword
-NCOMBINE, an image header keyword selected by the \fIexpname\fR parameters
-(which is usually an exposure time) is updated as the weighted average of
-the input header keywords, and any pixel list file created is recorded
-under the keyword BPM.  The output pixel type is set by the parameter
-\fIouttype\fR.  If left blank then the input datatype of highest precision
-is used.  If there is a mixture of short and unsigned short images then
-the highest precision is integer.
+NCOMBINE.  The input image names which are combined are also recorded under
+the indexed keywords IMCMBnnn provided there are fewer than 100 images.  If
+a bad pixel mask is created, the name of the mask will be included in the
+output image header under the keyword BPM.  The output pixel type is set by
+the parameter \fIouttype\fR.  If left blank then the input datatype of
+highest precision is used.  If there is a mixture of short and unsigned
+short images then the highest precision is integer.
 
 In addition to one or more output combined images there are some optional
-output files which may be specified.  A pixel mask identifying each pixel
-rejected or excluded may be created.  This mask will match the output
-image in size except there is one extra dimension.  The extra dimension
-indexes the input images in the order in which they are specified and
-combined.  What this means is that each element of the extra dimension
-is a mask of the pixel rejected in a particular input image (or lower
-dimensional element in the case of projection) but in the offset and
-sized to the output image.  For example, if the input consists of
-two dimensional images then the rejected pixel mask will be three
-dimensional and each plane will be for a particular input image.
-If one wants to separate this file the task \fBimslice\fR may be used.
-If there are no offsets then the masks will also be registered with the
-input image.  If there are offsets then the masks will be offset
-also.
-
-Another pixel mask may be produced giving just the total number of pixels
-rejected at each output pixel.  An image containing the sigmas of the
-pixels combined about the final output combined pixels may also be
-created.  The sigma computation is the standard deviation corrected for a
-finite population (the n/(n-1) factor) including weights if a weighted
-average is used.  Finally a log file may be produced.
+output files which may be specified as described in the OPTIONAL OUTPUT
+section.
 
 An outline of the steps taken by the program is given below and the
 following sections elaborate on the steps.
 
 .nf
+o   Check the input images and stack them if needed
 o   Set the input image offsets and the final output image size.
-o   Set the input image scales and weights
-o   Write the log file output
+o   Set the input image scales and weights possibly by computing
+    image statistics
+o   Write the log file and optional header output
 .fi
 
 For each output image line:
@@ -329,16 +380,122 @@ o   Reject pixels using the specified algorithm
 o   Reject neighboring pixels along each line
 o   Combine remaining pixels using the weighted average or median
 o   Compute sigmas of remaining pixels about the combined values
-o   Write the output image line, rejected pixel masks, and sigmas
+o   Write the output image line and other optional images.
 .fi
 
+OPTIONAL OUTPUTS
+
+There are various additional outputs that may be produced by providing
+the filenames.
+
+.ls Headers
+The output image can only have one set of header keywords which are
+inherited from the first input image in the input list.  Copies of all the
+input headers may be stored in a multiextension FITS file specified by the
+\fIheaders\fR parameter.  The extension names are the input image names.
+The extensions are dataless headers.  Since this means the image sizes are
+lost, AXLEN keywords are added.  Also the keywords INIMAGE and OUTIMAGE are
+added giving the name of the input image and the name of the output
+combined image.
+.le
+.ls Bad Pixel Masks
+The \fIbpmasks\fR parameter produces optional output bad pixel mask(s) with
+good values of 0 and bad values of 1.  Output pixels are marked as bad when
+no input pixels contributed to the output pixel.  The file name is also
+added to the output image header under the keyword BPM.
+.le
+.ls Rejection Masks
+The \fIrejmasks\fR parameter produces optional output mask file(s)
+identifying rejected or excluded pixels.  The pixel mask is the size of the
+output image.  There is one extra dimension with length equal to the number
+of input images.  Each element of the highest dimension is a mask
+corresponding to an input image with values of 1 for rejected or excluded
+pixels and values of 0 for pixels which were used.  The order of the masks
+is the order of the input images and image header keywords indexed by the
+element identify the input images.  Note that the pixel positions are in
+the output pixel coordinate system.
+
+This mask is the only way to record whether a particular input image pixel
+contributed to the output image.  As an example, consider the case of
+three input two dimensional images of sizes 1020x1020, 1010x1010, and
+1000x1000 with relative offsets of (0,0), (10,10), and (20,20).  The output
+image would then be 1020x1020.
+
+Suppose that the only input pixels not used are pixels (1,1) in each input
+image.  Because of the offsets the first 10 rows and columns of the output
+will be based on just a single pixel except for (1,1) which has no input
+pixels.  The next 10 rows and colums of the output will be a combination
+of 2 input pixels except (11,11) which is just based on pixel (11,11)
+in the first input image.  Finally all other pixels except (21,21) will be
+a combination of 3 values.
+
+The rejection mask will be three dimensional of size 1020x1020x3.  Plane 1
+will correspond to the first input image, plane 2 to the second, and so
+on.  All of the pixels will be zero except for the following pixels
+which will have a value of 1. In the first plane only pixel (1,1,1) will be
+one.  In the second plane the first 10 rows and columns and pixel (11,11,2)
+will be one.  And in the third plane, the first 20 rows and columns and pixel
+(21,21,3) will be one.  So if we want to know about output pixel (11,11)
+the rejection mask will tell us that pixels from the second and third
+images were excluded.
+
+This is a complex example because of the offsets and dissimilar sizes.
+In the more common and simpler case of equal sizes and registered images,
+the mask
+planes would have one to indicate that the pixel in the input image at
+that coordinate was not used.  For instance if pixel (12,15,2) is one
+in the rejection mask then pixel (12,15) in the second input image was
+excluded.
+
+Note that one can use image sections to extract a mask matching the input
+image.  For the example case with the offsets masks in the input
+coordinates can be extracted with the commands
+
+.nf
+    cl> imcopy rejmask[*,*,1] mask1
+    cl> imcopy rejmask[11:1020,11:1020,2] mask2
+    cl> imcopy rejmask[21:1020,21:1020,3] mask3
+.fi
+
+For the case of equal sized and registered images one could also use
+\fBimslice\fR.
+.le
+.ls Mask of the Number of Rejected Pixels
+The \fInrejmasks\fR parameter produces optional pixel mask(s) giving the
+number of input pixels rejected or excluded from the input images.  This is
+equivalent to projecting the rejection mask described previously by summing
+along the highest dimension.  Note that in this mask a value of 0 indicates
+all the input pixels were used to create the output pixel and a value equal
+to the number of input images indicate no input pixels were used.
+.le
+.ls Exposure Masks
+The \fIexpmasks\fR parameter produces optional output exposure mask(s)
+giving the sum of the exposure values of the input images with non-zero
+weights that contributed to that pixel.  Since masks are integer, the
+exposure values may be scaled to preserve dynamic range and fractional
+significance.  The scaling values are given in the header under the
+keywords MASKSCAL and MASKZERO.  Exposure values are computed from the mask
+values by scale * value + zero where scale is the value of the MASKSCAL
+keyword and zero is the value of the MASKZERO keyword.
+.le
+.ls Sigma of Combined Pixels
+The \fIsigma\fR parameter produces optional output sigma image(s).  The
+sigma is the standard deviation, corrected for a finite population, of the
+input pixel values (excluding rejected pixels) about the output combined
+pixel values.
+.le
+.ls Output Log File
+The \fIlogfile\fR parameter produces an optional output log file.  If no
+file is specified then no log information is produced.  The special
+filename "STDOUT" prints log information to the terminal.
+.le
 
 OFFSETS
 
 The images to be combined need not be of the same size or overlap.  They
 do have to have the same dimensionality which will also be the dimensionality
 of the output image.  Any dimensional images supported by IRAF may be
-used.  Note that if the \fIproject\fR flag is yes then the input images
+used.  Note that if the \fIproject\fR flag is "yes" then the input images
 are the elements of the highest dimension; for example the planes of a
 three dimensional image.
 
@@ -355,6 +512,9 @@ The output image size is set by the maximum extent in each dimension
 of any input image after applying the offsets.  In the above example if
 all the images have 100 columns then the output image will have 120
 columns corresponding to the 20 column offset in the third image.
+Note that this same output image size is computed and used as the
+basis for the \fIoutlimits\fR parameter to specify a subregion to
+actually be output.
 
 The input image offsets are set using the \fIoffset\fR parameter.  There
 are four ways to specify the offsets.  If the word "none" or the empty
@@ -435,6 +595,75 @@ will have the first pixel of the first image in the 11th pixel of the
 output image.  Note that there is no way to "pad" the other side of
 the output image.
 
+OUTPUT OF SUBREGIONS
+
+The output image size is computed from all of the input images including
+the offsets as described previously.  The \fIoutlimits\fR may be used to
+specify a subregion of this full size to be created.  The syntax of this
+parameter is pairs of whitespace separated numbers selecting the first and last
+pixel in each output dimension.  The pairs for each dimension are also
+whitespace separated and are given in order of the dimensions.  Any missing
+values at the end of the string default to the full limits of the output
+image.  If the requested limits fall outside the full output image they are
+reset to the size of the full computed output size.
+
+As an example, consider combining 10 images of size 1000x1000 with offsets
+of 0, 1, ..., 9 along the first dimension.  Because of the offsets the full
+output size is 1010x1000.  To output only the region [1:100,101:200]
+of this full size the parameter value would be the string "1 100 101 200".
+Note that if the value was just "1 100" then the output region would
+be [1:100,1:1000].
+
+The intended purpose for this option is to allow creating subregions using
+a smaller number of images in the case of offset data taken at a raster of
+positions.  This is important since when the number of images becomes too
+large (>4000) the program either has to prestack the images into a higher
+dimensional single image (requiring equal sized images) or utilize an
+inefficient algorithm where images are opened and closed for each input
+line.  A detail of how this task works is that it is the number of images
+required to be accessed for each output line that is significant.
+
+The following example was developed when the maximum number of images
+open at one time was ~240.  In V2.12 the number was increased to
+more than 4000 so it is not as relevant though it may apply to very
+large surveys with many small images.
+
+As an example, consider a survey of a region of the sky composed of 8000
+images which are each 500x1000.  The offsets between each image are 50
+pixels along the first dimension and 900 pixels along the second dimension,
+give or take a few pixels due to telescope pointing errors.  Thus this
+survey consists of strips of exposures.  Within a strip the images over by
+about 450 pixels.  Betweein strips the overlap is 100 pixels.  So the
+strips consist 400 exposures and there are 20 strips.
+
+The full size of this survey is then about 20450x18900.  At any point in a
+single strip the number of images contributing is no more than 10.
+Including the overlap of the strips the maximum number is then 20.  In
+order to combine the data for such a survey one would like to create
+subregion outputs which are 120 images from each strip.  The lines where
+the two strips overlap then require 240 images.  To produce roughly equal
+size regions we choose sizes along the first dimension of 5200 pixels.  The
+number of lines in the output subregions might be the full size of the
+survey.  However, it might be desirable to also  break the second dimension
+into blocks for ease of display and manipulation.
+
+The method for combining this example survey is then to combine the data in
+four groups along the first dimension to produce subimages each 5200 pixels
+wide which have no overlap.  The reason for wanting to create
+nonoverlapping subregions is to simplify creation of the related masks,
+most importantly, the exposure masks.  The \fIoutlimits\fR parameter would
+have the values "1 5200", "5201 10400", 10401 15600", and "15601 20800".
+The second pair of limits is not specified to obtain the full size along
+the second dimension.  Note that the last block will actually be smaller
+than 5200 pixels since the survey is less than 20800 pixels.
+
+In each combining step all the images must be specified for the input in
+order to compute the full output size but then only those images needed to
+produce an output line will be accessed at the same time.  By design this
+is roughly 240 images for lines where the strips overlap.  The
+nonoverlapping blocks can be mosaiced together with this task as a final
+step if desired.
+
 
 SCALES AND WEIGHTS
 
@@ -464,7 +693,7 @@ a text file containing a list of scale factors.
 .fi
 
 The image statistics are computed by sampling a uniform grid of points with
-the smallest grid step that yields less than 10000 pixels; sampling is used
+the smallest grid step that yields less than 100000 pixels; sampling is used
 to reduce the time needed to compute the statistics.  If one wants to
 restrict the sampling to a region of the image the \fIstatsec\fR parameter
 is used.  This parameter has the following syntax:
@@ -513,10 +742,12 @@ first and zero offset second.
 
 The image statistics and scale factors are recorded in the log file
 unless they are all equal, which is equivalent to no scaling.  The
-intensity scale factors are normalized to a unit mean and the zero
-point shifts are adjust to a zero mean.  When scale factors or
-zero point shifts are specifed by the user in an @file or
-by an image header keyword no normalization is done.
+scale factors are normalized so that the first input image has no
+scaling.  This is done because the header of the first input image
+is used as the template header for the combined output image.
+By scaling to this first image this means that flux related keywords,
+such as exposure time and airmass, are representative of the output
+(except when the "sum" option is used).
 
 Scaling affects not only the mean values between images but also the
 relative pixel uncertainties.  For example scaling an image by a
@@ -546,20 +777,20 @@ corrections the parameter is set to zero and to eliminate the correction in
 all cases it is set to a very large number.
 
 If the final combining operation is "average" then the images may be
-weighted during the averaging.  The weights are specified in the
-same way as the scale factors.  In addition
-the NCOMBINE keyword, if present, will be used in the weights.
-The weights, scaled to a unit sum, are printed in the log output.
+weighted during the averaging.  The weights are specified in the same way
+as the scale factors.  In addition the NCOMBINE keyword, if present, will
+be used in the weights.  The weights, scaled to a unit sum, are printed in
+the log output.
 
-The weights are only used for the final weighted average and sigma image
-output.  They are not used to form averages in the various rejection
-algorithms.  For weights in the case of no scaling or only multiplicative
-scaling the weights are used as given or determined so that images with
-lower signal levels will have lower weights.  However, for cases in which
-zero level scaling is used and the zero levels are determined from image
-statistics (not from an input file or keyword) the weights are computed
-from the initial weights (the exposure time, image statistics, or input
-values) using the formula:
+The weights are used for the final weighted average, sigma image, and
+exposure mask output.  They are not used to form averages in the various
+rejection algorithms.  For weights in the case of no scaling or only
+multiplicative scaling the weights are used as given or determined so that
+images with lower signal levels will have lower weights.  However, for
+cases in which zero level scaling is used and the zero levels are
+determined from image statistics (not from an input file or keyword) the
+weights are computed from the initial weights (the exposure time, image
+statistics, or input values) using the formula:
 
 .nf
 	weight_final = weight_initial / (scale * sky)
@@ -579,15 +810,33 @@ in the weights the user must specify the weights in a file taking
 explicit account of changes in the weights due to different sky
 statistics.
 
+When forming the final weighted averages if the sum of the weights of
+the non-rejected or excluded pixels is zero then instead of producing
+a zero average the unweighted average of the pixels is produced.  Similarly,
+in the sigma calculation when the weights of the pixels are all zero
+then the sigma is computed as if all pixels have unit weights.
 
-PIXEL MASKS
+When there are zero weights only the pixels with non-zero weights are
+used in computing the output exposure time mask.  Note that the actual
+weight values are not used but simply the sum of all exposure times
+of pixels from images with non-zero weights is produced.
 
-A pixel mask is a type of IRAF file having the extension ".pl" which
+The purpose of using zero weights is to identify images that are of
+poor quality (such as non-photometric or bad seeing) which are then
+excluded in the final weighted average or exposure time.  However,
+they contribute to the final image when there is no good
+quality data but with an output exposure time of zero.
+
+INPUT PIXEL MASKS
+
+A pixel mask is a type of IRAF file having the extension ".pl" or
+a FITS extension of "type=mask" which
 identifies an integer value with each pixel of the images to which it is
-applied.  The integer values may denote regions, a weight, a good or bad
+applied.  In future masks may also be stored as special FITS extensions.
+The integer values may denote regions, a weight, a good or bad
 flag, or some other type of integer or integer bit flag.  In the common
-case where many values are the same this file is compacted to be small and
-efficient to use.  It is also most compact and efficient if the majority of
+case where many values are the same, this type of file is compact.
+It is most compact and efficient if the majority of
 the pixels have a zero mask value so frequently zero is the value for good
 pixels.  Note that these files, while not stored as a strict pixel array,
 may be treated as images in programs.  This means they may be created by
@@ -595,35 +844,27 @@ programs such as \fBmkpattern\fR, edited by \fBimedit\fR, examined by
 \fBimexamine\fR, operated upon by \fBimarith\fR, graphed by \fBimplot\fR,
 and displayed by \fBdisplay\fR.
 
-At the time of introducing this task, generic tools for creating
-pixel masks have yet to be written.  There are two ways to create a
-mask in V2.10.  First if a regular integer image can be created
-then it can be converted to pixel list format with \fBimcopy\fR:
-
-.nf
-	cl> imcopy template plfile.pl
-.fi
-
-by specifically using the .pl extension on output.  Other programs that
-can create integer images (such \fBmkpattern\fR or \fBccdred.badpiximage\fR)
-can create the pixel list file directly by simply using the ".pl"
-extension in the output image name.
-
 To use pixel masks with \fBimcombine\fR one must associate a pixel
 mask file with an image by entering the pixel list file name in the
-image header under the keyword BPM (bad pixel mask).  This can be
+image header under the keyword BPM (bad pixel mask) or some other
+keyword to be specified.  This can be
 done with \fBhedit\fR.  Note that the same pixel mask may be associated
 with more than one image as might be the case if the mask represents
 defects in the detector used to obtain the images.
 
 If a pixel mask is associated with an image the mask is used when the
-\fImasktype\fR parameter is set to a value other than "none".  Note that
-when it is set to "none" mask information is not used even if it exists for
+\fImasktype\fR parameter is set to a value other than "none" or "".  Note that
+when it is set to "none", mask information is not used even if it exists for
 the image.  The values of \fImasktype\fR which apply masks are "goodvalue",
-"badvalue", "goodbits", and "badbits".  They are used in conjunction with
-the \fImaskvalue\fR parameter.  When the mask type is "goodvalue" the
+"badvalue", "goodbits", "badbits", and "!<keyword>.  The last choice
+allows specifying the keyword whose value is the mask to be used otherwise
+the keyword "BPM" is used.
+
+The \fImasktype\fR choices are used in conjunction with
+the \fImaskvalue\fR parameter.  When the mask type is "goodvalue" or
+an explicit keyword is specified, the
 pixels with mask values matching the specified value are included in
-combining and all others are rejected.  Similarly, for a mask type of
+combining and all others are rejected.  For a mask type of
 "badvalue" the pixels with mask values matching the specified value are
 rejected and all others are accepted.  The bit types are useful for
 selecting a combination of attributes in a mask consisting of bit flags.
@@ -631,25 +872,13 @@ The mask value is still an integer but is interpreted by bitwise comparison
 with the values in the mask file.
 
 If a mask operation is specified and an image has no mask image associated
-with it then the mask values are taken as all zeros.  In those cases be
-careful that zero is an accepted value otherwise the entire image will be
-rejected.
-
-In the case of combining the higher dimensions of an image into a
-lower dimensional image, the "project" option, the same pixel mask
-is applied to all of the data being combined; i.e. the same 2D
-pixel mask is applied to every plane of a 3D image.  This is because
-a higher dimensional image is treated as a collection of lower
-dimensional images having the same header and hence the same
-bad pixel mask.  It would be tempting to use a bad pixel mask with
-the same dimension as the image being projected but this is not
-currently how the task works.
+with it (the BPM or specified keyword is absent), the mask values are taken
+as all zeros.  In those cases be careful that zero is an accepted value
+otherwise the entire image will be rejected.
 
 When the number of input images exceeds the maximum number of open files
-allowed by IRAF (currently about 250 or 125 .hhh images) the input images
-are stacked and combined with the \fIproject\fR option.  \fBNote\fR that
-this means that the bad pixel mask from the first input image will be
-applied to all the images.
+allowed by IRAF and the input images need to be "stacked" then the masks
+are also stacked.  The stacking requires all the images to have the same size.
 
 
 THRESHOLD REJECTION
@@ -999,6 +1228,30 @@ sky brightness and make a weighted average:
 .fi
 .ih
 REVISIONS
+.ls IMCOMBINE V2.12
+A number of enhancements for dealing with large numbers of images were
+made.  Also the masktype option "!<keyword>", where <keyword> is a
+user specified keyword, was added.
+
+The new parameters "headers", "bpmasks", "rejmasks",  "nrejmasks", and
+"expmasks" provide additional types of output.  The old parameters
+"rejmask" and "plfile" were removed.  The new "nrejmasks" corresponds
+to the old "plfile" and the new "rejmasks" corresponds to the old
+"rejmask".
+
+There is a new "combine" type "sum" for summing instead of averaging the
+final set of offset, scaled, and weighted pixels.
+
+there is a new parameter "outlimits" to allow output of a subregion of
+the full output.  This is useful for raster surveys with large numbers
+of images.
+
+Additional keywords may appear in the output headers.
+
+The scaling is now done relative to the first image rather than an
+average over the images.  This is done so that flux related keywords
+such as exposure time and airmass remain representative.
+.le
 .ls IMCOMBINE V2.11.2
 The grow algorithm was improved to give a 2D growing radius.
 
@@ -1062,5 +1315,6 @@ was removed in V2.11 the method has the limitation that only a single
 bad pixel mask will be used for all images.
 .ih
 SEE ALSO
-ccdred.combine onedspec.scombine, wpfc.noisemodel
+ccdred.combine mscred.combine onedspec.scombine, wpfc.noisemodel,
+obsolete.ocombine
 .endhelp

@@ -70,19 +70,23 @@ begin
 
 	    # Decode the card images.
 	    if ((i == EOF) && (nread == 0)) {
+		call close (fd_usr)
 		return (EOF)
 	    } else if ((nread == 0) && SIMPLE(fits) == NO &&
 	        strmatch (card, "^SIMPLE  ") == 0) {
 		call flush (STDOUT)
+		call close (fd_usr)
 		call error (30,
 		    "RFT_READ_HEADER: Not a FITS file (no SIMPLE keyword)")
 	    } else if ((nread == 0) && EXTEND(fits) == YES &&
 	        strmatch (card, "^XTENSION") == 0) {
 		XTENSION(fits) = EXT_SPECIAL
 		call flush (STDOUT)
+		call close (fd_usr)
 		call error (30,
 		"RFT_READ_HEADER: Not a FITS extension (no XTENSION keyword)")
 	    } else if (i != LEN_CARD) {
+		call close (fd_usr)
 	        call error (2, "RFT_READ_HEADER: Error reading FITS header")
 	    } else
 	        nread = nread + 1

@@ -125,7 +125,7 @@ begin
 		ip_save = ip
 
 		while (iki_getfield (ip, Memc[strval], SZ_FNAME, delim) > 0) {
-		    call strlwr (Memc[strval])
+		    # call strlwr (Memc[strval])
 
 		    # Skip it if we already have something for this kernel.
 		    if (kset[kernel] == 0) {

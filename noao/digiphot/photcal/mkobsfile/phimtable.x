@@ -806,12 +806,13 @@ end
 # and the list of column numbers defining the fields required by the
 # program.
 
-int procedure ph_mkimtable (imtable, fd, columns, x, y, mag, merr, imid, id,
-	nptr, normtime, sortimid, verbose)
+int procedure ph_mkimtable (imtable, fd, columns, objid, x, y, mag, merr,
+        imid, id, nptr, normtime, sortimid, verbose)
 
 pointer	imtable			# pointer to the symbol table
 int	fd			# file descriptor of the input text file
 int	columns[ARB]		# the list of input columns
+pointer	objid			# pointer to the id array
 pointer	x			# pointer to the x coordinate array
 pointer	y			# pointer to the y coordinate array
 pointer	mag			# pointer to the magnitude array
@@ -823,8 +824,8 @@ int	normtime		# normalize exposure times
 int	sortimid		# does data need to be sorted on imid or id
 int	verbose			# print status, warning and error messages
 
-int	stat, dbufsize, lbufsize
-pointer	sp, fname, image, imname, filterid, line, sym
+int	idcol, stat, dbufsize, lbufsize
+pointer	sp, fname, image, imname, filterid, objname, line, sym
 real	itime, airmass, otime
 
 bool	streq()
@@ -837,10 +838,16 @@ begin
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
 	call salloc (filterid, SZ_FNAME, TY_CHAR)
+	call salloc (objname, DEF_LENLABEL, TY_CHAR)
+
+	# Is there id information.
+	idcol = columns[CAT_ID]
 
 	# Allocate some initial buffer space.
 	if (nptr == 0) {
 	    dbufsize = DEF_BUFSIZE
+	    if (idcol > 0)
+		call malloc (objid, dbufsize * (DEF_LENLABEL+ 1), TY_CHAR)
 	    call malloc (x, dbufsize, TY_REAL)
 	    call malloc (y, dbufsize, TY_REAL)
 	    call malloc (mag, dbufsize, TY_REAL)
@@ -916,8 +923,13 @@ begin
 	    repeat {
 
 		# Decode x, y, magnitude and error.
-		if (ph_stardata (Memc[line], columns, Memr[x+nptr],
-		    Memr[y+nptr], Memr[mag+nptr], Memr[merr+nptr]) == OK) {
+		if (ph_stardata (Memc[line], columns, Memc[objname],
+		    Memr[x+nptr], Memr[y+nptr], Memr[mag+nptr],
+		    Memr[merr+nptr]) == OK) {
+		    if (idcol > 0)
+			call strcpy (Memc[objname],
+			    Memc[objid+nptr*(DEF_LENLABEL+1)],
+			    DEF_LENLABEL)
 		    Memi[imid+nptr] = IMT_IMNO(sym)
 		    IMT_NENTRIES(sym) = IMT_NENTRIES(sym) + 1
 		    Memi[id+nptr] = IMT_NENTRIES(sym)
@@ -927,6 +939,9 @@ begin
 		# Allocate more buffer space if necessary.
 		if (nptr >= dbufsize) {
 		    dbufsize = dbufsize + DEF_BUFSIZE
+		    if (idcol > 0)
+			call realloc (objid, dbufsize * (DEF_LENLABEL + 1),
+			    TY_CHAR)
 	    	    call realloc (x, dbufsize, TY_REAL)
 	            call realloc (y, dbufsize, TY_REAL)
 	            call realloc (mag, dbufsize, TY_REAL)

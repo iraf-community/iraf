@@ -1,4 +1,5 @@
 include <fset.h>
+include "../lib/apphot.h"
 include "../lib/display.h"
 include "../lib/fitsky.h"
 include "../lib/polyphot.h"
@@ -18,10 +19,10 @@ int	pd			# polygon list number
 pointer	gid			# pointer to image display stream
 int	interactive		# interactive or batch mode
 
-int	req_num, prev_num, cier, sier, pier, nvertices, delim
-pointer	sp, x, y
-int	ap_ynextobj(), ap_ycenter(), apfitsky(), ap_yfit(), apstati()
 real	apstatr()
+pointer	sp, x, y, xout, yout
+int	req_num, prev_num, cier, sier, pier, nvertices, delim
+int	ap_ynextobj(), ap_ycenter(), apfitsky(), ap_yfit(), apstati()
 data	delim /';'/
 
 begin
@@ -29,6 +30,8 @@ begin
 	call smark (sp)
 	call salloc (x, MAX_NVERTICES + 1, TY_REAL)
 	call salloc (y, MAX_NVERTICES + 1, TY_REAL)
+	call salloc (xout, MAX_NVERTICES + 1, TY_REAL)
+	call salloc (yout, MAX_NVERTICES + 1, TY_REAL)
 
 	# Initialize
 	if (pl != NULL)
@@ -40,7 +43,7 @@ begin
 	pd = 0
 	prev_num = 0
 	req_num = ld + 1
-	nvertices = ap_ynextobj (py, gid, pl, cl, delim, Memr[x], Memr[y],
+	nvertices = ap_ynextobj (py, im, gid, pl, cl, delim, Memr[x], Memr[y],
 	    MAX_NVERTICES, prev_num, req_num, ld, pd)
 
 	while (nvertices != EOF) {
@@ -65,15 +68,26 @@ begin
 	    # Write the output to a file.
 	    if (id == 1)
 	        call ap_param (py, out, "polyphot")
-	    call ap_yprint (py, out, Memr[x], Memr[y], nvertices, id, ld,
+            switch (apstati(py,WCSOUT)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_ltoo (py, Memr[x], Memr[y], Memr[xout], Memr[yout],
+		    nvertices + 1)
+            case WCS_TV:
+                call ap_ltov (im, Memr[x], Memr[y], Memr[xout], Memr[yout],
+		    nvertices + 1)
+            default:
+		call amovr (Memr[x], Memr[xout], nvertices + 1)
+		call amovr (Memr[y], Memr[yout], nvertices + 1)
+            }
+	    call ap_yprint (py, out, Memr[xout], Memr[yout], nvertices, id, ld,
 	        pd, cier, sier, pier) 
 	    id = id + 1
 
 	    # Setup for next polygon.
 	    prev_num = ld
 	    req_num = ld + 1
-	    nvertices = ap_ynextobj (py, gid, pl, cl, delim, Memr[x], Memr[y],
-	        MAX_NVERTICES, prev_num, req_num, ld, pd)
+	    nvertices = ap_ynextobj (py, im, gid, pl, cl, delim, Memr[x],
+	        Memr[y], MAX_NVERTICES, prev_num, req_num, ld, pd)
 	}   
 
 	call sfree (sp)

@@ -707,7 +707,7 @@ replotcol_
 	call mfree (ynew, TY_REAL)
 	call mfree (xold, TY_REAL)
 	call mfree (yold, TY_REAL)
-	call sl_free (sl, TY_CHAR)
+	call sl_free (sl)
 
 	call gclose (gp)
 	call mw_close (mw)

@@ -1,0 +1,470 @@
+.help detect Sep00 ace
+.ih
+NAME
+detect -- detect and catalog objects in images
+.ih
+SYNOPSIS
+.ih
+USAGE	
+detect images objmasks catalogs
+.ih
+PARAMETERS
+.ls images
+List of images containing objects to be detected.  The images should generally
+have read and write permission to allow addition of header information.
+However, the task will still run without write access with the consequence
+that the header will not be updated.
+.le
+.ls masks = "!BPM"
+List of bad pixel masks for the images.  This may consist of no bad pixel
+mask specified as the empty string "", a single bad pixel mask to apply to
+all images or a list of bad pixel masks which must match the images list.
+Mask names beginning with "!" are image header keywords which point to the
+bad pixel mask.
+.le
+.ls skys = "SKYFIT"
+List of sky images, constant values, sky fit names, or keyword
+indirection.  If only one value is specified then it applies to all input
+images otherwise the list must match the images list.  Values beginning
+with "!" specify image header keywords containing the image name, constant
+value, or sky fit name to be used.  The value is first checked to see
+if an image with that name exists, then if sky fit keywords are in the
+header, and finally if it is a number.  Sky fit keywords are formed from
+the sky fit name with two digit sequence numbers and are interpreted as
+surface fit coefficients.
+
+If none of these are found then the value is treated as the sky fit name
+to be used to save sky fitting performed by this task.
+.le
+.ls sigmas = "SKYSIG"
+List of sky sigma images, constant values, sigma fit names, or keyword
+indirection.  If only one value is specified then it applies to all input
+images otherwise the list must match the images list.  Values beginning
+with "!" specify image header keywords containing the image name, constant
+value, or sigma fit name to be used.  The value is first checked to see
+if an image with that name exists, then if sigma fit keywords are in the
+header, and finally if it is a number.  Sigma fit keywords are formed from
+the sigma fit name with two digit sequence numbers and are interpreted as
+surface fit coefficients.
+
+If none of these are found then the value is treated as the sigma fit name
+to be used to save sky fitting performed by this task.
+.le
+
+The following parameters specify the output.
+.ls objmasks
+List of output object masks.  If no list is given then no object masks
+will be created.  Otherwise there must be one object mask name for each
+input image.  The object mask name will be recorded in the input image
+header and in any output catalog.
+.le
+.ls catalogs
+List of output catalogs.  If no list is given then no catalogs will be
+created.  Otherwise there must be one catalog name for each input image.
+The catalog name will be recorded in the input image header and in any
+object mask.  The catalog is created as a "table" (see \fBtables\fR
+for information about the tables and general tools to interact with the
+tables).  If the name has an explicit ".fits" extension then a FITS binary
+table is created otherwise an IRAF table (".tab" extension) is created.
+.le
+.ls logfiles = "STDOUT"
+List of output log files.  If no list is given then no output log information
+will be produced.  If only one file is specified it applies to all input
+images otherwise the list of files must match the images list.  Note that
+the special name "STDOUT" corresponds to terminal output.
+.le
+
+The following parameters define the initial sky fit determination.  This is
+only done if no sky image or sky constant value and sigma image or sigma
+constant value are specified.
+# Sky
+.ls newsky = no
+Determine new sky fit if one already exists?  When the specified sky
+corresponds to an existing sky fit (the sky fit coefficients are in the
+image header) then this parameter is used to override that fit with a new
+fit.  Otherwise the fit is used and the initial sky fitting is skipped.
+The sky fitting is also skipped if the specified sky is an image or
+constant.
+.le
+.ls nskylines = 100
+Number of sky sample lines to use.  This number of lines spread evenly
+through the image are used to determine the initial sky fit.
+.le
+.ls skyblk1d = 10
+Sky block size for 1D sky estimation. 
+.le
+.ls skyhclip = 2.
+High sky clipping during 1D sky estimation
+.le
+.ls skylclip = 3.
+Low sky clippling during 1D sky estimation
+.le
+.ls skyxorder = 4
+Sky fitting x order
+.le
+.ls skyyorder = 4
+Sky fitting y order
+.le
+.ls skyxterms = "half" (none|half|full)
+Sky fitting y order
+.le
+
+# Iterated Sky
+.ls skyupdate = no
+Update sky after detection iterations?
+.le
+.ls niterate = 1
+Maximum number of sky iterations
+.le
+.ls skyblk2d = 50
+Sky block size during detection
+.le
+.ls maxskyres = 0.2
+Maximum sky residual for iteration
+.le
+
+# Detection
+.ls convolve = "block 3 3"
+Convolution kernel
+.le
+.ls hsigma = 3.
+Sigma threshold above sky
+.le
+.ls lsigma = 10.
+Sigma threshold below sky
+.le
+.ls hdetect = yes
+Detect objects above sky?
+.le
+.ls ldetect = yes
+Detect objects below sky?
+.le
+.ls minpix = 10
+Minimum number of pixels in detected objects
+.le
+.ls sigavg = 4.
+Sigma of mean flux cutoff
+.le
+.ls sigmax = 4.
+Sigma of maximum pixel
+.le
+.ls bpval = 1
+Output bad pixel value
+.le
+
+# Splitting"
+.ls split = yes
+Split objects?
+.le
+.ls splitmax = INDEF
+Maximum sigma above sky for splitting
+.le
+.ls splitstep = 0.4
+Splitting steps in convolved sigma
+.le
+.ls splitthresh = 5.
+Splitting threshold in sigma
+.le
+.ls sminpix = 10
+Minimum number of pixels in split objects
+.le
+.ls ssigavg = 10.
+Sigma of mean flux cutoff
+.le
+.ls ssigmax = 5.
+Sigma of maximum pixel
+.le
+
+
+# Growing"
+.ls ngrow = 2
+Number of grow rings
+.le
+.ls agrow = 2.
+Area grow factor
+.le
+.ih
+DESCRIPTION
+
+SKY DETERMINATION
+
+A critical part of detecting objects in astronomical images is determining
+the background sky and sky sigma at each point in the image.  In the
+following discussion sky means both the mean sky level and the sky sigma.
+\fBDetect\fR provides for either the user to specify the sky or for the
+task to use a sky fitting algorithm.  The user may specify a sky either as
+another image or as a constant value.  Note that the image name or
+value may be specified either explicitly or with a keyword associated
+with the image.
+
+If the sky is not specified by an image or constant value then a surface
+fit to the sky is used.  The surface fit is recorded in the image header as
+a sequence of keywords with a specified name (the keyword prefix which may
+be up to six characters) and two digit sequence number.  The values of the
+keywords contain the coefficients of the fit.  The the surface fit
+coefficients are defined in the SURFACE FIT section.
+
+Note that it is possible to specify the mean sky and the sky sigma in
+different ways.  When one is given as an image or constant and the other
+as a fit.  The one given as an image or constant will be kept fixed and
+the fit determination and updating will be done only on the other.
+
+The sky surface fit is computed in two stages.  There is an initial
+determination using a subsample of image lines.  Then there is an
+optional update of the sky sample during the object detection step.
+The detection step with sky updating may be iterated a specified number
+of times until the maximum difference in the mean sky is less than some
+amount.
+
+INITIAL SKY DETERMINATION
+
+If an existing surface fit is specified then the parameter \fInewsky\fR
+selects whether a new surface fit is to be computed.  If the value is "no"
+then the initial sky determination is skipped though the detection update
+may still be selected.
+
+The initial sky fit uses a combination of block averaging to reduce the
+number of points in the fitting, one dimensional line fitting with sigma
+clipping rejection to eliminate objects, and finally fitting a two
+dimensional surface to the set of block averages over all the sample lines
+which cover the image.
+
+The parameter \fInskylines\fR defines the number of sample lines across
+the image to be used.  The lines are evenly spaced starting with the
+first line and ending with the last line.  The number of lines affects
+how fast the sky estimation is done.
+
+The pixels from the input line are initially all given unit weight.  Bad
+pixels identified by the input bad pixel mask are excluded by setting their
+weights to zero.  A weighted block average, with the weight of each block
+being the sum of the weights, is computed.  The size of the blocks is given
+by the \fIskyblk1d\fR parameter.  This is done to speed the fitting by
+reducing the number of points.  Note that when all pixels in a block have
+zero weight due to the bad pixel mask or subsequent rejection the weight of
+the composite block average point is zero.
+
+If only one of sky mean and sky sigma quantities is being determined with
+the other quantity given by an input image, constant, or previous fit
+then those values are simple block averaged with the same block size
+to produce sample points for the mean sky or sky sigma.  Note that the
+sky sigma of the sample points also requires division by the square root
+of the block size to give the sky sigma per block average point.  The
+line fitting described next is then skipped for this quantity.
+
+The weighted one dimensional line fitting to the block averages uses
+Chebyshev polynomials of order given by the \fIskyxorder\fR.  Note that
+this order is the number of polynomial terms, which is one higher than the
+maximum power of the polynomial so that a value of 3 corresponds to a
+quadratic polynomial.
+
+When the mean sky is being determined, the line fitting is performed and
+the fitted values at the block centers are evaluated.
+
+When the sky sigma is being determined, the absolute value of the residuals
+relative to the mean sky divided by 0.7979 are computed.  A gaussian noise
+distribution will have a mean value of this quantity equal to the sigma of
+the distribution.  In other words, the mean of the absolute deviations of a
+guassian distribution is 0.7979 times sigma.  By fitting a function to
+these residual values a position variable estimate of the sky sigma is
+obtained without needing to compute standard deviations over some set of
+points.  The fitted values at the block centers are evaluated to give the
+sky sigmas for the block averaged data.
+
+With the set of block averaged data points and estimated mean skys and sky
+sigmas points that deviate by more than the number of sigma given by the
+\fIskyhclip\fR and \fIskylclip\fR parameters are rejected by setting their
+weights to zero.  The line fitting is then repeated until no points are
+rejected with a maximum of 10 iterations.
+
+When the iteration completes the block average points for that image line
+are accumulated for a two dimensional surface fit.  Note that the weights
+are used to exclude rejected averages and to weight blocks that had fewer
+points due to bad pixels.  The surface fit is a two dimensional Chebyshev
+polynomial of orders given by the \fIskyxorder\fR and \fIskyyorder\fR.  The
+orders have the same meaning as in the one dimensional polynomial, namely
+the number of terms in powers of x and y.  There are also cross terms which
+are a mixture of powers of both x and y.  The \fIskyxterms\fR select
+whether to use any cross terms, only cross terms whose total power does not
+exceed the maximum of the pure x and y terms, or all combinations of
+powers.
+
+After all the sample lines are completed the final surface fits are
+computed.  The coefficients of the fits are written to the image header
+under the specified sky fit names and the fits are passed on to the
+detection phase.  Note that if the input image is read only then the
+fit will not be written to the header but the task continues.
+
+UPDATED TO SKY DURING DETECTION
+
+
+DETECTION
+
+The detection of objects in an image is conceptually quite simple.  Each
+pixel is compared against the expected sky at that point and if it is
+more that a specified number of sky sigma above the sky it is a candidate
+object pixels.  Candidate object pixels are grouped into objects on the basis
+of being connected along the eight neighboring directions.  The candidate
+object is then accepted if it satisfies the criteria of a minimum
+number of pixels, a sufficiently significant maximum pixel, and a sufficiently
+significant flux above sky.
+
+To detect faint objects where individual pixels are not significantly above
+the sky but all pixels taken together are significant a detection filter is
+applied.  This consists of applying a convolution function to the image and
+performing the detection described in the previous paragraph on the
+convolved pixels with the sky sigma suitable adjusted for the convolution.
+The convolution acts as an optimizing filter for objects with shapes
+corresponding to the convolution weights.  The remaining discussion
+is in terms of the convolved pixel values.  The case of no convolution
+can be thought of as a convolution with a delta function though the
+implementation is not done as a convolution for efficiency.
+
+Two other options to the detection are to also find pixels that are
+significantly below sky (using an independent threshold to that used for
+detecting pixels above sky) and form them into "dark" objects and to
+take the remaining pixels that are not significantly above or below the
+sky and use them to define a sky sample for output or for updating the
+initial sky.
+
+We now go into more detail.  The background sky and sky sigma against which
+the detection is performed is initially set as described earlier.  If desired
+the sky pixels may be accumulated to update the sky.  After updating the
+sky the detection step may be repeated using the new sky.  This is
+discussed  futher when we reach the end of the detection step description.
+
+The convolution is specified by the \fIconvolve\fR parameter.  The values for
+this parameter and the definition of the convolution are given in the
+CONVOLUTION DETECTION FILTER section.  The input pixel data is convolved
+and the sky sigma is appropriately adjusted.
+
+When the central pixel in the convolution is flagged as a bad pixel by the
+bad pixel mask (any non-zero value is a bad pixels) then the convolved
+value is considered to be a bad pixel.  If an output object masks is
+specified the pixel will be marked  with the value specified by the
+\fIbpval\fR parameter.  The value may be set to not show the bad pixel in
+the object mask, to set all input bad pixels to some value, or to pass the
+input bad pixel value to the object mask.  Note that bad pixel masks in the
+object mask must be between 1 and 10 to avoid confusion with the values
+used to identify objects.  If other pixels in the convolution are flagged
+as bad pixels they are excluded from the convolution and the
+convolved sky sigma is adjusted but the convolution value is still used
+as a valid image pixel for detection.
+
+The sigma threshold for pixels to be detected as part of an object above
+sky is given by the \fIhsigma\fR.  This number is multiplied by the sky
+sigma to get the deviation from sky.  As noted earlier the sky sigma is
+for the convolved pixels and the 
+
+
+CONVOLUTION DETECTION FILTER
+
+
+The convolution detection filter is specified with the \fIconvolve\fR
+parameter.  There is only one convolution that can be specified and it applies
+to all input images in a list.  If a null string ("") is specified
+then no convolution is performed.  The task has been optimizations for
+this case to avoid treating this as a 1x1 convolution and to avoid extra
+memory allocations required when a convolution is done.
+
+The convolved value at pixel (i,j), denoted I(i,j), within an image of size
+CxL is defined by
+
+.nf
+    I_convolved(i,j) = sum_kl{I_unconvolved(m,n)*W(k,l)} / sum_kl{W(k,l)}
+.fi
+
+where I(m,n) is the unconvolved value at pixel (m,n), W(k,l) are the NX x
+NY (both must be odd) convolution weights, sum_kl is the double sum over k
+and l, and
+
+.nf
+    m' = i + k - (NX+1)/2	for k = 1 to NX
+    n' = j + l - (NY+1)/2	for l = 1 to NY
+
+    m = m' (1<=m'<=C)	m = 1-m' (m'<1)	  m = 2C-m' (m'>C)
+    n = n' (1<=n'<=L)	n = 1-n' (n'<1)	  n = 2L-n' (m'>L)
+.fi
+
+The last two lines represent boundary reflection at the edges of the image.
+
+The sky sigma of a convolved pixel is approximated by
+
+.nf
+    sigma_convolved(i,j) = sigma_unconvolved(i,j) / sum_kl{W(k,l)}
+.fi
+
+In the presence of bad pixels identified by a bad pixel mask the convolution
+weight applied to a bad pixel is set to zero.  The sum of the weights
+used to normalize the covolution is then modified from the situation with
+no bad pixels.  This will correct the convolved pixel value for the missing
+data and the estimated sky sigma is appropriately larger.
+
+A convolution can be computational slow, especially for larger sizes.
+The implementation of the convolution has been optimized to recognize
+bilinear symmetries or lines which are scaled versions of other lines.
+So if possible such symmetries should be used.  The "block", "bilinear",
+and "gauss" special convolutions described below have such symmetries.
+
+There is also an overhead in checking for bad pixels.  The convolution
+has an optimization to avoid such checks in the case where no bad pixel
+mask is specified.
+
+The \fIconvolve\fR parameter is a string which can take one of the
+following forms.
+
+.ls ""
+There is no convolution or, equivalently, NX=1, NY=1.
+.le
+.ls @[filename]
+The weights are given in the specified file.  The format consists of lines
+of whitespace separated values.  The number of values on each line must be
+the same and defines NX and the number of lines defines NY.
+.le
+.ls block [NX] [NY]
+The weights are all the same and the convolution size is given by the
+two numbers following the word "block".
+.le
+.ls bilinear [NX] [NY]
+The weights are the bilinear matrix product of triangular one dimensional
+matices of sizes given by the two numbers following the word "bilinear".
+The weights are described by the matrix product relation 
+
+.nf
+    [1 ... (NX+1)/2 ... 1] * Transpose{[1 ... (NY+2)/2 ... 1]}
+.fi
+
+For example for NX=5, and NY=3 the weights would be
+
+.nf
+    1 2 3 2 1
+    2 4 6 4 2
+    1 2 3 2 1
+.fi
+.le
+.ls gauss [NX] [NY] [SX] [SY]
+The weights are bidimensional gaussian values on a grid of size NX by NY
+with sigma values SX and SY (real numbers) in units of pixel spacing.
+.le
+.ls [W(1,1)] ... [W(NX,1)], ..., [W(1,NY)] ... [W(NX,NY)]
+The weights are specified as a string of real values.  The values are
+whitespace separated within each line and the lines are delimited by
+comma.  For example
+
+.nf
+                               1 2 1
+    1 2 1, 2 3 2, 1 2 1  ==>   2 3 2
+                               1 2 1
+.le
+
+When a logfile is defined the weights are included in the log output.
+
+
+OBJECT MASKS
+
+.ih
+EXAMPLES
+.ih
+REVISIONS
+.ih
+SEE ALSO
+.endhelp

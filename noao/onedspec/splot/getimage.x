@@ -123,6 +123,7 @@ begin
 
 	call shdr_open (im, mw, nline, nband, nap, SHDATA, sh)
 	nap = AP(sh)
+	nline = LINDEX(sh,1)
 
 	if (DC(sh) == DCNO && !IS_INDEFD(w0))
 	    call usercoord (sh, 'l', 1D0, w0, 2D0, w0+wpc)

@@ -157,12 +157,12 @@ begin
 			    call pargs (Mems[data+i-1])
 			    call pargr (val)
 			if (c1 >= col1) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c1)
 			    call pargi (line)
 			}
 			if (c2 <= col2) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c2)
 			    call pargi (line)
 			}
@@ -410,12 +410,12 @@ begin
 			    call pargi (Memi[data+i-1])
 			    call pargr (val)
 			if (c1 >= col1) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c1)
 			    call pargi (line)
 			}
 			if (c2 <= col2) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c2)
 			    call pargi (line)
 			}
@@ -663,12 +663,12 @@ begin
 			    call pargl (Meml[data+i-1])
 			    call pargr (val)
 			if (c1 >= col1) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c1)
 			    call pargi (line)
 			}
 			if (c2 <= col2) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c2)
 			    call pargi (line)
 			}
@@ -916,12 +916,12 @@ begin
 			    call pargr (Memr[data+i-1])
 			    call pargr (val)
 			if (c1 >= col1) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c1)
 			    call pargi (line)
 			}
 			if (c2 <= col2) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c2)
 			    call pargi (line)
 			}
@@ -1169,12 +1169,12 @@ begin
 			    call pargd (Memd[data+i-1])
 			    call pargd (val)
 			if (c1 >= col1) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c1)
 			    call pargi (line)
 			}
 			if (c2 <= col2) {
-			    call fprintf (fd, "%4d %4d")
+			    call fprintf (fd, " %4d %4d")
 			    call pargi (c2)
 			    call pargi (line)
 			}

@@ -16,8 +16,9 @@ libpkg.a:
 	apgsvw.x	<imio.h>		<imhdr.h>               \
 			<math.h>
 	apgtverify.x	
-	apinit.x	../lib/apphotdef.h	../lib/displaydef.h     \
-			../lib/noisedef.h	../lib/noise.h
+	apinit.x	../lib/apphotdef.h	../lib/apphot.h         \
+			../lib/noisedef.h	../lib/noise.h          \
+			../lib/displaydef.h
 	apinpars1.x	../lib/apphot.h		../lib/noise.h          \
 			../lib/find.h           ../lib/display.h
 	apinpars2.x	../lib/display.h	../lib/center.h		\
@@ -96,4 +97,6 @@ libpkg.a:
 			../lib/apphotdef.h
 	apwparam2.x	../lib/apphotdef.h	../lib/polyphot.h       \
 			../lib/radprof.h	../lib/fitpsf.h
+	apimkeys.x	../lib/apphot.h
+	apwcs.x		../lib/apphot.h		<imio.h>
 	;

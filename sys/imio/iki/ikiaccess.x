@@ -46,8 +46,10 @@ begin
 	}
 
 	call iki_parse (image, root, extn)
-	if (fnullfile (root))
+	if (fnullfile (root)) {
+	    call sfree (sp)
 	    return (1)
+	}
 
 	repeat {
 	    # Convert to absolute pathname to render names like file

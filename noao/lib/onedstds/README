@@ -31,6 +31,8 @@ kpnoextinct.dat -  KPNO extinction table for ONEDSPEC (in Angstroms)
                            FLUX STANDARD DIRECTORIES
                         (eg caldir = onedstds$iidscal/)
 
+      blackbody -  Directory for using blackbody flux distributions in
+		   various magnitude bands.
        bstdscal -  Directory of the brighter KPNO IRS standards (i.e. those 
                    with HR numbers) at 29 bandpasses, data from various
                    sources transformed to the Hayes and Latham system,
@@ -91,6 +93,13 @@ kpnoextinct.dat -  KPNO extinction table for ONEDSPEC (in Angstroms)
 
                        STANDARD STAR MENUS
 
+--------------------------------------------------------------------------------
+Blackbody calibrations in onedstds$blackbody/
+
+U    B    V    R    I   J   H   K   L   Lprime    M
+
+Magnitude conversions are available between V, J, H, K, L, Lprime, and M
+but for U, B, R, and I the star magnitudes must be in the same bandpass.
 --------------------------------------------------------------------------------
 Standard stars in onedstds$bstdscal/
 

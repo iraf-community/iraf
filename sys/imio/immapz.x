@@ -2,6 +2,7 @@
 
 include	<syserr.h>
 include	<error.h>
+include	<mach.h>
 include	<imhdr.h>
 include	<imio.h>
 
@@ -15,9 +16,9 @@ int	acmode			# image access mode
 int	hdr_arg			# length of user fields, or header pointer
 
 pointer	sp, imname, root, cluster, ksection, section, im
-int	min_lenuserarea, len_imhdr, cl_index, cl_size, i
+int	min_lenuserarea, len_imhdr, cl_index, cl_size, i, val
+int	btoi(), ctoi(), envfind(), fnroot(), strlen(), envgeti()
 errchk	im_make_newcopy, im_init_newimage, malloc
-int	btoi(), ctoi(), envfind(), fnroot(), strlen()
 
 begin
 	call smark (sp)
@@ -70,7 +71,20 @@ begin
 	IM_VNBUFS(im) = 1
 	IM_VCOMPRESS(im) = DEF_COMPRESS
 	IM_VADVICE(im) = DEF_ADVICE
+
+	# Initialize the IMIO buffer size defaults.  The builtin defaults
+	# are used unless a value is explicitly set in the environment;
+	# an IMSET on the open descriptor will override either.
+
 	IM_VBUFSIZE(im) = DEF_FIOBUFSIZE
+	ifnoerr (val = envgeti (ENV_BUFSIZE))
+	    IM_VBUFSIZE(im) = val / SZB_CHAR
+	IM_VBUFFRAC(im) = DEF_FIOBUFFRAC
+	ifnoerr (val = envgeti (ENV_BUFFRAC))
+	    IM_VBUFFRAC(im) = val
+	IM_VBUFMAX(im) = DEF_MAXFIOBUFSIZE
+	ifnoerr (val = envgeti (ENV_BUFMAX))
+	    IM_VBUFMAX(im) = val
 
 	# Set fast i/o flag to yes initially to force IMOPSF and hence IMSETBUF
 	# to be called when the first i/o operation occurs.

@@ -29,7 +29,7 @@ begin
 		if (IE_IM(ie) != NULL) {
 		    call fprintf (IE_LOGFD(ie), "# [%d] %s - %s\n")
 			call pargi (IE_INDEX(ie))
-			call pargstr (IE_IMAGE(ie))
+			call pargstr (IE_IMNAME(ie))
 			call pargstr (IM_TITLE(IE_IM(ie)))
 		}
 

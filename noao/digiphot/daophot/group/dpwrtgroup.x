@@ -109,10 +109,14 @@ begin
 	call dp_sparam (tp, "TASK", "group", "name", "")
 
 	# Write the file name parameters.
-	call dp_sparam (tp, "IMAGE", DP_INIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "PHOTFILE", DP_INPHOTFILE(dao), "filename", "")
-	call dp_sparam (tp, "PSFIMAGE", DP_PSFIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "GRPFILE", DP_OUTPHOTFILE(dao), "filename", "")
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "IMAGE", Memc[outstr], "imagename", "")
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PHOTFILE", Memc[outstr], "filename", "")
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PSFIMAGE", Memc[outstr], "imagename", "")
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "GRPFILE", Memc[outstr], "filename", "")
 
 	# Write out relevant data parameters.
 	call dp_rparam (tp, "SCALE", DP_SCALE(dao), "units/pix", "")
@@ -178,10 +182,14 @@ begin
 	call tbhadt (tp, "TASK", "group")
 
 	# Write the file name parameters.
-	call tbhadt (tp, "IMAGE", DP_INIMAGE(dao))
-	call tbhadt (tp, "PHOTFILE", DP_INPHOTFILE(dao))
-	call tbhadt (tp, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call tbhadt (tp, "GRPFILE", DP_OUTPHOTFILE(dao))
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "IMAGE", Memc[outstr])
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PHOTFILE", Memc[outstr])
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PSFIMAGE", Memc[outstr])
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "GRPFILE", Memc[outstr])
 
 	# Write out relevant data parameters.
 	call tbhadr (tp, "SCALE", DP_SCALE(dao))
@@ -212,9 +220,10 @@ end
 
 # DP_WRTGROUP -- Write out each group into a text file or an ST table.
 
-procedure dp_wrtgroup (dao, grp, number, index, group_size, maxgroup)
+procedure dp_wrtgroup (dao, im, grp, number, index, group_size, maxgroup)
 
 pointer	dao			# pointer to daophot structure
+pointer	im			# the input image descriptor
 int	grp			# the output file descriptor
 int	number[ARB]		# number in group of each size
 int	index[ARB]		# index to results
@@ -223,9 +232,11 @@ int	maxgroup		# maximum group size
 
 begin
 	if (DP_TEXT(dao) == YES)
-	    call dp_xwrtgroup (dao, grp, number, index, group_size, maxgroup)
+	    call dp_xwrtgroup (dao, im, grp, number, index, group_size,
+	        maxgroup)
 	else
-	    call dp_twrtgroup (dao, grp, number, index, group_size, maxgroup)
+	    call dp_twrtgroup (dao, im, grp, number, index, group_size,
+	        maxgroup)
 end
 
 
@@ -241,9 +252,10 @@ define GR_DATASTR "%-9d%10t%-6d%16t%-10.3f%26t%-10.3f%36t%-12.3f%48t%-15.7g\
 
 # DP_XWRTGROUP -- Write each group into the GROUP output ST table.
 
-procedure dp_xwrtgroup (dao, grp, number, index, group_size, maxgroup)
+procedure dp_xwrtgroup (dao, im, grp, number, index, group_size, maxgroup)
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 int	grp			# the output file descriptor
 int	number[ARB]		# number in group of each size
 int	index[ARB]		# index to results
@@ -294,6 +306,7 @@ begin
 		y = Memr[DP_APYCEN(apsel)+j-1]
 		if (IS_INDEFR(x) || IS_INDEFR(y))
 		    break
+		call dp_wout (dao, im, x, y, x, y, 1)
 
 		# Get the rest of the numbers.
 		id = Memi[DP_APID(apsel)+k-1]
@@ -334,9 +347,10 @@ end
 
 # DP_TWRTGROUP -- Write each group into the GROUP output text file.
 
-procedure dp_twrtgroup (dao, grp, number, index, group_size, maxgroup)
+procedure dp_twrtgroup (dao, im, grp, number, index, group_size, maxgroup)
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 pointer	grp			# pointer to group output file
 int	number[ARB]		# number in group of each size
 int	index[ARB]		# index to results
@@ -392,6 +406,7 @@ begin
 		y = Memr[DP_APYCEN(apsel)+j-1]
 		if (IS_INDEFR(x) || IS_INDEFR(y))
 		    break
+		call dp_wout (dao, im, x, y, x, y, 1)
 
 		# Get the rest of the values.
 		id = Memi[DP_APID(apsel)+k-1]

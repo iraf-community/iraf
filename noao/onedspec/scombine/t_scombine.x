@@ -88,6 +88,8 @@ begin
 	i = nowhite (Memc[weight], Memc[weight], SZ_FNAME)
 
 	# Check parameters, map INDEFs, and set threshold flag
+	if (combine == SUM)
+	    reject1 = NONE
 	if (pclip1 == 0. && reject1 == PCLIP)
 	    call error (1, "Pclip parameter may not be zero")
 	if (IS_INDEFR (blank))
@@ -510,18 +512,18 @@ double	z			# redshift
 char	coeff[ARB]		# nonlinear coefficient array
 
 bool	clgetb()
-int	i, clgeti()
-double	w2, aux, clgetd()
+int	i, nwa, clgeti()
+double	w2, aux, w1a, w2a, dwa, clgetd()
 pointer	sh
 
 begin
 	if (clgetb ("first"))
 	    return
 
-	w1 = clgetd ("w1")
-	w2 = clgetd ("w2")
-	dw = clgetd ("dw")
-	nw = clgeti ("nw")
+	w1a = clgetd ("w1")
+	w2a = clgetd ("w2")
+	dwa = clgetd ("dw")
+	nwa = clgeti ("nw")
 	if (clgetb ("log"))
 	    dtype = DCLOG
 	else
@@ -538,6 +540,11 @@ begin
 		}
 	    }
 	}
+
+	w1 = w1a
+	w2 = w2a
+	dw = dwa
+	nw = nwa
 
 	# Starting wavelength
 	if (IS_INDEFD (w1)) {
@@ -609,6 +616,15 @@ begin
 	if (IS_INDEFI (nw))
 	    nw = int ((w2 - w1) / dw + 0.5) + 1
 
-	# Force the ending wavelength
-	w2 = w1 + (nw - 1) * dw
+	# Adjust the values.
+	if (IS_INDEFD (dwa))
+	    dw = (w2 - w1) / (nw - 1)
+	else if (IS_INDEFD (w2a))
+	    w2 = w1 + (nw - 1) * dw
+	else if (IS_INDEFD (w1a))
+	    w1 = w2 - (nw - 1) * dw
+	else {
+	    nw = int ((w2 - w1) / dw + 0.5) + 1
+	    w2 = w1 + (nw - 1) * dw
+	}
 end

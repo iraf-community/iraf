@@ -167,4 +167,4 @@ BUGS
 .ih
 SEE ALSO
 images.imcombine, images.imarith, proto.bscale, images.imtrans, proto.irmosaic
-
+.endhelp

@@ -56,7 +56,7 @@ begin
 	nspec = 0
 	list = imtopenp ("spectra")
 	call clgstr ("units", Memc[units], SZ_LINE)
-	if (nowhite (Memc[units], Memc[units], SZ_LINE) == 0)
+	if (nowhite (Memc[units], Memc[cmd], SZ_LINE) == 0)
 	    call strcpy ("display", Memc[units], SZ_LINE)
 	while (imtgetim (list, Memc[cmd], SZ_FNAME) != EOF) {
 	    iferr (call sp_gdata (Memc[cmd], Memc[units], i, sps, nspec))

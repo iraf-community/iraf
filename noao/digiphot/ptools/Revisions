@@ -1,13 +1,18 @@
 .help revisions Jan90 noao.digiphot.ptools
 .nf
-ptools$*/mkpkg
-    Added some missing file dependencies to the ptools package mkpkg files.
+ptools$pconvert/ptconvert.x
+ptools$pconvert/txtools/ptxcalc.x
+ptools$pconvert/txtools/ptxdump.x
+ptools$pconvert/txtools/ptxselect.x
+    Added missing xev_freeop calls to the pconvert, txcalc, txdump, and
+    txselect tasks so that memory is released if any of the input operands
+    are strings.
 
-    (Davis, September 30, 1999)
-     
+    (Davis, March 6, 2002)
+
+
 ptools$mkpkg
-    Modified the build procedures to support picking up user compile and
-    link flags.
+    Modified the mkpkg procedures to pick up user compile and link flags.
 
     (Davis, June 17, 1999)
 
@@ -15,7 +20,7 @@ ptools$ptools.cl
     Modified the package cl script to check and see if the tables package is
     already loaded before checking to see if it exists and then loading it.
 
-   (Davis, August 1, 1998)
+    (Davis, August 1, 1998)
 
 ptools$pdump.cl
     Modified the way the pdump script handles the tdump pwidth parameter
@@ -32,8 +37,8 @@ ptools$pconcat.cl
     (Davis, July 28, 1997)
 
 ptools$txtools/t_txselect.x
-    Changed the maximimum size of the expression to be evaluated from SZ_FNAME
-    to SZ_LINE which is what it was supposed to be.
+    Changed the maximimum size of the expression to be evaluated from
+    SZ_FNAME to SZ_LINE which is what it was supposed to be.
 
     (Davis, May 25, 1996)
 
@@ -64,26 +69,19 @@ ptools/ptutils/t_tbkeycol.x
 
     (Davis, March 21, 1995)
 
+
 ptools/tbconcat.cl
     Add a test for the existence of the ttools.keypar.silent parameter
     for backwards compatability between tables 1.3.3 and 1.3.2.
 
-    (Davis, Feb 25, 1994)
+    (Davis, Feb 25, 1995)
 
 ptools/pexamine/ptplot.x
     An off the end of the array computation error in the routine pt_hplot
     was causing an invalid floating point operation on the Dec Alpha when
     the user tried to plot the histogram of an array,
 
-    (Davis, Feb 23, 1994)
-
-
-ptools/pdump.cl
-    A reference was being made to a tdump task parameter outside of the
-    loop for processing ST binary tables files causing an "unknown task
-    tdump" error for users which do not have the tables package defined.
-
-    (Davis, Dec 20, 1994)
+    (Davis, Feb 23, 1995)
 
 ptools/pconvert/ptdeftable.x
     Modified the pconvert task so that header space is preallocated rather
@@ -91,14 +89,7 @@ ptools/pconvert/ptdeftable.x
     by decreasing the number of disk writes required. This change was
     made in response to a suggestion from PHil Hodge at ST.
 
-    (Davis, Feb 2, 1994)
-
-ptools/pconvert/ptdeftable.x
-    The pconvert task was refusing to append data to existing tables with
-    multi-valued columns, e.g. MAG[1] etc.
-
-    (Davis, July 27 1993)
-
+    (Davis, Feb 2, 1995)
 
 ptools/txtools/t_txcalc.x
 ptools/txtools/ptxcalc.x

@@ -1,6 +1,8 @@
 	 ccfind - Find catalog sources in an image 
+	  ccget - Extract objects from a text file catalog
 	  ccmap - Compute image plate solutions using matched coordinate lists
        ccsetwcs - Create an image celestial wcs from the ccmap plate solution
+          ccstd - Transform to and from standard astrometric coordinates
 	 cctran - Transform coordinate lists using the ccmap plate solution
       ccxymatch - Match celestial and pixel coordinate lists
        imcctran - Transform image header from one celestial wcs to another

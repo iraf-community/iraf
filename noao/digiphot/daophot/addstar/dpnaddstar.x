@@ -167,11 +167,16 @@ begin
 	call dp_sparam (tp, "TASK", "addstar", "name", "")
 
 	# Write the file name parameters.
-	call dp_sparam (tp, "IMAGE", DP_INIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "PHOTFILE", DP_INPHOTFILE(dao), "filename", "")
-	call dp_sparam (tp, "PSFIMAGE", DP_PSFIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "ADDIMAGE", DP_OUTIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "ADDFILE", DP_OUTPHOTFILE(dao), "filename", "")
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "IMAGE", Memc[outstr], "imagename", "")
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PHOTFILE", Memc[outstr], "filename", "")
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PSFIMAGE", Memc[outstr], "imagename", "")
+	call dp_imroot (DP_OUTIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "ADDIMAGE", Memc[outstr], "imagename", "")
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "ADDFILE", Memc[outstr], "filename", "")
 
 	# Write out relevant data parameters.
 	call dp_rparam (tp, "SCALE", DP_SCALE(dao), "units/pix", "")
@@ -229,11 +234,16 @@ begin
 	call tbhadt (tp, "TASK", "group")
 
 	# Write the file name parameters.
-	call tbhadt (tp, "IMAGE", DP_INIMAGE(dao))
-	call tbhadt (tp, "PHOTFILE", DP_INPHOTFILE(dao))
-	call tbhadt (tp, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call tbhadt (tp, "ADDIMAGE", DP_OUTIMAGE(dao))
-	call tbhadt (tp, "ADDFILE", DP_OUTPHOTFILE(dao))
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "IMAGE", Memc[outstr])
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PHOTFILE", Memc[outstr])
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PSFIMAGE", Memc[outstr])
+	call dp_imroot (DP_OUTIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "ADDIMAGE", Memc[outstr])
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "ADDFILE", Memc[outstr])
 
 	# Write out relevant data parameters.
 	call tbhadr (tp, "SCALE", DP_SCALE(dao))

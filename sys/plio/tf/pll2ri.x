@@ -15,14 +15,22 @@ int	npix			#I number of pixels to convert
 
 int	pv, hi
 bool	skipword
-int	opcode, data, ll_len
+int	opcode, data, ll_len, ll_first
 int	x1, x2, i1, i2, xe, np, rn, ip
 define	range_ 91
 define	putrange_ 92
  
 begin
+	# Support old format line lists.
+	if (LL_OLDFORMAT(ll_src)) {
+	    ll_len = OLL_LEN(ll_src)
+	    ll_first = OLL_FIRST
+	} else {
+	    ll_len = LL_LEN(ll_src)
+	    ll_first = LL_FIRST(ll_src)
+	}
+
 	# No pixels?
-	ll_len = LL_LEN(ll_src)
 	if (npix <= 0 || ll_len <= 0)
 	    return (0)
  
@@ -32,7 +40,7 @@ begin
 	x1 = 1
 	hi = 1
 
-	do ip = LL_FIRST, ll_len {
+	do ip = ll_first, ll_len {
 	    if (skipword) {
 		skipword = false
 		next

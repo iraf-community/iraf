@@ -1,7 +1,7 @@
 include <fset.h>
 include	<ctype.h>
 include <math.h>
-include "../../lib/skywcs.h"
+include <pkg/skywcs.h>
 
 
 define	MAX_FIELDS	100		# Maximum number of fields in list

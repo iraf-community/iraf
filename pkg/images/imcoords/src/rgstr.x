@@ -51,11 +51,13 @@ begin
 
 	    # Replace the field.
 	    if (cfptr != 0) {
-		if (laxno[cfptr] == 0)
-	            call li_format_fieldr (INDEFR, Memc[field], maxch,
-		        Memc[formats[cfptr]], nsdig[cfptr], width,
-			min_sigdigits)
-		else
+		if (laxno[cfptr] == 0) {
+		    Memc[field] = EOS
+		    next
+	            #call li_format_field$t ($INDEF$T, Memc[field], maxch,
+		        #Memc[formats[cfptr]], nsdig[cfptr], width,
+			#min_sigdigits)
+		} else
 	            call li_format_fieldr (coords[laxno[cfptr]], Memc[field],
 		        maxch, Memc[formats[laxno[cfptr]]], nsdig[laxno[cfptr]],
 		        width, min_sigdigits)
@@ -77,10 +79,12 @@ begin
 	do cfptr = ncin + 1, ncout {
 
 	    # Copy out the extra fields if any.
-	    if (laxno[cfptr] == 0)
-	        call li_format_fieldr (INDEFR, Memc[field], maxch, "%g",
-		    min_sigdigits, width, min_sigdigits)
-	    else
+	    if (laxno[cfptr] == 0) {
+		Memc[field] = EOS
+		next
+	        #call li_format_field$t ($INDEF$T, Memc[field], maxch, "%g",
+		    #min_sigdigits, width, min_sigdigits)
+	    } else
 	        call li_format_fieldr (coords[laxno[cfptr]], Memc[field],
 		    maxch, Memc[formats[laxno[cfptr]]], nsdig[laxno[cfptr]],
 		    width, min_sigdigits)
@@ -153,11 +157,13 @@ begin
 
 	    # Replace the field.
 	    if (cfptr != 0) {
-		if (laxno[cfptr] == 0)
-	            call li_format_fieldd (INDEFD, Memc[field], maxch,
-		        Memc[formats[cfptr]], nsdig[cfptr], width,
-			min_sigdigits)
-		else
+		if (laxno[cfptr] == 0) {
+		    Memc[field] = EOS
+		    next
+	            #call li_format_field$t ($INDEF$T, Memc[field], maxch,
+		        #Memc[formats[cfptr]], nsdig[cfptr], width,
+			#min_sigdigits)
+		} else
 	            call li_format_fieldd (coords[laxno[cfptr]], Memc[field],
 		        maxch, Memc[formats[laxno[cfptr]]], nsdig[laxno[cfptr]],
 		        width, min_sigdigits)
@@ -179,10 +185,12 @@ begin
 	do cfptr = ncin + 1, ncout {
 
 	    # Copy out the extra fields if any.
-	    if (laxno[cfptr] == 0)
-	        call li_format_fieldd (INDEFD, Memc[field], maxch, "%g",
-		    min_sigdigits, width, min_sigdigits)
-	    else
+	    if (laxno[cfptr] == 0) {
+		Memc[field] = EOS
+		next
+	        #call li_format_field$t ($INDEF$T, Memc[field], maxch, "%g",
+		    #min_sigdigits, width, min_sigdigits)
+	    } else
 	        call li_format_fieldd (coords[laxno[cfptr]], Memc[field],
 		    maxch, Memc[formats[laxno[cfptr]]], nsdig[laxno[cfptr]],
 		    width, min_sigdigits)

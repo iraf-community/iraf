@@ -1,5 +1,208 @@
 .help revisions Jun88 images.tv
 .nf
+pkg/images/tv/display/t_display.x
+    Removed an unused extern declaration for ds_errfcn() which was causing
+    a link failure on the alpha (6/12/02, MJF)
+
+pkg/images/tv/tvmark/mktools.x
+pkg/images/tv/tvmark/mkoutname.x
+    Fixed a bug in the default output image name code that would result in
+    hidden images with names like .snap.1, .snap.2, etc being written
+    if the display image name included a kernel or pixel section.
+    Davis (3/21/02)
+
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/imdmapping.x
+    Added a check for the image name being "dev$pix" and if so prevented
+    this from being expanded to the full node!prefix pathname.  Previously
+    the WCS would be written with a path like 'tucana!/iraf/iraf/dev/pix'
+    and would trigger an ambiguous image name error in clients like IMEXAM
+    which need to readback the image name with a WCS query. (3/4/02, MJF)
+
+pkg/images/tv/imexamine/iegimage.x
+    When imexmaine fails to map the image name returned by the display
+    server it uses the frame buffer.  Previously there was no warning
+    message about failing to map the image.  Now there is a warning.
+    This is only given once until there is no error or the error message
+    changes either by going to a new frame buffer or doing a new display.
+    (3/4/02, Valdes)
+
+pkg/images/tv/imexamine/iegimage.x
+pkg/images/tv/imexamine/t_imexam.x
+    When the frame buffer is used as the image source (when the image name
+    in the display frame cannot be mapped) the final imunmap would
+    attempt to unmap the same descriptor twice.  (3/1/02, Valdes)
+
+pkg/images/tv/imexamine/iegimage.x
+    The 'p' was not properly updated for the multiple WCS changes.
+    (2/26/02, Valdes)
+
+pkg/images/tv/imexamine/iegimage.x
+    The changes to support multiple WCS per frame involved keeping track of
+    the full WCS frame id (i.e. 101) rather than just the frame number.
+    There was a minor error in this bookkeeping when incrementing the
+    the next display frame to be used.  (2/19/02, Valdes)
+
+pkg/images/tv/display/sigm2.x
+    The routine to compute the maximum value as the interpolated quantity
+    was incorrect because the size of the input and output arrays were
+    treated as the same when they are not.  This is used for overlay
+    display which produced the symptom of horizontal lines.  (2/5/02, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+    Added the feature that the bad pixel mask or overlay mask may be
+    specified by a keyword value with the syntax !<keyword>.  This is
+    important for multiextension files where various masks are set
+    as keywords.  The new task OBJMASKS also writes the object mask name
+    that is created for an image in the header.  Use of !objmask then
+    allows the object mask to be used for the bad pixel mask (to set
+    the scaling using only sky pixels) and for overlay.  (2/5/02, Valdes)
+
+pkg/images/tv/imedit/epimcopy.x
+    Added a missing TY_USHORT branch to the image copy routines.
+    (10/10/01, LED)
+
+pkg/images/tv/display/imdgetwcs.x
+pkg/images/tv/display/imdputwcs.x
+pkg/images/tv/display/imdsetwcs.x
+    Modified to allow read/write of the additional mapping information
+    during WCS i/o.  If the iis_version flag is non-zero and a valid mapping
+    exists, the set/put wcs routines will automatically format the WCS text
+    to include this information, otherwise it writes the old WCS text.  If
+    iis_version is non-zero and a server query returns mapping information
+    this will be stored in the iis common for later retrieval by the
+    imd_getmapping() routine.  (06/21/01, MJF)
+
+pkg/images/tv/display/imdwcsver.x
+	Removed 'frame' number argument form the procedure.  The procedure
+    will now map frame one if no connection is already opened and query the
+    WCS.  Returns non-zero if the server is capable of using the new mapping
+    structures.  Required to be called explicitly by programs using mappings
+    to initialize the imd interface for this functionality.  (06/21/01, MJF)
+
+pkg/images/tv/display/t_display.x
+	Removed earlier addition of ds_setwcs() function since this is now
+    handled by the standard imd_putwcs() interface.  Mapping information
+    is set prior to the WCS write with imd_setmapping().  (06/21/01, MJF)
+
+pkg/images/tv/display/mkpkg
+	Updated dependencies (06/21/01, MJF)
+
+pkg/images/tv/display/imdmapping.x		+
+	New routines imd_[sg]etmapping() allow a program to set the
+    mapping to be sent with the next imd_putwcs() call, or retrieve the
+    mapping info sent by the server with the last wcs query.  The calls
+    are no-ops if the connected server doesn't know about the new
+    mappings, imd_getmapping() is an integer function which returns
+    non-zero if a valid mapping is available.  A new imd_query_map() is
+    available to return the mapping information for a given WCS number.
+    The intent is that the mapping can be obtained for a wcs returned by a
+    cursor read, e.g. to get the image name associated with the mapping.
+    (6/21/01, MJF)
+
+pkg/images/tv/display/iis.com
+	Added new variables to the IIS common to hold the mapping
+    information for each WCS write.  In order to preserve the imd interfaces
+    it was necessary to save the mappings in the common, along with a flag
+    indicating whether the connected server can use them. (06/21/01, MJF)
+
+pkg/images/tv/display/iisopn.x
+    Added initialization of the iis_version value at device open time
+    (6/21/01, MJF)
+
+pkg/images/tv/display/gwindow.h
+    Removed struct element W_WCSVER added earlier, no longer needed.
+    (6/21/01, MJF)
+
+pkg/images/tv/display/t_display.x
+    Replaced call to alogr with direct call to log10 to avoid having to
+    define and error function for the vops operator.  (6/15/01, Valdes)
+
+pkg/images/tv/display/sigm2.x
+    Removed extra arguments in amaxr call.  (6/15/01, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+    Added missing arguments to mw_ctrand.  (6/15/01, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+    Fixed problems with ds_match.  The new version is more robust and
+    correct.  A bad pixel for the displayed image is the maximum of all
+    pixels in the pixel mask which fall within the display pixel.   This
+    version still does not allow any relative rotations but does allow
+    non-integer offsets.  (4/24/01, Valdes)
+
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/imdgetwcs.x
+pkg/images/tv/display/imdwcsver.x
+pkg/images/tv/display/iis.h
+    Compatability fixes for the new WCS strings and "old" servers.  The
+    WCS version query is now carried out with a read request using the old
+    WCS data size (320) to avoid blocked reads from old servers not sending
+    the 1024-char data.  imd_getwcs() was modified to query the server for
+    the version before the actual wcs query and the request is made with the
+    appropriate size.  In the case of a WCS query the IIS 'x' register is
+    used to signal that the new format is being used, the WCS version is
+    passed back if the 'y' register is non-zero.  Neither of these registers
+    was used by the old protocol, the new ximtool checks these registers and
+    responds by using the correct WCS buffer size.  (03/12/01, MJF)
+
+pkg/images/tv/display/t_display.x
+    Removed the code which stripped the path-prefix and section from
+    the image name displayed in the title string.  This was originally
+    done to save space but confuses tasks like IMEXAM which rely on
+    this to map the image.  (02/26/01, MJF)
+
+pkg/images/tv/display/iis.h	
+    Somehow the SZ_WCSTEXT value got reset to 320, this was causing
+    a problem with TVMARK redrawing the display.  Reset to 1024.
+    (02/26/01, MJF)
+
+pkg/images/tv/display/t_display.x
+    Changes to detect and use new WCS strings (12/04/00, MJF)
+
+pkg/images/tv/display/gwindow.h
+    Added struct element W_WCSVER (12/04/00, MJF)
+
+pkg/images/tv/display/iis.h
+    Added definitions for 16-frame support, increased the size of
+    the SZ_WCSTEXT to 1024 (12/04/00, MJF)
+
+pkg/images/tv/display/mkpkg 
+pkg/images/tv/display/imdwcsver.x     	+
+    Added a routine which does a WCS query with the X register set
+    to check whether the server can handle the new WCS strings.  If
+    the reply is "version=<num>" we use the new stuff, otherwise it's
+    a no-op and we use the old format strings. (12/04/00, MJF)
+
+pkg/images/tv/display/t_display.x
+    Fixed an off-by-one error in WCS sent to the display when the display
+    buffer is smaller than the image.  (9/5/00, Valdes)
+
+pkg/images/tv/imexamine/t_imexam.x
+pkg/images/tv/imexamine/timexam.x	+
+pkg/images/tv/imexamine/iecolon.x
+pkg/images/tv/imexamine/mkpkg
+pkg/images/tv/imexamine.par
+pkg/images/tv/doc/imexamine.hlp
+lib/scr/imexamine.key
+    Added new key 't' to ouput an image section centered on the cursor.
+    (9/2/00, Valdes)
+
+pkg/images/tv/display/dspmmap.x
+    Masks were being copied internally in short which would truncate masks
+    having larger values.  (5/16/00, Valdes)
+
+=========
+V2.11.3p2
+=========
+
+pkg/images/tv/imedit/t_imedit.x
+pkg/images/tv/imedit/epimcopy.x
+    Added some errchks.  In particular, even though the output and working
+    images can be mapped without an error there could be an error in the
+    first I/O as when the imdir directory is not available/writeable.
+    (1/18/00, Valdes)
+
 pkg/images/tv/imedit/t_imedit.x
     The use of a temporary image causes the output image type to be
     set by "imtype" instead of any explicit extension.  Changed to

@@ -301,6 +301,9 @@ begin
 end
 
 
+# DP_VFITRAD -- Confirm the fitting radius.
+
+
 # DP_VDATAMIN-- Verify the minimum good data value.
 
 procedure dp_vdatamin (dao)
@@ -558,4 +561,3 @@ begin
 	    call pargr (sdannulus)
 	    call pargr (dannulus)
 end
-

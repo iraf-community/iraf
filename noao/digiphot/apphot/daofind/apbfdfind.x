@@ -117,7 +117,7 @@ begin
 
 	# Find the stars.
 	stid = 1
-	nstars = ap_find (im, cnv, out, NULL, Memr[gker2d],
+	nstars = ap_find (ap, im, cnv, out, NULL, Memr[gker2d],
 	    Memi[skip], nxk, nyk, skymode, threshold, relerr,
 	    apstati (ap,POSITIVE), xsigsq, ysigsq, dmin, dmax,
 	    apstatr (ap, SHARPLO), apstatr (ap, SHARPHI), apstatr (ap,

@@ -66,7 +66,7 @@ begin
 	    }
 
 	    # Load data
-	    cur_pix = imgl1r (im[tog], 1)
+	    cur_pix = imgl1r (im[tog])
 
 	    # Allocate space for the sum
 	    if (mod (ifile,2) == 0) {

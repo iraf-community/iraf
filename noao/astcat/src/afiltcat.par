@@ -1,0 +1,27 @@
+# The AFILTCAT parameter file.
+
+# The input and output catalog parameters.
+
+input,s,a,"",,,"The input catalogs(s)"
+output,s,a,"",,,"The output catalogs(s)"
+acatpars,pset,h,"",,,"The default catalog format parameters"
+
+# The astrometric catalog parameters.
+
+catalogs,s,h,filename@noao,,,"The input astrometric catalog"
+
+# The output catalog filtering parameters.
+
+standard,b,h,yes,,,Output a standard catalog ?
+filter,b,h,yes,,,"Filter the output catalog ?"
+afiltpars,pset,h,"",,,The catalog filtering parameters
+
+# The taskmode  parameters
+
+update,b,h,no,,,"Update algorithm parameters at task termination ?"
+verbose,b,h,yes,,,"Print task status messages ?"
+
+# The task configuration parameters.
+catdb,s,h,)_.catdb,,,"The astrometric catalog configuration file"
+
+mode,s,h,"ql",,,

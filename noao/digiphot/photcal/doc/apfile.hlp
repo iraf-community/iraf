@@ -302,7 +302,7 @@ q	Quit task
 
 :show   parameters   Show the initial cog model parameter values
 :show   model	     Show the fitted cog model parameters
-:show   seeiing      Show the computed seeing radii for all images
+:show   seeing       Show the computed seeing radii for all images
 :image  [value]      Show/set the image to be analyzed
 
 	Colon Parameter Editing Commands

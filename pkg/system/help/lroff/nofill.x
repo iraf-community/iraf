@@ -23,12 +23,13 @@ begin
 	call smark (sp)
 	call salloc (rjbuf, SZ_IBUF, TY_CHAR)
 
-	call breakline (out)
+	call breakline (out, NJ)
 
 	while (input (in, linebuf) != EOF) {
 	    command = nextcmd (linebuf, ip)
 	    switch (command) {
 	    case FI, ENDHELP:
+		call sfree (sp)
 		return (command)
 	    case RJ:				# right justify text
 		if (input (in, Memc[rjbuf]) == EOF)

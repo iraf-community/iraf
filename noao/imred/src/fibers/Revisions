@@ -1,5 +1,26 @@
 .help revisions Nov90 noao.imred.src.fibers
 .nf
+
+=======
+V2.12.1
+=======
+
+srcfibers$skysub.cl
+    Added a flpr to workaround a FITS kernel caching problem.
+    (6/21/02, Valdes)
+
+=====
+V2.12
+=====
+
+srcfibers$proc.cl
+    Modified code to eliminate goto.  This is for use with pyraf.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
+
 srcfibers$arcrefs.cl
     The test for crval/cdelt both INDEF was not working.  (9/24/99, Valdes)
 

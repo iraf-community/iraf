@@ -304,6 +304,7 @@ begin
 
 	    if (stat == YES)
 		break
+	    call rg_xindefr (xc)
 	}
 
 	if (verbose == YES)

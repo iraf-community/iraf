@@ -1,5 +1,5 @@
 include <fset.h>
-include "../../lib/skywcs.h"
+include <pkg/skywcs.h>
 
 procedure t_skyctran()
 
@@ -97,10 +97,10 @@ begin
 	    # reserved for the image display cursor.
 	    if (streq (Memc[inname], "imcursor") && mwin != NULL) {
 		infd = NULL
-		optype = sk_stati (cooin, S_PTYPE)
-		call sk_seti (cooin, S_PTYPE, PIXTYPE_TV)
+		optype = sk_stati (cooin, S_PIXTYPE)
+		call sk_seti (cooin, S_PIXTYPE, PIXTYPE_TV)
 	    } else if (streq (Memc[inname], "grid")) {
-		optype = sk_stati (cooin, S_PTYPE)
+		optype = sk_stati (cooin, S_PIXTYPE)
 		infd = NULL
 	    } else
 		infd = open (Memc[inname], READ_ONLY, TEXT_FILE)
@@ -176,7 +176,7 @@ begin
 	                ilngunits, ilatunits, olngunits, olatunits,
 			Memc[olngformat], Memc[olatformat])
 		else if (instat == ERR || outstat == ERR)
-		    call sk_copy (infd, outfd, lngcolumn, latcolumn,
+		    call sk_copytran (infd, outfd, lngcolumn, latcolumn,
 		        transform)
 		else
 	            call sk_listran (infd, outfd, mwin, mwout, cooin, cooout,
@@ -194,7 +194,7 @@ begin
 	    if (infd != NULL)
 	        call close (infd)
 	    else
-		call sk_seti (cooin, S_PTYPE, optype)
+		call sk_seti (cooin, S_PIXTYPE, optype)
 
 	    first_file = false
 	}

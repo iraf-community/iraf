@@ -462,7 +462,42 @@ begin
 		fd1 = ""; delete (objs, verify=no)
 		apscript.ansfitscatter = "NO"
 		apscript.ansfitsmooth = "NO"
-		goto batch
+
+		flprcache
+		batch.objects = objects
+		batch.datamax = datamax
+		batch.response = response
+		batch.arcs1 = arcs1
+		batch.arcs2 = arcs2
+		batch.arcref1 = arcref1
+		batch.arcref2 = arcref2
+		batch.arcreplace = arcreplace
+		batch.apidtable = apidtable
+		batch.arcrefs = arcrefs
+		batch.extn = extn
+		batch.objaps = objaps
+		batch.skyaps = skyaps
+		batch.arcaps = arcaps
+		batch.objbeams = objbeams
+		batch.skybeams = skybeams
+		batch.arcbeams = arcbeams
+		batch.done = done
+		batch.logfile = log1
+		batch.redo = reextract
+		batch.update = update
+		batch.scattered = scattered
+		batch.arcap = arcap
+		batch.dispcor = dispcor
+		batch.savearcs = savearcs
+		batch.skyalign = skyalign
+		batch.skysubtract = skysubtract
+		batch.saveskys = saveskys
+		batch.newaps = newaps
+		batch.newresp = newresp
+		batch.newdisp = newdisp
+		batch.newarcs = newarcs
+		dobatch = yes
+		return
 	    }
 
 	    # Process the spectrum in foreground.
@@ -662,42 +697,4 @@ begin
 
 	if (access (done))
 	    delete (done, verify=no)
-
-	bye
-
-batch:
-	flprcache
-	batch.objects = objects
-	batch.datamax = datamax
-	batch.response = response
-	batch.arcs1 = arcs1
-	batch.arcs2 = arcs2
-	batch.arcref1 = arcref1
-	batch.arcref2 = arcref2
-	batch.arcreplace = arcreplace
-	batch.apidtable = apidtable
-	batch.arcrefs = arcrefs
-	batch.extn = extn
-	batch.objaps = objaps
-	batch.skyaps = skyaps
-	batch.arcaps = arcaps
-	batch.objbeams = objbeams
-	batch.skybeams = skybeams
-	batch.arcbeams = arcbeams
-	batch.done = done
-	batch.logfile = log1
-	batch.redo = reextract
-	batch.update = update
-	batch.scattered = scattered
-	batch.arcap = arcap
-	batch.dispcor = dispcor
-	batch.savearcs = savearcs
-	batch.skyalign = skyalign
-	batch.skysubtract = skysubtract
-	batch.saveskys = saveskys
-	batch.newaps = newaps
-	batch.newresp = newresp
-	batch.newdisp = newdisp
-	batch.newarcs = newarcs
-	dobatch = yes
 end

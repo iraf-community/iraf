@@ -174,9 +174,8 @@ int	nc
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 real	bz, bs
 
-complex imgnlx(), impnlx()
-double  imgnld(), impnld()
-pointer	in, out, imgnlr(), impnlr()
+pointer	in, out
+int	imgnlr(), impnlr(), imgnlx(), impnlx(), imgnld(), impnld()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)

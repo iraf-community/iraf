@@ -1,6 +1,6 @@
 # CENTER header file
 
-define	LEN_CENSTRUCT		(30 + SZ_FNAME + 1)
+define	LEN_CENSTRUCT		(36 + SZ_FNAME + 1)
 
 # centering parameters
 
@@ -31,14 +31,20 @@ define	AP_CNY		    Memi[$1+20]	# Y dimension of subraster
 
 # center fitting output
 
-define	AP_XCENTER	    Memr[$1+21]	# computed x center
-define	AP_YCENTER	    Memr[$1+22]	# computed y center
-define	AP_XSHIFT	    Memr[$1+23]	# total x shift
-define	AP_YSHIFT	    Memr[$1+24]	# total y shift
-define	AP_XERR		    Memr[$1+25]	# x error
-define	AP_YERR		    Memr[$1+26]	# y error
-define	AP_CDATALIMIT	    Memr[$1+27]	# min (max) of subraster
-define	AP_CSTRING	    Memc[P2C($1+28)]# centering algorithm id
+define	AP_OXINIT	    Memr[$1+21]	# initial output x center
+define	AP_OYINIT	    Memr[$1+22]	# initial output y center
+define	AP_XCENTER	    Memr[$1+23]	# computed x center
+define	AP_YCENTER	    Memr[$1+24]	# computed y center
+define	AP_OXCENTER	    Memr[$1+25]	# computed output x center
+define	AP_OYCENTER	    Memr[$1+26]	# computed output y center
+define	AP_XSHIFT	    Memr[$1+27]	# total x shift
+define	AP_YSHIFT	    Memr[$1+28]	# total y shift
+define	AP_OXSHIFT	    Memr[$1+29]	# total output x shift
+define	AP_OYSHIFT	    Memr[$1+30]	# total output y shift
+define	AP_XERR		    Memr[$1+31]	# x error
+define	AP_YERR		    Memr[$1+32]	# y error
+define	AP_CDATALIMIT	    Memr[$1+33]	# min (max) of subraster
+define	AP_CSTRING	    Memc[P2C($1+34)]# centering algorithm id
 
 # default setup values for centering parameters
 

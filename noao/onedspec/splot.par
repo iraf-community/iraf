@@ -32,6 +32,9 @@ markrej,b,h,yes,,,"Mark rejected points?
 
 # PARAMETERS FOR OVERPLOTTING STANDARD STAR FLUXES"
 star_name,s,q,,,,"Standard star name"
+mag,r,q,,,,"Magnitude of star"
+magband,s,q,,"U|B|V|R|I|J|H|K|L|Lprime|M",,"Magnitude type"
+teff,s,q,,,,"Effective temperature or spectral type"
 caldir,s,h,)_.caldir,,,"Directory containing calibration data"
 fnuzero,r,h,3.68e-20,,,"Absolute flux zero point
 

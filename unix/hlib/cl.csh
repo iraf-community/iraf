@@ -3,45 +3,20 @@
 # architecture or floating point hardware appropriate for the current
 # machine.
 
-# Determine IRAF root directory (value set in install script).
-if ($?iraf == 0) then
-    setenv iraf "/iraf/iraf/"
-endif
-
 # Determine platform architecture.
-if ($?IRAFARCH) then
-    if (-e $iraf/bin.${IRAFARCH}/cl.e) then
-	set MACH = $IRAFARCH
+setenv  MACH    `uname -m`
+
+# Determine IRAF root directory (value set in install script).
+set d_iraf = "/iraf/iraf/"
+if ($?iraf) then
+    if (! -e $iraf) then
+        echo "Warning: iraf=$iraf does not exist (check .cshrc or .login)"
+        echo "Session will default to iraf=$d_iraf"
+        unsetenv iraf ; sleep 3
     endif
 endif
-
-if (! $?MACH) then
-    if (-f /etc/redhat-release) then
-	set mach = redhat
-    else if (-f /etc/SuSE-release) then
-	set mach = suse
-    else
-	set mach = `uname -s | tr '[A-Z]' '[a-z]'`
-    endif
-
-    if (-e $iraf/bin.$mach/cl.e) then
-	set MACH = $mach
-    else if (-e $iraf/bin.freebsd/cl.e) then
-	set MACH = freebsd
-    else if (-e $iraf/bin.linux/cl.e) then
-	set MACH = linux
-    else if (-e $iraf/bin.redhat/cl.e) then
-	set MACH = redhat
-    else if (-e $iraf/bin.suse/cl.e) then
-	set MACH = suse
-    else if (-e $iraf/bin.sunos/cl.e) then
-	set MACH = sunos
-    else if (-e $iraf/bin.linuz/cl.e) then
-	set MACH = linuz
-    else
-	echo "cannot find $iraf/bin.xxx/cl.e!"
-	exit 1
-    endif
+if ($?iraf == 0) then
+    setenv iraf "$d_iraf"
 endif
 
 # Check for obsolete IRAFBIN definition.
@@ -68,18 +43,10 @@ if ($?IRAFARCH) then
 endif
 
 # Determine the architecture to be used.
-if ("$MACH" == "freebsd") then
-    setenv IRAFARCH "freebsd"
-else if ("$MACH" == "linux") then
-    setenv IRAFARCH "linux"
-else if ("$MACH" == "redhat") then
-    setenv IRAFARCH "redhat"
-else if ("$MACH" == "suse") then
-    setenv IRAFARCH "suse"
-else if ("$MACH" == "sunos") then
-    setenv IRAFARCH "sunos"
-else if ("$MACH" == "linuz") then
-    setenv IRAFARCH "linuz"
+if ("$MACH" == "alpha") then
+    setenv IRAFARCH "alpha"
+else
+    setenv IRAFARCH "alpha"
 endif
 
 setenv arch .$IRAFARCH

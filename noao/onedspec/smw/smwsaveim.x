@@ -96,7 +96,10 @@ begin
 	    do i = 1, nl {
 		call smw_gwattrs (smw, i, 1, ap, beam, dtype, w1, dw, nw, z,
 		    aplow, aphigh, coeff)
-		call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
+		if (i < 1000)
+		    call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
+		else
+		    call sprintf (Memc[key], SZ_FNAME, "AP%d")
 		    call pargi (i)
 		call sprintf (Memc[str1], SZ_LINE, "%d %d")
 		    call pargi (ap)
@@ -135,7 +138,10 @@ begin
 
 	    # Delete unnecessary aperture information.
 	    do i = nl+1, ARB {
-		call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
+		if (i < 1000)
+		    call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
+		else
+		    call sprintf (Memc[key], SZ_FNAME, "AP%d")
 		    call pargi (i)
 		iferr (call imdelf (im, Memc[key]))
 		    break
@@ -195,7 +201,10 @@ begin
 	    # define the axis mapping.
 
 	    do j = 1, ARB {
-		call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
+		if (j < 1000)
+		    call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
+		else
+		    call sprintf (Memc[key], SZ_FNAME, "AP%d")
 		    call pargi (j)
 		iferr (call imdelf (im, Memc[key]))
 		    break

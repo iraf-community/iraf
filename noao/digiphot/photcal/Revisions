@@ -1,24 +1,54 @@
 .help revisions May91 noao.digiphot.photcal
 .nf
-photcal/photcal.cl
-    Added a missing ; to the cl file that could cause a hangup if the
-    tables package is not defined.
+photcal/mknobsfile.cl
+photcal/mkobsfile.cl
+photcal/obsfile.par
+photcal/doc/obsfile.hlp
+photcal/doc/mkobsfile.hlp
+photcal/doc/mknobsfile.hlp
+    Declarations for the missing wrap parameter were added to the obsfile,
+    mknobsfile, and mkobsfile tasks. Descriptions of the wrap parameter
+    were added to the obsfile, mknobsfile, and mkobsfile task help pages.
+		
+    (Davis, May 29, 2002)
 
-    (Davis, September 29, 1999)
+
+photcal$mkobsfile/phagrow.x
+    Added a missing sfree statement.
+
+    (Davis, February 19, 2002)
+
+photcal$mkobsfile/mkpkg
+    Added a missing "../lib/obsfile.h" dependency to the mkpkg phsort.x
+    declaration.
+
+    (Davis, December 13, 2001)
+
+photcal/fitparams/mkpkg
+photcal/fitparams/fttrneqs.x
+    Modified the interactiving fitting code so that the plots are automatically
+    autoscaled when a new equation is fit. 
+
+    (Davis, October 9, 2000)
+
+photcal/mkimsets/t_imgroup.x
+    Modifed the imgroup task to write out the image root names minus
+    the directory specification if any to the output image sets file.
+
+    (Davis, April 25, 2000)
+
+photcal/mkimsets.cl
+    The mkimsets script was leaving a temporary file in tmp$ if the review
+    parameter was set to yes. This did not cause any trouble but might fill
+    up the tmp$ area after a while.
+
+    (Davis, April 24, 2000)
 
 photcal/*/mkpkg
     Added some missing file dependencies and removed some unecessary ones.
 
     (Davis, September 20, 1999)
 
-
-photcal/io/mkpkg
-    Added a missing <time.h> dependence for the iocat.x file in the mkpkg
-    file. iocat.x must be recompiled to pick up the change in the time
-    structure buffer.
-
-    (Davis, August 27, 1999)
-    
 photcal/catalogs/nlandolt.dat
     Replaced the existing catalog which was an early version I got off a tape
     given to us by Arlo Landolt with a new version in which the positions
@@ -28,7 +58,8 @@ photcal/catalogs/nlandolt.dat
 
 photcal/photcal.cl
     Modified the package cl script to check and see if the tables package is
-    already loaded before checking to see whether it is defined or not.
+    already loaded before checking to see whether it is defined and then
+    loading it.
 
     (Davis, August 1, 1998)
 
@@ -40,6 +71,7 @@ photcal/evaluate/phminv.f
     sense. 
 
     (Davis, Novemeber 12, 1997)
+
 
 photcal$mkapfile.cl
     Modified the way the mkapfile script handles the tdump pwidth parameter
@@ -98,7 +130,7 @@ photcal/mkobsfile/t_obsfile.x
 photcal/mkobsfile/t_phimtable.x
     Modified the obsfile task (and as a result the mk(n)obsfile script task
     as well) to accept long (> 161 characters) lines in the input text
-    files. The chnage avoids problems with the ttools task tdump used to extract
+    files. The change avoids problems with the ttools task tdump used to extract
     the fields of interest: image name, x, y, magnitude, magnitude and error,
     exposure time, airmass, filter, and time of observation from ST tables
     and which due to the internal formatting can exceed the default size of
@@ -106,26 +138,8 @@ photcal/mkobsfile/t_phimtable.x
     (Davis, 10/6/95)
 
 photcal/mkobsfile/apfile.key
-    Added a description of the b key to the mkapfile/apfile key file.
-    (Davis, 6/22/95)
-
-photcal/mkobsfile/t_apfile.x
-photcal/mkobsfile/phagrow.x
-photcal/mkobsfile/phaigrow.x
-photcal/mkobsfile/dinvers.f
-    In some case "bad" input data could cause the mkapfile/apfile tasks
-    to terminate with a floating point overflow error or, if run interactively,
-    hang as a result of the same error. The problem occurs when the
-    moffet function radius parameter ro cannot be accurately fit, resulting
-    in fitted values that approach 0 or go slightly negative producing
-    the overflow.  A check on ro was added to catch this condition. At the
-    same time a check for negative diagonal inverse matrix elements was added
-    to the error computation to avoid floating operand errors in the square
-    root. The plotting code was also modified to deal properly with the "fit
-    did not converge condition" and an mfree call was added for an array
-    that was not being freed but was being reallocated if the number
-    of fitting parameters changed.
-    (Davis, 6/13/95)
+    Added a description of the 'b' key to the mkapfile/apfile key file.
+    (Davis, 6/22/95/95)
 
 photcal/apfile.par
 photcal/mkapfile.cl
@@ -141,10 +155,10 @@ photcal/mkobsfile/phaitable.x
     (Davis, 4/28/95)
 
 photcal/mkobsfile/phaimtable.x
-    Due to a type mkapfile/were not writing the the filter id that was read
+    Due to a typo mkapfile/pfile were not writing the filter id that was read
     from the input photometry files into the output mag file correctly.
     (Davis, 4/28/95)
-
+    
 photcal/mkobsfile/t_apfile.x
 photcal/mkobsfile/phagrow.x
 photcal/mkobsfile/phaigrow.x

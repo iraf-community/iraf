@@ -110,22 +110,28 @@ begin
 	    }
 
 	    # Print full helpblock (default action).
-	    if (option == O_HELP || option == O_ALLDOC || option==O_REFERENCES)
-		if (hd_getname (hp,modnum,TY_HLP,Memc[fname],SZ_PATHNAME) > 0)
+	    if (option == O_HELP || option == O_ALLDOC ||
+		option == O_REFERENCES) {
+
+		if (hd_getname (hp,modnum,TY_HLP,Memc[fname],SZ_PATHNAME) > 0) {
 		    ifnoerr {
 			call pr_helpblock (Memc[fname],
 			    Memc[pakname], Memc[modname], TY_HLP, ctrl)
 		    } then
 			not_found = false
+		}
+	    }
 
 	    # Print system documentation.
-	    if (option == O_SYSDOC || option == O_ALLDOC)
-		if (hd_getname (hp,modnum,TY_SYS,Memc[fname],SZ_PATHNAME) > 0)
+	    if (option == O_SYSDOC || option == O_ALLDOC) {
+		if (hd_getname (hp,modnum,TY_SYS,Memc[fname],SZ_PATHNAME) > 0) {
 		    ifnoerr {
 			call pr_helpblock (Memc[fname],
 			    Memc[pakname], Memc[modname], TY_HLP, ctrl)
 		    } then
 			not_found = false
+		}
+	    }
 	}
 
 exit_

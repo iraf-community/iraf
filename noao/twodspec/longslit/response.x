@@ -33,27 +33,33 @@ int	niterate			# Number of rejection iterations
 real	grow				# Rejection growing radius
 int	interactive			# Interactive?
 
-char	image1[SZ_LINE], image2[SZ_LINE], image3[SZ_LINE], history[SZ_LINE]
 pointer	cal, norm, resp, ic, gt
+pointer	sp, image1, image2, image3, history
 
-int	clgeti(), imtopen(), imtgetim(), imtlen(), gt_init()
+int	clgeti(), imtopen(), imtgetim(), imtlen(), gt_init(), ic_geti()
 bool	clgetb()
-real	clgetr()
+real	clgetr(), ic_getr()
 pointer	immap()
 
 errchk	immap, ls_immap
 
 begin
+	call smark (sp)
+	call salloc (image1, SZ_LINE, TY_CHAR)
+	call salloc (image2, SZ_LINE, TY_CHAR)
+	call salloc (image3, SZ_LINE, TY_CHAR)
+	call salloc (history, SZ_LINE, TY_CHAR)
+
 	# Get the calibration, normalization, and response image lists and
 	# check that the they match.
 
-	call clgstr ("calibration", image1, SZ_LINE)
-	call clgstr ("normalization", image2, SZ_LINE)
-	call clgstr ("response", image3, SZ_LINE)
+	call clgstr ("calibration", Memc[image1], SZ_LINE)
+	call clgstr ("normalization", Memc[image2], SZ_LINE)
+	call clgstr ("response", Memc[image3], SZ_LINE)
 
-	list1 = imtopen (image1)
-	list2 = imtopen (image2)
-	list3 = imtopen (image3)
+	list1 = imtopen (Memc[image1])
+	list2 = imtopen (Memc[image2])
+	list3 = imtopen (Memc[image3])
 	if ((imtlen(list1)!=imtlen(list3)) || (imtlen(list2)!=imtlen(list3))) {
 	    call imtclose (list1)
 	    call imtclose (list2)
@@ -64,9 +70,9 @@ begin
 	# Get remaining parameters and initialize the curve fitting package.
 
 	threshold = clgetr ("threshold")
-	call clgstr ("sample", image1, SZ_LINE)
+	call clgstr ("sample", Memc[image1], SZ_LINE)
 	naverage = clgeti ("naverage")
-	call clgstr ("function", image2, SZ_LINE)
+	call clgstr ("function", Memc[image2], SZ_LINE)
 	order = clgeti ("order")
 	low_reject = clgetr ("low_reject")
 	high_reject = clgetr ("high_reject")
@@ -79,9 +85,9 @@ begin
 
 	# Set the ICFIT pointer structure.
 	call ic_open (ic)
-	call ic_pstr (ic, "sample", image1)
+	call ic_pstr (ic, "sample", Memc[image1])
 	call ic_puti (ic, "naverage", naverage)
-	call ic_pstr (ic, "function", image2)
+	call ic_pstr (ic, "function", Memc[image2])
 	call ic_puti (ic, "order", order)
 	call ic_putr (ic, "low", low_reject)
 	call ic_putr (ic, "high", high_reject)
@@ -94,41 +100,60 @@ begin
 
 	# Create the response image for each calibration image.
 
-	while ((imtgetim (list1, image1, SZ_LINE) != EOF) &&
-	    (imtgetim (list2, image2, SZ_LINE) != EOF) &&
-	    (imtgetim (list3, image3, SZ_LINE) != EOF)) {
+	while ((imtgetim (list1, Memc[image1], SZ_LINE) != EOF) &&
+	    (imtgetim (list2, Memc[image2], SZ_LINE) != EOF) &&
+	    (imtgetim (list3, Memc[image3], SZ_LINE) != EOF)) {
 
 	    # Map the images.  If the response image does not exist it
 	    # is created and initialized to unit response everywhere.
 	    # If the calibration image is an image section then the response
 	    # image is opened as a section also.
 
-	    call ls_immap (image1, image3, cal, resp)
-	    norm = immap (image2, READ_ONLY, 0)
+	    call ls_immap (Memc[image1], Memc[image3], cal, resp)
+	    norm = immap (Memc[image2], READ_ONLY, 0)
 
 	    # Determine whether the normalization spectrum is to be fit
 	    # interactively and if so set the graphics title.
 
-	    call sprintf (image2, SZ_LINE,
+	    call sprintf (Memc[image2], SZ_LINE,
 		"Fit the normalization spectrum for %s interactively")
-	        call pargstr (image1)
-	    call xt_answer (image2, interactive)
+	        call pargstr (Memc[image1])
+	    call xt_answer (Memc[image2], interactive)
 
 	    if ((interactive == YES) || (interactive == ALWAYSYES)) {
-	        call sprintf (image2, SZ_LINE,
+	        call sprintf (Memc[image2], SZ_LINE,
 		    "Fit the normalization spectrum for %s\n%s")
-	            call pargstr (image1)
+	            call pargstr (Memc[image1])
 	            call pargstr (IM_TITLE(cal))
-	        call gt_sets (gt, GTTITLE, image2)
+	        call gt_sets (gt, GTTITLE, Memc[image2])
 	    }
 
-	    # Make the response and unmap the images.
-
+	    # Make the response.
 	    call re_make (cal, norm, resp, ic, gt, threshold, interactive)
+
+	    # Document the fit.
+	    call ic_gstr (ic, "sample", Memc[history], SZ_LINE)
+	    call clpstr ("sample", Memc[history])
+	    naverage = ic_geti (ic, "naverage")
+	    call clputi ("naverage", naverage)
+	    call ic_gstr (ic, "function", Memc[history], SZ_LINE)
+	    call clpstr ("function", Memc[history])
+	    order = ic_geti (ic, "order")
+	    call clputi ("order", order)
+	    low_reject = ic_getr (ic, "low")
+	    call clputr ("low_reject", low_reject)
+	    high_reject = ic_getr (ic, "high")
+	    call clputr ("high_reject", high_reject)
+	    niterate = ic_geti (ic, "niterate")
+	    call clputi ("niterate", niterate)
+	    grow = ic_getr (ic, "grow", grow)
+	    call clputr ("grow", grow)
+
 	    call imaddr (resp, "ccdmean", 1.)
-	    call sprintf (history, SZ_LINE, "Response determined from %s.")
-		call pargstr (image2)
-	    call xt_phistory (resp, history)
+	    call sprintf (Memc[history], SZ_LINE,
+		"Response determined from %s.")
+		call pargstr (Memc[image2])
+	    call xt_phistory (resp, Memc[history])
 	    call imunmap (cal)
 	    call imunmap (norm)
 	    call imunmap (resp)
@@ -141,6 +166,7 @@ begin
 	call imtclose (list2)
 	call imtclose (list3)
 	call gt_free (gt)
+	call sfree (sp)
 end
 
 

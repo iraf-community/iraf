@@ -1,0 +1,28 @@
+# Make the ASTCAT package
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools -lslalib"
+	$update	libpkg.a
+	$omake	x_astcat.x
+	$link	x_astcat.o libpkg.a $(LIBS) -o x_astcat.e
+	;
+
+install:
+	$move	x_astcat.e noaobin$x_astcat.e
+	;
+
+
+libpkg.a:
+	@agetcat
+	@attools
+	@awcs
+	@debug
+        ;

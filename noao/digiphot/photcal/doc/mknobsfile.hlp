@@ -36,6 +36,13 @@ The format of \fIimsets\fR is described in detail below.
 The output observation file suitable for input to FITPARAMS or
 EVALFIT/INVERTFIT.
 .le
+.ls wrap = yes
+Format the output observations file for easy reading ? If wrap = yes then
+the observations for each filter are written to a separate line and the
+* character in column 1 is interpreted as a continuation character. Otherwise
+all the observations for a single object are written to a single line
+where the maximum size of a line is SZ_LINE characters.
+.le
 .ls obsparams = ""
 The name of an optional text file containing the correct filter ids,
 exposure times, airmasses, and times of observation for each image whose values are either

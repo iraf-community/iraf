@@ -1,10 +1,10 @@
-.help qphot Aug93 noao.digiphot.apphot
+.help qphot May00 noao.digiphot.apphot
 .ih
 NAME
 qphot -- quick aperture photometer
 .ih
 USAGE
-qphot image
+qphot image cbox annulus dannulus apertures
 .ih
 PARAMETERS
 .ls image
@@ -20,38 +20,36 @@ The inner radius of the sky annulus in pixels.
 The width of the sky annulus in pixels.
 .le
 .ls apertures
-The list of aperture radii in pixels. This list is a string parameter with
-the apertures listed individually, separated by comas.
+The list of aperture radii in pixels. Apertures is a string parameter 
+specifying either a single aperture radius e.g. "3.0", a list of aperture
+radii separated by commas e.g. "3.0,5.0,10.0", or a range of aperture radii
+e.g. "1.0:20.0:1.0".
 .le
 .ls coords = ""
-The list of text files containing the coordinates of the objects to be
-measured, 1 object per line with the x and y coordinates in columns
-1 and 2 respectively. If \fIcoords\fR is null (""), QPHOT will either read
-commands from the image cursor (default), or read commands from a cursor
-command file. In the
-latter case the image cursor parameter \fIicommands\fR must be set to the
-name of the cursor command file.
-If coords is defined, QPHOT accepts
-coordinate input from either the image cursor or the list file (interactive
-mode), or reads the coordinates from the coordinates file or a cursor
-command file (batch mode).
-The number of coords files is either 0, 1 or equal to the number of input
-images.
+The list of text files containing initial coordinates for the objects to
+be measured. Objects are listed in coords one object per line with the
+initial coordinate values in columns one and two. The number of coordinate
+files must be zero, one, or equal to the number of images. If coords is
+"default", "dir$default", or a directory specification then a coords file name
+of the form dir$root.extension.version is constructed and searched for,
+where dir is the directory, root is the root image name, extension is "coo"
+and version is the next available version number for the file.
 .le
 .ls output = "default"
-The name of the results file or results directory. If output is "default",
-"dir$default", or a directory specification then an output name of the form
-dir$root.extension.version is constructed, where dir is the directory,
-root is the root image name, extension is "mag" and version is the next
-available version number for the file. If output is null (""),
-then no output file is
-written. The number of output files must be either 1 or
-equal to the number of image files.
+The name of the results file or results directory. If output is
+"default", "dir$default", or a directory specification then an output file name
+of the form dir$root.extension.version is constructed, where dir is the
+directory, root is the root image name, extension is "mag" and version is
+the next available version number for the file. The number of output files
+must be zero, one, or equal to the number of image files.  In both interactive
+and batch mode full output is written to output. In interactive mode
+an output summary is also written to the standard output.
 .le
 .ls plotfile = ""
-The name of the file containing radial plots for the stars written to the
-output file. If plotfile is not equal to null then a single radial plot
-is written to plotfile for every record written to output.
+The name of the file containing radial profile plots of the stars written
+to the output file. If plotfile is defined then a radial profile plot
+is written to plotfile every time a record is written to \fIoutput\fR.
+The user should be aware that this can be a time consuming operation.
 .le
 .ls zmag = 25.0
 The zero point of the magnitude scale.
@@ -69,67 +67,157 @@ The image header keyword containing the filter id of the observation.
 The image header keyword containing the time of the observation.
 .le
 .ls epadu = 1.0
-The gain in photons per adu. This parameter
-is used to compute the magnitude errors.
+The gain in photons per adu. Epadu is used to compute the magnitude errors.
 .le
 .ls interactive = yes
 Interactive or batch mode.
 .le
 .ls radplots = no
-If radplots is yes and QPHOT is run in interactive mode then a radial profile
-of each measured star is plotted on stdgraph.
-.le
-.ls verbose = no
-Print messages in non-interactive mode.
-.le
-.ls graphics = "stdgraph"
-The default graphics device.
-.le
-.ls display = "stdimage"
-The default display device. \fIDisplay\fR can be set to
-"stdgraph" if QPHOT is to be run off the graphics device.
+If radplots is "yes" and QPHOT is run in interactive mode then a radial profile
+of each star is plotted on the screen after it is measured.
 .le
 .ls icommands = ""
-The image cursor.
+The image display cursor or image cursor command file.
 .le
 .ls gcommands = ""
-The graphics cursor.
+The graphics cursor or graphics cursor command file.
+.le
+.ls wcsin = ")_.wcsin", wcsout = ")_.wcsout"
+The coordinate system of the input coordinates read from \fIcoords\fR and
+of the output coordinates written to \fIoutput\fR respectively. The image
+header coordinate system is used to transform from the input coordinate
+system to the "logical" pixel coordinate system used internally,
+and from the internal "logical" pixel coordinate system to the output
+coordinate system. The input coordinate system options are "logical", tv",
+"physical", and "world". The output coordinate system options are "logical",
+"tv", and "physical". The image cursor coordinate system is assumed to
+be the "tv" system.
+.ls logical
+Logical coordinates are pixel coordinates relative to the current image.
+The  logical coordinate system is the coordinate system used by the image
+input/output routines to access the image data on disk. In the logical
+coordinate system the coordinates of the first pixel of a  2D image, e.g.
+dev$ypix  and a 2D image section, e.g. dev$ypix[200:300,200:300] are
+always (1,1).
+.le
+.ls tv
+Tv coordinates are the pixel coordinates used by the display servers. Tv
+coordinates  include  the effects of any input image section, but do not
+include the effects of previous linear transformations. If the input
+image name does not include an image section, then tv coordinates are
+identical to logical coordinates.  If the input image name does include a
+section, and the input image has not been linearly transformed or copied from
+a parent image, tv coordinates are identical to physical coordinates.
+In the tv coordinate system the coordinates of the first pixel of a
+2D image, e.g. dev$ypix and a 2D image section, e.g. dev$ypix[200:300,200:300]
+are (1,1) and (200,200) respectively.
+.le
+.ls physical
+Physical coordinates are pixel coordinates invariant  with respect to linear
+transformations of the physical image data.  For example, if the current image
+was created by extracting a section of another image,  the  physical
+coordinates of an object in the current image will be equal to the physical
+coordinates of the same object in the parent image,  although the logical
+coordinates will be different.  In the physical coordinate system the
+coordinates of the first pixel of a 2D image, e.g. dev$ypix and a 2D
+image section, e.g. dev$ypix[200:300,200:300] are (1,1) and (200,200)
+respectively.
+.le
+.ls world
+World coordinates are image coordinates in any units which are invariant
+with respect to linear transformations of the physical image data. For
+example, the ra and dec of an object will always be the same no matter
+how the image is linearly transformed. The units of input world coordinates
+must be the same as those expected by the image header wcs, e. g.
+degrees and degrees for celestial coordinate systems.
+.le
+The wcsin and wcsout parameters default to the values of the package
+parameters of the same name. The default values of the package parameters
+wcsin and wcsout are "logical" and "logical" respectively.
+.le
+.le
+.ls cache = ")_.cache"
+Cache the image pixels in memory. Cache may be set to the value of the apphot
+package parameter (the default), "yes", or "no". By default cacheing is 
+disabled.
+.le
+.ls verbose = ")_.verbose"
+Print messages in non-interactive mode ? Verbose may be set to the apphot
+package parameter value (the default), "yes", or "no.
+.le
+.ls graphics = ")_.graphics"
+The default graphics device.  Graphics may be set to the apphot package
+parameter value (the default), "yes", or "no.
+.le
+.ls display = ")_.display"
+The default display device. Display may be set to the apphot package parameter
+value (the default), "yes", or "no. By default graphics overlay is disabled.
+Setting display to one of "imdr", "imdg", "imdb", or "imdy" enables graphics
+overlay with the IMD graphics kernel.  Setting display to "stdgraph" enables
+QPHOT to work interactively from a contour plot.
 .le
 
 .ih
 DESCRIPTION
 QPHOT computes accurate centers, sky values, and magnitudes for a list of
-objects in the IRAF image
-\fIimage\fR whose coordinates are
-marked on the image display interactively with the image
-cursor or listed in a coordinate file,
-and writes the computed x and y coordinates, sky values and
+objects in the IRAF image \fIimage\fR whose initial coordinates are
+read from the image image cursor or the coordinate file \fIcoords\fR,
+and writes the computed x and y coordinates, sky values, and
 magnitudes to the text file \fIoutput\fR.
-In interactive mode the user must define the list of objects
-interactively with the image cursor, or select them interactively from 
-the coordinate list \fIcoords\fR.  In batch mode
-the coordinates can be read directly from \fIcoords\fR, or from a
-cursor command file specified by the parameter \fIicommands\fR.
+
+The coordinates read from \fIcoords\fR are assumed to be in coordinate
+system defined by \fIwcsin\fR. The options are "logical", "tv", "physical",
+and "world" and the transformation from the input coordinate system to
+the internal "logical" system is defined by the image coordinate system.
+The simplest default is the "logical" pixel system. Users working on with
+image sections but importing pixel coordinate lists generated from the parent
+image must use use the "tv" or "physical" input coordinate systems.
+Users importing coordinate lists in world coordinates, e.g. ra and dec,
+must use the "world" coordinate system and may need to convert their
+equatorial coordinate units from hours and degrees to degrees and degrees first.
+
+The coordinates written to \fIoutput\fR are in the coordinate
+system defined by \fIwcsout\fR. The options are "logical", "tv",
+and "physical". The simplest default is the "logical" system. Users
+wishing to correlate the output coordinates of objects measured in
+image sections or mosaic mosaic pieces with coordinates in the parent
+image must use the "tv" or "physical" coordinate systems.
+
+In interactive mode the user measure objects interactively with the image
+cursor, or select them interactively from the coordinate list \fIcoords\fR.
+In batch mode the coordinates can be read directly from \fIcoords\fR, or from 
+the cursor command file specified by the parameter \fIicommands\fR.
+
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input image pixels are cached in memory. If cacheing
+is enabled and QPHOT is run interactively the first measurement will appear
+to take a long time as the entire image must be read in before the measurement
+is actually made. All subsequent measurements will be very fast because QPHOT
+is accessing memory not disk. The point of cacheing is to speed up random
+image access by making the internal image i/o buffers the same size as the
+image itself. However if the input object lists are sorted in row order and
+sparse cacheing may actually worsen not improve the execution time. Also at
+present there is no point in enabling cacheing for images that are less than
+or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
+default image i/o buffer is exactly that size. However if the size of dev$ypix
+is doubled by converting it to a real image with the chpixtype task then the
+effect of cacheing in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halfs of the image are alternated.
 
 QPHOT computes accurate centers for each object using the centroid
-centering
-algorithm, pixels inside \fIcbox\fR and the default values of the
-\fIcenterpars\fR parameters.
-Accurate sky value for each object are computed using
-the \fIcentroid\fR algorithm with histogram smoothing turned on,
-pixels inside the sky annulus defined by
-\fIannulus\fR and \fIdannulus\fR, and the default values of the remaining
-sky fitting parameters as defined in the \fIfitskypars\fR parameter set.
-Magnitudes are computed using pixels inside the apertures defined by
-\fIapertures\fR.
-The user should set the gain \fIepadu\fR to ensure that the magnitude errors
-are correctly computed and \fIexposure\fR to normalize the computed magnitudes
-to an exposure time of 1 time unit. The zero point of the magnitude scale
-can be adjusted by setting \fIzmag\fR. \fIAirmass\fR,
-\fIfilter\fR, and \fIobstime\fR are book-keeping parameters which may
-be useful to
-preserve for future reduction steps such as calibration. 
-The noise statistics are assumed to be Poisson.
+centering algorithm, pixels inside \fIcbox\fR and the default values of the
+\fIcenterpars\fR parameters.  Accurate sky values for each object are
+computed using the \fIcentroid\fR sky fitting algorithm with histogram
+smoothing turned on, pixels inside the sky annulus defined by \fIannulus\fR
+and \fIdannulus\fR, and the default values of the remaining sky fitting
+parameters as defined in the \fIfitskypars\fR parameter set. Magnitudes
+are computed using pixels inside the apertures defined by \fIapertures\fR.
+The user must set the gain \fIepadu\fR to ensure that the magnitude error
+estimates are correctly computed and \fIexposure\fR to normalize the computed
+magnitudes to an exposure time of 1 time unit. The zero point of the magnitude
+scale can be adjusted by setting \fIzmag\fR. \fIAirmass\fR, \fIfilter\fR,
+and \fIobstime\fR are book-keeping parameters. Setting  them to appropriate
+values will simplify future analysis and calibration steps.
 
 .ih
 CURSOR COMMANDS
@@ -267,6 +355,14 @@ sky. Mag and merr are the magnitude and error in the magnitude in the aperture.
 
 Pier and perror are photometry error code and accompanying error message.
 
+In interactive mode a radial profile of each measured object is plotted
+in the graphics window if \fIradplots\fR is "yes".
+
+In interactive and batchmode a radial profile plot is written to
+\fIplotfile\fR  if it is defined each time the result of an object
+measurement is written to \fIoutput\fR .
+
+
 .ih
 ERRORS
 If the object centering was error free then the field cier will be zero.
@@ -319,153 +415,231 @@ If no error occurs during the measurement of the magnitudes then pier is
 .ih
 EXAMPLES
 
-1. Perform aperture photometry interactively for a few stars in n4147 using
+1. Perform aperture photometry interactively for a few stars in dev$ypix using
 the display and the image cursor.
 
 .nf
-	ap> set stdimcur = stdimage
-
-	... define the image cursor
-
-	ap> display n4147 1 fi+
+	ap> display dev$ypix 1 fi+
 
 	... display the image
 
-	ap> qphot m92 5. 8. 15. 2.,4.,6.0 
+	ap> qphot dev$ypix 5. 10. 5. 2.,4.,6.0 
 
 	... move image cursor to objects of interest and tap space bar
 
 	... a 1 line summary will be printed on the standard output
 	    for each object measured
 
-	... full output will be written to n4147.mag.1
+	... type q to quit and q again to confirm the quit
+
+	... full output will appear in ypix.mag.1
 .fi
 
-2. Perform aperture photometry interactively for a few stars in m92 using the
-contour plot and the graphics cursor.
+
+2. Perform aperture photometry interactively for a few stars in dev$ypix
+using the contour plot and the graphics cursor. This option is only useful
+for those (now very few) users who have access to a graphics terminal but
+not to an image display server. Setup the task parameters using the
+interactive setup menu defined by the i key command as in example 1.
+
 
 .nf
+        ap> show stdimcur
+
+        ... record the default value of stdimcur
+
 	ap> set stdimcur = stdgraph
 
-	ap> contour m92 >G m92.plot1
+        ... define the image cursor to be the graphics cursor
 
-	... store the contour plot of m92 in the file m92.plot1
+        ap> contour dev$ypix
 
-	ap> qphot m92 5. 8. 15. 2.,4.,6.0 
+        ... make a contour plot of dev$ypix
 
-	... type :.read m92.plot.1 to read in plot file
+	ap> contour dev$pix >G ypix.plot1
+
+	... store the contour plot of dev$ypix in the file ypix.plot1
+
+	ap> qphot dev$ypix 5. 10. 5. 2.,4.,6.0 
+
+        ... type ? to see the help screen
 
 	... move image cursor to objects of interest and tap space bar
 
 	... a 1 line summary will be printed on the standard output
 	    for each object measured
 
-	... full output will be written to m92.mag.1
+	... type q to quit and q again to confirm the quit
+
+	... full output will be written to ypix.mag.2
+
+        ap> set stdimcur = <default>
+
+        ... reset stdimcur to its previous value
 .fi
 
-3. Setup the parameters interactively and run QPHOT from a contour plot.
+
+
+3. Setup and run QPHOT interactively on a list of objects temporarily
+overriding the fwhmpsf, sigma, cbox, annulus, dannulus, and apertures
+ parameters determined in examples 1 or 2.
 
 .nf
-	ap> set stdimcur = stdgraph
+        ap> daofind dev$ypix fwhmpsf=2.6 sigma=25.0 verify-
 
-	ap> contour m92
+        ... make a coordinate list
 
-	... plot appears on screen
+        ... the output will appear in the text file ypix.coo.1
 
-	... adjust contour parameters until good plot achieved
+        ap> qphot dev$ypix 7.0 12.0 5.0 "3.0,5.0" coords=ypix.coo.1
 
-	ap> =gcur
+        ... type ? for optional help
 
-	... type :.write m92.plot to make a metacode file of plot
 
-	ap> qphot m92 5. 8. 15. 2.,4.6.
+        ... move the graphics cursor to the stars and tap space bar
 
-	... move cursor to a bright star
+                                or
 
-	... type i to enter interactive setup loop
-	    mark the centering radius, inner and and outer sky annuli,
-	    and the apertures
+        ... select stars from the input coordinate list with m / :m #
+            and measure with spbar
 
-	... type w to save the parameters
+        ... measure stars selected from the input coordinate list
+            with n / n #
 
-	... type :.read m92.plot to reread in the contour plot metacode
-	    file
+        ... a one line summary of results will appear on the standard output
+            for each star measured
 
-	... move cursor to stars of interest and tap space bar 
+	... type q to quit and q again to confirm the quit
 
-	... output will appear in m92.mag.2
+        ... the output will appear in ypix.mag.3 ...
 .fi
 
-4. Run QPHOT in batch using a coords file generated by the DAOFIND task.
+
+4. Display and measure some stars in an image section and write the output
+coordinates in the coordinate system of the parent image.
 
 .nf
-	ap> daofind m92 fw=3.5 sigma=10.0 threshold=3.0
+        ap> display dev$ypix[150:450,150:450] 1
 
-	... make a coordinate list by searching for objects with a fwhmpsf
-	    of 3.5 pixels and a maximum pixel of at least 30 counts above
-	    local sky
+        ... display the image section
 
-	... the output will appear in the text file m92.coo.1
+        ap> qphot dev$ypix[150:450,150:450] 7.0 12.0 5.0 "3.0,5.0" wcsout=tv
 
-	ap> qphot m92 coords=m92.coo.1 inter-
+        ... move cursor to stars and type spbar
 
-	... output will appear in m92.mag.3
+        ... type q to quit and q again to confirm quit
+
+        ... output will appear in ypix.mag.4
+
+        ap> pdump ypix.mag.4 xc,yc yes | tvmark 1 STDIN col=204
 .fi
 
-5. Run QPHOT interactively on the sun workstation using the IMTOOL window.
-Setup the parameters interactively. This example assumes that the user
-has no display device but does have a list of initial positions for his/her
-stars generated for example by daofind.
+
+5. Run QPHOT in batch mode using the coordinate file and the previously
+saved parameters.
 
 .nf
-	ap> set stdimcur = text
+        ap> qphot dev$ypix 7. 12.0 5.0 "3.0,5.0" coords=ypix.coo.1 inter-
 
-	... set the image cursor to the standard input
-
-	ap> qphot m92 5. 8. 25. 2.,4.,6.
-
-	... type :m 3 to move the coordinate list to star number three
-	    which will be our setup star
-
-	... type i in response to the image cursor prompt to enter the
-	    interactive setup menu
-	... enter maximum radius in pixels of the radial profile
-	... set the centering aperture, inner and outer sky annulus, and
-	    the apertures using the stellar radial profile plot and
-	    verify
-	... typing <CR> leaves everything at the default value
-
-	... an alternate response to the above image cursor prompt would be
-	    "xcoord ycoord 1 i" which would attempt to set up on a star
-	    at position xcoord, ycoord
-
-	... type r to rewind the coordinate list
-
-	... type l measure all the stars in the list
-	... a one line summary of the answers will appear on the standard
-	    output for each star measured
-
-	... full output will appear in the text file m92.mag.4 
+        ... output will appear in ypix.mag.5 ...
 .fi
 
-.ih
-TIME REQUIREMENTS
+
+6. Repeat example 5 but assume that the input coordinate are ra and dec
+in degrees and degrees and submit the task to to the background.
+
+.nf
+        ap> display dev$ypix
+
+        ap> rimcursor wcs=world > radec.coo
+
+        ... move to selected stars and type any key
+
+        ... type ^Z to quit
+
+        ap> qphot dev$ypix 7.0 12.0 5.0 "3.0,5.0" coords=radec.coo \
+            wcsin=world inter- &
+
+        ... output will appear in ypix.ctr.6
+
+        ap> pdump ypix.mag.6 xc,yc yes | tvmark 1 STDIN col=204
+
+        ... mark the stars on the display
+.fi
+
+
+7. Run QPHOT interactively without using the image display.
+
+.nf
+        ap> show stdimcur
+
+        ... record the default value of stdimcur
+
+        ap> set stdimcur = text
+
+        ... set the image cursor to the standard input
+
+        ap> qphot dev$ypix 7.0 12.0 5.0 "3.0,5.0" coords=ypix.coo.1
+
+        ... type ? for optional help
+
+        ... type :m 3 to set the initial coordinates to those of the
+            third star in the list
+
+        ... type "442 409 101 i" to enter the interactive setup menu
+        ... enter the maximum radius in pixels for the radial profile or
+            accept the default with a CR
+        ... type v to enter the default menu
+        ... reset cbox, annulus, dannulus, and apertures using the graphics
+            cursor and the stellar radial profile plot
+        ... typing <CR> after the prompt leaves the parameter at its default
+            value
+	... type q to quit the setup menu
+
+        ... type r to rewind the coordinate list
+
+        ... type l to measure all the stars in the coordinate list
+
+        ... a one line summary of the answers will appear on the standard
+            output for each star measured
+
+        ... type q to quit followed by q to confirm the quit
+
+        ... full output will appear in the text file ypix.mag.7
+
+        ap> set stdimcur = <default>
+
+        ... reset the value of stdimcur
+.fi
+
+8. Use a image cursor command file to drive the qphot task. The cursor command
+file shown below computes the centers, sky values, and magnitudes  for 3 stars
+and quits the task.
+
+.nf
+        ap> type cmdfile
+        442 410 101 \040
+        349 188 101 \040
+        225 131 101 \040
+        q
+
+        ap> qphot dev$ypix 7.0 12.0 5.0 "3.0,5.0" icommands=cmdfile
+
+        ... full output will appear in ypix.mag.8
+.fi
+
 
 .ih
 BUGS
 
-It is currently the responsibility of the user to make sure that the
-image displayed in the frame is the same as that specified by the image
-parameter.
+It is the responsibility of the user to make sure that the image displayed
+in the image display is the same as that specified by the image parameter.
 
-Commands which draw to the image display are currently disabled.
-The TVMARK task in the proto package  can be used to draw simple marks
-on the display. All the APPHOT marking commands will however function
-if a contour plot is used in lieu of the image display.
-
-Users should not be confused by the normally enabled markcur option in the
-SUN/IMTOOL setup window. This feature is under the control of the
-IMTOOL window and the APPHOT package has no control over it.
+Commands which draw to the image display are disabled by default.
+To enable graphics overlay on the image display, set the display
+parameter to "imdr", "imdg", "imdb", or "imdy" to get red, green,
+blue or yellow overlays. It may be necessary to run gflush and to
+redisplay the image to get the overlays position correctly.
 
 .ih
 SEE ALSO

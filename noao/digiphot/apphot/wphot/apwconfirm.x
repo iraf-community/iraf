@@ -56,17 +56,11 @@ begin
 
 	    # Confirm the sky annulus parameter.
 	    annulus = ap_vannulus (ap)
+
 	    # Confirm the width of the sky annulus.
 	    dannulus = ap_vdannulus (ap)
 
-	} else if (apstati (ap, SKYFUNCTION) == AP_CONSTANT) {
-
-	    skysigma = ap_vsigma (ap)
-	    annulus = apstatr (ap, ANNULUS)
-	    dannulus = apstatr (ap, DANNULUS)
-
 	} else {
-
 	    annulus = apstatr (ap, ANNULUS)
 	    dannulus = apstatr (ap, DANNULUS)
 	}

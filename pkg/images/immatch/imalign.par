@@ -12,6 +12,7 @@ lower,r,h,INDEF,,,"Lower threshold for data"
 upper,r,h,INDEF,,,"Upper threshold for data"
 niterate,i,h,3,2,,"Maximum number of iterations"
 tolerance,i,h,0,0,,"Tolerance for convergence"
+maxshift,r,h,INDEF,,,"Maximum acceptable pixel shift"
 
 shiftimages,b,h,yes,,,"Shift the images ?"
 interp_type,s,h,"linear","|nearest|linear|poly3|poly5|spline3|",,"Interpolant"

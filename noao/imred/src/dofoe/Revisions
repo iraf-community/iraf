@@ -1,5 +1,13 @@
 .help revisions Jan95 noao.imred.src.dofoe
 .nf
+dofoe$proc.cl
+    Modified code to eliminate goto.  This is for use with pyraf.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
+
 dofoe$arcrefs.cl
 dofoe$batch.cl
 dofoe$doarcs.cl

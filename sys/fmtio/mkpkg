@@ -32,7 +32,7 @@ tfiles:
 libsys.a:
 	$ifeq (USE_GENERIC, yes) $call tfiles $endif
 
-	cctoc.x		escchars.inc <chars.h> <ctype.h>
+	cctoc.x	escchars.inc <chars.h> <ctype.h>
 	chdeposit.x	
 	chfetch.x	
 	chrlwr.x	<ctype.h>
@@ -43,7 +43,7 @@ libsys.a:
 	ctod.x		<ctype.h> <mach.h>
 	ctoi.x		<ctype.h>
 	ctol.x		<ctype.h>
-	ctor.x	
+	ctor.x		<mach.h>
 	ctotok.x	tokdata.inc <chars.h> <lexnum.h> <ctotok.h> <ctype.h>
 	ctowrd.x	<chars.h> <ctype.h>
 	ctox.x		<ctype.h>
@@ -52,8 +52,8 @@ libsys.a:
 	dtoc3.x		<ctype.h> <mach.h> <printf.h>
 	eprintf.x	<printf.h>
 	evexpr.x	evexpr.com <ctype.h> <evexpr.h> <lexnum.h> <mach.h>
-	evvexpr.x	evvexpr.com <lexnum.h> <ctype.h> <mach.h> <math.h>\
-			<evvexpr.h>
+	evvexpr.x	evvexpr.com <ctype.h> <evvexpr.h> <lexnum.h>\
+			<mach.h> <math.h>
 	fmterr.x	
 	fmtinit.x	fmt.com <printf.h>
 	fmtread.x	fmt.com <printf.h>
@@ -71,7 +71,7 @@ libsys.a:
 	gargl.x		<mach.h>
 	gargr.x	
 	gargrad.x	scan.com
-	gargs.x	
+	gargs.x		<mach.h>
 	gargstr.x	scan.com
 	gargtok.x	scan.com
 	gargwrd.x	scan.com
@@ -97,7 +97,7 @@ libsys.a:
 	sprintf.x	<printf.h>
 	sscan.x		scan.com
 	strcat.x	
-	strcmp.x
+	strcmp.x	
 	strcpy.x	
 	strdic.x	<ctype.h>
 	streq.x	

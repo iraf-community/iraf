@@ -11,19 +11,22 @@ PARAMETERS
 Time in seconds for output of magnitude at the specified signal-to-noise and
 signal-to-noise at the specified magnitude.  This time applies to all
 filters.  If specified as INDEF then no output at fixed exposure time will
-be produced.
+be produced.  If the value is not greater than zero or less than 100000
+an error is reported.
 .le
 .ls magnitude = 20.
 Magnitude for output of time at the specified signal-to-noise and
 signal-to-noise at the specified time.  This magnitude applies to all
 filters. If specified as INDEF then no output at fixed magnitude will
-be produced.
+be produced.  If the absolute value of the magnitude is greater than 40
+an error will be reported.
 .le
 .ls snr = 20.
 Signal-to-noise ratio for output of time at the specified magnitude and
 magnitude at the specified time.  This signal-to-noise ratio applies to all
 filters. If specified as INDEF then no output at fixed signal-to-noise
-ratio will be produced.
+ratio will be produced.  If the value is not greater than zero or less than
+100000 an error is reported.
 .le
 
 .ls database = "ccdtime$kpno.dat"
@@ -330,6 +333,11 @@ mode.  In the following example we want to change the magnitude.
 .fi
 .ih
 REVISIONS
+.ls CCDTIME V2.11.4
+A error will be reported if the requested time or SNR is not greater
+than zero and less than 100000., or if the absolute value
+of the magnitude is greater than 40.
+.le
 .ls CCDTIME V2.11.2
 The incorrect usage of a 1 mag/airmass extinction was fixed by adding an
 expected "extinction" entry in the filter entries.  Note that old files

@@ -103,7 +103,7 @@ begin
 
 		    kp = ua
 		    fd = open (Memc[efile], READ_ONLY, TEXT_FILE)
-		    while (getline (fd, Memc[eline], SZ_LINE) != EOF) {
+		    while (getline (fd, Memc[eline]) != EOF) {
 			for (ip=eline; IS_WHITE(Memc[ip]); ip=ip+1)
 			    ;
 			for (jp=ip; IS_FITS(Memc[jp]); jp=jp+1)

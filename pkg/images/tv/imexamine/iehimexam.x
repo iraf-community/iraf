@@ -167,7 +167,7 @@ begin
 	    call salloc (title, IE_SZTITLE, TY_CHAR)
 	    call sprintf (Memc[title], IE_SZTITLE,
 		"%s[%d:%d,%d:%d]: Histogram from z1=%g to z2=%g, nbins=%d\n%s")
-	        call pargstr (IE_IMAGE(ie))
+	        call pargstr (IE_IMNAME(ie))
 		call pargi (x1)
 		call pargi (x2)
 	        call pargi (y1)

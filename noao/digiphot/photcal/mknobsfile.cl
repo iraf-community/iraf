@@ -11,6 +11,7 @@ file	photfiles    {prompt="The input list of APPHOT/DAOPHOT databases"}
 string	idfilters    {prompt="The list of filter ids"}
 file	imsets       {prompt="The input image set file"}
 file	observations {prompt="The output observations file"}
+bool    wrap         {yes, prompt="Format output file for easy reading ?"}
 file	obsparams    {"", prompt="The input observing parameters file"}
 string	obscolumns   {"2 3 4 5", prompt="The format of obsparams"}
 real	minmagerr    {0.001, min=0.0, prompt="The minimum error magnitude"}
@@ -94,9 +95,9 @@ begin
 
 	# Create the observations file.
 
-	obsfile (tdatafile, "1,2,3,6,9,7,8,4,5", tidfilters, timsets,
-	    tobsfile, obsparams=obsparams, minmagerr=minmagerr, normtime=no,
-	    tolerance=tolerance, allfilters=allfilters,
+	obsfile (tdatafile, "1,2,3,6,9,7,8,4,5,0", tidfilters, timsets,
+	    tobsfile, wrap=wrap, obsparams=obsparams, minmagerr=minmagerr,
+	    normtime=no, tolerance=tolerance, allfilters=allfilters,
 	    obscolumns="1," // tobscolumns, shifts=shifts, apercors=apercors,
 	    verify=verify, verbose=verbose)
 

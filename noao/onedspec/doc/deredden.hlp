@@ -75,9 +75,13 @@ uncorrect parameter should be no.
 DESCRIPTION
 The input spectra are corrected for interstellar extinction, or
 reddening, using the empirical selective extinction function of
-Cardelli, Clayton, and Mathis, \fBApJ 345:245\fR, 1989, (CCM).  This
-function requires two parameters, the absolute extinction at 5550A,
-A(V), and the ratio, R(V), of this extinction to the color excess
+Cardelli, Clayton, and Mathis, \fBApJ 345:245\fR, 1989, (CCM).
+The function is defined over the range 0.3-10 inverse microns
+or 100-3333 nanometers.  If the input data extend outside this
+range an error message will be produced.
+
+The extinction function requires two parameters, the absolute extinction at
+5550A, A(V), and the ratio, R(V), of this extinction to the color excess
 between 4350A and 5550A, E(B-V).
 
 One of the input task parameters is R(V).  If it is not known one

@@ -13,7 +13,7 @@ libpkg.a:
 			<xwhen.h>		<fset.h>                    \
 			../lib/daophotdef.h	../lib/psfdef.h
 	dpdelstar.x	<imhdr.h>		../lib/daophotdef.h         \
-			../lib/psfdef.h		<mach.h>
+			../lib/psfdef.h         <mach.h>
 	dpfitpsf.x	<mach.h>                <imhdr.h>                   \
 			../lib/daophotdef.h	../lib/apseldef.h           \
 			../lib/psfdef.h		../lib/peakdef.h
@@ -21,14 +21,14 @@ libpkg.a:
 			../lib/daophotdef.h	../lib/apseldef.h           \
 			../lib/psfdef.h
 	dpispstars.x	<fset.h>		<ctype.h>		    \
-			../lib/daophotdef.h	../lib/apseldef.h	    \
-			../lib/psfdef.h
+			<gset.h>                ../lib/daophotdef.h	    \
+			../lib/apseldef.h	../lib/psfdef.h
 	dppcolon.x	../lib/daophotdef.h	../lib/psfdef.h
 	dpqverify.x	<fset.h>
 	dpmempsf.x	../lib/daophotdef.h	../lib/psfdef.h
 	dpmkpsf.x	<imhdr.h>               <ctype.h>                   \
-			../lib/daophotdef.h	../lib/apseldef.h           \
-			../lib/psfdef.h
+			<gset.h>                ../lib/daophotdef.h	    \
+			../lib/apseldef.h       ../lib/psfdef.h
 	dppconfirm.x
 	dppsfutil.x	../lib/daophotdef.h     ../lib/apseldef.h           \
 			../lib/psfdef.h
@@ -46,8 +46,8 @@ libpkg.a:
 			../lib/psfdef.h
 	dprmpsf.x	<fset.h>		<imhdr.h>                   \
 			../lib/daophotdef.h	../lib/psfdef.h
-	dprstars.x	<tbset.h>		../lib/apseldef.h           \
-			../lib/psfdef.h
+	dprstars.x	<gset.h>                <tbset.h>		    \
+	                ../lib/apseldef.h       ../lib/psfdef.h
 	dpshowpsf.x	<mach.h>		<ctype.h>                   \
 			../lib/daophotdef.h     ../lib/psfdef.h
 	dpspstars.x	<mach.h>		../lib/daophotdef.h	    \
@@ -62,9 +62,9 @@ libpkg.a:
 			../lib/daophotdef.h	../lib/apseldef.h           \
 			../lib/psfdef.h
 	t_psf.x		<fset.h>		<gset.h>                    \
-			../lib/daophotdef.h	../lib/apseldef.h           \
-			../lib/psfdef.h
+			<imhdr.h>               ../lib/daophotdef.h	    \
+			../lib/apseldef.h	../lib/psfdef.h
 	t_pstselect.x	<fset.h>		<gset.h>		    \
-			../lib/daophotdef.h	../lib/apseldef.h           \
-			../lib/psfdef.h
+			<imhdr.h>               ../lib/daophotdef.h	    \
+			../lib/apseldef.h       ../lib/psfdef.h
 	;

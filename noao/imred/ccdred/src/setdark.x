@@ -137,6 +137,11 @@ begin
 	    darktime1 = hdmgetr (IN_IM(ccd), "exptime")
 	iferr (darktime2 = hdmgetr (im, "darktime"))
 	    darktime2 = hdmgetr (im, "exptime")
+	if (darktime2 <= 0.) {
+	    call sprintf (Memc[str], SZ_LINE, "Dark time is zero for `%s'")
+		call pargstr (Memc[image])
+	    call error (1, Memc[str])
+	}
 
 	DARKSCALE(ccd) = darktime1 / darktime2
 	CORS(ccd, DARKCOR) = D

@@ -6,9 +6,10 @@ include	"../lib/psfdef.h"
 
 # DP_WRITEPSF -- Write out the PSF into an IRAF image. 
 
-procedure dp_writepsf (dao, psfim)
+procedure dp_writepsf (dao, im, psfim)
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 pointer	psfim			# pointer to the output psf image
 
 begin
@@ -23,7 +24,7 @@ begin
 	call dp_wfuncpars (dao, psfim) 
 
 	# Write out the list of PSF stars.
-	call dp_wstars (dao, psfim)
+	call dp_wstars (dao, im, psfim)
 
 	# Write out the lookup table.
 	call dp_wlt (dao, psfim)
@@ -65,12 +66,18 @@ begin
 	# Write out the package, task, and input/output file names.
 	call imastr (psfim, "PACKAGE", "daophot")
 	call imastr (psfim, "TASK", "psf")
-	call imastr (psfim, "IMAGE", DP_INIMAGE(dao))
-	call imastr (psfim, "PHOTFILE", DP_INPHOTFILE(dao))
-	call imastr (psfim, "PSTFILE", DP_COORDS(dao))
-	call imastr (psfim, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call imastr (psfim, "OPSTFILE", DP_OUTREJFILE(dao))
-	call imastr (psfim, "GRPSFILE", DP_OUTPHOTFILE(dao))
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call imastr (psfim, "IMAGE", Memc[outstr])
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call imastr (psfim, "PHOTFILE", Memc[outstr])
+	call dp_froot (DP_COORDS(dao), Memc[outstr], SZ_LINE)
+	call imastr (psfim, "PSTFILE", Memc[outstr])
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call imastr (psfim, "PSFIMAGE", Memc[outstr])
+	call dp_froot (DP_OUTREJFILE(dao), Memc[outstr], SZ_LINE)
+	call imastr (psfim, "OPSTFILE", Memc[outstr])
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call imastr (psfim, "GRPSFILE", Memc[outstr])
 
 	# Add information about fitting parameters.
 	call imaddr (psfim, "SCALE", DP_SCALE(dao))
@@ -152,13 +159,15 @@ end
 
 # DP_WSTARS -- Write out the PSF star list to the PSF image.
 
-procedure dp_wstars (dao, psfim)
+procedure dp_wstars (dao, im, psfim)
 
 pointer	dao			# pointer to the daophot descriptor
+pointer	im			# the input image descriptor
 pointer	psfim			# the psfimage descriptor
 
-int	i
+real	tx, ty
 pointer	apsel, psf, sp, str
+int	i
 
 begin
 	apsel = DP_APSEL(dao)
@@ -174,17 +183,19 @@ begin
 	# Write out the ids of all the PSF stars.
 	do i = 1, DP_PNUM(psf) {
 
+	    call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+i-1],
+		Memr[DP_APYCEN(apsel)+i-1], tx, ty, 1)
 	    call sprintf (Memc[str], SZ_FNAME, "ID%d")
 	        call pargi (i)
 	    call imaddi (psfim, Memc[str], Memi[DP_APID(apsel)+i-1])
 
 	    call sprintf (Memc[str], SZ_FNAME, "X%d")
 	        call pargi (i)
-	    call imaddr (psfim, Memc[str], Memr[DP_APXCEN(apsel)+i-1]) 
+	    call imaddr (psfim, Memc[str], tx)
 
 	    call sprintf (Memc[str], SZ_FNAME, "Y%d")
 	        call pargi (i)
-	    call imaddr (psfim, Memc[str], Memr[DP_APYCEN(apsel)+i-1]) 
+	    call imaddr (psfim, Memc[str], ty)
 
 	    call sprintf (Memc[str], SZ_FNAME, "MAG%d")
 	        call pargi (i)

@@ -101,7 +101,7 @@ pointer	fc			#I pointer to FC descriptor
 double	a_x			#I point to sample WCS at
 double	a_y			#O value of WCS at that point
 
-int	index, i
+int	index, i, step
 double	frac, x, y
 pointer	ip, op, i1, i2
 int	wf_smp_binsearch()
@@ -109,45 +109,55 @@ define	sample_ 91
 define	oor_ 92
 
 begin
-	i1 = FC_V1(fc)
-	ip = FC_LOC(fc) + i1 - 1
-
 	# Get the input X value.
 	if (FC_DIR(fc) == FORWARD)
 	    x = a_x
 	else
 	    x = a_x - FC_W(fc)
 
-	# Always check the current inverval first, to optimize the case of
+	# Check for out of bounds and set step.
+	i1 = FC_V1(fc)
+	i2 = i1 + FC_NPTS(fc) - 1
+	if (Memd[i1] <= Memd[i2]) {
+	    if (x < Memd[i1] || x > Memd[i2])
+		goto oor_
+	    step = 1
+	} else {
+	    if (x < Memd[i2] || x > Memd[i1])
+		goto oor_
+	    step = -1
+	}
+
+	# Check the endpoints and the last inverval to optimize the case of
 	# repeated samplings of the same region of the curve.
 
-	if (Memd[ip] <= x && x <= Memd[ip+1])
+	if (x == Memd[i1])
+	    ip = i1 - min (0, step)
+	else if (x == Memd[i2])
+	    ip = i2 - max (0, step)
+	else
+	    ip = FC_LOC(fc) + i1 - 1
+	if (Memd[ip] <= x && x <= Memd[ip+step])
 	    goto sample_
-
-	i2 = i1 + FC_NPTS(fc) - 1
 
 	# Next check several intervals to either side.
 	if (x < Memd[ip]) {
 	    do i = 1, 5 {
-		ip = ip - 1
-		if (ip < i1)
-		    goto oor_
+		ip = ip - step
 		if (Memd[ip] <= x)
 		    goto sample_
 	    }
 	} else {
 	    do i = 1, 5 {
-		if (Memd[ip+1] >= x)
+		if (Memd[ip+step] >= x)
 		    goto sample_
-		ip = ip + 1
-		if (ip+1 > i2)
-		    goto oor_
+		ip = ip + step
 	    }
 	}
 
 	# Give up and do a full binary search!
 	index = wf_smp_binsearch (x, Memd[i1], FC_NPTS(fc))
-	if (i == 0)
+	if (index == 0)
 	    goto oor_
 	else
 	    ip = i1 + index - 1
@@ -156,14 +166,17 @@ begin
 	# interpolating the output vector.
 sample_
 	op = FC_V2(fc) + ip-i1
-	frac = (Memd[ip+1] - x) / (Memd[ip+1] - Memd[ip])
-	y = (Memd[op+1] - Memd[op]) * frac + Memd[op]
+	frac = (x - Memd[ip]) / (Memd[ip+step] - Memd[ip])
+	y = (Memd[op+step] - Memd[op]) * frac + Memd[op]
 
 	# Get the output Y value.
 	if (FC_DIR(fc) == FORWARD)
 	    a_y = y
 	else
 	    a_y = y + FC_W(fc)
+
+	# Save last location.
+	FC_LOC(fc) = ip - i1 + 1
 
 	return
 oor_
@@ -187,21 +200,34 @@ int	low, high, pos, i
 
 begin
 	low = 1
-	high = max (1, npts - 1)
-	pos = 0
+	high = max (1, npts)
 
 	# Cut range of search in half until interval is found, or until range
 	# vanishes (high - low <= 1).
 
-	do i = 1, npts {
-	    pos = (high - low) / 2 + low
-	    if (pos == low)
-		return (0)				# not found
-	    else if (v[pos] <= x && x <= v[pos+1])
-		return (pos)
-	    else if (x < v[pos])
-		high = pos
-	    else
-		low = pos
+	if (v[1] < v[npts]) {
+	    do i = 1, npts {
+		pos = min ((high - low) / 2 + low, npts-1)
+		if (pos == low)
+		    return (0)				# not found
+		else if (v[pos] <= x && x <= v[pos+1])
+		    return (pos)
+		else if (x < v[pos])
+		    high = pos
+		else
+		    low = pos
+	    }
+	} else {
+	    do i = 1, npts {
+		pos = min ((high - low) / 2 + low, npts-1)
+		if (pos == low)
+		    return (0)				# not found
+		else if (v[pos+1] <= x && x <= v[pos])
+		    return (pos+1)
+		else if (x > v[pos])
+		    high = pos
+		else
+		    low = pos
+	    }
 	}
 end

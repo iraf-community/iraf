@@ -138,6 +138,7 @@ action is to use the string (not pattern) which delimited the input record.
 .ls comments = yes
 Pass comment lines and blank lines on to the output list.
 .le
+.le
 
 .nh
 Statements
@@ -535,3 +536,4 @@ Reverse the characters in each field, without changing the ordering
 of the fields:
 
 	lcalc list, "[*] fi[-*]"
+.endhelp

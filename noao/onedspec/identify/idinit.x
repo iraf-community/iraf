@@ -50,7 +50,7 @@ begin
 	call mfree (ID_APS(id), TY_INT)
 
 	ptr = ID_LABEL(id)
-	do i = 1, ID_NALLOC(id) {
+	do i = 1, ID_NFEATURES(id) {
 	    call mfree (Memi[ptr], TY_CHAR)
 	    ptr = ptr + 1
 	}
@@ -90,7 +90,7 @@ begin
 	stp = ID_STP(id)
 	for (sid = sthead(stp); sid != NULL; sid = stnext (stp, sid)) {
 	    ptr = ID_LABEL(sid)
-	    do i = 1, ID_NALLOC(sid) {
+	    do i = 1, ID_NFEATURES(sid) {
 		call mfree (Memi[ptr], TY_CHAR)
 		ptr = ptr + 1
 	    }
@@ -284,7 +284,7 @@ end
 
 # ID_GID -- Restore saved identify information.
 
-int procedure id_gid (id, sid)
+procedure id_gid (id, sid)
 
 pointer	id		#I IDENTIFY structure
 int	sid		#I IDENTIFY save structure
@@ -365,6 +365,4 @@ begin
 	ID_AP(id,1) = ID_AP(sid,1)
 	ID_AP(id,2) = ID_AP(sid,2)
 	ID_SHIFT(id) = ID_SHIFT(sid)
-
-	return (OK)
 end

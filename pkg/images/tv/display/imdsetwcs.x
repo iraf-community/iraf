@@ -24,7 +24,7 @@ begin
 	call salloc (pkwcs, count, TY_CHAR)
 	call strpak (wcstext, Memc[pkwcs], count)
 
-	call iishdr (IWRITE+PACKED, count, WCS, 0,0, iisflu(chan),
+	call iishdr (IWRITE+PACKED, count, WCS, iis_version, 0, iisflu(chan),
 	    max(0,iis_config-1))
 	call iisio (Memc[pkwcs], count, status)
 

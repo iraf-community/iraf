@@ -5,6 +5,7 @@ $doc		= "./doc/"
 $argus		= "noao$imred/argus/"
 $bias		= "noao$imred/bias/"
 $ccdred		= "noao$imred/ccdred/"
+$crutil		= "noao$imred/crutil/"
 $ctioslit	= "noao$imred/ctioslit/"
 $dtoi		= "noao$imred/dtoi/"
 $echelle	= "noao$imred/echelle/"
@@ -15,6 +16,7 @@ $irred		= "noao$imred/irred/"
 $irs		= "noao$imred/irs/"
 $kpnocoude	= "noao$imred/kpnocoude/"
 $kpnoslit	= "noao$imred/kpnoslit/"
+$quadred	= "noao$imred/quadred/"
 $specred	= "noao$imred/specred/"
 $vtel		= "noao$imred/vtel/"
 
@@ -36,6 +38,12 @@ ccdred		men=ccdred$ccdred.men,
 		sys=ccdred$ccdred.hlp,
 		pkg=ccdred$ccdred.hd,
 		src=ccdred$ccdred.cl
+
+crutil		men=crutil$crutil.men,
+		hlp=..,
+		sys=crutil$crutil.hlp,
+		pkg=crutil$crutil.hd,
+		src=crutil$crutil.cl
 
 ctioslit	men=ctioslit$ctioslit.men,
 		hlp=..,
@@ -91,6 +99,12 @@ kpnoslit	men=kpnoslit$kpnoslit.men,
 		hlp=..,
 		pkg=kpnoslit$kpnoslit.hd,
 		src=kpnoslit$kpnoslit.cl
+
+quadred		men=quadred$quadred.men,
+		hlp=..,
+		sys=quadred$quadred.hlp,
+		pkg=quadred$quadred.hd,
+		src=quadred$quadred.cl
 
 specred		men=specred$specred.men,
 		hlp=..,

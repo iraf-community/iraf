@@ -9,11 +9,14 @@ dofoe objects
 SUMMARY
 The \fBdofoe\fR reduction task is specialized for scattered light
 subtraction, extraction, flat fielding, and wavelength calibration of Fiber
-Optic Echelle (FOE) spectra.  It is a command language script which
-collects and combines the functions and parameters of many general purpose
-tasks to provide a single complete data reduction path.  The task provides
-a degree of guidance, automation, and record keeping necessary when dealing
-with the complexities of reducing this type of data.
+Optic Echelle (FOE) spectra.  There may be one fiber or two fibers where
+the second fiber is illuminated by an arc calibration during arc and object
+exposures and a flat field during flat field exposures.  It is a command
+language script which collects and combines the functions and parameters of
+many general purpose tasks to provide a single complete data reduction
+path.  The task provides a degree of guidance, automation, and record
+keeping necessary when dealing with the complexities of reducing this type
+of data.
 .ih
 PARAMETERS
 .ls objects
@@ -30,12 +33,9 @@ Flat field spectrum.  If specified the one dimensional flat field spectrum
 is extracted and used to make flat field calibrations.
 .le
 .ls arcs = "" (at least one if dispersion correcting)
-List of arc spectra in which both fibers have arc spectra.  These spectra
-are used to define the dispersion functions for each fiber apart from a
-zero point correction made with the arc fiber during an observation.  One
-fiber from the first spectrum is used to mark lines and set the dispersion
-function interactively and dispersion functions for the other fiber and arc
-spectra are derived from it.
+List of arc spectra.  The first arc in the list is used to create a
+dispersion solution interactively.  All other arc spectra will be
+automatically reidentified.
 .le
 .ls arctable = "" (optional) (refspectra)
 Table defining arc spectra to be assigned to object spectra (see
@@ -70,8 +70,9 @@ on this see the discussion of the saturation parameter in the
 .ls norders = 12 (apfind)
 Number of orders to be found.  This number is used during the automatic
 definition of the apertures from the aperture reference spectrum.  Note
-that the number of apertures defined is twice this number, one set for
-the object fiber orders and one set for the arc fiber orders.
+that when there is a second fiber for simultaneous arcs the specified
+number will be automatically doubled for finding both sets of orders.
+So in either case specify only the number of orders from a single fiber.
 The interactive review of the aperture assignments allows verification
 and adjustments to the automatic aperture definitions.
 .le
@@ -80,10 +81,12 @@ Approximate base full width of the fiber profiles.  This parameter is used
 for the profile centering algorithm.
 .le
 .ls arcaps = "2x2"
-List of arc fiber aperture numbers.
+When there is only a single fiber set this parameter to "".  When there is
+a second fiber used to create simultaneous arcs during the object exposures
+this parameter specifies a list of aperture numbers for the arc fibers.
 Since the object and arc fiber orders are paired the default setting
-expects the even number apertures to be the are apertures.  This should
-be checked interactively.
+expects the even number apertures to be the are apertures.  This should be
+checked interactively.
 .le
 
 .ls fitflat = yes (flat1d)
@@ -462,11 +465,18 @@ for example "d1h".
 DESCRIPTION
 The \fBdofoe\fR reduction task is specialized for scattered light
 subtraction, extraction, flat fielding, and wavelength calibration of Fiber
-Optic Echelle (FOE) spectra.  It is a command language script which
-collects and combines the functions and parameters of many general purpose
-tasks to provide a single complete data reduction path.  The task provides
-a degree of guidance, automation, and record keeping necessary when dealing
-with the complexities of reducing this type of data.
+Optic Echelle (FOE) spectra.  There may be one fiber or two fibers where
+the second fiber is illuminated by an arc calibration during arc and object
+exposures and a flat field during flat field exposures.  When there is
+just one fiber the parameter \fIarcaps\fR is set to "" and when there are
+two fibers the parameter is used to select which of the defined
+apertures are the orders from the simultaneous arc fiber.
+
+This task is a command language script which collects and combines the
+functions and parameters of many general purpose tasks to provide a single
+complete data reduction path.  The task provides a degree of guidance,
+automation, and record keeping necessary when dealing with the complexities
+of reducing this type of data.
 
 The general organization of the task is to do the interactive setup steps
 first using representative calibration data and then perform the majority
@@ -521,7 +531,8 @@ the widths of the profiles at a fixed fraction of the peak height.
 .ls [5]
 The automatic order identification and aperture assignment is based on peak
 height and may be incorrect.  The interactive aperture editor is entered
-with a plot of the apertures.  It is essential that the object and arc
+with a plot of the apertures.  When there is a second simultaneous arc
+fiber it is essential that the object and arc
 fiber orders are properly paired with the arc fibers having even aperture
 numbers and the object fibers having odd aperture numbers.  It is also
 required that no orders be skipped in the region of interest.  Missing
@@ -564,8 +575,8 @@ dispersion function.  Check the quality of the dispersion function fit
 with 'f'.  When satisfied exit with 'q'.
 .le
 .ls [10]
-The other fiber dispersion function is automatically determined using
-the task \fBecreidentify\fR.
+If there is a second fiber the dispersion function is automatically
+determined using the task \fBecreidentify\fR.
 .le
 .ls [11]
 The arc reference spectrum is dispersion corrected.
@@ -580,7 +591,8 @@ and dispersion corrected.  Any new dispersion function reference arcs
 assigned to the object images are automatically extracted and
 dispersion functions determined.  A zero point wavelength correction
 is computed from the simultaneous arc fiber spectrum and applied to
-the object spectrum.
+the object spectrum if orders from the second fiber have been identified
+with the \fIarcaps\fR parameter.
 .le
 .ls [13]
 The final spectra will have the same name as the original 2D images
@@ -589,20 +601,19 @@ with a ".ec" extension added.
 
 \fBSpectra and Data Files\fR
 
-The basic input consists of dual fiber FOE object and calibration spectra
-stored as IRAF images.
-The type of image format is defined by the
-environment parameter \fIimtype\fR.  Only images with that extension will
-be processed and created.
-The raw CCD images must be processed to remove
-overscan, bias, and dark count effects.  This is generally done using the
-\fBccdred\fR package.  Flat fielding is generally not done at this stage
-but as part of \fBdofoe\fR.  The calibration spectra are
-flat field observations in both fibers, comparison arc lamp spectra
-in both fibers, and arc spectra in one fiber while the second
-fiber observes the object.  If for some reason the flat field or
-calibration arc spectra have separate exposures for the two fibers
-the separate exposures may simply be added.
+The basic input consists of single or dual fiber FOE object and calibration
+spectra stored as IRAF images.  The \fIarcaps\fR parameter is used to
+discriminate between the two cases.  The type of image format is defined by
+the environment parameter \fIimtype\fR.  Only images with that extension
+will be processed and created.  The raw CCD images must be processed to
+remove overscan, bias, and dark count effects.  This is generally done
+using the \fBccdred\fR package.  Flat fielding is generally not done at
+this stage but as part of \fBdofoe\fR.  The calibration spectra are flat
+field observations in all fibers, comparison arc lamp spectra in all
+fibers, and, for dual fiber model, arc spectra in one fiber while the
+second fiber observes the object.  If for some reason the flat field or
+calibration arc spectra have separate exposures for the two fibers the
+separate exposures may simply be added.
 
 The assignment of arc calibration exposures to object exposures is
 generally done by selecting the nearest in time and interpolating.
@@ -660,10 +671,12 @@ of spectra in the image if not defined in the image header by the keyword
 DISPAXIS.  The width parameter (in pixels) is used for the profile
 centering algorithm (\fBcenter1d\fR).
 
-The number of orders selects the number of "pairs" of object and arc
-fiber profiles to be automatically found based on the strongest peaks.
-Because it is important that both elements of a pair be found,
-no orders be skipped, and the aperture numbers be sequential with
+The number of orders selects the number of orders for a single
+fiber and "pairs" of object and arc
+fiber profiles for dual fibers.   The number specified will be
+automatically found based on the strongest peaks.
+In the  dual fiber case it is important that both elements of a pair be found,
+so no orders be skipped, and the aperture numbers must be sequential with
 arc profiles having even aperture numbers and object profiles having
 odd numbers in the region of interest, the automatic identification is  
 just a starting point for the interactive review.  The even/odd
@@ -752,14 +765,15 @@ The first operation is to define the extraction apertures, which include the
 aperture width, background regions, and position dependence with
 wavelength, for the object and arc orders of interest.  This is done
 on a reference spectrum which is usually a flat field taken through
-both fibers.  Other spectra will inherit the reference apertures and
+all fibers.  Other spectra will inherit the reference apertures and
 apply a correction for any shift of the orders across the dispersion.
 The reference apertures are defined only once unless the \fIredo\fR
 option is set.
 
 The selected number of orders are found automatically by selecting the
 highest peaks in a cut across the dispersion.  Note that the specified
-number of orders is multiplied by two in defining the apertures.  Apertures
+number of orders is multiplied by two in defining the apertures when
+there is a second fiber.  Apertures
 are assigned with a limits set by the \fIlower\fR and
 \fIupper\fR parameter and numbered sequentially.  A query is then
 given allowing the aperture limits to be "resized" based on the profile
@@ -768,12 +782,17 @@ itself (see \fBapresize\fR).
 A cut across the orders is then shown with the apertures marked and
 an interactive aperture editing mode is entered (see \fBapedit\fR).
 For \fBdofoe\fR the aperture identifications and numbering is particularly
-critical.  All "pairs" of object and arc orders in the region of
+critical.  When there is a single fiber the aperture numbers must
+be sequential with the order numbers.  If an order is skipped then the
+aperture number must also be skipped.
+
+For dual fibers all "pairs" of object and arc orders in the region of
 interest must be defined without skipping any orders.  The orders must
 also be numbered sequentially (though the direction does not matter)
 so that the arc apertures are either all even or all odd as defined
 by the \fIarcaps\fR parameter (the default is even numbers for the
 arc apertures).  The 'o' key will provide the necessary reordering.
+
 If local background subtraction is used the background regions should
 also be checked with the 'b' key.  Typically one adjusts all
 the background regions at the same time by selecting all apertures with
@@ -793,10 +812,10 @@ further queries and so are used to eliminate further queries of that kind.
 The above steps are all performed using tasks from the \fBapextract\fR
 package and parameters from the \fBparams\fR parameters.  As a quick
 summary, the dispersion direction of the spectra are determined from the
-package \fBdispaxis\fR parameter if not defined in the image header.  The default
-line or column for finding the orders and the number of image lines or
-columns to sum are set by the \fIline\fR and \fInsum\fR parameters.  A line
-of INDEF (the default) selects the middle of the image.  The automatic
+package \fBdispaxis\fR parameter if not defined in the image header.  The
+default line or column for finding the orders and the number of image lines
+or columns to sum are set by the \fIline\fR and \fInsum\fR parameters.  A
+line of INDEF (the default) selects the middle of the image.  The automatic
 finding algorithm is described for the task \fBapfind\fR and basically
 finds the strongest peaks.  The resizing is described in the task
 \fBapresize\fR and the parameters used are also described there and
@@ -915,13 +934,14 @@ response spectra.
 
 If dispersion correction is not selected, \fIdispcor\fR=no, then the object
 spectra are simply extracted.  If it is selected the arc spectra are used
-to dispersion calibrate the object spectra.  There are four steps involved;
+to dispersion calibrate the object spectra.  There are three steps involved;
 determining the dispersion functions relating pixel position to wavelength,
 assigning the appropriate dispersion function to a particular observation,
-determining a zero point wavelength shift from the arc fiber to be applied
-to the object fiber dispersion function, and either storing the nonlinear
+and either storing the nonlinear
 dispersion function in the image headers or resampling the spectra to
-evenly spaced pixels in wavelength.
+evenly spaced pixels in wavelength.  When there are two fibers there is
+also a step of applying a zero point correction to the object fiber based
+on the arc fiber.
 
 The first arc spectrum in the arc list is used to define the reference
 dispersion solution.  It is extracted using the reference aperture
@@ -931,9 +951,9 @@ to define the dispersion function in one fiber.  The idea is to mark some
 lines in a few orders whose wavelengths are known (with the line list used
 to supply additional lines after the first few identifications define the
 approximate wavelengths) and to fit a function giving the wavelength from
-the aperture number and pixel position.  The dispersion function for
-the second fiber is then determined automatically by reference to the first
-fiber using the task \fBecreidentify\fR.
+the aperture number and pixel position.  The dispersion function for the
+second fiber, if one is present, is then determined automatically by
+reference to the first fiber using the task \fBecreidentify\fR.
 
 The arc dispersion function parameters are for \fBecidentify\fR and it's
 related partner \fBecreidentify\fR.  The parameters define a line list for
@@ -954,10 +974,11 @@ arcs is done either explicitly with an arc assignment table (parameter
 The assignments are made by the task \fBrefspectra\fR.  When two arcs are
 assigned to an object spectrum an interpolation is done between the two
 dispersion functions.  This makes an approximate correction for steady
-drifts in the dispersion.  Because the arc fiber monitors any zero point
-shifts in the dispersion functions it is probably only necessary to have
-one or two arc spectra, one at the beginning and/or one at the end of the
-night.
+drifts in the dispersion.
+
+When a second arc fiber monitors any zero point shifts in the dispersion
+functions it is probably only necessary to have one or two arc spectra, one
+at the beginning and/or one at the end of the night.
 
 The tasks \fBsetjd\fR and \fBsetairmass\fR are automatically run on all
 spectra.  This computes and adds the header parameters for the Julian date
@@ -971,19 +992,19 @@ Defining the dispersion function for a new arc extraction is done with
 the task \fBecreidentify\fR.  This is done noninteractively with log
 information recorded about the line reidentifications and the fit.
 
-From the one or two arc spectra come two full dispersion function,
-one for the object fiber and one for the arc fiber.  When an object
-spectrum is extracted so is the simultaneous arc spectrum.  A zero point
-shift of the arc spectrum relative to the dispersion solution of the
-dual arc observation is computed using \fBecreidentify\fR
-(\fIrefit\fR=no).  This zero point shift is assumed to be the same for the
-object fiber and it is added to the dispersion function of the dual arc
-observation for the object fiber.  Note that this does not assume that the
-object and arc fiber dispersion functions are the same or have the same
-wavelength origin, but only that the same shift in wavelength zero point
-applies to both fibers.  Once the dispersion function correction is
-determined from the extracted arc fiber spectrum it is deleted leaving only
-the object spectrum.
+When there are two fibers there are two full dispersion function from the
+single or pair of arc spectra, one for the object fiber and one for the arc
+fiber.  When an object spectrum is extracted so is the simultaneous arc
+spectrum.  A zero point shift of the arc spectrum relative to the
+dispersion solution of the dual arc observation is computed using
+\fBecreidentify\fR (\fIrefit\fR=no).  This zero point shift is assumed to
+be the same for the object fiber and it is added to the dispersion function
+of the dual arc observation for the object fiber.  Note that this does not
+assume that the object and arc fiber dispersion functions are the same or
+have the same wavelength origin, but only that the same shift in wavelength
+zero point applies to both fibers.  Once the dispersion function correction
+is determined from the extracted arc fiber spectrum it is deleted leaving
+only the object spectrum.
 
 The last step of dispersion correction is setting the dispersion
 of the object spectrum.  There are two choices here.

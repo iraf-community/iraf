@@ -85,7 +85,7 @@ begin
 	# right.  The number of pixels in each region is given by SEGSIZE.
 
 	o_pv = -1
-	op = LL_FIRST
+	op = LL_CURHDRLEN + 1
 	segsize = ds - 1
 	rop_enable = false
 	x1 = 1;  iz = 1;  hi = 1
@@ -284,6 +284,6 @@ done_
 	}
 
 	# Update the line list header.
-	call amovs (ll_dst, ll_out, LL_FIRST - 1)
-	LL_LEN(ll_out) = op - 1
+	call amovs (ll_dst, ll_out, LL_CURHDRLEN)
+	LL_SETLEN(ll_out, op - 1)
 end

@@ -3,7 +3,7 @@
 include <fset.h>
 include <ctype.h>
 include <imhdr.h>
-include "../../lib/skywcs.h"
+include <pkg/skywcs.h>
 
 # T_CCFIND -- Locate objects with known celestial coordinates in an image
 # using the image WCS or a user supplied WCS. Write the matched celestial and
@@ -309,7 +309,7 @@ begin
 		    txref, tyref, txmag, tymag, txrot, tyrot, false)
 
 		# Force the wcs to look like an image wcs.
-		call sk_seti (refcoo, S_PTYPE, PIXTYPE_LOGICAL)
+		call sk_seti (refcoo, S_PIXTYPE, PIXTYPE_LOGICAL)
 
 	    }
 
@@ -318,7 +318,7 @@ begin
 	    if (verbose && out != STDOUT)
 		call sk_iiprint ("Insystem", Memc[insystem], NULL, coo)
 	    call sk_iiwrite (out, "Insystem", Memc[insystem], NULL, coo)
-	    call sk_getstr (refcoo, S_COOSYSTEM, Memc[str], SZ_FNAME)
+	    call sk_stats (refcoo, S_COOSYSTEM, Memc[str], SZ_FNAME)
 	    if (usewcs) {
 	        if (verbose && out != STDOUT) {
 		    call sk_iiprint ("Refsystem", Memc[str], mw, refcoo)

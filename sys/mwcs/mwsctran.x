@@ -210,24 +210,30 @@ begin
 	else
 	    call mw_invertd (D(mw,WCS_CD(w1)), Memd[i_ltm], pdim)
 
-	# Copy R to LTV.
-	if (WCS_R(w1) == NULL)
-	    call aclrd (Memd[i_ltv], pdim)
-	else
-	    call amovd (D(mw,WCS_R(w1)), Memd[i_ltv], pdim)
-
 	# If no function calls for an axis and W is set, LTV=(R-inv(CD)*W).
 	if (WCS_W(w1) != NULL) {
-	    call mw_vmuld (Memd[i_ltm], D(mw,WCS_W(w1)), Memd[t_ltv], pdim)
-	    call asubd (Memd[i_ltv], Memd[t_ltv], Memd[i_ltv], pdim)
+	    call amovd (D(mw,WCS_W(w1)), Memd[i_ltv], pdim)
 	    do i = 1, CT_NCALLI(ct) {
 		fc = CT_FCI(ct,i)
 		do j = 1, FC_NAXES(fc) {
-		    k = axis[FC_AXIS(fc,j)]	# undo -inv(CD)*W
-		    lp = i_ltv + k - 1
-		    Memd[lp] = Memd[lp] + Memd[t_ltv+k-1]
+		    k = axis[FC_AXIS(fc,j)]
+		    Memd[i_ltv+k-1] = 0.0d0
 		}
 	    }
+	    call mw_vmuld (Memd[i_ltm], Memd[i_ltv], Memd[t_ltv], pdim)
+
+	    # Copy R to LTV.
+	    if (WCS_R(w1) == NULL)
+	        call anegd (Memd[t_ltv], Memd[i_ltv], pdim)
+	    else
+		call asubd (D(mw,WCS_R(w1)), Memd[t_ltv], Memd[i_ltv], pdim)
+
+	} else {
+	    # Copy R to LTV.
+	    if (WCS_R(w1) == NULL)
+	        call aclrd (Memd[i_ltv], pdim)
+	    else
+	        call amovd (D(mw,WCS_R(w1)), Memd[i_ltv], pdim)
 	}
 
 	# Now prepare the output side of the transformation, from P->W2.

@@ -87,6 +87,7 @@ libos.a:
 	zshlib.c
 	zwmsec.c	<libc/kernel.h> <libc/spp.h>
 	zxwhen.c	<libc/kernel.h> <libc/spp.h>
+	zzepro.c	<libc/spp.h>
 	zzexit.c	<libc/spp.h>
 	zzpstr.c	<libc/spp.h>
 	zzsetk.c	<libc/spp.h>

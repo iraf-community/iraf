@@ -25,6 +25,7 @@ int	cl, dl, log, ft, frame, ltid, wcs_status, ndelete, bufsize
 
 bool	clgetb()
 int	access(), btoi(), clgeti(), imstati(), mk_mark()
+int	imd_wcsver()
 pointer	immap(), open(), imd_mapframe(), iw_open()
 
 begin
@@ -41,6 +42,13 @@ begin
 	call salloc (font, SZ_FNAME, TY_CHAR)
 	call salloc  (cfilename, SZ_FNAME, TY_CHAR)
 	call salloc (tmpname, SZ_FNAME, TY_CHAR)
+
+        # Query server to get the WCS version, this also tells us whether
+        # we can use the all 16 supported frames.
+        if (imd_wcsver() == 0)
+            call clputi ("tvmark.frame.p_max", 4)
+        else
+            call clputi ("tvmark.frame.p_max", 16)
 
 	frame = clgeti ("frame")
 	call clgstr ("coords", Memc[coords], SZ_FNAME)

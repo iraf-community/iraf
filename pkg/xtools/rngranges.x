@@ -23,6 +23,7 @@ include	<mach.h>
 
 define	LEN_RNG		2			# Length of main structure
 define	RNG_ALLOC	10			# Allocation size
+define	RNG_MAXINT	(MAX_INT/2)		# Maximum range integer
 
 define	RNG_NPTS	Memi[$1]		# Number of points in ranges
 define	RNG_NRNGS	Memi[$1+1]		# Number of range intervals
@@ -56,7 +57,7 @@ begin
 	if (IS_INDEF(a))
 	    a = 0
 	if (IS_INDEF(b))
-	    b = MAX_INT / 2
+	    b = RNG_MAXINT
 	if (IS_INDEF(c))
 	    c = 1
 
@@ -232,7 +233,7 @@ begin
 end
 
 
-# RNG_ADD -- Add a range.
+# RNG_ADD -- Add a range
 
 procedure rng_add (rg, rstr, r1, r2, dr)
 
@@ -240,8 +241,8 @@ pointer	rg			# Range descriptor
 char	rstr[ARB]		# Range string
 real	r1, r2, dr		# Default range and range limits
 
-int	i, j, nx, nrgs, strlen(), ctor()
-real	x1, x2, dx
+int	i, j, nrgs, strlen(), ctor()
+real	x1, x2, dx, nx
 pointer	sp, str, ptr
 errchk	rng_error
 
@@ -285,6 +286,8 @@ begin
 		x1 = r1
 		x2 = r2
 		dx = dr
+		if ((x2 - x1) / dx + 1 > RNG_MAXINT)
+		    x2 = x1 + (RNG_MAXINT - 1) * dx
 	    } else {
 		j = 1
 		if (ctor (Memc[str], j, x1) == 0)
@@ -307,6 +310,8 @@ begin
 			x2 = min (r1, r2)
 		    else
 			x2 = max (r1, r2)
+		    if ((x2 - x1) / dx + 1 > RNG_MAXINT)
+			x2 = x1 + (RNG_MAXINT - 1) * dx
 		} else {
 		    x2 = x1
 		    dx = dr
@@ -321,18 +326,13 @@ begin
 	    if (mod (nrgs, RNG_ALLOC) == 0)
 		call realloc (rg, LEN_RNG+4*(nrgs+RNG_ALLOC), TY_STRUCT)
 	    nrgs = nrgs + 1
-	    nx = (x2 - x1) / dx + 1
-	    if (nx > MAX_INT)
-		call rng_error (5, rstr, r1, r2, dr, rg)
 	    RNG_NRNGS(rg) = nrgs
 	    RNG_X1(rg, nrgs) = x1
 	    RNG_X2(rg, nrgs) = x2
 	    RNG_DX(rg, nrgs) = dx
-	    RNG_NX(rg, nrgs) = nx
-	    nx = nx + RNG_NPTS(rg)
-	    if (nx > MAX_INT)
-		call rng_error (5, rstr, r1, r2, dr, rg)
-	    RNG_NPTS(rg) = nx
+	    nx = (x2 - x1) / dx + 1
+	    RNG_NX(rg, nrgs) = min (nx, real (RNG_MAXINT))
+	    RNG_NPTS(rg) = min (nx + RNG_NPTS(rg), real (RNG_MAXINT))
 	}
 
 	call sfree (sp)

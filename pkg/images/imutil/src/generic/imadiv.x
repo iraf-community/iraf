@@ -43,7 +43,7 @@ begin
 	    im[2] = im_a
 	    while (ima_nls (im, buf, v, 2) != EOF) {
 		if (b == 0)
-		    call amovks (divzero, Mems[1], len)
+		    call amovks (divzero, Mems[buf[1]], len)
 		else if (b == 1)
 		    call amovs (Mems[buf[2]], Mems[buf[1]], len)
 		else
@@ -111,7 +111,7 @@ begin
 	    im[2] = im_a
 	    while (ima_nli (im, buf, v, 2) != EOF) {
 		if (b == 0)
-		    call amovki (divzero, Memi[1], len)
+		    call amovki (divzero, Memi[buf[1]], len)
 		else if (b == 1)
 		    call amovi (Memi[buf[2]], Memi[buf[1]], len)
 		else
@@ -179,7 +179,7 @@ begin
 	    im[2] = im_a
 	    while (ima_nll (im, buf, v, 2) != EOF) {
 		if (b == 0)
-		    call amovkl (divzero, Meml[1], len)
+		    call amovkl (divzero, Meml[buf[1]], len)
 		else if (b == 1)
 		    call amovl (Meml[buf[2]], Meml[buf[1]], len)
 		else
@@ -247,7 +247,7 @@ begin
 	    im[2] = im_a
 	    while (ima_nlr (im, buf, v, 2) != EOF) {
 		if (b == 0.0)
-		    call amovkr (divzero, Memr[1], len)
+		    call amovkr (divzero, Memr[buf[1]], len)
 		else if (b == 1.0)
 		    call amovr (Memr[buf[2]], Memr[buf[1]], len)
 		else
@@ -315,7 +315,7 @@ begin
 	    im[2] = im_a
 	    while (ima_nld (im, buf, v, 2) != EOF) {
 		if (b == 0.0D0)
-		    call amovkd (divzero, Memd[1], len)
+		    call amovkd (divzero, Memd[buf[1]], len)
 		else if (b == 1.0D0)
 		    call amovd (Memd[buf[2]], Memd[buf[1]], len)
 		else

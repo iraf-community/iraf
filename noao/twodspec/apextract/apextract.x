@@ -94,20 +94,22 @@ bool	clean			# Reject cosmic rays?
 real	gain			# Photon/DN gain
 real	rdnoise			# Read out noise
 int	nsubaps			# Number of subapertures
+int	interptype		# Edge interpolation type
 
-int	i, j, k, napsex, aaxis, baxis, namax, na, nb, na1
+int	i, j, k, napsex, aaxis, baxis, namax, na, nb, na1, interpbuf
 int	amin, amax, bmin, bmax
 int	new_size, old_size, max_size, best_size
 real	cmin, cmax, xmin, xmax, shift
 pointer	sp, str, bkgstr, wtstr, cleanstr, apsex
 pointer	a, b, c, astart, spec, specsky, specsig, raw, profile
 pointer	a1, a2, b1, b2, c1, c2, im, pim, ap, cv, ic, dbuf, pbuf, sbuf, svar, ptr
+pointer	asi
 
 bool	clgetb(), apgetb(), strne()
 int	apgeti(), apgwrd(), begmem(), ap_check()
 real	apgimr(), cveval(), ic_getr()
 pointer	ap_immap(), imgs2r(), imgl2r()
-errchk	salloc, malloc, ap_immap, imgs2r, imgl2r
+errchk	salloc, malloc, ap_immap, imgs2r, imgl2r, asiinit
 errchk	ap_check, ap_skyeval, ap_profile, ap_variance, ap_output, apgimr
 
 begin
@@ -160,6 +162,7 @@ begin
 	else
 	    call strcpy ("no", Memc[cleanstr], SZ_FNAME)
 	nsubaps = apgeti ("nsubaps")
+	interptype = II_LINEAR
 
 	# Do clobber checking.  Return if output exists and not clobbering.
 	call apgstr ("ansclobber", Memc[str], SZ_LINE)
@@ -225,6 +228,22 @@ begin
 	c1 = c - 1
 	c2 = c1 + napsex
 
+	# Initialize image interpolator for edge pixel weighting.
+	switch (interptype) {
+	case II_LINEAR:
+	    interpbuf = 1
+	case II_POLY3:
+	    interpbuf = 2
+	case II_SINC:
+	    interpbuf = 15
+	default:
+	    interpbuf = 0
+	}
+	if (interptype > 0)
+	    call asiinit (asi, interptype)
+	else
+	    asi = NULL
+
 	na1 = 0
 	do i = 1, napsex {
 	    ap = Memi[apsex+i-1]
@@ -256,6 +275,8 @@ begin
 		xmin = xmin - 2
 		xmax = xmax + 2
 	    }
+	    xmin = xmin - interpbuf
+	    xmax = xmax + interpbuf
 	    if (bkg != B_NONE && AP_IC(ap) != NULL) {
 		xmin = min (xmin, ic_getr (ic, "xmin"))
 		xmax = max (xmax, ic_getr (ic, "xmax"))
@@ -335,8 +356,8 @@ begin
 		    amin = Memi[a1+i]
 		    amax = Memi[a2+i]
 		    do j = i,  napsex {
-			amin = min (amin, Memi[a1+i]) 
-			amax = max (amax, Memi[a2+i]) 
+			amin = min (amin, Memi[a1+j]) 
+			amax = max (amax, Memi[a2+j]) 
 			na = amax - amin + 1
 			if (na > namax)
 			    break
@@ -406,6 +427,8 @@ begin
 		if (weights == W_NONE) {
 		    xmin = AP_CEN(ap,aaxis) + AP_LOW(ap,aaxis)
 		    xmax = AP_CEN(ap,aaxis) + AP_HIGH(ap,aaxis)
+		    xmin = xmin - interpbuf
+		    xmax = xmax + interpbuf
 		    na1 = nint (xmax) - nint (xmin) + 1
 		    cv = AP_CV(ap)
 		    do j = bmin, bmax {
@@ -416,11 +439,15 @@ begin
 		    if (pfit == P_FIT1D) {
 			xmin = AP_CEN(ap,aaxis) + AP_LOW(ap,aaxis) + Memr[c1+i]
 			xmax = AP_CEN(ap,aaxis) + AP_HIGH(ap,aaxis) + Memr[c2+i]
+			xmin = xmin - interpbuf
+			xmax = xmax + interpbuf
 			na1 = nint (xmax) - nint (xmin) + 1
 			call amovki (nint (xmin), Memi[astart], nb)
 		    } else if (pfit == P_FIT2D) {
 			xmin = AP_CEN(ap,aaxis) + AP_LOW(ap,aaxis) - 2
 			xmax = AP_CEN(ap,aaxis) + AP_HIGH(ap,aaxis) + 2
+			xmin = xmin - interpbuf
+			xmax = xmax + interpbuf
 			na1 = nint (xmax) - nint (xmin) + 1
 			cv = AP_CV(ap)
 			do j = bmin, bmax {
@@ -463,15 +490,17 @@ begin
 
 		if (weights == W_NONE)
 		    call ap_sum (ap, dbuf, na, nb, amin, 1, sbuf, na1, nb,
-			Memi[astart], 1, Memr[spec], nsubaps)
+			Memi[astart], 1, Memr[spec], nsubaps, asi)
 		else {
 		    call malloc (profile, na1 * nb, TY_REAL)
 		    if (pim == NULL)
 			call ap_profile (im, ap, dbuf, na, nb, amin, 1, sbuf,
-			    svar, Memr[profile], na1, nb, Memi[astart], 1)
+			    svar, Memr[profile], na1, nb, Memi[astart], 1,
+			    asi)
 		    else {
 			call ap_profile (pim, ap, pbuf, na, nb, amin, 1, sbuf,
-			    svar, Memr[profile], na1, nb, Memi[astart], 1)
+			    svar, Memr[profile], na1, nb, Memi[astart], 1,
+			    asi)
 			if (sbuf != NULL)
 			    call ap_skyeval (im, ap, dbuf, na, nb, amin, 1,
 				Memr[sbuf], Memr[svar], Memr[specsky], na1, nb,
@@ -480,7 +509,7 @@ begin
 
 		    call ap_variance (im, ap, dbuf, na, nb, amin, 1, sbuf, svar,
 			Memr[profile], na1, nb, Memi[astart], 1, Memr[spec],
-			Memr[raw], Memr[specsig], nsubaps)
+			Memr[raw], Memr[specsig], nsubaps, asi)
 		}
 
 		# Output the extracted spectrum.  The extras of sky, sigma,
@@ -510,6 +539,8 @@ begin
 	    }
 
 	    # Finish up and restore the working set size.
+	    if (asi != NULL)
+		call asifree (asi)
 	    if (pim != NULL) {
 		if (aaxis == 2)
 		    call mfree (pbuf, TY_REAL)
@@ -527,6 +558,8 @@ begin
 	    call mfree (svar, TY_REAL)
 	    call mfree (specsky, TY_REAL)
 
+	    if (asi != NULL)
+		call asifree (asi)
 	    if (pim != NULL) {
 		if (aaxis == 2)
 		    call mfree (pbuf, TY_REAL)
@@ -1439,7 +1472,7 @@ end
 # AP_SUM -- Simple, unweighted aperture sum.
 
 procedure ap_sum (ap, dbuf, nc, nl, c1, l1, sbuf, nx, ny, xs, ys, spec,
-	nsubaps)
+	nsubaps, asi)
 
 pointer	ap			# Aperture structure
 pointer	dbuf			# Data buffer
@@ -1449,11 +1482,14 @@ pointer	sbuf			# Sky values (NULL if none)
 int	nx, ny			# Size of profile array
 int	xs[ny], ys		# Origin of sky array
 real	spec[ny, nsubaps]	# Spectrum
-int	nsubaps
+int	nsubaps			# Number of subapertures
+pointer	asi			# Interpolator for edge pixel weighting
 
 int	i, ix, iy, ix1, ix2
-real	low, high, step, x1, x2, s, cveval()
+real	low, high, step, x1, x2, wt1, wt2, s, sval, skyval
+real	cveval()
 pointer	cv, data, sky
+errchk	asifit
 
 begin
 	i = AP_AXIS(ap)
@@ -1463,6 +1499,8 @@ begin
 	cv = AP_CV(ap)
 	do iy = 1, ny {
 	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
+	    if (asi != NULL)
+		call asifit (asi, Memr[data], nc)
 	    s = cveval (cv, real (iy + ys - 1)) - c1 + 1
 	    do i = 1, nsubaps {
 	        x1 = max (0.5, low + (i - 1) * step + s) + c1 - xs[iy]
@@ -1474,30 +1512,79 @@ begin
 	        ix1 = nint (x1)
 	        ix2 = nint (x2)
 
-	        if (sbuf == NULL) {
-		    if (ix1 == ix2)
-		        spec[iy,i] = (x2 - x1) * Memr[data+ix1]
-		    else {
-		        spec[iy,i] = (ix1 - x1 + 0.5) * Memr[data+ix1]
-		        spec[iy,i] = spec[iy,i] + (x2-ix2+0.5) * Memr[data+ix2]
-		    }
-	            do ix = ix1+1, ix2-1
-		        spec[iy,i] = spec[iy,i] + Memr[data+ix]
-	        } else {
+		# Compute end pixel weights.  Remember x1/x2 are zero indexed.
+		call ap_edge (asi, x1+1, x2+1, wt1, wt2)
+
+		# Sum pixels.
+		sval = wt1 * Memr[data+ix1] + wt2 * Memr[data+ix2]
+		do ix = ix1+1, ix2-1
+		    sval = sval + Memr[data+ix]
+
+		# Subtract sky if desired.
+	        if (sbuf != NULL) {
 		    sky = sbuf + (iy - 1) * nx - 1
-		    if (ix1 == ix2)
-		        spec[iy,i] = (x2-x1) * (Memr[data+ix1] - Memr[sky+ix1])
-		    else {
-		        spec[iy,i] = (ix1 - x1 + 0.5) *
-			    (Memr[data+ix1] - Memr[sky+ix1])
-		        spec[iy,i] = spec[iy,i] + (x2 - ix2 + 0.5) *
-		            (Memr[data+ix2] - Memr[sky+ix2])
-		    }
+		    skyval = wt1 * Memr[sky+ix1] + wt2 * Memr[sky+ix2]
 	            do ix = ix1+1, ix2-1
-		        spec[iy,i] = spec[iy,i] + Memr[data+ix] - Memr[sky+ix]
+		        skyval = skyval + Memr[sky+ix]
+		    sval = sval - skyval
 	        }
+
+		# Save extracted pixel value.
+		spec[iy,i] = sval
 	    }
 	}
+end
+
+
+# AP_EDGE -- Compute edge weights.
+
+procedure ap_edge (asi, x1, x2, wt1, wt2)
+
+pointer	asi			#I Image interpolator pointer
+real	x1, x2			#I Aperture edges
+real	wt1, wt2		#I Weights
+
+int	ix1, ix2
+real	a, b
+real	asieval(), asigrl()
+
+begin
+	    # Edge pixel centers.
+	    ix1 = nint (x1)
+	    ix2 = nint (x2)
+
+	    # Default weights are fractions of pixel.
+	    if (ix1 == ix2) {
+		wt1 = (x2 - x1)
+		wt2 = 0
+	    } else {
+		wt1 = (ix1 - x1 + 0.5)
+		wt2 = (x2 - ix2 + 0.5)
+	    }
+
+	    # If there is an interpolator compute fraction of integral.
+	    # We require that data and integrals be positive.
+	    if (asi != NULL) {
+		if (asieval (asi, real(ix1)) > 0) {
+		    b = asigrl (asi, ix1-0.5, ix1+0.5)
+		    if (b > 0) {
+			if (ix1 == ix2)
+			    a = asigrl (asi, x1, x2)
+			else
+			    a = asigrl (asi, x1, ix1+0.5)
+			if (a > 0 && a < b)
+			    wt1 = a / b
+		    }
+		}
+		if (ix1 != ix2 && asieval (asi, real(ix2)) > 0) {
+		    b = asigrl (asi, ix2-0.5, ix2+0.5)
+		    if (b > 0) {
+			a = asigrl (asi, ix2-0.5, x2)
+			if (a > 0 && a < b)
+			    wt2 = a / b
+		    }
+		}
+	    }
 end
 
 

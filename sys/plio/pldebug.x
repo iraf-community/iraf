@@ -180,9 +180,9 @@ llout_
 			"%s%12tlp=%5d, nref=%d, blen=%d, len=%d")
 			call pargstr (Memc[rng])
 			call pargi (lp)
-			call pargs (LP_NREF(pp))
-			call pargs (LP_BLEN(pp))
-			call pargs (LP_LEN(pp))
+			call pargi (LP_NREF(pp))
+			call pargi (LP_BLEN(pp))
+			call pargi (LP_LEN(pp))
 		} else
 		    call strcpy (Memc[rng], Memc[buf], SZ_LINE)
 

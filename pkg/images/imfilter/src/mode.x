@@ -64,8 +64,7 @@ begin
 	    # Modal filter the image line.
 	    if (MOD_XBOX(mde) == 1)
 		call mde_yofilter (mde, Memr[inbuf], ncols, MOD_YBOX(mde),
-		    Memr[filter], Memr[outbuf], int (IM_LEN(im2,1)),
-		    Memr[filter], Memi[left], Memi[right])
+		    Memr[filter], Memr[outbuf], int (IM_LEN(im2,1)))
 	    else if (MOD_YBOX(mde) == 1)
 		call mde_xofilter (mde, Memr[inbuf], ncols, MOD_YBOX(mde),
 		    Memr[outbuf], int (IM_LEN(im2,1)), Memr[filter],

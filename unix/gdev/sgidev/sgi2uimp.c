@@ -216,7 +216,7 @@ FILE	*out;
 {
 	int	 n, x, y, swap_bytes;
 	float	 xscale, yscale;
-	register struct sgi_inst *sgi;
+	register struct sgi_inst *sgip;
 	struct	 sgi_inst inbuf[LEN_MCBUF], *buftop;
 	DECL_OBUF;
 
@@ -245,15 +245,15 @@ FILE	*out;
 
 	/* Process the metacode:
 	 */
-	while ((n = fread ((char *)inbuf, sizeof(*sgi), LEN_MCBUF, in)) > 0) {
+	while ((n = fread ((char *)inbuf, sizeof(*sgip), LEN_MCBUF, in)) > 0) {
 
 	    if (swap_bytes)
-		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgi) * n);
+		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgip) * n);
 
 	    buftop = inbuf + n;
 
-	    for (sgi = inbuf;  sgi < buftop;  sgi++) {
-		switch (sgi->opcode) {
+	    for (sgip = inbuf;  sgip < buftop;  sgip++) {
+		switch (sgip->opcode) {
 		case SGK_FRAME:
 		    /* Terminate and output any DRAW buffer contents.
 		     */
@@ -283,8 +283,8 @@ FILE	*out;
 			o_flush (out);
 		    }
 
-		    x = imp_left + sgi->x * xscale;
-		    y = imp_bottom + sgi->y * yscale;
+		    x = imp_left + sgip->x * xscale;
+		    y = imp_bottom + sgip->y * yscale;
 
 		    /* Initialize output buffer for start of draw instruction.
 		     */
@@ -296,8 +296,8 @@ FILE	*out;
 		    break;
 
 		case SGK_DRAW:
-		    x = imp_left + sgi->x * xscale;
-		    y = imp_bottom + sgi->y * yscale;
+		    x = imp_left + sgip->x * xscale;
+		    y = imp_bottom + sgip->y * yscale;
 		    putword (x); putword (y);
 
 		    /* If we are about to exceed output buffer, flush and re-
@@ -333,12 +333,12 @@ FILE	*out;
 		    /* Set pen width.
 		     */
 		    putc (SET_PEN, out);
-		    putc ((imp_penbase + ((sgi->x) - 1) * imp_penslope), out);
+		    putc ((imp_penbase + ((sgip->x) - 1) * imp_penslope), out);
 		    break;
 		
 		default:
 		    fprintf (stderr, "sgi2uimp: unrecognized sgi opcode %d\n",
-			sgi->opcode);
+			sgip->opcode);
 		    break;
 		}
 	    }

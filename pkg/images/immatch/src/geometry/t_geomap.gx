@@ -24,7 +24,7 @@ procedure t_geomap ()
 bool	verbose, interactive
 double	xmin, xmax, ymin, ymax, reject
 int	geometry, function, calctype, nfiles, list, in, reclist, nrecords
-int	xxorder, xyorder, xxterms, yxorder, yyorder, yxterms
+int	xxorder, xyorder, xxterms, yxorder, yyorder, yxterms, maxiter
 int	reslist, nresfiles, res
 pointer	sp, in_name, str, out, fit, gd, graphics
 real	rxmin, rxmax, rymin, rymax
@@ -34,6 +34,8 @@ double	clgetd()
 int	clgeti(), clgwrd(), clplen(), errget(), imtopenp(), imtlen()
 int	imtgetim()
 pointer	clpopnu(), clgfil(), dtmap(), gopen(), open()
+
+errchk	geo_mapr(), geo_mapd()
 
 begin
 	# Get working space.
@@ -107,6 +109,7 @@ begin
 	yxorder = clgeti ("yxorder")
 	yyorder = clgeti ("yyorder")
 	yxterms = clgwrd ("yxterms", Memc[str], SZ_LINE, GM_XFUNCS) - 1
+	maxiter = clgeti ("maxiter")
 	reject = clgetd ("reject")
 	calctype = clgwrd ("calctype", Memc[str], SZ_LINE, ",real,double,")
 
@@ -120,7 +123,7 @@ begin
 
 	# Initialize the fit structure.
 	call geo_minit (fit, GM_NONE, geometry, function, xxorder, xyorder,
-	    xxterms, yxorder, yyorder, yxterms, reject)
+	    xxterms, yxorder, yyorder, yxterms, maxiter, reject)
 
 	# Loop over the files.
 	while (clgfil (list, Memc[in_name], SZ_FNAME) != EOF) {
@@ -325,8 +328,19 @@ begin
 
 	# Fit the data.
 	if (gd != NULL) {
-	    call geo_mgfit$t (gd, fit, sx1, sy1, sx2, sy2, Mem$t[xref],
-	        Mem$t[yref], Mem$t[xin], Mem$t[yin], Mem$t[wts], npts)
+	    iferr {
+	        call geo_mgfit$t (gd, fit, sx1, sy1, sx2, sy2, Mem$t[xref],
+	            Mem$t[yref], Mem$t[xin], Mem$t[yin], Mem$t[wts], npts,
+		    Memc[xerrmsg], Memc[yerrmsg], SZ_LINE)
+	    } then {
+		call gdeactivate (gd, 0)
+		call mfree (xfit, TY_PIXEL)
+		call mfree (yfit, TY_PIXEL)
+		call mfree (wts, TY_PIXEL)
+		call geo_mmfree$t (sx1, sy1, sx2, sy2)
+		call sfree (sp)
+		call error (3, "Too few points for X or Y fits.")
+	    }
 	    call gdeactivate (gd, 0)
 	    if (verbose && res != STDOUT) {
 		call printf ("Coordinate mapping status\n")
@@ -343,9 +357,18 @@ begin
 	    if (res != NULL) {
 		call fprintf (res, "# Coordinate mapping status\n#     ")
 	    }
-	    call geo_fit$t (fit, sx1, sy1, sx2, sy2, Mem$t[xref], Mem$t[yref],
-		Mem$t[xin], Mem$t[yin], Mem$t[wts], npts, Memc[xerrmsg],
-		Memc[yerrmsg], SZ_LINE)
+	    iferr {
+	        call geo_fit$t (fit, sx1, sy1, sx2, sy2, Mem$t[xref],
+		    Mem$t[yref], Mem$t[xin], Mem$t[yin], Mem$t[wts], npts,
+		    Memc[xerrmsg], Memc[yerrmsg], SZ_LINE)
+	    } then {
+		call mfree (xfit, TY_PIXEL)
+		call mfree (yfit, TY_PIXEL)
+		call mfree (wts, TY_PIXEL)
+		call geo_mmfree$t (sx1, sy1, sx2, sy2)
+		call sfree (sp)
+		call error (3, "Too few points for X or Y fits.")
+	    }
 	    if (verbose && res != STDOUT) {
 		call printf ("%s  %s\n")
 		    call pargstr (Memc[xerrmsg])

@@ -29,18 +29,24 @@ define	CLEAN		105
 define	RCLEAN		106
 define	RCLIP		107
 define	SIGMACLEAN	108
-define	XCENTER		109
-define	YCENTER		110
-define	XERR		111
-define	YERR		112
-define	CMAXITER	113
-define	CXCUR		114
-define	CYCUR		115
-define	XSHIFT		116
-define	YSHIFT		117
-define	CSTRING		118
-define	CDATALIMIT	119
-define	CTHRESHOLD	120
+define	OXINIT		109
+define	OYINIT		110
+define	XCENTER		111
+define	YCENTER		112
+define	OXCENTER	113
+define	OYCENTER	114
+define	XERR		115
+define	YERR		116
+define	CMAXITER	117
+define	CXCUR		118
+define	CYCUR		119
+define	XSHIFT		120
+define	YSHIFT		121
+define	OXSHIFT		122
+define	OYSHIFT		123
+define	CSTRING		124
+define	CDATALIMIT	125
+define	CTHRESHOLD	126
 
 # center keywords
 

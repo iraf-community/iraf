@@ -3,6 +3,34 @@ include "../../lib/ptkeysdef.h"
 include	"../lib/daophotdef.h"
 include	"../lib/apseldef.h"
 
+# DP_WGETAPERT -- Read the aperture photometry results and transform the
+# input coordinates to the appropriate coordinate system. Works with
+# either the "old" APPHOT files or the new ST Tables.
+
+procedure dp_wgetapert (dao, im, apd, max_nstars, old_ap)
+
+pointer	dao			# pointer to the DAOPHOT structure
+pointer	im			# the input image descriptor
+int	apd			# input photometry file descriptor
+int	max_nstars		# maximum number of stars
+bool	old_ap			# YES indicates old APPHOT file
+
+pointer	apsel
+int	dp_stati()
+
+begin
+	# Get the stars.
+	call dp_getapert (dao, apd, max_nstars, old_ap)
+
+	# Transform the coordinates if necessary.
+	apsel = DP_APSEL (dao)
+	if (dp_stati (dao, WCSIN) != WCS_LOGICAL)
+	    call dp_win (dao, im, Memr[DP_APXCEN(apsel)],
+	        Memr[DP_APYCEN(apsel)], Memr[DP_APXCEN(apsel)],
+		Memr[DP_APYCEN(apsel)], DP_APNUM(apsel))
+end
+
+
 # DP_GETAPERT -- Read the aperture photometry results. Works with
 # either the "old" APPHOT files or the new ST Tables.
 
@@ -500,4 +528,3 @@ begin
 
 	}
 end
-

@@ -1,0 +1,9 @@
+.help revisions Nov01 obsutil
+.nf
+spfgraph.x
+    Fixed case where if the average of the minimum and maximum focus values
+    is zero then a floating divide by zero would occur.  (2/14/97, Valdes)
+
+t_specfocus.x
+    Fixed bug in interpreting the focus parameter.  (6/26/95, Valdes)
+.endhelp

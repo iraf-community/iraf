@@ -6,10 +6,9 @@ include	"grc.h"
 # GRC_INIT -- Initialize the rcursor descriptor.  Allocate storage for the
 # descriptor and initialize all variables and the keystroke mapping.
 
-procedure grc_init (rc, stream)
+procedure grc_init (rc)
 
-pointer	rc			# grc descriptor (pointer)
-int	stream			# graphics stream (for grc_command)
+pointer	rc			#U grc descriptor (pointer)
 
 int	ip, ch
 string	keys KEYSTROKES

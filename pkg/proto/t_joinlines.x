@@ -14,7 +14,8 @@ char	c
 pointer	sp, fname, fds
 int	i, j, in
 int	nfiles, nlines, neof, nchars, ntruncate, nlong, ndelim, nmissing
-int	fntopnb(), clplen(), clgfil(), clgeti(), open(), getc(), strlen()
+int	fntopnb(), clplen(), clgfil(), clgeti(), open(), strlen()
+char	getc()
 bool	clgetb()
 
 begin

@@ -16,7 +16,8 @@ int	rop			#I rasterop
 
 int	ll_len
 pointer	sp, ll_src, ll_out, ll_dst
-int	pl_access(), pl_p2ls()
+pointer	pl_access()
+int	pl_p2ls()
 errchk	pl_access
 
 begin
@@ -30,7 +31,7 @@ begin
 	    call pl_update (pl, v, Mems[ll_src])
 	else {
 	    call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
-	    ll_dst = Ref (pl, pl_access(pl,v))
+	    ll_dst = pl_access (pl,v)
 	    call pl_linerop (Mems[ll_src], 1, PL_MAXVAL(pl), Mems[ll_dst], v[1],
 		MV(px_depth), Mems[ll_out], npix, rop)
 	    call pl_update (pl, v, Mems[ll_out])

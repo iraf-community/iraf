@@ -1,5 +1,6 @@
 include <ctype.h>
 include <gset.h>
+include <imhdr.h>
 include "../lib/apphot.h"
 include "../lib/display.h"
 include "../lib/fitsky.h"
@@ -9,7 +10,7 @@ define	HELPFILE	"apphot$fitsky/fitsky.key"
 # APSKY -- Procedure to interactively determine sky values in an annular
 # region around a list of objects.
 
-int procedure apsky (ap, im, cl, sd, gd, mgd, id, out, stid, interactive)
+int procedure apsky (ap, im, cl, sd, gd, mgd, id, out, stid, interactive, cache)
 
 pointer ap			# pointer to apphot structure
 pointer	im			# pointer to IRAF image
@@ -21,15 +22,19 @@ pointer	id			# pointer to image display stream
 int	out			# output file descriptor
 int	stid			# output file sequence number
 int	interactive		# interactive mode
+int	cache			# cache the input image pixels
 
-int	wcs, key, colonkey, newimage, newobject, newsky, newlist, ier
-int	ip, ltid, oid, prev_num, req_num
-pointer sp, cmd
 real	wx, wy, xlist, ylist
+pointer sp, cmd
+int	wcs, key, colonkey, newimage, newobject, newsky, newlist, ier
+int	ip, ltid, oid, prev_num, req_num, buf_size, req_size, old_size
+int	memstat
 
-int	clgcur(), apfitsky(), aprefitsky(), apgscur(), ctoi(), apstati()
-int	apgqverify(), apgtverify(), apnew()
 real	apstatr()
+int	clgcur(), apfitsky(), aprefitsky(), apgscur(), ctoi(), apstati()
+int	apgqverify(), apgtverify(), apnew(), ap_memstat(), sizeof()
+
+define  endswitch_ 99
 
 begin
 	call smark (sp)
@@ -54,6 +59,7 @@ begin
 	    EOF) {
 
 	    # Store the current cursor coordinates.
+	    call ap_vtol (im, wx, wy, wx, wy, 1)
 	    call apsetr (ap, CWX, wx)
 	    call apsetr (ap, CWY, wy)
 
@@ -96,11 +102,13 @@ begin
 		    call seek (cl, BOFL)
 		    ltid = 0
 		} else if (interactive == YES)
-		    call printf ("No coordinate list\7\n")
+		    call printf ("No coordinate list\n")
 
 	    # Verify the critical parameters.
 	    case 'v':
 		call ap_sconfirm (ap, out, stid)
+		newobject = YES
+		newsky = YES
 
 	    # Save the sky fitting parameters.
 	    case 'w':
@@ -134,64 +142,91 @@ begin
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
 		        call apskycolon (ap, im, cl, out, stid, ltid,
 			    Memc[cmd], newimage, newobject, newsky)
+			goto endswitch_
+		    }
 
-		    # Measure the sky for the next object in the list.
-		    } else if (cl != NULL) {
-		        ip = ip + 1
-			prev_num = ltid
-			if (ctoi (Memc[cmd], ip, req_num) <= 0)
-			    req_num = ltid + 1
-		        if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
-			    ltid) != EOF) {
-		   	    newlist = YES
-			    if (colonkey == 'm') {
-			        newobject = YES
-				newsky = YES
-			    } else {
-		                ier = apfitsky (ap, im, xlist, ylist, sd, gd)
-			        if (id != NULL) {
-			            call apmark (ap, id, NO, apstati (ap,
-				        MKSKY), NO)
-				    if (id == gd)
-				        call gflush (id)
-				    else
-				        call gframe (id)
-			        }
-			        call ap_splot (ap, stid, gd, apstati (ap,
-			            RADPLOTS))
-			        if (interactive == YES)
-		                    call ap_qspsky (ap, ier)
-		                if (stid == 1)
-				    call ap_param (ap, out, "fitsky")
-		                call ap_pssky (ap, out, stid, ltid, ier)
-			        call ap_splot (ap, stid, mgd, YES)
-		                stid = stid + 1
-		                newobject = NO; newsky = NO
-			    }
-		        } else if (interactive == YES)
-			    call printf (
-			    "End of coordinate list, use r key to rewind\7\n")
+                    # No coordinate list.
+                    if (cl == NULL) {
+                        if (interactive == YES)
+                            call printf ("No coordinate list\n")
+                        goto endswitch_
+                    }
 
-		    } else if (interactive == YES)
-		        call printf ("No coordinate list\7\n")
+		    # Get next object from the list.
+		    ip = ip + 1
+		    prev_num = ltid
+		    if (ctoi (Memc[cmd], ip, req_num) <= 0)
+			req_num = ltid + 1
+
+		    # Fetch the next object from the list.
+		    if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
+		        ltid) == EOF) {
+                        if (interactive == YES)
+                            call printf (
+                            "End of coordinate list, use r key to rewind\n")
+                        goto endswitch_
+		    }
+
+                    # Convert the coordinates.
+                    switch (apstati (ap, WCSIN)) {
+                    case WCS_PHYSICAL, WCS_WORLD:
+                        call ap_itol (ap,  xlist, ylist, xlist, ylist, 1)
+                    case WCS_TV:
+                        call ap_vtol (im, xlist, ylist, xlist, ylist, 1)
+                    default:
+                        ;
+                    }
+
+		    # Move to the next object.
+		    newlist = YES
+		    if (colonkey == 'm') {
+		        newobject = YES
+			newsky = YES
+                        goto endswitch_
+		    }
+
+		    # Measure the next object.	
+		    ier = apfitsky (ap, im, xlist, ylist, sd, gd)
+		    if (id != NULL) {
+		        call apmark (ap, id, NO, apstati (ap, MKSKY), NO)
+			if (id == gd)
+			    call gflush (id)
+			else
+			    call gframe (id)
+		    }
+		    call ap_splot (ap, stid, gd, apstati (ap, RADPLOTS))
+		    if (interactive == YES)
+		        call ap_qspsky (ap, ier)
+		    if (stid == 1)
+		        call ap_param (ap, out, "fitsky")
+		    call ap_splot (ap, stid, mgd, YES)
+		    call ap_pssky (ap, out, stid, ltid, ier)
+		    stid = stid + 1
+		    newobject = NO; newsky = NO
 
 		default:
 		    call apskycolon (ap, im, cl, out, stid, ltid, Memc[cmd],
 		        newimage, newobject, newsky)
 		}
 
-		if ((newimage == YES) && (id != NULL) && (gd != id)) {
-		    call apstats (ap, IMNAME, Memc[cmd], SZ_LINE)
-		    call ap_gswv (id, Memc[cmd], im, 4)
-		    newimage = NO
+		if (newimage == YES) {
+		    if ((id != NULL) && (gd != id))
+		        call ap_gswv (id, Memc[cmd], im, 4)
+                    req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
+                        sizeof (IM_PIXTYPE(im))
+                    memstat = ap_memstat (cache, req_size, old_size)
+                    if (memstat == YES)
+                        call ap_pcache (im, INDEFI, buf_size)
 		}
+
+		newimage = NO
 
 	    # Fit the sky and store the results.
 	    case 'f', ' ':
 		if (newobject == YES)
 		    ier = apfitsky (ap, im, wx, wy, sd, gd)
 		else if (newsky == YES)
-		    ier = aprefitsky (ap, gd)
+		    ier = aprefitsky (ap, im, gd)
 		if (id != NULL) {
 		    call apmark (ap, id, NO, apstati (ap, MKSKY), NO)
 		    if (id == gd)
@@ -217,42 +252,63 @@ begin
 
 	    # Get, fit the next object in the list.
 	    case 'm', 'n':
-		if (cl != NULL) {
-		    prev_num = ltid
-		    req_num = ltid + 1
-		    if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
-			ltid) != EOF) {
-		   	newlist = YES
-			if (key == 'm') {
-			    newobject = YES
-			    newsky = YES
-			} else {
-		            ier = apfitsky (ap, im, xlist, ylist, sd, gd)
-			    if (id != NULL) {
-			        call apmark (ap, id, NO, apstati (ap, MKSKY),
-				    NO)
-				if (id == gd)
-				    call gflush (id)
-				else
-				    call gframe (id)
-			    }
-			    call ap_splot (ap, stid, gd, apstati (ap,
-			        RADPLOTS))
-			    if (interactive == YES)
-		                call ap_qspsky (ap, ier)
-		            if (stid == 1)
-			    call ap_param (ap, out, "fitsky")
-		            call ap_pssky (ap, out, stid, ltid, ier)
-			    call ap_splot (ap, stid, mgd, YES)
-		            stid = stid + 1
-		            newobject = NO
-			    newsky = NO
-			}
-		    } else if (interactive == YES)
-		        call printf (
-		    	    "End of coordinate list, use r key to rewind\7\n")
-		} else if (interactive == YES)
-		    call printf ("No coordinate list\7\n")
+
+                # No coordinate file.
+                if (cl == NULL) {
+                    if (interactive == YES)
+                        call printf ("No coordinate list\n")
+                    goto endswitch_
+                }
+
+		# Need to rewind coordinate file.
+		prev_num = ltid
+		req_num = ltid + 1
+		if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
+		    ltid) == EOF) {
+                    if (interactive == YES)
+                        call printf (
+                            "End of coordinate list, use r key to rewind\n")
+                    goto endswitch_
+
+		}
+
+                # Convert coordinates if necessary.
+                switch (apstati (ap, WCSIN)) {
+                case WCS_PHYSICAL, WCS_WORLD:
+                    call ap_itol (ap,  xlist, ylist, xlist, ylist, 1)
+                case WCS_TV:
+                    call ap_vtol (im, xlist, ylist, xlist, ylist, 1)
+                default:
+                    ;
+                }
+
+		# Move to the next object.
+		newlist = YES
+		if (key == 'm') {
+		    newobject = YES
+		    newsky = YES
+                    goto endswitch_
+		}
+
+		# Measure the next object.
+		ier = apfitsky (ap, im, xlist, ylist, sd, gd)
+		if (id != NULL) {
+		    call apmark (ap, id, NO, apstati (ap, MKSKY), NO)
+		    if (id == gd)
+			call gflush (id)
+		    else
+			call gframe (id)
+		}
+		call ap_splot (ap, stid, gd, apstati (ap, RADPLOTS))
+		if (interactive == YES)
+		    call ap_qspsky (ap, ier)
+		if (stid == 1)
+		    call ap_param (ap, out, "fitsky")
+		call ap_pssky (ap, out, stid, ltid, ier)
+		call ap_splot (ap, stid, mgd, YES)
+		stid = stid + 1
+		newobject = NO
+		newsky = NO
 
 	    # Process the remainder of the list.
 	    case 'l':
@@ -269,12 +325,14 @@ begin
 		            call gframe (id)
 		    }
 		} else if (interactive == YES)
-		    call printf ("No coordinate list\7\n")
+		    call printf ("No coordinate list\n")
 
 	    default:
 		# do nothing
-		call printf ("Unknown or ambiguous keystroke command\7\n")
+		call printf ("Unknown or ambiguous keystroke command\n")
 	    }
+
+endswitch_
 
 	    # Setup for the next object.
 	    key = ' '

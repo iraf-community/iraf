@@ -6,9 +6,10 @@ include "daoedit.h"
 # DP_ERPROFILE -- Compute and optionally plot the radial profile of the
 # selected star.
 
-procedure dp_erprofile (gd, banner, xwcs, ywcs, im, xinit, yinit)
+procedure dp_erprofile (gd, id, banner, xwcs, ywcs, im, xinit, yinit)
 
 pointer	gd		# pointer to the graphics descriptor
+pointer	id		# pointer to the display descriptor
 int	banner		# print banner for photometry results
 int	xwcs		# the x wcs type
 int	ywcs		# the y wcs type
@@ -20,13 +21,11 @@ int	cboxsize, rboxsize, npts, naperts, nbins, nr
 pointer	sp, radius, intensity, apstr, aperts, rcentroid, pmean, integral, title
 real	scale, pradius, iannulus, oannulus, mean, median, sigma, pnorm, inorm
 real	fwhmpsf, xcenter, ycenter, apradius, counts
-int	dp_rprofile(), strlen(), dp_gaperts()
 real	clgetr(), dp_aprcounts()
+int	dp_rprofile(), strlen(), dp_gaperts(), btoi()
+bool	clgetb()
 
 begin
-	# Allocate working space.
-	call smark (sp)
-
 	# Return if the initial x and y centers are undefined.
 	if (IS_INDEFR(xinit) || IS_INDEFR(yinit))
 	    return
@@ -50,6 +49,7 @@ begin
 	pradius = scale * (clgetr ("fitskypars.annulus") +
 	    clgetr ("fitskypars.dannulus") + 1.0)
 	rboxsize = 2 * nint (pradius + 1.0) + 1
+	call smark (sp)
 	call salloc (radius, rboxsize * rboxsize, TY_REAL)
 	call salloc (intensity, rboxsize * rboxsize, TY_REAL)
 
@@ -58,8 +58,7 @@ begin
 	    Memr[radius], Memr[intensity])
 	if (npts <= 0) {
 	    call printf ("No data for computing radial profile\n")
-	    call mfree (radius, TY_REAL)
-	    call mfree (intensity, TY_REAL)
+	    call sfree (sp)
 	    return
 	}
 
@@ -89,6 +88,20 @@ begin
 	call dp_crprofile (Memr[radius], Memr[intensity], npts, Memi[nr],
 	    Memr[rcentroid], Memr[pmean], Memr[integral], nbins, 0.0,
 	    pradius, real ((cboxsize-1)/ 2), iannulus, fwhmpsf, pnorm, inorm)
+
+	# Mark the objects on the display.
+	if (id != NULL) {
+	    call dp_eomark (id, xcenter, ycenter, iannulus, oannulus,
+	        apradius, btoi (clgetb ("centerpars.mkcenter")),
+		btoi (clgetb ("fitskypars.mksky")),
+		btoi (clgetb ("photpars.mkapert")))
+	    if (gd == id)
+		call gflush (gd)
+	    else
+		call gframe (id)
+	}
+	# Convert the center coordinates if appropriate.
+	call dp_ltov (im, xcenter, ycenter, xcenter, ycenter, 1)
 
 	# Draw the plot.
 	if (gd != NULL) {

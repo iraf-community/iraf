@@ -9,6 +9,7 @@ include <finfo.h>
 include <fset.h>
 include <mach.h>
 include <imset.h>
+include <error.h>
 include "fxf.h"
 
 # FXFRFITS.X -- Routines to load FITS header in memory and set up the cache
@@ -68,13 +69,12 @@ begin
 	o_fit = IM_KDES(im)
 	reload = false
 	slot = 1
-
 	# Get file system info on the desired header file.
 	call fpathname (IM_HDRFILE(im), Memc[hdrfile], SZ_PATHNAME)
 
-	if (finfo (Memc[hdrfile], fi) == ERR)
+	if (finfo (Memc[hdrfile], fi) == ERR) 
 	    call syserrs (SYS_FOPEN, IM_HDRFILE(im))
-
+	
 	repeat {
 	    # Search the header file cache for the named image.
 	    do cindx = 1, rf_cachesize {
@@ -82,7 +82,6 @@ begin
 		   slot = cindx
 		   next
 		}
-
 		if (streq (Memc[hdrfile], rf_fname[1,cindx])) {
 		    # File is in cache; is cached entry still valid?
 		    if (FI_MTIME(fi) != rf_mtime[cindx]) {
@@ -90,14 +89,18 @@ begin
 			slot = cindx
 			break
 		    } 
-
 		    # Return the cached header.
 		    rf_lru[cindx] = rf_refcount
 		    cfit = rf_fit[cindx]
- 
 		    FIT_XTENSION(cfit) = FIT_XTENSION(o_fit)
 		    FIT_ACMODE(cfit) = FIT_ACMODE(o_fit)
 		    FIT_EXPAND(cfit) = FIT_EXPAND(o_fit)
+
+		    # Load Extend value from cache header entry to
+		    # the current fit struct entry.
+
+		    FIT_EXTEND(o_fit) = FIT_EXTEND(cfit)
+
 		    call amovi (FIT_ACMODE(cfit), FIT_ACMODE(o_fit),
 			LEN_FITBASE)
 		    hoff = rf_hdrp[cindx]
@@ -110,12 +113,6 @@ begin
 
 		    extname_or_ver = (FKS_EXTNAME(o_fit) != EOS ||
 			!IS_INDEFL (FKS_EXTVER(o_fit)))
-
-		    # Do not allow inheritance if the PHDU has NAXIS != 0.
-		    if (FKS_INHERIT(o_fit) == YES &&  
-			    FIT_NAXIS(cfit) != 0 &&
-			    FIT_ACMODE(cfit) != READ_ONLY) 
-			call syserr (SYS_FXFBADINH)
 
 		    # If the group number or extname_or_ver has not been
 		    # specified we need to load the group number where there
@@ -159,7 +156,6 @@ begin
 		    } else {
 			# Read intermediate xtension headers if not in
 			# hoff and poff yet.
-
 			offs_count = FIT_NUMOFFS(cfit)
 			call fxf_read_xtn (im,
 			    cfit, group, hoff, poff, extn, extv)
@@ -191,6 +187,8 @@ begin
 		call mfree (rf_hdrp[slot], TY_INT)
 		call mfree (rf_fit[slot], TY_STRUCT)
 		call mfree (rf_hdr[slot], TY_CHAR)
+		rf_lru[slot] = 0
+		rf_fname[1,slot] = EOS
 	    }
 
 	    # Allocate a spool file for the FITS data.
@@ -230,8 +228,10 @@ begin
 	    rf_lru[slot] = rf_refcount
 	    rf_mtime[slot] = FI_MTIME(fi)
 
-	    if (!reload)
+	    if (!reload) {
 		rf_time[slot] = clktime (0)
+	    }
+	    
 	    reload = true
 
 	    in = IM_HFD(im)
@@ -239,11 +239,12 @@ begin
 	    
 	    # Read main FITS header and copy to spool fd.
 	    FIT_IM(fit) = im
+	    call amovki (1, FIT_LENAXIS(fit,1), IM_MAXDIM)
 
 	    call fxf_load_header (in, fit, spool, nrec1440, totpix)
-	    # Record group 0 if NAXIS != 0.
-	    if (FIT_NAXIS(fit) != 0)
-	       FIT_GROUP(fit) = 0
+
+	    # Record group 0 (PHU) as having just been read.
+	    FIT_GROUP(fit) = 0
 
 	    call seek (spool, BOFL)
 	    fitslen = fstatl (spool, F_FILESIZE)
@@ -427,6 +428,14 @@ rxtn_
 	    call fxf_load_header (in, lfit, spool, nrec1440, totpix)
 	}
 
+	# If requested a non supported BINTABLE format, post an error
+	# message.
+
+	if (strcmp(FIT_EXTTYPE(lfit), "BINTABLE") == 0) {
+	    if (strcmp(FIT_EXTSTYPE(lfit), "PLIO_1")!=0)
+		call syserrs (SYS_IKIEXTN, IM_NAME(im))
+	}
+	
 	# Merge Image Extension header to the user area.
 	fitslen = fstatl (spool, F_FILESIZE)
 
@@ -444,9 +453,29 @@ rxtn_
 	    i = i + LEN_UACARD
 	}
 	Memc[i] = EOS
-	call fxf_merge_w_ua (im, po, fitslen)
-	call sfree (sp)
 
+	# Make the user aware that they cannot use inheritance
+	# if the PDU contains a data array.
+
+	if (Memi[poff] != Memi[hoff+1]) {
+	    if (FKS_INHERIT(lfit) == YES) {
+		call syserr (SYS_FXFBADINH)
+	    }
+	} else {
+	    # Disable inheritance if PHDU has a DU.
+	    if (Memi[poff+0] != Memi[hoff+1])
+		FIT_INHERIT(lfit) = NO
+	}
+
+	# Reset the value of FIT_INHERIT if FKS_INHERIT is set
+	if (FKS_INHERIT(lfit) != NO_KEYW)
+	    FIT_INHERIT(lfit) = FKS_INHERIT(lfit)
+
+	if (FIT_TFIELDS(lfit) > 0)
+	    fitslen = fitslen + FIT_TFIELDS(lfit)*LEN_UACARD
+	call fxf_merge_w_ua (im, po, fitslen)
+
+	call sfree (sp)
 	call close (spool)
 end
 
@@ -582,7 +611,6 @@ begin
 	}
 
 	Memi[poff+group] = Memi[hoff+group] + nrec1440
-
 	# The offset for the beginning of next group.
 	Memi[hoff+group+1] = Memi[poff+group] + totpix
 
@@ -606,9 +634,10 @@ int	spool			#I spool output file descriptor
 int	nrec1440		#O number of 1440 char records output
 int	datalen			#O length of data area in chars
 
-pointer lbuf, sp, im, stime, fb
-int	totpix, nchars, nbytes, index, ncards, simple, i, pcount
-int	fxf_read_card(), fxf_ctype()
+int	ncols
+pointer lbuf, sp, im, stime, fb, ttp
+int	totpix, nchars, nbytes, index, ncards, simple, i, pcount, junk
+int	fxf_read_card(), fxf_ctype(), ctoi(), strsearch()
 bool	fxf_fpl_equald()
 errchk	syserr, syserrs
 
@@ -665,25 +694,26 @@ begin
 	    case KW_EXTVER:
 		call fxf_geti (Memc[lbuf], FIT_EXTVER(fit))
 		call putline (spool, Memc[lbuf])
+	    case KW_ZCMPTYPE:
+		call fxf_gstr (Memc[lbuf], FIT_EXTSTYPE(fit), SZ_EXTTYPE)
 	    case KW_PCOUNT:
 		call fxf_geti (Memc[lbuf], pcount)
 		call putline (spool, Memc[lbuf])
+		FIT_PCOUNT(fit) = pcount
 	    case KW_INHERIT:
 		call fxf_getb (Memc[lbuf], FIT_INHERIT(fit))
 		call putline (spool, Memc[lbuf])
-
 	    case KW_BITPIX:
 		call fxf_geti (Memc[lbuf], FIT_BITPIX(fit))
 	    case KW_DATATYPE:
 		call fxf_gstr (Memc[lbuf], FIT_DATATYPE(fit), SZ_DATATYPE)
-
 	    case KW_NAXIS:
-		call fxf_geti (Memc[lbuf], FIT_NAXIS(fit))
-		if (FIT_NAXIS(fit) < 0 )
-		    call syserr (SYS_FXFRFBNAXIS)
-	    case KW_NAXISN:
-		call fxf_geti (Memc[lbuf], FIT_LENAXIS(fit,index))
-
+		if (index == 0) {
+		    call fxf_geti (Memc[lbuf], FIT_NAXIS(fit))
+		    if (FIT_NAXIS(fit) < 0 )
+			call syserr (SYS_FXFRFBNAXIS)
+	  	} else
+		    call fxf_geti (Memc[lbuf], FIT_LENAXIS(fit,index))
 	    case KW_BSCALE:
 		call fxf_getd (Memc[lbuf], FIT_BSCALE(fit))
 		# If BSCALE is like 1.00000011 reset to 1.0.
@@ -702,22 +732,50 @@ begin
 	    case KW_DATAMIN:
 		call fxf_getr (Memc[lbuf], FIT_MIN(fit))
 		call putline (spool, Memc[lbuf])
+	    case KW_TFIELDS:
+		# Allocate space for TFORM and TTYPE keyword values
+		call fxf_geti (Memc[lbuf], ncols)
+		FIT_TFIELDS(fit) = ncols
+		if (FIT_TFORMP(fit) != NULL) {
+		    call mfree (FIT_TFORMP(fit), TY_CHAR)
+		    call mfree (FIT_TTYPEP(fit), TY_CHAR)
+	        }
+		call malloc (FIT_TFORMP(fit), ncols*LEN_FORMAT, TY_CHAR)
+		call malloc (FIT_TTYPEP(fit), ncols*LEN_OBJECT, TY_CHAR)
+	    case KW_TFORM:
+		call fxf_gstr (Memc[lbuf], Memc[stime], LEN_CARD)
+		if (index == 1) {
+		    # PLMAXLEN is used to indicate the maximum line list
+		    # length for PLIO masks in bintables.  The syntax
+		    # "PI(maxlen)" is used in bintables to pass the max
+		    # vararray length for a column.
 
+		    i = strsearch (Memc[stime], "PI(") 
+		    if (i > 0)
+			junk = ctoi (Memc[stime], i, FIT_PLMAXLEN(fit))
+		}
+	    case KW_TTYPE:
+		ttp = FIT_TTYPEP(fit) + (index-1)*LEN_OBJECT
+		call fxf_gstr (Memc[lbuf], Memc[ttp], LEN_CARD)
 	    case KW_OBJECT:
 		# Since only OBJECT can go into the header and IM_TITLE has its
 		# values as well, we need to save both to see which one has
 		# changed at closing time.
 
 		call fxf_gstr (Memc[lbuf], FIT_OBJECT(fit), LEN_CARD)
+		if (FIT_OBJECT(fit) == EOS)
+		    call strcpy ("        ", FIT_OBJECT(fit), SZ_KEYWORD)
 		call strcpy (FIT_OBJECT(fit), FIT_TITLE(fit), LEN_CARD)
 		call strcpy (FIT_OBJECT(fit), IM_TITLE(im), LEN_CARD)
 		call putline (spool, Memc[lbuf])
-
 	    case KW_IRAFTLM:
 		call fxf_gstr (Memc[lbuf], Memc[stime], LEN_CARD)
 		call fxf_date2limtime (Memc[stime], FIT_MTIME(fit))
 		call putline (spool, Memc[lbuf])
-
+	    case KW_DATE:
+		call fxf_gstr (Memc[lbuf], Memc[stime], LEN_CARD)
+		call fxf_date2limtime (Memc[stime], IM_CTIME(im))
+		call putline (spool, Memc[lbuf])
 	    default:
 		call putline (spool, Memc[lbuf])
 	    }
@@ -771,13 +829,11 @@ begin
 
 	fit = IM_KDES(im)
 
-	# FKS_INHERIT has the logically combined value of the fkinit inherit's
+	# FIT_INHERIT has the logically combined value of the fkinit inherit's
 	# value, if any; the ksection value, if any and the INHERIT value in
 	# the extension header.
-	
-	inherit = false
-	if (FKS_INHERIT(fit) == YES)
-	    inherit = true
+
+	inherit = (FIT_INHERIT(fit) == YES)
 	inherit = (inherit && (FIT_GROUP(fit) != 0))
 
 	# Reallocate the image descriptor to allow space for the spooled user
@@ -884,12 +940,11 @@ char	datestr[ARB]	#I fixed format date string
 long	limtime		#O output limtime (LST seconds from 1980.0)
 
 double	dsec
-int	hours,minutes,seconds,day,month,year, days_per_year
-int     month_to_days[12], adays, status, iso, flags, ip, i
+int	hours,minutes,seconds,day,month,year
+int     status, iso, flags, ip, m, d, y
 int	dtm_decode_hms(), btoi(), ctoi()
 long    gmttolst()
-
-data    month_to_days / 0,31,59,90,120,151,181,212,243,273,304,334/
+double  jd
 
 begin
 	iso = btoi (datestr[3] != ':')
@@ -906,9 +961,12 @@ begin
 		hours = 0
 		minutes = 0
 		seconds = 0
-	    } else
-		seconds = nint(dsec)
-
+	    } else {
+ 		if (IS_INDEFD(dsec))
+                    seconds = 0
+		else
+                    seconds = nint(dsec)
+            }
 	} else {
 	    ip = 1;  ip = ctoi (datestr,     ip, hours)
 	    ip = 1;  ip = ctoi (datestr[4],  ip, minutes)
@@ -925,15 +983,28 @@ begin
 
 	seconds = seconds + minutes * 60 + hours * 3600
 
-	days_per_year = 0
-	do i = 1, year - 1980
-	   days_per_year = days_per_year + 365
+        # Calculate the Julian day from jan 1, 1980. Algorithm taken
+	# from astutil/asttools/asttimes.x.
 
-	adays = (year - 1980) / 4
+        y = year
 	if (month > 2)
-	    adays = adays + 1
+	    m = month + 1
+	else {
+	    m = month + 13
+	    y = y - 1
+	}
 
-	day = adays + day-1 + days_per_year + month_to_days[month]
+	# Original: jd = int (JYEAR * y) + int (30.6001 * m) + day + 1720995
+        # -723244.5 is the number of days to add to get 'jd' from jan 1, 1980.
+
+	jd = int (365.25 * y) + int (30.6001 * m) + day - 723244.5
+	if (day + 31 * (m + 12 * y) >= 588829) {
+	    d = int (y / 100)
+	    m = int (y / 400)
+	    jd = jd + 2 - d + m
+	}
+	jd = jd - 0.5 
+        day = jd
 
 	limtime = seconds + day * 86400
 	if (iso == YES)
@@ -957,6 +1028,7 @@ pointer po		#I matching pattern accumulation pointer
 char	line[LEN_UACARD]
 pointer sp, pt, tpt, tst, ps, pkp
 int	nbl, l, k, j, i, strncmp(), nbkw, nsb, cmplen
+int	stridxs()
 
 begin
 	call smark (sp)
@@ -985,6 +1057,7 @@ begin
 		if (strncmp (line, "COMMENT ", 8) == 0 ||
 		    strncmp (line, "HISTORY ", 8) == 0 ||
 		    strncmp (line, "OBJECT  ", 8) == 0 ||
+		    strncmp (line, "EXTEND  ", 8) == 0 ||
 		    strncmp (line, "ORIGIN  ", 8) == 0 ||
 		    strncmp (line, "IRAF-TLM", 8) == 0 ||
 		    strncmp (line, "DATE    ", 8) == 0 ) {
@@ -1059,13 +1132,18 @@ begin
 	    } else {
 		# One line to compare.
 		ps = str - LEN_UACARD
-		cmplen = LEN_UACARD
-	        if (merge == YES)
-		    cmplen = SZ_KEYWORD
+		cmplen = min (stridxs("=", Memc[pt]), LEN_UACARD)
+		if (cmplen == 0)
+		    cmplen = LEN_UACARD
+
+#	        if (merge == YES)
+#		    cmplen = SZ_KEYWORD
 
 	        do j = 1, slines {
 		    ps = ps + LEN_UACARD
 		    if (Memc[ps] == Memc[pt]) {
+			if (merge == NO)
+			    cmplen = LEN_CARD 
 		        if (strncmp (Memc[ps], Memc[pt], cmplen) == 0) {
 			    nbl = 0
 			    break

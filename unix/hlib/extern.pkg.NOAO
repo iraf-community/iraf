@@ -14,8 +14,14 @@ task	tables.pkg	= tables$tables.cl
 reset	mscred		= /iraf/extern/mscred/
 task	mscred.pkg	= mscred$mscred.cl
 
-reset	guidemos	= /iraf/extern/guidemos/
-task	guidemos.pkg	= guidemos$guidemos.cl
+reset	guiapps		= /iraf/extern/guiapps/
+task	guiapps.pkg	= guiapps$guiapps.cl
+
+reset	fitsutil	= /iraf/extern/fitsutil/
+task	fitsutil.pkg	= fitsutil$fitsutil.cl
+
+reset	nmisc		= /iraf/extern/nmisc/
+task	nmisc.pkg	= nmisc$nmisc.cl
 
 #reset	grasp		= /iraf/extern/grasp/
 #task	grasp.pkg	= grasp$grasp.cl
@@ -28,7 +34,8 @@ reset	helpdb		= "lib$helpdb.mip\
 			  ,noao$lib/helpdb.mip\
 			  ,tables$lib/helpdb.mip\
 			  ,mscred$lib/helpdb.mip\
-			  ,guidemos$lib/helpdb.mip\
+			  ,nmisc$lib/helpdb.mip\
+			  ,guiapps$lib/helpdb.mip\
 #			  ,grasp$lib/helpdb.mip\
 #			  ,arcon$lib/helpdb.mip\
 			  "

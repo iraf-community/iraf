@@ -10,7 +10,7 @@ include "geomap.h"
 # GEO_MINIT -- Initialize the fitting routines.
 
 procedure geo_minit (fit, projection, geometry, function, xxorder, xyorder,
-	xxterms, yxorder, yyorder, yxterms, reject)
+	xxterms, yxorder, yyorder, yxterms, maxiter, reject)
 
 pointer	fit		#I pointer to the fit structure
 int	projection	#I the coordinate projection type
@@ -22,6 +22,7 @@ int	xxterms		#I include cross terms in x fit
 int	yxorder		#I order of y fit in x
 int	yyorder		#I order of y fit in y
 int	yxterms		#I include cross-terms in y fit
+int	maxiter		#I the maximum number of rejection interations
 double	reject		#I rejection threshold in sigma
 
 begin
@@ -43,6 +44,7 @@ begin
 	# Set rejection parameters.
 	GM_XRMS(fit) = 0.0d0
 	GM_YRMS(fit) = 0.0d0
+	GM_MAXITER(fit) = maxiter
 	GM_REJECT(fit) = reject
 	GM_NREJECT(fit) = 0
 	GM_REJ(fit) = NULL
@@ -56,6 +58,8 @@ procedure geo_free (fit)
 pointer	fit		#I pointer to the fitting structure
 
 begin
+	if (GM_REJ(fit) != NULL)
+	    call mfree (GM_REJ(fit), TY_INT)
 	call mfree (fit, TY_STRUCT)
 end
 
@@ -116,7 +120,7 @@ begin
 	    call geo_fxyr (fit, sy1, sy2, xref, yref, yin, wts,
 	        Memr[yresidual], npts, NO, yerrmsg, maxch)
 	}
-	if (IS_INDEFD(GM_REJECT(fit)))
+	if (GM_MAXITER(fit) <= 0 || IS_INDEFD(GM_REJECT(fit)))
 	    GM_NREJECT(fit) = 0
 	else
 	    call geo_mrejectr (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
@@ -201,10 +205,19 @@ begin
 	# Do the fit.
 	if (sw < 2) {
 	    call sfree (sp)
-	    if (GM_PROJECTION(fit) == GM_NONE)
-	        call error (0, "Too few data points for X and Y fits.")
-	    else
-	        call error (0, "Too few data points for XI and ETA fits.")
+	    if (GM_PROJECTION(fit) == GM_NONE) {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for X and Y fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for X and Y fits.")
+	        call error (1, "Too few data points for X and Y fits.")
+	    } else {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call error (1, "Too few data points for XI and ETA fits.")
+	    }
 
 	} else {
 
@@ -410,10 +423,19 @@ begin
 	# Do the fit.
 	if (sw < 2) {
 	    call sfree (sp)
-	    if (GM_PROJECTION(fit) == GM_NONE)
-	        call error (0, "Too few data points for X and Y fits.")
-	    else
-	        call error (0, "Too few data points for XI and ETA fits.")
+	    if (GM_PROJECTION(fit) == GM_NONE) {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for X and Y fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for X and Y fits.")
+	        call error (1, "Too few data points for X and Y fits.")
+	    } else {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call error (1, "Too few data points for XI and ETA fits.")
+	    }
 	} else {
 
 	    # Compute the sums.
@@ -644,10 +666,19 @@ begin
 	# Do the fit.
 	if (sw < 3) {
 	    call sfree (sp)
-	    if (GM_PROJECTION(fit) == GM_NONE)
-	        call error (0, "Too few data points for X and Y fits.")
-	    else
-	        call error (0, "Too few data points for XI and ETA fits.")
+	    if (GM_PROJECTION(fit) == GM_NONE) {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for X and Y fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for X and Y fits.")
+	        call error (1, "Too few data points for X and Y fits.")
+	    } else {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call error (1, "Too few data points for XI and ETA fits.")
+	    }
 	} else {
 	    xr0 = sxr / sw
 	    yr0 = syr / sw
@@ -968,15 +999,25 @@ begin
 	if (ier == NO_DEG_FREEDOM) {
 	    call sfree (sp)
 	    if (xfit == YES) {
-		if (GM_PROJECTION(fit) == GM_NONE)
-	            call error (0, "Too few data points for X fit.")
-		else
-	            call error (0, "Too few data points for XI fit.")
+		if (GM_PROJECTION(fit) == GM_NONE) {
+	            call sprintf (errmsg, maxch,
+		        "Too few data points for X fit.")
+	            call error (1, "Too few data points for X fit.")
+		} else {
+	            call sprintf (errmsg, maxch,
+		        "Too few data points for XI fit.")
+	            call error (1, "Too few data points for XI fit.")
+		}
 	    } else {
-		if (GM_PROJECTION(fit) == GM_NONE)
-	            call error (0, "Too few data points for Y fit.")
-		else
-	            call error (0, "Too few data points for ETA fit.")
+		if (GM_PROJECTION(fit) == GM_NONE) {
+	            call sprintf (errmsg, maxch,
+		        "Too few data points for Y fit.")
+	            call error (1, "Too few data points for Y fit.")
+		} else {
+	            call sprintf (errmsg, maxch,
+		        "Too few data points for ETA fit.")
+	            call error (1, "Too few data points for ETA fit.")
+		}
 	    }
 	} else if (ier == SINGULAR) {
 	    if (xfit == YES) {
@@ -1013,15 +1054,25 @@ begin
 	    if (ier == NO_DEG_FREEDOM) {
 		call sfree (sp)
 		if (xfit == YES) {
-		    if (GM_PROJECTION(fit) == GM_NONE)
-		       call error (0, "Too few data points for X fit.")
-		    else
-		       call error (0, "Too few data points for XI fit.")
+		    if (GM_PROJECTION(fit) == GM_NONE) {
+		       call sprintf (errmsg, maxch,
+		           "Too few data points for X fit.")
+		       call error (1, "Too few data points for X fit.")
+		    } else {
+		       call sprintf (errmsg, maxch,
+		           "Too few data points for XI fit.")
+		       call error (1, "Too few data points for XI fit.")
+		    }
 		} else {
-		    if (GM_PROJECTION(fit) == GM_NONE)
-			call error (0, "Too few data points for Y fit.")
-		    else
-			call error (0, "Too few data points for ETA fit.")
+		    if (GM_PROJECTION(fit) == GM_NONE) {
+		       call sprintf (errmsg, maxch,
+		           "Too few data points for Y fit.")
+			call error (1, "Too few data points for Y fit.")
+		    } else {
+		       call sprintf (errmsg, maxch,
+		           "Too few data points for ETA fit.")
+			call error (1, "Too few data points for ETA fit.")
+		    }
 		}
 	    } else if (ier == SINGULAR) {
 		if (xfit == YES) {
@@ -1099,7 +1150,7 @@ char	yerrmsg[ARB]	#O the output y error message
 int	ymaxch		#I maximum number of characters in the y error message
 
 int	i
-int	nreject
+int	nreject, niter
 pointer	sp, twts
 real	cutx, cuty
 errchk	geo_fxyr(), geo_fthetar(), geo_fmagnifyr(), geo_flinearr()
@@ -1113,33 +1164,39 @@ begin
 	if (GM_REJ(fit) != NULL)
 	    call mfree (GM_REJ(fit), TY_INT)
 	call malloc (GM_REJ(fit), npts, TY_INT)
+	GM_NREJECT(fit) = 0
 
-	# Compute the rejection limits.
-	if ((npts - GM_NWTS0(fit)) > 1) {
-	    cutx = GM_REJECT(fit) * sqrt (GM_XRMS(fit) / (npts -
-	        GM_NWTS0(fit) - 1))
-	    cuty = GM_REJECT(fit) * sqrt (GM_YRMS(fit) / (npts -
-	        GM_NWTS0(fit) - 1))
-	} else {
-	    cutx = MAX_REAL
-	    cuty = MAX_REAL
-	}
-
-	# Reject points from the fit.
-	nreject = 0
+	# Initialize the temporary weights array and the number of rejected
+	# points.
 	call amovr (wts, Memr[twts], npts)
-	do i = 1, npts {
-	    if (wts[i] > 0.0 && ((abs (xresid[i]) > cutx) || (abs (yresid[i]) >
-	        cuty))) {
-		Memr[twts+i-1] = real(0.0)
-		nreject = nreject + 1
-		Memi[GM_REJ(fit)+nreject-1] = i
-	    }
-	}
-	GM_NREJECT(fit) = nreject
+	nreject = 0
 
-	# Resolve and calculate new residuals.
-	if (nreject > 0) {
+	niter = 0
+	repeat {
+
+	    # Compute the rejection limits.
+	    if ((npts - GM_NWTS0(fit)) > 1) {
+	        cutx = GM_REJECT(fit) * sqrt (GM_XRMS(fit) / (npts -
+	            GM_NWTS0(fit) - 1))
+	        cuty = GM_REJECT(fit) * sqrt (GM_YRMS(fit) / (npts -
+	            GM_NWTS0(fit) - 1))
+	    } else {
+	        cutx = MAX_REAL
+	        cuty = MAX_REAL
+	    }
+
+	    # Reject points from the fit.
+	    do i = 1, npts {
+	        if (Memr[twts+i-1] > 0.0 && ((abs (xresid[i]) > cutx) ||
+		    (abs (yresid[i]) > cuty))) {
+		    Memr[twts+i-1] = real(0.0)
+		    nreject = nreject + 1
+		    Memi[GM_REJ(fit)+nreject-1] = i
+	        }
+	    }
+	    if ((nreject - GM_NREJECT(fit)) <= 0)
+		break
+	    GM_NREJECT(fit) = nreject
 
 	    # Compute number of deleted points.
 	    GM_NWTS0(fit) = 0
@@ -1184,7 +1241,10 @@ begin
 	    GM_YRMS(fit) = 0.0d0
 	    do i = 1, npts
 	        GM_YRMS(fit) = GM_YRMS(fit) + Memr[twts+i-1] * yresid[i] ** 2
-	}
+
+	    niter = niter + 1
+
+	} until (niter >= GM_MAXITER(fit))
 
 	call sfree (sp)
 end
@@ -1264,7 +1324,7 @@ begin
 	    call geo_fxyd (fit, sy1, sy2, xref, yref, yin, wts,
 	        Memd[yresidual], npts, NO, yerrmsg, maxch)
 	}
-	if (IS_INDEFD(GM_REJECT(fit)))
+	if (GM_MAXITER(fit) <= 0 || IS_INDEFD(GM_REJECT(fit)))
 	    GM_NREJECT(fit) = 0
 	else
 	    call geo_mrejectd (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
@@ -1349,10 +1409,19 @@ begin
 	# Do the fit.
 	if (sw < 2) {
 	    call sfree (sp)
-	    if (GM_PROJECTION(fit) == GM_NONE)
-	        call error (0, "Too few data points for X and Y fits.")
-	    else
-	        call error (0, "Too few data points for XI and ETA fits.")
+	    if (GM_PROJECTION(fit) == GM_NONE) {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for X and Y fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for X and Y fits.")
+	        call error (1, "Too few data points for X and Y fits.")
+	    } else {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call error (1, "Too few data points for XI and ETA fits.")
+	    }
 
 	} else {
 
@@ -1558,10 +1627,19 @@ begin
 	# Do the fit.
 	if (sw < 2) {
 	    call sfree (sp)
-	    if (GM_PROJECTION(fit) == GM_NONE)
-	        call error (0, "Too few data points for X and Y fits.")
-	    else
-	        call error (0, "Too few data points for XI and ETA fits.")
+	    if (GM_PROJECTION(fit) == GM_NONE) {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for X and Y fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for X and Y fits.")
+	        call error (1, "Too few data points for X and Y fits.")
+	    } else {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call error (1, "Too few data points for XI and ETA fits.")
+	    }
 	} else {
 
 	    # Compute the sums.
@@ -1792,10 +1870,19 @@ begin
 	# Do the fit.
 	if (sw < 3) {
 	    call sfree (sp)
-	    if (GM_PROJECTION(fit) == GM_NONE)
-	        call error (0, "Too few data points for X and Y fits.")
-	    else
-	        call error (0, "Too few data points for XI and ETA fits.")
+	    if (GM_PROJECTION(fit) == GM_NONE) {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for X and Y fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for X and Y fits.")
+	        call error (1, "Too few data points for X and Y fits.")
+	    } else {
+	        call sprintf (xerrmsg, xmaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call sprintf (yerrmsg, ymaxch,
+		    "Too few data points for XI and ETA fits.")
+	        call error (1, "Too few data points for XI and ETA fits.")
+	    }
 	} else {
 	    xr0 = sxr / sw
 	    yr0 = syr / sw
@@ -2114,15 +2201,25 @@ begin
 	if (ier == NO_DEG_FREEDOM) {
 	    call sfree (sp)
 	    if (xfit == YES) {
-		if (GM_PROJECTION(fit) == GM_NONE)
-	            call error (0, "Too few data points for X fit.")
-		else
-	            call error (0, "Too few data points for XI fit.")
+		if (GM_PROJECTION(fit) == GM_NONE) {
+	            call sprintf (errmsg, maxch,
+		        "Too few data points for X fit.")
+	            call error (1, "Too few data points for X fit.")
+		} else {
+	            call sprintf (errmsg, maxch,
+		        "Too few data points for XI fit.")
+	            call error (1, "Too few data points for XI fit.")
+		}
 	    } else {
-		if (GM_PROJECTION(fit) == GM_NONE)
-	            call error (0, "Too few data points for Y fit.")
-		else
-	            call error (0, "Too few data points for ETA fit.")
+		if (GM_PROJECTION(fit) == GM_NONE) {
+	            call sprintf (errmsg, maxch,
+		        "Too few data points for Y fit.")
+	            call error (1, "Too few data points for Y fit.")
+		} else {
+	            call sprintf (errmsg, maxch,
+		        "Too few data points for ETA fit.")
+	            call error (1, "Too few data points for ETA fit.")
+		}
 	    }
 	} else if (ier == SINGULAR) {
 	    if (xfit == YES) {
@@ -2159,15 +2256,25 @@ begin
 	    if (ier == NO_DEG_FREEDOM) {
 		call sfree (sp)
 		if (xfit == YES) {
-		    if (GM_PROJECTION(fit) == GM_NONE)
-		       call error (0, "Too few data points for X fit.")
-		    else
-		       call error (0, "Too few data points for XI fit.")
+		    if (GM_PROJECTION(fit) == GM_NONE) {
+		       call sprintf (errmsg, maxch,
+		           "Too few data points for X fit.")
+		       call error (1, "Too few data points for X fit.")
+		    } else {
+		       call sprintf (errmsg, maxch,
+		           "Too few data points for XI fit.")
+		       call error (1, "Too few data points for XI fit.")
+		    }
 		} else {
-		    if (GM_PROJECTION(fit) == GM_NONE)
-			call error (0, "Too few data points for Y fit.")
-		    else
-			call error (0, "Too few data points for ETA fit.")
+		    if (GM_PROJECTION(fit) == GM_NONE) {
+		       call sprintf (errmsg, maxch,
+		           "Too few data points for Y fit.")
+			call error (1, "Too few data points for Y fit.")
+		    } else {
+		       call sprintf (errmsg, maxch,
+		           "Too few data points for ETA fit.")
+			call error (1, "Too few data points for ETA fit.")
+		    }
 		}
 	    } else if (ier == SINGULAR) {
 		if (xfit == YES) {
@@ -2245,7 +2352,7 @@ char	yerrmsg[ARB]	#O the output y error message
 int	ymaxch		#I maximum number of characters in the y error message
 
 int	i
-int	nreject
+int	nreject, niter
 pointer	sp, twts
 double	cutx, cuty
 errchk	geo_fxyd(), geo_fthetad(), geo_fmagnifyd(), geo_flineard()
@@ -2259,33 +2366,39 @@ begin
 	if (GM_REJ(fit) != NULL)
 	    call mfree (GM_REJ(fit), TY_INT)
 	call malloc (GM_REJ(fit), npts, TY_INT)
+	GM_NREJECT(fit) = 0
 
-	# Compute the rejection limits.
-	if ((npts - GM_NWTS0(fit)) > 1) {
-	    cutx = GM_REJECT(fit) * sqrt (GM_XRMS(fit) / (npts -
-	        GM_NWTS0(fit) - 1))
-	    cuty = GM_REJECT(fit) * sqrt (GM_YRMS(fit) / (npts -
-	        GM_NWTS0(fit) - 1))
-	} else {
-	    cutx = MAX_REAL
-	    cuty = MAX_REAL
-	}
-
-	# Reject points from the fit.
-	nreject = 0
+	# Initialize the temporary weights array and the number of rejected
+	# points.
 	call amovd (wts, Memd[twts], npts)
-	do i = 1, npts {
-	    if (wts[i] > 0.0 && ((abs (xresid[i]) > cutx) || (abs (yresid[i]) >
-	        cuty))) {
-		Memd[twts+i-1] = double(0.0)
-		nreject = nreject + 1
-		Memi[GM_REJ(fit)+nreject-1] = i
-	    }
-	}
-	GM_NREJECT(fit) = nreject
+	nreject = 0
 
-	# Resolve and calculate new residuals.
-	if (nreject > 0) {
+	niter = 0
+	repeat {
+
+	    # Compute the rejection limits.
+	    if ((npts - GM_NWTS0(fit)) > 1) {
+	        cutx = GM_REJECT(fit) * sqrt (GM_XRMS(fit) / (npts -
+	            GM_NWTS0(fit) - 1))
+	        cuty = GM_REJECT(fit) * sqrt (GM_YRMS(fit) / (npts -
+	            GM_NWTS0(fit) - 1))
+	    } else {
+	        cutx = MAX_REAL
+	        cuty = MAX_REAL
+	    }
+
+	    # Reject points from the fit.
+	    do i = 1, npts {
+	        if (Memd[twts+i-1] > 0.0 && ((abs (xresid[i]) > cutx) ||
+		    (abs (yresid[i]) > cuty))) {
+		    Memd[twts+i-1] = double(0.0)
+		    nreject = nreject + 1
+		    Memi[GM_REJ(fit)+nreject-1] = i
+	        }
+	    }
+	    if ((nreject - GM_NREJECT(fit)) <= 0)
+		break
+	    GM_NREJECT(fit) = nreject
 
 	    # Compute number of deleted points.
 	    GM_NWTS0(fit) = 0
@@ -2330,7 +2443,10 @@ begin
 	    GM_YRMS(fit) = 0.0d0
 	    do i = 1, npts
 	        GM_YRMS(fit) = GM_YRMS(fit) + Memd[twts+i-1] * yresid[i] ** 2
-	}
+
+	    niter = niter + 1
+
+	} until (niter >= GM_MAXITER(fit))
 
 	call sfree (sp)
 end

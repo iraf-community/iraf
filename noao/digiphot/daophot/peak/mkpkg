@@ -17,5 +17,6 @@ libpkg.a:
 			../lib/daophotdef.h     ../lib/apseldef.h           \
 			../lib/peakdef.h
 	dprrphot.x      ../lib/apseldef.h
-	t_peak.x	<fset.h>		../lib/daophotdef.h
+	t_peak.x	<fset.h>		<imhdr.h>                   \
+	                ../lib/daophotdef.h
 	;

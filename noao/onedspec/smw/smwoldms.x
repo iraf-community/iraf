@@ -88,8 +88,10 @@ begin
 	# Delete old parameters
 	i = imofnlu (im,
 	    "DISPAXIS,APFORMAT,BEAM-NUM,DC-FLAG,W0,WPC,NP1,NP2")
-	while (imgnfn (i, Memc[key], SZ_FNAME) != EOF)
-	    call imdelf (im, Memc[key])
+	while (imgnfn (i, Memc[key], SZ_FNAME) != EOF) {
+	    iferr (call imdelf (im, Memc[key]))
+		;
+	}
 	call imcfnl (i)
 
 	# Update MWCS

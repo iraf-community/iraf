@@ -1,5 +1,45 @@
 .help revisions Jun88 pkg.dataio
 .nf
+dataio$export/export.h
+    Changed the zscale sampling parameters to use more points spread out
+    over more of the image.  The old values would sometimes find an
+    innappropriate z1/z2 range causing problems when doing many images in
+    batch mode.  (3/20/02, MJF)
+
+dataio$fits/t_rfits.x
+dataio$imtext/t_rtextimage.x
+    Changed the clgetc calls to to clgstr calls for the datatype parameter
+    in rfits and the otype parameter in rtextimage. This change is required
+    to avoid an "ERROR: Parameter not a legal character constant (parname)"
+    error introduced by recent changes to the CL. Basically "" is no longer
+    a legal argument for clgetc. (6/15/01 LED)
+
+dataio$fits/fits_rheader.x
+    Fixed a bug in the MEF file reading error recovery code that can cause
+    a segvio due to a too many open file descriptors condition. (5/1/01 LED)
+
+dataio$export/bltins/expgm.x
+dataio$export/bltins/exppm.x
+    Fixed a bug in writing the header for these formats on PCIX.  (6/23/00 MJF)
+
+dataio$export.par
+    Made the 'format' parameter automatic mode (5/16/00 MJF)
+
+dataio$export/expreproc.x
+    Modified so that the 'overlay' colors are not scaled.  (5/16/00 MJF)
+
+dataio$reblock/t_reblock.x
+dataio$reblock/reblock_file.x
+    Fixed a bug in the output block writing code caused by a failure to
+    check the status return of the awaitb call. At the same time worked
+    around a longstanding  problem in tape to tape copies caused by
+    trying to open and close a magtape file for writing when there is
+    no data and fixed an initialization bug in the record trimming and
+    padding code that has been there a long time. (2/9/00 LED)
+
+dataio$import/ipdb.gx
+    Fixed a string overflow bug causing segvios on PCs (12/13/99 MJF)
+
 dataio$import.par
 dataio$export.par
     Changed query param modes to auto to avoid prompt from epar :go 

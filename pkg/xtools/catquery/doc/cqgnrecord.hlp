@@ -1,0 +1,61 @@
+.help cqgnrecord Mar00 "Catquery Package"
+.ih
+NAME
+cqgnrecord -- get the next record from the catalog results
+.ih
+SYNOPSIS
+
+stat = cq_gnrecord (res, buf, maxch, nextrec)
+
+.nf
+pointer	res		# the results descriptor
+char	buf		# the output record buffer
+int	maxch		# the maximum size of the output record buffer
+int	recno		# the next available record number 
+.fi
+.ih
+ARGUMENTS
+.ls res    
+The results descriptor.
+.le
+.ls buf
+The buffer containing the returned record.
+.le
+.ls maxch
+The maximum size of the output buffer.
+.le
+.ls recptr
+The next available record number. Recptr is updated after each call.
+.le
+.ih
+DESCRIPTION
+Cq_gnrecord returns the requested record. Cq_grecord is an integer function
+which returns BOF, the number of characters in the record, or EOF as
+its function value.
+
+.ih
+NOTES
+In most cases allocating a buffer size that is SZ_LINE chars long
+will be adequate to hold the output record. If the integer results parameter
+CQRECSIZE is defined, i.e. non-zero, then an output buffer  CQRECSIZE chars
+long can be allocated.
+
+.ih
+EXAMPLES
+
+pointer	cq_query()
+int cq_gnrecord()
+
+...
+
+res = cq_query (cq)
+recno = 0
+while (cq_gnrecord (res, record, SZ_LINE, recno) != EOF) {
+     call printf ("%s")
+	call pargstr (record)
+}
+call cq_rclose (res)
+.ih
+SEE ALSO
+cqgrecord
+.endhelp

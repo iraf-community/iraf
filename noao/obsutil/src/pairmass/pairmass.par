@@ -1,0 +1,40 @@
+ra,r,h,,0.,24.,Right Ascension of the object
+dec,r,h,,-90.,90.,Declination of the object
+epoch,r,h,INDEF,,,Epoch of the coordinates
+
+year,i,h,,,,Year of the observation
+month,i,h,,1,12,Numerical month specification
+day,i,h,,1,31,Day of the month
+
+observatory,s,h,"observatory",,,Observatory
+
+timesys,s,h,"Standard","|Universal|Standard|Siderial|",,Time system
+resolution,r,h,4,0.25,,Number of UT points per hour
+listout,b,h,no,,,"List, rather than plot, the airmass vs. UT"
+
+wx1,r,h,-7.,,,left user x-coord if not autoscaling
+wx2,r,h,7.,,,right user x-coord if not autoscaling
+wy1,r,h,0.,,,lower user y-coord if not autoscaling
+wy2,r,h,5.,,,upper user y-coord if not autoscaling
+pointmode,b,h,no,,,plot points instead of lines
+marker,s,h,"box",\
+  "point|box|plus|cross|circle|hebar|vebar|hline|vline|diamond",\
+  ,point marker character 
+szmarker,r,h,5E-3,,,marker size (0 for list input)
+logx,b,h,no,,,log scale x-axis
+logy,b,h,no,,,log scale y-axis
+xlabel,s,h,"default",,,x-axis label
+ylabel,s,h,"Airmass",,,y-axis label
+title,s,h,"default",,,title for plot
+vx1,r,h,0.,,,left limit of device window (ndc coords)
+vx2,r,h,0.,,,right limit of device window (ndc coords)
+vy1,r,h,0.,,,bottom limit of device window (ndc coords)
+vy2,r,h,0.,,,upper limit of device window (ndc coords)
+majrx,i,h,5,,,number of major divisions along x grid
+minrx,i,h,5,,,number of minor divisions along x grid
+majry,i,h,5,,,number of major divisions along y grid
+minry,i,h,5,,,number of minor divisions along y grid
+round,b,h,no,,,round axes to nice values
+fill,b,h,yes,,,fill device viewport regardless of aspect ratio?
+append,b,h,no,,,append to existing plot
+device,s,h,"stdgraph",,,output device

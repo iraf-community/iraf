@@ -350,7 +350,7 @@ begin
 	    if (IS_INDEFR (pclip))
 		pclip = -0.5
 
-            i = (nimages - 1) / 2.
+            i = nimages / 2.
             if (abs (pclip) < 1.)
                 pclip = pclip * i
             if (pclip < 0.)

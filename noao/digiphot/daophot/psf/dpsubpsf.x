@@ -16,22 +16,29 @@ pointer	gd			# pointer to the graphics stream
 pointer	mgd			# pointer to the metacode descriptor
 bool 	showplots		# show plots?
 
-bool	star_ok
-int	x1, x2, y1, y2, starnum, saturated
+real	tx, ty
 pointer	srim
+int	x1, x2, y1, y2, starnum, saturated
+bool	star_ok
 
-int	dp_locstar(), dp_idstar(), dp_pstati(), dp_issat()
-pointer	dp_psubrast()
 real	dp_statr()
+pointer	dp_psubrast()
+int	dp_locstar(), dp_idstar(), dp_pstati(), dp_issat()
 
 begin
+        # Convert coordinates for display.
+	if (showplots)
+            call dp_ltov (im, x, y, tx, ty, 1)
+	else
+            call dp_wout (dao, im, x, y, tx, ty, 1)
+
 	# Check that the position of the star is within the image.
 	if (idnum == 0 && (x < 1.0 || x > real (IM_LEN(im,1)) || y < 1.0 || y >
 	    real (IM_LEN(im,2)))) {
 	    if (DP_VERBOSE(dao) == YES) {
 	        call printf ("Star at %g,%g is outside the image\n")
-	            call pargr (x)
-	            call pargr (y)
+	            call pargr (tx)
+	            call pargr (ty)
 	    }
 	    return (ERR)
 	}
@@ -49,8 +56,8 @@ begin
 		} else {
 	            call printf (
 		        "Star at %g,%g  not found in the photometry file\n")
-		        call pargr (x)
-		        call pargr (y)
+		        call pargr (tx)
+		        call pargr (ty)
 		}
 	    }
 	    return (ERR)
@@ -89,14 +96,14 @@ begin
 
 	# Now let's look at the extracted subraster.
 	if (showplots) {
-	    call dp_showpsf (dao, Memr[srim], (x2 - x1 + 1), (y2 - y1 + 1),
+	    call dp_showpsf (dao, im, Memr[srim], (x2 - x1 + 1), (y2 - y1 + 1),
 	        x1, y1, gd, star_ok)
 	} else
 	    star_ok = true
 
 	if (star_ok) {
 	    if (mgd != NULL)
-	        call dp_plotpsf (dao, Memr[srim], (x2 - x1 + 1),
+	        call dp_plotpsf (dao, im, Memr[srim], (x2 - x1 + 1),
 		    (y2 - y1 + 1), x1, y1, mgd)
 	    if (DP_VERBOSE(dao) == YES) {
 	        call printf ("PSF star %d saved by user\n")
@@ -149,8 +156,8 @@ begin
 	# Get the star position and scale factor.
 	xstar = Memr[DP_PXCEN(psf)+starno-1]
 	ystar = Memr[DP_PYCEN(psf)+starno-1]
-	deltax = (xstar - 1.0) / DP_PSFX(psffit)
-	deltay = (ystar - 1.0) / DP_PSFY(psffit)
+	deltax = (xstar - 1.0) / DP_PSFX(psffit) - 1.0
+	deltay = (ystar - 1.0) / DP_PSFY(psffit) - 1.0
 	xstar = xstar - x1 + 1
 	ystar = ystar - y1 + 1
 	scale = Memr[DP_PH(psf)+starno-1] / Memr[DP_PH(psf)] 

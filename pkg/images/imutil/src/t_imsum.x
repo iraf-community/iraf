@@ -244,6 +244,8 @@ begin
 	default:
 	    call error (0, "Unrecognized datatype")
 	}
+
+	call sfree (sp)
 end
 
 # IMSUM_HPARM -- Arithmetic on image header parameters.

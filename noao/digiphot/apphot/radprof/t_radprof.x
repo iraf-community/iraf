@@ -1,5 +1,6 @@
 include <fset.h>
 include <gset.h>
+include <imhdr.h>
 include "../lib/apphot.h"
 
 # T_RADPROF -- Procedure to compute the radial profiles of a list of
@@ -14,18 +15,20 @@ pointer plotfile	# pointer to the metacode plot file
 pointer graphics	# pointer to the graphics device
 pointer display		# pointer to the display device
 int	interactive	# interactive mode
+int	cache		# cache the input image
 int	verify		# verify the critical parameters
 int	update		# update the critical parameters
 int	verbose		# verbose mode
 
+pointer	sp, cname, outfname, ap, im, id, gd, mgd, str
 int	limlist, lclist, lolist, sid, lid, cl, out, pfd, root, stat
-int	imlist, clist, olist
-pointer	sp, cname, outfname, ap, im, id, gd, mgd
+int	imlist, clist, olist, wcs, memstat, req_size, old_size, buf_size
 
-bool	clgetb(), streq()
-int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), fnldir(), strncmp()
-int	strlen(), ap_radprof(), imtopenp(), clpopnu(), open()
 pointer	immap(), gopen()
+int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), fnldir(), strncmp()
+int	strlen(), ap_radprof(), imtopenp(), clpopnu(), open(), clgwrd()
+int	ap_memstat(), sizeof()
+bool	clgetb(), streq()
 errchk	gopen
 
 begin
@@ -39,6 +42,7 @@ begin
 	call salloc (display, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
 	call salloc (cname, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Set standard output to flush on newline.
 	call fseti (STDOUT, F_FLUSHNL, YES)
@@ -74,17 +78,36 @@ begin
 	    #interactive = YES
 	else
 	    interactive = btoi (clgetb ("interactive"))
+	cache = btoi (clgetb ("cache"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
 	verbose = btoi (clgetb ("verbose"))
 
 	# Get the radial profile fitting parameters.
 	call ap_grppars (ap)
+
+	# Verify the radial profile fitting parameters.
 	if (verify == YES && interactive == NO) {
 	    call ap_rconfirm (ap, NULL, 1)
 	    if (update == YES)
 		call ap_rpars (ap)
 	}
+
+        # Get the wcs information.
+        wcs = clgwrd ("wcsin", Memc[str], SZ_LINE, WCSINSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the input coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call apseti (ap, WCSIN, wcs)
+        wcs = clgwrd ("wcsout", Memc[str], SZ_LINE, WCSOUTSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the output coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call apseti (ap, WCSOUT, wcs)
 
 	# Get the graphics and display devices.
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
@@ -138,15 +161,18 @@ begin
 
 	    # Open the image.
 	    im = immap (Memc[image], READ_ONLY, 0)
-	    call apsets (ap, IMNAME, Memc[image])
-	    call ap_rdnoise (im, ap)
-	    call ap_padu (im, ap)
-	    call ap_itime (im, ap)
-	    call ap_otime (im, ap)
-	    call ap_airmass (im, ap)
-	    call ap_filter (im, ap)
+
+	    # Set the image display viewport.
+	    call apimkeys (ap, im, Memc[image])
 	    if ((id != NULL) && (id != gd))
 		call ap_gswv (id, Memc[image], im, 4)
+
+	    # Cache the input image pixels.
+            req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
+                sizeof (IM_PIXTYPE(im))
+            memstat = ap_memstat (cache, req_size, old_size)
+            if (memstat == YES)
+                call ap_pcache (im, INDEFI, buf_size)
 
 	    # Open the coordinate file, where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -173,6 +199,8 @@ begin
 		}
 	    }
 	    call apsets (ap, CLNAME, Memc[outfname])
+	    call apfroot (Memc[outfname], Memc[coords], SZ_FNAME)
+	    call apsets (ap, CLROOT, Memc[coords])
 
 	    # Open output text file, if output is "default", dir$default,
 	    # or a directory specification then the extension "prf" is added
@@ -204,7 +232,7 @@ begin
 	    if (interactive == NO) {
 	        if (Memc[cname] != EOS)
 		    stat = ap_radprof (ap, im, cl, NULL, mgd, NULL, out,
-		        sid, NO)
+		        sid, NO, cache)
 	        else  if (cl != NULL) {
 		    lid = 1
 	            call ap_bradprof (ap, im, cl, id, gd, mgd, out, sid, lid,
@@ -213,8 +241,10 @@ begin
 		} else
 		    stat = NO
 	    } else
-	        stat = ap_radprof (ap, im, cl, gd, mgd, id, out, sid, YES)
+	        stat = ap_radprof (ap, im, cl, gd, mgd, id, out, sid, YES,
+		    cache)
 
+	    # Cleanup.
 	    call imunmap (im)
 	    if (cl != NULL) {
 		if (lclist > 1)
@@ -228,6 +258,10 @@ begin
 		}
 		sid = 1
 	    }
+
+	    # Uncache memory.
+	    call fixmem (old_size)
+
 	    if (stat == YES)
 		break
 

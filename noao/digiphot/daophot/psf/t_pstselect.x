@@ -1,4 +1,5 @@
 include	<fset.h>
+include <imhdr.h>
 include <gset.h>
 include "../lib/daophotdef.h"
 include "../lib/apseldef.h"
@@ -16,20 +17,25 @@ int	maxnpsf			# maximimum number of psf stars
 pointer	plotfile		# pointer to the plot metacode file
 bool	interactive		# interactive mode
 pointer	plottype		# default plot type
+int	cache			# cache the input image pixels
 int	verify			# verify the critical parameters
 int	update			# update the critical parameters
 pointer	graphics		# the graphics device
 pointer	display			# the display device
+bool	mkstars			# mark deleted and accepted psf stars
 
-bool	ap_text
+pointer	sp, pfd, dao, outfname, curfile, str, im, gd, id, mgd
 int	imlist, limlist, alist, lalist, olist, lolist, root, apd, pmgd, pltype
-pointer	sp, pfd, dao, outfname, curfile, im, gd, id, mgd
+int	wcs, req_size, old_size, buf_size, memstat()
+bool	ap_text
 
-bool	clgetb(), itob(), streq()
+pointer	immap(), gopen()
 int	tbtopn(), open(), fnldir(), strlen(), strncmp(), fstati(), btoi()
 int	access(), fntopnb(), fntlenb(), clgeti(), imtopen(), imtlen()
-int	fntgfnb(), imtgetim(), strdic(), dp_stati()
-pointer	immap(), gopen()
+int	fntgfnb(), imtgetim(), strdic(), dp_stati(), clgwrd(), sizeof()
+int	dp_memstat()
+bool	clgetb(), itob(), streq()
+
 errchk	gopen()
 
 begin
@@ -48,12 +54,14 @@ begin
 	call salloc (display, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
 	call salloc (curfile, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Get the various task parameters.
 	call clgstr ("image", Memc[image], SZ_FNAME)
 	call clgstr ("photfile", Memc[photfile], SZ_FNAME)
 	call clgstr ("pstfile", Memc[pstfile], SZ_FNAME)
 	maxnpsf = clgeti ("maxnpsf")
+	cache = btoi (clgetb ("cache"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
 
@@ -89,12 +97,30 @@ begin
 	}
 
 	# Initialize the DAOPHOT structure, and get the pset parameters.
-	call dp_gppars (dao, NULL)	
+	call dp_gppars (dao)	
+
+	# Confirm the parameters.
 	if (verify == YES) {
 	    call dp_ptconfirm (dao)
 	    if (update == YES)
 		call dp_pppars (dao)
 	}
+
+        # Get the wcs information.
+        wcs = clgwrd ("wcsin", Memc[str], SZ_LINE, WCSINSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the input coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSIN, wcs)
+        wcs = clgwrd ("wcsout", Memc[str], SZ_LINE, WCSOUTSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the output coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSOUT, wcs)
 
 	# Initialize the photometry structure.
 	call dp_apsetup (dao)
@@ -144,10 +170,15 @@ begin
 		    id = NULL
 		}
 	    }
+	    if (id != NULL)
+	        mkstars = clgetb ("mkstars")
+	    else
+		mkstars = false
 	} else {
 	    gd = NULL
 	    id = NULL
 	    call dp_seti (dao, VERBOSE, btoi (clgetb ("verbose")))
+	    mkstars = false
 	}
 
 	# Open the plot file.
@@ -169,7 +200,19 @@ begin
 
 	    # Open the input image.
 	    im = immap (Memc[image], READ_ONLY, 0)
+	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
+
+            # Set up the display coordinate system.
+            if ((id != NULL) && (id != gd))
+                call dp_gswv (id, Memc[image], im, 4)
+
+            # Cache the input image pixels.
+            req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
+                sizeof (IM_PIXTYPE(im))
+            memstat = dp_memstat (cache, req_size, old_size)
+            if (memstat == YES)
+                call dp_pcache (im, INDEFI, buf_size)
 
 	    # Open the input photometry table and read in the photometry.
 	    if (fntgfnb (alist, Memc[photfile], SZ_FNAME) == EOF)
@@ -186,7 +229,7 @@ begin
 	        apd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
 	        apd = tbtopn (Memc[outfname], READ_ONLY, 0)
-	    call dp_getapert (dao, apd, DP_MAXNSTAR(dao), ap_text)
+	    call dp_wgetapert (dao, im, apd, DP_MAXNSTAR(dao), ap_text)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
 	    # Open the output PSTSELECT file. If the output is "default",
@@ -221,13 +264,13 @@ begin
 	    # Now select the PSF stars.
 	    if (Memc[curfile] != EOS)
 	        call dp_gpstars (dao, im, apd, pfd, ap_text, maxnpsf, NULL,
-		    mgd, NULL, false, true)
+		    mgd, NULL, false, false, true)
 	    else if (interactive)
 	        call dp_gpstars (dao, im, apd, pfd, ap_text, maxnpsf, gd, mgd,
-		    id, true, false)
+		    id, mkstars, true, false)
 	    else
 	        call dp_gpstars (dao, im, apd, pfd, ap_text, maxnpsf, NULL,
-		    mgd, NULL, false, false)
+		    mgd, NULL, false, false, false)
 
 	    # Close the input image.
 	    call imunmap (im)
@@ -243,6 +286,10 @@ begin
 	        call close (pfd)
 	    else
 	        call tbtclo (pfd)
+
+            # Uncache memory.
+            call fixmem (old_size)
+
 	}
 
 	# Close up the graphics and display streams.

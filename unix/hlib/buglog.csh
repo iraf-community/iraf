@@ -32,7 +32,7 @@
 unalias	rm set find echo sleep tail sed cmp echo cat mail
 
 set	bugfile	= "${iraf}local/bugs.log"
-set	arcfile	= "/u1/ftp/iraf/v210/bugs.log"
+set	arcfile	= "/u1/ftp/iraf/v212/bugs.log"
 set	tmpfile	= "/tmp/bug."
 set	lokfile = "/tmp/bug.lok"
 
@@ -40,7 +40,7 @@ set	number	= 1
 set	module	= "$1"
 set	from	= "`whoami`"
 set	date	= "`date`"
-set	system	= "V2.10"
+set	system	= "V2.12"
 set	irafmail = "iraf@iraf.noao.edu"
 set	buglog   = "adass-iraf-buglog@iraf.noao.edu"
 

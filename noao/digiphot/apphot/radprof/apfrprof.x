@@ -9,6 +9,7 @@ include "../lib/noisedef.h"
 include "../lib/fitskydef.h"
 include "../lib/photdef.h"
 include "../lib/radprofdef.h"
+include "../lib/apphot.h"
 include "../lib/phot.h"
 include "../lib/radprof.h"
 
@@ -32,14 +33,30 @@ errchk	asinit(), asifit(), asigrl(), asifree()
 errchk	ap_rpmeasure(), ap_rpiter()
 
 begin
-	# Initialize.
-	call apsetr (ap, RPXCUR, wx)
-	call apsetr (ap, RPYCUR, wy)
-	call ap_rpindef (ap)
-
 	# Set up some apphot pointers.
 	sky = AP_PSKY(ap)
 	rprof = AP_RPROF(ap)
+
+	# Initialize.
+         AP_RPXCUR(rprof) = wx
+         AP_RPYCUR(rprof) = wy
+	call ap_rpindef (ap)
+        if (IS_INDEFR(wx) || IS_INDEFR(wy)) {
+            AP_ORPXCUR(rprof) = INDEFR
+            AP_ORPYCUR(rprof) = INDEFR
+        } else {
+            switch (AP_WCSOUT(ap)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_ltoo (ap, wx, wy, AP_ORPXCUR(rprof),
+		    AP_ORPYCUR(rprof), 1)
+            case WCS_TV:
+                call ap_ltov (im, wx, wy, AP_ORPXCUR(rprof),
+		    AP_ORPYCUR(rprof), 1)
+            default:
+                AP_ORPXCUR(rprof) = wx
+                AP_ORPYCUR(rprof) = wy
+            }
+        }
 
 	# Get the pixels and check for error conditions.
 	if (IS_INDEFR(wx) || IS_INDEFR(wy)) {

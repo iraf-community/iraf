@@ -121,5 +121,7 @@ begin
 	    call flush (STDOUT)
 	}
 
+	call xev_freeop (o)
+	call mfree (o, TY_STRUCT)
 	call sfree (sp)
 end

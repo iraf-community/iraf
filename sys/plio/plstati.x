@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<plset.h>
 include	<plio.h>
 
@@ -21,8 +22,10 @@ begin
 	case P_MAXLINE:
 	    return (PL_MAXLINE(pl))
 	case P_DEPTH:
-	    do i = 1, ARB
+	    do i = 0, ARB
 		if (2**i > min (I_PVMAX, PL_MAXVAL(pl)))
 		    return (i)
+	default:
+	    call syserr (SYS_PLINVPAR)
 	}
 end

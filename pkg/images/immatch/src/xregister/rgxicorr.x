@@ -182,7 +182,7 @@ begin
 		if (rg_xstati (xc, NREGIONS) > 0) {
 
 	    	    if (newdata == YES) {
-			call rg_xindefr (xc)
+			call rg_xcindefr (xc, rg_xstati(xc,CREGION))
 			newdata = NO
 	    	    }
 

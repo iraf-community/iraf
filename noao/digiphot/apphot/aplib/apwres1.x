@@ -31,7 +31,8 @@ begin
 
 	# Write out the parameters.
 	call ap_param (ap, out, "daofind")
-	call apstats (ap, IMNAME, Memc[str], SZ_FNAME)
+	#call apstats (ap, IMNAME, Memc[str], SZ_FNAME)
+	call apstats (ap, IMROOT, Memc[str], SZ_FNAME)
 	call ap_sparam (out, KY_IMNAME, Memc[str], "imagename", "image name")
 	call ap_rparam (out, KY_FWHMPSF, apstatr (ap, FWHMPSF), UN_ASCALEUNIT,
 	    "fwhm of the psf")
@@ -168,13 +169,13 @@ end
 
 # define the #N, #U and #K id strings
 
-define	ID_NSTR	"#N%4tIMAGE%24tXINIT%34tYINIT%44tID%49tCOORDS%72tLID%80t\\\n"
-define	ID_USTR	"#U%4timagename%24tpixels%34tpixels%44t##%49tfilename%72t\
+define	ID_NSTR	"#N%4tIMAGE%24tXINIT%34tYINIT%44tID%50tCOORDS%73tLID%80t\\\n"
+define	ID_USTR	"#U%4timagename%24tpixels%34tpixels%44t##%50tfilename%73t\
 ##%80t\\\n"
-define	ID_FSTR	"#F%4t%%-23s%24t%%-10.3f%34t%%-10.3f%44t%%-5d%49t%%-23s%72t\
-%%-5d%80t \n"
-define	ID_WSTR "%-23.23s%24t%-10.3f%34t%-10.3f%44t%-5d%49t%-23.23s%72t\
-%-5d%80t%c\n"
+define	ID_FSTR	"#F%4t%%-23s%24t%%-10.3f%34t%%-10.3f%44t%%-6d%50t%%-23s%73t\
+%%-6d%80t \n"
+define	ID_WSTR "%-23.23s%24t%-10.3f%34t%-10.3f%44t%-6d%50t%-23.23s%73t\
+%-6d%80t%c\n"
 
 # AP_IDHDR -- Print the id column header strings.
 
@@ -216,8 +217,8 @@ begin
 	call salloc (clname, SZ_FNAME, TY_CHAR)
 
 	# Print description of object.
-	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
-	call apstats (ap, CLNAME, Memc[clname], SZ_FNAME)
+	call apstats (ap, IMROOT, Memc[imname], SZ_FNAME)
+	call apstats (ap, CLROOT, Memc[clname], SZ_FNAME)
 	if (Memc[clname] == EOS)
 	    call strcpy ("nullfile", Memc[clname], SZ_FNAME)
 	call fprintf (fd, ID_WSTR)
@@ -284,10 +285,10 @@ begin
 
 	# Print the computed centers.
 	call fprintf (fd, CTR_WSTR)
-	    call pargr (apstatr (ap, XCENTER))
-	    call pargr (apstatr (ap, YCENTER))
-	    call pargr (apstatr (ap, XSHIFT))
-	    call pargr (apstatr (ap, YSHIFT))
+	    call pargr (apstatr (ap, OXCENTER))
+	    call pargr (apstatr (ap, OYCENTER))
+	    call pargr (apstatr (ap, OXSHIFT))
+	    call pargr (apstatr (ap, OYSHIFT))
 	    call pargr (apstatr (ap, XERR))
 	    call pargr (apstatr (ap, YERR))
 	    call pargi (ier)
@@ -434,4 +435,3 @@ begin
 	    call strcpy ("NoError", str, maxch)
 	}
 end
-

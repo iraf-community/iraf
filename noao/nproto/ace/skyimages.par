@@ -1,0 +1,10 @@
+# SKYIMAGES
+
+images,f,a,,,,"List of images"
+skyimages,f,a,,,,"List of output sky images"
+sigmaimages,f,a,,,,"List of output sigma images"
+skys,s,h,"",,,"List of sky maps"
+sigmas,s,h,"",,,"List of sigma maps"
+exps,s,h,"",,,"List of exposure maps"
+gains,s,h,"",,,"List of gain maps"
+logfiles,s,h,"STDOUT",,,"List of log files"

@@ -1,4 +1,5 @@
 include "../lib/apphotdef.h"
+include "../lib/apphot.h"
 include "../lib/noisedef.h"
 include "../lib/fitskydef.h"
 include "../lib/fitsky.h"
@@ -29,6 +30,21 @@ begin
 	nse = AP_NOISE(ap)
 	AP_SXCUR(sky) = wx
 	AP_SYCUR(sky) = wy
+        if (IS_INDEFR(wx) || IS_INDEFR(wy)) {
+            AP_OSXCUR(sky) = INDEFR
+            AP_OSYCUR(sky) = INDEFR
+        } else {
+            switch (AP_WCSOUT(ap)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_ltoo (ap, wx, wy, AP_OSXCUR(sky), AP_OSYCUR(sky), 1)
+            case WCS_TV:
+                call ap_ltov (im, wx, wy, AP_OSXCUR(sky), AP_OSYCUR(sky), 1)
+            default:
+                AP_OSXCUR(sky) = wx
+                AP_OSYCUR(sky) = wy
+            }
+        }
+
 	AP_SKY_MODE(sky) = INDEFR
 	AP_SKY_SIG(sky) = INDEFR
 	AP_SKY_SKEW(sky) = INDEFR
@@ -248,7 +264,7 @@ begin
 
 	    # Mark the sky level on the radial profile plot.
 	    call gactivate (gd, 0)
-	    gt = ap_gtinit (AP_IMNAME(ap), wx, wy)
+	    gt = ap_gtinit (AP_IMROOT(ap), wx, wy)
 	    ier = ap_radplot (gd, gt, Memr[AP_SKYPIX(sky)],
 	        Memi[AP_COORDS(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
 		AP_SXC(sky), AP_SYC(sky), AP_SNX(sky), AP_SNY(sky),
@@ -292,7 +308,7 @@ begin
 
 	    # Mark the peak of the histogram on the histogram plot.
 	    #call gactivate (gd, 0)
-	    gt = ap_gtinit (AP_IMNAME(ap), wx, wy)
+	    gt = ap_gtinit (AP_IMROOT(ap), wx, wy)
 	    ier = ap_histplot (gd, gt, Memr[AP_SKYPIX(sky)],
 	        Memr[AP_SWGT(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
 		AP_K1(sky), INDEFR, AP_BINSIZE(sky), AP_SMOOTH(sky),

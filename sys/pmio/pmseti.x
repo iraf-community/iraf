@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<pmset.h>
 include	<plio.h>
 include	<imio.h>
@@ -23,5 +24,7 @@ begin
 	    PL_MAXLINE(pl) = value
 	case P_DEPTH:
 	    PL_MAXVAL(pl) = MV(value)
+	default:
+	    call syserr (SYS_PLINVPAR)
 	}
 end

@@ -98,7 +98,7 @@ begin
 
 entry dbreopen (db_old) 
 
-	fd = reopen (DB_FD(db_old), mode, BINARY_FILE)
+	fd = reopen (DB_FD(db_old), mode)
 
 	# Get DBIO descriptor
 10	call db_getdes (db)

@@ -5,7 +5,7 @@
 #define	import_libc
 #define	import_stdio
 #define	import_ctype
-#define	import_varargs
+#define	import_stdarg
 #include <iraf.h>
 
 /*
@@ -57,21 +57,28 @@ struct _input {
  * pointers.  The number of fields successfully converted is returned as
  * the function value.  EOF is returned for a scan at EOF.
  */
-/* VARARGS */
+#ifdef USE_STDARG
+scanf (char *format, ...)
+#else
 scanf (va_alist)
 va_dcl
+#endif
 {
 	va_list	argp;
-	char	*format;		/* format string		*/
-	int	status;
-	struct	_input in;
+	struct _input in;
+	int status;
 
+#ifdef USE_STDARG
+	va_start (argp, format);
+#else
+	char *format;
+	va_start (argp);
+	format = va_arg (argp, char *);
+#endif
 	in.i_type = SCAN_FILE;
 	in.i_nchars = 0;
 	in.u.fp = stdin;
 
-	va_start (argp);
-	format = va_arg (argp, char *);
 	status = u_doscan (&in, format, &argp);
 	va_end (argp);
 	return (status);
@@ -80,20 +87,26 @@ va_dcl
 
 /* FSCANF -- Formatted scan from a file.
  */
-/* VARARGS */
+#ifdef USE_STDARG
+fscanf (FILE *fp, char *format, ...)
+#else
 fscanf (va_alist)
 va_dcl
+#endif
 {
 	va_list	argp;
-	FILE	*fp;			/* input file			*/
-	char	*format;		/* format string		*/
 	int	status;
 	struct	_input in;
 
+#ifdef USE_STDARG
+	va_start (argp, format);
+#else
+	FILE *fp;
+	char *format;
 	va_start (argp);
 	fp = va_arg (argp, FILE *);
 	format = va_arg (argp, char *);
-
+#endif
 	in.i_type = SCAN_FILE;
 	in.i_nchars = 0;
 	in.u.fp = fp;
@@ -107,20 +120,26 @@ va_dcl
 
 /* SSCANF -- Formatted scan from a string.
  */
-/* VARARGS */
+#ifdef USE_STDARG
+sscanf (char *str, char *format, ...)
+#else
 sscanf (va_alist)
 va_dcl
+#endif
 {
 	va_list	argp;
-	char	*str;			/* input file			*/
-	char	*format;		/* format string		*/
-	int	status;
-	struct	_input in;
+	struct _input in;
+	int status;
 
+#ifdef USE_STDARG
+	va_start (argp, format);
+#else
+	char *str;
+	char *format;
 	va_start (argp);
 	str = va_arg (argp, char *);
 	format = va_arg (argp, char *);
-
+#endif
 	in.i_type = SCAN_STRING;
 	in.i_nchars = 0;
 	in.u.ip = str;

@@ -38,7 +38,6 @@ begin
 	        tdump (inname, cdfile=cdfile, pfile=pfile, datafile=datafile,
 	            columns=tfields, rows=rows, pwidth=pagwidth)
 	    }
-	    print ("")
 	}
 	delete (tmpin, ver-, >& "dev$null")
 	inlist = ""

@@ -1,3 +1,4 @@
+include	<mach.h>
 include	<error.h>
 
 # FC_DLIST -- Fit Coordinates Deletion List Procedures.
@@ -14,6 +15,7 @@ real	w[npts]			# Weight of coordinate
 int	npts			# Number of coordinates
 
 int	i, fd
+real	r
 char	file[SZ_FNAME]
 real	xdel, ydel
 
@@ -35,11 +37,14 @@ begin
 		next
 
 	    do i = 1, npts {
-	        if (x[i] != xdel)
-		    next
-	        if (y[i] != ydel)
-		    next
-		w[i] = 0.
+		r = sqrt ((x[i]-xdel)**2 + (y[i]-ydel)**2)
+		if (r < 10*EPSILONR)
+		    w[i] = 0.
+#	        if (x[i] != xdel)
+#		    next
+#	        if (y[i] != ydel)
+#		    next
+#		w[i] = 0.
 	    }
 	}
 

@@ -143,7 +143,7 @@ begin
 	    if (fp != NULL)
 		call xt_fpfree (fp)
 	    if (pmim != NULL)
-		call imunmap (pmim)
+		call xt_pmunmap (pmim)
 	    if (im != NULL)
 		call imunmap (im)
 	}

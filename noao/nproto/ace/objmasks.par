@@ -1,0 +1,22 @@
+# OBJMASKS
+
+images,f,a,,,,"List of images or MEF files"
+objmasks,s,a,"",,,"List of output object masks"
+omtype,s,h,"numbers","boolean|numbers|colors|all",,"Object mask type"
+skys,s,h,"",,,"List of input/output sky maps"
+sigmas,s,h,"",,,"List of input/output sigma maps"
+masks,s,h,"!BPM",,,"List of input bad pixel masks"
+extnames,s,h,"",,,"Extension names"
+logfiles,s,h,"STDOUT",,,"List of log files
+"
+blkstep,i,h,1,1,,"Line step for sky sampling"
+blksize,i,h,-10,,,"Sky block size (+=pixels, -=blocks)"
+convolve,s,h,"block 3 3",,,"Convolution kernel"
+hsigma,r,h,3.,.1,,"Sigma threshold above sky"
+lsigma,r,h,10.,.1,,"Sigma threshold below sky"
+hdetect,b,h,yes,,,"Detect objects above sky?"
+ldetect,b,h,no,,,"Detect objects below sky?"
+neighbors,s,h,"8","4|8",,Neighbor type"
+minpix,i,h,6,1,,"Minimum number of pixels in detected objects"
+ngrow,i,h,2,0,,"Number of grow rings"
+agrow,r,h,2.,0,,"Area grow factor"

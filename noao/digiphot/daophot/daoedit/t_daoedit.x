@@ -1,4 +1,6 @@
+include <imhdr.h>
 include <gset.h>
+include "../lib/daophotdef.h"
 include "daoedit.h"
 
 define	HELPFILE	"daophot$daoedit/daoedit.key"
@@ -10,26 +12,61 @@ define	IHELPFILE	"daophot$daoedit/daoedit.key"
 procedure t_daoedit ()
 
 pointer	image			# the name of the input image
+int	cache			# cache the image pixels
 pointer	graphics		# the graphics device
+pointer	display			# the image display
 
-int	wcs, key, redraw, gcurtype, curtype, xwcs, ywcs, lastkey
-pointer	sp, cmd, im, gd
 real	wx, wy, xlast, ylast
-int	dp_gcur()
+pointer	sp, cmd, im, gd, id
+int	wcs, key, redraw, gcurtype, curtype, xwcs, ywcs, lastkey
+int	req_size, memstat, old_size, buf_size
+
 pointer	immap(), gopen()
+int	dp_gcur(), btoi(), sizeof(), dp_memstat()
+bool	clgetb(), streq()
+errchk	gopen()
+
 data	gcurtype /'g'/
 
 begin
 	call smark (sp)
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (graphics, SZ_FNAME, TY_CHAR)
+	call salloc (display, SZ_FNAME, TY_CHAR)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
 
 	call clgstr ("image", Memc[image], SZ_FNAME)
 	im = immap (Memc[image], READ_ONLY, 0)
 
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
-	gd = gopen (Memc[graphics], AW_DEFER+NEW_FILE, STDGRAPH) 
+	iferr (gd = gopen (Memc[graphics], AW_DEFER+NEW_FILE, STDGRAPH))
+	    gd = NULL
+	call clgstr ("display", Memc[display], SZ_FNAME)
+        if (Memc[display] == EOS)
+            id = NULL
+        else if (streq (Memc[graphics], Memc[display]))
+            id = gd
+        else {
+            iferr {
+                id = gopen (Memc[display], APPEND, STDIMAGE)
+            } then {
+                call eprintf (
+                "Warning: Graphics overlay not available for display device.\n")
+                id = NULL
+            }
+        }
+	cache = btoi (clgetb ("cache"))
+
+	# Set up the display coordinate system.
+        if ((id != NULL) && (id != gd))
+            call dp_gswv (id, Memc[image], im, 4)
+
+        # Cache the input image pixels.
+        req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
+	    sizeof (IM_PIXTYPE(im))
+        memstat = dp_memstat (cache, req_size, old_size)
+        if (memstat == YES)
+            call dp_pcache (im, INDEFI, buf_size)
 
 	xlast = INDEFR
 	ylast = INDEFR
@@ -40,6 +77,10 @@ begin
 	redraw = NO
 
 	while (dp_gcur (curtype, wx, wy, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
+
+	    # Convert the cursor coordinates if necessary.
+	    if (curtype == 'i')
+		call dp_vtol (im, wx, wy, wx, wy, 1)
 
 	    switch (key) {
 
@@ -85,18 +126,14 @@ begin
 
 	    case 'a':
 		if (curtype == 'i') {
-		    #call gdeactivate (gd, 0)
 		    if (lastkey == 'a')
-		        call dp_erprofile (NULL, NO, xwcs, ywcs, im, wx, wy)
+		        call dp_erprofile (NULL, id, NO, xwcs, ywcs, im, wx, wy)
 		    else
-		        call dp_erprofile (NULL, YES, xwcs, ywcs, im, wx, wy)
+		        call dp_erprofile (NULL, id, YES, xwcs, ywcs, im,
+			    wx, wy)
 		} else {
-		    #if (lastkey == 'a')
-		        call dp_erprofile (NULL, NO, xwcs, ywcs, im, xlast,
-			    ylast)
-		    #else
-		        #call dp_erprofile (NULL, YES, xwcs, ywcs, im, xlast,
-			    #ylast)
+		    call dp_erprofile (NULL, id, NO, xwcs, ywcs, im,
+		        xlast, ylast)
 		}
 
 	    case 'r':
@@ -124,9 +161,7 @@ begin
 
 	    # Draw the plot.
 	    if (redraw == YES) {
-		#if (curtype == 'i')
-		    #call greactivate (gd, 0)
-		call dp_erprofile (gd, NO, xwcs, ywcs, im, xlast, ylast)
+		call dp_erprofile (gd, id, NO, xwcs, ywcs, im, xlast, ylast)
 		if (key == 'i')
 		    call dp_isetup (gcurtype, gd)
 		redraw = NO
@@ -134,20 +169,23 @@ begin
 		    call gdeactivate (gd, 0)
 	    }
 
-	    # Enter the interactive setup menu.
-	    #if (key == 'i') {
-		#if (curtype == 'i')
-		    #call greactivate (gd, 0)
-		#call dp_isetup (gcurtype, gd)
-		#if (curtype == 'i')
-		    #call gdeactivate (gd, 0)
-	    #}
-
 	    lastkey = key
 	}
 
-	call gclose (gd)
+        if (id == gd && gd != NULL) {
+	    call gclose (gd)
+	} else {
+	    if (gd != NULL)
+		call gclose (gd)
+	    if (id != NULL)
+		call gclose (id)
+	}
+
 	call imunmap (im)
+
+        # Uncache memory.
+        call fixmem (old_size)
+
 	call sfree (sp)
 end
 

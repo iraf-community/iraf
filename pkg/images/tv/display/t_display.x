@@ -7,6 +7,7 @@ include	<error.h>
 include	<pmset.h>
 include	"display.h"
 include	"gwindow.h"
+include	"iis.h"
 
 # DISPLAY - Display an image.  The specified image section is mapped into
 # the specified section of an image display frame.  The mapping involves
@@ -28,7 +29,7 @@ int	i
 pointer	sp, wdes, im, ds
 
 bool	clgetb()
-int	clgeti(), btoi()
+int	clgeti(), btoi(), imd_wcsver()
 pointer	immap(), imd_mapframe1()
 errchk	immap, imd_mapframe1
 errchk	ds_getparams, ds_setwcs, ds_load_display, ds_erase_border
@@ -44,8 +45,18 @@ begin
 	if (IM_NDIM(im) <= 0)
 	    call error (1, "image has no pixels")
 
+        # Query server to get the WCS version, this also tells us whether
+	# we can use the all 16 supported frames.
+        if (imd_wcsver() == 0)
+	    call clputi ("display.frame.p_max", 4)
+	else
+	    call clputi ("display.frame.p_max", 16)
+
+
 	# Open display device as an image.
 	frame = clgeti ("frame")
+	W_FRAME(wdes)  = frame
+
 	erase = btoi (clgetb ("erase"))
 	if (erase == YES)
 	    ds = imd_mapframe1 (frame, WRITE_ONLY,
@@ -204,9 +215,9 @@ begin
 	# Round down if upper pixel is exactly at one-half.
 
 	W_XS(wipix) = max (1, nint(W_XS(wdwin)))
-	W_XE(wipix) = min (ncols, nint(W_XE(wdwin)-0.01))
+	W_XE(wipix) = min (ncols, nint(W_XE(wdwin)-1.01))
 	W_YS(wipix) = max (1, nint(W_YS(wdwin)))
-	W_YE(wipix) = min (nlines, nint(W_YE(wdwin)-0.01))
+	W_YE(wipix) = min (nlines, nint(W_YE(wdwin)-1.01))
 
 	# Now compute the image and display pixels to be used.
 	# The image may be truncated to fit in the display window.
@@ -217,9 +228,11 @@ begin
 	xcenter = (W_XE(wnwin) + W_XS(wnwin)) / 2.0 * IM_LEN(ds,1) + 0.5
 	ycenter = (W_YE(wnwin) + W_YS(wnwin)) / 2.0 * IM_LEN(ds,2) + 0.5
 
-	W_XS(wdpix) = max (1, nint (xcenter - (pxsize/2.0*xmag) + 0.5))
+	#W_XS(wdpix) = max (1, nint (xcenter - (pxsize/2.0*xmag) + 0.5))
+	W_XS(wdpix) = max (1, int (xcenter - (pxsize/2.0*xmag) + 0.5))
 	W_XE(wdpix) = min (IM_LEN(ds,1), nint (W_XS(wdpix)+pxsize*xmag - 1.01))
-	W_YS(wdpix) = max (1, nint (ycenter - (pysize/2.0*ymag) + 0.5))
+	#W_YS(wdpix) = max (1, nint (ycenter - (pysize/2.0*ymag) + 0.5))
+	W_YS(wdpix) = max (1, int (ycenter - (pysize/2.0*ymag) + 0.5))
 	W_YE(wdpix) = min (IM_LEN(ds,2), nint (W_YS(wdpix)+pysize*ymag - 1.01))
 
 	# Now adjust the display window to be consistent with the image and
@@ -362,13 +375,20 @@ int	frame			# frame
 
 real	a, b, c, d, tx, ty
 int	ip, i, j, axis[2]
+real	sx, sy
+int	dx, dy, snx, sny, dnx, dny
 pointer	sp, imname, title, wnwin, wdwin
+pointer	src, dest, region, objref
 long	lv[IM_MAXDIM], pv1[IM_MAXDIM], pv2[IM_MAXDIM]
+
+bool	streq()
 
 begin
 	call smark (sp)
 	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (title, SZ_LINE, TY_CHAR)
+	call salloc (title,  SZ_LINE,  TY_CHAR)
+        call salloc (region, SZ_FNAME, TY_CHAR)
+        call salloc (objref, SZ_FNAME, TY_CHAR)
 
 	# Compute the rotation matrix needed to transform screen pixel coords
 	# to image section coords.
@@ -398,8 +418,12 @@ begin
 	# and determining the axis reduction if any.  pv1 will be the
 	# offset and pv2-pv1 will be the scale.
 
-	lv[1] = 0; lv[2] = 0; call imaplv (im, lv, pv1, 2)
-	lv[1] = 1; lv[2] = 1; call imaplv (im, lv, pv2, 2)
+	call aclrl (pv1, IM_MAXDIM)
+	call aclrl (lv, IM_MAXDIM)
+	call imaplv (im, lv, pv1, 2)
+	call amovkl (long(1), lv, IM_MAXDIM)
+	call aclrl (pv2, IM_MAXDIM)
+	call imaplv (im, lv, pv2, 2)
 
 	i = 1
 	axis[1] = 1;  axis[2] = 2
@@ -416,7 +440,6 @@ begin
 	# separately here.  Multiply the two rotation matrices and add the
 	# translation vectors to get the overall transformation from screen
 	# coordinates to image coordinates.
-
 	a = a * pv2[axis[1]]
 	d = d * pv2[axis[2]]
 	tx = tx * pv2[axis[1]] + pv1[axis[1]]
@@ -424,15 +447,106 @@ begin
 
 	# Get the image name (minus image section) and
 	# title string (minus any newline.
-	call imgimage (image, Memc[imname], SZ_FNAME)
+	call ds_gimage (im, image, Memc[imname], SZ_FNAME)
 	call strcpy (IM_TITLE(im), Memc[title], SZ_LINE)
 	for (ip=title;  Memc[ip] != '\n' && Memc[ip] != EOS;  ip=ip+1)
 	    ;
 	Memc[ip] = EOS
 
+
+	# Define the mapping from the image pixels to frame buffer pixels.
+        src  = W_WC(wdes,W_IPIX)
+	sx   = W_XS(src)
+	sy   = W_YS(src)
+	snx  = (W_XE(src) - W_XS(src) + 1)
+	sny  = (W_YE(src) - W_YS(src) + 1)
+
+        dest = W_WC(wdes,W_DPIX)
+	dx   = W_XS(dest)
+	dy   = W_YS(dest)
+	dnx  = (W_XE(dest) - W_XS(dest) + 1)
+	dny  = (W_YE(dest) - W_YS(dest) + 1)
+
+	# For a single image display the 'region' is fixed. The object ref
+	# is the fully defined image node!prefix path, including any sections.
+        # We need a special kludge to keep backward compatability with the
+        # use of "dev$pix" as the standard test image name.
+        call strcpy ("image", Memc[region], SZ_FNAME)
+        if (streq (image, "dev$pix"))
+            call fpathname ("dev$pix.imh", Memc[objref], SZ_PATHNAME)
+        else
+            call fpathname (image, Memc[objref], SZ_PATHNAME)
+
+	# Add the mapping info to be written with the WCS.
+	call imd_setmapping (Memc[region], sx, sy, snx, sny,
+	    dx, dy, dnx, dny, Memc[objref])
+
 	# Write the WCS.
 	call imd_putwcs (ds, frame, Memc[imname], Memc[title],
 	    a, b, c, d, tx, ty, W_ZS(wdwin), W_ZE(wdwin), W_ZT(wdwin))
+
+	call sfree (sp)
+end
+
+
+# DS_GIMAGE -- Convert input image section name to a 2D physical image section.
+
+procedure ds_gimage (im, input, output, maxchar)
+
+pointer	im			#I IMIO pointer
+char	input[ARB]		#I Input image name
+char	output[maxchar]		#O Output image name
+int	maxchar			#I Maximum characters in output name.
+
+int	i, fd
+pointer	sp, section, lv, pv1, pv2
+
+int	stropen(), strlen()
+bool	streq()
+
+begin
+	call smark (sp)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (lv, IM_MAXDIM, TY_LONG)
+	call salloc (pv1, IM_MAXDIM, TY_LONG)
+	call salloc (pv2, IM_MAXDIM, TY_LONG)
+
+	# Get endpoint coordinates in original image.
+	call amovkl (long(1), Meml[lv], IM_MAXDIM)
+	call aclrl (Meml[pv1], IM_MAXDIM)
+	call imaplv (im, Meml[lv], Meml[pv1], 2)
+	call amovl (IM_LEN(im,1), Meml[lv], IM_NDIM(im))
+	call aclrl (Meml[pv2], IM_MAXDIM)
+	call imaplv (im, Meml[lv], Meml[pv2], 2)
+
+	# Set image section.
+	fd = stropen (Memc[section], SZ_FNAME, NEW_FILE)
+	call fprintf (fd, "[")
+	do i = 1, IM_MAXDIM {
+	    if (Meml[pv1+i-1] != Meml[pv2+i-1])
+		call fprintf (fd, "*")
+	    else if (Meml[pv1+i-1] != 0) {
+		call fprintf (fd, "%d")
+		call pargi (Meml[pv1+i-1])
+	    } else
+		break
+	    call fprintf (fd, ",")
+	}
+	call close (fd)
+	i = strlen (Memc[section])
+	Memc[section+i-1] = ']'
+
+	if (streq ("[*,*]", Memc[section]))
+	    Memc[section] = EOS
+
+	# Strip existing image section and add new section.
+#	call imgimage (input, output, maxchar)
+#	call strcat (Memc[section], output, maxchar)
+	
+	if (Memc[section] == EOS)
+	    call imgimage (input, output, maxchar)
+	else
+	    call strcpy (input, output, maxchar)
 
 	call sfree (sp)
 end
@@ -649,7 +763,8 @@ begin
 		} else if (zt == W_LOG) {
 		    call amapr (Memr[in], Memr[out], nx,
 			z1, z2, 1.0, 10.0 ** MAXLOG)
-		    call alogr (Memr[out], Memr[out], nx)
+                    do i = 0, nx-1
+                        Memr[out+i] = log10 (Memr[out+i])
 		    call amapr (Memr[out], Memr[out], nx,
 			0.0, real(MAXLOG), dz1, dz2)
 		} else

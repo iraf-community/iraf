@@ -49,7 +49,11 @@ ymag default to 1.0 and 1.0 respectively.
 .le
 .ls xrotation = INDEF, yrotation = INDEF
 The x and y rotation angles measured in degrees counter-clockwise. Xrotation
-and yrotation default to 0.0 and 0.0 degrees respectively.
+and yrotation default to 0.0 and 0.0 degrees respectively. To set east to the
+up, down, left, and right directions, set xrotation to 90, 270, 180, and 0
+respectively. To set north to the up, down, left, and right directions, set
+yrotation to  0, 180, 90, and 270 degrees respectively. Any global rotation
+must be added to both the xrotation and yrotation values.
 .le
 .ls projection = "tan"
 The sky projection geometry. The most commonly used projections in

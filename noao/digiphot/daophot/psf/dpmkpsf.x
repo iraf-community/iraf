@@ -1,3 +1,4 @@
+include <gset.h>
 include <ctype.h>
 include	<imhdr.h>
 include "../lib/daophotdef.h"
@@ -8,8 +9,8 @@ define	HELPFILE	"daophot$psf/mkpsf.key"
 
 # DP_MKPSF -- Construct a stellar PSF from one or more stars in an image frame.
 
-procedure dp_mkpsf (dao, im, psfim, opst, psfgr, gd, mgd, id, interactive,
-	showplots)
+procedure dp_mkpsf (dao, im, psfim, opst, psfgr, gd, mgd, id, mkstars,
+	interactive, showplots)
 
 pointer	dao			# pointer to the main daophot structure
 pointer im			# pointer to the input image
@@ -19,18 +20,20 @@ int	psfgr			# the psf group file descriptor
 pointer gd			# pointer to graphics descriptor
 pointer mgd			# pointer to the metacode file
 pointer id			# pointer to image display stream
+bool	mkstars			# mark the added and deleted psf stars
 bool	interactive		# interactive mode
 bool	showplots		# show the plots
 
-bool	psf_new, psf_computed, psf_written
-int	i, key, wcs, idnum, istar, ip, npsf, verbose
-pointer apsel, sp, cmd, str
 real	wx, wy
+pointer apsel, sp, cmd, str
+int	i, key, wcs, idnum, istar, ip, npsf, verbose
+bool	psf_new, psf_computed, psf_written
 
-bool	dp_updatepsf()
+real	dp_pstatr()
 int	clgcur(), dp_qverify(), dp_locstar(), dp_idstar(), dp_stati()
 int	dp_pstati(), ctoi(), dp_addstar(), dp_delstar(), dp_subpsf()
 int	dp_fitpsf()
+bool	dp_updatepsf()
 
 begin
 	# Get some pointers
@@ -53,6 +56,9 @@ begin
 	# Begin to build the PSF.
 	while (clgcur ("icommands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=
 	    EOF) {
+
+	    # Convert coordinates if necessary.
+	    call dp_vtol (im, wx, wy, wx, wy, 1)
 
 	    switch (key) {
 
@@ -88,10 +94,18 @@ begin
 	    # Add the star nearest the cursor position to the PSF.
 	    case 'a':
 		if (dp_addstar (dao, im, wx, wy, INDEFR, 0, gd, mgd,
-		    showplots) == OK) {
-		    psf_new = false
-		    psf_computed = false
-		    psf_written = false
+		    showplots) == ERR) 
+		    next
+		psf_new = false
+		psf_computed = false
+		psf_written = false
+                if (mkstars && id != NULL) {
+                    call gmark (id, dp_pstatr (dao, CUR_PSFX), dp_pstatr (dao,
+                        CUR_PSFY), GM_PLUS, -5.0, -5.0)
+                    if (gd == id)
+                        call gflush (id)
+                    else
+                        call gframe (id)
 		}
 
 	    # Subtract the star nearest the cursor position from the PSF
@@ -99,28 +113,40 @@ begin
 	    case 's':
 		if (psf_new) {
 		    call printf ("The PSF star list is empty\n")
-		} else if (! psf_computed) {
-		    call printf ("The PSF is not uptodate\n")
-		} else if (dp_subpsf (dao, im, wx, wy, 0, gd, mgd,
-		    showplots) == OK) {
-		    if (dp_pstati (dao, PNUM) <= 0)
-		        psf_new = true
-		    psf_computed = false
-		    psf_written = false
+		    next
 		}
+		if (! psf_computed) {
+		    call printf ("The PSF is not uptodate\n")
+		    next
+		}
+		if (dp_subpsf (dao, im, wx, wy, 0, gd, mgd, showplots) == ERR)
+		    next
+		if (dp_pstati (dao, PNUM) <= 0)
+		    psf_new = true
+		psf_computed = false
+		psf_written = false
 
 	    # Delete the star nearest the cursor position from the PSF.
 	    case 'd':
-		if (dp_delstar (dao, im, wx, wy, 0, gd, showplots) == OK) {
-		    if (dp_pstati (dao, PNUM) <= 0)
-		        psf_new = true
-		    psf_computed = false
-		    psf_written = false
-		}
+		if (dp_delstar (dao, im, wx, wy, 0, gd, showplots) == ERR)
+		    next
+		if (dp_pstati (dao, PNUM) <= 0)
+		    psf_new = true
+		psf_computed = false
+		psf_written = false
+                if (mkstars && id != NULL) {
+                    call gmark (id, dp_pstatr (dao, CUR_PSFX), dp_pstatr (dao,
+                        CUR_PSFY), GM_CROSS, -5.0, -5.0)
+                    if (gd == id)
+                        call gflush (id)
+                    else
+                        call gframe (id)
+                }
 
 	    # List all the current psf stars.
 	    case 'l':
-		call dp_listpsf (dao)
+		if (interactive)
+		    call dp_listpsf (dao, im)
 
 	    # Fit the PSF.
 	    case 'f':
@@ -206,9 +232,12 @@ begin
 	    # Locate the star in the aperture photometry file and print out
 	    # the photometry.
 	    case 'p':
-		istar = dp_locstar (dao, im, wx, wy)
+		if (interactive)
+		    istar = dp_locstar (dao, im, wx, wy)
+		else
+		    next
 		if (istar > 0)
-		    call dp_pshow (dao, istar)
+		    call dp_pshow (dao, im, istar)
 		else if (istar == 0)
 		    call printf ("Star not found in the photometry file.\n")
 		else
@@ -225,75 +254,97 @@ begin
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
 			call dp_pcolon (dao, psfim, opst, psfgr, Memc[cmd],
 			    psf_new, psf_computed, psf_written)
-		    } else {
-		        ip = ip + 1
-		        if (ctoi (Memc[cmd], ip, idnum) <= 0)
-			    istar = dp_locstar (dao, im, wx, wy)
-		        else
-			    istar = dp_idstar (dao, im, idnum)
-		        if (istar > 0)
-			    call dp_pshow (dao, istar)
-		        else if (istar == 0)
-		            call printf (
-		                "Star not found in the photometry file\n")
-		        else
-		            call printf (
-		            "Star is off or too near the edge of the image.\n")
+			next
 		    }
+		    if (! interactive)
+			next
+		    ip = ip + 1
+		    if (ctoi (Memc[cmd], ip, idnum) <= 0)
+		        istar = dp_locstar (dao, im, wx, wy)
+		    else
+		        istar = dp_idstar (dao, im, idnum)
+		    if (istar > 0)
+		        call dp_pshow (dao, im, istar)
+		    else if (istar == 0)
+		        call printf (
+		            "Star not found in the photometry file\n")
+		    else
+		        call printf (
+		            "Star is off or too near the edge of the image.\n")
 
 		case 'a':
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
 			call dp_pcolon (dao, psfim, opst, psfgr, Memc[cmd],
 			    psf_new, psf_computed, psf_written)
-		    } else {
-		        ip = ip + 1
-		        if (ctoi (Memc[cmd], ip, idnum) <= 0)
-			    idnum = 0
-		        if (dp_addstar (dao, im, wx, wy, INDEFR, idnum, gd, mgd,
-		            showplots) == OK) {
-			    psf_new = false
-			    psf_computed = false
-			    psf_written = false
-		        }
+			next
 		    }
+		    ip = ip + 1
+		    if (ctoi (Memc[cmd], ip, idnum) <= 0)
+		        idnum = 0
+		    if (dp_addstar (dao, im, wx, wy, INDEFR, idnum, gd, mgd,
+		        showplots) == ERR) 
+			next
+		    psf_new = false
+		    psf_computed = false
+		    psf_written = false
+                    if (mkstars && id != NULL) {
+                        call gmark (id, dp_pstatr (dao, CUR_PSFX),
+                            dp_pstatr (dao, CUR_PSFY), GM_PLUS, -5.0, -5.0)
+                        if (gd == id)
+                            call gflush (id)
+                        else
+                            call gframe (id)
+                    }
 
 		case 's':
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
 			call dp_pcolon (dao, psfim, opst, psfgr, Memc[cmd],
 			    psf_new, psf_computed, psf_written)
-		    } else {
-		        ip = ip + 1
-		        if (ctoi (Memc[cmd], ip, idnum) <= 0)
-			    idnum = 0
-		        if (! psf_computed) {
-		            call printf ("The PSF has not been fit\n")
-		        } else if (! psf_computed) {
-		            call printf ("Warning: The PSF is not uptodate\n")
-			} else if (dp_subpsf (dao, im, wx, wy, idnum, gd, mgd,
-		            showplots) == OK) {
-			    if (dp_pstati (dao, PNUM) <= 0)
-			        psf_new = true
-			    psf_computed = false
-			    psf_written = false
-		        }
+			next
 		    }
+		    ip = ip + 1
+		    if (ctoi (Memc[cmd], ip, idnum) <= 0)
+			idnum = 0
+		    if (! psf_computed) {
+		        call printf ("The PSF has not been fit\n")
+			next
+		    }
+		    if (! psf_computed) {
+		        call printf ("Warning: The PSF is not uptodate\n")
+			next
+		    }
+		    if (dp_subpsf (dao, im, wx, wy, idnum, gd, mgd,
+		        showplots) == ERR)
+			next
+		    if (dp_pstati (dao, PNUM) <= 0)
+		        psf_new = true
+		    psf_computed = false
+		    psf_written = false
 
 		case 'd':
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
 			call dp_pcolon (dao, psfim, opst, psfgr, Memc[cmd],
 			    psf_new, psf_computed, psf_written)
-		    } else {
-		        ip = ip + 1
-		        if (ctoi (Memc[cmd], ip, idnum) <= 0)
-			    idnum = 0
-		        if (dp_delstar (dao, im, wx, wy, idnum, gd,
-		            showplots) == OK) {
-			    if (dp_pstati (dao, PNUM) <= 0)
-			        psf_new = true
-			    psf_computed = false
-			    psf_written = false
-		        }
+			next
 		    }
+		    ip = ip + 1
+		    if (ctoi (Memc[cmd], ip, idnum) <= 0)
+		        idnum = 0
+		    if (dp_delstar (dao, im, wx, wy, idnum, gd,
+		        showplots) == ERR) 
+			next
+		    if (dp_pstati (dao, PNUM) <= 0)
+		        psf_new = true
+		    psf_computed = false
+		    psf_written = false
+                    if (mkstars && id != NULL) {
+                        call gmark (id, dp_pstatr (dao, CUR_PSFX),
+                            dp_pstatr (dao, CUR_PSFY), GM_CROSS, -5.0, -5.0)
+                        if (gd == id)
+                            call gflush (id)
+                        else
+                            call gframe (id)
+                    }
 
 		default:
 		    call dp_pcolon (dao, psfim, opst, psfgr, Memc[cmd],
@@ -301,7 +352,7 @@ begin
 		}
 
 	    default:
-		call printf ("Unknown keystroke command\007\n")
+		call printf ("Unknown keystroke command\n")
 	    }
 	}
 

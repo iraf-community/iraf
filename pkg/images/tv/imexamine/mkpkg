@@ -4,6 +4,14 @@ $checkout libpkg.a ../
 $update   libpkg.a
 $checkin  libpkg.a ../
 $exit
+
+standalone:
+	$set   LIBS1 = "-lds -liminterp -lncar -lgks -lxtools"
+	$set   LIBS2 = "-lgsurfit -lnlfit -lcurfit -lllsq"
+	$update libpkg.a
+	$omake	x_imexam.x
+	$link	x_imexam.o libpkg.a $(LIBS1) $(LIBS2) -o xx_imexam.e
+	;
  
 libpkg.a:
 	iecimexam.x	imexam.h <error.h> <imhdr.h>
@@ -30,6 +38,7 @@ libpkg.a:
 			<math/gsurfit.h> <math/nlfit.h>
 	iesimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <mach.h>
 	iestatistics.x	imexam.h <error.h>
+	ietimexam.x	imexam.h <error.h> <imhdr.h>
 	ievimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <mach.h>\
 			<imset.h> <math.h> <math/iminterp.h>
 	stfmeasure.x	starfocus.h <error.h> <imhdr.h> <imset.h> <mach.h>\

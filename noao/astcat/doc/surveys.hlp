@@ -1,0 +1,275 @@
+.help surveys Mar00 astcat
+.ih
+NAME
+surveys -- describe the image survey configuration file
+.ih
+USAGE
+help surveys
+.ih
+IMAGE SURVEYS
+
+An image survey is a collection of image data for a large region of
+the sky from which image data for a small region of the sky can be extracted
+by specifying an extraction region.
+
+Image surveys may be installed locally or accessed remotely. Each
+supported survey must have a record in the image survey configuration file
+defining the image survey network address, the image survey query format,
+and the query output format. The default configuration file supplied with
+the package is "astcat$lib/imdb.dat". A list of the supported surveys in the
+configuration file can be obtained by running the aslist task.
+
+.ih
+THE IMAGE SURVEY CONFIGURATION FILE
+
+The image survey configuration file specifies the network address, the query
+format, and the output image format for each supported image server. Each
+image survey record is accessed via a record name of the form
+survey@site, e.g. "dss2@cadc". Adding support for a new image 
+server or responding to changes in the behavior of an existing image 
+server requires adding a new record to the configuration file or changing
+an existing record.  No modification to the code should be required.
+
+The image server network address tells the image survey access code where
+and how to connect to the network. Each network address has the syntax
+"domain:port:address:flags" e.g. "inet:80:www.noao.edu:text".
+
+The query format specifies the form of the query string, and the
+names, default values, units, and format of the query parameters. A set of
+query parameter names are reserved for accessing image surveys
+including "ra", "dec", "width", "hwidth", "xwidth", "ywidth", "xhwidth",
+and "yhwidth". The astcat package recognizes the reserved query parameter
+names, replaces the default query parameter values with user supplied ones,
+and sends the query to the image server. "ra" and "dec" always refer
+to the center of the region to be extracted. The size parameter is
+input by the user as a width in ra and dec in arcminutes. This value
+is translated into a halfwidth or width  like parameter
+depending on whether the query parameter is defined as "hwidth", "width",
+"xwidth", "ywidth", "hxwidth", or "hywidth" etc.
+
+The server output format specifies the form of the server query results:
+including the image type, the world coordinate system type, and the
+standard keyword set. At present the only supported image type is FITS,
+the supported world coordinate system types are FITS and DSS,
+and the standard keyword set includes keywords that are required or
+useful for astrometric analysis tasks.
+
+.ih
+SAMPLE IMAGE SURVEY RECORD
+
+The following example illustrates the main features of a image survey
+configuration file record.
+
+.nf
+begin dss1@cadc
+address inet:80:cadcwww.hia.nrc.ca:text
+query  GET /cadcbin/dss-server?ra=%-s&dec=%-s&mime-type=application/x-fits&x=%-s
+&y=%-s HTTP/1.0\n\n
+nquery 5
+    ra 00:00:00.00 hours %0.2h
+    dec +00:00:00.0 degrees %0.1h
+    xwidth 10.0 minutes %0.1f
+    ywidth 10.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+type fits
+hread 1
+wcs dss
+nwcs 10
+    wxref INDEF INDEF d pixels
+    wyref INDEF INDEF d pixels
+    wxmag INDEF 1.701 d arcsec/pixel
+    wymag INDEF 1.701 d arcsec/pixel
+    wxrot INDEF 180.0 d degrees
+    wyrot INDEF 0.0 d degrees
+    wraref OBJCTRA INDEF d hms
+    wdecref OBJCTDEC INDEF d dms
+    wproj INDEF tan c INDEF
+    wsystem INDEF J2000 c INDEF
+nkeys 13
+    observat INDEF Palomar c INDEF
+    esitelng INDEF +116:51:46.80 d degrees
+    esitelat INDEF +33:21:21.6 d degrees
+    esitealt INDEF 1706 r meters
+    esitetz INDEF 8 r INDEF
+    emjdobs INDEF INDEF d INDEF
+    edatamin INDEF INDEF r ADU
+    edatamax INDEF INDEF r ADU
+    egain INDEF INDEF r e-/ADU
+    erdnoise INDEF INDEF r e-
+    ewavlen INDEF INDEF r angstroms
+    etemp INDEF INDEF r degrees
+    epress INDEF INDEF r mbars
+.fi
+
+The beginning of a new image survey record is marked by  a line
+of the form "begin surveyname" where surveyname is a unique name of the
+form survey@site. Any number of unique names can access the same
+image survey.  Multiple entries for the same survey
+can be used to define a different query format or to interpret the
+output in different ways.  For example if the image server supports a
+variety of image formats then the query can be set up to make
+use of this facility. 
+
+The \fIaddress\fR, \fIquery\fR and \fInquery\fR keywords are required and
+define the network address, query command format, and query parameters for
+the image survey.
+
+The \fIaddress\fR keyword  "domain", "port", and "flags" fields are almost
+always "inet", "80", and "text" respectively for image surveys, so
+the only field that has to be set differently is the address
+field :cadcwww.hia.nrc.ca" in this case.
+
+The \fIquery\fR keyword defines the query command whose form is server
+dependent. Note the %-s formatting strings. These strings are replaced
+by the query parameter values supplied by the user of the default query
+parameter values.
+
+The number of query parameters is defined by the \fInquery\fR keyword. The
+number of query parameters must be greater than or equal to the number of "-%s"
+strings in the query keyword value. The name,  default value, units,
+and format of each query parameter is listed below the nquery keyword and value,
+one parameter description per line. Alert users will notice that in the
+example above the number of query parameters is 5 but there are only 4 "%-s"
+strings in the query keyword value. In this case the qsystem query parameter
+which defines the coordinate system of the ra and dec query parameters is
+fixed at J2000. For some servers this could be a true query parameter, i.e.
+the server may accept coordinates in B1950, J2000, or some other system.
+
+Users must use the standard query parameter names "ra", "dec", and "qysystem"
+to define the extraction region center and its coordinate system, and one or
+more of "width", "xwidth", "ywidth", "hwidth", "xhwidth", or "ywidth" to define
+the extraction region size. Currently the units of "ra" may be "hours",
+"degrees", or "radians", the units of dec may be "degrees" or "radians",
+and units of the size query parameter may be "degrees" or "minutes".
+The qsystem parameter may be any one of the supported celestial coordinate
+systems. The most popular values are "icrs", "J2000", and "B1950".
+For more details type "help ccsystems". The formats are used to convert
+any numerical values supplied by the user to strings arguments that
+can be passed to the query string.
+
+The \fItype\fR keyword defines the format of the output image file. At
+present only fits data is supported.
+
+The \fIhread\fR keyword is the number of network reads to discard before
+the image transfer begins.  If undefined the hread keyword defaults to 0.
+A related parameter \fIhskip\fR defines the amount of data to be skipped
+in bytes. Hskip is not yet supported.
+
+The \fIwcs\fR parameter defines the wcs status of the image. The options
+are "fits" for an image which already has a valid fits wcs, "dss" for an
+image which has a dss WCS, and "none" for an image which has no wcs
+information. The value of this parameter determines what if any fits wcs
+information should be added to the output image headers.
+
+The \fInwcs\fR keyword defines the number of following wcs parameters. Each
+parameter consists of a standard keyword name, the actual keyword name or INDEF
+is no keyword exists, the default value or INDEF is there is no default value,
+the data type which must be one of d(double), r(real), (i)integer, or
+c(character), and the units which may be INDEF if they are undefined.
+
+Users should use the reserved wcs parameter names \fIwxref\fR, \fIwyref\fR,
+\fIwxmag\fR, \fIwymag\fR, \fIwxref\fR, \fIwyref\fR, \fIwraref\fR,
+\fIwdecref\fR, \fIwproj\fR, and \fIwsystem\fR to define the wcs parameter
+pixel reference coordinates, pixel scale in "/ pixel, coordinate
+system rotation and skew in degrees, reference coordinates in some celestial
+coordinate system, projection scheme, and celestial coordinate system. At
+present the units for all but the wraref and wdecref are fixed.
+
+The \fInkeys\fR keyword defines the number of following standard keyword
+parameters.  Each parameter consists of a standard keyword name, the actual
+keyword name or INDEF is no keyword exists, the default value or INDEF is
+there is no default value, the data type which must be one of d(double),
+r(real), (i)integer, or c(character), and the parameter units which may be
+INDEF if they are undefined.
+
+Users should use the reserved standard keyword names \fIobservat\fR,
+\fIesitelng\fR, \fIesitelat\fR, \fIesitelat\fR, and \fIesitetz\fR to
+define the site, \fIemjdobs\fR, \fIewavelen\fR, \fIetemp\fR, and \fIepress\fR 
+to define the time and physical conditions of the observation, and
+\fIedatamin\fR, \fIedatamax\fR,  \fIegain\fR, and \fIerdnoise\fR
+to define the detector parameters. At present the units of all these
+parameters should be regarded as fixed. The standard keyword set determines
+what if any standard keyword and value information should be added to the
+image headers.
+
+.ih
+INSTALLING A NEW IMAGE SURVEY RECORD
+
+Some users may need to install a local version of an image survey ,  or
+support a new image survey as it comes on line. The procedure for doing
+this is outlined below.
+
+To install a new image survey record.
+
+.ls [1]
+Create a new configuration file by making a copy of the old one.
+.le
+
+.ls [2]
+Determine a unique name for the image server. This name should be short and
+have the form survey@site, e.g. "dss1@cadc". Existing names can be
+reviewed with the aslist task.
+.le
+
+.ls [3]
+Determine the appropriate values for the address, query and nquery
+keywords and enter these quantities in the survey record.
+Determine the name, default value, units and format for each query parameter
+and enter these quantities in the survey record in the order they are
+requested by the query parameter string. Make sure that all the query keyword
+value formatting strings are -%s, that the value of the nquery keyword is
+greater than or equal to the number of %-s strings in the query keyword
+value, and that standard query parameter names are used.
+.le
+
+.ls [4]
+Set the value of type to "fits". Note that image servers which do not
+produce fits image files cannot be supported at present.
+.le
+
+.ls [5]
+Run the adumpim task. Adumpim tests the address and query parts of the
+survey record but dumps the query results directly to a file without
+modification. If adumpim fails either the network connection is bad
+or the address and / or query format is incorrect.
+.le
+
+.ls [6]
+Examine the adumpim results with imhdr and imstat.  Note that it may be
+necessary to add a ".fits" extension to the output file name in order to
+make IRAF think it is an image.  If imheader or imstat fail it
+may be because some leading junk header data got included with the image
+data. Determine the size and type of this junk data, set hread or hskip
+keywords appropriately, and run adumpim again.
+.le
+
+.ls [7]
+Examine the fits image header and determine the type of wcs information if
+any in the header. For dss images set wcs to "dss", for images with fits
+wcs information already present in the headers set wcs to "fits", for all
+remaining images set wcs to "none".
+.le
+
+.ls [8]
+Fill in the wcs information using information in the returned image header
+or apriori information about the survey, and one of the existing records
+as a model. If no information is available  set the nwcs keyword to 0.
+.le
+
+.ls [9]
+Fill in the standard keyword information using information in the image
+header or apriori information about the survey, and one of the existing
+records as a model. If no information is available set the nkeys keyword
+to 0.
+.le
+
+.ls [11]
+Run the agetim task with and without the header editing options enabled
+to check the accuracy of the survey record.
+.le
+.fi
+
+.ih
+SEE ALSO
+aslist
+.endhelp

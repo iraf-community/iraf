@@ -30,7 +30,10 @@ begin
 	    return (NULL)
 	if (streq (fname, "EMPTY"))
 	    return (NULL)
-	if (streq (fname, "BPM")) {
+	if (fname[1] == '!') {
+	    iferr (call imgstr (refim, fname[2], fname, SZ_FNAME))
+		fname[1] = EOS
+	} else if (streq (fname, "BPM")) {
 	    iferr (call imgstr (refim, "BPM", fname, SZ_FNAME))
 		return (NULL)
 	}
@@ -59,11 +62,10 @@ pointer procedure ds_pmimmap (pmname, refim)
 char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 
-short	val
-int	i, ndim, npix
+int	i, ndim, npix, val
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
-int	imgnls()
+int	imgnli()
 pointer immap(), pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
 errchk	immap, mw_openim
 
@@ -76,18 +78,18 @@ begin
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
 
 	im_in = immap (pmname, READ_ONLY, 0)
-	pm = pm_newmask (im_in, 16)
+	pm = pm_newmask (im_in, 27)
 
 	ndim = IM_NDIM(im_in)
 	npix = IM_LEN(im_in,1)
 
-	while (imgnls (im_in, data, Meml[v1]) != EOF) {
+	while (imgnli (im_in, data, Meml[v1]) != EOF) {
 	    do i = 0, npix-1 {
-		val = Mems[data+i]
+		val = Memi[data+i]
 		if (val < 0)
-		   Mems[data+i] = 0
+		   Memi[data+i] = 0
 	    }
-	    call pmplps (pm, Meml[v2], Mems[data], 0, npix, PIX_SRC)
+	    call pmplpi (pm, Meml[v2], Memi[data], 0, npix, PIX_SRC)
 	    call amovl (Meml[v1], Meml[v2], ndim)
 	}
 
@@ -107,18 +109,19 @@ end
 # This matches sizes and physical coordinates and allows the
 # original mask to be smaller or larger than the reference image.
 # Subsequent use of the pixel mask can then work in the logical
-# coordinates of the reference image.  A null input returns a null output.
+# coordinates of the reference image.  The mask values are the maximum
+# of the mask values which overlap each reference image pixel.
+# A null input returns a null output.
 
 procedure ds_match (im, refim)
 
 pointer	im			#U Pixel mask image pointer
 pointer	refim			#I Reference image pointer
 
-int	i, j, k, nc, nl, ncpm, nlpm, c1, c2, l1, l2, nref, npm
-int	steptype, xoffset, xstep, yoffset, ystep
-double	x1, x2, y1, y2
+int	i, j, k, l, i1, i2, j1, j2, nc, nl, ncpm, nlpm, nx, val
+double	x1, x2, y1, y2, lt[6], lt1[6], lt2[6]
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
-pointer	mwref, mwpm, ctref, ctpm, pm, pmnew, imnew, bufref, bufpm
+pointer	pm, pmnew, imnew, mw, ctx, cty, bufref, bufpm
 
 int	imstati()
 pointer	pm_open(), mw_openim(), im_pmmapo(), imgl1i(), mw_sctran()
@@ -130,147 +133,111 @@ begin
 	    return
 
 	# Set sizes.
-	pm = imstati (im, IM_PMDES)
 	nc = IM_LEN(refim,1)
 	nl = IM_LEN(refim,2)
 	ncpm = IM_LEN(im,1)
 	nlpm = IM_LEN(im,2)
 
-	# Check if the two are the same logical size and the mask is empty.
-	if (nc == ncpm && nl == nlpm && pm_empty (pm))
+	# If the mask is empty and the sizes are the same then it does not
+	# matter if the two are actually matched in physical coordinates.
+	pm = imstati (im, IM_PMDES)
+	if (pm_empty(pm) && nc == ncpm && nl == nlpm)
 	    return
 
-	# Check coordinate transformations.
-	mwref = mw_openim (refim)
-	mwpm = mw_openim (im)
+	# Compute transformation between reference (logical) coordinates
+	# and mask (physical) coordinates.
 
-	steptype = 1
-	ctref = mw_sctran (mwref, "logical", "physical", 3)
-	ctpm = mw_sctran (mwpm, "physical", "logical", 3)
-	call mw_c2trand (ctref, 1D0, 1D0, x1, y1) 
-	call mw_c2trand (ctpm, x1, y1, x1, y1) 
-	call mw_c2trand (ctref, 2D0, 1D0, x2, y2) 
-	call mw_c2trand (ctpm, x2, y2, x2, y2) 
-	if (abs(x2-x1) < 1.) {
-	    steptype = 2
-	    call mw_ctfree (ctref)
-	    call mw_ctfree (ctpm)
-	    ctref = mw_sctran (mwref, "physical", "logical", 3)
-	    ctpm = mw_sctran (mwpm, "logical", "physical", 3)
-	    call mw_c2trand (ctpm, 1D0, 1D0, x1, y1) 
-	    call mw_c2trand (ctref, x1, y1, x1, y1) 
-	    call mw_c2trand (ctpm, 2D0, 1D0, x2, y2) 
-	    call mw_c2trand (ctref, x2, y2, x2, y2) 
-	}
-	x2 = x2 - x1
-	if (abs(y1-y2) > 10*EPSILONR)
-	    call error (0, "Image and mask have a relative rotation")
-	if (abs(x1-nint(x1)) > 10*EPSILONR  &&
-	    abs(x1-nint(x1))-0.5 > 10*EPSILONR)
-	    call error (0, "Image and mask have non-integer relative offsets")
-	if (abs(x2-nint(x2)) > 10*EPSILONR)
-	    call error (0, "Image and mask have non-integer relative steps")
-	xoffset = nint (x1 - 1D0)
-	xstep = nint (x2)
+	mw = mw_openim (im)
+	call mw_gltermd (mw, lt, lt[5], 2)
+	call mw_close (mw)
 
-	if (steptype == 1) {
-	    call mw_c2trand (ctref, 1D0, 1D0, x1, y1) 
-	    call mw_c2trand (ctpm, x1, y1, x1, y1) 
-	    call mw_c2trand (ctref, 1D0, 2D0, x2, y2) 
-	    call mw_c2trand (ctpm, x2, y2, x2, y2) 
-	} else {
-	    call mw_c2trand (ctpm, 1D0, 1D0, x1, y1) 
-	    call mw_c2trand (ctref, x1, y1, x1, y1) 
-	    call mw_c2trand (ctpm, 1D0, 2D0, x2, y2) 
-	    call mw_c2trand (ctref, x2, y2, x2, y2) 
-	}
-	y2 = y2 - y1
-	if (abs(x1-x2) > 10*EPSILONR)
-	    call error (0, "Image and mask have a relative rotation")
-	if (abs(y1-nint(y1)) > 10*EPSILONR  &&
-	    abs(y1-nint(y1))-0.5 > 10*EPSILONR)
-	    call error (0, "Image and mask have non-integer relative offsets")
-	if (abs(y2-nint(y2)) > 10*EPSILONR)
-	    call error (0, "Image and mask have non-integer relative steps")
-	yoffset = nint (y1 - 1D0)
-	ystep = nint (y2)
+	mw = mw_openim (refim)
+	call mw_gltermd (mw, lt2, lt2[5], 2)
+	call mw_close (mw)
 
-	call mw_ctfree (ctref)
-	call mw_ctfree (ctpm)
-	call mw_close (mwref)
-	call mw_close (mwpm)
+	# Combine lterms.
+	call mw_invertd (lt, lt1, 2)
+	call mw_mmuld (lt1, lt2, lt, 2)
+	call mw_vmuld (lt, lt[5], lt[5], 2)
+	lt[5] = lt2[5] - lt[5]
+	lt[6] = lt2[6] - lt[6]
+	do i = 1, 6
+	    lt[i] = nint (1D6 * (lt[i]-int(lt[i]))) / 1D6 + int(lt[i])
 
-	# Check if the two have the same coordinate system.
-	if (nc==ncpm && nl==nlpm && xoffset==0 && yoffset==0 && xstep==ystep)
+	# Check for a rotation.  For now don't allow any rotation.
+	if (lt[2] != 0. || lt[3] != 0.)
+	    call error (1, "Image and mask have a relative rotation")
+	
+	# Check for an exact match.
+	if (lt[1] == 1D0 && lt[4] == 1D0 && lt[5] == 0D0 && lt[6] == 0D0)
 	    return
+
+	# Set reference to mask coordinates.
+	mw = mw_openim (im)
+	call mw_sltermd (mw, lt, lt[5], 2)
+	ctx = mw_sctran (mw, "logical", "physical", 1)
+	cty = mw_sctran (mw, "logical", "physical", 2)
 
 	# Create a new pixel mask of the required size and offset.
+	# Do dummy image I/O to set the header.
 	pmnew = pm_open (NULL)
-	call pm_ssize (pmnew, 2, IM_LEN(refim,1), 16)
+	call pm_ssize (pmnew, 2, IM_LEN(refim,1), 27)
 	imnew = im_pmmapo (pmnew, NULL)
 	bufref = imgl1i (imnew)
 
-	if (steptype == 1) {
-	    c1 = 1 + xoffset + max (0, (xstep - 1 - xoffset) / xstep) * xstep
-	    c2 = 1 + xoffset + min (nc-1, (ncpm - 1 - xoffset) / xstep) * xstep
-	    l1 = 1 + yoffset + max (0, (ystep - 1 - yoffset) / ystep) * ystep
-	    l2 = 1 + yoffset + min (nl-1, (nlpm - 1 - yoffset) / ystep) * ystep
-	    npm = c2 - c1 + 1
-	    nref = npm / xstep
-	    if (nref > 0) {
-		call malloc (bufpm, npm, TY_SHORT)
-		call malloc (bufref, nref, TY_SHORT)
-		call amovkl (long(1), vold, IM_MAXDIM)
-		call amovkl (long(1), vnew, IM_MAXDIM)
-		vold[1] = c1
-		vnew[1] = c1 - xoffset
-		do i = l1, l2, ystep {
-		    vold[2] = i
+	# Compute region of mask overlapping the reference image.
+	call mw_ctrand (ctx, 1-0.5D0, x1, 1)
+	call mw_ctrand (ctx, nc+0.5D0, x2, 1)
+	i1 = max (1, nint(min(x1,x2)+1D-5))
+	i2 = min (ncpm, nint(max(x1,x2)-1D-5))
+	call mw_ctrand (cty, 1-0.5D0, y1, 1)
+	call mw_ctrand (cty, nl+0.5D0, y2, 1)
+	j1 = max (1, nint(min(y1,y2)+1D-5))
+	j2 = min (nlpm, nint(max(y1,y2)-1D-5))
+
+	# Set the new mask values to the maximum of all mask values falling
+	# within each reference pixel in the overlap region.
+	if (i1 <= i2 && j1 <= j2) {
+	    nx = i2 - i1 + 1
+	    call malloc (bufpm, nx, TY_INT)
+	    call malloc (bufref, nc, TY_INT)
+	    vold[1] = i1
+	    vnew[1] = 1
+	    do j = 1, nl {
+		call mw_ctrand (cty, j-0.5D0, y1, 1)
+		call mw_ctrand (cty, j+0.5D0, y2, 1)
+		j1 = max (1, nint(min(y1,y2)+1D-5))
+		j2 = min (nlpm, nint(max(y1,y2)-1D-5))
+		if (j2 < j1)
+		    next
+
+		vnew[2] = j
+		call aclri (Memi[bufref], nc)
+		do l = j1, j2 {
+		    vold[2] = l
 		    if (!pm_linenotempty (pm, vold))
 			next
-		    call pmglps (pm, vold, Mems[bufpm], 0, npm, 0)
-		    vnew[2] = l1 - yoffset + (i - l1) / ystep
-		    j = 0
-		    do k = 0, npm-1, xstep {
-			Mems[bufref+j] = Mems[bufpm+k]
-			j = j + 1
+		    call pmglpi (pm, vold, Memi[bufpm], 0, nx, 0)
+		    do i = 1, nc {
+			call mw_ctrand (ctx, i-0.5D0, x1, 1)
+			call mw_ctrand (ctx, i+0.5D0, x2, 1)
+			i1 = max (1, nint(min(x1,x2)+1D-5))
+			i2 = min (ncpm, nint(max(x1,x2)-1D-5))
+			if (i2 < i1)
+			    next
+			val = Memi[bufref+i-1]
+			do k = i1-vold[1], i2-vold[1]
+			    val = max (val, Memi[bufpm+k])
+			Memi[bufref+i-1] = val
 		    }
-		    call pmplps (pmnew, vnew, Mems[bufref], 0, nref, PIX_SRC)
 		}
+		call pmplpi (pmnew, vnew, Memi[bufref], 0, nc, PIX_SRC)
 	    }
-	} else {
-	    c1 = max (1, 1 - xoffset)
-	    c2 = min (ncpm, nc / xstep - xoffset)
-	    l1 = max (1, 1 - yoffset)
-	    l2 = min (nlpm, nl / ystep - yoffset)
-	    npm = c2 - c1 + 1
-	    nref = npm * xstep
-	    if (nref > 0) {
-		call malloc (bufpm, npm, TY_SHORT)
-		call malloc (bufref, nref, TY_SHORT)
-		call amovkl (long(1), vold, IM_MAXDIM)
-		call amovkl (long(1), vnew, IM_MAXDIM)
-		vold[1] = c1
-		vnew[1] = c1 + xoffset
-		do i = l1, l2 {
-		    vold[2] = i
-		    if (!pm_linenotempty (pm, vold))
-			next
-		    call pmglps (pm, vold, Mems[bufpm], 0, npm, 0)
-		    call aclrs (Mems[bufref], nref)
-		    do j = 0, npm-1 {
-			k = j * xstep
-			Mems[bufref+k] = Mems[bufpm+j]
-		    }
-		    vnew[2] = l1 + yoffset + (i - l1) * ystep
-		    call pmplps (pmnew, vnew, Mems[bufref], 0, nref, PIX_SRC)
-		}
-	    }
-	    call mfree (bufpm, TY_SHORT)
-	    call mfree (bufref, TY_SHORT)
+	    call mfree (bufref, TY_INT)
+	    call mfree (bufpm, TY_INT)
 	}
 
-	# Update the IMIO descriptor.
+	call mw_close (mw)
 	call imunmap (im)
 	im = imnew
 	call imseti (im, IM_PMDES, pmnew)

@@ -1,5 +1,24 @@
 .help revisions Jun88 noao.imred.echelle
 .nf
+=====
+V2.12
+=====
+
+imred$echelle/standard.par
+    Added blackbody query parameters.  (5/2/02, Valdes)
+
+imred$echelle/doc/ecidentify.hlp
+    Added a description of how to evaluate the dispersion functions.
+    (4/20/01, Valdes)
+
+imred$echelle/doc/dofoe.hlp
+    Modified to explain that this task may be used with a single fiber.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
+
 imred$echelle/doc/ecidentify.hlp
     Fixed minor formating problem. (4/22/99, Valdes)
 

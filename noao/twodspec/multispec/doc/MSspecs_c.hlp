@@ -240,3 +240,4 @@ this should not be necessary; if the user interactively marks centers,
 it is not necessary.
 .le
 .le
+.endhelp

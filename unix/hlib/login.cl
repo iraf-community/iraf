@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.11 May 1997"
+    logver = "IRAF V2.12.1 July 2002"
 
 set	home		= "U_HOME"
 set	imdir		= "U_IMDIR"
@@ -10,10 +10,10 @@ set	uparm		= "home$uparm/"
 set	userid		= "U_USER"
 
 # Set the terminal type.
-if (envget("TERM") == "sun") {
+if (envget("TERM") == "xterm") {
     if (!access (".hushiraf"))
-	print "setting terminal type to gterm..."
-    stty gterm
+	print "setting terminal type to xgterm..."
+    stty xgterm
 } else {
     if (!access (".hushiraf"))
 	print "setting terminal type to U_TERM..."
@@ -22,7 +22,8 @@ if (envget("TERM") == "sun") {
 
 # Uncomment and edit to change the defaults.
 #set	editor		= vi
-#set	printer		= lw
+#set	printer		= lp
+#set	pspage		= "letter"
 #set	stdimage	= imt800
 #set	stdimcur	= stdimage
 #set	stdplot		= lw
@@ -31,6 +32,8 @@ if (envget("TERM") == "sun") {
 #set	cmbuflen	= 512000
 #set	min_lenuserarea	= 64000
 #set	imtype		= "imh"
+#set	imextn		= "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
+
 
 # IMTOOL/XIMAGE stuff.  Set node to the name of your workstation to
 # enable remote image display.  The trailing "!" is required.
@@ -59,6 +62,8 @@ task	$fc = ("$" // envget("iraf") // "unix/hlib/fc.csh" //
 task	$nbugs = ("$(setenv EDITOR 'buglog -e';" //
 	    "less -Cqm +G " // envget ("iraf") // "local/bugs.*)")
 task	$cls = "$clear;ls"
+task	$clw = "$clear;w"
+task	$pg = ("$(less -Cqm $*)")
 
 if (access ("home$loginuser.cl"))
     cl < "home$loginuser.cl"

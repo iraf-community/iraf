@@ -65,7 +65,7 @@ libex.a:
 	imloop.x	<imio.h>
 	immaky.x	<error.h> <imhdr.h> <imio.h>
 	immap.x	
-	immapz.x	<error.h> <imhdr.h> <imio.h>
+	immapz.x	<error.h> <imhdr.h> <imio.h> <mach.h>
 	imnote.x	<imhdr.h> <imio.h> <szdtype.inc>
 	imopsf.x	<fset.h> <imhdr.h> <imio.h> <plset.h> <pmset.h>
 	imparse.x	<ctype.h>
@@ -76,7 +76,7 @@ libex.a:
 	impmlnev.x	<imhdr.h> <imio.h>
 	impmmap.x	<error.h> <imhdr.h> <imio.h> <pmset.h>
 	impmmapo.x	<imhdr.h> <imio.h> <plio.h> <pmset.h>
-	impmopen.x	<imhdr.h> <imio.h> <pmset.h>
+	impmopen.x	<error.h> <imhdr.h> <imio.h> <pmset.h>
 	impmsne1.x	<imio.h>
 	impmsne2.x	<imio.h>
 	impmsne3.x	<imio.h>

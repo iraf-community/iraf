@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
 include	<plio.h>
 
 # PL_COMPRESS -- Compress the line list buffer to eliminate any unusable
@@ -13,7 +14,7 @@ pointer	pl			#I mask descriptor
 
 pointer	n_bp, o_lp, n_lp, op
 int	nwords, r_len, b_len, i
-errchk	malloc, mfree
+errchk	malloc, mfree, syserr
 
 begin
 	# Redundant calls are ignored.
@@ -25,6 +26,8 @@ begin
 	for (i=0;  i < PL_LLOP(pl);  i=i+b_len) {
 	    o_lp = Ref (pl, i)
 	    b_len = LP_BLEN(o_lp)
+	    if (b_len <= 0 || b_len > PL_LLOP(pl))
+		call syserr (SYS_PLBADMASK)
 	    if (i == PL_EMPTYLINE || LP_NREF(o_lp) > 0)
 		nwords = nwords + LP_LEN(o_lp)
 	}
@@ -44,6 +47,8 @@ begin
 	for (i=0;  i < PL_LLOP(pl);  i=i+b_len) {
 	    o_lp = Ref (pl, i)
 	    b_len = LP_BLEN(o_lp)
+	    if (b_len <= 0 || b_len > PL_LLOP(pl))
+		call syserr (SYS_PLBADMASK)
 
 	    if (i == PL_EMPTYLINE || LP_NREF(o_lp) > 0) {
 		n_lp = n_bp + op
@@ -55,9 +60,9 @@ begin
 
 		call amovs (Mems[o_lp], Mems[n_lp], r_len)
 
-		LP_NREF(o_lp) = op / I_SHIFT
-		LP_BLEN(o_lp) = mod (op, I_SHIFT)
-		LP_BLEN(n_lp) = r_len
+		LP_NREFS(o_lp) = op / I_SHIFT
+		LP_SETBLEN(o_lp, mod (op, I_SHIFT))
+		LP_SETBLEN(n_lp, r_len)
 		op = op + r_len
 	    }
 	}
@@ -67,7 +72,7 @@ begin
 
 	do i = 1, PL_NLP(pl) {
 	    o_lp = Ref (pl, PL_LP(pl,i))
-	    PL_LP(pl,i) = int(LP_NREF(o_lp)) * I_SHIFT + LP_BLEN(o_lp)
+	    PL_LP(pl,i) = LP_NREF(o_lp) * I_SHIFT + LP_BLEN(o_lp)
 	}
 	    
 	# Deallocate the old buffer and install the new one.

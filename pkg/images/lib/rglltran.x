@@ -1,5 +1,5 @@
 include <math.h>
-include "skywcs.h"
+include <pkg/skywcs.h>
 
 # RG_LLTRANSFORM -- Transform the reference image world coordinates to the
 # input image world coordinate system.

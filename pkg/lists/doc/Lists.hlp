@@ -478,6 +478,7 @@ Hidden params:
 					word or string in the input.
 .fi
 .le
+.ke
 
 .ks
 .ls TAIL [files]
@@ -565,3 +566,4 @@ SET without any arguments displays the current environment.
 .ke
 
 (etc.)
+.endhelp

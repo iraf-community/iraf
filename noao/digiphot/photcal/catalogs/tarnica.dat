@@ -1,0 +1,12 @@
+# Sample transformation section for the Aarnica JHK system
+
+transformation
+
+fit   j1=0.0, j2=0.05, j3=0.000
+JFIT : mJ = J + j1 + j2 * XJ + j3 * (J - K)
+
+fit   h1=0.0, h2=0.05, h3=0.000
+HFIT : mH = H + h1 + h2 * XH + h3 * (H - K)
+
+fit   k1=0.0, k2=0.05, k3=0.000
+KFIT : mK = K + k1 + k2 * XK + k3 * (H - K)

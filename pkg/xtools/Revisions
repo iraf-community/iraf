@@ -1,5 +1,125 @@
 .help revisions Jun88 pkg.xtools
 .nf
+=====
+V2.12
+=====
+
+xtools$fixpix/xtpmmap.x
+    The change to IMIO for mapping bad pixel files in FITS extensions
+    resulted in a different error code when failing to open the file.
+    This code needed to be recognized by this routine in order to
+    continue on to try other possible formats.  (2/27/02, Valdes)
+
+xtools$rngranges.x
+    Further modification for INDEF range limits.  (2/4/02, Valdes)
+
+xtools$rngranges.x
+    Added missing rstr argument to 2 rng_error calls. (01/07/02, Davis)
+
+xtools$catquery/cqquery.x
+    Fixed a couple of typos in the code which detects the end of the http
+    header. (01/03/02, Davis)
+
+xtools$rngranges.x
+xtools$rngranges.xBAK +
+    Modified rng_add to handle INDEFs better.  This was the change found
+    in the nmisc version.  There are some other differences but since the
+    records of why the changes were made are missing I fixed only the
+    immediate problem found with OBSUTIL.SPECFOCUS.
+    (11/14/01, Valdes)
+
+xtools$skywcs/doc/skdecim.hlp
+xtools$skywcs/doc/skequatorial.hlp
+xtools$skywcs/doc/sklltran.hlp
+xtools$skywcs/doc/skultran.hlp
+xtools$skywcs/doc/skywcs.hlp
+xtools$catquery/doc/catquery.hlp
+xtools$catquery/doc/cqsqpar.hlp
+xtools$catquery/doc/cqsqparn.hlp
+    Fixed various formatting problems in the skywcs and catquery library
+    help pages. (19/09/01, Davis)
+
+xtools$catquery/
+    Added the prototype catalog and survey access tools to the xtools package.
+    (27/08/01, Davis)
+
+xtools$fixpix/xtpmmap.x
+    Added missing argument to mw_ctrand calls.  (6/15/01, Valdes)
+
+xtools$fixpix/xtpmmap.x
+    Fixed problems with xt_match.  The new version is more robust and
+    correct.  A bad pixel for the reference image is the maximum of all
+    pixels in the pixel mask which fall within the reference pixel.   This
+    version still does not allow any relative rotations but does allow
+    non-integer offsets.  (4/24/01, Valdes)
+
+xtools$fixpix/xtfixpix.x
+    Added a call to pm_compress to compress the pixel mask if there are
+    more than a certain number of edits to avoid the memory inefficiency
+    in plio.  (2/2/01, Valdes)
+
+xtools$fixpix/xtpmmap.x
+    A mask name beginning with '^' is used to invert a mask.
+    (2/1/01, Valdes)
+
+xtools$inlfit.gx
+xtools$inlfitr.x
+xtools$inlfitd.x
+xtools$inlrefit.gx
+xtools$inlreffitr.x
+xtools$inlrefitd.x
+    Added a check for the condition case where the number of data points
+    minus the number of deleted points (i.e. those with weights of 0.0)
+    is less than the number of fitting parameters. The previous checks did
+    not task into account the number of deleted points and could produce
+    solutions that were correct but non-physical (1/2/01, Davis)
+
+xtools$fixpix/xtpmmap.x
+    1. The test for matching offsets was incorrect.
+    2. The use of BPM was broken.
+    3. There was a memory leak because imunmap does not free the pl
+	pointer set with im_pmmapo (also there was an imio bug in
+	freeing the pl pointer set with im_pmmap which has now been
+	fixed).  A new procedure xt_pmunmap should be used whenever
+	xt_pmmap is used to insure any internal pointer created by
+	xt_match to match the mask to a reference image is freed.
+    (12/12/00, Valdes)
+
+xtools$skywcs/
+    Added the sky coordinates transformation tools to the xtools package.
+    (10/12/00, Davis)
+
+=========
+V2.11.3p1
+=========
+
+xtools/fixpix/xtpmmap.x
+    A mask name begining with '!' is now treated as a reference to a
+    header keyword.  (9/4/00, Valdes)
+
+xtools/fixpix/xtpmmap.x
+    When a pixel mask (overlay or bad pixel) needed to be matched to
+    the data in physical coordinates the internal generation of a
+    new mask was being done in short integers.  This would truncate
+    any masks with values greater than 16 bits.  All uses of short
+    where changed to integer.  (5/16/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+
+=======
+V2.11.3
+=======
+
+xtools$fixpix/xtfp.gx
+    The formating of the verbose pixel printing was missing a couple of
+    blanks.  (12/15/99, Valdes)
+
+=======
+V2.11.2
+=======
+
 xtools$ranges/mkpkg
 xtools$icfit/mkpkg
 xtools$fixpix/mkpkg

@@ -17,7 +17,7 @@ libxtools.a:
 	gtget.x		gtools.h <gset.h>
 	gtgui.x		gtools.h <gset.h>
 	gtinit.x	gtools.h <gset.h>
-	gtlabax.x	gtools.h <ctype.h> <gset.h>
+	gtlabax.x	gtools.h <ctype.h> <gset.h> <gio.h>
 	gtplot.x	gtools.h <gset.h>
 	gtreset.x	gtools.h <gset.h>
 	gtset.x		gtools.h <ctype.h> <gset.h>

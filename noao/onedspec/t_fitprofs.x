@@ -612,7 +612,6 @@ begin
 	}
 
 	call smw_close (MW(sh))
-	call imunmap (in)
 	if (out != NULL) {
 	    call smw_saveim (mwout, out)
 	    if (shout != NULL)
@@ -623,6 +622,7 @@ begin
 		call imrename (Memc[temp], output)
 	    }
 	}
+	call imunmap (in)
 	} then {
 	    if (shout != NULL)
 		call smw_close (MW(shout))

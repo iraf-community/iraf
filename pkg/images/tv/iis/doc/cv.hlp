@@ -334,6 +334,7 @@ lower legal value.  The model 70 zooms all planes together.  The center
 of the zoom is determined by the cursor position relative to the first
 frame specified (if none, the lowest numbered active one).  Once the zoom
 has taken place, the \fIpan\fR routine is called for the specified frames.
+.le
 .ih
 SEE ALSO
 cvl

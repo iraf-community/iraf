@@ -14,7 +14,7 @@ geomap          hlp=doc$geomap.hlp,     src=geometry$t_geomap.x
 geotran         hlp=doc$geotran.hlp,    src=geometry$t_geotran.x
 geoxytran       hlp=doc$geoxytran.hlp,  src=geometry$t_geoxytran.x
 gregister       hlp=doc$gregister.hlp,  src=immatch$gregister.cl
-imalign		hlp=doc$imalign.hlp,	src=immatch$imlalign.cl
+imalign		hlp=doc$imalign.hlp,	src=immatch$imalign.cl
 imcentroid	hlp=doc$imcentroid.hlp,	src=listmatch$t_imctroid.x
 imcombine       hlp=doc$imcombine.hlp,  src=imcombine$t_imcombine.x
 linmatch	hlp=doc$linmatch.hlp,	src=linmatch$t_linmatch.x

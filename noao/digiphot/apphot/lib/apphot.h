@@ -2,27 +2,48 @@
 
 # APPHOT parameters (# 1 - 100)
 
-define	FWHMPSF		1	# Full width half maximum of the PSF
-define	WX		2	# Previous X cursor position
-define	WY		3	# Previous Y cursor position
-define	IMNAME		4	# Image name
-define	CWX		5	# Current X cursor position
-define	CWY		6	# Current Y cursor position
-define	CLNAME		7	# Coordinates file name
-define	PLOTFILE	8	# Name of the plotfile
-define	POSITIVE	9	# Emission or absorption feature
-define	ITIME		10	# Exposure time
-define	EXPOSURE	11	# Exposure time keyword
-define	DATAMIN		12	# Minimum good data value
-define	DATAMAX		13	# Maximum good data value
-define	OUTNAME		14	# Output file name
-define	SCALE		15	# Scale in pixels / unit
-define	AIRMASS		16	# Airmass keyword
-define	XAIRMASS	17	# Airmass value
-define	FILTER		18	# Filter keyword
-define	FILTERID	19	# Filter id
+define	IMNAME		1	# Image name
+define	IMROOT		2	# Image name
+define	CLNAME		3	# Coordinates file name
+define	CLROOT		4	# Coordinates file name
+define	PLOTFILE	5	# Name of the plotfile
+define	OUTNAME		6	# Output file name
+
+define	WCSIN		7	# Input WCS
+define	WCSOUT		8	# Input WCS
+define	MW		9	# MWCS descriptor
+define	CTIN		10	# Input WCS transformation
+define	CTOUT		11	# Output WCS transformation
+
+define	SCALE		12	# Scale in pixels / unit
+define	FWHMPSF		13	# Full width half maximum of the PSF
+define	POSITIVE	14	# Emission or absorption feature
+define	DATAMIN		15	# Minimum good data value
+define	DATAMAX		16	# Maximum good data value
+
+define	ITIME		17	# Exposure time
+define	AIRMASS		18	# Airmass keyword
+define	FILTER		19	# Filter keyword
 define	OBSTIME		20	# Time of observation keyword
-define	OTIME		21	# Time stamp
+
+define	XAIRMASS	21	# Airmass value
+define	FILTERID	22	# Filter id
+define	OTIME		23	# Time stamp
+define	EXPOSURE	24	# Exposure time keyword
+
+define	WX		25	# Previous X cursor position
+define	WY		26	# Previous Y cursor position
+define	CWX		27	# Current X cursor position
+define	CWY		28	# Current Y cursor position
+
+# Define the WCS types
+
+define	WCSINSTR		"|logical|tv|physical|world|"
+define	WCSOUTSTR		"|logical|tv|physical|"
+define	WCS_LOGICAL		1
+define	WCS_TV			2
+define	WCS_PHYSICAL		3
+define	WCS_WORLD		4
 
 # define APPHOT keywords
 
@@ -44,20 +65,6 @@ define	KY_OBSTIME	"obstime"
 define	KY_OTIME	"otime"
 
 # define APPHOT units strings
-
-#define	UN_FWHMPSF	"scaleunit"
-#define	UN_POSITIVE	"switch"
-#define	UN_ITIME	"timeunit"
-#define	UN_EXPOSURE	"keyword"
-#define	UN_DATAMIN	"counts"
-#define	UN_DATAMAX	"counts"
-#define	UN_SCALE	"units"
-#define	UN_AIRMASS	"keyword"
-#define	UN_XAIRMASS	"number"
-#define	UN_FILTER	"keyword"
-#define	UN_FILTERID	"name"
-#define	UN_OBSTIME	"keyword"
-#define	UN_OTIME	"timeunit"
 
 define	UN_ASCALEUNIT	"scaleunit"
 define	UN_ASWITCH	"switch"
@@ -88,6 +95,11 @@ define	APCMD_FILTER	13
 define	APCMD_FILTERID	14
 define	APCMD_OBSTIME	15
 define	APCMD_OTIME	16
+
+
+# Define the memory cacheing fudge factor
+
+define	MEMFUDGE	1.05
 
 # Miscellaneous commands
 

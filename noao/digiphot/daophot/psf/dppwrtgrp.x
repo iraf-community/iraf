@@ -8,9 +8,10 @@ include	"../lib/psfdef.h"
 # DP_WNEISTARS -- Identify the neighbour stars of the psf stars and write them
 # out in groups.
 
-procedure dp_wneistars (dao, psfgr)
+procedure dp_wneistars (dao, im, psfgr)
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 int	psfgr			# the output group file descriptor
 
 bool	newfile
@@ -25,7 +26,7 @@ begin
 	do psf_star = 1, DP_PNUM(psf) {
 	    if (dp_neistars (dao, psf_star, top_star, nei1, nei2) <= 0)
 	        ;
-	    call dp_pwrtgrp (dao, psfgr, psf_star, nei1, nei2, newfile)
+	    call dp_pwrtgrp (dao, im, psfgr, psf_star, nei1, nei2, newfile)
 	    if (newfile)
 	        newfile = false
 	}
@@ -105,9 +106,10 @@ end
 
 # DP_PWRTGRP --  Add a group to the PSF output group file.
 
-procedure dp_pwrtgrp (dao, psfgr, psf_star, nei1_star, nei2_star, new_table)
+procedure dp_pwrtgrp (dao, im, psfgr, psf_star, nei1_star, nei2_star, new_table)
 
 pointer	dao			# the pointer to the daophot structure
+pointer	im			# the input image descriptor
 int	psfgr			# the group file descriptor
 int	psf_star		# the psf star index
 int	nei1_star, nei2_star	# the first and last neighbour star indices
@@ -128,11 +130,11 @@ begin
 
 	    # Make a new group.
 	    if (DP_TEXT(dao) == YES)
-		call dp_pxnewgrp (dao, psfgr, psf_star, nei1_star, nei2_star,
-		    group)
+		call dp_pxnewgrp (dao, im, psfgr, psf_star, nei1_star,
+		    nei2_star, group)
 	    else
-	        call dp_ptnewgrp  (dao, psfgr, psf_star, nei1_star, nei2_star,
-		    group) 
+	        call dp_ptnewgrp  (dao, im, psfgr, psf_star, nei1_star,
+		    nei2_star, group) 
 
 	} else  {
 
@@ -141,11 +143,11 @@ begin
 
 	    # Add to the file.
 	    if (DP_TEXT(dao) == YES)
-	        call dp_pxaddgrp (dao, psfgr, psf_star, nei1_star, nei2_star,
-		    group)
+	        call dp_pxaddgrp (dao, im, psfgr, psf_star, nei1_star,
+		    nei2_star, group)
 	    else
-	        call dp_ptaddgrp (dao, psfgr, psf_star, nei1_star, nei2_star,
-		    group)
+	        call dp_ptaddgrp (dao, im, psfgr, psf_star, nei1_star,
+		    nei2_star, group)
 	}
 
 end
@@ -155,14 +157,15 @@ define	NCOLUMN	5
 
 # DP_WPLIST -- Write the list of psf stars to the output psf star list.
 
-procedure dp_wplist (dao, opst)
+procedure dp_wplist (dao, im, opst)
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor 
 int	opst			# the output psf star list descriptor
 
-pointer	apsel, psf, sp, ocolpoint
-bool	itob()
+pointer	apsel, psf, sp, ocolpoint, tx, ty
 int	dp_stati()
+bool	itob()
 
 begin
 	# Get some daophot pointers.
@@ -172,6 +175,8 @@ begin
 	# Allocate some working memory.
 	call smark (sp)
 	call salloc (ocolpoint, NCOLUMN, TY_POINTER)
+	call salloc (tx, DP_PNUM(psf), TY_REAL)
+	call salloc (ty, DP_PNUM(psf), TY_REAL)
 
 	# Initialize the output file.
 	if (dp_stati (dao, TEXT) == YES) {
@@ -183,9 +188,10 @@ begin
 	}
 
 	# Write out the stars.
+	call dp_wout (dao, im, Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
+	    Memr[tx], Memr[ty], DP_PNUM(psf))
 	call dp_wpstars (opst, Memi[ocolpoint], itob (dp_stati (dao, TEXT)),
-	    Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
-	    Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
+	    Memi[DP_APID(apsel)], Memr[tx], Memr[ty], Memr[DP_APMAG(apsel)],
 	    Memr[DP_APMSKY(apsel)], DP_PNUM(psf))
 
 	# Free memory.
@@ -205,16 +211,18 @@ define	PGR_DATASTR "%-9d%10t%-6d%16t%-10.3f%26t%-10.3f%36t%-12.3f%48t\
 # DP_PXNEWGRP -- Create a new PSF output group text file and write the
 # first group to it.
 
-procedure dp_pxnewgrp (dao, tp, psf_star, nei1_star, nei2_star, group)
+procedure dp_pxnewgrp (dao, im, tp, psf_star, nei1_star, nei2_star, group)
 
 pointer	dao			# pointer to the daophot structure.
+pointer	im			# pointer to the input image
 int	tp			# the output file descriptor
 int	psf_star		# the psf star index
 int	nei1_star, nei2_star	# the first and last neighbour star indices
 int	group			# current group 
 
-int	i
+real	tx, ty
 pointer	apsel
+int	i
 
 begin
 	# Check to see if the PSF group file is open.
@@ -235,21 +243,25 @@ begin
 	call fprintf (tp, "#\n")
 
 	# Write out the psf star.
+	call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+psf_star-1],
+	    Memr[DP_APYCEN(apsel)+psf_star-1], tx, ty, 1)
 	call fprintf (tp, PGR_DATASTR)
 	    call pargi (Memi[DP_APID(apsel)+psf_star-1])
 	    call pargi (group)
-	    call pargr (Memr[DP_APXCEN(apsel)+psf_star-1])
-	    call pargr (Memr[DP_APYCEN(apsel)+psf_star-1])
+	    call pargr (tx)
+	    call pargr (ty)
 	    call pargr (Memr[DP_APMAG(apsel)+psf_star-1])
 	    call pargr (Memr[DP_APMSKY(apsel)+psf_star-1])
 
 	# Write out the neighbour stars.
 	do i = nei1_star, nei2_star {
+	    call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+i-1],
+	        Memr[DP_APYCEN(apsel)+i-1], tx, ty, 1)
 	    call fprintf (tp, PGR_DATASTR)
 		call pargi (Memi[DP_APID(apsel)+i-1])
 		call pargi (group)
-	        call pargr (Memr[DP_APXCEN(apsel)+i-1])
-	        call pargr (Memr[DP_APYCEN(apsel)+i-1])
+	        call pargr (tx)
+	        call pargr (ty)
 	        call pargr (Memr[DP_APMAG(apsel)+i-1])
 	        call pargr (Memr[DP_APMSKY(apsel)+i-1])
 	}
@@ -259,17 +271,19 @@ end
 # DP_PTNEWGRP -- Create a new PSF output group ST table and add to a new
 # group to it.
 
-procedure dp_ptnewgrp (dao, tp, psf_star, nei1_star, nei2_star, group)
+procedure dp_ptnewgrp (dao, im, tp, psf_star, nei1_star, nei2_star, group)
 
 pointer	dao			# pointer to the daophot structure.
+pointer	im			# the input image descriptor
 pointer	tp			# pointer to table
 int	psf_star		# the psf star index
 int	nei1_star, nei2_star	# the first and last psf star indices
 int	group			# current group 
 
-int	i, j, row
-pointer	apsel
+real	tx, ty
 pointer	sp, colnames, colunits, colformat, coldtype, collen, colpoint
+pointer	apsel
+int	i, j, row
 
 begin
 	# Check to see if the PSF group file is open.
@@ -334,12 +348,12 @@ begin
 	call tbtcre (tp)
 
 	# Write out the psf star.
+	call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+psf_star-1],
+	    Memr[DP_APYCEN(apsel)+psf_star-1], tx, ty, 1)
 	call tbrpti (tp, Memi[colpoint], Memi[DP_APID(apsel)+psf_star-1], 1, 1)
 	call tbrpti (tp, Memi[colpoint+1], group, 1, 1)
-	call tbrptr (tp, Memi[colpoint+2], Memr[DP_APXCEN(apsel)+psf_star-1],
-	    1, 1)
-	call tbrptr (tp, Memi[colpoint+3], Memr[DP_APYCEN(apsel)+psf_star-1],
-	    1, 1)
+	call tbrptr (tp, Memi[colpoint+2], tx, 1, 1)
+	call tbrptr (tp, Memi[colpoint+3], ty, 1, 1)
 	call tbrptr (tp, Memi[colpoint+4], Memr[DP_APMAG(apsel)+psf_star-1],
 	    1, 1)
 	call tbrptr (tp, Memi[colpoint+5], Memr[DP_APMSKY(apsel)+psf_star-1],
@@ -348,12 +362,12 @@ begin
 	# Now write out the group.
 	row = 2
 	do i = nei1_star, nei2_star {
+	    call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+i-1],
+	        Memr[DP_APYCEN(apsel)+i-1], tx, ty, 1)
 	    call tbrpti (tp, Memi[colpoint], Memi[DP_APID(apsel)+i-1], 1, row)
 	    call tbrpti (tp, Memi[colpoint+1], group, 1, row)
-	    call tbrptr (tp, Memi[colpoint+2], Memr[DP_APXCEN(apsel)+i-1],
-	        1, row)
-	    call tbrptr (tp, Memi[colpoint+3], Memr[DP_APYCEN(apsel)+i-1],
-	        1, row)
+	    call tbrptr (tp, Memi[colpoint+2], tx, 1, row)
+	    call tbrptr (tp, Memi[colpoint+3], ty, 1, row)
 	    call tbrptr (tp, Memi[colpoint+4], Memr[DP_APMAG(apsel)+i-1],
 	        1, row)
 	    call tbrptr (tp, Memi[colpoint+5], Memr[DP_APMSKY(apsel)+i-1],
@@ -408,15 +422,23 @@ begin
 	call tbhadt (tp, "TASK", "psf")
 
 	# Define the input and output files.
-	call tbhadt (tp, "IMAGE", DP_INIMAGE(dao))
-	call tbhadt (tp, "PHOTFILE", DP_INPHOTFILE(dao))
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "IMAGE", Memc[outstr])
+
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PHOTFILE", Memc[outstr])
 	if (DP_COORDS(dao) == EOS)
 	    call tbhadt (tp, "PSTFILE", "\"\"")
-	else
-	    call tbhadt (tp, "PSTFILE", DP_COORDS(dao))
+	else {
+	    call dp_froot (DP_COORDS(dao), Memc[outstr], SZ_LINE)
+	    call tbhadt (tp, "PSTFILE", Memc[outstr])
+	}
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
 	call tbhadt (tp, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call tbhadt (tp, "OPSTFILE", DP_OUTREJFILE(dao))
-	call tbhadt (tp, "GRPSFILE", DP_OUTPHOTFILE(dao))
+	call dp_froot (DP_OUTREJFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "OPSTFILE", Memc[outstr])
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "GRPSFILE", Memc[outstr])
 
 	# Data dependent parameters.
 	call tbhadr (tp, "SCALE", DP_SCALE(dao))
@@ -474,15 +496,22 @@ begin
 	call dp_sparam (tp, "TASK", "psf", "name", "") 
 
 	# Define the input and output files.
-	call dp_sparam (tp, "IMAGE", DP_INIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "PHOTFILE", DP_INPHOTFILE(dao), "filename", "")
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "IMAGE", Memc[outstr], "imagename", "")
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PHOTFILE", Memc[outstr], "filename", "")
 	if (DP_COORDS(dao) == EOS)
 	    call dp_sparam (tp, "PSTFILE", "\"\"", "filename", "")
-	else
-	    call dp_sparam (tp, "PSTFILE", DP_COORDS(dao), "filename", "")
-	call dp_sparam (tp, "PSFIMAGE", DP_PSFIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "GRPSFILE", DP_OUTPHOTFILE(dao), "filename", "")
-	call dp_sparam (tp, "OPSTFILE", DP_OUTREJFILE(dao), "filename", "")
+	else {
+	    call dp_froot (DP_COORDS(dao), Memc[outstr], SZ_LINE)
+	    call dp_sparam (tp, "PSTFILE", Memc[outstr], "filename", "")
+	}
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PSFIMAGE", Memc[outstr], "imagename", "")
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "GRPSFILE", Memc[outstr], "filename", "")
+	call dp_froot (DP_OUTREJFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "OPSTFILE", Memc[outstr], "filename", "")
 
 	# Define the data dependent parameters.
 	call dp_rparam (tp, "SCALE", DP_SCALE(dao), "units/pix", "")
@@ -502,16 +531,18 @@ end
 
 # DP_PXADDGRP -- Add a new group to the existing PSF output group text file.
 
-procedure dp_pxaddgrp (dao, tp, psf_star, nei1_star, nei2_star, group)
+procedure dp_pxaddgrp (dao, im, tp, psf_star, nei1_star, nei2_star, group)
 
 pointer	dao			# pointer to daophot structure
+pointer	im			# the input image descriptor
 int	tp			# the output file descriptor
 int	psf_star		# the psf star index
 int	nei1_star, nei2_star	# the first and last neighbour star indices
 int	group			# current group
 
-int	i
+real	tx, ty
 pointer	apsel
+int	i
 
 begin
 	# Check to see if the PSF group file is open.
@@ -522,21 +553,25 @@ begin
 	apsel = DP_APSEL(dao)
 
 	# Write out the psf star.
+	call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+psf_star-1],
+	    Memr[DP_APYCEN(apsel)+psf_star-1], tx, ty, 1)
 	call fprintf (tp, PGR_DATASTR)
 	    call pargi (Memi[DP_APID(apsel)+psf_star-1])
 	    call pargi (group)
-	    call pargr (Memr[DP_APXCEN(apsel)+psf_star-1])
-	    call pargr (Memr[DP_APYCEN(apsel)+psf_star-1])
+	    call pargr (tx)
+	    call pargr (ty)
 	    call pargr (Memr[DP_APMAG(apsel)+psf_star-1])
 	    call pargr (Memr[DP_APMSKY(apsel)+psf_star-1])
 
 	# Now write out the group.
 	do i = nei1_star, nei2_star {
+	    call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+i-1],
+	        Memr[DP_APYCEN(apsel)+i-1], tx, ty, 1)
 	    call fprintf (tp, PGR_DATASTR)
 		call pargi (Memi[DP_APID(apsel)+i-1])
 		call pargi (group)
-	        call pargr (Memr[DP_APXCEN(apsel)+i-1])
-	        call pargr (Memr[DP_APYCEN(apsel)+i-1])
+	        call pargr (tx)
+	        call pargr (ty)
 	        call pargr (Memr[DP_APMAG(apsel)+i-1])
 	        call pargr (Memr[DP_APMSKY(apsel)+i-1])
 	}
@@ -545,16 +580,18 @@ end
 
 # DP_PTADDGRP -- Add a new group to the existing PSF output group ST table.
 
-procedure dp_ptaddgrp (dao, tp, psf_star, nei1_star, nei2_star, group)
+procedure dp_ptaddgrp (dao, im, tp, psf_star, nei1_star, nei2_star, group)
 
 pointer	dao			# pointer to daophot structure
+pointer	im			# the input image descriptor
 pointer	tp			# pointer to output table
 int	psf_star		# the psf star index
 int	nei1_star, nei2_star	# the first and last neighbor star indices
 int	group			# current group
 
-int	i, nrows
+real	tx, ty
 pointer	apsel, sp, colpoint
+int	i, nrows
 int	tbpsta()
 
 begin
@@ -573,14 +610,14 @@ begin
 	nrows = tbpsta (tp, TBL_NROWS)
 
 	# Write out the psf star
+	call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+psf_star-1],
+	    Memr[DP_APYCEN(apsel)+psf_star-1], tx, ty, 1)
 	nrows = nrows + 1
 	call tbrpti (tp, Memi[colpoint], Memi[DP_APID(apsel)+psf_star-1],
 	    1, nrows)
 	call tbrpti (tp, Memi[colpoint+1], group, 1, nrows)
-	call tbrptr (tp, Memi[colpoint+2], Memr[DP_APXCEN(apsel)+psf_star-1],
-	    1, nrows)
-	call tbrptr (tp, Memi[colpoint+3], Memr[DP_APYCEN(apsel)+psf_star-1],
-	    1, nrows)
+	call tbrptr (tp, Memi[colpoint+2], tx, 1, nrows)
+	call tbrptr (tp, Memi[colpoint+3], ty, 1, nrows)
 	call tbrptr (tp, Memi[colpoint+4], Memr[DP_APMAG(apsel)+psf_star-1],
 	    1, nrows)
 	call tbrptr (tp, Memi[colpoint+5], Memr[DP_APMSKY(apsel)+psf_star-1],
@@ -589,12 +626,12 @@ begin
 	# Now write out the group.
 	do i = nei1_star, nei2_star {
 	    nrows = nrows + 1
+	    call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+i-1],
+	        Memr[DP_APYCEN(apsel)+i-1], tx, ty, 1)
 	    call tbrpti (tp, Memi[colpoint], Memi[DP_APID(apsel)+i-1], 1, nrows)
 	    call tbrpti (tp, Memi[colpoint+1], group, 1, nrows)
-	    call tbrptr (tp, Memi[colpoint+2], Memr[DP_APXCEN(apsel)+i-1], 1,
-	        nrows)
-	    call tbrptr (tp, Memi[colpoint+3], Memr[DP_APYCEN(apsel)+i-1], 1,
-	        nrows)
+	    call tbrptr (tp, Memi[colpoint+2], tx, 1, nrows)
+	    call tbrptr (tp, Memi[colpoint+3], ty, 1, nrows)
 	    call tbrptr (tp, Memi[colpoint+4], Memr[DP_APMAG(apsel)+i-1], 1,
 	        nrows)
 	    call tbrptr (tp, Memi[colpoint+5], Memr[DP_APMSKY(apsel)+i-1], 1,

@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set LIBS="-lxtools -liminterp"
+	$set LIBS="-lxtools -liminterp -lcurfit -lgsurfit -lds"
 	$update	libpkg.a
 	$omake	x_nproto.x
 	$link	x_nproto.o libpkg.a $(LIBS) -o xx_nproto.e
@@ -20,6 +20,7 @@ install:
 	;
 
 libpkg.a:
+	@ace
 	@ir
 	t_binpairs.x	
 	t_linpol.x	<imhdr.h> <error.h>

@@ -9,17 +9,22 @@ int	frame			#I display frame
 char	imname[maxch]		#O image name
 int	maxch			#I max chars out
 
-int	status
-pointer	sp, dname, iw
+int	snx, sny, dx, dy, dnx, dny, status, imd_query_map()
+real	sx, sy
+pointer	sp, reg, dname, iw
 pointer	iw_open()
-errchk	iw_open
+errchk	imd_query_map, iw_open
 
 begin
 	call smark (sp)
-	call salloc (dname, SZ_LINE, TY_CHAR)
+	call salloc (reg, SZ_FNAME, TY_CHAR)
+	call salloc (dname, SZ_FNAME, TY_CHAR)
 
-	iw = iw_open (ds, frame, Memc[dname], SZ_LINE, status)
-	call iw_close (iw)
+	if (imd_query_map (frame, Memc[reg], sx, sy, snx, sny, dx, dy, dnx, dny,
+	    Memc[dname]) == ERR) {
+	    iw = iw_open (ds, frame/100, Memc[dname], SZ_FNAME, status)
+	    call iw_close (iw)
+	}
 
 	# call imgimage (Memc[dname], imname, maxch)
 	call strcpy (Memc[dname], imname, maxch)

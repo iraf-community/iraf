@@ -98,7 +98,7 @@ stg:
 	;
 libmain:
 	$echo "-------------- LIBMAIN.O -------------" 
-	$ifolder (lib$libmain.o, host$os/zmain.c)
+	$ifolder (bin$libmain.o, host$os/zmain.c)
 	    $call libmain.o
 	$else
 	    $echo "Libmain.o is up to date"
@@ -189,6 +189,7 @@ libsys.a:				# Core system
 	@symtab
 	@tty
 	@ki
+	@psio
 
 	@host$gdev/			# HSI graphics device drivers
 	;

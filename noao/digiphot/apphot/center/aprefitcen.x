@@ -1,5 +1,6 @@
 include <mach.h>
 include "../lib/apphotdef.h"
+include "../lib/apphot.h"
 include "../lib/noisedef.h"
 include "../lib/centerdef.h"
 include "../lib/center.h"
@@ -9,9 +10,10 @@ define	CONVERT	.424660900	# conversion factor from fwhmpsf to sigma
 # APREFITCENTER -- Procedure to refit the centers assuming that the appropriate
 # pixel buffer is in memory. See apfitcenter for further information.
 
-int procedure aprefitcenter (ap, ier)
+int procedure aprefitcenter (ap, im, ier)
 
 pointer	ap		# pointer to the apphot structure
+pointer	im		# the input image descriptor
 int	ier		# previous error code
 
 int	fier
@@ -27,13 +29,41 @@ begin
 	AP_YCENTER(cen) = AP_CYCUR(cen)
 	AP_XSHIFT(cen) = 0.0
 	AP_YSHIFT(cen) = 0.0
+	AP_OXSHIFT(cen) = 0.0
+	AP_OYSHIFT(cen) = 0.0
 	AP_XERR(cen) = INDEFR
 	AP_YERR(cen) = INDEFR
 
-	# Return input coordinates if no center fitting.
-	if (IS_INDEFR(AP_CXCUR(cen)) || IS_INDEFR(AP_CYCUR(cen)))
+	# Return if the center is undefined.
+	if (IS_INDEFR(AP_CXCUR(cen)) || IS_INDEFR(AP_CYCUR(cen))) {
+	    AP_OXINIT(cen) = INDEFR
+	    AP_OYINIT(cen) = INDEFR
+            AP_OXCENTER(cen) = INDEFR
+	    AP_OYCENTER(cen) = INDEFR
 	    return (AP_CTR_NOAREA)
-	else if (AP_CENTERFUNCTION(cen) == AP_NONE)
+	}
+
+	# Convert the coordinates.
+	switch (AP_WCSOUT(ap)) {
+        case WCS_WORLD, WCS_PHYSICAL:
+            call ap_ltoo (ap, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXINIT(cen),
+		AP_OYINIT(cen), 1)
+            call ap_ltoo (ap, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXCENTER(cen),
+		AP_OYCENTER(cen), 1)
+        case WCS_TV:
+            call ap_ltov (im, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXINIT(cen),
+		AP_OYINIT(cen), 1)
+            call ap_ltov (im, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXCENTER(cen),
+		AP_OYCENTER(cen), 1)
+        default:
+	    AP_OXINIT(cen) = AP_CXCUR(cen)
+	    AP_OYINIT(cen) = AP_CYCUR(cen)
+            AP_OXCENTER(cen) = AP_CXCUR(cen)
+	    AP_OYCENTER(cen) = AP_CYCUR(cen)
+        }
+
+	# Return input coordinates if no center fitting.
+	if (AP_CENTERFUNCTION(cen) == AP_NONE)
 	    return (AP_OK)
 
 	# Choose the centering algorithm.
@@ -93,6 +123,33 @@ begin
 	    # do nothing gracefully
         }
 
+	# Convert the coordinates.
+        switch (AP_WCSOUT(ap)) {
+        case WCS_WORLD, WCS_PHYSICAL:
+            call ap_ltoo (ap, AP_XCENTER(cen), AP_YCENTER(cen),
+                AP_OXCENTER(cen), AP_OYCENTER(cen), 1)
+            call ap_ltoo (ap, AP_XCENTER(cen) - AP_XSHIFT(cen),
+                AP_YCENTER(cen) - AP_YSHIFT(cen), AP_OXINIT(cen),
+                AP_OYINIT(cen), 1)
+            AP_OXSHIFT(cen) = AP_OXCENTER(cen) - AP_OXINIT(cen)
+            AP_OYSHIFT(cen) = AP_OYCENTER(cen) - AP_OYINIT(cen)
+        case WCS_TV:
+            call ap_ltov (im, AP_XCENTER(cen), AP_YCENTER(cen),
+                AP_OXCENTER(cen), AP_OYCENTER(cen), 1)
+            call ap_ltov (im, AP_XCENTER(cen) - AP_XSHIFT(cen),
+                AP_YCENTER(cen) - AP_YSHIFT(cen), AP_OXINIT(cen),
+                AP_OYINIT(cen), 1)
+            AP_OXSHIFT(cen) = AP_OXCENTER(cen) - AP_OXINIT(cen)
+            AP_OYSHIFT(cen) = AP_OYCENTER(cen) - AP_OYINIT(cen)
+        default:
+	    AP_OXCENTER(cen) = AP_XCENTER(cen)
+	    AP_OYCENTER(cen) = AP_YCENTER(cen)
+	    AP_OXINIT(cen) = AP_XCENTER(cen) - AP_XSHIFT(cen)
+	    AP_OYINIT(cen) = AP_YCENTER(cen) - AP_YSHIFT(cen)
+	    AP_OXSHIFT(cen) = AP_XSHIFT(cen)
+	    AP_OYSHIFT(cen) = AP_YSHIFT(cen)
+        }
+
 	# Return appropriate error code.
 	if (fier != AP_OK) {
 	    AP_XCENTER(cen) = AP_CXCUR(cen)
@@ -101,6 +158,25 @@ begin
 	    AP_YSHIFT(cen) = 0.0
 	    AP_XERR(cen) = INDEFR
 	    AP_YERR(cen) = INDEFR
+	    switch (AP_WCSOUT(ap)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_ltoo (ap, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXINIT(cen),
+		    AP_OYINIT(cen), 1)
+                call ap_ltoo (ap, AP_CXCUR(cen), AP_CYCUR(cen),
+		    AP_OXCENTER(cen), AP_OYCENTER(cen), 1)
+            case WCS_TV:
+                call ap_ltov (im, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXINIT(cen),
+		    AP_OYINIT(cen), 1)
+                call ap_ltov (im, AP_CXCUR(cen), AP_CYCUR(cen),
+		    AP_OXCENTER(cen), AP_OYCENTER(cen), 1)
+            default:
+	        AP_OXCENTER(cen) = AP_CXCUR(cen)
+	        AP_OYCENTER(cen) = AP_CYCUR(cen)
+	        AP_OXINIT(cen) = AP_CXCUR(cen)
+	        AP_OYINIT(cen) = AP_CYCUR(cen)
+            }
+            AP_OXSHIFT(cen) = 0.0
+            AP_OYSHIFT(cen) = 0.0
 	    return (fier)
 	} else if (ier == AP_CTR_BADDATA) {
 	    return (AP_CTR_BADDATA)

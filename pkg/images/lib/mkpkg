@@ -42,17 +42,17 @@ libpkg.a:
 	# used by ccmap, ccsetwcs, cctran, skyxymatch, skyctran, imcctran
 	# ccxymatch tasks
 	# put in xtools at some point ?
-	skywcs.x	<imhdr.h> <imio.h> <math.h> <mwset.h> \
-			"skywcs.h" "skywcsdef.h"
+	#skywcs.x	<imhdr.h> <imio.h> <math.h> <mwset.h> \
+	#		"skywcs.h" "skywcsdef.h"
 
 	# used by ccmap, ccxymatch
-	rgccwcs.x	<imhdr.h> <math.h> <mwset.h> "skywcs.h"
+	rgccwcs.x	<imhdr.h> <math.h> <mwset.h> <pkg/skywcs.h>
 
 	# used by xyxymatch, ccxymatch, imtile tasks
 	rgsort.x
 
-	# used by skyxymatch and imctran tasks, include in skywcs.h?
-	rglltran.x	<math.h> "skywcs.h"
+	# used by skyxymatch and imctran tasks, include in skywcs.x ?
+	rglltran.x	<math.h> <pkg/skywcs.h>
 
 	# used by skyxymatch, wcsxymatch, imcctran tasks
 	rgxymatch.x	<mwset.h>

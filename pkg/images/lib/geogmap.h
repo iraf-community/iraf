@@ -19,17 +19,19 @@ define	YYRESID		5		# y fit residuals versus y
 # define the permitted colon commands
 
 define  GM_CMDS         "|show|projection|refpoint|fitgeometry|function|\
-xxorder|xyorder|yxorder|yyorder|xxterms|yxterms|reject|"
+order|xxorder|xyorder|yxorder|yyorder|xxterms|yxterms|reject|maxiter|"
 
 define  GMCMD_SHOW      	1
 define	GMCMD_PROJECTION	2
 define	GMCMD_REFPOINT		3
 define  GMCMD_GEOMETRY  	4
 define  GMCMD_FUNCTION  	5
-define  GMCMD_XXORDER   	6
-define  GMCMD_XYORDER   	7
-define  GMCMD_YXORDER   	8
-define  GMCMD_YYORDER   	9
-define  GMCMD_XXTERMS   	10
-define  GMCMD_YXTERMS   	11
-define  GMCMD_REJECT    	12
+define  GMCMD_ORDER  		6
+define  GMCMD_XXORDER   	7
+define  GMCMD_XYORDER   	8
+define  GMCMD_YXORDER   	9
+define  GMCMD_YYORDER   	10
+define  GMCMD_XXTERMS   	11
+define  GMCMD_YXTERMS   	12
+define  GMCMD_REJECT    	13
+define  GMCMD_MAXITER    	14

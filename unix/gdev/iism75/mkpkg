@@ -6,12 +6,12 @@ $checkin  libsys.a lib$
 $exit
 
 libsys.a:
-	m75put.x	m75.h <mach.h> iis.h
+	m75put.x	iis.h m75.h <mach.h>
 	zclm75.x	m75.h <mach.h>
 	zopm75.x	m75.h <mach.h>
-	zrdm75.x	m75.h <mach.h>
-	zstm75.x	m75.h <mach.h> <fio.h>
-	zwrm75.x	m75.h <mach.h> iis.h
+	zrdm75.x	iis.h m75.h <mach.h>
+	zstm75.x	m75.h <fio.h> <mach.h>
+	zwrm75.x	iis.h m75.h <mach.h>
 	zwtm75.x	m75.h <mach.h>
 	zzrdii.x	m75.h <mach.h>
 	zzwrii.x	m75.h <mach.h>

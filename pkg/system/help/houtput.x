@@ -24,8 +24,8 @@ procedure houtput (ctrl, lbuf)
 pointer	ctrl
 char	lbuf[ARB]
 bool	formfeed, query_enabled
-int	map_cc, maxlines, nlines, junk, ip, cmd
-int	envgeti(), ttyclear(), ho_getcmd()
+int	map_cc, maxlines, nlines, ip, cmd
+int	envgeti(), ho_getcmd()
 data	map_cc /YES/
 
 begin
@@ -91,7 +91,7 @@ begin
 		}
 
 		if (formfeed && H_QUIT(ctrl) == NO) {
-		    junk = ttyclear (H_OUT(ctrl), H_TTY(ctrl))
+		    call ttyclear (H_OUT(ctrl), H_TTY(ctrl))
 		    nlines = 0
 		}
 	    }

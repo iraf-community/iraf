@@ -1,5 +1,6 @@
 include <imhdr.h>
 include <error.h>
+include <mach.h>
 
 define	LEN_CP		32		# center structure pointer
 
@@ -13,15 +14,16 @@ define	LO_THRESH	Memr[($1)+5]
 define	HI_THRESH	Memr[($1)+6]
 define	MAX_TRIES	Memi[($1)+7]
 define	TOL		Memi[($1)+8]
+define	MAX_SHIFT	Memr[($1)+9]
 
 # other scalars
-define	IM		Memi[($1)+9]
-define	BOXSIZE		Memi[($1)+10]
-define	BACK_LOCAL	Memr[($1)+11]
-define	LO_LOCAL	Memr[($1)+12]
-define	HI_LOCAL	Memr[($1)+13]
-define	NIMAGES		Memi[($1)+14]
-define	NCOORDS		Memi[($1)+15]
+define	IM		Memi[($1)+10]
+define	BOXSIZE		Memi[($1)+11]
+define	BACK_LOCAL	Memr[($1)+12]
+define	LO_LOCAL	Memr[($1)+13]
+define	HI_LOCAL	Memr[($1)+14]
+define	NIMAGES		Memi[($1)+15]
+define	NCOORDS		Memi[($1)+16]
 
 # expensive, but the indexing isn't done excessively many times
 define	OFF1D		(($1)-1)
@@ -171,7 +173,15 @@ begin
 		    BOXSIZE(cp) = SMALLBOX(cp)
 		    if (ia_center (cp, x, y, XCENTER(cp,i,j), YCENTER(cp,i,j),
 			XSIGMA(cp,i,j), YSIGMA(cp,i,j)) == ERR) {
+			REJECTED(cp,i,j) = YES
+			next
+		    }
 
+		    if (abs (XCENTER(cp,i,j) - x) > MAX_SHIFT(cp)) {
+			REJECTED(cp,i,j) = YES
+			next
+		    }
+		    if (abs (YCENTER(cp,i,j) - y) > MAX_SHIFT(cp)) {
 			REJECTED(cp,i,j) = YES
 			next
 		    }
@@ -226,7 +236,6 @@ begin
 
 		    if (x < 1 || x > XSIZE(cp,nimages+1) ||
 			y < 1 || y > YSIZE(cp,nimages+1)) {
-
 			REJECTED(cp,nimages+1,j) = YES
 			next
 		    }
@@ -235,7 +244,15 @@ begin
 		    if (ia_center (cp, x, y, XCENTER(cp,nimages+1,j),
 			YCENTER(cp,nimages+1,j), XSIGMA(cp,nimages+1,j),
 			YSIGMA(cp,nimages+1,j)) == ERR) {
+			REJECTED(cp,nimages+1,j) = YES
+			next
+		    }
 
+		    if (abs (XCENTER(cp,nimages+1,j) - x) > MAX_SHIFT(cp)) {
+			REJECTED(cp,nimages+1,j) = YES
+			next
+		    }
+		    if (abs (YCENTER(cp,nimages+1,j) - y ) > MAX_SHIFT(cp)) {
 			REJECTED(cp,nimages+1,j) = YES
 			next
 		    }
@@ -356,6 +373,11 @@ begin
 
 	MAX_TRIES(cp)	= max (clgeti ("niterate"), 2)
 	TOL(cp)		= abs (clgeti ("tolerance"))
+	MAX_SHIFT(cp)   = clgetr ("maxshift")
+	if (IS_INDEFR(MAX_SHIFT(cp)))
+	    MAX_SHIFT(cp) = MAX_REAL
+	else
+	    MAX_SHIFT(cp) = abs (MAX_SHIFT(cp))
 	VERBOSE(cp)	= btoi (clgetb ("verbose"))
 
 	IM(cp)		= NULL
@@ -875,13 +897,13 @@ begin
 	    yprop = sqrt (max (ysig2, 0.)) / nsources
 
 	    if (firsttime) {
-		call printf ("#Shifts%16tImage    X-shift  Err     ")
-		call printf ("Y-shift  Err     N    Internal\n")
+		call printf ("#Shifts%16tImage    X-shift   Err      ")
+		call printf ("Y-shift   Err      N      Internal\n")
 		firsttime = false
 	    }
 
 	    call printf (
-		"%20s   %7.2f (%.2f)   %7.2f (%.2f) %4d   (%.2f,%.2f)\n")
+		"%20s   %8.3f (%.3f)   %8.3f (%.3f) %4d   (%.3f,%.3f)\n")
 		call pargstr (Memc[img])
 		call pargr (XSHIFT(cp,i))
 		call pargr (xprop)

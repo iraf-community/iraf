@@ -355,6 +355,9 @@ cl> type rv.dat
 Note that this does not work when the task is run as a background job!
 .ih
 REVISIONS
+.ls RVCORRECT V2.11.4
+The ut keyword can be in either date plus time or hours.
+.le
 .ls RVCORRECT V2.11
 Y2K update: The date keyword can be in the full format with full
 year and time.  The time takes precedence over a time keyword.

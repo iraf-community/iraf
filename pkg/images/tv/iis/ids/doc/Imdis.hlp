@@ -790,3 +790,4 @@ begin
 	call gescape (cv_gp, IDS_CONTROL, Mems[cv_stack], count+8)
 end
 .fi
+.endhelp

@@ -1,0 +1,12 @@
+# Declare the NICMOS JHKKs standards catalog variables
+
+catalog
+
+J		2	# J magnitude
+error(J)	3	# err J
+H		4	# H magnitude
+error(H)	5	# err H
+K		6	# K magnitude
+error(K)	7	# err K
+Ks		6	# Ks (K-short) magnitude
+error(Ks)	7	# err Ks

@@ -25,8 +25,9 @@ only if the the template is one-dimensional.  Individual apertures from a
 two-dimensional template may be
 extracted to 1-D using the \fIonedspec.scopy\fR task, and these new images may
 then be used in the template list as separate images.  (See the examples for
-how this may be done.) The default of '*' means to process all of the
-apertures in the spectrum.
+how this may be done). The default of '*' means to process all of the
+apertures in the spectrum.  Note that the sample regions named by the 
+\fIosample\fR and \fIrsample\fR parameters will apply to all apertures.
 .le
 .ls cursor = ""
 Graphics cursor input.

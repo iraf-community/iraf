@@ -2,8 +2,8 @@
 
 input,f,a,,,,Input images to be filtered
 output,f,a,,,,Output images
-xwindow,i,a,,,,X window size of median filter
-ywindow,i,a,,,,Y window size of median filter
+xwindow,i,a,,,,X window size of mode filter
+ywindow,i,a,,,,Y window size of mode filter
 zloreject,r,h,INDEF,,,Lowside pixel value cutoff
 zhireject,r,h,INDEF,,,High side pixel value cutoff
 boundary,s,h,'nearest',,,'Boundary (constant,nearest,reflect,wrap)'

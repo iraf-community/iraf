@@ -9,7 +9,7 @@ libpkg.a:
 	@igsfit
 
 	fcdbio.x	<error.h> <math/gsurfit.h> <pkg/dttext.h> <units.h>
-	fcdlist.x	<error.h>
+	fcdlist.x	<error.h> <mach.h>
 	fcfitcoords.x	<pkg/gtools.h> <pkg/igsfit.h> <pkg/xtanswer.h>
 	fcgetcoords.x	<imio.h> <mach.h> <pkg/dttext.h> <pkg/igsfit.h>
 	fcgetim.x	

@@ -12,9 +12,11 @@ define	IM_BNDRYPIXVAL	9	# for option IM_CONSTANT
 define	IM_CANCEL	10	# free any pixel data buffers
 define	IM_CLOSEFD	11	# set F_CLOSEFD on pixfile
 define	IM_BUFSIZE	12	# recommended FIO buffer size, chars
-define	IM_IMAGENAME	13	# name of open image section
-define	IM_PLDES	14	# pixel mask descriptor
-define	IM_RLIO		15	# enable range list i/o (image masks)
+define	IM_BUFFRAC	13	# FIO buffer as a fraction of full image
+define	IM_BUFMAX	14	# max size FIO buffer, chars
+define	IM_IMAGENAME	15	# name of open image section
+define	IM_PLDES	16	# pixel mask descriptor
+define	IM_RLIO		17	# enable range list i/o (image masks)
 
 define	IM_PMDES	IM_PLDES
 

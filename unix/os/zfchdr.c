@@ -7,7 +7,8 @@
 #define import_spp
 #include <iraf.h>
 
-char	oscwd[SZ_PATHNAME+1];		/* See ZFGCWD		*/
+extern	char oscwd[];
+
 
 /* ZFCHDR -- Change the current working directory.  Save directory name,
  * excluding the trailing "/", in oscwd so that a subsequent call to ZFGCWD

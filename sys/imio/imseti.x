@@ -27,6 +27,10 @@ begin
 	    IM_VADVICE(im) = value
 	case IM_BUFSIZE:
 	    IM_VBUFSIZE(im) = value
+	case IM_BUFFRAC:
+	    IM_VBUFFRAC(im) = value
+	case IM_BUFMAX:
+	    IM_VBUFMAX(im) = value
 	case IM_COMPRESS:
 	    IM_VCOMPRESS(im) = value
 	case IM_NBNDRYPIX:

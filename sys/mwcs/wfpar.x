@@ -79,6 +79,7 @@ begin
 
 	# Get the value of W for each axis, i.e. the world coordinates at
 	# the reference point.
+
 	wv = MI_DBUF(mw) + WCS_W(wp) - 1
 	do i = 1, 2
 	    FC_W(fc,i) = Memd[wv+CT_AXIS(ct,FC_AXIS(fc,i))-1]
@@ -132,6 +133,7 @@ begin
         # generating sphere for the projection. If RO is absent which
         # is the usual case set it to 180 / PI. Search both axes for
         # this quantity.
+
         iferr {
             call mw_gwattrs (mw, FC_IRA(fc), "ro", Memc[atvalue], SZ_LINE)
         } then {
@@ -250,10 +252,10 @@ begin
 
         if (FC_W(fc,FC_IRA(fc)) >= 0.0d0) {
             if (FC_NATRA(fc) < 0.0d0)
-                FC_NATRA(fc) = FC_NATRA(fc) + 360.0d0
+                FC_NATRA(fc) = FC_NATRA(fc) + DTWOPI
         } else {
             if (FC_NATRA(fc) > 0.0d0)
-                FC_NATRA(fc) = FC_NATRA(fc) - 360.0d0
+                FC_NATRA(fc) = FC_NATRA(fc) - DTWOPI
         }
         FC_COSDEC(fc) = cos (FC_NATDEC(fc))
         FC_SINDEC(fc) = sin (FC_NATDEC(fc))

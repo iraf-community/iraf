@@ -69,6 +69,8 @@ begin
 	    	    WTS(id,j) = WTS(id,i)
 	    	    FWIDTH(id,j) = FWIDTH(id,i)
 	    	    FTYPE(id,j) = FTYPE(id,i)
+		    call mfree (Memi[ID_LABEL(id)+j-1], TY_CHAR)
+		    Memi[ID_LABEL(id)+j-1] = Memi[ID_LABEL(id)+i-1]
 		} else {
 		    if (Memd[wts+k] != 0.) {
 		        j = j + 1
@@ -81,10 +83,13 @@ begin
 			        WTS(id,j) = 0.
 	    	        FWIDTH(id,j) = FWIDTH(id,i)
 	    	        FTYPE(id,j) = FTYPE(id,i)
+			Memi[ID_LABEL(id)+j-1] = Memi[ID_LABEL(id)+i-1]
 		    }
 		    k = k + 1
 		}
 	    }
+	    do i = j+1, ID_NFEATURES(id)
+		Memi[ID_LABEL(id)+i-1] = NULL
 	    ID_NFEATURES(id) = j
 
 	    ID_SHIFT(id) = 0.

@@ -66,19 +66,68 @@ define	PIX_NOT_SRC_AND_DST	07B
 define	PIX_NOT_SRC_OR_DST	01B
 define	PIX_NOT_SRC_XOR_DST	11B
 
+
 # Macro defines for the line list data format.
 
+# ----- Old/original line list header definitions.  This version uses a
+# ----- three element header, but the maximum values are limited to 32K by
+# ----- the use of type short.
+
 # Line list definitions (accessed as a short integer array).
-define	LL_NREF		$1[1]		# number of references
-define	LL_BLEN		$1[2]		# length of buffer containing LL
-define	LL_LEN		$1[3]		# length of encoded line list
-define	LL_FIRST	4		# first data range entry in list
+define	OLL_NREF	$1[1]		# number of references
+define	OLL_BLEN	$1[2]		# length of buffer containing LL
+define	OLL_LEN		$1[3]		# length of encoded line list
+define	OLL_FIRST	4		# first data range entry in list
 
 # Line list definitions (accessed via a short integer pointer).
-define	LP_NREF		Mems[$1]	# number of references
-define	LP_BLEN		Mems[$1+1]	# length of buffer containing LL
-define	LP_LEN		Mems[$1+2]	# length of encoded line list
-define	LP_FIRST	3		# first data range entry in list
+define	OLP_NREF	Mems[$1]	# number of references
+define	OLP_BLEN	Mems[$1+1]	# length of buffer containing LL
+define	OLP_LEN		Mems[$1+2]	# length of encoded line list
+define	OLP_FIRST	3		# first data range entry in list
+
+
+# ----- New format line list header definitions.  This version uses a 
+# ----- variable length header and a version number to allow new encodings
+# ----- while retaining backwards compatibility.
+
+define  LL_CURVERSION	(-100)		# LL version code (must be negative)
+define	LL_OLDFORMAT	(LL_VERSION($1) > 0)
+define	LL_CURHDRLEN	7
+
+# Line list definitions (accessed as a short integer array).
+define	LL_NREFS	$1[1]		# number of references
+define	LL_HDRLEN	$1[2]		# length of encoded line list
+define	LL_VERSION	$1[3]		# version number (negative)
+define	LL_LENLO	$1[4]		# length of encoded line list
+define	LL_LENHI	$1[5]		# length of encoded line list
+define	LL_BLENLO	$1[6]		# length of LL buffer
+define	LL_BLENHI	$1[7]		# length of LL buffer
+
+# Handy line list macros.
+define	LL_NREF		(int(LL_NREFS($1)))
+define	LL_BLEN		((int(LL_BLENHI($1)))*32768+(int(LL_BLENLO($1))))
+define	LL_SETBLEN	LL_BLENLO($1)=mod($2,32768); LL_BLENHI($1)=($2)/32768
+define	LL_LEN		((int(LL_LENHI($1)))*32768+(int(LL_LENLO($1))))
+define	LL_SETLEN	LL_LENLO($1)=mod($2,32768); LL_LENHI($1)=($2)/32768
+define	LL_FIRST	(LL_HDRLEN($1)+1)
+
+# Line list definitions (accessed as a short integer pointer).
+define	LP_NREFS	Mems[$1]	# number of references
+define	LP_HDRLEN	Mems[$1+1]	# length of encoded line list
+define	LP_VERSION	Mems[$1+2]	# version number (negative)
+define	LP_LENLO	Mems[$1+3]	# length of encoded line list
+define	LP_LENHI	Mems[$1+4]	# length of encoded line list
+define	LP_BLENLO	Mems[$1+5]	# length of LL buffer
+define	LP_BLENHI	Mems[$1+6]	# length of LL buffer
+
+# Handy line list pointer macros.
+define	LP_NREF		(int(LP_NREFS($1)))
+define	LP_BLEN		(int(LP_BLENHI($1))*32768+int(LP_BLENLO($1)))
+define	LP_SETBLEN	LP_BLENLO($1)=mod($2,32768); LP_BLENHI($1)=($2)/32768
+define	LP_LEN		(int(LP_LENHI($1))*32768+int(LP_LENLO($1)))
+define	LP_SETLEN	LP_LENLO($1)=mod($2,32768); LP_LENHI($1)=($2)/32768
+define	LP_FIRST	(($1)+LP_HDRLEN($1))
+
 
 # Packed instruction decoding.
 define	I_SHIFT		10000B		# shift to encode/decode data bits

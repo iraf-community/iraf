@@ -49,10 +49,10 @@ begin
 	string_valued = false
 	for (ip=IDB_STARTVALUE;  ip <= IDB_ENDVALUE;  ip=ip+1)
 	    if (Memc[rp+ip-1] == '\'') {
-		string_valued = true
+		# String valued keyword.  Clear the previous value up to
+		# the second quote.
 
-		# Clear the previous value up to the second quote.
-		do i = ip, 80 {
+		do i = ip, IDB_RECLEN {
 		    ch = Memc[rp+i]
 		    if (ch == '\n')
 			break
@@ -61,7 +61,20 @@ begin
 			break
 		}
 
+		string_valued = true
 		break
+
+	    } else {
+		# Numeric keyword.  Clear any trailing characters from the
+		# previous value where trailing characters are those beyond
+		# column 31, ending with either a comment or the end of card.
+
+		do i = IDB_ENDVALUE, IDB_RECLEN {
+		    ch = Memc[rp+i]
+		    if (ch == '\n' || ch == ' ' || ch == '/')
+			break
+		    Memc[rp+i] = ' '
+		}
 	    }
 
 	# Encode the new value of the parameter.

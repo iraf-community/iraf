@@ -38,19 +38,17 @@ are ignored.
 .le
 .ls xrotation = INDEF, yrotation = INDEF
 The x and y rotation angles in degrees measured counter-clockwise with
-respect to the x and y axes. If database is undefined then xrotation and
-yrotation are interpreted as the rotation of the coordinates with respect
-to the x and y axes and default 0.0 and 0.0 degrees. For example xrotation
-and yrotation values of 30.0 and 30.0 will rotate a point 30 degrees
-counter-clockwise with respect to the x and y axes. To flip the x axis
-coordinates in this case either set the angles to 210.0 and 30.0 degrees
-or leave the angles set to 30.0 and 30.0 and set the xmag parameter to a
-negative value.  If database is defined these parameters are ignored. CCMAP
-computes the x and y rotation angles of the x and y axes, not the rotation
-angles of the coordinates. An celestial coordinate system rotated 30.0
-degrees counter-clockwise with respect to the pixel coordinate system
-will produce xrotation and yrotation values of 330.0 and 330.0 or
-equivalently -30.0 and -30.0 degrees in the database file 30.0 and 30.0.
+respect to the x and y axes. Xrotation and yrotation are interpreted as the
+rotation of the coordinates with respect to the x and y axes and default 0.0
+and 0.0 degrees. For example xrotation and yrotation values of 30.0 and 30.0
+will rotate a point 30 degrees counter-clockwise with respect to the x and y
+axes. To flip the x axis coordinates in this case either set the angles to
+210.0 and 30.0 degrees or leave the angles set to 30.0 and 30.0 and set the
+xmag parameter to a negative value. To set east to the up, down, left, and
+right directions, set xrotation to 90, 270, 180, and 0 respectively. To set
+north to the up, down, left, and right directions, set yrotation to  0, 180,
+90, and 270 degrees respectively. Any global rotation must be added to both the
+xrotation and yrotation values.
 .le
 .ls lngref = INDEF, latref = INDEF
 The celestial coordinates of the sky projection reference point, e.g.

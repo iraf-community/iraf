@@ -4,30 +4,33 @@
 #lpnode			: @ursa
 #plnode			: @ursa
 
-vmware			: vmware!/iraf/iraf/bin.redhat/irafks.e
-slack40			: slack40!/iraf/iraf/bin.linux/irafks.e
-suse62			: suse62!/iraf/iraf/bin.suse/irafks.e
-sol7			: sol7!/iraf/iraf/bin.sunos/irafks.e
-
 # Host table.
-aloe                	: aloe!/iraf/iraf/bin.linux/irafks.e
+aloe aloe.tuc.noao.ed  	: aloe!/iraf/iraf/bin.redhat/irafks.e
 anasazi                 : anasazi!/local/iraf/iraf/bin.ssun/irafks.e
 aquarius                : aquarius!/iraf/iraf/bin.ssun/irafks.e
 apus			: apus!/iraf/iraf/bin.ssun/irafks.e
 argo arg		: argo!/iraf/iraf/bin.ssun/irafks.e
 arun			: arun!/iraf/iraf/bin.sparc/irafks.e
+atand			: atand!/iraf/iraf/bin.redhat/irafks.e
 aten			: aten!/iraf/iraf/bin.ssun/irafks.e
 beet                    : beet!/iraf/iraf/bin.ssun/irafks.e
 bigx                    : bigx!/iraf/iraf/bin.sparc/irafks.e
 betelgeuse              : betelgeuse!/iraf/iraf/bin.linux/irafks.e
 bluemoon		: bluemoon!/iraf/iraf/bin.ssun/irafks.e
+bobcat			: bobcat!/iraf/iraf/bin.ssun/irafks.e
 bokchoy			: bokchoy!/iraf/iraf/bin.ssun/irafks.e
+bruckner		: bruckner!/iraf/iraf/bin.sparc/irafks.e
+bunyip			: bunyip!/iraf/iraf/bin.ssun/irafks.e
+camille                 : camille!/iraf/iraf/bin.redhat/irafks.e
 carina			: carina!/iraf/iraf/bin.ssun/irafks.e
 cephus			: cephus!/re02/iraf/iraf/bin.ddec/irafks.e
 ceres			: ceres!/iraf/iraf/bin.linux/irafks.e
+cetus			: cetus!/iraf/iraf/bin.macosx/irafks.e
 charfman                : charfman!/iraf/iraf/bin.sparc/irafks.e
+cholla                  : cholla!/iraf/iraf/bin.redhat/irafks.e
 chomper                 : chomper!/iraf/iraf/bin.ssun/irafks.e
 chopin                  : chopin!/iraf/iraf/bin.ssun/irafks.e
+climber                 : climber!/iraf/iraf/bin.ssun/irafks.e
 coma			: coma!/iraf/iraf/bin.ssun/irafks.e
 condorito		: condorito!/usr/iraf/bin.sparc/irafks.e
 corvus			: corvus!/iraf/iraf/bin.ssun/irafks.e
@@ -37,17 +40,19 @@ data			: data!/iraf/iraf/bin.ssun/irafks.e
 defiant			: defiant!/iraf/iraf/bin.ssun/irafks.e
 deneb			: deneb!/local/iraf/iraf/bin.ssun/irafks.e
 driftwood		: driftwood!/iraf/iraf/bin.ssun/irafks.e
-dynamo                  : dynamo!/usr/iraf/iraf/bin.sparc/irafks.e
+dropbear		: dropbear!/iraf/iraf/bin.redhat/irafks.e
 eagle			: eagle!/iraf/iraf/bin.sparc/irafks.e
 elqui			: elqui!/iraf/iraf/bin.sparc/irafks.e
 enzo                    : enzo!/iraf/iraf/bin.ssun/irafks.e
-equuleus		: equuleus!/local/iraf/iraf/bin.sparc/irafks.e
+equuleus		: equuleus!/local/iraf/iraf/bin.ssun/irafks.e
+new-equuleus		: new-equuleus!/local/iraf/iraf/bin.ssun/irafks.e
 felis			: felis!/u1/iraf/iraf/bin.rs6000/irafks.e
 gemini g		: gemini!/iraf/iraf/bin.sparc/irafks.e
-gronk			: gronk!/iraf/iraf/bin.ssun/irafks.e
+gonk			: gonk!/iraf/iraf/bin.ssun/irafks.e
+gongxx			: gongxx!/iraf/iraf/bin.ssun/irafks.e
 grotrian		: grotrian!/iraf/iraf/bin.sparc/irafks.e
 grus			: grus!/iraf/iraf/bin.ssun/irafks.e
-hohokam                 : hohokam!/local/iraf/iraf/bin.ssun/irafks.e
+hohokam                 : hohokam!/iraf/iraf/bin.ssun/irafks.e
 humu                    : humu!/solaris/iraf/iraf/bin.ssun/irafks.e
 inti                    : inti!/iraf/iraf/bin.ssun/irafks.e
 isis                    : isis!/local/iraf/iraf/bin.ssun/irafks.e
@@ -79,8 +84,11 @@ mozart			: mozart!/iraf/iraf/bin.ssun/irafks.e
 msgsun			: msgsun!/iraf/iraf/bin.sparc/irafks.e
 musca                   : musca!/iraf/iraf/bin.sparc/irafks.e
 mytoy			: mytoy!/iraf/iraf/bin.sparc/irafks.e
+nebula                  : nebula!/iraf/iraf/bin.ssun/irafks.e
+ndws archive            : ndws!/iraf/iraf/bin.freebsd/irafks.e
 norma			: norma!/iraf/iraf/bin.ssun/irafks.e
 odysseus                : odysseus!/iraf/iraf/bin.sparc/irafks.e
+ohmah                   : ohmah!/iraf/iraf/bin.redhat/irafks.e
 orion o			: orion!/iraf/iraf/bin.sparc/irafks.e
 otter                   : otter!/iraf/iraf/bin.sparc/irafks.e
 oso                     : oso!/iraf/iraf/bin.ssun/irafks.e
@@ -94,17 +102,19 @@ pisces pi		: pisces!/iraf/iraf/bin.ssun/irafks.e
 potosi 			: potosi!/iraf/iraf/bin.ssun/irafks.e
 prometheus prometheu    : prometheus!/local/iraf/iraf/bin.ssun/irafks.e
 puppis pu		: puppis!/iraf/iraf/bin.ssun/irafks.e
-pyxis pyx		: pyxis!/iraf/iraf.v2104/bin.f68881/irafks.e
+pym			: pym!/iraf/iraf/bin.redhat/irafks.e
 radix			: radix!/iraf/iraf/bin.sparc/irafks.e
 rainbow                 : rainbow!/iraf/iraf/bin.sparc/irafks.e
 roadrunner              : roadrunner!/iraf/iraf/bin.ssun/irafks.e
-rush                    : rush!/iraf/iraf/bin.sparc/irafks.e
 sagittarius		: sagittarius!/iraf/iraf/bin.sparc/irafks.e
 scorpius sco s		: scorpius!/local/iraf/bin.sparc/irafks.e
 seurat                  : seurat!/iraf/iraf/bin.ssun/irafks.e
 shea			: shea!/iraf/iraf/bin.redhat/irafks.e
+slack40                 : slack40!/iraf/iraf/bin.linux/irafks.e
+suse62                  : suse62!/iraf/iraf/bin.suse/irafks.e
 soi			: soi!/iraf/iraf/bin.ssun/irafks.e
 sol                     : sol!/usr/local/iraf/iraf/bin.ssun/irafks.e
+sol7                    : sol7!/iraf/iraf/bin.sunos/irafks.e
 solarium		: solarium!/iraf/iraf/bin.sparc/irafks.e
 soleil                  : soleil!/iraf/iraf/bin.ssun/irafks.e
 solstice                : solstice!/local/iraf/iraf/bin.ssun/irafks.e
@@ -122,8 +132,10 @@ turkey                  : turkey!/iraf/iraf/bin.sparc/irafks.e
 ursa u			: ursa!/iraf/iraf/bin.ssun/irafks.e
 vega			: vega!/iraf/iraf/bin.hp700/irafks.e
 vissun-1		: vissun-1!/iraf/iraf/bin.sparc/irafks.e
+vmware                  : vmware!/iraf/iraf/bin.redhat/irafks.e
 volans			: volans!/iraf/iraf/bin.sparc/irafks.e
 xari			: xari!/iraf/iraf/bin.ssun/irafks.e
+zathras			: zathras!/iraf/iraf/bin.ssun/irafks.e
 zippy			: zippy!/iraf/iraf/bin.redhat/irafks.e
 
 
@@ -165,6 +177,7 @@ coral coral.kpno.noao.edu       : coral!/usr/iraf/iraf/bin.sparc/irafks.e
 gyaos gyaos.kpno.noao.edu       : gyaos!/usr/iraf/iraf/bin.sparc/irafks.e
 gamera gamera.kpno.noao.edu     : gamera!/usr/iraf/iraf/bin.sparc/irafks.e
 almond almond.kpno.noa          : almond!/iraf/iraf/bin.irix/irafks.e
+sand sand.kpno.noao.ed          : sand!/iraf/iraf/bin.redhat/irafks.e
 
 # Cerro Tololo mountain sites
 ctio4m			: ctio4m!/usr/iraf/bin/irafks.e

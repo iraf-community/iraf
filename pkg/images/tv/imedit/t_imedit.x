@@ -28,7 +28,7 @@ pointer	sp, ep, cmd, temp
  
 pointer	immap()
 int	imtopenp(), imtlen(), imtgetim(), imaccess(), ep_gcur()
-errchk	imdelete
+errchk	immap, imdelete, ep_imcopy, ep_setpars
  
 define	newim_	99
  
@@ -68,6 +68,10 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		call erract (EA_WARN)
 		next
 	    }
+
+	    EP_IM(ep) = immap (EP_WORK(ep), READ_WRITE, 0)
+	    EP_INDATA(ep) = NULL
+	    EP_OUTDATA(ep) = NULL
  
 	    if (EP_LOGFD(ep) != NULL) {
 		call fprintf (EP_LOGFD(ep), "# Input image %s\n")
@@ -80,9 +84,6 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 	        call ep_command (ep, EP_WORK(ep), erase)
 	    }
  
-	    EP_IM(ep) = immap (EP_WORK(ep), READ_WRITE, 0)
-	    EP_INDATA(ep) = NULL
-	    EP_OUTDATA(ep) = NULL
  
 	    # Enter the cursor loop.  The apertures and commands are
 	    # returned by the EP_GCUR procedure.

@@ -73,7 +73,7 @@ begin
 	    ip = ip + 3
 
 	    # Copy parameter value.  It is an error if there is no value.
-	    if (IS_WHITE (Memc[ip]) || (Memc[ip] == ')')) {
+	    if (IS_WHITE (Memc[ip]) || (Memc[ip] == ')' && Memc[ip+1] != '_')) {
 		call sprintf (Memc[obuf], SZ_CMDSTR,
 		    "Undefined parameter value (%s.%s)")
 		    call pargstr (Memc[ltask])
@@ -95,6 +95,28 @@ begin
 		}
 		Memc[op] = Memc[ip]
 		ip = ip + 1
+		op = op + 1
+
+	    } else if (Memc[ip] == ')' && Memc[ip+1] == '_') {
+		# If the value is a redirection, e.g. ")_.foo", add quotes
+		# around the value and copy as a special case.
+		Memc[op] = '"'
+		op = op + 1
+
+		# Copy the opening paren.
+		Memc[op] = Memc[ip]
+		op = op + 1
+		ip = ip + 1
+
+		# Copy the rest of the string.
+		while (!IS_WHITE(Memc[ip]) && (Memc[ip] != ')')) {
+		    Memc[op] = Memc[ip]
+		    ip = ip + 1
+		    op = op + 1
+		}
+
+		# Add the closing quote.
+		Memc[op] = '"'
 		op = op + 1
 
 	    } else {

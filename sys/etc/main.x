@@ -520,6 +520,7 @@ char	i_args[ARB]		# (first part of) argument list
 
 int	fd
 char	ch
+bool	skip
 pointer	sp, fname, args, ip, op
 int	getlline()
 
@@ -529,6 +530,9 @@ begin
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	call strcpy (i_args, Memc[args], SZ_CMDBUF)
+
+	# Do not skip whitespace for param=value args on the command line.
+	skip = false
 
 	# Inform FIO that all standard i/o streams are unredirected (overridden
 	# below if redirected by an argument).
@@ -577,7 +581,7 @@ begin
 		call sys_getpars (Memc[fname])
 
 	    } else if (IS_ALPHA(ch) || ch == '_' || ch == '$') {
-		call sys_paramset (Memc, ip)
+		call sys_paramset (Memc, ip, skip)
 	    } else
 		call sys_redirect (Memc, ip)
 	}
@@ -593,6 +597,7 @@ procedure sys_getpars (fname)
 
 char	fname			# pset file
 
+bool	skip
 int	lineno, fd
 pointer	sp, lbuf, ip
 int	open(), getlline()
@@ -604,6 +609,9 @@ begin
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 
+	# Skip whitespace for param = value args in a par file.
+	skip = true
+
 	lineno = 0
 	while (getlline (fd, Memc[lbuf], SZ_CMDBUF) != EOF) {
 	    lineno = lineno + 1
@@ -611,7 +619,7 @@ begin
 		;
 	    if (Memc[ip] == '#' || Memc[ip] == '\n')
 		next
-	    iferr (call sys_paramset (Memc, ip)) {
+	    iferr (call sys_paramset (Memc, ip, skip)) {
 		for (;  Memc[ip] != EOS && Memc[ip] != '\n';  ip=ip+1)
 		    ;
 		Memc[ip] = EOS
@@ -630,10 +638,11 @@ end
 # or switch argument and enter them into the CL parameter cache.  (see also
 # clio.clcache).
 
-procedure sys_paramset (args, ip)
+procedure sys_paramset (args, ip, skip)
 
 char	args[ARB]		# argument list
 int	ip			# pointer to first char of argument
+bool	skip			# skip whitespace within "param=value" args
 
 pointer	sp, param, value, op
 int	stridx()
@@ -672,6 +681,10 @@ begin
 	    # string delimited by any of the metacharacters listed below.
 
 	    ip = ip + 1
+	    if (skip) {
+		while (IS_WHITE (args[ip]))
+		    ip = ip + 1
+	    }
 	    call sys_gstrarg (args, ip, Memc[value], SZ_VALSTR)
 
 	default:
@@ -830,9 +843,6 @@ int	stridx()
 
 begin
 	op = 1
-	while (IS_WHITE (args[ip]))
-	    ip = ip + 1
-
 	if (args[ip] == '"' || args[ip] == '\'') {
 	    # Quoted value string.
 

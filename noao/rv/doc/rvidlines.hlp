@@ -127,6 +127,18 @@ for additional information.
 The date, universal time, right ascension, declination, and coordinate epoch
 for the observation are obtained from the image header.  The keywords
 for these parameters are defined in the \fBkeywpars\fR parameter set.
+Note that the parameters used are "ra", "dec", "ut", and "date-obs".
+The "utmiddle" parameter is not used so if you have a keyword for the
+middle of the exposure that you want to use then you must set the
+"ut" parameter to reference that keyword.
+
+Before IRAF V2.12, if the date keyword included a time then that time was
+used and the "ut" keyword was not used.  In V2.12 this was changed and the
+time is always taken from the keyword specified by "ut".  However, the
+value can be in either a single time or a date/time string.  So if you
+want to use both the date and time from the same keyword, say DATE-OBS,
+then point the "date_obs" and "ut" parameters in KEYWPARS to the same
+keyword.
 .ih
 CURSOR KEYS
 

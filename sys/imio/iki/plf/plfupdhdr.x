@@ -16,6 +16,8 @@ int	nchars, flags, sz_buf
 int	im_pmsvhdr()
 
 begin
+	status = OK
+
 	flags = 0
 	if (IM_ACMODE(im) == READ_WRITE)
 	    flags = PL_UPDATE
@@ -26,7 +28,6 @@ begin
 	    call pl_savef (IM_PL(im), IM_HDRFILE(im), Memc[bp], flags)
 	} then
 	    status = ERR
-	call mfree (bp, TY_CHAR)
 
-	status = OK
+	call mfree (bp, TY_CHAR)
 end

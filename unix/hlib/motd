@@ -1,5 +1,5 @@
-    NOAO PC-IRAF Revision 2.11.3 EXPORT Tue Oct 26 21:01:12 MST 1999
-    This is the EXPORT version of PC-IRAF V2.11 supporting most PC systems.
+  NOAO Digital Unix/IRAF Revision 2.12.1-EXPORT Sat Jul 13 09:52:16 MST 2002
+  This is the EXPORT version of DUNX/IRAF V2.12 for Digital Unix 4.0
 
     Welcome to IRAF.  To list the available commands, type ? or ??.  To get
     detailed information about a command, type `help command'.   To  run  a

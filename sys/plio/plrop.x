@@ -31,7 +31,8 @@ pointer	sp, ll_out, ll_src, ll_dst, ol_src, ol_dst
 long	v_src[PL_MAXDIM], v_dst[PL_MAXDIM]
 long	ve_src[PL_MAXDIM], ve_dst[PL_MAXDIM]
 
-int	plloop(), pl_access()
+int	plloop()
+pointer	pl_access()
 errchk	syserr, plvalid, plsslv, pl_access
 
 begin
@@ -58,9 +59,9 @@ begin
 	    # parameters determine the size of the output list, and the
 	    # rop may only apply to a portion of the DST list.
 
-	    ll_dst = Ref (pl_dst, pl_access(pl_dst,v_dst))
+	    ll_dst = pl_access (pl_dst, v_dst)
 	    if (need_src)
-		ll_src = Ref (pl_src, pl_access(pl_src,v_src))
+		ll_src = pl_access (pl_src, v_src)
 
 	    # Perform the rasterop operation upon one line of the mask.
 	    # Note that if successive mask lines point to the same encoded

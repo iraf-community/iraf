@@ -22,9 +22,10 @@ char	pkfn[ARB]		#I packed virtual filename from FIO
 int	mode			#I file access mode (ignored)
 int	status			#O output status - i/o channel if successful
 
-int	ip, indx, channel, strldx(), ctoi(), fstati()
+pointer im, fit
+int	ip, indx, channel, strldx(), ctoi()
+bool	lscale, lzero, bfloat, fxf_fpl_equald()
 char    fname[SZ_PATHNAME]
-pointer fit, fp
 
 begin
 	# Separate the FIT descriptor from the file name.
@@ -37,6 +38,30 @@ begin
 	   return
 	}
 
+	# Determine if we have a Fits Kernel non supported
+	# data format; i.e. Bitpix -32 or -64 and BSCALE and/or
+	# BZERO with non default values.
+
+	### Only "low level" routines can be falled from a file driver:
+	### high level routines like syserr cannot be used due to
+	### recursion/reentrancy problems.
+	# We are calling syserrs at this level because we want to
+	# give the application the freedom to manipulate the FITS header
+	# at will and not imposing restriction at that level.
+
+	im = FIT_IM(fit)
+	lscale = fxf_fpl_equald (1.0d0, FIT_BSCALE(fit), 1)
+	lzero =  fxf_fpl_equald (0.0d0, FIT_BZERO(fit), 1)
+
+	# Determine if scaling is necessary.
+	bfloat = !(lscale && lzero)
+	if (bfloat && (FIT_BITPIX(fit) == -32 || FIT_BITPIX(fit) == -64)) {
+	    FIT_IOSTAT(fit) = ERR
+	    #call syserrs (SYS_FXFRDHSC,IM_HDRFILE(im))
+	    status = ERR
+	    return
+	}
+
 	fname[ip] = EOS
 	call strpak (fname, fname, SZ_PATHNAME)
 
@@ -46,11 +71,6 @@ begin
 	   status = ERR
 	   return
 	}
-
-	# Reset the FIO filename in case we are called again by FIO.
-	fp = fstati (channel, F_FIODES)
-	call strupk (pkfn, fname, SZ_PATHNAME)
-	call strpak (fname, FPKOSFN(fp), SZ_PATHNAME)
 
 	status = fit
 	FIT_IO(fit) = channel
@@ -155,10 +175,12 @@ char	ibuf[ARB]		#O data buffer
 int	nbytes			#I nbytes to be written
 int	boffset			#I file offset
 
-bool	noconvert
 pointer fit, im, sp, obuf
+bool	noconvert, lscale, lzero, bfloat
 int	ip, op, pixtype, npix, totpix, nb, nchars, i
 int	datasizeb, pixoffb, nb_skipped, obufsize
+
+bool	fxf_fpl_equald()
 int	sizeof()
 
 begin
@@ -168,6 +190,23 @@ begin
 
 	# We don't have to pack the data if it is integer and we don't need
 	# to byte swap; the data buffer can be written directly out.
+
+
+	# Determine if we are writing into an scaled floating point data
+	# unit; i.e. bitpix > 0 and BSCALE or/and BZERO with non default
+	# values.  This is an error since we are not supporting this
+	# combination for writing at this time.
+
+	lscale = fxf_fpl_equald (1.0d0, FIT_BSCALE(fit), 1)
+	lzero =  fxf_fpl_equald (0.0d0, FIT_BZERO(fit), 1)
+
+	# Determine if scaling is necessary.
+	bfloat = !(lscale && lzero)
+	if (bfloat &&
+		(IM_PIXTYPE(im) == TY_REAL || IM_PIXTYPE(im) == TY_DOUBLE)) {
+	    FIT_IOSTAT(fit) = ERR
+	    return
+	}
 
 	pixtype = IM_PIXTYPE(im)
 	noconvert = ((pixtype == TY_SHORT && BYTE_SWAP2 == NO) ||
@@ -186,7 +225,6 @@ begin
 	    FIT_IOSTAT(fit) = ERR
 	    return
         }		
-
 
 	totpix = IM_PHYSLEN(im,1)
 	do i = 2, IM_NPHYSDIM(im)
@@ -279,13 +317,15 @@ begin
 	else
 	    call zawtbf (FIT_IO(fit), status)
 
+	# FIT_ZBYTES has the correct number of logical bytes that need
+	# to be passed to fio since we are expanding the buffer size
+	# from byte to short or real and short to real.
+
 	if (status > 0) {
-	    if (FIT_PIXTYPE(fit) == TY_SHORT && IM_PIXTYPE(im) == TY_REAL)
+	    if (FIT_PIXTYPE(fit) == TY_UBYTE)
 		status = FIT_ZBYTES(fit)
-	    else if (FIT_PIXTYPE(fit) == TY_UBYTE && IM_PIXTYPE(im) == TY_SHORT)
-		status = status * SZB_CHAR		# to short
-	    else if (FIT_PIXTYPE(fit) == TY_UBYTE && IM_PIXTYPE(im) == TY_REAL)
-		status = status * SZB_CHAR * SZ_REAL	# to real
+	    else if (FIT_PIXTYPE(fit) == TY_SHORT && IM_PIXTYPE(im) == TY_REAL)
+		status = FIT_ZBYTES(fit)
 	}
 end
 
@@ -330,6 +370,7 @@ begin
             }
 	}
 end
+
 
 # FXF_CNVPX -- Convert FITS type BITPIX = 8 to SHORT or REAL depending
 # on the value of BSCALE, BZERO (1, 32768 is already iraf supported as ushort

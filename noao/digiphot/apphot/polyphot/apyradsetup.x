@@ -32,17 +32,17 @@ real	ap_crgrow(), ap_crclean(), ap_crclip()
 begin
 	# Mark the polygon interactively.
 	if (id == gd)
-	    nvertices = ap_ymkpoly (ap, id, x, y, max_nvertices, NO)
+	    nvertices = ap_ymkpoly (ap, im, id, x, y, max_nvertices, NO)
 	else
-	    nvertices = ap_ymkpoly (ap, id, x, y, max_nvertices, YES)
-	if (nvertices <= 0)
-	    return (nvertices)
+	    nvertices = ap_ymkpoly (ap, im, id, x, y, max_nvertices, YES)
 	if (id != NULL) {
 	    if (gd == id)
 		call gflush (id)
 	    else
 		call gframe (id)
 	}
+	if (nvertices <= 0)
+	    return (nvertices)
 
 	# Store the viewport and window coordinates.
 	call ggview (gd, u1, u2, v1, v2)

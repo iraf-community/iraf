@@ -1,5 +1,17 @@
 .help revisions Jun88 pkg.lists
 .nf
+=====
+V2.12
+=====
+
+doc/Lcalc.hlp
+doc/Lcalc.hlp
+doc/Lists.hlp
+doc/unique.hlp
+doc/average.hlp
+        Fixed various formatting problems in the lists package help files.
+	(19/09/01, Davis)
+
 rimcursor.par
 rimcursor.x
 doc/rimcursor.hlp

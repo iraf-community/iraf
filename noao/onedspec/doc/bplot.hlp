@@ -134,11 +134,11 @@ each spectrum with the IRAF banner suppressed:
 
 .nf
     cl> bplot @nite1.lst ... >G nite1.mc
-    cl> gkimosiac nite1.mc dev=stdplot
+    cl> gkimosaic nite1.mc dev=stdplot
 .fi
 
 The first command redirects the output of the graphics to the metacode
-file nite1.mc.  The task \fBgkimosiac\fR is used to make multiple plots
+file nite1.mc.  The task \fBgkimosaic\fR is used to make multiple plots
 per page.  Other tasks in the \fBplot\fR package may be used to
 manipulate and redisplay the contents of the metacode file.
 

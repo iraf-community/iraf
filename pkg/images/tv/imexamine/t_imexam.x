@@ -20,7 +20,7 @@ int	curtype, key, redraw, mode, nframes, nargs
  
 bool	clgetb()
 pointer	gopen(), ie_gimage()
-int	imtopen(), ie_gcur(), ie_getnframes()
+int	imtopen(), imd_wcsver(), ie_gcur(), ie_getnframes()
 int	btoi(), clgeti(), imtlen()
 
 begin
@@ -38,6 +38,8 @@ begin
 
 	IE_USEDISPLAY(ie) = btoi (clgetb ("use_display"))
 	if (IE_USEDISPLAY(ie) == YES)
+	    if (imd_wcsver() == 0)
+		;
 	    iferr (nframes = ie_getnframes (ie)) {
 		call eprintf ("cannot access display\n")
 		IE_USEDISPLAY(ie) = NO
@@ -56,10 +58,10 @@ begin
 
 	    if (nargs > 1) {
 		# Set user specified display frame.
-		IE_DFRAME(ie) = clgeti ("frame")
+		IE_DFRAME(ie) = 100 * clgeti ("frame") + 1
 		IE_NEWFRAME(ie) = IE_DFRAME(ie)
 		if (IE_USEDISPLAY(ie) == YES) {
-		    nframes = max (IE_NEWFRAME(ie), nframes)
+		    nframes = max (IE_NEWFRAME(ie)/100, nframes)
 		    IE_NFRAMES(ie) = nframes
 		}
 	    } else {
@@ -67,14 +69,14 @@ begin
 		# default to frame 1 (should use the current display frame
 		# but we don't have a cursor read yet to tell us what it is).
 
-		IE_DFRAME(ie) = 1
-		IE_NEWFRAME(ie) = 1
+		IE_DFRAME(ie) = 101
+		IE_NEWFRAME(ie) = 101
 	    }
 
 	} else {
 	    IE_INDEX(ie) = 1
-	    IE_DFRAME(ie) = 1
-	    IE_NEWFRAME(ie) = 1
+	    IE_DFRAME(ie) = 101
+	    IE_NEWFRAME(ie) = 101
 	}
  
 	# Set the wcs, logfile and graphics.
@@ -121,7 +123,7 @@ begin
 	    # examine-image-list mode.
 
 	    if (IE_USEDISPLAY(ie) == YES && IE_LIST(ie) != NULL &&
-		IE_NEWFRAME(ie) != IE_MAPFRAME(ie)) {
+		IE_NEWFRAME(ie)/100 != IE_MAPFRAME(ie)/100) {
 		call ie_imname (IE_DS(ie), IE_NEWFRAME(ie), Memc[imname],
 		    SZ_FNAME)
 		call ie_addimage (ie, Memc[imname], imlist)
@@ -129,7 +131,7 @@ begin
 
 	    # Set workstation state.
 	    switch (key) {
-	    case 'a', 'b', 'd', 'm', 'w', 'x', 'y', 'z', ',':
+	    case 'a', 'b', 'd', 'm', 't', 'w', 'x', 'y', 'z', ',':
 		call gdeactivate (gp, 0)
 	    }
  
@@ -176,14 +178,14 @@ begin
 		# display frame being the default.
 
 		call clgstr ("image", Memc[imname], SZ_FNAME)
-		call clputi ("frame", IE_NEWFRAME(ie))
-		IE_DFRAME(ie) = clgeti ("frame")
+		call clputi ("frame", IE_NEWFRAME(ie)/100)
+		IE_DFRAME(ie) = 100 * clgeti ("frame") + 1
 		IE_NEWFRAME(ie) = IE_DFRAME(ie)
 
 		if (IE_LIST(ie) != NULL)
 		    call ie_addimage (ie, Memc[imname], imlist)
 		else
-		    call ie_display (ie, Memc[imname], IE_DFRAME(ie))
+		    call ie_display (ie, Memc[imname], IE_DFRAME(ie)/100)
 
 	    case 'g':	# Graphics cursor
 		curtype = 'g'
@@ -198,9 +200,9 @@ begin
 		    if (IE_INDEX(ie) > IE_LISTLEN(ie))
 			IE_INDEX(ie) = 1
 		} else {
-		    IE_NEWFRAME(ie) = IE_NEWFRAME(ie) + 1
-		    if (IE_NEWFRAME(ie) > IE_NFRAMES(ie))
-			IE_NEWFRAME(ie) = 1
+		    IE_NEWFRAME(ie) = 100 * (IE_NEWFRAME(ie)/100 + 1) + 1
+		    if (IE_NEWFRAME(ie)/100 > IE_NFRAMES(ie))
+			IE_NEWFRAME(ie) = 101
 		}
 		im = ie_gimage (ie, YES)
 
@@ -213,14 +215,17 @@ begin
 		    if (IE_INDEX(ie) <= 0)
 			IE_INDEX(ie) = IE_LISTLEN(ie)
 		} else {
-		    IE_NEWFRAME(ie) = IE_NEWFRAME(ie) - 1
-		    if (IE_NEWFRAME(ie) <= 0)
-			IE_NEWFRAME(ie) = IE_NFRAMES(ie)
+		    IE_NEWFRAME(ie) = 100 * (IE_NEWFRAME(ie)/100 - 1) + 1
+		    if (IE_NEWFRAME(ie)/100 <= 0)
+			IE_NEWFRAME(ie) = 100 * IE_NFRAMES(ie) + 1
 		}
 		im = ie_gimage (ie, YES)
 
 	    case 'q':	# Quit
 		break
+
+	    case 't':	# Extract a section.
+		call ie_timexam (ie, x, y)
 
 	    case 'w':	# Toggle logfile
 		if (IE_LOGFD(ie) == NULL) {
@@ -283,7 +288,7 @@ begin
 
 	# Finish up.
 	call gclose (gp)
-	if (IE_IM(ie) != NULL)
+	if (IE_IM(ie) != NULL && IE_IM(ie) != IE_DS(ie))
 	    call imunmap (IE_IM(ie))
 	if (IE_MW(ie) != NULL)
 	    call mw_close (IE_MW(ie))

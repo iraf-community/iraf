@@ -4,11 +4,27 @@ include	<syserr.h>
 include <plset.h>
 include	<plio.h>
 
-# PL_ACCESS -- Return a pointer (llbuf offset) to the indicated mask image
-# line.  A valid offset is always returned; if the mask line is empty, the
-# offset will be that of the "empty line" linelist.
+# PL_ACCESS -- Return a pointer (type short) to the encoded line list data
+# for the indicated mask image line.  A valid pointer is always returned;
+# if the mask line is empty, the pointer will point to "empty line" linelist.
 
-int procedure pl_access (pl, v)
+pointer procedure pl_access (pl, v)
+
+pointer	pl			#I mask descriptor
+long	v[PL_MAXDIM]		#I coordinates of desired line
+
+pointer	pl_reference()
+
+begin
+	return (Ref (pl, pl_reference(pl,v)))
+end
+
+
+# PL_REFERENCE -- Return a reference (llbuf offset) to the indicated mask
+# image line.  A valid offset is always returned; if the mask line is empty,
+# the offset will be that of the "empty line" linelist.
+
+int procedure pl_reference (pl, v)
 
 pointer	pl			#I mask descriptor
 long	v[PL_MAXDIM]		#I coordinates of desired line

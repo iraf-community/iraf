@@ -19,7 +19,8 @@ long	v[PL_MAXDIM]
 int	npix, ll_len
 pointer	sp, ll_out, ll_reg, rl_out, ll_dst, op
 errchk	plvalid, pl_access, pl_linerop, pl_update
-int	pl_r2li(), pl_access()
+pointer	pl_access()
+int	pl_r2li()
 
 begin
 	call plvalid (pl)
@@ -28,11 +29,11 @@ begin
 
 	call smark (sp)
 	call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
-	call salloc (ll_reg, LL_FIRST + 5, TY_SHORT)
+	call salloc (ll_reg, LL_CURHDRLEN + 6, TY_SHORT)
 	call salloc (rl_out, RL_FIRST * 3, TY_INT)
 
 	# Access the destination line in the mask.
-	ll_dst = Ref (pl, pl_access(pl,v))
+	ll_dst = pl_access (pl, v)
 
 	# Construct the edit-region list.
 	npix = 1

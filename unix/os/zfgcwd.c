@@ -8,7 +8,7 @@
 #define	import_knames
 #include <iraf.h>
 
-extern	char oscwd[];			/* See ZFCHDR		*/
+extern	char oscwd[];
 
 /* ZFGCWD -- Get working (current) UNIX directory.  The current working
  * directory, once set, is saved in oscwd.

@@ -1020,7 +1020,7 @@ to create a color image:
 
 .ih
 NOTES
-	This task is new with V2.xx.x
+	This task is new with V2.11.
 
 	(long int headers in RAS and XWD may cause problems on 64-bit 
 machines like the Alpha where host software expects 64-bit values.  Need to

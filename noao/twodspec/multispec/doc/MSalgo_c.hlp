@@ -446,3 +446,4 @@ information is provided by the current model at each point in each extracted
 spectrum.  The extracted spectra can be corrected for the variation in the
 PSF by convolution with a spread function the width of which varies along
 the spectrum.
+.endhelp

@@ -1,5 +1,32 @@
 .help revisions Jun88 pkg.xtools.icfit
 .nf
+=====
+V2.12
+=====
+
+icdosetup.gx
+    The change made previously is now restricted to the polynomial functions
+    which make sense to extrapolate.  The spline functions define the
+    fitting region to be the region set by the calling program.
+    (11/21/00, Valdes)
+
+icfshow.gx
+    Will now work if the GT pointer is NULL.  (8/19/00, Valdes)
+
+icdosetup.gx
+    When using sample ranges the fitting region is now limited to the
+    minimum and maximum of the fitted region.  (8/11/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+=======
+V2.11.3
+=======
+
+icgui.x
+    Eliminated gmsg calls when there is no GUI.  (2/1/99, Valdes)
+
 icshow.x
 icvshow.gx
     The gt pointer was not being used when called by CURFIT noninteractively.

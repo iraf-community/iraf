@@ -250,6 +250,16 @@ suse:					# install suse binaries
         !$(hlib)/mkfloat.csh suse
         !(cd ./unix; setenv MACH suse; sh -x setarch.sh)
         ;
+linuxppc:					# install Linux PPC binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh linuxppc
+        !(cd ./unix; setenv MACH ppc; sh -x setarch.sh)
+        ;
+macosx:					# install MacOS X binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh macosx
+        !(cd ./unix; setenv MACH macosx; sh -x setarch.sh)
+        ;
 linuz:					# install linuz binaries
         $verbose off
         !$(hlib)/mkfloat.csh linuz

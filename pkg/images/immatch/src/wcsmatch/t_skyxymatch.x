@@ -2,7 +2,7 @@ include <fset.h>
 include <imhdr.h>
 include <mwset.h>
 include <math.h>
-include "../../../lib/skywcs.h"
+include <pkg/skywcs.h>
 include "wcsxymatch.h"
 
 # T_SKYXYMATCH -- Compute a list of the tie points required to register an

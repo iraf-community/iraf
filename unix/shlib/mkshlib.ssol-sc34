@@ -19,7 +19,11 @@ setarch:
 	    set dir = /opt/SUNWspro;  pushd $dir
 	    set SC3LIB = `find . -name "SC3*" -print`
 	    set SC4LIB = `find . -name "SC4*" -print`
-	    if ($SC4LIB != "") then
+	    set SC5LIB = `find . -name "SC5*" -print`
+	    if ($SC5LIB != "") then
+		set LIB = ${dir}/${SC5LIB}/lib
+		set VER = 5
+	    else if ($SC4LIB != "") then
 		set LIB = ${dir}/${SC4LIB}/lib
 		set VER = 4
 	    else if ($SC3LIB != "") then
@@ -64,11 +68,11 @@ set	OMIT = omit.$BMACH
 set	EXCL = "zshlib.o zzstrt.o"
 set	ADDR = 10000000		# default base address of shared region
 set	PGSZ = 0x2000		# maximum page size
-set	CMSZ = 0x4000		# common area - 2 pages (must be > TOTCOMSZ)
+set	CMSZ = 0x26000		# common area (must be N*PGSZ > TOTCOMSZ)
 
-set	FIOCOMSZ = 0x2a60	# exported commons
+set	FIOCOMSZ = 0x24660	# exported commons
 set	XERCOMSZ = 0x810
-set	TOTCOMSZ = 0x3270
+set	TOTCOMSZ = 0x24e70
 
 if (`uname -m` == i386) then
     set	FHSZ = 0xd0		# .e file header size
@@ -144,7 +148,10 @@ case ssun:
 	echo "data = A0x2000;" >> mapfile
 	set lflags = "-dn -Bstatic -t -e _start -M mapfile"
 	set lpath  = "./:/opt/SUNWspro/lib:${LIB}:/usr/ccs/lib:/usr/lib"
-    if ($VER == 4) then
+    if ($VER == 5) then
+	set objs   = \
+	    "V.o $LIB/crti.o $LIB/crt1.o $LIB/values-xi.o $OBJS"
+    else if ($VER == 4) then
 	set objs   = \
 	    "V.o $LIB/crti.o $LIB/crt1.o $LIB/values-xi.o $OBJS"
     else
@@ -152,7 +159,7 @@ case ssun:
 	    "V.o $LIB/crti.o $LIB/crt1.o $FLIB/__fstd.o $LIB/values-xt.o $OBJS"
     endif
 	set hlibs  = \
- "-Y P,$lpath -lM77 -lF77 -lsunmath -lm -lsocket -lnsl -lintl -lc $LIB/crtn.o"
+ "-Y P,$lpath -lM77 -lF77 -lsunmath -lm -lsocket -lnsl -lintl -lc $hbin/libcompat.a $LIB/crtn.o"
 	set mcode  = 5
 	breaksw
 case sparc:

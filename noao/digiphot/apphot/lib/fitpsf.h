@@ -28,7 +28,9 @@ define	PERRS		408
 define	PNREJECT	409
 define	PFXCUR		410
 define	PFYCUR		411
-define	PSFSTRING	412
+define	OPFXCUR		412
+define	OPFYCUR		413
+define	PSFSTRING	414
 
 # define fitpsf keywords
 

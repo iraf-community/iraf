@@ -17,7 +17,7 @@ begin
 	call smark (sp)
 	call salloc (fmt, SZ_LINE, TY_CHAR)
 
-	call sprintf (Memc[fmt], "\031%s %s\035\037")
+	call sprintf (Memc[fmt], SZ_LINE, "\031%s %s\035\037")
 	    call pargstr (object)
 	    call pargstr (format)
 

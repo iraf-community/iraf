@@ -1,0 +1,22 @@
+# AWCS task subdirectory
+
+$checkout libpkg.a "../"
+$update libpkg.a
+$checkin libpkg.a "../"
+$exit
+
+libpkg.a:
+	dsswcs.x	<imhdr.h> <mwset.h> <math.h>
+	dbwcs.x		<imhdr.h> <mwset.h> <math.h> <pkg/skywcs.h> <pkg/cq.h>
+	parswcs.x	<imhdr.h> "../../lib/astrom.h" "../../lib/aimpars.h" \
+	                <pkg/skywcs.h>
+	atmwshow.x
+	ccqseq.x
+	calcds.x	<math.h>
+	trsteq.x	<math.h>
+	treqst.x
+	dcmpsv.f
+	fitsvd.f
+	ksbsvd.f
+	varsvd.f
+	;

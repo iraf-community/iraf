@@ -49,6 +49,6 @@ libpkg.a:
 	t_gratings.x	<error.h> <math.h>
 	t_obs.x		<error.h>
 	t_rvcorrect.x	rvcorrect.com <error.h> <time.h>
-	t_setairmass.x	<error.h> <imhdr.h>
+	t_setairmass.x	<error.h> <ctype.h> <imhdr.h>
 	t_setjd.x	<error.h> <ctype.h> <imhdr.h>
 	;

@@ -247,17 +247,17 @@ include	"evvexpr.com"
 
 %token		CONSTANT IDENTIFIER NEWLINE YYEOS
 %token		PLUS MINUS STAR SLASH EXPON CONCAT QUEST COLON
-%token		LT GT LE GT EQ NE SE LAND LOR LNOT AT
+%token		LT GT LE GT EQ NE SE LAND LOR LNOT BAND BOR BXOR BNOT AT
 
 %nonassoc	QUEST
-%left		LOR
-%left 		LAND
+%left		LAND LOR
+%left		BAND BOR BXOR
 %nonassoc	EQ NE SE
 %nonassoc	LT GT LE GE
 %left		CONCAT
 %left		PLUS MINUS
 %left		STAR SLASH
-%right		UMINUS LNOT
+%right		UMINUS LNOT BNOT
 %left		EXPON
 %right		AT
 
@@ -327,6 +327,10 @@ expr	:	CONSTANT {
 			# Logical not.
 			call xvv_unop (LNOT, $2, $$)
 		    }
+	|	BNOT expr {
+			# Boolean not.
+			call xvv_unop (BNOT, $2, $$)
+		    }
 	|	expr PLUS opnl expr {
 			# Addition.
 			call xvv_binop (PLUS, $1, $4, $$)
@@ -358,6 +362,18 @@ expr	:	CONSTANT {
 	|	expr LOR opnl expr {
 			# Logical or.
 			call xvv_boolop (LOR, $1, $4, $$)
+		    }
+	|	expr BAND opnl expr {
+			# Boolean and.
+			call xvv_binop (BAND, $1, $4, $$)
+		    }
+	|	expr BOR opnl expr {
+			# Boolean or.
+			call xvv_binop (BOR, $1, $4, $$)
+		    }
+	|	expr BXOR opnl expr {
+			# Boolean xor.
+			call xvv_binop (BXOR, $1, $4, $$)
 		    }
 	|	expr LT opnl expr {
 			# Boolean less than.
@@ -502,6 +518,8 @@ begin
 	    }
 
 	case LNOT:
+	    # Logical NOT.
+
 	    call xvv_initop (out, nelem, TY_BOOL)
 	    switch (O_TYPE(in)) {
 	    case TY_BOOL:
@@ -556,6 +574,36 @@ begin
 		call xvv_error (s_badswitch)
 	    }
 
+	case BNOT:
+	    # Bitwise boolean NOT.
+
+	    call xvv_initop (out, nelem, O_TYPE(in))
+	    switch (O_TYPE(in)) {
+	    case TY_BOOL, TY_CHAR, TY_REAL, TY_DOUBLE:
+		call xvv_error ("boolean not of a noninteger operand")
+
+	    case TY_SHORT:
+		if (nelem > 0)
+		    call anots (Mems[O_VALP(in)], Mems[O_VALP(out)], nelem)
+		else
+		    O_VALS(out) = not(O_VALS(in))
+
+	    case TY_INT:
+		if (nelem > 0)
+		    call anoti (Memi[O_VALP(in)], Memi[O_VALP(out)], nelem)
+		else
+		    O_VALI(out) = not(O_VALI(in))
+
+	    case TY_LONG:
+		if (nelem > 0)
+		    call anotl (Meml[O_VALP(in)], Meml[O_VALP(out)], nelem)
+		else
+		    O_VALL(out) = not(O_VALL(in))
+
+	    default:
+		call xvv_error (s_badswitch)
+	    }
+
 	default:
 	    call xvv_error (s_badswitch)
 	}
@@ -602,6 +650,8 @@ include	"evvexpr.com"
 int	xvv_newtype(), strlen()
 errchk	xvv_newtype, xvv_initop, xvv_chtype, xvv_error
 string	s_badswitch "binop: bad case in switch"
+string	s_boolop "binop: bitwise boolean operands must be an integer type"
+define	done_ 91
 
 begin
 	# Set the datatype of the output operand, taking an error action if
@@ -703,7 +753,123 @@ begin
 	p2 = O_VALP(in2)
 	po = O_VALP(out)
 
-	# Perform the operation.
+	# The bitwise boolean binary operators a special case since only the
+	# integer datatypes are permitted.  Otherwise the bitwise booleans
+	# are just like arithmetic booleans.
+
+	if (opcode == BAND || opcode == BOR || opcode == BXOR) {
+	    switch (dtype) {
+
+	    case TY_SHORT:
+		switch (opcode) {
+		case BAND:
+		    if (len1 <= 0) {
+			O_VALS(out) = and (O_VALS(in1), O_VALS(in2))
+		    } else if (len2 <= 0) {
+			call aandks (Mems[p1], O_VALS(in2),
+			    Mems[po], nelem)
+		    } else {
+			call aands (Mems[p1], Mems[p2],
+			    Mems[po], nelem)
+		    }
+		case BOR:
+		    if (len1 <= 0) {
+			O_VALS(out) = or (O_VALS(in1), O_VALS(in2))
+		    } else if (len2 <= 0) {
+			call aborks (Mems[p1], O_VALS(in2),
+			    Mems[po], nelem)
+		    } else {
+			call abors (Mems[p1], Mems[p2],
+			    Mems[po], nelem)
+		    }
+		case BXOR:
+		    if (len1 <= 0) {
+			O_VALS(out) = xor (O_VALS(in1), O_VALS(in2))
+		    } else if (len2 <= 0) {
+			call axorks (Mems[p1], O_VALS(in2),
+			    Mems[po], nelem)
+		    } else {
+			call axors (Mems[p1], Mems[p2],
+			    Mems[po], nelem)
+		    }
+		}
+
+	    case TY_INT:
+		switch (opcode) {
+		case BAND:
+		    if (len1 <= 0) {
+			O_VALI(out) = and (O_VALI(in1), O_VALI(in2))
+		    } else if (len2 <= 0) {
+			call aandki (Memi[p1], O_VALI(in2),
+			    Memi[po], nelem)
+		    } else {
+			call aandi (Memi[p1], Memi[p2],
+			    Memi[po], nelem)
+		    }
+		case BOR:
+		    if (len1 <= 0) {
+			O_VALI(out) = or (O_VALI(in1), O_VALI(in2))
+		    } else if (len2 <= 0) {
+			call aborki (Memi[p1], O_VALI(in2),
+			    Memi[po], nelem)
+		    } else {
+			call abori (Memi[p1], Memi[p2],
+			    Memi[po], nelem)
+		    }
+		case BXOR:
+		    if (len1 <= 0) {
+			O_VALI(out) = xor (O_VALI(in1), O_VALI(in2))
+		    } else if (len2 <= 0) {
+			call axorki (Memi[p1], O_VALI(in2),
+			    Memi[po], nelem)
+		    } else {
+			call axori (Memi[p1], Memi[p2],
+			    Memi[po], nelem)
+		    }
+		}
+
+	    case TY_LONG:
+		switch (opcode) {
+		case BAND:
+		    if (len1 <= 0) {
+			O_VALL(out) = and (O_VALL(in1), O_VALL(in2))
+		    } else if (len2 <= 0) {
+			call aandkl (Meml[p1], O_VALL(in2),
+			    Meml[po], nelem)
+		    } else {
+			call aandl (Meml[p1], Meml[p2],
+			    Meml[po], nelem)
+		    }
+		case BOR:
+		    if (len1 <= 0) {
+			O_VALL(out) = or (O_VALL(in1), O_VALL(in2))
+		    } else if (len2 <= 0) {
+			call aborkl (Meml[p1], O_VALL(in2),
+			    Meml[po], nelem)
+		    } else {
+			call aborl (Meml[p1], Meml[p2],
+			    Meml[po], nelem)
+		    }
+		case BXOR:
+		    if (len1 <= 0) {
+			O_VALL(out) = xor (O_VALL(in1), O_VALL(in2))
+		    } else if (len2 <= 0) {
+			call axorkl (Meml[p1], O_VALL(in2),
+			    Meml[po], nelem)
+		    } else {
+			call axorl (Meml[p1], Meml[p2],
+			    Meml[po], nelem)
+		    }
+		}
+
+	    default:
+		call xvv_error (s_boolop)
+	    }
+
+	    goto done_
+	}
+
+	# Perform an arithmetic binary operation.
 	switch (dtype) {
 	case TY_CHAR:
 	    switch (opcode) {
@@ -1127,17 +1293,18 @@ begin
 	default:
 	    call xvv_error (s_badswitch)
 	}
-
+done_
 	# Free any storage in input operands.
 	call xvv_freeop (in1)
 	call xvv_freeop (in2)
 end
 
 
-# XVV_BOOLOP -- Boolean binary operations.  Perform the indicated boolean
-# binary operation on the two input operands, returning the result as the
-# output operand.  The opcodes implemented by this routine are characterized
-# by the fact that they all return a boolean result.
+# XVV_BOOLOP -- Boolean (actually logical) binary operations.  Perform the
+# indicated logical operation on the two input operands, returning the result
+# as the output operand.  The opcodes implemented by this routine are
+# characterized by the fact that they all return a logical result (YES or NO
+# physically expressed as an integer).
 
 procedure xvv_boolop (opcode, in1, in2, out)
 
@@ -1162,11 +1329,9 @@ int	xvv_newtype(), xvv_patmatch(), strncmp(), btoi()
 errchk	xvv_newtype, xvv_initop, xvv_chtype, xvv_error
 string	s_badop "boolop: illegal operation"
 string	s_badswitch "boolop: illegal switch"
-define	land_ 91
-define	lor_ 92
 
 begin
-	# Boolean operands are treated as integer in this routine.
+	# Boolean operands are treated as integer within this routine.
 	if (O_TYPE(in1) == TY_BOOL)
 	    O_TYPE(in1) = TY_INT
 	if (O_TYPE(in2) == TY_BOOL)
@@ -1262,28 +1427,9 @@ begin
 	po = O_VALP(out)
 
 	# Perform the operation.
-	switch (dtype) {
-	case TY_BOOL:
-	    switch (opcode) {
-	    case LAND:
-land_		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) != 0 && O_VALI(in2) != 0)
-		else if (len2 <= 0)
-		    call aandki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call aandi (Memi[p1], Memi[p2], Memi[po], nelem)
-	    case LOR:
-lor_		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) != 0 || O_VALI(in2) != 0)
-		else if (len2 <= 0)
-		    call aborki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abori (Memi[p1], Memi[p2], Memi[po], nelem)
-	    default:
-		call xvv_error (s_badop)
-	    }
+	if (dtype == TY_CHAR) {
+	    # Character data is a special case.
 
-	case TY_CHAR:
 	    switch (opcode) {
 	    case SE:
 		O_VALI(out) = btoi(xvv_patmatch (O_VALC(in1), O_VALC(in2)) > 0)
@@ -1303,339 +1449,358 @@ lor_		if (len1 <= 0)
 		call xvv_error (s_badop)
 	    }
 
+	} else if (opcode == LAND || opcode == LOR) {
+	    # Operations supporting only the integer types.
 
-	case TY_SHORT:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
+	    switch (dtype) {
+
+	    case TY_SHORT:
+		switch (opcode) {
+		case LAND:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALS(in1) != 0 && O_VALS(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alanks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    } else
+			call alans (Mems[p1], Mems[p2], Memi[po], nelem)
+		case LOR:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALS(in1) != 0 || O_VALS(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alorks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    } else
+			call alors (Mems[p1], Mems[p2], Memi[po], nelem)
+		default:
 		    call xvv_error (s_badop)
+		}
 
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
+	    case TY_INT:
+		switch (opcode) {
+		case LAND:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALI(in1) != 0 && O_VALI(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alanki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    } else
+			call alani (Memi[p1], Memi[p2], Memi[po], nelem)
+		case LOR:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALI(in1) != 0 || O_VALI(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alorki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    } else
+			call alori (Memi[p1], Memi[p2], Memi[po], nelem)
+		default:
 		    call xvv_error (s_badop)
+		}
 
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) < O_VALS(in2))
-		else if (len2 <= 0)
-		    call abltks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call ablts (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) <= O_VALS(in2))
-		else if (len2 <= 0)
-		    call ableks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call ables (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) > O_VALS(in2))
-		else if (len2 <= 0)
-		    call abgtks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call abgts (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) >= O_VALS(in2))
-		else if (len2 <= 0)
-		    call abgeks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call abges (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) == O_VALS(in2))
-		else if (len2 <= 0)
-		    call abeqks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call abeqs (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) != O_VALS(in2))
-		else if (len2 <= 0)
-		    call abneks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call abnes (Mems[p1], Mems[p2], Memi[po], nelem)
+	    case TY_LONG:
+		switch (opcode) {
+		case LAND:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALL(in1) != 0 && O_VALL(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alankl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    } else
+			call alanl (Meml[p1], Meml[p2], Memi[po], nelem)
+		case LOR:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALL(in1) != 0 || O_VALL(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alorkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    } else
+			call alorl (Meml[p1], Meml[p2], Memi[po], nelem)
+		default:
+		    call xvv_error (s_badop)
+		}
 
 	    default:
-		call xvv_error (s_badop)
+		call xvv_error (s_badswitch)
 	    }
+	} else {
+	    # Operations supporting any arithmetic type.
 
-	case TY_INT:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
+	    switch (dtype) {
+
+	    case TY_SHORT:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) < O_VALS(in2))
+		    else if (len2 <= 0)
+			call abltks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call ablts (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) <= O_VALS(in2))
+		    else if (len2 <= 0)
+			call ableks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call ables (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) > O_VALS(in2))
+		    else if (len2 <= 0)
+			call abgtks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call abgts (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) >= O_VALS(in2))
+		    else if (len2 <= 0)
+			call abgeks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call abges (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) == O_VALS(in2))
+		    else if (len2 <= 0)
+			call abeqks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call abeqs (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) != O_VALS(in2))
+		    else if (len2 <= 0)
+			call abneks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call abnes (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		default:
 		    call xvv_error (s_badop)
+		}
 
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
+	    case TY_INT:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) < O_VALI(in2))
+		    else if (len2 <= 0)
+			call abltki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call ablti (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) <= O_VALI(in2))
+		    else if (len2 <= 0)
+			call ableki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call ablei (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) > O_VALI(in2))
+		    else if (len2 <= 0)
+			call abgtki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call abgti (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) >= O_VALI(in2))
+		    else if (len2 <= 0)
+			call abgeki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call abgei (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) == O_VALI(in2))
+		    else if (len2 <= 0)
+			call abeqki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call abeqi (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) != O_VALI(in2))
+		    else if (len2 <= 0)
+			call abneki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call abnei (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		default:
 		    call xvv_error (s_badop)
+		}
 
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) < O_VALI(in2))
-		else if (len2 <= 0)
-		    call abltki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call ablti (Memi[p1], Memi[p2], Memi[po], nelem)
+	    case TY_LONG:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) < O_VALL(in2))
+		    else if (len2 <= 0)
+			call abltkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abltl (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) <= O_VALI(in2))
-		else if (len2 <= 0)
-		    call ableki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call ablei (Memi[p1], Memi[p2], Memi[po], nelem)
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) <= O_VALL(in2))
+		    else if (len2 <= 0)
+			call ablekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call ablel (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) > O_VALI(in2))
-		else if (len2 <= 0)
-		    call abgtki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abgti (Memi[p1], Memi[p2], Memi[po], nelem)
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) > O_VALL(in2))
+		    else if (len2 <= 0)
+			call abgtkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abgtl (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) >= O_VALI(in2))
-		else if (len2 <= 0)
-		    call abgeki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abgei (Memi[p1], Memi[p2], Memi[po], nelem)
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) >= O_VALL(in2))
+		    else if (len2 <= 0)
+			call abgekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abgel (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) == O_VALI(in2))
-		else if (len2 <= 0)
-		    call abeqki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abeqi (Memi[p1], Memi[p2], Memi[po], nelem)
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) == O_VALL(in2))
+		    else if (len2 <= 0)
+			call abeqkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abeql (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) != O_VALI(in2))
-		else if (len2 <= 0)
-		    call abneki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abnei (Memi[p1], Memi[p2], Memi[po], nelem)
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) != O_VALL(in2))
+		    else if (len2 <= 0)
+			call abnekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abnel (Meml[p1], Meml[p2], Memi[po], nelem)
+
+		default:
+		    call xvv_error (s_badop)
+		}
+
+	    case TY_REAL:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) < O_VALR(in2))
+		    else if (len2 <= 0)
+			call abltkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abltr (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) <= O_VALR(in2))
+		    else if (len2 <= 0)
+			call ablekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abler (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) > O_VALR(in2))
+		    else if (len2 <= 0)
+			call abgtkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abgtr (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) >= O_VALR(in2))
+		    else if (len2 <= 0)
+			call abgekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abger (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) == O_VALR(in2))
+		    else if (len2 <= 0)
+			call abeqkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abeqr (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) != O_VALR(in2))
+		    else if (len2 <= 0)
+			call abnekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abner (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		default:
+		    call xvv_error (s_badop)
+		}
+
+	    case TY_DOUBLE:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) < O_VALD(in2))
+		    else if (len2 <= 0)
+			call abltkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abltd (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) <= O_VALD(in2))
+		    else if (len2 <= 0)
+			call ablekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abled (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) > O_VALD(in2))
+		    else if (len2 <= 0)
+			call abgtkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abgtd (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) >= O_VALD(in2))
+		    else if (len2 <= 0)
+			call abgekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abged (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) == O_VALD(in2))
+		    else if (len2 <= 0)
+			call abeqkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abeqd (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) != O_VALD(in2))
+		    else if (len2 <= 0)
+			call abnekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abned (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		default:
+		    call xvv_error (s_badop)
+		}
 
 	    default:
-		call xvv_error (s_badop)
+		call xvv_error (s_badswitch)
 	    }
-
-	case TY_LONG:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
-		    call xvv_error (s_badop)
-
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
-		    call xvv_error (s_badop)
-
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) < O_VALL(in2))
-		else if (len2 <= 0)
-		    call abltkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abltl (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) <= O_VALL(in2))
-		else if (len2 <= 0)
-		    call ablekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call ablel (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) > O_VALL(in2))
-		else if (len2 <= 0)
-		    call abgtkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abgtl (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) >= O_VALL(in2))
-		else if (len2 <= 0)
-		    call abgekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abgel (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) == O_VALL(in2))
-		else if (len2 <= 0)
-		    call abeqkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abeql (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) != O_VALL(in2))
-		else if (len2 <= 0)
-		    call abnekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abnel (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    default:
-		call xvv_error (s_badop)
-	    }
-
-	case TY_REAL:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
-		    call xvv_error (s_badop)
-
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
-		    call xvv_error (s_badop)
-
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) < O_VALR(in2))
-		else if (len2 <= 0)
-		    call abltkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abltr (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) <= O_VALR(in2))
-		else if (len2 <= 0)
-		    call ablekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abler (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) > O_VALR(in2))
-		else if (len2 <= 0)
-		    call abgtkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abgtr (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) >= O_VALR(in2))
-		else if (len2 <= 0)
-		    call abgekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abger (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) == O_VALR(in2))
-		else if (len2 <= 0)
-		    call abeqkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abeqr (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) != O_VALR(in2))
-		else if (len2 <= 0)
-		    call abnekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abner (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    default:
-		call xvv_error (s_badop)
-	    }
-
-	case TY_DOUBLE:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
-		    call xvv_error (s_badop)
-
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
-		    call xvv_error (s_badop)
-
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) < O_VALD(in2))
-		else if (len2 <= 0)
-		    call abltkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abltd (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) <= O_VALD(in2))
-		else if (len2 <= 0)
-		    call ablekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abled (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) > O_VALD(in2))
-		else if (len2 <= 0)
-		    call abgtkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abgtd (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) >= O_VALD(in2))
-		else if (len2 <= 0)
-		    call abgekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abged (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) == O_VALD(in2))
-		else if (len2 <= 0)
-		    call abeqkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abeqd (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) != O_VALD(in2))
-		else if (len2 <= 0)
-		    call abnekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abned (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    default:
-		call xvv_error (s_badop)
-	    }
-
-	default:
-	    call xvv_error (s_badswitch)
 	}
 
 	# Free any storage in input operands.
@@ -4222,13 +4387,18 @@ ident_
 		ip = ip + 1
 		token = LAND
 	    } else
-		token = LAND
+		token = BAND
 	case '|':
 	    if (Memc[ip+1] == '|') {
 		ip = ip + 1
 		token = LOR
 	    } else
-		token = LOR
+		token = BOR
+
+	case '^':
+	    token = BXOR
+	case '~':
+	    token = BNOT
 
 	case '(', ')', ',':
 	    token = ch

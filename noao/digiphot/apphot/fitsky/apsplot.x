@@ -66,11 +66,11 @@ begin
 	call ggwind (gd, x1, x2, y1, y2)
 
 	# Initialize the plot.
-	call apstats (ap, IMNAME, Memc[str], SZ_LINE)
+	call apstats (ap, IMROOT, Memc[str], SZ_LINE)
 	call sprintf (Memc[str], SZ_LINE, "%s  Star %d")
 	    call pargstr (Memc[str])
 	    call pargi (sid)
-	gt = ap_gtinit (Memc[str], xcenter, ycenter)
+	gt = ap_gtinit (Memc[str], apstatr (ap,OSXCUR), apstatr(ap,OSYCUR))
 	
 	# Draw the plot.
 	call gclear (gd)

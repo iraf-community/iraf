@@ -6,6 +6,7 @@ procedure t_lroff()
 
 char	fname[SZ_FNAME]
 char	line[SZ_LINE]
+char	format[SZ_FNAME]
 int	fd, lmargin, rmargin
 int	open(), getline(), strmatch(), clgeti()
 extern	getline(), putline()
@@ -16,11 +17,19 @@ begin
 
 	lmargin = clgeti ("lmargin")
 	rmargin = clgeti ("rmargin")
+	call clgstr ("format", format, SZ_FNAME)
 
-	while (getline (fd, line) != EOF)
-	    if (strmatch (line, "^.help") > 0)
-		call lroff (getline, fd, putline, STDOUT, lmargin, rmargin,
-		    YES, NO)
+	while (getline (fd, line) != EOF) {
+	    if (strmatch (line, "^.help") > 0) {
+		if (format[1] == 't')
+		    call lroff (getline, fd, putline, STDOUT, lmargin, rmargin,
+		        YES, NO)
+		else if (format[1] == 'h')
+		    call lroff2html (fd, STDOUT, fname, "", "", "", "")
+		else if (format[1] == 'p')
+		    call lroff2ps (fd, STDOUT, NULL, "", "")
+	    }
+	}
 	
 	call close (fd)
 end

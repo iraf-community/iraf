@@ -132,11 +132,13 @@ The plot has been moved to the lower left corner of the display.
     cl> cont crab.5009 ceil=500 vx1=.1 vx2=.6 vy1=.1 vy2=.6
 
 4. Overlay a contour plot of an image on the same image displayed on the
-display device. Note that the contour parameters \fBfill\fR and \fBperimeter\fR
-must be on and off respectively.
+display device. Note that the CONTOUR parameters \fBfill\fR and \fBperimeter\fR
+must be on and off respectively, the \fBfill\fR parameter should be specified
+for the DISPLAY task to ensure the image fills the frame buffer in the 
+same way.
 
 .nf
-    cl> display m51 1
+    cl> display m51 1 fill+
     cl> cont m51 fill+ per- device=imd
 .fi
 .ih

@@ -1,7 +1,7 @@
 include <imhdr.h>
 include <math.h>
 include <mwset.h>
-include "skywcs.h"
+include <pkg/skywcs.h>
 
 
 # RG_CELTOSTD - Convert the longitude / latitude coordinates to standard

@@ -16,7 +16,7 @@ pointer	sp, infile, file_list, outfile, ext_list, in_fname, out_fname
 pointer	pl, axes
 
 bool	clgetb(), pl_linenotempty()
-char	clgetc()
+#char	clgetc()
 int	rft_get_image_type(), clgeti(), mtfile(), strlen(), btoi(), fntlenb()
 int	rft_read_fitz(), fntgfnb(), fstati(), mtneedfileno(), fntrfnb()
 pointer	fntopnb(), rft_flist()
@@ -102,8 +102,11 @@ begin
 	    call error (0,
 	        "T_RFITS: Output and input lists have different lengths")
 
-	# Get the remaining parameters.
-	data_type = rft_get_image_type (clgetc ("datatype"))
+	# Get the remaining parameters. Use the string in_fname as a
+	# temporary variable.
+	#data_type = rft_get_image_type (clgetc ("datatype"))
+	call clgstr ("datatype", Memc[in_fname], SZ_FNAME)
+	data_type = rft_get_image_type (Memc[in_fname])
 	scale = btoi (clgetb ("scale"))
 	blank = clgetr ("blank")
 

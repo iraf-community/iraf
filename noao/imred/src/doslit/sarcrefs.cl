@@ -95,6 +95,7 @@ begin
 		nw=INDEF, log=sparams.log, flux=sparams.flux, samedisp=yes,
 		global=no, ignoreaps=yes, confirm=yes, verbose=no, listonly=no,
 		logfile=logfile)
+	    flpr
 
 	    hedit (arcrefms, "dispcor", 0, add=yes, verify=no,
 		show=no, update=yes)

@@ -45,11 +45,22 @@ begin
 	    call gargr (wy)
 	    if (nscan () != 2) {
 		if (stdin == YES) {
-	            call printf ("Type object x and y coordinates (^Z or ^D to end): ")
+	            call printf (
+		        "Type object x and y coordinates (^Z or ^D to end): ")
 	            call flush (STDOUT)
 	        } 
 		next
 	    }
+
+	    # Transform the input coordinates.
+            switch (apstati(ap,WCSIN)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_itol (ap, wx, wy, wx, wy, 1)
+            case WCS_TV:
+                call ap_vtol (im, wx, wy, wx, wy, 1)
+            default:
+                ;
+            }
 
 	    # Store the current cursor coordinates.
 	    call apsetr (ap, CWX, wx)
@@ -74,7 +85,8 @@ begin
 	    call apsetr (ap, WX, wx)
 	    call apsetr (ap, WY, wy)
 	    if (stdin == YES) {
-		call printf ("Type object x and y coordinates (^D or ^Z to end): ")
+		call printf (
+		    "Type object x and y coordinates (^D or ^Z to end): ")
 		call flush (STDOUT)
 	    } 
 

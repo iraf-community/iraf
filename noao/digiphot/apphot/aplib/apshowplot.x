@@ -1,7 +1,7 @@
 include "../lib/apphot.h"
 
-define	CRADIUS	3
 define	RADIUS	15.0
+define	CRADIUS	 5
 
 # AP_SHOWPLOT -- Plot a radial profile of a star.
 
@@ -16,12 +16,13 @@ real	xcenter, ycenter	# the centered coordinates
 real	rmin, rmax		# minimum and maximum radius
 real	imin, imax		# minimum and maximum intensity
 
-int	lenbuf, nx, ny, nsky
+real	radius, xc, yc, xold, yold
 pointer	sp, r, skypix, coords, index, str, gt
-real	radius, xc, yc
-int	ap_gvrad(), apstati(), ap_skypix()
-pointer	ap_gtinit()
+int	niter, lenbuf, nx, ny, nsky
+
 real	apstatr()
+pointer	ap_gtinit()
+int	ap_gvrad(), apstati(), ap_skypix()
 
 begin
 	call gclear (gd)
@@ -39,8 +40,18 @@ begin
 	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Center the star.
-	call ap_ictr (im, wx, wy, CRADIUS, apstati (ap, POSITIVE), xcenter,
-	    ycenter)
+	niter = 0
+	xold = wx
+	yold = wy
+	repeat {
+	    call ap_ictr (im, xold, yold, CRADIUS, apstati (ap, POSITIVE),
+	        xcenter, ycenter)
+	    niter = niter + 1
+	    if (abs (xcenter - xold) <= 1.0 && abs (ycenter - yold) <= 1.0)
+		break
+	    xold = xcenter
+	    yold = ycenter
+	} until (niter >= 3)
 
 	# Fetch the pixels.
 	nsky = ap_skypix (im, xcenter, ycenter, 0.0, radius, Memr[skypix],
@@ -57,8 +68,10 @@ begin
 	call alimr (Memr[skypix], nsky, imin, imax)
 
 	# Plot the radial profiles.
-	call apstats (ap, IMNAME, Memc[str], SZ_FNAME)
-	gt = ap_gtinit (Memc[str], xcenter, ycenter)
+	#call apstats (ap, IMNAME, Memc[str], SZ_FNAME)
+	call apstats (ap, IMROOT, Memc[str], SZ_FNAME)
+	call ap_ltov (im, xcenter, ycenter, xc, yc, 1)
+	gt = ap_gtinit (Memc[str], xc, yc)
 	call ap_rset (gd, gt, 0.0, rmax, imin, imax, apstatr (ap, SCALE))
 	call ap_plotrad (gd, gt, Memr[r], Memr[skypix], nsky, "plus")
 

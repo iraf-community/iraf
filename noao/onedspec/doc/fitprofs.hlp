@@ -74,7 +74,6 @@ Default gaussian and lorentzian full width at half maximum (FWHM).
 These values are used for the initial and/or fixed width when they are
 not specified in the position file.
 .le
-.le
 .ls fitbackground = yes
 Fit the background?  If "yes" a linear background across the fitting region
 will be fit simultaneously with the profiles.  If "no" the background will

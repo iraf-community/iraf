@@ -607,6 +607,81 @@ identifier.  Following this is a name which may be specified following the
 is used.  The lines following the record identifier contain
 the feature information and dispersion function coefficients.
 .ih
+ECHELLE DISPERSION FUNCTIONS
+The fitted echelle dispersion functions are evaluated as described in
+this section.  The basic equations are
+
+.nf
+    (1)  w = (f(x,o) + shift) / o
+    (2)  o = ap * slope + offset
+.fi
+
+where w is the wavelength, x is the pixel coordinate along the order, o is
+the order, and ap is the aperture number.  The database parameter "shift"
+provides a wavelength zero point shift and the parameters "slope" and
+"offset" provide the transformation between aperture number and order.
+Note that the function f(x,o) and the shift are in terms of first order
+wavelengths.
+
+The database entries contain "parameter value" pairs.  This includes the
+parameters "shift", "offset", and "slope" defined above.  The default
+values for these if they are absent are 0, 0, and 1 respectively.  The
+"coefficients" parameter specifies the number of coefficients that follow
+and define the first order wavelength dispersion function.  The
+coefficients and functions are described below.
+
+The numerical values following the "coefficients" parameter, shown in
+the order in which they appear, have the following meaning.
+
+.nf
+    type	Function type: 1=chebychev, 2=legendre
+    xpow	Highest power of x
+    opow	Highest power of o
+    xterms	Type of cross terms: Always 1 for echelle functions
+    xmin	Minimum x for normalization
+    xmax	Maximum x for normalization
+    omin	Minimum o for normalization
+    omax	Maximum o for normalization
+    Cmn		Coefficients: m=0-xpow, n=0-ypow, i varies first
+.fi
+
+The functions are evaluated by a sum over m and n up to the specified
+highest powers.
+
+.nf
+    (3)  f(x,o) = sum {Cmn * Pm * Pn}	m=0-xpow, n=0-ypow
+.fi
+
+The Cmn are the coefficients of the polynomial terms Pm and Pn which
+are defined as follows.
+
+.nf
+    Chebyshev:
+	xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+	P0 = 1.0
+	P1 = xnorm
+	Pm+1 = 2.0 * xnorm * Pm - Pm-1 
+
+	onorm = (2 * o - (omax + omin)) / (omax - omin)
+	P0 = 1.0
+	P1 = onorm
+	Pn+1 = 2.0 * onorm * Pn - Pn-1 
+
+    Legendre:
+	xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+	P0 = 1.0
+	P1 = xnorm
+	Pm+1 = ((2m + 1) * xnorm * Pm - m * Pm-1)/ (m + 1)   
+
+	onorm = (2 * o - (omax + omin)) / (omax - omin)
+	P0 = 1.0
+	P1 = onorm
+	Pn+1 = ((2n + 1) * onorm * Pn - n * Pn-1)/ (n + 1)   
+.fi
+
+Note that the polynomial terms are obtained by first normalizing the x and
+o values to the range -1 to 1 and then iteratively evaluating them.
+.ih
 EXAMPLES
 Because this task is interactive it is difficult to provide an actual
 example.  The following describes a typical usage on arc spectra.

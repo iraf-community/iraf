@@ -1,4 +1,4 @@
-.help imcctran Jun99 images.imcoords
+.help imcctran Oct00 images.imcoords
 .ih
 NAME
 imcctran -- convert between image celestial coordinate systems 
@@ -136,6 +136,11 @@ The dimensions of the coordinate grid used to compute the rotation angle and,
 optionally, the x and y magnification factors required to transform the input
 image celestial coordinate system to the output celestial coordinate system.
 .le
+.ls longpole = no
+If longpole = yes the zenithal projections ARC, SIN, STG, TAN, and ZEA
+will be transformed by updating the longpole and latpole parameters instead
+of rotating the CD matrix in the usual manner.
+.le
 .ls verbose = yes
 Print messages about actions taken by the task on the standard output ?
 .le
@@ -173,10 +178,11 @@ system.
 
 The second four characters of the values of the ra / longitude and dec /
 latitude axis CTYPE keywords specify the sky projection geometry. IRAF
-currently supports the TAN, SIN, ARC, and GLS geometries, and consequently the
-currently permitted values of CTYPE[5:8] are -TAN, -ARC, -SIN, and -GLS.
-IM
-support the GLS projection.
+currently supports the AIT, ARC, CAR, CSC, GLS, MER, PAR, PCO, QSC,
+SIN,  STG, TAN, TSC, and ZEA geometries as well as two internal projection
+geomemtries TNX, and ZPX. Consequently the currently permitted values of
+CTYPE[5:8] are -AIT, -ARC, -CAR, -CSC, -GLS, -MER, -PAR, -PCO, -QSC,
+-SIN, -STG, -TAN, -TSC, -ZEA as well as -ZPX and -TNX. 
 
 If the input image celestial coordinate system is equatorial, the value of the
 RADECSYS keyword specifies which fundamental equatorial system is to be
@@ -219,6 +225,17 @@ as described in the PARAMETERS section.
 If an error is encountered when decoding the input or output world coordinate
 systems, an error message is printed on the standard output (if \fIverbose\fR
 is "yes"), and the input image left unmodified.
+
+If the input projection is one of the zenithal projections TAN, SIN, STG,
+ARC, or ZEA, then the header coordinate tranformation can be preformed by
+transforming the CRVAL parameters and rotating the CD matrix as described in 
+detail below. Otherwise the CRVAL values are transformed, the CD matrix is
+left unmodified, and the LONGPOLE and LATPOLE parameters required to perform
+the rotation are computed. If \fIlongpole\fR is yes then the zenithal
+coordinate systems will also be transformed using LONGPOLE and LATPOLE. At
+present IRAF looks for longpole and latpole parameters in the approriate
+WATN_* keywords. If these are undefined the appropriate default values for
+each projection are assumed and new values are written to the WATN_* keywords.
 
 The new image celestial coordinate system is computed as follows.  First a
 grid of \fInx\fR by \fIny\fR pixel and celestial coordinates, evenly spaced
@@ -566,19 +583,14 @@ TIME REQUIREMENTS
 .ih
 BUGS
 
-IMCCTRAN can write correct FITS celestial coordinate systems for all
-the non-equatorial coordinate system listed here. However IRAF v 2.10
-tasks will not be able to read the non-equatorial coordinate systems
-correctly; IRAF 2.11 tasks will be able to read these correctly.
+At present IRAF requires that the LONGPOLE and or LATPOLE keywords be
+defined in the appropriate WAT_* keywords, e.g. WAT1_* and WAT2_* for
+a 2D image. If these are not present then default values are assumed.
+The new values are computed and added to the WAT1_* and WAT2_* keywords.
 
-IRAF 2.10 supports the TAN, SIN, ARC, and GLS projections. IMCCTRAN
-accurately supports the TAN, SIN, and ARC projections . However attempting
-to transform a GLS projected image will produce incorrect results. The GLS
-function driver as currently coded is limited to the declination or latitude
-equals 0 case. Since transforming the coordinate system by definition includes
-shifting the reference point, the GLS projection becomes invalid. The 2.11
-version of this function driver will be able to handle full spherical
-coordinate transformations correctly.
+At present the experimental TNX and ZPX projections cannot be transformed
+with precision. Users should use the SKYCTRAN task to transfrom individual
+coordinate pairs.
 
 .ih
 SEE ALSO

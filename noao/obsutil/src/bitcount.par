@@ -1,0 +1,4 @@
+images,s,a,,,,Input image names
+grandtotal,b,h,no,,,Accumulate a grand total over all the images?
+leftzeroes,b,h,yes,,,Count the leftmost zeroes?
+verbose,b,h,yes,,,Verbose output?

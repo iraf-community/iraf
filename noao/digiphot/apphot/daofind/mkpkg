@@ -16,7 +16,7 @@ libpkg.a:
 			"../lib/find.h"         "../lib/display.h"
 	apfdconfirm.x	
 	apfdfind.x	"../lib/apphot.h"	"../lib/display.h"	\
-			"../lib/find.h"
+			"../lib/find.h"         <imhdr.h>
 	apfdfree.x	"../lib/apphotdef.h"
 	apfdgpars.x	"../lib/noise.h"	"../lib/display.h"
 	apfdinit.x	"../lib/apphotdef.h"	"../lib/finddef.h"
@@ -28,9 +28,10 @@ libpkg.a:
 			"../lib/apphot.h"	"../lib/noise.h"	\
 			"../lib/find.h"		"../lib/display.h"
 	apfind.x	<imhdr.h>		<mach.h>                \
-			<gset.h>
+			<gset.h>		"../lib/apphot.h"
 	apimset.x	<imset.h>
 	t_daofind.x	<fset.h> 		 <imhdr.h>		\
 			<gset.h>		"../lib/apphot.h"	\
-			"../lib/noise.h"	"../lib/find.h"
+			"../lib/noise.h"	"../lib/find.h"         \
+			<imhdr.h>
 	;

@@ -55,11 +55,11 @@ define	BADVALUE	0	# row value for bad read
 
 procedure t_suntoiraf ()
 
-int	infile, fd, fdtmp, i, krow, nlut, nchars, junk
+int	infile, fd, fdtmp, i, krow, nlut, nchars, junk, nread
 pointer	fname, image, buf, im, imtmp, pix, sp, sp1, hdr, lut
 bool	apply_lut, delete_file, verbose, listonly, yflip
 
-int	clpopni(), clgfil(), open(), strcmp(), fnroot(), fnextn()
+int	clpopni(), clgfil(), open(), strcmp(), fnroot(), fnextn(), read()
 pointer	immap(), impl2s()
 bool	clgetb()
 
@@ -86,10 +86,10 @@ begin
 	while (clgfil (infile, Memc[fname], SZ_FNAME) != EOF) {
 	    iferr {
 		fdtmp = open (Memc[fname], READ_ONLY, BINARY_FILE); fd = fdtmp
-		call read (fd, Memi[hdr], RAS_HEADER_LEN * SZ_INT)
+		nread = read (fd, Memi[hdr], RAS_HEADER_LEN * SZ_INT)
 
 		if (RAS_MAGIC_NUM(hdr) != RAS_MAGIC)
-		    call error ("not a rasterfile")
+		    call error (0, "not a rasterfile")
 
 		# correct for an old peculiarity
 		if (RAS_TYPE(hdr) == RT_OLD && RAS_LENGTH(hdr) == 0)
@@ -140,14 +140,14 @@ begin
 
 		if (! listonly) {
 		    if (RAS_DEPTH(hdr) != 8)
-			call error ("unsupported number of bits/pixel")
+			call error (0, "unsupported number of bits/pixel")
 
 		    if (RAS_TYPE(hdr) != RT_STANDARD && RAS_TYPE(hdr) != RT_OLD)
-			call error ("unsupported rasterfile type")
+			call error (0, "unsupported rasterfile type")
 
 		    if (RAS_MAPTYPE(hdr) != RMT_NONE &&
 			RAS_MAPTYPE(hdr) != RMT_EQUAL_RGB)
-			    call error ("unsupported rasterfile type")
+			    call error (0, "unsupported rasterfile type")
 
 		    junk = fnextn (Memc[fname], Memc[buf], SZ_FNAME)
 
@@ -203,7 +203,7 @@ begin
 		call salloc (lut, RAS_MAPLENGTH(hdr), TY_SHORT)
 
 		# assumes that MAPLENGTH is even (for SZB_CHAR=2)
-		call read (fd, Mems[lut], RAS_MAPLENGTH(hdr) / SZB_CHAR)
+		nread = read (fd, Mems[lut], RAS_MAPLENGTH(hdr) / SZB_CHAR)
 		call achtbs (Mems[lut], Mems[lut], RAS_MAPLENGTH(hdr))
 
 		nlut = RAS_MAPLENGTH(hdr) / 3
@@ -214,7 +214,7 @@ begin
 
 	    # Access pixels and write them out for each row
 	    do i = 1, RAS_HEIGHT(hdr) {
-	        ifnoerr (call read (fd, Mems[pix], nchars)) {
+	        ifnoerr (nread = read (fd, Mems[pix], nchars)) {
 		    call achtbs (Mems[pix], Mems[pix], RAS_WIDTH(hdr))
 		    if (apply_lut && RAS_MAPLENGTH(hdr) > 0)
 		        call si_lut (Mems[pix], RAS_WIDTH(hdr), Mems[lut], nlut)

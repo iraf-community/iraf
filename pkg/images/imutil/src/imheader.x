@@ -202,8 +202,12 @@ errchk	stropen, fprintf, pargl
 begin
 	fd = stropen (outstr, maxch, NEW_FILE)
 
-	call fprintf (fd, "[%d")
-	    call pargl (len_axes[1])
+	if (IM_NDIM(im) == 0) {
+	    call fprintf (fd, "[0")
+	} else {
+	    call fprintf (fd, "[%d")
+	        call pargl (len_axes[1])
+	}
 
 	do i = 2, IM_NDIM(im) {
 	    call fprintf (fd, ",%d")

@@ -296,7 +296,7 @@ begin
 		    # just sensible weighting. Three is a crude attempt
 		    # at making the solution more robust against bad pixels.
 
-		    weight = dp_ntsubtract (dao, Memr[DP_APXCEN(apsel)],
+		    weight = dp_ntsubtract (dao, im, Memr[DP_APXCEN(apsel)],
 		        Memr[DP_APYCEN(apsel)], Memr[DP_NRPIXSQ(nstar)],
 		        Memr[DP_APMAG(apsel)], Memi[DP_NSKIP(nstar)],
 		        Memr[DP_NX(nstar)], group_size, xtemp, ytemp, ds,
@@ -755,10 +755,11 @@ end
 # DP_NTSUBTRACT -- Procedure to subtract the contribution of a particular
 # pixel from a particular star.
 
-real procedure dp_ntsubtract (dao, xcen, ycen, rpixsq, mag, skip, x,
+real procedure dp_ntsubtract (dao, im, xcen, ycen, rpixsq, mag, skip, x,
 	group_size, fx, fy, ds, psfradsq, fitradsq, recenter)
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 real	xcen[ARB]		# array of x centers
 real	ycen[ARB]		# array of y centers
 real	rpixsq[ARB]		# array of distances squared
@@ -786,8 +787,9 @@ begin
 		next
 	    dx = fx - xcen[i]
 	    dy = fy - ycen[i]
-	    deltax = (xcen[i] - 1.0) / DP_PSFX(psffit) - 1.0
-	    deltay = (ycen[i] - 1.0) / DP_PSFY(psffit) - 1.0
+	    call dp_wpsf (dao, im, xcen[i], ycen[i], deltax, deltay, 1)
+	    deltax = (deltax - 1.0) / DP_PSFX(psffit) - 1.0
+	    deltay = (deltay - 1.0) / DP_PSFY(psffit) - 1.0
 	    val = dp_usepsf (DP_PSFUNCTION(psffit), dx, dy,
 	        DP_PSFHEIGHT(psffit), Memr[DP_PSFPARS(psffit)],
 		Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),

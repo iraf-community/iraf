@@ -1,0 +1,13 @@
+images,s,a,,,,List of images
+focus,s,h,"",,,Focus values
+corwidth,i,h,20,,,Correlation width
+level,r,h,0.5,,,Percent or fraction of peak for width measurement
+shifts,b,h,yes,,,"Compute shifts across the dispersion?
+"
+dispaxis,i,h,2,1,2,Dispersion axis (long slit only)
+nspectra,i,h,1,1,,Number of spectral samples (long slit only)
+ndisp,i,h,1,1,,Number of dispersion samples
+slit1,i,h,INDEF,,,Lower slit edge
+slit2,i,h,INDEF,,,"Upper slit edge
+"
+logfile,s,h,"logfile",,,"Logfile"

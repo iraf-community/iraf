@@ -263,8 +263,10 @@ begin
 	for (pat=1;  pat <= npat;  pat=pat+1) {
 	    call sprintf (Memc[pattern], SZ_FNAME, "^{%s}")
 		call pargstr (Memc[patoff[pat]])
-	    if (strmatch (lbuf, Memc[pattern]) > 0)
+	    if (strmatch (lbuf, Memc[pattern]) > 0) {
+		call sfree (sp)
 		return (true)
+	    }
 	}
 
 	call sfree (sp)

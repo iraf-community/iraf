@@ -243,13 +243,17 @@ begin
 	in_line = 0
 	repeat {
 	    repeat {
-	        if (getlongline (in, Memc[lbuf], SZ_LINE, in_line) == EOF)
+	        if (getlongline (in, Memc[lbuf], SZ_LINE, in_line) == EOF) {
+		    call close (in)
+		    call sfree (sp)
 	            return
+		}
 	    } until (is_in_range (lines, in_line))
 
 	    call fi_precord (in_fname, Memc[lbuf], fields, nfields, quit, name)
 	}	
 
+	call close (in)
 	call sfree (sp)
 end
 

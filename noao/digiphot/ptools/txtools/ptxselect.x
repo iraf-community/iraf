@@ -142,8 +142,10 @@ begin
 		    # Reinitialize the record read.
 		    ncontinue = 0
 		    recptr = 1
-		    if (o != NULL)
+		    if (o != NULL) {
+			call xev_freeop (o)
 		        call mfree (o, TY_STRUCT)
+		    }
 	        }
 	    }
 

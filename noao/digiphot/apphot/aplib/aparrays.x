@@ -50,4 +50,3 @@ begin
 	    call error (0, "AP_ARRAYD: Unknown apphot double array")
 	}
 end
-

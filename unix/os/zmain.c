@@ -194,5 +194,5 @@ ipc_:
 	if (prtype == PR_DETACHED)
 	    unlink ((char *)osfn_bkgfile);
 
-	_exit (errstat);
+	exit (errstat);
 }

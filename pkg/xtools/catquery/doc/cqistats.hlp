@@ -1,0 +1,56 @@
+.help cqistats Mar00 "Catquery Package"
+.ih
+NAME
+cqistats -- get an image survey results string parameter
+.ih
+SYNOPSIS
+include <cq.h>
+
+call cq_istats (imres, parameter, str, maxch)
+
+.nf
+pointer	imres		# the image survey results descriptor
+int	parameter	# the parameter to be returned
+char	str		# the returned string parameter value
+int	maxch		# the maximum size of the string parameter
+.fi
+.ih
+ARGUMENTS
+.ls res     
+The image survey results descriptor.
+.le
+.ls parameter
+The image survey results parameter to be returned. The currently supported
+image survey parameters defined in cq.h are:
+
+.nf
+CQIMCATDB	# the name of the parent configuration file
+CQIMCATNAME	# the name of the parent image survey
+CQIMADDRESS	# the network address used to produce the results
+CQIMQUERY	# the query used to produce the results
+CQIMNAME	# the output image name
+CQIQPNAMES	# the results query parameter dictionary
+CQIQPVALUES	# the results query parameter values dictionary
+CQIQPUNITS	# the results query parameter units dictionary
+.fi
+.le
+.ls str
+Array containing returned string parameter value.
+.le
+.ls maxch
+The maximum size in characters of the returned string value.
+.le
+.ih
+DESCRIPTION
+Cq_istats returns the values of image survey results string parameters.
+
+.ih
+NOTES
+More information about the image survey results parameters and their
+relationship to the parent image survey is available by typing
+"help surveys".
+
+.ih
+SEE ALSO
+cq_istati, cq_istatt
+.endhelp

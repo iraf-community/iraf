@@ -14,7 +14,7 @@ define	CHELPFILE 	"images$lib/coomap.key"
 # GEO_MGFIT -- Fit the surface using interactive graphics.
 
 procedure geo_mgfitr (gd, fit, sx1, sy1, sx2, sy2, xref, yref, xin,
-        yin, wts, npts)
+        yin, wts, npts, xerrmsg, yerrmsg, maxch)
 
 pointer	gd		#I graphics file descriptor
 pointer	fit		#I pointer to the fit structure
@@ -28,17 +28,21 @@ real	xin[npts]	#I input x coordinates
 real	yin[npts]	#I input y coordinates
 real	wts[npts]	#I array of weights
 int	npts		#I number of data points
+char	xerrmsg[ARB]	#O the output x fit error message 
+char	yerrmsg[ARB]	#O the output x fit error message 
+int	maxch		#I the size of the error messages
 
 char	errstr[SZ_LINE]
 int	newgraph, delete, wcs, key, errcode
-pointer	sp, w, gfit, xresid, yresid, cmd, xerrmsg, yerrmsg
+pointer	sp, w, gfit, xresid, yresid, cmd
 pointer	gt1, gt2, gt3, gt4, gt5
 real	wx, wy
 real	xshift, yshift, xscale, yscale, thetax, thetay
 
 int	clgcur(), errget()
 pointer	gt_init()
-errchk	smark(), salloc(), geo_fxyr(), geo_mrejectr(), geo_fthetar()
+
+errchk	geo_fxyr(), geo_mrejectr(), geo_fthetar()
 errchk	geo_fmagnifyr(), geo_flinearr()
 
 begin
@@ -49,41 +53,48 @@ begin
 	call salloc (yresid, npts, TY_REAL)
 	call salloc (w, npts, TY_REAL)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
-	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
 
 	# Do initial fit.
-	switch (GM_FIT(fit)) {
-	case GM_ROTATE:
-	    call geo_fthetar (fit, sx1, sy1, xref, yref, xin, yin, wts,
-	        Memr[xresid], Memr[yresid], npts, Memc[xerrmsg], SZ_LINE,
-		Memc[yerrmsg], SZ_LINE)
-		sx2 = NULL
-		sy2 = NULL
-	case GM_RSCALE:
-	    call geo_fmagnifyr (fit, sx1, sy1, xref, yref, xin, yin, wts,
-	        Memr[xresid], Memr[yresid], npts, Memc[xerrmsg], SZ_LINE,
-		Memc[yerrmsg], SZ_LINE)
-		sx2 = NULL
-		sy2 = NULL
-	case GM_RXYSCALE:
-	    call geo_flinearr (fit, sx1, sy1, xref, yref, xin, yin, wts,
-	        Memr[xresid], Memr[yresid], npts, Memc[xerrmsg], SZ_LINE,
-		Memc[yerrmsg], SZ_LINE)
-		sx2 = NULL
-		sy2 = NULL
-	default:
-	    call geo_fxyr (fit, sx1, sx2, xref, yref, xin, wts, Memr[xresid],
-	        npts, YES, Memc[xerrmsg], SZ_LINE)
-	    call geo_fxyr (fit, sy1, sy2, xref, yref, yin, wts, Memr[yresid],
-	        npts, NO, Memc[yerrmsg], SZ_LINE)
+	iferr {
+	    switch (GM_FIT(fit)) {
+	    case GM_ROTATE:
+	        call geo_fthetar (fit, sx1, sy1, xref, yref, xin, yin, wts,
+	            Memr[xresid], Memr[yresid], npts, xerrmsg, maxch,
+		    yerrmsg, maxch)
+		    sx2 = NULL
+		    sy2 = NULL
+	    case GM_RSCALE:
+	        call geo_fmagnifyr (fit, sx1, sy1, xref, yref, xin, yin, wts,
+	            Memr[xresid], Memr[yresid], npts, xerrmsg, maxch,
+		    yerrmsg, maxch)
+		    sx2 = NULL
+		    sy2 = NULL
+	    case GM_RXYSCALE:
+	        call geo_flinearr (fit, sx1, sy1, xref, yref, xin, yin, wts,
+	            Memr[xresid], Memr[yresid], npts, xerrmsg, maxch,
+		    yerrmsg, maxch)
+		    sx2 = NULL
+		    sy2 = NULL
+	    default:
+	        call geo_fxyr (fit, sx1, sx2, xref, yref, xin, wts,
+		    Memr[xresid], npts, YES, xerrmsg, maxch)
+	        call geo_fxyr (fit, sy1, sy2, xref, yref, yin, wts,
+		    Memr[yresid], npts, NO, yerrmsg, maxch)
+	    }
+	    if (GM_MAXITER(fit) <= 0 || IS_INDEFD(GM_REJECT(fit)))
+	        GM_NREJECT(fit) = 0
+	    else
+	        call geo_mrejectr (fit, sx1, sy1, sx2, sy2, xref, yref, xin,
+		    yin, wts, Memr[xresid], Memr[yresid], npts, xerrmsg,
+		    maxch, yerrmsg, maxch)
+	} then {
+	    call sfree (sp)
+	    if (GM_PROJECTION(fit) == GM_NONE)
+	        call error (2, "Too few points for X and Y fits.")
+	    else
+	        call error (2, "Too few points for XI and ETA fits.")
 	}
-	if (IS_INDEFD(GM_REJECT(fit)))
-	    GM_NREJECT(fit) = 0
-	else
-	    call geo_mrejectr (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
-		wts, Memr[xresid], Memr[yresid], npts, Memc[xerrmsg],
-		SZ_LINE, Memc[yerrmsg], SZ_LINE)
+
 	GG_NEWFUNCTION(gfit) = NO
 	GG_FITERROR(gfit) = NO
 	errcode = OK
@@ -116,8 +127,8 @@ begin
 	if (GG_CONSTXY(gfit) == YES)
 	    call geo_conxyr (gd, fit, sx1, sy1, sx2, sy2)
 	call printf ("%s  %s\n")
-	    call pargstr (Memc[xerrmsg])
-	    call pargstr (Memc[yerrmsg])
+	    call pargstr (xerrmsg)
+	    call pargstr (yerrmsg)
 
 	# Read the cursor commands.
 	call amovr (wts, Memr[w], npts)
@@ -235,39 +246,36 @@ begin
 			case GM_ROTATE:
 		            call geo_fthetar (fit, sx1, sy1, xref, yref, xin,
 			        yin, Memr[w], Memr[xresid], Memr[yresid],
-				npts, Memc[xerrmsg], SZ_LINE, Memc[yerrmsg],
-				SZ_LINE) 
+				npts, xerrmsg, maxch, yerrmsg, maxch) 
 				sx2 = NULL
 				sy2 = NULL
 			case GM_RSCALE:
 		            call geo_fmagnifyr (fit, sx1, sy1, xref, yref, xin,
 			        yin, Memr[w], Memr[xresid], Memr[yresid],
-				npts, Memc[xerrmsg], SZ_LINE, Memc[yerrmsg],
-				SZ_LINE) 
+				npts, xerrmsg, maxch, yerrmsg, maxch) 
 				sx2 = NULL
 				sy2 = NULL
 			case GM_RXYSCALE:
 		            call geo_flinearr (fit, sx1, sy1, xref, yref, xin,
 			        yin, Memr[w], Memr[xresid], Memr[yresid],
-				npts, Memc[xerrmsg], SZ_LINE, Memc[yerrmsg],
-				SZ_LINE) 
+				npts, xerrmsg, maxch, yerrmsg, maxch) 
 				sx2 = NULL
 				sy2 = NULL
 			default:
 		            call geo_fxyr (fit, sx1, sx2, xref, yref, xin,
 			        Memr[w], Memr[xresid], npts, YES,
-				Memc[xerrmsg], SZ_LINE) 
+				xerrmsg, maxch) 
 		            call geo_fxyr (fit, sy1, sy2, xref, yref, yin,
 			        Memr[w], Memr[yresid], npts, NO,
-				Memc[yerrmsg], SZ_LINE) 
+				yerrmsg, maxch) 
 			}
-		        if (IS_INDEFD(GM_REJECT(fit)))
+		        if (GM_MAXITER(fit) <= 0 || IS_INDEFD(GM_REJECT(fit)))
 			    GM_NREJECT(fit) = 0
 		        else
 			    call geo_mrejectr (fit, sx1, sy1, sx2, sy2, xref,
 			        yref, xin, yin, Memr[w], Memr[xresid],
-				Memr[yresid], npts, Memc[xerrmsg], SZ_LINE,
-				Memc[yerrmsg], SZ_LINE)
+				Memr[yresid], npts, xerrmsg, maxch,
+				yerrmsg, maxch)
 			GG_NEWFUNCTION(gfit) = NO
 			GG_FITERROR(gfit) = NO
 			errcode = OK
@@ -319,8 +327,8 @@ begin
 		         Memr[w], npts)
 		}
 	        call printf ("%s  %s\n")
-	    	    call pargstr (Memc[xerrmsg])
-	    	    call pargstr (Memc[yerrmsg])
+	    	    call pargstr (xerrmsg)
+	    	    call pargstr (yerrmsg)
 		newgraph = NO
 	    }
 	}
@@ -335,7 +343,7 @@ begin
 
 	# Call an error if appropriate.
 	if (errcode > 0)
-	    call error (0, errstr)
+	    call error (2, errstr)
 end
 
 # GEO_LCOEFF -- Print the coefficents of the linear portion of the
@@ -452,7 +460,7 @@ end
 # GEO_MGFIT -- Fit the surface using interactive graphics.
 
 procedure geo_mgfitd (gd, fit, sx1, sy1, sx2, sy2, xref, yref, xin,
-        yin, wts, npts)
+        yin, wts, npts, xerrmsg, yerrmsg, maxch)
 
 pointer	gd		#I graphics file descriptor
 pointer	fit		#I pointer to the fit structure
@@ -466,17 +474,21 @@ double	xin[npts]	#I input x coordinates
 double	yin[npts]	#I input y coordinates
 double	wts[npts]	#I array of weights
 int	npts		#I number of data points
+char	xerrmsg[ARB]	#O the output x fit error message 
+char	yerrmsg[ARB]	#O the output x fit error message 
+int	maxch		#I the size of the error messages
 
 char	errstr[SZ_LINE]
 int	newgraph, delete, wcs, key, errcode
-pointer	sp, w, gfit, xresid, yresid, cmd, xerrmsg, yerrmsg
+pointer	sp, w, gfit, xresid, yresid, cmd
 pointer	gt1, gt2, gt3, gt4, gt5
 real	wx, wy
 double	xshift, yshift, xscale, yscale, thetax, thetay
 
 int	clgcur(), errget()
 pointer	gt_init()
-errchk	smark(), salloc(), geo_fxyd(), geo_mrejectd(), geo_fthetad()
+
+errchk	geo_fxyd(), geo_mrejectd(), geo_fthetad()
 errchk	geo_fmagnifyd(), geo_flineard()
 
 begin
@@ -487,41 +499,48 @@ begin
 	call salloc (yresid, npts, TY_DOUBLE)
 	call salloc (w, npts, TY_DOUBLE)
 	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
-	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
 
 	# Do initial fit.
-	switch (GM_FIT(fit)) {
-	case GM_ROTATE:
-	    call geo_fthetad (fit, sx1, sy1, xref, yref, xin, yin, wts,
-	        Memd[xresid], Memd[yresid], npts, Memc[xerrmsg], SZ_LINE,
-		Memc[yerrmsg], SZ_LINE)
-		sx2 = NULL
-		sy2 = NULL
-	case GM_RSCALE:
-	    call geo_fmagnifyd (fit, sx1, sy1, xref, yref, xin, yin, wts,
-	        Memd[xresid], Memd[yresid], npts, Memc[xerrmsg], SZ_LINE,
-		Memc[yerrmsg], SZ_LINE)
-		sx2 = NULL
-		sy2 = NULL
-	case GM_RXYSCALE:
-	    call geo_flineard (fit, sx1, sy1, xref, yref, xin, yin, wts,
-	        Memd[xresid], Memd[yresid], npts, Memc[xerrmsg], SZ_LINE,
-		Memc[yerrmsg], SZ_LINE)
-		sx2 = NULL
-		sy2 = NULL
-	default:
-	    call geo_fxyd (fit, sx1, sx2, xref, yref, xin, wts, Memd[xresid],
-	        npts, YES, Memc[xerrmsg], SZ_LINE)
-	    call geo_fxyd (fit, sy1, sy2, xref, yref, yin, wts, Memd[yresid],
-	        npts, NO, Memc[yerrmsg], SZ_LINE)
+	iferr {
+	    switch (GM_FIT(fit)) {
+	    case GM_ROTATE:
+	        call geo_fthetad (fit, sx1, sy1, xref, yref, xin, yin, wts,
+	            Memd[xresid], Memd[yresid], npts, xerrmsg, maxch,
+		    yerrmsg, maxch)
+		    sx2 = NULL
+		    sy2 = NULL
+	    case GM_RSCALE:
+	        call geo_fmagnifyd (fit, sx1, sy1, xref, yref, xin, yin, wts,
+	            Memd[xresid], Memd[yresid], npts, xerrmsg, maxch,
+		    yerrmsg, maxch)
+		    sx2 = NULL
+		    sy2 = NULL
+	    case GM_RXYSCALE:
+	        call geo_flineard (fit, sx1, sy1, xref, yref, xin, yin, wts,
+	            Memd[xresid], Memd[yresid], npts, xerrmsg, maxch,
+		    yerrmsg, maxch)
+		    sx2 = NULL
+		    sy2 = NULL
+	    default:
+	        call geo_fxyd (fit, sx1, sx2, xref, yref, xin, wts,
+		    Memd[xresid], npts, YES, xerrmsg, maxch)
+	        call geo_fxyd (fit, sy1, sy2, xref, yref, yin, wts,
+		    Memd[yresid], npts, NO, yerrmsg, maxch)
+	    }
+	    if (GM_MAXITER(fit) <= 0 || IS_INDEFD(GM_REJECT(fit)))
+	        GM_NREJECT(fit) = 0
+	    else
+	        call geo_mrejectd (fit, sx1, sy1, sx2, sy2, xref, yref, xin,
+		    yin, wts, Memd[xresid], Memd[yresid], npts, xerrmsg,
+		    maxch, yerrmsg, maxch)
+	} then {
+	    call sfree (sp)
+	    if (GM_PROJECTION(fit) == GM_NONE)
+	        call error (2, "Too few points for X and Y fits.")
+	    else
+	        call error (2, "Too few points for XI and ETA fits.")
 	}
-	if (IS_INDEFD(GM_REJECT(fit)))
-	    GM_NREJECT(fit) = 0
-	else
-	    call geo_mrejectd (fit, sx1, sy1, sx2, sy2, xref, yref, xin, yin,
-		wts, Memd[xresid], Memd[yresid], npts, Memc[xerrmsg],
-		SZ_LINE, Memc[yerrmsg], SZ_LINE)
+
 	GG_NEWFUNCTION(gfit) = NO
 	GG_FITERROR(gfit) = NO
 	errcode = OK
@@ -554,8 +573,8 @@ begin
 	if (GG_CONSTXY(gfit) == YES)
 	    call geo_conxyd (gd, fit, sx1, sy1, sx2, sy2)
 	call printf ("%s  %s\n")
-	    call pargstr (Memc[xerrmsg])
-	    call pargstr (Memc[yerrmsg])
+	    call pargstr (xerrmsg)
+	    call pargstr (yerrmsg)
 
 	# Read the cursor commands.
 	call amovd (wts, Memd[w], npts)
@@ -673,39 +692,36 @@ begin
 			case GM_ROTATE:
 		            call geo_fthetad (fit, sx1, sy1, xref, yref, xin,
 			        yin, Memd[w], Memd[xresid], Memd[yresid],
-				npts, Memc[xerrmsg], SZ_LINE, Memc[yerrmsg],
-				SZ_LINE) 
+				npts, xerrmsg, maxch, yerrmsg, maxch) 
 				sx2 = NULL
 				sy2 = NULL
 			case GM_RSCALE:
 		            call geo_fmagnifyd (fit, sx1, sy1, xref, yref, xin,
 			        yin, Memd[w], Memd[xresid], Memd[yresid],
-				npts, Memc[xerrmsg], SZ_LINE, Memc[yerrmsg],
-				SZ_LINE) 
+				npts, xerrmsg, maxch, yerrmsg, maxch) 
 				sx2 = NULL
 				sy2 = NULL
 			case GM_RXYSCALE:
 		            call geo_flineard (fit, sx1, sy1, xref, yref, xin,
 			        yin, Memd[w], Memd[xresid], Memd[yresid],
-				npts, Memc[xerrmsg], SZ_LINE, Memc[yerrmsg],
-				SZ_LINE) 
+				npts, xerrmsg, maxch, yerrmsg, maxch) 
 				sx2 = NULL
 				sy2 = NULL
 			default:
 		            call geo_fxyd (fit, sx1, sx2, xref, yref, xin,
 			        Memd[w], Memd[xresid], npts, YES,
-				Memc[xerrmsg], SZ_LINE) 
+				xerrmsg, maxch) 
 		            call geo_fxyd (fit, sy1, sy2, xref, yref, yin,
 			        Memd[w], Memd[yresid], npts, NO,
-				Memc[yerrmsg], SZ_LINE) 
+				yerrmsg, maxch) 
 			}
-		        if (IS_INDEFD(GM_REJECT(fit)))
+		        if (GM_MAXITER(fit) <= 0 || IS_INDEFD(GM_REJECT(fit)))
 			    GM_NREJECT(fit) = 0
 		        else
 			    call geo_mrejectd (fit, sx1, sy1, sx2, sy2, xref,
 			        yref, xin, yin, Memd[w], Memd[xresid],
-				Memd[yresid], npts, Memc[xerrmsg], SZ_LINE,
-				Memc[yerrmsg], SZ_LINE)
+				Memd[yresid], npts, xerrmsg, maxch,
+				yerrmsg, maxch)
 			GG_NEWFUNCTION(gfit) = NO
 			GG_FITERROR(gfit) = NO
 			errcode = OK
@@ -757,8 +773,8 @@ begin
 		         Memd[w], npts)
 		}
 	        call printf ("%s  %s\n")
-	    	    call pargstr (Memc[xerrmsg])
-	    	    call pargstr (Memc[yerrmsg])
+	    	    call pargstr (xerrmsg)
+	    	    call pargstr (yerrmsg)
 		newgraph = NO
 	    }
 	}
@@ -773,7 +789,7 @@ begin
 
 	# Call an error if appropriate.
 	if (errcode > 0)
-	    call error (0, errstr)
+	    call error (2, errstr)
 end
 
 # GEO_LCOEFF -- Print the coefficents of the linear portion of the

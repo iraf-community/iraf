@@ -126,7 +126,7 @@ detect_
 	ysigsq = (apstatr (ap, SCALE) * apstatr (ap, RATIO) *
 	    apstatr (ap, FWHMPSF) / 2.35482) ** 2
 
-	nstars = ap_find (im, cnv, out, id, Memr[gker2d],
+	nstars = ap_find (ap, im, cnv, out, id, Memr[gker2d],
 	    Memi[skip], nxk, nyk, skymode, threshold, relerr,
 	    apstati (ap, POSITIVE), xsigsq, ysigsq, dmin, dmax,
 	    apstatr (ap, SHARPLO), apstatr (ap, SHARPHI), apstatr (ap,

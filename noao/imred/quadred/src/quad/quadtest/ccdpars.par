@@ -1,0 +1,29 @@
+ncols,i,h,1060,,,"Number of columns"
+nlines,i,h,1024,,,"Number of lines
+"
+datasec,s,h,"[1:1024,1:1024]",,,"Data section"
+trimsec,s,h,"[1:1024,1:1024]",,,"Trim section"
+biassec,s,h,"[1025:1060,1:1024]",,,"Bias section
+"
+amplifiers,s,h,"Quad","|Quad|UpperPair|LowerPair|LowerLeft|",,"Amplifiers to use
+"
+gain1,r,h,1.0,,,gain (e-/ADU) for Amp12
+ron1,r,h,4.0,,,readout noise for Amp11
+zero1,i,h,1000,,,"zero level for Amp11"
+nlin1,s,h,"",,,"Non-linearity coefficants
+"
+gain2,r,h,1.0,,,gain (e-/ADU) for Amp12
+ron2,r,h,4.0,,,readout noise for Amp12
+zero2,i,h,1000,,,"zero level for Amp12"
+nlin2,s,h,"",,,"Non-linearity coefficants
+"
+gain3,r,h,1.0,,,gain (e-/ADU) for Amp21
+ron3,r,h,4.0,,,readout noise for Amp21
+zero3,i,h,1000,,,"zero level for Amp21"
+nlin3,s,h,"",,,"Non-linearity coefficants
+"
+gain4,r,h,1.0,,,gain (e-/ADU) for Amp22
+ron4,r,h,4.0,,,readout noise for Amp22
+zero4,i,h,1000,,,"zero level for Amp22"
+nlin4,s,h,"",,,"Non-linearity coefficants
+"

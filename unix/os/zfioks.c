@@ -20,6 +20,11 @@
 #include <sgtty.h>
 #endif
 
+#ifdef MACOSX
+#define	USE_RCMD 1
+#include <unistd.h>
+#endif
+
 #define	import_kernel
 #define	import_knames
 #define	import_zfstat
@@ -157,7 +162,7 @@ int	debug_ks = 0;			/* print debug info on stderr	  */
 char	debug_file[64] = "";		/* debug output file if nonnull   */
 FILE	*debug_fp = NULL;		/* debugging output		  */
 
-extern	int getuid();
+extern	uid_t getuid();
 extern	char *getenv();
 static	jmp_buf jmpbuf;
 static	int jmpset = 0;
@@ -569,7 +574,12 @@ s_err:		    dbgmsg1 ("in.irafksd fork complete, status=%d\n",
 	     */
 	    hostp = host;
 	    dbgmsg2 ("rexec for host=%s, user=%s\n", host, username);
+#ifdef USE_RCMD
+	    *chan = rcmd (&hostp, ks_rexecport(),
+		getlogin(), username, cmd, 0);
+#else
 	    *chan = rexec (&hostp, ks_rexecport(), username, password, cmd, 0);
+#endif
 
 	} else if (ks.protocol == C_REXEC_CALLBACK) {
 	    /* Use rexec-callback protocol.  In this case the remote kernel
@@ -605,8 +615,13 @@ s_err:		    dbgmsg1 ("in.irafksd fork complete, status=%d\n",
 	    hostp = host;
 	    dbgmsg3 ("rexec for host=%s, user=%s, using client port %d\n",
 		host, username, s_port);
+#ifdef USE_RCMD
+	    ss = rcmd (&hostp, ks_rexecport(),
+		getlogin(), username, callback_cmd, 0);
+#else
 	    ss = rexec (&hostp,
 		ks_rexecport(), username, password, callback_cmd, 0);
+#endif
 
 	    /* Wait for the server to call us back. */
 	    dbgmsg1 ("waiting for connection on port %d\n", s_port);
@@ -732,8 +747,13 @@ retry:
 			dbgmsg3 ("rexec %s@%s: %s\n", username, host, command);
 
 			hostp = host;
+#ifdef USE_RCMD
+			fd = rcmd (&hostp, ks_rexecport(),
+			    getlogin(), username, command, 0);
+#else
 			fd = rexec (&hostp, ks_rexecport(),
 			    username, password, command, NULL);
+#endif
 
 			if (fd < 0) {
 			    status |= 02000;

@@ -59,4 +59,6 @@ begin
 	AP_PYX(ply) = INDEFR
 	AP_PYY(ply) = INDEFR
 	AP_PYZMAG(ply) = DEF_PYZMAG
+	AP_PYNAME(ply) = EOS
+	AP_PYROOT(ply) = EOS
 end

@@ -1,29 +1,28 @@
 include <mach.h>
 include "../lib/obsfile.h"
 
-define	DEF_LENLABEL	15
-define	DEF_LENINDEX	6
-
 # PH_JOIN -- For each individual field join the data from each image
 # line for line.
 
-procedure ph_join (out, label, sym, filters, nfilters, x, y, mag, merr,
-	allfilters, verbose)
+procedure ph_join (out, label, sym, filters, nfilters, objid, x, y, mag, merr,
+	allfilters, wrap, verbose)
 
-int	out		# the output file descriptor
-char	label[ARB]	# the label string
-pointer	sym[ARB]	# list of pointers to the image set  data
-char	filters[ARB]	# the filter id string
-int	nfilters	# number of filters in an image  set
-real	x[ARB]		# array of shifted x coordinates
-real	y[ARB]		# array of shifted y coordinates
-real	mag[ARB]	# array of corrected magnitudes
-real	merr[ARB]	# array of magnitude errors
-int	allfilters	# match objects in all filters ?
-int	verbose		# print status, warning and error messages ?
+int	out			  # the output file descriptor
+char	label[ARB]		  # the label string
+pointer	sym[ARB]		  # list of pointers to the image set  data
+char	filters[ARB]		  # the filter id string
+int	nfilters		  # number of filters in an image  set
+char	objid[DEF_LENLABEL,ARB]   # array of object ids
+real	x[ARB]			  # array of shifted x coordinates
+real	y[ARB]			  # array of shifted y coordinates
+real	mag[ARB]		  # array of corrected magnitudes
+real	merr[ARB]		  # array of magnitude errors
+int	allfilters		  # match objects in all filters ?
+int	wrap			  # format the output file for easy reading ?
+int	verbose			  # print status, warning and error messages ?
 
-int	i, j, nobjs, dptr, len_label
-pointer	sp, outfilter, newlabel, bptrs, eptrs
+int	i, j, nobjs, dptr, len_label, useid
+pointer	sp, outfilter, idlabel, newlabel, bptrs, eptrs
 bool	streq()
 int	ph_nthlabel(), strlen()
 
@@ -54,6 +53,7 @@ begin
 	    }
 	}
 
+
 	# Return if there is no data.
 	if (nobjs <= 0) {
 	    if (verbose == YES) {
@@ -66,10 +66,25 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
+	call salloc (idlabel, SZ_FNAME, TY_CHAR)
 	call salloc (newlabel, SZ_FNAME, TY_CHAR)
 	call salloc (outfilter, SZ_FNAME, TY_CHAR)
 	call salloc (bptrs, nfilters, TY_INT)
 	call salloc (eptrs, nfilters, TY_INT)
+
+	# Determine whether or not to use the object id as the object label
+	# and determine the length of the label. 
+
+	if (objid[1,1] == EOS) {
+	    useid = NO
+	    if (nobjs == 1)
+	        len_label = max (DEF_LENLABEL, strlen (label))
+	    else
+	        len_label = max (DEF_LENLABEL, strlen (label)+DEF_LENINDEX)
+	} else { 
+	    useid = YES
+	    len_label = DEF_LENLABEL
+	}
 
 	# Initialize the arrays which point to the beginning and ending of
 	# the data for each image in the set.
@@ -85,18 +100,31 @@ begin
 	}
 
 	# Write out the output.
-	if (nobjs == 1)
-	    len_label = max (DEF_LENLABEL, strlen (label))
-	else
-	    len_label = max (DEF_LENLABEL, strlen (label)+DEF_LENINDEX)
-
 	do i = 1, nobjs {
+
+	    # Determine the object id. This is the object id of the first
+	    # defined filter.
+	    if (useid == YES) {
+		Memc[idlabel] = EOS
+		do j = 1, nfilters {
+		    if (Memi[bptrs+j-1] == 0)
+			next
+		    call strcpy (objid[1,Memi[bptrs+j-1]], Memc[idlabel],
+		        DEF_LENLABEL)
+		    break
+		}
+	    }
 
 	    do j = 1, nfilters {
 
 		# Write the label.
 		if (j == 1) {
-		    if (nobjs == 1) {
+		    if (useid == YES && Memc[idlabel] != EOS) {
+		        call fprintf (out, "%*.*s ")
+			    call pargi (-len_label)
+			    call pargi (len_label)
+			    call pargstr (Memc[idlabel])
+		    } else if (nobjs == 1) {
 		        call fprintf (out, "%*.*s ")
 			    call pargi (-len_label)
 			    call pargi (len_label)
@@ -110,11 +138,13 @@ begin
 			    call pargi (len_label)
 			    call pargstr (Memc[newlabel])
 		    }
-		} else {
+		} else if (wrap == YES) {
 		    call fprintf (out, "%*.*s ")
-			    call pargi (-len_label)
-			    call pargi (len_label)
-			call pargstr ("*")
+		        call pargi (-len_label)
+		        call pargi (len_label)
+		        call pargstr ("*")
+		} else {
+		    call fprintf (out, "  ")
 		}
 
 		# Write the results.
@@ -123,7 +153,7 @@ begin
 		dptr = Memi[bptrs+j-1]
 		if (dptr == 0) {
 		    call fprintf (out,
-		        "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f\n")
+		        "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f")
 		        call pargstr (Memc[outfilter])
 			call pargr (INDEFR)
 		        call pargr (INDEFR)
@@ -132,12 +162,16 @@ begin
 		        call pargr (INDEFR)
 		        call pargr (INDEFR)
 		} else {
-		    call fprintf (out,
-		        "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f\n")
-			if (streq (IMT_IFILTER(sym[j]), "INDEF"))
-			    call pargstr (Memc[outfilter])
-			else
-		            call pargstr (IMT_IFILTER(sym[j]))
+		    if (IMT_OTIME(sym[j]) >= 0.0 && IMT_OTIME(sym[j]) <= 24.0)
+		        call fprintf (out,
+		            "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f")
+		    else
+		        call fprintf (out,
+		            "%-10.10s %11g %6.3f %9.3f %9.3f %7.3f %6.3f")
+		    if (streq (IMT_IFILTER(sym[j]), "INDEF"))
+			call pargstr (Memc[outfilter])
+		    else
+		        call pargstr (IMT_IFILTER(sym[j]))
 			call pargr (IMT_OTIME(sym[j]))
 		        call pargr (IMT_XAIRMASS(sym[j]))
 		        call pargr (x[dptr] - IMT_XSHIFT(sym[j]))
@@ -145,6 +179,10 @@ begin
 		        call pargr (mag[dptr])
 		        call pargr (merr[dptr])
 		}
+		if (wrap == YES)
+		    call fprintf (out, "\n")
+		else if (j == nfilters)
+		    call fprintf (out, "\n")
 
 		# Increment the data pointers making sure to check for non-
 		# existent data and unequal length object lists.
@@ -172,29 +210,31 @@ end
 # PH_MERGE -- For an individual field join the data from each image (filter) in
 # the image (filter) set by matching the x-y positions.
 
-procedure ph_merge (out, label, sym, filters, nfilters, x, y, mag, merr,
-	ysort, match, index, ndata, tolerance, allfilters, verbose)
+procedure ph_merge (out, label, sym, filters, nfilters, objid, x, y, mag, merr,
+	ysort, match, index, ndata, tolerance, allfilters, wrap, verbose)
 
-int	out			# the output file descriptor
-char	label[ARB]		# label string
-pointer	sym[ARB]		# list of pointers to the image set  data
-char	filters[ARB]		# filter string
-int	nfilters		# number of images an image set
-real	x[ARB]			# array of x coordinates
-real	y[ARB]			# array of y coordinates
-real	mag[ARB]		# array of magnitudes
-real	merr[ARB]		# array of magnitude errors
-int	ysort[ARB]		# the y sort index
-int	match[ARB]		# the matching array
-int	index[ndata,ARB]	# the matching index array
-int	ndata			# the number of data points
-real	tolerance		# tolerance in pixels
-int	allfilters		# match objects in all filters
-int	verbose			# print status, warning and error messages
+int	out			  # the output file descriptor
+char	label[ARB]		  # label string
+pointer	sym[ARB]		  # list of pointers to the image set  data
+char	filters[ARB]		  # filter string
+int	nfilters		  # number of images an image set
+char	objid[DEF_LENLABEL,ARB] # array of object ids
+real	x[ARB]			  # array of x coordinates
+real	y[ARB]			  # array of y coordinates
+real	mag[ARB]		  # array of magnitudes
+real	merr[ARB]		  # array of magnitude errors
+int	ysort[ARB]		  # the y sort index
+int	match[ARB]		  # the matching array
+int	index[ndata,ARB]	  # the matching index array
+int	ndata		          # the number of data points
+real	tolerance		  # tolerance in pixels
+int	allfilters		  # match objects in all filters
+int	wrap			  # format the output file for easy reading ?
+int	verbose			  # print status, warning and error messages
 
 int	i, j, k, l, biptr, eiptr, bjptr, ejptr, len_label
-int	ntimes, nframe, nobjs, nmatch, starok, lsort
-pointer	sp, newlabel, outfilter
+int	ntimes, nframe, nobjs, nmatch, starok, lsort, useid
+pointer	sp, idlabel, newlabel, outfilter
 real	tol2, dx, dy, maxrsq, distsq
 bool	streq()
 int	ph_nthlabel(), strlen()
@@ -202,6 +242,7 @@ int	ph_nthlabel(), strlen()
 begin
 	# Allocate working space.
 	call smark (sp)
+	call salloc (idlabel, SZ_FNAME, TY_CHAR)
 	call salloc (newlabel, SZ_FNAME, TY_CHAR)
 	call salloc (outfilter, SZ_FNAME, TY_CHAR)
 
@@ -302,6 +343,12 @@ begin
 		}
 	    }
 
+	    # Use the individual star id.
+	    if (objid[1,1] == EOS)
+		useid = NO
+	    else
+		useid = YES
+
 	    # Write the results.
 	    do j = 1, eiptr - biptr + 1 {
 
@@ -333,17 +380,36 @@ begin
 		if (starok == NO)
 		    next
 
-	        if (nobjs == 1)
+		if (useid == YES)
+	    	    len_label = DEF_LENLABEL
+	        else if (nobjs == 1)
 	    	    len_label = max (DEF_LENLABEL, strlen (label))
 		else
 	    	    len_label = max (DEF_LENLABEL, strlen (label)+DEF_LENINDEX)
+
+		# Find the label.
+		if (useid == YES) {
+		    Memc[idlabel] = EOS
+		    do k = 1, nfilters {
+			if (index[j,k] == 0)
+			    next
+			call strcpy (objid[1,index[j,k]], Memc[idlabel],
+			    DEF_LENLABEL)
+			break
+		    }
+		}
 
 		# Loop over the filters, writing the data for each point.
 		do k = 1, nfilters {
 
 		    # Write the label.
 		    if (k == 1) {
-		        if ((nmatch == 1) && (nobjs == 0)) {
+			if (useid == YES && Memc[idlabel] != EOS) {
+		            call fprintf (out, "%*.*s ")
+				call pargi (-len_label)
+				call pargi (len_label)
+			        call pargstr (Memc[idlabel])
+		        } else if ((nmatch == 1) && (nobjs == 0)) {
 		            call fprintf (out, "%*.*s ")
 				call pargi (-len_label)
 				call pargi (len_label)
@@ -357,11 +423,13 @@ begin
 				call pargi (len_label)
 			        call pargstr (Memc[newlabel])
 		        }
-		    } else {
+		    } else if (wrap == YES) {
 		        call fprintf (out, "%*.*s ")
 			    call pargi (-len_label)
 			    call pargi (len_label)
 			    call pargstr ("*")
+		    } else {
+			call fprintf (out, "  ")
 		    }
 
 		    # Write the data.
@@ -370,7 +438,7 @@ begin
 			Memc[outfilter] = EOS
 		    if (index[j,k] == 0) {
 		        call fprintf (out,
-		            "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f\n")
+		            "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f")
 		            call pargstr (Memc[outfilter])
 			    call pargr (INDEFR)
 		            call pargr (INDEFR)
@@ -379,12 +447,17 @@ begin
 		            call pargr (INDEFR)
 		            call pargr (INDEFR)
 		    } else {
-		        call fprintf (out,
-		            "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f\n")
-			    if (streq (IMT_IFILTER(sym[k]), "INDEF"))
-		                call pargstr (Memc[outfilter])
-			    else
-		                call pargstr (IMT_IFILTER(sym[k]))
+			if (IMT_OTIME(sym[k]) >= 0.0 &&
+			    IMT_OTIME(sym[k]) <= 24.0)
+		            call fprintf (out,
+		            "%-10.10s %11.1h %6.3f %9.3f %9.3f %7.3f %6.3f")
+			else
+		            call fprintf (out,
+		            "%-10.10s %11g %6.3f %9.3f %9.3f %7.3f %6.3f")
+			if (streq (IMT_IFILTER(sym[k]), "INDEF"))
+		            call pargstr (Memc[outfilter])
+			else
+		            call pargstr (IMT_IFILTER(sym[k]))
 			    call pargr (IMT_OTIME(sym[k]))
 		            call pargr (IMT_XAIRMASS(sym[k]))
 		            call pargr (x[index[j,k]] - IMT_XSHIFT(sym[k]))
@@ -392,6 +465,10 @@ begin
 		            call pargr (mag[index[j,k]])
 		            call pargr (merr[index[j,k]])
 		    }
+		    if (wrap == YES)
+			call fprintf (out, "\n")
+		    else if (k == nfilters)
+			call fprintf (out, "\n")
 
 		}
 

@@ -1,5 +1,60 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
+
+=====
+V2.12
+=====
+
+ccdred/src/icsetout.x
+    When computing offsets the registration point was the reference pixel
+    returned by mw_gwterm for the first image.  The code then went on to
+    assume this was a logical pixel when comparing with the other images,
+    which is not true when there is a physical coordinate system.  The
+    algorithm was fixed by converting the reference point to logical
+    coordinates.  (4/18/02, Valdes)
+
+ccdred/src/t_ccdmask.x
+    Fixed bug where the if the last line or last column had a bad pixel
+    without a neighboring interior pixel then the mask value would be
+    some number corresponding to the number of pixels in that last line
+    or column.  (2/28/02, Valdes)
+
+ccdred/ccdred.cl
+ccdred/ccdred.men
+ccdred/ccdred.hd
+ccdred/src/mkpkg
+ccdred/x_ccdred.x
+    Removed COSMICRAYS from package tasks.  The source is still not
+    removed.  (8/22/01, Valdes)
+
+ccdred/src/setdark.x
+    Added a check for a zero divide in calculating the dark time scaling
+    which results in an appropriate error message.  (7/5/01, Valdes)
+
+========
+V2.11.3b
+========
+
+t_combine.x
+    Modified the conversion of pclip from a fraction to a number of images
+    because for even number of images the number above/below the median
+    is one too small.  (9/26/00, Valdes)
+
+ccdred/src/icmedian.gx
+    Replaced with faster Wirth algorithm.  (5/16/00, Valdes)
+
+ccdred/src/icgdata.gx
+ccdred/src/iclog.x
+ccdred/src/icmask.x
+ccdred/src/icombine.gx
+ccdred/src/icscale.x
+ccdred/src/icsetout.x
+    Changed declarations for the array "out" to be ARB rather than 3 in
+    some places (because it was not changed when another element was added)
+    or 4.  This will insure that any future output elements added will
+    no require changing these arguments for the sake of cosmetic correctness.
+    (1/13/99, Valdes)
+
 ccdred/src/t_combine.x
     Added workaround for error recovery problem that loses the error
     message.  (10/21/99, Valdes)

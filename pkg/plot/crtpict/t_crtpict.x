@@ -109,7 +109,7 @@ begin
 	# Loop over commands until EOF
 	repeat {
 	    if (redir) {
-		if (getline (STDIN, Memc[command], SZ_LINE) == EOF)
+		if (getline (STDIN, Memc[command]) == EOF)
 		    break
 		call sscan (Memc[command])
 		    call gargwrd (Memc[word], SZ_LINE)

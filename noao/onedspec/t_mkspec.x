@@ -109,7 +109,7 @@ begin
 	    if (nlines > 1)
 		buf = impl2r (im,i)
 	    else
-		buf = impl1r (im,1)
+		buf = impl1r (im)
 
 	    # Copy saved row to output image
 	    call amovr (Memr[row], Memr[buf], ncols)

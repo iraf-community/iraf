@@ -1,6 +1,6 @@
 include <fset.h>
-include <ctype.h>
 include <ctotok.h>
+include <ctype.h>
 include "../lib/obsfile.h"
 
 # T_OBSFILE -- Make an observations catalog using the data extracted
@@ -24,10 +24,10 @@ real	tolerance	# tolerance in pixels for position matching
 int	verify		# verify interactive user input
 int	verbose		# print status, warning and errors messages
 
-int	incat, sets, sh, ap, obs, outcat, fmt
+int	incat, sets, sh, ap, obs, outcat, fmt, wrap
 int	csp, cp, nincolumns, nfilters, nimages, npts, sortimid
 pointer	sp, outfilters, fname, tfname, column, incolumns, obscolumns, imtable
-pointer	x, y, mag, merr, imid, id
+pointer	objid, x, y, mag, merr, imid, id
 real	minmagerr
 
 bool	clgetb()
@@ -90,6 +90,7 @@ begin
 	if (access (Memc[tfname], 0, 0) == YES)
 	    call delete (Memc[tfname])
 	fmt = open (Memc[tfname], NEW_FILE, TEXT_FILE)
+	wrap = btoi (clgetb ("wrap"))
 
 	# Get the minimum magnitude error.
 	minmagerr = clgetr ("minmagerr")
@@ -209,6 +210,7 @@ begin
 	# Read the  x and y and magnitude and magnitude error data into
 	# separate data arrays.
 
+	objid = NULL
 	x = NULL
 	y = NULL
 	mag = NULL
@@ -220,11 +222,13 @@ begin
 	npts = 0
 	while (clgfil (photfiles, Memc[fname], SZ_FNAME) != EOF) {
 	    incat = open (Memc[fname], READ_ONLY, TEXT_FILE)
-	    npts = ph_mkimtable (imtable, incat, Memi[incolumns], x, y, mag,
-	        merr, imid, id, npts, normtime, sortimid, verbose)
+	    npts = ph_mkimtable (imtable, incat, Memi[incolumns], objid, x,
+	        y, mag, merr, imid, id, npts, normtime, sortimid, verbose)
 	    call close (incat)
 	}
 
+	if (objid != NULL)
+	    call realloc (objid, npts * (DEF_LENLABEL+1), TY_CHAR)
 	call realloc (x, npts, TY_REAL)
 	call realloc (y, npts, TY_REAL)
 	call realloc (mag, npts, TY_REAL)
@@ -236,9 +240,13 @@ begin
 	# turned off or by image id and y coordinate if position matching is
 	# turned on.
 
-	call ph_sort (imtable, nimages, Memr[x], Memr[y], Memr[mag],
-	    Memr[merr], Memi[imid], Memi[id], npts, sortimid, tolerance)
-
+	if (objid == NULL)
+	    call ph_sort (imtable, nimages, "", Memr[x], Memr[y], Memr[mag],
+	        Memr[merr], Memi[imid], Memi[id], npts, sortimid, tolerance)
+	else
+	    call ph_sort (imtable, nimages, Memc[objid], Memr[x], Memr[y],
+	        Memr[mag], Memr[merr], Memi[imid], Memi[id], npts, sortimid,
+		tolerance)
 	# Free the image id sorting index arrays.
 
 	if (imid != NULL)
@@ -260,9 +268,14 @@ begin
 	# zero or by x-y position if tolerance is greater than zero and output
 	# the data.
 
-	call ph_match (imtable, nimages, Memc[outfilters], nfilters, outcat,
-	    Memr[x], Memr[y], Memr[mag], Memr[merr], Memi[id], npts, tolerance,
-	    allfilters, verbose)
+	if (objid == NULL)
+	    call ph_match (imtable, nimages, Memc[outfilters], nfilters, outcat,
+	        "", Memr[x], Memr[y], Memr[mag], Memr[merr], Memi[id], npts,
+		tolerance, allfilters, wrap, verbose)
+	else
+	    call ph_match (imtable, nimages, Memc[outfilters], nfilters, outcat,
+	        Memc[objid], Memr[x], Memr[y], Memr[mag], Memr[merr],
+		Memi[id], npts, tolerance, allfilters, wrap, verbose)
 
 	if (verbose == YES)
 	    call printf ("\n")
@@ -273,6 +286,8 @@ begin
 
 	# Free the data arrays.
 
+	if (objid != NULL)
+	    call mfree (objid, TY_CHAR)
 	if (x != NULL)
 	    call mfree (x, TY_REAL)
 	if (y != NULL)
@@ -306,11 +321,12 @@ end
 
 # PH_SORT -- Sort the data.
 
-procedure ph_sort (imtable, nimages, x, y, mag, merr, imid, id, npts, sortimid,
-	tolerance)
+procedure ph_sort (imtable, nimages, objid, x, y, mag, merr, imid, id, npts,
+	sortimid, tolerance)
 
 pointer	imtable			# pointer to the symbol table
 int	nimages			# the number of images in the symbol table
+char	objid[ARB]		# the array of object ids objid[1] = EOS if none
 real	x[ARB]			# array of x coordinates
 real	y[ARB]			# array of y coordinates
 real	mag[ARB]		# array of magnitudes
@@ -347,7 +363,10 @@ begin
 	# information for images that have more than one entry.
 
 	if (sortimid == YES) {
-	    call ph_4r2isort (x, y, mag, merr, imid, id, npts)
+	    if (objid[1] == EOS)
+	        call ph_4r2isort (x, y, mag, merr, imid, id, npts)
+	    else
+	        call ph_1c4r2isort (objid, x, y, mag, merr, imid, id, npts)
 	    nptr = npts + 1
 	    do i = 1, nimages {
 	        symbol = Memi[sym+i-1]
@@ -441,14 +460,15 @@ end
 # PH_MATCH -- Match up the photometry lists by order in the input catalog
 # or x-y position.
 
-procedure ph_match (imtable, nimages, filters, nfilters, out, x, y, mag, merr,
-	ysort, npts, tolerance, allfilters, verbose)
+procedure ph_match (imtable, nimages, filters, nfilters, out, objid, x, y,
+	mag, merr, ysort, npts, tolerance, allfilters, wrap, verbose)
 
 pointer	imtable			# pointer to the image name symbol table
 int	nimages			# the number of images in the symbol table
 char	filters[ARB]		# the filters string
 int	nfilters		# the number of filters
 int	out			# the output file descriptor
+char	objid[ARB]		# the object id array
 real	x[ARB]			# the x input array
 real	y[ARB]			# the y input array
 real	mag[ARB]		# the magnitude array
@@ -457,6 +477,7 @@ int	ysort[ARB]		# the y sort index
 int	npts			# the number of points
 real	tolerance		# the x-y matching tolerance in pixels
 int	allfilters		# match in all filters
+int	wrap			# format the output file for easy reading
 int	verbose			# print status, warning and error messages
 
 int	i, k, nsets, imptr, filterno, ndata
@@ -468,8 +489,20 @@ pointer	sthead(), stnext(), stfind()
 begin
 	# Write out the output file column headers.
 	call fprintf (out, "\n")
-	call fprintf (out,
+	if (wrap == YES) {
+	    call fprintf (out,
 "# FIELD%17tFILTER%34tOTIME%40tAIRMASS%49tXCENTER%59tYCENTER%71tMAG%77tMERR\n")
+	} else {
+	    do i = 1, nfilters {
+		if (i == 1)
+		    call fprintf (out,
+"# FIELD%17tFILTER%34tOTIME%40tAIRMASS%49tXCENTER%59tYCENTER%71tMAG%77tMERR ")
+		else
+		    call fprintf (out,
+"%2tFILTER%19tOTIME%25tAIRMASS%34tXCENTER%44tYCENTER%56tMAG%62tMERR ")
+	    }
+	    call fprintf (out,"\n")
+	}
 	call fprintf (out, "\n")
 
 	# Allocate and or initialize working space.
@@ -596,16 +629,29 @@ begin
 
 	    # Do the matching.
 	    if (tolerance <= 0.0) {
-		call ph_join (out, Memc[label], Memi[sym], filters, nfilters,
-		    x, y, mag, merr, allfilters, verbose)
+		if (objid[1] == EOS)
+		    call ph_join (out, Memc[label], Memi[sym], filters,
+		        nfilters, "", x, y, mag, merr, allfilters, wrap,
+			verbose)
+		else
+		    call ph_join (out, Memc[label], Memi[sym], filters,
+		        nfilters, objid, x, y, mag, merr, allfilters, wrap,
+			verbose)
 	    } else {
 		if (index == NULL)
 		    call malloc (index, nfilters * ndata, TY_INT)
 		else
 		    call realloc (index, nfilters * ndata, TY_INT)
-		call ph_merge (out, Memc[label], Memi[sym], filters, nfilters,
-		    x, y, mag, merr, ysort, Memi[match], Memi[index], ndata,
-		    tolerance, allfilters, verbose)
+		if (objid[1] == EOS)
+		    call ph_merge (out, Memc[label], Memi[sym], filters,
+		        nfilters, "", x, y, mag, merr, ysort, Memi[match],
+			Memi[index], ndata, tolerance, allfilters, wrap,
+			verbose)
+		else
+		    call ph_merge (out, Memc[label], Memi[sym], filters,
+		        nfilters, objid, x, y, mag, merr, ysort, Memi[match],
+			Memi[index], ndata, tolerance, allfilters, wrap,
+			verbose)
 	    }
 	}
 
@@ -918,14 +964,15 @@ end
 # PH_STARDATA -- Decode the image name, x and y coordinates, magnitude
 # and magnitude error from the input catalog.
 
-int procedure ph_stardata (line, columns, x, y, mag, merr)
+int procedure ph_stardata (line, columns, objid, x, y, mag, merr)
 
 char	line[ARB]	# input line to be scanned
 int	columns[ARB]	# the list of input columns
+char	objid[ARB]	# the object id
 real	x, y		# the output x and y coordinates
 real	mag, merr	# the output magnitude and magnitude error
 
-int	i, xcol, ycol, mcol, ecol, maxcol, stat
+int	i, icol, xcol, ycol, mcol, ecol, maxcol, stat
 pointer	sp, str
 int	nscan()
 
@@ -933,12 +980,14 @@ begin
 	call smark (sp)
 	call salloc (str, SZ_FNAME, TY_CHAR)
 
+	icol = columns[CAT_ID]
 	xcol= columns[CAT_XCENTER]
 	ycol= columns[CAT_YCENTER]
 	mcol = columns[CAT_MAG]
 	ecol = columns[CAT_MERR]
-	maxcol = max (xcol, ycol, mcol, ecol)
+	maxcol = max (icol, xcol, ycol, mcol, ecol)
 
+	objid[1] = EOS
 	x = INDEFR
 	y = INDEFR
 	mag = INDEFR
@@ -948,7 +997,11 @@ begin
 	call sscan (line)
 	do i = 1, maxcol {
 
-	    if (i == xcol) {
+	    if (i == icol) {
+		call gargwrd (objid, DEF_LENLABEL)
+		if (nscan() != icol)
+		    stat = ERR
+	    } else if (i == xcol) {
 		call gargr (x)
 		if (nscan() != xcol)
 		    stat = ERR

@@ -133,6 +133,7 @@ begin
 			log=sparams.log, flux=sparams.flux, samedisp=no,
 			global=no, ignoreaps=no, confirm=no, listonly=no,
 			logfile=logfile, > log2)
+		    flpr
 		    hedit (specms, "dispcor", 0, add=yes, verify=no,
 			show=no, update=yes)
 		}

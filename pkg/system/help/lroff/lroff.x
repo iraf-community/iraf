@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<chars.h>
+include	<ctype.h>
 include	"lroff.h"
 
 .help lroff
@@ -54,6 +55,8 @@ errchk	input, textout, nofill, rawcopy, skiplines, breakline, right_justify
 errchk	salloc, new_section, new_indented_section, center_text, init_ls
 errchk	init_nh, indent_left_margin, do_LS, textout, set_wordbuf, set_outbuf
 include	"lroff.com"
+
+define	text_	98
 
 begin
 	call smark (sp)
@@ -146,6 +149,21 @@ begin
 	    case LS, LE:
 		call do_LS (out, Memc[ibuf+ip-1], command, last_command)
 
+	    case HR:
+		# HTML href target of the form ".hr <href> <text>", we skip
+		# ahead to the <text> and process as a normal line.
+		while (IS_WHITE(Memc[ibuf+ip]))		# skip space
+		    ip = ip + 1
+		while (!IS_WHITE(Memc[ibuf+ip]))	# skip <href>
+		    ip = ip + 1
+		call amovc (Memc[ibuf+ip+1], Memc[ibuf], SZ_IBUF)
+		ip = 0
+		goto text_
+
+	    case HN:
+		# HTML name target of the form ".hn <name>", ignore.
+		next
+
 	    # The following cases are for forms control.
 	    case BP:
 		call breakline (out, NJ)
@@ -172,7 +190,7 @@ begin
 		break
 
 	    default:				# ordinary line of text
-		if (Memc[ibuf] == '.') {
+text_		if (Memc[ibuf] == '.') {
 		    # Ignore unrecognized directives.
 		    next
 		} else {

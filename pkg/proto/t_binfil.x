@@ -124,13 +124,13 @@ procedure t_irafil()
 
 char	ifile[SZ_FNAME], out_image[SZ_FNAME]
 int	infile, nfiles, fd, i, j, file_nr, ncols, nrows, ptype, krow
-int	nr_bits, nr_chars, nr_skip, ival
+int	nr_bits, nr_chars, nr_skip, nc_skip, ival
 long	offset
 bool	flip, sign16
 pointer	im, pix, sp, temp, opix, sp1, hdr, src
 
 int	clpopni(), clplen(), clgfil(), clgeti()
-int	open()
+int	open(), read()
 bool	clgetb()
 pointer	immap(), impl2s(), impl2l()
 
@@ -198,17 +198,19 @@ begin
 	    call salloc (temp, ncols, TY_SHORT)
 
 	    # Skip over header pixels if any
+	    nc_skip = nr_skip / 2
 	    if (nr_skip > 0) {
 		call smark (sp1)
-		call salloc (hdr, nr_skip/2, TY_SHORT)
-		call read (fd, Mems[hdr], nr_skip/2)
+		call salloc (hdr, nc_skip, TY_SHORT)
+		if (read (fd, Mems[hdr], nc_skip) != EOF)
+		    ;
 		call sfree (sp1)
 	    }
 
 	    # Access pixels and write them out for each row
 	    nr_chars = ncols * nr_bits / 8 / 2
 	    do i = 1, nrows {
-	        iferr (call read (fd, Mems[pix], nr_chars))
+	        iferr (nc_skip = read (fd, Mems[pix], nr_chars))
 		    call amovks (0, Mems[pix], nr_chars)
 		else {
 		    if (nr_bits == 8) {

@@ -103,3 +103,4 @@ There is no way to explicitly specify the output image name.
 .ih
 SEE ALSO
 binfil,imcopy,reblock
+.endhelp

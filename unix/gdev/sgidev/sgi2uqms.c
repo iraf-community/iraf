@@ -199,7 +199,7 @@ FILE	*out;
 {
 	int	 n, x, y, swap_bytes;
 	float	 xscale, yscale;
-	register struct sgi_inst *sgi;
+	register struct sgi_inst *sgip;
 	struct	 sgi_inst inbuf[LEN_MCBUF], *buftop;
 	char	 *xyencode(), *penencode();
 
@@ -218,41 +218,41 @@ FILE	*out;
 
 	/* Process the metacode:
 	 */
-	while ((n = fread ((char *)inbuf, sizeof(*sgi), LEN_MCBUF, in)) > 0) {
+	while ((n = fread ((char *)inbuf, sizeof(*sgip), LEN_MCBUF, in)) > 0) {
 
 	    if (swap_bytes)
-		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgi) * n);
+		bswap2 ((char *)inbuf, (char *)inbuf, sizeof(*sgip) * n);
 
 	    buftop = inbuf + n;
 
-	    for (sgi = inbuf;  sgi < buftop;  sgi++) {
-		switch (sgi->opcode) {
+	    for (sgip = inbuf;  sgip < buftop;  sgip++) {
+		switch (sgip->opcode) {
 		case SGK_FRAME:
 		    fwrite (DEV_FRAME, strlen(DEV_FRAME), 1, out);
 		    break;
 
 		case SGK_MOVE:
-		    x = dev_left + sgi->x * xscale;
-		    y = dev_bottom + sgi->y * yscale;
+		    x = dev_left + sgip->x * xscale;
+		    y = dev_bottom + sgip->y * yscale;
 		    fwrite (xyencode ('U', x, y), SZ_VECT, 1, out);
 		    break;
 
 		case SGK_DRAW:
-		    x = dev_left + sgi->x * xscale;
-		    y = dev_bottom + sgi->y * yscale;
+		    x = dev_left + sgip->x * xscale;
+		    y = dev_bottom + sgip->y * yscale;
 		    fwrite (xyencode ('D', x, y), SZ_VECT, 1, out);
 		    break;
 
 		case SGK_SETLW:
 		    /* Set pen width.
 		     */
-		    fwrite (penencode (DEV_SETLW, dev_penbase + ((sgi->x) - 1) *
-			dev_penslope), SZ_PENCMD, 1, out);
+		    fwrite (penencode (DEV_SETLW, dev_penbase +
+			((sgip->x) - 1) * dev_penslope), SZ_PENCMD, 1, out);
 		    break;
 		
 		default:
 		    fprintf (stderr, "sgi2uqms: unrecognized sgi opcode %d\n",
-			sgi->opcode);
+			sgip->opcode);
 		    break;
 		}
 	    }

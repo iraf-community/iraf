@@ -1,0 +1,130 @@
+.help cqget Mar00 "Catquery Package"
+.ih
+NAME
+cqget -- read configuration file keywords directly
+.ih
+SYNOPSIS
+
+.nf
+      [ird]val = cq_fget[ird](cq, fname)
+        nelems = cq_fga[ird](cq, fname, [ird]array, max_nelems)
+            call cq_fgwrd (cq, fname, wrd, maxch)
+	    call cq_fgstr (cq, fname, str, maxch)
+	nlines = cq_fgtext (cq, fname, text, maxch)
+	  stat = cq_scan (cq)
+
+pointer	cq		# the configuration file descriptor
+char	fname		# the field or keyword to be located
+int	iarray		# the returned integer array
+int	rarray		# the returned real array
+int	darray		# the returned double array
+int	max_nelems	# the maximum size of the returned array
+char	wrd		# the keyword word value to be read
+char	str		# the keyword string value to be read
+char	text		# the keyword text value to be read
+int	maxch		# the maximum size of the word, string, text value
+.fi
+.ih
+SYNOPSIS
+.ls cq
+The configuration file descriptor.
+.le
+.ls fname
+The name of the field or keyword to be read.
+.le
+.ls [ird]array
+The integer, real, or double array returned by a call to cq_fga[ird].
+.le
+.ls max_nelems
+The maximum number of elements in the array returned by a call to
+cq_fga[ird].
+.le
+.ls wrd, str, text
+The word, string, or text value returned by a call to cq_fgwrd, cq_fgstr, or
+cq_fgtext.
+.le
+.ls maxch
+The maximum number of characters in the word, string, or text returned
+by cq_fgwrd, cq_fgstr, cq_fgtext.
+.le
+.ih
+DESCRIPTION
+
+Cq_fgval[ird] is an integer, real, or double function which returns the
+integer, real, or double value of the requested field or keyword as its
+function value.
+
+Cq_fga[ird] returns an integer, real, or double array for the requested
+field.  Cq_fga[ird] is an integer function which returns the number of elements
+in the retrieved array as its function value.
+
+Cq_fg[wrd/str/text] returns the next word, the entire string,  or the
+number of lines in the requested keyword. Cq_fgtext is an integer function
+which returns the number of lines in the returned text as its functions
+value.
+
+.ih
+NOTES
+The cqget routines are used to read keywords or fields in the current catalog
+or survey directly. The routines cq_setcat or cq_setcatn must be called before
+the cqget routines can be used.
+
+The cqget routines must be error checked to avoid task termination.
+.ih
+EXAMPLES
+
+Sample catalog configuration file  record.
+
+.nf
+begin usno2@noao
+address inet:80:www.noao.edu:text
+query GET /cgi-bin/usno/usnoextract?search=yes&ra=%-s&dec=%-s&width=%-s HTTP/1.0
+\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec 00:00:00.0 degrees %0.1h
+    radius 5.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+type stext
+    hskip 10
+    tskip  6
+    recsize 44
+    triml 0
+    trimr 4
+nheader 1
+    csystem J2000.0
+nfields 4
+    ra 1 0 d hours %12.3h
+    dec 2 0 d degrees %12.2h
+    mag1 3 0 r INDEF %4.1f
+    mag2 4 0 r INDEF %4.1f
+.fi
+
+Example 1: To fetch the query field which includes embedded blanks use cq_fgstr.
+
+.nf
+call cq_fgstr (cq, "query", buffer, SZ_LINE)
+.fi
+
+Example 2: To fetch the type field use cq_fgwrd.
+
+.nf
+call cq_fgwrd (cq, "type", buffer, SZ_LINE)
+.fi
+
+Example 3: To determine the number of query parameters.
+
+.nf
+nquery = cq_fgeti (cq, "nquery")
+.fi
+
+Example4: To return a text array which follows a numerically valued parameter.
+
+.nf
+nquery = cq_fgeti (cq, "nquery")
+nlines = cq_fgtext (cq, "nquery", buffer, nquery * SZ_LINE)
+.fi
+
+.ih
+SEE ALSO
+.endhelp

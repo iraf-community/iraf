@@ -1,6 +1,6 @@
 # FITSKY structure
 
-define LEN_SKYSTRUCT		(35 + SZ_FNAME + 1)
+define LEN_SKYSTRUCT		(36 + SZ_FNAME + 1)
 
 # sky fitting parameters
 
@@ -37,13 +37,15 @@ define	AP_SNY		Memi[$1+26]	# y dimension of sky subraster
 
 # fitsky output
 
-define	AP_SKY_MODE	Memr[$1+27]	  # computed sky value
-define	AP_SKY_SIG	Memr[$1+28]	  # computed sky sigma
-define	AP_SKY_SKEW	Memr[$1+29]	  # computed sky skew
-define	AP_NSKY		Memi[$1+30]	  # number of sky pix
-define	AP_NSKY_REJECT	Memi[$1+31]	  # number of rejected sky pix
+define	AP_OSXCUR	Memr[$1+27]	# x center of sky annulus
+define	AP_OSYCUR	Memr[$1+28]	# y center of sky annulus
+define	AP_SKY_MODE	Memr[$1+29]	  # computed sky value
+define	AP_SKY_SIG	Memr[$1+30]	  # computed sky sigma
+define	AP_SKY_SKEW	Memr[$1+31]	  # computed sky skew
+define	AP_NSKY		Memi[$1+32]	  # number of sky pix
+define	AP_NSKY_REJECT	Memi[$1+33]	  # number of rejected sky pix
 
-define	AP_SSTRING	Memc[P2C($1+32)]  # salgorithm string
+define	AP_SSTRING	Memc[P2C($1+34)]  # salgorithm string
 
 # default setup values for sky fitting
 

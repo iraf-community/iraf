@@ -15,7 +15,7 @@ int	boundary	# type of boundary extension
 real	constant	# constant for constant boundary extension
 
 int	i, ncols, nlines, col1, col2, nincols, inline, outline
-pointer	sp, lineptrs, linebuf, outbuf
+pointer	sp, lineptrs, linebuf, outbuf, nkern
 pointer	imgs2r(), impl2r()
 errchk	imgs2r, impl2r
 
@@ -23,6 +23,7 @@ begin
 	# Set up an array of line pointers.
 	call smark (sp)
 	call salloc (lineptrs, nyk, TY_POINTER)
+	call salloc (nkern, nxk * nyk, TY_REAL)
 
 	# Set the number of image buffers.
 	call imseti (im1, IM_NBUFS, nyk)
@@ -44,6 +45,9 @@ begin
 	col1 = 1 - nxk / 2
 	col2 = IM_LEN(im1,1) + nxk / 2
 	nincols = col2 - col1 + 1
+
+	# Flip the kernel
+	call rg_pflip (kernel, Memr[nkern], nxk, nyk)
 
 	# Initialise the line buffers.
 	inline = 1 - nyk / 2
@@ -73,11 +77,30 @@ begin
 	    call aclrr (Memr[outbuf], ncols)
 	    do i = 1, nyk
 	        call acnvr (Memr[Memi[lineptrs+i-1]], Memr[outbuf], ncols,
-	    	    kernel[1,i], nxk)
+	    	    Memr[nkern+(i-1)*nxk], nxk)
 
 	    inline = inline + 1
 	}
 
 	# Free the image buffer pointers
 	call sfree (sp)
+end
+
+
+# RG_PFLIP -- Flip the kernel in preparation for convolution.
+
+procedure rg_pflip (inkern, outkern, nxk, nyk)
+
+real	inkern[nxk,nyk]		# the input kernel
+real	outkern[nxk,nyk]	# the output kernel
+int	nxk, nyk		# the kernel dimensions 
+
+int	i, j
+
+begin
+	do j = 1, nyk {
+	    do i = 1, nxk {
+		outkern[i,j] = inkern[nxk+1-i,nyk+1-j]
+	    }
+	}
 end

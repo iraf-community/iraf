@@ -14,7 +14,7 @@ procedure ic_gdatas (in, out, dbuf, d, id, n, m, lflag, offsets, scales,
 	zeros, nimages, npts, v1, v2)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output images
+pointer	out[ARB]		# Output images
 pointer	dbuf[nimages]		# Data buffers for nonaligned images
 pointer	d[nimages]		# Data pointers
 pointer	id[nimages]		# ID pointers
@@ -240,7 +240,7 @@ procedure ic_gdatar (in, out, dbuf, d, id, n, m, lflag, offsets, scales,
 	zeros, nimages, npts, v1, v2)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output images
+pointer	out[ARB]		# Output images
 pointer	dbuf[nimages]		# Data buffers for nonaligned images
 pointer	d[nimages]		# Data pointers
 pointer	id[nimages]		# ID pointers
@@ -456,3 +456,4 @@ begin
 	    call mfree (dp, TY_REAL)
 	}
 end
+

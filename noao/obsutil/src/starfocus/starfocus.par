@@ -1,0 +1,32 @@
+# STARFOCUS -- Determine best star focus.
+
+images,s,a,,,,"List of images"
+focus,s,h,"1x1",,,"Focus values"
+fstep,s,h,"",,,"Focus step
+"
+nexposures,s,h,"1",,,"Number of exposures"
+step,s,h,"30",,,"Step in pixels"
+direction,s,h,"-line","-line|+line|-column|+column",,"Step direction"
+gap,s,h,"end","none|beginning|end",,"Double step gap
+"
+coords,s,h,"mark1","center|mark1|markall",,"Object coordinates"
+wcs,s,h,"logical","logical|physical|world",,"Coordinate system"
+display,b,h,yes,,,"Display images?"
+frame,i,h,1,1,,"Display frame to use
+"
+level,r,h,0.5,,,"Measurement level (fraction or percent)"
+size,s,h,"FWHM","Radius|FWHM|GFWHM|MFWHM",,"Size to display"
+beta,r,h,INDEF,2.1,,Moffat beta parameter
+scale,r,h,1.,,,"Pixel scale"
+radius,r,h,5.,,,"Measurement radius (pixels)"
+sbuffer,r,h,5,,,"Sky buffer (pixels)"
+swidth,r,h,5.,,,"Sky width (pixels)"
+saturation,r,h,INDEF,,,"Saturation level"
+ignore_sat,b,h,no,,,"Ignore objects with saturated pixels?"
+iterations,i,h,2,1,,"Number of radius adjustment iterations"
+xcenter,r,h,INDEF,,,X field center (pixels)
+ycenter,r,h,INDEF,,,Y field center (pixels)
+logfile,s,h,"logfile",,,"Logfile
+"
+imagecur,*imcur,h,"",,,"Image cursor input"
+graphcur,*gcur,h,"",,,"Graphics cursor input"

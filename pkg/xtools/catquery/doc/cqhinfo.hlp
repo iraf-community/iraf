@@ -1,0 +1,39 @@
+.help cqhinfo Mar00 "Catquery Package"
+.ih
+NAME
+cqhinfo -- get catalog results header parameter value by name
+.ih
+SYNOPSIS
+
+hparno = cq_hinfo (res, hname, hvalue, max_hvalue)
+
+.nf
+pointer	res		# the results descriptor
+char	hname		# the results header parameter name
+char	hvalue		# the returned header parameter value
+int	max_hvalue	# the maximum size of the header parameter value
+.fi
+.ih
+ARGUMENTS
+.ls  res    
+The results descriptor.
+.le
+.ls hname
+The name of the results header parameter for which the value is to be returned.
+.le
+.ls hvalue
+The returned results header parameter value.
+.le
+.ls max_hvalue
+The maximum size of the returned results header parameter value.
+.le
+.ih
+DESCRIPTION
+Cq_hinfo returns the value of the requested header parameter. Cq_hinfo is
+an integer function which returns the header parameter sequence number
+as its function value.  Zero is returned if the header parameter
+cannot be found.
+.ih
+SEE ALSO
+cqhinfon
+.endhelp

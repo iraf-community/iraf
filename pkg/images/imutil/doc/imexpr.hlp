@@ -1,4 +1,4 @@
-.help imexpr Aug93 images.imutil
+.help imexpr Dec01 images.imutil
 .ih
 NAME
 imexpr -- General image expression evaluator
@@ -194,6 +194,11 @@ set of operators:
 	==			equals
 	!=			not equals
 	?=			substring equals
+
+	&			bitwise and
+	|			bitwise or
+	^			bitwise exclusive or
+	~			bitwise not (complement)
 .fi
 
 The conditional expression has the value \fIexpr1\fR if \fIexpr\fR is true,

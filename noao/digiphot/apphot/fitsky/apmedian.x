@@ -53,6 +53,15 @@ begin
 	if (maxiter < 1 || (IS_INDEFR(losigma) && IS_INDEFR(hisigma)) ||
 	    sky_sigma <= 0.0)
 	    return (AP_OK)
+	#call printf (
+	    #"mean=%g med=%g sigma=%g nsky=%d nrej=%d dmin=%g dmax=%g\n")
+	    #call pargr (sky_mean)
+	    #call pargr (sky_med)
+	    #call pargr (sky_sigma)
+	    #call pargi (nsky)
+	    #call pargi (nsky_reject)
+	    #call pargr (dmin)
+	    #call pargr (dmax)
 
 	# Reject points outside losigma * sky_sigma and hisigma * sky_sigma
 	# of the median.
@@ -75,6 +84,9 @@ begin
 		    hisigma * sky_sigma)
 	    else
 	        hicut = sky_med + hisigma * sky_sigma
+	    #call printf ("    locut=%g hicut=%g\n")
+		#call pargr (locut)
+		#call pargr (hicut)
 
 	    # Detect pixels to be rejected.
 	    for (il = ilo; il <= nskypix; il = il + 1) {
@@ -143,6 +155,16 @@ begin
 	    call apmoments (sumpx, sumsqpx, sumcbpx, nsky, sky_zero,
 	        sky_mean, sky_sigma, sky_skew)
 	    sky_mean = max (dmin, min (sky_mean, dmax))
+	    #call printf (
+	    #"    mean=%g med=%g sigma=%g nsky=%d nrej=%d dmin=%g dmax=%g\n")
+	        #call pargr (sky_mean)
+	        #call pargr (sky_med)
+	        #call pargr (sky_sigma)
+	        #call pargi (nsky)
+	        #call pargi (nsky_reject)
+	        #call pargr (dmin)
+	        #call pargr (dmax)
+
 	    if (sky_sigma <= 0.0)
 		break
 	    ilo = il

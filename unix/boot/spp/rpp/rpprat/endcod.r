@@ -7,6 +7,7 @@ subroutine endcod (endstr)
 
 character endstr(1)
 include COMMON_BLOCKS
+string	sepro "call zzepro"
 string	sret "return"
 
 	if (esp != 0)
@@ -21,6 +22,9 @@ string	sret "return"
 
 	if (retlab != NULL)
 	    call outnum (retlab)
+	call outtab
+	call outstr (sepro)
+	call outdon
 	call outtab
 	call outstr (sret)
 	call outdon

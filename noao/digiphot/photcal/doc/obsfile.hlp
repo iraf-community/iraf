@@ -9,111 +9,106 @@ obsfile photfiles incolumns idfilters imsets observations
 .ih
 PARAMETERS
 .ls photfiles
-A list of text files containing the image names or an image id,
-x-y positions, magnitudes, magnitude errors, airmasses, filter ids,
-exposure times, and time of observation of all the measured objects.
-\fIPhotfiles\fR are assumed to be the output of the user's own
-digital photometry program. All the files in the list must have the
-format specified by \fIincolumns\fR.
+A list of text files containing the image names or an image id, x-y positions,
+magnitudes, magnitude errors, airmasses, filter ids, exposure times, and time
+of observation of all the measured objects. \fIPhotfiles\fR are assumed to be
+the output of the user's own digital photometry program. All the files in the
+list must have the format specified by \fIincolumns\fR.
 .le
 .ls incolumns
-A list of nine numbers separated by commas or whitespace specifying
-which columns in \fIphotfiles\fR contain the following fields: the image name
-or id, x coordinate, y coordinate, filter id, exposure time, airmass, time of observation,
-instrumental magnitude, and magnitude error, respectively.  
+A list of nine numbers separated by commas or whitespace specifying which
+columns in \fIphotfiles\fR contain the following fields: the image name or id,
+x coordinate, y coordinate, filter id, exposure time, airmass, time of
+observation, instrumental magnitude, and magnitude error, respectively.  
 .le
 .ls idfilters
-The list of filter ids separated by whitespace or
-commas which define a complete observation. The filter ids must
-correspond to those in \fIphotfiles\fR.
+The list of filter ids separated by whitespace or commas which define a
+complete observation. The filter ids must correspond to those in
+\fIphotfiles\fR.
 .le
 .ls imsets
-The name of the text file which lists the observations of
-each field, assigns a name to each
-field, and tells OBSFILE which images belong to the same
-observation of that field.
-Only observations corresponding to the images specified in \fIimsets\fR
-will be extracted from \fIphotfiles\fR.
-Observations are listed in \fIimsets\fR, 1 observation
-per line with the field name in column 1, a colon in column 2,
-followed by, in filter order and separated by whitespace, the names of the
-images of that field belonging to that observation.
-The format of \fIimsets\fR is described in detail below.
+The name of the text file which lists the observations of each field, assigns a
+name to each field, and tells OBSFILE which images belong to the same
+observation of that field. Only observations corresponding to the images
+specified in \fIimsets\fR will be extracted from \fIphotfiles\fR. Observations
+are listed in \fIimsets\fR, 1 observation per line with the field name in
+column 1, a colon in column 2, followed by, in filter order and separated by
+whitespace, the names of the images of that field belonging to that
+observation. The format of \fIimsets\fR is described in detail below.
 .le
 .ls observations
 The output observations file suitable for input to FITPARAMS or
 EVALFIT/INVERTFIT.
 .le
+.ls wrap = yes
+Format the output observations file for easy reading ? If wrap = yes then the
+observation in each filter are written on a separate line and the * character
+in column 1 is interpreted as a continuation character. Otherwise all the
+observations for a single filter are written on a single line where the maximum
+length of a line is SZ_LINE characters.
+.le
 .ls obsparams = ""
-The name of an optional text file containing the correct filter ids, exposure times,
-airmasses, and time of observations for each image whose values are either undefined or
-incorrectly stored in \fIphotfiles\fR.  The observing parameters for each image are
-listed in the file \fIobsparams\fR, 1 image per line with the image
-name in column 1 and the filter ids, exposure times, airmasses, and times of observation
-listed in columns \fIobscolumns\fR.  The image names must match those in
-\fIimsets\fR. Images which have no
-entries in \fIobsparams\fR are assigned the values stored in \fIphotfiles\fR.
+The name of an optional text file containing the correct filter ids, exposure
+times, airmasses, and time of observations for each image whose values are
+either undefined or incorrectly stored in \fIphotfiles\fR. The observing
+parameters for each image are listed in the file \fIobsparams\fR, 1 image per
+line with the image name in column 1 and the filter ids, exposure times,
+airmasses, and times of observation listed in columns \fIobscolumns\fR. The
+image names must match those in \fIimsets\fR. Images which have no entries in
+\fIobsparams\fR are assigned the values stored in \fIphotfiles\fR.
 .le
 .ls obscolumns = "2 3 4 5"
 The list of numbers separated by commas or whitespace specifying which columns
-in the text file \fIobsparams\fR contain the correct filter ids, 
-exposure times, airmasses, and times of observation respectively.
-The number 0 can be used as a place holder in the \fIobscolumns\fR string.
-For example, to correct only  the \fIphotfiles\fR airmass
-values, \fIobscolumns\fR should be set to "0 0 column 0", where column is
-the airmass column number.
-The default value of \fIobscolumns\fR corresponds to
-the format of the default \fIobsparams\fR file produced by MKIMSETS.
+in the text file \fIobsparams\fR contain the correct filter ids, exposure
+times, airmasses, and times of observation respectively. The number 0 can be
+used as a place holder in the \fIobscolumns\fR string. For example, to correct
+only  the \fIphotfiles\fR airmass values, \fIobscolumns\fR should be set to
+"0 0 column 0", where column is the airmass column number. The default value of
+\fIobscolumns\fR corresponds to the format of the default \fIobsparams\fR file
+produced by MKIMSETS.
 .le
 .ls minmagerr = 0.001
-The error that will be assigned to a non-INDEF valued magnitude
-measurement whose recorded error is less than \fIminmagerr\fR.
+The error that will be assigned to a non-INDEF valued magnitude measurement
+whose recorded error is less than \fIminmagerr\fR.
 .le
 .ls shifts = ""
-The name of the text file specifying the x and y shifts to be ADDED
-to the x-y positions of all objects in an image before position matching
-(the original x's and y's are retained in the output). 
-Shifts are listed for each image, 1 image per line with
-the name of the image in column 1, followed by the x and y shifts
-in columns 2 and 3 respectively. Image names must match those in 
-\fIimsets\fR. Images for which
-no shift is supplied are assigned x and y shifts of zero.
+The name of the text file specifying the x and y shifts to be ADDED to the x-y
+positions of all objects in an image before position matching (the original x's
+and y's are retained in the output). Shifts are listed for each image, 1 image
+per line with the name of the image in column 1, followed by the x and y shifts
+in columns 2 and 3 respectively. Image names must match those in \fIimsets\fR.
+Images for which no shift is supplied are assigned x and y shifts of zero.
 .le
 .ls apercors = ""
-The name of the text file specifying the aperture corrections 
-to be ADDED to the extracted magnitudes.
-Aperture corrections are listed for each image, 1 image per line with
-the name of the image in column 1, followed by the aperture correction in
-magnitudes in column 2.
-The image names must match those in
-\fIimsets\fR. Images for which
-no aperture correction is supplied are assigned a default value of zero.
+The name of the text file specifying the aperture corrections to be ADDED to
+the extracted magnitudes. Aperture corrections are listed for each image, 1
+image per line with the name of the image in column 1, followed by the aperture
+correction in magnitudes in column 2.  The image names must match those in
+\fIimsets\fR. Images for which no aperture correction is supplied are assigned
+a default value of zero.
 .le
 .ls normtime = no
 Normalize the magnitudes to an exposure time of one time unit using the
 exposure times in \fIphotfiles\fR.
 .le
 .ls tolerance = 5.0
-The tolerance in pixels for matching objects in the same observation,
-but different images.  OBSFILE extracts
-the x and y coordinates of each object in each image of a given observation
-from \fIphotfiles\fR, adds the shift for that image in
-\fIshifts\fR to the extracted x-y coordinates,
-and matches the objects to within \fItolerance\fR pixels.
-Missing objects are assigned INDEF entries in \fIobservations\fR.
-If \fItolerance\fR is less
-than or equal to 0 no coordinate matching is done, and objects are
-matched in order of occurrence with missing objects being assigned
-INDEF values.
+The tolerance in pixels for matching objects in the same observation, but
+different images.  OBSFILE extracts the x and y coordinates of each object
+in each image of a given observation from \fIphotfiles\fR, adds the shift for
+that image in \fIshifts\fR to the extracted x-y coordinates, and matches the
+objects to within \fItolerance\fR pixels. Missing objects are assigned INDEF
+entries in \fIobservations\fR. If \fItolerance\fR is less than or equal to 0
+no coordinate matching is done, and objects are matched in order of occurrence
+with missing objects being assigned INDEF values.
 .le
 .ls allfilters = no
-Output only objects which are sucessfully matched in all the filters
-specified by \fIidfilters\fR?
+Output only objects which are sucessfully matched in all the filters specified
+by \fIidfilters\fR?
 .le
 .ls verify = no
 Verify interactive user input? This option is used only if any of \fIimsets\fR,
-\fIobsparams\fR, \fIshifts\fR, or \fI apercors\fR are set to the 
-standard input "STDIN".
+\fIobsparams\fR, \fIshifts\fR, or \fI apercors\fR are set to the standard input
+"STDIN".
 .le
 .ls verbose = yes
 Print messages about actions taken by the task or any warnings or errors
@@ -123,11 +118,10 @@ encountered?
 .ih
 DESCRIPTION
 
-OBSFILE takes a list of user generated text files \fIphotfiles\fR,
-where each file contains  observations of one or more objects taken
-through one or more filters, and the image 
-set file \fIimsets\fR, and prepares a single observations
-file \fIobservations\fR. OBSFILE is intended for use with any
+OBSFILE takes a list of user generated text files \fIphotfiles\fR, where each
+file contains  observations of one or more objects taken through one or more
+filters, and the image set file \fIimsets\fR, and prepares a single
+observations file \fIobservations\fR. OBSFILE is intended for use with any
 user digital stellar photometry program which writes its output in simple text
 files format.
 

@@ -227,7 +227,7 @@ begin
 
 	# Type the new value.
 	call apsetr (ap, CAPERT, capert / 2.0) 
-	 call printf ("\tNew centering box width: %g scale units  %g pixels\n")
+	call printf ("\tNew centering box width: %g scale units  %g pixels\n")
 	    call pargr (capert)
 	    call pargr (scale * capert)
 

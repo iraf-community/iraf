@@ -2,7 +2,7 @@
 .ih
 NAME
 tbdump -- print fields (columns) from a list of  APPHOT/DAOPHOT STSDAS table
-databases
+	  databases
 .ih
 USAGE
 tbdump tables columns expr

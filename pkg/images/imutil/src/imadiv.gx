@@ -43,7 +43,7 @@ begin
 	    im[2] = im_a
 	    while (ima_nl$t (im, buf, v, 2) != EOF) {
 		if (b == 0$f)
-		    call amovk$t (divzero, Mem$t[1], len)
+		    call amovk$t (divzero, Mem$t[buf[1]], len)
 		else if (b == 1$f)
 		    call amov$t (Mem$t[buf[2]], Mem$t[buf[1]], len)
 		else

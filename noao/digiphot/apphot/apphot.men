@@ -1,7 +1,7 @@
          aptest - Run basic tests on the apphot package tasks
 	 center - Compute accurate centers for a list of objects
      centerpars - Edit the centering parameters
-	daofind - Find stars in an image using the DAO algorithm
+	daofind - Find stars in an image using the dao algorithm
        datapars - Edit the data dependent parameters
        findpars - Edit the star detection parameters
 	 fitpsf - Model the stellar psf with an analytic function
@@ -17,5 +17,10 @@
 	  wphot - Measure magnitudes for a list of stars with weighting
 
         lintran - Linearly transform a coordinate list
-       pexamine - Interactively examine or edit an apphot output file
-	 txdump - Dump selected fields from an apphot output file
+          pcalc - Do arithmetic operations on a list of apphot databases
+       pconvert - Convert a text database to a tables database
+          pdump - Print selected fields from a list of apphot databases
+       pexamine - Interactively examine and edit an apphot database
+      prenumber - Renumber stars in an apphot database
+        pselect - Select records from an apphot database
+          psort - Sort an apphot database

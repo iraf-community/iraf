@@ -636,9 +636,25 @@ begin
 		p2 = (NP2(sh1) - a) / b
 		p3 = (IM_LEN(out,1) - a) / b
 		nw = nint (min (max (p1, p3), max (p1, p2))) + NP1(sh1) - 1
-		if (p1 != p2)
-		    dw = (wb - w) / (p2 - p1) * (1 + z)
-		w = w * (1 + z) - (p1 - 1) * dw
+
+		w = w * (1 + z)
+		wb = wb * (1 + z)
+		if (dtype == DCLOG) {
+		    w = log10 (w)
+		    wb = log10 (wb)
+		    if (p1 != p2)
+			dw = (wb - w) / (p2 - p1)
+		    w = w - (p1 - 1) * dw
+		    wb = w + (nw - 1) * dw
+		    w = 10.**w
+		    wb = 10.**wb
+		    dw = (wb - w) / (nw - 1)
+		} else {
+		    if (p1 != p2)
+			dw = (wb - w) / (p2 - p1)
+		    w = w - (p1 - 1) * dw
+		    wb = w + (nw - 1) * dw
+		}
 
 		call smw_swattrs (mwout, l, 1, ap, beam, dtype,
 		    w, dw, nw, z, aplow, aphigh, Memc[coeff])
@@ -963,9 +979,25 @@ begin
 		    p2 = (NP2(sh1) - Memd[ltv2]) / Memd[ltm2]
 		    p3 = (IM_LEN(out,1) - Memd[ltv2]) / Memd[ltm2]
 		    nw = nint (min (max (p1, p3), max (p1, p2))) + NP1(sh1) - 1
-		    if (p1 != p2)
-			dw = (wb - w) / (p2 - p1) * (1 + z)
-		    w = w * (1 + z) - (p1 - 1) * dw
+
+		    w = w * (1 + z)
+		    wb = wb * (1 + z)
+		    if (dtype == DCLOG) {
+			w = log10 (w)
+			wb = log10 (wb)
+			if (p1 != p2)
+			    dw = (wb - w) / (p2 - p1)
+			w = w - (p1 - 1) * dw
+			wb = w + (nw - 1) * dw
+			w = 10.**w
+			wb = 10.**wb
+			dw = (wb - w) / (nw - 1)
+		    } else {
+			if (p1 != p2)
+			    dw = (wb - w) / (p2 - p1)
+			w = w - (p1 - 1) * dw
+			wb = w + (nw - 1) * dw
+		    }
 
 		    call smw_swattrs (mwout, 1, 1, ap, beam, dtype,
 			w, dw, nw, z, aplow, aphigh, Memc[coeff])

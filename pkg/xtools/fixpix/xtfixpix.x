@@ -18,7 +18,7 @@ pointer	pm			#I Pixel mask
 int	lvalin			#I Input line interpolation code
 int	cvalin			#I Input column interpolation code
 
-int	i, j, k, l, n, nc, nl, l1, l2, lmin, lmax, ncols, lval, cval
+int	i, j, k, l, n, nc, nl, l1, l2, lmin, lmax, ncols, lval, cval, ncompress
 short	val
 long	v[IM_MAXDIM]
 pointer	fp, ptr, col, pl1, pl2
@@ -116,6 +116,7 @@ begin
 	    ncols = 0
 	    lmin = nl
 	    lmax = 0
+	    ncompress = 0
 	    do i = 1, nc {
 		if (Mems[cols+i-1] == 0)
 		    next
@@ -144,7 +145,12 @@ begin
 				val = lval
 			    v[2] = l
 			    call pmplps (pm, v, val, 0, 1, PIX_SRC)
+			    ncompress = ncompress + 1
 			}
+		    }
+		    if (ncompress > 100) {
+			call pm_compress (pm)
+			ncompress = 0
 		    }
 		    if (j > 0) {
 			if (ncols == n) {

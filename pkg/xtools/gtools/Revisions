@@ -1,5 +1,12 @@
 .help revisions Jun88 pkg.xtools.gtools
 .nf
+=====
+V2.12
+=====
+
+pkg$xtools/gtools/gtlabax.x
+    Added workaround to avoid GUI message.  (2/1/99, Valdes)
+
 =======
 V2.11.2
 =======

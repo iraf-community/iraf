@@ -1,5 +1,57 @@
 .help revisions Jun88 noao.twodspec.apextract
 .nf
+
+apextract.x
+approfile.x
+apvariance.x
+    Modified to handle edge pixels by interpolation.  (6/19/02, Valdes)
+
+=====
+V2.12
+=====
+
+apgraph.x
+apgmark.x
+    When there is just one aperture the background regions are marked
+    in apedit and in plotfile output.  (9/21/01, Valdes)
+
+doc/apall.hlp
+    The help page was indicating the extra information output was the
+    variance rather than the sigma.  (8/19/00, Valdes)
+
+apextract.x
+    The checking for the maximum number of apertures that fit in the allocated
+    memory (the "do j = i, napsex" loop) was incorrect because i was used
+    instead of the loop index j.  (3/20/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+=======
+V2.11.3
+=======
+
+approfile.x
+    In the previous change to the weights in the Horne algorithm
+    the behavior when all data is rejected (say because the background
+    is set wrong and all data is below the background) the weights
+    would be set to MAX_REAL/10 which would cause CVFIT to fail.
+    (3/13/00, Valdes)
+
+apall1.par
+apdebug.par
+apfit1.par
+apnoise1.par
+apnorm1.par
+apparams.par
+    Reduced the polysep parameter.  (1/26/00, Valdes)
+
+apextractbak.x	-
+mkpkg
+    Removed this second old copy which was accidentally introduced into
+    mkpkg as well resulting in multiple copies of the same procedures
+    in the library in V2.11.3beta.  (12/9/99, Valdes)
+
 doc/apflatten.hlp
     Removed extraneous parameters not actually in task parameter set.
     (10/21/99, Valdes)

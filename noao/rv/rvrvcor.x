@@ -214,7 +214,7 @@ begin
 	    # Time specified in the DATE-OBS keyword, if present, takes
 	    # precedence over UT keyword value.
 
-	    if (flags != TF_OLDFITS) {
+	    if (flags != TF_OLDFITS && !IS_INDEFD(time)) {
 		# Use the DATE-OBS time value as the UT.
 		ut_start = time
 

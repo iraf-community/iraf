@@ -1,5 +1,20 @@
 .help revisions Aug90 pkg.plot
 .nf
+=====
+V2.12
+=====
+
+pkg/plot/crtpic/t_crtpict.x
+pkg/plot/crtpic/plotimage.x
+pkg/plot/t_graph.x
+pkg/plot/t_implot.x
+    Fixed various missing/extra argument and function/subroutine mismatch
+    problems found by running spplint on the code. (9/19/01, Davis)
+
+pkg/plot/doc/contour.hlp
+    Clarified the use of the 'fill' parameter in the example when overlaying
+    contours to an image display. (08/10/01, MJF)
+
 pkg/plot/mkpkg
     Added some missing file dependencies to the mkpkg file. (21/9/99, Davis)
 

@@ -51,38 +51,30 @@ begin
 	    call amovr (OBJPIXY(rv,1), Memr[otempy], RV_NPTS(rv))
 	else
 	    call amovr (OCONT_DATA(rv,1), Memr[otempy], RV_NPTS(rv))
-	if (plot_only == YES) {
-            if (RV_FILTER(rv) == OBJ_ONLY || RV_FILTER(rv) == BOTH) {
-                call realft (Memr[otempy], fnpts, 1)        # forward FFT
-                call rv_filter (rv, Memr[otempy], fnpts)    # Object
-                call realft (Memr[otempy], fnpts, -1)       # forward FFT
-            }
-	}
+
 	if (RV_OW0(rv) == RV_GLOB_W1(rv) || RV_DCFLAG(rv) == -1)
 	    ishift = 0
 	else
 	    ishift = nint ((RV_OW0(rv) - RV_GLOB_W1(rv)) / RV_OWPC(rv))
+
 	call prep_spec (rv, RV_OSAMPLE(rv), npts, fnpts, RV_NPTS(rv), 
 	    otempy, wkobj, ishift, YES)
+
 
 	# Now do the template spectrum.
 	if (REFCONT(rv) == NO)
 	    call amovr (REFPIXY(rv,1), Memr[rtempy], RV_RNPTS(rv))
 	else
 	    call amovr (RCONT_DATA(rv,1), Memr[rtempy], RV_RNPTS(rv))
-	if (plot_only == YES) {
-            if (RV_FILTER(rv) == TEMP_ONLY || RV_FILTER(rv) == BOTH) {
-                call realft (Memr[rtempy], fnpts, 1)        # forward FFT
-                call rv_filter (rv, Memr[rtempy], fnpts)    # Template
-                call realft (Memr[rtempy], fnpts, -1)       # forward FFT
-	    }
-	}
+
 	if (RV_RW0(rv) == RV_GLOB_W1(rv) || RV_DCFLAG(rv) == -1)
 	    ishift = 0
 	else
 	    ishift = nint ((RV_RW0(rv) - RV_GLOB_W1(rv)) / RV_RWPC(rv))
+
 	call prep_spec (rv, RV_RSAMPLE(rv), npts, fnpts, RV_RNPTS(rv), 
 	    rtempy, wkref, ishift, YES)
+
 
 	# Normalize the correlation.
 	call rv_normalize (Memr[wkobj], fnpts)
@@ -91,6 +83,17 @@ begin
 	# Now do a plot of the prepared spectra if that what's requested.
 	if (plot_only == YES) {
 	    call gclear (RV_GP(rv))			# clear the screen
+
+            if (RV_FILTER(rv) == OBJ_ONLY || RV_FILTER(rv) == BOTH) {
+                call realft (Memr[wkobj], fnpts, 1)        # forward FFT
+                call rv_filter (rv, Memr[wkobj], fnpts)    # Object
+                call realft (Memr[wkobj], fnpts, -1)       # inverse FFT
+            }
+            if (RV_FILTER(rv) == TEMP_ONLY || RV_FILTER(rv) == BOTH) {
+                call realft (Memr[wkref], fnpts, 1)        # forward FFT
+                call rv_filter (rv, Memr[wkref], fnpts)    # Template
+                call realft (Memr[wkref], fnpts, -1)       # inverse FFT
+	    }
 
 	    call split_plot (rv, RV_GP(rv), TOP, Memr[wkobj], fnpts, 
 		OBJ_ONLY, PREPARED_PLOT)

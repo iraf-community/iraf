@@ -1,0 +1,16 @@
+# Libary for the celestial coordinate sytem pacakge
+
+$checkout libxtools.a lib$
+$update   libxtools.a
+$checkin  libxtools.a lib$
+$exit
+
+libxtools.a:
+	skdecode.x	<imio.h> <imhdr.h> <mwset.h> "skywcsdef.h" "skywcs.h"
+	skwrite.x	"skywcsdef.h" "skywcs.h"
+	skstat.x	"skywcsdef.h" "skywcs.h"
+	skset.x		"skywcsdef.h" "skywcs.h"
+	sktransform.x	<math.h> "skywcsdef.h" "skywcs.h"
+	sksaveim.x	"skywcsdef.h" "skywcs.h"
+	skwrdstr.x
+	;

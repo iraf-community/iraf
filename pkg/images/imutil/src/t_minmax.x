@@ -64,13 +64,28 @@ begin
 
 		pixtype = IM_PIXTYPE(im)
 		if (force || (IM_LIMTIME(im) < IM_MTIME(im))) {
-		    call im_vminmax (im, minval, maxval, iminval, imaxval,
-		        vmin, vmax)
-		    call mkoutstr (vmin, IM_NDIM(im), Memc[pixmin], SZ_FNAME)
-		    call mkoutstr (vmax, IM_NDIM(im), Memc[pixmax], SZ_FNAME)
-		    if (!section) {
-			IM_MIN(im) = minval
-			IM_MAX(im) = maxval
+		    if (IM_NDIM(im) > 0) {
+		        call im_vminmax (im, minval, maxval, iminval, imaxval,
+		            vmin, vmax)
+		        call mkoutstr (vmin, IM_NDIM(im), Memc[pixmin],
+			    SZ_FNAME)
+		        call mkoutstr (vmax, IM_NDIM(im), Memc[pixmax],
+			    SZ_FNAME)
+		    } else {
+			minval = INDEFD
+			maxval = INDEFD
+			Memc[pixmin] = EOS
+			Memc[pixmax] = EOS
+		    }
+		    if (! section) {
+			if (IS_INDEFD(minval))
+			    IM_MIN(im) = INDEFR
+			else
+			    IM_MIN(im) = minval
+			if (IS_INDEFD(maxval))
+			    IM_MAX(im) = INDEFR
+			else
+			    IM_MAX(im) = maxval
 			IM_LIMTIME(im) = clktime (long(0))
 			call imseti (im, IM_WHEADER, YES)
 		    }
@@ -88,12 +103,19 @@ tryagain_	iferr (im = immap (Memc[imname], READ_ONLY, 0)) {
 		} else {
 		    pixtype = IM_PIXTYPE(im)
 		    if (force || IM_LIMTIME(im) < IM_MTIME(im)) {
-			call im_vminmax (im, minval, maxval, iminval, imaxval,
-			    vmin, vmax)
-			call mkoutstr (vmin, IM_NDIM(im), Memc[pixmin],
-			    SZ_FNAME)
-			call mkoutstr (vmax, IM_NDIM(im), Memc[pixmax],
-			    SZ_FNAME)
+		        if (IM_NDIM(im) > 0) {
+			    call im_vminmax (im, minval, maxval, iminval,
+			        imaxval, vmin, vmax)
+			    call mkoutstr (vmin, IM_NDIM(im), Memc[pixmin],
+			        SZ_FNAME)
+			    call mkoutstr (vmax, IM_NDIM(im), Memc[pixmax],
+			        SZ_FNAME)
+			} else {
+			    minval = INDEFD
+			    maxval = INDEFD
+			    Memc[pixmin] = EOS
+			    Memc[pixmax] = EOS
+			}
 		    } else {
 			minval = IM_MIN(im)
 			maxval = IM_MAX(im)
@@ -132,8 +154,8 @@ tryagain_	iferr (im = immap (Memc[imname], READ_ONLY, 0)) {
 	call clputd ("maxval", maxval)
 	call clputd ("iminval", iminval)
 	call clputd ("imaxval", imaxval)
-	call clpstr ("minpix", Memc[pixmin], SZ_FNAME)
-	call clpstr ("maxpix", Memc[pixmax], SZ_FNAME)
+	call clpstr ("minpix", Memc[pixmin])
+	call clpstr ("maxpix", Memc[pixmax])
 
 	call sfree (sp)
 end

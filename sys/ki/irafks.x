@@ -158,7 +158,7 @@ char	curdir[SZ_PATHNAME]
 int	len_iobuf, status, i, nchars, opcode, subcode, arg1, arg2, arg3
 int	bfdd[LEN_BFDD], txdd[LEN_TXDD]
 
-char	txbuf[SZ_TXBUF]
+char	txbuf[SZ_TXBUF], queue[SZ_FNAME]
 char	osfn1[SZ_PATHNAME], osfn2[SZ_PATHNAME], temp[SZ_PATHNAME]
 int	ks_receive(), ks_send(), strlen(), envscan()
 int	diropen(), gstrcpy(), getline()
@@ -552,12 +552,13 @@ begin
 		iferr {
 		    call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
 		    call ks_fmapfn (temp, osfn1, SZ_PATHNAME)
-		    call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
+		    call strcpy (p_sbuf[arg2], temp, SZ_PATHNAME)
 		    call ks_fmapfn (temp, osfn2, SZ_PATHNAME)
+		    call strcpy (p_sbuf[arg3], queue, SZ_FNAME)
 		} then {
 		    status = ERR
 		} else
-		    call zopdpr (osfn1, osfn2, status)
+		    call zopdpr (osfn1, osfn2, queue, status)
 
 	    case KI_ZCLDPR:
 		# Close a detached process.

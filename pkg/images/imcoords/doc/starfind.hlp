@@ -150,11 +150,16 @@ brightness (Mag) of each object using the second order moments analysis
 shown below.
 
 .nf
-  Sky = maxdata - maxden
+   I0 = sum (I)
+    N = sum (1.0)
+    if (N <= 0)
+        Sky = maxdata - maxden
+    else
+        Sky = I0 / N
+
    M0 = sum (I - Sky)
    Mx = sum (X * (I - Sky))
    My = sum (Y * (I - Sky))
-    N = sum (1.0)
 
    Xc = Mx / M0
    Xc = My / M0

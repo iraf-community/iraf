@@ -76,6 +76,7 @@ begin
 
 	# Get the value of W for each axis, i.e. the world coordinates at
 	# the reference point.
+
 	wv = MI_DBUF(mw) + WCS_W(wp) - 1
 	do i = 1, 2
 	    FC_W(fc,i) = Memd[wv+CT_AXIS(ct,FC_AXIS(fc,i))-1]
@@ -105,7 +106,6 @@ begin
             if (ctod (Memc[atvalue], i, FC_LONGP(fc)) <= 0)
                 FC_LONGP(fc) = INDEFD
         }
-
         iferr {
             call mw_gwattrs (mw, FC_IRA(fc), "latpole", Memc[atvalue], SZ_LINE)
         } then {
@@ -131,6 +131,7 @@ begin
         # generating sphere for the projection. If RO is absent which
         # is the usual case set it to 180 / PI. Search both axes for
         # this quantity.
+
         iferr {
             call mw_gwattrs (mw, FC_IRA(fc), "ro", Memc[atvalue], SZ_LINE)
         } then {
@@ -249,10 +250,10 @@ begin
 
         if (FC_W(fc,FC_IRA(fc)) >= 0.0d0) {
             if (FC_NATRA(fc) < 0.0d0)
-                FC_NATRA(fc) = FC_NATRA(fc) + 360.0d0
+                FC_NATRA(fc) = FC_NATRA(fc) + DTWOPI
         } else {
             if (FC_NATRA(fc) > 0.0d0)
-                FC_NATRA(fc) = FC_NATRA(fc) - 360.0d0
+                FC_NATRA(fc) = FC_NATRA(fc) - DTWOPI
         }
         FC_COSDEC(fc) = cos (FC_NATDEC(fc))
         FC_SINDEC(fc) = sin (FC_NATDEC(fc))
@@ -298,6 +299,7 @@ data	p51/-.53022337/, p02/.27058160/, p12/-.56800938/, p22/.30803317/
 data	p32/.98938102/, p42/-.83180469/, p03/-.60441560/, p13/1.50880086/
 data	p23/-.93678576/, p33/.08693841/, p04/.93412077/, p14/-1.41601920/
 data	p24/.33887446/, p05/-.63915306/, p15/.52032238/, p06/.14381585/
+
 
 begin
 	# Get the axis numbers.
@@ -516,7 +518,6 @@ begin
 
 	# Compute the transformation from native coordinates PHI and THETA
 	# to projected coordinates X and Y.
-
 	costhe = cos (theta)
 	l = costhe * sin (phi)
 	m = costhe * cos (phi)

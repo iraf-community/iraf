@@ -28,16 +28,16 @@ define	SZ_TEMPBUF	SZ_HELPDB
 
 procedure t_help()
 
-int	ncols, nlines, list
+int	ncols, nlines, list, out_device
 long	fi[LEN_FINFO], db_ctime
 char	helpdb[SZ_HELPDB], device[SZ_FNAME]
 bool	output_is_not_redirected, file_template
-pointer	sp, ctrl, option, tempbuf, db, tty, fname
+pointer	sp, ctrl, option, tempbuf, db, tty, fname, tempdev
 
 long	clktime()
 pointer	ttyodes(), hdb_open()
 bool	strne(), streq(), clgetb()
-int	btoi(), stridxs(), finfo(), fntopnb(), fntgfnb()
+int	btoi(), stridxs(), finfo(), fntopnb(), fntgfnb(), strdic()
 int	clgeti(), get_option(), fstati(), envgets(), envgeti()
 
 data	tty /NULL/, db_ctime /0/
@@ -49,6 +49,7 @@ begin
 	call salloc (ctrl, LEN_CTRLSTRUCT, TY_STRUCT)
 	call salloc (option, SZ_FNAME, TY_CHAR)
 	call salloc (tempbuf, SZ_TEMPBUF, TY_CHAR)
+	call salloc (tempdev, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 
 	# If we were called without any arguments, do not query for the
@@ -63,6 +64,19 @@ begin
 	    H_SECNAME(ctrl) = EOS
 	} else
 	    call clgstr ("template", H_TEMPLATE(ctrl), SZ_LINE)
+
+	# get the output device type.  If the device is 'gui' pass off to
+	# the XHELP code to execute the GUI, otherwise process the device
+	# type once we set up the normal HELP task structure.
+
+	call aclrc (Memc[tempdev], SZ_TEMPBUF)
+	call clgstr ("device", Memc[tempdev], SZ_FNAME)
+        out_device = strdic (Memc[tempdev], device, SZ_FNAME, HF_DEVICES)
+	if (out_device == HF_GUI) {
+	    call xhelp (H_TEMPLATE(ctrl))
+	    call sfree (sp)
+	    return
+	}
 
 	# Determine whether the template is a module name template or a
 	# file matching template.
@@ -80,6 +94,7 @@ begin
 	# the name of the database to be used does not change, and provided
 	# a new help database is not created.
 
+	call aclrc (Memc[tempbuf], SZ_TEMPBUF)
 	call clgstr (s_helpdb, Memc[tempbuf], SZ_TEMPBUF)
 	if (streq (Memc[tempbuf], s_helpdb))
 	    if (envgets (s_helpdb, Memc[tempbuf], SZ_TEMPBUF) <= 0)
@@ -180,23 +195,25 @@ forms_
 	H_PAGINATE(ctrl) = NO
 	output_is_not_redirected = (fstati (STDOUT, F_REDIR) == NO)
 
-	if (output_is_not_redirected) {
-	    if (clgetb ("page")) {
-		H_PAGINATE(ctrl) = YES
-		call xttysize (ncols, nlines)
-	    }
-	} else {
-	    if (clgetb ("page")) {
-		switch (H_OPTION(ctrl)) {
-		case O_HELP, O_SOURCE, O_SYSDOC, O_ALLDOC:
-		    H_MANPAGE(ctrl) = YES
-		    H_NLPP(ctrl) = clgeti ("nlpp")
-		    call man_init()
-		default:
+	if (out_device < HF_GUI) {
+	    if (output_is_not_redirected && out_device == HF_TERMINAL) {
+	        if (clgetb ("page")) {
+		    H_PAGINATE(ctrl) = YES
+		    call xttysize (ncols, nlines)
+	        }
+	    } else {
+	        if (clgetb ("page")) {
+		    switch (H_OPTION(ctrl)) {
+		    case O_HELP, O_SOURCE, O_SYSDOC, O_ALLDOC:
+		        H_MANPAGE(ctrl) = YES
+		        H_NLPP(ctrl) = clgeti ("nlpp")
+		        call man_init()
+		    default:
+		        H_RAWOUT(ctrl) = YES
+		    }
+	        } else
 		    H_RAWOUT(ctrl) = YES
-		}
-	    } else
-		H_RAWOUT(ctrl) = YES
+	    }
 	}
 
 	# Get the current package.  Normally this is specified as the null
@@ -215,22 +232,45 @@ forms_
 	# provided the process does not shutdown and the device name or page
 	# size does not change.
 
-	call clgstr ("device", Memc[tempbuf], SZ_TEMPBUF)
-	if (tty == NULL || strne (Memc[tempbuf], device)) {
-	    call strcpy (Memc[tempbuf], device, SZ_FNAME)
-	    if (tty != NULL)
-		call ttycdes (tty)
-	    tty = ttyodes (device)
+	if (out_device == HF_TERMINAL) {
+	    if (tty == NULL || strne (Memc[tempdev], device)) {
+                call strcpy (Memc[tempdev], device, SZ_FNAME)
+	        if (tty != NULL)
+	            call ttycdes (tty)
+	        tty = ttyodes (device)
+	    }
+	}
+
+	if (out_device == HF_HTML) {
+	    H_FORMAT(ctrl) = HF_HTML
+	    H_RAWOUT(ctrl) = YES
+	    H_SOFLAG(ctrl) = NO
+	    H_MANPAGE(ctrl) = NO
+	    tty = NULL
+	} else if (out_device == HF_PS || out_device == HF_POSTSCRIPT) {
+	    H_FORMAT(ctrl) = HF_PS
+	    H_RAWOUT(ctrl) = YES
+	    H_SOFLAG(ctrl) = NO
+	    H_MANPAGE(ctrl) = NO
+	    tty = NULL
+	} else if (out_device == HF_TEXT) {
+	    H_FORMAT(ctrl) = HF_TEXT
+	    H_SOFLAG(ctrl) = NO
+	} else {
+	    H_FORMAT(ctrl) = HF_TEXT
+	    H_SOFLAG(ctrl) = YES
 	}
 	H_TTY(ctrl) = tty
 
 	# Get left and right margins for output text.  Make sure right margin
 	# does not exceed screen width of output device.
 
-	H_LMARGIN(ctrl) = max (1, clgeti ("lmargin"))
-	H_RMARGIN(ctrl) = max (H_LMARGIN(ctrl) + 1, clgeti ("rmargin"))
-	if (streq (device, "terminal"))
-	    H_RMARGIN(ctrl) = min (H_RMARGIN(ctrl), envgeti ("ttyncols"))
+	if (H_FORMAT(ctrl) == HF_TEXT) {
+	    H_LMARGIN(ctrl) = max (1, clgeti ("lmargin"))
+	    H_RMARGIN(ctrl) = max (H_LMARGIN(ctrl) + 1, clgeti ("rmargin"))
+	    if (streq (device, "terminal"))
+	        H_RMARGIN(ctrl) = min (H_RMARGIN(ctrl), envgeti ("ttyncols"))
+	}
 
 	# Initialization is completed, control structure is completed.
 	# Format and output the help text.  If we have a module name template

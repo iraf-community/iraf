@@ -60,7 +60,7 @@ begin
 	    # Open lok file and get device name.
 	    iferr (fd = open (Memc[fname], READ_ONLY, TEXT_FILE))
 		next
-	    if (getline (fd, Memc[lbuf], SZ_LINE) == EOF) {
+	    if (getline (fd, Memc[lbuf]) == EOF) {
 		call close (fd)
 		goto del_
 	    }

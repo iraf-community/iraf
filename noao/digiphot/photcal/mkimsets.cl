@@ -174,6 +174,8 @@ begin
 	    match ("^<", tfile2, metacharacters+, stop+, print_file_names+) |
 	    match ("^ \#", "STDIN", metacharacters+, stop+, print_file_names+,
 	        > timsets)
+	    delete (tfile2, verify-, default_action+, allversions+, subfiles+,
+	        >& "dev$null")
 	} else
 	    type (tfile1)
 

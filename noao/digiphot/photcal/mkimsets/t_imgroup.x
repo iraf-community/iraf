@@ -104,8 +104,8 @@ begin
 
 	    while (Memc[temp+tp-1] != EOS) {
 	        token = ctotok (Memc[temp], tp, Memc[vptr+op-1], max_lvalue)
-		if (Memc[vptr+op-1] == EOS)
-		    next
+                if (Memc[vptr+op-1] == EOS)
+                    next
 		if (token == TOK_UNKNOWN || token == TOK_CHARCON)
 		    next
 		if ((token == TOK_PUNCTUATION) && (Memc[vptr+op-1] == ',' ||
@@ -339,18 +339,26 @@ char	record[ARB]	# the name of the output record
 int	index[ARB]	# array of indices
 int	nvalues		# number of values
 
+pointer	sp, str
 int	i
 
 begin
+	call smark (sp)
+	call salloc (str, SZ_FNAME, TY_CHAR)
+
 	call fprintf (out, "%s :")
 	    call pargstr (name)
 
 	do i = 1, nvalues {
+	    call ph_imroot (record[index[i]], Memc[str], SZ_FNAME)
 	    call fprintf (out, "  %s")
-		call pargstr (record[index[i]])
+		#call pargstr (record[index[i]])
+		call pargstr (Memc[str])
 	}
 
 	call fprintf (out, "\n")
+
+	call sfree (sp)
 end
 
 
@@ -379,4 +387,44 @@ begin
 	    call strcpy (tname, name, max_lname)
 
 	call printf ("\n")
+end
+
+
+# PH_IMROOT -- Fetch the root image name minus the directory specification
+# and the section notation.
+
+procedure ph_imroot (image, root, maxch)
+
+char    image[ARB]              # image specification
+char    root[ARB]               # output root name
+int     maxch                   # maximum number of characters
+
+pointer sp, imroot, kernel, section, str
+int     clindex, clsize, nchars
+int     fnldir()
+
+begin
+        call smark (sp)
+        call salloc (imroot, SZ_PATHNAME, TY_CHAR)
+        call salloc (kernel, SZ_FNAME, TY_CHAR)
+        call salloc (section, SZ_FNAME, TY_CHAR)
+        call salloc (str, SZ_PATHNAME, TY_CHAR)
+
+        call imparse (image, Memc[imroot], SZ_PATHNAME, Memc[kernel], SZ_FNAME,
+            Memc[section], SZ_FNAME, clindex, clsize)
+        nchars = fnldir (Memc[imroot], Memc[str], SZ_PATHNAME)
+	if (clindex >= 0) {
+            call sprintf (root, maxch, "%s[%d]%s%s")
+                call pargstr (Memc[imroot+nchars])
+		call pargi (clindex)
+                call pargstr (Memc[kernel])
+                call pargstr (Memc[section])
+	} else {
+            call sprintf (root, maxch, "%s%s%s")
+                call pargstr (Memc[imroot+nchars])
+                call pargstr (Memc[kernel])
+                call pargstr (Memc[section])
+	}
+
+        call sfree (sp)
 end

@@ -9,6 +9,10 @@
 #include <sys/timeb.h>
 #endif
 
+#ifdef MACOSX
+#include <time.h>
+#endif
+
 #define	SECONDS_1970_TO_1980	315532800L
 static	long get_timezone();
 
@@ -45,8 +49,15 @@ get_timezone()
 	tzset();
 	return (timezone);
 #else
-	struct	timeb time_info;
+#ifdef MACOSX
+	struct tm *tm;
+	time_t clock = time(NULL);
+	tm = gmtime (&clock);
+	return (-(tm->tm_gmtoff));
+#else
+	struct timeb time_info;
 	ftime (&time_info);
 	return (time_info.timezone * 60);
+#endif
 #endif
 }

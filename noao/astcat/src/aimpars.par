@@ -1,0 +1,21 @@
+# THE AIMPARS parameter set
+
+observat,s,h,"OBSERVAT",,,"The observatory site id"
+esitelng,s,h,"INDEF",,,"The observatory longitude (degrees)" 
+esitelat,s,h,"INDEF",,,"The observatory latitude (degrees)" 
+esitealt,s,h,"INDEF",,,"The observatory altitude (meters)" 
+esitetz,s,h,"INDEF",,,"The observatory time zone"
+emjdobs,s,h,"MJD-OBS",,,"The effective date of the observation"
+
+#ut,s,h,"UT",,,"The beginning UT of the observation"
+#exposure,s,h,"EXPTIME",,,"The exposure time"
+
+edatamin,s,h,"INDEF",,,"The effective good data minimum (ADU)"
+edatamax,s,h,"INDEF",,,"The effective good data maximum (ADU)"
+egain,s,h,"GAIN",,,"The effective gain (electrons / ADU)"
+erdnoise,s,h,"RDNOISE",,,"The effective readout noise (electrons)"
+ewavlen,s,h,"INDEF",,,"The effective wavelength (microns)"
+etemp,s,h,"INDEF",,,"The effective ambient temperature (degrees)"
+epress,s,h,"INDEF",,,"The effective ambient pressure (mbars)"
+
+mode,s,h,"ql",,,

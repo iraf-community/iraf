@@ -168,7 +168,7 @@ begin
 	npts = IM_LEN (im, 1)
 
 	# Map pixels and optionally correct for coincidence
-	pix = imgl1r (im, 1)
+	pix = imgl1r (im)
 
 	# Add in the current data
 	npts = min (npts, len[beam, object])
@@ -221,7 +221,7 @@ begin
 	    call pargstr (title)
 	call strcpy (temp, IM_TITLE (imnew), SZ_LINE)
 
-	newpix = impl1r (imnew, 1)
+	newpix = impl1r (imnew)
 	call amovr (accum, Memr[newpix], npts)
 
 	call imaddr (imnew, "EXPOSURE", expo_sum)

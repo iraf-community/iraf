@@ -57,10 +57,13 @@ into a single output image with the other selected apertures.
 .le
 .le
 .ls combine = "average" (average|median|sum)
-Option for combining pixels at the same dispersion coordinate after any
+Option for combining pixels at the same dispersion coordinate.  after any
 rejection operation.  The options are to compute the  "average", "median",
-or "sum" of the pixels.  The median uses the average of the two central
-values when the number of pixels is even.
+or "sum" of the pixels.  The first two are applied after any pixel
+rejection.  The sum option ignores the rejection and scaling parameters and
+no rejection is performed.  In other words, the "sum" option is simply the
+direct summation of the pixels.  The median uses the average of the two
+central values when the number of pixels is even.
 .le
 .ls reject = "none" (none|minmax|ccdclip|crreject|sigclip|avsigclip|pclip)
 Type of rejection operation performed on the pixels which overlap at each
@@ -209,7 +212,10 @@ DESCRIPTION
 to a common dispersion sampling, rejecting pixels exceeding specified low
 and high thresholds, scaling them in various ways, applying a rejection
 algorithm based on known or empirical noise statistics, and computing the
-sum, weighted average, or median of the remaining pixels.
+sum, weighted average, or median of the remaining pixels.  Note that
+the "sum" option is the direct summation of the pixels and does not
+perform any rejection or scaling of the data regardless of the parameter
+settings.
 
 The input spectra are specified using an image list in which each image
 may contain multiple spectra.  The set of spectra may be restricted

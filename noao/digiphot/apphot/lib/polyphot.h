@@ -15,17 +15,22 @@ define	PYXMEAN			801
 define	PYYMEAN			802
 define	PYCX			803
 define	PYCY			804
-define	PYFLUX			805
-define	PYNPIX			806
-define	PYNVER			807
-define	PYMINRAD		808
-define	PYX			809
-define	PYY			810
-define	PYZMAG			811
-define	PYMAG			812
-define	PYMAGERR		813
-define	PYNAME			814
-define	PYBADPIX		815
+define	OPYXMEAN		805
+define	OPYYMEAN		806
+define	OPYCX			807
+define	OPYCY			808
+define	PYFLUX			809
+define	PYNPIX			810
+define	PYNVER			811
+define	PYMINRAD		812
+define	PYX			813
+define	PYY			814
+define	PYZMAG			815
+define	PYMAG			816
+define	PYMAGERR		817
+define	PYNAME			818
+define	PYROOT			819
+define	PYBADPIX		820
 
 # polyphot keywords
 

@@ -149,7 +149,7 @@ define  EX_RED          0		# color flags
 define  EX_GREEN        1
 define  EX_BLUE         2
 
-define  SAMPLE_SIZE     600		# default zscale() sample size
+define  SAMPLE_SIZE     1600		# default zscale() sample size
 define  CONTRAST        0.25		# default zscale() contrast
-define  SAMP_LEN        5		# default zscale() sample length
+define  SAMP_LEN        40		# default zscale() sample length
 

@@ -7,6 +7,7 @@ procedure mkobsfile (photfiles, idfilters, observations)
 file	photfiles    {prompt="The input list of APPHOT/DAOPHOT databases"}
 string	idfilters    {prompt="The list of filter ids"}
 file	observations {prompt="The output observations file"}
+bool    wrap         {yes, prompt="Format the output file for easy reading ?"}
 file	imsets       {"STDIN", prompt="The input image set file"}
 file	obsparams    {"", prompt="The observing parameters file"}
 string	obscolumns   {"2 3 4 5", prompt="The format of obsparams"}
@@ -126,8 +127,8 @@ begin
 
 	# Create the output catalog.
 
-	obsfile (tdatafile, "1,2,3,6,9,7,8,4,5", tidfilters, timsets,
-	    tobsfile, obsparams=tobsparams, minmagerr=minmagerr,
+	obsfile (tdatafile, "1,2,3,6,9,7,8,4,5,0", tidfilters, timsets,
+	    tobsfile, wrap=wrap, obsparams=tobsparams, minmagerr=minmagerr,
 	    normtime=no, tolerance=tolerance, allfilters=allfilters,
 	    obscolumns="1," // tobscolumns, shifts=tshifts,
 	    apercors=tapercors, verify-, verbose=verbose)

@@ -133,7 +133,7 @@ begin
 		    nchars = i
 	    }
 
-	    op = op + nchars
+	    op = op + nchars 
 	    Memc[op] = '\n';  op = op + 1
 	}
 
@@ -268,6 +268,13 @@ begin
 			ip = ip + 1
 	    	    if (Memc[ip] == '\n')
 			ip = ip + 1
+
+		} else {
+	    	    # No keyword matched. Advance to next line.
+	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
+			ip = ip + 1
+	    	    if (Memc[ip] == '\n')
+			ip = ip + 1
 		}
 	    } else
 		break
@@ -297,7 +304,7 @@ begin
 	    }
 
 	    # Copy the saved card, leave IP positioned to past newline.
-	    do i = 1, IDB_RECLEN {
+	    do i = 1, IDB_RECLEN + 1 {
 		ch = Memc[ip]
 		if (ch != EOS)
 		    ip = ip + 1

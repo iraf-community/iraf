@@ -211,7 +211,7 @@ begin
 	        call sprintf (Memc[title], IE_SZTITLE, 
     "%s\n%s: Contoured from %g to %g, interval = %g\n%s")
 		    call pargstr (Memc[hostid])
-		    call pargstr (IE_IMAGE(ie))
+		    call pargstr (IE_IMNAME(ie))
 	            call pargr (hold(1))
 	            call pargr (hold(2))
 	            call pargr (hold(3))
@@ -220,7 +220,7 @@ begin
 	        call sprintf (Memc[title], IE_SZTITLE, 
     "%s\n%s:contoured from %g to %g, interval = %g, labels scaled by %g\n%s")
 		    call pargstr (Memc[xlabel])
-		    call pargstr (IE_IMAGE(ie))
+		    call pargstr (IE_IMNAME(ie))
 	            call pargr (hold(1))
 	            call pargr (hold(2))
 	            call pargr (hold(3))

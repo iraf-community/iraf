@@ -8,7 +8,7 @@ define	NCOLUMN	5
 # DP_GPSTARS -- Select the psf stars.
 
 procedure dp_gpstars (dao, im, tp_in, tp_out, text_file, maxnpsf, gd, mgd, id,
-	interactive, use_cmdfile)
+	mkstars, interactive, use_cmdfile)
 
 pointer	dao			# pointer to the daophot structure
 pointer	im			# pointer to the input image
@@ -19,6 +19,7 @@ int	maxnpsf			# the maximum number of psf stars
 pointer	gd			# pointer to the graphics stream
 pointer	mgd			# pointer to the plot metacode file
 pointer	id			# pointer to the image display stream
+bool	mkstars			# mark the accepted and deleted stars
 bool	interactive		# interactive mode
 bool	use_cmdfile		# cursor command file mode
 
@@ -67,10 +68,10 @@ begin
 	# Select the stars and write them to the output file.
 	if (use_cmdfile)
 	    npsf = dp_ipfstars (dao, im, maxnpsf, -MAX_REAL, radius, gd,
-		mgd, id, false, false)
+		mgd, id, mkstars, false, false)
 	else if (interactive)
 	    npsf = dp_ipfstars (dao, im, maxnpsf, -MAX_REAL, radius, gd,
-		mgd, id, true, true)
+		mgd, id, mkstars, true, true)
 	else
 	    npsf = dp_pfstars (dao, im, Memi[DP_APID(apsel)],
 	        Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
@@ -83,6 +84,8 @@ begin
 	}
 
 	# Write out the stars.
+	call dp_wout (dao, im, Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
+	    Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)], npsf)
 	call dp_wpstars (tp_out, Memi[ocolpoint], text_file,
 	    Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
 	    Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],

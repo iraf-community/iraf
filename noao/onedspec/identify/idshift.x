@@ -78,7 +78,7 @@ double	cdsearch	#I Search range
 
 int	marker
 double	shift, asumd()
-pointer	new
+pointer	new, id_getid()
 errchk	aid_shift
 
 begin
@@ -91,12 +91,15 @@ begin
 	    call aid_shift (id, crsearch, cdsearch)
 	    call malloc (new, ID_NPTS(id), TY_DOUBLE)
 	    call amovd (FITDATA(id,1), Memd[new], ID_NPTS(id))
-	    call id_getid (id, "backup")
+	    if (id_getid (id, "backup") == NULL)
+		call error (1, "Error getting saved record")
 	    call asubd (FITDATA(id,1), Memd[new], Memd[new], ID_NPTS(id))
 	    shift = asumd (Memd[new], ID_NPTS(id)) / ID_NPTS(id)
 	    call mfree (new, TY_DOUBLE)
-	} then
-	    call id_getid (id, "backup")
+	} then {
+	    if (id_getid (id, "backup") == NULL)
+		call error (1, "Error getting saved record")
+	}
 
 	call stfree (ID_STP(id), marker)
 	return (shift)

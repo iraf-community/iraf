@@ -19,7 +19,6 @@ int	sier	# sky fitting error
 int	pier	# photometric error
 
 int	i, naperts
-real	xpos, ypos
 int	apstati()
 real	apstatr()
 
@@ -29,9 +28,8 @@ begin
 	    return
 
 	# Write out the object id parameters.
-	xpos = apstatr (ap, XCENTER) - apstatr (ap, XSHIFT)
-	ypos = apstatr (ap, YCENTER) - apstatr (ap, YSHIFT)
-	call ap_wid (ap, fd, xpos, ypos, id, lid, '\\')
+	call ap_wid (ap, fd, apstatr (ap, OXINIT), apstatr(ap, OYINIT),
+	    id, lid, '\\')
 
 	# Write out the centering results.
 	call ap_wcres (ap, fd, cier, '\\')
@@ -77,11 +75,11 @@ begin
 	phot = AP_PPHOT(ap)
 
 	# Print the center and sky value.
-	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
+	call apstats (ap, IMROOT, Memc[imname], SZ_FNAME)
 	call printf ("%s  %8.2f %8.2f  %8g  ")
 	    call pargstr (Memc[imname])
-	    call pargr (apstatr (ap, PXCUR))
-	    call pargr (apstatr (ap, PYCUR))
+	    call pargr (apstatr (ap, OPXCUR))
+	    call pargr (apstatr (ap, OPYCUR))
 	    call pargr (apstatr (ap, SKY_MODE))
 
 	# Print out the magnitudes and errors.

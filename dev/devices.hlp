@@ -54,6 +54,7 @@
     ursa!mtm=mtmhi                 DLT-7000, Rm 101
     ursa!mtn                       Seagate DAT, Rm 101
     ursa!mto          [8500]       Exabyte Eliant 820, Rm 101
+    ursa!mtp=mtphi                 DLT-7000, Rm 101
     bigx!mtb,mtbhi    [8200|8500]  Exabyte 8505XL, Rm 101
     bigx!mtc                       Seagate DAT, Rm 101
     orion!mta                      Seagate DAT, Rm 101

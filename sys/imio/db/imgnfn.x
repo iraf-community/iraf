@@ -190,27 +190,27 @@ begin
 		# Now scan the user area.
 		for (ip=IM_USERAREA(im);  Memc[ip] != EOS;  ip=ip+1) {
 		    # Skip entries that are not keywords.
-		    if (Memc[ip+8] != '=')
-			next
+		    if (Memc[ip+8] == '=') {
 
-		    # Extract keyword name.
-		    Memc[kwname+8] = EOS
-		    do i = 1, 8 {
-			ch = Memc[ip+i-1]
-			if (ch == ' ') {
-			    Memc[kwname+i-1] = EOS
-			    break
-			} else
-			    Memc[kwname+i-1] = ch
-		    }
+			# Extract keyword name.
+			Memc[kwname+8] = EOS
+			do i = 1, 8 {
+			    ch = Memc[ip+i-1]
+			    if (ch == ' ') {
+				Memc[kwname+i-1] = EOS
+				break
+			    } else
+				Memc[kwname+i-1] = ch
+			}
 
-		    # Check for a match.
-		    if (Memc[kwname] != EOS) {
-			# Put key in list if it matches.
-			nmatch = patmatch (Memc[kwname], Memc[patcode]) - 1
-			if (nmatch > 0 && nmatch == strlen(Memc[kwname]))
-			    call imfn_putkey (Memc[ip],
-				FN_STRP(fn,1), nstr, nextch, sbuf)
+			# Check for a match.
+			if (Memc[kwname] != EOS) {
+			    # Put key in list if it matches.
+			    nmatch = patmatch (Memc[kwname], Memc[patcode]) - 1
+			    if (nmatch > 0 && nmatch == strlen(Memc[kwname]))
+				call imfn_putkey (Memc[ip],
+				    FN_STRP(fn,1), nstr, nextch, sbuf)
+			}
 		    }
 
 		    # Advance to the next record.

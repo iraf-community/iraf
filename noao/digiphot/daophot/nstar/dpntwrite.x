@@ -175,19 +175,24 @@ begin
 	call dp_sparam (nst, "TASK", "nstar", "name", Memc[comment])
 
 	# Write out the file names.
-	call dp_sparam (nst, "IMAGE", DP_INIMAGE(dao), "imagename",
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_FNAME)
+	call dp_sparam (nst, "IMAGE", Memc[outstr], "imagename",
 	    Memc[comment])
-	call dp_sparam (nst, "GRPFILE", DP_INPHOTFILE(dao), "filename",
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_FNAME)
+	call dp_sparam (nst, "GRPFILE", Memc[outstr], "filename", Memc[comment])
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_FNAME)
+	call dp_sparam (nst, "PSFIMAGE", Memc[outstr], "imagename",
 	    Memc[comment])
-	call dp_sparam (nst, "PSFIMAGE", DP_PSFIMAGE(dao), "imagename",
-	    Memc[comment])
-	call dp_sparam (nst, "NSTARFILE", DP_OUTPHOTFILE(dao), "filename",
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_FNAME)
+	call dp_sparam (nst, "NSTARFILE", Memc[outstr], "filename",
 	    Memc[comment])
 	if (DP_OUTREJFILE(dao) == EOS)
 	    call dp_sparam (nst, "REJFILE", "\"\"", "filename", Memc[comment])
-	else
-	    call dp_sparam (nst, "REJFILE", DP_OUTREJFILE(dao), "filename",
+	else {
+	    call dp_froot (DP_OUTREJFILE(dao), Memc[outstr], SZ_FNAME)
+	    call dp_sparam (nst, "REJFILE", Memc[outstr], "filename",
 	        Memc[comment])
+	}
 
 	# Write out the data dependent parameters.
 	call dp_rparam (nst, "SCALE", DP_SCALE(dao), "units/pix",
@@ -276,14 +281,20 @@ begin
 	call tbhadt (nst, "TASK", "nstar")
 
 	# Write out the file names.
-	call tbhadt (nst, "IMAGE", DP_INIMAGE(dao))
-	call tbhadt (nst, "GRPFILE", DP_INPHOTFILE(dao))
-	call tbhadt (nst, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call tbhadt (nst, "NSTARFILE", DP_OUTPHOTFILE(dao))
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_FNAME)
+	call tbhadt (nst, "IMAGE", Memc[outstr])
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_FNAME)
+	call tbhadt (nst, "GRPFILE", Memc[outstr])
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_FNAME)
+	call tbhadt (nst, "PSFIMAGE", Memc[outstr])
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_FNAME)
+	call tbhadt (nst, "NSTARFILE", Memc[outstr])
 	if (DP_OUTREJFILE(dao) == EOS)
 	    call tbhadt (nst, "REJFILE", "\"\"")
-	else
-	    call tbhadt (nst, "REJFILE", DP_OUTREJFILE(dao))
+	else {
+	    call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_FNAME)
+	    call tbhadt (nst, "REJFILE", Memc[outstr])
+	}
 
 	# Write out the data dependent parameters.
 	call tbhadr (nst, "SCALE", DP_SCALE(dao))
@@ -318,10 +329,11 @@ end
 
 # DP_TNTWRITE -- Write out the NSTAR results to an ST table.
 
-procedure dp_tntwrite (dao, nst, rej, niter, old_size, output_row,
+procedure dp_tntwrite (dao, im, nst, rej, niter, old_size, output_row,
 	routput_row, colpoint) 
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 pointer	nst			# output photometry file descriptor
 int	rej			# output rejections file descriptor
 int	niter			# number of iterations
@@ -362,6 +374,7 @@ begin
 	    ycen = Memr[DP_APYCEN (apsel)+i-1]
 	    if (IS_INDEFR(xcen) || IS_INDEFR(ycen))
 		next
+	    call dp_wout (dao, im, xcen, ycen, xcen, ycen, 1)
 	    mag = Memr[DP_APMAG(apsel)+i-1]
 	    errmag = Memr[DP_APERR(apsel)+i-1]
 	    if (! IS_INDEFR(mag)) {
@@ -440,9 +453,10 @@ define NST_DATA2STR "%12t%-6d%18t%-12.3f%30t%-12.3f%42t%-6d%48t%-13.13s%80t \n"
 
 # DP_XNTWRITE -- Write out the NSTAR results to a text file.
 
-procedure dp_xntwrite (dao, nst, rej, niter, old_size) 
+procedure dp_xntwrite (dao, im, nst, rej, niter, old_size) 
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 int	nst			# the output photometry file descriptor
 int	rej			# the output rejections file descriptor
 int	niter			# the number of the iteration
@@ -480,6 +494,7 @@ begin
 	    ycen = Memr[DP_APYCEN (apsel)+i-1]
 	    if (IS_INDEFR(xcen) || IS_INDEFR(ycen))
 		next
+	    call dp_wout (dao, im, xcen, ycen, xcen, ycen, 1)
 	    mag = Memr[DP_APMAG(apsel)+i-1]
 	    errmag = Memr[DP_APERR(apsel)+i-1]
 	    if (! IS_INDEFR(mag)) {

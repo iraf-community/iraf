@@ -18,8 +18,8 @@ int	ll_src, i
 long	v[PL_MAXDIM], vs[PL_MAXDIM], ve[PL_MAXDIM], vn[PL_MAXDIM]
 
 bool	pll_empty()
-int	pl_access(), plloop()
-errchk	plvalid, plsslv, pl_access
+int	pl_reference(), plloop()
+errchk	plvalid, plsslv, pl_reference
 
 begin
 	call plvalid (pl_src)
@@ -43,7 +43,7 @@ begin
 
 	# Test each line segment in the section.
 	repeat {
-	    ll_src = pl_access (pl_src, v)
+	    ll_src = pl_reference (pl_src, v)
 	    if (ll_src != PL_EMPTYLINE) {
 		lp = Ref (pl_src, ll_src)
 		if (!pll_empty (Mems[lp], vs[1], vn[1]))

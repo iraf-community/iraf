@@ -30,6 +30,8 @@ define	H_EOF		Memi[$1+14]	# input should return EOF to Lroff
 define	H_QUIT		Memi[$1+15]	# stop program
 define	H_LENTL		Memi[$1+16]	# length of the TL template list
 define	H_ALLMODULES	Memi[$1+17]	# process all modules matching template
+define	H_FORMAT	Memi[$1+18]	# output format type
+define	H_SOFLAG	Memi[$1+19]	# standout flags
 			# (extra space)
 define	H_CURPACK	Memc[P2C($1+20)]	# current package
 define	H_SECNAME	Memc[P2C($1+60)]	# section name
@@ -50,8 +52,8 @@ define	O_SOURCE	2		# print source code
 define	O_SYSDOC	3		# print technical system documentation
 define	O_ALLDOC	4		# print all documentation (!source)
 define	O_FILES		5		# print file names
-define	O_DIR		6		# print directory of help blocks
-define	O_SUMMARY	7		# summarize contents of help file
+define	O_SUMMARY	6		# summarize contents of help file
+define	O_DIR		7		# print directory of help blocks
 define	O_REFERENCES	8		# keyword search output format
 define	MAX_OPTIONS	8
 
@@ -69,6 +71,17 @@ define	TY_SRC		3
 define	TY_PKG		4
 define	TY_MEN		5
 define	TY_UNKNOWN	6
+
+# Format codes.  This is used to determine whether we output formatted
+# text, HTML or Postscript.
+
+define	HF_DEVICES	"|terminal|text|gui|html|postscript|ps|"
+define	HF_TERMINAL	1
+define	HF_TEXT		2
+define	HF_GUI		3
+define	HF_HTML		4
+define	HF_POSTSCRIPT	5
+define	HF_PS		6
 
 # Help block header structure.  A ".help" directive is decoded into this
 # structure.  The line number counter should be zeroed when the structure

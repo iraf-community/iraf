@@ -1,4 +1,4 @@
-.help imstatistics Jan90 images.imutil
+.help imstatistics Feb01 images.imutil
 .ih
 NAME
 imstatistics -- compute and print image pixel statistics
@@ -8,18 +8,26 @@ imstatistics images
 .ih
 PARAMETERS
 .ls images
-Images for which pixel statistics are to be computed.
+The input images or image sections for which pixel statistics are to be computed.
 .le
 .ls fields = "image,npix,mean,stddev,min,max"
 The statistical quantities to be computed and printed.
 .le
 .ls lower = INDEF
-Use only pixels with values greater than or equal to this limit.
-All pixels are above the default value of INDEF.
+The minimum good data limit.  All pixels are above the default value of INDEF.
 .le
 .ls upper = INDEF
-Use only pixels with values less than or equal to this limit.
-All pixels are below the default value of INDEF.
+The maximum good data limit.  All pixels are above the default value of INDEF.
+.le
+.ls nclip = 0
+The maximum number of iterative clipping cycles. By default no clipping is
+performed.
+.le
+.ls lsigma = 3.0
+The low side clipping factor in sigma.
+.le
+.ls usigma = 3.0
+The high side clipping factor in sigma.
 .le
 .ls binwidth = 0.1
 The width of the histogram bins used for computing the midpoint (estimate
@@ -29,6 +37,10 @@ The units are in sigma.
 .ls format = yes
 Label the output columns and print the result in fixed format. If format
 is "no" no column labels are printed and the output is in free format.
+.le
+.ls cache = no
+Cache the image data in memory ? This can increase the efficiency of the
+task if nclip > 0 or either of the midpt and mode statistics are computed.
 .le
 .ih
 DESCRIPTION

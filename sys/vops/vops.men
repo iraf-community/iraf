@@ -39,9 +39,13 @@
 	  aiftr - Inverse real discrete fourier transform
 	  aiftx - Inverse complex discrete fourier transform
 	   aimg - Imaginary part of a complex vector
+	   alan - Logical AND of two vectors
+	  alank - Logical AND of a vector and a constant
 	   alim - Compute the limits (minimum and maximum values) of a vector
 	   alln - Natural logarithm of a vector
 	   alog - Logarithm of a vector
+	   alor - Logical OR of two vectors
+	  alork - Logical OR of a vector and a constant
 	   alov - Compute the low (minimum) value of a vector
 	   altr - Linear transformation of a vector
 	   alui - Vector lookup and interpolate (linear)

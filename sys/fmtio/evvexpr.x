@@ -244,15 +244,19 @@ define	SE		274
 define	LAND		275
 define	LOR		276
 define	LNOT		277
-define	AT		278
-define	GE		279
-define	UMINUS		280
+define	BAND		278
+define	BOR		279
+define	BXOR		280
+define	BNOT		281
+define	AT		282
+define	GE		283
+define	UMINUS		284
 define	yyclearin	yychar = -1
 define	yyerrok		yyerrflag = 0
 define	YYMOVE		call amovi (Memi[$1], Memi[$2], YYOPLEN)
 define	YYERRCODE	256
 
-# line 438 "evvexpr.y"
+# line 454 "evvexpr.y"
 
 
 # End generic preprocessor escape.
@@ -320,6 +324,8 @@ begin
 	    }
 
 	case LNOT:
+	    # Logical NOT.
+
 	    call xvv_initop (out, nelem, TY_BOOL)
 	    switch (O_TYPE(in)) {
 	    case TY_BOOL:
@@ -374,6 +380,36 @@ begin
 		call xvv_error (s_badswitch)
 	    }
 
+	case BNOT:
+	    # Bitwise boolean NOT.
+
+	    call xvv_initop (out, nelem, O_TYPE(in))
+	    switch (O_TYPE(in)) {
+	    case TY_BOOL, TY_CHAR, TY_REAL, TY_DOUBLE:
+		call xvv_error ("boolean not of a noninteger operand")
+
+	    case TY_SHORT:
+		if (nelem > 0)
+		    call anots (Mems[O_VALP(in)], Mems[O_VALP(out)], nelem)
+		else
+		    O_VALS(out) = not(O_VALS(in))
+
+	    case TY_INT:
+		if (nelem > 0)
+		    call anoti (Memi[O_VALP(in)], Memi[O_VALP(out)], nelem)
+		else
+		    O_VALI(out) = not(O_VALI(in))
+
+	    case TY_LONG:
+		if (nelem > 0)
+		    call anotl (Meml[O_VALP(in)], Meml[O_VALP(out)], nelem)
+		else
+		    O_VALL(out) = not(O_VALL(in))
+
+	    default:
+		call xvv_error (s_badswitch)
+	    }
+
 	default:
 	    call xvv_error (s_badswitch)
 	}
@@ -420,6 +456,8 @@ include	"evvexpr.com"
 int	xvv_newtype(), strlen()
 errchk	xvv_newtype, xvv_initop, xvv_chtype, xvv_error
 string	s_badswitch "binop: bad case in switch"
+string	s_boolop "binop: bitwise boolean operands must be an integer type"
+define	done_ 91
 
 begin
 	# Set the datatype of the output operand, taking an error action if
@@ -521,7 +559,123 @@ begin
 	p2 = O_VALP(in2)
 	po = O_VALP(out)
 
-	# Perform the operation.
+	# The bitwise boolean binary operators a special case since only the
+	# integer datatypes are permitted.  Otherwise the bitwise booleans
+	# are just like arithmetic booleans.
+
+	if (opcode == BAND || opcode == BOR || opcode == BXOR) {
+	    switch (dtype) {
+
+	    case TY_SHORT:
+		switch (opcode) {
+		case BAND:
+		    if (len1 <= 0) {
+			O_VALS(out) = and (O_VALS(in1), O_VALS(in2))
+		    } else if (len2 <= 0) {
+			call aandks (Mems[p1], O_VALS(in2),
+			    Mems[po], nelem)
+		    } else {
+			call aands (Mems[p1], Mems[p2],
+			    Mems[po], nelem)
+		    }
+		case BOR:
+		    if (len1 <= 0) {
+			O_VALS(out) = or (O_VALS(in1), O_VALS(in2))
+		    } else if (len2 <= 0) {
+			call aborks (Mems[p1], O_VALS(in2),
+			    Mems[po], nelem)
+		    } else {
+			call abors (Mems[p1], Mems[p2],
+			    Mems[po], nelem)
+		    }
+		case BXOR:
+		    if (len1 <= 0) {
+			O_VALS(out) = xor (O_VALS(in1), O_VALS(in2))
+		    } else if (len2 <= 0) {
+			call axorks (Mems[p1], O_VALS(in2),
+			    Mems[po], nelem)
+		    } else {
+			call axors (Mems[p1], Mems[p2],
+			    Mems[po], nelem)
+		    }
+		}
+
+	    case TY_INT:
+		switch (opcode) {
+		case BAND:
+		    if (len1 <= 0) {
+			O_VALI(out) = and (O_VALI(in1), O_VALI(in2))
+		    } else if (len2 <= 0) {
+			call aandki (Memi[p1], O_VALI(in2),
+			    Memi[po], nelem)
+		    } else {
+			call aandi (Memi[p1], Memi[p2],
+			    Memi[po], nelem)
+		    }
+		case BOR:
+		    if (len1 <= 0) {
+			O_VALI(out) = or (O_VALI(in1), O_VALI(in2))
+		    } else if (len2 <= 0) {
+			call aborki (Memi[p1], O_VALI(in2),
+			    Memi[po], nelem)
+		    } else {
+			call abori (Memi[p1], Memi[p2],
+			    Memi[po], nelem)
+		    }
+		case BXOR:
+		    if (len1 <= 0) {
+			O_VALI(out) = xor (O_VALI(in1), O_VALI(in2))
+		    } else if (len2 <= 0) {
+			call axorki (Memi[p1], O_VALI(in2),
+			    Memi[po], nelem)
+		    } else {
+			call axori (Memi[p1], Memi[p2],
+			    Memi[po], nelem)
+		    }
+		}
+
+	    case TY_LONG:
+		switch (opcode) {
+		case BAND:
+		    if (len1 <= 0) {
+			O_VALL(out) = and (O_VALL(in1), O_VALL(in2))
+		    } else if (len2 <= 0) {
+			call aandkl (Meml[p1], O_VALL(in2),
+			    Meml[po], nelem)
+		    } else {
+			call aandl (Meml[p1], Meml[p2],
+			    Meml[po], nelem)
+		    }
+		case BOR:
+		    if (len1 <= 0) {
+			O_VALL(out) = or (O_VALL(in1), O_VALL(in2))
+		    } else if (len2 <= 0) {
+			call aborkl (Meml[p1], O_VALL(in2),
+			    Meml[po], nelem)
+		    } else {
+			call aborl (Meml[p1], Meml[p2],
+			    Meml[po], nelem)
+		    }
+		case BXOR:
+		    if (len1 <= 0) {
+			O_VALL(out) = xor (O_VALL(in1), O_VALL(in2))
+		    } else if (len2 <= 0) {
+			call axorkl (Meml[p1], O_VALL(in2),
+			    Meml[po], nelem)
+		    } else {
+			call axorl (Meml[p1], Meml[p2],
+			    Meml[po], nelem)
+		    }
+		}
+
+	    default:
+		call xvv_error (s_boolop)
+	    }
+
+	    goto done_
+	}
+
+	# Perform an arithmetic binary operation.
 	switch (dtype) {
 	case TY_CHAR:
 	    switch (opcode) {
@@ -945,17 +1099,18 @@ begin
 	default:
 	    call xvv_error (s_badswitch)
 	}
-
+done_
 	# Free any storage in input operands.
 	call xvv_freeop (in1)
 	call xvv_freeop (in2)
 end
 
 
-# XVV_BOOLOP -- Boolean binary operations.  Perform the indicated boolean
-# binary operation on the two input operands, returning the result as the
-# output operand.  The opcodes implemented by this routine are characterized
-# by the fact that they all return a boolean result.
+# XVV_BOOLOP -- Boolean (actually logical) binary operations.  Perform the
+# indicated logical operation on the two input operands, returning the result
+# as the output operand.  The opcodes implemented by this routine are
+# characterized by the fact that they all return a logical result (YES or NO
+# physically expressed as an integer).
 
 procedure xvv_boolop (opcode, in1, in2, out)
 
@@ -980,11 +1135,9 @@ int	xvv_newtype(), xvv_patmatch(), strncmp(), btoi()
 errchk	xvv_newtype, xvv_initop, xvv_chtype, xvv_error
 string	s_badop "boolop: illegal operation"
 string	s_badswitch "boolop: illegal switch"
-define	land_ 91
-define	lor_ 92
 
 begin
-	# Boolean operands are treated as integer in this routine.
+	# Boolean operands are treated as integer within this routine.
 	if (O_TYPE(in1) == TY_BOOL)
 	    O_TYPE(in1) = TY_INT
 	if (O_TYPE(in2) == TY_BOOL)
@@ -1080,28 +1233,9 @@ begin
 	po = O_VALP(out)
 
 	# Perform the operation.
-	switch (dtype) {
-	case TY_BOOL:
-	    switch (opcode) {
-	    case LAND:
-land_		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) != 0 && O_VALI(in2) != 0)
-		else if (len2 <= 0)
-		    call aandki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call aandi (Memi[p1], Memi[p2], Memi[po], nelem)
-	    case LOR:
-lor_		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) != 0 || O_VALI(in2) != 0)
-		else if (len2 <= 0)
-		    call aborki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abori (Memi[p1], Memi[p2], Memi[po], nelem)
-	    default:
-		call xvv_error (s_badop)
-	    }
+	if (dtype == TY_CHAR) {
+	    # Character data is a special case.
 
-	case TY_CHAR:
 	    switch (opcode) {
 	    case SE:
 		O_VALI(out) = btoi(xvv_patmatch (O_VALC(in1), O_VALC(in2)) > 0)
@@ -1121,339 +1255,358 @@ lor_		if (len1 <= 0)
 		call xvv_error (s_badop)
 	    }
 
+	} else if (opcode == LAND || opcode == LOR) {
+	    # Operations supporting only the integer types.
 
-	case TY_SHORT:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
+	    switch (dtype) {
+
+	    case TY_SHORT:
+		switch (opcode) {
+		case LAND:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALS(in1) != 0 && O_VALS(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alanks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    } else
+			call alans (Mems[p1], Mems[p2], Memi[po], nelem)
+		case LOR:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALS(in1) != 0 || O_VALS(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alorks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    } else
+			call alors (Mems[p1], Mems[p2], Memi[po], nelem)
+		default:
 		    call xvv_error (s_badop)
+		}
 
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
+	    case TY_INT:
+		switch (opcode) {
+		case LAND:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALI(in1) != 0 && O_VALI(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alanki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    } else
+			call alani (Memi[p1], Memi[p2], Memi[po], nelem)
+		case LOR:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALI(in1) != 0 || O_VALI(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alorki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    } else
+			call alori (Memi[p1], Memi[p2], Memi[po], nelem)
+		default:
 		    call xvv_error (s_badop)
+		}
 
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) < O_VALS(in2))
-		else if (len2 <= 0)
-		    call abltks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call ablts (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) <= O_VALS(in2))
-		else if (len2 <= 0)
-		    call ableks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call ables (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) > O_VALS(in2))
-		else if (len2 <= 0)
-		    call abgtks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call abgts (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) >= O_VALS(in2))
-		else if (len2 <= 0)
-		    call abgeks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call abges (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) == O_VALS(in2))
-		else if (len2 <= 0)
-		    call abeqks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call abeqs (Mems[p1], Mems[p2], Memi[po], nelem)
-
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALS(in1) != O_VALS(in2))
-		else if (len2 <= 0)
-		    call abneks (Mems[p1], O_VALS(in2), Memi[po], nelem)
-		else
-		    call abnes (Mems[p1], Mems[p2], Memi[po], nelem)
+	    case TY_LONG:
+		switch (opcode) {
+		case LAND:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALL(in1) != 0 && O_VALL(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alankl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    } else
+			call alanl (Meml[p1], Meml[p2], Memi[po], nelem)
+		case LOR:
+		    if (len1 <= 0) {
+			O_VALI(out) =
+			    btoi (O_VALL(in1) != 0 || O_VALL(in2) != 0)
+		    } else if (len2 <= 0) {
+			call alorkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    } else
+			call alorl (Meml[p1], Meml[p2], Memi[po], nelem)
+		default:
+		    call xvv_error (s_badop)
+		}
 
 	    default:
-		call xvv_error (s_badop)
+		call xvv_error (s_badswitch)
 	    }
+	} else {
+	    # Operations supporting any arithmetic type.
 
-	case TY_INT:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
+	    switch (dtype) {
+
+	    case TY_SHORT:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) < O_VALS(in2))
+		    else if (len2 <= 0)
+			call abltks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call ablts (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) <= O_VALS(in2))
+		    else if (len2 <= 0)
+			call ableks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call ables (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) > O_VALS(in2))
+		    else if (len2 <= 0)
+			call abgtks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call abgts (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) >= O_VALS(in2))
+		    else if (len2 <= 0)
+			call abgeks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call abges (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) == O_VALS(in2))
+		    else if (len2 <= 0)
+			call abeqks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call abeqs (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALS(in1) != O_VALS(in2))
+		    else if (len2 <= 0)
+			call abneks (Mems[p1], O_VALS(in2), Memi[po], nelem)
+		    else
+			call abnes (Mems[p1], Mems[p2], Memi[po], nelem)
+
+		default:
 		    call xvv_error (s_badop)
+		}
 
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
+	    case TY_INT:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) < O_VALI(in2))
+		    else if (len2 <= 0)
+			call abltki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call ablti (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) <= O_VALI(in2))
+		    else if (len2 <= 0)
+			call ableki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call ablei (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) > O_VALI(in2))
+		    else if (len2 <= 0)
+			call abgtki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call abgti (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) >= O_VALI(in2))
+		    else if (len2 <= 0)
+			call abgeki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call abgei (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) == O_VALI(in2))
+		    else if (len2 <= 0)
+			call abeqki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call abeqi (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALI(in1) != O_VALI(in2))
+		    else if (len2 <= 0)
+			call abneki (Memi[p1], O_VALI(in2), Memi[po], nelem)
+		    else
+			call abnei (Memi[p1], Memi[p2], Memi[po], nelem)
+
+		default:
 		    call xvv_error (s_badop)
+		}
 
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) < O_VALI(in2))
-		else if (len2 <= 0)
-		    call abltki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call ablti (Memi[p1], Memi[p2], Memi[po], nelem)
+	    case TY_LONG:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) < O_VALL(in2))
+		    else if (len2 <= 0)
+			call abltkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abltl (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) <= O_VALI(in2))
-		else if (len2 <= 0)
-		    call ableki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call ablei (Memi[p1], Memi[p2], Memi[po], nelem)
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) <= O_VALL(in2))
+		    else if (len2 <= 0)
+			call ablekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call ablel (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) > O_VALI(in2))
-		else if (len2 <= 0)
-		    call abgtki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abgti (Memi[p1], Memi[p2], Memi[po], nelem)
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) > O_VALL(in2))
+		    else if (len2 <= 0)
+			call abgtkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abgtl (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) >= O_VALI(in2))
-		else if (len2 <= 0)
-		    call abgeki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abgei (Memi[p1], Memi[p2], Memi[po], nelem)
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) >= O_VALL(in2))
+		    else if (len2 <= 0)
+			call abgekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abgel (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) == O_VALI(in2))
-		else if (len2 <= 0)
-		    call abeqki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abeqi (Memi[p1], Memi[p2], Memi[po], nelem)
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) == O_VALL(in2))
+		    else if (len2 <= 0)
+			call abeqkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abeql (Meml[p1], Meml[p2], Memi[po], nelem)
 
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALI(in1) != O_VALI(in2))
-		else if (len2 <= 0)
-		    call abneki (Memi[p1], O_VALI(in2), Memi[po], nelem)
-		else
-		    call abnei (Memi[p1], Memi[p2], Memi[po], nelem)
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALL(in1) != O_VALL(in2))
+		    else if (len2 <= 0)
+			call abnekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
+		    else
+			call abnel (Meml[p1], Meml[p2], Memi[po], nelem)
+
+		default:
+		    call xvv_error (s_badop)
+		}
+
+	    case TY_REAL:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) < O_VALR(in2))
+		    else if (len2 <= 0)
+			call abltkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abltr (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) <= O_VALR(in2))
+		    else if (len2 <= 0)
+			call ablekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abler (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) > O_VALR(in2))
+		    else if (len2 <= 0)
+			call abgtkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abgtr (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) >= O_VALR(in2))
+		    else if (len2 <= 0)
+			call abgekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abger (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) == O_VALR(in2))
+		    else if (len2 <= 0)
+			call abeqkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abeqr (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALR(in1) != O_VALR(in2))
+		    else if (len2 <= 0)
+			call abnekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
+		    else
+			call abner (Memr[p1], Memr[p2], Memi[po], nelem)
+
+		default:
+		    call xvv_error (s_badop)
+		}
+
+	    case TY_DOUBLE:
+		switch (opcode) {
+		case LT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) < O_VALD(in2))
+		    else if (len2 <= 0)
+			call abltkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abltd (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case LE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) <= O_VALD(in2))
+		    else if (len2 <= 0)
+			call ablekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abled (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case GT:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) > O_VALD(in2))
+		    else if (len2 <= 0)
+			call abgtkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abgtd (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case GE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) >= O_VALD(in2))
+		    else if (len2 <= 0)
+			call abgekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abged (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case EQ:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) == O_VALD(in2))
+		    else if (len2 <= 0)
+			call abeqkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abeqd (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		case NE:
+		    if (len1 <= 0)
+			O_VALI(out) = btoi (O_VALD(in1) != O_VALD(in2))
+		    else if (len2 <= 0)
+			call abnekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
+		    else
+			call abned (Memd[p1], Memd[p2], Memi[po], nelem)
+
+		default:
+		    call xvv_error (s_badop)
+		}
 
 	    default:
-		call xvv_error (s_badop)
+		call xvv_error (s_badswitch)
 	    }
-
-	case TY_LONG:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
-		    call xvv_error (s_badop)
-
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
-		    call xvv_error (s_badop)
-
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) < O_VALL(in2))
-		else if (len2 <= 0)
-		    call abltkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abltl (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) <= O_VALL(in2))
-		else if (len2 <= 0)
-		    call ablekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call ablel (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) > O_VALL(in2))
-		else if (len2 <= 0)
-		    call abgtkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abgtl (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) >= O_VALL(in2))
-		else if (len2 <= 0)
-		    call abgekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abgel (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) == O_VALL(in2))
-		else if (len2 <= 0)
-		    call abeqkl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abeql (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALL(in1) != O_VALL(in2))
-		else if (len2 <= 0)
-		    call abnekl (Meml[p1], O_VALL(in2), Memi[po], nelem)
-		else
-		    call abnel (Meml[p1], Meml[p2], Memi[po], nelem)
-
-	    default:
-		call xvv_error (s_badop)
-	    }
-
-	case TY_REAL:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
-		    call xvv_error (s_badop)
-
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
-		    call xvv_error (s_badop)
-
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) < O_VALR(in2))
-		else if (len2 <= 0)
-		    call abltkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abltr (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) <= O_VALR(in2))
-		else if (len2 <= 0)
-		    call ablekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abler (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) > O_VALR(in2))
-		else if (len2 <= 0)
-		    call abgtkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abgtr (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) >= O_VALR(in2))
-		else if (len2 <= 0)
-		    call abgekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abger (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) == O_VALR(in2))
-		else if (len2 <= 0)
-		    call abeqkr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abeqr (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALR(in1) != O_VALR(in2))
-		else if (len2 <= 0)
-		    call abnekr (Memr[p1], O_VALR(in2), Memi[po], nelem)
-		else
-		    call abner (Memr[p1], Memr[p2], Memi[po], nelem)
-
-	    default:
-		call xvv_error (s_badop)
-	    }
-
-	case TY_DOUBLE:
-	    switch (opcode) {
-	    case LAND:
-		if (dtype == TY_INT)
-		    goto land_
-		else
-		    call xvv_error (s_badop)
-
-	    case LOR:
-		if (dtype == TY_INT)
-		    goto lor_
-		else
-		    call xvv_error (s_badop)
-
-	    case LT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) < O_VALD(in2))
-		else if (len2 <= 0)
-		    call abltkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abltd (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case LE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) <= O_VALD(in2))
-		else if (len2 <= 0)
-		    call ablekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abled (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case GT:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) > O_VALD(in2))
-		else if (len2 <= 0)
-		    call abgtkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abgtd (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case GE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) >= O_VALD(in2))
-		else if (len2 <= 0)
-		    call abgekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abged (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case EQ:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) == O_VALD(in2))
-		else if (len2 <= 0)
-		    call abeqkd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abeqd (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    case NE:
-		if (len1 <= 0)
-		    O_VALI(out) = btoi (O_VALD(in1) != O_VALD(in2))
-		else if (len2 <= 0)
-		    call abnekd (Memd[p1], O_VALD(in2), Memi[po], nelem)
-		else
-		    call abned (Memd[p1], Memd[p2], Memi[po], nelem)
-
-	    default:
-		call xvv_error (s_badop)
-	    }
-
-	default:
-	    call xvv_error (s_badswitch)
 	}
 
 	# Free any storage in input operands.
@@ -4040,13 +4193,18 @@ ident_
 		ip = ip + 1
 		token = LAND
 	    } else
-		token = LAND
+		token = BAND
 	case '|':
 	    if (Memc[ip+1] == '|') {
 		ip = ip + 1
 		token = LOR
 	    } else
-		token = LOR
+		token = BOR
+
+	case '^':
+	    token = BXOR
+	case '~':
+	    token = BNOT
 
 	case '(', ')', ',':
 	    token = ch
@@ -4486,8 +4644,8 @@ begin
 	return (0.0D0)
 end
 
-define	YYNPROD		35
-define	YYLAST		292
+define	YYNPROD		39
+define	YYLAST		303
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 # Parser for yacc output, translated to the IRAF SPP language.  The contents
@@ -4558,102 +4716,109 @@ include	"evvexpr.com"
 
 short	yyexca[96]
 data	(yyexca(i),i=  1,  8)	/  -1,   1,   0,  -1,  -2,   0,  -1,   5/
-data	(yyexca(i),i=  9, 16)	/  40,  29,  -2,   5,  -1,   6,  40,  28/
-data	(yyexca(i),i= 17, 24)	/  -2,   6,  -1,  65, 269,   0, 270,   0/
-data	(yyexca(i),i= 25, 32)	/ 271,   0, 279,   0,  -2,  18,  -1,  66/
-data	(yyexca(i),i= 33, 40)	/ 269,   0, 270,   0, 271,   0, 279,   0/
-data	(yyexca(i),i= 41, 48)	/  -2,  19,  -1,  67, 269,   0, 270,   0/
-data	(yyexca(i),i= 49, 56)	/ 271,   0, 279,   0,  -2,  20,  -1,  68/
-data	(yyexca(i),i= 57, 64)	/ 269,   0, 270,   0, 271,   0, 279,   0/
-data	(yyexca(i),i= 65, 72)	/  -2,  21,  -1,  69, 272,   0, 273,   0/
-data	(yyexca(i),i= 73, 80)	/ 274,   0,  -2,  22,  -1,  70, 272,   0/
-data	(yyexca(i),i= 81, 88)	/ 273,   0, 274,   0,  -2,  23,  -1,  71/
-data	(yyexca(i),i= 89, 96)	/ 272,   0, 273,   0, 274,   0,  -2,  24/
-short	yyact[292]
-data	(yyact(i),i=  1,  8)	/  14,  15,  16,  17,  18,  19,  29,  75/
-data	(yyact(i),i=  9, 16)	/  22,  23,  24,  26,  28,  27,  20,  21/
-data	(yyact(i),i= 17, 24)	/  54,  18,  25,  14,  15,  16,  17,  18/
-data	(yyact(i),i= 25, 32)	/  19,  29,  30,  22,  23,  24,  26,  28/
-data	(yyact(i),i= 33, 40)	/  27,  20,  21,  11,  33,  25,  14,  15/
-data	(yyact(i),i= 41, 48)	/  16,  17,  18,  19,  11,  52,  22,  23/
-data	(yyact(i),i= 49, 56)	/  24,  26,  28,  27,  20,  11,  10,   2/
-data	(yyact(i),i= 57, 64)	/  25,  14,  15,  16,  17,  18,  19,  13/
-data	(yyact(i),i= 65, 72)	/   1,  22,  23,  24,  26,  28,  27,  16/
-data	(yyact(i),i= 73, 80)	/  17,  18,   0,  25,  14,  15,  16,  17/
-data	(yyact(i),i= 81, 88)	/  18,  19,   0,   0,  22,  23,  24,  14/
-data	(yyact(i),i= 89, 96)	/  15,  16,  17,  18,  19,   4,  25,  14/
-data	(yyact(i),i= 97,104)	/  15,  16,  17,  18,   0,  73,  31,  32/
-data	(yyact(i),i=105,112)	/  74,  34,   0,   0,   0,   0,   0,   0/
-data	(yyact(i),i=113,120)	/   0,   0,   0,   0,   0,   0,   0,   0/
-data	(yyact(i),i=121,128)	/   0,   0,   0,   0,   0,   0,   0,  53/
-data	(yyact(i),i=129,136)	/   0,  55,  57,  58,  59,  60,  61,  62/
-data	(yyact(i),i=137,144)	/  63,  64,  65,  66,  67,  68,  69,  70/
-data	(yyact(i),i=145,152)	/  71,  72,   0,   0,   0,   0,   0,   0/
-data	(yyact(i),i=153,160)	/   0,   0,   0,   0,   0,  35,   0,   0/
-data	(yyact(i),i=161,168)	/   0,   0,   0,   0,   0,   0,   0,   0/
-data	(yyact(i),i=169,176)	/   0,   0,  78,  79,  36,  37,  38,  39/
-data	(yyact(i),i=177,184)	/  40,  41,  42,  43,  44,  45,  46,  47/
-data	(yyact(i),i=185,192)	/  48,  49,  50,  51,   0,   0,   0,   0/
-data	(yyact(i),i=193,200)	/   0,   0,   0,   0,   0,   0,   0,   0/
-data	(yyact(i),i=201,208)	/   0,   0,   0,   0,   0,   0,   0,   0/
+data	(yyexca(i),i=  9, 16)	/  40,  33,  -2,   5,  -1,   6,  40,  32/
+data	(yyexca(i),i= 17, 24)	/  -2,   6,  -1,  76, 269,   0, 270,   0/
+data	(yyexca(i),i= 25, 32)	/ 271,   0, 283,   0,  -2,  22,  -1,  77/
+data	(yyexca(i),i= 33, 40)	/ 269,   0, 270,   0, 271,   0, 283,   0/
+data	(yyexca(i),i= 41, 48)	/  -2,  23,  -1,  78, 269,   0, 270,   0/
+data	(yyexca(i),i= 49, 56)	/ 271,   0, 283,   0,  -2,  24,  -1,  79/
+data	(yyexca(i),i= 57, 64)	/ 269,   0, 270,   0, 271,   0, 283,   0/
+data	(yyexca(i),i= 65, 72)	/  -2,  25,  -1,  80, 272,   0, 273,   0/
+data	(yyexca(i),i= 73, 80)	/ 274,   0,  -2,  26,  -1,  81, 272,   0/
+data	(yyexca(i),i= 81, 88)	/ 273,   0, 274,   0,  -2,  27,  -1,  82/
+data	(yyexca(i),i= 89, 96)	/ 272,   0, 273,   0, 274,   0,  -2,  28/
+short	yyact[303]
+data	(yyact(i),i=  1,  8)	/  15,  16,  17,  18,  19,  20,  33,  86/
+data	(yyact(i),i=  9, 16)	/  26,  27,  28,  30,  32,  31,  21,  22/
+data	(yyact(i),i= 17, 24)	/  62,  23,  24,  25,  19,  34,  29,  15/
+data	(yyact(i),i= 25, 32)	/  16,  17,  18,  19,  20,  33,  38,  26/
+data	(yyact(i),i= 33, 40)	/  27,  28,  30,  32,  31,  21,  22,  60/
+data	(yyact(i),i= 41, 48)	/  23,  24,  25,  12,  11,  29,  15,  16/
+data	(yyact(i),i= 49, 56)	/  17,  18,  19,  20,  12,   2,  26,  27/
+data	(yyact(i),i= 57, 64)	/  28,  30,  32,  31,  12,   1,   0,  23/
+data	(yyact(i),i= 65, 72)	/  24,  25,   0,  14,  29,  15,  16,  17/
+data	(yyact(i),i= 73, 80)	/  18,  19,  20,   0,   0,  26,  27,  28/
+data	(yyact(i),i= 81, 88)	/  30,  32,  31,   0,  15,  16,  17,  18/
+data	(yyact(i),i= 89, 96)	/  19,  20,   0,  29,  26,  27,  28,  15/
+data	(yyact(i),i= 97,104)	/  16,  17,  18,  19,  20,  15,  16,  17/
+data	(yyact(i),i=105,112)	/  18,  19,  29,  17,  18,  19,   4,   0/
+data	(yyact(i),i=113,120)	/  84,   0,  40,  85,   0,   0,   0,  35/
+data	(yyact(i),i=121,128)	/  36,  37,   0,  39,   0,   0,   0,   0/
+data	(yyact(i),i=129,136)	/   0,   0,  41,  42,  43,  44,  45,  46/
+data	(yyact(i),i=137,144)	/  47,  48,  49,  50,  51,  52,  53,  54/
+data	(yyact(i),i=145,152)	/  55,  56,  57,  58,  59,  61,   0,  63/
+data	(yyact(i),i=153,160)	/  65,  66,  67,  68,  69,  70,  71,  72/
+data	(yyact(i),i=161,168)	/  73,  74,  75,  76,  77,  78,  79,  80/
+data	(yyact(i),i=169,176)	/  81,  82,  83,   0,   0,   0,   0,   0/
+data	(yyact(i),i=177,184)	/   0,   0,   0,   0,   0,   0,   0,   0/
+data	(yyact(i),i=185,192)	/   0,   0,   0,   0,   0,   0,   0,   0/
+data	(yyact(i),i=193,200)	/   0,   0,   0,   0,   0,   0,  89,  90/
+data	(yyact(i),i=201,208)	/  87,  88,   0,   0,   0,   0,   0,   0/
 data	(yyact(i),i=209,216)	/   0,   0,   0,   0,   0,   0,   0,   0/
 data	(yyact(i),i=217,224)	/   0,   0,   0,   0,   0,   0,   0,   0/
 data	(yyact(i),i=225,232)	/   0,   0,   0,   0,   0,   0,   0,   0/
-data	(yyact(i),i=233,240)	/  76,  77,   0,   0,  14,  15,  16,  17/
-data	(yyact(i),i=241,248)	/  18,  19,  29,   0,  22,  23,  24,  26/
-data	(yyact(i),i=249,256)	/  28,  27,  20,  21,   5,   6,  25,   0/
-data	(yyact(i),i=257,264)	/   0,   8,   0,   0,   0,   5,   6,  56/
-data	(yyact(i),i=265,272)	/   0,   0,   8,   0,   0,   3,   5,   6/
-data	(yyact(i),i=273,280)	/   9,   7,   0,   8,   0,   0,   0,  12/
-data	(yyact(i),i=281,288)	/   0,   9,   7,   0,   0,   0,   0,   0/
-data	(yyact(i),i=289,292)	/   0,   0,   9,   7/
-short	yypact[80]
-data	(yypact(i),i=  1,  8)	/  13,-1000,  19,-1000,-242,-1000,-1000,-231/
-data	(yypact(i),i=  9, 16)	/  -5,  -5,  -4,  -5,-1000,-1000,-1000,-1000/
+data	(yyact(i),i=233,240)	/   0,   0,   0,   0,  15,  16,  17,  18/
+data	(yyact(i),i=241,248)	/  19,  20,  33,   0,  26,  27,  28,  30/
+data	(yyact(i),i=249,256)	/  32,  31,  21,  22,   0,  23,  24,  25/
+data	(yyact(i),i=257,264)	/   0,   0,  29,   0,   5,   6,  64,   0/
+data	(yyact(i),i=265,272)	/   0,   8,   0,   0,   3,   5,   6,   0/
+data	(yyact(i),i=273,280)	/   0,   0,   8,   0,   0,   5,   6,   0/
+data	(yyact(i),i=281,288)	/   9,   0,   8,  13,  10,   7,   0,   0/
+data	(yyact(i),i=289,296)	/   0,   9,   0,   0,   0,  10,   7,   0/
+data	(yyact(i),i=297,303)	/   0,   9,   0,   0,   0,  10,   7/
+short	yypact[91]
+data	(yypact(i),i=  1,  8)	/  12,-1000,  23,-1000,-238,-1000,-1000,-236/
+data	(yypact(i),i=  9, 16)	/  20,  20,  20, -10,  20,-1000,-1000,-1000/
 data	(yypact(i),i= 17, 24)	/-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000/
-data	(yypact(i),i= 25, 32)	/-1000,-1000,-1000,-1000,-1000,-1000,-1000,-248/
-data	(yypact(i),i= 33, 40)	/-248,  -5, -25,   4,   4,   4,   4,   4/
-data	(yypact(i),i= 41, 48)	/   4,   4,   4,   4,   4,   4,   4,   4/
-data	(yypact(i),i= 49, 56)	/   4,   4,   4,   4,  60,-242,-1000,-242/
-data	(yypact(i),i= 57, 64)	/-1000,-192,-192,-248,-248,-1000,-166,-204/
-data	(yypact(i),i= 65, 72)	/-223,-174,-174,-174,-174,-185,-185,-185/
-data	(yypact(i),i= 73, 80)	/-261,-1000,-1000,-1000,   4,   4,-242,-242/
+data	(yypact(i),i= 25, 32)	/-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000/
+data	(yypact(i),i= 33, 40)	/-1000,-1000,-1000,-245,-245,-245,  20, -25/
+data	(yypact(i),i= 41, 48)	/   3,   3,   3,   3,   3,   3,   3,   3/
+data	(yypact(i),i= 49, 56)	/   3,   3,   3,   3,   3,   3,   3,   3/
+data	(yypact(i),i= 57, 64)	/   3,   3,   3,   3,  71,-238,-1000,-238/
+data	(yypact(i),i= 65, 72)	/-1000,-156,-156,-245,-245,-1000,-160,-215/
+data	(yypact(i),i= 73, 80)	/-215,-192,-192,-192,-166,-166,-166,-166/
+data	(yypact(i),i= 81, 88)	/-177,-177,-177,-261,-1000,-1000,-1000,   3/
+data	(yypact(i),i= 89, 91)	/   3,-238,-238/
 short	yypgo[7]
-data	(yypgo(i),i=  1,  7)	/   0,  64,  55,  93, 157,  54,  45/
-short	yyr1[35]
+data	(yypgo(i),i=  1,  7)	/   0,  61,  53, 110, 114,  44,  39/
+short	yyr1[39]
 data	(yyr1(i),i=  1,  8)	/   0,   1,   1,   2,   2,   3,   3,   3/
 data	(yyr1(i),i=  9, 16)	/   3,   3,   3,   3,   3,   3,   3,   3/
 data	(yyr1(i),i= 17, 24)	/   3,   3,   3,   3,   3,   3,   3,   3/
-data	(yyr1(i),i= 25, 32)	/   3,   3,   3,   3,   5,   5,   6,   6/
-data	(yyr1(i),i= 33, 35)	/   6,   4,   4/
-short	yyr2[35]
+data	(yyr1(i),i= 25, 32)	/   3,   3,   3,   3,   3,   3,   3,   3/
+data	(yyr1(i),i= 33, 39)	/   5,   5,   6,   6,   6,   4,   4/
+short	yyr2[39]
 data	(yyr2(i),i=  1,  8)	/   0,   2,   1,   1,   4,   1,   1,   2/
-data	(yyr2(i),i=  9, 16)	/   2,   2,   4,   4,   4,   4,   4,   4/
+data	(yyr2(i),i=  9, 16)	/   2,   2,   2,   4,   4,   4,   4,   4/
 data	(yyr2(i),i= 17, 24)	/   4,   4,   4,   4,   4,   4,   4,   4/
-data	(yyr2(i),i= 25, 32)	/   4,   7,   4,   3,   1,   1,   0,   1/
-data	(yyr2(i),i= 33, 35)	/   4,   0,   2/
-short	yychk[80]
-data	(yychk(i),i=  1,  8)	/-1000,  -1,  -2, 256,  -3, 257, 258, 278/
-data	(yychk(i),i=  9, 16)	/ 262, 277,  -5,  40, 260,  44, 261, 262/
-data	(yychk(i),i= 17, 24)	/ 263, 264, 265, 266, 275, 276, 269, 270/
-data	(yychk(i),i= 25, 32)	/ 271, 279, 272, 274, 273, 267, 257,  -3/
-data	(yychk(i),i= 33, 40)	/  -3,  40,  -3,  -4,  -4,  -4,  -4,  -4/
+data	(yyr2(i),i= 25, 32)	/   4,   4,   4,   4,   4,   7,   4,   3/
+data	(yyr2(i),i= 33, 39)	/   1,   1,   0,   1,   4,   0,   2/
+short	yychk[91]
+data	(yychk(i),i=  1,  8)	/-1000,  -1,  -2, 256,  -3, 257, 258, 282/
+data	(yychk(i),i=  9, 16)	/ 262, 277, 281,  -5,  40, 260,  44, 261/
+data	(yychk(i),i= 17, 24)	/ 262, 263, 264, 265, 266, 275, 276, 278/
+data	(yychk(i),i= 25, 32)	/ 279, 280, 269, 270, 271, 283, 272, 274/
+data	(yychk(i),i= 33, 40)	/ 273, 267, 257,  -3,  -3,  -3,  40,  -3/
 data	(yychk(i),i= 41, 48)	/  -4,  -4,  -4,  -4,  -4,  -4,  -4,  -4/
-data	(yychk(i),i= 49, 56)	/  -4,  -4,  -4,  -4,  -6,  -3,  41,  -3/
-data	(yychk(i),i= 57, 64)	/ 259,  -3,  -3,  -3,  -3,  -3,  -3,  -3/
-data	(yychk(i),i= 65, 72)	/  -3,  -3,  -3,  -3,  -3,  -3,  -3,  -3/
-data	(yychk(i),i= 73, 80)	/  -3,  41,  44, 268,  -4,  -4,  -3,  -3/
-short	yydef[80]
+data	(yychk(i),i= 49, 56)	/  -4,  -4,  -4,  -4,  -4,  -4,  -4,  -4/
+data	(yychk(i),i= 57, 64)	/  -4,  -4,  -4,  -4,  -6,  -3,  41,  -3/
+data	(yychk(i),i= 65, 72)	/ 259,  -3,  -3,  -3,  -3,  -3,  -3,  -3/
+data	(yychk(i),i= 73, 80)	/  -3,  -3,  -3,  -3,  -3,  -3,  -3,  -3/
+data	(yychk(i),i= 81, 88)	/  -3,  -3,  -3,  -3,  41,  44, 268,  -4/
+data	(yychk(i),i= 89, 91)	/  -4,  -3,  -3/
+short	yydef[91]
 data	(yydef(i),i=  1,  8)	/   0,  -2,   0,   2,   3,  -2,  -2,   0/
-data	(yydef(i),i=  9, 16)	/   0,   0,   0,   0,   1,  33,  33,  33/
-data	(yydef(i),i= 17, 24)	/  33,  33,  33,  33,  33,  33,  33,  33/
-data	(yydef(i),i= 25, 32)	/  33,  33,  33,  33,  33,  33,   7,   8/
-data	(yydef(i),i= 33, 40)	/   9,  30,   0,   0,   0,   0,   0,   0/
+data	(yydef(i),i=  9, 16)	/   0,   0,   0,   0,   0,   1,  37,  37/
+data	(yydef(i),i= 17, 24)	/  37,  37,  37,  37,  37,  37,  37,  37/
+data	(yydef(i),i= 25, 32)	/  37,  37,  37,  37,  37,  37,  37,  37/
+data	(yydef(i),i= 33, 40)	/  37,  37,   7,   8,   9,  10,  34,   0/
 data	(yydef(i),i= 41, 48)	/   0,   0,   0,   0,   0,   0,   0,   0/
-data	(yydef(i),i= 49, 56)	/   0,   0,   0,   0,   0,  31,  27,   4/
-data	(yydef(i),i= 57, 64)	/  34,  10,  11,  12,  13,  14,  15,  16/
-data	(yydef(i),i= 65, 72)	/  17,  -2,  -2,  -2,  -2,  -2,  -2,  -2/
-data	(yydef(i),i= 73, 80)	/   0,  26,  33,  33,   0,   0,  32,  25/
+data	(yydef(i),i= 49, 56)	/   0,   0,   0,   0,   0,   0,   0,   0/
+data	(yydef(i),i= 57, 64)	/   0,   0,   0,   0,   0,  35,  31,   4/
+data	(yydef(i),i= 65, 72)	/  38,  11,  12,  13,  14,  15,  16,  17/
+data	(yydef(i),i= 73, 80)	/  18,  19,  20,  21,  -2,  -2,  -2,  -2/
+data	(yydef(i),i= 81, 88)	/  -2,  -2,  -2,   0,  30,  37,  37,   0/
+data	(yydef(i),i= 89, 91)	/   0,  36,  29/
 
 begin
 	call smark (yysp)
@@ -4913,101 +5078,125 @@ case 9:
 case 10:
 # line 330 "evvexpr.y"
 {
-			# Addition.
-			call xvv_binop (PLUS, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Boolean not.
+			call xvv_unop (BNOT, yypvt, yyval)
 		    }
 case 11:
 # line 334 "evvexpr.y"
 {
-			# Subtraction.
-			call xvv_binop (MINUS, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Addition.
+			call xvv_binop (PLUS, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 12:
 # line 338 "evvexpr.y"
 {
-			# Multiplication.
-			call xvv_binop (STAR, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Subtraction.
+			call xvv_binop (MINUS, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 13:
 # line 342 "evvexpr.y"
 {
-			# Division.
-			call xvv_binop (SLASH, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Multiplication.
+			call xvv_binop (STAR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 14:
 # line 346 "evvexpr.y"
 {
-			# Exponentiation.
-			call xvv_binop (EXPON, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Division.
+			call xvv_binop (SLASH, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 15:
 # line 350 "evvexpr.y"
 {
-			# Concatenate two operands.
-			call xvv_binop (CONCAT, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Exponentiation.
+			call xvv_binop (EXPON, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 16:
 # line 354 "evvexpr.y"
 {
-			# Logical and.
-			call xvv_boolop (LAND, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Concatenate two operands.
+			call xvv_binop (CONCAT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 17:
 # line 358 "evvexpr.y"
 {
-			# Logical or.
-			call xvv_boolop (LOR, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Logical and.
+			call xvv_boolop (LAND, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 18:
 # line 362 "evvexpr.y"
 {
-			# Boolean less than.
-			call xvv_boolop (LT, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Logical or.
+			call xvv_boolop (LOR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 19:
 # line 366 "evvexpr.y"
 {
-			# Boolean greater than.
-			call xvv_boolop (GT, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Boolean and.
+			call xvv_binop (BAND, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 20:
 # line 370 "evvexpr.y"
 {
-			# Boolean less than or equal.
-			call xvv_boolop (LE, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Boolean or.
+			call xvv_binop (BOR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 21:
 # line 374 "evvexpr.y"
 {
-			# Boolean greater than or equal.
-			call xvv_boolop (GE, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Boolean xor.
+			call xvv_binop (BXOR, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 22:
 # line 378 "evvexpr.y"
 {
-			# Boolean equal.
-			call xvv_boolop (EQ, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Boolean less than.
+			call xvv_boolop (LT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 23:
 # line 382 "evvexpr.y"
 {
-			# String pattern-equal.
-			call xvv_boolop (SE, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Boolean greater than.
+			call xvv_boolop (GT, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 24:
 # line 386 "evvexpr.y"
 {
-			# Boolean not equal.
-			call xvv_boolop (NE, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Boolean less than or equal.
+			call xvv_boolop (LE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 25:
 # line 390 "evvexpr.y"
 {
-			# Conditional expression.
-			call xvv_quest (yypvt-6*YYOPLEN, yypvt-3*YYOPLEN, yypvt, yyval)
+			# Boolean greater than or equal.
+			call xvv_boolop (GE, yypvt-3*YYOPLEN, yypvt, yyval)
 		    }
 case 26:
 # line 394 "evvexpr.y"
+{
+			# Boolean equal.
+			call xvv_boolop (EQ, yypvt-3*YYOPLEN, yypvt, yyval)
+		    }
+case 27:
+# line 398 "evvexpr.y"
+{
+			# String pattern-equal.
+			call xvv_boolop (SE, yypvt-3*YYOPLEN, yypvt, yyval)
+		    }
+case 28:
+# line 402 "evvexpr.y"
+{
+			# Boolean not equal.
+			call xvv_boolop (NE, yypvt-3*YYOPLEN, yypvt, yyval)
+		    }
+case 29:
+# line 406 "evvexpr.y"
+{
+			# Conditional expression.
+			call xvv_quest (yypvt-6*YYOPLEN, yypvt-3*YYOPLEN, yypvt, yyval)
+		    }
+case 30:
+# line 410 "evvexpr.y"
 {
 			# Call an intrinsic or external function.
 			ap = O_VALP(yypvt-YYOPLEN)
@@ -5016,37 +5205,37 @@ case 26:
 			call xvv_freeop (yypvt-3*YYOPLEN)
 			call xvv_freeop (yypvt-YYOPLEN)
 		    }
-case 27:
-# line 402 "evvexpr.y"
+case 31:
+# line 418 "evvexpr.y"
 {
 			YYMOVE (yypvt-YYOPLEN, yyval)
 		    }
-case 28:
-# line 408 "evvexpr.y"
+case 32:
+# line 424 "evvexpr.y"
 {
 			YYMOVE (yypvt, yyval)
 		    }
-case 29:
-# line 411 "evvexpr.y"
+case 33:
+# line 427 "evvexpr.y"
 {
 			if (O_TYPE(yypvt) != TY_CHAR)
 			    call error (1, "illegal function name")
 			YYMOVE (yypvt, yyval)
 		    }
-case 30:
-# line 419 "evvexpr.y"
+case 34:
+# line 435 "evvexpr.y"
 {
 			# Empty.
 			call xvv_startarglist (NULL, yyval)
 		    }
-case 31:
-# line 423 "evvexpr.y"
+case 35:
+# line 439 "evvexpr.y"
 {
 			# First arg; start a nonnull list.
 			call xvv_startarglist (yypvt, yyval)
 		    }
-case 32:
-# line 427 "evvexpr.y"
+case 36:
+# line 443 "evvexpr.y"
 {
 			# Add an argument to an existing list.
 			call xvv_addarg (yypvt, yypvt-3*YYOPLEN, yyval)

@@ -1,5 +1,5 @@
-# Package script task for the PHOTCAL package 
-#{ PHOTCAL package definition
+# Package script task for the PHOTCAL package.
+#{ PHOTCALX package definition
 
 if (! defpac ("tables")) {
     if (deftask ("tables")) {
@@ -26,7 +26,7 @@ proto	  # some of the preprocessors require fields
 
 package photcal
 
-# PHOTCAL tasks
+# PHOTCALX tasks
 
 task	apfile,
 	catalog,
@@ -39,7 +39,7 @@ task	apfile,
 	obsfile,
 	mkphotcors	= "photcal$x_photcal.e"
 
-# PHOTCAL scripts
+# PHOTCALX scripts
 
 task	mkapfile	= "photcal$mkapfile.cl"
 task	mkcatalog	= "photcal$mkcatalog.cl"

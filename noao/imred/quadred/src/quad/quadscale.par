@@ -1,0 +1,7 @@
+input,s,a,,,,Input image
+output,s,a,,,,Output image
+gain11,r,h,1,,,"Gain for quadrant y=1, x=1"
+gain12,r,h,1,,,"Gain for quadrant y=1, x=2"
+gain21,r,h,1,,,"Gain for quadrant y=2, x=1"
+gain22,r,h,1,,,"Gain for quadrant y=2, x=2"
+opperation,s,h,"multiply","multiply|divide",,Multiply or divide by gains

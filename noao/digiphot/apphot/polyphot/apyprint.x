@@ -19,7 +19,6 @@ int	cier		# centering error
 int	sier		# sky fitting error
 int	pier		# photometric error
 
-real	xpos, ypos
 real	apstatr()
 
 begin
@@ -27,9 +26,8 @@ begin
 	    return
 
 	# Write object id parameters.
-	xpos = apstatr (py, XCENTER) - apstatr (py, XSHIFT)
-	ypos = apstatr (py, YCENTER) - apstatr (py, YSHIFT)
-	call ap_wid (py, fd, xpos, ypos, id, lid, '\\')
+	call ap_wid (py, fd, apstatr (py, OXINIT), apstatr (py, OYINIT), id,
+	    lid, '\\')
 
 	# Write the centering parameters
 	call ap_wcres (py, fd, cier, '\\')
@@ -61,11 +59,12 @@ begin
 	call salloc (imname, SZ_FNAME, TY_CHAR)
 
 	# Print polyphot magnitudes.
-	call apstats (py, IMNAME, Memc[imname], SZ_FNAME)
+	#call apstats (py, IMNAME, Memc[imname], SZ_FNAME)
+	call apstats (py, IMROOT, Memc[imname], SZ_FNAME)
 	call printf ("%s  %8.2f %8.2f  %8g  ")
 	    call pargstr (Memc[imname])
-	    call pargr (apstatr (py, PYCX))
-	    call pargr (apstatr (py, PYCY))
+	    call pargr (apstatr (py, OPYCX))
+	    call pargr (apstatr (py, OPYCY))
 	    call pargr (apstatr (py, SKY_MODE))
 	call printf ("%7.3f  %s\n")
 	    call pargr (apstatr (py, PYMAG))

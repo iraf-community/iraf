@@ -20,7 +20,7 @@ int	status 			#O return status
 
 pointer sp, fn, fit
 char    pathname[SZ_PATHNAME]
-int	compress, blklen, pixoff
+int	compress, blklen, pixoff, filesize
 int	i, hdr_size, sz_pixfile, sz_fitfile, junk, npix
 extern  fxfzop(), fxfzrd(), fxfzwr(), fxfzwt(), fxfzst(), fxfzcl()
 int	strncmp(), fxf_header_size(), fxf_totpix(), sizeof()
@@ -91,13 +91,12 @@ begin
 	    }
 	    
 	    FIT_TOTPIX(fit) = fxf_totpix(im)
-	    IM_FILESIZE(im) = fstatl (IM_PFD(im), F_FILESIZE)
+	    filesize = fstatl (IM_PFD(im), F_FILESIZE)
 	    FIT_PFD(fit) = IM_PFD(im)
 
 	case NEW_COPY, NEW_IMAGE, APPEND:
-	    # See if the apllication has set the number of dimensions.
+	    # See if the application has set the number of dimensions.
 	    call fxf_chk_ndim (im)
-
 	    FIT_PIXTYPE(fit) = IM_PIXTYPE(im)
 	    npix = fxf_totpix (im)
 	    FIT_NAXIS(fit) = IM_NDIM(im)
@@ -105,6 +104,14 @@ begin
 
 	    call fxf_discard_keyw (im)
 	    FIT_TOTPIX(fit) = npix
+
+	    # Do not allow BSCALE and BZERO in the UA when making a new copy or
+	    # new image if bitpix is negative. Except for ushort
+
+	    if (IM_PIXTYPE(im) != TY_USHORT) {
+		call fxf_filter_keyw (im, "BSCALE")
+		call fxf_filter_keyw (im, "BZERO")
+	    }
 
 	    # Hdr_size is in char units. (i.e. 1440 chars per FITS block).
 	    hdr_size = fxf_header_size (im)
@@ -135,18 +142,18 @@ begin
 	    }
 
 	    FIT_PFD(fit) = IM_PFD(im)
-	    IM_FILESIZE(im) = fstatl (IM_PFD(im), F_FILESIZE)
-	    FIT_EOFSIZE(fit) = IM_FILESIZE(im) + 1
+	    filesize = fstatl (IM_PFD(im), F_FILESIZE)
+	    FIT_EOFSIZE(fit) = filesize + 1
 
 	    if (FIT_NEWIMAGE(fit) == NO) {
 	        # Now we are appending a new IMAGE extension.
 	        # Write a blank header in order to append the
 	        # pixels after it.
 
-	        pixoff = IM_FILESIZE(im) + hdr_size + 1
+	        pixoff = filesize + hdr_size + 1
 
-	        # Update IM_FILESIZE.
-	        IM_FILESIZE(im) = IM_FILESIZE(im) + sz_fitfile
+	        # Update filesize
+	        filesize = filesize + sz_fitfile
 	        call fxf_write_blanks (IM_PFD(im), hdr_size)
 	    } else 
 	        pixoff = hdr_size + 1
@@ -197,7 +204,7 @@ begin
 	fit = IM_KDES(im)
         inherit = false
 
-	# Kks_inherit is a combined value.
+	# Fks_inherit is a combined value.
         if (FKS_INHERIT(fit) == YES)
 	    inherit = true
 
@@ -324,8 +331,6 @@ int	nheader_cards		#O Number of mandatory cards in header.
 pointer ua
 int	ncards, rp, fit, acmode
 int	idb_findrecord()
-bool    fxf_fpl_equald()
-double  imgetd()
 
 begin
 	ua = IM_USERAREA(im)
@@ -336,29 +341,54 @@ begin
 	else					# create an EHU
 	    ncards = 12 + IM_NDIM(im) 
 
-	if (idb_findrecord (im, "PCOUNT", rp) > 0)
-	    ncards = ncards - 1
-	if (idb_findrecord (im, "GCOUNT", rp) > 0)
-	    ncards = ncards - 1
-	if (idb_findrecord (im, "EXTNAME", rp) > 0)
-	    ncards = ncards - 1
-	if (idb_findrecord (im, "INHERIT", rp) > 0)
-	    ncards = ncards - 1
-	if (idb_findrecord (im, "EXTEND", rp) > 0)
-	    ncards = ncards - 1
+	if (idb_findrecord (im, "PCOUNT", rp) > 0) {
+	    if (FIT_XTENSION(fit) == YES) 
+	        ncards = ncards - 1
+	    else
+	        call fxf_filter_keyw (im, "PCOUNT")
+	}
+	if (idb_findrecord (im, "GCOUNT", rp) > 0) {
+	    if (FIT_XTENSION(fit) == YES) 
+	        ncards = ncards - 1
+	    else
+	        call fxf_filter_keyw (im, "GCOUNT")
+	}
+	if (idb_findrecord (im, "EXTNAME", rp) > 0) {
+	    if (FIT_XTENSION(fit) == YES) 
+	        ncards = ncards - 1
+	    else
+	        call fxf_filter_keyw (im, "EXTNAME")
+	}
+	if (idb_findrecord (im, "INHERIT", rp) > 0) {
+	    if (FIT_XTENSION(fit) == YES) 
+	        ncards = ncards - 1
+	    else
+	        call fxf_filter_keyw (im, "INHERIT")
+	}
+	if (idb_findrecord (im, "EXTEND", rp) > 0)  {
+	    if (FIT_XTENSION(fit) == NO)  {
+	        ncards = ncards - 1
+	    } else {
+		# Delete the keyword from the UA because EXTEND is not
+		# recommended in XTENSION units.
+
+	        call fxf_filter_keyw (im, "EXTEND")
+	    }
+	}
+
 	if (idb_findrecord (im, "ORIGIN", rp) > 0)
 	    ncards = ncards - 1
-	if (idb_findrecord (im, "DATE", rp) > 0 )
+	if (idb_findrecord (im, "DATE", rp) > 0 ) 
 	    ncards = ncards - 1
-	if (idb_findrecord (im, "IRAF-TLM", rp) > 0)
+	if (idb_findrecord (im, "IRAF-TLM", rp) > 0) 
 	    ncards = ncards - 1
-	if (idb_findrecord (im, "OBJECT", rp) > 0)
+	if (idb_findrecord (im, "OBJECT", rp) > 0) 
 	    ncards = ncards - 1
 
 	# See if we need to add one more mandatory card when an EXTVER value
 	# was specified when appending a new extension.
 
-	if (FIT_NEWIMAGE(fit) == NO && idb_findrecord (im, "EXTVER", rp) == 0) {
+	if (FIT_NEWIMAGE(fit) == NO && idb_findrecord(im,"EXTVER",rp) == 0) {
 	    # Keyword does not exist.
 	    acmode = IM_ACMODE(im)
 	    if ((acmode == NEW_IMAGE || acmode == NEW_COPY) && 
@@ -366,7 +396,7 @@ begin
 	    ncards = ncards + 1
 	}
 
-	# We want to keep around BSCALE and BZERO in case we are 
+	# We want to keep BSCALE and BZERO in the UA in case we are 
 	# editing the values. Is up to the user or application
 	# responsability to deal with the change in pixel value when reading.
 	# If we are reading pixels the values will change according to the
@@ -375,27 +405,15 @@ begin
 	# changing right before closing the image, the pixel value will be 
 	# unchanged.
 
-	if (idb_findrecord (im, "BSCALE", rp) > 0) {
-	    FIT_BSCALE(fit) = imgetd (im, "BSCALE")
-	    call fxf_filter_keyw (im, "BSCALE")
-        }	  	 
-	if (idb_findrecord (im, "BZERO", rp) > 0) {
-	    FIT_BZERO(fit) = imgetd (im, "BZERO")
-	    call fxf_filter_keyw (im, "BZERO")
-        }	   
+	# See if BSCALE and BZERO are in the UA for ushort, otherwise
+	# increase the number.
 
-	# If need to write BSCALE and BZERO make sure the output datatype
-	# is not REAL or DOUBLE, since we are using only nonscaled IEEE.
-
-	if (FIT_PIXTYPE(fit) != TY_REAL && FIT_PIXTYPE(fit) != TY_DOUBLE) {
-	    if (!fxf_fpl_equald (1.0d0, FIT_BSCALE(fit), 4) ||
-		!fxf_fpl_equald (0.0d0, FIT_BZERO(fit), 4) || 
-	        IM_PIXTYPE(im) == TY_USHORT) {
-
-	       ncards = ncards + 2
-	    }
-	}
-
+	if (IM_PIXTYPE(im) == TY_USHORT) {
+	    if (idb_findrecord (im, "BSCALE", rp) == 0) 
+	        ncards = ncards + 1
+	    if (idb_findrecord (im, "BZERO", rp) == 0) 
+	        ncards = ncards + 1
+        }
 	nheader_cards = ncards
 end
 
@@ -410,7 +428,7 @@ pointer	fit			#I Fits descriptor
 pointer	im			#I Image descriptor
 
 pointer sp, file, mii
-int	pixoff, compress, blklen, sz_fitfile, i, group
+int	pixoff, compress, blklen, sz_fitfile, i, group, filesize
 int	junk, in_fd, out_fd, nblocks, nk, hdr_size, sz_pixfile
 extern  fxfzop(), fxfzrd(), fxfzwr(), fxfzwt(), fxfzst(), fxfzcl()
 int	fnroot(), open(), read(), fxf_totpix(), strncmp(), itoc()
@@ -461,6 +479,14 @@ begin
 	
 	FIT_TOTPIX(fit) = fxf_totpix(im)
 
+	# Do not allow BSCALE and BZERO in the UA when making a new copy or
+	# new image if bitpix is negative. Except for ushort.
+
+	if (IM_PIXTYPE(im) != TY_USHORT) {
+	    call fxf_filter_keyw (im, "BSCALE")
+	    call fxf_filter_keyw (im, "BZERO")
+	}
+
 	# The new copy header should not have the following keywords:
 	# GROUPS, PSIZE and that could come from a GEIS file. 
 
@@ -495,8 +521,8 @@ begin
 	    goto err_
 	}
 
-	IM_FILESIZE(im) = fstatl (IM_PFD(im), F_FILESIZE)
-	FIT_EOFSIZE(fit) = IM_FILESIZE(im) + 1
+	filesize = fstatl (IM_PFD(im), F_FILESIZE)
+	FIT_EOFSIZE(fit) = filesize + 1
 	# Now write a blank header.
 	if (group != 0) {
 	    call amovki (0, Memi[mii], FITS_BLOCK_CHARS)
@@ -507,8 +533,8 @@ begin
 	    do nk = 1, nblocks 
 		call write (IM_PFD(im), Memi[mii], FITS_BLOCK_CHARS)
 	    
-	    pixoff = IM_FILESIZE(im) + hdr_size + 1
-	    IM_FILESIZE(im) = IM_FILESIZE(im) + sz_fitfile
+	    pixoff = filesize + hdr_size + 1
+	    filesize = filesize + sz_fitfile
 	} else
 	   pixoff = hdr_size + 1
 

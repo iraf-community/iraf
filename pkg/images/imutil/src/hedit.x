@@ -11,8 +11,9 @@ define	SZ_IMAGENAME	63		# max size of an image name
 define	SZ_FIELDNAME	31		# max size of a field name
 
 define	OP_EDIT		1		# hedit opcodes
-define	OP_ADD		2
-define	OP_DELETE	3
+define	OP_INIT		2		
+define	OP_ADD		3
+define	OP_DELETE	4
 
 
 # HEDIT -- Edit or view selected fields of an image header or headers.  This
@@ -54,6 +55,8 @@ begin
 	operation = OP_EDIT
 	if (clgetb ("add"))
 	    operation = OP_ADD
+	else if (clgetb ("addonly"))
+	    operation = OP_INIT
 	else if (clgetb ("delete"))
 	    operation = OP_DELETE
 
@@ -118,7 +121,7 @@ begin
 		next
 	    }
 
-	    if (operation == OP_ADD) {
+	    if (operation == OP_INIT || operation == OP_ADD) {
 		# Add a field to the image header.  This cannot be done within
 		# the IMGNFN loop because template expansion on the existing
 		# fields of the image header would discard the new field name
@@ -126,8 +129,14 @@ begin
 
 		nfields = 1
 		call he_getopsetimage (im, Memc[image], Memc[field])
-		call he_addfield (im, Memc[image], Memc[fields], Memc[valexpr],
-		    verify, show, update)
+		switch (operation) {
+		case OP_INIT:
+		    call he_initfield (im, Memc[image], Memc[fields],
+		        Memc[valexpr], verify, show, update)
+		case OP_ADD:
+		    call he_addfield (im, Memc[image], Memc[fields],
+		        Memc[valexpr], verify, show, update)
+		}
 	    
 	    } else {
 		# Open list of fields to be processed.
@@ -250,6 +259,7 @@ begin
 	if (valexpr[1] == '(') {
 	    o = evexpr (valexpr, locpr (he_getop), 0)
 	    call he_encodeop (o, Memc[newval], SZ_LINE)
+	    call xev_freeop (o)
 	    call mfree (o, TY_STRUCT)
 	} else
 	    call strcpy (valexpr, Memc[newval], SZ_LINE)
@@ -315,6 +325,92 @@ begin
 		show)
 	}
 
+	call sfree (sp)
+end
+
+
+# HE_INITFIELD -- Add a new field to the indicated image.  If the field already
+# existsdo not set its value.  The value expression is evaluated and the
+# resulting value used as the initial value in adding the field to the image.
+
+procedure he_initfield (im, image, field, valexpr, verify, show, update)
+
+pointer	im			# image descriptor of image to be edited
+char	image[ARB]		# name of image to be edited
+char	field[ARB]		# name of field to be edited
+char	valexpr[ARB]		# value expression
+int	verify			# verify new value interactively
+int	show			# print record of edit
+int	update			# enable updating of the image
+
+bool	numeric
+int	numlen, ip
+pointer	sp, newval, o
+pointer	evexpr()
+int	imaccf(), locpr(), strlen(), lexnum()
+extern	he_getop()
+errchk	imaccf, evexpr, imaddb, imastr, imaddi, imaddr
+
+begin
+	call smark (sp)
+	call salloc (newval, SZ_LINE, TY_CHAR)
+
+	# If the named field already exists, this is really an edit operation
+	# rather than an add.  Call editfield so that the usual verification
+	# can take place.
+
+	if (imaccf (im, field) == YES) {
+	    call eprintf ("parameter %s,%s already exists\n")
+	        call pargstr (image)
+	        call pargstr (field)
+	    call sfree (sp)
+	    return
+	}
+
+	# If the expression is not parenthesized, assume that is is already
+	# a string literal.  If the expression is a string check for a simple
+	# numeric field.
+
+	ip = 1
+	numeric = (lexnum (valexpr, ip, numlen) != LEX_NONNUM)
+	if (numeric)
+	    numeric = (numlen == strlen (valexpr))
+
+	if (numeric || valexpr[1] == '(')
+	    o = evexpr (valexpr, locpr(he_getop), 0)
+	else {
+	    call malloc (o, LEN_OPERAND, TY_STRUCT)
+	    call xev_initop (o, strlen(valexpr), TY_CHAR)
+	    call strcpy (valexpr, O_VALC(o), ARB)
+	}
+
+	# Add the field to the image (or update the value).  The datatype of
+	# the expression value operand determines the datatype of the new
+	# parameter.
+
+	switch (O_TYPE(o)) {
+	case TY_BOOL:
+	    call imaddb (im, field, O_VALB(o))
+	case TY_CHAR:
+	    call imastr (im, field, O_VALC(o))
+	case TY_INT:
+	    call imaddi (im, field, O_VALI(o))
+	case TY_REAL:
+	    call imaddr (im, field, O_VALR(o))
+	default:
+	    call error (1, "unknown expression datatype")
+	}
+
+	if (show == YES) {
+	    call he_encodeop (o, Memc[newval], SZ_LINE)
+	    call printf ("add %s,%s = %s\n")
+		call pargstr (image)
+		call pargstr (field)
+		call he_pargstr (Memc[newval])
+	}
+
+	call xev_freeop (o)
+	call mfree (o, TY_STRUCT)
 	call sfree (sp)
 end
 

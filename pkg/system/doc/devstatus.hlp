@@ -28,7 +28,10 @@ one of the following messages is printed:
 .fi
 
 A list of the allocatable devices, including the host system names for the
-devices, can be obtained by paging the file \fBdev$devices\fR.
+devices, can be obtained by paging the file \fBdev$devices\fR providing
+that file has been properly configure by the Site Manager at installation
+time.  The dev$tapecap file is used to define the tape devices available
+on the system.
 .ih
 EXAMPLES
 

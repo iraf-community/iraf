@@ -96,12 +96,14 @@ end
 
 # DP_LISTPSF -- List the PSF stars.
 
-procedure dp_listpsf (dao)
+procedure dp_listpsf (dao, im)
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 
-int	i
+real	x, y
 pointer	apsel, psf
+int	i
 
 begin
 	apsel = DP_APSEL(dao)
@@ -109,11 +111,13 @@ begin
 
 	call printf ("\nCurrent PSF star list\n")
 	do i = 1, DP_PNUM(psf) {
+	    call dp_ltov (im, Memr[DP_APXCEN(apsel)+i-1],
+	        Memr[DP_APYCEN(apsel)+i-1], x, y, 1)
 	    call printf (
 	        "    Star: %4d  X: %7.2f Y: %7.2f  Mag: %7.2f  Sky: %10.1f\n")
 		call pargi (Memi[DP_APID(apsel)+i-1])
-		call pargr (Memr[DP_APXCEN(apsel)+i-1])
-		call pargr (Memr[DP_APYCEN(apsel)+i-1])
+		call pargr (x)
+		call pargr (y)
 		call pargr (Memr[DP_APMAG(apsel)+i-1])
 		call pargr (Memr[DP_APMSKY(apsel)+i-1])
 	}
@@ -184,20 +188,24 @@ end
 
 # DP_PSHOW -- Print photometry for the given star
 
-procedure dp_pshow (dao, istar)
+procedure dp_pshow (dao, im, istar)
 
 pointer	dao		# pointer to the main daophot descriptor
+pointer im		# the input image descriptor
 int	istar		# star to be printed
 
+real	x, y
 pointer	apsel
 
 begin
 	apsel = DP_APSEL(dao)
+	call dp_ltov (im, Memr[DP_APXCEN(apsel)+istar-1],
+	    Memr[DP_APYCEN(apsel)+istar-1], x, y, 1)
 	call printf (
 	    "Star: %4d X: %7.2f Y: %7.2f  Mag: %7.2f  Sky: %10.1f\n")
 	    call pargi (Memi[DP_APID(apsel)+istar-1])
-	    call pargr (Memr[DP_APXCEN(apsel)+istar-1])
-	    call pargr (Memr[DP_APYCEN(apsel)+istar-1])
+	    call pargr (x)
+	    call pargr (y)
 	    call pargr (Memr[DP_APMAG(apsel)+istar-1])
 	    call pargr (Memr[DP_APMSKY(apsel)+istar-1])
 end

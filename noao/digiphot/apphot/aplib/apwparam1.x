@@ -47,7 +47,7 @@ begin
 	    "IRAF host machine")
 
 	call apdate (Memc[date], Memc[time], SZ_DATE)
-	call ap_sparam (out, "DATE", Memc[date], "yyyy-mm-dd", "date")
+	call ap_sparam (out, "DATE", Memc[date], "yyy-mm-dd", "date")
 	call ap_sparam (out, "TIME", Memc[time], "hh:mm:ss", "time")
 
 	call ap_sparam (out, "PACKAGE", "apphot", "name",

@@ -68,7 +68,8 @@ XINT	*mode;			/* file access mode			*/
 XINT	*chan;			/* UNIX file number (output)		*/
 {
 	register char *ip;
-	static	char delim;
+	static char delim;
+	int fd;
 
 	/* We do not see a need to have more than one plotter open at
 	 * a time, and it makes things simpler.  We can easily generalize
@@ -108,7 +109,10 @@ XINT	*chan;			/* UNIX file number (output)		*/
 	pltr.pl = &dpltr;
 	strcpy (pltr.spoolfile, dpltr.spoolfile);
 	if (dpltr.dispose[0] != EOS)
-	    mktemp (pltr.spoolfile);
+	    if ((fd = mkstemp (pltr.spoolfile)) >= 0) {
+		fchmod (fd, 0644);
+		close (fd);
+	    }
 	
 	ZOPNBF ((PKCHAR *)pltr.spoolfile, mode, chan);
 }

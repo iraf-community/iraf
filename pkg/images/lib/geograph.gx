@@ -372,6 +372,24 @@ begin
 		}
 	    }
 
+	case GMCMD_ORDER:
+	    call gargi (ival)
+	    if (nscan () == 1) {
+		call printf (
+		    "xxorder = %d xyorder = %d yxorder = %d yyorder = %d\n")
+		    call pargi (GM_XXORDER(fit))
+		    call pargi (GM_XYORDER(fit))
+		    call pargi (GM_YXORDER(fit))
+		    call pargi (GM_YYORDER(fit))
+	    } else {
+		GM_XXORDER(fit) = max (ival, 2)
+		GM_XYORDER(fit) = max (ival, 2)
+		GM_YXORDER(fit) = max (ival, 2)
+		GM_YYORDER(fit) = max (ival, 2)
+		GG_NEWFUNCTION(gfit) = YES
+		GG_FITERROR(gfit) = NO
+	    }
+
 	case GMCMD_XXORDER:
 	    call gargi (ival)
 	    if (nscan () == 1) {
@@ -463,6 +481,17 @@ begin
 		    call pargr (rval)
 	    } else {
 		GM_REJECT(fit) = rval
+		GG_NEWFUNCTION(gfit) = YES
+		GG_FITERROR(gfit) = NO
+	    }
+
+	case GMCMD_MAXITER:
+	    call gargi (ival)
+	    if (nscan() == 1) {
+		call printf ("maxiter = %d\n")
+		    call pargi (GM_MAXITER(fit))
+	    } else {
+		GM_MAXITER(fit) = ival
 		GG_NEWFUNCTION(gfit) = YES
 		GG_FITERROR(gfit) = NO
 	    }

@@ -48,3 +48,5 @@ extern char *e_twoargs;
 extern char *e_unlink;
 extern char *e_uopcode;
 extern char *e_wopen;
+extern char *e_fdivzero;
+extern char *e_idivzero;

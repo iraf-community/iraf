@@ -16,9 +16,9 @@ char	buf[ARB]
 int	nchars
 long	offset
 
-char	zbuf[SZ_ZBUF]
 int	fd
-long	pos
+char	zbuf[SZ_ZBUF]
+long	start, i
 long	fstatl()
 errchk	write, seek, fstatl
 data	zbuf /SZ_ZBUF*0,0/
@@ -32,16 +32,26 @@ begin
 	# up to date, but does provide a lower bound on the size of the pixel
 	# storage file.
 
-	if (IM_FILESIZE(imdes) == 0)
+	if (offset >= IM_FILESIZE(imdes))
 	    IM_FILESIZE(imdes) = fstatl (fd, F_FILESIZE)
 
-	if (offset-1 <= IM_FILESIZE(imdes))
+	if (offset-1 <= IM_FILESIZE(imdes)) {
+	    # Write within bounds of file, or at EOF.
+
 	    call seek (fd, offset)
-	else {
-	    IM_FILESIZE(imdes) = fstatl (fd, F_FILESIZE)
-	    do pos = IM_FILESIZE(imdes)+1, offset, SZ_ZBUF
-		call write (fd, zbuf, min (SZ_ZBUF, offset-pos))
-	}
+	    call write (fd, buf, nchars)
 
-	call write (fd, buf, nchars)
+	} else {
+	    # Write beyond EOF.
+
+	    IM_FILESIZE(imdes) = fstatl (fd, F_FILESIZE)
+	    start = IM_FILESIZE(imdes) + 1
+
+	    call seek (fd, start)
+	    do i = start, offset, SZ_ZBUF
+		call write (fd, zbuf, min (SZ_ZBUF, offset-i))
+
+	    call write (fd, buf, nchars)
+	    IM_FILESIZE(imdes) = fstatl (fd, F_FILESIZE)
+	}
 end

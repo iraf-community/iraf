@@ -51,16 +51,18 @@ libex.a:
 	pldbgout.x	
 	pldebug.x	<plio.h> <plset.h>
 	plempty.x	<plio.h>
+	plemptyline.x	<plio.h>
 	plglls.x	<plio.h>
 	plgplane.x	<plio.h>
 	plgsize.x	<plio.h> <plset.h>
+	pllen.x		<plio.h>
 	plleq.x		<plio.h>
 	plline.x	<math.h> <plio.h> <plset.h>
 	pllinene.x	<plio.h> <plset.h>
 	pllnext.x	pllseg.h <plio.h>
 	plload.x	<plio.h> <plset.h>
 	plloadf.x	<plio.h> <plset.h>
-	plloadim.x	<imhdr.h> <plio.h> <plset.h>
+	plloadim.x	<imhdr.h> <imset.h> <plio.h> <plset.h>
 	plloop.x	<plio.h>
 	pllpr.x		<plio.h>
 	pllrop.x	<plio.h> <plset.h> pllseg.h
@@ -75,7 +77,7 @@ libex.a:
 	plrop.x		<plio.h> <plset.h>
 	plsave.x	<plio.h> <plset.h>
 	plsavef.x	<plio.h> <plset.h>
-	plsaveim.x	<imhdr.h> <mach.h> <plio.h> <plset.h>
+	plsaveim.x	<imhdr.h> <imset.h> <mach.h> <plio.h> <plset.h>
 	plsectnc.x	<plio.h> pllseg.h <plset.h>
 	plsectne.x	<plio.h> pllseg.h <plset.h>
 	plseti.x	<plio.h> <plset.h>

@@ -1,4 +1,5 @@
 include	<fset.h>
+include <imhdr.h>
 include "../lib/daophotdef.h"
 
 # T_NSTAR  -- Procedure to fit the PSF to multiple stars.
@@ -13,17 +14,19 @@ pointer	rejfile				# output rejections file descriptor
 int	verbose				# print messages 
 int	verify				# verify the critical parameters
 int	update				# update the parameter set
+int	cache				# cache the input image pixels
 
-bool	ap_text
+pointer	sp, outfname, im, psfim, dao, str
 int	imlist, limlist, alist, lalist, pimlist, lpimlist, olist, lolist
-int	rlist, lrlist, root, grp, nst, rejfd
-pointer	sp, outfname, im, psfim, dao
+int	rlist, lrlist, root, grp, nst, rejfd, wcs, req_size, old_size
+int	buf_size, memstat
+bool	ap_text
 
-bool	clgetb(), itob()
+pointer	immap(), tbtopn()
 int	strlen(), strncmp(), fnldir(), fstati(), open(), btoi()
 int	access(), imtopen(), imtlen(), imtgetim(), fntopnb(), fntlenb()
-int	fntgfnb()
-pointer	immap(), tbtopn()
+int	fntgfnb(), clgwrd(), sizeof(), dp_memstat()
+bool	clgetb(), itob()
 
 begin
 	# Set the standard output to flush on newline.
@@ -38,6 +41,7 @@ begin
 	call salloc (nstarfile, SZ_FNAME, TY_CHAR)
 	call salloc (rejfile, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Get the input and output file names.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -50,6 +54,7 @@ begin
 	verbose = btoi (clgetb ("verbose"))
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
+	cache = btoi (clgetb ("cache"))
 
 	# Get the lists.
 	imlist = imtopen (Memc[image])
@@ -116,7 +121,7 @@ begin
 	}
 
 	# Open the daophot structure and get some parameters.
-	call dp_gppars (dao, NULL)	
+	call dp_gppars (dao)	
 
 	# Set some parameters.
 	call dp_seti (dao, VERBOSE, verbose)
@@ -127,6 +132,29 @@ begin
 	    if (update == YES)
 		call dp_pppars (dao)
 	}
+
+        # Get the wcs information.
+        wcs = clgwrd ("wcsin", Memc[str], SZ_FNAME, WCSINSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the input coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSIN, wcs)
+        wcs = clgwrd ("wcsout", Memc[str], SZ_FNAME, WCSOUTSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the output coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSOUT, wcs)
+        wcs = clgwrd ("wcspsf", Memc[str], SZ_FNAME, WCSPSFSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the psf coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSPSF, wcs)
 
 	# Initialize the photometry structure.
 	call dp_apsetup (dao)
@@ -142,12 +170,15 @@ begin
 
 	    # Open the input image.
 	    im = immap (Memc[image], READ_ONLY, 0)		
-	    call dp_padu (im, dao)
-	    call dp_rdnoise (im, dao)
-	    call dp_otime (im, dao)
-	    call dp_filter (im, dao)
-	    call dp_airmass (im, dao)
+	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
+
+            # Cache the input image pixels.
+            req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
+                sizeof (IM_PIXTYPE(im))
+            memstat = dp_memstat (cache, req_size, old_size)
+            if (memstat == YES)
+                call dp_pcache (im, INDEFI, buf_size)
 
 	    # Open the input group table.
 	    if (fntgfnb (alist, Memc[groupfile], SZ_FNAME) == EOF)
@@ -248,6 +279,10 @@ begin
 	        else
 	            call tbtclo (rejfd)
 	    }
+
+            # Uncache memory.
+            call fixmem (old_size)
+
 	}
 
 	# Close the image/file lists.

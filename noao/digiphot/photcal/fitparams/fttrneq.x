@@ -1,5 +1,6 @@
 include	<error.h>
 include	<pkg/xtanswer.h>
+include	<pkg/gtools.h>
 include	<math/nlfit.h>
 include	<pkg/inlfit.h>
 include	"../lib/parser.h"
@@ -309,7 +310,6 @@ begin
 	nfparams = pr_gsymi (sym, PTEQNFPAR)
 
 	# Initialize INLFIT.
-	nl = NULL
 	call in_initr (in, locpr (ft_func), locpr (ft_dfunc),
 	    Memr[pr_gsymp (sym, PTEQSPARVAL)], Memr[dparams],
 	    nparams, Memi[plist], nfparams)
@@ -385,6 +385,10 @@ begin
 	    nlwtflag = WTS_USER
 
 	if (interactive) {
+	    call gt_setr (gt, GTXMIN, INDEFR)
+	    call gt_setr (gt, GTXMAX, INDEFR)
+	    call gt_setr (gt, GTYMIN, INDEFR)
+	    call gt_setr (gt, GTYMAX, INDEFR)
 	    call ing_fitr (in, gp, "cursor", gt, nl, Memr[mct_getbuf (otable)],
 	        Memr[mct_getbuf (rtable)], Memr[mct_getbuf (wtable)],
 		Memc[mct_getbuf(ntable)], nobs, nvars, len_name, nlwtflag,

@@ -91,7 +91,8 @@ begin
 	    Memd[sum2bin+j-1] = 0.0
 	}
 
-	p0 = Memd[x]
+	#p0 = Memd[x]
+	call alimd (Memd[x+segst-1], segend-segst+1, p0, p)
 	do j = segst, segend {
 	    if (Memi[inuse+j-1] == 0)
 		next

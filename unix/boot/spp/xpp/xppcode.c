@@ -116,7 +116,7 @@ char	sbuf[SZ_SBUF];			/* string buffer 		      */
 char	*sp = sbuf;			/* string buffer pointer	      */
 char	*op = obuf;			/* pointer in output buffer	      */
 char	*dp = dbuf;			/* pointer in decls buffer	      */
-int	nstrings;			/* number of strings so far	      */
+int	nstrings = 0;			/* number of strings so far	      */
 int	strloopdecl;			/* data dummy do index declared?      */
 
 int	ntasks = 0;			/* number of tasks in interpreter     */

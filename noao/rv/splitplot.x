@@ -60,9 +60,9 @@ begin
 		x1 = WRKPIXX(rv,1)
 		x2 = WRKPIXX(rv,RV_CCFNPTS(rv))
 		fnpts = RV_CCFNPTS(rv)
-		call amovr (WRKPIXX(rv,1), Memr[xdata], fnpts)
 		call strcpy ("", Memc[ylbl], SZ_LINE)
 	    }
+	    call amovr (WRKPIXX(rv,1), Memr[xdata], fnpts)
 
 	case VCORRELATION_PLOT:
 	    call sp_vcorrelation (rv, title, xlbl, ylbl, x1, x2)
@@ -366,14 +366,18 @@ real	xdata[ARB]				#I X-Vector to plot
 int	fnpts, pnpts				#I FFT npts and plot npts
 
 real	left, right
-int	i
+int	i, npts
 
 begin
 	switch (pltype) {
 	case CORRELATION_PLOT:
 	    if (DBG_QUICK(rv) == NO || (DBG_QUICK(rv) == YES && where==BOTTOM)){
-	        #call gpline (gp, xdata, pldata, fnpts)
-	        call gpline (gp, xdata[2], pldata[2], fnpts-1)
+                if (where == BOTTOM) {
+                    i = RV_WINCENTER(rv) - RV_WINDOW(rv)
+                    npts = 2 * RV_WINDOW(rv) + 1
+                    call gpline (gp, xdata[i], pldata[i], npts)
+                } else 
+                    call gpline (gp, xdata[2], pldata[2], fnpts-2)
 		call gflush (gp)
 	    }
 
@@ -801,7 +805,7 @@ int	fnpts					#I Npts in fft
 
 begin
 	call get_fft (rv, rinpt, npts, Memr[pldata], fnpts)
-	fnpts = fnpts / 2
+	fnpts = max (RV_FFTNPTS(rv), fnpts) / 2
 	if (where != BOTTOM)
 	    call get_anplot_title (rv, title)
 	else
@@ -845,7 +849,7 @@ int	fnpts					#O Npts to plot
 
 begin
 	call get_pspec (rv, rinpt, npts, Memr[pldata], fnpts)
-	fnpts = fnpts / 2
+	fnpts = max (RV_FFTNPTS(rv), fnpts) / 2
 	call get_anplot_title (rv, title)
 
 	if (RVP_LOG_SCALE(rv) == YES)

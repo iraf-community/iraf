@@ -20,7 +20,6 @@ int	pier	# photometric error
 int	rier	# radial profile error
 
 int	i, naperts
-real	xpos, ypos
 int	apstati()
 real	apstatr()
 
@@ -29,9 +28,8 @@ begin
 	    return
 
 	# Print the id parameters.
-	xpos = apstatr (ap, XCENTER) - apstatr (ap, XSHIFT)
-	ypos = apstatr (ap, YCENTER) - apstatr (ap, YSHIFT)
-	call ap_wid (ap, fd, xpos, ypos, id, lid, '\\')
+	call ap_wid (ap, fd, apstatr (ap, OXINIT), apstatr (ap, OYINIT),
+	    id, lid, '\\')
 
 	# Print the center parameters.
 	call ap_wcres (ap, fd, cier, '\\')
@@ -93,11 +91,11 @@ begin
 	phot = AP_PPHOT(ap)
 
 	# Print quick summary of radprof results on the standard output.
-	call apstats (ap, IMNAME, Memc[imname], SZ_FNAME)
+	call apstats (ap, IMROOT, Memc[imname], SZ_FNAME)
 	call printf ("%s  %8.2f %8.2f  %8g %5.2f  ")
 	    call pargstr (Memc[imname])
-	    call pargr (apstatr (ap, RPXCUR))
-	    call pargr (apstatr (ap, RPYCUR))
+	    call pargr (apstatr (ap, ORPXCUR))
+	    call pargr (apstatr (ap, ORPYCUR))
 	    call pargr (apstatr (ap, SKY_MODE))
 	    call pargr (apstatr (ap, RPFWHM) / apstatr (ap, SCALE))
 	call printf ("%7.3f  %s\n")

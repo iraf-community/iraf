@@ -175,14 +175,15 @@ operations between two spectra are performed in dispersion coordinate space
 (typically wavelength) rather than logical pixel space.  In the latter case
 the spectra are checked for matching dispersion functions (which are not
 necessarily linear) and, if they don't match, the second operand is
-interpolated using flux conservation.  Thus, the spectra may have different
-dispersion functions but the arithmetic is done at matching wavelengths.
-The default interpolation function is a 5th order polynomial.  The choice
-of interpolation type is made with the package parameter "interp".  It may
-be set to "nearest", "linear", "spline3", "poly5", or "sinc".  Remember
-that this applies to all tasks which might need to interpolate spectra in
-the \fBonedspec\fR and associated packages.  For a discussion of
-interpolation types see \fBonedspec\fR.
+interpolated without flux conservation.  (If flux conservation is desired
+then the task \fBdispcor\fR should be used first.) Thus, the spectra may
+have different dispersion functions but the arithmetic is done at matching
+wavelengths.  The default interpolation function is a 5th order
+polynomial.  The choice of interpolation type is made with the package
+parameter "interp".  It may be set to "nearest", "linear", "spline3",
+"poly5", or "sinc".  Remember that this applies to all tasks which might
+need to interpolate spectra in the \fBonedspec\fR and associated packages.
+For a discussion of interpolation types see \fBonedspec\fR.
 
 The unary operators operate on the spectra in the first operand list to
 produce the specified output spectra, which may be the same as the
@@ -239,7 +240,7 @@ exponentiation and replacement:
 .fi
 
 If the second operand is a spectrum, as mentioned previously, it is
-interpolated, conserving flux per unit dispersion, to the dispersion
+interpolated, without flux conservation, to the dispersion
 function of the first operand spectrum if necessary.
 
 There is a distinctions between the first operand and the second operand.

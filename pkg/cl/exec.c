@@ -58,7 +58,7 @@ run ()
 
 	if (cltrace)
 	    eprintf ("\t----- task %s -----\n",
-		currentask->t_ltp->lt_lname, pc);
+		currentask->t_ltp->lt_lname);
 
 	do {
 	    cp = coderef (pc);

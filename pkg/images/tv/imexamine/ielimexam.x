@@ -69,7 +69,7 @@ begin
 	    yp = data
 
 	call sprintf (Memc[title], IE_SZTITLE, "%s: Lines %d - %d\n%s")
-	    call pargstr (IE_IMAGE(ie))
+	    call pargstr (IE_IMNAME(ie))
 	    call pargi (y1)
 	    call pargi (y2)
 	    call pargstr (IM_TITLE(im))

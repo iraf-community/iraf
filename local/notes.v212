@@ -1,0 +1,92 @@
+System Notes File for IRAF Version 2.12.
+Begun with V2.12 code freeze 02 May 2002.
+-------------------------------------------
+
+unix/hlib/motd
+unix/hlib/zzsetenv.def
+	Changed system version to V2.12.1-DEVELOP.  (5/19/2002)
+
+unix/hlib/install
+	Updated the script with several bug fixes found since the initial
+	V2.12 release.  These fix problems with tapecap configuration and
+	the use of "which" in determining paths.  (6/12/02, MJF)
+
+pkg/images/tv/display/t_display.x
+	Removed an unused extern declaration for ds_errfcn() which was
+	causing a link failure on the alpha (6/12/02, MJF)
+
+pkg/images/immatch/src/imcombine/src/xtimmap.gx
+	The size of image header data structures was computed incorrectly
+	resulting in the potential for segmenation violations.  (6/14/02,
+	Valdes)
+
+pkg/images/immatch/src/imcombine/src/icsetout.x
+	Needed to disable axis mapping to handle cases where the input
+	images are dimensionally reduced.  (6/14/02, Valdes)
+
+unix/gdev/sgidev/sgi2uapl.c
+unix/gdev/sgidev/sgi2uhpgl.c
+unix/gdev/sgidev/sgi2uimp.c
+unix/gdev/sgidev/sgi2uqms.c
+	Converted some 'sgi' variables to 'sgip' to workaround pre-processor
+	name collisions on the SGI.  This has always been needed on the SGI
+	system for updates, just moving this into the master system so it's
+	not forgotten in later updates (6/17/02, MJF)
+
+maskexpr/peregfuncs.x
+        Fixed various min / max data type mismatch problems. (06/19/02, Davis)
+
+pkg/images/immatch/src/xregister/t_xregister.x
+pkg/images/immatch/src/xregister/rgxicorr.x
+        If the xregister task parameter interactive = yes and the output images
+        are defined then the computed shifts are not applied. This occurs
+	because the reinitialization routine triggered by the 'n' keystroke
+	command is in the wrong place. The work around is to run xregister
+	twice, once interactively to compute the shifts, and again
+	non-interactively to apply them. (6/20/02, Davis)
+
+pkg/system/doc/allocate.hlp
+pkg/system/doc/devstatus.hlp
+pkg/system/doc/deallocate.hlp
+	Clarified the dev$devices and dev$tapecap files. (7/9/02, MJF)
+
+pkg/cl/exec.c
+	Removed an extra argument to an eprintf() call. (7/9/02, MJF)
+
+dev/imtoolrc
+dev/graphcap
+	Added a 2048x2500 frame buffer called 'imt50' or 'imtwttm' for
+	the WIYN Tip-Tilt. (7/9/02, MJF)
+
+sys/imio/iki/fxf/fxfopix.x
+        fxf_mandatory_cards(). We want to keep BSCALE and BZERO
+        in case we are editing the values. This is only valid for
+        access mode READ_WRITE. (7/9/02, Zarate)
+
+sys/imio/iki/fxf/fxfrfits.x
+        Load FIT_EXTEND value from cache header entry to 
+        the current fit struct entry. It used to be the other way
+        around wich was a bug. (7/9/02, Zarate)
+
+        Uncomment the reload code (~line 137) if the cache if younger
+        than 2 seconds.(7/9/02, Zarate)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+        Fix the code to update the value of the keyword EXTEND.
+        fxf_update_extend(). Add code to update the FIT_EXTEND entry
+        when the header keyword have been changed to T. (7/9/02, Zarate)
+
+pkg/cl/cl.par
+unix/hlib/login.cl
+unix/hlib/motd
+unix/hlib/zzsetenv.def
+	Changed the cl.version and cl.logver to "IRAF V2.12.1 July 2002"
+	and updated the motd for the patch release (7/12/02, MJF)
+
+unix/hlib/install
+	Several last-minute bug fixes for the Alpha.  Also made the query
+	for an iraf user a bit smarter.  (7/12/02, MJF)
+
+----------------------------------------
+V2.12.1 patch generated.  (7/12/02, MJF)
+

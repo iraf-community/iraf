@@ -191,9 +191,9 @@ begin
 	    grpwt = 0.0
 
 	    # Accumulate the data into the matrix.
-	    call dp_alaccum (dao, Memr[data], DP_DNX(allstar), DP_DNY(allstar),
-	        DP_DXOFF(allstar), DP_DYOFF(allstar), Memr[subt],
-		DP_SNX(allstar), DP_SNY(allstar), DP_SXOFF(allstar),
+	    call dp_alaccum (dao, im, Memr[data], DP_DNX(allstar),
+	        DP_DNY(allstar), DP_DXOFF(allstar), DP_DYOFF(allstar),
+		Memr[subt], DP_SNX(allstar), DP_SNY(allstar), DP_SXOFF(allstar),
 		DP_SYOFF(allstar), Memr[weights], DP_WNX(allstar),
 		DP_WNY(allstar), DP_WXOFF(allstar), DP_WYOFF(allstar), nxpix,
 		nypix, fixmin, fiymin, mean_sky, istar, lstar, niter, clip,
@@ -269,14 +269,14 @@ begin
 	    # two. These clamps are released any time a star in the group
 	    # disappears.
 
-	    if (dp_alclamp (dao, Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
-	        Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
-	        Memr[DP_APERR(apsel)], Memr[DP_ASUMWT(allstar)],
-	        Memi[DP_ASKIP(allstar)], Memr[DP_AXOLD(allstar)],
-		Memr[DP_AXCLAMP(allstar)], Memr[DP_AYOLD(allstar)],
-		Memr[DP_AYCLAMP(allstar)], istar, lstar, Memr[DP_AC(allstar)],
-		Memr[DP_AX(allstar)], cdimen, niter, clampmax, pererr,
-		peakerr)) {
+	    if (dp_alclamp (dao, im, Memi[DP_APID(apsel)],
+	        Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
+		Memr[DP_APMAG(apsel)], Memr[DP_APERR(apsel)],
+		Memr[DP_ASUMWT(allstar)], Memi[DP_ASKIP(allstar)],
+		Memr[DP_AXOLD(allstar)], Memr[DP_AXCLAMP(allstar)],
+		Memr[DP_AYOLD(allstar)], Memr[DP_AYCLAMP(allstar)], istar,
+		lstar, Memr[DP_AC(allstar)], Memr[DP_AX(allstar)], cdimen,
+		niter, clampmax, pererr, peakerr)) {
 
 	        # Flush the new data to the output buffers. Actually
 		# only data which fits this criterion need be written.
@@ -473,12 +473,13 @@ end
 
 # DP_ALACCUM -- Accumulate the data into the matrix.
 
-procedure dp_alaccum (dao, data, dnx, dny, dxoff, dyoff, subt, snx, sny,
+procedure dp_alaccum (dao, im, data, dnx, dny, dxoff, dyoff, subt, snx, sny,
 	sxoff, syoff, weights, wnx, wny, wxoff, wyoff, nxpix, nypix, ixmin,
 	iymin, mean_sky, istar, lstar, niter, clip, pererr, peakerr, sumres,
 	grpwt, chigrp, cdimen, nterm)
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 real	data[dnx,dny]		# the subtracted data array
 int	dnx, dny		# dimenions of the data array
 int	dxoff, dyoff		# lower left corner of the data array
@@ -503,12 +504,11 @@ real	chigrp			# the group chi value
 int	cdimen			# maximum number of maxtrix dimensions
 int	nterm			# number of terms in the matrix to fit
 
-int	dix, diy, sxdiff, sydiff, wxdiff, wydiff
-pointer	psffit, apsel, allstar
 real	fitradsq, maxgdata, fix, fiy, d, delta, sigmasq, relerr, wt, dwt
-real	sky_value
+pointer	psffit, apsel, allstar
+int	dix, diy, sxdiff, sydiff, wxdiff, wydiff
+real	sky_value, dp_alskyval()
 bool	dp_alomit()
-real	dp_alskyval()
 
 begin
 	# Set up some pointers.
@@ -618,7 +618,7 @@ begin
 		# group.
 
 		wt = 0.0
-		call dp_alxaccum (psffit, Memr[DP_APXCEN(apsel)],
+		call dp_alxaccum (dao, im,  Memr[DP_APXCEN(apsel)],
 		    Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
 		    Memr[DP_ARPIXSQ(allstar)], Memi[DP_ASKIP(allstar)],
 		    Memr[DP_AX(allstar)], Memr[DP_ANUMER(allstar)],
@@ -759,10 +759,11 @@ end
 
 # DP_ALXACCUM - Accumulate the x vector.
 
-procedure dp_alxaccum (psffit, xcen, ycen, mag, rpixsq, skip, x, numer1,
+procedure dp_alxaccum (dao, im, xcen, ycen, mag, rpixsq, skip, x, numer1,
 	denom1, istar, lstar, fix, fiy, resid, wt, sigmasq, nterm, fitradsq)
 
-pointer	psffit			# pointer to  psf structure
+pointer	dao			# pointer to the daopot structure
+pointer	im			# pointer to the input image
 real	xcen[ARB]		# array of x centers
 real	ycen[ARB]		# array of y centers
 real	mag[ARB]		# array of relative brightnesses
@@ -781,12 +782,15 @@ real	sigmasq			# the sigma squared value
 int	nterm			# number of terms in the matrix
 real	fitradsq		# fitting radius squared
 
-int	nstar, i, i3, k
 real	psfsigsqx, psfsigsqy, dx, dy, deltax, deltay, value, radsq, rhosq
 real	dvdx, dvdy, dfdsig
+pointer	psffit
+int	nstar, i, i3, k
 real	dp_usepsf()
 
 begin
+	psffit = DP_PSFFIT(dao)
+
 	nstar = lstar - istar + 1
 	psfsigsqx = Memr[DP_PSFPARS(psffit)]
 	psfsigsqy = Memr[DP_PSFPARS(psffit)+1]
@@ -818,8 +822,9 @@ begin
 
 	    dx = fix - xcen[i]
 	    dy = fiy - ycen[i]
-	    deltax = (xcen[i] - 1.0) / DP_PSFX(psffit) - 1.0
-	    deltay = (ycen[i] - 1.0) / DP_PSFY(psffit) - 1.0
+	    call dp_wpsf (dao, im, xcen[i], ycen[i], deltax, deltay, 1)
+	    deltax = (deltax - 1.0) / DP_PSFX(psffit) - 1.0
+	    deltay = (deltay - 1.0) / DP_PSFY(psffit) - 1.0
 	    value = dp_usepsf (DP_PSFUNCTION(psffit), dx, dy,
 	        DP_PSFHEIGHT(psffit), Memr[DP_PSFPARS(psffit)],
 		Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
@@ -1052,11 +1057,12 @@ end
 
 # DP_ALCLAMP -- Get the answers.
 
-bool procedure dp_alclamp (dao, id, xcen, ycen, mag, magerr, sumwt,
+bool procedure dp_alclamp (dao, im, id, xcen, ycen, mag, magerr, sumwt,
 	skip, xold, xclamp, yold, yclamp, istar, lstar, c, x,
 	cdimen, niter, clampmax, pererr, peakerr)
 
 pointer	dao			# pointer to the daophot structure
+pointer	im			# the input image descriptor
 int	id[ARB]			# array of star ids
 real	xcen[ARB]		# array of star x centers
 real	ycen[ARB]		# array of star y centers
@@ -1181,7 +1187,7 @@ begin
 	    nx = mx - lx + 1
 	    ny = my - ly + 1
 
-	    call dp_swstar (psffit, Memr[DP_DBUF(allstar)], DP_DNX(allstar),
+	    call dp_swstar (dao, im, Memr[DP_DBUF(allstar)], DP_DNX(allstar),
 		DP_DNY(allstar), DP_DXOFF(allstar), DP_DYOFF(allstar),
 		Memr[DP_WBUF(allstar)], DP_WNX(allstar), DP_WNY(allstar),
 		DP_WXOFF(allstar), DP_WYOFF(allstar), xcen[i], ycen[i],
@@ -1191,6 +1197,7 @@ begin
 	    skip[i] = YES
 
 	    if (DP_VERBOSE(dao) == YES) {
+		call dp_wout (dao, im, xcen[i], ycen[i], xcen[i], ycen[i], 1)
 		call printf (
 		"FITTING:   ID: %5d  XCEN: %8.2f  YCEN: %8.2f  MAG: %8.2f\n")
 		    call pargi (id[i])
@@ -1212,11 +1219,12 @@ end
 # DP_SWSTAR -- Subtract the fitted star for the data and adjust the
 # weights.
 
-procedure dp_swstar (psffit, data, dnx, dny, dxoff, dyoff, weights, wnx, wny,
+procedure dp_swstar (dao, im, data, dnx, dny, dxoff, dyoff, weights, wnx, wny,
 	wxoff, wyoff, xcen, ycen, mag, lx, ly, nx, ny, psfradsq, gain,
 	pererr, peakerr)
 
-pointer	psffit				# pointer to the psf structure
+pointer	dao				# pointer to the daophot structure
+pointer	im				# pointer to the input image
 real	data[dnx,dny]			# the data array
 int	dnx, dny			# dimensions of the data array
 int	dxoff, dyoff			# lower left corner of data array
@@ -1232,15 +1240,19 @@ real	gain				# the gain in photons per adu
 real	pererr				# the flat field error factor
 real	peakerr				# the peak error factor
 
-int	di, dj, wxdiff, wydiff
 real	deltax, deltay, dx, dy, dysq, diff, dvdx, dvdy
+pointer	psffit
+int	di, dj, wxdiff, wydiff
 real	dp_usepsf()
 
 begin
+	psffit = DP_PSFFIT(dao)
+
 	wxdiff = dxoff - wxoff
 	wydiff = dyoff - wyoff
-	deltax = (xcen - 1.0) / DP_PSFX(psffit) - 1.0
-	deltay = (ycen - 1.0) / DP_PSFY(psffit) - 1.0
+	call dp_wpsf (dao, im, xcen, ycen, deltax, deltay, 1)
+	deltax = (deltax - 1.0) / DP_PSFX(psffit) - 1.0
+	deltay = (deltay - 1.0) / DP_PSFY(psffit) - 1.0
 
 	do dj = ly - dyoff + 1, ly - dyoff + ny {
 	    dy = (dj + dyoff - 1) - ycen

@@ -130,6 +130,7 @@ begin
 			}
 		    }  then {
 			call erract (EA_WARN)
+			call xev_freeop (o)
 		        call mfree (o, TY_STRUCT)
 			break
 		    }
@@ -144,8 +145,10 @@ begin
 		    ncontinue = 0
 		    recptr = 1
 		    first_rec = NO
-		    if (o != NULL)
+		    if (o != NULL) {
+			call xev_freeop (o)
 		        call mfree (o, TY_STRUCT)
+		    }
 	        }
 	    }
 

@@ -824,21 +824,49 @@ struct	context *cx;
 }
 
 
-/* DO_LINK -- Call XC to link a list of object and/or libraries.  This is
+/* DO_LINK -- Call XC to link a list of objects and/or libraries.  This is
  * equivalent to $XC, except that the LFLAGS are used instead of the XFLAGS.
  */
 do_link (cx)
 struct	context *cx;
 {
-	char	cmd[SZ_CMD+1];
-	char	*lflags;
+	register struct sfile *sflist, *sfp=NULL;
+	static int skip_sf = 0;
+	char *ip, token[SZ_FNAME+1];
+	char linkline[SZ_CMD+1];
+	char cmdbuf[SZ_CMD+1];
+	char *cmd = cmdbuf;
+	int lflags_set = 0;
+	char *lflags;
 
 	if (debug > 1) {
 	    printf ("do_link:\n");
 	    fflush (stdout);
 	}
 
-	lflags = getsym (LFLAGS);
+	/* Get the link command from the input stream. */
+	getcmd (cx, "", linkline, SZ_CMD);
+
+	/* Check whether the executable being generated is on the special
+	 * file list.
+	 */
+	if (!skip_sf && (sflist = sf_dirsearch (cx->dirpath))) {
+	    for (ip=linkline;  getword(&ip,token,SZ_FNAME);  )
+		if (strcmp (token, "-o") == 0)
+		    if (getword (&ip, token, SZ_FNAME))
+			if (sfp = sf_filesearch (sflist, token))
+			    break;
+	}
+
+	/* Check if LFLAGS is being substituted for this file. */
+	if (sfp && strncmp (sfp->sf_mkobj, "LFLAGS", 6) == 0) {
+	    for (ip=sfp->sf_mkobj;  *ip && *ip != '=';  ip++)
+		;
+	    lflags = (*ip == '=') ? ip + 1 : ip;
+	    lflags_set++;
+	} else
+	    lflags = getsym (LFLAGS);
+
 	if (irafdir[0])
 	    sprintf (cmd, "%s %s -r %s", XC, lflags, irafdir);
 	else
@@ -849,10 +877,24 @@ struct	context *cx;
 	if (dbgout)
 	    strcat (cmd, " -x");
 
-	getcmd (cx, cmd, cmd, SZ_CMD);
+	strcat (cmd, linkline);
 
 	if (ifstate[iflev] == STOP)
 	    return;
+
+	/* Check whether a special $link command or other build command
+	 * should be executed.
+	 */
+	if (sfp && !lflags_set) {
+	    /* Push back the special link command. */
+	    m_pushstr (cx, "\n");
+	    m_pushstr (cx, sfp->sf_mkobj);
+
+	    /* Avoid recursion if $link is pushed back. */
+	    if (strncmp (sfp->sf_mkobj, "$link", 5) == 0)
+		skip_sf++;
+	    return (OK);
+	}
 
 	if (verbose) {
 	    printf ("%s\n", cmd);
@@ -864,6 +906,7 @@ struct	context *cx;
 	if (exit_status == INTERRUPT)
 	    fatals ("<ctrl/c> interrupt %s", cx->library);
 
+	skip_sf = 0;
 	return (exit_status);
 }
 
@@ -1259,6 +1302,35 @@ char	*value;			/* receives value of symbol	*/
 	/* Extract symbol value */
 	strcpy (value, getargs(cx));
 	return (OK);
+}
+
+
+/* GETWORD -- Extract a whitespace delimited substring from a string.
+ * The input pointer is left pointing to the first character following
+ * the extracted string.
+ */
+getword (str, outstr, maxch)
+char **str;
+char *outstr;
+int maxch;
+{
+	register char *ip=(*str), *op=outstr;
+	register char *otop = outstr + maxch;
+	register int ch;
+
+	while (*ip && isspace (*ip))
+	    ip++;
+
+	while (op < otop && (ch = *ip++))
+	    if (isspace (ch))
+		break;
+	    else
+		*op++ = ch;
+
+	*op = EOS;
+	*str = ip;
+
+	return (op - outstr);
 }
 
 

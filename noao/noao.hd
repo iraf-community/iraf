@@ -2,6 +2,7 @@
 
 $artdata	= "./artdata/"
 $astrometry	= "./astrometry/"
+$astcat		= "./astcat/"
 $astutil	= "./astutil/"
 $digiphot	= "./digiphot/"
 $focas		= "./focas/"
@@ -9,6 +10,7 @@ $imred		= "./imred/"
 $mtlocal	= "./mtlocal/"
 $nobsolete	= "./nobsolete/"
 $nproto		= "./nproto/"
+$obsutil	= "./obsutil/"
 $onedspec	= "./onedspec/"
 $rv		= "./rv/"
 $surfphot	= "./surfphot/"
@@ -21,6 +23,12 @@ artdata		men = artdata$artdata.men,
 		sys = artdata$artdata.hlp,
 		pkg = artdata$artdata.hd,
 		src = artdata$artdata.cl
+
+astcat		men = astcat$astcat.men,
+		hlp = ..,
+		sys = astcat$astcat.hlp,
+		pkg = astcat$astcat.hd,
+		src = astcat$astcat.cl
 
 astutil		men = astutil$astutil.men,
 		hlp = ..,
@@ -57,6 +65,12 @@ nproto		men = nproto$nproto.men,
 		sys = nproto$nproto.hlp,
 		pkg = nproto$nproto.hd,
 		src = nproto$nproto.cl
+
+obsutil		men = obsutil$obsutil.men,
+		hlp = ..,
+		sys = obsutil$obsutil.hlp,
+		pkg = obsutil$obsutil.hd,
+		src = obsutil$obsutil.cl
 
 onedspec	men = onedspec$onedspec.men,
 		hlp = ..,

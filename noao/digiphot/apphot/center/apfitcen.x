@@ -1,5 +1,6 @@
 include <mach.h>
 include "../lib/apphotdef.h"
+include "../lib/apphot.h"
 include "../lib/noisedef.h"
 include "../lib/centerdef.h"
 include "../lib/center.h"
@@ -31,10 +32,16 @@ begin
 	# Initialize.
 	AP_CXCUR(ctr) = wx
 	AP_CYCUR(ctr) = wy
+	AP_OXINIT(ctr) = INDEFR
+	AP_OYINIT(ctr) = INDEFR
 	AP_XCENTER(ctr) = INDEFR
 	AP_YCENTER(ctr) = INDEFR
+	AP_OXCENTER(ctr) = INDEFR
+	AP_OYCENTER(ctr) = INDEFR
 	AP_XSHIFT(ctr) = 0.0
 	AP_YSHIFT(ctr) = 0.0
+	AP_OXSHIFT(ctr) = 0.0
+	AP_OYSHIFT(ctr) = 0.0
 	AP_XERR(ctr) = INDEFR
 	AP_YERR(ctr) = INDEFR
 
@@ -44,6 +51,19 @@ begin
 	} else if (AP_CENTERFUNCTION(ctr) == AP_NONE) {
 	    AP_XCENTER(ctr) = wx
 	    AP_YCENTER(ctr) = wy
+	    switch (AP_WCSOUT(ap)) {
+	    case WCS_WORLD, WCS_PHYSICAL:
+		call ap_ltoo (ap, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
+		call ap_ltoo (ap, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+	    case WCS_TV:
+		call ap_ltov (im, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
+		call ap_ltov (im, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+	    default:
+		AP_OXINIT(ctr) = wx
+		AP_OYINIT(ctr) = wy
+		AP_OXCENTER(ctr) = wx
+		AP_OYCENTER(ctr) = wy
+	    }
 	    return (AP_OK)
 	}
 
@@ -72,6 +92,23 @@ begin
 	    	AP_YSHIFT(ctr) = 0.0
 	    	AP_XERR(ctr) = INDEFR
 	    	AP_YERR(ctr) = INDEFR
+	        switch (AP_WCSOUT(ap)) {
+	        case WCS_WORLD, WCS_PHYSICAL:
+		    call ap_ltoo (ap, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
+		    call ap_ltoo (ap, wx, wy, AP_OXCENTER(ctr),
+		        AP_OYCENTER(ctr), 1)
+	        case WCS_TV:
+		    call ap_ltov (im, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
+		    call ap_ltov (im, wx, wy, AP_OXCENTER(ctr),
+		        AP_OYCENTER(ctr), 1)
+	        default:
+		    AP_OXINIT(ctr) = wx
+		    AP_OYINIT(ctr) = wy
+		    AP_OXCENTER(ctr) = wx
+		    AP_OYCENTER(ctr) = wy
+	        }
+	    	AP_OXSHIFT(ctr) = 0.0
+	    	AP_OYSHIFT(ctr) = 0.0
 	    	return (ier)
 	    }
 
@@ -178,6 +215,33 @@ begin
 	    AP_YCENTER(ctr) = yshift + owy
 	    AP_YSHIFT(ctr) = AP_YCENTER(ctr) - wy
 
+	    switch (AP_WCSOUT(ap)) {
+	    case WCS_PHYSICAL, WCS_WORLD:
+		call ap_ltoo (ap, AP_XCENTER(ctr), AP_YCENTER(ctr),
+		    AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+		call ap_ltoo (ap, AP_XCENTER(ctr) - AP_XSHIFT(ctr),
+		    AP_YCENTER(ctr) - AP_YSHIFT(ctr), AP_OXINIT(ctr),
+		    AP_OYINIT(ctr), 1)
+		AP_OXSHIFT(ctr) = AP_OXCENTER(ctr) - AP_OXINIT(ctr)
+		AP_OYSHIFT(ctr) = AP_OYCENTER(ctr) - AP_OYINIT(ctr)
+	    case WCS_TV:
+		call ap_ltov (im, AP_XCENTER(ctr), AP_YCENTER(ctr),
+		    AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+		call ap_ltov (im, AP_XCENTER(ctr) - AP_XSHIFT(ctr),
+		    AP_YCENTER(ctr) - AP_YSHIFT(ctr), AP_OXINIT(ctr),
+		    AP_OYINIT(ctr), 1)
+		AP_OXSHIFT(ctr) = AP_OXCENTER(ctr) - AP_OXINIT(ctr)
+		AP_OYSHIFT(ctr) = AP_OYCENTER(ctr) - AP_OYINIT(ctr)
+	    default:
+		AP_OXINIT(ctr) = AP_XCENTER(ctr) - AP_XSHIFT(ctr)
+		AP_OYINIT(ctr) = AP_YCENTER(ctr) - AP_YSHIFT(ctr)
+		AP_OXCENTER(ctr) = AP_XCENTER(ctr)
+		AP_OYCENTER(ctr) = AP_YCENTER(ctr)
+		AP_OXSHIFT(ctr) = AP_XSHIFT(ctr)
+		AP_OYSHIFT(ctr) = AP_YSHIFT(ctr)
+		
+	    }
+
 	    # Setup for next iteration.
 	    niter = niter + 1
 	    owx = AP_XCENTER(ctr)
@@ -195,6 +259,21 @@ begin
 	    AP_YSHIFT(ctr) = 0.0
 	    AP_XERR(ctr) = INDEFR
 	    AP_YERR(ctr) = INDEFR
+	    switch (AP_WCSOUT(ap)) {
+	    case WCS_WORLD, WCS_PHYSICAL:
+		call ap_ltoo (ap, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
+		call ap_ltoo (ap, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+	    case WCS_TV:
+		call ap_ltov (im, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
+		call ap_ltov (im, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+	    default:
+		AP_OXINIT(ctr) = wx
+		AP_OYINIT(ctr) = wy
+		AP_OXCENTER(ctr) = wx
+		AP_OYCENTER(ctr) = wy
+	    }
+	    AP_OXSHIFT(ctr) = 0.0
+	    AP_OYSHIFT(ctr) = 0.0
 	    return (fier)
 	} else if (ier == AP_CTR_BADDATA) {
 	    return (AP_CTR_BADDATA)

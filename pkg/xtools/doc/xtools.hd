@@ -4,6 +4,8 @@ $xtools		= "pkg$xtools/"
 $icfit		= "pkg$xtools/icfit/"
 $gtools		= "pkg$xtools/gtools/"
 $ranges		= "pkg$xtools/ranges/"
+$skywcs		= "pkg$xtools/skywcs/doc/"
+$catquery	= "pkg$xtools/catquery/doc/"
 
 revisions	sys = xtools$Revisions
 dttext		hlp = xtools$dttext.x,		src = ..
@@ -29,3 +31,11 @@ icfit		hlp = icfit$icfit.hlp
 inlfit		hlp = xtools$doc/inlfit.hlp
 #gtools		hlp = gtools$gtools.hlp,	pkg = gtools$gtools.hd
 gtools		hlp = gtools$gtools.hlp
+
+skywcs		hlp = skywcs$skywcs.men,
+		sys = skywcs$skywcs.hlp,
+		pkg = skywcs$skywcs.hd
+
+catquery	hlp = catquery$catquery.men,
+		sys = catquery$catquery.hlp,
+		pkg = catquery$catquery.hd

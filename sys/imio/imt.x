@@ -36,7 +36,7 @@ templates; the [] are either interpreted as part of the image specification,
 or as part of the filename.
 .endhelp _____________________________________________________________________
 
-define	SZ_FNT		512
+define	SZ_FNT		16384
 define	CH_DELIM	20B		# used to flag image section
 
 
@@ -81,7 +81,7 @@ int	fntopnb(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (fnt, strlen(template)*12/10 + SZ_FNT, TY_CHAR)
+	call salloc (fnt, max(strlen(template)*2, SZ_FNT), TY_CHAR)
 
 	# Sorting is disabled as input and output templates, derived from the
 	# same database but with string editing used to modify the output list,

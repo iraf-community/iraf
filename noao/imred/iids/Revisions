@@ -1,5 +1,17 @@
 .help revisions Jun88 noao.imred.iids
 .nf
+
+=====
+V2.12
+=====
+
+imred$iids/standard.par
+    Added blackbody query parameters.  (5/2/02, Valdes)
+
+========
+V2.11.3b
+========
+
 imred$iids/identify.par
     Added new units parameters.  (3/11/97, Valdes)
 

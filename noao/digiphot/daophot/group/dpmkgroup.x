@@ -134,8 +134,10 @@ begin
 		curr_point = Memi[index+curr_star-1]
 		xcurr = Memr[DP_APXCEN(apsel)+curr_point-1]
 		ycurr = Memr[DP_APYCEN(apsel)+curr_star-1]
-		dxcurr_frompsf = (xcurr - 1.0) / DP_PSFX(psffit) - 1.0
-		dycurr_frompsf = (ycurr - 1.0) / DP_PSFY(psffit) - 1.0
+		call dp_wpsf (dao, im, xcurr, ycurr, dxcurr_frompsf,
+		    dycurr_frompsf, 1)
+		dxcurr_frompsf = (dxcurr_frompsf - 1.0) / DP_PSFX(psffit) - 1.0
+		dycurr_frompsf = (dycurr_frompsf - 1.0) / DP_PSFY(psffit) - 1.0
 		magcurr = Memr[DP_APMAG(apsel)+curr_point-1]
 		skycurr = Memr[DP_APMSKY(apsel)+curr_point-1]
 		if (IS_INDEFR(magcurr))
@@ -171,10 +173,13 @@ begin
 		    crit_point = Memi[index+i-1]
 		    magcrit = Memr[DP_APMAG(apsel)+crit_point-1]
 		    skycrit = Memr[DP_APMSKY(apsel)+crit_point-1]
-		    dxcrit_frompsf = (Memr[DP_APXCEN(apsel)+crit_point-1] -
-			1.0) / DP_PSFX(psffit) - 1.0
-		    dycrit_frompsf = (Memr[DP_APYCEN(apsel)+i-1] - 1.0) /
-		        DP_PSFY(psffit) - 1.0
+		    call dp_wpsf (dao, im, Memr[DP_APXCEN(apsel)+crit_point-1],
+		        Memr[DP_APYCEN(apsel)+i-1], dxcrit_frompsf,
+		        dycrit_frompsf, 1)
+		    dxcrit_frompsf = (dxcrit_frompsf - 1.0) / DP_PSFX(psffit) -
+		        1.0
+		    dycrit_frompsf = (dycrit_frompsf - 1.0) / DP_PSFY(psffit) -
+		        1.0
 
 		    # Check to see if stars overlap critically.
 
@@ -261,7 +266,7 @@ begin
 	}		   
 
 	# Write out all the groups to the output file.
-	call dp_wrtgroup (dao, grp, Memi[number], Memi[index],
+	call dp_wrtgroup (dao, im, grp, Memi[number], Memi[index],
 	    Memi[group_size], maxgroup)
 
 	call mfree (number, TY_INT)

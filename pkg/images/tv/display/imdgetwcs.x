@@ -35,10 +35,12 @@ real	b, c			#O cross terms (rotations)
 real	tx, ty			#O x, y offsets
 
 char	ch
-int	fd, chan, status, wcs_status
+int	fd, chan, status, wcs_status, zt
+real	z1, z2
 pointer	sp, dir, device, fname, wcstext
 int	envfind(), strncmp(), open(), fscan(), nscan(), stropen(), iisflu()
-define	done_ 91
+
+include "iis.com"
 
 begin
 	call smark (sp)
@@ -53,18 +55,30 @@ begin
 
 	if (server == YES) {
 	    # Retrieve the WCS information from a display server.
-	    chan = FRTOCHAN(frame)
+	    chan = iisflu(FRTOCHAN(frame))
 
 	    # Cannot use iisio here as the data is byte packed and cannot be
 	    # swapped (while the header still has to be swapped).
 
-	    call iishdr (IREAD+PACKED, SZ_WCSTEXT, WCS, 0,0, iisflu(chan), 0)
-	    call iisio (Memc[wcstext], SZ_WCSTEXT, status)
-	    if (status > 0)
-		call strupk (Memc[wcstext], Memc[wcstext], SZ_WCSTEXT)
+	    if (iis_version > 0) {
+		iis_valid = NO
+	        call iishdr (IREAD+PACKED, SZ_WCSTEXT, WCS, 1, 0, chan, 0)
+	        call iisio (Memc[wcstext], SZ_WCSTEXT, status)
+	        if (status > 0)
+		    call strupk (Memc[wcstext], Memc[wcstext], SZ_WCSTEXT)
 
-	    iferr (fd = stropen (Memc[wcstext], SZ_WCSTEXT, READ_ONLY))
-		fd = NULL
+	        iferr (fd = stropen (Memc[wcstext], SZ_WCSTEXT, READ_ONLY))
+		    fd = NULL
+
+	    } else {
+	        call iishdr (IREAD+PACKED, SZ_OLD_WCSTEXT, WCS, 0, 0, chan, 0)
+	        call iisio (Memc[wcstext], SZ_OLD_WCSTEXT, status)
+	        if (status > 0)
+		    call strupk (Memc[wcstext], Memc[wcstext], SZ_OLD_WCSTEXT)
+
+	        iferr (fd = stropen (Memc[wcstext], SZ_OLD_WCSTEXT, READ_ONLY))
+		    fd = NULL
+	    }
 
 	} else {
 	    # Construct the WCS filename, "dir$device_frame.wcs".  (Copied from
@@ -123,22 +137,49 @@ begin
 		    call gargr (d)
 		    call gargr (tx)
 		    call gargr (ty)
-		    if (nscan() == 6)
-			goto done_
+		    call gargr (z1)
+		    call gargr (z2)
+		    call gargi (zt)
+		    if (nscan() == 9)
+			wcs_status = OK
+
+	            if (iis_version > 0) {
+			if (fscan (fd) != EOF) {
+		            call gargstr (iis_region, SZ_FNAME)
+		            call gargr (iis_sx)
+		            call gargr (iis_sy)
+		            call gargi (iis_snx)
+		            call gargi (iis_sny)
+		            call gargi (iis_dx)
+		            call gargi (iis_dy)
+		            call gargi (iis_dnx)
+		            call gargi (iis_dny)
+			}
+		        if (nscan() == 9) {
+			    if (fscan (fd) != EOF)
+		                call gargstr (iis_objref, SZ_FNAME)
+		            if (nscan() == 1)
+			        iis_valid = YES
+			} else
+			    iis_valid = NO
+	            } else {
+		        if (nscan() != 9) {
+			    # Set up the unitary transformation if we
+			    # cannot retrieve the real one.
+			    a  = 1.0
+			    b  = 0.0
+			    c  = 0.0
+			    d  = 1.0
+			    tx = 1.0
+			    ty = 1.0
+			    wcs_status = ERR
+			}
+	            }
 		}
 	    }
 	}
 
-	# Set up the unitary transformation if we cannot retrieve the real one.
-	a  = 1.0
-	b  = 0.0
-	c  = 0.0
-	d  = 1.0
-	tx = 1.0
-	ty = 1.0
-	wcs_status = ERR
 
-done_
 	if (fd != NULL)
 	    call close (fd)
 	call sfree (sp)

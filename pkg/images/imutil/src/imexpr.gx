@@ -19,13 +19,14 @@ define	DEF_LENSBUF	8192
 define	DEF_LINELEN	8192
 
 # Input image operands.
-define	LEN_IMOPERAND	17
+define	LEN_IMOPERAND	18
 define	IO_OPNAME	Memi[$1]		# symbolic operand name
 define	IO_TYPE		Memi[$1+1]		# operand type
 define	IO_IM		Memi[$1+2]		# image pointer if image
 define	IO_V		Memi[$1+3+($2)-1]	# image i/o pointer
 define	IO_DATA		Memi[$1+10]		# current image line
-define	IO_OP		($1+11)			# pointer to evvexpr operand
+			# align
+define	IO_OP		($1+12)			# pointer to evvexpr operand
 
 # Image operand types (IO_TYPE). 
 define	IMAGE		1			# image (vector) operand
@@ -33,7 +34,7 @@ define	NUMERIC		2			# numeric constant
 define	PARAMETER	3			# image parameter reference
 
 # Main imexpr descriptor.
-define	LEN_IMEXPR	(23+LEN_IMOPERAND*MAX_OPERANDS)
+define	LEN_IMEXPR	(24+LEN_IMOPERAND*MAX_OPERANDS)
 define	IE_ST		Memi[$1]		# symbol table
 define	IE_IM		Memi[$1+1]		# output image
 define	IE_NDIM		Memi[$1+2]		# dimension of output image
@@ -45,7 +46,8 @@ define	IE_BTYPE	Memi[$1+13]		# type of boundary extension
 define	IE_BPIXVAL	Memr[$1+14]		# boundary pixel value
 define	IE_V		Memi[$1+15+($2)-1]	# position in output image
 define	IE_NOPERANDS	Memi[$1+22]		# number of input operands
-define	IE_IMOP		($1+23+(($2)-1)*LEN_IMOPERAND)	# image operand array
+			# align
+define	IE_IMOP		($1+24+(($2)-1)*LEN_IMOPERAND)	# image operand array
 
 # Expression database symbol.
 define	LEN_SYM		2
@@ -522,7 +524,7 @@ image_
 
 		    switch (O_TYPE(out)) {
 		    case TY_BOOL:
-			Mems[op] = O_VALI(out)
+			Memi[op] = O_VALI(out)
 		    $for (silrd)
 		    case TY_PIXEL:
 			Mem$t[op] = O_VAL$T(out)
@@ -536,7 +538,7 @@ image_
 		    ip = O_VALP(out)
 		    switch (O_TYPE(out)) {
 		    case TY_BOOL:
-			call achtis (Memi[ip], Mems[op], npix)
+			call amovi (Memi[ip], Memi[op], npix)
 		    $for (silrd)
 		    case TY_PIXEL:
 			call amov$t (Mem$t[ip], Mem$t[op], npix)
@@ -597,7 +599,7 @@ image_
 	    if (IM_PIXTYPE(outim) == 0) {
 		if (IE_OUTTYPE(ie) == 0) {
 		    if (O_TYPE(out) == TY_BOOL)
-			IE_OUTTYPE(ie) = TY_SHORT
+			IE_OUTTYPE(ie) = TY_INT
 		    else
 			IE_OUTTYPE(ie) = O_TYPE(out)
 		    IM_PIXTYPE(outim) = IE_OUTTYPE(ie)
@@ -630,7 +632,7 @@ image_
 
 	    switch (O_TYPE(out)) {
 	    case TY_BOOL:
-		status = impnls (outim, data, IE_V(ie,1))
+		status = impnli (outim, data, IE_V(ie,1))
 	    $for (silrd)
 	    case TY_PIXEL:
 		status = impnl$t (outim, data, IE_V(ie,1))

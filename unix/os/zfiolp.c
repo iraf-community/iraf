@@ -75,7 +75,8 @@ XINT	*mode;			/* file access mode			*/
 XINT	*chan;			/* UNIX file number (output)		*/
 {
 	register char *ip;
-	static	char delim;
+	static char delim;
+	int fd;
 
 	/* We do not see a need to have more than one printer open at
 	 * a time, and it makes things simpler.  We can easily generalize
@@ -116,7 +117,10 @@ XINT	*chan;			/* UNIX file number (output)		*/
 	lpr.lp = &dpr;
 	strcpy (lpr.spoolfile, dpr.spoolfile);
 	if (dpr.dispose[0] != EOS)
-	    mktemp (lpr.spoolfile);
+	    if ((fd = mkstemp (lpr.spoolfile)) >= 0) {
+		fchmod (fd, 0644);
+		close (fd);
+	    }
 	
 	ZOPNBF ((PKCHAR *)lpr.spoolfile, mode, chan);
 }

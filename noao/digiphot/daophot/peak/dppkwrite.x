@@ -165,14 +165,20 @@ begin
 	call tbhadt (tp, "TASK", "peak")
 
 	# Write out the files names.
-	call tbhadt (tp, "IMAGE", DP_INIMAGE(dao))
-	call tbhadt (tp, "PHOTFILE", DP_INPHOTFILE(dao))
-	call tbhadt (tp, "PSFIMAGE", DP_PSFIMAGE(dao))
-	call tbhadt (tp, "PEAKFILE", DP_OUTPHOTFILE(dao))
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "IMAGE", Memc[outstr])
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PHOTFILE", Memc[outstr])
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PSFIMAGE", Memc[outstr])
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call tbhadt (tp, "PEAKFILE", Memc[outstr])
 	if (DP_OUTREJFILE(dao) == EOS)
 	    call tbhadt (tp, "REJFILE", "\"\"")
-	else
-	    call tbhadt (tp, "REJFILE", DP_OUTREJFILE(dao))
+	else {
+	    call dp_froot (DP_OUTREJFILE(dao), Memc[outstr], SZ_LINE)
+	    call tbhadt (tp, "REJFILE", Memc[outstr])
+	}
 
 	# Define the data characteristics.
 	call tbhadr (tp, "SCALE", DP_SCALE(dao))
@@ -240,14 +246,21 @@ begin
 	call dp_sparam (tp, "TASK", "peak", "name", "")
 
 	# Write out the files names.
-	call dp_sparam (tp, "IMAGE", DP_INIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "PHOTFILE", DP_INPHOTFILE(dao), "filename", "")
-	call dp_sparam (tp, "PSFIMAGE", DP_PSFIMAGE(dao), "imagename", "")
-	call dp_sparam (tp, "PEAKFILE", DP_OUTPHOTFILE(dao), "filename", "")
+	call dp_imroot (DP_INIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "IMAGE", Memc[outstr], "imagename", "")
+	call dp_froot (DP_INPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PHOTFILE", Memc[outstr], "filename", "")
+	call dp_imroot (DP_PSFIMAGE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PSFIMAGE", Memc[outstr], "imagename", "")
+	call dp_froot (DP_OUTPHOTFILE(dao), Memc[outstr], SZ_LINE)
+	call dp_sparam (tp, "PEAKFILE", Memc[outstr], "filename", "")
+
 	if (DP_OUTREJFILE(dao) == EOS)
 	    call dp_sparam (tp, "REJFILE", "\"\"", "filename", "")
-	else
-	    call dp_sparam (tp, "REJFILE", DP_OUTREJFILE(dao), "filename", "")
+	else {
+	    call dp_froot (DP_OUTREJFILE(dao), Memc[outstr], SZ_LINE)
+	    call dp_sparam (tp, "REJFILE", Memc[outstr], "filename", "")
+	}
 
 	# Define the data characteristics.
 	call dp_rparam (tp, "SCALE", DP_SCALE(dao), "units/pix", "")

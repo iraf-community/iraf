@@ -70,19 +70,22 @@ int	interactive		# Interactive bandpass definition
 bool	newobs, obshead
 int	i, j, line, enwaves, nstds
 real	wave, dwave, latitude
-pointer	sp, image, ewaves, emags, im, mw, sh, obj, sky, std, stds, obs, gp
+pointer	sp, units, image, ewaves, emags
+pointer	im, mw, un, unang, sh, obj, sky, std, stds, obs, gp
 
 int	imtgetim()
 real	clgetr(), obsgetr()
 bool	clgetb(), rng_elementi()
-pointer	imtopenp(), rng_open(), immap(), smw_openim()
+pointer	imtopenp(), rng_open(), immap(), smw_openim(), un_open()
 errchk	immap, smw_openim, shdr_open, std_calib, get_airm, ext_load, obsimopen
+errchk	un_open, std_gcalib
 
 begin
 	call smark (sp)
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (observatory, SZ_FNAME, TY_CHAR)
+	call salloc (units, SZ_FNAME, TY_CHAR)
 
 	# Get task parameters.
 	list = imtopenp ("input")
@@ -108,6 +111,7 @@ begin
 
 	call ext_load (ewaves, emags, enwaves)
 
+	un = NULL
 	sh = NULL
 	obj = NULL
 	sky = NULL
@@ -129,7 +133,14 @@ begin
 		call imunmap (IM(sh))
 		next
 	    }
-	    call shdr_units (sh, "angstroms")
+
+	    # Work in units of first spectrum.
+	    if (un == NULL) {
+		call strcpy (UNITS(sh), Memc[units], SZ_FNAME)
+		un = un_open (Memc[units])
+		unang = un_open ("Angstroms")
+		call un_ctranr (unang, un, Memr[ewaves], Memr[ewaves], enwaves)
+	    }
 	    if (IS_INDEF (IT(sh))) {
 		call printf ("%s: ")
 		    call pargstr (Memc[image])
@@ -150,7 +161,7 @@ begin
 		call shdr_open (im, mw, line, 1, INDEFI, SHDATA, sh)
 		if (!rng_elementi (aps, AP(sh)))
 		    next
-		call shdr_units (sh, "angstroms")
+		call shdr_units (sh, Memc[units])
 
 		if (!bswitch || OFLAG(sh) == OBJ) {
 		    call printf ("%s%s(%d): %s\n")
@@ -211,9 +222,7 @@ begin
 		    if (!samestar || i == 0) {
 	 	        # Read calibration data
 		        repeat {
-		            iferr (call getcalib (CAL_WAVES(std),
-				CAL_DWAVES(std), CAL_MAGS(std),
-				CAL_NWAVES(std))) {
+		            iferr (call std_gcalib (std, un)) {
 		                call erract (EA_WARN)
 			        next
 			    }
@@ -307,6 +316,10 @@ begin
 	    call imunmap (IM(sh))
 	}
 
+	if (un != NULL) {
+	    call un_close (un)
+	    call un_close (unang)
+	}
 	if (obs != NULL)
 	    call obsclose (obs)
 	if (gp != NULL)
@@ -510,7 +523,8 @@ beep_	            call printf ("\007")
 end
 
 
-# STD_OUTPUT -- Output standard  star data
+# STD_OUTPUT -- Output standard  star data.
+# For now we do this in Angstroms.
 
 procedure std_output (obj, sky, std, output)
 
@@ -521,7 +535,8 @@ char	output[ARB]		# Output file name
 
 int	i, fd, open()
 real	wave, dwave, mag, flux, fnuzero, flambda, clgetr()
-errchk	open()
+pointer	unang, un_open()
+errchk	open, un_open, un_ctranr, std_units
 
 begin
 	fd = open (output, APPEND, TEXT_FILE)
@@ -531,15 +546,22 @@ begin
 	    call fprintf (fd, "-[%s]")
 	        call pargstr (IMNAME(sky))
 	}
+
+	unang = un_open ("Angstroms")
+	call un_ctranr (UN(obj), unang, W0(obj), wave, 1)
+	call un_ctranr (UN(obj), unang, W0(obj)+(SN(obj)-1)*WP(obj), dwave, 1)
 	call fprintf (fd, " %d %d %.2f %5.3f %9.3f %9.3f %s\n")
 	    call pargi (AP(obj))
 	    call pargi (SN(obj))
 	    call pargr (IT(obj))
 	    call pargr (AM(obj))
-	    call pargr (W0(obj))
-	    call pargr (W0(obj) + (SN(obj)-1) * WP(obj))
+	    #call pargr (W0(obj))
+	    #call pargr (W0(obj) + (SN(obj)-1) * WP(obj))
+	    call pargr (wave)
+	    call pargr (dwave)
 	    call pargstr (TITLE(obj))
 
+	fnuzero = clgetr ("fnuzero")
 	do i = 0, STD_NWAVES(std)-1 {
 	    wave = Memr[STD_WAVES(std)+i]
 	    dwave = Memr[STD_DWAVES(std)+i]
@@ -548,7 +570,7 @@ begin
 	    if (flux == 0.)
 		next
 
-	    fnuzero = clgetr ("fnuzero")
+	    call std_units (UN(obj), unang, wave, dwave, 1)
 	    flambda = fnuzero * 10. ** (-0.4 * mag) * VLIGHT / wave**2
 	    call fprintf (fd, "%8.2f %12.5g %8.3f %12.5g\n")
 		call pargr (wave)
@@ -557,6 +579,8 @@ begin
 		call pargr (flux)
 	}
 	call close (fd)
+
+	call un_close (unang)
 end
 
 
@@ -747,5 +771,58 @@ begin
 		shdr_wl (sh, double (wave+dwave/2)))
 	    flux = flux / dw
 	    call gmark (gp, wave, flux, GM_BOX, -dwave, 3.)
+	}
+end
+
+
+# STD_GCALIB -- Get calibration data in desired units.
+
+procedure std_gcalib (std, un)
+
+pointer	std		#I Standard pointer
+pointer	un		#I Desired units pointer
+
+pointer	unang, un_open()
+errchk	getcalib, std_units
+
+begin
+	call getcalib (CAL_WAVES(std), CAL_DWAVES(std), CAL_MAGS(std),
+	    CAL_NWAVES(std))
+
+	# Cnvert to desired units.
+	unang = un_open ("Angstroms")
+	call std_units (unang, un,
+	    Memr[CAL_WAVES(std)], Memr[CAL_DWAVES(std)], CAL_NWAVES(std))
+	call un_close (unang)
+end
+
+
+# STD_UNITS -- Convert bandpass information to different units.
+
+procedure std_units (unin, unout, center, width, n)
+
+pointer	unin		#I Input units
+pointer	unout		#I Output units
+real	center[ARB]	#U Bandpass centers
+real	width[ARB]	#U Bandpass widths
+int	n		#I Number of bandpasses
+
+int	i
+real	x1, x2
+bool	un_compare()
+errchk	un_ctranr
+
+
+begin
+	if (un_compare (unin, unout))
+	    return
+
+	do i = 1, n {
+	    x1 = center[i] - width[i] / 2
+	    x2 = center[i] + width[i] / 2
+	    call un_ctranr (unin, unout, x1, x1, 1)
+	    call un_ctranr (unin, unout, x2, x2, 1)
+	    center[i] = (x1 + x2) / 2.
+	    width[i] = abs (x1 - x2)
 	}
 end

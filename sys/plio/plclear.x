@@ -18,7 +18,7 @@ begin
 	# Clear the line list buffer.
 	lp = Ref (pl, PL_EMPTYLINE)
 	PL_LLOP(pl) = LP_BLEN(lp)
-	LP_NREF(lp) = PL_NLP(pl)
+	LP_NREFS(lp) = PL_NLP(pl)
 
 	do i = 1, PL_NLP(pl)
 	    PL_LP(pl,i) = PL_EMPTYLINE

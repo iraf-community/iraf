@@ -19,17 +19,17 @@ int	verbose			# verbose mode ?
 int	verify			# verify critical task parameters ?
 int	update			# update the task parameters ?
 
-bool	ap_text
+pointer	sp, outfname, im, subim, dao, str
 int	imlist, limlist, alist, lalist, pimlist, lpimlist, olist, lolist
 int	simlist, lsimlist, rlist, lrlist, photfd, psffd, allfd, root, savesub
-int	rejfd
-pointer	sp, outfname, im, subim, dao
+int	rejfd, wcs
+bool	ap_text
 
-bool	itob(), clgetb()
-int	open(), fnldir(), strncmp(), strlen(), btoi(), access()
+pointer	immap(), tbtopn()
+int	open(), fnldir(), strncmp(), strlen(), btoi(), access(), clgwrd()
 int	fstati(), imtopen, imtlen(), imtgetim(), fntopnb(), fntlenb()
 int	fntgfnb()
-pointer	immap(), tbtopn()
+bool	itob(), clgetb()
 
 begin
 	# Set the standard output to flush on newline.
@@ -45,6 +45,7 @@ begin
 	call salloc (rejfile, SZ_FNAME, TY_CHAR)
 	call salloc (subimage, SZ_FNAME, TY_CHAR)
 	call salloc (outfname, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Get the task input and output file names.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -145,7 +146,7 @@ begin
 	# Open the input image, initialize the daophot structure, get the
 	# pset parameters
 
-	call dp_gppars (dao, NULL)	
+	call dp_gppars (dao)	
 
 	# Set some parameters.
 	call dp_seti (dao, VERBOSE, verbose)
@@ -156,6 +157,29 @@ begin
 	    if (update == YES)
 		call dp_pppars (dao)
 	}
+
+        # Get the wcs information.
+        wcs = clgwrd ("wcsin", Memc[str], SZ_FNAME, WCSINSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the input coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSIN, wcs)
+        wcs = clgwrd ("wcsout", Memc[str], SZ_FNAME, WCSOUTSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the output coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSOUT, wcs)
+        wcs = clgwrd ("wcspsf", Memc[str], SZ_FNAME, WCSPSFSTR)
+        if (wcs <= 0) {
+            call eprintf (
+                "Warning: Setting the psf coordinate system to logical\n")
+            wcs = WCS_LOGICAL
+        }
+        call dp_seti (dao, WCSPSF, wcs)
 
 	# Initialize the PSF structure.
 	call dp_fitsetup (dao)
@@ -171,11 +195,7 @@ begin
 
 	    # Open the image and store some header parameters.
 	    im = immap (Memc[image], READ_ONLY, 0)		
-	    call dp_padu (im, dao)
-	    call dp_rdnoise (im, dao)
-	    call dp_otime (im, dao)
-	    call dp_filter (im, dao)
-	    call dp_airmass (im, dao)
+	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
 
 	    # Open the input photometry file.
@@ -194,7 +214,7 @@ begin
 	    else
 	        photfd = tbtopn (Memc[outfname], READ_ONLY, 0)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
-	    call dp_getapert (dao, photfd, DP_MAXNSTAR(dao) + 1, ap_text)
+	    call dp_wgetapert (dao, im, photfd, DP_MAXNSTAR(dao), ap_text)
 
 	    # Open the PSF image and read in the PSF.
 	    if (imtgetim (pimlist, Memc[psfimage], SZ_FNAME) == EOF)

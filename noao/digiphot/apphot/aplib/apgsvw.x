@@ -85,7 +85,7 @@ begin
 
 	# X dimension.
 	dim1 = IM_VMAP(im,1)
-	step1 = IM_VSTEP(im,1)
+	step1 = IM_VSTEP(im,dim1)
 	if (step1 >= 0) {
 	    x1 = IM_VOFF(im,dim1) + 1
 	    x2 = x1 + IM_LEN(im,1) - 1
@@ -96,7 +96,7 @@ begin
 
 	# Y dimension.
 	dim2 = IM_VMAP(im,2)
-	step2 = IM_VSTEP(im,2)
+	step2 = IM_VSTEP(im,dim2)
 	if (step2 >= 0) {
 	    y1 = IM_VOFF(im,dim2) + 1
 	    y2 = y1 + IM_LEN(im,2) - 1

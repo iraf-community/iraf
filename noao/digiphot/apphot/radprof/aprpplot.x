@@ -59,8 +59,8 @@ begin
 	call ggview (gd, u1, u2, v1, v2)
 
 	# Set up the labels and annotate the plot.
-	gt = ap_gtinit (AP_IMNAME(ap), apstatr (ap, XCENTER), apstatr (ap,
-	    YCENTER))
+	gt = ap_gtinit (AP_IMROOT(ap), apstatr (ap, OXINIT), apstatr (ap,
+	    OYINIT))
 	call gclear (gd)
 	call ap_rpset (gd, gt, ap, rmin, rmax, IMIN, IMAX)
 	call ap_rpannotate (gd, ap, rmin, rmax, IMIN, IMAX)
@@ -120,8 +120,8 @@ begin
 	# Encode the center string
 	call fprintf (fd,
 	    "Center: xc=%0.2f yc=%0.2f xerr=%0.2f yerr=%0.2f\n")
-	    call pargr (apstatr (ap, XCENTER))
-	    call pargr (apstatr (ap, YCENTER))
+	    call pargr (apstatr (ap, OXCENTER))
+	    call pargr (apstatr (ap, OYCENTER))
 	    call pargr (apstatr (ap, XERR))
 	    call pargr (apstatr (ap, YERR))
 

@@ -15,6 +15,7 @@
 #endif
 
 #include <stdio.h>
+#include <unistd.h>
 #ifndef NORLIMIT
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -25,10 +26,19 @@
 #define import_spp
 #include <iraf.h>
 
+#define	PCT_RESERVE	10	 /* percent */
+#define	MIN_RESERVE	50	 /* megabytes */
+#define	MIN_WORKSET	32	 /* megabytes */
+
+#define	ENV_DEBUG	"ZAWSET_DEBUG"
+#define	MB		(1024*1024)
+#define	KB		1024
+
 /* Kernel default working set values in bytes. */
-int defworkset = SZ_DEFWORKSET;
-int maxworkset = SZ_MAXWORKSET;
-static int max_wss = 0;
+unsigned int defworkset = SZ_DEFWORKSET;
+unsigned int maxworkset = SZ_MAXWORKSET;
+static unsigned int max_wss = 0;
+extern char *getenv();
 
 
 /* ZAWSET -- Adjust or query the "working set", i.e., the maximum amount of
@@ -39,10 +49,38 @@ XINT	*best_size;		/* requested working set size, bytes.	*/
 XINT	*new_size, *old_size;	/* actual new and old sizes, bytes.	*/
 XINT	*max_size;		/* max working set size, bytes		*/
 {
+	int physmem=0, kb_page;
+	int debug = (getenv(ENV_DEBUG) != NULL);
 	char *s, *getenv();
+
 #ifndef NORLIMIT
-	int working_set_size;
+	unsigned int working_set_size;
 	struct rlimit rlp;
+#endif
+
+	/* Get the page size in kilobytes. */
+	kb_page = getpagesize() / KB;
+
+#ifdef _SC_PHYS_PAGES
+	/* On recent POSIX systems (including Solaris, Linux, and maybe
+	 * others) we can use sysconf to get the actual system memory size.
+	 * The computation is done in KB to avoid integer overflow.
+	 */
+	physmem = sysconf(_SC_PHYS_PAGES) * kb_page;
+	if (physmem > 0) {
+	    maxworkset = min (MAX_LONG / KB, physmem);
+
+	    /* Don't try to use all of physical memory. */
+	    if (maxworkset == physmem) {
+		maxworkset -= (max ((MIN_RESERVE*MB)/KB,
+		    physmem * PCT_RESERVE / 100));
+		if (maxworkset <= 0)
+		    maxworkset = (MIN_WORKSET * MB) / KB;
+	    }
+
+	    /* Now convert back to bytes. */
+	    maxworkset *= 1024;
+	}
 #endif
 
 	/* The hard upper limit on memory utilization defined by the unix
@@ -58,6 +96,10 @@ XINT	*max_size;		/* max working set size, bytes		*/
 	    } else
 		max_wss = maxworkset;
 
+	if (debug)
+	    fprintf(stderr,"zawset: physmem=%dm, maxworkset=%dm max_wss=%dm\n",
+		physmem / KB, maxworkset / MB, max_wss / MB);
+
 #ifdef NORLIMIT
 	if (*best_size == 0)
 	    *old_size = *new_size = defworkset;
@@ -66,12 +108,20 @@ XINT	*max_size;		/* max working set size, bytes		*/
 	*max_size = max_wss;
 #else
 	getrlimit (RLIMIT_RSS, &rlp);
-	working_set_size = min (max_wss, rlp.rlim_cur);
+	if (debug)
+	    fprintf (stderr, "zawset: starting rlimit cur=%dm, max=%dm\n",
+		(rlp.rlim_cur == RLIM_INFINITY ? 0 : rlp.rlim_cur) / MB,
+		(rlp.rlim_max == RLIM_INFINITY ? 0 : rlp.rlim_max) / MB);
+
+	working_set_size = min (max_wss,
+	    rlp.rlim_cur == RLIM_INFINITY ? max_wss : rlp.rlim_cur);
 
 	/* Now try to set the size requested by our caller.  If bestsize was
 	 * given as zero, merely return the status values.
 	 */
-	(*max_size) = min (max_wss, rlp.rlim_max);
+	(*max_size) = min (max_wss,
+	    rlp.rlim_max == RLIM_INFINITY ? max_wss : rlp.rlim_max);
+
 	if (*best_size <= 0)
 	    *new_size = *old_size = working_set_size;
 	else {
@@ -80,7 +130,15 @@ XINT	*max_size;		/* max working set size, bytes		*/
 		setrlimit (RLIMIT_RSS, &rlp);
 	    getrlimit (RLIMIT_RSS, &rlp);
 	    *old_size = working_set_size;
-	    *new_size = min(*best_size, min(max_wss, rlp.rlim_cur));
+	    *new_size = min(*best_size, min(max_wss,
+		rlp.rlim_cur == RLIM_INFINITY ? max_wss : rlp.rlim_cur));
 	}
+	if (debug)
+	    fprintf (stderr, "zawset: adjusted rlimit cur=%dm, max=%dm\n",
+		(rlp.rlim_cur == RLIM_INFINITY ? 0 : rlp.rlim_cur) / MB,
+		(rlp.rlim_max == RLIM_INFINITY ? 0 : rlp.rlim_max) / MB);
 #endif
+	if (debug)
+	    fprintf (stderr, "zawset: best=%dm, old=%dm, new=%dm, max=%dm\n",
+		*best_size/MB, *old_size/MB, *new_size/MB, *max_size/MB);
 }

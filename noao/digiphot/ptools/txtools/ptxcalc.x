@@ -231,11 +231,15 @@ begin
 		    ncontinue = 0
 		    recptr = 1
 		    fieldptr = 0
-		    if (o != NULL)
+		    if (o != NULL) {
+			call xev_freeop (o)
 		        call mfree (o, TY_STRUCT)
+		    }
 		    o = NULL
-		    if (v != NULL)
+		    if (v != NULL) {
+			call xev_freeop (v)
 		        call mfree (v, TY_STRUCT)
+		    }
 		    v = NULL
 	        }
 	    }

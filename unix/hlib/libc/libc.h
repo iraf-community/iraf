@@ -13,7 +13,7 @@
 #define	XCHAR		short
 #define	XINT		int
 #define	SZ_DEFIOBUF	1024
-#define	FIO_MAXFD	256
+#define	FIO_MAXFD	4096
 
 #define	FIOCOM		fiocom_		/* [MACHDEP] */
 #define	MEMCOM		mem_

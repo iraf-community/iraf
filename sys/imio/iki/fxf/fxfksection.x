@@ -26,6 +26,7 @@ define	KS_EHULINES	13
 define	KS_PADLINES	14
 define	KS_NOEXPAND	15
 define	KS_CACHESIZE	16
+define	KS_TYPE		17
 define	ERROR           -2
 
 
@@ -176,6 +177,8 @@ begin
 	    return (KS_APPEND)
 	if (strncmp (outstr, "noappend", len) == 0)
 	    return (KS_NOAPPEND)
+	if (strncmp (outstr, "type", len) == 0)
+	    return (KS_TYPE)
 	if (strncmp (outstr, "expand", len) == 0)
 	    return (KS_EXPAND)
 	if (strncmp (outstr, "phulines", len) == 0)
@@ -260,7 +263,7 @@ end
 
 procedure fxf_ks_val (outstr, param, fit)
 
-char	outstr[ARB] 		#I Input tring with value		
+char	outstr[ARB] 		#I Input string with value		
 int	param			#I Parameter code
 pointer fit			#U Fits kernel descriptor
 
@@ -281,6 +284,12 @@ begin
 	case  KS_EXTNAME:
 	    call strcpy (outstr, FKS_EXTNAME(fit), LEN_CARD)
 
+	case  KS_TYPE:
+	    call strlwr (outstr)
+	    if (strcmp ("mask", outstr) == 0)
+		FKS_SUBTYPE(fit) = FK_PLIO
+	    else
+		call syserrs (SYS_FXFKSINVAL, "type")
 	case KS_EXTVER:
 	    ip = 1
 	    ty = lexnum (outstr, ip, nchars)
@@ -402,7 +411,6 @@ begin
 	    FKS_EXPAND(fit) = ival
 	default:
 	    call syserr (SYS_FXFKSSYN)
-
 	}
 end
 
@@ -453,6 +461,7 @@ pointer	fit			#I fits kernel descriptor
 
 begin
 	FKS_EXTNAME(fit)   = EOS
+	FKS_SUBTYPE(fit)   = NO
 	FKS_EXTVER(fit)    = INDEFL
 	FKS_APPEND(fit)    = NO
 	FKS_OVERWRITE(fit) = NO

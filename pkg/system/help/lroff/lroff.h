@@ -35,5 +35,7 @@ define	BP		15		# break page
 define	TP		16		# test space left on page
 define	KS		17		# start floating keep
 define	KE		18		# end floating keep
-define	ENDHELP		19		# end of help block
-define	HELP		20		# start of help block
+define	HR		19		# HTML href tag
+define	HN		20		# HTML name tag
+define	ENDHELP		21		# end of help block
+define	HELP		22		# start of help block

@@ -1,5 +1,12 @@
 .help revisions Dec94 noao.imred.src.doecslit
 .nf
+doecslit$sproc.cl
+    Modified code to eliminate goto.  This is for use with pyraf.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
 
 doecslit$sproc.cl
     The arcref and arcrefs variables were not initialized if dispcor=no

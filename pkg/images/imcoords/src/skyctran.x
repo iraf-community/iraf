@@ -1,7 +1,7 @@
 include <fset.h>
 include <ctype.h>
 include <math.h>
-include "../../lib/skywcs.h"
+include <pkg/skywcs.h>
 
 define	HELPFILE1	"imcoords$src/skycur.key"
 define	HELPFILE2	"imcoords$src/ttycur.key"
@@ -514,9 +514,9 @@ begin
 end
 
 
-# SK_COPY -- Copy the input coordinate file to the output coordinate file.
+# SK_COPYTRAN -- Copy the input coordinate file to the output coordinate file.
 
-procedure sk_copy (infd, outfd, lngcolumn, latcolumn, transform)
+procedure sk_copytran (infd, outfd, lngcolumn, latcolumn, transform)
 
 int	infd			#I the input file descriptor
 int	outfd			#I the output file descriptor
@@ -816,7 +816,7 @@ begin
             if (sk_stati (cooin, S_STATUS) == ERR)
                 call fprintf (outfd,
                 "# Error decoding the input coordinate system\n")
-	    call sk_getstr (cooin, S_COOSYSTEM, Memc[str1], SZ_FNAME)
+	    call sk_stats (cooin, S_COOSYSTEM, Memc[str1], SZ_FNAME)
             call sk_iiwrite (outfd, "Insystem", Memc[str1], mwin,
                 cooin)
 	    if (infd == NULL)
@@ -835,7 +835,7 @@ begin
             if (sk_stati(cooout, S_STATUS) == ERR)
                 call fprintf (outfd,
                 "# Error decoding the output coordinate system\n")
-	    call sk_getstr (cooout, S_COOSYSTEM, Memc[str1], SZ_FNAME)
+	    call sk_stats (cooout, S_COOSYSTEM, Memc[str1], SZ_FNAME)
             call sk_iiwrite (outfd, "Outsystem", Memc[str1], mwout,
                 cooout)
 	    call sk_woformats (cooin, cooout, olngunits, olatunits,
@@ -853,7 +853,7 @@ begin
                 if (sk_stati (cooin, S_STATUS) == ERR)
                     call printf (
                     "Error decoding the input coordinate system\n")
-	        call sk_getstr (cooin, S_COOSYSTEM, Memc[str1], SZ_FNAME)
+	        call sk_stats (cooin, S_COOSYSTEM, Memc[str1], SZ_FNAME)
                 call sk_iiprint ("Insystem", Memc[str1], mwin, cooin)
 	        if (infd == NULL)
 	            call sk_wiformats (cooin, ilngunits, ilatunits, "%10.3f",
@@ -871,7 +871,7 @@ begin
                 if (sk_stati(cooout, S_STATUS) == ERR)
                     call printf (
                     "Error decoding the output coordinate system\n")
-	        call sk_getstr (cooout, S_COOSYSTEM, Memc[str1], SZ_FNAME)
+	        call sk_stats (cooout, S_COOSYSTEM, Memc[str1], SZ_FNAME)
                 call sk_iiprint ("Outsystem", Memc[str1], mwout, cooout)
 	        call sk_woformats (cooin, cooout, olngunits, olatunits,
 		    olngformat, olatformat, Memc[str1], Memc[str2], Memc[str3],
@@ -895,7 +895,7 @@ begin
                 if (sk_stati(cooin, S_STATUS) == ERR)
                     call fprintf (outfd,
                     "# Error decoding the input coordinate system\n")
-	        call sk_getstr (cooin, S_COOSYSTEM, Memc[str1], SZ_FNAME)
+	        call sk_stats (cooin, S_COOSYSTEM, Memc[str1], SZ_FNAME)
                 call sk_iiwrite (outfd, "Insystem", Memc[str1], mwin, cooin)
 		call fprintf (outfd, "\n")
 		if (outfd != STDOUT) {
@@ -903,7 +903,7 @@ begin
                     if (sk_stati(cooin, S_STATUS) == ERR)
                         call printf (
                         "# Error decoding the input coordinate system\n")
-	            call sk_getstr (cooin, S_COOSYSTEM, Memc[str1], SZ_FNAME)
+	            call sk_stats (cooin, S_COOSYSTEM, Memc[str1], SZ_FNAME)
                     call sk_iiprint ("Insystem", Memc[str1], mwin, cooin)
 		    call printf ("\n")
 		}
@@ -914,7 +914,7 @@ begin
 		mwin = tmw
 		cooin = tcoo
 		if (infd == NULL)
-		    call sk_seti (cooin, S_PTYPE, PIXTYPE_TV)
+		    call sk_seti (cooin, S_PIXTYPE, PIXTYPE_TV)
 		newsystem = YES
 		newformat = YES
 	    }
@@ -929,7 +929,7 @@ begin
                 if (sk_stati(cooout, S_STATUS) == ERR)
                     call fprintf (outfd,
                     "# Error decoding the output coordinate system\n")
-	        call sk_getstr (cooout, S_COOSYSTEM, Memc[str1], SZ_FNAME)
+	        call sk_stats (cooout, S_COOSYSTEM, Memc[str1], SZ_FNAME)
                 call sk_iiwrite (outfd, "Outsystem", Memc[str1], mwout, cooout)
 		call fprintf (outfd, "\n")
 		if (outfd != STDOUT) {
@@ -937,7 +937,7 @@ begin
                     if (sk_stati(cooout, S_STATUS) == ERR)
                         call printf (
                         "# Error decoding the output coordinate system\n")
-	            call sk_getstr (cooout, S_COOSYSTEM, Memc[str1], SZ_FNAME)
+	            call sk_stats (cooout, S_COOSYSTEM, Memc[str1], SZ_FNAME)
                     call sk_iiprint ("Outsystem", Memc[str1], mwout, cooout)
 		    call printf ("\n")
 		}
@@ -1139,7 +1139,7 @@ begin
 
 	# Compute the grid parameters in x/ra/longitude.
 	if (IS_INDEFD(ilngmin)) {
-	    switch (sk_stati(cooin, S_PTYPE)) {
+	    switch (sk_stati(cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 	        ilng1 = 1.0d0
 	    default:
@@ -1161,7 +1161,7 @@ begin
 	    ilng1 = ilngmin
 
 	if (IS_INDEFD(ilngmax)) {
-	    switch (sk_stati(cooin, S_PTYPE)) {
+	    switch (sk_stati(cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 	        ilng2 = sk_stati (cooin, S_NLNGAX)
 	    default:
@@ -1188,7 +1188,7 @@ begin
 
 	# Compute the grid parameters in y/dec/latitude.
 	if (IS_INDEFD(ilatmin)) {
-	    switch (sk_stati (cooin, S_PTYPE)) {
+	    switch (sk_stati (cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 	        ilat1 = 1.0d0
 	    default:
@@ -1210,7 +1210,7 @@ begin
 	    ilat1 = ilatmin
 
 	if (IS_INDEFD(ilatmax)) {
-	    switch (sk_stati (cooin, S_PTYPE)) {
+	    switch (sk_stati (cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 	        ilat2 = sk_stati (cooin, S_NLATAX)
 	    default:
@@ -1279,8 +1279,8 @@ end
 # SK_GRCOPY -- Copy the input logical pixel grid to the output logical
 # pixel grid.
 
-procedure sk_grcopy (outfd, cooin, ilngmin, ilngmax, nilng, ilatmin, ilatmax,
-	nilat, ilngunits, ilatunits, olngunits, olatunits, ilngformat,
+procedure sk_grcopy (outfd, cooin, cooout, ilngmin, ilngmax, nilng, ilatmin,
+	ilatmax, nilat, ilngunits, ilatunits, olngunits, olatunits, ilngformat,
 	ilatformat, olngformat, olatformat, transform) 
 
 int	outfd			#I the output file descriptor
@@ -1356,7 +1356,7 @@ begin
 
 	# Compute the grid parameters in x/ra/longitude.
 	if (IS_INDEFD(ilngmin)) {
-	    switch (sk_stati (cooin, S_PTYPE)) {
+	    switch (sk_stati (cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 	        x1 = 1.0d0
 	    default:
@@ -1377,7 +1377,7 @@ begin
 	} else
 	    x1 = ilngmin
 	if (IS_INDEFD(ilngmax)) {
-	    switch (sk_stati(cooin, S_PTYPE)) {
+	    switch (sk_stati(cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 	        x2 = sk_stati(cooin, S_NLNGAX)
 	    default:
@@ -1404,7 +1404,7 @@ begin
 
 	# Compute the grid parameters in y/dec/latitude.
 	if (IS_INDEFD(ilatmin)) {
-	    switch (sk_stati (cooin, S_PTYPE)) {
+	    switch (sk_stati (cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 	        y1 = 1.0d0
 	    default:
@@ -1426,7 +1426,7 @@ begin
 	    y1 = ilatmin
 
 	if (IS_INDEFD(ilatmax)) {
-	    switch (sk_stati (cooin, S_PTYPE)) {
+	    switch (sk_stati (cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 	        y2 = sk_stati (cooin, S_NLATAX)
 	    default:
@@ -1507,7 +1507,7 @@ begin
             tilatunits = ilatunits
 
 	# Format the units strings.
-	if (sk_stati(cooin, S_PTYPE) != PIXTYPE_WORLD) {
+	if (sk_stati(cooin, S_PIXTYPE) != PIXTYPE_WORLD) {
 	    call strcpy ("pixels", ilngunitstr, maxch)
 	    call strcpy ("pixels", ilatunitstr, maxch)
 	} else {
@@ -1557,7 +1557,7 @@ begin
 	    if (sk_stati(cooin, S_STATUS) == ERR)
 		call strcpy ("%10.3f", oilngformat, maxch)
 	    else {
-		switch (sk_stati(cooin, S_PTYPE)) {
+		switch (sk_stati(cooin, S_PIXTYPE)) {
 		case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL: 
 		    call strcpy ("%10.3f", oilngformat, maxch)
 		default:
@@ -1578,7 +1578,7 @@ begin
 	    if (sk_stati (cooin, S_STATUS) == ERR)
 	        call strcpy ("%10.3f", oilatformat, maxch)
 	    else {
-	        switch (sk_stati(cooin, S_PTYPE)) {
+	        switch (sk_stati(cooin, S_PIXTYPE)) {
 	        case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL: 
 		    call strcpy ("%10.3f", oilatformat, maxch)
 	        default:
@@ -1629,7 +1629,7 @@ begin
             tolatunits = olatunits
 
 	# Format the units strings.
-	if (sk_stati(cooout, S_PTYPE) != PIXTYPE_WORLD) {
+	if (sk_stati(cooout, S_PIXTYPE) != PIXTYPE_WORLD) {
 	    call strcpy ("pixels", olngunitstr, maxch)
 	    call strcpy ("pixels", olatunitstr, maxch)
 	} else {
@@ -1682,9 +1682,9 @@ begin
 		call strcpy ("%10.3f", oolngformat, maxch)
 	    else {
 		if (sk_stati(cooout, S_STATUS) == ERR)
-		    sptype = sk_stati (cooin, S_PTYPE)
+		    sptype = sk_stati (cooin, S_PIXTYPE)
 		else
-		    sptype = sk_stati (cooout, S_PTYPE)
+		    sptype = sk_stati (cooout, S_PIXTYPE)
 		switch (sptype) {
 		case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL: 
 		    call strcpy ("%10.3f", oolngformat, maxch)
@@ -1707,9 +1707,9 @@ begin
 		call strcpy ("%10.3f", oolatformat, maxch)
 	    else {
 		if (sk_stati(cooout, S_STATUS) == ERR)
-		    sptype = sk_stati (cooin, S_PTYPE)
+		    sptype = sk_stati (cooin, S_PIXTYPE)
 		else
-		    sptype = sk_stati (cooout, S_PTYPE)
+		    sptype = sk_stati (cooout, S_PIXTYPE)
 		switch (sptype) {
 		case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL: 
 		    call strcpy ("%10.3f", oolatformat, maxch)
@@ -1744,12 +1744,12 @@ errchk	mw_sctran()
 
 begin
 	if (mwin != NULL) {
-	    switch (sk_stati(cooin, S_PTYPE)) {
+	    switch (sk_stati(cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 		axbits = 2 ** (sk_stati(cooin, S_XLAX) - 1) +
 		    2 ** (sk_stati(cooin, S_YLAX) - 1)
 		iferr {
-		    if (sk_stati(cooin, S_PTYPE) == PIXTYPE_PHYSICAL)
+		    if (sk_stati(cooin, S_PIXTYPE) == PIXTYPE_PHYSICAL)
 		        ctin = mw_sctran (mwin, "physical", "world", axbits)
 		    else
 		        ctin = mw_sctran (mwin, "logical", "world", axbits)
@@ -1781,7 +1781,7 @@ int	sk_stati()
 
 begin
 	if (mwin != NULL) {
-	    switch (sk_stati(cooin, S_PTYPE)) {
+	    switch (sk_stati(cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 		oilngunits = SKY_DEGREES
 		oilatunits = SKY_DEGREES
@@ -1811,12 +1811,12 @@ errchk	mw_sctran()
 
 begin
 	if (mwout != NULL) {
-	    switch (sk_stati(cooout, S_PTYPE)) {
+	    switch (sk_stati(cooout, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 		axbits = 2 ** (sk_stati (cooout, S_XLAX) - 1) +
 		    2 ** (sk_stati (cooout, S_YLAX) - 1)
 		iferr {
-		    if (sk_stati (cooout, S_PTYPE) == PIXTYPE_PHYSICAL)
+		    if (sk_stati (cooout, S_PIXTYPE) == PIXTYPE_PHYSICAL)
 		        ctout = mw_sctran (mwout, "world", "physical", axbits)
 		    else
 		        ctout = mw_sctran (mwout, "world", "logical", axbits)
@@ -1850,7 +1850,7 @@ int	sk_stati()
 
 begin
 	if (mwout != NULL) {
-	    switch (sk_stati(cooout, S_PTYPE)) {
+	    switch (sk_stati(cooout, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_TV, PIXTYPE_PHYSICAL:
 		oolngunits = SKY_RADIANS
 		oolatunits = SKY_RADIANS
@@ -1888,7 +1888,7 @@ int	sk_stati()
 begin
 	# Convert the input image coordinates to world coordinates.
 	if (mwin != NULL) {
-	    switch (sk_stati (cooin, S_PTYPE)) {
+	    switch (sk_stati (cooin, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_PHYSICAL:
 		if (ctin == NULL) {
 		    olng = ilng
@@ -1964,8 +1964,8 @@ int	sk_stati()
 
 begin
 	# Convert the output image coordinates to image coordinates.
-	#if (mwout == NULL || (sk_stati(cooin, S_PTYPE) == PIXTYPE_WORLD &&
-	#    sk_stati (cooout, S_PTYPE) == PIXTYPE_WORLD)) {
+	#if (mwout == NULL || (sk_stati(cooin, S_PIXTYPE) == PIXTYPE_WORLD &&
+	#    sk_stati (cooout, S_PIXTYPE) == PIXTYPE_WORLD)) {
 	if (mwout == NULL || ctout == NULL) { 
 	    switch (olngunits) {
 	    case SKY_HOURS:
@@ -1984,7 +1984,7 @@ begin
 		    ;
 	    }
 	} else  {
-	    switch (sk_stati (cooout, S_PTYPE)) {
+	    switch (sk_stati (cooout, S_PIXTYPE)) {
 	    case PIXTYPE_LOGICAL, PIXTYPE_PHYSICAL:
 		tlng = RADTODEG(ilng)
 		tlat = RADTODEG(ilat)

@@ -1,5 +1,44 @@
 .help revisions Jan92 pkg.obsolete
 .nf
+=====
+V2.12
+=====
+
+obsolete/obsolete.cl
+obsolete/obsolete.men
+obsolete/obsolete.hd
+obsolete/x_obsolete.x
+obsolete/mkpkg
+obsolete/oimstatistics.par
+obsolete/oimstat.h
+obsolete/t_oimstat
+obsolete/doc/oimstat.hlp
+    Added IMSTATISTICS from V2.11.3b.  (8/30/01, Davis)
+
+obsolete/obsolete.cl
+obsolete/obsolete.men
+obsolete/obsolete.hd
+obsolete/x_obsolete.x
+obsolete/mkpkg
+obsolete/oimcombine.par		+
+obsolete$doc/oimcombine.hlp	+
+obsolete$imcombine/		+
+    Added IMCOMBINE from V2.11.3b.  (8/17/01, Valdes)
+
+obsolete/obsolete.cl
+obsolete/obsolete.men
+obsolete/obsolete.hd
+obsolete/x_obsolete.x
+obsolete/mkpkg
+obsolete/odisplay.par		-
+obsolete$doc/odisplay.hlp	-
+obsolete$display/		-
+    Removed ODISPLAY task.  (8/17/01, Valdes)
+
+=======
+V2.11.3
+=======
+
 obsolete/obsolete.cl
 obsolete/obsolete.men
 obsolete/obsolete.hd

@@ -2,4 +2,4 @@
 
 keeplog,b,h,no,,,Keep log of processing?
 logfile,f,h,"imred.log",,,Log file
-version,s,h,"IMRED V2: August 1990"
+version,s,h,"IMRED V3: August 2001"

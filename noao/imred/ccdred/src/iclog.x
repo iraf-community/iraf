@@ -13,7 +13,7 @@ procedure ic_log (in, out, ncombine, exptime, sname, zname, wname,
 	dozero, nout, expname, exposure)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output images
+pointer	out[ARB]		# Output images
 int	ncombine[nimages]	# Number of previous combined images
 real	exptime[nimages]	# Exposure times
 char	sname[ARB]		# Scale name

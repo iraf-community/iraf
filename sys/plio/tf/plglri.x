@@ -17,11 +17,12 @@ int	rop			#I rasterop
 
 int	mr, nr
 pointer	sp, rl_out, rl_src, ll_src
-int	pl_access(), pl_l2ri()
+pointer	pl_access()
+int	pl_l2ri()
 errchk	pl_access
 
 begin
-	ll_src = Ref (pl, pl_access(pl,v))
+	ll_src = pl_access (pl,v)
 	if (!R_NEED_DST(rop))
 	    nr = pl_l2ri (Mems[ll_src], v[1], rl_dst, npix)
 	else {

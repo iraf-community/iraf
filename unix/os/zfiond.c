@@ -60,13 +60,20 @@
  *				both the client and the server, as for the
  *				other domains.
  *
+ *  sock:5			Used by servers to accept a connection on
+ *				a server socket opened in nonblocking mode
+ *				on the given channel (5 in the example).
+ *				The channel is returned in a previous call
+ *				to open an INET or UNIX server port.
+ *
  * The address field may contain up to two "%d" fields.  If present, the
  * user's UID will be substituted (e.g. "unix:/tmp/.IMT%d").
  *
- * The only protocol flags currently supported are "text" and "binary".
+ * The protocol flags currently supported are "text", "binary", and "nonblock".
  * If "text" is specified the datastream is assumed to consist only of byte
  * packed ascii text and is automatically converted by the driver to and
  * from SPP chars during i/o.  The default is binary i/o (no conversions).
+ * The "nonblock" flag is used to specify nonblocking mode.
  *
  * Client connections normally use mode READ_WRITE, although READ_ONLY and
  * WRITE_ONLY are permitted.  APPEND is the same as WRITE_ONLY.  A server
@@ -74,10 +81,19 @@
  * connection will be created if necessary.  A client connection will timeout
  * if no server responds.
  *
- * An INET or UNIX domain server connection will block indefinitely until a
- * client connects.  Since connections are synchronous only a single client
- * can be supported.  The server sees an EOF on the input stream when the
- * client disconnects.
+ * By default a server connection will block until a client connects, and
+ * the channel returned will be the i/o channel for the client connection.
+ * If however a server connection is opened in nonblocking mode then a server
+ * socket will be opened which can be used for multiple client connections.
+ * When a client makes a connection attempt, opening the server socket as
+ * "sock:<chan>", where <chan> is the channel assigned to the socket, will
+ * accept the client connection and open a new channel to be used for
+ * bidirectional i/o to the client.  The open will block until a client
+ * connects unless the socket is opened in nonblocking mode.  If opening the
+ * channel under IRAF FIO and separate read and write streams are desired,
+ * this can be achieved by using REOPEN to open a second stream on the same
+ * channel).  The server sees an EOF on the input stream when the client
+ * disconnects.
  *
  * FIFO domain connection are slightly different.  When the server opens a FIFO
  * connection the open returns immediately.  When the server reads from the
@@ -90,20 +106,23 @@
 
 #define	SZ_NAME		256
 #define	SZ_OBUF		4096
-#define	MAXCONN		5
+#define	MAXCONN		32
 #define	MAXSEL		32
 
 #define	INET		1
 #define	UNIX		2
 #define	FIFO		3
+#define	SOCK		4
 
 #define	F_SERVER	00001
-#define	F_DEL1		00002
-#define	F_DEL2		00004
-#define	F_TEXT		00010
+#define	F_NONBLOCK	00002
+#define	F_TEXT		00004
+#define	F_DEL1		00010
+#define	F_DEL2		00020
 
 /* Network portal descriptor. */
 struct portal {
+	int channel;
 	int domain;
 	int flags;
 	int datain;
@@ -129,7 +148,7 @@ XINT	*mode;			/* file access mode */
 XINT	*chan;			/* file number (output) */
 {
 	register int fd;
-	register struct portal *np;
+	register struct portal *np, *s_np;
 	unsigned short host_port;
 	unsigned long host_addr;
 	char osfn[SZ_NAME*2];
@@ -161,7 +180,7 @@ XINT	*chan;			/* file number (output) */
 	     * name or as a decimal port number.
 	     */
 	    ip = osfn + 5;
-	    if (getstr (&ip, port_str, SZ_NAME) <= 0)
+	    if (getstr (&ip, port_str, SZ_NAME, ':') <= 0)
 		goto err;
 	    if (isdigit (port_str[0])) {
 		port = atoi (port_str);
@@ -175,7 +194,7 @@ XINT	*chan;			/* file number (output) */
 	     * name or as an Internet address in dot notation.  If no host
 	     * name is specified default to the local host.
 	     */
-	    if (getstr (&ip, host_str, SZ_NAME) <= 0)
+	    if (getstr (&ip, host_str, SZ_NAME, ':') <= 0)
 		strcpy (host_str, "localhost");
 	    if (isdigit (host_str[0])) {
 		host_addr = inet_addr (host_str);
@@ -192,9 +211,32 @@ XINT	*chan;			/* file number (output) */
 	    /* Unix domain socket connection.
 	     */
 	    ip = osfn + 5;
-	    if (!getstr (&ip, np->path1, SZ_NAME))
+	    if (!getstr (&ip, np->path1, SZ_NAME, ':'))
 		goto err;
 	    np->domain = UNIX;
+
+	} else if (strncmp (osfn, "sock:", 5) == 0) {
+	    /* Open (accept) a client connection on an existing, open
+	     * server socket.
+	     */
+	    char chan_str[SZ_NAME];
+	    int channel;
+
+	    /* Get the channel of the server socket. */
+	    ip = osfn + 5;
+	    if (getstr (&ip, chan_str, SZ_NAME, ':') <= 0)
+		goto err;
+	    if (isdigit (chan_str[0]))
+		channel = atoi (chan_str);
+	    else
+		goto err;
+
+	    /* Get the server portal descriptor. */
+	    s_np = get_desc(channel);
+	    if (!(s_np->flags & F_SERVER))
+		goto err;
+
+	    np->domain = SOCK;
 
 	} else if (strncmp (osfn, "fifo:", 5) == 0) {
 	    /* FIFO (named pipe) connection.
@@ -202,15 +244,15 @@ XINT	*chan;			/* file number (output) */
 	    ip = osfn + 5;
 	    if (*mode == NEW_FILE) {
 		/* Server. */
-		if (!getstr (&ip, np->path2, SZ_NAME))
+		if (!getstr (&ip, np->path2, SZ_NAME, ':'))
 		    goto err;
-		if (!getstr (&ip, np->path1, SZ_NAME))
+		if (!getstr (&ip, np->path1, SZ_NAME, ':'))
 		    goto err;
 	    } else {
 		/* Client. */
-		if (!getstr (&ip, np->path1, SZ_NAME))
+		if (!getstr (&ip, np->path1, SZ_NAME, ':'))
 		    goto err;
-		if (!getstr (&ip, np->path2, SZ_NAME))
+		if (!getstr (&ip, np->path2, SZ_NAME, ':'))
 		    goto err;
 	    }
 	    np->domain = FIFO;
@@ -220,7 +262,7 @@ XINT	*chan;			/* file number (output) */
 
 	/* Process any optional protocol flags.
 	 */
-	while (getstr (&ip, flag, SZ_NAME) > 0) {
+	while (getstr (&ip, flag, SZ_NAME, ':') > 0) {
 	    /* Get content type (text or binary).  If the stream will be used
 	     * only for byte-packed character data the content type can be
 	     * specified as "text" and data will be automatically packed and
@@ -230,6 +272,11 @@ XINT	*chan;			/* file number (output) */
 		np->flags |= F_TEXT;
 	    if (strcmp (flag, "binary") == 0)
 		np->flags &= ~F_TEXT;
+
+	    /* Check for nonblocking i/o or connections. */
+	    if (strcmp (flag, "nonblock") == 0)
+		np->flags |= F_NONBLOCK;
+
 	}
 
 	/* Open the network connection.
@@ -365,16 +412,23 @@ XINT	*chan;			/* file number (output) */
 		    goto err;
 		}
 
-		/* Wait for client to connect. */
+		/* Enable queuing of client connections. */
 		if (listen (s, MAXCONN) < 0) {
 		    close (s);
 		    goto err;
 		}
-		if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
-		    close (s);
-		    goto err;
+
+		/* If in blocking mode wait for a client connection, otherwise
+		 * return the server socket on the channel.
+		 */
+		if (!(np->flags & F_NONBLOCK)) {
+		    if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
+			close (s);
+			goto err;
+		    } else
+			close (s);
 		} else
-		    close (s);
+		    fd = s;
 
 		np->datain = fd;
 		np->dataout = fd;
@@ -392,7 +446,8 @@ XINT	*chan;			/* file number (output) */
 		bzero ((char *)&sockaddr, sizeof(sockaddr));
 		sockaddr.sun_family = AF_UNIX;
 		strncpy (sockaddr.sun_path,np->path1,sizeof(sockaddr.sun_path));
-		addrlen = sizeof(sockaddr.sun_family) + strlen(np->path1);
+		addrlen = sizeof(sockaddr) - sizeof(sockaddr.sun_path)
+		    + strlen(np->path1);
 
 		unlink (np->path1);
 		if (bind (s, (struct sockaddr *)&sockaddr, addrlen) < 0) {
@@ -400,20 +455,37 @@ XINT	*chan;			/* file number (output) */
 		    goto err;
 		}
 
-		/* Wait for client to connect. */
+		/* Enable queuing of client connections. */
 		if (listen (s, MAXCONN) < 0) {
 		    close (s);
 		    goto err;
 		}
-		if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
-		    close (s);
-		    goto err;
+
+		/* If in blocking mode wait for a client connection, otherwise
+		 * return the server socket on the channel.
+		 */
+		if (!(np->flags & F_NONBLOCK)) {
+		    if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
+			close (s);
+			goto err;
+		    } else
+			close (s);
 		} else
-		    close (s);
+		    fd = s;
 
 		np->datain = fd;
 		np->dataout = fd;
 		np->flags |= F_DEL1;
+
+	    } else if (np->domain == SOCK) {
+		/* Open (accept) a client connection on a server socket. */
+		int s = s_np->channel;
+
+		if ((fd = accept (s, (struct sockaddr *)0, (int *)0)) < 0)
+		    goto err;
+
+		np->datain = fd;
+		np->dataout = fd;
 
 	    } else if (np->domain == FIFO) {
 		/* Server side FIFO connection. */
@@ -499,6 +571,7 @@ err:	    free (np);
 	    zfd[fd].flags  = 0;
 	    zfd[fd].filesize = 0;
 	    set_desc(fd,np);
+	    np->channel = fd;
 	}
 }
 
@@ -581,7 +654,7 @@ XLONG	*offset;		/* 1-indexed file offset to read at */
 	    op[n] = XEOS;
 	    for (ip = (char *)buf;  --n >= 0;  )
 		op[n] = ip[n];
-	    nbytes *= 2;
+	    nbytes *= sizeof(XCHAR);
 	}
 
 	kfp->nbytes = nbytes;
@@ -615,14 +688,19 @@ XLONG	*offset;		/* 1-indexed file offset */
 		register XCHAR *ipp = (XCHAR *)ip;
 		register char *op = (char *)obuf;
 		register int nbytes = n;
+
 		while (--nbytes >= 0)
 		    *op++ = *ipp++;
 		text = obuf;
-	    } else
-		text = ip;
+		if ((n = write (np->dataout, text, n / sizeof(XCHAR))) < 0)
+		    break;
+		n *= sizeof(XCHAR);
 
-	    if ((n = write (np->dataout, text, n)) < 0)
-		break;
+	    } else {
+		text = ip;
+		if ((n = write (np->dataout, text, n)) < 0)
+		    break;
+	    }
 	}
 
 	kfp->nbytes = nwritten;
@@ -686,32 +764,33 @@ XLONG	*lvalue;
  * ----------------------------
  */
 
-/* GETSTR -- Internal routine to extract a colon delimited string from a
- * network filename.
+/* GETSTR -- Internal routine to extract a metacharacter delimited substring
+ * from a formatted string.  The metacharacter to be taken as the delimiter
+ * is passed as an argument.  Any embedded whitespace between the tokens is
+ * stripped.  The number of characters in the output token is returned as 
+ * the function value, or zero if EOS or the delimiter is reached.
  */
 static int
-getstr (ipp, obuf, maxch)
+getstr (ipp, obuf, maxch, delim)
 char **ipp;
 char *obuf;
-int maxch;
+int maxch, delim;
 {
-	register char *ip = *ipp, *op = obuf;
+	register char *op, *ip = *ipp;
 	register char *otop = obuf + maxch;
-	char *start;
 
-	while (isspace(*ip))
+	while (*ip && isspace(*ip))
 	    ip++;
-	for (start=ip;  *ip;  ip++) {
-	    if (*ip == ':') {
+	for (op=obuf;  *ip;  ip++) {
+	    if (*ip == delim) {
 		ip++;
 		break;
-	    } else if (op && op < otop)
+	    } else if (op < otop && !isspace(*ip))
 		*op++ = *ip;
 	}
 
-	if (op)
-	    *op = '\0';
+	*op = '\0';
 	*ipp = ip;
 
-	return (ip - start);
+	return (op - obuf);
 }

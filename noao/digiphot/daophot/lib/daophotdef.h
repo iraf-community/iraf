@@ -13,88 +13,110 @@ define	FCTN_AUTO	7
 
 define	FCTN_NFTYPES	6
 
+# WCS types
+
+define	WCS_LOGICAL	1
+define	WCS_TV		2
+define	WCS_PHYSICAL	3
+define	WCS_WORLD	4
+
+define	WCSINSTR	"|logical|tv|physical|world|"
+define	WCSOUTSTR	"|logical|tv|physical|"
+define	WCSPSFSTR	"|logical|tv|physical|"
+
 # DAOPHOT parameters (# 1 - 100)
+
+# wcs parameters
+
+define	MW		1	# mwcs pointer
+define	WCSIN		2	# input wcs type
+define	WCSOUT		3	# output wcs type
+define	WCSPSF		4	# psf wcs type
+define	CTIN		5	# input transform
+define	CTOUT		6	# output transform
+define	CTPSF		7	# psf transform
 
 # data dependent parameters
 
-define	SFWHMPSF	1	# full-width at half-max of the psf (scale)
-define	FWHMPSF		2	# full-width at half-max of the psf (pixels)
-define	MAXGDATA	3	# maximum good data value (ADU)
-define	MINGDATA	4	# minimum good data value (ADU)
-define	PHOTADU		5 	# gain (photon / ADU)
-define	READNOISE	6	# readout noise
-define	SCALE		7 	# scale of the imge
+define	SFWHMPSF	8	# full-width at half-max of the psf (scale)
+define	FWHMPSF		9	# full-width at half-max of the psf (pixels)
+define	MAXGDATA	10	# maximum good data value (ADU)
+define	MINGDATA	11	# minimum good data value (ADU)
+define	PHOTADU		12 	# gain (e- / ADU)
+define	READNOISE	13	# readout noise (e-)
+define	SCALE		14 	# scale of the imge
 
 # keyword parameters
 
-define	CCDGAIN		8	# gain image header keyword
-define	CCDREAD		9	# readnoise image header keyword
-define	EXPTIME		10	# exposure time image header keyword
-define	FILTER		11	# filter image header keyword
-define	OBSTIME		12	# observing time image header keyword
-define	AIRMASS		13	# airmass image header keyword
+define	CCDGAIN		15	# gain image header keyword
+define	CCDREAD		16	# readnoise image header keyword
+define	EXPTIME		17	# exposure time image header keyword
+define	FILTER		18	# filter image header keyword
+define	OBSTIME		19	# observing time image header keyword
+define	AIRMASS		20	# airmass image header keyword
 
 # observing parameters
 
-define	XAIRMASS	14	# value of the airmass
-define	IFILTER		15 	# filter id
-define	ITIME		16	# integration time
-define	OTIME		17 	# time of observation
+define	XAIRMASS	21	# value of the airmass
+define	IFILTER		22 	# filter id
+define	ITIME		23	# integration time
+define	OTIME		24 	# time of observation
 
 # psf fitting parameters 
 
-define	FUNCTION	18	# psf function analytic function
-define	VARORDER	19	# order of psf variability (0, 1, or 2)
-define	FEXPAND		20	# fraction pixel interpolation (yes or no)
-define	SATURATED	21	# use saturated psf stars ?
-define	NCLEAN		22	# the number of psf clean passes
-define	FUNCLIST	23	# user function list
-define	RPSFRAD		24	# requested psf radius (scale)
-define	SPSFRAD		25	# psf radius (scale)
-define	PSFRAD		26	# psf radius (pixels)
-define	SMATCHRAD	27	# matching radius (scale)
-define	MATCHRAD	28	# matching radius (pixels)
+define	FUNCTION	25	# psf function analytic function
+define	VARORDER	26	# order of psf variability (0, 1, or 2)
+define	FEXPAND		27	# fraction pixel interpolation (yes or no)
+define	SATURATED	28	# use saturated psf stars ?
+define	NCLEAN		29	# the number of psf clean passes
+define	FUNCLIST	30	# user function list
+define	RPSFRAD		31	# requested psf radius (scale)
+define	SPSFRAD		32	# psf radius (scale)
+define	PSFRAD		33	# psf radius (pixels)
+define	SMATCHRAD	34	# matching radius (scale)
+define	MATCHRAD	35	# matching radius (pixels)
 
 # star fitting parameters 
 
-define	SFITRAD		29	# fitting radius (scale)
-define	FITRAD		30	# fitting radius (pixels)
-define	SANNULUS	31	# inner sky radius (scale)
-define	ANNULUS		32	# inner sky radius (pixels)
-define	SDANNULUS	33	# width of sky annulus (scale)
-define	DANNULUS	34	# width of sky annulus (pixels)
-define	SMERGERAD	35	# merging radius (scale)
-define	MERGERAD	36	# merging radius (pixels)
+define	SFITRAD		36	# fitting radius (scale)
+define	FITRAD		37	# fitting radius (pixels)
+define	SANNULUS	38	# inner sky radius (scale)
+define	ANNULUS		39	# inner sky radius (pixels)
+define	SDANNULUS	40	# width of sky annulus (scale)
+define	DANNULUS	41	# width of sky annulus (pixels)
+define	SMERGERAD	42	# merging radius (scale)
+define	MERGERAD	43	# merging radius (pixels)
 
-define	CRITSNRATIO	37	# critical S/N overlap
-define	MAXNSTAR	38	# maximum number of stars to fit
-define	MAXGROUP	39	# maximum number of stars in group
-define	MAXITER		40	# maximum number of iterations
-define	RECENTER	41	# recenter ?
-define	FITSKY		42	# refit the group sky ?
-define	GROUPSKY	43	# use group or individual sky values
-define	FLATERR		44	# the flat field error
-define	PROFERR		45	# the profile or interpolation error 
-define	CLIPRANGE	46	# clipping range
-define	CLIPEXP		47	# clipping exponent
+define	CRITSNRATIO	44	# critical S/N overlap
+define	MAXNSTAR	45	# maximum number of stars to fit
+define	MAXGROUP	46	# maximum number of stars in group
+define	MAXITER		47	# maximum number of iterations
+define	RECENTER	48	# recenter ?
+define	FITSKY		49	# refit the group sky ?
+define	GROUPSKY	50	# use group or individual sky values
+define	FLATERR		51	# the flat field error
+define	PROFERR		52	# the profile or interpolation error 
+define	CLIPRANGE	53	# clipping range
+define	CLIPEXP		54	# clipping exponent
 
 
 # file/image name and input/output parameters
 
-define	TEXT		48	# text file
-define	VERBOSE		49	# verbose mode
-define	INIMAGE		50	# input image name
-define	INPHOTFILE	51	# input photometry file
-define	PSFIMAGE	52	# psf image name
-define	COORDS		53	# input coordinate file
-define	OUTPHOTFILE	54	# output photometry file
-define	OUTIMAGE	55	# output image name
-define	OUTREJFILE	56	# output rejected photometry file
+define	TEXT		55	# text file
+define	VERBOSE		56	# verbose mode
+define	INIMAGE		57	# input image name
+define	INPHOTFILE	58	# input photometry file
+define	PSFIMAGE	59	# psf image name
+define	COORDS		60	# input coordinate file
+define	OUTPHOTFILE	61	# output photometry file
+define	OUTIMAGE	62	# output image name
+define	OUTREJFILE	63	# output rejected photometry file
 
+define	MEMFUDGE	1.05
 
 # DAOPHOT structure definitions
 
-define	LEN_DPSTRUCT (60 + 17 * SZ_FNAME + 17)
+define	LEN_DPSTRUCT (70 + 17 * SZ_FNAME + 17)
 
 # sub-structure pointers
 
@@ -109,79 +131,91 @@ define	DP_PSF		Memi[$1+7]	# pointer to psf structure (used)
 define	DP_PSFFIT	Memi[$1+8]	# pointer to psffit structure (used)
 define	DP_SUBSTAR	Memi[$1+9]	# pointer to substar structure
 
+# the wcs parameters
+
+define  DP_WCSIN        Memi[$1+10]     # the input wcs
+define  DP_WCSOUT       Memi[$1+11]     # the output wcs
+define  DP_WCSPSF       Memi[$1+12]     # the psf wcs
+define	DP_MW		Memi[$1+13]	# pointer to mwcs structure
+define  DP_CTIN         Memi[$1+14]     # the input transformation pointer
+define  DP_CTOUT        Memi[$1+15]     # the output transformation pointer
+define  DP_CTPSF        Memi[$1+16]     # the psf transformation pointer
+
 # parameters
 
-define	DP_VARORDER	Memi[$1+10]	# order of psf variability
-define	DP_FEXPAND	Memi[$1+11]	# expand the analytic function ?
-define	DP_SATURATED	Memi[$1+12]	# use saturated psf stars ?
-define	DP_NCLEAN	Memi[$1+13]	# number of psf cleaning passes
-define	DP_MAXNSTAR	Memi[$1+14]	# maximum number of stars
-define	DP_MAXGROUP	Memi[$1+15]	# maximum group size
-define	DP_MAXITER	Memi[$1+16]	# maximum number of iterations
-define	DP_RECENTER	Memi[$1+17]	# recenter ?
-define	DP_FITSKY	Memi[$1+18]	# fit the sky ?
-define	DP_GROUPSKY	Memi[$1+19]	# use the group sky value ?
-define	DP_CLIPEXP	Memi[$1+20]	# clip exponent
-define	DP_TEXT		Memi[$1+21]	# text file or table input/output ?
-define	DP_VERBOSE	Memi[$1+22]	# verbose mode ?
+define	DP_VARORDER	Memi[$1+17]	# order of psf variability
+define	DP_FEXPAND	Memi[$1+18]	# expand the analytic function ?
+define	DP_SATURATED	Memi[$1+19]	# use saturated psf stars ?
+define	DP_NCLEAN	Memi[$1+20]	# number of psf cleaning passes
+define	DP_MAXNSTAR	Memi[$1+21]	# maximum number of stars
+define	DP_MAXGROUP	Memi[$1+22]	# maximum group size
+define	DP_MAXITER	Memi[$1+23]	# maximum number of iterations
+define	DP_RECENTER	Memi[$1+24]	# recenter ?
+define	DP_FITSKY	Memi[$1+25]	# fit the sky ?
+define	DP_GROUPSKY	Memi[$1+26]	# use the group sky value ?
+define	DP_CLIPEXP	Memi[$1+27]	# clip exponent
+define	DP_TEXT		Memi[$1+28]	# text file or table input/output ?
+define	DP_VERBOSE	Memi[$1+29]	# verbose mode ?
 
-define	DP_SCALE	Memr[$1+23]	# image scale in units/pixel
-define	DP_SFWHMPSF	Memr[$1+24]	# fwhm of the psf (scale)
-define	DP_FWHMPSF	Memr[$1+25]	# fwhm of the psf (pixels)
-define	DP_MAXGDATA	Memr[$1+26]	# maximum good data value (ADU)
-define	DP_MINGDATA	Memr[$1+27]	# minimum good data value (ADU)
-define 	DP_PHOTADU	Memr[$1+28]	# gain in electrons/ADU
-define	DP_READNOISE 	Memr[$1+29]	# readout noise (electrons)
-define	DP_XAIRMASS	Memr[$1+30]	# value of the airmass
-define	DP_ITIME	Memr[$1+31]	# value of the exposure time
-define	DP_SMATCHRAD	Memr[$1+32]	# matching radius (scale)
-define	DP_MATCHRAD	Memr[$1+33]	# matching radius (pixels)
-define	DP_RPSFRAD	Memr[$1+34]	# requested psf radius (scale)
-define	DP_SPSFRAD	Memr[$1+35]	# actual psf radius (scale)
-define	DP_PSFRAD	Memr[$1+36]	# actual psf radius (pixels)
-define	DP_SFITRAD	Memr[$1+37]	# fitting radius (scale)
-define	DP_FITRAD	Memr[$1+38]	# fitting radius (pixels)
-define	DP_SANNULUS	Memr[$1+39]	# inner sky radius (scale)
-define	DP_ANNULUS	Memr[$1+40]	# inner sky radius (pixels)
-define	DP_SDANNULUS	Memr[$1+41]	# width of sky annulus (scale)
-define	DP_DANNULUS	Memr[$1+42]	# width of sky annulus (pixels)
-define	DP_CRITSNRATIO	Memr[$1+43]	# critical S/N overlap 
-define	DP_FLATERR	Memr[$1+44]	# percent flat field error
-define	DP_PROFERR	Memr[$1+45]	# percent profile error
-define	DP_CLIPRANGE	Memr[$1+46]	# clipping range
-define	DP_SMERGERAD	Memr[$1+47]	# merging radius (scale)
-define	DP_MERGERAD	Memr[$1+48]	# merging radius (pixels)
+define	DP_SCALE	Memr[$1+30]	# image scale in units/pixel
+define	DP_SFWHMPSF	Memr[$1+31]	# fwhm of the psf (scale)
+define	DP_FWHMPSF	Memr[$1+32]	# fwhm of the psf (pixels)
+define	DP_MAXGDATA	Memr[$1+33]	# maximum good data value (ADU)
+define	DP_MINGDATA	Memr[$1+34]	# minimum good data value (ADU)
+define 	DP_PHOTADU	Memr[$1+35]	# gain in electrons/ADU
+define	DP_READNOISE 	Memr[$1+36]	# readout noise (electrons)
+define	DP_XAIRMASS	Memr[$1+37]	# value of the airmass
+define	DP_ITIME	Memr[$1+38]	# value of the exposure time
+define	DP_SMATCHRAD	Memr[$1+39]	# matching radius (scale)
+define	DP_MATCHRAD	Memr[$1+40]	# matching radius (pixels)
+define	DP_RPSFRAD	Memr[$1+41]	# requested psf radius (scale)
+define	DP_SPSFRAD	Memr[$1+42]	# actual psf radius (scale)
+define	DP_PSFRAD	Memr[$1+43]	# actual psf radius (pixels)
+define	DP_SFITRAD	Memr[$1+44]	# fitting radius (scale)
+define	DP_FITRAD	Memr[$1+45]	# fitting radius (pixels)
+define	DP_SANNULUS	Memr[$1+46]	# inner sky radius (scale)
+define	DP_ANNULUS	Memr[$1+47]	# inner sky radius (pixels)
+define	DP_SDANNULUS	Memr[$1+48]	# width of sky annulus (scale)
+define	DP_DANNULUS	Memr[$1+49]	# width of sky annulus (pixels)
+define	DP_CRITSNRATIO	Memr[$1+50]	# critical S/N overlap 
+define	DP_FLATERR	Memr[$1+51]	# percent flat field error
+define	DP_PROFERR	Memr[$1+52]	# percent profile error
+define	DP_CLIPRANGE	Memr[$1+53]	# clipping range
+define	DP_SMERGERAD	Memr[$1+54]	# merging radius (scale)
+define	DP_MERGERAD	Memr[$1+55]	# merging radius (pixels)
 
 # temporary variables, not yet used
 
-#define	DP_FITRADSQ	Memr[$1+47]	# fit radius squared (pixels)
-#define	DP_PSFRADSQ	Memr[$1+48]	# psf radius squared (pixels)
-#define	DP_RNOISESQ	Memr[$1+49]	# read noise squared (ADU)
-#define	DP_PERR		Memr[$1+51]	# percentage error
-#define	DP_PKERR	Memr[$1+52]	# peak error
-#define	DP_TMAXGDATA	Memr[$1+53]	# true data max
-#define	DP_TMINGDATA	Memr[$1+54]	# true data min
+#define	DP_FITRADSQ	Memr[$1+56]	# fit radius squared (pixels)
+#define	DP_PSFRADSQ	Memr[$1+57]	# psf radius squared (pixels)
+#define	DP_RNOISESQ	Memr[$1+58]	# read noise squared (ADU)
+#define	DP_PERR		Memr[$1+59]	# percentage error
+#define	DP_PKERR	Memr[$1+60]	# peak error
+#define	DP_TMAXGDATA	Memr[$1+61]	# true data max
+#define	DP_TMINGDATA	Memr[$1+62]	# true data min
 
 # file / image names
 
-define	DP_INIMAGE	Memc[P2C($1+56)]                # input image name
-define	DP_PSFIMAGE	Memc[P2C($1+56+SZ_FNAME+1)]     # psf image name
-define	DP_INPHOTFILE	Memc[P2C($1+56+2*SZ_FNAME+2)]   # input photometry file
-define	DP_COORDS	Memc[P2C($1+56+3*SZ_FNAME+3)]   # input coordinate file
-define	DP_OUTIMAGE	Memc[P2C($1+56+4*SZ_FNAME+4)]   # output image name
-define	DP_OUTPHOTFILE	Memc[P2C($1+56+5*SZ_FNAME+5)]   # output photometry file
-define	DP_OUTREJFILE	Memc[P2C($1+56+6*SZ_FNAME+6)]   # output photometry file
+define	DP_INIMAGE	Memc[P2C($1+64)]                # input image name
+define	DP_PSFIMAGE	Memc[P2C($1+64+SZ_FNAME+1)]     # psf image name
+define	DP_INPHOTFILE	Memc[P2C($1+64+2*SZ_FNAME+2)]   # input photometry file
+define	DP_COORDS	Memc[P2C($1+64+3*SZ_FNAME+3)]   # input coordinate file
+define	DP_OUTIMAGE	Memc[P2C($1+64+4*SZ_FNAME+4)]   # output image name
+define	DP_OUTPHOTFILE	Memc[P2C($1+64+5*SZ_FNAME+5)]   # output photometry file
+define	DP_OUTREJFILE	Memc[P2C($1+64+6*SZ_FNAME+6)]   # output photometry file
 
-define	DP_IFILTER	Memc[P2C($1+56+7*SZ_FNAME+7)] # filter id
-define	DP_OTIME	Memc[P2C($1+56+8*SZ_FNAME+8)] # time of observation
-define	DP_CCDGAIN	Memc[P2C($1+56+9*SZ_FNAME+9)] # gain keyword
-define	DP_CCDREAD	Memc[P2C($1+56+10*SZ_FNAME+10)] # readnoise keyword
-define	DP_EXPTIME	Memc[P2C($1+56+11*SZ_FNAME+11)] # exposure keyword
-define	DP_FILTER	Memc[P2C($1+56+12*SZ_FNAME+12)] # filter keyword
-define	DP_OBSTIME	Memc[P2C($1+56+13*SZ_FNAME+13)] # obstime keyword
-define	DP_AIRMASS	Memc[P2C($1+56+14*SZ_FNAME+14)] # airmass keyword
-define	DP_FUNCTION	Memc[P2C($1+56+15*SZ_FNAME+15)]	# analytic psf function
-define	DP_FUNCLIST	Memc[P2C($1+56+16*SZ_FNAME+16)]	# psf function list
+# keyword / parameter names
+
+define	DP_IFILTER	Memc[P2C($1+64+7*SZ_FNAME+7)] # filter id
+define	DP_OTIME	Memc[P2C($1+64+8*SZ_FNAME+8)] # time of observation
+define	DP_CCDGAIN	Memc[P2C($1+64+9*SZ_FNAME+9)] # gain keyword
+define	DP_CCDREAD	Memc[P2C($1+64+10*SZ_FNAME+10)] # readnoise keyword
+define	DP_EXPTIME	Memc[P2C($1+64+11*SZ_FNAME+11)] # exposure keyword
+define	DP_FILTER	Memc[P2C($1+64+12*SZ_FNAME+12)] # filter keyword
+define	DP_OBSTIME	Memc[P2C($1+64+13*SZ_FNAME+13)] # obstime keyword
+define	DP_AIRMASS	Memc[P2C($1+64+14*SZ_FNAME+14)] # airmass keyword
+define	DP_FUNCTION	Memc[P2C($1+64+15*SZ_FNAME+15)]	# analytic psf function
+define	DP_FUNCLIST	Memc[P2C($1+64+16*SZ_FNAME+16)]	# psf function list
 
 # PSF Fit Parameters
 

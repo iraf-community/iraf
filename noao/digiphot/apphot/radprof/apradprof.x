@@ -1,5 +1,6 @@
 include <ctype.h>
 include <gset.h>
+include <imhdr.h>
 include "../lib/apphot.h"
 include "../lib/display.h"
 include "../lib/center.h"
@@ -11,7 +12,8 @@ define	HELPFILE	"apphot$radprof/radprof.key"
 # AP_RADPROF -- Procedure to determine radial profiles for a list of objects
 # in a list of images.
 
-int procedure ap_radprof (ap, im, cl, gd, mgd, id, out, stid, interactive)
+int procedure ap_radprof (ap, im, cl, gd, mgd, id, out, stid, interactive,
+	cache)
 
 pointer ap			# pointer to apphot structure
 pointer	im			# pointer to IRAF image
@@ -22,18 +24,21 @@ pointer	id			# pointer to image display stream
 int	out			# output file descriptor
 int	stid			# output file sequence number
 int	interactive		# interactive mode
+int	cache			# cache the input image pixels
 
-int	wcs, key, oid, ltid, newlist, colonkey
-int	newimage, newskybuf, newsky, newcenterbuf, newcenter, newbuf, newfit
-int	ip, prev_num, req_num, cier, sier, pier, rier
-pointer	sp, cmd
 real	wx, wy, xlist, ylist
+pointer	sp, cmd
+int	wcs, key, oid, ltid, newlist, colonkey, req_size, buf_size, old_size
+int	newimage, newskybuf, newsky, newcenterbuf, newcenter, newbuf, newfit
+int	ip, prev_num, req_num, cier, sier, pier, rier, memstat
 
-bool	fp_equalr()
+real	apstatr()
 int	clgcur(), apfitsky(), aprefitsky(), apfitcenter(), aprefitcenter()
 int	apstati(), apgscur(), ap_frprof(), ctoi(), apgqverify(), apgtverify()
-int	apnew(), ap_avsky()
-real	apstatr()
+int	apnew(), ap_avsky(), sizeof(), ap_memstat()
+bool	fp_equalr()
+
+define  endswitch_ 99
 
 begin
 	# Initialize.
@@ -60,6 +65,7 @@ begin
 	    EOF) {
 
 	    # Store the cursor coords.
+	    call ap_vtol (im, wx, wy, wx, wy, 1)
 	    call apsetr (ap, CWX, wx)
 	    call apsetr (ap, CWY, wy)
 
@@ -103,57 +109,73 @@ begin
 		    call seek (cl, BOF)
 		    ltid = 0
 		} else if (interactive == YES)
-		    call printf ("No coordinate list\7\n")
+		    call printf ("No coordinate list\n")
 
 	    # Move, measure next object in the coordinate list.
 	    case 'm', 'n':
-		if (cl != NULL) {
-		    prev_num = ltid
-		    req_num = ltid + 1
-		    if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
-		        ltid) != EOF) {
 
-		    	newlist = YES
-			if (key == 'm') {
-			    newcenterbuf = YES; newcenter = YES
-			    newskybuf = YES; newsky = YES
-			    newbuf = YES; newfit = YES
-			} else {
-		    	    cier = apfitcenter (ap, im, xlist, ylist)
-		    	    sier = apfitsky (ap, im, apstatr (ap, XCENTER),
-			        apstatr (ap, YCENTER), NULL, gd)
-		    	    rier = ap_frprof (ap, im, apstatr (ap,
-				XCENTER), apstatr (ap, YCENTER), pier)
-			    call aprmark (ap, id, apstati (ap, MKCENTER),
-			        apstati (ap, MKSKY), apstati (ap, MKAPERT))
-		    	    if (id != NULL) {
-				if (id == gd)
-			    	    call gflush (id)
-				else
-			    	    call gframe (id)
-		    	    }
-			    call ap_rpplot (ap, stid, gd, apstati (ap,
-			        RADPLOTS))
-			    if (interactive == YES)
-		    	        call ap_qprprof (ap, cier, sier, pier, rier)
+		# No coordinate file.
+		if (cl == NULL) {
+                    if (interactive == YES)
+                        call printf ("No coordinate list\n")
+                    goto endswitch_
+		}
 
-		    	    if (stid == 1)
-				call ap_param (ap, out, "radprof")
-		            call ap_prprof (ap, out, stid, ltid, cier, sier,
-			        pier, rier)
-			    call ap_rpplot (ap, stid, mgd, YES)
-		    	    stid = stid + 1
+		# Need to rewind the coordinate file.
+		prev_num = ltid
+		req_num = ltid + 1
+		if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
+		    ltid) == EOF) {
+                    if (interactive == YES)
+                        call printf (
+                            "End of coordinate list, use r key to rewind\n")
+                    goto endswitch_
+		}
 
-		    	    newcenterbuf = NO; newcenter = NO
-		    	    newskybuf = NO; newsky = NO
-		    	    newbuf = NO; newfit = NO
-			}
+		# Convert coordinates if necessary.
+                switch (apstati (ap, WCSIN)) {
+                case WCS_PHYSICAL, WCS_WORLD:
+                    call ap_itol (ap,  xlist, ylist, xlist, ylist, 1)
+                case WCS_TV:
+                    call ap_vtol (im, xlist, ylist, xlist, ylist, 1)
+                default:
+                    ;
+                }
 
-		    } else
-			call printf (
-			    "End of coordinate list, use r key to rewind\7\n")
-		} else if (interactive == YES)
-		    call printf ("No coordinate list\7\n")
+		# Move to the next object.
+		newlist = YES
+		if (key == 'm') {
+		    newcenterbuf = YES; newcenter = YES
+		    newskybuf = YES; newsky = YES
+		    newbuf = YES; newfit = YES
+                    goto endswitch_
+		}
+
+		# Measure next object.
+		cier = apfitcenter (ap, im, xlist, ylist)
+		sier = apfitsky (ap, im, apstatr (ap, XCENTER), apstatr (ap,
+		    YCENTER), NULL, gd)
+		rier = ap_frprof (ap, im, apstatr (ap, XCENTER), apstatr (ap,
+		    YCENTER), pier)
+		call aprmark (ap, id, apstati (ap, MKCENTER), apstati (ap,
+		    MKSKY), apstati (ap, MKAPERT))
+	        if (id != NULL) {
+		    if (id == gd)
+		    	call gflush (id)
+		    else
+		        call gframe (id)
+		}
+	        call ap_rpplot (ap, stid, gd, apstati (ap, RADPLOTS))
+		if (interactive == YES)
+		    call ap_qprprof (ap, cier, sier, pier, rier)
+		if (stid == 1)
+		    call ap_param (ap, out, "radprof")
+		call ap_prprof (ap, out, stid, ltid, cier, sier, pier, rier)
+		call ap_rpplot (ap, stid, mgd, YES)
+		stid = stid + 1
+		newcenterbuf = NO; newcenter = NO
+		newskybuf = NO; newsky = NO
+		newbuf = NO; newfit = NO
 
 	    # Process the remainder of the list.
 	    case 'l':
@@ -170,7 +192,7 @@ begin
 			    call gframe (id)
 		    }
 		} else if (interactive == YES)
-		    call printf ("No coordinate list\7\n")
+		    call printf ("No coordinate list\n")
 
 	    # Process radprof colon commands.
 	    case ':':
@@ -185,59 +207,76 @@ begin
 		        call ap_rpcolon (ap, im, cl, out, stid, ltid, Memc[cmd],
 			    newimage, newcenterbuf, newcenter, newskybuf,
 			    newsky, newbuf, newfit)
+			goto endswitch_
+		    }
 
 		    # Process the next object.
-		    } else if (cl != NULL) {
-			ip = ip + 1
-			prev_num = ltid
-			if (ctoi (Memc[cmd], ip, req_num) <= 0)
-			    req_num = ltid + 1
-		        if (apgscur (cl, id, xlist, ylist, prev_num,
-			    req_num, ltid) != EOF) {
+		    if (cl == NULL) {
+                        if (interactive == YES)
+                            call printf ("No coordinate list\n")
+                        goto endswitch_
+		    }
 
-		    	    newlist = YES
-			    if (colonkey == 'm') {
-			        newcenterbuf = YES; newcenter = YES
-			        newskybuf = YES; newsky = YES
-			        newbuf = YES; newfit = YES
-			    } else {
-		    	        cier = apfitcenter (ap, im, xlist, ylist)
-		    	        sier = apfitsky (ap, im, apstatr (ap, XCENTER),
-			            apstatr (ap, YCENTER), NULL, gd)
-		    	        rier = ap_frprof (ap, im, apstatr (ap,
-				    XCENTER), apstatr (ap, YCENTER), pier)
+		    # Get next object from the list.
+		    ip = ip + 1
+		    prev_num = ltid
+		    if (ctoi (Memc[cmd], ip, req_num) <= 0)
+		        req_num = ltid + 1
 
-			        call aprmark (ap, id, apstati (ap, MKCENTER),
-				    apstati (ap, MKSKY), apstati (ap, MKAPERT))
-		    	        if (id != NULL) {
-				    if (id == gd)
-			    	        call gflush (id)
-				    else
-			    	        call gframe (id)
-		    	        }
-			        call ap_rpplot (ap, stid, gd, apstati (ap,
-				    RADPLOTS))
-			        if (interactive == YES)
-		    	            call ap_qprprof (ap, cier, sier, pier, rier)
+		    # Fetch next object from the list.
+		    if (apgscur (cl, id, xlist, ylist, prev_num, req_num,
+			ltid) == EOF) {
+                        if (interactive == YES)
+                            call printf (
+                            "End of coordinate list, use r key to rewind\n")
+                        goto endswitch_
 
-		    	        if (stid == 1)
-				    call ap_param (ap, out, "radprof")
-		                call ap_prprof (ap, out, stid, ltid, cier,
-				    sier, pier, rier)
-			        call ap_rpplot (ap, stid, mgd, YES)
-		    	        stid = stid + 1
+		    }
 
-		    	        newcenterbuf = NO; newcenter = NO
-		    	        newskybuf = NO; newsky = NO
-		    	        newbuf = NO; newfit = NO
-			    }
+                    # Convert the coordinates.
+                    switch (apstati (ap, WCSIN)) {
+                    case WCS_PHYSICAL, WCS_WORLD:
+                        call ap_itol (ap,  xlist, ylist, xlist, ylist, 1)
+                    case WCS_TV:
+                        call ap_vtol (im, xlist, ylist, xlist, ylist, 1)
+                    default:
+                        ;
+                    }
 
-			} else
-			    call printf (
-			    "End of coordinate list, use r key to rewind\7\n")
+		    # Move to next object.
+		    newlist = YES
+		    if (colonkey == 'm') {
+		        newcenterbuf = YES; newcenter = YES
+		        newskybuf = YES; newsky = YES
+		        newbuf = YES; newfit = YES
+		    }
 
-		    } else if (interactive == YES)
-			call printf ("No coordinate list\7\n")
+		    # Measure the next object.
+		    cier = apfitcenter (ap, im, xlist, ylist)
+		    sier = apfitsky (ap, im, apstatr (ap, XCENTER),
+			apstatr (ap, YCENTER), NULL, gd)
+		    rier = ap_frprof (ap, im, apstatr (ap, XCENTER),
+			apstatr (ap, YCENTER), pier)
+		    call aprmark (ap, id, apstati (ap, MKCENTER), apstati (ap,
+			MKSKY), apstati (ap, MKAPERT))
+		    if (id != NULL) {
+		        if (id == gd)
+		    	    call gflush (id)
+			else
+			    call gframe (id)
+		    }
+		    call ap_rpplot (ap, stid, gd, apstati (ap, RADPLOTS))
+		    if (interactive == YES)
+		        call ap_qprprof (ap, cier, sier, pier, rier)
+
+		    if (stid == 1)
+		        call ap_param (ap, out, "radprof")
+		    call ap_prprof (ap, out, stid, ltid, cier, sier, pier, rier)
+		    call ap_rpplot (ap, stid, mgd, YES)
+		    stid = stid + 1
+		     newcenterbuf = NO; newcenter = NO
+		     newskybuf = NO; newsky = NO
+		     newbuf = NO; newfit = NO
 
 		default:
 		    call ap_rpcolon (ap, im, cl, out, stid, ltid, Memc[cmd],
@@ -246,11 +285,17 @@ begin
 		}
 
 		# Reestablish the image viewport and window.
-		if ((newimage == YES) && (id != NULL) && (id != gd)) {
-		    call apstats (ap, IMNAME, Memc[cmd], SZ_LINE)
-		    call ap_gswv (id, Memc[cmd], im, 4)
-		    newimage = NO
+		if (newimage == YES) {
+		    if ((id != NULL) && (id != gd))
+		        call ap_gswv (id, Memc[cmd], im, 4)
+                    req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
+                        sizeof (IM_PIXTYPE(im))
+                    memstat = ap_memstat (cache, req_size, old_size)
+                    if (memstat == YES)
+                        call ap_pcache (im, INDEFI, buf_size)
 		}
+
+		newimage = NO
 
 	    # Save the parameters.
 	    case 'w':
@@ -278,13 +323,16 @@ begin
 	    # Verify the critical radprof parameters.
 	    case 'v':
 		call ap_rconfirm (ap, out, stid)
+		newcenterbuf = YES; newcenter = YES
+		newskybuf = YES; newsky = YES
+		newbuf = YES; newfit = YES
 
 	     # Fit the center around the current cursor value.
 	     case 'c':
 		if (newcenterbuf == YES)
 		    cier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
-		    cier = aprefitcenter (ap, cier)
+		    cier = aprefitcenter (ap, im, cier)
 		call aprmark (ap, id, apstati (ap, MKCENTER), NO, NO)
 		if (id != NULL) {
 		    if (id == gd)
@@ -304,7 +352,7 @@ begin
 		    SYCUR)))
 		    sier = apfitsky (ap, im, wx, wy, NULL, gd)
 	        else if (newsky == YES)
-		    sier = aprefitsky (ap, gd)
+		    sier = aprefitsky (ap, im, gd)
 		call aprmark (ap, id, NO, apstati (ap, MKSKY), NO)
 		if (id != NULL) {
 		    if (id == gd)
@@ -333,7 +381,7 @@ begin
 		    sier = apfitsky (ap, im, apstatr (ap, XCENTER),
 		        apstatr (ap, YCENTER), NULL, gd)
 		else if (newsky == YES)
-		    sier = aprefitsky (ap, gd)
+		    sier = aprefitsky (ap, im, gd)
 		call aprmark (ap, id, NO, apstati (ap, MKSKY), NO)
 		if (id != NULL) {
 		    if (id == gd)
@@ -352,7 +400,7 @@ begin
 		if (newcenterbuf == YES)
 		    cier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
-		    cier = aprefitcenter (ap, cier)
+		    cier = aprefitcenter (ap, im, cier)
 		call aprmark (ap, id, apstati (ap, MKCENTER), NO,
 		    apstati (ap, MKAPERT))
 		if (id != NULL) {
@@ -391,14 +439,14 @@ begin
 		if (newcenterbuf == YES)
 		    cier = apfitcenter (ap, im, wx, wy)
 		else if (newcenter == YES)
-		    cier = aprefitcenter (ap, cier)
+		    cier = aprefitcenter (ap, im, cier)
 		if (newskybuf == YES || ! fp_equalr (apstatr (ap, XCENTER),
 		    apstatr (ap, SXCUR)) || ! fp_equalr (apstatr (ap, YCENTER),
 		    apstatr (ap, SYCUR)))
 		    sier = apfitsky (ap, im, apstatr (ap, XCENTER),
 		        apstatr (ap, YCENTER), NULL, gd)
 		else if (newsky == YES)
-		    sier = aprefitsky (ap, gd)
+		    sier = aprefitsky (ap, im, gd)
 
 		if (newfit == YES || newbuf == YES || ! fp_equalr (apstatr (ap,
 		    XCENTER), apstatr (ap, RPXCUR)) || ! fp_equalr (apstatr (ap,
@@ -436,9 +484,10 @@ begin
 
 	    default:
 		# do nothing
-		call printf ("Print unknown or ambiguous colon command\7\n")
+		call printf ("Print unknown or ambiguous colon command\n")
 	    }
 
+endswitch_
 	    # Prepare for the next object.
 	    key = ' '
 	    Memc[cmd] = EOS

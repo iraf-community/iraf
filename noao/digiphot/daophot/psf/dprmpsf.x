@@ -72,18 +72,18 @@ begin
 	    call printf ("Warning: The PSF star list is undefined\n")
 	} else if (! psf_current) {
 	    if (dp_fitpsf (dao, im, Memc[str], SZ_LINE) == OK) {
-		call dp_writepsf (dao, psfim)
-		call dp_wplist (dao, opst)
-		call dp_wneistars (dao, psfgr)
+		call dp_writepsf (dao, im, psfim)
+		call dp_wplist (dao, im, opst)
+		call dp_wneistars (dao, im, psfgr)
 		update = true
 	    } else {
 		call printf ("%s\n")
 		    call pargstr (Memc[str])
 	    }
 	} else if (! psf_written) {
-	    call dp_writepsf (dao, psfim)
-	    call dp_wplist (dao, opst)
-	    call dp_wneistars (dao, psfgr)
+	    call dp_writepsf (dao, im, psfim)
+	    call dp_wplist (dao, im, opst)
+	    call dp_wneistars (dao, im, psfgr)
 	    update = true
 	}
 

@@ -56,14 +56,23 @@ begin
 
 	switch (ngpix) {		# compute mean and sigma
 	case 0:
-	    mean = INDEF
-	    sigma = INDEF
+$if (datatype == dl)
+	    mean = $INDEFD
+	    sigma = $INDEFD
+$else
+	    mean = $INDEFR
+	    sigma = $INDEFR
+$endif
 	case 1:
 	    mean = sum
-	    sigma = INDEF
+$if (datatype == dl)
+	    sigma = $INDEFD
+$else
+	    sigma = $INDEFR
+$endif
 	default:
 	    mean = sum / ngpix
-	    temp = (sumsq - mean * sum) / (ngpix - 1)
+	    temp = (sumsq - (sum/ngpix) * sum) / (ngpix - 1)
 	    if (temp < 0)		# possible with roundoff error
 		sigma = 0.0
 	    else

@@ -49,6 +49,12 @@ begin
 	# Physically close the image.
 	call iki_close (im)
 
+	# If the image is a mask image and the PL_CLOSEPL flag is set, close
+	# the associated mask.
+
+	if (IM_PL(im) != NULL && and(IM_PLFLAGS(im),PL_CLOSEPL) != 0)
+	    call pl_close (IM_PL(im))
+
 	# Free all buffer space allocated by IMIO.
 	call imrmbufs (im)
 	call mfree (im, TY_STRUCT)

@@ -337,7 +337,7 @@ begin
 
 	if (ID_UN(id) != NULL) {
 	    call dtput (dt, "\tunits\t%s\n")
-		call pargstr (UN_UNITS(ID_UN(id)))
+		call pargstr (UN_USER(ID_UN(id)))
 	}
 	call dtput (dt, "\tfeatures\t%d\n")
 	    call pargi (ID_NFEATURES(id))

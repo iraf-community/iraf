@@ -53,7 +53,9 @@ define	NSKY		218
 define	NSKY_REJECT	219
 define	SXCUR		220
 define	SYCUR		221
-define	SSTRING		222
+define	OSXCUR		222
+define	OSYCUR		223
+define	SSTRING		224
 
 # define sky fitting keywords
 

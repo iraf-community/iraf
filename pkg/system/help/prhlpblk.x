@@ -17,10 +17,11 @@ pointer	ctrl
 
 bool	block_found, help_file, at_eof
 int	fd, lmarg, rmarg, soflag, foflag, i, nblocks
-pointer	sp, hb, block_name
+pointer	sp, hb, block_name, ps
 
 bool	streq()
 int	open(), hb_getnextblk()
+pointer	ps_open()
 extern	hinput(), houtput()
 errchk	hb_getnextblk, pr_block_header
 
@@ -48,10 +49,11 @@ begin
 	nblocks = 0
 	call strcpy (modname, Memc[block_name], SZ_FNAME)
 
-	# Always output standout mode control chars (soflag).  Only output
-	# forms mode control chars if using Manpage format output filter.
-
-	soflag = YES
+	# Output standout mode control chars (soflag) only if told to do so.
+	# Only output forms mode control chars if using Manpage format output
+	# filter.
+		
+	soflag = H_SOFLAG(ctrl)
 	foflag = H_MANPAGE(ctrl)
 
 	# Process all help blocks in the file which list the current key
@@ -123,11 +125,26 @@ begin
 	    if (H_SECNAME(ctrl) == EOS && H_PARNAME(ctrl) == EOS)
 		call pr_block_header (hb, Memc[block_name], ctrl)
 
-	    # Finally!!  Call Lroff to format the help text.
 
+	    # Finally!!  Call Lroff to format the help text.
 	    iferr {
-		call lroff (hinput, ctrl, houtput, ctrl, lmarg, rmarg,
-		    soflag, foflag)
+		if (H_FORMAT(ctrl) == HF_TEXT) {
+		    call lroff (hinput, ctrl, houtput, ctrl, lmarg, rmarg,
+		        soflag, foflag)
+		} else if (H_FORMAT(ctrl) == HF_HTML) {
+		    call lroff2html (H_IN(ctrl), H_OUT(ctrl), Memc[block_name],
+			HB_SECTION(hb), HB_TITLE(hb), H_PARNAME(ctrl),
+			H_SECNAME(ctrl))
+		} else if (H_FORMAT(ctrl) == HF_PS) {
+		    ps = ps_open (H_OUT(ctrl), YES)
+		    call sprintf (Memc[block_name], SZ_LINE, "%s (%s)")
+			call pargstr (Memc[block_name])
+			call pargstr (HB_SECTION(hb))
+		    call ps_header (ps, Memc[block_name], HB_TITLE(hb), 
+			Memc[block_name])
+		    call lroff2ps (H_IN(ctrl), H_OUT(ctrl), ps,
+			H_PARNAME(ctrl), H_SECNAME(ctrl))
+		}
 	    } then
 		call erract (EA_WARN)
 	}

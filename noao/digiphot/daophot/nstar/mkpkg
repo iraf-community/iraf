@@ -19,5 +19,6 @@ libpkg.a:
 	dpntwrite.x	<tbset.h>		<time.h>		  \
 			../lib/daophotdef.h	../lib/apseldef.h         \
 			../lib/nstardef.h
-	t_nstar.x	<fset.h>		 ../lib/daophotdef.h
+	t_nstar.x	<fset.h>		<imhdr.h>                 \
+	                ../lib/daophotdef.h
 	;

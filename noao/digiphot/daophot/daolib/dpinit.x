@@ -10,11 +10,20 @@ pointer	dp		# pointer to the daophot structure
 
 begin
 	# Set the daophot structure.
-	call malloc (dp, LEN_DPSTRUCT, TY_STRUCT)
+	call calloc (dp, LEN_DPSTRUCT, TY_STRUCT)
 
 	# Initalize the output type parameters.
 	DP_TEXT(dp) = YES
 	DP_VERBOSE(dp) = YES
+
+	# Initialize the wcs parameters.
+	DP_MW(dp) = NULL
+	DP_WCSIN(dp) = WCS_LOGICAL
+	DP_WCSOUT(dp) = WCS_LOGICAL
+	DP_WCSPSF(dp) = WCS_LOGICAL
+	DP_CTIN(dp) = NULL
+	DP_CTOUT(dp) = NULL
+	DP_CTPSF(dp) = NULL
 
 	# Initialize the data depedent parameters.
 	DP_SCALE(dp) = DEF_SCALE

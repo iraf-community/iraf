@@ -38,7 +38,7 @@ libsys.a:
 	fmlfdel.x	fmio.h
 	fmlfname.x	fmio.h <fmset.h>
 	fmlfopen.x	fmio.h
-	fmlfparse.x	
+	fmlfparse.x	<fmset.h>
 	fmlfstat.x	fmio.h <fmlfstat.h>
 	fmlfstt.x	fmio.h <config.h> <fio.h> <mach.h>
 	fmlfundel.x	fmio.h

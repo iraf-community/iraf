@@ -46,7 +46,6 @@ generic:
 libpkg.a:
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 	@generic
-	@cosmic
 
 	calimage.x	ccdtypes.h <error.h> <imset.h>
 	ccdcache.x	ccdcache.com ccdcache.h ccdcache.com <imhdr.h>\

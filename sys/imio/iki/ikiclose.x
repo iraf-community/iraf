@@ -17,7 +17,8 @@ int	status
 include	"iki.com"
 
 begin
-	call zcall2 (IKI_CLOSE(IM_KERNEL(im)), im, status)
+	iferr (call zcall2 (IKI_CLOSE(IM_KERNEL(im)), im, status))
+	    status = ERR
 	if (status == ERR)
 	    call syserrs (SYS_IKICLOSE, IM_NAME(im))
 end

@@ -1,6 +1,6 @@
 #{ Package script task for the NPROTO package.
 
-images			# for the script tasks findgain, findthresh, ndprep 
+images			# for the script tasks findthresh, ndprep 
 
 package nproto
 
@@ -12,7 +12,11 @@ task	binpairs,
 	linpol,
 	slitpic		= nproto$x_nproto.e
 
-task	findgain	= nproto$findgain.cl
-task	findthresh	= nproto$findthresh.cl
+task	findthresh	= "nproto$findthresh.cl"
+
+task	detect		= "nproto$ace/x_nproto.e"
+task	objmasks	= "nproto$ace/objmasks.cl"
+task	objmasks1	= "nproto$ace/objmasks1.par"
+hidetask detect, objmasks1
 
 clbye

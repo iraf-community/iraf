@@ -18,6 +18,7 @@ libpkg.a:
 	apmapr.x
 	apmeds.x
 	apmoments.x
+	appcache.x		<imhdr.h>		<imset.h>
 	aprmwhite.x		<ctype.h>
 	aptopt.x		<math.h> <mach.h>
 	apvectors.x

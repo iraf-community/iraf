@@ -1,7 +1,7 @@
-.help polyphot Dec92 noao.digiphot.apphot
+.help polyphot May00 noao.digiphot.apphot
 .ih
 NAME
-polyphot -- compute fluxes inside polygonal apertures
+polyphot -- compute magnitudes inside polygonal apertures
 .ih
 USAGE
 polyphot image
@@ -11,96 +11,242 @@ PARAMETERS
 The list of images containing the objects to be measured.
 .le
 .ls coords = ""
-The list of text files containing the centers of the polygons
-to be measured, one center per line with the x and y coordinates in
-columns one and two respectively. The ";" character in column 1 tells POLYPHOT
-to skip to the next polygon listed in \fIpolygons\fR. If \fIcoords\fR
-is the null string the coordinates of the polygon are read
-directly from \fIpolygons\fR otherwise, the mean x and y value of the
-current polygon is shifted to the coordinates listed in \fIcoords\fR.
+The list of text files containing the center coordinates of the polygons
+to be measured. Polygon centers are listed one per line with the x and y
+coordinates in columns one and two. A ";" character in column terminates
+the polygon center list for the current polygon and tells POLYPHOT to skip
+to the next polygon listed in \fIpolygons\fR.  If coords is undefined the
+polygons are not shifted. The number of polygon center files must be
+zero, one, or equal to the number of images. If coords is "default",
+"dir$default", or a directory specification then a coords file name
+of the form dir$root.extension.version is constructed and searched for,
+where dir is the directory, root is the root image name, extension is "coo"
+and version is the next available version number for the file.
 .le
 .ls polygons = ""
-The file containing the x and y coordinates of the vertices of the polygons to
-be measured.  The vertices are listed 1 per line, with the x and y
-coordinates of each vertex in columns 1 and 2 respectively. The list of
-vertices is terminated by a semi-colon character in column 1.
+The list of text files containing the vertices of the polygons to be
+measured.  The polygon vertices are listed 1 vertext per line with the x and y
+coordinates of each vertex in columns 1 and 2. The vertices list is terminated
+a ';' in column 1. The number of polygon files must be zero, one, or
+equal to the number of images.  If polygons is "default", "dir$default", or
+a directory specification then a coords file name of the form
+dir$root.extension.version is constructed and searched for, where dir is the
+directory, root is the root image name, extension is "ver"
+and version is the next available version number for the file.
 .le
 .ls output = "default"
-The name of the results file or results directory.
-If output is "default", "dir$default" or a directory specification
-then an output name of the form dir$root.extension.version
-is constructed, where dir is the directory, root is the root image name,
-extension is "ply", and version is the next available version number.
-If output is null (""), then no output file is created.
-If output is defined, the number of output files must be either 1 or equal
-to the number of image files.
+The name of the results file or results directory. If output is
+"default", "dir$default", or a directory specification then an output file name
+of the form dir$root.extension.version is constructed, where dir is the
+directory, root is the root image name, extension is "ply" and version is
+the next available version number for the file. The number of output files
+must be zero, one, or equal to the number of image files.  In both interactive
+and batch mode full output is written to output. In interactive mode
+an output summary is also written to the standard output.
 .le
 .ls datapars = ""
-The name of the file containing the data dependent parameters.
-If \fIdatapars\fR is null ("") then the default parameter set in the
-user's uparm directory is used.
-The critical parameters \fIfwhmpsf\fR, and \fIsigma\fR
-are located here.
+The name of the file containing the data dependent parameters. The critical
+parameters \fIfwhmpsf\fR and \fIsigma\fR are located here. If \fIdatapars\fR
+is undefined then the default parameter set in uparm directory is used.
 .le
 .ls centerpars = ""
-The name of the file containing the centering algorithm parameters.
-If \fIcenterpars\fR is null ("") then the default parameter set in the
-user's uparm directory is used.
-The critical parameters \fIcalgorithm\fR and \fIcbox\fR are located
-here.
+The name of the file containing the centering parameters. The critical
+parameters \fIcalgorithm\fR and \fIcbox\fR are located here.
+If \fIcenterpars\fR is undefined then the default parameter set in
+uparm directory is used.
 .le
 .ls fitskypars = ""
-The name of the file containing the sky fitting algorithm parameters.
-If \fIfitskypars\fR is null ("") then the default parameter set in the
-user's uparm directory is used.
-The critical parameters \fIsalgorithm\fR, \fIannulus\fR and \fIdannulus\fR
-are located here.
+The name of the text file containing the sky fitting parameters. The critical
+parameters \fIsalgorithm\fR, \fIannulus\fR, and \fIdannulus\fR are located here.
+If \fIfitskypars\fR is undefined then the default parameter set in uparm
+directory is used.
 .le
 .ls polypars = ""
-The name of the file containing the photometry parameters.
-If \fIpolypars\fR is null ("") then the default parameter set in the
-user's uparm directory is used.
+The name of the text file containing the polygon photometry parameters,
+If \fIpolypars\fR is undefined then the default parameter set in 
+ uparm directory is used.
 .le
 .ls interactive = yes
-Interactive or batch mode.
-.le
-.ls verify = yes
-Verify the critical parameters in non-interactive mode
-.le
-.ls update = yes
-Update the critical parameters in non-interactive mode if verify is yes.
-.le
-.ls verbose = no
-Print messages in non-interactive mode.
-.le
-.ls graphics = "stdgraph"
-The default graphics device.
-.le
-.ls display = "stdimage"
-The default image display device. \fIDisplay\fR can be set to "stdgraph"
-if POLYPHOT is to be run interactively from a contour plot.
+Run the task interactively ?
 .le
 .ls icommands = ""
-The image cursor.
+The image cursor or image cursor command file.
 .le
 .ls gcommands = ""
-The graphics cursor.
+The graphics cursor or graphics cursor command file.
+.le
+.ls wcsin = ")_.wcsin", wcsout = ")_.wcsout"
+The coordinate system of the input coordinates read from \fIcoords\fR and
+of the output coordinates written to \fIoutput\fR respectively. The image
+header coordinate system is used to transform from the input coordinate
+system to the "logical" pixel coordinate system used internally,
+and from the internal "logical" pixel coordinate system to the output
+coordinate system. The input coordinate system options are "logical", tv",
+"physical", and "world". The output coordinate system options are "logical",
+"tv", and "physical". The image cursor coordinate system is assumed to
+be the "tv" system.
+.ls logical
+Logical coordinates are pixel coordinates relative to the current image.
+The  logical coordinate system is the coordinate system used by the image
+input/output routines to access the image data on disk. In the logical
+coordinate system the coordinates of the first pixel of a  2D image, e.g.
+dev$ypix  and a 2D image section, e.g. dev$ypix[200:300,200:300] are
+always (1,1).
+.le
+.ls tv
+Tv coordinates are the pixel coordinates used by the display servers. Tv
+coordinates  include  the effects of any input image section, but do not
+include the effects of previous linear transformations. If the input
+image name does not include an image section, then tv coordinates are
+identical to logical coordinates.  If the input image name does include a
+section, and the input image has not been linearly transformed or copied from
+a parent image, tv coordinates are identical to physical coordinates.
+In the tv coordinate system the coordinates of the first pixel of a
+2D image, e.g. dev$ypix and a 2D image section, e.g. dev$ypix[200:300,200:300]
+are (1,1) and (200,200) respectively.
+.le
+.ls physical
+Physical coordinates are pixel coordinates invariant  with respect to linear
+transformations of the physical image data.  For example, if the current image
+was created by extracting a section of another image,  the  physical
+coordinates of an object in the current image will be equal to the physical
+coordinates of the same object in the parent image,  although the logical
+coordinates will be different.  In the physical coordinate system the
+coordinates of the first pixel of a 2D image, e.g. dev$ypix and a 2D
+image section, e.g. dev$ypix[200:300,200:300] are (1,1) and (200,200)
+respectively.
+.le
+.ls world
+World coordinates are image coordinates in any units which are invariant
+with respect to linear transformations of the physical image data. For
+example, the ra and dec of an object will always be the same no matter
+how the image is linearly transformed. The units of input world coordinates
+must be the same as those expected by the image header wcs, e. g.
+degrees and degrees for celestial coordinate systems.
+.le
+The wcsin and wcsout parameters default to the values of the package
+parameters of the same name. The default values of the package parameters
+wcsin and wcsout are "logical" and "logical" respectively.
+.le
+.le
+.ls cache = ")_.cache"
+Cache the image pixels in memory. Cache may be set to the value of the apphot
+package parameter (the default), "yes", or "no". By default cacheing is 
+disabled.
+.le
+.ls verify = ")_.verify"
+Verify the critical parameters in non-interactive mode ? Verify may be set to
+the apphot package parameter value (the default), "yes", or "no.
+.le
+.ls update = ")_.update"
+Update the critical parameters in non-interactive mode if verify is yes ?
+Update may be set to the apphot package parameter value (the default), "yes",
+or "no.
+.le
+.ls verbose = ")_.verbose"
+Print messages in non-interactive mode? Verbose may be set to the apphot
+package parameter value (the default), "yes", or "no.
+.le
+.ls graphics = ")_.graphics"
+The default graphics device. Graphics may be set to the apphot package
+parameter value (the default), "yes",
+or "no.
+.le
+.ls display = ")_.display"
+The default display device. By default graphics overlay is disabled. Display
+may be set to the apphot package parameter value (the default), "yes", or "no. 
+Setting display to one of "imdr", "imdg", "imdb", or "imdy" enables graphics
+overlay with the IMD graphics kernel.  Setting display to "stdgraph" enables
+POLYPHOT to work interactively from a contour plot.
 .le
 
 .ih
 DESCRIPTION
 
-POLYPHOT computes the magnitude of an object in the IRAF image \fIimage\fR
-inside a polygonal aperture whose vertices are listed in the text file
+POLYPHOT computes the magnitude of objects in the IRAF image \fIimage\fR
+inside a list of polygonal apertures whose vertices are listed in the text file
 \fIpolygons\fR or are marked on the display interactively with the
-image cursor. The polygon can be shifted by specifying the center coordinates
-of the polygons in \fIpolygons\fR in the text file \fIcoords\fR or by
-using the image cursor if the polygon was drawn interactively.
+image cursor. The polygon centers  may be read from the polygon center
+file \fIcoords\fR or set interactively with the image cursor.
 
-POLYPHOT can be run either interactively or in batch mode by setting
-the parameter interactive. In interactive mode starting x and y positions
-can either be read directly from the image cursor or read from the text
-files \fIpolygons\fR and \fIcoords\fR.
+The coordinates read from \fIcoords\fR are assumed to be in coordinate
+system defined by \fIwcsin\fR. The options are "logical", "tv", "physical",
+and "world" and the transformation from the input coordinate system to
+the internal "logical" system is defined by the image coordinate system.
+The simplest default is the "logical" pixel system. Users working on with
+image sections but importing pixel coordinate lists generated from the parent
+image must use use the "tv" or "physical" input coordinate systems.
+Users importing coordinate lists in world coordinates, e.g. ra and dec,
+must use the "world" coordinate system and may need to convert their
+equatorial coordinate units from hours and degrees to degrees and degrees first.
+
+The coordinates written to \fIoutput\fR are in the coordinate
+system defined by \fIwcsout\fR. The options are "logical", "tv",
+and "physical". The simplest default is the "logical" system. Users
+wishing to correlate the output coordinates of objects measured in
+image sections or mosaic mosaic pieces with coordinates in the parent
+image must use the "tv" or "physical" coordinate systems.
+
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input image pixels are cached in memory. If cacheing
+is enabled and POLYPHOT is run interactively the first measurement will appear
+to take a long time as the entire image must be read in before the measurement
+is actually made. All subsequent measurements will be very fast because POLYPHOT
+is accessing memory not disk. The point of cacheing is to speed up random
+image access by making the internal image i/o buffers the same size as the
+image itself. However if the input object lists are sorted in row order and
+sparse cacheing may actually worsen not improve the execution time. Also at
+present there is no point in enabling cacheing for images that are less than
+or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
+default image i/o buffer is exactly that size. However if the size of dev$ypix
+is doubled by converting it to a real image with the chpixtype task then the
+effect of cacheing in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halfs of the image are alternated.
+
+In interactive mode the user may either define the list of objects to be
+measured interactively with the image cursor or create a polygon and polygon
+center list prior to running POLYPHOT. In either case the user may adjust
+the centering, sky fitting, and photometry algorithm parameters until a
+satisfactory fit is achieved and optionally store the final results
+in \fIoutput\fR. In batch mode the polygon and polygon centers are read
+from the text files \fIpolygons\fR and \fIcoords\fR or the image cursor
+parameter \fIicommands\fR can be redirected to a text file containing
+a list of cursor commands. In batch mode the current set of algorithm
+parameters is used.
+
+.ih
+THE POLYGON and POLYGON CENTERS FILES
+
+A sample polygons file and accompanying coordinates file is listed below.
+
+.nf
+        # Sample Polygons File (2 polygons)
+
+        200.5  200.5
+        300.5  200.5
+        300.5  300.5
+        200.5  300.5
+        ;
+        100.4  100.4
+        120.4  100.4
+        120.4  120.4
+        100.4  120.4
+        ;
+.fi
+
+.nf
+        # Sample Coordinates File (2 groups, 1 for each polygon)
+
+        123.4  185.5
+        110.4  130.4
+        150.9  200.5
+        ;
+        85.6   35.7
+        400.5  300.5
+        69.5   130.5
+        ;
+.fi
+
 
 .ih
 CURSOR COMMANDS
@@ -248,38 +394,37 @@ ALGORITHMS
 A brief description of the data dependent parameters, the centering
 algorithms and the sky fitting algorithms can be found in the online
 manual pages for the DATAPARS, CENTERPARS, and FITSKYPARS tasks.
-A full description of the algorithms can be found in the document
-\fISpecifications for the Apphot Package\fR.
+User measuring extended "fuzzy" features may wish to set the CENTERPARS 
+\fIcalgorithm\fR parameter to "none", the FITSKYPARS parameters
+\fIsalgorithm\fR and \fIskyvalue\fR to "constant" and <uservalue> before
+running POLYPHOT.
 
-POLYPHOT computes the intersection of each image line
-with the line segments composing the polygon in order to determine the
-extent of the polygon . A one dimensional
-summation including a fractional approximation for the end pixels
-is performed over those regions of the image line which
-intersect the polygon. All the 1D summations are summed to give
-the total integral. The vertices of the polygon must be specified in order
-either clockwise or counterclockwise.
+POLYPHOT computes the intersection of each image line with the line segments
+composing the polygon in order to determine the extent of the polygon. A one
+dimensional summation including a fractional approximation for the end pixels
+is performed over those regions of the image line which intersect the polygon.
+All the 1D summations are summed to give the total integral. The vertices of
+the polygon must be specified in order either clockwise or counterclockwise.
 
 .ih
 OUTPUT
 
 In interactive mode the following quantities are printed on the standard
-output as each object is measured. Error is a simple string which
-indicates whether the task encountered an error in
-the centering algorithm, the sky fitting algorithm or the photometry
-algorithm. Mag are the magnitudes in
-the polygonal aperture and xcenter, ycenter and msky are the
-x and y centers and the sky value respectively.
+output as each object is measured. Error is a simple string which indicates
+whether the task encountered an error in the centering algorithm, the sky
+fitting algorithm or the photometry algorithm. Mag are the magnitudes in
+the polygonal aperture and xcenter, ycenter and msky are the x and y centers
+and the sky value respectively.
 
 .nf
     image  xcenter  ycenter  msky  mag  merr error
 .fi
 
 In both interactive and batch mode full output is written to the text file
-\fIoutput\fR. At the beginning of each file is a header listing the
-current values of the parameters when the first stellar record was written.
-These parameters can be subsequently altered. For each star measured the
-following record is written
+\fIoutput\fR. At the beginning of each file is a header listing the current
+values of the parameters when the first stellar record was written.  These
+parameters can be subsequently altered. For each star measured the following
+record is written
 
 .nf
 	image  xinit  yinit  id  coords  lid
@@ -294,10 +439,9 @@ following record is written
 Image and coords are the name of the image and coordinate file respectively.
 Id and lid are the sequence numbers of objects in the output and coordinate
 files respectively. Cier and cerror are the centering error code and
-accompanying
-error message respectively.  Xinit, yinit, xcenter, ycenter, xshift, yshift,
-and xerr, yerr are self explanatory and output in pixel units. The sense of
-the xshift and yshift definitions is the following.
+accompanying error message respectively.  Xinit, yinit, xcenter, ycenter,
+xshift, yshift, and xerr, yerr are self explanatory and output in pixel units.
+The sense of the xshift and yshift definitions is the following.
 
 .nf
 	xshift = xcenter - xinit
@@ -306,9 +450,9 @@ the xshift and yshift definitions is the following.
 
 Sier and serror are the sky fitting error code and accompanying error
 message respectively.  Msky, stdev and sskew are the best estimage of the
-sky value (per pixel),
-standard deviation and skew respectively. Nsky and nsrej are the number of
-sky pixels used and the number of sky pixels rejected from the fit respectively.
+sky value (per pixel), standard deviation and skew respectively. Nsky and
+nsrej are the number of sky pixels used and the number of sky pixels rejected
+from the fit respectively.
 
 Itime is the exposure time, xairmass is self-evident, ifilter is an id string
 identifying the filter used during the observation, and otime is a string
@@ -349,7 +493,7 @@ If the object centering was error free then the field cier will be zero.
 Non-zero values of cier flag the following error conditions.
 
 .nf
-	0       # No error
+	0        # No error
 	101      # The centering box is off image
 	102      # The centering box is partially off the image
 	103      # The S/N ratio is low in the centering box
@@ -380,7 +524,7 @@ will be 0. Non-zero values of sier flag the following error conditions.
 .fi
 
 If no error occurs during the measurement of the magnitudes then pier is
-0. Non-zero values of pier flag the following error conditins.
+0. Non-zero values of pier flag the following error conditions.
 
 .nf
 	0       # No error
@@ -394,173 +538,229 @@ If no error occurs during the measurement of the magnitudes then pier is
 .ih
 EXAMPLES
 
-1. Compute the magnitudes inside a polygonal aperture for a few  stars in
-N4147 using the display and the image cursor. Setup the task parameters
-using the interactive setup menu defined by the i key command.
+1. Compute the magnitudes inside  2 polygonal aperture for a few  regions in
+dev$ypix using the display and the image cursor.  Turn off centering and set
+the sky background to to 0.0.
 
 .nf
-	ap> set stdimcur = stdimage
-
-	... define the image cursor
-
-	ap> display n4147 1 fi+
+	ap> display dev$ypix 1 fi+
 
 	... display the image
 
-	ap> polyphot n4147 
+	ap> polyphot dev$ypix calgorithm=none salgorithm=constant \
+            skyvalue=0.0 display=imdg mkpolygon+
 
 	... type ? to print a help page
 
-	... move image cursor to a star
+	... move image cursor to a region of interest
 
-	... type i to enter the interactive setup menu
-	... use the image cursor to mark the vertices of the polygonal
-       	    aperture as directed
+	... type g to enter the polygon definition menu
+	... use the image cursor and spbar key to mark the vertices of
+            the polygonal aperture 
 	... mark each vertex only once, POLYPHOT will close the polygon
 	    for you
-	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    and sigma using the graphics cursor and the stellar radial
-	    profile plot, verifying each value
-	... typing <CR> leaves everything at the default value
+        ... type q to quit the polygon definition menu
 
-	... type the v key to verify the parameters one more time
+	... type the v key to verify the parameters
 
 	... type the w key to save the parameters in the parameter files
 
-	... move the image cursor to the stars of interest and tap
-	    the space bar
+	... move the image cursor to the objects of interest and tap
+	    the space bar, the polygon will be marked on the image 
+            display
+
+	... type g to enter the polygon definition menu
+	... use the image cursor and spbar key to mark the vertices of
+            the polygonal aperture 
+	... mark each vertex only once, POLYPHOT will close the polygon
+	    for you
+        ... type q to quit the polygon definition menu
+
+	... move the image cursor to the objects of interest and tap
+	    the space bar, the polygon will be marked on the image
+            display 
 
 	... a one line summary of the fitted parameters will appear on the
 	    standard output for each star measured
 
-	... the output will appear in n4147.ply.1
+	... the output will appear in ypix.ply.1
 .fi
 
 
-2. Compute the magnitudes inside a polygonal aperture for a few  stars in
-M92 using a  contour plot
-and the graphics cursor. Setup the task parameters using the interactive
-setup menu defined by the i key command.
+2.  Repeat the previous example but use a contour plot and the graphics
+cursor in place of the image display and image cursor. This option is
+really only useful for users (very few these days) with access to a graphics
+terminal but not an image display server.
 
 .nf
+	ap> show stdimcur
+
+        ... determine the default value of stdimcur
+
 	ap> set stdimcur = stdgraph
 
 	... define the image cursor to be the graphics cursor
 
-	ap> contour m92 >G m92.plot1
+        ap> contour dev$ypix
 
-	... store the contour plot of m92 in the file m92.plot
+        ... create a contour plot of dev$ypix
 
-	ap> polyphot m92 display=stdgraph mkpoly+
+	ap> contour dev$ypix >G ypix.plot1
+
+	... store the contour plot of dev$ypix in the file ypix.plot1
+
+	ap> polyphot dev$ypix calgorithm=none salgorithm=constant \
+            skyvalue=0.0 display=stdgraph mkpolygon+
 
 	... type ? to print a help page
 
-	... type :.read m92.plot1 to load the contour plot on the screen
-
-	... move graphics cursor to a star
-
-	... type i to enter the interactive setup menu
-	... use the graphics cursor as directed  to draw the polygonal
-	    aperture
-	... mark each vertex only once, POLYPHOT will close the polygon
-	    for you
-	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, centering radius, inner and outer sky annuli,
-	    and sigma using the graphics cursor and the stellar radial
-	    profile plot, verifying each entry
-	... typing <CR> leaves everything at the default value
-
-	... type the v key one more time to verify the parameters
+	... type the v key to verify the parameters
 
 	... type the w key to save the parameters in the parameter files
 
-	... retype :.read m92.plot1 to reload the contour plot
+	... move image cursor to a region of interest
+	... type g to enter the polygon definition menu
+	... use the image cursor and spbar key to mark the vertices of
+            the polygonal aperture 
+	... mark each vertex only once, POLYPHOT will close the polygon
+	    for you
+        ... type q to quit the polygon definition menu
 
-	... move the graphics cursor to the stars of interest and tap
-	    the space bar
+	... move the image cursor to the objects of interest and tap
+	    the space bar, the polygon will be marked on the contour
+            plot
+
+	... move image cursor to a region of interest
+	... type g to enter the polygon definition menu
+	... use the image cursor and spbar key to mark the vertices of
+            the polygonal aperture 
+	... mark each vertex only once, POLYPHOT will close the polygon
+	    for you
+        ... type q to quit the polygon definition menu
+
+	... move the image cursor to the objects of interest and tap
+	    the space bar, the polygon will be marked on the image 
+            display
 
 	... a one line summary of the fitted parameters will appear on the
 	    standard output for each star measured and the polygons will
 	    be drawn on the display
 
-	... full output will appear in the text file m92.ply.1 
+	... full output will appear in the text file ypix.ply.2 
+
+	ap> reset stdimcur = <default>
+
+	... reset stdimcur to its default value
+
+
 .fi
 
-3. Setup and run POLYPHOT interactively on a list of objects,
-using a contour plot as the image display and the parameters defined and
-saved in example 1.
+3. Setup and run POLYPHOT interactively on a list of objects created with
+POLYMARK.
 
 .nf
-	ap> set stdimcur = stdgraph
+	ap> display dev$ypix 1
 
-	... define the image cursor to be the graphics cursor
+        ... display the image
 
-	ap> contour m92
+	ap> polymark dev$ypix display=imdg
 
-	... adjust plot parameters until the contour plot is satisfactory
-
-	ap> =gcur
-
-	... enter cursor mode
-
-	... type :.write m92.plot2 to save the plot in a metacode file
-
-	... type any key to quit cursor mode
-
-	ap> polymark m92 
-
-	... type g to draw a polygon on the display and follow the
-	    instructions 
+	... type g to enter the polygon definition menu
+        ... mark each vertex with the spbar
 	... mark each vertex only once, POLYPHOT will close the
 	    polygon for you
+        ... type q to quit the polygon definition menu 
 
-	... move the graphics cursor to the stars of interest and tap
-	    the space bar
+	... move the cursor to the regions of interest and tap
+	    the space bar, the polygon will be marked on the image
+            display
 
-	... the coordinates and the polygonal aperture  will be written
-	    to the text files m92.coo.1 and m92.ver.1 respectively
+	... the polygon and polygon centers will be written to the text
+            files ypix.ver.1 and ypix.coo.1 respectively
 
-	... type q to quit
+	... type q to quit and q again to confirm the quit
 
-	ap> polyphot m92 coords=m92.coo.1 poly=m92.ver.1 display=stdgraph \
-	    mkpoly+
+	ap> display dev$ypix 2
 
-	... type ? to print a help page
+        ... redisplay the image
 
-	... type :.read m92.plot2 to read in the contour plot
+	ap> polyphot dev$ypix calgorithm=none salgorithm=constant skyvalue=0.0 \
+            coords=default polygon=default display=imdg mkpolygon+
 
-	... type :n 1 to measure the first object in the list
+	... type n to measure the first polygon in the list
 
 	... if everything looks okay type l to measure the rest of the stars 
 
 	... a one line summary of results will appear on the standard output
-	    for each star measured and the aperture will be plotted on
-	    the contour plot
+	    for each star measured and the aperture will be drawn on the
+            image display
 
-	... the output will appear in m92.ply.2 ...
+        ... type q to quit and q again to confirm the quit
+
+	... the output will appear in ypix.ply.3
 .fi
 
-4. Run POLYPHOT in batch mode using a polygon and coordinate file and the
-previously saved parameters.  Verify the critical parameters.
+
+4. Repeat example 3 but work on a section of the input image while
+preserving the coordinate system of the original image.
 
 .nf
-	ap> polyphot m92 coords=m92.coo.1 poly=m92.ver.1 inter- verify+
+	ap> display dev$ypix[150:450,150:450] 1
 
-	... output will appear in m92.ply.3
+        ... display the image
+
+	p> polymark dev$ypix[150:450,150:450] wcsout=tv display=imdg
+
+	... type g to enter the polygon definition menu
+        ... mark each vertex with the spbar
+	... mark each vertex only once, POLYPHOT will close the
+	    polygon for you
+        ... type q to quit the polygon definition menu 
+
+	... move the cursor to the regions of interest and tap
+	    the space bar, the polygon will be marked on the image
+            display
+
+	... the polygon and polygon centers will be written to the text
+            files ypix.ver.1 and ypix.coo.1 respectively
+
+	... type q to quit and q again to confirm the quit
+
+	ap> display dev$ypix[150:450,150:450] 2
+
+        ... redisplay the image
+
+	ap> polyphot dev$ypix[150:450,150:450] calgorithm=none \
+	    salgorithm=constant skyvalue=0.0 coords=default polygon=default \
+	    display=imdg mkpolygon+ wcsin=tv wcsout=tv
+
+	... type n to measure the first polygon in the list
+
+	... if everything looks okay type l to measure the rest of the stars 
+
+	... a one line summary of results will appear on the standard output
+	    for each star measured and the aperture will be drawn on the
+            image display
+
+        ... type q to quit and q again to confirm the quit
+
+	... the output will appear in ypix.ply.4
+
+        ap> pdump ypix.ply.4 xc,yc yes | tvmark 2 STDIN col=204
+
+        ... mark the centers of the polygons on the display
 .fi
 
 
-5. Run POLYPHOT in batch mode using the coordinate file and the previously
-saved parameters. The task can be submitted to the background by
-appending an ampersand to the command line as shown below. Be sure to
-turn off the verify switch.
+5. Run POLYPHOT in batch mode using a polygon and coordinate file and the
+default parameters. Verify the critical parameters.
 
 .nf
-	ap> polyphot m92 coords=m92.coo.1 poly=m92.ver.1 inter- verify- &
+	ap> polyphot dev$ypix coords=default polygon=default inter- verify+
 
-	... output will appear in m92.ply.4
+	... output will appear in ypix.ply.5
 .fi
+
 
 .ih
 TIMINGS
@@ -577,10 +777,13 @@ It is currently the responsibility of the user to make sure that the
 image displayed on the display is the same as that specified by the image
 parameter.
 
-Commands which draw to the image display are currently disabled.
-The TVMARK task in the proto package  can be used to draw simple marks
-on the display. All the APPHOT marking commands will however function
-if a contour plot is used in lieu of the image display.
+Commands which draw to the image display are disabled by default.
+To enable graphics overlay on the image display, set the display
+parameter to "imdr", "imdg", "imdb", or "imdy" to get red, green,
+blue or yellow overlays and set the centerpars mkcenter switch to
+"yes", the fitskypars mksky switch to"yes", or the polypars mkpolygon
+switch to "yes". It may be necessary to run gflush and to redisplay the image
+to get the overlays position correctly.
 
 .ih
 SEE ALSO

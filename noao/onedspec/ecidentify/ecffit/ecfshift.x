@@ -14,16 +14,16 @@ end
 
 # ECF_PSHIFT -- Put the shift for the given order.
 
-procedure ecf_pshift (ecf, order, shift)
+procedure ecf_pshift (ecf, order, shft)
 
 pointer	ecf			# GSURFIT pointer
 int	order			# User order
-double	shift			# Shift at given order
+double	shft			# Shift at given order
 
 include	"ecffit.com"
 
 begin
-	return (shift / (slope * order + offset))
+	shift = shft * (slope * order + offset)
 end
 
 

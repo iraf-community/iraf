@@ -131,7 +131,7 @@ pointer	sp, ltypes, colors, ptemp
 
 pointer	gopen()
 bool	clgetb(), streq(), fp_equalr()
-int	clgeti(), gg_rdcurves(), ctoi()
+int	clgeti(), gg_rdcurves(), ctoi(), ggeti()
 real	clgetr(), plt_iformatr()
 errchk	clgetb, clgeti, clgstr, clgetr, glabax, gpmark
 errchk	gswind, gseti, gg_rdcurves, gascale, grscale
@@ -292,8 +292,8 @@ begin
 	# autoscaling will reset it later.
 
 	if (append) {
-	    call ggeti (gd, G_XTRAN, xtran)
-	    call ggeti (gd, G_YTRAN, ytran)
+	    xtran = ggeti (gd, G_XTRAN)
+	    ytran = ggeti (gd, G_YTRAN)
 	    call ggwind (gd, wx1, wx2, wy1, wy2)
 	} else {
 	    xtran = GW_LINEAR

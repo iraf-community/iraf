@@ -206,10 +206,13 @@ begin
 		    pl = NULL
 		    call erract (EA_WARN)
 		    call apsets (ap, PYNAME, "")
+		    call apsets (ap, PYROOT, "")
 		    ptid = 0
 		    ltid = 0
 		} else {
 		    call apsets (ap, PYNAME, Memc[cmd])
+		    call apfroot (Memc[cmd], Memc[str], SZ_FNAME)
+		    call apsets (ap, PYROOT, Memc[str])
 		    ptid = 0
 		    ltid = 0
 		}

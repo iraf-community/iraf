@@ -582,7 +582,7 @@ begin
 	call strcpy (title, IM_TITLE(imout), SZ_LINE)
 
 	# Write out pixels
-	spec = impl1r (imout,1)
+	spec = impl1r (imout)
 	call amovr (accum, Memr[spec], ncols)
 
 	# Update changed parameters

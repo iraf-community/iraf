@@ -60,6 +60,8 @@ begin
 		call pargr (xmax)
 		call pargr (ymax)
 		call pargr (xgseval (sf, xmax, ymax))
+	    call printf ("rms %g\n")
+		call pargr (rms)
 	    call greactivate (gp, AW_PAUSE)
 
 	case FUNCTION: # :function - List or set the fitting function.

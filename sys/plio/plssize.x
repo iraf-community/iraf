@@ -57,8 +57,8 @@ begin
 	call calloc (PL_LPP(pl), PL_NLP(pl), TY_INT)
 
 	# Set up the LL header for the empty line.
-	LP_NREF(lp) = PL_NLP(pl)
-	LP_BLEN(lp) = PL_LLOP(pl)
+	LP_NREFS(lp) = PL_NLP(pl)
+	LP_SETBLEN(lp, PL_LLOP(pl))
 
 	call sfree (sp)
 end

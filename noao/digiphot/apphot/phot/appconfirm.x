@@ -55,10 +55,6 @@ begin
 	    apstati (ap, SKYFUNCTION) != AP_SKYFILE) {
 	    annulus = ap_vannulus (ap)
 	    dannulus = ap_vdannulus (ap)
-	} else if (apstati (ap, SKYFUNCTION) == AP_CONSTANT) {
-	    skysigma = ap_vsigma (ap)
-	    annulus = apstatr (ap, ANNULUS)
-	    dannulus = apstatr (ap, DANNULUS)
 	} else {
 	    annulus = apstatr (ap, ANNULUS)
 	    dannulus = apstatr (ap, DANNULUS)
@@ -68,6 +64,7 @@ begin
 	call ap_vaperts (ap, Memc[aperts], SZ_LINE)
 
 	# Confirm the datamin and datamax parameters.
+	skysigma = ap_vsigma (ap)
 	datamin = ap_vdatamin (ap)
 	datamax = ap_vdatamax (ap)
 

@@ -67,12 +67,11 @@ begin
 	call ggwind (gd, x1, x2, y1, y2)
 
 	# Initialize the plot.
-	call apstats (ap, IMNAME, Memc[str], SZ_LINE)
+	call apstats (ap, IMROOT, Memc[str], SZ_LINE)
 	call sprintf (Memc[str], SZ_LINE, "%s  Star %d")
 	    call pargstr (Memc[str])
 	    call pargi (sid)
-	gt = ap_gtinit (Memc[str], xcenter - apstatr (ap, XSHIFT), ycenter -
-	    apstatr (ap, YSHIFT))
+	gt = ap_gtinit (Memc[str], apstatr (ap,OXINIT), apstatr (ap, OYINIT))
 
 	# Make the plot.
 	call gclear (gd)
@@ -127,8 +126,8 @@ begin
 	    call pargstr (Memc[title])
 	call fprintf (fd,
 	    "Center: xc=%0.2f yc=%0.2f xerr=%0.2f yerr=%0.2f\n")
-	    call pargr (apstatr (ap, XCENTER))
-	    call pargr (apstatr (ap, YCENTER))
+	    call pargr (apstatr (ap, OXCENTER))
+	    call pargr (apstatr (ap, OYCENTER))
 	    call pargr (apstatr (ap, XERR))
 	    call pargr (apstatr (ap, YERR))
 	call gt_gets (gt, GTTITLE, Memc[title], SZ_LINE)

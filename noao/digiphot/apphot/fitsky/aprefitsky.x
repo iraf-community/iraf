@@ -1,4 +1,5 @@
 include "../lib/apphotdef.h"
+include "../lib/apphot.h"
 include "../lib/noisedef.h"
 include "../lib/fitskydef.h"
 include "../lib/fitsky.h"
@@ -6,9 +7,10 @@ include "../lib/fitsky.h"
 # APREFITSKY -- Procedure to fit the sky using the pixels currently stored in
 # the sky fitting buffers.
 
-int procedure aprefitsky (ap, gd)
+int procedure aprefitsky (ap, im, gd)
 
 pointer	ap		# pointer to the apphot structure
+pointer	im		# the input image descriptor
 pointer	gd		# pointer to graphics stream
 
 int	ier, nclip, nsky, ilo, ihi
@@ -27,6 +29,23 @@ begin
 	AP_SKY_SKEW(sky) = INDEFR
 	AP_NSKY(sky) = 0
 	AP_NSKY_REJECT(sky) = 0
+	if (IS_INDEFR(AP_SXCUR(sky)) || IS_INDEFR(AP_SYCUR(sky))) {
+            AP_OSXCUR(sky) = AP_SXCUR(sky)
+            AP_OSYCUR(sky) = AP_SYCUR(sky)
+	} else {
+            switch (AP_WCSOUT(ap)) {
+            case WCS_WORLD, WCS_PHYSICAL:
+                call ap_ltoo (ap, AP_SXCUR(sky), AP_SYCUR(sky), AP_OSXCUR(sky),
+		    AP_OSYCUR(sky), 1)
+            case WCS_TV:
+                call ap_ltov (im, AP_SXCUR(sky), AP_SYCUR(sky), AP_OSXCUR(sky),
+		    AP_OSYCUR(sky), 1)
+            default:
+                AP_OSXCUR(sky) = AP_SXCUR(sky)
+                AP_OSYCUR(sky) = AP_SYCUR(sky)
+            }
+	}
+
 	if (IS_INDEFR(AP_SXCUR(sky)) || IS_INDEFR(AP_SYCUR(sky)))
 	    return (AP_NOSKYAREA)
 
@@ -193,7 +212,7 @@ begin
 	    }
 
 	    call gactivate (gd, 0)
-	    gt = ap_gtinit (AP_IMNAME(ap), AP_SXCUR(sky), AP_SYCUR(sky))
+	    gt = ap_gtinit (AP_IMROOT(ap), AP_SXCUR(sky), AP_SYCUR(sky))
 	    ier = ap_radplot (gd, gt, Memr[AP_SKYPIX(sky)],
 	        Memi[AP_COORDS(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
 		AP_SXC(sky), AP_SYC(sky), AP_SNX(sky), AP_SNY(sky),
@@ -231,7 +250,7 @@ begin
 	    }
 
 	    #call gactivate (gd, 0)
-	    gt = ap_gtinit (AP_IMNAME(ap), AP_SXCUR(sky), AP_SYCUR(sky))
+	    gt = ap_gtinit (AP_IMROOT(ap), AP_SXCUR(sky), AP_SYCUR(sky))
 	    ier = ap_histplot (gd, gt, Memr[AP_SKYPIX(sky)],
 	        Memr[AP_SWGT(sky)], Memi[AP_INDEX(sky)+ilo-1], nsky,
 		AP_K1(sky), INDEFR, AP_BINSIZE(sky), AP_SMOOTH(sky),
@@ -240,7 +259,6 @@ begin
 	    AP_NSKY_REJECT(sky) = AP_NBADSKYPIX(sky) + nclip +
 	        AP_NSKY_REJECT(sky) 
 	    call ap_gtfree (gt)
-	    #call gdeactivate (gd, 0)
 
 	    return (ier)
 

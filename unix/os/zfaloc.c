@@ -37,7 +37,7 @@ XINT	*status;
 	 * the blocks will be zero-fill on demand.
 	 */
 	if (*nbytes > 0) {
-	    if (lseek (fd, (long)(*nbytes - 1), 0) == ERR) {
+	    if (lseek (fd, (off_t)(*nbytes - 1), 0) == ERR) {
 		close (fd);
 		*status = XERR;
 		return;
@@ -47,7 +47,7 @@ XINT	*status;
 		*status = XERR;
 		return;
 	    }
-	    lseek (fd, 0L, 0);
+	    lseek (fd, (off_t)0, 0);
 	}
 
 	/* For efficiency reasons the above is all we normally do.  However,
@@ -82,7 +82,7 @@ XINT	*status;
 
 	    if (match)
 		for (i=0;  i < *nbytes;  i += 512) {
-		    lseek (fd, i, 0);
+		    lseek (fd, (off_t)i, 0);
 		    if (write (fd, &data, 1) < 0) {
 			*status = XERR;
 			close (fd);

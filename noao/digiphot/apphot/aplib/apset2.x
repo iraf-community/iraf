@@ -28,6 +28,8 @@ begin
 	switch (param) {
 	case PYNAME:
 	    call strcpy (str, AP_PYNAME(ply), SZ_FNAME)
+	case PYROOT:
+	    call strcpy (str, AP_PYROOT(ply), SZ_FNAME)
 	case GAIN:
 	    call strcpy (str, AP_GAIN(nse), SZ_FNAME)
 	case NSTRING:
@@ -122,6 +124,10 @@ begin
 	    AP_RPXCUR(rprof) = rval
 	case RPYCUR:
 	    AP_RPYCUR(rprof) = rval
+	case ORPXCUR:
+	    AP_ORPXCUR(rprof) = rval
+	case ORPYCUR:
+	    AP_ORPYCUR(rprof) = rval
 	case RPRADIUS:
 	    AP_RPRADIUS(rprof) = rval
 	    AP_RPNPTS(rprof) = int (AP_RPRADIUS(rprof) / AP_RPSTEP(rprof)) + 1
@@ -154,10 +160,18 @@ begin
 	    AP_PYCX(ply) = rval
 	case PYCY:
 	    AP_PYCY(ply) = rval
+	case OPYCX:
+	    AP_OPYCX(ply) = rval
+	case OPYCY:
+	    AP_OPYCY(ply) = rval
 	case PYXMEAN:
 	    AP_PYXMEAN(ply) = rval
 	case PYYMEAN:
 	    AP_PYYMEAN(ply) = rval
+	case OPYXMEAN:
+	    AP_OPYXMEAN(ply) = rval
+	case OPYYMEAN:
+	    AP_OPYYMEAN(ply) = rval
 	case SKYSIGMA:
 	    AP_SKYSIGMA(nse) = rval
 	case EPADU:
@@ -211,4 +225,3 @@ begin
 	    call error (0, "APSETD: Unknown apphot double parameter")
 	}
 end
-

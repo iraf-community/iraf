@@ -168,11 +168,13 @@ procedure ex_pp_setcmap (ex, expstr)
 pointer	ex				#i task struct pointer
 char	expstr[ARB]			#i expression string
 
-pointer	sp, cm
+pointer	sp, cm, cmap
 int	ip, lp				# string pointers
-int	tp				# where to trim the string
+int	tp, i				# where to trim the string
 
 int	ctor()
+bool	streq()
+include "cmaps.inc"
 
 begin
 	call smark (sp)
@@ -228,8 +230,23 @@ begin
 	    ip = ip + 1
 	    if (ctor (expstr, ip, EX_CONTRAST(ex)) == 0)
 	        call error (5, "cannot interpret contrast value")
-	    call ex_scale_cmap (EX_CMAP(ex), EX_NCOLORS(ex), EX_BRIGHTNESS(ex), 
-	        EX_CONTRAST(ex))
+
+            # Don't scale the overlay colors in colormap.
+            if (streq(CMAPFILE(ex), "overlay")) {
+                cmap = EX_CMAP(ex)
+                call ex_scale_cmap (cmap, 200,
+                    EX_BRIGHTNESS(ex), EX_CONTRAST(ex))
+
+                # Patch up the static overlay colors.
+                do i = 201, 255 {
+                    Memc[cmap+(EX_RED*CMAP_SIZE)+i]   = overlay[i*3+1]
+                    Memc[cmap+(EX_GREEN*CMAP_SIZE)+i] = overlay[i*3+2]
+                    Memc[cmap+(EX_BLUE*CMAP_SIZE)+i]  = overlay[i*3+3]
+                }
+            } else {
+                call ex_scale_cmap (EX_CMAP(ex), EX_NCOLORS(ex),
+                    EX_BRIGHTNESS(ex), EX_CONTRAST(ex))
+            }
 	}
 
 	# We should be at the end of the string now.

@@ -119,7 +119,7 @@ begin
 		IM_LEN (im, 1) = imlen
 		IM_PIXTYPE (im) = TY_REAL
 
-		pix = impl1r (im, 1)
+		pix = impl1r (im)
 
 		do i = 1, imlen {
 		    x = x1 + (i - 1) * dx

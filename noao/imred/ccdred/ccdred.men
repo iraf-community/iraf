@@ -7,7 +7,6 @@
         ccdproc - Process CCD images
         ccdtest - CCD test and demonstration package
         combine - Combine CCD images
-     cosmicrays - Detect and replace cosmic rays
     darkcombine - Combine and process dark count images
     flatcombine - Combine and process flat field images
     mkfringecor - Make fringe correction images from sky images

@@ -58,7 +58,7 @@ begin
 	do i = 1, npts {
 	    val = a[i]
 	    if (val > 0.0)
-		npos = npos + 1
+	        npos = npos + 1
 	    sumi = sumi + val
 	    sumix = sumix + val * i
 	    sumix2 = sumix2 + val * i ** 2

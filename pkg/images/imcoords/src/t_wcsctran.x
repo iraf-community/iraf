@@ -358,6 +358,7 @@ begin
                 nfields)
 
 	    # Decode the coordinates checking for valid input.
+	    call aclri (Memi[nsig], wcsndim)
 	    do ip = 1, nread {
 
 		if (columns[ip] > nfields) {
@@ -372,6 +373,16 @@ begin
 		offset = Memi[field_pos+columns[ip]-1]
 		if (li_get_numd (Memc[linebuf+offset-1],
 		    Memd[incoo+ip-1], Memi[nsig+ip-1]) == 0) {
+		    call fstats (icl, F_FILENAME, Memc[outbuf], SZ_LINE)
+		    call eprintf ("\tBad value in file %s line %d column %d\n")
+			call pargstr (Memc[outbuf])
+			call pargi (nline)
+			call pargi (ip)
+		    call putline (ocl, Memc[linebuf])
+		    break
+		}
+
+		if (IS_INDEFD(Memd[incoo+ip-1])) {
 		    call fstats (icl, F_FILENAME, Memc[outbuf], SZ_LINE)
 		    call eprintf ("\tBad value in file %s line %d column %d\n")
 			call pargstr (Memc[outbuf])
@@ -461,7 +472,7 @@ end
 # violates a system interface and uses the internal definitions in
 # the imio.h file. However this routine is required to support tv coordinates
 # which are coordinates with respect to the current section, and not identical
-# to section coordinates.
+# to physcial coordinates.
 
 procedure wt_vmap (im, voff, vstep, ndim)
 
@@ -476,7 +487,7 @@ begin
 	do i = 1, ndim {
 	    dim = IM_VMAP(im,i)
 	    voff[i] = IM_VOFF(im,dim)
-	    vstep[i] = IM_VSTEP(im,i)
+	    vstep[i] = IM_VSTEP(im,dim)
 	}
 end
 

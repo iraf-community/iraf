@@ -5,7 +5,7 @@
 #define	import_libc
 #define	import_xnames
 #define	import_stdio
-#define	import_varargs
+#define	import_stdarg
 #include <iraf.h>
 
 #define	SZ_OBUF		SZ_COMMAND	/* sz intermediate buffer	*/
@@ -17,23 +17,29 @@
  * XCHAR into the char output string.  This is not as bad as it sounds
  * as the operation is negligible compared to the encoding operation.
  */
-/* VARARGS */
 char *
+#ifdef USE_STDARG
+sprintf (char *str, char *format, ...)
+#else
 sprintf (va_alist)
-va_dcl				/* pointer to arg list		*/
+va_dcl
+#endif
 {
-	va_list	argp;
-	char	*str;			/* output string		*/
-	char	*format;		/* format specification		*/
-
 	register XCHAR	*ip;
 	register char	*op;
-	XCHAR	obuf[SZ_OBUF], *fiobuf;
-	XINT	fd, maxch=SZ_OBUF, mode=NEW_FILE;
+	XCHAR obuf[SZ_OBUF], *fiobuf;
+	XINT fd, maxch=SZ_OBUF, mode=NEW_FILE;
+	va_list	argp;
 
+#ifdef USE_STDARG
+	va_start (argp, format);
+#else
+	char *str;
+	char *format;
 	va_start (argp);
 	str = va_arg (argp, char *);
 	format = va_arg (argp, char *);
+#endif
 
 	/* Select output buffer. */
 	if (sizeof (XCHAR) == sizeof (char))

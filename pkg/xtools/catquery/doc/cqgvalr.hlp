@@ -1,0 +1,40 @@
+.help cqgvalr Mar00 "Catquery Package"
+.ih
+NAME
+cqgvalr -- get the catalog results field as a real value
+.ih
+SYNOPSIS
+
+nchars = cq_gvalr (res, recno, fname, rval)
+
+.nf
+pointer	res		# the results descriptor
+int	recno		# the record number
+char	fname		# the field name
+real	rval		# the returned field value
+.fi
+.ih
+ARGUMENTS
+.ls res     
+The results descriptor.
+.le
+.ls recno
+The record number.
+.le
+.ls fname
+The field name.
+.le
+.ls rval
+The returned real value.
+.le
+.ih
+DESCRIPTION
+Cq_gvalr returns the requested field as a real value.
+Cq_gvalr is an integer function which returns the number of characters
+that were successfully decoded as its function value. Zero is returned
+if the requested field could not be decoded.
+
+.ih
+SEE ALSO
+cqgval[csild]
+.endhelp

@@ -19,6 +19,7 @@ int	fd, nchars
 pointer	sp, bp, sv, text, fname, extn
 int	open(), read(), miireadc(), miireadi(), fnextn()
 errchk	open, read, syserrs
+define	err_ 91
 
 begin
 	call smark (sp)
@@ -36,24 +37,31 @@ begin
 	# Get savefile header.
 	call salloc (sv, LEN_SVDES, TY_STRUCT)
 	if (miireadi (fd, Memi[sv], LEN_SVDES) != LEN_SVDES)
-	    call syserrs (SYS_PLBADSAVEF, Memc[fname])
+	    goto err_
 
 	# Verify file type.
 	if (SV_MAGIC(sv) != PLIO_SVMAGIC)
-	    call syserrs (SYS_PLBADSAVEF, Memc[fname])
+	    goto err_
 
 	# Get descriptive text.
 	call salloc (text, SV_TITLELEN(sv), TY_CHAR)
 	if (miireadc (fd, Memc[text], SV_TITLELEN(sv)) != SV_TITLELEN(sv))
-	    call syserrs (SYS_PLBADSAVEF, Memc[fname])
+	    goto err_
 	else
 	    call strcpy (Memc[text], title, maxch)
 
 	# Get encoded mask.
 	call salloc (bp, SV_MASKLEN(sv), TY_SHORT)
-	nchars = read (fd, Mems[bp], SV_MASKLEN(sv) * SZ_SHORT)
+	iferr (nchars = read (fd, Mems[bp], SV_MASKLEN(sv) * SZ_SHORT))
+	    goto err_
 	call close (fd)
 
-	call pl_load (pl, bp) 
+	iferr (call pl_load (pl, bp))
+	    goto err_
+
 	call sfree (sp)
+	return
+err_
+	call close (fd)
+	call syserrs (SYS_PLBADSAVEF, Memc[fname])
 end

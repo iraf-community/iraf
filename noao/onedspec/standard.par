@@ -15,4 +15,7 @@ cursor,*gcur,h,"",,,Graphics cursor input
 star_name,s,q,,,,Star name in calibration list
 airmass,r,q,,1.,,Airmass
 exptime,r,q,,,,Exposure time (seconds)
+mag,r,q,,,,Magnitude of star
+magband,s,q,,"U|B|V|R|I|J|H|K|L|Lprime|M",,"Magnitude type"
+teff,s,q,,,,Effective temperature or spectral type
 answer,s,q,no,,,"(no|yes|NO|YES|NO!|YES!)"

@@ -158,8 +158,6 @@ begin
 end
 
 
-define	MAXSAMPLE	50	# Maximum sample points
-
 # TR_SETUP -- Setup the transformation interpolation.
 # At each point (U,V) in the output image we need to know the coordinate
 # (X,Y) of the input images to be interpolated.  This means we need to
@@ -196,7 +194,7 @@ pointer	xmsi, ymsi, jmsi	# Surface interpolators for X, Y and Jacobian
 pointer	uout, vout		# Output coordinates relative to interpolator 
 pointer	duout, dvout		# Output coordinate intervals
 
-int	i, j, nsf, nusf, nvsf, nu1, nv1
+int	i, j, step, nsf, nusf, nvsf, nu1, nv1
 real	xmin, xmax, ymin, ymax, umin, umax, vmin, vmax
 real	u, v, x, y, du1, dv1, der[8]
 pointer	sp, sfname, usf, vsf, un1, sf, xgrid, ygrid, zgrid, ptr1, ptr2, ptr3
@@ -218,6 +216,9 @@ begin
 	call salloc (sfname, SZ_FNAME, TY_CHAR)
 	call salloc (usf, nsf, TY_INT)
 	call salloc (vsf, nsf, TY_INT)
+
+	#step = clgeti ("step")
+	step = 10
 
 	un[1] = NULL
 	un[2] = NULL
@@ -343,8 +344,8 @@ begin
 	# point.  This allows the interative inversion routine to work most
 	# efficiently with typically only two evaluations per step.
 
-	nu1 = nu / ((nu + MAXSAMPLE - 1) / MAXSAMPLE)
-	nv1 = nv / ((nv + MAXSAMPLE - 1) / MAXSAMPLE)
+	nu1 = max (2, nu / step)
+	nv1 = max (2, nv / step)
 	du1 = (u2 - u1) / (nu1 - 1)
 	dv1 = (v2 - v1) / (nv1 - 1)
 
@@ -591,7 +592,7 @@ real	fudge, du, dv, dx, dy, tmp[3]
 begin
 	# Use the last result as the starting point for the next position.
 	# If this is near the desired value then the interation will converge
-	# quickly.  Allow a interation to go off the surface twice.
+	# quickly.  Allow a iteration to go off the surface twice.
 	# Quit when DX and DY are within ERROR.
 
 	nedge = 0
@@ -606,12 +607,12 @@ begin
 	    y = der[2] + fudge * dy
 	    der[1] = max (xmin, min (xmax, x))
 	    der[2] = max (ymin, min (ymax, y))
-	    if (x < xmin || x > xmax)
-	        nedge = nedge + 1
-	    if (y < ymin || y > ymax)
-	        nedge = nedge + 1
-	    if (nedge > 2)
-	        break
+#	    if (x < xmin || x > xmax)
+#	        nedge = nedge + 1
+#	    if (y < ymin || y > ymax)
+#	        nedge = nedge + 1
+#	    if (nedge > 2)
+#	        break
 	    if ((abs (dx) < ERROR) && (abs (dy) < ERROR))
 	        break
 

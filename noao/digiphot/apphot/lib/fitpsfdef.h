@@ -25,11 +25,13 @@ define	AP_PNX		Memi[$1+14]	# X dimension of subraster
 define	AP_PNY		Memi[$1+15]	# Y dimension of subraster
 define	AP_PFXCUR	Memr[$1+16]	# X initial position
 define	AP_PFYCUR	Memr[$1+17]	# Y initial position
+define	AP_OPFXCUR	Memr[$1+18]	# X initial position
+define	AP_OPFYCUR	Memr[$1+19]	# Y initial position
 
 # fitpsf answers
 
-define	AP_PPARS	Memi[$1+18]	# fitted parameters
-define	AP_PPERRS	Memi[$1+19]	# errors in the parameters
+define	AP_PPARS	Memi[$1+20]	# fitted parameters
+define	AP_PPERRS	Memi[$1+21]	# errors in the parameters
 define	AP_PSFSTRING	Memc[P2C($1+22)] # functions string
 
 # default fitpsf parameters

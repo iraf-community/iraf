@@ -79,9 +79,13 @@ tfiles:
 	$ifolder (ak/ahgmi.x,  ahgm.gx )    $(GA) -t csilrd  ahgm.gx	$endif
 	$ifolder (ak/ahivi.x,  ahiv.gx )    $(GA) -t csilrdx ahiv.gx	$endif
 	$ifolder (ak/aimgi.x,  aimg.gx )    $(GA) -t  silrd  aimg.gx	$endif
+	$ifolder (lz/alani.x,  alan.gx )    $(GL) -t  sil    alan.gx	$endif
+	$ifolder (lz/alanki.x, alank.gx)    $(GL) -t  sil    alank.gx	$endif
 	$ifolder (lz/alimi.x,  alim.gx )    $(GL) -t csilrdx alim.gx	$endif
 	$ifolder (lz/allni.x,  alln.gx )    $(GL) -t  silrdx alln.gx	$endif
 	$ifolder (lz/alogi.x,  alog.gx )    $(GL) -t  silrdx alog.gx	$endif
+	$ifolder (lz/alori.x,  alor.gx )    $(GL) -t  sil    alor.gx	$endif
+	$ifolder (lz/alorki.x, alork.gx)    $(GL) -t  sil    alork.gx	$endif
 	$ifolder (lz/alovi.x,  alov.gx )    $(GL) -t csilrdx alov.gx	$endif
 	$ifolder (lz/altai.x,  alta.gx )    $(GL) -t  silrdx alta.gx	$endif
 	$ifolder (lz/altmi.x,  altm.gx )    $(GL) -t  silrdx altm.gx	$endif

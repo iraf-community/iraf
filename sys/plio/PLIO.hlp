@@ -1011,7 +1011,8 @@ Line List Structure
     The full line list structure consists of a header describing the line
 list entry in the PLIO descriptor, plus the LL encoding of the line, as
 illustrated below.  This information is internal to the PLIO package and
-should not be used in applications code.
+should not be used in applications code.  [The LL header was generalized
+in Aug2000 to permit larger masks; see plio.h]
 
 .ks
 .nf

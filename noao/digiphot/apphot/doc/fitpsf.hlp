@@ -1,4 +1,4 @@
-.help fitpsf Dec92 noao.digiphot.apphot
+.help fitpsf May00 noao.digiphot.apphot
 .ih
 NAME
 fitpsf -- model the point spread function with an analytic function
@@ -14,39 +14,31 @@ The list of images containing the objects to be measured.
 The width of the fitting box in scale units.
 .le
 .ls coords = ""
-The name of the text file(s) containing the coordinates of the objects
-to be modeled, 1 object per line with the x and y coordinates in
-columns 1 and 2 respectively. If coords is null (""), FITPSF will either
-read commands from the image cursor (default) or read commands from a
-cursor command file.
-In the latter case the image cursor parameter \fIicommands\fR
-must be set to the name
-of the cursor command file.
-If \fIcoords\fR is defined, FITPSF will
-accept coordinate input from either the image cursor or coords
-(interactive mode), or read coordinates from
-coords or a cursor command file (batch mode).
-The number of coords files must be zero,
-one, or equal to the number of input images.
+The list of text files containing initial coordinates for the objects to
+be centered. Objects are listed in coords one object per line with the
+initial coordinate values in columns one and two. The number of coordinate
+files must be zero, one, or equal to the number of images.
+If coords is "default", "dir$default", or a directory specification then an
+coords file name of the form dir$root.extension.version is constructed and
+searched for, where dir is the directory, root is the root image name,
+extension is "coo" and version is the next available version number for the
+file.
 .le
 .ls output = "default"
-The name of the results file or results directory.
-If output is "default", "dir$default" or a directory specification
-then an output name of the form dir$root.extension.version
-is constructed, where dir is the directory, root is the root image name,
-extension is "psf" and version is the next available version of the file.
-If output is null (""),  then no output file is created.
-If output is defined the number of output files must be one, or
-equal to the number of input images.
-In both interactive and batch mode full results are written to output. In
-interactive mode a subset of the results is printed on the standard output.
+The name of the results file or results directory. If output is
+"default", "dir$default", or a directory specification then an output file name
+of the form dir$root.extension.version is constructed, where dir is the
+directory, root is the root image name, extension is "psf" and version is
+the next available version number for the file. The number of output files
+must be zero, one, or equal to the number of image files.  In both interactive
+and batch mode full output is written to output. In interactive mode
+an output summary is also written to the standard output.
 .le
 .ls datapars = ""
-The parameter file containing the data dependent parameters.
-If \fIdatapars\fR is null (""), then the default parameter set in the user's
+The name of the file containing the data dependent parameters.
+The critical parameters \fIfwhmpsf\fR and \fIsigma\fR are located in
+datapars.  If datapars is undefined then the default parameter set in
 uparm directory is used.
-The critical parameters \fIfwhmpf\fR, and \fIsigma\fR are
-located here.
 .le
 .ls function = "radgauss"
 The function to be fit. The options are:
@@ -78,43 +70,147 @@ The default is no rejection.
 .ls kreject = 3.0
 The k-sigma rejection limit in units of sigma.
 .le
-.ls interactive = yes
-Interactive or batch mode.
-.le
-Draw the fitting box on the image display?
 .ls mkbox = no
+Draw the fitting box on the image display?
 .le
-.ls verify = yes
-Verify the critical parameters in non-interactive mode.
-.le
-.ls update = no
-Update the critical parameters in non-interactive mode.
-.le
-.ls verbose = no
-Print messages on the terminal in non-interactive mode.
-.le
-.ls graphics = "stdgraph"
-The default graphics device.
-.le
-.ls display = "stdimage"
-The default image display device.
-Display can be set to "stdgraph" to enable FITPSF to work interactively
-from a contour plot.
+.ls interactive = yes
+Run the task interactively ?
 .le
 .ls icommands = ""
-The image cursor.
+The image cursor or image cursor command file.
 .le
 .ls gcommands = ""
-The graphics cursor.
+The graphics cursor or graphics cursor command file.
+.le
+.ls wcsin = ")_.wcsin", wcsout = ")_.wcsout"
+The coordinate system of the input coordinates read from \fIcoords\fR and
+of the output coordinates written to \fIoutput\fR respectively. The image
+header coordinate system is used to transform from the input coordinate
+system to the "logical" pixel coordinate system used internally,
+and from the internal "logical" pixel coordinate system to the output
+coordinate system. The input coordinate system options are "logical", tv",
+"physical", and "world". The output coordinate system options are "logical",
+"tv", and "physical". The image cursor coordinate system is assumed to
+be the "tv" system.
+.ls logical
+Logical coordinates are pixel coordinates relative to the current image.
+The  logical coordinate system is the coordinate system used by the image
+input/output routines to access the image data on disk. In the logical
+coordinate system the coordinates of the first pixel of a  2D image, e.g.
+dev$ypix  and a 2D image section, e.g. dev$ypix[200:300,200:300] are
+always (1,1).
+.le
+.ls tv
+Tv coordinates are the pixel coordinates used by the display servers. Tv
+coordinates  include  the effects of any input image section, but do not
+include the effects of previous linear transformations. If the input
+image name does not include an image section, then tv coordinates are
+identical to logical coordinates.  If the input image name does include a
+section, and the input image has not been linearly transformed or copied from
+a parent image, tv coordinates are identical to physical coordinates.
+In the tv coordinate system the coordinates of the first pixel of a
+2D image, e.g. dev$ypix and a 2D image section, e.g. dev$ypix[200:300,200:300]
+are (1,1) and (200,200) respectively.
+.le
+.ls physical
+Physical coordinates are pixel coordinates invariant  with respect to linear
+transformations of the physical image data.  For example, if the current image
+was created by extracting a section of another image,  the  physical
+coordinates of an object in the current image will be equal to the physical
+coordinates of the same object in the parent image,  although the logical
+coordinates will be different.  In the physical coordinate system the
+coordinates of the first pixel of a 2D image, e.g. dev$ypix and a 2D
+image section, e.g. dev$ypix[200:300,200:300] are (1,1) and (200,200)
+respectively.
+.le
+.ls world
+World coordinates are image coordinates in any units which are invariant
+with respect to linear transformations of the physical image data. For
+example, the ra and dec of an object will always be the same no matter
+how the image is linearly transformed. The units of input world coordinates
+must be the same as those expected by the image header wcs, e. g.
+degrees and degrees for celestial coordinate systems.
+.le
+The wcsin and wcsout parameters default to the values of the package
+parameters of the same name. The default values of the package parameters
+wcsin and wcsout are "logical" and "logical" respectively.
+.le
+.le
+.ls cache = ")_.cache"
+Cache the image pixels in memory. Cache may be set to the value of the apphot
+package parameter (the default), "yes", or "no". By default cacheing is 
+disabled.
+.le
+.ls verify = ")_.verify"
+Verify the critical parameters in non-interactive mode ? Verify may be set to
+the apphot package parameter value (the default), "yes", or "no.
+.le
+.ls update = ")_.update"
+Update the critical parameters in non-interactive mode if verify is set of
+"yes" ? Update may be set to the apphot package parameter value (the default),
+"yes", or "no.
+
+.le
+.ls verbose = ")_.verbose"
+Print messages on the terminal in non-interactive mode ? Verbose may be set
+to the apphot package parameter value (the default), "yes", or "no.
+
+.le
+.ls graphics = ")_.graphics"
+The default graphics device.  Graphics may be set to the apphot package
+parameter value (the default), "yes", or "no.
+.le
+.ls display = ")_.display"
+The default display device.  Display may be set to the apphot package
+parameter value (the default), "yes", or "no.  By default graphics overlay
+is disabled.  Setting display to one of "imdr", "imdg", "imdb", or "imdy"
+enables graphics overlay with the IMD graphics kernel.  Setting display to
+"stdgraph" enables FITPSF to work interactively from a contour plot.
 .le
 
 .ih
 DESCRIPTION
 
 FITPSF models the stellar brightness distribution of objects in the IRAF image
-\fIimage\fR using non-linear least squares techniques and produces a
-list of model parameters and associated errors as output. Pixels in a
-subraster of width \fIbox * scale\fR are extracted and used in the fit.
+\fIimage\fR using non-linear least squares techniques and writes the
+list of model parameters and associated errors to the file \fIoutput\fR.
+Initial coordinates for the objects are read from the image cursor or
+the text file \fIcoords\fR.  Pixels in a subraster of width \fIbox * scale\fR
+are extracted and used in the fit.
+
+The coordinates read from \fIcoords\fR are assumed to be in coordinate
+system defined by \fIwcsin\fR. The options are "logical", "tv", "physical",
+and "world" and the transformation from the input coordinate system to
+the internal "logical" system is defined by the image coordinate system.
+The simplest default is the "logical" pixel system. Users working on with
+image sections but importing pixel coordinate lists generated from the parent
+image must use use the "tv" or "physical" input coordinate systems.
+Users importing coordinate lists in world coordinates, e.g. ra and dec,
+must use the "world" coordinate system and may need to convert their
+equatorial coordinate units from hours and degrees to degrees and degrees first.
+
+The coordinates written to \fIoutput\fR are in the coordinate
+system defined by \fIwcsout\fR. The options are "logical", "tv",
+and "physical". The simplest default is the "logical" system. Users
+wishing to correlate the output coordinates of objects measured in
+image sections or mosaic mosaic pieces with coordinates in the parent
+image must use the "tv" or "physical" coordinate systems.
+
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input image pixels are cached in memory. If cacheing
+is enabled and FITPSF is run interactively the first measurement will appear
+to take a long time as the entire image must be read in before the measurement
+is actually made. All subsequent measurements will be very fast because FITPSF
+is accessing memory not disk. The point of cacheing is to speed up random
+image access by making the internal image i/o buffers the same size as the
+image itself. However if the input object lists are sorted in row order and
+sparse cacheing may actually worsen not improve the execution time. Also at
+present there is no point in enabling cacheing for images that are less than
+or equal to 524288 bytes, i.e. the size of the test image dev$ypix, as the
+default image i/o buffer is exactly that size. However if the size of dev$ypix
+is doubled by converting it to a real image with the chpixtype task then the
+effect of cacheing in interactive is can be quite noticeable if measurements
+of objects in the top and bottom halfs of the image are alternated.
 
 FITPSF can be run either interactively or in batch mode by setting the
 parameter \fIinteractive\fR. In interactive mode starting x and y positions
@@ -205,7 +301,7 @@ q	Exit task
 :mkbox		[y/n]		Mark the fitting box on the display
 
 
-The following command are availalble from within the interactive setup menu.
+The following command are available from within the interactive setup menu.
 
 
                     Interactive Fitpsf Setup Menu
@@ -223,27 +319,23 @@ The following command are availalble from within the interactive setup menu.
 .ih
 ALGORITHMS
 
-The fitting parameters
-are \fIfunction\fR, the functional form of the model to be fit,
-\fImaxiter\fR, the
-maximum number of iterations per fit, \fIkreject\fR, the K-sigma rejection
-limit and \fInreject\fR, the maximum number of rejection cycles. The
-currently available functions are a 2D moments analysis "moments",
-a 2D radial Gaussian "radgauss",  and a 2D elliptical Gaussian "elgauss".
+The fitting parameters are \fIfunction\fR, the functional form of the model
+to be fit, \fImaxiter\fR, the maximum number of iterations per fit,
+\fIkreject\fR, the K-sigma rejection limit and \fInreject\fR, the maximum
+number of rejection cycles. The currently available functions are a 2D
+moments analysis "moments", a 2D radial Gaussian "radgauss",  and a
+2D elliptical Gaussian "elgauss".
 
 The weighting of the fit is determined by the parameter \fInoise\fR in the 
 \fIdatapars\fR file. The two options are \fIconstant\fR, in which all the
 weights are set to 1 and \fIpoisson\fR in which the weights are equal to
-the inverse of the counts divided by the image gain read from
-the datapars \fIgain\fR or \fIepadu\fR parameters plus the square
-of the readout noise determined from the datapars parameters \fIccdread\fR or
-\fIreadnoise\fR.
+the inverse of the counts divided by the image gain read from the datapars
+\fIgain\fR or \fIepadu\fR parameters plus the square of the readout noise
+determined from the datapars parameters \fIccdread\fR or \fIreadnoise\fR.
 If \fIfunction\fR is either "radgauss" or "ellgauss" then the datapars
-parameter
-\fIfwhmpsf\fR is used to determine the initial guess for the Gaussian
-sigma.
-The datapars parameter \fIthreshold\fR determines the intensity threshold above
-which the moment analysis is performed.
+parameter \fIfwhmpsf\fR is used to determine the initial guess for the
+Gaussian sigma.  The datapars parameter \fIthreshold\fR determines the
+intensity threshold above which the moment analysis is performed.
 
 .ih
 OUTPUT
@@ -291,8 +383,8 @@ Xcenter and ycenter are the computed x and y
 positions of the object. Rsigma, xsigma and ysigma are the distance from
 the center of the Gaussian at which the Gaussian is equal to exp (-0.5)
 of its central value. Xsigma and ysigma refer to those values along the major
-and minor axes of the ellipse respectively. The amplitude and sky refer
-to the amplitude of
+and minor axes of the ellipse respectively. The amplitude and sky refer to
+the amplitude of
 the Gaussian function and a constant background value respectively.
 If function = "moments" amplitude and sky refer to the total intensity
 above threshold and sky is the threshold value. Rot and pa are position angles
@@ -321,30 +413,28 @@ conditions.
 .ih
 EXAMPLES
 
-1. Compute the radial Gaussian function parameters for a few  stars in N4147
-using
-the display and the image cursor. Setup the task parameters using
-the interactive setup menu defined by the i key command.
+1. Compute the radial Gaussian function parameters for a few  stars in dev$ypix
+using the display and the image cursor. Setup the task parameters using
+the interactive setup menu defined by the i key command. Use uniform
+weighting.
 
 .nf
-	ap> set stdimcur = stdimage
-
-	... define the image cursor
-
-	ap> display n4147 1 fi+
+	ap> display dev$ypix 1 fi+
 
 	... display the image
 
-	ap> fitpsf n4147
+	ap> fitpsf dev$ypix 11 noise=constant
 
-	... type ? to get a short help page on the screen
+	... type ? to see the help screen
 
 	... move the image cursor to a star
 	... type i to enter the interactive setup menu
-	... enter maximum radius in pixels of the radial profile
+	... enter maximum radius in pixels of the radial profile or type
+	    CR to accept the default value
 	... set the fitting box width, fwhmpsf, and sigma using the graphics
 	    cursor and the stellar radial profile plot
 	... typing <CR> leaves everything at the default value
+	... type q to quit the setup menu
 
 	... type the v key to verify the parameters
 
@@ -356,41 +446,47 @@ the interactive setup menu defined by the i key command.
 	... a one line summary of the fitted parameters will appear on the
 	    standard output for each star measured
 
-	... the full output will appear in n4147.psf.1
+	... type q to quit and another q to confirm the quit
+
+	... the full output will appear in ypix.psf.1
 .fi
 
-2. Compute the radial Gaussian function  parameters for a few  stars in M92
-using the contour plot
-and the graphics cursor. Setup the task parameters using the interactive
-setup menu defined by the i key command.
+2. Compute the radial Gaussian function  parameters for a few  stars in 
+dev$ypix using the contour plot and the graphics cursor. Setup the task
+parameters using the interactive setup menu defined by the i key command.
+Use uniform weighting.
 
 .nf
+	ap> show stdimcur
+
+	... save the current value of stdimcur
+
 	ap> set stdimcur = stdgraph
 
 	... define the image cursor to be the graphics cursor
 
-	ap> contour m92 >G m92.plot1
+	ap> contour dev$ypix >G ypix.plot1
 
-	... store the contour plot of m92 in the file m92.plot
+	... store the contour plot of dev$ypix in the file ypix.plot1
 
-	ap> fitpsf m92 display=stdgraph
+	ap> fitpsf dev$ypix 11.0 noise=constant display=stdgraph
 
 	... type ? to get a short help page on the screen
 
-	... type :.read m92.plot1 to load the contour plot on the screen
-
 	... move the graphics cursor to a star
 	... type i to enter the interactive setup menu
-	... enter the maximum radius in pixels of the radial profile
+	... enter the maximum radius in pixels of the radial profile or
+	    type CR to accept the default value
 	... set the fitting box width, fwhmpsf, and sigma using the graphics
 	    cursor and the stellar radial profile plot
 	... typing <CR> leaves everything at the default value
+	... type q to quit the setup menu
 
 	... type the v key to verify critical parameters
 
 	... type the w key to save the parameters in the parameter files
 
-	... retype :.read m92.plot1 to reload the contour plot
+	... retype :.read ypix.plot1 to reload the contour plot
 
 	... move the graphics cursor to the stars of interest and tap
 	    the space bar
@@ -398,111 +494,167 @@ setup menu defined by the i key command.
 	... a one line summary of the fitted parameters will appear on the
 	    standard output for each star measured
 
-	... full output will appear in the text file m92.psf.1 
+	... type q to quit and q again to confirm the quit
+
+	... full output will appear in the text file ypix.psf.2 
 .fi
 
 
-3. Setup and run FITPSF interactively on a list of objects,
-using a contour plot as the image display and the parameters defined and
-saved in example 2.
+3. Setup and run FITPSF interactively on a list of objects temporarily
+overriding the fwhmpsf and sigma parameters determined in examples 1 or 2.
+Use uniform weighting.
 
 .nf
-	ap> set stdimcur = stdgraph
+        ap> daofind dev$ypix fwhmpsf=2.6 sigma=25.0 verify-
 
-	... define the image cursor to be the graphics cursor
+        ... make a coordinate list
 
-	ap> contour m92
+        ... the output will appear in the text file ypix.coo.1
 
-	... adjust plot parameters until the contour plot is satisfactory
+        ap> fitpsf dev$ypix 11.0 fwhmpsf=2.6 noise=constant coords=ypix.coo.1
 
-	ap> =gcur
+        ... type ? for optional help
 
-	... enter cursor mode
 
-	... type :.write m92.plot2 to save the plot in a metacode file
+        ... move the graphics cursor to the stars and tap space bar
 
-	... type any key to quit cursor mode
+                                or
 
-	ap> daofind m92
+        ... select stars from the input coordinate list with m / :m #
+            and measure with spbar
 
-	... make a coordinate list by searching for objects with  the
-	    fwhmpsf and threshold defined in example 2
+        ... measure stars selected from the input coordinate list
+            with n / n #
 
-	... the output will appear in the text file m92.coo.1
+        ... a one line summary of results will appear on the standard output
+            for each star measured
 
-	ap> fitpsf m92 coords=m92.coo.1 display=stdgraph
+        ... type q to quit and q again to confirm the quit
 
-	... type ? for optional help
-
-	... type :.read m92.plot2 to read in the contour plot
-
-	... move the graphics cursor to the stars and tap space bar
-
-				or
-
-	... use m, :m and/or n, :n, l, r commands to measure objects in the
-	    coordinate list
-
-	... a one line summary of results will appear on the standard output
-	    for each star measured
-
-	... the output will appear in m92.psf.2 ...
+        ... the output will appear in ypix.psf.3 ...
 .fi
 
 
-4. Run FITPSF in batch mode using the coordinate file and the previously
-saved parameters. Verify the critical parameters.
+4. Display and fit some stars in an image section and write the output
+coordinates in the coordinate system of the parent image. Use uniform 
+weighting.
 
 .nf
-	ap> fitpsf m92 coords=m92.coo.1 verify+ inter-
+        ap> display dev$ypix[150:450,150:450] 1
 
-	... output will appear in m92.psf.3 ...
+        ... display the image section
+
+        ap> fitpsf dev$ypix[150:450,150:450] 11.0 noise=constant wcsout=tv
+
+        ... move cursor to stars and type spbar
+
+        ... type q to quit and q again to confirm quit
+
+        ... output will appear in ypix.psf.4
+
+        ap> pdump ypix.psf.4 xc,yc yes | tvmark 1 STDIN col=204
 .fi
 
 
 5. Run FITPSF in batch mode using the coordinate file and the previously
-saved parameters. The task can be submitted to the background by
-appending an ampersand to the command line listed below.
+saved parameters. Use uniform weighting. Verify the critical parameters.
 
 .nf
-	ap> fitpsf m92 coords=m92.coo.1 verify- inter-
+        ap> fitpsf dev$ypix 11.0 coords=ypix.coo.1 noise=constant verify+ \
+            inter-
 
-	... output will appear in m92.psf.4
+        ... output will appear in ypix.psf.5 ...
 .fi
 
-6. Run FITPSF interactively on the Sun workstation without the use of the
-IMTOOL window using only a coordinate list and the current set of parameters
-as input.
+6. Repeat example 5 but assume that the input coordinate are ra and dec
+in degrees and degrees, turn off verification, and submit the task to to
+the background. Use uniform weighting.
 
 .nf
-	ap> set stdimcur = text
+        ap> display dev$ypix 1
 
-	... set the image cursor to the standard input
+        ap> rimcursor wcs=world > radec.coo
 
-	ap> fitpsf m92 coords=m92.coo.1
+        ... move to selected stars and type any key
 
-	... type ? for optional help
+        ... type ^Z to quit
 
-	... type :m 3 to set the initial coordinates to those of the
-	    third star in the list
+        ap> fitpsf dev$ypix 11.0 coords=radec.coo noise=constant \
+            wcsin=world verify- inter- &
 
-	... type i to enter the interactive setup menu followed by v to
-	    get the default menu
-	... enter maximum radius in pixels of the radial profile
-	... set the fwhmpsf, sigma, and fitting box half-width
-	    using the graphics cursor and the stellar radial profile plot,
-	    typing <CR> after the prompt leaves the parameter at its default
-	    value
+        ... output will appear in ypix.psf.6
 
-	... type r to rewind the coordinate list
+        ap> pdump ypix.psf.6 xc,yc yes | tvmark 1 STDIN col=204
 
-	... type l to measure all the stars in the coordinate list
-
-	... a one line summary of the answers will appear on the standard
-	    output for each star measured
-
-	... full output will appear in the text file m92.psf.5 
+        ... mark the stars on the display
 .fi
+
+7. Run FITPSF interactively without using the image display.
+
+.nf
+        ap> show stdimcur
+
+        ... record the default value of stdimcur
+
+        ap> set stdimcur = text
+
+        ... set the image cursor to the standard input
+
+        ap> fitpsf dev$ypix 11.0 coords=ypix.coo.1 noise=constant
+
+        ... type ? for optional help
+
+        ... type :m 3 to set the initial coordinates to those of the
+            third star in the list
+
+        ... type i to enter the interactive setup menu
+        ... enter the maximum radius in pixels for the radial profile or
+            accept the default with a CR
+        ... type v to enter the default menu
+        ... set the fwhmpsf, sigma, and fitting box size  using the
+            graphics cursor and the stellar radial profile plot
+        ... typing <CR> after the prompt leaves the parameter at its default
+            value
+        ... type q to quit the setup menu
+
+        ... type r to rewind the coordinate list
+
+        ... type l to measure all the stars in the coordinate list
+
+        ... a one line summary of the answers will appear on the standard
+            output for each star measured
+
+        ... type q to quit followed by q to confirm the quit
+
+        ... full output will appear in the text file ypix.psf.7
+
+        ap> set stdimcur = <default>
+
+        ... reset the value of stdimcur
+.fi
+
+8. Use an image cursor command file to drive the FITPSF task. The cursor command
+file shown below sets the fwhmpsf, sigma, and noise, computes the model
+fit parameter values for 3 stars, updates the parameter files, and quits
+the task.
+
+.nf
+        ap> type cmdfile
+        : fwhmpsf 2.6
+        : sigma 5.0
+        : noise constant
+        442 410 101 \040
+        349 188 101 \040
+        225 131 101 \040
+        w
+        q
+
+        ap> fitpsf dev$ypix 11.0 icommands=cmdfile verify-
+
+        ... full output will appear in ypix.psf.8
+.fi
+
+
 .ih
 BUGS
 
@@ -514,14 +666,12 @@ It is currently the responsibility of the user to make sure that the
 image displayed in the frame is the same as that specified by the image
 parameter.
 
-Commands which draw to the image display are currently disabled.
-The TVMARK task in the proto package  can be used to draw simple marks
-on the display. All the APPHOT marking commands will however function
-if a contour plot is used in lieu of the image display.
-
-Users should not be confused by the normally enabled markcur option in the
-SUN/IMTOOL setup window. This feature is under the control of the
-IMTOOL window and the APPHOT package has no control over it.
+Commands which draw to the image display are disabled by default.
+To enable graphics overlay on the image display, set the display
+parameter to "imdr", "imdg", "imdb", or "imdy" to get red, green,
+blue or yellow overlays and set the  mkbox switch to"yes".
+It may be necessary to run gflush and to redisplay the image
+to get the overlays position correctly.
 
 .ih
 SEE ALSO

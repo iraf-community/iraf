@@ -18,6 +18,8 @@ task	mpp	= t_mpp,
 	many	= t_many,
 	server	= t_server,
 	client	= t_client,
+	oserver	= t_old_server,
+	oclient	= t_old_client,
 	daytime = t_daytime,
 	http	= t_http
 
@@ -226,6 +228,98 @@ end
 # listens on the specified port and waits for a client connection, then
 # returns a status message for every message received from the client,
 # shutting down when the client exits.
+
+procedure t_server()
+
+char	buf[SZ_BUF]
+int	fdi, fdo, nb, i
+int	ndopen(), read(), reopen()
+
+begin
+	do i = 1, 5 {
+	    call printf ("server waiting for connection\n")
+	    fdi = ndopen ("unix:/tmp/nd:text", NEW_FILE)
+	    fdo = reopen (fdi, READ_WRITE)
+
+	    call printf ("fdin = %d  fdout = %d\n")
+		call pargi (fdi) ; call pargi (fdo)
+
+	    call fdebug (STDOUT, fdi, fdo)
+	    call flush (STDOUT)
+
+	    repeat {
+		nb = read (fdi, buf, SZ_BUF)
+		if (nb > 0) {
+		    call fprintf (STDOUT, "read %d bytes from client\n")
+			call pargi (nb)
+		    call flush (STDOUT)
+
+		    call fprintf (fdo, "read %d bytes from client\n")
+			call pargi (nb)
+		    call flush (fdo)
+		}
+	    } until (nb <= 0)
+
+	    call printf ("client has disconnected\n")
+	    call close (fdi)
+	    call close (fdo)
+	}
+end
+
+
+# CLIENT -- Connect to the server on the given port and send a number of
+# test messages, then close the connection and exit.
+
+procedure t_client()
+
+char	buf[SZ_BUF]
+int	fdi, fdo, n, i, msglen
+int	msgsize[8]
+
+int	ndopen(), read(), reopen()
+data	msgsize /64, 128, 256, 134, 781, 3, 19, 1544/
+
+begin
+	fdi = ndopen ("unix:/tmp/nd:text", READ_WRITE)
+	fdo = reopen (fdi, READ_WRITE)
+
+	call printf ("fdin = %d  fdout = %d\n")
+	    call pargi (fdi) ; call pargi (fdo)
+
+	call fdebug (STDOUT, fdi, fdo)
+	call flush (STDOUT)
+
+	for (i=1;  i <= 5;  i=i+1) {
+	    msglen = msgsize[mod(i,8)+1)
+	    call printf ("send %d chars to server\n")
+		call pargi (msglen)
+
+	    call write (fdo, buf, msglen)
+	    call flush (fdo)
+
+	    n = read (fdi, buf, SZ_BUF)
+	    if (n > 0) {
+		buf[n+1] = EOS
+		call printf ("read %d bytes from server\n")
+		    call pargi (n)
+		call printf ("server: %s\n")
+		    call pargstr (buf)
+	    } else {
+		call printf ("server has disconnected\n")
+		break
+	    }
+	    call flush (STDOUT)
+	}
+
+	call close (fdi)
+	call close (fdo)
+end
+
+
+# SERVER -- Simple ND server for testing the network driver.  This server
+# listens on the specified port and waits for a client connection, then
+# returns a status message for every message received from the client,
+# shutting down when the client exits.
 #
 # To test the ND driver, start up two copies of zzdebug.e, one running the
 # server task and the other the client task.  Give the same value of "port"
@@ -234,8 +328,11 @@ end
 # messages to be exchanged.  The client will send nmsg messages of various
 # sizes to the server and echo on the stdout the response returned by the
 # server.
+#
+# NOTE - this is the original version, before adding support for "reopen"
+# to have two fully streaming file descriptors per connection.
 
-procedure t_server()
+procedure t_old_server()
 
 char	port[SZ_LINE]
 char	buf[SZ_BUF]
@@ -273,8 +370,11 @@ end
 
 # CLIENT -- Connect to the server on the given port and send a number of
 # test messages, then close the connection and exit.
+#
+# NOTE - this is the original version, before adding support for "reopen"
+# to have two fully streaming file descriptors per connection.
 
-procedure t_client()
+procedure t_old_client()
 
 char	buf[SZ_BUF]
 char	port[SZ_LINE]

@@ -6,7 +6,7 @@ include <mwset.h>
 procedure ic_setout (in, out, offsets, nimages)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output images
+pointer	out[ARB]		# Output images
 int	offsets[nimages,ARB]	# Offsets
 int	nimages			# Number of images
 
@@ -16,7 +16,8 @@ bool	reloff, streq()
 pointer	sp, fname, lref, wref, cd, coord, shift, axno, axval
 pointer	mw, ct, mw_openim(), mw_sctran()
 int	open(), fscan(), nscan(), mw_stati()
-errchk	mw_openim, mw_sctran(), mw_ctrand(), open
+errchk	mw_openim, mw_gwtermd, mw_gltermd, mw_gaxmap
+errchk	mw_sctran, mw_ctrand, open
 
 include	"icombine.com"
 define	newscan_ 10
@@ -50,6 +51,9 @@ begin
 	mw = mw_openim (in[1])
 	mwdim = mw_stati (mw, MW_NPHYSDIM)
 	call mw_gwtermd (mw, Memd[lref], Memd[wref], Memd[cd], mwdim)
+	ct = mw_sctran (mw, "world", "logical", 0)
+	call mw_ctrand (ct, Memd[wref], Memd[lref], mwdim)
+	call mw_ctfree (ct)
 	if (project)
 	    Memd[lref+outdim] = 1
 
@@ -155,27 +159,31 @@ newscan_	if (fscan (fd) == EOF)
 	if (project || !aligned || !reloff) {
 	    call mw_close (mw)
 	    mw = mw_openim (out[1])
+	    mwdim = mw_stati (mw, MW_NPHYSDIM)
+	    call mw_gaxmap (mw, Memi[axno], Memi[axval], mwdim)
 	    if (!aligned || !reloff) {
-		call mw_gwtermd (mw, Memd[lref], Memd[wref], Memd[cd], indim)
-		do i = 1, indim
-		    Memd[lref+i-1] = Memd[lref+i-1] + offsets[1,i]
-		call mw_swtermd (mw, Memd[lref], Memd[wref], Memd[cd], indim)
+		call mw_gltermd (mw, Memd[cd], Memd[lref], mwdim)
+		do i = 1, mwdim {
+		    j = Memi[axno+i-1]
+		    if (j > 0 && j <= indim)
+			Memd[lref+i-1] = Memd[lref+i-1] + offsets[1,j]
+		}
+		call mw_sltermd (mw, Memd[cd], Memd[lref], mwdim)
 	    }
 	    if (project) {
 		# Apply dimensional reduction.
-		i = mw_stati (mw, MW_NPHYSDIM)
-		call mw_gaxmap (mw, Memi[axno], Memi[axval], i)
-		do j = 0, i-1 {
-		    if (Memi[axno+j] <= outdim) {
+		do i = 1, mwdim {
+		    j = Memi[axno+i-1]
+		    if (j <= outdim)
 			next
-		    } else if (Memi[axno+j] > outdim+1) {
-			Memi[axno+j] = Memi[axno+j] - 1
-		    } else {
-			Memi[axno+j] = 0
-			Memi[axval+j] = 0
+		    else if (j > outdim+1)
+			Memi[axno+i-1] = j - 1
+		    else {
+			Memi[axno+i-1] = 0
+			Memi[axval+i-1] = 0
 		    }
 		}
-		call mw_saxmap (mw, Memi[axno], Memi[axval], i)
+		call mw_saxmap (mw, Memi[axno], Memi[axval], mwdim)
 	    }
 	    call mw_saveim (mw, out)
 	}

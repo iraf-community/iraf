@@ -3,10 +3,9 @@ include "../lib/daophotdef.h"
 
 # DP_GPPARS -- Procedure to fetch the daophot task parameters.
 
-procedure dp_gppars (dao, im)
+procedure dp_gppars (dao)
 
 pointer	dao		# pointer to daophot structure
-pointer	im		# input image descriptor
 
 int	dp, dap
 pointer	mp, str, tstr
@@ -129,15 +128,6 @@ begin
 	    call dp_setr (dao, MERGERAD, INDEFR)
 	else
 	    call dp_setr (dao, MERGERAD, mergerad / scale)
-
-	# Get the proper values from the image header if an image is defined.
-	if (im != NULL) {
-	    call dp_padu (im, dao)
-	    call dp_rdnoise (im, dao)
-	    call dp_filter (im, dao)
-	    call dp_airmass (im, dao)
-	    call dp_otime (im, dao)
-	}
 
 	call sfree (mp)
 end

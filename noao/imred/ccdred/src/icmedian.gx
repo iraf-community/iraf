@@ -16,24 +16,29 @@ $else
 PIXEL	median[npts]		# Median
 $endif
 
-int	i, j1, j2, j3, k, n1
+int	i, j, k, j1, j2, n1, lo, up, lo1, up1
 bool	even
 $if (datatype == silx)
 real	val1, val2, val3
 $else
 PIXEL	val1, val2, val3
 $endif
+PIXEL	temp, wtemp
+$if (datatype == x)
+real	abs_temp
+$endif
 
 include	"../icombine.com"
 
 begin
+	# If no data return after possibly setting blank values.
 	if (dflag == D_NONE) {
 	    do i = 1, npts
 		median[i]= blank
 	    return
 	}
 
-	# Check for previous sorting
+	# If the data were previously sorted then directly compute the median.
 	if (mclip) {
 	    if (dflag == D_ALL) {
 		n1 = n[1]
@@ -69,62 +74,102 @@ begin
 	    return
 	}
 
-	# Repeatedly exchange the extreme values until there are three
-	# or fewer pixels.
-
+	# Compute the median.
 	do i = 1, npts {
 	    k = i - 1
 	    n1 = n[i]
-	    while (n1 > 3) {
-		j1 = 1
-		j2 = 1
-		$if (datatype == x)
-	        val1 = abs (Mem$t[d[j1]+k])
-		$else
-	        val1 = Mem$t[d[j1]+k]
-		$endif
-	        val2 = val1
-	        do j3 = 2, n1 {
-		    $if (datatype == x)
-	            val3 = abs (Mem$t[d[j3]+k])
-		    $else
-		    val3 = Mem$t[d[j3]+k]
-		    $endif
-	            if (val3 > val1) {
-		        j1 = j3
-		        val1 = val3
-		    } else if (val3 < val2) {
-		        j2 = j3
-		        val2 = val3
-		    }
-	        }
-		j3 = n1 - 1
-		if (j1 < j3 && j2 < j3) {
-		    Mem$t[d[j1]+k] = val3
-		    Mem$t[d[j2]+k] = Mem$t[d[j3]+k]
-		    Mem$t[d[j3]+k] = val1
-		    Mem$t[d[n1]+k] = val2
-		} else if (j1 < j3) {
-		    if (j2 == j3) {
-			Mem$t[d[j1]+k] = val3
-			Mem$t[d[n1]+k] = val1
-		    } else {
-			Mem$t[d[j1]+k] = Mem$t[d[j3]+k]
-			Mem$t[d[j3]+k] = val1
-		    }
-		} else if (j2 < j3) {
-		    if (j1 == j3) {
-			Mem$t[d[j2]+k] = val3
-			Mem$t[d[n1]+k] = val2
-		    } else {
-			Mem$t[d[j2]+k] = Mem$t[d[j3]+k]
-			Mem$t[d[j3]+k] = val2
-		    }
-		}
-		n1 = n1 - 2
-	    }
 
-	    if (n1 == 3) {
+	    # If there are more than 3 points use Wirth algorithm.  This
+	    # is the same as vops$amed.gx except for an even number of
+	    # points it selects the middle two and averages.
+	    if (n1 > 3) {
+		lo = 1
+		up = n1
+		j  = max (lo, min (up, (up+1)/2))
+
+		while (lo < up) {
+		    if (! (lo < up))
+			break
+
+		    temp = Mem$t[d[j]+k];  lo1 = lo;  up1 = up
+		    $if (datatype == x)
+		    abs_temp = abs (temp)
+		    $endif
+
+		    repeat {
+			$if (datatype == x)
+			while (abs (Mem$t[d[lo1]+k]) < abs_temp)
+			$else
+			while (Mem$t[d[lo1]+k] < temp)
+			$endif
+			    lo1 = lo1 + 1
+			$if (datatype == x)
+			while (abs_temp < abs (Mem$t[d[up1]+k]))
+			$else
+			while (temp < Mem$t[d[up1]+k])
+			$endif
+			    up1 = up1 - 1
+			if (lo1 <= up1) {
+			    wtemp = Mem$t[d[lo1]+k]
+			    Mem$t[d[lo1]+k] = Mem$t[d[up1]+k]
+			    Mem$t[d[up1]+k] = wtemp
+			    lo1 = lo1 + 1;  up1 = up1 - 1
+			}
+		    } until (lo1 > up1)
+
+		    if (up1 < j)
+			lo = lo1
+		    if (j < lo1)
+			up = up1
+		}
+
+		median[i] = Mem$t[d[j]+k]
+
+		if (mod (n1,2) == 0) {
+		    lo = 1
+		    up = n1
+		    j  = max (lo, min (up, (up+1)/2)+1)
+
+		    while (lo < up) {
+			if (! (lo < up))
+			    break
+
+			temp = Mem$t[d[j]+k];  lo1 = lo;  up1 = up
+			$if (datatype == x)
+			abs_temp = abs (temp)
+			$endif
+
+			repeat {
+			    $if (datatype == x)
+			    while (abs (Mem$t[d[lo1]+k]) < abs_temp)
+			    $else
+			    while (Mem$t[d[lo1]+k] < temp)
+			    $endif
+				lo1 = lo1 + 1
+			    $if (datatype == x)
+			    while (abs_temp < abs (Mem$t[d[up1]+k]))
+			    $else
+			    while (temp < Mem$t[d[up1]+k])
+			    $endif
+				up1 = up1 - 1
+			    if (lo1 <= up1) {
+				wtemp = Mem$t[d[lo1]+k]
+				Mem$t[d[lo1]+k] = Mem$t[d[up1]+k]
+				Mem$t[d[up1]+k] = wtemp
+				lo1 = lo1 + 1;  up1 = up1 - 1
+			    }
+			} until (lo1 > up1)
+
+			if (up1 < j)
+			    lo = lo1
+			if (j < lo1)
+			    up = up1
+		    }
+		    median[i] = (median[i] + Mem$t[d[j]+k]) / 2
+		}
+
+	    # If 3 points find the median directly.
+	    } else if (n1 == 3) {
 		$if (datatype == x)
 	        val1 = abs (Mem$t[d[1]+k])
 	        val2 = abs (Mem$t[d[2]+k])
@@ -164,12 +209,18 @@ begin
 		        median[i] = val1
 	        }
 		$endif
+
+	    # If 2 points average.
 	    } else if (n1 == 2) {
 		val1 = Mem$t[d[1]+k]
 		val2 = Mem$t[d[2]+k]
 		median[i] = (val1 + val2) / 2
+
+	    # If 1 point return the value.
 	    } else if (n1 == 1)
 		median[i] = Mem$t[d[1]+k]
+
+	    # If no points return with a possibly blank value.
 	    else
 		median[i] = blank
 	}

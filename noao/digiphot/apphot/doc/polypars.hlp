@@ -1,4 +1,4 @@
-.help polypars Dec92 noao.digiphot.apphot
+.help polypars May00 noao.digiphot.apphot
 .ih
 NAME
 polypars -- edit the polygonal aperture photometry parameters
@@ -16,6 +16,7 @@ Draw the polygons on the screen.
 .ih
 DESCRIPTION
 The zero point of the magnitude scale is determined by \fIzmag\fR.
+
 If the \fImkpolygon\fR switch is enabled polygons are marked on the screen.
 .ih
 EXAMPLES
@@ -41,9 +42,9 @@ EXAMPLES
 
 	... move to the polypars parameter and type :e
 
-	... edit the polypars parameters and type :q
+	... edit the polypars parameters and type :wq
 
-	... finish editing the polyphot parameters and type ^Z
+	... finish editing the polyphot parameters and type :wq
 .fi
 
 4. Save the current POLYPARS parameter set in a text file polynite1.par.
@@ -58,12 +59,11 @@ above example.
 	... type ":w polynite1.par"  from within epar
 
 .fi
-
 .ih
 TIME REQUIREMENTS
 .ih
 BUGS
 .ih
 SEE ALSO
-polyphot
+polyphot. polymark
 .endhelp

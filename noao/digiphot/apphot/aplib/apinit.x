@@ -1,4 +1,5 @@
 include "../lib/apphotdef.h"
+include "../lib/apphot.h"
 include "../lib/noisedef.h"
 include "../lib/noise.h"
 include "../lib/displaydef.h"
@@ -14,10 +15,18 @@ real	fwhmpsf			# the FWHM of the stellar images
 begin
 	# Initalize the file names.
 	AP_IMNAME(ap) = EOS
+	AP_IMROOT(ap) = EOS
 	AP_CLNAME(ap) = EOS
+	AP_CLROOT(ap) = EOS
 	AP_OUTNAME(ap) = EOS
 	AP_PLOTFILE(ap) = EOS
 	AP_OUTNAME(ap) = EOS
+
+	AP_WCSIN(ap) = WCS_LOGICAL
+	AP_WCSOUT(ap) = WCS_LOGICAL
+	AP_MW(ap) = NULL
+	AP_CTIN(ap) = NULL
+	AP_CTOUT(ap) = NULL
 
 	# Initialize the cursor positions.
 	AP_CWX(ap) = INDEFR

@@ -13,5 +13,6 @@ libpkg.a:
 	dpwrtgroup.x	<mach.h>		<time.h>                \
 			<tbset.h>		../lib/daophotdef.h     \
 			../lib/apseldef.h
-	t_group.x	<fset.h>		../lib/daophotdef.h
+	t_group.x	<fset.h>		<imhdr.h>               \
+	                ../lib/daophotdef.h
 	;

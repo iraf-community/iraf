@@ -44,14 +44,14 @@ begin
 
 	switch (ngpix) {		# compute mean and sigma
 	case 0:
-	    mean = INDEFI
-	    sigma = INDEFI
+	    mean = INDEFR
+	    sigma = INDEFR
 	case 1:
 	    mean = sum
-	    sigma = INDEFI
+	    sigma = INDEFR
 	default:
 	    mean = sum / ngpix
-	    temp = (sumsq - mean * sum) / (ngpix - 1)
+	    temp = (sumsq - (sum/ngpix) * sum) / (ngpix - 1)
 	    if (temp < 0)		# possible with roundoff error
 		sigma = 0.0
 	    else

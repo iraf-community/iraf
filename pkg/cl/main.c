@@ -76,6 +76,10 @@ int	errlev;			/* detect error recursion in CL_ERROR	*/
 int	ninterrupts;		/* number of onint() calls per task	*/
 long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
 
+static void execute();
+static	void login(), logout();
+static	void startup(), shutdown();
+
 
 /* C_MAIN -- Called by the SPP procedure in cl.x to fire up the CL.
  * In effect we are chained to the IRAF Main, being called immediately after
@@ -143,6 +147,14 @@ clexit()
 }
 
 
+/* CLSHUTDOWN -- Public entry for shutdown.
+ */
+clshutdown()
+{
+	shutdown();
+}
+
+
 /* STARTUP -- CL startup code.  Called by onentry() at process startup.
  *   Allocate space for the dictionary, post exception handlers, initialize
  *   error recovery.
@@ -164,6 +176,7 @@ clexit()
  *   The only alternative would be to use indices rather than pointers in
  *   the dictionary, which is not what C likes to do.
  */
+static void
 startup()
 {
 	int	onint(), onipc();
@@ -199,6 +212,7 @@ startup()
  * Don't bother with restor'ing if BATCH since we don't want to write out
  *   anything then anyway.
  */
+static void
 shutdown()
 {
 	float	cpu, clk;
@@ -230,6 +244,7 @@ shutdown()
  * mode, we skip the preliminaries and jump right in and interpret the
  * compiled code.
  */
+static void
 execute (mode)
 int	mode;
 {
@@ -324,6 +339,7 @@ bkg:
  * Add the builtin function ltasks.  Run the startup file as the stdin of cl.
  * If any of this fails, we die.
  */
+static void
 login (cmd)
 char *cmd;
 { 
@@ -480,6 +496,7 @@ char *cmd;
  * of the CL is hooked to the system logout file and when the eof of the
  * logout file is seen the CL really does exit.
  */
+static void
 logout ()
 { 
 	register struct task *tp;

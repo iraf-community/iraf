@@ -18,6 +18,6 @@ install:
 	$move	xx_softools.e bin$x_softools.e
 
 libpkg.a:
-	mktags.x
-	memchk.x
+	memchk.x        <ctype.h>
+	mktags.x        <ctotok.h> <ctype.h> <error.h>
 	;

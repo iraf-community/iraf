@@ -12,7 +12,7 @@ include	"icombine.h"
 procedure ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
 pointer	in[nimages]		# Input images
-pointer	out[3]			# Output images
+pointer	out[ARB]		# Output images
 int	offsets[nimages,ARB]	# Image offsets
 real	scales[nimages]		# Scale factors
 real	zeros[nimages]		# Zero or sky levels

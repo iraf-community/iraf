@@ -4,17 +4,18 @@ include "../lib/apseldef.h"
 
 
 # DP_RESTARS -- Read in the IDS of the stars to be excluded, find these stars
-# in the photometry list, and set there magnitudes to INDEF.
+# in the photometry list, and set their magnitudes to INDEF.
 
-int procedure dp_restars (dao, ext, text_file)
+int procedure dp_restars (dao, im, ext, text_file)
 
 pointer	dao		# pointer to the daophot structure
+pointer	im		# the input image descriptor
 int	ext		# the exclude list file descriptor
 bool	text_file	# text or table file ?
 
-int	i, nrow, idno, nexcl
+real	tx, ty, rjunk
 pointer	apsel, sp, fields, indices, key
-real	rjunk
+int	i, nrow, idno, nexcl, starno
 int	tbpsta(), dp_apsel(), dp_exfind()
 
 begin
@@ -48,15 +49,31 @@ begin
 	    } else {
 		if (i > nrow)
 		    break
-		call dp_tptread (ext, Memi[indices], idno, i)
+		call dp_tptread (ext, Memi[indices], idno, rjunk, rjunk, rjunk,
+		    i)
 	    }
 
 	    # Subtract star from the photometry list.
 	     if (idno > 0) {
-	        if (dp_exfind (Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
-		    Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
-		    DP_APNUM(apsel), idno, DP_VERBOSE(dao)) == YES)
+	        starno = dp_exfind (Memi[DP_APID(apsel)],
+		    Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
+		    Memr[DP_APMAG(apsel)], DP_APNUM(apsel), idno)
+		if (starno > 0) {
+		    if (DP_VERBOSE(dao) == YES) {
+			call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+starno-1],
+			    Memr[DP_APYCEN(apsel)+starno-1], tx, ty, 1)
+		        call printf (
+		        "EXCLUDING   - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
+		        call pargi (Memi[DP_APID(apsel)+starno-1])
+		        call pargr (tx)
+		        call pargr (ty)
+		        call pargr (Memr[DP_APMAG(apsel)+starno-1])
+		    }
 		    nexcl = nexcl + 1
+		} else if (DP_VERBOSE(dao) == YES) {
+		    call printf ("EXCLUDING   - Star:%5d not found\n")
+		        call pargi (idno)
+		}
 	    }
 
 	    i = i + 1
@@ -72,7 +89,7 @@ end
 
 # DP_EXFIND -- Find the star to be exclude in the photometry list.
 
-int procedure dp_exfind (ids, xcen, ycen, mags, nstars, idex, verbose)
+int procedure dp_exfind (ids, xcen, ycen, mags, nstars, idex)
 
 int	ids[ARB]		# array of stellar ids
 real	xcen[ARB]		# array of x coordinates
@@ -80,34 +97,20 @@ real	ycen[ARB]		# array of y coordinates
 real	mags[ARB]		# array of magnitudes
 int	nstars			# number of stars in photometry list
 int	idex			# id of star to be excluded
-int	verbose			# print messages about actions taken
 
 int	i, found
 
 begin
-	found = NO
+	found = 0
 	do i = 1, nstars {
 	    if (ids[i] != idex)
 		next
-	    found = YES
+	    found = i
 	    break
 	}
 
-	if (found == YES) {
-	    if (verbose == YES)
-		call printf (
-		    "EXCLUDING   - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
-		    call pargi (ids[i])
-		    call pargr (xcen[i])
-		    call pargr (ycen[i])
-		    call pargr (mags[i])
+	if (found > 0)
 	    mags[i] = INDEFR
-	} else {
-	    if (verbose == YES)
-		call printf (
-		    "EXCLUDING   - Star:%5d not found\n")
-		    call pargi (idex)
-	}
 
 	return (found)
 end

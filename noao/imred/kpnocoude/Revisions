@@ -1,5 +1,17 @@
 .help revisions Dec94 noao.imred.kpnocoude
 .nf
+
+=====
+V2.12
+=====
+
+imred$kpnocoude/standard.par
+    Added blackbody query parameters.  (5/2/02, Valdes)
+
+========
+V2.11.3b
+========
+
 iimred$kpnocoude/doc/do3fiber.hlp
     Fixed minor formating problem.  (4/22/99, Valdes)
 

@@ -8,13 +8,15 @@ include	<error.h>
 procedure t_unprotect()
 
 char	fname[SZ_FNAME]
-int	list, clpopns(), clgfil()
+int	list, status
+
+int	clpopns(), clgfil(), protect()
 
 begin
 	list = clpopns ("files")
 
 	while (clgfil (list, fname, SZ_FNAME) != EOF)
-	    iferr (call protect (fname, REMOVE_PROTECTION))
+	    iferr (status = protect (fname, REMOVE_PROTECTION))
 		call erract (EA_WARN)
 
 	call clpcls (list)

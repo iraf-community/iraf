@@ -13,6 +13,7 @@ ZFDELE (fname, status)
 PKCHAR	*fname;
 XINT	*status;
 {
+	vm_delete ((char *)fname, 0);
 	if (unlink ((char *)fname) == ERR)
 	    *status = XERR;
 	else

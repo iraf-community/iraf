@@ -10,8 +10,8 @@ bool procedure pl_linenotempty (pl, v)
 pointer	pl			#I mask descriptor
 long	v[PL_MAXDIM]		#I coordinates of desired line
 
-int	pl_access()
+int	pl_reference()
 
 begin
-	return (pl_access (pl, v) != PL_EMPTYLINE)
+	return (pl_reference(pl,v) != PL_EMPTYLINE)
 end

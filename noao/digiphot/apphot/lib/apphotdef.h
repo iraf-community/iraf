@@ -1,6 +1,6 @@
 # APPHOT Structure
 
-define	LEN_APSTRUCT	(30 + 10 * SZ_FNAME + 10)
+define	LEN_APSTRUCT	(36 + 12 * SZ_FNAME + 12)
 
 # apphot definitions
 
@@ -29,7 +29,7 @@ define	AP_POLY		Memi[$1+18]	# Pointer to polyphot structure
 define	AP_RPROF	Memi[$1+19]	# Pointer to radprof strucuture
 define	AP_PFIND	Memi[$1+20]	# Pointer to the find structure
 
-# pointer to sequential access buffer
+# pointer to sequential access buffer (not used currently)
 
 define	AP_SEQUENTIAL	Memi[$1+21]	# Sequential or random access
 define	AP_IMBUF	Memi[$1+22]	# Pointer to internal buffer
@@ -39,18 +39,29 @@ define	AP_IMX2		Memi[$1+25]	# Upper column limit of buffer
 define	AP_IMY1		Memi[$1+26]	# Lower line limit of buffer
 define	AP_IMY2		Memi[$1+27]	# Upper line limit of buffer
 
+# pointer to the wcs info
+
+
+define	AP_WCSIN	Memi[$1+28]	# the input wcs
+define	AP_WCSOUT	Memi[$1+29]	# the output wcs
+define	AP_MW		Memi[$1+30]	# the mwcs pointer
+define	AP_CTIN	        Memi[$1+31]	# the input transformation pointer
+define	AP_CTOUT        Memi[$1+32]	# the output transformation pointer
+
 # image, file and keyword names
 
-define  AP_IMNAME	Memc[P2C($1+30)]                # IRAF image name
-define	AP_CLNAME	Memc[P2C($1+30+SZ_FNAME+1)]     # Coordinate list
-define	AP_PLOTFILE	Memc[P2C($1+30+2*SZ_FNAME+2)]	# Plotfile
-define	AP_OUTNAME	Memc[P2C($1+30+3*SZ_FNAME+3)]	# Output
-define	AP_EXPOSURE	Memc[P2C($1+30+4*SZ_FNAME+4)]	# Exposure keyword
-define	AP_AIRMASS	Memc[P2C($1+30+5*SZ_FNAME+5)]	# Airmass keyword
-define	AP_FILTER	Memc[P2C($1+30+6*SZ_FNAME+6)]	# Filter keyword
-define	AP_FILTERID	Memc[P2C($1+30+7*SZ_FNAME+7)]	# Filter id
-define	AP_OBSTIME	Memc[P2C($1+30+8*SZ_FNAME+8)]	# Obstime keyword
-define	AP_OTIME	Memc[P2C($1+30+9*SZ_FNAME+9)]	# Time of observation
+define  AP_IMNAME	Memc[P2C($1+36)]                # IRAF image name
+define  AP_IMROOT	Memc[P2C($1+36+SZ_FNAME+1)]     # IRAF image root name
+define	AP_CLNAME	Memc[P2C($1+36+2*SZ_FNAME+2)]   # Coordinate list
+define	AP_CLROOT	Memc[P2C($1+36+3*SZ_FNAME+3)]   # Coordinate list root
+define	AP_PLOTFILE	Memc[P2C($1+36+4*SZ_FNAME+4)]	# Plotfile
+define	AP_OUTNAME	Memc[P2C($1+36+5*SZ_FNAME+5)]	# Output
+define	AP_EXPOSURE	Memc[P2C($1+36+6*SZ_FNAME+6)]	# Exposure keyword
+define	AP_AIRMASS	Memc[P2C($1+36+7*SZ_FNAME+7)]	# Airmass keyword
+define	AP_FILTER	Memc[P2C($1+36+8*SZ_FNAME+8)]	# Filter keyword
+define	AP_FILTERID	Memc[P2C($1+36+9*SZ_FNAME+9)]	# Filter id
+define	AP_OBSTIME	Memc[P2C($1+36+10*SZ_FNAME+10)]	# Obstime keyword
+define	AP_OTIME	Memc[P2C($1+36+11*SZ_FNAME+11)]	# Time of observation
 
 # default definitions
 
