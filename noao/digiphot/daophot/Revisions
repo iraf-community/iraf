@@ -1,5 +1,28 @@
 .help revisions Jan90 noao.digiphot.daophot
 .nf
+
+========
+V2.12.2b
+========
+
+daophot/daolib/invers2.x
+daophot/daolib/mkpkg
+daophot/allstar/t_allstar.x
+daophot/allstar/dpalphot.x
+daophot/allstar/dpastar.x
+daophot/allstar.par
+    Made a small change to the matrix inversion code to avoid problems with
+    very small numbers.  This was done by translating the original fortran
+    version to SPP and then replacing small numbers by zero.  In order to
+    allow users to reproduces earlier results or if there is a problem
+    a version parameter was added to ALLSTAR.  Setting the version to 1
+    will use the old version of the inversion routine and the default of
+    2 will use the new version.  (6/18/04, Valdes)
+
+=======
+V2.12.2
+=======
+
 daophot/daoedit/dpeconfirm.x
 daophot/daoedit/dperprofile.x
     Added some missing sfree statements to the daophot package routines.

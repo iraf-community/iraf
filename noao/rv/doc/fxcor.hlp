@@ -1106,6 +1106,34 @@ EXAMPLES
        the file,  then use RSPECTEXT to linearize and convert to an image
        format.  This avoids the task interpolating a saved image CCF in
        cases where it may not be required.
+
+    7. Compute a cross-correlation where the template has already been
+       corrected to the rest frame and no heliocentric correction is 
+       required:
+
+	  Step 1)  Use the HEDIT or HFIX tasks to add the following
+		   keywords to the template image:
+
+		        DATE-OBS= '1993-03-17T04:56:38.0'
+		        RA      = '12:00:00'
+		        DEC     = '12:00:00'
+		        EPOCH   = 1993.0
+		        OBSERVAT= 'KPNO'
+		        VHELIO  = 0.0
+
+		   These values produce a heliocentric correction of zero
+		   to within 5 decimal places.  The VHELIO keyword will 
+		   default to zero if not present.
+
+	  Step 2)  Use the HEDIT task to add an OBSERVAT keyword to each
+		   of the object spectra.  The OBSERVATORY task can be used
+		   get a list of recognized observatories.
+
+	Because mixing observatories is not currently well supported, the
+	use of the OBSERVAT keyword in \fI both\fR images is the only sure
+	way to apply the proper observatory information to each image.  Users
+	may wish to derive a zero-valued heliocentric correction for their
+	local observatory and use those values instead.
 .fi
 
 .ih

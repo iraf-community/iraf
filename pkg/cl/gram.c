@@ -881,7 +881,17 @@ addpipe()
 	 *
 	 */
 	    pipecode %= MAX_PIPECODE;
-	    pipecode++;
+
+	 /* There can be applications where multiple CL are spawned in
+	  * relatively short order so that the PIDs are close.  Incrementing
+	  * the least significant digits can result in duplications.  So
+	  * instead we use the lower digits as the "unique" part and
+	  * increment the higer digits.
+	  *  
+	  *  pipecode++;
+	  */
+	    pipecode += 1000;
+
 	} while (c_access (pipefile(pipecode),0,0) == YES);
 
 	pipetable[nextpipe++] = pipecode;
@@ -939,11 +949,13 @@ int	pipecode;
 	char	*dir;
 	char	*envget();
 
-	/* Put pipefiles in uparm if defined, else use tmp.  Do not put pipe
-	 * files in current directory or pipe commands will fail when used in
-	 * someone elses directory.
+	/* Put pipefiles in 'pipes' or 'uparm' if defined, else use tmp.  Do
+	 * not put pipe files in current directory or pipe commands will fail
+	 * when used in someone elses directory.
 	 */
-	if (envget ("uparm") != NULL)
+	if (envget ("pipes") != NULL)
+	    dir = "pipes$";
+	else if (envget ("uparm") != NULL)
 	    dir = "uparm$";
 	else
 	    dir = "tmp$";

@@ -235,8 +235,11 @@ begin
 	        } else {
 	            call ap_values (current, Memi[aps], line, apid,
 			apbeam, center, low, high)
-		    call ap_update (gp, Memi[aps+current-1], line, apid,
-			apbeam, rval, low, high)
+		    iferr (call ap_update (gp, Memi[aps+current-1], line, apid,
+			apbeam, rval, low, high)) {
+			call erract (EA_WARN)
+			statline = YES
+		    }
 	        }
 	    case LOWER: # :lower - Set lower aperture limit
 	        if (current == 0)
@@ -251,14 +254,20 @@ begin
 	        } else if (all == NO) {
 		    call ap_values (current, Memi[aps], line, apid,
 			apbeam, center, low, high)
-		    call ap_update (gp, Memi[aps+current-1], line, apid,
-			apbeam, center, rval, high)
+		    iferr (call ap_update (gp, Memi[aps+current-1], line, apid,
+			apbeam, center, rval, high)) {
+			call erract (EA_WARN)
+			statline = YES
+		    }
 	        } else {
 		    do i = 1, naps {
 		        call ap_values (i, Memi[aps], line, apid,
 			    apbeam, center, low, high)
-		        call ap_update (gp, Memi[aps+i-1], line, apid,
-			    apbeam, center, rval, high)
+		        iferr (call ap_update (gp, Memi[aps+i-1], line, apid,
+			    apbeam, center, rval, high))
+			    call erract (EA_WARN) {
+			    statline = YES
+			}
 		    }
 	        }
 	    case UPPER: # :upper - Set upper aperture limit
@@ -274,14 +283,20 @@ begin
 	        } else if (all == NO) {
 		    call ap_values (current, Memi[aps], line, apid,
 			apbeam, center, low, high)
-		    call ap_update (gp, Memi[aps+current-1], line, apid,
-			apbeam, center, low, rval)
+		    iferr (call ap_update (gp, Memi[aps+current-1], line, apid,
+			apbeam, center, low, rval)) {
+			call erract (EA_WARN)
+			statline = YES
+		    }
 	        } else {
 		    do i = 1, naps {
 		        call ap_values (i, Memi[aps], line, apid,
 			    apbeam, center, low, high)
-		        call ap_update (gp, Memi[aps+i-1], line, apid,
-			    apbeam, center, low, rval)
+		        iferr (call ap_update (gp, Memi[aps+i-1], line, apid,
+			    apbeam, center, low, rval)) {
+			    call erract (EA_WARN)
+			    statline = YES
+			}
 		    }
 	        }
 	    case APTITLE:

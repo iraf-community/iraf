@@ -104,9 +104,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=nc && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFS(Mems[FP_V1(fp,j)]))
 				data = xt_fpvals (fp, im, FP_L1(fp,j))
@@ -169,9 +169,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<nc && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -357,9 +357,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=nc && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFI(Memi[FP_V1(fp,j)]))
 				data = xt_fpvali (fp, im, FP_L1(fp,j))
@@ -422,9 +422,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<nc && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -610,9 +610,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=nc && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFL(Meml[FP_V1(fp,j)]))
 				data = xt_fpvall (fp, im, FP_L1(fp,j))
@@ -675,9 +675,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<nc && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -863,9 +863,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=nc && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFR(Memr[FP_V1(fp,j)]))
 				data = xt_fpvalr (fp, im, FP_L1(fp,j))
@@ -928,9 +928,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<nc && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)
@@ -1116,9 +1116,9 @@ begin
 	    j = 1
 	    do i = col1, col2 {
 		if (Mems[bp+i] == FP_CVAL(fp)) {
-		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<=nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<=nc && FP_COL(fp,j)==i; j=j+1) {
 			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
 			    if (IS_INDEFD(Memd[FP_V1(fp,j)]))
 				data = xt_fpvald (fp, im, FP_L1(fp,j))
@@ -1181,9 +1181,9 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		} else {
-		    for (; j<ncols && FP_COL(fp,j)!=i; j=j+1)
+		    for (; j<nc && FP_COL(fp,j)!=i; j=j+1)
 			;
-		    for (; j<ncols && FP_COL(fp,j)==i; j=j+1) {
+		    for (; j<nc && FP_COL(fp,j)==i; j=j+1) {
 			l1 = FP_L1(fp,j)
 			l2 = FP_L2(fp,j)
 			if (l1 < line1 && l2 > line2)

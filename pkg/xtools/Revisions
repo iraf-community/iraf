@@ -1,6 +1,40 @@
 .help revisions Jun88 pkg.xtools
 .nf
 
+=======
+V2.12.3
+=======
+
+fixpix/xtfp.x
+    For reasons I can't understand, the column interpolation was broken.
+    A loop over the columns was using ncols=FP_NCOLS, the number of bad pixels
+    across columns, instead of nc=IM_LEN(im,1), the number of columns in
+    the image.
+    (6/22/04, Valdes)
+
+numrecipes.x
+    Added LU decomposition.  (6/18/04, 2004)
+
+fixpix/xtpmmap.x
+    1. The routines now allow selecting whether to match masks in physical
+       coordinates or logical coordinates.  When matching in logical
+       coordinates this simply means extending or trimming the mask if
+       the sizes are not the same.
+    2. Added a new routine xt_mappm which is now the prefered routine
+       that allows selecting the matching type.  The previous xt_pmmap
+       could not be changed since it used by various tasks.
+    (6/18/04, Valdes)
+
+xtmasknames.x
+    Added routines that hand pixel mask names.  This is fairly sophisticated
+    in dealing with whether or not the user specifies file extensions,
+    image extensions, and flags.  It will produced masks in FITS extensions
+    by default.  (6/16/04, Valdes)
+
+=======
+V2.12.2
+=======
+
 fixpix/xtpmmap.x
     If the mask and data are offset by a fraction of a pixel it was possible
     to get an out-of-bounds error.  (8/14/03, Valdes)

@@ -11,7 +11,7 @@ pointer	aps[ARB]		# Apertures
 
 int	apaxis
 pointer	ap
-real	cveval()
+real	ap_cveval()
 
 begin
 	if (index < 1)
@@ -28,7 +28,7 @@ begin
 "aperture = %d  beam = %d  center = %.2f  low = %.2f  upper = %.2f\n")
 	    call pargi (AP_ID(ap))
 	    call pargi (AP_BEAM(ap))
-	    call pargr (AP_CEN(ap, apaxis)+cveval (AP_CV(ap), real (line)))
+	    call pargr (AP_CEN(ap, apaxis)+ap_cveval (AP_CV(ap), real (line)))
 	    call pargr (AP_LOW(ap, apaxis))
 	    call pargr (AP_HIGH(ap, apaxis))
 end

@@ -466,7 +466,8 @@ begin
 	    }
 	}
 
-	AID_NT(aid) = min (2 * AID_NR(aid), AID_NTF(aid))
+	#AID_NT(aid) = min (2 * AID_NR(aid), AID_NTF(aid))
+	AID_NT(aid) = AID_NTF(aid)
 	call asrtd (Memd[AID_XTF(aid)], Memd[AID_XT(aid)], AID_NT(aid))
 
 	# Debug w: Print wavelength bin limits.

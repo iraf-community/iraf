@@ -60,6 +60,9 @@ libc.a:
 	cnote.c		<libc/libc.h> <libc/xnames.h> <libc/fset.h> <libc/spp.h>
 	copen.c		<libc/libc.h> <libc/xnames.h> <libc/spp.h>
 	coscmd.c	<libc/libc.h> <libc/spp.h> <libc/xnames.h>
+	cndopen.c	<libc/libc.h> <libc/spp.h> <libc/xnames.h>
+	cpoll.c		<libc/libc.h> <libc/spp.h> <libc/xnames.h>\
+			<libc/fpoll.h>
 	cprcon.c	<libc/libc.h> <libc/prstat.h> <libc/stdio.h>\
 			<libc/xnames.h> <libc/spp.h>
 	cprdet.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
@@ -69,6 +72,7 @@ libc.a:
 	cread.c		<libc/libc.h> <libc/xnames.h> <libc/error.h>\
 			<libc/fset.h> <libc/spp.h> <libc/stdio.h>
 	crename.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
+	creopen.c	<libc/libc.h> <libc/spp.h> <libc/xnames.h>
 	csalloc.c	<libc/libc.h> <libc/spp.h> <libc/xnames.h>
 	cseek.c		<libc/libc.h> <libc/xnames.h> <libc/fset.h> <libc/spp.h>
 	csppstr.c	<libc/libc.h> <libc/spp.h>

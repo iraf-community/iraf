@@ -30,8 +30,8 @@ specifying line interpolation is given by the \fIlinterp\fR parameter and
 the value specifying column interpolation is given by the \fIcinterp\fR
 parameter.  Any values which are do not match one of these parameters
 results in interpolation along the narrowest dimension.  Note that a
-text file mask always has 1 for pixels with narrow dimension along
-lines and 2 for pixels with narrow dimension along columns.
+text file mask always has 2 for pixels with narrow dimension along
+lines and 3 for pixels with narrow dimension along columns.
 .le
 .ls verbose = no
 If this parameter is set to yes a line identifying each image and

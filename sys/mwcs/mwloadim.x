@@ -1,27 +1,32 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<error.h>
+include	<syserr.h>
 include	<imhdr.h>
 include	<imio.h>
 include	"mwcs.h"
 include	"imwcs.h"
 
 # MW_LOADIM -- Load a MWCS object saved in an image header in FITS format
-# into an MWCS descriptor.
+# into an MWCS descriptor.  Note that the MWCS descriptor is allocated
+# if the input is NULL.  This is to allow the WCS cards to be read to
+# determine the WCS dimensionality.
 
 procedure mw_loadim (mw, im)
 
-pointer	mw			#I pointer to MWCS descriptor
+pointer	mw			#U pointer to MWCS descriptor
 pointer	im			#I pointer to image header
 
 bool	have_wcs
-int	ndim, i, j
+int	ndim, i, j, ea_type
 int	axno[MAX_DIM], axval[MAX_DIM]
+double	maxval
 pointer	sp, sysname, iw, ct, wp, cp, bufp, ip
 
-int	mw_allocd(), mw_refstr(), ctoi()
-pointer	iw_rfits(), iw_findcard(), iw_gbigfits()
+int	mw_allocd(), mw_refstr(), ctoi(), envgeti()
+pointer	iw_rfits(), iw_findcard(), iw_gbigfits(), mw_open()
 errchk	iw_rfits, mw_allocd, mw_newsystem, mw_swtype, iw_enterwcs, mw_saxmap
+errchk	mw_open
 string	s_physical "physical"
 define	axerr_ 91
 define	axinit_ 92
@@ -32,6 +37,10 @@ begin
 
 	# Read the FITS image header into an IMWCS descriptor.
 	iw = iw_rfits (mw, im, RF_REFERENCE)
+	if (mw == NULL) {
+	    ndim = max (IW_NDIM(iw), IM_NPHYSDIM(im))
+	    mw = mw_open (NULL, ndim)
+	}
 	ndim = IW_NDIM(iw)
 
 	# Initialize the MWCS descriptor from the IMWCS descriptor.
@@ -60,12 +69,45 @@ begin
 	MI_LTV(mw) = mw_allocd (mw, ndim)
 	MI_LTM(mw) = mw_allocd (mw, ndim * ndim)
 
-	# Set the Lterm.
+	# Set the Lterm.  Set axes with no LTM scales to unit scales.
+	# Issue a warning by default but use "wcs_matrix_err" to allow
+	# setting other error actions.
+
 	call amovd (IW_LTV(iw,1), D(mw,MI_LTV(mw)), ndim)
 	if (iw_findcard (iw, TY_LTM, ERR, 0) != NULL) {
-	    do j = 1, ndim
-		do i = 1, ndim
+	    do i = 1, ndim {
+		maxval = 0D0
+		do j = 1, ndim {
 		    D(mw,MI_LTM(mw)+(j-1)*ndim+(i-1)) = IW_LTM(iw,i,j)
+		    maxval = max (maxval, abs (IW_LTM(iw,i,j)))
+		}
+		if (maxval == 0D0) {
+		    iferr (ea_type = envgeti ("wcs_matrix_err"))
+			ea_type = EA_WARN
+		    iferr {
+			switch (ea_type) {
+			case EA_FATAL, EA_ERROR:
+			    call sprintf (Memc[sysname], SZ_FNAME, 
+				"LTM keywords for axis %d undefined")
+				call pargi (i)
+			    call error (SYS_MWMISSAX, Memc[sysname])
+			case EA_WARN:
+			    IW_LTM(iw,i,i) = 1D0
+			    D(mw,MI_LTM(mw)+(i-1)*ndim+(i-1)) = IW_LTM(iw,i,i)
+			    call sprintf (Memc[sysname], SZ_FNAME, 
+				"setting LTM%d_%d to %.4g")
+				call pargi (i)
+				call pargi (i)
+				call pargd (IW_LTM(iw,i,i))
+			    call error (SYS_MWMISSAX, Memc[sysname])
+			default:
+			    IW_LTM(iw,i,i) = 1D0
+			    D(mw,MI_LTM(mw)+(i-1)*ndim+(i-1)) = IW_LTM(iw,i,i)
+			}
+		    } then
+			call erract (ea_type)
+		}
+	    }
 	} else
 	    call mw_mkidmd (D(mw,MI_LTM(mw)), ndim)
 

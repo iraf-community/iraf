@@ -1,9 +1,36 @@
 .help revisions Jan97 images
 .nf
 
+images$immatach/src/imcombine/src/icgdata.gx
+    Offset one-dimensional images do not combine correctly because the
+    imgnl routines reset the index counter for the first element in
+    this case.  This index counter was being used assuming only the
+    second dimension would increment; i.e. images were at least 2D.
+    (4/8/04, Valdes)
+
+images$imutil/src/hedit.x
+    The task could segfault when initializing/adding a new keyword with a
+    null value.  The evexpr operator was being initialized as a scalar and
+    the string pointer wasn't allocated, added a check so string pointer
+    is always allocated to at least one char.  (3/23/04, MJF)
+
+images$imcoords/src/t_wcsctran.x
+    If the image dimensionality is zero then use the WCS dimensionality.
+    (3/15/04, Valdes)
+
+images$imcoords/src/t_wcsctran.x
+    An error in mw_openim was trapped but the garbage in the return value
+    caused a segmentation error during error recovery.  A fix was made to
+    this and also to report, as a comment, the MWCS error.
+    (3/12/04, Valdes)
+
 =======
 V2.12.2
 =======
+
+images$immatch/src/imcombine/src/xtimmap.gx
+    The change for the short image name from 8/20/03 was lost.  This
+    change restores it.  (2/3/04, Valdes)
 
 images$immatch/src/imcombine/src/xtimmap.gx
     Copying the IMIO structure to an internal structure required two

@@ -41,7 +41,7 @@ begin
 	    PL_AXLEN(pl,i) = 1
 
 	# Allocate the line list buffer.
-	PL_MAXLINE(pl) = (axlen[1] * 3) / 2
+	PL_MAXLINE(pl) = (axlen[1] * 3) + LL_CURHDRLEN
 	PL_LLLEN(pl) = PL_LLBUFLEN
 	call malloc (PL_LLBP(pl), PL_LLBUFLEN, TY_SHORT)
 	lp = PL_LLBP(pl)

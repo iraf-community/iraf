@@ -126,7 +126,7 @@ bool	clgetb()		# Center normalize?
 real	threshold, clgetr()	# Division threshold
 
 int	i, ncols, nlines, ix1, ix2, iy, nsum
-real	cen, low, high, s, x1, x2, sum, cveval(), asumr()
+real	cen, low, high, s, x1, x2, sum, ap_cveval(), asumr()
 pointer	cv, datain, dataout, imps2r(), impl2r()
 
 begin
@@ -148,7 +148,7 @@ begin
 		iy = i - ys + 1
 		if (iy < 1 || iy > ny)
 		    next
-		s = cen + cveval (cv, real (i))
+		s = cen + ap_cveval (cv, real (i))
 		ix1 = max (1, int (s))
 		ix2 = min (ncols, int (s + 1))
 		if (ix1 > ix2)
@@ -177,7 +177,7 @@ begin
 	    iy = i - ys + 1
 	    if (iy < 1 || iy > ny)
 		next
-	    s = cveval (cv, real (i))
+	    s = ap_cveval (cv, real (i))
 	    x1 = max (0.5, low + s) 
 	    x2 = min (ncols + 0.49, high + s) 
 	    if (x1 > x2)
@@ -218,7 +218,7 @@ bool	clgetb()		# Center normalize?
 real	threshold, clgetr()	# Division threshold
 
 int	ncols, nlines, ix, iy, ix1, ix2, iy1, iy2, nsum
-real	cen, low, high, s, sum, cveval(), asumr()
+real	cen, low, high, s, sum, ap_cveval(), asumr()
 pointer	sp, y1, y2, cv, datain, dataout, buf, imps2r(), impl2r()
 
 begin
@@ -242,7 +242,7 @@ begin
 	    sum = 0.
 	    nsum = 0
 	    do ix = ys, ys+ny-1 {
-		s = cen + cveval (cv, real (ix))
+		s = cen + ap_cveval (cv, real (ix))
 		iy1 = max (1, int (s))
 		iy2 = min (nlines, int (s + 1))
 		if (iy1 > iy2)
@@ -263,7 +263,7 @@ begin
 	    call arltr (spec, ny, threshold, threshold)
 
 	do ix = ys, ys+ny-1 {
-	    s = cveval (cv, real (ix))
+	    s = ap_cveval (cv, real (ix))
 	    Memi[y1+ix] = nint (low + s) 
 	    Memi[y2+ix] = nint (high + s) 
 	}
@@ -326,7 +326,7 @@ int	init			# Fill between apertures with 1?
 real	threshold, clgetr()	# Division threshold
 
 int	i, ncols, nlines, ix, iy, ix1, ix2
-real	low, high, s, x1, x2, cveval()
+real	low, high, s, x1, x2, ap_cveval()
 pointer	cv, datain, dataout, sky, imps2r(), impl2r()
 
 begin
@@ -350,7 +350,7 @@ begin
 	    iy = i - ys + 1
 	    if (iy < 1 || iy > ny)
 		next
-	    s = cveval (cv, real (i))
+	    s = ap_cveval (cv, real (i))
 	    x1 = max (0.5, low + s) 
 	    x2 = min (ncols + 0.49, high + s) 
 	    if (x1 > x2)
@@ -403,7 +403,7 @@ int	init			# Fill between apertures with 1?
 real	threshold, clgetr()	# Division threshold
 
 int	ncols, nlines, ix, iy, ix1, ix2, iy1, iy2
-real	low, high, s, cveval()
+real	low, high, s, ap_cveval()
 pointer	sp, y1, y2, cv, datain, dataout, sky, buf, imps2r(), impl2r()
 
 begin
@@ -424,7 +424,7 @@ begin
 	nlines = IM_LEN(out, 2)
 
 	do ix = ys, ys+ny-1 {
-	    s = cveval (cv, real (ix))
+	    s = ap_cveval (cv, real (ix))
 	    Memi[y1+ix] = nint (low + s) 
 	    Memi[y2+ix] = nint (high + s) 
 	}
@@ -493,7 +493,7 @@ int	xs[ny], ys		# Start of spectrum in image
 int	init			# Fill between apertures with 1?
 
 int	i, ncols, nlines, ix, iy, ix1, ix2
-real	low, high, s, x1, x2, cveval()
+real	low, high, s, x1, x2, ap_cveval()
 pointer	cv, datain, dataout, imps2r(), impl2r()
 
 begin
@@ -512,7 +512,7 @@ begin
 	    iy = i - ys + 1
 	    if (iy < 1 || iy > ny)
 		next
-	    s = cveval (cv, real (i))
+	    s = ap_cveval (cv, real (i))
 	    x1 = max (0.5, low + s) 
 	    x2 = min (ncols + 0.49, high + s) 
 	    if (x1 > x2)
@@ -554,7 +554,7 @@ int	xs[ny], ys		# Start of spectrum in image
 int	init			# Fill between apertures with 1?
 
 int	ncols, nlines, ix, iy, ix1, ix2, iy1, iy2
-real	low, high, s, cveval()
+real	low, high, s, ap_cveval()
 pointer	sp, y1, y2, cv, datain, dataout, buf, imps2r(), impl2r()
 
 begin
@@ -570,7 +570,7 @@ begin
 	nlines = IM_LEN(out, 2)
 
 	do ix = ys, ys+ny-1 {
-	    s = cveval (cv, real (ix))
+	    s = ap_cveval (cv, real (ix))
 	    Memi[y1+ix] = nint (low + s) 
 	    Memi[y2+ix] = nint (high + s) 
 	}
@@ -626,7 +626,7 @@ int	xs[ny], ys		# Start of spectrum in image
 int	init			# Fill between apertures with 1?
 
 int	i, ncols, nlines, ix, iy, ix1, ix2
-real	low, high, s, x1, x2, cveval()
+real	low, high, s, x1, x2, ap_cveval()
 pointer	cv, dataout, imps2r(), impl2r()
 
 begin
@@ -645,7 +645,7 @@ begin
 	    iy = i - ys + 1
 	    if (iy < 1 || iy > ny)
 		next
-	    s = cveval (cv, real (i))
+	    s = ap_cveval (cv, real (i))
 	    x1 = max (0.5, low + s) 
 	    x2 = min (ncols + 0.49, high + s) 
 	    if (x1 > x2)
@@ -681,7 +681,7 @@ int	xs[ny], ys		# Start of spectrum in image
 int	init			# Fill between apertures with 1?
 
 int	ncols, nlines, ix, iy, ix1, ix2, iy1, iy2
-real	low, high, s, cveval()
+real	low, high, s, ap_cveval()
 pointer	sp, y1, y2, cv, dataout, buf, imps2r(), impl2r()
 
 begin
@@ -697,7 +697,7 @@ begin
 	nlines = IM_LEN(out, 2)
 
 	do ix = ys, ys+ny-1 {
-	    s = cveval (cv, real (ix))
+	    s = ap_cveval (cv, real (ix))
 	    Memi[y1+ix] = nint (low + s) 
 	    Memi[y2+ix] = nint (high + s) 
 	}

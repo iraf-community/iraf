@@ -1553,13 +1553,13 @@ begin
 	} else if (opcode >= KI_ZFIOTX || opcode <= KI_ZFIOTY) {
 	    switch (subcode) {
 	    case TX_OPN:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
-	    case TX_CLS:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
-	    case TX_GET:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
-	    case TX_PUT:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
-	    case TX_FLS:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
-	    case TX_SEK:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
-	    case TX_NOT:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
-	    case TX_STT:  call strcpy ("TX_OPN", s_str, SZ_LINE) 
+	    case TX_CLS:  call strcpy ("TX_CLS", s_str, SZ_LINE) 
+	    case TX_GET:  call strcpy ("TX_GET", s_str, SZ_LINE) 
+	    case TX_PUT:  call strcpy ("TX_PUT", s_str, SZ_LINE) 
+	    case TX_FLS:  call strcpy ("TX_FLS", s_str, SZ_LINE) 
+	    case TX_SEK:  call strcpy ("TX_SEK", s_str, SZ_LINE) 
+	    case TX_NOT:  call strcpy ("TX_NOT", s_str, SZ_LINE) 
+	    case TX_STT:  call strcpy ("TX_STT", s_str, SZ_LINE) 
 	    default: 	  call strcpy ("", s_str, SZ_LINE)
 	    }
 

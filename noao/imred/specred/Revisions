@@ -1,6 +1,16 @@
 .help revisions Jun88 noao.imred.msred
 .nf
 
+=======
+V2.12.3
+=======
+
+specred.cl
+specred.men
+    1.  Added ODCOMBINE and LSCOMBINE to the package.
+    2.  Modified SCOMBINE to point to new executable.
+    (6/21/04, Valdes)
+
 =====
 V2.12
 =====

@@ -419,7 +419,7 @@ begin
 
 	    mwtmp = mw_open (NULL, mwoutdim)
 	    call mw_newsystem (mwtmp, "equispec", mwoutdim)
-	    call mw_swattrs (mwout, 0, "sformat", "equispec")
+	    call mw_swattrs (SMW_MW(mwout,0), 0, "sformat", "equispec")
 	    call mw_swtype (mwtmp, axis, mwoutdim, "linear", "")
 	    if (LABEL(sh2) != EOS)
 		call mw_swattrs (mwtmp, 1, "label", LABEL(sh2))

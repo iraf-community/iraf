@@ -152,6 +152,11 @@ begin
 
 	        pixoff = filesize + hdr_size + 1
 
+		# Update the offset for the blank write to follow which uses
+		# a local file driver tied to the IM_PFD descriptor and not
+		# the normal FIO.
+                FIT_PIXOFF(fit) = pixoff
+
 	        # Update filesize
 	        filesize = filesize + sz_fitfile
 	        call fxf_write_blanks (IM_PFD(im), hdr_size)

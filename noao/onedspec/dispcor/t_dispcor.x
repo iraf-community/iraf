@@ -22,6 +22,7 @@ int	out			# List of output spectra
 bool	linearize		# Linearize spectra?
 bool	log			# Log scale?
 bool	flux			# Conserve flux?
+real	blank			# Blank value
 int	ignoreaps		# Ignore aperture numbers?
 int	fd1			# Log file descriptor
 int	fd2			# Log file descriptor
@@ -31,6 +32,7 @@ int	open(), nowhite(), imtopenp(), imtgetim(), errcode(), btoi()
 pointer	sp, input, output, str, err, stp, table
 pointer	im, im1, smw, smw1, ap, immap(), smw_openim()
 bool	clgetb()
+real	clgetr()
 errchk	open, immap, smw_openim, dc_gms, dc_gec, dc_multispec, dc_echelle
  
 begin
@@ -56,6 +58,7 @@ begin
 	if (linearize) {
 	    log = clgetb ("log")
 	    flux = clgetb ("flux")
+	    blank = clgetr ("blank")
 
 	    call dc_table (table, naps)
 	    if (clgetb ("global")) {
@@ -126,7 +129,7 @@ begin
 
 		    call dc_gms (Memc[input], im1, smw1, stp, YES, ap, fd1, fd2)
 		    call dc_ndspec (im, smw, smw1, ap, Memc[input],
-			Memc[output], linearize, log, flux, table, naps,
+			Memc[output], linearize, log, flux, blank, table, naps,
 			fd1, fd2)
 		default:
 		    # Get dispersion functions.  Determine type of dispersion
@@ -156,12 +159,12 @@ begin
 		    switch (format) {
 		    case MULTISPEC:
 			call dc_multispec (im, smw, ap, Memc[input],
-			    Memc[output], linearize, log, flux, table, naps,
-			    fd1, fd2)
+			    Memc[output], linearize, log, flux, blank, table,
+			    naps, fd1, fd2)
 		    case ECHELLE:
 			call dc_echelle (im, smw, ap, Memc[input],
-			    Memc[output], linearize, log, flux, table, naps,
-			    fd1, fd2)
+			    Memc[output], linearize, log, flux, blank, table,
+			    naps, fd1, fd2)
 		    }
 		}
 	    } then
@@ -198,7 +201,7 @@ end
 # DC_NDSPEC -- Dispersion correct N-dimensional spectrum.
  
 procedure dc_ndspec (in, smw, smw1, ap, input, output, linearize, log, flux,
-	table, naps, fd1, fd2)
+	blank, table, naps, fd1, fd2)
  
 pointer	in			# Input IMIO pointer
 pointer	smw			# SMW pointer
@@ -209,6 +212,7 @@ char	output[ARB]		# Output root name
 bool	linearize		# Linearize?
 bool	log			# Log wavelength parameters?
 bool	flux			# Conserve flux?
+real	blank			# Blank value
 pointer	table			# Wavelength table
 int	naps			# Number of apertures
 int	fd1			# Log file descriptor
@@ -302,8 +306,8 @@ begin
 		}
 
 		call aclrr (Memr[outdata], n1)
-		call dispcor (cti, 1, cto, INDEFI, Memr[indata], nin,
-		    Memr[outdata], n1, flux)
+		call dispcora (cti, 1, cto, INDEFI, Memr[indata], nin,
+		    Memr[outdata], n1, flux, blank)
 	    }
 	}
 
@@ -331,7 +335,7 @@ end
 # required to contain the longest spectrum.
  
 procedure dc_multispec (in, smw, ap, input, output, linearize, log, flux,
-	table, naps, fd1, fd2)
+	blank, table, naps, fd1, fd2)
  
 pointer	in			# Input IMIO pointer
 pointer	smw			# SMW pointer
@@ -341,6 +345,7 @@ char	output[ARB]		# Output root name
 bool	linearize		# Linearize?
 bool	log			# Log wavelength parameters?
 bool	flux			# Conserve flux?
+real	blank			# Blank value
 pointer	table			# Wavelength table
 int	naps			# Number of apertures
 int	fd1			# Log file descriptor
@@ -464,8 +469,8 @@ begin
 		    indata = imgl3r (in, i, j)
 		    outdata = impl3r (out, i, j)
 		    call aclrr (Memr[outdata], IM_LEN(out,1))
-		    call dispcor (cti, i, cto, i, Memr[indata], nc,
-			Memr[outdata], DC_NW(ap,i), flux)
+		    call dispcora (cti, i, cto, i, Memr[indata], nc,
+			Memr[outdata], DC_NW(ap,i), flux, blank)
 		    if (DC_NW(ap,i) < IM_LEN(out,1))
 			call amovkr (Memr[outdata+DC_NW(ap,i)-1],
 			    Memr[outdata+DC_NW(ap,i)],IM_LEN(out,1)-DC_NW(ap,i))
@@ -500,8 +505,8 @@ end
 # spectrum.  The number of pixels in each image line is the maximum
 # required to contain the longest spectrum.
  
-procedure dc_echelle (in, smw, ap, input, output, linearize, log, flux, table,
-	naps, fd1, fd2)
+procedure dc_echelle (in, smw, ap, input, output, linearize, log, flux,
+	blank, table, naps, fd1, fd2)
  
 pointer	in			# IMIO pointer
 pointer	smw			# SMW pointers
@@ -511,6 +516,7 @@ char	output[ARB]		# Output root name
 bool	linearize		# Linearize?
 bool	log			# Log wavelength parameters?
 bool	flux			# Conserve flux?
+real	blank			# Blank value
 pointer	table			# Wavelength table
 int	naps			# Number of apertures
 int	fd1			# Log file descriptor
@@ -615,8 +621,8 @@ begin
 		    indata = imgl3r (in, i, j)
 		    outdata = impl3r (out, i, j)
 		    call aclrr (Memr[outdata], IM_LEN(out,1))
-		    call dispcor (cti, i, cto, i, Memr[indata], nc,
-			Memr[outdata], DC_NW(ap,i), flux)
+		    call dispcora (cti, i, cto, i, Memr[indata], nc,
+			Memr[outdata], DC_NW(ap,i), flux, blank)
 		    if (DC_NW(ap,i) < IM_LEN(out,1))
 			call amovkr (Memr[outdata+DC_NW(ap,i)-1],
 			    Memr[outdata+DC_NW(ap,i)],IM_LEN(out,1)-DC_NW(ap,i))
@@ -675,31 +681,44 @@ begin
 	wmin = MAX_REAL
 	wmax = -MAX_REAL
 	dwmin = MAX_REAL
- 
+
 	while (imtgetim (in, Memc[input], SZ_FNAME) != EOF) {
 	    iferr (im = immap (Memc[input], READ_ONLY, 0))
 		next
 	    mw = smw_openim (im)
-	    iferr {
-		iferr (call dc_gms (Memc[input],im,mw,stp,NO,ap,NULL,NULL)) {
-		    iferr (call dc_gec (Memc[input],im,mw,stp,ap,NULL,NULL)) {
-			call sprintf (Memc[str], SZ_LINE,
-			    "%s: Dispersion data not found")
-			    call pargstr (Memc[input])
-			call error (1, Memc[str])
+	    switch (SMW_FORMAT(mw)) {
+	    case SMW_ND:
+		nwmax = SMW_NW(mw)
+		dw = SMW_DW(mw)
+		w1 = SMW_W1(mw)
+		w2 = w1 + dw * (nwmax - 1)
+		wmin = min (wmin, w1, w2)
+		wmax = max (wmax, w1, w2)
+		dwmin = min (dwmin, abs (dw))
+	    default:
+		iferr {
+		    iferr (call dc_gms (Memc[input], im, mw, stp, NO, ap,
+			NULL, NULL)) {
+			iferr (call dc_gec (Memc[input], im, mw, stp, ap,
+			    NULL, NULL)) {
+			    call sprintf (Memc[str], SZ_LINE,
+				"%s: Dispersion data not found")
+				call pargstr (Memc[input])
+			    call error (1, Memc[str])
+			}
 		    }
-		}
- 
-		do i = 1, IM_LEN(im,2) {
-		    w1 = DC_W1(ap,i)
-		    w2 = DC_W2(ap,i)
-		    dw = DC_DW(ap,i)
-		    wmin = min (wmin, w1, w2)
-		    wmax = max (wmax, w1, w2)
-		    dwmin = min (dwmin, abs (dw))
-		}
-	    } then
-		;
+     
+		    do i = 1, IM_LEN(im,2) {
+			w1 = DC_W1(ap,i)
+			w2 = DC_W2(ap,i)
+			dw = DC_DW(ap,i)
+			wmin = min (wmin, w1, w2)
+			wmax = max (wmax, w1, w2)
+			dwmin = min (dwmin, abs (dw))
+		    }
+		} then
+		    ;
+	    }
 
 	    call mfree (ap, TY_STRUCT)
 	    call smw_close (mw)
@@ -731,7 +750,7 @@ pointer	table			# Wavelength table
 int	naps			# Number of apertures
  
 int	i, j, nw, imtgetim()
-double	w1, w2
+double	w1, w2, dw
 pointer	sp, input, str, im, mw, ap, tbl, immap(), smw_openim()
 errchk	dc_gms, dc_gec, smw_openim
  
@@ -749,29 +768,43 @@ begin
 	    iferr (im = immap (Memc[input], READ_ONLY, 0))
 		next
 	    mw = smw_openim (im)
-	    iferr {
-		iferr (call dc_gms (Memc[input],im,mw,stp,NO,ap,NULL,NULL)) {
-		    iferr (call dc_gec (Memc[input],im,mw,stp,ap,NULL,NULL)) {
-			call sprintf (Memc[str], SZ_LINE,
-			    "%s: Dispersion data not found")
-			    call pargstr (Memc[input])
-			call error (1, Memc[str])
+	    switch (SMW_FORMAT(mw)) {
+	    case SMW_ND:
+		tbl = Memi[table]
+		nw = SMW_NW(mw)
+		dw = SMW_DW(mw)
+		w1 = SMW_W1(mw)
+		w2 = w1 + dw * (nw - 1)
+		TBL_WMIN(tbl) = min (TBL_WMIN(tbl), w1, w2)
+		TBL_WMAX(tbl) = max (TBL_WMAX(tbl), w1, w2)
+		TBL_NWMAX(tbl) = max (TBL_NWMAX(tbl), nw)
+	    default:
+		iferr {
+		    iferr (call dc_gms (Memc[input], im, mw, stp, NO, ap,
+			NULL, NULL)) {
+			iferr (call dc_gec (Memc[input], im, mw, stp, ap,
+			    NULL, NULL)) {
+			    call sprintf (Memc[str], SZ_LINE,
+				"%s: Dispersion data not found")
+				call pargstr (Memc[input])
+			    call error (1, Memc[str])
+			}
 		    }
-		}
- 
-		do i = 1, IM_LEN(im,2) {
-		    call dc_getentry (false, DC_AP(ap,i), table, naps, j)
-		    tbl = Memi[table+j]
      
-		    nw = DC_NW(ap,i)
-		    w1 = DC_W1(ap,i)
-		    w2 = DC_W2(ap,i)
-		    TBL_WMIN(tbl) = min (TBL_WMIN(tbl), w1, w2)
-		    TBL_WMAX(tbl) = max (TBL_WMAX(tbl), w1, w2)
-		    TBL_NWMAX(tbl) = max (TBL_NWMAX(tbl), nw)
-		}
-	    } then
-		;
+		    do i = 1, IM_LEN(im,2) {
+			call dc_getentry (false, DC_AP(ap,i), table, naps, j)
+			tbl = Memi[table+j]
+	 
+			nw = DC_NW(ap,i)
+			w1 = DC_W1(ap,i)
+			w2 = DC_W2(ap,i)
+			TBL_WMIN(tbl) = min (TBL_WMIN(tbl), w1, w2)
+			TBL_WMAX(tbl) = max (TBL_WMAX(tbl), w1, w2)
+			TBL_NWMAX(tbl) = max (TBL_NWMAX(tbl), nw)
+		    }
+		} then
+		    ;
+	    }
 
 	    call mfree (ap, TY_STRUCT)
 	    call smw_close (mw)
@@ -784,7 +817,7 @@ begin
 	    call dc_defaults (TBL_WMIN(tbl), TBL_WMAX(tbl), TBL_NWMAX(tbl),
 		TBL_W1(tbl), TBL_W2(tbl), TBL_DW(tbl), TBL_NW(tbl))
 	}
- 
+
 	call sfree (sp)
 end
  

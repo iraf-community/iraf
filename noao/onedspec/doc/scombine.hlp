@@ -102,19 +102,20 @@ in the log of the endpoints divided by the number of pixel increments.
 .le
 
 .ls scale = "none" (none|mode|median|mean|exposure|@<file>|!<keyword>)
-Multiplicative image scaling to be applied.  The choices are none, scale
-by the mode, median, or mean of the specified statistics section, scale
-by the exposure time in the image header, scale by the values in a specified
-file, or scale by a specified image header keyword.  When specified in
-a file the scales must be one per line in the order of the input
-spectra.
+Multiplicative image scaling to be applied.  The choices are none,
+multiply by the reciprocal of the mode , median, or mean of the specified
+statistics section, scale by the exposure time in the image header, multiply
+by the values in a specified file, or multiply by a specified image header
+keyword.  When specified in a file the scales must be one per line in the
+order of the input spectra.
 .le
 .ls zero = "none" (none|mode|median|mean|@<file>|!<keyword>)
-Additive zero level image shifts to be applied.  The choices are none or
-shift by the mode, median, or mean of the specified statistics section,
-shift by values given in a file, or shift by values given by an image
-header keyword.  When specified in a file the zero values must be one
-per line in the order of the input spectra.
+Additive zero level image shifts to be applied.  The choices are none,
+add the negative of the mode, median, or mean of the specified statistics
+section, add the values given in a file, or add values given by an
+image header keyword.  When specified in a file the zero values must be one
+per line in the order of the input spectra. File or keyword zero offset
+values do not allow a correction to the weights.
 .le
 .ls weight = "none" (none|mode|median|mean|exposure|@<file>|!<keyword>)
 Weights to be applied during the final averaging.  The choices are none,
@@ -349,7 +350,9 @@ is available.
 The spectrum statistics and scale factors are recorded in the log file
 unless they are all equal, which is equivalent to no scaling.  The
 intensity scale factors are normalized to a unit mean and the zero
-point shifts are adjust to a zero mean.
+point shifts are adjusted to a zero mean.  When scal factors
+or zero point shifts are specified by the user in an @file or by an
+image header keyword, no normalization is done.
 
 Scaling affects not only the mean values between spectra but also the
 relative pixel uncertainties.  For example scaling an spectrum by a
@@ -758,5 +761,5 @@ particular it would be desirable to propagate the pixel uncertainties
 and CCD noise parameters from the initial CCD images.
 .ih
 SEE ALSO
-images.imcombine ccdred.combine
+imcombine, odcombine, lscombine
 .endhelp

@@ -7,5 +7,8 @@ real	du, dv			# Coordinate intervals
 int	nu, nv			# Number of pixels
 bool	ulog, vlog		# Logrithmic coordinates?
 bool	flux			# Conserve flux per pixel?
+bool	usewcs			# Use WCS?
+real	blank			# Blank value
 
-common	/trcom/ u1, v1, u2, v2, du, dv, nu, nv, itype, ulog, vlog, flux
+common	/trcom/ u1, v1, u2, v2, du, dv, nu, nv, itype, ulog, vlog,
+		flux, usewcs, blank

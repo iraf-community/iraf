@@ -58,7 +58,66 @@ begin
 	    ref = NULL
 
 	if (Memc[fname] != EOS)
-	    im = xt_pmmap1 (Memc[fname], ref, refim, flag)
+	    im = xt_pmmap1 (Memc[fname], ref, refim, flag, YES)
+	call strcpy (Memc[fname], mname, sz_mname)
+
+	call sfree (sp)
+	return (im)
+end
+
+
+# XT_MAPPM -- Open a pixel mask READ_ONLY with/without matching.
+#
+# This routine maps multiple types of mask files and designations.
+# It may match the mask coordinates to the reference image based on the
+# physical coordinate system.  In either case the mask is matched to be
+# the same size.  The mask name is returned so that the task has the
+# name pointed to by "BPM".  A null filename is allowed and returns NULL.
+
+pointer procedure xt_mappm (pmname, refim, match, mname, sz_mname)
+
+char	pmname[ARB]		#I Pixel mask name
+pointer	refim			#I Reference image pointer
+int	match			#I Match by physical coordinates?
+char	mname[ARB]		#O Expanded mask name
+int	sz_mname		#O Size of expanded mask name
+
+int	i, flag, nowhite()
+pointer	sp, fname, im, ref, xt_pmmap1()
+bool	streq()
+errchk	xt_pmmap1
+
+begin
+	call smark (sp)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+
+	im = NULL
+	i = nowhite (pmname, Memc[fname], SZ_FNAME)
+	if (Memc[fname] == '!') {
+	    iferr (call imgstr (refim, Memc[fname+1], Memc[fname], SZ_FNAME))
+		Memc[fname] = EOS
+	} else if (streq (Memc[fname], "BPM")) {
+	    iferr (call imgstr (refim, "BPM", Memc[fname], SZ_FNAME))
+		Memc[fname] = EOS
+	} else if (streq (Memc[fname], "^BPM")) {
+	    flag = INVERT_MASK
+	    iferr (call imgstr (refim, "BPM", Memc[fname+1], SZ_FNAME))
+		Memc[fname] = EOS
+	}
+
+	if (Memc[fname] == '^') {
+	    flag = INVERT_MASK
+	    call strcpy (Memc[fname+1], Memc[fname], SZ_FNAME)
+	} else
+	    flag = NO
+
+	if (streq (Memc[fname], "EMPTY"))
+	    ref = refim
+	else
+	    ref = NULL
+
+	if (Memc[fname] != EOS)
+	    im = xt_pmmap1 (Memc[fname], ref, refim, flag, match)
 	call strcpy (Memc[fname], mname, sz_mname)
 
 	call sfree (sp)
@@ -90,12 +149,13 @@ end
 # Return error if the pixel mask cannot be opened.  For pixel masks
 # or image masks match the WCS.
 
-pointer procedure xt_pmmap1 (pmname, ref, refim, flag)
+pointer procedure xt_pmmap1 (pmname, ref, refim, flag, match)
 
 char	pmname[ARB]		#I Pixel mask name
 pointer	ref			#I Reference image for pixel mask
 pointer	refim			#I Reference image for image or text
 int	flag			#I Mask flag
+int	match			#I Match by physical coordinates?
 
 int	imstati(),  errcode()
 pointer	im, pm
@@ -114,7 +174,7 @@ begin
 
 	else {
 	    ifnoerr (im = im_pmmap (pmname, READ_ONLY, ref)) {
-		call xt_match (im, refim)
+		call xt_match (im, refim, match)
 		if (flag == INVERT_MASK) {
 		    pm = imstati (im, IM_PMDES)
 		    call xt_pminvert (pm)
@@ -124,7 +184,7 @@ begin
 		switch (errcode()) {
 		case SYS_IKIOPEN, SYS_FOPNNEXFIL, SYS_PLBADSAVEF, SYS_FOPEN:
 		    ifnoerr (im = xt_pmimmap (pmname, refim, flag))
-			call xt_match (im, refim)
+			call xt_match (im, refim, match)
 		    else {
 			switch (errcode()) {
 			case SYS_IKIOPEN:
@@ -471,10 +531,11 @@ end
 # of the mask values which overlap each reference image pixel.
 # A null input returns a null output.
 
-procedure xt_match (im, refim)
+procedure xt_match (im, refim, match)
 
 pointer	im			#U Pixel mask image pointer
 pointer	refim			#I Reference image pointer
+int	match			#I Match by physical coordinates?
 
 int	i, j, k, l, i1, i2, j1, j2, nc, nl, ncpm, nlpm, nx, val
 double	x1, x2, y1, y2, lt[6], lt1[6], lt2[6]
@@ -503,15 +564,18 @@ begin
 	    return
 
 	# Compute transformation between reference (logical) coordinates
-	# and mask (physical) coordinates.
+	# and mask (physical) coordinates if desired.
 
 	mw = mw_openim (im)
 	call mw_gltermd (mw, lt, lt[5], 2)
 	call mw_close (mw)
 
-	mw = mw_openim (refim)
-	call mw_gltermd (mw, lt2, lt2[5], 2)
-	call mw_close (mw)
+	if (match == YES) {
+	    mw = mw_openim (refim)
+	    call mw_gltermd (mw, lt2, lt2[5], 2)
+	    call mw_close (mw)
+	} else
+	    call amovd (lt, lt2, 6)
 
 	# Combine lterms.
 	call mw_invertd (lt, lt1, 2)

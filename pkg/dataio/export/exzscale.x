@@ -65,7 +65,7 @@ begin
         # Now fix up any zscale functions calls embedded in the expression.
         ip = 0
         repeat {
-            # Skip ahead to a possible zscale() call.
+            # Skip ahead to a possible zscale()/mzscale() call.
             while (Memc[exp+ip] != 'z' && Memc[exp+ip] != EOS)
                 ip = ip + 1
             if (Memc[exp+ip] == EOS)
@@ -88,7 +88,7 @@ begin
             # Update pointer into string past '('.
             ip = ip + 1
 
-            if (streq(Memc[func],"zscale")) {
+            if (streq(Memc[func],"zscale") || streq(Memc[func],"zscalem")) {
                 iferr (call ex_edit_zscale (ex, Memc[exp], ip+1))
                     call erract (EA_FATAL)
                 ip = ip + 1
@@ -113,10 +113,10 @@ pointer ex                              #i task struct pointer
 char    expstr[ARB]                     #i expression string
 int     pp                              #i position pointer
 
-pointer sp, arg, exp, buf
-pointer exptr, ep
+pointer sp, arg, arg2, exp, buf
+pointer exptr, exptr2, ep
 char    ch
-int     ip, op, tp, plev
+int     ip, op, tp, tp2, plev
 real    z1, z2
 
 pointer	ex_evaluate()
@@ -124,6 +124,7 @@ pointer	ex_evaluate()
 begin
         call smark (sp)
         call salloc (arg, SZ_EXPSTR, TY_CHAR); call aclrc (Memc[arg], SZ_EXPSTR)
+        call salloc (arg2, SZ_EXPSTR,TY_CHAR); call aclrc (Memc[arg2],SZ_EXPSTR)
         call salloc (exp, SZ_EXPSTR, TY_CHAR); call aclrc (Memc[exp], SZ_EXPSTR)
         call salloc (buf, SZ_EXPSTR, TY_CHAR); call aclrc (Memc[buf], SZ_EXPSTR)
 
@@ -145,8 +146,31 @@ begin
         }
         Memc[arg+op] = EOS
         tp = ip - 1
-
+        tp2 = tp
         if (DEBUG) {call eprintf("\t\targ = `%s'\n");call pargstr(Memc[arg])}
+
+	# Gather the mask argument.
+	if (expstr[pp-2] == 'm' && ch == ',') {
+	    ip = ip + 1
+	    op = 0
+	    plev = 0
+	    repeat {
+		ch = expstr[ip]
+		if (ch == '(')   plev = plev + 1
+		if (ch == ')')   plev = plev - 1
+		Memc[arg2+op] = ch
+		if ((ch == ',' && plev == 0) || (ch == ')' && plev < 0))
+		    break
+		ip = ip + 1
+		op = op + 1
+	    }
+	    Memc[arg2+op] = EOS
+	    tp2 = ip - 1
+	    if (DEBUG) {
+	        call eprintf("\t\targ2 = `%s'\n")
+		call pargstr(Memc[arg2])
+	    }
+	}
 
         if (ch == ',') {
             # We have more arguments, assume they're okay and return.
@@ -165,30 +189,56 @@ begin
 	    call ex_getpix (ex, 1)
 	    ep = ex_evaluate (ex, Memc[OB_EXPSTR(exptr)])
             OB_WIDTH(exptr) = O_LEN(ep)
+	    call evvfree (ep)
 	    if (OB_WIDTH(exptr) == 0)
                 OB_HEIGHT(exptr) = 1
 	    else
                 OB_HEIGHT(exptr) = EX_NLINES(ex)
-	    call evvfree (ep)
+
+	    # Setup the mask expression if needed.
+	    if (Memc[arg2] != EOS) {
+		call ex_alloc_outbands (exptr2)
+		call strcpy (Memc[arg2], Memc[OB_EXPSTR(exptr2)], SZ_EXPSTR)
+
+		# Get the size of the expression.
+		ep = ex_evaluate (ex, Memc[OB_EXPSTR(exptr2)])
+		OB_WIDTH(exptr2) = O_LEN(ep)
+		call evvfree (ep)
+		if (OB_WIDTH(exptr2) == 0)
+		    OB_HEIGHT(exptr2) = 1
+		else
+		    OB_HEIGHT(exptr2) = EX_NLINES(ex)
+		if (OB_WIDTH(exptr2) != OB_WIDTH(exptr) ||
+		    OB_WIDTH(exptr2) != OB_WIDTH(exptr))
+		    call error (1, "Sizes of zscalem arguments not the same.")
+	    } else
+	        exptr2 = NULL
 
 	    if (EX_VERBOSE(ex) == YES) {
 	    	call printf ("Computing zscale values...")
 	    	call flush (STDOUT)
 	    }
 
-            call ex_zscale (ex, exptr, z1, z2, CONTRAST, SAMPLE_SIZE, SAMP_LEN)
+            call ex_zscale (ex, exptr, exptr2, z1, z2,
+	        CONTRAST, SAMPLE_SIZE, SAMP_LEN)
             call ex_free_outbands (exptr)
+	    if (exptr2 != NULL)
+		call ex_free_outbands (exptr2)
 
             if (DEBUG) {call eprintf("\t\t\tz1=%g z2=%g\n")
                 call pargr(z1) ; call pargr (z2) }
 
             # Now patch up the expression string to insert the computed values.
-            call strcpy (expstr, Memc[exp], tp)
+	    if (expstr[pp-2] == 'm') {
+		call strcpy (expstr, Memc[exp], pp-3)
+		call strcat (expstr[pp-1], Memc[exp], tp-1)
+	    } else
+		call strcpy (expstr, Memc[exp], tp)
             call sprintf (Memc[buf], SZ_EXPSTR, ",%g,%g,256")
                 call pargr (z1)
                 call pargr (z2)
             call strcat (Memc[buf], Memc[exp], SZ_EXPSTR)
-            call strcat (expstr[tp+1], Memc[exp], SZ_EXPSTR)
+            call strcat (expstr[tp2+1], Memc[exp], SZ_EXPSTR)
 
 	    # Print the computed values to the screen.
 	    if (EX_VERBOSE(ex) == YES) {
@@ -210,11 +260,12 @@ end
 
 # EX_ZSCALE -- Sample the expression and compute Z1 and Z2.
 
-procedure ex_zscale (ex, exptr, z1, z2, contrast, optimal_sample_size, 
+procedure ex_zscale (ex, exptr, exptr2, z1, z2, contrast, optimal_sample_size, 
     len_stdline)
 
 pointer	ex				# task struct pointer
 pointer	exptr				# expression struct pointer
+pointer	exptr2				# expression struct pointer (mask)
 real	z1, z2				# output min and max greyscale values
 real	contrast			# adj. to slope of transfer function
 int	optimal_sample_size		# desired number of pixels in sample
@@ -228,7 +279,7 @@ int	ex_sample_expr(), ex_fit_line()
 
 begin
 	# Subsample the expression.
-	npix = ex_sample_expr (ex, exptr, sample, optimal_sample_size, 
+	npix = ex_sample_expr (ex, exptr, exptr2, sample, optimal_sample_size, 
 	    len_stdline)
 	center_pixel = max (1, (npix + 1) / 2)
 
@@ -276,18 +327,19 @@ end
 # EX_SAMPLE_EXPR -- Extract an evenly gridded subsample of the pixels from
 # a possibly two-dimensional expression into a one-dimensional vector.
 
-int procedure ex_sample_expr (ex, exptr, sample, optimal_sample_size, 
+int procedure ex_sample_expr (ex, exptr, exptr2, sample, optimal_sample_size, 
     len_stdline)
 
 pointer	ex				# task struct pointer
 pointer	exptr				# expression struct pointer
+pointer	exptr2				# expression struct pointer (mask)
 pointer	sample				# output vector containing the sample
 int	optimal_sample_size		# desired number of pixels in sample
 int	len_stdline			# optimal number of pixels per line
 
-pointer	op, ep, out
+pointer	op, ep, out, bpm
 int	ncols, nlines, col_step, line_step, maxpix, line
-int	opt_npix_per_line, npix_per_line
+int	opt_npix_per_line, npix_per_line, nsubsample
 int	opt_nlines_in_sample, min_nlines_in_sample, max_nlines_in_sample
 
 pointer	ex_evaluate()
@@ -327,6 +379,8 @@ begin
 	# Extract the vector.
 	op = sample
 	call malloc (out, ncols, TY_REAL)
+	if (exptr2 != NULL)
+	    call malloc (bpm, ncols, TY_INT)
 	do line = (line_step + 1) / 2, nlines, line_step {
 
 	    # Evaluate the expression at the current line.
@@ -334,27 +388,38 @@ begin
 	    ep = ex_evaluate (ex, Memc[OB_EXPSTR(exptr)])
 	    switch (O_TYPE(ep)) {
 	    case TY_CHAR:
-	        call achtc (Memc[O_VALP(ep)], Memr[out], O_LEN(ep), TY_REAL)
+	        call achtcr (Memc[O_VALP(ep)], Memr[out], O_LEN(ep))
 	    case TY_SHORT:
-	        call achts (Mems[O_VALP(ep)], Memr[out], O_LEN(ep), TY_REAL)
+	        call achtsr (Mems[O_VALP(ep)], Memr[out], O_LEN(ep))
 	    case TY_INT:
-	        call achti (Memi[O_VALP(ep)], Memr[out], O_LEN(ep), TY_REAL)
+	        call achtir (Memi[O_VALP(ep)], Memr[out], O_LEN(ep))
 	    case TY_LONG:
-	        call achtl (Meml[O_VALP(ep)], Memr[out], O_LEN(ep), TY_REAL)
+	        call achtlr (Meml[O_VALP(ep)], Memr[out], O_LEN(ep))
 	    case TY_REAL:
 	        call amovr (Memr[O_VALP(ep)], Memr[out], O_LEN(ep))
 	    case TY_DOUBLE:
-	        call achtd (Memd[O_VALP(ep)], Memr[out], O_LEN(ep), TY_REAL)
+	        call achtdr (Memd[O_VALP(ep)], Memr[out], O_LEN(ep))
 	    default:
-		call error (0, "Unknown expression type in zscale().")
+		call error (0, "Unknown expression type in zscale/zscalem().")
 	    }
-	    call ex_subsample (Memr[out], Memr[op], npix_per_line, 
-		col_step)
-
-	    # Clean up the pointers.
 	    call evvfree (ep)
+	    if (exptr2 != NULL) {
+		ep = ex_evaluate (ex, Memc[OB_EXPSTR(exptr2)])
+		switch (O_TYPE(ep)) {
+		case TY_BOOL:
+		    call amovi (Memi[O_VALP(ep)], Memi[bpm], O_LEN(ep))
+		default:
+		    call error (0,
+		        "Selection expression must be boolean in zscalem().")
+		}
+		call ex_subsample1 (Memr[out], Memi[bpm], Memr[op], O_LEN(ep),
+		    npix_per_line, col_step, nsubsample)
+		call evvfree (ep)
+	    } else
+		call ex_subsample (Memr[out], Memr[op], O_LEN(ep),
+		    npix_per_line, col_step, nsubsample)
 
-	    op = op + npix_per_line
+	    op = op + nsubsample
 	    if (op - sample + npix_per_line > maxpix)
 		break
 	}
@@ -367,14 +432,16 @@ end
 # EX_SUBSAMPLE -- Subsample an image line.  Extract the first pixel and
 # every "step"th pixel thereafter for a total of npix pixels.
 
-procedure ex_subsample (a, b, npix, step)
+procedure ex_subsample (a, b, n, npix, step, nsubsample)
 
-real	a[ARB]
+real	a[n]
 real	b[npix]
-int	npix, step
+int	n
+int	npix, step, nsubsample
 int	ip, i
 
 begin
+	nsubsample = npix
 	if (step <= 1)
 	    call amovr (a, b, npix)
 	else {
@@ -382,6 +449,50 @@ begin
 	    do i = 1, npix {
 		b[i] = a[ip]
 		ip = ip + step
+	    }
+	}
+end
+
+
+# EX_SUBSAMPLE1 -- Subsample an image line.  Extract the first pixel and
+# every "step"th pixel thereafter for a total of npix pixels.
+#
+# Check for mask values and exclude them from the sample.  In case a
+# subsampled line has fewer than 75% good pixels then increment the starting
+# pixel and step through again.  Return the number of good pixels.
+
+procedure ex_subsample1 (a, c, b, n, npix, step, nsubsample)
+
+real	a[ARB]
+int	c[ARB]
+real	b[npix]
+int	n
+int	npix, step, nsubsample
+int	i, j
+
+begin
+	nsubsample = 0
+	if (step <= 1) {
+	    do i = 1, n {
+	        if (c[i] == 0)
+		    next
+		nsubsample = nsubsample + 1
+		b[nsubsample] = a[i]
+		if (nsubsample == npix)
+		    break
+	    }
+	} else {
+	    do j = 1, step-1 {
+		do i = j, n, step {
+		    if (c[i] == 0)
+		        next
+		    nsubsample = nsubsample + 1
+		    b[nsubsample] = a[i]
+		    if (nsubsample == npix)
+		        break
+		}
+		if (nsubsample >= 0.75 * npix)
+		    break
 	    }
 	}
 end

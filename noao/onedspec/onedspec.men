@@ -13,6 +13,7 @@
          mkspec - Generate an artificial spectrum (obsolete)
           names - Generate a list of image names from a string
 	 ndprep - Make neutral density filter calibration image
+      odcombine - Combine spectra having different wavelength ranges (new)
      refspectra - Assign wavelength reference spectra to other spectra
      reidentify - Automatically identify features in spectra
       rspectext - Convert ascii text spectra to image spectra

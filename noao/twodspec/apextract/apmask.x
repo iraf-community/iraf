@@ -23,7 +23,7 @@ short	val
 pointer	im, pm, ap, cv, a1, b1
 pointer	sp, name, str, buf, a, b, amin, bmax
 
-real	clgetr(), cveval()
+real	clgetr(), ap_cveval()
 bool	ap_answer()
 pointer	ap_immap(), pm_newmask()
 errchk	ap_immap, pm_savef
@@ -74,7 +74,7 @@ begin
 	    a1 = a + (i - 1) * nb
 	    b1 = b + (i - 1) * nb
 	    do j = 1, nb {
-		shift = cveval (cv, real (j))
+		shift = ap_cveval (cv, real (j))
 		low = nint (aplow + shift)
 		high = nint (aphigh + shift)
 		Mems[a1+j-1] = low

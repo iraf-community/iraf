@@ -1,5 +1,9 @@
 .help revisions Jun88 noao.nproto
 .nf
+
+ace/catio.x
+    An extra argument to tbhgtr() was found by lint.  (5/24/04, Valdes)
+
 =======
 V2.12.2
 =======

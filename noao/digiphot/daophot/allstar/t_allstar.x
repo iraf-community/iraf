@@ -18,6 +18,7 @@ int	cache			# cache the data in memory
 int	verbose			# verbose mode ?
 int	verify			# verify critical task parameters ?
 int	update			# update the task parameters ?
+int	version			# version number
 
 pointer	sp, outfname, im, subim, dao, str
 int	imlist, limlist, alist, lalist, pimlist, lpimlist, olist, lolist
@@ -26,7 +27,8 @@ int	rejfd, wcs
 bool	ap_text
 
 pointer	immap(), tbtopn()
-int	open(), fnldir(), strncmp(), strlen(), btoi(), access(), clgwrd()
+int	clgwrd(), clgeti()
+int	open(), fnldir(), strncmp(), strlen(), btoi(), access()
 int	fstati(), imtopen, imtlen(), imtgetim(), fntopnb(), fntlenb()
 int	fntgfnb()
 bool	itob(), clgetb()
@@ -60,6 +62,8 @@ begin
 	verify = btoi (clgetb ("verify"))
 	update = btoi (clgetb ("update"))
 	cache = btoi (clgetb ("cache"))
+	version = clgeti ("version")
+	version = 2
 
 	# Get the lists.
 	imlist = imtopen (Memc[image])
@@ -291,7 +295,8 @@ begin
 	    call dp_sets (dao, OUTIMAGE, Memc[outfname])
 
 	    # Fit the stars.
-	    call dp_astar (dao, im, subim, allfd, rejfd, cache, savesub)
+	    call dp_astar (dao, im, subim, allfd, rejfd, cache, savesub,
+	        version)
 
 	    # Close the input image.
 	    call imunmap (im)

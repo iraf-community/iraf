@@ -1,5 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<error.h>
+include	<syserr.h>
 include	<ctype.h>
 include	<imhdr.h>
 include	<imio.h>
@@ -21,12 +23,13 @@ int	ndim			#I system dimension
 double	theta
 char	ctype[8]
 bool	have_ltm, have_ltv, have_wattr
-int	axes[2], axis, npts, ch, ip, raax, decax, ax1, ax2, i, j
+int	axes[2], axis, npts, ch, ip, raax, decax, ax1, ax2, i, j, ea_type
+double	maxval
 pointer	sp, r, o_r, cd, ltm, cp, rp, bufp, pv, wv, o_cd, o_ltm, str
 
 bool	streq()
 pointer	iw_gbigfits(), iw_findcard()
-int	strncmp(), ctod(), strldxs()
+int	strncmp(), ctod(), strldxs(), envgeti()
 errchk	mw_swtermd, iw_gbigfits, malloc, mw_swtype, mw_swsampd
 define	samperr_ 91
 
@@ -233,6 +236,40 @@ samperr_		call eprintf (
 		if (j == raax || j == decax)
 		    next
 		IW_CD(iw,j,j) =  IW_CDELT(iw,j)
+	    }
+	}
+
+	# Set axes with no scales to unit scales.  Issue a warning by
+	# default but use "wcs_matrix_err" to allow setting other error
+	# actions.
+
+	do i = 1, ndim {
+	    maxval = 0D0
+	    do j = 1, ndim
+		maxval = max (maxval, abs(IW_CD(iw,i,j)))
+	    if (maxval == 0D0) {
+		iferr (ea_type = envgeti ("wcs_matrix_err"))
+		    ea_type = EA_WARN
+		iferr {
+		    switch (ea_type) {
+		    case EA_FATAL, EA_ERROR:
+			call sprintf (Memc[str], SZ_FNAME, 
+			    "CD keywords for axis %d undefined")
+			    call pargi (i)
+			call error (SYS_MWMISSAX, Memc[str])
+		    case EA_WARN:
+			IW_CD(iw,i,i) = 1D0
+			call sprintf (Memc[str], SZ_LINE, 
+			    "setting CD%d_%d to %.4g")
+			    call pargi (i)
+			    call pargi (i)
+			    call pargd (IW_CD(iw,i,i))
+			call error (SYS_MWMISSAX, Memc[str])
+		    default:
+			IW_CD(iw,i,i) = 1D0
+		    }
+		} then
+		    call erract (ea_type)
 	    }
 	}
 

@@ -47,7 +47,7 @@ real	p, s, chisq, tfac, rrej, predict, var0, var, vmin, resid, wt1, wt2, dat
 pointer	sp, str, spec, x1, x2, y, reject, xreject, data, sky, cv, gp
 
 int	apgeti()
-real	apgetr(), cveval(), apgimr()
+real	apgetr(), ap_cveval(), apgimr()
 bool	apgetb()
 errchk	salloc, ap_horne, ap_marsh, apgimr, ap_asifit
 
@@ -98,7 +98,7 @@ begin
 	s = AP_CEN(ap,i) + AP_HIGH(ap,i)
 	xreject = reject
 	do iy = 1, ny {
-	    dat = cveval (cv, real (iy + ys - 1)) - c1 + 1
+	    dat = ap_cveval (cv, real (iy + ys - 1)) - c1 + 1
 	    Memr[x1+iy] = p + dat
 	    Memr[x2+iy] = s + dat
 	    Memr[x1+iy] = max (0.5, Memr[x1+iy]) + c1 - xs[iy]

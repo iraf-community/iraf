@@ -24,7 +24,7 @@ pointer	sp, str, x, ids
 
 bool	clgetb()
 int	apgeti(), apgwrd()
-real	apgetr(), ap_center(), cveval()
+real	apgetr(), ap_center(), ap_cveval()
 
 begin
 	# Determine the maximum number of apertures to be found and return
@@ -43,7 +43,7 @@ begin
 	nx = naps
 	for (i = 0; i < nx; i = i + 1)
 	    Memr[x+i] = AP_CEN (Memi[aps+i], AP_AXIS(Memi[aps+i])) +
-		cveval (AP_CV(Memi[aps+i]), real (line))
+		ap_cveval (AP_CV(Memi[aps+i]), real (line))
 
 	# Find peaks not already identified.
 	minsep = apgetr ("minsep")
@@ -67,7 +67,7 @@ begin
 		if (AP_TITLE(Memi[aps+naps]) != NULL)
 		    call mfree (AP_TITLE(Memi[aps+naps]), TY_CHAR)
 		AP_CEN(Memi[aps+naps], AP_AXIS(Memi[aps+naps])) = center -
-		    cveval (AP_CV(Memi[aps+naps]), real (line))
+		    ap_cveval (AP_CV(Memi[aps+naps]), real (line))
 		naps = naps + 1
 	    }
 	}

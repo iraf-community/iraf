@@ -52,6 +52,7 @@ extern	int cldebug;
 extern	int cltrace;
 extern	int lastjobno;		/* last background job spawned		*/
 extern	int gologout;		/* flag to execute() to cause logout	*/
+extern	int logout_status;	/* optional arg to logout()		*/
 extern	char *findexe();
 
 /* Device Allocation stuff (really should be in a separate package).
@@ -89,8 +90,36 @@ cllogout()
 {
 	register int	n;
 	register struct	d_alloc	*dv;
-	char	owner[SZ_FNAME+1];
+	register struct pfile *pfp;
+	struct   operand o;
+	char	 owner[SZ_FNAME+1];
 
+
+	/* Set logout status value */
+	pfp = newtask->t_pfp;
+	if ((n = nargs (pfp)) > 0) {
+	    pushbparams (pfp->pf_pp);   /* push so first popped is 1st param */
+	    popop();                    /* discard the $n name          */
+	    o = popop();                /* pop logout status number     */
+	
+	    if ((o.o_type & OT_BASIC) == OT_STRING) {
+		eprintf ("Warning: logout status `%s' not a number\n",
+	            o.o_val.v_s);
+		nlogouts++;
+		gologout = 1;		/* LOGOUT on third attempt */
+		return;
+	    }
+	
+	    pushop (&o);
+	    opcast (OT_INT);
+	    o = popop();
+	    logout_status = o.o_val.v_i;
+	} else
+	    logout_status = 0;
+
+
+	/* Clean up any allocated devices.
+	 */
 	if (nallocdev > 0) {
 	    /* Examine each apparently allocated device to see if it is in
 	     * fact still allocated.
@@ -188,6 +217,99 @@ clcache ()
 
 	    /* Retain the pfiles read in. */
 	    keep (prevtask);
+	}
+}
+
+
+/* CL_LOCATE -- Locate the named task in the package list.
+ */
+cl_locate (task_spec, first_only)
+char	*task_spec;
+int	first_only;
+{
+	char	buf[SZ_LINE];
+	char	*pkname, *ltname, *junk;
+	struct	package *pkp;
+	int	stat, found = 0;
+
+	strcpy (buf, task_spec);
+	breakout (buf, &junk, &pkname, &ltname, &junk);
+
+	if (pkname[0] != '\0') {	/* explicit package named	*/
+	    if ((pkp = pacfind (pkname)) == NULL)
+		cl_error (E_UERR, e_pcknonexist, pkname);
+	    if ((stat = (int) ltaskfind (pkp, ltname, 1)) == NULL)
+		oprintf ("%s'\n", pkname);
+
+	} else {			/* search all packages		*/
+	    pkp = reference (package, pachead);
+	    stat = NULL;
+
+	    while (pkp != NULL) {
+		stat = (int) ltaskfind (pkp, ltname, 1);
+		if (stat == ERR)
+	    	    cl_error (E_UERR, e_tambig, ltname);
+		else if (stat != NULL) {
+	            oprintf ("%s", pkp->pk_name);
+		    found++;
+		    if (first_only == YES)
+			break;
+	            oprintf (" ");
+		}
+		pkp = pkp->pk_npk;
+	    }
+	}
+
+	if (found == NULL)
+	    oprintf ("%s: task not found.\n", task_spec);
+	else
+	    oprintf ("\n");
+}
+
+
+/* CLWHICH -- Locate the named task in the package list.
+ */
+clwhich ()
+{
+	register struct pfile *pfp;
+	struct	operand o;
+	int	n;
+
+	pfp = newtask->t_pfp;
+	if ((n = nargs (pfp)) < 1)
+	    cl_error (E_UERR, e_geonearg, "which");
+
+	pushbparams (pfp->pf_pp);
+	while (n--) {
+	    popop();			/* discard fake name.		*/
+	    opcast (OT_STRING);
+	    o = popop();		/* get ltask			*/
+
+	    cl_locate (o.o_val.v_s, YES);
+	}
+}
+
+
+
+/* CLWHEREIS -- Locate all occurances of named task in the package list.
+ */
+clwhereis ()
+{
+	register struct pfile *pfp;
+	struct	operand o;
+	int	n;
+
+	pfp = newtask->t_pfp;
+	if ((n = nargs (pfp)) < 1)
+	    cl_error (E_UERR, e_geonearg, "whereis");
+
+	pushbparams (pfp->pf_pp);
+	while (n--) {
+	    popop();			/* discard fake name.		*/
+	    opcast (OT_STRING);
+	    o = popop();		/* get ltask			*/
+
+	    cl_locate (o.o_val.v_s, NO);
 	}
 }
 
@@ -1980,6 +2102,8 @@ register struct package *pkp;
 	    "flprcache", clflprcache, 0,/* flush the process cache	*/
 	    "gflush", clgflush, 0,	/* flush graphics output	*/
 	    "cache", clcache, 0,	/* pre-load a tasks pfile	*/
+	    "which", clwhich, 0,	/* locate named task		*/
+	    "whereis", clwhereis, 0,	/* locate all instances of task	*/
 	    "clbye", clclbye, LT_CL|LT_CLEOF,	/* cl() with EOF	*/
 	    "bye", clbye, 0,		/* restore previous state	*/
 	    "logout", cllogout, 0,	/* log out of the CL		*/

@@ -78,3 +78,5 @@ unlearn		hlp = unlearn.hlp
 update		hlp = update.hlp
 wait		hlp = wait.hlp
 while		hlp = while.hlp
+which		hlp = which.hlp
+whereis		hlp = which.hlp

@@ -40,8 +40,8 @@ crux			: crux!/iraf/iraf/bin.redhat/irafks.e
 cygnus			: cygnus!/local/iraf/bin.sparc/irafks.e
 data			: data!/iraf/iraf/bin.ssun/irafks.e
 defiant			: defiant!/iraf/iraf/bin.ssun/irafks.e
+denali			: denali!/iraf/iraf/bin.redhat/irafks.e
 deneb			: deneb!/local/iraf/iraf/bin.ssun/irafks.e
-dhcp-4-152		: dhcp-4-152!/iraf/iraf/bin.redhat/irafks.e
 driftwood		: driftwood!/iraf/iraf/bin.ssun/irafks.e
 dropbear		: dropbear!/iraf/iraf/bin.redhat/irafks.e
 dtsn1			: dtsn1!/iraf/iraf/bin.redhat/irafks.e
@@ -122,7 +122,8 @@ suse62                  : suse62!/iraf/iraf/bin.suse/irafks.e
 soi			: soi!/iraf/iraf/bin.ssun/irafks.e
 sol                     : sol!/usr/local/iraf/iraf/bin.ssun/irafks.e
 sol7                    : sol7!/iraf/iraf/bin.sunos/irafks.e
-solarium		: solarium!/iraf/iraf/bin.sparc/irafks.e
+solarch			: solarch!/iraf/iraf/bin.ssun/irafks.e
+solarium		: solarium!/iraf/iraf/bin.ssun/irafks.e
 soleil                  : soleil!/iraf/iraf/bin.ssun/irafks.e
 solstice                : solstice!/local/iraf/iraf/bin.ssun/irafks.e
 spud			: spud!/iraf/iraf/bin.sparc/irafks.e

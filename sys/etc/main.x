@@ -294,9 +294,15 @@ begin
 		call fredir (STDERR, nullfile, WRITE_ONLY, TEXT_FILE)
 	    }
 
-	    # Call the custom or default ONENTRY procedure.
-	    if (onentry (prtype, bkgfname, a_cmd) == PR_EXIT) {
+	    # Call the custom or default ONENTRY procedure.  The lowest bit
+	    # of the return value contains the PR_EXIT/PR_NOEXIT flag, higher
+	    # bits may contain a more meaningful 7-bit status code which will
+	    # be returned to the shell.
+
+	    i = onentry (prtype, bkgfname, a_cmd)
+	    if (mod(i, 2) == PR_EXIT) {
 		interpret = NO
+		errstat = i / 2
 		goto shutdown_
 	    } else
 		interpret = YES

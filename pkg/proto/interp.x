@@ -1,6 +1,6 @@
 include	<fset.h>
 
-define	SZ_TABLE	200
+define	SZ_TABLE	4096
 define	LINEAR		1
 define	SPLINE		2
 
@@ -20,15 +20,13 @@ define	SPLINE		2
 # If only a small number of values are needed to be interpolated
 # from the table, the user may enter a number of x's from either
 # a file or STDIN.
-# 
-# The number of elements in the table is limited to SZ_TABLE
-# which is currently set to 200.
+
 
 procedure t_interp()
 
-real	xtab[SZ_TABLE], ytab[SZ_TABLE]
-real	x, y, x1, x2, dx
-int	npts, ierr
+double	x, y, x1, x2, dx
+pointer	xtab, ytab
+int	npts, ierr, tbsize
 int	filelist, tbl, in, imode
 char	fname[SZ_FNAME], tbl_file[SZ_FNAME], mode[SZ_FNAME]
 bool	gen
@@ -49,12 +47,20 @@ begin
 
 	npts = 0
 
+	# Allocate the initial arrays.
+	call calloc (xtab, SZ_TABLE, TY_DOUBLE)
+	call calloc (ytab, SZ_TABLE, TY_DOUBLE)
+	tbsize = SZ_TABLE
+
 	while (fscan(tbl) != EOF) {
 	    npts = npts + 1
-	    if (npts > SZ_TABLE)
-		call error (1, "Maximum table size [SZ_TABLE] exceeded.")
-	    call gargr (xtab[npts])
-	    call gargr (ytab[npts])
+	    if (npts > tbsize) {
+		call realloc (xtab, (tbsize+SZ_TABLE), TY_DOUBLE)
+		call realloc (ytab, (tbsize+SZ_TABLE), TY_DOUBLE)
+		tbsize = tbsize + SZ_TABLE
+	    }
+	    call gargd (Memd[xtab+npts-1])
+	    call gargd (Memd[ytab+npts-1])
 	    if (nscan() < 2) {
 		call eprintf ("Error reading x,y pairs\n")
 		npts = npts - 1
@@ -76,19 +82,19 @@ begin
 	# Generate a curve?
 	gen = clgetb ("curve_gen")
 	if (gen) {
-	    x1 = clgetr ("x1")
-	    x2 = clgetr ("x2")
-	    dx = clgetr ("dx")
+	    x1 = double(clgetr ("x1"))
+	    x2 = double(clgetr ("x2"))
+	    dx = double(clgetr ("dx"))
 
 	    # Verify that dx will not cause an infinite loop
 	    if (dx == 0.0 || dx * (x2-x1) < 0.0)
 		call error (1, "Interval paramater dx implies infinite loop.")
 
 	    for (x=x1; x <= x2; x = x+dx) {
-		call intrp (1, xtab, ytab, npts, x, y, ierr)
+		call intrp (1, Memd[xtab], Memd[ytab], npts, x, y, ierr)
 		call printf ("%12.5g  %12.5g\n")
-		    call pargr (x)
-		    call pargr (y)
+		    call pargd (x)
+		    call pargd (y)
 	    }
 
 	# No, just one point at a time
@@ -103,15 +109,15 @@ begin
 
 		# Process input requests
 		while (fscan(in) != EOF) {
-		    call gargr (x)
+		    call gargd (x)
 		    if (imode == LINEAR)
-			call lintrp (1, xtab, ytab, npts, x, y, ierr)
+			call lintrp (1, Memd[xtab], Memd[ytab], npts, x,y, ierr)
 		    else
-			call intrp  (1, xtab, ytab, npts, x, y, ierr)
+			call intrp  (1, Memd[xtab], Memd[ytab], npts, x,y, ierr)
 
 		    call printf ("%12.5g  %12.5g\n")
-			call pargr (x)
-			call pargr (y)
+			call pargd (x)
+			call pargd (y)
 		}
 
 		call close (in)
@@ -119,4 +125,8 @@ begin
 
 	    call clpcls (filelist)
 	}
+
+	# Free the pointers.
+	call mfree (xtab, TY_DOUBLE)
+	call mfree (ytab, TY_DOUBLE)
 end

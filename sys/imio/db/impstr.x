@@ -71,10 +71,10 @@ begin
 	    } else {
 		# Skip numeric value.
 		do i = ip, IDB_RECLEN {
-		    ch = Memc[rp+i]
+		    ch = Memc[rp+i-1]
 		    if (ch == '\n' || ch == ' ' || ch == '/')
 			break
-		    Memc[rp+i] = ' '
+		    Memc[rp+i-1] = ' '
 		}
 		break
 	    }

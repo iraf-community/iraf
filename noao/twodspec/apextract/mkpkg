@@ -29,6 +29,7 @@ libpkg.a:
 	apcenter.x	<pkg/center1d.h>
 	apcolon.x	apertures.h <error.h> <gset.h> <imhdr.h>
 	apcopy.x	apertures.h
+	apcveval.x	<math/curfit.h>
 	apcvset.x	apertures.h <math/curfit.h>
 	apdb.x		apertures.h <math/curfit.h> <pkg/dttext.h>
 	apdefault.x	apertures.h <imhdr.h>

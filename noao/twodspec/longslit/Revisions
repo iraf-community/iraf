@@ -1,5 +1,51 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
+
+========
+V2.12.2a
+========
+
+transform/t_transform.x
+    Fixed a typo nxin -> nyin.  (7/8/04, Valdes)
+
+lscombine/			+
+lscombine.par			+
+mkpkg
+x_longslit.x
+longslit.hd
+longslit.men
+longslit.cl
+doc/lscombine.hlp		+
+    1.  Added the new task LSCOMBINE to register and combine longslit data.
+    	This is a combination of the functions in TRANSFORM for resampling
+	and IMCOMBINE for combining.
+
+transform/trsetup.x		+
+transform/t_transform.x
+transform/transform.com
+transform/mkpkg
+transform.par
+doc/transform.hlp
+    1.  Added the parameters "minput" and "moutput".  This allows masks
+    	to be transformed using the same transformation as the data.  The
+	transformation procedures were modified to allow doing this
+	efficiently; i.e. doing it in parallel with the data transformation
+	using the same internal coordinate lookup maps.
+    2.  Added the parameter "blank" to allow setting the value for output
+    	pixels interpolated from outside the input image.  The value
+	INDEF produces the old behavior or extrapolating from the nearest
+	edge pixel in the input image.
+    3.  If no "fitnames" are specified the tasks now uses the WCS for
+    	defining the transformation.  This allows resampling dispersion
+	calibrated longslit data.
+    4.  The routines were restructured to allow calling the setup and
+    	resampling from another task such as LSCOMBINE.
+    (6/18/04, Valdes)
+
+=======
+V2.12.2
+=======
+
 longslit$transform/t_fceval.x	+
 longslit$transform/fceval.par	+
 longslit$doc/fceval.hlp		+
@@ -859,4 +905,45 @@ This is done by having three query parameters giving the name of the
 image to be traced or which was previously traced, a list of input
 images from which to extract, and a list of output rootnames
 one for each input image.
-.endhelp
+
+
+.:
+total 4520
+-rw-r--r--    1 valdes   iraf         1423 Sep 24  1985 airmass.x
+-rw-r--r--    1 valdes   iraf          245 Oct 22  1985 fluxcalib.par
+-rw-r--r--    1 valdes   iraf          659 Nov 18  1985 fitcoords.par
+-rw-r--r--    1 valdes   iraf          879 Mar 13  1986 illumination.par
+-rw-r--r--    1 valdes   iraf         3108 Jun  2  1986 lstools.x
+-rw-r--r--    1 valdes   iraf          800 Aug 18  1986 response.par
+-rw-r--r--    1 valdes   iraf          183 May 26  1987 extinction.par
+-rw-r--r--    1 valdes   iraf         5297 Feb  3  1989 ilsetbins.x
+-rw-r--r--    1 valdes   iraf          493 Feb 12  1993 calibrate.par
+-rw-r--r--    1 valdes   iraf          950 Feb 12  1993 sensfunc.par
+-rw-r--r--    1 valdes   iraf          758 Feb 12  1993 standard.par
+-rw-r--r--    1 valdes   iraf          496 Feb 12  1993 longslit.par
+-rw-r--r--    1 valdes   iraf         8574 May 14  1993 fluxcalib.x
+-rw-r--r--    1 valdes   iraf          690 May 14  1993 getdaxis.x
+-rw-r--r--    1 valdes   iraf        10216 May 14  1993 illumination.x
+-rw-r--r--    1 valdes   iraf         5996 May 14  1993 extinction.x
+-rw-r--r--    1 valdes   iraf         1567 Jul 21  1997 reidentify.par
+drwxr-xr-x    2 valdes   iraf         4096 Aug 12  1999 demos
+-rw-r--r--    1 valdes   iraf         9206 Jan  7  2002 response.x
+-rw-r--r--    1 valdes   iraf          171 Aug 27  2003 fceval.par
+-rw-r--r--    1 valdes   iraf        30895 Aug 27  2003 Revisions
+-rw-r--r--    1 valdes   iraf          212 Jun 10 14:38 x_longslit.x
+-rw-r--r--    1 valdes   iraf        12252 Jun 10 14:38 x_longslit.o
+-rw-rw-r--    1 valdes   iraf        17479 Jun 15 16:16 xtpmmap.x
+-rw-rw-r--    1 valdes   iraf         3240 Jun 16 11:30 xtmaskname.x
+-rw-r--r--    1 valdes   iraf        13080 Jun 16 11:43 xtmaskname.o
+-rw-r--r--    1 valdes   iraf        46608 Jun 16 11:43 xtpmmap.o
+-rw-r--r--    1 valdes   iraf          841 Jun 16 11:49 transform.par
+-rw-r--r--    1 valdes   iraf          804 Jun 16 17:12 mkpkg
+drwxr-xr-x    3 valdes   iraf         4096 Jun 16 17:53 transform
+-rw-r--r--    1 valdes   iraf      1613602 Jun 16 18:06 libpkg.a
+-rwxr-xr-x    1 valdes   iraf      2714998 Jun 16 18:06 xx_longslit.e
+drwxrwxr-x    3 valdes   iraf         4096 Jun 18 16:07 lscombine
+-rw-r--r--    1 valdes   iraf         2331 Jun 18 16:25 lscombine.par
+drwxr-xr-x    2 valdes   iraf         4096 Jun 18 16:50 doc
+-rw-r--r--    1 valdes   iraf          376 Jun 18 16:50 longslit.hd
+-rw-r--r--    1 valdes   iraf         1499 Jun 18 16:51 longslit.men
+-rw-r--r--    1 valdes   iraf          776 Jun 18 16:52 longslit.cl

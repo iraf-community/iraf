@@ -79,6 +79,13 @@
 #undef import_fset
 #endif
 
+#ifdef import_fpoll
+#ifndef D_fpoll
+#include "/iraf/iraf/unix/hlib/libc/fpoll.h"
+#endif
+#undef import_fpoll
+#endif
+
 #ifdef import_kernel
 #ifndef D_kernel
 #include "/iraf/iraf/unix/hlib/libc/kernel.h"

@@ -75,6 +75,8 @@ int	recursion;		/* detect error recursion in ONERROR	*/
 int	errlev;			/* detect error recursion in CL_ERROR	*/
 int	ninterrupts;		/* number of onint() calls per task	*/
 long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
+int	logout_status = 0;	/* optional status arg to logout()	*/
+
 
 static void execute();
 static	void login(), logout();
@@ -134,7 +136,7 @@ exit_:
 	 * seems to be no alternative to this sort of thing...
 	 */
 	cl_amovi ((int *)jmp_save, jumpcom, LEN_JUMPBUF);
-	return (PR_EXIT);
+	return (PR_EXIT | (logout_status << 1));
 }
 
 

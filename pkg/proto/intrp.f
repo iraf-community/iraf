@@ -12,9 +12,9 @@ c          x - independent for which a y-value is desired
 c          y - returned interpolated (or extrapolated) value
 c       ierr - =0 for ok, -1 for extrapolation
 c
-        real xtab(ntab), ytab(ntab), x, y
+        double precision xtab(ntab), ytab(ntab), x, y
         integer itab, ierr, index
-        real t(4), u(4)
+        double precision t(4), u(4)
 c       integer savind
 c       data savind/-1/
 c
@@ -86,7 +86,7 @@ c
 c       Modified to remove entry points.  3/20/86 Valdes
 c
         integer ntab, index, init
-        real xtab(ntab), x
+        double precision xtab(ntab), x
 c
 c common for subroutines intrp0 and intrpi
 c
@@ -104,7 +104,7 @@ c Initialize
         endif
 c
 c Determine direction of table, ascending or descending
-        idir = sign (1.0, xtab(ntab) - xtab(1))
+        idir = sign (1.0d0, xtab(ntab) - xtab(1))
 c
 c-----
 c Reset error flag
@@ -119,8 +119,8 @@ c-----
 c no previous entry
                 isrch = 1
 c check for extrapolation
-                if ((x-xtab(   1)) * idir .lt. 0.0) go to 2000
-                if ((x-xtab(ntab)) * idir .gt. 0.0) go to 2100
+                if ((x-xtab(   1)) * idir .lt. 0.0d0) go to 2000
+                if ((x-xtab(ntab)) * idir .gt. 0.0d0) go to 2100
         else
 c
 c-----
@@ -130,7 +130,7 @@ c
 c check for still wihin bounds - difference from above should be opposite
 c                                sign of difference from below
 c
-                if ((xtab(last)-x) * (xtab(last-1)-x) .lt. 0.0) then
+                if ((xtab(last)-x) * (xtab(last-1)-x) .lt. 0.0d0) then
                         index = last
                         return
                 endif
@@ -140,11 +140,11 @@ c -----
 c Begin searching - first determine direction
 c
 c This change made because x = xtab(1) was considered extrapolation.
-c       if ((x - xtab(isrch)) * idir .gt. 0.0) then
-        if ((x - xtab(isrch)) * idir .ge. 0.0) then
+c       if ((x - xtab(isrch)) * idir .gt. 0.0d0) then
+        if ((x - xtab(isrch)) * idir .ge. 0.0d0) then
 c forward
                 do 1100 i = isrch+1, ntab
-                        if ((x-xtab(i)) * idir .gt. 0.0) go to 1100
+                        if ((x-xtab(i)) * idir .gt. 0.0d0) go to 1100
                         go to 1500
 1100            continue
 c fall thru implies extrapolation required at high end
@@ -154,7 +154,7 @@ c
 c-----
 c negative direction search
                 do 1200 i = isrch-1,1,-1
-                        if ((x-xtab(i)) * idir .lt. 0.0) go to 1200
+                        if ((x-xtab(i)) * idir .lt. 0.0d0) go to 1200
                         go to 1400
 1200            continue
 c fall through implies extrapolation at low end
@@ -221,13 +221,16 @@ c           i1 = 3, i3 = 3  :  1 pt  available
 c
 c       y - output interpolated (or extrapolated) dependent value
 c
-        real t(4), u(4), x, y
+        double precision t(4), u(4), x, y
         integer i1, i2
+        double precision s, v, z, a1, a2, a3, c1, c2, c3, a4, c4, c5, c6
+	double precision e1, e2, p1, p2, slope1, slope2, al, bt, xe
+
 c
 c variable xk affects the extrapolation procedure. a value of -1.0
 c appears to be a reliable value.
 c
-        data xk/-1.0/
+        data xk/-1.0d0/
 c
         v = x
 c the following code is extracted from an original source
@@ -255,7 +258,7 @@ c
       goto1260
 1230  slope1=abs((u(4)-u(3))/(t(4)-t(3)))
       slope2=abs((u(3)-u(2))/(t(3)-t(2)))
-      xe=1.0
+      xe=1.0d0
       if(slope1+slope2.ne.0.)xe=1.-abs(slope1-slope2)/(slope1+slope2)
 1260  p1=s+xe*(p2-s)
       goto1500
@@ -264,7 +267,7 @@ c
       goto1460
 1430  slope1=abs((u(2)-u(1))/(t(2)-t(1)))
       slope2=abs((u(3)-u(2))/(t(3)-t(2)))
-      xe=1.0
+      xe=1.0d0
       if(slope1+slope2.ne.0.)xe=1.-abs(slope1-slope2)/(slope1+slope2)
 1460  p2=s+xe*(p1-s)
 1500  e1=abs(p1-s)
@@ -289,7 +292,7 @@ c Arguments are identical to INTRP, and uses the same index search
 c scheme so that values for ITAB should not clash with calls
 c to INTRP and LINTRP.
 c
-        real xtab(ntab), ytab(ntab), x , y
+        double precision xtab(ntab), ytab(ntab), x , y
         integer itab, ierr
 c
 c----- Only 1 pt in table

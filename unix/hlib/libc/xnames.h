@@ -124,6 +124,7 @@
 #define	KI_MAPCHAN	kimapn_
 #define	LEXNUM		lexnum_
 #define	LPOPEN		lpopen_
+#define	NDOPEN		ndopen_
 #define	ONENTRY		onenty_
 #define	ONERROR		onerrr_
 #define	ONEXIT		onexit_
@@ -137,6 +138,15 @@
 #define	PARGS		pargs_
 #define	PARGSTR		pargsr_
 #define	PARGX		pargx_
+#define POLL            xfpoll_
+#define POLL_OPEN       pollon_
+#define POLL_CLOSE      pollce_
+#define POLL_ZERO       pollzo_
+#define POLL_SET        pollst_
+#define POLL_CLEAR      pollcr_
+#define POLL_TEST       polltt_
+#define POLL_GET_NFDS   pollgs_
+#define POLL_PRINT      pollpt_
 #define	PRCHDIR		prchdr_
 #define	PRCLCPR		prclcr_
 #define	PRCLDPR		prcldr_

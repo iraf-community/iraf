@@ -330,7 +330,7 @@ end
 
 
 # HE_INITFIELD -- Add a new field to the indicated image.  If the field already
-# existsdo not set its value.  The value expression is evaluated and the
+# exists do not set its value.  The value expression is evaluated and the
 # resulting value used as the initial value in adding the field to the image.
 
 procedure he_initfield (im, image, field, valexpr, verify, show, update)
@@ -380,7 +380,7 @@ begin
 	    o = evexpr (valexpr, locpr(he_getop), 0)
 	else {
 	    call malloc (o, LEN_OPERAND, TY_STRUCT)
-	    call xev_initop (o, strlen(valexpr), TY_CHAR)
+	    call xev_initop (o, max(1,strlen(valexpr)), TY_CHAR)
 	    call strcpy (valexpr, O_VALC(o), ARB)
 	}
 
@@ -464,7 +464,7 @@ begin
 	    o = evexpr (valexpr, locpr(he_getop), 0)
 	else {
 	    call malloc (o, LEN_OPERAND, TY_STRUCT)
-	    call xev_initop (o, strlen(valexpr), TY_CHAR)
+	    call xev_initop (o, max(1,strlen(valexpr)), TY_CHAR)
 	    call strcpy (valexpr, O_VALC(o), ARB)
 	}
 

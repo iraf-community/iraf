@@ -4,6 +4,7 @@ $call	relink
 $exit
 
 update:
+	$call	update@scombine
 	$call	relink
 	$call	install
 	;
@@ -35,7 +36,7 @@ libpkg.a:
 	@fortran
 	@identify
 	@irsiids
-	@scombine
+	@odcombine
 	@sensfunc
 	@splot
 

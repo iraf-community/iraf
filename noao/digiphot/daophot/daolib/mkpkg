@@ -39,6 +39,7 @@ libpkg.a:
 	daoran.x
 	erf.x
 	invers.f
+	invers2.x
 	mvmul.x
 	quick.f
 	pctile.f

@@ -946,7 +946,6 @@ unix/hlib/zzsetenv.def		[+pcix]
 	Reset the value of cl.logregen to advise users to update with a new
 	MKIRAF.  Also reset cl.version="IRAF V2.12.2 January 2004 and
 	cl.release="2.12.2" in preparation for the final release (1/8/04, MJF)
-	(1/8/04, MJF)
 
 local/.login                    [pcix]
 unix/hlib/install               [pcix]
@@ -1063,7 +1062,7 @@ pkg/images/immatch/src/imcombine/src/xtimmap.gx
 	An earlier change to increase the path length was somehow lost.
 	(2/3/04, Valdes)
 
-unix/hlib/cl.csh
+unix/hlib/cl.csh		[pcix]
 	Last-minute testing under RHEL showed a segfault in nearly all
 	tasks.  This was traced to a number of pointer values being returned
 	by the system at addresses outside of the process stack space.
@@ -1077,4 +1076,295 @@ unix/hlib/cl.csh
 
 -----------------------------------------------------------
 V2.12.2 -- Final (really) release builds begun.  (2/5/04)
+V2.12.2 -- Public release.  (2/7/04)
+-----------------------------------------------------------
+
+
+pkg/cl/cl.par
+unix/hlib/motd			[+pcix]
+unix/hlib/login.cl		[+pcix]
+unix/hlib/zzsetenv.def		[+pcix]
+	Incremented system version to V2.12.3-DEVELOP.  Also reset cl.version
+	to "IRAF V2.12.2 February 2004 and cl.release to "2.12.3". (2/9/04, MJF)
+
+sys/imio/db/impstr.x
+	Fixed a problem where modifying a boolean keyword or a numeric
+	value could corrupt the comment string. (3/1/04, MJF)
+
+pkg/images/imcoords/src/t_wcsctran.x
+	An error in mw_openim was trapped but the garbage in the return value
+	caused a segmentation error during error recovery.  A fix was made to
+	this and also to report, as a comment, the MWCS error.  
+	(3/12/04, Valdes)
+
+sys/mwcs/mwopenim.x
+sys/mwcs/mwloadim.x
+        Allocation of the WCS descriptor was moved from before reading the
+        WCS cards and before calling mw_loadim until after the cards
+        are read in mw_loadim to allow creating a descriptor based on the
+        WCS dimensionality rather than the image dimensionality.  In
+        particular, it is no longer an error if the image dimensionality
+        is zero.  (3/12/04, Valdes)
+
+sys/mwcs/iwrfits.x
+        The dimensionality returned from reading the WCS cards is now
+        set to the maximum axis seen when the image dimensionality
+        is zero and there is no WCSDIM card.  (3/12/04, Valdes)
+
+pkg/images/imcoords/src/t_wcsctran.x
+	If the image dimensionality is zero then use the WCS dimensionality.
+	(3/15/04, Valdes)
+
+pkg/cl/binop.c
+	Fixed a bug in the new strstr()/strlstr() which could fail due to a
+	pointer increment side-effect when the last char of the search string
+	didn't match. (3/22/04, MJF)
+
+pkg/cl/binop.c
+	The concat operator could create garbage in the output string when
+	the first operand was not a string.  The problem is that the operands
+	are popped from the stack in reverse order, but when the first op
+	is recast as a string it then gets a string storage area which can
+	overwrite the pointer of the second op.  The popop() program comments
+	even warn that the string should be used before another pushop() (as
+	is done in opcast()) or else the string will be clobbered.  Added code
+	to preserve the second string (3/22/04, MJF)
+
+pkg/cl/login.cl
+	Updated the 'logver' version. (3/22/04, MJF)
+
+unix/hlib/install
+	Updated the version string. (3/22/04, MJF)
+
+sys/mwcs/iwgbfits.x
+	Fixed a bug where WAT keyword strings could be concatenated inadvert-
+	antly, e.g.  WAT1_001='wtype=linear' and WAT1_002='system=world'
+	could result in concatenated values without a separating space.  Since
+	concatenation is needed in some cases (e.g. TNX projection coeffs),
+	a space is only added when the string terminates before col 80 of the
+	card, indicating a completed string. (3/23/04, MJF)
+
+pkg/images/imutil/src/hedit.x
+	The task could segfault when initializing/adding a new keyword with a
+	null value.  The evexpr operator was being initialized as a scalar and
+	the string pointer wasn't allocated, added a check so string pointer
+	is always allocated to at least one char.  (3/23/04, MJF)
+
+pkg/cl/builtin.c
+pkg/language/language.hd
+pkg/language/language.men
+pkg/language/doc/which.hlp	+
+	Implemented a new 'which' and 'whereis' set of commands.  The 'which'
+	command searches the package list in reverse order and returns the
+	first package containing the task, 'whereis' returns a space-delimited
+	list of all packages containing that task.  These are user-convenience
+	functions mostly, e.g. with many packages loaded and tasks multiply 
+	declared it might not be obvious which instance of a task is actually
+	being called.  
+	    Note, these commands only search the list of loaded packages, in
+	some cases the user may actually want to find all instances of the
+	task in the system, but this is better left as a help/references 
+	option (TBD). (3/25/04, MJF)
+
+sys/mwcs/iwgbfits.x
+	As earlier fix to this routine had an off-by-one error (3/30/04, MJF)
+
+sys/etc/main.x
+	Modified so the return of the ONENTRY call can contain a status value
+	in the higher bits.  The test for PR_EXIT does a 'mod(i,2)' and so
+	tests only for the process return code.  The optional status value
+	is recovered and returned to zmain().  (4/7/04, Valdes/MJF)
+
+pkg/cl/main.c
+pkg/cl/builtin.c
+	Added an optional argument to the logout() command which will return
+	a status value to the shell in #!cl scripts.  If no argument is
+	present the status is zero (OK) as before and the return of the
+	c_main() remains just PR_EXIT to the iraf main.  Otherwise, the
+	status is shifted left one bit and or'd with the PR_EXIT so the
+	main still interprets the value correctly.  In the iraf main, the
+	status is recovered and return to the zmain which calls exit() to
+	set the $status shell variable.  (4/7/04, Valdes/MJF)
+
+
+unix/hlib/libc/iraf.h		[+pcix]
+	Added ifdef code for new import_fpoll directive. (4/7/04, MJF)
+
+unix/hlib/libc/xnames.h		[+pcix]
+	Added definitions for NDOPEN and the new POLL interface functions
+	(4/7/04, MJF)
+
+unix/hlib/libc/knames.h		[+pcix]
+	Added definition for new zfpoll() HSI routine. (4/7/04, MJF)
+
+unix/hlib/libc/fpoll.h		[+pcix]
+	Added include file to define the kernel poll structure (4/7/04, MJF)
+
+unix/os/mkpkg			[+pcix]
+unix/os/zfpoll.c		[+pcix]
+	Added new zfpoll() kernel routine. (4/7/04, MJF)
+
+sys/libc/mkpkg
+sys/libc/cpoll.c		+
+sys/libc/cndopen.c		+
+sys/libc/creopen.c		+
+	Added LIBC bindings for the network driver ndopen/reopen functions
+	and the new polling interface. (4/7/04, MJF)
+
+iraf/lib/poll.h			+
+	Added VOS <poll.h> interface file. (4/7/04, MJF)
+
+sys/fio/mkpkg
+sys/fio/poll.x			+
+sys/fio/zzdebug.x
+	Added a new FIO interface for polling file descriptors.  The
+	interface is described in the fio$poll.x source comments and
+	consists mainly of routines to manage an internal data structure
+	of descriptors to be polled, along with the primary poll() procedure.
+	See the test programs in fio$zzdebug.x for usage examples.
+	    This interface operates in a manner similar to the unix poll
+	command, i.e. it will block until the is activity (either input or
+	output) on one or more of the file descriptors in the set.  Any
+	FIO file descriptor may be added to the polling set, including 
+	ND descriptors.  This makes it easier to now write iraf client/server
+	tasks with multiple inputs (e.g. accept a new connection, read
+	data on a socket, write to a file when it's ready, etc), or tasks
+	which can't afford to block waiting for input from a particular
+	source.  The STDIN/STDOUT streams and any file descriptor returned
+	from FIO may be added to a poll set.  Currently, polling on graphics
+	streams, or CLIO is not supported.
+	(4/7/04, MJF)
+
+pkg/cl/gram.c
+	Modified the addpipe() procedure to change the pipecode increment
+	to be 1000 rather than just one to avoid pid conflicts when multiple
+	CLs are started nearly simultaneously.  Also, added code to pipefile()
+	to permit a user-defined 'pipes' directory to be used in preference
+	to uparm and tmp.  (4/8/04, Valdes/MJF)
+
+sys/imio/iki/fxf/fxfopix.x
+	Under certain conditions when in APPEND mode, if the entry
+	FIT_PIXOFF(fit) is not set, then the 'write blanks' routine does
+	not append a blank header at the right location. Setting it to the
+	correct value solves this problem.  (4/21/04, NZ/MJF)
+
+unix/hlib/iraf.h
+	Forgot a redefinition of 'poll' to 'xfpoll' in libsys.a (5/4/04, MJF)
+
+sys/mwcs/mwloadim.x
+sys/mwcs/iwewcs.x
+	There is now a check when setting up the WCS from a FITS header
+	that the CD and LTM matrices have scales defined for all axes.
+	Note that when there are no keywords unit matrices are
+	automatically set.  It is a problem only when there is a partial
+	set of keywords.  A typical type of format error is when the the
+	3rd or higher dimensions are degenerate and no WCS keywords are
+	included.  Rather than waiting for a singular matrix error to occur
+	(and some applications don't catch this error and later seg fault
+	or do something else bad) MWCS will now add a unit scale in the
+	diagnoal element; e.g. CD3_3 = 1.  The default action is to add the
+	scale and issue a warning.  The "wcs_matrix_err" environment
+	variable may be set to 0 to eliminate the warning or 1 or 2 to
+	trigger an error that the application may trap or trigger an
+	abort.  (5/5/04, FV)
+
+pkg/proto/interp.x
+pkg/proto/doc/interp.hlp
+        Removed the limit of 200 points from the interpolation table.  The
+        task starts out with a max of 4096 and will dynamically increase the
+        tables as needed (5/5/04, MJF)
+
+pkg/proto/intrp.f
+pkg/proto/interp.x
+        The user requesting this task have the limit removed also had a
+        dataset which would fail due to floating point precision problems.
+        The task was modified to use doubles (5/6/04, MJF)
+
+sys/imio/db/impstr.x
+	An earlier fix to this routine wasn't properly cleaning up the
+	string when editing existing keywords leading to an indexin problem.
+	(5/17/04, MJF)
+
+dev/termcap
+dev/graphcap
+	Added lw37 (6/29/04, MJF)
+
+unix/hlib/install
+	On DUNX systems the code creating the libiraf.so link was removing
+	the .so extension and so only the old version of the shared lib was
+	still being used.  Fixed.  (6/29/04, MJF)
+
+imio/iki/fxf/fxfupdhdr.x
+	If we need to write more than one block of blanks, substract
+	one line corresponding to the END keyword, since this will be
+	written after the blanks. (6/30/04, NZ)
+
+sys/plio/plssize.x
+	Changed the initial allocation for the PL_MAXLINE line list buffer.
+	Previously this was roughly the npix/2 which assumed some compression
+	would be achieved.  However, for extremely complex arrays this would
+	lead to a short buffer and rather than rely on catching all places
+	where this may need to be checked we adopt a more conservative value
+	of the entire length of the line  (6/30/04, Valdes/MJF)
+
+
+pkg/cl/cl.par
+pkg/cl/login.cl
+unix/hlib/motd			[+pcix]
+unix/hlib/login.cl		[+pcix]
+unix/hlib/zzsetenv.def		[+pcix]
+unix/hlib/install
+	Updated the version to 'V2.12.2a-BETA' (7/1/04, MJF)
+
+pkg/proto/intrp.f
+pkg/proto/interp.x
+	The earlier change to make the routines double precision had a
+	remaining use of a 'real' that was causing invalid calculations.
+	(7/2/04, MJF)
+
+------------------------------------------------------
+V2.12.2a-BETA -- patch generated.  (7/2/04, MJF)
+
+
+dev/hosts
+	Added new RH9 system denali (7/5/04, MJF)
+
+lib/helpdb.mip
+noao/lib/helpdb.mip
+	Rebuilt the help databases. (7/6/04, MJF)
+
+sys/ki/irafks.x
+	Fixed typos in debug output strings.  (7/6/04, MJF)
+
+pkg/dataio/export/exzscale.x
+pkg/dataio/doc/export.hlp
+	Added a new operand zscalem to do an automatic zscale calculation
+	with a selection expression to allow excluding bad pixels which
+	would otherwise perturb the result.  The selection expression would
+	typically involve a bad pixel mask or a selection range.
+	(7/8/04, Valdes)
+
+pkg/proto/maskexpr/t_mskregions.x
+	There was an error that did not allow the new mask to take on the
+	size of the reference image if one is specified.  (7/8/04, Valdes)
+
+dev/hosts
+	Added solarch, fixed arch for solarium (7/12/04, MJF)
+
+unix/hlib/login.cl		[+pcix]
+	Removed the check against TERM in the default terminal stty 
+	command.  The problem is that in most cases this will be set
+	by the user to 'xterm' whether it's correct or not (e.g. in their
+	unix environment or as a default for PC terminals like konsole).
+	Previously a TERM=xterm would do an 'stty xgterm' in all cases,
+	making the MKIRAF setting a no-op and effectively preventing users
+	from using XTerm properly.  (7/14/04, MJF)
+
+unix/hlib/motd			[+pcix]
+unix/hlib/zzsetenv.def		[+pcix]
+	Updated the version to 'V2.12.2a-EXPORT' (7/14/04, MJF)
+
+------------------------------------------------------
+V2.12.2a-EXPORT -- patch generated.  (7/14/04, MJF)
+
 

@@ -393,7 +393,7 @@ real	buf			# Aperture buffer
  
 int	i, j, axis
 int	low, high
-real	center, cveval(), clgetr()
+real	center, ap_cveval(), clgetr()
  
 begin
 	buf = clgetr ("buffer") + 0.5
@@ -401,7 +401,7 @@ begin
  
 	axis = AP_AXIS(aps[1])
 	do i = 1, naps {
-	    center = AP_CEN(aps[i],axis) + cveval (AP_CV(aps[i]), real (line))
+	    center = AP_CEN(aps[i],axis) + ap_cveval (AP_CV(aps[i]), real(line))
 	    low = max (1, int (center + AP_LOW(aps[i],axis) - buf))
 	    high = min (npts, int (center + AP_HIGH(aps[i],axis) + buf))
 	    do j = low, high
@@ -434,7 +434,7 @@ int	index			# Last line (input), current line (returned)
 pointer	indata			# Input data pointer
 pointer	outdata			# Output data pointer
  
-real	val, cveval()
+real	val, ap_cveval()
 int	i, last_index, col1, col2, nc, nd, ncols, nlines, ncols_block
 pointer	inbuf, outbuf, ptr, imgl2r(), impl2r(), imgs2r(), imps2r()
  
@@ -518,7 +518,7 @@ begin
 	if (cvs != NULL) {
 	    val = index
 	    do i = 1, nd
-		Memr[outdata+i-1] = cveval (Memi[cvs+i-1], val)
+		Memr[outdata+i-1] = ap_cveval (Memi[cvs+i-1], val)
 	}
  
 	return (index)
@@ -546,7 +546,7 @@ int	aaxis			# Aperture axis
 int	line			# Line to get
 pointer	data			# Image data
  
-real	rval, clgetr(), cveval()
+real	rval, clgetr(), ap_cveval()
 int	i, stat, cmd, ival, strdic(), scan(), nscan()
 pointer	sp, name, str, imgl2r(), imgs2r()
  
@@ -636,7 +636,7 @@ begin
 			call malloc (data, IM_LEN(im,1), TY_REAL)
 		    rval = line
 		    do i = 1, IM_LEN(im,1)
-			Memr[data+i-1] = cveval (Memi[cvs+i-1], rval)
+			Memr[data+i-1] = ap_cveval (Memi[cvs+i-1], rval)
 		}
 	    case 2:
 		call sprintf (Memc[str], SZ_LINE, "%s: Fit column %d\n%s")
@@ -652,7 +652,7 @@ begin
 			call malloc (data, IM_LEN(im,2), TY_REAL)
 		    rval = line
 		    do i = 1, IM_LEN(im,2)
-			Memr[data+i-1] = cveval (Memi[cvs+i-1], rval)
+			Memr[data+i-1] = ap_cveval (Memi[cvs+i-1], rval)
 		}
 	    }
 	}

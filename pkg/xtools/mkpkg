@@ -44,6 +44,7 @@ libxtools.a:
 	xtimnames.x
 	xtimtgetim.x	
 	xtlogfiles.x
+	xtmaskname.x	
 	xtmksection.x	<imhdr.h>
 	xtphistory.x	<imhdr.h>
 	xtsort.x	

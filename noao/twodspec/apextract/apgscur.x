@@ -15,7 +15,7 @@ int	apaxis
 real	x
 pointer	ap
 
-real	cveval()
+real	ap_cveval()
 
 begin
 	if (index < 1 || IS_INDEF (y))
@@ -23,6 +23,6 @@ begin
 
 	ap = aps[index]
 	apaxis = AP_AXIS(ap)
-	x = AP_CEN(ap, apaxis) + cveval (AP_CV(ap), real (line))
+	x = AP_CEN(ap, apaxis) + ap_cveval (AP_CV(ap), real (line))
 	call gscur (gp, x, y)
 end

@@ -562,6 +562,16 @@ begin
 	    diff = 0
 	} else {
 	    diff = pixoff - ualen
+
+            # If we need to write more than one block of blanks, substract
+	    # one line corresponding to the END keyword, since this will be
+	    # written after the blanks.
+
+	    if (diff > 2880) {
+		ualen = (usize / LEN_UACARD + nheader_cards-1) * LEN_CARD
+		ualen = FITS_LEN_CHAR(ualen / 2)
+		diff = pixoff - ualen
+	    }
         }
 
         if (diff < 0 && FIT_EXPAND(fit) == NO) {

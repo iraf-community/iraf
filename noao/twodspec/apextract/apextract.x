@@ -107,7 +107,7 @@ pointer	asi
 
 bool	clgetb(), apgetb(), strne()
 int	apgeti(), apgwrd(), begmem(), ap_check()
-real	apgimr(), cveval(), ic_getr()
+real	apgimr(), ap_cveval(), ic_getr()
 pointer	ap_immap(), imgs2r(), imgl2r()
 errchk	salloc, malloc, ap_immap, imgs2r, imgl2r, asiinit
 errchk	ap_check, ap_skyeval, ap_profile, ap_variance, ap_output, apgimr
@@ -259,7 +259,7 @@ begin
 		cmin = MAX_REAL
 	        cmax = -MAX_REAL
 	        do j = bmin, bmax {
-	           shift = cveval (cv, real (j))
+	           shift = ap_cveval (cv, real (j))
 	           cmin = min (cmin, shift)
 	           cmax = max (cmax, shift)
 	        }
@@ -363,9 +363,15 @@ begin
 			    break
 		    }
 
-		    if (aaxis == 1)
-			dbuf = imgs2r (im, amin, amax, bmin, bmax)
-		    else {
+		    if (aaxis == 1) {
+			if (fmt == DIFF) {
+			    call mfree (dbuf, TY_REAL)
+			    call malloc (dbuf, na*nb, TY_REAL)
+			    call amovr (Memr[imgs2r(im,amin,amax,bmin,bmax)],
+				Memr[dbuf], na*nb)
+			} else
+			    dbuf = imgs2r (im, amin, amax, bmin, bmax)
+		    } else {
 			if (na > namax) {
 			    call mfree (dbuf, TY_REAL)
 			    namax = na
@@ -432,7 +438,7 @@ begin
 		    na1 = nint (xmax) - nint (xmin) + 1
 		    cv = AP_CV(ap)
 		    do j = bmin, bmax {
-			shift = cveval (cv, real (j))
+			shift = ap_cveval (cv, real (j))
 			Memi[astart+j-bmin] = nint (xmin + shift)
 		    }
 		} else {
@@ -451,7 +457,7 @@ begin
 			na1 = nint (xmax) - nint (xmin) + 1
 			cv = AP_CV(ap)
 			do j = bmin, bmax {
-			    shift = cveval (cv, real (j))
+			    shift = ap_cveval (cv, real (j))
 			    Memi[astart+j-bmin] = nint (xmin + shift)
 			}
 		    }
@@ -1532,7 +1538,7 @@ pointer	asi			# Interpolator for edge pixel weighting
 
 int	i, ix, iy, ix1, ix2
 real	low, high, step, x1, x2, wt1, wt2, s, sval, skyval
-real	cveval()
+real	ap_cveval()
 pointer	cv, data, sky
 errchk	asifit
 
@@ -1543,7 +1549,7 @@ begin
 	step = (high - low) / nsubaps
 	cv = AP_CV(ap)
 	do iy = 1, ny {
-	    s = cveval (cv, real (iy + ys - 1)) - c1 + 1
+	    s = ap_cveval (cv, real (iy + ys - 1)) - c1 + 1
 	    call ap_asifit (dbuf+(iy+ys-1-l1)*nc, nc, xs[iy]-c1+1,
 		low+s, high+s, data, asi)
 #	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
@@ -1652,7 +1658,7 @@ int	nx, ny			# Size of profile array
 int	xs[ny], ys		# Origin of sky array
 
 int	i, na, iy, ix1, ix2, nasi
-real	low, high, s, x, cveval(), asieval()
+real	low, high, s, x, ap_cveval(), asieval()
 pointer	obuf, cv, asi, data, sky, ptr, imps2r()
 
 begin
@@ -1668,7 +1674,7 @@ begin
 
 	do iy = 1, ny {
 	    i = iy + ys - 1
-	    s = cveval (cv, real (i))
+	    s = ap_cveval (cv, real (i))
 	    ix1 = max (1, nint (low + s) - 1)
 	    ix2 = min (nc, nint (high + s) + 1)
 	    nasi = ix2 - ix1 + 1
@@ -1719,7 +1725,7 @@ int	nx, ny			# Size of profile array
 int	xs[ny], ys		# Origin of profile array
 
 int	na, ix, iy
-real	low, high, s, x, cveval(), asieval()
+real	low, high, s, x, ap_cveval(), asieval()
 pointer	sp, cv, asi, data, impl2r()
 
 begin
@@ -1738,7 +1744,7 @@ begin
 	    do ix = 1, nx
 		Memr[data+ix-1] = s * profile[iy,ix]
 	    call asifit (asi, Memr[data], nx)
-	    s = cveval (cv, real (iy+ys-1)) - xs[iy] + 1
+	    s = ap_cveval (cv, real (iy+ys-1)) - xs[iy] + 1
 	    x = low + s
 	    do ix = 1, na {
 		profile[iy,ix] = asieval (asi, x)

@@ -70,12 +70,12 @@ int	interactive		# Interactive bandpass definition
 bool	newobs, obshead
 int	i, j, line, enwaves, nstds
 real	wave, dwave, latitude
-pointer	sp, units, image, ewaves, emags
+pointer	sp, units, errstr, str, image, ewaves, emags
 pointer	im, mw, un, unang, sh, obj, sky, std, stds, obs, gp
 
-int	imtgetim()
+int	imtgetim(), errget()
 real	clgetr(), obsgetr()
-bool	clgetb(), rng_elementi()
+bool	clgetb(), rng_elementi(), streq()
 pointer	imtopenp(), rng_open(), immap(), smw_openim(), un_open()
 errchk	immap, smw_openim, shdr_open, std_calib, get_airm, ext_load, obsimopen
 errchk	un_open, std_gcalib
@@ -86,6 +86,8 @@ begin
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (observatory, SZ_FNAME, TY_CHAR)
 	call salloc (units, SZ_FNAME, TY_CHAR)
+	call salloc (errstr, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	# Get task parameters.
 	list = imtopenp ("input")
@@ -221,8 +223,13 @@ begin
 
 		    if (!samestar || i == 0) {
 	 	        # Read calibration data
+			Memc[str] = EOS
 		        repeat {
 		            iferr (call std_gcalib (std, un)) {
+				j = errget (Memc[errstr], SZ_FNAME)
+				if (streq (Memc[errstr], Memc[str]))
+				    call erract (EA_ERROR)
+				call strcpy (Memc[errstr], Memc[str], SZ_LINE)
 		                call erract (EA_WARN)
 			        next
 			    }

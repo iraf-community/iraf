@@ -41,7 +41,7 @@ real	apgetr()
 bool	clgetb(), ap_answer()
 pointer	ap_immap()
 
-errchk	ap_immap, ic_open, ap_ltrace, ap_ctrace
+errchk	ap_immap, ic_open, ap_ltrace, ap_ctrace, ap_default
 
 common	/apt_com/ ic
 
@@ -175,11 +175,12 @@ int	i, j, n, nx, ny, ntrace, istart, lost, fd
 real	yc, yc1
 pointer	co, data, sp, str, x, y, wts, gp, gt
 
-real	center1d(), cveval()
+real	center1d(), ap_cveval()
 bool	ap_answer()
 pointer comap(), gt_init()
 
-errchk	cveval, xt_csum, xt_csumb, center1d, icg_fit, ic_fit, ap_gopen, ap_popen
+errchk	ap_cveval, xt_csum, xt_csumb, center1d, icg_fit, ic_fit
+errchk	ap_gopen, ap_popen
 
 begin
 	# Set up column access buffering.
@@ -228,7 +229,7 @@ begin
 	    # position is not INDEF.
 
 	    lost = 0
-	    yc = AP_CEN(aps[j], 2) + cveval (AP_CV(aps[j]), real (start))
+	    yc = AP_CEN(aps[j], 2) + ap_cveval (AP_CV(aps[j]), real (start))
 	    do i = istart, ntrace {
 		Memr[y+i-1] = INDEF
 		if (lost < nlost) {
@@ -291,7 +292,7 @@ begin
 	    # position is not INDEF.
 
 	    lost = 0
-	    yc = AP_CEN(aps[j], 2) + cveval (AP_CV(aps[j]), real (start))
+	    yc = AP_CEN(aps[j], 2) + ap_cveval (AP_CV(aps[j]), real (start))
 	    do i = istart - 1, 1, -1 {
 		Memr[y+i-1] = INDEF
 		if (lost < nlost) {
@@ -436,11 +437,12 @@ real	xc1
 int	i, j, n, nx, ny, ntrace, istart, line, line1, line2, fd
 pointer	data, sp, str, x, y, wts, xc, lost, x1, x2, gp, gt
 
-real	center1d(), cveval()
+real	center1d(), ap_cveval()
 bool	ap_answer()
 pointer	gt_init()
 
-errchk	cveval, xt_lsum, xt_lsumb, center1d, icg_fit, ic_fit, ap_gopen, ap_popen
+errchk	ap_cveval, xt_lsum, xt_lsumb, center1d, icg_fit, ic_fit
+errchk	ap_gopen, ap_popen
 
 begin
 	# Determine the number of lines to be traced and allocate memory.
@@ -477,7 +479,7 @@ begin
 	    if (AP_SELECT(aps[i]) == NO)
 		next
 	    Memr[xc+i-1] = AP_CEN(aps[i], 1) +
-		cveval (AP_CV(aps[i]), real (start))
+		ap_cveval (AP_CV(aps[i]), real (start))
 	    Memi[lost+i-1] =  0
 	}
 
@@ -535,7 +537,7 @@ begin
 	    if (AP_SELECT(aps[i]) == NO)
 		next
 	    Memr[xc+i-1] = AP_CEN(aps[i], 1) +
-		cveval (AP_CV(aps[i]), real (start))
+		ap_cveval (AP_CV(aps[i]), real (start))
 	    Memi[lost+i-1] = 0
 	}
 

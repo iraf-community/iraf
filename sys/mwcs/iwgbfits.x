@@ -32,7 +32,7 @@ begin
 	}
 
 	# Allocate the space.
-	call malloc (bp, ncards * MAX_FITSCOLS, TY_CHAR)
+	call calloc (bp, ncards * MAX_FITSCOLS, TY_CHAR)
 
 	# For successive cards 1, 2, 3, etc...
 	op = bp
@@ -64,11 +64,18 @@ begin
 		    if (ch == EOS || ch == '\n') {
 			break
 		    } else if (ch == '\'') {
-			if (Memc[ip+1] == '\'')
+			if (Memc[ip+1] == '\'') {
 			    goto put_
-			else if (Memc[ip-1] == '\'')
+			} else if (Memc[ip-1] == '\'') {
 			    ;
-			else
+			} else if (i > 1 && i <= MAX_FITSCOLS) {
+			    # If we're not at the end of the card, we have a
+			    # complete string, but add a space for appending
+			    # so we don't concatenate.
+			    Memc[op] = ' ' 
+			    op = op + 1
+			    break
+			} else
 			    break
 		    } else {
 put_			Memc[op] = ch

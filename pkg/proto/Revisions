@@ -1,5 +1,19 @@
 .help revisions Jun88 proto
 .nf
+
+========
+V2.12.2a
+========
+
+maskexpr/t_mskregions.x
+     The code to inherit the size of the reference image was incorrect
+     and is now fixed.  (7/8/04, Valdes)
+
+interp.x
+     Removed the limit on the size of the table.  The table is initially
+     allocated to 4096 pairs, and dynamically reallocated in 4096 chunks
+     as needed.  (5/6/04, MJF)
+
 =======
 V2.12.2
 =======

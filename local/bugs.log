@@ -7545,3 +7545,83 @@ BUG:	Support for extractions on image sections added in V2.10.4 was
 
 STATUS:	The ability to specify input images sections is restored in the
 	V2.12.2 release.
+
+NUMBER:	533
+MODULE:	sarith, scopy
+SYSTEM:	V2.12.2
+DATE:	Tue Mar  9 14:15:08 MST 2004
+FROM:	valdes
+
+BUG:	In V2.12.2 a bug was introduced such that the "merge" option no
+	longer works.  It produces a segmentation violation type of error.
+	The workaround is to produce a temporary file and then use SCOPY.
+
+	DOES NOT WORK:
+	    sarith a - b a clobber+ merge+
+	WORKAROUND
+	    sarith a - b c
+	    scopy a,c a clobber+
+	    imdel c
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	534
+MODULE:	test
+SYSTEM:	V2.12
+DATE:	Thu Mar 25 11:37:43 MST 2004
+FROM:	fitz
+
+BUG:	...bug
+
+STATUS:	...fixed
+
+NUMBER:	535
+MODULE:	imcombine
+SYSTEM:	V2.12.1-V2.12.2
+DATE:	Thu Apr  8 16:48:28 MST 2004
+FROM:	valdes
+
+BUG:	When combining one-dimensional images usng offsets the result is wrong.
+	The workaround is to promote the images to 2D using IMSTACK; i.e.
+	"imstack im1 im2" where im1 is the 1D image and im2 is the 2D
+	image with one line.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	536
+MODULE:	apall, apsum
+SYSTEM:	-V2.12.2
+DATE:	Fri May 21 16:14:31 MST 2004
+FROM:	valdes
+
+BUG:	When an aperture trace is lost the region of the trace fit is less
+	than the range of the dispersion.  However, during extraction the
+	trace is evaluated at all points along the dispersion.  The
+	extrapolation of the fit can cause problems resulting in errors
+	such as out of memory or salloc underflow.  The only workaround
+	is to eliminate the aperture with the bad trace or use the 
+	interactive trace fitting options to constrain the fit, such as
+	by adding dummy points, to give a well behaved trace fit.
+
+STATUS:	In future releases evaluation of the trace will use
+	fit at the end point when extrapolating outside the range of
+	the fit.
+
+NUMBER:	537
+MODULE:	fixpix
+SYSTEM:	-V2.12.2
+DATE:	Tue Jun 22 14:19:28 MST 2004
+FROM:	valdes
+
+BUG:	Column interpolation does not work except under special circumstances.
+	The bug is that a count is made of the number columns containing
+	pixels to be replaced.  This number is incorrectly used in place of
+	the number of columns in the image.  For instance if the
+	description of the pixels to be fixed is a single column then the
+	task only allows column interpolations in the first column.
+	Knowing this one crude workaround is to specify one region to be a
+	whole line; for instance the region consisting of the first image
+	line.  The other workaround is to transpose the image, use line
+	interpolation, and then transpose back.
+
+STATUS:	Fixed for the next release.

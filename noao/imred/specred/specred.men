@@ -22,7 +22,9 @@
        fitprofs - Fit gaussian profiles
        identify - Identify features in spectrum for dispersion solution
    illumination - Determine illumination calibration
+      lscombine - Combine longslit spectra
        msresp1d - Create 1D response spectra from flat field and sky spectra
+      odcombine - Combine spectra (new version)
      refspectra - Assign wavelength reference spectra to other spectra
      reidentify - Automatically reidentify features in spectra
        response - Determine response calibration
@@ -43,6 +45,7 @@
           splot - Preliminary spectral plot/analysis
        standard - Tabuluate standard star counts and fluxes
        telluric - Remove telluric features from 1D spectra
+      transform - Resample longslit spectra
 
        dofibers - Process fiber spectra
          doslit - Process slit spectra

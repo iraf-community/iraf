@@ -22,7 +22,7 @@ task	autoidentify,
 	sapertures,
 	sarith,
 	sbands,
-	scombine,
+	odcombine,
 	scoords,
 	sensfunc,
 	sfit,
@@ -35,6 +35,8 @@ task	autoidentify,
 	splot,
 	standard,
 	telluric	= onedspec$x_onedspec.e
+
+task	scombine	= "onedspec$scombine/x_scombine.e"
 
 task	setairmass,
 	setjd		= astutil$x_astutil.e

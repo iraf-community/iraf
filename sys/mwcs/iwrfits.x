@@ -13,7 +13,11 @@ include	"imwcs.h"
 # pass through the header to get all the WCS data, with interpretation of
 # the data being a separate independent step.  A pointer to an IMWCS descriptor
 # is returned as the function value.  When no longer needed, this should be
-# freed with IW_CLOSE.
+# freed with IW_CLOSE.  The dimensionality of the WCS is determined first
+# from the image dimensionality (which may be zero) and then overridden
+# if there is a WCSDIM card.  If the final dimensionality is zero then
+# the maximum axis of the WCS cards sets the dimensionality.
+
 
 pointer procedure iw_rfits (mw, im, mode)
 
@@ -64,6 +68,7 @@ begin
 	    if (iw_cardtype (Memc[rp], type, axis, index) <= 0)
 		next
 
+
 	    # Has this card already been seen?
 	    omit = false
 	    do i = 1, IW_NCARDS(iw) {
@@ -98,6 +103,8 @@ begin
 	    C_AXIS(cp) = axis
 	    C_INDEX(cp) = index
 	    C_CARDNO(cp) = recno
+
+	    ndim = max (ndim, axis)
 
 	    # The FITS data must be copied into local storage if the header
 	    # will be edited, since otherwise the cards may move, invalidating
@@ -150,6 +157,10 @@ begin
 		    IW_NDIM(iw) = temp
 	    }
 	}
+
+	# Set dimension to the maximum axis seen.
+	if (IW_NDIM(iw) == 0)
+	    IW_NDIM(iw) = ndim
 
 	call idb_close (idb)
 	return (iw)

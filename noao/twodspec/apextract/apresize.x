@@ -24,7 +24,7 @@ int	i, na, npts, apaxis
 pointer	sp, str, im, imdata, title
 
 bool	clgetb(), ap_answer(), apgetb()
-real	apgetr(), cveval()
+real	apgetr(), ap_cveval()
 errchk	ap_getdata
 
 begin
@@ -85,7 +85,7 @@ begin
 		    low = llimit
 		    high = ulimit
 		    center = AP_CEN(aps[i], apaxis) +
-			cveval (AP_CV(aps[i]), real (line))
+			ap_cveval (AP_CV(aps[i]), real (line))
 		    call ap_ylevel (Memr[imdata], npts, ylevel, peak, bkg, grow,
 			center, low, high)
 		    AP_LOW(aps[i], apaxis) = min (low, high)

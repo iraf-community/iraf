@@ -2,6 +2,17 @@
 .nf
 
 noaolib$obsdb.dat
+    Corrected entry for FMO, added MGO at user suggestion (6/15/04, MJF)
+
+noaolib$obsdb.dat
+    Added EUO and TNO.  (4/26/04, MJF)
+
+noaolib$ccdtime/kpno.dat
+noaolib$ccdtime/kpno.datBAK	+
+    Revised file from Dick Joyce to add FLMN and remove IRIM and ONIS.
+    (3/16/04, Valdes)
+
+noaolib$obsdb.dat
     Added SLN.  (7/17/03, Valdes)
 
 noaolib$obsdb.dat

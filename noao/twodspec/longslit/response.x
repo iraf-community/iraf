@@ -146,7 +146,7 @@ begin
 	    call clputr ("high_reject", high_reject)
 	    niterate = ic_geti (ic, "niterate")
 	    call clputi ("niterate", niterate)
-	    grow = ic_getr (ic, "grow", grow)
+	    grow = ic_getr (ic, "grow")
 	    call clputr ("grow", grow)
 
 	    call imaddr (resp, "ccdmean", 1.)

@@ -1,5 +1,7 @@
 input,s,a,,,,Input images
 output,s,a,,,,Output images
+minput,s,h,"",,,Input masks
+moutput,s,h,"",,,Output masks
 fitnames,s,a,,,,Names of coordinate fits in the database
 database,f,h,database,,,Identify database
 interptype,s,h,spline3,"nearest|linear|poly3|poly5|spline3",,Interpolation type
@@ -14,4 +16,5 @@ dy,r,h,INDEF,,,Output Y pixel interval
 ny,r,h,INDEF,,,Number of output y pixels
 ylog,b,h,no,,,Logarithmic y coordinate?
 flux,b,h,yes,,,Conserve flux per pixel?
+blank,r,h,INDEF,,,Value for out of range pixels
 logfiles,s,h,"STDOUT,logfile",,,List of log files

@@ -1100,7 +1100,7 @@ begin
 	    return (INDEF)
 
 	sb = (GR_G(gr) * m * w - GR_N(gr) * GR_SA(gr)) / GR_TYPE(gr)
-	if (abs(sb) > 1.)
+	if (abs(sb) >= 1.)
 	    sb = INDEF
 
 	return (sb)

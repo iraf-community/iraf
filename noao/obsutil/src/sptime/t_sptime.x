@@ -941,14 +941,14 @@ real	tabinterp1(), tabinterp2(), st_dispeff(), st_w2dw(), st_w2x()
 errchk	tabinterp1, tabinterp2, st_dispeff
 
 begin
+	nobj = 0.
+	nbkg = 0.
+	snr = 0.
+	thruput = 0.
+
 	# Check for reasonable wavlength and source flux.
-	if (wave < 0. || flux < 0.) {
-	    nobj = 0.
-	    nbkg = 0.
-	    snr = 0.
-	    thruput = 0.
+	if (wave <= 0. || flux < 0.)
 	    return
-	}
 
 	# Set observation time.
 	switch (ST_SKYSUB(st)) {
@@ -961,9 +961,13 @@ begin
 	# Compute pixel counts over subsampled pixels.
 	disp = st_w2dw (st, 1, wave) * ST_PIXSIZE(st) * ST_BIN(st,1) /
 	    ST_SUBPIXELS(st)
+	if (IS_INDEFR(disp))
+	    return
 	w1 = wave - disp * (ST_SUBPIXELS(st) + 1) / 2.
 	do i = 1, ST_SUBPIXELS(st) {
 	    w = w1 + disp * i
+	    if (w <= 0.)
+		return
 
 	    # Atmospheric transmission.
 	    iferr {

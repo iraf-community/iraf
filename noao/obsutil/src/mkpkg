@@ -12,11 +12,11 @@ relink:
 	$update	libpkg.a
 	$omake	x_obsutil.x
 	$link	x_obsutil.o libpkg.a -lxtools -lcurfit -liminterp\
-	    -lsmw -lnlfit -lgsurfit -lds -lasttools -o x_obsutil.e
+	    -lsmw -lnlfit -lgsurfit -lds -lasttools -o xx_obsutil.e
 	;
 
 install:
-	$move	x_obsutil.e noaobin$x_obsutil.e
+	$move	xx_obsutil.e noaobin$x_obsutil.e
 	;
 
 

@@ -95,6 +95,8 @@ lw34|                   :tc=uapl34:
 lw34s|                  :PW#1.2:tc=uapl34:
 lw35|                   :tc=uapl35:
 lw35s|                  :PW#1.2:tc=uapl35:
+lw37|                   :tc=uapl37:
+lw37s|                  :PW#1.2:tc=uapl37:
 lwdp|                   :tc=uapldp:
 lwdp|                   :PW#1.2:tc=uapldp:
 printronix|ptx|		:tc=uptx:
@@ -472,6 +474,10 @@ uapl35|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
         :xs#0.265:ys#0.202:ar#0.760:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
         -h$(YW) -p$(PW) | lpr -Plw35; rm $F; }&:tc=sgi_apl:
+uapl37|UNIX generic interface to Hewlett-Packard LaserJet 4200N:\
+        :xs#0.265:ys#0.202:ar#0.760:\
+        :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
+        -h$(YW) -p$(PW) | lpr -Plw37; rm $F; }&:tc=sgi_apl:
 uapldp|UNIX generic interface to Hewlett-Packard LaserJet 4m:\
         :xs#0.265:ys#0.202:ar#0.760:MF#2:\
         :DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \

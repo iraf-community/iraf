@@ -43,7 +43,7 @@ real	vmin, resid, rrej
 pointer	cv, gp
 pointer	sp, str, work, wt, xplot, yplot, eplot, fplot, data, sky, data1
 
-real	apgetr(), apgimr(), cveval()
+real	apgetr(), apgimr(), ap_cveval()
 bool	apgetb()
 errchk	apgimr, ap_asifit
 
@@ -108,7 +108,7 @@ begin
 	total1 = 0.
 	total2 = 0.
 	do iy = 1, ny {
-	    shift = cveval (cv, real (iy + ys - 1)) - c1 + 1
+	    shift = ap_cveval (cv, real (iy + ys - 1)) - c1 + 1
 	    x1 = max (0.5, low + shift) + c1 - xs[iy]
 	    x2 = min (nc + 0.49, high + shift) + c1 - xs[iy]
 	    if (x1 >= x2)

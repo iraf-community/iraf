@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.11 May 1997"
+    logver = "IRAF V2.12.2a July 2004"
 
 set	home		= "cl$"
 set	imdir		= "uparm$"

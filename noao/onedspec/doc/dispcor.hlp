@@ -81,6 +81,12 @@ change; for example rebinning to logrithmic wavelengths will produce flux
 per log lambda.  For flux calibrated data you most likely would not want to
 conserve flux.
 .le
+.ls blank = 0.
+Output value corresponding to points outside the range of the input
+data.  In other words, the out of bounds value.  This only has an
+effect when linearizing and the output spectral coordinates extend
+beyond the input spectral range.
+.le
 .ls samedisp = no
 Use the same dispersion parameters for all apertures?  If yes then all
 apertures in a single image will have the same dispersion parameters.
@@ -313,7 +319,8 @@ current value, are the first to be changed.
 
 Once the wavelength scale has been defined the input spectrum is
 interpolated for each output pixel.  Output wavelengths outside the range
-of the input spectrum are set to zero.  The default interpolation function
+of the input spectrum are set to the value given by the \fIblank\fR parameter
+value.  The default interpolation function
 is a 5th order polynomial.  The choice of interpolation type is made
 with the package parameter "interp".  It may be set to "nearest",
 "linear", "spline3", "poly5", or "sinc".  Remember that this
@@ -422,6 +429,9 @@ ir> dispcor nite101 dcnite101 "1-10" ignore+ confirm-
 
 .ih
 REVISIONS
+.ls DISPCOR V2.12.3
+Added the blank parameter value.
+.le
 .ls DISPCOR V2.11.3
 Long slit and data cubes can be used with this task to either resample
 using the existing WCS or to use a single dispersion function from

@@ -33,11 +33,12 @@ bool	verbose
 int	i, csp, imlist,inlist, outlist, limlist, linlist, loutlist
 int	icl, ocl, ndim, wcsndim, ncolumns, nunits, inwcs, outwcs, min_sigdigits
 pointer	sp, image, columns, units, iwcs, owcs, fmtstr, fmtptrs
-pointer	str, name, im, mw, ct
+pointer	str, name, im, mw, ct, tmp
 
 bool	clgetb()
 int	imtopenp(), imtlen(), imtgetim(), fntopnb(), fntlenb(), fntgfnb()
 int	open(), mw_stati(), wt_getlabels(), ctoi(), strdic(), clgeti(), nscan()
+int	errget()
 pointer	immap(), mw_openim(), mw_sctran()
 errchk	mw_openim(), mw_gwattrs(), mw_sctran()
 
@@ -160,7 +161,7 @@ begin
 	    mw = NULL
 	    iferr {
 
-	        mw = mw_openim (im)
+	        tmp = mw_openim (im); mw = tmp
 
 		call mw_seti (mw, MW_USEAXMAP, NO)
 		if (inwcs == WT_TV && outwcs == WT_TV)
@@ -172,6 +173,9 @@ begin
 		else
 		    ct = mw_sctran (mw, Memc[iwcs], Memc[owcs], 0)
 		wcsndim = mw_stati (mw, MW_NPHYSDIM)
+
+		if (ndim == 0)
+		    ndim = wcsndim
 
 		call sscan (Memc[fmtstr])
 		do i = 1, IM_MAXDIM {
@@ -188,7 +192,11 @@ begin
 		}
 
 	    } then {
-
+		if (verbose) {
+		    i = errget (Memc[str], SZ_LINE)
+		    call fprintf (ocl, "# \tWarning: %s\n")
+			call pargstr (Memc[str])
+		}
 		if (mw != NULL)
 		    call mw_close (mw)
 		mw = NULL

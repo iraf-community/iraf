@@ -7,7 +7,7 @@ include	"../lib/allstardef.h"
 
 # DP_ASTAR -- Begin doing the photometry.
 
-procedure dp_astar (dao, im, subim, allfd, rejfd, cache, savesub)
+procedure dp_astar (dao, im, subim, allfd, rejfd, cache, savesub, version)
 
 pointer	dao		# pointer to the daophot structure
 pointer	im		# pointer to the input image
@@ -16,6 +16,7 @@ int	allfd		# file descriptor for the output photometry file
 int	rejfd		# file descriptor for rejections files
 int	cache 		# cache the data ?
 int	savesub		# save the subtracted image ?
+int	version		# version number
 
 bool	clip
 int	nstar, row1_number, row2_number, niter, itsky, x1, x2, y1, y2, istar
@@ -208,7 +209,7 @@ begin
 
 		# Do the fitting a group at a time.
 	        lstar = dp_alphot (dao, im, nstar, istar, niter, sepcrt,
-		    sepmin, wcrit, clip, clmpmx) 
+		    sepmin, wcrit, clip, clmpmx, version) 
 
 		# Write the results.
 	        if (DP_TEXT(dao) == YES) {

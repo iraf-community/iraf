@@ -47,6 +47,8 @@ lw29|                   :tc=sapple29:
 lw30|                   :tc=sapple30:
 lw34|                   :tc=sapple34:
 lw35|                   :tc=sapple35:
+lw36|                   :tc=sapple36:
+lw37|                   :tc=sapple37:
 lwdp|			:tc=sappledp:
 lwti|ti|		:tc=slwti:
 vmsprint|vmslp|		:tc=svprint:
@@ -231,6 +233,9 @@ sapple34|HP LaserJet 4m 600dpi printer:\
 sapple35|HP LaserJet 4m 600dpi printer:\
         :co#80:li#66:os:pt:ta^I:\
         :DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw35 $F; rm $F; }:
+sapple37|HP LaserJet 4m 600dpi printer:\
+        :co#80:li#66:os:pt:ta^I:\
+        :DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plw37 $F; rm $F; }:
 sappledp|HP LaserJet 5M duplex printer:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=lpnode!apple,/tmp/asfXXXXXX,!{ lpr -Plwdp $F; rm $F; }:

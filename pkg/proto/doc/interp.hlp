@@ -78,9 +78,6 @@ EXAMPLES
 
 .ih
 BUGS
-The maximum number of data elements is currently limited to 200
-XY pairs.
-
 If a blank (null) table filename is entered, a floating divide error
 occurs.
 

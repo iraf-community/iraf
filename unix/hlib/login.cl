@@ -2,23 +2,20 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.12.2 January 2004"
+    logver = "IRAF V2.12.2a July 2004"
 
 set	home		= "U_HOME"
 set	imdir		= "U_IMDIR"
 set	uparm		= "home$uparm/"
 set	userid		= "U_USER"
 
-# Set the terminal type.
-if (envget("TERM") == "xterm") {
-    if (!access (".hushiraf"))
-	print "setting terminal type to xgterm..."
-    stty xgterm
-} else {
-    if (!access (".hushiraf"))
-	print "setting terminal type to U_TERM..."
-    stty U_TERM
-}
+# Set the terminal type.  We assume the user has defined this correctly 
+# when issuing the MKIRAF and no longer key off the unix TERM to set a
+# default.
+if (!access (".hushiraf"))
+    print "setting terminal type to U_TERM..."
+stty U_TERM
+
 
 # Uncomment and edit to change the defaults.
 #set	editor		= vi
@@ -43,6 +40,7 @@ if (envget("TERM") == "xterm") {
 #ehinit   = "nostandout eol noverify"
 #epinit   = "standout showall"
 showtype = yes
+
 
 # Load the default CL package.  Doing so here allows us to override package
 # paths and load personalized packages from our loginuser.cl. 

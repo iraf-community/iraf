@@ -41,8 +41,8 @@ begin
 	un = NULL
 
 	while (fc_getim (list, image1, SZ_FNAME) != EOF) {
-	    call sprintf (root, SZ_FNAME, "id%s")
-		call pargstr (image1)
+	    call strcpy ("id", root, SZ_FNAME)
+	    call imgcluster (image1, root[3], SZ_FNAME-2)
 	    dt = dtmap1 (database, root, READ_ONLY)
 	    do rec = 1, DT_NRECS(dt) {
 

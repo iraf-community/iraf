@@ -82,3 +82,6 @@ Builtin Commands and Functions:
         unlearn - Restore the default parameters for a task or package
 	 update - Update a task's parameters (flush to disk)
 	   wait - Wait for all background jobs to complete
+        whereis - locate all occurances of a task in the package list
+          which - locate a task in the package list
+

@@ -1,5 +1,18 @@
 .help Revisions Nov01 obsutuil
 
+========
+V2.12.2a
+========
+
+grating.x
+t_sptime.x
+    Added some checks against unphysical parameters.
+    (7/7/04, Valdes)
+
+mkpkg
+    Did not follow the standard convention of building xx_obsutil.e.
+    (7/7/04, Valdes)
+
 =======
 V2.12.2
 =======

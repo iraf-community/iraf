@@ -16,7 +16,7 @@ real	high			# Upper limit of aperture
 int	apaxis
 pointer	ap
 
-real	cveval()
+real	ap_cveval()
 
 begin
 	if (current > 0) {
@@ -25,7 +25,7 @@ begin
 
 	    apid = AP_ID(ap)
 	    apbeam = AP_BEAM(ap)
-	    center = AP_CEN(ap, apaxis) + cveval (AP_CV(ap), real (line))
+	    center = AP_CEN(ap, apaxis) + ap_cveval (AP_CV(ap), real (line))
 	    low = AP_LOW(ap, apaxis)
 	    high = AP_HIGH(ap, apaxis)
 	}

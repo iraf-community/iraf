@@ -7,7 +7,7 @@ include	"../lib/allstardef.h"
 # DP_ALPHOT -- Perform one iteration on each group of stars.
 
 int procedure dp_alphot (dao, im, ntot, istar, niter, sepcrit, sepmin, wcrit,
-	clip, clampmax)
+	clip, clampmax, version)
 
 pointer	dao			# pointer to the daophot structure
 pointer	im			# pointer to the input image
@@ -19,6 +19,7 @@ real	sepmin			# minimum separation for merging
 real	wcrit			# the critical error for merging
 bool	clip			# clip the data
 real	clampmax		# maximum clamping factor
+int	version			# version number
 
 bool	regroup
 int	cdimen, lstar, nstar, fstar, nterm, ixmin, ixmax, iymin, iymax
@@ -248,7 +249,10 @@ begin
 		return (lstar)
 
 	    # Invert the matrix.
-  	    call invers (Memr[DP_AC(allstar)], cdimen, nterm, flag)
+	    if (version == 1)
+		call invers (Memr[DP_AC(allstar)], cdimen, nterm, flag)
+	    else
+		call invers2 (Memr[DP_AC(allstar)], cdimen, nterm, flag)
 
 	    if (dp_checkc (Memr[DP_AC(allstar)], cdimen, nterm,
 	        Memi[DP_APID(apsel)], Memr[DP_APMAG(apsel)],

@@ -63,6 +63,7 @@ libos.a:
 	zfmkdr.c	<libc/kernel.h> <libc/spp.h>
 	zfnbrk.c	<libc/kernel.h> <libc/spp.h>
 	zfpath.c	<libc/kernel.h> <libc/spp.h>
+	zfpoll.c        <libc/kernel.h> <libc/spp.h>
 	zfprot.c	<libc/kernel.h> <libc/spp.h>
 	zfrnam.c	<libc/kernel.h> <libc/spp.h>
 	zfsubd.c	<libc/kernel.h> <libc/spp.h>

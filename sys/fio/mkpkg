@@ -93,6 +93,7 @@ libsys.a:
 	nullfile.x	<config.h> <fio.h>
 	open.x		<knet.h>
 	osfnlock.x	<config.h> <ctype.h> <finfo.h> <knet.h>
+	poll.x 		<poll.h> <fio.h> <fset.h> <config.h> <syserr.h>
 	protect.x	<config.h> <fio.com> <fio.h> <knet.h> <protect.h>
 	putc.x		<config.h> <fio.com> <fio.h>
 	putcc.x		<ctype.h>

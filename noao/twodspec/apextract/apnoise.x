@@ -25,7 +25,7 @@ int	nbin			# Number of bins
 real	dmin, dmax		# Data limits of bins
 
 int	i, ix, iy, ix1, ix2
-real	dstep, low, high, s, x1, x2, model, data, cveval()
+real	dstep, low, high, s, x1, x2, model, data, ap_cveval()
 pointer	cv, sptr, dptr
 
 begin
@@ -38,7 +38,7 @@ begin
 
 	do iy = 1, ny {
 	    i = iy + ys - 1
-	    s = cveval (cv, real (i))
+	    s = ap_cveval (cv, real (i))
 	    x1 = max (0.5, low + s) 
 	    x2 = min (c1 + nc - 0.49, high + s) 
 	    if (x1 > x2)

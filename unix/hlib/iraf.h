@@ -121,6 +121,7 @@ define	mfree	xmfree
 define	mktemp	xmktep
 define	note	xfnote
 define	open	xfopen
+define	poll	xfpoll
 define	printf	xprinf
 define	putc	xfputc
 define	putchar	xfputr

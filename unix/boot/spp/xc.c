@@ -713,7 +713,7 @@ passflag:		    mkobject = YES;
 	 */
 	if (!floatoption[0] && (irafarch = os_getenv("IRAFARCH")))
 	    if (irafarch[0] == 'f')
-		sprintf (floatoption, "-%s", irafarch);
+		sprintf (floatoption, "-%s", rafarch);
 #endif
 	/* Compile all F77 source files with F77 to produce object code.
 	 * This compilation is separate from that used for the '.x' files,

@@ -1,14 +1,17 @@
 # KPNO Telescope, Filter, and Detector Database
 # Revised on the basis of drawings (true aperture size) and
 # improved count rates. Agrees with KPNO Direct Imaging Manual 
+# Revised to remove obsolete IR imagers IRIM and ONIS and to
+# include FLAMINGOS
 # 1 May 1997 --- plm
 # 22 Jul 1998 --- dj
 # 12 Aug 1998 --- gj
+# 15 Mar 2004 --- dj
 
 
 
 # Telescope data:
-# aperture diameter in meters, scale in arcsec/mm, and tranmission.
+# aperture diameter in meters, scale in arcsec/mm, and transmission.
 
 telescope = "0.9m"
 	aperture = 0.81
@@ -107,7 +110,7 @@ filter = "J"
         extinction = 0.08
 	mag = 20
  	star = 36.5
- 	sky0 = 16.2
+ 	sky0 = 15.7
  	sky1 = 0.
  	sky2 = 0.
 
@@ -115,7 +118,7 @@ filter = "H"
         extinction = 0.04
 	mag = 20
 	star = 21.8
-	sky0 = 14.2
+	sky0 = 13.9
 	sky1 = 0.
 	sky2 = 0.
 
@@ -123,15 +126,15 @@ filter = "K"
         extinction = 0.07
 	mag = 20
 	star = 14.6
-	sky0 = 13.3
+	sky0 = 12.9
 	sky1 = 0.
 	sky2 = 0.
 
-filter = "K'"
+filter = "Ks"
         extinction = 0.05
 	mag = 20
 	star = 11.7
-	sky0 = 13.6
+	sky0 = 13.1
 	sky1 = 0.
 	sky2 = 0.
 
@@ -221,20 +224,12 @@ detector = "S2KB"
 	R = 0.82
 	I = 0.60
 
-detector = "IRIM"
-	rdnoise = 35
+detector = "FLMN"
+	rdnoise = 40
 	dark = 1
-	pixsize = 167
-	J = 0.23
-	H = 0.33
-	K = 0.31
-	K' = 0.38
+	pixsize = 47.3
+	J = 0.082
+	H = 0.177
+	K = 0.26
+	Ks = 0.28
 
-detector = "ONIS"
-	rdnoise = 35
- 	dark = 0.75
-	pixsize = 27
-	J = 0.18
-	H = 0.28
- 	K = 0.22
-	K' = 0.34

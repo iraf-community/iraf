@@ -58,7 +58,7 @@ real	center, xmin, xmax, a, b, c, s, avg
 pointer	ic, cv, cv1, asi, sp, str, data, as, bs, x, y, w
 
 int	apgwrd(), apgeti(), ctor()
-real	ic_getr(), cveval(), asieval(), asigrl(), amedr()
+real	ic_getr(), ap_cveval(), asieval(), asigrl(), amedr()
 errchk	salloc, ic_fit
 
 begin
@@ -140,7 +140,7 @@ begin
 	    # and apply image boundary limits.
 
 	    i = iy + ys - 1
-	    s = cveval (cv, real (i))
+	    s = ap_cveval (cv, real (i))
 	    ix1 = max (c1, nint (xmin + s) - 1)
 	    ix2 = min (c1+nc-1, nint (xmax + s) + 1)
 	    nfit = ix2 - ix1 + 1
@@ -233,7 +233,7 @@ begin
 		    avg = 0.
 	            do i = 1, nx {
 		        a = xs[iy] + i - 1
-			b = cveval (cv1, a - c)
+			b = ap_cveval (cv1, a - c)
 			avg = avg + b
 			sbuf[i,iy] = b
 	            }
@@ -339,7 +339,7 @@ begin
 
 	do iy = 1, ny {
 	    data = dbuf + (iy + ys - 1 - l1) * nc + xs[iy] - c1 - 1
-	    s = cveval (cv, real (iy + ys - 1)) - c1 + 1
+	    s = ap_cveval (cv, real (iy + ys - 1)) - c1 + 1
 	    do i = 1, nsubaps {
 		xmin = max (0.5, a + (i - 1) * c + s) + c1 - xs[iy]
 		xmax = min (nc + 0.49, a + i * c + s) + c1 - xs[iy]

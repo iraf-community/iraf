@@ -57,7 +57,7 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 set LS			= "/bin/ls"				# [MACHDEP]
 set LSDF        	= "-lLtgs"				# [MACHDEP]
 
-set VERSION		= "V2.12.1"
+set VERSION		= "V2.12.2a"
 set hmach 		= "INDEF"
 set pciraf 		= 0
 set suniraf 		= 0
@@ -146,11 +146,13 @@ switch ($UNAME)
 	set pciraf		= 1
 	set do_tapecaps 	= 1
         if (`$uname_cmd -m` == "ppc") then		    # LinuxPPC
-            set mach 		= "linuxppc"
-            set hmach 		= "linuxppc"
-	    set TAPES		= "/dev/*st[0-7]"
-	    set shlib		= "no"
-	    set LIBFILES    	= ""
+            if (-f /etc/redhat-release) then
+                set mach 	= "linuxppc"
+                set hmach 	= "linuxppc"
+		set TAPES	= "/dev/*st[0-7]"
+		set shlib	= "no"
+		set LIBFILES    = ""
+            endif
         else
             if (-f /etc/redhat-release) then		    # Linux RedHat 6.x
                 set mach 	= "redhat"
@@ -1914,7 +1916,7 @@ if ("$shlib" == "yes") then
     set err_seen = 0
     foreach i ($LIBFILES)
         # Locate the file to be linked to.
-        set file1 = $i:r
+        set file1 = $i
         foreach j ($iraf/bin.$mach $iraf/bin.$hmach)
 	    set file2 = $j/$i
 	    if (-e $file2) then

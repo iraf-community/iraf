@@ -25,8 +25,8 @@ begin
 
 	call smark (sp)
 	call salloc (dbfile, SZ_FNAME, TY_CHAR)
-	call sprintf (Memc[dbfile], SZ_FNAME, "fc%s")
-	    call pargstr (fitname)
+	call strcpy ("fc", Memc[dbfile], SZ_FNAME)
+	call imgcluster (fitname, Memc[dbfile+2], SZ_FNAME-2)
 	dt = dtmap1 (database, Memc[dbfile], APPEND)
 
 	call dtptime (dt)
@@ -81,8 +81,8 @@ begin
 	call smark (sp)
 	call salloc (dbfile, SZ_FNAME, TY_CHAR)
 	call salloc (units, SZ_FNAME, TY_CHAR)
-	call sprintf (Memc[dbfile], SZ_FNAME, "fc%s")
-	    call pargstr (fitname)
+	call strcpy ("fc", Memc[dbfile], SZ_FNAME)
+	call imgcluster (fitname, Memc[dbfile+2], SZ_FNAME-2)
 	dt = dtmap1 (database, Memc[dbfile], READ_ONLY)
 
 	rec = dtlocate (dt, fitname)

@@ -14,9 +14,13 @@ real	center		# New center at dispersion line
 real	low		# New lower limit
 real	high		# New upper limit
 
-real	cveval(), ic_getr()
+real	ap_cveval(), ic_getr()
 
 begin
+	# Check for bad values.
+	if (IS_INDEFR(center) || IS_INDEFR(low) || IS_INDEFR(high))
+	    call error (1, "INDEF not allowed")
+
 	# Erase the current aperture.
 	call gseti (gp, G_PLTYPE, 0)
 	call ap_gmark (gp, line, ap, 1)
@@ -24,7 +28,7 @@ begin
 	# Update the aperture.
 	AP_ID(ap) = apid
 	AP_BEAM(ap) = apbeam
-	AP_CEN(ap, AP_AXIS(ap)) = center - cveval (AP_CV(ap), real (line))
+	AP_CEN(ap, AP_AXIS(ap)) = center - ap_cveval (AP_CV(ap), real (line))
         AP_LOW(ap, AP_AXIS(ap)) = min (low, high)
         AP_HIGH(ap, AP_AXIS(ap)) = max (low, high)
 	if (AP_IC(ap) != NULL) {

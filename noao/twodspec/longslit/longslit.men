@@ -8,6 +8,7 @@
        identify - Identify features
    illumination - Determine illumination calibration
          lcalib - List calibration file data
+      lscombine - Combine longslit images
      reidentify - Reidentify features
        response - Determine response calibration
          sarith - Spectrum arithmetic

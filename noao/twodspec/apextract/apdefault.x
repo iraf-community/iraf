@@ -29,7 +29,11 @@ begin
 	AP_AXIS(ap) = apaxis
 	AP_CEN(ap, apaxis) = apcenter
 	AP_LOW(ap, apaxis) = apgetr ("lower") 
+	if (IS_INDEFR(AP_LOW(ap,apaxis)))
+	    call error (1, "INDEF not allowed (lower)")
 	AP_HIGH(ap, apaxis) = apgetr ("upper") 
+	if (IS_INDEFR(AP_HIGH(ap,apaxis)))
+	    call error (1, "INDEF not allowed (upper)")
 	AP_CEN(ap, dispaxis) = dispcenter
 	AP_LOW(ap, dispaxis) = 1 - AP_CEN(ap, dispaxis)
 	AP_HIGH(ap, dispaxis) = IM_LEN(im, dispaxis) - AP_CEN(ap, dispaxis)

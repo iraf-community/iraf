@@ -1,5 +1,13 @@
 .help revisions May92 noao.rv
 .nf
+========
+V2.12.2a
+========
+
+doc/fxcor.hlp
+	Added an example for setting a zero heliocentric correction for
+	the template image.  (7/1/04)
+
 =======
 V2.12.2
 =======

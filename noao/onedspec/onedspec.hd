@@ -27,13 +27,14 @@ lcalib		hlp=doc$lcalib.hlp,		src=t_lcalib.x
 mkspec		hlp=doc$mkspec.hlp,		src=x_mkspec.x
 names		hlp=doc$names.hlp,		src=t_names.x
 ndprep		hlp=doc$ndprep.hlp,		src=ndprep.cl
+odcombine	hlp=doc$odcombine.hlp
 refspectra	hlp=doc$refspectra.hlp,		src=dispcor$refspectra.x
 reidentify	hlp=doc$reidentify.hlp,		src=identify$t_reidentify.x
 rspectext	hlp=doc$rspectext.hlp,		src=rspectext.cl
 sapertures	hlp=doc$sapertures.hlp,		src=t_sapertures.x
 sbands		hlp=doc$sbands.hlp,		src=t_sbands.x
 sarith		hlp=doc$sarith.hlp,		src=t_sarith.x
-scombine	hlp=doc$scombine.hlp,		src=t_scombine.x
+scombine	hlp=doc$scombine.hlp
 scoords		hlp=doc$scoords.hlp,		src=t_scoords.x
 scopy		hlp=doc$scopy.hlp,		src=scopy.cl
 sensfunc	hlp=doc$sensfunc.hlp,		src=sensfunc$t_sensfunc.x

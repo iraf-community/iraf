@@ -374,9 +374,10 @@ a given number of times.
 .nf
 
    zscale (arg [,z1, z2 [, nbins]]) - scale to a fixed number of bins
-  gr[ea]y (arg1,arg2,arg3) 	    - RGB to grayscale conversion
-   bscale (arg, zero, scale)        - linearly transform intensity scale
-    gamma (arg, gamma [, scale])    - apply a gamma correction
+               zscalem (arg1, arg2) - automatic scaling with filtering
+           gr[ea]y (arg1,arg2,arg3) - RGB to grayscale conversion
+          bscale (arg, zero, scale) - linearly transform intensity scale
+       gamma (arg, gamma [, scale]) - apply a gamma correction
 .fi
 
         These functions may be used to scale the intensity values of the
@@ -395,16 +396,33 @@ be computed using the same algorithm and default parameters used by
 the \fIDISPLAY\fR task (see the help page for more information).
 If no \fInbins\fR value is given 256 bins are assumed.
 
-If the given value of z1
-is greater than z2 the mappings will be inverted, i.e. larger pixel values
-will map to the lower bin numbers, smaller pixel values will map to larger
-bin numbers.  For example, to map the dev$pix test image
-to 200 colors such that there are "black" stars on a "white" background
-one could use
+If the given value of z1 is greater than z2 the mappings will be inverted,
+i.e. larger pixel values will map to the lower bin numbers, smaller pixel
+values will map to larger bin numbers.  For example, to map the dev$pix
+test image to 200 colors such that there are "black" stars on a "white"
+background one could use
 .nf
 
 	zscale (b1, @"i_maxpixval", @"i_minpixval", 200)
 .fi
+.le
+.ls zscalem (arg1, arg2)
+This is a variant of the zscale operand with automatic scale calculation;
+i.e.  zscale (arg).  The first argument is the same as for zscale to select
+the pixel values.  The second argument is a boolean (true or false)
+expression selecting whether a value in the first argument is to be used in
+the calculation.  This allows limiting the automatic scale calculation to
+pixels specified in a mask or to a certain range to exclude extreme or bad
+values that would otherwise perturb the result.  Typical usages might be
+.nf
+
+	zscalem (i1, i2==0)
+	zscalem (i1, i1>0&&i1<10000)
+.fi
+where i1 are the image pixels and i2 would be pixels from the second
+input argrument which defines a mask.  Note that you can't just say i2
+for a mask but must use it in an expression resulting in a true or false
+value.  Also note that the result is always in the range 0 to 255.
 .le
 .ls grey (arg1,arg2,arg3) or gray (arg1,arg2,arg3)
 Convert three image operands or expressions to a single grayscale image
@@ -580,7 +598,7 @@ header required.  More complex formats such as GIF and EPS are implemented
 as special cases.  Note that all of the builtin formats require 8-bit color
 index or 8-bits per color in RGB or RGBA files, users should be careful
 in how the datatype conversion from IRAF image types is handled. In most
-cases this can be handled with the \fIzscale()\fR function.
+cases this can be handled with the \fIzscale()\fR or \fIzscalem\fR functions.
 
 	For each of the formats listed below the table shows the number
 of \fIoutbands\fR expressions required and the type of output file that
@@ -1017,6 +1035,18 @@ to create a color image:
   cl> export im1,im2,im3,im4 cquad gif outbands="@expr.dat"
 
 .fi
+
+Automatically scale an image ignoring data in a bad pixel mask (bpm), map the
+result to the greyscale part of the "overlay" color map, and apply a
+overlay pattern given by another mask (pattern).
+
+  cl> export dev$pix,bpm,pattern foo gif \
+  >>> outbands = "setcmap(i3==0?(zscalem(i1,i2==0)*200/255.):i3+203,'overlay')"
+
+
+The pattern has values of 1 and 203 is added to get it into the color map
+values of the overlay colors.  The factor of 200/255 is to scale the result
+of zscalem from the range 0-255 to the range 0-200.
 
 .ih
 NOTES

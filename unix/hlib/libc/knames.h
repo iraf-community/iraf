@@ -84,6 +84,7 @@
 #define	ZFNBRK		zfnbrk_
 #define	ZFPATH		zfpath_
 #define	ZFPROT		zfprot_
+#define ZFPOLL		zfpoll_
 #define	ZFRNAM		zfrnam_
 #define	ZFSUBD		zfsubd_
 #define	ZFUNC0		zfunc0_

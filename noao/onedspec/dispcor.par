@@ -9,6 +9,7 @@ dw,r,h,INDEF,,,Wavelength interval per pixel
 nw,i,h,INDEF,,,Number of output pixels
 log,b,h,no,,,Logarithmic wavelength scale?
 flux,b,h,yes,,,Conserve flux?
+blank,r,h,0.,,,Output value of points not in input
 samedisp,b,h,no,,,Same dispersion in all apertures?
 global,b,h,no,,,Apply global defaults?
 ignoreaps,b,h,no,,,Ignore apertures?

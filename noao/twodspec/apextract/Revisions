@@ -1,6 +1,53 @@
 .help revisions Jun88 noao.twodspec.apextract
 .nf
 
+========
+V2.12.2a
+========
+
+apextract.x
+    When using APFIT to output the difference the IMIO buffer which was
+    assumed to be static was invalidated because of I/O needed to create
+    the difference.  A special case was added to handle this case.
+    (7/7/04, Valdes)
+
+apcveval.x	+
+apedit.x
+apextract.x
+apfind.x
+apfindnew.x
+apfit.x
+apgmark.x
+apgscur.x
+apmask.x
+apnoise.x
+apprint.x
+approfile.x
+aprecenter.x
+apresize.x
+apskyeval.x
+apupdate.x
+apvalues.x
+apvariance.x
+apnearest.x
+apscatter.x
+aptrace.x
+mkpkg
+    Added an interface routine to CVEVAL to avoid calling it with
+    independent variables outside the range of the fit.  The fit range
+    may be short because of tracing problems.  So the profile shift
+    is now extended from the end points of the fitted range.
+    (5/21/04, Valdes)
+
+apupdate.x
+apdefault.x
+apfind.x
+aptrace.x
+apedit.x
+apcolon.x
+    Modified to check for inappropriate INDEF values in the "lower"
+    and "upper" aperture settings.  (3/26/04, Valdes)
+
 =======
 V2.12.2
 =======

@@ -16,6 +16,7 @@ task	extinction,
 	fitcoords,
 	fluxcalib,
 	illumination,
+	lscombine,
 	response,
 	transform	= longslit$x_longslit.e
 

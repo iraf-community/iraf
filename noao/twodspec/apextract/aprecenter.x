@@ -22,7 +22,7 @@ int	i, j, k, na, npts, apaxis
 pointer	sp, str, im, imdata, title, index, peaks, deltas
 
 int	decode_ranges()
-real	apgetr(), ap_center(), cveval(), asokr()
+real	apgetr(), ap_center(), ap_cveval(), asokr()
 bool	clgetb(), ap_answer(), apgetb(), is_in_range()
 errchk	ap_getdata
 
@@ -69,11 +69,11 @@ begin
 		if (AP_SELECT(aps[i]) == NO)
 		    next
 	        center = AP_CEN(aps[i], apaxis) +
-		    cveval (AP_CV(aps[i]), real (line))
+		    ap_cveval (AP_CV(aps[i]), real (line))
 	        center = ap_center (center, Memr[imdata], npts)
 	        if (!IS_INDEF(center)) {
 		    AP_CEN(aps[i], apaxis) = center -
-		        cveval (AP_CV(aps[i]), real (line))
+		        ap_cveval (AP_CV(aps[i]), real (line))
 		    na = na + 1
 		}
 	    }
@@ -92,7 +92,7 @@ begin
 	        if (!is_in_range (Memi[ranges], AP_ID(aps[i])))
 		    next
 	        center = AP_CEN(aps[i], apaxis) +
-		    cveval (AP_CV(aps[i]), real (line))
+		    ap_cveval (AP_CV(aps[i]), real (line))
 	        delta = ap_center (center, Memr[imdata], npts)
 	        if (!IS_INDEF(delta)) {
 		    k = max (1, min (npts, int (delta+0.5)))

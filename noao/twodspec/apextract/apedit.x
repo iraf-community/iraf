@@ -1,3 +1,4 @@
+include	<error.h>
 include	<gset.h>
 include	<imhdr.h>
 include	<mach.h>
@@ -34,10 +35,10 @@ pointer	im, imdata, title
 pointer	sp, x, wts, apdef, gp, gt, ic_gt, cv, str, output, profiles, ids
 
 int	gt_gcur(), apgwrd(), scan(), nscan()
-real	cveval(), ap_center()
+real	ap_cveval(), ap_center()
 bool	ap_answer()
 pointer	gt_init()
-errchk	ap_getdata, ap_gopen
+errchk	ap_getdata, ap_gopen, ap_default
 
 define	new_	10
 define	beep_	99
@@ -128,8 +129,9 @@ new_	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 			newgraph = YES
 		    }
 		    call ap_free (apdef)
-		    call ap_default (im, INDEFI, 1, apaxis, INDEFR,
-			real (line), apdef)
+		    iferr (call ap_default (im, INDEFI, 1, apaxis, INDEFR,
+			real (line), apdef))
+			call erract (EA_WARN)
 		}
 
 	    case '.': # Select current aperture.  This has been done already.
@@ -378,7 +380,7 @@ new_	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 
 		    AP_ID(Memi[aps+naps-1]) = INDEFI
 		    AP_CEN(Memi[aps+naps-1], apaxis) = wx -
-		    	cveval (AP_CV(Memi[aps+naps-1]), real (line))
+		    	ap_cveval (AP_CV(Memi[aps+naps-1]), real (line))
 		    AP_CEN(Memi[aps+naps-1], dispaxis) = line
 		    AP_LOW(Memi[aps+naps-1], dispaxis) =
 			1 - AP_CEN(Memi[aps+naps-1], dispaxis)

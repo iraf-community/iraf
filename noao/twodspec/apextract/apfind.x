@@ -21,9 +21,9 @@ pointer	im, imdata, title, sp, str, x, ids
 
 bool	clgetb(), ap_answer()
 int	apgeti(), apgwrd()
-real	apgetr(), ap_center(), cveval()
+real	apgetr(), ap_center(), ap_cveval()
 
-errchk	ap_getdata
+errchk	ap_getdata, ap_default
 
 begin
 	# Find apertures only if there are no other apertures defined.
@@ -83,7 +83,7 @@ begin
 			call ap_copy (Memi[aps], Memi[aps+naps])
 
 		    AP_CEN(Memi[aps+naps], AP_AXIS(Memi[aps+naps])) = center -
-			cveval (AP_CV(Memi[aps+naps]), real (line))
+			ap_cveval (AP_CV(Memi[aps+naps]), real (line))
 		    naps = naps + 1
 		}
 	    }
@@ -103,7 +103,7 @@ begin
 		    call ap_copy (Memi[aps], Memi[aps+naps])
 
 		AP_CEN(Memi[aps+naps], AP_AXIS(Memi[aps+naps])) = center -
-		    cveval (AP_CV(Memi[aps+naps]), real (line))
+		    ap_cveval (AP_CV(Memi[aps+naps]), real (line))
 		naps = naps + 1
 	    }
 	}

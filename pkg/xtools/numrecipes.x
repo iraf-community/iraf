@@ -498,3 +498,192 @@ begin
 	  mmax = istep
 	}
 end
+
+
+################################################################################
+# LU Decomosition
+################################################################################
+define	TINY	(1E-20)		# Number of numerical limit
+
+# Given an N x N matrix A, with physical dimension N, this routine
+# replaces it by the LU decomposition of a rowwise permutation of
+# itself.  A and N are input.  A is output, arranged as in equation
+# (2.3.14) above; INDX is an output vector which records the row
+# permutation effected by the partial pivioting; D is output as +/-1
+# depending on whether the number of row interchanges was even or odd,
+# respectively.  This routine is used in combination with LUBKSB to
+# solve linear equations or invert a matrix.
+#
+# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
+# Used by permission of the authors.
+# Copyright(c) 1986 Numerical Recipes Software.
+
+procedure ludcmp (a, n, np, indx, d)
+
+real	a[np,np]
+int	n
+int	np
+int	indx[n]
+real	d
+
+int	i, j, k, imax
+real	aamax, sum, dum
+pointer	vv
+
+begin
+	# Allocate memory.
+	call malloc (vv, n, TY_REAL)
+	
+	# Loop over rows to get the implict scaling information.
+	d = 1.
+	do i = 1, n {
+	    aamax = 0.
+	    do j = 1, n {
+	        if (abs (a[i,j]) > aamax)
+		    aamax = abs (a[i,j])
+	    }
+	    if (aamax == 0.) {
+	    	call mfree (vv, TY_REAL)
+	        call error (1, "Singular matrix")
+	    }
+	    Memr[vv+i-1] = 1. / aamax
+	}
+
+	# This is the loop over columns of Crout's method.
+	do j = 1, n {
+	    do i = 1, j-1 {
+	        sum = a[i,j]
+		do k = 1, i-1
+		    sum = sum - a[i,k] * a[k,j]
+		a[i,j] = sum
+	    }
+
+	    aamax = 0.
+	    do i = j, n {
+	        sum = a[i,j]
+		do k = 1, j-1
+		    sum = sum - a[i,k] * a[k,j]
+		a[i,j] = sum
+		dum = Memr[vv+i-1] * abs (sum)
+		if (dum >= aamax) {
+		    imax = i
+		    aamax = dum
+		}
+	    }
+
+	    if (j != imax) {
+	        do k = 1, n {
+		    dum = a[imax,k]
+		    a[imax,k] = a[j,k]
+		    a[j,k] = dum
+		}
+		d = -d
+		Memr[vv+imax-1] = Memr[vv+j-1]
+	    }
+	    indx[j] = imax
+
+	    # Now, finally, divide by the pivot element.
+	    # If the pivot element is zero the matrix is signular (at
+	    # least to the precission of the algorithm.  For some
+	    # applications on singular matrices, it is desirable to
+	    # substitute TINY for zero.
+
+	    if (a[j,j] == 0.)
+	        a[j,j] = TINY
+	    if (j != n) {
+	        dum = 1. / a[j,j]
+		do i = j+1, n
+		    a[i,j] = a[i,j] * dum
+	    }
+	}
+
+	call mfree (vv, TY_REAL)
+end
+
+
+# Solves the set of N linear equations AX = B.  Here A is input, not
+# as the matrix of A but rather as its LU decomposition, determined by
+# the routine LUDCMP.  INDX is input as the permuation vector returned
+# by LUDCMP.  B is input as the right-hand side vector B, and returns
+# with the solution vector X.  A, N, NP and INDX are not modified by
+# this routine and can be left in place for successive calls with
+# different right-hand sides B.  This routine takes into account the
+# possiblity that B will begin with many zero elements, so it is
+# efficient for use in matrix inversion.
+#
+# Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
+# Used by permission of the authors.
+# Copyright(c) 1986 Numerical Recipes Software.
+
+procedure lubksb (a, n, np, indx, b)
+
+real	a[np,np]
+int	n
+int	np
+int	indx[n]
+real	b[n]
+
+int	i, j, ii, ll
+real	sum
+
+begin
+	ii = 0
+	do i = 1, n {
+	    ll = indx[i]
+	    sum = b[ll]
+	    b[ll] = b[i]
+	    if (ii != 0) {
+	        do j = ii, i-1
+		    sum = sum - a[i,j] * b[j]
+	    } else if (sum != 0.)
+	        ii = i
+	    b[i] = sum
+	}
+
+	do i = n, 1, -1 {
+	    sum = b[i]
+	    if (i < n) {
+	        do j = i+1, n
+		    sum = sum - a[i,j] * b[j]
+	    }
+	    b[i] = sum / a[i,i]
+	}
+end
+
+
+# Invert a matrix using LU decomposition using A as both input and output.
+
+procedure luminv (a, n, np)
+
+real	a[np,np]
+int	n
+int	np
+
+int	i, j
+real	d
+pointer	y, indx
+
+begin
+	# Allocate working memory.
+	call calloc (y, n*n, TY_REAL)
+	call malloc (indx, n, TY_INT)
+
+	# Setup identify matrix.
+	do i = 0, n-1
+	    Memr[y+(n+1)*i] = 1.
+
+	# Do LU decomposition.
+	call ludcmp (a, n, np, Memi[indx], d)
+
+	# Find inverse by columns.
+	do j = 0, n-1
+	    call lubksb (a, n, np, Memi[indx], Memr[y+n*j])
+
+	# Return inverse in a.
+	do i = 1, n
+	    do j = 1, n
+	        a[i,j] = Memr[y+n*(j-1)+(i-1)]
+
+	call mfree (y, TY_REAL)
+end
+################################################################################

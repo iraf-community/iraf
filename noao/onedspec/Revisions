@@ -1,6 +1,61 @@
 .help revisions Jun88 noao.onedspec
 .nf
 
+=======
+V2.12.3
+=======
+
+odcombine/		+
+doc/odcombine.hlp	+
+x_onedspec.x
+onedspec.cl
+onedspec.men
+onedspec.hd
+mkpkg
+    Added a new task ODCOMBINE which is layered more directly on the
+    source for IMCOMBINE.  This version supports bad pixel masks as well
+    as most of the new features of IMCOMBINE.  (6/21/04, Valdes)
+
+scombine/x_scombine.x	+
+scombine/mkpkg
+onedspec.cl
+mkpkg
+    Packaged SCOMBINE as its own executable noaobin$x_scombine.e.
+    (6/21/04, Valdes)
+
+t_standard.x
+    In case someone puts the query parameter "star_name" on the command
+    line and the calibration cannot be found the task will not only try
+    twice before aborting rather than go into an infinite loop.
+    (5/21/04, Valdes)
+
+dispcor/t_dispcor.x
+dispcor/dispcor.x
+dispcor.par
+doc/dispcor.hlp
+    Added the new parameter "blank" to control the output values when there
+    are no input values; i.e. the out of bounds values.  (5/18/04, Valdes)
+
+dispcor/t_discpor.x
+    For 2D spectra the "global" option was not working.  (5/14/04, Valdes)
+
+scombine/t_scombine.x
+    A check for the input format was added.  If the input is 2D spectra
+    then a format error is printed.  (5/14/04, Valdes)
+
+identify/autoid/autoid.x
+    Changed "AID_NT(aid) = min (2 * AID_NR(aid), AID_NTF(aid))" to
+    "AID_NT(aid) = AID_NTF(aid)".  While this may have speed consequences
+    it avoids preselecting target lines.  (4/23/04, Cooke, Valdes)
+
+doc/scombine.hlp
+    Made corrections suggested by Francois Schweizer on 2/25/04.
+    (3/10/04, valdes with input from schweizer)
+
+t_sarith.x
+    When the task was modified 8/3/02 to add something to the WCS the
+    wrong pointer was used resulting in a segmentation violation when
+    using the "merge" option.  (3/9/04, Valdes)
 
 =======
 V2.12.2

@@ -177,7 +177,8 @@ begin
 		IM_PIXTYPE(pmim) = TY_INT
 		pl = imstati (pmim, IM_PLDES)
 		call pl_close (pl)
-		pl = pl_create (undim, Meml[uaxlen], depth)
+		#pl = pl_create (undim, Meml[uaxlen], depth)
+		pl = pl_create (IM_NDIM(pmim), IM_LEN(pmim,1), depth)
 		call imseti (pmim, IM_PLDES, pl)
 		call imunmap (pmim)
 		pmim = immap (Memc[mskname], READ_WRITE, 0) 

@@ -674,7 +674,7 @@ begin
 	    HDR_IMAGE(hdr) = EOS
 	iferr (call tbhgtt (tp, "MASK", HDR_MASK(hdr), HDR_SZFNAME))
 	    HDR_MASK(hdr) = EOS
-	iferr (call tbhgtr (tp, "MAGZERO", HDR_MAGZERO(hdr), HDR_SZFNAME))
+	iferr (call tbhgtr (tp, "MAGZERO", HDR_MAGZERO(hdr)))
 	    HDR_MAGZERO(hdr) = INDEFR
 end
 

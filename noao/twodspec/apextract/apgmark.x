@@ -17,7 +17,7 @@ real	x1, x2, y1, y2, dy, xc, xl, xu
 pointer	sp, text, format, ap
 
 int	itoc()
-real	cveval()
+real	ap_cveval()
 
 begin
 	# The aperture is marked at the top of the graph.
@@ -40,7 +40,7 @@ begin
 	    ap = aps[i]
 	    apaxis = AP_AXIS(ap)
 
-	    xc = AP_CEN(ap, apaxis) + cveval (AP_CV(ap), real (imvec))
+	    xc = AP_CEN(ap, apaxis) + ap_cveval (AP_CV(ap), real (imvec))
 	    xl = xc + AP_LOW(ap, apaxis)
 	    xu = xc + AP_HIGH(ap, apaxis)
 	    call gline (gp, xc, y1 - 2 * dy, xc, y1 + 2 * dy)
@@ -76,7 +76,7 @@ int	i, j, nx, apaxis
 real	x1, x2, y1, y2, dy, xc, xl, xu
 pointer	sp, sample, x, ap, rg
 
-real	cveval()
+real	ap_cveval()
 pointer	rg_xrangesr()
 
 begin
@@ -98,7 +98,7 @@ begin
 	    ap = aps[i]
 	    apaxis = AP_AXIS(ap)
 
-	    xc = AP_CEN(ap, apaxis) + cveval (AP_CV(ap), real (imvec))
+	    xc = AP_CEN(ap, apaxis) + ap_cveval (AP_CV(ap), real (imvec))
 
 	    if (AP_IC(ap) == NULL)
 		next

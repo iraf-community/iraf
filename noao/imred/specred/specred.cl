@@ -41,11 +41,11 @@ task	autoidentify,
 	dopcor,
 	fitprofs,
 	identify,
+	odcombine,
 	refspectra,
 	reidentify,
 	sapertures,
 	sarith,
-	scombine,
 	sensfunc,
 	sfit,
 	sflip,
@@ -56,6 +56,7 @@ task	autoidentify,
 	splot,
 	standard,
 	telluric	= "onedspec$x_onedspec.e"
+task	scombine	= "onedspec$scombine/x_scombine.e"
 task	aidpars		= "onedspec$aidpars.par"
 task	bplot		= "onedspec$bplot.cl"
 task	scopy		= "onedspec$scopy.cl"
@@ -85,7 +86,9 @@ task	apscat2		= "apextract$apscat2.par"
 
 # Longslit tasks
 task	illumination,
-	response	= "twodspec$longslit/x_longslit.e"
+	lscombine,
+	response,
+	transform	= "twodspec$longslit/x_longslit.e"
 task	background	= "generic$background.cl"
 
 # Astutil tasks

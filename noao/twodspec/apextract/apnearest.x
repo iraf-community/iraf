@@ -19,7 +19,7 @@ real	d, delta
 pointer	ap
 
 int	fscan(), nscan()
-real	cveval()
+real	ap_cveval()
 
 begin
 	if (naps == 0)
@@ -31,7 +31,7 @@ begin
 	for (i = 1; i <= naps; i = i + 1) {
 	    ap = aps[i]
 	    apaxis = AP_AXIS(ap)
-	    d = abs (AP_CEN(ap, apaxis) + cveval (AP_CV(ap), real (line)) - x)
+	    d = abs (AP_CEN(ap, apaxis)+ap_cveval(AP_CV(ap),real(line))-x)
 	    if (d < delta - DELTA) {
 		j = 1
 		index = i
@@ -46,7 +46,7 @@ begin
 	    for (i = 1; i <= naps; i = i + 1) {
 	        ap = aps[i]
 	        apaxis = AP_AXIS(ap)
-	        d = abs (AP_CEN(ap, apaxis) + cveval (AP_CV(ap),real(line)) - x)
+	        d = abs (AP_CEN(ap, apaxis)+ap_cveval(AP_CV(ap),real(line))-x)
 	        if (d < delta + DELTA) {
 		    call printf (" %d")
 			call pargi (AP_ID (ap))

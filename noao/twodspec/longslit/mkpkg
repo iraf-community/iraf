@@ -19,12 +19,14 @@ install:
 
 longslit:
 	$omake	x_longslit.x
+	$omake	x_longslit.x
 	$link	x_longslit.o libpkg.a -lsmw -lxtools -lcurfit -liminterp\
 		-lgsurfit -o xx_longslit.e
 	;
 
 libpkg.a:
 	@transform
+	@lscombine
 
 	airmass.x	<math.h>
 	extinction.x	<error.h> <imhdr.h>
