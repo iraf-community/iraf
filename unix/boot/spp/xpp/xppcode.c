@@ -885,7 +885,7 @@ parse_task_statement()
 		if (sp >= &sbuf[SZ_SBUF])
 		    goto err;
 	    for (ip=proc_name;  (*op++ = *ip++) != EOS;  )
-		if (op >= &sbuf[SZ_OBUF])
+		if (op >= &obuf[SZ_OBUF])
 		    goto err;
 
 	    /* If the next character is a comma, skip it and a newline if
@@ -1144,6 +1144,8 @@ char	*string;
  */
 begin_code()
 {
+	char	text[1024];
+
 	/* If we are already processing the body of a procedure, we probably
 	 * have a missing END.
 	 */
@@ -1156,6 +1158,7 @@ begin_code()
 	 * begins.
 	 */
 	setcontext (BODY);
+	d_runtime (text);  outstr (text);
 	outstr ("begin\n");
 
 	/* Initialization. */
@@ -1237,7 +1240,6 @@ end_code()
 	 * are not permitted in the procedure body.
 	 */
 	init_strings();
-	d_runtime (yyout);
 	*op++ = EOS;
 	fputs (obuf, yyout);
 	fputs ("end\n", yyout);

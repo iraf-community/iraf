@@ -153,15 +153,15 @@ char	image[SZ_FNAME]
 char	mask[SZ_FNAME]
 
 real	rsum
-bool	debug
-long	v[IM_MAXDIM]
 pointer	im, mp, pm, bp
+bool	debug, usefullimage
+long	v[IM_MAXDIM], vs[2], ve[2]
 int	mval, npix, totpix
 
 real	asums()
 bool	clgetb()
 pointer	immap(), mio_open()
-int	clgeti(), mio_glsegs(), mio_stati()
+int	clgeti(), mio_glsegs(), mio_stati(), clscan(), nscan()
 
 begin
 	call clgstr ("image", image, SZ_FNAME)
@@ -170,6 +170,19 @@ begin
 
 	im = immap (image, READ_ONLY, 0)
 	mp = mio_open (mask, clgeti("flags"), im)
+
+	# The following assumes a 2D image.
+	usefullimage = true
+	if (clscan ("region") != EOF) {
+	    call gargi(vs[1]);  call gargi (vs[2])
+	    call gargi(ve[1]);  call gargi (ve[2])
+	    usefullimage = (nscan() != 4)
+	}
+	if (usefullimage) {
+	    call amovkl (1, vs, 2)
+	    call amovl (IM_LEN(im,1), ve, 2)
+	}
+	call mio_setrange (mp, vs, ve, 2)
 
 	if (debug) {
 	    pm = mio_stati (mp, P_PMDES)

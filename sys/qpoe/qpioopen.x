@@ -22,23 +22,28 @@ char	paramex[ARB]		#I event-list parameter plus expression list
 int	mode			#I access mode
 
 bool	newlist
-pointer	sp, io, dd, eh, op, oo, flist
-pointer	param, expr, filter, mask, psym, dsym, name
+pointer	sp, io, dd, eh, op, oo, flist, deffilt, defmask, maskname
+pointer	param, expr, filter, filter_text, mask, umask, psym, dsym, name
 int	sz_filter, szb_page, nwords, nchars, junk, fd, ip, i, j
 
 pointer	qp_gpsym(), qpex_open(), stname(), strefstab()
-int	qp_geti(), qp_gstr(), qp_parsefl(), qpio_parse()
-int	qp_accessf(), qp_popen(), qp_lenf(), read(), pl_l2pi(), fstati()
+int	qp_popen(), qp_lenf(), read(), pl_l2pi(), fstati()
+int	qp_geti(), qp_gstr(), qp_parsefl(), qpio_parse(), qpex_modfilter()
 
 errchk	qp_bind, qp_geti, qpio_parse, qp_gpsym, qp_addf, qp_gstr
-errchk	qp_parsefl, qp_popen, qpex_open, qpio_loadmask
+errchk	qp_parsefl, qp_popen, qpex_open, qpio_loadmask, qpex_modfilter
 errchk	stname, calloc, malloc, realloc, read, syserrs
-string	def_filter DEF_FILTER
-string	def_mask DEF_MASK
+string	s_deffilt DEF_FILTER
+string	s_defmask DEF_MASK
 define	done_ 91
 
 begin
 	call smark (sp)
+	call salloc (deffilt, SZ_FNAME, TY_CHAR)
+	call salloc (defmask, SZ_FNAME, TY_CHAR)
+	call salloc (maskname, SZ_FNAME, TY_CHAR)
+	call salloc (umask, SZ_FNAME, TY_CHAR)
+
 	if (QP_ACTIVE(qp) == NO)
 	    call qp_bind (qp)
 
@@ -62,6 +67,8 @@ begin
 	IO_MODE(io) = mode
 	IO_DEBUG(io) = QP_DEBUG(qp)
 	IO_BLOCK(io) = QP_BLOCK(qp)
+	IO_NODEFFILT(io) = QP_NODEFFILT(qp)
+	IO_NODEFMASK(io) = QP_NODEFMASK(qp)
 	IO_OPTBUFSIZE(io) = QP_OPTBUFSIZE(qp)
 	IO_ACTIVE(io) = NO
 
@@ -104,13 +111,14 @@ iferr {
 	    filter, sz_filter, Memc[mask], SZ_FNAME) == ERR)
 	    call eprintf ("QPIO warning: error parsing options expression\n")
 
+	# If no event list parameter was named, use the default.
+	if (Memc[param] == EOS)
+	    call strcpy (DEF_EVENTPARAM, Memc[param], SZ_FNAME)
+
 	# Verify the parameter's type if it already exists, or create a new
 	# parameter of the default type if the mode is newfile or append.
 
-	if (Memc[param] == EOS)
-	    call strcpy (DEF_EVENTPARAM, Memc[param], SZ_FNAME)
 	psym = qp_gpsym (qp, Memc[param])
-
 	if (psym != NULL) {
 	    if (S_DTYPE(psym) != TY_USER || S_DSYM(psym) == NULL)
 		call syserrs (SYS_QPNEVPAR, Memc[param])
@@ -231,23 +239,42 @@ iferr {
 	# We won't need the file buffer any more, so free it.
 	call fseti (fd, F_BUFSIZE, 0)
 
-	# Compile the event attribute filter (EAF).  This may be explicitly
-	# specified in the parameter expression, else we open the default
-	# filter if one is specified.  Note that the macro syntax allows
-	# filters or portions of filters to be stored in macros, in parameters,
-	# or in external files.
+	# Compile the event attribute filter (EAF).  Always open the default
+	# filter if one is provided with the datafile.  If the user has also
+	# specified a filter, this will modify the default filter.
 
-	if (Memc[filter] == EOS) {
-	    nchars = qp_lenf (qp, def_filter)
+	if (IO_NODEFFILT(io) != YES) {
+	    # Check for "deffilt.<evl>" first, then "deffilt".
+	    call sprintf (Memc[deffilt], SZ_FNAME, "%s.%s")
+		call pargstr (s_deffilt)
+		call pargstr (Memc[param])
+	    nchars = qp_lenf (qp, Memc[deffilt])
+	    if (nchars <= 0) {
+		call strcpy (s_deffilt, Memc[deffilt], SZ_FNAME)
+		nchars = qp_lenf (qp, Memc[deffilt])
+	    }
+
+	    # Open the default filter if one was found.
 	    if (nchars > 0) {
-		call realloc (filter, nchars, TY_CHAR)
-		if (qp_gstr (qp, def_filter, Memc[filter], nchars) < nchars)
-		    call syserrs (SYS_QPBADVAL, def_filter)
+		call salloc (filter_text, nchars, TY_CHAR)
+		if (qp_gstr(qp,Memc[deffilt],Memc[filter_text],nchars) < nchars)
+		    call syserrs (SYS_QPBADVAL, Memc[deffilt])
+		IO_EX(io) = qpex_open (qp, Memc[filter_text])
+		IO_EXCLOSE(io) = YES
 	    }
 	}
 
+	# Fold in the user specified filter if one was given.
 	if (Memc[filter] != EOS) {
-	    IO_EX(io) = qpex_open (qp, Memc[filter])
+	    if (IO_EX(io) != NULL) {
+		if (qpex_modfilter (IO_EX(io), Memc[filter]) == ERR)
+		    call fprintf (STDERR,
+			"Warning: error compiling QPIO filter\n")
+	    } else {
+		IO_EX(io) = qpex_open (qp, Memc[filter])
+		IO_EXCLOSE(io) = YES
+	    }
+
 	    if (IO_DEBUG(io) > 0) {
 		call eprintf ("event attribute filter: %s\n")
 		    call pargstr (Memc[filter])
@@ -261,13 +288,28 @@ iferr {
 	# parameter containing the name of the mask (TY_CHAR), or the name of
 	# a mask storage file (.pl extension).
 
-	if (Memc[mask] == EOS)
-	    if (qp_accessf (qp, def_mask) == YES)
-		if (qp_gstr (qp, def_mask, Memc[mask], SZ_FNAME) <= 0)
-		    Memc[mask] = EOS
+	# Make a copy of the user mask name, as qpio_loadmask will clobber it.
+	call strcpy (Memc[mask], Memc[umask], SZ_FNAME)
 
-	if (Memc[mask] != EOS)
-	    call qpio_loadmask (io, Memc[mask])
+	if (IO_NODEFMASK(io) != YES) {
+	    # Check for "defmask.<evl>" first, then "defmask".
+	    call sprintf (Memc[defmask], SZ_FNAME, "%s.%s")
+		call pargstr (s_defmask)
+		call pargstr (Memc[param])
+	    nchars = qp_lenf (qp, Memc[defmask])
+	    if (nchars <= 0) {
+		call strcpy (s_defmask, Memc[defmask], SZ_FNAME)
+		nchars = qp_lenf (qp, Memc[defmask])
+	    }
+
+	    if (nchars > 0)
+		if (qp_gstr (qp, Memc[defmask], Memc[maskname], SZ_FNAME) > 0)
+		    call qpio_loadmask (io, Memc[maskname], NO)
+	}
+
+	# Load user specified mask.
+	if (Memc[umask] != EOS)
+	    call qpio_loadmask (io, Memc[umask], YES)
 	else if (IO_INDEXLEN(io) > 0)
 	    call malloc (IO_RL(io), RL_LENELEM*2, TY_INT)
 

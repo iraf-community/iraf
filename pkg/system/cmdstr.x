@@ -49,7 +49,7 @@ begin
 		hparam = false
 
 	    # Check if parameter name is "mode" and skip it.
-	    if (strncmp (Memc[ip], "mode", 4) == 0)
+	    if (strncmp (Memc[ip], "mode =", 6) == 0)
 		next
 
 	    # Copy or skip parameter name.

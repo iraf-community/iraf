@@ -50,7 +50,7 @@ begin
 
 	# Set region mask.
 	if (Memc[mask] != EOS)
-	    call qpio_loadmask (io, Memc[mask])
+	    call qpio_loadmask (io, Memc[mask], NO)
 
 	IO_ACTIVE(io) = NO
 

@@ -60,9 +60,10 @@ begin
 	    # line list, we only have to compute the result once.
 
 	    if (ll_src != ol_src || ll_dst != ol_dst || ll_stn != ol_stn) {
-		call pl_linestencil (Mems[ll_src], vs_src[1],
-		    Mems[ll_dst], vs_dst[1], Mems[ll_stn], vs_stn[1],
-		    Mems[ll_out], vn[1], rop)
+		call pl_linestencil (Mems[ll_src], vs_src[1], PL_MAXVAL(pl_src),
+				     Mems[ll_dst], vs_dst[1], PL_MAXVAL(pl_dst),
+				     Mems[ll_stn], vs_stn[1],
+				     Mems[ll_out], vn[1], rop)
 
 		ol_src = ll_src
 		ol_dst = ll_dst

@@ -2,6 +2,7 @@
 
 include	<syserr.h>
 include	<ctype.h>
+include	<mach.h>
 include	"qpoe.h"
 include	"qpex.h"
 include	"qpio.h"
@@ -23,8 +24,9 @@ int	sz_filter		#U allocated buffer size
 char	mask[sz_mask]		#O new mask name (not reallocatable)
 int	sz_mask			#I max chars out
 
+int	assignop, byte_offset
 pointer	qp, sp, keyword, vp, in
-int	level, zlevel, status, start, value, token, op, kw
+int	level, zlevel, status, start, value, token, op, kw, tokno
 
 pointer	qp_opentext()
 int	qp_gettok(), gstrcpy(), strlen(), strdic(), ctoi()
@@ -49,6 +51,7 @@ begin
 	# unparenthesized comma.
 
 	op = 1
+	tokno = 0
 	F(op) = EOS
 	mask[1] = EOS
 	status = OK
@@ -59,6 +62,8 @@ begin
 
 	    # Advance to the next keyword.
 	    token = qp_gettok (in, F(op), SZ_TOKBUF)
+	    tokno = tokno + 1
+
 	    switch (token) {
 	    case EOF:
 		break
@@ -67,6 +72,13 @@ begin
 		next
 	    case ')', ']', '}':
 		level = level - 1
+		next
+	    case '!':
+		if (tokno <= 2) {
+		    IO_NODEFFILT(io) = YES
+		    IO_NODEFMASK(io) = YES
+		    tokno = 1
+		}
 		next
 	    case TOK_IDENTIFIER:
 		op = op + strlen (F(op))
@@ -88,9 +100,12 @@ begin
 	    value = NULL
 	    token = qp_gettok (in, F(op), SZ_TOKBUF)
 
-	    if (token == '=' || token == TOK_PLUSEQUALS) {
+	    if (token == '=' ||
+		token == TOK_PLUSEQUALS || token == TOK_COLONEQUALS) {
+
 		# Accumulate the expression.
 		zlevel = level
+		assignop = token
 		op = op + strlen (F(op))
 		value = op
 
@@ -178,9 +193,7 @@ badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
 		# syntax of the key value is, e.g.,  key=(s10,s8).
 
 		call strlwr (Memc[vp])
-		if (Memc[vp] == '(')
-		    vp = vp + 1
-		while (Memc[vp] == ' ')
+		while (Memc[vp] == ' ' || Memc[vp] == '(')
 		    vp = vp + 1
 
 		# Get the X field offset.
@@ -188,13 +201,13 @@ badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
 		    goto badkey_
 		else {
 		    vp = vp + 1
-		    if (ctoi (Memc, vp, IO_EVXOFF(io)) <= 0)
+		    if (ctoi (Memc, vp, byte_offset) <= 0)
 			goto badkey_
+		    else
+			IO_EVXOFF(io) = byte_offset / (SZ_SHORT * SZB_CHAR)
 		}
 
-		while (Memc[vp] == ' ')
-		    vp = vp + 1
-		if (Memc[vp] == ',')
+		while (Memc[vp] == ' ' || Memc[vp] == ',')
 		    vp = vp + 1
 
 		# Get the Y field offset.
@@ -202,11 +215,12 @@ badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
 		    goto badkey_
 		else {
 		    vp = vp + 1
-		    if (ctoi (Memc, vp, IO_EVYOFF(io)) <= 0) {
+		    if (ctoi (Memc, vp, byte_offset) <= 0) {
 badkey_			call eprintf ("QPIO: bad key value `%s'\n")
 			    call pargstr (F(value))
 			status = ERR
-		    }
+		    } else
+			IO_EVXOFF(io) = byte_offset / (SZ_SHORT * SZB_CHAR)
 		}
 		op = start
 
@@ -235,6 +249,8 @@ noval_		    call eprintf ("QPIO: kewyord `%s' requires an argument\n")
 		    } else {
 			# Set the name of the region mask.
 			call strcpy (Memc[vp], mask, sz_mask)
+			if (assignop == TOK_COLONEQUALS)
+			    IO_NODEFMASK(io) = YES
 		    }
 		}
 		op = start
@@ -298,6 +314,8 @@ noval_		    call eprintf ("QPIO: kewyord `%s' requires an argument\n")
 	sz_filter = op
 	call realloc (filter, sz_filter, TY_CHAR)
 
+	call qp_closetext (in)
 	call sfree (sp)
+
 	return (status)
 end

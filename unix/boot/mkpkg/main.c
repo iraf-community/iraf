@@ -36,8 +36,9 @@ struct	symbol symtab[MAX_SYMBOLS];	/* symbol table (macros)	*/
 struct	context *topcx;			/* currently active context	*/
 char	*cp = sbuf;			/* pointer into sbuf		*/
 char	*ctop = &sbuf[SZ_SBUF];		/* top of sbuf			*/
-char	*pkgenv;			/* reference package		*/
-char	v_pkgenv[SZ_FNAME+1];		/* buffer for pkgenv name	*/
+int	npkg = 0;			/* number of packages		*/
+char	*pkgenv[MAX_PKGENV];		/* package environments		*/
+char	v_pkgenv[SZ_PKGENV+1];		/* buffer for pkgenv names	*/
 char	irafdir[SZ_PATHNAME+1];		/* iraf root directory		*/
 int	nsymbols = 0;			/* number of defined symbols	*/
 int	ifstate[SZ_IFSTACK];		/* $IF stack			*/
@@ -82,7 +83,7 @@ char	*argv[];
 	iflev       = 0;
 	lflags[0]   = EOS;
 	islib       = YES;
-	pkgenv	    = NULL;
+	npkg	    = 0;
 
 	/* Process the command line.
 	 */
@@ -115,8 +116,12 @@ char	*argv[];
 		    case 'p':
 			if (*argp == NULL)
 			    warns ("missing argument to switch `-p'");
-			else
-			    loadpkgenv (pkgenv = *argp++);
+			else {
+			    pkgenv[npkg] = *argp++;
+			    loadpkgenv (pkgenv[npkg]);
+			    if (npkg++ >= MAX_PKGENV)
+				fatals ("too many -p package arguments");
+			}
 			break;
 		    case 'u':
 			forceupdate = YES;
@@ -174,13 +179,25 @@ char	*argv[];
 	}
 
 	/* Initialize the package environment.  This has already been done
-	 * if -p pkgname was given on the command line, otherwise look for
-	 * the name PKGENV in the user's environment.
+	 * if any -p pkgname arguments were given on the command line,
+	 * otherwise look for the name PKGENV in the user's environment.
 	 */
-	if (!pkgenv)
-	    if (pkgenv = os_getenv (PKGENV)) {
-		strcpy (v_pkgenv, pkgenv);
-		loadpkgenv (pkgenv = v_pkgenv);
+	if (npkg <= 0)
+	    if (pkgenv[0] = os_getenv (PKGENV)) {
+		char    *ip;
+
+		strcpy (v_pkgenv, pkgenv[0]);
+		for (ip=v_pkgenv;  *ip;  ) {
+		    while (isspace (*ip))
+			ip++;
+		    pkgenv[npkg] = ip;
+		    while (*ip && !isspace (*ip))
+			ip++;
+		    *ip++ = EOS;
+		    loadpkgenv (pkgenv[npkg]);
+		    if (npkg++ >= MAX_PKGENV)
+			fatals ("too many -p package arguments");
+		}
 	    }
 
 	/* Initialize the symbol table from the system dependent global
@@ -188,13 +205,17 @@ char	*argv[];
 	 */
 	do_include (cx, MKPKGINC);
 
-	/* Likewise the package global mkpkg.inc, if a reference package
-	 * has been identified.
+	/* Likewise load the package global mkpkg.inc files for each
+	 * reference package.
 	 */
-	if (pkgenv) {
+	if (npkg > 0) {
 	    char   fname[SZ_PATHNAME+1];
-	    sprintf (fname, "%s$lib/mkpkg.inc", pkgenv);
-	    do_include (cx, fname);
+	    int    i;
+
+	    for (i=0;  i < npkg;  i++) {
+		sprintf (fname, "%s$lib/mkpkg.inc", pkgenv[i]);
+		do_include (cx, fname);
+	    }
 	}
 
 	/* Append any flags given on the command line to LFLAGS.

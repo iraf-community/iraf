@@ -34,50 +34,15 @@ $special "sys$vops/lz/":	amovc.x		as$amovc.c
 # Files requiring special compilation due to host compiler bugs.
 # -------------------------------------------------------------
 
-$set	XNO	= '& "$xc -cq -/$(MACH) &"'
-$set	XO1	= '& "$xc -cq -/O1 -/$(MACH) &"'
-$set	XO2	= '& "$xc -cq -/O2 -/$(MACH) &"'
+# All this has been commented out for the new V1.3 Fortran compiler.
+$set	XNO	= '& "$xc -cq  &"'
+$set	XO1	= '& "$xc -cq -/O1 &"'
+$set	XO2	= '& "$xc -cq -/O2 &"'
 
-$special "sys$etc/":
-	onerror.x	$(XNO)
-	onexit.x	$(XNO)
+$special "sys$vops/ak/":
+	abnekx.x	$(XNO)
+	abnex.x		$(XNO)
 	;
-
-$special "sys$gio/cursor/":
-	grcwcs.x	$(XNO);
-
-$special "sys$gio/ncarutil/autograph/":
-	agstup.f	$(XNO);
-
-# The following causes the compiler to produce semi-infinite intermediate code
-# tables, necessitating use of reduced levels (O1 or O2) of optimization.
-
-$special "sys$osb/":
-	achtbu.c	$(XO1)
-	achtcu.c	$(XO1)
-	achtdu.c	$(XO1)
-	achtiu.c	$(XO1)
-	achtlu.c	$(XO1)
-	achtru.c	$(XO1)
-	achtsu.c	$(XO1)
-	achtuu.c	$(XO1)
-	achtxu.c	$(XO1)
-	achtub.c	$(XO1)
-	achtuc.c	$(XO1)
-	achtud.c	$(XO1)
-	achtui.c	$(XO1)
-	achtul.c	$(XO1)
-	achtur.c	$(XO1)
-	achtus.c	$(XO1)
-	achtuu.c	$(XO1)
-	achtux.c	$(XO1)
+$special "sys$vops/lz/":
+	aveqx.x		$(XNO)
 	;
-
-# Partial optimization needed to prevent infinite loop in iropt.
-# In main.c and errs.c, no optimization is needed to avoid an optimizer problem
-# associated with ZSVJMP (setjmp).  I tried using a #pragma to fix this but
-# it didn't work.
-
-$special "$(pkg)cl/":			ytab.c   $(XO2)
-					main.c   $(XNO)
-					errs.c   $(XNO)

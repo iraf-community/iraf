@@ -20,11 +20,11 @@ char	mask[ARB]		#I mask file name or "BPM"
 int	mode			#I mode and flag bits
 pointer	ref_im			#I reference image
 
-pointer	sp, cluster, ksection, section, pl, im, title
-int	cl_index, cl_size, acmode, flags
+pointer	sp, cluster, ksection, section, pl, im, title, hp
+int	cl_index, cl_size, acmode, flags, sz_svhdr, ip
 pointer	im_pmmapo(), im_pmopen()
-errchk	im_pmopen
-int	btoi()
+int	btoi(), ctoi(), envfind()
+errchk	im_pmopen, im_pmopen
 
 begin
 	call smark (sp)
@@ -36,12 +36,25 @@ begin
 	acmode = PL_ACMODE(mode)
 	flags  = PL_FLAGS(mode)
 
+	# If opening an existing mask, get a buffer for the saved mask image
+	# header.
+
+	if (acmode != NEW_IMAGE && acmode != NEW_COPY) {
+	    ip = 1
+	    if (envfind ("min_lenuserarea", Memc[section], SZ_FNAME) > 0) {
+		if (ctoi (Memc[section], ip, sz_svhdr) <= 0)
+		    sz_svhdr = MIN_LENUSERAREA
+	    } else
+		sz_svhdr = MIN_LENUSERAREA
+	    call salloc (hp, sz_svhdr, TY_CHAR)
+	}
+
 	# Parse the full image specification into its component parts.
 	call imparse (mask, Memc[cluster],SZ_PATHNAME,
 	    Memc[ksection],SZ_FNAME, Memc[section],SZ_FNAME, cl_index,cl_size)
 
 	# Open the mask.
-	pl = im_pmopen (Memc[cluster], flags,  Memc[title], SZ_LINE, ref_im)
+	pl = im_pmopen (Memc[cluster], mode, Memc[hp], sz_svhdr, ref_im)
 
 	# Map the mask onto an image descriptor.
 	iferr (im = im_pmmapo (pl, ref_im)) {
@@ -49,11 +62,19 @@ begin
 	    call erract (EA_ERROR)
 	} else {
 	    call strcpy (mask, IM_NAME(im), SZ_IMNAME)
-	    call strcpy (Memc[title], IM_TITLE(im), SZ_IMTITLE)
+	    if (acmode != NEW_IMAGE && acmode != NEW_COPY)
+		call im_pmldhdr (im, hp)
 	}
 
 	# Set flag to close PL descriptor at IMUNMAP time.
 	IM_PLFLAGS(im) = or (IM_PLFLAGS(im), PL_CLOSEPL)
+
+	# If we are creating a new mask of type boolean, set bool flag so
+	# that imopsf will make a boolean mask.
+
+	if (acmode == NEW_IMAGE || acmode == NEW_COPY)
+	    if (and (flags, BOOLEAN_MASK) != 0)
+		IM_PLFLAGS(im) = or (IM_PLFLAGS(im), PL_BOOL)
 
 	# Set access mode for mask, and mask update at unmap flag.
 	IM_ACMODE(im) = acmode

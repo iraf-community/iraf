@@ -28,6 +28,7 @@
 # 	
 # 	P_PMDES			pixel mask descriptor
 # 	P_IMDES			image descriptor
+#	P_REGCOORDS		mio_setrange region relative coords
 # 
 # The get/put line segment i/o routines return successive line segments of
 # constant value from the data image IM, advancing through the image in storage
@@ -48,7 +49,8 @@ define	M_RLP		Memi[$1+6]		# range list pointer
 define	M_RLI		Memi[$1+7]		# range list index
 define	M_NDIM		Memi[$1+8]		# dimensionality of section
 define	M_LINEIO	Memi[$1+9]		# section is entire line
-define	M_V		Meml[$1+10+$2-1]	# current vector
+define	M_REGCOORDS	Memi[$1+10]		# region relative coords
+define	M_V		Meml[$1+11+$2-1]	# current vector
 define	M_VS		Meml[$1+20+$2-1]	# start vector
 define	M_VE		Meml[$1+30+$2-1]	# end vector
 define	M_VN		Meml[$1+40+$2-1]	# size of section

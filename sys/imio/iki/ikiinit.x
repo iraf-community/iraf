@@ -14,6 +14,8 @@ extern	stf_open(), stf_close(), stf_opix(), stf_updhdr(),
 	stf_access(), stf_copy(), stf_delete(), stf_rname()
 extern	qpf_open(), qpf_close(), qpf_opix(), qpf_updhdr(),
 	qpf_access(), qpf_copy(), qpf_delete(), qpf_rename()
+extern	plf_open, plf_close, plf_null(), plf_updhdr(),
+	plf_access(), plf_copy(), plf_delete(), plf_rename(),
 
 bool	first_time
 data	first_time /true/
@@ -36,6 +38,10 @@ begin
 	# Load the QPOE photon image kernel (QPF).
 	call iki_lddriver (qpf_open, qpf_close, qpf_opix, qpf_updhdr,
 	    qpf_access, qpf_copy, qpf_delete, qpf_rename)
+
+	# Load the PLIO mask image mini-kernel (PLF - not a full kernel).
+	call iki_lddriver (plf_open, plf_close, plf_null, plf_updhdr,
+	    plf_access, plf_copy, plf_delete, plf_rename)
 
 	first_time = false
 end

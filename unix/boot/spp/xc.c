@@ -28,6 +28,7 @@
 #define	SZ_LIBBUF	1024		/* full library names */
 #define	SZ_FNAME	127
 #define	SZ_PATHNAME	127
+#define	SZ_PKGENV	256
 
 #define	DEBUGFLAG	'g'		/* what to use when -x is seen */
 #define	SYSBINDIR	"/usr/lang/"		/* special system BIN */
@@ -78,7 +79,7 @@ char	libbuf[SZ_LIBBUF+1];
 char	*bp = buffer;
 char	*libp = libbuf;
 char	*pkgenv = NULL;
-char	v_pkgenv[SZ_FNAME+1];
+char	v_pkgenv[SZ_PKGENV+1];
 int	nflags, nfiles, nxfiles, nffiles;
 int	sig_int, sig_quit, sig_hup, sig_term;
 char	*shellname = "/bin/sh";
@@ -87,6 +88,8 @@ int	debug = NO;
 int	hostprog;
 int	foreigndefs;
 char	*foreign_defsfile = "";
+char	*irafarch = "";				/* IRAFARCH string */
+char	floatoption[32] = "";			/* f77 arch flag, if any */
 
 char	*vfn2osfn();
 char	*os_getenv();
@@ -115,7 +118,9 @@ char	*argv[];
 	char	*arg, *ip, *iraflib(), *mkfname();
 	int	status, noperands;
 
+	/* Initialization. */
 	ZZSTRT();
+	isv13();
 
 	nflags = nfiles = nxfiles = nffiles = 0;
 
@@ -128,13 +133,19 @@ char	*argv[];
 	pid = getpid();
 
 	/* Count the number of file arguments.  Load the environment for
-	 * any packages names on the command line.
+	 * any packages named on the command line.
 	 */
+	pkgenv = NULL;
+	v_pkgenv[0] = EOS;
 	for (i=1, nfileargs=0;  argv[i] != NULL;  i++)
 	    if (argv[i][0] != '-')
 		nfileargs++;
-	    else if (strcmp (argv[i], "-p") == 0 && argv[i+1])
-		loadpkgenv (pkgenv = argv[++i]);
+	    else if (strcmp (argv[i], "-p") == 0 && argv[i+1]) {
+		loadpkgenv (argv[++i]);
+		strcat (v_pkgenv, v_pkgenv[0] ? " -p " : "-p ");
+		strcat (v_pkgenv, argv[i]);
+		pkgenv = v_pkgenv;
+	    }
 
 	/* If no package environment was specified see if the user has
 	 * specified a default package in their user environment.
@@ -161,6 +172,13 @@ char	*argv[];
 			;
 		    if (nflags++ >= MAXFLAG)
 			fatal ("Too many compiler options");
+#ifdef sun
+		    /* Check for an explicit architecture setting.  If given
+		     * this will override IRAFARCH.
+		     */
+		    if (strncmp (arg, "-/f", 3) == 0)
+			sprintf (floatoption, "-%s", &arg[2]);
+#endif
 		    break;
 
 		case 'l':
@@ -322,6 +340,17 @@ passflag:		    mkobject = YES;
 	    exit (errflag);
 	}
 
+#ifdef sun
+	/* Determine if any special architecture dependent compilation flags
+	 * are needed.  For the Sun V1.3 compiler, since FLOAT_OPTION is no
+	 * longer supported, we look for IRAFARCH and generate the -f68881
+	 * or -ffpa compiler switches automatically if we are compiling on a
+	 * Sun-3 and no -/f* has already been specified on the command line.
+	 */
+	if (!floatoption[0] && (irafarch = os_getenv("IRAFARCH")))
+	    if (irafarch[0] == 'f')
+		sprintf (floatoption, "-%s", irafarch);
+#endif
 
 	/* Compile all F77 source files with F77 to produce object code.
 	 * This compilation is separate from that used for the '.x' files,
@@ -331,6 +360,10 @@ passflag:		    mkobject = YES;
 	nargs = 0;
 	arglist[nargs++] = "f77";
 	arglist[nargs++] = "-c";
+#ifdef sun
+	if (floatoption[0])
+	    arglist[nargs++] = floatoption;
+#endif
 	if (optimize)
 	    arglist[nargs++] = "-O";
 
@@ -355,6 +388,10 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = "f77";
 	arglist[nargs++] = "-c";
 	arglist[nargs++] = "-u";
+#ifdef sun
+	if (floatoption[0])
+	    arglist[nargs++] = floatoption;
+#endif
 	if (optimize)
 	    arglist[nargs++] = "-O";
 
@@ -387,6 +424,10 @@ passflag:		    mkobject = YES;
 	nargs = 0;
 	arglist[nargs++] = "cc";
 	arglist[nargs++] = "-c";
+#ifdef sun
+	if (floatoption[0])
+	    arglist[nargs++] = floatoption;
+#endif
 	if (optimize)
 	    arglist[nargs++] = "-O";
 
@@ -451,6 +492,10 @@ passflag:		    mkobject = YES;
 	    arglist[nargs++] = lflags[i];
 
 #ifdef sun
+	/* Need to pass -f<float> to CC for the C libraries. */
+	if (floatoption[0])
+	    arglist[nargs++] = floatoption;
+
 	/* If we are using the V1.3 Sun Fortran compiler, the V1.3 "f77"
 	 * should be a symbolic link pointing to the BIN directory for the
 	 * new compiler.  Construct the path to this directory and put it
@@ -478,7 +523,8 @@ passflag:		    mkobject = YES;
 		*op = EOS;
 
 		/* Search, e.g., /usr/lang/SC0.0/ffpa first if Sun-3. */
-		if (s = os_getenv ("FLOAT_OPTION")) {
+		if (floatoption[0]) {
+		    s = floatoption + 1;
 		    *op = '/';
 		    strcpy (op+1, s);
 		    strcpy (libp, libpath);
@@ -558,6 +604,12 @@ passflag:		    mkobject = YES;
 	    char    edsym[SZ_PATHNAME+1];
 	    char    command[256];
 
+	    /* The os_sysfile(SHIMAGE) below assumes the existence of a file
+	     * entry "S.e" in the directory containing the real shared image
+	     * "S<n>.e".  We can't easily look directly for S<n>.e because
+	     * the process symbol table and image has to be examined to
+	     * determine the shared image version number.
+	     */
 	    if (os_sysfile (SHIMAGE, shlib, SZ_PATHNAME) > 0) {
 		if (os_sysfile (EDSYM, edsym, SZ_PATHNAME) > 0) {
 		    sprintf (command, "%s %s %s", edsym, outfile, shlib);
@@ -669,7 +721,7 @@ char	*file;
 		strcpy (xpp_path, XPP);
 
 	if (pkgenv)
-	    sprintf (cmdbuf, "%s -p %s -R %s", xpp_path, pkgenv, file);
+	    sprintf (cmdbuf, "%s %s -R %s", xpp_path, pkgenv, file);
 	else
 	    sprintf (cmdbuf, "%s -R %s", xpp_path, file);
 
@@ -781,10 +833,10 @@ char	*argv[];
 	    execvp (task, argv);	/* use user PATH for search */
 	    strcpy (path, SYSBINDIR);
 	    strcat (path, task);
-	    execv  (task, argv);	/* look in SYSBINDIR */
+	    execv  (path, argv);	/* look in SYSBINDIR */
 	    strcpy (path, LOCALBINDIR);
-	    strcat (path, task);
-	    execv  (task, argv);	/* look in LOCALBINDIR */
+	    strcat (path, path);
+	    execv  (path, argv);	/* look in LOCALBINDIR */
 
 	    fatalstr ("Cannot execute %s", task);
 	}
@@ -1035,10 +1087,11 @@ char	*dir;			/* pointer to output string buf, or NULL */
 	static	char path[256];
 	char	dirpath[256];
 	char	*dp = dir ? dir : dirpath;
+	char	*pathp;
 
 	/* Look for the program in the directories in the user's path.
 	 */
-	ip = os_getenv ("PATH");
+	ip = pathp = os_getenv ("PATH");
 	while (*ip) {
 	    for (op=dp;  *ip && (*op = *ip++) != ':';  op++)
 		;
@@ -1054,9 +1107,23 @@ char	*dir;			/* pointer to output string buf, or NULL */
 	strcpy (dp, SYSBINDIR);
 	strcpy (path, dp);
 	strcat (path, prog);
-	if (access (path, 0) != -1)
-	    return (path);
 
+	if (access (path, 0) != -1) {
+	    static  char newpath[256];
+	    char    *oldpath;
+
+	    /* Add SYSBINDIR to the user's path.  This is required to
+	     * use the V1.3 compiler.  Note that this code should only be
+	     * executed once, since the next time findexe is called the
+	     * SYSBINDIR directory will be in the default path, above.
+	     */
+	    if (oldpath = pathp) {
+		sprintf (newpath, "PATH=%s:%s", SYSBINDIR, oldpath);
+		putenv (newpath);
+	    }
+
+	    return (path);
+	}
 
 	/* Look in LOCALBINDIR. */
 	strcpy (dp, LOCALBINDIR);

@@ -1,7 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <mach.h>
 include <imhdr.h>
-include <imset.h>
 include <math/surfit.h>
 include "imsurfit.h"
 
@@ -16,7 +16,7 @@ pointer	imfit	# pointer to the imsurfit parameters
 pointer	gl	# pointer to the good regions list
 
 pointer	sf, rl
-errchk	isfree, plfree
+errchk	isfree, prl_free
 errchk	all_pixels, good_pixels, good_median, all_medians, do_reject
 errchk	set_outimage
 
@@ -45,7 +45,7 @@ begin
 	call set_outimage (imin, imout, imfit, sf, rl)
 
 	# Cleanup.
-	call plfree (rl)
+	call prl_free (rl)
 	call isfree (sf)
 
 	rl = NULL
@@ -151,13 +151,13 @@ pointer	sf	# pointer to the surface descriptor
 
 int	lp, lineno, prevlineno, ncols, nlines, npts, nranges, ier, ijunk
 pointer	sp, colsfit, lines, buf, fbuf, wgt, ranges
-int	pl_nextlineno(), pl_eqlines(), pl_get_ranges(), expand_ranges()
+int	prl_nextlineno(), prl_eqlines(), prl_get_ranges(), expand_ranges()
 int	choose_rangesr()
 pointer	imgl2r()
 
 errchk	smark, salloc, sfree, imgl2r
 errchk	isinit, islfit, islrefit, issolve
-errchk	pl_nextlineno, pl_eqlines, pl_get_ranges
+errchk	prl_nextlineno, prl_eqlines, prl_get_ranges
 errchk	choose_rangesr
 
 begin
@@ -183,7 +183,7 @@ begin
 	prevlineno = 0
 
 	# Loop over those lines to be fit.
-	while (pl_nextlineno (gl, lineno) != EOF) {
+	while (prl_nextlineno (gl, lineno) != EOF) {
 
 	    # Read in the image line.
 	    buf = imgl2r (im, lineno)
@@ -191,12 +191,12 @@ begin
 		call error (0, "GOOD_PIXELS: Error reading image.")
 
 	    # Get the ranges for that image line.
-	    nranges = pl_get_ranges (gl, lineno, Memi[ranges], MAX_NRANGES)
+	    nranges = prl_get_ranges (gl, lineno, Memi[ranges], MAX_NRANGES)
 	    if (nranges == 0)
 		next
 
 	    # If ranges are not equal to previous line fit else refit.
-	    if (lp == 0 || pl_eqlines (gl, lineno, prevlineno) == NO) {
+	    if (lp == 0 || prl_eqlines (gl, lineno, prevlineno) == NO) {
 		npts = expand_ranges (Memi[ranges], Memi[colsfit], ncols)
 		ijunk = choose_rangesr (Memi[colsfit], Memr[buf], Memr[fbuf],
 		    npts, 1, ncols)
@@ -385,12 +385,12 @@ int	nimcols, nimlines, ncols, nlines, nranges, nbox, nxpts
 int	lineno, current_line, lines_per_box
 pointer	sp, colsfit, cols, lines, wgt, npts, lbuf, med, mbuf, z, ranges
 
-int	pl_get_ranges(), pl_nextlineno(), expand_ranges(), choose_rangesr()
+int	prl_get_ranges(), prl_nextlineno(), expand_ranges(), choose_rangesr()
 pointer	imgl2r()
 real	asokr()
 errchk	smark, salloc, sfree, imgl2r
 errchk	isinit, islfit, issolve
-errchk	pl_get_ranges, pl_nextlineno, choose_rangesr()
+errchk	prl_get_ranges, prl_nextlineno, choose_rangesr()
 
 begin
 	# Determine the number of lines and columns for a median processed
@@ -434,7 +434,7 @@ begin
 
 	    # If lines not in range, next image section.
 	    lines_per_box = 0
-	    while (pl_nextlineno (gl, current_line) != EOF) {
+	    while (prl_nextlineno (gl, current_line) != EOF) {
 		if (current_line > y2)
 		    break
 		lines_per_box = lines_per_box + 1
@@ -448,7 +448,7 @@ begin
 
 		# Get image line, and check the good regions list.
 		lbuf = imgl2r (im, i)
-		nranges = pl_get_ranges (gl, i, Memi[ranges], MAX_NRANGES)
+		nranges = prl_get_ranges (gl, i, Memi[ranges], MAX_NRANGES)
 		if (nranges == 0)
 		    next
 		nxpts = expand_ranges (Memi[ranges], Memi[colsfit], nimcols)
@@ -640,7 +640,7 @@ int	ngrow		# radius for region growing
 int	cp, j, k, nranges, dist, yreg_min, yreg_max, xreg_min, xreg_max
 pointer	sp, branges
 real	r2
-int	pl_get_ranges(), get_next_number()
+int	prl_get_ranges(), get_next_number()
 real	iseval()
 
 begin
@@ -652,7 +652,7 @@ begin
 	yreg_max = min (nlines, line + ngrow)
 
 	do j = yreg_min, yreg_max {
-	    nranges = pl_get_ranges (rl, j, Memi[branges], MAX_NRANGES)
+	    nranges = prl_get_ranges (rl, j, Memi[branges], MAX_NRANGES)
 	    if (nranges == 0)
 		next
 	    dist = int (sqrt (r2 - (j - line) ** 2))
@@ -684,11 +684,11 @@ int	niter, nrejects
 real	sigma
 int	detect_rejects()
 real	get_sigma()
-errchk  plinit, detect_rejects, get_sigma, refit_surface
+errchk  prl_init, detect_rejects, get_sigma, refit_surface
 
 begin
 	# Initialize rejected pixel list.
-	call plinit (rl, int(IM_LEN(im,1)), int(IM_LEN(im,2)))
+	call prl_init (rl, int(IM_LEN(im,1)), int(IM_LEN(im,2)))
 
 	# Do an iterative rejection cycle on the image.
 	niter = 0
@@ -725,11 +725,11 @@ int	i, ijunk, lp, ier
 int	ncols, nlines, npts, nfree, nrejects, nranges, ncoeff
 pointer	sp, cols, colsfit, lines, buf, fbuf, wgt, granges
 
-int	pl_get_ranges(), grow_regions(), expand_ranges(), choose_rangesr()
+int	prl_get_ranges(), grow_regions(), expand_ranges(), choose_rangesr()
 pointer	imgl2r()
 errchk	smark, salloc, sfree, imgl2r
 errchk	iscoeff, islfit, issolve
-errchk	pl_get_ranges, grow_regions
+errchk	prl_get_ranges, grow_regions
 errchk	choose_rangesr
 
 begin
@@ -766,7 +766,7 @@ begin
 
 	    # Determine whether image line is good.
 	    if (gl != NULL) {
-		nranges = pl_get_ranges (gl, i, Memi[granges], MAX_NRANGES)
+		nranges = prl_get_ranges (gl, i, Memi[granges], MAX_NRANGES)
 		if (nranges == 0)
 		    next
 	    }
@@ -867,9 +867,9 @@ int	cp, j, k, nrejects, nranges
 int	dist, yreg_min, yreg_max, xreg_min, xreg_max
 pointer	sp, branges
 real	r2
-int	pl_get_ranges(), get_next_number()
+int	prl_get_ranges(), get_next_number()
 errchk	smark, salloc, sfree
-errchk	pl_get_ranges, get_next_number 
+errchk	prl_get_ranges, get_next_number 
 
 begin
 	call smark (sp)
@@ -881,7 +881,7 @@ begin
 	yreg_max = min (nlines, line + ngrow)
 
 	do j = yreg_min, yreg_max {
-	    nranges = pl_get_ranges (rl, j, Memi[branges], MAX_NRANGES)
+	    nranges = prl_get_ranges (rl, j, Memi[branges], MAX_NRANGES)
 	    if (nranges == 0)
 		next
 	    dist = int (sqrt (r2 - (j - line) ** 2))
@@ -916,7 +916,7 @@ pointer		rl	# pointer to rejected pixel list
 int	i, ijunk, cp, nranges, npts, ntpts, ncols, nlines
 pointer	sp, colsfit, x, xfit, y, zfit, buf, fbuf, wgt, granges, branges
 real	sum, sigma
-int	pl_get_ranges(), get_next_number(), expand_ranges(), choose_rangesr()
+int	prl_get_ranges(), get_next_number(), expand_ranges(), choose_rangesr()
 pointer	imgl2r()
 real	asumr(), awssqr()
 errchk	smark, salloc, sfree, imgl2r
@@ -951,7 +951,7 @@ begin
 
 	    # Check that line is in range.
 	    if (gl != NULL) {
-		nranges = pl_get_ranges (gl, i, Memi[granges], MAX_NRANGES)
+		nranges = prl_get_ranges (gl, i, Memi[granges], MAX_NRANGES)
 		if (nranges == 0)
 		    next
 		npts = expand_ranges (Memi[granges], Memi[colsfit], ncols)
@@ -979,7 +979,7 @@ begin
 
 	    # Get ranges of rejected pixels for the line and set weights.
 	    call amovkr (1., Memr[wgt], ncols)
-	    nranges = pl_get_ranges (rl, i, Memi[branges], MAX_NRANGES)
+	    nranges = prl_get_ranges (rl, i, Memi[branges], MAX_NRANGES)
 	    if (nranges > 0) {
 		cp = 0
 		while (get_next_number (Memi[branges], cp) != EOF)
@@ -1016,7 +1016,7 @@ pointer	sp, granges, branges, x, xfit, cols, colsfit, y, zfit, buf, fbuf
 pointer	wgt, list
 real	upper, lower
 
-int	pl_get_ranges(), get_next_number(), make_ranges(), expand_ranges()
+int	prl_get_ranges(), get_next_number(), make_ranges(), expand_ranges()
 int	choose_rangesr()
 pointer	imgl2r()
 
@@ -1046,15 +1046,21 @@ begin
 	call amovi (Memi[cols], Memi[colsfit], ncols)
 
 	ntrejects = 0
-	lower = -sigma * LOWER(imfit)
-	upper = sigma * UPPER(imfit)
+	if (LOWER(imfit) <= 0.0)
+	    lower = -MAX_REAL
+	else
+	    lower = -sigma * LOWER(imfit)
+	if (UPPER(imfit) <= 0.0)
+	    upper = MAX_REAL
+	else
+	    upper = sigma * UPPER(imfit)
 
 	# Loop over the image.
 	do i = 1, nlines {
 
 	    # Get ranges if appropriate.
 	    if (gl != NULL) {
-		nranges = pl_get_ranges (gl, i, Memi[granges], MAX_NRANGES)
+		nranges = prl_get_ranges (gl, i, Memi[granges], MAX_NRANGES)
 		if (nranges == 0)
 		    next
 		npts = expand_ranges (Memi[granges], Memi[colsfit], ncols) 
@@ -1082,7 +1088,7 @@ begin
 
 	    # Get ranges of rejected pixels for the line and set weights.
 	    call amovkr (1., Memr[wgt], ncols)
-	    nranges = pl_get_ranges (rl, i, Memi[branges], MAX_NRANGES)
+	    nranges = prl_get_ranges (rl, i, Memi[branges], MAX_NRANGES)
 	    if (nranges > 0) {
 		cp = 0
 		while (get_next_number (Memi[branges], cp) != EOF)
@@ -1107,7 +1113,7 @@ begin
 		nranges = make_ranges (Memi[list], nlrejects, Memi[granges],
 		    MAX_NRANGES)
 		j = 0
-		call pl_add_ranges (rl, i, i, Memi[granges])
+		call prl_add_ranges (rl, i, i, Memi[granges])
 	    }
 
 	    ntrejects = ntrejects + nlrejects

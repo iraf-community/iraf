@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<syserr.h>
+include	<pmset.h>
 include	<plset.h>
 include	<imhdr.h>
 include	<imio.h>
@@ -33,15 +34,22 @@ begin
 	    call strcpy (IM_NAME(im), Memc[imname], SZ_IMNAME)
 
 	    if (ref_im != NULL) {
-		# Inherit the runtime descriptor of the reference image.
-		call amovi (Memi[ref_im], Memi[im], LEN_IMDES)
-		IM_IBDES(im) = NULL
-		IM_OBDES(im) = NULL
-		IM_LASTBDES(im) = NULL
-		IM_OOBPIX(im) = 1
+		# Create a mask the same size as the physical size of the
+		# reference image.  Inherit any image section from the
+		# reference image.
 
 		IM_NDIM(im) = IM_NDIM(ref_im)
+		IM_NPHYSDIM(im) = IM_NPHYSDIM(ref_im)
+		IM_SECTUSED(im) = IM_SECTUSED(ref_im)
 		call amovl (IM_LEN(ref_im,1), IM_LEN(im,1), IM_MAXDIM)
+		call amovl (IM_PHYSLEN(ref_im,1), IM_PHYSLEN(im,1), IM_MAXDIM)
+		call amovl (IM_SVLEN(ref_im,1), IM_SVLEN(im,1), IM_MAXDIM)
+		call amovl (IM_VMAP(ref_im,1), IM_VMAP(im,1), IM_MAXDIM)
+		call amovl (IM_VOFF(ref_im,1), IM_VOFF(im,1), IM_MAXDIM)
+		call amovl (IM_VSTEP(ref_im,1), IM_VSTEP(im,1), IM_MAXDIM)
+
+		# Tell PMIO to use this image as the reference image.
+		call pm_seti (IM_PL(im), P_REFIM, im)
 
 	    } else if (sv_acmode == NEW_IMAGE || sv_acmode == NEW_COPY) {
 		# If ndim was not explicitly set, compute it by counting the

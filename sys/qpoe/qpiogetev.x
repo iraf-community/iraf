@@ -133,14 +133,16 @@ begin
 	    # a region mask is used.
 
 	    bbmask = IO_BBMASK(io)
+	    if (bbmask != NULL)
+		call plr_close (bbmask)
+
 	    if (IO_IOTYPE(io) == NoINDEX_RMorBB && rmused) {
 		bbmask = plr_open (pl, v, 0)	# (v is never referenced)
 		call plr_setrect (bbmask, IO_VS(io,1),IO_VS(io,2),
 		    IO_VE(io,1),IO_VE(io,2))
 		call plr_getlut (bbmask,
 		    bb_bufp, bb_xsize, bb_ysize, bb_xblock, bb_yblock)
-	    } else if (bbmask != NULL)
-		call plr_close (bbmask)
+	    }
 
 	    # Update the QPIO descriptor.
 	    IO_LINEIO(io)   = btoi(lineio)

@@ -1,4 +1,4 @@
-# Update the generically expanded files in libqpoe.a.
+# Update the generically expanded files in libex.a.
 
 $checkout libex.a lib$
 $update   libex.a
@@ -14,9 +14,15 @@ libex.a:
 	qpaddr.x	../qpoe.h
 	qpadds.x	../qpoe.h
 	qpaddx.x	../qpoe.h
+	qpexattrld.x	../qpex.h <mach.h>
+	qpexattrli.x	../qpex.h <mach.h>
+	qpexattrlr.x	../qpex.h <mach.h>
 	qpexcoded.x	../qpex.h <mach.h>
 	qpexcodei.x	../qpex.h <mach.h>
 	qpexcoder.x	../qpex.h <mach.h>
+	qprlmerged.x	../qpex.h <mach.h>
+	qprlmergei.x	../qpex.h <mach.h>
+	qprlmerger.x	../qpex.h <mach.h>
 	qpexparsed.x	../qpex.h <ctype.h> <mach.h>
 	qpexparsei.x	../qpex.h <ctype.h> <mach.h>
 	qpexparser.x	../qpex.h <ctype.h> <mach.h>

@@ -69,19 +69,21 @@ begin
 	do dim = ndim + 1, IM_MAXDIM
 	    IM_LEN(im,dim) = 1
 
-	temp1 = pixoff + IM_LEN(im,1) * sz_pixel
-	temp2 = temp1
-	call imalign (temp2, lblksize)
+	if (lblksize > 1) {
+	    temp1 = pixoff + IM_LEN(im,1) * sz_pixel
+	    temp2 = temp1
+	    call imalign (temp2, lblksize)
 
-	# Only block lines if the packing density is above a certain threshold.
-	# Alignment is disabled if compress=YES since lblksize will have been
-	# set to 1.
+	    # Only block lines if the packing density is above a certain
+	    # threshold.  Alignment is disabled if compress=YES since lblksize
+	    # will have been set to 1.
 
-	iferr (impkden = envgetr ("impkden"))
-	    impkden = IM_PACKDENSITY
+	    iferr (impkden = envgetr ("impkden"))
+		impkden = IM_PACKDENSITY
 
-	if (real(temp1-pixoff) / real(temp2-pixoff) >= impkden)
-	    IM_PHYSLEN(im,1) = (temp2 - pixoff) / sz_pixel
+	    if (real(temp1-pixoff) / real(temp2-pixoff) >= impkden)
+		IM_PHYSLEN(im,1) = (temp2 - pixoff) / sz_pixel
+	}
 
 	# Set the offsets of the histogram pixels and the bad pixel list.
 	# The HGMOFF offset marks the end of the pixel segment.

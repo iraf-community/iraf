@@ -22,12 +22,14 @@ define	QPOE_PAGESIZE		15	# page size of datafile, bytes
 define	QPOE_PROGBUFLEN		16	# QPEX program buffer length, ints
 define	QPOE_SBUFSIZE		17	# symtab string buf size, chars (init)
 define	QPOE_STABLEN		18	# symtab data area size, su (init)
+define	QPOE_NODEFFILT		19	# disable use of default filter
+define	QPOE_NODEFMASK		20	# disable use of default mask
 
 # QPOE Read-Only Parameters.
-define	QPOE_FM			19	# FMIO descriptor
-define	QPOE_MODE		20	# poefile access mode
-define	QPOE_ST			21	# SYMTAB symbol table descriptor
-define	QPOE_VERSION		22	# QPOE version number
+define	QPOE_FM			21	# FMIO descriptor
+define	QPOE_MODE		22	# poefile access mode
+define	QPOE_ST			23	# SYMTAB symbol table descriptor
+define	QPOE_VERSION		24	# QPOE version number
 
 # Parameter flags (for qp_addf).
 define	QPF_NONE		(-1)	# no flags (0 gives default flags)

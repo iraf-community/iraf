@@ -24,8 +24,9 @@ int	xlen, nranges, n_nranges, level, opcode, ip, i
 pointer	pb_save, db_save, xs_buf, xe_buf, xs, xe, n_xs, n_xe, et, prev
 
 PIXEL	sv_xs[MAX_LEVELS], sv_xe[MAX_LEVELS]
-pointer	sv_lt[MAX_LEVELS], sv_lutx[MAX_LEVELS]
+pointer	sv_lt[MAX_LEVELS], sv_lut[MAX_LEVELS], sv_lutx[MAX_LEVELS]
 int	sv_xp[MAX_LEVELS], sv_nranges[MAX_LEVELS], sv_bin[MAX_LEVELS]
+int	sv_nbins[MAX_LEVELS]
 
 $if (datatype == d)
 double	xoffset, xscale
@@ -45,6 +46,7 @@ define	fp_equal$t($1==$2)
 $endif
 
 $if (datatype == i)
+bool	complement
 int	maskval
 int	qp_ctoi()
 $endif
@@ -59,7 +61,8 @@ define	error_ 91
 define	next_  92
 define	null_  93
 define	resume_ 94
-define	continue_ 95
+define	bbmask_ 95
+define	continue_ 96
 define	XS Mem$t[xs+($1)-1]
 define	XE Mem$t[xe+($1)-1]
 
@@ -97,16 +100,40 @@ begin
 	    # expressions, this case is handled separately.
 
 	    if (ip > 0) {
-		ip = ip + 1
+		complement = false
+		level = 0
 
-		if (qp_ctoi (expr, ip, maskval) < 0) {
-		    call eprintf ("%s: bad bitmask expression `%s'\n")
+		# Parse expression (very limited for this case).
+		for (ip=1;  expr[ip] != EOS;  ip=ip+1) {
+		    switch (expr[ip]) {
+		    case '!':
+			complement = !complement
+		    case '(', '[':
+			level = level + 1
+		    case ')', ']':
+			level = level - 1
+		    case '%':
+			ip = ip + 1
+			if (qp_ctoi (expr, ip, maskval) < 0)
+			    goto bbmask_
+			else
+			    ip = ip - 1
+		    default:
+			goto bbmask_
+		    }
+		}
+
+		# Verify paren level, handle errors.
+		if (level != 0) {
+bbmask_		    call eprintf ("%s: bad bitmask expression `%s'\n")
 			call pargstr (qpexwarn)
 			call pargstr (expr)
 			goto error_
 		}
 
 		# Compile the bitmask test.
+		if (complement)
+		    maskval = not(maskval)
 		if (dtype == TY_SHORT)
 		    call qpex_pbpin (ex, BTTXS, offset, maskval, 0)
 		else
@@ -395,6 +422,8 @@ continue_
 			sv_nranges[level] = nranges
 			sv_lt[level] = lt
 			sv_bin[level] = i
+			sv_nbins[level] = nbins
+			sv_lut[level] = lut
 			sv_lutx[level] = lutx
 
 			# Set up context for the new rangelist.
@@ -426,6 +455,8 @@ resume_
 		nranges = sv_nranges[level]
 		lt = sv_lt[level]
 		bin = sv_bin[level]
+		nbins = sv_nbins[level]
+		lut = sv_lut[level]
 		lutx = sv_lutx[level]
 
 		# Compile a return from subprogram.

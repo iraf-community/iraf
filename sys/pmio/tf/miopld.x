@@ -12,7 +12,11 @@ include	"../mio.h"
 # the function value, or EOF when the region is exhausted.  Once EOF is
 # reached, repeated calls will continue to return EOF until the next call to
 # MIO_SETRANGE.  Repeated calls to MIO_SETRANGE may be used to access a series
-# of distinct regions in the image.
+# of distinct regions in the image.  If a subregion of the image is being
+# accessed with MIO_SETRANGE, the vector coordinates V returned below will
+# be relative to the defined subregion (if this is not what is desired,
+# the range should be set to the full image and a region mask used to mask
+# off the subregion to be accessed).
 
 int procedure mio_plsegd (mp, ptr, mval, v, npix)
 
@@ -22,7 +26,7 @@ int	mval			#O mask value for the output line segment
 long	v[IM_MAXDIM]		#U vector coordinates of first pixel
 int	npix			#O number of pixels in output line segment
 
-int	x1
+int	x1, i
 long	ve[IM_MAXDIM]
 pointer	pm, im, rl, rp, bp
 pointer	impl2d(), impl3d(), impgsd()
@@ -80,10 +84,19 @@ begin
 	M_RLI(mp) = M_RLI(mp) + 1
 
 	x1   = Memi[rp+RL_XOFF]
-	ptr  = bp + x1 - 1
-	v[1] = M_VS(mp,1) + x1 - 1
 	npix = Memi[rp+RL_NOFF]
 	mval = Memi[rp+RL_VOFF]
+	ptr  = bp + x1 - M_VS(mp,1)
+
+	if (M_REGCOORDS(mp) == NO) {
+	    v[1] = x1
+	    do i = 2, M_NDIM(mp)
+		v[i] = M_V(mp,i)
+	} else {
+	    v[1] = x1 - M_VS(mp,1) + 1
+	    do i = 2, M_NDIM(mp)
+		v[i] = M_V(mp,i) - M_VS(mp,i) + 1
+	}
 
 	return (npix)
 end

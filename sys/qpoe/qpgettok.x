@@ -128,6 +128,7 @@ int	maxch			#I max chars out
 pointer	sp, bp, qp, cmd, ibuf, obuf, argbuf, fname, sym, textp
 int	fd, token, level, nargs, nchars, i_fd, o_fd, ftemp
 
+bool	streq()
 pointer	qp_gmsym()
 int	strmac(), open(), stropen()
 int	qp_rawtok(), qp_nexttok(), qp_arglist()
@@ -225,6 +226,15 @@ begin
 		    } else {
 			call eprintf ("macro `%s' called with no arguments\n")
 			    call pargstr (tokbuf)
+		    }
+		}
+
+		# Check for the builtin symbol $DFN, the datafile name.
+		if (tokbuf[1] == '$') {
+		    if (streq (tokbuf, "$DFN")) {
+			call strcpy (QP_DFNAME(qp), tokbuf, maxch)
+			token = TOK_STRING
+			break
 		    }
 		}
 
@@ -482,6 +492,17 @@ again_
 		    ch = getci (fd, ch)
 		} else
 		    token = '+'
+
+	} else if (ch == ':') {
+	    # May be the := operator.
+	    if (getci (fd, ch) != EOF)
+		if (ch == '=') {
+		    token = TOK_COLONEQUALS
+		    outstr[op] = ch
+		    op = op + 1
+		    ch = getci (fd, ch)
+		} else
+		    token = ':'
 
 	} else {
 	    # Other characters.

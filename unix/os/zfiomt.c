@@ -28,6 +28,17 @@
  *
  * 1/4inch cartridge tape and 9 track via the SCSI driver are not supported
  * in this driver.
+ *
+ * ----------------------------------------------------------------------------
+ * Further changes to support Exabyte and HP88780 1/2inch tape drive on SCSI,
+ * both under SunOS 4.1 on Sun 470 and 490.  490 fixes contributed by Skip
+ * Schaller, Steward Obs.  All these "fixes" were required to work around
+ * bugs in the Sun driver - our driver is getting to be quite a kludge as a
+ * result.
+ * ----------------------------------------------------------------------------
+ * Further hacked for SunOS 4.1.1 (there were changes in the Sun magtape driver
+ * between 4.1.0 and 4.1.1).  It is no longer known if this particular version
+ * of the driver will work for other versions of SunOS, or other devices.
  * ----------------------------------------------------------------------------
  */
 
@@ -42,14 +53,24 @@
  */
 
 extern	int errno;
+extern	char *getenv();
 static	int sunos_version = 0;
 static	int mtioctop, mtiocget;		/* need 4.0.3, 4.1 versions	*/
 
+#define	MTDEBUG		"MTDEBUG"	/* define in env. to get debug msgs */
 #define	MAX_ERRIGNORE	10		/* max errs before skiprec	*/
 #define	MAX_ERRCNT	20		/* max errs before EOF		*/
 #define	errcnt		io_flags	/* i/o error count		*/
-#define	KF_ISEXB	01		/* device is Exabyte		*/
-#define	KF_ISRT		02		/* Ciprico Rimfire driver	*/
+#define	KF_ISEXB	001		/* device is Exabyte		*/
+#define	KF_ISHPST	002		/* device is HP88780 on ST	*/
+#define	KF_ISRT		004		/* Ciprico Rimfire driver	*/
+#define	KF_ATEOT	010		/* positioned to EOT		*/
+
+/* The following are used to store/retrieve the current file number in the
+ * flags word.
+ */
+#define KF_FILENO(f)		((f)>>8)
+#define	KF_SETFILE(f,fileno)	f=(((f)&0377)|((fileno)<<8))
 
 #ifndef MTNBSF
 #define	MTNBSF		11
@@ -88,9 +109,52 @@ XINT	*newfile;	/* file to be opened or EOT		*/
 XINT	*oschan;	/* OS channel of opened file		*/
 {
 	int	read_only = 0, write_only = 1;
+	int	flags;
 
 	/* Get magic for ioctls. */
 	mtsunos();
+
+#ifdef sun
+	/* Discard any saved status if the tape has been rewound, or if it
+	 * has been repositioned to a different file than it was set to
+	 * when the status was last saved.
+	 */
+	if (*oldfile <= 1 || (KF_FILENO(mt_getstat((char *)dev)) != *oldfile))
+	    mt_savestat ((char *)dev, 0);
+
+	/* The following is a special case kludge for the HP88780 used with
+	 * the ST driver under SunOS 4.1.  This driver is brain-damaged when
+	 * it comes to appending files and basically all you can do is
+	 * open-write-close, open-write-close etc.  Any file positioning
+	 * operations other than rewind, or any extra opens will mess things
+	 * up, causing EOT to fail to be written or causing false EOTs to
+	 * be written between files.  To avoid these problems merely open
+	 * for writing and begin writing, if we are appending a file and
+	 * are already positioned to EOT.
+	 *
+	 * In SunOS 4.1.1, the ST driver will runaway when the EOM ioctl is
+	 * issued when the tape is opened already positoned to EOT, hence it
+	 * is necessary to avoid any file positioning for the Exabyte under
+	 * the ST driver as well.  (1/5/91)
+	 */
+	if ((flags = mt_getstat((char *)dev)) &&
+	    (flags & KF_ISHPST) || ((flags & KF_ISEXB) && !(flags & KF_ISRT))) {
+
+	    if (*acmode == WRITE_ONLY && *newfile < 0 && (flags & KF_ATEOT)) {
+		if (getenv (MTDEBUG))
+		    fprintf (stderr, "already at EOT\n");
+		*oschan = zzopenmt ((char *)dev, write_only);
+		if (*oschan == ERR)
+		    *oschan = XERR;
+		else {
+		    *newfile = *oldfile;
+		    zfd[*oschan].errcnt = 0;
+		}
+		KF_SETFILE(zfd[*oschan].flags,*newfile);
+		return;
+	    }
+	}
+#endif
 
 	/* Position to the desired file.  Open the tape read-only for
 	 * positioning, so that an interrupt occurring while seeking to EOT
@@ -104,14 +168,16 @@ XINT	*oschan;	/* OS channel of opened file		*/
 	    *oschan = XERR;
 	    return;
 	} else if (*oschan >= MAXOFILES) {
-	    close ((int)*oschan);
+	    KF_SETFILE(zfd[*oschan].flags,0);
+	    zzclosemt ((int)*oschan);
 	    *oschan = XERR;
 	    return;
 	}
 
 	/* Physically position the tape. */
 	if (zzposmt_ (oschan, oldrec, oldfile, newfile) == XERR) {
-	    close ((int)*oschan);
+	    KF_SETFILE(zfd[*oschan].flags,0);
+	    zzclosemt ((int)*oschan);
 	    *oschan = XERR;
 	    return;
 	}
@@ -120,9 +186,18 @@ XINT	*oschan;	/* OS channel of opened file		*/
 	 */
 	switch (*acmode) {
 	case READ_ONLY:
+#ifdef sun
+	    /* The following is a kludge for SunOS 4.1; evidently needed
+	     * to synchronize after a rewind.
+	     */
+	    KF_SETFILE(zfd[*oschan].flags,*newfile);
+	    zzclosemt ((int)*oschan);
+	    *oschan = zzopenmt ((char *)dev, read_only);
+#endif
 	    break;
 	case WRITE_ONLY:
-	    close ((int)*oschan);
+	    KF_SETFILE(zfd[*oschan].flags,*newfile);
+	    zzclosemt ((int)*oschan);
 	    *oschan = zzopenmt ((char *)dev, write_only);
 	    if (*oschan == ERR)
 		*oschan = XERR;
@@ -132,12 +207,12 @@ XINT	*oschan;	/* OS channel of opened file		*/
 	}
 
 	zfd[*oschan].errcnt = 0;
+	KF_SETFILE(zfd[*oschan].flags,*newfile);
 }
 
 
 /* ZZCLMT -- Close magtape.  Write a new EOT mark at the current position
- * if so indicated.  UNIX always writes an EOT mark when a tape opened for
- * writing is closed, so we ignore the access mode argument here.
+ * if so indicated.
  */
 ZZCLMT (oschan, access_mode, nrecords, nfiles, status)
 XINT	*oschan;
@@ -146,7 +221,14 @@ XINT	*nrecords;
 XINT	*nfiles;
 XINT	*status;
 {
-	*status = (close ((int)*oschan) == ERR) ? XERR : XOK;
+	int	fd = *oschan;
+
+	if (*access_mode == WRITE_ONLY) {
+	    zfd[fd].flags |= KF_ATEOT;
+	    KF_SETFILE(zfd[fd].flags,KF_FILENO(zfd[fd].flags)+1);
+	}
+
+	*status = (zzclosemt(fd) == ERR) ? XERR : XOK;
 	*nfiles = (*access_mode == WRITE_ONLY) ? 1 : 0;
 	*nrecords = 0;
 }
@@ -234,6 +316,8 @@ register XINT	*bytecount;
 		/* if fpos=0 we are at EOT. */
 		if (zfd[fd].fpos > 0)
 		    *nfiles = 1;
+		else
+		    zfd[fd].flags |= KF_ATEOT;
 	    } else {					/* record rd/wr	*/
 		*nrecords = 1;
 		zfd[fd].fpos += nb;
@@ -247,11 +331,17 @@ register XINT	*bytecount;
 		int      nf = 1;
 		if (zzfbmt_ (oschan, &nf, &status) == XERR)
 		    nb = XERR;
-	    } else					/* record rd/wr	*/
+		if (zfd[fd].fpos == 0)
+		    zfd[fd].flags |= KF_ATEOT;
+	    } else {					/* record rd/wr	*/
 		*nrecords = 1;
+		zfd[fd].fpos += nb;
+	    }
 	}
 
 	*bytecount = nb;
+	if (*nfiles)
+	    KF_SETFILE(zfd[fd].flags,KF_FILENO(zfd[fd].flags)+1);
 }
 
 
@@ -274,7 +364,7 @@ XINT	*status;
 	else if ((*status = zzrewindmt (oschan)) == ERR)
 	    *status = XERR;
 	else
-	    close (oschan);
+	    zzclosemt (oschan);
 }
 
 
@@ -291,8 +381,8 @@ zzopenmt (dev, acmode)
 char	*dev;		/* device name or pathname		*/
 int	acmode;		/* read_only or write_only for tapes	*/
 {
+	register int fd, flags;
 	char	path[SZ_PATHNAME+1];
-	int	fd;
 
 	/* If the device name is already a pathname leave it alone, else
 	 * prepend the /dev/ prefix.
@@ -305,6 +395,8 @@ int	acmode;		/* read_only or write_only for tapes	*/
 
 	zfd[fd].flags = 0;
 	zfd[fd].fpos = 0;
+	zfd[fd].fp = (FILE *) malloc (strlen(path)+1);
+	strcpy ((char *)zfd[fd].fp, path);
 
 	/* Determine the tape type.  This version of the driver supports
 	 * 1/2inch (Pertek style) drives, and Exabyte.  Sun/OS dependent.
@@ -315,6 +407,8 @@ int	acmode;		/* read_only or write_only for tapes	*/
 
 	    if ((ioctl(fd,mtiocget,&mt) != -1) && mt.mt_type == MT_ISEXABYTE)
 		zfd[fd].flags |= KF_ISEXB;
+	    else if (mt.mt_type == MT_ISHP)
+		zfd[fd].flags |= KF_ISHPST;
 
 	    /* Test for Ciprico driver (/dev/nrrtN) instead of Sun SCSI
 	     * driver (/dev/nrstN).  This kludge does not pretend to support
@@ -327,7 +421,27 @@ int	acmode;		/* read_only or write_only for tapes	*/
 		zfd[fd].flags |= KF_ISRT;
 	}
 #endif
+	flags = mt_getstat ((char *)zfd[fd].fp);
+	if (flags & KF_ATEOT)
+	    zfd[fd].flags |= KF_ATEOT;
+	KF_SETFILE(zfd[fd].flags,KF_FILENO(flags));
+
 	return (fd);
+}
+
+
+/* ZZCLOSEMT -- Close the magtape device.
+ */
+zzclosemt (oschan)
+int	oschan;
+{
+	if (getenv (MTDEBUG))
+	    fprintf (stderr,
+		"close at file %d\n", KF_FILENO(zfd[oschan].flags));
+
+	mt_savestat ((char *)zfd[oschan].fp, zfd[oschan].flags);
+	free ((char *)zfd[oschan].fp);
+	return (close (oschan));
 }
 
 
@@ -339,6 +453,12 @@ zzrewindmt (oschan)
 int	oschan;
 {
 	static	struct mtop mt_rewind = { MTREW, 1 };
+
+	if (getenv (MTDEBUG))
+	    fprintf (stderr, "rewind %s\n", (char *)zfd[oschan].fp);
+
+	/* Keep track of where we are. */
+	KF_SETFILE(zfd[oschan].flags,1);
 
 	/* NOSTRICT */
 	return (ioctl (oschan, mtioctop, (char *)&mt_rewind));
@@ -356,19 +476,29 @@ XINT	*newfile;
 {
 	register int new, old, rec;
 	int	flags = zfd[*oschan].flags;
-	XINT	status;
+	XINT	status = XOK;
 
 	new = *newfile;
 	old = *oldfile;
 	rec = *oldrec;
+
+	if (getenv (MTDEBUG)) {
+	    if (new < 0)
+		fprintf (stderr, "position to EOT\n");
+	    else
+		fprintf (stderr, "position to file %d\n", new);
+	}
 
 	if (new == 0) {					/* do not move tape */
 	    status = XOK;
 
 	} else if (new == 1) {				/* rewind tape */
 	    status = (zzrewindmt ((int)*oschan) == ERR) ? XERR : XOK;
+	    zfd[*oschan].flags &= ~KF_ATEOT;
 
 	} else if (new > 1 && new <= old) {		/* backspace file */
+	    if (new < old || rec > 1)
+		zfd[*oschan].flags &= ~KF_ATEOT;
 #ifdef sun
 	    if ((flags & KF_ISEXB) && !(flags & KF_ISRT)) {
 		/* Under SunOS 4.0.3, the Exabyte (actually the st driver)
@@ -389,7 +519,7 @@ XINT	*newfile;
 		    if (ioctl (*oschan, mtiocget, &mt) != ERR)
 			if (mt.mt_fileno < nf || mt.mt_fileno == 1 && nf == 1) {
 			    zzrewindmt ((int)*oschan);
-			    old = 1;
+			    old = rec = 1;
 			    goto fwd;
 			}
 
@@ -406,6 +536,11 @@ XINT	*newfile;
 		    mt.mt_count = nf;
 		    status = ((ioctl(*oschan,mtioctop,&mt)) == -1) ? XERR:XOK;
 		}
+	    } else if ((flags & KF_ISHPST) && (flags & KF_ATEOT)) {
+		zzrewindmt (*oschan);
+		zfd[*oschan].flags &= ~KF_ATEOT;
+		old = rec = 1;
+		goto fwd;
 	    } else
 #endif
 	    {
@@ -417,8 +552,14 @@ XINT	*newfile;
 		    zzrfmt_ (oschan, &status);
 	    }
 #ifdef sun
-	} else if ((flags & KF_ISEXB) && !(flags & KF_ISRT) && new < 0) {
-	    /* Position to EOT on Exabyte. */
+#ifdef SUNOS403
+	} else if ((flags & (KF_ISEXB|KF_ISHPST)) && !(flags & KF_ISRT)
+	    && new < 0) {
+#else
+	} else if ((flags & KF_ISHPST) && new < 0) {
+#endif
+
+	    /* Position to EOT on Exabyte or SCSI/HP using MTEOM ioctl. */
 	    struct  x_mtget omt, nmt;
 	    struct  mtop mteom;
 
@@ -427,6 +568,7 @@ XINT	*newfile;
 	    mteom.mt_count = 0;
 	    if (ioctl ((int)*oschan, mtioctop, (char *)&mteom) == ERR)
 		status = XERR;
+
 	    ioctl (*oschan, mtiocget, &nmt);
 	    *newfile = old + nmt.mt_fileno - omt.mt_fileno;
 	    rec = 1;
@@ -490,7 +632,7 @@ fwd:	    /* EOT is flagged as new < 0.
 	    }
 	    *newfile = old;
 	}
-
+done:
 	if (status == XERR)
 	    *newfile = XERR;
 
@@ -526,7 +668,11 @@ XINT	*status;
 {
 	register int	nb;
 #ifdef sun
-	char	buf[65535];
+	/* The 4/490 st driver complains about odd byte DMA, so let's super
+	 * align everything.  [fix contrib. by Skip Schaller, Steward Obs.]
+	 */
+	long	lbuf[65532/sizeof(long)];
+	char	*buf = (char *)lbuf;
 #else
 	char	buf[29184];
 #endif
@@ -546,7 +692,7 @@ XINT	*status;
 	buf[0] = 0;
 
 #ifdef sun
-	nb = read ((int)*oschan, buf, 65535);
+	nb = read ((int)*oschan, buf, 65532);
 #else
 	nb = read ((int)*oschan, buf, 29184);
 #endif
@@ -694,4 +840,76 @@ set_sunos_version()
 	}
 done:
 	return (sunos_version);
+}
+
+
+#define	NSAVE	5
+struct	sv {
+	int	flags;
+	char	sv_dev[SZ_FNAME];
+};
+static	struct sv svv[NSAVE];
+static	int svnext;
+
+/* MT_SAVESTAT, MT_GETSTAT -- This is a kludge to save the ATEOT flag
+ * over a close, which frees the runtime descriptor.
+ */
+mt_getstat (device)
+char	*device;
+{
+	register int	i;
+	register struct sv *sp;
+	char	path[SZ_FNAME];
+
+	strcpy (path, (*device == '/') ? "" : "/dev/");
+	strcat (path, device);
+
+	for (i=0;  i < NSAVE;  i++) {
+	    sp = &svv[i];
+	    if (sp->sv_dev[0] && strcmp (path, sp->sv_dev) == 0)
+		return (sp->flags);
+	}
+
+	return (0);
+}
+
+mt_savestat (device, flags)
+char	*device;
+int	flags;
+{
+	register int	i;
+	register struct sv *sp;
+	char	path[SZ_FNAME];
+
+	strcpy (path, (*device == '/') ? "" : "/dev/");
+	strcat (path, device);
+
+	/* Update existing device entry if there is one. */
+	for (i=0;  i < NSAVE;  i++) {
+	    sp = &svv[i];
+	    if (sp->sv_dev[0] && strcmp (path, sp->sv_dev) == 0) {
+		sp->flags = flags;
+		return;
+	    }
+	}
+
+	/* Allocate a new slot. */
+	if (++svnext >= NSAVE)
+	    svnext = 0;
+	sp = &svv[svnext];
+	strcpy (sp->sv_dev, path);
+	sp->flags = flags;
+}
+
+
+/* PSTAT -- Print file position (debug routine).
+ */
+Pstat(fd)
+int	fd;
+{
+	struct  x_mtget mt;
+
+	if (ioctl (fd, mtiocget, &mt) != ERR)
+	    fprintf (stderr, "file=%d, record=%d\n",
+		mt.mt_fileno, mt.mt_blkno);
 }

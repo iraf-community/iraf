@@ -20,10 +20,10 @@ begin
 	call salloc (kwname, SZ_FNAME, TY_CHAR)
 
 	# Look the string up in the dictionary of standard keywords.  Note that
-	# the "i_" prefix is omitted in the dictionary.  Minimum match abbrev.
-	# are permitted.  The order of the keywords in the dictionary must
-	# agree with the defined codes in the header file.  A standard keyword
-	# is recognized with or without the "i_" prefix.
+	# the "i_" prefix is omitted in the dictionary.  The order of the
+	# keywords in the dictionary must agree with the defined codes in the
+	# header file.  A standard keyword is recognized with or without the
+	# "i_" prefix.
 
 	if (key[1] == 'i' && key[2] == '_')
 	    ip = 3
@@ -34,7 +34,7 @@ begin
 	if (key[ip] == 'n')
 	    if (strncmp (key[ip], "naxis", 5) == 0) {
 		ch = key[ip+5]
-		if (ch == EOS || IS_DIGIT(ch))
+		if (ch == EOS || (IS_DIGIT(ch) && key[ip+6] == EOS))
 		    return (7)
 	    }
 

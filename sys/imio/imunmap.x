@@ -1,8 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<syserr.h>
-include	<error.h>
-include	<plset.h>
 include	<imhdr.h>
 include	<imio.h>
 
@@ -13,12 +11,10 @@ procedure imunmap (im)
 
 pointer	im
 
-pointer	pl
-int	acmode, flags
-errchk	imflush, close, imerr, iki_updhdr, pl_savef
+int	acmode
+errchk	imflush, close, imerr, iki_updhdr
 
 begin
-	pl = IM_PL(im)
 	acmode = IM_ACMODE(im)
 
 	# Note that if no pixel i/o occurred, the pixel storage file will
@@ -47,24 +43,11 @@ begin
 	    }
 
 	    # Update the image header or mask storage file.
-	    if (pl == NULL)
-		call iki_updhdr (im)
-	    else {
-		flags = 0
-		if (acmode == READ_WRITE)
-		    flags = PL_UPDATE
-		call pl_savef (IM_PL(im), IM_NAME(im), IM_TITLE(im), flags)
-	    }
+	    call iki_updhdr (im)
 	}
 
 	# Physically close the image.
-	if (IM_PL(im) != NULL) {
-	    if (IM_PFD(im) != NULL)
-		call close (IM_PFD(im))
-	    if (and (IM_PLFLAGS(im), PL_CLOSEPL) != 0)
-		call pl_close (IM_PL(im))
-	} else
-	    call iki_close (im)
+	call iki_close (im)
 
 	# Free all buffer space allocated by IMIO.
 	call imrmbufs (im)

@@ -15,25 +15,12 @@ char	key[ARB]		# parameter to be set
 
 pointer	rp
 int	ch, ip
-int	idb_findrecord(), idb_kwlookup(), strncmp()
+int	idb_findrecord(), idb_kwlookup()
 errchk	syserrs
 
 begin
-	# A standard keyword is recognized with or without the "i_" prefix.
-	if (key[1] == 'i' && key[2] == '_')
-	    ip = 3
-	else
-	    ip = 1
-
-	# The standard header keywords "naxis1", "naxis2", etc. are treated
-	# as a special case.
-
-	if (strncmp (key[ip], "naxis", 5) == 0)
-	    return (TY_LONG)
-
-	# Handle the standard header keywords.
-
-	switch (idb_kwlookup (key[ip])) {
+	# Check for a standard header keyword.
+	switch (idb_kwlookup (key)) {
 	case I_CTIME:
 	    return (TY_LONG)
 	case I_HISTORY:
@@ -59,7 +46,7 @@ begin
 	# If we get here then the named parameter is not a standard header
 	# keyword.
 
-	if (idb_findrecord (im, key[ip], rp) > 0) {
+	if (idb_findrecord (im, key, rp) > 0) {
 	    # Check for boolean field.
 	    ch = Memc[rp+IDB_ENDVALUE-1]
 	    if (ch == 'T' || ch == 'F')

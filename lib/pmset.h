@@ -9,12 +9,13 @@ define	P_REFIM		P_PRIVATE1
 define	P_MAPXY		P_PRIVATE2
 
 # MIO parameter codes.
-define	P_PMDES		1
-define	P_IMDES		2
+define	P_PMDES		1		# PMIO descriptor
+define	P_IMDES		2		# IMIO descriptor
+define	P_REGCOORDS	3		# mio_setrange region relative coords
 
 # IMPLMAP flags.
-define	BOOLEAN_MASK	100B			# convert mask to boolean
-define	INVERT_MASK	200B			# invert a mask (PIX_NOT)
+define	BOOLEAN_MASK	100B		# convert mask to boolean
+define	INVERT_MASK	200B		# invert a mask (PIX_NOT)
 
 # The following routines are identical in both the PMIO and PLIO packages.
 define	pm_close	pl_close

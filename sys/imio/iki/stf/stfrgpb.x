@@ -35,6 +35,7 @@ real	imgetr()
 
 string	readerr "cannot read group data block - no such group?"
 string	badtype "illegal group data parameter datatype"
+string	nogroup "group index out of range"
 define	minmax_ 91
 
 begin
@@ -43,6 +44,10 @@ begin
 
 	stf = IM_KDES(im)
 	pfd = STF_PFD(stf)
+
+	# Verify that the given group exists.
+	if (group < 1 || group > STF_GCOUNT(stf))
+	    call error (1, nogroup)
 
 	# Skip ahead if there is no group parameter block.
 	if (STF_PSIZE(stf) == 0)

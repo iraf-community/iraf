@@ -6,7 +6,7 @@ chmod		4755 alloc.e
 mv -f		alloc.e ../hlib
 rm		alloc.o
 
-cc -c $HSI_CF	../as/zsvjmp.s [b-z]*.c
+cc -c $HSI_CF	../as/zsvjmp.s gmttolst.c irafpath.c prwait.c z*.c
 ar rv		libos.a *.o; ar dv libos.a zmain.o; rm *.o
 ranlib		libos.a
 mv -f		libos.a ../bin

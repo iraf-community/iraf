@@ -6,7 +6,6 @@ include	<imhdr.h>
 include	<qpexset.h>
 include	<qpioset.h>
 include	<qpset.h>
-include	<qpset.h>
 include	<gset.h>
 include	"qpoe.h"
 include	"qpex.h"
@@ -26,15 +25,21 @@ task	parsei		= t_parsei,	# parse integer range list
 	hlist		= t_hlist,	# list file header
 	dumpevl		= t_dumpevl,	# dump event list descriptor
 	mkpoe		= t_mkpoe,	# convert CFA poefile to QPOE poefile
+	testpoe		= t_testpoe,	# make a test QPOE file
 	countpoe	= t_countpoe,	# count photons in regions
+	tfilter		= t_tfilter,	# verify time filtering
 	plotpoe		= t_plotpoe,	# read and plot photons
 	sum		= t_sum,	# sum counts in an image section
 	setwcs		= t_setwcs,	# store a wcs in a qpoe file
+	setmask		= t_setmask,	# set the default mask
+	mergei		= t_mergei,	# test merging of range lists
 	clear		= t_clear	# clear the screen
 
 define	SZ_EXPR		256
 define	SZ_OBUF		1024
 define	SZ_TBUF		8
+define	MAX_EVENTS	8192
+define	SZ_RLBUF	512
 
 
 # PARSEI -- Test integer range list decoding and expression optimization.
@@ -192,6 +197,8 @@ begin
 		    call pargstr ("COMMAND")
 		case TOK_PLUSEQUALS:
 		    call pargstr ("PLUSEQ")
+		case TOK_COLONEQUALS:
+		    call pargstr ("COLONEQ")
 		default:
 		    junk = gltoc (token, num, SZ_FNAME, 8)
 		    call pargstr (num)
@@ -427,15 +434,19 @@ pointer	qp, list, sym
 int	nelem, maxelem, flags
 char	datatype[SZ_DATATYPE], comment[SZ_COMMENT]
 char	fname[SZ_FNAME], param[SZ_FNAME], pattern[SZ_FNAME]
-pointer	qp_open(), qp_ofnlu(), qp_gpsym()
+pointer	qp_open(), qp_ofnlu(), qp_ofnls(), qp_gpsym()
 int	qp_queryf(), qp_gnfn()
+bool	clgetb()
 
 begin
 	call clgstr ("fname", fname, SZ_FNAME)
 	call clgstr ("pattern", pattern, SZ_FNAME)
-
+	
 	qp = qp_open (fname, READ_ONLY, 0)
-	list = qp_ofnlu (qp, pattern)
+	if (clgetb ("sort"))
+	    list = qp_ofnls (qp, pattern)
+	else
+	    list = qp_ofnlu (qp, pattern)
 
 	call printf ("          PARAM  DTYPE NELEM MAXEL LF OFF FLG COMMENT\n")
 	while (qp_gnfn (list, param, SZ_FNAME) != EOF) {
@@ -447,10 +458,17 @@ begin
 		call pargstr (datatype)
 		call pargi (nelem)
 		call pargi (maxelem)
-		call pargi (S_LFILE(sym))
-		call pargi (S_OFFSET(sym))
-		call pargi (and (flags, 777B))
-		call pargstr (comment)
+		if (sym != NULL) {
+		    call pargi (S_LFILE(sym))
+		    call pargi (S_OFFSET(sym))
+		    call pargi (and (flags, 777B))
+		    call pargstr (comment)
+		} else {
+		    call pargi (0)
+		    call pargi (0)
+		    call pargi (0)
+		    call pargstr ("[could not find symbol (macro?)]")
+		}
 	}
 
 	call qp_cfnl (list)
@@ -629,6 +647,7 @@ define	LEN_CVBUF	1000		# max number of mask regions
 define	SZ_KEY		20
 
 # CFA Poefile definitions.
+define	SZ_EVENT	SZ_OEVENT
 define	SZ_IEVENT	10		# size of input event struct, chars
 define	SZ_OEVENT	12		# size of output event struct, chars
 define	SZ_FILEHEADER	256		# size of file header, chars
@@ -665,13 +684,13 @@ define	T_DY		TY_SHORT
 
 # The event struct to be stored in the QPOE file.
 define	EVTYPE		"event"
-define	FIELDLIST	"{d,s:x,s:y,s,s,s,s}"
+define	FIELDLIST	"{s:x,s:y,s,s,d,s,s}"
 
-define	EV_TIME		Memd[($1-1)/SZ_DOUBLE+1]
-define	EV_X		Mems[$1+4]
-define	EV_Y		Mems[$1+5]
-define	EV_PHA		Mems[$1+6]
-define	EV_PI		Mems[$1+7]
+define	EV_X		Mems[$1]
+define	EV_Y		Mems[$1+1]
+define	EV_PHA		Mems[$1+2]
+define	EV_PI		Mems[$1+3]
+define	EV_TIME		Memd[($1+4-1)/SZ_DOUBLE+1]
 define	EV_DX		Mems[$1+8]
 define	EV_DY		Mems[$1+9]
 
@@ -774,8 +793,7 @@ begin
 	call qp_puti (qp, "instrument", instrument)
 
 	# Define the event structure for the QPOE output file.
-	call qp_addf (qp, "event", "{d,s:x,s:y,s,s,s,s}", 1,
-	    "event record type", 0)
+	call qp_addf (qp, EVTYPE, FIELDLIST, 1, "event record type", 0)
 
 	# Copy the event (photon) list.
 	call qp_addf (qp, "events", "event", 0, "main event list", 0)
@@ -913,6 +931,70 @@ begin
 end
 
 
+# TESTPOE -- Make a test QPOE file, generating an artificial sequence of
+# events (for testing special cases).  The event list is not sorted or
+# indexed.
+
+procedure t_testpoe()
+
+char	outfile[SZ_FNAME]		# output QPOE-format poefile
+
+pointer	sp, ev, qp, io, evl[1]
+int	nevents, naxes, axlen[2], i
+pointer	qp_open(), qpio_open()
+int	clgeti()
+
+begin
+	call smark (sp)
+	call salloc (ev, SZ_EVENT / SZ_SHORT, TY_SHORT)
+
+	# Open the output file.
+	call clgstr ("outfile", outfile, SZ_FNAME)
+	iferr (call qp_delete (outfile))
+	    ;
+	qp = qp_open (outfile, NEW_FILE, NULL)
+
+	naxes = 2
+	axlen[1] = 1024
+	axlen[2] = 1024
+
+	# Setup the QPOE file header.
+	call qp_addf (qp, "naxes", "i", 1, "number of image axes", 0)
+	call qp_puti (qp, "naxes", naxes)
+	call qp_addf (qp, "axlen", "i", 2, "length of each axis", 0)
+	call qp_write (qp, "axlen", axlen, 2, 1, "i")
+
+	# Define the event structure for the QPOE output file.
+	call qp_addf (qp, EVTYPE, FIELDLIST, 1, "event record type", 0)
+
+	# Copy the event (photon) list.
+	call qp_addf (qp, "events", "event", 0, "main event list", 0)
+	io = qpio_open (qp, "events", NEW_FILE)
+
+	# Generate some dummy events.
+	nevents = clgeti ("nevents")
+	evl[1] = ev
+
+	# Hack this to generate different types of test files.
+	do i = 1, nevents {
+	    EV_TIME(ev) = 1.0D0 + double(i) / 10.0D0
+	    EV_X(ev)    = (i - 1) * 10 + 1
+	    EV_Y(ev)    = (i - 1) * 10 + 1
+	    EV_PHA(ev)  = mod (nint(i * 11.1111), 20)
+	    EV_PI(ev)   = i / 2
+	    EV_DX(ev)   = nevents - i + 1
+	    EV_DY(ev)   = nevents - i + 1
+
+	    call qpio_putevents (io, evl, 1)
+	}
+
+	# Clean up.
+	call qpio_close (io)
+	call qp_close (qp)
+	call sfree (sp)
+end
+
+
 # COUNTPOE -- Count photons in regions.  Whether or not there are any regions
 # depends upon whether the user specifies a region mask, or upon whether the
 # image has a default mask.   If there is no mask the entire image is counted.
@@ -996,6 +1078,204 @@ begin
 	call printf ("\n")
 
 	call qp_close (qp)
+	call sfree (sp)
+end
+
+
+# TFILTER -- Perform a brute force time filtering operation upon an event
+# list, and compare against the results of a standard QPEX time filter.
+# This is used to verify the operation of the optimized QPEX time filter.
+
+procedure t_tfilter()
+
+bool	open_left, open_right, pass
+int	nev1, nev2, totev, mval, nev, xlen, nranges, fd1, fd2, i, j
+pointer	sp, poefile, filter, output, fname, evl, x1, y1, t1, x2, y2, t2
+pointer	qp, io, ex, ev, xs, xe
+double	t
+
+bool	clgetb()
+int	qpio_getevents(), qpex_attrld(), open()
+pointer	qp_open(), qpio_open(), qpex_open()
+
+begin
+	call smark (sp)
+	call salloc (poefile, SZ_FNAME, TY_CHAR)
+	call salloc (output, SZ_FNAME, TY_CHAR)
+	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (filter, SZ_EXPR, TY_CHAR)
+	call salloc (evl, LEN_EVBUF, TY_POINTER)
+
+	call salloc (x1, MAX_EVENTS, TY_SHORT)
+	call salloc (y1, MAX_EVENTS, TY_SHORT)
+	call salloc (t1, MAX_EVENTS, TY_DOUBLE)
+	call salloc (x2, MAX_EVENTS, TY_SHORT)
+	call salloc (y2, MAX_EVENTS, TY_SHORT)
+	call salloc (t2, MAX_EVENTS, TY_DOUBLE)
+
+	nev1 = 0
+	nev2 = 0
+	totev = 0
+
+	call clgstr ("poefile", Memc[poefile], SZ_FNAME)
+	qp = qp_open (Memc[poefile], READ_ONLY, NULL)
+	io = qpio_open (qp, "", READ_ONLY)
+
+	call clgstr ("filter", Memc[filter], SZ_EXPR)
+	ex = qpex_open (qp, Memc[filter])
+
+	call clgstr ("output", Memc[output], SZ_FNAME)
+
+	if (clgetb ("showfilter")) {
+	    call qpex_debug (ex, STDOUT, QPEXD_SHOWALL)
+	    call flush (STDOUT)
+	}
+
+	# Scan the event list using the given filter.
+	call printf ("scan event list using optimized filter: ")
+	call flush (STDOUT)
+
+	call qpio_seti (io, QPIO_EX, ex)
+	while (qpio_getevents (io, Memi[evl], mval, LEN_EVBUF, nev) != EOF) {
+call fprintf ("nev = %d\n"); call pargi (nev)
+	    do i = 1, nev {
+		ev = Memi[evl+i-1]
+		Mems[x1+nev1] = EV_X(ev)
+		Mems[y1+nev1] = EV_Y(ev)
+		Memd[t1+nev1] = EV_TIME(ev)
+		nev1 = min (MAX_EVENTS, nev1 + 1)
+	    }
+	}
+
+	call printf ("%d events\n")
+	    call pargi (nev1)
+	xlen = 128
+	call malloc (xs, TY_DOUBLE, xlen)
+	call malloc (xe, TY_DOUBLE, xlen)
+
+	# Get the time filter as a list of ranges.
+	xs = NULL;  xe = NULL;  xlen = 0
+	nranges = qpex_attrld (ex, "time", xs, xe, xlen)
+	if (nranges > 0) {
+	    open_left = IS_INDEF(Memd[xs])
+	    open_right = IS_INDEF(Memd[xe+nranges-1])
+	} else {
+	    open_left = false
+	    open_right = false
+	}
+
+	# Scan the event list, applying a brute force time filter.
+	call qpio_seti (io, QPIO_EX, NULL)
+	call printf ("scan event list using brute force filter: ")
+	call flush (STDOUT)
+
+	while (qpio_getevents (io, Memi[evl], mval, LEN_EVBUF, nev) != EOF) {
+	    do i = 1, nev {
+		ev = Memi[evl+i-1]
+		t = EV_TIME(ev)
+
+		# Apply the time filter.
+		if (open_left && open_right && nranges == 1)
+		    pass = true
+		else {
+		    pass = false
+		    do j = 1, nranges {
+			if (j == 1 && open_left) {
+			    if (t <= Memd[xe]) {
+				pass = true
+				break
+			    }
+			} else if (j == nranges && open_right) {
+			    if (t >= Memd[xs+nranges-1]) {
+				pass = true
+				break
+			    }
+			} else if (t >= Memd[xs+j-1] && t <= Memd[xe+j-1]) {
+			    pass = true
+			    break
+			}
+		    }
+		}
+
+		if (pass) {
+		    Mems[x2+nev2] = EV_X(ev)
+		    Mems[y2+nev2] = EV_Y(ev)
+		    Memd[t2+nev2] = EV_TIME(ev)
+		    nev2 = min (MAX_EVENTS, nev2 + 1)
+		}
+	    }
+
+	    totev = totev + nev
+	}
+
+	call printf ("%d events\n")
+	    call pargi (nev2)
+	call printf ("out of a total of %d events\n")
+	    call pargi (totev)
+	call flush (STDOUT)
+
+	# Dump the two event lists if an output root filename was given.
+	if (Memc[output] != EOS) {
+	    call sprintf (Memc[fname], SZ_FNAME, "%s.1")
+		call pargstr (Memc[output])
+	    iferr (call delete (Memc[fname]))
+		;
+	    fd1 = open (Memc[fname], NEW_FILE, TEXT_FILE)
+
+	    call sprintf (Memc[fname], SZ_FNAME, "%s.2")
+		call pargstr (Memc[output])
+	    iferr (call delete (Memc[fname]))
+		;
+	    fd2 = open (Memc[fname], NEW_FILE, TEXT_FILE)
+
+	    do i = 1, max (nev1, nev2) {
+		if (i <= nev1) {
+		    call fprintf (fd1, "%d %d %g\n")
+			call pargs (Mems[x1+i-1])
+			call pargs (Mems[y1+i-1])
+			call pargd (Memd[t1+i-1])
+		}
+		if (i <= nev2) {
+		    call fprintf (fd2, "%d %d %g\n")
+			call pargs (Mems[x2+i-1])
+			call pargs (Mems[y2+i-1])
+			call pargd (Memd[t2+i-1])
+		}
+	    }
+
+	    call close (fd1)
+	    call close (fd2)
+	}
+
+	# Compare the results of the two filters for equality.
+	pass = true
+	do i = 1, min (nev1, nev2) {
+	    if (Mems[x1+i-1] != Mems[x2+i-1] || Mems[y1+i-1] != Mems[y2+i-1]) {
+		call printf ("bad compare at event %d: ")
+		    call pargi (i)
+		call printf ("[%d,%d,%0.4f] != [%d,%d,%0.4f]\n")
+		    call pargs (Mems[x1+i-1])
+		    call pargs (Mems[y1+i-1])
+		    call pargd (Memd[t1+i-1])
+		    call pargs (Mems[x2+i-1])
+		    call pargs (Mems[y2+i-1])
+		    call pargd (Memd[t2+i-1])
+		pass = false
+		break
+	    }
+	}
+
+	if (pass) {
+	    call printf ("first %d events are identical\n")
+		call pargi (min (nev1, nev2))
+	}
+
+	call mfree (xs, TY_DOUBLE)
+	call mfree (xe, TY_DOUBLE)
+	call qpex_close (ex)
+	call qpio_close (io)
+	call qp_close (qp)
+
 	call sfree (sp)
 end
 
@@ -1111,6 +1391,168 @@ begin
 
 	call mw_close (mw)
 	call qp_close (qp)
+end
+
+
+# SETFILT -- Set the default filter in a QPOE file.
+
+procedure t_setfilt()
+
+pointer	qp
+char	poefile[SZ_FNAME]
+char	filter[SZ_LINE]
+pointer	qp_open()
+
+begin
+	call clgstr ("poefile", poefile, SZ_FNAME)
+	qp = qp_open (poefile, READ_WRITE, 0)
+
+	call clgstr ("deffilt", filter, SZ_LINE)
+	call qp_astr (qp, "deffilt", filter, "default filter")
+
+	call qp_close (qp)
+end
+
+
+# SETMASK -- Set the default mask in a QPOE file.
+
+procedure t_setmask()
+
+pointer	qp
+char	poefile[SZ_FNAME]
+char	mask[SZ_LINE]
+pointer	qp_open()
+
+begin
+	call clgstr ("poefile", poefile, SZ_FNAME)
+	qp = qp_open (poefile, READ_WRITE, 0)
+
+	call clgstr ("defmask", mask, SZ_LINE)
+	call qp_astr (qp, "defmask", mask, "default mask")
+
+	call qp_close (qp)
+end
+
+
+# MERGEI -- Test the merge range list routine (integer version).
+# The lists may be specified either as strings, or as @file-name.
+
+procedure t_mergei()
+
+int	p1, p2
+char	list1[SZ_LINE], list2[SZ_LINE]
+pointer	sp, rl1, rl2, op, xs, xe, ys, ye, os, oe
+int	fd, ch, xlen, ylen, olen, nx, ny, nout, i
+int	open(), getci(), qpex_parsei(), qpex_mergei()
+
+begin
+	call smark (sp)
+	call salloc (rl1, SZ_RLBUF, TY_CHAR)
+	call salloc (rl2, SZ_RLBUF, TY_CHAR)
+
+	# Get the first range list.
+	call clgstr ("list1", list1, SZ_LINE)
+	if (list1[1] == '@') {
+	    fd = open (list1[2], READ_ONLY, TEXT_FILE)
+	    op = rl1
+	    while (getci (fd, ch) != EOF) {
+		if (ch == '\n')
+		    ch = ' '
+		Memc[op] = ch
+		op = op + 1
+	    }
+	    Memc[op] = EOS
+	} else
+	    call strcpy (list1, Memc[rl1], SZ_RLBUF)
+
+	# Get the second range list.
+	call clgstr ("list2", list2, SZ_LINE)
+	if (list2[1] == '@') {
+	    fd = open (list2[2], READ_ONLY, TEXT_FILE)
+	    op = rl2
+	    while (getci (fd, ch) != EOF) {
+		if (ch == '\n')
+		    ch = ' '
+		Memc[op] = ch
+		op = op + 1
+	    }
+	    Memc[op] = EOS
+	} else
+	    call strcpy (list2, Memc[rl2], SZ_RLBUF)
+
+	# Parse the lists.
+	xlen = 100
+	call malloc (xs, xlen, TY_INT)
+	call malloc (xe, xlen, TY_INT)
+	nx = qpex_parsei (Memc[rl1], xs, xe, xlen)
+
+	ylen = 100
+	call malloc (ys, ylen, TY_INT)
+	call malloc (ye, ylen, TY_INT)
+	ny = qpex_parsei (Memc[rl2], ys, ye, ylen)
+
+	# Merge the lists.
+	olen = 100
+	call malloc (os, olen, TY_INT)
+	call malloc (oe, olen, TY_INT)
+	nout = qpex_mergei (os,oe,olen,
+	    Memi[xs],Memi[xe],nx, Memi[ys],Memi[ye],ny)
+
+	# Print results:
+	call printf ("---- list 1 -----\n")
+	do i = 1, nx {
+	    p1 = Memi[xs+i-1]
+	    p2 = Memi[xe+i-1]
+	    call printf ("%8d  %8s : %8s\n")
+		call pargi (i)
+		if (IS_LEFTI(p1))
+		    call pargstr ("left")
+		else
+		    call pargi (p1)
+		if (IS_RIGHTI(p2))
+		    call pargstr ("right")
+		else
+		    call pargi (p2)
+	}
+
+	call printf ("---- list 2 -----\n")
+	do i = 1, ny {
+	    p1 = Memi[ys+i-1]
+	    p2 = Memi[ye+i-1]
+	    call printf ("%8d  %8s : %8s\n")
+		call pargi (i)
+		if (IS_LEFTI(p1))
+		    call pargstr ("left")
+		else
+		    call pargi (p1)
+		if (IS_RIGHTI(p2))
+		    call pargstr ("right")
+		else
+		    call pargi (p2)
+	}
+
+	call printf ("---- merged -----\n")
+	do i = 1, nout {
+	    p1 = Memi[os+i-1]
+	    p2 = Memi[oe+i-1]
+	    call printf ("%8d  %8s : %8s\n")
+		call pargi (i)
+		if (IS_LEFTI(p1))
+		    call pargstr ("left")
+		else
+		    call pargi (p1)
+		if (IS_RIGHTI(p2))
+		    call pargstr ("right")
+		else
+		    call pargi (p2)
+	}
+
+	# Free list storage.
+	call mfree (xs, TY_INT);  call mfree (xe, TY_INT)
+	call mfree (ys, TY_INT);  call mfree (ye, TY_INT)
+	call mfree (os, TY_INT);  call mfree (oe, TY_INT)
+
+	call sfree (sp)
 end
 
 

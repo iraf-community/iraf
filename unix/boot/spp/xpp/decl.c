@@ -29,7 +29,7 @@
  *	    d_newproc (name, type)	process procedure declaration
  *	d_declaration (typestr)		process typed declaration statement
  *	    d_codegen (fp)		output declarations for sym table
- *	    d_runtime (fp)		output any runtime initialization
+ *	    d_runtime (text)		return any runtime initialization text
  *
  *	*symbol =  d_enter (symbol, dtype, flags)
  *	*symbol = d_lookup (symbol)
@@ -317,11 +317,12 @@ register FILE	*fp;
 }
 
 
-/* D_RUNTIME -- Output any runtime procedure initialization statements,
- * i.e., statements to be executed at runtime when a procedure is entered.
+/* D_RUNTIME -- Return any runtime procedure initialization statements,
+ * i.e., statements to be executed at runtime when a procedure is entered,
+ * in the given output buffer.
  */
-d_runtime (fp)
-FILE	*fp;
+d_runtime (text)
+char	*text;
 {
 	/* For certain types of functions, ensure that the function value
 	 * is initialized to a legal value, in case the procedure is exited
@@ -330,9 +331,10 @@ FILE	*fp;
 	switch (proctype) {
 	case XTY_REAL:
 	case XTY_DOUBLE:
-	    fprintf (fp, "\t%s = 0\n", procname);
+	    sprintf (text, "\t%s = 0\n", procname);
 	    break;
 	default:
+	    text[0] = EOS;
 	    break;
 	}
 }

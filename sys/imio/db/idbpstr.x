@@ -44,7 +44,7 @@ begin
 
 	# The keywords "naxis1", "naxis2", etc. are treated as a special case.
 	if (strncmp (key[ip], "naxis", 5) == 0)
-	    if (IS_DIGIT (key[ip+5])) {
+	    if (IS_DIGIT(key[ip+5]) && key[ip+6] == EOS) {
 		axis = TO_INTEG(key[ip+5])
 		if (numeric && axis >= 1 && axis <= IM_NDIM(im)) {
 		    IM_LEN(im,axis) = nint(dval)

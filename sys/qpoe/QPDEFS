@@ -1,4 +1,8 @@
-# Global defines for QPOE.
+# QPDEFS -- SAMPLE global macro definition file for QPOE.  This should be
+# modified (and a copy placed somewhere outside the QPOE sources) to establish
+# the defaults for a given site.  Each user may also have their own private
+# copy of this file.  The environment variable `qmfiles' defines the list of
+# QPDEFS files to be read to define the runtime environment for QPOE.
 
 # Interface parameters (defaults shown).
 #set	bucketlen	1024
@@ -22,16 +26,17 @@
 set	lutscale	32
 set	blockfactor	4
 
-# The PROS event structure.
-define	evfields	{d,s:x,s:y,s,s,s,s}
-define	time		d0
-define	x		s8
-define	y		s10
-define	pha		s12
-define	pi		s14
+# The event structure used in qpoe$zzdebug.x for s/w testing.
+define	evfields	{s:x,s:y,s,s,d,s,s}
+define	x		s0
+define	y		s2
+define	pha		s4
+define	pi		s6
+define	time		d8
 define	dx		s16
 define	dy		s18
 
+# An alias.
 define	t		time
 
 # Some test filters.

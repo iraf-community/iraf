@@ -19,5 +19,7 @@ begin
 	case P_IMDES:
 	    M_IM(mp) = value
 	    M_ACTIVE(mp) = NO
+	case P_REGCOORDS:
+	    M_REGCOORDS(mp) = value
 	}
 end

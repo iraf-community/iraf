@@ -114,9 +114,11 @@ define	PS_FMCACHESIZE	Memi[$1+10]	# FMIO buffer cache size
 define	PS_STINDEXLEN	Memi[$1+11]	# SYMTAB hash index length
 define	PS_STSTABLEN	Memi[$1+12]	# SYMTAB stab len (start)
 define	PS_STSBUFSIZE	Memi[$1+13]	# SYMTAB sbuf size (start)
-define	PS_BLOCK	Memi[$1+14]	# QPIO blocking factor
-define	PS_DEBUG	Memi[$1+15]	# debug level
-define	PS_OPTBUFSIZE	Memi[$1+16]	# QPIO/QPF FIO optimum buffer size 
+define	PS_NODEFFILT	Memi[$1+14]	# Disable use of default filter
+define	PS_NODEFMASK	Memi[$1+15]	# Disable use of default mask
+define	PS_BLOCK	Memi[$1+16]	# QPIO blocking factor
+define	PS_DEBUG	Memi[$1+17]	# debug level
+define	PS_OPTBUFSIZE	Memi[$1+18]	# QPIO/QPF FIO optimum buffer size 
 
 # Handy macros.
 define	IS_PUNCT	(IS_WHITE($1)||($1)==','||($1)=='\n')
@@ -499,7 +501,7 @@ char	param[ARB]		#I parameter to be set
 char	valstr[ARB]		#I parameter value
 
 pointer	ps
-int	value, ip
+int	value, ip, pp
 int	qp_ctoi(), strncmp()
 pointer	stfind()
 bool	streq()
@@ -510,54 +512,62 @@ begin
 	if (ps == NULL)
 	    return
 
-	# Decode the parameter value - only integer parameters at present.
-	ip = 1
-	if (qp_ctoi (valstr, ip, value) <= 0) {
-	    call eprintf ("bad value `%s' for QPOE parameter `%s'\n")
-		call pargstr (valstr)
-		call pargstr (param)
-	    return
+	# Accept either QP_PARAM or just PARAM.
+	pp = 1
+	if (strncmp (param, "qp_", 3) == 0)
+	    pp = 4
+
+	# Decode the parameter value - only integer parameters at present,
+	# except for "nodeffilt" and "nodefmask" which do not have a value.
+
+	if (strncmp (param[pp], "nodef", 5) != 0) {
+	    ip = 1
+	    if (qp_ctoi (valstr, ip, value) <= 0) {
+		call eprintf ("bad value `%s' for QPOE parameter `%s'\n")
+		    call pargstr (valstr)
+		    call pargstr (param)
+		return
+	    }
 	}
 
-	# Accept either QP_PARAM or just PARAM.
-	ip = 1
-	if (strncmp (param, "qp_", 3) == 0)
-	    ip = 4
-
 	# Set the parameter value in the global QM descriptor.
-	if (     streq (param[ip], "bucketlen"))
+	if (     streq (param[pp], "bucketlen"))
 	    PS_BUCKETLEN(ps) = value
-	else if (streq (param[ip], "cachesize"))
+	else if (streq (param[pp], "cachesize"))
 	    PS_FMCACHESIZE(ps) = value
-	else if (streq (param[ip], "indexlen"))
+	else if (streq (param[pp], "indexlen"))
 	    PS_STINDEXLEN(ps) = value
-	else if (streq (param[ip], "maxlfiles"))
+	else if (streq (param[pp], "maxlfiles"))
 	    PS_FMMAXLFILES(ps) = value
-	else if (streq (param[ip], "pagesize"))
+	else if (streq (param[pp], "pagesize"))
 	    PS_FMPAGESIZE(ps) = value
-	else if (streq (param[ip], "sbufsize"))
+	else if (streq (param[pp], "sbufsize"))
 	    PS_STSBUFSIZE(ps) = value
-	else if (streq (param[ip], "stablen"))
+	else if (streq (param[pp], "stablen"))
 	    PS_STSTABLEN(ps) = value
-	else if (streq (param[ip], "progbuflen"))
+	else if (streq (param[pp], "progbuflen"))
 	    PS_EXPBLEN(ps) = value
-	else if (streq (param[ip], "databuflen"))
+	else if (streq (param[pp], "databuflen"))
 	    PS_EXDBLEN(ps) = value
-	else if (streq (param[ip], "maxfrlutlen"))
+	else if (streq (param[pp], "maxfrlutlen"))
 	    PS_EXMAXFRLLEN(ps) = value
-	else if (streq (param[ip], "maxrrlutlen"))
+	else if (streq (param[pp], "maxrrlutlen"))
 	    PS_EXMAXRRLLEN(ps) = value
-	else if (streq (param[ip], "lutminranges"))
+	else if (streq (param[pp], "lutminranges"))
 	    PS_EXLMINRANGES(ps) = value
-	else if (streq (param[ip], "lutscale"))
+	else if (streq (param[pp], "lutscale"))
 	    PS_EXLSCALE(ps) = value
-	else if (streq (param[ip], "maxpushback"))
+	else if (streq (param[pp], "maxpushback"))
 	    PS_SZPBBUF(ps) = value
-	else if (streq (param[ip], "blockfactor"))
+	else if (streq (param[pp], "nodeffilt"))
+	    PS_NODEFFILT(ps) = YES
+	else if (streq (param[pp], "nodefmask"))
+	    PS_NODEFMASK(ps) = YES
+	else if (streq (param[pp], "blockfactor"))
 	    PS_BLOCK(ps) = value
-	else if (streq (param[ip], "debuglevel"))
+	else if (streq (param[pp], "debuglevel"))
 	    PS_DEBUG(ps) = value
-	else if (streq (param[ip], "optbufsize"))
+	else if (streq (param[pp], "optbufsize"))
 	    PS_OPTBUFSIZE(ps) = value
 	else {
 	    call eprintf ("unknown QPOE parameter `%s' in SET statement\n")
@@ -604,6 +614,8 @@ begin
 	QP_STSBUFSIZE(qp) = qm_setpar (PS_STSBUFSIZE(ps), DEF_STSBUFSIZE)
 
 	# Other parameters.
+	QP_NODEFFILT(qp) = qm_setpar (PS_NODEFFILT(ps), NO)
+	QP_NODEFMASK(qp) = qm_setpar (PS_NODEFMASK(ps), NO)
 	QP_BLOCK(qp) = qm_setpar (PS_BLOCK(ps), DEF_BLOCKFACTOR)
 	QP_OPTBUFSIZE(qp) = qm_setpar (PS_OPTBUFSIZE(ps), DEF_OPTBUFSIZE)
 	QP_DEBUG(qp) = qm_setpar (PS_DEBUG(ps), 0)
@@ -665,6 +677,8 @@ begin
 	if (PS_STSBUFSIZE(ps) != 0)	QP_STSBUFSIZE(qp) = PS_STSBUFSIZE(ps)
 
 	# Other parameters.
+	if (PS_NODEFFILT(ps) != 0)	QP_NODEFFILT(qp) = PS_NODEFFILT(ps)
+	if (PS_NODEFMASK(ps) != 0)	QP_NODEFMASK(qp) = PS_NODEFMASK(ps)
 	if (PS_BLOCK(ps) != 0)		QP_BLOCK(qp) = PS_BLOCK(ps)
 	if (PS_OPTBUFSIZE(ps) != 0)	QP_OPTBUFSIZE(qp) = PS_OPTBUFSIZE(ps)
 	if (PS_DEBUG(ps) != 0)		QP_DEBUG(qp) = PS_DEBUG(ps)

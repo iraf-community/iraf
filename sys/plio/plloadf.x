@@ -8,35 +8,44 @@ include	<plio.h>
 # simple code permits only one mask per file; more sophisticated storage
 # facilities are planned; these will probably obsolete this routine.
 
-procedure pl_loadf (pl, fname, title, maxch)
+procedure pl_loadf (pl, mask, title, maxch)
 
 pointer	pl			#I mask descriptor
-char	fname[ARB]		#I file
+char	mask[ARB]		#I mask file
 char	title[maxch]		#O mask title
 int	maxch			#I max chars out
 
 int	fd, nchars
-pointer	sp, bp, sv, text
-int	open(), read(), mii_readc(), mii_readi()
+pointer	sp, bp, sv, text, fname, extn
+int	open(), read(), mii_readc(), mii_readi(), fnextn()
 errchk	open, read, syserrs
 
 begin
 	call smark (sp)
-	fd = open (fname, READ_ONLY, BINARY_FILE)
+	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
+
+	# Get mask file name.
+	call strcpy (mask, Memc[fname], SZ_PATHNAME)
+	if (fnextn (mask, Memc[extn], SZ_FNAME) <= 0)
+	    call strcat (".pl", Memc[fname], SZ_PATHNAME)
+
+	# Open the mask save file.
+	fd = open (Memc[fname], READ_ONLY, BINARY_FILE)
 
 	# Get savefile header.
 	call salloc (sv, LEN_SVDES, TY_STRUCT)
 	if (mii_readi (fd, Memi[sv], LEN_SVDES) != LEN_SVDES)
-	    call syserrs (SYS_PLBADSAVEF, fname)
+	    call syserrs (SYS_PLBADSAVEF, Memc[fname])
 
 	# Verify file type.
 	if (SV_MAGIC(sv) != PLIO_SVMAGIC)
-	    call syserrs (SYS_PLBADSAVEF, fname)
+	    call syserrs (SYS_PLBADSAVEF, Memc[fname])
 
 	# Get descriptive text.
 	call salloc (text, SV_TITLELEN(sv), TY_CHAR)
 	if (mii_readc (fd, Memc[text], SV_TITLELEN(sv)) != SV_TITLELEN(sv))
-	    call syserrs (SYS_PLBADSAVEF, fname)
+	    call syserrs (SYS_PLBADSAVEF, Memc[fname])
 	else
 	    call strcpy (Memc[text], title, maxch)
 

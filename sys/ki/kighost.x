@@ -4,7 +4,9 @@ include	<ctype.h>
 include	"ki.h"
 
 # KI_GETHOSTS -- Read the host name table (file) and initialize the node
-# descriptor table (common).
+# descriptor table (common).  The default hosts table is the file "dev$hosts";
+# a different file may be specified with the environment variable
+# "irafhostnametable".
 
 int procedure ki_gethosts()
 
@@ -34,24 +36,26 @@ begin
 	# we cannot use high level file i/o to read the HNT file without
 	# reentrancy problems.
 
-	if (envfind ("iraf", Memc[osfn], SZ_PATHNAME) <= 0) {
-	    call sfree (sp)
-	    return (ERR)
+	if (envfind (HNT_ENVNAME, Memc[osfn], SZ_PATHNAME) <= 0) {
+	    if (envfind ("iraf", Memc[osfn], SZ_PATHNAME) <= 0) {
+		call sfree (sp)
+		return (ERR)
+	    }
+
+	    # Strip any node prefix from the iraf$ pathname; it had better 
+	    # reference the local node.
+
+	    junk = ki_gnode (Memc[osfn], Memc[lbuf], delim)
+	    if (delim > 0)
+		call strcpy (Memc[osfn+delim], Memc[osfn], SZ_PATHNAME)
+
+	    # Form filename "iraf$subdir/file".
+	    call zfsubd (Memc[osfn], SZ_PATHNAME, HNT_SUBDIR, junk)
+	    call strcat (HNT_FILENAME, Memc[osfn], SZ_PATHNAME)
 	}
 
-	# Strip any node prefix from the iraf$ pathname; it had better 
-	# reference the local node.
-
-	junk = ki_gnode (Memc[osfn], Memc[lbuf], delim)
-	if (delim > 0)
-	    call strcpy (Memc[osfn+delim], Memc[osfn], SZ_PATHNAME)
-
-	# Form filename "iraf$subdir/file".
-	call zfsubd (Memc[osfn], SZ_PATHNAME, HNT_SUBDIR, junk)
-	call strcat (HNT_FILENAME, Memc[osfn], SZ_PATHNAME)
-	call strpak (Memc[osfn], Memc[osfn], SZ_PATHNAME)
-
 	# Open the table file, a text file.
+	call strpak (Memc[osfn], Memc[osfn], SZ_PATHNAME)
 	call zopntx (Memc[osfn], READ_ONLY, chan)
 	if (chan == ERR) {
 	    call sfree (sp)

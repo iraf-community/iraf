@@ -33,7 +33,7 @@ begin
 
 	# The keywords "naxis1", "naxis2", etc. are treated as a special case.
 	if (strncmp (key[ip], "naxis", 5) == 0)
-	    if (IS_DIGIT (key[ip+5])) {
+	    if (IS_DIGIT(key[ip+5]) && key[ip+6] == EOS) {
 		dtype = TY_LONG
 		axis  = TO_INTEG(key[ip+5])
 		lval  = IM_LEN(im,axis)

@@ -198,4 +198,4 @@ prompt is printed may result in the character being echoed (messing up the
 output) and then ignored when raw mode is enabled for the prompt.
 .ih
 SEE ALSO
-mkhelpdb, hdbexamine, mkmanpage, lroff
+references, phelp, mkhelpdb, hdbexamine, mkmanpage, lroff

@@ -1,12 +1,14 @@
 # KI.H -- IRAF Kernel Interface definitions.
 
-define	MAX_NODES	64		# max nodes known to KI
+define	MAX_NODES	128		# max nodes known to KI
 define	MAX_CHANNELS	LAST_FD		# requires <config.h>
 define	MAX_ALIAS	8		# maximum number of aliases per node
 define	SZ_ALIAS	9		# size of a node name alias
 define	SZ_SERVER	64		# size of a server name
 define	HNT_SUBDIR	"dev"		# parts of host name table filename
-define	HNT_FILENAME	"hosts"	
+define	HNT_FILENAME	"hosts"		# default host name table
+define	HNT_ENVNAME	"irafhnt"	# user host name table
+
 define	READ_IN_PROGRESS (-11)		# used in binary file i/o
 define	OSHIFT		128		# optype= (opcode * OSHIFT) + subcode
 define	FIRST_CHAN	4		# first available kchan.

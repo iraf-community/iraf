@@ -33,6 +33,10 @@ begin
 	    IO_EVYOFF(io) = value
 	case QPIO_NOINDEX:
 	    IO_NOINDEX(io) = value
+	case QPIO_NODEFFILT:
+	    IO_NODEFFILT(io) = value
+	case QPIO_NODEFMASK:
+	    IO_NODEFMASK(io) = value
 	case QPIO_OPTBUFSIZE:
 	    IO_OPTBUFSIZE(io) = value
 

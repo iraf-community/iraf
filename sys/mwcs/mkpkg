@@ -35,7 +35,7 @@ libex.a:
 
 	iwcfits.x	imwcs.h
 	iwctype.x	imwcs.h <ctype.h>
-	iwewcs.x	imwcs.h mwcs.h <imhdr.h> <imio.h>
+	iwewcs.x	imwcs.h mwcs.h <imhdr.h> <imio.h> <math.h>
 	iwfind.x	imwcs.h
 	iwgbfits.x	imwcs.h
 	iwparray.x	imwcs.h
@@ -52,6 +52,7 @@ libex.a:
 	mwgaxmap.x	mwcs.h
 	mwgltermd.x	mwcs.h
 	mwgltermr.x	mwcs.h
+	mwgsys.x	mwcs.h
 	mwgwattrs.x	mwcs.h
 	mwgwsampd.x	mwcs.h
 	mwgwsampr.x	mwcs.h

@@ -36,6 +36,10 @@ begin
 	    return (QP_EXLSCALE(qp))
 	case QPOE_MAXPUSHBACK:
 	    return (QP_SZPBBUF(qp))
+	case QPOE_NODEFFILT:
+	    return (QP_NODEFFILT(qp))
+	case QPOE_NODEFMASK:
+	    return (QP_NODEFMASK(qp))
 	case QPOE_OPTBUFSIZE:
 	    return (QP_OPTBUFSIZE(qp))
 	case QPOE_PAGESIZE:

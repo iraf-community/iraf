@@ -19,6 +19,7 @@ access help module lists:
 
 	modnum = hd_findmod (hp, modname)
 	nchars = hd_getname (hp, modnum, field, outstr, maxch)
+		   hd_debug (hp, out)
 
 The HD_OPEN function opens the helpdir file and decodes the contents, producing
 a binary structure pointed to by hp.  HD_FINDMOD searches for a module by name,
@@ -693,4 +694,82 @@ begin
 	outstr[1] = EOS
 	call sfree (sp)
 	return (0)
+end
+
+
+# HD_DEBUG -- Dump a compiled helpdir structure to the given output file.
+
+procedure hd_debug (hd, out)
+
+pointer	hd				#I compiled helpdir
+int	out				#O output file
+
+int	i
+pointer	sbuf, mp
+
+begin
+	sbuf = HD_SBUF(hd)
+
+	# General header stuff.
+	call fprintf (out,
+	    "pakname=%d(%s), nmodules=%d, maxmodules=%d, lenhd=%d\n")
+	    call pargi (HD_PAKNAME(hd))
+	    call pargstr (Memc[sbuf+HD_PAKNAME(hd)])
+	    call pargi (HD_NMODULES(hd))
+	    call pargi (HD_MAXMODULES(hd))
+	    call pargi (HD_LENHD(hd))
+	call fprintf (out, "defdir=%d(%s)\n")
+	    call pargi (HD_DEFDIR(hd))
+	    call pargstr (Memc[sbuf+HD_DEFDIR(hd)])
+	call fprintf (out, "sbuf=%x, szsbuf=%d, nextch=%d\n")
+	    call pargi (HD_SBUF(hd))
+	    call pargi (HD_SZSBUF(hd))
+	    call pargi (HD_NEXTCH(hd))
+
+	# List of defined logical directories.
+	if (HD_NLDIRS(hd) > 0) {
+	    call fprintf (out, "nldirs=%d:\n")
+		call pargi (HD_NLDIRS(hd))
+	    do i = 1, HD_NLDIRS(hd) {
+		call fprintf (out, "%7d %s\n")
+		    call pargi (i)
+		    call pargstr (Memc[sbuf+HD_LDIR(hd,i)])
+	    }
+	}
+
+	# List the modules.
+	if (HD_NMODULES(hd) > 0) {
+	    call fprintf (out, "modules:\n")
+	    do i = 1, HD_NMODULES(hd) {
+		mp = HD_MODULE(hd,i)
+		call fprintf (out, "%7d %20s\n")
+		    call pargi (i)
+		    call pargstr (Memc[sbuf+M_NAME(mp)])
+		if (M_HLP(mp) > 0) {
+		    call fprintf (out, "\t\t\t\tHLP=%d(%s)\n")
+			call pargi (M_HLP(mp))
+			call pargstr (Memc[sbuf+M_HLP(mp)])
+		}
+		if (M_SYS(mp) > 0) {
+		    call fprintf (out, "\t\t\t\tSYS=%d(%s)\n")
+			call pargi (M_SYS(mp))
+			call pargstr (Memc[sbuf+M_SYS(mp)])
+		}
+		if (M_SRC(mp) > 0) {
+		    call fprintf (out, "\t\t\t\tSRC=%d(%s)\n")
+			call pargi (M_SRC(mp))
+			call pargstr (Memc[sbuf+M_SRC(mp)])
+		}
+		if (M_PKG(mp) > 0) {
+		    call fprintf (out, "\t\t\t\tPKG=%d(%s)\n")
+			call pargi (M_PKG(mp))
+			call pargstr (Memc[sbuf+M_PKG(mp)])
+		}
+		if (M_MEN(mp) > 0) {
+		    call fprintf (out, "\t\t\t\tMEN=%d(%s)\n")
+			call pargi (M_MEN(mp))
+			call pargstr (Memc[sbuf+M_MEN(mp)])
+		}
+	    }
+	}
 end

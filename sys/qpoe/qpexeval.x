@@ -31,6 +31,7 @@ double	d0			# double data register
 bool	pass			# expression value
 int	npass			# number of events which pass expr
 
+real	rbin
 bool	pv_save[MAX_LEVELS]
 pointer ip_save[MAX_LEVELS]
 pointer lt, ev, ev_i, ev_r, ev_d, ip
@@ -42,7 +43,9 @@ define	ev_s ev
 
 begin
 	npass = 0
+
 	do j = 1, nev {
+	    pass = false
 	    ev = i_ev[j]
 
 	    # Get event struct pointers of various types.
@@ -50,7 +53,6 @@ begin
 	    ev_i = (ev - 1) * SZ_SHORT / SZ_INT + 1
 	    ev_r = ev_i
 
-# call eprintf ("evaluate event %d\n"); call pargi(j)
 	    # Execute each compiled instruction in sequence until the value
 	    # of the compiled attribute-value expression is known.  The call
 	    # stack level is used to keep track of subroutine calls
@@ -61,10 +63,6 @@ begin
 	    level = 0
 
 	    do i = 1, MAX_INSTRUCTIONS {
-# call eprintf ("ip=%d, opcode=%d, pass=%b, level=%d\n")
-# call pargi((ip-EX_PB(ex))/LEN_INSTRUCTION+1);  call pargi(OPCODE(ip))
-# call pargb(pass);  call pargi(level)
-
 		pragma switch_no_range_check
 		switch (OPCODE(ip)) {
 		case NOP:				# null operation
@@ -237,30 +235,33 @@ ret_		    if (level > 0) {
 		case LUTXS:				# lookup tables
 		    i0 = Mems[ev_s+IARG1(ip)]
 		    lt = IARG2(ip)
-		    bin = int((i0 - int(LT_I0(lt))) * LT_IS(lt)) + 1
+		    rbin = (i0 - int(LT_I0(lt))) * LT_IS(lt)
 		    goto lut_
 		case LUTXI:
 		    i0 = Memi[ev_i+IARG1(ip)]
 		    lt = IARG2(ip)
-		    bin = int((i0 - int(LT_I0(lt))) * LT_IS(lt)) + 1
+		    rbin = (i0 - int(LT_I0(lt))) * LT_IS(lt)
 		    goto lut_
 		case LUTXR:
 		    r0 = Memr[ev_r+IARG1(ip)]
 		    lt = IARG2(ip)
-		    bin = int((r0 - LT_R0(lt)) * LT_RS(lt)) + 1
+		    rbin = (r0 - LT_R0(lt)) * LT_RS(lt)
 		    goto lut_
 		case LUTXD:
 		    d0 = Memd[ev_d+IARG1(ip)]
 		    lt = IARG2(ip)
-		    bin = int((d0 - LT_D0(lt)) * LT_DS(lt)) + 1
+		    rbin = (d0 - LT_D0(lt)) * LT_DS(lt)
 lut_
 		    # Common code for any lookup table.
-		    if (bin <= 0)
+		    if (rbin <= 0)
 			v = LT_LEFT(lt)
-		    else if (bin > LT_NBINS(lt))
-			v = LT_RIGHT(lt)
-		    else
-			v = LT_LUT(lt,bin)
+		    else {
+			bin = int(rbin) + 1
+			if (bin > LT_NBINS(lt))
+			    v = LT_RIGHT(lt)
+			else
+			    v = LT_LUT(lt,bin)
+		    }
 
 		    # Table value may be 0, 1, or indeterminate, i.e., the
 		    # offset of a subprogram to be called to evaluate the
@@ -304,9 +305,6 @@ lut_
 		npass = npass + 1
 		o_ev[npass] = ev
 	    }
-# call eprintf ("...  pass\n")
-#	    } else
-# call eprintf ("...  fail\n")
 	}
 
 	return (npass)

@@ -21,7 +21,7 @@ char	title[maxch]		#O mask title
 int	maxch			#I max chars out
 pointer	ref_im			#I reference image
 
-pointer	sp, fname, pl, b_pl, im
+pointer	sp, fname, pl, b_pl
 long	axlen[PL_MAXDIM], v[PL_MAXDIM]
 int	acmode, flags, naxes, depth, rop
 
@@ -65,7 +65,6 @@ begin
 		call amovkl (1, v, PL_MAXDIM)
 
 		if (and (flags, BOOLEAN_MASK) != 0 && depth > 1) {
-		    IM_PLFLAGS(im) = or (IM_PLFLAGS(im), PL_BOOL)
 		    b_pl = pl_create (naxes, axlen, 1)
 
 		    rop = PIX_SRC

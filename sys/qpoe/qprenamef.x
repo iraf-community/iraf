@@ -34,9 +34,13 @@ begin
 
 	# Rename the symbol.  We cannot just edit the name, as the hash
 	# function would not be able to find it.  We must create a new
-	# symstruct and replace the old one by it.
+	# symstruct and replace the old one by it.  The stenter can cause
+	# reallocation of the symbol table, so we need to recompute the
+	# symbol pointer.
 
 	nsym = stenter (st, newname, LEN_SYMBOL)
+	sym = qp_gpsym (qp, param)
+
 	call amovi (Memi[sym], Memi[nsym], LEN_SYMBOL)
 	S_FLAGS(sym) = or (S_FLAGS(sym), SF_DELETED)
 

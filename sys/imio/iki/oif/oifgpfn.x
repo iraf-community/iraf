@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<knet.h>
 include	"oif.h"
 
 # OIF_GPIXFNAME -- Convert a logical pixfile name into a physical pathname.

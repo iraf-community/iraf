@@ -70,8 +70,8 @@ pointer	qp			#I QPOE descriptor
 char	template[ARB]		#I field name template
 bool	sort			#I sort list of matched names?
 
-int	len_offv, sz_sbuf, nsyms, nc, junk, nchars, i
 pointer	sp, patbuf, pattern, sym, fl, st, offv, sbuf, ip, op
+int	len_offv, sz_sbuf, nsyms, nc, junk, nchars, i, nmatch
 
 pointer	sthead(), stnext(), stname()
 int	patmake(), patmatch(), strlen()
@@ -95,12 +95,15 @@ begin
 	nc = 0
 
 	# Default to match all; map '*' into '?*', which is probably what
-	# the user intends.
+	# the user intends.  Match only at the beginning of line as we want
+	# to match only entire field name strings.
 
 	if (template[1] == EOS)
 	    call strcpy ("?*", Memc[pattern], SZ_LINE)
 	else {
 	    op = pattern
+	    Memc[op] = '^'
+	    op = op + 1
 	    for (ip=1;  template[ip] != EOS && ip < SZ_LINE;  ip=ip+1) {
 		if (template[ip] == '*')
 		    if (ip == 1 || (ip > 1 && template[ip-1] != ']')) {
@@ -126,7 +129,8 @@ begin
 	    nchars = strlen (Memc[ip])
 
 	    # Save in list if it matches.
-	    if (patmatch (Memc[ip], Memc[patbuf]) > 0) {
+	    nmatch = patmatch (Memc[ip], Memc[patbuf]) - 1
+	    if (nmatch > 0 && nmatch == nchars) {
 		nsyms = nsyms + 1
 
 		# Make room in offset vector?
@@ -142,7 +146,7 @@ begin
 		}
 
 		# Add the symbol.
-		Memi[offv+nsyms-1] = nc
+		Memi[offv+nsyms-1] = nc + 1
 		call strcpy (Memc[ip], Memc[sbuf+nc], nchars)
 		nc = nc + nchars + 1
 	    }
@@ -186,7 +190,7 @@ begin
 	    return (EOF)
 
 	off = Memi[FL_OFFV(fl) + pos]
-	nchars = gstrcpy (Memc[FL_SBUF(fl) + off], outstr, maxch)
+	nchars = gstrcpy (Memc[FL_SBUF(fl)+off-1], outstr, maxch)
 
 	FL_POS(fl) = pos + 1
 	return (nchars)

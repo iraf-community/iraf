@@ -88,8 +88,7 @@ char	*irafdir;		/* iraf root directory		*/
 	    if (nfiles <= 0) {
 		printf ("OS command overflow; cannot compile files\n");
 		fflush (stdout);
-		exit_status = ERR;
-		return;
+		return (exit_status = ERR);
 	    }
 
 	    if (verbose) {
@@ -125,7 +124,7 @@ char	*irafdir;		/* iraf root directory		*/
 	 * the library will be updated.
 	 */
 	if (baderr)
-	    return;
+	    return (exit_status);
 
 	/*
 	 * Update the library.
@@ -151,8 +150,7 @@ char	*irafdir;		/* iraf root directory		*/
 		printf ("OS command overflow; cannot update library `%s'\n",
 		    library);
 		fflush (stdout);
-		exit_status = ERR;
-		return;
+		return (exit_status = ERR);
 	    }
 
 	    if (verbose) {
@@ -380,6 +378,8 @@ char	*dir;		/* LOGICAL directory name */
 	 * if (execute)
 	 *     call os_cmd to execute purge command
 	 */
+
+	 return (OK);
 }
 
 

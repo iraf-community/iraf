@@ -24,6 +24,10 @@ begin
 	    return (IO_EVYOFF(io))
 	case QPIO_EX:
 	    return (IO_EX(io))
+	case QPIO_NODEFFILT:
+	    return (IO_NODEFFILT(io))
+	case QPIO_NODEFMASK:
+	    return (IO_NODEFMASK(io))
 	case QPIO_NOINDEX:
 	    return (IO_NOINDEX(io))
 	case QPIO_OPTBUFSIZE:

@@ -7,6 +7,10 @@ $exit
 
 zzdebug:
 zzdebug.e:
+	$checkout libex.a lib$
+	$update   libex.a
+	$checkin  libex.a lib$
+
 	$omake	zzdebug.x <error.h> <ctype.h> <qpset.h> <qpexset.h> "qpoe.h"
 	$link	-z zzdebug.o
 	;
@@ -20,12 +24,17 @@ generic:
 	$ifolder (gen/qpaddb.x, qpadd.gx) $generic $(GFLAGS) qpadd.gx $endif
 
 	$set GFLAGS = "-k -t ird -p gen/"
-	$ifolder (gen/qpexparsei.x, qpexparse.gx)
-	    $generic $(GFLAGS) qpexparse.gx		$endif
+	$ifolder (gen/qpexattrli.x, qpexattrl.gx)
+	    $generic $(GFLAGS) qpexattrl.gx		$endif
 	$ifolder (gen/qpexcodei.x, qpexcode.gx)
 	    $generic $(GFLAGS) qpexcode.gx		$endif
+	$ifolder (gen/qpexparsei.x, qpexparse.gx)
+	    $generic $(GFLAGS) qpexparse.gx		$endif
 	$ifolder (gen/qpexsubi.x, qpexsub.gx)
 	    $generic $(GFLAGS) qpexsub.gx		$endif
+
+	$ifolder (gen/qprlmergei.x, qprlmerge.gx)
+	    $generic $(GFLAGS) qprlmerge.gx		$endif
 
 	$set GFLAGS = "-k -t si -p gen/"
 	$ifolder (gen/qpiorpixi.x, qpiorpix.gx)
@@ -57,9 +66,10 @@ libex.a:
 	qpelsize.x	
 	qpexclose.x	qpex.h <mach.h>
 	qpexdata.x	qpex.h <mach.h>
-	qpexdebug.x	qpex.h qpoe.h <qpexset.h>
+	qpexdebug.x	qpex.h qpoe.h <mach.h> <qpexset.h>
 	qpexdel.x	qpex.h <mach.h>
 	qpexeval.x	qpex.h <mach.h>
+	qpexgetat.x	qpex.h <mach.h>
 	qpexgetfil.x	qpex.h <mach.h>
 	qpexmodfil.x	qpex.h qpoe.h <mach.h>
 	qpexopen.x	qpex.h qpoe.h <mach.h>
@@ -82,7 +92,7 @@ libex.a:
 	qpiomkidx.x	qpio.h qpoe.h <error.h> <fset.h> <mach.h>
 	qpioopen.x	qpex.h qpio.h qpoe.h <error.h> <fset.h> <mach.h>\
 			<plset.h>
-	qpioparse.x	qpex.h qpio.h qpoe.h <ctype.h>
+	qpioparse.x	qpex.h qpio.h qpoe.h <ctype.h> <mach.h>
 	qpioputev.x	qpio.h qpoe.h <mach.h>
 	qpiorb.x	qpio.h
 	qpiosetfil.x	qpex.h qpio.h
@@ -95,7 +105,7 @@ libex.a:
 	qploadwcs.x	qpoe.h
 	qpmacro.x	qpex.h qpoe.h <ctype.h> <error.h> <finfo.h>
 	qpmkfname.x	qpoe.h
-	qpopen.x	qpoe.h qpio.h <fmset.h>
+	qpopen.x	qpio.h qpoe.h <fmset.h>
 	qpparse.x	<ctype.h>
 	qpparsefl.x	qpex.h qpoe.h
 	qppclose.x	<fset.h>

@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<qpexset.h>
+include	<mach.h>
 include	"qpex.h"
 include	"qpoe.h"
 
@@ -355,13 +356,20 @@ lut_		    call fprintf (out, "lutx%c\t(%d), %xX, L%d")
 	    if (EX_LTHEAD(ex) != NULL) {
 		call fprintf (out,
 		    "==================== lutlist =====================\n")
-		call fprintf (out,
-		    " N     LT   LUTP TYPE NBINS  L R   ZERO  SCALE\n")
 
+		# Output column labels.
+		call fprintf (out,
+		    " N     LT   LUTP TYPE NBINS  L R %*wZERO  SCALE\n")
+		    if (LT_TYPE(EX_LTHEAD(ex)) == TY_DOUBLE)
+			call pargi (NDIGITS_DP - 4)
+		    else
+			call pargi (NDIGITS_RP - 4)
+
+		# Output lookup table descriptors.
 		lutno = 0
 		for (lt=EX_LTHEAD(ex);  lt != NULL;  lt=LT_NEXT(lt)) {
 		    lutno = lutno + 1
-		    call fprintf (out, "%2d %6x %6x %4d %5d  %d %d %6g  %g\n")
+		    call fprintf (out, "%2d %6x %6x %4d %5d  %d %d %*g  %g\n")
 			call pargi (lutno)
 			call pargi (lt)
 			call pargi (LT_LUTP(lt))
@@ -372,12 +380,15 @@ lut_		    call fprintf (out, "lutx%c\t(%d), %xX, L%d")
 
 			switch (LT_TYPE(lt)) {
 			case TY_INT:
+			    call pargi (NDIGITS_RP)
 			    call pargr (LT_I0(lt))
 			    call pargr (LT_IS(lt))
 			case TY_REAL:
+			    call pargi (NDIGITS_RP)
 			    call pargr (LT_R0(lt))
 			    call pargr (LT_RS(lt))
 			case TY_DOUBLE:
+			    call pargi (NDIGITS_DP)
 			    call pargd (LT_D0(lt))
 			    call pargd (LT_DS(lt))
 			}

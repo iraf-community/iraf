@@ -11,10 +11,15 @@ include "qpex.h"
 #
 #       pha=%104B, e=100:, t=(:9,11:29,33,42:65,67:99,!(82,87),103), ...
 #
-# A variant on "attribute = expr" is "attribute += expr".  In the first form,
-# any expression terms already entered for the named attribute will be replaced
-# by the new expression.  In the second term, the given expression denotes an
-# additional condition which the attribute must satisfy to pass the filter.
+# 
+# Variants on "attr = expr" are "attr := expr" and "attr += expr".  In the
+# case of :=, any expression terms already entered for the named attribute
+# will be REPLACED by the new expression.  In the case of +=, the given
+# expression denotes an additional condition which the attribute must satisfy
+# to pass the filter, i.e., a new term is added to the existing filter.  The
+# case = is the same as +=, i.e., the default action is to modify rather than
+# replace any existing filter.
+# 
 #
 # Our function is to extract each attribute=expr term and compile it into a
 # series of instructions to be repeatedly executed (interpreted) at runtime
@@ -96,10 +101,10 @@ begin
 
 	    # Get operator.
 	    switch (qp_gettok (in, Memc[assignop], SZ_TOKBUF)) {
-	    case '=':
-		replace = true
-	    case TOK_PLUSEQUALS:
+	    case TOK_PLUSEQUALS, '=':
 		replace = false
+	    case TOK_COLONEQUALS:
+		replace = true
 
 	    default:
 		call eprintf ("%s: missing assignment token (`%s')\n")
@@ -111,7 +116,8 @@ eatup_
 		    if (Memc[expr] == ',')
 			break
 
-		replace = true
+		# The default is to add to any existing filter.
+		replace = false
 	    }
 
 	    parenlevel = 0
@@ -147,7 +153,7 @@ eatup_
 		nchars = strlen (Memc[tokbuf])
 		buflen = op - expr
 		if (buflen + nchars > sz_expr) {
-		    sz_expr = INC_SZEXPRBUF
+		    sz_expr = sz_expr + INC_SZEXPRBUF
 		    call realloc (expr, sz_expr, TY_CHAR)
 		    op = expr + buflen
 		}

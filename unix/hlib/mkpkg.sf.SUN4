@@ -22,21 +22,25 @@ $special "sys$vops/lz/":	amovc.x		as$amovc.c
 				amovd.x		as$amovd.c
 				;
 
+# The iraf main has to be compiled without optimization on the Sun-4
+# as setjmp does not save the register set.
+
+$set	XNO	= '& "$xc -cq &"'
+$special "sys$etc/":
+	main.x		$(XNO)
+	;
+
 # All files needing special processing for the local host operating system,
 # e.g., to permit host dependent optimization or to work around compiler bugs,
 # should be listed here.
 
-$special "$(sys)osb/":			f77pak.f & "$xc -cq &";
-$special "$(sys)imfort/":		imemsg.x & "$xc -cq &";
-
-# Partial optimization needed to prevent infinite loop in iropt.
-$special "$(pkg)bench/xctest/":		unique.x & "$xc -cq -P &";
-$special "$(pkg)lists/":		unique.x & "$xc -cq -P &";
-
-# Ditto for ytab.c.  In main.c and errs.c, no optimization is needed to
-# avoid an optimizer problem associated with ZSVJMP (setjmp).  I tried using
-# a #pragma to fix this but it didn't work.
-
-$special "$(pkg)cl/":			ytab.c   & "$xc -cq -/O2 &"
-					main.c   & "$xc -cq &"
-					errs.c   & "$xc -cq &";
+$special "sys$vops/ak/":
+	abnekx.x	$(XNO)
+	abnex.x		$(XNO)
+	;
+$special "sys$vops/lz/":
+	aveqx.x		$(XNO)
+	;
+$special "sys$etc/":
+	oscmd.x		as$oscmd.s
+	;

@@ -35,24 +35,26 @@ define	IO_NCOLS	Memi[$1+4]	# number of image columns (physical)
 define	IO_BLOCK	Memi[$1+5]	# blocking factor for qpio_readpix
 define	IO_OPTBUFSIZE	Memi[$1+6]	# optbufsize for FIO (qpio_readpix)
 define	IO_NOINDEX	Memi[$1+7]	# don't use indexed extraction
-define	IO_PARAM	Memi[$1+8]	# pointer to buffer with param name
-define	IO_PSYM		Memi[$1+9]	# symbol table entry for parameter
-define	IO_MASK		Memi[$1+10]	# pointer to buffer with mask name
-define	IO_MDEPTH	Memi[$1+11]	# mask depth, bits
-define	IO_EXCLOSE	Memi[$1+12]	# qpex was opened by qpio
-define	IO_PLCLOSE	Memi[$1+13]	# mask was opened by qpio
-define	IO_PL		Memi[$1+14]	# PLIO (mask) pointer
-define	IO_EX		Memi[$1+15]	# QPEX (event attribute filter) pointer
-define	IO_FD		Memi[$1+16]	# file descriptor of open lfile
-define	IO_LF		Memi[$1+17]	# lfile where event list is stored
-define	IO_CHAN		Memi[$1+18]	# i/o channel of open lfile
+define	IO_NODEFFILT	Memi[$1+8]	# disable use of default filter
+define	IO_NODEFMASK	Memi[$1+9]	# disable use of default mask
+define	IO_PARAM	Memi[$1+10]	# pointer to buffer with param name
+define	IO_PSYM		Memi[$1+11]	# symbol table entry for parameter
+define	IO_MASK		Memi[$1+12]	# pointer to buffer with mask name
+define	IO_MDEPTH	Memi[$1+13]	# mask depth, bits
+define	IO_EXCLOSE	Memi[$1+14]	# qpex was opened by qpio
+define	IO_PLCLOSE	Memi[$1+15]	# mask was opened by qpio
+define	IO_PL		Memi[$1+16]	# PLIO (mask) pointer
+define	IO_EX		Memi[$1+17]	# QPEX (event attribute filter) pointer
+define	IO_FD		Memi[$1+18]	# file descriptor of open lfile
+define	IO_LF		Memi[$1+19]	# lfile where event list is stored
+define	IO_CHAN		Memi[$1+20]	# i/o channel of open lfile
 # events
-define	IO_DD		Memi[$1+20]	# pointer to domain descriptor
-define	IO_EVXOFF	Memi[$1+21]	# offset of X field used for extraction
-define	IO_EVYOFF	Memi[$1+22]	# offset of Y field used for extraction
-define	IO_EVENTLEN	Memi[$1+23]	# length of event struct, shorts
-define	IO_MINEVL	Memi[$1+24]	# pointer to min event for full list
-define	IO_MAXEVL	Memi[$1+25]	# pointer to max event for full list
+define	IO_DD		Memi[$1+21]	# pointer to domain descriptor
+define	IO_EVXOFF	Memi[$1+22]	# offset of X field used for extraction
+define	IO_EVYOFF	Memi[$1+23]	# offset of Y field used for extraction
+define	IO_EVENTLEN	Memi[$1+24]	# length of event struct, shorts
+define	IO_MINEVL	Memi[$1+25]	# pointer to min event for full list
+define	IO_MAXEVL	Memi[$1+26]	# pointer to max event for full list
 # buckets
 define	IO_SZBBUCKET	Memi[$1+30]	# event file bucket size, bytes
 define	IO_BUCKETLEN	Memi[$1+31]	# nevents per bucket (excl. min/max)

@@ -9,6 +9,7 @@ libex.a:
 	@oif		# Old IRAF format
 	@stf		# ST SDAS/GEIS format
 	@qpf		# QPOE photon image kernel
+	@plf		# PLIO mask image mini-kernel (partial)
 
 	ikiaccess.x	iki.com iki.h <imhdr.h>
 	ikiclose.x	iki.com iki.h <imhdr.h> <imio.h>

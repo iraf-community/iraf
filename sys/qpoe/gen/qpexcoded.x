@@ -24,8 +24,9 @@ int	xlen, nranges, n_nranges, level, opcode, ip, i
 pointer	pb_save, db_save, xs_buf, xe_buf, xs, xe, n_xs, n_xe, et, prev
 
 double	sv_xs[MAX_LEVELS], sv_xe[MAX_LEVELS]
-pointer	sv_lt[MAX_LEVELS], sv_lutx[MAX_LEVELS]
+pointer	sv_lt[MAX_LEVELS], sv_lut[MAX_LEVELS], sv_lutx[MAX_LEVELS]
 int	sv_xp[MAX_LEVELS], sv_nranges[MAX_LEVELS], sv_bin[MAX_LEVELS]
+int	sv_nbins[MAX_LEVELS]
 
 double	xoffset, xscale
 double	sv_xoffset[MAX_LEVELS], sv_xscale[MAX_LEVELS]
@@ -45,7 +46,8 @@ define	error_ 91
 define	next_  92
 define	null_  93
 define	resume_ 94
-define	continue_ 95
+define	bbmask_ 95
+define	continue_ 96
 define	XS Memd[xs+($1)-1]
 define	XE Memd[xe+($1)-1]
 
@@ -306,6 +308,8 @@ continue_
 			sv_nranges[level] = nranges
 			sv_lt[level] = lt
 			sv_bin[level] = i
+			sv_nbins[level] = nbins
+			sv_lut[level] = lut
 			sv_lutx[level] = lutx
 
 			# Set up context for the new rangelist.
@@ -337,6 +341,8 @@ resume_
 		nranges = sv_nranges[level]
 		lt = sv_lt[level]
 		bin = sv_bin[level]
+		nbins = sv_nbins[level]
+		lut = sv_lut[level]
 		lutx = sv_lutx[level]
 
 		# Compile a return from subprogram.

@@ -63,6 +63,8 @@ define	QP_MODIFIED	Memi[$1+23]	# QPOE descriptor has been modified
 define	QP_DEBUG	Memi[$1+24]	# global debug level (debug messages)
 define	QP_BLOCK	Memi[$1+25]	# default blocking factor for QPIO
 define	QP_OPTBUFSIZE	Memi[$1+26]	# optimum buffer size for IMIO/QPF/FIO
+define	QP_NODEFFILT	Memi[$1+27]	# disable use of default filter
+define	QP_NODEFMASK	Memi[$1+28]	# disable use of default mask
 define	QP_DFNAME	Memc[P2C($1+30)] # QPOE filename (for messages)
 
 # Symbol descriptor.
@@ -94,6 +96,7 @@ define	TOK_NUMBER	(-98)
 define	TOK_STRING	(-97)
 define	TOK_COMMAND	(-96)
 define	TOK_PLUSEQUALS	(-95)
+define	TOK_COLONEQUALS	(-94)
 
 # QPOE header as stored in datafile.
 define	LEN_QPH		32

@@ -16,5 +16,7 @@ begin
 	    return (M_PM(mp))
 	case P_IMDES:
 	    return (M_IM(mp))
+	case P_REGCOORDS:
+	    return (M_REGCOORDS(mp))
 	}
 end

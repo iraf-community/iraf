@@ -17,7 +17,7 @@ begin
 
 	call qpio_sync (io)
 
-	if (IO_EX(io) != NULL)
+	if (IO_EX(io) != NULL && IO_EXCLOSE(io) == YES)
 	    call qpex_close (IO_EX(io))
 	if (IO_PL(io) != NULL && IO_PLCLOSE(io) == YES)
 	    call pl_close (IO_PL(io))

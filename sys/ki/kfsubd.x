@@ -32,6 +32,8 @@ begin
 		call strupk (osdir[delim+1], osdir[delim+1], maxch-delim)
 	    }
 	    call zfsubd (osdir[delim+1], maxch - delim, subdir, nchars)
+	    if (nchars != ERR)
+		nchars = nchars + delim
 
 	} else {
 	    # File is on a remote node.  Do not map the filename; leave that

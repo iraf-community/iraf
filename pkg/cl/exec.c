@@ -1069,10 +1069,13 @@ oneof()
 		pfcopyback (pfp);
 	}
 
-	if (currentask == firstask || (flags & T_BATCH))
-	    alldone = 1;		/* do not pop firstask!		*/
-	else
+	if (currentask == firstask)
+	    alldone = 1;
+	else {
 	    currentask = poptask();
+	    if (currentask->t_flags & T_BATCH)
+		alldone = 1;
+	}
 
 	restor (currentask);		/* restore environment 		*/
 }

@@ -27,6 +27,7 @@ begin
 	    }
 
 	M_LINEIO(mp) = btoi (vs[1] == 1 && ve[1] == IM_LEN(M_IM(mp),1))
+	M_REGCOORDS(mp) = YES
 	M_ACTIVE(mp) = NO
 	M_NDIM(mp) = ndim
 end

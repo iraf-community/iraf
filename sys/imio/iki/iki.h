@@ -6,7 +6,7 @@ define	MIN_LENEXTN	2		# min length header filename extension
 define	LEN_KERNEL	8		# length of a kernel entry in k_table
 define	ENV_DEFIMTYPE	"imtype"	# name of environment variable
 define	DEF_IMTYPE	"imh"		# default imtype if envvar not found
-define	HDR_EXTENSIONS	"|^imh|^??h|^qp|"	# legal header extensions
+define	HDR_EXTENSIONS	"|^imh|^??h|^qp|^pl|"	# legal header extensions
 
 define	IKI_OPEN	k_table[1,$1]	# open/create image
 define	IKI_CLOSE	k_table[2,$1]	# close image

@@ -1,0 +1,2300 @@
+System Notes File for IRAF Version 2.10.
+Begun 15 May 1990.
+-------------------------------------------
+
+pkg/cl/cl.par
+doc/notes.v29 +
+local/notes.v210 +
+doc/bugs.v28 +
+local/bugs.log
+unix/hlib/buglog.csh
+unix/hlib/motd
+unix/hlib/zzsetenv.def
+	Switched IRAFX development systems to version 2.10.  (5/15)
+
+unix/hlib/install
+	Added xyacc to the list of HSI tasks to be installed as command in
+	the unix local/bin.  (5/16)
+
+dev/graphcap
+	Updated entries for devices uapl[123457] and vapl[123457] to include
+	newly measured values of xs, ys and ar.	 (5/21 ShJ)
+
+mkpkg
+bin.dsux		+
+noao/mkpkg
+noao/bin.dsux		+
+noao/lib/mkpkg.inc
+noao/lib/mkpkg.sf.MIPS
+noao/lib/mkpkg.sf.DSUX	+
+local/.login
+unix/hlib/cl.csh
+unix/hlib/install
+unix/hlib/irafuser.csh		[DSUX ONLY]
+unix/hlib/mkpkg.inc
+unix/mkpkg.sh
+unix/setarch.sh		+
+unix/os/irafpath.c
+unix/os/zgcmdl.c
+	1. Modified DECstation/IRAF to change the architecture name from "mips"
+	to "dsux".  Anyone having IRAFARCH defined in their environment as
+	"mips" will have to change it to "dsux" to run IRAF.
+	2. A couple of the files in OS were modified to change #ifdef mips
+	constructs to also check for #ifdef ultrix.  If both mips and ultrix
+	are defined it is a DECstation, otherwise at present we will assume
+	the OS is umips.  (5/27)
+
+mkpkg
+noao/mkpkg
+	Modified so that the same mkpkg file can be used for DSUX and MIPS
+	systems without change.  (5/27)
+
+local/COPYRIGHT		-
+local/COPYRIGHTS	+
+	Replaced the COPYRIGHT file by the more carefully prepared COPYRIGHTS
+	file from the network archive.  (5/27)
+
+doc/ports/notes.mips	-
+doc/ports/notes.dsux	+
+	Renamed the notes file for the DECstation port.  (5/28)
+
+sys/mwcs/README		+
+	Added a README file to MWCS, containing an interface summary.  (6/5)
+
+sys/mwcs/iwewcs.x
+	The code which computes CRPIX when reconstructing the Wterm from a
+	FITS header was optimized with a "if (have_ltv)" but this was
+	incorrect, since the computation uses both the LTV and LTM portions
+	of the Lterm (hence it is necessary to test have_ltm as well).
+	The result was that, given an Lterm consisting of only a scale term
+	and no shift, the code could fail to restore the correct Wterm
+	reference pixel coordinate.  (6/7)
+
+dev/termcap	[tucana, orion, gemini]
+	Added Rob's 3 two-column landscape mode printer entries.  (6/12/90 SRo)
+
+*
+	Removed world write permission from all iraf files.  Only a few were
+	affected, but there were a few files and directories that happened
+	to have world write perm, and none should (too easy for users to
+	delete or modify files, accidentally or otherwise).  (6/18)
+
+pkg/softools/mkttydata.hlp
+	Deleted the explicit instructions for performing a sysgen-relink,
+	which are no longer applicable to all versions of IRAF, and added
+	comments to the affect that use of MKTTYDATA to cache termcap or
+	graphcap entries is inadvisable for most sites.  (6/19)
+
+sys/qpoe/QPOE.hlp
+	Revised and updated the section on QPEX; the documentation for this
+	section was out of date.  (6/20)
+
+lib/syserrmsg
+	Changed the error message for SYS_QPUKNPAR from "attempt to delete a
+	nonexistent parameter" to "unknown parameter".  This message is used
+	for all unknown parameter references, not just parameter deletions.
+	(6/22)
+
+sys/qpoe/qpgpsym.x
+sys/qpoe/qpgmsym.x
+sys/qpoe/qpaccessf.x
+sys/qpoe/README
+	1. The QPOE macro facility supports two kinds of macros, global macros
+	defined in an external QPDEFS type file which affect all QPOE file
+	references, and datafile-local macros defined as "macro" type
+	parameters in the individual QPOE file headers.  There was a problem
+	with the latter feature (datafile-local macros) due to QPOE header
+	parameter references employing full macro expansion.  A routine
+	such as qp_write would perform macro expansion on the parameter name,
+	and if the referenced parameter was the macro parameter itself, one
+	would get the parameter pointed to by the macro alias rather than
+	the macro parameter, making it impossible to access macro parameters
+	once defined.  The solution adopted was to disable expansion of
+	datafile-local macros in low level header parameter accesses.
+	Datafile-local macros are still used in expressions, hence can be
+	used to define things like event struct fields names.  Also, global
+	macros are still used in header parameter accesses, hence header
+	parameters may still be aliased using global defines.
+
+	2. The routine qp_expandtext was reclassed as an interface routine
+	instead of an internal routine.  If aliasing of header parameters
+	using datafile-local macro parameters is desired, this routine may
+	be called to conditionally translate the parameter name before
+	accessing the parameter, allowing the name to be aliased.  (6/24)
+
+unix/boot/rtar/rtar.c
+unix/boot/rtar/rtar.hlp
+	Added two new switches to RTAR.
+
+		-m	Do not restore the file modify times.
+		-u	Do not attempt to reset the user and group ids.
+	(6/25)
+
+sys/qpoe/qpclose.x
+	A qp_open to create a new qpoe file followed immediately by a qp_close
+	would create a file with no qpoe file header descriptor, causing an
+	error when the file was subsequently opened with qp_open.  qp_close
+	was checking for the case of an open/close with no header writes and
+	was forcing a qp_bind in this case, but the QP_MODIFIED flag was zero
+	so the file header was not being updated.  Added a QP_MODIFIED(qp)=YES
+	to force the file header to be updated, if qp_close is called on a
+	new qpoe file before any header modifications have been made.  (6/26)
+
+sys/gio/imdkern/imdopen.x
+sys/gio/imdkern/imdopenws.x
+	The imd_openws routine in the new IMD kernel was given a calling
+	sequence of imd_openws(devname,n,frame,color,mode) when the kernel
+	was first written.  However, this routine is one of the externally
+	callable driver routines and the calling sequence is fixed as defined
+	by the GKI interface (the calling sequence must be the same for all
+	GIO kernels).  The IMD kernel will work fine when run standalone,
+	but could die on a segmentation violation when called as a GIO
+	subkernel, since the subkernel interface is GKI.  By chance this
+	escaped all our testing, as the argument list mismatch can easily
+	go undetected, depending upon the chance contents of the registers
+	or stack locations associated with the missing input arguments.  (7/1)
+
+unix/hlib/mkiraf.csh
+	Modified the unix/iraf mkiraf script to prevent the user from running
+	mkiraf in an iraf system directory (any iraf directory other than
+	iraf/local).  (7/5)
+
+unix/hlib/mkpkg.inc
+unix/shlib/edsym.c
+	1. In the tucana/irafx mkpkg.inc, deleted the -T from the default
+	link flags to allow editing of shared image symbols.
+
+	2. When shared image versions were added a while back I forgot
+	to add version support to EDSYM, the symbol table editor.  The
+	program has been modified to examine the text segment of the
+	file being edited to determine the shared library version number,
+	and use this to access the correct shared image (e.g., S5.e is
+	the version 5 shared image).  With these changes, executables
+	linked in the default way will again have the correct symbols
+	for the shared image (allowing use of adb or dbx to examine
+	locations in the shared image, without having to relink -z).  (7/5)
+
+unix/boot/spp/xc.c
+	Modified XC to automatically disable the call to EDSYM (the symbol
+	table editor) when linking a host program (xc -h).  (7/6)
+
+sys/imfort/mkpkg
+sys/imfort/imfparse.x
+sys/imfort/imfmkpfn.x
+sys/imfort/imftrans.x			+
+	1. Due to the use of vfn_translate in imfparse.x, the directory prefix
+	field, if any, of the image name was being discarded.  This would
+	prevent use of IMFORT to access images other than in the current
+	directory.  The use of vfn_translate was inadvisable in any case,
+	as it performs more VFN translation than is desired, and IMFORT is
+	supposed to allow unrestricted use of host filenames.  The fix was
+	to replace the call to vfn_translate by a call to a new internal
+	imfort routine imf_trans.  This will still do a very limited amount
+	of escape sequence encoding on the image filename, allowing mixed
+	case and multiple "." delimited fields to be input and translated
+	as for IRAF vfns, e.g., on VMS.  Since such filenames are not legal
+	in VMS (mixed case is legal but is not very useful in VMS) this
+	level of translation should be fairly safe.
+
+	This was introduced into V2.9 on 11/28/89 (when the IMFORT pixel-file-
+	clobber bug was fixed).  It is surprising that the problem was not
+	reported earlier.  Most people must access only images in the current
+	directory.  (7/6)
+
+	2. The call to vfn_encode in imf_parse was not quite right either.
+	vfn_encode only returns the next field of a pathname, and when
+	imf_parse was called with a path and a non-image 3 char extension,
+	part of the path would be lost.  The solution was to replace the
+	call to vfn_encode by a call to the new imf_trans routine, which
+	avoids just this problem.  (7/9)
+
+dev/hosts	[tucana, orion, gemini]
+	Changed cmd field for draco, to use known object "241", which
+oke]irafks.com, but will shortly
+afext.kpnolocal.src.dni]irafks.com.  (7/12 SRo)
+
+dev/graphcap	[tucana, orion, gemini]
+	Added iism70d field for draco-hosted iis, aliased to iism70c & iism70l
+	for backward compatibility.  Changed DD in default iism70 entry to
+	point to draco, using iia0, as we currently have no UNIX-hosted iis.
+	(7/12 SRo)
+
+unix/os/zmain.c
+unix/os/zzsetk.c
+unix/os/zfiopr.c
+	Added a new facility to UNIX/IRAF for debugging interprocess
+	communication (IPC).  This feature will also be useful for debugging
+	tasks standalone, particularly in cases where a bug seen when the
+	task is run from the CL is difficult to reproduce when the task
+	is run standalone.
+
+ LOGIPC is defined in the host environment
+	when an iraf process is started, the process will create two files
+	PID.in and PID.out, where PID is the process id.  Everything read
+	from the IPC input file is copied to the .in file, and everything
+	written to the IPC output (e.g., sent back to the CL) is copied to
+	the .out file.  This is done only for connected subprocesses.
+	It will work for any connected subprocess, e.g., normal cached
+	processes and graphics subkernels in both foreground and background
+	CLs, but not the i/o of the CL itself since it is not driven by IPC.
+
+	The IPC streams saved are an exact binary copy of whatever was sent
+	via IPC, including the binary IPC packet headers, binary graphics
+	data, etc.  However, most IPC traffic is textual in nature, so it
+	will usually be possible to read the IPC files with a file pager,
+	or even "cat" them to the screen (not avisable if graphics data is
+	involved).
+
+	A particularly interesting use of this feature is to allow a process
+	to be run under the CL in the normal fashion, then rerun under the
+	debugger using the saved IPC input to duplicate the input and actions
+	of the process when run under the CL.  For example:
+
+		% setenv LOGIPC
+		% cl
+		cl> dir
+		cl> logout
+		% unsetenv LOGIPC
+
+	Will run the CL, saving the IPC of all subprocesses (x_system.e).
+	We can then run the system process manually, using the saved IPC
+	input:
+
+		% $iraf/bin/x_system.e -c < PID.in
+
+	To run the process under ADB or DBX, using the saved input:
+
+		% adb $iraf/bin/x_system.e
+PID.in -c
+	or
+		% dbx $iraf/bin/x_system.e
+		dbx> r -c < PID.in
+
+	Note that the redirection has to be given first for ADB, and last
+th ADB there should be no space
+	between the "<" and the file name]
+
+	Running a task in this way is not identical to running the task
+	standalone, e.g. using a DPARAM file for parameter input, because
+	the exact runtime context of the process as run under the CL is
+	reproduced.  The differences are subtle but can be important when
+	trying to reproduce a bug seen when the process is run under the
+	CL.  For example, the functioning of the task is slightly differenct
+	when the -c flag is used, the environment is passed in via IPC rather
+	than being read from hlib$zzsetenv.def, and so on.  Except for
+	possible kernel level differences associated with spawning the
+	process by forking a shell rather than the CL, the process should
+	execute identically as it did under the CL.  (7/17)
+
+sys/vops/amov.gx
+	This routine could fail, corrupting the data array, in some
+	cases when the input and output arrays overlap.  The same
+	problem exists in standard V2.9 iraf except that in most iraf
+	implementations, a host optimized version of AMOV is used,
+	hence the bug has not been seen.  (7/19)
+
+sys/imfort/tasks/pcube.f
+	This file contained a subroutine containing the following sequence of
+	statements (irrelevant statements ommitted):
+
+		subroutine pcuber (pix, nx,ny,nz, i1,i2, j1,j2, k1,k2)
+		real	pix(nx,ny,nz)
+		integer	nx, ny, nz
+
+	On the MIPS, this produced a warning about nx/ny/nz already having
+	been declared.  Probably when the compiler processes the REAL
+	statement it assumes the parameters are type integer.  This seems
+	reasonable, so I moved the INTEGER card up before the REAL and the
+	warning went away.  (7/19)
+
+sys/imfort/tasks/mkim.f
+	This task creates a test image where the pixel value is computed based
+	on the position of the pixel in the image.  The relation being used
+	was (j*ncols+i), which is the pixel number starting at [1,1], except
+	that the value is offset by a line, which is ok but not what one would
+	expect.  I changed it to ((j-1)*ncols+i).  (7/19)
+
+vms/hlib/sigqueue.com
+	Added qualifiers /passall/nofeed to the ln03 print command.  (7/20 ShJ)
+
+pkg/utilities/doc/polyfit.hlp
+	Added the missing "statistical" heading under the weighting section
+	in the polyfit task help page. (7/23/90 LED)
+
+sys/plio/pllpr.x
+sys/plio/pllnext.x
+sys/plio/pll2r.gx
+sys/plio/pll2p.gx
+sys/plio/plcmpress.x
+	These files each contained statements of the form
+
+		(foo * I_SHIFT) + goo
+
+	where foo is type short and I_SHIFT is an integer constant.  The VMS
+	Fortran compiler, due to a misfeature or otherwise, evaluates a short
+	times an integer literal using short integer arithmetic, causing
+	integer overflow in the short integer intermediate expression.  The
+	solution adopted was to replace the "foo" in expressions such as the
+	above by "int(foo)".  (7/24)
+
+vms/os/zmain.c
+	The vms/iraf process main was modified to add support for calling
+	iraf tasks on the host system command line, a feature which was added
+	to unix/iraf some time ago.  As with unix/iraf, any extra command
+	line arguments are passed on to the iraf main as the iraf command to
+	be executed.  The vms/iraf version has the additional feature that
+	the process stdin and stdout/stderr may be redirected on the command
+	line, using the usual syntax <file >file >>file.  This is NOT THE
+	SAME as redirecting the i/o of the iraf task, with 4>file etc.
+	arguments to the task.  Both or either form of redirection may be
+	used, but the process main arguments must preceed the command to be
+	passed to the iraf main.  (7/24)
+
+noao/lib/strip.noao
+	Added ONEDSPEC to the list of packages to be stripped; don't know
+	why this was missing.  (7/25)
+
+pkg/utilities/t_curfit.x,curfit.gx
+	Moved the ic_close(rd) calls out of the input file/image loop
+	and into the main routine. The pointer to icfit was being freed
+	after the first file of data was fit and not reallocated before the
+	next fit was initiated resulting in a segmentation violation.
+	(LED 7/30/90)
+
+dev/hosts	[tucana only]
+	Added adonis (engineering hp9000/370) to network for hpux testing.
+	(7/30/90 SRo)
+
+math/gsurfit/gsder.gx,gsderd.x
+	Corrected a typo in the gsder.gx routine which was causing a
+	pointer to be passed to the salloc routine instead of a size.
+	If the pointer addresses became very large this caused
+	an out of memory allocation error. This error has been in existence
+	as long as the package but only showed up on the MIPS.
+	(8/1/90 LED)
+
+sys/imio/iki/oif/oifmkpfn.x
+	Modified to check for the null image, and return "dev$null" as
+	the pixel file name in this case.  (8/4)
+
+unix/boot/spp/xc.c
+	1. All internal system executables called by XC (currently xpp.e,
+	rpp.e, and edsym.e) are now located using the iraf routine
+	os_sysfile, rather than searching through the host system
+	directories /usr/bin, /usr/local/bin, and so on.  This ensures
+	that XC will always find these executables, regardless of where
+	the iraf host level commands xpp, rpp, etc. are installed (XC does
+	not even care if these are installed as user commands, anymore).
+
+	2. The technique used to locate host commands such as f77 and cc
+] first the directories
+	defined by the user's $PATH are searched (using execvp), [2] the
+	internally defined directory SYSBINDIR is searched (this defaults
+	to /usr/lang on a Sun), [3] the internally defined directory
+	LOCALBINDIR is searched (defaults to /usr/local/bin).
+
+	3. When linking on a Sun/IRAF system, -lI77 is searched only if
+	the old (pre-V1.3) compilers are being used, as I77 has been
+	deleted with the V1.3 compiler.
+
+	The result of the above change for Sun/IRAF is that the revised XC
+	will work with either the new V1.3[.1] compiler, or any of the old
+	compilers.  If both compilers are installed, either may be
+	selected using $PATH.  If the system contains only the new
+	compiler at /usr/lang and the user has not included this directory
+	in their path, XC will still find the compiler.  (8/4)
+
+	NOTE - Although IRAF can now make use of the new V1.3 compilers,
+	these are NOT fully supported yet.  These appear to be largely new
+	compilers.  A new set of system default compiler switches will
+	have to be developed, and the full iraf system recompiled from
+	scratch and tested before the new compilers are fully supported.
+	In particular, note that there is no guarantee that sources
+	compiled with the new compiler will link correctly with iraf
+	objects produced by the old compiler, or that old iraf objects
+	will link properly with the system libraries included with the
+	new compiler.  The default iraf mkpkg compiler switches may not
+	be correct for the new compilers.  Compiler bugs are likely.
+
+unix/boot/spp/xpp/decl.c
+unix/boot/spp/xpp/xppcode.c
+	Modified the code which outputs runtime initialization statements
+	to output these statements after any DATA initialization statements
+	(they were coming out before the DATA statements).  Runtime
+	initialization is used to zero the function value of real and double
+	functions upon procedure entry.  (8/7)
+
+sys/qpoe/README
+sys/qpoe/mkpkg
+sys/qpoe/qpio.h
+sys/qpoe/qpmacro.x
+sys/qpoe/qpoe.h
+sys/qpoe/qpopen.x
+	1. The builtin interface default blocking factor for QPOE was changed
+	from 8 to 1.
+
+	2. The default blocking factor may now be specified individually for
+	each datafile, by defining the optional parameter "defblock" in the
+	QPOE header.   If a datafile default is given this overrides the
+	builtin interface default; any global SET value overrides both,
+	and setting the block factor in the runtime filter expression or
+	in a runtime call to an interface seti routine will override both
+	the datafile and global defaults.
+
+	3. In a related change made while implementing the above feature,
+	qp_open was modified so that interface parameters set in global
+	SET statements (as in QPDEFS) will override datafile parameters
+	inherited from an existing datafile in a NEW_COPY operation.
+	In other words, if the user explicitly specifies a parameter such
+	as "pagesize" or "bucketlen" in their QPDEFS, this will override
+	the default value inherited from an old datafile when a new copy
+	is made.  As before, any runtime qp_seti calls made once the new
+	datafile has been opened will override these defaults.  This was
+	necessary to be consistent with the rule that the most recently
+	specified value for a parameter takes precedence.  (8/8)
+
+pkg/system/directory.x
+	A couple of obscure bugs were fixed which affected unsorted
+	directory listings.  (8/8)
+
+pkg/images/imarith/imasub.gx
+	Fixed a bug in the special path for subtracting an image from
+	the constant zero; i.e. negation via subtraction.  (8/15)
+
+pkg/images/imutil/hedit.x
+	Modified hedit to use the maximum of the default task min_lenuserarea
+	value (28800) and the "min_lenuserarea" environment variable if
+	defined. The previous version always used the default value. (8/15 LED)
+
+dev/graphcap	[tucana, orion]
+	Known object irafks.e is failing due to some problem with its I/O
+	channels at startup time; this happened apparently without any change
+	to VMS or IRAF software.  IIS access via dni from tucana or orion
+	still works if the user has an irafks.com in their login directory.
+	Changed draco!iis to dnidraco!iis, so that the private irafks.com
+	is used.  Will have to fix known object irafks.e later.  (8/17/90 SRo)
+
+pkg/dataio/t2d/t_t2d.x
+	Increased OBUF_PAD, which controls the size of a data record read,
+	from 20000 to 32767 chars.  This value limits the maximum size of
+	an input data record in the tape record, and it is a read error if
+	the actual record is larger.  (Also increased SZ_OBUF to the next
+	larger power of two and increased the max ranges, not that the latter
+	is likely to matter).  (8/22)
+
+dev/uhosts
+	Updated this file to reflect changes in the NOAO internet.  This file 
+	is a modified version of tucana's /etc/hosts file.  (ShJ 8/29)
+
+dev/graphcap
+	Added entries for all colors of imd devices; color indices 202 through
+	217 are now available.  Also added a device "imddicomed" suitable for
+	drawing black, variable width lines destined for dicomed output via
+	the imdkernel.  The imd entry was modified so xs=ys=#0.263, indicating
+	a physically square device.  (8/30 ShJ)
+
+unix/hlib/config.h
+	Changed MT_SZBDEFIBUF (the default maximum input buffer size for
+	magtape i/o) from 32768 to 65535.  This more nearly reflects the
+	maximum record size of most modern devices, and the change was needed
+	to permit the full range of blocking factors for tapes.  (9/3)
+
+unix/os/zfiomt.c
+unix/os/zfiomt.c.BSD            +
+	Installed the temporary "hacked magtape driver" for SunOS, which
+	includes Exabyte support.  This will be replaced shortly in V2.10
+	but is what is being shipped in V2.9.1.  This driver supports the
+	following combinations of devices and host drivers (given the
+	current chaotic situation with tape drivers on Suns it is unlikely
+	that any combinations not tested will work):
+
+	    1/2" reel tape	4.0.3	all except ST (SCSI tape) driver
+	    1/2" reel tape	4.1	untested, but should work
+
+	    Exabyte		4.0.3	Sun ST driver, Ciprico RT driver
+					sparcstation under 4.0.3 not tested
+	    Exabyte		4.1	Sun ST driver, except sparcstation
+
+	1/4" cartridge tape and 1/2" reel tape on the Sun SCSI driver (at
+	least under 4.0.3) is not currently supported.  The Exabyte on the
+	sparcstation version of the ST driver is not currently supported
+	due to serious bugs in the sparcstation version of the ST driver,
+	which is different than any other version of the ST driver.
+
+	The driver automatically determines whether the current system is
+	running 4.0.3 or 4.1 and adjusts it behavior accordingly.  The
+	behavior of the ST driver differs from 4.0.3 to 4.1, and worse,
+	the driver ioctls changed, which prevents magtape code compiled
+	under 4.0.3 from even running on 4.1.  zfiomt works around this
+	by using the hardwired values of the iocts for the two SunOS
+	versions.  (9/3)
+
+unix/os/tape.c                  +
+	This file (not part of the runtime iraf system) is a host level
+	magtape test program, which should compile and run on most unix
+	systems.  It is kind of like the unix "mt" program, except that it
+	runs as a command interpreter, allowing one to open a drive and
+	issue a series of commands to exercise the drive.  All the
+	standard driver ioctls are provided, plus commands for reading and
+	writing data records, and various interpreter control commands.
+	The program is useful for exercising drivers (and drives) to
+	determine exactly what they do when the various driver ioctls are
+	issued.
+
+	The following commands are provided:
+
+	    open [device [r|w]]    rewind                   fsf [n]
+	    close                  read [nrec [bufsz]]      fsr [n]
+	    log [file]             write [nrec [bufsz]]     bsf [n]
+	    run <file>             weof                     bsr [n]
+	    verbose                status                   quit
+
+	The "write" command writes records of the given size (default 1024)
+	containing a comment such as "file M, block N" at the beginning of
+	each record.  The "read" command prints out the first 80 printable
+	chars or so of each record read, omitting unprintable chars.  These
+	commands can be used to prepare test tapes and determine to what
+	record the tape is positioned after a given ioctl or command is
+	issued.  (The program is also useful as a crude mtexamine type
+	program).  (9/3)
+
+unix/boot/spp/xc.c		[Sun/IRAF only]
+	The SunOS version of the XC compiler, which makes a stab at trying
+	to support the version 1.3 Sun Fortran and other compilers, was
+	modified as follows:
+
+	    o	When a compile is performed with the new compilers in the
+		path, the compiler runtime BIN directory /usr/lang/SC0.0
+		(or whatever - the path is generated at runtime to reflect
+		whereever the user installed the compiler) is passed as
+		in -L/usr/lang/SC0.0 to the CC command used to link.  This
+		is necessary because the version of CC used to link may be
+		the old C compiler, which will not automatically search
+		the compiler BIN directory /usr/lang.
+
+		The actual library search path specified depends upon
+		whether FLOAT_OPTION is defined in the user environment.
+		For example, if FLOAT_OPTION is defined in the user
+		environment as "ffpa", the search path command line options 
+		will be -L/usr/lang/SC0.0/ffpa -L/usr/lang/SC0.0 (where
+		the user specified path (/usr/lang) and BIN version (SC0.0)
+		are determined automatically at runtime).  Referencing the
+		right version of each library is necessary in order to get
+		the library version optimized for the local floating point
+		hardware on Sun-3s.
+
+	    o	The host libraries searched to link with the 1.3 compilers
+		were changed to -lF77 -lm.  It appears that -lU77 was
+		eliminated in 1.3, as well as the -lI77 noted earlier.
+
+	Using, e.g., f77 to perform the link would avoid the need to have
+	XC know the details of the host libraries but is probably not a
+	workable solution since iraf programs are not Fortran programs
+	("host" programs linked with xc -h are not necessarily Fortran
+	programs either).  f77 would set up the startup files etc.
+	required by f77 programs, whereas an iraf program is to the host
+	system a C program which uses some of the f77 libraries.  If f77
+	could be used to link a C program then it might provide an
+	alternative to having XC know what host libraries to link against,
+	but I doubt if this would work.
+
+	It should be noted that while we are attempting to support the new
+	compilers, full support cannot be expected until the IRAF project
+	begins using these compilers routinely.  (9/3)
+
+	Addendum - Note on 1.3 compilers.  Testing the new XC with the 1.3
+	compilers on a Sun-3, I find that FLOAT_OPTION no longer works as
+	it used to.  If FLOAT_OPTION is defined in the environment and one
+	does, e.g., a cc to compile a file, a message is printed warning that
+	FLOAT_OPTION is being ignored and the the default (fsoft) is being
+	used.  It is necessary to explicitly compile with -f68881 or whatever
+	to get the desired architecture.  This is not a problem for mkpkg or
+	fc, since these utilities automatically generate the -float arguments,
+	but if one calls xc directly the argument must be given.  (9/4)
+
+dev/graphcap	[orion, tucana]
+	Changed dni networking to draco back to normal (known object) mode
+	after fixing vms irafks.e startup problem (kpnolocal version).
+	(9/4/90 SRo)
+
+dev/hosts	[orion only]
+	Added columba to hosts file (gemini & tucana were okay).  (9/7/90 SRo)
+
+--------------------
+All tucana architectures and irafx@draco were updated to the latest snapshot
+of V2.10.  orion, pegasus, columba, cephus, and iraf@draco were updated to
+V2.9.1 and the V2.9 distribution files rebuilt in the network archive.
+(3-9 Sept.)
+
+sys/imio/db/idbfind.x
+	Commented out a couple of lines of code in the code which scans
+	an unblocked header.   The erroneous code was harmless given a
+	normal header containing nonempty cards, but could result in header
+	cards being skipped if blank header lines were encountered.  (9/11)
+
+doc/ports/notes.mips		+
+	Archived the notes for the the MIPS port.  (9/17)
+
+unix/os/tape.c
+	Installed a newer version which is more conservative about the use
+	of the status (NOP) ioctl.  (9/17)
+
+math/curfit/cvrestore.gx,cvrestorer.x,cvrestored.x
+math/gsurfit/gsrestore.gx,gsrestorer.x,gsrestored.x
+math/surfit/isreplace.x
+	Changed all the int() calls to nint() calls in the above math
+	package restore routines. This is a totally safe way for the 
+	math routines to do the required floating point to integer
+	conversions and removes any potential precision problems for
+	tasks which read the math package structures back from a text
+	file. This change was made in response to problems encountered
+	with reading text databases on the HP. (LED 9/18)
+
+unix/hlib/zzsetenv.def
+	Removed the default imdir=tmp$ entry.  Having this in zzsetenv.def
+	prevents use of a host level environment definition to set the per-user
+	default, and isn't necessary as IMIO will default to imdir=HDR$ if
+	imdir is not defined.  (10/2)
+
+dataio/doc/wfits.hlp
+	Added some comments to the wfits help page concerning the unwisdom
+	of writing to EOT on a blank tape. Updated the section describing
+	the tape blocking factors and added an example showing how
+	wfits can be used to write exabyte tapes with large blocking
+	factors. (LED 10/3)
+
+-----------
+f68881,ffpa,sparc binaries updated on tucana.  (10/16)
+
+unix/boot/spp/xpp/xppcode.c
+	Fixed a typo on line 888, changing "op >= &sbuf" to "op >= &obuf".
+	(10/19)
+
+pkg/images/imhistogram.par
+pkg/images/iminfo/imhistogram.x
+pkg/images/doc/imhistogram.hlp
+	Added a new parameter binwidth to the imhistogram task so that the
+	user can define the imhistogram resolution in terms of intensity
+	units or number of bins. (LED 10/26)
+
+pkg/images/tv/doc/display.hlp
+	Modified the description of zrange to note that the minimum and
+	maximum pixel values, if not already known, are estimated rather
+	than computed by examination of the full image.  (11/5)
+
+sys/INDEX		+
+	I added a MKTAGS procedure index listing to the SYS directory,
+	to make it easier for people to locate VOS routines without having
+	to know about MKTAGS (since few do, it seems).  This file contains
+	a list of all the procedures defined in all the .x source files in
+	the sys$ directories, giving the calling sequence and source file
+	and line number for each.  (11/8)
+
+dev/graphcap
+unix/sun/imtoolrc
+	Added a new entry for the GONG Cache Monitor.  (11/9/90 ShJ)
+
+sys/qpoe/qpexdebug.x
+	Modified to print the lookup table zero to NDIGITS_DP precision,
+	in the case of a double precision lookup table.  (11/9)
+
+sys/qpoe/zzdebug.x
+	1. Modified the `hlist' task to survive the case of a symbol
+	returned by qp_gnfn not being found by qp_gpsym; this can happen
+	when the symbol name is a macro.
+	2. Modified the default debug event list struct to agree with that
+	of PROS/Einstein datafiles, for convenience sake when debugging with
+	this data (the zzdebug code is crude and uses a wired-in compile
+	time event struct).  (11/10)
+
+dev/hosts
+dev/devices
+dev/devices.hlp
+	1. Added node ursa.
+	2. The 1/2" drives now have a default density of 6250 instead of 1600.
+	3. devices.hlp file updated to reflect the above changes.
+	(ShJ 11/12) (CB 11/12)
+
+pkg/images/images.hd
+pkg/images/rotate.cl
+pkg/images/imlintran.cl
+pkg/images/register.cl
+pkg/images/register.par
+	Added src="script file name" entries to the IMAGES help database
+	for the tasks ROTATE, IMLINTRAN, and REGISTER.  Changed the CL
+	script for REGISTER to a procedure script to remove the ugly
+	local variable declarations.  Added a few comments to the scripts.
+	(LED 11/12)
+
+sys/qpoe/README
+sys/qpoe/mkpkg
+sys/qpoe/qpexgetat.x			+
+sys/qpoe/qpexattrl.gx			+
+	Added the following new routines to QPEX:
+
+	     nc = qpex_getattribute (ex, attribute, outstr, maxch)
+	       nr = qpex_attrl[ird] (ex, attribute, xs, xe, xlen)
+
+	The qpex_getattribute routine is like qpex_getfilter, except that it
+	returns only that portion of the current compiled filter which
+	pertains to the named attribute.  The filter expression for the
+	attribute is returned as a text string.  The family of routines
+	qpex_attrl[ird] are similar, except that they return the filter for
+	the named attribute as a binary range list.  In both cases, the
+	actual filter is stored internally in the QPEX descriptor as a
+	compiled program, hence the attribute or expression is only a
+	representation of the actual filter.  Unless there is a bug they
+	should amount to the same thing, but one should be aware that the
+	internal form of the compiled filter is not a simple range list.
+	(11/12)
+
+sys/qpoe/zzdebug.x
+	Added a new debug task TFILTER, used to verify time filtering.  Also
+	tests qpex_attrld, qpex_getattribute, and the use of QPEX and QPIO
+	independently, using qpex_seti to set the event attribute filter and
+	rewind the event list.  Time filtering is tested by filtering the
+	event list once using the normal optimized time filtering code,
+	saving the x/y of each event which passes the filter in a memory
+	array.  The event list is then rewound, the filter removed,
+	qpex_attrld called to get the time filter as a binary range list,
+	and the raw event list is manually filtered and the x/y of each
+	event which passes the filter saved in memory.  The filter results
+	are then compared to see if they agree.  (11/12)
+
+	[I wasted half a day getting TFILTER working, due to a very uncommon
+	problem.  Changing the name of the task in the task statement in the
+	QPOE zzdebug.x would cause QPEX parsing (totally unrelated) to fail
+	in some cases and work in others.  I traced this to particular file,
+	but when it was recompiled the bug went away.  The newly compiled
+	object, though, was identical to that on orion (V2.9.1).  Short of
+	recalling files from a backup tape, it was impossible to look into
+	this further.]
+
+sys/qpoe/qpexeval.x
+	In testing the time filtering code with the new debug task I found
+	the following bugs.
+
+	1. The code which evaluates the filter expression for a single event
+	was not initializing the value of the expression to false before
+	evaluation.  In most cases this step is redundant (which is probably
+	why I didn't put it in the original code) but it turns out that
+	there is a case in the lookup table code used to evaluate long range
+	lists where the old expression value is pushed before evaluating a
+	subexpression, and an undefined value could be pushed causing events
+	near a range boundary to occasionally be passed when they shouldn't.
+
+	2. The first thing the lookup table code does is map the data value
+	to a bin of the lookup table.  This involves an INT operation, and
+	values a fraction of a data value left of the first bin of the table
+	would have a fractional negative value which INT would convert to
+	a zero, causing values just left of the first bin to erroneously be
+	mapped into the first bin.  (11/14)
+
+unix/os/tape.c
+	Was opening the tape drive with mode 1 when open-write was specified;
+	changed this to open with mode 2, read-write.  (11/15)
+
+sys/qpoe/qpexcode.gx
+	Nested range list evaluation lookup tables occur where a bin of the
+	table at level N maps to so many closely spaced ranges that another
+	lookup table at level N+1 is needed to evaluate the range list for a
+	value that maps into the bin.  Using the new TFILTER debug task to
+	test nested floating time filter lookup tables, I found that a
+	couple of internal variables were not being saved on the stack when
+	the routine recursed to generate code for the new table.  (This is
+	the first time this feature was ever tested, as it has not been
+	needed until now).  (11/15)
+
+sys/qpoe/qpex.h
+	Increased the size of the program and data buffers used for
+	expression evaluation by QPEX.  These can overflow at runtime
+	causing a program abort and the memory is dynamically allocated so
+	we may as well be more generous.  There is still a builtin default
+	upper limit, but if someone does come up with a filter which is
+	large enough to overflow either buffer the size can be increased in
+	QPDEFS before compiling the filter.  (11/15)
+
+pkg/system/doc/help.hlp
+	Added REFERENCES and PHELP to the "SEE ALSO" section.  (11/16)
+
+unix/os/mkpkg.sh
+	Modified the bootstrap code to avoid compiling sources such as
+	getproc.c and tape.c into LIBOS, since these are not part of the
+	library.  The new version compiles all z*.c files plus an explicit
+	list of other files which are part of the kernel, such as
+	irafpath.c, prwait.c, and so on.  (11/19)
+
+pkg/images/doc/gauss.hlp
+	Added a detailed mathematical description of the form of the 
+	Gaussian kernel used in the GAUSS task to the help page. (28/11/90)
+
+pkg/images/filters/t_convolve.x
+	CONVOLVE was not decoding the legal 1D kernel "1.0 2.0 1.0" correctly
+	although the alternate form "1.0 2.0 1.0;" worked. Leading blanks in
+	string kernels as in for example " 1.0 2.0 1.0" also generated
+	an error.  Fixed these bugs and added some  additional error checking
+	code.  (11/28/90 Davis)
+
+dev/hosts [draco, iraf and irafx]
+	Changed path to irafks.e to use "bin.dsux" for cephus.  Other
+	DECstation installations left as "bin.mips.  Node equuleus uses
+	mips as IRAF architecture; couldn't check virgo (passwd changed?).
+	(11/28/90 CB)
+
+unix/boot/spp/xc.c
+	While testing the magtape driver code on Ursa (Sun 470, SunOS 4.1)
+	I had occasion to compile a file and found that XC failed with the
+	message "f77 not found".  The following two changes were made.
+
+	1. There was an actual bug in the code for "run".  This would build
+	the path of the executable, e.g., "/usr/lang/f77", but not use it,
+	calling execv with only the task name, e.g. "f77".  Hence the routine
+	would only work if the executable was found in the user's path.
+
+	2. Evidently the V1.3 compiler cannot even execute unless the
+	directory containing the f77 driver (normally /usr/lang) is in the
+	user's path.  Since we want XC to function properly whether or not
+	the user has /usr/lang in their path, I modified XC to use PUTENV to
+	add /usr/lang to PATH in the environment for the XC process, if f77
+	is found in this directory.  (If f77 is in some nonstandard location
+	then the user will already have the directory in their path).
+	(12/1)
+
+dev/hosts	[tucana only]
+	Added madrona (George Jacoby) to network.
+	(12/4/90 FV)
+
+sys/qpoe/qpgettok.x
+	Edited the description of TOK_IDENTIFIER in the file header.  The list
+	of legal identifier characters ommitted certain characters.  (12/4)
+
+pkg/dataio/fits/t_rfits.x
+        Modified the rfits task so that it will supply a temporary root output
+	file name if old_irafname="yes" or quit with a clear error message if 
+	old_irafname="no", in the case where the user sets the output file 
+	to the null string "". (12/6/90 LED)
+
+dev/hosts
+        Modified the dev/hosts file on draco (iraf and irafx) so that
+        the kernel server was started on orion-gw rather than orion. 
+        (12/6/90 jvb)
+
+pkg/system/cmdstr.x
+	Would ignore any parameter the name of which began with "mode".
+	Fixed to ignore only the mode parameter (I guess this is right;
+	actually it is not obvious if the mode parameter really has to
+	be skipped, although it should be safe to do so).  (12/11)
+
+doc/ports/notes.dsux
+	Fixed a typo; a Dec 1990 date should have been Dec 1989.  (12/13)
+
+sys/imio/impmap.x
+	The "flags" value was being passed to im_pmopen, rather than "mode",
+	causing im_pmopen to get an access mode of zero.  This was harmless
+	when opening masks read only but prevented opening new masks.  (12/14)
+
+sys/imio/immap.x
+	The case of a NEW_COPY .pl image (mask image) was broken out as a
+	special case.  A mask image is created with mode NEW_IMAGE, set to
+	the logical size of the image being copied, and im_make_newcopy is
+	called to copy the header and other inheritable image attributes.
+
+	This is not a normal create-mask operation because the new mask is
+	actually an image stored as a mask which is a new copy of another
+	image; this is not the same as a new mask which is created for use
+	with some reference image.  The main difference is that a mask is
+	always associated with the physical image matrix, and inherits any
+	runtime section defined for the reference image, whereas an image
+	which is a new copy of another image is sized according to any
+	section defined for the old image.  In other words, a new-copy .pl
+	mask-image created from a section of an existing image will be the
+	size of the section being copied, rather than the size of the full
+	image.  Normal mask operations do not work that way, which is why
+	im_pmmap cannot be called directly in this case to make a NEW_COPY
+	mask.  (12/15)
+
+sys/imio/impmmap.x
+sys/imio/impmopen.x
+	The flag PL_BOOL (create boolean mask) was being set in IM_PLFLAGS
+	by im_pmopen, but that was incorrect as this routine doesn't have
+	access to the image descriptor.  Moved the flag setting code to
+	im_pmmap.  (12/15)
+
+sys/imio/impmhdr.x              +
+sys/imio/impmmap.x
+sys/imio/imunmap.x
+	The IMIO image mask support was modified to save the image header in
+	the PLIO save file, and restore the header when the mask is later
+	mapped onto an image descriptor.  The image title string and header
+	cards are stored in the mask "title" string as an arbitrarily long
+	string consisting of a number of lines of text.  In effect, this
+	gives PLIO mask images (.pl images) the same header functionality
+	as, e.g., OIF format images.  Mask images can now be dynamically
+	created, edited, etc., and have full headers, so they can be
+	considered full fledged images except for the one restriction that
+	the pixel type is always integer (with 28 bit unsigned integer
+	pixels).  The semantics of accessing or copying sections, world
+	coordinates, etc., are the same as for any other image format.
+	Randomly accessing an image should be efficient despite the
+	compression, since the mask lines are compressed and indexed
+	individually.
+
+	One possibly useful feature of image masks is that they represent
+	the first machine independent image format for iraf.  Character
+	data is stored as byte packed ascii strings, and the save format
+	for mask image data is an MII short integer sequence.
+
+	Mask images provide a general image compression capability for
+	integer images.  If you try to store a floating image in a mask it
+	will work, but the data will be converted to integer (with
+	incredible compression if the data converts to zeros!).  Since the
+	compression algorithm was designed for masks there will be little
+	compression for noisy 16 bit images.  32 bit integer images, or any
+	smooth (low noise) integer image will compress to some degree.
+	Compression factors for actual image masks, of course, will be very
+	large, with factors of 100-1000 being common.  (12/17)
+
+sys/imio/iki/iki.h
+sys/imio/iki/ikiinit.x
+sys/imio/iki/mkpkg
+sys/imio/iki/plf/README		+
+sys/imio/iki/plf/mkpkg		+
+sys/imio/iki/plf/plf.h		+
+sys/imio/iki/plf/plfcopy.x	+
+sys/imio/iki/plf/plfdelete.x	+
+sys/imio/iki/plf/plfrename.x	+
+sys/imio/iki/plf/plfaccess.x	+
+sys/imio/iki/plf/plfnull.x	+
+	Added limited support to the IKI interface for PLIO image masks.
+	A new mini-kernel PLF was added; this consists of about half of
+	an IKI kernel (the access/copy/delete/rename primitives), with
+	the open/close, header access, and i/o functions being performed
+	directly in the IMIO code and in the IMPM code in IMIO.  With
+	this change operations such as imaccess, imdelete, imrename, etc.
+	will work for .pl image masks as for the other image formats.
+
+	In principle everything related to image masks should be isolated to
+	an IKI kernel, but the mask i/o stuff does not fit the current image
+	kernel model very well, and it was simpler to solve the problem as a
+	special case in the IMIO code.  This will be cleaned up later as
+	part of the new image structures project when the IKI interface is
+	redesigned.  (12/17)
+
+pkg/images/imfit/imsurfit.x
+pkg/images/imfit/t_imsurfit.x
+pkg/images/lib/pixlist.h
+pkg/images/lib/pixlist.x
+	Changed the package prefix of the "pixlist" package, used internally
+	within IMSURFIT, from "pl" to "prl" (pixel range list) to avoid a
+	name conflict with the system interface PLIO.  (12/18)
+
+sys/imio/immap.x
+	Modified so that the .pl extension does not have to be given
+	explicitly for the code therein to recognize a mask image.  (12/18)
+
+sys/plio/plloadf.x
+	Modified to make specification of the .pl extension optional when
+	opening an existing save file.  (12/18)
+
+sys/imio/immap.x
+sys/imio/imunmap.x
+sys/imio/iki/ikiinit.x
+sys/imio/iki/plf/mkpkg
+sys/imio/iki/plf/plfclose.x
+sys/imio/iki/plf/plfupdhdr.x
+sys/imio/iki/plf/plfopen.x
+	The special case nature of the code to map pixel mask images in
+	IMMAP led to further complications, to the point where it became
+	worthwhile to scrap this and move the open procedure into the
+	IKI PLF kernel where it belongs.  Added open, update header, and
+	close procedures to the PLF image kernel and deleted the special
+	case code in immap.x and imunmap.x  The main thing still missing
+	from this kernel is the i/o, which is still handled directly in
+	IMIO (pixel masks do not fit the virtual file model very well).
+	(12/20)
+
+sys/imio/imopsf.x
+	The code in this file which copies the descriptor of the reference
+	image was doing too much.  Replaced by some code that copies only
+	selected fields.  The concept of what a reference image means in
+	this case is still muddy, however, so I doubt if this stuff is right
+	yet. (12/20)
+
+sys/imio/imioff.x
+	The impkden computation could result in a divide by zero if the
+	logical block size was 1 char.  Alignment does nothing in such a
+	case anyhow, so I put an IF around this code to skip it if the
+	logical block size is given as 1 char.  This is the case in some
+	of the new image kernels which do not do anything so simple as
+	store pixels on a blocked device.  (12/20)
+
+sys/qpoe/qpoe.h
+sys/qpoe/qpgettok.x
+sys/qpoe/qpioopen.x
+sys/qpoe/qpioparse.x
+sys/qpoe/qpexeval.x
+sys/qpoe/qpexmodfil.x
+	QPOE has a parameter "deffilt" which can be used to define a default
+	event attribute filter for event i/o.  Previously, either the default
+	filter was used or a user specified filter was used, i.e., if the
+	user specified a filter it would *replace* the default filter.  This
+	was changed so that the user specifed filter would add to or modify
+	the default filter, on an attribute by attribute basis.  In effect
+	the data is run through the default filter, then the result is run
+	through the user filter.
+
+	The expected use of the default filter, which is stored in the
+	datafile with the data, is to exclude "bad" data from normal analysis.
+	Since all the data is nonetheless present, the default filter can
+	be overridden to get at the normally excluded data.  This can be done
+	by editing the value of the deffilt parameter, deleting the parameter,
+	or by overriding elements of the filter in the user specified filter
+	at run time.
+
+	For example,
+
+imes]"
+
+	would replace the time term of the default filter with the time list
+	from the file "times", preserving any other terms of the default
+	filter, whereas
+
+	    cl> countpoe "foo.qp[time+=@times]"
+	or
+	    cl> countpoe "foo.qp[time=@times]"
+
+	would modify the filter for the time attribute, passing only those
+	events which pass both the default time filter and the time filter
+must
+	be used to override any existing filter term; if the usual "=" is
+	used, the default filter term, if any, remains in effect.
+
+	The default filter is a string of the form "attr=expr[,attr=expr...]".
+	This is parsed at qpio_open time just as the user specified filter
+	is, hence the default filter may reference macros, include files,
+	etc.  Operators such as qpex_getattribute and qpex_attrl will return
+	the final filter or range list as used to filter the data, produced
+	by combining the default and user filters.  (12/27)
+
+sys/qpoe/zzdebug.x
+	Added a new debug task SETFILT, used to set the value of the "deffilt"
+	parameter in a QPOE datafile.  (12/27)
+
+sys/qpoe/QPDEFS
+	1. Added a comment at the top to make it more clear that this file
+	is only intended as an example of a QPDEFS file, and to give some
+	pointers regarding how to use the global macro facility.
+	2. Changed the event structure definitions to match those now used
+	in qpoe$zzdebug.x.  (12/28)
+
+sys/qpoe/qpexpand.x
+	This routine copies the input string to the output string, expanding
+	any macros or include file references in the process.  The problem
+	was that qp_gettok returns a string token with the quotes removed,
+	and qp_expand was merely copying tokens out, resulting in the quotes
+	being stripped from string tokens.  qp_expand was modified to
+	restore the quotes to string tokens written to the output stream.
+	I checked various other places where text is pushed back, and all
+	other instances preserved the quotes.  (12/29)
+
+sys/qpoe/qpgettok.x
+	Added support for the builtin symbol or macro "$DFN".  When
+	encountered in the input stream being processed by qp_gettok(), this
+	results in the datafile name being returned as a string token.  This
+	can be used, for example, in macros used to call external tasks,
+	e.g.,  [time=`mytask($DFN,arg,...)`].  (12/29)
+
+sys/qpoe/qpiogetev.x
+	When rereading an event list opened and read earlier, and a PLRIO
+	descriptor was created, any existing PLRIO descriptor would not be
+	closed first.  Added a plr_close call to deal with this case.  (12/29)
+
+sys/qpoe/zzdebug.x
+	Added a new debug task TESTPOE, used to make simple artificial or test
+	qpoe files for testing purposes.  This was used to check out a bug
+	report that events with x=y=1 would pass a filter containing a mask
+	which excluded this corner of the image, however I was unable to
+	duplicate the problem.  (12/30)
+
+sys/qpoe/qpioparse.x
+	This routine was missing a call to qp_closetext(), causing it to leave
+	an open file descriptor behind.  This would cause a task which did
+	many qpio_open() calls to eventually run out of file descriptors.
+	[FDEBUG is very useful to diagnose problems like this).  (12/30)
+
+sys/qpoe/qpioopen.x
+sys/qpoe/qpioclose.x
+	While working on other things I noticed that qpio_open() was not
+	setting the IO_EXCLOSE flag when calling qpex_open to open an
+	expression evaluator.  This did not matter much as qpio_close was
+	not checking the flag to see if it needed to close the QPEX, but in
+	the rare circumstance that a new QPEX was set with qpio_seti() an
+	open descriptor would have been left behind.  Also a QPEX passed in
+	with qpio_seti() woudl be closed by qpio_close() when it shouldn't.
+	Modified qpio_open() to set the flag and qpio_close to check it.
+	(12/30)
+
+lib/qpset.h
+lib/qpioset.h
+sys/qpoe/qpoe.h
+sys/qpoe/qpio.h
+sys/qpoe/qpseti.x
+sys/qpoe/qpstati.x
+sys/qpoe/qpioseti.x
+sys/qpoe/qpiostati.x
+sys/qpoe/qpmacro.x
+sys/qpoe/qpioopen.x
+	Since the default filter (and probably mask eventually) are now much
+	more dangerous or noticeable than previously, I added switches in all
+	the usual places to disable the use of these defaults.  Specifically,
+	in <qpset.h> we have
+
+		QPOE_NODEFFILT
+		QPOE_NODEFMASK
+
+	(default off, i.e., use default filter or mask.  In <qpioset.h> we
+	have the same thing, just at the level of a specific QPIO descriptor:
+
+		QPIO_NODEFFILT
+		QPIO_NODEFMASK
+
+	And for global control by the user we have the new global set options
+
+		set nodeffilt
+		set nodefmask
+
+	which do what they say (omit or comment out these definitions to
+	enable use of the default filter and mask).  (12/31)
+
+sys/qpoe/qpioparse.x
+xpr" syntax, which can only
+	override any earlier filter terms for the referenced attribute (such
+	as terms of the default filter) I added some new syntax which can
+	disable the entire default filter and mask for a particular filter
+	expression.  This is done by adding a "!" after the leading "[", and
+	before the new filter, e.g.:
+
+]"
+
+	would temporarily disable both the default filter and mask.  This
+	does not affect the use of ! within expressions since an expression
+	cannot be the first term of a filter.  (12/31)
+
+sys/qpoe/qpioopen.x
+	A QPOE file is supposed to be able to contain more than one event
+	list, so the default filter/mask facility was modified to permit
+	a different default filter or mask to be specified for each event
+	list.  For example, to define a default filter for event list "foo",
+	one would insert the parameter "deffilt.foo" into the datafile.
+	When looking for the default filter or mask, qpio_open() will look
+	first for the "def[filt|mask].<evl>" parameter, then "def[filt|mask]".
+	(1/1/91)
+
+sys/qpoe/qpiolmask.x
+sys/qpoe/qpioopen.x
+sys/qpoe/qpiosetfil.x
+	The default mask mechanism was modified to provide the same
+	semantics as the default filter.  If a default mask is defined and
+	nodefmask is not set, the default mask is used as a spatial filter
+	for event i/o.  If a default mask is defined, nodefmask is not set,
+	and a user mask is also specified, the user mask is edited using the
+	default mask as a stencil (the new mask is the user mask, with only
+	those pixels set which were also set in the default mask).  Setting
+n a
+	filter expression disables the default mask.  If the mask is set
+	with an explicit qpio_seti() call the default mask is ignored.  (1/1)
+
+sys/plio/plsten.x
+	This routine was evidently not working at all, due to an internal
+	interface change that was never propagated to this routine.  The
+	call to pl_linestencil was missing the maxpixval argument for both
+	the source and destination line lists.  (1/1)
+
+sys/qpoe/qpexcode.gx
+	The QPEX parser syntax for bitmask expressions was generalized
+	somewhat to permit expression negation and parens, e.g., "%1",
+	"!%1", "!(%1)", "!(!%1)", etc. are now handled properly.  Range
+	lists are still not supported for bitmask expressions, as it is
+	not clear that such a feature would be useful (one can just enter
+	a different bitmask instead).  (1/1)
+
+sys/qpoe/README
+	Updated this file to reflect all recent changes to the QPOE
+	interfaces.  (1/2)
+
+pkg/dataio/doc/rcardimage.hlp
+pkg/dataio/cardimage/t_rcardimage.x
+	Modified the rcardimage help page to include an example of how
+	to reformat an odd-blocked cardimage tape with reblock.
+	Modified the rcardimage task to print a clearer error message
+	when it encounters an odd-blocked rcardimage tape. (1/3 LED)
+
+pkg/system/help/help.par
+pkg/system/help/t_help.x
+pkg/system/help/tlist.x
+pkg/system/help/help.h
+	The HELP task was modified to add a new parameter "curpack", default
+	value "AskCL".  With this default the help task will issue a clcmdw
+	to ask the CL the name of the current package; this is necessary to
+	preserve the current semantics of HELP (in the case of task redefs,
+	help for the task in the current package is returned).  The reason
+	for the new parameter is to allow the current package to be
+	specified explicitly to avoid the clcmdw query, e.g., when calling
+	the task at the host level.  (1/4)
+
+dev/hosts
+	Added noctua to iraf hosts table.  (1/8/91 SRo)
+
+pkg/dataio/fits/fits_rimage.x
+pkg/dataio/fits/fits_wimage.x
+	The scaling routines in rfits and wfits were modified to minimize
+        the precision lost when converting from real pixels to fits integers
+	and vice versa. (1/17/91 LED)
+
+dev/hosts
+        Added aquarius to iraf hosts table on tucana and Draco/iraf.
+        (1/17/91 jvb)
+
+unix/hlib/extern.pkg	[orion, tucana]
+	Added steward package at iraftest level after numerous discussions.
+	(1/22/91 SRo)
+
+dev/devices		[ursa]
+	Added argo and libra exabytes, since these machines are hosted by
+	ursa now.  Just tacked onto the end (mt[fgh]); perhaps we should
+	establish noao conventions for which letters represent 9track,
+	cartridge, exabyte, dat.  (1/28/91 SRo)
+
+pkg/images/gradient.par
+pkg/images/laplace.par
+pkg/images/gauss.par
+pkg/images/convolve.par
+pkg/images/doc/gradient.hlp
+pkg/images/doc/laplace.hlp
+pkg/images/doc/gauss.hlp
+pkg/images/doc/convolve.hlp
+pkg/images/filter/t_gradient.x
+pkg/images/filter/t_laplace.x
+pkg/images/filter/t_gauss.x
+pkg/images/filter/t_convolve.x
+pkg/images/filter/convolve.x
+pkg/images/filter/xyconvolve.x
+pkg/images/filter/radcnv.x
+	Modified the convolution operators (laplace, gauss, and convolve) to
+	make use of symmetries in the convolution kernel to compute the
+	convolution much faster. Laplace now makes use of radial
+	symmetry in the y direction as well as the x direction
+	resulting in a modest decrease in execution time. Gauss now
+	computes 2 indepedent 1D convolutions in x and y if the user
+	specified kernel is separable in x and y instead of the full 2D
+	kernel. (1/29/91 LED)
+
+dev/hosts
+	Added Doug Rabin's mozart to irafx host table.  (1/30/91 SRo)
+
+--------------------------
+Tucana system upgraded from SunOS 4.0.3 to 4.1.1.  (2/4)
+Began revisions of Sun/IRAF to support SunOS 4.1.  (2/5)
+
+./*
+	The iraf root was relocated to /u3/iraf on tucana, retaining link
+	at /usr/iraf.  All of the iraf runtime files (sources and bins) are
+	now consolidated on /u3.  (2/6)
+
+unix/*
+	Did a bootstrap of the system (mc68020 version) under 4.1.1 without
+	incident.  (2/6)
+
+local/.login
+local/.exrc
+	Made a number of changes for 4.1.1.  Added OPENWINHOME and MANPATH
+	definitions.  Added /usr/lang (default location of new Fortran
+	compiler) to the default PATH.  FLOAT_OPTION is no longer defined
+	as it is not used by the new compilers and causes a warning message
+	to be issued.  The default IRAFARCH for Sun-3 systems is now f68881
+	if the f68881 binaries are installed.  EXINIT is no longer defined,
+	added a .exrc file instead to allow for vi macros such as the very
+	useful "@".  Deleted the susp/eof control in STTY, it seems time to
+	abandon the DEC defaults and go with the UNIX standard ctrl/z and
+	ctrl/d instead.  (2/6)
+
+unix/boot/spp/xc.c
+	The SunOS version of XC was modified to look for the IRAFARCH
+	environment variable and add a -f68881, -ffpa, etc. switch to the
+	f77 or cc command line.  Specifying any switch beginning with -/f on
+	the XC command line overrides the use of IRAFARCH.  With this change
+	the architecture used for both compilation and linking is controlled
+	entirely by IRAFARCH, and FLOAT_OPTION is no longer used.  So long
+	as IRAFARCH is specified and all modules of a program are compiled
+	with the same setting, mixing of modules or libraries compiled for
+	different architectures is ruled out.  (2/6)
+
+unix/shlib/edsym.c
+	Looking at the edsym code I note that lseek(fd,o,L_SET) is now
+	considered obsolete and one is supposed to use lseek(fd,o,SEEK_SET)
+	instead, including <unistd.h> to define SEEK_SET.  L_SET is still
+	defined for backwards compatibility so I think I will leave things
+	as they are for now.  (No changes.)  (2/6)
+
+unix/shlib/mkshlib.csh
+	1. Modified to support the new Sun V1.3 Fortran compiler.  The iraf
+	shared image is linked explicitly with LD and it is necessary to
+	specify exactly the directories, objects, and libraries to be
+	linked.  These are much different for the new compiler than for the
+	old one.  For example, for f68881 one links with
+	/usr/lang/SC0.0/crt0.o, /usr/lang/SC0.0/f68881/_crt1.o, the libm.a
+	in SC0.0/f68881 (linking with the SC0.0 version of libm.a causes
+	Mlog10[ds] to be unresolved), and the libF77.a in SC0.0.  In
+	principle the directory /usr/lang can be relocated so this is
+	defined as a variable at the top of the file.
+
+	2. The following error message was being reported (by edsym) when
+	linking shared with XC under SunOS 4.1:
+
+	    cannot read shared image version number from <file>.e
+
+	In the code which generates the S.s file (the shared library) I
+	moved ushlib from data space to text space.  Evidently under 4.1.1
+	the system is more clever and can have initialized data at addresses
+	for which corresponding file offsets do not exist in the executable
+	file.  This results in a seek to an offset beyond the end of the .e
+	file, leading to the error message shown above.  Since ushlib is not
+	modified at runtime we can just as easily have it in text space,
+	which avoids the problem.  A simple workaround for this problem is
+	to link -e (no edsym symbol table editing).  (2/6)
+
+unix/hlib/mkpkg.inc
+	Added -libmil (use inline templates) and -dalign (double align type
+	double data) to the list of default mkpkg compile switches for the
+	new compiler.  By default the compiler will use optimization level -O3
+	and on a Sun-4, will compile -cg87.  This latter option is necessary
+	for code compiled for a Sun-4 to run on both older and newer Suns,
+	which have different floating point units.  There is another option
+	-cg89 which tells the compile to take advantage of certain features
+	of the newer floating point units (e.g. hardware sqrt) but we can't
+	use that for binaries that must run on all sparc systems.  (2/6)
+
+unix/hlib/mkpkg.sf.SUN3
+unix/hlib/mkpkg.sf.SUN4
+	Commented out all the bug entries, we should start over with this
+	new compiler.  (2/6)
+
+---------------------
+Started full f68881 sysgen/recompile.  (2/6)
+
+unix/hlib/mkpkg.sf.SUN3
+	The files vops$ak/{abnekx.x,abnex.x} and vops$lz/aveqx.x, all of
+	which contain equality comparisons of complex numbers, produced the
+	following message from the V1.3 compiler:
+
+expected parent of complex expression subtree
+
+	Compiling the files without optimization avoids the problem.  The
+	floating point or complex equalities used in these routines are
+	questionable, but there does not appear to be anything wrong with
+	the code.  (2/7)
+
+unix/boot/spp/xpp/decl.c
+	The d_runtime() routine returns in a char argument any runtime
+	initialization text needed for a procedure.  The routine would do
+	nothing if no initialization was required, which was incorrect, as
+	any old text in the string buffer argument would then be reused.
+	Modified to write an EOS into the output string in this case.
+	This bug was introduced as a result of a recent change in V2.10
+	iraf.  (2/7)
+
+pkg/cl/compile.c
+	The CL failed to come up after the sysgen.  This was eventually
+	traced to the compile() function.  This contains a register flag
+	"status" which was used without being initialized.  The routine
+	would operate correctly provided the (random) value of the variable
+	was anything other than ERR.  This is highly likely which is why
+	the bug has gone undetected for so long.  (2/7)
+
+unix/sun/Makefile
+	Changed the suggested values of FLOAT from fswitch/fsingle for
+	Sun-3/other to -f68881/"".  (2/7)
+
+-----------------------------------
+Sysgen of f68881 binaries for core system completed.
+Sparc bootstrap completed; sparc sysgen begun.
+Sysgen of f68881 binaries for noao packages begun.  (2/7)
+
+unix/hlib/mkpkg/host.c
+	In the sparc sysgen I got an error message complaining that a $purge
+	directive had failed.  It turns out that the unix/iraf version of
+	h_purge in host.c is a no-op and does not even return an exit status,
+	which is incorrect as the status of the routine is checked by the
+	portable mkpkg code.  I modified it to always return an exit status
+	of OK.  Checking the rest of the routines in the file, there was
+	one other routine which inconsistently returned status values and I
+	fixed that as well.  (2/8)
+
+unix/hlib/mkpkg.inc
+	Deleted the "-dalign" switch from all X*FLAGS entries.  It turns out
+	that the CL does not begin to double align double data, and cannot
+	be easily modified to do so, so this cannot be used, at least with
+	the CL C code (SPP pretty much double aligns all double data so there
+	is no problem there).  This option only affects Sun-4s, i.e., the
+	already compiled f68881 code is not affected by this switch.  (2/8)
+
+-----------------------------------
+ffpa sysgen begun.  (2/8)
+
+unix/boot/spp/xc.c
+	The ffpa sysgen went fine except that all the links failed with a
+	ffpa_used unresolved external message.  This was occurring due to
+	the -Bstatic and the reference was occuring in one of the C libraries.
+	It was necessary to add a -f<float-option> switch to the CC command
+	used for the link to avoid the problem.  XC explicitly links all the
+	right Fortran libraries for a given architecture, but it is still
+	necessary to pass the -fxxx flag for the benefit of the C libraries.
+	(2/8)
+
+bin.ffpa/S.e
+bin.f68881/S.e
+bin.sparc/S.e
+unix/boot/spp/xc.c
+	Since shared image version support has been around for a year or so
+	and V2.10 no longer uses the older shared images I deleted S.e and
+	S4.e in the recent sysgens, leaving only the current (actually V2.9)
+	shared image S5.e.  It turns out however, that XC needs to have a
+	file entry S.e in the directory containing the real shared image in
+	order to permit runtime searching to find the file (runtime searching
+	is necessary to provide architecture support, IRAFULIB support, etc.).
+	XC could search for S<n>.e except that it is difficult to determine
+	the shared image version number.  The simple solution was to add a
+	file entry S.e in each of the core system BIN directories.  This is
+	not an actual shared image, rather a zero length directory entry used
+	to flag the directory containing the real shared image or images.
+	If this marker file is not present the system will still run, but
+	link time EDSYM symbol editing will be disabled.  (2/10)
+
+unix/shlib/mkshlib.csh
+unix/os/zmain.c
+unix/os/zzstrt.c
+unix/os/zshlib.c
+	It turned out that zmain/zzstrt were using the ushlib vector to pass
+	the sh_debug flag, used to map the shared image text writable so
+w in adb).  This was a
+	bit of a trick and doesn't work any more since I moved ushlib to the
+	text segment, so I made sh_debug an explicit variable in data space.
+	It is defined in the shared library (libshare.a) or in zshlib.o if
+	linking unshared.  (2/10)
+
+unix/hlib/install
+	I added a rm -f preceeding each ln -s, since ln will not clobber
+	any existing link.  This could occur in certain cases when link
+	/usr/include/iraf.h already existed but had the wrong value.  (2/10)
+
+unix/as.sparc/oscmd.s		+
+unix/hlib/mkpkg.sf.SUN4
+	After the sparc sysgen with the new compiler all OS escapes would
+	fail with the error "cannot open `A'".  This was traced to a host
+	compiler error for file oscmd.x.  The null string "" was being passed
+	to a subroutine; in Fortran this is a short array of length 1
+	initialized to zero, but the compiler was initializing the value to
+	random garbage, in this case A (in tests I ran other values were
+	generated).  Other identical cases of "" being passed to subroutines
+	in the same file were compiled correctly.  Compiling without
+	optimization did not help, so I had to edit the assembler and place
+	the file on the special file list.  (2/10)
+
+---------------------------------
+SunOS 4.1.1 / Sun Fortran 1.3.1 upgrades completed (except for full
+testing and further bug fixing).  (2/10)
+
+iraf/dev/devices  [Ursa only]
+        Added mti to the devices file for libra's 9track tape drive.  It
+        was interesting that there was no entry in the devices file when
+        libra was served by orion - but then the host names were the same
+        for both orion and libra's mtas.
+
+sys/qpoe/qpioparse.x
+	The event list filter syntax supports runtime specification of the
+	event coordinate system to be used with the notation key=(xoff,yoff)
+	where xoff,yoff are event field specifiers, e.g., (s0,s2).  Fixed
+	two problems with the code in this routine which parses the KEY
+ whitespace etc. was not being skipped properly, causing
+	the key= expression to be rejected, and 2) the offset values were
+	being used directly, which is incorrect, since at the user level
+	event struct offsets are specified in bytes, whereas in the QPIO
+	descriptor short integer offsets are used for efficiency reasons.
+	With these problems fixed the key=(x,y) feature checks out, i.e.,
+	QPIO itself handles the key properly and it was only the parsing
+	routine which had problems.  (2/10)
+
+dev/devices 	[tucana]
+	deleted mt device aliases no longer used in OS 4.1.1  (2/12 ShJ)
+
+sys/qpoe/qprenamef.x
+	This routine renames a header parameter by creating a new one and
+	setting the deleted bit in the old one.  There was a subtle bug
+	which could cause the old parameter to fail to be deleted.  The
+	routine was indeed setting the delete bit in the symstruct of the
+	old parameter, but it was doing so *after* adding the new parameter
+	to the SYMTAB symbol table.  This was not correct because the
+	symstruct of the first parameter was being referenced by an absolute
+	pointer the value of which was computed before the new parameter
+	was added.  In SYMTAB adding a new parameter can cause the symbol
+	table to be reallocated, invalidated any such pointer.  (2/13)
+
+sys/qpoe/qpgnfn.x
+	1. The pattern string input by the user was being used almost directly,
+	after only * -> ?* mapping.  Any match was accepted.  This is
+	incorrect because we want to accept matches which only match the
+	*entire* field name.  It is necessary to constrain the match to
+	begin at the beginning of the string being checked, and verify that
+	the entire string is matched.
+	2. Sorting was not working correctly.  The package was using zero
+	indexed string buffer offsets internally, and calling STRSRT with
+	this index array.  This is incorrect because STRSRT expects a one
+	indexed index array.  The result was that the list would be sorted
+	ignoring the first character of each string.  (2/13)
+
+sys/qpoe/zzdebug.x
+	Added a "sort" parameter to the HLIST task.  (2/13)
+
+sys/imio/db/imgnfn.x
+sys/imfort/db/imgnfn.x
+pkg/images/doc/hedit.hlp
+	Since the QPOE gnfn code was derived from IMIO I figured the IMIO
+	code might have the same bug and indeed it did (the pattern matching
+	bug, not the sort bug).  Fixing this should fix the problem of HSELECT
+	matching field names using a prefix-match rather than full match.
+	The IMIO version was mapping * to ?* and was constraining the match
+	to the beginning of the name, but was not checking for a full
+	length match.  This was not completely trivial as the name being
+	matched is embedded in a FITS card, hence space or "=" terminates
+	the name, rather than EOS.  (2/13)
+
+sys/ki/ki.h
+sys/ki/kighost.x
+	Added support for an optional environment variable "irafhostnametable".
+	If defined, this specifies the host pathname of the hosts file to be
+	used for iraf networking.  The default is dev$hosts.  (2/13)
+
+	[Changed variable name to "irafhnt".  The original name was too long,
+	this could conceivably cause problems on some systems. (5/13)]
+
+unix/hlib/mkpkg.sf.SUN4
+	Evidently with the latest OS, the sparc register set is no longer
+	saved with the version of SETJMP found on a Sun-4.  This would cause
+	a process executed on a Sun-4 to die in the iraf main during error
+	recovery, upon return from the ZSVJMP call.  Compiling without
+	optimization so that the compiler does not cache values in registers
+	seems to avoid the problem.  I added etc$main.x to the special file
+	list to be compiled without optimization, although this is probably
+	going to be sufficiently common problem that we might want to
+	consider some more machine independent way of always compiling
+	without optimization routines that use ZSVJMP.  (2/14)
+
+pkg/images/doc/hedit.hlp
+pkg/images/doc/hselect.hlp
+pkg/images/doc/imheader.hlp
+pkg/images/doc/imgets.hlp
+	Added a reference to the imgets and imheader tasks in the SEE ALSO
+	sections of the HEDIT and HSELECT tasks. Added a reference to the
+	HSELECT and HEDIT tasks in the SEE ALSO sections of the IMHEADER
+	and IMGETS tasks. (2/22/91 LED)
+
+pkg/images/imfit/imsurfit.x
+        Fixed a bug in the deviant pixel rejection code in the IMSURFIT
+	task. If the parameter upper > 0 and lower = 0.0 or vice versa
+	the rejection limits were not being computed correctly. In the
+	former case all point with negative residuals were rejected
+	instead of none and in the latter case all points with positive
+	residuals were rejected instead of none. (2/25/91 LED)
+
+sys/fio/getlline.x
+sys/fio/glongline.x
+	Added some comments to the file headers noting that the size of
+	the output buffer must be at least SZ_LINE characters larger than
+	the length of the longest line to be read.  (3/01)
+
+sys/mwcs/iwewcs.x
+	The value of the (obsolete) FITS keyword CROTA2, which is input in
+	decimal degrees, was being used without first converting to radians.
+	There is no problem when the CD matrix notation is used instead. (3/12)
+
+pkg/images/tv/display/sigl2.x
+	The routine si_blkavgs, which is used to block average an image
+	(when scaling a large image to fit into a small display window)
+	would accumulate the sum of several short integer image lines in
+	a short integer buffer.  This could lead to integer overflow in
+	the case of images with large pixel values.  The routine was
+	modified to accumulate into a buffer of type long.  (Note that
+	the problem affected only block averaging in Y, X was being
+	handled correctly by the vector operator ABAV.).  (3/20)
+
+dev/hosts
+	Updated grus from 68881 to sparc.  (3/21/91 SRo)
+
+dev/hosts
+	Added herbie, Stuart Jeffries' new workstation to table.  (4/2/91 SRo)
+
+sys/fio/fstati.x
+sys/fio/fmkpbbuf.x
+	1. A fstati on F_UNREAD returns the number of unread characters in the
+	file buffer.  This was ignoring any pushback; the fstati routine was
+	modified to count pushed back data as well as any data remaining to
+	be read in the current buffer area.  Zero will be returned only if
+	the file buffer is empty and there is no pushed back data.
+	2. fmkppbuf (make pushback buffer) will now automatically create the
+	normal file i/o buffer if any pushback occurs.  Probably this is not
+	necessary but we may as well make sure that pushback before any file
+	i/o occurs is not different than after i/o has occurred and a buffer
+	has been created.  (4/2)
+
+sys/imio/iki/oif/mkpkg
+sys/imio/iki/oif/oifgpfn.x
+	Added an "include <knet.h>" to oifgpfn.x.  This is needed for the
+	zfsubd call in the routine.  (4/3)
+
+sys/ki/kfsubd.x
+	Was not returning the length of the output string correctly in
+	the case of a file on the local node, but with the node name
+	prefix included.  (4/3)
+
+dev$hosts
+        Added khaki, lapis, taupe, scarlet, and elsol to dev$hosts on
+        tucana, orion, gemini, and ursa.  (4/5 jb)
+
+pkg/images/geometry/geofit.x
+pkg/images/geometry/geogmap.x
+pkg/images/doc/geomap.hlp
+	Cross-term fitting will now work in the case where xxorder=2
+	and xyorder=2 (x fit) and in the case where yxorder=2 and
+	yyorder=2 (y fit). (4/9/91)
+
+dev$hosts
+        Added aliases to dev$hosts on tucana, orion, gemini, and ursa
+        for machines on mountain (machine.kpno.noao.edu).  (4/10 jb)
+
+hlib$extern.pkg
+	Swapped RV0 for RV since this will be the new package.  No tucana
+	users are working w/ RV at present anyway.  (4/16  MJF)
+
+pkg/images/geometry/t_blkavg.x
+pkg/images/geometry/blkavg.gx
+pkg/images/geometry/blkavg.x
+        The blkavg task was partially modified to support complex image data.  
+	The full modifications cannot be made because of an error in abavx.x
+	and the missing routine absux.x. (4/18/91 LED)
+
+pkg/images/imarith/t_imcombine.x
+	Changed the order in which images are unmapped to unmap the output
+	images last.  Closing the input images frees file descriptors
+	which are needed for the temporary file used when updating
+	STF images.  Previously IMCOMBINE would fail for STF images which
+	used the full number of file descriptors, had a sigma output
+	image, and a logfile.  (4/22/91, Valdes)
+
+math/curfit/cv_b1eval.gx
+math/curfit/cv_beval.gx
+math/curfit/cv_feval.gx
+math/curfit/cvaccum.gx
+math/curfit/cvacpts.gx
+math/curfit/cvchomat.gx
+math/curfit/cvfree.gx
+math/curfit/cvinit.gx
+	Did some cleaning up in the .gx files to make the code easier to
+	read. (4/23/91, LED)
+
+sys/ki/ki.h
+	Increased the maximum number of nodes from 64 to 128.  This is only a
+	stopgap measure; eventually the code should be rewritten to eliminate
+	the fixed size static host name table.  (4/29)
+
+dev/devices.hlp
+dev/graphcap
+dev/termcap
+	Added "lw6" and removed "imagen" from these files on tucana, gemini, 
+	ursa, orion and irafx@draco.			(4/30 ShJ)
+
+pkg/images/doc/imarith.hlp
+	Fixed some formating problems in the IMARITH help page. (5/2/91 LED)
+
+math/curfit/cvpower.gx
+	Changed the amovk$t (INDEFR,,,) call to amovk$t (INDEF,,,) to avoid
+	the double precision version of the routine being called with
+	INDEFR. This problem was caught with f2c on the Mac. (5/6/91 LED).
+
+math/gsurfit/gs_f1deval.gx
+	Changed the amulk$t (,,,2.,,,) call to amulk$t (,,,2$f,,,) to remove
+	a type dependency mismatch in the routine.  This problem was caught
+	with f2c on the Mac. (5/6/91 LED).
+
+math/curfit/cverrors.gx
+math/curfit/cvpower.gx
+math/curfit/cvrefit.gx
+math/curfit/cvrestore.gx
+	Finished cleaning up the .gx files in the curfit directory. (5/6/91 LED)
+
+unix/hlib/login.cl
+        The line
+
+            if (access ("home$loginuser.cl") cl < "home$loginuser.cl"
+
+        causes the following statement to be ignored if the IF is true.
+        This is a CL bug, but for now the workaround is to add a null
+        statement ; to the line following the IF.  (5/6)
+
+unix/sun/imtoolrc
+	Added a new config imt31|imtret for the Reticon CCD (1240x400_
+	at the request of CTIO.  (5/8)
+
+lib/math/curfit.h
+lib/math/gsurfit.h
+lib/math/iminterp.h
+lib/math/interp.h
+lib/math/surfit.h
+	Added dictionary string definitions for the interpolator types and
+	weights.  Use of these strings insures that strdic/clgwrd will
+	return the correct type code.  Currently one has to assume the code
+	definitions will not change or put a lookup table with a data
+	statement containing the macro definitions.  The code would also
+	have to be modified to add new types.  The dates were restored to
+	their original values to avoid recompilation.  (5/9, Valdes)
+
+	[I updated the dates on the above files and performed sysgen updates
+	over the weekend.  It is dangerous to modify files without modifing
+	the file date, as this can break various automatic system maintenance
+	procedures.  (5/11DCT)]
+
+unix/hlib/login.cl
+	The noao and proto packages are now loaded by default in the standard
+	login.cl.  This indirectly includes images, tv, and plot.  (5/11)
+
+pkg/images/imarith/t_imarith.x
+	There was a missing statement to set an error flag if the operand
+	image dimensions do not agree.  (5/14/91, Valdes/Schaller)
+
+pkg/images/minmax.par
+pkg/images/imutil/t_minmax.x
+pkg/images/imutil/minmax.x
+pkg/images/doc/minmax.hlp
+	Modified the minmax task to compute the minimum and maximum
+	pixel values with the correct precision if the input images are
+	of type double precision or complex. Note that does not get
+	around the fact that the minimum and maximum pixel values are
+	stored in the image header as type real. (5/16/91 Davis)
+
+pkg/images/listpixels.par
+pkg/images/iminfo/listpixels.x
+pkg/images/doc/listpixels.hlp
+	Modified the listpixels task to print the image pixel coordinates
+	in logical, physical or world coordinates. The default is logical
+	as before. (5/17/91 Davis)
+
+unix/boot/spp/xc.c
+unix/boot/mkpkg/main.c
+unix/boot/mkpkg/mkpkg.h
+	These tasks have supported multiple -p pkg arguments for some time,
+	but would only pass one such argument on to subprocesses.  XC was
+	modified to pass multiple -p pkg arguments on to XPP and MKPKG was
+	modified to load the mkpkg.inc file for multiple enviroments
+	(formerly it would load multiple environments, but would only read
+	one mkpkg.inc in addition to the global core system one).  The PKGENV
+	environment variable was generalized; this can be now be a
+	whitespace delimited list of packages, not just a single package
+	name.  It was not necessary to modify MKPKG to pass -p pkg stuff
+	on to XC, since this is done explicitly in the package mkpkg.inc
+	files (by redefining XFLAGS and LFLAGS).  (5/21)
+
+sys/vops/asqr.gx
+	Changed to test for <0 rather than <=0, since taking the square root
+	of zero is a legal operation.  (6/3)
+
+pkg/dataio/fits/fits_read.x
+pkg/dataio/fits/fits_write.x
+	Modified the fits reader and writer to deal correctly with
+	image sections in the IRAFNAME header parameter. (11/6 LED)
+
+pkg/images/iminfo/imhistogram.x
+	The imhistogram task has been modified to print out the value
+	at the middle of the histogram bin instead of the value of the
+	left most edge if the output type is list. (11/6 LED)
+
+pkg/dataio/doc/wfits.hlp
+pkg/dataio/fits/wfits.h
+pkg/dataio/fits/t_wfits.x
+pkg/dataio/fits/fits_write.x
+pkg/dataio/fits/fits_wheader.x
+	The wfits task has been modified to write IEEE format FITS files,
+	fits bitpix = -32 and -64, instead of scaled integers if the input
+	image pixel type is real or double respectively and if the wfits
+	parameter bitpix is left at the default. If the user overrides the
+	default and elects to scale the data, a warning message with an
+	estimate of the maximum precision loss is provided. (11/6 LED)
+
+dev/termcap
+	Fixed typo so that "stty wyse" works, not just "stty wyse75".
+	(6/12/91 SRo)
+
+dev/devices [gemini only]
+        Updated the devices file on gemini for Tom Duvall's two Exabytes
+        on his workstation.  They are called rst0 and rst1 so this
+        causes duplicate entries in the devices file for different
+        mt[devices].  (6/13/91 jb)
+
+sys/etc/mkpkg
+sys/etc/qsort.x
+sys/etc/xqsort.x		+
+	Added a new routine XQSORT, a variant on the old QSORT routine.
+	This is identical to qsort except for an extra argument which is
+	private to the compare routine and merely passed on to the compare
+	routine by xqsort.  The intent of this is to avoid the need for
+	initialization routines and commons to pass context information
+	on to the compare routine.  The datatype of the "private data"
+	argument is int but a pointer can be passed as well, as in C where
+	an integer cast is used to pass pointer data in an integer.  Since
+	a pointer can be passed, if necessary any arbitrarily complex
+	descriptor can be passed on to the compare routine.  (6/15)
+
+	!NOTE -- the name of this procedure had to be changed to "gqsort".
+	!See note below.  (6/27)
+
+lib/clio.h
+lib/clset.h
+sys/clio/README
+sys/clio/mkpkg
+sys/clio/clcache.x
+sys/clio/clstati.x
+sys/clio/clepset.x		+
+sys/clio/clgpseta.x		+
+sys/clio/clppseta.x		+
+sys/clio/clgpset.x
+sys/clio/clppset.x
+	1. Added a full CLIO interface definition to the README file.
+
+	2. The pset routines cl[gp]pset, used to get/put the values of
+	string valued parameters, where named to cl[gp]pseta as the old
+	names were too misleading (what does it mean to get/put a pset).
+	The old routines are retained for compatibility but are now
+	considered obsolete.
+
+	3. The CLGFIL routines are also now considered obsolete.  clgstr
+	and fntgfn etc. should be used instead.  It doesn't make any sense
+	to have a system routine that arbitrarily combines two such 
+	different facilities as get-string and the file name template
+	package (if this is justified then any number of other equally
+	logical combinations are possible too).
+
+	4. Added a new routine CLEPSET to the pset package.  This is called
+	to "edit" a pset.  So far as the application is concerned all this
+	means is that the pset values can be changed by the operation.  In
+	the specific case of the current combination of CLIO and the CL,
+	EPARAM is called to edit the pset and the edited values are updated
+	in the parameter cache in the local process.  This routine is still
+	considered experimental.  (6/22)
+
+pkg/cl/task.h
+pkg/cl/exec.c
+pkg/cl/opcodes.c
+	Minor changes to the CL were required to support the CLEPSET
+	routine.  clepset uses dparam to efficiently obtain the edited pset
+	and update the local parameter cache.  A way was needed to redirect
+	the output of a task like dparam back to CLIO in a subprocess.  A
+	hidden special file ("IPC$IPCIO-OUT" currently, but this could
+	change at any time) was defined such that if a task is run with the
+	output redirected as in "dparam > IPC$IPCIO-OUT" the stdout of the
+	task is sent to t_out, the CLIN of the subprocess which issued the
+	command.  When the task terminates the message "# IPC$IPCIO-FINISHED\n"
+	is sent to mark the end of the output from the task.
+
+	These changes are considered internal to CLIO.  The method used to
+	implement this feature is a minimum-modification approach which
+	only solves a part of a more general problem, hence this facility
+	should not be used outside of CLIO.  (6/22)
+
+sys/clio/README
+sys/clio/clcache.x
+sys/clio/clio.com
+sys/clio/clepset.x
+sys/etc/main.x
+	1. Added a new routine clc_compress() to the CLIO parameter cache
+	code, with a call to this routine in clepset().  The caching
+	mechanism handles parameter updates by simply redefining the
+	parameter and its value in the symbol table; if there are many
+	parameter updates significant wasted space can result.  clc_compress
+	rebuilds the cache symbol table, saving only the most recent entry
+	for each parameter.
+
+	2. Modified clc_init() to permit it to be called repeatedly to
+	reinitialize the parameter cache.  Modified main.x to use clc_init
+	instead of clc_mark/clc_free to reinitialize the cache before
+	running a task.  This was done to eliminate the external marker,
+	which would be invalidated after rebuilding the cache symbol table
+	in an operation such as clc_compress.  (6/23)
+
+sys/gio/imdkern/idk.x
+	The arguments "frame" and "color" to the idk_open procedure were
+	being modified by the procedure, causing the external values to be
+	preserved across open/close workstation calls.  This was causing
+	the automatic frame number detection logic to fail when displaying
+	to multiple frames without restarting the kernel.  (6/23)
+
+sys/clio/README
+sys/clio/mkpkg
+sys/clio/clcache.x
+sys/clio/cllpset.x			+
+	Added a new routine clc_list(fd,pset,format) to the parameter
+	cache package, and a corresponding routine cllpset(pp,format) to
+	the pset package.  These are used to list the contents of a pset,
+	or of the full parameter cache, to an output file using a caller
+	specified format.  (6/23)
+
+sys/fio/fseti.x
+	Added a call to fcanpb() in the F_CANCEL code to cancel any pushed
+	back input.  (6/24)
+
+dev/hosts
+	Added radix (Richard Green) to host table.  (6/27/91 SRo)
+
+sys/etc/mkpkg
+sys/etc/qsort.x
+sys/etc/xqsort.x		-
+sys/etc/gqsort.x		+
+	It was necessary to change the name of the recently added procedure
+	"xqsort" to "gqsort" to avoid a library name conflict.  The old
+	qsort procedure is defined in hlib$iraf.h as "xqsort".  The best
+	thing to do would have been to change this definition to something
+	more obscure, but this would have required recompiling all existing
+	applications that use qsort, and worse, since there would be a new
+	procedure xqsort with a different calling sequence, existing 
+	applications using the new shared image would get the new xqsort
+	and would have died with a segvio when the program was executed.
+	It is easier to pick a new name then force recompilation of the
+	existing applications.  (6/27)
+
+dev/termcap
+dev/graphcap
+	Added new entry for pericomdg submitted by Skip Schaller.  Modified
+	existing termcap entry for vi501 as suggested by Alan Koski.  (7/5 ShJ)
+
+dev$hosts
+	Added aliases to dev$hosts on tucana, orion, gemini, ursa,
+	and draco for downtown node "morrison".  (CB, 7/5/91)
+
+ursa!hlib$extern.pkg
+	Set ccdacq as a top level package to point to /u2/rooke/ice/ccdaqcq.
+	(7/5/91 SRo)
+
+sys/pmio/miogl.x
+	The activation code in this routine was not initializing the "ve"
+	vector.  The error was harmless in the typical case where the
+	i/o range is the full image, but could lead to an error when
+	mio_setrange was used to specify a subregion, becasuse the "ve"
+	vector was only used in the latter case.  (7/6)
+
+sys/pmio/zzdebug.x
+	Added a "region" parameter to the MIO zzdebug task, to allow testing
+	of mio_setrange.  (7/6)
+
+sys/imio/db/imgnfn.x
+sys/imio/db/idbkwlu.x
+sys/imio/db/imgftype.x
+sys/imio/db/idbpstr.x
+sys/imio/db/idbgstr.x
+	1.  The image keyword list (gnfn) stuff, which was modified earlier
+	to require full keyword matches for header keywords, would still
+	permit partial matches for the standard builtin keywords (there
+	was a second call to patmatch, used to check the stadard keywords,
+	which was missed earlier).
+	2. Tightened up the keyword matching performed on the naxisN keywords.
+	Formerly there would have been a conflict if a user keyword happened
+	to have a name such as "naxisNfoo".
+	3. In imgftype, there was some code in the procedure to check for
+	"i_" and naxisN which was apparently redundant (idb_kwlookup already
+	does this) so I deleted the code.  (7/8)
+
+pkg/system/help/helpdb.x
+pkg/system/help/helpdir.x
+	1. Added a new routine hd_debug to helpdir.x.  This dumps the
+	descriptor of a compiled help directory to a file and is used for
+	debugging purposes (it is not used in the runtime system).
+
+	2. The routine hdb_make_rhd, used to make the root help directory
+	(directory of packages), contained a line HD_NMODULES(hd) =
+	HDB_NENTRIES(db) which was incorrect; this could add extra,
+	unitialized modules to the help directory just assembled, possibly
+	leading to a segementation violation when later the unitialized
+	entries were referenced.  This was causing segmentation violations
+	when many external packages were loaded (the bug would only come
+	into effect with root help directories, and each external package
+	has one).  The bug has always been there, it is just more likely to
+	cause a problem when there are many packages.  (7/10)
+
+sys/qpoe/qpexmodfil.x
+	A filter expresion such as "foo = expr" is supposed to be the same
+	as "foo += expr", adding to any existing filter term, instead of
+	replacing the existing filter as with "foo := expr".  This code had
+	it the other way around, i.e., = was the same as := (replace).  (7/15)
+
+unix/hlib/login.cl
+	Modified the template login.cl as follows:
+	1. Added code to check the environment variable TERM, if it exists,
+	for the special cases "sun" and "xterm".  This won't work in many
+	cases but should make it easier for people to customize things if
+	they want, without requiring a loginuser.cl.
+	2. If the file ".hushiraf" is seen during login the message of the
+	day is not printed and cl.menus is set to no.  This makes it
+	possible to get a simple cl prompt without all the other verbiage
+	being printed, which experienced users don't necessarily want
+	to see during every login.
+	3. Deleted some old stuff that has been commented out for quite a
+	while without causing problems.  (7/15)
+
+pkg/system/doc/mkdir.hlp
+	Fixed a typo.  (7/18)
+
+dev/hosts
+        Added enzo to the hosts table (Frank Hill's new machine). Did this on
+        tucana and gemini. (7/19 jb)
+
+pkg/images/imarith/imc* -
+pkg/images/imarith/ic* +
+pkg/images/imarith/t_imcombine.x
+pkg/images/imarith/mkpkg
+pkg/images/imarith/generic/mkpkg
+pkg/images/imcombine.par
+pkg/images/doc/imcombine.hlp
+	Replaced old version of IMCOMBINE with new version supporting masks,
+	offsets, and new algorithms.  (7/19 fv)
+
+lib/math/iminterp.h
+math/iminterp/arbpix.x
+math/iminterp/arider.x
+math/iminterp/arieval.x
+math/iminterp/asider.x
+math/iminterp/asieval.x
+math/iminterp/asifit.x
+math/iminterp/asiffree.x
+math/iminterp/asigrl.x
+math/iminterp/asiinit.x
+math/iminterp/asirestore.x
+math/iminterp/asisave.x
+math/iminterp/asivector.x
+math/iminterp/ii_1dinteg.x
+math/iminterp/ii_eval.x
+math/iminterp/ii_pc1deval.x
+math/iminterp/im1interpdef.h
+math/iminterp/doc/arbpix.hlp 
+math/iminterp/doc/arider.hlp
+math/iminterp/doc/arieval.hlp
+math/iminterp/doc/asider.hlp
+math/iminterp/doc/asieval.hlp
+math/iminterp/doc/asifit.hlp
+math/iminterp/doc/asigrl.hlp
+math/iminterp/doc/asiinit.hlp
+math/iminterp/doc/asivector.hlp
+	The 1D image interpolation routines were replaced with new versions 
+	modified by Frank Valdes to support sinc interpolation. (7/26/91 Davis)
+
+sys/qpoe/qprlmerge.gx		+
+sys/qpoe/qpexattrl.gx
+sys/qpoe/qpexgetat.x
+sys/qpoe/README
+sys/qpoe/mkpkg
+sys/qpoe/gen/mkpkg
+sys/qpoe/zzdebug.x
+	The qpex_attrl routine would fail for attribute expressions
+	containing multiple eterms (filter subexpressions).  Instead of
+	AND-ing the successive filter terms, it was combining them (OR-ing
+	them) to produce a single expression, and parsing the result
+	to return the output range list.
+
+	1. Modified qpex_getattribute to return expressions containing
+	multiple eterms with a semicolon rather than a comma delimiting
+	each eterm, so that the eterms can be distinguished.
+	2. Added a new routine qp_rlmerge, used to merge (AND) two range
+	lists of any datatype.
+	3. Modified qpex_attrl to parse each eterm separately and merge
+	the resultant range list into the output range list.
+	4. Added a new debug task mergei and used this to test the new
+	merge range list routine.  (7/27)
+
+sys/imio/iki/stf/stfrgpb.x
+	Added a check for a group index out of range.  (7/28)
+
+sys/pmio/miopl.gx
+sys/pmio/miogl.gx
+sys/pmio/miostati.x
+sys/pmio/mioseti.x
+sys/pmio/miosrange.x
+sys/pmio/mio.h
+	MIO_SETRANGE still wasn't working correctly so I had a more careful
+	look at the mio_[gp]l routines.
+
+	1. The fix made earlier to initialize the "ve" vector was incorrect,
+	as any data that wants to be saved between calls has to be saved in
+	the i/o descriptor and "ve" is a local variable.  Moved the "ve"
+	initialization to immediately before the call to imggsc, where the
+	variable is used.
+
+	2. Made extensive changes to the way the "V" vector is handled.
+	This is passed back by the routines in each call to give the
+	coordinates of the first pixel of the referenced line segment.
+	Modified the routine to pass back a vector matching the image
+	dimension rather than of length IM_MAXDIM, to lessen the chance
+	of overrunning the client's buffer.  Fixed a bug that was preventing
+	the routine from returning correct vector coordinates when doing
+	i/o on a subregion (mio_setrange) of the image.  Fixed a bug that
+	would cause the data pointer to be offset when accessing subregions.
+
+	3. By default the coordinates of the V vector returned by the
+	mio_[gp]l routines will be relative to any subregion specified
+	with a prior call to mio_setrange.  This is convenient when using
+	mio_setrange to randomly access subregions of the image.  If this
+	is not what is desired it is now possible to follow the mio_setrange
+	call with a call to "mio_seti(mio,P_REGCOORDS,NO)" to cause the
+	V vector to be returned in image rather than region relative
+	coordinates.  This is more convenient for applications that use
+	mio_setrange only to optimize i/o and want this to be transparent
+	to the rest of the code.  (7/28)
+
+pkg/images/geometry/t_imshift.x
+        The shifts file pointer was not being correctly initialized to NULL 
+        in the case where no shifts file was declared. When the task
+	was invoked repeatedly from a script, this  could result in an array
+	being referenced,  for which space not been previously allocated.
+	(LED 7/29/91)
+
+unix/hlib/extern.pkg	URSA ONLY
+	Changed ccdacq from /u2/rooke/ice/ccdacq/ to
+	/ursa/iraf/extern/ice/ccdacq.  We now have "production" and development
+	versions on ursa.  (7/31/91 SRo)
+
+dev/hosts
+        Added mira, Mike Merrill's machine - this had been added to gemini
+        but not to tucana.  (8/3/91 jb)
+
+mkpkg
+noao/mkpkg
+	Added a new entry point "arch" as an alias for "showfloat".  The
+	command "mkpkg arch" will print the current architecture.  (8/06)
+
+pkg/xtools/inlfit/		+
+pkg/xtools/doc/inlfit.hlp	+
+pkg/xtools/mkpkg
+	The interactive non-linear least squares fitting package inlfit
+	developed by Pedro Gigoux and used by the photcal package has
+	been added to xtools. (8/7/91 LED) 
+
+dev/hosts	[tucana, gemini, ursa]
+	Changed lapis to /usr/iraf/iraf.  Other mountain systems should be
+	changed as Jim Davis gets around to them.  (8/8/91 SRo)
+
+sys/libc/qsort.c
+	Added the copyright notice from the BSD source.  Berkeley finally
+	made this source publically available without a unix source license,
+	provided the copyright notice is retained.  (8/11)
+
+sys/imio/iki/stf/stfaddpar.x
+	Added a case for TY_BOOL (LOGICAL*4), and changed the abbreviated
+	type names "INT*4" etc. to their full Fortran equivalents.  (Bug
+	fix contributed by B.Simon).  (8/11)
+
+sys/mwcs/mwgsys.x		+
+sys/mwcs/mkpkg
+	Added source for the routine mw_gsystem.  This was in the interface
+	specification but was missing from the interface.  (8/11)
+
+unix/sun/imtoolrc
+unix/sun/imtool.c
+	Added several new entries to the imtoolrc file.  Increased the
+	maximum number of frame buffer configuration entries from 64 to 128,
+	and added a comment to the file suggesting that users add their
+	custom additions starting with config #64.  (8/11)
+
+pkg/plot/phistogram.par
+pkg/plot/phistogram.x
+pkg/plot/phminmax.x
+pkg/plot/doc/phistogram.hlp
+	Added a new task phistogram to the plot package. Phistogram takes
+	input from either an image or a list and permits full control over
+	the plotting parameters. The histogram computation is done in
+	and identical manner to the imhistogram task. (8/14/91 LED)
+
+pkg/plot/pradprof.par
+pkg/plot/t_pradprof.x
+pkg/plot/doc/pradprof.hlp
+	Added a new task pradprof to the plot package. (8/16/91 LED)
+
+unix/gdev/sgidev/mkpkg.sh
+unix/gdev/sgidev/sgi2ueps.c
+	Installed new SGI to EPS (encapsulated postscript) graphics driver.
+	(8/16)
+
+dev/grapcap
+	1. Installed a minor bug fix affecting the vhpl (VMS) entry.
+	2. Added entries for the EPS driver.  Device "eps" is the default
+	portrait mode output, "epsl" provides landscape mode.  (8/16)
+
+dev/hosts	[tucana, gemini, ursa]
+	Changed khaki to /usr/iraf/iraf.  (8/16 jb)
+
+pkg/cl/exec.c
+	There was a bug in the oneof() function in how the "alldone" flag
+	is set to cause termination of a background process.  The flag
+	would be set when attempting to pop (at task termination) a task
+	that has the T_BATCH flag set.  The problem is that this test
+	would result in the continued execution of the task *after* execution
+	of the background command completed.  In the normal case of a
+	background command submitted interactively on the command line this
+	would be harmless as the task would be "cl", which would see EOF
+	on the stdin and exit.  In more complex cases, e.g., an executable
+	task or a script reading from a file, this could result in an
+	attempt to read from a stream that existed in the foreground CL
+	but which was never opened in the background CL.
+
+	The particular case in which this showed up was in the OBSERVE task
+	in CCDACQ, when submitting the command "display <image> 1 &" to
+	the CL from the subprocess, using clcmd.  The display task would
+	run normally, being left behind in the process cache as the first
+	non-system process.  The task descriptor for the observe task in
+	the background cl would be set up to read from a connected subprocess,
+	and after execution of the display command would resume waiting for
+	commands from the subprocess.  Meanwhile, the subprocess actually
+	in the cache would be display rather than observe, and display would
+	have already terminated, resulting in deadlock with both the CL
+	(observe) and the display task executable waiting for a command.
+	Due to the deadlock the background job would never terminate and
+	after this sequence had repeated several times background job
+	submission would fail in the foreground cl with "no more background
+	job slots".  (8/18)
+
+pkg/plot/phistogram.par
+pkg/plot/phistogram.x
+pkg/plot/phminmax.x
+pkg/plot/doc/phistogram.hlp
+	The new phistogram task has been restored to the plot package after
+	the disk crash.  (8/26/91 LED)
+
+pkg/plot/pradprof.par
+pkg/plot/t_pradprof.x
+pkg/plot/doc/pradprof.hlp
+	The new pradprof task has been restored to the plot package after
+	the disk crash. (8/26/91 LED)
+
+dev/graphcap
+	Added the six new ICE imtool frame buffer entries.  (8/27/91 SRo)
+
+sys/qpoe/qpexmodfil.x
+	There was a simple bug in the buffer reallocation code which would
+	cause filter expansion to fail for expressions longer than 1024
+	characters.  A "sz_expr = INC_SZEXPRBUF" should have been
+	"sz_expr = sz_expr + INC_SZEXPRBUF".  (9/04)
+
+unix/shlib/mkshlib.csh		[not modified]
+	After a sysgen all sparc executables would fail to run due to an
+	access violation.  This was due to a problem with the shared image;
+	the data and text segments were overlapping by 8 bytes, evidently
+	due to a linker bug in SunOS 4.1.1.  I worked around the problem by
+	manually relinking the shared image including a dummy object "foo.o"
+	in the link to make the text segment slightly larger.  Since the
+	text size of the shared image will change as soon as any code is
+	changed, it doesn't seem worthwhile to devise a more permanent
+	workaround.  It looks like the linker fails to align the data segment
+	properly if etext is close to a page boundary.  (9/07)

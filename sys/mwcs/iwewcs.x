@@ -3,6 +3,7 @@
 include	<ctype.h>
 include	<imhdr.h>
 include	<imio.h>
+include	<math.h>
 include	"mwcs.h"
 include	"imwcs.h"
 
@@ -149,7 +150,7 @@ samperr_		call eprintf (
 	    if (iw_findcard (iw, TY_CDELT, ERR, 0) == NULL)
 		call mw_mkidmd (IW_CD(iw,1,1), ndim)
 	    else {
-		theta = IW_CROTA(iw)
+		theta = DEGTORAD(IW_CROTA(iw))
 		ax2 = decax
 		ax1 = 3 - decax
 		IW_CD(iw,ax1,ax1) = IW_CDELT(iw,ax1) * cos(theta)

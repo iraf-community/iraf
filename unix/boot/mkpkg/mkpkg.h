@@ -7,12 +7,14 @@
 #define	SZ_CMD		2048	/* buf for os escape			*/
 #define	SZ_IFSTACK	50	/* max $IF nesting			*/
 #define	SZ_PREDBUF	1024	/* largest $IF predicate		*/
+#define	SZ_PKGENV	256	/* pkgenv package list buffer		*/
 #define	MAX_ARGS	50	/* max args to a $IF			*/
 #define	MAX_FILES	512	/* max files in a module list		*/
 #define	MAX_DEPFILES	100	/* max dependency files			*/
 #define	MAX_SYMBOLS	256	/* max macros				*/
 #define	MAX_SFDIRS	128	/* max dirs containing special 	files	*/
 #define	MAX_SFFILES	1024	/* max special files			*/
+#define	MAX_PKGENV	20	/* max package environments		*/
 
 #define	INTERRUPT	SYS_XINT
 #define	MKPKGFILE	"mkpkg"

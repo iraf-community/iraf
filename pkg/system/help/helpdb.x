@@ -427,7 +427,7 @@ pointer	db			#I database descriptor
 pointer	data			#I data buffer (compiled help directories)
 pointer	index			#I database index
 
-int	i, j, len_modlist, newpos
+int	i, j, len_modlist, newpos, pos
 pointer	hp, o_hp, mp, ix, sbuf, o_mp, c_modlist, hdfile
 
 bool	streq()
@@ -505,13 +505,17 @@ begin
 	    # somewhere but has no .hd file.  We exclude such files from the
 	    # index, hence the new modlist may be shorter than the original.
 
+	    pos = 1
 	    newpos = ERR
 	    do j = 1, HDB_NENTRIES(db) {
 		ix = index + (j - 1) * LEN_HDBINDEX
-		if (streq (DBI_KEY(ix), Memc[hdfile])) {
-		    newpos = j
+		if (strncmp (DBI_KEY(ix), "_index", 6) == 0) {
+		    next
+		} else if (streq (DBI_KEY(ix), Memc[hdfile])) {
+		    newpos = pos
 		    break
-		}
+		} else
+		    pos = pos + 1
 	    }
 
 	    # Copy the module entry back into the original modlist,
@@ -523,7 +527,6 @@ begin
 	}
 
 	call mfree (c_modlist, TY_STRUCT)
-	HD_NMODULES(hp) = HDB_NENTRIES(db)
 
 	# Return any unused space in string buffer.
 	call realloc (HD_SBUF(hp), HD_NEXTCH(hp), TY_CHAR)

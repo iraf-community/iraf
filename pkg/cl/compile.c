@@ -36,7 +36,7 @@ compile (opcode, args, args2)
 int opcode, args, args2;
 {
 	register struct codeentry *cep;
-	register status;
+	register status = OK;
 
 	if (pc > topcs - 20) {
 	    eprintf ("INTERNAL ERROR: pc/topcs collision: %d/%d\n", pc, topcs);

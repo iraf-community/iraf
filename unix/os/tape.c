@@ -198,7 +198,7 @@ quit:		if (in != stdin)
 
 		/* Open device. */
 		if ((tape = open (mtdev, 
-		    ((token=gettok()) && *token == 'w') ? 1 : 0)) == -1) {
+		    ((token=gettok()) && *token == 'w') ? 2 : 0)) == -1) {
 		    sprintf (lbuf, "cannot open device %s\n", mtdev);
 		    output (lbuf);
 		    mtdev[0] = EOS;
@@ -379,20 +379,23 @@ pstatus()
 	struct	mtget mt;
 	char	*tn;
 
-	if (ioctl (tape, MTIOCGET, &mt) != 0)
-	    sprintf (obuf, "MTIOCGET ioctl fails\n");
-	else {
-	    for (tn="unknown", tp=info;  tp->t_type;  tp++)
-		if (tp->t_type == mt.mt_type) {
-		    tn = tp->t_name;
-		    break;
-		}
+	if (verbose) {
+	    if (ioctl (tape, MTIOCGET, &mt) != 0)
+		sprintf (obuf, "MTIOCGET ioctl fails\n");
+	    else {
+		for (tn="unknown", tp=info;  tp->t_type;  tp++)
+		    if (tp->t_type == mt.mt_type) {
+			tn = tp->t_name;
+			break;
+		    }
 
-	    sprintf (obuf,
+		sprintf (obuf,
 	    "status %d (%d) file=%d block=%d resid=%d [ds=0x%x er=0x%x] %s\n",
-		status, errno, mt.mt_fileno, mt.mt_blkno,
-		mt.mt_resid, mt.mt_dsreg, mt.mt_erreg, tn);
-	}
+		    status, errno, mt.mt_fileno, mt.mt_blkno,
+		    mt.mt_resid, mt.mt_dsreg, mt.mt_erreg, tn);
+	    }
+	} else
+	    sprintf (obuf, "status %d (%d)\n", status, errno);
 #else
 	sprintf (obuf, "status %d (%d)\n", status, errno);
 #endif
