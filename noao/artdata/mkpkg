@@ -29,6 +29,7 @@ libpkg.a:
 	numrecipes.x	<math.h>
 	t_mk1dspec.x	<error.h> <imhdr.h>
 	t_mk2dspec.x	<error.h> <imhdr.h> <math/iminterp.h>
+	t_mkheader.x	<error.h>
 	t_mknoise.x	<error.h> <imhdr.h>
 	t_mkobjects.x	<error.h> <imhdr.h> <math.h>
 	t_mkpattern.x	<error.h> <imhdr.h>

@@ -2,6 +2,9 @@ include	<error.h>
 include	<imhdr.h>
 include	<math/iminterp.h>
 
+define	MAX_HDR		20000		# Maximum user header
+define	LEN_COMMENT	70		# Maximum comment length
+
 define	NALLOC		10		# Alloc block size
 define	NPROF		201		# Length of profile
 
@@ -46,17 +49,18 @@ bool	new
 int	ilist, olist, mlist
 int	i, j, k, k1, k2, fd, npts, nmods, nalloc
 real	pcen[2], fwhm[2], flux[2], peak, pstep, pstart, pend, x1, x2, dx
-pointer	sp, mod, mods, asi, asis[2], data, in, out, temp, pname
+pointer	sp, comment, mod, mods, asi, asis[2], data, in, out, temp, pname
 
 bool	streq()
 real	asigrl()
 int	clgeti(), access(),  open(), fscan(), nscan(), imaccess(), strdic()
-int	imtopenp(), imtlen(), imtgetim()
+int	imtopenp(), imtlen(), imtgetim(), clktime()
 pointer	immap(), imgl1r(), imgl2r(), impl2r()
 errchk	open, immap
 
 begin
 	call smark (sp)
+	call salloc (comment, LEN_COMMENT, TY_CHAR)
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (models, SZ_FNAME, TY_CHAR)
@@ -111,6 +115,7 @@ begin
 	            IM_PIXTYPE(out) = TY_REAL
 		    call clgstr ("title", IM_TITLE(out), SZ_IMTITLE)
 		    call imaddi (out, "dispaxis", 2)
+		    call mko_header (out)
 	        }
 	    } else {
 	        iferr (in = immap (Memc[input], READ_ONLY, 0)) {
@@ -127,10 +132,21 @@ begin
 	    nc = IM_LEN(out,1)
 	    nl = IM_LEN(out,2)
 
+	    # Add comment history of task parameters.
+	    call strcpy ("# ", Memc[comment], LEN_COMMENT)
+	    call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
+	    call mko_comment (out, Memc[comment])
+	    call mko_comment (out, "begin\tmk2dspec")
+	    call mko_comment1 (out, "models", 's', Memc[comment])
+
 	    # Read the models file.
 	    fd = open (Memc[models], READ_ONLY, TEXT_FILE)
 	    nmods = 0
 	    while (fscan (fd) != EOF) {
+		call gargstr (Memc[comment], LEN_COMMENT)
+		call mko_comment (out, Memc[comment])
+
+		call reset_scan ()
 	        call gargwrd (Memc[template], SZ_FNAME)
 	        call gargr (scale)
 	        call gargwrd (Memc[pname], SZ_FNAME)

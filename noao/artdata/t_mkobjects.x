@@ -2,6 +2,10 @@ include	<error.h>
 include	<imhdr.h>
 include	<math.h>
 
+define	MAX_HDR		20000			# Maximum user header
+define	COMMENT		"COMMENT   "		# Comment key
+define	LEN_COMMENT	70			# Maximum comment length
+
 # Object data structure
 define	LEN_MKO		9
 define	MKO_MKT		Memi[$1]		# Template
@@ -42,18 +46,18 @@ real	x, y, z, r, ar, pa
 
 bool	new, bsave
 int	i, j, k, l, nx, ny, nlines, c1, c2, c3, c4, l1, l2, l3, l4, irbuf, ipbuf
-pointer	sp, input, output, fname, star, rbuf, pbuf
+pointer	sp, input, output, fname, star, comment, rbuf, pbuf
 pointer	in, out, buf, lines, newlines, obj, ptr1, ptr2
 pointer	mko, mkt
 
-long	clgetl()
+long	clgetl(), clktime()
 bool	clgetb(), streq()
 int	imtopenp(), imtlen(), imtgetim(), btoi()
-int	clgeti(), access(), nowhite(), open(), fscan(), nscan(), imaccess()
+int	clgeti(), open(), fscan(), nscan(), imaccess()
 real	clgetr()
 pointer	immap(), imgl2r(), impl2r()
 pointer	mkt_star(), mkt_object()
-errchk	open, immap, imgl2r, impl2r, malloc, realloc, mkt_object
+errchk	open, immap, imgl2r, impl2r, malloc, realloc, mkt_star, mkt_object
 
 int	mko_compare()
 extern	mko_compare
@@ -66,6 +70,7 @@ begin
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 	call salloc (star, SZ_FNAME, TY_CHAR)
+	call salloc (comment, LEN_COMMENT, TY_CHAR)
 
 	# Get parameters which apply to all images.
 	ilist = imtopenp ("input")
@@ -92,10 +97,10 @@ begin
 
 	background = exptime * background
 
-	if (max (1, imtlen (olist)) != imtlen (ilist))
-	    call error (1, "Output image list does not match input image list")
+	if (imtlen (objects) == 0)
+	    call error (1, "No objects list")
 
-	# Loop through input, output, and cosmic ray lists.
+	# Loop through input, output, and object lists.
 	# Missing output images take the input image name.
 	# The object list will repeat if shorter than input list.
 
@@ -103,32 +108,44 @@ begin
 	while (imtgetim (ilist, Memc[input], SZ_FNAME) != EOF) {
 	    if (imtgetim (olist, Memc[output], SZ_FNAME) == EOF)
 		call strcpy (Memc[input], Memc[output], SZ_FNAME)
+
+	    # Get and check object list.
 	    i = imtgetim (objects, Memc[fname], SZ_FNAME)
+	    iferr (i = open (Memc[fname], READ_ONLY, TEXT_FILE)) {
+		call erract (EA_WARN)
+		next
+	    }
 
 	    # Map images.  Check for new, existing, and in-place images.
 	    if (streq (Memc[input], Memc[output])) {
 		if (imaccess (Memc[input], 0) == YES) {
-		    iferr (in = immap (Memc[input], READ_WRITE, 0)) {
+		    iferr (in = immap (Memc[input], READ_WRITE, MAX_HDR)) {
 			call erract (EA_WARN)
 			next
 		    }
 		    out = in
 		    new = false
 		} else {
-		    iferr (in = immap (Memc[input], NEW_IMAGE, 0)) {
+		    iferr (in = immap (Memc[input], NEW_IMAGE, MAX_HDR)) {
 			call erract (EA_WARN)
 			next
 		    }
 		    out = in
-		    IM_NDIM(in) = 2
-		    IM_LEN(in,1) = clgeti ("ncols")
-		    IM_LEN(in,2) = clgeti ("nlines")
-		    IM_PIXTYPE(in) = TY_REAL
+
+		    IM_NDIM(out) = 2
+		    IM_LEN(out,1) = clgeti ("ncols")
+		    IM_LEN(out,2) = clgeti ("nlines")
+		    IM_PIXTYPE(out) = TY_REAL
 		    call clgstr ("title", IM_TITLE(out), SZ_IMTITLE)
+		    call imaddr (out, "exptime", exptime)
+		    call imaddr (out, "gain", gain)
+		    call imaddr (out, "rdnoise", rdnoise * gain)
+		    call mko_header (out)
+
 		    new = true
 		}
 	    } else {
-		iferr (in = immap (Memc[input], READ_ONLY, 0)) {
+		iferr (in = immap (Memc[input], READ_ONLY, MAX_HDR)) {
 		    call erract (EA_WARN)
 		    next
 		}
@@ -151,67 +168,90 @@ begin
 
 	    # Read the object list.
 	    nobjects = 0
-	    i = nowhite (Memc[fname], Memc[fname], SZ_FNAME)
-	    if (access (Memc[fname], 0, 0) == YES) {
-		i = open (Memc[fname], READ_ONLY, TEXT_FILE)
-		while (fscan (i) != EOF) {
-		    call gargr (x)
-		    call gargr (y)
-		    call gargr (z)
-		    call gargwrd (Memc[fname], SZ_FNAME)
-		    call gargr (r)
-		    call gargr (ar)
-		    call gargr (pa)
-		    call gargb (bsave)
-		    x = (x + xo) / distance
-		    y = (y + yo) / distance
-		    if (nscan() < 3 || x < 1 || x > nc || y < 1 || y > nl)
-			next
-		    if (nobjects == 0) {
-			j = 100
-			call malloc (MKO_MKT(mko), j, TY_POINTER)
-			call malloc (MKO_X(mko), j, TY_REAL)
-			call malloc (MKO_Y(mko), j, TY_REAL)
-			call malloc (MKO_Z(mko), j, TY_REAL)
-			call malloc (MKO_R(mko), j, TY_REAL)
-			call malloc (MKO_AR(mko), j, TY_REAL)
-			call malloc (MKO_PA(mko), j, TY_REAL)
-			call malloc (MKO_SAVE(mko), j, TY_INT)
-			call malloc (MKO_SORT(mko), j, TY_INT)
-		    } else if (nobjects == j) {
-			j = j + 100
-			call realloc (MKO_MKT(mko), j, TY_POINTER)
-			call realloc (MKO_X(mko), j, TY_REAL)
-			call realloc (MKO_Y(mko), j, TY_REAL)
-			call realloc (MKO_Z(mko), j, TY_REAL)
-			call realloc (MKO_R(mko), j, TY_REAL)
-			call realloc (MKO_AR(mko), j, TY_REAL)
-			call realloc (MKO_PA(mko), j, TY_REAL)
-			call realloc (MKO_SAVE(mko), j, TY_INT)
-			call realloc (MKO_SORT(mko), j, TY_INT)
-		    }
-
-		    Memr[MKO_X(mko)+nobjects] = x
-		    Memr[MKO_Y(mko)+nobjects] = y
-		    Memr[MKO_Z(mko)+nobjects] =
-			exptime / (distance * distance) * 10. ** (-0.4*(z-m0))
-		    if (nscan() < 7)
-			Memi[MKO_MKT(mko)+nobjects] = mkt_star (Memc[star])
-		    else {
-			Memi[MKO_MKT(mko)+nobjects] = mkt_object (Memc[fname])
-			Memr[MKO_R(mko)+nobjects] = r / distance
-			Memr[MKO_AR(mko)+nobjects] = ar
-			Memr[MKO_PA(mko)+nobjects] = DEGTORAD (pa)
-			if (nscan() == 8)
-			    Memi[MKO_SAVE(mko)+nobjects] = btoi (bsave)
-			else
-			    Memi[MKO_SAVE(mko)+nobjects] = NO
-		    }
-		    Memi[MKO_SORT(mko)+nobjects] = nobjects
-		    nobjects = nobjects + 1
+	    while (fscan (i) != EOF) {
+		call gargr (x)
+		call gargr (y)
+		call gargr (z)
+		if (nscan() < 3) {
+		    call reset_scan ()
+		    call gargstr (Memc[comment], LEN_COMMENT)
+		    call mko_comment (out, Memc[comment])
+		    next
 		}
-		call close (i)
+		call gargwrd (Memc[fname], SZ_FNAME)
+		call gargr (r)
+		call gargr (ar)
+		call gargr (pa)
+		call gargb (bsave)
+		x = (x + xo) / distance
+		y = (y + yo) / distance
+		if (x < 1 || x > nc || y < 1 || y > nl)
+		    next
+		if (nobjects == 0) {
+		    j = 100
+		    call malloc (MKO_MKT(mko), j, TY_POINTER)
+		    call malloc (MKO_X(mko), j, TY_REAL)
+		    call malloc (MKO_Y(mko), j, TY_REAL)
+		    call malloc (MKO_Z(mko), j, TY_REAL)
+		    call malloc (MKO_R(mko), j, TY_REAL)
+		    call malloc (MKO_AR(mko), j, TY_REAL)
+		    call malloc (MKO_PA(mko), j, TY_REAL)
+		    call malloc (MKO_SAVE(mko), j, TY_INT)
+		    call malloc (MKO_SORT(mko), j, TY_INT)
+		} else if (nobjects == j) {
+		    j = j + 100
+		    call realloc (MKO_MKT(mko), j, TY_POINTER)
+		    call realloc (MKO_X(mko), j, TY_REAL)
+		    call realloc (MKO_Y(mko), j, TY_REAL)
+		    call realloc (MKO_Z(mko), j, TY_REAL)
+		    call realloc (MKO_R(mko), j, TY_REAL)
+		    call realloc (MKO_AR(mko), j, TY_REAL)
+		    call realloc (MKO_PA(mko), j, TY_REAL)
+		    call realloc (MKO_SAVE(mko), j, TY_INT)
+		    call realloc (MKO_SORT(mko), j, TY_INT)
+		}
+
+		Memr[MKO_X(mko)+nobjects] = x
+		Memr[MKO_Y(mko)+nobjects] = y
+		Memr[MKO_Z(mko)+nobjects] =
+		    exptime / (distance * distance) * 10. ** (-0.4*(z-m0))
+		if (nscan() < 7)
+		    Memi[MKO_MKT(mko)+nobjects] = mkt_star (Memc[star])
+		else {
+		    Memi[MKO_MKT(mko)+nobjects] = mkt_object (Memc[fname])
+		    Memr[MKO_R(mko)+nobjects] = r / distance
+		    Memr[MKO_AR(mko)+nobjects] = ar
+		    Memr[MKO_PA(mko)+nobjects] = DEGTORAD (pa)
+		    if (nscan() == 8)
+			Memi[MKO_SAVE(mko)+nobjects] = btoi (bsave)
+		    else
+			Memi[MKO_SAVE(mko)+nobjects] = NO
+		}
+		Memi[MKO_SORT(mko)+nobjects] = nobjects
+		nobjects = nobjects + 1
 	    }
+	    call close (i)
+
+	    # Add comment history of task parameters.
+	    call strcpy ("# ", Memc[comment], LEN_COMMENT)
+	    call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
+	    call mko_comment (out, Memc[comment])
+	    call mko_comment (out, "begin\tmkobjects")
+	    call mko_comment1 (out, "background", 'r', Memc[comment])
+	    call mko_comment1 (out, "xoffset", 'r', Memc[comment])
+	    call mko_comment1 (out, "yoffset", 'r', Memc[comment])
+	    call mko_comment1 (out, "star", 's', Memc[comment])
+	    call mko_comment1 (out, "radius", 'r', Memc[comment])
+	    call mko_comment1 (out, "beta", 'r', Memc[comment])
+	    call mko_comment1 (out, "ar", 'r', Memc[comment])
+	    call mko_comment1 (out, "pa", 'r', Memc[comment])
+	    call mko_comment1 (out, "distance", 'r', Memc[comment])
+	    call mko_comment1 (out, "exptime", 'r', Memc[comment])
+	    call mko_comment1 (out, "magzero", 'r', Memc[comment])
+	    call mko_comment1 (out, "gain", 'r', Memc[comment])
+	    call mko_comment1 (out, "rdnoise", 'r', Memc[comment])
+	    call mko_comment1 (out, "poisson", 'b', Memc[comment])
+	    call mko_comment1 (out, "seed", 'i', Memc[comment])
 
 	    # If no objects are requested then do the image I/O
 	    # line by line.  Add noise if creating a new image or
@@ -301,11 +341,11 @@ begin
 
 		call mkt_gobject (mkt, obj, nx, ny, x, y, z, r, ar, pa, save)
 
-		c1 = x - nx/2 + 0.5
+		c1 = nint (x - nx/2)
 		c2 = c1 + nx - 1
 		c3 = max (1, c1)
 		c4 = min (nc, c2)
-		l1 = y - ny/2 + 0.5
+		l1 = nint (y - ny/2)
 		l2 = l1 + ny - 1
 		l3 = max (1, l1)
 		l4 = min (nl, l2)
@@ -440,4 +480,118 @@ begin
 	    return (1)
 	else
 	    return (0)
+end
+
+
+# MKO_COMMENT -- Add comment to header.
+
+procedure mko_comment (im, comment)
+
+pointer	im			# image descriptor
+char	comment[ARB]		# comment
+
+pointer	ua
+
+begin
+	ua = IM_USERAREA(im)
+	if (Memc[ua] == EOS)
+	    call strcat ("\n", Memc[ua], MAX_HDR)
+	call strcat (COMMENT, Memc[ua], MAX_HDR)
+	call strcat (comment, Memc[ua], MAX_HDR)
+	call strcat ("\n", Memc[ua], MAX_HDR)
+end
+
+
+# MKO_COMMENT1 -- Make comment out of CL parameter.
+
+procedure mko_comment1 (im, param, type, comment)
+
+pointer	im			# image descriptor
+char	param[ARB]		# parameter name
+int	type			# datatype
+char	comment[ARB]		# comment string
+
+bool	clgetb()
+int	clgeti()
+real	clgetr()
+pointer	str
+
+begin
+	switch (type) {
+	case 'b':
+	    call sprintf (comment, LEN_COMMENT, "\t%s%24t%b")
+		call pargstr (param)
+	    	call pargb (clgetb (param))
+	case 'i':
+	    call sprintf (comment, LEN_COMMENT, "\t%s%24t%d")
+		call pargstr (param)
+	    	call pargi (clgeti (param))
+	case 'r':
+	    call sprintf (comment, LEN_COMMENT, "\t%s%24t%g")
+		call pargstr (param)
+	    	call pargr (clgetr (param))
+	case 's':
+	    call malloc (str, SZ_FNAME, TY_CHAR)
+	    call clgstr (param, Memc[str], SZ_FNAME)
+	    call sprintf (comment, LEN_COMMENT, "\t%s%24t%s")
+		call pargstr (param)
+	    	call pargstr (Memc[str])
+	    call mfree (str, TY_CHAR)
+	}
+
+	call mko_comment (im, comment)
+end
+
+
+# MKO_HEADER -- Set new image header.
+
+procedure mko_header (im)
+
+pointer	im			# Image pointer
+
+int	i, fd, open(), nowhite(), fscan(), nscan()
+real	r
+pointer	sp, key, type, str
+errchk	open
+
+begin
+	call smark (sp)
+	call salloc (key, SZ_FNAME, TY_CHAR)
+	call salloc (type, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
+
+	call clgstr ("header", Memc[key], SZ_FNAME)
+	if (nowhite (Memc[key], Memc[key], SZ_FNAME) > 0) {
+	    iferr {
+		fd = NULL
+		i = open (Memc[key], READ_ONLY, TEXT_FILE)
+		fd = i
+		while (fscan (fd) != EOF) {
+		    call gargwrd (Memc[key], SZ_FNAME)
+		    call gargwrd (Memc[type], SZ_FNAME)
+		    if (nscan() < 2)
+			next
+		    switch (Memc[type]) {
+		    case 'i':
+			call gargi (i)
+			if (nscan() == 3)
+			    call imaddi (im, Memc[key], i)
+		    case 'r':
+			call gargr (r)
+			if (nscan() == 3)
+			    call imaddr (im, Memc[key], r)
+		    default:
+			call gargstr (Memc[str], SZ_LINE)
+			if (nscan() == 3)
+			    call imastr (im, Memc[key], Memc[str])
+		    }
+		}
+		call close (fd)
+	    } then {
+		call erract (EA_WARN)
+		if (fd != NULL)
+		    call close (fd)
+	    }
+	}
+	call sfree (sp)
 end

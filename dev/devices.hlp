@@ -6,10 +6,13 @@
     \fBDevice      Aliases 	Description+Location\fR
 
     lw1		apl|lw		Laserwriter, Rm B-50
+    lw1p2			lw1 with 2 landscape pages per page
     lw2		apl2		Laserwriter, Xerox Rm (Rm 135)
+    lw2p2			lw2 with 2 landscape pages per page
     lw3		apl3		Laserwriter, Engineering Mezzanine
     lw4		apl4		Laserwriter, GONG lab (B-14)
     lw5		apl5|nlw	Laserwriter NT, Rm 72
+    lw5p2			lw5 with 2 landscape pages per page
     lw7		apl7|tops	Laserwriter, Solar Office, Rm 152
     imagen	i240		240 dpi imagen, Rm 105
     imagend	i300		300 dpi imagen, Rm 113
@@ -31,7 +34,8 @@
     orion!mtb	[1600|6250]	Fujitsu 1/2" tapedrive, Rm 101
     gemini!mta	[1600|6250]	Fujitsu 1/2" tapedrive, Rm 101
     gemini!mtb	[?]		Exabyte, Rm 101
-    gemini!mtc	[?]		Sun 1/4" cartridge, Rm 101
+    gemini!mtc	[?]		Exabyte, Rm 101
+    gemini!mtd	[?]		Sun 1/4" cartridge, Rm 101
     aquila!mta  [1600]		DEC TU80 1/2" tapedrive, Rm B-49
     aquila!mtb  [1600|6250]    	Kennedy 1/2" tapedrive,  Rm B-49
     aquila!mtc	[1600|6250]    	Kennedy 1/2" tapedrive, Rm B-49

@@ -36,6 +36,8 @@ begin
 	g_kt = NULL
 	g_nframes = 0
 	g_ndraw = 0
+	g_frame = frame
+	g_color = color
 	call strcpy (devname, g_device, SZ_GDEVICE)
 
 	# Install the device driver.
@@ -72,7 +74,7 @@ begin
 	len_devname = strlen (devname)
 	if (len_devname > 0) {
 	    call achtcs (devname, Mems[devns], len_devname)
-	    call imd_openws (Mems[devns], len_devname, frame, color, NEW_FILE)
+	    call imd_openws (Mems[devns], len_devname, NEW_FILE)
 	}
 
 	call sfree (sp)

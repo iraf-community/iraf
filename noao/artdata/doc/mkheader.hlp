@@ -1,0 +1,58 @@
+.help mkheader Aug90 noao.artdata
+.ih
+NAME
+mkheader - Make/add image header information from a data file
+.ih
+USAGE
+mkheader images headers
+.ih
+PARAMETERS
+.ls images
+List of images in which header information is to be added or modified.
+.le
+.ls headers
+List of header keyword data files.  If this list is shorter than the
+image list the last data file will be reused.  The data files consist
+of lines with three fields: the keyword name, the datatype (one of
+"integer", "real", "string" which may be abbreviated), and the keyword
+value.
+.le
+.ls clobber = no
+Clobber existing keywords?
+.le
+.ls verbose = no
+Verbose output giving image name and keyword added, changed, or not changed?
+.le
+.ih
+DESCRIPTION
+Header keywords in the list of input images are added or modified using
+a header keyword data file.  The data files are specified as a list but
+if the list is shorter, typically one file, than the image list then the
+last file is reused.  A header keyword data file consists of
+of lines with three fields: the keyword name, the datatype (one of
+"integer", "real", "string" which may be abbreviated), and the keyword
+value.
+
+If the clobber option is not set then any existing header parameters
+with the same keyword are not modified.  If set then the new values
+replace the old values.  The verbose option may be used to see the
+keywords added, changed, or not changed.
+
+The header files are also used by several of the tasks in the artificial
+data package with a standard default file "artdata$stdheader.dat".
+To edit image headers also see \fBhedit\fR.
+.ih
+EXAMPLES
+1. Add some standard keywords to an image.
+
+.nf
+    ar> type myheader
+    instrument	s	bspec mark II
+    lens	i	3
+    focratio	r	5.2
+    ar> mkheader *.imh myheader clobber+ verbose+
+.fi
+.ih
+SEE ALSO
+hedit, mkobjects, mknoise, mk1dspec, mk2dspec
+.endhelp

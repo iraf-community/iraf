@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include "bootlib.h"
 
 /* OS_SETOWNER -- Set the user and group identifications for the file.  This is

@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 include	<mach.h>
 include	<knet.h>
 include	"m70.h"

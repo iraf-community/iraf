@@ -16,8 +16,4 @@ $else $ifeq (MACH, vms) then
 $include "noao$lib/mkpkg.sf.VMS"
 $else $ifeq (MACH, mips) then
 $include "noao$lib/mkpkg.sf.MIPS"
-$else $ifeq (MACH, m68k) then
-$include "noao$lib/mkpkg.sf.M68K"
-$else $ifeq (MACH, a88k) then
-$include "noao$lib/mkpkg.sf.A88K"
 $end

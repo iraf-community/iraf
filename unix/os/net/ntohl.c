@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 /* NTOHL -- [MACHDEP] Convert a long integer in net format to host format.
  */
 ntohl (lword)

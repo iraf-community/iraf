@@ -4,8 +4,8 @@
 
 # The following definitions are site dependent. [SITEDEP]
 
-set	iraf	= "/usr/iraf"
-set	imdir	= "/usr/users/iraf"
+set	iraf	= "/local/iraf"
+set	imdir	= "/tmp4/iraf"
 set	ttymsg  =\
 "Terminal types: gterm=ttysw+graphics,vt640=(vt100+retrographics),etc."
 

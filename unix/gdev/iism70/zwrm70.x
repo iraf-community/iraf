@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 # ZWRM70 -- Initiate an asynchronous write to the IIS.
 
 procedure zwrm70 (chan, buf, nbytes, offset)

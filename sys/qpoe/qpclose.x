@@ -10,8 +10,10 @@ pointer	qp			#I QPOE descriptor
 
 begin
 	# An open/close should produce an empty poefile.
-	if (QP_ACTIVE(qp) == NO)
+	if (QP_ACTIVE(qp) == NO) {
+	    QP_MODIFIED(qp) = YES
 	    call qp_bind (qp)
+	}
 
 	# Update the poefile on disk.
 	call qp_flushpar (qp)

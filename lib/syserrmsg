@@ -256,7 +256,7 @@
 972 QPOE: attempt to open existing nonarray parameter for array i/o
 973 QPOE: attempt to use getparam to fetch value of struct type parameter
 974 QPOE: attempt to redefine an existing header parameter
-975 QPOE: attempt to delete a nonexistent parameter
+975 QPOE: unknown parameter
 976 QPIO: coordinate fields used for index must be type short
 977 QPOE file does not have a default WCS
 978 QPIO expression syntax

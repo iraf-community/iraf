@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include "bootlib.h"
 
 /* OS_CLOSE -- Close a file created (opened) by OSCREATE.  If writing to a

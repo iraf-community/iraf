@@ -1,4 +1,4 @@
-.help mkobjects Jan90 noao.artdata
+.help mkobjects Aug90 noao.artdata
 .ih
 NAME
 mkobjects - Make/add artificial stars and galaxies to 2D images
@@ -23,6 +23,13 @@ Image title to be given to the images.  Maximum of 79 characters.
 .le
 .ls ncols = 512, nlines = 512
 Number of columns and lines.
+.le
+.ls header = "artdata$stdheader.dat"
+Header keyword data file.  Header keywords are added from this file, if
+defined, to new images created.  Note this applies only to new images.
+The file consists of lines with a keyword, a datatype (one of
+"integer", "real", or "string", usually abbreviated to one character),
+and the parameter value.
 .le
 .ls background = 1000.
 Default background and poisson noise background.
@@ -190,6 +197,16 @@ profiles, user defined one dimensional profiles, and user defined image
 templates.  The profiles and templates are given elliptical shapes by
 specifying a scale radius for the major axis, a minor axis to major
 axis axial ratio, and a position angle.
+
+For new images a set of header keywords may be added by specifying a
+data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
+This file contains lines with keyword names, datatype ("integer",
+"real", or "string"), and values.  In addition to these optional
+keywords, parameters for the gain, read noise, and exposure time are
+defined.  Finally, comments are added to the image header recording the task
+parameters and any information from the objects file which are not
+object definitions; in particular, the \fBstarlist\fR and
+\fBgallist\fR parameters are recorded.
 
 A completely accurate simulation of the effects of pixel sampling,
 atmospheric seeing, object appearance, luminosity functions, and noise
@@ -495,10 +512,12 @@ EXAMPLES
 1. Create a galaxy cluster with a power law distribution of field galaxies
 and stars as background/foreground.
 
+.nf
     ar> gallist galaxies.dat 100 spatial=hubble lum=schecter egal=.8
     ar> gallist galaxies.dat 500
     ar> starlist galaxies.dat 100
     ar> mkobjects galaxies obj=galaxies.dat gain=3 rdnoise=10 poisson+
+.fi
 
 Making the image takes about 5 minutes (2.5 min cpu) on a SPARCstation 1.
 
@@ -560,5 +579,5 @@ It would be somewhat more efficient to first block average the
 template since the oversampling in this case is very large.
 .ih
 SEE ALSO
-gallist starlist mknoise
+gallist, starlist, mknoise, mkheader
 .endhelp

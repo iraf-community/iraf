@@ -49,11 +49,11 @@ begin
 	case IE_NEXKW:
 %	    errmsg = 'nonexistent header keyword referenced'
 	case IE_NONNUMARG:
-%           errmsg = 'command line argument cannot be decoded as number'
+%	    errmsg = 'command line argument cannot be decoded as a number'
 	case IE_NOTIMH:
 %	    errmsg = 'attempt to access a non-image file as an image'
 	case IE_NOTSHORT:
-%	    errmsg = 'imfort short integer i/o needs a type short image'
+%	    errmsg = 'imfort short integer i/o requires a type short image'
 	case IE_OPEN:
 %	    errmsg = 'cannot open image'
 	case IE_OPNPIX:
@@ -65,7 +65,7 @@ begin
 	case IE_UPDHDR:
 %	    errmsg = 'error updating image header file'
 	case IE_UPDRO:
-%	    errmsg = 'image header modified but image opened read only'
+%	    errmsg = 'image header modified but image was opened read only'
 	case IE_WRHDR:
 %	    errmsg = 'error writing to image header file'
 	case IE_WRPIX:
@@ -90,7 +90,7 @@ begin
 %	    errmsg = 'new image would overwrite existing image'
 
 	case SYS_IDBDELNXKW:
-%	    errmsg = 'attempt to delete nonexistent im-header keyword'
+%	    errmsg = 'attempt to delete a nonexistent image header keyword'
 	case SYS_IDBKEYNF:
 %	    errmsg = 'image header keyword not found'
 	case SYS_IDBNODEL:

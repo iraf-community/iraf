@@ -5,12 +5,7 @@
 
 # set	echo
 
-if ("$ISP" == "") then
-    set MACH = "m68k"
-else
-    set	MACH = `echo $ISP`	# Domain/OS specific (m68k or a88k arch.)
-endif
-#set	MACH = `mach`		# SUNOS specific.
+set	MACH = `mach`		# SUNOS specific.
 #set	MACH = convex		# other systems
 set	args = ""
 
@@ -32,16 +27,6 @@ if (! $?IRAFARCH) then
 	setenv IRAFARCH "sparc"
     else if ("$MACH" == "i386") then
 	setenv IRAFARCH "i386"
-    else if ("$MACH" == "m68k") then
-	set fpstat =\
-	    `/etc/nodestat -c | fgrep 'Floating Point Accelerator Unit present'`
-	if ("$fpstat" != "" && -e ${iraf}bin.m68k_fpa/cl.e) then
-	    setenv IRAFARCH "m68k_fpa"
-	else
-	    setenv IRAFARCH "m68k_f68"
-	endif
-    else if ("$MACH" == "a88k") then
-	setenv IRAFARCH "a88k"
     else if (-e /dev/fpa && -e ${iraf}bin.ffpa/cl.e) then
 	setenv IRAFARCH "ffpa"
     else
@@ -62,15 +47,6 @@ case f68881:
     breaksw
 case ffpa:
     set float = "-/ffpa"
-    breaksw
-case m68k_fpa:
-    set float = "-/W0,-cpu,FPA1"
-    breaksw
-case m68k_f68:
-    set float = "-/W0,-cpu,3000"
-    breaksw
-case a88k:
-    set float = "-/W0,-cpu,a88k"
     breaksw
 default:
     set float = ""

@@ -67,7 +67,7 @@ begin
 
 	do i = 1, PL_NLP(pl) {
 	    o_lp = Ref (pl, PL_LP(pl,i))
-	    PL_LP(pl,i) = LP_NREF(o_lp) * I_SHIFT + LP_BLEN(o_lp)
+	    PL_LP(pl,i) = int(LP_NREF(o_lp)) * I_SHIFT + LP_BLEN(o_lp)
 	}
 	    
 	# Deallocate the old buffer and install the new one.

@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include "bootlib.h"
 
 /* OS_CHDIR -- Change the current default directory.  Note that the kernel

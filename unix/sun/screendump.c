@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <suntool/sunview.h>
 #include <suntool/fullscreen.h>
 #include <pixrect/pr_planegroups.h>

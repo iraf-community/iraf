@@ -42,7 +42,7 @@ begin
 			# Make sure the text buffer is large enough.
 			if (sz_textbuf < S_NELEM(sym)) {
 			    sz_textbuf = S_NELEM(sym)
-			    call realloc (textbuf, TY_CHAR)
+			    call realloc (textbuf, sz_textbuf, TY_CHAR)
 			}
 
 			# Read the data.

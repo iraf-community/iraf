@@ -16,10 +16,11 @@ procedure wft_write_fitz (iraf_file, fits_file)
 char	iraf_file[ARB]		# IRAF file name
 char	fits_file[ARB]		# FITS file name
 
-int	fits_fd, chars_rec, dev_blk, nchars, ip
-pointer	im, sp, fits
+int	fits_fd, chars_rec, dev_blk, nchars, ip, min_lenuserarea
+pointer	im, sp, fits, envstr
 
-int	mtfile(), mtopen(), open(), fnldir(), fstati(), ctowrd()
+int	mtfile(), mtopen(), open(), fnldir(), fstati(), ctowrd(), envfind()
+int	ctoi()
 pointer	immap()
 errchk	immap, imunmap, open, mtopen, close, smark, salloc, sfree
 errchk	delete, wft_write_header, wft_write_image, wft_data_limits
@@ -30,6 +31,7 @@ begin
 	# Allocate memory for program data structure.
 	call smark (sp)
 	call salloc (fits, LEN_FITS, TY_STRUCT)
+	call salloc (envstr, SZ_FNAME, TY_CHAR)
 
 	# Construct the old iraf name by removing and directory and 
 	# section specifications.
@@ -41,7 +43,15 @@ begin
 	    IRAFNAME(fits) = EOS
 
 	# Open input image.
-	im = immap (iraf_file, READ_ONLY, 0)
+	if (envfind ("min_lenuserarea", Memc[envstr], SZ_FNAME) > 0) {
+	    ip = 1
+	    if (ctoi (Memc[envstr], ip, min_lenuserarea) <= 0)
+		min_lenuserarea = LEN_USERAREA
+	    else
+		min_lenuserarea = max (LEN_USERAREA, min_lenuserarea)
+	} else
+	    min_lenuserarea = LEN_USERAREA
+	im = immap (iraf_file, READ_ONLY, min_lenuserarea)
 
 	# Open output file. Check whether the output file is a magtape
 	# device or a binary file. If the output file is magtape check
@@ -51,7 +61,7 @@ begin
 	    call strcpy ("dev$null", fits_file, SZ_FNAME)
 
 	if (mtfile (fits_file) == YES) {
-	    if (blkfac > 10)
+	    if (blkfac > MAX_BLKFAC)
 		chars_rec = (blkfac * FITS_BYTE) / (SZB_CHAR * NBITS_BYTE)
 	    else
 	        chars_rec = (blkfac * len_record * FITS_BYTE) / (SZB_CHAR *

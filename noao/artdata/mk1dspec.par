@@ -1,9 +1,12 @@
 input,s,a,,,,"List of input spectra"
-output,s,h,"",,,"List of output spectra
+output,s,h,"",,,"List of output spectra"
+rv,r,h,0.,,,Radial velocity (km/s) or redshift
+z,b,h,no,,,"Is velocity a redshift?
 
 IF NEW SPECTRUM"
 title,s,h,"",,,"Title of spectrum"
 ncols,i,h,512,1,,"Number of columns"
+header,f,h,"artdata$stdheader.dat",,,"Header keyword file"
 wstart,r,h,4000.,,,"Starting wavelength (Angstroms)"
 wend,r,h,8000,,,"Ending wavelength (Angstroms)
 

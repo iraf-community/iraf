@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 /* NTOHS -- [MACHDEP] Convert a short integer in net format to host format.
  */
 ntohs (word)

@@ -17,8 +17,6 @@ f77 -c $HSI_FF	swcode.f swend.f swvar.f synerr.f thenco.f ulstal.f
 f77 -c $HSI_FF	uniqid.f unstak.f untils.f whilec.f whiles.f
 
 ar rv		librpp.a *.o
-case $USE_RANLIB in
-    yes)	ranlib librpp.a;;
-esac
+ranlib		librpp.a
 mv -f		librpp.a ..
 rm		*.o

@@ -1,5 +1,83 @@
 .help revisions Jan90 noao.artdata
 .nf
+artdata$artdata.cl
+artdata$artdata.hd
+artdata$artdata.men
+artdata$doc/mkexamples.hlp +
+artdata$mkexamples/	+
+artdata$mkexamples/mkexamples.cl +
+artdata$mkexamples/mkexamples.men +
+artdata$mkexamples/globular.cl +
+artdata$mkexamples/multifiber.cl +
+artdata$mkexamples/longslit.cl +
+artdata$mkexamples/galcluster.cl +
+artdata$mkexamples/galfield.cl +
+artdata$mkexamples/starfield.cl +
+    1.  A new task, MKEXAMPLES, has been added to make some standard examples
+	for demonstrations and task scripts in this and other packages.
+    2.  The task is driven by simple script files located in the logical
+	directory mkexamples$.
+
+artdata$artdata.cl
+artdata$artdata.hd
+artdata$artdata.men
+artdata$artdata.par
+artdata$x_artdata.x
+artdata$mkheader.par +
+artdata$mk1dspec.par
+artdata$mk2dspec.par
+artdata$mknoise.par
+artdata$mkobjects.par
+artdata$stdheader.dat +
+artdata$mkpkg
+artdata$t_mkheader.x +
+artdata$t_mk1dspec.x
+artdata$t_mk2dspec.x
+artdata$t_mknoise.x
+artdata$t_mkobjects.x
+artdata$doc/mkheader.hlp +
+artdata$doc/mkobjects.hlp
+artdata$doc/mknoise.hlp
+artdata$doc/mk1dspec.hlp
+artdata$doc/mk2dspec.hlp
+    1.  A new task, MKHEADER, has been added to add or modify image headers
+	using a header keyword data file.
+    2.  The tasks MKOBJECTS, MKNOISE, MK1DSPEC, and MK2DSPEC have a new
+	parameter, header, which allows specifying a header keyword data
+	file.  A standard header data file is used as the default.
+    3.  The tasks MKOBJECTS, MKNOISE, MK1DSPEC, and MK2DSPEC add some
+	some header parameters such as gain, rdnoise, and exptime as
+	well as extensively comment task and data file parameters.
+    4.  The package version number was incremented.
+
+artdata$mktemplates.x
+    1.  The logic for discriminating between an image template and profile
+	file doesn't work because IMACCESS does not check if the file is
+	an image.  Modified to use an error check on IMMAP.
+    2.  The ACCESS call to test for access to a profile file had a missing
+	third argument causing a segmentation error on at least Sun3.
+    3.  For the star profile input an initialization of nxm was missing
+	and a malloc used nxm instead of j resulting in an alloc of 0 length.
+    Basically the profile file input was not working.  (8/9/90, Valdes)
+
+artdata$mktemplates.x
+    The gaussian radius was being treated as a full width resulting in
+    stars which are half that expected.  (7/19/90, Valdes)
+
+artdata$t_mkobjects
+    A rounding error for objects which go off the
+    lower edges was causing the objects to appear one pixel offset to larger
+    numbers.  Replaced rounding done by adding 0.5 by nint.  (7/2/90, Valdes)
+
+artdata$t_mk1dspec.x
+artdata$mk1dspec.par
+artdata$doc/mk1dspec.hlp
+    Added redshifting capability.  (5/18/90, Valdes)
+
+====
+V2.9
+====
+
 artdata$t_mkpattern.x
     The COORDINATES pattern was off by 1.  (3/12/90, Valdes)
 

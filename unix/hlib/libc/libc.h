@@ -20,19 +20,7 @@
 
 /* SPP/C pointer conversions.
  */
-#ifdef apollo
-#ifdef ATTRIBUTE
-int			FIOCOM[]	#attribute[section(FIOCOM)];	/*APO*/
-char			MEMCOM[]	#attribute[section(MEMCOM)];	/*APO*/
-#else
-#define	LEN_FIOCOM	1200						/*APO*/
-int			FIOCOM[LEN_FIOCOM];				/*APO*/
-char			MEMCOM[2];					/*APO*/
-#endif
-#else
 extern	char		MEMCOM[];
-#endif
-
 #define	Memc		(((XCHAR *)MEMCOM)-1)
 #define	Memi		(((XINT *)MEMCOM)-1)
 #define	Memcptr(addr)	((XCHAR *)(addr) - Memc + 1)

@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 #include <pwd.h>
@@ -381,7 +384,7 @@ FILE	*out;
  * 7 byte encoding scheme.
  */
 xy_point (out, x, y, flag)
-FILE	*out;			/* output file */
+int	out;			/* output file */
 register int x, y;		/* coords to move to */
 int	flag;			/* move or draw? */
 {
@@ -427,7 +430,7 @@ int	flag;			/* move or draw? */
  * stroke command to Postscript to draw the buffered points.
  */
 xy_flush (out)
-FILE	*out;
+int	out;
 {
 	if (npts > 0) {
 	    if (fourbyte)
@@ -460,7 +463,7 @@ char	*code;			/* draw or move		*/
 	    *op-- = n % 10 + '0';
 
 	obuf[i++] = ' ';
-	for (op = &obuf[i++], ip = code, n = SZ_VCODE;  --n >= 0; )
+	for (op = &obuf[i++], ip = code, n = SZ_VCODE;  --n >= 0;  i++)
 	    *op++ = *ip++;
 
 	return (obuf);
@@ -493,7 +496,7 @@ int	val;			/* device line width 		*/
 /* TEXTOUT -- Output lines of text to a file.
  */
 textout (out, text)
-FILE	*out;			/* output file */
+int	out;			/* output file */
 char	*text[];		/* array of lines of text */
 {
 	register char **lp;

@@ -1,6 +1,8 @@
 include	<error.h>
 include	<imhdr.h>
 
+define	MAX_HDR		20000			# Maximum user header
+define	LEN_COMMENT	70			# Maximum comment length
 
 # T_MK1DSPEC -- Make one dimensional spectra.  New images may be created
 # or existing images modified.  The continuum may be a slope and/or
@@ -16,6 +18,7 @@ int	olist			# List of output spectra (output param)
 int	nw			# Number of pixels (ncols param or imlen)
 real	w0			# Starting wavelength (wstart param)
 real	wpc			# Wavelength per pix (wstart/wend params)
+real	z			# Redshift
 
 real	cont			# Continuum at first pixel
 real	slope			# Continuum slope per pixel
@@ -29,17 +32,18 @@ real	subsample		# Subsampling (nxsub param)
 real	nsigma			# Dynamic range of gaussian (dynrange param)
 long	seed			# Random number seed
 
-bool	new
+bool	new, ranlist
 int	i, j
 real	w, x, x1, x2
-pointer	sp, input, output, lines, in, out, waves, peaks, sigmas, spec, buf
+pointer	sp, input, output, lines, comment
+pointer	in, out, waves, peaks, sigmas, spec, buf
 
-long	clgetl()
+long	clgetl(), clktime()
 int	clgeti(), imtopenp(), imtlen(), imtgetim(), imaccess()
 int	nowhite(), access(), open(), fscan(), nscan()
 real	clgetr(), urand()
 pointer	immap(), imgl1r(), impl1r()
-bool	streq()
+bool	clgetb(), streq()
 errchk	open()
 
 begin
@@ -47,6 +51,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (lines, SZ_FNAME, TY_CHAR)
+	call salloc (comment, LEN_COMMENT, TY_CHAR)
 
 	# Get file lists and fixed parameters.
 	ilist = imtopenp ("input")
@@ -54,6 +59,13 @@ begin
 	llist = imtopenp ("lines")
 	subsample = 1. / clgeti ("nxsub")
 	nsigma = sqrt (2. * log (clgetr ("dynrange")))
+	z = clgetr ("rv")
+	if (clgetb ("z"))
+	    z = 1 + z
+	else {
+	    z = z / 299792.5
+	    z = sqrt ((1 + z) / (1 - z)) 
+	}
 
 	if (max (1, imtlen (olist)) != imtlen (ilist))
 	    call error (1, "Output image list does not match input image list")
@@ -97,6 +109,9 @@ begin
 		    call imaddr (out, "CRPIX1", 1.)
 		    call imaddr (out, "CRVAL1", w0)
 		    call imaddr (out, "CDELT1", wpc)
+		    call imaddi (out, "DC-FLAG", 0)
+
+		    call mko_header (out)
 	        }
 	    } else {
 	        iferr (in = immap (Memc[input], READ_ONLY, 0)) {
@@ -113,10 +128,14 @@ begin
 	    call get_hdr (in, w0, wpc, nw)
 
 	    # Get the line list if given or create random lines.
+	    ranlist = false
 	    i = nowhite (Memc[lines], Memc[lines], SZ_FNAME)
 	    if (access (Memc[lines], 0, 0) == YES) {
 	        i = open (Memc[lines], READ_ONLY, TEXT_FILE)
 	        nlines = 0
+		x1 = clgetr ("peak")
+		x2 = clgetr ("sigma")
+	        seed = clgetl ("seed")
 	        while (fscan (i) != EOF) {
 		    call gargr (w)
 		    call gargr (peak)
@@ -124,9 +143,9 @@ begin
 		    if (nscan() < 1)
 		        next
 		    if (nscan() < 3)
-	    	        sigma = clgetr ("sigma")
+	    	        sigma = x2
 		    if (nscan() < 2)
-	    	        peak = clgetr ("peak")
+	    	        peak = x1 * urand (seed)
 		    if (nlines == 0) {
 		        j = 50
 		        call malloc (waves, j, TY_REAL)
@@ -138,9 +157,9 @@ begin
 		        call realloc (peaks, j, TY_REAL)
 		        call realloc (sigmas, j, TY_REAL)
 		    }
-		    Memr[waves+nlines] = w
-		    Memr[peaks+nlines] = peak
-		    Memr[sigmas+nlines] = sigma
+		    Memr[waves+nlines] = z * w
+		    Memr[peaks+nlines] = peak / z
+		    Memr[sigmas+nlines] = z * sigma
 		    nlines = nlines + 1
 	        }
 	        call close (i)
@@ -152,22 +171,53 @@ begin
 	        call malloc (waves, nlines, TY_REAL)
 	        call malloc (peaks, nlines, TY_REAL)
 	        call malloc (sigmas, nlines, TY_REAL)
-	        w = wpc * (nw - 1)
 	        do i = 0, nlines-1 {
-		    Memr[waves+i] = w0 + w * urand (seed)
-		    Memr[peaks+i] = peak * urand (seed)
-		    Memr[sigmas+i] = sigma
+		    w = z * (w0 + wpc * (nw - 1) * urand (seed))
+		    x = (w - w0) / wpc / (nw - 1)
+		    if (x < 0)
+			x = x - int (x - 1)
+		    else
+		        x = x - int (x)
+		    w = w0 + wpc * (nw - 1) * x
+		    Memr[waves+i] = w
+		    Memr[peaks+i] = peak / z * urand (seed)
+		    Memr[sigmas+i] = z * sigma
 	        }
 	        if (nlines > 0 && Memc[lines] != EOS) {
 	            i = open (Memc[lines], NEW_FILE, TEXT_FILE)
 		    do j = 0, nlines-1 {
 			call fprintf (i, "%g %g %g\n")
-			    call pargr (Memr[waves+j])
-			    call pargr (Memr[peaks+j])
-			    call pargr (Memr[sigmas+j])
+			    call pargr (Memr[waves+j] / z)
+			    call pargr (Memr[peaks+j] * z)
+			    call pargr (Memr[sigmas+j] / z)
 		    }
 	            call close (i)
 	        }
+	    }
+
+	    # Add comment history of task parameters.
+	    call strcpy ("# ", Memc[comment], LEN_COMMENT)
+	    call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
+	    call mko_comment (out, Memc[comment])
+	    call mko_comment (out, "begin\tmk1dspec")
+	    call mko_comment1 (out, "rv", 'r', Memc[comment])
+	    call mko_comment1 (out, "z", 'b', Memc[comment])
+	    call mko_comment1 (out, "wstart", 'r', Memc[comment])
+	    call mko_comment1 (out, "wend", 's', Memc[comment])
+	    call mko_comment1 (out, "continuum", 'r', Memc[comment])
+	    call mko_comment1 (out, "slope", 'r', Memc[comment])
+	    call mko_comment1 (out, "temperature", 'r', Memc[comment])
+	    if (nlines > 0) {
+		if (Memc[lines] != EOS)
+	            call mko_comment1 (out, "lines", 's', Memc[comment])
+		call sprintf (Memc[comment], LEN_COMMENT, "\tnlines%24t%d")
+		    call pargi (nlines)
+		call mko_comment (out, Memc[comment])
+		if (ranlist) {
+	            call mko_comment1 (out, "peak", 'r', Memc[comment])
+	            call mko_comment1 (out, "sigma", 'r', Memc[comment])
+		    call mko_comment1 (out, "seed", 'i', Memc[comment])
+		}
 	    }
 
 	    # Make the spectrum.
@@ -198,12 +248,14 @@ begin
 	    temp = clgetr ("temperature")
 	    if (temp > 0.) {
 	        w  = w0 * 1.0e-8
-	        wpc = wpc * 1.0e-8
 	        x1 = exp (1.4388 / (w * temp))
 	        x2 = w**5 * (x1-1.0)
+
+		w = w / z
+	        wpc = wpc * 1.0e-8 / z
 	    }
 	    do i = 0, nw-1 {
-	        x = cont + slope * i
+	        x = cont + slope / wpc * ((w0 + wpc * i) / z - w0)
 	        if (temp > 0.) {
 		    x1 = exp (1.4388 / (w * temp))
 		    x = x * (x2 / w**5 / (x1-1.0))

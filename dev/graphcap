@@ -7,10 +7,6 @@
 # ---------------------------------------------------------------------------
 # START of site local additions.
 #	(add local graphcap device entries here)
-
-bogus|bogus device for fake cache to work around apollo FTN bug:\
-	:tc=4012:
-
 # END of site local additions.
 # ---------------------------------------------------------------------------
 
@@ -123,15 +119,17 @@ imt27|imtgcam|Gold camera:cn#27:xr#348:yr#800:\
 imt28|imt2df9x3|2D-Frutti detector format:cn#28:xr#976:yr#3040:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,/dev/imt1,976,3040:tc=iism70:
 
-iism70c|iism70l|NOAO Carina hosted IIS model 70:\
-	:BS:DD=carina!iism70,/dev/iis:tc=iism70:
+iism70d|iism70c|iism70l|NOAO Draco hosted IIS model 70:\
+	:BS:DD=draco!iism70,iia0:tc=iism70:
+iism70a|NOAO Aquila hosted IIS model 70:\
+	:BS:DD=aquila!iism70,/dev/iis:tc=iism70:
 iism70v|NOAO Vela hosted IIS model 70 (for VMS):\
 	:BS:DD=vela!iism70,iia0:tc=iism70:
 iism75|IIS model 75 image display (for VMS):\
 	:BS:DD=iism75,iia0:tc=iism70:
 iism70|IIS model 70 image display:\
 	:xr#512:yr#512:ip#4:gp#4:ca:in:nc#1:ro:zo:zr#256:ch#.0294:cw#.0125:\
-	:BS:DD=carina!iism70,/dev/iis:
+	:BS:DD=draco!iism70,iia0:
 
 # IMD kernel (IMDKERN).  Plots into graphics overlay of image display.
 
@@ -161,21 +159,27 @@ uqms|UNIX generic interface to 300dpi QMS (Talaris) LaserWriter:\
 	:DD=qms,tmp$sgk,!{ sgidispatch sgi2uqms $F -l$(XO) -w$(XW) -b$(YO) \
 	-h$(YW) -p$(PW) | lpr -Pqms; rm $F; }&:tc=sgi_qms:
 uapl1|UNIX generic interface to 300dpi Apple Laserwriter (Postscript):\
+	:xs#0.265:ys#0.202:ar#0.760:\
 	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
 	-h$(YW) -p$(PW) | lpr -Plw1; rm $F; }&:tc=sgi_apl:
 uapl2|UNIX generic interface to a second 300dpi Apple Laserwriter (Postscript):\
+	:xs#0.266:ys#0.201:ar#0.756:\
 	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
 	-h$(YW) -p$(PW) | lpr -Plw2; rm $F; }&:tc=sgi_apl:
 uapl3|UNIX generic interface to a third third Apple Laserwriter (Postscript):\
+	:xs#0.266:ys#0.201:ar#0.756:\
 	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
 	-h$(YW) -p$(PW) | lpr -Plw3; rm $F; }&:tc=sgi_apl:
 uapl4|UNIX generic interface to a fourth 300dpi Apple Laserwriter (Postscript):\
+	:xs#0.266:ys#0.202:ar#0.759:\
 	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
 	-h$(YW) -p$(PW) | lpr -Plw4; rm $F; }&:tc=sgi_apl:
 uapl5|UNIX generic interface to 300dpi Apple Laserwriter NT on Orion:\
+	:xs#0.269:ys#0.210:ar#0.781:\
 	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
 	-h$(YW) -p$(PW) | lpr -Plw5; rm $F; }&:tc=sgi_apl:
 uapl7|UNIX generic interface to 300dpi Apple Laserwriter in Solar office:\
+	:xs#0.0.267:ys#0.201:ar#0.753:\
 	:DD=apl,tmp$sgk,!{ sgidispatch sgi2uapl $F -l$(XO) -w$(XW) -b$(YO) \
 	-h$(YW) -p$(PW) | lpr -Plw7; rm $F; }&:tc=sgi_apl:
 uptx|UNIX generic printronix interface for UNIX/IRAF:\

@@ -95,7 +95,7 @@ entry	rft_read_pixels (fd, buffer, npix, recptr, bufsize)
 		call miiupk (Memi[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
 
 		ip = 0
-		recptr = recptr + 1
+		#recptr = recptr + 1
 	    }
 
 	    n = min (nch_rec - ip, nchars - op)
@@ -119,25 +119,36 @@ int	sz_rec		# size in chars of record to be read
 int	bufsize		# buffer size in records
 int	recptr		# last successful FITS record read
 
-int	i
+int	i, nchars
 int	read()
 errchk	read
 
 begin
-	iferr {
-	    i = read (fd, buf, sz_rec)
-	} then {
-	    call fseti (fd, F_VALIDATE, bufsize * i)
-	    call printf ("Error reading FITS record %d\n")
-	    if (mod (recptr + 1, bufsize) == 0)
-		call pargi ((recptr + 1) / bufsize)
+	nchars = 0
+	repeat {
+	    iferr {
+	        i = read (fd, buf[nchars+1], sz_rec - nchars)
+	    } then {
+	        call fseti (fd, F_VALIDATE, bufsize * i)
+	        call printf ("Error reading FITS record %d\n")
+	        if (mod (recptr + 1, bufsize) == 0)
+		    call pargi ((recptr + 1) / bufsize)
+	        else
+		    call pargi ((recptr + 1) / bufsize + 1)
+	        i = read (fd, buf[nchars+1], sz_rec - nchars)
+	    }
+
+	    if (i == EOF)
+		break
 	    else
-		call pargi ((recptr + 1) / bufsize + 1)
-	    i = read (fd, buf, sz_rec)
-	}
+	        nchars = nchars + i
+
+	} until (nchars >= sz_rec)
 
 	if (i == EOF)
 	    return (EOF)
-	else
-	    return (i)
+	else {
+	    recptr = recptr + 1
+	    return (nchars)
+	}
 end

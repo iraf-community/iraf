@@ -235,13 +235,13 @@ real	pa		# Position angle (radians)
 
 int	i, j, k, nxm, nym, nx, ny
 real	dr, intensity, flux, radius, seeing, beta, xc, yc, dxc, dyc
-pointer	sym, mkt1, mkt2, prof, prof1, msi, data
+pointer	sym, mkt1, mkt2, prof, prof1, asi, msi, data
 
 bool	streq()
-real	clgetr()
-int	open(), fscan(), nscan(), access(), imaccess()
+real	clgetr(), asieval()
+int	open(), fscan(), nscan()
 pointer	immap(), imgs2r(), stfind(), stenter()
-errchk	immap, open, imgs2r
+errchk	immap, open, imgs2r, asifit, asieval
 
 include	"mktemplates.com"
 
@@ -267,11 +267,11 @@ begin
 		flux = 1 - intensity
 		Memr[prof+i] = flux
 	    }
-	    flux = Memr[prof+nxm-1]
 
-	    r = 2 * sqrt (log (2.))
+	    r = sqrt (log (2.))
 	    radius = radius / r
 	    seeing = seeing / r
+	    flux = Memr[prof+nxm-1]
 	} else if (streq (name, "moffat")) {
 	    nxm = NPROF
 	    call malloc (prof, nxm, TY_REAL)
@@ -287,17 +287,23 @@ begin
 		flux = flux + intensity * r * dr
 		Memr[prof+i] = flux
 	    }
+
+	    # The last part of the flux below is computed by expanding
+	    # (1+r**2) --> r**2 under the approximation that r >> 1.
+	    # Note that it is possible to explicitly compute the total
+	    # flux  F(total) = beta / (2 * beta - 2) (CRC 53rd edition)
+	    # If found errors in other versions of CRC for this integral!
+
 	    r = r + dr / 2
-	    beta = 2 * beta - 2
-	    flux = flux + 1. / (beta * r ** beta)
+	    xc = 2 * beta - 2
+	    flux = flux + 1. / (xc * r ** xc)
 	    call adivkr (Memr[prof], flux, Memr[prof], nxm)
-	    flux = Memr[prof+nxm-1]
 
 	    r = sqrt (2. ** (1/beta) - 1.)
 	    radius = radius / r
 	    seeing = seeing / r
-	} else if (imaccess (name, 0) == YES) {
-	    i = immap (name, READ_ONLY, 0)
+	    flux = Memr[prof+nxm-1]
+	} else ifnoerr (i = immap (name, READ_ONLY, 0)) {
 	    iferr {
 		nxm = IM_LEN(i,1)
 		nym = IM_LEN(i,2)
@@ -307,32 +313,48 @@ begin
 	    } then
 		call erract (EA_WARN)
 	    call imunmap (i)
+
 	    radius = 1
 	    seeing = 0.4
 	    flux = 1.
-	} else if (access (name, 0) == YES) {
-	    i = open (name, READ_ONLY, TEXT_FILE)
-	    j = NPROF
-	    call malloc (prof, nxm, TY_REAL)
+	} else ifnoerr (i = open (name, READ_ONLY, TEXT_FILE)) {
+	    nxm = NPROF
+	    call malloc (prof1, nxm, TY_REAL)
+
+	    j = 0
 	    while (fscan (i) != EOF) {
 	 	call gargr (flux)
 		if (nscan() < 1)
 		    next
-		if (nxm == j) {
-		    j = j + NPROF
-		    call realloc (prof, j, TY_REAL)
+		if (j == nxm) {
+		    nxm = nxm + NPROF
+		    call realloc (prof1, nxm, TY_REAL)
 		}
-		if (flux < 0.9)
-		    k = nxm
-		Memr[prof+nxm] = flux
-		nxm = nxm + 1
+		Memr[prof1+j] = flux
+		j = j + 1
 	    }
 	    call close (i)
-	    if (nxm == 0) {
-		call mfree (prof, TY_REAL)
+	    if (j == 0) {
+		call mfree (prof1, TY_REAL)
 		call error (1, "PSF template not found")
-	    } else
-	        call realloc (prof, nxm, TY_REAL)
+	    }
+	    call asiinit (asi, II_LINEAR)
+	    call asifit (asi, Memr[prof1], j)
+	    call mfree (prof1, TY_REAL)
+
+	    nxm = NPROF
+	    call malloc (prof, nxm, TY_REAL)
+	    radius = j - 1
+	    dr = radius / (nxm - 1)
+	    do i = 0, nxm - 1 {
+		r = i * dr
+		flux = asieval (asi, 1 + r)
+		if (flux < 0.9)
+		    k = i
+		Memr[prof+i] = flux
+	    }
+
+	    call asifree (asi)
 
 	    radius = 1.
 	    seeing = (k - 1.) / (nxm - 1.)
@@ -432,12 +454,13 @@ char	name[ARB]	# Profile name or file
 
 int	i, j, nxm, nym
 real	radius, r, dr, intensity, flux, c3, c4, c5, c6, c7
-pointer	sym, mkt, prof, msi, buf
+pointer	sym, mkt, prof, asi, msi, buf
 
-int	open(), fscan(), nscan(), access(), imaccess()
+real	asieval()
+int	open(), fscan(), nscan()
 pointer	immap(), imgs2r(), stfind(), stenter()
 bool	streq()
-errchk	open, immap
+errchk	open, immap, asifit, asieval
 
 include	"mktemplates.com"
 
@@ -480,8 +503,7 @@ begin
 		Memr[prof+i] = flux
 	    }
 	    radius = radius / 7.67 ** 4
-	} else if (imaccess (name, 0) == YES) {
-	    i = immap (name, READ_ONLY, 0)
+	} else ifnoerr (i = immap (name, READ_ONLY, 0)) {
 	    iferr {
 		nxm = IM_LEN(i,1)
 		nym = IM_LEN(i,2)
@@ -492,27 +514,43 @@ begin
 		call erract (EA_WARN)
 	    call imunmap (i)
 	    radius = 1.
-	} else if (access (name, 0) == YES) {
-	    i = open (name[2], READ_ONLY, TEXT_FILE)
-	    j = NPROF
-	    call malloc (prof, j, TY_REAL)
-	    nxm = 0
+	} else ifnoerr (i = open (name, READ_ONLY, TEXT_FILE)) {
+	    nxm = NPROF
+	    call malloc (buf, nxm, TY_REAL)
+
+	    j = 0
 	    while (fscan (i) != EOF) {
-		call gargr (flux)
+	 	call gargr (flux)
 		if (nscan() < 1)
 		    next
-		if (nxm == j) {
-		    j = j + NPROF
-		    call realloc (prof, j, TY_REAL)
+		if (j == nxm) {
+		    nxm = nxm + NPROF
+		    call realloc (buf, nxm, TY_REAL)
 		}
-		Memr[prof+nxm] = flux
-		nxm = nxm + 1
+		Memr[buf+j] = flux
+		j = j + 1
 	    }
 	    call close (i)
-	    if (nxm == 0)
-		call mfree (prof, TY_REAL)
-	    else
-	        call realloc (prof, nxm, TY_REAL)
+	    if (j == 0) {
+		call mfree (buf, TY_REAL)
+		nxm = 0
+	    }
+	    call asiinit (asi, II_LINEAR)
+	    call asifit (asi, Memr[buf], j)
+	    call mfree (buf, TY_REAL)
+
+	    nxm = NPROF
+	    call malloc (prof, nxm, TY_REAL)
+	    radius = j - 1
+	    dr = radius / (nxm - 1)
+	    do i = 0, nxm - 1 {
+		r = i * dr
+		flux = asieval (asi, 1 + r)
+		Memr[prof+i] = flux
+	    }
+
+	    call asifree (asi)
+
 	    radius = 1.
 	} else {
 	    call eprintf ("WARNING: Object template %s not found.\n")

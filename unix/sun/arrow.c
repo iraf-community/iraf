@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <sys/types.h>
 #include <sundev/kbio.h>
 #include <sundev/kbd.h>

@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 
 #define	NBITS_CHAR	8	/* number of bits in a char */

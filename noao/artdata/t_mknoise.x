@@ -1,6 +1,9 @@
 include	<error.h>
 include	<imhdr.h>
 
+define	MAX_HDR		20000			# Maximum user header
+define	LEN_COMMENT	70			# Maximum comment length
+
 # Cosmic ray data structure
 define	LEN_MKO		4
 define	MKO_X		Memi[$1]		# X position
@@ -32,11 +35,11 @@ real	energy				# Maximum random energy (electrons)
 bool	new
 real	x, y, z
 int	i, j, k, l, nx, ny, nlines, c1, c2, c3, c4, l1, l2, l3, l4, irbuf, ipbuf
-pointer	sp, input, output, fname, rbuf, pbuf
+pointer	sp, input, output, fname, comment, rbuf, pbuf
 pointer	in, out, buf, lines, newlines, obj, ptr1, ptr2
 pointer	mko, mkt
 
-long	clgetl()
+long	clgetl(), clktime()
 bool	clgetb(), streq()
 int	imtopenp(), imtlen(), imtgetim()
 int	clgeti(), access(), nowhite(), open(), fscan(), nscan(), imaccess()
@@ -55,6 +58,7 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
+	call salloc (comment, LEN_COMMENT, TY_CHAR)
 
 	# Get parameters which apply to all images.
 	ilist = imtopenp ("input")
@@ -89,14 +93,14 @@ begin
 	    # Map images.  Check for new, existing, and in-place images.
 	    if (streq (Memc[input], Memc[output])) {
 		if (imaccess (Memc[input], 0) == YES) {
-		    iferr (in = immap (Memc[input], READ_WRITE, 0)) {
+		    iferr (in = immap (Memc[input], READ_WRITE, MAX_HDR)) {
 			call erract (EA_WARN)
 			next
 		    }
 		    out = in
 		    new = false
 		} else {
-		    iferr (in = immap (Memc[input], NEW_IMAGE, 0)) {
+		    iferr (in = immap (Memc[input], NEW_IMAGE, MAX_HDR)) {
 			call erract (EA_WARN)
 			next
 		    }
@@ -106,10 +110,11 @@ begin
 		    IM_LEN(in,2) = clgeti ("nlines")
 		    IM_PIXTYPE(in) = TY_REAL
 		    call clgstr ("title", IM_TITLE(out), SZ_IMTITLE)
+		    call mko_header (out)
 		    new = true
 		}
 	    } else {
-		iferr (in = immap (Memc[input], READ_ONLY, 0)) {
+		iferr (in = immap (Memc[input], READ_ONLY, MAX_HDR)) {
 		    call erract (EA_WARN)
 		    next
 		}
@@ -123,6 +128,9 @@ begin
 	    nc = IM_LEN(in,1)
 	    nl = IM_LEN(in,2)
 
+	    call imaddr (out, "gain", gain)
+	    call imaddr (out, "rdnoise", rdnoise * gain)
+
 	    # Read the object list.
 	    call malloc (mko, LEN_MKO, TY_STRUCT)
 	    call mkt_init ()
@@ -135,6 +143,7 @@ begin
 	    # If a nonexistent object list is given then write the random
 	    # events out.
 
+	    energy = INDEF
 	    nobjects = 0
 	    i = nowhite (Memc[fname], Memc[fname], SZ_FNAME)
 	    if (access (Memc[fname], 0, 0) == YES) {
@@ -143,7 +152,13 @@ begin
 		    call gargr (x)
 		    call gargr (y)
 		    call gargr (z)
-		    if (nscan() < 3 || x < 1 || x > nc || y < 1 || y > nl)
+		    if (nscan() < 3) {
+			call reset_scan ()
+			call gargstr (Memc[comment], LEN_COMMENT)
+			call mko_comment (out, Memc[comment])
+			next
+		    }
+		    if (x < 1 || x > nc || y < 1 || y > nl)
 			next
 		    if (nobjects == 0) {
 			j = 100
@@ -191,6 +206,29 @@ begin
 			call close (i)
 		    }
 		}
+	    }
+
+	    # Add comment history of task parameters.
+	    call strcpy ("# ", Memc[comment], LEN_COMMENT)
+	    call cnvtime (clktime (0), Memc[comment+2], LEN_COMMENT-2)
+	    call mko_comment (out, Memc[comment])
+	    call mko_comment (out, "begin\tmknoise")
+	    call mko_comment1 (out, "background", 'r', Memc[comment])
+	    call mko_comment1 (out, "gain", 'r', Memc[comment])
+	    call mko_comment1 (out, "rdnoise", 'r', Memc[comment])
+	    call mko_comment1 (out, "poisson", 'b', Memc[comment])
+	    call mko_comment1 (out, "seed", 'i', Memc[comment])
+	    if (nobjects > 0) {
+		if (Memc[fname] != EOS)
+	            call mko_comment1 (out, "cosrays", 's', Memc[comment])
+		call sprintf (Memc[comment], LEN_COMMENT, "\tncosrays%24t%d")
+		    call pargi (nobjects)
+		call mko_comment (out, Memc[comment])
+		if (!IS_INDEF (energy))
+	            call mko_comment1 (out, "energy", 'r', Memc[comment])
+	        call mko_comment1 (out, "radius", 'r', Memc[comment])
+	        call mko_comment1 (out, "ar", 'r', Memc[comment])
+	        call mko_comment1 (out, "pa", 'r', Memc[comment])
 	    }
 
 	    # If no objects are requested then do the image I/O

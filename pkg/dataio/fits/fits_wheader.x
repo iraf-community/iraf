@@ -267,14 +267,16 @@ bool	rft_equald()
 
 begin
 	# Calculate the maximum and minimum values in the data.
-	maxdata = datamax
-	mindata = datamin
+	maxdata = datamax + abs ((datamax / (10.0 ** (NDIGITS_RP - 1))))
+	mindata = datamin - abs ((datamin / (10.0 ** (NDIGITS_RP - 1))))
 	denom =  maxtape - mintape
 	num = maxdata - mindata
 	#denom = denom - denom / (1.0d1 ** (NDIGITS_RP - 1))
-	num = num + num / (1.0d1 ** (NDIGITS_RP - 1))
+	#num = num + num / (1.0d1 ** (NDIGITS_RP - 1))
 
 	# Check for constant image case.
+	mindata = datamin
+	maxdata = datamax
 	if (rft_equald (num, 0.0d0)) {
 	    bscale = 1.0d0
 	    bzero = maxdata

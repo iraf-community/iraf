@@ -594,11 +594,7 @@ int	type;			/* text, binary, directory	*/
 	    cp = rindex (fname, '/');
 	    if (cp && *(cp+1) == EOS)
 		*cp = EOS;
-#ifdef apollo
-	    os_createdir (fname, mode);	/* compiler doesn't like fd not used */
-#else
 	    fd = os_createdir (fname, mode);
-#endif
 
 	    /* Ignore any error creating directory, as this may just mean
 	     * that the directory already exists.  If the directory does

@@ -27,6 +27,7 @@ routines may be used to access the symbol table.
 	 qm = qm_access ()
 	 st = qm_symtab (qm)
 	 qm_setdefaults (qm, qp)
+	 qm_upddefaults (qm, qp)
 
 		qm_scan (qm, fname, flags)
 	       qm_scano (qm, fd, flags)
@@ -41,7 +42,9 @@ once upon entry to every routine which accesses the macro database.
 
 QM_SETDEFAULTS is called when a datafile is opened to set the default values
 of all interface and datafile parameters; the user can control these defaults
-by including SET statements in the macro definition file.
+by including SET statements in the macro definition file.  QM_UPDDEFAULTS is
+similar, except that it sets ONLY the values of those parameters that have
+been explicitly set in SET statements in the macro files.
 
 When QM_ACCESS is called it looks for two variables in the user environment.
 
@@ -158,24 +161,6 @@ begin
 	    # Initialize settable interface/datafile parameters.
 	    ps = stenter (st, PSETKW, LEN_PSET)
 	    call aclri (Memi[ps], LEN_PSET)
-
-	    PS_EXPBLEN(ps)	= DEF_PROGBUFLEN
-	    PS_EXDBLEN(ps)	= DEF_DATABUFLEN
-	    PS_EXMAXFRLLEN(ps)	= DEF_MAXFRLUTLEN
-	    PS_EXMAXRRLLEN(ps)	= DEF_MAXRRLUTLEN
-	    PS_EXLMINRANGES(ps)	= DEF_LUTMINRANGES
-	    PS_EXLSCALE(ps)	= DEF_LUTSCALE
-	    PS_SZPBBUF(ps)	= DEF_MAXPUSHBACK
-	    PS_BUCKETLEN(ps)	= DEF_BUCKETLEN
-	    PS_FMMAXLFILES(ps)	= DEF_FMMAXLFILES
-	    PS_FMPAGESIZE(ps)	= DEF_FMPAGESIZE
-	    PS_FMCACHESIZE(ps)	= DEF_FMCACHESIZE
-	    PS_STINDEXLEN(ps)	= DEF_STINDEXLEN
-	    PS_STSTABLEN(ps)	= DEF_STSTABLEN
-	    PS_STSBUFSIZE(ps)	= DEF_STSBUFSIZE
-	    PS_BLOCK(ps)	= DEF_BLOCKFACTOR
-	    PS_DEBUG(ps)	= 0
-	    PS_OPTBUFSIZE(ps)	= DEF_OPTBUFSIZE
 
 	    # Free back to here when rebuilding symbol table.
 	    call stmark (st, st_start)
@@ -581,11 +566,73 @@ begin
 end
 
 
-# QM_SETDEFAULTS -- Pass the current default values of all interface and
-# datafile parameters to a QPOE descriptor.  Called at datafile open time
+# QM_SETDEFAULTS -- Set the current default values of all interface and
+# datafile parameters in a QPOE descriptor.  Called at datafile open time
 # to get the defaults.
 
 procedure qm_setdefaults (qm, qp)
+
+pointer	qm			#I QM descriptor
+pointer	qp			#I QPOE descriptor
+
+pointer	ps
+pointer	stfind()
+int	qm_setpar()
+errchk	stfind
+
+begin
+	ps = stfind (QM_ST(qm), PSETKW)
+	if (ps == NULL)
+	    return
+
+	# Interface parameters.
+	QP_EXPBLEN(qp) = qm_setpar (PS_EXPBLEN(ps), DEF_PROGBUFLEN)
+	QP_EXDBLEN(qp) = qm_setpar (PS_EXDBLEN(ps), DEF_DATABUFLEN)
+	QP_EXMAXFRLLEN(qp) = qm_setpar (PS_EXMAXFRLLEN(ps), DEF_MAXFRLUTLEN)
+	QP_EXMAXRRLLEN(qp) = qm_setpar (PS_EXMAXRRLLEN(ps), DEF_MAXRRLUTLEN)
+	QP_EXLMINRANGES(qp) = qm_setpar (PS_EXLMINRANGES(ps), DEF_LUTMINRANGES)
+	QP_EXLSCALE(qp) = qm_setpar (PS_EXLSCALE(ps), DEF_LUTSCALE)
+	QP_SZPBBUF(qp) = qm_setpar (PS_SZPBBUF(ps), DEF_MAXPUSHBACK)
+	QP_FMCACHESIZE(qp) = qm_setpar (PS_FMCACHESIZE(ps), DEF_FMCACHESIZE)
+
+	# Datafile parameters.
+	QP_BUCKETLEN(qp) = qm_setpar (PS_BUCKETLEN(ps), DEF_BUCKETLEN)
+	QP_FMMAXLFILES(qp) = qm_setpar (PS_FMMAXLFILES(ps), DEF_FMMAXLFILES)
+	QP_FMPAGESIZE(qp) = qm_setpar (PS_FMPAGESIZE(ps), DEF_FMPAGESIZE)
+	QP_STINDEXLEN(qp) = qm_setpar (PS_STINDEXLEN(ps), DEF_STINDEXLEN)
+	QP_STSTABLEN(qp) = qm_setpar (PS_STSTABLEN(ps), DEF_STSTABLEN)
+	QP_STSBUFSIZE(qp) = qm_setpar (PS_STSBUFSIZE(ps), DEF_STSBUFSIZE)
+
+	# Other parameters.
+	QP_BLOCK(qp) = qm_setpar (PS_BLOCK(ps), DEF_BLOCKFACTOR)
+	QP_OPTBUFSIZE(qp) = qm_setpar (PS_OPTBUFSIZE(ps), DEF_OPTBUFSIZE)
+	QP_DEBUG(qp) = qm_setpar (PS_DEBUG(ps), 0)
+end
+
+
+# QM_SETPAR -- Return the given parameter value, if set in the user's macro
+# files, otherwise return the interface default.
+
+int procedure qm_setpar (userval, defval)
+
+int	userval			#I user specified value, or zero
+int	defval			#I interface default
+
+begin
+	if (userval != 0)
+	    return (userval)
+	else
+	    return (defval)
+end
+
+
+# QM_UPDDEFAULTS -- Update the values in the QPOE descriptor of all interface
+# and datafile parameters set explicitly by a user macro or SET statement.
+# Only those parameters for which values were explicitly specified in the
+# use macro files are affected, allowing the use of global macros or set
+# statements to override the interface or datafile defaults.
+
+procedure qm_upddefaults (qm, qp)
 
 pointer	qm			#I QM descriptor
 pointer	qp			#I QPOE descriptor
@@ -600,27 +647,27 @@ begin
 	    return
 
 	# Interface parameters.
-	QP_EXPBLEN(qp) = PS_EXPBLEN(ps)
-	QP_EXDBLEN(qp) = PS_EXDBLEN(ps)
-	QP_EXMAXFRLLEN(qp) = PS_EXMAXFRLLEN(ps)
-	QP_EXMAXRRLLEN(qp) = PS_EXMAXRRLLEN(ps)
-	QP_EXLMINRANGES(qp) = PS_EXLMINRANGES(ps)
-	QP_EXLSCALE(qp) = PS_EXLSCALE(ps)
-	QP_SZPBBUF(qp) = PS_SZPBBUF(ps)
-	QP_FMCACHESIZE(qp) = PS_FMCACHESIZE(ps)
+	if (PS_EXPBLEN(ps) != 0)	QP_EXPBLEN(qp) = PS_EXPBLEN(ps)
+	if (PS_EXDBLEN(ps) != 0)	QP_EXDBLEN(qp) = PS_EXDBLEN(ps)
+	if (PS_EXMAXFRLLEN(ps) != 0)	QP_EXMAXFRLLEN(qp) = PS_EXMAXFRLLEN(ps)
+	if (PS_EXMAXRRLLEN(ps) != 0)	QP_EXMAXRRLLEN(qp) = PS_EXMAXRRLLEN(ps)
+	if (PS_EXLMINRANGES(ps) != 0)	QP_EXLMINRANGES(qp)= PS_EXLMINRANGES(ps)
+	if (PS_EXLSCALE(ps) != 0)	QP_EXLSCALE(qp) = PS_EXLSCALE(ps)
+	if (PS_SZPBBUF(ps) != 0)	QP_SZPBBUF(qp) = PS_SZPBBUF(ps)
+	if (PS_FMCACHESIZE(ps) != 0)	QP_FMCACHESIZE(qp) = PS_FMCACHESIZE(ps)
 
 	# Datafile parameters.
-	QP_BUCKETLEN(qp) = PS_BUCKETLEN(ps)
-	QP_FMMAXLFILES(qp) = PS_FMMAXLFILES(ps)
-	QP_FMPAGESIZE(qp) = PS_FMPAGESIZE(ps)
-	QP_STINDEXLEN(qp) = PS_STINDEXLEN(ps)
-	QP_STSTABLEN(qp) = PS_STSTABLEN(ps)
-	QP_STSBUFSIZE(qp) = PS_STSBUFSIZE(ps)
+	if (PS_BUCKETLEN(ps) != 0)	QP_BUCKETLEN(qp) = PS_BUCKETLEN(ps)
+	if (PS_FMMAXLFILES(ps) != 0)	QP_FMMAXLFILES(qp) = PS_FMMAXLFILES(ps)
+	if (PS_FMPAGESIZE(ps) != 0)	QP_FMPAGESIZE(qp) = PS_FMPAGESIZE(ps)
+	if (PS_STINDEXLEN(ps) != 0)	QP_STINDEXLEN(qp) = PS_STINDEXLEN(ps)
+	if (PS_STSTABLEN(ps) != 0)	QP_STSTABLEN(qp) = PS_STSTABLEN(ps)
+	if (PS_STSBUFSIZE(ps) != 0)	QP_STSBUFSIZE(qp) = PS_STSBUFSIZE(ps)
 
 	# Other parameters.
-	QP_BLOCK(qp) = PS_BLOCK(ps)
-	QP_DEBUG(qp) = PS_DEBUG(ps)
-	QP_OPTBUFSIZE(qp) = PS_OPTBUFSIZE(ps)
+	if (PS_BLOCK(ps) != 0)		QP_BLOCK(qp) = PS_BLOCK(ps)
+	if (PS_OPTBUFSIZE(ps) != 0)	QP_OPTBUFSIZE(qp) = PS_OPTBUFSIZE(ps)
+	if (PS_DEBUG(ps) != 0)		QP_DEBUG(qp) = PS_DEBUG(ps)
 end
 
 

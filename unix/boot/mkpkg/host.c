@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -86,7 +89,7 @@ char	*irafdir;		/* iraf root directory		*/
 		printf ("OS command overflow; cannot compile files\n");
 		fflush (stdout);
 		exit_status = ERR;
-		return (exit_status);
+		return;
 	    }
 
 	    if (verbose) {
@@ -149,7 +152,7 @@ char	*irafdir;		/* iraf root directory		*/
 		    library);
 		fflush (stdout);
 		exit_status = ERR;
-		return (exit_status);
+		return;
 	    }
 
 	    if (verbose) {

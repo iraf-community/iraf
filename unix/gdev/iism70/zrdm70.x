@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 # ZRDM70 -- Initiate an asynchronous read from the IIS.
 
 procedure zrdm70 (chan, buf, nbytes, offset)

@@ -1,17 +1,12 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
-#
-# Note:  the following change was negated, as the problem was due to a last
-# minute change to decl.c in xpp.  File date for t_combine.x is left as
-# Jun 18, 1990, but it is a direct copy of the Jun '89 file.  (6/18/90 SRo)
-#
-#ccdred$src/t_combine.x
-#    Changed:
-#	char images[SZ_FNAME-1,nimages] --> char images[SZ_FNAME,nimages-1]
-#    The incorrect declaration results in each successive image name have
-#    additional leading characters.  Apparently, since this has not be
-#    found previously, the leading characters have generally been blanks.
-#    (3/30/90, Valdes)
+ccdred$src/t_combine.x
+    Changed:
+	char images[SZ_FNAME-1,nimages] --> char images[SZ_FNAME,nimages-1]
+    The incorrect declaration results in each successive image name have
+    additional leading characters.  Apparently, since this has not be
+    found previously, the leading characters have generally been blanks.
+    (3/30/90, Valdes)
 
 ccdred$doc/combine.hlp
     Clarified and documented definitions of the scale, offset, and weights.

@@ -4,10 +4,10 @@ include <error.h>
 include <fset.h>
 include <mach.h>
 
-define	OBUF_PAD	20000
-define	SZ_OBUF		100000
+define	OBUF_PAD	32767
+define	SZ_OBUF		131072
 define	SWAP		{temp=$1;$1=$2;$2=temp}
-define	MAX_RANGES	100
+define	MAX_RANGES	200
 
 # T2D -- This is an asynchronous tape to disk copy routine.  It considers
 # the input to be a streaming device and the output to be a block structured

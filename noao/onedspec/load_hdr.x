@@ -60,7 +60,7 @@ begin
 	    call ids_hdri (im, "NP2", NP2(ids))
 	}
 	LINE(ids) = line
-	NP1(ids) = max (NP1(ids), 1)
+	NP1(ids) = max (NP1(ids), 0)
 	NP2(ids) = min (NP2(ids), IM_LEN(im,1))
 
 	call ids_hdri (im, "OFLAG", OFLAG(ids))

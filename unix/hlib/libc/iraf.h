@@ -7,17 +7,15 @@
 
 #ifndef D_iraf
 /* ### Start of run time definitions */
-#define	HOST		"/usr/iraf/unix/"
-#define	IRAF		"/usr/iraf/"
+#define	HOST		"/local/iraf/unix/"
+#define	IRAF		"/local/iraf/"
 #define	TMP		"/tmp/"
 /* ### End of run time definitions */
 
 /* Compile time definitions (for C #ifdefs).
  */
 #define	BSDUNIX
-/* #define	SUNOS4 */
-#define	UNIX
-#define	BSD43
+#define	SUNOS4
 
 #define D_iraf
 #endif
@@ -27,154 +25,154 @@
  */
 #ifdef import_libc
 #ifndef D_libc
-#include "/usr/iraf/unix/hlib/libc/libc.h"
+#include "/local/iraf/unix/hlib/libc/libc.h"
 #endif
 #undef import_libc
 #endif
 
 #ifdef import_spp
 #ifndef D_spp
-#include "/usr/iraf/unix/hlib/libc/spp.h"
+#include "/local/iraf/unix/hlib/libc/spp.h"
 #endif
 #undef import_spp
 #endif
 
 #ifdef import_main
 #ifndef D_main
-#include "/usr/iraf/unix/hlib/libc/main.h"
+#include "/local/iraf/unix/hlib/libc/main.h"
 #endif
 #undef import_main
 #endif
 
 #ifdef import_stdio
 #ifndef D_stdio
-#include "/usr/iraf/unix/hlib/libc/stdio.h"
+#include "/local/iraf/unix/hlib/libc/stdio.h"
 #endif
 #undef import_stdio
 #endif
 
 #ifdef import_error
 #ifndef D_error
-#include "/usr/iraf/unix/hlib/libc/error.h"
+#include "/local/iraf/unix/hlib/libc/error.h"
 #endif
 #undef import_error
 #endif
 
 #ifdef import_ctype
 #ifndef D_ctype
-#include "/usr/iraf/unix/hlib/libc/ctype.h"
+#include "/local/iraf/unix/hlib/libc/ctype.h"
 #endif
 #undef import_ctype
 #endif
 
 #ifdef import_finfo
 #ifndef D_finfo
-#include "/usr/iraf/unix/hlib/libc/finfo.h"
+#include "/local/iraf/unix/hlib/libc/finfo.h"
 #endif
 #undef import_finfo
 #endif
 
 #ifdef import_fset
 #ifndef D_fset
-#include "/usr/iraf/unix/hlib/libc/fset.h"
+#include "/local/iraf/unix/hlib/libc/fset.h"
 #endif
 #undef import_fset
 #endif
 
 #ifdef import_kernel
 #ifndef D_kernel
-#include "/usr/iraf/unix/hlib/libc/kernel.h"
+#include "/local/iraf/unix/hlib/libc/kernel.h"
 #endif
 #undef import_kernel
 #endif
 
 #ifdef import_xnames
 #ifndef D_xnames
-#include "/usr/iraf/unix/hlib/libc/xnames.h"
+#include "/local/iraf/unix/hlib/libc/xnames.h"
 #endif
 #undef import_xnames
 #endif
 
 #ifdef import_knames
 #ifndef D_knames
-#include "/usr/iraf/unix/hlib/libc/knames.h"
+#include "/local/iraf/unix/hlib/libc/knames.h"
 #endif
 #undef import_knames
 #endif
 
 #ifdef import_setjmp
 #ifndef D_setjmp
-#include "/usr/iraf/unix/hlib/libc/setjmp.h"
+#include "/local/iraf/unix/hlib/libc/setjmp.h"
 #endif
 #undef import_setjmp
 #endif
 
 #ifdef import_xwhen
 #ifndef D_xwhen
-#include "/usr/iraf/unix/hlib/libc/xwhen.h"
+#include "/local/iraf/unix/hlib/libc/xwhen.h"
 #endif
 #undef import_xwhen
 #endif
 
 #ifdef import_protect
 #ifndef D_protect
-#include "/usr/iraf/unix/hlib/libc/protect.h"
+#include "/local/iraf/unix/hlib/libc/protect.h"
 #endif
 #undef import_protect
 #endif
 
 #ifdef import_prtype
 #ifndef D_prtype
-#include "/usr/iraf/unix/hlib/libc/prtype.h"
+#include "/local/iraf/unix/hlib/libc/prtype.h"
 #endif
 #undef import_prtype
 #endif
 
 #ifdef import_zfstat
 #ifndef D_zfstat
-#include "/usr/iraf/unix/hlib/libc/zfstat.h"
+#include "/local/iraf/unix/hlib/libc/zfstat.h"
 #endif
 #undef import_zfstat
 #endif
 
 #ifdef import_alloc
 #ifndef D_alloc
-#include "/usr/iraf/unix/hlib/libc/alloc.h"
+#include "/local/iraf/unix/hlib/libc/alloc.h"
 #endif
 #undef import_alloc
 #endif
 
 #ifdef import_math
 #ifndef D_math
-#include "/usr/iraf/unix/hlib/libc/math.h"
+#include "/local/iraf/unix/hlib/libc/math.h"
 #endif
 #undef import_math
 #endif
 
 #ifdef import_prstat
 #ifndef D_prstat
-#include "/usr/iraf/unix/hlib/libc/prstat.h"
+#include "/local/iraf/unix/hlib/libc/prstat.h"
 #endif
 #undef import_prstat
 #endif
 
 #ifdef import_lexnum
 #ifndef D_lexnum
-#include "/usr/iraf/unix/hlib/libc/lexnum.h"
+#include "/local/iraf/unix/hlib/libc/lexnum.h"
 #endif
 #undef import_lexnum
 #endif
 
 #ifdef import_ttset
 #ifndef D_ttset
-#include "/usr/iraf/unix/hlib/libc/ttset.h"
+#include "/local/iraf/unix/hlib/libc/ttset.h"
 #endif
 #undef import_ttset
 #endif
 
 #ifdef import_varargs
 #ifndef D_varargs
-#include "/usr/iraf/unix/hlib/libc/varargs.h"
+#include "/local/iraf/unix/hlib/libc/varargs.h"
 #endif
 #undef import_varargs
 #endif

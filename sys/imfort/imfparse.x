@@ -12,20 +12,21 @@ char	image[ARB]		# input image name
 char	root[SZ_PATHNAME]	# output root pathname
 char	extn[MAX_LENEXTN]	# output extension
 
-int	ip, op
-pointer	sp, pattern, osdir
-int	delim, len_osdir, len_root, len_extn
+int	delim, ip, op
+pointer	sp, pattern, osfn
 int	strmatch(), strlen()
 string	ex HDR_EXTENSIONS
 
 begin
 	call smark (sp)
 	call salloc (pattern, SZ_FNAME, TY_CHAR)
-	call salloc (osdir, SZ_PATHNAME, TY_CHAR)
+	call salloc (osfn, SZ_PATHNAME, TY_CHAR)
 
-	# Parse the image name into the root and extn fields (discard osdir).
-	call vfn_translate (image, Memc[osdir], len_osdir,
-	    root, len_root, extn, len_extn)
+	# Parse the image name into the root and extn fields.  The portion
+	# of the filename excluding any directory specification is also
+	# escape sequence encoded.
+
+	call imf_trans (image, root, extn)
 
 	# Search the list of legal imagefile extensions.  If the extension
 	# given is not found in the list, tack it back onto the root and
@@ -59,10 +60,10 @@ begin
 	# later discarding it ensures that the root name is properly encoded
 	# for the local host.
 
-	if (len_extn > 0) {
-	    call strcpy (image, Memc[osdir], SZ_PATHNAME)
-	    call strcat (".foo", Memc[osdir], SZ_PATHNAME)
-	    call vfn_encode (Memc, osdir, root, len_root, extn, len_extn)
+	if (strlen(extn) > 0) {
+	    call strcpy (image, Memc[osfn], SZ_PATHNAME)
+	    call strcat (".foo", Memc[osfn], SZ_PATHNAME)
+	    call imf_trans (Memc[osfn], root, extn)
 	    extn[1] = EOS
 	}
 

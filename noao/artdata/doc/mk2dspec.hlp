@@ -1,4 +1,4 @@
-.help mk2dspec Jan90 noao.artdata
+.help mk2dspec Aug90 noao.artdata
 .ih
 NAME
 mk2dspec -- Make/add 2D spectra using 1D spectra templates
@@ -32,6 +32,13 @@ Image title to be given to the spectra.  Maximum of 79 characters.
 .ls ncols = 100, nlines = 512
 Number of columns and lines.
 .le
+.ls header = "artdata$stdheader.dat"
+Header keyword data file.  Header keywords are added from this file, if
+defined, to new images created.  Note this applies only to new images.
+The file consists of lines with a keyword, a datatype (one of
+"integer", "real", or "string", usually abbreviated to one character),
+and the parameter value.
+.le
 .ih
 DESCRIPTION
 This task creates or modifies two dimensional spectra by taking one
@@ -43,6 +50,13 @@ the task \fBmknoise\fR.  The spatial profile is fully subsampled and
 may vary in width and position along the dispersion axis.  The spatial
 axis is along the first dimension and the dispersion is along the
 second dimension.
+
+For new images a set of header keywords may be added by specifying a
+data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
+This file contains lines with keyword names, datatype ("integer",
+"real", or "string"), and values.  In addition, comments are added to
+the image header recording the model file name and the contents of the
+model file.
 
 The spatial profile models are specified in one or more model parameter
 files.  These files contain lines giving a one dimensional spectrum template
@@ -181,5 +195,5 @@ of the spec2 spectrum is wider simulating a galaxy spectrum.
 .fi
 .ih
 SEE ALSO
-mk1dspec, mknoise
+mk1dspec, mknoise, mkheader
 .endhelp

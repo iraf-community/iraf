@@ -142,18 +142,3 @@ i386:					# install 386i binaries
 	!$(hlib)/mkfloat.csh i386
 	!(cd ./unix; setenv MACH i386; sh -x setarch.sh)
 	;
-m68k_fpa:				# install apollo m68k fpa binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh m68k_fpa
-	!(cd ./unix; setenv MACH m68k_fpa; sh -x setarch.sh)
-	;
-m68k_f68:				# install apollo m68k f68882 binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh m68k_f68
-	!(cd ./unix; setenv MACH m68k_f68; sh -x setarch.sh)
-	;
-a88k:					# install apollo prism binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh a88k
-	!(cd ./unix; setenv MACH a88k; sh -x setarch.sh)
-	;

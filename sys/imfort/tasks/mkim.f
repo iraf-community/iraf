@@ -56,7 +56,7 @@ c --- Open the image for writing, and write the data.
 
 	do 20 j = 1, nlines
 	    do 10 i = 1, ncols
-		pix(i) = j * ncols + i
+		pix(i) = (j-1) * ncols + i
  10	    continue
 	    call impl2r (im, pix, j, ier)
 	    if (ier .ne. 0) goto 91

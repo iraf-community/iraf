@@ -1,5 +1,49 @@
 .help revisions Jun88 pkg.dataio
 .nf
+dataio$fits/wfits.h: From Davis, August 15, 1990
+dataio$fits/t_wfits.x: From Davis, August 15, 1990
+dataio$fits/fits_write.x: From Davis, August 15, 1990
+dataio$fits/fits_wimage.x: From Davis, August 15, 1990
+dataio$fits/fits_wpixels.x: From Davis, August 15, 1990
+dataio$fits/fits_rpixels.x: From Davis, August 15, 1990
+    1. Wfits will now permit FITS blocking factors up to and including
+    22 although a warning message will be issued if a blocking factor
+    > 10 is requested.
+
+    2. Wfits occasionally crashed with a segmentation violation if a
+    non-standard fits blocking factor was selected. This error was
+    triggered if the unused portion of the output block to be blank
+    filled was greater than 2880 bytes. This bug has been fixed in
+    2.10
+
+    3. Rfits was not reading FITS data with a block size < 2880 on
+    the 9-track drives correctly. This bug has been fixed in 2.10.
+
+    4. Wfits.rfits now sets the length of the user area to the maximum of
+    the default of 28800 chars and the value of the environment variable
+    "min_lenuserarea".
+
+dataio$fits/fits_wheader.x: From Davis, July 3, 1990
+dataio$fits/fits_cards.x: From Davis, July 3, 1990
+dataio$fits/fits_rheader.x: From Davis, July 3, 1990
+    Fixed a problem in the way bscale and bzero were computed that was
+    causing floating point errors for some double precision images,
+    basically because the precision was worse than I thought.
+    The really problem is that the min and max of a double precision
+    image are  stored as reals in the image header do they do not
+    quite correspond to what is in the image. The solution was to extend
+    the values of the min and max to slightly lower and higher values
+    respectively. These problems will go away when ieee becomes more
+    accepted. (See messages below for history of this problem)
+
+    Wfits now checks for the presence of the FITS keywords SIMPLE, BITPIX,
+    NAXIS and NAXISn in the user area and filters them out before writing
+    the FITS header.
+
+    Rfits will now ignore FITS keywords that are duplicates of SIMPLE,
+    BITPIX, NAXIS and NAXISn. A warning message is issued if any of
+    these keywords are duplicated.
+
 dataio$fits/fits_wheader.x: From Davis, April 21
 dataio$fits/fits_write.x: From Davis, April 21
 dataio$fits/fits_read.x: From Davis, April 21

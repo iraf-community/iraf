@@ -3,8 +3,8 @@
 include	"qpoe.h"
 
 # QP_ACCESSF -- Test whether the named field (header parameter) exists.
-# Aliased parameters are recursively expanded and must resolve to a normal
-# parameter reference.
+# Globally aliased parameters are recursively expanded and must resolve to
+# a normal parameter reference.
 
 int procedure qp_accessf (qp, param)
 

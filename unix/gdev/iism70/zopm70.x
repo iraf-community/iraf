@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 # ZOPM70 -- Open the IIS for binary file i/o.  The device will be automatically
 # allocated if necessary.
 

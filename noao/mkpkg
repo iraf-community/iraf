@@ -133,21 +133,3 @@ mips:					# install mips binaries
 		     surfphot twodspec"
 	!$(hlib)/mkfloat.csh mips -d $(DIRS)
 	;
-m68k_fpa:				# install apollo fpa binaries
-	$verbose off
-	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
-		     surfphot twodspec"
-	!$(hlib)/mkfloat.csh m68k_fpa -d $(DIRS)
-	;
-m68k_f68:				# install apollo mc68882 binaries
-	$verbose off
-	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
-		     surfphot twodspec"
-	!$(hlib)/mkfloat.csh m68k_f68 -d $(DIRS)
-	;
-a88k:					# install apollo PRISM binaries
-	$verbose off
-	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec proto\
-		     surfphot twodspec"
-	!$(hlib)/mkfloat.csh a88k -d $(DIRS)
-	;

@@ -16,7 +16,7 @@ libpkg.a:
 				<fset.h>
 	fits_wheader.x		wfits.com wfits.h <mach.h> <imhdr.h>
 	fits_wimage.x		wfits.com wfits.h <imhdr.h>
-	fits_wpixels.x		<fset.h> <mach.h>
+	fits_wpixels.x		wfits.h <fset.h> <mach.h>
 	fits_cards.x		wfits.com wfits.h <imhdr.h>
 	fits_params.x		wfits.h <time.h>
 	;

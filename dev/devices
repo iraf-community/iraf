@@ -11,7 +11,17 @@
 # plus one entry for the default density.  Backslash continuation may be used
 # to break long lines, and # style comments are permitted anywhere.
 
-mta		rct8	rct12
-mta.low		rct8	rct12
-mta.high	rct12	rct8
+mta		nrmt0	mt0 mt4 mt8 mt12 nmt0 nmt8 rmt0 rmt4 rmt8 rmt12 nrmt8
+mta.1600	nrmt0	mt0 mt4 mt8 mt12 nmt0 nmt8 rmt0 rmt4 rmt8 rmt12 nrmt8
+mta.6250        nrmt8	mt0 mt4 mt8 mt12 nmt0 nmt8 rmt0 rmt4 rmt8 rmt12 nrmt0
 
+mtb		nrmt1	mt1 mt5 mt9 mt13 nmt1 nmt9 rmt1 rmt5 rmt9 rmt13 nrmt9
+mtb.1600	nrmt1	mt1 mt5 mt9 mt13 nmt1 nmt9 rmt1 rmt5 rmt9 rmt13 nrmt9
+mtb.6250        nrmt9	mt1 mt5 mt9 mt13 nmt1 nmt9 rmt1 rmt5 rmt9 rmt13 nrmt1
+
+# Orion Exabyte (Sun SCSI driver).
+mtc             nrst1	rst1 rst9 rst17 rst25 nrst9 nrst17 nrst25
+
+# Argo Exabytes (Ciprico driver).
+mtd		nrrt0	nrt0 rrt0 rt0 fnrrt0 fnrt0 frrt0 frt0
+mte		nrrt1	nrt1 rrt1 rt1 fnrrt1 fnrt1 frrt1 frt1

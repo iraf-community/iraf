@@ -31,7 +31,11 @@ include "rfits.com"
 
 begin
 	# Initialization.
-	SIMPLE(fits) = YES
+	SIMPLE(fits) = NO
+	BITPIX(fits) = INDEFI
+	NAXIS(im) = INDEFI
+	do i = 1, IM_MAXDIM
+	    IM_LEN(im,i) = INDEFL
 	SCALE(fits) = NO
 	FITS_BSCALE(fits) = 1.0d0
 	FITS_BZERO(fits) = 0.0d0
@@ -146,24 +150,36 @@ begin
 	    call sfree (sp)
 	    return(YES)
 	} else if (strmatch (card, "^SIMPLE  ") != 0) {
-	    nchar = cctoc (card, i, cval)
-	    if (cval != 'T') {
-		call error (13, "RFT_DECODE_CARD: Non-standard FITS format")
-		SIMPLE(fits) = NO
+	    if (SIMPLE(fits) == YES)
+		call printf ("Warning: Duplicate SIMPLE keyword ignored\n")
+	    else {
+	        nchar = cctoc (card, i, cval)
+	        if (cval != 'T')
+		    call error (13, "RFT_DECODE_CARD: Non-standard FITS format")
 	    }
 	} else if (strmatch (card, "^BITPIX  ") != 0) {
-	    nchar = ctoi (card, i, BITPIX(fits))
+	    if (! IS_INDEFI(BITPIX(fits)))
+		call printf ("Warning: Duplicate BITPIX keyword ignored\n")
+	    else
+	        nchar = ctoi (card, i, BITPIX(fits))
 	} else if (strmatch (card, "^BLANK   ") != 0) {
 	    BLANKS(fits) = YES
 	    nchar = ctol (card, i, BLANK_VALUE(fits))
 	} else if (strmatch (card, "^NAXIS   ") != 0) {
-	    nchar = ctoi (card, i, NAXIS(im))
+	    if (! IS_INDEFI(NAXIS(im)))
+		call printf ("Warning: Duplicate NAXIS keyword ignored\n")
+	    else
+	        nchar = ctoi (card, i, NAXIS(im))
 	    if (NAXIS(im) > IM_MAXDIM)
 		call error (5, "RFT_DECODE_CARD: FITS NAXIS too large")
 	} else if (strmatch (card, "^NAXIS") != 0) {
 	    k = strmatch (card, "^NAXIS")
 	    nchar = ctoi (card, k, j)
-	    nchar = ctol (card, i, NAXISN(im, j))
+	    if (! IS_INDEFL(NAXISN(im,j))) {
+		call printf ("Warning: Duplicate NAXIS%d keyword ignored\n")
+		    call pargi (j)
+	    } else
+	        nchar = ctol (card, i, NAXISN(im, j))
 	} else if (strmatch (card, "^GROUPS  ") != 0) {
 	    nchar = cctoc (card, i, cval)
 	    if (cval == 'T') {

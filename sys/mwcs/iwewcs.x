@@ -187,7 +187,7 @@ samperr_		call eprintf (
 	    call amovd (Memd[o_cd], Memd[cd], ndim*ndim)
 
 	# Compute R = inv(LTM) * (R' - LTV).
-	if (have_ltv) {
+	if (have_ltm || have_ltv) {
 	    call mw_invertd (Memd[o_ltm], Memd[ltm], ndim)
 	    call asubd (IW_CRPIX(iw,1), IW_LTV(iw,1), Memd[o_r], ndim)
 	    call mw_vmuld (Memd[ltm], Memd[o_r], Memd[r], ndim)

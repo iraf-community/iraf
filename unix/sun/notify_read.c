@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <syscall.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>

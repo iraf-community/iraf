@@ -41,6 +41,7 @@ See QPOE.hlp for detailed information.
 	        qp_addf (qp, param, datatype, maxelem, comment, flags)
       nelem = qp_queryf (qp, param, datatype, maxelem, comment, flags)
         nelem = qp_lenf (qp, param)
+ nchars = qp_expandtext (qp, s1, s2, maxch)
 
       ptr = qp_ofnl[su] (qp, template)
 	  ptr = qp_ofnl (qp, template, sort)
@@ -67,8 +68,7 @@ nchars = qp_elementsize (qp, datatype)
     dtype = qp_putparam (qp, param, o_pp)
 	    qp_flushpar (qp)
 
- nchars = qp_expandtext (qp, s1, s2, maxch)		# token i/o
-       gt = qp_opentext (qp, text)
+       gt = qp_opentext (qp, text)			# token i/o
      token = qp_nexttok (gt)
       token = qp_gettok (gt, tokbuf, maxch)
       token = qp_rawtok (gt, outstr, maxch)
@@ -79,7 +79,7 @@ nchars = qp_elementsize (qp, datatype)
 	   ch = qm_getc (fd, ch)
 		qm_scan (qm, fname, flags)
 	       qm_scano (qm, fd, flags)
-	 qm_setdefaults (qm, qp)
+   qm_[set|upd]defaults (qm, qp)
 	    qm_setparam (qm, param, valstr)
 	ptr = qm_symtab (qm)
 

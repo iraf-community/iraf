@@ -10,12 +10,10 @@ include	"imd.h"
 # kernel is closed.  Opening a workstation involves initialization of the
 # kernel data structures, following by initialization of the device itself.
 
-procedure imd_openws (devname, n, frame, color, mode)
+procedure imd_openws (devname, n, mode)
 
 short	devname[ARB]		# device name
 int	n			# length of device name
-int	frame			# display frame buffer number
-int	color			# graphics overlay color index
 int	mode			# access mode
 
 pointer	sp, buf
@@ -76,7 +74,7 @@ begin
 	    # Open the output file.  Metacode output to the device will be
 	    # spooled and then disposed of to the device at CLOSEWS time.
 
-	    iferr (g_out = idk_open (frame, color, g_tty)) {
+	    iferr (g_out = idk_open (g_frame, g_color, g_tty)) {
 	        call ttycdes (g_tty)
 	        call erract (EA_ERROR)
 	    } else {
@@ -85,8 +83,6 @@ begin
 		    call idk_frame (g_out)
 		g_nframes = 0
 		g_ndraw = 0
-		g_frame = frame
-		g_color = color
 	    }
 	}
 

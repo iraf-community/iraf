@@ -13,8 +13,6 @@ f77 -c $HSI_FF	stcopy.f stlu.f strcmp.f strim.f termin.f trmout.f type.f
 f77 -c $HSI_FF	upper.f wkday.f
 
 ar rv		libf.a *.o
-case $USE_RANLIB in
-    yes)	ranlib libf.a;;
-esac
+ranlib		libf.a
 mv -f		libf.a ..
 rm		*.o

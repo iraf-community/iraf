@@ -73,6 +73,12 @@ uapple5|Apple laser writer NT on ORION running Transcript Software:\
 uapple7|Apple laser writer in the Solar office:\
 	:co#80:li#66:os:pt:ta^I:\
 	:DD=apple,/tmp/asfXXXXXX,!{ lpr -Plw7 $F; rm $F; }:
+lw1p2|two landscape pages via enscript to lw1:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw1 $F; rm $F; }:
+lw2p2|two landscape pages via enscript to lw2:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw2 $F; rm $F; }:
+lw5p2|two landscape pages via enscript to lw5:co#80:li#66:os:pt:ta^I:\
+        :DD=enscript,/tmp/asfXXXXXX,!{ enscript -2rlq -Plw5 $F; rm $F; }:
 
 # The following 2 entries were submitted by Joe Harrington, MIT Planetary
 # Science Group.  <jh@athena.mit.edu> 7 March 1989.  The first sends the

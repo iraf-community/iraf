@@ -63,7 +63,7 @@ range_
 		x1 = x2 + 1
 
 	    case I_SH:
-		hi = (ll_src[ip+1] * I_SHIFT) + data
+		hi = (int(ll_src[ip+1]) * I_SHIFT) + data
 		skipword = true
 		next
 	    case I_IH:

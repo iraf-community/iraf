@@ -60,7 +60,7 @@ begin
 		    call pargi (data)
 
 	    case I_SH:
-		pv = (ll[ip+1] * I_SHIFT) + data
+		pv = (int(ll[ip+1]) * I_SHIFT) + data
 		skipword = true
 		call sprintf (Memc[buf], SZ_FNAME, "SH(%d)")
 		    call pargi (pv)

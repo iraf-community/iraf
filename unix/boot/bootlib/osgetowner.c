@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "bootlib.h"

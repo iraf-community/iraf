@@ -16,8 +16,8 @@ char	pixfile[maxch]		#O receives pathname to pixfile
 int	maxch			#I max chars out
 int	ier			#O exit status code
 
+int	status, n
 char	suffix[2], hdr[STRLEN_HDR]
-int	len_osdir, len_root, len_extn, status, n
 pointer	sp, imdir, osdir, root, extn, subdir, fname, ip, op
 int	fnroot(), fnldir(), strncmp(), imgdirx()
 string	pixextn OIF_PIXEXTN
@@ -82,8 +82,7 @@ begin
 	    call strcpy (pixextn, Memc[fname], SZ_PATHNAME)
 	call strcat (".", Memc[fname], SZ_PATHNAME)
 	call strcat (pixextn, Memc[fname], SZ_PATHNAME)
-	call vfn_translate (Memc[fname], Memc[osdir], len_osdir,
-	    Memc[root], len_root, Memc[extn], len_extn)
+	call imf_trans (Memc[fname], Memc[root], Memc[extn])
 
 	# Get a unique pixel file name.  If a file with the default pixel
 	# file name already exists in the current IMDIR, a suffix is found

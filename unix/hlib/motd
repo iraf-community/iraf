@@ -1,5 +1,5 @@
-    NOAO APOLLO/IRAF Revision 2.9EXPORT Wed Apr 18 14:18:46 MST 1990
-    This is the EXPORT version of Apollo/IRAF V2.9 for Domain/OS, SR10.2.
+    NOAO SUN/IRAF Revision 2.9.1EXPORT Mon Sep  3 11:03:43 MST 1990
+    This is the EXPORT version of Sun/IRAF V2.9.1 for SunOS-4.
 
     Welcome to IRAF.  To list the available commands, type ? or ??.  To get
     detailed information about a command, type `help command'.   To  run  a

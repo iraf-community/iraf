@@ -121,5 +121,3 @@ BUGS
 A large number of plotter instructions ( > 100,000 polylines) is generated 
 per frame for square images.
 .endhelp
-es.
-.endhelp

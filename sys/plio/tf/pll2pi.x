@@ -66,7 +66,7 @@ begin
 		x1 = x2 + 1
 
 	    case I_SH:
-		pv = (ll_src[ip+1] * I_SHIFT) + data
+		pv = (int(ll_src[ip+1]) * I_SHIFT) + data
 		skipword = true
 	    case I_IH:
 		pv = pv + data

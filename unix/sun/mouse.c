@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <suntool/sunview.h>
 
 /* MOUSE.C -- Routines for saving and restoring the mouse position.  These

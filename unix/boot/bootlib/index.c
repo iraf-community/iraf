@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 /* INDEX -- Return pointer to the first occurrence of a character in a string,
  * or null if the char is not found.
  */

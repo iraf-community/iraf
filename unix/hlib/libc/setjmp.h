@@ -4,20 +4,13 @@
 typedef	int	jmp_buf[LEN_JUMPBUF];
 static	int	u_jmpstat;
 
-#ifdef A88K
-#define	setjmp(e)	(_setjmp(e))
-#define	longjmp(e,v)	(_longjmp(e,v))
-#else
 #define	setjmp(e)	(ZSVJMP((e),&u_jmpstat),u_jmpstat)
 #define	longjmp(e,v)	(u_jmpstat=(v),ZDOJMP((e),&u_jmpstat))
-#endif
 
 /* The following is necessary to prevent to prevent the optimizer from
  * doing unwise things with setjmp on a Sun-4.
  */
-#ifndef apollo
 extern	zsvjmp_();
 #pragma unknown_control_flow(zsvjmp_)
-#endif
 
 #define	D_setjmp

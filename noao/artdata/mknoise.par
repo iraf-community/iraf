@@ -5,6 +5,7 @@ IF NEW IMAGE"
 title,s,h,"",,,"Title of image"
 ncols,i,h,512,1,,"Number of columns"
 nlines,i,h,512,1,,"Number of lines"
+header,f,h,"artdata$stdheader.dat",,,"Header keyword file"
 background,r,h,0.,0.,,"Default background and Poisson background
 
 NOISE PARAMETERS"

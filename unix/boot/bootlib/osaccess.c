@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include "bootlib.h"
 
 /* OS_ACCESS -- Determine if file is accessible with the given access mode

@@ -188,7 +188,7 @@ begin
 
 	}
 
-	if (nxrows > 0) {
+	if (nxrows) {
 	    call aclrr (Memr[xvec], nxin)
 	    do ii = yin, nyin 
 		call aaddr (Memr[imgl2r(im,ii)], Memr[xvec], Memr[xvec], nxin)

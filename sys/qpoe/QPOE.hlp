@@ -1,4 +1,4 @@
-.help QPOE Jul88 "Quick POE Design"
+.help QPOE Jun90 "Quick POE Design"
 .ce
 \fBQuick-POE (Position Ordered Event File) Interface Design\fR
 .ce
@@ -537,27 +537,29 @@ described separately in section 2.3.2.  The selection procedures are
 summarized in the figure below.
 
 .nf
-             ep = qpex_open (qp, selexpr)
-               qpex_compile (ep, selexpr, mode)
-       bool = qpex_evaluate (ep, ev)
-    nchars = qpex_getfilter (ep, outstr, maxch)
-                 qpex_close (ep)
+	     ex = qpex_open (qp, expr)
+    ok|err = qpex_modfilter (ex, exprlist)
+    nchars = qpex_getfilter (ex, outstr, maxch)
+	nev = qpex_evaluate (ex, i_ev, o_ev, nev)
+		 qpex_close (ex)
 .fi
 
-A selection expression, input as the string \fIselexpr\fR, is compiled with
+A selection expression, input as the string \fIexpr\fR, is compiled with
 \fIqpex_open\fR, which returns a pointer to the runtime descriptor (filter)
-for the given compiled selection expression.  If \fIselexpr\fR is the null
+for the given compiled selection expression.  If \fIexpr\fR is the null
 string the filter returned will pass all events.
 
-An active filter may be modified with \fIqpex_compile\fR, which incrementally
-folds the given \fIselexpr\fR into the current filter, allowing complex
+An active filter may be modified with \fIqpex_modfilter\fR, which combines
+the expression \fIexpr\fR into the current filter, allowing complex
 filters to be built up in several calls, or allowing an application to modify
-a base filter without knowledge of the base filter (the \fImode\fR parameter
-determines whether the modification adds to or replaces the current filter).
+a base filter without knowledge of the base filter.  The expression consists
+of a list of comma delimited "attribute = exprlist" terms.  If the assignment
+is specified as "=" the term for the given attribute is replaced; if the
+assignment is "+=" the term for the given attribute is further qualified.
 A text representation for the current filter may be obtained at any time with
 \fIqpex_getfilter\fR.  The boolean function \fIqpex_evaluate\fR is called to
 test whether a specific event meets the selection criteria, i.e., to test
-whether or not \fIselexpr\fR is true for the given event.
+whether or not \fIexpr\fR is true for the given event.
 
 Selection is normally performed transparently to the application by the QPIO
 interface, which calls the routines described in this section to create and

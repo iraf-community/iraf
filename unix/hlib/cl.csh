@@ -5,16 +5,11 @@
 
 #set	echo
 #set	MACH = vax
-#set	MACH = `mach`		# SUNOS specific.
-if ("$ISP" == "") then
-    set MACH = "m68k"
-else
-    set	MACH = `echo $ISP`	# Domain/OS specific (m68k or a88k arch.)
-endif
+set	MACH = `mach`		# SUNOS specific.
 
 # Determine IRAF root directory (value set in install script).
 if ($?iraf == 0) then
-    setenv iraf "/usr/iraf/"
+    setenv iraf "/local/iraf/"
 endif
 
 # Check for obsolete IRAFBIN definition.
@@ -45,16 +40,6 @@ if ("$MACH" == "sparc") then
     setenv IRAFARCH "sparc"
 else if ("$MACH" == "i386") then
     setenv IRAFARCH "i386"
-else if ("$MACH" == "m68k") then
-    set fpstat =\
-	`/etc/nodestat -c | fgrep 'Floating Point Accelerator Unit present'`
-    if ("$fpstat" != "" && -e ${iraf}bin.m68k_fpa/cl.e) then
-	setenv IRAFARCH "m68k_fpa"
-    else
-	setenv IRAFARCH "m68k_f68"
-    endif
-else if ("$MACH" == "a88k") then
-    setenv IRAFARCH "a88k"
 else if (-e /dev/fpa && -e ${iraf}bin.ffpa/cl.e) then
     setenv IRAFARCH "ffpa"
 else

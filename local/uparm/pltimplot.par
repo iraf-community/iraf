@@ -1,5 +1,0 @@
-image,s,a,"dev$pix",,,"image to be plotted"
-line,i,a,,,,"line to be plotted"
-coords,*gcur,h,"",,,"graphics cursor input"
-device,s,h,"stdgraph",,,"graphics device for plots"
-mode,s,h,"ql",,,

@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 
@@ -78,6 +81,7 @@ char	*argv[];
 	ifstate[0]  = PASS;
 	iflev       = 0;
 	lflags[0]   = EOS;
+	islib       = YES;
 	pkgenv	    = NULL;
 
 	/* Process the command line.

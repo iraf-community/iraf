@@ -2,6 +2,7 @@
 
 include <mach.h>
 include <fset.h>
+include "wfits.h"
 
 # WFT_INIT_WRITE_PIXELS -- This procedure calculates the input and
 # output buffer sizes based in the spp and mii data types and allocates
@@ -21,7 +22,7 @@ char	buffer[1]		# input buffer
 int	npix			# number of pixels in the input buffer
 int	nrecords		# number of FITS records written
 
-char	blank
+char	blank, zero
 int	ty_mii, ty_spp, npix_rec, nch_rec, len_mii, sz_rec, nchars, n, nrec
 int	blocking, szblk
 pointer	spp, mii, ip, op
@@ -39,6 +40,7 @@ begin
 	nch_rec = npix_rec * sizeof (ty_spp)
 	blocking = blkfac
 	blank = ' '
+	zero = 0
 
 	# Compute the size of the mii buffer.
 	len_mii = miilen (npix_rec, ty_mii)
@@ -114,7 +116,7 @@ entry	wft_write_last_record (fd, nrecords)
 	    if (ty_spp == TY_CHAR)
 		call amovkc (blank, Memc[spp + op], n)
 	    else
-		call amovkc (0, Memc[spp + op], n)
+		call amovkc (zero, Memc[spp + op], n)
 
 	    # Write last record.
 	    call miipak (Memc[spp], Memi[mii], npix_rec, ty_spp, ty_mii)
@@ -136,17 +138,27 @@ entry	wft_write_last_record (fd, nrecords)
 
 
 	    nrec = nrec + 1
-	    op = op + n
+	    #op = op + n
 
 	    # Pad out the record if the blocking is non-standard.
-	    if ((blocking > 10) && (ty_spp != TY_CHAR)) {
+	    if ((blocking > MAX_BLKFAC) && (ty_spp != TY_CHAR)) {
 		szblk = fstati (fd, F_SZBBLK) / SZB_CHAR
 		n = note (fd) - 1
-		n = szblk - mod (n, szblk)
-		if (n > 0) {
-		    call amovkc (0, Memc[spp], n)
-		    call write (fd, Memc[spp], n)
+		if (mod (n, szblk) == 0)
+		    n = 0
+		else
+		    n = szblk - mod (n, szblk)
+		for (op = 1; op <= n; op = op + nch_rec) {
+		    szblk = min (nch_rec, n - op + 1)
+		    call amovkc (zero, Memc[spp], szblk)
+		    call write (fd, Memc[spp], szblk)
 		}
+		#repeat {
+		    #szblk = min  (nch_rec, n)
+		    #call amovkc (zero, Memc[spp], szblk)
+		    #call write (fd, Memc[spp], szblk)
+		    #n = n - szblk
+		#} until (n <= 0)
 	    }
 
 	}

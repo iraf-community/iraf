@@ -19,7 +19,7 @@ define	SZ_STKHDR	(4*SZ_POINTER)	# size of stack segment header
 define	SZ_VMEMALIGN	SZ_VMPAGE	# alignment criterium for vmalloc
 define	VMEM_BASE	0		# fwa to align with, vmalloc
 define	SZ_WORKSET	100000		# tasks normal working set size
-define	LEN_JUMPBUF	60		# buffer for ZSVJMP
+define	LEN_JUMPBUF	64		# buffer for ZSVJMP
 define	JUMPCOM		zjucom		# IRAF Main ZDOJMP common
 
 define	MAX_ONEXIT	10		# max onexit procedures
@@ -32,7 +32,7 @@ define	IM_FALLOC	YES		# "falloc" pixel storage file (IMIO)?
 define	IM_PACKDENSITY	0.6		# minimum storage efficiency for images
 
 define	MT_MAXTAPES	2		# maximum open tape drives
-define	MT_SZBDEFIBUF	32768		# def. input buffer size (bytes)
+define	MT_SZBDEFIBUF	65535		# def. input buffer size (bytes)
 define	MT_SZBDEFOBUF	8192		# def. output buffer size (bytes)
 
 # File Locking.

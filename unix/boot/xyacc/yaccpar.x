@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 # Parser for yacc output, translated to the IRAF SPP language.  The contents
 # of this file form the bulk of the source of the parser produced by Yacc.
 # Yacc recognizes several macros in the yaccpar input source and replaces

@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include "bootlib.h"
 
 /* OS_OPEN -- Open or create a host system file for reading or writing (text

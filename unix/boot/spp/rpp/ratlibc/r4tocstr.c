@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include "ratdef.h"
 
 /* Convert a Ratfor string (one character per 16-bit word, terminated

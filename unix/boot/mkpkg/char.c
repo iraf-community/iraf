@@ -54,9 +54,7 @@ register struct context *cx;
 		    *op = EOS;
 		    val = name;
 		    goto push;
-#ifndef apollo
-		    break;	/* domain compiler barfs; should prob be axed */
-#endif
+		    break;
 		}
 	    *op = EOS;
 

@@ -51,13 +51,13 @@ begin
 	# Get length of record in FITS bytes.
 	len_record = FITS_RECORD
 	blkfac = clgeti ("blocking_factor")
-	if (blkfac > 10 && mod (blkfac, SZB_CHAR) != 0)
+	if (blkfac > MAX_BLKFAC && mod (blkfac, SZB_CHAR) != 0)
 	    call error (0, "Block size must be an integral number of chars.")
-	if (blkfac > 1 && blkfac <= 10) {
-	    call printf ("WARNING: FITS tape blocking factor is %d\n\n")
+	if (blkfac > 1 && blkfac <= MAX_FITS_BLKFAC) {
+	    call printf ("WARNING: FITS tape blocking factor is %d\n")
 		call pargi (blkfac)
 	}
-	if (blkfac > 10) {
+	if (blkfac > MAX_FITS_BLKFAC) {
 	    call printf ("WARNING: Blocking factor %d is not legal fits\n")
 		call pargi (blkfac)
 	}

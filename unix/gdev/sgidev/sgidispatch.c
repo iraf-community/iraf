@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 
@@ -31,7 +34,7 @@ char	*argv[];
 {
 	char	tpath[SZ_PATHNAME+1];
 	char	translator[SZ_PATHNAME+1];
-	int	ip, status;
+	int	ip, status, maxch=SZ_PATHNAME;
 
 	/* Do nothing if called with no arguments.
 	 */

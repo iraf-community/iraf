@@ -291,4 +291,3 @@ begin
 	    call printf ("The luminosity function is unknown.\n")
 	}
 end
-

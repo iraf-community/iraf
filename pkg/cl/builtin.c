@@ -144,7 +144,7 @@ clcache ()
 	register struct pfile *pfp;
 	char	pfilename[SZ_PATHNAME];
 	char	**list, **next;
-	struct	operand o, junk;
+	struct	operand o;
 	int	n, npfile;
 
 	pfp = newtask->t_pfp;
@@ -180,7 +180,7 @@ clcache ()
 	     */
 	    pushbparams (pfp->pf_pp);
 	    while (n--) {
-		junk = popop();			/* discard fake name.	*/
+		popop();			/* discard fake name.	*/
 		o = popop();			/* get ltask		*/
 		pfilesrch (o.o_val.v_s);
 	    }
@@ -199,7 +199,7 @@ clflprcache()
 {
 	register struct pfile *pfp;
 	register int n, pid;
-	struct	operand o, junk;
+	struct	operand o;
 	struct	ltask *ltp;
 	int	break_locks = 1;
 
@@ -211,7 +211,7 @@ clflprcache()
 
 	pushbparams (pfp->pf_pp);    /* push so first popped is first param */
 	while (--n >= 0) {
-	    junk = popop();			/* discard fake name.	*/
+	    popop();			/* discard the $n name		*/
 	    o = popop();		/* pop proc name or number	*/
 
 	    if ((o.o_type & OT_BASIC) == OT_STRING) {
@@ -245,7 +245,7 @@ clprcache()
 {
 	register struct pfile *pfp;
 	register int n, pid;
-	struct	operand o, junk;
+	struct	operand o;
 
 	pfp = newtask->t_pfp;
 	if ((n = nargs (pfp)) <= 0) {
@@ -255,7 +255,7 @@ clprcache()
 
 	pushbparams (pfp->pf_pp);    /* push so first popped is first param */
 	while (--n >= 0) {
-	    junk = popop();
+	    popop();			/* discard the $n name		*/
 	    o = popop();
 
 	    if ((o.o_type & OT_BASIC) == OT_STRING) {
@@ -295,7 +295,7 @@ static	char cd_emsg[] = "Cannot change directory to `%s'";
 clchdir()
 {
 	register struct pfile *pfp;
-	struct	operand o, junk;
+	struct	operand o;
 	char	*dirname;
 	char	*index(), *envget();
 
@@ -306,7 +306,7 @@ clchdir()
 		cl_error (E_UERR, "No home directory defined in environment");
 	} else {
 	    pushbparams (pfp->pf_pp);
-	    junk = popop();			/* discard the $1 	*/
+	    popop();				/* discard the $1 	*/
 	    opcast (OT_STRING);
 	    o = popop();			/* get directory spec	*/
 	}
@@ -432,7 +432,7 @@ clhelp()
 {
 	register struct pfile *pfp;
 	register struct package *pkp;
-	struct	operand o, junk;
+	struct	operand o;
 	int	n, nleft, show_invis=NO;
 
 	pfp = newtask->t_pfp;
@@ -441,7 +441,7 @@ clhelp()
 	else {
 	    pushbparams (pfp->pf_pp);
 	    for (nleft=n;  nleft > 0;  nleft--) {
-		junk = popop();
+		popop();
 		o = popop();
 		if ((o.o_type & OT_BASIC) != OT_STRING)
 		    cl_error (E_UERR, "non-string argument");
@@ -478,7 +478,7 @@ clallhelp()
 clhistory()
 {
 	register struct pfile *pfp;
-	struct	operand o, junk;
+	struct	operand o;
 	static	int default_max_history = 15;
 	int	max_history;
 
@@ -487,7 +487,7 @@ clhistory()
 
 	if (nargs (pfp) > 0) {
 	    pushbparams (pfp->pf_pp);
-	    junk = popop();			/* discard the $1 	*/
+	    popop();				/* discard the $1 	*/
 	    o = popop();			/* get max records 	*/
 	    if (o.o_type != OT_INT)
 		cl_error (E_UERR,
@@ -520,7 +520,7 @@ clehistory()
 clservice()
 {
 	register struct pfile *pfp;
-	struct	operand o, junk;
+	struct	operand o;
 	int	bkgjob;
 
 	pfp = newtask->t_pfp;
@@ -528,7 +528,7 @@ clservice()
 	    bkgjob = lastjobno;
 	else {
 	    pushbparams (pfp->pf_pp);
-	    junk = popop();			/* discard the $1 	*/
+	    popop();				/* discard the $1 	*/
 	    o = popop();			/* get max records 	*/
 	    if (o.o_type != OT_INT)
 		cl_error (E_UERR,
@@ -593,7 +593,7 @@ clkill()
 {
 	register struct pfile *pfp;
 	register int n, jn;
-	struct operand o, junk;
+	struct operand o;
 
 	pfp = newtask->t_pfp;
 	if ((n = nargs (pfp)) <= 0)
@@ -602,8 +602,8 @@ clkill()
 	pushbparams (pfp->pf_pp);    /* push so first popped is first param */
 
 	while (n--) {
-	    junk = popop();		/* discard the $n name		*/
-	    opcast (OT_INT);		/* insure we get an integer	*/
+	    popop();		/* discard the $n name		*/
+	    opcast (OT_INT);	/* insure we get an integer	*/
 	    o = popop();		/* pop job number, as int	*/
 	    jn = o.o_val.v_i;
 
@@ -618,7 +618,7 @@ cleparam()
 {
 	register struct pfile *pfp;
 	int	n, nleft, quit;
-	struct	operand o, junk;
+	struct	operand o;
 
 	pfp = newtask->t_pfp;
 	if ((n = nargs (pfp)) <= 0)
@@ -628,7 +628,7 @@ cleparam()
 	quit = NO;
 
 	for (nleft=n;  nleft > 0;  nleft--) {
-	    junk = popop();	/* discard the $n name			*/
+	    popop();		/* discard the $n name			*/
 	    o = popop();	/* get task name (value of the param)	*/
 
 	    if (!quit && (o.o_type & OT_BASIC) == OT_STRING)
@@ -653,7 +653,7 @@ cllparam()
 {
 	register struct ltask *ltp;
 	register struct pfile *pfp;
-	struct	operand o, junk;
+	struct	operand o;
 	int	n, nleft;
 
 	pfp = newtask->t_pfp;
@@ -663,7 +663,7 @@ cllparam()
 	pushbparams (pfp->pf_pp);    /* push so first popped is first param */
 
 	for (nleft=n;  nleft > 0;  nleft--) {
-	    junk = popop();	/* discard the $n name			*/
+	    popop();		/* discard the $n name			*/
 	    o = popop();	/* get task name (value of the param)	*/
 	    if ((o.o_type & OT_BASIC) == OT_STRING) {
 		pfp = pfilesrch (o.o_val.v_s);
@@ -685,7 +685,7 @@ cldparam()
 {
 	register struct ltask *ltp;
 	register struct pfile *pfp;
-	struct	operand o, junk;
+	struct	operand o;
 	int	n, nleft;
 
 	pfp = newtask->t_pfp;
@@ -695,7 +695,7 @@ cldparam()
 	pushbparams (pfp->pf_pp);    /* push so first popped is first param */
 
 	for (nleft=n;  nleft > 0;  nleft--) {
-	    junk = popop();	/* discard the $n name			*/
+	    popop();		/* discard the $n name			*/
 	    o = popop();	/* get task name (value of the param)	*/
 
 	    if ((o.o_type & OT_BASIC) == OT_STRING) {
@@ -731,7 +731,7 @@ clpack()
 	register struct task	*tp;
 	register struct package *pkp;
 	char	*paknam, *bindir;
-	struct	operand o1, o2, junk;
+	struct	operand o1, o2;
 	int	n;
 
 	pfp = newtask->t_pfp;
@@ -750,7 +750,7 @@ clpack()
 
 	/* Get name of new package. */
 	pushbparams (pfp->pf_pp);
-	junk = popop();		/* discard param's $n name	*/
+	popop();		/* discard param's $n name	*/
 	opcast (OT_STRING);
 	o1 = popop();
 	paknam = o1.o_val.v_s;
@@ -865,7 +865,7 @@ char	*dest;
 	FILE	*fout;
 	char	*pkname, *ltname, *pname, *field;
 	char	outbuf[SZ_LINE];
-	struct	operand o, out, junk;
+	struct	operand o, out;
 	int	type, op, n, nleft;
 
 	pfp = newtask->t_pfp;
@@ -897,7 +897,7 @@ argerr:		cl_error (E_UERR, "Too few arguments to print or fprint");
 	op = 0;
 	outbuf[op] = '\0';
 	for (nleft = n;  nleft > 0;  nleft--) {
-	    junk = popop();	/* discard the $n name			*/
+	    popop();		/* discard the $n name			*/
 	    o = popop();
 	    sprop (&outbuf[op], &o);
 	    while (outbuf[op] != '\0')
@@ -947,7 +947,7 @@ argerr:		cl_error (E_UERR, "Too few arguments to print or fprint");
 clputlog()
 {
 	register struct pfile *pfp;
-	struct	operand o, junk;
+	struct	operand o;
 	char	*usermsg;
 	int	n;
 
@@ -956,13 +956,13 @@ clputlog()
 	    usermsg = "";
 	else {
 	    pushbparams (pfp->pf_pp);
-	    junk = popop();		/* discard fake name.		*/
+	    popop();			/* discard fake name.		*/
 	    opcast (OT_STRING);
 	    o = popop();		/* get user string 		*/
 	    usermsg = o.o_val.v_s;
 	    while (--n) {		/* get rid of any extra args */
-	    	junk = popop();		/* discard fake name	*/
-	    	junk = popop();		/* discard extra arg	*/
+	    	popop();		/* discard fake name	*/
+	    	popop();		/* discard extra arg	*/
 	    }
 	}
 
@@ -1058,7 +1058,7 @@ clreset()
 clshow()
 {
 	register struct pfile *pfp;
-	struct	operand onam, junk;
+	struct	operand onam;
 	int	n, show_redefs=NO;
 	char	val[SZ_VALUE];
 
@@ -1068,7 +1068,7 @@ clshow()
 	else {
 	    pushbparams (pfp->pf_pp); /* push so first popped is first param */
 	    while (n--) {
-		junk = popop();			/* discard the $n */
+		popop();			/* discard the $n */
 		opcast (OT_STRING);
 		onam = popop();
   	        if (c_envfind (onam.o_val.v_s, val, SZ_VALUE) < 0)
@@ -1132,7 +1132,7 @@ cltask (redef)
 int	redef;
 {
 	register struct pfile *pfp;
-	struct	operand o, junk;
+	struct	operand o;
 	int	n, scantmp;
 	char	*physname, *logname;
 	extern	clforeign();
@@ -1172,7 +1172,7 @@ int	redef;
 	    addltask (curpack, physname, logname, redef);
 
 	while (--n) {
-	    junk = popop();		/* discard $n param name	*/
+	    popop();			/* discard $n param name	*/
 	    opcast (OT_STRING);
 	    o = popop();		/* get logical name		*/
 	    logname = o.o_val.v_s;
@@ -1337,7 +1337,7 @@ clunlearn()
 	register struct pfile *pfp;
 	register struct ltask *ltp, *ltt;
 	char	*x1, *pk, *t, *x2;
-	struct	operand o, junk;
+	struct	operand o;
 	int	n;
 
 	pfp = newtask->t_pfp;
@@ -1346,7 +1346,7 @@ clunlearn()
 
 	pushbparams (pfp->pf_pp);
 	while (n--) {
-	    junk = popop();		/* discard fake name.		*/
+	    popop();			/* discard fake name.		*/
 	    opcast (OT_STRING);
 	    o = popop();		/* get ltask|package name	*/
 	    breakout (o.o_val.v_s, &x1, &pk, &t, &x2);
@@ -1377,7 +1377,7 @@ clupdate()
 	register struct pfile *pfp;
 	register struct ltask *ltp;
 	char	*x1, *pk, *t, *x2;
-	struct	operand o, junk;
+	struct	operand o;
 	int	n;
 
 	pfp = newtask->t_pfp;
@@ -1386,7 +1386,7 @@ clupdate()
 
 	pushbparams (pfp->pf_pp);
 	while (n--) {
-	    junk = popop();		/* discard fake name.		*/
+	    popop();			/* discard fake name.		*/
 	    opcast (OT_STRING);
 	    o = popop();		/* get ltask			*/
 	    breakout (o.o_val.v_s, &x1, &pk, &t, &x2);
@@ -1413,7 +1413,7 @@ clhidetask()
 	register struct pfile *pfp;
 	register struct ltask *ltp;
 	char	*x1, *pk, *t, *x2;
-	struct	operand o, junk;
+	struct	operand o;
 	int	n;
 
 	pfp = newtask->t_pfp;
@@ -1422,7 +1422,7 @@ clhidetask()
 
 	pushbparams (pfp->pf_pp);
 	while (n--) {
-	    junk = popop();		/* discard fake name.		*/
+	    popop();			/* discard fake name.		*/
 	    opcast (OT_STRING);
 	    o = popop();		/* get ltask			*/
 	    breakout (o.o_val.v_s, &x1, &pk, &t, &x2);
@@ -1439,7 +1439,7 @@ clwait()
 {
 	register struct pfile *pfp;
 	register int n, jn;
-	struct operand o, junk;
+	struct operand o;
 
 	pfp = newtask->t_pfp;
 	if ((n = nargs (pfp)) <= 0)
@@ -1449,7 +1449,7 @@ clwait()
 
 	if (n > 0) {
 	    while (n--) {
-		junk = popop();	/* discard the $n name		*/
+		popop();		/* discard the $n name		*/
 	 	opcast (OT_INT);	/* insure we get an integer	*/
 		o = popop();		/* pop job number, as int	*/
 		jn = o.o_val.v_i;
@@ -1468,7 +1468,7 @@ cljobs()
 {
 	register struct pfile *pfp;
 	register int n, jn;
-	struct operand o, junk;
+	struct operand o;
 
 	pfp = newtask->t_pfp;
 	if ((n = nargs (pfp)) <= 0) {
@@ -1478,7 +1478,7 @@ cljobs()
 
 	pushbparams (pfp->pf_pp);    /* push so first popped is first param */
 	while (--n >= 0) {
-	    junk = popop();		/* discard the $n name		*/
+	    popop();			/* discard the $n name		*/
 	    opcast (OT_INT);		/* insure we get an integer	*/
 	    o = popop();		/* pop job number, as int	*/
 	    jn = o.o_val.v_i;
@@ -1541,14 +1541,14 @@ clclear()
 clsleep()
 {
 	register struct pfile *pfp;
-	struct	operand o, junk;
+	struct	operand o;
 
 	pfp = newtask->t_pfp;
 	pushbparams (pfp->pf_pp);	/* push sofirst popped is first param */
 	if ( nargs (pfp) <= 0)
 	    return;
 	else {
-	    junk = popop();		/* discard the $n name	*/
+	    popop();			/* discard the $n name	*/
 	    opcast (OT_INT);
 	    o = popop();		/* get the number of seconds */
 	    c_tsleep (o.o_val.v_i);
@@ -1570,7 +1570,7 @@ cledit()
 	register struct pfile *pfp;
 	char	oscmd[SZ_LINE], os_filelist[SZ_LINE];
 	char	osfn[SZ_PATHNAME];
-	struct	operand o, junk;
+	struct	operand o;
 	char	*envget();
 	int	n;
 
@@ -1583,7 +1583,7 @@ cledit()
 	     */
 	    os_filelist[0] = EOS;
 	    while (--n >= 0) {
-		junk = popop();		/* discard the $1 	*/
+		popop();		/* discard the $1 	*/
 		o = popop();
 		c_fmapfn (o.o_val.v_s, osfn, SZ_PATHNAME);
 		if (os_filelist[0] != EOS)
@@ -1610,7 +1610,7 @@ clallocate()
 	register struct pfile *pfp;
 	register int	n;
 	static char	noalloc[] = "cannot allocate device %s";
-	struct	operand o, junk;
+	struct	operand o;
 	char	device[SZ_FNAME+1];
 	char	owner[SZ_FNAME+1];
 
@@ -1619,7 +1619,7 @@ clallocate()
 	    return;
 
 	pushbparams (pfp->pf_pp);
-	junk = popop();			/* throw $1 away	*/
+	popop();			/* throw $1 away	*/
 	opcast (OT_STRING);		/* param 1 == device	*/
 	o = popop();
 	strcpy (device, o.o_val.v_s);
@@ -1673,7 +1673,7 @@ cldeallocate()
 	register struct pfile *pfp;
 	register int	n;
 	static char	nodealloc[] = "cannot deallocate device %s";
-	struct	operand o, junk;
+	struct	operand o;
 	char	device[SZ_FNAME+1];
 	char	owner[SZ_FNAME+1];
 	int	rewind=0, n_args;
@@ -1683,13 +1683,13 @@ cldeallocate()
 	    return;
 
 	pushbparams (pfp->pf_pp); 	/* params in correct order	*/
-	junk = popop();			/* throw $1 away		*/
+	popop();			/* throw $1 away		*/
 	opcast (OT_STRING);		/* param 1 == device name	*/
 	o = popop();
 	strcpy (device, o.o_val.v_s);
 
 	if (n_args > 1) {
-	    junk = popop();		/* throw $2 away		*/
+	    popop();			/* throw $2 away		*/
 	    opcast (OT_BOOL);		/* param 2 == rewind flag	*/
 	    o = popop();
 	    rewind = o.o_val.v_i;
@@ -1734,7 +1734,7 @@ cldeallocate()
 cldevstatus()
 {
 	register struct pfile *pfp;
-	struct	operand o, junk;
+	struct	operand o;
 	char	device[SZ_FNAME+1];
 
 	pfp = newtask->t_pfp;
@@ -1742,7 +1742,7 @@ cldevstatus()
 	    return;
 
 	pushbparams (pfp->pf_pp); 	/* params in correct order	*/
-	junk = popop();			/* throw $1 away		*/
+	popop();			/* throw $1 away		*/
 	opcast (OT_STRING);		/* param 1 == device name	*/
 	o = popop();
 	strcpy (device, o.o_val.v_s);

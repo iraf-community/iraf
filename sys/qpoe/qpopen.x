@@ -3,6 +3,7 @@
 include <syserr.h>
 include <fmset.h>
 include "qpoe.h"
+include "qpio.h"
 
 # QP_OPEN -- Open or create a QPOE datafile.  This routine must be called
 # before the poefile can be accessed.  In the case of a create, the file
@@ -19,9 +20,11 @@ pointer o_qp			#I reference file, if NEW_COPY
 int	fmmode, fd, n
 pointer sp, qph, qp, fname, fm
 
-int	fm_fopen(), read(), fm_stati()
 pointer fm_open(), strestore(), qm_access()
-errchk	fm_open, strestore, fm_fopen, seek, read, calloc, syserrs, qm_access
+int	fm_fopen(), read(), fm_stati(), qp_geti(), qp_accessf()
+errchk	fm_open, strestore, fm_fopen, seek, read
+errchk	calloc, syserrs, qm_access, qp_geti
+string	s_defblock DEF_BLOCK
 
 begin
 	call smark (sp)
@@ -101,8 +104,17 @@ begin
 	    call fm_seti (fm, FM_FCACHESIZE, DEF_FMCACHESIZE)
 	    QP_ACTIVE(qp) = YES
 
+	    # See if the default block factor is set in the datafile header.
+	    if (qp_accessf (qp, s_defblock) == YES)
+		QP_BLOCK(qp) = qp_geti (qp, s_defblock)
+
 	    call close (fd)
 	}
+
+	# Allow any interface parameters set explicitly in global macro SET
+	# statements to override the inherited or datafile values set above.
+
+	call qm_upddefaults (QP_QM(qp), qp)
 
 	call sfree (sp)
 	return (qp)

@@ -1,4 +1,0 @@
-if ("`tty`" == "/dev/console") then
-	textcolor -W -F 255 0 0
-	clear
-endif

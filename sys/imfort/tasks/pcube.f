@@ -84,9 +84,9 @@ c ----------------------------------------------------------------
 
 	subroutine pcuber (pix, nx,ny,nz, i1,i2, j1,j2, k1,k2)
 
+	integer		nx, ny, nz
 	real		pix(nx,ny,nz)
 	integer		i1, i2, j1, j2, k1, k2
-	integer		nx, ny, nz
 	integer		i, j, k
 
 	nx = i2 - i1 + 1

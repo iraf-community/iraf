@@ -21,24 +21,6 @@
 #include <floatingpoint.h>
 #endif
 
-#ifdef apollo
-/* The following declaration is included here because this routine needs
- * to be included in all IRAF programs, and the bootstrap can use /com/bind
- * to post-process zzstrt.o to cause the Mem common to be aligned at higher
- * than the default longword alignment.  If this is not done, a small fraction
- * of the IRAF executables (at least in the m68k/68882 or -cpu,3000
- * architecture) have Mem only 4-byte aligned, creating memory corruption
- * problems when double precision data types are used.  The Domain extension
- * #attribute[section(mem_)] creates an overlay section, which the loader
- * later maps to the fortran /mem/.  Since we still don't know where the
- * loader will load /mem/ in each executable, we also provide a reference
- * to debug_mem(MEMCOM) so a debugger can examine the stack and get the
- * actual runtime base address.
- */
-#define	MEMCOM		mem_
-char			MEMCOM[]	#attribute[section(MEMCOM)];
-#endif
-
 /*
  * ZZSTRT,ZZSTOP -- Routines to perform initialization and cleanup functions
  * during process startup and shutdown, when the IRAF kernel routines are being
@@ -357,14 +339,6 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	}
 #endif
 #endif
-
-#ifdef apollo
-	/* Call debug_mem() so a debugger can find the base address of the
-	 * mem common at runtime.
-	 */
-	debug_mem(MEMCOM);
-#endif
-
 	/* Place a query call to ZAWSET to set the process working set limit
 	 * to the IRAF default value, in case we did not inherit a working set
 	 * limit value from the parent process.
@@ -379,13 +353,3 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 /* ZZSTOP -- Clean up prior to process shutdown.
  */
 ZZSTOP(){}
-
-
-#ifdef apollo
-/* DEBUG_MEM -- Provide so a debugger can get base address of mem common
- * at runtime.
- */
-debug_mem(mem)
-char	mem[];
-{}
-#endif

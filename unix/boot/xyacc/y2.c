@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 # include "dextern"
 # define IDENTIFIER 257
 # define MARK 258

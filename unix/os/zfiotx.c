@@ -10,11 +10,7 @@
 #include <errno.h>
 
 # ifndef O_NDELAY
-# ifdef apollo
 #include <fcntl.h>
-# else
-#include <sys/fcntl.h>
-# endif
 # endif
 
 #define	import_kernel

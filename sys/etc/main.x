@@ -700,9 +700,9 @@ int	ip			# pointer to first char of redir arg
 
 int	fd, mode, type, junk
 pointer	sp, fname
-int	ctoi()			# Domain/OS:  , fredir()
+int	ctoi(), fredir()
 define	badredir_ 91
-errchk	fseti			# Domain/OS:  fredir, 
+errchk	fredir, fseti
 
 begin
 	call smark (sp)
@@ -795,8 +795,7 @@ begin
 	# recovery.
 
 	if (Memc[fname] != EOS)
-#Domain/OS: junk = fredir (fd, Memc[fname], mode, type)
-	    call fredir (fd, Memc[fname], mode, type)
+	    junk = fredir (fd, Memc[fname], mode, type)
 	else
 	    call fseti (fd, F_REDIR, YES)
 

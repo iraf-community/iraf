@@ -1,0 +1,119 @@
+.help mkexamples Aug90 noao.artdata
+.ih
+NAME
+mkexamples - Make artificial data example images
+.ih
+USAGE
+mkexamples name image
+.ih
+PARAMETERS
+.ls name
+Example name (abbreviations are not allowed):
+
+.nf
+       longslit - Long slit spectrum
+     multifiber - Multifiber spectrum
+     galcluster - Galaxy cluster
+       globular - Globular cluster
+       galfield - Galaxy field
+      starfield - Starfield
+.fi
+.le
+.ls image
+Output image name.
+.le
+.ls verbose = yes
+Print message indicating image being created?
+.le
+.ls errors = yes
+Print messages if the image already exists, bad example name, or other
+errors?
+.le
+.ls list = no
+List script used to generate the example rather than create an image?
+.le
+.ih
+DESCRIPTION
+The task is intended to generate a few artificial images of various types to
+be used as examples of the artificial data package and in various
+demonstrations and test procedures for other packages.  The examples are not 
+exhaustive and do not have adjustable parameters.
+
+If the example name is not given on the command line a menu of example
+names is first printed and then a prompt for the name is given.  The
+example names may not be abbreviated.  If desired the simple command
+script used to generate the example may be paged.  Otherwise the
+specified image will be generated.  Keep in mind that some of the
+examples (particularly those generating galaxy images) may take a
+significant amount of time.  On a SPARCstation the examples all run in
+under five minutes.  A check is made to see if the image already
+exists.  If the image exists then the task exists.  If the \fIerrors\fR
+parameter is specified an error message is printed.
+
+A reason for the error output to be turned off is in test scripts and
+demonstrations where the image will be created the first time and reused
+in further tests or demonstrations.  In such cases the verbose option is
+generally set so that the user is aware that an image is being created
+and some delay is to be expected.
+
+This task is a procedure script which selects and lists or executes
+any file in the mkexamples$ logical directory with the example name and the
+extension ".cl".  Thus, to add additional examples create a simple
+command script (not a procedure script) and place it in the mkexamples
+directory along with an entry in the menu file mkexamples$mkexamples.men.
+.ih
+EXAMPLES
+1. Create a globular cluster example.
+
+.nf
+    ar> mkexample
+			    MKEXAMPLE Menu
+
+	   longslit - Long slit spectrum
+	 multifiber - Multifiber spectrum
+	 galcluster - Galaxy cluster
+	   globular - Globular cluster
+	   galfield - Galaxy field
+	  starfield - Starfield
+
+    Example name: globular
+    Image name: globular
+    Creating example globular in image globular ...
+.fi
+
+2.  Try and create the same example again.
+
+.nf
+    ar> mkexample globular globular
+    ERROR: Image globular already exists
+.fi
+
+3.  List the script which creates the globular example.
+
+.nf
+    ar> mkexample globular list+
+    # GLOBULAR - Globular cluster
+
+    file	image, dat
+
+    image = s1
+    dat = mktemp ("art")
+
+    starlist (dat, 5000, "", "", interactive=no, spatial="hubble",
+	xmin=1., xmax=512., ymin=1., ymax=512., xcenter=INDEF,
+	ycenter=INDEF, core_radius=30., base=0., sseed=1,
+	luminosity="bands", minmag=-7., maxmag=0., mzero=-4., power=0.6,
+	alpha=0.74, beta=0.04, delta=0.294, mstar=1.28, lseed=1,
+	nssample=100, sorder=10, nlsample=100, lorder=10,
+	rbinsize=10., mbinsize=0.5, graphics="stdgraph", cursor="")
+
+    mkobjects (image, output="", ncols=512, nlines=512,
+	title="Example artificial globular cluster",
+	header="artdata$stdheader.dat", background=1000., objects=dat,
+	xoffset=0., yoffset=0., star="moffat", radius=1.0, beta=2.5,
+	ar=1., pa=0., distance=1., exptime=1., magzero=7.,
+	gain=3., rdnoise=10., poisson=yes, seed=1)
+
+    delete (dat, verify=no)
+.fi
+.endhelp

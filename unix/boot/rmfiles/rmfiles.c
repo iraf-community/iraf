@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 #define import_spp
@@ -112,7 +115,6 @@ int	oneliner;		/* if !oneliner, open program file	*/
 	char	*extnlist[MAXEXTN], *ip, *op;
 	char	lbuf[SZ_LINE+1];
 	int	nextn, mode;
-	char	*vfn2osfn();
 	FILE	*fp;
 
 	if (debug) {

@@ -95,7 +95,7 @@ libex.a:
 	qploadwcs.x	qpoe.h
 	qpmacro.x	qpex.h qpoe.h <ctype.h> <error.h> <finfo.h>
 	qpmkfname.x	qpoe.h
-	qpopen.x	qpoe.h <fmset.h>
+	qpopen.x	qpoe.h qpio.h <fmset.h>
 	qpparse.x	<ctype.h>
 	qpparsefl.x	qpex.h qpoe.h
 	qppclose.x	<fset.h>

@@ -1,3 +1,0 @@
-#!/bin/csh
-/usr/iraf/unix/bin.a88k/rpp.e $1 | sed -e 's+setjmp+_setjmp+'
-

@@ -1,3 +1,5 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 task	rexec	= t_rexec,
 	rtype	= t_rtype,
 	rread	= t_rread

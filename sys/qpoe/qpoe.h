@@ -1,7 +1,7 @@
 # QPOE.H -- QPOE data definitions (private to the package).
 
 # Size limiting definitions.
-define	DEF_BLOCKFACTOR	8		# default block factor for image matrix
+define	DEF_BLOCKFACTOR	1		# default block factor for image matrix
 define	DEF_BUCKETLEN	1024		# def nevents per bucket
 define	DEF_FMMAXLFILES 128		# def maxlfile per datafile
 define	DEF_FMPAGESIZE	512		# def datafile page size

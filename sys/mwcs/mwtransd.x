@@ -45,8 +45,7 @@ begin
 	do j = 1, ndim {
 	    v = ltv_2[j]
 	    do i = 1, ndim
-#Domain/OS:	v = v + ltm[i,j] * -ltv_1[i]
-		v = v + ltm[i,j] * (-ltv_1[i])
+		v = v + ltm[i,j] * -ltv_1[i]
 	    Memd[ltv+j-1] = v
 	}
 

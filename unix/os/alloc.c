@@ -2,19 +2,11 @@
  */
 
 #include <stdio.h>
-#ifndef apollo
 #include <utmp.h>
 #include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <ctype.h>
-#else
-#include <sys/types.h>
-#include <utmp.h>
-#include <pwd.h>
-#include <sys/stat.h>
-#include <ctype.h>
-#endif
 
 #define	import_spp
 #define	import_alloc
@@ -114,17 +106,7 @@ int	statonly;		/* if set, just return device status */
 		if (!statonly)
 		    printf ("rw access to %s is denied\n", fp->f_name);
 		return (DV_DEVINUSE);
-#ifndef apollo
 	    } else if (ruid && uid_executing(ruid)) {
-#else
-	    /* For Domain/OS we cannot read "kmem" or otherwise obtain
-	     * a list of UNIX uid's of processes, nor does there appear
-	     * to be any way to use native domain calls to see if a process
-	     * has a given file open.  A kludge might be to fork a "ps -ax"
-	     * process and scan its output, but doesn't seem worth it now.
-	     */
-	    } else if (ruid) {
-#endif
 		if (ruid != getuid()) {
 		    if (!statonly)
 			printf ("%s already allocated to %s\n",

@@ -14,6 +14,8 @@ define	LIMTIME		IM_LIMTIME($1)		# Last modify limits time
 define	MTIME		IM_MTIME($1)		# Last modify time
 define	CTIME		IM_CTIME($1)		# Create time
 
+define	LEN_USERAREA	28800			# Default user area size
+
 # Set up a structure for wfits parameters
 
 define	LEN_FITS	(44 + SZ_FNAME + 1)
@@ -35,6 +37,8 @@ define	IRAFNAME	Memc[P2C($1+41)]# IRAF file name
 # define FITS data types
 
 define	FITS_RECORD	2880		# Size of standard FITS record (bytes)
+define	MAX_FITS_BLKFAC	10		# Maximum legal FITS blocking factor
+define	MAX_BLKFAC	22		# Maximum permitted FITS blocking factor
 define	FITS_BYTE	8		# Number of bits in a FITS byte
 define	FITS_SHORT	16		# Number of bits in a FITS short
 define	FITS_LONG	32		# Number of bits in a FITS long
@@ -96,6 +100,7 @@ define	LEN_ORIGIN	9		# Length of origin keyword
 define	LEN_OBJECT	63		# Maximum length of string parameter
 define	LEN_BLANK	11		# Length of the blank string
 define	LEN_STRING	8		# Minimum length of a FITS string
+define	LEN_NAXIS_KYWRD	5               # Length of the NAXIS keyword
 
 # miscellaneous
 

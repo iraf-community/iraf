@@ -1,3 +1,6 @@
+/* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+ */
+
 #include <stdio.h>
 #include <ctype.h>
 
@@ -118,11 +121,7 @@ ZCLSPL (chan, status)
 XINT	*chan;
 XINT	*status;
 {
-#ifdef apollo
-	static	PKCHAR	xnullstr[1] = {EOS};
-#else
 	static	PKCHAR	xnullstr[1] = EOS;
-#endif
 	register char *ip, *op, *f;
 	PKCHAR	cmd[(SZ_OSCMD+1) / sizeof(PKCHAR)];
 	XINT	junk;

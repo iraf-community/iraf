@@ -63,6 +63,7 @@ define	NBPIX		IM_NBPIX($1)
 define	IRAFMAX		IM_MAX($1)
 define	IRAFMIN		IM_MIN($1)
 define	LIMTIME		IM_LIMTIME($1)
+define	LEN_USERAREA	28800
 
 # Mapping of FITS Keywords to IRAF image header
 

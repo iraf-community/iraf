@@ -1,6 +1,7 @@
 # QPIO.H -- Definitions for the QPOE event i/o subpackage.
 
 # Default parameter and domain names.
+define	DEF_BLOCK	"defblock"	# header param - default block factor
 define	DEF_MASK	"defmask"	# header param - default region mask
 define	DEF_FILTER	"deffilt"	# header param - default event filter
 define	DEF_EVENTTYPE	"event"		# default name of user event datatype

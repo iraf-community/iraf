@@ -1,4 +1,4 @@
-.help mk1dspec Jan90 noao.artdata
+.help mk1dspec Aug90 noao.artdata
 .ih
 NAME
 mk1dspec -- Make/add artificial 1D spectra
@@ -15,6 +15,16 @@ Output spectra when modifying input spectra.  If no output spectra are
 given then existing spectra in the input list are modified directly.
 If an output list is given then it must match in number the input list.
 .le
+.ls rv = 0.
+Radial velocity (km/s) or redshift, as selected by the parameter \fIz\fR,
+applied to line positions and continuum.  Velocities are converted to
+redshift using the relativistic relation 1+z = sqrt ((1+rv/c)/(1-rv/c)).
+Note the shift is not a shift in the dispersion parameters but in the
+underlying artificial spectrum.
+.le
+.ls z = no
+Is the velocity parameter a radial velocity or a redshift?
+.le
 
 WHEN CREATING NEW SPECTRA
 .ls title = ""
@@ -23,6 +33,13 @@ Image title to be given to the spectra.  Maximum of 79 characters.
 .ls ncols = 512
 Number of columns.
 .le
+.ls header = "artdata$stdheader.dat"
+Header keyword data file.  Header keywords are added from this file, if
+defined, to new images created.  Note this applies only to new images.
+The file consists of lines with a keyword, a datatype (one of
+"integer", "real", or "string", usually abbreviated to one character),
+and the parameter value.
+.le
 .ls wstart = 4000., wend = 8000.
 Starting and ending wavelengths in Angstroms.  The dispersion is
 determined by these values and the number of columns.
@@ -30,17 +47,17 @@ determined by these values and the number of columns.
 
 CONTINUUM PARAMETERS
 .ls continuum = 1000., slope = 0.
-Continuum at the first pixel and the slope of the continuum.
+Continuum of the starting wavelength at rest and the slope of the continuum.
 .le
 .ls temperature = 5700.
 Blackbody continuum temperture in Kelvin.  A value of 0 is used if
 no blackbody continuum is desired.  The intensity level is set by
-scaling to the continuum level at the first pixel.
+scaling to the continuum level of the starting wavelength at rest.
 .le
 
 LINE PARAMETERS
 .ls lines = ""
-List of spectral line files.  Spectral line files contain lines of
+List of spectral line files.  Spectral line files contain lines of rest
 wavelength, peak, and widths (see the the DESCRIPTION section).
 The latter two parameters may be missing in which case they default to
 the task \fIpeak\fR and \fIsigma\fR parameters.  If no file or a new
@@ -52,15 +69,17 @@ spectral line list file is reused.
 .le
 .ls nlines = 0
 If no spectral line file or a new file is specified then the task will
-generate this number of random spectral lines.  The wavelengths are
+generate this number of random spectral lines.  The rest wavelengths are
 uniformly random within the limits of the spectrum, the peaks are
 uniformly random between zero and the value of the \fIpeak\fR parameter
 and the width is fixed at the value of the \fIsigma\fR parameter.
+If a redshift is applied the rest wavelengths are shifted and repeated
+periodically.
 .le
 .ls peak = -0.5
-The default peak value when missing from the spectral line list
-or the maximum spectral line peak when generating random lines.  This
-value is relative to the continuum unless the continuum is zero.
+The maximum spectral line peak value when generating random lines or
+when the peak is missing fromthe spectral line file.
+This value is relative to the continuum unless the continuum is zero.
 Negative values are absorption lines and positive values are emission lines.
 .le
 .ls sigma = 10.
@@ -85,44 +104,88 @@ the profiles.
 DESCRIPTION
 This task creates or modifies one dimensional spectra with a
 combination of blackbody and linear sloped continuum and emission and
-absorption gaussian profile spectral lines.  No noise is included but
-may be added with the task \fBmknoise\fR.  New spectra are created with
-the specified number of pixels, wavelength range, and real datatype.
+absorption gaussian profile spectral lines.  A velocity shift may be
+applied to the underlying artificial spectrum which is shifted into the
+specified observed wavelength region.  No noise is included but may be
+added with the task \fBmknoise\fR.  New spectra are created with the
+specified number of pixels, wavelength range, and real datatype.
 Existing spectra may be modified in place or new spectra output.
 Spectra are modified by adding the continuum and lines defined by the
 parameters.
 
-A continuum is defined by the value of the first pixel, a slope, and
-a blackbody function of a given temperture.  The blackbody function
-is scaled to have the specified continuum value at the first pixel.
-A zero continuum value or a zero temperture will not produce a
-blackbody continuum.
+For new images a set of header keywords may be added by specifying a
+data file with the \fIheader\fR parameter (see also \fBmkheader\fR).
+This file contains lines with keyword names, datatype ("integer",
+"real", or "string"), and values.  In addition to these optional
+keywords, parameters for the wavelength coordinates are defined.
+Finally, comments are added to the image header recording the task
+parameters and any information from the line file which are not
+line definitions.
 
-Spectral lines are modeled by gaussian profiles of specified wavelength,
-peak, and sigma.  The lines are defined in a spectral line file
-or generated randomly.  A spectral line file consists of text lines 
-giving wavelength, peak, and sigma.  The sigma or the sigma and peak
-may be absent in which case the parameters \fIsigma\fR and \fIpeak\fR
-will be used.  Thus, a simple list of wavelengths or a list of wavelengths
-and peaks may be used.  If no spectral line file is specified or
-a new (nonexistent) file is named then the number of random lines
-given by the parameter \fInlines\fR is generated.  The wavelengths
-are uniformly random within the wavelength range of the spectrum,
-the peaks are uniformly random between zero and the \fIpeak\fR
-parameter, and the widths are given by the \fIsigma\fR parameter.
-If a new file is named then the parameters of the generated lines
-will be output.
+A continuum is defined by the value at the starting wavelength at rest,
+a slope, and a blackbody function of a given temperture.  The blackbody
+function is scaled to have the specified continuum value at the
+starting wavelength at rest.  A zero continuum value or a zero
+temperture will not produce a blackbody continuum.
 
-The peak values are taken relative to a positive continuum.  In other words
-the generated line profile is multiplied by the continuum (with a minimum
-of zero for fully saturated absorption lines).  If the
-continuum is less than or equal to zero, as in the case of an artificial
-arc spectrum or pure emission line spectrum, then the peak values are
-absolute intensities.  Positive peak values produce emission lines and
-negative values produce absorption lines.  Odd results will occur
-if the continuum has both positive and zero or negative values.
+Spectral lines are modeled by gaussian profiles of specified
+wavelength, peak, and sigma.  The lines are defined in a spectral line
+file or generated randomly.  A spectral line file consists of text
+lines giving rest wavelength, peak, and sigma.  The sigma or the sigma
+and peak may be absent in which case the parameters \fIsigma\fR and
+\fIpeak\fR will be used.  If peak values are missing random values
+between zero and the \fIpeak\fR value are generated.  Thus, a simple
+list of wavelengths or a list of wavelengths and peaks may be used.
+
+If no spectral line file is specified or a new (nonexistent) file is
+named then the number of random lines given by the parameter
+\fInlines\fR is generated.  The rest wavelengths are uniformly random
+within the wavelength range of the spectrum and extend periodically
+outside this range in the case of an applied velocity shift, the peaks
+are uniformly random between zero and the \fIpeak\fR parameter, and the
+widths are given by the \fIsigma\fR parameter.  If a new file is named
+then the parameters of the generated lines will be output.
+
+The peak values are taken relative to a positive continuum.  In other
+words the generated line profile is multiplied by the continuum (with a
+minimum of zero for fully saturated absorption lines).  If the
+continuum is less than or equal to zero, as in the case of an
+artificial arc spectrum or pure emission line spectrum, then the peak
+values are absolute intensities.  Positive peak values produce emission
+lines and negative values produce absorption lines.  Odd results will
+occur if the continuum has both positive and zero or negative values.
 
 The width values are gaussian sigmas given in Angstroms.
+
+The underlying rest spectrum may be shifted.  This is used primarily for
+testing radial velocity measuring algorithms and is not intended as a
+complete model of redshift effects.  The starting and ending wavelengths
+are not changed by redshifting; these are the instrumental observed
+wavelengths.  Input line wavelengths are specified at rest and then
+shifted into or out of the final spectrum.  To be realistic the line
+list should include wavelengths over a great enough range to cover
+all desired redshifts.  The peaks and sigma are also appropriately
+modified by a redshift.  As an example, if the redshift is 1 the
+lines will appear broader by a factor of 2 and the peaks will be down
+by a factor of 2 in order to maintain the same flux.
+
+The random line generation is difficult in that one wants to have the
+same set of lines (for a given seed) observed at different redshifts.
+What is done is that the specified number of random lines is generated
+within the observed wavelength interval taken at rest.  This set is
+then repeated periodical over all wavelengths.  A redshift will then
+shift these rest lines in to or out of the observed spectrum.  If the
+lines are output, they are given at rest.  \fBNote that this
+periodicity may be important in interpreting cross correlation redshift
+tests for large shifts between template and object spectra.\fR
+
+The definitions of the continuum are also affected by a redshift.
+The reference point for the continuum level, slope, and blackbody
+continuum is the starting wavelength taken at rest.  Shifts will then
+modify the continuum level at the first pixel appropriately.  In
+particular a large redshift will shift the blackbody in such a way that
+the flux is still given by the \fIcontinuum\fR parameter at the starting
+wavelength at rest.
 .ih
 KEYWORDS
 The wavelengh parameters are written to the parameters W0, WPC, CRPIX1,
@@ -192,7 +255,16 @@ the line list.
 .fi
 
 Normally the input spectrum would be a real spectrum.
+
+8. Make two spectra taken from the same set of random lines but differing
+in redshift.
+
+.nf
+	cl> mk1dspec restspec nl=30
+	cl> mk1dspec redspec rv=3000 nl=30
+	cl> mk1dspec bluespec rv=-.01 z+ nl=30
+.fi
 .ih
 SEE ALSO
-mknoise, mk2dspec, onedspec.sinterp
+mknoise, mk2dspec, mkheader, onedspec.sinterp
 .endhelp

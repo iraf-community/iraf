@@ -42,7 +42,7 @@
 #define	UNGETC		xfungc_
 #define	WRITE		xfwrie_
 
-#define	AREAD		aread_
+#define	AREAD		aread_		/* other VOS names */
 #define	AREADB		areadb_
 #define	AWAIT		await_
 #define	AWAITB		awaitb_

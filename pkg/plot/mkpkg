@@ -69,6 +69,3 @@ libpkg.a:
 			<mach.h> <xwhen.h>
 	vport.x		<gset.h>
 	;
-		<mach.h>   <xwhen.h>
-	vport.x		<gset.h>
-	;
