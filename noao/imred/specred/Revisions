@@ -1,5 +1,53 @@
 .help revisions Jun88 noao.imred.msred
 .nf
+imred$specred/doc/dofibers.hlp
+imred$specred/doc/doslit.hlp
+imred$specred/doc/dofibers.ms
+imred$specred/doc/doslit.ms
+    Updated for change where if both crval and cdelt are INDEF then the
+    automatic identification is not done.  (5/2/96, Valdes)
+
+imred$specred/specred.cl
+    Increased the minimum min_lenuserarea from 40000 to 100000.
+    (7/31/96, Valdes)
+
+imred$specred/doc/doslit.hlp
+imred$specred/doc/doslit.ms
+    Updated for the addition of automatic arc line identification.  (4/9/96)
+
+imred$specred/sparams.par
+    Changed match from 10 to -3.  (4/5/96, Valdes)
+
+imred$specred/dofibers.cl
+imred$specred/dofibers.par
+imred$specred/params.par
+imred$specred/doc/dofibers.hlp
+imred$specred/doc/dofibers.ms
+imred$specred/doc/doslit.hlp
+imred$specred/doc/doslit.ms
+    Added crval/cdelt parameters used in new version with automatic arc
+    line identification.  (4/5/96, Valdes)
+
+imred$specred/doc/msresp1d.hlp
+    Added a sentence to say that extracted throughput (sky) spectra are
+    flat fielded before computing the throughput values.  (1/9/96, Valdes)
+
+imred$specred/doc/dofibers.hlp
+imred$specred/doc/dofibers.ms
+    Describes the new header option for the aperture identification table.
+    (7/25/95, Valdes)
+
+imred$specred/specred.cl
+imred$specred/dofibers.cl
+imred$specred/dofibers.par
+imred$specred/doc/dofibers.hlp
+imred$specred/doc/dofibers.ms
+    Added sky alignment option.  (7/19/95, Valdes)
+
+=======
+V2.10.4
+=======
+
 specred/specred.cl
 specred/specred.men
     1.  Added background, illumination, and response.

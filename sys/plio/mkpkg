@@ -84,6 +84,6 @@ libex.a:
 	plsslv.x	<plio.h> <plset.h>
 	plstati.x	<plio.h> <plset.h>
 	plsten.x	<plio.h> <plset.h>
-	plupdate.x	<plio.h> <plset.h>
+	plupdate.x	<mach.h> <plio.h> <plset.h>
 	plvalid.x	<plio.h>
 	;

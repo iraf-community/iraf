@@ -18,7 +18,7 @@ int	npeaks			# Number of bright peaks to select
 bool	shift			# Shift instead of center?
 
 real	center, delta
-int	i, j, k, npts, apaxis
+int	i, j, k, na, npts, apaxis
 pointer	sp, str, im, imdata, title, index, peaks, deltas
 
 int	decode_ranges()
@@ -28,7 +28,11 @@ errchk	ap_getdata
 
 begin
 	# Check if apertures are defined.
-	if (naps < 1)
+	na = 0
+	do i = 1, naps
+	    if (AP_SELECT(aps[i]) == YES)
+		na = na + 1
+	if (na < 1)
 	    return
 
 	# Query user.
@@ -47,13 +51,8 @@ begin
 	}
 
 	# Get parameters
-	call apgstr ("apertures", Memc[str], SZ_LINE)
 	delta = apgetr ("npeaks")
 	shift = apgetb ("shift")
-
-	call salloc (ranges, 3*NRANGES, TY_INT)
-	if (decode_ranges (Memc[str], Memi[ranges], NRANGES, i) == ERR)
-	    call error (0, "Bad aperture list")
 	if (IS_INDEFR (delta))
 	    npeaks = naps
 	else if (delta < 1.)
@@ -64,10 +63,10 @@ begin
 	# Map the image and get the image data.
 	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 
-	j = 0
 	if (npeaks == naps && !shift) {
+	    na = 0
 	    do i = 1, naps {
-	        if (!is_in_range (Memi[ranges], AP_ID(aps[i])))
+		if (AP_SELECT(aps[i]) == NO)
 		    next
 	        center = AP_CEN(aps[i], apaxis) +
 		    cveval (AP_CV(aps[i]), real (line))
@@ -75,13 +74,20 @@ begin
 	        if (!IS_INDEF(center)) {
 		    AP_CEN(aps[i], apaxis) = center -
 		        cveval (AP_CV(aps[i]), real (line))
-		    j = j + 1
+		    na = na + 1
 		}
 	    }
 	} else {
+	    call salloc (ranges, 3*NRANGES, TY_INT)
 	    call salloc (index, naps, TY_REAL)
 	    call salloc (peaks, naps, TY_REAL)
 	    call salloc (deltas, naps, TY_REAL)
+
+	    call apgstr ("aprecenter", Memc[str], SZ_LINE)
+	    if (decode_ranges (Memc[str], Memi[ranges], NRANGES, i) == ERR)
+		call error (0, "Bad aperture list")
+
+	    j = 0
 	    do i = 1, naps {
 	        if (!is_in_range (Memi[ranges], AP_ID(aps[i])))
 		    next
@@ -109,17 +115,24 @@ begin
 				asokr (Memr[deltas], j, 1+j/2)) / 2
 		    else
 			delta = asokr (Memr[deltas], j, 1+j/2)
-		    j = naps
-		    do i = 1, j {
+		    na = 0
+		    do i = 1, naps {
+			if (AP_SELECT(aps[i]) == NO)
+			    next
 		        center = AP_CEN(aps[i], apaxis) + delta
 		        AP_CEN(aps[i], apaxis) = center
+			na = na + 1
 		    }
 	        } else {
+		    na = 0
 		    do k = 1, j {
 		        delta = Memr[deltas+k-1]
 		        i = Memr[index+k-1]
-		        center = AP_CEN(aps[i], apaxis) + delta
-		        AP_CEN(aps[i], apaxis) = center
+			if (AP_SELECT(aps[i]) == NO)
+			    next
+			center = AP_CEN(aps[i], apaxis) + delta
+			AP_CEN(aps[i], apaxis) = center
+			na = na + 1
 		    }
 		}
 	    }
@@ -130,13 +143,13 @@ begin
 	if (shift) {
 	    call sprintf (Memc[str], SZ_LINE,
 	        "RECENTER  - %d apertures shifted by %.2f for %s.")
-	        call pargi (j)
+	        call pargi (na)
 		call pargr (delta)
 	        call pargstr (image)
 	} else {
 	    call sprintf (Memc[str], SZ_LINE,
 	        "RECENTER - %d apertures recentered for %s")
-	        call pargi (j)
+	        call pargi (na)
 	        call pargstr (image)
 	}
 	if (apedit == NO)

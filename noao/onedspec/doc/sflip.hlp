@@ -103,7 +103,7 @@ long slit, or spectral data cubes.
 .fi
 .ih
 REVISIONS
-.ls SFLIP V2.11
+.ls SFLIP V2.10.4
 New in this release.  Note that the V2.9 SFLIP was different in that
 it was script which simply flipped the data.  Coordinate systems were
 not handled in the same way.

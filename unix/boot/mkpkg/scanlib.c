@@ -48,13 +48,16 @@ char	*library;
 {
 	register char	*ip, *op;
 	register int	i;
-
+	char	libfname[SZ_PATHNAME+1];
 	char	modname[SZ_KEY+1];
 	char	lbuf[SZ_LINE];
 	struct	ar_hdr arf;
 	long	length, fdate;
 	int	len_arfmag, nmodules;
 	FILE	*fp;
+
+	/* Get the library file name. */
+	h_getlibname (library, libfname);
 
 	/* Clear the symbol table.
 	 */
@@ -67,14 +70,14 @@ char	*library;
 
 	/* Open the UNIX archive file.
 	 */
-	if ((fp = fopen (library, "r")) == NULL) {
-	    printf ("warning: library `%s' not found\n", library);
+	if ((fp = fopen (libfname, "r")) == NULL) {
+	    printf ("warning: library `%s' not found\n", libfname);
 	    fflush (stdout);
 	    return (0);
 	}
 
 	if (debug) {
-	    printf ("scan unix archive %s:\n", library);
+	    printf ("scan unix archive %s:\n", libfname);
 	    fflush (stdout);
 	}
 
@@ -82,14 +85,14 @@ char	*library;
 	 */
 	fread (lbuf, 1, SARMAG, fp);
 	if (strncmp (lbuf, ARMAG, SARMAG) != 0) {
-	    printf ("file `%s' is not a library\n", library);
+	    printf ("file `%s' is not a library\n", libfname);
 	    goto err;
 	}
 
 	len_arfmag = strlen (ARFMAG);
 	while ((int)(fread (&arf, 1, sizeof(arf), fp)) > 0) {
 	    if (strncmp (arf.ar_fmag, ARFMAG, len_arfmag) != 0) {
-		printf ("cannot decode library `%s'\n", library);
+		printf ("cannot decode library `%s'\n", libfname);
 		goto err;
 	    }
 

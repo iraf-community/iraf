@@ -24,7 +24,10 @@ pointer fm_open(), strestore(), qm_access()
 int	fm_fopen(), read(), fm_stati(), qp_geti(), qp_accessf()
 errchk	fm_open, strestore, fm_fopen, seek, read
 errchk	calloc, syserrs, qm_access, qp_geti
+
 string	s_defblock DEF_BLOCK
+string	s_defxblock DEF_XBLOCK
+string	s_defyblock DEF_YBLOCK
 
 begin
 	call smark (sp)
@@ -106,8 +109,14 @@ begin
 	    QP_ACTIVE(qp) = YES
 
 	    # See if the default block factor is set in the datafile header.
-	    if (qp_accessf (qp, s_defblock) == YES)
-		QP_BLOCK(qp) = qp_geti (qp, s_defblock)
+	    if (qp_accessf (qp, s_defblock) == YES) {
+		QP_XBLOCK(qp) = qp_geti (qp, s_defblock)
+		QP_YBLOCK(qp) = QP_XBLOCK(qp)
+	    }
+	    if (qp_accessf (qp, s_defxblock) == YES)
+		QP_XBLOCK(qp) = qp_geti (qp, s_defxblock)
+	    if (qp_accessf (qp, s_defyblock) == YES)
+		QP_YBLOCK(qp) = qp_geti (qp, s_defyblock)
 
 	    call close (fd)
 	}

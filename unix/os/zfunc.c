@@ -6,9 +6,9 @@
 #define import_spp
 #include <iraf.h>
 
-/* ZFUNC[0-9] -- Call the function whose entry point address is pointed to
+/* ZFUNC[0-10] -- Call the function whose entry point address is pointed to
  * by the first argument, which is the integer valued entry point address of
- * the procedure as returned by ZLOCPR.  Up to nine arguments are passed by
+ * the procedure as returned by ZLOCPR.  Up to ten arguments are passed by
  * reference to the called subprocedure.  The integer function value is
  * returned as the function value of the ZFUNC procedure (only integer
  * functions are supported).
@@ -93,4 +93,13 @@ int	*arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9;
 {
 	return ((*(PFI)(*proc))
 	    (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
+}
+
+
+ZFUNCA (proc, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
+XINT	*proc;
+int	*arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9, *arg10;
+{
+	return ((*(PFI)(*proc))
+	    (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10));
 }

@@ -4,13 +4,14 @@
 $bev		= "math$bevington/doc/"
 $curfit		= "math$curfit/doc/"
 $deboor		= "math$deboor/doc/"
-$ieee		= "math$ieee/doc/"
-$llsq		= "math$llsq/doc/"
-$interp		= "math$interp/doc/"
-$iminterp	= "math$iminterp/doc/"
-$nlfit		= "math$nlfit/doc/"
-$surfit		= "math$surfit/doc/"
 $gsurfit	= "math$gsurfit/doc/"
+$ieee		= "math$ieee/doc/"
+$iminterp	= "math$iminterp/doc/"
+$interp		= "math$interp/doc/"
+$llsq		= "math$llsq/doc/"
+$nlfit		= "math$nlfit/doc/"
+$slalib		= "math$slalib/doc/"
+$surfit		= "math$surfit/doc/"
 
 bevington	hlp = bev$bev.men,
 		sys = bev$bev.hlp,
@@ -51,3 +52,7 @@ surfit		hlp = surfit$surfit.men,
 gsurfit		hlp = gsurfit$gsurfit.men,
 		sys = gsurfit$gsurfit.hlp,
 		pkg = gsurfit$gsurfit.hd
+
+slalib		hlp = slalib$slalib.men,
+		sys = slalib$slalib.hlp,
+		pkg = slalib$slalib.hd

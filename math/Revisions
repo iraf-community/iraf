@@ -1,5 +1,19 @@
 .help revisions Jun88 math
 .nf
+math$gsurfit/
+	Installed a completely new version of gsurfit which support "half"
+	or "diagonal" cross terms. All the .gx and .x files were replaced.
+
+	(4/30/97 Davis)
+
+math$gsurfit/gsrestore.gx
+math$gsurfit/gsrestorer.x
+math$gsurfit/gsrestored.x
+	Changed the type declaration of the xmin, xmax, ymin, ymax variables
+	from real to PIXEL to avoid machine precision problems.
+
+	(3/21/96 Davis)
+
 math$nlfit/nlfit.gx
 math$nlfit/nlfitr.x
 math$nlfit/nlfitd.x

@@ -22,7 +22,7 @@ define	MAKE_PRINTABLE	($1+'A'-1)
 define	SZ_QUERYMSG	80
 define	SZ_KEYSTR	80
 define	LNO_MAXLINES	2048
-define	SZ_LONGLINE	1024
+define	SZ_LONGLINE	4096
 define	MAX_PAGE	100
 define	MAX_PBCMD	100
 define	UKEYS		"ukey"		# CL parameter for keyboard input

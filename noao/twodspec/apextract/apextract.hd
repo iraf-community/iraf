@@ -22,5 +22,6 @@ package		hlp=doc$apextract.hlp,		 sys=doc$apextractsys.hlp
 apbackground	hlp=doc$apbackground.hlp
 approfiles	hlp=doc$approfiles.hlp
 apvariance	hlp=doc$apvariance.hlp
+extras		hlp=doc$apextras.hlp
 
 revisions	sys=Revisions

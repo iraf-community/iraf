@@ -3,6 +3,7 @@
 include	<syserr.h>
 include	<config.h>
 include	<error.h>
+include	<prstat.h>
 include	<fset.h>
 include	<fio.h>
 include	<gio.h>
@@ -177,6 +178,13 @@ begin
 		    redir_code = -redir_code
 		call pr_redir (source_pid, stream, redir_code)
 		TR_REDIR(tr) = redir_code
+
+		# Mark the process busy.  This flags it it as busy executing
+		# some subprotocol (in this case processing GKI metacode) and
+		# prevents commands such as chdir/set from being sent to the
+		# process and corrupting the IPC protocol.
+
+		call prseti (TR_PID(tr), PR_STATUS, P_BUSY)
 	    }
 
 	    call gki_subkernel (stream, TR_PID(tr), locpr(prpsio))

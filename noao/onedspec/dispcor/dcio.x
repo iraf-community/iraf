@@ -3,20 +3,22 @@ include	<imhdr.h>
 include	<imset.h>
 include	<pkg/dttext.h>
 include	<smw.h>
+include	<units.h>
 include	"dispcor.h"
 
 # Symbol table structure for the dispersion solutions.
-define	LEN_DC		10		# Length of dispersion solution struct.
+define	LEN_DC		11		# Length of dispersion solution struct.
 define	DC_FORMAT	Memi[$1]	# Type of dispersion
 define	DC_PAPS		Memi[$1+1]	# Pointer to aperture numbers
 define	DC_PAPCEN	Memi[$1+2]	# Pointer to aperture centers
-define	DC_PSHIFT	Memi[$1+3]	# Pointer to shifts
-define	DC_PCOEFF	Memi[$1+4]	# Pointer to coefficients
-define	DC_NAPS		Memi[$1+5]	# Number of apertures
-define  DC_OFFSET       Memi[$1+6]      # Aperture to order offset
-define  DC_SLOPE        Memi[$1+7]      # Aperture to order slope
-define  DC_COEFFS       Memi[$1+8]      # Dispersion coefficients
-define  DC_SHIFT        Memr[$1+9]      # Dispersion function shift
+define	DC_PUN		Memi[$1+3]	# Pointer to units
+define	DC_PSHIFT	Memi[$1+4]	# Pointer to shifts
+define	DC_PCOEFF	Memi[$1+5]	# Pointer to coefficients
+define	DC_NAPS		Memi[$1+6]	# Number of apertures
+define  DC_OFFSET       Memi[$1+7]      # Aperture to order offset
+define  DC_SLOPE        Memi[$1+8]      # Aperture to order slope
+define  DC_COEFFS       Memi[$1+9]      # Dispersion coefficients
+define  DC_SHIFT        Memr[$1+10]      # Dispersion function shift
 
 
 # DC_OPEN    -- Initialize the dispersion data structures
@@ -59,13 +61,17 @@ begin
 	# Close each dispersion function and then the symbol table.
 	for (sym = sthead (stp); sym != NULL; sym = stnext (stp, sym)) {
 	    if (DC_FORMAT(sym) == 1) {
-		do i = 1, DC_NAPS(sym)
+		do i = 1, DC_NAPS(sym) {
+		    call un_close (Memi[DC_PUN(sym)+i-1])
 		    call mfree (Memi[DC_PCOEFF(sym)+i-1], TY_DOUBLE)
+		}
 		call mfree (DC_PAPS(sym), TY_INT)
 		call mfree (DC_PAPCEN(sym), TY_REAL)
+		call mfree (DC_PUN(sym), TY_POINTER)
 		call mfree (DC_PSHIFT(sym), TY_DOUBLE)
 		call mfree (DC_PCOEFF(sym), TY_POINTER)
 	    } else if (DC_FORMAT(sym) == 2) {
+		call un_close (DC_PUN(sym))
 		call mfree (DC_COEFFS(sym), TY_DOUBLE)
 	    }
 	}
@@ -87,16 +93,16 @@ pointer	ap		#O Aperture data structure
 int	fd1		#I Logfile descriptor
 int	fd2		#I Logfile descriptor
 
-double	wt1, wt2
-int	i, j, k, l, dc, sfd, axis[2], naps, naps1, naps2, ncoeffs
-pointer	sp, spec, str1, str2, coeff, papcen, pshift, coeffs, ct1, ct2
-pointer	paps1, paps2, pshift1, pshift2, pcoeff1, pcoeff2
+double	wt1, wt2, dval
+int	i, j, k, k1, k2, l, dc, sfd, axis[2], naps, naps1, naps2, ncoeffs
+pointer	sp, spec, str1, str2, papcen, pshift, coeffs, ct1, ct2, un, un1, un2
+pointer	paps1, paps2, punits1, punits2, pshift1, pshift2, pcoeff1, pcoeff2
 
-bool	clgetb()
+bool	clgetb(), un_compare()
 double	smw_c1trand()
 int	imaccf(), nscan(), stropen()
-pointer	smw_sctran()
-errchk	dc_gmsdb, dc_refshft, imgstr, smw_sctran
+pointer	smw_sctran(), un_open()
+errchk	dc_gmsdb, dc_refshft, imgstr, smw_sctran, un_open
 
 data	axis/1,2/
 define	done_	90
@@ -106,18 +112,24 @@ begin
 	call salloc (spec, SZ_FNAME, TY_CHAR)
 	call salloc (str1, SZ_LINE, TY_CHAR)
 	call salloc (str2, SZ_LINE, TY_CHAR)
-	coeff = NULL
 
 	call imstats (im, IM_IMAGENAME, Memc[spec], SZ_FNAME)
 
 	# Set WCS attributes
 	naps = IM_LEN(im,2)
-	call malloc (ap, LEN_AP(naps), TY_STRUCT)
+	call calloc (ap, LEN_AP(naps), TY_STRUCT)
 	do i = 1, naps {
 	    DC_PL(ap,i) = i
+	    DC_CF(ap,i) = NULL
 	    call smw_gwattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
 		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
-		DC_LW(ap,i), DC_UP(ap,i), coeff)
+		DC_LW(ap,i), DC_UP(ap,i), DC_CF(ap,i))
+	    if (i == 1) {
+		iferr (call mw_gwattrs (SMW_MW(smw,0), 1, "units", Memc[str1],
+		    SZ_LINE))
+		    Memc[str1] = EOS
+		DC_UN(ap,i) = un_open (Memc[str1])
+	    }
 	    dc = DC_DT(ap,i)
 	}
 
@@ -156,7 +168,7 @@ begin
 	    call strcpy (Memc[spec], Memc[str1], SZ_LINE)
 	    wt1 = 1.
 	}
-	iferr (call dc_gmsdb (Memc[str1], stp, paps1, papcen, pshift,
+	iferr (call dc_gmsdb (Memc[str1], stp, paps1, papcen, punits1, pshift,
 	    pcoeff1, naps1)) {
 	    call sfree (sp)
 	    call erract (EA_ERROR)
@@ -187,8 +199,8 @@ begin
             call gargd (wt2)
             if (nscan() == 1)
                 wt2 = 1.
-            call dc_gmsdb (Memc[str1], stp, paps2, papcen, pshift, pcoeff2,
-		naps2)
+            call dc_gmsdb (Memc[str1], stp, paps2, papcen, punits2, pshift,
+		pcoeff2, naps2)
             call salloc (pshift2, naps2, TY_DOUBLE)
             call amovd (Memd[pshift], Memd[pshift2], naps2)
 	    if (fd1 != NULL) {
@@ -213,14 +225,14 @@ begin
 	# Enter dispersion function in the MWCS.
 	do i = 1, naps {
 	    j = DC_AP(ap,i)
-	    for (k=0; k<naps1 && Memi[paps1+k]!=j; k=k+1)
+	    for (k1=0; k1<naps1 && Memi[paps1+k1]!=j; k1=k1+1)
 		;
-	    if (k == naps1)
-		for (k=0; k<naps1 && !IS_INDEFI(Memi[paps1+k]); k=k+1)
+	    if (k1 == naps1)
+		for (k1=0; k1<naps1 && !IS_INDEFI(Memi[paps1+k1]); k1=k1+1)
 		    ;
-	    if (k == naps1) {
+	    if (k1 == naps1) {
 		if (clgetb ("ignoreaps"))
-		    k = 0
+		    k1 = 0
 		else {
 		    call sprintf (Memc[str1], SZ_LINE,
 			"%s - Missing reference for aperture %d")
@@ -229,37 +241,44 @@ begin
 		    call fatal (1, Memc[str1])
 		}
 	    }
-	    coeffs = Memi[pcoeff1+k]
-	    if (coeffs == NULL)
-		ncoeffs = 6
-	    else
-		ncoeffs = nint (Memd[coeffs])
-	    l = 20 * (ncoeffs + 2)
-	    if (wt2 > 0.)
-		l = 2 * l
-	    call realloc (coeff, l, TY_CHAR)
-	    call aclrc (Memc[coeff], l)
-	    sfd = stropen (Memc[coeff], l, NEW_FILE)
-	    call fprintf (sfd, "%.3g %g")
-		call pargd (wt1)
-		call pargd (Memd[pshift1+k])
+	    un1 = Memi[punits1+k1]
 
 	    # The following assumes some knowledge of the data structure in
 	    # order to shortten the the attribute string.
+	    coeffs = Memi[pcoeff1+k1]
 	    if (coeffs == NULL) {
 		if (DC_DT(ap,i) == 2) {
-		    call mfree (coeff, TY_CHAR)
-		    call sfree (sp)
-		    call error (2,
-			"Cannot apply shift to unlinearized spectrum")
+		    sfd = NULL
+		    if (wt2 <= 0.)
+			call sshift1 (Memd[pshift1+k1], DC_CF(ap,i))
+		} else {
+		    ncoeffs = 6
+		    l = 20 * (ncoeffs + 2)
+		    if (wt2 > 0.)
+			l = 2 * l
+		    call realloc (DC_CF(ap,i), l, TY_CHAR)
+		    call aclrc (Memc[DC_CF(ap,i)], l)
+		    sfd = stropen (Memc[DC_CF(ap,i)], l, NEW_FILE)
+		    call fprintf (sfd, "%.3g %g")
+			call pargd (wt1)
+			call pargd (Memd[pshift1+k1])
+		    dval = DC_DW(ap,i) * (DC_NW(ap,i) - 1) / 2.
+		    call fprintf (sfd, " 1 2 1 %d %g %g")
+			call pargi (DC_NW(ap,i))
+			call pargd (DC_W1(ap,i) + dval)
+			call pargd (dval)
 		}
-		wt1 = DC_DW(ap,i) * (DC_NW(ap,i) - 1) / 2.
-		call fprintf (sfd, " 1 2 1 %d %g %g")
-		    call pargi (DC_NW(ap,i))
-		    call pargd (DC_W1(ap,i) + wt1)
-		    call pargd (wt1)
 	    } else {
-		call fprintf (sfd, " %d %d")
+		ncoeffs = nint (Memd[coeffs])
+		l = 20 * (ncoeffs + 2)
+		if (wt2 > 0.)
+		    l = 2 * l
+		call realloc (DC_CF(ap,i), l, TY_CHAR)
+		call aclrc (Memc[DC_CF(ap,i)], l)
+		sfd = stropen (Memc[DC_CF(ap,i)], l, NEW_FILE)
+		call fprintf (sfd, "%.3g %g %d %d")
+		    call pargd (wt1)
+		    call pargd (Memd[pshift1+k1])
 		    call pargi (nint (Memd[coeffs+1]))
 		    call pargi (nint (Memd[coeffs+2]))
 		do k = 3, ncoeffs {
@@ -269,50 +288,59 @@ begin
 	    }
 
 	    if (wt2 > 0.) {
-		for (k=0; k<naps2 && Memi[paps2+k]!=j; k=k+1)
+		for (k2=0; k2<naps2 && Memi[paps2+k2]!=j; k2=k2+1)
 		    ;
-		if (k == naps2)
-		    for (k=0; k<naps2 && !IS_INDEFI(Memi[paps2+k]); k=k+1)
+		if (k2 == naps2)
+		    for (k2=0; k2<naps2 && !IS_INDEFI(Memi[paps2+k2]); k2=k2+1)
 			;
-		if (k == naps2) {
+		if (k2 == naps2) {
 		    if (clgetb ("ignoreaps"))
-			k = 0
+			k2 = 0
 		    else {
 			call sprintf (Memc[str1], SZ_LINE,
 			    "%s - Missing reference for aperture %d")
 			    call pargstr (Memc[spec])
 			    call pargi (j)
-			call strclose (sfd)
-			call mfree (coeff, TY_CHAR)
+			if (sfd != NULL)
+			    call strclose (sfd)
 			call sfree (sp)
 			call fatal (1, Memc[str1])
 		    }
 		}
-		coeffs = Memi[pcoeff2+k]
-		l = 20 * (ncoeffs + 2)
-		if (coeffs == NULL)
-		    ncoeffs = 6
-		else
-		    ncoeffs = nint (Memd[coeffs])
-		call fprintf (sfd, " %5.3g %g")
-		    call pargd (wt2)
-		    call pargd (Memd[pshift2+k])
+		un2 = Memi[punits2+k2]
+		if (!un_compare (un1, un2)) {
+		    call sfree (sp)
+		    call error (2,
+			"Can't combine references with different units")
+		}
+		if (DC_DT(ap,i)==2 && !(coeffs==NULL&&Memi[pcoeff2+k2]==NULL)) {
+		    call sfree (sp)
+		    call error (2,
+			"Can't combine references with non-linear dispersions")
+		}
+		coeffs = Memi[pcoeff2+k2]
 		if (coeffs == NULL) {
 		    if (DC_DT(ap,i) == 2) {
-			call mfree (coeff, TY_CHAR)
-			call sfree (sp)
-			call error (2,
-			    "Cannot apply shift to unlinearized spectrum")
+			dval = (wt1*Memd[pshift1+k1] + wt2*Memd[pshift2+k2]) /
+			    (wt1 + wt2)
+			call sshift1 (dval, DC_CF(ap,i))
+		    } else {
+			call fprintf (sfd, " %5.3g %g")
+			    call pargd (wt2)
+			    call pargd (Memd[pshift2+k2])
+			dval = DC_DW(ap,i) * (DC_NW(ap,i) - 1) / 2.
+			call fprintf (sfd, " 1 2 1 %d %g %g")
+			    call pargi (DC_NW(ap,i))
+			    call pargd (DC_W1(ap,i) + dval)
+			    call pargd (dval)
 		    }
-		    wt1 = DC_DW(ap,i) * (DC_NW(ap,i) - 1) / 2.
-		    call fprintf (sfd, " 1 2 1 %d %g %g")
-			call pargi (DC_NW(ap,i))
-			call pargd (DC_W1(ap,i) + wt1)
-			call pargd (wt1)
 		} else {
-		    call fprintf (sfd, " %d %d")
+		    call fprintf (sfd, " %5.3g %g %d %d")
+			call pargd (wt2)
+			call pargd (Memd[pshift2+k2])
 			call pargi (nint (Memd[coeffs+1]))
 			call pargi (nint (Memd[coeffs+2]))
+		    ncoeffs = nint (Memd[coeffs])
 		    do k = 3, ncoeffs {
 			call fprintf (sfd, " %.15g")
 			    call pargd (Memd[coeffs+k])
@@ -321,14 +349,23 @@ begin
 	    }
 
 	    if (i == 1) {
-		call mw_swattrs (SMW_MW(smw,0), 1, "label", "Wavelength")
-		call mw_swattrs (SMW_MW(smw,0), 1, "units", "Angstroms")
+		un = un1
+		if (UN_LABEL(un) != EOS)
+		    call mw_swattrs (SMW_MW(smw,0), 1, "label", UN_LABEL(un))
+		if (UN_UNITS(un) != EOS)
+		    call mw_swattrs (SMW_MW(smw,0), 1, "units", UN_UNITS(un))
+		call un_close (DC_UN(ap,i))
+		DC_UN(ap,i) = un
+	    } else if (!un_compare (un, un1)) {
+		call sfree (sp)
+		call error (3, "Units must be the same for all apertures")
 	    }
 	    DC_DT(ap,i) = 2
 	    call smw_swattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
 		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
-		DC_LW(ap,i), DC_UP(ap,i), Memc[coeff])
-	    call strclose (sfd)
+		DC_LW(ap,i), DC_UP(ap,i), Memc[DC_CF(ap,i)])
+	    if (sfd != NULL)
+		call strclose (sfd)
 	}
 
 	# Update the linear part of WCS.
@@ -337,13 +374,13 @@ begin
 	do i = 1, naps {
 	    call smw_gwattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
 		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
-		DC_LW(ap,i), DC_UP(ap,i), coeff)
+		DC_LW(ap,i), DC_UP(ap,i), DC_CF(ap,i))
 	    wt1 = nint (smw_c1trand (ct1, double(i)))
 	    call smw_c2trand (ct2, double(DC_NW(ap,i)), wt1, DC_W2(ap,i), wt2)
 	    DC_DW(ap,i) = (DC_W2(ap,i) - DC_W1(ap,i)) / (DC_NW(ap,i) - 1)
 	    call smw_swattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
 		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
-		DC_LW(ap,i), DC_UP(ap,i), Memc[coeff])
+		DC_LW(ap,i), DC_UP(ap,i), Memc[DC_CF(ap,i)])
 	}
 	call smw_ctfree (ct1)
 	call smw_ctfree (ct2)
@@ -366,7 +403,8 @@ done_	# Set aperture parameters in terms of logical image.
 	}
 	call smw_ctfree (ct1)
 
-	call mfree (coeff, TY_CHAR)
+	do i = 1, naps
+	    call mfree (DC_CF(ap,i), TY_CHAR)
 	call sfree (sp)
 end
 
@@ -376,12 +414,13 @@ end
 # symbol table keyed by the spectrum name.  Subsequent requests for the
 # reference spectrum returns the data from the symbol table.
 
-procedure dc_gmsdb (spec, stp, paps, papcen, pshift, pcoeff, naps)
+procedure dc_gmsdb (spec, stp, paps, papcen, punits, pshift, pcoeff, naps)
 
 char	spec[ARB]	# Spectrum image name
 pointer	stp		# Symbol table pointer
 pointer	paps		# Pointer to aperture numbers
 pointer	papcen		# Pointer to aperture centers
+pointer	punits		# Pointer to units
 pointer	pshift		# Pointer to shifts
 pointer	pcoeff		# Pointer to coefficients
 int	naps		# Number of apertures
@@ -390,8 +429,8 @@ double	dval
 int	i, n, dtgeti(), getline(), ctod()
 real	low, high, dtgetr()
 pointer	sp, str, coeffs, sym, db, dt, dt1
-pointer	stfind(), stenter(), strefsbuf(), dtmap1()
-errchk	dtmap1, dtgeti, dtgad
+pointer	stfind(), stenter(), strefsbuf(), dtmap1(), un_open()
+errchk	dtmap1, dtgeti, dtgad, un_open
 
 begin
 	# Check if dispersion solution is in the symbol table from a previous
@@ -425,6 +464,7 @@ begin
 	    naps = max (1, DT_NRECS(dt))
 	    call calloc (paps, naps, TY_INT)
 	    call calloc (papcen, naps, TY_REAL)
+	    call calloc (punits, naps, TY_POINTER)
 	    call calloc (pshift, naps, TY_DOUBLE)
 	    call calloc (pcoeff, naps, TY_POINTER)
 	    if (DT_NRECS(dt) > 0) {
@@ -439,6 +479,9 @@ begin
 			Memr[papcen+i-1] = 0.
 		    else
 			Memr[papcen+i-1] = (low + high) / 2.
+		    iferr (call dtgstr (dt, i, "units", Memc[str], SZ_LINE))
+			call strcpy ("Angstroms", Memc[str], SZ_LINE)
+		    Memi[punits+i-1] = un_open (Memc[str])
 		    iferr (Memd[pshift+i-1] = dtgetr (dt, i, "shift"))
 			Memd[pshift+i-1] = 0.
 		    iferr {
@@ -453,6 +496,7 @@ begin
 	    } else {
 		Memi[paps] = INDEFI
 		Memr[papcen] = INDEFR
+		Memi[punits] = un_open ("")
 		Memd[pshift] = 0.
 		call malloc (coeffs, 100, TY_DOUBLE)
 		n = 3
@@ -479,6 +523,7 @@ begin
 	    DC_FORMAT(sym) = 1
 	    DC_PAPS(sym) = paps
 	    DC_PAPCEN(sym) = papcen
+	    DC_PUN(sym) = punits
 	    DC_PSHIFT(sym) = pshift
 	    DC_PCOEFF(sym) = pcoeff
 	    DC_NAPS(sym) = naps
@@ -487,6 +532,7 @@ begin
 		call error (1, "Not a multispec dispersion function")
 	    paps = DC_PAPS(sym)
 	    papcen = DC_PAPCEN(sym)
+	    punits = DC_PUN(sym)
 	    pshift = DC_PSHIFT(sym)
 	    pcoeff = DC_PCOEFF(sym)
 	    naps = DC_NAPS(sym)
@@ -513,7 +559,7 @@ int	fd2			# Logfile descriptor
 
 int	i, j, k, pnaps
 double	apcen, shift, sumx, sumy, sumxx, sumyy, sumxy, a, b
-pointer	sp, refshft, option, paps, papcen, pshift, pcoeff
+pointer	sp, refshft, option, paps, papcen, punits, pshift, pcoeff
 bool	streq()
 errchk	imgstr, dc_gmsdb
 
@@ -533,7 +579,8 @@ begin
 	call gargwrd (Memc[option], SZ_FNAME)
 
 	# Get reference shift apertures.
-	call dc_gmsdb (Memc[refshft], stp, paps, papcen, pshift, pcoeff, pnaps)
+	call dc_gmsdb (Memc[refshft], stp, paps, papcen, punits, pshift,
+	    pcoeff, pnaps)
 	if (pnaps == 0) {
 	    call sfree (sp)
 	    return
@@ -654,13 +701,14 @@ int	fd2		#I Logfile descriptor
 
 double	wt1, wt2
 int	i, j, k, l, dc, sfd, axis[2], naps, ncoeffs, offset, slope
-pointer	sp, spec, str1, str2, coeff, coeffs, ct1, ct2
+pointer	sp, spec, str1, str2, coeff, coeffs, ct1, ct2, un1, un2, un3
 pointer	pshift1, pshift2, pshift3, pcoeff1, pcoeff2, pcoeff3
 
+bool	un_compare()
 double	smw_c1trand()
 int	imaccf(), nscan(), stropen()
-pointer	smw_sctran()
-errchk	dc_gecdb, imgstr, smw_sctran
+pointer	smw_sctran(), un_open()
+errchk	dc_gecdb, imgstr, smw_sctran, un_open
 
 data	axis/1,2/
 define	done_	90
@@ -676,12 +724,18 @@ begin
 
 	# Set WCS attributes
 	naps = IM_LEN(im,2)
-	call malloc (ap, LEN_AP(naps), TY_STRUCT)
+	call calloc (ap, LEN_AP(naps), TY_STRUCT)
 	do i = 1, naps {
 	    DC_PL(ap,i) = i
 	    call smw_gwattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
 		DC_DT(ap,i), DC_W1(ap,i), DC_DW(ap,i), DC_NW(ap,i), DC_Z(ap,i),
 		DC_LW(ap,i), DC_UP(ap,i), coeff)
+	    if (i == 1) {
+		iferr (call mw_gwattrs (SMW_MW(smw,0), 1, "units", Memc[str1],
+		    SZ_LINE))
+		    Memc[str1] = EOS
+		DC_UN(ap,i) = un_open (Memc[str1])
+	    }
 	    dc = DC_DT(ap,i)
 	}
 
@@ -723,7 +777,7 @@ begin
 	call salloc (pshift1, naps, TY_DOUBLE)
 	call salloc (pcoeff1, naps, TY_POINTER)
 	slope = 0
-	iferr (call dc_gecdb (Memc[str1], stp, ap, Memd[pshift1],
+	iferr (call dc_gecdb (Memc[str1], stp, ap, un1, Memd[pshift1],
 	    Memi[pcoeff1], naps, offset, slope)) {
 	    call sfree (sp)
 	    call erract (EA_ERROR)
@@ -745,7 +799,7 @@ begin
             call imgstr (im, "refshft1", Memc[str1], SZ_LINE)
 	    call salloc (pshift3, naps, TY_DOUBLE)
 	    call salloc (pcoeff3, naps, TY_POINTER)
-	    call dc_gecdb (Memc[str1], stp, ap, Memd[pshift3],
+	    call dc_gecdb (Memc[str1], stp, ap, un3, Memd[pshift3],
 		Memi[pcoeff3], naps, offset, slope)
             if (fd1 != NULL) {
                 call fprintf (fd1, "%s: REFSHFT1 = '%s', shift = %.6g\n")
@@ -772,7 +826,7 @@ begin
                 wt2 = 1.
 	    call salloc (pshift2, naps, TY_DOUBLE)
 	    call salloc (pcoeff2, naps, TY_POINTER)
-	    call dc_gecdb (Memc[str1], stp, ap, Memd[pshift2],
+	    call dc_gecdb (Memc[str1], stp, ap, un2, Memd[pshift2],
 		Memi[pcoeff2], naps, offset, slope)
 	    if (fd1 != NULL) {
 		call fprintf (fd1, "%s: REFSPEC2 = '%s %.3g'\n")
@@ -791,7 +845,7 @@ begin
 		call imgstr (im, "refshft2", Memc[str1], SZ_LINE)
 		call salloc (pshift3, naps, TY_DOUBLE)
 		call salloc (pcoeff3, naps, TY_POINTER)
-		call dc_gecdb (Memc[str1], stp, ap, Memd[pshift3],
+		call dc_gecdb (Memc[str1], stp, ap, un3, Memd[pshift3],
 		    Memi[pcoeff3], naps, offset, slope)
 		if (fd1 != NULL) {
 		    call fprintf (fd1, "%s: REFSHFT2 = '%s', shift = %.6g\n")
@@ -853,11 +907,20 @@ begin
 		    call fprintf (sfd, " %.15g")
 			call pargd (Memd[coeffs+j])
 		}
+		if (!un_compare (un1, un2)) {
+		    call sfree (sp)
+		    call error (2,
+			"Can't combine references with different units")
+		}
 	    }
 
 	    if (i == 1) {
-		call mw_swattrs (SMW_MW(smw,0), 1, "label", "Wavelength")
-		call mw_swattrs (SMW_MW(smw,0), 1, "units", "Angstroms")
+		if (UN_LABEL(un1) != EOS)
+		    call mw_swattrs (SMW_MW(smw,0), 1, "label", UN_LABEL(un1))
+		if (UN_UNITS(un1) != EOS)
+		    call mw_swattrs (SMW_MW(smw,0), 1, "units", UN_UNITS(un1))
+		call un_close (DC_UN(ap,i))
+		DC_UN(ap,i) = un1
 	    }
 	    DC_DT(ap,i) = 2
 	    call smw_swattrs (smw, DC_PL(ap,i), 1, DC_AP(ap,i), DC_BM(ap,i),
@@ -912,11 +975,12 @@ end
 # symbol table keyed by the spectrum name.  Subsequent requests for the
 # reference spectrum returns the data from the symbol table.
 
-procedure dc_gecdb (spec, stp, ap, shifts, pcoeff, naps, offset, slope)
+procedure dc_gecdb (spec, stp, ap, un, shifts, pcoeff, naps, offset, slope)
 
 char	spec[ARB]	# Spectrum image name
 pointer	stp		# Symbol table pointer
 pointer	ap		# Aperture data structure
+pointer	un		# Units
 double	shifts[naps]	# Shifts
 pointer	pcoeff[naps]	# Pointer to coefficients
 int	naps		# Number of apertures
@@ -926,8 +990,9 @@ int     slope           # Aperture to order slope
 double  shift
 real    dtgetr()
 int     i, rec, offst, slpe, n, dtlocate(), dtgeti()
-pointer sp, str, coeffs, sym, db, dt, stfind(), stenter(), strefsbuf(), dtmap1()
-errchk  dtmap1, dtlocate, dtgeti, dtgad
+pointer sp, str, coeffs, sym, db, dt
+pointer	stfind(), stenter(), strefsbuf(), dtmap1(), un_open()
+errchk  dtmap1, dtlocate, dtgeti, dtgad, un_open
 
 begin
 	# Check if dispersion solution is in the symbol table from a previous
@@ -954,6 +1019,9 @@ begin
                 call fatal (0, Memc[str])
 	    }
 
+	    iferr (call dtgstr (dt, rec, "units", Memc[str], SZ_LINE))
+		call strcpy ("Angstroms", Memc[str], SZ_LINE)
+	    un = un_open (Memc[str])
             iferr (offst = dtgeti (dt, rec, "offset"))
                 offst = 0
             iferr (slpe = dtgeti (dt, rec, "slope"))
@@ -966,6 +1034,7 @@ begin
 
             sym = stenter (stp, spec, LEN_DC)
 	    DC_FORMAT(sym) = 2
+	    DC_PUN(sym) = un
             DC_OFFSET(sym) = offst
             DC_SLOPE(sym) = slpe
             DC_SHIFT(sym) = shift
@@ -976,6 +1045,7 @@ begin
 	} else {
 	    if (DC_FORMAT(sym) != 2)
 		call error (1, "Not an echelle dispersion function")
+	    un = DC_PUN(sym)
             offst = DC_OFFSET(sym)
             slpe = DC_SLOPE(sym)
             coeffs = DC_COEFFS(sym)
@@ -987,11 +1057,8 @@ begin
 	    offset = offst
 	    slope = slpe
 	} else if (offset != offst || slope != slpe) {
-	    call sprintf (Memc[str], SZ_LINE,
-		"DISPCOR: Reference order offset/slope error (%s/%s)")
-		call pargstr (DT_DNAME(dt))
-		call pargstr (DT_FNAME(dt))
-	    call fatal (1, Memc[str])
+	    call eprintf (
+		"WARNING: Echelle order offsets/slopes are not the same.\n")
 	}
 
 	# Convert to multispec coefficients

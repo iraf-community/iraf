@@ -1,8 +1,12 @@
-# FITS parameters
+# WFITS parameters
+
 iraf_files,s,a,,,,IRAF images
-fits_files,f,a,,,,FITS filename
+fits_files,f,a,,,,FITS filename(s)
 newtape,b,a,,,,Blank tape?
-make_image,b,h,yes,,,Create a FITS image?
+fextn,s,h,"fits",,,Extension to append to output disk FITS filename(s)
+extensions,b,h,no,,,Write all images to a single FITS file ?
+global_hdr,b,h,yes,,,Prepend a global header to the FITS extensions file ?
+make_image,b,h,yes,,,Create a FITS image file?
 long_header,b,h,no,,,Print FITS header cards?
 short_header,b,h,yes,,,Print short header?
 bitpix,i,h,0,,,FITS bits per pixel

@@ -1045,7 +1045,7 @@ begin
 		i = sqrt ((x - xc1) ** 2 + c)
 		dsub = 1. / max (1, nxsub - i)
 		sum = 0.
-		for (y1 = y-0.5; y1 < y+0.5; y1 = y1+dsub) {
+		for (y1 = y-0.5; y1 < y+0.5-dsub/2; y1 = y1+dsub) {
 		    asdy1 = (y1 - yc1)
 		    asdy2 = asdy1 + dsub
 		    bcdy1 = bc * asdy1 + ycm
@@ -1060,7 +1060,7 @@ begin
 		    }
 		    asdy1 = as * asdy1
 		    asdy2 = as * asdy2
-		    for (x1=x-0.5; x1<x+0.5; x1=x1+dsub) {
+		    for (x1=x-0.5; x1<x+0.5-dsub/2; x1=x1+dsub) {
 			bsdx1 = (x1-xc1)
 			bsdx2 = bsdx1 + dsub
 			acdx1 = ac * bsdx1 + xcm
@@ -1185,7 +1185,7 @@ see_	n = nx * ny
 		    xs1 = max (0, nxs2 - x)
 		    xs2 = min (nxs-1, nx - x + nxs2 - 1)
 		    ptr1 = ptr + xs1
-		    for (y1=y-0.5+dsub/2; y1<y+0.5; y1=y1+dsub) {
+		    for (y1=y-0.5; y1<y+0.5-dsub/2; y1=y1+dsub) {
 			asdy1 = (y1 - yc1)
 			asdy2 = asdy1 + dsub
 			bcdy1 = bc * asdy1 + ycm
@@ -1200,7 +1200,7 @@ see_	n = nx * ny
 		        }
 			asdy1 = as * asdy1
 			asdy2 = as * asdy2
-		        for (x1=x-0.5; x1<x+0.5; x1=x1+dsub) {
+		        for (x1=x-0.5; x1<x+0.5-dsub/2; x1=x1+dsub) {
 			    bsdx1 = (x1-xc1)
 			    bsdx2 = bsdx1 + dsub
 			    acdx1 = ac * bsdx1 + xcm

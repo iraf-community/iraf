@@ -1,0 +1,34 @@
+# TAPECAP file for FreeBSD.  Apr97.
+# ------------------------------------
+
+# LEPUS - Gateway P5-166, Adaptec 2940 PCI SCSI adaptor, HPDAT tape drive.
+mta|HP DAT drive unit 0|		:so:tc=mtst0-dat:
+mtax|HP DAT with debug output|		:so=/tmp/mt.log:tc=mtst0-dat:
+
+
+# Unit assignments (FreeBSD).
+# ---------------------------
+
+mtdat0|mtst0-dat|HP DAT drive unit 0:\
+	:se:dt=HP 35480A Helical Scan DAT drive:al=erst0 nrst0 rst0:\
+	:dv=nrst0:lk=st0:tc=generic-dat:
+
+# Generic device entries.
+# -------------------------
+dat-60m|Generic DAT/DDS tape drive with 60M tape:\
+	:tt=DG-90M:ts#1274378:tc=generic-dat:
+generic-dat|dat-90m|Generic DAT/DDS tape drive with 90M tape:\
+	:dt=DAT 4mm Helical Scan tape drive:tt=DG-90M:\
+	:ts#1911567:bs#0:mr#32768:or#32768:fb#10:fs#127000:mf:fe#2000:
+generic-exb|Generic Exabyte Model 8200 drive:\
+        :dt=Exabyte EXB-8200 8mm tape drive:\
+	:tt=P6-120MP:ts#2347794:\
+        :bs#0:mr#32768:or#32768:fb#10:rs#2000:fs#188416:mf:
+
+hpdat-90m|HP DAT with 90 meter tape:tt=DG-90M:ts#1911570:tc=hpdat-60m:
+apunix-hpdat|hpdat|hpdat-60m|HP DAT with ApUNIX driver:\
+        :dt=HP DAT DDS 4mm:tt=DG-60M:tc=apunix-dat:
+dat-90m|WangDAT with 90 meter tape:tt=DG-90M:ts#1911570:tc=dat-60m:
+apunix-dat|dat|dat-60m|WangDAT 1300 DDS with ApUNIX driver:\
+        :dt=WangDAT 1300 DDS 4mm:tt=DG-60M:ts#1274378:\
+        :bs#0:mr#0:or#65536:fb#10:fs#127000:mf:fe#2000:

@@ -38,8 +38,8 @@ int	inlist1			# List of input spectra
 int	op			# Operation
 int	inlist2			# List of input spectra or operands
 int	outlist			# List of output spectra
-real	w1			# Starting wavelength
-real	w2			# Ending wavelength
+double	w1			# Starting wavelength
+double	w2			# Ending wavelength
 bool	rebin			# Rebin wavelength region?
 int	format			# Output format
 pointer	aps			# Aperture/col/line list
@@ -59,7 +59,7 @@ real	errval			# Error value
 int	list1, list2
 pointer	sp, input1, opstr, input2, output, ptr
  
-real	clgetr()
+double	clgetd()
 int	imtopenp(), imtopen(), imtlen(), imtgetim()
 int	clgwrd(), clgeti()
 bool	clgetb()
@@ -82,14 +82,12 @@ begin
 	    inlist2 = imtopen ("")
 	outlist = imtopenp ("output")
 
-	w1 = clgetr ("w1")
-	w2 = clgetr ("w2")
-	rebin = clgetb ("rebin")
-	if (IS_INDEF(w1) || IS_INDEF(w2)) {
-	    w1 = INDEF
-	    w2 = INDEF
+	w1 = clgetd ("w1")
+	w2 = clgetd ("w2")
+	if (IS_INDEFD(w1) && IS_INDEFD(w2))
 	    rebin = false
-	}
+	else
+	    rebin = clgetb ("rebin")
 
 	format = clgwrd ("format", Memc[input1], SZ_LINE, FORMATS)
 	call clgstr ("apertures", Memc[input1], SZ_LINE)
@@ -103,7 +101,7 @@ begin
 	merge = clgetb ("merge")
 	renumber = clgetb ("renumber")
 	verbose = clgetb ("verbose")
-	errval = clgetr ("errval")
+	errval = clgetd ("errval")
  
 	if (op == 0)
 	    call error (1, "Unknown operation")
@@ -198,8 +196,8 @@ int	list2			# Input image list
 char	output[ARB]		# Output image
 int	op			# Operation
 char	opstr[ARB]		# Operation string
-real	w1			# Starting wavelength
-real	w2			# Ending wavelength
+double	w1			# Starting wavelength
+double	w2			# Ending wavelength
 bool	rebin			# Rebin wavelength region?
 pointer	aps			# Apertures/columns/lines
 pointer	bands			# Bands
@@ -482,7 +480,7 @@ begin
 	    if (nin > 1) {
 		ptr = immap (Memc[input2], READ_ONLY, 0); in1 = ptr
 		ptr = smw_openim (in1); mwin1 = ptr
-		call shdr_open (in1, mwin1, i, 1, INDEFI, SHHDR, sh1)
+		call shdr_open (in1, mwin1, i, 1, INDEFI, SHDATA, sh1)
 	    }
 	    ptr = immap (Memc[temp], NEW_COPY, in1); out = ptr
 	    if (IM_PIXTYPE(out) != TY_DOUBLE)
@@ -630,7 +628,7 @@ begin
 
 		w = shdr_lw (sh1, 1D0)
 		wb = shdr_lw (sh1, double (SN(sh1)))
-		if (!IS_INDEF(w1) && rebin)
+		if (rebin)
 		    Memc[coeff] = EOS
 
 		p1 = (NP1(sh1) - a) / b
@@ -685,6 +683,11 @@ begin
 				op1 = COPY
 			}
 		    }
+
+		    # For now just copy noise band.
+		    if (STYPE(sh1,1) == SHSIG)
+			op1 = COPY
+
 		    call sa_arith (op1, sh1, sh2, const, reverse,
 			Memr[SY(sh1)], Memr[impl3r(out,l,k)+NP1(sh1)-1],SN(sh1))
 
@@ -755,8 +758,8 @@ int	list2			# Input image list
 char	output[ARB]		# Output image
 int	op			# Operation
 char	opstr[ARB]		# Operation string
-real	w1			# Starting wavelength
-real	w2			# Ending wavelength
+double	w1			# Starting wavelength
+double	w2			# Ending wavelength
 bool	rebin			# Rebin wavelength region?
 pointer	aps			# Apertures/columns/lines
 pointer	bands			# Bands
@@ -898,16 +901,14 @@ begin
 			call strcpy (Memc[output1], Memc[temp],
 			    SZ_FNAME)
 
-		    ptr = immap (Memc[temp], NEW_COPY, in1); out = ptr
-		    if (IM_PIXTYPE(out) != TY_DOUBLE)
-			IM_PIXTYPE(out) = TY_REAL
-		    ptr = mw_open (NULL, 1); mwout = ptr
-
 		    # Get data
 		    call shdr_open (in1, mwin1, i, band, INDEFI, SHDATA,
 			sh1)
 
 		    # Set header
+		    ptr = immap (Memc[temp], NEW_COPY, in1); out = ptr
+		    if (IM_PIXTYPE(out) != TY_DOUBLE)
+			IM_PIXTYPE(out) = TY_REAL
 		    IM_NDIM(out) = 1
 		    if (!streq (TITLE(sh1), IM_TITLE(out))) {
 			call imastr (out, "MSTITLE", IM_TITLE(out))
@@ -925,6 +926,7 @@ begin
 		    # Set WCS
 		    j = SMW_PDIM(MW(sh1))
 		    k = SMW_PAXIS(MW(sh1),1)
+		    ptr = mw_open (NULL, 1); mwout = ptr
 		    call mw_newsystem (mwout, "equispec", 1)
 		    call mw_swtype (mwout, 1, 1, "linear", "")
 		    if (LABEL(sh1) != EOS)
@@ -953,8 +955,8 @@ begin
 			beam, dtype, w, dw, nw, z, aplow, aphigh, coeff)
 		    w = shdr_lw (sh1, 1D0)
 		    wb = shdr_lw (sh1, double(SN(sh1)))
-		    if (!IS_INDEF(w1) && rebin)
-			    Memc[coeff] = EOS
+		    if (rebin)
+			Memc[coeff] = EOS
 
 		    p1 = (NP1(sh1) - Memd[ltv2]) / Memd[ltm2]
 		    p2 = (NP2(sh1) - Memd[ltv2]) / Memd[ltm2]
@@ -980,6 +982,10 @@ begin
 				op1 = COPY
 			}
 		    }
+
+		    # For now just copy noise band.
+		    if (STYPE(sh1,1) == SHSIG)
+			op1 = COPY
 
 		    call sa_arith (op1, sh1, sh2, const, reverse,
 			Memr[SY(sh1)], Memr[impl1r(out)+NP1(sh1)-1], SN(sh1))
@@ -1117,10 +1123,13 @@ begin
 	    else
 		call advzr (in, Memr[buf], out, n, sa_errfcn)
 	case POW:
-	    if (reverse)
-		call apowr (Memr[buf], in, out, n)
-	    else
-		call apowr (in, Memr[buf], out, n)
+	    if (reverse) {
+		do i = 1, n
+		    out[i] = Memr[buf+i-1] ** in[i]
+	    } else {
+		do i = 1, n
+		    out[i] = in[i] ** Memr[buf+i-1]
+	    }
 	}
 end
 
@@ -1316,28 +1325,36 @@ end
 procedure sa_sextract (sh, w1, w2, rebin, l1, dl, n)
 
 pointer	sh			#U SHDR structure
-real	w1			#I Starting wavelength
-real	w2			#I Ending wavelength
+double	w1			#I Starting wavelength
+double	w2			#I Ending wavelength
 bool	rebin			#I Rebin wavelength region?
 double	l1			#O Starting logical pixel
 double	dl			#O Logical pixel increment
 int	n			#O Number of logical pixels
 
 int	i1, i2
+double	a, b
 bool	fp_equald()
-double	shdr_wl()
+double	shdr_lw(), shdr_wl()
 errchk	shdr_wl, shdr_linear, shdr_extract
 
 begin
-	if (IS_INDEF(w1) || IS_INDEF(w2)) {
+	if (IS_INDEFD(w1) && IS_INDEFD(w2)) {
 	    l1 = 1.
 	    dl = 1.
 	    n = SN(sh)
 	    return
 	}
 
-	l1 = shdr_wl (sh, double (w1))
-	dl = shdr_wl (sh, double (w2))
+	a = w1
+	b = w2
+	if (IS_INDEFD(a))
+	    a = shdr_lw (sh, 1.0D0)
+	if (IS_INDEFD(b))
+	    b = shdr_lw (sh, double (SN(sh)))
+
+	l1 = shdr_wl (sh, a)
+	dl = shdr_wl (sh, b)
 	if (fp_equald(l1,dl) || max(l1,dl) < 1. || min (l1,dl) > SN(sh))
 	    call error (1, "No pixels to extract")
 	l1 = max (1D0, min (double (SN(sh)), l1))
@@ -1355,5 +1372,5 @@ begin
 	    dl = (dl - l1) / (n - 1)
 
 	if (SY(sh) != NULL)
-	    call shdr_extract (sh, w1, w2, rebin)
+	    call shdr_extract (sh, real(a), real(b), rebin)
 end

@@ -1775,6 +1775,7 @@ begin
 	    # the two.  The condition operand contributes to the dimension of
 	    # the expression result, although not to the datatype.
 
+	    nelem = 0
 	    if (O_LEN(in1) > 0 && O_LEN(in2) > 0)
 		nelem = min (O_LEN(in1), O_LEN(in2))
 	    else if (O_LEN(in1) > 0)

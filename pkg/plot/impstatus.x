@@ -43,6 +43,6 @@ int	line			# Line to enter
 int	i
 
 begin
-	i = mod (line-1, Memc[sl])
+	i = mod (line-1, int(Memc[sl]))
 	return (sl + i * (SZ_LINE+1) + 1)
 end

@@ -32,6 +32,9 @@ begin
 	int	i, j, n, dc
 
 	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	mstype = ".ms" // imtype
 	n = strlen (imtype)
 

@@ -137,7 +137,7 @@ begin
 	    }
 	}
 
-	if (abs(vexp+expon) > MAX_EXPONENT)		# check for overflow
+	if (abs(vexp+expon) > MAX_EXPONENTD)		# check for overflow
 	    return (ip - ip_start)
 
 	dval = dval + value * scalar

@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include "gsurfitdef.h"
 
 # GSFIT -- Procedure to solve the normal equations for a surface.

@@ -6,9 +6,13 @@ $identify	= "./identify/
 $irsiids	= "./irsiids/"
 $sensfunc	= "./sensfunc/
 $splot		= "./splot/
+$linelists	= "noao$lib/linelists/"
+$onedstds	= "noao$lib/onedstds/"
 
 revisions	sys=Revisions
 
+aidpars		hlp=doc$aidpars.hlp,		src=aidpars.par
+autoidentify	hlp=doc$autoidentify.hlp,	src=identify$t_autoid.x
 bplot		hlp=doc$bplot.hlp,		src=bplot.cl
 calibrate	hlp=doc$calibrate.hlp,		src=t_calibrate.x
 continuum	hlp=doc$continuum.hlp,		src=t_sfit.x
@@ -30,19 +34,24 @@ sapertures	hlp=doc$sapertures.hlp,		src=t_sapertures.x
 sbands		hlp=doc$sbands.hlp,		src=t_sbands.x
 sarith		hlp=doc$sarith.hlp,		src=t_sarith.x
 scombine	hlp=doc$scombine.hlp,		src=t_scombine.x
+scoords		hlp=doc$scoords.hlp,		src=t_scoords.x
 scopy		hlp=doc$scopy.hlp,		src=scopy.cl
 sensfunc	hlp=doc$sensfunc.hlp,		src=sensfunc$t_sensfunc.x
 sfit		hlp=doc$sfit.hlp,		src=t_sfit.x
 sflip		hlp=doc$sflip.hlp,		src=t_sflip.x
 sinterp		hlp=doc$sinterp.hlp,		src=t_sinterp.x
+skytweak	hlp=doc$skytweak.hlp,		src=t_tweak.x
 slist		hlp=doc$slist.hlp,		src=t_slist.x
 specplot	hlp=doc$specplot.hlp,		src=t_specplot.x
 specshift	hlp=doc$specshift.hlp,		src=t_specshift.x
 splot		hlp=doc$splot.hlp,		src=splot$splot.x
 standard	hlp=doc$standard.hlp,		src=t_standard.x
+telluric	hlp=doc$telluric.hlp,		src=t_tweak.x
 wspectext	hlp=doc$wspectext.hlp,		src=wspectext.cl
 
 package		hlp=doc$onedspec.hlp,		src=onedspec.cl
 specwcs		hlp=doc$specwcs.hlp
+linelists	hlp=linelists$README
+onedstds	hlp=onedstds$README
 
 irsiids		pkg=irsiids$irsiids.hd

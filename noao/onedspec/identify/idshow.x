@@ -21,7 +21,7 @@ begin
 	call pargstr (line)
 
 	call fprintf (fd, "image %s\n")
-	    call pargstr (Memc[ID_IMAGE(id)])
+	    call pargstr (ID_IMAGE(id))
 	call fprintf (fd, "nsum %d\n")
 	    call pargi (ID_NSUM(id,1))
 	switch (ID_FTYPE(id)) {
@@ -53,9 +53,9 @@ begin
 	call fprintf (fd, "fwidth %g\n")
 	    call pargr (ID_FWIDTH(id))
 	call fprintf (fd, "database %s\n")
-	    call pargstr (Memc[ID_DATABASE(id)])
+	    call pargstr (ID_DATABASE(id))
 	call fprintf (fd, "coordlist %s\n")
-	    call pargstr (Memc[ID_COORDLIST(id)])
+	    call pargstr (ID_COORDLIST(id))
 	call fprintf (fd, "cradius %g\n")
 	    call pargr (ID_CRADIUS(id))
 	call fprintf (fd, "threshold %g\n")

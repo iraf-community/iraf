@@ -43,13 +43,9 @@ begin
 
 	# Resolve any macro references in the 'datatype' text.
 	# (Disabled - not sure this is a good idea here).
+
 	# nchars = qp_expandtext (qp, datatype, Memc[text], SZ_TEXTBUF)
-
 	nchars = gstrcpy (datatype, Memc[text], SZ_TEXTBUF)
-
-	# Determine symbol type.
-	dtype = qp_dtype (qp, Memc[text], dsym)
-	newtype = (dtype == TY_USER && dsym == NULL)
 
 	if (QP_DEBUG(qp) > 1) {
 	    call eprintf ("qp_addf: `%s' typ=`%s' nel=%d com=`%s' flg=%oB\n")
@@ -67,9 +63,13 @@ begin
 
 	# Add the symbol.
 	sym = stenter (st, param, LEN_SYMBOL)
+
+	# Determine symbol type.
+	dtype = qp_dtype (qp, Memc[text], dsym)
+	newtype = (dtype == TY_USER && dsym == NULL)
 	sz_elem = qp_elementsize (qp, Memc[text], INSTANCEOF)
 
-	S_DTYPE(sym)  = dtype
+	S_DTYPE(sym) = dtype
 	S_SZELEM(sym) = 0
 	if (dsym != NULL)
 	    S_DSYM(sym) = dsym - strefstab(st,0)

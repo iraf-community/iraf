@@ -60,6 +60,7 @@ libpkg.a:
 	aprecenter.x	apertures.h
 	apresize.x	apertures.h
 	apscatter.x	apertures.h <error.h> <imhdr.h> <imset.h> <pkg/gtools.h>
+	apselect.x	apertures.h
 	apshow.x	apertures.h
 	apskyeval.x	apertures.h <math/iminterp.h> <mach.h>
 	apsort.x	apertures.h

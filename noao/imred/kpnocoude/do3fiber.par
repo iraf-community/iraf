@@ -9,6 +9,8 @@ gain,s,h,"GAIN",,,"Photon gain (photons/data number)"
 datamax,r,h,INDEF,,,"Max data value / cosmic ray threshold"
 fibers,i,h,3,,,"Number of fibers"
 width,r,h,6.,,,"Width of profiles (pixels)"
+crval,s,h,INDEF,,,"Approximate central wavelength"
+cdelt,s,h,INDEF,,,"Approximate dispersion"
 objaps,s,h,"2",,,"Object apertures"
 arcaps,s,h,"1,3",,,"Arc apertures
 "

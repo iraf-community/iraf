@@ -43,6 +43,8 @@ Radial Velocity:  These formulas for these routines were partly obtained
 
 Coordinates:
 
+    astarcsep.x -- Arc distance (arcsec) between two spherical coordinates
+	(hours, degrees).
     astcoord.x -- This procedure converts the longitude-latitude coordinates
 	(a1, b1) of a point on a sphere into corresponding coordinates
 	(a2, b2) in a different coordinate system that is specified by

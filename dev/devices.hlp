@@ -1,27 +1,27 @@
 # DEVICES.HLP -- Edit this file to describe the devices available on your
 # local host or network.
 
-.help devices Feb95 "NOAO/Tucson Devices"
+.help devices Apr97 "NOAO/Tucson Devices"
 .nf
     \fBDevice      Aliases 	Description+Location\fR
 
-    lw1		apl		Laserwriter, Rm B-50
+    lw1		apl		HP LaserJet-4M, outside Rm B50-A
     lw1p2			lw1 with 2 landscape pages per page
-    lw2		apl2		Laserwriter, Rm 129
+    lw2		apl2		Apple Laserwriter IINT, Rm 135
     lw2p2			lw2 with 2 landscape pages per page
-    lw3		apl3		Laserwriter, Engineering Mezzanine
-    lw4		apl4		Laserwriter, GONG lab (B-14)
-    lw5		apl5|nlw	Laserwriter NT, Rm 72
+    lw3		apl3		HP LaserJet-4M Plus, Engineering Mezzanine
+    lw4		apl4		Apple LaserWriter, Rm 192
+    lw5		apl5|nlw	Apple Laserwriter IINT, Rm 72
     lw5p2			lw5 with 2 landscape pages per page
-    lw6		apl6		Laserwriter, Engineering, Rm 210
-    lw7		apl7|tops	Laserwriter, Solar Office, Rm 152
-    lw8		apple8		Laserwriter, Gemini, Rm 120, *restricted use*
-    lw9				QMS PostScript 815, hallway near Rm 152
-    lw10			SPARCprinter, Rm 105 (inside Rm 101)
-    lw15			QMS-PS 410, Rm 72
-    lw16			HP LaserJet 4, Rm 72
-    lw17			Tektronix Phaser 200e, Rm 105 (inside Rm 101)
-    vmsprint	vmslp	        VMS cluster lineprinter, Rm 101
+    lw6		apl6		HP LaserJet-4MV, Drafting
+    lw7		apl7|tops	Apple Laserwriter, NSO mail room, Rm 152
+    lw8		apple8		Apple Laserwriter, Employee's Lounge
+    lw9				Apple Laserwriter, hallway near NSO Dir. office
+    lw10			SPARCprinter, Rm 101 (computer room)
+    lw14                        HP LaserJet-5N, DMAC
+    lw16			HP LaserJet 4M Plus, Rm 72
+    lw20                        HP LaserJet-4M Plus, DMAC
+    vmsprint	vmslp	        VMS cluster lineprinter, Rm 101 (computer room)
     vapl			DECLaser 1100, VMS only
     lw		lp|lpr		Default UNIX `lpr' printer(*)
     psdump			PostScript file named /tmp/irafdmp$$.ps
@@ -32,30 +32,30 @@
     (*)This device is available on UNIX systems only.  A specific output
     device may be selected by defining PRINTER in the user environment.
 
-    The following devices can be specified as shown with a trailing `s' 
-    to indicate a finer linewidth will be used, intended for small, dense
-    plots: lw1s, lw2s, lw3s, lw4s, lw5s, lw6s, lw7s, i300s.
+    All the ``lw'' devices can be specified as shown above with a trailing 
+    `s' to indicate a finer linewidth will be used, intended for small, dense
+    plots, e.g., lw1s.
 
-    tucana!mta  [6250|1600]*    Fujitsu 1/2" tapedrive, Rm 101
-    tucana!mtb  [4|9]		Sun QIC 1/4" cartridge, Rm 101
-    orion!mta   [6250|1600]	Fujitsu 1/2" tapedrive, Rm 101
-    orion!mtc   [?]		Exabyte, Rm 101
-    orion!mtd   [?]		Argo's Exabyte, Rm 101
-    gemini!mta	[6250|1600]	Fujitsu 1/2" tapedrive, Rm 101
-    gemini!mtb	[6250|1600]	Fujitsu 1/2" tapedrive, Rm 101
-    gemini!mtc	[?]		Exabyte, Rm 101
-    gemini!mtd  [?]		Exabyte, Rm 101
-    gemini!mte	[?]		Sun QIC 1/4" cartridge, Rm 101
-    ursa!mta    [6250|1600]     Sun/HP 1/2" tapedrive, Rm 101
-    ursa!mtb    [6250|1600]     Sun/HP 1/2" tapedrive, Rm 101 
-    ursa!mtc    [?]             Exabyte, Rm 101
-    ursa!mtd    [?]             Exabyte, Rm 101
-    ursa!mte    [?]             Sun QIC 1/4" cartridge, Rm 101
-    draco!mtf			TK50 on G11		[VMS cluster only]
-    draco!mtflo			low density G11 TK50	[VMS cluster only]
-    draco!mtg			Robur's DAT drive	[VMS cluster only]
-    draco!mti			HP tabletop 9T, Rm 101  [VMS cluster only]
-    draco!mtj			Exabyte, Rm 101		[VMS cluster only]
+    gemini!mta=mta6250,mta1600     HP 1/2" tapedrive, Rm 101
+    gemini!mtc	   		   Exabyte 8200, Rm 101
+    gemini!mtd     		   Exabyte 8200, Rm 101
+    gemini!mte,mtehi  [8200|8500]  Exabyte 8505, Rm 101
+    gemini!mtj                     HP DAT, RM 101
+    ursa!mta=mta6250,mta1600       HP 1/2" tapedrive, Rm 101
+    ursa!mtb=mtb6250,mtb1600       HP 1/2" tapedrive, Rm 101 
+    ursa!mtc                       Exabyte 8200, Rm 101
+    ursa!mtd,mtdhi    [8200|8500]  Exabyte 8505, Rm 101
+    ursa!mte,mtehi    [8200|8500]  Exabyte 8505, Rm 101
+    ursa!mtf                       HP DAT, Rm 101
+    bigx!mtb,mtbhi    [8200|8500]  Exabyte 8505, Rm 101
+    bigx!mtc                       HP DAT, Rm 101
+    orion!mta                      Wang DAT, Rm 101
+    argo!mto,mtohi    [8200|8500]  Exabyte 8500, B50-C
+    argo!mts,mtshi    [8200|8500]  Exabyte 8500, B50-C
+    argo!mtt,mtthi    [8200|8500]  Exabyte 8505, B50-C
+    pandora!mtr                    Exabyte 8200, Library
+    madrona!mtc                    Exabyte 8200, Rm 143
+    draco!mti			   HP 1/2" tapedrive, Rm 101 [VMS cluster only]
+    draco!mtj			   Exabyte 8200, Rm 101 [VMS cluster only]
 
-    *Default tape densities listed first.
 .endhelp

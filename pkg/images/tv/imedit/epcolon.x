@@ -279,7 +279,7 @@ begin
 	        call printf ("xorder %d\n")
 		    call pargi (EP_XORDER(ep))
 	    } else {
-		EP_XORDER(ep) = max (1, ival)
+		EP_XORDER(ep) = max (0, ival)
 	        call clputi ("xorder", EP_XORDER(ep))
 		if (EP_LOGFD(ep) != NULL) {
 		    call fprintf (EP_LOGFD(ep), ":xorder %d\n")
@@ -292,7 +292,7 @@ begin
 	        call printf ("yorder %d\n")
 		    call pargi (EP_YORDER(ep))
 	    } else {
-		EP_YORDER(ep) = max (1, ival)
+		EP_YORDER(ep) = max (0, ival)
 	        call clputi ("yorder", EP_YORDER(ep))
 		if (EP_LOGFD(ep) != NULL) {
 		    call fprintf (EP_LOGFD(ep), ":yorder %d\n")

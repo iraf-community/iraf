@@ -8,18 +8,19 @@ real	pixels[nx,ARB]		# subraster pixel values
 int	nx, ny			# dimensions of the subraster
 real	wx, wy			# center of subraster
 real	aperts[ARB]		# array of apertures
-real	sums[ARB]		# array of sums
-real	areas[ARB]		# aperture areas
+double	sums[ARB]		# array of sums
+double	areas[ARB]		# aperture areas
 int	naperts			# number of apertures
 
 int	i, j, k
-real	apmaxsq, dy2, r2, r, fctn
+double	fctn
+real	apmaxsq, dy2, r2, r
 
 begin
 	# Initialize.
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
-	call aclrr (sums, naperts)
-	call aclrr (areas, naperts)
+	call aclrd (sums, naperts)
+	call aclrd (areas, naperts)
 
 	# Loop over the pixels.
 	do j = 1, ny {
@@ -52,19 +53,20 @@ real	wx, wy			# center of subraster
 real	datamin			# minimum good data value
 real	datamax			# maximum good data value
 real	aperts[ARB]		# array of apertures
-real	sums[ARB]		# array of sums
-real	areas[ARB]		# aperture areas
+double	sums[ARB]		# array of sums
+double	areas[ARB]		# aperture areas
 int	naperts			# number of apertures
 int	minapert		# minimum number of apertures
 
 int	i, j, k, kindex
-real	apmaxsq, dy2, r2, r, fctn, pixval
+double	fctn
+real	apmaxsq, dy2, r2, r, pixval
 
 begin
 	# Initialize.
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
-	call aclrr (sums, naperts)
-	call aclrr (areas, naperts)
+	call aclrd (sums, naperts)
+	call aclrd (areas, naperts)
 	minapert = naperts + 1
 
 	# Loop over the pixels.

@@ -1,6 +1,7 @@
 include <mach.h>
 include "../lib/daophotdef.h"
 include "../lib/apseldef.h"
+include "../lib/psfdef.h"
 
 define	NCOLUMN	5
 
@@ -137,8 +138,13 @@ real	radsq, dy2, dr2
 int	dp_addstar()
 
 begin
+	# Initialize the list.
+	call dp_pseti (dao, PNUM, 0)
+
+	# Set the radius.
 	radsq = radius * radius
 
+	# Get the first star.
 	if ((mag[1] > lolimit) && (dp_addstar (dao, im, xcen[1], ycen[1],
 	    INDEFR, ids[1], NULL, mgd, false)) == OK) {
 	    npsf = 1

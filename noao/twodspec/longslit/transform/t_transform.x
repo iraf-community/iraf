@@ -2,6 +2,7 @@ include	<math.h>
 include	<imhdr.h>
 include	<math/gsurfit.h>
 include	<math/iminterp.h>
+include	<units.h>
 
 define	ITYPES	"|nearest|linear|poly3|poly5|spline3|"
 
@@ -23,7 +24,7 @@ int	logfiles		# List of log files
 
 int	itypes[II_NTYPES2D], logfd
 pointer	in, out
-pointer	xmsi, ymsi, jmsi, xout, yout, dxout, dyout
+pointer	un[2], xmsi, ymsi, jmsi, xout, yout, dxout, dyout
 pointer	sp, image1, image2, image3, str
 
 int	clpopnu(), clgfil(), clgeti(), clgwrd(), open()
@@ -88,7 +89,7 @@ begin
 	    # Do this only on the first pass.
 
 	    if (xmsi == NULL)
-		call tr_setup (Memc[database], fitnames, xmsi, ymsi, jmsi,
+		call tr_setup (Memc[database], fitnames, un, xmsi, ymsi, jmsi,
 		    xout, yout, dxout, dyout)
 
 	    # Write log information.
@@ -128,7 +129,7 @@ begin
 	    }
 	    call clprew (logfiles)
 
-	    call tr_transform (in, out, xmsi, ymsi, jmsi, Memr[xout],
+	    call tr_transform (in, out, un, xmsi, ymsi, jmsi, Memr[xout],
 		Memr[yout], Memr[dxout], Memr[dyout])
 
 	    call imunmap (in)
@@ -144,6 +145,10 @@ begin
 	call msifree (ymsi)
 	if (jmsi != NULL)
 	    call msifree (jmsi)
+	if (un[1] != NULL)
+	    call un_close (un[1])
+	if (un[2] != NULL)
+	    call un_close (un[2])
 	call imtclose (input)
 	call imtclose (output)
 	call clpcls (fitnames)
@@ -180,11 +185,12 @@ define	MAXSAMPLE	50	# Maximum sample points
 # 5. Compute the mapping between output coordinates along each axis, which
 #    may be logrithmic, into the subsampling interpolation coordinates.
 
-procedure tr_setup (database, sflist, xmsi, ymsi, jmsi, uout, vout,
+procedure tr_setup (database, sflist, un, xmsi, ymsi, jmsi, uout, vout,
 	duout, dvout)
 
 char	database[SZ_FNAME]	# Database containing coordinate surfaces
 int	sflist			# List of user coordinate surfaces
+pointer	un[2]			# Units pointers
 pointer	xmsi, ymsi, jmsi	# Surface interpolators for X, Y and Jacobian
 pointer	uout, vout		# Output coordinates relative to interpolator 
 pointer	duout, dvout		# Output coordinate intervals
@@ -192,8 +198,9 @@ pointer	duout, dvout		# Output coordinate intervals
 int	i, j, nsf, nusf, nvsf, nu1, nv1
 real	xmin, xmax, ymin, ymax, umin, umax, vmin, vmax
 real	u, v, x, y, du1, dv1, der[8]
-pointer	sp, sfname, usf, vsf, sf, xgrid, ygrid, zgrid, ptr1, ptr2, ptr3
+pointer	sp, sfname, usf, vsf, un1, sf, xgrid, ygrid, zgrid, ptr1, ptr2, ptr3
 
+bool	un_compare()
 int	clgfil(), clplen()
 real	xgsgetr(), xgseval()
 
@@ -211,12 +218,27 @@ begin
 	call salloc (usf, nsf, TY_INT)
 	call salloc (vsf, nsf, TY_INT)
 
+	un[1] = NULL
+	un[2] = NULL
 	Memi[usf] = NULL
 	Memi[vsf] = NULL
 	nusf = 0
 	nvsf = 0
 	while (clgfil (sflist, Memc[sfname], SZ_FNAME) != EOF) {
-	    call lm_dbread (database, Memc[sfname], j, sf)
+	    call lm_dbread (database, Memc[sfname], j, un1, sf)
+	    if (un1 != NULL) {
+		if (un[j] == NULL)
+		    un[j] = un1
+		else if (un_compare (un1, un[j]))
+		    call un_close (un1)
+		else {
+		    call un_close (un1)
+		    call un_close (un[j])
+		    call sfree (sp)
+		    call error (1, "Input units disagree")
+		}
+	    }
+
 	    if (sf != NULL) {
 		if (j == 1) {
 		    nusf = nusf+1
@@ -715,9 +737,10 @@ define	NEDGE		2	# Number of edge lines to add for interpolation
 # TR_TRANSFORM -- Perform the image transformation using a user specified
 # image interpolator.
 
-procedure tr_transform (in, out, xmsi, ymsi, jmsi, xout, yout, dxout, dyout)
+procedure tr_transform (in, out, un, xmsi, ymsi, jmsi, xout, yout, dxout, dyout)
 
 pointer	in, out			# IMIO pointers
+pointer	un[2]			# Units
 pointer xmsi, ymsi		# Coordinate interpolation pointers
 pointer	jmsi			# Jacobian interpolation pointer
 real	xout[ARB], yout[ARB]	# Output grid relative to interpolation surface
@@ -742,8 +765,14 @@ begin
 
 	mw = mw_open (NULL, 2)
 	call mw_newsystem (mw, "world", 2)
-	call mw_swtype (mw, 1, 1, "linear", "")
-	call mw_swtype (mw, 2, 1, "linear", "")
+	do i = 1, 2 {
+	    call mw_swtype (mw, i, 1, "linear", "")
+	    if (un[i] != NULL) {
+		call mw_swattrs (mw, i, "label", UN_LABEL(un[i]))
+		call mw_swattrs (mw, i, "units", UN_UNITS(un[i]))
+	    }
+	}
+
 	r[1] = 1.
 	if (ulog)
 	    w[1] = log10 (u1)
@@ -772,15 +801,19 @@ begin
 		call imaddi (out, "dc-flag", 1)
 	    else
 		call imaddi (out, "dc-flag", 0)
-	    call mw_swattrs (mw, 1, "label", "Wavelength")
-	    call mw_swattrs (mw, 1, "units", "Angstroms")
+	    if (un[laxis] == NULL) {
+		call mw_swattrs (mw, laxis, "label", "Wavelength")
+		call mw_swattrs (mw, laxis, "units", "Angstroms")
+	    }
 	case 2:
 	    if (vlog)
 		call imaddi (out, "dc-flag", 1)
 	    else
 		call imaddi (out, "dc-flag", 0)
-	    call mw_swattrs (mw, 2, "label", "Wavelength")
-	    call mw_swattrs (mw, 2, "units", "Angstroms")
+	    if (un[laxis] == NULL) {
+		call mw_swattrs (mw, laxis, "label", "Wavelength")
+		call mw_swattrs (mw, laxis, "units", "Angstroms")
+	    }
 	}
 	call mw_saveim (mw, out)
 	call mw_close (mw)

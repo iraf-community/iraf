@@ -2,6 +2,9 @@
  */
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #define	NOKNET
 #define	import_spp
 #define	import_finfo
@@ -27,7 +30,10 @@
 #define	MAXTRYS		100
 #define	SZ_TAPEBUFFER	(TBLOCK * NBLOCK)
 #define	RWXR_XR_X	0755
-#define	SYMLINK		2
+
+#define	LF_LINK		1
+#define	LF_SYMLINK	2
+#define	LF_DIR		5
 
 /* File header structure.  One of these precedes each file on the tape.
  * Each file occupies an integral number of TBLOCK size logical blocks
@@ -148,6 +154,7 @@ char	*argv[];
 			printfnames++;
 			break;
 		    case 'v':
+			printfnames++;
 			verbose++;
 			break;
 		    case 'o':
@@ -257,7 +264,7 @@ char	*path;			/* pathname of curr. directory	*/
 	 */
 	while (os_gfdir (dp, fname, SZ_PATHNAME) > 0)
 	    if (os_symlink (fname, 0, 0))
-		tarfileout (fname, out, SYMLINK, newpath);
+		tarfileout (fname, out, LF_SYMLINK, newpath);
 	    else if ((ftype = os_filetype (fname)) == DIRECTORY_FILE)
 		putfiles (fname, out, newpath);
 	    else
@@ -311,13 +318,17 @@ char	*path;			/* current path		*/
 
 	/* Format and output the file header.
 	 */
+	memset (&fh, 0, sizeof(fh));
 	strcpy (fh.name, path);
 	strcat (fh.name, fname);
+	strcpy (fh.linkname, "");
+	fh.linkflag = 0;
 
 	if (ftype == DIRECTORY_FILE) {
 	    strcpy (fh.name, dname(fh.name));
 	    fh.size  = 0;
 	    fh.isdir = 1;
+	    fh.linkflag = LF_DIR;
 	} else {
 	    fh.size  = fi.fi_size;
 	    fh.isdir = 0;
@@ -327,11 +338,7 @@ char	*path;			/* current path		*/
 	fh.mode  = u_fmode  (fi.fi_perm, fi.fi_type);
 	fh.mtime = os_utime (fi.fi_mtime);
 
-	if (ftype == SYMLINK) {
-#ifdef BSDUNIX
-#include <sys/types.h>
-#include <sys/stat.h>
-
+	if (ftype == LF_SYMLINK) {
 	    struct  stat fi;
 	    lstat (fname, &fi);
 
@@ -340,14 +347,10 @@ char	*path;			/* current path		*/
 	    fh.gid   = fi.st_gid;
 	    fh.mode  = fi.st_mode;
 	    fh.mtime = fi.st_mtime;
-#endif
-	    fh.size = 0;
-	    fh.linkflag = SYMLINK;
-	    os_symlink (fname, fh.linkname, NAMSIZ);
+	    fh.size  = 0;
 
-	} else {
-	    fh.linkflag = 0;			/* hard links not supported */
-	    strcpy (fh.linkname, "");
+	    fh.linkflag = LF_SYMLINK;
+	    os_symlink (fname, fh.linkname, NAMSIZ);
 	}
 
 	if (putheader (&fh, out) == EOF)  {
@@ -394,7 +397,17 @@ int	 out;			/* output file descriptor	*/
 	sprintf (hb.dbuf.size,  "%11lo ", fh->size);
 	sprintf (hb.dbuf.mtime, "%11lo ", fh->mtime);
 
-	hb.dbuf.linkflag = (fh->linkflag == SYMLINK) ? '2' : 0;
+	switch (fh->linkflag) {
+	case LF_SYMLINK:
+	    hb.dbuf.linkflag = '2';
+	    break;
+	case LF_DIR:
+	    hb.dbuf.linkflag = '5';
+	    break;
+	default:
+	    hb.dbuf.linkflag = '0';
+	    break;
+	}
 	strcpy (hb.dbuf.linkname, fh->linkname);
 
 	/* Encode the checksum value for the file header and then
@@ -474,7 +487,7 @@ int	verbose;		/* long format output		*/
 	    tp + 4, tp + 20,
 	    fh->name);
 
-	if (fh->linkflag)
+	if (fh->linkflag && *fh->linkname)
 	    fprintf (fp, " -> %s\n", fh->linkname);
 	else
 	    fprintf (fp, "\n");

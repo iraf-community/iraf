@@ -3,7 +3,15 @@
 
 #include <stdio.h>
 #include <signal.h>
-#include <fpu_control.h>
+
+#ifdef LINUX
+# include <fpu_control.h>
+# define USE_SIGACTION
+#else
+# ifdef BSD
+# include <floatingpoint.h>
+# endif
+#endif
 
 #define import_spp
 #define	import_kernel
@@ -12,13 +20,15 @@
 #include <iraf.h>
 
 /* ZXWHEN.C -- IRAF exception handling interface.  This version has been 
- * customized for LINUX.
+ * customized for PC-IRAF, i.e., LINUX and FreeBSD.
  */
 
 /* Set the following nonzero to cause process termination with a core dump
  * when the first signal occurs.
  */
 int debug_sig = 0;
+
+#ifdef LINUX
 static int fpstatus();
 
 /* The following definition has intimate knowledge of the STDIO structures. */
@@ -50,7 +60,6 @@ static int fpstatus();
 #define	X86_ALIGNMENT_CHECK	27
 #define	X86_MACHINE_CHECK	28
 
-
 /* x86 FPU hardware exceptions.
  */
 #define	FPE_FPA_ERROR		30
@@ -63,6 +72,16 @@ static int fpstatus();
 #define	FPE_FLTUND_TRAP		37
 #define	FPE_FLTINEX_TRAP	38
 #define	FPE_FLTSTK_TRAP		39
+
+#else
+# ifdef BSD
+/* The following definition has intimate knowledge of the STDIO structures. */
+# define	fcancel(fp)	((fp)->_r = (fp)->_w = 0)
+# endif
+#endif
+
+static long setsig();
+static int ex_handler();
 
 
 /* Exception handling:  ZXWHEN (exception, handler, old_handler)
@@ -143,6 +162,7 @@ struct	_hwx {
 	char	*v_msg;			/* Descriptive error message	*/
 };
 
+#ifdef LINUX
 struct	_hwx hwx_exception[] = {
 	/* x86 hardware (cpu) exceptions. */
 	X86_DIVIDE_ERROR,	"integer divide by zero",
@@ -179,6 +199,21 @@ struct	_hwx hwx_exception[] = {
 	EOMAP,			""
 };
 
+#else
+# ifdef BSD
+struct	_hwx hwx_exception[] = {
+	FPE_INTOVF_TRAP,	"integer overflow",
+	FPE_INTDIV_TRAP,	"integer divide by zero",
+	FPE_FLTDIV_TRAP,	"floating divide by zero",
+	FPE_FLTOVF_TRAP,	"floating overflow",
+	FPE_FLTUND_TRAP,	"floating underflow",
+	FPE_FPU_NP_TRAP,	"floating point unit not present",
+	FPE_SUBRNG_TRAP,	"subrange out of bounds",
+	EOMAP,			""
+};
+# endif
+#endif
+
 
 /* ZXWHEN -- Post an exception handler or turn off interrupts.  Return
  * value of old handler, so that it may be restored by the user code if
@@ -193,7 +228,6 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 	static	int ignore_sigint;
 	int     vex, uex;
 	SIGFUNC	vvector;
-	extern  ex_handler();
 
 	/* Convert code for virtual exception into an index into the table
 	 * of exception handler EPA's.
@@ -231,24 +265,47 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 	    if (unix_exception[uex].x_vex == *sig_code)
 		if (uex == SIGINT) {
 		    if (first_call) {
-			if (signal (uex, vvector) == SIG_IGN) {
-			    signal (uex, SIG_IGN);
+			if (setsig (uex, vvector) == (long) SIG_IGN) {
+			    setsig (uex, SIG_IGN);
 			    ignore_sigint++;
 			}
 			first_call = 0;
 		    } else if (!ignore_sigint) {
 			if (debug_sig)
-			    signal (uex, SIG_DFL);
+			    setsig (uex, SIG_DFL);
 			else
-			    signal (uex, vvector);
+			    setsig (uex, vvector);
 		    }
 		} else {
 		    if (debug_sig)
-			signal (uex, SIG_DFL);
+			setsig (uex, SIG_DFL);
 		    else
-			signal (uex, vvector);
+			setsig (uex, vvector);
 		}
 	}
+}
+
+
+/* SETSIG -- Post an exception handler for the given exception.
+ */
+static long
+setsig (code, handler)
+int code;
+SIGFUNC	handler;
+{
+	long status;
+
+#ifdef USE_SIGACTION
+	struct sigaction sig;
+	sig.sa_handler = (SIGFUNC) handler;
+	sigemptyset (&sig.sa_mask);
+	sig.sa_flags = SA_NODEFER;
+	status = (long) sigaction (code, &sig, NULL);
+#else
+	status = (long) signal (code, handler);
+#endif
+
+	return (status);
 }
 
 
@@ -258,12 +315,18 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-ex_handler (unix_signal)
-int	unix_signal;			/* SIGINT, SIGFPE, etc.		*/
+static int
+#ifdef USE_SIGACTION
+    ex_handler (unix_signal, hwcode, scp)
+    int unix_signal, hwcode;
+    struct sigcontext *scp;
+#else
+    ex_handler (unix_signal)
+    int unix_signal;
+#endif
 {
-	XINT	next_epa, epa, x_vex;
-	int	*frame;
-	int	vex;
+	XINT next_epa, epa, x_vex;
+	int *frame, vex;
 
 	last_os_exception = unix_signal;
 	last_os_hwcode = 0;
@@ -271,6 +334,7 @@ int	unix_signal;			/* SIGINT, SIGFPE, etc.		*/
 	vex = x_vex - X_FIRST_EXCEPTION;	
 	epa = handler_epa[vex];
 
+#ifdef LINUX
 	/* [LINUX] The following is horribly system dependent but is the only
 	 * way to find out more about what type of system trap has occurred.
 	 * The EBP register points to the beginning of the current stack frame.
@@ -302,9 +366,16 @@ int	unix_signal;			/* SIGINT, SIGFPE, etc.		*/
 	    fcancel (stdout);
 	}
 
-	/* Reenable the exception (LINUX). */
-	signal (unix_signal, (SIGFUNC)ex_handler);
-	__setfpucw (_FPU_DEFAULT);
+	/* Reenable the exception (LINUX).  */
+#ifndef USE_SIGACTION
+	sigset (unix_signal, (SIGFUNC) ex_handler);
+#endif
+	__setfpucw (0x1372);
+
+#else
+# ifdef BSD
+# endif
+#endif
 
 	/* Call user exception handler(s).  Each handler returns with the
 	 * "value" (epa) of the next handler, or X_IGNORE if exception handling
@@ -352,6 +423,7 @@ XINT	*maxch;
 }
 
 
+#ifdef LINUX
 /*
  * x86 Floating status register.
  *
@@ -427,3 +499,4 @@ int old_hwcode;
 
 	return (hwcode);
 }
+#endif

@@ -32,12 +32,12 @@ pointer	observatory		# Observatory
 bool	newobs, obshead
 int	i, year, month, day
 double	zone, exp, time, ra, dec, ep, epoch, ujd, hjd, ljd, lt
-pointer	im, obs, sp, input, date
+pointer	im, obs, sp, input, date, ep_str
 
 bool	clgetb()
 int	nowhite(), imtgetim(), ctoi()
 pointer	imtopenp(), immap()
-double	imgetd(), obsgetd(), ast_julday()
+double	imgetd(), ctod(), obsgetd(), ast_julday()
 errchk	immap, obsobpen, obsgetd, obsimopen, imgstr, imgetd
 
 begin
@@ -50,6 +50,7 @@ begin
 	call salloc (ra_key, SZ_FNAME, TY_CHAR)
 	call salloc (dec_key, SZ_FNAME, TY_CHAR)
 	call salloc (ep_key, SZ_FNAME, TY_CHAR)
+	call salloc (ep_str, SZ_FNAME, TY_CHAR)
 	call salloc (ujd_key, SZ_FNAME, TY_CHAR)
 	call salloc (hjd_key, SZ_FNAME, TY_CHAR)
 	call salloc (ljd_key, SZ_FNAME, TY_CHAR)
@@ -70,6 +71,16 @@ begin
 	call clgstr ("jd", Memc[ujd_key], SZ_FNAME)
 	call clgstr ("hjd", Memc[hjd_key], SZ_FNAME)
 	call clgstr ("ljd", Memc[ljd_key], SZ_FNAME)
+
+	i = nowhite (Memc[date_key], Memc[date_key], SZ_FNAME)
+	i = nowhite (Memc[time_key], Memc[time_key], SZ_FNAME)
+	i = nowhite (Memc[exp_key], Memc[exp_key], SZ_FNAME)
+	i = nowhite (Memc[ra_key], Memc[ra_key], SZ_FNAME)
+	i = nowhite (Memc[dec_key], Memc[dec_key], SZ_FNAME)
+	i = nowhite (Memc[ep_key], Memc[ep_key], SZ_FNAME)
+	i = nowhite (Memc[ujd_key], Memc[ujd_key], SZ_FNAME)
+	i = nowhite (Memc[hjd_key], Memc[hjd_key], SZ_FNAME)
+	i = nowhite (Memc[ljd_key], Memc[ljd_key], SZ_FNAME)
 
 	utdate = clgetb ("utdate")
 	uttime = clgetb ("uttime")
@@ -158,8 +169,31 @@ begin
 		    }
 		}
 
+		# Get RA, DEC, EPOCH if needed.
+		if (Memc[hjd_key] != EOS) {
+		    ra = imgetd (im, Memc[ra_key]) 
+		    dec = imgetd (im, Memc[dec_key]) 
+		    ep = INDEFD
+		    if (Memc[ep_key] != EOS) {
+			call imgstr (im, Memc[ep_key], Memc[ep_str], SZ_FNAME)
+			if (nowhite (Memc[ep_str],Memc[ep_str],SZ_FNAME) > 0) {
+			    call strupr (Memc[ep_str])
+			    i = 1
+			    if (Memc[ep_str] == 'B' || Memc[ep_str] == 'J')
+				i = 2
+			    if (ctod (Memc[ep_str], i, ep) == 0)
+				call error (0, "Epoch not understood")
+			    if (ep < 1800. || ep > 2100.) {
+				call eprintf (
+				    "# Warning: Epoch %d is unlikely.\n")
+				    call pargstr (Memc[ep_str])
+			    }
+			}
+		    }
+		}
+
 		
-		# Print results.  The HJD is only computed if needed.
+		# Print results.
 		call printf ("%20s")
 		    call pargstr (Memc[input])
 		if (Memc[ujd_key] != EOS) {
@@ -168,10 +202,6 @@ begin
 			call pargd (ujd)
 		}
 		if (Memc[hjd_key] != EOS) {
-		    ra = imgetd (im, Memc[ra_key]) 
-		    dec = imgetd (im, Memc[dec_key]) 
-		    iferr (ep = imgetd (im, Memc[ep_key]))
-		        ep = INDEFD
 		    call ast_precess (ra, dec, ep, ra, dec, epoch)
 		    call ast_jd_to_hjd (ra, dec, ujd, lt, hjd)
 		    call imaddd (im, Memc[hjd_key], hjd)

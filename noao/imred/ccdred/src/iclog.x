@@ -4,6 +4,7 @@ include	<imhdr.h>
 include	<imset.h>
 include	<mach.h>
 include	"icombine.h"
+include	"icmask.h"
 
 # IC_LOG -- Output log information is a log file has been specfied.
 
@@ -31,15 +32,14 @@ int	nout			# Number of images combined in output
 char	expname[ARB]		# Exposure name
 real	exposure		# Output exposure
 
-int	i, j, ctor()
+int	i, j, stack, ctor()
 real	rval, imgetr()
 long	clktime()
 bool	prncombine, prexptime, prmode, prmedian, prmean, prmask
 bool	prrdn, prgain, prsn
-pointer	sp, fname
+pointer	sp, fname, key
 errchk	imgetr
 
-include	"icmask.com"
 include	"icombine.com"
 
 begin
@@ -48,6 +48,14 @@ begin
 
 	call smark (sp)
 	call salloc (fname, SZ_LINE, TY_CHAR)
+
+	stack = NO
+	if (project) {
+	    ifnoerr (call imgstr (in[1], "stck0001", Memc[fname], SZ_LINE))
+	        stack = YES
+	}
+	if (stack == YES)
+	    call salloc (key, SZ_FNAME, TY_CHAR)
 
 	# Time stamp the log and print parameter information.
 
@@ -140,20 +148,20 @@ begin
 		call pargstr (Memc[fname])
 	}
 
-	if (mtype != M_NONE) {
-	    switch (mtype) {
+	if (ICM_TYPE(icm) != M_NONE) {
+	    switch (ICM_TYPE(icm)) {
 	    case M_BOOLEAN, M_GOODVAL:
 		call fprintf (logfd, "  masktype = goodval, maskval = %d\n")
-		    call pargi (mvalue)
+		    call pargi (ICM_VALUE(icm))
 	    case M_BADVAL:
 		call fprintf (logfd, "  masktype = badval, maskval = %d\n")
-		    call pargi (mvalue)
+		    call pargi (ICM_VALUE(icm))
 	    case M_GOODBITS:
 		call fprintf (logfd, "  masktype = goodbits, maskval = %d\n")
-		    call pargi (mvalue)
+		    call pargi (ICM_VALUE(icm))
 	    case M_BADBITS:
 		call fprintf (logfd, "  masktype = badbits, maskval = %d\n")
-		    call pargi (mvalue)
+		    call pargi (ICM_VALUE(icm))
 	    }
 	}
 
@@ -181,7 +189,7 @@ begin
 		prmedian = true
 	    if (mean[i] != mean[1])
 		prmean = true
-	    if (mtype != M_NONE && Memi[pms+i-1] != NULL)
+	    if (ICM_TYPE(icm) != M_NONE && Memi[ICM_PMS(icm)+i-1] != NULL)
 		prmask = true
 	    if (reject == CCDCLIP || reject == CRREJECT) {
 		j = 1
@@ -253,12 +261,25 @@ begin
 	call fprintf (logfd, "\n")
 
 	do i = 1, nimages {
-	    call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_LINE)
-	    if (project) {
+	    if (stack == YES) {
+		call sprintf (Memc[key], SZ_FNAME, "stck%04d")
+		    call pargi (i)
+		ifnoerr (call imgstr (in[i], Memc[key], Memc[fname], SZ_LINE)) {
+		    call fprintf (logfd, "  %21s")
+			call pargstr (Memc[fname])
+		} else {
+		    call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_LINE)
+		    call fprintf (logfd, "  %16s[%3d]")
+			call pargstr (Memc[fname])
+			call pargi (i)
+		}
+	    } else if (project) {
+		call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_LINE)
 		call fprintf (logfd, "  %16s[%3d]")
 		    call pargstr (Memc[fname])
 		    call pargi (i)
 	    } else  {
+		call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_LINE)
 		call fprintf (logfd, "  %21s")
 		    call pargstr (Memc[fname])
 	    }
@@ -320,7 +341,7 @@ begin
 		    }
 		}
 	    }
-	    if (prmask && Memi[pms+i-1] != NULL) {
+	    if (prmask && Memi[ICM_PMS(icm)+i-1] != NULL) {
 		call imgstr (in[i], "BPM", Memc[fname], SZ_LINE)
 		call fprintf (logfd, " %s")
 		    call pargstr (Memc[fname])
@@ -329,7 +350,7 @@ begin
 	}
 
 	# Log information about the output images.
- 	call imgstr (out[1], "TEMPNAME", Memc[fname], SZ_LINE)
+ 	call imstats (out[1], IM_IMAGENAME, Memc[fname], SZ_LINE)
 	call fprintf (logfd, "\n  Output image = %s, ncombine = %d")
 	    call pargstr (Memc[fname])
 	    call pargi (nout)
@@ -341,13 +362,13 @@ begin
 	call fprintf (logfd, "\n")
 
 	if (out[2] != NULL) {
-	    call imgstr (out[2], "TEMPNAME", Memc[fname], SZ_LINE)
+	    call imstats (out[2], IM_IMAGENAME, Memc[fname], SZ_LINE)
 	    call fprintf (logfd, "  Pixel list image = %s\n")
 		call pargstr (Memc[fname])
 	}
 
 	if (out[3] != NULL) {
-	    call imgstr (out[3], "TEMPNAME", Memc[fname], SZ_LINE)
+	    call imstats (out[3], IM_IMAGENAME, Memc[fname], SZ_LINE)
 	    call fprintf (logfd, "  Sigma image = %s\n")
 		call pargstr (Memc[fname])
 	}

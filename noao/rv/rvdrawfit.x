@@ -27,7 +27,10 @@ begin
 	    return
 
 	nfitpts = RV_IEND(rv) - RV_ISTART(rv) + 1
-	pltnpts = 10 * nfitpts
+	if (RV_FITFUNC(rv) == SINC)
+	    pltnpts = (snfit-1) * 10
+	else 
+	    pltnpts = 10 * nfitpts
 	nvars = 1
 
 	# Plot the deblended fit if that is what was done
@@ -55,7 +58,6 @@ begin
 	    return
 
 	} else if (RV_FITFUNC(rv) == SINC) {
-	    pltnpts = (snfit-1) * 10
 	    if (is_velocity == YES && RV_DCFLAG(rv) != -1) {
 	        do i = 1, pltnpts
 		    Memr[pltx+i-1] = real(rv_shift2vel(rv, Memr[splx+i-1]))

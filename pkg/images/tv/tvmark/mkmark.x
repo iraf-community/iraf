@@ -219,8 +219,8 @@ begin
 		    #call seek (cl, EOF)
 
 		    # Mark the object.
-		    call mk_onemark (mk, im, iw, wx, wy, oxlist, oylist,
-		        Memc[label], ltid)
+		    call mk_onemark (mk, im, iw, wx, wy, oxlist, oylist, "",
+		        ltid)
 
 		} 
 

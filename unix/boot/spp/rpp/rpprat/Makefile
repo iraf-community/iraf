@@ -38,5 +38,7 @@ FORT=	addchr.f allblk.f alldig.f baderr.f balpar.f beginc.f brknxt.f\
 
 fort:	$(SRCS) common defs
 	make fsrc; mv *.f ../rppfor; touch fort
+	(cd ../rppfor; sed -e 's/      goto 23012/c     goto 23012/'\
+	< caslab.f > temp; mv temp caslab.f)
 
 fsrc:	$(FORT)

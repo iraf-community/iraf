@@ -229,7 +229,8 @@ real	threshold		# Normalization treshold
 real	spectrum[npts]		# Pointer to normalization spectrum
 int	npts			# Number of points in spectrum
 
-int	i, ncols, nlines
+int	i, j, ncols, nlines
+real	norm
 pointer	datain, dataout
 
 pointer	imgl2r(), impl2r()
@@ -238,25 +239,51 @@ begin
 	ncols = IM_LEN (cal, 1)
 	nlines = IM_LEN (cal, 2)
 
-	# Replace spectrum values below threshold by threshold.
-
-	if (!IS_INDEF (threshold))
-	    call arltr (spectrum, npts, threshold, threshold)
-
 	# Compute the response image.
+	if (IS_INDEF (threshold)) {
+	    do i = 1, nlines {
+		datain = imgl2r (cal, i)
+		dataout = impl2r (resp, i)
 
-	do i = 1, nlines {
-	    datain = imgl2r (cal, i)
-	    dataout = impl2r (resp, i)
+		switch (axis) {
+		case 1:
+		    call adivr (Memr[datain], spectrum, Memr[dataout], ncols)
+		case 2:
+		    call adivkr (Memr[datain], spectrum[i], Memr[dataout],
+			ncols)
+		}
+	    }
+	} else {
+	    do i = 1, nlines {
+		datain = imgl2r (cal, i)
+		dataout = impl2r (resp, i)
 
-	    if (!IS_INDEF (threshold))
-		call arltr (Memr[datain], ncols, threshold, threshold)
-
-	    switch (axis) {
-	    case 1:
-		call adivr (Memr[datain], spectrum, Memr[dataout], ncols)
-	    case 2:
-	        call adivkr (Memr[datain], spectrum[i], Memr[dataout], ncols)
+		switch (axis) {
+		case 1:
+		    do j = 1, ncols {
+			norm = spectrum[j]
+			if (norm < threshold || Memr[datain] < threshold)
+			    Memr[dataout] = 1.
+			else
+			    Memr[dataout] = Memr[datain] / norm
+			datain = datain + 1
+			dataout = dataout + 1
+		    }
+		case 2:
+		    norm = spectrum[i]
+		    if (norm < threshold)
+			call amovkr (1., Memr[dataout], ncols)
+		    else {
+			do j = 1, ncols {
+			    if (Memr[datain] < threshold)
+				Memr[dataout] = 1.
+			    else
+				Memr[dataout] = Memr[datain] / norm
+			    datain = datain + 1
+			    dataout = dataout + 1
+			}
+		    }
+		}
 	    }
 	}
 end

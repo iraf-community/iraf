@@ -224,10 +224,26 @@ hp800:					# install HPUX series 800/700 binaries
         !$(hlib)/mkfloat.csh hp700
         !(cd ./unix; setenv MACH hp700; sh -x setarch.sh)
         ;
+freebsd:				# install freebsd binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh freebsd
+        !(cd ./unix; setenv MACH freebsd; sh -x setarch.sh)
+        ;
+        ;
+fitsbin:				# install fitsbin binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh fitsbin
+        !(cd ./unix; setenv MACH freebsd; sh -x setarch.sh)
+        ;
 linux:					# install linux binaries
         $verbose off
         !$(hlib)/mkfloat.csh linux
         !(cd ./unix; setenv MACH linux; sh -x setarch.sh)
+        ;
+redhat:					# install redhat binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh redhat
+        !(cd ./unix; setenv MACH redhat; sh -x setarch.sh)
         ;
 linuz:					# install linuz binaries
         $verbose off

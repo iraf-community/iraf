@@ -426,8 +426,6 @@ newim_	# Start here for each new image.
 		    }
 		}
 		for (i = 1; i <= npeaks; i = i + 1) {
-		    if (IS_INDEF(pix))
-			next
 		    pix = Memr[peaks+i-1]
 		    pix = ec_center (ec, pix, EC_FWIDTH(ec), EC_FTYPE(ec))
 		    if (IS_INDEFD (pix))

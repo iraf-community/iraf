@@ -32,6 +32,9 @@ data	unit_v /IM_MAXDIM * 1/
 
 begin
 	ndim = IM_NDIM(im)
+	if (ndim == 0)
+	    return (EOF)
+
 	npix = IM_LEN(im,1)			# write entire line
 	pixtype = IM_PIXTYPE(im)
 	sz_pixel = ty_size[pixtype]

@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include "gsurfitdef.h"
 
 # GSZERO -- Procedure to zero the accumulators before doing

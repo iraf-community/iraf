@@ -19,7 +19,7 @@ real	xmin, xmax, ymin, ymax, x1, x2, y1, y2, temp
 begin
 	if (gt == NULL) {
 	    call gascale (gp, x, npts, 1)
-	    call gascale (gp, y, npts, 1)
+	    call gascale (gp, y, npts, 2)
 	    return
 	}
 

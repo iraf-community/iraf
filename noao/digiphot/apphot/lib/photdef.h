@@ -36,6 +36,6 @@ define	AP_APSTRING	Memc[P2C($1+23+SZ_FNAME+1)] # Apertures string
 
 # phot default defintions
 
-define	DEF_ZMAG		26.0
+define	DEF_ZMAG		25.0
 define	DEF_APERTS		"3.0"
 define	DEF_PWEIGHTS		AP_PWCONSTANT

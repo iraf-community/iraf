@@ -26,11 +26,11 @@ char	newimage[SZ_FNAME]
 int	i, j, last, all, prfeature, nfeatures1, npeaks, newline[2]
 bool	answer
 double	pix, fit, user, shift, pix_shift, z_shift
-pointer	peaks, label
+pointer	peaks, label, aid, stp, sid
 
-bool	clgetb()
-pointer	gopen()
-int	clgcur(), scan(), nscan(), find_peaks(), errcode(), id_gid()
+bool	clgetb(), aid_autoid()
+pointer	gopen(), id_getap(), sthead(), stnext()
+int	clgcur(), scan(), nscan(), id_peaks(), errcode(), strncmp
 double	id_center(), fit_to_pix(), id_fitpt(), id_shift(), id_rms()
 errchk	id_gdata(), id_graph(), id_dbread(), xt_mk1d()
 
@@ -54,7 +54,7 @@ newim_
 
 	# Get the database entry for the image if it exists.
 	iferr {
-	    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO, YES)
+	    call id_dbread (id, ID_IMAGE(id), ID_AP(id,1), NO, YES)
 	    ID_NEWDBENTRY(id) = NO
 	} then
 	    if ((ID_NFEATURES(id) > 0) || (ID_CV(id) != NULL))
@@ -114,6 +114,19 @@ newim_
 		ID_CURRENT(id) = ID_CURRENT(id) + 1
 	    case 'a':	# Set all flag for next key
 		all = 1
+	    case 'b':	# Autoidentify
+		call aid_init (aid, "aidpars")
+		call aid_sets (aid, "crval", "CL crval")
+		call aid_sets (aid, "cdelt", "CL cdelt")
+		if (aid_autoid (id, aid)) {
+		    ID_NEWCV(id) = YES
+		    ID_NEWFEATURES(id) = YES
+		    ID_NEWGRAPH(id) = YES
+		} else {
+		    prfeature = 0
+		    call printf ("No solution found\n")
+		}
+		call aid_free (aid)
 	    case 'c':	# Recenter features
 		if (all != 0) {
 		    for (i = 1; i <= ID_NFEATURES(id); i = i + 1) {
@@ -170,6 +183,10 @@ newim_
 		    ID_CURRENT(id) = min (ID_NFEATURES(id), ID_CURRENT(id))
 		    last = 0
 		}
+	    case 'e':	# Find features from line list with no fitting
+		call id_linelist (id)
+		if (ID_NEWFEATURES(id) == YES)
+		    ID_NEWGRAPH(id) = YES
 	    case 'f':	# Fit dispersion function
 		call id_dofit (id, YES)
 	    case 'g':	# Fit shift
@@ -215,8 +232,13 @@ newim_
 		fit = wx
 		pix = fit_to_pix (id, fit)
 		pix = id_center (id, pix, ID_FWIDTH(id), ID_FTYPE(id))
-		if (IS_INDEFD (pix))
+		if (IS_INDEFD (pix)) {
+		    prfeature = NO
+		    call printf ("Center not found: check cursor position")
+		    if (ID_THRESHOLD(id) > 0.)
+			call printf (" and threshold value")
 		    goto beep_
+		}
 		fit = id_fitpt (id, pix)
 		user = fit
 		call id_newfeature (id, pix, fit, user, 1.0D0, ID_FWIDTH(id),
@@ -294,10 +316,11 @@ newim_
 		    } else
 		        shift = 0.
 		case 'x':
-		    if (ID_NFEATURES(id) > 5)
-			shift = id_shift (id)
-		    else
+		    shift = id_shift (id, -1D0, -0.05D0)
+		    if (IS_INDEFD(shift)) {
+			call printf ("No solution found\n")
 			goto beep_
+		    }
 		}
 
 		ID_NEWFEATURES(id) = YES
@@ -426,8 +449,8 @@ newim_
 		call gt_window (ID_GT(id), ID_GP(id), "cursor", ID_NEWGRAPH(id))
 	    case 'y':	# Find peaks
 		call malloc (peaks, ID_NPTS(id), TY_REAL)
-		npeaks = find_peaks (IMDATA(id,1), Memr[peaks], ID_NPTS(id), 0.,
-		    int (ID_MINSEP(id)), 0, ID_MAXFEATURES(id), 0., false)
+		npeaks = id_peaks (id, IMDATA(id,1), Memr[peaks], ID_NPTS(id),
+		    0., int (ID_MINSEP(id)), 0, ID_MAXFEATURES(id), 0., false)
 		for (j = 1; j <= ID_NFEATURES(id); j = j + 1) {
 		    for (i = 1; i <= npeaks; i = i + 1) {
 			if (!IS_INDEF (Memr[peaks+i-1])) {
@@ -476,13 +499,13 @@ newkey_
 
 	    # If a new line, save features and set new line.
 	    if (newline[1] != ID_LINE(id,1) || newline[2] != ID_LINE(id,2)) {
-		call id_saveid (id, ID_LINE(id,1))
+		call id_saveap (id)
 		ID_LINE(id,1) = newline[1]
 		ID_LINE(id,2) = newline[2]
 		call id_gdata (id)
-		if (id_gid (id, newline) == EOF) {
+		if (id_getap (id) == NULL) {
 		    iferr {
-		        call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+		        call id_dbread (id, ID_IMAGE(id), ID_AP(id,1),
 			    NO, NO)
 		        ID_NEWDBENTRY(id) = NO
 			ID_NEWFEATURES(id) = NO
@@ -553,8 +576,11 @@ newkey_
 	    answer = true
 	else {
 	    answer = false
-	    for (i = 0; i < ID_NID(id); i = i + 1) {
-	        if (ID_NEWDBENTRY(Memi[ID_ID(id)+i]) == YES) {
+	    stp = ID_STP(id)
+	    for (sid=sthead(stp); sid!=NULL; sid=stnext(stp,sid)) {
+		if (strncmp (ID_SAVEID(sid), "aperture", 8) != 0)
+		    next
+		if (ID_NEWDBENTRY(sid) == YES) {
 		    answer = true
 		    break
 		}
@@ -571,14 +597,16 @@ newkey_
 		newline[1] = ID_LINE(id,1)
 		newline[2] = ID_LINE(id,2)
 		if (ID_NEWDBENTRY(id) == YES)
-	            call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1), NO)
-		for (i = 0; i < ID_NID(id); i = i + 1) {
-	    	    j = Memi[ID_ID(id)+i]
-	    	    if (ID_NEWDBENTRY(j) == YES &&
-			(ID_LINE(j,1)!=newline[1]||ID_LINE(j,2)!=newline[2])) {
-			j =id_gid (id, ID_LINE(j,1))
-	            	call id_dbwrite (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
-			    NO)
+	            call id_dbwrite (id, ID_IMAGE(id), ID_AP(id,1), NO)
+		stp = ID_STP(id)
+		for (sid=sthead(stp); sid!=NULL; sid=stnext(stp, sid)) {
+		    if (strncmp (ID_SAVEID(sid), "aperture", 8) != 0)
+			next
+	    	    if (ID_NEWDBENTRY(sid) == YES &&
+			(ID_LINE(sid,1) != newline[1] ||
+			 ID_LINE(sid,2) != newline[2])) {
+			call id_gid (id, sid)
+	            	call id_dbwrite (id, ID_IMAGE(id), ID_AP(id,1), NO)
 		    }
 		}
 	    }
@@ -597,7 +625,7 @@ newkey_
 
 	# If a new image was requested with colon command start over.
 	if (newimage[1] != EOS) {
-	    call strcpy (newimage, Memc[ID_IMAGE(id)], SZ_FNAME)
+	    call strcpy (newimage, ID_IMAGE(id), ID_LENSTRING)
 	    goto newim_
 	}
 end

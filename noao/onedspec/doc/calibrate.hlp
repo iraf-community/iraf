@@ -138,7 +138,13 @@ the task \fBsensfunc\fR.  The sensitivity spectrum is in units of:
 A new spectrum is created in "F-lambda" units - ergs/cm2/sec/Angstrom
 or "F-nu" units - ergs/cm2/sec/Hz.  The sensitivity must span the range of
 wavelengths in the spectrum and interpolation is used if the wavelength
-coordinates are not identical.  Multiaperture instruments typically have
+coordinates are not identical.  If some pixels in the spectrum being
+calibrated fall outside the wavelength range of the sensitivity function
+spectrum a warning message giving the number of pixels outside the
+range.  In this case the sensitivity value for the nearest wavelength
+in the sensitivity function is used.
+
+Multiaperture instruments typically have
 a separate aperture sensitivity function for each aperture.  The appropriate
 sensitivity function for each input spectrum is selected based on the
 spectrum's aperture by appending this number to the root sensitivity function

@@ -20,4 +20,4 @@ RFIT : mR = (V - VR)  + r1 + r2 * XR + r3 * VR + r4 * VR * XR
 
 fit   i1=0.0, i2=0.03, i3=0.000
 const i4=0.0
-IFIT : mI = (V - VR - RI) + i1 + i2 * XI + i3 * RI + i4 * RI * XI
+IFIT : mI = (V - VI) + i1 + i2 * XI + i3 * VI + i4 * VI * XI

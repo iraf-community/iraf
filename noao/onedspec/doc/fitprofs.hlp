@@ -40,12 +40,17 @@ is usually wavelength in Angstroms and for other data it is usually pixels.
 A fitting region must be specified.
 .le
 .ls positions = ""
-File of initial or fixed profile positions and (optional) widths.  The
-format consists of lines with one or two whitespace separated numbers.
+File of initial or fixed profile positions and (optional) peaks, profile
+types, and widths.  The
+format consists of lines with one or more whitespace separated fields.
+The fields are the position, peak relative to the continuum with
+negative values being absorption, profile type of gaussian, lorentzian,
+or voigt, and the gaussian and/or lorentzian full width at half maximum.
+Trailing fields may be missing and fields to be set from default parameters
+or the image data (the peak value) may be given as INDEF.
 Comments and any additional columns are ignored.  The positions and
 widths are specified in the coordinate units of the image, usually
-wavelength for dispersion corrected spectra and pixels otherwise.  The
-width is interpreted as a sigma for Gaussian profile fitting.
+wavelength for dispersion corrected spectra and pixels otherwise.
 .le
 .ls background = ""
 Initial or fixed linear background defined by the region
@@ -55,13 +60,15 @@ space separated numbers.  When fitting the background this parameter
 defines the initial guess otherwise the background is fixed as
 specified.
 .le
-.ls sigma = 5.
-Default profile width or sigma.  This value is used for the initial/fixed
-width when a value is not specified in the position file.
+.ls profile = "gaussian" (gaussian|lorentzian|voigt)
+Default profile type to be fit when a profile type is not specified in
+the positions file.  The type are "gaussian", "lorentzian", or "voigt".
 .le
-.ls function = "gaussian"
-Profile function to be fit.  Currently the only choice is "Gaussian" for
-Gaussian profiles though additional functions may be added in future.
+.ls gfwhm = 20., lfwhm = 20.
+Default gaussian and lorentzian full width at half maximum (FWHM).
+These values are used for the initial and/or fixed width when they are
+not specified in the position file.
+.le
 .le
 .ls fitbackground = yes
 Fit the background?  If "yes" a linear background across the fitting region
@@ -74,15 +81,21 @@ initial values, "single" to fit a single shift to the positions while
 keeping their separations fixed, or "all" to independently fit all the
 positions.
 .le
-.ls fitsigmas = "all"
-Profile width fitting option.  This may be "fixed" to fix all widths at their
-initial values, "single" to fit a single scale factor to the initial
-widths of the profiles, or "all" to independently fit all the widths.
+.ls fitgfwhm = "all", fitlfwhm = "all"
+Profile width fitting options.  These may be "fixed" to fix all widths
+at their initial values, "single" to fit a single scale factor to the initial
+widths, or "all" to independently fit all the widths.
 .le
 
-The following parameters are used for error estimates in the 'd',
-'k', and 'e' key measurements.  See the ERROR ESTIMATES section for a
-discussion of the error estimates.
+The following parameters are used for error estimates as described
+below in the ERROR ESTIMATES section.
+.ls nerrsample = 0
+Number of samples for the error computation.  A value less than 10 turns
+off the error computation.  A value of ~10 does a rough error analysis, a
+value of ~50 does a reasonable error analysis, and a value >100 does a
+detailed error analysis.  The larger this value the longer the analysis
+takes.
+.le
 .ls sigma0 = INDEF, invgain = INDEF
 The pixel sigmas are modeled by the formula:
 
@@ -126,7 +139,7 @@ The plotfile may be examined and manipulated later with tools such as
 List of output images.  If not specified then no output images are created.
 If images are specified the list is matched with the input list.
 .le
-.ls option = "fit"
+.ls option = "fit" (fit|difference)
 Image output option.  The choices are "fit" to output the fitted image
 vector which is the sum of the fitted profiles (without a background),
 or "difference" to output the data with the profiles subtracted.
@@ -156,28 +169,53 @@ columns to increase the signal-to-noise.  A subset of the image apertures,
 lines, or columns may be specified or all image vectors may be fit.
 
 The fitting parameters consist of a fitting region, a list of initial
-positions and widths, initial background endpoints, the fitting function,
-and the parameters to be fit or constrained.  The coordinates and units
-used for the positions and widths are those defined by the standard
-linear coordinate header parameters.  For dispersion corrected
-spectra these are generally wavelengths in Angstroms and otherwise they
-are generally pixels.  A fitting region must be specified by a pair of
+positions, peaks, and widths, initial background endpoints, the fitting
+function, and the parameters to be fit or constrained.  The coordinates and
+units used for the positions and widths are those defined by the standard
+linear coordinate header parameters.  For dispersion corrected spectra
+these are generally wavelengths in Angstroms and otherwise they are
+generally pixels.  A fitting region must be specified by a pair of
 numbers.  The background parameter may be left empty to select the pixel
 values at the endpoints of the fitting region for defining the initial
-linear background.  The position list consists of one or two columns.  The
-positions are the first column and are required while the second column
-gives the profile width which defaults to the \fIsigma\fR parameter if
-it is missing.
+linear background.
 
-The task currently fits only Gaussian profiles with simultaneous linear
-background.  Other functions may be added in the future.  The profile
-parameters fit are the central position, the peak amplitude, and
-sigma.  The fitting may be constrained in number of ways.  The linear
-background may be fixed or simultaneously fit with the profiles.  The
-profile positions may be fixed, the relative separations fixed but a
-single zero point shift fit, or all positions may be fit simultaneously.
-The profile sigmas may also be fixed, the relative ratios of the widths
-fixed while fitting a single scale factor, or all widths fit
+The position list file consists of one or more columns.
+The format of this file has
+one or more columns.  The columns are the wavelength, the peak value
+(relative to the continuum with negative values being absorption),
+the profile type (gaussian, lorentzian, or voigt), and the
+gaussian and/or lorentzian FWHM.  End columns may be missing
+or INDEF values may be specified to use the default parameter
+values (the profile and widths) or determine the peak from the data.
+Below are examples of the file line formats
+
+.nf
+	wavelength
+	wavelength peak
+	wavelength peak (gaussian|lorenzian|voigt)
+	wavelength peak gaussian gfwhm
+	wavelength peak lorentzian lfwhm
+	wavelength peak voigt gfwhm
+	wavelength peak voigt gfwhm lfwhm
+
+	1234.5			<- Wavelength only
+	1234.5 -100		<- Wavelength and peak
+	1234.5 INDEF v		<- Wavelength and profile type
+	1234.5 INDEF g 12	<- Wavelength and gaussian FWHM
+.fi
+
+where peak is the peak value, gfwhm is the gaussian FWHM, and lfwhm is
+the lorentzian FWHM.  This format is the same as used by \fBsplot\fR
+and also by \fBartdata.mk1dspec\fR (except in the latter case the
+peak is normalized to a continuum of 1).
+
+The profile parameters fit are the central position, the peak amplitude,
+and the profile widths.  The fitting may be constrained in number of ways.
+The linear background may be fixed or simultaneously fit with the
+profiles.  The profile positions may be fixed, the relative separations
+fixed but a single zero point shift fit, or all positions may be fit
+simultaneously.  The profile widths may also be fixed, the relative ratios
+of the widths fixed while fitting a single scale factor, or all widths fit
 simultaneously.  The profile amplitudes are always fit.
 
 The fitting technique uses a nonlinear iterative Levenberg-Marquardt
@@ -194,8 +232,9 @@ spectral lines but others apply to any image data.  The quantities are
 the profile center, the background or continuum at the center of the
 profile, the integral or flux of the profile (which is negative for
 profiles below the background), the equivalent width, the profile peak
-amplitude or core value, and the Gaussian sigma and full width at half
-maximum.
+amplitude or core value, and the profile full width at half
+maximum.  Pure gaussian and lorentzian profiles will have one of
+the widths set to zero while voigt profiles will have both values.
 
 Summary plots are recored in a plotfile (if specified).  The plots
 show the data with the total fit, individual profiles, and residuals
@@ -222,28 +261,36 @@ where I is the pixel value and "**2" means the square of the quantity.
 
 If either the constant sigma or the inverse gain are specified as INDEF or
 with values less than zero then no noise model is applied and no error
-estimates are computed.  Note that for processed spectra this noise model
-will not generally be the same as the detector readout noise and gain.
-These parameters would need to be estimated in some way using the statistics
-of the spectrum.  The use of an inverse gain rather than a direct gain
-was choosed to allow a value of zero for this parameters.  This provides
-a model with constant uncertainties.
+estimates are computed.  Also if the number of error samples is less than
+10 then no error estimates are computed.  Note that for processed spectra
+this noise model will not generally be the same as the detector readout
+noise and gain.  These parameters would need to be estimated in some way
+using the statistics of the spectrum.  The use of an inverse gain rather
+than a direct gain was choosed to allow a value of zero for this
+parameters.  This provides a model with constant uncertainties.
 
 The error estimates are computed by Monte-Carlo simulation.  The model is
-fit to the data (using the sigmas) and this model is used to describe the
-noise-free spectrum.  One hundred simulations are created in which random
-Gaussian noise is added to the noise-free spectrum based on the pixel
-sigmas from the noise model.  The model fitting is done for each simulation
-and the absolute deviation of each fitted parameter to model parameter is
-recorded.  The error estimate for the each parameter is then the absolute
-deviation containing 68.3% of the parameter estimates.  This corresponds to
-one sigma if the distribution of parameter estimates is Gaussian though
-this method does not assume this.
+fit to the data (using the noise sigmas) and this model is used to describe
+the noise-free spectrum.  A number of simulations, given by the
+\fInerrsample\fR, are created in which random Gaussian noise is added to
+the noise-free spectrum based on the pixel sigmas from the noise model.
+The model fitting is done for each simulation and the absolute deviation of
+each fitted parameter to model parameter is recorded.  The error estimate
+for the each parameter is then the absolute deviation containing 68.3% of
+the parameter estimates.  This corresponds to one sigma if the distribution
+of parameter estimates is Gaussian though this method does not assume
+this.
 
 The Monte-Carlo technique automatically includes all effects of
 parameter correlations and does not depend on any approximations.
 However the computation of the errors does take a significant
-amount of time.
+amount of time.  The amount of time and the accuracy of the
+error estimates depend on how many simulations are done.  A
+small number of samples (of order 10) is fast but gives crude
+estimates.  A large number (greater than 100) is slow but gives
+very good estimates.  A compromise value of 50 is recommended
+for many applications.
+
 .ih
 EXAMPLES
 1.  The following example creates an artificial spectrum and fits it.
@@ -254,33 +301,39 @@ It requires the \fBartdata\fR and \fBproto\fR packages be loaded.
     cl> mknoise test rdnoise=10 poisson=yes
     cl> fields testlines fields=1,3 > fitlines
     cl> fitprofs test reg="4000 8000" pos=fitlines
-    # Jan  3 17:42 test - Ap 1: 
-    # Nfit=20, bkgd=YES, positions=all, sigmas=all, RMS=177.073
-    #   center     cont     flux    eqw     core sigma  fwhm
-      6829.874 1362.309 -7159.78  5.256 -157.466 18.14 42.72
-      7963.207 1507.092 -9451.88  6.272 -376.275 10.02  23.6
-      5688.533 1216.502 -8024.02  6.596 -370.239 8.646 20.36
-      6832.274 1362.615 -16332.1  11.99 -626.033 10.41 24.51
-      7216.591 1411.712 -11661.5  8.261 -417.378 11.15 26.25
-      6708.711  1346.83 -5725.68  4.251 -222.683 10.26 24.16
-       6433.66 1311.692 -8449.34  6.442 -331.589 10.17 23.94
-      6130.577 1272.974 -7032.61  5.525 -228.346 12.29 28.94
-      4567.955 1073.349 -6480.78  6.038 -249.199 10.38 24.43
-      5657.427 1212.529 -9856.24  8.129 -311.541 12.62 29.72
-      4219.741 1028.864 -6138.24  5.966 -238.262 10.28  24.2
-      4546.741 1070.638 -2892.72  2.702 -139.746 8.258 19.45
-       4605.13 1078.098 -6454.01  5.986  -259.21 9.933 23.39
-      6966.801 1379.801 -13722.6  9.945 -572.377 9.565 22.52
-       4258.94 1033.872 -4701.89  4.548 -214.153 8.759 20.63
-      5952.413 1250.213 -9507.61  7.605 -318.475 11.91 28.05
-      4530.854 1068.609 -706.732 0.6614 -62.6292 4.502  10.6
-      7815.642 1488.241 -2176.27  1.462 -271.426 3.199 7.533
-      5311.103 1168.286 -11653.5  9.975 -481.713 9.651 22.73
-      5022.378 1131.401 -8689.48   7.68 -329.906 10.51 24.75
+    # Jul 27 17:49 test - Ap 1: 
+    # Nfit=20, background=YES, positions=all, gfwhm=all, lfwhm=all
+    #   center      cont      flux      eqw      core   gfwhm   lfwhm
+      6832.611  1363.188  -13461.8    9.875  -408.339   30.97      0.
+      7963.674  1507.641  -8193.58    5.435  -395.207   19.48      0.
+      5688.055   1217.01  -7075.11    5.814  -392.006   16.96      0.
+	6831.3   1363.02  -7102.01     5.21  -456.463   14.62      0.
+      7217.335  1412.323   -10110.    7.158  -427.797    22.2      0.
+      6709.286  1347.437  -4985.06      3.7  -225.346   20.78      0.
+      6434.317  1312.319  -7121.03    5.426  -342.849   19.51      0.
+      6130.415  1273.506    -6164.     4.84  -224.146   25.83      0.
+      4569.375  1074.138   -3904.6    3.635  -183.963   19.94      0.
+      5656.645  1212.999  -8202.81    6.762  -303.617   25.38      0.
+       4219.53  1029.458  -5161.64    5.014  -241.135   20.11      0.
+      4551.424  1071.845  -3802.61    3.548   -139.39   25.63      0.
+      4604.649  1078.643  -5539.15    5.135  -264.654   19.66      0.
+      6966.557  1380.294  -11717.5    8.489  -600.581   18.33      0.
+      4259.019  1034.501  -4280.38    4.138  -213.446   18.84      0.
+      5952.958  1250.843  -8006.98    6.401  -318.313   23.63      0.
+       4531.89  1069.351  -712.598   0.6664  -155.197   4.313      0.
+      7814.418  1488.579  -2926.49    1.966  -164.891   16.67      0.
+      5310.929  1168.846  -10132.2    8.669  -487.502   19.53      0.
+      5022.948  1132.066   -7532.8    6.654  -325.594   21.73      0.
+
 .fi
 .ih
 REVISIONS
 .ls FITPROFS V2.11
+Modified to include lorentzian and voigt profiles.  The parameters and
+positions file format have changed in this version.  A new parameter
+controls the number of Monte-Carlo samples used in the error estimates.
+.le
+.ls FITPROFS V2.10.3
 Error estimates based on a simple noise model are now computed.
 .le
 .ls FITPROFS V2.10

@@ -56,7 +56,7 @@ libex.a:
 	qpbind.x	qpoe.h <fmset.h>
 	qpclose.x	qpoe.h
 	qpcopy.x	qpoe.h
-	qpcopyf.x	qpoe.h
+	qpcopyf.x	qpoe.h <qpset.h>
 	qpctod.x	
 	qpctoi.x	<lexnum.h>
 	qpdelete.x	qpoe.h
@@ -114,7 +114,7 @@ libex.a:
 	qppstr.x	qpoe.h
 	qpputb.x	qpoe.h
 	qpputx.x	qpoe.h
-	qpqueryf.x	qpoe.h
+	qpqueryf.x	qpoe.h <qpset.h>
 	qpread.x	qpoe.h
 	qprebuild.x	qpoe.h
 	qprename.x	qpoe.h

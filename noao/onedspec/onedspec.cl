@@ -4,7 +4,8 @@
 
 package onedspec
 
-task	calibrate,
+task	autoidentify,
+	calibrate,
 	continuum,
 	deredden,
 	dispcor,
@@ -22,21 +23,25 @@ task	calibrate,
 	sarith,
 	sbands,
 	scombine,
+	scoords,
 	sensfunc,
 	sfit,
 	sflip,
 	sinterp,
+	skytweak,
 	slist,
 	specplot,
 	specshift,
 	splot,
-	standard	= onedspec$x_onedspec.e
+	standard,
+	telluric	= onedspec$x_onedspec.e
 
 task	setairmass,
 	setjd		= astutil$x_astutil.e
 
 # Scripts and Psets
 
+task	aidpars		= onedspec$aidpars.par
 task	bplot		= onedspec$bplot.cl
 task	ndprep		= onedspec$ndprep.cl
 task	scopy		= onedspec$scopy.cl

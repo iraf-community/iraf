@@ -2,6 +2,7 @@
 
 input,s,a,,,,List of images to flatten
 output,s,a,,,,List of output flatten images
+apertures,s,h,"",,,Apertures
 references,s,h,"",,,"List of reference images
 "
 interactive,b,h,yes,,,Run task interactively?

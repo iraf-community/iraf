@@ -7,8 +7,8 @@ include "../lib/noise.h"
 procedure apcopmags (sums, areas, mags, magerrs, naperts, sky, sigma, nsky,
     zmag, noise, padu)
 
-real	sums[ARB]		# aperture sums
-real	areas[ARB]		# aperture areas
+double	sums[ARB]		# aperture sums
+double	areas[ARB]		# aperture areas
 real	mags[ARB]		# output magnitudes
 real	magerrs[ARB]		# errors in the magnitudes
 int	naperts			# number of apertures
@@ -65,8 +65,8 @@ end
 procedure apconmags (sums, areas, mags, magerrs, naperts, sky, sigma, nsky,
     zmag, noise, padu, readnoise)
 
-real	sums[ARB]		# aperture sums
-real	areas[ARB]		# aperture areas
+double	sums[ARB]		# aperture sums
+double	areas[ARB]		# aperture areas
 real	mags[ARB]		# output magnitudes
 real	magerrs[ARB]		# errors in the magnitudes
 int	naperts			# number of apertures

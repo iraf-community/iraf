@@ -15,7 +15,6 @@ int 	which					#I Which spectrum to work on?
 pointer	sp, fit
 int	tnum, inum
 int	continuum()
-bool	streq()
 errchk	realloc, continuum
 
 begin
@@ -44,13 +43,8 @@ begin
 	    }
 
 	    call realloc (RV_RCONTP(rv), RV_RNPTS(rv), TY_REAL)
-	    if (streq(IMAGE(rv),RIMAGE(rv)) && OBJCONT(rv) == YES) {
-	        call amovr (OCONT_DATA(rv,1), RCONT_DATA(rv,1), RV_RNPTS(rv))
-	        REFCONT(rv) = OBJCONT(rv)
-	    } else {
-	        REFCONT(rv) = continuum (rv, REFPIXY(rv,1), RV_RNPTS(rv), 
-		    RCONT_DATA(rv,1), Memr[fit])
-	    }
+	    REFCONT(rv) = continuum (rv, REFPIXY(rv,1), RV_RNPTS(rv), 
+		RCONT_DATA(rv,1), Memr[fit])
 	}
 
 	call sfree (sp)

@@ -46,11 +46,19 @@ wcslab computes a default value. To overlay the plot
 with a displayed image, vl, vr, vb, and vt must use the same viewport used
 by the display task to load the image into the frame buffer.
 .le
+.ls overplot = no
+Overplot to an existing plot?  If yes, wcslab will not erase the
+current plot.  This differs from append in that a new viewport
+may be defined.  Append has priority if both
+append and overwrite are yes.
+.le
 .ls append = no
 Append to an existing plot?  If no, wcslab resets the
 graphics to a new viewport/wcs for each new plot.  Otherwise, it uses
 the scaling from a previous plot. If append=yes but no plot was drawn, it
-will behave as if append=no. 
+will behave as if append=no.   This differs from overplot in that
+the same viewport is used.  Append has priority if both
+append and overwrite are yes.
 .le
 .ls device = "imd"
 The graphics device. To create an overlay plot, device must be set
@@ -299,9 +307,11 @@ In this case the user must, either adjust the DISPLAY parameters
 buffer,  or change the DISPLAY viewport parameters \fIxsize\fR and
 \fIysize\fR so as to display only a fraction of the image.
 
-WCSLAB can either create a new plot each time it is run, \fIappend\fR = no,
-or append to an existing plot, \fIappend\fR = yes. 
-For new plots WCSLAB computes the viewport and window, otherwise it
+WCSLAB can create a new plot each time it is run, \fIappend\fR = no
+and \fIoverplot\fR = no,  add a new graph to an existing plot
+if \fIoverplot\fR = yes and \fIappend\fR=no,
+or append to an existing plot if \fIappend\fR = yes. 
+For new or overplots WCSLAB computes the viewport and window, otherwise it
 uses the viewport and window of a previously existing plot. If \fIdevice\fR
 is "stdgraph", then WCSLAB will clear the screen between each new plot.
 This is not possible if \fIdevice\fR is one of the "imd" devices

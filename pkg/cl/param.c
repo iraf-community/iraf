@@ -776,6 +776,20 @@ char	*param_spec;
 }
 
 
+/* DEFVAR -- Determine if the named environment variable exists.
+ */
+defvar (envvar)
+char	*envvar;
+{
+	char	sbuf[SZ_LINE];
+
+	if (c_envfind (envvar, sbuf, SZ_LINE) <= 0)
+	    return (NO);
+	else
+	    return (YES);
+}
+
+
 /* LOOKUP_PARAM -- Hunt for and return pointer to param in given package
  *   and ltask.  If task does not have param file, NULL is returned.  If pfile
  *   exists but is not loaded, it is loaded before searching for parameter.

@@ -13,7 +13,7 @@ int	ira, idec		#O CTRAN relative RA, DEC axis numbers
 
 pointer	ct, mw
 int	ax[2], i
-char	axtype[3]
+char	axtype[4]
 bool	streq()
 
 begin
@@ -28,16 +28,17 @@ begin
 	do i = 1, 2
 	    ax[i] = CT_AXIS(ct,FC_AXIS(fc,i))
 
-	# Determine which is the DEC axis, and hence the axis order.
+	# Determine which is the DEC/LAT axis, and hence the axis order.
+	ira = 0
 	idec = 0
 	do i = 1, 2
-	    ifnoerr (call mw_gwattrs (mw, ax[i], "axtype", axtype, 3)) {
+	    ifnoerr (call mw_gwattrs (mw, ax[i], "axtype", axtype, 4)) {
 		call strlwr (axtype)
-		if (streq (axtype, "ra")) {
+		if (streq (axtype, "ra") || streq (axtype[2], "lon")) {
 		    ira  = i
 		    idec = 3 - i
 		    break
-		} else if (streq (axtype, "dec")) {
+		} else if (streq (axtype, "dec") || streq (axtype[2], "lat")) {
 		    ira  = 3 - i
 		    idec = i
 		    break
@@ -45,5 +46,6 @@ begin
 	    }
 
 	if (idec == 0)
-	    call error (2, "DEC axis must be specified for a projection WCS")
+	    call error (2,
+	    "DEC/xLAT axis must be specified for a projection WCS")
 end

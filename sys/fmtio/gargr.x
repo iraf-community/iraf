@@ -10,7 +10,8 @@ double	dval
 
 begin
 	call gargd (dval)
-	rval = dval
-	if (IS_INDEFR (dval))
+	if (IS_INDEFD (dval))
 	    rval = INDEFR
+	else
+	    rval = dval
 end

@@ -30,7 +30,7 @@ libimfort.a:
 	imfmkpfn.x	imfort.h oif.h <imhdr.h>
 	imfparse.x	oif.h
 	imftrans.x	oif.h
-	imfupdhdr.x	imfort.h <imhdr.h>
+	imfupdhdr.x	imfort.h oif.h <imhdr.h>
 	imgkwb.x	imfort.h
 	imgkwc.x	imfort.h
 	imgkwd.x	imfort.h
@@ -54,7 +54,7 @@ libimfort.a:
 	imokwl.x	imfort.h
 	imopen.x	
 	imopnc.x	imfort.h <imhdr.h>
-	imopnx.x	imfort.h <config.h> <imhdr.h> <mach.h>
+	imopnx.x	imfort.h oif.h <config.h> <imhdr.h> <mach.h>
 	impixf.x	imfort.h <imhdr.h>
 	impkwb.x	imfort.h
 	impkwc.x	imfort.h
@@ -73,7 +73,11 @@ libimfort.a:
 	imps2s.x	imfort.h <imhdr.h>
 	imps3r.x	imfort.h <imhdr.h>
 	imps3s.x	imfort.h <imhdr.h>
+	imrdhdr.x	imfort.h imhv1.h imhv2.h oif.h <imhdr.h> <mach.h>
 	imrnam.x	imfort.h oif.h <imhdr.h>
+	imswap.x	imfort.h <mach.h>
 	imtypk.x	imfort.h
-	imwphdr.x	oif.h <imhdr.h>
+	imwpix.x	imfort.h <imhdr.h> <mach.h>
+	imwrhdr.x	imfort.h imhv1.h imhv2.h oif.h <imhdr.h> <mach.h>
+	mii.x		<mii.h>
 	;

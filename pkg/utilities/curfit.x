@@ -62,11 +62,12 @@ begin
 		call ttycdes (tty)
 	    }
 
-	    call ic_show (ic, "STDOUT", gt)
+	    #call ic_show (ic, "STDOUT", gt)
 	    call ic_vshowr (ic, "STDOUT", cv, x, y, wts, nvalues, gt)
 
 	    if (ofmt == VERBOSE_OUTPUT) {
-		call printf ("\n\t    X     \t     Yc   \t     Y    \t     W\n")
+		call printf (
+		    "\n# \t    X     \t     Yc   \t     Y    \t     W\n")
 	        call cf_listxyr (cv, x, y, wts, nvalues)
 	    }
 	} else
@@ -79,10 +80,10 @@ begin
 	    call smark (sp)
 	    call salloc (coeff, ncoeff, TY_REAL)
 	    call rcvpower (cv, Memr[coeff], ncoeff)
-	    call printf ("Power series coefficients would be:\n")
-	    call printf ("\t\tcoefficient\n")
+	    call printf ("# Power series coefficients would be:\n")
+	    call printf ("# \t\tcoefficient\n")
 	    do i = 1, ncoeff {
-		call printf ("\t%d \t%14.7e\n")
+		call printf ("# \t%d \t%14.7e\n")
 		    call pargi (i)
 		    call pargr (Memr[coeff+i-1])
 	    }
@@ -253,11 +254,12 @@ begin
 		call ttycdes (tty)
 	    }
 
-	    call ic_show (ic, "STDOUT", gt)
+	    #call ic_show (ic, "STDOUT", gt)
 	    call ic_vshowd (ic, "STDOUT", cv, x, y, wts, nvalues, gt)
 
 	    if (ofmt == VERBOSE_OUTPUT) {
-		call printf ("\n\t    X     \t     Yc   \t     Y    \t     W\n")
+		call printf (
+		    "\n# \t    X     \t     Yc   \t     Y    \t     W\n")
 	        call cf_listxyd (cv, x, y, wts, nvalues)
 	    }
 	} else
@@ -270,10 +272,10 @@ begin
 	    call smark (sp)
 	    call salloc (coeff, ncoeff, TY_DOUBLE)
 	    call dcvpower (cv, Memd[coeff], ncoeff)
-	    call printf ("Power series coefficients would be:\n")
-	    call printf ("\t\tcoefficient\n")
+	    call printf ("# Power series coefficients would be:\n")
+	    call printf ("# \t\tcoefficient\n")
 	    do i = 1, ncoeff {
-		call printf ("\t%d \t%14.7e\n")
+		call printf ("# \t%d \t%14.7e\n")
 		    call pargi (i)
 		    call pargd (Memd[coeff+i-1])
 	    }

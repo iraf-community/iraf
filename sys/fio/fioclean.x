@@ -18,7 +18,7 @@ int	status
 
 int	fd
 bool	stddev
-int	ref_count, and()
+int	mode, ref_count
 include	<fio.com>
 errchk	close
 
@@ -83,8 +83,10 @@ begin
 		iferr (call fio_qflush (fd, status))
 		    call erract (EA_WARN)		# keep open?
 
+		stddev = (FDEV(fp)==TX_DRIVER || FDEV(fp)==BF_DRIVER)
 		call strcpy (FNAME(fp), pathname, SZ_PATHNAME)
 		ref_count = FREFCNT(fp) - 1
+		mode = FMODE(fp)
 
 		iferr {
 		    call close (fd)
@@ -92,8 +94,7 @@ begin
 		    # Delete any new files that have been only partially
 		    # written into.
 
-		    stddev = (FDEV(fp)==TX_DRIVER || FDEV(fp)==BF_DRIVER)
-		    if (stddev && FMODE(fp) == NEW_FILE && ref_count <= 0)
+		    if (stddev && mode == NEW_FILE && ref_count <= 0)
 			call delete (pathname)
 		} then
 		    call erract (EA_WARN)

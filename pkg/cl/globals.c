@@ -12,36 +12,40 @@
 #include "task.h"
 #include "eparam.h"
 
-int	nextdest[MAX_LOOP];	/* Destinations for NEXT's 	*/
-int	brkdest[MAX_LOOP];	/* Destinations for BREAK's 	*/
+int	parse_state;		/* What are we parsing?			*/
+int	proc_script;		/* In a procedure script?		*/
+struct	pfile *parse_pfile;	/* Where parsed params are added.	*/
 
-int	nestlevel = 0;		/* Loop nesting level		*/
-int	ncaseval;		/* Number of cases in switch	*/
+int	nextdest[MAX_LOOP];	/* Destinations for NEXT's 		*/
+int	brkdest[MAX_LOOP];	/* Destinations for BREAK's 		*/
 
-int	n_oarr;			/* Number of open array indices	*/
-int	i_oarr;			/* Current open array index	*/
+int	nestlevel = 0;		/* Loop nesting level			*/
+int	ncaseval;		/* Number of cases in switch		*/
 
-int	oarr_beg[N_OPEN_ARR];	/* Open index limits.		*/
+int	n_oarr;			/* Number of open array indices		*/
+int	i_oarr;			/* Current open array index		*/
+
+int	oarr_beg[N_OPEN_ARR];	/* Open index limits.			*/
 int	oarr_end[N_OPEN_ARR];
-int	oarr_curr[N_OPEN_ARR];	/* Current value for index.	*/
-int	imloopset = 0;		/* Loop inited at run time?	*/
-int	n_indexes = 0;		/* Number of indexes on stack.	*/
+int	oarr_curr[N_OPEN_ARR];	/* Current value for index.		*/
+int	imloopset = 0;		/* Loop inited at run time?		*/
+int	n_indexes = 0;		/* Number of indexes on stack.		*/
 
-int	maybeindex;		/* Could last constant be index */
-				/* range?			*/
+int	maybeindex;		/* Could last constant be index		*/
+				/* range?				*/
 
-struct	label	*label1 = NULL; /* Pointer to first top of label list. */
-int	igoto1 = -1;		/* Head of list of indirect GOTO's */
+struct	label	*label1 = NULL; /* Pointer to first top of label list.	*/
+int	igoto1 = -1;		/* Head of list of indirect GOTO's	*/
 
 struct	operand	*parlist[MAX_PROC_PARAMS];
-struct	param *last_parm;/* Last parameter before compilation.		*/
+struct	param *last_parm;	/* Last parameter before compilation.	*/
 int	n_procpar;		/* Number of params in proc stmt.	*/
 
 /* Default initialization of the EDCAP editor command set.
  * Note: these are expected to be reset be the edcap facility at runtime.
  * The source of most of these defaults is the EMACS editor
  */
-int	numcommands;		/* number of defined commands */
+int	numcommands;		/* number of defined commands		*/
 
 struct edit_commands command[MAX_COMMANDS] = {
 	{ EDITOR_ID	,"\0"		,""		},

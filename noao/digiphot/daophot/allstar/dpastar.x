@@ -129,7 +129,7 @@ begin
 	    niter = niter + 1) {
 
 	    if (DP_VERBOSE(dao) == YES) {
-	        call eprintf ("NITER = %d\n")
+	        call printf ("NITER = %d\n")
 		    call pargi (niter)
 	    }
 

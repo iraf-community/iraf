@@ -1,4 +1,4 @@
-.help combine Dec93 noao.imred.ccdred
+.help combine Aug96 noao.imred.ccdred
 .ih
 NAME
 combine -- Combine CCD images using various algorithms
@@ -13,10 +13,11 @@ selected with the parameter \fIccdtype\fR with the remaining images ignored.
 .le
 .ls output
 Output combined image or list of images.  If the \fIproject\fR parameter is
-no (the typical case for CCD acquisition) then there will be one output image
-or, if the \fIsubsets\fR parameter is selected, one output image per subset.
-If the images consist of stacks then the \fIproject\fR option allows combining
-each input stack into separate output images as given by the image list.
+no (the typical case for CCD acquisition) then there will be one output
+image or, if the \fIsubsets\fR parameter is selected, one
+output image per subset.  If the images consist of stacks then
+the \fIproject\fR option allows combining each input stack into separate
+output images as given by the image list.
 .le
 .ls plfile = "" (optional)
 Output pixel list file or list of files.  If no name is given or the
@@ -37,6 +38,12 @@ rejected pixels) about the output combined pixel values.
 CCD image type to combine.  If specified only input images of the specified
 type are combined.  See \fBccdtypes\fR for the possible image types.
 .le
+.ls amps = yes
+Combine images by amplifier?  If yes then the input images are grouped by
+the amplifier parameter and each group combined into a separate output
+image.  The amplifier identifier is appended to the output image name(s).
+See \fBsubsets\fR for more on the amplifier parameter.
+.le
 .ls subsets = no
 Combine images by subset parameter?  If yes then the input images are
 grouped by subset parameter and each group combined into a separate output
@@ -47,7 +54,9 @@ name(s).  See \fBsubsets\fR for more on the subset parameter.
 Delete input images after combining?  Only those images combined are deleted.
 .le
 .ls clobber = no
-Clobber existing output images?
+Clobber existing output images?  THIS OPTION IS NO LONGER SUPPORTED BUT
+THE PARAMETER REMAINS FOR NOW FOR BACKWARD COMPATIBILITY.  IF SET TO
+yes AN ERROR ABORT WILL OCCUR.
 .le
 
 .ls combine = "average" (average|median)
@@ -84,13 +93,23 @@ mask image.
 Output image pixel datatype.  The pixel datatypes are "double", "real",
 "long", "integer", unsigned short ("ushort") and "short" with highest
 precedence first.  If none is specified then the highest precedence
-datatype of the input images is used.  The datatypes may be abbreviated to
+datatype of the input images is used.   A mixture of short and unsigned
+short images has a highest precedence of integer.
+The datatypes may be abbreviated to
 a single character.
 .le
-.ls offsets = "none" (none|grid|<filename>)
-Input image offsets.  The offsets may be specified in a file consisting
-of one line per image with the offsets in each dimension forming the
-columns.  The special case of a grid may be specified by the string:
+.ls offsets = "none" (none|wcs|grid|<filename>)
+Integer offsets to add to each image axes.  The options are:
+.ls "none"
+No offsets are applied.
+.le
+.ls "wcs"
+The world coordinate system (wcs) in the image is used to derive the
+offsets.  The nearest integer offset that matches the world coordinate
+at the center of the first input image is used.
+.le
+.ls "grid"
+A uniform grid of offsets is specified by a string of the form
 
 .nf
 	grid [n1] [s1] [n2] [s2] ...
@@ -100,6 +119,12 @@ where ni is the number of images in dimension i and si is the step
 in dimension i.  For example "grid 5 100 5 100" specifies a 5x5
 grid with origins offset by 100 pixels.
 .le
+.ls <filename>
+The offsets are given in the specified file.  The file consists
+of one line per image with the offsets in each dimension forming the
+columns.
+.le
+.le
 .ls masktype = "none" (none|goodvalue|badvalue|goodbits|badbits)
 Type of pixel masking to use.  If "none" then no pixel masking is done
 even if an image has an associated  pixel mask.  The other choices
@@ -107,6 +132,13 @@ are to select the value in the pixel mask to be treated as good
 (goodvalue) or bad (badvalue) or the bits (specified as a value)
 to be treated as good (goodbits) or bad (badbits).  The pixel mask
 file name comes from the image header keyword BPM.
+Note that when
+combining images by projection of the highest dimension only one
+pixel mask is applied to all the images.  \fBAlso if the number of
+input images becomes too large (currently about 115 .imh or 57 .hhh
+images) then the images are temporarly stacked and combined by projection
+which also means the bad pixel mask from the first image will be used
+for all images.\fR
 .le
 .ls maskvalue = 0
 Mask value used with the \fImasktype\fR parameter.  If the mask type
@@ -131,14 +163,18 @@ Additive zero level image shifts to be applied.  The choices are none or
 shift by the mode, median, or mean of the specified statistics section,
 shift by values given in a file, or shift by values given by an image
 header keyword.  When specified in a file the zero values must be one
-per line in the order of the input images.
+per line in the order of the input images.  File or keyword zero offset
+values do not allow a correction to the weights.
 .le
 .ls weight = "none" (none|mode|median|mean|exposure|@<file>|!<keyword>)
 Weights to be applied during the final averaging.  The choices are none,
 the mode, median, or mean of the specified statistics section, the exposure
 time, values given in a file, or values given by an image header keyword.
 When specified in a file the weights must be one per line in the order of
-the input images.
+the input images and the only adjustment made by the task is for the number of
+images previously combined.   In this case the weights should be those
+appropriate for the scaled images which would normally be the inverse
+of the variance in the scaled image.
 .le
 .ls statsec = ""
 Section of images to use in computing image statistics for scaling and
@@ -243,15 +279,16 @@ for CCD images.
 
 The input images to be combined are specified by a list.  A subset or
 subsets of the input list may be selected using the parameters
-\fIccdtype\fR and  \fIsubsets\fR.  The \fIccdtype\fR parameter selects only
-images of a specified standard CCD image type.  The \fIsubsets\fR parameter
-breaks up the input list into sublists of common subset parameter (filter,
-grating, etc.).  For more information see \fBccdtypes\fR and
-\fBsubsets\fR.  This selection process is useful with wildcard templates to
-combine, for example, the flat field images for each filter in one step
-(see \fBflatcombine\fR).  When subsets of the input list are used the
-output image and optional pixel file and sigma image are given by root names
-with a subset identifier appended by the task.
+\fIccdtype\fR and \fIsubsets\fR.  The \fIccdtype\fR parameter
+selects only images of a specified standard CCD image type.
+The \fIsubsets\fR parameter breaks up the input
+list into sublists of common subset parameter (filter, grating, etc.).  For
+more information see \fBccdtypes\fR and \fBsubsets\fR.  This selection
+process is useful with wildcard templates to combine, for example, the flat
+field images for each filter in one step (see \fBflatcombine\fR).  When
+subsets of the input list are used the output image and optional pixel file
+and sigma image are given by root names with an amplifier and subset
+identifier appended by the task.
 
 If the \fBproject\fR parameter is yes then the highest dimension elements
 of each input image are combined to make an output image of one lower
@@ -268,6 +305,8 @@ NCOMBINE, the exposure time is updated as the weighted average of the input
 exposure times, and any pixel list file created is recorded under the
 keyword BPM.  The output pixel type is set by the parameter \fIouttype\fR.
 If left blank then the input datatype of highest precision is used.
+A mixture of short and unsigned short images has a highest precision of
+integer.
 
 In addition to one or more output combined images there may also be a pixel
 list image containing the number of pixels rejected at each point in the
@@ -334,10 +373,18 @@ all the images have 100 columns then the output image will have 130
 columns corresponding to the 30 column offset in the third image.
 
 The input image offsets are set using the \fIoffset\fR parameter.  There
-are three ways to specify the offsets.  If the word "none" or the empty
+are four ways to specify the offsets.  If the word "none" or the empty
 string "" are used then all offsets will be zero and all pixels with the
 same coordinates will be combined.  The output image size will be equal to
 the biggest dimensions of the input images.
+
+If "wcs" offsets are specified then the world coordinate systems (wcs)
+in the image headers are used to derived the offsets.  The world coordinate
+at the center of the first input image is evaluated.  Then integer pixel
+offsets are determined for each image to bring the same world coordinate
+to the same point.  Note the following caveats.  The world coordinate
+systems must be of the same type, orientation, and scale and only the
+nearest integer shift is used.
 
 If the input images have offsets in a regular grid or one wants to make
 an output image in which the input images are "mosaiced" together in
@@ -508,19 +555,30 @@ The weights, scaled to a unit sum, are printed in the log output.
 The weights are only used for the final weighted average and sigma image
 output.  They are not used to form averages in the various rejection
 algorithms.  For weights in the case of no scaling or only multiplicative
-scaling the weights are used as given or determined so that images
-with lower signal levels will have lower weights.  However, for
-cases in which zero level scaling is used the weights are computed
-from the initial weights (the exposure time, image statistics, or
-input values) using the formula:
+scaling the weights are used as given or determined so that images with
+lower signal levels will have lower weights.  However, for cases in which
+zero level scaling is used and the zero levels are determined from image
+statistics (not from an input file or keyword) the weights are computed
+from the initial weights (the exposure time, image statistics, or input
+values) using the formula:
 
 .nf
-	weight_final = weight_initial / (scale * zero)
+	weight_final = weight_initial / (scale * sky)
 .fi
 
-where the zero values are those before adjustment to zero mean over
-all images.  The reasoning is that if the zero level is high the sky
-brightness is high and so the S/N is lower and the weight should be lower.
+where the sky values are those from the image statistics before conversion
+to zero level shifts and adjustment to zero mean over all images.  The
+reasoning is that if the zero level is high the sky brightness is high and
+so the S/N is lower and the weight should be lower.  If any sky value
+determined from the image  statistics comes out to be negative a warning is
+given and the none of the weight are adjusted for sky levels.
+
+The weights are not adjusted when the zero offsets are input from a file
+or keyword since these values do not imply the actual image sky value.
+In this case if one wants to account for different sky statistics
+in the weights the user must specify the weights in a file taking
+explicit account of changes in the weights due to different sky
+statistics.
 
 
 PIXEL MASKS
@@ -587,6 +645,12 @@ dimensional images having the same header and hence the same
 bad pixel mask.  It would be tempting to use a bad pixel mask with
 the same dimension as the image being projected but this is not
 currently how the task works.
+
+When the number of input images exceeds the maximum number of open files
+allowed by IRAF (currently about 115 .imh or 57 .hhh images) the input
+images are stacked and combined with the project option.  \fBThis means
+that the bad pixel mask from the first input image will be applied to all
+the images.\fR
 
 
 THRESHOLD REJECTION
@@ -1014,7 +1078,22 @@ IMAGES  COMBINE  REJECT        O M T S     TIME
 .fi
 .ih
 REVISIONS
+.ls COMBINE V2.11
+The limit of the number of images that may be combined has been removed.
+If the number of images exceeds the maximum number of open images permitted
+then the images are stacked in a single temporary image and then combined
+with the project option.  Note that this will double the amount of
+diskspace temporarily.  There is also a limitation in this case that the
+bad pixel mask from the first image in the list will be applied to all the
+images.
+
+Integer offsets may be determined from the image world coordinate system.
+.le
 .ls COMBINE V2.10.3
+The output pixel datatype parameter, \fIouttype\fR was previously ignored
+and the package \fIpixeltype\fR was used.  The task output pixel type
+parameter is now used.
+
 The factors specified by an @file or keyword are not normalized.
 .le
 .ls COMBINE V2.10.2
@@ -1048,19 +1127,9 @@ are:
 .le
 .ih
 LIMITATIONS
-Though this task is essentially not limited by the physical
-limits of the host (number of open files, amount of memory) there is a
-software limit in the IRAF virtual operating system of about 120 separate
-images which may be combined.  To combine more images one may combine smaller
-groups and then combine those or one may stack the images into a higher
-dimensional image using \fBimstack\fR and use the \fIproject\fR option.
-.ih
-REVISIONS
-.ls COMBINE V2.10.3
-The output pixel datatype parameter, \fIouttype\fR was previously ignored
-and the package \fIpixeltype\fR was used.  The task output pixel type
-parameter is now used.
-.le
+Though the previous limit on the number of images that can be combined
+was removed in V2.11 the method has the limitation that only a single
+bad pixel mask will be used for all images.
 .ih
 SEE ALSO
 image.imcombine, instruments, ccdtypes, icfit, ccdred, guide, darkcombine,

@@ -62,7 +62,7 @@ begin
 
 	    # Search for nearest point in-use.
 	    j = 0
-	    r2min = MAX_DOUBLE
+	    r2min = MAX_REAL
 	    do i = 1, npts {
 		index = PDM_SORT(pdmp,i)
 	        if (PDM_INUSE(pdmp,index) == 0)

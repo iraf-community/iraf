@@ -4,6 +4,8 @@
  * compiler and with <iraf.h> and <mach.h>.
  */
 
+#ifndef D_spp
+
 /* Assorted machine constants. [MACHDEP]
  * Use osb$zzeps.f to compute the machine epsilon.
  */
@@ -20,31 +22,36 @@
 #define	INDEFL		(0x80000001)
 #define	INDEFI		INDEFL
 #define	INDEFR		1.6e38
-#define	INDEFD		1.6e38
+#define	INDEFD		1.6e308
 #define	INDEFX		(INDEF,INDEF)
 #define	INDEF		INDEFR
 
 
 /* Oft used constants.
  */
-#define	SZ_LINE		161
-#define	SZ_FNAME	63
-#define	SZ_PATHNAME	127
-#define	SZ_COMMAND	1024
+#define	SZ_LINE		1023
+#define	SZ_FNAME	255
+#define	SZ_PATHNAME	511
+#define	SZ_COMMAND	2047
 #define	EOS		'\0'
 #define	ERR		(-1)
 #define	OK		0
 #define	YES		1
 #define	NO		0
 #define	MAX_DIGITS	25
+
+#ifndef min
 #define	min(a,b)	(((a)<(b))?(a):(b))
+#endif
+#ifndef max
 #define	max(a,b)	(((a)>(b))?(a):(b))
+#endif
 
-# ifndef NULL
+#ifndef NULL
 #define	NULL		0
-# endif
+#endif
 
-# ifndef EOF
+#ifndef EOF
 #define	EOF		(-1)
 #endif
 
@@ -63,13 +70,13 @@
 
 /* SPP datatypes. (potentially MACHDEP)
  */
-# ifndef XCHAR
+#ifndef XCHAR
 #define	XCHAR		short
-# endif
+#endif
 
-# ifndef XINT
+#ifndef XINT
 #define	XINT		int
-# endif
+#endif
 
 #define	PKCHAR		XCHAR
 #define XUBYTE		unsigned char
@@ -137,4 +144,6 @@ struct cplx {
 XCHAR	*c_sppstr();
 XCHAR	*c_strupk();
 char	*c_strpak();
+
 #define	D_spp
+#endif

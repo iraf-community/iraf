@@ -83,7 +83,7 @@ begin
 	# Set the graphics mode depending on whether we are appending to a plot
 	# or starting a new plot.
 	do_fill = clgetb ("fill")
-	if (clgetb ("append")) 
+	if (clgetb ("overplot")) 
 	    mode = APPEND
 	else
 	    mode = NEW_FILE
@@ -92,7 +92,7 @@ begin
 	call clgstr ("device", Memc[device], SZ_FNAME)
 
 	# If we are appending, get the previous viewing parameters.
-	if (mode == APPEND) {
+	if (clgetb ("append")) {
 
 	    gp = gopen (Memc[device], APPEND, STDGRAPH)
 	    call ggview (gp, vl, vr, vb, vt)
@@ -107,7 +107,7 @@ begin
 	    vb = clgetr ("vb")
 	    vt = clgetr ("vt")
 	    call wl_imd_viewport (frame, im, c1, c2, l1, l2, vl, vr, vb, vt)
-	    gp = gopen (Memc[device], NEW_FILE, STDGRAPH)
+	    gp = gopen (Memc[device], mode, STDGRAPH)
 
 	# Otherwise set up a standard viewport.
 	} else {
@@ -115,7 +115,7 @@ begin
 	    vr = clgetr ("vr")
 	    vb = clgetr ("vb")
 	    vt = clgetr ("vt")
-	    gp = gopen (Memc[device], NEW_FILE, STDGRAPH)
+	    gp = gopen (Memc[device], mode, STDGRAPH)
 	}
 
 	# Set the viewport.

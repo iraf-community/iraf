@@ -1,5 +1,91 @@
 .help revisions Jun88 noao.astutil
 .nf
+pdm/pdmdelete.x
+    The statement "r2min = MAX_DOUBLE" was changed to "r2min=MAX_REAL"
+    since r2min is declared and used as real.  (10/6/97, Valdes)
+
+=====
+V2.11
+=====
+
+pdm/pdmtheta.x
+pdm/pdmthetaran.x
+pdm/t_pdm.x
+doc/pdm.hlp
+pdm.par
+    1.	The theta calculation was incorrect when there is less than 100 input
+	data points.  In that case overlapping bins are used and the
+	calculation failed to account for this.
+    2.  Removed the debug option.
+    3.  Updated help including documentation of the "pluspoint" parameter.
+    (10/1/96, Valdes)
+
+t_setjd.x
+setjd.hlp
+    Improved error checking and interpretation of the epoch keyword.
+    If an epoch keyword is specified and the keyword is not found
+    or can't be interpreted it is an error.  If the epoch is an unlikely
+    value a warning is printed.  If the epoch begins with B or J (case
+    insensitive) that is ok.  (8/30/96, Valdes)
+
+rvcorrect.par
+doc/rvcorrect.par
+	Forgot to add the keywpars pset declaration.  (8/26/96  MJF)
+
+astfunc.x
+    Added btoi function "iresult = btoi (O_VALC(args[1])=='y'..."
+    (6/3/96, Tody)
+
+astradius.cl	+
+astradius.dat	+
+doc/astradius.hlp +
+astutil.cl
+astutil.men
+astutil.hd
+    A new script task, ASTRADIUS, was written that is based on ASTCALC.
+    It finds and prints all images from an image list that have coordinates
+    within a specified radius of a specified coordinate.  (1/24/96, Valdes)
+
+t_astcalc.x	+
+astcalc.par	+
+x_astutil.x
+astutil.cl
+astutil.men
+astutil.hd
+mkpkg
+doc/astcalc.hlp	+
+    A new task, ASTCALC, was written that uses a greatly enhanced syntax
+    from that of the original t_asthedit.  It includes assignment statements,
+    simple conditional statements, and expressions without assignment.
+    Variables are implemented with a symbol table.  Image, text file,
+    and CL parameter I/O is done with function calls in the
+    expression evaluator.
+    (1/24/96, Valdes)
+
+t_asthedit.x
+asthedit.par
+mkpkg
+doc/asthedit.hlp
+    The task ASTHEDIT was revised to use a greatly enhanced syntax.  
+    Internally it is significantly different but functionally it
+    is similar.  A new parameter, update, was added to allow images
+    to be used which are read-only or not to be modified.  The
+    task allows a null image list so that it can be used as a calculator.
+    (1/24/96, Valdes)
+
+astfunc.x	+
+astfunc.h	+
+    The function evaluator from t_asthedit.x was extracted to a separate
+    file.  The set of functions was increased, primarily with the
+    addition of I/O functions for printing, imio, fio, clio, fmtio,
+    and errors.  These functions are organized in a subfunction
+    procedure. (1/24/96, Valdes)
+
+airmass.x
+t_setairmass.x
+    Moved the airmass procedure from t_setairmass.x to airmass.x.
+    (1/23/96, Valdes)
+
 astutil$t_obs.x
 astutil$t_asttimes.x
 astutil$observatory.par

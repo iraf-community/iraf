@@ -18,6 +18,21 @@ extern	wf_gls_init(), wf_gls_fwd(), wf_gls_inv()
 extern	wf_sin_init(), wf_sin_fwd(), wf_sin_inv()
 extern	wf_msp_init(), wf_msp_fwd(), wf_msp_inv(), wf_msp_destroy()
 
+extern	wf_ait_init(), wf_ait_fwd(), wf_ait_inv()
+extern	wf_car_init(), wf_car_fwd(), wf_car_inv()
+extern	wf_csc_init(), wf_csc_fwd(), wf_csc_inv()
+extern	wf_mer_init(), wf_mer_fwd(), wf_mer_inv()
+extern	wf_mol_init(), wf_mol_fwd(), wf_mol_inv()
+extern	wf_par_init(), wf_par_fwd(), wf_par_inv()
+extern	wf_pco_init(), wf_pco_fwd(), wf_pco_inv()
+extern	wf_qsc_init(), wf_qsc_fwd(), wf_qsc_inv()
+extern	wf_stg_init(), wf_stg_fwd(), wf_stg_inv()
+extern	wf_tsc_init(), wf_tsc_fwd(), wf_tsc_inv()
+extern	wf_zea_init(), wf_zea_fwd(), wf_zea_inv()
+
+extern	wf_zpx_init(), wf_zpx_fwd(), wf_zpx_inv(), wf_zpx_destroy()
+extern	wf_tnx_init(), wf_tnx_fwd(), wf_tnx_inv(), wf_tnx_destroy()
+
 bool	first_time
 data	first_time /true/
 errchk	wf_fnload
@@ -48,8 +63,42 @@ begin
 	call wf_fnload ("sin", F_RADEC,
 	    locpr(wf_sin_init), NULL, locpr(wf_sin_fwd), locpr(wf_sin_inv))
 
-	call wf_fnload ("multispec", F_RADEC, locpr(wf_msp_init),
-	    locpr(wf_msp_destroy), locpr(wf_msp_fwd), locpr(wf_msp_inv))
+	# Custom IRAF WCS for images containing multiple spectra.
+	call wf_fnload ("multispec", F_RADEC,
+	    locpr(wf_msp_init), locpr(wf_msp_destroy), locpr(wf_msp_fwd),
+	    locpr(wf_msp_inv))
+
+	# Most of the following are from G&C (also GLS above).
+	call wf_fnload ("ait", F_RADEC,
+	    locpr(wf_ait_init), NULL, locpr(wf_ait_fwd), locpr(wf_ait_inv))
+	call wf_fnload ("car", F_RADEC,
+	    locpr(wf_car_init), NULL, locpr(wf_car_fwd), locpr(wf_car_inv))
+	call wf_fnload ("csc", F_RADEC,
+	    locpr(wf_csc_init), NULL, locpr(wf_csc_fwd), locpr(wf_csc_inv))
+	call wf_fnload ("mer", F_RADEC,
+	    locpr(wf_mer_init), NULL, locpr(wf_mer_fwd), locpr(wf_mer_inv))
+	call wf_fnload ("mol", F_RADEC,
+	    locpr(wf_mol_init), NULL, locpr(wf_mol_fwd), locpr(wf_mol_inv))
+	call wf_fnload ("par", F_RADEC,
+	    locpr(wf_par_init), NULL, locpr(wf_par_fwd), locpr(wf_par_inv))
+	call wf_fnload ("pco", F_RADEC,
+	    locpr(wf_pco_init), NULL, locpr(wf_pco_fwd), locpr(wf_pco_inv))
+	call wf_fnload ("qsc", F_RADEC,
+	    locpr(wf_qsc_init), NULL, locpr(wf_qsc_fwd), locpr(wf_qsc_inv))
+	call wf_fnload ("stg", F_RADEC,
+	    locpr(wf_stg_init), NULL, locpr(wf_stg_fwd), locpr(wf_stg_inv))
+	call wf_fnload ("tsc", F_RADEC,
+	    locpr(wf_tsc_init), NULL, locpr(wf_tsc_fwd), locpr(wf_tsc_inv))
+	call wf_fnload ("zea", F_RADEC,
+	    locpr(wf_zea_init), NULL, locpr(wf_zea_fwd), locpr(wf_zea_inv))
+
+	# Experimental WCS for astrometric approximations.
+	call wf_fnload ("zpx", F_RADEC,
+	    locpr(wf_zpx_init), locpr(wf_zpx_destroy), locpr(wf_zpx_fwd),
+	    locpr(wf_zpx_inv))
+	call wf_fnload ("tnx", F_RADEC,
+	    locpr(wf_tnx_init), locpr(wf_tnx_destroy), locpr(wf_tnx_fwd),
+	    locpr(wf_tnx_inv))
 end
 
 

@@ -7,11 +7,12 @@ include	"stf.h"
 # STF_DELETE -- Delete an image.  A special operator is required since the
 # image is stored as two files.
 
-procedure stf_delete (root, extn, status)
+procedure stf_delete (kernel, root, extn, status)
 
-char	root[ARB]		# root filename
-char	extn[ARB]		# header file extension
-int	status
+int	kernel			#I IKI kernel
+char	root[ARB]		#I root filename
+char	extn[ARB]		#U header file extension
+int	status			#O return value
 
 pointer	sp
 pointer	hdr_fname, pix_fname
@@ -34,6 +35,6 @@ begin
 		call erract (EA_WARN)
 	}
 
-	call sfree (sp)
 	status = OK
+	call sfree (sp)
 end

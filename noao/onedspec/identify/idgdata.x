@@ -2,6 +2,7 @@ include	<imhdr.h>
 include	<imio.h>
 include	<pkg/gtools.h>
 include	<smw.h>
+include	<units.h>
 include	"identify.h"
 
 define	SZ_TITLE	320	# Size of long string for title.
@@ -31,14 +32,18 @@ begin
 	    ID_LINE(id,2) = 1
 	call shdr_open (im, mw, ID_LINE(id,1), ID_LINE(id,2),
 	    INDEFI, SHDATA, sh)
+	if (ID_UN(id) != NULL) {
+	    iferr (call shdr_units (sh, UN_UNITS(ID_UN(id))))
+		;
+	}
 	ID_AP(id,1) = AP(sh)
 	ID_AP(id,2) = ID_LINE(id,2)
 	ID_NPTS(id) = SN(sh)
-	call id_dbsection (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
-	     Memc[ID_SECTION(id)], SZ_FNAME)
+	call id_dbsection (id, ID_IMAGE(id), ID_AP(id,1),
+	     ID_SECTION(id), ID_LENSTRING)
 	call sprintf (Memc[str], SZ_TITLE, "identify %s%s\n%s")
-	    call pargstr (Memc[ID_IMAGE(id)])
-	    call pargstr (Memc[ID_SECTION(id)])
+	    call pargstr (ID_IMAGE(id))
+	    call pargstr (ID_SECTION(id))
 		call pargstr (TITLE(sh))
 	call gt_sets (ID_GT(id), GTTITLE, Memc[str])
 

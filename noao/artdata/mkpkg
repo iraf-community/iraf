@@ -36,4 +36,5 @@ libpkg.a:
 	t_mknoise.x	<error.h> <imhdr.h> <mach.h>
 	t_mkobjects.x	<error.h> <imhdr.h> <math.h> <mach.h>
 	t_mkpattern.x	<error.h> <imhdr.h>
+	voigt.x
 	;

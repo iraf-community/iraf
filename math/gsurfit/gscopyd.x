@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include "dgsurfitdef.h"
 
 # GSCOPY -- Procedure to copy the fit from one surface into another.

@@ -1,8 +1,8 @@
 # QPEX.H -- QPOE expression evaluator definitions.
 
 # Size limiting definitions.
-define	DEF_PROGBUFLEN		8192	# default program buffer length, ints
-define	DEF_DATABUFLEN		32768	# default data buffer length, chars
+define	DEF_PROGBUFLEN		65536	# default program buffer length, ints
+define	DEF_DATABUFLEN		65536	# default data buffer length, chars
 define	DEF_SZEXPRBUF		2048	# default size expression buffer
 define	INC_SZEXPRBUF		2048	# increment if overflow
 define	DEF_XLEN		256	# default (initial) range buffer size

@@ -21,6 +21,7 @@ mathgen:
 	$call interp
 	$call llsq
 	$call nlfit
+	$call slalib
 	$call surfit
 	$purge lib$
 	;
@@ -79,6 +80,12 @@ nlfit:
 	$update   libnlfit.a
 	$checkin  libnlfit.a lib$
 	;
+slalib:
+	$echo "-------------- LIBSLALIB ----------------"
+	$checkout libslalib.a lib$
+	$update   libslalib.a
+	$checkin  libslalib.a lib$
+	;
 surfit:
 	$echo "-------------- LIBSURFIT ----------------"
 	$checkout libsurfit.a lib$
@@ -120,6 +127,10 @@ libllsq.a:				# Lawson and Hanson Least Squares pkg
 
 libnlfit.a:                             # Levenberg-Marquardt fitting package
 	@nlfit
+	;
+
+libslalib.a:				# Starlink positional astronomy library
+	@slalib
 	;
 
 libsurfit.a:				# Surface fitting on an even grid

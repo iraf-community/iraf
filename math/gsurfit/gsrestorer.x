@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include "gsurfitdef.h"
 
 # GSRESTORE -- Procedure to restore the surface fit stored by GSSAVE
@@ -10,9 +9,7 @@ include "gsurfitdef.h"
 # pieces in x), yorder (or number of polynomial pieces in y), xterms,
 # xmin, xmax and ymin and ymax, are stored in the first
 # eight elements of the real array fit, followed by the GS_NCOEFF(sf)
-# surface coefficients. The coefficient of B(i,x) * B(j,y)
-# is stored in element number 6 + (j - 1) * GS_NXCOEFF(sf) + i of the
-# array fit.
+# surface coefficients.
 
 procedure gsrestore (sf, fit)
 
@@ -20,7 +17,7 @@ pointer	sf		# surface descriptor
 real	fit[ARB]	# array containing the surface parameters and
 			# coefficients
 
-int	surface_type, xorder, yorder
+int	surface_type, xorder, yorder, order
 real	xmin, xmax, ymin, ymax	
 
 begin
@@ -51,19 +48,25 @@ begin
 	    GS_XORDER(sf) = xorder
 	    GS_XMIN(sf) = xmin
 	    GS_XMAX(sf) = xmax
-	    GS_XRANGE(sf) = 2. / (xmax - xmin)
-	    GS_XMAXMIN(sf) =  - (xmax + xmin) / 2.
+	    GS_XRANGE(sf) = real(2.0) / (xmax - xmin)
+	    GS_XMAXMIN(sf) =  - (xmax + xmin) / real(2.0)
 	    GS_NYCOEFF(sf) = yorder
 	    GS_YORDER(sf) = yorder
 	    GS_YMIN(sf) = ymin
 	    GS_YMAX(sf) = ymax
-	    GS_YRANGE(sf) = 2. / (ymax - ymin)
-	    GS_YMAXMIN(sf) =  - (ymax + ymin) / 2.
+	    GS_YRANGE(sf) = real(2.0) / (ymax - ymin)
+	    GS_YMAXMIN(sf) =  - (ymax + ymin) / real(2.0)
 	    GS_XTERMS(sf) = GS_SAVEXTERMS(fit)
-	    if (GS_XTERMS(sf) == NO)
+	    switch (GS_XTERMS(sf)) {
+	    case GS_XNONE:
 		GS_NCOEFF(sf) = GS_NXCOEFF(sf) + GS_NYCOEFF(sf) - 1
-	    else
+	    case GS_XHALF:
+		order = min (xorder, yorder)
+		GS_NCOEFF(sf) = GS_NXCOEFF(sf) * GS_NYCOEFF(sf) - order *
+		    (order - 1) / 2
+	    case GS_XFULL:
 		GS_NCOEFF(sf) = GS_NXCOEFF(sf) * GS_NYCOEFF(sf)
+	    }
 	default:
 	    call error (0, "GSRESTORE: Unknown surface type.")
 	}

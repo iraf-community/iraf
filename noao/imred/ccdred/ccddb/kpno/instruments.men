@@ -1,6 +1,7 @@
 direct          Current headers for Sun plus CCDPROC setup for direct CCD
 specphot        Current headers for Sun plus CCDPROC setup for spectropho-
                   tometry, ie GoldCam, barefoot CCD
+hydra           WIYN Hydra with Arcon
 foe             Current headers for Sun plus CCDPROC setup for FOE
 fibers          Current headers for Sun plus CCDPROC setup for fiber array
 coude           Current headers for Sun plus CCDPROC setup for Coude

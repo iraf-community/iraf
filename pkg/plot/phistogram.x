@@ -98,8 +98,18 @@ begin
 		nbins = nbins + 1
 	    z2 = z1 + nbins * dz
 	}
-	z1i = nint (z1)
-	z2i = nint (z2)
+
+	# Set the integer defaults.
+	if (isimage == YES) {
+	    switch (IM_PIXTYPE(im)) {
+	    case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
+	        z1i = nint (z1)
+	        z2i = nint (z2)
+	        z1 = real (z1i)
+	        z2 = real (z2i)
+	    }
+	}
+
 
 	# Adjust the resolution of the histogram and/or the data range
 	# so that an integral number of data values map into each

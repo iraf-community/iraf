@@ -105,9 +105,16 @@ named file.
 A verbose version of "show" which includes the fitted coefficients and their
 errors.
 .le
+.ls :evaluate <value>
+Evaluate the fit at the specified value and print the result on the status
+line.
+.le
 .ls :xyshow [file]
-A version of "show" which lists the input independent (X), fitted (Y fit), and
-input dependent (Y) data values.
+List the independent (X), dependent (y), fitted (Y fit), and weight values.
+The output may be listed on the screen or to a file.  Note that if the
+original input is combined into composit points (\fInaverage\fR not 1)
+then the values are for the composite points.  Deleted points will have
+a weight of zero.
 .le
 .ls :errors [file]
 Show the fitted function and square root of the chi square of the fit.
@@ -124,6 +131,11 @@ polynomial or linear or cubic spline.
 .ls :grow [value]
 Show the current value or set the rejection growing radius.  Any points within
 this distance of rejected points are also rejected.
+.le
+.ls :color [value=0-9]
+Color of fit where 0=background (invisible), 1=foreground, and higher
+numbers depend on the graphics device.  Note that this applies to the
+fit and to change the color of the data use ":/color".
 .le
 .ls :markrej [value]
 Mark rejected points?  If there are many rejected points then it might be
@@ -203,6 +215,14 @@ characters), initial sample regions input with a CL parameter are limited
 to this smaller length string.  The limitation may be escaped by using
 the new capability of specifying a file containing ranges.  Also sample
 regions initialize by a task parameter may be extended interactively.
+.ih
+REVISIONS
+.ls ICFIT V2.11
+The :xyshow output was modified to 1) not include colon labels,
+2) print (X, Y, Y fit, Weight) instead of (X, Y fit, Y), and 3)
+the printed values are those actually used in the fit when using
+composite points (naverage not 1).
+.le
 .ih
 SEE ALSO
 gtools

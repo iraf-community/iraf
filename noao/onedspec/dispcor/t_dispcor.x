@@ -6,6 +6,7 @@ include	<mwset.h>
 include	"dispcor.h"
 include	"dctable.h"
 include	<smw.h>
+include	<units.h>
  
 # Spectra formats
 define	MULTISPEC	1
@@ -29,7 +30,7 @@ int	imtopenp(), imtgetim(), errcode()
 pointer	sp, input, output, str, err, stp, table
 pointer	im, smw, ap, immap(), smw_openim()
 bool	clgetb()
-errchk	open, immap, smw_openim, dc_gms, dc_gec
+errchk	open, immap, smw_openim, dc_gms, dc_gec, dc_multispec, dc_echelle
  
 begin
 	call smark (sp)
@@ -182,7 +183,7 @@ pointer	sp, temp, str, out, mwout, cti, cto, indata, outdata
 pointer	immap(), imgl3r(), impl3r()
 pointer	mw_open(), smw_sctran()
 bool	clgetb(), streq()
-errchk	immap, mw_open, smw_open
+errchk	immap, mw_open, smw_open, dispcor, imgl3r, impl3r
 
 data	axis/1,2/
  
@@ -269,8 +270,11 @@ begin
 		i = 2
 	    mwout = mw_open (NULL, i)
 	    call mw_newsystem (mwout, "multispec", i)
-	    call mw_swtype (mwout, axis, 2, "multispec",
-		"label=Wavelength units=Angstroms")
+	    call mw_swtype (mwout, axis, 2, "multispec", "")
+	    if (UN_LABEL(DC_UN(ap,1)) != EOS)
+		call mw_swattrs (mwout, 1, "label", UN_LABEL(DC_UN(ap,1)))
+	    if (UN_UNITS(DC_UN(ap,1)) != EOS)
+		call mw_swattrs (mwout, 1, "units", UN_UNITS(DC_UN(ap,1)))
 	    if (i == 3)
 		call mw_swtype (mwout, 3, 1, "linear", "")
 	    call smw_open (mwout, NULL, out)
@@ -349,7 +353,7 @@ pointer	sp, temp, str, out, mwout, cti, cto, indata, outdata
 pointer	immap(), imgl3r(), impl3r()
 pointer	mw_open(), smw_sctran()
 bool	clgetb(), streq()
-errchk	immap, mw_open, smw_open
+errchk	immap, mw_open, smw_open, dispcor, imgl3r, impl3r
 
 data	axis/1,2/
  
@@ -417,8 +421,11 @@ begin
 		i = 2
 	    mwout = mw_open (NULL, i)
 	    call mw_newsystem (mwout, "multispec", i)
-	    call mw_swtype (mwout, axis, 2, "multispec",
-		"label=Wavelength units=Angstroms")
+	    call mw_swtype (mwout, axis, 2, "multispec", "")
+	    if (UN_LABEL(DC_UN(ap,1)) != EOS)
+		call mw_swattrs (mwout, 1, "label", UN_LABEL(DC_UN(ap,1)))
+	    if (UN_UNITS(DC_UN(ap,1)) != EOS)
+		call mw_swattrs (mwout, 1, "units", UN_UNITS(DC_UN(ap,1)))
 	    if (i == 3)
 		call mw_swtype (mwout, 3, 1, "linear", "")
 	    call smw_open (mwout, NULL, out)

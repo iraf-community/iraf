@@ -4,9 +4,9 @@ proto		# bscale
 
 s1 = envget ("min_lenuserarea")
 if (s1 == "")
-    reset min_lenuserarea = 40000
-else if (int (s1) < 40000)
-    reset min_lenuserarea = 40000
+    reset min_lenuserarea = 100000
+else if (int (s1) < 100000)
+    reset min_lenuserarea = 100000
  
 package specred
 
@@ -22,6 +22,7 @@ task	proc		= "srcfibers$proc.cl"
 task	fibresponse	= "srcfibers$fibresponse.cl"
 task	arcrefs		= "srcfibers$arcrefs.cl"
 task	doarcs		= "srcfibers$doarcs.cl"
+task	doalign		= "srcfibers$doalign.cl"
 task	skysub		= "srcfibers$skysub.cl"
 task	batch		= "srcfibers$batch.cl"
 task	getspec		= "srcfibers$getspec.cl"
@@ -32,7 +33,8 @@ task	apscript	= "srcfibers$x_apextract.e"
 task	msresp1d	= "specred$msresp1d.cl"
 
 # Onedspec tasks
-task	calibrate,
+task	autoidentify,
+	calibrate,
 	continuum,
 	deredden,
 	dispcor,
@@ -48,10 +50,13 @@ task	calibrate,
 	sfit,
 	sflip,
 	slist,
+	skytweak,
 	specplot,
 	specshift,
 	splot,
-	standard	= "onedspec$x_onedspec.e"
+	standard,
+	telluric	= "onedspec$x_onedspec.e"
+task	aidpars		= "onedspec$aidpars.par"
 task	bplot		= "onedspec$bplot.cl"
 task	scopy		= "onedspec$scopy.cl"
 task	dispcor1	= "onedspec$dispcor1.par"
@@ -89,7 +94,7 @@ task	setairmass,
 
 # Hide tasks from the user
 hidetask apparams, apall1, apfit1, apflat1, apnorm1, apscat1, apscat2, dispcor1
-hidetask sparams, params
+hidetask sparams, params, doalign
 hidetask apscript, proc, batch, arcrefs, doarcs, getspec, listonly, fibresponse
 
 clbye

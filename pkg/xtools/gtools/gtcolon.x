@@ -10,7 +10,7 @@ define	PROMPT	"graph format options"
 define	COMMANDS "|/xwindow|/ywindow|/xtransform|/ytransform|/title|/xlabel|\
 	|/ylabel|/xunits|/yunits|/comments|/help|/redraw|/subtitle|/xsize|\
 	|/ysize|/parameters|/type|/mark|/line|/transpose|/sysid|/color|\
-	|/xflip|/yflip|"
+	|/xflip|/yflip|/drawtitle|/drawxlabels|/drawylabels|"
 
 define	XWINDOW		1	# Set X window limits
 define	YWINDOW		2	# Set Y window limits
@@ -39,6 +39,9 @@ define	COLOR		24	# Set color
 #	newline		25
 define	XFLIP		26	# Toggle x flip
 define	YFLIP		27	# Toggle y flip
+define	DRAWTITLE	28	# Draw title?
+define	DRAWXLABELS	29	# Draw X label?
+define	DRAWYLABELS	30	# Draw Y label?
 
 
 # GT_COLON -- Process standard gtools colon commands.
@@ -229,6 +232,33 @@ begin
 	    else {
 		call printf ("sysid = %b\n")
 		    call pargi (gt_geti (gt, GTSYSID))
+	    }
+
+	case DRAWTITLE: # /drawtitle: Draw title?
+	    call gargb (bval)
+	    if (nscan() == 2)
+		call gt_seti (gt, GTDRAWTITLE, btoi (bval))
+	    else {
+		call printf ("drawtitle = %b\n")
+		    call pargi (gt_geti (gt, GTDRAWTITLE))
+	    }
+
+	case DRAWXLABELS: # /drawxlabels: draw x labels?
+	    call gargb (bval)
+	    if (nscan() == 2)
+		call gt_seti (gt, GTDRAWXLABELS, btoi (bval))
+	    else {
+		call printf ("drawxlabels = %b\n")
+		    call pargi (gt_geti (gt, GTDRAWXLABELS))
+	    }
+
+	case DRAWYLABELS: # /drawylabels: draw y labels?
+	    call gargb (bval)
+	    if (nscan() == 2)
+		call gt_seti (gt, GTDRAWYLABELS, btoi (bval))
+	    else {
+		call printf ("drawylabels = %b\n")
+		    call pargi (gt_geti (gt, GTDRAWYLABELS))
 	    }
 
 	case COLOR: # /color: line/mark color

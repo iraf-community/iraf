@@ -35,7 +35,7 @@ libsys.a:
 	mtparse.x	mtio.h <config.h> <ctype.h>
 	mtpos.x	mtio.h
 	mtrdlock.x	mtio.com mtio.h <config.h>
-	mtrewind.x	mtio.h
+	mtrewind.x	mtio.h <error.h>
 	mtskip.x	<fset.h>
 	mtstatus.x	
 	mtupdlock.x	mtio.com mtio.h <config.h> <knet.h> <mach.h>

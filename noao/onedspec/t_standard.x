@@ -129,6 +129,7 @@ begin
 		call imunmap (IM(sh))
 		next
 	    }
+	    call shdr_units (sh, "angstroms")
 	    if (IS_INDEF (IT(sh))) {
 		call printf ("%s: ")
 		    call pargstr (Memc[image])
@@ -149,6 +150,7 @@ begin
 		call shdr_open (im, mw, line, 1, INDEFI, SHDATA, sh)
 		if (!rng_elementi (aps, AP(sh)))
 		    next
+		call shdr_units (sh, "angstroms")
 
 		if (!bswitch || OFLAG(sh) == OBJ) {
 		    call printf ("%s%s(%d): %s\n")
@@ -577,17 +579,24 @@ real	flux			# Bandpass flux
 
 int	i, i1, i2, ierr
 real	a, e, ec, x1, x2
-double	shdr_wl()
+double	w1, w2, w3, w4, shdr_lw(), shdr_wl()
 pointer	x, y
 
 begin
 	# Determine bandpass limits in pixel and return if out of bounds.
-	a = shdr_wl (sh, double(wave-dwave/2))
-	x2 = shdr_wl (sh, double(wave+dwave/2))
+	w1 = wave - dwave / 2.
+	w2 = wave + dwave / 2.
+	w3 = shdr_lw (sh, 0.5D0)
+	w4 = shdr_lw (sh, double (SN(sh)+0.5))
+	if (w1 < min (w3, w4) || w2 > max (w3, w4)) 
+	    return (0.)
+
+	a = shdr_wl (sh, w1)
+	x2 = shdr_wl (sh, w2)
 	x1 = min (a, x2)
 	x2 = max (a, x2)
 	i1 = nint (x1)
-	i2 = nint (x2)
+	i2 = nint (x2 - 0.00001)
 	if (x1 == x2 || i1 < 1 || i2 > SN(sh))
 	    return (0.)
 

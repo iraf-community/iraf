@@ -12,7 +12,7 @@ alloc:
 	;
 
 libos.a:
-	$set XFLAGS = "-c $(HSI_XF)"
+	$set XFLAGS = "-cd $(HSI_XF)"
 
 	"as$zsvjmp.s"
 	#"as$enbint.s"
@@ -77,6 +77,8 @@ libos.a:
 	zshlib.c
 	zwmsec.c	<libc/kernel.h> <libc/spp.h>
 	zxwhen.c	<libc/kernel.h> <libc/spp.h>
+	zzexit.c	<libc/spp.h>
+	zzpstr.c	<libc/spp.h>
 	zzsetk.c	<libc/spp.h>
 	zzstrt.c
 	;

@@ -309,6 +309,7 @@ new_	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 					call pargi (apid)
 				} else {
 				    AP_ID(Memi[aps+current-1]) = apid
+				    call ap_ids (Memi[aps+current-1], 1, ids)
 				    break
 				}
 			    }

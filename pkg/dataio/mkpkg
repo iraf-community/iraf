@@ -21,6 +21,8 @@ install:
 
 libpkg.a:
 	@lib
+	@export
+	@import
 	@imtext
 	@reblock
 	@fits

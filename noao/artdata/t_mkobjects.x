@@ -53,7 +53,7 @@ pointer	mko, mkt
 long	clgetl(), clktime()
 bool	clgetb(), streq()
 int	imtopenp(), imtlen(), imtgetim(), btoi()
-int	clgeti(), open(), fscan(), nscan(), imaccess()
+int	clgeti(), open(), fscan(), nscan()
 real	clgetr()
 pointer	immap(), imgl2r(), impl2r()
 pointer	mkt_star(), mkt_object()
@@ -95,6 +95,8 @@ begin
 	exptime = clgetr ("exptime")
 	m0 = clgetr ("magzero")
 	seed = clgetl ("seed")
+	if (IS_INDEFL(seed))
+	    seed = clktime (long (0))
 	cmmts = clgetb ("comments")
 
 	background = exptime * background
@@ -120,11 +122,7 @@ begin
 
 	    # Map images.  Check for new, existing, and in-place images.
 	    if (streq (Memc[input], Memc[output])) {
-		if (imaccess (Memc[input], 0) == YES) {
-		    iferr (out = immap (Memc[output], READ_WRITE, LEN_UA)) {
-			call erract (EA_WARN)
-			next
-		    }
+		ifnoerr (out = immap (Memc[output], READ_WRITE, LEN_UA)) {
 		    in = out
 		    new = false
 		} else {

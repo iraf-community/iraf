@@ -38,7 +38,7 @@
 /* Size limiting definitions.
  */
 #define MAX_TASKS	100	/* max no. of tasks we can handle	*/
-#define SZ_OBUF		50000	/* buffers procedure body		*/
+#define SZ_OBUF		131072	/* buffers procedure body		*/
 #define SZ_DBUF		4096	/* for errchk, common, ect. decls	*/
 #define SZ_SBUF		8192	/* buffers text of strings		*/
 #define MAX_STRINGS	256	/* max strings in a procedure		*/
@@ -194,6 +194,8 @@ popcontext()
 /* Keyword table.  The simple hashing scheme requires that the keywords appear
  * in the table in sorted order.
  */
+#define LEN_KWTBL	18
+
 struct {
 	char	*keyw;		/* keyword name string			*/
 	short	opcode;		/* opcode from above definitions	*/
@@ -201,6 +203,8 @@ struct {
 				 * to get to next character class.
 				 */
 } kwtbl[] = {
+	"FALSE",	XTY_FALSE,	0,
+	"TRUE",		XTY_TRUE,	0,
 	"bool",		XTY_BOOL,	0,
 	"char",		XTY_CHAR,	1,
 	"complex",	XTY_COMPLEX,	0,
@@ -219,8 +223,12 @@ struct {
 	"true",		XTY_TRUE,	0,
 	};
 
-short	kwindex[30];		/* simple alphabetic hash index		*/
-#define CINDEX(ch)		(isupper(ch)?ch-'A':ch-'a')
+/* short kwindex[30];		simple alphabetic hash index		*/
+/* #define CINDEX(ch)		(isupper(ch)?ch-'A':ch-'a')		*/
+
+#define MAXCH 128
+short	kwindex[MAXCH];		/* simple alphabetic hash index		*/
+#define CINDEX(ch)		(ch)
 
 
 /* HASHTBL -- Hash the keyword table.  Initializes the "kwindex" hash table.
@@ -232,10 +240,10 @@ hashtbl()
 {
 	int	i, j;
 
-	for (i=j=0;  i <= CINDEX('z');  i++) {
+	for (i=j=0;  i <= MAXCH;  i++) {
 	    if (i == CINDEX (kwtbl[j].keyw[0])) {
 		kwindex[i] = j;
-		j = min (MAX_KEY-1, j + kwtbl[j].nelem + 1);
+		j = min (LEN_KWTBL-1, j + kwtbl[j].nelem + 1);
 	    } else
 		kwindex[i] = -1;
 	}
@@ -254,7 +262,7 @@ findkw()
 	    hashtbl();
 
 	i = CINDEX (yytext[0]);
-	if (i < 0 || i > ('z'-'a') || (i = kwindex[i]) < 0)
+	if (i < 0 || i >= MAXCH || (i = kwindex[i]) < 0)
 	    return (ERR);
 	ilimit = i + kwtbl[i].nelem;
 
@@ -264,8 +272,10 @@ findkw()
 
 	    for (;  *p != EOS;  q++, p++) {
 		ch = *q;
+		/* 5DEC95 - Don't case convert keywords.
 		if (isupper (ch))
 		    ch = tolower (ch);
+		 */
 		if (*p != ch)
 		    break;
 	    }
@@ -1150,7 +1160,7 @@ begin_code()
 	 * have a missing END.
 	 */
 	if (context & BODY)
-	    warn ("Unmatched BEGIN statement");
+	    xpp_warn ("Unmatched BEGIN statement");
 
 	/* Set context flag noting that we are processing the body of a 
 	 * procedure.  Output the BEGIN statement, for the benefit of the
@@ -1564,7 +1574,7 @@ char	delim;
 
 	    } else if (*op == '\n') {		/* error recovery exit	*/
 		unput ('\n');
-		warn ("Newline while processing string");
+		xpp_warn ("Newline while processing string");
 		break;
 
 	    } else if (*op == '\\') {
@@ -1572,6 +1582,7 @@ char	delim;
 		    break;
 		} else if (*op == '\n') {
 		    --op;			/* explicit continuation */
+		    linenum[istkptr]++;
 		    continue;
 		} else if ((cp = index (esc_ch, *op)) != NULL) {
 		    *op = esc_val[cp-esc_ch];
@@ -1608,11 +1619,11 @@ char	*errmsg;
 }
 
 
-/* WARN -- Output a warning message.  Do not set exit flag since this is only
- * a warning message; linking should occur if there are not any more serious
- * errors.
+/* XPP_WARN -- Output a warning message.  Do not set exit flag since this is
+ * only a warning message; linking should occur if there are not any more
+ * serious errors.
  */
-warn (warnmsg)
+xpp_warn (warnmsg)
 char	*warnmsg;
 {
 	fprintf (stderr, "Warning on line %d of %s: %s\n", linenum[istkptr],

@@ -7,15 +7,14 @@ double procedure id_rms (id)
 pointer	id			# ID pointer
 
 int	i, nrms
-double	z, rms
+double	rms, id_zshiftd()
 
 begin
-	z = ID_REDSHIFT(id)
 	rms = 0.
 	nrms = 0
 	for (i=1; i<=ID_NFEATURES(id); i=i+1) {
 	    if (!IS_INDEFD (USER(id,i)) && WTS(id,i) != 0.) {
-		rms = rms + (FIT(id,i) / (1 + z) - USER(id,i)) ** 2
+		rms = rms + (id_zshiftd (id, FIT(id,i), 0) - USER(id,i)) ** 2
 		nrms = nrms + 1
 	    }
 	}

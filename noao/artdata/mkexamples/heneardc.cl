@@ -9,7 +9,8 @@ for (k=1; k<=i; k+=1) {
     mk1dspec (out, output="", ap=k, rv=0., z=no, ncols=512, naps=i,
 	wstart=4210.0, wend=7362.7, title="Helium-Neon-Argon Arc Example",
 	header=hdr, continuum=0.5, slope=0., temperature=0.,
-	lines="mkexamples$henear1.dat", sigma=6., comments=b1)
+	lines="mkexamples$henear1.dat", profile="gaussian",
+	gfwhm=14, comments=b1)
 }
 
 mknoise (out, output="", ncols=512, nlines=512, title="", header="",

@@ -13,91 +13,91 @@ long	lseed				# luminsosity function seed
 
 begin
 	call dtptime (dt)
-	call dtput (dt, "begin\t%s\n")
+	call dtput (dt, "# begin\t%s\n")
 	    call pargstr (starlist)
 
 	# Write out the spatial density function parameters.
-	call dtput (dt, "\tspatial\t\t%s\n")
+	call dtput (dt, "#\tspatial\t\t%s\n")
 	switch (ST_SPATIAL(st)) {
 	case ST_UNIFORM:
 	    call pargstr ("uniform")
 	case ST_HUBBLE:
 	    call pargstr ("hubble")
-	    call dtput (dt, "\txcenter\t\t%g\n")
+	    call dtput (dt, "#\txcenter\t\t%g\n")
 		call pargr (ST_XC(st))
-	    call dtput (dt, "\tycenter\t\t%g\n")
+	    call dtput (dt, "#\tycenter\t\t%g\n")
 		call pargr (ST_YC(st))
-	    call dtput (dt, "\tcoreradius\t%g\n")
+	    call dtput (dt, "#\tcoreradius\t%g\n")
 		call pargr (ST_CORE(st))
-	    call dtput (dt, "\tbaseline\t%g\n")
+	    call dtput (dt, "#\tbaseline\t%g\n")
 		call pargr (ST_BASE(st))
 	case ST_SPFILE:
 	    call pargstr (ST_SFILE(st))
-	    call dtput (dt, "\txcenter\t\t%g\n")
+	    call dtput (dt, "#\txcenter\t\t%g\n")
 		call pargr (ST_XC(st))
-	    call dtput (dt, "\tycenter\t\t%g\n")
+	    call dtput (dt, "#\tycenter\t\t%g\n")
 		call pargr (ST_YC(st))
 	}
-	call dtput (dt, "\txmin\t\t%g\n")
+	call dtput (dt, "#\txmin\t\t%g\n")
 	    call pargr (ST_XMIN(st))
-	call dtput (dt, "\txmax\t\t%g\n")
+	call dtput (dt, "#\txmax\t\t%g\n")
 	    call pargr (ST_XMAX(st))
-	call dtput (dt, "\tymin\t\t%g\n")
+	call dtput (dt, "#\tymin\t\t%g\n")
 	    call pargr (ST_YMIN(st))
-	call dtput (dt, "\tymax\t\t%g\n")
+	call dtput (dt, "#\tymax\t\t%g\n")
 	    call pargr (ST_YMAX(st))
 
 	# Write out the luminsosity function parameters.
-	call dtput (dt, "\tluminosity\t%s\n")
+	call dtput (dt, "#\tluminosity\t%s\n")
 	switch (ST_LUMINOSITY(st)) {
 	case ST_UNIFORM:
 	    call pargstr ("uniform")
 	case ST_POWLAW:
 	    call pargstr ("powlaw")
-	    call dtput (dt, "\tpower\t\t%g\n")
+	    call dtput (dt, "#\tpower\t\t%g\n")
 	        call pargr (ST_POWER(st))
 	case ST_SALPETER:
 	    call pargstr ("salpeter")
-	    call dtput (dt, "\tmzero\t\t%g\n")
+	    call dtput (dt, "#\tmzero\t\t%g\n")
 	        call pargr (ST_MZERO(st))
 	case ST_BANDS:
 	    call pargstr ("bands")
-	    call dtput (dt, "\tmzero\t\t%g\n")
+	    call dtput (dt, "#\tmzero\t\t%g\n")
 	        call pargr (ST_MZERO(st))
-	    call dtput (dt, "\talpha\t\t%g\n")
+	    call dtput (dt, "#\talpha\t\t%g\n")
 	        call pargr (ST_ALPHA(st))
-	    call dtput (dt, "\tbeta\t\t%g\n")
+	    call dtput (dt, "#\tbeta\t\t%g\n")
 	        call pargr (ST_BETA(st))
-	    call dtput (dt, "\tdelta\t\t%g\n")
+	    call dtput (dt, "#\tdelta\t\t%g\n")
 	        call pargr (ST_DELTA(st))
-	    call dtput (dt, "\tmstar\t\t%g\n")
+	    call dtput (dt, "#\tmstar\t\t%g\n")
 	        call pargr (ST_MSTAR(st))
 	case ST_LFFILE:
 	    call pargstr (ST_LFILE(st))
 	}
-	call dtput (dt, "\tminmag\t\t%g\n")
+	call dtput (dt, "#\tminmag\t\t%g\n")
 	    call pargr (ST_MINMAG(st))
-	call dtput (dt, "\tmaxmag\t\t%g\n")
+	call dtput (dt, "#\tmaxmag\t\t%g\n")
 	    call pargr (ST_MAXMAG(st))
 
 	# Save the spatial density function fitting parameters.
-	call dtput (dt, "\tnssample\t%d\n")
+	call dtput (dt, "#\tnssample\t%d\n")
 	    call pargi (ST_NSSAMPLE(st))
-	call dtput (dt, "\tsorder\t\t%d\n")
+	call dtput (dt, "#\tsorder\t\t%d\n")
 	    call pargi (ST_SORDER(st))
-	call dtput (dt, "\tsseed\t\t%d\n")
+	call dtput (dt, "#\tsseed\t\t%d\n")
 	    call pargl (sseed)
 
 	# Save the luminosity function fitting parameters.
-	call dtput (dt, "\tnlsample\t%d\n")
+	call dtput (dt, "#\tnlsample\t%d\n")
 	    call pargi (ST_NLSAMPLE(st))
-	call dtput (dt, "\tlorder\t\t%d\n")
+	call dtput (dt, "#\tlorder\t\t%d\n")
 	    call pargi (ST_LORDER(st))
-	call dtput (dt, "\tlseed\t\t%d\n")
+	call dtput (dt, "#\tlseed\t\t%d\n")
 	    call pargl (lseed)
 
 	# Save the number of stars.
-	call dtput (dt, "\tnstars\t\t%d\n")
+	call dtput (dt, "#\tnstars\t\t%d\n")
 	    call pargi (ST_NSTARS(st))
 end
 
@@ -114,96 +114,96 @@ long	lseed				# luminsosity function seed
 
 begin
 	call dtptime (dt)
-	call dtput (dt, "begin\t%s\n")
+	call dtput (dt, "# begin\t%s\n")
 	    call pargstr (galaxies)
 
 	# Save the spatial distribution function parameters.
-	call dtput (dt, "\tspatial\t\t%s\n")
+	call dtput (dt, "#\tspatial\t\t%s\n")
 	switch (ST_SPATIAL(st)) {
 	case ST_UNIFORM:
 	    call pargstr ("uniform")
 	case ST_HUBBLE:
 	    call pargstr ("hubble")
-	    call dtput (dt, "\txcenter\t\t%g\n")
+	    call dtput (dt, "#\txcenter\t\t%g\n")
 		call pargr (ST_XC(st))
-	    call dtput (dt, "\tycenter\t\t%g\n")
+	    call dtput (dt, "#\tycenter\t\t%g\n")
 		call pargr (ST_YC(st))
-	    call dtput (dt, "\tcoreradius\t%g\n")
+	    call dtput (dt, "#\tcoreradius\t%g\n")
 		call pargr (ST_CORE(st))
-	    call dtput (dt, "\tbaseline\t%g\n")
+	    call dtput (dt, "#\tbaseline\t%g\n")
 		call pargr (ST_BASE(st))
 	case ST_SPFILE:
 	    call pargstr (ST_SFILE(st))
-	    call dtput (dt, "\txcenter\t\t%g\n")
+	    call dtput (dt, "#\txcenter\t\t%g\n")
 		call pargr (ST_XC(st))
-	    call dtput (dt, "\tycenter\t\t%g\n")
+	    call dtput (dt, "#\tycenter\t\t%g\n")
 		call pargr (ST_YC(st))
 	}
-	call dtput (dt, "\txmin\t\t%g\n")
+	call dtput (dt, "#\txmin\t\t%g\n")
 	    call pargr (ST_XMIN(st))
-	call dtput (dt, "\txmax\t\t%g\n")
+	call dtput (dt, "#\txmax\t\t%g\n")
 	    call pargr (ST_XMAX(st))
-	call dtput (dt, "\tymin\t\t%g\n")
+	call dtput (dt, "#\tymin\t\t%g\n")
 	    call pargr (ST_YMIN(st))
-	call dtput (dt, "\tymax\t\t%g\n")
+	call dtput (dt, "#\tymax\t\t%g\n")
 	    call pargr (ST_YMAX(st))
 
 	# Save the luminsosity function parameters.
-	call dtput (dt, "\tluminosity\t%s\n")
+	call dtput (dt, "#\tluminosity\t%s\n")
 	switch (ST_LUMINOSITY(st)) {
 	case ST_UNIFORM:
 	    call pargstr ("uniform")
 	case ST_POWLAW:
 	    call pargstr ("powlaw")
-	    call dtput (dt, "\tpower\t\t%g\n")
+	    call dtput (dt, "#\tpower\t\t%g\n")
 		call pargr (ST_POWER(st))
 	case ST_SCHECTER:
 	    call pargstr ("shechter")
-	    call dtput (dt, "\tmzero\t\t%g\n")
+	    call dtput (dt, "#\tmzero\t\t%g\n")
 	        call pargr (ST_MZERO(st))
-	    call dtput (dt, "\talpha\t\t%g\n")
+	    call dtput (dt, "#\talpha\t\t%g\n")
 		call pargr (ST_ALPHA(st))
-	    call dtput (dt, "\tmstar\t\t%g\n")
+	    call dtput (dt, "#\tmstar\t\t%g\n")
 		call pargr (ST_MSTAR(st))
 	case ST_LFFILE:
 	    call pargstr (ST_LFILE(st))
 	}
-	call dtput (dt, "\tminmag\t\t%g\n")
+	call dtput (dt, "#\tminmag\t\t%g\n")
 	    call pargr (ST_MINMAG(st))
-	call dtput (dt, "\tmaxmag\t\t%g\n")
+	call dtput (dt, "#\tmaxmag\t\t%g\n")
 	    call pargr (ST_MAXMAG(st))
-	call dtput (dt, "\teradius\t\t%g\n")
+	call dtput (dt, "#\teradius\t\t%g\n")
 	    call pargr (ST_ERADIUS(st))
-	call dtput (dt, "\tsradius\t\t%g\n")
+	call dtput (dt, "#\tsradius\t\t%g\n")
 	    call pargr (ST_SRADIUS(st))
 
-	call dtput (dt, "\tegalmix\t\t%g\n")
+	call dtput (dt, "#\tegalmix\t\t%g\n")
 	    call pargr (ST_EGALMIX(st))
-	call dtput (dt, "\tar\t\t%g\n")
+	call dtput (dt, "#\tar\t\t%g\n")
 	    call pargr (ST_AR(st))
-	call dtput (dt, "\tabsorption\t%g\n")
+	call dtput (dt, "#\tabsorption\t%g\n")
 	    call pargr (ST_ABSORPTION(st))
-	call dtput (dt, "\tz\t\t%g\n")
+	call dtput (dt, "#\tz\t\t%g\n")
 	    call pargr (ST_Z(st))
 
 	# Save the spatial distribution fitting parameters.
-	call dtput (dt, "\tnssample\t%d\n")
+	call dtput (dt, "#\tnssample\t%d\n")
 	    call pargi (ST_NSSAMPLE(st))
-	call dtput (dt, "\tsorder\t\t%d\n")
+	call dtput (dt, "#\tsorder\t\t%d\n")
 	    call pargi (ST_SORDER(st))
-	call dtput (dt, "\tsseed\t\t%d\n")
+	call dtput (dt, "#\tsseed\t\t%d\n")
 	    call pargl (sseed)
 
 	# Save the spatial function fitting parameters.
-	call dtput (dt, "\tnlsample\t%d\n")
+	call dtput (dt, "#\tnlsample\t%d\n")
 	    call pargi (ST_NLSAMPLE(st))
-	call dtput (dt, "\tlorder\t\t%d\n")
+	call dtput (dt, "#\tlorder\t\t%d\n")
 	    call pargi (ST_LORDER(st))
-	call dtput (dt, "\tlseed\t\t%d\n")
+	call dtput (dt, "#\tlseed\t\t%d\n")
 	    call pargl (lseed)
 
 	# Save the number of stars.
-	call dtput (dt, "\tngals\t\t%d\n")
+	call dtput (dt, "#\tngals\t\t%d\n")
 	    call pargi (ST_NSTARS(st))
 end
 
@@ -228,7 +228,7 @@ begin
 
 	do i = 1, nstars {
 	    j = Memi[index+i-1]
-	    call dtput (dt, "\t%7.2f  %7.2f  %7.3f\n")
+	    call dtput (dt, "\t%8.3f  %8.3f  %7.3f\n")
 		call pargr (x[j])
 		call pargr (y[j])
 		call pargr (mag[j])
@@ -263,7 +263,7 @@ begin
 	do i = 1, nstars {
 	    j = Memi[index+i-1]
 	    call dtput (dt,
-	        "\t%7.2f  %7.2f  %7.3f  %7s  %7.2f  %5.3f  %5.1f\n")
+	        "\t%8.3f  %8.3f  %7.3f  %7s  %7.2f  %5.3f  %5.1f\n")
 		call pargr (x[j])
 		call pargr (y[j])
 		call pargr (mag[j])

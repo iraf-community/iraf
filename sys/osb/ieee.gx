@@ -13,7 +13,7 @@ IEEE related definitions in <mach.h>.
 		ieevpak[rd] (native, ieee, nelem)	# vector conversions
 		ieevupk[rd] (ieee, native, nelem)
 	     iee[sg]nan[rd] (NaN)			# NaN handling
-		 ieemap[rd] (mapin, mapout)
+	     iee[sg]map[rd] (mapin, mapout)
 		ieestat[rd] (nin, nout)
 	       ieezstat[rd] ()
 
@@ -30,7 +30,7 @@ last call to ieezstat[rd].
 
 The NaN mapping enable switch and statistics counters are UNDEFINED at
 process startup; programs which use the IEEE conversion package should call
-ieemap[rd] to enable or disable NaN mapping, and ieezstat[rd] to initialize
+ieesmap[rd] to enable or disable NaN mapping, and ieezstat[rd] to initialize
 the statistics counters.
 
 The routines in this file are the "portable" versions.  The "portable"
@@ -105,7 +105,7 @@ PIXEL	ieee[ARB]		#I input IEEE floating format array
 PIXEL	native[ARB]		#O output native floating format array
 int	nelem			#I number of floating point numbers
 
-int	i
+int	expon, i
 $if (datatype == r)
 real	fval
 int	ival[1]
@@ -124,9 +124,15 @@ begin
 	if (IEEE_SWAP == YES) {
 	    call BSWAP (ieee, 1, native, 1, nelem * NSWAP)
 	    if (mapin != NO)
+		# Check for IEEE exceptional values and map NaN to the native
+		# NaN value, and denormalized numbers (zero exponent) to zero.
+
 		do i = 1, nelem {
 		    fval = native[i]
-	            if (and (ival[IOFF], NaNmask) == NaNmask) {
+		    expon = and (ival[IOFF], NaNmask)
+		    if (expon == 0) {
+			native[i] = 0
+		    } else if (expon == NaNmask) {
 			native[i] = native_NaN
 			nin = nin + 1
 		    }
@@ -135,9 +141,15 @@ begin
 	    if (mapin == NO)
 		call amov$t (ieee, native, nelem)
 	    else {
+		# Check for IEEE exceptional values and map NaN to the native
+		# NaN value, and denormalized numbers (zero exponent) to zero.
+
 		do i = 1, nelem {
 		    fval = ieee[i]
-	            if (and (ival[IOFF], NaNmask) == NaNmask) {
+		    expon = and (ival[IOFF], NaNmask)
+		    if (expon == 0) {
+			native[i] = 0
+		    } else if (expon == NaNmask) {
 			native[i] = native_NaN
 			nin = nin + 1
 		    } else
@@ -175,6 +187,7 @@ procedure ieeupk$t (x)
 
 PIXEL	x			#U datum to be converted
 
+int	expon
 $if (datatype == r)
 real	fval
 int	ival[1]
@@ -192,9 +205,16 @@ common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 begin
 	if (IEEE_SWAP == YES)
 	    call BSWAP (x, 1, x, 1, NSWAP)
+
+	# Check for IEEE exceptional values and map NaN to the native NaN
+	# value, and denormalized numbers (zero exponent) to zero.
+
 	if (mapin != NO) {
 	    fval = x
-	    if (and (ival[IOFF], NaNmask) == NaNmask) {
+	    expon = and (ival[IOFF], NaNmask)
+	    if (expon == 0)
+		x = 0
+	    else if (expon == NaNmask) {
 	        x = native_NaN
 		nin = nin + 1
 	    }
@@ -204,9 +224,7 @@ end
 
 # IEESNAN -- Set the native floating point value used to replace NaNs and
 # overflows when converting IEEE to native.  This must be a legal (finite)
-# native floating point value.  Setting the reserved native pseudo-NaN value
-# has the side effect of enabling NaN mapping and zeroing the statistics
-# counters.
+# native floating point value.
 
 procedure ieesnan$t (x)
 
@@ -218,7 +236,6 @@ common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
 	native_NaN = x
-	call ieemap$t (YES, YES)
 	nin = 0
 	nout = 0
 end
@@ -271,17 +288,47 @@ begin
 end
 
 
+# IEEMAP -- Same as IEESMAP.  Retained for backwards compatibility.
+
+procedure ieemap$t (inval, outval)
+
+int	inval				#I enable mapping on input
+int	outval				#I enable mapping on output
+
+begin
+	call ieesmap$t (inval, outval)
+end
+
+
+# IEEGMAP -- Query the current values of the input and output mapping
+# enables.
+
+procedure ieegmap$t (inval, outval)
+
+int	inval				#O get input mapping enable flag
+int	outval				#O get output mapping enable flag
+
+PIXEL	native_NaN, ieee_NaN
+int	mapin, mapout, nin, nout, NaNmask
+common	/ieenan$t/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
+
+begin
+	inval = mapin
+	outval = mapout
+end
+
+
 # MACHINE DEPENDENT PART.
 # ---------------------------
 
-# IEEMAP -- Enable or disable NaN mapping.
+# IEESMAP -- Enable or disable NaN mapping.
 #
 # sEEE EEEE Emmm mmmm mmmm mmmm mmmm mmmm
 #  3           2            1           0
 # 1098 7654 3210 9876 5432 1098 7654 3210
 #    7    f    8    0    0    0    0    0
 
-procedure ieemap$t (inval, outval)
+procedure ieesmap$t (inval, outval)
 
 int	inval				#I enable NaN mapping for input?
 int	outval				#I enable NaN mapping for output?

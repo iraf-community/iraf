@@ -45,7 +45,7 @@ int	size;
 int	(*compar)();
 {
 	register char c, *i, *j, *lo, *hi;
-	char	*min, *max;
+	char	*minval, *maxval;
 
 	if (n <= 1)
 	    return;
@@ -54,13 +54,13 @@ int	(*compar)();
 	qcmp    = compar;
 	thresh  = qsz * THRESH;
 	mthresh = qsz * MTHRESH;
-	max     = base + n * qsz;
+	maxval  = base + n * qsz;
 
 	if (n >= THRESH) {
-	    qst (base, max);
+	    qst (base, maxval);
 	    hi = base + thresh;
 	} else
-	    hi = max;
+	    hi = maxval;
 
 	/* First put smallest element, which must be in the first THRESH, in
 	 * the first position as a sentinel.  This is done just by searching
@@ -85,11 +85,11 @@ int	(*compar)();
 	 * Then, do the standard insertion sort shift on a character at a time
 	 * basis for each element in the frob.
 	 */
-	for (min=base;  (hi = min += qsz) < max;  ) {
-	    while ((*qcmp) (hi -= qsz, min) > 0)
+	for (minval=base;  (hi = minval += qsz) < maxval;  ) {
+	    while ((*qcmp) (hi -= qsz, minval) > 0)
 		/* void */;
-	    if ((hi += qsz) != min) {
-		for (lo = min + qsz; --lo >= min; ) {
+	    if ((hi += qsz) != minval) {
+		for (lo = minval + qsz; --lo >= minval; ) {
 		    c = *lo;
 		    for (i=j=lo;  (j -= qsz) >= hi;  i=j)
 			*i = *j;
@@ -113,8 +113,8 @@ int	(*compar)();
  * (And there are only three places where this is done).
  */
 static
-qst (base, max)
-char	*base, *max;
+qst (base, maxval)
+char	*base, *maxval;
 {
 	register char c, *i, *j, *jj;
 	register int ii;
@@ -122,20 +122,20 @@ char	*base, *max;
 	int lo, hi;
 
 	/* At the top here, lo is the number of characters of elements in the
-	 * current partition.  (Which should be max - base).
+	 * current partition.  (Which should be maxval - base).
 	 * Find the median of the first, last, and middle element and make
 	 * that the middle element.  Set j to largest of first and middle.
-	 * If max is larger than that guy, then it's that guy, else compare
-	 * max with loser of first and take larger.  Things are set up to
+	 * If maxval is larger than that guy, then it's that guy, else compare
+	 * maxval with loser of first and take larger.  Things are set up to
 	 * prefer the middle, then the first in case of ties.
 	 */
-	lo = max - base;		/* number of elements as chars */
+	lo = maxval - base;		/* number of elements as chars */
 
 	do {
 	    mid = i = base + qsz * ((lo / qsz) >> 1);
 	    if (lo >= mthresh) {
 		j = ((*qcmp)((jj = base), i) > 0 ? jj : i);
-		if ((*qcmp)(j, (tmp = max - qsz)) > 0) {
+		if ((*qcmp)(j, (tmp = maxval - qsz)) > 0) {
 		    /* switch to first loser */
 		    j = (j == jj ? i : jj);
 		    if ((*qcmp)(j, tmp) < 0)
@@ -153,7 +153,7 @@ char	*base, *max;
 
 	    /* Semi-standard quicksort partitioning/swapping
 	     */
-	    for (i = base, j = max - qsz; ; ) {
+	    for (i = base, j = maxval - qsz; ; ) {
 		while (i < mid && (*qcmp)(i, mid) <= 0)
 		    i += qsz;
 		while (j > mid) {
@@ -194,21 +194,21 @@ char	*base, *max;
 
 	    /* Look at sizes of the two partitions, do the smaller
 	     * one first by recursion, then do the larger one by
-	     * making sure lo is its size, base and max are update
+	     * making sure lo is its size, base and maxval are update
 	     * correctly, and branching back.  But only repeat
 	     * (recursively or by branching) if the partition is
 	     * of at least size THRESH.
 	     */
 	    i = (j = mid) + qsz;
-	    if ((lo = j - base) <= (hi = max - i)) {
+	    if ((lo = j - base) <= (hi = maxval - i)) {
 		if (lo >= thresh)
 		    qst(base, j);
 		base = i;
 		lo = hi;
 	    } else {
 		if (hi >= thresh)
-		    qst(i, max);
-		max = j;
+		    qst(i, maxval);
+		maxval = j;
 	    }
 
 	} while (lo >= thresh);

@@ -11,8 +11,10 @@
  * (String *data* will be edited too).
  */
 
+/* Solaris used to need this but it doesn't any longer.
+#define bcopy(a,b,n) memmove(b,a,n) */
+
 #define	BUFLEN	16384
-#define bcopy(a,b,n)    memmove(b,a,n)
 static	char	buf[BUFLEN];
 static	int	nbytes;
 

@@ -1,5 +1,124 @@
 .help revisions Jun88 noao.twodspec.apextract
 .nf
+doc/apsum.hlp
+    Added missing task name in revisions section.  (4/22/97, Valdes)
+
+apextract.x
+    Removed calls to impl from inside amove in order to error check them.
+    (1/24/97, Valdes)
+
+t_apall.x
+    1.  Added errchk for ap_dbwrite.
+    2.  Made writing the aplast file optional.
+    3.  It is a warning if the plot file can't be written.
+    (1/24/97, Valdes)
+
+apextract.x
+    The step where the data is multplied by the gain was multiplying
+    outside the data if dispaxis=1.  If the there are enough apertures
+    and the aperture widths decrease then it is possible to get
+    mulitplications of gain**naps which can cause a floating overflow.
+    This was fixed.  (11/12/96, Valdes)
+
+apertures.h
+t_apall.x
+aptrace.x
+apresize.x
+apalloc.x
+apextract.x
+apselect.x
+aprecenter.x
+apall.par
+apall1.par
+apfit1.par
+apflat1.par
+apnorm1.par
+apparams.par
+apnoise1.par
+apdebug.par
+apfit.par
+apflatten.par
+apmask.par
+apnoise.par
+apnormalize.par
+apresize.par
+apscatter.par
+apsum.par
+aptrace.par
+apedit.par
+apfind.par
+aprecenter.par
+mkpkg
+doc/apextract.hlp
+doc/apextras.hlp
+doc/apedit.hlp
+doc/apall.hlp
+doc/apfind.hlp
+doc/apresize.hlp
+doc/apsum.hlp
+doc/aptrace.hlp
+doc/apfit.hlp
+doc/apflatten.hlp
+doc/apmask.hlp
+doc/apnoise.hlp
+doc/apnormalize.hlp
+doc/aprecenter.hlp
+doc/apscatter.hlp
+    Added a new parameter "apertures" to select a subset of the apertures
+    to resize, recenter, trace, extract, etc.  The parameter "apertures"
+    which applied to the recentering was changed to "aprecenter".
+    (9/5/96, Valdes)
+
+apedit.key
+    Alphabetized the summary command lists.  (9/3/96, Valdes)
+
+apextract.x
+    1. Onedspec output format is now allowed when nsubaps is greater than 1.
+    2. Echelle format outputs all orders for a each subapertures in
+       separate files.
+    (4/3/96, Valdes)
+
+apmw.x
+apextract.x
+    The WCS for strip extraction was wrong.  (1/31/96, Valdes)
+
+apmw.x
+    An error in computing the WCS transformation now prints a more informative
+    message indicating the final extracted spectrum will be in pixel units.
+    (1/4/96, Valdes)
+
+apids.x
+apedit.x
+    Changed the behavior of the 'i' and 'o' keys with regard to the beam
+    numbers.  These keys will now assign a beam number from the apid table
+    for the selected aperture as well as all other apertures.  Previously
+    the beam number was not changed which resulted in a new aperture
+    number with a beam number that did not agree with the apid table.
+    (10/27/95, Valdes)
+
+doc/apextras.hlp +
+apextract.men
+apextract.hd
+    Added a help topic on the "extras" information.  (9/5/95, Valdes)
+
+apimmap.x
+    If the image header dispersion axis is unreasonable a warning is
+    printed and the "dispaxis" parameter is used instead.  (8/2/95, Valdes)
+
+apids.x
+apmw.x
+doc/apall.hlp
+doc/apdefault.hlp
+doc/apedit.hlp
+doc/apfind.hlp
+    Modified to allow aperture ID table to be from an image header
+    under the keywords SLFIBnnn.  The extracted image will have
+    these keywords deleted.  (7/25/95, Valdes)
+
+=======
+V2.10.4
+=======
+
 apscatter.x
     When not smoothing along the dispersion there was a bug that when
     the number of points being fit across the disperision changed

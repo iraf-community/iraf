@@ -108,9 +108,11 @@ int	sz_units1		# Size of secondary units string
 int	unlog, uninv, untype
 int	i, j,  nscan(), strdic()
 pointer	sp, str
+pointer	stp, sym, stfind(), strefsbuf()
 
 int	class[UN_NUNITS]
 real	scale[UN_NUNITS]
+data	stp/NULL/
 data	class /UN_WAVE,UN_WAVE,UN_WAVE,UN_WAVE,UN_WAVE,UN_WAVE,UN_WAVE,
 		UN_FREQ,UN_FREQ,UN_FREQ,UN_FREQ,UN_VEL,UN_VEL,
 		UN_ENERGY,UN_ENERGY,UN_ENERGY,UN_DOP/
@@ -121,7 +123,16 @@ begin
 	call smark (sp)
 	call salloc (str, SZ_FNAME, TY_CHAR)
 
+	iferr (call un_abbr (stp))
+	    ;
+
 	call strcpy (units, Memc[str], SZ_FNAME)
+	if (stp != NULL) {
+	    sym = stfind (stp, Memc[str])
+	    if (sym != NULL)
+		call strcpy (Memc[strefsbuf(stp,Memi[sym])],
+		    Memc[str], SZ_FNAME)
+	}
 	call strlwr (Memc[str])
 	call sscan (Memc[str])
 	untype = 0
@@ -467,4 +478,47 @@ begin
 	    call un_close(un1)
 	    call erract (EA_ERROR)
 	}
+end
+
+
+# UN_ABBR -- Load abbreviations into a symbol table.
+
+procedure un_abbr (stp)
+
+pointer	stp		#U Symbol table
+
+int	fd, open(), fscan(), nscan(), stpstr()
+pointer	sp, key, val
+pointer	sym, stopen(), stfind(), stenter(), strefsbuf()
+errchk	open
+
+begin
+	if (stp != NULL)
+	    return
+
+	fd = open (ABBREVIATIONS, READ_ONLY, TEXT_FILE)
+	stp = stopen ("unabbr", 20, 20, 40*SZ_LINE)
+
+	call smark (sp)
+	call salloc (key, SZ_LINE, TY_CHAR)
+	call salloc (val, SZ_LINE, TY_CHAR)
+
+	while (fscan (fd) != EOF) {
+	    call gargwrd (Memc[key], SZ_LINE)
+	    call gargwrd (Memc[val], SZ_LINE)
+	    if (nscan() != 2)
+		next
+	    if (Memc[key] == '#')
+		next
+
+	    sym = stfind (stp, Memc[key])
+	    if (sym == NULL) {
+		sym = stenter (stp, Memc[key], 1)
+		Memi[sym] = stpstr (stp, Memc[val], SZ_LINE)
+	    } else
+		call strcpy (Memc[val], Memc[strefsbuf(stp,Memi[sym])], SZ_LINE)
+	}
+
+	call close (fd)
+	call sfree (sp)
 end

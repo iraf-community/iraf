@@ -58,8 +58,8 @@ begin
 			call pargstr ("flux")
 			call pargstr ("eqw")
 			call pargstr ("core")
-			call pargstr ("sigma")
-			call pargstr ("fwhm")
+			call pargstr ("gfwhm")
+			call pargstr ("lfwhm")
 		}
 		if (fd2 != NULL) {
 		    call fprintf (fd2, "%10s%10s%10s%10s%10s%10s%10s\n")
@@ -68,8 +68,8 @@ begin
 			call pargstr ("flux")
 			call pargstr ("eqw")
 			call pargstr ("core")
-			call pargstr ("sigma")
-			call pargstr ("fwhm")
+			call pargstr ("gfwhm")
+			call pargstr ("lfwhm")
 		}
 	    }
 	    key1 = key

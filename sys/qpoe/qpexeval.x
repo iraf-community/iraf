@@ -59,6 +59,43 @@ begin
 	    # (subroutines are used to evaluate the indeterminate cells of
 	    # compressed lookup tables).
 
+	    # Notes on expression evaluation.
+	    # ---------------------------------
+	    # An expression consists of 1 or more expression terms, all of
+	    # which must pass the event for the event to pass the filter.
+	    #
+	    # An expression term consists of a range list giving a list of
+	    # acceptable values or ranges of values.
+	    #
+	    # The compiled expression consists of a sequence of instruction
+	    # blocks, one for each expression term.  If the event fails to
+	    # pass any expression term (instruction block) then the event
+	    # fails and we are done.  Instruction blocks are of three types:
+	    #
+	    #	1)	Multiple instructions consisting of a load register,
+	    #		any number of register tests, then a XIFF or XIFT
+	    #		test at the end of the block.  PASS is set to false
+	    # 		at the beginning of the block and can be set to true
+	    #		by any register test to pass the event to the next
+	    #		expression term.
+	    #
+	    #   2)	In simple cases the above can all be expressed as a
+	    #		single test-and-exit-if-false instruction.  These are
+	    #		the "X" instructions below.
+	    #
+	    #   3)	The lookup table (LUTX) instruction.  LUTX is like
+	    #		case 2) except that it may compile as a sequence of
+	    #		many instructions, using subprograms to evaluate the
+	    #		value of LUT bins.  LUTs may nest.  When lookup table
+	    #		evaluation is complete the instruction branches
+	    #		forward to a closing XIFF which is used to test the
+	    #		value of PASS returned by the executed LUT-bin
+	    #		subprograms.
+	    #
+	    # The blocks of instructions corresponding to successive expression
+	    # terms are executed until the PASS instruction is encountered.
+	    # Execution of PASS terminates evaluation and passes the event.
+
 	    ip = EX_START(ex)
 	    level = 0
 
@@ -268,10 +305,21 @@ lut_
 		    # subrangelist for that bin.
 
 		    if (v == 0) {
+			# Table value is zero, !pass, all done.
 			pass = false
 			goto ret_
+
 		    } else if (v > 1) {
-			# Call subroutine to evaluate subrange.
+			# Table value is indeterminate and depends on the
+			# data value.  Call subroutine to evaluate subrange.
+			# At level=0 where we are starting to evaluate an
+			# independent expression term we must initialize pass
+			# to false before entering the subprogram instruction
+			# sequence.
+
+			if (level == 0)
+			    pass = false
+
 			level = level + 1
 			pv_save[level] = pass
 
@@ -283,8 +331,11 @@ lut_
 			pass = false
 			ip = EX_PB(ex) + v
 			next
-		    } else if (v == 1)
+
+		    } else if (v == 1) {
+			# Table value is one, value passes this test.
 			pass = true
+		    }
 
 		    # Go to the jump address if set.  The jump is needed
 		    # to skip over any subprograms that may have been compiled

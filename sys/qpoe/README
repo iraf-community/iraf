@@ -102,7 +102,7 @@ nchars = qpio_getfilter (io, outstr, maxch)
 
 	 qpio_putevents (io, i_ev, nevents)
  n|EOF = qpio_getevents (io, o_ev, maskval, maxev, nev)
- nev = qpio_readpix[si] (io, obuf, vs, ve, ndim, block)
+ nev = qpio_readpix[si] (io, obuf, vs, ve, ndim, xblock, yblock)
 
 		    [ --- internal routines --- ]
 

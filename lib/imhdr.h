@@ -3,47 +3,50 @@
 
 define	IM_MAXDIM	7			# maximum dimension of image
 define	SZ_IMMAGIC	5			# used to verify structure
-define	SZ_IMPIXFILE	79			# name of pixel storage file
-define	SZ_IMHDRFILE	79			# name of header storage file
-define	SZ_IMTITLE	79			# image title string
-define	SZ_IMHIST	511			# image history record
+define	SZ_IMPIXFILE	255			# name of pixel storage file
+define	SZ_IMHDRFILE	255			# name of header storage file
+define	SZ_IMTITLE	383			# image title string
+define	SZ_IMHIST	1023			# image history record
 define	SZ_BUNIT	9			# brightness units string
 define	SZ_CTYPE	9			# coord axes units string
+
+define	IMH_MAGICSTR	"imhdr"			# file identification string
+define	PIX_MAGICSTR	"impix"			# file identification string
 
 # The IMIO image header structure.
 
 # Parameters.
 define	LEN_IMDES	200			# length of image descriptor
-define	LEN_IMHDR	513			# length of std header
+define	LEN_IMHDR	1024			# length of std header
 define	IMD		LEN_IMDES		# offset to std header fields
-define	IMU		713			# offset to user fields
+define	IMU		(LEN_IMDES+LEN_IMHDR)	# offset to user fields
 define	IM_USERAREA	(P2C($1+IMU))		# user area (database)
 
 # Disk resident header.
 define	IM_MAGIC	Memi[$1+IMD]		# contains the string "imhdr"
 define	IM_HDRLEN	Memi[$1+IMD+3]		# length of image header
-define	IM_PIXTYPE	Memi[$1+IMD+4]		# datatype of the pixels
-define	IM_NDIM		Memi[$1+IMD+5]		# number of dimensions
-define	IM_LEN		Meml[$1+IMD+$2+6-1]	# length of the dimensions
-define	IM_PHYSLEN	Meml[$1+IMD+$2+13-1]	# physical length (as stored)
-define	IM_SSMTYPE	Meml[$1+IMD+20]		# type of subscript mapping
-define	IM_LUTOFF	Meml[$1+IMD+21]		# offset to subscript map luts
-define	IM_PIXOFF	Meml[$1+IMD+22]		# offset of the pixels
-define	IM_HGMOFF	Meml[$1+IMD+23]		# offset of hgm pixels
-define	IM_BLIST	Meml[$1+IMD+24]		# offset of bad pixel list
-define	IM_SZBLIST	Meml[$1+IMD+25]		# size of bad pixel list
-define	IM_NBPIX	Meml[$1+IMD+26]		# number of bad pixels
-define	IM_CTIME	Meml[$1+IMD+27]		# time of image creation
-define	IM_MTIME	Meml[$1+IMD+28]		# time of last modify
-define	IM_LIMTIME	Meml[$1+IMD+29]		# time min,max computed
-define	IM_MAX		Memr[$1+IMD+30]		# max pixel value
-define	IM_MIN		Memr[$1+IMD+31]		# min pixel value
-define	IM_HGM		($1+IMD+33)		# histogram descriptor
-define	IM_CTRAN	($1+IMD+52)		# coordinate transformations
-define	IM_PIXFILE	Memc[P2C($1+IMD+103)]	# name of pixel storage file
-define	IM_HDRFILE	Memc[P2C($1+IMD+143)]	# name of header storage file
-define	IM_TITLE	Memc[P2C($1+IMD+183)]	# image name string
-define	IM_HISTORY	Memc[P2C($1+IMD+223)]	# history comment string
+define	IM_HDRVER	Memi[$1+IMD+4]		# image format version
+define	IM_PIXTYPE	Memi[$1+IMD+5]		# datatype of the pixels
+define	IM_SWAPPED	Memi[$1+IMD+6]		# pixels are byte swapped
+define	IM_NDIM		Memi[$1+IMD+7]		# number of dimensions
+define	IM_LEN		Meml[$1+IMD+$2+8-1]	# length of the dimensions
+define	IM_PHYSLEN	Meml[$1+IMD+$2+15-1]	# physical length (as stored)
+define	IM_SSMTYPE	Meml[$1+IMD+22]		# type of subscript mapping
+define	IM_LUTOFF	Meml[$1+IMD+23]		# offset to subscript map luts
+define	IM_PIXOFF	Meml[$1+IMD+24]		# offset of the pixels
+define	IM_HGMOFF	Meml[$1+IMD+25]		# offset of hgm pixels
+define	IM_BLIST	Meml[$1+IMD+26]		# offset of bad pixel list
+define	IM_SZBLIST	Meml[$1+IMD+27]		# size of bad pixel list
+define	IM_NBPIX	Meml[$1+IMD+28]		# number of bad pixels
+define	IM_CTIME	Meml[$1+IMD+29]		# time of image creation
+define	IM_MTIME	Meml[$1+IMD+30]		# time of last modify
+define	IM_LIMTIME	Meml[$1+IMD+31]		# time min,max computed
+define	IM_MAX		Memr[$1+IMD+32]		# max pixel value
+define	IM_MIN		Memr[$1+IMD+33]		# min pixel value
+define	IM_PIXFILE	Memc[P2C($1+IMD+37)]	# name of pixel storage file
+define	IM_HDRFILE	Memc[P2C($1+IMD+165)]	# name of header storage file
+define	IM_TITLE	Memc[P2C($1+IMD+293)]	# image name string
+define	IM_HISTORY	Memc[P2C($1+IMD+485)]	# history comment string
 
 # The Histogram structure (field IM_HGM)
 define	LEN_HGMSTRUCT	20

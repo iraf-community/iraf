@@ -198,3 +198,27 @@ hp800:					# install HPUX series 800/700 binaries
         $verbose off
         !$(hlib)/mkfloat.csh hp700
         ;
+freebsd:				# install FREEBSD binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh freebsd -d $(DIRS)
+	;
+linux:					# install LINUX (Slackware) binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh linux -d $(DIRS)
+	;
+redhat:					# install REDHAT Linux binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh redhat -d $(DIRS)
+	;
+linuz:					# install LINUZ binaries
+	$verbose off
+	$set DIRS = "lib artdata astutil digiphot imred mtlocal onedspec nproto\
+		     nobsolete rv surfphot twodspec"
+	!$(hlib)/mkfloat.csh linuz -d $(DIRS)
+	;

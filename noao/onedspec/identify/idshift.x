@@ -2,23 +2,23 @@ include	"identify.h"
 
 define	NBIN	10	# Bin parameter for mode determination
 
-# ID_SHIFT -- Determine a shift by correlating feature user positions
+# ID_SHIFT1 -- Determine a shift by correlating feature user positions
 # with peaks in the image data.
 
-double procedure id_shift (id)
+double procedure id_shift1 (id)
 
 pointer	id			# ID pointer
 
-int	i, j, npeaks, ndiff, find_peaks()
+int	i, j, npeaks, ndiff, id_peaks()
 real	d, dmin
 double	pix, id_center(), id_fitpt()
 pointer	x, y, diff
-errchk	malloc, find_peaks
+errchk	malloc, id_peaks
 
 begin
 	# Find the peaks in the image data and center.
 	call malloc (x, ID_NPTS(id), TY_REAL)
-	npeaks = find_peaks (IMDATA(id,1), Memr[x], ID_NPTS(id), 0.,
+	npeaks = id_peaks (id, IMDATA(id,1), Memr[x], ID_NPTS(id), 0.,
 	    int (ID_MINSEP(id)), 0, ID_MAXFEATURES(id), 0., false)
 
 	# Center the peaks and convert to user coordinates.
@@ -62,4 +62,42 @@ begin
 	call mfree (diff, TY_REAL)
 
 	return (pix)
+end
+
+
+# ID_SHIFT -- Determine a shift using the AID_SHIFT algorithm.  This
+# differs from AID_SHIFT in that the input ID pointer is unchanged
+# (same dispersion function and features) but a shift is computed and
+# returned.
+
+double procedure id_shift (id, crsearch cdsearch)
+
+pointer	id		#I ID pointer
+double	crsearch	#I Search range
+double	cdsearch	#I Search range
+
+int	marker
+double	shift, asumd()
+pointer	new
+errchk	aid_shift
+
+begin
+	call stmark (ID_STP(id), marker)
+	call id_saveid (id, "backup")
+
+	# Find the shift.
+	shift = INDEFD
+	iferr {
+	    call aid_shift (id, crsearch, cdsearch)
+	    call malloc (new, ID_NPTS(id), TY_DOUBLE)
+	    call amovd (FITDATA(id,1), Memd[new], ID_NPTS(id))
+	    call id_getid (id, "backup")
+	    call asubd (FITDATA(id,1), Memd[new], Memd[new], ID_NPTS(id))
+	    shift = asumd (Memd[new], ID_NPTS(id)) / ID_NPTS(id)
+	    call mfree (new, TY_DOUBLE)
+	} then
+	    call id_getid (id, "backup")
+
+	call stfree (ID_STP(id), marker)
+	return (shift)
 end

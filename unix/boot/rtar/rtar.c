@@ -60,8 +60,11 @@
 #define	OK		0
 #define	RWXR_XR_X	0755
 #define	SZ_PADBUF	8196
-#define	SYMLINK		2
 #define ctrlcode(c)	((c) >= '\007' && (c) <= '\017')
+
+#define	LF_LINK		1
+#define	LF_SYMLINK	2
+#define	LF_DIR		5
 
 /* File header structure.  One of these precedes each file on the tape.
  * Each file occupies an integral number of TBLOCK size logical blocks
@@ -194,6 +197,7 @@ char	*argv[];
 			printfnames++;
 			break;
 		    case 'v':
+			printfnames++;
 			verbose++;
 			break;
 		    case 'l':
@@ -272,14 +276,13 @@ char	*argv[];
 		fflush (stdout);
 	    }
 
-	    if (fh.linkflag) {
+	    if (fh.linkflag == LF_SYMLINK || fh.linkflag == LF_LINK) {
 		/* No file follows header if file is a link.  Try to resolve
 		 * the link by copying the original file, assuming it has been
 		 * read from the tape.
 		 */
 		if (extract) {
-#ifdef BSDUNIX
-		    if (fh.linkflag == SYMLINK) {
+		    if (fh.linkflag == LF_SYMLINK) {
 			if (replace)
 			    os_delete (fh.name);
 			if (symlink (fh.linkname, fh.name) != 0) {
@@ -287,9 +290,7 @@ char	*argv[];
 				"Cannot make symbolic link %s -> %s\n",
 				fh.name, fh.linkname);
 			}
-		    } else
-#endif
-		    if (!links) {
+		    } else if (fh.linkflag == LF_LINK && !links) {
 			if (replace)
 			    os_delete (fh.name);
 			if (os_fcopy (fh.linkname, fh.name) == ERR) {
@@ -524,7 +525,7 @@ int	verbose;		/* long format output		*/
 	    tp + 4, tp + 20,
 	    fh->name);
 
-	if (fh->linkflag)
+	if (fh->linkflag && *fh->linkname)
 	    fprintf (out, " -> %s\n", fh->linkname);
 	else
 	    fprintf (out, "\n");

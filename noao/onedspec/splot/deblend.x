@@ -1,16 +1,32 @@
+include	<math.h>
 include	<mach.h>
 
-# DOFIT -- Fit gaussian components.  This is an interface to DOFIT1
-# which puts parameters into the form required by DOFIT1 and vice-versa.
+# Profile types.
+define	GAUSS		1	# Gaussian profile
+define	LORENTZ		2	# Lorentzian profile
+define	VOIGT		3	# Voigt profile
+
+# Elements of fit array.
+define	BKG		1	# Background
+define	POS		2	# Position
+define	INT		3	# Intensity
+define	GAU		4	# Gaussian FWHM
+define	LOR		5	# Lorentzian FWHM
+
+# Type of constraints.
+define	FIXED		1	# Fixed parameter
+define	SINGLE		2	# Fit a single value for all lines
+define	INDEP		3	# Fit independent values for all lines
+
+
+# DOFIT -- Fit line profiles.  This is an interface to DOFIT1
+# which puts parameters into the required form and vice-versa.
 # It also implements a constrained approach to the solution.
 
-procedure dofit (bkgfit, posfit, intfit, sigfit, x, y, s, npts, dx, nsub,
-	y1, dy, xg, yg, sg, ng, chisq)
+procedure dofit (fit, x, y, s, npts, dx, nsub, y1, dy,
+    xp, yp, gp, lp, tp, np, chisq)
 
-int	bkgfit		# Fit background (0=no, 1=yes)
-int	posfit		# Position fitting flag (1=fixed, 2=single, 3=all)
-int	intfit		# Intensity fitting flag (1=fixed, 2=single, 3=all)
-int	sigfit		# Sigma fitting flag (1=fixed, 2=single, 3=all)
+int	fit[5]		# Fit constraints
 real	x[npts]		# X data
 real	y[npts]		# Y data
 real	s[npts]		# Sigma data
@@ -19,76 +35,170 @@ real	dx		# Pixel size
 int	nsub		# Number of subpixels
 real	y1		# Continuum offset
 real	dy		# Continuum slope
-real	xg[ng]		# Initial and final x coordinates of gaussians
-real	yg[ng]		# Initial and final y coordinates of gaussians
-real	sg[ng]		# Initial and final sigmas of gaussians
-int	ng		# Number of gaussians
+real	xp[np]		# Profile positions
+real	yp[np]		# Profile intensities
+real	gp[np]		# Profile Gaussian FWHM
+real	lp[np]		# Profile Lorentzian FWHM
+int	tp[np]		# Profile type	
+int	np		# Number of profiles
 real	chisq		# Chi squared
 
-int	i
-pointer	sp, a, j
+int	i, j, fit1[5]
+pointer	sp, a, b
 errchk	dofit1
 
 begin
 	call smark (sp)
-	call salloc (a, 7 + 3 * ng, TY_REAL)
+	call salloc (a, 8 + 5 * np, TY_REAL)
 
 	# Convert positions and widths relative to first component.
 	Memr[a] = dx
 	Memr[a+1] = nsub
 	Memr[a+2] = y1
 	Memr[a+3] = dy
-	Memr[a+4] = yg[1]
-	Memr[a+5] = xg[1]
-	Memr[a+6] = sg[1]
-	do i = 1, ng {
-	    j = a + 3 * i + 4
-	    Memr[j] = yg[i] / Memr[a+4]
-	    Memr[j+1] = xg[i] - Memr[a+5]
-	    Memr[j+2] = sg[i] / Memr[a+6]
+	Memr[a+4] = yp[1]
+	Memr[a+5] = xp[1]
+	Memr[a+6] = gp[1]
+	Memr[a+7] = lp[1]
+	do i = 1, np {
+	    b = a + 5 * i + 3
+	    Memr[b]   = yp[i] / Memr[a+4]
+	    Memr[b+1] = xp[i] - Memr[a+5]
+	    switch (tp[i]) {
+	    case GAUSS:
+		if (Memr[a+6] == 0.)
+		    Memr[a+6] = gp[i]
+		Memr[b+2] = gp[i] / Memr[a+6]
+	    case LORENTZ:
+		if (Memr[a+7] == 0.)
+		    Memr[a+7] = lp[i]
+		Memr[b+3] = lp[i] / Memr[a+7]
+	    case VOIGT:
+		if (Memr[a+6] == 0.)
+		    Memr[a+6] = gp[i]
+		Memr[b+2] = gp[i] / Memr[a+6]
+		if (Memr[a+7] == 0.)
+		    Memr[a+7] = lp[i]
+		Memr[b+3] = lp[i] / Memr[a+7]
+	    }
+	    Memr[b+4] = tp[i]
 	}
 
 	# Do fit.
-	do i = 0, bkgfit {
-	    switch (10*posfit+sigfit) {
-	    case 11:
-		call dofit1 (i, 1, intfit, 1, x, y, s, npts, Memr[a], ng, chisq)
-	    case 12:
-		call dofit1 (i, 1, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-	    case 13:
-		call dofit1 (i, 1, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 1, intfit, 3, x, y, s, npts, Memr[a], ng, chisq)
-	    case 21:
-		call dofit1 (i, 2, intfit, 1, x, y, s, npts, Memr[a], ng, chisq)
-	    case 22:
-		call dofit1 (i, 1, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 2, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-	    case 23:
-		call dofit1 (i, 1, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 2, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 2, intfit, 3, x, y, s, npts, Memr[a], ng, chisq)
-	    case 31:
-		call dofit1 (i, 2, intfit, 1, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 3, intfit, 1, x, y, s, npts, Memr[a], ng, chisq)
-	    case 32:
-		call dofit1 (i, 1, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 2, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 3, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-	    case 33:
-		call dofit1 (i, 1, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 2, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 3, intfit, 2, x, y, s, npts, Memr[a], ng, chisq)
-		call dofit1 (i, 3, intfit, 3, x, y, s, npts, Memr[a], ng, chisq)
+	fit1[INT] = fit[INT]
+	do i = 1, fit[BKG] {
+	    fit1[BKG] = i
+	    fit1[GAU] = min (SINGLE, fit[GAU])
+	    fit1[LOR] = min (SINGLE, fit[LOR])
+	    do j = FIXED, fit[POS] {
+		fit1[POS] = j
+		if (np > 1 || j != INDEP)
+		    call dofit1 (fit1, x, y, s, npts, Memr[a], np, chisq)
+	    }
+	    if (np > 1 && (fit[GAU] == INDEP || fit[LOR] == INDEP)) {
+		fit1[GAU] = fit[GAU]
+		fit1[LOR] = fit[LOR]
+		call dofit1 (fit1, x, y, s, npts, Memr[a], np, chisq)
 	    }
 	}
 
 	y1 = Memr[a+2]
 	dy = Memr[a+3]
-	do i = 1, ng {
-	    j = a + 3 * i + 4
-	    yg[i] = Memr[j] * Memr[a+4]
-	    xg[i] = Memr[j+1] + Memr[a+5]
-	    sg[i] = abs (Memr[j+2] * Memr[a+6])
+	do i = 1, np {
+	    b = a + 5 * i + 3
+	    yp[i] = Memr[b] * Memr[a+4]
+	    xp[i] = Memr[b+1] + Memr[a+5]
+	    switch (tp[i]) {
+	    case GAUSS:
+		gp[i] = abs (Memr[b+2] * Memr[a+6])
+	    case LORENTZ:
+		lp[i] = abs (Memr[b+3] * Memr[a+7])
+	    case VOIGT:
+		gp[i] = abs (Memr[b+2] * Memr[a+6])
+		lp[i] = abs (Memr[b+3] * Memr[a+7])
+	    }
+	}
+
+	call sfree (sp)
+end
+
+
+# DOREFIT -- Refit line profiles.  This assumes the input is very close
+# to the final solution and minimizes the number of calls to the
+# fitting routines.  This is intended for efficient use in the
+# in computing bootstrap error estimates.
+
+procedure dorefit (fit, x, y, s, npts, dx, nsub, y1, dy,
+    xp, yp, gp, lp, tp, np, chisq)
+
+int	fit[5]		# Fit constraints
+real	x[npts]		# X data
+real	y[npts]		# Y data
+real	s[npts]		# Sigma data
+int	npts		# Number of points
+real	dx		# Pixel size
+int	nsub		# Number of subpixels
+real	y1		# Continuum offset
+real	dy		# Continuum slope
+real	xp[np]		# Profile positions
+real	yp[np]		# Profile intensities
+real	gp[np]		# Profile Gaussian FWHM
+real	lp[np]		# Profile Lorentzian FWHM
+int	tp[np]		# Profile type	
+int	np		# Number of profiles
+real	chisq		# Chi squared
+
+int	i
+pointer	sp, a, b
+errchk	dofit1
+
+begin
+	call smark (sp)
+	call salloc (a, 8 + 5 * np, TY_REAL)
+
+	# Convert positions and widths relative to first component.
+	Memr[a] = dx
+	Memr[a+1] = nsub
+	Memr[a+2] = y1
+	Memr[a+3] = dy
+	Memr[a+4] = yp[1]
+	Memr[a+5] = xp[1]
+	Memr[a+6] = gp[1]
+	Memr[a+7] = lp[1]
+	do i = 1, np {
+	    b = a + 5 * i + 3
+	    Memr[b]   = yp[i] / Memr[a+4]
+	    Memr[b+1] = xp[i] - Memr[a+5]
+	    switch (tp[i]) {
+	    case GAUSS:
+		Memr[b+2] = gp[i] / Memr[a+6]
+	    case LORENTZ:
+		Memr[b+3] = lp[i] / Memr[a+7]
+	    case VOIGT:
+		Memr[b+2] = gp[i] / Memr[a+6]
+		Memr[b+3] = lp[i] / Memr[a+7]
+	    }
+	    Memr[b+4] = tp[i]
+	}
+
+	# Do fit.
+	call dofit1 (fit, x, y, s, npts, Memr[a], np, chisq)
+
+	y1 = Memr[a+2]
+	dy = Memr[a+3]
+	do i = 1, np {
+	    b = a + 5 * i + 3
+	    yp[i] = Memr[b] * Memr[a+4]
+	    xp[i] = Memr[b+1] + Memr[a+5]
+	    switch (tp[i]) {
+	    case GAUSS:
+		gp[i] = abs (Memr[b+2] * Memr[a+6])
+	    case LORENTZ:
+		lp[i] = abs (Memr[b+3] * Memr[a+7])
+	    case VOIGT:
+		gp[i] = abs (Memr[b+2] * Memr[a+6])
+		lp[i] = abs (Memr[b+3] * Memr[a+7])
+	    }
 	}
 
 	call sfree (sp)
@@ -96,23 +206,21 @@ end
 
 
 # MODEL -- Compute model.
-#
-#	I(x) = I(i) exp {-[(x-xg(i)) / sg(i)]**2 / 2.}
-#
-# where the params are I1, I2, xg, yg, and sg.
 
-real procedure model (x, dx, nsub, xg, yg, sg, ng)
+real procedure model (x, dx, nsub, xp, yp, gp, lp, tp, np)
 
 real	x		# X value to be evaluated
 real	dx		# Pixel width
 int	nsub		# Number of subpixels
-real	xg[ng]		# X coordinates of gaussians
-real	yg[ng]		# Y coordinates of gaussians
-real	sg[ng]		# Sigmas of gaussians
-int	ng		# Number of gaussians
+real	xp[np]		# Profile positions
+real	yp[np]		# Profile intensities
+real	gp[np]		# Profile Gaussian FWHM
+real	lp[np]		# Profile Lorentzian FWHM
+int	tp[np]		# Profile type	
+int	np		# Number of profiles
 
 int	i, j
-real	delta, x1, y, arg
+real	delta, x1, y, arg1, arg2, v, v0, u
 
 begin
 	delta = dx / nsub
@@ -120,10 +228,22 @@ begin
 	y = 0.
 	do j = 1, nsub {
 	    x1 = x1 + delta
-	    do i = 1, ng {
-		arg = (x1 - xg[i]) / sg[i]
-		if (abs (arg) < 7.)
-		    y = y + yg[i] * exp (-arg**2 / 2.)
+	    do i = 1, np {
+		switch (tp[i]) {
+		case GAUSS:
+		    arg1 = 1.66511 * abs ((x1 - xp[i]) / gp[i])
+		    if (arg1 < 5.)
+			y = y + yp[i] * exp (-arg1**2)
+		case LORENTZ:
+		    arg2 = abs ((x1 - xp[i]) / (lp[i] / 2))
+		    y = y + yp[i] / (1 + arg2**2)
+		case VOIGT:
+		    arg1 = 1.66511 * (x1 - xp[i]) / gp[i]
+		    arg2 = 0.832555 * lp[i] / gp[i]
+		    call voigt (0., arg2, v0, u)
+		    call voigt (arg1, arg2, v, u)
+		    y = y + yp[i] * v / v0
+		}
 	    }
 	}
 	y = y / nsub
@@ -131,16 +251,107 @@ begin
 end
 
 
+# DERIVS -- Compute model and derivatives for MR_SOLVE procedure.
+# This could be optimized more for the Voigt profile by reversing
+# the do loops since v0 need only be computed once per line.
+
+procedure derivs (x, a, y, dyda, na)
+
+real	x		# X value to be evaluated
+real	a[na]		# Parameters
+real	y		# Function value
+real	dyda[na]	# Derivatives
+int	na		# Number of parameters
+
+int	i, j, nsub
+real	dx, dx1, delta, x1, wg, wl, arg1, arg2, I0, dI, c, u, v, v0
+
+begin
+	dx = a[1]
+	nsub = a[2]
+	delta = dx / nsub
+	dx1 = .1 * delta
+	x1 = x - (dx + delta) / 2
+	y = 0.
+	do i = 1, na
+	   dyda[i] = 0.
+	do j = 1, nsub {
+	    x1 = x1 + delta
+	    y = y + a[3] + a[4] * x1
+	    dyda[3] = dyda[3] + 1.
+	    dyda[4] = dyda[4] + x1
+	    do i = 9, na, 5 {
+		switch (a[i+4]) {
+		case GAUSS:
+		    I0 = a[5] * a[i]
+		    wg = a[7] * a[i+2]
+		    arg1 = 1.66511 * (x1 - a[6] - a[i+1]) / wg
+		    if (abs (arg1) < 5.) {
+			dI = exp (-arg1**2)
+			c = I0 * dI * arg1
+			y = y + I0 * dI
+			dyda[5] = dyda[5] + a[i] * dI
+			dyda[6] = dyda[6] + c / wg
+			dyda[7] = dyda[7] + c * arg1 / a[7]
+			dyda[i] = dyda[i] + a[5] * dI
+			dyda[i+1] = dyda[i+1] + c / wg
+			dyda[i+2] = dyda[i+2] + c * arg1 / a[i+2]
+		    }
+		case LORENTZ:
+		    I0 = a[5] * a[i]
+		    wl = (a[8] * a[i+3] / 2)
+		    arg2 = (x1 - a[6] - a[i+1]) / wl
+		    dI = 1 / (1 + arg2**2)
+		    c = 2 * I0 * dI * dI * arg2
+		    y = y + I0 * dI
+		    dyda[5] = dyda[5] + a[i] * dI
+		    dyda[6] = dyda[6] + c / wl
+		    dyda[8] = dyda[8] + c * arg2 / a[8]
+		    dyda[i] = dyda[i] + a[5] * dI
+		    dyda[i+1] = dyda[i+1] + c / wl
+		    dyda[i+3] = dyda[i+3] + c * arg2 / a[i+3]
+		case VOIGT:
+		    a[7] = max (dx1, abs(a[7]))
+		    a[8] = max (dx1, abs(a[8]))
+		    a[i+2] = max (1E-6, abs(a[i+2]))
+		    a[i+3] = max (1E-6, abs(a[i+3]))
+
+		    I0 = a[5] * a[i]
+		    wg = a[7] * a[i+2]
+		    wl = a[8] * a[i+3]
+		    arg1 = 1.66511 * (x1 - a[6] - a[i+1]) / wg
+		    arg2 = 0.832555 * wl / wg
+		    call voigt (0., arg2, v0, u)
+		    call voigt (arg1, arg2, v, u)
+		    v = v / v0; u = u / v0
+		    dI = (1 - v) / (v0 * SQRTOFPI)
+		    c = 2 * I0 * arg2
+		    y = y + I0 * v
+		    dyda[5] = dyda[5] + a[i] * v
+		    dyda[6] = dyda[6] + 2 * c * (arg1 * v - arg2 * u) / wl
+		    dyda[7] = dyda[7] +
+			c * (dI + arg1 * (arg1 / arg2 * v - 2 * u)) / a[7]
+		    dyda[8] = dyda[8] + c * (arg1 * u - dI) / a[8]
+		    dyda[i] = dyda[i] + a[5] * v
+		    dyda[i+1] = dyda[i+1] + 2 * c * (arg1 * v - arg2 * u) / wl
+		    dyda[i+2] = dyda[i+2] +
+			c * (dI + arg1 * (arg1 / arg2 * v - 2 * u)) / a[i+2]
+		    dyda[i+3] = dyda[i+3] + c * (arg1 * u - dI) / a[i+3]
+		}
+	    }
+	}
+	y = y / nsub
+	do i = 1, na
+	   dyda[i] = dyda[i] / nsub
+end
+
+
 # DOFIT1 -- Perform nonlinear iterative fit for the specified parameters.
 # This uses the Levenberg-Marquardt method from NUMERICAL RECIPES.
 
-procedure dofit1 (bkgfit, posfit, intfit, sigfit, x, y, s, npts, a, nlines,
-	chisq)
+procedure dofit1 (fit, x, y, s, npts, a, nlines, chisq)
 
-int	bkgfit		# Background fit (0=no, 1=yes)
-int	posfit		# Position fitting flag (1=fixed, 2=one, 3=all)
-int	intfit		# Intensity fitting flag (1=fixed, 2=one, 3=all)
-int	sigfit		# Sigma fitting flag (1=fixed, 2=one, 3=all)
+int	fit[5]		# Fit constraints
 real	x[npts]		# X data
 real	y[npts]		# Y data
 real	s[npts]		# Sigma data
@@ -155,54 +366,67 @@ pointer	sp, flags, ptr
 errchk	mr_solve
 
 begin
-	# Number of terms is 3 for each line plus common background, center,
-	# intensity and sigma.  Also the pixel size and number of subpixels.
+	# Number of terms is 5 for each line plus common background, center,
+	# intensity and widths.  Also the pixel size and number of subpixels.
 
-	np = 3 * nlines + 7
+	np = 5 * nlines + 8
 
 	call smark (sp)
 	call salloc (flags, np, TY_INT)
 	ptr = flags
 
 	# Background.
-	if (bkgfit == 1) {
+	switch (fit[BKG]) {
+	case SINGLE:
 	    Memi[ptr] = 3
 	    Memi[ptr+1] = 4
 	    ptr = ptr + 2
 	}
 
 	# Peaks.
-	switch (intfit) {
-	case 2:
+	switch (fit[INT]) {
+	case SINGLE:
 	    Memi[ptr] = 5
 	    ptr = ptr + 1
-	case 3:
+	case INDEP:
 	    do i = 1, nlines {
-		Memi[ptr] = 3 * i + 5
+		Memi[ptr] = 5 * i + 4
 		ptr = ptr + 1
 	    }
 	}
 
 	# Positions.
-	switch (posfit) {
-	case 2:
+	switch (fit[POS]) {
+	case SINGLE:
 	    Memi[ptr] = 6
 	    ptr = ptr + 1
-	case 3:
+	case INDEP:
 	    do i = 1, nlines {
-	        Memi[ptr] = 3 * i + 6
+		Memi[ptr] = 5 * i + 5
 		ptr = ptr + 1
 	    }
 	}
 
-	# Sigmas.
-	switch (sigfit) {
-	case 2:
+	# Gaussian FWHM.
+	switch (fit[GAU]) {
+	case SINGLE:
 	    Memi[ptr] = 7
 	    ptr = ptr + 1
-	case 3:
+	case INDEP:
 	    do i = 1, nlines {
-	        Memi[ptr] = 3 * i + 7
+		Memi[ptr] = 5 * i + 6
+		ptr = ptr + 1
+	    }
+	}
+
+	# Lorentzian FWHM.
+	switch (fit[LOR]) {
+	case SINGLE:
+	    Memi[ptr] = 8
+	    ptr = ptr + 1
+	case INDEP:
+	    do i = 1, nlines {
+		Memi[ptr] = 5 * i + 7
 		ptr = ptr + 1
 	    }
 	}
@@ -213,72 +437,17 @@ begin
 	chi2 = MAX_REAL
 	repeat {
 	    call mr_solve (x, y, s, npts, a, Memi[flags], np, nfit, mr, chisq)
-	    if (chi2 - chisq > 1.)
+	    if (chi2 - chisq > 0.0001)
 		i = 0
 	    else
 		i = i + 1
 	    chi2 = chisq
-	} until (i == 3)
+	} until (i == 5)
 
 	mr = 0.
 	call mr_solve (x, y, s, npts, a, Memi[flags], np, nfit, mr, chisq)
 
 	call sfree (sp)
-end
-
-
-# DERIVS -- Compute model and derivatives for MR_SOLVE procedure.
-#
-#	I(x) = I1 + I2 * x + I3 * I(i) exp {-[(x-xc-dx(i))/(sig*sig(i))]**2/2.}
-#
-# where the params are I1, I2, I3, xc, sig, I(i), dx(i), sig(i) (i=1,nlines).
-
-procedure derivs (x, a, y, dyda, na)
-
-real	x		# X value to be evaluated
-real	a[na]		# Parameters
-real	y		# Function value
-real	dyda[na]	# Derivatives
-int	na		# Number of parameters
-
-int	i, j, nsub
-real	dx, delta, x1, I0, sig, arg, ex, fac
-
-begin
-	dx = a[1]
-	nsub = a[2]
-	delta = dx / nsub
-	x1 = x - (dx + delta) / 2
-	y = 0.
-	do i = 1, na
-	   dyda[i] = 0.
-	do j = 1, nsub {
-	    x1 = x1 + delta
-	    y = y + a[3] + a[4] * x1
-	    dyda[3] = dyda[3] + 1.
-	    dyda[4] = dyda[4] + x1
-	    do i = 8, na, 3 {
-		I0 = a[5] * a[i]
-		sig = a[7] * a[i+2]
-		arg = (x1 - a[6] - a[i+1]) / sig
-		if (abs (arg) < 7.)
-		    ex = exp (-arg**2 / 2.)
-		else
-		    ex = 0.
-		fac = I0 * ex * arg
-
-		y = y + I0 * ex
-		dyda[5] = dyda[5] + a[i] * ex
-		dyda[6] = dyda[6] + fac / sig
-		dyda[7] = dyda[7] + fac * arg / a[7]
-		dyda[i] = dyda[i] + a[5] * ex
-		dyda[i+1] = dyda[i+1] + fac / sig
-		dyda[i+2] = dyda[i+2] + fac * arg / a[i+2]
-	    }
-	}
-	y = y / nsub
-	do i = 1, na
-	   dyda[i] = dyda[i] / nsub
 end
 
 
@@ -402,6 +571,8 @@ begin
 	chisq = 0.
 	do i = 1, npts {
 	    call derivs (x[i], params, ymod, Memr[dydp], np)
+	    if (IS_INDEF(ymod))
+		next
 	    sig2i = 1. / (s[i] * s[i])
 	    dy = y[i] - ymod
 	    do j = 1, nfit {

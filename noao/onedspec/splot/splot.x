@@ -35,7 +35,7 @@ real	avg_pix, sigma_pix
 int	fd1, fd2, ng, hline, hlines
 int	newgraph, newimage, overplot, options[NOPTIONS]
 pointer	sp, image, units, units1, units2, units3, cmd, save1, save2
-pointer	gp, gt, im, mw, x, y, sh, xg, yg, sg, hptr
+pointer	gp, gt, im, mw, x, y, sh, xg, yg, sg, lg, pg, hptr
 bool	wave_scl, fnu
 
 pointer	gopen(), gt_init()
@@ -80,7 +80,7 @@ begin
 	hline = 1
 	nline = 0
 	nband = 0
-	if (nowhite (Memc[units], Memc[units], SZ_FNAME) == 0)
+	if (nowhite (Memc[units], Memc[units1], SZ_FNAME) == 0)
 	    call strcpy ("display", Memc[units], SZ_FNAME)
 	call strcpy (Memc[units], Memc[units1], SZ_FNAME)
 	call strcpy (Memc[units], Memc[units2], SZ_FNAME)
@@ -135,7 +135,7 @@ begin
 		        call gt_colon (Memc[cmd], gp, gt, newgraph)
 		    else {
 			call splot_colon (Memc[cmd], options, gp, gt, sh,
-			    Memc[units], Memc[save1], Memc[save2],
+			    wx, wy, Memc[units], Memc[save1], Memc[save2],
 			    fd1, fd2,  newgraph)
 			overplot = options[OVERPLOT]
 			if (sh == NULL) {
@@ -177,14 +177,14 @@ begin
 		    call ans_hdr (sh, newimage, key, Memc[save1], Memc[save2],
 			fd1, fd2)
 		    call sp_deblend (sh, gp, wx, wy, Memr[x], Memr[y], npts,
-			fd1, fd2, xg, yg, sg, ng)
+			fd1, fd2, xg, yg, sg, lg, pg, ng)
 		    newimage = NO
     
 	        case 'k': # Fit gaussian
 		    call ans_hdr (sh, newimage, key, Memc[save1], Memc[save2],
 			fd1, fd2)
 		    call gfit (sh, gp, wx, wy, Memr[x], Memr[y], npts,
-			fd1, fd2, xg, yg, sg, ng)
+			fd1, fd2, xg, yg, sg, lg, pg, ng)
 		    newimage = NO
 
 	        case 'e': # Equivalent width
@@ -234,11 +234,13 @@ begin
 			switch (key) {
 			case 'a', 'b', 'c': # Continuum at cursor width at 1/2
 		            call eqwidth_cp (sh, gp, wx, wy, INDEF,
-				Memr[y], npts, key, fd1, fd2, xg, yg, sg, ng)
+				Memr[y], npts, key, fd1, fd2, xg, yg, sg,
+				lg, pg, ng)
 			    break
 			case 'l', 'r', 'k': # Continuum at 1
 		            call eqwidth_cp (sh, gp, wx, 1., wy,
-			        Memr[y], npts, key, fd1, fd2, xg, yg, sg, ng)
+			        Memr[y], npts, key, fd1, fd2, xg, yg, sg,
+				lg, pg, ng)
 			    break
 			default:
 		    	    call printf (
@@ -279,7 +281,7 @@ begin
 			if (streq (Memc[image], Memc[cmd])) {
 			    call shdr_close (sh)
 			} else if (imaccess (Memc[cmd], READ_ONLY) == YES) {
-			    call shdr_close(sh)
+			    call shdr_close (sh)
 			    call smw_close (mw)
 			    call imunmap (im)
 			    newimage = YES
@@ -496,7 +498,7 @@ begin
 
 	        case '-': # Subtract deblended fit
 		    call subblend (sh, gp, Memr[x], Memr[y], npts, wx, wy,
-			xg, yg, sg, ng)
+			xg, yg, sg, lg, pg, ng)
 
 	        case '.': # Slide upward
 		    call auto_exp (gp, gt, key, wx, Memr[x], Memr[y], npts)
@@ -593,6 +595,8 @@ begin
 	    call mfree (xg, TY_REAL)
 	    call mfree (yg, TY_REAL)
 	    call mfree (sg, TY_REAL)
+	    call mfree (lg, TY_REAL)
+	    call mfree (pg, TY_INT)
 	}
 	call smw_daxis (NULL, NULL, 0, 0, 0)
 	call gt_free (gt)

@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include "dgsurfitdef.h"
 
 # GSSUB -- Procedure to subtract two surfaces. The surfaces
@@ -14,8 +13,9 @@ pointer	sf1		# pointer to the first surface
 pointer	sf2		# pointer to the second surface
 pointer	sf3		# pointer to the output surface
 
-int	i, ncoeff
-pointer	sp, coeff, sfx, sfn, ptr1, ptr2, ptr3
+int	i, ncoeff, order, maxorder1, maxorder2, maxorder3
+int	nmove1, nmove2, nmove3
+pointer	sp, coeff, ptr1, ptr2, ptr3
 
 bool	fpequald()
 int	dgsgeti()
@@ -73,14 +73,22 @@ begin
 	    GS_YMAX(sf3) = GS_YMAX(sf1)
 	    GS_YRANGE(sf3) = GS_YRANGE(sf1)
 	    GS_YMAXMIN(sf3) = GS_YMAXMIN(sf1)
-	    if (GS_XTERMS(sf1) == YES || GS_XTERMS(sf2) == YES)
-		GS_XTERMS(sf3) = YES
+	    if (GS_XTERMS(sf1) == GS_XTERMS(sf2))
+		GS_XTERMS(sf3) = GS_XTERMS(sf1)
+	    else if (GS_XTERMS(sf1) == GS_XFULL || GS_XTERMS(sf2) == GS_XFULL)
+		GS_XTERMS(sf3) = GS_XFULL
 	    else
-		GS_XTERMS(sf3) = NO
-	    if (GS_XTERMS(sf3) == NO)
+		GS_XTERMS(sf3) = GS_XHALF
+	    switch (GS_XTERMS(sf3)) {
+	    case GS_XNONE:
 		GS_NCOEFF(sf3) = GS_NXCOEFF(sf3) + GS_NYCOEFF(sf3) - 1
-	    else
+	    case GS_XHALF:
+		order = min (GS_XORDER(sf3), GS_YORDER(sf3))
+	        GS_NCOEFF(sf3) = GS_NXCOEFF(sf3) * GS_NYCOEFF(sf3) - order *
+		    (order - 1) / 2
+	    default:
 	        GS_NCOEFF(sf3) = GS_NXCOEFF(sf3) * GS_NYCOEFF(sf3)
+	    }
 	default:
 	    call error (0, "GSADD: Unknown curve type.")
 	}
@@ -97,82 +105,66 @@ begin
 	# calculate the coefficients
 	call calloc (GS_COEFF(sf3), GS_NCOEFF(sf3), TY_DOUBLE)
 
-	if (GS_XTERMS(sf1) == YES && GS_XTERMS(sf2) == YES) {
+	# set up the line counters.
+        maxorder1 = max (GS_XORDER(sf1) + 1, GS_YORDER(sf1) + 1)
+        maxorder2 = max (GS_XORDER(sf2) + 1, GS_YORDER(sf2) + 1)
+        maxorder3 = max (GS_XORDER(sf3) + 1, GS_YORDER(sf3) + 1)
 
-	    ptr1 = GS_COEFF(sf1)
-	    ptr3 = GS_COEFF(sf3)
-	    do i = 1, GS_NYCOEFF(sf1) {
-		call amovd (COEFF(ptr1), COEFF(ptr3), GS_NXCOEFF(sf1))
-		ptr1 = ptr1 + GS_NXCOEFF(sf1)
-		ptr3 = ptr3 + GS_NXCOEFF(sf3)
-	    }
+        # add in the first surface.
+        ptr1 = GS_COEFF(sf1)
+        ptr3 = GS_COEFF(sf3)
+        nmove1 = GS_NXCOEFF(sf1)
+        nmove3 = GS_NXCOEFF(sf3)
+        do i = 1, GS_NYCOEFF(sf1) {
+            call amovd (COEFF(ptr1), COEFF(ptr3), nmove1)
+            ptr1 = ptr1 + nmove1
+            ptr3 = ptr3 + nmove3
+            switch (GS_XTERMS(sf1)) {
+            case GS_XNONE:
+                nmove1 = 1
+            case GS_XHALF:
+                if ((i + GS_XORDER(sf1) + 1) > maxorder1)
+                    nmove1 = nmove1 - 1
+            case GS_XFULL:
+                ;
+            }
+            switch (GS_XTERMS(sf3)) {
+            case GS_XNONE:
+                nmove3 = 1
+            case GS_XHALF:
+                if ((i + GS_XORDER(sf3) + 1) > maxorder3)
+                    nmove3 = nmove3 - 1
+            case GS_XFULL:
+                ;
+            }
+        }
 
-	    ptr2 = GS_COEFF(sf2)
-	    ptr3 = GS_COEFF(sf3)
-	    do i = 1, GS_NYCOEFF(sf2) {
-		call asubd (COEFF(ptr3), COEFF(ptr2), COEFF(ptr3),
-		    GS_NXCOEFF(sf2)) 
-		ptr2 = ptr2 + GS_NXCOEFF(sf2)
-		ptr3 = ptr3 + GS_NXCOEFF(sf3)
-	    }
-
-	} else if (GS_XTERMS(sf1) == NO && GS_XTERMS(sf2) == NO) {
-
-	    ptr1 = GS_COEFF(sf1)
-	    ptr2 = GS_COEFF(sf2)
-	    ptr3 = GS_COEFF(sf3)
-	    call amovd (COEFF(ptr1), COEFF(ptr3), GS_NXCOEFF(sf1))
-	    call asubd (COEFF(ptr3), COEFF(ptr2), COEFF(ptr3), GS_NXCOEFF(sf2))
-
-	    ptr1 = ptr1 + GS_NXCOEFF(sf1)
-	    ptr2 = ptr2 + GS_NXCOEFF(sf2)
-	    ptr3 = ptr3 + GS_NXCOEFF(sf3)
-	    call amovd (COEFF(ptr1), COEFF(ptr3), GS_NXCOEFF(sf1) - 1)
-	    call asubd (COEFF(ptr3), COEFF(ptr2), COEFF(ptr3),
-	        GS_NXCOEFF(sf2) - 1)
-
-	} else {
-	    
-	    # determine which surface has cross terms
-	    if (GS_XTERMS(sf1) == YES) {
-		sfx = sf1
-		sfn = sf2
-	    } else {
-		sfx = sf2
-		sfn = sf1
-	    }
-
-	    # add in surface with cross terms
-	    ptr1 = GS_COEFF(sfx)
-	    ptr3 = GS_COEFF(sf3)
-	    do i = 1, GS_NYCOEFF(sf3) {
-		call amovd (COEFF(ptr1), COEFF(ptr3), GS_NXCOEFF(sfx))
-		if (sfx == sf2)
-		    call amulkd (COEFF(ptr3), -1.0d0, COEFF(ptr3),
-		        GS_NXCOEFF(sfx))
-		ptr1 = ptr1 + GS_NXCOEFF(sfx)
-		ptr3 = ptr3 + GS_NXCOEFF(sf3)
-	    }
-
-	    # add remaining surface
-	    ptr2 = GS_COEFF(sfn)
-	    ptr3 = GS_COEFF(sf3)
-	    if (sfn == sf2)
-	        call asubd (COEFF(ptr3), COEFF(ptr2), COEFF(ptr3),
-		    GS_NXCOEFF(sfn))
-	    else
-	        call aaddd (COEFF(ptr3), COEFF(ptr2), COEFF(ptr3),
-		    GS_NXCOEFF(sfn))
-
-	    ptr2 = ptr2 + GS_NXCOEFF(sfn)
-	    ptr3 = ptr3 + GS_NXCOEFF(sf3)
-	    do i = 2, GS_NYCOEFF(sfn) {
-		if (sfn == sf2)
-		    COEFF(ptr3) = COEFF(ptr3) - COEFF(ptr2)
-		else
-		    COEFF(ptr3) = COEFF(ptr3) + COEFF(ptr2)
-	        ptr2 = ptr2 + 1
-	        ptr3 = ptr3 + GS_NXCOEFF(sf3)
-	    }
-	}
+        # subtract the second surface.
+        ptr2 = GS_COEFF(sf2)
+        ptr3 = GS_COEFF(sf3)
+        nmove2 = GS_NXCOEFF(sf2)
+        nmove3 = GS_NXCOEFF(sf3)
+        do i = 1, GS_NYCOEFF(sf2) {
+            call asubd (COEFF(ptr3), COEFF(ptr2), COEFF(ptr3), nmove2)
+            ptr2 = ptr2 + nmove2
+            ptr3 = ptr3 + nmove3
+            switch (GS_XTERMS(sf2)) {
+            case GS_XNONE:
+                nmove2 = 1
+            case GS_XHALF:
+                if ((i + GS_XORDER(sf2) + 1) > maxorder2)
+                    nmove2 = nmove2 - 1
+            case GS_XFULL:
+                ;
+            }
+            switch (GS_XTERMS(sf3)) {
+            case GS_XNONE:
+                nmove3 = 1
+            case GS_XHALF:
+                if ((i + GS_XORDER(sf3) + 1) > maxorder3)
+                    nmove3 = nmove3 - 1
+            case GS_XFULL:
+                ;
+            }
+        }
 end

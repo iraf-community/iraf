@@ -33,7 +33,7 @@ begin
 	if (ex != ey)
 	    return (false)
 	else {
-	    tol = EPSILOND * 10.0D0
+	    tol = EPSILOND * 32.0D0
 	    x1 = 1.0D0 + abs (normx - normy)
 	    x2 = 1.0D0 + tol
 	    return (x1 <= x2)

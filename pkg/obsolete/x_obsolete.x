@@ -1,4 +1,7 @@
 task	imtitle		= t_imtitle,
 	mkhistogram	= t_mkhistogram,
-	oimcombine	= t_imcombine,
+	odisplay	= t_display,
+	ofixpix		= t_fixpix,
+	orfits		= t_rfits,
+	owfits		= t_wfits,
 	radplt		= t_radplt

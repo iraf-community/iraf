@@ -10,7 +10,8 @@ for (k=1; k<=i; k+=1) {
     mk1dspec (out, output="", ap=k, rv=0., z=no, ncols=512, naps=i,
 	wstart=4210.0, wend=7362.7, title="Artificial Spectrum",
 	header=hdr, continuum=x, slope=0., temperature=5700.,
-        lines="", nlines=50, peak=-0.5, sigma=10., seed=i, comments=b1)
+        lines="", nlines=50, peak=-0.5, profile="gaussian", gfwhm=24,
+	seed=i, comments=b1)
 }
 
 mknoise (out, output="", ncols=512, nlines=512, title="", header="",

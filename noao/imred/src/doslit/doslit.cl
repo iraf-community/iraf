@@ -15,7 +15,9 @@ string	standards = ""		{prompt="List of standard star spectra\n"}
 string	readnoise = "rdnoise"	{prompt="Read out noise sigma (photons)"}
 string	gain = "gain"		{prompt="Photon gain (photons/data number)"}
 real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
-real	width = 5.		{prompt="Width of profiles (pixels)\n"}
+real	width = 5.		{prompt="Width of profiles (pixels)"}
+string	crval = "INDEF"		{prompt="Approximate wavelength"}
+string	cdelt = "INDEF"		{prompt="Approximate dispersion\n"}
 
 bool	dispcor = yes		{prompt="Dispersion correct spectra?"}
 bool	extcor = no		{prompt="Extinction correct spectra?"}
@@ -48,7 +50,7 @@ begin
 	apslitproc.clean = clean
 	sproc.datamax = datamax
 
-	sproc (obj, arc, arctable, std, dispcor, extcor, fluxcal,
+	sproc (obj, arc, arctable, std, crval, cdelt, dispcor, extcor, fluxcal,
 	    resize, clean, splot, redo, update, quicklook, batch, listonly)
 	delete (std, verify=no)
 

@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<qpset.h>
 include	"qpoe.h"
 
 define	MAX_NELEM	8192	# copy unit (chunk) size

@@ -17,12 +17,23 @@ The information saved in the plio save file title string consist of a
 series of keyword = value assignments, one per line.
 .endhelp ---------------------------------------------------------------------
 
-define	KW_TITLE	"$TITLE = "
-define	LEN_KWTITLE	9
 define	DEF_SZBUF	32768
 define	INC_SZBUF	16384
 define	INC_HDRMEM	8100
 define	IDB_RECLEN	80
+
+define	KW_TITLE	"$TITLE = "
+define	LEN_KWTITLE	9
+define	KW_CTIME	"$CTIME = "
+define	LEN_KWCTIME	9
+define	KW_MTIME	"$MTIME = "
+define	LEN_KWMTIME	9
+define	KW_LIMTIME	"$LIMTIME = "
+define	LEN_KWLIMTIME	11
+define	KW_MINPIXVAL	"$MINPIXVAL = "
+define	LEN_KWMINPIXVAL	13
+define	KW_MAXPIXVAL	"$MAXPIXVAL = "
+define	LEN_KWMAXPIXVAL	13
 
 
 # IM_PMSVHDR -- Save an image header in a text string as a sequence of
@@ -57,15 +68,48 @@ begin
 	call strcpy (IM_TITLE(im), Memc[tbuf], SZ_IMTITLE)
 	op = bp + gstrcpy (KW_TITLE, Memc[bp], ARB)
 	Memc[op] = '"';  op = op + 1
-
 	for (ip=tbuf;  Memc[ip] != EOS;  ip=ip+1) {
 	    if (Memc[ip] == '"') {
 		Memc[op] = '\\';  op = op + 1
 	    }
 	    Memc[op] = Memc[ip];  op = op + 1
 	}
-
 	Memc[op] = '"';  op = op + 1
+	Memc[op] = '\n';  op = op + 1
+
+	# Store the create time in buffer.
+	call sprintf (Memc[tbuf], SZ_IMTITLE, "%d")
+	    call pargl (IM_CTIME(im))
+	op = op + gstrcpy (KW_CTIME, Memc[op], ARB)
+	op = op + gstrcpy (Memc[tbuf], Memc[op], ARB)
+	Memc[op] = '\n';  op = op + 1
+
+	# Store the modify time in buffer.
+	call sprintf (Memc[tbuf], SZ_IMTITLE, "%d")
+	    call pargl (IM_MTIME(im))
+	op = op + gstrcpy (KW_MTIME, Memc[op], ARB)
+	op = op + gstrcpy (Memc[tbuf], Memc[op], ARB)
+	Memc[op] = '\n';  op = op + 1
+
+	# Store the limits time in buffer.
+	call sprintf (Memc[tbuf], SZ_IMTITLE, "%d")
+	    call pargl (IM_LIMTIME(im))
+	op = op + gstrcpy (KW_LIMTIME, Memc[op], ARB)
+	op = op + gstrcpy (Memc[tbuf], Memc[op], ARB)
+	Memc[op] = '\n';  op = op + 1
+
+	# Store the minimum good pixel value in buffer.
+	call sprintf (Memc[tbuf], SZ_IMTITLE, "%g")
+	    call pargr (IM_MIN(im))
+	op = op + gstrcpy (KW_MINPIXVAL, Memc[op], ARB)
+	op = op + gstrcpy (Memc[tbuf], Memc[op], ARB)
+	Memc[op] = '\n';  op = op + 1
+
+	# Store the maximum good pixel value in buffer.
+	call sprintf (Memc[tbuf], SZ_IMTITLE, "%g")
+	    call pargr (IM_MAX(im))
+	op = op + gstrcpy (KW_MAXPIXVAL, Memc[op], ARB)
+	op = op + gstrcpy (Memc[tbuf], Memc[op], ARB)
 	Memc[op] = '\n';  op = op + 1
 
 	# Copy the header cards.  
@@ -117,7 +161,7 @@ pointer	bp			#I pointer to text buffer (header save buf)
 
 int	hdrlen, sz_ua, nchars, ch, i
 pointer	sp, tbuf, ip, op, rp, ua
-int	strncmp()
+int	strncmp(), ctol(), ctor()
 errchk	realloc
 
 begin
@@ -125,7 +169,7 @@ begin
 	call salloc (tbuf, SZ_IMTITLE, TY_CHAR)
 
 	# Get the image title string.
-	for (ip=bp;  Memc[ip] != EOS;  ip=ip+1) {
+	for (ip = bp;  Memc[ip] != EOS;) {
 	    if (Memc[ip] == '$') {
 		if (strncmp (Memc[ip], KW_TITLE, LEN_KWTITLE) == 0) {
 		    # Advance to first character of quoted string.
@@ -149,15 +193,84 @@ begin
 		    Memc[op] = EOS
 		    call strcpy (Memc[tbuf], IM_TITLE(im), SZ_IMTITLE)
 
-		    # Advance to next line.
-		    while (Memc[ip] != EOS && Memc[ip] != '\n')
+	    	    # Advance to next line.
+	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
 			ip = ip + 1
-		    if (Memc[ip] == '\n')
+	    	    if (Memc[ip] == '\n')
 			ip = ip + 1
 
-		    break
+		} else if (strncmp (Memc[ip], KW_CTIME, LEN_KWCTIME) == 0) {
+		    # Decode the create time.
+		    ip = ip + LEN_KWCTIME
+		    rp = 1
+		    if (ctol (Memc[ip], rp, IM_CTIME(im)) <= 0)
+			IM_CTIME(im) = 0
+		    ip = ip + rp - 1
+
+	    	    # Advance to next line.
+	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
+			ip = ip + 1
+	    	    if (Memc[ip] == '\n')
+			ip = ip + 1
+
+		} else if (strncmp (Memc[ip], KW_MTIME, LEN_KWMTIME) == 0) {
+		    # Decode the modify time.
+		    ip = ip + LEN_KWMTIME
+		    rp = 1
+		    if (ctol (Memc[ip], rp, IM_MTIME(im)) <= 0)
+			IM_MTIME(im) = 0
+		    ip = ip + rp - 1
+
+	    	    # Advance to next line.
+	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
+			ip = ip + 1
+	    	    if (Memc[ip] == '\n')
+			ip = ip + 1
+
+		} else if (strncmp (Memc[ip], KW_LIMTIME, LEN_KWLIMTIME) == 0) {
+		    # Decode the limits time.
+		    ip = ip + LEN_KWLIMTIME
+		    rp = 1
+		    if (ctol (Memc[ip], rp, IM_LIMTIME(im)) <= 0)
+			IM_LIMTIME(im) = 0
+		    ip = ip + rp - 1
+
+	    	    # Advance to next line.
+	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
+			ip = ip + 1
+	    	    if (Memc[ip] == '\n')
+			ip = ip + 1
+
+		} else if (strncmp(Memc[ip],KW_MINPIXVAL,LEN_KWMINPIXVAL)==0) {
+		    # Decode the minimum pixel value.
+		    ip = ip + LEN_KWMINPIXVAL
+		    rp = 1
+		    if (ctor (Memc[ip], rp, IM_MIN(im)) <= 0)
+			IM_MIN(im) = 0.0
+		    ip = ip + rp - 1
+
+	    	    # Advance to next line.
+	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
+			ip = ip + 1
+	    	    if (Memc[ip] == '\n')
+			ip = ip + 1
+
+		} else if (strncmp(Memc[ip],KW_MAXPIXVAL,LEN_KWMAXPIXVAL)==0) {
+		    # Decode the maximum pixel value.
+		    ip = ip + LEN_KWMAXPIXVAL
+		    rp = 1
+		    if (ctor (Memc[ip], rp, IM_MAX(im)) <= 0)
+			IM_MAX(im) = 0.0
+		    ip = ip + rp - 1
+
+	    	    # Advance to next line.
+	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
+			ip = ip + 1
+	    	    if (Memc[ip] == '\n')
+			ip = ip + 1
 		}
-	    }
+	    } else
+		break
 	}
 
 	# Get the header keywords.

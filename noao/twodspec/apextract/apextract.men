@@ -19,4 +19,5 @@
    apbackground - Background subtraction algorithms
      approfiles - Profile determination algorithms
      apvariance - Extractions, variance weighting, cleaning, and noise model
+	 extras - Information about the extra information in 3D images
         package - Package parameters and general description of package

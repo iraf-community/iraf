@@ -56,7 +56,7 @@ real	nsigma			# Dynamic range of gaussian (dynrange param)
 
 int	ncnew, nlnew, nonew
 bool	new, flag[2]
-int	i, j, k, k1, k2, m, m1, m2
+int	i, j, k, k1, k2, m, m1, m2, dc
 real	mwc, mw1, mw2, dmw, x, x1, x2, dx, w, p, s, xc1, dx1
 real	p1, p2, pcen, fwhm, flux, flux1
 real	a[2], b[2], c[2], tb[2], cb[2], tt[2], ctb[2], t2tb[2], xmin[2], xmax[2]
@@ -66,7 +66,7 @@ pointer	sp, image, fname, apnum, comment
 pointer	im, mw, waves, peaks, sigmas, buf, spec, bf1, bf2, asi, data
 
 long	clgetl(), clktime()
-int	clgeti(), clgwrd(), imtopenp(), imtgetim(), imaccess()
+int	clgeti(), clgwrd(), imtopenp(), imtgetim()
 int	nowhite(), access(), open(), fscan(), nscan()
 real	clgetr(), urand(), asigrl()
 real	ecx2w(), ecxdx(), ecw2x(), ecw2xr, ecdelta()
@@ -123,6 +123,8 @@ begin
 	peak = clgetr ("peak")
 	sigma = clgetr ("sigma")
 	seed = clgetl ("seed")
+	if (IS_INDEFL(seed))
+	    seed = clktime (long(0))
 	subsample = 1. / clgeti ("nxsub")
 	nsigma = sqrt (2. * log (clgetr ("dynrange")))
 
@@ -183,17 +185,14 @@ begin
 	    i = imtgetim (lines, Memc[fname], SZ_FNAME)
 
 	    # Map image and check for existing images.
-	    if (imaccess (Memc[image], 0) == YES) {
+	    ifnoerr (im = immap (Memc[image], READ_WRITE, LEN_UA)) {
 		call eprintf ("%s: ")
 		    call pargstr (Memc[image])
 		call flush (STDERR)
 		if (!clgetb ("clobber")) {
 		    call eprintf ("Warning: Image already exists (%s)\n")
 			call pargstr (Memc[image])
-		    next
-		}
-		iferr (im = immap (Memc[image], READ_WRITE, LEN_UA)) {
-		    call erract (EA_WARN)
+		    call imunmap (im)
 		    next
 		}
 		new = false
@@ -309,9 +308,11 @@ begin
 			if (IS_INDEF(f[1])) {
 			    w1 = mw1 / m
 			    dw = b[1] / m
+			    dc = 0
 			} else {
 			    w1 = 1.
 			    dw = 1.
+			    dc = -1
 			}
 			w = mwc / m
 			if (mc[2] == 0)
@@ -322,7 +323,7 @@ begin
 			aphigh[1] = 1 + x + width
 			aplow[2] = INDEFR
 			aphigh[2] = INDEFR
-			call smw_swattrs (mw, i, 1, i, m, 0, w1, dw, nl,
+			call smw_swattrs (mw, i, 1, i, m, dc, w1, dw, nl,
 			    0D0, aplow, aphigh, "")
 		    }
 		    call smw_saveim (mw, im)

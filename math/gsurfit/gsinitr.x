@@ -18,12 +18,10 @@ real	xmax		# maximum value of x
 real	ymin		# minimum value of y
 real	ymax		# maximum value of y
 
+int	order
 errchk	malloc, calloc
 
 begin
-	# allocate space for the gsurve descriptor
-	call malloc (sf, LEN_GSSTRUCT, TY_STRUCT)
-
 	if (xorder < 1 || yorder < 1)
 	    call error (0, "GSINIT: Illegal order.")
 
@@ -31,6 +29,9 @@ begin
 	    call error (0, "GSINIT: xmax <= xmin.")
 	if (ymax <= ymin)
 	    call error (0, "GSINIT: ymax <= ymin.")
+
+	# allocate space for the gsurve descriptor
+	call malloc (sf, LEN_GSSTRUCT, TY_STRUCT)
 
 	# specify the surface-type dependent parameters
 	switch (surface_type) {
@@ -40,10 +41,15 @@ begin
 	    GS_NXCOEFF(sf) = xorder
 	    GS_NYCOEFF(sf) = yorder
 	    GS_XTERMS(sf) = xterms
-	    if (GS_XTERMS(sf) == YES)
-		GS_NCOEFF(sf) = GS_NXCOEFF(sf) * GS_NYCOEFF(sf)
-	    else
-		GS_NCOEFF(sf) = GS_NXCOEFF(sf) + GS_NYCOEFF(sf) - 1
+	    switch (xterms) {
+	    case GS_XNONE:
+		GS_NCOEFF(sf) = xorder + yorder - 1
+	    case GS_XHALF:
+	        order = min (xorder, yorder)
+		GS_NCOEFF(sf) = xorder * yorder - order * (order - 1) / 2
+	    default:
+		GS_NCOEFF(sf) = xorder * yorder
+	    }
 	    GS_XRANGE(sf) = 2. / (xmax - xmin)
 	    GS_XMAXMIN(sf) = - (xmax + xmin) / 2.
 	    GS_YRANGE(sf) = 2. / (ymax - ymin)
@@ -54,10 +60,15 @@ begin
 	    GS_NXCOEFF(sf) = xorder
 	    GS_NYCOEFF(sf) = yorder
 	    GS_XTERMS(sf) = xterms
-	    if (GS_XTERMS(sf) == YES)
-		GS_NCOEFF(sf) = GS_NXCOEFF(sf) * GS_NYCOEFF(sf)
-	    else
-		GS_NCOEFF(sf) = GS_NXCOEFF(sf) + GS_NYCOEFF(sf) - 1
+	    switch (xterms) {
+	    case GS_XNONE:
+		GS_NCOEFF(sf) = xorder + yorder - 1
+	    case GS_XHALF:
+	        order = min (xorder, yorder)
+		GS_NCOEFF(sf) = xorder *  yorder - order * (order - 1) / 2
+	    default:
+		GS_NCOEFF(sf) = xorder * yorder
+	    }
 	    GS_XRANGE(sf) = 1.0 
 	    GS_XMAXMIN(sf) = 0.0
 	    GS_YRANGE(sf) = 1.0

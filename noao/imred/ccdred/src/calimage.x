@@ -4,7 +4,7 @@ include	"ccdtypes.h"
 
 define	SZ_SUBSET	16			# Maximum size of subset string
 define	IMAGE	Memc[$1+($2-1)*SZ_FNAME]	# Image string
-define	SUBSET	Memc[$1+($2-1)*SZ_SUBSET]	# Subset string
+define	SUBSET	Memc[$1+($2-1)*(SZ_SUBSET+1)]	# Subset string
 
 # CAL_IMAGE -- Return a calibration image for a specified input image.
 # CAL_OPEN  -- Open the calibration image list.
@@ -307,7 +307,7 @@ begin
 		# Allocate memory for a new image.
 		if (i == 1) {
 		    call malloc (ccdtypes, i, TY_INT)
-		    call malloc (subsets, i * SZ_SUBSET, TY_CHAR)
+		    call malloc (subsets, i * (SZ_SUBSET+1), TY_CHAR)
 		    call malloc (nscans, i, TY_INT)
 		    call malloc (images, i * SZ_FNAME, TY_CHAR)
 		} else {
@@ -320,7 +320,7 @@ begin
 		# Enter the ccdtype, subset, and image name.
 		Memi[ccdtypes+i-1] = ccdtype
 		Memi[nscans+i-1] = ccdnscan (im, ccdtype)
-		call ccdsubset (im, SUBSET(subsets,i), SZ_SUBSET-1)
+		call ccdsubset (im, SUBSET(subsets,i), SZ_SUBSET)
 		call strcpy (Memc[image], IMAGE(images,i), SZ_FNAME-1)
 		nimages = i
 	    }

@@ -711,7 +711,7 @@ pointer	pd			# Plot file pointer
 
 int	i, j, nfeatures1, nfeatures2, nfit, iden, mono, clgwrd()
 double	shift, pix_shift, z_shift, v, vrms
-double	id_fitpt(), fit_to_pix(), id_shift(), id_center(), id_rms()
+double	id_fitpt(), fit_to_pix(), id_shift(), id_center(), id_rms(), id_zval()
 pointer	sp, pix, fit
 bool	clgetb()
 
@@ -781,7 +781,7 @@ begin
 	    pix_shift = pix_shift + PIX(id,i) - Memd[pix+i-1]
 	    fit_shift = fit_shift + FIT(id,i) - Memd[fit+i-1]
 	    if (Memd[fit+i-1] != 0.)
-	        z_shift = z_shift + (FIT(id,i) - Memd[fit+i-1]) / Memd[fit+i-1]
+		z_shift = z_shift + id_zval (id, FIT(id,i), Memd[fit+i-1])
 
 	    j = j + 1
 	    PIX(id,j) = PIX(id,i)
@@ -1043,8 +1043,8 @@ pointer	id				# ID pointer
 pointer	pd				# GIO pointer
 
 int	i, j
-double	z
 pointer	sp, str, x, y, gt, gt_init()
+double	id_zshiftd()
 
 begin
 	# Check if there is anything to plot.
@@ -1057,14 +1057,13 @@ begin
 	call salloc (y, ID_NFEATURES(id), TY_REAL)
 
 	# Set plot points.
-	z = ID_REDSHIFT(id)
 	j = 0
 	do i = 1, ID_NFEATURES(id) {
 	    if (IS_INDEFD(USER(id,i)))
 		break
 
 	    Memr[x+j] = USER(id,i)
-	    Memr[y+j] = FIT(id,i) / (1 + z) - USER(id,i)
+	    Memr[y+j] = id_zshiftd (id, FIT(id,i), 0)
 	    j = j + 1
 	}
 

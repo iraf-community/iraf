@@ -350,13 +350,17 @@ FILE	*out;
 		    }
 		    break;
 
-		case SGK_SETLW:
+		case SGK_SETLW: {
 		    /* Set pen width.
 		     */
+		    int x = max (0, sgip->x - 1);
+
 		    xy_flush (out);
 		    curpoints = 0;
-		    fwrite (penencode (dev_penbase + ((sgip->x) - 1) *
-			dev_penslope, DEV_SETLW), SZ_PENCMD, 1, out);
+		    fwrite (penencode (
+			max (1, dev_penbase + x * dev_penslope), DEV_SETLW),
+			SZ_PENCMD, 1, out);
+		    }
 		    break;
 		
 		default:

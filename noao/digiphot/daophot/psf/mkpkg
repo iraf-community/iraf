@@ -51,7 +51,7 @@ libpkg.a:
 	dpshowpsf.x	<mach.h>		<ctype.h>                   \
 			../lib/daophotdef.h     ../lib/psfdef.h
 	dpspstars.x	<mach.h>		../lib/daophotdef.h	    \
-			../lib/apseldef.h
+			../lib/apseldef.h	../lib/psfdef.h
 	dpsubpsf.x	<mach.h>		<imhdr.h>                   \
 			../lib/daophotdef.h     ../lib/psfdef.h
 	dpsurfpsf.x	<error.h>		<mach.h>                    \

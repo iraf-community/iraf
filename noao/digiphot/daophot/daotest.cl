@@ -38,7 +38,7 @@ begin
 	# plot files.
 
 	if (! access (im // ".imh") && ! access (im // ".hhh")) {
-	    rfits ("daophot$test/fits3.fits", 1, im, make_image=yes,
+	    rfits ("daophot$test/fits3.fits", "0", im, make_image=yes,
 		    long_header=no, short_header=yes, datatype="",blank=0,
 		    scale=yes,oldirafname=no,offset=0, >& "dev$null")
 	} else {

@@ -36,7 +36,7 @@ b_high,r,h,3.,0.,,"Background upper rejection sigma
 -- ARC DISPERSION FUNCTION PARAMETERS --"
 threshold,r,h,10.,0.,,"Minimum line contrast threshold"
 coordlist,f,h,linelists$thar.dat,,,"Line list"
-match,r,h,0.2,,,"Line list matching limit in Angstroms"
+match,r,h,-3.,,,"Line list matching limit in Angstroms"
 fwidth,r,h,3.5.,,,"Arc line widths in pixels"
 cradius,r,h,4.,,,Centering radius in pixels
 i_function,s,h,"legendre","legendre|chebyshev|spline1|spline3",,"Coordinate function"

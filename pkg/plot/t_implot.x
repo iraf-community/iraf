@@ -752,6 +752,7 @@ begin
 	    ny = IM_LEN(im,2)
 	else
 	    ny = 1
+	call amovkr (1., Memr[axvals], ndim)
 
 	if (lineplot) {
 	    # Extract a line vector.

@@ -66,7 +66,8 @@ begin
 	IO_QP(io) = qp
 	IO_MODE(io) = mode
 	IO_DEBUG(io) = QP_DEBUG(qp)
-	IO_BLOCK(io) = QP_BLOCK(qp)
+	IO_XBLOCK(io) = QP_XBLOCK(qp)
+	IO_YBLOCK(io) = QP_YBLOCK(qp)
 	IO_NODEFFILT(io) = QP_NODEFFILT(qp)
 	IO_NODEFMASK(io) = QP_NODEFMASK(qp)
 	IO_OPTBUFSIZE(io) = QP_OPTBUFSIZE(qp)
@@ -151,8 +152,24 @@ iferr {
 	    j = DD_YFIELD(dd)
 	    if (i == 0 || j == 0)
 		call syserrs (SYS_QPNOXYF, Memc[name])
-	    if (DD_FTYPE(dd,i) != TY_SHORT || DD_FTYPE(dd,j) != TY_SHORT)
+
+	    switch (DD_FTYPE(dd,i)) {
+	    case TY_INT, TY_LONG:
+		IO_EVXTYPE(io) = TY_INT
+	    case TY_SHORT:
+		IO_EVXTYPE(io) = TY_SHORT
+	    default:
 		call syserrs (SYS_QPXYFNS, Memc[name])
+	    }
+
+	    switch (DD_FTYPE(dd,j)) {
+	    case TY_INT, TY_LONG:
+		IO_EVYTYPE(io) = TY_INT
+	    case TY_SHORT:
+		IO_EVYTYPE(io) = TY_SHORT
+	    default:
+		call syserrs (SYS_QPXYFNS, Memc[name])
+	    }
 
 	    IO_EVXOFF(io) = DD_FOFFSET(dd,i)
 	    IO_EVYOFF(io) = DD_FOFFSET(dd,j)
@@ -196,6 +213,8 @@ iferr {
 	IO_YLENVLEN(io) = EH_YLENVLEN(eh)
 	IO_IXXOFF(io)	= EH_IXXOFF(eh)
 	IO_IXYOFF(io)	= EH_IXYOFF(eh)
+	IO_IXXTYPE(io)	= EH_IXXTYPE(eh)
+	IO_IXYTYPE(io)	= EH_IXYTYPE(eh)
 
 	# Copy the MINEVL event struct into the QPIO descriptor.
 	nwords = IO_EVENTLEN(io)

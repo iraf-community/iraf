@@ -4,6 +4,15 @@ procedure mkdoecslit ()
 begin
 
 	artdata
+	artdata.nxc = 5
+	artdata.nyc = 5
+	artdata.nxsub = 10
+	artdata.nysub = 10
+	artdata.nxgsub = 5
+	artdata.nygsub = 5
+	artdata.dynrange = 100000.
+	artdata.psfrange = 10.
+	artdata.ranbuf = 0
 
 	if (!access ("Bdemoflat." // envget ("imtype"))) {
 	    print ("Creating example demoflat ...")

@@ -129,7 +129,7 @@ begin
 
 	    # Set workstation state.
 	    switch (key) {
-	    case 'a', 'b', 'd', 'm', 'w', 'x', 'y', 'z':
+	    case 'a', 'b', 'd', 'm', 'w', 'x', 'y', 'z', ',':
 		call gdeactivate (gp, 0)
 	    }
  
@@ -149,6 +149,8 @@ begin
 		y = INDEF
 	    case 'a':	# Aperture photometry
 		call ie_rimexam (NULL, NULL, ie, x, y)
+	    case ',':	# Aperture photometry
+		call ie_qrimexam (NULL, NULL, ie, x, y)
 
 	    case 'b':	# Print image region coordinates
 		call printf ("%4d %4d %4d %4d\n")
@@ -165,7 +167,7 @@ begin
 			call pargi (IE_IY2(ie))
 		}
 
-	    case 'c','e','h','j','k','s','l','r','u','v': # Graphs (drawn below)
+	    case 'c','e','h','j','k','s','l','r','u','v','.': # Graphs
 		IE_GTYPE(ie) = key
 		redraw = YES
 
@@ -246,7 +248,7 @@ begin
 	    }
 
 	    switch (key) {
-	    case '?', 'a', 'b', 'd', 'm', 'w', 'x', 'y', 'z':
+	    case '?', 'a', 'b', 'd', 'm', 'w', 'x', 'y', 'z', ',':
 		IE_LASTKEY(ie) = key
 	    }
 
@@ -271,6 +273,8 @@ begin
 		    call ie_simexam (gp, mode, ie, x, y)
 		case 'u', 'v':	# vector cut plot
 		    call ie_vimexam (gp, mode, ie, x, y, IE_GTYPE(ie))
+		case '.':	# radial profile plot
+		    call ie_qrimexam (gp, mode, ie, x, y)
 		}
 		redraw = NO
 		mode = NEW_FILE

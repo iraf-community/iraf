@@ -106,12 +106,14 @@ separate throughput image or file is given then the individual
 flat field spectra are normalized to unity and then scaled by the
 throughput determined from the image or file.
 
-If a throughput image, such as a blank sky observation, is specified it
-is extracted if needed.  The total flux through each aperture is then
-found to define the relative throughputs of the apertures.  If a flat
-field was also specified the throughput values are multiplied into the
-normalized flat field otherwise the response image will consist of constant
-spectra with the relative throughputs derived from the image.
+If a throughput image, such as a blank sky observation, is specified it is
+extracted if needed.  The extracted sky spectra are divided by the flat
+field which is not yet corrected for throughput variations.  The total flux
+through each aperture is then found to define the relative throughputs of
+the apertures.  If a flat field was also specified the throughput values
+are multiplied into the normalized flat field otherwise the response image
+will consist of constant spectra with the relative throughputs derived from
+the image.
 
 If a throughput file is specified the throughput values for each aperture
 are defined from this file.  The file consists of lines with two columns,

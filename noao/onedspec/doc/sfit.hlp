@@ -239,7 +239,7 @@ command or by editing.
 	cl> sfit uv.* type=ratio logscale+ listonly+ fun=leg order=2
 .ih
 REVISIONS
-.ls SFIT V2.11
+.ls SFIT V2.10.4
 The task was expanded to include fitting specified bands in 3D multispec
 spectra.
 

@@ -24,11 +24,14 @@ libpkg.a:
 	ieopenlog.x	imexam.h <error.h> <imhdr.h>
 	iepos.x		imexam.h <error.h> <math.h>
 	ieprint.x	imexam.h <error.h>
+	ieqrimexam.x	imexam.h <error.h> <imhdr.h> <gset.h> <math.h>\
+			<math/gsurfit.h> <math/nlfit.h>
 	ierimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <math.h>\
-			<math/gsurfit.h>
+			<math/gsurfit.h> <math/nlfit.h>
 	iesimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <mach.h>
 	iestatistics.x	imexam.h <error.h>
 	ievimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <mach.h>\
 			<imset.h> <math.h> <math/iminterp.h>
+	stfmeasure.x	starfocus.h <error.h> <imhdr.h> <imset.h>
 	t_imexam.x	imexam.h <error.h> <gset.h> <imhdr.h>
 	;

@@ -6,7 +6,7 @@ include	<pkg/igsfit.h>
 # of images.  Determine the image dimensions.
 
 procedure fc_getcoords (database, list, axis, xmin, xmax, ymin, ymax,
-    coords, ncoords, labels)
+    coords, ncoords, labels, un)
 
 char	database[ARB]			# Database
 int	list				# List of images
@@ -16,23 +16,26 @@ real	ymin, ymax			# Image Y limits
 pointer	coords				# Coordinate data pointer
 pointer	ncoords				# Number of coordinate points
 char	labels[SZ_LINE,IGSPARAMS]	# Axis labels
+pointer	un				# Units pointer
 
-char	image1[SZ_FNAME], image2[SZ_FNAME], root[SZ_FNAME]
-int	i, j, rec, index, nfeatures
+char	image1[SZ_FNAME], image2[SZ_FNAME], root[SZ_FNAME], units[SZ_FNAME]
+int	i, j, rec, index, nfeatures, ntotal
 real	value, ltm[2,2], ltv[2]
 pointer	dt, im, mw, ct, x, y, user
 
 int	fc_getim(), dtgeti(), dtscan()
 real	mw_c1tranr()
 bool	strne()
-pointer	dtmap1(), immap(), mw_openim(), mw_sctran()
+pointer	dtmap1(), immap(), mw_openim(), mw_sctran(), un_open()
 
-errchk	dtgstr
+errchk	dtmap1, dtgstr
 
 begin
 	x = NULL
 	ncoords = 0
+	ntotal = 0
 	axis = 0
+	un = NULL
 
 	while (fc_getim (list, image1, SZ_FNAME) != EOF) {
 	    call sprintf (root, SZ_FNAME, "id%s")
@@ -90,12 +93,22 @@ begin
 		    ltm[2,2] = ltm[1,2]
 		    ltm[1,2] = 0.
 		    call mw_sltermr (mw, ltm, ltv, 2)
+		} else if (ltm[1,2] != 0. || ltm[2,1] != 0.) {
+		    ltv[1] = 0.
+		    ltv[2] = 0.
+		    ltm[1,1] = 1.
+		    ltm[2,1] = 0.
+		    ltm[2,2] = 1.
+		    ltm[1,2] = 0.
+		    call mw_sltermr (mw, ltm, ltv, 2)
 		}
 		ct = mw_sctran (mw, "physical", "logical", 1)
 
 		# Allocate memory for the feature information and read
 		# the database.
 
+		ifnoerr (call dtgstr (dt, rec, "units", units, SZ_FNAME))
+		    un = un_open (units)
 		nfeatures = dtgeti (dt, rec, "features")
 		if (x == NULL) {
 		    call malloc (x, nfeatures, TY_REAL)
@@ -124,6 +137,7 @@ begin
 			Memr[user+ncoords] = value
 			ncoords = ncoords + 1
 		    }
+		    ntotal = ntotal + 1
 		}
 		call mw_close (mw)
 		call imunmap (im)
@@ -133,29 +147,36 @@ begin
 	    call dtunmap (dt)
 	}
 
-	# If no features were found return.
+	# Set coordinates.  Take error action if no features are found.
 
-	if (ncoords == 0)
-	    return
+	if (ncoords > 0) {
+	    call xt_sort3 (Memr[user], Memr[x], Memr[y], ncoords)
+	    call malloc (coords, ncoords*IGSPARAMS, TY_REAL)
+	    call amovr (Memr[x], Memr[coords+(X-1)*ncoords], ncoords)
+	    call amovr (Memr[y], Memr[coords+(Y-1)*ncoords], ncoords)
+	    call amovr (Memr[user], Memr[coords+(Z-1)*ncoords], ncoords)
+	    call amovkr (1., Memr[coords+(W-1)*ncoords], ncoords)
 
-	call xt_sort3 (Memr[user], Memr[x], Memr[y], ncoords)
-	call malloc (coords, ncoords*IGSPARAMS, TY_REAL)
-	call amovr (Memr[x], Memr[coords+(X-1)*ncoords], ncoords)
-	call amovr (Memr[y], Memr[coords+(Y-1)*ncoords], ncoords)
-	call amovr (Memr[user], Memr[coords+(Z-1)*ncoords], ncoords)
-	call amovkr (1., Memr[coords+(W-1)*ncoords], ncoords)
+	    call fc_setfeatures (Memr[coords], Memr[coords+(Z-1)*ncoords],
+		ncoords)
+
+	    call strcpy ("X (pixels)", labels[1,X], SZ_LINE)
+	    call strcpy ("Y (pixels)", labels[1,Y], SZ_LINE)
+	    call strcpy ("User", labels[1,Z], SZ_LINE)
+	    call strcpy ("Surface", labels[1,S], SZ_LINE)
+	    call strcpy ("Residuals", labels[1,R], SZ_LINE)
+	}
 
 	call mfree (x, TY_REAL)
 	call mfree (y, TY_REAL)
 	call mfree (user, TY_REAL)
 
-	call fc_setfeatures (Memr[coords], Memr[coords+(Z-1)*ncoords], ncoords)
-
-	call strcpy ("X (pixels)", labels[1,X], SZ_LINE)
-	call strcpy ("Y (pixels)", labels[1,Y], SZ_LINE)
-	call strcpy ("User", labels[1,Z], SZ_LINE)
-	call strcpy ("Surface", labels[1,S], SZ_LINE)
-	call strcpy ("Residuals", labels[1,R], SZ_LINE)
+	if (ncoords == 0) {
+	    if (ntotal == 0)
+		call error (1, "No coordinates found in database")
+	    else
+		call error (1, "Only INDEF coordinates found in database")
+	}
 end
 
 

@@ -41,7 +41,7 @@ libex.a:
 	iwgbfits.x	imwcs.h
 	iwparray.x	imwcs.h
 	iwpstr.x	imwcs.h
-	iwrfits.x	imwcs.h mwcs.h <imhdr.h> <imio.h>
+	iwrfits.x	imwcs.h mwcs.h <imhdr.h> <imio.h> <ctype.h>
 	iwsaxmap.x	mwcs.h <imhdr.h> <imio.h>
 	mwallocd.x	mwcs.h
 	mwallocs.x	mwcs.h
@@ -93,12 +93,26 @@ libex.a:
 	mwswtype.x	mwcs.h <ctype.h>
 	mwtransd.x	mwcs.h
 	mwtransr.x	
+	wfait.x		mwcs.h <math.h>
 	wfarc.x		mwcs.h <math.h>
+	wfcar.x		mwcs.h <math.h>
+	wfcsc.x		mwcs.h <math.h>
 	wfdecaxis.x	mwcs.h
 	wfgls.x		mwcs.h <math.h>
+	wfgsurfit.x
 	wfinit.x	mwcs.com mwcs.h
+	wfmer.x		mwcs.h <math.h>
+	wfmol.x		mwcs.h <math.h>
 	wfmspec.x	mwcs.h <imhdr.h>
+	wfpar.x		mwcs.h <math.h>
+	wfpco.x		mwcs.h <math.h>
+	wfqsc.x		mwcs.h <math.h>
 	wfsamp.x	mwcs.h
 	wfsin.x		mwcs.h <math.h>
+	wfstg.x		mwcs.h <math.h>
 	wftan.x		mwcs.h <math.h>
+	wftnx.x		mwcs.h <math.h>
+	wftsc.x		mwcs.h <math.h>
+	wfzea.x		mwcs.h <math.h>
+	wfzpx.x		mwcs.h <math.h>
 	;

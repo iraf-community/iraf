@@ -2,6 +2,7 @@
 
 input,s,a,,,,List of images to fit
 output,s,a,,,,List of output images
+apertures,s,h,"",,,Apertures
 fittype,s,a,"difference","fit|difference|ratio",,Type of output fit
 references,s,h,"",,,"List of reference images
 "

@@ -17,7 +17,7 @@
 .sp .5v
 .in -2
 ..
-.ND February 1993
+.ND July 1995
 .TL
 Guide to the HYDRA Reduction Task DOHYDRA
 .AU
@@ -87,7 +87,8 @@ images to be processed, the flat field image as the aperture reference and
 the flat field, and one or more arc images.  A throughput file or image,
 such as a blank sky observation, may also be specified.  If there are many
 object or arc spectra per setup you might want to prepare "@ files".
-Specify the aperture identification file which is provided for each Hydra
+Specify the aperture identification table (a file for 4meter data or an
+image for WIYN data) which is provided for each Hydra
 configuration.  You might wish to verify the geometry parameters,
 separations, dispersion direction, etc., which may
 change with different detector setups.  The processing parameters are set
@@ -158,7 +159,11 @@ recorded in the log and possibly printed to the terminal.
 .IP [8]
 If dispersion correction is selected the first arc in the arc list is
 extracted.  The middle fiber is used to identify the arc lines and define
-the dispersion function using the task \fBidentify\fR.  Identify a few arc
+the dispersion function using the task \fBautoidentify\fR.  The
+\fIcrval\fR and \fIcdelt\fR parameters are used in the automatic
+identification.  Whether or not the automatic identification is
+successful you will be shown the result of the arc line identification.
+If the automatic identification is not successful identify a few arc
 lines with 'm' and use the 'l' line list identification command to
 automatically add additional lines and fit the dispersion function.  Check
 the quality of the dispersion function fit with 'f'.  When satisfied exit
@@ -174,18 +179,27 @@ If the spectra are to be resampled to a linear dispersion system
 (which will be the same for all spectra) default dispersion parameters
 are printed and you are allowed to adjust these as desired.
 .IP [11]
+If the sky line alignment option is selected and the sky lines have not
+been identified for a particular aperture identification table then you are
+asked to mark one or more sky lines.  You may simply accept the wavelengths
+of these lines as defined by the dispersion solution for this spectrum and
+fiber or you may specify knowns wavelengths for the lines. These lines will
+be reidentified in all object spectra extracted and a mean zeropoint shift
+will be added to the dispersion solution.  This has the effect of aligning
+these lines to optimize sky subtraction.
+.IP [12]
 The object spectra are now automatically scatteredl ight subtracted,
  extracted, flat fielded, and dispersion corrected.
-.IP [12]
+.IP [13]
 When sky subtracting, the individual sky spectra may be reviewed and some
 spectra eliminated using the 'd' key.  The last deleted spectrum may be
 recovered with the 'e' key.  After exiting the review with 'q' you are
 asked for the combining option.  The type of combining is dictated by the
 number of sky fibers.
-.IP [13]
+.IP [14]
 The option to examine the final spectra with \fBsplot\fR may be given.
 To exit type 'q'.
-.IP [14]
+.IP [15]
 If scattered light is subtracted from the input data a copy of the
 original image is made by appending "noscat" to the image name.
 If the data are reprocessed with the \fIredo\fR flag the original
@@ -196,7 +210,10 @@ The final spectra will have the same name as the original 2D images
 with a ".ms" extension added.  The flat field and arc spectra will
 also have part of the aperture identification table name added to
 allow different configurations to use the same 2D flat field and arcs
-but with different aperture definitions.
+but with different aperture definitions.  If using the sky alignment
+option an image "align" with the aperture identification table name
+applied will also be created.
+
 .NH
 Spectra and Data Files
 .LP
@@ -255,10 +272,11 @@ to that object.  That file is called an \fIarc assignment table\fR and it
 is one of the optional setup files which can used with \fBdohydra\fR.
 .LP
 The first step in the processing is identifying the spectra in the images.
-The \fIaperture identification file\fR contains information about the fiber
-assignments.  This file is created for you when using Hydra but must be
-prepared by the user when using Nessie.  A description of this file is
-given in the section concerning Nessie.
+The \fIaperture identification table\fR (which may be a file or an image)
+contains information about the fiber assignments.  This table is created
+for you when using Hydra but must be prepared by the user when using
+Nessie.  A description of this table as a text file is given in the section
+concerning Nessie.
 .LP
 The final reduced spectra are recorded in two or three dimensional IRAF
 images.  The images have the same name as the original images with an added
@@ -350,6 +368,8 @@ objects =               List of object spectra
 (minsep =           8.) Minimum separation between fibers (pixels)
 (maxsep =          15.) Maximum separation between fibers (pixels)
 (apidtab=             ) Aperture identifications
+(crval  =        INDEF) Approximate wavelength
+(cdelt  =        INDEF) Approximate dispersion
 (objaps =             ) Object apertures
 (skyaps =             ) Sky apertures
 (arcaps =             ) Arc apertures
@@ -390,26 +410,40 @@ spectrum.
 .LP
 The detector read out noise and gain are used for cleaning and variance
 (optimal) extraction.  The default will determine the values from the image
-itself.  The dispersion axis defines the wavelength direction of spectra in
+itself.
+The variance
+weighting and cosmic-ray cleanning are sensitive to extremely strong
+cosmic-rays; ones which are hundreds of times brighter than the
+spectrum.  The \fIdatamax\fR is used to set an upper limit for any
+real data.  Any pixels above this value will be flagged as cosmic-rays
+and will not affect the extractions.
+The dispersion axis defines the wavelength direction of spectra in
 the image if not defined in the image header by the keyword DISPAXIS.  The
 width and separation parameters define the dimensions (in pixels) of the
 spectra (fiber profile) across the dispersion.  The width parameter
 primarily affects the centering.  The maximum separation parameter is
-important if missing spectra from the aperture identification file are to
+important if missing spectra from the aperture identification table are to
 be correctly skipped.  The number of fibers can be left at the default
 (for Hydra) and the task will try to account for unassigned or missing fibers.
+.LP
+The approximate central wavelength and dispersion are used for the
+automatic identification of the arc reference.  They may be specified
+as image header keywords or values.  The INDEF values search the
+entire range of the coordinate reference file but the automatic
+line identification algorithm works much better and faster if
+approximate values are given.
 .LP
 The task needs to know which fibers are object, sky if sky subtraction is
 to be done, and simultaneous arcs if used.  One could explicitly give the
 aperture numbers but the recommended way, provided an aperture
-identification file is used, is to select the apertures based on the beam
-numbers.  The default values are those appropriate for the identification
-files generated for Hydra configurations.  Sky subtracted sky spectra are
-useful for evaluating the sky subtraction.  Since only the spectra
-identified as objects are sky subtracted one can exclude fibers from the
-sky subtraction.  For example, if the \f(CWobjbeams\fR parameter is set to 1
-then only those fibers with a beam of 1 will be sky subtracted.  All other
-fibers will remain in the extracted spectra but will not be sky
+identification table is used, is to select the apertures based on
+the beam numbers.  The default values are those appropriate for the
+identification files generated for Hydra configurations.  Sky subtracted
+sky spectra are useful for evaluating the sky subtraction.  Since only the
+spectra identified as objects are sky subtracted one can exclude fibers
+from the sky subtraction.  For example, if the \fIobjbeams\fR parameter is
+set to 1 then only those fibers with a beam of 1 will be sky subtracted.
+All other fibers will remain in the extracted spectra but will not be sky
 subtracted.
 .LP
 The next set of parameters select the processing steps and options.  The
@@ -434,6 +468,12 @@ possibly, resample the spectra to a linear (or log-linear) wavelength
 scale.  If simultaneous arc fibers are defined there is an option to delete
 them from the final spectra when they are no longer needed.
 .LP
+The sky alignment option allows applying a zeropoint dispersion shift
+to all fibers based on one or more sky lines.  This requires all fibers
+to have the sky lines visible.  When there are sky lines this will
+improve the sky subtraction if there is a systematic error in the
+fiber illumination between the sky and the arc calibration.
+.LP
 The sky subtraction option selects whether to combine the sky fiber spectra
 and subtract this sky from the object fiber spectra.  \fIDispersion
 correction and sky subtraction are independent operations.\fR  This means
@@ -456,7 +496,7 @@ Generally once a spectrum has been processed it will not be reprocessed if
 specified as an input spectrum.  However, changes to the underlying
 calibration data can cause such spectra to be reprocessed if the
 \f(CWupdate\fR flag is set.  The changes which will cause an update are a new
-aperture identification file, a new reference image, new flat fields, and a
+aperture identification table, a new reference image, new flat fields, and a
 new arc reference.  If all input spectra are to be processed regardless of
 previous processing the \f(CWredo\fR flag may be used.  Note that
 reprocessing clobbers the previously processed output spectra.
@@ -622,7 +662,7 @@ number of dispersion lines to improve the signal.  The number of lines is
 set by the \f(CWnsum\fR parameter.
 .LP
 The \f(CWorder\fR parameter defines whether the order of the aperture
-identifications in the aperture identification file (or the default
+identifications in the aperture identification table (or the default
 sequential numbers if no file is used) is in the same sense as the image
 coordinates (increasing) or the opposite sense (decreasing).  If the
 aperture identifications turn out to be opposite to what is desired when
@@ -648,7 +688,7 @@ which uses the \f(CWwidth\fR parameter.
 Apertures are then assigned to each spectrum.  The initial edges of the
 aperture relative to the center are defined by the \f(CWlower\fR and
 \f(CWupper\fR parameters.  The trickiest part of assigning the apertures is
-relating the aperture identification from the aperture identification file
+relating the aperture identification from the aperture identification table
 to automatically selected fiber profiles.  The first aperture id in the
 file is assigned to the first spectrum found using the \f(CWorder\fR
 parameter to select the assignment direction.  The numbering proceeds in
@@ -672,7 +712,7 @@ correct identification of the fibers is tricky and it is fundamentally
 important that this be done correctly; otherwise the spectrum
 identifications will not be for the objects they say.  An important command in
 this regard is the 'o' key which allows reordering the identifications
-based on the aperture identification file.  This is required if the first
+based on the aperture identification table.  This is required if the first
 fiber is actually missing since the initial assignment begins assigning the
 first spectrum found with the first entry in the aperture file.  The
 aperture editor is a very powerful tool and is described in detail as
@@ -828,13 +868,17 @@ particular observation, and resampling the spectra to evenly spaced pixels
 in wavelength.
 .LP
 The comparison arc spectra are used to define dispersion functions for the
-fibers using the tasks \fBidentify\fR and \fBreidentify\fR.  The
-interactive \fBidentify\fR task is only used on the central fiber of the
+fibers using the tasks \fBautoidentify\fR and \fBreidentify\fR.  The
+interactive \fBautoidentify\fR task is only used on the central fiber of the
 first arc spectrum to define the basic reference dispersion solution from
 which all other fibers and arc spectra are automatically derived using
-\fBreidentify\fR.
+\fBreidentify\fR. \fBAutoidentify\fR attempts to automatically identify
+the arc lines using the \fIcrval\fR and \fIcdelt\fR parameters.  Whether
+or not it is successful the user is presented with the interactive
+identification graph.  The automatic identifications can be reviewed and a
+new solution or corrections to the automatic solution may be performed.
 .LP
-The set of arc dispersion function parameters are from \fBidentify\fR and
+The set of arc dispersion function parameters are from \fBautoidentify\fR and
 \fBreidentify\fR.  The parameters define a line list for use in
 automatically assigning wavelengths to arc lines, a parameter controlling
 the width of the centering window (which should match the base line
@@ -845,7 +889,7 @@ and the addition of new lines from the line list when reidentifying
 additional arc spectra.  The defaults should generally be adequate and the
 dispersion function fitting parameters may be altered interactively.  One
 should consult the help for the two tasks for additional details of these
-parameters and the operation of \fBidentify\fR.
+parameters and the operation of \fBautoidentify\fR.
 .LP
 Generally, taking a number of comparison arc lamp exposures interspersed
 with the program spectra is sufficient to accurately dispersion calibrate
@@ -875,6 +919,19 @@ the middle of the exposure).  The Julian date and a local Julian day number
 LJD.  In addition the universal time at the middle of the exposure, keyword
 UTMIDDLE, is computed by the task \fBsetairmass\fR and this may also be used
 for ordering the arc and object observations.
+.LP
+An optional step is to use sky lines in the spectra to compute a zeropoint
+dispersion shift that will align the sky lines.  This may improve sky
+subtraction if the illumination is not the same between the arc calibration
+and the sky.  When selected the object spectrum is dispersion corrected
+using a non-linear dispersion function to avoid resampling the spectrum.
+The sky lines are then reidentified in wavelength space from a template
+list of sky lines.  The mean shift in the lines for each fiber relative to
+the template in that fiber is computed to give the zeropoint shift.  The
+database file is created when the first object is extracted.  You are asked
+to mark the sky lines in one fiber and then the lines are automatically
+reidentified in all other fibers.  Note that this technique requires the
+sky lines be found in all fibers.
 .LP
 The last step of dispersion correction (resampling the spectrum to evenly
 spaced pixels in wavelength) is optional and relatively straightforward.
@@ -971,17 +1028,17 @@ The primary arc exposure is \f(CWnesjun042c\fR, the secondary arc is
 the list of apertures also includes hyphen delimited ranges such as
 "8-10".
 .LP
-With Hydra the aperture identification file is produced for the user.  With
-Nessie this is not the case, hence, the user must prepare the file
-manually.  The identification file is not mandatory, sequential numbering
-will be used, but it is highly recommended for keeping track of the objects
-assigned to the fibers.  The aperture identification file contains lines
-consisting of an aperture number, a beam number, and an object
-identification.  These must be in the same order as the fibers in the
-image.  The aperture number may be any unique number but it is recommended
-that the fiber number be used.  The beam number is used to flag object,
-sky, arc, or other types of spectra.  The default beam numbers used by the
-task are 0 for sky, 1 for object, and 2 for arc.  The object
+With Hydra the aperture identification table is produced for the user.  With
+Nessie this is not the case, hence, the user must prepare a file
+manually.  The aperture identification file is not mandatory, sequential
+numbering will be used, but it is highly recommended for keeping track of
+the objects assigned to the fibers.  The aperture identification file
+contains lines consisting of an aperture number, a beam number, and an
+object identification.  These must be in the same order as the fibers in
+the image.  The aperture number may be any unique number but it is
+recommended that the fiber number be used.  The beam number is used to flag
+object, sky, arc, or other types of spectra.  The default beam numbers used
+by the task are 0 for sky, 1 for object, and 2 for arc.  The object
 identifications are optional but it is good practice to include them so
 that the data will contain the object information independent of other
 records.  Figure 5 shows an example for the \fIblue\fR fibers from a board
@@ -1014,11 +1071,11 @@ is actually between fibers 44 and 45.  The broken fiber entries, given beam
 number -1, are optional but recommended to give the automatic spectrum
 finding operation the best chance to make the correct identifications.  The
 identification file will vary for each plugboard setup.  Additional
-information about the aperture identification file may be found in the
+information about the aperture identification table may be found in the
 description of the task \fBapfind\fR.
 .LP
-An alternative to using an aperture identification file is to give no
-file, the "" empty string, and to explicitly give a range of
+An alternative to using an aperture identification table is to give no
+name, the "" empty string, and to explicitly give a range of
 aperture numbers for the skys and possibly for the sky subtraction
 object list in the parameters \f(CWobjaps, skyaps, arcaps, objbeams,
 skybeams,\fR and \f(CWarcbeams\fR.
@@ -1242,9 +1299,7 @@ fibers = 97 (apfind)
 Number of fibers.  This number is used during the automatic definition of
 the apertures from the aperture reference spectrum.  It is best if this
 reflects the actual number of fibers which may be found in the aperture
-reference image.  Note that Hydra fibers which are unassigned will still
-contain enough light for identification and the aperture identification
-file will be used to eliminate the unassigned fibers.  The interactive
+reference image.  The interactive
 review of the aperture assignments allows verification and adjustments
 to the automatic aperture definitions.
 .LE
@@ -1267,11 +1322,24 @@ identification assignments will be adjusted accordingly.
 .LE
 apidtable = "" (apfind)
 .LS
-Aperture identification table containing the fiber number, beam number
-defining object (1), sky (0), and arc (2) fibers, and a spectrum title.
-For Hydra this file is generated for the user while for Nessie the user
-prepares it for each plugboard.  Unassigned and broken fibers (beam of -1)
-should be included in this list since they will automatically be excluded.
+Aperture identification table.  This may be either a text file or an
+image.  A text file contains the fiber number, beam number defining object
+(1), sky (0), and arc (2) fibers, and a object title.  An image contains
+the keywords SLFIBnnn with string value consisting of the fiber number,
+beam number, optional right ascension and declination, and an object
+title.  For Nessie the user had to prepare the file for each plugboard, for
+Hydra at the 4meter the file was generated for the user, and for Hydra at
+the WIYN the image header contains the information.  Unassigned and broken
+fibers (beam of -1) should be included in the identification information
+since they will automatically be excluded.
+.LE
+crval = INDEF, cdelt = INDEF (autoidentify)
+.LS
+These parameters specify an approximate central wavelength and dispersion.
+They may be specified as numerical values, INDEF, or image header keyword
+names whose values are to be used.
+If both these parameters are INDEF then the automatic identification will
+not be done.
 .LE
 objaps = "", skyaps = "", arcaps = ""
 .LS
@@ -1329,6 +1397,14 @@ savearcs = yes
 .LS
 Save any simultaneous arc apertures?  If no then the arc apertures will
 be deleted after use.
+.LE
+skyalign = no
+.LS
+Align sky lines?  If yes then for the first object spectrum you are asked
+to mark one or more sky lines to use for alignment.  Then these lines will
+be found in all spectra and an average zeropoint shift computed and applied
+to the dispersion solution to align these lines.  Note that this assumes
+the sky lines are seen in all fibers.
 .LE
 skysubtract = yes
 .LS
@@ -1588,22 +1664,22 @@ order specifying the number of pieces.
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
 
-threshold = 10. (identify/reidentify)
+threshold = 10. (autoidentify/identify/reidentify)
 .LS
 In order for a feature center to be determined the range of pixel intensities
 around the feature must exceed this threshold.
 .LE
-coordlist = "linelists$idhenear.dat" (identify)
+coordlist = "linelists$idhenear.dat" (autoidentify/identify)
 .LS
 Arc line list consisting of an ordered list of wavelengths.
 Some standard line lists are available in the directory "linelists$".
 .LE
-match = 10. (identify)
+match = -3. (autoidentify/identify)
 .LS
 The maximum difference for a match between the dispersion function prediction
 value and a wavelength in the coordinate list.
 .LE
-fwidth = 4. (identify)
+fwidth = 4. (autoidentify/identify)
 .LS
 Approximate full base width (in pixels) of arc lines.
 .LE
@@ -1611,13 +1687,13 @@ cradius = 10. (reidentify)
 .LS
 Radius from previous position to reidentify arc line.
 .LE
-i_function = "spline3", i_order = 3 (identify)
+i_function = "spline3", i_order = 3 (autoidentify/identify)
 .LS
 The default function and order to be fit to the arc wavelengths as a
 function of the pixel coordinate.  The functions choices are "chebyshev",
 "legendre", "spline1", or "spline3".
 .LE
-i_niterate = 2, i_low = 3.0, i_high = 3.0 (identify)
+i_niterate = 2, i_low = 3.0, i_high = 3.0 (autoidentify/identify)
 .LS
 Number of rejection iterations and sigma thresholds for rejecting arc
 lines from the dispersion function fits.

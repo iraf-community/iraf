@@ -8,26 +8,37 @@ include "iki.h"
 
 procedure iki_parse (image, root, extn)
 
-char	image[ARB]		# input image name
-char	root[SZ_PATHNAME]	# output root pathname
-char	extn[MAX_LENEXTN]	# output extension
+char	image[ARB]			#I input image name
+char	root[SZ_PATHNAME]		#U output root pathname
+char	extn[MAX_LENEXTN]		#O output extension
 
-int	ip, op
-int	dot, delim
-pointer	sp, pattern
-string	ex HDR_EXTENSIONS
-int	strmatch(), strlen()
+pointer	sp, imname
+int	ip, op, dot
+int	strlen(), iki_validextn()
+bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (pattern, SZ_FNAME, TY_CHAR)
+	call salloc (imname, SZ_PATHNAME, TY_CHAR)
 
 	dot = 0
 	op  = 1
 
+	# The following is a backwards-compatibility kludge.  If the image
+	# name we are given is the canonical standard test image STD_TESTIMAGE
+	# ("dev$pix") replace the name with the fully qualified name
+	# DEF_TESTIMAGE.  This is necessary to avoid ambiguous image name
+	# errors due to pix.imh and pix.hhh being in the same directory; these
+	# are well known names, neither of which can easily be changed.
+
+	if (streq (image, STD_TESTIMAGE))
+	    call strcpy (DEF_TESTIMAGE, Memc[imname], SZ_PATHNAME)
+	else
+	    call strcpy (image, Memc[imname], SZ_PATHNAME)
+
 	# Copy image name to root and mark the position of the last dot.
-	for (ip=1;  image[ip] != EOS;  ip=ip+1) {
-	    root[op] = image[ip]
+	for (ip=1;  Memc[imname+ip-1] != EOS;  ip=ip+1) {
+	    root[op] = Memc[imname+ip-1]
 	    if (root[op] == '.')
 		dot = op
 	    op = op + 1
@@ -58,25 +69,12 @@ begin
 	# user to supply the image type extension.  For example, "im.c"
 	# and "im.c.imh" must refer to the same image - ".c" is part of
 	# the image name, not an image type extension.
-	#
-	# Note - EX is a string of the form "|imh|hhh|...|". (iki.h).
 
-	if (strlen(extn) >= MIN_LENEXTN) {
-	    delim = ex[1]
-	    for (ip=2;  ex[ip] != EOS;  ip=ip+1) {
-		op = pattern
-		while (ex[ip] != delim && ex[ip+1] != EOS) {
-		    Memc[op] = ex[ip]
-		    op = op + 1
-		    ip = ip + 1
-		}
-		Memc[op] = EOS
-		if (strmatch (extn, Memc[pattern]) > 0) {
-		    call sfree (sp)
-		    return
-		}
+	if (strlen(extn) >= MIN_LENEXTN)
+	    if (iki_validextn (0, extn) > 0) {
+		call sfree (sp)
+		return
 	    }
-	}
 
 	# Not a legal image header extension.  Restore the extn field to the
 	# root and null the extn.

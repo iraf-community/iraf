@@ -69,8 +69,15 @@ char *fname;			/* simple filename, no dirs */
 	 */
 	strcpy (pathname, (char *)hostdir);
 	strcat (pathname, "bin.");
+
+#ifdef REDHAT
+	strcat (pathname, "redhat");
+#else
 #ifdef LINUX
 	strcat (pathname, "linux");
+#else
+#ifdef BSD
+	strcat (pathname, "freebsd");
 #else
 #ifdef SOLARIS
 	strcat (pathname, "ssol");
@@ -100,6 +107,9 @@ char *fname;			/* simple filename, no dirs */
 #endif
 #endif
 #endif
+#endif
+#endif
+
 	strcat (pathname, "/");
 	strcat (pathname, fname);
 	if (access (pathname, 0) == 0)

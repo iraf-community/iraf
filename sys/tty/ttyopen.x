@@ -185,7 +185,7 @@ begin
 
 	    for (;  getc(fd,ch) != ':';  op=op+1) {
 		Memc[op] = ch
-		if (ch == EOF || ch == '\n') {
+		if (ch == EOF || ch == '\n' || op-lbuf >= SZ_LINE) {
 		    goto errtn_
 		}
 	    }

@@ -1,17 +1,24 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<syserr.h>
+
+
 # IMACCESS -- Test if an image exists and is accessible with the given access
 # mode.  If the access mode given is NEW_IMAGE, test if the image name given
-# is legal (has a legal extension, i.e., type).
+# is legal (has a legal extension, i.e., type).  YES is returned if the named
+# image exists, NO if no image exists with the given name, and ERR if the
+# image name is ambiguous (multiple images, e.g. of different types, exist
+# with the same name).
 
 int procedure imaccess (image, acmode)
 
 char	image[ARB]		# image name
 int	acmode			# access mode
 
-int	exists, cl_index, cl_size, mode
+int	exists, cl_index, cl_size, mode, status
 pointer	sp, cluster, ksection, section, root, extn, im
 int	iki_access()
+errchk	syserrs
 pointer	immap()
 
 begin
@@ -34,7 +41,7 @@ begin
 	# object specified by the full notation exists, otherwise we can just
 	# call the IKI access function to determine if the cluster exists.
 
-	if (Memc[section] != EOS || Memc[ksection] != EOS || cl_index > 0) {
+	if (Memc[section] != EOS || Memc[ksection] != EOS || cl_index >= 0) {
 	    mode = acmode
 	    if (acmode == 0)
 		mode = READ_ONLY
@@ -44,10 +51,15 @@ begin
 		exists = YES
 		call imunmap (im)
 	    }
-	} else if (iki_access (image, Memc[root], Memc[extn], acmode) != 0) {
-	    exists = YES
-	} else
-	    exists = NO
+	} else {
+	    status = iki_access (image, Memc[root], Memc[extn], acmode)
+	    if (status > 0)
+		exists = YES
+	    else if (status == 0)
+		exists = NO
+	    else
+		call syserrs (SYS_IKIAMBIG, image)
+	}
 
 	call sfree (sp)
 	return (exists)

@@ -18,16 +18,16 @@ real	skyval		# sky value
 real	skysig		# sigma of sky pixels
 int	nsky		# number of sky pixels
 
-double	flux
+double	flux, area
 int	noise, badpix, ier
-real	datamin, datamax, mag, area, magerr, zmag, padu, itime, readnoise
+real	datamin, datamax, mag, magerr, zmag, padu, itime, readnoise
 int	apstati(), ap_yyfit(), ap_byyfit()
 real	apstatr()
 
 begin
 	# Initialize.
-	call apsetr (py, PYFLUX, 0.0)
-	call apsetr (py, PYNPIX, 0.0)
+	call apsetd (py, PYFLUX, 0.0d0)
+	call apsetd (py, PYNPIX, 0.0d0)
 	call apsetr (py, PYMAG, INDEFR)
 	call apsetr (py, PYMAGERR, INDEFR)
 
@@ -53,8 +53,8 @@ begin
 	    return (PY_NOPOLYGON)
 
 	# Store the results.
-	call apsetr (py, PYFLUX, real (flux))
-	call apsetr (py, PYNPIX, area)
+	call apsetd (py, PYFLUX, flux)
+	call apsetd (py, PYNPIX, area)
 	call apseti (py, PYBADPIX, badpix)
 
 	if (IS_INDEFR(skyval))
@@ -70,10 +70,10 @@ begin
 	# Compute the magnitude and error.
 	if (badpix == NO) {
 	    if (apstati (py, POSITIVE) == YES)
-	        call apcopmags (real (flux), area, mag, magerr, 1, skyval,
+	        call apcopmags (flux, area, mag, magerr, 1, skyval,
 		    skysig, nsky, zmag, noise, padu)
 	    else
-	        call apconmags (real (flux), area, mag, magerr, 1, skyval,
+	        call apconmags (flux, area, mag, magerr, 1, skyval,
 		    skysig, nsky, zmag, noise, padu, readnoise)
 	    mag  = mag + 2.5 * log10 (itime)
 
@@ -94,10 +94,10 @@ real	xver[ARB]	# x coordinates of the vertices
 real	yver[ARB]	# y coordinates of the vertices:
 int	nver		# number of vertices
 double	flux		# flux interior to the polygon
-real	area		# approximate area of polygon
+double	area		# approximate area of polygon
 
-double	fluxx
-real	xmin, xmax, ymin, ymax, x1, x2, lx, ld, fctnx, fctny, areax
+double	fluxx, areax, fctnx, fctny
+real	xmin, xmax, ymin, ymax, x1, x2, lx, ld
 pointer	sp, work1, work2, xintr, buf
 int	i, j, k, linemin, linemax, colmin, colmax, nintr, ier
 int	ap_yclip()
@@ -107,7 +107,7 @@ begin
 	# Check that polygon has at least 3 vertices plus the closing vertex.
 	if (nver < 4) {
 	    flux = INDEFD
-	    area = 0.0
+	    area = 0.0d0
 	    return (PY_NOPOLYGON)
 	}
 
@@ -139,7 +139,7 @@ begin
 	x2 = IM_LEN(im,1) + 0.5
 	lx = x2 - x1
 	flux = 0.0d0
-	area = 0.0
+	area = 0.0d0
 
 	# Loop over the range of lines of interest.
 	do i = linemin, linemax {
@@ -167,7 +167,7 @@ begin
 
 	    # Integrate the flux in each line segment.
 	    fluxx = 0.0d0
-	    areax = 0.0
+	    areax = 0.0d0
 	    do j = 1, nintr, 2 {
 
 		# Compute the line segment limits.
@@ -194,7 +194,7 @@ begin
 	call sfree (sp)
 
 	# Return the appropriate error code.
-	if (area <= 0.0)
+	if (area <= 0.0d0)
 	    return (PY_NOPIX)
 	else if (ier != PY_OK)
 	    return (ier)
@@ -216,13 +216,13 @@ int	nver		# number of vertices
 real	datamin		# minimum good data value
 real	datamax		# maximum good data value
 double	flux		# flux interior to the polygon
-real	area		# approximate area of polygon
+double	area		# approximate area of polygon
 int	badpix		# are there bad pixels
 
 int	i, j, k, linemin, linemax, colmin, colmax, nintr, ier
 pointer	sp, work1, work2, xintr, buf
-real	xmin, xmax, ymin, ymax, x1, x2, lx, ld, fctnx, fctny, areax
-double	fluxx
+real	xmin, xmax, ymin, ymax, x1, x2, lx, ld
+double	fluxx, areax, fctnx, fctny
 int	ap_yclip()
 pointer	imgl2r()
 
@@ -230,7 +230,7 @@ begin
 	# Check that polygon has at least 3 vertices plus a closing vertex.
 	if (nver < 4) {
 	    flux = INDEFD
-	    area = 0.0
+	    area = 0.0d0
 	    badpix = NO
 	    return (PY_NOPOLYGON)
 	}
@@ -263,7 +263,7 @@ begin
 	x2 = IM_LEN(im,1) + 0.5
 	lx = x2 - x1
 	flux = 0.0d0
-	area = 0.0
+	area = 0.0d0
 
 	# Loop over the range of lines of interest.
 	badpix = NO
@@ -292,7 +292,7 @@ begin
 
 	    # Integrate the flux in the line segment
 	    fluxx = 0.0d0
-	    areax = 0.0
+	    areax = 0.0d0
 	    do j = 1, nintr, 2 {
 
 		# Compute the line segment limits.
@@ -319,7 +319,7 @@ begin
 
 	call sfree (sp)
 
-	if (area <= 0.0)
+	if (area <= 0.0d0)
 	    return (PY_NOPIX)
 	if (badpix == YES)
 	    return (PY_BADDATA)

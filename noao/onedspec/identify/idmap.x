@@ -1,7 +1,7 @@
 include	<ctype.h>
 include	<imhdr.h>
-include	<pkg/gtools.h>
 include	<smw.h>
+include	<units.h>
 include	"identify.h"
 
 # Sepcial section words.
@@ -40,23 +40,23 @@ errchk	immap, id_maphdr
 
 begin
 	# Separate the image name and image section and map the full image.
-	call imgsection (Memc[ID_IMAGE(id)], Memc[ID_SECTION(id)], SZ_FNAME)
-	call imgimage (Memc[ID_IMAGE(id)], Memc[ID_IMAGE(id)], SZ_FNAME)
-	im = immap (Memc[ID_IMAGE(id)], READ_ONLY, 0)
+	call imgsection (ID_IMAGE(id), ID_SECTION(id), ID_LENSTRING)
+	call imgimage (ID_IMAGE(id), ID_IMAGE(id), ID_LENSTRING)
+	im = immap (ID_IMAGE(id), READ_ONLY, 0)
 
 	# If no image section is found use the "section" parameter.
-	if (Memc[ID_SECTION(id)] == EOS && IM_NDIM(im) > 1) {
-	    call clgstr ("section", Memc[ID_SECTION(id)], SZ_FNAME)
-	    call xt_stripwhite (Memc[ID_SECTION(id)])
+	if (ID_SECTION(id) == EOS && IM_NDIM(im) > 1) {
+	    call clgstr ("section", ID_SECTION(id), ID_LENSTRING)
+	    call xt_stripwhite (ID_SECTION(id))
 
 	    # If not an image section construct one.
-	    if (Memc[ID_SECTION(id)] != '[') {
+	    if (ID_SECTION(id) != '[') {
 	        call smark (sp)
 	        call salloc (wrd1, SZ_FNAME, TY_CHAR)
 	        call salloc (wrd2, SZ_FNAME, TY_CHAR)
 	        call salloc (wrd3, SZ_FNAME, TY_CHAR)
 
-		call sscan (Memc[ID_SECTION(id)])
+		call sscan (ID_SECTION(id))
 
 		# Parse axis and elements.
 		call gargwrd (Memc[wrd1], SZ_FNAME)
@@ -153,9 +153,9 @@ begin
 		case 2:
 		    switch (i) {
 		    case 1:
-		        call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, "[*,%d]")
+		        call sprintf (ID_SECTION(id), ID_LENSTRING, "[*,%d]")
 		    case 2:
-		        call sprintf (Memc[ID_SECTION(id)], SZ_FNAME, "[%d,*]")
+		        call sprintf (ID_SECTION(id), ID_LENSTRING, "[%d,*]")
 		    default:
 			call error (1, "Error in section specification")
 		    }
@@ -163,11 +163,11 @@ begin
 		case 3:
 		    switch (i) {
 		    case 1:
-		        call sprintf (Memc[ID_SECTION(id)],SZ_FNAME,"[*,%d,%d]")
+		        call sprintf (ID_SECTION(id), ID_LENSTRING, "[*,%d,%d]")
 		    case 2:
-		        call sprintf (Memc[ID_SECTION(id)],SZ_FNAME,"[%d,*,%d]")
+		        call sprintf (ID_SECTION(id), ID_LENSTRING, "[%d,*,%d]")
 		    case 3:
-		        call sprintf (Memc[ID_SECTION(id)],SZ_FNAME,"[%d,%d,*]")
+		        call sprintf (ID_SECTION(id), ID_LENSTRING, "[%d,%d,*]")
 		    }
 		    call pargi (ID_LINE(id,1))
 		    call pargi (ID_LINE(id,2))
@@ -181,7 +181,7 @@ begin
 	x1[1] = 1; x2[1] = IM_LEN(im,1); xs[1] = 1
 	x1[2] = 1; x2[2] = IM_LEN(im,2); xs[2] = 1
 	x1[3] = 1; x2[3] = IM_LEN(im,3); xs[3] = 1
-	call id_section (Memc[ID_SECTION(id)], x1, x2, xs, 3)
+	call id_section (ID_SECTION(id), x1, x2, xs, 3)
 
 	# Set the axes.  The axis to be identified is the longest one.
 	i = 1
@@ -218,11 +218,11 @@ begin
 	# This is not done earlier to avoid updating of the WCS.
 
 	call imunmap (im)
-	if (imaccess (Memc[ID_IMAGE(id)], READ_WRITE) == YES)
-	    im = immap (Memc[ID_IMAGE(id)], READ_WRITE, 0)
+	if (imaccess (ID_IMAGE(id), READ_WRITE) == YES)
+	    im = immap (ID_IMAGE(id), READ_WRITE, 0)
 	else
-	    im = immap (Memc[ID_IMAGE(id)], READ_ONLY, 0)
-	call id_noextn (Memc[ID_IMAGE(id)])
+	    im = immap (ID_IMAGE(id), READ_ONLY, 0)
+	call id_noextn (ID_IMAGE(id))
 	IM(ID_SH(id)) = im
 end
 
@@ -249,6 +249,9 @@ begin
 	}
 	call shdr_open (im, mw, ID_LINE(id,1), ID_LINE(id,2),
 	    INDEFI, SHHDR, ID_SH(id))
+	if (ID_UN(id) != NULL)
+	    iferr (call shdr_units (ID_SH(id), UN_UNITS(ID_UN(id))))
+		;
 	sh = ID_SH(id)
 
 	if (SMW_FORMAT(mw) == SMW_MS || SMW_FORMAT(mw) == SMW_ES) {
@@ -272,11 +275,6 @@ begin
 	    ID_AP(id,2) = ID_LINE(id,2)
 	}
 	ID_NPTS(id) = IM_LEN(im, SMW_LAXIS(mw,1))
-
-	call gt_sets (ID_GT(id), GTXLABEL, LABEL(sh))
-	call ic_pstr (ID_IC(id), "ylabel", LABEL(sh))
-	call gt_sets (ID_GT(id), GTXUNITS, UNITS(sh))
-	call ic_pstr (ID_IC(id), "yunits", UNITS(sh))
 
 	# Set logical / physical transformations
 	i = 2 ** (SMW_PAXIS(mw,1) - 1)

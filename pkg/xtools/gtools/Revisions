@@ -2,6 +2,27 @@
 .nf
 lib$pkg/gtools.h
 pkg$xtools/gtools/gtools.h
+pkg$xtools/gtools/gtcolon.x
+pkg$xtools/gtools/gtset.x
+pkg$xtools/gtools/gtget.x
+pkg$xtools/gtools/gtlabax.x
+pkg$xtools/gtools/gtinit.x
+pkg$xtools/gtools/gtools.hlp
+    Added GTDRAWTITLE, GTDRAWXLABELS, and GTDRAWYLABELS to control the
+    three label components as blocks and independent of the user or
+    application settings of the title parameters and label parameters.
+    The help and key files were updated.
+    (4/26/96, Valdes)
+
+=========
+V2.10.4p2
+=========
+
+pkg$xtools/gtools/gtascale.x
+    The case with gt==NULL was not correct.  (8/16/95, Valdes)
+
+lib$pkg/gtools.h
+pkg$xtools/gtools/gtools.h
 pkg$xtools/gtools/gtget.x
 pkg$xtools/gtools/gtset.x
 pkg$xtools/gtools/gtwindow.x

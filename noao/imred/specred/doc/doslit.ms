@@ -124,10 +124,14 @@ fitting parameters adjusted.  To exit the interactive fitting type 'q'.
 .IP [5]
 If dispersion correction is selected the first arc in the arc list is
 extracted.  The dispersion function is defined using the task
-\fBidentify\fR.  Mark and identify a few arc lines with 'm' and
-and use the 'l' line list identification command to automatically add
-additional lines and fit the dispersion function.  Check the quality of the
-dispersion function fit with 'f'.  When satisfied exit with 'q'.
+\fBautoidentify\fR.  The \fIcrval\fR and \fIcdelt\fR parameters are used in
+the automatic identification.  Whether or not the automatic identification
+is successful you will be shown the result of the arc line identification.
+If the automatic identification is not successful identify a few arc lines
+with with 'm' and and use the 'l' line list identification command to
+automatically add additional lines and fit the dispersion function.  Check
+the quality of the dispersion function fit with 'f'.  When satisfied exit
+with 'q'.
 .IP [6]
 If the flux calibration option is selected the standard star spectra are
 processed (if not done previously).  The images are
@@ -229,7 +233,7 @@ with standard star fluxes and band passes.  The available extinction
 files and flux calibration directories may be listed using the command:
 .V1
 
-	cl> page onedstds$README
+	cl> help onedstds
 
 .V2
 The extinction correction requires computation of an air mass using the
@@ -243,6 +247,12 @@ The spectrum interpolation type is used whenever a spectrum needs to be
 resampled for linearization or performing operations between spectra
 with different sampling.  The "sinc" interpolation may be of interest
 as an alternative but see the cautions given in \fBonedspec.package\fR.
+.LP
+The general direction in which the spectra run is specified by the
+dispersion axis parameter.  Recall that ideally it is the direction
+of constant wavelength which should be aligned with an image axis and
+the dispersion direction may not be exactly aligned because atmospheric
+dispersion.
 .LP
 The verbose parameter selects whether to print everything which goes
 into the log file on the terminal.  It is useful for monitoring
@@ -277,6 +287,8 @@ objects =               List of object spectra
 (gain   =         gain) Photon gain (photons/data number)
 (datamax=        INDEF) Max data value / cosmic ray threshold
 (width  =           5.) Width of profiles (pixels)
+(crval  =        INDEF) Approximate wavelength
+(cdelt  =        INDEF) Approximate dispersion
 
 (dispcor=          yes) Dispersion correct spectra?
 (extcor =           no) Extinction correct spectra?
@@ -320,14 +332,23 @@ spectrum characteristics.  The read out noise and gain are used when
 parameters must be fairly accurate.  Note that these are the effective
 parameters and must be adjusted if previous processing has modified the
 pixel values; such as with an unnormalized flat field.
+The variance
+weighting and cosmic-ray cleanning are sensitive to extremely strong
+cosmic-rays; ones which are hundreds of times brighter than the
+spectrum.  The \fIdatamax\fR is used to set an upper limit for any
+real data.  Any pixels above this value will be flagged as cosmic-rays
+and will not affect the extractions.
 .LP
-The general direction in which the spectra run is specified by the
-dispersion axis parameter.  Recall that ideally it is the direction
-of constant wavelength which should be aligned with an image axis and
-the dispersion direction may not be exactly aligned because atmospheric
-dispersion.  The profile width should be approximately the full width
+The profile width should be approximately the full width
 at the profile base.  This parameter is used for centering and tracing
 of the spectrum profiles.
+.LP
+The approximate central wavelength and dispersion are used for the
+automatic identification of the arc reference.  They may be specified
+as image header keywords or values.  The INDEF values search the
+entire range of the coordinate reference file but the automatic
+line identification algorithm works much better and faster if
+approximate values are given.
 .LP
 The next set of parameters select the processing steps and options.  The
 various calibration steps may be done simultaneously, that is at the same
@@ -477,7 +498,7 @@ PACKAGE = specred
 .V1
                         -- ARC DISPERSION FUNCTION PARAMETERS --
 (coordli=linelists$idhenear.dat) Line list
-(match  =          10.) Line list matching limit in Angstroms
+(match  =          -3.) Line list matching limit in Angstroms
 (fwidth =           4.) Arc line widths in pixels
 (cradius=          10.) Centering radius in pixels
 (i_funct=      spline3) Coordinate function
@@ -631,14 +652,14 @@ wavelength.
 .LP
 The first arc spectrum in the arc list is used to define the reference
 dispersion solution.  It is extracted at middle of the image with no
-tracing.  Note extractions of arc spectra are not background
-subtracted.  The interactive task \fBidentify\fR is used to define the
-dispersion function.  The idea is to mark some lines whose
-wavelengths are known (with the line list used to supply additional lines after
-the first few identifications define the approximate wavelengths) and to fit a
-function giving the wavelength from the pixel position.
+tracing.  Note extractions of arc spectra are not background subtracted.
+The task \fBautoidentify\fR is attempts to define the dispersion function
+automatically using the \fIcrval\fR and \fIcdelt\fR parameters.  Whether or
+not it is successful the user is presented with the interactive
+identification graph.  The automatic identifications can be reviewed and a
+new solution or corrections to the automatic solution may be performed.
 .LP
-The arc dispersion function parameters are for \fBidentify\fR and it's
+The arc dispersion function parameters are for \fBautoidentify\fR and it's
 related partner \fBreidentify\fR.  The parameters define a line list for
 use in automatically assigning wavelengths to arc lines, a centering width
 (which should match the line widths at the base of the lines), the
@@ -648,7 +669,7 @@ opposed to simply determining a zero point shift.  The defaults should
 generally be adequate and the dispersion function fitting parameters may be
 altered interactively.  One should consult the help for the two tasks for
 additional details of these parameters and the interactive operation of
-\fBidentify\fR.
+\fBautoidentify\fR.
 .LP
 The extracted reference arc spectrum is then dispersion corrected.
 If the spectra are to be linearized, as set by the \f(CWlinearize\fR
@@ -796,47 +817,48 @@ The output of this command can be piped to \fBlprint\fR to make a printed
 copy.
 
 .V1
-      apall - Extract 1D spectra (all parameters in one task)
-  apdefault - Set the default aperture parameters and apidtable
-     apedit - Edit apertures interactively
-     apfind - Automatically find spectra and define apertures
-      apfit - Fit 2D spectra and output the fit, difference, or ratio
-  apflatten - Remove overall spectral and profile shapes from flat fields
-     apmask - Create and IRAF pixel list mask of the apertures
-apnormalize - Normalize 2D apertures by 1D functions
- aprecenter - Recenter apertures
-   apresize - Resize apertures
-  apscatter - Fit and subtract scattered light
-      apsum - Extract 1D spectra
-    aptrace - Trace positions of spectra
-
-      bplot - Batch plot of spectra with SPLOT
-  calibrate - Extinction and flux calibrate spectra
-  continuum - Fit the continuum in spectra
-   deredden - Apply interstellar extinction correction
-    dispcor - Dispersion correct spectra
-     dopcor - Doppler correct spectra
-   fitprofs - Fit gaussian profiles
-   identify - Identify features in spectrum for dispersion solution
-   msresp1d - Create 1D response spectra from flat field and sky spectra
- refspectra - Assign wavelength reference spectra to other spectra
- reidentify - Automatically reidentify features in spectra
- sapertures - Set or change aperture header information
-     sarith - Spectrum arithmetic
-   scombine - Combine spectra
-      scopy - Select and copy apertures in different spectral formats
-   sensfunc - Compute instrumental sensitivity from standard stars
- setairmass - Compute effective airmass and middle UT for an exposure
-      setjd - Compute and set Julian dates in images
-       sfit - Fit spectra and output fit, ratio, or difference
-     skysub - Sky subtract extracted multispec spectra
-      slist - List spectrum header parameters
-   specplot - Scale, stack, and plot multiple spectra
-      splot - Preliminary spectral plot/analysis
-   standard - Tabulate standard star counts and fluxes
-
-     doslit - Process slit spectra
-      demos - Demonstrations and tests
+       apall - Extract 1D spectra (all parameters in one task)
+   apdefault - Set the default aperture parameters and apidtable
+      apedit - Edit apertures interactively
+      apfind - Automatically find spectra and define apertures
+       apfit - Fit 2D spectra and output the fit, difference, or ratio
+   apflatten - Remove overall spectral and profile shapes from flat fields
+      apmask - Create and IRAF pixel list mask of the apertures
+ apnormalize - Normalize 2D apertures by 1D functions
+  aprecenter - Recenter apertures
+    apresize - Resize apertures
+   apscatter - Fit and subtract scattered light
+       apsum - Extract 1D spectra
+     aptrace - Trace positions of spectra
+ 
+autoidentify - Automatically identify arc lines and a dispersion function
+       bplot - Batch plot of spectra with SPLOT
+   calibrate - Extinction and flux calibrate spectra
+   continuum - Fit the continuum in spectra
+    deredden - Apply interstellar extinction correction
+     dispcor - Dispersion correct spectra
+      dopcor - Doppler correct spectra
+    fitprofs - Fit gaussian profiles
+    identify - Identify features in spectrum for dispersion solution
+    msresp1d - Create 1D response spectra from flat field and sky spectra
+  refspectra - Assign wavelength reference spectra to other spectra
+  reidentify - Automatically reidentify features in spectra
+  sapertures - Set or change aperture header information
+      sarith - Spectrum arithmetic
+    scombine - Combine spectra
+       scopy - Select and copy apertures in different spectral formats
+    sensfunc - Compute instrumental sensitivity from standard stars
+  setairmass - Compute effective airmass and middle UT for an exposure
+       setjd - Compute and set Julian dates in images
+        sfit - Fit spectra and output fit, ratio, or difference
+      skysub - Sky subtract extracted multispec spectra
+       slist - List spectrum header parameters
+    specplot - Scale, stack, and plot multiple spectra
+       splot - Preliminary spectral plot/analysis
+    standard - Tabulate standard star counts and fluxes
+ 
+      doslit - Process slit spectra
+       demos - Demonstrations and tests
 
 	    Additional help topics
 
@@ -908,6 +930,14 @@ width = 5. (apedit)
 .LS
 Approximate full width of the spectrum profiles.  This parameter is used
 to define a width and error radius for the profile centering algorithm.
+.LE
+crval = INDEF, cdelt = INDEF (autoidentify)
+.LS
+These parameters specify an approximate central wavelength and dispersion.
+They may be specified as numerical values, INDEF, or image header keyword
+names whose values are to be used.
+If both these parameters are INDEF then the automatic identification will
+not be done.
 .LE
 
 dispcor = yes
@@ -1125,22 +1155,22 @@ number of times the sigma of the residuals are rejected before refitting.
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
 
-threshold = 10. (identify/reidentify)
+threshold = 10. (autoidentify/reidentify)
 .LS
 In order for a feature center to be determined the range of pixel intensities
 around the feature must exceed this threshold.
 .LE
-coordlist = "linelists$idhenear.dat" (identify)
+coordlist = "linelists$idhenear.dat" (autoidentify)
 .LS
 Arc line list consisting of an ordered list of wavelengths.
 Some standard line lists are available in the directory "linelists$".
 .LE
-match = 10. (identify)
+match = -3. (autoidentify)
 .LS
 The maximum difference for a match between the dispersion function computed
 value and a wavelength in the coordinate list.
 .LE
-fwidth = 4. (identify)
+fwidth = 4. (autoidentify)
 .LS
 Approximate full base width (in pixels) of arc lines.
 .LE
@@ -1148,13 +1178,13 @@ cradius = 10. (reidentify)
 .LS
 Radius from previous position to reidentify arc line.
 .LE
-i_function = "spline3", i_order = 1 (identify)
+i_function = "spline3", i_order = 1 (autoidentify)
 .LS
 The default function and order to be fit to the arc wavelengths as a
 function of the pixel coordinate.  The functions choices are "chebyshev",
 "legendre", "spline1", or "spline3".
 .LE
-i_niterate = 0, i_low = 3.0, i_high = 3.0 (identify)
+i_niterate = 0, i_low = 3.0, i_high = 3.0 (autoidentify)
 .LS
 Number of rejection iterations and sigma thresholds for rejecting arc
 lines from the dispersion function fits.

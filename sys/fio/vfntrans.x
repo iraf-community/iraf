@@ -34,7 +34,7 @@ extension procedures.
 # Size limiting definitions.
 
 define	MAX_PUSHBACK	16	# determines length of pushback stack
-define	SZ_PBBUF	161	# size of pushback buffer
+define	SZ_PBBUF	255	# size of pushback buffer
 define	MAX_EXTENSIONS	20	# max filename extension pairs in EXTN_MAP
 define	MAX_RESERVEXTN	20	# max reserved filename extensions
 define	SZ_EXTNMAP	64	# storage for iraf/os extn pairs

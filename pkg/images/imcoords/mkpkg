@@ -1,0 +1,5 @@
+# MKPKG for the IMCOORDS Package
+
+libpkg.a:
+	@src
+	;

@@ -1,6 +1,9 @@
 	imtitle - Change the title of an image (noao.proto V2.9)
     mkhistogram - List or plot the histogram of a data stream (noao.proto V2.9)
-     oimcombine - Combine images (images.imcombine V2.9)
+       odisplay - Display images (tv V2.10.4)
+        ofixpix - Fix bad pixels using text file (proto V2.10.4)
+	 orfits - Convert a FITS image into an IRAF image (dataio V2.10.4)
+	 owfits - Convert an IRAF image into a FITS image (dataio V2.10.4)
          radplt - PLot the radial profile of an object (noao.proto V2.9)
 
 

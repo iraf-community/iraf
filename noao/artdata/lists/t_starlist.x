@@ -7,12 +7,12 @@ pointer	starlist		# pointer to the name of the output file
 pointer	graphics		# pointer to the graphics device name
 
 int	sf, lf
-long	sseed, lseed
+long	seed, sseed, lseed
 pointer	sp, str, x, y, mag, dt, st, gd
 
 bool	clgetb()
 int	clgeti(), clgwrd(), open()
-long	clgetl()
+long	clgetl(), clktime()
 pointer	dtmap(), gopen()
 real	clgetr()
 
@@ -88,9 +88,14 @@ begin
 	ST_MSTAR(st) = clgetr ("mstar")
 
 	# Get the function sampling parameters.
+	seed = clktime (long (0))
 	sseed = clgetl ("sseed")
+	if (IS_INDEFL(sseed))
+	    sseed = seed
 	ST_SSEED(st) = sseed
 	lseed = clgetl ("lseed")
+	if (IS_INDEFL(lseed))
+	    lseed = seed+1
 	ST_LSEED(st) = lseed
 	ST_NSSAMPLE(st) = clgeti ("nssample")
 	ST_NLSAMPLE(st) = clgeti ("nlsample")

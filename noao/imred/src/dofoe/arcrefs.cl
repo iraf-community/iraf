@@ -13,7 +13,7 @@ file	log2
 struct	*fd
 
 begin
-	string	arcrefec, arcec, temp, str
+	string	arcrefec, arcec, temp, str, imtype
 	int	i, dc
 	bool	log
 
@@ -23,12 +23,16 @@ begin
 	# dispersion function with ECIDENTIFY/ECREIDENTIFY.  Set the wavelength
 	# parameters with ECDISPCOR.
 
+	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	arcrefec = arcref // ".ec"
 	if (arcaps != "" || arcbeams  != "")
 	    arcec = arcref // "arc.ec"
 	else
 	    arcec = ""
-	if (!access (arcrefec//"."//envget("imtype"))) {
+	if (!access (arcrefec//imtype)) {
 	    print ("Extract arc reference image ", arcref) | tee (log1)
 	    apscript (arcref, ansrecenter="NO", ansresize="NO", ansedit="NO",
 		anstrace="NO", background="none", clean=no, weights="none")

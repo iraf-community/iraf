@@ -9,20 +9,16 @@ rspectext input output
 PARAMETERS
 .ls input
 Input list of ascii text spectra.  These may have a optional FITS header
-and are then followed by two columns of wavelength and flux.
+at the beginning and then two columns of wavelength and flux.
 .le
 .ls output
 Output list of IRAF spectra image names.  The list must match the
 input list.
 .le
-.ls header = yes
-This parameter is set to yes if there is a FITS header (such as produced
-by \fBwspectext\fR.  If there is a header the remaining parameters are
-ignored and the header is assumed to contain all the dispersion and
-calibration information.  If there is no header but only a list of
-wavelengths and fluxes then this parameter is set to no and the following
-parameters are used.
-.le
+
+
+The following parameters are only used if there is no FITS header
+with the data.
 .ls title = ""
 Title to be assigned to the spectra.
 .le
@@ -114,7 +110,7 @@ EXAMPLES
     4010.10  1005.54
     4020.20  1011.05
     ...
-    cl> rspectext text001 spec001 header+
+    cl> rspectext text001 spec001
 .fi
 
 2.  Create a spectrum with a nonlinear dispersion using the wavelength
@@ -126,10 +122,13 @@ values as a lookup table.
     4010.10  1005.54
     4020.20  1011.05
     ...
-    cl> rspectext text002 spec002 header- title="HH12" dtype=nonlinear
+    cl> rspectext text002 spec002 title="HH12" dtype=nonlinear
 .fi
 .ih
 REVISIONS
+.ls RSPECTEXT V2.11
+The task now automatically senses the presence of a header.
+.le
 .ls RSPECTEXT V2.10.3
 This is a new task with this version.
 .le

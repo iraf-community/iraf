@@ -46,6 +46,7 @@
 #define	BKG_QUANTUM	30	/* period(sec) bkgjob checkup		*/
 #define	MAX_INTERRUPTS	5	/* max interrupts of a task		*/
 #define	LEN_INTRSTK	10	/* max nesting of saved interrupts	*/
+typedef	int (*PFI)();
 
 extern	int yydebug;		/* print each parser state if set	*/
 extern	FILE *yyin;		/* where parser reads from		*/
@@ -56,7 +57,7 @@ extern	bkgno;			/* job number if bkg job		*/
 int	cldebug = 0;		/* print out lots of goodies if > 0	*/
 int	cltrace = 0;		/* trace instruction execution if > 0	*/
 
-static	int old_onipc;		/* X_IPC handler chained to onint()	*/
+static	PFI old_onipc;		/* X_IPC handler chained to onint()	*/
 static	long *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
 static	jmp_buf jmp_save;	/* save IRAF Main jump vector		*/
 static	jmp_buf jmp_clexit;	/* clexit() jumps here			*/
@@ -74,7 +75,6 @@ int	recursion;		/* detect error recursion in ONERROR	*/
 int	errlev;			/* detect error recursion in CL_ERROR	*/
 int	ninterrupts;		/* number of onint() calls per task	*/
 long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
-typedef	int (*PFI)();
 
 
 /* C_MAIN -- Called by the SPP procedure in cl.x to fire up the CL.

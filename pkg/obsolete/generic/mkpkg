@@ -1,22 +1,11 @@
-# Make IMARITH.
+# Make generic routines.
 
-$checkout libpkg.a pkg$images/
+$checkout libpkg.a ../
 $update   libpkg.a
-$checkin  libpkg.a pkg$images/
+$checkin  libpkg.a ../
 $exit
 
 libpkg.a:
-	imcasigclip.x	<imhdr.h>
-	imcaverage.x	<imhdr.h>
-	imccopy.x	<imhdr.h>
-	imcmaxrej.x	<imhdr.h>
-	imcmedian.x	<imhdr.h>
-	imcminrej.x	<imhdr.h>
-	imcmmrej.x	<imhdr.h>
-	imcmode.x	<imhdr.h>
-	imcombine.x	<error.h> <imhdr.h> <imset.h>
-	imcsigclip.x	<imhdr.h>
-	imcsum.x	<imhdr.h>
-	imcthresh.x	<imhdr.h>
-	sigma.x	
+	fixcol.x	<imhdr.h> <imset.h>
+	fixline.x	<imhdr.h> <imset.h>
 	;

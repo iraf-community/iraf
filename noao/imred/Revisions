@@ -1,5 +1,13 @@
 .help revisions Jun88 noao.imred
 .nf
+imred$argus/argus.cl
+imred$argus/hydra.cl
+imred$argus/echelle.cl
+imred$argus/kpnocoude.cl
+imred$argus/specred.cl
+    Increased the minimum min_lenuserarea from 40000 to 100000.
+    (7/31/96, Valdes)
+
 imred$hydra/demos/xgdonessie.dat
     Fixed playback.  (7/26/94, Valdes)
 

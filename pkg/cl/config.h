@@ -13,8 +13,8 @@
  *   dictionary, a fatal error.  We have a static sized dictionary until
  *   this can be fixed.
  */
-#define	STACKSIZ	64000
-#define	DICTSIZE	256000
+#define	STACKSIZ	128000
+#define	DICTSIZE	512000
 #define	MEMINCR		1024
 
 typedef unsigned long memel;	/* type for dictionary, stack, etc.	*/
@@ -24,8 +24,8 @@ typedef unsigned long memel;	/* type for dictionary, stack, etc.	*/
  * most interactively entered multiline command blocks.  The history buffer
  * must be at least as large as the command block buffer.
  */
-#define SZ_CMDBLK	512
-#define	SZ_HISTBUF	2048
+#define SZ_CMDBLK	2048
+#define	SZ_HISTBUF	8192
 
 /* ----------
  * char buffers sizes.

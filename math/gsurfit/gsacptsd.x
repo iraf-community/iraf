@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include "dgsurfitdef.h"
 
 # GSACPTS -- Procedure to add a set of points to the normal equations.
@@ -23,8 +22,8 @@ double	w[npts]		# array of weights
 int	npts		# number of data points
 int	wtflag		# type of weighting
 
-int	i, ii, j, jj, k, l
-int	xorder, xxorder, ntimes
+int	i, ii, j, jj, k, l, ll
+int	maxorder, xorder, xxorder, ntimes
 pointer	sp, vzptr, vindex, mzptr, mindex, bxptr, bbxptr, byptr, bbyptr
 pointer	byw, bw
 
@@ -115,6 +114,7 @@ begin
 
 	case GS_LEGENDRE, GS_CHEBYSHEV, GS_POLYNOMIAL:
 
+	    maxorder = max (GS_XORDER(sf) + 1, GS_YORDER(sf) + 1)
 	    xorder = GS_XORDER(sf)
 	    ntimes = 0
 
@@ -131,6 +131,7 @@ begin
 	            bbxptr = bxptr
 		    xxorder = xorder
 		    jj = k
+		    ll = l
 	            ii = 0
 		    do j = k + ntimes, GS_NCOEFF(sf) {
 		        mindex = mzptr + ii
@@ -139,10 +140,18 @@ begin
 				XBASIS(bbxptr+i-1) * YBASIS(bbyptr+i-1)	
 			if (mod (jj, xxorder) == 0) {
 			    jj = 1
+			    ll = ll + 1
 			    bbxptr = GS_XBASIS(sf)
 			    bbyptr = bbyptr + npts
-			    if (GS_XTERMS(sf) == NO)
+			    switch (GS_XTERMS(sf)) {
+			    case GS_XNONE:
 				xxorder = 1
+			    case GS_XHALF:
+				if ((ll + GS_XORDER(sf)) > maxorder)
+		    		    xxorder = xxorder - 1
+			    default:
+				;
+			    }
 			} else {
 			    jj = jj + 1
 			    bbxptr = bbxptr + npts
@@ -155,8 +164,15 @@ begin
 
 		vzptr = vzptr + xorder
 		ntimes = ntimes + xorder
-		if (GS_XTERMS(sf) == NO)
+		switch (GS_XTERMS(sf)) {
+		case GS_XNONE:
 		    xorder = 1
+		case GS_XHALF:
+		    if ((l + GS_XORDER(sf) + 1) > maxorder)
+		        xorder = xorder - 1
+		default:
+		    ;
+		}
 		byptr = byptr + npts
 	    }
 

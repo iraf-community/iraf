@@ -24,8 +24,8 @@ int	sz_filter		#U allocated buffer size
 char	mask[sz_mask]		#O new mask name (not reallocatable)
 int	sz_mask			#I max chars out
 
-int	assignop, byte_offset
 pointer	qp, sp, keyword, vp, in
+int	assignop, byte_offset, sz_field, ival
 int	level, zlevel, status, start, value, token, op, kw, tokno
 
 pointer	qp_opentext()
@@ -156,13 +156,31 @@ begin
 
 	    switch (kw) {
 	    case KW_BLOCK:
-		# Set the blocking factor for pixelation.
+		# Set the XY blocking factor for pixelation.
 		if (value == NULL)
 		    goto noval_
-		else if (ctoi (Memc, vp, IO_BLOCK(io)) <= 0) {
-		    IO_BLOCK(io) = QP_BLOCK(qp)
+		else if (ctoi (Memc, vp, ival) <= 0)
 		    goto badval_
-		}
+		IO_XBLOCK(io) = ival
+		IO_YBLOCK(io) = ival
+		op = start
+
+	    case KW_XBLOCK:
+		# Set the X blocking factor for pixelation.
+		if (value == NULL)
+		    goto noval_
+		else if (ctoi (Memc, vp, ival) <= 0)
+		    goto badval_
+		IO_XBLOCK(io) = ival
+		op = start
+
+	    case KW_YBLOCK:
+		# Set the Y blocking factor for pixelation.
+		if (value == NULL)
+		    goto noval_
+		else if (ctoi (Memc, vp, ival) <= 0)
+		    goto badval_
+		IO_YBLOCK(io) = ival
 		op = start
 
 	    case KW_DEBUG:
@@ -190,38 +208,50 @@ badval_		    call eprintf ("QPIO: cannot convert `%s' to integer\n")
 	    case KW_KEY:
 		# Set the offsets of the event attribute fields to be used
 		# for the event coordinates during extraction.  The typical
-		# syntax of the key value is, e.g.,  key=(s10,s8).
+		# syntax of the key value is, e.g.,  key=(s10,s8).  Fields
+		# used for event coordinate keys may be short or int.
 
 		call strlwr (Memc[vp])
 		while (Memc[vp] == ' ' || Memc[vp] == '(')
 		    vp = vp + 1
 
-		# Get the X field offset.
-		if (Memc[vp] != 's')
+		# Get the X field offset and type.
+		if (Memc[vp] == 'i') {
+		    IO_EVXTYPE(io) = TY_INT
+		    sz_field = SZ_INT
+		} else if (Memc[vp] == 's') {
+		    IO_EVXTYPE(io) = TY_SHORT
+		    sz_field = SZ_SHORT
+		} else
 		    goto badkey_
-		else {
-		    vp = vp + 1
-		    if (ctoi (Memc, vp, byte_offset) <= 0)
-			goto badkey_
-		    else
-			IO_EVXOFF(io) = byte_offset / (SZ_SHORT * SZB_CHAR)
-		}
+
+		vp = vp + 1
+		if (ctoi (Memc, vp, byte_offset) <= 0)
+		    goto badkey_
+		else
+		    IO_EVXOFF(io) = byte_offset / (sz_field * SZB_CHAR)
 
 		while (Memc[vp] == ' ' || Memc[vp] == ',')
 		    vp = vp + 1
 
 		# Get the Y field offset.
-		if (Memc[vp] != 's')
+		if (Memc[vp] == 'i') {
+		    IO_EVYTYPE(io) = TY_INT
+		    sz_field = SZ_INT
+		} else if (Memc[vp] == 's') {
+		    IO_EVYTYPE(io) = TY_SHORT
+		    sz_field = SZ_SHORT
+		} else
 		    goto badkey_
-		else {
-		    vp = vp + 1
-		    if (ctoi (Memc, vp, byte_offset) <= 0) {
+
+		vp = vp + 1
+		if (ctoi (Memc, vp, byte_offset) <= 0) {
 badkey_			call eprintf ("QPIO: bad key value `%s'\n")
-			    call pargstr (F(value))
-			status = ERR
-		    } else
-			IO_EVYOFF(io) = byte_offset / (SZ_SHORT * SZB_CHAR)
-		}
+			call pargstr (F(value))
+		    status = ERR
+		} else
+		    IO_EVYOFF(io) = byte_offset / (sz_field * SZB_CHAR)
+
 		op = start
 
 	    case KW_NOINDEX:

@@ -50,8 +50,10 @@ and declination (in degrees) of the observation is determined from these
 keywords.  The values may be in either decimal or sexigesimal notation.
 An epoch keyword is optional and if given is used to precess
 the coordinates from the specified epoch to the observation epoch.
-If not specified or not found in header the epoch is assumed to be the
-same as the epoch of observation.
+If an epoch keyword is given but is not found in the header or can't
+be interpreted then it is an error.  The epoch keyword value may begin
+with 'B' or 'J'.  If the value is before 1800 or after 2100 a warning
+will be printed though the task will still compute the values.
 .le
 
 .ls jd = "jd"
@@ -195,6 +197,16 @@ the Julian date may change during the observations.
 .nf
     cl> setjd obs1 date=date time=time exp="" hjd="" ljd=""
 .fi
+.ih
+REVISIONS
+.ls SETJD V2.11
+The checking of the epoch keyword value was improved.  Previously if
+there was a problem with the keyword value (missing or malformed) the
+task would use the epoch of the observation.  Now it is an error
+if an epoch keyword is specified but the epoch value can't be determined.
+Also a leading 'B' or 'J' is allowed and a warning will be given if
+the epoch value is unlikely.
+.le
 .ih
 SEE ALSO
 setairmass, hedit, refspectra, observatory

@@ -61,14 +61,14 @@ begin
 	    if (istable.table) {
 
 	        # Adjust pagination for TDUMP.
-	        tpagwidth = tdump.pwidth.p_max
-	        tdump.pwidth.p_max = 5000
+	        #tpagwidth = tdump.pwidth.p_max
+	        tdump.pwidth.p_max = 1023
 
 		tbdump (inname, col, texpr, cdfile=hfile, pfile=pfile,
-		    datafile="STDOUT", rows="-", pagwidth=tpagwidth)
+		    datafile="STDOUT", rows="-", pagwidth=1023)
 
 	        # Reset pagination for TDUMP.
-		tdump.pwidth.p_max = tpagwidth
+		#tdump.pwidth.p_max = tpagwidth
 
 	    } else if (istable.text) {
 		txdump (inname, col, texpr, headers=headers,

@@ -12,7 +12,8 @@ set	irsiids		= "onedspec$irsiids/"
 package irs
 
 # Standard ONEDSPEC tasks
-task	continuum,
+task	autoidentify,
+	continuum,
 	deredden,
 	dopcor,
 	mkspec,
@@ -24,6 +25,7 @@ task	continuum,
 	splot,
 	specplot,
 	specshift	= onedspec$x_onedspec.e
+task	aidpars		= "onedspec$aidpars.par"
 task	dispcor1	= onedspec$dispcor1.par
 task	scopy		= onedspec$scopy.cl
 hidetask dispcor1

@@ -1,14 +1,15 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
-include	<config.h>
 include	<error.h>
+include	<config.h>
+include	<prstat.h>
 
 # PRUPDATE -- Broadcast a message to a process, or if pid=0, to all connected
 # subprocesses.  Used primarily to incrementally pass SET and CHDIR commands to
 # subprocesses, eliminating the need to reconnect each process.  Note that the
 # child process does not return "bye" in response to one of the builtin
-# functions SET and CHDIR.  NOTE: we assume that we are called when all child
-# processes are idle.
+# functions SET and CHDIR.  NOTE: if a child process is marked "busy" the
+# message is not sent to that process; only idle processes receive the message.
 
 procedure prupdate (pid, message, flushout)
 
@@ -16,9 +17,9 @@ int	pid			#I process to be updated, or 0 for all procs
 char	message[ARB]		#I message to be broadcast to each child
 int	flushout		#I flush output
 
-int	pr
+int	pr, status
 pointer	sp, cmd, op
-int	gstrcpy()
+int	gstrcpy(), prstati()
 include	"prc.com"
 
 begin
@@ -47,10 +48,13 @@ begin
 	    if ((pid != NULL && pr_pid[pr] == pid) ||
 		(pid == NULL && pr_pid[pr] != NULL)) {
 
-		iferr (call putline (pr_outfd[pr], Memc[cmd]))
-		    call erract (EA_WARN)
-		else if (flushout == YES)
-		    call flush (pr_outfd[pr])
+		status = prstati (pr_pid[pr], PR_STATUS)
+		if (status == P_RUNNING) {
+		    iferr (call putline (pr_outfd[pr], Memc[cmd]))
+			call erract (EA_WARN)
+		    else if (flushout == YES)
+			call flush (pr_outfd[pr])
+		}
 	    }
 
 	call sfree (sp)

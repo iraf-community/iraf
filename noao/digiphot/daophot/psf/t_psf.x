@@ -153,7 +153,7 @@ begin
             call fntclsb (oclist)
             call sfree (sp)
             call error (0,
-                "Incompatable image and output psf star file list lengths")
+                "Incompatable image and output psf file list lengths")
         }
 
 	# Initialize DAOPHOT main structure, get pset parameters. 
@@ -369,6 +369,7 @@ begin
 	    }
 
 	    # Read in the PSF star list.
+	    call dp_pseti (dao, PNUM, 0)
 	    if (pst != NULL) {
 	        call dp_rpstars (dao, im, pst, pst_text, gd, mgd, matchbyid,
 		    showplots)

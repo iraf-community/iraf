@@ -8,13 +8,14 @@ real	wx, wy			# center of subraster
 int	c1, c2			# column limits
 int	l1, l2			# line limits
 real	aperts[ARB]		# array of apertures
-real	sums[ARB]		# array of sums
-real	areas[ARB]		# aperture areas
+double	sums[ARB]		# array of sums
+double	areas[ARB]		# aperture areas
 int	naperts			# number of apertures
 
 int	i, j, k, nx, yindex
+double	fctn
 pointer	buf
-real	xc, yc, apmaxsq, dy2, r2, r, fctn
+real	xc, yc, apmaxsq, dy2, r2, r
 pointer	imgs2r()
 
 begin
@@ -23,8 +24,8 @@ begin
 	xc = wx - c1 + 1
 	yc = wy - l1 + 1
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
-	call aclrr (sums, naperts)
-	call aclrr (areas, naperts)
+	call aclrd (sums, naperts)
+	call aclrd (areas, naperts)
 
 	# Loop over the pixels.
 	do j = l1, l2 {
@@ -63,14 +64,15 @@ int	l1, l2			# line limits
 real	datamin			# minimum good data value
 real	datamax			# maximum good data value
 real	aperts[ARB]		# array of apertures
-real	sums[ARB]		# array of sums
-real	areas[ARB]		# aperture areas
+double	sums[ARB]		# array of sums
+double	areas[ARB]		# aperture areas
 int	naperts			# number of apertures
 int	minapert		# minimum apertures
 
 int	i, j, k, nx, yindex, kindex
+double	fctn
 pointer	buf
-real	xc, yc, apmaxsq, dy2, r2, r, pixval, fctn
+real	xc, yc, apmaxsq, dy2, r2, r, pixval
 pointer	imgs2r()
 
 begin
@@ -79,8 +81,8 @@ begin
 	xc = wx - c1 + 1
 	yc = wy - l1 + 1
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
-	call aclrr (sums, naperts)
-	call aclrr (areas, naperts)
+	call aclrd (sums, naperts)
+	call aclrd (areas, naperts)
 	minapert = naperts + 1
 
 	# Loop over the pixels.

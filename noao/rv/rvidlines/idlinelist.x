@@ -98,27 +98,26 @@ end
 #
 # This is extremely inefficient.  It can be greatly improved.
 
-procedure id_match (id, in, out, label, diff, z)
+procedure id_match (id, in, out, label, diff)
 
 pointer	id			# Identify structure
 double	in			# Coordinate to be matched
 double	out			# Matched coordinate
 pointer	label			# Pointer to label
 real	diff			# Maximum difference
-double	z			# Redshift
 
-double	zin, delta, deltamin
+double	zin, delta, deltamin, id_zshiftd()
 pointer	ll1, ll2, tmp
 int	strlen()
 
 begin
 	if (ID_LL(id) == NULL) {
-	    out = in / (1 + z)
+	    out = id_zshiftd (id, in, 0)
 	    label = NULL
 	    return
 	}
 
-	zin = in / (1 + z)
+	zin = id_zshiftd (id, in, 0)
 	deltamin = MAX_REAL
 
 	ll1 = Memi[ID_LL(id)]
@@ -150,10 +149,10 @@ procedure id_linelist (id)
 pointer	id			# Identify structure
 
 int	i, nfound, nextpix, lastpix, cursave
-double	z, pix, fit, fit1, fit2, user, peak, minval, diff, diff1
+double	pix, fit, fit1, fit2, user, peak, minval, diff, diff1
 pointer	sp, pixes, fits, users, labels, ll1, ll2, label
 
-double	id_center(), fit_to_pix(), id_fitpt(), id_peak()
+double	id_center(), fit_to_pix(), id_fitpt(), id_peak(), id_zshiftd()
 
 begin
 	if (ID_LL(id) == NULL)
@@ -168,14 +167,13 @@ begin
 	nfound = 0
 	lastpix = 0
 	minval = MAX_REAL
-	z = ID_REDSHIFT(id)
 
 	fit1 = min (FITDATA(id,1), FITDATA(id,ID_NPTS(id)))
 	fit2 = max (FITDATA(id,1), FITDATA(id,ID_NPTS(id)))
 	ll1 = Memi[ID_LL(id)]
 	ll2 = Memi[ID_LL(id)+1]
 	while (!IS_INDEFD(Memd[ll1])) {
-	    user = Memd[ll1] * (1 + z)
+	    user = id_zshiftd (id, Memd[ll1], 1)
 	    label = Memi[ll2]
 	    ll1 = ll1 + 1
 	    ll2 = ll2 + 1
@@ -197,7 +195,7 @@ begin
 			if (diff < diff1) {
 			    Memd[pixes+lastpix-1] = pix
 			    Memd[fits+lastpix-1] = fit
-			    Memd[users+lastpix-1] = user / (1 + z)
+			    Memd[users+lastpix-1] = id_zshiftd (id, user, 0)
 			    Memi[labels+lastpix-1] = label
 			}
 			next
@@ -213,13 +211,13 @@ begin
 		    }
 		    Memd[pixes+nfound-1] = pix
 		    Memd[fits+nfound-1] = id_fitpt (id, pix)
-		    Memd[users+nfound-1] = user / (1 + z)
+		    Memd[users+nfound-1] = id_zshiftd (id, user, 0)
 		    Memi[labels+nfound-1] = label
 		    lastpix = nfound
 		} else if (peak > minval) {
 		    Memd[pixes+nextpix-1] = pix
 		    Memd[fits+nextpix-1] = id_fitpt (id, pix)
-		    Memd[users+nextpix-1] = user / (1 + z)
+		    Memd[users+nextpix-1] = id_zshiftd (id, user, 0)
 		    Memi[labels+nextpix-1] = label
 		    lastpix = nextpix
 

@@ -4,6 +4,7 @@ include	<config.h>
 include	<imhdr.h>
 include	<mach.h>
 include	"imfort.h"
+include	"oif.h"
 
 # IMOPNX -- Open an existing imagefile.  Only host system filenames are
 # permitted, image sections are not permitted, no out of bounds references,
@@ -11,24 +12,26 @@ include	"imfort.h"
 
 procedure imopnx (image, acmode, im, ier)
 
-char	image[ARB]	# HOST name of image header file
-int	acmode		# image access mode (RO, WO)
-pointer	im		# receives image descriptor pointer
-int	ier		# receives error status
+char	image[ARB]	#I HOST name of image header file
+int	acmode		#I image access mode (RO, WO)
+pointer	im		#O receives image descriptor pointer
+int	ier		#O receives error status
 
-pointer	sp, pix_fp, hdr_fp, pixfile, hdrfile, root, extn
-int	len_hdrmem, status, nchars, n, ip
+pointer	sp, pix_fp, hdr_fp
+pointer	pixfile, hdrfile, root, extn, envvar, valstr
+int	len_hdrmem, len_ua, status, ip
 
-bool	strne()
 pointer	bfopnx()
 long	clktime()
-int	bfread(), sizeof(), stridxs()
+int	imrdhdr(), sizeof(), stridxs(), ctoi()
 errchk	calloc
 
 begin
 	call smark (sp)
 	call salloc (hdrfile, SZ_FNAME, TY_CHAR)
 	call salloc (pixfile, SZ_PATHNAME, TY_CHAR)
+	call salloc (envvar, SZ_FNAME, TY_CHAR)
+	call salloc (valstr, SZ_FNAME, TY_CHAR)
 	call salloc (root, SZ_FNAME, TY_CHAR)
 	call salloc (extn, SZ_FNAME, TY_CHAR)
 
@@ -50,17 +53,29 @@ begin
 	    return
 	}
 
+	# Determine the user area size.
+	len_ua = -1
+	call strpak ("min_lenuserarea", Memc[envvar], SZ_FNAME)
+	call zgtenv (Memc[envvar], Memc[valstr], SZ_FNAME, status)
+	if (status > 0) {
+	    ip = 1
+	    call strupk (Memc[valstr], Memc[valstr], SZ_FNAME)
+	    if (ctoi (Memc[valstr], ip, len_ua) <= 0)
+		len_ua = -1
+	}
+	if (len_ua < 0)
+	    len_ua = LEN_USERAREA
+
 	# Allocate image descriptor.
-	len_hdrmem = LEN_IMHDR + LEN_USERAREA
+	len_hdrmem = LEN_IMHDR + (LEN_USERAREA / SZ_STRUCT)
 	call calloc (im, LEN_IMDES + len_hdrmem, TY_STRUCT)
+
+	IM_ACMODE(im) = acmode
 
 	# Read image header into descriptor.  Close the file after reading in
 	# the header if we are opening the image read only.
 
-	nchars = len_hdrmem * SZ_STRUCT
-	n = bfread (hdr_fp, IM_MAGIC(im), nchars, long(1))
-
-	if (n < (LEN_IMHDR * SZ_STRUCT) || strne (IM_MAGIC(im), "imhdr")) {
+	if (imrdhdr (hdr_fp, im, len_ua, TY_IMHDR) == ERR) {
 	    call bfclos (hdr_fp, status)
 	    call mfree (im, TY_STRUCT)
 	    call sfree (sp)

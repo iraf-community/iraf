@@ -1,60 +1,44 @@
 # Help directory for the IMAGES package.
 
-$doc		= "./doc/"
+$imcoords	= "./imcoords/"
+$imfilter	= "./imfilter/"
+$imfit		= "./imfit/"
+$imgeom		= "./imgeom/"
+$immatch	= "./immatch/"
+$imutil		= "./imutil/"
 $tv		= "./tv/"
-$filters	= "images$filters/"
-$geometry	= "images$geometry/"
-$imfit		= "images$imfit/"
-$imarith	= "images$imarith/"
-$iminfo		= "images$iminfo/"
-$imutil		= "images$imutil/"
 
-blkavg		hlp=doc$blkavg.hlp,	src=geometry$t_blkavg.x
-blkrep		hlp=doc$blkrep.hlp,	src=geometry$t_blkrep.x
-boxcar		hlp=doc$boxcar.hlp,	src=filters$t_boxcar.x
-chpixtype	hlp=doc$chpix.hlp,	src=imutil$t_chpix.x
-convolve	hlp=doc$convolve.hlp,	src=filters$t_convolve.x
-fmedian		hlp=doc$fmedian.hlp,	src=filters$t_fmedian.x
-fmode		hlp=doc$fmode.hlp,	src=filters$t_fmode.x
-fit1d		hlp=doc$fit1d.hlp,	src=imfit$fit1d.x
-gauss		hlp=doc$gauss.hlp,	src=filters$gauss.hlp
-geomap		hlp=doc$geomap.hlp,	src=geometry$t_geomap.x
-geotran		hlp=doc$geotran.hlp,	src=geometry$t_geotran.x
-gradient	hlp=doc$gradient.hlp,	src=filters$t_gradient.x
-hedit		hlp=doc$hedit.hlp,	src=imutil$hedit.x
-hselect		hlp=doc$hselect.hlp,	src=iminfo$hselect.x
-imarith		hlp=doc$imarith.hlp,	src=imarith$t_imarith.x
-imcombine	hlp=doc$imcombine.hlp,	src=imarith$t_imcombine.x
-imcopy		hlp=doc$imcopy.hlp,	src=imutil$t_imcopy.x
-imdelete	hlp=doc$imdelete.hlp,	src=imutil$imdelete.x
-imdivide	hlp=doc$imdivide.hlp,	src=imarith$t_imdivide.x
-imexpr		hlp=doc$imexpr.hlp,	src=imarith$imexpr.gx
-imgets		hlp=doc$imgets.hlp,	src=iminfo$imgets.x
-imheader	hlp=doc$imheader.hlp,	src=iminfo$imheader.x
-imhistogram	hlp=doc$imhistogram.hlp,src=iminfo$imhistogram.x
-imlintran	hlp=doc$imlintran.hlp,  src=images$imlintran.cl
-imrename	hlp=doc$imrename.hlp,	src=imutil$t_imrename.x
-imshift		hlp=doc$imshift.hlp,	src=geometry$t_imshift.x
-imslice		hlp=doc$imslice.hlp,	src=imutil$t_imslice.x
-imstack		hlp=doc$imstack.hlp,	src=imutil$t_imstack.x
-imstatistics	hlp=doc$imstat.hlp,	src=iminfo$t_imstat.x
-imsum		hlp=doc$imsum.hlp,	src=imarith$t_imsum.x
-imsurfit	hlp=doc$imsurfit.hlp,	src=imfit$t_imsurfit.x
-imtranspose	hlp=doc$imtrans.hlp,	src=geometry$t_imtrans.x
-laplace		hlp=doc$laplace.hlp,	src=filters$t_laplace.x
-lineclean	hlp=doc$lineclean.hlp,	src=imfit$t_lineclean.x
-listpixels	hlp=doc$listpixels.hlp,	src=iminfo$listpixels.x
-magnify		hlp=doc$magnify.hlp,	src=geometry$t_magnify.x
-median		hlp=doc$median.hlp,	src=filters$t_median.x
-minmax		hlp=doc$minmax.hlp,	src=imutil$t_minmax.x
-mode		hlp=doc$mode.hlp,	src=filters$t_mode.x
-register	hlp=doc$register.hlp,	src=images$register.cl
 revisions	sys=Revisions
-rotate		hlp=doc$rotate.hlp,	src=images$rotate.cl
-sections	hlp=doc$sections.hlp,	src=iminfo$t_sections.x
-shiftlines	hlp=doc$shiftlines.hlp,	src=geometry$t_shiftlines.x
-xregister	hlp=doc$xregister.hlp,	src=geometry$xregister/t_xregister.x
-cvl		hlp=cvl.hlp
+
+imcoords	men=imcoords$imcoords.men,
+		hlp=..,
+		src=imcoords$imcoords.cl,
+		pkg=imcoords$imcoords.hd
+
+imfilter	men=imfilter$imfilter.men,
+		hlp=..,
+		src=imfilter$imfilter.cl,
+		pkg=imfilter$imfilter.hd
+
+imfit		men=imfit$imfit.men,
+		hlp=..,
+		src=imfit$imfit.cl,
+		pkg=imfit$imfit.hd
+
+imgeom		men=imgeom$imgeom.men,
+		hlp=..,
+		src=imgeom$imgeom.cl,
+		pkg=imgeom$imgeom.hd
+
+immatch		men=immatch$immatch.men,
+		hlp=..,
+		src=immatch$immatch.cl,
+		pkg=immatch$immatch.hd
+
+imutil		men=imutil$imutil.men,
+		hlp=..,
+		src=imutil$imutil.cl,
+		pkg=imutil$imutil.hd
 
 tv		men=tv$tv.men,
 		hlp=..,

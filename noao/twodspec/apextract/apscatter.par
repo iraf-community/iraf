@@ -2,6 +2,7 @@
 
 input,s,a,,,,List of input images to subtract scattered light
 output,s,a,,,,List of output corrected images
+apertures,s,h,"",,,Apertures
 scatter,s,h,"",,,List of scattered light images (optional)
 references,s,h,"",,,"List of aperture reference images
 "

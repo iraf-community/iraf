@@ -51,6 +51,7 @@ libc.a:
 	cgetpid.c	<libc/libc.h> <libc/xnames.h>
 	cgetuid.c	<libc/libc.h> <libc/spp.h> <libc/xnames.h>
 	cgflush.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
+	cimaccess.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
 	cimdrcur.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
 	ckimapc.c	<libc/libc.h> <libc/xnames.h> <libc/spp.h>
 	clexnum.c	<libc/ctype.h> <libc/lexnum.h> <libc/spp.h>\

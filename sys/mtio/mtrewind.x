@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<error.h>
 include	"mtio.h"
 
 # MTREWIND -- Rewind the named magtape device.  This is a synchronous
@@ -15,8 +16,8 @@ char	mtname[ARB]		#I device to be rewound
 int	initcache		#I discard positional information?
 
 pointer	sp, fname
+int	fd, mtopen()
 errchk	mtfname
-int	mtopen()
 
 begin
 	call smark (sp)
@@ -31,7 +32,10 @@ begin
 
 	# Rewind device.
 	call mtfname (mtname, 1, Memc[fname], SZ_FNAME)
-	call close (mtopen (Memc[fname], READ_ONLY, 0))
+	iferr (fd = mtopen (Memc[fname], READ_ONLY, 0))
+	    call erract (EA_WARN)
+	else
+	    call close (fd)
 
 	call sfree (sp)
 end

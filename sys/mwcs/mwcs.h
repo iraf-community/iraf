@@ -14,7 +14,7 @@ define	MAX_CTRAN	20		# max runtime ctran descriptors
 define	MAX_CALL	7		# max CTRAN function calls
 define	MAX_FUNC	7		# max WCS function descriptors
 define	MAX_WCSFD	10		# max loaded WCS function drivers
-define	MAX_FN		20		# max MWCS function drivers
+define	MAX_FN		32		# max MWCS function drivers
 define	SZ_FNNAME	20		# max size function name
 define	SZ_ATNAME	20		# max size attribute name
 
@@ -123,7 +123,7 @@ define	GEN		2			# general catch all case
 # common to all WCS functions, followed by a private area reserved for use
 # by the WCS function.
 
-define	LEN_FC		24
+define	LEN_FC		64
 define	FC_CT		Memi[$1]		# CTRAN descriptor
 define	FC_WCS		Memi[$1+1]		# WCS descriptor
 define	FC_WF		Memi[$1+2]		# WF descriptor

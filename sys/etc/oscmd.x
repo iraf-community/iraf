@@ -69,7 +69,7 @@ begin
 	    else if (fnullfile (errfile))
 		call fmapfn (Memc[ostmp], Memc[oserr], SZ_PATHNAME)
 	    else {
-		call fclobber (outfile)
+		call fclobber (errfile)
 		call fmapfn (errfile, Memc[oserr], SZ_PATHNAME)
 	    }
 

@@ -186,10 +186,11 @@ define	MAXPTS		8192
 begin
 	# Get the header.
 	call shdr_open (im, smw, 1, 1, RV_APNUM(rv), SHHDR, sh)
+	if (DC(sh) != DCNO)
+	    call shdr_units (sh, "Angstroms")
 
-	# Override the display units and Check units are pixels or Angstroms.
-	call un_copy (MWUN(sh), UN(sh))
-	if (UN_TYPE(UN(sh)) != UN_UNKNOWN && UN_TYPE(UN(sh)) != UN_ANG) {
+	# Check units are pixels or Angstroms.
+	if (DC(sh) != DCNO && UN_TYPE(UN(sh)) != UN_ANG) {
 	    call rv_errmsg("Spectrum units not supported: %s")
 		call pargstr (UN_USER(UN(sh)))
 	    call tsleep (1)
@@ -198,14 +199,16 @@ begin
 
 	# Get data.
 	call shdr_open (im, smw, 1, 1, RV_APNUM(rv), SHDATA, sh)
+	if (DC(sh) != DCNO)
+	    call shdr_units (sh, "Angstroms")
 
 	# Check for maximum size.
-	if (SN(sh) > MAXPTS) {
-	    call rv_errmsg("Too many data points in image. (MAXPTS=%d)%80t")
-		call pargi (MAXPTS)
-	    call tsleep (1)
-	    return (ERR_READ)
-	}
+	#if (SN(sh) > MAXPTS) {
+	#    call rv_errmsg("Too many data points in image. (MAXPTS=%d)%80t")
+	#	call pargi (MAXPTS)
+	#    call tsleep (1)
+	#    return (ERR_READ)
+	#}
 
 	# Check aperture numbers.
 	if (AP(sh) != RV_APNUM(rv)) {

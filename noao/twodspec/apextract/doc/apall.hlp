@@ -1,4 +1,4 @@
-.help apall Feb93 noao.twodspec.apextract
+.help apall Sep96 noao.twodspec.apextract
 .ih
 NAME
 apall -- Extract one dimensional sums across the apertures
@@ -17,6 +17,15 @@ of the input list then the input image name is used as the output root name.
 This will not conflict with the input image since an aperture number
 extension is added for onedspec format, the extension ".ms" for multispec
 format, or the extension ".ec" for echelle format.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and extract.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
 .le
 .ls format = "multispec" (onedspec|multispec|echelle|strip)
 Format for output extracted spectra.  "Onedspec" format extracts each
@@ -109,9 +118,13 @@ These limits are used for apertures found with \fBapfind\fR and when
 defining the first aperture in \fBapedit\fR.
 .le
 .ls apidtable = ""
-Aperture identification table consisting of lines with an aperture number,
-a beam number, and a title.  This table is used to assign aperture
-information automatically in \fBapfind\fR and \fBapedit\fR.
+Aperture identification table.  This may be either a text file or an
+image.  A text file consisting of lines with an aperture number, beam
+number, and aperture title or identification.  An image will contain the
+keywords SLFIBnnn with string value consisting of aperture number, beam
+number, optional right ascension and declination, and aperture title.  This
+information is used to assign aperture information automatically in
+\fBapfind\fR and \fBapedit\fR.
 .le
 
 .ce
@@ -195,8 +208,8 @@ right-to-left in a cross-section plot of the image).
 
 .ce
 RECENTERING PARAMETERS
-.ls apertures = ""
-List of apertures to be recentered.
+.ls aprecenter = ""
+List of apertures to be used in shift calculation.
 .le
 .ls npeaks = INDEF
 Select the specified number of apertures with the highest peak values
@@ -205,8 +218,10 @@ If the value is less than 1 then the value is interpreted as a fraction
 of total number of apertures.
 .le
 .ls shift = yes
-Use the average shift from recentering the selected apertures to apply to
-all apertures.  The recentering is then a constant shift for all apertures.
+Use the average shift from recentering the apertures selected by the
+\fIaprecenter\fR parameter to apply to the apertures selected by the
+\fIapertures\fR parameter.  The recentering is then a constant shift for
+all apertures.
 .le
 
 .ce
@@ -364,7 +379,14 @@ estimated sigma of a pixel, for cleaning.
 .le
 .ls nsubaps = 1
 During extraction it is possible to equally divide the apertures into
-this number of subapertures.
+this number of subapertures.  For multispec format all subapertures will
+be in the same file with aperture numbers of 1000*(subap-1)+ap where
+subap is the subaperture (1 to nsubaps) and ap is the main aperture
+number.  For echelle format there will be a separate echelle format
+image containing the same subaperture from each order.  The name
+will have the subaperture number appended.  For onedspec format
+each subaperture will be in a separate file with extensions and
+aperture numbers as in the multispec format.
 .le
 .ih
 ADDITIONAL PARAMETERS
@@ -386,10 +408,10 @@ defined using an interactive graphical interface called the \fIaperture
 editor\fR.
 .le
 .ls o
-Recenter reference apertures on the image spectrum profiles.
+Recenter selected reference apertures on the image spectrum profiles.
 .le
 .ls o
-Resize the reference apertures based on spectrum profile width.
+Resize the selected reference apertures based on spectrum profile width.
 .le
 .ls o
 Interactively define or adjust aperture definitions using a graphical
@@ -398,14 +420,14 @@ be performed from this editor and, so, provides an alternative
 method of processing and extracting spectra.
 .le
 .ls o
-Trace the positions of spectra profiles from a starting image line
+Trace the positions of the selected spectra profiles from a starting image line
 or column to other image lines or columns and fit a smooth function.
 The trace function is used to shift the center of the apertures
 at each dispersion point in the image.
 .le
 .ls o
-Extract the flux in the apertures into one dimensional spectra in various
-formats.  This includes possible background subtraction, variance
+Extract the flux in the selected apertures into one dimensional spectra in
+various formats.  This includes possible background subtraction, variance
 weighting, and bad pixel rejection.
 .le
 
@@ -500,7 +522,20 @@ and review options and the reference image eliminates the find
 (find only occurs if there are no initial apertures).
 .ih
 REVISIONS
-.ls V2.11
+.ls APALL V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+
+The aperture ID table information may now be contained in the
+image header under the keywords SLFIBnnn.
+
+The "nsubaps" parameter now allows onedspec and echelle output formats.
+The echelle format is appropriate for treating each subaperture as
+a full echelle extraction.
+.le
+.ls APALL V2.10.3
 The dispersion axis parameter was moved to purely a package parameter.
 
 As a final step when computing a weighted/cleaned spectrum the total

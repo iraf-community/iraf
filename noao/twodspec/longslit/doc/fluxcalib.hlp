@@ -63,7 +63,12 @@ flux so that the instrumental counts are preserved.
 The image header keyword DISPAXIS must be present with a value of 1 for
 dispersion parallel to the lines (varying with the column coordinate) or 2
 for dispersion parallel to the columns (varying with line coordinate).
-This parameter may be added using \fBhedit\fR.
+This parameter may be added using \fBhedit\fR.  Note that if the image has
+been transposed (\fBimtranspose\fR) the dispersion axis should still refer
+to the original dispersion axis unless the physical world coordinate system
+is first reset (see \fBwcsreset\R).  This is done in order to allow images
+which have DISPAXIS defined prior to transposing to still work correctly
+without requiring this keyword to be changed.
 .ih
 EXAMPLES
 Standard stars were observed and extracted to one dimensional spectra.
@@ -92,7 +97,7 @@ vertically (varying with the image lines):
 .fi
 .ih
 REVISIONS
-.ls V2.10
+.ls FLUXCALIB V2.10
 The output pixel type is now forced to be real.
 .le
 .ih

@@ -1,5 +1,136 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
+ccdred$src/icscale.x
+ccdred$doc/combine.hlp
+    When zero offsets or weights are specified in a file the weights
+    are not modified for zero offsets.  (10/3/97, Valdes)
+
+ccdred$src/setoutput.x
+    It is now allowed to go from ushort input to short output.
+    (9/29/97, Valdes)
+
+ccdred$src/t_combine.x
+    Fixed a segmentation violation caused by attempting to close the
+    mask data structures during error recovery when the error occurs
+    before the data structures are defined.  (8/14/97, Valdes)
+
+ccdred$src/cosmic/crfind.x
+ccdred$src/cosmic/crlist.x
+    Changed arguments with adjustable arrays to use ARB.  (8/6/97, Valdes)
+
+ccdred$src/setsections.
+    Generalized the LTERM update to work with arbitrary WCSDIM.
+    (7/24/97, Valdes)
+
+ccdred$src/ccdcheck.x
+    No change except date modified.
+    (7/17/97, Valdes)
+
+=====
+V2.11
+=====
+
+ccdred$src/setoverscan.x
+ccdred$src/proc.gx
+ccdred$src/ccdred.h
+ccdred$doc/ccdproc.hlp
+    The overscan fitting function now allows "average", "median", and "minmax"
+    for line-by-line overscan determination.
+    (2/21/97, Valdes)
+
+ccdred$src/setfixpix.x
+ccdred$src/setproc.x
+ccdred$src/proc.gx
+ccdred$src/setsections.x
+ccdred$src/setheader.x
+ccdred$src/ccdred.h
+ccdred$src/corinput.gx		-
+ccdred$src/generic/corinput.x	-
+ccdred$src/mkpkg
+ccdred$src/generic/mkpkg
+ccdred$doc/ccdproc.hlp
+    The bad pixel fixing is now done with the new fixpix routines from xtools.
+    As part of this the physical coordinate system is set to be that of
+    the CCD.
+    (2/21/97, Valdes)
+
+ccdred$src/t_ccdmask.x  +
+ccdred$ccdmask.par      +
+ccdred$doc/ccdmask.hlp  +
+ccdred$src/mkpkg
+ccdred$ccdred.cl
+ccdred$ccdred.hd
+ccdred$ccdred.men
+ccdred$x_ccdred.x
+    A new task, CCDMASK, has been added.  This task finds deviant pixels
+    in CCD data and creates a pixel mask.  (2/21/97, Valdes)
+
+ccdred$src/icscale.x
+    The ccdmean keyword is now updated rather than deleted.  However
+    the ccdmeant keyword is delete to force a later computation if needed.
+    (1/7/97, Valdes)
+
+ccdred$src/icsetout.x
+ccdred$doc/combine.hlp
+    A new option for computing offsets from the image WCS has been added.
+    (1/7/97, Valdes)
+
+ccdred$src/icmask.x
+ccdred$src/iclog.x
+ccdred$src/icombine.com
+ccdred$src/icmask.h	+
+ccdred$src/icmask.com	-
+    Changed to use a mask structure.  (1/7/97, Valdes)
+
+ccdred$src/t_combine.x
+ccdred$src/icombine.gx
+ccdred$src/icimstack.x +
+ccdred$src/iclog.x
+ccdred$src/mkpkg
+ccdred$doc/combine.hlp
+    The limit on the maximum number of images that can be combined, set by
+    the maximum number of logical file descriptors, has been removed.  If
+    the condition of too many files is detected the task now automatically
+    stacks all the images in a temporary image and then combines them with
+    the project option.
+
+    The project option probably did not work previously.  May not still
+    work.
+    (1/7/97, Valdes)
+
+ccdred$src/icsort.gx
+    There was an error in the ic_2sort routine when there are exactly
+    three images that one of the explicit cases did not properly keep
+    the image identifications.  See buglog 344.  (1/17/97, Valdes)
+
+ccdred$src/calimage.x
+    The use of SZ_SUBSET-1 can cause problems because the names are
+    unique to SZ_SUBSET but if unique part is the SZ_SUBSET character
+    this causes problems.  (1/17/97, Valdes)
+
+==========
+V2.10.4-p2
+==========
+
+ccdred$src/icpclip.gx
+    Fixed a bug where a variable was improperly used for two different
+    purposes causing the algorithm to fail (bug 316).  (10/19/95, Valdes)
+
+ccdred$src/cosmic/crlist.x
+    The output bad pixel data accidentally included some extra fields
+    making it incorrect to use the file directly with BADPIXIMAGE.
+    The extra diagnostic fields were removed.  (9/25/95, Valdes)
+
+ccdred$src/cosmic/t_cosmicrays.x
+    Added a test for interactive mode before opening the graphics
+    stream and whether to call the training routine.  This change
+    was needed to allow the task to run non-interactively on
+    dumb, non-graphics terminals.  (7/24/95, Valdes)
+
+=======
+V2.10.4
+=======
+
 ccdred$src/t_combine.x
     If an error occurs while opening an input image header the error
     recovery will close all open images and then propagate the error.

@@ -119,14 +119,16 @@ begin
 
 	    # Normalize the radial profile.
 	    inorm = cveval (cv, 0.0)
-	    call adivkr (Memr[AP_INTENSITY(rprof)], inorm,
-	        Memr[AP_INTENSITY(rprof)], nrpts)
+	    if (inorm != 0.0)
+	        call adivkr (Memr[AP_INTENSITY(rprof)], inorm,
+	            Memr[AP_INTENSITY(rprof)], nrpts)
 	    call apsetr (ap, INORM, inorm)
 
 	    # Normalize the total intensity.
 	    tinorm = Memr[AP_TINTENSITY(rprof)+AP_RPNPTS(rprof)-1]
-	    call adivkr (Memr[AP_TINTENSITY(rprof)], tinorm,
-	        Memr[AP_TINTENSITY(rprof)], nrpts)
+	    if (tinorm != 0.0)
+	        call adivkr (Memr[AP_TINTENSITY(rprof)], tinorm,
+	            Memr[AP_TINTENSITY(rprof)], nrpts)
 	    call apsetr (ap, TNORM, tinorm)
 
 	    # Compute the FWHMPSF.
@@ -181,33 +183,33 @@ begin
 	    datamax = AP_DATAMAX(ap)
 
 	# Compute the sums.
-	call aparrays (ap, APERTS, Memr[aperts])
+	call ap_arrayr (ap, APERTS, Memr[aperts])
 	call amulkr (Memr[aperts], AP_SCALE(ap), Memr[aperts], AP_NAPERTS(phot))
 	if (IS_INDEFR(AP_DATAMIN(ap)) && IS_INDEFR(AP_DATAMAX(ap))) {
 	    call ap_rmmeasure (Memr[AP_RPIX(rprof)], AP_RPNX(rprof),
 	        AP_RPNY(rprof), AP_RPXC(rprof), AP_RPYC(rprof), Memr[aperts],
-		Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+		Memd[AP_SUMS(phot)], Memd[AP_AREA(phot)], AP_NMAXAP(phot))
 	    AP_NMINAP(phot) = AP_NMAXAP(phot) + 1
 	} else
 	    call ap_brmmeasure (Memr[AP_RPIX(rprof)], AP_RPNX(rprof),
 	        AP_RPNY(rprof), AP_RPXC(rprof), AP_RPYC(rprof), datamin,
-		datamax, Memr[aperts], Memr[AP_SUMS(phot)],
-		Memr[AP_AREA(phot)], AP_NMAXAP(phot), AP_NMINAP(phot))
+		datamax, Memr[aperts], Memd[AP_SUMS(phot)],
+		Memd[AP_AREA(phot)], AP_NMAXAP(phot), AP_NMINAP(phot))
 
 	# Check for bad pixels.
 	if ((pier == AP_OK) && (AP_NMINAP(phot) <= AP_NMAXAP(phot)))
 	    pier = AP_APERT_BADDATA
+	nap = min (AP_NMINAP(phot) - 1, AP_NMAXAP(phot))
 
 	# Compute the magnitudes.
-	nap = min (AP_NMINAP(phot) - 1, AP_NMAXAP(phot))
 	zmag = AP_ZMAG(phot) + 2.5 * log10 (AP_ITIME(ap))
 	if (AP_POSITIVE(ap) == YES)
-	    call apcopmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
+	    call apcopmags (Memd[AP_SUMS(phot)], Memd[AP_AREA(phot)],
 	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], nap,
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_NSKY(sky), zmag,
 		AP_NOISEFUNCTION(nse), AP_EPADU(nse))
 	else
-	    call apconmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
+	    call apconmags (Memd[AP_SUMS(phot)], Memd[AP_AREA(phot)],
 	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], nap,
 		AP_SKY_MODE(sky), AP_SKY_SIG(sky), AP_NSKY(sky), zmag,
 		AP_NOISEFUNCTION(nse), AP_EPADU(nse), AP_READNOISE(nse))

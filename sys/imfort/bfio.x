@@ -24,9 +24,14 @@ required to read through an image.
 	chan =  bfchan (fp)				# get channel
 		bfclos (fp, status)
 
-	stat =	bfread (fp, buf, nchars, offset)
+	stat =	bfread (fp, buf, nchars, offset)	# random i/o
 	stat =	bfwrit (fp, buf, nchars, offset)
-	stat =	bfflsh (fp)
+
+	stat =  bfseek (fp, offset)			# sequential i/o
+	stat =  bfrseq (fp, buf, nchars)
+	stat =  bfwseq (fp, buf, nchars)
+
+	stat =	bfflsh (fp)				# flush buffered output
 
 where
 	fname	host file name (no virtual filenames here)
@@ -48,13 +53,15 @@ define	LEN_BFIO	10
 define	BF_CHAN		Memi[$1]		# OS channel
 define	BF_ACMODE	Memi[$1+1]		# access mode
 define	BF_BUFP		Memi[$1+2]		# buffer pointer
-define	BF_BUFSIZE	Memi[$1+3]		# buffer length, chars
-define	BF_BUFOFFSET	Memi[$1+4]		# file offset of buffer
-define	BF_UPDATE	Memi[$1+5]		# write buffer to disk
-define	BF_BLKSIZE	Memi[$1+6]		# device block size
+define	BF_BUFSIZE	Memi[$1+3]		# buffer capacity, chars
+define	BF_BUFCHARS	Memi[$1+4]		# amount of data in buffer
+define	BF_BUFOFFSET	Memi[$1+5]		# file offset of buffer
+define	BF_FILEOFFSET	Memi[$1+6]		# file offset for seq i/o
+define	BF_UPDATE	Memi[$1+7]		# write buffer to disk
+define	BF_BLKSIZE	Memi[$1+8]		# device block size
 
-define	SZ_RANBUF	512			# SPP chars
-define	SZ_SEQBUF	16384
+define	SZ_RANBUF	2048			# SPP chars
+define	SZ_SEQBUF	131072
 define	READ		0
 define	WRITE		1
 
@@ -88,7 +95,7 @@ char	sppname[SZ_PATHNAME]
 
 begin
 	call f77upk (fname, sppname, SZ_PATHNAME)
-	call strpak (fname, sppname, SZ_PATHNAME)
+	call strpak (sppname, sppname, SZ_PATHNAME)
 	call zfaloc (sppname, nchars * SZB_CHAR, status)
 end
 
@@ -131,13 +138,15 @@ begin
 	bufsize = (bufsize + blksize - 1) / blksize * blksize
 	call malloc (bp, bufsize, TY_CHAR)
 
-	BF_CHAN(fp)      = chan
-	BF_ACMODE(fp)    = acmode
-	BF_BUFP(fp)      = bp
-	BF_BUFSIZE(fp)   = bufsize
-	BF_BUFOFFSET(fp) = 0
-	BF_UPDATE(fp)    = NO
-	BF_BLKSIZE(fp)   = blksize
+	BF_CHAN(fp)       = chan
+	BF_ACMODE(fp)     = acmode
+	BF_BUFP(fp)       = bp
+	BF_BUFSIZE(fp)    = bufsize
+	BF_BUFCHARS(fp)   = 0
+	BF_BUFOFFSET(fp)  = 0
+	BF_FILEOFFSET(fp) = 1
+	BF_UPDATE(fp)     = NO
+	BF_BLKSIZE(fp)    = blksize
 
 	return (fp)
 end
@@ -235,7 +244,7 @@ int	bffill()
 
 begin
 	off1  = BF_BUFOFFSET(fp)
-	off2  = off1 + BF_BUFSIZE(fp)
+	off2  = off1 + BF_BUFCHARS(fp)
 	off   = offset
 	nleft = nchars
 	op    = 1
@@ -248,14 +257,16 @@ begin
 		    return (ERR)
 		else {
 		    off1 = BF_BUFOFFSET(fp)
-		    off2 = off1 + BF_BUFSIZE(fp)
+		    off2 = off1 + BF_BUFCHARS(fp)
 		}
 
 	    # Return as much data as possible from the current buffer and
 	    # advance all the pointers when done.
 
 	    ip = off - off1
-	    chunk = min (nleft, BF_BUFSIZE(fp) - ip)
+	    chunk = min (nleft, BF_BUFCHARS(fp) - ip)
+	    if (chunk <= 0)
+		break
 	    call amovc (Memc[bp+ip], buf[op], chunk)
 
 	    nleft = nleft - chunk
@@ -263,7 +274,10 @@ begin
 	    op    = op + chunk
 	}
 
-	return (nchars)
+	if (nleft >= nchars)
+	    return (EOF)
+	else
+	    return (nchars - nleft)
 end
 
 
@@ -306,6 +320,7 @@ begin
 	    op = off - off1
 	    chunk = min (nleft, BF_BUFSIZE(fp) - op)
 	    call amovc (buf[ip], Memc[bp+op], chunk)
+	    BF_BUFCHARS(fp) = max (BF_BUFCHARS(fp), off+chunk - off1)
 	    BF_UPDATE(fp) = YES
 
 	    nleft = nleft - chunk
@@ -314,6 +329,77 @@ begin
 	}
 
 	return (nchars)
+end
+
+
+# BFRSEQ -- Sequential read from a file.  Successive reads advance through
+# the file.
+
+int procedure bfrseq (fp, buf, nchars)
+
+pointer	fp			#I BFIO file descriptor
+char	buf[ARB]		#I user data buffer
+int	nchars			#I nchars of data to be read
+
+int	status
+int	bfread()
+
+begin
+	status = bfread (fp, buf, nchars, BF_FILEOFFSET(fp))
+	if (status > 0)
+	    BF_FILEOFFSET(fp) = BF_FILEOFFSET(fp) + status
+
+	return (status)
+end
+
+
+# BFWSEQ -- Sequential write to a file.  Successive writes advance through
+# the file.
+
+int procedure bfwseq (fp, buf, nchars)
+
+pointer	fp			#I BFIO file descriptor
+char	buf[ARB]		#O user data buffer
+int	nchars			#I nchars of data to be written
+
+int	status
+int	bfwrit()
+
+begin
+	status = bfwrit (fp, buf, nchars, BF_FILEOFFSET(fp))
+	if (status > 0)
+	    BF_FILEOFFSET(fp) = BF_FILEOFFSET(fp) + status
+
+	return (status)
+end
+
+
+# BFSEEK -- Set the file offset for sequential i/o using bf[rw]seq.
+# If called as bfseek(fp,0) the current file offset is returned without
+# changing the file position.
+
+int procedure bfseek (fp, offset)
+
+pointer	fp			#I BFIO file descriptor
+int	offset			#I desired file offset (1-indexed)
+
+int	bffsiz()
+int	old_offset
+
+begin
+	old_offset = BF_FILEOFFSET(fp)
+
+	switch (offset) {
+	case BOF:
+	    BF_FILEOFFSET(fp) = 1
+	case EOF:
+	    BF_FILEOFFSET(fp) = bffsiz(fp) + 1
+	default:
+	    if (offset > 0)
+		BF_FILEOFFSET(fp) = offset
+	}
+
+	return (old_offset)
 end
 
 
@@ -349,17 +435,16 @@ begin
 	    (offset == bufoff && nchars >= bufsize && rwflag == WRITE))
 	    return (nchars)
 
-	# Fill the buffer from the file.  BFIO always reads and writes entire
-	# file buffers.
-
+	# Fill the buffer from the file.
 	call zardbf (BF_CHAN(fp), Memc[BF_BUFP(fp)], BF_BUFSIZE(fp) * SZB_CHAR,
 	    (bufoff - 1) * SZB_CHAR + 1)
 	call zawtbf (BF_CHAN(fp), status)
 
 	if (status == ERR)
 	    return (ERR)
-	else
-	    return (status / SZB_CHAR)
+
+	BF_BUFCHARS(fp) = status / SZB_CHAR
+	return (BF_BUFCHARS(fp))
 end
 
 
@@ -376,10 +461,8 @@ begin
 	else
 	    BF_UPDATE(fp) = NO
 
-	# Flush the buffer to the file.  BFIO always reads and writes entire
-	# file buffers.
-
-	call zawrbf (BF_CHAN(fp), Memc[BF_BUFP(fp)], BF_BUFSIZE(fp) * SZB_CHAR,
+	# Flush the buffer to the file.
+	call zawrbf (BF_CHAN(fp), Memc[BF_BUFP(fp)], BF_BUFCHARS(fp) * SZB_CHAR,
 	    (BF_BUFOFFSET(fp) - 1) * SZB_CHAR + 1)
 	call zawtbf (BF_CHAN(fp), status)
 

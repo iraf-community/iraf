@@ -11,7 +11,7 @@ include "curfitdef.h"
 cvpower (cv, ps_coeff, ncoeff)
 
 pointer	cv			# Curve descriptor
-real	ps_coeff[ncoeff]	# Power series coefficients (returned)
+real	ps_coeff[ncoeff]	# Power series coefficients
 int	ncoeff			# Number of coefficients in fit
 .fi
 .ih
@@ -20,23 +20,21 @@ ARGUMENTS
 Pointer to the curve descriptor structure.
 .le
 .ls ps_coeff
-The output array of power series coefficients; should be dimensioned to ncoeff.
+The output array of power series coefficients.
 .le
 .ls ncoeff
-Number of coefficients in the fit.  This number is stored in the
-cv structure and can be obtained by:
-.nf
-		ncoeff = cvstati (cv, CVNCOEFF).
-.fi
+The output number of coefficients in the fit.
 .le
 .ih
 DESCRIPTION
+This routine routines the equivlalent power series fit coefficients
+and the number of coefficients.
+
 The coefficients of either a legendre or chebyshev solution can be converted
 to power series coefficients of the form y = a0 + a1*x + a2*x**2 + a3*x**3...
 The output coefficients are scaled to the original data range.
 .ih
 NOTES
-Only legendre and chebyshev coefficients are converted; an error is
-reported for other curve types.  Also, errors in the coefficients are not 
-converted, only the coefficients themselves.
+Only legendre and chebyshev coefficients are converted. An error is
+reported for other curve types.
 .endhelp

@@ -14,18 +14,18 @@ include	"oif.h"
 
 procedure imcrex (image, axlen, naxis, pixtype, ier)
 
-char	image[ARB]		# HOST filename of image
-int	axlen[IM_MAXDIM]	# receives axis lengths
-int	naxis			# receives number of axes
-int	pixtype			# receives pixel type
-int	ier			# receives error status
+char	image[ARB]		#I HOST filename of image
+int	axlen[IM_MAXDIM]	#I axis lengths
+int	naxis			#I number of axes
+int	pixtype			#I pixel type
+int	ier			#O receives error status
 
+int	fp, status, ip, i
 long	pfsize, clktime, cputime
 pointer	sp, hdrfile, pixfile, osfn, root, extn, sval, im
-int	fp, status, nbytes, i
 
 pointer	bfopnx()
-int	imwphdr()
+int	imwrhdr(), ctoi()
 define	done_ 91
 define	operr_ 92
 errchk	calloc
@@ -40,7 +40,6 @@ begin
 	call salloc (sval, SZ_FNAME, TY_CHAR)
 
 	# Verify image size and datatype operands.
-
 	ier = OK
 	if (naxis < 1 || naxis > MAX_NAXIS)
 	    ier = IE_NAXIS
@@ -51,13 +50,12 @@ begin
 	if (ier == OK)
 	    if (pixtype != TY_SHORT && pixtype != TY_REAL)
 		ier = IE_PIXTYPE
-
 	if (ier != OK) {
 	    call im_seterrop (ier, image)
 	    goto done_
 	}
 
-	# Construct name of image header file.
+	# Construct the name of the image header file.
 	call imf_parse (image, Memc[root], Memc[extn])
 	if (Memc[extn] == EOS)
 	    call strcpy (OIF_HDREXTN, Memc[extn], SZ_FNAME)
@@ -88,7 +86,7 @@ begin
 	}
 
 	# Create the new image.
-	call zopnbf (Memc[osfn], NEW_FILE, fp)
+	fp = bfopnx (Memc[hdrfile], NF, RANDOM)
 	if (fp == ERR) {
 	    ier = IE_CREHDR
 operr_	    call sfree (sp)
@@ -110,24 +108,30 @@ operr_	    call sfree (sp)
 	call imf_initoffsets (im, SZ_DEVBLK)
 	pfsize = IM_HGMOFF(im) - 1
 
+	# Get the image format version for new images.
+	call strpak (ENV_OIFVER, Memc[sval], SZ_FNAME)
+	call zgtenv (Memc[sval], Memc[sval], SZ_FNAME, status)
+	if (status != ERR) {
+	    ip = 1
+	    call strupk (Memc[sval], Memc[sval], SZ_FNAME)
+	    if (ctoi (Memc[sval], ip, IM_HDRVER(im)) <= 0)
+		IM_HDRVER(im) = DEF_VERSION
+	} else
+	    IM_HDRVER(im) = DEF_VERSION
+
 	# Get a unique pixel file name.
+	call aclrc (IM_HDRFILE(im), SZ_IMHDRFILE)
 	call strcpy (Memc[hdrfile], IM_HDRFILE(im), SZ_IMHDRFILE)
 	call imf_mkpixfname (im, Memc[pixfile], SZ_IMPIXFILE, ier)
 	if (ier != OK)
 	    goto done_
 
-	# Write the image header and close the header file.  Do not use BFIO
-	# to write the header, because we want the file to be odd sized.
-
-	nbytes = IM_HDRLEN(im) * SZ_STRUCT * SZB_CHAR
-	call zawrbf (fp, IM_MAGIC(im), nbytes, long(1))
-	call zawtbf (fp, status)
-
-	if (status != nbytes) {
-	    call zclsbf (fp, status)
+	# Write the image header and close the header file.
+	if (imwrhdr (fp, im, TY_IMHDR) == ERR) {
+	    call bfclos (fp, status)
 	    status = ERR
 	} else
-	    call zclsbf (fp, status)
+	    call bfclos (fp, status)
 
 	if (status == ERR) {
 	    ier = IE_WRHDR
@@ -144,10 +148,10 @@ operr_	    call sfree (sp)
 	}
 
 	# Write the backpointing pixel header into the pixel file.
-	fp = bfopnx (Memc[pixfile], WRITE_ONLY, RANDOM)
+	fp = bfopnx (Memc[pixfile], WO, RANDOM)
 	if (fp == ERR) {
 	    status = ERR
-	} else if (imwphdr (fp, im, image) == ERR) {
+	} else if (imwrhdr (fp, im, TY_PIXHDR) == ERR) {
 	    call bfclos (fp, status)
 	    status = ERR
 	} else

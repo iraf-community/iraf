@@ -227,16 +227,18 @@ chooses to compute it, contains an estimate of the best fitting sky value
 at that point.
 
 After image convolution , DAOFIND steps through \fIstarmap\fR searching
-for density enhancements greater than
-\fIfindpars.threshold\fR * \fIdatapars.sigma\fR, and brighter than
-all other density enhancements within a semi-major
-axis of 0.42466 \fIfindpars.nsigma\fR * \fIdatapars.fwhmpsf\fR.
-As the program selects
-candidates, it computes two shape characteristics sharpness and roundness.
+for density enhancements greater than \fIfindpars.threshold\fR *
+\fIdatapars.sigma\fR, and brighter than all other density enhancements within
+a semi-major axis of 0.42466 \fIfindpars.nsigma\fR * \fIdatapars.fwhmpsf\fR.
+As the program selects candidates, it computes three shape characteristics,
+sharpness and 2 estimates of roundness.
 The sharpness statistic measures the ratio of, the difference between the height
 of the central pixel and the mean of the surrounding non-bad pixels, to
 the height of the best fitting Gaussian function at that point.
-The roundness statistics measures the ratio of, the difference in
+The first roundness characteristic computes the ratio of a measure of
+the bilateral symmetry of the object to a measure of the four-fold symmetry
+of the object.
+The second roundness statistic measures the ratio of, the difference in
 the height of the best fitting Gaussian function in x minus the
 best fitting Gaussian function in y, over the average of the best fitting
 Gaussian functions in x and y.
@@ -261,7 +263,7 @@ the following quantities are written to the terminal as each object is
 detected.
 
 .nf
-	xcenter  ycenter  mag  sharp  round  id
+	xcenter  ycenter  mag  sharpness  sround  ground id
 
 		    where
 
@@ -270,8 +272,8 @@ detected.
 
 The object centers are in pixels and the magnitude estimate measures the
 ratio of the maximum density enhancement to the detection threshold. 
-Sharp is typically around .5 to .8 for a star with of fwhmpsf similar to
-the pattern star. Roundness is close to zero for a truly 
+Sharp is typically around .5 to .8 for a star with a fwhmpsf similar to
+the pattern star. Both sround and ground are close to zero for a truly 
 round star. Id is the sequence number of the star in the list.
 
 In both interactive and batch mode the full output is written to the text

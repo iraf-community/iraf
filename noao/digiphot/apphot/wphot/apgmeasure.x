@@ -1,54 +1,34 @@
-include "../lib/apphot.h"
-include "../lib/noise.h"
-include "../lib/center.h"
-include "../lib/fitsky.h"
-
-define	CONVERSION	2.772588
-
 # AP_GMEASURE -- Procedure to measure the fluxes and effective areas of a set of
 # apertures assuming a Gaussian weighting function.
 
-procedure ap_gmeasure (ap, im, wx, wy, c1, c2, l1, l2, aperts, sums, areas,
-        naperts)
+procedure ap_gmeasure (im, wx, wy, c1, c2, l1, l2, aperts, sums, areas,
+        naperts, sigsq, gain, varsky)
 
-pointer	ap			# pointer to apphot structure
 pointer	im			# pointer to image
 real	wx, wy			# center of subraster
 int	c1, c2			# column limits
 int	l1, l2			# line limits
 real	aperts[ARB]		# array of apertures
-real	sums[ARB]		# array of sums
-real	areas[ARB]		# aperture areas
+double	sums[ARB]		# array of sums
+double	areas[ARB]		# aperture areas
 int	naperts			# number of apertures
+real	sigsq			# the profile widht squared
+real	gain			# the sky value
+real	varsky			# the sky variance
 
-int	i, j, k, nx, yindex, positive
+int	i, j, k, nx, yindex
+double	fctn, weight, norm
 pointer	sp, buf, sump, sumpw
-real	xc, yc, apmaxsq, fwhmpsf, skyval, varsky, dy2, r2, r, fctn
-real	sig2, prof, var, weight, norm
-
-int	apstati()
+real	xc, yc, apmaxsq, dy2, r2, r, prof, var
 pointer	imgs2r()
-real	apstatr()
 
 begin
 	# Initialize.
 	call smark (sp)
-	call salloc (sump, naperts, TY_REAL)
-	call salloc (sumpw, naperts, TY_REAL)
-	call aclrr (Memr[sump], naperts)
-	call aclrr (Memr[sumpw], naperts)
-
-	# Setup some apphot parameters.
-	fwhmpsf = apstatr (ap, FWHMPSF) * apstatr (ap, SCALE)
-	sig2 = fwhmpsf ** 2 / CONVERSION
-	positive = apstati (ap, POSITIVE)
-	if (positive == YES) {
-	    skyval = apstatr (ap, SKY_MODE)
-	    varsky = apstatr (ap, SKY_SIGMA) ** 2
-	} else {
-	    skyval = 0.0
-	    varsky = (apstatr (ap, READNOISE) / apstatr (ap, EPADU)) ** 2
-	}
+	call salloc (sump, naperts, TY_DOUBLE)
+	call salloc (sumpw, naperts, TY_DOUBLE)
+	call aclrd (Memd[sump], naperts)
+	call aclrd (Memd[sumpw], naperts)
 
 	# Get array boundary parameters.
 	nx = c2 - c1 + 1
@@ -57,8 +37,8 @@ begin
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
 
 	# Clear out the accumulaters
-	call aclrr (sums, naperts)
-	call aclrr (areas, naperts)
+	call aclrd (sums, naperts)
+	call aclrd (areas, naperts)
 
 	# Loop over the pixels.
 	do j = l1, l2 {
@@ -73,32 +53,33 @@ begin
 		r2 = (i - xc) ** 2 + dy2
 		if (r2 > apmaxsq)
 		    next
-		var = abs (Memr[buf+i-1] - skyval) + varsky
-		if (var <= 0.0)
-		    next
-		r = sqrt (r2) - 0.5
-		prof = max (exp (-r2 / sig2), 0.0)
+		prof = max (exp (-r2 / sigsq), 0.0)
 		if (prof <= 0.0)
 		    next
+		var = max (0.0, Memr[buf+i-1])
+		var = var / gain + varsky
+		if (var <= 0.0)
+		    next
 		weight = prof / var
+		r = sqrt (r2) - 0.5
 		do k = 1, naperts {
 		    if (r > aperts[k])
 			next
 		    fctn = max (0.0, min (1.0, aperts[k] - r))
 		    sums[k] = sums[k] + weight * fctn * Memr[buf+i-1]
 		    areas[k] = areas[k] + weight * fctn
-		    Memr[sump+k-1] = Memr[sump+k-1] + prof
-		    Memr[sumpw+k-1] = Memr[sumpw+k-1] + weight * prof
+		    Memd[sump+k-1] = Memd[sump+k-1] + prof
+		    Memd[sumpw+k-1] = Memd[sumpw+k-1] + weight * prof
 		}
 	    }
 	}
 
 	# Normalize.
 	do k = 1, naperts {
-	    if (Memr[sumpw+k-1] <= 0.0)
-	        norm = 0.0
+	    if (Memd[sumpw+k-1] <= 0.0d0)
+	        norm = 0.0d0
 	    else
-	        norm = Memr[sump+k-1] / Memr[sumpw+k-1]
+	        norm = Memd[sump+k-1] / Memd[sumpw+k-1]
 	    sums[k] = sums[k] * norm
 	    areas[k] = areas[k] * norm
 	}
@@ -110,10 +91,9 @@ end
 # AP_BGMEASURE -- Procedure to measure the fluxes and effective areas of a set
 # of apertures assuming a Gaussian weighting function.
 
-procedure ap_bgmeasure (ap, im, wx, wy, c1, c2, l1, l2, datamin, datamax,
-	aperts, sums, areas, naperts, minapert)
+procedure ap_bgmeasure (im, wx, wy, c1, c2, l1, l2, datamin, datamax,
+	aperts, sums, areas, naperts, minapert, sigsq, gain, varsky)
 
-pointer	ap			# pointer to apphot structure
 pointer	im			# pointer to image
 real	wx, wy			# center of subraster
 int	c1, c2			# column limits
@@ -121,40 +101,29 @@ int	l1, l2			# line limits
 real	datamin			# minimum good data
 real	datamax			# maximum good data
 real	aperts[ARB]		# array of apertures
-real	sums[ARB]		# array of sums
-real	areas[ARB]		# aperture areas
+double	sums[ARB]		# array of sums
+double	areas[ARB]		# aperture areas
 int	naperts			# number of apertures
 int	minapert		# minimum aperture fo bad pixels
+real	sigsq			# the profile widht squared
+real	gain			# the image gain value
+real	varsky			# the sky variance
 
-int	i, j, k, nx, yindex, kindex, positive
+int	i, j, k, nx, yindex, kindex
+double	fctn, weight, norm
 pointer	sp, buf, sump, sumpw
-real	xc, yc, apmaxsq, fwhmpsf, skyval, varsky, dy2, r2, r, fctn
-real	pixval, sig2, prof, var, weight, norm
-
-int	apstati()
+real	xc, yc, apmaxsq, dy2, r2, r
+real	pixval, prof, var
 pointer	imgs2r()
-real	apstatr()
 
 begin
 	# Initialize.
 	call smark (sp)
-	call salloc (sump, naperts, TY_REAL)
-	call salloc (sumpw, naperts, TY_REAL)
-	call aclrr (Memr[sump], naperts)
-	call aclrr (Memr[sumpw], naperts)
+	call salloc (sump, naperts, TY_DOUBLE)
+	call salloc (sumpw, naperts, TY_DOUBLE)
+	call aclrd (Memd[sump], naperts)
+	call aclrd (Memd[sumpw], naperts)
 	minapert = naperts + 1
-
-	# Setup some apphot parameters.
-	fwhmpsf = apstatr (ap, FWHMPSF) * apstatr (ap, SCALE)
-	sig2 = fwhmpsf ** 2 / CONVERSION
-	positive = apstati (ap, POSITIVE)
-	if (positive == YES) {
-	    skyval = apstatr (ap, SKY_MODE)
-	    varsky = apstatr (ap, SKY_SIGMA) ** 2
-	} else {
-	    skyval = 0.0
-	    varsky = (apstatr (ap, READNOISE) / apstatr (ap, EPADU)) ** 2
-	}
 
 	# Get array boundary parameters.
 	nx = c2 - c1 + 1
@@ -163,8 +132,8 @@ begin
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
 
 	# Clear out the accumulaters
-	call aclrr (sums, naperts)
-	call aclrr (areas, naperts)
+	call aclrd (sums, naperts)
+	call aclrd (areas, naperts)
 
 	# Loop over the pixels.
 	do j = l1, l2 {
@@ -179,15 +148,16 @@ begin
 		r2 = (i - xc) ** 2 + dy2
 		if (r2 > apmaxsq)
 		    next
-		pixval = Memr[buf+i-1]
-		var = abs (pixval - skyval) + varsky
-		if (var <= 0.0)
-		    next
-		r = sqrt (r2) - 0.5
-		prof = max (exp (-r2 / sig2), 0.0)
+		prof = max (exp (-r2 / sigsq), 0.0)
 		if (prof <= 0.0)
 		    next
+		pixval = Memr[buf+i-1]
+		var = max (0.0, pixval)
+		var = pixval / gain + varsky
+		if (var <= 0.0)
+		    next
 		weight = prof / var
+		r = sqrt (r2) - 0.5
 		kindex = naperts + 1
 		do k = 1, naperts {
 		    if (r > aperts[k])
@@ -196,8 +166,8 @@ begin
 		    fctn = max (0.0, min (1.0, aperts[k] - r))
 		    sums[k] = sums[k] + weight * fctn * pixval
 		    areas[k] = areas[k] + weight * fctn
-		    Memr[sump+k-1] = Memr[sump+k-1] + prof
-		    Memr[sumpw+k-1] = Memr[sumpw+k-1] + weight * prof
+		    Memd[sump+k-1] = Memd[sump+k-1] + prof
+		    Memd[sumpw+k-1] = Memd[sumpw+k-1] + weight * prof
 		}
 		if (kindex < minapert) {
 		    if (pixval < datamin || pixval > datamax)
@@ -208,10 +178,10 @@ begin
 
 	# Normalize.
 	do k = 1, naperts {
-	    if (Memr[sumpw+k-1] <= 0.0)
-	        norm = 0.0
+	    if (Memd[sumpw+k-1] <= 0.0d0)
+	        norm = 0.0d0
 	    else
-	        norm = Memr[sump+k-1] / Memr[sumpw+k-1]
+	        norm = Memd[sump+k-1] / Memd[sumpw+k-1]
 	    sums[k] = sums[k] * norm
 	    areas[k] = areas[k] * norm
 	}

@@ -43,6 +43,14 @@ extern memel *dictionary;    /* base of the dictionary; never moves */
 (((unsigned)(char *)(ptr) - (unsigned)(char *)(dictionary))/BPI)
 
 /* ----------
+ * Generic push/pop memory routines.  Can be used to push/pop any integer type
+ * argument regardless of size, so long as it fits in a memel.
+ */
+#define push(v)		pushmem((memel)v)
+#define ppush(v)	ppushmem((memel)v)
+#define pop		popmem
+
+/* ----------
  * convert a dictionary index into a genuine address; type will be 
  * the type of dictionary.
  */

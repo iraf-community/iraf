@@ -24,6 +24,8 @@ gain\r
 \r
 \r
 4\r
+6600\r
+6.1\r
 \r
 \r
 \r
@@ -45,10 +47,6 @@ q/<-5\s\s\s\s/=(.\s=\r
 N\r
 q/<-5\s\s\s\s/=(.\s=\r
 :/<-5\s\s\s\s/=(.\s=\r coord\slinelists$idhenear.dat\r
-i/<-5\s\s\s\s/=(.\s=\r
-m%),!\s\s\s\s%)$0$;\r 5852\r
-m:2,;\s\s\s\s:3%/"<\r 7281\r
-l/<-5\s\s\s\s/=(.\s=\r
 f/<-5\s\s\s\s/=(.\s=\r
 l/<-5\s\s\s\s/=(.\s=\r
 q/<-5\s\s\s\s/=(.\s=\r

@@ -235,8 +235,8 @@ for density enhancements greater than
 \fIfindpars.threshold\fR * \fIdatapars.sigma\fR, and brighter than
 all other density enhancements within a semi-major
 axis of 0.42466 \fIfindpars.nsigma\fR * \fIdatapars.fwhmpsf\fR.
-As the program selects
-candidates, it computes two shape characteristics, sharpness and roundness.
+As the program selects candidates, it computes three shape characteristics,
+sharpness and 2 estimates of roundness.
 The sharpness statistic measures the ratio of, the difference between the height
 of the central pixel and the mean of the surrounding non-bad pixels, to
 the height of the best fitting Gaussian function at the central pixel.
@@ -244,6 +244,13 @@ The roundness statistics measures the ratio of, the difference between
 the height of the best fitting Gaussian function in x minus the
 height of the best fitting Gaussian function in y,
 over the average of the heights of the best fitting
+Gaussian functions in x and y.
+The first roundness characteristic computes the ratio of a measure of
+the bilateral symmetry of the object to a measure of the four-fold symmetry
+of the object.
+The second roundness statistic measures the ratio of, the difference in
+the height of the best fitting Gaussian function in x minus the
+best fitting Gaussian function in y, over the average of the best fitting
 Gaussian functions in x and y.
 The default limits on these parameters \fIfindpars.sharplo\fR,
 \fIfindpars.sharphi\fR
@@ -268,9 +275,9 @@ the following quantities are written to the terminal as each object is
 measured.
 
 .nf
-	xcenter  ycenter  mag  sharpness  roundness  id
+	xcenter  ycenter  mag  sharpness  sround  ground id
 
-			where
+		       where
 
 	mag = -2.5 * log10 (peak density / detection threshold)
 .fi
@@ -280,7 +287,7 @@ Mag is a measure of the intensity ratio
 of the amplitude of the best fitting Gaussian function at the object position
 to the detection threshold. 
 Sharpness is typically .5 to .8 for a star with fwhmpsf identical 
-to the pattern star and roundness is approximately zero for
+to the pattern star. Both sround and ground are approximately zero for
 round stars. Id is the sequence number of the star in the list.
 
 In both interactive and batch mode the full output is written to the text

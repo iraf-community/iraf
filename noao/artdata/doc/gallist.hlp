@@ -55,6 +55,9 @@ density distribution.
 .ls sseed = 2
 The initial value supplied to the random number generator used to
 generate the output x and y coordinates.
+If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each excution.
 .le
 
 			MAGNITUDE DISTRIBUTION
@@ -97,6 +100,9 @@ The characteristic magnitude of the Schecter luminosity function.
 .ls lseed = 2
 The intial value supplied to the random number generator used to
 generate the output magnitudes.
+If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each excution.
 .le
 
 			MORPHOLOGY DISTRIBUTION
@@ -105,7 +111,7 @@ The fraction of the galaxies that are "ellipticals" represented
 by a de Vaucouleurs surface brightness law as opposed to "spirals"
 represented by an exponential disk surface brightness law.
 .le
-.ls ar = 0.7
+.ls ar = 0.3
 Minimum elliptical galaxy axial ratio (major/minor ratio).
 .le
 .ls eradius = 20.0
@@ -278,7 +284,8 @@ The artifical galaxies have one of two morphological types,
 of elliptical galaxies is set by the parameter \fIegalmix\fR.  The
 position angles of the major axis are distributed uniformly between 0.0
 and 360.0 degrees.  The axial ratio (major to minor) of the elliptical
-models is allowed to range uniformly between 1 and \fIar\fR.
+models is allowed to range uniformly between 1 and \fIar\fR
+(that is E0 - E7).
 
 The spiral models have inclinations, i, ranging uniformly between 0 and
 90 degrees.  The axial ratio is then given by
@@ -452,6 +459,16 @@ creating a data file.
 	    ... type = to make a copy of any of the plots
 	    ... type q to quit
 .fi
+.ih
+REVISIONS
+.ls GALLIST V2.11+
+The random number seeds can be set from the clock time by using the value
+"INDEF" to yield different random numbers for each execution.
+.le
+.ls GALLIST V2.11
+The default value for the minimum elliptical galaxy axial ratio was
+change to 0.3 to cover the range E0-E7 uniformly.
+.le
 .ih
 BUGS
 This is a first version and is not intended to produce a full model

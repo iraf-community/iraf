@@ -1,4 +1,5 @@
 include <fset.h>
+include <ctype.h>
 include <ctotok.h>
 include "../lib/obsfile.h"
 
@@ -1065,7 +1066,8 @@ begin
 	    }
 
 	    op = op + strlen (label[op])
-	    break
+	    if (IS_WHITE(list[ip]))
+	        break
 	}
 
 	label[op] = EOS

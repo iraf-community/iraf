@@ -55,6 +55,7 @@
 #define	ZCALL7		zcall7_
 #define	ZCALL8		zcall8_
 #define	ZCALL9		zcall9_
+#define	ZCALLA		zcalla_
 #define	ZCLCPR		zclcpr_
 #define	ZCLDIR		zcldir_
 #define	ZCLDPR		zcldpr_
@@ -95,6 +96,7 @@
 #define	ZFUNC7		zfunc7_
 #define	ZFUNC8		zfunc8_
 #define	ZFUNC9		zfunc9_
+#define	ZFUNCA		zfunca_
 #define	ZFXDIR		zfxdir_
 #define	ZGCMDL		zgcmdl_
 #define	ZGETTT		zgettt_

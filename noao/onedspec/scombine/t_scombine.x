@@ -25,14 +25,14 @@ real	flow1, fhigh1, pclip1, nkeep1
 real	rval
 bool	grdn, ggain, gsn
 int	i, j, k, l, n, naps, npts
-pointer	im, mw, nout, shin, shout
-pointer	sp, input, output, noutput, str, logfile, sh, ns
+pointer	im, mw, nout, refim, shin, shout
+pointer	sp, input, output, noutput, scale, zero, weight, str, logfile, sh, ns
 pointer	sp1, d, id, nc, m, lflag, scales, zeros, wts
 
 real	clgetr(), imgetr()
 bool	clgetb(), rng_elementi()
 int	clgeti(), clgwrd(), ctor()
-int	imtopenp(), imtgetim(), open()
+int	imtopenp(), imtgetim(), open(), nowhite()
 pointer	rng_open(), immap(), smw_openim(), impl2i(), impl2r()
 errchk	open, immap, smw_openim, shdr_open, imgetr
 errchk	scb_output, scb_combine, ic_combiner
@@ -44,6 +44,9 @@ begin
 	call salloc (input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (noutput, SZ_FNAME, TY_CHAR)
+	call salloc (scale, SZ_FNAME, TY_CHAR)
+	call salloc (zero, SZ_FNAME, TY_CHAR)
+	call salloc (weight, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (gain, SZ_FNAME, TY_CHAR)
 	call salloc (snoise, SZ_FNAME, TY_CHAR)
@@ -62,6 +65,9 @@ begin
 	combine = clgwrd ("combine", Memc[input], SZ_FNAME, COMBINE)
 	reject1 = clgwrd ("reject", Memc[input], SZ_FNAME, REJECT)
 	blank = clgetr ("blank")
+	call clgstr ("scale", Memc[scale], SZ_FNAME)
+	call clgstr ("zero", Memc[zero], SZ_FNAME)
+	call clgstr ("weight", Memc[weight], SZ_FNAME)
 	call clgstr ("gain", Memc[gain], SZ_FNAME)
 	call clgstr ("rdnoise", Memc[rdnoise], SZ_FNAME)
 	call clgstr ("snoise", Memc[snoise], SZ_FNAME)
@@ -76,6 +82,10 @@ begin
 	grow = clgeti ("grow")
 	mclip = clgetb ("mclip")
 	sigscale = clgetr ("sigscale")
+
+	i = nowhite (Memc[scale], Memc[scale], SZ_FNAME)
+	i = nowhite (Memc[zero], Memc[zero], SZ_FNAME)
+	i = nowhite (Memc[weight], Memc[weight], SZ_FNAME)
 
 	# Check parameters, map INDEFs, and set threshold flag
 	if (pclip1 == 0. && reject1 == PCLIP)
@@ -146,7 +156,13 @@ begin
 	    if (imtgetim (nlist, Memc[noutput], SZ_FNAME) == EOF)
 		Memc[noutput] = EOS
 
-	    # Get spectra to combine
+	    # Get spectra to combine.
+	    # Because the input images are unmapped we must get all the
+	    # data we need for combining into the spectrum data structures.
+	    # In particular any header keyword parameters that will be
+	    # used.  We save the header values in unused elements of
+	    # the spectrum data structure.
+
 	    naps = 0
 	    repeat {
 		iferr (im = immap (Memc[input], READ_ONLY, 0)) {
@@ -162,6 +178,12 @@ begin
 
 		do i = 1, SMW_NSPEC(mw) {
 		    call shdr_open (im, mw, i, 1, INDEFI, SHDATA, shin)
+		    if (Memc[scale] == '!')
+			ST(shin) = imgetr (im, Memc[scale+1])
+		    if (Memc[zero] == '!')
+			HA(shin) = imgetr (im, Memc[zero+1])
+		    if (Memc[weight] == '!')
+			AM(shin) = imgetr (im, Memc[weight+1])
 		    if (grdn)
 			RA(shin) = imgetr (im, Memc[rdnoise])
 		    if (ggain)
@@ -218,7 +240,7 @@ begin
 
 	    # Set the output and combine the spectra.
 	    call scb_output (sh, ns, naps, Memc[output], Memc[noutput],
-		im, mw, nout)
+		im, mw, nout, refim)
 
 	    do j = 1, naps {
 		call shdr_open (im, mw, j, 1, INDEFI, SHHDR, shout)
@@ -291,6 +313,7 @@ begin
 	    call shdr_close (shout)
 	    call smw_close (mw)
 	    call imunmap (im)
+	    call imunmap (refim)
 	    if (nout != NULL)
 		call imunmap (nout)
 
@@ -329,7 +352,8 @@ end
 
 
 # SCB_REBIN - Rebin input spectra to output dispersion
-# Use the SX array ask mask
+# Use the SX array as mask.  If less than 1% of an input
+# pixel contributes to an output pixel then flag it as missing data.
 
 procedure scb_rebin (sh, shout, lflag, ns, npts)
 
@@ -354,8 +378,8 @@ begin
 	    shin = sh[i]
 	    c = shdr_wl (shout, shdr_lw (shin, double(0.5)))
 	    b = shdr_wl (shout, shdr_lw (shin, double(SN(shin)+0.5)))
-	    a = max (1, nint (min (b, c) + 0.99))
-	    b = min (npts, nint (max (b, c) - 0.99))
+	    a = max (1, nint (min (b, c) + 0.01))
+	    b = min (npts, nint (max (b, c) - 0.01))
 	    j = b - a + 1
 	    if (j < 1) {
 		lflag[i] = D_NONE
@@ -388,7 +412,7 @@ end
 
 # SCB_OUTPUT - Set the output spectrum
 
-procedure scb_output (sh, ns, naps, output, noutput, im, mw, nout)
+procedure scb_output (sh, ns, naps, output, noutput, im, mw, nout, refim)
 
 pointer	sh			# spectra structures
 int	ns			# number of spectra
@@ -398,11 +422,12 @@ char	noutput[SZ_FNAME]	# output number combined image name
 pointer	im			# output IMIO pointer
 pointer	mw			# output MWCS pointer
 pointer	nout			# output number combined IMIO pointer
+pointer	refim			# reference image for output image
 
 int	i, ap, beam, dtype, nw, nmax, axis[2]
 double	w1, dw, z
 real	aplow[2], aphigh[2]
-pointer	sp, key, coeff, sh1, junk
+pointer	sp, key, coeff, sh1
 pointer	immap(), mw_open(), smw_openim()
 errchk	immap, smw_openim
 data	axis/1,2/
@@ -413,14 +438,18 @@ begin
 	coeff = NULL
 
 	# Create output image using the first input image as a reference
-	nout = immap (IMNAME(SH(sh,1,1)), READ_ONLY, 0)
-	im = immap (output, NEW_COPY, nout)
-	call imunmap (nout)
+	refim = immap (IMNAME(SH(sh,1,1)), READ_ONLY, 0)
+	im = immap (output, NEW_COPY, refim)
+
+	# Use smw_openim to clean up old keywords(?).
+	mw = smw_openim (im)
+	call smw_close (mw)
 
 	if (naps == 1)
 	    IM_NDIM(im) = 1
 	else
 	    IM_NDIM(im) = 2
+	call imaddi (im, "SMW_NDIM", IM_NDIM(im))
 	IM_LEN(im,2) = naps
 	if (IM_PIXTYPE(im) != TY_DOUBLE)
 	    IM_PIXTYPE(im) = TY_REAL
@@ -447,9 +476,7 @@ begin
 
 	IM_LEN(im,1) = nmax
 
-	# Set header.  Use smw_openim to clean up old keywords.
-	junk = smw_openim (im)
-	call smw_close (junk)
+	# Set MWCS header.
 	call smw_saveim (mw, im)
 	call smw_close (mw)
 	mw = smw_openim (im)

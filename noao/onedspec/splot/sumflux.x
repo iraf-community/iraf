@@ -99,11 +99,11 @@ begin
 
 	# Correct for angstroms/channel
 	if (i1 != i2)
-	    wpc = (x[i2] - x[i1]) / (i2 - i1)
+	    wpc = abs ((x[i2] - x[i1]) / (i2 - i1))
 	else if (i1 < n)
-	    wpc = x[i1+1] - x[i1]
+	    wpc = abs (x[i1+1] - x[i1])
 	else
-	    wpc = x[i1-1] - x[i1]
+	    wpc = abs (x[i1-1] - x[i1])
 	sum[1] = sum[1] * wpc
 	if (!IS_INDEF(esum[1]))
 	    esum[1] = esum[1] * wpc

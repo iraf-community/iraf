@@ -17,8 +17,10 @@ pointer	im			#I Template IMIO pointer
 int	i, pdim, ldim, paxis, laxis, nw, dtype, nspec
 real	smw_c1tranr()
 double	w1, dw
-pointer	sp, axno, axval, r, w, cd, mw, ct, smw_sctran()
+pointer	sp, str, axno, axval, r, w, cd, mw, ct, smw_sctran()
 int	mw_stati(), imgeti()
+bool	fp_equald()
+errchk	smw_sctran
 
 begin
 	# If a template SMW pointer is specified just copy the axes parameters.
@@ -43,6 +45,7 @@ begin
 	}
 
 	call smark (sp)
+	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (axno, 3, TY_INT)
 	call salloc (axval, 3, TY_INT)
 	call aclri (Memi[axno], 3)
@@ -60,15 +63,15 @@ begin
 	    call salloc (w, pdim, TY_DOUBLE)
 	    call salloc (cd, pdim*pdim, TY_DOUBLE)
 
-	    # Check for a transposed 2D image.
+	    # Check for a transposed or rotated 2D image.
 	    SMW_TRANS(smw) = NO
 	    if (pdim == 2) {
 		call mw_gltermd (mw, Memd[cd], Memd[w], pdim)
 		if (Memd[cd] == 0D0 && Memd[cd+3] == 0D0) {
-		    Memd[cd] = Memd[cd+2]
-		    Memd[cd+2] = 0.
-		    Memd[cd+3] = Memd[cd+1]
+		    Memd[cd] = Memd[cd+1]
 		    Memd[cd+1] = 0.
+		    Memd[cd+3] = Memd[cd+2]
+		    Memd[cd+2] = 0.
 		    call mw_sltermd (mw, Memd[cd], Memd[w], pdim)
 		    paxis = SMW_PAXIS(smw,1)
 		    if (paxis == 1)
@@ -76,6 +79,14 @@ begin
 		    else
 			SMW_PAXIS(smw,1) = 1
 		    SMW_TRANS(smw) = YES
+		} else if (Memd[cd+1] != 0D0 || Memd[cd+2] != 0D0) {
+		    Memd[w] = 0
+		    Memd[w+1] = 0
+		    Memd[cd] = 1
+		    Memd[cd+1] = 0
+		    Memd[cd+2] = 0
+		    Memd[cd+3] = 1
+		    call mw_sltermd (mw, Memd[cd], Memd[w], pdim)
 		}
 	    }
 
@@ -113,13 +124,27 @@ begin
 	    # Set the dispersion system.
 	    call mw_gwtermd (mw, Memd[r], Memd[w], Memd[cd], pdim)
 	    if (SMW_TRANS(smw) == YES) {
-		w1 = Memd[r]
-		Memd[r] = Memd[r+1]
-		Memd[r+1] = w1
 		Memd[cd] = Memd[cd+1]
 		Memd[cd+1] = 0.
 		Memd[cd+3] = Memd[cd+2]
 		Memd[cd+2] = 0.
+	    }
+	    if (pdim == 2 && (Memd[cd+1] != 0D0 || Memd[cd+2] != 0D0)) {
+		iferr (dtype = imgeti (im, "DC-FLAG"))
+		    dtype = DCNO
+		if (dtype != DCNO) {
+		    call sfree (sp)
+		    call error (1,
+		    "Rotated, dispersion calibrated spectra are not allowed")
+		}
+		Memd[r] = 0
+		Memd[r+1] = 0
+		Memd[w] = 0
+		Memd[w+1] = 0
+		Memd[cd] = 1
+		Memd[cd+1] = 0
+		Memd[cd+2] = 0
+		Memd[cd+3] = 1
 	    }
 	    do i = 0, pdim-1 {
 		dw = Memd[cd+i*(pdim+1)]
@@ -137,14 +162,27 @@ begin
 	    nw = max (smw_c1tranr (ct, 0.5), smw_c1tranr (ct, nw+0.5))
 	    call smw_ctfree (ct)
 
-	    iferr (dtype = imgeti (im, "DC-FLAG"))
-		dtype = DCNO
+	    iferr (dtype = imgeti (im, "DC-FLAG")) {
+		if (fp_equald (1D0, w1) || fp_equald (1D0, dw))
+		    dtype = DCNO
+		else
+		    dtype = DCLINEAR
+	    }
 	    if (dtype==DCLOG) {
 		if (abs(w1)>20. || abs(w1+(nw-1)*dw)>20.)
 		    dtype = DCLINEAR
 		else {
 		    w1 = 10D0 ** w1
 		    dw = w1 * (10D0 ** ((nw-1)*dw) - 1) / (nw - 1)
+		}
+	    }
+
+	    if (dtype != DCNO) {
+		iferr (call mw_gwattrs (mw,paxis,"label",Memc[str],SZ_LINE)) {
+		iferr (call mw_gwattrs(mw,paxis,"units",Memc[str],SZ_LINE)) {
+			call mw_swattrs (mw, paxis, "units", "angstroms")
+			call mw_swattrs (mw, paxis, "label", "Wavelength")
+		    }
 		}
 	    }
 

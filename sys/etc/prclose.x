@@ -25,7 +25,8 @@ begin
 	if (child == ERR)
 	    call syserr (SYS_PRNOTFOUND)
 
-	if (pr_status[child] == P_RUNNING)
+	if (pr_status[child] != P_DONE && pr_status[child] != P_DEAD)
 	    call putline (pr_outfd[child], "bye\n")
+
 	return (prclcpr (pid))
 end

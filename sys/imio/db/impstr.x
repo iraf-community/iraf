@@ -14,22 +14,26 @@ include	"idb.h"
 
 procedure impstr (im, key, value)
 
-pointer	im			# image descriptor
-char	key[ARB]		# parameter to be set
-char	value[ARB]		# new parameter value
+pointer	im			#I image descriptor
+char	key[ARB]		#I parameter to be set
+char	value[ARB]		#I new parameter value
 
-int	ch, i
 bool	string_valued
-pointer	rp, ip, op, sp, val, start
-int	idb_putstring(), idb_findrecord()
+int	nchars, ch, i
+pointer	rp, ip, op, sp, val, start, text
+int	idb_putstring(), idb_findrecord(), idb_filstr()
 errchk	syserrs
 
 begin
 	call smark (sp)
 	call salloc (val, SZ_LINE, TY_CHAR)
+	call salloc (text, SZ_LINE, TY_CHAR)
+
+	# Filter the value string to remove any undesirable characters.
+	nchars = idb_filstr (value, Memc[text], SZ_LINE)
 
 	# Check for a standard header parameter first.
-	if (idb_putstring (im, key, value) != ERR) {
+	if (idb_putstring (im, key, Memc[text]) != ERR) {
 	    call sfree (sp)
 	    return
 	}
@@ -63,10 +67,10 @@ begin
 	# Encode the new value of the parameter.
 	if (string_valued) {
 	   call sprintf (Memc[val], SZ_LINE, " '%-0.68s%11t'%21t")
-		call pargstr (value)
+		call pargstr (Memc[text])
 	} else {
 	    call sprintf (Memc[val], SZ_LINE, "%21s")
-		call pargstr (value)
+		call pargstr (Memc[text])
 	}
 
 	# Update the parameter value.

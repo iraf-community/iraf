@@ -1,4 +1,4 @@
-.help apfit Aug90 noao.twodspec.apextract
+.help apfit Sep96 noao.twodspec.apextract
 .ih
 NAME
 apfit -- Fit 2D spectra using APEXTRACT profile algorithms
@@ -15,6 +15,15 @@ List of output images to be created with the  fitting results.  If the null
 string is given or the end of the output list is reached before the end
 of the input list then the input image name is used and an extension
 of ".fit", ".diff", or ".ratio" is added based on the type of fit.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and fit.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
 .le
 .ls fittype = "difference"
 Type of fitted output.  The choices are:
@@ -239,6 +248,14 @@ aperture defined:
 
 	cl> apfit ls1 inter- rec- res- trace- read=3 gain=1 back=fit
 
+.ih
+REVISIONS
+.ls APFIND V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+.le
 .ih
 SEE ALSO
 apbackground, approfile, apvariance,

@@ -17,7 +17,13 @@ begin
 	    if (i > 3 && spec[i-3] == '.')
 		spec[i-3] = EOS
 	case 'l':
-	    if (i > 2 && streq (spec[i-3], ".pl"))
+	    if (i > 2 && streq (spec[i-2], ".pl"))
 		spec[i-2] = EOS
+	case 's':
+	    if (i > 4 && streq (spec[i-4], ".fits"))
+		spec[i-4] = EOS
+	case 't':
+	    if (i > 3 && streq (spec[i-3], ".fit"))
+		spec[i-3] = EOS
 	}
 end

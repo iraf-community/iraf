@@ -1,5 +1,45 @@
 .help revisions May91 noao.digiphot.photcal
 .nf
+photcal/evaluate/phinvert.x
+photcal/evaluate/phminv.f
+    Modified the inversion routines to fit systems of equations which are
+    singular more robustly, by forcing the appropriate columns in the
+    inversion matrix to 0, and trying to fit the system in the least squares
+    sense. 
+
+    (Davis, Novemeber 12, 1997)
+
+photcal$mkapfile.cl
+    Modified the way the mkapfile script handles the tdump pwidth parameter
+    to work around a change made to the tables.ttools.tdump task. The solution
+    is not ideal because it leaves the value of tdump.pwidth.p_max
+    modified but the parameter value is not changed.
+
+    (Davis, August 15, 1997)
+
+photcal/mkobsfile/t_obsfile.x
+photcal/mkobsfile/mkpkg
+photcal/mkimsets/t_imgroup.x
+    Fixed a bug in the filter id parsing code that was causing filter ids
+    that began with non-alphabetic characters [a-z][A-Z] to be incorrectly
+    parsed, e.g 1U,1B,1V became 1, U, 1B, 1, V instead of 1U, 1B, 1V as
+    intended.
+    (Davis, 6/12/97)
+
+photcal/catalogs/README
+photcal/catalogs/ukirt.dat
+photcal/catalogs/fukirt.dat
+photcal/catalogs/tukirt.dat
+photcal/mkconfig/catlist.key
+    Installed the UKIRT JHK standards list in the photcal package.
+    (Davis, 6/25/96)
+
+photcal/evaluate/phinvert.x
+    Modified the numerical inversion routines to avoid a floating point
+    precision problem on the Linux system. This precision problem would
+    cause the code to go into an infinite loop on some objects.
+    (Davis, 5/7/96)
+
 photcal/mkobsfile/phagrow.x
 photcal/mkobsfile/phaigrow.x
     Modified the mkapfile/apfile task curve of growth fitting code to avoid

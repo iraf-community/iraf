@@ -28,7 +28,7 @@ SET_AFT		\0		undefined
 TOGGLE_DIR	\0		undefined
 
 DEL_LEFT	\177		DEL	
-DEL_CHAR	^F		^F
+DEL_CHAR	^F		^FBS
 DEL_WORD	^I^W		^I^W
 DEL_LINE	^I^D		^I^D
 UNDEL_CHAR	^U^C		^U^C

@@ -27,10 +27,12 @@ int	maxev			#I max events out
 int	o_nev			#O same as function value (nev_out|EOF)
 
 int	x1, x2, y1, y2, xs, xe, ys, ye, x, y
-pointer	pl, rl, rp, bp, ex, ev, bbmask, bb_bufp
+pointer	pl, rl, rp, bp, ex, ev, ev_i, bbmask, bb_bufp
 bool	useindex, lineio, bbused, rmused, nodata
 int	bb_xsize, bb_ysize, bb_xblock, bb_yblock, ii, jj
-int	v[NDIM], szs_event, mval, nev, evi, evtop, temp, i
+int	v[NDIM], szs_event, mval, nev, evidx, evtop, temp, i
+int	ev_xoff, ev_yoff
+bool	ev_xint, ev_yint
 
 pointer	plr_open()
 bool	pl_linenotempty(), pl_sectnotempty()
@@ -162,6 +164,11 @@ begin
 	maskval = 0
 	nev = 0
 
+	ev_xoff = IO_EVXOFF(io)
+	ev_yoff = IO_EVYOFF(io)
+	ev_xint = (IO_EVXTYPE(io) == TY_INT)
+	ev_yint = (IO_EVYTYPE(io) == TY_INT)
+
 	# Extract events using the most efficient type of i/o for the given
 	# selection critera (index, mask, BB, EAF, etc.).
 again_
@@ -215,11 +222,28 @@ again_
 
 		if (bbused) {
 		    ev = IO_MINEVB(io)
-			xs = Mems[ev+IO_EVXOFF(io)]
-			ys = Mems[ev+IO_EVYOFF(io)]
+		    ev_i = (ev - 1) * SZ_SHORT / SZ_INT + 1
+
+		    if (ev_xint)
+			xs = Memi[ev_i+ev_xoff]
+		    else
+			xs = Mems[ev+ev_xoff]
+		    if (ev_yint)
+			ys = Memi[ev_i+ev_yoff]
+		    else
+			ys = Mems[ev+ev_yoff]
+
 		    ev = IO_MAXEVB(io)
-			xe = Mems[ev+IO_EVXOFF(io)]
-			ye = Mems[ev+IO_EVYOFF(io)]
+		    ev_i = (ev - 1) * SZ_SHORT / SZ_INT + 1
+
+		    if (ev_xint)
+			xe = Memi[ev_i+ev_xoff]
+		    else
+			xe = Mems[ev+ev_xoff]
+		    if (ev_yint)
+			ye = Memi[ev_i+ev_yoff]
+		    else
+			ye = Mems[ev+ev_yoff]
 
 		    if (xs > x2 || xe < x1 || ys > y2 || ye < y1)
 			IO_EVI(io) = IO_BKLASTEV(io) + 1
@@ -239,8 +263,16 @@ again_
 	    do i = IO_EVI(io), IO_BKLASTEV(io) {
 		# Get event x,y coordinates in whatever coord system.
 		ev = ev + szs_event
-		x = Mems[ev+IO_EVXOFF(io)]
-		y = Mems[ev+IO_EVYOFF(io)]
+		ev_i = (ev - 1) * SZ_SHORT / SZ_INT + 1
+
+		if (ev_xint)
+		    x = Memi[ev_i+ev_xoff]
+		else
+		    x = Mems[ev+ev_xoff]
+		if (ev_yint)
+		    y = Memi[ev_i+ev_yoff]
+		else
+		    y = Mems[ev+ev_yoff]
 
 		# Reject events lying outside the bounding box.
 		if (bbused)
@@ -304,9 +336,9 @@ putevent_		if (nev >= maxev)
 		    }
 
 		    IO_V(io,2) = y
-		    evi = Memi[IO_YOFFVP(io)+y-1]
+		    evidx = Memi[IO_YOFFVP(io)+y-1]
 
-		    if (evi > 0) {
+		    if (evidx > 0) {
 			if (IO_RMUSED(io) == YES) {
 			    if (IO_LINEIO(io) == YES) {
 				if (!pl_linenotempty (pl,IO_V(io,1)))
@@ -323,9 +355,9 @@ putevent_		if (nev >= maxev)
 		    }
 		} until (IO_RLI(io) <= RLI_LEN(rl))
 
-		IO_EVI(io) = evi
-		IO_EV1(io) = evi
-		IO_EV2(io) = Memi[IO_YLENVP(io)+y-1] + evi - 1
+		IO_EVI(io) = evidx
+		IO_EV1(io) = evidx
+		IO_EV2(io) = Memi[IO_YLENVP(io)+y-1] + evidx - 1
 	    }
 
 	    # Refill the event bucket?
@@ -346,18 +378,38 @@ putevent_		if (nev >= maxev)
 	    # of the current line.  This is the inner loop of indexed event
 	    # extraction, ignoring event attribute filtering.
 
-	    do i = IO_EVI(io), evtop {
-		x = Mems[ev+IO_EVXOFF(io)]		# X is assumed SHORT
-		if (x >= x1) {
-		    if (x > x2) {
-			IO_RLI(io) = IO_RLI(io) + 1
-			break
-		    } else if (nev >= maxev)
-			break
-		    nev = nev + 1
-		    o_ev[nev] = ev
+	    if (ev_xint) {
+		# Optimized loop for an integer index.
+		do i = IO_EVI(io), evtop {
+		    ev_i = (ev - 1) * SZ_SHORT / SZ_INT + 1
+		    x = Memi[ev_i+ev_xoff]
+		    if (x >= x1) {
+			if (x > x2) {
+			    IO_RLI(io) = IO_RLI(io) + 1
+			    break
+			} else if (nev >= maxev)
+			    break
+			nev = nev + 1
+			o_ev[nev] = ev
+		    }
+		    ev = ev + szs_event
 		}
-		ev = ev + szs_event
+
+	    } else {
+		# Optimized loop for a short integer index.
+		do i = IO_EVI(io), evtop {
+		    x = Mems[ev+ev_xoff]
+		    if (x >= x1) {
+			if (x > x2) {
+			    IO_RLI(io) = IO_RLI(io) + 1
+			    break
+			} else if (nev >= maxev)
+			    break
+			nev = nev + 1
+			o_ev[nev] = ev
+		    }
+		    ev = ev + szs_event
+		}
 	    }
 
 	    IO_EVI(io) = i

@@ -53,10 +53,10 @@ begin
 	    e = max (c, d)
 	    c = min (c, d)
 	    d = e
-	    x1 = a + 0.5
-	    y1 = c + 0.5
-	    x2 = b + 0.5
-	    y2 = d + 0.5
+	    x1 = nint(a)
+	    y1 = nint(c)
+	    x2 = nint(b)
+	    y2 = nint(d)
 	    ap = APRECTANGLE
 	    if (x2 - x1 <= y2 - y1)
 		key = 'c'
@@ -80,13 +80,13 @@ begin
 	    nitems = clgcur ("cursor", c, d, wcs, key, strval, SZ_LINE)
 	    call printf ("\n")
 	    if (!IS_INDEF(a))
-	        x1 = a + 0.5
+	        x1 = nint (a)
 	    if (!IS_INDEF(b))
-	        y1 = b + 0.5
+	        y1 = nint (b)
 	    if (!IS_INDEF(c))
-	        x2 = c + 0.5
+	        x2 = nint (c)
 	    if (!IS_INDEF(d))
-	        y2 = d + 0.5
+	        y2 = nint (d)
 	    if (key == 'f') {
 	        if (abs (x2-x1) > abs (y2-y1))
 	            ap = APLDIAG
@@ -95,32 +95,32 @@ begin
 	    } else
 	        ap = APRECTANGLE
 	case 'b', 'e', 'k', 'm', 'n', 'p', 's', ' ':
-	    if (!IS_INDEF(a))
-	        x1 = a - EP_RADIUS(ep) + 0.5
-	    if (!IS_INDEF(b))
-	        y1 = b - EP_RADIUS(ep) + 0.5
-	    if (!IS_INDEF(c))
-	        x2 = a + EP_RADIUS(ep) + 0.5
-	    if (!IS_INDEF(d))
-	        y2 = b + EP_RADIUS(ep) + 0.5
+	    if (!IS_INDEF(a)) {
+	        x1 = nint (a - EP_RADIUS(ep))
+	        x2 = nint (a + EP_RADIUS(ep))
+	    }
+	    if (!IS_INDEF(b)) {
+	        y1 = nint (b - EP_RADIUS(ep))
+	        y2 = nint (b + EP_RADIUS(ep))
+	    }
 	    ap = EP_APERTURE(ep)
 	case 'E':
 	    call printf ("again:")
 	    nitems = clgcur ("cursor", c, d, wcs, key, strval, SZ_LINE)
 	    call printf ("\n")
 	    if (!IS_INDEF(a))
-	        x1 = a + 0.5
+	        x1 = nint (a)
 	    if (!IS_INDEF(b))
-	        y1 = b + 0.5
+	        y1 = nint (b)
 	    if (!IS_INDEF(c))
-	        x2 = c + 0.5
+	        x2 = nint (c)
 	    if (!IS_INDEF(d))
-	        y2 = d + 0.5
+	        y2 = nint (d)
 	default:
 	    if (!IS_INDEF(a))
-	        x1 = a + 0.5
+	        x1 = nint (a)
 	    if (!IS_INDEF(b))
-	        y1 = b + 0.5
+	        y1 = nint (b)
 	}
 
 	return (nitems)

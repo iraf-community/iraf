@@ -28,7 +28,7 @@ pointer	im				#I pointer to image descriptor
 double	cdelt
 char	label[SZ_VALSTR]
 bool	update, output_cdelt
-char	kwname[SZ_KWNAME], ctype[SZ_KWNAME], axtype[3]
+char	kwname[SZ_KWNAME], ctype[SZ_KWNAME], axtype[4]
 int	ndim, axis, fn, ira, idec, i, j, pv, wv, npts, fd
 pointer	sp, iw, wp, wf, vp, cp, at, o_r, n_r, o_cd, n_cd, ltm
 int	op
@@ -96,10 +96,11 @@ begin
 		} then {
 		    call strupr (label)
 		    if (nowhite (label, label, SZ_VALSTR) <= SZ_KWNAME) {
-
 			if (strncmp (label, "SAMPLED", 8) != 0 &&
 			    strncmp (label, "RA--", 4) != 0 &&
-			    strncmp (label, "DEC-", 4) != 0) {
+			    strncmp (label, "DEC-", 4) != 0 &&
+			    strncmp (label[2], "LON", 3) != 0 &&
+			    strncmp (label[2], "LAT", 3) != 0) {
 
 			    call sprintf (ctype, SZ_KWNAME, "%-8s%9t")
 				call pargstr (label)
@@ -113,33 +114,57 @@ begin
 
 		if (and (FN_FLAGS(fn), F_RADEC) != 0) {
 		    # Determine the axis type.
+		    ira = 0
 		    idec = 0
-		    do i = 1, 2
+		    axtype[1] = EOS
+		    do i = 1, 2 {
 			ifnoerr (call mw_gwattrs (mw,
-			    WF_AXIS(wf,i), "axtype", axtype, 3)) {
+				WF_AXIS(wf,i), "axtype", axtype, 4)) {
 			    call strlwr (axtype)
-			    if (streq (axtype, "ra")) {
+			    if (streq (axtype, "ra") ||
+				    streq (axtype[2], "lon")) {
 				ira  = i
 				idec = 3 - i
 				break
-			    } else if (streq (axtype, "dec")) {
+			    } else if (streq (axtype, "dec") ||
+				    streq (axtype[2], "lat")) {
 				ira  = 3 - i
 				idec = i
 				break
 			    } 
 			}
+		    }
 
 		    # RA and DEC had better be flagged, but if not, assume
 		    # that the first axis is RA and the second DEC.
 
+		    if (ira == 0)
+			ira = 1
 		    if (idec == 0)
 			idec = 2
 			
 		    # Make a name like "RA---TAN".
-		    if (WF_AXIS(wf,idec) == axis)
-			call strcpy ("DEC-----", ctype, SZ_KWNAME)
-		    else
-			call strcpy ("RA------", ctype, SZ_KWNAME)
+		    if (WF_AXIS(wf,idec) == axis) {
+			if (streq (axtype, "ra") || streq (axtype, "dec")) {
+			    call strcpy ("DEC-----", ctype, SZ_KWNAME)
+			} else if (streq (axtype[2], "lon") ||
+				streq (axtype[2], "lat")) {
+			    call sprintf (ctype, SZ_KWNAME, "%cLAT----")
+				call pargc (axtype[1])
+			} else {
+			    call strcpy ("DEC-----", ctype, SZ_KWNAME)
+			}
+		    } else {
+			if (streq (axtype, "ra") || streq (axtype, "dec")) {
+			    call strcpy ("RA------", ctype, SZ_KWNAME)
+			} else if (streq (axtype[2], "lon") ||
+				streq (axtype[2], "lat")) {
+			    call sprintf (ctype, SZ_KWNAME, "%cLON----")
+				call pargc (axtype[1])
+			} else {
+			    call strcpy ("RA------", ctype, SZ_KWNAME)
+			}
+		    }
 
 		    op = max (1, SZ_KWNAME - strlen (FN_NAME(fn)) + 1)
 		    call strcpy (FN_NAME(fn), ctype[op], SZ_KWNAME-op+1)

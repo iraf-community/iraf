@@ -33,3 +33,10 @@ define	DS_TOL		(1E-4)
 define	U_MAXPTS	4096
 define	U_Z1		0
 define	U_Z2		4095
+
+# BPDISPLAY options:
+
+define	BPDISPLAY	"|none|overlay|interpolate|"
+define	BPDNONE		1	# Ignore bad pixel mask
+define	BPDOVRLY	2	# Overlay bad pixels
+define	BPDINTERP	3	# Interpolate bad pixels

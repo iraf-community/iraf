@@ -1,5 +1,0 @@
-# Task parameters for IMHEADER.
-
-images,s,a,,,,image names
-longheader,b,h,no,,,print header in multi-line format
-userfields,b,h,yes,,,print the user fields (instrument parameters)

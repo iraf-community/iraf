@@ -2,20 +2,21 @@
 
 include	"oif.h"
 
-# OIF_ACCESS -- Test the accessibility or existence of an existing image, or the
-# legality of the name of a new image.
+# OIF_ACCESS -- Test the accessibility or existence of an existing image, or
+# the legality of the name of a new image.
 
-procedure oif_access (root, extn, acmode, status)
+procedure oif_access (kernel, root, extn, acmode, status)
 
-char	root[ARB]		# root filename
-char	extn[ARB]		# extension (SET on output if none specified)
-int	acmode			# access mode (0 to test only existence)
-int	status
+int	kernel			#I IKI kernel
+char	root[ARB]		#I root filename
+char	extn[ARB]		#U extension (SET on output if none specified)
+int	acmode			#I access mode (0 to test only existence)
+int	status			#O status
 
 pointer	sp, fname
-bool	streq()
-int	btoi(), access()
+int	btoi(), access(), iki_validextn()
 string	oif_extn OIF_HDREXTN
+bool	strne()
 
 begin
 	call smark (sp)
@@ -25,35 +26,26 @@ begin
 	# This is used to select a kernel given the imagefile extension.
 
 	if (acmode == NEW_IMAGE || acmode == NEW_COPY) {
-	    status = btoi (streq (extn, oif_extn))
+	    status = btoi (iki_validextn (kernel, extn) > 0)
 	    call sfree (sp)
 	    return
 	}
 
-	# The OIF format permits image header filenames with no extensions.
-	# If no extension was given, look for a file both with the standard
-	# extension, and without any extension.  If such an image is found
-	# return the actual extension.
-
-	status = YES
-	if (extn[1] == EOS) {
-	    call iki_mkfname (root, oif_extn, Memc[fname], SZ_PATHNAME)
-	    if (access (Memc[fname], acmode, 0) == YES) {
-		call strcpy (oif_extn, extn, MAX_LENEXTN)
-		call sfree (sp)
-		return
-	    } else if (access (root, acmode, 0) == YES) {
-		call sfree (sp)
-		return
-	    }
-	} else if (streq (extn, oif_extn)) {
-	    call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
-	    if (access (Memc[fname], acmode, 0) == YES) {
-		call sfree (sp)
-		return
-	    }
+	# Reject image if an invalid extension is given.
+	if (extn[1] != EOS && strne (extn, oif_extn)) {
+	    status = NO
+	    call sfree (sp)
+	    return
 	}
 
-	status = NO
+	# Check for the imagefile.
+	call iki_mkfname (root, oif_extn, Memc[fname], SZ_PATHNAME)
+	if (access (Memc[fname], acmode, 0) == YES) {
+	    if (extn[1] == EOS)
+		call strcpy (oif_extn, extn, MAX_LENEXTN)
+	    status = YES
+	} else
+	    status = NO
+
 	call sfree (sp)
 end

@@ -1,7 +1,17 @@
-.help reidentify Mar92 noao.onedspec
+.help reidentify Jan96 noao.onedspec
 .ih
 NAME
 reidentify -- Reidentify features
+.ih
+SUMMARY
+Given a reference vector with identified features and (optionally) a
+coordinate function find the same features in other elements of the
+reference image and fit a new dispersion function or determine a
+zero point shift.  After all vectors of the reference image are
+reidentified use the reference vectors to reidentify corresponding
+vectors in other images.  This task is used for transferring dispersion
+solutions in arc calibration spectra and for mapping geometric and
+dispersion distortion in two and three dimensional images.
 .ih
 USAGE
 reidentify reference images
@@ -27,7 +37,7 @@ vector reidentified after printing the results of the automatic fit and the
 user may chose to enter the interactive \fBidentify\fR task.
 .le
 .ls section = "middle line"
-If the reference image is not one dimensional or given as a one dimensional
+If the reference image is not one dimensional or specified as a one dimensional
 image section then this parameter selects the master reference image
 vector.  The master reference is used when reidentifying other vectors in
 the reference image or when other images contain apertures not present in
@@ -44,9 +54,9 @@ first|middle|last|# [first|middle|last|#] line|column|x|y|z
 
 where each field can be one of the strings separated by | except for #
 which is an integer number.  The field in [] is a second designator which
-is used with 3D data.  See the example section for \fBidentify\fR for
-examples of this syntax.  Abbreviations are allowed though beware that 'l'
-is not a sufficient abbreviation.
+is used with three dimensional data.  See the example section for
+\fBidentify\fR for examples of this syntax.  Abbreviations are allowed
+though beware that 'l' is not a sufficient abbreviation.
 .le
 .ls newaps = yes
 Reidentify new apertures in the images which are not in the reference
@@ -110,13 +120,23 @@ multispec type images.
 .le
 .ls shift = "0"
 Shift in user coordinates to be added to the reference features before
-centering when stepping to other lines, columns, or bands in the reference
-image.  Generally no shift is used by setting the value to zero.
-The shift is used as a slope with positive values increasing towards
-larger line or column numbers.  This parameter is not used for
-reidentifications from the reference image to other images.
-If the image is three dimensional then two numbers may be specified
-for the two axes.
+centering.  If the image is three dimensional then two numbers may be
+specified for the two axes.  Generally no shift is used by setting the
+value to zero.  When stepping to other lines, columns, or bands in the
+reference image the shift is added to the primary reference spectrum if not
+tracing.  When tracing the shift is added to last spectrum when stepping to
+higher lines and subtracted when stepping to lower lines.  If a value
+if INDEF is specified then an automatic algorithm is applied to find
+a shift.
+.le
+.ls search = 0.
+If the \fIshift\fR parameter is specified as INDEF then an automatic
+search for a shift is made.  There are two algorithms.  If the search
+value is INDEF then a cross-correlation of line peaks is done.  Otherwise
+if a non-zero value is given then a pattern matching algorithm (see
+\fIautoidentify\fR) is used.  A positive value specifies the search radius in
+dispersion units and a negative value specifies a search radius as a
+fraction of the reference dispersion range.
 .le
 .ls nlost = 0
 When reidentifying features by tracing, if the number of features not found
@@ -133,7 +153,7 @@ than this distance from the previous line or column when tracing or
 from the reference feature position when reidentifying a new image
 then the feature is not reidentified.
 .le
-.ls threshold = 10.
+.ls threshold = 0.
 In order for a feature center to be determined, the range of pixel
 intensities around the feature must exceed this threshold.  This parameter
 is used to exclude noise peaks and terminate tracing when the signal
@@ -153,17 +173,14 @@ are not introduced.
 .le
 .ls coordlist = "linelists$idhenear.dat"
 User coordinate list consisting of an ordered list of line coordinates.
-Some standard line lists are available in the directory "linelists$":
-
-.nf
-	cl> dir linelists
-	cl> page linelists$README
-.fi
+Some standard line lists are available in the directory "linelists$".
+The standard line lists are described under the topic \fIlinelists\fR.
 .le
-.ls match = 10.
+.le
+.ls match = -3.
 The maximum difference for a match between the feature coordinate function
-value and a coordinate in the coordinate list.  The unit of this parameter
-is that of the user coordinates.
+value and a coordinate in the coordinate list.  Positive values
+are in user coordinate units and negative values are in units of pixels.
 .le
 .ls maxfeatures = 50
 Maximum number of the strongest features to be selected automatically from
@@ -180,7 +197,7 @@ Database containing the feature data for the reference image and in which
 the features for the reidentified images are recorded.
 .le
 .ls logfiles = "logfile"
-List of file in which to keep a processing log.  If a null file, "",
+List of files in which to keep a processing log.  If a null file, "",
 is given then no log is kept.
 .le
 .ls plotfile = ""
@@ -197,28 +214,65 @@ generally a graphics terminal.
 Cursor input file.  If a cursor file is not given then the standard graphics
 cursor is read.
 .le
+
+The following parameters are queried when the 'b' key is used in the
+interactive review.
+.ls crval, cdelt
+These parameters specify an approximate coordinate value and coordinate
+interval per pixel when the automatic line identification
+algorithm ('b' key) is used.  The coordinate value is for the
+pixel specified by the \fIcrpix\fR parameter in the \fBaidpars\fR
+parameter set.  The default value of \fIcrpix\fR is INDEF which then
+refers the coordinate value to the middle of the spectrum.  By default
+only the magnitude of the coordinate interval is used.  Either value
+may be given as INDEF.  In this case the search for a solution will
+be slower and more likely to fail.  The values may also be given as
+keywords in the image header whose values are to be used.
+.le
+.ls aidpars = "" (parameter set)
+This parameter points to a parameter set for the automatic line
+identification algorithm.  See \fIaidpars\fR for further information.
+.le
 .ih
 DESCRIPTION
-Features identified in vectors from a reference image are reidentified in
-other images and the results recorded in the database.  If the images are
-two or three dimensional or multiaperture format and a \fIstep\fR greater
+Features (spectral lines, cross-dispersion profiles, etc.) identified in a
+single reference vector (using the tasks \fBidentify\fR or
+\fBautoidentify\fR) are reidentified in other reference vectors and the set
+of reference vectors are reidentified in other images with the same type of
+vectors.  A vector may be a single one dimensional (1D) vector in a two or
+three dimensional (2D or 3D) image, the sum of neighboring vectors to form
+a 1D vector of higher signal, or 1D spectra in multiaperture images.  The
+number of vectors summed in 2D and 3D images is specified by the parameter
+\fInsum\fR.  This parameter does not apply to multiaperture images.
+
+As the previous paragraph indicates, there are two stages in this task.
+The first stage is to identify the same features from a single reference
+vector to a set of related reference vectors.  This generally consists
+of other vectors in the same reference image such as other lines or
+columns in a long slit spectrum or the set of 1D aperture spectra in
+a multiaperture image.  In these cases the vectors are identified by
+a line, column, band, or aperture number.  The second stage is to
+reidentify the features from the reference vectors in the matching
+vectors of other images.  For example the same lines in the reference
+image and another image or the same apertures in several multiaperture
+images.  For multiaperture images the reference vector and target vector
+will have the same aperture number but may be found in different image
+lines.  The first stage may be skipped if all the reference vectors
+have been identified.
+
+If the images are 2D or 3D or multiaperture format and a \fIstep\fR greater
 than zero is specified then additional vectors (lines/columns/bands) in the
 reference image will be reidentified from the initial master reference
 vector (as defined by an image section or \fIsection\fR parameter) provided
 they have not been reidentified previously or the \fIoverride\fR flag is
-set.  For multiple aperture spectra images, called multiaperture, a step
+set.  For multiple aperture spectral images, called multiaperture, a step
 size of zero means don't reidentify any other aperture and any other step
 size reidentifies all apertures.  For two and three dimensional images,
 such as long slit and Fabry-Perot spectra, the step(s) should be large
 enough to minimize execution time and storage requirements but small enough
 to follow shifts in the features (see the discussion below on tracing).
-The set of reference identifications is applied to other images in the same
-lines, columns, bands, or apertures.  In multiaperture images the same
-apertures are matched in the reference image regardless of actual line
-order; i.e.  the apertures need not be in the same order or even have all
-apertures present.
 
-The reidentification of other features in other reference image vectors
+The reidentification of features in other reference image vectors
 may be done in two ways selected by the parameter \fItrace\fR.  If not
 tracing, the initial reference vector is applied to the other selected
 vectors.  If tracing, the reidentifications are made with respect to the
@@ -232,16 +286,6 @@ reidentifications will not propagate (unless the \fIaddfeatures\fR option
 is used).  By not tracing, the original set of features is used for every
 other vector in the reference image.
 
-When reidentifying other vectors in the reference image the parameter
-\fBshift\fR may be used to add a shift(s) to the features positions
-before recentering.  The shift is added to lines, columns, or bands, greater
-than the current line, column, or band and subtracted if less.  If tracing
-the shifts are the same from step to step while if not tracing the
-shifts are added to the shifts from the previous step.  Thus, in both
-cases an approximation of a slope is used.  This allows large
-slopes in the features to be followed even when not tracing but the 
-shift value must be predetermined.
-
 When tracing, the parameter \fInlost\fR is used to terminate the
 tracing whenever this number of features has been lost.  This parameter,
 in conjunction with the other centering parameters which define
@@ -253,9 +297,73 @@ features are those from the same aperture, line, column, or band of the
 reference image.  However, if the \fInewaps\fR parameter is set
 apertures in multiaperture spectra which are not in the reference
 image may be reidentified against the master reference aperture and
-added to the list of aperture to be reidentified in other images.
-This is useful when specta with different aperture numbers are
+added to the list of apertures to be reidentified in other images.
+This is useful when spectra with different aperture numbers are
 stored as one dimensional images.
+
+The reidentification of features between a reference vector and
+a target vector is done as follows.  First a mean shift between
+the two vectors is determined.  After correcting for the shift
+the estimated pixel position of each reference feature in the
+target vector is used as the starting point for determining
+a feature center near this position.  The centering fails the
+feature is dropped and a check against the \fInlost\fR is made.
+If it succeeds it is added to the list of features found in the
+target spectrum.  A zero point shift or new dispersion
+function may be determined.  New features may then be added from
+a coordinate list.  The details are given below.
+
+There may be a large shift between the two vectors such that the same
+feature in the target vector is many pixels away from the pixel position in
+the reference spectrum.  A shift must then be determined.   The \fIshift\fR
+parameter may be used to specify a shift.  The shift is in user coordinates
+and is added to the reference user coordinates before trying to center
+on a feature.  For example if the reference spectrum has a feature at
+5015A but in the new spectrum the feature is at 5025A when the reference
+dispersion function is applied then the shift would be +10.  Thus
+a reference feature at 5015A would have the shift added to get 5025A,
+then the centering would find the feature some pixel value and that
+pixel value would be used with the true user coordinate of 5015A in the
+new dispersion solution.
+
+When tracing a 2D/3D reference spectrum the shift is applied to the
+previous reidentified spectrum rather than the initial reference spectrum.
+The shift is added for increasing line or column values and subtracted for
+decreasing line or column values.  This allows "tracing" when there is a
+rotation or tilt of the 2D or 3D spectrum.  When not tracing the shift is
+always added to the reference spectrum features as described previously.
+
+When reidentify other images with the reference spectrum the shift
+parameter is always just added to the reference dispersion solution
+matching the aperture, line, or column being reidentified.
+
+If the \fIshift\fR parameter is given as INDEF then an automatic
+search algorithm is applied.  There are two algorithms that may be
+used.  If the \fIsearch\fR parameter is INDEF then a cross-correlation
+of the features list with the peaks found in the target spectrum is
+performed.  This algorithm can only find small shifts since otherwise
+many lines may be missing off either end of the spectrum relative to
+the reference spectrum.
+
+If the search parameter is non-zero then the pattern matching algorithm
+described in \fIaidpars\fR is used.  The search parameter specified a
+search radius from the reference solution.  If the value is positive the
+search radius is a distance in dispersion units.  If the value is negative
+then the absolute value is used as a fraction of the dispersion range in
+the reference solution.  For example, a value of -0.1 applied to reference
+dispersion solution with a range of 1000A would search for a new solution
+within 100A of the reference dispersion solution.
+
+The pattern matching algorithm has to stages.  First if there are
+more than 10 features in the reference the pattern matching tries
+to match the lines in the target spectrum to those features with
+a dispersion per pixel having the same sign and a value within 2%.
+If no solution is found then the \fIlinelist\fR is used to match
+against the lines in the target spectrum, again with the dispersion
+per pixel having the same sign and a value within 5%.  The first
+stage works when the set of features is nearly the same while the
+second stage works when the shifts are large enough that many features
+in the reference and target spectra are different.
 
 The centering algorithm is described under the topic \fIcenter1d\fR and
 also in \fBidentify\fR.  If a feature positions shifts by more than the
@@ -270,12 +378,6 @@ data (say if data values are very small due to a calibration or
 normalization operation) is the most common source of problems in using
 this task.
 
-In two and three dimensional images, though not multiaperture images, the
-number of lines, columns, or bands given by the parameter \fInsum\fR are summed
-to form the one dimensional image vector in which the features are
-identified.  This increases the accuracy for reidentifying weak
-features.
-
 If a fitting function is defined for the features in the reference image,
 say a dispersion function in arc lamp spectra, then the function is refit
 at each reidentified line or column if the parameter \fIrefit\fR is yes.
@@ -286,12 +388,16 @@ a sequence of observation using low quality calibration spectra.  When
 refitting, the fitting parameters from the reference are used including
 iterative rejection parameters to eliminate misidentifications.
 
-If the parameter \fIaddfeatures\fR is set additional features may be
-added after the initial reidentification and function fit using a
-line list.  A maximum number of added features, a matching distance
-in user coordinates, and a minimum separation from other features
-are additional parameters.  This option is similar to that available
-in \fBidentify\fR and is described more fully in the help for that task.
+If the parameter \fIaddfeatures\fR is set additional features may be added
+from a line list.  If there are reference features then the new features
+are added AFTER the initial reidentification and function fit.  If the
+reference consists only of a dispersion function, that is it has no
+features, then new features will be added followed by a function fit and
+then another pass of adding new features.  A maximum number of added
+features, a matching distance in user coordinates, and a minimum separation
+from other features are additional parameters.  This option is similar to
+that available in \fBidentify\fR and is described more fully in the help
+for that task.
 
 A statistics line is generated for each reidentified vector.  The line
 contains the name of the image being reidentified (which for two
@@ -324,6 +430,11 @@ If an accessible file name is given for the plot file then a residual plot
 of the reidentified lines is recorded in this file.  The plot file can
 be viewed with \fBgkimosaic, stdgraph\fR or reading the file
 with ".read" when in cursor mode (for example with "=gcur").
+
+The reidentification results for this task are recorded in a
+\fIdatabase\fR.  Currently the database is a directory and entries
+in the database are text files with filenames formed by adding
+the prefix "id" to the image name without an image extension.
 .ih
 EXAMPLES
 1.  Arc lines and a dispersion solution were defined for the middle
@@ -369,6 +480,20 @@ purpose of making a distortion correction:
 .fi
 .ih
 REVISIONS
+.ls REIDENTIFY V2.11
+The \fIsearch\fR parameter and new searching algorithm has been added.
+
+The task will now work with only a warning if the reference image is absent;
+i.e. it is possible to reidentify given only the database.
+
+The \fIaddfeatures\fR function will now add features before a fit if there
+are no reference database features.  Previously features could only be
+added after an initial fit using the reference features and, so, required
+the reference database to contain features for reidentification.  This
+new feature is useful if one wants to uses a dispersion function from one
+type of calibration but wants to add features for a different kind of
+calibration.
+.le
 .ls REIDENTIFY V2.10.3
 The section, nsum, step, and shift parameter syntax was extended to apply to 3D
 images.  The previous values and defaults may still be used.
@@ -388,5 +513,5 @@ in the reference image may be added.
 .le
 .ih
 SEE ALSO
-center1d, identify
+autoidentify, identify, aidpars, center1d, linelists, fitcoords
 .endhelp

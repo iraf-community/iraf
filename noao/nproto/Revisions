@@ -1,5 +1,11 @@
 .help revisions Jun88 noao.nproto
 .nf
+noao$nproto/t_irmosaic.x
+    Modified the irmosaic task to avoid a potential divide by zero error
+    in the range decoding software. This error was actually due to
+    an interface change to the xtools$ranges.x code, which has since been
+    changed back, but the potential for error was there. (8/22/97, Davis)
+
 noao$nproto/linpol
     Added the PROTO package task LINPOL to NPROTO. (1/31/92, Davis)
 

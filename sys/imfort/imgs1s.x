@@ -43,5 +43,8 @@ begin
 	    return
 	}
 
+	# Swap bytes if necessary.
+	call imswap (im, buf, nchars)
+
 	ier = OK
 end

@@ -1,5 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <math/gsurfit.h>
+
 # GS_EVPOLY -- Procedure to evluate the polynomials
 
 procedure dgs_evpoly (coeff, x, y, zfit, npts, xterms, xorder, yorder, k1x,
@@ -15,7 +17,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 double	k1x, k2x		# normalizing constants
 double	k1y, k2y
 
-int	i, k, cptr
+int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
 begin
@@ -53,19 +55,28 @@ begin
 	# accumulate the output vector
 	cptr = 0
 	call aclrd (zfit, npts)
-	if (xterms == YES) {
+	if (xterms != GS_XNONE) {
+	    maxorder = max (xorder + 1, yorder + 1)
+	    xincr = xorder
 	    ybptr = yb
 	    do i = 1, yorder {
 	        call aclrd (Memd[accum], npts)
 	        xbptr = xb
-	        do k = 1, xorder {
+	        do k = 1, xincr {
 		    call awsud (Memd[accum], Memd[xbptr], Memd[accum], npts,
 		        1.0d0, coeff[cptr+k])
 		    xbptr = xbptr + npts
 	        }
 	        call gs_asumvpd (Memd[accum], Memd[ybptr], zfit, zfit, npts)
-	        cptr = cptr + xorder
+	        cptr = cptr + xincr
 	        ybptr = ybptr + npts
+		switch (xterms) {
+		case GS_XHALF:
+		    if ((i + xorder + 1) > maxorder)
+			xincr = xincr - 1
+		default:
+		    ;
+		}
 	    }
 	} else {
 	    xbptr = xb
@@ -101,7 +112,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 double	k1x, k2x		# normalizing constants
 double	k1y, k2y
 
-int	i, k, cptr
+int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, xbptr, ybptr, accum
 
 begin
@@ -124,19 +135,28 @@ begin
 	# accumulate thr output vector
 	cptr = 0
 	call aclrd (zfit, npts)
-	if (xterms == YES) {
+	if (xterms != GS_XNONE) {
+	    maxorder = max (xorder + 1, yorder + 1)
+	    xincr = xorder
 	    ybptr = yb
 	    do i = 1, yorder {
 	        call aclrd (Memd[accum], npts)
 	        xbptr = xb
-	        do k = 1, xorder {
+	        do k = 1, xincr {
 		    call awsud (Memd[accum], Memd[xbptr], Memd[accum], npts,
 		        1.0d0, coeff[cptr+k])
 		    xbptr = xbptr + npts
 	        }
 	        call gs_asumvpd (Memd[accum], Memd[ybptr], zfit, zfit, npts)
-	        cptr = cptr + xorder
+	        cptr = cptr + xincr
 	        ybptr = ybptr + npts
+		switch (xterms) {
+		case GS_XHALF:
+		    if ((i + xorder + 1) > maxorder)
+			xincr = xincr - 1
+		default:
+		    ;
+		}
 	    }
 	} else {
 	    xbptr = xb
@@ -173,7 +193,7 @@ int	xorder,yorder		# order of the polynomials in x and y
 double	k1x, k2x		# normalizing constants
 double	k1y, k2y
 
-int	i, k, cptr
+int	i, k, cptr, maxorder, xincr
 pointer	sp, xb, yb, accum, xbptr, ybptr
 
 begin
@@ -195,19 +215,28 @@ begin
 
 	cptr = 0
 	call aclrd (zfit, npts)
-	if (xterms == YES) {
+	if (xterms != GS_XNONE) {
+	    maxorder = max (xorder + 1, yorder + 1)
+	    xincr = xorder
 	    ybptr = yb
 	    do i = 1, yorder {
 	        xbptr = xb
 	        call aclrd (Memd[accum], npts)
-	        do k = 1, xorder {
+	        do k = 1, xincr {
 		    call awsud (Memd[accum], Memd[xbptr], Memd[accum], npts,
 		        1.0d0, coeff[cptr+k])
 		    xbptr = xbptr + npts
 	        }
 	        call gs_asumvpd (Memd[accum], Memd[ybptr], zfit, zfit, npts)
-	        cptr = cptr + xorder
+	        cptr = cptr + xincr
 	        ybptr = ybptr + npts
+		switch (xterms) {
+		case GS_XHALF:
+		    if ((i + xorder + 1) > maxorder)
+			xincr = xincr - 1
+		default:
+		    ;
+		}
 	    }
 	} else {
 	    xbptr = xb

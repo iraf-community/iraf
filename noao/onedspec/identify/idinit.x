@@ -6,29 +6,29 @@ include	"identify.h"
 
 procedure id_init (id)
 
-pointer	id			# ID pointer
+pointer	id			#O ID pointer
+
+pointer	stopen()
+errchk	stopen
 
 begin
-	call calloc (id, LEN_IDSTRUCT, TY_STRUCT)
+	call calloc (id, ID_LENSTRUCT, TY_STRUCT)
 
 	ID_NALLOC(id) = 20
 	ID_NFEATURES(id) = 0
 	ID_CURRENT(id) = 0
-	ID_NID(id) = 0
 	ID_DT(id) = NULL
+	ID_STP(id) = stopen ("identify", 100, 10*ID_LENSTRUCT, 10*SZ_LINE)
 
-	call malloc (ID_IMAGE(id), SZ_FNAME, TY_CHAR)
-	call malloc (ID_SECTION(id), SZ_FNAME, TY_CHAR)
-	call malloc (ID_DATABASE(id), SZ_FNAME, TY_CHAR)
-	call malloc (ID_COORDLIST(id), SZ_FNAME, TY_CHAR)
-
-	call malloc (ID_PIX(id), ID_NALLOC(id), TY_DOUBLE)
-	call malloc (ID_FIT(id), ID_NALLOC(id), TY_DOUBLE)
-	call malloc (ID_USER(id), ID_NALLOC(id), TY_DOUBLE)
-	call malloc (ID_WTS(id), ID_NALLOC(id), TY_DOUBLE)
-	call malloc (ID_FWIDTHS(id), ID_NALLOC(id), TY_REAL)
-	call malloc (ID_FTYPES(id), ID_NALLOC(id), TY_INT)
-	call calloc (ID_LABEL(id), ID_NALLOC(id), TY_POINTER)
+	if (ID_NALLOC(id) > 0) {
+	    call malloc (ID_PIX(id), ID_NALLOC(id), TY_DOUBLE)
+	    call malloc (ID_FIT(id), ID_NALLOC(id), TY_DOUBLE)
+	    call malloc (ID_USER(id), ID_NALLOC(id), TY_DOUBLE)
+	    call malloc (ID_WTS(id), ID_NALLOC(id), TY_DOUBLE)
+	    call malloc (ID_FWIDTHS(id), ID_NALLOC(id), TY_REAL)
+	    call malloc (ID_FTYPES(id), ID_NALLOC(id), TY_INT)
+	    call calloc (ID_LABEL(id), ID_NALLOC(id), TY_POINTER)
+	}
 end
 
 
@@ -36,16 +36,17 @@ end
 
 procedure id_free (id)
 
-pointer	id				# ID pointer
+pointer	id			#I ID pointer
 
 int	i
 pointer	ptr
 
 begin
-	call mfree (ID_IMAGE(id), TY_CHAR)
-	call mfree (ID_SECTION(id), TY_CHAR)
-	call mfree (ID_DATABASE(id), TY_CHAR)
-	call mfree (ID_COORDLIST(id), TY_CHAR)
+	if (id == NULL)
+	    return
+
+	call id_free1 (id)
+
 	call mfree (ID_APS(id), TY_INT)
 
 	ptr = ID_LABEL(id)
@@ -64,11 +65,13 @@ begin
 
 	if (ID_DT(id) != NULL)
 	    call dtunmap (ID_DT(id))
-	call id_free1 (id)
 	call id_unmapll (id)
+	call stclose (ID_STP(id))
 	call gt_free (ID_GT(id))
 	call dcvfree (ID_CV(id))
 	call ic_closed (ID_IC(id))
+	if (ID_UN(id) != NULL)
+	    call un_close (ID_UN(id))
 
 	call mfree (id, TY_STRUCT)
 end
@@ -80,117 +83,160 @@ procedure id_free1 (id)
 
 pointer	id				# ID pointer
 
-int	i, j
-pointer	id1, ptr
+int	i
+pointer	stp, sid, ptr, sthead(), stnext(), stopen()
 
 begin
-	for (i = 0; i < ID_NID(id); i = i + 1) {
-	    id1 = Memi[ID_ID(id)+i]
-
-	    ptr = ID_LABEL(id1)
-	    do j = 1, ID_NALLOC(id1) {
+	stp = ID_STP(id)
+	for (sid = sthead(stp); sid != NULL; sid = stnext (stp, sid)) {
+	    ptr = ID_LABEL(sid)
+	    do i = 1, ID_NALLOC(sid) {
 		call mfree (Memi[ptr], TY_CHAR)
 		ptr = ptr + 1
 	    }
 
-	    call mfree (ID_PIX(id1), TY_DOUBLE)
-	    call mfree (ID_FIT(id1), TY_DOUBLE)
-	    call mfree (ID_USER(id1), TY_DOUBLE)
-	    call mfree (ID_WTS(id1), TY_DOUBLE)
-	    call mfree (ID_FWIDTHS(id1), TY_REAL)
-	    call mfree (ID_FTYPES(id1), TY_INT)
-	    call mfree (ID_LABEL(id1), TY_POINTER)
-	    if (ID_CV(id1) != NULL)
-	        call dcvfree (ID_CV(id1))
-	    if (ID_IC(id1) != NULL)
-	        call ic_closed (ID_IC(id1))
-	    call shdr_close (ID_SH(id1))
-	    call mfree (id1, TY_STRUCT)
+	    call mfree (ID_PIX(sid), TY_DOUBLE)
+	    call mfree (ID_FIT(sid), TY_DOUBLE)
+	    call mfree (ID_USER(sid), TY_DOUBLE)
+	    call mfree (ID_WTS(sid), TY_DOUBLE)
+	    call mfree (ID_FWIDTHS(sid), TY_REAL)
+	    call mfree (ID_FTYPES(sid), TY_INT)
+	    call mfree (ID_LABEL(sid), TY_POINTER)
+	    if (ID_CV(sid) != NULL)
+	        call dcvfree (ID_CV(sid))
+	    if (ID_IC(sid) != NULL)
+	        call ic_closed (ID_IC(sid))
 	}
-	call mfree (ID_ID(id), TY_POINTER)
-
-	ID_NID(id) = 0
+	if (sthead(stp) != NULL) {
+	    call stclose (stp)
+	    ID_STP(id) = stopen ("identify", 100, 10*ID_LENSTRUCT, 10*SZ_LINE)
+	}
 end
 
 
-# ID_SAVEID -- Save identify information by line.
+# ID_SAVEID -- Save identify information by key.
 
-procedure id_saveid (id, line)
+procedure id_saveid (id, key)
 
-pointer	id		# IDENTIFY structure
-int	line[2]		# Save as line
+pointer	id		#I IDENTIFY structure
+char	key[ARB]	#I Key to use in saving information
 
-int	i
-pointer	id1
+pointer	sid, stfind(), stenter()
 
 begin
-	# Check if already saved.  If not saved allocate memory.
-	for (i = 1; i <= ID_NID(id); i = i + 1) {
-	    id1 = Memi[ID_ID(id)+i-1]
-	    if (ID_LINE(id1,1) == line[1] && ID_LINE(id1,2) == line[2])
-		break
+	sid = stfind (ID_STP(id), key)
+	if (sid == NULL) {
+	    sid = stenter (ID_STP(id), key, ID_LENSTRUCT)
+	    call aclri (Memi[sid], ID_LENSTRUCT)
 	}
-
-	call id_sid (id, i)
+	call strcpy (key, ID_SAVEID(id), ID_LENSTRING)
+	call id_sid (id, sid)
 end
 
 
+# ID_GETID -- Get saved identify information by key.
+# Return NULL if not found.
 
-# ID_SID -- Save identify information by index.
+pointer procedure id_getid (id, key)
 
-procedure id_sid (id, n)
+pointer	id		#I IDENTIFY structure
+char	key[ARB]	#I Key to use in saving information
+
+int	sid, stfind()
+
+begin
+	sid = stfind (ID_STP(id), key)
+	if (sid != NULL)
+	    call id_gid (id, sid)
+
+	return (sid)
+end
+
+
+# ID_SAVEAP -- Save identify information by aperture.
+
+procedure id_saveap (id)
 
 pointer	id		# IDENTIFY structure
-int	n		# Save as index
+
+begin
+	call sprintf (ID_SAVEID(id), ID_LENSTRING, "aperture %d %d")
+	    call pargi (ID_AP(id,1))
+	    call pargi (ID_AP(id,2))
+	call id_saveid (id, ID_SAVEID(id))
+end
+
+
+# ID_GETAP -- Get saved identify information by aperture.
+# Return NULL if not found.
+
+pointer procedure id_getap (id)
+
+pointer	id		# IDENTIFY structure
+
+int	sid, stfind()
+
+begin
+	call sprintf (ID_SAVEID(id), ID_LENSTRING, "aperture %d %d")
+	    call pargi (ID_AP(id,1))
+	    call pargi (ID_AP(id,2))
+
+	# Check if saved.
+	sid = stfind (ID_STP(id), ID_SAVEID(id))
+	if (sid != NULL)
+	    call id_gid (id, sid)
+
+	return (sid)
+end
+
+
+# ID_SID -- Save parts of IDENTIFY structure.
+
+procedure id_sid (id, sid)
+
+pointer	id		#I IDENTIFY structure
+pointer	sid		#I IDENTIFY save structure
 
 int	i, j, dcvstati(), strlen()
-pointer	sp, id1, coeffs, ptr1, ptr2
+pointer	sp, coeffs, ptr1, ptr2
 
 begin
-	if (n > ID_NID(id)) {
-	    if (n == 1)
-	        call malloc (ID_ID(id), 1, TY_POINTER)
-	    else
-	        call realloc (ID_ID(id), n, TY_POINTER)
-	    call calloc (id1, LEN_IDSTRUCT, TY_STRUCT)
-	    Memi[ID_ID(id)+n-1] = id1
-	    ID_NID(id) = n
-	} else
-	    id1 = Memi[ID_ID(id)+n-1]
+	if (sid == NULL)
+	    return
 
 	# Allocate or reallocate memory for features and copy them.
 	if (ID_NFEATURES(id) > 0) {
-	    if (ID_NALLOC(id1) == 0) {
-	        call malloc (ID_PIX(id1), ID_NFEATURES(id), TY_DOUBLE)
-	        call malloc (ID_FIT(id1), ID_NFEATURES(id), TY_DOUBLE)
-	        call malloc (ID_USER(id1), ID_NFEATURES(id), TY_DOUBLE)
-	        call malloc (ID_WTS(id1), ID_NFEATURES(id), TY_DOUBLE)
-	        call malloc (ID_FWIDTHS(id1), ID_NFEATURES(id), TY_REAL)
-	        call malloc (ID_FTYPES(id1), ID_NFEATURES(id), TY_INT)
-	        call calloc (ID_LABEL(id1), ID_NFEATURES(id), TY_POINTER)
-	    } else if (ID_NALLOC(id1) != ID_NFEATURES(id)) {
-	        call realloc (ID_PIX(id1), ID_NFEATURES(id), TY_DOUBLE)
-	        call realloc (ID_FIT(id1), ID_NFEATURES(id), TY_DOUBLE)
-	        call realloc (ID_USER(id1), ID_NFEATURES(id), TY_DOUBLE)
-	        call realloc (ID_WTS(id1), ID_NFEATURES(id), TY_DOUBLE)
-	        call realloc (ID_FWIDTHS(id1), ID_NFEATURES(id), TY_REAL)
-	        call realloc (ID_FTYPES(id1), ID_NFEATURES(id), TY_INT)
-	        call realloc (ID_LABEL(id1), ID_NFEATURES(id), TY_POINTER)
+	    if (ID_NALLOC(sid) == 0) {
+	        call malloc (ID_PIX(sid), ID_NFEATURES(id), TY_DOUBLE)
+	        call malloc (ID_FIT(sid), ID_NFEATURES(id), TY_DOUBLE)
+	        call malloc (ID_USER(sid), ID_NFEATURES(id), TY_DOUBLE)
+	        call malloc (ID_WTS(sid), ID_NFEATURES(id), TY_DOUBLE)
+	        call malloc (ID_FWIDTHS(sid), ID_NFEATURES(id), TY_REAL)
+	        call malloc (ID_FTYPES(sid), ID_NFEATURES(id), TY_INT)
+	        call calloc (ID_LABEL(sid), ID_NFEATURES(id), TY_POINTER)
+	    } else if (ID_NALLOC(sid) != ID_NFEATURES(id)) {
+	        call realloc (ID_PIX(sid), ID_NFEATURES(id), TY_DOUBLE)
+	        call realloc (ID_FIT(sid), ID_NFEATURES(id), TY_DOUBLE)
+	        call realloc (ID_USER(sid), ID_NFEATURES(id), TY_DOUBLE)
+	        call realloc (ID_WTS(sid), ID_NFEATURES(id), TY_DOUBLE)
+	        call realloc (ID_FWIDTHS(sid), ID_NFEATURES(id), TY_REAL)
+	        call realloc (ID_FTYPES(sid), ID_NFEATURES(id), TY_INT)
+	        call realloc (ID_LABEL(sid), ID_NFEATURES(id), TY_POINTER)
 
-		j = ID_NALLOC(id1)
+		j = ID_NALLOC(sid)
 		i = ID_NFEATURES(id) - j
 		if (i > 0)
-		    call aclri (Memi[ID_LABEL(id1)+j], i)
+		    call aclri (Memi[ID_LABEL(sid)+j], i)
 	    }
-	    call amovd (PIX(id,1), PIX(id1,1), ID_NFEATURES(id))
-	    call amovd (FIT(id,1), FIT(id1,1), ID_NFEATURES(id))
-	    call amovd (USER(id,1), USER(id1,1), ID_NFEATURES(id))
-	    call amovd (WTS(id,1), WTS(id1,1), ID_NFEATURES(id))
-	    call amovr (FWIDTH(id,1), FWIDTH(id1,1), ID_NFEATURES(id))
-	    call amovi (FTYPE(id,1), FTYPE(id1,1), ID_NFEATURES(id))
+	    call amovd (PIX(id,1), PIX(sid,1), ID_NFEATURES(id))
+	    call amovd (FIT(id,1), FIT(sid,1), ID_NFEATURES(id))
+	    call amovd (USER(id,1), USER(sid,1), ID_NFEATURES(id))
+	    call amovd (WTS(id,1), WTS(sid,1), ID_NFEATURES(id))
+	    call amovr (FWIDTH(id,1), FWIDTH(sid,1), ID_NFEATURES(id))
+	    call amovi (FTYPE(id,1), FTYPE(sid,1), ID_NFEATURES(id))
 
 	    ptr1 = ID_LABEL(id) 
-	    ptr2 = ID_LABEL(id1) 
+	    ptr2 = ID_LABEL(sid) 
 	    do i = 1, ID_NFEATURES(id) {
 		call mfree (Memi[ptr2], TY_CHAR)
 		if (Memi[ptr1] != NULL) {
@@ -202,104 +248,80 @@ begin
 		ptr2 = ptr2 + 1
 	    }
 
-	    ID_NALLOC(id1) = ID_NFEATURES(id)
+	    ID_NALLOC(sid) = ID_NFEATURES(id)
 	}
 
 	# Use a SAVE and RESTORE to copy the CURFIT data.
-	if (ID_CV(id1) != NULL)
-	    call dcvfree (ID_CV(id1))
+	if (ID_CV(sid) != NULL)
+	    call dcvfree (ID_CV(sid))
 	if (ID_CV(id) != NULL) {
 	    call smark (sp)
 	    i = dcvstati (ID_CV(id), CVNSAVE)
 	    call salloc (coeffs, i, TY_DOUBLE)
 	    call dcvsave (ID_CV(id), Memd[coeffs])
-	    call dcvrestore (ID_CV(id1), Memd[coeffs])
+	    call dcvrestore (ID_CV(sid), Memd[coeffs])
 	    call sfree (sp)
 
-	    if (ID_IC(id1) == NULL)
-		call ic_open (ID_IC(id1))
-	    call ic_copy (ID_IC(id), ID_IC(id1))
+	    if (ID_IC(sid) == NULL)
+		call ic_open (ID_IC(sid))
+	    call ic_copy (ID_IC(id), ID_IC(sid))
 	}
 
-	#ID_LINE(id1,1) = line[1]
-	#ID_LINE(id1,2) = line[2]
-	ID_LINE(id1,1) = ID_LINE(id,1)
-	ID_LINE(id1,2) = ID_LINE(id,2)
-	ID_AP(id1,1) = ID_AP(id,1)
-	ID_AP(id1,2) = ID_AP(id,2)
-	ID_NFEATURES(id1) = ID_NFEATURES(id)
-	ID_SHIFT(id1) = ID_SHIFT(id)
-	ID_CURRENT(id1) = ID_CURRENT(id)
+	call strcpy (ID_SAVEID(id), ID_SAVEID(sid), ID_LENSTRING)
+        ID_LINE(sid,1) = ID_LINE(id,1)
+        ID_LINE(sid,2) = ID_LINE(id,2)
+        ID_AP(sid,1) = ID_AP(id,1)
+        ID_AP(sid,2) = ID_AP(id,2)
+        ID_NFEATURES(sid) = ID_NFEATURES(id)
+        ID_SHIFT(sid) = ID_SHIFT(id)
+        ID_CURRENT(sid) = ID_CURRENT(id)
 
-	ID_NEWFEATURES(id1) = ID_NEWFEATURES(id)
-	ID_NEWCV(id1) = ID_NEWCV(id)
-	ID_NEWDBENTRY(id1) = ID_NEWDBENTRY(id)
+        ID_NEWFEATURES(sid) = ID_NEWFEATURES(id)
+        ID_NEWCV(sid) = ID_NEWCV(id)
+        ID_NEWDBENTRY(sid) = ID_NEWDBENTRY(id)
 end
 
 
-# ID_GID -- Get saved identify information for specified line.
+# ID_GID -- Restore saved identify information.
 
-int procedure id_gid (id, line)
+int procedure id_gid (id, sid)
 
-pointer	id		# IDENTIFY structure
-int	line[2]		# Line number to get
-
-int	i, id_getid()
-
-begin
-	# Check if saved.
-	for (i = 1; i <= ID_NID(id); i = i + 1) {
-	    if (ID_LINE(Memi[ID_ID(id)+i-1],1) == line[1] &&
-	        ID_LINE(Memi[ID_ID(id)+i-1],2) == line[2])
-		break
-	}
-
-	return (id_getid (id, i))
-end
-
-
-# ID_GETID -- Get saved identify information for specified index.
-
-int procedure id_getid (id, n)
-
-pointer	id		# IDENTIFY structure
-int	n		# Index of saved features to be returned
+pointer	id		#I IDENTIFY structure
+int	sid		#I IDENTIFY save structure
 
 int	i, j, dcvstati(), strlen()
-pointer	sp, id1, coeffs, ptr1, ptr2
+pointer	sp, coeffs, ptr1, ptr2
 
 begin
-	if (n < 1 || n > ID_NID(id))
-	    return (EOF)
-
-	id1 = Memi[ID_ID(id)+n-1]
+	if (sid == NULL)
+	    return
 
 	# Reallocate memory for features and copy them.
-	if (ID_NFEATURES(id1) > 0) {
-	    if (ID_NALLOC(id1) != ID_NALLOC(id)) {
-	        call realloc (ID_PIX(id), ID_NALLOC(id1), TY_DOUBLE)
-	        call realloc (ID_FIT(id), ID_NALLOC(id1), TY_DOUBLE)
-	        call realloc (ID_USER(id), ID_NALLOC(id1), TY_DOUBLE)
-	        call realloc (ID_WTS(id), ID_NALLOC(id1), TY_DOUBLE)
-	        call realloc (ID_FWIDTHS(id), ID_NALLOC(id1), TY_REAL)
-	        call realloc (ID_FTYPES(id), ID_NALLOC(id1), TY_INT)
-	        call realloc (ID_LABEL(id), ID_NALLOC(id1), TY_POINTER)
+	if (ID_NFEATURES(sid) > 0) {
+	    if (ID_NALLOC(sid) != ID_NALLOC(id)) {
+	        call realloc (ID_PIX(id), ID_NALLOC(sid), TY_DOUBLE)
+	        call realloc (ID_FIT(id), ID_NALLOC(sid), TY_DOUBLE)
+	        call realloc (ID_USER(id), ID_NALLOC(sid), TY_DOUBLE)
+	        call realloc (ID_WTS(id), ID_NALLOC(sid), TY_DOUBLE)
+	        call realloc (ID_FWIDTHS(id), ID_NALLOC(sid), TY_REAL)
+	        call realloc (ID_FTYPES(id), ID_NALLOC(sid), TY_INT)
+	        call realloc (ID_LABEL(id), ID_NALLOC(sid), TY_POINTER)
 
 		j = ID_NALLOC(id)
-		i = ID_NALLOC(id1) - j
+		i = ID_NALLOC(sid) - j
 		if (i > 0)
 		    call aclri (Memi[ID_LABEL(id)+j], i)
 	    }
-	    call amovd (PIX(id1,1), PIX(id,1), ID_NFEATURES(id1))
-	    call amovd (FIT(id1,1), FIT(id,1), ID_NFEATURES(id1))
-	    call amovd (USER(id1,1), USER(id,1), ID_NFEATURES(id1))
-	    call amovd (WTS(id1,1), WTS(id,1), ID_NFEATURES(id1))
-	    call amovr (FWIDTH(id1,1), FWIDTH(id,1), ID_NFEATURES(id1))
-	    call amovi (FTYPE(id1,1), FTYPE(id,1), ID_NFEATURES(id1))
+	    call amovd (PIX(sid,1), PIX(id,1), ID_NFEATURES(sid))
+	    call amovd (FIT(sid,1), FIT(id,1), ID_NFEATURES(sid))
+	    call amovd (USER(sid,1), USER(id,1), ID_NFEATURES(sid))
+	    call amovd (WTS(sid,1), WTS(id,1), ID_NFEATURES(sid))
+	    call amovr (FWIDTH(sid,1), FWIDTH(id,1), ID_NFEATURES(sid))
+	    call amovi (FTYPE(sid,1), FTYPE(id,1), ID_NFEATURES(sid))
 
-	    ptr1 = ID_LABEL(id1) 
+	    ptr1 = ID_LABEL(sid) 
 	    ptr2 = ID_LABEL(id) 
-	    do i = 1, ID_NFEATURES(id1) {
+	    do i = 1, ID_NFEATURES(sid) {
 		call mfree (Memi[ptr2], TY_CHAR)
 		if (Memi[ptr1] != NULL) {
 		    j = strlen (Memc[Memi[ptr1]])
@@ -310,35 +332,39 @@ begin
 		ptr2 = ptr2 + 1
 	    }
 
-	    ID_NALLOC(id) = ID_NALLOC(id1)
-	    ID_NFEATURES(id) = ID_NFEATURES(id1)
-	    ID_NEWFEATURES(id) = ID_NEWFEATURES(id1)
-	    ID_CURRENT(id) = ID_CURRENT(id1)
-	    ID_NEWDBENTRY(id) = ID_NEWDBENTRY(id1)
+	    ID_NALLOC(id) = ID_NALLOC(sid)
+	    ID_NFEATURES(id) = ID_NFEATURES(sid)
+	    ID_NEWFEATURES(id) = ID_NEWFEATURES(sid)
+	    ID_CURRENT(id) = ID_CURRENT(sid)
+	    ID_NEWDBENTRY(id) = ID_NEWDBENTRY(sid)
 	}
 
 	# Use a SAVE and RESTORE to copy the CURFIT data.
-	if (ID_CV(id1) != NULL) {
+	if (ID_CV(sid) != NULL) {
 	    if (ID_CV(id) != NULL)
 	        call dcvfree (ID_CV(id))
 	    call smark (sp)
-	    i = dcvstati (ID_CV(id1), CVNSAVE)
+	    i = dcvstati (ID_CV(sid), CVNSAVE)
 	    call salloc (coeffs, i, TY_DOUBLE)
-	    call dcvsave (ID_CV(id1), Memd[coeffs])
+	    call dcvsave (ID_CV(sid), Memd[coeffs])
 	    call dcvrestore (ID_CV(id), Memd[coeffs])
 	    call sfree (sp)
 
-	    call ic_copy (ID_IC(id1), ID_IC(id))
+	    call ic_copy (ID_IC(sid), ID_IC(id))
 
-	    ID_SHIFT(id) = ID_SHIFT(id1)
-	    ID_NEWCV(id) = ID_NEWCV(id1)
-	    ID_NEWDBENTRY(id) = ID_NEWDBENTRY(id1)
+	    ID_SHIFT(id) = ID_SHIFT(sid)
+	    ID_NEWCV(id) = ID_NEWCV(sid)
+	    ID_NEWDBENTRY(id) = ID_NEWDBENTRY(sid)
+
+	    call id_fitdata (id)
+	    call id_fitfeatures (id)
 	}
 
-	ID_LINE(id,1) = ID_LINE(id1,1)
-	ID_LINE(id,2) = ID_LINE(id1,2)
-	ID_AP(id,1) = ID_AP(id1,1)
-	ID_AP(id,2) = ID_AP(id1,2)
+	call strcpy (ID_SAVEID(sid), ID_SAVEID(id), ID_LENSTRING)
+	ID_LINE(id,1) = ID_LINE(sid,1)
+	ID_LINE(id,2) = ID_LINE(sid,2)
+	ID_AP(id,1) = ID_AP(sid,1)
+	ID_AP(id,2) = ID_AP(sid,2)
 
 	return (OK)
 end

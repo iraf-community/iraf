@@ -98,15 +98,19 @@ begin
 			call sfree (sp)
 			call strclose (fd)
 			call erract (EA_ERROR)
-		    default:
+		    case SYS_FTOOMANYFILES, SYS_IKIOPIX:
 			if (imstati (in[i], IM_CLOSEFD) == YES) {
+			    call sfree (sp)
 			    call strclose (fd)
-			    call error (1,
-				"icombine - Too many images to combine")
+			    call erract (EA_ERROR)
 			}
 			do j = i-2, nimages
 			    call imseti (in[j], IM_CLOSEFD, YES)
 			buf = imgl1s (in[i])
+		    default:
+			call sfree (sp)
+			call strclose (fd)
+			call erract (EA_ERROR)
 		    }
 		}
 	    }
@@ -188,13 +192,15 @@ begin
 	    if (ctor (Memc[gain], i, r) > 0) {
 		do i = 1, nimages {
 		    Memr[nm+3*(i-1)+1] = r
-		    Memr[nm+3*(i-1)] = (Memr[nm+3*(i-1)] / r) ** 2
+		    Memr[nm+3*(i-1)] =
+			max ((Memr[nm+3*(i-1)] / r) ** 2, 1e4 / MAX_REAL)
 		}
 	    } else {
 		do i = 1, nimages {
 		    r = imgetr (in[i], Memc[gain])
 		    Memr[nm+3*(i-1)+1] = r
-		    Memr[nm+3*(i-1)] = (Memr[nm+3*(i-1)] / r) ** 2
+		    Memr[nm+3*(i-1)] =
+			max ((Memr[nm+3*(i-1)] / r) ** 2, 1e4 / MAX_REAL)
 		}
 	    }
 	    i = 1
@@ -384,15 +390,19 @@ begin
 			call sfree (sp)
 			call strclose (fd)
 			call erract (EA_ERROR)
-		    default:
+		    case SYS_FTOOMANYFILES, SYS_IKIOPIX:
 			if (imstati (in[i], IM_CLOSEFD) == YES) {
+			    call sfree (sp)
 			    call strclose (fd)
-			    call error (1,
-				"icombine - Too many images to combine")
+			    call erract (EA_ERROR)
 			}
 			do j = i-2, nimages
 			    call imseti (in[j], IM_CLOSEFD, YES)
 			buf = imgl1r (in[i])
+		    default:
+			call sfree (sp)
+			call strclose (fd)
+			call erract (EA_ERROR)
 		    }
 		}
 	    }
@@ -474,13 +484,15 @@ begin
 	    if (ctor (Memc[gain], i, r) > 0) {
 		do i = 1, nimages {
 		    Memr[nm+3*(i-1)+1] = r
-		    Memr[nm+3*(i-1)] = (Memr[nm+3*(i-1)] / r) ** 2
+		    Memr[nm+3*(i-1)] =
+			max ((Memr[nm+3*(i-1)] / r) ** 2, 1e4 / MAX_REAL)
 		}
 	    } else {
 		do i = 1, nimages {
 		    r = imgetr (in[i], Memc[gain])
 		    Memr[nm+3*(i-1)+1] = r
-		    Memr[nm+3*(i-1)] = (Memr[nm+3*(i-1)] / r) ** 2
+		    Memr[nm+3*(i-1)] =
+			max ((Memr[nm+3*(i-1)] / r) ** 2, 1e4 / MAX_REAL)
 		}
 	    }
 	    i = 1
@@ -592,3 +604,4 @@ begin
 
 	call sfree (sp)
 end
+

@@ -64,7 +64,7 @@ libex.a:
 	imisec.x	<ctype.h> <imhdr.h> <imio.h> <mach.h>
 	imloop.x	<imio.h>
 	immaky.x	<error.h> <imhdr.h> <imio.h>
-	immap.x
+	immap.x	
 	immapz.x	<error.h> <imhdr.h> <imio.h>
 	imnote.x	<imhdr.h> <imio.h> <szdtype.inc>
 	imopsf.x	<fset.h> <imhdr.h> <imio.h> <plset.h> <pmset.h>
@@ -83,20 +83,21 @@ libex.a:
 	impmsnev.x	<imhdr.h> <imio.h>
 	impnln.x	<imhdr.h> <imio.h> <szdtype.inc>
 	imrbpx.x	<imhdr.h> <imio.h> <imset.h> <szdtype.inc>
-	imrdpx.x	<imhdr.h> <imio.h> <plset.h> <szdtype.inc>
+	imrdpx.x	<imhdr.h> <imio.h> <mach.h> <plset.h> <szdtype.inc>
 	imrename.x	
 	imrmbufs.x	<imio.h>
 	imsamp.x	
 	imsetbuf.x	<fset.h> <imhdr.h> <imio.h>
-	imseti.x	
-	imsetr.x	<fset.h> <imhdr.h> <imio.h> <imset.h>
+	imseti.x	<fset.h> <imhdr.h> <imio.h> <imset.h>
+	imsetr.x	<imhdr.h> <imio.h> <imset.h>
 	imsinb.x	<imhdr.h> <imio.h>
 	imsslv.x	<imhdr.h> <imio.h>
 	imstati.x	<imhdr.h> <imio.h> <imset.h>
+	imstatr.x	<imhdr.h> <imio.h> <imset.h>
 	imstats.x	<imhdr.h> <imio.h> <imset.h>
 	imt.x	
-	imunmap.x	<error.h> <imhdr.h> <imio.h> <plset.h>
+	imunmap.x	<imhdr.h> <imio.h>
 	imwbpx.x	<imhdr.h> <imio.h> <imset.h> <szdtype.inc>
 	imwrite.x	<fset.h> <imio.h>
-	imwrpx.x	<imhdr.h> <imio.h> <plset.h> <szdtype.inc>
+	imwrpx.x	<imhdr.h> <imio.h> <mach.h> <plset.h> <szdtype.inc>
 	;

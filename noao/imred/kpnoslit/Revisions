@@ -1,11 +1,17 @@
 .help revisions Jun88 noao.imred.kpnoslit
 .nf
-kpnoslit/kpnoslit.cl
-kpnoslit/kpnoslit.men
+imred$kpnoslit/demos/mkdoslit.cl
+    Made the ARTDATA package parameters explicit (4/15/97, Valdes)
+
+imred$kpnoslit/sparams.par
+    Changed match from 10 to -3.  (4/5/96, Valdes)
+
+imred$kpnoslit/kpnoslit.cl
+imred$kpnoslit/kpnoslit.men
     Added background, illumination, response, apflatten, apnormalize.
     (12/29/94, Valdes)
 
-kpnoslit/demos/xdoslit.dat
+imred$kpnoslit/demos/xdoslit.dat
     Incorrectly used hz2 as a standard star instead of hz44.  (8/10/92, Valdes)
 
 =======

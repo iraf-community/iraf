@@ -3948,3 +3948,837 @@ BUG:	Due to a floating point precision problem, the invertfit task could
 
 STATUS:	Fixed for the next release of iraf and in the ftp archive version
 	of digiphotx. There is no workaround.
+
+NUMBER:	340
+MODULE:	standard
+SYSTEM:	V2.10.4p2 Solaris
+DATE:	Mon Jun 10 16:47:38 MST 1996
+FROM:	valdes
+
+BUG:	In V2.10.4p2 for Solaris there is an optimizer bug in the executable
+	for the task STANDARD.  The flux values are incorrectly
+	calculated.  This will be seen if the bandpasses are plotted.  The
+	boxes will not cover the spectrum.  Other indications of trouble
+	will be the flux values in the output data file will be
+	monotonically increasing and the sensitivity function solution will
+	be odd.  The only workaround is to get a corrected executable (see
+	ftp://iraf.noao.edu/pub/x_onedspec.ssolp2.readme).
+
+STATUS:	Fixed for the next release.  Another patch may be considered.
+
+NUMBER:	341
+MODULE:	rv.fxcor
+SYSTEM:	V2.10
+DATE:	Wed Jun 26 16:27:30 MST 1996
+FROM:	fitz
+
+BUG:	There is a bug in the rv correction code in which images that do
+	not have an OBSERVAT keyword in the header have the heliocentric
+	correction computed using KPNO as the observatory regardless of the
+	task 'observatory' parameter setting.  The only workarounds are to
+	either add an OBSERVAT keyword to each image, or create a dummy
+	observatory database where the 'kpno' entry contains the information
+	for the observatory you're really using, you would need to define
+	an "obsdb" environment variable to this file to make use of it.
+	A code change fixing this bug is available from iraf site support.
+
+STATUS:	Fixed for versions after V2.10.4p2
+
+NUMBER:	342
+MODULE:	dohydra, doargus, dofibers
+SYSTEM:	V2.10-V2.10.4p2
+DATE:	Fri Jun 28 16:30:04 MST 1996
+FROM:	valdes
+
+BUG:	The fiber extraction task will produce funny results in various ways
+	if the "apidtable" file does not have the format
+
+	    aperture  beam  title
+
+	WITH THE TITLE QUOTED if there are blanks in the title.  The problems
+	will still only occur if the first part of the title is numeric
+	so that the task SAPERTURES, used in the script, interprets the
+	value as dispersion information.
+
+STATUS:	This is warning and indication of what to check if funny results
+	are obtained.  How problems with bad formating of the file
+	can be avoided is under investigation.
+
+NUMBER:	343
+MODULE:	apphot.daofind, daophot.daofind
+SYSTEM:	V2.10.4 patch2
+DATE:	Mon Jul 22 08:29:12 MST 1996
+FROM:	davis
+
+BUG:	In rare circumstances daofind can fail with a floating operand
+	error. This bug is caused by a divide by zero error in the 
+	new (2.10.4 patch2) roundness statistic computation.
+
+STATUS:	Fixed for the next release of iraf and the addon package digiphotx.
+	There is no workaround.
+
+NUMBER:	344
+MODULE:	imcombine, combine
+SYSTEM:	V2.10.2-V2.10.4
+DATE:	Thu Aug  1 09:00:22 MST 1996
+FROM:	valdes
+
+BUG:	When there are exactly three images, mclip=yes, and scales, zero
+	levels, or weights are computed and are not all the same there is a
+	bug that will confuse the scales and weights for about 1/6 of the
+	pixels.  This becomes more significant as the scales/zeros/weights
+	differ more from each other.  This affects computation of the
+	weighted average (combine=average) and the sigma clipping
+	algorithms (ccdclip, crrej, sigclip, avsigclip, and pclip).
+	In addition, even if the scales/zeros are all the same but the
+	gains and read noise values are different for the ccdclip or
+	crrej algorithms the gains and read noise values will be misapplied
+	in 1/6 of the cases.
+
+	The bug is that when mclip=yes the pixels are sorted and the
+	idenification of which image each pixel came from is kept.  When
+	there are exactly three images an explict sort is done but in one
+	of the six possible orders of the 3 pixels the identification
+	mapping to the image is wrong for two of the pixels.  Thus the
+	wrong scale, zero, weight, gain, or read noise will be used.  If
+	they are equal there is no problem but if they are not equal the
+	weighted average and the scaling of the sigmas in the clipping
+	rejection algorithms will be wrong.  If the values are close there
+	is still little error.
+
+	The effects of this are probably negligible in most cases
+	unless the scales or CCD parameters of the images are grossly
+	different.  The only workaround is to set mclip=no.
+
+STATUS:	Fixed for the next release expected to be V2.11.
+
+NUMBER:	345
+MODULE:	rv.rvcorrect, astutil.rvcorrect
+SYSTEM:	V2.10
+DATE:	Mon Aug 26 21:43:48 MST 1996
+FROM:	fitz
+
+BUG:	The KEYWPARS pset is not declared for the RVCORRECT task even though
+	it is available for use.
+
+STATUS:	Fixed for versions later than V2.10.4p2.  The workaround is to add the
+	line
+		keywpars,pset,h,"",,,"Header keyword translation pset" 
+
+	to the file astutil$rvcorrect.par and rv$rvcorect.par. Declarations
+	in the help page for RVCORRECT should be made in the 
+	rv$doc/rvcorrect.hlp and astutil$doc/rvcorrect.hlp files if needed,
+	users can cut-n-paste the entry from the rv$doc/fxcor.hlp page if
+	needed.
+
+NUMBER:	346
+MODULE:	nmisc.psfmeasure, nmisc.starfocus, nmisc.kpnofocus
+SYSTEM:	NMISC V12-p1 and earlier
+DATE:	Thu Aug 29 13:32:30 MST 1996
+FROM:	valdes
+
+BUG:	If the scale parameter is set to other than one and the PSF
+	being measured is sufficiently small then the computed PSF
+	sizes will be incorrect.  The workaround is to use a scale
+	of 1 to compute widths in pixels and then convert to some
+	other scale separately.
+
+STATUS:	Fixed in NMISC V12-p2
+
+NUMBER:	347
+MODULE:	noao.rv.fxcor
+SYSTEM:	V2.10p2 and earlier
+DATE:	Thu Sep 12 14:52:16 MST 1996
+FROM:	fitz
+
+BUG: 	The normalized reference spectrum was being copied from the object
+	spectrum when the image names were the same as a form of optimization.
+	This could fail in cases where the 'n' key was used to move through
+	a list to get the next object and the object spectrum was previously
+	rebinned at a different dispersion causing artificial shifts in 
+	the data.  The code was modified to always compute a normalization
+	to avoid this in all cases.  Workarounds include rebinning all
+	spectra to a common dispersion or setting the 'rebin' param to be
+	'object'.
+
+STATUS:	Fixed in versions after V2.10.4p2.
+
+NUMBER:	348
+MODULE:	artdata.mkobjects
+SYSTEM:	V2.10-V2.10.4p2
+DATE:	Tue Oct  1 10:35:05 MST 1996
+FROM:	valdes
+
+BUG:	The routine for computing Poisson deviates does not check for
+	negative input values which can lead to a floating point
+	exception.  This routine can be called with negative values if the
+	objects being created have negative values and the "poisson"
+	parameter is yes.  Negative values in the model objects can occur
+	if image template models are used either for the objects or for the
+	PSF.  The workarounds are to make sure the object models do not
+	have negative values, to use a "background" parameter sufficiently
+	large to make the object+background be non-negative, or to not add
+	Poisson noise.  The first option is the rigorously correct
+	solution.  The case that identified this bug was with an
+	empirically generated PSF that produced some negative values at the
+	edge of the PSF template.
+
+STATUS:	The Poisson deviate routine now returns zero if the input
+	Poisson mean is negative.
+
+NUMBER:	349
+MODULE:	astutil.pdm
+SYSTEM:	-V2.10.4p2
+DATE:	Tue Oct  1 16:49:49 MST 1996
+FROM:	valdes
+
+BUG:	When there are fewer than 100 input data points the calculation of
+	theta is incorrect.  This is because the calculation does not take
+	into account use of overlapping period bins for the small N case.
+	The theta plot values will be incorrect (negative) but the shape
+	appears to be approximately correct.  It is not clear how the error
+	acts in detail.  One workaround is to increase the number of data
+	points, say by replication, to greater than 100 points.  Note that
+	the shape of the theta curve will be different even if the error
+	was not present because of the change in binning from overlapping
+	bins to non-overlapping bins.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	350
+MODULE:	echelle.doecslit
+SYSTEM:	V2.10.4
+DATE:	Thu Oct  3 13:29:40 MST 1996
+FROM:	valdes
+
+BUG:	In V2.10.4 the batch option of DOECSLIT does not work.  The
+	workaround is to run DOECSLIT with the batch option turned on
+	until it tries to run the background processing and fails with
+	an error.  At this point all the interactive things have been done.
+	Now run DOECSLIT directly in the background with:
+
+	    ec> doecslit <images> splot- >& dev$null&
+
+	Be sure the list of images is the same or at least includes
+	images previously used in the interactive step.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	351
+MODULE:	center1d
+SYSTEM:	V2.9-V2.10.4
+DATE:	Thu Oct 24 13:11:29 MST 1996
+FROM:	valdes
+
+BUG:	This subroutine algorithm is used in many places such as APFIND,
+	APRECENTER, APEDIT, APTRACE, IDENTIFY, REIDENTIFY, ECIDENTIFY, and
+	ECREIDENTIFY (and possibly more).  One feature of this algorithm is
+	that if the centering width parameter is less than or equal to one
+	pixel it will find the nearest local maximum (minimum) to the
+	starting point.  The bug was that unless the starting point is a
+	local minimum (maximum) it would simple return the nearest pixel to
+	the starting point.  There is no workaround.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	352
+MODULE:	starfocus, kpnofocus
+SYSTEM:	nmisc external package earlier than V12-p3
+DATE:	Thu Oct 24 17:27:55 MST 1996
+FROM:	valdes
+
+BUG:	The routine that fits a parabola to the three lowest points when
+	estimating the best FWHM could crash or give poor results when
+	the focus values are large.  For example focus values around
+	10000.  The workaround is to use focus values which are
+	small (less than 1000).
+
+STATUS:	Fixed in NMISC V12-p3
+
+NUMBER:	353
+MODULE:	astutil.pdm
+SYSTEM:	-V2.10.2
+DATE:	Wed Nov  6 11:32:16 MST 1996
+FROM:	valdes
+
+BUG:	PDM will only draw graphs with points.  The points are often very
+	difficult to see.  There is a parameter, which is not documented
+	in the help page up to V2.10.4p2, called "pluspoint" that is
+	supposed to define the maximum number of data points for which
+	plus symbols are used before going to points.  However there
+	is a bug that prevents this feature from working.
+
+STATUS:	The pluspoint parameter works in V2.10.3 and later and is documented
+	in versions later than V2.10.4p2.
+
+NUMBER:	354
+MODULE:	scombine
+SYSTEM:	V2.10-V2.10.4p2
+DATE:	Mon Nov 11 11:39:41 MST 1996
+FROM:	valdes
+
+BUG:	The option to use image header keywords for the scale, zero,
+	and weight values by specifying the parameter values as
+	"!<keyword>" does not work.  The symptoms are either an error that
+	the image header keyword does not exist or all the scale, zero, or
+	weight values come out the same.  The workaround is to put the
+	values into a file and use the file input option.  For example one
+	cannot use 'weight="!wtkeyword" but one can do the following:
+
+	    on> hselect <spectra> wtkeyword yes > wts
+	    on> scombine <spectra> weight="@wts"
+
+	where <spectra> are the list of spectra and "wtkeyword" is the
+	keyword in the images to use for the weights.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	355
+MODULE:	apall, apsum
+SYSTEM:	V2.10-V2.10.4p2
+DATE:	Tue Nov 12 16:36:10 MST 1996
+FROM:	valdes
+
+BUG:	If dispaxis=1 and using cleaning or variance weighted extraction
+	with a gain > 1 and with a large number of apertures which have
+	differing widths it is possible to get a floating overflow error.
+	The workarounds are to either multiply the images by the gain
+	and then set the gain to 1 for the extraction or transpose
+	the images so that dispaxis=2.
+
+STATUS:	Fixed in the next release.
+
+NUMBER:	356
+MODULE:	splot
+SYSTEM:	V2.10.4 (including p1 and p2)
+DATE:	Tue Dec  3 12:02:39 MST 1996
+FROM:	valdes
+
+BUG:	Any units string in the "units" parameter that contains whitespace,
+	such as "km/s 400 ang" "inv cm", will fail to be recognized.  This
+	is because the whitespace is removed to check for a null string.
+	This means such units cannot be specified for SPLOT to start up
+	with.  The work around is to change the units interactively
+	with :units.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	357
+MODULE:	splot
+SYSTEM:	V2.10-V2.10.4p2
+DATE:	Fri Jan 10 16:33:32 MST 1997
+FROM:	valdes
+
+BUG:	The 'a' key for expanding a region with y scaling based on the
+	values in the selected region can be wrong if the dispersion is
+	non-linear.  This is because the inversion from dispersion
+	coordinate to pixel is done assuming a linear dispersion.  The
+	symptom is that the y scale will not cover the data.  If the data
+	is sufficiently sloped and the dispersion sufficiently non-linear
+	it is possible the graph window will be outside the range of the
+	data yielding an empty plot.  The workaround is to use the 'w'
+	windowing keys such as 'e'.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	358
+MODULE:	dofibers, dohydra, doargus
+SYSTEM:	V2.10-V2.10.2
+DATE:	Wed Jan 15 09:32:23 MST 1997
+FROM:	valdes
+
+BUG:	When there are more than 127 fibers and the aperture identification
+	file has titles for all the fibers these script tasks will fail
+	either with a segmentation violation or the error
+	"Too many field names in image header field name template".
+	This is caused by calls to SCOPY and SARITH in the scripts
+	which trigger the previously recorded Bug #241.  The only
+	work around is to not use aperture titles.  At the end of
+	the processing one may associate titles with the apertures
+	using SAPERTURES.
+
+STATUS:	Fixed in version 2.10.3.
+
+NUMBER:	359
+MODULE:	calibrate (onedspec, longslit, imred spectral packages)
+SYSTEM:	V2.10.3-V2.10.4p2
+DATE:	Wed Jan 22 11:18:52 MST 1997
+FROM:	valdes
+
+BUG:	The flux calibration of spectra with non-linear dispersion is
+	incorrect.  Instead of dividing by the wavelength width of each
+	pixel the width of the pixel corresponding to the image line is
+	used for all pixels at a given line; (i.e. the width of pixel 2 is
+	used for all pixels in the spectrum of the second line in a
+	multispec image).  Since a linear dispersion has constant pixel
+	width by definition, this bug does not affect linearized spectra.
+	The magnitude of the error depends on how non-linear the dispersion
+	is; i.e.  how much the widths of the pixels vary.  The workaround
+	is to linearize the spectra first with DISPCOR.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	360
+MODULE:	splot
+SYSTEM:	-V2.10p2
+DATE:	Thu Feb  6 15:53:00 MST 1997
+FROM:	valdes
+
+BUG:	Equivalent widths and line fluxes measured with the 'e' and 'h' keys
+	will have the wrong sign if the wavelength increment per pixel in
+	the spectrum image is negative; i.e. the dispersion units decrease
+	with increasing pixel number.  This is because these quantities are
+	computed in pixels and then converted to wavelength units by
+	multiplying by the wavelength increment per pixel rather than the
+	absolute value.  Note that SPLOT always plots with dispersion units
+	increasing to the right whether or not the actual order of pixels
+	in the image has increasing or decreasing wavelength with
+	increasing pixel number.  The only error is one of sign and the
+	workaround is to take account of this sign error when reporting
+	equivalent widths.  The convention is that absorption lines have
+	positive equivalent widths.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	361
+MODULE:	scombine
+SYSTEM:	V2.10.3-V2.10.4p2
+DATE:	Wed Feb 19 11:19:14 MST 1997
+FROM:	valdes
+
+BUG:	If several multispec images with the "equispec" coordinate system
+	(headers "WAT0_001 = 'system=equispec'" and with APNUM keyword)
+	are being combined by aperture where the set of apertures in each
+	image are not the same and if the first image in the input list
+	does not contain all the apertures then an error about a missing
+	aperture will occur.  For example:
+
+	    ERROR: Image header parameter not found (APNUM79)
+
+	More precisely, the problem occurs if the output image will
+	have more apertures than in the first input image.
+
+	The workarounds are to either put an image which has all the
+	apertures first in the input list or use the "aperture" parameter
+	to select fewer or an equal number of apertures to the first
+	image.  For example:
+
+	    cl> scombine a,b,c,d out1 apertures=1-50
+	    cl> scombine a,b,c,d out2 apertures=51-100
+	    cl> scopy out1,out2 out
+
+	where the input images contain apertures 1 to 60 but there with
+	missing apertures in each image.  Image a has 50 apertures.
+	Note that it is alright to specify apertures that do not exist
+	as long as the number of existing apertures does not exceed
+	the number in the first input image.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	362
+MODULE:	daophot.pstselect, daophot.psf
+SYSTEM:	V2.10
+DATE:	Fri Feb 21 13:17:11 MST 1997
+FROM:	davis
+
+BUG:	The pstselect and psf task were not reinitializing the psf star list
+	correctly when more than one image was being analyzed in a single
+	execution of either task. In the case of pstselect, psf stars whose ids
+	were identical to the ids of psf stars in previous images were being
+	arbitrarily rejected from the psf star list. In the case of psf, psf
+	stars from previous lists could be retained in the list, although
+	this was unlikely because the positions and magnitudes would usually
+	result in the star being severely down-weighted or rejected from the
+	fit.
+
+STATUS:	Fixed for 2.11 and in the ftp archive version of the addon package
+	digiphotx. The workaround is to use pstselect and psf on a single
+	image at a time.  The z keystroke command in the psf task will also
+	reinialize the list properly.
+
+NUMBER:	363
+MODULE:	dispcor
+SYSTEM:	V2.10.2-V2.10.4p2
+DATE:	Tue Mar  4 09:17:37 MST 1997
+FROM:	valdes
+
+BUG:	Input spectra which are in two dimensional images, have an "equispec"
+	coordinate system, and log sampled (DC-FLAG=1), are not properly
+	resampled by DISPCOR.  One dimensional images and "multispec"
+	coordinate systems do not have this problem.  The workaround is to
+	convert all the spectra to one dimensional images with SCOPY and
+	format="onedspec".
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	364
+MODULE:	onedspec
+SYSTEM:	V2.10-V2.10.4p2
+DATE:	Tue Mar  4 11:55:48 MST 1997
+FROM:	valdes
+
+BUG:	The coordinate function driver, the system software that evaluates
+	coordinates, for multispec format spectra incorrectly inverts
+	wavelengths to pixels for the case of log sampled coordinates
+	with a doppler shift.  This will cause various tasks to misbehave
+	such as equivalent width measurements in SPLOT.  The log
+	sampling occurs when using DISPCOR with log=yes and the doppler
+	shift is added to the coordinate system when DOPCOR is run.
+	The workaround is to not run DOPCOR on log sampled multispec
+	spectra (such as echelle data) and correct any measurements
+	made for doppler shifts after the fact.  To determine if
+	you have this type of format you will "specN=" strings in
+	WAT keywords.  In these strings the third number will be 1
+	for log sampling and the seventh number will be non-zero
+	for the doppler correction.
+
+STATUS:	Fixed in the next release.
+
+NUMBER:	365
+MODULE:	apall, apsum
+SYSTEM:	V2.10.4
+DATE:	Wed Apr  2 12:27:20 MST 1997
+FROM:	valdes
+
+BUG:	The "strip" format option may fail with the error
+
+	    No write permission on file (String_File)
+
+	Unfortunately there is no workaround for this error.
+	Contact iraf@noao.edu for a fix.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	366
+MODULE:	implot
+SYSTEM:	V2.10.4 Dec Alpha OSF1
+DATE:	Thu Apr  3 11:36:07 MST 1997
+FROM:	valdes
+
+BUG:	Attempting to plot a 3D image, even if the third dimension is only
+	1 (i.e. [512,512,1]), results in "ERROR: FPE" on Dec Alpha/OSF1.
+	This does not occur on the Sun versions.  The workaround is
+	to use an image section:
+
+	    cl> implot im3d[*,*,1]
+
+STATUS:	To be fixed in a future version.
+
+NUMBER:	367
+MODULE:	images.tv.tvmark
+SYSTEM:	V2.10
+DATE:	Thu Apr 17 15:02:40 MST 1997
+FROM:	davis
+
+BUG:	The 'a' keystroke command can produce a segmentation violation
+	when 1) the coordinates file does not exist at task startup time,
+	and 2) the label parameter is set to "yes". So far this bug
+	has only been reported on Sun Solaris systems.
+
+	The bug is due to a failure to initialize the label string to ""
+	in the call to the routine which actually draws the mark.
+
+STATUS:	Fixed for the next release of IRAF. The workaround is to create
+	an empty coordinates file before starting tvmark or to avoid
+	use of the label feature.
+
+NUMBER:	368
+MODULE:	images.geotran
+SYSTEM:	V2.10
+DATE:	Tue Apr 29 16:46:38 MST 1997
+FROM:	davis
+
+BUG:	Geotran fails if the user: 1) sets any of xmin, xmax, ymin, ymax
+	explicitly, and 2) xmin > xmax or ymin > ymax. The failure is
+	occuring because the computed number of columns or lines is
+	negative in that case.
+
+STATUS:	Fixed for 2.11. The workaround is to always ensure that xmin < xmax
+	and ymin < ymax and perform any image flipping after the fact.
+
+NUMBER:	369
+MODULE:	images.median,images.mode
+SYSTEM:	V2.10
+DATE:	Fri May 16 10:22:26 MST 1997
+FROM:	davis
+
+BUG:	The pixels in alternating lines on the far right side of an image
+	may be in error due to a bug in the merge-sort algorithm indexing
+	code that is triggered when the sliding median filter turns the
+	corner.
+
+STATUS:	This bug is fixed in iraf 2.11 and was never a problem for the median
+	and mode tasks in the mfilters addon package or in any of the other
+	mfilters tasks.
+
+NUMBER:	370
+MODULE:	standard
+SYSTEM:	V2.10-V2.10.4
+DATE:	Tue May 27 10:09:21 MST 1997
+FROM:	valdes
+
+BUG:	The task is supposed to only include bandpasses which are entirely
+	within the spectrum data.  However, this turns out not to be the
+	case and partial bandpasses are used without any corresponding
+	correction to the calibration fluxes.  This means the end points
+	may cause a spurious behavior in the sensitivity function
+	calculation unless the endpoints are ignored.  The workarounds
+	are either to delete the points in the standard data file or
+	when fitting the sensitivity function in SENSFUNC.
+
+STATUS:	Fixed for V2.11.
+
+NUMBER:	371
+MODULE:	apphot.daofind, daophot.daofind
+SYSTEM:	V2.10
+DATE:	Tue Jun 24 10:50:44 MST 1997
+FROM:	davis
+
+BUG:	Daofind can fail with a divide by zero error in rare cicumstances
+	due to a failure to trap a potential divide by zero in the
+	x and y centering code. The problem is most likely to occur if
+	the detection threshold is very low, or if very bad values of
+	sigma, gain, or readout noise are supplied.
+
+STATUS:	Fixed for 2.11.
+
+NUMBER:	372
+MODULE:	images.imexpr
+SYSTEM:	V2.10
+DATE:	Mon Jun 30 10:00:41 MST 1997
+FROM:	davis
+
+BUG:	Expressions involving the J, K, etc operands may be evaluated
+	incorrectly if the I operand does not preceed them in the expression.
+
+STATUS:	Fixed for 2.11. The workaround is to include a dummy term containing
+	I in the expression, e.g. 0.0 * I, before the J, K, etc appear.
+
+NUMBER:	373
+MODULE:	longslit.response
+SYSTEM:	V2.11Beta
+DATE:	Thu Jul 10 11:47:18 MST 1997
+FROM:	valdes
+
+BUG:	The Beta version of V2.11 has a bug such that if the dispersion
+	axis is 1 and the threshold parameter is not INDEF then the
+	resulting response image will be incorrect.  The error is a typo
+	that reversed the column and line indices in the division by the
+	normalization spectrum.
+
+STATUS:	Fixed for the V2.11 release.
+
+NUMBER:	374
+MODULE:	sarith
+SYSTEM:	V2.10-V2.11Beta
+DATE:	Tue Jul 15 10:27:11 MST 1997
+FROM:	valdes
+
+BUG:	The power option ^ does not work.  The workaround is to use
+	the multiple steps of taking the log, multiplying, and taking
+	the anti-log.
+
+STATUS:	Fixed in V2.11.
+
+NUMBER:	375
+MODULE:	images.xregister, immatch.xregister
+SYSTEM:	V2.10
+DATE:	Fri Jul 25 14:59:18 MST 1997
+FROM:	davis
+
+BUG:	The xregister task was failing if: 1) the correlation parameter was
+	set to "fourier" and, 2) at least one of the correlation regions was
+	entirely off the input image. If this circumstance occurred all
+	subsequent region shifts for the current and succedding images
+	are set to INDEF, and if all the shifts for a given image were
+	INDEF, the total shift was set to 0.0.
+
+STATUS:	Fixed in 2.11 and in the version of the external addon package
+	immatch, now renamed to immatchx.
+
+NUMBER:	376
+MODULE:	images.imhistogram, plot.phistogram
+SYSTEM:	V2.10
+DATE:	Thu Jul 31 16:08:51 MST 1997
+FROM:	davis
+
+BUG:	Images with pixel values outside the legal integer range can produce
+	invalid floating point operation errors in the imhistogram and
+	phistogram tasks in some circumstances.
+
+STATUS:	Fixed for 2.11. In most but not all cases modifying the histogram
+	binning parameters z1 and z2 will work around the problem.
+
+NUMBER:	377
+MODULE:	splot, identify, and all onedspec tasks operating on 2D images
+SYSTEM:	V2.10.3-V2.11beta
+DATE:	Wed Aug  6 14:39:37 MST 1997
+FROM:	valdes
+
+BUG:	Beginning with V2.10.3 the ONEDSPEC tasks allow using previously
+	transposed 2D images.  However if the image is also flipped, say
+	with the command:
+
+	    cl> imtranspose im1[-*,*] im2
+
+	then these tasks can fail with an arithmetic error such as
+	"floating operand" depending on the dispersion axis.  The
+	workaround is to reset the physical and/or world coordinates with
+	WCSRESET.
+
+STATUS:	Fixed for V2.11.
+
+NUMBER:	378
+MODULE:	onedspec.sfit, onedspec.continuum
+SYSTEM:	V2.10-V2.11
+DATE:	Wed Sep  3 10:56:08 MST 1997
+FROM:	valdes
+
+BUG:	When there is an error accessing an input image, such as specifying
+	a non-existant image, the error given is:
+	    ERROR: With range specification for `lines or bands'
+	This is due to the structure of the program that first uses the
+	the image sizes to set the acceptible limits of the lines and
+	bands to be fit.  If there are no images the limits are zero
+	lines and bands and the above error occurs.
+
+STATUS:	This bug log documents the behavior as of V2.11.  Modifications have
+	yet to be determined.
+
+NUMBER:	379
+MODULE:	plot.phistogram
+SYSTEM:	V2.11
+DATE:	Sat Oct  4 14:58:58 MST 1997
+FROM:	davis
+
+BUG:	Phistogram fails with a segmentation violation for text file input.
+	This bug was inadvertantly introduced by the fixmade to bug 376.
+
+STATUS:	Fixed for the next release of IRAF. There is no workaround.
+
+NUMBER:	380
+MODULE:	imcombine/combine
+SYSTEM:	V2.11
+DATE:	Tue Oct 21 14:09:34 MST 1997
+FROM:	valdes
+
+BUG:	With STF format images (GEIS files) there is a limit of 58 images
+	that can be combined.  More than this will produce a cannot
+	open file error on an image.  The workaround is to either
+	convert the images to another format or stack the images
+	using IMSTACK and then combine with the "project" option.
+
+
+STATUS:	Fixed for the next patch or release.
+
+NUMBER:	381
+MODULE:	dimsum
+SYSTEM:	V2.11
+DATE:	Wed Oct 22 09:20:46 MST 1997
+FROM:	valdes
+
+BUG:	When using DIMSUM with V2.11 you must have image type inheritance
+	enabled; for example 'reset imtype="imh,inherit"'.  This may
+	be set in your login.cl or loginuser.cl or on the command line
+	(type "flpr" when resetting on the command line).  If inheritance
+	is not enabled then mask files will be converted to non-mask
+	files causing the reductions to fail.
+
+STATUS:	A solution is being determined.
+
+NUMBER:	382
+MODULE:	splot
+SYSTEM:	V2.11
+DATE:	Thu Oct 23 09:23:46 MST 1997
+FROM:	valdes
+
+BUG:	When doing a profile fit on data that has negative values and
+	using the default INDEF values for sigma0 and invgain that turn off
+	error computations the error message "Cannot compute errors with
+	non-zero gain and negative pixel values" is produced.  The warning
+	can be ignored.  To eliminate it (remembering that this only occurs
+	with negative values in the spectrum) the workaround is to set
+	invgain to zero and sigma0 to a positive value.
+
+STATUS:	This is fixed for a future patch or release.
+
+NUMBER:	383
+MODULE:	dataio.rfits
+SYSTEM:	V2.11
+DATE:	Tue Nov  4 09:38:35 MST 1997
+FROM:	davis
+
+BUG:    Header listing as slow because rfit is reading through the data instead
+	of skipping it if: 1) the make_image parameter is no, 2) there are
+	no fits extensions in the file, and 3) the tapecap parameter fe is
+	undefined. This bug affects the 2.11 version of rfits only, and was
+	introduced when support for fits image extensions was added.
+
+STATUS:	Fixed for the next release of iraf. If fast header listing is required
+	the workaround is to use the old version of rfits, orfits in the
+	obsolete package.
+
+NUMBER:	384
+MODULE:	artdata: mkobjects, mknoise, mk2dspec
+SYSTEM:	V2.9 - V2.11
+DATE:	Wed Nov 19 10:40:55 MST 1997
+FROM:	valdes
+
+BUG:	The ARTDATA tasks which can record comments from an input data
+	file in the image header will produce improper headers if the input
+	data has tab characters.  The consequence of this only affects FITS
+	files produced directly through the FITS kernel or using WFITS to
+	write a FITS file from some other image format.  Such FITS files
+	will have malformed headers and when using the FITS kernel a possible
+	error is "Pixel storage file is truncated".  The most common
+	way this problem can occur is with MKOBJECTS using object lists
+	produced by STARLIST or GALLIST which generate comments with tab
+	characters in them.  The workarounds are to turn off the "comments"
+	parameter in the task to eliminate the writing of the data file
+	comment information to the header or not producing a FITS file from
+	the created image.
+
+STATUS:	Fixed after the initial V2.11 release.
+
+NUMBER:	385
+MODULE:	dataio.import
+SYSTEM:	V2.11
+DATE:	Fri Dec 12 13:43:33 MST 1997
+FROM:	fitz
+
+BUG:	Use of the red(), green(), or blue() functions in the outbands
+	expression parameter can cause the size of the output image to
+	be incorrectly computed, resulting in a "Negative or zero length
+	dimension" error.
+
+STATUS:	Fixed for the next patch or release.  There is no workaround.
+
+NUMBER:	386
+MODULE:	immatch.linmatch
+SYSTEM:	V2.11
+DATE:	Mon Dec 15 12:24:52 MST 1997
+FROM:	davis
+
+BUG:	Linmatch could crash with a floating operand error if the bscale scaling
+	algorithm was one of "mean", "median", or "mode", and the reference
+	image contained one or more regions with a zero-valued mean, median,
+	or mode. The error was in the computation of the error in the bscale
+	value.
+
+STATUS:	Fixed for the next release of iraf. The only work around is to choose
+	the regions used for scaling carefully.
+
+NUMBER:	387
+MODULE:	identify,autoidentify,reidentify
+SYSTEM:	V2.10.4 - V2.11.1
+DATE:	Mon Jan 12 14:39:26 MST 1998
+FROM:	valdes
+
+BUG:	If the coordinate list has duplicate values it is possible to
+	get a floating divide by zero error when using the automatic
+	line identification algorithm.  For example using the 'x'
+	key in IDENTIFY or using the autoidentify algorithm in
+	REIDENTIFY.
+
+STATUS:	A change in V2.11.2 eliminates duplicate lines automatically as
+	well as no longer requiring the line lists to be sorted.

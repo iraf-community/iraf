@@ -1,5 +1,6 @@
 # Make the Sun/IRAF shared library.
 
+
 $call	relink
 $exit
 
@@ -15,9 +16,14 @@ relink:
 Relink:
 	$set	rebuild = yes
 relink_:
-	$set	ADDR = 0a000000
+	$set	ADDR = 10000000
 	$set	VV = "$$(@S.ver.$(MACH))"
-	$set	SI = bin$$S$(VV).e
+
+	$ifeq (OSVERSION, 4)
+	    $set SI = bin$$S$(VV).e
+	$else
+	    $set SI = bin$$S$(VV)_$(OSRELEASE).e
+	$endif
 
 	$set	L1 = <libos.a>
 	$set	L2 = <libex.a>
@@ -31,7 +37,11 @@ relink_:
 	$end
 
 	$ifeq (rebuild, yes)
-	    !./mkshlib.csh -a $(ADDR)
+	    $ifeq (OSVERSION, 4)
+		!./mkshlib.sos4 -a $(ADDR)
+	    $else
+		!./mkshlib.ssol -a $(ADDR)
+	    $endif
 	    $call libshare
 	$else
 	    $echo "shared library is up to date"
@@ -40,7 +50,11 @@ relink_:
 
 install:
 	$set	VV = "$$(@S.ver.$(MACH))"
-	$set	SI = S$(VV).e
+	$ifeq (OSVERSION, 4)
+	    $set SI = S$(VV).e
+	$else
+	    $set SI = S$(VV)_$(OSRELEASE).e
+	$endif
 
 	$iffile (S.e)
 	    $iffile (bin$$$(SI).2) $move bin$$$(SI).2 bin$$$(SI).3 $endif
@@ -58,8 +72,9 @@ libshare:
 libshare.a:
 	$set	SYSF = onentry.o
 	$omake	S.s
-	!ar xv $(iraf)lib/libsys.a $(SYSF)
-	!ar rv libshare.a S.o $(SYSF); ranlib libshare.a; rm $(SYSF)
+	!ar xv $(iraf)bin.$(MACH)/libsys.a $(SYSF)
+	!ar rv libshare.a S.o $(SYSF); ranlib libshare.a; rm -f $(SYSF)
+	$endif
 	;
 
 coff:
@@ -70,10 +85,19 @@ coff.e:
 
 edsym:
 edsym.e:
-	$omake	edsym.c
-	!cc edsym.o -o edsym.e
+	$ifeq (OSVERSION, 4)
+	    $omake edsym-sos4.c
+	    !cc edsym-sos4.o -o edsym.e
+	$else
+	    $omake edsym-ssol.c
+	    !cc edsym-ssol.o -lelf -o edsym.e
+	$endif
 	;
 
 clean:
-	!./mkshlib.csh -c
+	$ifeq (OSVERSION, 4)
+	    !./mkshlib.sos4 -c
+	$else
+	    !./mkshlib.ssol -c
+	$endif
 	;

@@ -7,12 +7,13 @@ include	"iki.h"
 # kernel entry in the table containing the entry point address of each of the
 # kernel procedures.
 
-procedure iki_lddriver (ex_open, ex_close, ex_opix, ex_updhdr, ex_access,
-	ex_copy, ex_delete, ex_rename, flags)
+procedure iki_lddriver (kname, ex_open, ex_close, ex_opix, ex_updhdr,
+	ex_access, ex_copy, ex_delete, ex_rename, flags)
 
-int	locpr()
+char	kname[ARB]
 extern	ex_open(), ex_close(), ex_opix(), ex_updhdr()
 extern	ex_access(), ex_copy(), ex_delete(), ex_rename()
+int	locpr()
 int	flags
 
 include	"iki.com"
@@ -24,6 +25,7 @@ begin
 	else
 	    k_nkernels = k_nkernels + 1
 	    
+	call strcpy (kname, IKI_KNAME(k_nkernels), SZ_KNAME)
 	IKI_OPEN(k_nkernels)	= locpr (ex_open)
 	IKI_CLOSE(k_nkernels)	= locpr (ex_close)
 	IKI_OPIX(k_nkernels)	= locpr (ex_opix)

@@ -24,13 +24,17 @@ output image is specified then it must match the input image list in
 number.
 .le
 .ls w1 = INDEF, w2 = INDEF
-Starting and ending wavelengths to be copied.  The region may be specified
-as either increasing or decreasing allowing the copied region to be
-flipped.  If either endpoint is specified as INDEF the entire range of the
-input spectrum is copied.  If the spectrum only partially covers the range
-only that portion of the spectrum within the range is copied.  It is an
-error if the range is outside that of a spectrum.  If a range is specified
-then the \fIrebin\fR parameter also applies.
+Starting and ending wavelengths to be copied.  If \fIw1\fR is not specified
+then the wavelength of the starting edge of the first pixel is used
+(wavelength at pixel coordinate 0.5) and if \fIw2\fR is not specified then
+the wavelength of the ending edge of the last pixel is used (wavelength of
+the last pixel plus 0.5).  If both are not specified, that is set to INDEF,
+then the whole spectrum is copied and the \fIrebin\fR parameter is
+ignored.  Note that by specifying both endpoints the copied region can be
+set to have increasing or decreasing wavelength per pixel.  If the spectrum
+only partially covers the specified range only that portion of the spectrum
+within the range is copied.  It is an error if the range is entirely
+outside that of a spectrum.
 .le
 .ls apertures = "", beams = ""
 List of apertures and beams to be selected from the input spectra.  The
@@ -89,17 +93,17 @@ with the same aperture number and new apertures are added if not present.
 .le
 .ls rebin = yes
 Rebin the spectrum to the exact wavelength range specified by the \fIw1\fR
-and \fIw2\fR parameters if not given as INDEF?  If the range is given as
-INDEF this parameter does not apply.  If a range is given and this
-parameter is no set then the pixels in the specified range (using the
-nearest pixels to the endpoint wavelengths) are copied without rebinning.
-In this case the wavelength of the first pixel may not be exactly that
-specified by \fIw1\fR and the dispersion, including non-linear dispersions,
-is unchanged.  If this parameter is set the spectra are interpolated to
-have the first and last pixels at exactly the specified endpoint
-wavelengths while preserving the same number of pixels in the interval.
-Linear and log-linear dispersion types are maintained while non-linear
-dispersions are linearized.
+and \fIw2\fR parameters?  If the range is given as INDEF for both endpoints
+this parameter does not apply.  If a range is given and this parameter is
+not set then the pixels in the specified range (using the nearest pixels to
+the endpoint wavelengths) are copied without rebinning.  In this case the
+wavelength of the first pixel may not be exactly that specified by \fIw1\fR
+and the dispersion, including non-linear dispersions, is unchanged.  If
+this parameter is set the spectra are interpolated to have the first and
+last pixels at exactly the specified endpoint wavelengths while preserving
+the same number of pixels in the interval.  Linear and log-linear
+dispersion types are maintained while non-linear dispersions are
+linearized.
 .le
 .ls verbose = no
 Print a record of each aperture copied?
@@ -517,6 +521,11 @@ line 100 from a set of 3D images with dispaxis=3:
 .fi
 .ih
 REVISIONS
+.ls SCOPY V2.11
+Previously both w1 and w2 had to be specified to select a range to
+copy.  Now if only one is specified the second endpoint defaults
+to the first or last pixel.
+.le
 .ls SCOPY V2.10.3
 Additional support for 3D multispec/equispec or spatial spectra has been
 added.  The "bands" parameter allows selecting specific bands and

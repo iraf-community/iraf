@@ -71,20 +71,30 @@ dividing the calibration image by a normalization spectrum which is the
 same at all points along the spatial axis.  The normalization spectrum is
 obtained by averaging the normalization image across the dispersion to form
 a one dimensional spectrum and smoothing the spectrum by fitting a
-function.  The image header keyword DISPAXIS must be present with a value
-of 1 for dispersion parallel to the lines (varying with the column
-coordinate) or 2 for dispersion parallel to the columns (varying with line
-coordinate).  This parameter may be added using \fBhedit\fR.  When
-normalizing only values in the normalization spectrum and the data above a
-threshold are used.  Pixels falling below the threshold are set to unit
-response.
+function.  The threshold value does not apply to creating or fitting of
+the normalization spectrum but only the final creation of the response
+values.  When normalizing (that is dividing the data values by the
+fit to the normalization spectrum) only pixels in which both the fitted
+normalization value and the data value are above the threshold are
+computed.  If either the normalization value or the data value is below
+the threshold the output response value is one.
+
+The image header keyword DISPAXIS must be present with a value of 1 for
+dispersion parallel to the lines (varying with the column coordinate) or 2
+for dispersion parallel to the columns (varying with line coordinate).
+This parameter may be added using \fBhedit\fR.  Note that if the image has
+been transposed (\fBimtranspose\fR) the dispersion axis should still refer
+to the original dispersion axis unless the physical world coordinate system
+is first reset (see \fBwcsreset\fR).  This is done in order to allow images
+which have DISPAXIS defined prior to transposing to still work correctly
+without requiring this keyword to be changed.
 
 If the output image does not exist it is first created with unit response
 everywhere.  Subsequently the response is only modified in those regions
-occupied by the input calibration image.
-Thus, image sections may be used to select regions in which the response
-is desired.  This ability is particularly useful when dealing with multiple
-slits within an image or to exclude regions outside the slit.
+occupied by the input calibration image.  Thus, image sections may be used
+to select regions in which the response is desired.  This ability is
+particularly useful when dealing with multiple slits within an image or to
+exclude regions outside the slit.
 
 Normally the normalization images are the same as the calibration images.
 In other words the calibration image is normalized by the average spectrum

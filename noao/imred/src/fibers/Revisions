@@ -1,5 +1,81 @@
 .help revisions Nov90 noao.imred.src.fibers
 .nf
+srcfibers$arcrefs.cl
+srcfibers$batch.cl
+srcfibers$doarcs.cl
+srcfibers$fibresponse.cl
+srcfibers$getspec.cl
+srcfibers$listonly.cl
+srcfibers$mkfibers.cl
+srcfibers$skysub.cl
+srcfibers$proc.cl
+    Any additional qualifiers in the imtype string are stripped.
+    (8/14/97, Valdes)
+
+=========
+V2.11BETA
+=========
+
+arcrefs.cl
+    If both crval and cdelt are INDEF then the autoidentify option is
+    not used.  (5/2/97, Valdes)
+
+apsript.par
+    Made changes for the new aperture selection option.  (9/5/96, Valdes)
+
+skysub.cl
+    Added package name to calls of "match", "sort", "uniq" to avoid
+    possible conflicts.  (5/6/96, Valdes)
+
+proc.cl
+proc.par
+arcrefs.cl
+arcrefs.par
+params.par
+    Modified to use autoidentify.  (4/5/96, Valdes)
+
+srcfibers$proc.cl
+srcfibers$batch.cl
+    When using subapertures the subapertures were not wavelength
+    calibrated correctly because the reference arc spectrum which
+    provides the wavelength scale does not contain the subapertures
+    and DISPCOR does not use samedisp=yes.  Changed the value of
+    samedisp to yes.  (10/27/95, Valdes)
+
+srcfibers$mkfibers.cl
+    The calls to mk1dspec did not specify the header file which would
+    then default to the task parameter which might be invalid.
+    (10/17/95, Valdes)
+
+srcfibers$proc.cl
+    Needed to initialize arcref2 in order work in batch when no dispersion
+    correction is requested.  (10/16/95, Valdes)
+
+srcfibers$mkfibers.cl
+    The calls to MK1DSPEC were changed in accordance with parameter changes
+    to that task.
+    (7/28/95, Valdes)
+
+srcfibers$proc.cl
+    Any image extension is stripped from the apidtable parameter.
+    (7/24/95, Valdes)
+
+srcfibers$doalign.cl +
+srcfibers$doalign.par +
+srcfibers$proc.cl
+srcfibers$batch.cl
+    Added the sky alignment option.  (7/19/95, Valdes)
+
+srcfibers$proc.cl
+srcfibers$batch.cl
+srcfibers$arcrefs.cl
+    The wrong range syntax is used with subapertures in SARITH/SCOPY.
+    Changed all -999 to 1-999.  (6/14/95, Valdes)
+
+=======
+V2.10.4
+=======
+
 srcfibers$proc.cl
 srcfibers$fibresponse.cl
     1.  Need to add check for the throughput being a file rather than

@@ -6,8 +6,9 @@ include	"qpf.h"
 # QPF_COPY -- Copy an image.  A special operator is provided for fast, blind
 # copies of entire images.
 
-procedure qpf_copy (old_root, old_extn, new_root, new_extn, status)
+procedure qpf_copy (kernel, old_root, old_extn, new_root, new_extn, status)
 
+int	kernel			#I IKI kernel
 char	old_root[ARB]		#I old image root name
 char	old_extn[ARB]		#I old image extn
 char	new_root[ARB]		#I new image root name

@@ -26,7 +26,8 @@ libsgi.a:
 	sgiclose.x	sgi.com sgi.h
 	sgiclws.x	sgi.h sgi.com
 	sgicolor.x	sgi.com sgi.h
-	sgidrawch.x	font.com font.h sgi.com sgi.h <gki.h> <gset.h> <math.h>
+	sgidrawch.x	font.com font.h greek.com sgi.com sgi.h \
+			<gki.h> <gset.h> <math.h>
 	sgiescape.x	
 	sgifa.x		sgi.com sgi.h
 	sgifaset.x	sgi.com sgi.h <gki.h>
@@ -43,7 +44,8 @@ libsgi.a:
 	sgipm.x		sgi.com sgi.h <gki.h>
 	sgipmset.x	sgi.com sgi.h <gki.h>
 	sgireset.x	sgi.com sgi.h <gset.h> <gki.h>
-	sgitx.x		sgi.com sgi.h <gki.h> <gset.h> <math.h>
+	sgitx.x		font.com font.h greek.com sgi.com sgi.h \
+			<gki.h> <gset.h> <math.h>
 	sgitxset.x	sgi.com sgi.h <gki.h> <gset.h>
 	sgk.x		sgk.com sgk.h <chars.h> <gki.h> <mach.h>
 	t_sgideco.x	sgk.h <error.h> <gki.h>

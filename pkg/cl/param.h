@@ -217,3 +217,4 @@ struct	pfile *newpfile();	/* add a new pfile off parhead		*/
 struct	pfile *pfilecopy();	/* make an in-core copy of a pfile	*/
 
 int	defpar();		/* determine whether param exists	*/
+int	defvar();		/* determine whether envvar exists	*/

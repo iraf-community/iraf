@@ -27,7 +27,7 @@ begin
 	# Get the various task parameters.
 	inlist = clpopnu ("textfiles")
 	outlist = clpopnu ("outfiles")
-	call clgstr ("expr", Memc[expr], SZ_FNAME)
+	call clgstr ("expr", Memc[expr], SZ_LINE)
 
 	# Check that the input and output file lists have the
 	# same length.

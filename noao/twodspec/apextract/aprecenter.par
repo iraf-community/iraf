@@ -1,6 +1,7 @@
 # APRECENTER
 
 input,s,a,,,,List of input images
+apertures,s,h,"",,,Apertures
 references,s,h,"",,,"Reference images
 "
 interactive,b,h,no,,,Run task interactively?
@@ -11,6 +12,6 @@ edit,b,h,yes,,,"Edit apertures?
 "
 line,i,h,INDEF,1,,Dispersion line
 nsum,i,h,1,,,Number of dispersion lines to sum or median
-apertures,s,h,"",,,Select apertures
+aprecenter,s,h,"",,,Apertures for recentering calculation
 npeaks,r,h,INDEF,0.,,Select brightest peaks
 shift,b,h,yes,,,Use average shift instead of recentering?

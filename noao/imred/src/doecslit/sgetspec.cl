@@ -20,6 +20,9 @@ begin
 	int	n, n1, narcs
 
 	imtype = "." // envget ("imtype")
+	n = stridx (",", imtype)
+	if (n > 0)
+	    imtype = substr (imtype, 1, n-1)
 	n1 = strlen (imtype)
 
 	temp = mktemp ("tmp$iraf")
@@ -158,7 +161,7 @@ begin
 	if (narcs > 0) {
 	    sort (arc, column=0, ignore=yes, numeric=no, reverse=no, > temp)
 	    delete (arc, verify=no)
-	    rename (temp, arc)
+	    rename (temp, arc, field="all")
 	    itype = ""
 	    fd1 = arc
 	    while (fscan (fd1, image, narcs) != EOF) {

@@ -2,6 +2,7 @@
 
 input,s,a,,,,List of input images
 output,s,h,"",,,List of output spectra
+apertures,s,h,"",,,Apertures
 format,s,h,"multispec","onedspec|multispec|echelle|strip",,Extracted spectra format
 references,s,h,"",,,List of aperture reference images
 profiles,s,h,"",,,"List of aperture profile images

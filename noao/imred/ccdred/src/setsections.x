@@ -1,15 +1,16 @@
 include	<imhdr.h>
+include	<mwset.h>
 include	"ccdred.h"
 
 # SET_SECTIONS -- Set the data section, ccd section, trim section and
-# bias section.
+# bias section.  Also set the WCS.
 
 procedure set_sections (ccd)
 
 pointer	ccd			# CCD structure (returned)
 
-pointer	sp, str
-int	nc, nl, c1, c2, cs, l1, l2, ls
+pointer	sp, str, mw, lterm, mw_openim()
+int	nc, nl, c1, c2, cs, l1, l2, ls, ndim, mw_stati()
 bool	streq()
 
 begin
@@ -91,6 +92,22 @@ begin
 	OUT_C2(ccd) = IN_C2(ccd)
 	OUT_L1(ccd) = IN_L1(ccd)
 	OUT_L2(ccd) = IN_L2(ccd)
+
+	# Set the physical WCS to be CCD coordinates.
+	mw = mw_openim (IN_IM(ccd))
+	ndim = mw_stati (mw, MW_NPHYSDIM)
+	call salloc (lterm, ndim * (1 + ndim), TY_REAL)
+	call mw_gltermr (mw, Memr[lterm+ndim], Memr[lterm], ndim)
+	Memr[lterm] = IN_C1(ccd) - CCD_C1(ccd)
+	Memr[lterm+1] = IN_L1(ccd) - CCD_L1(ccd)
+	Memr[lterm+ndim] = 1. / cs
+	Memr[lterm+ndim+1] = 0.
+	Memr[lterm+ndim+ndim] = 0.
+	Memr[lterm+ndim+ndim+1] = 1. / ls
+	call mw_sltermr (mw, Memr[lterm+ndim], Memr[lterm], ndim)
+	call mw_saveim (mw, IN_IM(ccd))
+	call mw_saveim (mw, OUT_IM(ccd))
+	call mw_close (mw)
 
 	call sfree (sp)
 end

@@ -136,7 +136,7 @@ begin
 	    if (IS_INDEFI (odtype))
 		odtype = dtype
 	    else
-		odtype = min (-1, max (1, odtype))
+		odtype = max (-1, min (1, odtype))
 	    if (IS_INDEFD (ow1))
 		ow1 = w1
 	    if (IS_INDEFD (odw))
@@ -232,11 +232,13 @@ bool	verbose			# Verbose (negative beam warning)?
 pointer	sap
 
 int	naps, ap, beam, fd, nalloc
-pointer	sp, fname
+double	ra, dec
+pointer	sp, str, key, im, list
 
 real	clgetr()
 double	clgetd()
 int	nowhite(), open(), fscan(), nscan(), clgeti()
+pointer	immap(), imofnlu(), imgnfn()
 errchk	open
 
 begin
@@ -261,62 +263,130 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (fname, SZ_LINE, TY_CHAR)
-	call clgstr ("apidtable", Memc[fname], SZ_LINE)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (key, SZ_FNAME, TY_CHAR)
+	call clgstr ("apidtable", Memc[str], SZ_LINE)
 
 	# Set parameters from an APIDTABLE if given.
 	naps = 0
-	if (nowhite (Memc[fname], Memc[fname], SZ_LINE) > 0) {
+	if (nowhite (Memc[str], Memc[str], SZ_LINE) > 0) {
 	    iferr {
-		fd = open (Memc[fname], READ_ONLY, TEXT_FILE)
-		while (fscan (fd) != EOF) {
-		    call gargi (ap)
-		    call gargi (beam)
-		    if (nscan() < 2)
-			next
-		    if (!IS_INDEFI(beam) && beam < 0 && verbose) {
-			call eprintf (
+		# Read aperture information from an image.
+		ifnoerr (im = immap (Memc[str], READ_ONLY, 0)) {
+		    list = imofnlu (im, "SLFIB[0-9]*")
+		    while (imgnfn (list, Memc[key], SZ_FNAME) != EOF) {
+			call imgstr (im, Memc[key], Memc[str], SZ_LINE)
+			call sscan (Memc[str])
+			call gargi (ap)
+			call gargi (beam)
+			if (nscan() < 2)
+			    next
+			if (!IS_INDEFI(beam) && beam < 0 && verbose) {
+			    call eprintf (
 			    "Negative beam number for aperture %d ignored.\n") 
-			    call pargi (ap)
-			beam = INDEFI
-		    }
-		    if (naps == 0) {
-			nalloc = 50
-			call malloc (saps, nalloc, TY_POINTER)
-		    } else if (naps == nalloc) {
-			nalloc = nalloc + 50
-			call realloc (saps, nalloc, TY_POINTER)
-		    }
-		    call malloc (Memi[saps+naps], LEN_SAP, TY_STRUCT)
+				call pargi (ap)
+			    beam = INDEFI
+			}
+			if (naps == 0) {
+			    nalloc = 50
+			    call malloc (saps, nalloc, TY_POINTER)
+			} else if (naps == nalloc) {
+			    nalloc = nalloc + 50
+			    call realloc (saps, nalloc, TY_POINTER)
+			}
+			call malloc (Memi[saps+naps], LEN_SAP, TY_STRUCT)
 
-		    sap = Memi[saps+naps]
-		    AP(sap) = ap
-		    BEAM(sap) = beam
-		    call gargi (DTYPE(sap))
-		    call gargd (W1(sap))
-		    call gargd (DW(sap))
-		    call gargd (Z(sap))
-		    call gargr (APLOW(sap))
-		    call gargr (APHIGH(sap))
-		    call gargstr (TITLE(sap), LEN_SAPTITLE)
-		    if (nscan() < 9) {
-			call reset_scan()
-			call gargi (AP(sap))
-			call gargi (BEAM(sap))
-			if (!IS_INDEFI(BEAM(sap)) && BEAM(sap) < 0)
-			    BEAM(sap) = INDEFI
-			call gargstr (TITLE(sap), LEN_SAPTITLE)
+			sap = Memi[saps+naps]
+			AP(sap) = ap
+			BEAM(sap) = beam
+			call gargd (ra)
+			call gargd (dec)
+                        if (nscan() != 4) {
+                            call reset_scan ()
+                            call gargi (ap)
+                            call gargi (beam)
+			    call gargstr (TITLE(sap), LEN_SAPTITLE)
+                        } else {
+                            Memc[str] = EOS
+                            call gargstr (Memc[str], SZ_LINE)
+                            call xt_stripwhite (Memc[str])
+                            if (Memc[str] == EOS) {
+                                call sprintf (TITLE(sap), LEN_SAPTITLE,
+                                    "(%.2h %.2h)")
+                                    call pargd (ra)
+                                    call pargd (dec)
+                            } else {
+                                call sprintf (TITLE(sap), LEN_SAPTITLE,
+                                    "%s (%.2h %.2h)")
+                                    call pargstr (Memc[str])
+                                    call pargd (ra)
+                                    call pargd (dec)
+                            }
+                        }
 			DTYPE(sap) = INDEFI
 			W1(sap) = INDEFD
 			DW(sap) = INDEFD
 			Z(sap) = INDEFD
 			APLOW(sap) = INDEF
 			APHIGH(sap) = INDEF
-		    }
-		    call xt_stripwhite (TITLE(sap))
-		    naps = naps + 1
-		}	
-		call close (fd)
+			call xt_stripwhite (TITLE(sap))
+			naps = naps + 1
+		    }	
+		    call imcfnl (list)
+		    call imunmap (im)
+
+		# Read aperture information from a file.
+		} else {
+		    fd = open (Memc[str], READ_ONLY, TEXT_FILE)
+		    while (fscan (fd) != EOF) {
+			call gargi (ap)
+			call gargi (beam)
+			if (nscan() < 2)
+			    next
+			if (!IS_INDEFI(beam) && beam < 0 && verbose) {
+			    call eprintf (
+			    "Negative beam number for aperture %d ignored.\n") 
+				call pargi (ap)
+			    beam = INDEFI
+			}
+			if (naps == 0) {
+			    nalloc = 50
+			    call malloc (saps, nalloc, TY_POINTER)
+			} else if (naps == nalloc) {
+			    nalloc = nalloc + 50
+			    call realloc (saps, nalloc, TY_POINTER)
+			}
+			call malloc (Memi[saps+naps], LEN_SAP, TY_STRUCT)
+
+			sap = Memi[saps+naps]
+			AP(sap) = ap
+			BEAM(sap) = beam
+			call gargi (DTYPE(sap))
+			call gargd (W1(sap))
+			call gargd (DW(sap))
+			call gargd (Z(sap))
+			call gargr (APLOW(sap))
+			call gargr (APHIGH(sap))
+			call gargstr (TITLE(sap), LEN_SAPTITLE)
+			if (nscan() < 9) {
+			    call reset_scan()
+			    call gargi (AP(sap))
+			    call gargi (BEAM(sap))
+			    if (!IS_INDEFI(BEAM(sap)) && BEAM(sap) < 0)
+				BEAM(sap) = INDEFI
+			    call gargstr (TITLE(sap), LEN_SAPTITLE)
+			    DTYPE(sap) = INDEFI
+			    W1(sap) = INDEFD
+			    DW(sap) = INDEFD
+			    Z(sap) = INDEFD
+			    APLOW(sap) = INDEF
+			    APHIGH(sap) = INDEF
+			}
+			call xt_stripwhite (TITLE(sap))
+			naps = naps + 1
+		    }	
+		    call close (fd)
+		}
 	    } then
 		call erract (EA_WARN)
 	}

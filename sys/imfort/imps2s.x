@@ -17,7 +17,7 @@ int	ier
 
 long	offset
 int	nchars, npix, ip, j
-int	bfwrit()
+int	imwpix()
 
 begin
 	# Verify in bounds.
@@ -45,7 +45,7 @@ begin
 		((j-1) * IM_LINESIZE(im) + (i1-1)) * SZ_SHORT
 
 	    # Write one line of data.
-	    if (nchars != bfwrit (IM_PIXFP(im), buf[ip], nchars, offset)) {
+	    if (nchars != imwpix (im, buf[ip], nchars, offset, 0)) {
 		ier = IE_WRPIX
 		call im_seterrim (ier, im)
 		return

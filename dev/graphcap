@@ -75,6 +75,8 @@ solitaire8k|            :tc=usolitaire8k:
 epsf|eps|               :tc=uepsf:
 epsfl|epsl|             :tc=uepsfl:
 epshalf|epsh|           :XO#300:YO#1650:tc=uepsf:
+clp|clpl|		:tc=uclpl:
+clpp|			:tc=uclpp:
 
 lpr|lp|lw|		:tc=g-lpr:
 psdump|			:tc=g-psdump:
@@ -111,8 +113,8 @@ imt5|imt2048|:cn#5:xr#2048:yr#2048:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,2048,2048:tc=iism70:
 imt6|imt4096|:cn#6:xr#4096:yr#4096:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,4096,4096:tc=iism70:
-imt7|imt4x1|:cn#7:xr#4096:yr#1024:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,,4096,1024:tc=iism70:
+imt7|imt8192|:cn#7:xr#8192:yr#8192:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,8192,8192:tc=iism70:
 imt8|imt1x4|:cn#8:xr#1024:yr#4096:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1024,4096:tc=iism70:
 imt9|imtfs|Full screen, landscape mode:cn#9:xr#1144:yr#880:\
@@ -135,6 +137,8 @@ imt17|imtssy|:cn#17:xr#1008:yr#648:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1008,648:tc=iism70:
 imt18|imtssn|:cn#18:xr#1024:yr#680:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1024,680:tc=iism70:
+imt19|imt4x1|:cn#19:xr#4096:yr#1024:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,4096,1024:tc=iism70:
 
 # NOAO specific display frame buffer formats.
 imt20|imtgec|GEC CCD detector format:cn#20:xr#388:yr#576:\
@@ -149,10 +153,10 @@ imt24|imt2df5|imt2df5x1|2D-Frutti detector format:cn#24:xr#512:yr#1520:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,512,1520:tc=iism70:
 imt25|imt2df9|imt2df9x1|2D-Frutti detector format:cn#25:xr#960:yr#1520:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,960,1520:tc=iism70:
-imt26|imtcryo|Cryogenic camera:cn#26:xr#1232:yr#400:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1232,400:tc=iism70:
-imt27|imtgcam|Gold camera - Ford:cn#27:xr#3104:yr#348:\
-	:LC:BS@:z0#1:zr#200:DD=node!imtool,,3104,348:tc=iism70:
+imt26|imtcryo|Cryogenic camera:cn#26:xr#1232:yr#800:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1232,800:tc=iism70:
+imt27|imtgcam|Gold camera - Ford:cn#27:xr#3104:yr#512:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,3104,512:tc=iism70:
 imt28|imt2df9x3|2D-Frutti detector format:cn#28:xr#976:yr#3040:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,976,3040:tc=iism70:
 imt29|imtgw|GONG Cache Monitor:cn#29:xr#800:yr#256:\
@@ -163,16 +167,24 @@ imt31|imtret|Reticon detector format:cn#31:xr#1240:yr#400:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1240,400:tc=iism70:
 imt32|imtti|imtti2|imtti3|imtti4|imtti5|KPNO TI 800x800:cn#32:xr#832:yr#800:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,832,800:tc=iism70:
-imt33|imtt5ha|KPNO Tek 512x512:cn#33:xr#544:yr#512:\
+imt33|imtt5ha|imtt5hc|KPNO Tek 512x512:cn#33:xr#544:yr#512:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,544,512:tc=iism70:
 imt34|imtt1ka|KPNO Tek 1K:cn#34:xr#1056:yr#1024:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1056,1024:tc=iism70:
-imt35|imts2ka|imtt2ka|imtt2kb|KPNO Tek or STIS 2K:cn#35:xr#2080:yr#2048:\
+imt35|imts2kaf|imtt2kaf|imtt2kbf|KPNO Tek or STIS 2K:cn#35:xr#2080:yr#2048:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,2080,2048:tc=iism70:
-imt36|imtf3ka|imtfo3k|KPNO Ford 3072x1024:cn#36:xr#3104:yr#1024:\
+imt36|imts2ka|imtt2ka|imtt2kb|imt2k40|KPNO Tek or STIS 2K @ 40%:\
+	:cn#36:xr#832:yr#820:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,832,820:tc=iism70:
+imt37|imts2kas|imtt2kas|imtt2kbs|imt2k25|KPNO Tek or STIS 2K @ 25%:\
+	:cn#37:xr#520:yr#512:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,520,512:tc=iism70:
+imt38|imtf3ka|imtf3kb|imtfo3k|KPNO Ford 3072x1024:cn#38:xr#3104:yr#1024:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,3104,1024:tc=iism70:
-imt37|imtf1ka|KPNO Ford (Loral) 1200x800:cn#37:xr#1232:yr#800:\
+imt39|imtf1ka|KPNO Ford (Loral) 1200x800:cn#39:xr#1232:yr#800:\
 	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1232,800:tc=iism70:
+imt40|imtweather|GOES weather pictures:cn#40:xr#1200:yr#600:\
+	:LC:BS@:z0#1:zr#200:DD=node!imtool,,1200,600:tc=iism70:
 
 iism70d|iism70c|iism70l|NOAO Draco hosted IIS model 70:\
 	:BS:DD=draco!iism70,iia0:tc=iism70:
@@ -213,6 +225,56 @@ imd|imdkern|Image device kernel:\
 	:kf=bin$x_imdkern.e:tn=imdkern:cw#.0125:ch#.0294:\
 	:ar#1.0:xs#0.263:ys#0.263:xr#2048:yr#2048:ip#4:gp#4:ca:in:nc#1:\
 	:z0#1:zr#200:LC:LO#1:LS#1:CI#205:FN#0:
+
+
+# PostScript kernel (PSIKERN).
+
+# NOAO specific devices.
+uclp|uclpl|UNIX interface to Tektronix Phaser 200e color printer (landscape):\
+        :xr#2464:yr#2792:ar#1.13:xs#0.2214:\
+        :DD=psi_def,tmp$psk,!{ lpr -Pclp $F ; rm $F ; }&:tc=psi_land:
+uclpp|UNIX interface to Tektronix Phaser 200e color printer (portrait):\
+        :xr#2464:yr#2792:ar#1.13:ys#0.2214:\
+        :DD=psi_def,tmp$psk,!{ lpr -Pclp $F ; rm $F ; }&:tc=psi_port:
+
+# Generic PSIKERN devices.
+g-psiland|PostScript Kernel output to default printer, (landscape):\
+        :DD=psi_def,tmp$psk,!{ lpr $F; rm $F ;}&:tc=psi_land:
+g-psiport|PostScript Kernel output to default printer (portrait):\
+        :DD=psi_def,tmp$psk,!{ lpr $F; rm $F ;}&:tc=psi_port:
+
+psidump|psidumpl|UNIX generic interface to PSIKERN file dump (landscape):\
+        :xr#2464:yr#2792:ar#1.13:ys#0.2214:\
+        :DD=psi_def,tmp$psk,!{ mv $F /tmp/psidmp$$.ps ; }&:tc=psi_land:
+psidumpp|UNIX generic interface to PSIKERN file dump:\
+        :xr#2464:yr#2792:ar#1.13:ys#0.2214:\
+        :DD=psi_def,tmp$psk,!{ mv $F /tmp/psidmp$$.ps ; }&:tc=psi_port:
+
+psi_land_thin|PostScript Kernel, thin lines, (landscape):\
+        :PW#0.00008:PI#0.5:tc=psi_land:
+psi_port_thin|PostScript Kernel, thin lines, (portrait):\
+        :PW#0.00008:PI#0.5:tc=psi_port:
+psi_port|psidbgp|PostScript Kernel default portrait:\
+        :ar#1.3241525:ch#.02:cw#.02644:\
+        :xr#2313:xs#0.1959:yr#3063:ys#0.2594:PT:\
+        :tc=psi_def:
+psi_square|PostScript Kernel square viewport:\
+        :PT:xs#0.1959:ys#0.1959:ar#1:cw#.02:ch#.02:\
+        :XO#0.01:YO#0.0581:xr#2313:yr#2313:\
+        :tc=psi_def:
+psi_def|psi_land|Postscript Kernel Default 8.5x11in 300dpi Landscape:\
+        :ar#0.7552:ca:ch#.02644:co#80:cw#.02:fa:fs#6:\
+        :kf=stsdas$bin($arch)/x_psikern.e:\
+        :li#24:lt#4:pl:pm:se:tf#4:tn=psikern:tq#1:tx:xr#3063:xs#0.2594:\
+        :yr#2313:ys#0.1959:zr#256:\
+        :BO:\
+        :DD=psi_def,tmp$psk,!{ mv $F psk$$.eps; }&:\
+        :FB=Times-Bold:FG=Symbol:FI=Times-Italic:FR=Times-Roman:\
+        :IF=stsdas$lib/psikern_prolog.ps:\
+        :LG=stsdas$lib/invxgterm:\
+        :MF#100:PI#1.:PW#.00011:TD#.01221:TP#.001221:TS#.006104:\
+        :XO#0.01:YO#0.01:
+
 
 # SGI kernel (STDPLOT).
 
@@ -459,7 +521,7 @@ sgi_qms|QMS (Talaris) LaserWriter 300dpi:\
 sgi_apl|Apple Laserwriter (Postscript) 300dpi:\
 	:kf=bin$x_sgikern.e:tn=sgikern:cw#.0125:ch#.0294:\
 	:ar#0.762:xs#0.267:ys#0.203:xr#3180:yr#2380:\
-	:MF#1:XO#55:XW#3180:YO#90:YW#2380:PW#2.4:
+	:MF#1:XO#55:XW#3180:YO#90:YW#2380:PW#2.3:
 sgi_versatec|Versatec electrostatic raster plotter:\
 	:kf=bin$x_sgikern.e:tn=sgikern:ar#.756:xs#.267:ys#.202:\
 	:xr#2112:yr#1636:zr#1:cw#.0125:ch#.0294:\
@@ -552,16 +614,16 @@ vsolitaire8k|Solitaire film recorder, VMS version (8192x6144):\
         :tc=usolitaire8k:
 usolitaire2k|Solitaire film recorder, 2k mode (2048x1536):\
         :xr#2048:yr#2048:\
-        :DD=solitaire,tmp$slt,!{ /local/bin/qsoli -wid 2048 \
+        :DD=solitaire,tmp$slt,!{ qsoli -wid 2048 \
          -hgt 1536 -res 2048 -bot 250 $F; 'rm' $F; }&:\
         :tc=nas_solitaire:
 usolitaire4k|Solitaire film recorder, default (4096x3072):\
         :xr#4096:yr#4096:\
-        :DD=solitaire,tmp$slt,!{ /local/bin/qsoli $F; 'rm' $F; }&:\
+        :DD=solitaire,tmp$slt,!{ qsoli $F; 'rm' $F; }&:\
         :tc=nas_solitaire:
 usolitaire8k|Solitaire film recorder, 8k mode (8192x6144):\
 	:xr#8192:yr#8192:\
-	:DD=solitaire,tmp$slt,!{ /local/bin/qsoli -wid 8192 \
+	:DD=solitaire,tmp$slt,!{ qsoli -wid 8192 \
 	 -hgt 6144 -res 8192 -bot 1000 $F; 'rm' $F; }&:\
 	:tc=nas_solitaire:
 nas_solitaire|Common parameters for above different resolutions:\

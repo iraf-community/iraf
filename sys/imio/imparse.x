@@ -10,7 +10,7 @@ include	<ctype.h>
 #
 # where all fields are optional except the cluster name.  In the limiting case
 # (cl_size = 1) the cluster name and image name are the same.  CL_INDEX and
-# CL_SIZE must be simple positive decimal integer constants, if given.  The
+# CL_SIZE must be simple nonnegative decimal integer constants, if given.  The
 # [ character must be escaped to be included in the filename of the cluster.
 #
 # NOTE -- The image specification syntax is not frozen and further changes
@@ -27,8 +27,8 @@ char	ksection[ARB]		# receives kernel section
 int	sz_ksection		# max chars in kernel section name
 char	section[ARB]		# receives image section
 int	sz_section		# max chars in image section name
-int	cl_index		# receives cluster index (default 0)
-int	cl_size			# receives cluster size (default 0)
+int	cl_index		# receives cluster index (default -1)
+int	cl_size			# receives cluster size (default -1)
 
 pointer	sp, cp, secbuf
 int	ip, op, lbrack, level, ch, n
@@ -63,8 +63,8 @@ begin
 	ksection[1] = EOS
 	section[1]  = EOS
 	lbrack      = ip
-	cl_index    = 0
-	cl_size     = 0
+	cl_index    = -1
+	cl_size     = -1
 
 	if (ch == EOS) {
 	    call sfree (sp)
@@ -77,27 +77,29 @@ begin
 	# kernel or image section.
 
 	ip = ip + 1
-	n = 0
+	n = -1
 
 	for (ch=imspec[ip];  ch != EOS;  ch=imspec[ip]) {
 	    if (IS_DIGIT(ch)) {
+		if (n < 0)
+		    n = 0
 		n = (n * 10) + TO_INTEG(ch)
 	    } else if (ch == '/') {
 		cl_index = max (n, 1)
-		n = 0
+		n = -1
 	    } else if (ch == ']') {
 		ip = ip + 1
 		break
 	    } else {
 		# Not a cl_index subscript; must be a section.
 		ip = lbrack
-		n  = 0
+		n = -1
 		break
 	    }
 	    ip = ip + 1
 	}
 
-	if (cl_index == 0)
+	if (cl_index < 0)
 	    cl_index = n
 	else
 	    cl_size = n

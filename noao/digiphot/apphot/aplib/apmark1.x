@@ -71,7 +71,7 @@ begin
 	    iferr {
 		call smark (sp)
 	        call salloc (temp, apstati (ap, NAPERTS), TY_REAL)
-	        call aparrays (ap, APERTS, Memr[temp])
+	        call ap_arrayr (ap, APERTS, Memr[temp])
 	        call gseti (id, G_PMLTYPE, GL_DASHED)
 	        call gmark (id, apstatr (ap, PXCUR), apstatr (ap, PYCUR),
 		    GM_PLUS, -2.0, -2.0)
@@ -244,7 +244,7 @@ begin
 	        call gseti (id, G_PMLTYPE, GL_DASHED)
 	        call gmark (id, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
 		    GM_PLUS, -2.0, -2.0)
-	        call aparrays (ap, APERTS, Memr[temp])
+	        call ap_arrayr (ap, APERTS, Memr[temp])
 	        do i = 1, apstati (ap, NAPERTS) {
 		    apert = 2.0 * apstatr (ap, SCALE) * Memr[temp+i-1]
 		    call gmark (id, apstatr (ap, XCENTER), apstatr (ap,

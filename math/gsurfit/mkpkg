@@ -45,27 +45,27 @@ libgsurfit.a:
 	gs_bevalr.x	
 	gs_chomatr.x	gsurfitdef.h <mach.h> <math/gsurfit.h>
 	gs_f1devalr.x	
-	gs_fevalr.x	
+	gs_fevalr.x	<math/gsurfit.h>
 	gsaccumr.x	gsurfitdef.h <math/gsurfit.h>
 	gsacptsr.x	gsurfitdef.h <math/gsurfit.h>
-	gsaddr.x		gsurfitdef.h <math/gsurfit.h>
+	gsaddr.x	gsurfitdef.h <math/gsurfit.h>
 	gscoeffr.x	gsurfitdef.h
 	gscopyr.x	gsurfitdef.h <math/gsurfit.h>
-	gsderr.x		gsurfitdef.h <math/gsurfit.h>
+	gsderr.x	gsurfitdef.h <math/gsurfit.h>
 	gserrorsr.x	gsurfitdef.h <mach.h>
 	gsevalr.x	gsurfitdef.h <math/gsurfit.h>
-	gsfitr.x		gsurfitdef.h <math/gsurfit.h>
+	gsfitr.x	gsurfitdef.h <math/gsurfit.h>
 	gsfreer.x	gsurfitdef.h
-	gsgcoeffr.x	gsurfitdef.h
+	gsgcoeffr.x	gsurfitdef.h <math/gsurfit.h>
 	gsinitr.x	gsurfitdef.h <math/gsurfit.h>
 	gsrefitr.x	gsurfitdef.h <math/gsurfit.h>
 	gsrejectr.x	gsurfitdef.h <math/gsurfit.h>
 	gsrestorer.x	gsurfitdef.h <math/gsurfit.h>
 	gssaver.x	gsurfitdef.h <math/gsurfit.h>
-	gsscoeffr.x	gsurfitdef.h
+	gsscoeffr.x	gsurfitdef.h <math/gsurfit.h>
 	gssolver.x	gsurfitdef.h <math/gsurfit.h>
 	gsstatr.x	gsurfitdef.h <math/gsurfit.h>
-	gssubr.x		gsurfitdef.h <math/gsurfit.h>
+	gssubr.x	gsurfitdef.h <math/gsurfit.h>
 	gsvectorr.x	gsurfitdef.h <math/gsurfit.h>
 	gszeror.x	gsurfitdef.h <math/gsurfit.h>
 
@@ -73,24 +73,24 @@ libgsurfit.a:
 	gs_bevald.x	
 	gs_chomatd.x	dgsurfitdef.h <mach.h> <math/gsurfit.h>
 	gs_f1devald.x	
-	gs_fevald.x	
+	gs_fevald.x	<math/gsurfit.h>
 	gsaccumd.x	dgsurfitdef.h <math/gsurfit.h>
 	gsacptsd.x	dgsurfitdef.h <math/gsurfit.h>
-	gsaddd.x		dgsurfitdef.h <math/gsurfit.h>
+	gsaddd.x	dgsurfitdef.h <math/gsurfit.h>
 	gscoeffd.x	dgsurfitdef.h
 	gscopyd.x	dgsurfitdef.h <math/gsurfit.h>
-	gsderd.x		dgsurfitdef.h <math/gsurfit.h>
+	gsderd.x	dgsurfitdef.h <math/gsurfit.h>
 	gserrorsd.x	dgsurfitdef.h <mach.h>
 	gsevald.x	dgsurfitdef.h <math/gsurfit.h>
-	gsfitd.x		dgsurfitdef.h <math/gsurfit.h>
+	gsfitd.x	dgsurfitdef.h <math/gsurfit.h>
 	gsfreed.x	dgsurfitdef.h
-	gsgcoeffd.x	dgsurfitdef.h
+	gsgcoeffd.x	dgsurfitdef.h <math/gsurfit.h>
 	gsinitd.x	dgsurfitdef.h <math/gsurfit.h>
 	gsrefitd.x	dgsurfitdef.h <math/gsurfit.h>
 	gsrejectd.x	dgsurfitdef.h <math/gsurfit.h>
 	gsrestored.x	dgsurfitdef.h <math/gsurfit.h>
 	gssaved.x	dgsurfitdef.h <math/gsurfit.h>
-	gsscoeffd.x	dgsurfitdef.h
+	gsscoeffd.x	dgsurfitdef.h <math/gsurfit.h>
 	gssolved.x	dgsurfitdef.h <math/gsurfit.h>
 	gsstatd.x	dgsurfitdef.h <math/gsurfit.h>
 	gssubd.x	dgsurfitdef.h <math/gsurfit.h>

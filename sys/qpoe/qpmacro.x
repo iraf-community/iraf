@@ -117,9 +117,10 @@ define	PS_STSTABLEN	Memi[$1+13]	# SYMTAB stab len (start)
 define	PS_STSBUFSIZE	Memi[$1+14]	# SYMTAB sbuf size (start)
 define	PS_NODEFFILT	Memi[$1+15]	# Disable use of default filter
 define	PS_NODEFMASK	Memi[$1+16]	# Disable use of default mask
-define	PS_BLOCK	Memi[$1+17]	# QPIO blocking factor
-define	PS_DEBUG	Memi[$1+18]	# debug level
-define	PS_OPTBUFSIZE	Memi[$1+19]	# QPIO/QPF FIO optimum buffer size 
+define	PS_XBLOCK	Memi[$1+17]	# QPIO blocking factor in X
+define	PS_YBLOCK	Memi[$1+18]	# QPIO blocking factor in Y
+define	PS_DEBUG	Memi[$1+19]	# debug level
+define	PS_OPTBUFSIZE	Memi[$1+20]	# QPIO/QPF FIO optimum buffer size 
 
 # Handy macros.
 define	IS_PUNCT	(IS_WHITE($1)||($1)==','||($1)=='\n')
@@ -588,7 +589,11 @@ begin
 	else if (streq (param[pp], "nodefmask"))
 	    PS_NODEFMASK(ps) = YES
 	else if (streq (param[pp], "blockfactor"))
-	    PS_BLOCK(ps) = value
+	    { PS_XBLOCK(ps) = value;  PS_YBLOCK(ps) = value }
+	else if (streq (param[pp], "xblockfactor"))
+	    PS_XBLOCK(ps) = value
+	else if (streq (param[pp], "yblockfactor"))
+	    PS_YBLOCK(ps) = value
 	else if (streq (param[pp], "debuglevel"))
 	    PS_DEBUG(ps) = value
 	else if (streq (param[pp], "optbufsize"))
@@ -641,7 +646,8 @@ begin
 	# Other parameters.
 	QP_NODEFFILT(qp) = qm_setpar (PS_NODEFFILT(ps), NO)
 	QP_NODEFMASK(qp) = qm_setpar (PS_NODEFMASK(ps), NO)
-	QP_BLOCK(qp) = qm_setpar (PS_BLOCK(ps), DEF_BLOCKFACTOR)
+	QP_XBLOCK(qp) = qm_setpar (PS_XBLOCK(ps), DEF_BLOCKFACTOR)
+	QP_YBLOCK(qp) = qm_setpar (PS_YBLOCK(ps), DEF_BLOCKFACTOR)
 	QP_OPTBUFSIZE(qp) = qm_setpar (PS_OPTBUFSIZE(ps), DEF_OPTBUFSIZE)
 	QP_DEBUG(qp) = qm_setpar (PS_DEBUG(ps), 0)
 end
@@ -705,7 +711,8 @@ begin
 	# Other parameters.
 	if (PS_NODEFFILT(ps) != 0)	QP_NODEFFILT(qp) = PS_NODEFFILT(ps)
 	if (PS_NODEFMASK(ps) != 0)	QP_NODEFMASK(qp) = PS_NODEFMASK(ps)
-	if (PS_BLOCK(ps) != 0)		QP_BLOCK(qp) = PS_BLOCK(ps)
+	if (PS_XBLOCK(ps) != 0)		QP_XBLOCK(qp) = PS_XBLOCK(ps)
+	if (PS_YBLOCK(ps) != 0)		QP_YBLOCK(qp) = PS_YBLOCK(ps)
 	if (PS_OPTBUFSIZE(ps) != 0)	QP_OPTBUFSIZE(qp) = PS_OPTBUFSIZE(ps)
 	if (PS_DEBUG(ps) != 0)		QP_DEBUG(qp) = PS_DEBUG(ps)
 end

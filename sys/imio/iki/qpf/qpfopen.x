@@ -11,9 +11,10 @@ include	"qpf.h"
 # QPF_OPEN -- Open a QPOE image.  New QPOE images can only be written by
 # calling QPOE directly; under IMIO, only READ_ONLY access is supported.
 
-procedure qpf_open (im, o_im,
+procedure qpf_open (kernel, im, o_im,
 	root, extn, ksection, cl_index, cl_size, acmode, status)
 
+int	kernel			#I IKI kernel
 pointer	im			#I image descriptor
 pointer	o_im			#I [not used]
 char	root[ARB]		#I root image name
@@ -24,7 +25,7 @@ int	cl_size			#I [not used]
 int	acmode			#I [not used]
 int	status			#O ok|err
 
-int	block, n
+int	xblock, yblock, n
 pointer	sp, qp, io, v, fname, qpf
 
 pointer	qp_open, qpio_open()
@@ -36,6 +37,14 @@ begin
 	call smark (sp)
 	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 	call salloc (v, SZ_FNAME, TY_CHAR)
+
+	io = NULL
+	qp = NULL
+	qpf = NULL
+
+	# The only valid cl_index for a QPOE image is -1 (none specified) or 1.
+	if (!(cl_index < 0 || cl_index == 1))
+	    goto err_
 
 	call malloc (qpf, LEN_QPFDES, TY_STRUCT)
 
@@ -66,16 +75,19 @@ begin
 	# factor from 1 to len(data[min|max]), i.e., the blocking factor
 	# serves as the index into these vectors.
 
-	if (io != NULL)
-	    block = max (1, qpio_stati (io, QPIO_BLOCKFACTOR))
-	else
-	    block = max (1, qp_stati (qp, QPOE_BLOCKFACTOR))
+	if (io != NULL) {
+	    xblock = max (1, qpio_stati (io, QPIO_XBLOCKFACTOR))
+	    yblock = max (1, qpio_stati (io, QPIO_YBLOCKFACTOR))
+	} else {
+	    xblock = max (1, qp_stati (qp, QPOE_XBLOCKFACTOR))
+	    yblock = max (1, qp_stati (qp, QPOE_YBLOCKFACTOR))
+	}
 	call strcpy ("datamax", Memc[v], SZ_FNAME)
 	n = qp_lenf (qp, Memc[v])
 
-	if (n >= block) {
+	if (n >= max(xblock,yblock)) {
 	    call sprintf (Memc[v+7], SZ_FNAME-7, "[%d]")
-		call pargi (block)
+		call pargi ((xblock+yblock+1)/2)
 	    IM_MAX(im) = qp_geti (qp, Memc[v])
 	    Memc[v+5] = 'i';  Memc[v+6] = 'n'
 	    IM_MIN(im) = qp_geti (qp, Memc[v])
@@ -96,12 +108,12 @@ begin
 
 	if (io != NULL) {
 	    IM_NDIM(im)  = qpio_getrange (io, QPF_VS(qpf,1), QPF_VE(qpf,1), 2)
-	    IM_LEN(im,1) = (QPF_VE(qpf,1) - QPF_VS(qpf,1) + 1) / block
-	    IM_LEN(im,2) = (QPF_VE(qpf,2) - QPF_VS(qpf,2) + 1) / block
+	    IM_LEN(im,1) = (QPF_VE(qpf,1) - QPF_VS(qpf,1) + 1) / xblock
+	    IM_LEN(im,2) = (QPF_VE(qpf,2) - QPF_VS(qpf,2) + 1) / yblock
 	} else {
 	    IM_NDIM(im)  = 2
-	    IM_LEN(im,1) = qp_geti (qp, "axlen[1]") / block
-	    IM_LEN(im,2) = qp_geti (qp, "axlen[2]") / block
+	    IM_LEN(im,1) = qp_geti (qp, "axlen[1]") / xblock
+	    IM_LEN(im,2) = qp_geti (qp, "axlen[2]") / yblock
 	    QPF_VS(qpf,1) = 1;	QPF_VE(qpf,1) = IM_LEN(im,1)
 	    QPF_VS(qpf,2) = 1;	QPF_VE(qpf,2) = IM_LEN(im,2)
 	}
@@ -121,7 +133,8 @@ begin
 	QPF_IM(qpf)	= im
 	QPF_QP(qpf)	= qp
 	QPF_IO(qpf)	= io
-	QPF_BLOCK(qpf)	= block
+	QPF_XBLOCK(qpf)	= xblock
+	QPF_YBLOCK(qpf)	= yblock
 	QPF_IOSTAT(qpf)	= 0
 
 	IM_KDES(im) = qpf

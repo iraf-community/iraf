@@ -11,7 +11,7 @@ include	"iki.h"
 
 procedure iki_opix (im)
 
-pointer	im			# image descriptor
+pointer	im			#I image descriptor
 int	status
 include	"iki.com"
 

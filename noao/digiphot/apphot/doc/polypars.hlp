@@ -7,7 +7,7 @@ USAGE
 polypars
 .ih
 PARAMETERS
-.ls zmag = 26.00
+.ls zmag = 25.00
 The zero point offset for the magnitude scale.
 .le
 .ls mkpolygon = no

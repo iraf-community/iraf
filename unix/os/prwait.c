@@ -61,7 +61,7 @@ int	pid;
 	register struct proctable *pr;
 	int	waitpid, error_code;
 	struct	proctable *pr_findpid();
-#ifdef SOLARIS
+#ifdef POSIX
 	int	exit_status;
 #else
 	union	wait exit_status;
@@ -94,7 +94,7 @@ int	pid;
 		    /* The integer argument to exit() is returned in the
 		     * wait struct defined in <sys/wait.h>.
 		     */
-#ifdef SOLARIS
+#ifdef POSIX
 		    error_code = WEXITSTATUS(exit_status);
 #else
 		    error_code = exit_status.w_T.w_Retcode;

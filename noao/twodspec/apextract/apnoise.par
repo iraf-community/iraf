@@ -1,6 +1,7 @@
 # APSIGMA
 
 input,s,a,,,,List of images to evaluate
+apertures,s,h,"",,,Apertures
 references,s,h,"",,,"List of reference images
 "
 dmin,r,a,,,,Data minimum for sigma bins

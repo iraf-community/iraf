@@ -173,8 +173,8 @@ replot_     RV_NEWGRAPH(rv) = NO
 		    } else {
 		        call malloc (filt, ofnpts, TY_REAL)
 		        call gclear (gp)
-		        if (RV_CONTINUUM(rv)==BOTH || 
-			    RV_CONTINUUM(rv)==OBJ_ONLY) {
+		        if (RV_CONTINUUM(rv) == BOTH || 
+			    RV_CONTINUUM(rv) == OBJ_ONLY) {
 		        	call amovr (OCONT_DATA(rv,1), Memr[filt], 
 				    RV_NPTS(RV))
 		                call split_plot (rv, gp, TOP, OCONT_DATA(rv,1),
@@ -241,8 +241,8 @@ replot_     RV_NEWGRAPH(rv) = NO
 		    } else {
 		        call malloc (filt, rfnpts, TY_REAL)
 		        call gclear (gp)
-		        if (RV_CONTINUUM(rv)==BOTH || 
-			    RV_CONTINUUM(rv)==TEMP_ONLY) {
+		        if (RV_CONTINUUM(rv) == BOTH || 
+			    RV_CONTINUUM(rv) == TEMP_ONLY) {
 		                call amovr (RCONT_DATA(rv,1), Memr[filt], 
 				    RV_RNPTS(rv))
 		                call split_plot (rv, gp, TOP, RCONT_DATA(rv,1),
@@ -299,43 +299,22 @@ procedure fft_plot (rv, flags)
 pointer	rv				#I RV struct pointer
 int	flags				#I Type of plot to draw
 
-pointer gp, sp, phase
-bool	streq()
-
 begin
 	# Get the graphics pointer and clear the workstation.
-	gp = RV_GP(rv)
-	if (gp != NULL)
-	    call gclear (gp)				
+	if (RV_GP(rv) != NULL)
+	    call gclear (RV_GP(rv))				
 	else
 	    return
-
-	call smark (sp)
-	call salloc (phase, RV_CCFNPTS(rv), TY_REAL)
 
 	# Call the plot primitives.
 	switch (flags) {
 	case AMPLITUDE_PLOT:
-	    if (!streq(IMAGE(rv),RIMAGE(rv)))
-	        call fft_fplot (rv, RVP_SPLIT_PLOT(rv))
-	    else {
-		RV_WHERE(rv) = TOP
-	        call fft_fplot (rv, SINGLE_PLOT)
-	    }
-
+	    call fft_fplot (rv, SPLIT_PLOT)
 	case POWER_PLOT:
-	    if (!streq(IMAGE(rv),RIMAGE(rv)))
-	        call fft_pplot (rv, RVP_SPLIT_PLOT(rv))
-	    else {
-		RV_WHERE(rv) = TOP
-	        call fft_pplot (rv, SINGLE_PLOT)
-	    }
-
+	    call fft_pplot (rv, SPLIT_PLOT)
 	default:
 	    call error (0, "Invalid FFT plot specification.")
 	}
-
-	call sfree (sp)
 end
 
 
@@ -442,7 +421,7 @@ begin
 end
 
 
-# PLOT_OVERLAY - Plot the filter function overlayed on the FFT plot.
+# FFT_OVERLAY - Plot the filter function overlayed on the FFT plot.
 
 procedure fft_fltoverlay (rv, gp, fnpts, y2)
 
@@ -626,7 +605,6 @@ pointer	gp
 real	period
 real	x1, x2, y1, y2, xx, yy
 int	fnpts, fft_pow2()
-bool	streq()
 
 begin
 	gp = RV_GP(rv)
@@ -635,13 +613,8 @@ begin
 
 	# Switch based on the plot flags.
 	call ggview (gp, x1, x2, y1, y2)
-	if (streq(IMAGE(rv),RIMAGE(rv))) {
-	    call gctran (gp, x, y, x, y, wcs, 2)
-	    call gctran (gp, x, y, xx, yy, 2, 0)
-	} else {
-	    call gctran (gp, x, y, x, y, wcs, 1)
-	    call gctran (gp, x, y, xx, yy, 1, 0)
-	}
+	call gctran (gp, x, y, x, y, wcs, 1)
+	call gctran (gp, x, y, xx, yy, 1, 0)
 
 	fnpts = fft_pow2 (max(RV_NPTS(rv),RV_RNPTS(rv))) / 2
 	if (xx < x1 || xx > x2) {		# outside plot window

@@ -54,6 +54,9 @@ density distribution.
 .ls sseed = 1
 The initial value supplied to the random number generator used to
 generate the output x and y coordinates.
+If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each excution.
 .le
 
 			MAGNITUDE DISTRIBUTION
@@ -104,6 +107,9 @@ The parameters of the Bahcall and Soneira luminosity function.
 .ls lseed = 1
 The intial value supplied to the random number generator used to
 generate the output magnitudes.
+If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each excution.
 .le
 
 			USER FUNCTIONS
@@ -328,6 +334,12 @@ creating a data file.
 	    ... type = to make a copy of any of the plots
 	    ... type q to quit
 .fi
+.ih
+REVISIONS
+.ls STARLIST V2.11+
+The random number seeds can be set from the clock time by using the value
+"INDEF" to yield different random numbers for each execution.
+.le
 .ih
 BUGS
 The spline approximation to the spatial density and luminosity

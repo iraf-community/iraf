@@ -1,5 +1,53 @@
 .help revisions Jan90 noao.digiphot.daophot
 .nf
+daophot/allstar/dpalinit.x
+    Fixed an uninitialized memory problem that was occurring on the Dec
+    ALPHA if cache=no and readnoise=0.0. This part of memory was never
+    used by the code, but was being written to a scratch image of type real,
+    which could result in an FPE if the affected memory was not a valid
+    FP number. A similar problem was was fixed for the cache=yes situtation
+    awhile back.
+
+    Davis, Nov 12, 1997
+
+daophot/psf/dpfitpsf.x
+    Fixed a bug in the psf task that was causing the fits image kernel to
+    crash when opening a new image, but apparently did not affect the oif
+    or stf kernels in any way. 
+
+    Davis, June 23, 1997
+
+daophot/daotest.cl
+    Modified the rfits calling sequence so that the test script will work
+    correctly with the new version of rfits.
+
+    Davis, May 29, 1997
+
+daophot$psf/mkpkg
+daophot$psf/dprstars.x
+daophot$psf/dpspstars.x
+daophot$psf/dpispstars.x
+    The pstselect and psf tasks were not reinitializing the psf star list
+    correctly when more than one image was being processed,  resulting in
+    psf stars on successive images which have the same ids as psf stars
+    in previous images being incorrectly rejected or include in the psf star
+    list.
+
+    Davis, Feb 21, 1997
+
+
+daophot$psf/dpmkpsf.x
+    The id number and magnitude arguments were reversed in the 'f' keystroke
+    command call to the routine dp_addstar. This should only cause trouble
+    if the psf star list need to be reread.
+
+    Davis, July 18, 1996
+
+daophot$doc/phot.hlp
+    Fixed a typo in the ERRORS section of the phot help page.
+
+    Davis, April 11, 1996
+
 daophot$daolib/dpinit.x
 daophot$psf/dpfitpsf.x
 daophot$psf/dppsfutil.x

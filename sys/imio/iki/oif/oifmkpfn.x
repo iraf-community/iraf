@@ -26,6 +26,9 @@ string	pixextn OIF_PIXEXTN
 errchk	fmkdir, imerr
 
 begin
+	# Clear junk text at the end of the filename.
+	call aclrc (IM_PIXFILE(im), SZ_IMPIXFILE)
+
 	# Check for the null image.
 	if (fnullfile (IM_HDRFILE(im))) {
 	    call strcpy ("dev$null", IM_PIXFILE(im), SZ_IMPIXFILE)

@@ -33,6 +33,7 @@ bool	scattered	{prompt="Subtracted scattered light?"}
 bool	arcap		{prompt="Use object apertures for arcs?"}
 bool	dispcor		{prompt="Dispersion correct spectra?"}
 bool	savearcs	{prompt="Save internal arcs?"}
+bool	skyalign	{prompt="Align sky lines?"}
 bool	skysubtract	{prompt="Subtract sky?"}
 bool	saveskys	{prompt="Save sky spectra?\n"}
 
@@ -47,6 +48,9 @@ begin
 	int	i
 
 	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	mstype = ".ms" // imtype
 
 	objs = mktemp ("tmp$iraf")
@@ -245,17 +249,20 @@ begin
 		if (i < 1)
 		    print ("No arc reference assigned for ", spec, >> logfile)
 		else {
+		    if (skyalign)
+			doalign (spec, specms, "align"//extn//imtype,
+			    arcref1//extn, logfile, yes)
 	            print ("Dispersion correct ", spec, >> logfile)
 		    dispcor (specms, "", linearize=params.linearize,
 			database=database, table=arcref1//extn, w1=INDEF,
 			w2=INDEF, dw=INDEF, nw=INDEF, log=params.log,
-			flux=params.flux, samedisp=no, global=no,
+			flux=params.flux, samedisp=yes, global=no,
 			ignoreaps=no, confirm=no, listonly=no, verbose=no,
 			logfile=logfile)
 		    if (params.nsubaps > 1) {
 			imrename (specms, temp, verbose=no)
 			scopy (temp, specms, w1=INDEF, w2=INDEF,
-			    apertures="-999", bands="", beams="", apmodulus=0,
+			    apertures="1-999", bands="", beams="", apmodulus=0,
 			    offset=0, format="multispec", clobber=no, merge=no,
 			    renumber=no, verbose=no)
 			blkavg (temp, temp, 1, params.nsubaps, option="sum")

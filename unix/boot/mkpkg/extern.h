@@ -10,6 +10,7 @@ extern	int	nsymbols;		/* number of defined symbols	*/
 extern	int	ifstate[];		/* $IF stack			*/
 extern	int	iflev;			/* $IF stack pointer		*/
 extern	int	debug;			/* print debug messages		*/
+extern	int	dbgout;			/* compile for debugging	*/
 extern	int	verbose;		/* print informative messages	*/
 extern	int	ignore;			/* ignore warns			*/
 extern	int	execute;		/* think but don't act?		*/

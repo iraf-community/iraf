@@ -4,7 +4,12 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#ifdef SOLARIS
+#ifdef LINUX
+/* Necessary to get DIR.dd_fd on Linux systems. */
+#define DIRENT_ILLEGAL_ACCESS
+#endif
+
+#ifdef POSIX
 #include <dirent.h>
 #else
 #include <sys/dir.h>
@@ -128,7 +133,12 @@ XINT	*chan;
 	dp->entry = 0;
 	dp->dir = dir;
 
+#ifdef REDHAT
+	fd = dirfd(dir);
+#else
 	fd = dir->dd_fd;		/* MACHDEP */
+#endif
+
 	zfd[fd].fp = (FILE *)dp;
 
 	*chan = fd;
@@ -198,7 +208,7 @@ int	maxch;
 	register char *ip, *op;
 	register int n;
 	int status;
-#ifdef SOLARIS
+#ifdef POSIX
 	register struct	dirent *dp;
 #else
 	register struct	direct *dp;
@@ -206,7 +216,7 @@ int	maxch;
 
 	for (dp = readdir(dir);  dp != NULL;  dp = readdir(dir))
 	    if (dp->d_ino != 0) {
-#ifdef SOLARIS
+#ifdef POSIX
 		n = strlen (dp->d_name);
 #else
 		n = (dp->d_namlen < maxch) ? dp->d_namlen : maxch;

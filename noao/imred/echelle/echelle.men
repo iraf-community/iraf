@@ -21,6 +21,7 @@
      ecidentify - Identify features in spectrum for dispersion solution
    ecreidentify - Automatically identify features in spectra
      refspectra - Assign wavelength reference spectra to other spectra
+     sapertures - Set or change aperture header information
 	 sarith - Spectrum arithmetic
        scombine - Combine spectra
           scopy - Select and copy apertures in different spectral formats

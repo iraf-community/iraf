@@ -13,7 +13,7 @@ define	RIGHT	2	# Fit to right edge
 define	BOTH	3	# Fit to both edges
 
 procedure eqwidth_cp (sh, gfd, center, cont, ylevel, y, n, key, fd1, fd2,
-	xg, yg, sg, ng)
+	xg, yg, sg, lg, pg, ng)
 
 pointer	sh
 int	gfd
@@ -22,11 +22,11 @@ real	y[n]
 int	n
 int	key
 int	fd1, fd2
-pointer	xg, yg, sg		# Pointers to fit parameters
+pointer	xg, yg, sg, lg, pg	# Pointers to fit parameters
 int	ng			# Number of components
 
 int	i, i1, i2, isrch, icore, edge
-real	xleft, xright, rcore, rinter, yl, sigma, flux, eqw, w, w1, w2
+real	xleft, xright, rcore, rinter, yl, gfwhm, lfwhm, flux, eqw, w, w1, w2
 real	pi, xpara[3], coefs[3], xcore, ycore
 double	shdr_lw(), shdr_wl()
 
@@ -137,17 +137,17 @@ begin
 	w2 = shdr_lw (sh, double(xright))
 
 	# Apply Gaussian model
-	sigma = (w2 - w1) / 2. / sqrt (2. * log (rcore/rinter))
+	gfwhm = 1.665109 * abs (w2 - w1) / 2. / sqrt (log (rcore/rinter))
+	lfwhm = 0.
 	rcore = ycore - cont
-	flux = rcore * sigma * sqrt (2. * pi)
+	flux = 1.064467 * rcore * gfwhm
 	eqw = -flux / cont
 
 	call printf (
-	    "center = %9.7g, eqw = %9.4g, sigma = %9.4g, fwhm = %9.4g\n")
+	    "center = %9.7g, eqw = %9.4g, gfwhm = %9.4g\n")
 	    call pargr (w)
 	    call pargr (eqw)
-	    call pargr (sigma)
-	    call pargr (2.355 * sigma)
+	    call pargr (gfwhm)
 
 	if (fd1 != NULL) {
 	    call fprintf (fd1, " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
@@ -156,8 +156,8 @@ begin
 		call pargr (flux)
 		call pargr (eqw)
 		call pargr (ycore - cont)
-		call pargr (sigma)
-		call pargr (2.355 * sigma)
+		call pargr (gfwhm)
+		call pargr (lfwhm)
 	}
 	if (fd2 != NULL) {
 	    call fprintf (fd2, " %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
@@ -166,21 +166,21 @@ begin
 		call pargr (flux)
 		call pargr (eqw)
 		call pargr (ycore - cont)
-		call pargr (sigma)
-		call pargr (2.355 * sigma)
+		call pargr (gfwhm)
+		call pargr (lfwhm)
 	}
 
 	# Mark line computed
 	call gline (gfd, w, cont, w, ycore)
 	call gline (gfd, w1, yl, w2, yl)
 
-	w1 = w - 3 * sigma
-	w2 = cont + rcore * exp (-0.5*((w1-w)/sigma)**2)
+	w1 = w - 2 * gfwhm
+	w2 = cont + rcore * exp (-(1.665109*(w1-w)/gfwhm)**2)
 	call gseti (gfd, G_PLTYPE, 2)
 	call gseti (gfd, G_PLCOLOR, 2)
 	call gamove (gfd, w1, w2)
-	for (; w1 <= w+3*sigma; w1=w1+0.1*sigma) {
-	    w2 = cont + rcore * exp (-0.5*((w1-w)/sigma)**2)
+	for (; w1 <= w+2*gfwhm; w1=w1+0.05*gfwhm) {
+	    w2 = cont + rcore * exp (-(1.665109*(w1-w)/gfwhm)**2)
 	    call gadraw (gfd, w1, w2)
 	}
 	call gseti (gfd, G_PLTYPE, 1)
@@ -191,14 +191,20 @@ begin
 	    call malloc (xg, 1, TY_REAL)
 	    call malloc (yg, 1, TY_REAL)
 	    call malloc (sg, 1, TY_REAL)
+	    call malloc (lg, 1, TY_REAL)
+	    call malloc (pg, 1, TY_INT)
 	} else if (ng != 1) {
 	    call realloc (xg, 1, TY_REAL)
 	    call realloc (yg, 1, TY_REAL)
-	    call realloc (sg, 1, TY_REAL)
+	    call realloc (sg, 1, TY_INT)
+	    call realloc (lg, 1, TY_INT)
+	    call realloc (pg, 1, TY_INT)
 	}
 	Memr[xg] = w
 	Memr[yg] = rcore
-	Memr[sg] = sigma
+	Memr[sg] = gfwhm
+	Memr[lg] = lfwhm
+	Memi[pg] = 1
 	ng = 1
 end
 

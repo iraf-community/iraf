@@ -19,6 +19,7 @@ int	cvstati()
 
 begin
 	function = cvstati (cv, CVTYPE)
+	ncoeff = cvstati (cv, CVNCOEFF)
 
 	if (function != LEGENDRE && function != CHEBYSHEV) {
 	    call eprintf ("Cannot convert coefficients - wrong function type\n")

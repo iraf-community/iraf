@@ -13,7 +13,14 @@ int	param			#I parameter to be queried
 begin
 	switch (param) {
 	case QPOE_BLOCKFACTOR:			# standard params
-	    return (QP_BLOCK(qp))
+	    if (QP_XBLOCK(qp) == QP_YBLOCK(qp))
+		return (QP_XBLOCK(qp))
+	    else
+		return (ERR)
+	case QPOE_XBLOCKFACTOR:
+	    return (QP_XBLOCK(qp))
+	case QPOE_YBLOCKFACTOR:
+	    return (QP_YBLOCK(qp))
 	case QPOE_BUCKETLEN:
 	    return (QP_BUCKETLEN(qp))
 	case QPOE_CACHESIZE:

@@ -1,17 +1,14 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include	"gsurfitdef.h"
 
 # GSSAVE -- Procedure to save the surface fit for later use by the
-# evaluate routines. After a call to SIFSAVE the first six elements
+# evaluate routines. After a call to GSSAVE the first eight elements
 # of fit contain the surface type, xorder (or number of polynomial pieces
-# in x), yorder (or the number of polynomial pieces in y), xterms, ncols
-# and nlines. The remaining spaces are filled by the GS_NYCOEFF(sf) *
-# GS_NXCOEFF(sf) surface coefficients. The coefficient of B(i,x) * B(j,y)
-# is located in element number 6 + (i - 1) * GS_NYCOEFF(sf) + j of the
-# array fit where i <= GS_NXCOEFF(sf) and j <= GS_NYCOEFF(sf).
+# in x), yorder (or the number of polynomial pieces in y), xterms, xmin,
+# xmax, ymin, and ymax. The remaining spaces are filled by the GS_NCOEFF(sf)
+# coefficients.
 
 procedure gssave (sf, fit)
 

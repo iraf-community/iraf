@@ -287,7 +287,12 @@ begin
 		        abs (density[cols[i]+j,ptrs[ymiddle-k]])
 		}
 	    }
-	    round[i] = 2.0 * sum2 / sum4
+	    if (sum2 == 0.0)
+		round[i] = 0.0
+	    else if (sum4 <= 0.0)
+		round[i] = INDEFR
+	    else
+	        round[i] = 2.0 * sum2 / sum4
 
 	    satur[i] = NO
 
@@ -325,7 +330,7 @@ begin
 	    }
 
 	    # Compute the sharpness statistic.
-	    if (density[cols[i],ptrs[ymiddle]] <= 0.0)
+	    if (density[cols[i],ptrs[ymiddle]] <= 0.0 || npixels <= 0)
 		sharps[i] = INDEFR
 	    else
 	        sharps[i] = (midpix - skymode - sharp / real (npixels)) /
@@ -452,7 +457,10 @@ begin
 	    dx = (sgdgdx - (sddgdx - sdgdx * (hx * sumg + skylvl * p))) /
 		(hx * sdgdxsq / xsigsq)
 	    if (abs (dx) > xhalf) {
-		dx = sumdx / sumd 
+		if (sumd == 0.0)
+		    dx = 0.0
+		else
+		    dx = sumdx / sumd 
 		if (abs (dx) > xhalf)
 		    dx = 0.0
 	    }
@@ -532,7 +540,10 @@ begin
 	    dy = (sgdgdx - (sddgdx - sdgdx * (hy * sumg + skylvl * p))) /
 		(hy * sdgdxsq / ysigsq)
 	    if (abs (dy) > yhalf) {
-		dy = sumdx / sumd 
+		if (sumd == 0.0)
+		    dy = 0.0
+		else
+		    dy = sumdx / sumd 
 		if (abs (dy) > yhalf)
 		    dy = 0.0
 	    }

@@ -151,7 +151,11 @@ mean over all fibers.
 .IP [9]
 If dispersion correction is selected the first arc in the arc list is
 extracted.  The middle fiber is used to identify the arc lines and define
-the dispersion function using the task \fBidentify\fR.  Identify a few arc
+the dispersion function using the task \fBautoidentify\fR.  The
+\fIcrval\fR and \fIcdelt\fR parameters are used in the automatic
+identification.  Whether or not the automatic identification is
+successful you will be shown the result of the arc line identification.
+If the automatic identification is not successful identify a few arc
 lines with 'm' and use the 'l' line list identification command to
 automatically add additional lines and fit the dispersion function.  Check
 the quality of the dispersion function fit with 'f'.  When satisfied exit
@@ -302,6 +306,8 @@ objects =               List of object spectra
 (datamax=        INDEF) Max data value / cosmic ray threshold
 (fibers =            3) Number of fibers
 (width  =           6.) Width of profiles (pixels)
+(crval  =        INDEF) Approximate wavelength
+(cdelt  =        INDEF) Approximate dispersion
 (objaps =            2) Object apertures
 (arcaps =          1,3) Arc apertures
 
@@ -333,7 +339,14 @@ assign arc spectra to particular object spectra and the format
 of the file is described in \fBrefspectra\fR.
 .LP
 The detector read out noise and gain are used for cleaning and variance
-(optimal) extraction.  The dispersion axis defines the wavelength direction
+(optimal) extraction.
+The variance
+weighting and cosmic-ray cleanning are sensitive to extremely strong
+cosmic-rays; ones which are hundreds of times brighter than the
+spectrum.  The \fIdatamax\fR is used to set an upper limit for any
+real data.  Any pixels above this value will be flagged as cosmic-rays
+and will not affect the extractions.
+The dispersion axis defines the wavelength direction
 of spectra in the image if not defined in the image header by the keyword
 DISPAXIS.  The width parameter (in pixels) is used for the profile finding and
 centering algorithm (\fBcenter1d\fR).
@@ -345,6 +358,13 @@ numbers sequentially.  The object and arc fibers are identified
 by these aperture numbers as specified by the \f(CWobjaps\fR and
 \f(CWarcaps\fR parameters.  The defaults are for the case of three
 fibers in the sequence arc fiber, object fiber, and arc fiber.
+.LP
+The approximate central wavelength and dispersion are used for the
+automatic identification of the arc reference.  They may be specified
+as image header keywords or values.  The INDEF values search the
+entire range of the coordinate reference file but the automatic
+line identification algorithm works much better and faster if
+approximate values are given.
 .LP
 The next set of parameters select the processing steps and options.  The
 scattered light option allows fitting and subtracting a scattered light
@@ -689,19 +709,18 @@ evenly spaced pixels in wavelength.
 .LP
 The first arc spectrum in the arc list is used to define the reference
 dispersion solution.  It is extracted using the reference aperture
-definitions.  The interactive task \fBidentify\fR is used
-to define the dispersion function in one fiber.  The idea is to mark some
-lines whose wavelengths are known (with the line list used
-to supply additional lines after the first few identifications define the
-approximate wavelengths) and to fit a function giving the wavelength from
-the pixel position.  The dispersion functions for
-the other fibers are then determined automatically by reference to the first
-fiber using the task \fBreidentify\fR.  Except in batch mode a query
-is given allowing the reidentified arc spectra to be examined interactively
-with \fBidentify\fR.  This would normally be done only if the information
-about the reidentification printed on the terminal indicates a problem
-such as a large increase in the RMS.  This query may be eliminated in the
-usual way.
+definitions.  The interactive task \fBautoidentify\fR is used to
+automatically define the dispersion function in one fiber.  Whether or not
+it is successful the user is presented with the interactive identification
+graph.  The automatic identifications can be reviewed and a new solution or
+corrections to the automatic solution may be performed.  The dispersion
+functions for the other fibers are then determined automatically by
+reference to the first fiber using the task \fBreidentify\fR.  Except in
+batch mode a query is given allowing the reidentified arc spectra to be
+examined interactively with \fBidentify\fR.  This would normally be done
+only if the information about the reidentification printed on the terminal
+indicates a problem such as a large increase in the RMS.  This query may be
+eliminated in the usual way.
 .LP
 The set of arc dispersion function parameters are from \fBidentify\fR and
 \fBreidentify\fR.  The parameters define a line list for use in
@@ -944,6 +963,13 @@ width = 6. (apedit)
 Approximate base full width of the fiber profiles.  This parameter is used
 for the profile centering algorithm.
 .LE
+crval = INDEF, cdelt = INDEF (autoidentify)
+.LS
+These parameters specify an approximate central wavelength and dispersion.
+They may be specified as numerical values, INDEF, or image header keyword
+names whose values are to be used.  If one or both of these parameters are
+specified as INDEF the search for a solution will be slower and more likely
+to fail.
 .LE
 objaps = "2", arcaps = "1,3"
 .LS
@@ -1228,22 +1254,22 @@ order specifying the number of pieces.
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
 
-threshold = 10. (identify/reidentify)
+threshold = 10. (autoidentify/identify/reidentify)
 .LS
 In order for a feature center to be determined the range of pixel intensities
 around the feature must exceed this threshold.
 .LE
-coordlist = "linelists$idhenear.dat" (identify)
+coordlist = "linelists$idhenear.dat" (autoidentify/identify)
 .LS
 Arc line list consisting of an ordered list of wavelengths.
 Some standard line lists are available in the directory "linelists$".
 .LE
-match = 10. (identify)
+match = -3. (autoidentify/identify)
 .LS
 The maximum difference for a match between the dispersion function prediction
 value and a wavelength in the coordinate list.
 .LE
-fwidth = 3.5 (identify)
+fwidth = 3.5 (autoidentify/identify)
 .LS
 Approximate full base width (in pixels) of arc lines.
 .LE
@@ -1251,13 +1277,13 @@ cradius = 4. (reidentify)
 .LS
 Radius from previous position to reidentify arc line.
 .LE
-i_function = "legendre", i_order = 3 (identify)
+i_function = "legendre", i_order = 3 (autoidentify/identify)
 .LS
 The default function and order to be fit to the arc wavelengths as a
 function of the pixel coordinate.  The functions choices are "chebyshev",
 "legendre", "spline1", or "spline3".
 .LE
-i_niterate = 3, i_low = 3.0, i_high = 3.0 (identify)
+i_niterate = 3, i_low = 3.0, i_high = 3.0 (autoidentify/identify)
 .LS
 Number of rejection iterations and sigma thresholds for rejecting arc
 lines from the dispersion function fits.

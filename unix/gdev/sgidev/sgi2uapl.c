@@ -84,9 +84,7 @@ struct sgi_inst {
 /* Commands to setup Postscript environment.
  */
 static char *ps_init[] = {
-	"%!PS-Adobe-1.0",
-	"%%Creator: sgi2uapl (IRAF Graphics)",
-	"",
+	"%!PS",
 	"/devppi 300 def",
 	"/userppi 72 def",
 	"/pagewidth 8.5 def",
@@ -354,13 +352,17 @@ FILE	*out;
 		    }
 		    break;
 
-		case SGK_SETLW:
+		case SGK_SETLW: {
 		    /* Set pen width.
 		     */
+		    int x = max (0, sgi->x - 1);
+
 		    xy_flush (out);
 		    curpoints = 0;
-		    fwrite (penencode (dev_penbase + ((sgi->x) - 1) *
-			dev_penslope, DEV_SETLW), SZ_PENCMD, 1, out);
+		    fwrite (penencode (
+			max (1, dev_penbase + x * dev_penslope), DEV_SETLW),
+			SZ_PENCMD, 1, out);
+		    }
 		    break;
 		
 		default:

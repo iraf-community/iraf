@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<config.h>
+include	<mach.h>
 include	<fset.h>
 include	<fio.h>
 
@@ -17,7 +18,8 @@ task	mpp	= t_mpp,
 	many	= t_many,
 	server	= t_server,
 	client	= t_client,
-	daytime = t_daytime
+	daytime = t_daytime,
+	http	= t_http
 
 
 define 	SZ_BUF		2048
@@ -355,6 +357,60 @@ begin
 	    call printf ("%s\n")
 		call pargstr (line)
 	}
+
+	call close (fd)
+end
+
+
+# HTTP -- Connect to a HTTP server on the given host, read a URL and print
+# what it returns.
+
+procedure t_http()
+
+bool	done
+int	fd, nchars, lastch
+char	hostname[SZ_FNAME], buf[SZ_BUF]
+char	netpath[SZ_LINE], path[SZ_LINE]
+int	ndopen(), read()
+
+begin
+	# Connect to HTTP server (default port 80) on the given host.
+	call clgstr ("host", hostname, SZ_FNAME)
+	call sprintf (netpath, SZ_LINE, "inet:80:%s:text")
+	    call pargstr (hostname)
+	iferr (fd = ndopen (netpath, READ_WRITE)) {
+	    call printf ("cannot access host\n")
+	    return
+	}
+
+	# Get the URL/URI (file pathname) to be read.
+	call clgstr ("path", path, SZ_LINE)
+
+	# Send the get-url request to the server.
+	call fprintf (fd, "GET %s HTTP/1.0\n\n")
+	    call pargstr (path)
+	call flush (fd)
+
+	# Read and print the given URL.  The returned text consists of the
+	# HTTP protocol header, a blank line, then the document text.
+	# Since this is a debug routine we output the protocol header as
+	# well as the document, but a real program would probably strip
+	# the header since it is not part of the document data.
+
+	repeat {
+	    call fseti (fd, F_CANCEL, OK)
+	    nchars = read (fd, buf, SZ_BUF)
+	    if (nchars > 0) {
+		buf[nchars+1] = EOS
+		call putline (STDOUT, buf)
+		lastch = buf[nchars]
+		done = false
+	    } else
+		done = true
+	} until (done)
+
+	if (lastch != '\n')
+	    call putline (STDOUT, "\n")
 
 	call close (fd)
 end

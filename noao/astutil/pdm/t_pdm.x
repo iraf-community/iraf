@@ -49,13 +49,10 @@ begin
 	PDM_NTHPT(pdmp) = clgeti ("ntheta")
 	autoranges = clgetb ("autoranges")
 	PDM_NSIGMA(pdmp) = double(clgetr ("nsigma"))
-	PDM_DEBUG(pdmp) = clgetb ("debug")
 	PDM_PLUSPOINT(pdmp) = clgeti ("pluspoint")
 
 	# Read in the data.
 	PDM_NPT(pdmp) = pdm_gdata (pdmp, infile)
-
-#	PDM_DEBUG(pdmp) = false
 
 	# If the autoranges flag is set, call the autorange subroutine.
 	if (autoranges)

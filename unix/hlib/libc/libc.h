@@ -3,10 +3,17 @@
  * use the IRAF runtime C library.
  */
 
+#ifndef D_libc
+#ifndef D_spp
+#ifndef import_spp
+#include <spp.h>
+#endif
+#endif
+
 #define	XCHAR		short
 #define	XINT		int
 #define	SZ_DEFIOBUF	1024
-#define	FIO_MAXFD	128
+#define	FIO_MAXFD	256
 
 #define	FIOCOM		fiocom_		/* [MACHDEP] */
 #define	MEMCOM		mem_
@@ -108,3 +115,4 @@ extern	char		MEMCOM[];
 #endif
 
 #define	D_libc
+#endif

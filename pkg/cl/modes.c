@@ -29,7 +29,7 @@
 #define	DELAY_MULT	1.4
 #define	MAXDELAY	(60*5)		/* sleep at most 5 minutes	*/
 #define	BKQ_TIMEOUT	(60*60*3)	/* time out after 3 hours	*/
-#define	SZ_PROMPTBUF	512		/* avoid string overflow	*/
+#define	SZ_PROMPTBUF	SZ_LINE		/* avoid string overflow	*/
 
 extern	int cldebug;
 extern	char *eofstr;

@@ -114,6 +114,7 @@
 #define	GPATMATCH	gpatmh_
 #define	GSTRMATCH	gstrmh_
 #define	GTR_GFLUSH	gtrgfh_
+#define	IMACCESS	imaccs_
 #define	IMDRCUR		imdrcr_
 #define	IRAF_MAIN	irafmn_
 #define	XISATTY		xisaty_

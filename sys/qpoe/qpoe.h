@@ -17,9 +17,7 @@ define	MAX_REDEF	20		# max entries for a symbol
 define	MAX_FIELDS	50		# max fields in a user structure
 define	INC_STRLEN	32		# unit of storage for strings
 define	LEN_PVAL	64		# max TY_USER struct size (in doubles)
-define	SZ_QPDFNAME	63		# max size QPOE filename
-define	SZ_COMMENT	79		# size of comment string
-define	SZ_DATATYPE	79		# size of datatype name string
+define	SZ_QPDFNAME	255		# max size QPOE filename
 define	SZ_TEXTBUF	2048		# handy text buffer for macro expansion
 define	SZ_TOKBUF	256		# token buffer size
 
@@ -28,7 +26,7 @@ define	LF_QPOE 	1		# QPOE file header and symbol table
 define	LF_STATICPARS	2		# static (fixed size) params
 define	QPOE_MAGIC	121120B		# QPOE magic code (descriptor type)
 define	QPOE_VERSION	101		# QPOE interface version number
-define	QPOE_TITLE	"QPOE-V1.1"	# title string, for symbol table
+define	QPOE_TITLE	"QPOE-V1.2"	# title string, for symbol table
 define	QPOE_EXTN	".qp"		# QPOE file extension
 define	QPOE_MACROEXTN	".qpm"		# QPOE macro definitions file extension
 define	QPWCS		"qpwcs"		# header parameter for default WCS
@@ -36,7 +34,7 @@ define	IMMEDIATE	0		# for qp_sizeof
 define	INSTANCEOF	1		# for qp_sizeof
 
 # The main QPOE descriptor.
-define	LEN_QPDES	95
+define	LEN_QPDES	160
 define	QP_MAGIC	Memi[$1]	# descriptor type code
 define	QP_VERSION	Memi[$1+1]	# QPOE version number
 define	QP_ACTIVE	Memi[$1+2]	# descriptor fully activated
@@ -63,11 +61,12 @@ define	QP_STSBUFSIZE	Memi[$1+22]	# SYMTAB sbuf size (start)
 define	QP_STOFFSET	Memi[$1+23]	# lfile offset of stored symbol table
 define	QP_MODIFIED	Memi[$1+24]	# QPOE descriptor has been modified
 define	QP_DEBUG	Memi[$1+25]	# global debug level (debug messages)
-define	QP_BLOCK	Memi[$1+26]	# default blocking factor for QPIO
-define	QP_OPTBUFSIZE	Memi[$1+27]	# optimum buffer size for IMIO/QPF/FIO
-define	QP_NODEFFILT	Memi[$1+28]	# disable use of default filter
-define	QP_NODEFMASK	Memi[$1+29]	# disable use of default mask
-define	QP_DFNAME	Memc[P2C($1+30)] # QPOE filename (for messages)
+define	QP_XBLOCK	Memi[$1+26]	# default X blocking factor for QPIO
+define	QP_YBLOCK	Memi[$1+27]	# default Y blocking factor for QPIO
+define	QP_OPTBUFSIZE	Memi[$1+28]	# optimum buffer size for IMIO/QPF/FIO
+define	QP_NODEFFILT	Memi[$1+29]	# disable use of default filter
+define	QP_NODEFMASK	Memi[$1+30]	# disable use of default mask
+define	QP_DFNAME	Memc[P2C($1+31)] # QPOE filename (for messages)
 
 # Symbol descriptor.
 define	LEN_SYMBOL	9

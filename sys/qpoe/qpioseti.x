@@ -26,11 +26,20 @@ begin
 	# Set the named parameter.
 	switch (param) {
 	case QPIO_BLOCKFACTOR:
-	    IO_BLOCK(io) = value
+	    IO_XBLOCK(io) = value
+	    IO_YBLOCK(io) = value
+	case QPIO_XBLOCKFACTOR:
+	    IO_XBLOCK(io) = value
+	case QPIO_YBLOCKFACTOR:
+	    IO_YBLOCK(io) = value
 	case QPIO_EVXOFF:
 	    IO_EVXOFF(io) = value
 	case QPIO_EVYOFF:
 	    IO_EVYOFF(io) = value
+	case QPIO_EVXTYPE:
+	    IO_EVXTYPE(io) = value
+	case QPIO_EVYTYPE:
+	    IO_EVYTYPE(io) = value
 	case QPIO_NOINDEX:
 	    IO_NOINDEX(io) = value
 	case QPIO_NODEFFILT:

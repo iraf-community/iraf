@@ -8,25 +8,27 @@ include	"stf.h"
 
 # STF_OPEN -- Open/create an STF group format image.
 
-procedure stf_open (im, o_im,
+procedure stf_open (kernel, im, o_im,
 	root, extn, ksection, gr_arg, gc_arg, acmode, status)
 
-pointer	im			# image descriptor
-pointer	o_im			# other descriptor for NEW_COPY image
-char	root[ARB]		# root image name
-char	extn[ARB]		# extension, if any
-char	ksection[ARB]		# NOT USED
-int	gr_arg			# index of group to be accessed
-int	gc_arg			# number of groups in STF image
-int	acmode			# access mode
-int	status
+int	kernel			#I IKI kernel
+pointer	im			#I image descriptor
+pointer	o_im			#I other descriptor for NEW_COPY image
+char	root[ARB]		#I root image name
+char	extn[ARB]		#I extension, if any
+char	ksection[ARB]		#I NOT USED
+int	gr_arg			#I index of group to be accessed
+int	gc_arg			#I number of groups in STF image
+int	acmode			#I access mode
+int	status			#O return value
 
+bool	subimage
 pointer	sp, fname, stf, stf_extn, ua, o_stf
 int	group, gcount, newimage, gpb, hdr, o_stflen
 
-bool	fnullfile()
+bool	fnullfile(), envgetb()
 int	open(), stropen(), access()
-errchk	stf_initwcs, fmkcopy, calloc, realloc
+errchk	stf_initwcs, fmkcopy, calloc, realloc, syserrs
 define	err_ 91
 
 begin
@@ -43,7 +45,7 @@ begin
 	group  = max (1, gr_arg)
 	gcount = max (group, gc_arg)
 
-	STF_GRARG(stf)	= gr_arg
+	STF_GRARG(stf)	= max (0, gr_arg)
 	STF_GROUP(stf)  = group
 	STF_GCOUNT(stf) = gcount
 	STF_ACMODE(stf) = acmode
@@ -59,13 +61,13 @@ begin
 
 	newimage = NO
 	if (acmode == NEW_IMAGE || acmode == NEW_COPY)
-	    if (gc_arg > 0 || (gr_arg == 0 && gc_arg == 0))
-		newimage= YES
+	    if (gc_arg > 0 || (gr_arg <= 0 && gc_arg <= 0))
+		newimage = YES
 	STF_NEWIMAGE(stf) = newimage
 
 	# Generate full header file name.
 	if (extn[1] == EOS) {
-	    call stf_gethdrextn (Memc[stf_extn], MAX_LENEXTN)
+	    call stf_gethdrextn (im, o_im, acmode, Memc[stf_extn], MAX_LENEXTN)
 	    call iki_mkfname (root, Memc[stf_extn], Memc[fname], SZ_PATHNAME)
 	    call strcpy (Memc[stf_extn], extn, MAX_LENEXTN)
 	} else
@@ -84,9 +86,18 @@ begin
 	# we must create a new header file with FMKCOPY rather than OPEN.
 
 	if (STF_NEWIMAGE(stf) == YES && !fnullfile (IM_HDRFILE(im))) {
-	    if (access (IM_HDRFILE(im), 0,0) == YES)
-		iferr (call syserrs (SYS_FCLOBBER, IM_HDRFILE(im)))
-		    goto err_
+	    if (access (IM_HDRFILE(im), 0,0) == YES) {
+		subimage = (gr_arg > 0 && gr_arg <= gc_arg)
+		if (subimage || envgetb ("imclobber")) {
+		    iferr (call delete (IM_PIXFILE(im)))
+			goto err_
+		    iferr (call delete (IM_HDRFILE(im)))
+			goto err_
+		} else {
+		    call mfree (stf, TY_STRUCT)
+		    call syserrs (SYS_IKICLOB, IM_HDRFILE(im))
+		}
+	    }
 	    iferr (call fmkcopy (HDR_TEMPLATE, IM_HDRFILE(im)))
 		goto err_
 	    iferr (IM_HFD(im) = open (IM_HDRFILE(im), READ_WRITE, TEXT_FILE))

@@ -7,13 +7,15 @@ include	"iki.h"
 
 procedure iki_delete (image)
 
-char	image[ARB]		# name of image
+char	image[ARB]		#I name of image
+
 int	k, status
 pointer	sp, root, extn
-bool	fnullfile()
 int	iki_access()
-include	"iki.com"
+bool	fnullfile()
+
 errchk	syserrs
+include	"iki.com"
 
 begin
 	if (fnullfile (image))
@@ -25,11 +27,13 @@ begin
 
 	# Verify that the image exists and determine its type.
 	k = iki_access (image, Memc[root], Memc[extn], 0)
-	if (k <= 0)
+	if (k < 0)
+	    call syserrs (SYS_IKIAMBIG, image)
+	else if (k == 0)
 	    call syserrs (SYS_IKIIMNF, image)
 
 	# Delete the image.
-	call zcall3 (IKI_DELETE(k), Memc[root], Memc[extn], status)
+	call zcall4 (IKI_DELETE(k), k, Memc[root], Memc[extn], status)
 	if (status == ERR)
 	    call syserrs (SYS_IKIDEL, image)
 	

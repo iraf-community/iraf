@@ -88,6 +88,8 @@ ZZSTRT()
 	XCHAR	*bp;
 #endif
 
+	spp_debug();
+
 	sprintf (os_process_name, "%d", getpid());
 	strcpy (osfn_bkgfile, "");
 	prtype = PR_HOST;
@@ -413,11 +415,11 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	ready();
 
 #ifdef LINUX
-	/* Enable the common IEEE exceptions.  Linux enables these by default,
-	 * but we don't know who is spawning the IRAF task.
+	/* Enable the common IEEE exceptions.  Newer Linux systems disable
+	 * these by default, the usual SYSV behavior.
 	 */
 	asm ("fclex");
-	__setfpucw (_FPU_DEFAULT);
+	__setfpucw (0x1372);
 #endif
 #ifdef SOLARIS
 	/* Enable the common IEEE exceptions.  _ieee_enbint is as$enbint.s.
@@ -429,7 +431,7 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	);
 
 #else
-#ifdef SUNOS4
+#ifdef SUNOS
 	/* The following enables the common IEEE floating point exceptions
 	 * invalid, overflow, and divzero, causing the program to abort if
 	 * any of these are detected.  If ZZSTRT is called from an IRAF

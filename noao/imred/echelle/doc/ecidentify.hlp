@@ -14,9 +14,25 @@ dispersion functions.
 .ls database = "database"
 Database in which the feature data and dispersion functions are recorded.
 .le
-.ls coordlist = "onedstds$thar.dat"
-User coordinate list consisting of an ordered list of line coordinates.
-Some standard line lists are available in the directory "onedstds$".
+.ls coordlist = "linelists$idhenear.dat"
+User coordinate list consisting of an ordered list of line coordinates.  A
+comment line of the form "# units <units>", where <units> is one of the
+understood units names, defines the units of the line list.  If no units
+are specified then Angstroms are assumed.  Some standard line lists are
+available in the directory "linelists$".  The standard line lists are
+described under the topic \fIlinelists\fR.
+.le
+.ls units = ""
+The units to use if no database entry exists.  The units are specified as
+described in
+
+.nf
+    cl> help onedspec.package section=units
+.fi
+
+If no units are specified and a coordinate list is used then the units of
+the coordinate list are selected.  If a database entry exists then the
+units defined there override both this parameter and the coordinate list.
 .le
 .ls match = 1.
 The maximum difference for a match between the feature coordinate function
@@ -667,6 +683,11 @@ keys to determine a large shift and do the recentering.
 Finally we can exit with 'q' or examine further images with the ":image"
 command.
 .le
+.ih
+REVISIONS
+.ls ECIDENTIFY V2.11
+The dispersion units are now determined from a user parameter,
+the coordinate list, or the database entry.
 .ih
 SEE ALSO
 apsum, center1d, gtools, ecreidentify, identify

@@ -20,9 +20,9 @@ double	v, m, w1, dw, z, w11, dw1, z1
 pointer	sp, key, str1, str2, axmap, lterm, coeff, mw, mw1
 
 bool	strne(), fp_equald()
-int	imaccf()
+int	imaccf(), imgeti()
 pointer	mw_open()
-errchk	smw_merge, smw_c2trand, imdelf
+errchk	smw_merge, imdelf
 data	axes/1,2,3/
 
 begin
@@ -44,6 +44,18 @@ begin
 	    nl = 1
 	else
 	    nl = IM_LEN(im,2)
+
+	# If writing to an existing image we must follow IM_NPHYSDIM
+	# but in a NEW_COPY header we may really want a lower dimension.
+	# Since IM_NPHYSDIM is outside the interface we only violate
+	# it here and use a temporary keyword to communicate from the
+	# routine setting up the WCS.
+
+	pdim1 = max (IM_NDIM(im), IM_NPHYSDIM(im))
+	ifnoerr (i = imgeti (im, "SMW_NDIM")) {
+	    pdim1 = i
+	    call imdelf (im, "SMW_NDIM")
+	}
 
 	# Check if MULTISPEC WCS can be converted to EQUISPEC.
 	if (format == SMW_MS) {
@@ -144,7 +156,7 @@ begin
 		call imdelf (im, "NP2")
 
 	    # Setup EQUISPEC WCS.
-	    pdim1 = max (IM_NDIM(im), IM_NPHYSDIM(im))
+
 	    mw1 = mw_open (NULL, pdim1)
 	    call mw_newsystem (mw1, "equispec", pdim1)
 	    call mw_swtype (mw1, axes, pdim1, "linear", "")

@@ -13,14 +13,16 @@ zzdebug.e:
 
 libds.a:
 	dsmap.x		<fset.h> <imset.h> <mach.h>
+	dspmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
+			<mwset.h> <pmset.h>
 	dsulut.x	display.h <ctype.h> <error.h>
 	findz.x		iis.com iis.h <imhdr.h>
 	iisblk.x	<mach.h> iis.h zdisplay.h
 	iiscls.x	iis.com <mach.h> iis.h zdisplay.h <knet.h>
-	iisers.x	iis.com <mach.h> iis.h zdisplay.h
+	iisers.x	iis.com iis.h zdisplay.h <mach.h>
 	iisflu.x	iis.h <mach.h> zdisplay.h
 	iisgop.x	<mach.h> iis.h
-	iishdr.x	iis.com <mach.h> iis.h zdisplay.h
+	iishdr.x	iis.com iis.h zdisplay.h <mach.h>
 	iisio.x		iis.com <mach.h> iis.h zdisplay.h <knet.h>
 	iismtc.x	<mach.h> iis.h zdisplay.h
 	iisofm.x	iis.h zdisplay.h <mach.h> <math.h>
@@ -41,14 +43,17 @@ libds.a:
 	imdmapfr.x	display.h iis.com iis.h <fset.h> <imhdr.h> <imset.h>\
 			<mach.h>
 	imdopen.x	<knet.h>
+	imdputwcs.x	display.h iis.h <error.h> <fset.h> <imhdr.h> <imset.h>
 	imdrcur.x	<ctype.h>
 	imdrcuro.x	iis.com iis.h zdisplay.h <chars.h> <ctype.h> <mach.h>
 	imdsetwcs.x	iis.com iis.h <knet.h> <mach.h>
 	imdwcs.x	<imhdr.h>
+	maskcolor.x	<ctotok.h>
 	maxmin.x	iis.com iis.h <imhdr.h> <mach.h>
 	sigl2.x		<error.h> <imhdr.h>
+	sigm2.x		<error.h> <imhdr.h>
 	t_dcontrol.x	iis.com display.h iis.h zdisplay.h <fset.h>
-	t_display.x	display.h gwindow.h iis.com iis.h <error.h> <imhdr.h>\
+	t_display.x	display.h gwindow.h <error.h> <pmset.h> <imhdr.h>\
 			<imset.h> <mach.h>
 	zardim.x	zdisplay.h
 	zawrim.x	zdisplay.h
@@ -64,7 +69,7 @@ libds.a:
 	zrcrim.x	zdisplay.h
 	zrgbim.x	zdisplay.h
 	zrmim.x		zdisplay.h
-	zscale.x	<imhdr.h>
+	zscale.x	<ctype.h> <imhdr.h> <imset.h> <pmset.h>
 	zsttim.x	iis.com iis.h <fio.h> <knet.h>
 	zwndim.x	zdisplay.h
 	;

@@ -38,6 +38,9 @@
  * characters from the input.
  */
 
+extern	int linenum[];			/* line numbers in files	*/
+extern	int istkptr;			/* istk pointer			*/
+
 struct symbol {
 	char	*s_name;		/* symbol name			*/
 	char	*s_dimstr;		/* dimension string if array	*/
@@ -100,10 +103,13 @@ int	dtype;			/* procedure type (0 if subr)	*/
 		    char lbuf[200];
 		    sprintf (lbuf, "%s.%s multiply declared",
 			procname, tokstr);
-		    warn (lbuf);
+		    xpp_warn (lbuf);
 		} else
 		    d_enter (tokstr, UNDECL, S_ARGUMENT);
-	    } else if (token == ',' || token == '\n') {
+	    } else if (token == '\n') {
+		linenum[istkptr]++;
+		continue;
+	    } else if (token == ',') {
 		continue;
 	    } else
 		error (XPP_SYNTAX, "bad syntax in procedure argument list");
@@ -148,7 +154,7 @@ int	dtype;			/* data type			*/
 			char lbuf[200];
 			sprintf (lbuf, "%s.%s multiply declared",
 			    procname, tokstr);
-			warn (lbuf);
+			xpp_warn (lbuf);
 		    }
 		} else
 		    sp = d_enter (tokstr, dtype, 0);
@@ -241,7 +247,9 @@ int	dtype;			/* data type			*/
 		    ch = yy_input();
 		} while (ch == ' ' || ch == '\t');
 
-		if (ch != '\n')
+		if (ch == '\n')
+		    linenum[istkptr]++;
+		else
 		    yy_unput (ch);
 
 	    } else if (sp && (sp->s_flags & S_ARGUMENT)) {
@@ -489,11 +497,6 @@ int	maxch;			/* max chars to token string	*/
 	*op++ = '\0';
 	if (ch <= 0)
 	    error (XPP_SYNTAX, "unexpected EOF");
-
-/*
-fprintf (stderr, "token = `%s':  ", tokstr);
-fprintf (stderr, "token = `%c' %d(0%o)\n", tokstr[0], tokstr[0]);
-*/
 
 	return (tokstr[0]);
 }

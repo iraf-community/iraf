@@ -48,7 +48,9 @@ Add poisson noise?  Note that any specified background is added to new
 or existing images before computing the Poisson noise.
 .le
 .ls seed = 1
-Random number seed
+Random number seed.  If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each excution.
 .le
 
 COSMIC RAYS
@@ -110,7 +112,7 @@ a dynamic range, the ratio of the peak intensity to the cutoff
 intensity, is imposed.  Because the cosmic rays are small this parameter
 is not critical.
 .le
-.ls ranbuf = 1000
+.ls ranbuf = 0
 Random number buffer size.  When generating readout and poisson noise,
 evaluation of new random values has an affect on the execution time.
 If truly (or computationally truly) random numbers are not needed
@@ -228,6 +230,15 @@ record of the cosmic rays.
 	325.6 99.6 250
 	cl> mknoise dev$pix out=newpix cos=cosfile
 .fi
+.ih
+REVISIONS
+.ls MKNOISE V2.11+
+The random number seed can be set from the clock time by using the value
+"INDEF" to yield different random numbers for each execution.
+.le
+.ls MKNOISE V2.11
+The default value of "ranbuf" was changed to zero.
+.le
 .ih
 SEE ALSO
 mkobjects, mkheader

@@ -16,6 +16,12 @@ begin
 	    return (GT_LINE(gt))
 	case GTTRANSPOSE:
 	    return (GT_TRANSPOSE(gt))
+	case GTDRAWTITLE:
+	    return (GT_DRAWTITLE(gt))
+	case GTDRAWXLABELS:
+	    return (GT_DRAWXLABELS(gt))
+	case GTDRAWYLABELS:
+	    return (GT_DRAWYLABELS(gt))
 	case GTSYSID:
 	    return (GT_SYSID(gt))
 	case GTCOLOR:

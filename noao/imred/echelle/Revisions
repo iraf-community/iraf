@@ -1,5 +1,24 @@
 .help revisions Jun88 noao.imred.echelle
 .nf
+imred$echelle/echelle.cl
+imred$echelle/echelle.men
+    Added sapertures to the pacakge.  (12/4/97, Valdes)
+
+=====
+V2.11
+=====
+
+imred$echelle/demos/mkdoecslit.cl
+imred$echelle/demos/mkdofoe.cl
+    Made the ARTDATA package parameters explicit (4/15/97, Valdes)
+
+imred$echelle/demos/xgdoecslit.dat
+    The test now includes batch processing.  (10/3/96, Valdes)
+
+imred$echelle/echelle.cl
+    Increased the minimum min_lenuserarea from 40000 to 100000.
+    (7/31/96, Valdes)
+
 imred$echelle/demos/mkdoecslit.cl
     Added a flat field.  (11/6/94, Valdes)
 

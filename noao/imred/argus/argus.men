@@ -4,6 +4,7 @@
 	 apfind - Automatically find spectra and define apertures
      aprecenter - Recenter apertures
        apresize - Resize apertures
+      apscatter - Fit and remove scattered light
           apsum - Extract 1D spectra
 	aptrace - Trace positions of spectra
 

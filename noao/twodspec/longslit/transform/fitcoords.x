@@ -1,3 +1,4 @@
+include	<error.h>
 include	<pkg/igsfit.h>
 include	<pkg/xtanswer.h>
 
@@ -68,8 +69,9 @@ begin
 		call sprintf (prompt, SZ_LINE, "%s%s")
 		    call pargstr (fitname)
 		    call pargstr (image)
-	        call fc_fitcoords (prompt, database, list2, logfiles,
-		    interactive)
+	        iferr (call fc_fitcoords (prompt, database, list2, logfiles,
+		    interactive))
+		    call erract (EA_WARN)
 	        call imtclose (list2)
 	    }
 	}

@@ -1,3 +1,3 @@
-set optimize redraw shell=/bin/csh ai sw=4
-map @ {jmb}:'b,.!fmt -77}be
+set optimize redraw ai sw=4 paragraphs=XSXEIPLPPPQPP\ LIpplpipnpbp
+map @ {j!}fmt}be
 map ;> :.,$s/^/> /

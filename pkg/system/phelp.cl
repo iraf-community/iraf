@@ -16,12 +16,14 @@ string	helpdb="helpdb"		{prompt="help database to be used"}
 
 begin
 	file	helptext
+	string	s_template
 
 	# Get a temp file to hold help text.
 	helptext = mktemp ("tmp$htx")
+	s_template = template
 
 	# Run HELP, redirecting the output to the temp file.
-	help (template, > helptext, page=no,
+	help (s_template, > helptext, page=no,
 	    all = all,
 	    file_template = file_template,
 	    parameter = parameter,
@@ -33,7 +35,7 @@ begin
 	    helpdb = helpdb)
 
 	# Page saved text output.
-	page (helptext, prompt = template)
+	page (helptext, prompt = s_template)
 
 	# Delete temp file.
 	delete (helptext, verify-)

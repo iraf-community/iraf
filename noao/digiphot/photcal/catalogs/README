@@ -9,6 +9,7 @@ The following standard star catalogs are supported.
        nlandolt.dat - the new Landolt UBVRI standards catalog
 	odewahn.dat - the Odewahn BVR cluster standards catalog        (1)
 	 porter.dat - the Porter UBVRI standards catalog               (2)
+	  ukirt.dat - the UKIRT JHK standards                          (3)
 
 Each supported catalog has an accompanying format description file which
 describes which photometric indices are stored in which column. This file is
@@ -20,11 +21,12 @@ following format files are defined.
      fnlandolt.dat - format file for new Landolt UBVRI standards
       fodewahn.dat - format file for Odewahn BVR cluster standards
        fporter.dat - format file for Porter UBVRI cluster standards
+        fukirt.dat - format file for UKIRT JHK standards
 
 Each supported catalog has an accompanying template transformation file
 which defines a default set of transformations equations. This file is
 used as a template by the MKCONFIG task to guide the user in the construction
-of a set of transformation equations The following transformation equations
+of a set of transformation equations. The following transformation equations
 sets are defined.
 
    flandolt.dat - template trnasformations for Elias JHKL standards
@@ -32,6 +34,7 @@ sets are defined.
   tnlandolt.dat - template transformations for new Landolt UBVRI standards
    todewahn.dat - template transformations for Odewahn BVR cluster standards
     tporter.dat - template transformations for Porter UBVRI cluster standards
+     tukirt.dat - template transformations for UKIRT JHK standards
 
 The references for the supported catalogs are listed below.
 
@@ -40,7 +43,9 @@ The references for the supported catalogs are listed below.
 	    landolt.dat - Landolt, A. U. 1983, A.J.  88, 439
 	   nlandolt.dat - Landolt, A. U. 1992, A.J. 104, 340 
 	    odewahn.dat - Odewahn, S. C. 1992 PASP 104,553
-	    porter.dat  - unpublished
+	     porter.dat - unpublished
+	      ukirt.dat - Casali, M. and Hawarden, T. 1992, JCMT-UKIRT
+			  Newsletter, 4, 33
 
 Notes:
 
@@ -88,3 +93,6 @@ Notes:
         Sandage, A. 1966, ApJ 143, 313.
         Sandage, A. and Wildey, R. 1967, ApJ 150, 469
         Schild, R.E. 1983, PASP 95, 1021.
+
+(3) The UKIRT JHK catalog was formatted for use with photcal by Pat Hall
+    (Steward Observatory).

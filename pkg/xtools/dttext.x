@@ -92,7 +92,7 @@ time command puts a comment line with the time.
        record = dtlocate (dt, recname)
 
 		dtgstr (dt, record, field, str, maxchar)
-	value = dtget[ir] (dt, record, field)
+	value = dtget[ird] (dt, record, field)
 		dtgar (dt, record, field, array, len_array, npts)
 
 		dtptime (dt)
@@ -272,6 +272,8 @@ procedure dtunmap (dt)
 pointer	dt				# Database file descriptor
 
 begin
+	if (dt == NULL)
+	    return
 	call close (DT(dt))
 	call mfree (DT_MAP(dt), TY_CHAR)
 	call mfree (DT_OFFSETS(dt), TY_LONG)
@@ -416,6 +418,44 @@ begin
 	}
 
 	call error (0, "Database field not found")
+end
+
+
+# DTGETD -- Get a doubel precision field.
+
+double procedure dtgetd (dt, record, field)
+
+pointer dt                              # DTTEXT pointer
+int     record                          # Database index
+char    field[ARB]                      # Database field
+
+double  dval
+char    name[SZ_LINE]
+
+int     fscan(), nscan()
+bool    streq()
+
+begin
+        if ((record < 1) || (record > DT_NRECS(dt)))
+            call error (0, "Database record request out of bounds")
+
+        call seek (DT(dt), DT_OFFSET(dt, record))
+
+        while (fscan (DT(dt)) != EOF) {
+            call gargwrd (name, SZ_LINE)
+
+            if (streq (name, "begin"))
+                break
+            else if (streq (name, field)) {
+                call gargd (dval)
+                if (nscan() == 2)
+                   return (dval)
+                else
+                   call error (0, "Error in database field value")
+            }
+        }
+
+        call error (0, "Database field not found")
 end
 
 

@@ -8,6 +8,7 @@ include	<math/iminterp.h>
 
 
 # SHDR_OPEN    -- Open the SHDR spectrum header structure.
+# SHDR_TYPE    -- Determine spectrum type.
 # SHDR_GTYPE   -- Get the selected spectrum type.
 # SHDR_CLOSE   -- Close and free the SHDR structure.
 # SHDR_COPY    -- Make a copy of an SHDR structure.
@@ -48,10 +49,10 @@ int	i, j, k, l, n, np, np1, np2, aplow[2], aphigh[2], strncmp()
 real	smw_c1tranr(), asumr()
 double	dval, shdr_lw()
 bool	newim, streq()
-pointer	sp, key, str, coeff, mw, ct
+pointer	sp, key, str, coeff, mw, ct, buf
 pointer	smw_sctran(), imgs3r(), un_open(), fun_open()
 errchk	smw_sctran, imgstr, imgeti, imgetr, smw_gwattrs
-errchk	un_open, fun_open, fun_ctranr
+errchk	un_open, fun_open, fun_ctranr, imgs3r, shdr_gtype
 
 define	data_	90
 
@@ -139,18 +140,22 @@ begin
 	    if (streq (LABEL(sh), "equispec") || streq (LABEL(sh), "multispe"))
 		call strcpy ("", LABEL(sh), LEN_SHDRS)
 	    iferr (call mw_gwattrs (mw, i, "units", UNITS(sh),LEN_SHDRS)) {
-		if (LABEL(sh) == EOS)
-		    call strcpy ("", UNITS(sh), LEN_SHDRS)
-		else if (streq (LABEL(sh), "lambda"))
-		    call strcpy ("meters", UNITS(sh), LEN_SHDRS)
-		else if (streq (LABEL(sh), "freq"))
-		    call strcpy ("hertz", UNITS(sh), LEN_SHDRS)
-		else if (strncmp (LABEL(sh), "velo", 4) == 0)
-		    call strcpy ("m/s", UNITS(sh), LEN_SHDRS)
-		else if (streq (LABEL(sh), "wavelength"))
-		    call strcpy ("meters", UNITS(sh), LEN_SHDRS)
-		else
-		    call strcpy ("", UNITS(sh), LEN_SHDRS)
+		call sprintf (Memc[key], SZ_FNAME, "cunit%d")
+		    call pargi (i)
+		iferr (call imgstr (im, Memc[key], UNITS(sh), LEN_SHDRS)) {
+		    if (LABEL(sh) == EOS)
+			call strcpy ("", UNITS(sh), LEN_SHDRS)
+		    else if (streq (LABEL(sh), "lambda"))
+			call strcpy ("meters", UNITS(sh), LEN_SHDRS)
+		    else if (streq (LABEL(sh), "freq"))
+			call strcpy ("hertz", UNITS(sh), LEN_SHDRS)
+		    else if (strncmp (LABEL(sh), "velo", 4) == 0)
+			call strcpy ("m/s 21 centimeters", UNITS(sh), LEN_SHDRS)
+		    else if (streq (LABEL(sh), "wavelength"))
+			call strcpy ("meters", UNITS(sh), LEN_SHDRS)
+		    else
+			call strcpy ("", UNITS(sh), LEN_SHDRS)
+		}
 	    }
 	    MWUN(sh) = un_open (UNITS(sh))
 	    call un_copy (MWUN(sh), UN(sh))
@@ -314,10 +319,7 @@ begin
 	    }
 
 	    call smw_gapid (smw, APINDEX(sh), 1, TITLE(sh), LEN_SHDRS)
-	    call sprintf (Memc[key], SZ_FNAME, "BANDID%d")
-		call pargi (PINDEX(sh,2))
-	    iferr (call imgstr (im, Memc[key], Memc[SID(sh,1)], LEN_SHDRS))
-		Memc[SID(sh,1)] = EOS
+	    call shdr_type (sh, 1, PINDEX(sh,2))
 
 	    switch (SMW_LDIM(smw)) {
 	    case 1:
@@ -401,20 +403,29 @@ data_	# Set the coordinate and data arrays if desired otherwise free them.
 		l = aphigh[1]
 		n = aphigh[1] - aplow[1] + 1
 		if (SMW_LAXIS(smw,1) == 1) {
-		    do j = aplow[2], aphigh[2]
-			do i = aplow[1], aphigh[1]
-			     call aaddr (Memr[imgs3r(im,np1,np2,i,i,j,j)],
-				 Memr[SY(sh)], Memr[SY(sh)], np)
+		    do j = aplow[2], aphigh[2] {
+			do i = aplow[1], aphigh[1] {
+			    buf = imgs3r (im, np1, np2, i, i, j, j)
+			    call aaddr (Memr[buf], Memr[SY(sh)],
+				 Memr[SY(sh)], np)
+			}
+		    }
 		} else if (SMW_LAXIS(smw,1) == 2) {
-		    do j = aplow[2], aphigh[2]
-			do i = np1, np2
+		    do j = aplow[2], aphigh[2] {
+			do i = np1, np2 {
+			    buf = imgs3r (im, k, l, i, i, j, j)
 			    Memr[SY(sh)+i-np1] = Memr[SY(sh)+i-np1] +
-				asumr (Memr[imgs3r(im,k,l,i,i,j,j)], n)
+				asumr (Memr[buf], n)
+			}
+		    }
 		} else {
-		    do i = np1, np2
-			do j = aplow[2], aphigh[2]
+		    do i = np1, np2 {
+			do j = aplow[2], aphigh[2] {
+			    buf = imgs3r (im, k, l, j, j, i, i)
 			    Memr[SY(sh)+i-np1] = Memr[SY(sh)+i-np1] +
-				asumr (Memr[imgs3r(im,k,l,j,j,i,i)], n)
+				asumr (Memr[buf], n)
+			}
+		    }
 		}
 	    }
 	case SMW_ES, SMW_MS:
@@ -425,7 +436,8 @@ data_	# Set the coordinate and data arrays if desired otherwise free them.
 		    call realloc (SY(sh), np, TY_REAL)
 		i = LINDEX(sh,1)
 		j = LINDEX(sh,2)
-		call amovr (Memr[imgs3r(im,np1,np2,i,i,j,j)], Memr[SY(sh)], np)
+		buf = imgs3r (im, np1, np2, i, i, j, j)
+		call amovr (Memr[buf], Memr[SY(sh)], np)
 	    }
 
 	    if (mode > SHDATA)
@@ -462,8 +474,8 @@ procedure shdr_gtype (sh, type)
 pointer	sh			#I SHDR pointer
 int	type			#I Spectrum type
 
-int	i, j, id, ctowrd(), strdic()
-pointer	sp, key, str, im, smw, ct, smw_sctran(), imgs3r()
+int	i, j, ctowrd(), strdic()
+pointer	sp, key, str, im, smw, ct, buf, smw_sctran(), imgs3r()
 real	smw_c1tranr()
 
 begin
@@ -486,20 +498,6 @@ begin
 	call smark (sp)
 	call salloc (key, SZ_LINE, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (id, SZ_LINE, TY_CHAR)
-
-	switch (type) {
-	case SHDATA:
-	    call strcpy ("|spectrum|data|", Memc[id], SZ_LINE)
-	case SHRAW:
-	    call strcpy ("|raw|", Memc[id], SZ_LINE)
-	case SHSIG:
-	    call strcpy ("|sigma|", Memc[id], SZ_LINE)
-	case SHSKY:
-	    call strcpy ("|background|", Memc[id], SZ_LINE)
-	case SHCONT:
-	    call strcpy ("|continuum|", Memc[id], SZ_LINE)
-	}
 
 	do i = 1, 4 {
 	    call sprintf (Memc[key], SZ_LINE, "BANDID%d")
@@ -508,11 +506,12 @@ begin
 		j = 1
 		if (ctowrd (Memc[str], j, Memc[key], SZ_LINE) == 0)
 		    next
-		if (strdic (Memc[key], Memc[key], SZ_LINE, Memc[id]) == 0)
+		if (strdic (Memc[key], Memc[key], SZ_LINE, STYPES) != type)
 		    next
 		if (SID(sh,type) == NULL)
 		    call malloc (SID(sh,type), LEN_SHDRS, TY_CHAR)
 		call strcpy (Memc[str], Memc[SID(sh,type)], LEN_SHDRS)
+		STYPE(sh,type) = type
 		break
 	    }
 	}
@@ -545,8 +544,45 @@ begin
 	    call malloc (SPEC(sh,type), SN(sh), TY_REAL)
 	else
 	    call realloc (SPEC(sh,type), SN(sh), TY_REAL)
-	call amovr (Memr[imgs3r(im,NP1(sh),NP2(sh),i,i,j,j)],
-	    Memr[SPEC(sh,type)], SN(sh))
+	buf = imgs3r (im, NP1(sh), NP2(sh), i, i, j, j)
+	call amovr (Memr[buf], Memr[SPEC(sh,type)], SN(sh))
+end
+
+
+# SHDR_TYPE -- Determine the spectrum type.
+# Currently this only works for multispec data.
+
+procedure shdr_type (sh, index, band)
+
+pointer	sh			#I SHDR pointer
+int	index			#I Index
+int	band			#I Physical band
+
+int	i, ctowrd(), strdic()
+pointer	sp, key
+
+begin
+	if (SMW_FORMAT(MW(sh)) == SMW_ND)
+	    return
+
+	call smark (sp)
+	call salloc (key, SZ_LINE, TY_CHAR)
+
+	if (SID(sh,index) == NULL)
+	    call malloc (SID(sh,index), LEN_SHDRS, TY_CHAR)
+
+	call sprintf (Memc[key], SZ_FNAME, "BANDID%d")
+	    call pargi (band)
+	 iferr (call imgstr (IM(sh), Memc[key], Memc[SID(sh,index)], LEN_SHDRS))
+	    Memc[SID(sh,index)] = EOS
+
+	i = 1
+	if (ctowrd (Memc[SID(sh,index)], i, Memc[key], SZ_LINE) > 0)
+	    STYPE(sh,index) = strdic (Memc[key], Memc[key], SZ_LINE, STYPES)
+	else
+	    STYPE(sh,index) = 0
+
+	call sfree (sp)
 end
 
 
@@ -769,9 +805,6 @@ begin
 	    switch (SMW_FORMAT(MW(sh))) {
 	    case SMW_ND, SMW_ES:
 		w = smw_c1trand (CTLW(sh), l0)
-		if (DC(sh) == DCLOG)
-		    if (SMW_CTTYPE(CTLW(sh)) == SMW_LW)
-			w = 10. ** max (-20D0, min (20D0, w))
 	    case SMW_MS:
 		call smw_c2trand (CTLW(sh), l0, double (APINDEX(sh)), w, w1)
 	    }
@@ -818,9 +851,6 @@ begin
 	if (CTWL(sh) != NULL) {
 	    switch (SMW_FORMAT(MW(sh))) {
 	    case SMW_ND, SMW_ES:
-		if (DC(sh) == DCLOG)
-		    if (SMW_CTTYPE(CTWL(sh)) == SMW_WL)
-			w1 = log10 (w1)
 		l = smw_c1trand (CTWL(sh), w1)
 	    case SMW_MS:
 		call smw_c2trand (CTWL(sh), w1, double (AP(sh)),l,l1)
@@ -917,7 +947,7 @@ begin
 		if (a <= b) {
 		    ia = nint (a + 0.5)
 		    ib = nint (b - 0.5)
-		    if (abs (a+0.5-ia) < .001 && abs (b-0.5-ib) < .001) {
+		    if (abs (a+0.5-ia) < .00001 && abs (b-0.5-ib) < .00001) {
 			sum = 0.
 			do j = ia, ib
 			    sum = sum + asieval (asi, real(j))
@@ -931,7 +961,7 @@ begin
 		} else {
 		    ib = nint (b + 0.5)
 		    ia = nint (a - 0.5)
-		    if (abs (a-0.5-ia) < .001 && abs (b+0.5-ib) < .001) {
+		    if (abs (a-0.5-ia) < .00001 && abs (b+0.5-ib) < .00001) {
 			sum = 0.
 			do j = ib, ia
 			    sum = sum + asieval (asi, real(j))
@@ -988,7 +1018,7 @@ int	dc		# Dispersion type (DCLINEAR | DCLOG)
 
 char	interp[10]
 int	i, j, type, ia, ib, n, clgwrd()
-real	a, b, sum, asieval(), asigrl()
+real	w0mw, w1mw, a, b, sum, asieval(), asigrl()
 double	x, w, w0l, wp, xmin, xmax, shdr_wl()
 pointer	unsave, asi, spec
 bool	fp_equalr()
@@ -1000,6 +1030,8 @@ begin
 	    return
 
 	# Do everything in units of MWCS.
+	call un_ctranr (UN(sh), MWUN(sh), w0, w0mw, 1)
+	call un_ctranr (UN(sh), MWUN(sh), w1, w1mw, 1)
 	unsave = UN(sh)
 	UN(SH) = MWUN(sh)
 
@@ -1033,12 +1065,12 @@ begin
 
 	    x = 0.5
 	    if (dc == DCLOG) {
-		w0l = log10 (w0)
-		wp = (log10 (w1) - log10(w0)) / (n - 1)
+		w0l = log10 (w0mw)
+		wp = (log10 (w1mw) - log10(w0mw)) / (n - 1)
 		w = 10. ** (w0l+(x-1)*wp)
 	    } else {
-		wp = (w1 - w0) / (n - 1)
-		w = w0 + (x - 1) * wp
+		wp = (w1mw - w0mw) / (n - 1)
+		w = w0mw + (x - 1) * wp
 	    }
 	    x = shdr_wl (sh, w)
 	    b = max (xmin, min (xmax, x)) + 1
@@ -1047,14 +1079,14 @@ begin
 		if (dc == DCLOG)
 		    w = 10. ** (w0l + (x - 1) * wp)
 		else
-		    w = w0 + (x - 1) * wp
+		    w = w0mw + (x - 1) * wp
 		x = shdr_wl (sh, w)
 		a = b
 		b = max (xmin, min (xmax, x)) + 1
 		if (a <= b) {
 		    ia = nint (a + 0.5)
 		    ib = nint (b - 0.5)
-		    if (abs (a+0.5-ia) < .001 && abs (b-0.5-ib) < .001) {
+		    if (abs (a+0.5-ia) < .00001 && abs (b-0.5-ib) < .00001) {
 			sum = 0.
 			do j = ia, ib
 			    sum = sum + asieval (asi, real(j))
@@ -1068,7 +1100,7 @@ begin
 		} else {
 		    ib = nint (b + 0.5)
 		    ia = nint (a - 0.5)
-		    if (abs (a-0.5-ia) < .001 && abs (b+0.5-ib) < .001) {
+		    if (abs (a-0.5-ia) < .00001 && abs (b+0.5-ib) < .00001) {
 			sum = 0.
 			do j = ib, ia
 			    sum = sum + asieval (asi, real(j))
@@ -1097,7 +1129,7 @@ begin
 	    if (dc == DCLOG)
 		w = 10. ** (w0l + i * wp)
 	    else
-		w = w0 + i * wp
+		w = w0mw + i * wp
 	    Memr[SX(sh)+i] = w
 	}
 	W0(sh) = w0

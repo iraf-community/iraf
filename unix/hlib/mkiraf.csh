@@ -10,11 +10,10 @@ set	ttymsg  =\
 "Terminal types: xgterm,xterm,gterm,vt640,vt100,etc."
 
 # ------------- (end of site dependent definitions) ------------------------
-# Make an empty "uparm" (user parameter) directory.
 
 unalias rm mkdir pwd echo mkdir sed whoami pushd popd
 
-# The following kludge is for Solaris, which doesn't have whomai.
+# The following kludge is for Solaris, which doesn't have whoami.
 if (! $?USER) then
     setenv USER `whoami`
 endif
@@ -29,6 +28,7 @@ if ("`pwd | grep $irafdir`" != "") then
     endif
 endif
 
+# Make an empty "uparm" (user parameter) directory.
 if (! -e uparm) then
     echo '-- creating a new uparm directory'
     mkdir uparm

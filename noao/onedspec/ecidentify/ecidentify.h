@@ -1,6 +1,6 @@
 # Task parameters
 
-define	LEN_EC		51		# Length ID structure
+define	LEN_EC		52		# Length ID structure
 
 define	EC_IMAGE	Memi[$1]	# Image name (pointer)
 define	EC_MAXFEATURES	Memi[$1+1]	# Maximum number of features
@@ -60,15 +60,16 @@ define	EC_LL		Memi[$1+41]	# Linelist pointer
 define	EC_ECF		Memi[$1+42]	# Curfit pointer
 define	EC_GP		Memi[$1+43]	# GIO pointer
 define	EC_GT		Memi[$1+44]	# Gtools pointer
+define	EC_UN		Memi[$1+45]	# Units pointer
 
 # Flags
 
-define	EC_NEWFEATURES	Memi[$1+45]	# Has feature list changed?
-define	EC_NEWECF	Memi[$1+46]	# Has fitting function changed?
-define	EC_NEWGRAPH	Memi[$1+47]	# Has graph changed?
-define	EC_NEWDBENTRY	Memi[$1+48]	# Has database entry changed?
-define	EC_REFIT	Memi[$1+49]	# Refit feature data?
-define	EC_GTYPE	Memi[$1+50]	# Graph type
+define	EC_NEWFEATURES	Memi[$1+46]	# Has feature list changed?
+define	EC_NEWECF	Memi[$1+47]	# Has fitting function changed?
+define	EC_NEWGRAPH	Memi[$1+48]	# Has graph changed?
+define	EC_NEWDBENTRY	Memi[$1+49]	# Has database entry changed?
+define	EC_REFIT	Memi[$1+50]	# Refit feature data?
+define	EC_GTYPE	Memi[$1+51]	# Graph type
 
 # End of structure ----------------------------------------------------------
 

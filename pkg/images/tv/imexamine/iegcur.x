@@ -133,7 +133,7 @@ begin
 			    }
 			}
 		    }
-		case 'r':	# Radial profile plot
+		case 'r','.':	# Radial profile plot
 		    x = IE_X1(ie)
 		    y = IE_Y1(ie)
 		case 'h', 's':	# Surface plot

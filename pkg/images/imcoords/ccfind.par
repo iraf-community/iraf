@@ -1,0 +1,48 @@
+# Parameters for the CCFIND task
+
+# Input and output files and images
+input,f,a,,,,The list input celestial coordinate files
+output,f,a,"",,,The output matched coordinates files
+images,f,a,"",,,The input images
+
+# The input coordinate file format
+lngcolumn,i,h,1,,,Column containing the ra / longitude
+latcolumn,i,h,2,,,Column containing the dec / latitude 
+lngunits,s,h,"",,,Input ra / longitude units
+latunits,s,h,"",,,Input dec / latitude units
+insystem,s,h,"j2000",,,Input celestial coordinate system
+
+# The celestial coordinate system reference point parameters
+usewcs,b,h,no,,,Locate objects using the existing image wcs ?
+xref,r,h,INDEF,,,The x reference pixel
+yref,r,h,INDEF,,,The y reference pixel
+xmag,r,h,INDEF,,,The x axis scale in arcsec / pixel
+ymag,r,h,INDEF,,,The y axis scale in arcsec / pixel
+xrotation,r,h,INDEF,,,The x rotation angle in degrees
+yrotation,r,h,INDEF,,,The y axis rotation angle in degrees
+lngref,s,h,"INDEF",,,Reference point ra / longitude coordinate
+latref,s,h,"INDEF",,,Reference point dec / latitude coordinate
+lngrefunits,s,h,"",,,Reference point ra / longitude units
+latrefunits,s,h,"",,,Reference point dec / latitude units
+refsystem,s,h,"j2000",,,Reference point coordinate system
+projection,s,h,"tan",,,Sky projection geometry
+
+# Centeaing parameters.
+center,b,h,yes,,,Center the pixel coordinates ?
+sbox,i,h,21,11,,Search box width in pixels
+cbox,i,h,9,5,,Centering box width in pixels
+datamin,r,h,INDEF,,,Minimum good data value
+datamax,r,h,INDEF,,,Maximum good data value
+background,r,h,INDEF,,,Background reference value
+maxiter,i,h,5,2,,Maximum number of iterations
+tolerance,i,h,0,0,,Tolerance for convergence in pixels
+
+# Output parameters.
+xformat,s,h,"",,,Output format for the x coordinate
+yformat,s,h,"",,,Output format for the y coordinate
+
+# Task mode parameters.
+verbose,b,h,yes,,,Print messages about progress of task ?
+
+mode,s,h,'ql'
+

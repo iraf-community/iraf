@@ -49,6 +49,8 @@ begin
 	EH_YLENVLEN(eh)		= IO_YLENVLEN(io)
 	EH_IXXOFF(eh)		= IO_IXXOFF(io)
 	EH_IXYOFF(eh)		= IO_IXYOFF(io)
+	EH_IXXTYPE(eh)		= IO_IXXTYPE(io)
+	EH_IXYTYPE(eh)		= IO_IXYTYPE(io)
 
 	# Output MINEV and MAXEV event structs following the header struct,
 	# but in the header page.

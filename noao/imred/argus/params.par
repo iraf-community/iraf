@@ -38,7 +38,7 @@ f_order,i,h,20,1,,"Fitting function order
 -- ARC DISPERSION FUNCTION PARAMETERS --"
 threshold,r,h,10.,0.,,"Minimum line contrast threshold"
 coordlist,f,h,linelists$idhenear.dat,,,"Line list"
-match,r,h,10.,,,"Line list matching limit in Angstroms"
+match,r,h,-3.,,,"Line list matching limit in Angstroms"
 fwidth,r,h,4.,,,"Arc line widths in pixels"
 cradius,r,h,10.,,,Centering radius in pixels
 i_function,s,h,"chebyshev","legendre|chebyshev|spline1|spline3",,"Coordinate function"

@@ -32,7 +32,9 @@ bool	keepids			# Keep track of the image indices?
 bool	docombine		# Call the combine procedure?
 bool	sort			# Sort data?
 
+pointer	icm			# Mask data structure
+
 common	/imccom/ combine, reject, blank, rdnoise, gain, snoise, lsigma, hsigma,
 		 lthresh, hthresh, nkeep, pclip, flow, fhigh, grow, logfd,
 		 dflag, sigscale, project, mclip, aligned, doscale, doscale1,
-		 dothresh, dowts, keepids, docombine, sort
+		 dothresh, dowts, keepids, docombine, sort, icm

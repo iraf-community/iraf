@@ -236,7 +236,7 @@ command or by editing.
 	cl> continuum uv.* type=ratio logscale+ listonly+ fun=leg order=2
 .ih
 REVISIONS
-.ls CONTINUUM V2.11
+.ls CONTINUUM V2.10.4
 The task was expanded to include fitting specified bands in 3D multispec
 spectra.
 

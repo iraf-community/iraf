@@ -10,6 +10,18 @@ include	<mwset.h>
 # APMW_SAVEIM -- Set WCS in image header.
 # APMW_WCSFIX -- Fix up WCS
 
+# Output formats
+define	ONEDSPEC	1	# Individual 1D spectra
+define	MULTISPEC	2	# Multiple spectra
+define	ECHELLE		3	# Echelle spectra
+define	STRIP		4	# Strip spectra
+define	NORM		5	# Normalized spectra
+define	FLAT		6	# Flat spectra
+define	RATIO		7	# Ratio of data to model
+define	DIFF		8	# Difference of data and model
+define	FIT		9	# Model
+define	NOISE		10	# Noise calculation
+
 
 # Data structure for the apertures.  This version assumes the coordinates
 # are the same for all the apertures.
@@ -30,11 +42,13 @@ define	APMW_APHIGH	Memd[P2D($1+6*($2-1)+12)]	# Aperture high
 
 # APMW_OPEN -- Open APMW structure.
 
-pointer procedure apmw_open (in, out, dispaxis)
+pointer procedure apmw_open (in, out, dispaxis, naps, nw)
 
 pointer	in		#I Input IMIO pointer
 pointer	out		#I Output IMIO pointer
 int	dispaxis	#I Input dispersion axis
+int	naps		#I Number of apertures
+int	nw		#I Number of dispersion pixels
 pointer	apmw		#O Returned APMW pointer
 
 int	imgeti()
@@ -44,7 +58,7 @@ errchk	mw_openim, mw_sctran, mw_c1trand, apmw_wcsfix
 
 begin
 	# Allocate data structure.
-	call malloc (apmw, APMW_LEN(IM_LEN(out,2)), TY_STRUCT)
+	call malloc (apmw, APMW_LEN(naps), TY_STRUCT)
 	call malloc (APMW_LABEL(apmw), SZ_LINE, TY_CHAR)
 	call malloc (APMW_UNITS(apmw), SZ_LINE, TY_CHAR)
 
@@ -52,7 +66,7 @@ begin
 	call strcpy ("Pixel", Memc[APMW_LABEL(apmw)], SZ_LINE)
 	Memc[APMW_UNITS(apmw)] = EOS
 	APMW_DTYPE(apmw,i) = -1
-	APMW_NW(apmw,i) = IM_LEN(out,1)
+	APMW_NW(apmw,i) = nw
 	APMW_W1(apmw,i) = 1.
 	APMW_DW(apmw,i) = 1.
 
@@ -77,10 +91,12 @@ begin
 	    }
 
 	    call apmw_wcsfix (in, mw)
-	    ct = mw_sctran (mw, "logical", "world", dispaxis)
+	    iferr (ct = mw_sctran (mw, "logical", "world", dispaxis))
+		call error (1,
+	    "Coordinate system ignored (rotated?). Using pixel coordinates.")
 	    APMW_W1(apmw) = mw_c1trand (ct, 1D0)
-	    APMW_DW(apmw) = mw_c1trand (ct, double (IM_LEN(out,1)))
-	    APMW_DW(apmw) = (APMW_DW(apmw)-APMW_W1(apmw)) / (IM_LEN(out,1)-1)
+	    APMW_DW(apmw) = mw_c1trand (ct, double (nw))
+	    APMW_DW(apmw) = (APMW_DW(apmw)-APMW_W1(apmw))/(nw-1)
 	} then
 	    call erract (EA_WARN)
 
@@ -124,15 +140,16 @@ end
 
 # APMW_SAVEIM -- Save WCS in image header.
 
-procedure apmw_saveim (apmw, im)
+procedure apmw_saveim (apmw, im, fmt)
 
 pointer	apmw			#I APMW pointer
 pointer	im			#I IMIO pointer
+int	fmt			#I Output format
 
-int	i, wcsdim, axes[3], imaccf()
+int	i, naps, wcsdim, axes[3], imaccf()
 double	r[3], w[3], cd[9]
 bool	strne()
-pointer	sp, key, str, mw, mw_open()
+pointer	sp, key, str, mw, list, mw_open(), imofnlu(), imgnfn()
 errchk	imdelf
 data	axes/1,2,3/
 
@@ -141,11 +158,22 @@ begin
 	call salloc (key, SZ_FNAME, TY_CHAR)
 	call salloc (str, SZ_LINE, TY_CHAR)
 
+	if (fmt == STRIP)
+	    naps = 1
+	else
+	    naps = IM_LEN(im, 2)
+
 	# Workaround for truncation of header during image header copy.
 	IM_HDRLEN(im) = IM_LENHDRMEM(im)
 
+	# Delete keywords.
+	list = imofnlu (im, "SLFIB[0-9]*")
+	while (imgnfn (list, Memc[key], SZ_FNAME) != EOF)
+	    call imdelf (im, Memc[key])
+	call imcfnl (list)
+
 	# Add aperture parameters to image header.
-	do i = 1, IM_LEN(im,2) {
+	do i = 1, naps {
 	    call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
 		call pargi (i)
 	    call sprintf (Memc[str], SZ_LINE, "%d %d %.2f %.2f")
@@ -154,7 +182,7 @@ begin
 		call pargd (APMW_APLOW(apmw,i))
 		call pargd (APMW_APHIGH(apmw,i))
 	    call imastr (im, Memc[key], Memc[str])
-	    if (IM_LEN(im,2) == 1) {
+	    if (naps == 1) {
 		call sprintf (Memc[key], SZ_FNAME, "APID%d")
 		    call pargi (i)
 		ifnoerr (call imgstr (im, Memc[key], Memc[str], SZ_LINE)) {
@@ -178,11 +206,16 @@ begin
 	    call imdelf (im, "NP2")
 	iferr (call imdelf (im, "dispaxis"))
 	    ;
+	if (fmt == STRIP)
+	    call imaddi (im, "dispaxis", 1)
 
-	# Set EQUISPEC WCS in image header.
+	# Set WCS in image header.
 	wcsdim = IM_NPHYSDIM(im)
 	mw = mw_open (NULL, wcsdim)
-	call mw_newsystem (mw, "equispec", wcsdim)
+	if (fmt == STRIP)
+	    call mw_newsystem (mw, "linear", wcsdim)
+	else
+	    call mw_newsystem (mw, "equispec", wcsdim)
 	call mw_swtype (mw, axes, wcsdim, "linear", "")
 	if (Memc[APMW_LABEL(apmw)] != EOS)
 	    call mw_swattrs (mw, 1, "label", Memc[APMW_LABEL(apmw)])

@@ -16,7 +16,7 @@
 
 #define	SCAN_STRING	0
 #define	SCAN_FILE	1
-#define	SZ_NUMBUF	25		/* maximum numeric field len	*/
+#define	SZ_NUMBUF	256		/* maximum numeric field len	*/
 #define	SZ_UCC		128		/* maximum size user char class	*/
 #define	HUGE		999
 #define	ISHEX(c)	(c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F')

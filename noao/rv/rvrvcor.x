@@ -298,9 +298,12 @@ double	lat, lon, alt
 double  ast_julday()
 bool	newobs, obshead
 double 	obsgetd()
+pointer	obspars()
 
 begin
-	call obsimopen (RV_OBSPTR(rv), im, "kpno", NO, newobs, obshead)
+	call obsimopen (RV_OBSPTR(rv), im, 
+            Memc[P2C(obspars(RV_OBSPTR(rv), "observatory"))], 
+	    NO, newobs, obshead)
 	if (newobs || obshead) {
 	    RV_LATITUDE(rv) = real (obsgetd (RV_OBSPTR(rv), "latitude"))
 	    RV_LONGITUDE(rv) = real (obsgetd (RV_OBSPTR(rv), "longitude"))

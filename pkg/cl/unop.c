@@ -103,8 +103,10 @@ int	opcode;
 	    /* fall through */
 
 	case OP_ACCESS:			/* these all require string op	*/
+	case OP_IMACCESS:		/* these all require string op	*/
 	case OP_DEFPAC:
 	case OP_DEFPAR:
+	case OP_DEFVAR:
 	case OP_DEFTASK:
 	    if (out_type == UNSET)
 		out_type = OT_BOOL;
@@ -169,6 +171,9 @@ int	opcode;
 	case OP_ACCESS:
 	    iresult = (c_access (sval, 0, 0) == YES);
 	    break;
+	case OP_IMACCESS:
+	    iresult = (c_imaccess (sval, 0) == YES);
+	    break;
 	case OP_COS:
 	    rresult = cos (rval);
 	    break;
@@ -177,6 +182,9 @@ int	opcode;
 	    break;
 	case OP_DEFPAR:
 	    iresult = defpar (sval);
+	    break;
+	case OP_DEFVAR:
+	    iresult = defvar (sval);
 	    break;
 	case OP_DEFTASK:
 	    iresult = deftask (sval);

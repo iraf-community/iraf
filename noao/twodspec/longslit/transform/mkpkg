@@ -8,12 +8,12 @@ $exit
 libpkg.a:
 	@igsfit
 
-	fcdbio.x	<error.h> <math/gsurfit.h> <pkg/dttext.h>
+	fcdbio.x	<error.h> <math/gsurfit.h> <pkg/dttext.h> <units.h>
 	fcdlist.x	<error.h>
 	fcfitcoords.x	<pkg/gtools.h> <pkg/igsfit.h> <pkg/xtanswer.h>
 	fcgetcoords.x	<imio.h> <pkg/dttext.h> <pkg/igsfit.h>
 	fcgetim.x	
-	fitcoords.x	<pkg/igsfit.h> <pkg/xtanswer.h>
+	fitcoords.x	<error.h> <pkg/igsfit.h> <pkg/xtanswer.h>
 	t_transform.x	transform.com <imhdr.h> <math.h> <math/gsurfit.h>\
-			<math/iminterp.h>
+			<math/iminterp.h> <units.h>
 	;

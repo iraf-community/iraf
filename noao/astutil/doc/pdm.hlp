@@ -7,6 +7,7 @@ USAGE
 pdm infile
 .ih
 PARAMETERS
+
 .ls infiles
 Input file template.  If more than one file matches the template, data
 from all the files will be concatenated to produce the working data set.
@@ -53,6 +54,10 @@ Resolution of the theta plot.  This parameter tells how many points in
 the period window should have their theta statistic calculated.  The points
 are spaced equidistant from one another in frequency space.
 .le
+.ls pluspoint = 50
+Maximum number of data points for which to use plus symbols.  If there
+are more data points then points are plotted.
+.le
 .ls autoranges = no
 This flag, when set, instructs the program to look for gaps in
 the data and, if large gaps are found, divide the data up into ranges
@@ -67,9 +72,6 @@ and standard deviation of the distribution of chronological spacing
 of input points are calculated.  Then the points are scanned in
 increasing order and if an inter-data gap bigger than nsigma
 standard deviations is found, a new range is started.
-.le
-.ls debug
-Flag to turn on debugging prints in the theta calculation subroutine.
 .le
 .ls cursor = "stdgcur"
 The source of graphics cursor input.

@@ -235,7 +235,7 @@ inverse of the unit and "log" to select logarithmic units. For example "log
 angstroms" to plot the logarithm of wavelength in Angstroms and "inv
 microns" to plot inverse microns.  The various identifiers may be
 abbreviated as words but the syntax is not sophisticated enough to
-recognized standard scientific abbreviations such as mm for millimeter.
+recognized standard scientific abbreviations except as noted below.
 
 .nf
 		Table 1:  Unit Types
@@ -257,6 +257,16 @@ recognized standard scientific abbreviations such as mm for millimeter.
 	         kev - Energy in kilo electron volts
 	         mev - Energy in mega electron volts
 		   z - Redshift
+
+	          nm - Wavelength in nanometers
+	          mm - Wavelength in millimeters
+	          cm - Wavelength in centimeters
+	           m - Wavelength in meters
+	          Hz - Frequency in hertz (cycles per second)
+	         KHz - Frequency in kilohertz
+	         MHz - Frequency in megahertz
+	         GHz - Frequency in gigahertz
+		  wn - Wave number (inverse centimeters)
 .fi
 
 The velocity and redshift units require a trailing value and unit defining the

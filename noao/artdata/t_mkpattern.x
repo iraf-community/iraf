@@ -47,7 +47,7 @@ pointer	sp, input, output, header, in, out, indata, outdata, pat1, pat2
 char	clgetc()
 bool	streq()
 int	clgwrd(), clgeti()
-int	imtopenp(), imtlen(), imtgetim(), imaccess(), imgnlr(), impnlr()
+int	imtopenp(), imtlen(), imtgetim(), imgnlr(), impnlr()
 real	clgetr()
 pointer	immap()
 errchk	immap
@@ -79,11 +79,7 @@ begin
 
 	    # Map images.  Check for new, existing, and inplace images.
 	    if (streq (Memc[input], Memc[output])) {
-	        if (imaccess (Memc[output], 0) == YES) {
-	            iferr (out = immap (Memc[output], READ_WRITE, 0)) {
-			call erract (EA_WARN)
-			next
-		    }
+		ifnoerr (out = immap (Memc[output], READ_WRITE, 0)) {
 		    in = out
 	            new = false
 	        } else {
@@ -105,6 +101,8 @@ begin
 		    IM_LEN(out,6) = clgeti ("n6")
 		    IM_LEN(out,7) = clgeti ("n7")
 		    switch (clgetc ("pixtype")) {
+		    case 'u':
+		        IM_PIXTYPE(out) = TY_USHORT
 		    case 's':
 		        IM_PIXTYPE(out) = TY_SHORT
 		    case 'i':
@@ -115,6 +113,8 @@ begin
 		        IM_PIXTYPE(out) = TY_REAL
 		    case 'd':
 		        IM_PIXTYPE(out) = TY_DOUBLE
+		    case 'c':
+		        IM_PIXTYPE(out) = TY_COMPLEX
 		    default:
 			call error (0, "Bad pixel type")
 		    }

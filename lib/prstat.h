@@ -12,6 +12,7 @@ define	PR_STDGRAPH	10
 define	PR_STDIMAGE	11
 define	PR_STDPLOT	12
 
-define	P_RUNNING	0	# process status
-define	P_DONE		1	# process terminated normally
-define	P_DEAD		2	# process died and sent us X_IPC
+define	P_RUNNING	0	# process is ready
+define	P_BUSY		1	# process is busy with subprotocol
+define	P_DONE		2	# process terminated normally
+define	P_DEAD		3	# process died and sent us X_IPC

@@ -4,18 +4,17 @@ $call	relink
 $exit
 
 update:
-	@imdebug
 	@tv
 	$call	relink
 	$call	install
 	;
 
 relink:
-	$set	LIBS = "-liminterp -lxtools -lcurfit -lsurfit -lnlfit -lgsurfit -lncar -lgks"
-
+	$set LIBS1 = "-lxtools -lcurfit -lsurfit -lgsurfit -liminterp -lnlfit"
+	$set LIBS2 = "-lslalib -lncar -lgks"
 	$update	libpkg.a
 	$omake	x_images.x
-	$link	x_images.o libpkg.a $(LIBS) -o xx_images.e
+	$link	x_images.o libpkg.a $(LIBS1) $(LIBS2) -o xx_images.e
 	;
 
 install:
@@ -23,11 +22,11 @@ install:
 	;
 
 libpkg.a:
-	@lib
-	@imarith
-	@filters
-	@geometry
+	@imcoords
+	@imfilter
 	@imfit
+	@imgeom
+	@immatch
 	@imutil
-	@iminfo
+	@lib
 	;

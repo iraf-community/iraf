@@ -37,7 +37,7 @@ libpkg.a:
 	idrms.x		identify.h
 	idshift.x	identify.h
 	idshow.x	identify.h
-	idvelocity.x	identify.h
+	idvelocity.x	identify.h <smw.h>
 	idvhelio.x	<error.h>
 	peaks.x	
 	reidentify.x	identify.h <error.h> <gset.h> <imhdr.h>

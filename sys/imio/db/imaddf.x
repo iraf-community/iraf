@@ -11,13 +11,14 @@ include	"idb.h"
 
 procedure imaddf (im, key, datatype)
 
-pointer	im			# image descriptor
-char	key[ARB]		# name of the new parameter
-char	datatype[ARB]		# string permits generalization to domains
+pointer	im			#I image descriptor
+char	key[ARB]		#I name of the new parameter
+char	datatype[ARB]		#I string permits generalization to domains
 
 pointer	rp, sp, keyname, ua, ip
-int	fd, max_lenuserarea, curlen, buflen
-int	stropen(), idb_kwlookup(), idb_findrecord(), strlen()
+int	fd, max_lenuserarea, curlen, buflen, nchars
+int	idb_kwlookup(), idb_findrecord()
+int	stropen(), strlen(), idb_filstr(), nowhite()
 errchk	syserrs, stropen, fprintf, pargstr, pargi
 
 begin
@@ -25,9 +26,12 @@ begin
 	call salloc (keyname, SZ_FNAME, TY_CHAR)
 
 	# FITS format requires that the keyword name be upper case, not to
-	# exceed 8 characters in length.
+	# exceed 8 characters in length.  [Nov97 - This is not entirely 
+	# correct, FITS does not require upper case, however we don't want
+	# to change this at this time.]
 
-	call strcpy (key, Memc[keyname], IDB_SZFITSKEY)
+	nchars = idb_filstr (key, Memc[keyname], IDB_SZFITSKEY)
+	nchars = nowhite (Memc[keyname], Memc[keyname], IDB_SZFITSKEY)
 	call strupr (Memc[keyname])
 
 	# Check for a redefinition.

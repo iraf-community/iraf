@@ -24,7 +24,7 @@ bool	center, background, clgpsetb()
 real	sigma, width, rplot, clgpsetr()
 
 int	i, j, k, nx, ny, x1, x2, y1, y2, nfit, flag[5]
-real	xc, yc, bkg, r, fit[5], xfit, yfit, asumr(), amedr()
+real	xc, yc, bkg, r, dr, fit[5], xfit, yfit, asumr(), amedr()
 pointer	sp, title, avstr, im, pp, data, xs, ys, ptr
 pointer	clopset(), ie_gimage(), ie_gdata()
 
@@ -39,7 +39,10 @@ begin
 	# Get parameters
 	if (IE_PP(ie) != NULL)
 	    call clcpset (IE_PP(ie))
-	IE_PP(ie) = clopset ("jimexam")
+	if (axis == 1)
+	    IE_PP(ie) = clopset ("jimexam")
+	else
+	    IE_PP(ie) = clopset ("kimexam")
 	pp = IE_PP(ie)
 	navg = clgpseti (pp, "naverage")
 	center = clgpsetb (pp, "center")
@@ -131,13 +134,17 @@ begin
 
 	# Convert to WCS
 	if (axis == 1) {
-	    call ie_mwctran (ie, xc, yc, fit[4], r)
+	    call ie_mwctran (ie, xc, yc, xfit, yfit)
+	    call ie_mwctran (ie, xc+sigma, yc, r, yfit)
+	    dr = abs (xfit - r)
 	    do i = 0, nx-1
-		call ie_mwctran (ie, real(x1+i), yc, Memr[xs+i], r)
+		call ie_mwctran (ie, real(x1+i), yc, Memr[xs+i], yfit)
 	} else {
-	    call ie_mwctran (ie, yc, xc, r, fit[4])
+	    call ie_mwctran (ie, yc, xc, yfit, xfit)
+	    call ie_mwctran (ie, yc, xc+sigma, yfit, r)
+	    dr = abs (xfit - r)
 	    do i = 0, nx-1
-		call ie_mwctran (ie, yc, real(x1+i), r, Memr[xs+i])
+		call ie_mwctran (ie, yc, real(x1+i), yfit, Memr[xs+i])
 	}
 
 	# Set initial fit parameters
@@ -145,8 +152,8 @@ begin
 	fit[1] = bkg
 	fit[2] = 0.
 	fit[3] = Memr[ys+k] - fit[1]
-	fit[4] = xc
-	fit[5] = sigma
+	fit[4] = xfit
+	fit[5] = dr
 
 	# Do fitting.
 	nfit = 1
@@ -194,26 +201,27 @@ begin
 		Memr[xs+j], Memr[ys+j], k-j+1, IE_YLABEL(ie), IE_YFORMAT(ie))
 
 	call gseti (gp, G_PLTYPE, 2)
-	xfit = Memr[xs+j]
+	xfit = min (Memr[xs+j], Memr[xs+k])
 	r = (xfit - fit[4]) / fit[5]
+	dr = abs ((Memr[xs+k] - Memr[xs+j]) / (k - j))
 	if (abs (r) < 7.)
 	    yfit = fit[1] + fit[2] * xfit + fit[3] * exp (-r**2 / 2.)
 	else
 	    yfit = fit[1] + fit[2] * xfit
 	call gamove (gp, xfit, yfit)
 	repeat {
-	    xfit = xfit + 0.2
+	    xfit = xfit + 0.2 * dr
 	    r = (xfit - fit[4]) / fit[5]
 	    if (abs (r) < 7.)
 		yfit = fit[1] + fit[2] * xfit + fit[3] * exp (-r**2 / 2.)
 	    else
 		yfit = fit[1] + fit[2] * xfit
 	    call gadraw (gp, xfit, yfit)
-	} until (xfit >= Memr[xs+k])
+	} until (xfit >= max (Memr[xs+j], Memr[xs+k]))
 	call gseti (gp, G_PLTYPE, 1)
 
 	# Print the fit values
-	call printf ("%s: center=%7g peak=%7g sigma=%5.3f fwhm=%5.3f bkg=%7g\n")
+	call printf ("%s: center=%7g peak=%7g sigma=%7.4g fwhm=%7.4g bkg=%7g\n")
 	    call pargstr (Memc[avstr])
 	    call pargr (fit[4])
 	    call pargr (fit[3])
@@ -297,7 +305,7 @@ begin
 	dyda[1] = 1.
 	dyda[2] = x
 	dyda[3] = ex
-	dyda[4] = fac
+	dyda[4] = fac / a[5]
 	dyda[5] = fac * arg / a[5]
 end
 

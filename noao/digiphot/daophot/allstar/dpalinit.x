@@ -13,7 +13,8 @@ pointer	dao				# pointer to daophot structure
 pointer	im				# input image decriptor
 
 int	ncol
-pointer	sp, v1, v2, v3, allstar, wtim, dataim, line1, line2, line3
+pointer	sp, v1, v2, v3, v4, line1, line2, line3, line4
+pointer	allstar, wtim, dataim, subtim
 real	rdnoise, mingdata, maxgdata
 int	imgnlr(), impnlr()
 
@@ -23,6 +24,7 @@ begin
 	call salloc (v1, IM_MAXDIM, TY_LONG)
 	call salloc (v2, IM_MAXDIM, TY_LONG)
 	call salloc (v3, IM_MAXDIM, TY_LONG)
+	call salloc (v4, IM_MAXDIM, TY_LONG)
 
 	# Define the allstar pointer.
 	allstar = DP_ALLSTAR (dao)
@@ -40,11 +42,13 @@ begin
 
 	wtim = DP_WEIGHTS (allstar)
 	dataim = DP_DATA(allstar)
+	subtim = DP_SUBT(allstar)
 	ncol = IM_LEN (im, 1)
 
 	call amovkl (long(1), Meml[v1], IM_MAXDIM)
 	call amovkl (long(1), Meml[v2], IM_MAXDIM)
 	call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	call amovkl (long(1), Meml[v4], IM_MAXDIM)
 	while (imgnlr (im, line1, Meml[v1]) != EOF) {
 
 	    # Initialize the subtracted image.
@@ -65,6 +69,13 @@ begin
 		    maxgdata, rdnoise)
 	    }
 
+	    # Initilize the subtracted image.
+	    if (DP_CACHE(allstar, A_WEIGHT) == YES) {
+		;
+	    } else if (impnlr (subtim, line4, Meml[v4]) != EOF) {
+		call amovkr (0.0, Memr[line4], ncol)
+	    }
+
 	}
 
 	# Make sure all the changes are written to disk.
@@ -72,6 +83,8 @@ begin
 	    call imflush (DP_WEIGHTS(allstar))
 	if (DP_CACHE(allstar, A_DCOPY) == NO)
 	    call imflush (DP_DATA(allstar))
+	if (DP_CACHE(allstar, A_SUBT) == NO)
+	    call imflush (DP_SUBT(allstar))
 
 	call sfree (sp)
 end
@@ -239,7 +252,7 @@ begin
 
 		# Test for INDEF.
 	        if (IS_INDEFR(x[j]) || IS_INDEFR(y[j])) {
-		    mag[j] = INDEF
+		    mag[j] = INDEFR
 		    skip[j] = YES
 		    aier[j] = ALLERR_OFFIMAGE
 		    if (verbose == YES)
@@ -427,6 +440,7 @@ begin
 	    # Set all the weights in the working array negative.
 	    call aabsr (Memr[wtbuf], Memr[owtbuf], npix)
 	    call anegr (Memr[owtbuf], Memr[owtbuf], npix)
+	    call amovkr (0.0, Memr[subtbuf], npix)
 
 	    # Set the y coordinate.
 	    y = real (j)

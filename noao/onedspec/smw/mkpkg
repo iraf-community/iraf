@@ -6,7 +6,16 @@ update:
 	$checkin  libsmw.a noaolib$
 	;
 
+generic:
+	$set	GEN = "$$generic -k"
+
+	$ifolder (smwctran.x, smwctran.gx)
+	    $(GEN) smwctran.gx -o smwctran.x $endif
+	;
+
 libsmw.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
 	funits.x	<funits.h> <error.h>
 	shdr.x		<smw.h> <error.h> <imhdr.h> <imset.h> <math/iminterp.h>
 	smwclose.x	<smw.h>

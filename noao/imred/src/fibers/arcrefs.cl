@@ -1,7 +1,7 @@
 # ARCREFS -- Determine dispersion relation for reference arcs.
 
 procedure arcrefs (arcref1, arcref2, extn, arcreplace, apidtable, response,
-	done, log1, log2)
+	crval, cdelt, done, log1, log2)
 
 file	arcref1
 file	arcref2
@@ -9,6 +9,8 @@ string	extn
 file	arcreplace
 file	apidtable
 file	response
+string	crval = "INDEF"
+string	cdelt = "INDEF"
 file	done
 file	log1
 file	log2
@@ -24,6 +26,9 @@ begin
 	bool	log
 
 	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	n = strlen (imtype)
 
 	temp = mktemp ("tmp$iraf")
@@ -131,15 +136,31 @@ begin
 	if (nscan () != 1) {
 	    print ("Determine dispersion solution for ", arcref) | tee (log1)
 	    #delete (database//"/id"//arcrefms//"*", verify=no)
-	    identify (arcrefms, section="middle line", database=database,
-		coordlist=params.coordlist, nsum=1, match=params.match,
-		maxfeatures=50, zwidth=100., ftype="emission",
-		fwidth=params.fwidth, cradius=params.cradius,
-		threshold=params.threshold, minsep=2.,
-		function=params.i_function, order=params.i_order,
-		sample="*", niterate=params.i_niterate,
-		low_reject=params.i_low, high_reject=params.i_high,
-		grow=0., autowrite=yes)
+	    if (real(crval) == INDEF && real(cdelt) == INDEF)
+		identify (arcrefms, section="middle line", database=database,
+		    coordlist=params.coordlist, nsum=1, match=params.match,
+		    maxfeatures=50, zwidth=100., ftype="emission",
+		    fwidth=params.fwidth, cradius=params.cradius,
+		    threshold=params.threshold, minsep=2.,
+		    function=params.i_function, order=params.i_order,
+		    sample="*", niterate=params.i_niterate,
+		    low_reject=params.i_low, high_reject=params.i_high,
+		    grow=0., autowrite=yes)
+	    else
+		autoidentify (arcrefms, crval, cdelt,
+		    coordlist=params.coordlist,
+		    interactive="YES", section="middle line", nsum="1",
+		    ftype="emission", fwidth=params.fwidth,
+		    cradius=params.cradius, threshold=params.threshold,
+		    minsep=2., match=params.match, function=params.i_function,
+		    order=params.i_order, sample="*",
+		    niterate=params.i_niterate, low_reject=params.i_low,
+		    high_reject=params.i_high, grow=0., dbwrite="YES",
+		    overwrite=yes, database="database", verbose=yes,
+		    logfile=logfile, plotfile=plotfile,
+		    reflist="", refspec="", crpix="INDEF", cddir="unknown",
+		    crsearch="-0.5", cdsearch="INDEF", aidpars="")
+
 	    hedit (arcrefms, "refspec1", arcrefms, add=yes,
 		show=no, verify=no)
 
@@ -167,7 +188,7 @@ begin
 		logfile=logfile)
 	    if (params.nsubaps > 1) {
 		imrename (arcrefms, temp, verbose=no)
-		scopy (temp, arcrefms, w1=INDEF, w2=INDEF, apertures="-999",
+		scopy (temp, arcrefms, w1=INDEF, w2=INDEF, apertures="1-999",
 		    bands="", beams="", apmodulus=0, offset=0,
 		    format="multispec", clobber=no, merge=no, renumber=no,
 		    verbose=no)
@@ -277,7 +298,7 @@ begin
 			grow=0., autowrite=yes, cursor=temp1, < temp2,
 			>G "dev$null", >>& temp)
 		delete (temp1, verify=no); delete (temp2, verify=no)
-		match ("Coordinate shift", temp, stop=no, print_file_n=yes,
+		system.match ("Coordinate shift", temp, stop=no, print_file_n=yes,
 		    metacharacte=yes) | tee (log1, > log2)
 		delete (temp, verify=no)
 
@@ -288,7 +309,7 @@ begin
 		    listonly=no, verbose=yes, logfile=logfile, > log2)
 		if (params.nsubaps > 1) {
 		    imrename (arcrefms, temp, verbose=no)
-		    scopy (temp, arcrefms, w1=INDEF, w2=INDEF, apertures="-999",
+		    scopy (temp, arcrefms, w1=INDEF, w2=INDEF, apertures="1-999",
 			bands="", beams="", apmodulus=0, offset=0,
 			format="multispec", clobber=no, merge=no, renumber=no,
 			verbose=no)

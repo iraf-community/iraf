@@ -1,0 +1,5 @@
+# MKPKG for the IMFILTER Package
+
+libpkg.a:
+	@src
+	;

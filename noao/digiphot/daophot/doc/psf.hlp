@@ -4,7 +4,7 @@ NAME
 psf -- build the point spread function for an image
 .ih
 USAGE
-psf image photfile pstfile psfimage groupfile
+psf image photfile pstfile psfimage opstfile groupfile
 .ih
 PARAMETERS
 .ls image

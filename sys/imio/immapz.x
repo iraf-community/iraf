@@ -40,13 +40,15 @@ begin
 	    Memc[ksection],SZ_FNAME, Memc[section],SZ_FNAME, cl_index,cl_size)
 
 	# Allocate buffer for image descriptor/image header.  Note the dual
-	# use of the HDR_ARG argument.  In the case of a new copy image, hdr_arg
-	# is a pointer to the image to be copied; otherwise is is the length of
-	# the user area in CHARS (since the user area is a string buffer).
+	# use of the HDR_ARG argument.  In the case of a new copy image,
+	# hdr_arg is a pointer to the image to be copied; otherwise is is the
+	# length of the user area in CHARS (since the user area is a string
+	# buffer).
 
-	if (acmode == NEW_COPY)
-	    len_imhdr = max (LEN_IMHDR + min_lenuserarea, IM_HDRLEN(hdr_arg))
-	else {
+	if (acmode == NEW_COPY) {
+	    len_imhdr = max (LEN_IMHDR + min_lenuserarea / SZ_STRUCT,
+		IM_HDRLEN(hdr_arg) + SZ_UAPAD / SZ_STRUCT)
+	} else {
 	    len_imhdr = LEN_IMHDR +
 		max (min_lenuserarea, int(hdr_arg)) / SZ_STRUCT
 	}

@@ -42,6 +42,10 @@ standard star data will be an absolute determination of the
 extinction.  The default value is redirected to the package parameter
 of the same name.  The extinction file is generally one of the standard
 extinctions in the calibration directory "onedstds$".
+
+If extinction corrected spectra were used as input to \fBstandard\fR
+then it is important that the same extinction file be used here.
+This includes using no extinction file in both tasks.
 .le
 .ls newextinction = "extinct.dat"
 Output revised extinction file.  If the extinction is revised and an

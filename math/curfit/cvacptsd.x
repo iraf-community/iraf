@@ -69,7 +69,14 @@ begin
 	    # user supplied weights
 	case WTS_CHISQ:
 	    # data assumed to be scaled to photons with Poisson statistics
-	    call arcpd (double(1.0), y, w, npts)
+	    do i = 1, npts {
+		if (y[i] > double(0.0))
+		    w[i] = double(1.0) / y[i]
+		else if (y[i] < double(0.0))
+		    w[i] = -double(1.0) / y[i]
+		else
+		    w[i] = double(0.0)
+	    }
 	default:
 	    call amovkd (double(1.0), w, npts)
 	}

@@ -1,25 +1,30 @@
 # KPNO Telescope, Filter, and Detector Database
+# Revised on the basis of drawings (true aperture size) and
+# improved count rates. Agrees with KPNO Direct Imaging Manual 
+# 1 May 1997 --- plm
+
+
 
 # Telescope data:
 # aperture diameter in meters, scale in arcsec/mm, and tranmission.
 
 telescope = "0.9m"
-	aperture = 0.91
+	aperture = 0.81
 	scale = 28.3
 	transmission = 1.0
 
 telescope = "0.9mf13"
-	aperture = 0.91
+	aperture = 0.81
 	scale = 15.9
 	transmission = 1.0
 
 telescope = "4m"
-	aperture = 4.00
-	scale = 19.6
+	aperture = 3.42
+	scale = 17.5
 	transmission = 1.0
 
 telescope = "2.1m"
-	aperture = 2.1
+	aperture = 1.94
 	scale = 12.7
 	transmission = 1.0
 
@@ -29,7 +34,7 @@ telescope = "Schmidt"
 	transmission = 0.7
 
 telescope = "WIYN"
-	aperture = 3.3	
+	aperture = 3.185
 	scale = 9.4
 	transmission = 1.0
 
@@ -43,35 +48,35 @@ end
 
 filter = "U"
 	mag = 20
-	star = 10.2
+	star = 8.0
 	sky0 = 22.0
 	sky1 = -0.2666
 	sky2 = -.00760
 
 filter = "B"
 	mag = 20
-	star = 34.0
+	star = 34.5
 	sky0 = 22.7 
 	sky1 = -0.0998
 	sky2 = -0.00953
 
 filter = "V"
 	mag = 20
-	star = 37.0
+	star = 36.2
 	sky0 = 21.8 
 	sky1 = -0.0153
 	sky2 = -0.00838
 
 filter = "R"
 	mag = 20
-	star = 40.0
+	star = 36.8
 	sky0 = 20.9 
 	sky1 = -0.0211
 	sky2 = -0.00364
 
 filter = "I"
 	mag = 20
-	star = 28.0
+	star = 26.7
 	sky0 = 19.9 
 	sky1 = -0.0086
 	sky2 = -0.00311
@@ -151,3 +156,4 @@ detector = "S2KB"
 	V = 0.80
 	R = 0.82
 	I = 0.60
+

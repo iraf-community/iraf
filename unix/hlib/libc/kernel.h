@@ -80,11 +80,7 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #ifdef AUX
 #define SIGFUNC sigfunc_t
 #else
-#ifdef SOLARIS
 typedef	void  (*SIGFUNC)();
-#else
-typedef	int  (*SIGFUNC)();
-#endif
 #endif
 
 typedef	void  (*PFV)();

@@ -1,0 +1,20 @@
+# XT_FIXPIX package.
+
+$checkout libxtools.a lib$
+$update	  libxtools.a
+$checkin  libxtools.a lib$
+$exit
+
+generic:
+	$set	GEN = "$$generic -k"
+	$ifolder (xtfp.x, xtfp.gx)
+	    $(GEN) xtfp.gx -o xtfp.x $endif
+	;
+
+libxtools.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	xtfixpix.x	xtfixpix.h <imhdr.h> <imset.h> <pmset.h>
+	xtfp.x		xtfixpix.h <imhdr.h> <pmset.h>
+	xtpmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <pmset.h>
+	;

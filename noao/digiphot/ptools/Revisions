@@ -1,5 +1,25 @@
 .help revisions Jan90 noao.digiphot.ptools
 .nf
+ptools$pdump.cl
+    Modified the way the pdump script handles the tdump pwidth parameter
+    to work around a change made to the tables.ttools.tdump task. The solution
+    is not ideal because it leaves the value of tdump.pwidth.p_max
+    modified but the parameter value is not changed.
+
+    (Davis, August 15, 1997)
+
+ptools$pconcat.cl
+    Added a missing "cache ("istable")" statement that could cause trouble
+    if the pconcat script was called from a backgroound job.
+
+    (Davis, July 28, 1997)
+
+ptools$txtools/t_txselect.x
+    Changed the maximimum size of the expression to be evaluated from SZ_FNAME
+    to SZ_LINE which is what it was supposed to be.
+
+    (Davis, May 25, 1996)
+
 ptools$tbdump.cl
     If the input file was an ST binary table file and the expression parameter
     was not equal to "yes", the intermediate tables file was not being deleted

@@ -176,9 +176,11 @@ pointer	ssp					#I Sample struct pointer
 pointer	gp					#I GIO pointer
 
 pointer	rv
-double	dex()
 real	left, right
-int	i, gstati()
+int	i
+
+double	dex()
+int	gstati()
 
 begin
 	if (SR_COUNT(ssp) == ALL_SPECTRUM || gp == NULL)
@@ -197,13 +199,11 @@ begin
 	    }
 
 	    call gseti (gp, G_WCS, 1)
-	    if (SR_IMTYPE(ssp) == OBJECT_SPECTRUM) {
-	        call gsview (gp, 0.115, 0.95, 0.51, 0.865)
-	        call mark_range (gp, left, right)
-	    } else if (SR_IMTYPE(ssp) == REFER_SPECTRUM) {
+	    if (SR_IMTYPE(ssp) == REFER_SPECTRUM) 
 	        call gsview (gp, 0.115, 0.95, 0.125, 0.5)
-	        call mark_range (gp, left, right)
-	    }
+	    else 
+	        call gsview (gp, 0.115, 0.95, 0.51, 0.865)
+	    call mark_range (gp, left, right)
 	}
 	if (gstati(gp, G_PLTYPE) != GL_CLEAR)
 	   call gseti (gp, G_PLCOLOR, C_FOREGROUND)

@@ -12,6 +12,7 @@ libxtools.a:
 	@gtools		# Graphics tools
 	@icfit		# Interactive curfit package
 	@inlfit		# Interactive non-linear least-squares package
+	@fixpix		# Mask and pixel fixing routines
 
 	center1d.x	<math/iminterp.h> <pkg/center1d.h>
 	clgcurfit.x	<math/curfit.h>

@@ -1,5 +1,7 @@
 	airmass - Compute the airmass at a given elevation above the horizon
+        astcalc - Astronomical calculator
        asthedit - Astronomical header editor
+      astradius - Find images within a circle on the sky
        asttimes - Compute UT, Julian day, epoch, and siderial time
 	ccdtime - Compute time, magnitude, and signal-to-noise for CCDs
        galactic - Convert ra, dec to galactic coordinates

@@ -1,46 +1,7 @@
-         blkavg - Block average or sum a list of N-D images
-	 blkrep - Block replicate a list of images
-	 boxcar - Boxcar smooth a list of 1 or 2-D images
-      chpixtype - Change the pixel type of a list of images
-       convolve - Convolve a list of 1 or 2-D images with a rectangular filter
-          fit1d - Fit a function to image lines or columns
-	fmedian - Quantize and median filter a 2-D image or a list of images
-	  fmode - Quantize and modal filter a 2-D image or list of images
-	  gauss - Convolve a list of 1 or 2-D images with an elliptical Gaussian
-	 geomap - Calculate a coordinate transformation
-	geotran - Geometrically transform a set of 2-D images
-       gradient - Convolve a list of 1 or 2-D images with a gradient operator
-	  hedit - Header editor
-	hselect - Select a subset of images satisfying a boolean expression
-        imarith - Simple image arithmetic
-      imcombine - Combine images pixel-by-pixel using various algorithms
-	 imcopy - Copy an image
-	imdebug - Image debugging package (currently undocumented)
-       imdelete - Delete a list of images
-       imdivide - Image division with zero checking and rescaling
-	 imexpr - Evaluate a general image expression
-         imgets - Return the value of an image parameter as a string
-       imheader - Print an image header
-    imhistogram - Compute image histogram
-      imlintran - Linearly transform a list of 2-D images
-       imrename - Rename one or more images
-        imshift	- Shift a list of 2-D images 
-	imslice - Slice images into images of lower dimension
-	imstack - Stack images into a single image of higher dimension
-   imstatistics - Compute and print statistics for a list of images
-          imsum - Compute the sum, average, or median of a set of images
-       imsurfit	- Fit a surface to a 2-D image
-    imtranspose - Transpose a 2-D image
-	laplace - Laplacian filter a list of 1 or 2-D images
-      lineclean - Replace deviant pixels in image lines
-     listpixels - Convert an image section into a list of pixels
-        magnify - Magnify a list of 1-D or 2-D images
-	 median - Median filter a 2-D image or list of images
-	 minmax - Compute the minimum and maximum pixel values in an image
-	   mode - Modal filter a 2-D image or list of images
-       register - Register a set of images
-	 rotate - Rotate and shift a list of 2-D images
-       sections - Expand an image template on the standard output
-     shiftlines - Shift image lines
-             tv - Image display load and control package
-      xregister - Register 1-D or 2-D images using x-correlation techniques
+       imcoords - Image coordinates package
+       imfilter - Image filtering package
+	  imfit - Image fitting package
+         imgeom - Image geometric transformation package
+        immatch - Image matching and combining package
+	 imutil - Image utilities package
+	     tv - Image display utilities package

@@ -1,5 +1,84 @@
 .help revisions Jun88 pkg.xtools
 .nf
+xtools$imtools.x
+     XT_MKIMTEMP was modified to append the same extension as the input
+     image when creating a temporary image name.  (10/30/97, Valdes)
+
+xtools$ranges.x
+     Returned the EOLIST marker to zero since some programs rely on this.
+     This means that zero cannot be a range element.  Added some
+     checks against a zero step size.  (8/22/97, Valdes)
+
+xtools$fixpix/xtpmmap.x
+     There was a bug in the code which gives "Warning: PLIO: reference out
+     of bounds on mask".  This was introduced with the changes to allow
+     masks and images to have different binning.  (8/21/97, Valdes)
+
+xtools$ranges.x
+xtools$doc/ranges.hlp
+    Now allows zero as a valid range element though the default for a
+    null string is still 1.  (7/15/97, Valdes)
+
+=========
+V2.11Beta
+=========
+
+xtools$fixpix/xtpmmap.x
+    Improved xt_match to match when the sampling is different.
+    (5/21/97, Valdes)
+
+xtools$obsdb.x
+    File date was changed but the code was not changed (5/7/97, Valdes)
+
+xtools$dttext.x
+    Added the new routine dtgetd to the dttext package. (1/16/97, Davis)
+
+xtools$fixpix/xtpmmap.x
+    Fixed some bugs.  (12/30/96, Valdes)
+
+xtools$mkpkg
+xtools$fixpix/	+
+    Added some new tools for dealing with masks.  (12/6/96, Valdes)
+
+xtools$center1d.x
+    When the width parameter is less than or equal to 1 pixel the algorithm
+    is supposed to return the nearest local maximum.  There was a bug
+    such that the nearest pixel to the starting point was returned
+    unless that pixel is a local minimum.  (10/24/96, Valdes)
+
+xtools$numrecipes.x
+    Modified the Poisson deviate routine to return zero for input
+    values less than or equal to zero.  (10/1/96, Valdes)
+
+xtools$xtimnames.x
+    Added "fits" and "fit" as extensions.  (7/30/96, Valdes)
+
+xtools$inlfit/ingresults.gx
+    Changed several INDEFR references to INDEF references so that INDEF
+    has the correct type (real or double) in the output .x files.
+    (18/7/96, Davis)
+
+xtools$dttext.x
+    The dtunmap procedure now returns if a null pointer is received.
+    (1/6/95, Valdes)
+
+xtools$center1d.x
+    Added a routine that allows setting some of the previously hardwired
+    parameters.  By default the routines behave as before unless
+    c1d_params is called to set the parameters.  (10/2/95, Valdes)
+
+xtools$incopy.gx
+    Changed 4 MEMP references to Mem$t references. The in_copyr and
+    in_copyd routines are not used anywhere in the system so this should
+    not be a problem. (8/2/95, Davis)
+
+xtools$rngranges.x
+    Added missing argument to rng_error calls.  (8/2/95, Valdes)
+
+=======
+V2.10.4
+=======
+
 xtools$obsdb.x
     Changed the "timezone" parameter to be a double instead of an integer.
     There are non-integer timezones such as India.  (12/29/94, Valdes)

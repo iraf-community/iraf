@@ -372,7 +372,8 @@ begin
 	switch (pltype) {
 	case CORRELATION_PLOT:
 	    if (DBG_QUICK(rv) == NO || (DBG_QUICK(rv) == YES && where==BOTTOM)){
-	        call gpline (gp, xdata, pldata, fnpts)
+	        #call gpline (gp, xdata, pldata, fnpts)
+	        call gpline (gp, xdata[2], pldata[2], fnpts-1)
 		call gflush (gp)
 	    }
 
@@ -444,15 +445,17 @@ begin
 	    }
 
 	case CONVOLUTION_PLOT, ANTISYM_PLOT, FILTER_PLOT, PREPARED_PLOT:
-	    if (DBG_QUICK(rv) == NO && pltype != SUMMARY_PLOT)
+	    if (DBG_QUICK(rv) == NO && RV_DTYPE(rv) != SUMMARY_PLOT)
 	        call gpline (gp, xdata, pldata, fnpts)
 
 	case SPECTRUM_PLOT, NORM_PLOT:
-	    if (DBG_QUICK(rv) == NO && pltype != SUMMARY_PLOT) {
-		if (where == TOP)
+	    if (DBG_QUICK(rv) == NO && RV_DTYPE(rv) != SUMMARY_PLOT) {
+		if (RV_DTYPE(rv) == OBJECT_SPECTRUM)
 	            call gpline (gp, xdata, pldata, RV_NPTS(rv))
 		else
 	            call gpline (gp, xdata, pldata, RV_RNPTS(rv))
+	    } else if (RV_DTYPE(rv) == SUMMARY_PLOT) {
+	        call gvline (gp, pldata, RV_NPTS(rv), x1, x2)
 	    }
 	default:
 	    call gvline (gp, pldata, fnpts, x1, x2)
@@ -660,7 +663,18 @@ begin
 	        x1 = 10. ** (RV_GLOB_W1(rv))
 	        x2 = 10. ** (RV_GLOB_W2(rv))
 	    }
-	    if (RV_WHERE(rv) == TOP) {
+
+	    if (pltype == FILTER_PLOT || 
+		pltype == NORM_PLOT || 
+		pltype == SPECTRUM_PLOT) {
+	            if (RV_DTYPE(rv) == REFER_SPECTRUM) {
+	                do i = 1, fnpts
+	                    xdata[i] = 10. ** (RV_RW0(rv) + (i-1) * RV_RWPC(rv))
+		    } else {
+	                do i = 1, fnpts
+		            xdata[i] = 10. ** (RV_OW0(rv) + (i-1) * RV_OWPC(rv))
+		    }
+	    } else if (RV_WHERE(rv) == TOP) {
 	        do i = 1, fnpts
 		    xdata[i] = 10. ** (RV_OW0(rv) + (i-1) * RV_OWPC(rv))
 	    } else {
@@ -802,7 +816,6 @@ begin
 	    call strcpy ("Frequency", Memc[x_lbl], SZ_FNAME)
 	    x1 = 0.0
 	    x2 = (real (fnpts) / RVP_FFT_ZOOM(rv)) / (2. * real (fnpts))
-	    #x2 = real (fnpts) / RVP_FFT_ZOOM(rv)
 	case BOTTOM:
 	    call strcpy ("Wavenumber", Memc[x_lbl], SZ_FNAME)
 	    x1 = 1.
@@ -826,7 +839,8 @@ pointer	x_lbl					#O Plot x label pointer
 pointer	y_lbl					#O Plot y label pointer
 real	x1, x2					#O Endpoints
 int	npts					#I Npts in data
-int	fnpts					#I Npts to plot
+int	fnpts					#O Npts to plot
+
 
 begin
 	call get_pspec (rv, rinpt, npts, Memr[pldata], fnpts)

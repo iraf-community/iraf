@@ -15,7 +15,7 @@
 #include <pwd.h>
 
 #ifdef SYSV
-#include <termio.h>
+#include <termios.h>
 #else
 #include <sgtty.h>
 #endif
@@ -118,13 +118,13 @@ extern	int save_prtype;
 #define	USER		"<user>"	/* symbol for user account info   */
 #define	UNAUTH		99		/* means auth did not match       */
 
-#ifdef SOLARIS
+#ifdef POSIX
 #define	SELWIDTH	FD_SETSIZE	/* number of bits for select	  */
 #else
 #define	SELWIDTH	32		/* number of bits for select	  */
 #endif
 
-#ifdef SOLARIS
+#if (defined(BSD) | defined(LINUX))
 #define	RSH		"rsh"		/* typical names are rsh, remsh   */
 #else
 #ifdef SYSV
@@ -328,7 +328,7 @@ XINT	*chan;			/* receives channel code (socket) */
 	    struct  timeval timeout;
 	    int     check, fromlen, req_port;
 	    int     nsec, fd, sig;
-#ifdef SOLARIS
+#ifdef POSIX
 	    fd_set  rfd;
 #else
 	    int     rfd;
@@ -429,7 +429,7 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 	     */
 
 	    dbgmsg1 ("in.irafksd started, pid=%d\n", getpid());
-	    old_sigcld = (SIGFUNC) signal (SIGCLD, (SIGFUNC)ks_onsig);
+	    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_onsig);
 
 	    /* Reset standard streams to console to record error messages. */
 	    fd = open ("/dev/null", 0);     close(0);  dup(fd);  close(fd);
@@ -442,7 +442,7 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 	    for (;;) {
 		timeout.tv_sec = nsec;
 		timeout.tv_usec = 0;
-#ifdef SOLARIS
+#ifdef POSIX
 		FD_ZERO(&rfd);
 		FD_SET(s,&rfd);
 #else
@@ -455,7 +455,7 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 		 */
 		jmpset++;
 		if (sig = setjmp(jmpbuf)) {
-		    if (sig == SIGCLD)
+		    if (sig == SIGCHLD)
 			wait (NULL);
 		    else
 			exit (0);
@@ -473,7 +473,7 @@ d_err:		dbgmsg1 ("in.irafksd parent exit, status=%d\n", status);
 
 		/* Find out where the connection is coming from. */
 		fromlen = sizeof (from);
-#ifdef SOLARIS
+#ifdef POSIX
 		if (getpeername (fd, (struct sockaddr *)&from, &fromlen) < 0) {
 #else
 		if (getpeername (fd, &from, &fromlen) < 0) {
@@ -528,7 +528,7 @@ s_err:		    dbgmsg1 ("in.irafksd fork complete, status=%d\n",
 		    unsigned char *ap = (unsigned char *)&n_addr;
 
 		    dbgmsg1 ("irafks server started, pid=%d\n", getpid());
-		    signal (SIGCLD, old_sigcld);
+		    signal (SIGCHLD, old_sigcld);
 		    close (fd); close (s);
 
 		    n_addr = from.sin_addr.s_addr;
@@ -1098,7 +1098,7 @@ int	*alport;
 
 	for (;;) {
 	    sin.sin_port = htons((u_short)*alport);
-#ifdef SOLARIS
+#ifdef POSIX
 	    if (bind(s, (struct sockaddr *)&sin, sizeof(sin)) >= 0)
 #else
 	    if (bind(s, (caddr_t)&sin, sizeof (sin)) >= 0)
@@ -1161,7 +1161,7 @@ int	fd;
 	register int value = 0;
 	struct  timeval timeout;
 	int	stat, sig;
-#ifdef SOLARIS
+#ifdef POSIX
 	fd_set  rfd;
 #else
 	int     rfd;
@@ -1170,12 +1170,12 @@ int	fd;
 
 	jmpset++;
 	if (sig = setjmp(jmpbuf))
-	    if (sig == SIGCLD)
+	    if (sig == SIGCHLD)
 		wait (NULL);
 
 	timeout.tv_sec = PRO_TIMEOUT;
 	timeout.tv_usec = 0;
-#ifdef SOLARIS
+#ifdef POSIX
 	FD_ZERO(&rfd);
 	FD_SET(fd,&rfd);
 #else
@@ -1870,7 +1870,7 @@ char	*host;
 	char    prompt[80];
 	int	tty, n;
 #ifdef SYSV
-	struct  termio tc, tc_save;
+	struct  termios tc, tc_save;
 #else
 	struct  sgttyb ttystat;
 	int     sg_flags;
@@ -1883,10 +1883,21 @@ char	*host;
 	write (tty, prompt, strlen(prompt));
 
 #ifdef SYSV
-	ioctl (tty, TCGETA, &tc);
+	tcgetattr (tty, &tc);
 	tc_save = tc;
-	tc.c_lflag &= ~ECHO;
-	ioctl (tty, TCSETAF, &tc);
+	 
+	tc.c_lflag &=
+	    ~(0 | ICANON | ECHO | ECHOE | ECHOK | ECHONL);
+	tc.c_oflag |=
+	    (0 | TAB3 | OPOST | ONLCR);
+	tc.c_oflag &=
+	    ~(0 | OCRNL | ONOCR | ONLRET);
+
+	tc.c_cc[VMIN] = 1;
+	tc.c_cc[VTIME] = 0;
+	tc.c_cc[VLNEXT] = 0;
+
+	tcsetattr (tty, TCSADRAIN, &tc);
 #else
 	ioctl (tty, TIOCGETP, &ttystat);
 	sg_flags = ttystat.sg_flags;
@@ -1898,7 +1909,7 @@ char	*host;
 	write (tty, "\n", 1);
 
 #ifdef SYSV
-	ioctl (tty, TCSETAF, &tc_save);
+	tcsetattr (tty, TCSADRAIN, &tc_save);
 #else
 	ttystat.sg_flags = sg_flags;
 	ioctl (tty, TIOCSETP, &ttystat);

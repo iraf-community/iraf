@@ -2,7 +2,7 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.10EXPORT April 1992 revision 1"
+    logver = "IRAF V2.11 May 1997"
 
 set	home		= "U_HOME"
 set	imdir		= "U_IMDIR"
@@ -29,7 +29,7 @@ if (envget("TERM") == "sun") {
 #set	clobber		= no
 #set	filewait	= yes
 #set	cmbuflen	= 512000
-#set	min_lenuserarea	= 24000
+#set	min_lenuserarea	= 64000
 #set	imtype		= "imh"
 
 # IMTOOL/XIMAGE stuff.  Set node to the name of your workstation to

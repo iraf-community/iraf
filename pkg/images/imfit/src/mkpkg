@@ -1,0 +1,15 @@
+# Library for the IMAGES IMFIT Subpackage Tasks
+
+$checkout libpkg.a ../../
+$update   libpkg.a
+$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+	fit1d.x		<imhdr.h> <pkg/gtools.h> <error.h>
+	imsurfit.x	imsurfit.h <math/surfit.h> <imhdr.h> <mach.h>
+	pixlist.x       pixlist.h
+	ranges.x        <ctype.h> <mach.h>
+	t_imsurfit.x	imsurfit.h <error.h> <imhdr.h>
+	t_lineclean.x	<imhdr.h> <pkg/gtools.h>
+	;

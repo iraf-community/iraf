@@ -8,8 +8,8 @@ size,i,h,1,1,,"Pattern size
 
 IF NEW IMAGE"
 title,s,h,"",,,"Image title"
-pixtype,s,h,"real","short|integer|real|double",,"Pixel datatype"
-ndim,i,h,2,1,7,"Number of dimensions"
+pixtype,s,h,"real","ushort|short|integer|real|double|complex",,"Pixel datatype"
+ndim,i,h,2,0,7,"Number of dimensions"
 ncols,i,h,512,1,,"Number of columns"
 nlines,i,h,512,1,,"Number of lines"
 n3,i,h,1,1,,"Number of pixels in 3rd dimension"

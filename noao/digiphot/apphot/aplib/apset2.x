@@ -11,7 +11,7 @@ include "../lib/radprof.h"
 include "../lib/finddef.h"
 include "../lib/find.h"
 
-# APSETS2 -- Procedure to set an apphot string parameter.
+# AP2SETS -- Procedure to set an apphot string parameter.
 
 procedure ap2sets (ap, param, str)
 
@@ -35,7 +35,7 @@ begin
 	case CCDREAD:
 	    call strcpy (str, AP_CCDREAD(nse), SZ_FNAME)
 	default:
-	    call error (0, "APSETS: Unknown apphot parameter")
+	    call error (0, "APSETS: Unknown apphot string parameter")
 	}
 end
 
@@ -88,7 +88,7 @@ begin
 	case RPNDATAREJ:
 	    AP_RPNDATAREJ(rprof) = ival
 	default:
-	    call error (0, "APSETI: Unknown apphot parameter")
+	    call error (0, "APSETI: Unknown apphot integer parameter")
 	}
 end
 
@@ -140,8 +140,6 @@ begin
 	    AP_RPKSIGMA(rprof) = rval
 	case PYZMAG:
 	    AP_PYZMAG(ply) = rval
-	case PYNPIX:
-	    AP_PYNPIX(ply) = rval
 	case PYMAG:
 	    AP_PYMAG(ply) = rval
 	case PYMAGERR:
@@ -160,8 +158,6 @@ begin
 	    AP_PYXMEAN(ply) = rval
 	case PYYMEAN:
 	    AP_PYYMEAN(ply) = rval
-	case PYFLUX:
-	    AP_PYFLUX(ply) = rval
 	case SKYSIGMA:
 	    AP_SKYSIGMA(nse) = rval
 	case EPADU:
@@ -185,6 +181,34 @@ begin
 	case ROUNDHI:
 	    AP_ROUNDHI(fnd) = rval
 	default:
-	    call error (0, "APSETR: Unknown apphot parameter")
+	    call error (0, "APSETR: Unknown apphot real parameter")
 	}
 end
+
+
+# AP2SETD -- Procedure to set a double apphot parameter.
+
+procedure ap2setd (ap, param, dval)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+double	dval		# double value
+
+pointer	nse, ply, rprof, fnd
+
+begin
+	nse = AP_NOISE(ap)
+	ply = AP_POLY(ap)
+	rprof = AP_RPROF(ap)
+	fnd = AP_PFIND(ap)
+
+	switch (param) {
+	case PYNPIX:
+	    AP_PYNPIX(ply) = dval
+	case PYFLUX:
+	    AP_PYFLUX(ply) = dval
+	default:
+	    call error (0, "APSETD: Unknown apphot double parameter")
+	}
+end
+

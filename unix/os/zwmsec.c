@@ -7,6 +7,25 @@
 #define import_spp
 #include <iraf.h>
 
+/* Comment out or ifdef the following if usleep is not available. */
+#define USE_USLEEP
+
+#ifdef USE_USLEEP
+
+/* ZWMSEC -- Suspend task execution (sleep) for the specified number
+ * of milliseconds.
+ */
+ZWMSEC (msec)
+XINT	*msec;
+{
+	/* Usleep doesn't really appear to be a standard, but it is
+	 * available on most platforms.
+	 */
+	(void) usleep (*msec * 1000);
+}
+
+
+#else
 #include <sys/time.h>
 #include <signal.h>
 
@@ -78,3 +97,4 @@ napmsx()
 {
 	ringring = 1;
 }
+#endif

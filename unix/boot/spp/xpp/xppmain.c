@@ -13,7 +13,6 @@
  * Main routine for the XPP preprocessor (first pass of the SPP compiler).
  */
 
-#define	SZ_PATHNAME	127
 #define	IRAFDEFS	"host$hlib/iraf.h"
 
 int	errflag;

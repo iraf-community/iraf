@@ -2,6 +2,7 @@
 
 input,s,a,,,,List of input images
 output,s,h,"",,,List of output spectra
+apertures,s,h,"",,,Apertures
 scatter,s,h,"",,,List of scattered light images (optional)
 references,s,h,"",,,List of aperture reference images
 profiles,s,h,"",,,"List of aperture profile images
@@ -64,7 +65,7 @@ order,s,h,"increasing",,,"Order of apertures
 
 # RECENTERING PARAMETERS
 "
-apertures,s,h,"",,,Select apertures
+aprecenter,s,h,"",,,Apertures for recentering calculation
 npeaks,r,h,INDEF,,,Select brightest peaks
 shift,b,h,yes,,,"Use average shift instead of recentering?
 

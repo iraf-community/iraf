@@ -324,7 +324,7 @@ begin
 		Memd[FC_DYDX(fc)+i])
 	} else {
 	    if (Memi[FC_DTYPE(fc)+i] == LOG)
-		din = log10 (in[1])
+		din = log10 (din)
 	    out[1] = (din-Memd[FC_CRVAL(fc)+i]) / Memd[FC_CDELT(fc)+i] + 1
 	    out[1] = max (0.5D0, min (double(Memi[FC_NPTS(fc)+i]+0.5), out[1]))
 	}

@@ -31,7 +31,7 @@ real	cradius			# Centering radius
 real	cwidth			# Centering width
 real	cthreshold		# Detection threshold for centering
 
-int	dispaxis, apaxis
+int	i, na, dispaxis, apaxis
 real	center
 pointer	im, ic, ic1, sp, str
 data	ic1 /NULL/
@@ -46,6 +46,13 @@ errchk	ap_immap, ic_open, ap_ltrace, ap_ctrace
 common	/apt_com/ ic
 
 begin
+	na = 0
+	do i = 1, naps
+	    if (AP_SELECT(aps[i]) == YES)
+		na = na + 1
+	if (naps > 0 && na == 0)
+	    return
+
 	# Query user.
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
@@ -118,9 +125,10 @@ begin
 	}
 
 	# Log the tracing and write the traced apertures to the database.
+
 	call sprintf (Memc[str], SZ_LINE,
 	    "TRACE - %d apertures traced in %s.")
-       	    call pargi (naps)
+       	    call pargi (na)
        	    call pargstr (image)
 	if (apedit == NO)
 	    call ap_log (Memc[str], YES, YES, NO)
@@ -213,6 +221,8 @@ begin
 	# Trace each feature.
 
 	do j = 1, naps {
+	    if (AP_SELECT(aps[j]) == NO)
+		next
 
 	    # Trace from the starting column to the last column while the
 	    # position is not INDEF.
@@ -464,6 +474,8 @@ begin
 
 	x1 = x + istart - 1
 	do i = 1, naps {
+	    if (AP_SELECT(aps[i]) == NO)
+		next
 	    Memr[xc+i-1] = AP_CEN(aps[i], 1) +
 		cveval (AP_CV(aps[i]), real (start))
 	    Memi[lost+i-1] =  0
@@ -482,8 +494,10 @@ begin
 	    else
 	        call xt_lsum (im, 1, nx, line1, line2, data)
 
-	    x2 = x1
 	    do j = 1, naps {
+		if (AP_SELECT(aps[j]) == NO)
+		    next
+		x2 = x1 + (j - 1) * ntrace
 		Memr[x2] = INDEF
 		if (Memi[lost+j-1] < nlost) {
 		    xc1 = center1d (Memr[xc+j-1], Memr[data], nx,
@@ -510,7 +524,6 @@ begin
 			}
 		    }
 		}
-		x2 = x2 + ntrace
 	    }
 	    x1 = x1 + 1
 	}
@@ -519,6 +532,8 @@ begin
 
 	x1 = x + istart - 2
 	do i = 1, naps {
+	    if (AP_SELECT(aps[i]) == NO)
+		next
 	    Memr[xc+i-1] = AP_CEN(aps[i], 1) +
 		cveval (AP_CV(aps[i]), real (start))
 	    Memi[lost+i-1] = 0
@@ -537,8 +552,10 @@ begin
 	    else
 	        call xt_lsum (im, 1, nx, line1, line2, data)
 
-	    x2 = x1
 	    do j = 1, naps {
+		if (AP_SELECT(aps[j]) == NO)
+		    next
+		x2 = x1 + (j - 1) * ntrace
 		Memr[x2] = INDEF
 		if (Memi[lost+j-1] < nlost) {
 		    xc1 = center1d (Memr[xc+j-1], Memr[data], nx,
@@ -565,7 +582,6 @@ begin
 			}
 		    }
 		}
-		x2 = x2 + ntrace
 	    }
 	    x1 = x1 - 1
 	}
@@ -581,6 +597,9 @@ begin
 	call gt_setr (gt, GTXMAX, real (ny + step / 2))
 
 	do j = 1, naps {
+	    if (AP_SELECT(aps[j]) == NO)
+		next
+
 	    # Order the traced points and exclude INDEF positions.
 
 	    x1 = x + (j - 1) * ntrace

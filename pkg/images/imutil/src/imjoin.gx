@@ -1,0 +1,92 @@
+include <imhdr.h>
+
+define	VPTR		Memi[$1+$2-1]	# Array of axis vector pointers
+
+$for (silrdx)
+
+# IMJOIN -- Join the set of input images into an output image along the
+# specified axis, any dimension.
+
+procedure imjoin$t (inptr, nimages, out, joindim, outtype)
+
+pointer	inptr[nimages]		#I Input IMIO pointers
+int	nimages			#I Number of input images
+pointer	out			#I Output IMIO pointer
+int	joindim			#I Dimension along which to join images
+int	outtype			#I Output datatype
+
+int	i, image, line, nlines, nbands, stat, cum_len
+pointer	sp, vin, vout, in, inbuf, outbuf
+
+pointer	imgnl$t()
+pointer	impnl$t()
+
+begin
+	# Allocate working space.
+	call smark (sp)
+	call salloc (vin, nimages, TY_INT)
+	call salloc (vout, IM_MAXDIM, TY_LONG)
+
+	# Initialize the v vectors.
+	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	do image = 1, nimages {
+	    call salloc (VPTR(vin,image), IM_MAXDIM, TY_LONG)
+	    call amovkl (long(1), Meml[VPTR(vin,image)], IM_MAXDIM)
+	}
+
+	# Join input images along the specified dimension. Joins along
+	# columns and lines require processing in special order, all others
+	# in the same order.  In the first two cases we process all input
+	# images in inner loops, so we have to keep all those image
+	# descriptors open.
+
+	switch (joindim) {
+	case 1:						# join columns
+	    nlines = 1
+	    do i = 2, IM_NDIM(out)
+		nlines = nlines * IM_LEN(out,i)
+	    do i = 1, nlines {
+		stat = impnl$t (out, outbuf, Meml[vout])
+		cum_len = 0
+		do image = 1, nimages {
+		    in = inptr[image]
+		    stat = imgnl$t (in, inbuf, Meml[VPTR(vin,image)])
+		    call amov$t (Mem$t[inbuf], Mem$t[outbuf+cum_len],
+			    IM_LEN(in,1))
+		    cum_len = cum_len + IM_LEN(in,1)
+		}
+	    }
+
+	case 2:						# join lines
+	    nbands = 1
+	    do i = 3, IM_NDIM(out)
+		nbands = nbands * IM_LEN(out,i)
+	    do i = 1, nbands {
+		do image = 1, nimages {
+		    in = inptr[image]
+		    do line = 1, IM_LEN(in,2) {
+			stat = impnl$t (out, outbuf, Meml[vout])
+			stat = imgnl$t (in, inbuf, Meml[VPTR(vin,image)])
+			call amov$t (Mem$t[inbuf], Mem$t[outbuf], IM_LEN(in,1))
+		    }
+		}
+	    }
+
+	default:					# join bands or higher
+	    do image = 1, nimages {
+		in = inptr[image]
+		nlines = 1
+		do i = 2, IM_NDIM(in)
+		    nlines = nlines * IM_LEN(in,i)
+		do i = 1, nlines {
+		    stat = impnl$t (out, outbuf, Meml[vout])
+		    stat = imgnl$t (in, inbuf, Meml[VPTR(vin,image)])
+		    call amov$t (Mem$t[inbuf], Mem$t[outbuf], IM_LEN(in,1))
+		}
+	    }
+	}
+
+	call sfree (sp)
+end
+
+$endfor

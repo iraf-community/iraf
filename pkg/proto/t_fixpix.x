@@ -1,172 +1,154 @@
+include	<error.h>
 include	<imhdr.h>
-include	<fset.h>
+include	<imset.h>
+include	<pmset.h>
 
-# FIXPIX -- Interpolate over bad columns and lines.
+
+# T_FIXPIX -- Interpolate over bad columns and lines.
 
 procedure t_fixpix ()
 
-char	images[SZ_LINE]			# Image template
-char	badpixels[SZ_FNAME]		# File containing the badpixel regions
-bool	verbose				# Print image names and regions?
+int	ilist			# List of images
+int	mlist			# List of masks
+int	linterp			# Mask code for line interpolation
+int	cinterp			# Mask code for column interpolation
+bool	verbose			# Verbose output?
+int	fd			# List pixels?
 
-char	imname[SZ_FNAME]		# Image name
-pointer	image				# Image pointer
+int	i, nc, nl
+long	v[IM_MAXDIM]
+pointer	sp, imname, pmname, str1, str2, im, pmim, pm, fp, buf, tmp
 
-int	list, badpix
-
-int	open(), imtopen(), imtgetim()
-bool	clgetb()
-pointer	immap()
+bool	clgetb(), pm_linenotempty()
+int	imtopenp(), imtgetim(), imtlen(), clgeti(), imaccf(), imstati()
+long	clktime()
+pointer	immap(), xt_pmmap(), xt_fpinit()
+pointer	xt_fps(), xt_fpi(), xt_fpl(), xt_fpr(), xt_fpd()
+pointer	impl2s(), impl2i(), impl2l(), impl2r(), impl2d()
+errchk	immap, xt_pmmap, xt_fpinit
 
 begin
-	# Get the image template and expand.
+	call smark (sp)
+	call salloc (imname, SZ_FNAME, TY_CHAR)
+	call salloc (pmname, SZ_FNAME, TY_CHAR)
+	call salloc (str1, SZ_LINE, TY_CHAR)
+	call salloc (str2, SZ_LINE, TY_CHAR)
 
-	call clgstr ("images", images, SZ_LINE)
-	call clgstr ("badpixels", badpixels, SZ_FNAME)
+	# Get task parameters
+	ilist = imtopenp ("images")
+	mlist = imtopenp ("masks")
+	linterp = clgeti ("linterp")
+	cinterp = clgeti ("cinterp")
 	verbose = clgetb ("verbose")
-	if (verbose)
-	    call fseti (STDOUT, F_FLUSHNL, YES)
+	if (verbose && clgetb ("pixels"))
+	    fd = STDOUT
+	else
+	    fd = NULL
 
-	list = imtopen (images)
+	i = imtlen (mlist)
+	if (i == 0 || (i > 1 && i != imtlen (ilist))) {
+	    call imtclose (ilist)
+	    call imtclose (mlist)
+	    call sfree (sp)
+	    call error (1, "Image and mask lists are incompatible")
+	}
+	if (!IS_INDEFI(linterp) && !IS_INDEF(cinterp) &&
+	    linterp>0 && linterp==cinterp) {
+	    call imtclose (ilist)
+	    call imtclose (mlist)
+	    call sfree (sp)
+	    call error (1, "Interpolation codes are the same")
+	}
 
-	while (imtgetim (list, imname, SZ_FNAME) != EOF) {
-
-	    if (verbose) {
-		call printf ("fixpix: %s\n")
-		    call pargstr (imname)
+	# Fix the pixels.
+	while (imtgetim (ilist, Memc[imname], SZ_FNAME) != EOF) {
+	    if (imtgetim (mlist, Memc[pmname], SZ_FNAME) == EOF) {
+		call imtrew (mlist)
+		if (imtgetim (mlist, Memc[pmname], SZ_FNAME) == EOF)
+		    call error (1, "Error in mask list")
 	    }
-	    image = immap (imname, READ_WRITE, 0)
-	    badpix = open (badpixels, READ_ONLY, TEXT_FILE)
-	    call fixpix (image, badpix, verbose)
-	    call imunmap (image)
-	    call close (badpix)
+	    iferr {
+		im = NULL
+		pmim = NULL
+		fp = NULL
+	        tmp = immap (Memc[imname], READ_WRITE, 0)
+		im = tmp
+		tmp = xt_pmmap (Memc[pmname], im, Memc[pmname], SZ_FNAME);
+		pmim = tmp
+		pm = imstati (pmim, IM_PMDES)
+
+		nc = IM_LEN(im,1)
+		nl = IM_LEN(im,2)
+		tmp= xt_fpinit (pm, linterp, cinterp)
+		fp = tmp
+
+		if (verbose || fd != NULL) {
+		    call printf ("FIXPIX: image %s with mask %s\n")
+			call pargstr (Memc[imname])
+			call pargstr (Memc[pmname])
+		    call flush (STDOUT)
+		}
+
+		call amovkl (long(1), v, IM_MAXDIM)
+		if (fp != NULL) {
+		    do i = 1, nl {
+			v[2] = i
+			if (!pm_linenotempty (pm, v))
+			    next
+			switch (IM_PIXTYPE(im)) {
+			case TY_SHORT:
+			    buf = impl2s (im, i)
+			    tmp = xt_fps (fp, im, i, fd)
+			    call amovs (Mems[tmp], Mems[buf], nc)
+			case TY_INT:
+			    buf = impl2i (im, i)
+			    tmp = xt_fpi (fp, im, i, fd)
+			    call amovi (Memi[tmp], Memi[buf], nc)
+			case TY_USHORT, TY_LONG:
+			    buf = impl2l (im, i)
+			    tmp = xt_fpl (fp, im, i, fd)
+			    call amovl (Meml[tmp], Meml[buf], nc)
+			case TY_REAL, TY_COMPLEX:
+			    buf = impl2r (im, i)
+			    tmp = xt_fpr (fp, im, i, fd)
+			    call amovr (Memr[tmp], Memr[buf], nc)
+			case TY_DOUBLE:
+			    buf = impl2d (im, i)
+			    tmp = xt_fpd (fp, im, i, fd)
+			    call amovd (Memd[tmp], Memd[buf], nc)
+			}
+		    }
+		}
+
+		# Add log to header.
+		call cnvdate (clktime(0), Memc[str2], SZ_LINE)
+		call sprintf (Memc[str1], SZ_LINE, "%s Bad pixel file is %s")
+			call pargstr (Memc[str2])
+			call pargstr (Memc[pmname])
+		if (imaccf (im, "FIXPIX") == NO)
+		    call imastr (im, "FIXPIX", Memc[str1])
+		else {
+		    do i = 2, 99 {
+			call sprintf (Memc[str2], SZ_LINE, "FIXPIX%02d")
+			    call pargi (i)
+			if (imaccf (im, Memc[str2]) == NO) {
+			    call imastr (im, Memc[str2], Memc[str1])
+			    break
+			}
+		    }
+		}
+	    } then
+		call erract (EA_WARN)
+
+	    if (fp != NULL)
+		call xt_fpfree (fp)
+	    if (pmim != NULL)
+		call imunmap (pmim)
+	    if (im != NULL)
+		call imunmap (im)
 	}
 
-	call imtclose (list)
-end
-
-procedure fixpix (image, badpix, verbose)
-
-pointer	image				# Image pointer
-int	badpix				# File pointer
-bool	verbose				# Print regions fixed?
-
-int	x1, x2, y1, y2			# Bad region
-
-int	temp, fscan(), nscan()
-
-begin
-	# Scan the bad pixel regions from the file.
-
-	while (fscan (badpix) != EOF) {
-	    call gargi (x1)
-	    call gargi (x2)
-	    call gargi (y1)
-	    call gargi (y2)
-	    if (nscan () != 4)
-		next
-
-	    if (x1 > x2) {
-		temp = x1; x1 = x2; x2 = temp
-	    }
-	    if (y1 > y2) {
-		temp = y1; y1 = y2; y2 = temp
-	    }
-
-	    # Check that the region is not the entire image.
-
-	    if ((x1 == 1) && (x2 == IM_LEN (image, 1)) &&
-		(y1 == 1) && (y2 == IM_LEN (image, 2))) {
-		call eprintf ("Cannot fix an entire image")
-		next
-	    }
-
-	    # If the bad region spans entire lines interpolate lines.
-	    if ((x1 == 1) && (x2 == IM_LEN (image, 1)))
-		call fixline (image, x1, x2, y1, y2, verbose)
-
-	    # If the bad region spans entire columns interpolate columns.
-	    else if ((y1 == 1) && (y2 == IM_LEN (image, 2)))
-		call fixcolumn (image, x1, x2, y1, y2, verbose)
-
-	    # If the bad region is longer in the columns interpolate columns.
-	    else if ((x2 - x1) < (y2 - y1))
-		call fixcolumn (image, x1, x2, y1, y2, verbose)
-
-	    # If the bad region is longer in the lines interpolate lines.
-	    else 
-		call fixline (image, x1, x2, y1, y2, verbose)
-	}
-end
-
-# FIXLINE -- Switch to the appropriate generic procedure to optimize the
-# image I/O.
-
-procedure fixline (image, x1, x2, y1, y2, verbose)
-
-pointer	image				# Image pointer
-int	x1, x2, y1, y2			# Region to be fixed
-bool	verbose				# Print regions fixed?
-
-begin
-	if (verbose) {
-	    call printf ("  Interpolate lines for region %d %d %d %d\n")
-		call pargi (x1)
-		call pargi (x2)
-		call pargi (y1)
-		call pargi (y2)
-	}
-
-	switch (IM_PIXTYPE (image)) {
-	case TY_SHORT:
-	    call fixlines (image, x1, x2, y1, y2)
-	case TY_INT:
-	    call fixlinei (image, x1, x2, y1, y2)
-	case TY_USHORT, TY_LONG:
-	    call fixlinel (image, x1, x2, y1, y2)
-	case TY_REAL:
-	    call fixliner (image, x1, x2, y1, y2)
-	case TY_DOUBLE:
-	    call fixlined (image, x1, x2, y1, y2)
-	case TY_COMPLEX:
-	    call fixlinex (image, x1, x2, y1, y2)
-	default:
-	    call eprintf ("Unknown pixel type")
-	}
-end
-
-# FIXCOLUMN -- Switch to the appropriate generic procedure to optimize the
-# image I/O.
-
-procedure fixcolumn (image, x1, x2, y1, y2, verbose)
-
-pointer	image				# Image pointer
-int	x1, x2, y1, y2			# Region to be fixed
-bool	verbose				# Print regions fixed?
-
-begin
-	if (verbose) {
-	    call printf ("  Interpolate columns for region %d %d %d %d\n")
-		call pargi (x1)
-		call pargi (x2)
-		call pargi (y1)
-		call pargi (y2)
-	}
-
-	switch (IM_PIXTYPE (image)) {
-	case TY_SHORT:
-	    call fixcols (image, x1, x2, y1, y2)
-	case TY_INT:
-	    call fixcoli (image, x1, x2, y1, y2)
-	case TY_USHORT, TY_LONG:
-	    call fixcoll (image, x1, x2, y1, y2)
-	case TY_REAL:
-	    call fixcolr (image, x1, x2, y1, y2)
-	case TY_DOUBLE:
-	    call fixcold (image, x1, x2, y1, y2)
-	case TY_COMPLEX:
-	    call fixcolx (image, x1, x2, y1, y2)
-	default:
-	    call eprintf ("Unknown pixel type")
-	}
+	call imtclose (ilist)
+	call imtclose (mlist)
+	call sfree (sp)
 end

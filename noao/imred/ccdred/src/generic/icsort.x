@@ -187,6 +187,8 @@ begin
 				b[3] = pivot
 				itemp = d[2]
 				d[2] = d[3]
+				d[3] = d[1]
+				d[1] = itemp
 			    }
 			} else {				# cba
 			    b[1] = temp3
@@ -458,6 +460,8 @@ begin
 				b[3] = pivot
 				itemp = d[2]
 				d[2] = d[3]
+				d[3] = d[1]
+				d[1] = itemp
 			    }
 			} else {				# cba
 			    b[1] = temp3
@@ -544,3 +548,4 @@ copy_
 	    }
 	}
 end
+

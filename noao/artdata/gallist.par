@@ -28,7 +28,7 @@ lseed,i,h,2,,,"Seed for sampling the luminosity probability function
 
 MORPHOLOGY DISTRIBUTION"
 egalmix,r,h,0.4,,,"Percentage of elliptical galaxies"
-ar,r,h,0.7,0.,1.,"Minimum elliptical galaxy axial ratio"
+ar,r,h,0.3,0.3,1.,"Minimum elliptical galaxy axial ratio"
 eradius,r,h,20.,,,"Maximum elliptical half flux radius"
 sradius,r,h,1.,,,"Spiral/ellipical radius at same magnitude"
 absorption,r,h,1.2,,,"Absorption in edge on spirals (mag)"

@@ -8,12 +8,13 @@ include	"icombine.h"
 
 # T_COMBINE -- Combine CCD images.
 # This task is a copy of IMAGES.IMCOMBINE except that it recognizes the
-# CCD types and can group images by SUBSET.  It also uses header keyword
-# translation for the exposure times.
+# CCD types and can group images by AMP and SUBSET.  It also uses header
+# keyword translation for the exposure times.
 
 procedure t_combine ()
 
-pointer	images			# Images filter by ccdtype and sorted by subset
+pointer	images			# Images
+pointer	extns			# Image extensions for each subset
 pointer	subsets			# Subsets
 pointer	nimages			# Number of images in each subset
 int	nsubsets		# Number of subsets
@@ -22,7 +23,6 @@ pointer	plroot			# Output pixel list root name
 pointer	sigroot			# Output root sigma image name
 pointer	logfile			# Log filename
 bool	delete			# Delete input images?
-bool	clobber			# Clobber output images?
 
 int	i
 pointer	sp, output, plfile, sigma
@@ -48,12 +48,12 @@ begin
 	call salloc (logfile, SZ_FNAME, TY_CHAR)
 
 	# Open the header translation which is needed to determine the
-	# subsets and ccdtypes.  Get the input images.
+	# amps, subsets and ccdtypes.  Get the input images.
 	# There must be a least one image in order to continue.
 
 	call clgstr ("instrument", Memc[output], SZ_FNAME)
 	call hdmopen (Memc[output])
-	call cmb_images (images, subsets, nimages, nsubsets)
+	call cmb_images (images, extns, subsets, nimages, nsubsets)
 	if (nsubsets == 0)
 	    call error (0, "No images to combine")
 
@@ -81,7 +81,6 @@ begin
         mclip = clgetb ("mclip")
         sigscale = clgetr ("sigscale")
 	delete = clgetb ("delete")
-	clobber = clgetb ("clobber")
 
         # Check parameters, map INDEFs, and set threshold flag
         if (IS_INDEFR (blank))
@@ -105,6 +104,10 @@ begin
                 hthresh = MAX_REAL
         }
 
+	# This is here for backward compatibility.
+	if (clgetb ("clobber"))
+	    call error (1, "Clobber option is no longer supported")
+
 	# Combine each input subset.
 	do i = 1, nsubsets {
 	    # Set the output, pl, and sigma image names with subset extension.
@@ -112,12 +115,14 @@ begin
 	    call strcpy (Memc[outroot], Memc[output], SZ_FNAME)
 	    call sprintf (Memc[output], SZ_FNAME, "%s%s")
 		call pargstr (Memc[outroot])
-		call pargstr (Memc[Memi[subsets+i-1]])
+		call pargstr (Memc[Memi[extns+i-1]])
 
 	    call strcpy (Memc[plroot], Memc[plfile], SZ_FNAME)
 	    if (Memc[plfile] != EOS) {
 		call sprintf (Memc[plfile], SZ_FNAME, "%s%s")
 		    call pargstr (Memc[plroot])
+		    # Use this if we can append pl files.
+		    #call pargstr (Memc[Memi[extns+i-1]])
 		    call pargstr (Memc[Memi[subsets+i-1]])
 	    }
 
@@ -125,21 +130,23 @@ begin
 	    if (Memc[sigma] != EOS) {
 		call sprintf (Memc[sigma], SZ_FNAME, "%s%s")
 		    call pargstr (Memc[sigroot])
-		    call pargstr (Memc[Memi[subsets+i-1]])
+		    call pargstr (Memc[Memi[extns+i-1]])
 	    }
 
 	    # Combine all images from the (subset) list.
 	    iferr (call icombine (Memc[Memi[images+i-1]], Memi[nimages+i-1],
 		Memc[output], Memc[plfile], Memc[sigma],
-		Memc[logfile], delete, clobber)) {
+		Memc[logfile], NO, delete)) {
 		call erract (EA_WARN)
 	    }
 	    call mfree (Memi[images+i-1], TY_CHAR)
+	    call mfree (Memi[extns+i-1], TY_CHAR)
 	    call mfree (Memi[subsets+i-1], TY_CHAR)
 	}
 
 	# Finish up.
 	call mfree (images, TY_POINTER)
+	call mfree (extns, TY_POINTER)
 	call mfree (subsets, TY_POINTER)
 	call mfree (nimages, TY_INT)
 	call hdmclose ()
@@ -148,22 +155,27 @@ end
 
 
 # CMB_IMAGES -- Get images from a list of images.
-# The images are filtered by ccdtype and sorted by subset.  The allocated lists
-# must be freed by the caller.
+# The images are filtered by ccdtype and sorted by amplifier and subset.
+# The allocated lists must be freed by the caller.
 
-procedure cmb_images (images, subsets, nimages, nsubsets)
+procedure cmb_images (images, extns, subsets, nimages, nsubsets)
 
 pointer	images		# Pointer to lists of subsets (allocated)
-pointer	subsets		# Subset numbers (allocated)
+pointer	extns		# Image extensions for each subset (allocated)
+pointer	subsets		# Subset names (allocated)
 pointer	nimages		# Number of images in subset (allocated)
 int	nsubsets	# Number of subsets
 
 int	list		# List of input images
-bool	dosubsets	# Divide input into subsets?
+bool	doamps		# Divide input into subsets by amplifier?
+bool	dosubsets	# Divide input into subsets by subset parameter?
+bool	extend		# Add extensions to output image names?
 
 int	i, nimage, ccdtype
-pointer	sp, image, subset, ptr, str, im
+pointer	sp, type, image, extn, subset, str, ptr, im
+#int	imtopenp(), imtlen(), imtgetim(), ccdtypecl(), ccdtypes()
 int	imtopenp(), imtlen(), imtgetim()
+pointer	immap()
 bool	clgetb(), streq()
 
 begin
@@ -176,57 +188,94 @@ begin
 	    return
 	}
 
-	# Determine whether to divide images into subsets.
+	# Determine whether to divide images into subsets and append extensions.
+	#doamps = clgetb ("amps")
+	doamps = false
 	dosubsets = clgetb ("subsets")
+	#extend = clgetb ("extensions")
+	extend = true
 
 	call smark (sp)
+	call salloc (type, SZ_FNAME, TY_CHAR)
 	call salloc (image, SZ_FNAME, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
 	call salloc (subset, SZ_FNAME, TY_CHAR)
-	call calloc (images, nimage, TY_POINTER)
-	call calloc (subsets, nimage, TY_POINTER)
-	call calloc (nimages, nimage, TY_INT)
+	call salloc (str, SZ_FNAME, TY_CHAR)
 
 	# Go through the input list and eliminate images not satisfying the
 	# CCD image type.  Separate into subsets if desired.  Create image
 	# and subset lists.
 
-	while (imtgetim (list, Memc[image], SZ_FNAME)!=EOF) {
-	    call set_input (Memc[image], im, ccdtype)
-	    if (im == NULL)
-		next
+	#ccdtype = ccdtypecl ("ccdtype", Memc[type], SZ_FNAME)
+	ccdtype = 0
+	call clgstr ("ccdtype", Memc[type], SZ_FNAME)
+	call xt_stripwhite (Memc[type])
 
-	    if (dosubsets) {
-	        call ccdsubset (im, Memc[subset], SZ_FNAME)
-	        for (i=1; i <= nsubsets; i=i+1)
-		    if (streq (Memc[subset], Memc[Memi[subsets+i-1]]))
-		        break
-	    } else {
-		Memc[subset] = EOS
-		i = 1
+	while (imtgetim (list, Memc[image], SZ_FNAME)!=EOF) {
+	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
+		call erract (EA_WARN)
+		next
 	    }
+	    #ccdtype = ccdtypes (im, Memc[str], SZ_FNAME)
+	    call ccdtypes (im, Memc[str], SZ_FNAME)
+	    if (Memc[type] != EOS && !streq (Memc[str], Memc[type]))
+		next
 	    
+	    Memc[extn] = EOS
+	    Memc[subset] = EOS
+	    if (doamps) {
+		#call ccdamp (im, Memc[str], SZ_FNAME)
+		Memc[str] = EOS
+		if (extend)
+		    call strcat (Memc[str], Memc[extn], SZ_FNAME)
+		call strcat (Memc[str], Memc[subset], SZ_FNAME)
+	    }
+	    if (dosubsets) {
+		call ccdsubset (im, Memc[str], SZ_FNAME)
+		call strcat (Memc[str], Memc[extn], SZ_FNAME)
+		call strcat (Memc[str], Memc[subset], SZ_FNAME)
+	    }
+	    for (i=1; i <= nsubsets; i=i+1)
+		if (streq (Memc[subset], Memc[Memi[subsets+i-1]]))
+		    break
+
 	    if (i > nsubsets) {
-	        nsubsets = i
+		if (nsubsets == 0) {
+		    call malloc (images, nimage, TY_POINTER)
+		    call malloc (extns, nimage, TY_POINTER)
+		    call malloc (subsets, nimage, TY_POINTER)
+		    call malloc (nimages, nimage, TY_INT)
+		} else if (mod (nsubsets, nimage) == 0) {
+		    call realloc (images, nsubsets+nimage, TY_POINTER)
+		    call realloc (extns, nsubsets+nimage, TY_POINTER)
+		    call realloc (subsets, nsubsets+nimage, TY_POINTER)
+		    call realloc (nimages, nsubsets+nimage, TY_INT)
+		}
+		nsubsets = i
+		call malloc (ptr, SZ_FNAME, TY_CHAR)
+		call strcpy (Memc[image], Memc[ptr], SZ_FNAME-1)
+		Memi[images+i-1] = ptr
+		call malloc (ptr, SZ_FNAME, TY_CHAR)
+		call strcpy (Memc[extn], Memc[ptr], SZ_FNAME)
+		Memi[extns+i-1] = ptr
 		call malloc (ptr, SZ_FNAME, TY_CHAR)
 		call strcpy (Memc[subset], Memc[ptr], SZ_FNAME)
 		Memi[subsets+i-1] = ptr
-		call malloc (ptr, SZ_FNAME, TY_CHAR)
-	        call strcpy (Memc[image], Memc[ptr], SZ_FNAME-1)
-	        Memi[images+i-1] = ptr
-	        Memi[nimages+i-1] = 1
+		Memi[nimages+i-1] = 1
 	    } else {
 		ptr = Memi[images+i-1]
 		nimage = Memi[nimages+i-1] + 1
 		call realloc (ptr, nimage * SZ_FNAME, TY_CHAR)
-	        str = ptr + (nimage - 1) * SZ_FNAME
-	        call strcpy (Memc[image], Memc[str], SZ_FNAME-1)
-	        Memi[images+i-1] = ptr
-	        Memi[nimages+i-1] = nimage
+		Memi[images+i-1] = ptr
+		Memi[nimages+i-1] = nimage
+		ptr = ptr + (nimage - 1) * SZ_FNAME
+		call strcpy (Memc[image], Memc[ptr], SZ_FNAME-1)
 	    }
 		    
 	    call imunmap (im)
 	}
 	call realloc (images, nsubsets, TY_POINTER)
+	call realloc (extns, nsubsets, TY_POINTER)
 	call realloc (subsets, nsubsets, TY_POINTER)
 	call realloc (nimages, nsubsets, TY_INT)
 	call imtclose (list)
@@ -239,71 +288,49 @@ end
 # opens the logfile, and sets IMIO parameters.  It attempts to adjust
 # buffer sizes and memory requirements for maximum efficiency.
 
-procedure icombine (images, nimages, output, plfile, sigma, logfile,
-	delete, clobber)
+procedure icombine (images, nims, output, plfile, sigma, logfile, stack,
+	delete)
 
-char	images[SZ_FNAME-1, nimages]	# Input images
-int	nimages				# Number of images in list
+char	images[SZ_FNAME-1, nims]	# Input images
+int	nims				# Number of images in list
 char	output[ARB]			# Output image
 char	plfile[ARB]			# Pixel list file
 char	sigma[ARB]			# Output sigma image
 char	logfile[ARB]			# Log filename
+int	stack				# Stack input images?
 bool	delete				# Delete input images?
-bool	clobber				# Clobber output images?
 
-int	i, j, intype, bufsize, maxsize, memory, oldsize
-pointer	sp, in, out[3], offsets, temp1, temp2, temp3
+int	i, j, nimages, intype, bufsize, maxsize, memory, oldsize, stack1, err
+pointer	sp, sp1, in, out[3], offsets, temp, key, tmp
 
-bool	strne()
-int	getdatatype(), imaccess()
+int	getdatatype()
 real	clgetr()
 char	clgetc()
 int	clgeti(), begmem(), errcode(), open(), ty_max(), sizeof()
 pointer	immap(), ic_plfile()
-errchk	immap, ic_plfile, ic_setout, ccddelete
+errchk	ic_imstack, immap, ic_plfile, ic_setout, ccddelete
 
 include	"icombine.com"
 
 define	retry_	98
+define	done_	99
 
 begin
 	call smark (sp)
-	call salloc (in, nimages, TY_POINTER)
-	call salloc (temp1, SZ_FNAME, TY_CHAR)
-	call salloc (temp2, SZ_FNAME, TY_CHAR)
-	call salloc (temp3, SZ_FNAME, TY_CHAR)
 
-	# Check output images for existence.  If clobbering the output images
-	# use temporary images for output and only replace the existing
-	# image when the operation is successfully completed.
-
-	call strcpy (output, Memc[temp1], SZ_FNAME)
-	if (imaccess (Memc[temp1], READ_ONLY) == YES) {
-	    if (clobber)
-		call mktemp ("temp", Memc[temp1], SZ_FNAME)
-	    else
-		call error (0, "Output image exists")
-	}
-
-	call strcpy (plfile, Memc[temp2], SZ_FNAME)
-	if (Memc[temp2] != EOS) {
-	    if (imaccess (Memc[temp2], READ_ONLY) == YES) {
-	        if (clobber)
-		    call mktemp ("temp", Memc[temp2], SZ_FNAME)
-	        else
-		    call error (0, "Output pixel list image exists")
+	# Set number of images to combine.
+	if (project) {
+	    if (nims > 1) {
+		call sfree (sp)
+		call error (1, "Cannot project combine a list of images")
 	    }
-	}
-
-	call strcpy (sigma, Memc[temp3], SZ_FNAME)
-	if (Memc[temp3] != EOS) {
-	    if (imaccess (Memc[temp3], READ_ONLY) == YES) {
-	        if (clobber)
-		    call mktemp ("temp", Memc[temp3], SZ_FNAME)
-	        else
-		    call error (0, "Output sigma image exists")
-	    }
-	}
+	    tmp = immap (images[1,1], READ_ONLY, 0); out[1] = tmp
+	    if (IM_NDIM(out[1]) == 1)
+		call error (1, "Can't project one dimensional images")
+	    nimages = IM_LEN(out[1],IM_NDIM(out[1]))
+	    call imunmap (out[1])
+	} else
+	    nimages = nims
 
 	# Convert the nkeep parameter if needed.
         # Convert the pclip parameter to a number of pixels rather than
@@ -356,95 +383,130 @@ begin
 
 	# Map the input images.
 	bufsize = 0
+	stack1 = stack
 retry_
-	do i = 1, nimages
-	    iferr (Memi[in+i-1] = immap (images[1,i], READ_ONLY, 0)) {
-		do j = 1, i-1
-		    call imunmap (Memi[in+i-1])
-		call sfree (sp)
-		call erract (EA_ERROR)
+	iferr {
+	    out[1] = NULL
+	    out[2] = NULL
+	    out[3] = NULL
+	    icm = NULL
+	    logfd = NULL
+
+	    call smark (sp1)
+	    if (stack1 == YES) {
+		call salloc (temp, SZ_FNAME, TY_CHAR)
+		call mktemp ("tmp", Memc[temp], SZ_FNAME)
+		call ic_imstack (images, nimages, Memc[temp])
+		project = true
 	    }
 
-        # Map the output image and set dimensions and offsets.
-        out[1] = immap (Memc[temp1], NEW_COPY, Memi[in])
-        call salloc (offsets, nimages*IM_NDIM(out[1]), TY_INT)
-        call ic_setout (Memi[in], out, Memi[offsets], nimages)
+	    # Map the input image(s).
+	    if (project) {
+		if (stack1 == YES) {
+		    tmp = immap (Memc[temp], READ_ONLY, 0); out[1] = tmp
+		} else {
+		    tmp = immap (images[1,1], READ_ONLY, 0); out[1] = tmp
+		}
+		nimages = IM_LEN(out[1],IM_NDIM(out[1]))
+		call calloc (in, nimages, TY_POINTER)
+		call amovki (out[1], Memi[in], nimages)
+	    } else {
+		call calloc (in, nimages, TY_POINTER)
+		do i = 1, nimages {
+		    tmp = immap (images[1,i], READ_ONLY, 0); Memi[in+i-1] = tmp
+		}
+	    }
 
-        # Determine the highest precedence datatype and set output datatype.
-        intype = IM_PIXTYPE(Memi[in])
-        do i = 2, nimages
-            intype = ty_max (intype, IM_PIXTYPE(Memi[in+i-1]))
-        IM_PIXTYPE(out[1]) = getdatatype (clgetc ("outtype"))
-        if (IM_PIXTYPE(out[1]) == ERR)
-            IM_PIXTYPE(out[1]) = intype
+	    # Map the output image and set dimensions and offsets.
+	    tmp = immap (output, NEW_COPY, Memi[in]); out[1] = tmp
+	    if (stack1 == YES) {
+		call salloc (key, SZ_FNAME, TY_CHAR)
+		do i = 1, nimages {
+		    call sprintf (Memc[key], SZ_FNAME, "stck%04d")
+			call pargi (i)
+		    call imdelf (out[1], Memc[key])
+		}
+	    }
+	    call salloc (offsets, nimages*IM_NDIM(out[1]), TY_INT)
+	    call ic_setout (Memi[in], out, Memi[offsets], nimages)
 
-        # Open pixel list file if given.
-        if (Memc[temp2] != EOS) {
-            out[2] = ic_plfile (Memc[temp2], NEW_COPY, out[1])
-	    call imastr (out[2], "TEMPNAME", plfile)
-        } else
-            out[2] = NULL
+	    # Determine the highest precedence datatype and set output datatype.
+	    intype = IM_PIXTYPE(Memi[in])
+	    do i = 2, nimages
+		intype = ty_max (intype, IM_PIXTYPE(Memi[in+i-1]))
+	    IM_PIXTYPE(out[1]) = getdatatype (clgetc ("outtype"))
+	    if (IM_PIXTYPE(out[1]) == ERR)
+		IM_PIXTYPE(out[1]) = intype
 
-        # Open the sigma image if given.
-        if (Memc[temp3] != EOS) {
-            out[3] = immap (Memc[temp3], NEW_COPY, out[1])
-	    call imastr (out[3], "TEMPNAME", sigma)
-            IM_PIXTYPE(out[3]) = ty_max (TY_REAL, IM_PIXTYPE(out[1]))
-            call sprintf (IM_TITLE(out[3]), SZ_IMTITLE,
-                "Combine sigma images for %s")
-                call pargstr (output)
-        } else
-            out[3] = NULL
+	    # Open pixel list file if given.
+	    if (plfile[1] != EOS) {
+		tmp = ic_plfile (plfile, NEW_COPY, out[1]); out[2] = tmp
+	    } else
+		out[2] = NULL
 
-        # This is done hear to work around problem adding a keyword to
-        # an NEW_COPY header and then using that header in a NEW_COPY.
-        call imastr (out[1], "TEMPNAME", output)
+	    # Open the sigma image if given.
+	    if (sigma[1] != EOS) {
+		tmp = immap (sigma, NEW_COPY, out[1]); out[3] = tmp
+		IM_PIXTYPE(out[3]) = ty_max (TY_REAL, IM_PIXTYPE(out[1]))
+		call sprintf (IM_TITLE(out[3]), SZ_IMTITLE,
+		    "Combine sigma images for %s")
+		    call pargstr (output)
+	    } else
+		out[3] = NULL
 
-        # Open masks.
-        call ic_mopen (Memi[in], out, nimages)
+	    # This is done here to work around problem adding a keyword to
+	    # an NEW_COPY header and then using that header in a NEW_COPY.
 
-        # Open the log file.
-        logfd = NULL
-        if (logfile[1] != EOS) {
-            iferr (logfd = open (logfile, APPEND, TEXT_FILE)) {
-                logfd = NULL
-                call erract (EA_WARN)
-            }
-        }
+	    # Open masks.
+	    call ic_mopen (Memi[in], out, nimages)
 
-	if (bufsize == 0) {
-	    # Set initial IMIO buffer size based on the number of images
-	    # and maximum amount of working memory available.  The buffer
-	    # size may be adjusted later if the task runs out of memory.
-	    # The FUDGE factor is used to allow for the size of the
-	    # program, memory allocator inefficiencies, and any other
-	    # memory requirements besides IMIO.
+	    # Open the log file.
+	    logfd = NULL
+	    if (logfile[1] != EOS) {
+		iferr (logfd = open (logfile, APPEND, TEXT_FILE)) {
+		    logfd = NULL
+		    call erract (EA_WARN)
+		}
+	    }
 
-	    bufsize = 1
-	    do i = 1, IM_NDIM(out[1])
-		bufsize = bufsize * IM_LEN(out[1],i)
-	    bufsize = bufsize * sizeof (intype)
-	    bufsize = min (bufsize, DEFBUFSIZE)
-	    memory = begmem ((nimages + 1) * bufsize, oldsize, maxsize)
-	    memory = min (memory, int (FUDGE * maxsize))
-	    bufsize = memory / (nimages + 1)
-	}
+	    if (bufsize == 0) {
+		# Set initial IMIO buffer size based on the number of images
+		# and maximum amount of working memory available.  The buffer
+		# size may be adjusted later if the task runs out of memory.
+		# The FUDGE factor is used to allow for the size of the
+		# program, memory allocator inefficiencies, and any other
+		# memory requirements besides IMIO.
 
-	# Combine the images.  If an out of memory error occurs close all
-	# images and files, divide the IMIO buffer size in half and try again.
+		bufsize = 1
+		do i = 1, IM_NDIM(out[1])
+		    bufsize = bufsize * IM_LEN(out[1],i)
+		bufsize = bufsize * sizeof (intype)
+		bufsize = min (bufsize, DEFBUFSIZE)
+		memory = begmem ((nimages + 1) * bufsize, oldsize, maxsize)
+		memory = min (memory, int (FUDGE * maxsize))
+		bufsize = memory / (nimages + 1)
+	    }
 
-        iferr {
-            switch (intype) {
-            case TY_SHORT:
-                call icombines (Memi[in], out, Memi[offsets], nimages, bufsize)
-            default:
-                call icombiner (Memi[in], out, Memi[offsets], nimages, bufsize)
-            }
-        } then {
-	    call ic_mclose (nimages)
+	    # Combine the images.  If an out of memory error occurs close all
+	    # images and files, divide the IMIO buffer size in half and try
+	    # again.
+
+	    switch (intype) {
+	    case TY_SHORT:
+		call icombines (Memi[in], out, Memi[offsets], nimages,
+		    bufsize)
+	    default:
+		call icombiner (Memi[in], out, Memi[offsets], nimages,
+		    bufsize)
+	    }
+	} then {
+	    err = errcode ()
+	    if (icm != NULL)
+		call ic_mclose (nimages)
 	    if (!project) {
 		do j = 2, nimages
-		    call imunmap (Memi[in+j-1])
+		    if (Memi[in+j-1] != NULL)
+			call imunmap (Memi[in+j-1])
 	    }
 	    if (out[2] != NULL) {
 		call imunmap (out[2])
@@ -454,22 +516,39 @@ retry_
 		call imunmap (out[3])
 		call imdelete (sigma)
 	    }
-	    call imunmap (out[1])
-	    call imdelete (output)
-	    call imunmap (Memi[in])
+	    if (out[1] != NULL) {
+		call imunmap (out[1])
+		call imdelete (output)
+	    }
+	    if (Memi[in] != NULL)
+		call imunmap (Memi[in])
 	    if (logfd != NULL)
 		call close (logfd)
-            switch (errcode()) {
-            case SYS_MFULL:
-                bufsize = bufsize / 2
-		call sfree (sp)
-                goto retry_
-            default:
+
+	    switch (err) {
+	    case SYS_MFULL:
+		bufsize = bufsize / 2
+		call sfree (sp1)
+		goto retry_
+	    case SYS_FTOOMANYFILES, SYS_IKIOPIX:
+		if (!project) {
+		    stack1 = YES
+		    call sfree (sp1)
+		    goto retry_
+		}
+		if (stack1 == YES)
+		    call imdelete (Memc[temp])
 		call fixmem (oldsize)
-		call sfree (sp)
-                call erract (EA_ERROR)
-            }
-        }
+		call sfree (sp1)
+		call erract (EA_ERROR)
+	    default:
+		if (stack1 == YES)
+		    call imdelete (Memc[temp])
+		call fixmem (oldsize)
+		call sfree (sp1)
+		call erract (EA_ERROR)
+	    }
+	}
 
         # Unmap all the images, close the log file, and restore memory.
 	# The input images must be unmapped first to insure that there
@@ -480,39 +559,29 @@ retry_
 
 	if (!project) {
 	    do i = 2, nimages {
-		call imunmap (Memi[in+i-1])
-		if (delete)
-		    call ccddelete (images[1,i])
+		if (Memi[in+i-1] != NULL) {
+		    call imunmap (Memi[in+i-1])
+		    if (delete)
+			call ccddelete (images[1,i])
+		}
 	    }
 	}
-	if (out[2] != NULL) {
-	    call imdelf (out[2], "TEMPNAME")
+	if (out[2] != NULL)
 	    call imunmap (out[2])
-	    if (strne (Memc[temp2], plfile)) {
-	        call ccddelete (plfile)
-	        call imrename (Memc[temp3], plfile)
-	    }
-	}
-	if (out[3] != NULL) {
-	    call imdelf (out[3], "TEMPNAME")
+	if (out[3] != NULL)
 	    call imunmap (out[3])
-	    if (strne (Memc[temp3], sigma)) {
-	        call ccddelete (sigma)
-	        call imrename (Memc[temp3], sigma)
-	    }
-	}
-	call imdelf (out[1], "TEMPNAME")
-	call imunmap (out[1])
-	if (strne (Memc[temp1], output)) {
-	    call ccddelete (output)
-	    call imrename (Memc[temp1], output)
-	}
-	call imunmap (Memi[in])
+	if (out[1] != NULL)
+	    call imunmap (out[1])
+	if (Memi[in] != NULL)
+	    call imunmap (Memi[in])
+	if (stack1 == YES)
+	    call imdelete (Memc[temp])
 	if (delete)
 	    call ccddelete (images[1,1])
 	if (logfd != NULL)
 	    call close (logfd)
-	call ic_mclose (nimages)
+	if (icm != NULL)
+	    call ic_mclose (nimages)
 
 	call fixmem (oldsize)
 	call sfree (sp)
@@ -525,7 +594,7 @@ int procedure ty_max (type1, type2)
 
 int	type1, type2		# Datatypes
 
-int	i, j, order[8]
+int	i, j, type, order[8]
 data	order/TY_SHORT,TY_USHORT,TY_INT,TY_LONG,TY_REAL,TY_DOUBLE,TY_COMPLEX,TY_REAL/
 
 begin
@@ -533,7 +602,13 @@ begin
 	    ;
 	for (j=1; (j<=7) && (type2!=order[j]); j=j+1)
 	    ;
-	return (order[max(i,j)])
+	type = order[max(i,j)]
+
+	# Special case of mixing short and unsigned short.
+	if (type == TY_USHORT && type1 != type2)
+	    type = TY_INT
+
+	return (type)
 end
 
 

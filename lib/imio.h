@@ -7,7 +7,8 @@ define	DEF_ADVICE		SEQUENTIAL	# type of access to optimize for
 define	DEF_FIOBUFSIZE		65536		# default FIO buffer size
 define	MAX_HGMLEN		2048		# maximum size histogram
 define	IM_MAXSTEP		64		# step size breakpoint
-define	MIN_LENUSERAREA		8000		# minimum (incore) sz user area
+define	MIN_LENUSERAREA		64000		# user area size (chars)
+define	SZ_UAPAD		5120		# padding at end of UA if copy
 define	SZ_IMNAME		79		# IM_NAME field
 
 define	LOOP_DONE		1		# used by IMLOOP
@@ -40,19 +41,20 @@ define	IM_OHDR		Memi[$1+17]		# if newcopy, ptr to old header
 define	IM_NPHYSDIM	Memi[$1+18]		# number of physical dims
 define	IM_SECTUSED	Memi[$1+19]		# image section in use
 define	IM_FAST		Memi[$1+20]		# fast i/o permitted
-define	IM_SVMTIME	Meml[$1+21]		# new time of last modify
-define	IM_OOBPIX	Memr[$1+22]		# value for out of bounds pixels
-define	IM_KERNEL	Memi[$1+23]		# IKI kernel assigned (runtime)
-define	IM_KDES		Memi[$1+24]		# IKI kernel descriptor
-define	IM_HFD		Memi[$1+25]		# header file descriptor
-define	IM_PFD		Memi[$1+26]		# pixel file descriptor
-define	IM_LENHDRMEM	Memi[$1+27]		# descr. length, IM_MAGIC to end
-define	IM_UABLOCKED	Memi[$1+28]		# user area blocked, 80 chars
-define	IM_CLINDEX	Memi[$1+29]		# index of image in cluster
-define	IM_CLSIZE	Memi[$1+30]		# no. images in cluster
-define	IM_PL		Memi[$1+31]		# PL descriptor if mask image
-define	IM_PLREFIM	Memi[$1+32]		# PL reference image if any
-define	IM_PLFLAGS	Memi[$1+33]		# PL mask i/o flags
+define	IM_SWAP		Memi[$1+21]		# byte swapping required
+define	IM_SVMTIME	Meml[$1+22]		# new time of last modify
+define	IM_OOBPIX	Memr[$1+23]		# value for out of bounds pixels
+define	IM_KERNEL	Memi[$1+24]		# IKI kernel assigned (runtime)
+define	IM_KDES		Memi[$1+25]		# IKI kernel descriptor
+define	IM_HFD		Memi[$1+26]		# header file descriptor
+define	IM_PFD		Memi[$1+27]		# pixel file descriptor
+define	IM_LENHDRMEM	Memi[$1+28]		# descr. length, IM_MAGIC to end
+define	IM_UABLOCKED	Memi[$1+29]		# user area blocked, 80 chars
+define	IM_CLINDEX	Memi[$1+30]		# index of image in cluster
+define	IM_CLSIZE	Memi[$1+31]		# no. images in cluster
+define	IM_PL		Memi[$1+32]		# PL descriptor if mask image
+define	IM_PLREFIM	Memi[$1+33]		# PL reference image if any
+define	IM_PLFLAGS	Memi[$1+34]		# PL mask i/o flags
 			# (extra space)
 define	IM_SVLEN	Meml[$1+$2+35-1]	# save true axis lengths
 define	IM_VMAP		Memi[$1+$2+42-1]	# map section dimensions

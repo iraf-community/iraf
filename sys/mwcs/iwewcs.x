@@ -22,7 +22,7 @@ double	theta
 char	ctype[8]
 bool	have_ltm, have_ltv, have_wattr
 int	axes[2], axis, npts, ch, ip, raax, decax, ax1, ax2, i, j
-pointer	sp, r, o_r, cd, ltm, cp, rp, bufp, pv, wv, o_cd, o_ltm
+pointer	sp, r, o_r, cd, ltm, cp, rp, bufp, pv, wv, o_cd, o_ltm, str
 
 pointer	iw_gbigfits(), iw_findcard()
 int	strncmp(), ctod(), strldxs()
@@ -37,6 +37,7 @@ begin
 	call salloc (ltm, ndim*ndim, TY_DOUBLE)
 	call salloc (o_cd, ndim*ndim, TY_DOUBLE)
 	call salloc (o_ltm, ndim*ndim, TY_DOUBLE)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	raax = 1
 	decax = 2
@@ -52,7 +53,7 @@ begin
 
 	    do i = 1, 8 {
 		ch = Memc[rp+i-1]
-		if (ch == ' ' || ch == '\'')
+		if (ch == EOS || ch == ' ' || ch == '\'')
 		    break
 		else if (IS_UPPER(ch))
 		    ch = TO_LOWER(ch)
@@ -60,7 +61,7 @@ begin
 		    ch = '-'
 		ctype[i] = ch
 	    }
-	    ctype[9] = EOS
+	    ctype[i] = EOS
 
 	    # Determine the type of function on this axis.
 	    if (strncmp (ctype, "linear", 6) == 0) {
@@ -135,6 +136,56 @@ samperr_		call eprintf (
 	    } else if (strncmp (ctype, "dec-", 4) == 0) {
 		;   # This case is handled when RA-- is seen.
 
+	    } else if (strncmp (ctype[2], "lon", 3) == 0) {
+		# The projections are restricted to two axes and are indicated
+		# by CTYPEi values such as, e.g., "xLON-TAN" and "xLAT-TAN"
+		# for the TAN projection. The letter x may be any character
+		# but must be the same for both the longitude and latitude
+		# axes. The standard values of x are G/g for galactic, E/e
+		# for ecliptic, and S/s for supergalactic coordinates.
+
+		raax = axis
+
+		# Locate the corresponding LAT axis.
+		decax = 0
+		do j = 1, ndim {
+		    cp = IW_CTYPE(iw,j)
+		    if (cp != NULL) {
+			if (Memc[cp+4] == '-' || Memc[cp+4] == '_') {
+			    if (strncmp (Memc[cp+1], "LAT", 3) == 0 ||
+			        strncmp (Memc[cp+1], "lat", 3) == 0) {
+			        decax = j
+			        break
+			    }
+			}
+		    }
+		}
+
+		# Did we find it?
+		if (decax == 0) {
+		    call eprintf (
+		        "Image %s, axis %d: Cannot locate %clat%s axis\n")
+		        call pargstr (IM_NAME(IW_IM(iw)))
+		        call pargi (axis)
+			call pargc (ctype[1])
+		        call pargstr (ctype[5])
+		}
+
+		# Get the function type.
+		ip = strldxs ("-", ctype) + 1
+
+		# Assign the function to the two axes.
+		axes[1] = axis
+		axes[2] = decax
+		call sprintf (Memc[str], SZ_LINE,
+		    "axis 1: axtype=%clon axis 2: axtype=%clat")
+		    call pargc (ctype[1])
+		    call pargc (ctype[1])
+		call mw_swtype (mw, axes, 2, ctype[ip], Memc[str])
+
+	    } else if (strncmp (ctype[2], "lat", 3) == 0) { 
+		;   # This case is handled when xLON is seen.
+
 	    } else if (strncmp (ctype, "multispec", 8) == 0) {
 		# Multispec format image.  Axis 1,2 are coupled.
 		if (axis == 1) {
@@ -175,6 +226,12 @@ samperr_		call eprintf (
 		IW_CD(iw,ax1,ax2) =  IW_CDELT(iw,ax1) * sin(theta)
 		IW_CD(iw,ax2,ax1) = -IW_CDELT(iw,ax2) * sin(theta)
 		IW_CD(iw,ax2,ax2) =  IW_CDELT(iw,ax2) * cos(theta)
+	    }
+
+	    do j = 1, ndim {
+		if (j == raax || j == decax)
+		    next
+		IW_CD(iw,j,j) =  IW_CDELT(iw,j)
 	    }
 	}
 

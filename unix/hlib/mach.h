@@ -7,14 +7,14 @@ define	MAX_DIGITS 	25		# max digits in a number
 define	NDIGITS_RP	7		# number of digits of real precision
 define	NDIGITS_DP 	16		# number of digits of precision (double)
 define	MAX_EXPONENT	38		# max exponent, base 10
-define	MAX_EXPONENTR	38
-define	MAX_EXPONENTD	38
+define	MAX_EXPONENTR	38		# IEEE single
+define	MAX_EXPONENTD	308		# IEEE double
 
 define	MAX_SHORT	32767		# largest numbers
 define	MAX_INT		2147483647
 define	MAX_LONG	2147483647
 define	MAX_REAL	0.99e37		# anything larger is INDEF
-define	MAX_DOUBLE	0.99d37
+define	MAX_DOUBLE	0.99d307
 define	NBITS_BYTE	8		# nbits in a machine byte
 define	NBITS_SHORT	16		# nbits in a short	
 define	NBITS_INT	32		# nbits in an integer	

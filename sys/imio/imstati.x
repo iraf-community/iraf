@@ -9,8 +9,8 @@ include	<imio.h>
 
 int procedure imstati (im, option)
 
-pointer	im			# image descriptor
-int	option			# imset option being queried
+pointer	im			#I image descriptor
+int	option			#I imset option being queried
 
 begin
 	switch (option) {

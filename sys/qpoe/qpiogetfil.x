@@ -37,16 +37,29 @@ begin
 	    goto ovfl_
 
 	# Coordinate system.
-	call sprintf (Memc[buf], SZ_TEXTBUF, "key=(s%d,s%d),")
-	    call pargi (IO_EVXOFF(io) * SZ_SHORT * SZB_CHAR)
-	    call pargi (IO_EVYOFF(io) * SZ_SHORT * SZB_CHAR)
+	call sprintf (Memc[buf], SZ_TEXTBUF, "key=(%c%d,%c%d),")
+	    if (IO_EVXTYPE(io) == TY_INT) {
+		call pargi ('i')
+		call pargi (IO_EVXOFF(io) * SZ_INT * SZB_CHAR)
+	    } else {
+		call pargi ('s')
+		call pargi (IO_EVXOFF(io) * SZ_SHORT * SZB_CHAR)
+	    }
+	    if (IO_EVYTYPE(io) == TY_INT) {
+		call pargi ('i')
+		call pargi (IO_EVYOFF(io) * SZ_INT * SZB_CHAR)
+	    } else {
+		call pargi ('s')
+		call pargi (IO_EVYOFF(io) * SZ_SHORT * SZB_CHAR)
+	    }
 	op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
 	if (op > maxch)
 	    goto ovfl_
 
 	# Blocking factor for generating pixels.
-	call sprintf (Memc[buf], SZ_TEXTBUF, "block=%d,")
-	    call pargi (IO_BLOCK(io))
+	call sprintf (Memc[buf], SZ_TEXTBUF, "block=%dx%d, ")
+	    call pargi (IO_XBLOCK(io))
+	    call pargi (IO_YBLOCK(io))
 	op = op + gstrcpy (Memc[buf], outstr[op], maxch-op+1)
 	if (op > maxch)
 	    goto ovfl_

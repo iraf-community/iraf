@@ -15,7 +15,10 @@
       integer memflg
       integer col
       integer logic0
-      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      common /cline/ dbgout, dbglev, level, linect (5), infile (5), fnam
+     *p, fnames ( 150)
+      integer dbgout
+      integer dbglev
       integer level
       integer linect
       integer infile
@@ -75,45 +78,51 @@
 23003 continue
 23000 continue
       n = 1
-      i = 1
-23004 if (.not.(getarg (i, arg, 30) .ne. -1))goto 23006
+      i=1
+23004 if (.not.(getarg(i,arg,30) .ne. -1))goto 23006
       n = n + 1
-      call query (32Husage:  ratfor [files] >outfile.)
-      if (.not.(arg (1) .eq. 45 .and. arg (2) .eq. -2))goto 23007
-      infile (1) = 0
-      call finit
-      goto 23008
+      call query (37Husage:  ratfor [-g] [files] >outfile.)
+      if (.not.(arg(1) .eq. 45 .and. arg(2) .eq. 103 .and. arg(3) .eq. -
+     *2))goto 23007
+      dbgout = 1
+      goto 23005
 23007 continue
-      infile (1) = rfopen(arg, 1)
-      if (.not.(infile (1) .eq. -3))goto 23009
-      call cant (arg)
+      if (.not.(arg(1) .eq. 45 .and. arg(2) .eq. -2))goto 23009
+      infile(1) = 0
+      call finit
       goto 23010
 23009 continue
+      infile(1) = rfopen(arg, 1)
+      if (.not.(infile(1) .eq. -3))goto 23011
+      call cant (arg)
+      goto 23012
+23011 continue
       call finit
       call scopy (arg, 1, fnames, 1)
       fnamp=1
-23011 if (.not.(fnames(fnamp) .ne. -2))goto 23013
+23013 if (.not.(fnames(fnamp) .ne. -2))goto 23015
       if (.not.(fnames(fnamp) .eq. 46 .and. fnames(fnamp+1) .eq. 114))go
-     *to 23014
+     *to 23016
       fnames(fnamp+1) = 120
-23014 continue
-23012 fnamp=fnamp+1
-      goto 23011
-23013 continue
+23016 continue
+23014 fnamp=fnamp+1
+      goto 23013
+23015 continue
+23012 continue
 23010 continue
 23008 continue
       call parse
-      if (.not.(infile (1) .ne. 0))goto 23016
+      if (.not.(infile (1) .ne. 0))goto 23018
       call rfclos(infile (1))
-23016 continue
-23005 i = i + 1
+23018 continue
+23005 i=i+1
       goto 23004
 23006 continue
-      if (.not.(n .eq. 1))goto 23018
+      if (.not.(n .eq. 1))goto 23020
       infile (1) = 0
       call finit
       call parse
-23018 continue
+23020 continue
       call lndict
       end
 c     logic0  logical_column

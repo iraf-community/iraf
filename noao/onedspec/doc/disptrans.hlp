@@ -117,7 +117,8 @@ select the inverse of the unit and "log" to select logarithmic units. For
 example "log angstroms" to select the logarithm of wavelength in Angstroms
 and "inv microns" to select inverse microns.  The various identifiers may
 be abbreviated as words but the syntax is not sophisticated enough to
-recognized standard scientific abbreviations such as mm for millimeter.
+recognized standard scientific abbreviations except for those given
+explicitly below.
 
 .nf
 	   angstroms - Wavelength in Angstroms
@@ -136,6 +137,16 @@ recognized standard scientific abbreviations such as mm for millimeter.
 	          ev - Energy in electron volts
 	         kev - Energy in kilo electron volts
 	         mev - Energy in mega electron volts
+
+	          nm - Wavelength in nanometers
+	          mm - Wavelength in millimeters
+	          cm - Wavelength in centimeters
+	           m - Wavelength in meters
+	          Hz - Frequency in hertz (cycles per second)
+	         KHz - Frequency in kilohertz
+	         MHz - Frequency in megahertz
+	         GHz - Frequency in gigahertz
+		  wn - Wave number (inverse centimeters)
 .fi
 
 The velocity units require a trailing value and unit defining the
@@ -173,7 +184,7 @@ a nonlinear dispersion function.
 .fi
 .ih
 REVISIONS
-.ls DISPTRANS V2.11
+.ls DISPTRANS V2.10.4
 New task with this release.
 .le
 .ih

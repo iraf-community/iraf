@@ -54,7 +54,7 @@ pointer	sp, comment, mod, mods, asi, asis[2], data, in, out, temp, pname
 
 bool	streq(), clgetb()
 real	asigrl()
-int	clgeti(), access(),  open(), fscan(), nscan(), imaccess(), strdic()
+int	clgeti(), access(),  open(), fscan(), nscan(), strdic()
 int	imtopenp(), imtlen(), imtgetim(), clktime()
 pointer	immap(), imgl1r(), imgl2r(), impl2r()
 errchk	open, immap
@@ -96,11 +96,7 @@ begin
 
 	    # Map images.  Check for new, existing, and in-place images.
 	    if (streq (Memc[input], Memc[output])) {
-	        if (imaccess (Memc[input], 0) == YES) {
-	            iferr (in = immap (Memc[input], READ_WRITE, 0)) {
-			call erract (EA_WARN)
-			next
-		    }
+		ifnoerr (in = immap (Memc[input], READ_WRITE, 0)) {
 		    out = in
 	            new = false
 	        } else {

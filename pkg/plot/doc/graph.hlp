@@ -67,6 +67,27 @@ of size \fBszmarker\fR.  If negative and the input operand is a list,
 the size of a marker is the third column of each list element times the
 absolute value of \fBszmarker\fR.
 .le
+.ls ltypes = "", colors = ""
+List of line types and colors to use when graphing multiple data sets.
+The lists are comma or space separate integer numbers.  If no list is
+given the line types and colors will cycle through the range of
+values.  If a list is given then the values are used in order and if
+the list is exhausted before the data the last value is used for all
+remaining data sets.
+
+The line types have values between 1 and 4:
+
+.nf
+    1 - solid line
+    2 - dashed line
+    3 - dotted line
+    4 - dot-dash line
+.fi
+
+The colors have values between 1 and 9.  The colors associated with each
+number depend on the graphics device.  For example "xgterm" colors are
+assigned by X resources.
+.le
 .ls xlabel = "wcslabel", ylabel = ""
 Label for the X-axis or Y-axis.  if \fBxlabel\fR = "wcslabel" and the first
 operand in the \fBinput\fR is an image, the world coordinate system label

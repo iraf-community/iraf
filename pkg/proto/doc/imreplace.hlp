@@ -1,4 +1,4 @@
-.help imreplace Dec84 proto
+.help imreplace Jul95 proto
 .ih
 NAME
 imreplace -- replace pixels in a window by a constant
@@ -20,12 +20,14 @@ complex data.
 .ls lower = INDEF
 Lower limit of window for replacing pixels.  If INDEF then all pixels
 are above \fIlower\fR.  For complex images this is the magnitude
-of the pixel values.
+of the pixel values.  For integer images the value is rounded up
+to the next higher integer.
 .le
 .ls upper = INDEF
 Upper limit of window for replacing pixels.  If INDEF then all pixels
 are below \fIupper\fR.  For complex images this is the magnitude
-of the pixel values.
+of the pixel values.  For integer images the value is rounded down
+to the next lower integer.
 .le
 .ih
 DESCRIPTION
@@ -35,7 +37,9 @@ are replaced by the constant \fIvalue\fR.  The special value INDEF in
 possible pixel values, respectively.
 
 For complex images the replacement value is specified as separate
-real and imaginary and the thresholds are the magnitude.
+real and imaginary and the thresholds are the magnitude.  For
+integer images the thresholds are used as inclusive limits
+so that, for example, the range 5.1-9.9 affets pixels 6-9.
 .ih
 EXAMPLES
 1. In a flat field calibration which has been scaled to unit mean replace
@@ -46,4 +50,13 @@ all response values less than or equal to 0.8 by 1.
 2. Set all pixels to zero within a section of an image.
 
     cl> imreplace image[1:10,5:100] 0
+.ih
+REVISIONS
+.ls IMREPLACE V2.11
+The lower value is now rounded up for integer images so that a range
+like 5.1-9.9 affects pixels 6-9 instead of 5-9.
+.le
+.ih
+SEE ALSO
+imexpr
 .endhelp

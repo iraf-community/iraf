@@ -1,18 +1,17 @@
-# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
-
 include	<mach.h>
 include	<ctype.h>
 
 define	FIRST	1		# Default starting range
 define	LAST	MAX_INT		# Default ending range
 define	STEP	1		# Default step
-
+define	EOLIST	0		# End of list
 
 # DECODE_RANGES -- Parse a string containing a list of integer numbers or
 # ranges, delimited by either spaces or commas.  Return as output a list
 # of ranges defining a list of numbers, and the count of list numbers.
-# Range limits must be positive integers.  ERR is returned if a conversion
-# error occurs.  The list of ranges is delimited by a single NULL.
+# Range limits must be positive nonnegative integers.  ERR is returned as
+# the function value if a conversion error occurs.  The list of ranges is
+# delimited by EOLIST.
 
 int procedure decode_ranges (range_string, ranges, max_ranges, nvalues)
 
@@ -28,7 +27,7 @@ begin
 	nvalues = 0
 
 	do nrange = 1, max_ranges - 1 {
-	    # Defaults to all positive integers
+	    # Defaults to all nonnegative integers
 	    first = FIRST
 	    last = LAST
 	    step = STEP
@@ -45,11 +44,11 @@ begin
 		    ranges[1, 1] = first
 		    ranges[2, 1] = last
 		    ranges[3, 1] = step
-		    ranges[1, 2] = NULL
-	    	    nvalues = abs (last-first) / step + 1
+		    ranges[1, 2] = EOLIST
+	    	    nvalues = MAX_INT
 		    return (OK)
 		} else {
-		    ranges[1, nrange] = NULL
+		    ranges[1, nrange] = EOLIST
 		    return (OK)
 		}
 	    } else if (range_string[ip] == '-')
@@ -59,13 +58,11 @@ begin
 	    else if (IS_DIGIT(range_string[ip])) {		# ,n..
 		if (ctoi (range_string, ip, first) == 0)
 		    return (ERR)
-		if (first <= 0)
-		    return (ERR)
 	    } else
 		return (ERR)
 
 	    # Skip delimiters
-	    while (IS_WHITE(range_string[ip]))
+	    while (IS_WHITE(range_string[ip]) || range_string[ip] == ',')
 		ip = ip + 1
 
 	    # Get last limit
@@ -74,18 +71,14 @@ begin
 		;
 	    else if (range_string[ip] == '-') {
 		ip = ip + 1
-		while (IS_WHITE(range_string[ip]))
+	        while (IS_WHITE(range_string[ip]) || range_string[ip] == ',')
 		    ip = ip + 1
 		if (range_string[ip] == EOS)
 		    ;
 		else if (IS_DIGIT(range_string[ip])) {
 		    if (ctoi (range_string, ip, last) == 0)
 		        return (ERR)
-		    if (last <= 0)
-			return (ERR)
 		} else if (range_string[ip] == 'x')
-		    ;
-		else if (range_string[ip] == ',')
 		    ;
 		else
 		    return (ERR)
@@ -93,27 +86,23 @@ begin
 		last = first
 
 	    # Skip delimiters
-	    while (IS_WHITE(range_string[ip]))
+	    while (IS_WHITE(range_string[ip]) || range_string[ip] == ',')
 		ip = ip + 1
 
 	    # Get step.
 	    # Must be 'x' or assume default step.
 	    if (range_string[ip] == 'x') {
 		ip = ip + 1
-		while (IS_WHITE(range_string[ip]))
+	        while (IS_WHITE(range_string[ip]) || range_string[ip] == ',')
 		    ip = ip + 1
 		if (range_string[ip] == EOS)
 		    ;
 		else if (IS_DIGIT(range_string[ip])) {
 		    if (ctoi (range_string, ip, step) == 0)
-			return (ERR)
-		    if (step <= 0)
+		        ;
+		    if (step == 0)
 			return (ERR)
 		} else if (range_string[ip] == '-')
-		    ;
-		else if (range_string[ip] == 'x')
-		    ;
-		else if (range_string[ip] == ',')
 		    ;
 		else
 		    return (ERR)
@@ -151,16 +140,18 @@ begin
 	number = number + 1
 	next_number = MAX_INT
 
-	for (ip=1;  ranges[ip] != NULL;  ip=ip+3) {
+	for (ip=1;  ranges[ip] != EOLIST;  ip=ip+3) {
 	    first = min (ranges[ip], ranges[ip+1])
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
+	    if (step == 0)
+		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
 		remainder = mod (number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)
-		    next_number = min (next_number, number - remainder + step)
+		    next_number = number - remainder + step
 	    } else if (first > number)
 		next_number = min (next_number, first)
 	}
@@ -195,16 +186,18 @@ begin
 	number = number - 1
 	next_number = 0
 
-	for (ip=1;  ranges[ip] != NULL;  ip=ip+3) {
+	for (ip=1;  ranges[ip] != EOLIST;  ip=ip+3) {
 	    first = min (ranges[ip], ranges[ip+1])
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
+	    if (step == 0)
+		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
 		remainder = mod (number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder >= first)
-		    next_number = max (next_number, number - remainder)
+		    next_number = number - remainder
 	    } else if (last < number) {
 		remainder = mod (last - first, step)
 		if (remainder == 0)
@@ -224,21 +217,27 @@ end
 
 
 # IS_IN_RANGE -- Test number to see if it is in range.
+# If the number is INDEFI then it is mapped to the maximum integer.
 
 bool procedure is_in_range (ranges, number)
 
 int	ranges[ARB]		# Range array
 int	number			# Number to be tested against ranges
 
-int	ip, first, last, step
+int	ip, first, last, step, num
 
 begin
-	for (ip=1;  ranges[ip] != NULL;  ip=ip+3) {
+	if (IS_INDEFI (number))
+	    num = MAX_INT
+	else
+	    num = number
+
+	for (ip=1;  ranges[ip] != EOLIST;  ip=ip+3) {
 	    first = min (ranges[ip], ranges[ip+1])
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
-	    if (number >= first && number <= last)
-		if (mod (number - first, step) == 0)
+	    if (num >= first && num <= last)
+		if (mod (num - first, step) == 0)
 		    return (true)
 	}
 

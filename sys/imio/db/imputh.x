@@ -22,16 +22,17 @@ pointer	im			#I image descriptor
 char	key[ARB]		#I name of the new parameter
 char	text[ARB]		#I the history string to be added
 
-pointer	sp, keyname, outstr, ua
-int	fd, max_lenuserarea, curlen, buflen
+pointer	sp, keyname, instr, outstr, ua
+int	fd, max_lenuserarea, curlen, buflen, nchars
 int	ip, op, in_last_blank, out_last_blank
 
 bool	streq()
-int	stropen(), strlen()
+int	stropen(), strlen(), idb_filstr()
 errchk	syserrs, stropen, fprintf
 
 begin
 	call smark (sp)
+	call salloc (instr, SZ_LINE, TY_CHAR)
 	call salloc (keyname, SZ_FNAME, TY_CHAR)
 	call salloc (outstr, LEN_HISTSTR, TY_CHAR)
 
@@ -78,22 +79,25 @@ begin
 	# Open a file descriptor on the userarea buffer.
 	fd = stropen (Memc[ua+curlen], max_lenuserarea-curlen, APPEND)
 
+	# Filter the input string to remove any undesirable characters.
+	nchars = idb_filstr (text, Memc[instr], SZ_LINE)
+
 	# Append the HISTORY or COMMENT record to the user area.
 	iferr {
-	    if (strlen(text) <= LEN_HISTSTR ) {
+	    if (nchars <= LEN_HISTSTR ) {
 		# This is the easy case: the HISTORY string will fit in
 		# one record.
 
 		call fprintf (fd, "%-8s  %s%*t\n")
 		    call pargstr (Memc[keyname])
-		    call pargstr (text)
+		    call pargstr (Memc[instr])
 		    call pargi (IDB_LENSTRINGRECORD + 1)
 
 	    } else {
 		# Not the simple case; break up the string into pieces that 
 		# will fit into LEN_HISTSTR, preferably on word boundaries.
 
-		for (ip=1;  text[ip] != EOS;  ) {
+		for (ip=1;  Memc[instr+ip-1] != EOS;  ) {
 		    # If no blanks are found in HISTORY string, make sure
 		    # all of it gets output anyway.
 
@@ -104,13 +108,13 @@ begin
 		    # last blank found.
 
 		    do op = 1, LEN_HISTSTR {
-			if (IS_WHITE (text[ip])) {
+			if (IS_WHITE (Memc[instr+ip-1])) {
 			    in_last_blank = ip
 			    out_last_blank = op
-			} else if (text[ip] == EOS)
+			} else if (Memc[instr+ip-1] == EOS)
 			    break
 
-			Memc[outstr+op-1] = text[ip]
+			Memc[outstr+op-1] = Memc[instr+ip-1]
 			ip = ip + 1
 		    }
 
@@ -118,15 +122,15 @@ begin
 		    # and get ready for the next round (if any).
 
 		    Memc[outstr+op-1] = EOS
-		    if (text[ip] != EOS) {
+		    if (Memc[instr+ip-1] != EOS) {
 			# Break at last word boundary if in a word.
-			if (!IS_WHITE (text[ip])) {
+			if (!IS_WHITE (Memc[instr+ip-1])) {
 			    Memc[outstr+out_last_blank] = EOS
 			    ip = in_last_blank + 1
 			}
 
 			# Skip leading whitespace on next line.
-			while (IS_WHITE(text[ip]))
+			while (IS_WHITE(Memc[instr+ip-1]))
 			    ip = ip + 1
 		    }
 

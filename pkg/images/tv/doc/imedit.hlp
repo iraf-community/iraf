@@ -92,7 +92,8 @@ with the specified width in pixels.
 .ls xorder = 2, yorder = 2
 Orders (number of terms) of surface polynomial fit to background pixels
 for statistics and background subtraction.  The orders should generally
-be low with orders of 2 for a plane background.
+be low with orders of 2 for a plane background.  If either order is
+zero then a median background is used.
 .le
 .ls value = 0.
 Value for constant substitution.  One editing command is replacement of
@@ -102,7 +103,7 @@ a region by this value.
 Sigma of noise to be added to substitution values.  If less than or
 equal to zero then no noise is added.  If INDEF then pixel values from
 the background region are randomly selected after subtracting the
-fitted background surface.  Finally if a positive value is given than
+fitted background surface or median.  Finally if a positive value is given than
 a gaussian noise distribution is added.
 .le
 .ls angh = -33., angv = 25.
@@ -246,13 +247,14 @@ to be written.  This can be used to save partial changes.
 REPLACEMENT ALGORITHMS
 .ls a, b
 Replace rectangular or aperture regions by background values.  A background
-surface is fit the pixels in the background annulus.  The x and y orders of
-the surface function are given by the \fIxorder\fR and \fIyorder\fR parameters.
-The surface is then evaluated for the pixels in the replacement region.  If
-a positive sigma is specified then gaussian noise is added.  If a sigma of
-INDEF is specified then the residuals of the background pixels are sorted,
-the upper and lower 10% are excluded, and the remainder are randomly
-selected as additive noise.
+surface is fit the pixels in the background annulus if the x and y orders
+are greater than zero otherwise a median is computed.  The x and y orders
+of the surface function are given by the \fIxorder\fR and \fIyorder\fR
+parameters.  The median is used or the surface is evaluated for the pixels
+in the replacement region.  If a positive sigma is specified then gaussian
+noise is added.  If a sigma of INDEF is specified then the residuals of the
+background pixels are sorted, the upper and lower 10% are excluded, and the
+remainder are randomly selected as additive noise.
 .le
 .ls c, f, l
 Replace rectangular or line regions by interpolation from the nearest
@@ -280,10 +282,10 @@ buffer from the input image.
 .ls m, n
 Replace an aperture region by another aperture region.  There is no
 centering applied in this option.  The aperture region to copy is
-background subtracted using the background annulus surface fitting.
-This data may then be added to the destination aperture or replace
-the data in the destination aperture.  In the latter case the destination
-background surface is also computed and added.
+background subtracted using the background annulus for median or surface
+fitting.  This data may then be added to the destination aperture or
+replace the data in the destination aperture.  In the latter case the
+destination background surface is also computed and added.
 .le
 .ls u
 Undo the last change.  When a change is made the before and after data
@@ -418,6 +420,10 @@ EXAMPLES
 .fi
 .ih
 REVISIONS
+.ls IMEDIT V2.11
+If xorder or yorder are zero then a median background is computed
+for the 'a' and 'b' keys.
+.le
 .ls IMEDIT V2.10.4
 The 'u', 'j', 'k', and 'n' keys were added to those recorded in the
 log file.

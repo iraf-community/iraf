@@ -93,8 +93,8 @@ begin
 	call malloc (AP_APERTS(phot), napert, TY_REAL)
 	call malloc (AP_MAGS(phot), napert, TY_REAL)
 	call malloc (AP_MAGERRS(phot), napert, TY_REAL)
-	call malloc (AP_AREA(phot), napert, TY_REAL)
-	call malloc (AP_SUMS(phot), napert, TY_REAL)
+	call malloc (AP_AREA(phot), napert, TY_DOUBLE)
+	call malloc (AP_SUMS(phot), napert, TY_DOUBLE)
 	call amovr (aperts, Memr[AP_APERTS(phot)], napert)
 	call asrtr (Memr[AP_APERTS(phot)], Memr[AP_APERTS(phot)], napert)
 end

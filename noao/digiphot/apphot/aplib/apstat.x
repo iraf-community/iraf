@@ -35,7 +35,7 @@ begin
 	else if (param <= MAXERR2)
 	    return (ap2stati (ap, param))
 	else
-	    call error (0, "APSTATI: Unknown apphot parameter")
+	    call error (0, "APSTATI: Unknown apphot integer parameter")
 end
 
 
@@ -54,5 +54,24 @@ begin
 	else if (param <= MAXERR2)
 	    return (ap2statr (ap, param))
 	else
-	    call error (0, "APSTATR: Unknown apphot parameter")
+	    call error (0, "APSTATR: Unknown apphot real parameter")
+end
+
+
+# APSTATD -- Procedure to set a double apphot parameter.
+
+double procedure apstatd (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+double	ap1statd(), ap2statd()
+
+begin
+	if (param <= MAXERR1)
+	    return (ap1statd (ap, param))
+	else if (param <= MAXERR2)
+	    return (ap2statd (ap, param))
+	else
+	    call error (0, "APSTATD: Unknown apphot double parameter")
 end

@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<mach.h>
 include	<syserr.h>
 include	<plset.h>
 include	<imhdr.h>
@@ -21,7 +22,7 @@ int	xstep			# step between pixels in X (neg for a flip)
 
 pointer	pl
 long	offset
-int	sz_pixel, fd, op, step, nchars, n
+int	sz_pixel, nbytes, fd, op, step, nchars, n
 
 int	read()
 long	imnote()
@@ -87,4 +88,17 @@ begin
 	# Flip the pixel array end for end.
 	if (xstep < 0)
 	    call imaflp (obuf, npix, sz_pixel)
+
+	# Byte swap if necessary.
+	if (IM_SWAP(im) == YES) {
+	    nbytes = npix * sz_pixel * SZB_CHAR
+	    switch (sz_pixel * SZB_CHAR) {
+	    case 2:
+		call bswap2 (obuf, 1, obuf, 1, nbytes)
+	    case 4:
+		call bswap4 (obuf, 1, obuf, 1, nbytes)
+	    case 8:
+		call bswap8 (obuf, 1, obuf, 1, nbytes)
+	    }
+	}
 end

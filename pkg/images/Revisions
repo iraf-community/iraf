@@ -1,5 +1,324 @@
-.help revisions Jun88 pkg.images
+.help revisions Jan97 images
 .nf
+pkg/images/immatch/src/linmatch/lsqfit.h
+pkg/images/immatch/src/linmatch/rglscale.x
+pkg/images/immatch/src/linmatch/rgliscale.x
+pkg/images/immatch/src/linmatch/rglsqfit.x
+pkg/images/immatch/src/linmatch/rglplot.x
+    Fixed several bugs in the linmatch bad region handling code. The
+    bad region flag was not being set if the input image regions were
+    partially of the image or the sizes of the input reference and input
+    regions were different image, the error status flag was not being correctly
+    set after a bad region was detected, and the linear least squares fits
+    were not being properly protected against bad data regions, and
+    non-physical data fits. The graphics routines were also changed
+    to force windowing around the good data points. (12/19/97, Davis)
+
+pkg/images/immatch/src/linmatch/rglscale.x
+    The linmatch task could produce a floating operand error if the fitting
+    algorithm was "mean", "median", or "mode", and one or more of the reference
+    image regions had a mean, median, or mode values of 0.0. (12/15/97, Davis)
+
+pkg/images/imutil/src/imcopy.x
+pkg/images/lib/imcopy.x
+    There were two different versions of the imcopy.x file  in the images
+    packages which were causing different behavior in the imcopy task.
+    Updated the version in the lib subdirectory and deleted the version in
+    imutil/src. (11/18/97, Davis)
+
+
+pkg/images/imfilter/src/t_median.x
+pkg/images/imfilter/src/t_mode.x
+    The constant for constant boundary extension was declared as in integer
+    instead of a real in the median and mode tasks causing an FPE error on
+    the Dec Alpha if the value could not be converted. A value of 0 for
+    constant would work correctly. (11/11/97, Davis)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+    When using STF images the failure error when there are too many images
+    is SYS_IKIOPEN rather than the others that occur with OIF, etc.
+    Added this error code to be caught and have the program build a
+    stacked image to combine.  (10/21/97, Valdes)
+
+pkg/images/immatch/src/imcombine/icscale.x
+pkg/images/immatch/doc/imcombine.hlp
+    When the zero offsets or weights are specified in a file the weight
+    adjustment for differeing sky levels is not done.  (10/3/97, Valdes)
+
+=====
+V2.11
+=====
+
+pkg/images/imutil/src/t_imtile.x
+    Modified the imtile task to avoid a potential divide by zero error
+    in the range decoding software. This error was actually due to
+    an interface change to the xtools$ranges.x code, which has since been
+    changed back, but the potential for error was there. (8/22/97, Davis)
+
+pkg/images/imcoords/src/sffind.x
+    Fixed a type mismatch in the call to atan2. (8/18/97, LED)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+    Fixed a segmentation violation caused by attempting to close the
+    mask data structures during error recovery when the error occurs
+    before the data structures are defined.  (8/14/97, Valdes)
+
+pkg/images/imutil/src/imhistogram.x
+    Fixed a bug in the imhistogram and phistogram tasks that could cause
+    an invalid floating point operation if the image contained pixels
+    outside the valid integer range. (7/31/97, Davis)
+
+pkg/images/immatch/src/xregister/rgxcorr.x
+    Fixed a bug in xregister that could occur if: the correlation parameter
+    was set to "fourier" and one of the correlation regions was completely
+    off the input image. In this case all the region shifts following
+    the first bad one were being set to INDEF. (7/25/97, Davis)
+
+pkg/images/lib/skywcs.x
+    Modified the coordinates structure initialization routine to explictly set
+    the physical and logical axis maps on startup rather than leaving them
+    undefined.  (6/16/97, Davis)
+
+pkg/images/immatch/wcsxymatch.par
+pkg/images/immatch/wcsmap.cl
+pkg/images/immatch/wregister.cl
+pkg/images/immatch/doc/wcsxymatch.hlp
+pkg/images/immatch/doc/wcsmap.hlp
+pkg/images/immatch/doc/wregister.hlp
+pkg/images/immatch/src/wcsmatch/t_wcsxymatch.hlp
+    Added the transpose parameter to the wcsxymatch, wcsmap, and wregister
+    task to permit users to force an image transpose in cases where the
+    image wcs does not contain enough information, e.g. axtype is undefined
+    or set to the same units.
+    (6/10/97, Davis)
+
+pkg/images/immatch/geomap.par
+pkg/images/immatch/skymap.cl
+pkg/images/immatch/wcsmap.cl
+pkg/images/immatch/sregister.cl
+pkg/images/immatch/wregister.cl
+pkg/images/immatch/doc/geomap.hlp
+pkg/images/immatch/doc/skymap.hlp
+pkg/images/immatch/doc/wcsmap.hlp
+pkg/images/immatch/doc/wregister.hlp
+pkg/images/immatch/doc/sregister.hlp
+pkg/images/immatch/src/geometry/geoxytran.gx
+pkg/images/immatch/src/geometry/geoxytran.x
+pkg/images/immatch/src/geometry/t_geomap.gx
+pkg/images/immatch/src/geometry/t_geomap.x
+pkg/images/immatch/src/geometry/t_geotran.x
+pkg/images/immatch/src/psfmatch/rgpbckgrd.x
+pkg/images/immatch/src/xregister/rgxbckgrd.x
+pkg/images/imcoords/ccmap.par
+pkg/images/imcoords/doc/ccmap.hlp
+pkg/images/imcoords/src/t_ccmap.x
+pkg/images/imcoords/src/t_imcctran.x
+pkg/images/lib/coomap.key
+pkg/images/lib/geofit.gx
+pkg/images/lib/geofit.x
+pkg/images/lib/geograph.gx
+pkg/images/lib/geograph.x
+pkg/images/lib/geomap.h
+pkg/images/lib/geomap.key
+pkg/images/lib/rgtransform.x
+    Modifed the geomap, wcsmap, skymap, wregister, sregister, and ccmap
+    tasks to use the new cross terms option in the gsurfit library.
+    This involved changing two boolean parameters in each task to string
+    parameters, making the interactive fitting software shared by all
+    these tasks aware of the change, and modifying the gsinit calls
+    to do the initialization properly.
+    (5/1/97, Davis)
+
+pkg/images/immatch/src/t_geotran.x
+pkg/images/immatch/src/geotran.x
+    Fixed various bugs triggered by the case where the user sets xmin, xmax,
+    ymin, or ymax, explicitly, and xmin > xmax or ymin > ymax. Improved
+    the precision of the flux conservation algorithm at the same time.
+    (4/30/97, Davis)
+
+pkg/images/imutil/src/imcopy.x
+    Changed imcopy so that it ignores the output image section if the
+    input and output root names are the same, making its behavior
+    consistent with other images package tasks which can overwrite the input
+    image. (4/24/97, Davis)
+
+pkg/images/immatch/doc/imcombine.hlp
+    Minor readability changes.  (4/14/97, Valdes)
+
+===============================
+Package Reorganization
+===============================
+
+pkg/images/imarith/t_imsum.x
+pkg/images/imarith/t_imcombine.x
+pkg/images/doc/imsum.hlp
+pkg/images/doc/imcombine.hlp
+    Provided options for USHORT data.  (12/10/96, Valdes)
+
+pkg/images/imarith/icsetout.x
+pkg/images/doc/imcombine.hlp
+    A new option for computing offsets from the image WCS has been added.
+    (11/30/96, Valdes)
+
+pkg/images/imarith/t_imcombine.x
+pkg/images/imarith/icombine.gx
+    Changed the error checking to catch additional errors relating to too
+    many files.  (11/12/96, Valdes)
+
+pkg/images/imarith/icsort.gx
+    There was an error in the ic_2sort routine when there are exactly
+    three images that one of the explicit cases did not properly keep
+    the image identifications.  See buglog 344.  (8/1/96, Valdes)
+
+pkg/images/filters/median.x
+    The routine mde_yefilter was being called with the wrong number of
+    arguments.
+    (7/18/96, Davis)
+
+pkg/images/imarith/t_imcombine.x
+pkg/images/imarith/icombine.gx
+pkg/images/imarith/icimstack.x +
+pkg/images/imarith/iclog.x
+pkg/images/imarith/mkpkg
+pkg/images/doc/imcombine.hlp
+    The limit on the maximum number of images that can be combined, set by
+    the maximum number of logical file descriptors, has been removed.  If
+    the condition of too many files is detected the task now automatically
+    stacks all the images in a temporary image and then combines them with
+    the project option.
+    (5/14/96, Valdes)
+
+pkg/images/geometry/xregister/rgxfit.x
+    Changed several Memr[] references to Memi[] in the rg_fit routine.
+    This bug was causing a floating point error in the xregister task
+    on the Dec Alpha if the coords file was defined, and could potentially
+    cause problems on other machines.
+    (Davis, April 3, 1996)
+
+pkg/images/geometry/t_geotran.x
+pkg/images/geometry/geograph.x
+pkg/images/doc/geomap.hlp
+     Corrected the definition of skew in the routines which compute a geometric
+     interpretation of the 6-coefficient fit, which compute the coefficients
+     from the geometric parameters, and in the relevant help pages.
+     (2/19/96, Davis)
+
+pkg/images/median.par
+pkg/images/rmedian.par
+pkg/images/mode.par
+pkg/images/rmode.par
+pkg/images/fmedian.par
+pkg/images/frmedian.par
+pkg/images/fmode.par
+pkg/images/frmode.par
+pkg/images/doc/median.hlp
+pkg/images/doc/rmedian.hlp
+pkg/images/doc/mode.hlp
+pkg/images/doc/rmode.hlp
+pkg/images/doc/fmedian.hlp
+pkg/images/doc/frmedian.hlp
+pkg/images/doc/fmode.hlp
+pkg/images/doc/frmode.hlp
+pkg/images/filters/t_median.x
+pkg/images/filters/t_rmedian.x
+pkg/images/filters/t_mode.x
+pkg/images/filters/t_rmode.x
+pkg/images/filters/t_fmedian.x
+pkg/images/filters/t_frmedian.x
+pkg/images/filters/t_fmode.x
+pkg/images/filters/t_frmode.x
+    Added a verbose parameter to the median, rmedian, mode, rmode, fmedian,
+    frmedian, fmode, and frmode tasks. (11/27/95, Davis)
+
+pkg/images/geometry/doc/geotran.hlp
+    Fixed an error in the help page for geotran. The default values for
+    the xscale and yscale parameters were incorrectly listed as INDEF,
+    INDEF instead of 1.0, 1.0. (11/14/95, Davis)
+
+pkg/images/imarith/icpclip.gx
+    Fixed a bug where a variable was improperly used for two different
+    purposes causing the algorithm to fail (bug 316).  (10/19/95, Valdes)
+
+pkg/images/doc/imcombine.hlp
+    Clarified a point about how the sigma is calculated with the SIGCLIP
+    option.  (10/11/95, Valdes)
+
+pkg/images/imarith/icombine.gx
+    To deal with the case of readnoise=0. and image data which has points with
+    negative mean or median and very small minimum readnoise is set
+    internally to avoid computing a zero sigma and dividing by it.  This
+    applies to the noise model rejection options.  (8/11/95, Valdes)
+
+pkg/images/frmedian.hlp
+pkg/images/frmode.hlp
+pkg/images/rmedian.hlp
+pkg/images/rmode.hlp
+pkg/images/frmedian.par
+pkg/images/frmode.par
+pkg/images/rmedian.par
+pkg/images/rmode.par
+pkg/images/filters/frmedian.h
+pkg/images/filters/frmode.h
+pkg/images/filters/rmedian.h
+pkg/images/filters/rmode.h
+pkg/images/filters/t_frmedian.x
+pkg/images/filters/t_frmode.x
+pkg/images/filters/t_rmedian.x
+pkg/images/filters/t_rmode.x
+pkg/images/filters/frmedian.x
+pkg/images/filters/frmode.x
+pkg/images/filters/rmedian.x
+pkg/images/filters/rmode.x
+pkg/images/filters/med_utils.x
+    Added new ring median and modal filtering tasks frmedian, rmedian,
+    frmode, and rmode to the images package.
+    (6/20/95, Davis)
+
+pkg/images/fmedian.hlp
+pkg/images/fmode.hlp
+pkg/images/median.hlp
+pkg/images/mode.hlp
+pkg/images/fmedian.par
+pkg/images/fmode.par
+pkg/images/median.par
+pkg/images/mode.par
+pkg/images/filters/fmedian.h
+pkg/images/filters/fmode.h
+pkg/images/filters/median.h
+pkg/images/filters/mode.h
+pkg/images/filters/t_fmedian.x
+pkg/images/filters/t_fmode.x
+pkg/images/filters/t_median.x
+pkg/images/filters/t_mode.x
+pkg/images/filters/fmedian.x
+pkg/images/filters/fmode.x
+pkg/images/filters/median.x
+pkg/images/filters/mode.x
+pkg/images/filters/fmd_buf.x
+pkg/images/filters/fmd_hist.x
+pkg/images/filters/fmd_maxmin.x
+pkg/images/filters/med_buf.x
+pkg/images/filters/med_sort.x
+    Added minimum and maximum good data parameters to the fmedian, fmode,
+    median, and mode filtering tasks.  Removed the 64X64 kernel size limit
+    in the median and mode tasks.  Replaced the common blocks with structures
+    and .h files.
+    (6/20/95, Davis)
+
+pkg/images/geometry/t_geotran.x
+pkg/images/geometry/geotran.x
+pkg/images/geometry/geotimtran.x
+    Fixed a bug in the buffering of the x and y coordinate surface interpolants
+    which can cause a memory corruption error if, nthe nxsample or nysample
+    parameters are > 1, and the nxblock or nyblock parameters are less
+    than the x and y dimensions of the input image. Took the opportunity
+    to clean up the code.
+    (6/13/95, Davis)
+
+=======
+V2.10.4
+=======
+
 pkg/images/geometry/t_geomap.x
     Corrected a harmless typo in the code which determines the minimum
     and maximum x values and improved the precision of the test when the
@@ -216,6 +535,10 @@ pkg/images/doc/imcombine.hlp
     it specifies the maximum number of pixels to reject from the initial
     set of pixels.  (11/8/93, Valdes)
 
+=======
+V2.10.2
+=======
+
 pkg/images/imarith/icsetout.x
     Added MWCS calls to update the axis mapping when using the project
     option in IMCOMBINE.  (10/8/93, Valdes)
@@ -332,9 +655,9 @@ pkg/images/imarith/icsclip.gx
 	if (nh == n2)  ==>  if (nh == n[i])
     (1/20/93, Valdes)
 
-.nf
+
 =======
-V2.10.2
+V2.10.1
 =======
 
 pkg/images/imarith/t_imcombine.x

@@ -1,0 +1,58 @@
+.help imslice Feb90 images.imutil
+.ih
+NAME
+imslice -- slice an image into images of lower dimension
+.ih
+USAGE
+imslice input output slicedim
+.ih
+PARAMETERS
+.ls input
+The list of input images to be sliced. The input images must have a
+dimensionality greater than one.
+.le
+.ls output
+The root name of the output images. For each n-dimensional input
+image m (n-1)-dimensional images will be created, where m is the
+length of the axis to be sliced. The sequence number m will
+be appended to the output image name.
+.le
+.ls slice_dimension
+The dimension to be sliced.
+.le
+.ls verbose = yes
+Print messages about actions taken.
+.le
+.ih
+DESCRIPTION
+The n-dimensional images \fIinput\fR are sliced into m (n-1)-dimensional
+images \fIoutput\fR, where m is the length of the axis of the input
+image to be sliced. A sequence number from 1 to m is appended to output
+to create the output image name.
+.ih
+EXAMPLES
+1. Slice the 3-D image "datacube" into a list of 2D images. A list of
+images called plane001, plane002, plane003 ... will be created.
+
+.nf
+	im> imslice datacube plane 3
+.fi
+
+2. Slice the list of 2-D images "nite1,nite2,nite3" into a list of 1-D images.
+A new list of images nite1001, nite1002, ..., nite2001, nite2002, ...,
+nite3001, nite3002 will be created.
+
+.nf
+	im> imslice nite1,nite2,nite3 nite1,nite2,nite3 2
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+If the image to be sliced is an image section, the images slices will
+refer to the section not the original image.
+.ih
+SEE ALSO
+imstack, imcopy
+.endhelp

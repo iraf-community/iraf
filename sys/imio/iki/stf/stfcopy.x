@@ -6,8 +6,9 @@ include	"stf.h"
 # STF_COPY -- Copy an image.  A special operator is provided for fast, blind
 # copies of entire images.
 
-procedure stf_copy (oroot, oextn, nroot, nextn, status)
+procedure stf_copy (kernel, oroot, oextn, nroot, nextn, status)
 
+int	kernel			#I IKI kernel
 char	oroot[ARB]		# old image root name
 char	oextn[ARB]		# old image extn
 char	nroot[ARB]		# new image root name

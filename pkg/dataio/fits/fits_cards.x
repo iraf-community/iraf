@@ -15,14 +15,22 @@ int	axisno		# axis number
 char	card[ARB]	# FITS card image
 
 char	keyword[LEN_KEYWORD]
+int	len_object
+int	strlen()
 errchk	wft_encodeb, wft_encodei, wft_encodel, wft_encode_axis
-include "wfits.com"
 
 begin
 	# Get mandatory keywords.
 	switch (cardno) {
 	case FIRST_CARD:
-	    call wft_encodeb ("SIMPLE", YES, card, "FITS STANDARD")
+	    if (XTENSION(fits) == EXT_PRIMARY) {
+	        call wft_encodeb ("SIMPLE", YES, card, "FITS STANDARD")
+	    } else {
+		len_object = max (min (LEN_OBJECT, strlen ("IMAGE")),
+		    LEN_STRING)
+		call wft_encodec ("XTENSION", "IMAGE", len_object, card,
+		    "IMAGE EXTENSION")
+	    }
 	case SECOND_CARD:
 	    call wft_encodei ("BITPIX", FITS_BITPIX(fits), card,
 	    "FITS BITS/PIXEL")
@@ -53,17 +61,34 @@ pointer	fits		# pointer to FITS structure
 int	optiono		# number of the option card
 char	card[ARB]	# FITS card image
 
-char	datestr[LEN_STRING]
+char	datestr[LEN_STRING+2]
 int	len_object, stat
 int	strlen()
 errchk	wft_encoded, wft_encodec, wft_encode_blank, wft_encoder, wft_encodei
 errchk	wft_encode_date 
+include "wfits.com"
 
 begin
 	 stat = YES
 
 	 # get optional keywords
 	 switch (optiono) {
+	 case KEY_EXTEND:
+	    if (XTENSION(fits) == EXT_IMAGE || wextensions == NO)
+		stat = NO
+	    else
+		call wft_encodeb ("EXTEND", YES, card,
+		    "STANDARD EXTENSIONS MAY BE PRESENT")
+	 case KEY_PCOUNT:
+	    if (XTENSION(fits) == EXT_PRIMARY)
+		stat = NO
+	    else
+		call wft_encodei ("PCOUNT", 0, card, "NO RANDOM PARAMETERS")
+	 case KEY_GCOUNT:
+	    if (XTENSION(fits) == EXT_PRIMARY)
+		stat = NO
+	    else
+		call wft_encodei ("GCOUNT", 1, card, "ONLY ONE GROUP")
 	 case KEY_BSCALE:
 	    if ((NAXIS(im) <= 0) || (FITS_BITPIX(fits) < 0))
 		stat = NO
@@ -96,8 +121,9 @@ begin
 	case KEY_ORIGIN:
 	    call wft_encodec ("ORIGIN", "KPNO-IRAF", LEN_ORIGIN, card, "")
 	case KEY_DATE:
-	    call wft_encode_date (datestr, LEN_STRING)
-	    call wft_encodec ("DATE", datestr, LEN_STRING, card, "")
+	    call wft_encode_date (datestr, LEN_STRING + 2)
+	    len_object = max (min (LEN_OBJECT, strlen (datestr)), LEN_STRING)
+	    call wft_encodec ("DATE", datestr, len_object, card, "")
 	case KEY_IRAFNAME:
 	    len_object = max (min (LEN_OBJECT, strlen (IRAFNAME(fits))),
 		LEN_STRING)
@@ -224,6 +250,20 @@ begin
 	        } else if (strmatch (card, "^IRAF-B/P") != 0) {
 		    stat = NO
 	        } else if (strmatch (card, "^IRAF-BPX") != 0) {
+		    stat = NO
+	        } else if (strmatch (card, "^FILENAME") != 0) {
+		    stat = NO
+	        } else if (strmatch (card, "^EXTEND  ") != 0) {
+		    stat = NO
+	        } else if (strmatch (card, "^EXTNAME ") != 0) {
+		    stat = NO
+	        } else if (strmatch (card, "^EXTVER  ") != 0) {
+		    stat = NO
+	        } else if (strmatch (card, "^INHERIT ") != 0) {
+		    stat = NO
+	        } else if (strmatch (card, "^IRAF-TLM") != 0) {
+		    stat = NO
+	        } else if (strmatch (card, "^OBJECT  ") != 0) {
 		    stat = NO
 	        } else if (strmatch (card, "^END     ") != 0) {
 		    stat = NO

@@ -79,7 +79,7 @@ int	xs			#I first pixel to test
 int	npix			#I length of region to be tested
 int	mval			#O mask value, if constant valued segment
 
-int	x1, np, v_src, i
+int	nleft, x1, np, v_src, i
 int	d_src[LEN_PLLDES]
 
 begin
@@ -95,11 +95,19 @@ begin
 	}
 
 	# Test if the next npix pixels are all set to the same value.
-	if (pll_nleft(d_src) < npix)
-	    return (false)
-	else {
-	    pll_getseg (ll_src, d_src, npix, v_src)
-	    mval = v_src
-	    return (true)
+	# Note the line list is segmented and we have to read segments until
+	# we have examined NPIX pixels, or until the mask value changes.
+
+	mval = -1
+	for (nleft=npix;  nleft > 0;  nleft = nleft - np) {
+	    np = min (pll_nleft(d_src), nleft)
+	    pll_getseg (ll_src, d_src, np, v_src)
+	    if (v_src != mval)
+		if (mval < 0)
+		    mval = v_src
+		else
+		    return (false)
 	}
+
+	return (true)
 end

@@ -18,12 +18,20 @@ begin
 	call imgimage (image, root, maxchar)
 	i = strlen (root)
 	switch (root[i]) {
-	case 'h':
+	case 'h':							# .??h
 	    if (i > 3 && root[i-3] == '.')
 		root[i-3] = EOS
-	case 'l':
-	    if (i > 2 && root[i-2] == '.')
+	case 'l':							# .pl
+	    if (i > 2 && root[i-2] == '.' && root[i-1] == 'p')
 		root[i-2] = EOS
+	case 's':							# .fits
+	    if (i > 4 && root[i-4] == '.' && root[i-3] == 'f' &&
+		root[i-2] == 'i' && root[i-1] == 't')
+		root[i-4] = EOS
+	case 't':							# .fit
+	    if (i > 3 && root[i-3] == '.' && root[i-2] == 'f' &&
+		root[i-1] == 'i')
+		root[i-3] = EOS
 	}
 end
 
@@ -48,12 +56,20 @@ begin
 	ext[1] = EOS
 	i = strlen (Memc[root])
 	switch (Memc[root+i-1]) {
-	case 'h':
+	case 'h':							# .??h
 	    if (i > 3 && Memc[root+i-4] == '.')
 		call strcpy (Memc[root+i-4], ext, maxchar)
-	case 'l':
-	    if (i > 2 && Memc[root+i-3] == '.')
+	case 'l':							# .pl
+	    if (i > 2 && Memc[root+i-3] == '.' && Memc[root+i-2] == 'p')
 		call strcpy (Memc[root+i-3], ext, maxchar)
+	case 's':							# .fits
+	    if (i > 4 && Memc[root+i-5] == '.' && Memc[root+i-4] == 'f' &&
+		Memc[root+i-3] == 'i' && Memc[root+i-2] == 't')
+		call strcpy (Memc[root+i-5], ext, maxchar)
+	case 't':							# .fit
+	    if (i > 3 && Memc[root+i-4] == '.' && Memc[root+i-3] == 'f' &&
+		Memc[root+i-2] == 'i')
+		call strcpy (Memc[root+i-5], ext, maxchar)
 	}
 	call sfree (sp)
 end

@@ -504,6 +504,9 @@ in the first column.
 
 .ih
 REVISIONS
+.ls RVIDLINES V2.11
+This task will now work in the units of the input spectra.
+.le
 .ls RVIDLINES V2.10.3
 This is a new task in this version. 
 .le

@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include "dgsurfitdef.h"
 
 # GSVECTOR -- Procedure to evaluate the fitted surface at an array of points.

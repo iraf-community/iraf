@@ -36,6 +36,9 @@ begin
 	int	i, j, n
 
 	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	n = strlen (imtype)
 
 	temp1 = mktemp ("tmp$iraf")
@@ -80,10 +83,11 @@ begin
 		    ylabel="", xmin=INDEF, xmax=INDEF, ymin=INDEF,
 		    ymax=INDEF, logfile=temp4, graphics="stdgraph")
 		imdelete (sky, verify=no)
-		match (sky, temp4, stop=no) |
+		system.match (sky, temp4, stop=no) |
 		fields (fields="2", lines="1-9999") |
-		sort (column=0, ignore=yes, numeric=no, reverse_sort=no) |
-		unique (> temp3)
+		system.sort (column=0, ignore=yes, numeric=no,
+		    reverse_sort=no) |
+		lists.unique (> temp3)
 		delete (temp4, verify=no)
 		aps = "@" // temp4
 		fd3 = temp3

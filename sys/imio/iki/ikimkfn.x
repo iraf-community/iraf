@@ -7,10 +7,10 @@ include	"iki.h"
 
 procedure iki_mkfname (root, extn, fname, maxch)
 
-char	root[ARB]		# root filename
-char	extn[ARB]		# filename extension
-char	fname[maxch]		# output filename
-int	maxch			# max chars out
+char	root[ARB]		#I root filename
+char	extn[ARB]		#I filename extension
+char	fname[maxch]		#O output filename
+int	maxch			#I max chars out
 
 int	op
 int	gstrcpy()

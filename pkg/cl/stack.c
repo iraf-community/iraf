@@ -38,13 +38,13 @@ int topcs = STACKSIZ;		/* index of last cstack; grows downward	*/
 int topos = -1;			/* index of last ostack; grows upward	*/
 int basos = -1;			/* lowest legal index of operand stack	*/
 
-/* Push an integer onto the control stack.  Return ERR if it would cause
+/* Push a memel value onto the control stack.  Return ERR if it would cause
  * overflow, else OK.  The control stack is used by the parser during
  * compilation.  If an error occurs during compilation, taskunwind() will
  * call poptask() to pop tasks off the control stack.  We must be careful
  * to avoid having the compiler temporaries interfere with task frames.
  */
-push (v)
+pushmem (v)
 memel v;
 {
 	if (topcs - 1 > topos)
@@ -55,31 +55,30 @@ memel v;
 }
 
 
-/* Pop top int off control stack and return it.
+/* Pop top memory value off control stack and return it.
  * ==> no real err return, although it is checked.
  */
-pop ()
+popmem ()
 {
 	if (topcs < STACKSIZ)
 	    return (stack[topcs++]);
 	else {
 	    eprintf ("control stack underflow\n");
-	    return (ERR);
+	    return ((memel) ERR);
 	}
 }
 
-/* Ppush pushes an element onto the stack, but leaves the top
+/* PPush pushes an element onto the stack, but leaves the top
  * of the stack untouched.
  */
-ppush (p)
+ppushmem (p)
 register memel p;
-
 {
 	register memel	q;
 
-	q = pop();
-	push(p);
-	push(q);
+	q = popmem();
+	pushmem(p);
+	pushmem(q);
 }
 
 

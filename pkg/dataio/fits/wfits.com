@@ -10,6 +10,8 @@ int	make_image	# Make a FITS image?
 int	scale		# Scale the data with bzero and bscale?
 int	autoscale	# Allow program to calculate bscale and bzero?
 int	blkfac		# FITS tape blocking factor
+int	wextensions	# Write a FITS extensions file
+int	gheader		# Write a global FITS extensions file header
 
 common /wfitscom/ bscale, bzero, bitpix, len_record, long_header, short_header,
-		  make_image, scale, autoscale, blkfac
+		  make_image, scale, autoscale, blkfac, wextensions, gheader

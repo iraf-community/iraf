@@ -1,5 +1,6 @@
 # T_RSTEXT -- This procedure replaces the following CL script code to
-# make the RSPECTEXT script efficient.
+# make the RSPECTEXT script efficient.  It also determines whether there
+# is a header rather than requiring the user to specify it.
 #
 #	# Separate the header and flux values for RTEXTIMAGE and the
 #	# wavelengths for later use.
@@ -26,13 +27,12 @@ procedure t_rstext ()
 pointer	input		# Input RSPECTEXT text file
 pointer	output1		# Output text file for RTEXTIMAGE
 pointer	output2		# Output text file for DISPCOR
-bool	header		# Does input contain a header?
 
 int	in, out1, out2, dim
+bool	header
 real	x, y
 pointer	sp, line
 int	open(), getline(), strncmp(), fscan(), nscan()
-bool	clgetb()
 errchk	open
 
 begin
@@ -45,11 +45,19 @@ begin
 	call clgstr ("input", Memc[input], SZ_FNAME)
 	call clgstr ("output1", Memc[output1], SZ_FNAME)
 	call clgstr ("output2", Memc[output2], SZ_FNAME)
-	header = clgetb ("header")
 
 	in = open (Memc[input], READ_ONLY, TEXT_FILE)
 	out1 = open (Memc[output1], NEW_FILE, TEXT_FILE)
 	out2 = open (Memc[output2], NEW_FILE, TEXT_FILE)
+
+	header = false
+	while (getline (in, Memc[line]) != EOF) {
+	    if (strncmp (Memc[line], "END", 3) == 0) {
+		header = true
+		break
+	    }
+	}
+	call seek (in, BOF)
 
 	if (header) {
 	    while (getline (in, Memc[line]) != EOF) {
@@ -72,7 +80,8 @@ begin
 	    dim = dim + 1
 	}
 
-	call printf ("%d\n")
+	call printf ("%b %d\n")
+	    call pargb (header)
 	    call pargi (dim)
 
 	call close (out2)

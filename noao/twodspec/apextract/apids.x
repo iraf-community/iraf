@@ -15,64 +15,140 @@ procedure ap_gids (ids)
 
 pointer	ids		# ID structure
 
-int	nids, ap, beam, fd, nalloc, nowhite(), open(), fscan(), nscan()
-pointer	sp, str, aps, beams, titles
+int	nids, ap, beam, fd, nalloc
+double	ra, dec
+pointer	sp, key, str, aps, beams, titles, im, list
+
+int	nowhite(), open(), fscan(), nscan()
+pointer	immap(), imofnlu(), imgnfn()
 errchk	open
 
 begin
 	call smark (sp)
-	    call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (key, SZ_FNAME, TY_CHAR)
+	call salloc (str, SZ_LINE, TY_CHAR)
 
 	nids = 0
 	nalloc = 0
 
-	call apgstr ("apidtable", Memc[str], SZ_LINE)
-	if (nowhite (Memc[str], Memc[str], SZ_LINE) > 0) {
+	call apgstr ("apidtable", Memc[key], SZ_FNAME)
+	if (nowhite (Memc[key], Memc[key], SZ_FNAME) > 0) {
 	    iferr {
-		fd = open (Memc[str], READ_ONLY, TEXT_FILE)
-		while (fscan (fd) != EOF) {
-		    call gargi (ap)
-		    if (nscan() == 0)
-			next
-		    if (ap < 1) {
-			call close (fd)
-			call error (1,
-			    "Aperture numbers in apidtable must be > 0")
-		    }
-		    if (nalloc == 0) {
-			nalloc = 50
-			call malloc (aps, nalloc, TY_INT)
-			call malloc (beams, nalloc, TY_INT)
-			call malloc (titles, nalloc, TY_POINTER)
-		    } else if (nids == nalloc) {
-			nalloc = nalloc + 50
-			call realloc (aps, nalloc, TY_INT)
-			call realloc (beams, nalloc, TY_INT)
-			call realloc (titles, nalloc, TY_POINTER)
-		    }
-		    Memi[aps+nids] = ap
-		    Memi[beams+nids] = ap
-		    Memc[str] = EOS
-		    call gargi (beam)
-		    if (nscan() == 2)
-		        Memi[beams+nids] = beam
-		    call gargstr (Memc[str], SZ_LINE)	
-		    call xt_stripwhite (Memc[str])
-		    if (Memc[str] == EOS)
-			Memi[titles+nids] = NULL
-		    else {
-		        call malloc (Memi[titles+nids], SZ_APTITLE, TY_CHAR)
-			call strcpy (Memc[str], Memc[Memi[titles+nids]],
-			    SZ_APTITLE)
-		    }
-		    nids = nids + 1
-		}	
-		call close (fd)
+		# Read aperture information from an image.
+		ifnoerr (im = immap (Memc[key], READ_ONLY, 0)) {
+		    list = imofnlu (im, "SLFIB[0-9]*")
+		    while (imgnfn (list, Memc[key], SZ_FNAME) != EOF) {
+			call imgstr (im, Memc[key], Memc[str], SZ_LINE)
+			call sscan (Memc[str])
+			call gargi (ap)
+			if (nscan() == 0)
+			    next
+			if (ap < 1) {
+			    call imcfnl (list)
+			    call imunmap (im)
+			    call error (1,
+				"Aperture numbers in apidtable must be > 0")
+			}
+			if (nalloc == 0) {
+			    nalloc = 50
+			    call malloc (aps, nalloc, TY_INT)
+			    call malloc (beams, nalloc, TY_INT)
+			    call malloc (titles, nalloc, TY_POINTER)
+			} else if (nids == nalloc) {
+			    nalloc = nalloc + 50
+			    call realloc (aps, nalloc, TY_INT)
+			    call realloc (beams, nalloc, TY_INT)
+			    call realloc (titles, nalloc, TY_POINTER)
+			}
+			Memi[aps+nids] = ap
+			call gargi (Memi[beams+nids])
+			call gargd (ra)
+			call gargd (dec)
+			if (nscan() != 4) {
+			    call reset_scan ()
+			    call gargi (ap)
+			    call gargi (beam)
+			    Memc[str] = EOS
+			    call gargstr (Memc[str], SZ_LINE)	
+			    call xt_stripwhite (Memc[str])
+			    if (Memc[str] == EOS)
+				Memi[titles+nids] = NULL
+			    else {
+				call malloc (Memi[titles+nids], SZ_APTITLE,
+				    TY_CHAR)
+				call strcpy (Memc[str], Memc[Memi[titles+nids]],
+				    SZ_APTITLE)
+			    }
+			} else {
+			    Memc[str] = EOS
+			    call gargstr (Memc[str], SZ_LINE)	
+			    call xt_stripwhite (Memc[str])
+			    call malloc (Memi[titles+nids], SZ_APTITLE, TY_CHAR)
+			    if (Memc[str] == EOS) {
+				call sprintf (Memc[Memi[titles+nids]],
+				    SZ_APTITLE, "(%.2h %.2h)")
+				    call pargd (ra)
+				    call pargd (dec)
+			    } else {
+				call sprintf (Memc[Memi[titles+nids]],
+				    SZ_APTITLE, "%s (%.2h %.2h)")
+				    call pargstr (Memc[str])
+				    call pargd (ra)
+				    call pargd (dec)
+			    }
+			}
+			nids = nids + 1
+		    }	
+		    call imcfnl (list)
+		    call imunmap (im)
+
+		# Read aperture information from a file.
+		} else {
+		    fd = open (Memc[key], READ_ONLY, TEXT_FILE)
+		    while (fscan (fd) != EOF) {
+			call gargi (ap)
+			if (nscan() == 0)
+			    next
+			if (ap < 1) {
+			    call close (fd)
+			    call error (1,
+				"Aperture numbers in apidtable must be > 0")
+			}
+			if (nalloc == 0) {
+			    nalloc = 50
+			    call malloc (aps, nalloc, TY_INT)
+			    call malloc (beams, nalloc, TY_INT)
+			    call malloc (titles, nalloc, TY_POINTER)
+			} else if (nids == nalloc) {
+			    nalloc = nalloc + 50
+			    call realloc (aps, nalloc, TY_INT)
+			    call realloc (beams, nalloc, TY_INT)
+			    call realloc (titles, nalloc, TY_POINTER)
+			}
+			Memi[aps+nids] = ap
+			Memi[beams+nids] = ap
+			Memc[str] = EOS
+			call gargi (beam)
+			if (nscan() == 2)
+			    Memi[beams+nids] = beam
+			call gargstr (Memc[str], SZ_LINE)	
+			call xt_stripwhite (Memc[str])
+			if (Memc[str] == EOS)
+			    Memi[titles+nids] = NULL
+			else {
+			    call malloc (Memi[titles+nids], SZ_APTITLE, TY_CHAR)
+			    call strcpy (Memc[str], Memc[Memi[titles+nids]],
+				SZ_APTITLE)
+			}
+			nids = nids + 1
+		    }	
+		    call close (fd)
+		}
 	    } then
 		call erract (EA_WARN)
 	}
 
-	if (nalloc < nids) {
+	if (nalloc > nids) {
 	    call realloc (aps, nids, TY_INT)
 	    call realloc (beams, nids, TY_INT)
 	    call realloc (titles, nids, TY_INT)
@@ -166,6 +242,14 @@ begin
 	    AP_BEAM(aps[i]) = beam
 	    Memi[used+nused] = ap
 	    nused = nused + 1
+	} else {
+	    ap = AP_ID(aps[i])
+	    for (l = 1; l <= nids && ap != Memi[a+l-1]; l = l + 1)
+		;
+	    if (l <= nids)
+		AP_BEAM(aps[i]) = Memi[b+l-1]
+	    else
+		AP_BEAM(aps[i]) = ap
 	}
 
 	# Work backwards through the undefined apertures.

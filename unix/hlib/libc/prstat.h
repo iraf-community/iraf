@@ -12,7 +12,8 @@
 #define	PR_STDIMAGE	11
 
 #define	P_RUNNING	0	/* process status			*/
-#define	P_DONE		1	/* process terminated normally		*/
-#define	P_DEAD		2	/* process died and sent us X_IPC	*/
+#define	P_BUSY		1	/* process is busy			*/
+#define	P_DONE		2	/* process terminated normally		*/
+#define	P_DEAD		3	/* process died and sent us X_IPC	*/
 
 #define	D_prstat

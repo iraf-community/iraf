@@ -133,8 +133,8 @@ begin
 		    verbose = dp_stati (dao, VERBOSE)
 		    call dp_seti (dao, VERBOSE, NO)
 		    do i = 1, npsf
-		        if (dp_addstar (dao, im, wx, wy,
-		            Memi[DP_APID(apsel)+i-1], INDEFR, gd, mgd,
+		        if (dp_addstar (dao, im, wx, wy, INDEFR,
+		            Memi[DP_APID(apsel)+i-1], gd, mgd,
 			    false) == OK)
 			    psf_new = false
 		    call dp_seti (dao, VERBOSE, verbose)

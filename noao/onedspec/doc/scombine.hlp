@@ -1,4 +1,4 @@
-.help scombine Sep92 noao.onedspec
+.help scombine Sep97 noao.onedspec
 .ih
 NAME
 scombine -- Combine spectra
@@ -10,7 +10,8 @@ PARAMETERS
 .ls input
 List of input images containing spectra to be combined.  The spectra
 in the images to be combined are selected with the \fIapertures\fR and
-\fIgroup\fR parameters.
+\fIgroup\fR parameters.  Only the primary spectrum is combined and
+the associated band spectra are ignored.
 .le
 .ls output
 List of output images to be created containing the combined spectra.
@@ -232,8 +233,11 @@ The spectral combining is done using pixels at common dispersion
 coordinates rather than physical or logical pixel coordinates.  If the
 spectra to be combined do not have identical dispersion coordinates then
 the spectra are interpolated to a common dispersion sampling before
-combining.  The interpolation conserves flux to correct for differing pixel
-widths.  The default interpolation function is a 5th order polynomial.  The
+combining.  The interpolation conserves pixel values rather pixel fluxes.
+This means that flux calibrated data is treated correctedly and that
+spectra in counts are not corrected in the interpolation for changes
+in pixel widths.  
+The default interpolation function is a 5th order polynomial.  The
 choice of interpolation type is made with the package parameter "interp".
 It may be set to "nearest", "linear", "spline3", "poly5", or "sinc".
 Remember that this applies to all tasks which might need to interpolate

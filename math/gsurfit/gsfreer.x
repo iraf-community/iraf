@@ -16,7 +16,7 @@ begin
 	if (GS_XBASIS(sf) != NULL)
 	    call mfree (GS_XBASIS(sf), TY_REAL)
 	if (GS_YBASIS(sf) != NULL)
-	    call mfree (GS_XBASIS(sf), TY_REAL)
+	    call mfree (GS_YBASIS(sf), TY_REAL)
 	if (GS_MATRIX(sf) != NULL)
 	    call mfree (GS_MATRIX(sf), TY_REAL)
 	if (GS_CHOFAC(sf) != NULL)

@@ -3,6 +3,9 @@ arcs1,f,a,"",,,"List of arc spectra"
 arctable,f,a,"",,,"Arc assignment table (optional)"
 standards,f,a,"",,,"List of standard star spectra
 "
+crval,s,a,INDEF,,,"Approximate wavelength"
+cdelt,s,a,INDEF,,,"Approximate dispersion
+"
 dispcor,b,a,yes,,,"Dispersion correct spectra?"
 extcor,b,a,no,,,"Extinction correct spectra?"
 fluxcal,b,a,no,,,"Flux calibrate spectra?"
@@ -17,13 +20,13 @@ listonly,b,a,no,,,"List steps but don\'t process?
 "
 datamax,r,h,INDEF,,,"Max data value / cosmic ray threshold"
 anssplot,s,q,,no|yes|NO|YES,,"Splot spectrum?"
-newdisp,b,h,no,,,
-newsens,b,h,yes,,,
-newarcs,b,h,no,,,
-fluxcal1,b,h,yes,,,
-splot1,b,h,no,,,
-splot2,b,h,yes,,,
-dobatch,b,h,no,,,
+newdisp,b,h,,,,
+newsens,b,h,,,,
+newarcs,b,h,,,,
+fluxcal1,b,h,,,,
+splot1,b,h,,,,
+splot2,b,h,,,,
+dobatch,b,h,,,,
 fd1,*struct,h,"",,,
 fd2,*struct,h,"",,,
 fd3,*struct,h,"",,,

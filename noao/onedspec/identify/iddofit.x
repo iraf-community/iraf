@@ -1,3 +1,4 @@
+include	<units.h>
 include	"identify.h"
 
 # ID_DOFIT -- Fit a function to the features.  Eliminate INDEF points.
@@ -37,6 +38,10 @@ begin
 	}
 
 	if (nfit > 1) {
+	    if (ID_UN(id) != NULL) {
+		call ic_pstr (ID_IC(id), "ylabel", UN_LABEL(ID_UN(id)))
+		call ic_pstr (ID_IC(id), "yunits", UN_UNITS(ID_UN(id)))
+	    }
 	    if (interactive == YES) {
 		call salloc (str, SZ_LINE, TY_CHAR)
 		gt1 = gt_init()

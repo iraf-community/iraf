@@ -383,9 +383,9 @@ register int	pid;			/* process id			*/
  * forced out of the cache by another disconnect, or by a dumpcache.
  *
  * This function is currently unused.
-
+ */
 pr_unlock (pid)
-register int	pid;			/* process id			
+register int	pid;			/* process id			*/
 {
 	register struct process *pr;
 
@@ -396,7 +396,7 @@ register int	pid;			/* process id
 
 	return (ERR);
 }
-*/
+
 
 /* PR_LISTCACHE -- Info command, used to display the contents of the process
  * cache.  Format:  pid [RH][L] process_name

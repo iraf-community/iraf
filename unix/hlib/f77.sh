@@ -31,11 +31,13 @@ PATH=/v/bin:/bin:/usr/bin
 s=/tmp/stderr_$$
 t=/tmp/f77_$$
 CC=${CC_f2c:-'/usr/bin/cc -m486'}
+CFLAGS=${CFLAGS:-'-I${iraf}unix/bin'}
 EFL=${EFL:-/v/bin/efl}
 EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
 F2C=${F2C:-/usr/bin/f2c}
 F2CFLAGS=${F2CFLAGS:='-ARw8 -Nn802'}
 warn=1
+xsrc=0
 rc=0
 lib=/lib/num/lib.lo
 trap "rm -f $s ; exit \$rc" 0
@@ -101,6 +103,10 @@ do
 		shift
 		;;
 
+	-x)	xsrc=1
+		shift
+		;;
+
 	-N)	F2CFLAGS="$F2CFLAGS $1""$2"
 		shift 2
 		;;
@@ -116,6 +122,10 @@ do
 	-S)	CFLAGS="$CFLAGS -S"
 		cOPT=0
 		shift
+		;;
+
+	-f2c)	F2C="$2"
+		shift 2
 		;;
 
 	-*)
@@ -142,6 +152,9 @@ do
 		    sed '/^	arg .*: here/d' $s 1>&2
 		else
 		    $F2C $F2CFLAGS $b.f
+		fi
+		if [ $xsrc = 1 ]; then
+		    sed -e "s/$b.f/$b.x/" < $b.c > $b.t; mv $b.t $b.c
 		fi
                 $CC $CPPFLAGS -c $CFLAGS $b.c 2>$s
 		rc=$?
@@ -183,6 +196,7 @@ do
 		case $? in 0);; *) exit;; esac
 		$F2C $F2CFLAGS $b.f
 		case $? in 0);; *) exit;; esac
+ecoh $CC -c $CFLAGS $b.c
                 $CC -c $CFLAGS $b.c
 		case $? in 0);; *) exit;; esac
 		OFILES="$OFILES $b.o"

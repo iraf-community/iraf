@@ -436,7 +436,7 @@ If no error occurs during the measurement of the magnitudes then pier is
 	 301      # The aperture is off the image
 	 302      # The aperture is partially off the image
 	 303      # The sky value is undefined
-	 304      # There is bad data in the aperture
+	 305      # There is bad data in the aperture
 .fi
 
 .ih

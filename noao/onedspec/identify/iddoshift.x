@@ -28,8 +28,8 @@ begin
 	    rms = rms / j
 	    if (interactive == YES) {
 	        call printf ("%s%s: Coordinate shift=%5f, rms=%5f, npts=%3d\n")
-		    call pargstr (Memc[ID_IMAGE(id)])
-		    call pargstr (Memc[ID_SECTION(id)])
+		    call pargstr (ID_IMAGE(id))
+		    call pargstr (ID_SECTION(id))
 		    call pargd (shft)
 		    call pargd (sqrt (rms - shft ** 2))
 		    call pargi (j)

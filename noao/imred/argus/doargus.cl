@@ -23,6 +23,8 @@ real	width = 6.		{prompt="Width of profiles (pixels)"}
 real	minsep = 8.	{prompt="Minimum separation between fibers (pixels)"}
 real	maxsep = 10.	{prompt="Maximum separation between fibers (pixels)"}
 file	apidtable = ""		{prompt="Aperture identifications"}
+string	crval = "INDEF"		{prompt="Approximate central wavelength"}
+string	cdelt = "INDEF"		{prompt="Approximate dispersion"}
 string	objaps = ""		{prompt="Object apertures"}
 string	skyaps = "2x2"		{prompt="Sky apertures"}
 string	objbeams = ""		{prompt="Object beam numbers"}
@@ -32,6 +34,7 @@ bool	scattered = no		{prompt="Subtract scattered light?"}
 bool	fitflat = yes		{prompt="Fit and ratio flat field spectrum?"}
 bool	clean = yes		{prompt="Detect and replace bad pixels?"}
 bool	dispcor = yes		{prompt="Dispersion correct spectra?"}
+bool	skyalign = no		{prompt="Align sky lines?"}
 bool	skysubtract = yes	{prompt="Subtract sky?"}
 bool	skyedit = yes		{prompt="Edit the sky spectra?"}
 bool	saveskys = yes		{prompt="Save sky spectra?"}
@@ -56,10 +59,10 @@ begin
 	proc.datamax = datamax
 
 	proc (objects, apref, flat, throughput, arcs1, arcs2, "",
-	    arctable, fibers, apidtable, objaps, skyaps, "", objbeams,
-	    skybeams, "", scattered, fitflat, no, no, no, no, clean,
-	    dispcor, no, skysubtract, skyedit, saveskys, splot, redo,
-	    update, batch, listonly)
+	    arctable, fibers, apidtable, crval, cdelt, objaps, skyaps, "",
+	    objbeams, skybeams, "", scattered, fitflat, no, no, no, no,
+	    clean, dispcor, no, skyalign, skysubtract, skyedit, saveskys,
+	    splot, redo, update, batch, listonly)
 
 	if (proc.dobatch) {
 	    print ("-- Do remaining spectra as a batch job --")

@@ -397,27 +397,25 @@ real	center, cveval(), clgetr()
  
 begin
 	buf = clgetr ("buffer") + 0.5
+	call aclrr (x, npts)
  
 	axis = AP_AXIS(aps[1])
-	nscatter = 0
-	low = 1
 	do i = 1, naps {
 	    center = AP_CEN(aps[i],axis) + cveval (AP_CV(aps[i]), real (line))
-	    high = min (npts, int (center + AP_LOW(aps[i],axis) - buf))
-	    do j = low, high {
+	    low = max (1, int (center + AP_LOW(aps[i],axis) - buf))
+	    high = min (npts, int (center + AP_HIGH(aps[i],axis) + buf))
+	    do j = low, high
+		x[j] = 1
+	}
+
+	nscatter = 0
+	do i = 1, npts {
+	    if (x[i] == 0.) {
 		nscatter = nscatter + 1
-		x[nscatter] = j
-		y[nscatter] = data[j]
+		x[nscatter] = i
+		y[nscatter] = data[i]
 		w[nscatter] = 1.
 	    }
-	    low = max (1, int (center + AP_HIGH(aps[i],axis) + buf))
-	}
-	high = npts
-	do j = low, high {
-	    nscatter = nscatter + 1
-	    x[nscatter] = j
-	    y[nscatter] = data[j]
-	    w[nscatter] = 1.
 	}
 end
  

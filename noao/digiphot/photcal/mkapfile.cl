@@ -152,12 +152,12 @@ begin
 	    istable (fname)
 	    if (istable.table) {
 		tpagwidth = tbdump.pagwidth
-	        tpwidth = tdump.pwidth.p_max
+	        #tpwidth = tdump.pwidth.p_max
 		tdump.pwidth.p_max = 5000
 		tbdump (fname, tsinfields, "yes", cdfile="", pfile="",
 		    datafile="STDOUT", rows="-", pagwidth=5000,
 		    >> tdatafile)
-		tdump.pwidth.p_max = tpwidth
+		#tdump.pwidth.p_max = tpwidth
 		tbdump.pagwidth = tpagwidth
 	    } else if (istable.text) {
 		txdump (fname, tainfields, "yes", headers=no, parameters=yes,

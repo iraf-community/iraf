@@ -23,6 +23,9 @@ begin
 	bool	verbose1
 
 	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	ectype = ".ec" // imtype
 	n = strlen (imtype)
 

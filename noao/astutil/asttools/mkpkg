@@ -7,6 +7,7 @@ update:
 	;
 
 libasttools.a:
+	astarcsep.x	<math.h>
 	astcoord.x	
 	astgalactic.x	<math.h>
 	astgaltoeq.x	<math.h>

@@ -11,8 +11,9 @@ include	"ccdred.h"
 #	if the image has been previously corrected.
 #   2.	Determine the overscan columns or lines.  This may be specifed
 #	directly or indirectly through the image header or symbol table.
-#   3.	Average the overscan columns or lines.
-#   4.	Fit a function with the ICFIT routines to smooth the overscan vector.
+#   3.  Determine the type of overscan.
+#   4.	If fitting the overscan average the overscan columns or lines and
+#     	fit a function with the ICFIT routines to smooth the overscan vector.
 #   5.  Set the processing flag.
 #   6.  Log the operation (to user, logfile, and output image header).
 
@@ -20,10 +21,11 @@ procedure set_overscan (ccd)
 
 pointer	ccd			# CCD structure pointer
 
-int	i, first, last, navg, npts
+int	i, first, last, navg, npts, type
 int	nc, nl, c1, c2, l1, l2
-pointer	sp, str, errstr, buf, x, overscan
+pointer	sp, str, errstr, func, buf, x, overscan
 
+int	clgwrd()
 real	asumr()
 bool	clgetb(), ccdflag()
 pointer	imgl2r(), imgs2r()
@@ -37,6 +39,7 @@ begin
 	call smark (sp)
 	call salloc (str, SZ_LINE, TY_CHAR)
 	call salloc (errstr, SZ_LINE, TY_CHAR)
+	call salloc (func, SZ_LINE, TY_CHAR)
 	call imstats (IN_IM(ccd), IM_IMAGENAME, Memc[str], SZ_LINE)
 
 	# Check bias section.
@@ -77,65 +80,84 @@ begin
 	# determines the type of overscan.  The step sizes are ignored.
 	# The limits in the long dimension are replaced by the trim limits.
 
-	if (READAXIS(ccd) == 1) {
-	    first = c1
-	    last = c2
-	    navg = last - first + 1
-	    npts = nl
-	    call salloc (buf, npts, TY_REAL)
-	    do i = 1, npts
-		Memr[buf+i-1] = asumr (Memr[imgs2r(IN_IM(ccd),first,last,i,i)],
-		    navg)
-	    if (navg > 1)
-	        call adivkr (Memr[buf], real (navg), Memr[buf], npts)
-
-	    # Trim the overscan vector and set the pixel coordinate.
-	    npts = CCD_L2(ccd) - CCD_L1(ccd) + 1
-	    call malloc (overscan, npts, TY_REAL)
-	    call salloc (x, npts, TY_REAL)
-	    call trim_overscan (Memr[buf], npts, IN_L1(ccd), Memr[x],
-		Memr[overscan])
-
-	    call fit_overscan (Memc[str], c1, c2, l1, l2, Memr[x],
-		Memr[overscan], npts)
-
+	type = clgwrd ("function", Memc[func], SZ_LINE, OVERSCAN_TYPES)
+	if (type < OVERSCAN_FIT) {
+	    overscan = NULL
+	    if (READAXIS(ccd) == 2)
+		call error (1,
+		    "Overscan function type not allowed with readaxis of 2")
 	} else {
-	    first = l1
-	    last = l2
-	    navg = last - first + 1
-	    npts = nc
-	    call salloc (buf, npts, TY_REAL)
-	    call aclrr (Memr[buf], npts)
-	    do i = first, last
-	        call aaddr (Memr[imgl2r(IN_IM(ccd),i)], Memr[buf], Memr[buf],
-		    npts)
-	    if (navg > 1)
-	        call adivkr (Memr[buf], real (navg), Memr[buf], npts)
+	    if (READAXIS(ccd) == 1) {
+		first = c1
+		last = c2
+		navg = last - first + 1
+		npts = nl
+		call salloc (buf, npts, TY_REAL)
+		do i = 1, npts
+		    Memr[buf+i-1] = asumr (Memr[imgs2r (IN_IM(ccd), first, last,
+			i, i)], navg)
+		if (navg > 1)
+		    call adivkr (Memr[buf], real (navg), Memr[buf], npts)
 
-	    # Trim the overscan vector and set the pixel coordinate.
-	    npts = CCD_C2(ccd) - CCD_C1(ccd) + 1
-	    call malloc (overscan, npts, TY_REAL)
-	    call salloc (x, npts, TY_REAL)
-	    call trim_overscan (Memr[buf], npts, IN_C1(ccd), Memr[x],
-		Memr[overscan])
+		# Trim the overscan vector and set the pixel coordinate.
+		npts = CCD_L2(ccd) - CCD_L1(ccd) + 1
+		call malloc (overscan, npts, TY_REAL)
+		call salloc (x, npts, TY_REAL)
+		call trim_overscan (Memr[buf], npts, IN_L1(ccd), Memr[x],
+		    Memr[overscan])
 
-	    call fit_overscan (Memc[str], c1, c2, l1, l2, Memr[x],
-		Memr[overscan], npts)
+		call fit_overscan (Memc[str], c1, c2, l1, l2, Memr[x],
+		    Memr[overscan], npts)
+
+	    } else {
+		first = l1
+		last = l2
+		navg = last - first + 1
+		npts = nc
+		call salloc (buf, npts, TY_REAL)
+		call aclrr (Memr[buf], npts)
+		do i = first, last
+		    call aaddr (Memr[imgl2r(IN_IM(ccd),i)], Memr[buf],
+			Memr[buf], npts)
+		if (navg > 1)
+		    call adivkr (Memr[buf], real (navg), Memr[buf], npts)
+
+		# Trim the overscan vector and set the pixel coordinate.
+		npts = CCD_C2(ccd) - CCD_C1(ccd) + 1
+		call malloc (overscan, npts, TY_REAL)
+		call salloc (x, npts, TY_REAL)
+		call trim_overscan (Memr[buf], npts, IN_C1(ccd), Memr[x],
+		    Memr[overscan])
+
+		call fit_overscan (Memc[str], c1, c2, l1, l2, Memr[x],
+		    Memr[overscan], npts)
+	    }
 	}
 	
 	# Set the CCD structure overscan parameters.
 	CORS(ccd, OVERSCAN) = O
 	COR(ccd) = YES
+	OVERSCAN_TYPE(ccd) = type
 	OVERSCAN_VEC(ccd) = overscan
 
 	# Log the operation.
-	call sprintf (Memc[str], SZ_LINE,
-	    "Overscan section is [%d:%d,%d:%d] with mean=%g")
-	    call pargi (c1)
-	    call pargi (c2)
-	    call pargi (l1)
-	    call pargi (l2)
-	    call pargr (asumr (Memr[overscan], npts) / npts)
+	if (type < OVERSCAN_FIT) {
+	    call sprintf (Memc[str], SZ_LINE,
+		"Overscan section is [%d:%d,%d:%d] with function=%s")
+		call pargi (c1)
+		call pargi (c2)
+		call pargi (l1)
+		call pargi (l2)
+		call pargstr (Memc[func])
+	} else {
+	    call sprintf (Memc[str], SZ_LINE,
+		"Overscan section is [%d:%d,%d:%d] with mean=%g")
+		call pargi (c1)
+		call pargi (c2)
+		call pargi (l1)
+		call pargi (l2)
+		call pargr (asumr (Memr[overscan], npts) / npts)
+	}
 	call timelog (Memc[str], SZ_LINE)
 	call ccdlog (IN_IM(ccd), Memc[str])
 	call hdmpstr (OUT_IM(ccd), "overscan", Memc[str])

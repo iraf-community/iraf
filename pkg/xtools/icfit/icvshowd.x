@@ -30,7 +30,7 @@ begin
 	call ic_show (ic, file, gt)
 
 	if (npts == 0) {
-	    call eprintf ("Incomplete output - no data points for fit\n")
+	    call eprintf ("# Incomplete output - no data points for fit\n")
 	    return
 	}
 
@@ -107,20 +107,20 @@ begin
 
 	# Print the error analysis.
 
-	call fprintf (fd, "total points = %d\nsample points = %d\n")
+	call fprintf (fd, "# total points = %d\n# sample points = %d\n")
 	    call pargi (npts)
 	    call pargi (n)
-	call fprintf (fd, "nrejected = %d\ndeleted = %d\n")
+	call fprintf (fd, "# nrejected = %d\n# deleted = %d\n")
 	    call pargi (IC_NREJECT(ic))
 	    call pargi (deleted)
-	call fprintf (fd, "RMS = %10.7g\n")
+	call fprintf (fd, "# RMS = %10.7g\n")
 	    call pargd (rms)
-	call fprintf (fd, "square root of reduced chi square = %10.7g\n")
+	call fprintf (fd, "# square root of reduced chi square = %10.7g\n")
 	    call pargd (sqrt (chisqr))
 
-	call fprintf (fd, "\t  coefficent\t  error\n")
+	call fprintf (fd, "# \t  coefficent\t  error\n")
 	do i = 1, ncoeffs {
-	    call fprintf (fd, "\t%14.7e\t%14.7e\n")
+	    call fprintf (fd, "# \t%14.7e\t%14.7e\n")
 		call pargd (Memd[coeffs+i-1])
 	 	call pargd (Memd[errors+i-1])
 	}
@@ -132,15 +132,17 @@ begin
 end
 
 
-# IC_XYSHOW -- List data as x,fit,y triplets on output.
+# IC_XYSHOW -- List data as x, y, fit, weight lines on output.
 
-procedure ic_xyshowd (file, cv, xvals, yvals, nvalues)
+procedure ic_xyshowd (ic, file, cv, x, y, w, npts)
 
+pointer	ic		# ICFIT pointer
 char	file[ARB]		# Output file
 pointer	cv			# Pointer to curfit structure
-int	nvalues			# Number of data values
-double	xvals[nvalues]		# Array of x data values
-double	yvals[nvalues]		# Array of y data values
+double	x[npts]			# Array of x data values
+double	y[npts]			# Array of y data values
+double	w[npts]			# Array of weight data values
+int	npts			# Number of data values
 
 int	i, fd, open()
 double	dcveval()
@@ -150,13 +152,24 @@ begin
 	# Open the output file.
 	fd = open (file, APPEND, TEXT_FILE)
 
-	call fprintf (fd, "\n\t         X     \t   Yc   \t    Y    \n")
-
-	do i = 1, nvalues {
-	    call fprintf (fd, "\t%14.7e \t%14.7e \t%14.7e\n")
-		call pargd (xvals[i])
-		call pargd (dcveval (cv, xvals[i]))
-		call pargd (yvals[i])
+	# List the data being fit (not necessarily the input data).
+	call fprintf (fd, "#      X        Y    Y FIT   WEIGHT\n")
+	if (npts == IC_NFIT(ic)) {
+	    do i = 1, npts {
+		call fprintf (fd, "%8g %8g %8g %8g\n")
+		    call pargd (x[i])
+		    call pargd (y[i])
+		    call pargd (dcveval (cv, x[i]))
+		    call pargd (w[i])
+	    }
+	} else {
+	    do i = 1, IC_NFIT(ic) {
+		call fprintf (fd, "%8g %8g %8g %8g\n")
+		    call pargd (Memd[IC_XFIT(ic)+i-1])
+		    call pargd (Memd[IC_YFIT(ic)+i-1])
+		    call pargd (dcveval (cv, Memd[IC_XFIT(ic)+i-1]))
+		    call pargd (Memd[IC_WTSFIT(ic)+i-1])
+	    }
 	}
 
 	call close (fd)

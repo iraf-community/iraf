@@ -18,7 +18,10 @@
       integer memflg
       integer col
       integer logic0
-      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      common /cline/ dbgout, dbglev, level, linect (5), infile (5), fnam
+     *p, fnames ( 150)
+      integer dbgout
+      integer dbglev
       integer level
       integer linect
       integer infile
@@ -60,18 +63,23 @@
       integer errstk
       integer mem( 60000)
       common/cdsmem/mem
-      integer serrc0(15)
-      integer serrd0(23)
+      integer serrc0(27)
+      integer serrd0(31)
       data serrc0(1)/108/,serrc0(2)/111/,serrc0(3)/103/,serrc0(4)/105/,s
      *errc0(5)/99/,serrc0(6)/97/,serrc0(7)/108/,serrc0(8)/32/,serrc0(9)/
      *120/,serrc0(10)/101/,serrc0(11)/114/,serrc0(12)/102/,serrc0(13)/10
-     *8/,serrc0(14)/103/,serrc0(15)/-2/
+     *8/,serrc0(14)/103/,serrc0(15)/44/,serrc0(16)/32/,serrc0(17)/120/,s
+     *errc0(18)/101/,serrc0(19)/114/,serrc0(20)/112/,serrc0(21)/97/,serr
+     *c0(22)/100/,serrc0(23)/40/,serrc0(24)/56/,serrc0(25)/52/,serrc0(26
+     *)/41/,serrc0(27)/-2/
       data serrd0(1)/99/,serrd0(2)/111/,serrd0(3)/109/,serrd0(4)/109/,se
      *rrd0(5)/111/,serrd0(6)/110/,serrd0(7)/32/,serrd0(8)/47/,serrd0(9)/
      *120/,serrd0(10)/101/,serrd0(11)/114/,serrd0(12)/99/,serrd0(13)/111
      */,serrd0(14)/109/,serrd0(15)/47/,serrd0(16)/32/,serrd0(17)/120/,se
      *rrd0(18)/101/,serrd0(19)/114/,serrd0(20)/102/,serrd0(21)/108/,serr
-     *d0(22)/103/,serrd0(23)/-2/
+     *d0(22)/103/,serrd0(23)/44/,serrd0(24)/32/,serrd0(25)/120/,serrd0(2
+     *6)/101/,serrd0(27)/114/,serrd0(28)/112/,serrd0(29)/97/,serrd0(30)/
+     *100/,serrd0(31)/-2/
       ntok = 0
       tok = 0
 23000 continue

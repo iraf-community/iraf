@@ -10,7 +10,7 @@ update:
 	;
 
 relink:
-	$set   LIBS1 = "-liminterp -lncar -lgks -lds"
+	$set   LIBS1 = "-liminterp -lncar -lgks -lds -lxtools"
 	$set   LIBS2 = "-lgsurfit -lnlfit -lcurfit -lllsq"
 	$checkout libds.a lib$
 	$update libds.a

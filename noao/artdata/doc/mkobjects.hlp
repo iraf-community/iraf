@@ -35,7 +35,8 @@ output of \fBimheader\fR is an acceptible data file.  See \fBmkheader\fR
 for further information.
 .le
 .ls background = 1000.
-Default background and poisson noise background.
+Default background and poisson noise background.  This is in data numbers
+with the conversion to photons determined by the \fIgain\fR parameter.
 .le
 
 OBJECT PARAMETERS
@@ -120,7 +121,7 @@ object list to instrumental/image fluxes.
 NOISE PARAMETERS
 .ls gain = 1.
 Gain in electrons per data number.  The gain is used for scaling the
-read noise parameter and in computing poisson noise.
+read noise parameter, the background, and in computing poisson noise.
 .le
 .ls rdnoise = 0.
 Gaussian read noise in electrons.  For new images this applies to the
@@ -133,7 +134,9 @@ that in the latter case the background parameter is added before
 computing the new value and then subtracted again.
 .le
 .ls seed = 1
-Random number seed.
+Random number seed.  If a value of "INDEF" is given then the clock
+time (integer seconds since 1980) is used as the seed yielding
+different random numbers for each excution.
 .le
 
 .ls comments = yes
@@ -185,7 +188,7 @@ evaluated over as large a dynamic range, given by the parameter
 execution time.  The convolution is normalized to unit weight over the
 specified dynamic range.
 .le
-.ls ranbuf = 1000
+.ls ranbuf = 0
 Random number buffer size.  When generating readout and poisson noise,
 evaluation of new random values has an affect on the execution time.
 If truly (or computationally truly) random numbers are not needed
@@ -234,14 +237,13 @@ parameters.
 
 New images are created with the specified dimensions, title, and real
 datatype.  The images have a constant background value given by the
-\fIbackground\fR parameter before adding objects and noise.  Noise
-consists of gaussian and poisson components.  For existing images, noise
-is only added to the objects and the background parameter
-is used in the calculation of the poisson noise: specifically, a
-poisson random value with mean given by the sum of the object and the
-background is generated and then the background is subtracted.
-For more on how the noise is computed and approximations used see
-\fBmknoise\fR.
+\fIbackground\fR parameter (in data numbers) before adding objects and
+noise.  Noise consists of gaussian and poisson components.  For existing
+images, noise is only added to the objects and the background parameter is
+used in the calculation of the poisson noise: specifically, a poisson
+random value with mean given by the sum of the object and the background is
+generated and then the background is subtracted.  For more on how the noise
+is computed and approximations used see \fBmknoise\fR.
 
 Objects are specified by a position, magnitude, model, scale, axial
 ratio, and position angle.  Since the point spread function (PSF)
@@ -591,6 +593,15 @@ must subtract the background.
 
 It would be somewhat more efficient to first block average the
 template since the oversampling in this case is very large.
+.ih
+REVISIONS
+.ls MKOBJECTS V2.11+
+The random number seed can be set from the clock time by using the value
+"INDEF" to yield different random numbers for each execution.
+.le
+.ls MKOBJECTS V2.11
+The default value of "ranbuf" was changed to zero.
+.le
 .ih
 SEE ALSO
 gallist, starlist, mknoise, mkheader

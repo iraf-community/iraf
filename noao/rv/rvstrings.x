@@ -267,9 +267,8 @@ begin
 end
 
 
-procedure nam_tempcode (rv, tnum, cod)
+procedure nam_tempcode (tnum, cod)
 
-pointer	rv					#I RV struct pointer
 int	tnum					#I Template number
 char	cod[SZ_FNAME]				#O Template code string
 

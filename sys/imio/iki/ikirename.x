@@ -7,8 +7,8 @@ include	"iki.h"
 
 procedure iki_rename (old, new)
 
-char	old[ARB]		# old name of image
-char	new[ARB]		# new name of image
+char	old[ARB]		#I old name of image
+char	new[ARB]		#I new name of image
 
 int	k, n, status
 pointer	new_root, new_extn
@@ -16,8 +16,8 @@ pointer	sp, old_root, old_extn
 
 bool	streq()
 int	iki_access()
-include	"iki.com"
 errchk	syserrs
+include	"iki.com"
 
 begin
 	call smark (sp)
@@ -28,7 +28,9 @@ begin
 
 	# Verify that the old image exists and determine its type.
 	k = iki_access (old, Memc[old_root], Memc[old_extn], 0)
-	if (k <= 0)
+	if (k < 0)
+	    call syserrs (SYS_IKIAMBIG, old)
+	else if (k == 0)
 	    call syserrs (SYS_IKIIMNF, old)
 
 	# Determine if the old image exists.  New name is new root plus
@@ -43,7 +45,7 @@ begin
 	# We cannot change the image type in a rename operation.
 
 	if (Memc[new_extn] != EOS) {
-	    call zcall4 (IKI_ACCESS(k), Memc[new_root], Memc[new_extn],
+	    call zcall5 (IKI_ACCESS(k), k, Memc[new_root], Memc[new_extn],
 		NEW_FILE, status)
 	    if (status == NO)
 		call strcpy (Memc[old_extn], Memc[new_extn], MAX_LENEXTN)
@@ -63,7 +65,7 @@ begin
 	}
 
 	# Rename the image.
-	call zcall5 (IKI_RENAME(k), Memc[old_root], Memc[old_extn],
+	call zcall6 (IKI_RENAME(k), k, Memc[old_root], Memc[old_extn],
 	    Memc[new_root], Memc[new_extn], status)
 	if (status == ERR)
 	    call syserrs (SYS_IKIRENAME, old)

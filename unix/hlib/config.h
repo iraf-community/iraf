@@ -2,7 +2,7 @@
 # specified.
 
 define	FIRST_FD	10		# first open file descriptor
-define	LAST_FD		128		# number of file descriptors
+define	LAST_FD		256		# number of file descriptors
 define	PSIOCTRL	9		# the last pseudofile (see etc$prpsio.x)
 define	FBUF_ALLOC	vmalloc		# call to allocate file buffer
 define	LEN_DEVTBL	150		# FIO device table (7 cells/device)
@@ -47,7 +47,7 @@ define	CASE_INSENSITIVE	false	# is case ignored in OS filenames
 define	HOST_CASE		'L'	# case used [UL] if case insensitive
 define	UNDERSCORE_PERMITTED	true	# is _ permitted in filenames
 define	PERIOD_PERMITTED	true	# is . permitted in root
-define	MAX_ROOTLEN		32	# max chars in OS root filename
+define	MAX_ROOTLEN		128	# max chars in OS root filename
 define	MAX_EXTNLEN		32	# max chars in OS filename extension
 define	EXTN_DELIMITER		'.'	# character preceding extension
 define	LEADING_ALPHA_ONLY	false	# first char must be a letter

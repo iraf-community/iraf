@@ -1,4 +1,4 @@
-.help imexamine Aug91 images.tv
+.help imexamine Mar96 images.tv
 .ih
 NAME
 imexamine -- examine images using image display, plots, and text
@@ -97,7 +97,7 @@ The default world system is the system named by the environment variable
 image WCS description, else it is the first user WCS defined for the image
 (if any), else physical coordinates are returned.
 .le
-.ls xformat = "wcsformat", yformat = ""
+.ls xformat = "", yformat = ""
 The numerical format for the world coordinate labels in the line and column
 plots and the format for printing world coordinates.  The values may be ""
 (an empty string), %f for decimal format, %h and %H for xx:xx:xx format, and
@@ -160,23 +160,28 @@ In the case of integer data, automatically adjust \fInbins\fR and
 .ls axes = yes				(s)
 Draw axes along edge of surface plots?
 .le
-.ls background = yes			(jkr)
+.ls background = yes			(jkr.)
 Fit and subtract a background for aperture sums, 1D gaussian fits, and
 radial profile plots?
 .le
-.ls banner = yes 			 (cehjklrsv)
+.ls banner = yes 			 (cehjklrsv.)
 Add a standard banner to a graph?  The standard banner includes the
 IRAF user and host identification and time, the image name and title,
 and graph specific parameters.
+.le
+.ls beta = INDEF			(ar.)
+Beta value to use for Moffat profile fits.  If the value is INDEF
+the value will be determine as part of the fit otherwise the parameter
+will be fixed at the specified value.
 .le
 .ls boundary = "constant"		(v)
 Boundary extension for vector plots in which the averaging width might
 go outside of the image.
 .le
-.ls box = yes 				(cehjklrv)
+.ls box = yes 				(cehjklrv.)
 Draw graph box and axes?
 .le
-.ls buffer = 1.				(r)
+.ls buffer = 5.				(r.)
 Buffer distance from object aperture of background annulus for aperture sums
 and radial profile plots.
 .le
@@ -185,7 +190,7 @@ Ceiling data value for contour and surface plots.  A value of INDEF does
 not apply a ceiling.  (In contour plots a value of 0. also does not
 apply a ceiling.)
 .le
-.ls center = yes			(jkr)
+.ls center = yes			(jkr.)
 Apply a centering algorithm for doing aperture sums, 1D guassian fits,
 and radial profile plots?
 .le
@@ -199,8 +204,12 @@ Dash pattern for negative contours.
 .ls fill = no				(e)
 Fill the output viewport regardless of the device aspect ratio?
 .le
-.ls fitplot = yes			(r)
-Overplot the gaussian fit on the radial profile data?
+.ls fitplot = yes			(r.)
+Overplot the profile fit on the radial profile data?
+.le
+.ls fittype = "moffat"			(ar.)
+Profile type to fit the radial profile data?  The choices are "gaussian"
+and "moffat".
 .le
 .ls floor = INDEF			(es)
 Floor data value for contour and surface plots.  A value of INDEF does
@@ -211,21 +220,24 @@ apply a floor.)
 Contour interval.  If 0, a contour interval is chosen which places 20 to 30
 contours spanning the intensity range of the image.
 .le
+.ls iterations = 3			(ar)
+Number of iterations to adjust the fitting radius.
+.le
 .ls label= no				(e)
 Label the major contours in the contour plot?
 .le
-.ls logx = no, logy = no		(chjklrv)
+.ls logx = no, logy = no		(chjklrv.)
 Plot the x or y axis logarithmically?  The default for histogram plots is
 to plot the y axis logarithmically.
 .le
-.ls magzero = 30.			(r)
+.ls magzero = 25.			(r.)
 Magnitude zero point for aperture sums.
 .le
-.ls majrx=5, minrx=5, majry=5, minry=5	(cehjklrv)
+.ls majrx=5, minrx=5, majry=5, minry=5	(cehjklrv.)
 Maximum number of major tick marks on each axis and number of minor tick marks
 between major tick marks.
 .le
-.ls marker = "box"			(chjklrv)
+.ls marker = "box"			(chjklrv.)
 Marker to be drawn if \fBpointmode\fR = yes.  Markers are "point", "box", 
 "cross", "plus", "circle", "hebar", "vebar", "hline", "vline" or "diamond".
 .le
@@ -250,33 +262,34 @@ on the plot.  If 1, the intensity of each pixel is marked on the plot.
 .ls pointmode = no			(chlv)
 Plot points or marks instead of lines?
 .le
-.ls pointmode = yes			(jkr)
+.ls pointmode = yes			(jkr.)
 Plot points or marks instead of lines?  For radial profile plots point
 mode should always be yes.
 .le
-.ls radius = 5.				(r)
+.ls radius = 5.				(r.)
 Radius of aperture for aperture sums and centering.
 .le
-.ls round = no				(cehjklrv)
+.ls round = no				(cehjklrv.)
 Extend the axes up to "nice" values?
 .le
-.ls rplot = 8.				(jkr)
-Radius to which the radial profile or 1D gaussian fits are plotted.
+.ls rplot = 8.				(jkr.)
+Radius to which the radial profile or 1D profile fits are plotted.
 .le
 .ls sigma = 2.				(jk)
-Initial guess for 1D gaussian fits.  This must be close to the true value
+Initial guess for 1D gaussian fits.  The value is in pixels even if the fitting
+is done in world coordinates.  This must be close to the true value
 for convergence.  Also the four times the initial sigma is used to define
 the distance to the background region for the initial background estimate.
 .le
-.ls szmarker = 1			(chjklrv)
+.ls szmarker = 1			(chjklrv.)
 Size of mark (except for points).  A positive size less than 1 specifies
 a fraction of the device size.  Values of 1, 2, 3, and 4 signify
 default sizes of increasing size.
 .le
-.ls ticklabels = yes			(cehjklrv)
+.ls ticklabels = yes			(cehjklrv.)
 Label the tick marks?
 .le
-.ls title = ""				(cehjklrsv)
+.ls title = ""				(cehjklrsv.)
 User title.  This is independent of the the standard banner title.
 .le
 .ls top_closed = no			(h)
@@ -285,14 +298,14 @@ subinterval that is half open at the top.  \fITop_closed\fR decides whether
 those pixels with values equal to z2 are to be counted in the histogram.  If
 \fBtop_closed\fR is yes, the top bin will be larger than the other bins.
 .le
-.ls width = 2.				(jkr)
+.ls width = 5.				(jkr.)
 Width of background region for background subtraction in aperture sums,
-1D gaussin fits, and radial profile plots.
+1D profile fits, and radial profile plots.
 .le
 .ls wcs = "physical"
 World coordinate system for axis labeling and coordinate readback.
 .le
-.ls x1 = INDEF, x2 = INDEF, y1 = INDEF, y2 = INDEF	(chjklrv)
+.ls x1 = INDEF, x2 = INDEF, y1 = INDEF, y2 = INDEF	(chjklrv.)
 Range of graph along each axis.  If INDEF the range is determined from
 the data range plus a buffer.  The default y1 for histogram plots is 0.
 .le
@@ -300,7 +313,7 @@ the data range plus a buffer.  The default y1 for histogram plots is 0.
 Set world image coordinate formats.  Any format changes take effect on the next
 usage; i.e. there is no automatic redrawing.
 .le
-.ls xlabel, ylabel			(cehjklrv)
+.ls xlabel, ylabel			(cehjklrv.)
 Axis labels.  Each graph type has an appropriate default.  If the label
 value is "wcslabel" then the coordinate label from the image WCS
 will be used if defined.
@@ -311,7 +324,7 @@ Order for 1D gaussian background.  If 0 then a median is computed.  If
 parameters.  If 2 then a linear background is fit simultaneously with the
 other gaussian parameters.
 .le
-.ls xorder = 0, yorder = 0		(r)
+.ls xorder = 0, yorder = 0		(r.)
 If either parameter is zero then the median value of the
 background annulus is used for background subtraction in aperture sums and
 radial profile plots.  Values greater than zero define polynomial
@@ -437,16 +450,25 @@ TEXT OUTPUT
 The following commands produce text output which may also be appended to
 a logfile.
 
-.ls a
+.ls a, ','
 Circular aperture photometry is performed at the position of the cursor.
 If the centering option is selected the cursor position is used as the
-initial point for computing the central moments of the marginal distributions
-in x and y.  The marginal distributions
-are obtained from a square aperture with edge dimensions of twice the
-aperture radius parameter.  Only the pixels above the mean are used in
-computing the central moments.  If the central moments are in a different
-pixel than that used for extracting the marginal distributions the
-computation is repeated using the new center.
+initial point for computing the central moments of the marginal
+distributions in x and y.  The marginal distributions are obtained from a
+square aperture with edge dimensions of twice the aperture radius
+parameter.  Only the pixels above the mean are used in computing the
+central moments.  If the central moments are in a different pixel than that
+used for extracting the marginal distributions the computation is repeated
+using the new center.
+
+The radius of the photometry and fitting aperture is specified by the
+\fIradius\fR parameter and the \fIiteration\fR parameter.  Iteration of the
+fitting radius and printing of the final radius is only done for the 'a'
+key.  If the number of iterations is one then the radius is not adjusted.
+If it is greater than one then the direct FWHM (described) below is used to
+adjust the radius.  At each iteration the new radius is set to three times
+the direct FWHM (which is six times the radius at half-maximum).  The
+radius is printed as part of the output.
 
 If the background subtraction option is selected a concentric circular
 annulus is defined.  The inner edge is separated from the object
@@ -468,39 +490,120 @@ positive a magnitude is computed as
 
 where the magnitude zero point is a user defined parameter.
 
-In addition to the flux, the second intensity momemnts are computed within
-the aperture.  The moments are output as a size, ellipticity, and
-position angle.  The equations defining the moments and related parameters
-are:
+In addition to the flux, the second intensity momemnts are used to compute
+an ellipticity and position angle.  The equations defining the moments and
+related parameters are:
 
 .nf
 	Mxx = sum (x * x * I) / sum (I)
 	Myy = sum (y * y * I) / sum (I)
 	Mxy = sum (x * y * I) / sum (I)
-	r = 2 * sqrt (ln (2) * (Mxx + Myy))
 	e = sqrt ((Mxx - Myy) ** 2 + (2 * Mxy) ** 2) / (Mxx + Myy)
 	pa = 0.5 * atan (2 * Mxy / (Mxx - Myy))
 .fi
 
-The size is scaled so that a gaussian intensity distribution gives a value
-of r equal to the full width at half maximum (FWHM).
+A nonlinear least squares profile of fixed center and zero background is
+fit to the radius and flux values of the background subtracted pixels to
+determine a peak intensity and FWHM.  The profile type is set by the
+\fIfittype\fR parameter.  The choices are "gaussian" and "moffat".  If the
+profile type is "moffat" there is an additional parameter "beta".  This
+value may be specifed to fix it or given as INDEF to also be determined.
+The profile equations are:
 
-Finally, a nonlinear least squares gaussian of fixed center and zero background is
-fit for a peak intensity and FWHM.  Weights which are the inverse
-square of the pixel radius are used.  This has the effect of giving
-equal weight to all parts of the profile instead of being overwhelmed
-by the larger number of pixels are larger radii.
+.nf
+	I = Ic exp (-0.5 * (r / sigma)**2)	(fittype = "gaussian")
+	I = Ic (1 + (r / alpha)**2)**(-beta)	(fittype = "moffat")
+.fi
 
-The output consists of the x-y coordinates, magnitude, flux, number of
-pixels within the aperture, mean background, r (FWHM), e, pa (in degrees
-between -90 and +90 with 0 along the x axis), gaussian peak, and gaussian
-FWHM.  If a quantity is numerically undefined then INDEF is printed.
+where Ic is the peak value, r is the radius, and the parameters are
+sigma, alpha, and beta.  The sigma and alpha values are converted to
+FWHM in the reported results.
 
-This aperture photometry tool is intended only for general image analysis and
-quick look photometry.  The background fitting and photometry techniques
-used are not intended for serious astronomical photometry; other packages,
-e.g., \fInoao.digiphot.apphot\fR, should be used if precise results are
-required.
+Weights which are the inverse square of the pixel radius are used.  This
+has the effect of giving equal weight to all parts of the profile instead
+of being overwhelmed by the larger number of pixels are larger radii.  An
+additional weighting factor is used for pixels outside the half-maximum
+radius (as determined using the algorithm described below).  The weights
+are
+
+.nf
+	wt = exp (-(r/rhalf - 1)**2)  for r/rhalf > 1
+.fi
+
+where rhalf is the radius at half-maximum.  This has the effect
+of reducing the contribution of the profile wings.
+
+The above fit is done to the individual pixel values with a radius measured
+to the center of the pixel.  For the 'a' key two additional measurements
+are made on a azimuthally averaged radial profile with a finer sampling of
+the radial bins.  This uses the same algorithms for centering, background
+estimation, and FWHM measurement as in the task \fBpsfmeasure\fR.  The
+centering is essentially the same as described above but the background
+estimation is a mode of the sky annulus pixels.  Note that the centering
+and background subtraction are done for these measurements regardless of
+the the \fIcenter\fR and \fIbackground\fR parameters which apply only to
+the photometry and profile fitting to the individual pixel values.
+
+To form the radially smoothed profile an image interpolator function is fit
+to the region containing the object.  The enclosed flux profile (total flux
+within a particular radius) is computed.  The sampling is done at a much
+finer resolution than individual pixels.  The subsampling scheme is that
+described in \fBpsfmeasure\fR and is such that the center of the profile is
+more finely sampled than the edges of the profile.
+
+Because the image interpolator function may not be very good for narrow
+profiles a second iteration is done if the radius enclosing half the flux
+is less than two pixels.  In this second iteration an analytic, radially
+symmetric Gaussian profile is subtracted from the image raster and the
+interpolation function is fit to the residuals.  Subpixel values are then
+computed by evaluating the analytic function plus the interpolated residual
+value.
+
+There are two FWHM measurements computed using the enclosed flux
+radial profile.  One is to fit a Gaussian or Moffat profile to the
+enclosed flux profile.  The type is selected by the same \fIfittype\fR
+parameter used to select the profile to fit to the individual pixel
+values.  As with the direct fit the Moffat beta value may be fixed or
+included in the fit.  The FWHM of the fit is then printed on the
+status line, terminal output, and log file.
+
+The other FWHM measurement directly measure the FWHM independent of a
+profile model.  The derivative of the enclosed flux profile is computed.
+This derivative is the azimuthally averaged radial profile with the radial
+bin sampling mentioned above.  The peak of this profile is found and the
+FWHM is twice the radius of the profile at half the peak value.  This
+"direct FWHM" is part of the output and is also used for the iterative
+adjustment of the fitting radius as noted above.
+
+.ls a
+The output consists of the image line and column, the coordinates, the
+final radius used for the photometry and fitting, magnitude, flux, mean
+background, peak value of the profile fit, e, pa (in degrees between -90
+and +90 with 0 along the x axis), the Moffat beta value if a Moffat profile
+is fit, and three measures of the FWHM.  The coordinates are those
+specified by the \fIwcs\fR and formated by the format parameters.  For the
+logical wcs the coordinates will be the same as the column and line
+values.  If a value is numerically undefined then INDEF is printed.  The
+FWHM values are, in order, the profile fit to the enclosed flux, the
+profile fit to the individual pixels, and the direct measurement from the
+derivative of the enclosed flux profile.  Note that except for the direct
+method, the other estimates are not really measurements of the FWHM but are
+quantities which give the correct FWHM for the specified profile type.
+.le
+.ls ','
+The output consists of the image line and column, magnitude, flux, number
+of pixels within the aperture, mean background, r (moment FWHM), e, pa (in
+degrees between -90 and +90 with 0 along the x axis), and the peak value
+and FWHM of the profile fit.  The label GFWHM indicates a Gaussian fit
+while the label MFWHM indicates a Moffat profile fit.  If a quantity is
+numerically undefined then INDEF is printed.
+.le
+
+This aperture photometry and FWHM tool is intended only for general image
+analysis and quick look measurements.  The background fitting, photometry,
+and FWHM techniques used are not intended for serious astronomical
+photometry; other packages, e.g., \fInoao.digiphot.apphot\fR, should be
+used if precise results are are desired.
 .le
 .ls b
 The integer pixel coordinates defining a region of the image are printed.
@@ -561,13 +664,14 @@ the ordinate and the pixel value as the abscissa.  The averaging number
 and various graph options are specified by the parameters from the
 \fBlimexam\fR parameter set.
 .le
-.ls r
-A radial profile plot is made.  There are options for centering and
-background subtraction and aperture sum output is printed as described
-for the 'a' aperture sum command.
-If the guassian fit parameters are determined and the \fIfitplot\fR
-parameter is set the fit
-is overplotted.  The aperture sum and graph options are specified by the
+.ls r, '.'
+A radial profile plot is made.  As with 'a'/',' there are options for centering
+and background subtraction.  There are also graphics option to set the
+radius to be plotted (\fIrplot\fR) and to overplot the profile fit
+(\fIfitplot\fR).  The measurement algorithms are those described for the
+'a'/',' key and the output is the same except that there is no header line and
+the object center is given in the graph title rather than on the graphics
+status line.  The aperture sum and graph options are specified by the
 parameters from the \fBrimexam\fR parameter set.
 .le
 .ls s
@@ -706,8 +810,7 @@ Cursor Keys
 
 .nf
 ?	Print help
-a	Aperture sum, moment parameters, and gaussian fit
-	    col line mag flux sky npixels rmom ellip pa peak fwhm
+a	Aperture sum, moment parameters, and profile fit
 b	Box coordinates for two cursor positions - c1 c2 l1 l2
 c	Column plot
 d	Load the image display
@@ -725,7 +828,7 @@ n	Next frame or image
 o	Overplot
 p	Previous frame or image
 q	Quit
-r	Radial profile plot with gaussian fit and aperture sum values
+r	Radial profile plot with fit and aperture sum values
 s	Surface plot
 u	Centered vector plot from two cursor positions
 v	Vector plot between two cursor positions
@@ -734,6 +837,8 @@ x	Print coordinates
 	    col line pixval [xorign yorigin dx dy r theta]
 y	Set origin for relative positions
 z	Print grid of pixel values - 10 x 10 grid
+,	Quick Gaussian/Moffat photometry
+.	Quick Gaussian/Moffat radial profile plot and fit
 .fi
 
 .ce
@@ -763,9 +868,10 @@ angh        s           Horizontal angle for surface plot
 angv        s           Vertical angle for surface plot
 autoredraw  cehlrsuv    Automatically redraw graph after colon command?
 autoscale   h           Adjust number of histogram bins to avoid aliasing
-axes	    s		Draw the axes?
+axes        s           Draw axes in surface plot?
 background  jkr         Subtract background for radial plot and photometry?
 banner      cehjklrsuv  Include standard banner on plots?
+beta        ar		Moffat beta parameter (INDEF to fit or value to fix)
 boundary    uv          Boundary extension type for vector plots
 box         cehjklruv   Draw box around graph?
 buffer      r           Buffer distance for background subtraction
@@ -775,9 +881,11 @@ constant    uv          Constant value for boundry extension in vector plots
 dashpat     e           Dash pattern for contour plot
 eparam      cehjklrsuv  Edit parameters
 fill        e           Fill viewport vs enforce unity aspect ratio?
-fitplot     r           Overplot gaussian fit on data?
+fitplot     r           Overplot profile fit on data?
+fittype     ar          Profile fitting type (gaussian|moffat)
 floor       es          Data floor for contour and surface plots
 interval    e           Contour interval (0 for default)
+iterations  ar          Iterations on fitting radius
 label       e           Draw axis labels for contour plot?
 logfile                 Log file name
 logx        chjklruv    Plot x axis logrithmically?
@@ -810,9 +918,11 @@ unlearn     cehjklrsuv  Unlearn parameters to default values
 wcs                     World coordinate system for axis labels and readback
 width       jkr         Width of background region
 x [min max] chjklruv    Range of x to be plotted (no values for autoscaling)
+xformat			Coordinate format for column world coordinates
 xlabel      cehjklrsuv  Optional label for x axis
 xorder      jkr         X order of surface for background subtraction
 y [min max] chjklruv    Range of y to be plotted (no values for autoscaling)
+yformat			Coordinate format for line world coordinates
 ylabel      cehjklrsuv  Optional label for y axis
 yorder      r           Y order of surface for background subtraction
 z1          h           Lower intensity value limit of histogram
@@ -879,8 +989,31 @@ entering the command, and verify that the mouse has been moved to the correct
 window.  In the future colon command input will be entered without moving
 the mouse out of the image window, which will avoid the problem.
 .ih
-SEE ALSO
-cursors, eparam, unlearn, plot., tvmark, digiphot., apphot.,
-implot, splot, imedit, radplt, imcntr, imhistogram, imstatistics, display
-.endhelp
+REVISIONS
+.ls IMEXAMINE V2.11
+('a' and 'r'): The fit to the radial profile points now includes both a
+Gaussian and a Moffat profile.  The Moffat profile exponent parameter,
+beta, may be fixed or left free to be fit.
 
+('a' and 'r'): New estimates fo the FWHM were added to the 'a' and 'r'
+keys.  These include the Moffat profile fit noted above, a direct
+measurement of the FWHM from the radially binned profile, and a Gaussian or
+Moffat fit to the radial enclosed flux profile.  The output from these keys
+was modified to include the new information.
+
+('a' and 'r'): The direct FWHM may be used to iteratively adjust the
+fitting radius to lessen the dependence on the initial fitting
+radius value.
+
+(',' and '.'): New keys to do the Gaussian or Moffat fitting without
+iteration or the enclosed flux and direct measurements.  The output
+format is the same as the previous version.
+
+('k'): Added a kimexam parameter set.
+.le
+.ih
+SEE ALSO
+cursors, eparam, unlearn, plot.*, tvmark, digiphot.*, apphot.*,
+implot, splot, imedit, radplt, imcntr, imhistogram, imstatistics, display
+psfmeasure.
+.endhelp

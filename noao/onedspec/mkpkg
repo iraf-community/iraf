@@ -1,6 +1,5 @@
 # ONEDSPEC package.
 
-$call	smw
 $call	relink
 $exit
 
@@ -55,6 +54,7 @@ libpkg.a:
 	t_sapertures.x	<smw.h> <error.h> <imhdr.h>
 	t_sarith.x	<smw.h> <error.h> <imhdr.h> <mach.h>
 	t_sbands.x	<smw.h> <error.h>
+	t_scoords.x	<error.h> <imhdr.h>
 	t_sfit.x	<smw.h> <error.h> <imhdr.h> <math/curfit.h>\
 			<pkg/gtools.h> <pkg/rg.h>
 	t_sflip.x	<smw.h> <error.h> <imhdr.h>
@@ -65,4 +65,7 @@ libpkg.a:
 	t_specshift.x	<smw.h> <error.h>
 	t_standard.x	<smw.h> <error.h> <gset.h> <imhdr.h> <mach.h>\
 			<pkg/gtools.h>
+	t_tweak.x	<error.h> <gset.h> <imset.h> <imhdr.h> <math.h>\
+			<math/iminterp.h> <pkg/gtools.h> <smw.h> <units.h>\
+			<pkg/xtanswer.h>
 	;

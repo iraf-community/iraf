@@ -15,7 +15,7 @@
 /* Compile time definitions (for C #ifdefs).
  */
 /* #define BSDUNIX */
-/* #define SUNOS4 */
+/* #define SUNOS */
 
 #define D_iraf
 #endif

@@ -55,6 +55,8 @@ pointer	ccd			# CCD structure
 
 begin
 	# Unmap calibration images.
+	if (MASK_IM(ccd) != NULL)
+	    call imunmap (MASK_IM(ccd))
 	if (ZERO_IM(ccd) != NULL)
 	    call ccd_unmap (ZERO_IM(ccd))
 	if (DARK_IM(ccd) != NULL)
@@ -67,11 +69,9 @@ begin
 	    call ccd_unmap (FRINGE_IM(ccd))
 
 	# Free memory
-	if (BADCOLS(ccd) != NULL)
-	    call mfree (BADCOLS(ccd), TY_SHORT)
-	if (BADLINES(ccd) != NULL)
-	    call mfree (BADLINES(ccd), TY_SHORT)
 	if (OVERSCAN_VEC(ccd) != NULL)
 	    call mfree (OVERSCAN_VEC(ccd), TY_REAL)
+	if (MASK_FP(ccd) != NULL)
+	    call xt_fpfree (MASK_FP(ccd))
 	call mfree (ccd, TY_STRUCT)
 end

@@ -1,5 +1,74 @@
 .help revisions Jun88 noao.digiphot.apphot
 .nf
+apphot/aptest.cl
+    Modified the rfits calling sequence so that the test script will work
+    with the new version of rfits.
+
+    Davis, May 29, 1997
+
+apphot/photpars.par
+apphot/polypars.par
+apphot/qphot.par
+apphot/doc/photpars.hlp
+apphot/doc/polypars.hlp
+apphot/doc/qphot.hlp
+apphot/doc/qphot.hlp
+apphot/doc/photdef.h
+apphot/doc/polyphotdef.h
+    Changed the apphot package zero point from 26.0 to 25.0 so as to
+    match the daophot zero point and avoid confusion.
+
+    Davis, March 31, 1997
+
+apphot/daofind/apfind.x
+    Modified the routine that computes the new roundness parameter to check
+    for <= 0.0 quantities in the denominator of the new roundness statistic.
+    Zero valued quantities can in rare cases cause a divide by zero or
+    floating operand error.
+
+    Davis, July 21, 1996
+
+apphot/lib/polyphotdef.h
+apphot/aplib/apset1.x
+apphot/aplib/apset2.x
+apphot/aplib/apset.x
+apphot/aplib/apstat1.x
+apphot/aplib/apstat2.x
+apphot/aplib/apstat.x
+apphot/aplib/apwres2.x
+apphot/aplib/aparrays.x
+apphot/aplib/aprcursor1.x
+apphot/aplib/mkpkg
+apphot/phot/apmag.x
+apphot/phot/apremag.x
+apphot/phot/appinit.x
+apphot/phot/appfree.x
+apphot/phot/appplot.x
+apphot/phot/apmeasure.x
+apphot/phot/apcomags.x
+apphot/phot/mkpkg
+apphot/wphot/apwmag.x
+apphot/wphot/apwremag.x
+apphot/wphot/apgmeasure.x
+apphot/wphot/aptmeasure.x
+apphot/wphot/mkpkg
+apphot/radprof/apfrprof.x
+apphot/radprof/aprpindex.x
+apphot/radprof/aprpplot.x
+apphot/radprof/aprmmeasure.x
+apphot/polyphot/apyfit.x
+apphot/polyphot/mkpkg
+    Modified the aperture sum routines to work in double precision where
+    appropriate. This avoids rounding errors that become visible when
+    working on synthetic data or data with neglible sky noise.
+
+    Davis, July 18, 1996
+
+apphot/doc/qphot.hlp
+    Fixed some typos and omissions in the qphot task help page.
+
+    Davis, April 11, 1996
+
 apphot/aplib/apwres1.x
 apphot/daofind/apfind.x
     Fixed a serious bug in the daofind centering code which resulted

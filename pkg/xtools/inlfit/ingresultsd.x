@@ -66,10 +66,10 @@ begin
 	    call fprintf (fd, " %14.14s %14.7g %14.7g %14.7g %14.7g\n")
 	    call pargstr (names[(i-1)*len_name+1])
 	    if (Memd[wts1+i-1] <= 0.0) {
-		call pargd (INDEFR)
-		call pargd (INDEFR)
-		call pargd (INDEFR)
-		call pargd (INDEFR)
+		call pargd (INDEFD)
+		call pargd (INDEFD)
+		call pargd (INDEFD)
+		call pargd (INDEFD)
 	    } else {
 		call pargd (y[i])
 		call pargd (Memd[fit+i-1])

@@ -78,8 +78,15 @@ XINT	*pid;
 
 	/* Open binary IPC channels.  Clear byte counts.
 	 */
-	pipe (pin);
-	if (pipe (pout) == ERR) {
+	pin[0] = pin[1] = -1;
+	pout[0] = pout[1] = -1;
+
+	if (pipe(pin) == ERR || pipe(pout) == ERR)
+	    goto err;
+	else if (pin[0] >= MAXOFILES || pin[1] >= MAXOFILES ||
+		pout[0] >= MAXOFILES || pout[1] >= MAXOFILES) {
+err:	    close (pin[0]);  close (pin[1]);
+	    close (pout[0]);  close (pout[1]);
 	    *pid = XERR;
 	    return;
 	}
@@ -213,7 +220,7 @@ XLONG	*loffset;		/* not used */
 	register int fd, nbytes;
 	int	record_length, status;
 	short	temp;
-#ifdef SOLARIS
+#ifdef POSIX
 	sigset_t sigmask_save, set;
 #else
 	int	sigmask_save;
@@ -288,7 +295,7 @@ XLONG	*loffset;		/* not used */
 	 * entire record.  This is implemented as a critical section to
 	 * prevent corruption of the IPC protocol when an interrupt occurs.
 	 */
-#ifdef SOLARIS
+#ifdef POSIX
 	sigemptyset (&set);
 	sigaddset (&set, SIGINT);
 	sigaddset (&set, SIGTERM);
@@ -327,7 +334,7 @@ XLONG	*loffset;		/* not used */
 	    if (read (fd, &temp, 1) <= 0)
 		break;
 reenab_:
-#ifdef SOLARIS
+#ifdef POSIX
 	sigprocmask (SIG_SETMASK, &sigmask_save, NULL);
 #else
 	sigsetmask (sigmask_save);
@@ -346,7 +353,7 @@ XLONG	*loffset;
 {
 	register int fd;
 	short	temp;
-#ifdef SOLARIS
+#ifdef POSIX
 	sigset_t sigmask_save, set;
 #else
 	int	sigmask_save;
@@ -373,7 +380,7 @@ XLONG	*loffset;
 
 	/* Write IPC block header.
 	 */
-#ifdef SOLARIS
+#ifdef POSIX
 	sigemptyset (&set);
 	sigaddset (&set, SIGINT);
 	sigaddset (&set, SIGTERM);
@@ -397,7 +404,7 @@ XLONG	*loffset;
 	if (ipc_out > 0)
 	    write (ipc_out, (char *)buf, (int)*nbytes);
 
-#ifdef SOLARIS
+#ifdef POSIX
 	sigprocmask (SIG_SETMASK, &sigmask_save, NULL);
 #else
 	sigsetmask (sigmask_save);

@@ -57,21 +57,21 @@ end
 
 define	RV_NSTR1S "#N OBJECT%13tIMAGE%24tREF%29tHJD%40tAP%44tSHIFT%53tFWHM%62tVHELIO%72tVERR\n"
 define	RV_USTR1S "#U name%13timage%29tdays%44tpixel%53t    %62tkm/s%72tkm/s\n"
-define	RV_WSTR1S "%-11.11s%13t%-10.10s%24t%.2s%29t%-9.4f%40t%-3d%44t%-7.3f%53t%-7.2f%62t%-9.4f%72t%-7.3f\n"
+define	RV_WSTR1S "%-11.11s%13t%-10.10s%24t%.2s%29t%-10.4f%40t%-3d%44t%-7.3f%53t%-7.2f%62t%-9.4f%72t%-7.3f\n"
 
 define  RV_NSTR1V "#N%4tOBJECT%18tIMAGE%28tREF%34tHJD%44tAP%50tCODES%60tSHIFT%68tHGHT%73tFWHM%81tTDR%88tVOBS%98tVREL%109tVHELIO%120tVERR\n"
 define  RV_USTR1V "#U%4tname%18timage%34tdays%50tcfr/fun%60tpixel%73t    %88tkm/s%98tkm/s%109tkm/s%120tkm/s\n"
-define  RV_WSTR1V "%-15.15s  %-10s %.2s   %-9.4f  %-3d  %-7.7s   %-7.3f %-4.2f %-7.2f %-6.2f %-9.4f %-9.4f  %-9.4f  %-7.3f\n"
+define  RV_WSTR1V "%-15.15s  %-10s %.2s  %-10.4f  %-3d  %-7.7s   %-7.3f %-4.2f %-7.2f %-6.2f %-9.4f %-9.4f  %-9.4f  %-7.3f\n"
 
 # Now define the parameter keyword strings in terms of redshift Z values.
 
-define	RV_NSTR1SZ "#N OBJECT%13tIMAGE%24tREF%29tHJD%40tAP%44tSHIFT%53tFWHM%62tZHELIO%72tVERR\n"
-define	RV_USTR1SZ "#U name%13timage%29tdays%44tpixel%53t    %62tz%72tkm/s\n"
-define	RV_WSTR1SZ "%-11.11s%13t%-10.10s%24t%.2s%29t%-9.4f%40t%-3d%44t%-7.3f%53t%-7.2f%62t%-7.6f%72t%-7.3f\n"
+define	RV_NSTR1SZ "#N OBJECT%13tIMAGE%24tREF%28tHJD%40tAP%44tSHIFT%53tFWHM%62tZHELIO%72tVERR\n"
+define	RV_USTR1SZ "#U name%13timage%28tdays%44tpixel%53t    %62tz%72tkm/s\n"
+define	RV_WSTR1SZ "%-11.11s%13t%-10.10s%24t%.2s%28t%-10.4f%40t%-3d%44t%-7.3f%53t%-7.2f%62t%-7.6f%72t%-7.3f\n"
 
 define  RV_NSTR1VZ "#N%4tOBJECT%18tIMAGE%28tREF%34tHJD%44tAP%50tCODES%60tSHIFT%68tHGHT%73tFWHM%81tTDR%88tZOBS%98tZREL%109tZHELIO%120tVERR\n"
 define  RV_USTR1VZ "#U%4tname%18timage%34tdays%50tcfr/fun%60tpixel%73t    %88tz%98tz%109tz%120tkm/s\n"
-define  RV_WSTR1VZ "%-15.15s  %-10s %.2s   %-9.4f  %-3d  %-7.7s   %-7.3f %-4.2f %-7.2f %-6.2f %-7.6f    %-7.6f     %-7.6f    %-7.3f\n"
+define  RV_WSTR1VZ "%-15.15s  %-10s %.2s  %-10.4f  %-3d  %-7.7s   %-7.3f %-4.2f %-7.2f %-6.2f %-7.6f    %-7.6f     %-7.6f    %-7.3f\n"
 
 
 
@@ -173,7 +173,7 @@ begin
 	if (IS_DBLSTAR(rv) == YES) {
 	    nshifts = DBL_NSHIFTS(rv)
 	    do i = 1, nshifts {
-	        call nam_tempcode (rv, RV_TEMPNUM(rv), tc)
+	        call nam_tempcode (RV_TEMPNUM(rv), tc)
 		if (RV_PRINTZ(rv) == NO)
                     call fprintf (fd, RV_WSTR1S)
 		else
@@ -203,7 +203,7 @@ begin
 		        call pargr (DBL_VERR(rv,i))
 	    }
 	} else {
-	    call nam_tempcode (rv, RV_TEMPNUM(rv), tc)
+	    call nam_tempcode (RV_TEMPNUM(rv), tc)
 	    if (RV_PRINTZ(rv) == NO)
                 call fprintf (fd, RV_WSTR1S)
 	    else
@@ -283,7 +283,7 @@ begin
 	if (IS_DBLSTAR(rv) == YES) {
 	    nshifts = DBL_NSHIFTS(rv)
 	    do i = 1, nshifts {
-		call nam_tempcode (rv, RV_TEMPNUM(rv), tc)
+		call nam_tempcode (RV_TEMPNUM(rv), tc)
 	        if (RV_PRINTZ(rv) == NO)
                     call fprintf (fd, RV_WSTR1V)
 	        else
@@ -329,7 +329,7 @@ begin
 	    	        call pargr (DBL_VERR(rv,i))
 	    }
 	} else {
-	    call nam_tempcode (rv, RV_TEMPNUM(rv), tc)
+	    call nam_tempcode (RV_TEMPNUM(rv), tc)
 	    if (RV_PRINTZ(rv) == NO)
                 call fprintf (fd, RV_WSTR1V)
 	    else
@@ -529,7 +529,7 @@ begin
 	    if (strlen(Memc[im]) > 30)
 		call rv_strip_path (Memc[im], 30)
 
-	    call nam_tempcode (rv, i, tc)
+	    call nam_tempcode (i, tc)
 	    call sprintf (Memc[buf], SZ_LINE, 
 	   "#T %s '%.2s' -- %s = '%.40s'%78t\*\n#%21t%s = '%.30s'%64t%s = %.2f")
 		    call pargstr ("Template")

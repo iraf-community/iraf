@@ -23,11 +23,11 @@ begin
 	    Memc[ksection], SZ_FNAME,
 	    Memc[section], SZ_FNAME, cl_index, cl_size)
 
-	if (cl_index > 0 && cl_size == 0) {
+	if (cl_index >= 0 && cl_size == -1) {
 	    call sprintf (image, maxch, "%s[%d]")
 		call pargstr (Memc[cluster])
 		call pargi (cl_index)
-	} else if (cl_index > 0 && cl_size > 0) {
+	} else if (cl_index >= 0 && cl_size > 0) {
 	    call sprintf (image, maxch, "%s[%d/%d]")
 		call pargstr (Memc[cluster])
 		call pargi (cl_index)
@@ -36,6 +36,5 @@ begin
 	    call strcpy (Memc[cluster], image, maxch)
 
 	call strcat (Memc[ksection], image, maxch)
-
 	call sfree (sp)
 end

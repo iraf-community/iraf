@@ -119,6 +119,13 @@ begin
 	call salloc (ftn_format, SZ_FORMAT, TY_CHAR)
 	call salloc (ep, SZ_LINE, TY_CHAR)
 
+	# Clear the format variables.
+	call aclrc (Memc[out_format], SZ_FORMAT)
+	call aclrc (Memc[spp_format], SZ_FORMAT)
+	call aclrc (Memc[ftn_format], SZ_FORMAT)
+	call aclrc (Memc[ep], SZ_LINE)
+	fmtchar = ' '
+
 	# Determine the output format.
 
 	if (user_format[1] == EOS) {

@@ -36,6 +36,9 @@ begin
 	bool	reextract, log
 
 	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	mstype = ".ms" // imtype
 
 	temp1 = mktemp ("tmp$iraf")

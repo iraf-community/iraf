@@ -1,69 +1,96 @@
 include	<error.h>
 include	<mach.h>
+include	<units.h>
 include	"identify.h"
 
 # ID_MAPLL -- Read the line list into memory.
+# Convert to desired units.
 
 procedure id_mapll (id)
 
 pointer	id		# Identify structure
 
 int	fd, nalloc, nlines
-pointer	ll1, ll2, str
-
-int	open(), fscan(), nscan(), nowhite()
+pointer	ll, lll
+pointer	sp, str, units
 double	value
 
-errchk	open, fscan, malloc, realloc
+bool	streq()
+int	open(), fscan(), nscan(), nowhite()
+pointer	un_open()
+errchk	open, fscan, malloc, realloc, un_open
 
 begin
-	ID_LL(id) = NULL
+	call id_unmapll (id)
 
-	if (nowhite (Memc[ID_COORDLIST(id)],
-	    Memc[ID_COORDLIST(id)], SZ_FNAME) == 0)
+	if (nowhite (ID_COORDLIST(id), ID_COORDLIST(id), ID_LENSTRING) == 0)
 	    return
-	iferr (fd = open (Memc[ID_COORDLIST(id)], READ_ONLY, TEXT_FILE)) {
+	iferr (fd = open (ID_COORDLIST(id), READ_ONLY, TEXT_FILE)) {
 	    call erract (EA_WARN)
 	    return
 	}
 
-	call malloc (str, SZ_LINE, TY_CHAR)
+	ID_COORDSPEC(id) = EOS
+	call smark (sp)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (units, SZ_LINE, TY_CHAR)
+	call strcpy ("Angstroms", Memc[units], SZ_LINE)
 	nalloc = 0
 	nlines = 0
 	while (fscan (fd) != EOF) {
+	    call gargwrd (Memc[str], SZ_LINE)
+	    if (nscan() != 1)
+		next
+	    if (Memc[str] == '#') {
+		call gargwrd (Memc[str], SZ_LINE)
+		call strlwr (Memc[str])
+		if (streq (Memc[str], "spectrum"))
+		    call gargwrd (ID_COORDSPEC(id), ID_LENSTRING)
+		if (streq (Memc[str], "units")) {
+		    call gargstr (Memc[units], SZ_LINE)
+		    call xt_stripwhite (Memc[units])
+		}
+		next
+	    }
+	    call reset_scan ()
+
 	    call gargd (value)
 	    if (nscan() != 1)
 		next
 
 	    if (nalloc == 0) {
 		nalloc = 100
-		call malloc (ll1, nalloc, TY_DOUBLE)
-		call calloc (ll2, nalloc, TY_POINTER)
+		call malloc (ll, nalloc, TY_DOUBLE)
+		call calloc (lll, nalloc, TY_POINTER)
 	    } else if (nlines == nalloc) {
 		nalloc = nalloc + 100
-		call realloc (ll1, nalloc, TY_DOUBLE)
-		call realloc (ll2, nalloc, TY_POINTER)
-		call aclri (Memi[ll2+nalloc-100], 100)
+		call realloc (ll, nalloc, TY_DOUBLE)
+		call realloc (lll, nalloc, TY_POINTER)
+		call aclri (Memi[lll+nalloc-100], 100)
 	    }
 
-	    Memd[ll1+nlines] = value
+	    Memd[ll+nlines] = value
 	    call gargstr (Memc[str], SZ_LINE)
-	    call id_label (Memc[str], Memi[ll2+nlines])
+	    call id_label (Memc[str], Memi[lll+nlines])
 
 	    nlines = nlines + 1
 	}
-	call mfree (str, TY_CHAR)
 	call close (fd)
 
-	if (nlines == 0)
-	    return
+	if (nlines > 0) {
+	    call realloc (ll, nlines + 1, TY_DOUBLE)
+	    call realloc (lll, nlines + 1, TY_POINTER)
+	    Memd[ll+nlines] = INDEFD
+	    ID_LL(id) = ll
+	    ID_LLL(id) = lll
+	    ID_NLL(id) = nlines
 
-	call realloc (ll1, nlines + 1, TY_DOUBLE)
-	call realloc (ll2, nlines + 1, TY_POINTER)
-	Memd[ll1+nlines] = INDEFD
-	call malloc (ID_LL(id), 2, TY_POINTER)
-	Memi[ID_LL(id)] = ll1
-	Memi[ID_LL(id)+1] = ll2
+	    if (ID_UN(id) == NULL && Memc[units] != EOS)
+		ID_UN(id) = un_open (Memc[units])
+	    call id_unitsll (id, Memc[units])
+	}
+
+	call sfree (sp)
 end
 
 
@@ -73,23 +100,68 @@ procedure id_unmapll (id)
 
 pointer	id		# Identify structure
 
-pointer	ll1, ll2
+pointer	lll
 
 begin
 	if (ID_LL(id) == NULL)
 	    return
 
-	ll1 = Memi[ID_LL(id)]
-	ll2 = Memi[ID_LL(id)+1]
-	while (!IS_INDEFD(Memd[ll1])) {
-	    call mfree (Memi[ll2], TY_CHAR)
-	    ll1 = ll1 + 1
-	    ll2 = ll2 + 1
+	do lll = ID_LLL(id), ID_LLL(id)+ID_NLL(id)-1
+	    call mfree (Memi[lll], TY_CHAR)
+
+	call mfree (ID_LL(id), TY_DOUBLE)
+	call mfree (ID_LLL(id), TY_POINTER)
+end
+
+
+# ID_UNITSLL -- Change the line list units from the input units to the
+# units given by ID_UN.  This may involve reversing the order of the list.
+
+procedure id_unitsll (id, units)
+
+pointer	id			# Identify structure
+char	units[ARB]		# Input units
+
+int	i, nll
+double	value
+pointer	un, ll, lll, llend, lllend, un_open()
+bool	un_compare()
+errchk	un_open
+
+begin
+	if (ID_LL(id) == NULL)
+	    return
+	if (ID_NLL(id) < 1)
+	    return
+	if (units[1] == EOS || ID_UN(id) == NULL)
+	    return
+	if (UN_CLASS(ID_UN(id)) == UN_UNKNOWN)
+	    return
+
+	un = un_open (units)
+	if (un_compare (un, ID_UN(id))) {
+	    call un_close (un)
+	    return
 	}
 
-	call mfree (Memi[ID_LL(id)], TY_DOUBLE)
-	call mfree (Memi[ID_LL(id)+1], TY_POINTER)
-	call mfree (ID_LL(id), TY_POINTER)
+	ll = ID_LL(id)
+	lll = ID_LLL(id)
+	nll = ID_NLL(id)
+	call un_ctrand (un, ID_UN(id), Memd[ll], Memd[ll], nll)
+	call un_close (un)
+
+	if (Memd[ll] > Memd[ll+nll-1]) {
+	    llend = ll + nll - 1
+	    lllend = lll + nll - 1
+	    do i = 0, nll / 2 - 1 {
+		value = Memd[ll+i]
+		Memd[ll+i] = Memd[llend-i]
+		Memd[llend-i] = value
+		un = Memi[lll+i]
+		Memi[lll+i] = Memi[lllend-i]
+		Memi[lllend-i] = un
+	    }
+	}
 end
 
 
@@ -106,38 +178,48 @@ double	out			# Matched coordinate
 pointer	label			# Pointer to label
 real	diff			# Maximum difference
 
-double	delta, deltamin
-pointer	ll1, ll2, tmp
+int	i, j, nll
+double	delta
+pointer	ll
 int	strlen()
 
 begin
+	call mfree (label, TY_CHAR)
+
 	if (ID_LL(id) == NULL) {
 	    out = in
-	    label = NULL
 	    return
 	}
 
-	deltamin = MAX_REAL
+	if (diff < 0.)
+	    delta = abs (diff * (FITDATA(id,1) - FITDATA(id,ID_NPTS(id))) /
+		(ID_NPTS(id) - 1))
+	else
+	    delta = diff
 
-	ll1 = Memi[ID_LL(id)]
-	ll2 = Memi[ID_LL(id)+1]
-	while (!IS_INDEFD(Memd[ll1])) {
-	    delta = abs (in - Memd[ll1])
-	    if (delta < deltamin) {
-		deltamin = delta
-	        if (deltamin <= diff) {
-		    out = Memd[ll1]
-		    label = Memi[ll2]
-		}
+	ll = ID_LL(id)
+	nll = ID_NLL(id)
+	j = max (1, nint (sqrt (real (nll))))
+	for (i = 0; i < nll && in > Memd[ll+i]; i = i + j)
+	    ;
+	for (i = max (0, min (i-1, nll-1)); i > 0 && in < Memd[ll+i]; i = i - 1)
+	    ;
+
+	ll = ll + i
+	if (i < nll-1) {
+	    if (abs (in - Memd[ll]) > abs (in - Memd[ll+1])) {
+		i = i + 1
+		ll = ll + 1
 	    }
-	    ll1 = ll1 + 1
-	    ll2 = ll2 + 1
 	}
 
-	if (label != NULL) {
-	    call malloc (tmp, strlen (Memc[label]), TY_CHAR)
-	    call strcpy (Memc[label], Memc[tmp], ARB)
-	    label = tmp
+	if (abs (in - Memd[ll]) <= delta) {
+	    out = Memd[ll]
+	    ll = Memi[ID_LLL(id)+i]
+	    if (ll != NULL) {
+		call malloc (label, strlen (Memc[ll]), TY_CHAR)
+		call strcpy (Memc[ll], Memc[label], ARB)
+	    }
 	}
 end
 
@@ -148,10 +230,13 @@ procedure id_linelist (id)
 pointer	id			# Identify structure
 
 int	i, nfound, nextpix, lastpix, cursave
-double	pix, fit, fit1, fit2, user, peak, minval, diff, diff1
-pointer	sp, pixes, fits, users, labels, ll1, ll2, label
+double	cd, pix, fit, fit1, fit2, user, peak, minval, diff, diff1
+pointer	sp, pixes, fits, users, labels, ll, lll, label
 
 double	id_center(), fit_to_pix(), id_fitpt(), id_peak()
+
+int	ncandidate, nmatch1, nmatch2
+common	/llstat/ ncandidate, nmatch1, nmatch2
 
 begin
 	if (ID_LL(id) == NULL)
@@ -163,31 +248,42 @@ begin
 	call salloc (users, ID_MAXFEATURES(id), TY_DOUBLE)
 	call salloc (labels, ID_MAXFEATURES(id), TY_POINTER)
 
+	ncandidate = 0
+	nmatch1 = 0
+	nmatch2 = 0
 	nfound = 0
 	lastpix = 0
 	minval = MAX_REAL
 
+	if (ID_MATCH(id) < 0.)
+	    cd = (FITDATA(id,1) - FITDATA(id,ID_NPTS(id))) / (ID_NPTS(id) - 1)
+	else
+	    cd = 1
+
 	fit1 = min (FITDATA(id,1), FITDATA(id,ID_NPTS(id)))
 	fit2 = max (FITDATA(id,1), FITDATA(id,ID_NPTS(id)))
-	ll1 = Memi[ID_LL(id)]
-	ll2 = Memi[ID_LL(id)+1]
-	while (!IS_INDEFD(Memd[ll1])) {
-	    user = Memd[ll1]
-	    label = Memi[ll2]
-	    ll1 = ll1 + 1
-	    ll2 = ll2 + 1
+	ll = ID_LL(id)
+	lll = ID_LLL(id)
+	while (!IS_INDEFD(Memd[ll])) {
+	    user = Memd[ll]
+	    label = Memi[lll]
+	    ll = ll + 1
+	    lll = lll + 1
 	    if (user < fit1)
 		next
 	    if (user > fit2)
 		break
 	
+	    ncandidate = ncandidate + 1
 	    pix = id_center (id, fit_to_pix (id, user), ID_FWIDTH(id),
 		ID_FTYPE(id))
 	    if (!IS_INDEFD(pix)) {
 		fit = id_fitpt (id, pix)
-		diff = abs (fit - user)
-		if (diff > ID_MATCH(id))
+		diff = abs ((fit - user) / cd)
+		if (diff > abs (ID_MATCH(id)))
 		    next
+
+		nmatch1 = nmatch1 + 1
 		if (lastpix > 0) {
 		    if (abs (pix - Memd[pixes+lastpix-1]) < 0.01) {
 			diff1 = abs (Memd[fits+lastpix-1]-Memd[users+lastpix-1])
@@ -200,7 +296,8 @@ begin
 			next
 		    }
 		}
-			
+
+		nmatch2 = nmatch2 + 1
 		peak = abs (id_peak (id, pix))
 		if (nfound < ID_MAXFEATURES(id)) {
 		    nfound = nfound + 1
@@ -209,13 +306,13 @@ begin
 			minval = peak
 		    }
 		    Memd[pixes+nfound-1] = pix
-		    Memd[fits+nfound-1] = id_fitpt (id, pix)
+		    Memd[fits+nfound-1] = fit
 		    Memd[users+nfound-1] = user
 		    Memi[labels+nfound-1] = label
 		    lastpix = nfound
 		} else if (peak > minval) {
 		    Memd[pixes+nextpix-1] = pix
-		    Memd[fits+nextpix-1] = id_fitpt (id, pix)
+		    Memd[fits+nextpix-1] = fit
 		    Memd[users+nextpix-1] = user
 		    Memi[labels+nextpix-1] = label
 		    lastpix = nextpix

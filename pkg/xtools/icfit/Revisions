@@ -1,5 +1,62 @@
 .help revisions Jun88 pkg.xtools.icfit
 .nf
+pkg$xtools/icfit/icfit.hlp
+    Changed the order of the task name and version number in the revisions
+    section.  (4/22/97, Valdes)
+
+pkg$xtools/icgcolon.gx
+pkg$xtools/icfit/icfit.hlp
+    Changed the "fitvalue" colon command to "evaluate" to avoid abbreviation
+    conflict with "function".  (4/16/97, Valdes)
+
+pkg$xtools/icfit/icshow.x
+    The commenting of the title string needed to be modified since the
+    title string could include new lines and we want each line to be
+    commented.  (3/27/97, Valdes)
+
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icfit.hlp
+    Added a "fitvalue" colon command to evaluate the fit at an arbitrary value.
+    (1/28/97, Valdes)
+
+pkg$xtools/icfit/icvshow.gx
+pkg$xtools/icfit/icshow.x
+pkg$xtools/icfit/icerrors.gx
+    All output except the tabular part of :xyshow now begins with
+    the comment character.  Comment column labels were added back.
+    (2/29/96, Valdes)
+
+pkg$xtools/icfit/icvshow.gx
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icfit.help
+    Enhanced the :xyshow command to include the weights and not print
+    column labels.  (11/20/95, Valdes)
+
+pkg$xtools/icfit/icparams.x
+    Added an ic_geti paramter "nmin" to return the minimum number of
+    points that can be fit.  (9/8/95, Valdes)
+
+pkg$xtools/icfit/icgfit.h
+    The prototype capability of adding points was supposed to return to
+    the calling program as if only the original data was used however
+    the structure element giving the number of points fit was the number
+    after adding the points.  This causes other routines to think the
+    data was sampled in some way which then leads to attempting to
+    reference a NULL array.  The routine now sets the number of points
+    fit back to the input value upon completion.  (7/12/95, Valdes)
+
+pkg$xtools/icfit/icfit.h
+pkg$xtools/icfit/icparams.x
+pkg$xtools/icfit/icggraph.gx
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icfit.hlp
+    Added a color option for the fit.  Users may set it with :color and
+    applications with ic_puti.  (6/30/95, Valdes)
+
+=======
+V2.10.4
+=======
+
 pkg$xtools/icfit/icdosetup.gx
     Fixed two type mismatches in min/max calls.  (12/30/94, Valdes)
 

@@ -92,7 +92,7 @@ begin
 	while (setvals[ip] != EOS) {
 
 	    # Extract whitespace separated strings.
-	    if (ctowrd (setvals, ip, Memc[temp], SZ_LINE) < 0)
+	    if (ctowrd (setvals, ip, Memc[temp], SZ_LINE) <= 0)
 		break
 
 	    # Initialize token extraction.
@@ -104,7 +104,9 @@ begin
 
 	    while (Memc[temp+tp-1] != EOS) {
 	        token = ctotok (Memc[temp], tp, Memc[vptr+op-1], max_lvalue)
-		if (token == TOK_UNKNOWN)
+		if (Memc[vptr+op-1] == EOS)
+		    next
+		if (token == TOK_UNKNOWN || token == TOK_CHARCON)
 		    next
 		if ((token == TOK_PUNCTUATION) && (Memc[vptr+op-1] == ',' ||
 		    Memc[vptr+op-1] == ';')) {
@@ -120,7 +122,8 @@ begin
 	        call realloc (values, (max_lvalue + 1) * bufsize, TY_CHAR)
 	    }
 
-	    nc = nc + 1
+	    if (op > 1)
+	        nc = nc + 1
 	    vptr = values + nc * (max_lvalue + 1)
 	    if (nc < def_nvalues)
 		next

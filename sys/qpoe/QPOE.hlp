@@ -477,7 +477,7 @@ portion of the current filter).  A region mask may also be specified with
           pl = qpio_getmask (qpio)
    nev|EOF = qpio_getevents (qpio, ev, maskval, maxevents)
              qpio_putevents (qpio, ev, nevents)
-               qpio_readpix (qpio, obuf, v, npix)
+               qpio_readpix (qpio, obuf, vs, ve, dxim, xblock, yblock)
                  qpio_close (qpio)
 .fi
 

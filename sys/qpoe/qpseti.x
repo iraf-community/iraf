@@ -14,7 +14,12 @@ int	value			#I new value for parameter
 begin
 	switch (param) {
 	case QPOE_BLOCKFACTOR:
-	    QP_BLOCK(qp) = value
+	    QP_XBLOCK(qp) = value
+	    QP_YBLOCK(qp) = value
+	case QPOE_XBLOCKFACTOR:
+	    QP_XBLOCK(qp) = value
+	case QPOE_YBLOCKFACTOR:
+	    QP_YBLOCK(qp) = value
 	case QPOE_BUCKETLEN:
 	    QP_BUCKETLEN(qp) = value
 	case QPOE_CACHESIZE:

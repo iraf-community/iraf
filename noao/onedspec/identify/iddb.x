@@ -1,7 +1,10 @@
 include	<imset.h>
 include	<math/curfit.h>
 include	<smw.h>
+include	<units.h>
 include	"identify.h"
+include	<pkg/dttext.h>
+
 
 # ID_DBREAD -- Read features data from the database.
 
@@ -13,15 +16,9 @@ int	ap[2]				# Aperture number
 int	add				# Add features?
 int	verbose				# Verbose flag
 
-double	pix
-int	i, j, k, ncoeffs, rec
-pointer	dt, sp, coeffs, line, str, sh
-
-int	dtgeti(), dcvstati(), dtlocate(), dtscan(), nscan()
-real	dtgetr()
-double	dcvstatd()
-
-errchk	dtremap(), dtlocate(), dtgeti(), dtgad()
+int	rec, dtlocate()
+pointer	sp, line, str
+errchk	dtremap, dtlocate, id_dbread_rec
 
 begin
 	call smark (sp)
@@ -29,25 +26,100 @@ begin
 
 	call strcpy ("id", Memc[line], SZ_LINE)
 	call imgcluster (name, Memc[line+2], SZ_LINE)
-	call dtremap (ID_DT(id), Memc[ID_DATABASE(id)], Memc[line], READ_ONLY)
+	call dtremap (ID_DT(id), ID_DATABASE(id), Memc[line], READ_ONLY)
 
-	call id_dbsection (id, name, ap, Memc[ID_SECTION(id)], SZ_FNAME)
+	call id_dbsection (id, name, ap, ID_SECTION(id), ID_LENSTRING)
 	call sprintf (Memc[line], SZ_LINE, "identify %s%s")
 	    call pargstr (name)
-	    call pargstr (Memc[ID_SECTION(id)])
+	    call pargstr (ID_SECTION(id))
 
-	dt = ID_DT(id)
-	sh = ID_SH(id)
-	iferr (rec = dtlocate (dt, Memc[line])) {
+	iferr (rec = dtlocate (ID_DT(Id), Memc[line])) {
 	    call salloc (str, SZ_LINE, TY_CHAR)
 	    call sprintf (Memc[str], SZ_LINE, "Entry not found: %s")
 		call pargstr (Memc[line])
 	    call error (0, Memc[str])
 	}
 
+	call id_dbread_rec (id, rec, add)
+
+	if (ID_NFEATURES(id) > 0) {
+	    ID_NEWGRAPH(id) = YES
+	    ID_NEWFEATURES(id) = YES
+	    ID_CURRENT(id) = 1
+	} else
+	    ID_CURRENT(id) = 0
+
+	if (verbose == YES) {
+	    call printf ("identify %s%s\n")
+		call pargstr (name)
+		call pargstr (ID_SECTION(id))
+	}
+
+	call sfree (sp)
+end
+
+
+# ID_DBSAVE -- Read all entries from a database and save.
+
+procedure id_dbsave (id, name)
+
+pointer	id				# ID pointer
+char	name[SZ_LINE]			# Image name
+
+int	rec, dtgeti()
+pointer	sp, line, dt
+errchk	dtremap, dtgeti, id_dbread_rec, id_saveap
+
+begin
+	call smark (sp)
+	call salloc (line, SZ_FNAME, TY_CHAR)
+
+	call strcpy ("id", Memc[line], SZ_FNAME)
+	call imgcluster (name, Memc[line+2], SZ_FNAME)
+	call dtremap (ID_DT(id), ID_DATABASE(id), Memc[line], READ_ONLY)
+
+	dt = ID_DT(id)
+	do rec = 1, DT_NRECS(dt) {
+	    ID_AP(id,1) = dtgeti (dt, rec, "aperture")
+	    ID_AP(id,2) = 1
+	    call id_dbread_rec (id, rec, NO)
+	    call id_saveap (id)
+	}
+
+	call sfree (sp)
+end
+
+
+# ID_DBREAD_REC -- Read specified record from the database.
+
+procedure id_dbread_rec (id, rec, add)
+
+pointer	id				# ID pointer
+int	rec				# Database record
+int	add				# Add features?
+
+double	pix
+int	i, j, k, ncoeffs
+pointer	dt, sh, un, sp, line, coeffs
+
+int	dtgeti(), dcvstati(), dtscan(), nscan()
+real	dtgetr()
+double	dcvstatd()
+bool	un_compare()
+pointer	un_open()
+errchk	un_open, dtgeti(), dtgad()
+
+begin
+	call smark (sp)
+	call salloc (line, SZ_LINE, TY_CHAR)
+
+	dt = ID_DT(id)
+	sh = ID_SH(id)
+
 	if (add == YES) {
 	    j = dtgeti (dt, rec, "features")
 	    k = j + ID_NFEATURES(id)
+	    ID_NALLOC(id) = k
 
 	    call realloc (ID_PIX(id), k, TY_DOUBLE)
 	    call realloc (ID_FIT(id), k, TY_DOUBLE)
@@ -89,12 +161,26 @@ begin
 		    WTS(id,k) = 1.
 	    }
 
+	    if (ID_UN(id) != NULL) {
+		ifnoerr (call dtgstr (dt, rec, "units", Memc[line], SZ_LINE)) {
+		    un = un_open (Memc[line])
+		    if (!un_compare (un, ID_UN(id)) && j > 0) {
+			k = ID_NFEATURES(id) - j
+			call un_ctrand (un, ID_UN(id), FIT(id,k), FIT(id,k), j)
+			call un_ctrand (un, ID_UN(id), USER(id,k), USER(id,k),j)
+		    }
+		    call un_close (un)
+		}
+	    }
+
 	} else {
-	    if (SMW_FORMAT(MW(sh)) == SMW_ES || SMW_FORMAT(MW(sh)) == SMW_MS) {
-		iferr (APLOW(sh,1) = dtgetr (dt, rec, "aplow"))
-		    APLOW(sh,1) = INDEF
-		iferr (APHIGH(sh,1) = dtgetr (dt, rec, "aphigh"))
-		    APHIGH(sh,1) = INDEF
+	    if (sh != NULL) {
+		if (SMW_FORMAT(MW(sh))==SMW_ES || SMW_FORMAT(MW(sh))==SMW_MS) {
+		    iferr (APLOW(sh,1) = dtgetr (dt, rec, "aplow"))
+			APLOW(sh,1) = INDEF
+		    iferr (APHIGH(sh,1) = dtgetr (dt, rec, "aphigh"))
+			APHIGH(sh,1) = INDEF
+		}
 	    }
 
 	    do i = 1, ID_NFEATURES(id)
@@ -180,23 +266,24 @@ begin
 		ID_NEWCV(id) = YES
 		ID_CURRENT(id) = min (1, ID_NFEATURES(id))
 	    } then
-		    ;
+		;
+
+	    ifnoerr (call dtgstr (dt, rec, "units", Memc[line], SZ_LINE)) {
+		if (ID_UN(id) == NULL)
+		    ID_UN(id) = un_open (Memc[line])
+		else {
+		    un = un_open (Memc[line])
+		    if (!un_compare (un, ID_UN(id))) {
+			call id_unitsll (id, Memc[line])
+			call un_close (ID_UN(id))
+			ID_UN(id) = un
+		    } else
+			call un_close (un)
+		}
+	    }
 	}
 
 	call sfree (sp)
-
-	if (ID_NFEATURES(id) > 0) {
-	    ID_NEWGRAPH(id) = YES
-	    ID_NEWFEATURES(id) = YES
-	    ID_CURRENT(id) = 1
-	} else
-	    ID_CURRENT(id) = 0
-
-	if (verbose == YES) {
-	    call printf ("identify %s%s\n")
-		call pargstr (name)
-		call pargstr (Memc[ID_SECTION(id)])
-	}
 end
 
 
@@ -223,22 +310,22 @@ begin
 
 	call strcpy ("id", Memc[root], SZ_FNAME)
 	call imgcluster (name, Memc[root+2], SZ_FNAME)
-	call dtremap (ID_DT(id), Memc[ID_DATABASE(id)], Memc[root], APPEND)
+	call dtremap (ID_DT(id), ID_DATABASE(id), Memc[root], APPEND)
 
-	call id_dbsection (id, name, ap, Memc[ID_SECTION(id)], SZ_FNAME)
+	call id_dbsection (id, name, ap, ID_SECTION(id), ID_LENSTRING)
 
 	sh = ID_SH(id)
 	dt = ID_DT(id)
 	call dtptime (dt)
 	call dtput (dt, "begin\tidentify %s%s\n")
 	    call pargstr (name)
-	    call pargstr (Memc[ID_SECTION(id)])
+	    call pargstr (ID_SECTION(id))
 	call dtput (dt, "\tid\t%s\n")
 	    call pargstr (name)
 	call dtput (dt, "\ttask\tidentify\n")
 	call dtput (dt, "\timage\t%s%s\n")
-	    call pargstr (Memc[ID_IMAGE(id)])
-	    call pargstr (Memc[ID_SECTION(id)])
+	    call pargstr (ID_IMAGE(id))
+	    call pargstr (ID_SECTION(id))
 	if (SMW_FORMAT(MW(sh)) == SMW_ES || SMW_FORMAT(MW(sh)) == SMW_MS) {
 	    call dtput (dt, "\taperture\t%d\n")
 		call pargi (ID_AP(id,1))
@@ -248,10 +335,14 @@ begin
 		call pargr (APHIGH(sh,1))
 	}
 
+	if (ID_UN(id) != NULL) {
+	    call dtput (dt, "\tunits\t%s\n")
+		call pargstr (UN_UNITS(ID_UN(id)))
+	}
 	call dtput (dt, "\tfeatures\t%d\n")
 	    call pargi (ID_NFEATURES(id))
 	do i = 1, ID_NFEATURES(id) {
-	    call dtput (dt, "\t    %10.2f %10.8g %10.8g %5.1f %d %d %s\n")
+	    call dtput (dt, "\t    %10.2f %10.9g %10.9g %5.1f %d %d %s\n")
 		call pargd (PIX(id,i))
 		call pargd (FIT(id,i))
 		call pargd (USER(id,i))
@@ -309,13 +400,13 @@ begin
 	if (verbose == YES) {
 	    call printf ("identify %s%s\n")
 		call pargstr (name)
-	        call pargstr (Memc[ID_SECTION(id)])
+	        call pargstr (ID_SECTION(id))
 	}
 
 	# Enter reference spectrum name in image header.
 	im = IM(sh)
 	call imseti (im, IM_WHEADER, YES)
-	call imastr (im, "REFSPEC1", Memc[ID_IMAGE(id)])
+	call imastr (im, "REFSPEC1", ID_IMAGE(id))
 	iferr (call imdelf (im, "REFSPEC2"))
 	    ;
  
@@ -349,7 +440,7 @@ begin
 	if (ID_DT(id) == NULL) {
 	    call strcpy ("id", Memc[line], SZ_LINE)
 	    call imgcluster (name, Memc[line+2], SZ_LINE)
-	    iferr (call dtremap (ID_DT(id), Memc[ID_DATABASE(id)], Memc[line],
+	    iferr (call dtremap (ID_DT(id), ID_DATABASE(id), Memc[line],
 		READ_ONLY)) {
 		call sfree (sp)
 		return (NO)
@@ -391,7 +482,7 @@ begin
 	switch (SMW_FORMAT(smw)) {
 	case SMW_ND:
 	    section[1] = EOS
-	    if (streq (name, Memc[ID_IMAGE(id)])) {
+	    if (streq (name, ID_IMAGE(id))) {
 		switch (SMW_LDIM(smw)) {
 		case 2:
 		    switch (SMW_LAXIS(smw,1)) {

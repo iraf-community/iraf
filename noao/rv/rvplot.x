@@ -16,7 +16,6 @@ pointer gp, sp
 pointer title
 real	y1, y2, statr
 real	rv_width()
-bool 	streq()
 
 begin
 	if (RV_INTERACTIVE(rv) == YES)
@@ -59,17 +58,10 @@ begin
 	switch (flags) {
 	case SPECTRUM_PLOT, FILTER_PLOT, NORM_PLOT:
 	    call gclear (gp)				
-	    if (streq(IMAGE(rv),RIMAGE(rv))) {
-	        if (RV_GTYPE(rv) == NORM_PLOT)
-	            call rv_nplot (rv, SINGLE_PLOT)
-	        else
-	            call rv_splot (rv, SINGLE_PLOT)
-	    } else {
-	        if (RV_GTYPE(rv) == NORM_PLOT)
-	            call rv_nplot (rv, SPLIT_PLOT)
-	        else
-	            call rv_splot (rv, SPLIT_PLOT)
-	    }
+	    if (RV_GTYPE(rv) == NORM_PLOT)
+	        call rv_nplot (rv, SPLIT_PLOT)
+	    else
+	        call rv_splot (rv, SPLIT_PLOT)
 	    if (ORCOUNT(rv) != ALL_SPECTRUM)
 	        call rv_mark_regions (RV_OSAMPLE(rv), gp)
 	    if (RRCOUNT(rv) != ALL_SPECTRUM)
@@ -108,7 +100,6 @@ pointer	gp				# Graphics pointer
 pointer sp, title, bp, xlbl, ylbl, sid
 int     npts
 real    x1, x2, y1, y2
-bool	streq()
 
 begin
 	gp = RV_GP(rv)
@@ -123,8 +114,7 @@ begin
 	# Clear the screen
 	call gclear (gp)
 
-	if (flag == SINGLE_PLOT || RV_CONTINUUM(rv) == OBJ_ONLY ||
-	    streq(IMAGE(rv),RIMAGE(rv))) {
+	if (flag == SINGLE_PLOT || RV_CONTINUUM(rv) == OBJ_ONLY) {
 
             call salloc (xlbl, SZ_FNAME, TY_CHAR)
             call salloc (ylbl, SZ_FNAME, TY_CHAR)
@@ -175,6 +165,9 @@ begin
             call gtext (gp, x1, y1, "Normalized Spectrum", "")
             call gseti (gp, G_TXCOLOR, C_FOREGROUND)
             call gseti (gp, G_XDRAWAXES, 3)             # reset gio flags
+
+	    # Draw sample regions.
+ 	    call rv_mark_regions (RV_OSAMPLE(rv), gp)
 
             call gflush (gp)
 
@@ -331,7 +324,6 @@ pointer	gp				# Graphics pointer
 pointer	sp, title, xlbl, ylbl, sid
 int	npts
 real	x1, x2, y1, y2
-bool	streq()
 
 begin
 	gp = RV_GP(rv)
@@ -342,7 +334,7 @@ begin
 	call gclear (gp)
 
         # Draw the plot to the screen.
-	if (flag == SINGLE_PLOT || streq(IMAGE(rv),RIMAGE(rv))) {
+	if (flag == SINGLE_PLOT) {
 
 	    call smark (sp)
 	    call salloc (title, 4*SZ_LINE, TY_CHAR)

@@ -1,0 +1,47 @@
+SLALIB_Version_1.6-3                                         Expiry 1 Feb 96
+
+The latest releases of SLALIB include the following changes:
+
+*  The UTC leap second at the end of 1995 has been added to sla_DAT.
+
+*  The refraction routine REFRO has been extensively revised.  The
+   principal motivation was to improve the radio predictions by
+   introducing better humidity models.  The models previously in
+   use had been entirely adequate for the optical case, for which
+   they had been devised, but improved models were required for
+   the radio case.  None of the changes significantly affects the
+   optical results with respect to the earlier version of the REFRO
+   routine.  For example, at 70 deg zenith distance the new version
+   agrees with the old version to better than 0.05 arcsec for any
+   reasonable combination of parameters.  However, the improved
+   water-vapour expressions do make a significant difference in the
+   radio band, at 70 deg zenith distance reaching almost 4 arcsec
+   for a hot, humid, low-altitude site during a period of low pressure.
+
+*  A new routine has been added, GMSTA.  This gives greater numerical
+   precision than the existing GMST function by allowing the date and
+   time to be specified separately rather than as a single MJD.
+
+*  Measures taken some time ago in MAPQK to avoid trouble when processing
+   Solar positions had not been carried through into MAPQKZ.  The two
+   routines now use the same strategy.
+
+*  In REFRO, at zenith distances well beyond 90 deg and under some
+   conditions, it was possible to encounter arithmetic errors due to
+   failure of the tropospheric model-atmosphere to deliver sensible
+   temperatures.  This is inherent in the published algorithm.  To
+   avoid the problem, the temperature delivered by the model has been
+   constrained to the range 200 to 320 deg K.
+
+*  A new routine has been added, ATMDSP, for rapidly recalculating
+   the A,B refraction coefficients for different wavelengths.
+
+*  The first UTC leap-second date in the DAT routine was one day early.
+   This will have had no effect on the results for more recent epochs.
+
+ P.T.Wallace
+ 14 November 1995
+
+ ptw@star.rl.ac.uk
+ +44-1235-44-5372
+--------------------------------------------------------------------------

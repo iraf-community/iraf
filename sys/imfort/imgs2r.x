@@ -51,6 +51,9 @@ begin
 		return
 	    }
 
+	    # Swap bytes if necessary.
+	    call imswap (im, buf[op], nchars)
+
 	    # Convert the datatype if necessary.
 	    if (IM_PIXTYPE(im) == TY_SHORT)
 		call achtsr (buf[op], buf[op], npix)

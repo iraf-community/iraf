@@ -20,7 +20,7 @@
 #
 # This file contains the SUN/UNIX 386i (80386) version of ZSVJMP.
  
-        .globl	_zsvjmp_
+        .globl	zsvjmp_
 
 	# The following has nothing to do with ZSVJMP, and is included here
 	# only because this assembler module is loaded with every process.
@@ -35,11 +35,11 @@
 	mem_	=	0
 
 	.text
-_zsvjmp_:
+zsvjmp_:
 	movl	4(%esp), %ecx		# &jmpbuf to ECX
 	movl	8(%esp), %eax		# &status to EAX
 	movl	%eax, (%ecx)		# store &status in jmpbuf[0]
 	movl 	$0, (%eax)		# zero the value of status
 	addl	$4, %ecx		# change stack to point to &jmpbuf[1]
 	movl	%ecx, 4(%esp)		# 	...
-	jmp	___setjmp		# let setjmp do the rest
+	jmp	__setjmp		# let setjmp do the rest

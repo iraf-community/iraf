@@ -34,6 +34,7 @@ begin
 	call ic_pstr (ic, "ylabel", "Y")
 	call ic_pstr (ic, "xunits", "")
 	call ic_pstr (ic, "yunits", "")
+	call ic_puti (ic, "color", 1)
 	call ic_pstr (ic, "help", IC_DEFHELP)
 	call ic_puti (ic, "key", 1)
 	call ic_pkey (ic, 1, 'x', 'y')
@@ -70,6 +71,7 @@ begin
 	IC_LOW(icout) = IC_LOW(icin)
 	IC_HIGH(icout) = IC_HIGH(icin)
 	IC_GROW(icout) = IC_GROW(icin)
+	IC_COLOR(icout) = IC_COLOR(icin)
 	IC_MARKREJ(icout) = IC_MARKREJ(icin)
 	IC_GKEY(icout) = IC_GKEY(icin)
 
@@ -197,6 +199,8 @@ begin
 	    IC_NITERATE(ic) = ival
 	else if (streq (param, "key"))
 	    IC_GKEY(ic) = ival
+	else if (streq (param, "color"))
+	    IC_COLOR(ic) = ival
 	else if (streq (param, "markrej"))
 	    IC_MARKREJ(ic) = ival
 	else
@@ -327,8 +331,20 @@ begin
 	    return (IC_NREJECT(ic))
 	else if (streq (param, "rejpts"))
 	    return (IC_REJPTS(ic))
+	else if (streq (param, "color"))
+	    return (IC_COLOR(ic))
 	else if (streq (param, "markrej"))
 	    return (IC_MARKREJ(ic))
+	else if (streq (param, "nmin")) {
+	    switch (IC_FUNCTION(ic)) {
+	    case 3:
+		return (IC_ORDER(ic) + 3)
+	    case 4:
+		return (IC_ORDER(ic) + 1)
+	    default:
+		return (IC_ORDER(ic))
+	    }
+	}
 
 	call error (0, "ICFIT: Unknown parameter")
 end

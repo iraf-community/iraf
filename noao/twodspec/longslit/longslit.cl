@@ -23,7 +23,8 @@ task	calibrate,
 	sensfunc,
 	standard	= longslit$x_onedspec.e
 
-task	deredden,
+task	autoidentify,
+	deredden,
 	dopcor,
 	identify,
 	lcalib,
@@ -34,6 +35,7 @@ task	deredden,
 	specshift,
 	splot		 = onedspec$x_onedspec.e
 
+task	aidpars		= onedspec$aidpars.par
 task	bplot		= onedspec$bplot.cl
 task	scopy		= onedspec$scopy.cl
 

@@ -1,35 +1,39 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<imhdr.h>
+include	<imio.h>
 include	"stf.h"
+
 
 # STF_GETHDREXTN -- Get the default header file extension.
 
-procedure stf_gethdrextn (outstr, maxch)
+procedure stf_gethdrextn (im, o_im, acmode, outstr, maxch)
 
-char	outstr[maxch]		# receives header extension
-int	maxch
+pointer	im, o_im		#I image descriptors
+int	acmode			#I access mode
+char	outstr[maxch]		#O receives header extension
+int	maxch			#I max chars out
 
-pointer	sp, stf_extn
-int	envfind(), strmatch()
-bool	strne()
+bool	inherit
+int	kernel, old_kernel
+int	fnextn(), iki_getextn(), iki_getpar()
 
 begin
-	call smark (sp)
-	call salloc (stf_extn, MAX_LENEXTN, TY_CHAR)
+	# Use the same extension as the input file if this is a new copy
+	# image of the same type as the input and inherit is enabled.
+	# If we have to get the extension using iki_getextn, the default
+	# extension for a new image is the first extension defined (index=1).
 
-	# The default extension if no extension was given is the value
-	# of the IMTYPE environment variable, else the default STF extn.
-	#
-	# Note - do not use the value of imtype if set to "imh", or the
-	# new STF image will be inaccessible (IMIO will think it is an
-	# OIF format image).  There should be a general way to do this
-	# but for now exclude imh as a special case.
+	kernel = IM_KERNEL(im)
 
-	call strcpy (STF_DEFHDREXTN, outstr, maxch)
-	if (envfind (ENV_DEFIMTYPE, Memc[stf_extn], MAX_LENEXTN) >= 0)
-	    if (strne (Memc[stf_extn], "imh"))
-		if (strmatch (Memc[stf_extn], STF_HDRPATTERN) > 0)
-		    call strcpy (Memc[stf_extn], outstr, maxch)
+	old_kernel = 0
+	if (acmode == NEW_COPY && o_im != NULL)
+	    old_kernel = IM_KERNEL(o_im)
 
-	call sfree (sp)
+	inherit = (iki_getpar ("inherit") == YES)
+	if (inherit && acmode == NEW_COPY && kernel == old_kernel) {
+	    if (fnextn (IM_HDRFILE(im), outstr, maxch) <= 0)
+		call strcpy (STF_DEFHDREXTN, outstr, maxch)
+	} else if (iki_getextn (kernel, 1, outstr, maxch) < 0)
+	    call strcpy (STF_DEFHDREXTN, outstr, maxch)
 end

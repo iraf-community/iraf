@@ -6,7 +6,11 @@
 # set	echo
 
 # Determine platform architecture.
-set MACH = linux
+if (-f /etc/redhat-release) then
+    set MACH = redhat
+else
+    set MACH = `uname -s | tr '[A-Z]' '[a-z]'`
+endif
 
 # Scan the argument list and concatenate all arguments.
 set args = ""
@@ -23,8 +27,12 @@ if (! $?IRAFARCH) then
 	else
 	    setenv IRAFARCH "native"
 	endif
+    else if ("$MACH" == "freebsd") then
+	setenv IRAFARCH "freebsd"
     else if ("$MACH" == "linux") then
 	setenv IRAFARCH "linux"
+    else if ("$MACH" == "redhat") then
+	setenv IRAFARCH "redhat"
     else if ("$MACH" == "ssol") then
 	setenv IRAFARCH "ssun"
     else if ("$MACH" == "sparc") then

@@ -1,0 +1,5 @@
+commands,f,h,"",,,Commands
+images,s,h,"",,,List of images
+table,f,h,"",,,Table of values
+prompt,s,h,"astcalc> ",,,Prompt for STDIN commands
+verbose,b,h,no,,,Verbose output?

@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<mach.h>
 include	<syserr.h>
 include	<plset.h>
 include	<imhdr.h>
@@ -20,7 +21,7 @@ bool	rlio
 long	offset
 pointer	pl, sp, ibuf
 long	o_v[IM_MAXDIM]
-int	sz_pixel, nchars, ip, step
+int	sz_pixel, nbytes, nchars, ip, step
 long	imnote()
 errchk	imerr, imwrite
 include	<szdtype.inc>
@@ -35,6 +36,19 @@ begin
 	# Flip the pixel array end for end.
 	if (xstep < 0)
 	    call imaflp (buf, npix, sz_pixel)
+
+	# Byte swap if necessary.
+	if (IM_SWAP(im) == YES) {
+	    nbytes = npix * sz_pixel * SZB_CHAR
+	    switch (sz_pixel * SZB_CHAR) {
+	    case 2:
+		call bswap2 (buf, 1, buf, 1, nbytes)
+	    case 4:
+		call bswap4 (buf, 1, buf, 1, nbytes)
+	    case 8:
+		call bswap8 (buf, 1, buf, 1, nbytes)
+	    }
+	}
 
 	if (pl != NULL) {
 	    # Write to a pixel list.

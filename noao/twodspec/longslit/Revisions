@@ -1,6 +1,71 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
 longslit.cl
+    aidpars was incorrectly defined to be aidpars.cl instead of aidpars.par.
+    (11/18/97, Valdes)
+
+=====
+V2.11
+=====
+
+response.x
+    The previous change had a typo in line 264 where the index should be
+    j and not i.  (7/10/97, Valdes)
+
+=========
+V2.11Beta
+=========
+
+response.x
+doc/response.hlp
+    Change the behavior of the task with respect to the threshold parameter
+    to agree with the help page.  Previously it replaced values below
+    the threshold by the threshold value in both the normalization and
+    the data prior to dividing.  The result would not be a unit response
+    unless both the data and normalization were below the threshold.
+    The new behavior gives a unit response if either the normalization
+    or data are below the threshold.  The help page was slightly
+    modified to make the behavior even clearer.  (5/15/97, Valdes)
+
+doc/response.help
+    Fixed formating typo.  (5/15/97, Valdes)
+
+reidentify.par
+    Change default threshold value to 0. (4/22/97, Valdes)
+
+doc/fluxcalib.hlp
+    Fixed missing task name in revisions section.  (4/22/97, Valdes)
+
+demos$mktest.cl
+demos$mktestt.cl
+    Made the ARTDATA package parameters explicit.  (4/15/97, Valdes)
+
+transform/fitcoords.x
+transform/fcfitcoords.x
+transform/fcgetcoords.x
+transform/mkpkg
+    Added error checking for missing database, missing database file,
+    no coordinates, all INDEF coordinates.  (2/21/96, Valdes)
+
+doc/illumination.hlp
+    Fixed a formating error (font change).  (10/15/96, Valdes)
+
+transform/fcgetcoords.x
+    A rotated WCS is ignored in the same way as IDENTIFY.
+    (1/4/96, Valdes)
+
+=======
+V2.10.4
+=======
+
+doc/response.hlp
+doc/illumination.hlp
+doc/extinction.hlp
+doc/fluxcalib.hlp
+    Added note that DISPAXIS refers to the original dispersion axis in
+    transposed images.  (7/31/95, Valdes)
+
+longslit.cl
 longslit.men
     Added the new SFLIP task to the package.  (7/18/94, Valdes)
 

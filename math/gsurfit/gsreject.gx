@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 $if (datatype == r)
 include "gsurfitdef.h"
 $else
@@ -31,7 +30,7 @@ PIXEL	w		# weight
 int	wtflag		# type of weighting
 
 int	ii, j, k, l
-int	xorder, xxorder, xindex, yindex, ntimes
+int	maxorder, xorder, xxorder, xindex, yindex, ntimes
 pointer	sp, vzptr, mzptr, xbptr, ybptr
 PIXEL	byw, bw
 
@@ -130,6 +129,7 @@ begin
 
 	case GS_LEGENDRE, GS_CHEBYSHEV, GS_POLYNOMIAL:
 
+	    maxorder = max (GS_XORDER(sf) + 1, GS_YORDER(sf) + 1)
 	    ntimes = 0
 	    xorder = GS_XORDER(sf)
 	    do l = 1, GS_YORDER(sf) {
@@ -148,8 +148,15 @@ begin
 			if (mod (xindex, xxorder) == 0) {
 			    xindex = 1
 			    yindex = yindex + 1
-			    if (GS_XTERMS(sf) == NO)
+			    switch (GS_XTERMS(sf)) {
+			    case GS_XNONE:
 				xxorder = 1
+			    case GS_XHALF:
+				if ((yindex + GS_XORDER(sf)) > maxorder)
+				    xxorder = xxorder - 1
+			    default:
+		    		;
+			    }
 			} else
 			    xindex = xindex + 1
 		        ii = ii + 1
@@ -159,8 +166,15 @@ begin
 
 		vzptr = vzptr + xorder
 		ntimes = ntimes + xorder
-		if (GS_XTERMS(sf) == NO)
+		switch (GS_XTERMS(sf)) {
+		case GS_XNONE:
 		    xorder = 1
+		case GS_XHALF:
+		    if ((l + GS_XORDER(sf) + 1) > maxorder)
+		        xorder = xorder - 1
+		default:
+		    ;
+		}
 	    }
 
 	default:

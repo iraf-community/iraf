@@ -18,14 +18,14 @@
 
 define	FITS_RECORD	2880	# number of bytes in a standard FITS record
 
-define	FITS_BYTE	8	# Bits in a FITS byte
+define	FITS_BYTE	 8	# Bits in a FITS byte
 define	FITS_SHORT	16	# Bits in a FITS short
 define	FITS_LONG	32	# Bits in a FITS long
-define	FITS_REAL	-32	# Bits in a FITS real * -1
-define	FITS_DOUBLE	-64	# Bits in a FITS double * -1
+define	FITS_REAL      -32	# Bits in a FITS real * -1
+define	FITS_DOUBLE    -64	# Bits in a FITS double * -1
 
-define	FITSB_PREC	3	# Decimal digits of precision in a FITS byte
-define	FITSS_PREC	5	# Decimal digits of precision in a FITS short
+define	FITSB_PREC	 3	# Decimal digits of precision in a FITS byte
+define	FITSS_PREC	 5	# Decimal digits of precision in a FITS short
 define	FITSL_PREC	10	# Decimal digits of precision in a FITS long
 
 define	LSBF		NO	# Least significant byte first
@@ -41,20 +41,35 @@ define	COL_VALUE	11	# Starting column for parameter values
 # 1. SIMPLE	SIMPLE = 'F' not implemented, file skipped
 # 2. GROUPS	Group data not currently implemented, file skippped
 
+# FITS extension currently recognised by IRAF
+
+define	EXT_PRIMARY	1		# recognized and read
+define	EXT_IMAGE	2		# recognized and read
+define	EXT_TABLE	3		# recognized and skipped
+define	EXT_BINTABLE	4		# recognized and skipped
+define	EXT_UNKNOWN	5		# unrecognized and skipped
+define	EXT_SPECIAL	6		# undefined
+
 
 # Values for the following quantities are stored in the structure below.
 
-define	LEN_FITS	(15 + SZ_FNAME + 1)
+define	LEN_FITS	(20 + SZ_FNAME + 1)
 
 define	FITS_BSCALE	Memd[P2D($1)]	  # FITS scaling parameter
 define	FITS_BZERO	Memd[P2D($1+2)]   # FITS zero parameter
 define	BLANK_VALUE	Meml[P2L($1+4)]   # Blank value
 define	BLANKS		Memi[$1+5]	  # YES if blank keyword in header
 define	BITPIX		Memi[$1+6]	  # Bits per pixel (Must be an MII type)
-define	SCALE		Memi[$1+7]	  # Scale the data?
+define	SCALE		Memi[$1+7]	  # Scale the data ?
 define	SIMPLE		Memi[$1+8]	  # Standard FITS format 
 define	NRECORDS	Memi[$1+9]	  # Number of FITS logical records
-define	IRAFNAME	Memc[P2C($1+12)]  # Old IRAF name
+define	EXTEND		Memi[$1+10]	  # FITS extensions may be present
+define	XTENSION	Memi[$1+11]	  # FITS extension type
+define	PCOUNT		Memi[$1+12]	  # Number of random parameters
+define	GCOUNT		Memi[$1+13]	  # Number of groups
+define	GLOBALHDR	Memi[$1+14]	  # Global header may be present
+define	INHERIT		Memi[$1+15]	  # Inherit global header if present
+define	IRAFNAME	Memc[P2C($1+16)]  # Old IRAF name
 
 # Mapping of additional IRAF header parameters
 
@@ -78,3 +93,4 @@ define	UNKNOWN	 Memc[($1+IMU-1)*SZ_STRUCT+1]	# All unrecognized keywords
 define	SZ_OBJECT	SZ_IMTITLE
 define	SZ_HISTORY	SZ_IMHIST
 define	SZ_FCTYPE	SZ_CTYPE
+define	LEN_TYPESTR	8

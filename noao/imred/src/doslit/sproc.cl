@@ -4,14 +4,18 @@
 # correction, extinction correction, and flux calibration in as simple
 # and noninteractive manner as possible.
 
-procedure sproc (objects, arcs1, arctable, standards, dispcor, extcor, fluxcal,
-	resize, clean, splot, redo, update, quicklook, batch, listonly)
+procedure sproc (objects, arcs1, arctable, standards, crval, cdelt, dispcor,
+	extcor, fluxcal, resize, clean, splot, redo, update, quicklook, batch,
+	listonly)
 
 file	objects = ""		{prompt="List of object spectra"}
 
 file	arcs1 = ""		{prompt="List of arc spectra"}
 file	arctable = ""		{prompt="Arc assignment table (optional)"}
 file	standards = ""		{prompt="List of standard star spectra\n"}
+
+string	crval = "INDEF"		{prompt="Approximate wavelength"}
+string	cdelt = "INDEF"		{prompt="Approximate dispersion\n"}
 
 bool	dispcor = yes		{prompt="Dispersion correct spectra?"}
 bool	extcor = no		{prompt="Extinction correct spectra?"}
@@ -55,6 +59,9 @@ begin
 	}
 
 	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	mstype = ".ms" // imtype
 	n = strlen (imtype)
 
@@ -175,7 +182,7 @@ begin
 	    if (redo && access (arcref1ms))
 	        imdelete (arcref1ms, verify=no)
 	    apslitproc.references = spec
-	    sarcrefs (arcref1, done, log1, log2)
+	    sarcrefs (arcref1, crval, cdelt, done, log1, log2)
 	    apslitproc.references = ""
 
 	    if (fluxcal1)

@@ -1,4 +1,4 @@
-.help sapertures Mar92 noao.onedspec
+.help sapertures Jul95 noao.onedspec
 .ih
 NAME
 sapertures -- Set or change aperture header information
@@ -18,19 +18,22 @@ optional step size may be given by using the 'x' followed by a number.
 See \fBxtools.ranges\fR for more information.
 .le
 .ls apidtable = ""
-Aperture table.  This file consists of lines with an aperture number,
+Aperture table.  This may be either a text file or an image.
+A text file consisting of lines with an aperture number,
 beam number, dispersion type code, coordinate of the first physical
 pixel, coordinate interval per physical pixel, redshift factor,
 lower extraction aperture position, upper extraction aperture position,
-and aperture title or identification.  Any field except the aperture
-number may be given the value INDEF to indicate that the value is not
-to be changed from the current value.  Any apertures not in this table
-are assigned the values given by the task parameters described
-below.
+and aperture title or identification.  An image will contain the
+keywords SLFIBnnn with string value consisting of aperture number,
+beam number, optional right ascension and declination, and aperture title.
+Any field except the aperture number may be given the value INDEF to
+indicate that the value is not to be changed from the current value.  Any
+apertures not in this table are assigned the values given by the task
+parameters described below.
 
-As a special case a file having just the aperture number, beam number,
-and spectrum aperture identification may be used.  This file is the
-same as that used in the \fBapextract\fR package.
+As a special case a file having just the aperture number, beam number, and
+spectrum aperture identification may be used.  This file format as well as
+use of an image header is the same as that in the \fBapextract\fR package.
 .le
 .ls wcsreset = no
 Reset the world coordinate system (WCS) of the selected apertures to
@@ -104,10 +107,12 @@ interval per physical pixel, the redshift factor, the aperture extraction
 limits, and the title.  The task has parameters for each of these and the
 aperture table consists of lines starting with an aperture number followed
 by the above parameters in the list order and separated by whitespace.  As
-a special case the aperture table may be abbreviated to aperture number,
-beam number, and title to allow use of the same file used in the
-\fBapextract\fR package.  If any of the parameters are specified as INDEF
-then the value will be unchanged.
+a special case the aperture table may be a file abbreviated to aperture
+number, beam number, and title or an image with keywords SLFIBnnn
+containing the aperture number, beam number, optional right ascension and
+declination, and title.  These special cases allow use of the same file
+orimage used in the \fBapextract\fR package.  If any of the parameters are
+specified as INDEF then the value will be unchanged.
 
 If the \fIwcsreset\fR parameter is set then the aperture table and
 task aperture parameters are ignored and the selected apertures are
@@ -195,6 +200,10 @@ beam numbers:
 .fi
 .ih
 REVISIONS
+.ls SAPERTURES V2.11
+This task has been modified to allow use of image header keywords
+as done in the APEXTRACT package.
+.le
 .ls SAPERTURES V2.10.3
 This task has been greatly expanded to allow changing any of the WCS
 parameters as well as the beam number and aperture title.

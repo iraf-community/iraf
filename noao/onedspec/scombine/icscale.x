@@ -251,9 +251,9 @@ int	nimages			#I Number of images
 int	type			#O Type of value
 
 int	fd, i, nowhite(), open(), fscan(), nscan(), strdic()
-real	rval, imgetr()
+real	rval
 pointer	errstr
-errchk	open, imgetr()
+errchk	open
 
 include	"icombine.com"
 
@@ -289,8 +289,16 @@ begin
 	    }
 	} else if (name[1] == '!') {
 	    type = S_KEYWORD
-	    do i = 1, nimages
-		values[i] = imgetr (IM(sh[i]), name[2])
+	    do i = 1, nimages {
+		switch (param[1]) {
+		case 's':
+		    values[i] = ST(sh[i])
+		case 'z':
+		    values[i] = HA(sh[i])
+		case 'w':
+		    values[i] = AM(sh[i])
+		}
+	    }
 	} else {
 	    type = strdic (name, name, SZ_FNAME, dic)
 	    if (type == 0)

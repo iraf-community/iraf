@@ -133,7 +133,7 @@ standard star using the calibration file data as the source.
 .fi
 .ih
 REVISIONS
-.ls SENSFUNC V2.10.3+
+.ls SINTERP V2.10.3+
 The image header dispersion coordinate system has been updated to the
 current system.
 .le

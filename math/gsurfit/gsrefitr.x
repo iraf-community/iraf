@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include "gsurfitdef.h"
 
 # GSREFIT -- Procedure to refit the surface assuming that the x, y and w
@@ -22,7 +21,7 @@ int	ier		# ier = OK, everything OK
 			# ier = NO_DEG_FREEDOM, too few points to solve matrix
 
 int	k, l
-int	xorder, nfree
+int	xorder, nfree, maxorder
 pointer	sp, vzptr, vindex, bxptr, byptr, bwz
 
 real	adotr()
@@ -84,6 +83,7 @@ begin
 
 	    call amulr (w, z, Memr[GS_WZ(sf)], GS_NPTS(sf))
 	    xorder = GS_XORDER(sf)
+	    maxorder = max (GS_XORDER(sf) + 1, GS_YORDER(sf) + 1)
 
 	    do l = 1, GS_YORDER(sf) {
 		call amulr (Memr[GS_WZ(sf)], YBASIS(byptr), Memr[bwz],
@@ -97,8 +97,15 @@ begin
 	        }
 
 		vzptr = vzptr + xorder
-		if (GS_XTERMS(sf) == NO)
+		switch (GS_XTERMS(sf)) {
+		case GS_XNONE:
 		    xorder = 1
+		case GS_XHALF:
+		    if ((l + GS_XORDER(sf) + 1) > maxorder)
+		        xorder = xorder - 1
+		default:
+		    ;
+		}
 		byptr = byptr + GS_NPTS(sf)
 	    }
 

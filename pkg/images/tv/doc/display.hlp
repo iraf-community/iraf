@@ -1,4 +1,4 @@
-.help display Mar89 images.tv
+.help display Mar97 images.tv
 .ih
 NAME
 display -- Load and display images in an image display
@@ -13,6 +13,47 @@ Image to be loaded.
 .ls frame
 Display frame to be loaded.
 .le
+
+.ls bpmask = "BPM"
+Bad pixel mask.  The bad pixel mask is used to exclude bad pixels from the
+automatic intensity mapping algorithm.  It may also be displayed as an
+overlay or to interpolate the input image as selected by the \fIbpdisplay\fR
+parameter.  The bad pixel mask is specified by a pixel list image
+(.pl extension) or an regular image.  Non-zero values define the
+bad pixels.  The special value "BPM" may be specified to select a pixel list
+image defined in the image header under the keyword "BPM".  If the
+bad pixel mask cannot be found a warning is given and the bad pixel mask
+is not used in the display.
+.le
+.ls bpdisplay = "none" (none|overlay|interpolate)
+Type of display for the bad pixel mask.  The options are "none" to not
+display the mask, "overlay" to display as an overlay with the colors given
+by the \fIbpcolors\fR parameter, or "interpolate" to linearly interpolate
+across the bad pixels in the displayed image.  Note that the bad is still
+used in the automatic intensity scaling regardless of the type of display
+for the bad pixel mask.
+.le
+.ls bpcolors = "red"
+The mapping between bad pixel values and display colors or intensity values
+when the bad pixels are displayed as an overlay.  The syntax consists of a
+color name, a display value, or maskvalue=color assignments.  This is
+described in the OVERLAY COLOR section.
+.le
+
+.ls overlay = ""
+Overlay mask to be displayed.  The overlay mask may be a pixel list image
+(.pl extension) or a regular image.  Overlay pixels are identified by
+non-zero values.  The overlay values are displayed with a mapping given by
+the \fIocolors\fR parameter.  If the overlay cannot be found a warning is
+given and the overlay is not displayed.
+.le
+.ls ocolors = "green"
+The mapping between overlay mask values and display colors or
+intensity values.  The syntax consists of a color name, a display
+value, or maskvalue=color assignments.  This is described in the
+OVERLAY COLOR section.
+.le
+
 .ls erase = yes
 Erase frame before loading image?
 .le
@@ -34,18 +75,32 @@ Apply an automatic intensity mapping algorithm when loading the image?
 .le
 .ls contrast = 0.25
 Contrast factor for the automatic intensity mapping algorithm.
+If a value of zero is given then the minimum and maximum of the
+intensity sample is used.
 .le
 .ls zrange = yes
 If not using the automatic mapping algorithm (\fIzscale = no\fR) map the
 full range of the image intensity to the full range of the display?  If the
-displayed image has current min/max values defined these will be used 
-to determine the mapping, otherwise the image will be subsampled 
-using \fInsample_lines\fR of data and an approximate min/max value 
-will be used to determine the mapping.  The \fIMINMAX\fR task can
-be used to update the min/max values in the image header.
+displayed image has current min/max values defined these will be used to
+determine the mapping, otherwise the min/max of the intensity sample will
+be used.  The \fIMINMAX\fR task can be used to update the min/max values in
+the image header.
 .le
-.ls nsample_lines = 5
-Number of sample lines to use in the automatic intensity mapping algorithm.
+.ls zmask = ""
+Pixel mask selecting the sample pixels for the automatic or range intensity
+mapping algorithm.  The pixel mask may be a pixel list image (.pl
+extension), a regular image, or an image section.  The sample pixels are
+identified by non-zero values in the masks and by the region specified in
+an image section.  If no mask specification is given then a uniform sample
+of approximately \fInsample\fR good pixels will be used.  The \fInsample\fR
+parameter also limits the number of sample pixels used from a mask.  Note that
+pixels identified by the bad pixel mask will be excluded from the sample.
+.le
+.ls nsample = 1000 (minimum of 100)
+The number of pixels from the image sampled for computing the automatic
+intensity scaling.  This number will be uniformly sampled from the image
+if the default \fIzmask\fR is used otherwise the first \fInsample\fR
+pixels from the specified mask will be used.
 .le
 .ls xcenter = 0.5, ycenter = 0.5
 Horizontal and vertical centers of the display window in normalized
@@ -79,7 +134,7 @@ maximum display levels.
 .le
 .ls "log"
 Map the minimum and maximum image intensities linearly to the range 1 to 1000,
-take the logrithm (base 10), and then map the logrithms to the display
+take the logarithm (base 10), and then map the logarithms to the display
 range.
 .le
 .ls "none"
@@ -101,46 +156,64 @@ intensity, column 2 the desired greyscale output.
 .le
 .ih
 DESCRIPTION
-The specified image is loaded into the specified frame of the standard
-image display device ("stdimage").  For devices with more than one
-frame it is possible to load an image in a frame different than that
-displayed on the monitor.  An option allows the loaded frame to become
-the displayed frame.  The previous contents of the frame may be erased (which
+The specified image and overlay mask are loaded into the specified frame of
+the standard image display device ("stdimage").  For devices with more than
+one frame it is possible to load an image in a frame different than that
+displayed on the monitor.  An option allows the loaded frame to become the
+displayed frame.  The previous contents of the frame may be erased (which
 can be done very quickly on most display devices) before the image is
-loaded.  Without erasing, the image replaces only those pixels in the
-frame defined by the display window and spatial mapping described
-below.  This allows displaying more than one image in a frame.  An
-alternate erase option erases only those pixels in the defined display
-window which are not occupied by the image being loaded.  This is
-generally slower than erasing the entire frame and should be used only
-if a display window is smaller than the entire frame.
+loaded.  Without erasing, the image replaces only those pixels in the frame
+defined by the display window and spatial mapping described below.  This
+allows displaying more than one image in a frame.  An alternate erase
+option erases only those pixels in the defined display window which are not
+occupied by the image being loaded.  This is generally slower than erasing
+the entire frame and should be used only if a display window is smaller
+than the entire frame.
 
-The image is mapped both in intensity and in space.
-The intensity is mapped from the image pixel values to the range of display
-values in the device.  Spatial interpolation maps the image pixel
-coordinates into a part of the display frame called the display window.
-Many of the parameters of this task are related to these two transformations.
+The image is mapped both in intensity and in space.  The intensity is
+mapped from the image pixel values to the range of display values in the
+device.  Spatial interpolation maps the image pixel coordinates into a part
+of the display frame called the display window.  Many of the parameters of
+this task are related to these two transformations.
+
+A bad pixel mask may be specified to be displayed as an overlay or to
+interpolate the displayed image.  It is also used to exclude bad pixels
+from the automatic intensity scaling.  The bad pixel mask is specified by
+the parameter \fIbpmask\fR and the display mode by the \fIbpdisplay\fR
+parameter.  The overlay display option uses the \fIbpcolors\fR parameters
+to specify a color mapping as described in the OVERLAY COLOR section.
+Interpolation consists of linear interpolation across columns if the mask
+value is one, across lines if the mask value is two, or across the shortest
+direction for other values.  This interpolation is done on the input data
+before any spatial interpolation and filling is done.  It does not modify
+the input data.  The task \fBfixpix\fR provides the same algorithm to fix
+the data in the image.
+
+An overlay mask may be specified by the \fIoverlay\fR parameter.  Any
+non-zero value in the overlay mask will be displayed in the color or
+intensity specified by the \fIocolor\fR parameter (see the OVERLAY COLOR
+section).
 
 A display window is defined in terms of the full frame.  The lower left
-corner of the frame is (0, 0) and the upper right corner is (1, 1) as viewed on
-the monitor.  The display window is specifed by a center (defaulted to the
-center of the frame (0.5, 0.5)) and a size (defaulted to the full size of
-the frame, 1 by 1).  The image is loaded only within the display window and
-does not affect data outside the window; though, of course, an initial
-frame erase erases the entire frame.  By using different windows one may
-load several images in various parts of the display frame.
+corner of the frame is (0, 0) and the upper right corner is (1, 1) as
+viewed on the monitor.  The display window is specified by a center
+(defaulted to the center of the frame (0.5, 0.5)) and a size (defaulted to
+the full size of the frame, 1 by 1).  The image is loaded only within the
+display window and does not affect data outside the window; though, of
+course, an initial frame erase erases the entire frame.  By using different
+windows one may load several images in various parts of the display frame.
 
-If the option \fIfill\fR is selected the image is spatially interpolated
-to fill the display window in its largest dimension (with an aspect
-ratio of 1:1).  When the display window is not automatically filled
-the image is scaled by the magnification factors (which need not be
-the same) and centered in the display window.  If the number of image
-pixels exceeds the number of display pixels in the window only the central
-portion of the image which fills the window is loaded.  By default
-the display window is the full frame, the image is not interpolated
+If the option \fIfill\fR is selected the image and overlay mask are
+spatially interpolated to fill the display window in its largest dimension
+(with an aspect ratio of 1:1).  When the display window is not
+automatically filled the image is scaled by the magnification factors
+(which need not be the same) and centered in the display window.  If the
+number of image pixels exceeds the number of display pixels in the window
+only the central portion of the image which fills the window is loaded.  By
+default the display window is the full frame, the image is not interpolated
 (no filling and magnification factors of 1), and is centered in the frame.
-The spatial interpolation algorithm is described in the section
-MAGNIFY AND FILL ALGORITHM.
+The spatial interpolation algorithm is described in the section MAGNIFY AND
+FILL ALGORITHM.
 
 There are several options for mapping the pixel values to the display values.
 There are two steps; mapping a range of image intensities to
@@ -154,21 +227,21 @@ This is sometimes desirable because it produces a contoured image which
 is not saturated at the brightest or weakest points.
 This is the fastest method of loading the display.  Another
 transformation, "linear", maps the selected image range linearly to the full
-display range.  The logrithmic transformation, "log", maps the image range
-linearly between 1 and 1000 and then maps the logrithm (base 10) linearly
+display range.  The logarithmic transformation, "log", maps the image range
+linearly between 1 and 1000 and then maps the logarithm (base 10) linearly
 to the full display range.  In the latter transformations pixel values
 greater than selected maximum display intensity are set to the maximum
 display value and pixel values less than the minimum intensity
 are set to the minimum display value.
 
-Methods for setting of the range of image pixel values, \fIz1\fR and \fIz2\fR,
-to be mapped to the full display range are arranged in
-a heirarchy from an automatic mapping which gives generally
-good result for typical astronomical images to those requiring the user
-to specify the mapping in detail.  The automatic mapping is
-selected with the parameter \fIzscale\fR.  The automatic mapping
-algorithm is described in the section ZSCALE ALGORITHM and has two parameters,
-\fInsample_lines\fR and \fIcontrast\fR.  
+Methods for setting of the range of image pixel values, \fIz1\fR and
+\fIz2\fR, to be mapped to the full display range are arranged in a
+hierarchy from an automatic mapping which gives generally good result for
+typical astronomical images to those requiring the user to specify the
+mapping in detail.  The automatic mapping is selected with the parameter
+\fIzscale\fR.  The automatic mapping algorithm is described in the section
+ZSCALE ALGORITHM and has three parameters, \fIzmask\fR, \fInsample\fR and
+\fIcontrast\fR.
 
 When \fIztrans\fR = user, a look up table of intensity values and their
 corresponding greyscale levels is read from the file specified by the
@@ -183,11 +256,12 @@ greyscale levels.  When \fIztrans\fR = user, parameters \fIzscale\fR,
 
 If the zscale algorithm is not selected the \fIzrange\fR parameter is
 examined.  If \fIzrange\fR is yes then the minimum and maximum pixel values
-in the image are estimated and \fIz1\fR and \fIz1\fR are set to those
-values, respectively.  This insures that the full range of the image is
-displayed but is generally slower than the zscale algorithm (because all the
-image pixels must be examined) and, for images with a large dynamic range,
-will generally show only the brightest parts of the image.
+in the image are taken from the image header or estimated from the
+intensity sample and \fIz1\fR and \fIz1\fR are set to those values,
+respectively.  This insures that the full range of the image is displayed
+but is generally slower than the zscale algorithm (because all the image
+pixels must be examined) and, for images with a large dynamic range, will
+generally show only the brightest parts of the image.
 
 Finally, if the zrange algorithm is not selected the user specifies the
 values of \fIz1\fR and \fIz2\fR directly.
@@ -203,46 +277,57 @@ histogram.  This is particularly useful for astronomical images which
 generally have a very peaked histogram corresponding to the background
 sky in direct imaging or the continuum in a two dimensional spectrum.
 
-A subset of the image is examined.  Approximately 600 pixels are
-sampled evenly over the image.  The number of lines is a user parameter,
-\fInsample_lines\fR.  The pixels are ranked in brightness to
-form the function I(i) where i is the rank of the pixel and I is its value.
-Generally the midpoint of this function (the median) is very near the peak
-of the image histogram and there is a well defined slope about the midpoint
-which is related to the width of the histogram.  At the ends of the
-I(i) function there are a few very bright and dark pixels due to objects
-and defects in the field.  To determine the slope a linear function is fit
-with iterative rejection;
+The sample of pixels, specified by the non-zero values in the sample mask
+\fIzmask\fR or by an image section, is selected up to a maximum of
+\fInsample\fR pixels.  If a bad pixel mask is specified by the \fIbpmask\fR
+parameter then any pixels with mask values which are non-zero are not
+counted in the sample.  Only the first pixels up to the limit are selected
+where the order is by line beginning from the first line.  If no mask is
+specified then a grid of pixels with even spacing along lines and columns
+that make up a number less than or equal to the maximum sample size is
+used.
 
-	I(i) = intercept + slope * (i - midpoint)
+If a \fIcontrast\fR of zero is specified (or the \fIzrange\fR flag is
+used and the image does not have a valid minimum/maximum value) then
+the minimum and maximum of the sample is used for the intensity mapping
+range.
 
-If more than half of the points are rejected
-then there is no well defined slope and the full range of the sample
-defines \fIz1\fR and \fIz2\fR.  Otherwise the endpoints of the linear
-function are used (provided they are within the original range of the
-sample):
+If the contrast is not zero the sample pixels are ranked in brightness to
+form the function I(i) where i is the rank of the pixel and I is its
+value.  Generally the midpoint of this function (the median) is very near
+the peak of the image histogram and there is a well defined slope about the
+midpoint which is related to the width of the histogram.  At the ends of
+the I(i) function there are a few very bright and dark pixels due to
+objects and defects in the field.  To determine the slope a linear function
+is fit with iterative rejection;
+
+        I(i) = intercept + slope * (i - midpoint)
+
+If more than half of the points are rejected then there is no well defined
+slope and the full range of the sample defines \fIz1\fR and \fIz2\fR.
+Otherwise the endpoints of the linear function are used (provided they are
+within the original range of the sample):
 
 .nf
-	z1 = I(midpoint) + (slope / contrast) * (1 - midpoint)
-	z2 = I(midpoint) + (slope / contrast) * (npoints - midpoint)
+        z1 = I(midpoint) + (slope / contrast) * (1 - midpoint)
+        z2 = I(midpoint) + (slope / contrast) * (npoints - midpoint)
 .fi
 
 As can be seen, the parameter \fIcontrast\fR may be used to adjust the contrast
 produced by this algorithm.
 .ih
 MAGNIFY AND FILL ALGORITHM
-The spatial interpolation algorithm magnifies (or demagnifies) the
-image along each axis by the desired amount.  The fill option is a
-special case of magnification in that the magnification factors are set
-by the requirement that the image just fit the display window in its
-maximum dimension with an aspect ratio (ratio of magnifications) of 1.
-There are two requirements on the interpolation algorithm; all the
-image pixels must contribute to the interpolated image and the
-interpolation must be time efficient.  The second requirement means that
-simple linear interpolation is used.  If more complex interpolation is
-desired then tasks in the IMAGES package must be used to first
-interpolate the image to the desired size before loading the display
-frame.
+The spatial interpolation algorithm magnifies (or demagnifies) the image
+(and the bad pixel and overlay masks) along each axis by the desired
+amount.  The fill option is a special case of magnification in that the
+magnification factors are set by the requirement that the image just fit
+the display window in its maximum dimension with an aspect ratio (ratio of
+magnifications) of 1.  There are two requirements on the interpolation
+algorithm; all the image pixels must contribute to the interpolated image
+and the interpolation must be time efficient.  The second requirement means
+that simple linear interpolation is used.  If more complex interpolation is
+desired then tasks in the IMAGES package must be used to first interpolate
+the image to the desired size before loading the display frame.
 
 If the magnification factors are greater than 0.5 (sampling step size
 less than 2) then the image is simply interpolated.  However, if the
@@ -259,6 +344,77 @@ pixel-to-pixel noise is unchanged and small features may be lost due to
 the subsampling.  With block averaging pixel-to-pixel noise is reduced
 and small scale features still contribute to the displayed image.
 .ih
+OVERLAY COLORS
+The overlay mask or the overlay display option for the bad pixel mask map
+the mask values to display colors or intensities.  The mapping is described
+by the parameters \fIbpcolors\fR and \fIocolors\fR.  The syntax consists of
+a comma delimited list where each element of the list may have one of the
+follow forms:
+
+.nf
+    color
+    maskvalue=color
+    maskvalue-maskvalue=color
+.fi
+
+where color is one of a color name, a color value, or value to be added or
+subtracted to the mask value to yield a color value.  The color values are
+unsigned integers (no '+' or '-') and values to be added or subtracted are
+given as signed integers.
+
+The first form provides the default intensity or color for all mask values.
+Note that if no default color is provided the default will be white.
+The other forms map a mask value or range of mask values to a color.
+In a list the last color defined for the default or mask value will
+be used.
+
+The color values may be the names black, white, red, green, blue, yellow,
+cyan, or magenta with case ignored and abbreviations allowed.  These values
+are based on the default resource colors for the display servers and any
+custom definitions may result in incorrect colors.  DISPLAY actually loads
+intensity levels as non-negative integers.  The level zero is the
+background, levels 1 to 200 are in the range of grey levels which may be
+adjusted by the user, and values above 200 are overlay colors with the
+range 202-209 being the standard colors in the above order.  The color
+values may be specified as these levels instead of using the color names.
+The values 201 and 202 are tied to the cursor and background resource
+colors.  Values above 217 are not defined and depend on the current state
+of the color table for the window system.  The table below gives the
+standard color assignments as discussed above.
+
+.nf
+        Level   Color           Level   Color
+        201     white           210     coral
+        202     black           211     maroon
+        203     white           212     orange
+        204     red             213     khaki
+        205     green           214     orchid
+        206     blue            215     turquoise
+        207     yellow          216     violet
+        208     cyan            217     wheat
+        209     magenta
+.fi
+
+The addition or subtraction from mask values provides a mechanism to have
+the bad pixel or overlay masks encode a variety of overlay colors.  Note
+that to display the mask values directly as colors one would use the color
+value "+0".
+
+The following examples illustrate the features of the syntax.
+
+.nf
+    ocolors=""          Display in default white
+    ocolors="red"       Display in red
+    ocolors="+0"        Display mask values as color values
+    ocolors="+200"      Display mask values offset by 200
+
+    ocolors="205,1=red,2=yellow,10-20=cyan,30-40=+100"
+.fi
+
+The last example has a default color of 205, mask values of 1 are
+red, mask values of 2 are yellow, mask values of 10 to 20 are cyan,
+and mask values of 30 to 40 are display as intensities 130 to 140.
+.ih
 EXAMPLES
 For the purpose of these examples we assume a display with four frames,
 512 x 512 in size, and a display range of 0 to 255.  Also consider two
@@ -267,8 +423,8 @@ images, image1 is 100 x 200 with a range 200 to 2000 and image2 is
 default parameters:
 
 .nf
-	cl> display image1 1
-	cl> display image2 2
+        cl> display image1 1
+        cl> display image2 2
 .fi
 
 The image frames are first erased and image1 is loaded in the center of
@@ -277,30 +433,40 @@ mapping.  Only the central 512x512 area of image2 is loaded in display frame 2
 
 To load the display without any intensity transformation:
 
-	cl> cvl image1 1 ztrans=none
+        cl> cvl image1 1 ztrans=none
 
 The next example interpolates image2 to fill the full 512 horizontal range
 of the frame and maps the full image range into the display range.  Note
 that the spatial interpolation first block averages by a factor of 2 and then
 magnifies by 0.512.
 
-	cl> display image2 3 fill+ zscale-
+        cl> display image2 3 fill+ zscale-
 
 The next example makes image1 square and sets the intensity range explicitly.
 
-	cl> display image1 4 zscale- zrange- z1=800 z2=1200 xmag=2
+        cl> display image1 4 zscale- zrange- z1=800 z2=1200 xmag=2
 
 The next example loads the two images in the same frame side-by-side.
 
 .nf
-	cl> display.xsize=0.5
-	cl> display image1 fill+ xcen=0.25
-	cl> display image2 erase- fill+ xcen=0.75
+        cl> display.xsize=0.5
+        cl> display image1 fill+ xcen=0.25
+        cl> display image2 erase- fill+ xcen=0.75
 .fi
+.ih
+REVISIONS
+.ls DISPLAY V2.11
+The bad pixel mask, overlay mask, sample mask, and overlay colors
+parameters and functionality have been added.  The "nsample_lines"
+parameter is now an "nsample" parameter.
+
+Bugs in the coordinate system sent to the image display for cursor
+readback were fixed.
+.le
 .ih
 BUGS
 The "repeat" option is not implemented.
 .ih
 SEE ALSO
-cvl, magnify, implot, minmax
+cvl, magnify, implot, minmax, fixpix
 .endhelp

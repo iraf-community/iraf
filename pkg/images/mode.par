@@ -1,9 +1,0 @@
-# MODE FILTER
-
-input,f,a,,,,Input images to be fit
-output,f,a,,,,Output images
-xwindow,i,a,,,,X window size of modal filter
-ywindow,i,a,,,,Y window size of modal filter
-boundary,s,h,'nearest',,,'Boundary (constant,nearest,reflect,wrap)'
-constant,r,h,0,,,Constant for boundary extension
-mode,s,h,'ql'

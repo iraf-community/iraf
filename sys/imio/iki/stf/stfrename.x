@@ -9,8 +9,9 @@ include	"stf.h"
 # [NOTE] - Name changed to `rname' rather than `rename' to avoid a name
 # collision with the SYMTAB procedure `stfree' (first such collision!).
 
-procedure stf_rname (oroot, oextn, nroot, nextn, status)
+procedure stf_rname (kernel, oroot, oextn, nroot, nextn, status)
 
+int	kernel			#I IKI kernel
 char	oroot[ARB]		# old image root name
 char	oextn[ARB]		# old image extn
 char	nroot[ARB]		# new image root name

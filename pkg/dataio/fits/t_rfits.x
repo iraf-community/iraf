@@ -4,29 +4,22 @@ include <error.h>
 include <fset.h>
 include "rfits.h"
 
-define	MAX_RANGES	100		# the maxium number of ranges
 define	NTYPES		7		# the number of image data types
 
 # RFITS -- Read FITS format data.  Further documentation given in rfits.hlp
 
 procedure t_rfits()
 
-char	infile[SZ_FNAME]		# fits file
-char	file_list[SZ_LINE]		# list of tape files
-char	outfile[SZ_FNAME]		# IRAF file
-char	in_fname[SZ_FNAME]		# input file name
-char	out_fname[SZ_FNAME]		# output file name
+int	inlist, outlist, len_inlist, len_outlist
+int	file_number, offset, stat, first_file, last_file
+pointer	sp, infile, file_list, outfile, ext_list, in_fname, out_fname
+pointer	pl, axes
 
-int	len_inlist, len_outlist
-int	range[MAX_RANGES*3+1], file_number, offset, stat
-pointer	inlist, outlist
-
-bool	clgetb()
+bool	clgetb(), pl_linenotempty()
 char	clgetc()
 int	rft_get_image_type(), clgeti(), mtfile(), strlen(), btoi(), fntlenb()
-int	rft_read_fitz(), decode_ranges(), get_next_number(), fntgfnb(), fstati()
-int	mtneedfileno(), fntrfnb()
-pointer	fntopnb()
+int	rft_read_fitz(), fntgfnb(), fstati(), mtneedfileno(), fntrfnb()
+pointer	fntopnb(), rft_flist()
 real	clgetr(), rft_fe()
 
 include	"rfits.com"
@@ -36,8 +29,18 @@ begin
 	if (fstati (STDOUT, F_REDIR) == NO)
 	    call fseti (STDOUT, F_FLUSHNL, YES)
 
+	# Allocate working space.
+	call smark (sp)
+	call salloc (infile, SZ_FNAME, TY_CHAR)
+	call salloc (file_list, SZ_LINE, TY_CHAR)
+	call salloc (outfile, SZ_FNAME, TY_CHAR)
+	call salloc (ext_list, SZ_LINE, TY_CHAR)
+	call salloc (in_fname, SZ_FNAME, TY_CHAR)
+	call salloc (out_fname, SZ_FNAME, TY_CHAR)
+	call salloc (axes, 2, TY_INT)
+
 	# Get RFITS parameters.
-	call clgstr ("fits_file", infile, SZ_FNAME)
+	call clgstr ("fits_file", Memc[infile], SZ_FNAME)
 	long_header = btoi (clgetb ("long_header"))
 	short_header = btoi (clgetb ("short_header"))
 	len_record = FITS_RECORD
@@ -45,43 +48,53 @@ begin
 	make_image = btoi (clgetb ("make_image"))
 
 	# Open the input file list.
-	if (mtfile (infile) == YES) {
+	call clgstr ("file_list", Memc[ext_list], SZ_LINE)
+	if (mtfile (Memc[infile]) == YES) {
 	    inlist = NULL
-	    if (mtneedfileno (infile) == YES)
-	        call clgstr ("file_list", file_list, SZ_LINE)
-	    else
-	        call strcpy ("1", file_list, SZ_LINE)
+	    if (mtneedfileno (Memc[infile]) == YES) {
+	        call strcpy (Memc[ext_list], Memc[file_list], SZ_LINE)
+	    } else {
+		call sprintf (Memc[file_list], SZ_LINE, "1[%s]")
+		    call pargstr (Memc[ext_list])
+	    }
 	} else {
-	    inlist = fntopnb (infile, NO)
+	    inlist = fntopnb (Memc[infile], NO)
 	    len_inlist = fntlenb (inlist)
 	    if (len_inlist > 0) {
-	        call sprintf  (file_list, SZ_LINE, "1-%d")
-		    call pargi (len_inlist)
-	    } else
-	        call sprintf  (file_list, SZ_LINE, "0")
+		if (Memc[ext_list] == EOS) {
+	            call sprintf  (Memc[file_list], SZ_LINE, "1-%d[0]")
+		        call pargi (len_inlist)
+		        #call pargstr (Memc[ext_list])
+		} else {
+	            call sprintf  (Memc[file_list], SZ_LINE, "1-%d[%s]")
+		        call pargi (len_inlist)
+		        call pargstr (Memc[ext_list])
+		}
+	    } else {
+	        call sprintf  (Memc[file_list], SZ_LINE, "0[%s]")
+		    call pargstr (Memc[ext_list])
+	    }
 	}
 
 	# Decode the ranges string.
-	if (decode_ranges (file_list, range, MAX_RANGES, len_inlist) == ERR)
-	    call error (1, "T_RFITS: Illegal file number list")
+	pl = rft_flist (Memc[file_list], first_file, last_file, len_inlist) 
+	if (pl == NULL || len_inlist <= 0)
+	    call error (1, "T_RFITS: Illegal file/extensions number list")
 
 	# Open the output file list.
 	if (make_image == YES) {
-	    call clgstr ("iraf_file", outfile, SZ_FNAME)
-	    if (outfile[1] == EOS) {
+	    call clgstr ("iraf_file", Memc[outfile], SZ_FNAME)
+	    if (Memc[outfile] == EOS) {
 		if (old_name == YES)
-		    call mktemp ("tmp", outfile, SZ_FNAME) 
+		    call mktemp ("tmp$", Memc[outfile], SZ_FNAME) 
 		else
 		    call error (0, "T_RFITS: Undefined output file name")
 	    }
-	    outlist = fntopnb (outfile, NO)
+	    outlist = fntopnb (Memc[outfile], NO)
 	    len_outlist = fntlenb (outlist)
-	    data_type = rft_get_image_type (clgetc ("datatype"))
-	    scale = btoi (clgetb ("scale"))
-	    blank = clgetr ("blank")
 	    offset = clgeti ("offset")
 	} else {
-	    outfile[1] = EOS
+	    Memc[outfile] = EOS
 	    outlist = NULL
 	    len_outlist = 1
 	}
@@ -89,45 +102,57 @@ begin
 	    call error (0,
 	        "T_RFITS: Output and input lists have different lengths")
 
+	# Get the remaining parameters.
+	data_type = rft_get_image_type (clgetc ("datatype"))
+	scale = btoi (clgetb ("scale"))
+	blank = clgetr ("blank")
+
 	# Get the scan size parameter.
-	fe = rft_fe (infile)
+	fe = rft_fe (Memc[infile])
 
 	# Read successive FITS files, convert and write into a numbered
 	# succession of output IRAF files.
 
-	file_number = 0
-	while (get_next_number (range, file_number) != EOF) {
+	do file_number = first_file, last_file {
+
+	    # Get the next file number.
+	    Memi[axes] = 1
+	    Memi[axes+1] = file_number
+	    if (! pl_linenotempty (pl, Memi[axes]))
+		next
 
 	    # Get the input file name.
 	    if (inlist != NULL) {
-		if (fntgfnb (inlist, in_fname, SZ_FNAME) == EOF)
+		if (fntgfnb (inlist, Memc[in_fname], SZ_FNAME) == EOF)
 		    call error (0, "T_RFITS: Error reading input file name")
 	    } else {
-		if (mtneedfileno (infile) == YES)
-		    call mtfname (infile, file_number, in_fname, SZ_FNAME)
+		if (mtneedfileno (Memc[infile]) == YES)
+		    call mtfname (Memc[infile], file_number, Memc[in_fname],
+		        SZ_FNAME)
 		else
-	            call strcpy (infile, in_fname, SZ_FNAME)
+	            call strcpy (Memc[infile], Memc[in_fname], SZ_FNAME)
 	    }
 
 	    # Get the output file name.
 	    if (outlist == NULL) {
-		out_fname[1] = EOS
+		Memc[out_fname] = EOS
 	    } else if (len_inlist > len_outlist) {
-		if (fntrfnb (outlist, 1, out_fname, SZ_FNAME) == EOF)
-	            call strcpy (outfile, out_fname, SZ_FNAME)
+		if (fntrfnb (outlist, 1, Memc[out_fname], SZ_FNAME) == EOF)
+	            call strcpy (Memc[outfile], Memc[out_fname], SZ_FNAME)
 	        if (len_inlist > 1) {
-		    call sprintf (out_fname[strlen(out_fname)+1], SZ_FNAME,
-		        "%04d")
+		    call sprintf (Memc[out_fname+strlen(Memc[out_fname])],
+		        SZ_FNAME, "%04d")
 		        call pargi (file_number + offset)
 	        }
-	    } else if (fntgfnb (outlist, out_fname, SZ_FNAME) == EOF)
+	    } else if (fntgfnb (outlist, Memc[out_fname], SZ_FNAME) == EOF)
 		call error (0, "T_RFITS: Error reading output file name")
 
 	    # Convert FITS file to the output IRAF file. If EOT is reached
 	    # then exit. If an error is detected then print a warning and
 	    # continue with the next file.
 
-	    iferr (stat = rft_read_fitz (in_fname, out_fname))
+	    iferr (stat = rft_read_fitz (Memc[in_fname], Memc[out_fname],
+	        pl, file_number))
 		call erract (EA_FATAL)
 	    if (stat == EOF)
 		break
@@ -137,6 +162,10 @@ begin
 	    call fntclsb (inlist) 
 	if (outlist != NULL)
 	    call fntclsb (outlist) 
+	if (pl != NULL)
+	    call pl_close (pl)
+
+	call sfree (sp)
 end
 
 

@@ -1,27 +1,27 @@
-#!/bin/csh
+# .cshrc - csh resource script, read at beginning 
+#	   of execution by each shell
 
 umask 022
 
-setenv SHELL /bin/csh
-setenv XFILESEARCHPATH ":/usr/lib/X11/%T/%N%S:/iraf/iraf/local/bin/%T/%N%S"
-setenv PATH ".:/usr/local/bin:/bin:/usr/bin:/iraf/iraf/local/bin:/usr/X11/bin:/sbin:/usr/games:"
-setenv PAGER "less -C -E -M"
-setenv IPAGER "less -C -M +G"
-unsetenv LESSPIPE
+set path = (. /sbin /bin /usr/sbin /usr/bin /usr/games \
+	/usr/local/bin /usr/local/sbin \
+	/usr/X11R6/bin $HOME/bin)
 
-set history = 200
-set prompt = "%n@%m% "
+if ($?prompt) then
+	# An interactive shell -- set some stuff up
+	set filec
+	set history = 100
+	set savehist = 100
+	set mail = (/var/mail/$USER)
 
-alias cls	'clear;ls'
-alias clw	'clear;w'
-alias pg	'less -Cqm -b256'
-alias his	'history | tail -15'
-alias sp	'clear; tail -f spool'
-alias man	'setenv PAGER "less -Cqm"; /usr/bin/man'
+	set prompt = "$user@`hostname`% "
 
-if ($?iraf == 0) then
-    setenv iraf /iraf/iraf/
+	# make mail(1) happy:
+	setenv	crt	24
 endif
-if ($?MACH == 0) then
-    source $iraf/unix/hlib/irafuser.csh
-endif
+
+alias	new	'find . \! -type d -mtime -7 -print'
+alias	newt	'find . \! -type d -mtime -7 -print | grep -v '\''\.[aoe]$'\'
+alias	newt2	'find . \! -type d -mtime -14 -print | grep -v '\''\.[aoe]$'\'
+alias	newt3	'find . \! -type d -mtime -21 -print | grep -v '\''\.[aoe]$'\'
+alias	newt4	'find . \! -type d -mtime -31 -print | grep -v '\''\.[aoe]$'\'

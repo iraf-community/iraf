@@ -1,6 +1,7 @@
 # APEDIT
 
 input,s,a,,,,List of input images to edit
+apertures,s,h,"",,,Apertures
 references,s,h,"",,,"Reference images
 "
 interactive,b,h,yes,,,Run task interactively?

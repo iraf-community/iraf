@@ -8,7 +8,8 @@ procedure set_header (ccd)
 pointer	ccd			# CCD structure
 
 int	nc, nl
-pointer	sp, str, out
+real	shift[2]
+pointer	sp, str, out, mw, mw_openim()
 long	clktime()
 
 begin
@@ -59,6 +60,12 @@ begin
 		    call pargi (BIAS_L2(ccd))
 		call hdmpstr (out, "biassec", Memc[str])
 	    }
+
+	    mw = mw_openim (out)
+	    shift[1] = 1 - IN_C1(ccd)
+	    shift[2] = 1 - IN_L1(ccd)
+	    call mw_shift (mw, shift, 3)
+	    call mw_saveim (mw, out)
 	}
 
 	# Set mean value if desired.

@@ -23,8 +23,8 @@ begin
 
 	call amovkr (INDEFR, Memr[AP_INTENSITY(rprof)], AP_RPNPTS(rprof))
 	call amovkr (INDEFR, Memr[AP_TINTENSITY(rprof)], AP_RPNPTS(rprof))
-	call amovkr (0.0, Memr[AP_AREA(phot)], AP_NAPERTS(phot))
-	call amovkr (0.0, Memr[AP_SUMS(phot)], AP_NAPERTS(phot))
+	call amovkd (0.0d0, Memd[AP_AREA(phot)], AP_NAPERTS(phot))
+	call amovkd (0.0d0, Memd[AP_SUMS(phot)], AP_NAPERTS(phot))
 	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot))
 	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot))
 end
@@ -56,11 +56,14 @@ begin
 	do i = 1, AP_NAPERTS(phot) {
 	    rapert = AP_SCALE(ap) * Memr[AP_APERTS(phot)+i-1]
 	    if (rapert <= rdist) {
-		pier = AP_OK
 		AP_NMAXAP(phot) = i
 	    } else {
-		pier = AP_APERT_OUTOFBOUNDS
 		break
 	    }
 	}
+
+	if (AP_NMAXAP(phot) < AP_NAPERTS(phot))
+	    pier = AP_APERT_OUTOFBOUNDS
+	else
+	    pier = AP_OK
 end

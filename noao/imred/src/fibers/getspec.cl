@@ -10,10 +10,13 @@ bool	ccdproc			{prompt="Add CCDPROC keyword and continue?",
 struct	*fd
 
 begin
-	string	imtype, temp, image, system
+	string	imtype, temp, image, system=""
 	int	n, n1
 
 	imtype = "." // envget ("imtype")
+	n = stridx (",", imtype)
+	if (n > 0)
+	    imtype = substr (imtype, 1, n-1)
 	n1 = strlen (imtype)
 
 	# Initialize files

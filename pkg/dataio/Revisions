@@ -1,5 +1,95 @@
 .help revisions Jun88 pkg.dataio
 .nf
+dataio$import/t_import.x
+dataio$import/ipobands.gx
+    Fixed a bug in which use of the red()/green()/blue() functions caused
+    the size of the output image to be computed incorrectly. (12/12/97 MJF)
+
+dataio$fits/fits_read.x
+    Fixed a bug in the header listing code which resulted in rfits reading
+    through the whole image after listing the data when EXTENSION = N.
+    (11/3/97 LED)
+
+dataio$fits/fits_read.x
+    Fixed a bug in the global header handling code that could result a
+    the global image header being left in the tmp$ directory.
+    (8/6/97 LED)
+
+dataio$wfits.par
+dataio$fits/t_wfits.x
+dataio$doc/wfits.hlp
+    Added a new parameter call fextn whose default value is "fits" to the
+    wfits task. A ".fextn" suffix is appended to the output disk file names
+    to ensure that they are compatable with the fits kernel.
+    (6/20/97 LED)
+
+dataio$rfits.par
+dataio$wfits.par
+dataio$doc/rfits.hlp
+dataio$doc/wfits.hlp
+dataio$fits/fits_cards.x
+dataio$fits/fits_files.x
+dataio$fits/fits_params.x
+dataio$fits/fits_read.x
+dataio$fits/fits_rheader.x
+dataio$fits/fits_rimage.x
+dataio$fits/fits_rpixels.x
+dataio$fits/fits_wheader.x
+dataio$fits/fits_wimage.x
+dataio$fits/fits_wpixels.x
+dataio$fits/fits_write.x
+dataio$fits/mkpkg
+dataio$fits/rfits.com
+dataio$fits/rfits.h
+dataio$fits/t_rfits.x
+dataio$fits/t_wfits.x
+dataio$fits/wfits.com
+dataio$fits/wfits.h
+    Installed new versions of rfits and wfits. The new rfits and wfits
+    include support for: 1) reading and writing multi-extension fits files,
+    2) reading and writing global header, 3) reading and writing ushort
+    images by default when appropriate.
+    (6/9/97 LED)
+
+
+dataio$doc/export.hlp
+dataio$export/excmap.x
+dataio$export/cmaps.inc
+    Added the 'overlay' cmap as a builtin cmap. (6/6/97)
+
+dataio$export/expreproc.x
+    Removed a call to scale the colormaps when using the default values.
+    Cmaps are now only scaled when a brightness/contrast value is set in
+    the setcmap() function.  (6/6/97  MJF)
+
+dataio$export/bltins/exgif.x
+    Fixed a small error in the output of GIF files causing some display
+    programs to complain.  GIF images which would now be an odd number of
+    bytes have an extra trailing ';' delimiter.  This should be harmless
+    as all processing is supposed to stop once that char is found. (6/6/97 MJF)
+
+dataio$mkpkg
+dataio$dataio.cl
+dataio$dataio.hd
+dataio$dataio.men
+dataio$x_dataio.x
+dataio$import/			+
+dataio$import.par		+
+dataio$export/			+
+dataio$export.par		+
+dataio$doc/import.hlp		+
+dataio$doc/export.hlp		+
+    Installed the IMPORT/EXPORT task for general use.  The images database
+    used by the IMPORT task is currently defined to be dataio$import/images.dat.
+    (3/31/97 MJF)
+
+
+dataio$fits/fits_rheader.x
+    Explictly set SIMPLE(fits) to YES the first time this card is encountered
+    so that duplicate fits SIMPLE cards are properly filtered out. Duplicate
+    SIMPLE cards are illegal fits so this should never happen but ...
+    (6/28/96 Davis).
+
 dataio$fits/fits_cards.x
     Added some wfits code to filter any "END     " keywords out of the image
     header userarea.

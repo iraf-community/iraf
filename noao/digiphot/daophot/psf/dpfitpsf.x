@@ -709,7 +709,7 @@ begin
 	call mktemp ("tmp", Memc[wimname], SZ_FNAME)
 
 	# Open a temporary image to hold the weights.
-	wim = immap (Memc[wimname], NEW_IMAGE, TY_CHAR)
+	wim = immap (Memc[wimname], NEW_IMAGE, 0)
 	IM_NDIM(wim) = 2
 	IM_LEN(wim,1) = DP_PNUM(psf)
 	IM_LEN(wim,2) = DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit) 

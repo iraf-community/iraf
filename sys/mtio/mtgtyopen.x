@@ -28,15 +28,16 @@ pointer procedure mt_gtyopen (device, ufields)
 char	device[ARB]			#I local device name (incl node)
 char	ufields[ARB]			#I optional user tapecap fields
 
-int	len_ufields
-bool	first_time, capseen
+int	len_ufields, junk
 char	c_device[SZ_DEVICE]
 char	c_ufields[SZ_DEVCAP]
-pointer	c_gty, gty, sp, tapecap, fname, dname, devcap, ip, op
+bool	first_time, capseen, remote
+pointer	c_gty, gty, sp, tapecap, devcap, ip, op
+pointer	fname, dname, nname, tname
 
 bool	streq()
 pointer	gtyopen()
-int	envfind(), stridxs(), strlen(), gstrcpy()
+int	envfind(), stridxs(), strlen(), gstrcpy(), ki_gnode()
 errchk	gtyopen, syserrs
 data	first_time /true/
 
@@ -59,7 +60,9 @@ begin
 	call salloc (tapecap, SZ_DEVCAP, TY_CHAR)
 	call salloc (devcap, SZ_DEVCAP, TY_CHAR)
 	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (tname, SZ_PATHNAME, TY_CHAR)
 	call salloc (dname, SZ_FNAME, TY_CHAR)
+	call salloc (nname, SZ_FNAME, TY_CHAR)
 
 	# Get tapecap definition.
 	if (envfind ("tapecap", Memc[tapecap], SZ_DEVCAP) <= 0)
@@ -90,14 +93,28 @@ begin
 	if (stridxs ("!", Memc[fname]) <= 0)
 	    call ki_xnode (device, Memc[fname], SZ_PATHNAME)
 
+	# Get the node name the device is on.
+	remote = (ki_gnode (Memc[fname], Memc[nname], junk) != 0)
+
 	# Get the tapecap device name minus any node prefix.
 	call strcpy (device, Memc[dname], SZ_FNAME)
 	call ki_xnode ("", Memc[dname], SZ_FNAME)
 
-	# Open the tapecap entry.
-	iferr (gty = gtyopen (Memc[fname], Memc[dname], Memc[devcap]))
-	    call syserrs (SYS_MTTAPECAP, device)
-	else if (gty == NULL)
+	# Open the tapecap entry.  Try "tapecap.<node>" first then "tapecap".
+	# <node> is the hostname of the host the tape device is on, i.e. the
+	# network server on which the drive is located.  The "tapecap.<node>"
+	# feature allows a shared common IRAF installation to support distinct
+	# tapecap files for different servers, falling back on the standard
+	# tapecap file if no node-specific file is found.
+
+	call strcpy (Memc[fname], Memc[tname], SZ_PATHNAME)
+	call strcat (".", Memc[tname], SZ_PATHNAME)
+	call strcat (Memc[nname], Memc[tname], SZ_PATHNAME)
+
+	iferr (gty = gtyopen (Memc[tname], Memc[dname], Memc[devcap]))
+	    iferr (gty = gtyopen (Memc[fname], Memc[dname], Memc[devcap]))
+		call syserrs (SYS_MTTAPECAP, device)
+	if (gty == NULL)
 	    call syserrs (SYS_MTTAPECAP, device)
 
 	# Update the cache.

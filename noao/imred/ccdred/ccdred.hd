@@ -6,6 +6,7 @@ badpiximage	hlp=doc$badpiximage.hlp
 ccdgroups	hlp=doc$ccdgroups.hlp
 ccdhedit	hlp=doc$ccdhedit.hlp
 ccdlist		hlp=doc$ccdlist.hlp
+ccdmask		hlp=doc$ccdmask.hlp
 ccdproc		hlp=doc$ccdproc.hlp
 combine		hlp=doc$combine.hlp
 cosmicrays	hlp=doc$cosmicrays.hlp

@@ -10,18 +10,20 @@ include	"qpio.h"
 # QPIO_MKINDEX -- Make an index for the event list associated with the QPIO
 # descriptor.  The event list must have been already written out, in sorted
 # order according to the given key.  Once an event list is indexed it cannot
-# be further extended or otherwise modified.  In QPOE, only short integer
+# be further extended or otherwise modified.  In QPOE, only short and int
 # coordinate fields can be used to construct an index.  The key fields are
 # specified as, e.g., "s10,s8" or "(s10,s8)" (Y // X), where the field name
-# is the datatype code followed by the decimal byte offset of the field in
-# the event struct.
+# is the datatype code (s for short, i for int) followed by the decimal byte
+# offset of the field in the event struct.  Both fields do not have to be
+# the same datatype.
 
 procedure qpio_mkindex (io, key)
 
 pointer	io			#I QPIO descriptor
 char	key[ARB]		#I list of key fields
 
-pointer	sp, tokbuf, ip, in, ev, ov, lv, oo, bp
+bool	xint, yint, isint
+pointer	sp, tokbuf, ip, in, ev, ev_i, ov, lv, oo, bp
 int	ox, line, nevents, szs_event, ncols, nlines, nout, x, y, i
 int	token, offset, xoff, yoff, len_index, nev, fd, sv_evi, firstev
 
@@ -43,6 +45,8 @@ begin
 	# Key defaults to sort x/y.
 	xoff = IO_EVXOFF(io)
 	yoff = IO_EVYOFF(io)
+	xint = (IO_EVXTYPE(io) == TY_INT)
+	yint = (IO_EVYTYPE(io) == TY_INT)
 
 	# Parse key list (macro references are permitted) to get offsets of
 	# the X and Y coordinate fields to be used as the index key.
@@ -57,12 +61,22 @@ begin
 		break
 
 	    call strlwr (Memc[tokbuf])
-	    if (Memc[tokbuf] != 's')
+	    if (Memc[tokbuf] == 'i')
+		isint = true
+	    else if (Memc[tokbuf] == 's')
+		isint = false
+	    else
 		call syserrs (SYS_QPXYFNS, key)
+	    if (i == 1)
+		xint = isint
+	    else
+		yint = isint
 
 	    ip = tokbuf + 1
 	    if (ctoi (Memc, ip, offset) <= 0)
 		call syserrs (SYS_QPBADKEY, key)
+	    else if (isint)
+		offset = offset / (SZ_INT * SZB_CHAR)
 	    else
 		offset = offset / (SZ_SHORT * SZB_CHAR)
 
@@ -90,10 +104,18 @@ begin
 	    call eprintf ("qpio_mkindex (%xX, `%s')\n")
 		call pargi (io)
 		call pargstr (key)
-	    call eprintf ("nevents=%d, evsize=%d, xoff=%d, yoff=%d\n")
+	    call eprintf ("nevents=%d, evsize=%d, xkey=%c%d, ykey=%c%d\n")
 		call pargi (IO_NEVENTS(io))
 		call pargi (szs_event)
+		if (xint)
+		    call pargc ('i')
+		else
+		    call pargc ('s')
 		call pargi (xoff)
+		if (yint)
+		    call pargc ('i')
+		else
+		    call pargc ('s')
 		call pargi (yoff)
 	}
 
@@ -124,8 +146,20 @@ begin
 	    nout = 0
 
 	    do i = 1, nev {
-		x = max(1, min(ncols,  int(Mems[ev+xoff])))
-		y = max(1, min(nlines, int(Mems[ev+yoff])))
+		ev_i = (ev - 1) * SZ_SHORT / SZ_INT + 1
+
+		if (xint)
+		    x = Memi[ev_i+xoff]
+		else
+		    x = Mems[ev+xoff]
+
+		if (yint)
+		    y = Memi[ev_i+yoff]
+		else
+		    y = Mems[ev+yoff]
+
+		x = max(1, min(ncols,  x))
+		y = max(1, min(nlines, y))
 
 		if (IO_DEBUG(io) > 4) {
 		    # Egads!  Dump every photon.
@@ -210,8 +244,18 @@ begin
 	IO_INDEXLEN(io) = len_index
 	IO_YOFFVP(io) = ov
 	IO_YLENVP(io) = lv
+
 	IO_IXXOFF(io) = xoff
 	IO_IXYOFF(io) = yoff
+
+	if (xint)
+	    IO_IXXTYPE(io) = TY_INT
+	else
+	    IO_IXXTYPE(io) = TY_SHORT
+	if (yint)
+	    IO_IXYTYPE(io) = TY_INT
+	else
+	    IO_IXYTYPE(io) = TY_SHORT
 
 	if (IO_DEBUG(io) > 1) {
 	    call eprintf ("index.offv %d words at offset %d\n")

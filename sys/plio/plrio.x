@@ -174,18 +174,32 @@ begin
 			call syserrs (SYS_PLSTKOVFL, "plr_open")
 
 		    # Push the four quadrants of this region on the stack.
+		    # If the region we are subdividing is only one pixel
+		    # wide in either axis then only two of the regions will
+		    # be valid.  The invalid regions will have zero pixels
+		    # in one axis or the other, i.e. (v2[i] < v1[i]).  If
+		    # a region is invalid discard it by not advancing the
+		    # stack pointer.
+
 		    V1(el,1) = v1[1];    V1(el,2) = vm[2]
 		    V2(el,1) = vm[1]-1;  V2(el,2) = v2[2]
-		    el = el + LEN_REGDES
+		    if (V1(el,1) <= V2(el,1) && V1(el,2) <= V2(el,2))
+			el = el + LEN_REGDES
+
 		    V1(el,1) = vm[1];    V1(el,2) = vm[2]
 		    V2(el,1) = v2[1];    V2(el,2) = v2[2]
-		    el = el + LEN_REGDES
+		    if (V1(el,1) <= V2(el,1) && V1(el,2) <= V2(el,2))
+			el = el + LEN_REGDES
+		    
 		    V1(el,1) = v1[1];    V1(el,2) = v1[2]
 		    V2(el,1) = vm[1]-1;  V2(el,2) = vm[2]-1
-		    el = el + LEN_REGDES
+		    if (V1(el,1) <= V2(el,1) && V1(el,2) <= V2(el,2))
+			el = el + LEN_REGDES
+
 		    V1(el,1) = vm[1];    V1(el,2) = v1[2]
 		    V2(el,1) = v2[1];    V2(el,2) = vm[2]-1
-		    el = el + LEN_REGDES
+		    if (V1(el,1) <= V2(el,1) && V1(el,2) <= V2(el,2))
+			el = el + LEN_REGDES
 		}
 	    } else {
 		# Set entire region to a constant mask value.

@@ -1,7 +1,0 @@
-# Parameters for task imreplace.
-
-images,s,a,,,,Images to be editted
-value,r,a,,,,Replacement value
-imaginary,r,h,0.,,,Imaginary component for complex
-lower,r,h,INDEF,,,Lower limit of replacement window
-upper,r,h,INDEF,,,Upper limit of replacement window

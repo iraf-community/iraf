@@ -15,6 +15,8 @@ begin
 	for (ip=1;  str[ip] != EOS && str[ip] != '\n';  ip=ip+1) {
 	    sc_scanbuf[op] = str[ip]
 	    op = op + 1
+	    if (op >= SZ_SCANBUF)
+		break
 	}
 
 	sc_scanbuf[op] = EOS

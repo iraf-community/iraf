@@ -61,7 +61,7 @@ begin
 	    nmissing = 0
 	    Memi[ranges] = 0
 	    Memi[ranges+1] = 0
-	    Memi[ranges+2] = 0
+	    Memi[ranges+2] = 1
 	    Memi[ranges+3] = NULL
 	} else {
 	    if (decode_ranges (Memc[nullinput], Memi[ranges], MAX_NRANGES,

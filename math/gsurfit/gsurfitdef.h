@@ -53,8 +53,6 @@ define	GS_SAVEYMAX	$1[8]
 
 # data type
 
-define	MEM_TYPE	TY_REAL
-define	VAR_TYPE	real
 define	DELTA		EPSILON
 
 # miscellaneous

@@ -1,8 +1,8 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<mach.h>
-include "zdisplay.h"
-include "iis.h"
+include	"zdisplay.h"
+include	"iis.h"
 
 # IISERS -- Erase IIS frame.
 
@@ -16,7 +16,7 @@ int	iisflu(), andi()
 include	"iis.com"
 
 begin
-	erase = andi (ERASE, 0177777B)
+	call achtiu (andi (ERASE, 0177777B), erase, 1)
 
 	# IMTOOL special - IIS frame bufrer configuration code.
 	tid = IWRITE+BYPASSIFM+BLOCKXFER

@@ -9,9 +9,10 @@ include	<plio.h>
 
 # PLF_OPEN -- Open a PMIO mask on an image descriptor.
 
-procedure plf_open (im, o_im,
+procedure plf_open (kernel, im, o_im,
 	root, extn, ksection, cl_index, cl_size, acmode, status)
 
+int	kernel			#I IKI kernel
 pointer	im			#I image descriptor
 pointer	o_im			#I [not used]
 char	root[ARB]		#I root image name
@@ -22,10 +23,10 @@ int	cl_size			#I [not used]
 int	acmode			#I [not used]
 int	status			#O ok|err
 
-int	naxes, axlen[IM_MAXDIM], depth
 pointer	sp, fname, hp, pl
+int	naxes, axlen[IM_MAXDIM], depth
+bool	envgetb(), fnullfile()
 pointer	pl_open()
-bool	envgetb()
 int	access()
 errchk	imerr
 
@@ -33,6 +34,13 @@ begin
 	call smark (sp)
 	call salloc (fname, SZ_PATHNAME, TY_CHAR)
 	call salloc (hp, IM_LENHDRMEM(im), TY_CHAR)
+
+	# The only valid cl_index for a PL image is -1 (none specified) or 1.
+	if (!(cl_index < 0 || cl_index == 1)) {
+	    call sfree (sp)
+	    status = ERR
+	    return
+	}
 
 	# Get mask file name.
 	call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
@@ -43,10 +51,13 @@ begin
 
 	if (acmode == NEW_IMAGE || acmode == NEW_COPY) {
 	    # Check that we will not be clobbering an existing mask.
-	    if (access (Memc[fname], 0, 0) == YES)
-		if (!envgetb ("clobber")) {
+	    if (!fnullfile(Memc[fname]) && access (Memc[fname], 0, 0) == YES)
+		if (envgetb ("imclobber")) {
+		    iferr (call delete (Memc[fname]))
+			;
+		} else {
 		    call pl_close (pl)
-		    call imerr (IM_NAME(im), SYS_FCLOBBER)
+		    call imerr (IM_NAME(im), SYS_IKICLOB)
 		}
 	} else {
 	    # Load the named mask if opening an existing mask image.

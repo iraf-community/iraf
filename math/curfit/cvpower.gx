@@ -32,8 +32,10 @@ $endif
 begin
 	$if (datatype == r)
 	function = cvstati (cv, CVTYPE)
+	ncoeff = cvstati (cv, CVNCOEFF)
 	$else
 	function = dcvstati (cv, CVTYPE)
+	ncoeff = dcvstati (cv, CVNCOEFF)
 	$endif
 
 	if (function != LEGENDRE && function != CHEBYSHEV) {

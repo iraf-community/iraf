@@ -64,23 +64,22 @@ define	B_STRNUM		Memi[$1+3]	# used to read list
 define	B_STRINDX		Memi[$1+$2-1+4]	# index of string
 
 # FNTU descriptor structure.
-define	LEN_FNTUHDR		292
+define	LEN_FNTUHDR		(10+1024+256)
 define	FNTU_MAGIC		5664
 define	U_MAGIC			Memi[$1]
 define	U_FILDES		Memi[$1+1]
 define	U_TEMPLATE		Memi[$1+2]	# pointer
 define	U_TEMPLATE_INDEX	Memi[$1+3]
 define	U_PATTERN		(P2C($1+10))
-define	U_LDIR			(P2C($1+210))
+define	U_LDIR			(P2C($1+1034))
 
 # Special characters and size limiting definitions.
 define	TOK_DELIM		','		# token delimiter
 define	LIST_FILE_CHAR		'@'		# @listfile
 define	CH_EDIT			'%'		# string substitution metachar
-define	SZ_PATTERN		199
-define	SZ_TEMPLATE		161
-define	SZ_LDIR			81
-define	SZ_PATSTR		81
+define	SZ_PATTERN		1023
+define	SZ_LDIR			255
+define	SZ_PATSTR		1023
 define	MAX_EDIT		8
 define	MAX_PATTERNS		8
 

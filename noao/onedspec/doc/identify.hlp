@@ -1,7 +1,16 @@
-.help identify Mar93 noao.onedspec
+.help identify Jan96 noao.onedspec
 .ih
 NAME
 identify -- Identify features in one dimensional image vectors
+.ih
+SUMMARY
+Features are interactively marked in one dimensional image vectors.
+The features may be spectral lines when the vector is a spectrum
+or profile positions when the vector is a spatial cut.  A function
+may be fit to the user coordinates as a function of pixel coordinates.
+This is primarily used to find dispersion functions for spectra
+such as arc-line calibration spectra.  The profile position measurements
+are generally used for geometric calibrations.
 .ih
 USAGE
 identify images
@@ -11,11 +20,10 @@ PARAMETERS
 List of images in which to identify features and fit coordinate functions.
 .le
 .ls section = "middle line"
-If an image is not one dimensional or given as a one dimensional image
+If an image is not one dimensional or specified as a one dimensional image
 section then the image section given by this parameter is used.  The
-section is used to define the initial vector and the direction (columns,
-lines, or "z") of the image vectors to be fit.  The image is still considered
-to be two or three dimensional and it is possible to change the data vector
+section defines a one dimensional vector.  The image is still considered to
+be two or three dimensional.  It is possible to change the data vector
 within the program.
 
 The section parameter may be specified directly as an image section or
@@ -28,21 +36,32 @@ first|middle|last|# [first|middle|last|#] line|column|x|y|z
 
 where each field can be one of the strings separated by | except for #
 which is an integer number.  The field in [] is a second designator
-which is used with 3D data.  See the example section for examples of
-this syntax.  Abbreviations are allowed though beware
-that 'l' is not a sufficient abbreviation.
+which is used with three dimensional data.  See the example section for
+examples of this syntax.  Abbreviations are allowed though beware that 'l'
+is not a sufficient abbreviation.
 .le
 .ls database = "database"
 Database in which the feature data and coordinate functions are recorded.
 .le
 .ls coordlist = "linelists$idhenear.dat"
-User coordinate list consisting of an ordered list of line coordinates.
-Some standard line lists are available in the directory "linelists$":
+User coordinate list consisting of an ordered list of line coordinates.  A
+comment line of the form "# units <units>", where <units> is one of the
+understood units names, defines the units of the line list.  If no units
+are specified then Angstroms are assumed.  Some standard line lists are
+available in the directory "linelists$".  The standard line lists are
+described under the topic \fIlinelists\fR.
+.le
+.ls units = ""
+The units to use if no database entry exists.  The units are specified as
+described in
 
 .nf
-	cl> dir linelists
-	cl> page linelists$README
+    cl> help onedspec.package section=units
 .fi
+
+If no units are specified and a coordinate list is used then the units of
+the coordinate list are selected.  If a database entry exists then the
+units defined there override both this parameter and the coordinate list.
 .le
 .ls nsum = "10"
 Number of lines, columns, or bands across the designated vector axis to be
@@ -53,10 +72,10 @@ dimensional axis  (the first number applies to the lower axis number and
 the second to the higher axis number).  If a second number is not specified
 the first number is used for both axes.
 .le
-.ls match = 5.
+.ls match = -3.
 The maximum difference for a match between the feature coordinate function
-value and a coordinate in the coordinate list.  The unit of this parameter
-is that of the user coordinates.
+value and a coordinate in the coordinate list.  Positive values
+are in user coordinate units and negative values are in units of pixels.
 .le
 .ls maxfeatures = 50
 Maximum number of the strongest features to be selected automatically from
@@ -72,13 +91,13 @@ Type of features to be identified.  The possibly abbreviated choices are
 "emission" and "absorption".
 .le
 .ls fwidth = 4.
-Width in pixels of features to be identified.
+Full-width at the base (in pixels) of features to be identified.
 .le
 .ls cradius = 5.
 The maximum distance, in pixels, allowed between a feature position
 and the initial estimate when defining a new feature.
 .le
-.ls threshold = 10.
+.ls threshold = 0.
 In order for a feature center to be determined the range of pixel intensities
 around the feature must exceed this threshold.
 .le
@@ -115,9 +134,11 @@ rejected regardless of their residuals.
 
 The following parameters control the input and output.
 .ls autowrite = no
-Automatically write or update the database?  If no then attempting to
-exit the program if the feature data and fit have been modified results
-in a query.  If yes exiting the program automatically updates the database.
+Automatically write or update the database?  If "no" then when exiting the
+program a query is given if the feature data and fit have been modified.
+The query is answered with "yes" or "no" to save or not save the results.
+If \fIautowrite\fR is "yes" exiting the program automatically updates the
+database.
 .le
 .ls graphics = "stdgraph"
 Graphics device.  The default is the standard graphics device which is
@@ -127,6 +148,24 @@ generally a graphics terminal.
 Cursor input file.  If a cursor file is not given then the standard graphics
 cursor is read.
 .le
+
+The following parameters are queried when the 'b' key is used.
+.ls crval, cdelt
+These parameters specify an approximate coordinate value and coordinate
+interval per pixel when the automatic line identification
+algorithm ('b' key) is used.  The coordinate value is for the
+pixel specified by the \fIcrpix\fR parameter in the \fBaidpars\fR
+parameter set.  The default value of \fIcrpix\fR is INDEF which then
+refers the coordinate value to the middle of the spectrum.  By default
+only the magnitude of the coordinate interval is used.  Either value
+may be given as INDEF.  In this case the search for a solution will
+be slower and more likely to fail.  The values may also be given as
+keywords in the image header whose values are to be used.
+.le
+.ls aidpars = "" (parameter set)
+This parameter points to a parameter set for the automatic line
+identification algorithm.  See \fIaidpars\fR for further information.
+.le
 .ih
 CURSOR KEYS
 .ls ?
@@ -135,6 +174,10 @@ Clear the screen and print a menu of options.
 .ls a
 Apply next (c)enter or (d)elete operation to (a)ll features
 .le
+.ls b
+Identify features and find a dispersion function automatically using
+the coordinate line list and approximate values for the dispersion.
+.le
 .ls c
 (C)enter the feature nearest the cursor.  Used when changing the position
 finding parameters or when features are defined from a previous feature list.
@@ -142,6 +185,10 @@ finding parameters or when features are defined from a previous feature list.
 .ls d
 (D)elete the feature nearest the cursor.  (D)elete all features when preceded
 by the (a)ll key.  This does not affect the dispersion function.
+.le
+.ls e
+Find features from a coordinate list without doing any fitting.  This is
+like the 'l' key without any fitting.
 .le
 .ls f
 (F)it a function of the pixel coordinates to the user coordinates.  This enters
@@ -164,7 +211,9 @@ Go to the next line, column, or band in a 2D/3D or multispec image.
 .ls l
 (L)ocate features in the coordinate list.  A coordinate function must be
 defined or at least two features must have user coordinates from which a
-coordinate function can be determined.
+coordinate function can be determined.  If there are features an
+initial fit is done, then features are added from the coordinate list,
+and then a final fit is done.
 .le
 .ls m
 (M)ark a new feature using the cursor position as the initial position
@@ -200,6 +249,7 @@ is \fInot\fR recentered.  This is used to mark an arbitrary position.
 .ls u
 Enter a new (u)ser coordinate for the current feature.
 When (m)arking a new feature the user coordinate is also requested.
+.le
 .ls v
 Modify the fitting weight of the current feature.  The weights are
 integers with the lowest weight being the default of 1.
@@ -207,13 +257,13 @@ integers with the lowest weight being the default of 1.
 .ls w
 (W)indow the graph.  A window prompt is given and a number of windowing
 options may be given.  For more help type '?' to the window prompt or
-see help under \gIgtools\fR.
+see help under \fIgtools\fR.
 .le
 .ls x
-Crosscorrelate features with the data peaks and reregister.  This is generally
-used with a feature list from a different image.
-The mean shift in user coordinates, mean shift in pixels, and the fractional
-shift in user coordinates is printed.
+Find a zero point shift for the current dispersion function.  This is used
+by starting with the dispersion solution and features from a different
+spectrum.  The mean shift in user coordinates, mean shift in pixels, and
+the fractional shift in user coordinates is printed.
 .le
 .ls y
 Up to \fImaxfeatures\fR emission peaks are found automatically (in order of
@@ -316,13 +366,14 @@ user coordinate list may be defined to automatically identify additional
 features.  This task is used to measure positions of features,
 determine dispersion solutions for spectra, and to identify features in
 two and three dimensional images for mapping a two or three dimensional
-coordinate transformation.
+coordinate transformation.  Because of this dual use the terms vector
+and feature are used rather than spectrum and spectral line.
 
 Each image in the input list is considered in turn.  If the image is
 not one dimensional or a one dimensional section of an image
 then the image section given by the parameter
 \fIsection\fR is used.  This parameter may be specified in several ways as
-described in the parameter and examples sections.  The image section is used
+described in the PARAMETERS and EXAMPLES sections.  The image section is used
 to select a starting vector and image axis.
 
 If the image is not one dimensional or in multispec format then the number
@@ -341,59 +392,70 @@ the CURSOR KEYS section and described further below.  The standard
 cursor mode keys are also available to window and redraw the graph and
 to produce hardcopy "snaps".
 
-There are two types of feature selection functions;  defining new
-features and selecting previously defined features.  The key 'm' marks
-a new feature nearest the cursor position.  The feature position is
-determined by the feature centering algorithm (see help for
-\fBcenter1d\fR).  If the new position is within a distance given by the
-parameter \fIminsep\fR of a previous feature it is considered to be the
-same feature and replaces the old feature.  Normally the position of
-the new feature will be exactly the same as the original feature.  The
-coordinate list is searched for a match between the coordinate function
-value (when defined) and a user coordinate in the list.  If a match is
-found it becomes the default user coordinate which the user may
-override.  The new feature is marked on the graph and it becomes the
-current feature.  The redefinition of a feature which is within the
+There are a number of ways of defining features.  They fall into
+two categories; interactively defining features with the cursor
+and using automatic algorithms.
+
+The 'm' key is the principle interactive feature marking method.  Typing
+'m' near the position of a feature applies a feature centering algorithm
+(see \fBcenter1d\fR) and, if a center is found, the feature is entered in
+the feature list and marked on the spectrum.  If the new position is within
+a distance given by the parameter \fIminsep\fR of a previous feature it is
+considered to be the same feature and replaces the old feature.  Normally
+the position of a new feature will be exactly the same as the original
+feature.  The coordinate list is searched for a match between the
+coordinate function value (when defined) and a user coordinate in the
+list.  If a match is found it becomes the default user coordinate which the
+user may override.  The new feature is marked on the graph and it becomes
+the current feature.  The redefinition of a feature which is within the
 minimum separation may be used to set the user coordinate from the
-coordinate list.  The key 't' allows setting the position of a feature
-to other than that found by the centering algorithm.
+coordinate list.  The 't' key allows setting the position of a feature to
+other than that found by the centering algorithm.
 
-The 'y' key applies a peak finding algorithm to the one dimensional image
-vector.  Up to the maximum number of features (\fImaxfeatures\fR) are
-found.  If there are more peaks only the strongest are kept.  The peaks
-are then matched against the coordinate list to find user coordinate values.
+The principle automatic feature identification algorithm is executed
+with the 'b' key.  The user is queried for an approximate coordinate
+value and coordinate interval per pixel.  The coordinate value
+is for the center of the spectrum by default though this may be changed
+with the \fBaidpars\fR parameters.  Only the magnitude of the
+coordinate interval per pixel is used by default though this also
+may be changed.  Either value may be given as INDEF to do an unconstrained
+search, however, this will be much slower and more likely to fail.
+The algorithm searches for matches between the strong lines in the
+spectrum and lines in the coordinate list.  The algorithm is described
+in the documentation for \fBaidpars\fR.
 
-To select a different feature as the current feature the keys '.', 'n', '+',
-and '-' are used.  The '.' selects the feature nearest the cursor, the
-'n' and '+' select the next feature, and the '-' selects the previous
-feature relative to the current feature in the feature list as ordered
-by pixel coordinate.  These keys are useful when redefining the user
-coordinate with the 'u' key, changing the fitting weight of a feature
-with 'v', and when examining features in zoom mode.
+The 'b' key works with no predefined dispersion solution or features.  If
+two or more features are identified, with 'm', spanning the range of the
+data or if a coordinate function is defined, from a previous solution, then
+the 'e', 'l', and 'y' keys may be used to identify additional features from
+a coordinate list.  The 'e' key only adds features at the coordinates of
+the line lists if the centering algorithm finds a feature at that
+wavelength (as described below).  The 'y' key works in reverse by finding
+the prominent features using a peak finding algorithm and then looking in
+the coordinate list for entries near the estimated position.  Up to a
+maximum number of features (\fImaxfeatures\fR) will be selected.  If there
+are more peaks only the strongest are kept.  In either of these cases there
+is no automatic fitting and refitting of the dispersion function.
 
-If two or more features are identified spanning the range of the
-data or if a coordinate function is defined then the 'l' key may be
-used to identify additional features from a coordinate list.  If a
-coordinate function is not defined the default function is fit to the
-user coordinates of the currently defined features.  Then for each
-coordinate value in the coordinate list the pixel coordinate is determined
-and a search for a feature at that point is made.  If a feature is found
-(based on the parameters \fIftype, fwidth\fR, \fIcradius\fR, and 
-\fBthreshold\fR) its
-user coordinate value based on the coordinate function is determined.
-If the coordinate function value matches the user coordinate from the
-coordinate list within the error limit set by the parameter \fImatch\fR
-then the new feature is entered in the feature list.  Up to a maximum
-number of features, set by the parameter \fImaxfeatures\fR, may be defined
-in this way.  A new user coordinate function is fit to all the located
-features.  Finally, the graph is redrawn in user coordinates with
-the additional features found from the coordinate list marked.
+The 'l' key combines automatic fits with locating lines from the coordinate
+list.  If two or more features are defined an initial fit is made.  Then
+for each coordinate value in the coordinate list the pixel coordinate is
+determined and a search for a feature at that point is made.  If a feature
+is found (based on the parameters \fIftype, fwidth\fR, \fIcradius\fR, and
+\fBthreshold\fR) its user coordinate value based on the coordinate function
+is determined.  If the coordinate function value matches the user
+coordinate from the coordinate list within the error limit set by the
+parameter \fImatch\fR then the new feature is entered in the feature list.
+Up to a maximum number of features, set by the parameter \fImaxfeatures\fR,
+may be defined in this way.  A new user coordinate function is fit to all
+the located features.  Finally, the graph is redrawn in user coordinates
+with the additional features found from the coordinate list marked.
 
-A minimum of two features must be defined for this algorithm to work.
-However, three or more features are preferable to determine changes
+A minimum of two features must be defined for the 'l' key algorithm to
+work.  However, three or more features are preferable to determine changes
 in the dispersion as a function of position.
 
-The key 'f' fits a function of the pixel coordinates to the user
+The 'f' key fits a function of the pixel coordinates to the user
 coordinates.  The type of function, order and other fitting parameters
 are initially set with the parameters \fIfunction, order, sample,
 niterate, low_reject, high_reject\fR and \fIgrow\fR..  The value of the
@@ -417,6 +479,15 @@ This is only an approximate correction for shifts in the raw spectra
 since these shifts are in pixels and the coordinate function should
 also be appropriately shifted.
 
+One a set of features is defined one may select features for various
+operations.  To select feature as the current feature the keys '.', 'n',
+'+', and '-' are used.  The '.' selects the feature nearest the cursor, the
+'n' and '+' select the next feature, and the '-' selects the previous
+feature relative to the current feature in the feature list as ordered by
+pixel coordinate.  These keys are useful when redefining the user
+coordinate with the 'u' key, changing the fitting weight of a feature with
+'v', and when examining features in zoom mode.
+
 Features may be deleted with the key 'd'.  All features are deleted
 when the 'a' key immediately precedes the delete key.  Deleting the
 features does not delete the coordinate function.  Features deleted in the
@@ -429,7 +500,7 @@ is examined, such as when going to the next image in the input list,
 changing image lines or columns with 'j', 'k' and 'o', or selecting
 a new image with the ":image" command, the current feature list and coordinate
 function are kept.  Alternatively, a database record from a different
-image may be read with the ":read" command.  When transfering feature
+image may be read with the ":read" command.  When transferring feature
 identifications between images the feature coordinates will not agree exactly
 with the new image feature positions and several options are available to
 reregister the feature positions.  The key 'c' centers the feature nearest
@@ -441,22 +512,31 @@ centering algorithm are changed.  An additional options is the ":add"
 command to add features from a database record.  This does not overwrite
 previous features (or the fitting functions) as does ":read".
 
-The (c)entering function is applicable when the shift between the
-current and true feature positions is small.  Larger shifts may be
-determined automatically with the 'x' function which correlates
-features in the image with the feature list.  The features are then
-recentered.  A zero point shift may also be given interactively with
-the 's' key by using the cursor to indicate the coordinate of a point
-in the spectrum.  If there are no features then the shift is exactly as
-marked by the cursor but if there are features the approximate shift is
-applied and then the features are recentered.  The shift is then the
-mean shift of the features after recentering.  The shift is used as a
-zero point offset added to the dispersion function.  The shift is
-in user coordinates.
+The (c)entering function is applicable when the shift between the current
+and true feature positions is small.  Larger shifts may be determined
+automatically with the 's' or 'x' keys.
+
+A zero point shift is specified interactively with the 's' key by using the
+cursor to indicate the coordinate of a point in the spectrum.  If there are
+no features then the shift is exactly as marked by the cursor.  If there
+are features the specified shift is applied, the features are recentered,
+and the mean shift for all the features is determined.
+
+The 'x' key uses the automatic line identification algorithm (see
+\fBaidpars\fR) with the constraint that the dispersion is nearly the
+same and the is primarily a shift in the coordinate zero point.  If
+features are defined, normally by inheritance from another spectrum, then a
+first pass is done to identify those features in the spectrum.  Since this
+only works when the shifts are significantly less than the dispersion range
+of the spectrum (i.e. a significant number of features are in common) a
+second pass using the full coordinate line list is performed if a shift
+based on the features is not found.  After a shift is found any features
+remaining from the original list are recentered and a mean shift is
+computed.
 
 In addition to the single keystroke commands there are commands initiated
 by the key ':' (colon commands).  As with the keystroke commands there are
-a number of standard graphics features available begining with ":."
+a number of standard graphics features available beginning with ":."
 (type ":.help" for these commands).  The identify colon commands
 allow the task parameter values to be listed and to be reset
 within the task.  A parameter is listed by typing its name.  The colon command
@@ -549,7 +629,7 @@ The polynomial can be expressed as the sum
 .fi
 
 where the the c_i are the coefficients and the z_i are defined
-interatively as:
+interactively as:
 
 .nf
 	z_1 = 1
@@ -566,7 +646,7 @@ The polynomial can be expressed as the sum
 .fi
 
 where the the c_i are the coefficients and the z_i are defined
-interatively as:
+interactively as:
 
 .nf
 	z_1 = 1
@@ -625,7 +705,7 @@ spectrum an arc calibration is used.  Three emission features are marked
 and the (l)ocate key is used to find additional features from a
 coordinate list of arc lines.  The dispersion solution is fit interactively
 and badly determined or misidentified lines are deleted.  The
-solution may be written to the database or transfered to the object
+solution may be written to the database or transferred to the object
 spectrum by reading the object image and deleting all the features.
 Deleting the features does not delete the coordinate function.
 .le
@@ -687,6 +767,25 @@ in the first column.
 
 .ih
 REVISIONS
+.ls IDENTIFY V2.11
+The dispersion units are now determined from a user parameter,
+the coordinate list, or the database entry.
+
+A new key, 'e', has been added to add features from a line list without
+doing any fits.  This is like the 'l' but without the automatic
+fitting before and after adding new features.
+
+A new key, 'b', has been added to apply an automatic line identification
+algorithm.
+
+The 'x' key has been changed to use the automatic line identification
+algorithm.  The allows finding much larger shifts.
+
+The match parameter may now be specified either in user coordinates or
+in pixels.  The default is now 3 pixels.
+
+The default threshold value has been changed to 0.
+.le
 .ls IDENTIFY V2.10.3
 The section and nsum parameter syntax was extended to apply to 3D
 images.  The previous values and defaults may still be used.
@@ -705,10 +804,7 @@ colon command "add" may be used to add features based on some other
 spectrum or arc type and then apply the fit to the combined set of features.
 .le
 .ih
-NOTES
-The coordinates and image data are double precision.
-The double precision curve fitting procedures are used.
-.ih
 SEE ALSO
-center1d, gtools, icfit, reidentify
+autoidentify, reidentify, aidpars, center1d, linelists, fitcoords, icfit,
+gtools
 .endhelp

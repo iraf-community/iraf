@@ -10,7 +10,8 @@ cl < doslit$doslittasks.cl
 task	sparams		= "ctioslit$sparams.par"
 
 # Onedspec tasks
-task	continuum,
+task	autoidentify,
+	continuum,
 	deredden,
 	dispcor,
 	dopcor,
@@ -24,6 +25,7 @@ task	continuum,
 	splot,
 	specplot,
 	specshift	= "onedspec$x_onedspec.e"
+task	aidpars		= "onedspec$aidpars.par"
 task	bplot		= "onedspec$bplot.cl"
 task	scopy		= "onedspec$scopy.cl"
 task	dispcor1	= "onedspec$dispcor1.par"

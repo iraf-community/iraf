@@ -38,7 +38,7 @@ order,s,h,)apfind.order,,,">apfind.order
 
 # RECENTERING PARAMETERS
 "
-apertures,s,h,)aprecenter.apertures,,,>aprecenter.apertures
+aprecenter,s,h,)aprecenter.aprecenter,,,>aprecenter.aprecenter
 npeaks,r,h,)aprecenter.npeaks,,,>aprecenter.npeaks
 shift,b,h,)aprecenter.shift,,,">aprecenter.shift
 

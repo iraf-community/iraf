@@ -18,11 +18,13 @@ char	logfile[SZ_FNAME], labels[SZ_LINE, IGSPARAMS]
 bool	answer
 int	ncoords, logfd, axes[2]
 real	xmin, xmax, ymin, ymax
-pointer	gp, gplog, gt, coords, title
+pointer	gp, gplog, gt, coords, title, un
 
 int	fntgfntb(), open(), igs_geti(), scan()
 real	xgseval()
 pointer	gopen(), gt_init()
+
+errchk	fc_getcoords
 
 begin
 	# Print a header to the log files giving the inputs.  This is
@@ -54,14 +56,7 @@ begin
 	# freed.
 
 	call fc_getcoords (database, list, axis, xmin, xmax, ymin, ymax,
-	    coords, ncoords, labels)
-
-	# If no image features are found then return a null surface pointer.
-
-	if (ncoords == 0) {
-	    sf = NULL
-	    return
-	}
+	    coords, ncoords, labels, un)
 
 	# Read points from the deletion list.
 
@@ -190,7 +185,7 @@ begin
 	        call gargb (answer)
 	}
 	if (answer)
-	    call fc_dbwrite (database, fitname, axis, sf)
+	    call fc_dbwrite (database, fitname, axis, un, sf)
 
 	# Write list of deleted points.
 
@@ -210,5 +205,7 @@ begin
 	# Free memory.
 
 	call mfree (coords, TY_REAL)
+	if (un != NULL)
+	    call un_close (un)
 	call xgsfree (sf)
 end

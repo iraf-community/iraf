@@ -17,6 +17,9 @@ begin
 	file	in, out
 	string	tmpin, inname
 
+        # Cache the istable parameters.
+        cache ("istable")
+
 	# Get the positional parameters.
 	in = infiles
 	out = outfile

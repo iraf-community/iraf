@@ -44,6 +44,7 @@ int	nsymbols = 0;			/* number of defined symbols	*/
 int	ifstate[SZ_IFSTACK];		/* $IF stack			*/
 int	iflev;				/* $IF stack pointer		*/
 int	debug = 0;			/* print debug messages		*/
+int	dbgout = 0;			/* compile for debugging	*/
 int	verbose = NO;			/* print informative messages	*/
 int	ignore = YES;			/* ignore warns			*/
 int	execute = YES;			/* think but don't act?		*/
@@ -59,7 +60,7 @@ int	argc;
 char	*argv[];
 {
 	struct	context *cx;
-	char	lflags[SZ_LINE+1];
+	char	flags[SZ_LINE+1];
 	char	*symargs[MAX_ARGS], *modules[MAX_ARGS];
 	int	islib, nsymargs=0, nmodules=0, i;
 	char	**argp, *ip, *op;
@@ -81,7 +82,7 @@ char	*argv[];
 	exit_status = OK;
 	ifstate[0]  = PASS;
 	iflev       = 0;
-	lflags[0]   = EOS;
+	flags[0]    = EOS;
 	islib       = YES;
 	npkg	    = 0;
 
@@ -109,6 +110,10 @@ char	*argv[];
 			debug++;
 			verbose = YES;
 			break;
+		    case 'x':
+		    case 'g':
+			dbgout++;
+			goto addflag;
 		    case 'n':
 			execute = NO;
 			verbose = YES;
@@ -136,7 +141,7 @@ char	*argv[];
 			    strcpy (irafdir, *argp++);
 			break;
 		    default:
-			for (op=lflags;  *op;  op++)
+addflag:		for (op=flags;  *op;  op++)
 			    ;
 			*op++ = ' ';
 			*op++ = '-';
@@ -218,11 +223,27 @@ char	*argv[];
 	    }
 	}
 
+	/* Append any flags given on the command line to XFLAGS.
+	 */
+	if (flags[0]) {
+	    char   new_xflags[SZ_LINE+1];
+	    sprintf (new_xflags, "%s %s", getsym(XFLAGS), flags);
+	    putsym (XFLAGS, new_xflags);
+	}
+
+	/* Append any flags given on the command line to XVFLAGS.
+	 */
+	if (flags[0]) {
+	    char   new_xvflags[SZ_LINE+1];
+	    sprintf (new_xvflags, "%s %s", getsym(XVFLAGS), flags);
+	    putsym (XVFLAGS, new_xvflags);
+	}
+
 	/* Append any flags given on the command line to LFLAGS.
 	 */
-	if (lflags[0]) {
+	if (flags[0]) {
 	    char   new_lflags[SZ_LINE+1];
-	    sprintf (new_lflags, "%s %s", getsym(LFLAGS), lflags);
+	    sprintf (new_lflags, "%s %s", getsym(LFLAGS), flags);
 	    putsym (LFLAGS, new_lflags);
 	}
 

@@ -26,7 +26,7 @@ begin
 	call fprintf (fd, "\n%s\n")
 	    call pargstr (str)
 	call fprintf (fd, "Features identified in image %s.\n")
-	    call pargstr (Memc[ID_IMAGE(id)])
+	    call pargstr (ID_IMAGE(id))
 
 	call fprintf (fd, "   %8s %10s %10s %10s %6s %2s %s\n")
 	    call pargstr ("Pixel")

@@ -119,8 +119,8 @@ begin
 	# Copy rejected point list and limit values.
 	call amovi  (MEMP[in_getp (insrc, INLREJPTS)],
 	    MEMP[in_getp (indst, INLREJPTS)], in_geti (indst, INLNPTS))
-	call amovd (MEMP[in_getp (insrc, INLXMIN)],
-	    MEMP[in_getp (indst, INLXMIN)], in_geti (indst, INLNVARS))
-	call amovd (MEMP[in_getp (insrc, INLXMAX)],
-	    MEMP[in_getp (indst, INLXMAX)], in_geti (indst, INLNVARS))
+	call amovd (Memd[in_getp (insrc, INLXMIN)],
+	    Memd[in_getp (indst, INLXMIN)], in_geti (indst, INLNVARS))
+	call amovd (Memd[in_getp (insrc, INLXMAX)],
+	    Memd[in_getp (indst, INLXMAX)], in_geti (indst, INLNVARS))
 end

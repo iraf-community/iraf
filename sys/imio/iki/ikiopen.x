@@ -14,77 +14,101 @@ include "iki.h"
 
 procedure iki_open (n_im, image, ksection, cl_index, cl_size, acmode, o_im)
 
-pointer	n_im			# descriptor of new image (to be filled in)
-char	image[ARB]		# name of image or cl_index to be opened
-char	ksection[ARB]		# information to be passed on to kernel
-int	cl_index		# index of image within cl_index
-int	cl_size			# number of images in cl_index
-int	acmode			# access mode
-pointer	o_im			# existing image descriptor, if new_copy
+pointer	n_im			#I descriptor of new image (to be filled in)
+char	image[ARB]		#I name of image or cl_index to be opened
+char	ksection[ARB]		#I information to be passed on to kernel
+int	cl_index		#I index of image within cl_index
+int	cl_size			#I number of images in cl_index
+int	acmode			#I access mode
+pointer	o_im			#I existing image descriptor, if new_copy
 
-bool	can_inherit_type
-pointer	sp, root, extn
-int	status, cluster_mode, k
-int	envfind()
+bool	inherit
+pointer	sp, root, extn, textn, fextn
+int	status, clmode, i, k
+errchk	syserrs, zcalla
 include	"iki.com"
-errchk	syserrs
 
 begin
 	call smark (sp)
 	call salloc (root, SZ_PATHNAME, TY_CHAR)
 	call salloc (extn, MAX_LENEXTN, TY_CHAR)
+	call salloc (textn, MAX_LENEXTN, TY_CHAR)
+	call salloc (fextn, MAX_LENEXTN, TY_CHAR)
 
 	# Compute the access mode for the ACCESS test, below.  If opening an
 	# existing image, all we want to do here is test for the existence of
 	# the image.  If opening a new image, use new image mode.
 
 	if ((acmode == NEW_IMAGE || acmode == NEW_COPY))
-	    cluster_mode = NEW_IMAGE
+	    clmode = NEW_IMAGE
 	else
-	    cluster_mode = 0		# test for existence of cluster
+	    clmode = 0
 
 	# Parse the image name into the root and extn fields.
 	call iki_parse (image, Memc[root], Memc[extn])
 
-	# If opening a new copy image, make it the same type as the old image
-	# unless an explicit extension was given.  If we are opening a new
-	# image and no extension was given, check the environment variable
-	# IMTYPE to see what type of image to create.  If opening an existing
-	# image, call the access routines to determine the image type.  The
-	# image type is defined by the filename extension if given.
+	# If we are opening a new image and an explicit extension is given
+	# this determines the type of image to be created.  Otherwise if we
+	# are opening a new copy image and type inheritance is enabled, the
+	# new image will be the same type as the old one.  Otherwise (new
+	# image, type not specified or inherited) the default image type 
+	# specified by the IMTYPE mechanism is used.  If opening an existing
+	# image the access method of each image kernel is called until a
+	# kernel recognizes the image.
 
 	repeat {
-	    if (acmode == NEW_COPY) {
-		k = IM_KERNEL(o_im)
-		can_inherit_type = (and (IKI_FLAGS(k), IKF_NOCREATE) == 0)
-	    } else
-		can_inherit_type = true
+	    # Is type inheritance permitted?
+	    inherit = (k_inherit == YES)
+	    if (inherit && acmode == NEW_COPY)
+		inherit = (and (IKI_FLAGS(IM_KERNEL(o_im)), IKF_NOCREATE) == 0)
 
-	    if (acmode == NEW_COPY && Memc[extn] == EOS && can_inherit_type) {
+	    # Select the kernel to be used.
+	    if (acmode == NEW_COPY && Memc[extn] == EOS && inherit) {
+		# Inherit the same type as an existing image.
 		k = IM_KERNEL(o_im)
 		break
+
+	    } else if (clmode == NEW_IMAGE && Memc[extn] == EOS) {
+		# Use the default type for new images.
+		k = k_defimtype
+		break
+
 	    } else {
-		if (cluster_mode == NEW_IMAGE)
-		    if (Memc[extn] == EOS)
-			if (envfind (ENV_DEFIMTYPE,Memc[extn],MAX_LENEXTN) <= 0)
-			    call strcpy (DEF_IMTYPE, Memc[extn], MAX_LENEXTN)
-
 		# Select an image kernel by calling the access function in each
-		# loaded kernel until somebody claims the image.  Note that in
-		# the case of a new image, the access function tests only the
-		# legality of the extn.  If no extn is given but the imagefile
-		# has an extension, the access procedure will fill in the extn
-		# field.
+		# loaded kernel until somebody claims the image.  In the case
+		# of a new image, the access function tests only the legality
+		# of the extn.  If no extn is given but the imagefile has an
+		# extension, the access procedure will fill in the extn field.
 
-		for (k=1;  k <= k_nkernels;  k=k+1) {
-		    call zcall4 (IKI_ACCESS(k), Memc[root], Memc[extn],
-			cluster_mode, status)
-		    if (status == YES)
-			break
+		k = 0
+		for (i=1;  i <= k_nkernels;  i=i+1) {
+		    call strcpy (Memc[extn], Memc[textn], MAX_LENEXTN)
+		    call zcall5 (IKI_ACCESS(i), i, Memc[root], Memc[textn],
+			clmode, status)
+
+		    if (status == YES) {
+			if (k == 0) {
+			    # Stop on the first match if an explicit extension
+			    # was given.
+
+			    k = i
+			    call strcpy (Memc[textn], Memc[fextn], MAX_LENEXTN)
+			    if (Memc[extn] != EOS)
+				break
+
+			} else if (Memc[extn] == EOS) {
+			    # If no extension was given and we match multiple
+			    # files then we have an ambiguous name and k=ERR.
+
+			    k = ERR
+			    break
+			}
+		    }
 		}
 
-		if (k > k_nkernels)
-		    k = 0
+		# Update the selected extn field.
+		if (k > 0)
+		    call strcpy (Memc[fextn], Memc[extn], MAX_LENEXTN)
 
 		# If the search failed and an extension was given, maybe what
 		# we thought was an extension was really just part of the root
@@ -98,19 +122,29 @@ begin
 	    }
 	}
 
+	# The image name is ambiguous; we don't know which image to open.
+	# This can only happen when opening an existing image and multiple
+	# images exist matching the name given.  It is permissible to create
+	# multiple images with the same name but different types.
+
+	if (k == ERR)
+	    call syserrs (SYS_IKIAMBIG, IM_NAME(n_im))
+
 	# Illegal image type or image does not exist.
-	if (k == 0)
+	if (k == 0) {
 	    if (acmode == NEW_IMAGE || acmode == NEW_COPY)
 		call syserrs (SYS_IKIEXTN, IM_NAME(n_im))
 	    else
 		call syserrs (SYS_IKIOPEN, IM_NAME(n_im))
+	}
 
+	# Set the image kernel (format) to be used.
 	IM_KERNEL(n_im) = k
 
 	# Open/create the image.  Save the kernel index in the image header
 	# so that subsequent IKI routines know which kernel to use.
 
-	call zcall9 (IKI_OPEN(k), n_im, o_im, Memc[root], Memc[extn],
+	call zcalla (IKI_OPEN(k), k, n_im, o_im, Memc[root], Memc[extn],
 	    ksection, cl_index, cl_size, acmode, status)
 	if (status == ERR)
 	    call syserrs (SYS_IKIOPEN, IM_NAME(n_im))

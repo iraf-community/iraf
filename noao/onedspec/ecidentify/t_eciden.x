@@ -10,7 +10,7 @@ include	"ecidentify.h"
 procedure t_ecidentify ()
 
 int	images
-pointer	ec, gopen(), gt_init()
+pointer	ec, gopen(), gt_init(), un_open()
 int	clgeti(), clgwrd(), imtopenp(), ec_getim()
 real	clgetr()
 double	clgetd()
@@ -31,12 +31,16 @@ begin
 	EC_THRESHOLD(ec) = clgetr ("threshold")
 	call clgstr ("database", Memc[EC_DATABASE(ec)], SZ_FNAME)
 	call clgstr ("coordlist", Memc[EC_COORDLIST(ec)], SZ_FNAME)
-	call clgstr ("function", Memc[EC_IMAGE(ec)], SZ_FNAME)
 
 	# Get the line list.
+	call clgstr ("units", Memc[EC_IMAGE(ec)], SZ_FNAME)
+	call xt_stripwhite (Memc[EC_IMAGE(ec)])
+	if (Memc[EC_IMAGE(ec)] != EOS)
+	    EC_UN(ec) = un_open (Memc[EC_IMAGE(ec)])
 	call ec_mapll (ec)
 
 	# Initialize graphics and fitting.
+	call clgstr ("function", Memc[EC_IMAGE(ec)], SZ_FNAME)
 	call ecf_sets ("function", Memc[EC_IMAGE(ec)])
 	call ecf_seti ("xorder", clgeti ("xorder"))
 	call ecf_seti ("yorder", clgeti ("yorder"))

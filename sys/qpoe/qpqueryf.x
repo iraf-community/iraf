@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<syserr.h>
+include	<qpset.h>
 include	"qpoe.h"
 
 # QP_QUERYF -- Get information describing the named parameter.  The current

@@ -61,13 +61,15 @@ procedure proc1s (ccd)
 pointer	ccd		# CCD structure
 
 int	line, ncols, nlines, findmean, rep
+int	overscan_type, overscan_c1, noverscan
 real	overscan, darkscale, flatscale, illumscale, frgscale, mean
 short	minrep
-pointer	in, out, zeroim, darkim, flatim, illumim, fringeim
-pointer	outbuf, overscan_vec, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
+pointer	in, out, zeroim, darkim, flatim, illumim, fringeim, overscan_vec
+pointer	inbuf, outbuf, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
 
 real	asums()
-pointer	imgl2s(), impl2s(), ccd_gls()
+real	find_overscans()
+pointer	imgl2s(), impl2s(), ccd_gls(), xt_fpss()
 
 begin
 	# Initialize.  If the correction image is 1D then just get the
@@ -78,9 +80,6 @@ begin
 	ncols = OUT_C2(ccd) - OUT_C1(ccd) + 1
 	nlines = OUT_L2(ccd) - OUT_L1(ccd) + 1
 
-	if (CORS(ccd, FIXPIX) == YES)
-	    call lfixinits (in)
-
 	findmean = CORS(ccd, FINDMEAN)
 	if (findmean == YES)
 	    mean = 0.
@@ -88,7 +87,14 @@ begin
 	if (rep == YES)
 	    minrep = MINREPLACE(ccd)
 
-	overscan_vec = OVERSCAN_VEC(ccd)
+	if (CORS(ccd, OVERSCAN) == 0)
+	    overscan_type = 0
+	else {
+	    overscan_type = OVERSCAN_TYPE(ccd)
+	    overscan_vec = OVERSCAN_VEC(ccd)
+	    overscan_c1 = BIAS_C1(ccd) - 1
+	    noverscan = BIAS_C2(ccd) - overscan_c1
+	}
 
 	if (CORS(ccd, ZEROCOR) == 0) {
 	    zeroim = NULL
@@ -139,13 +145,13 @@ begin
 	    frgscale = FRINGESCALE(ccd)
 	}
 
-	# For each line read lines from the input.  Procedure CORINPUT
-	# replaces bad pixels by interpolation and applies a trim to the
-	# input.  Get lines from the output image and from the zero level,
-	# dark count, flat field, illumination, and fringe images.
-	# Call COR1 to do the actual pixel corrections.  Finally, add the
-	# output pixels to a sum for computing the mean.
-	# We must copy data outside of the output data section.
+	# For each line read lines from the input.  Procedure XT_FPS replaces
+	# bad pixels by interpolation.  The trimmed region is copied to the
+	# output.  Get lines from the output image and from the zero level,
+	# dark count, flat field, illumination, and fringe images.  Call COR1
+	# to do the actual pixel corrections.  Finally, add the output pixels
+	# to a sum for computing the mean.  We must copy data outside of the
+	# output data section.
 
 	do line = 2 - OUT_L1(ccd), 0
 	    call amovs (
@@ -154,11 +160,20 @@ begin
 
 	do line = 1, nlines {
 	    outbuf = impl2s (out, OUT_L1(ccd)+line-1)
-	    call corinputs (in, line, ccd, Mems[outbuf], IM_LEN(out,1))
+
+	    inbuf = xt_fpss (MASK_FP(ccd), in, IN_L1(ccd)+line-1, IN_C1(ccd),
+		IN_C2(ccd), IN_L1(ccd), IN_L2(ccd), NULL)
+	    call amovs (Mems[inbuf+IN_C1(ccd)-OUT_C1(ccd)], Mems[outbuf],
+		IM_LEN(out,1))
 
 	    outbuf = outbuf + OUT_C1(ccd) - 1
-	    if (overscan_vec != NULL)
-		overscan = Memr[overscan_vec+line-1]
+	    if (overscan_type != 0) {
+		if (overscan_type < OVERSCAN_FIT)
+		    overscan = find_overscans (Mems[inbuf+overscan_c1],
+			noverscan, overscan_type)
+		else
+		    overscan = Memr[overscan_vec+line-1]
+	    }
 	    if (zeroim != NULL)
 		zerobuf = ccd_gls (zeroim, ZERO_C1(ccd), ZERO_C2(ccd),
 		    ZERO_L1(ccd)+line-1)
@@ -194,9 +209,6 @@ begin
 	# Compute the mean from the sum of the output pixels.
 	if (findmean == YES)
 	    MEAN(ccd) = mean / ncols / nlines
-
-	if (CORS(ccd, FIXPIX) == YES)
-	    call lfixfrees ()
 end
 
 
@@ -209,11 +221,11 @@ pointer	ccd		# CCD structure
 int	line, ncols, nlines, findmean, rep
 real	darkscale, flatscale, illumscale, frgscale, mean
 short	minrep
-pointer	in, out, zeroim, darkim, flatim, illumim, fringeim
-pointer	outbuf, overscan_vec, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
+pointer	in, out, zeroim, darkim, flatim, illumim, fringeim, overscan_vec
+pointer	inbuf, outbuf, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
 
 real	asums()
-pointer	imgl2s(), impl2s(), imgs2s(), ccd_gls()
+pointer	imgl2s(), impl2s(), imgs2s(), ccd_gls(), xt_fpss()
 
 begin
 	# Initialize.  If the correction image is 1D then just get the
@@ -223,9 +235,6 @@ begin
 	out = OUT_IM(ccd)
 	ncols = OUT_C2(ccd) - OUT_C1(ccd) + 1
 	nlines = OUT_L2(ccd) - OUT_L1(ccd) + 1
-
-	if (CORS(ccd, FIXPIX) == YES)
-	    call lfixinits (in)
 
 	findmean = CORS(ccd, FINDMEAN)
 	if (findmean == YES)
@@ -300,7 +309,11 @@ begin
 
 	do line = 1, nlines {
 	    outbuf = impl2s (out, OUT_L1(ccd)+line-1)
-	    call corinputs (in, line, ccd, Mems[outbuf], IM_LEN(out,1))
+
+	    inbuf = xt_fpss (MASK_FP(ccd), in, IN_L1(ccd)+line-1, IN_C1(ccd),
+		IN_C2(ccd), IN_L1(ccd), IN_L2(ccd), NULL)
+	    call amovs (Mems[inbuf+IN_C1(ccd)-OUT_C1(ccd)], Mems[outbuf],
+		IM_LEN(out,1))
 
 	    outbuf = outbuf + OUT_C1(ccd) - 1
 	    if (zeroim != NULL)
@@ -338,9 +351,47 @@ begin
 	# Compute the mean from the sum of the output pixels.
 	if (findmean == YES)
 	    MEAN(ccd) = mean / ncols / nlines
+end
 
-	if (CORS(ccd, FIXPIX) == YES)
-	    call lfixfrees ()
+
+# FIND_OVERSCAN -- Find the overscan value for a line.
+# No check is made on the number of pixels.
+# The median is the (npix+1)/2 element.
+
+real procedure find_overscans (data, npix, type)
+
+short	data[npix]	#I Overscan data
+int	npix		#I Number of overscan points
+int	type		#I Type of overscan calculation
+
+int	i
+real	overscan, d, dmin, dmax
+short	asoks()
+
+begin
+	if (type == OVERSCAN_MINMAX) {
+	    overscan = data[1]
+	    dmin = data[1]
+	    dmax = data[1]
+	    do i = 2, npix {
+		d = data[i]
+		overscan = overscan + d
+		if (d < dmin)
+		    dmin = d
+		else if (d > dmax)
+		    dmax = d
+	    }
+	    overscan = (overscan - dmin - dmax) / (npix - 2)
+	} else if (type == OVERSCAN_MEDIAN)
+	    overscan = asoks (data, npix, (npix + 1) / 2)
+	else {
+	    overscan = data[1]
+	    do i = 2, npix
+		overscan = overscan + data[i]
+	    overscan = overscan / npix
+	}
+
+	return (overscan)
 end
 
 # PROC1 -- Process CCD images with readout axis 1 (lines).
@@ -350,13 +401,15 @@ procedure proc1r (ccd)
 pointer	ccd		# CCD structure
 
 int	line, ncols, nlines, findmean, rep
+int	overscan_type, overscan_c1, noverscan
 real	overscan, darkscale, flatscale, illumscale, frgscale, mean
 real	minrep
-pointer	in, out, zeroim, darkim, flatim, illumim, fringeim
-pointer	outbuf, overscan_vec, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
+pointer	in, out, zeroim, darkim, flatim, illumim, fringeim, overscan_vec
+pointer	inbuf, outbuf, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
 
 real	asumr()
-pointer	imgl2r(), impl2r(), ccd_glr()
+real	find_overscanr()
+pointer	imgl2r(), impl2r(), ccd_glr(), xt_fpsr()
 
 begin
 	# Initialize.  If the correction image is 1D then just get the
@@ -367,9 +420,6 @@ begin
 	ncols = OUT_C2(ccd) - OUT_C1(ccd) + 1
 	nlines = OUT_L2(ccd) - OUT_L1(ccd) + 1
 
-	if (CORS(ccd, FIXPIX) == YES)
-	    call lfixinitr (in)
-
 	findmean = CORS(ccd, FINDMEAN)
 	if (findmean == YES)
 	    mean = 0.
@@ -377,7 +427,14 @@ begin
 	if (rep == YES)
 	    minrep = MINREPLACE(ccd)
 
-	overscan_vec = OVERSCAN_VEC(ccd)
+	if (CORS(ccd, OVERSCAN) == 0)
+	    overscan_type = 0
+	else {
+	    overscan_type = OVERSCAN_TYPE(ccd)
+	    overscan_vec = OVERSCAN_VEC(ccd)
+	    overscan_c1 = BIAS_C1(ccd) - 1
+	    noverscan = BIAS_C2(ccd) - overscan_c1
+	}
 
 	if (CORS(ccd, ZEROCOR) == 0) {
 	    zeroim = NULL
@@ -428,13 +485,13 @@ begin
 	    frgscale = FRINGESCALE(ccd)
 	}
 
-	# For each line read lines from the input.  Procedure CORINPUT
-	# replaces bad pixels by interpolation and applies a trim to the
-	# input.  Get lines from the output image and from the zero level,
-	# dark count, flat field, illumination, and fringe images.
-	# Call COR1 to do the actual pixel corrections.  Finally, add the
-	# output pixels to a sum for computing the mean.
-	# We must copy data outside of the output data section.
+	# For each line read lines from the input.  Procedure XT_FPS replaces
+	# bad pixels by interpolation.  The trimmed region is copied to the
+	# output.  Get lines from the output image and from the zero level,
+	# dark count, flat field, illumination, and fringe images.  Call COR1
+	# to do the actual pixel corrections.  Finally, add the output pixels
+	# to a sum for computing the mean.  We must copy data outside of the
+	# output data section.
 
 	do line = 2 - OUT_L1(ccd), 0
 	    call amovr (
@@ -443,11 +500,20 @@ begin
 
 	do line = 1, nlines {
 	    outbuf = impl2r (out, OUT_L1(ccd)+line-1)
-	    call corinputr (in, line, ccd, Memr[outbuf], IM_LEN(out,1))
+
+	    inbuf = xt_fpsr (MASK_FP(ccd), in, IN_L1(ccd)+line-1, IN_C1(ccd),
+		IN_C2(ccd), IN_L1(ccd), IN_L2(ccd), NULL)
+	    call amovr (Memr[inbuf+IN_C1(ccd)-OUT_C1(ccd)], Memr[outbuf],
+		IM_LEN(out,1))
 
 	    outbuf = outbuf + OUT_C1(ccd) - 1
-	    if (overscan_vec != NULL)
-		overscan = Memr[overscan_vec+line-1]
+	    if (overscan_type != 0) {
+		if (overscan_type < OVERSCAN_FIT)
+		    overscan = find_overscanr (Memr[inbuf+overscan_c1],
+			noverscan, overscan_type)
+		else
+		    overscan = Memr[overscan_vec+line-1]
+	    }
 	    if (zeroim != NULL)
 		zerobuf = ccd_glr (zeroim, ZERO_C1(ccd), ZERO_C2(ccd),
 		    ZERO_L1(ccd)+line-1)
@@ -483,9 +549,6 @@ begin
 	# Compute the mean from the sum of the output pixels.
 	if (findmean == YES)
 	    MEAN(ccd) = mean / ncols / nlines
-
-	if (CORS(ccd, FIXPIX) == YES)
-	    call lfixfreer ()
 end
 
 
@@ -498,11 +561,11 @@ pointer	ccd		# CCD structure
 int	line, ncols, nlines, findmean, rep
 real	darkscale, flatscale, illumscale, frgscale, mean
 real	minrep
-pointer	in, out, zeroim, darkim, flatim, illumim, fringeim
-pointer	outbuf, overscan_vec, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
+pointer	in, out, zeroim, darkim, flatim, illumim, fringeim, overscan_vec
+pointer	inbuf, outbuf, zerobuf, darkbuf, flatbuf, illumbuf, fringebuf
 
 real	asumr()
-pointer	imgl2r(), impl2r(), imgs2r(), ccd_glr()
+pointer	imgl2r(), impl2r(), imgs2r(), ccd_glr(), xt_fpsr()
 
 begin
 	# Initialize.  If the correction image is 1D then just get the
@@ -512,9 +575,6 @@ begin
 	out = OUT_IM(ccd)
 	ncols = OUT_C2(ccd) - OUT_C1(ccd) + 1
 	nlines = OUT_L2(ccd) - OUT_L1(ccd) + 1
-
-	if (CORS(ccd, FIXPIX) == YES)
-	    call lfixinitr (in)
 
 	findmean = CORS(ccd, FINDMEAN)
 	if (findmean == YES)
@@ -589,7 +649,11 @@ begin
 
 	do line = 1, nlines {
 	    outbuf = impl2r (out, OUT_L1(ccd)+line-1)
-	    call corinputr (in, line, ccd, Memr[outbuf], IM_LEN(out,1))
+
+	    inbuf = xt_fpsr (MASK_FP(ccd), in, IN_L1(ccd)+line-1, IN_C1(ccd),
+		IN_C2(ccd), IN_L1(ccd), IN_L2(ccd), NULL)
+	    call amovr (Memr[inbuf+IN_C1(ccd)-OUT_C1(ccd)], Memr[outbuf],
+		IM_LEN(out,1))
 
 	    outbuf = outbuf + OUT_C1(ccd) - 1
 	    if (zeroim != NULL)
@@ -627,8 +691,46 @@ begin
 	# Compute the mean from the sum of the output pixels.
 	if (findmean == YES)
 	    MEAN(ccd) = mean / ncols / nlines
+end
 
-	if (CORS(ccd, FIXPIX) == YES)
-	    call lfixfreer ()
+
+# FIND_OVERSCAN -- Find the overscan value for a line.
+# No check is made on the number of pixels.
+# The median is the (npix+1)/2 element.
+
+real procedure find_overscanr (data, npix, type)
+
+real	data[npix]	#I Overscan data
+int	npix		#I Number of overscan points
+int	type		#I Type of overscan calculation
+
+int	i
+real	overscan, d, dmin, dmax
+real	asokr()
+
+begin
+	if (type == OVERSCAN_MINMAX) {
+	    overscan = data[1]
+	    dmin = data[1]
+	    dmax = data[1]
+	    do i = 2, npix {
+		d = data[i]
+		overscan = overscan + d
+		if (d < dmin)
+		    dmin = d
+		else if (d > dmax)
+		    dmax = d
+	    }
+	    overscan = (overscan - dmin - dmax) / (npix - 2)
+	} else if (type == OVERSCAN_MEDIAN)
+	    overscan = asokr (data, npix, (npix + 1) / 2)
+	else {
+	    overscan = data[1]
+	    do i = 2, npix
+		overscan = overscan + data[i]
+	    overscan = overscan / npix
+	}
+
+	return (overscan)
 end
 

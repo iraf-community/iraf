@@ -1989,8 +1989,10 @@ register struct package *pkp;
 	    "fscan", clfunc, 0,		/* intrinsic function entries	*/
 	    "defpac", clfunc, 0,	/* 		"		*/
 	    "defpar", clfunc, 0,	/* 		"		*/
+	    "defvar", clfunc, 0,	/* 		"		*/
 	    "deftask", clfunc, 0,	/* 		"		*/
 	    "access", clfunc, 0,	/* 		"		*/
+	    "imaccess", clfunc, 0,	/* 		"		*/
 	    "mktemp", clfunc, 0,	/* 		"		*/
 	    "envget", clfunc, 0,	/* 		"		*/
 	    "radix",  clfunc, 0,	/* 		"		*/
@@ -2085,7 +2087,8 @@ char	*argp[];		/* array of arg pointers	*/
 		/* Get the parameter value. */
 		opcast (OT_STRING);
 		o_v = popop();
-		for (ip=o_v.o_val.v_s;  (*op++ = *ip++);  )
+		ip = opindef(&o_v) ? "INDEF" : o_v.o_val.v_s;
+		while (ip && (*op++ = *ip++))
 		    ;
 	    }
 

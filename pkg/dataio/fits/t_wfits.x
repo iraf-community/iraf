@@ -15,13 +15,15 @@ char	fits_files[SZ_FNAME]	# list of FITS files
 bool	newtape			# new or used tape ?
 char	in_fname[SZ_FNAME]	# input file name
 char	out_fname[SZ_FNAME]	# output file name
+char	fextn[SZ_FNAME]		# the fits extension
 
-int	imlist, flist, nimages, nfiles, file_number
-bool	clgetb()
+char	ch
+int	imlist, flist, nimages, nfiles, file_number, addext, index
+bool	clgetb(), streq()
 double	clgetd()
 int	imtopen(), imtlen (), wft_get_bitpix(), clgeti(), imtgetim()
 int	mtfile(), btoi(), fstati(), fntlenb(), fntgfnb(), mtneedfileno()
-int	wft_blkfac(), fntrfnb(), strlen()
+int	wft_blkfac(), fntrfnb(), strlen(), strldx()
 pointer	fntopnb()
 
 include "wfits.com"
@@ -37,6 +39,14 @@ begin
 	nimages = imtlen (imlist)
 
 	# Get the wfits parameters.
+	if (nimages == 1)
+	    wextensions = NO
+	else
+	    wextensions = btoi (clgetb ("extensions"))
+	if (wextensions == NO)
+	    gheader = NO
+	else
+	    gheader = btoi (clgetb ("global_hdr"))
 	long_header = btoi (clgetb ("long_header"))
 	short_header = btoi (clgetb ("short_header"))
 	make_image = btoi (clgetb ("make_image"))
@@ -66,6 +76,8 @@ begin
 	# or contains data. If the tape is blank output begins at BOT,
 	# otherwise at EOT.
 
+	call clgstr ("fextn", fextn, SZ_FNAME)
+	ch = '.'
 	if (make_image == YES) {
 	    call clgstr ("fits_files", fits_files, SZ_FNAME)
 	    if (mtfile (fits_files) == YES) {
@@ -83,6 +95,9 @@ begin
 	    } else {
 		flist = fntopnb (fits_files, NO)
 		nfiles = fntlenb (flist)
+		if (wextensions == YES && nfiles > 1)
+		    call error (0,
+			"Only one output FITS extensions file can be written")
 		if ((nfiles > 1) && (nfiles != nimages))
 		    call error (0,
 		    "T_WFITS: Input and output lists are not the same length")
@@ -100,13 +115,6 @@ begin
 	file_number = 1
 	while (imtgetim (imlist, in_fname, SZ_FNAME) != EOF) {
 
-	    # Print the id string.
-	    if (long_header == YES || short_header == YES) {
-		call printf ("File %d: %s")
-		    call pargi (file_number)
-		    call pargstr (in_fname)
-	    }
-
 	    # Get the output file name. If single file output to disk, use
 	    # name fits_file. If multiple file output to disk, the file number
 	    # is added to the output file name, if no output name list is
@@ -115,24 +123,53 @@ begin
 
 	    if (make_image == YES) {
 	        if (mtfile (fits_files) == YES) {
-		    if (file_number == 2)
+		    if (wextensions == NO && file_number == 2)
 			call mtfname (out_fname, EOT, out_fname, SZ_FNAME)
 	        } else if (nfiles > 1) {
 		    if (fntgfnb (flist, out_fname, SZ_FNAME) == EOF)
 			 call error (0, "Error reading output file name")
+		    if (fextn[1] != EOS) {
+			addext = OK
+			index = strldx (ch, out_fname)
+			if (index > 0) {
+			    if (streq (fextn, out_fname[index+1]))
+				addext = ERR
+			    else
+				addext = OK
+			}
+			if (addext == OK){
+		            call strcat (".", out_fname, SZ_FNAME)
+		            call strcat (fextn, out_fname, SZ_FNAME)
+			}
+		    }
 		} else {
 		    if (fntrfnb (flist, 1, out_fname, SZ_FNAME) == EOF)
-                        call strcpy (fits_files, out_fname, SZ_FNAME)
-		    if (nimages > 1) {
-		        call sprintf (out_fname[strlen(out_fname)+1],
-			    SZ_FNAME, "%04d")
+		        call strcpy (fits_files, out_fname, SZ_FNAME)
+		    if (nimages > 1 && wextensions == NO) {
+		        call sprintf (out_fname[strlen(out_fname)+1], SZ_FNAME,
+			    "%04d")
 			    call pargi (file_number)
+		    }
+		    if (fextn[1] != EOS) {
+			addext = OK
+			index = strldx (ch, out_fname)
+			if (index > 0) {
+			    if (streq (fextn, out_fname[index+1]))
+				addext = ERR
+			    else
+				addext = OK
+			}
+			if (addext == OK){
+		            call strcat (".", out_fname, SZ_FNAME)
+		            call strcat (fextn, out_fname, SZ_FNAME)
+			}
 		    }
 	        }
 	    }
 
 	    # Write each output file.
-	    iferr (call wft_write_fitz (in_fname, out_fname)) {
+	    iferr (call wft_write_fitz (in_fname, out_fname, file_number,
+		nimages)) {
 		call printf ("Error writing file: %s\n")
 		    call pargstr (out_fname)
 		call erract (EA_WARN)

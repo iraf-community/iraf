@@ -28,12 +28,11 @@ int	status				# return status
 
 long	pixoff
 pointer	sp, pixhdr, pixfile
-int	nchars, pfd, blklen
+int	pfd, blklen
 
-bool	strne()
-int	open(), read(), fdevblk()
-errchk	open, read, falloc, fdevblk, imerr
-errchk	imioff, oif_wphdr, oif_mkpixfname, oif_gpixfname
+int	open(), fdevblk(), oif_rdhdr()
+errchk	open, falloc, fdevblk, imerr, oif_rdhdr, oif_updhdr
+errchk	imioff, oif_wrhdr, oif_mkpixfname, oif_gpixfname, flush
 
 begin
 	status = OK
@@ -53,13 +52,10 @@ begin
 	    call oif_gpixfname (IM_PIXFILE(im), IM_HDRFILE(im), Memc[pixfile],
 		SZ_PATHNAME)
 	    pfd = open (Memc[pixfile], IM_ACMODE(im), STATIC_FILE)
-	    call seek (pfd, BOFL)
 
-	    nchars = LEN_PIXHDR * SZ_STRUCT
-	    if (read (pfd, IM_MAGIC(pixhdr), nchars) < nchars)
+	    call seek (pfd, BOFL)
+	    if (oif_rdhdr (pfd, pixhdr, 0, TY_PIXHDR) < 0)
 		call imerr (IM_NAME(im), SYS_IMRDPIXFILE)
-	    else if (strne (IM_MAGIC(pixhdr), "impix"))
-		call imerr (IM_NAME(im), SYS_IMMAGOPSF)
 
 	case NEW_COPY, NEW_FILE, TEMP_FILE:
 	    # Generate the pixel file name.
@@ -92,7 +88,8 @@ begin
 	    # Write small header into pixel storage file.  Allows detection of
 	    # headerless pixfiles, and reconstruction of header if it gets lost.
 
-	    call oif_wphdr (pfd, im, IM_HDRFILE(im))
+	    call oif_wrhdr (pfd, im, TY_PIXHDR)
+	    call flush (pfd)
 
 	    # Update the image header so that it knows about the pixel file.
 	    call oif_updhdr (im, status)

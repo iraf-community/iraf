@@ -12,6 +12,9 @@ List of input standard star spectra or root names if using the record number
 extension format.  All spectra of the same aperture must be of the same
 standard star.  In beam switch mode or when the same star parameter is set
 all spectra must be of the same standard star regardless of aperture number.
+Normally the spectra will not be extinction corrected but if they are
+then the extinction file should also be given and the same extinction
+file should be used with \fBsensfunc\fR.
 .le
 .ls records (imred.irs and imred.iids only)
 List of records or ranges of records to be appended to the input spectra
@@ -75,7 +78,10 @@ user to change this calibration.
 Extinction file used to make second order extinction corrections across
 the bandpasses.  The default value is  redirected to the package
 parameter of the same name.  See \fBlcalib\fR for a list of standard
-extinction files.
+extinction files.  Normally the input spectra will not be extinction
+corrected.  But if they are this file will be used to remove the
+extinction and then the same file should be specified in \fBsensfunc\fR.
+Note that one can choose to use a null extinction file in both.
 .le
 .ls caldir = ")_.caldir"
 Calibration directory containing standard star data.  The default is

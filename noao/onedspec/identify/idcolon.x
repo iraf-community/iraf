@@ -79,7 +79,7 @@ begin
 	    call gargwrd (cmd, SZ_LINE)
 	    if (nscan() == 1) {
 		call printf ("image %s\n")
-		    call pargstr (Memc[ID_IMAGE(id)])
+		    call pargstr (ID_IMAGE(id))
 		prfeature = NO
 	    } else {
 		call strcpy (cmd, newimage, SZ_FNAME)
@@ -111,10 +111,10 @@ begin
 	    call gargwrd (cmd, SZ_LINE)
 	    if (nscan() == 1) {
 		call printf ("database %s\n")
-		    call pargstr (Memc[ID_DATABASE(id)])
+		    call pargstr (ID_DATABASE(id))
 		prfeature = NO
 	    } else {
-	        call strcpy (cmd, Memc[ID_DATABASE(id)], SZ_FNAME)
+	        call strcpy (cmd, ID_DATABASE(id), ID_LENSTRING)
 		ID_NEWDBENTRY(id) = YES
 	    }
 	case READ: # :read - read database entry
@@ -122,7 +122,7 @@ begin
 	    iferr {
 	        call gargwrd (cmd, SZ_LINE)
 	        if (nscan() == 1)
-		    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+		    call id_dbread (id, ID_IMAGE(id), ID_AP(id,1),
 			NO, YES)
 	        else {
 		    call gargi (ival[1])
@@ -142,7 +142,7 @@ begin
 		ival[2] = ID_AP(id,2)
 	        call gargwrd (cmd, SZ_LINE)
 	        if (nscan() == 1)
-		    call id_dbwrite (id, Memc[ID_IMAGE(id)], ival, YES)
+		    call id_dbwrite (id, ID_IMAGE(id), ival, YES)
 	        else {
 		    call gargi (ival[1])
 		    if (nscan() < 3)
@@ -159,7 +159,7 @@ begin
 	    iferr {
 	        call gargwrd (cmd, SZ_LINE)
 	        if (nscan() == 1)
-		    call id_dbread (id, Memc[ID_IMAGE(id)], ID_AP(id,1),
+		    call id_dbread (id, ID_IMAGE(id), ID_AP(id,1),
 			YES, YES)
 	        else {
 		    call gargi (ival[1])
@@ -176,10 +176,10 @@ begin
 	    call gargwrd (cmd, SZ_LINE)
 	    if (nscan() == 1) {
 		call printf ("coordlist %s\n")
-		    call pargstr (Memc[ID_COORDLIST(id)])
+		    call pargstr (ID_COORDLIST(id))
 		prfeature = NO
 	    } else {
-	        call strcpy (cmd, Memc[ID_COORDLIST(id)], SZ_FNAME)
+	        call strcpy (cmd, ID_COORDLIST(id), ID_LENSTRING)
 		call id_unmapll (id)
 		call id_mapll (id)
 	    }

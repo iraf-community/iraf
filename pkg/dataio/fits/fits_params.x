@@ -190,10 +190,17 @@ begin
 	ctime = clktime (long (0))
 	call brktime (ctime, time)
 
-	call sprintf (datestr, szdate, "%02s-%02s-%02s")
-	    call pargi (TM_MDAY(time))
-	    call pargi (TM_MONTH(time))
-	    call pargi (mod (TM_YEAR(time), CENTURY))
+	if (TM_YEAR(time) >= NEW_CENTURY) {
+	    call sprintf (datestr, szdate, "%04s-%02s-%02s")
+	        call pargi (TM_YEAR(time))
+	        call pargi (TM_MONTH(time))
+	        call pargi (TM_MDAY(time))
+	} else {
+	    call sprintf (datestr, szdate, "%02s-%02s-%02s")
+	        call pargi (TM_MDAY(time))
+	        call pargi (TM_MONTH(time))
+	        call pargi (mod (TM_YEAR(time), CENTURY))
+	}
 end
 
 

@@ -19,8 +19,8 @@ install:
 
 longslit:
 	$omake	x_longslit.x
-	$link	x_longslit.o libpkg.a -lxtools -lcurfit -liminterp -lgsurfit\
-		-o xx_longslit.e
+	$link	x_longslit.o libpkg.a -lsmw -lxtools -lcurfit -liminterp\
+		-lgsurfit -o xx_longslit.e
 	;
 
 libpkg.a:

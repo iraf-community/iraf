@@ -7,11 +7,12 @@ include "dgsurfitdef.h"
 $endif
 
 # GSCOEFF -- Procedure to fetch the number and magnitude of the coefficients.
-# If the GS_XTERMS(sf) = YES then the number of coefficients will be
-# GS_NXCOEFF(sf) * GS_NYCOEFF(sf) otherwise the number of 
-# of coefficients will be (GS_NXCOEFF(sf) + GS_NYCOEFF(sf) - 1), and
-# the GS_NXCOEFF(sf) x coefficients will be output first followed by
-# the (GS_NYCOEFF(sf) - 1) y coefficients.
+# If the GS_XTERMS(sf) = GS_XBI (YES) then the number of coefficients will be
+# (GS_NXCOEFF(sf) * GS_NYCOEFF(sf)); if GS_XTERMS is GS_XTRI then the number
+# of coefficients will be (GS_NXCOEFF(sf) *  GS_NYCOEFF(sf) - order *
+# (order - 1) / 2) where order is the minimum of the x and yorders;  if
+# GS_XTERMS(sf) = GS_XNONE then the number of coefficients will be
+# (GS_NXCOEFF(sf) + GS_NYCOEFF(sf) - 1).
 
 $if (datatype == r)
 procedure gscoeff (sf, coeff, ncoeff)

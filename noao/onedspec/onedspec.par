@@ -7,4 +7,4 @@ dispaxis,i,h,1,1,3,"Image axis for 2D/3D images"
 nsum,s,h,"1",,,"Number of lines/columns to sum for 2D/3D images"
 records,s,h,"",,,"Record number extensions
 "
-version,s,h,"ONEDSPEC V3.1: March 1993"
+version,s,h,"ONEDSPEC: January 1996"

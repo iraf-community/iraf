@@ -56,16 +56,20 @@ on the number of input pixels and the wavelength range of the reference
 dispersion solutions are used.  These defaults may either come from all
 spectra, all spectra of the same aperture, or individually for each
 spectrum depending on the values of the \fIglobal\fR and \fIsamedisp\fR
-parameters.  Note that if a logarithmic wavelength scale is selected then
-\fIw1\fR, \fIw2\fR, and \fIdw\fR must be specified logarithmically.  These
+parameters.  Note that these parameters are specified in linear units even
+if a logarithmic wavelength scale is selected.  The conversion between
+linear and logarithmic intervals between pixels is given below.  These
 values may be overridden for specified apertures by a wavelength table or
 reference image.  Otherwise these values apply to all apertures.
 .le
 .ls log = no
-Use linear logarithmic wavelength coordinates?  Linear logarithmic
+Transform to linear logarithmic wavelength coordinates?  Linear logarithmic
 wavelength coordinates have wavelength intervals which are constant
-in the logarithm of the wavelength.  Note that if conserving flux
+in the logarithm (base 10) of the wavelength.  Note that if conserving flux
 this will change the flux units to flux per log lambda interval.
+Note that if the input spectra are in log sampling then \fIlog\fR=no will
+resample back to linear sampling and \fIlog\fR=yes will resample keeping
+the output spectra in log sampling.
 .le
 .ls flux = yes
 Conserve the total flux during interpolation rather than the flux density?
@@ -243,19 +247,37 @@ and the number of pixels.  These four parameters actually overspecify the
 coordinate system and only three of these values are needed to define it.
 The output coordinate system is specified by giving a set or subset of
 these parameters using the parameters \fIw1\fR, \fIw2\fR, \fIdw\fR, and
-\fInw\fR.  When the \fIlog\fR option is used these parameters are
-interpreted as logarithmic; i.e. the starting value is the log of the
-wavelength of the first pixel and the interval is the interval in the log
-of the wavelength.  Default values for any parameters which are not
-specified, by using the value INDEF, are supplied based on the wavelengths
-of the first and last pixel as given by the dispersion function and the
-number of pixels in the input image.  The defaults may either be determined
-separately for each spectrum (\fIglobal\fR = \fIno\fR), from all spectra
-with the same aperture (\fIglobal\fR = \fIyes\fR and \fIsamedisp\fR =
-\fIno\fR), or from all the spectra (\fIglobal\fR = \fIyes\fR and
-\fIsamedisp\fR = \fIyes\fR).  As indicated, the parameter \fIsamedisp\fR
-determines whether defaults are determined independently for each aperture
-or set the same for all apertures.
+\fInw\fR.
+
+When the \fIlog\fR option is used these parameters are still specified and
+computed in non-log units but the effective interval per pixel is
+
+.nf
+	dw_log = (log10(w2) - log10(w1)) / (nw - 1)
+	dw_log = (log10(w1+dw*(nw-1)) - log10(w1)) / (nw - 1)
+.fi
+
+In other words, the logarithmic interval divides the starting and ending
+wavelength into the required number of pixels in log step.  To avoid
+confusion in this case it is best to specify the starting and ending
+wavelengths (in non-log units) and the number of pixels.
+
+Note that if \fIlog\fR=yes the input spectra in either linear
+or log sampling will be resampled to produces an output spectrum in
+log sampling.  Similarly, if \fIlog\fR=no the input spectra will
+be resampled to linear sampling.  This means that log sampled input
+spectra will be resampled to to linear sampling.
+
+Default values for any parameters which are not specified, by using the
+value INDEF, are supplied based on the wavelengths of the first and last
+pixel as given by the dispersion function and the number of pixels in the
+input image.  The defaults may either be determined separately for each
+spectrum (\fIglobal\fR = \fIno\fR), from all spectra with the same aperture
+(\fIglobal\fR = \fIyes\fR and \fIsamedisp\fR = \fIno\fR), or from all the
+spectra (\fIglobal\fR = \fIyes\fR and \fIsamedisp\fR = \fIyes\fR).  As
+indicated, the parameter \fIsamedisp\fR determines whether defaults are
+determined independently for each aperture or set the same for all
+apertures.
 
 Another way to specify the wavelengths when there are many apertures is to
 use a wavelength table or reference image.  If an spectrum image name is

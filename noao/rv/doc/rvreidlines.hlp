@@ -393,6 +393,9 @@ drawback to this method is that the nubmer of columns summed is
 constant and so the signal-to-noise decreases with the galaxy light.
 .ih
 REVISIONS
+.ls RVREIDLINES V2.11
+This task will now work in the units of the input spectra.
+.le
 .ls RVREIDLINES V2.10.3
 This task in new in the version.
 .le

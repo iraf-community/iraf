@@ -7,12 +7,15 @@ nsum,s,h,)_.nsum,,,"Number of lines/columns to sum for 2D images
 region,s,h,,,,Fitting region
 positions,f,h,,,,File of positions/sigmas
 background,s,h,"",,,Default background
-sigma,r,h,5.,,,Default sigma
-function,s,h,"gaussian","gaussian",,Fitting function
+profile,s,h,"gaussian","gaussian|lorentzian|voigt",,Default profile type
+gfwhm,r,h,20.,,,Default Gaussian FWHM
+lfwhm,r,h,20.,,,Default Lorentzian FWHM
 fitbackground,b,h,yes,,,Fit background?
 fitpositions,s,h,"all","fixed|single|all",,Fit positions
-fitsigmas,s,h,"all","fixed|single|all",,"Fit sigmas
+fitgfwhm,s,h,"all","fixed|single|all",,"Fit Gaussian FWHM"
+fitlfwhm,s,h,"all","fixed|single|all",,"Fit Lorentzian FWHM
 "
+nerrsample,i,h,0,0,,"Number of error samples (<10 for no errors)"
 sigma0,r,h,INDEF,,,"Constant gaussian noise term (INDEF for no errors)"
 invgain,r,h,INDEF,,,"Inverse gain term (INDEF for no errors)
 "

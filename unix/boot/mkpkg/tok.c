@@ -713,8 +713,9 @@ struct	context *cx;
 char	*fname;
 {
 	char	cmd[SZ_COMMAND+1];
+	char	xflags[SZ_LINE+1];
 	char	*dflist[MAX_DEPFILES+1];
-	char	*xflags, *dfile;
+	char	*s_xflags, *dfile;
 	long	sourcedate, objdate, date;
 	int	recompile, i;
 
@@ -750,7 +751,15 @@ char	*fname;
 	}
 
 	if (recompile) {
-	    xflags = getsym (XFLAGS);
+	    /* Get XFLAGS. */
+	    s_xflags = getsym (XFLAGS);
+	    xflags[0] = EOS;
+	    if (debug)
+		strcat (xflags, "-d ");
+	    if (dbgout)
+		strcat (xflags, "-x ");
+	    strcat (xflags, s_xflags);
+
 	    if (irafdir[0])
 		sprintf (cmd, "%s %s -r %s %s", XC, xflags, irafdir, fname);
 	    else
@@ -793,6 +802,8 @@ struct	context *cx;
 
 	if (debug)
 	    strcat (cmd, " -d");
+	if (dbgout)
+	    strcat (cmd, " -x");
 
 	getcmd (cx, cmd, cmd, SZ_CMD);
 
@@ -835,6 +846,8 @@ struct	context *cx;
 
 	if (debug)
 	    strcat (cmd, " -d");
+	if (dbgout)
+	    strcat (cmd, " -x");
 
 	getcmd (cx, cmd, cmd, SZ_CMD);
 

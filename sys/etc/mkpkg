@@ -82,9 +82,10 @@ libsys.a:
 			<fio.h> <fset.h> <gio.h>
 	prpsload.x	prc.com <config.h>
 	prredir.x	prc.com <config.h>
+	prseti.x	prc.com <config.h> <prstat.h>
 	prsignal.x	prc.com <config.h> <knet.h>
 	prstati.x	prc.com <config.h> <prstat.h>
-	prupdate.x	prc.com <config.h> <error.h>
+	prupdate.x	prc.com <config.h> <error.h> <prstat.h>
 	psioisxt.x	<ctype.h> <gio.h>
 	psioxfer.x	
 	qsort.x	
@@ -100,7 +101,7 @@ libsys.a:
 	xerpop.x	error.com <error.h>
 	xerpue.x	<config.h> <fio.com> <fio.h> <mach.h>
 	xerreset.x	error.com <error.h>
-	xerstmt.x	error.com <error.h>
+	xerstmt.x	error.com <ctype.h> <error.h>
 	xerverify.x	error.com <error.h>
 	xgdevlist.x	<xalloc.h>
 	xisatty.x	<clset.h> <fset.h>

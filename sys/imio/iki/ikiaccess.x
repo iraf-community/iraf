@@ -4,34 +4,38 @@ include <imhdr.h>
 include "iki.h"
 
 # IKI_ACCESS -- Determine if the named image exists, and if so, return the
-# the index of the IKI kernel to be used to access the image, else return 0.
-# An NEW_IMAGE access mode may be specified to associate an extension with an
-# image kernel without testing for the existence of an image.  If the input
-# image name did not specify an extension or what appeared to be an extension
-# was just a . delimited field, we will patch up the ROOT and EXTN strings
-# to the real values.
+# the index of the IKI kernel to be used to access the image, else return 0 if
+# the named image is not found.  If multiple images exist with the same name
+# (e.g. but with different image types) then ERR is returned.  An NEW_IMAGE
+# access mode may be specified to associate an extension with an image kernel
+# without testing for the existence of an image.  If the input image name did
+# not specify an extension or what appeared to be an extension was just a .
+# delimited field, we will patch up the ROOT and EXTN strings to the real
+# values.
 
 int procedure iki_access (image, root, extn, acmode)
 
-char	image[ARB]		# image/group name
-char	root[ARB]		# image/group file name		[OUT]
-char	extn[ARB]		# image/group file extension	[OUT]
+char	image[ARB]		#I image/group name
+char	root[ARB]		#O image/group file name
+char	extn[ARB]		#O image/group file extension
 int	acmode
 
-pointer	sp, osroot, fname, ip
-int	k, status, op
 bool	first_time
+int	i, k, status, op
+pointer	sp, osroot, fname, textn, fextn, ip
 data	first_time /true/
 
-int	gstrcpy(), strlen()
 bool	fnullfile()
-errchk	fpathname
+int	gstrcpy(), strlen()
+errchk	fpathname, syserrs
 include	"iki.com"
 
 begin
 	call smark (sp)
 	call salloc (osroot, SZ_PATHNAME, TY_CHAR)
 	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+	call salloc (textn, MAX_LENEXTN, TY_CHAR)
+	call salloc (fextn, MAX_LENEXTN, TY_CHAR)
 
 	# The first call makes sure the IKI kernels are loaded into the kernel
 	# table.
@@ -70,16 +74,40 @@ begin
 	    root[op] = EOS
 
 	    # Select an image kernel by calling the access function in each
-	    # loaded kernel until somebody claims the image.  Note that in
-	    # the case of a new image, the access function tests only the
-	    # legality of the extn.
+	    # loaded kernel until somebody claims the image.  If multiple
+	    # kernels claim the image the image specification (name) is
+	    # ambiguous and we don't know which image was intended, an error.
+	    # Note that in the case of a new image, the access function
+	    # tests only the legality of the extn.
 
-	    for (k=1;  k <= k_nkernels;  k=k+1) {
-		call zcall4 (IKI_ACCESS(k), root, extn, acmode, status)
+	    k = 0
+	    for (i=1;  i <= k_nkernels;  i=i+1) {
+		call strcpy (extn, Memc[textn], MAX_LENEXTN)
+		call zcall5 (IKI_ACCESS(i), i,root,Memc[textn],acmode,status)
+
 		if (status == YES) {
-		    call sfree (sp)
-		    return (k)
+		    if (k == 0) {
+			# Stop on the first access if an explicit extension
+			# was given.
+
+			k = i
+			call strcpy (Memc[textn], Memc[fextn], MAX_LENEXTN)
+			if (extn[1] != EOS)
+			    break
+
+		    } else {
+			# The image name is ambiguous.
+			call sfree (sp)
+			return (ERR)
+		    }
 		}
+	    }
+
+	    # Valid image using kernel K.
+	    if (k != 0) {
+		call strcpy (Memc[fextn], extn, MAX_LENEXTN)
+		call sfree (sp)
+		return (k)
 	    }
 
 	    # If the search failed and an extension was given, maybe what

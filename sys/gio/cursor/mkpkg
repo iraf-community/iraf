@@ -36,8 +36,8 @@ libcur.a:
 	gtrgtran.x	gtr.com gtr.h <gio.h> <gki.h>
 	gtrgtty.x	gtr.h <gio.h> <gki.h>
 	gtrinit.x	gtr.com gtr.h <gio.h> <gki.h> <gset.h>
-	gtropenws.x	gtr.com gtr.h <config.h> <error.h> <fio.h> <fset.h>\
-			<gio.h> <gki.h>
+	gtropenws.x	gtr.com gtr.h <config.h> <error.h> <fio.h> <prstat.h>\
+			<fset.h> <gio.h> <gki.h>
 	gtrpage.x	gtr.h <gio.h> <gset.h>
 	gtrptran.x	gtr.com gtr.h <gio.h> <gki.h> <mach.h>
 	gtrrcur.x	<gki.h>

@@ -24,6 +24,8 @@
    label = FIRST_LABEL	   # starting statement label
    smem(1) = EOS	   # haven't read in "mem.com" file yet
    body = NO		   # not in procedure body to start
+   dbgout = NO		   # disable debug output by default
+   dbglev = 0		   # file level if debug enabled
    memflg = NO		   # haven't declared mem common yet
    swinrg = NO		   # default range checking for switches
    col = 6

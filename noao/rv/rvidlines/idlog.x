@@ -16,6 +16,7 @@ int	i, fd, nrms
 double	z, zrms, zerr, zhelio, resid, rms, v, verr, vhelio, hjd
 
 int	open()
+double	id_zshiftd(), id_zval()
 long	clktime()
 errchk	open, id_velocity, id_vhelio
 
@@ -108,7 +109,7 @@ begin
 	    do i = 1, ID_NFEATURES(id) {
 		call fprintf (fd,
 		    "%10.8g %10.8g %10.4g %10.8g %10.4g %4f %s\n")
-		    call pargd (FIT(id,i) / (1 + z))
+		    call pargd (id_zshiftd (id, FIT(id,i), 0))
 		    if (IS_INDEFD (USER(id,i))) {
 			call pargd (INDEFD)
 			call pargd (INDEFD)
@@ -116,13 +117,13 @@ begin
 			call pargd (INDEFD)
 		    } else {
 			call pargd (USER(id,i))
-			resid = FIT(id,i) / (1 + z) - USER(id,i)
+			resid = id_zshiftd (id, FIT(id,i), 0) - USER(id,i)
 			call pargd (resid)
 			if (WTS(id,i) > 0.) {
 			    rms = rms + resid ** 2
 			    nrms = nrms + 1
 			}
-			verr = (FIT(id,i)-USER(id,i))/USER(id,i) * VLIGHT
+			verr = id_zval (id, FIT(id,i), USER(id,i)) * VLIGHT
 			call pargd (verr + vhelio)
 			call pargd (verr - v)
 		    }

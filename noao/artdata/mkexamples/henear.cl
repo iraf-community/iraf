@@ -9,7 +9,8 @@ for (k=1; k<=i; k+=1) {
     mk1dspec (out, output="", ap=k, rv=0., z=no, ncols=512, naps=i,
 	wstart=4209.0+k, wend=7361.7+k, title="Helium-Neon-Argon Arc Example",
 	header="", continuum=0.5, slope=0., temperature=0.,
-	lines="mkexamples$henear2.dat", sigma=6., comments=b1)
+	lines="mkexamples$henear2.dat", profile="gaussian", gfwhm=14,
+	comments=b1)
 }
 
 mkheader (out, hdr, append=no, verbose=no)

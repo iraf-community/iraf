@@ -14,8 +14,6 @@ generic:
 	    $(GEN) proc.gx -o generic/proc.x $endif
         $ifolder (generic/cor.x,  cor.gx)
 	    $(GEN) cor.gx -o generic/cor.x $endif
-        $ifolder (generic/corinput.x,  corinput.gx)
-	    $(GEN) corinput.gx -o generic/corinput.x $endif
 
         $ifolder (generic/icaclip.x, icaclip.gx)
 	    $(GEN) icaclip.gx -o generic/icaclip.x $endif
@@ -51,57 +49,61 @@ libpkg.a:
 	@cosmic
 
 	calimage.x	ccdtypes.h <error.h> <imset.h>
-	ccdcmp.x
+	ccdcache.x	ccdcache.com ccdcache.h ccdcache.com <imhdr.h>\
+			<imset.h> <mach.h>
+	ccdcheck.x	ccdtypes.h <imhdr.h>
+	ccdcmp.x	
 	ccdcopy.x	<imhdr.h>
-	ccdcache.x	ccdtypes.h ccdcache.h ccdcache.com <imhdr.h> <imset.h>\
-			<mach.h>
-	ccdcheck.x	ccdtypes.h
 	ccddelete.x	
 	ccdflag.x	
-	ccdlog.x	<imset.h>
+	ccdlog.x	<imhdr.h> <imset.h>
 	ccdmean.x	<imhdr.h>
 	ccdnscan.x	ccdtypes.h
 	ccdproc.x	ccdred.h ccdtypes.h <error.h>
-	ccdsection.x	<ctype.h> <imhdr.h>
+	ccdsection.x	<ctype.h>
 	ccdsubsets.x	<ctype.h>
 	ccdtypes.x	ccdtypes.h
 	doproc.x	ccdred.h
-	hdrmap.x	hdrmap.com
-	iclog.x		icmask.com icombine.com icombine.h <imhdr.h> <imset.h>\
+	hdrmap.x	hdrmap.com <error.h>
+	icimstack.x	<error.h> <imhdr.h>
+	iclog.x		icmask.h icombine.com icombine.h <imhdr.h> <imset.h>\
 			<mach.h>
-	icmask.x	icmask.com icombine.com icombine.h <imhdr.h> <pmset.h>
+	icmask.x	icmask.h icombine.com icombine.h icombine.com <imhdr.h>\
+			<pmset.h>
 	icscale.x	icombine.com icombine.h <error.h> <imhdr.h> <imset.h>
 	icsection.x	<ctype.h>
-	icsetout.x	icombine.com <imhdr.h>
+	icsetout.x	icombine.com <imhdr.h> <mwset.h>
 	readcor.x	<imhdr.h>
 	scancor.x	<imhdr.h> <imset.h>
 	setdark.x	ccdred.h ccdtypes.h <imhdr.h>
-	setfixpix.x	ccdred.h <imhdr.h>
+	setfixpix.x	ccdred.h <imhdr.h> <imset.h> <pmset.h>
 	setflat.x	ccdred.h ccdtypes.h <imhdr.h>
 	setfringe.x	ccdred.h ccdtypes.h <imhdr.h>
 	setheader.x	ccdred.h <imhdr.h>
 	setillum.x	ccdred.h ccdtypes.h <imhdr.h>
 	setinput.x	ccdtypes.h <error.h>
 	setinteract.x	<pkg/xtanswer.h>
-	setoutput.x	<imhdr.h>
+	setoutput.x	<imhdr.h> <imset.h>
 	setoverscan.x	ccdred.h <imhdr.h> <imset.h> <pkg/xtanswer.h>\
 			<pkg/gtools.h>
 	setproc.x	ccdred.h <imhdr.h>
 	setsections.x	ccdred.h <imhdr.h>
-	settrim.x	ccdred.h <imhdr.h>
+	settrim.x	ccdred.h <imhdr.h> <imset.h>
 	setzero.x	ccdred.h ccdtypes.h <imhdr.h>
 	t_badpixim.x	<imhdr.h>
 	t_ccdgroups.x	<error.h> <math.h>
 	t_ccdhedit.x	<error.h>
-	t_ccdinst.x	ccdtypes.h <imhdr.h> <imio.h> <error.h>
+	t_ccdinst.x	ccdtypes.h <error.h> <imhdr.h> <imio.h>
 	t_ccdlist.x	ccdtypes.h <error.h> <imhdr.h>
+	t_ccdmask.x	<imhdr.h>
 	t_ccdproc.x	ccdred.h ccdtypes.h <error.h> <imhdr.h>
-	t_combine.x	ccdred.h <syserr.h> <error.h> <imhdr.h>
+	t_combine.x	ccdred.h icombine.com icombine.h <error.h> <imhdr.h>\
+			<mach.h>
 	t_mkfringe.x	ccdred.h <imhdr.h>
-	t_mkillumcor.x	ccdred.h <imhdr.h>
+	t_mkillumcor.x	ccdred.h
 	t_mkillumft.x	ccdred.h <imhdr.h>
-	t_mkskycor.x	ccdred.h <imhdr.h> <imset.h>
-	t_mkskyflat.x	ccdred.h <imhdr.h>
+	t_mkskycor.x	ccdred.h <mach.h> <imhdr.h> <imset.h>
+	t_mkskyflat.x	ccdred.h ccdtypes.h <imhdr.h>
 	t_skyreplace.x	<imhdr.h>
 	timelog.x	<time.h>
 	;

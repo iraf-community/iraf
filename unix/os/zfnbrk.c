@@ -17,10 +17,12 @@
  * procedure appears to work correctly for AOS, VMS, and UNIX filenames, as well
  * as IRAF virtual filenames.
  * 
- * The legal characters in a VFN are [a-zA-Z0-9_.].  The character '.',
+ * The legal characters in an IRAF VFN are [a-zA-Z0-9_.].  The character '.',
  * if present, separates the root file name from the extension.  If multiple
  * period delimited fields are present, the final field is taken to be the
- * extension, and the previous fields are included in the root name.
+ * extension, and the previous fields are included in the root name.  Other
+ * characters may or may not be permitted in filenames depending upon the
+ * restrictions of the host system.
  * 
  * The end of the logical directory prefix, if present, is marked by the index
  * of the last non-VFN character encountered.
@@ -39,13 +41,11 @@ XINT	*uextn_offset;		/* index of first char in extn, or 0	*/
 
 	for (ip=vfn;  *ip != EOS;  ip++) {
 	    ch = *ip;
-	    if (isalnum(ch) || ch == '_')
-		;				/* ordinary VFN character */
-	    else if (ch == '\\' && *(ip+1) != EOS)
+	    if (ch == '\\' && *(ip+1) != EOS)
 		ip++;
 	    else if (ch == '.')
 		extn_offset = ip;		/* possibly start of extn */
-	    else
+	    else if (ch == '$' || ch == '/' || ch == ':' || ch == ']')
 		root_offset = ip+1;		/* part of logical name */
 	}
 

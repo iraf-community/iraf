@@ -1,5 +1,20 @@
 .help revisions Jun88 pkg.utilities
 .nf
+utilities$urand.x
+utilities$doc/urand.hlp
+    If the "seed" parameter is set to INDEF then the clock time (integer
+    seconds since 1980) will be used as the seed.  This allows different
+    executions to produce different random numbers.
+    (9/23/97, Valdes)
+
+===========
+V2.11export
+===========
+
+utilities$curfit.gx
+    Removed repeated output and added a comment character to the table
+    header line.  (2/29/95, Valdes)
+
 utilities$t_polyfit.x
     Revoved the dependent variable normalization which was not doing anything
     to improve the numerical statbility of the routine and which was causing

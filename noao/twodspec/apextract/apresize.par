@@ -1,6 +1,7 @@
 # APRESIZE
 
 input,s,a,,,,List of input images
+apertures,s,h,"",,,Apertures
 references,s,h,"",,,"Reference images
 "
 interactive,b,h,no,,,Run task interactively?

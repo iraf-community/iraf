@@ -49,9 +49,9 @@ begin
 	if (AP_MAGERRS(phot) != NULL)
 	    call mfree (AP_MAGERRS(phot), TY_REAL)
 	if  (AP_SUMS(phot) != NULL)
-	    call mfree (AP_SUMS(phot), TY_REAL)
+	    call mfree (AP_SUMS(phot), TY_DOUBLE)
 	if (AP_AREA(phot) != NULL)
-	    call mfree (AP_AREA(phot), TY_REAL)
+	    call mfree (AP_AREA(phot), TY_DOUBLE)
 
 	#if (AP_APIX(phot) != NULL)
 	    #call mfree (AP_APIX(phot), TY_REAL)

@@ -9,10 +9,10 @@
 # tracked automatically.
 
 procedure proc (objects, apref, flat, throughput, arcs1, arcs2, arcreplace,
-	arctable, fibers, apidtable, objaps, skyaps, arcaps, objbeams, skybeams,
-	arcbeams, scattered, fitflat, recenter, edit, trace, arcap, clean,
-	dispcor, savearcs, skysubtract, skyedit, saveskys, splot, redo,
-	update, batch, listonly)
+	arctable, fibers, apidtable, crval, cdelt, objaps, skyaps, arcaps,
+	objbeams, skybeams, arcbeams, scattered, fitflat, recenter, edit,
+	trace, arcap, clean, dispcor, savearcs, skyalign, skysubtract,
+	skyedit, saveskys, splot, redo, update, batch, listonly)
 
 string	objects			{prompt="List of object spectra"}
 
@@ -26,6 +26,8 @@ file	arctable		{prompt="Arc assignment table (optional)\n"}
 
 int	fibers			{prompt="Number of fibers"}
 file	apidtable		{prompt="Aperture identifications"}
+string	crval = "INDEF"		{prompt="Approximate wavelength"}
+string	cdelt = "INDEF"		{prompt="Approximate dispersion"}
 string	objaps			{prompt="Object apertures"}
 string	skyaps			{prompt="Sky apertures"}
 string	arcaps			{prompt="Arc apertures"}
@@ -42,6 +44,7 @@ bool	arcap			{prompt="Use object apertures for arcs?"}
 bool	clean			{prompt="Detect and replace bad pixels?"}
 bool	dispcor			{prompt="Dispersion correct spectra?"}
 bool	savearcs		{prompt="Save internal arcs?"}
+bool	skyalign		{prompt="Align sky lines?"}
 bool	skysubtract		{prompt="Subtract sky?"}
 bool	skyedit			{prompt="Edit the sky spectra?"}
 bool	saveskys		{prompt="Save sky spectra?"}
@@ -64,7 +67,7 @@ struct	*fd1, *fd2, *fd3
 
 begin
 	string	imtype, mstype
-	string	arcref1, arcref2, spec, arc
+	string	arcref1, arcref2, spec, arc, align=""
 	string	arcref1ms, arcref2ms, specms, arcms, response
 	string	objs, temp, temp1, done
 	string	str1, str2, str3, str4, arcrefs, log1, log2
@@ -83,6 +86,9 @@ begin
 	}
 
 	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	mstype = ".ms" // imtype
 	n = strlen (imtype)
 
@@ -95,9 +101,13 @@ begin
 	done = mktemp ("tmp$iraf")
 
 	if (apidtable != "") {
-	    j = strlen (apidtable)
-	    for (i=1; i<=j && substr(apidtable,i,i)==" "; i+=1);
-	    apidtable = substr (apidtable, i, j)
+	    i = strlen (apidtable)
+	    if (i > n && substr (apidtable, i-n+1, i) == imtype) {
+		apidtable = substr (apidtable, 1, i-n)
+		i = strlen (apidtable)
+	    }
+	    for (j=1; j<=i && substr(apidtable,j,j)==" "; j+=1);
+	    apidtable = substr (apidtable, j, i)
 	}
 	i = strlen (apidtable)
 	if (i == 0)
@@ -128,6 +138,7 @@ begin
 	} else
 	    arcrefs = arctable
 	arcref1 = ""
+	arcref2 = ""
 
 	# Rather than always have switches on the logfile and verbose flags
 	# we use TEE and set a file to "dev$null" if output is not desired.
@@ -373,7 +384,14 @@ begin
 	    fd1 = ""; delete (temp, verify=no)
 
 	    arcrefs (arcref1, arcref2, extn, arcreplace, apidtable, response,
-		done, log1, log2)
+		crval, cdelt, done, log1, log2)
+
+	    # Define alignment if needed.
+	    if (skyalign) {
+		align = "align" // extn // imtype
+		if (reextract)
+		    imdelete (align, verify=no, >& "dev$null")
+	    }
 	}
 
 	# Now we are ready to process the object spectra.
@@ -440,7 +458,7 @@ begin
 
 	    # If not interactive and the batch flag is set submit rest to batch.
 	    if (batch && !skyedit1 && !skyedit2 && !splot1 && !splot2 &&
-		apscript.ansedit == "NO") {
+		apscript.ansedit == "NO" && (!skyalign || access (align))) {
 		fd1 = ""; delete (objs, verify=no)
 		apscript.ansfitscatter = "NO"
 		apscript.ansfitsmooth = "NO"
@@ -575,17 +593,19 @@ begin
 		    print ("No arc reference assigned for ", spec) | tee (log1)
 		    disperr = yes
 		} else {
+		    if (skyalign)
+			doalign (spec, specms, align, arcref1ms, log1, no)
 	            print ("Dispersion correct ", spec) | tee (log1)
 		    dispcor (specms, "", linearize=params.linearize,
 			database=database, table=arcref1ms, w1=INDEF,
 			w2=INDEF, dw=INDEF, nw=INDEF, log=params.log,
-			flux=params.flux, samedisp=no, global=no,
+			flux=params.flux, samedisp=yes, global=no,
 			ignoreaps=no, confirm=no, listonly=no,
 			verbose=verbose, logfile=logfile)
 		    if (params.nsubaps > 1) {
 			imrename (specms, temp, verbose=no)
 			scopy (temp, specms, w1=INDEF, w2=INDEF,
-			    apertures="-999", bands="", beams="", apmodulus=0,
+			    apertures="1-999", bands="", beams="", apmodulus=0,
 			    offset=0, format="multispec", clobber=no, merge=no,
 			    renumber=no, verbose=no)
 			blkavg (temp, temp, 1, params.nsubaps, option="sum")
@@ -672,6 +692,7 @@ batch:
 	batch.arcap = arcap
 	batch.dispcor = dispcor
 	batch.savearcs = savearcs
+	batch.skyalign = skyalign
 	batch.skysubtract = skysubtract
 	batch.saveskys = saveskys
 	batch.newaps = newaps

@@ -23,5 +23,5 @@ libpkg.a:
 	mkshow.x	"tvmark.h"
 	mktext.x	"pixelfont.inc"  "asciilook.inc"  <imhdr.h>  <mach.h>
 	mktools.x	<ctype.h> "tvmark.h"
-	t_tvmark.x	<imhdr.h>  <fset.h>  <gset.h>  "tvmark.h"
+	t_tvmark.x	<imhdr.h>  <imset.h> <fset.h>  <gset.h>  "tvmark.h"
 	;

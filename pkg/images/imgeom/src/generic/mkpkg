@@ -1,0 +1,13 @@
+# Library for the GEOMETRIC TRANSFORMATION tasks
+
+$checkout libpkg.a pkg$images/
+$update   libpkg.a
+$checkin  libpkg.a pkg$images/
+$exit
+
+libpkg.a:
+	blkav.x		<imhdr.h> <error.h>
+	blkrp.x		<imhdr.h>
+	imtrans.x
+	im3dtran.x
+	;

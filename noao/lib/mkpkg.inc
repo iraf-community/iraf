@@ -4,7 +4,9 @@ $set XFLAGS	= "$(XFLAGS) -p noao"
 $set XVFLAGS	= "$(XVFLAGS) -p noao"
 $set LFLAGS	= "$(LFLAGS) -p noao"
 
-$ifeq (MACH, sparc) then
+$ifeq (MACH, ssun) then
+    $include "noao$lib/mkpkg.sf.SSUN"
+$else $ifeq (MACH, sparc) then
     $include "noao$lib/mkpkg.sf.SUN4"
 $else $ifeq (MACH, i386) then
     $include "noao$lib/mkpkg.sf.I386"

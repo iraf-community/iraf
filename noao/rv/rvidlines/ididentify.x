@@ -33,7 +33,7 @@ bool	clgetb()
 pointer	gopen()
 int	clgcur(), scan(), nscan(), find_peaks(), errcode(), id_gid(), nowhite()
 double	id_center(), fit_to_pix(), id_fitpt()
-double	id_shift(), id_rms()
+double	id_shift(), id_rms(), id_zshiftd(), id_zval()
 errchk	id_gdata(), id_graph(), id_dbread(), xt_mk1d(), id_log()
 
 define	newim_		10
@@ -165,15 +165,15 @@ newim_
 		    call id_match (id, FIT(id,ID_CURRENT(id)),
 			USER(id,ID_CURRENT(id)),
 			Memi[ID_LABEL(id)+ID_CURRENT(id)-1],
-			ID_MATCH(id), ID_REDSHIFT(id))
+			ID_MATCH(id))
 		    call id_mark (id, ID_CURRENT(id))
 		    call printf ("%10.2f %10.8g ")
 			call pargd (PIX(id,ID_CURRENT(id)))
 			call pargd (FIT(id,ID_CURRENT(id)))
 		    if (ID_REDSHIFT(id) != 0.) {
 			call printf ("%10.8g ")
-			    call pargd (FIT(id,ID_CURRENT(id)) /
-				(1 + ID_REDSHIFT(id)))
+			    call pargd (
+				id_zshiftd (id, FIT(id,ID_CURRENT(id), 0)))
 		    }
 		    call printf ("(%10.8g %s): ")
 			call pargd (USER(id,ID_CURRENT(id)))
@@ -189,10 +189,10 @@ newim_
 			i = nscan()
 			if (i > 0) {
 			    USER(id,ID_CURRENT(id)) = user
-			    fit = user * (1 + ID_REDSHIFT(id))
+			    fit = id_zshiftd (id, user, 1)
 			    call id_match (id, fit, USER(id,ID_CURRENT(id)),
 				Memi[ID_LABEL(id)+ID_CURRENT(id)-1],
-				ID_MATCH(id), ID_REDSHIFT(id))
+				ID_MATCH(id))
 			}
 			if (i > 1) {
 			    call reset_scan ()
@@ -332,15 +332,15 @@ newim_
 		call id_match (id, FIT(id,ID_CURRENT(id)),
 		    USER(id,ID_CURRENT(id)),
 		    Memi[ID_LABEL(id)+ID_CURRENT(id)-1],
-		    ID_MATCH(id), ID_REDSHIFT(id))
+		    ID_MATCH(id))
 		call id_mark (id, ID_CURRENT(id))
 		call printf ("%10.2f %10.8g ")
 		    call pargd (PIX(id,ID_CURRENT(id)))
 		    call pargd (FIT(id,ID_CURRENT(id)))
 		if (ID_REDSHIFT(id) != 0.) {
 		    call printf ("%10.8g ")
-			call pargd (FIT(id,ID_CURRENT(id)) /
-			    (1 + ID_REDSHIFT(id)))
+			call pargd (
+			    id_zshiftd (id, FIT(id,ID_CURRENT(id)), 0))
 		}
 		call printf ("(%10.8g %s): ")
 		    call pargd (USER(id,ID_CURRENT(id)))
@@ -356,10 +356,10 @@ newim_
 		    i = nscan()
 		    if (i > 0) {
 			USER(id,ID_CURRENT(id)) = user
-			fit = user * (1 + ID_REDSHIFT(id))
+			fit = id_zshiftd (id, user, 1)
 			call id_match (id, fit, USER(id,ID_CURRENT(id)),
 			    Memi[ID_LABEL(id)+ID_CURRENT(id)-1],
-			    ID_MATCH(id), ID_REDSHIFT(id))
+			    ID_MATCH(id))
 		    }
 		    if (i > 1) {
 			call reset_scan ()
@@ -449,7 +449,7 @@ newim_
 
 		    pix_shift = pix_shift + pix - PIX(id,i)
 		    if (FIT(id,i) != 0.)
-		        z_shift = z_shift + (fit - FIT(id,i)) / FIT(id,i)
+			z_shift = z_shift + id_zval (id, fit, FIT(id,i))
 
 		    j = j + 1
 		    PIX(id,j) = pix
@@ -508,8 +508,7 @@ newim_
 		    call pargd (FIT(id,ID_CURRENT(id)))
 		if (ID_REDSHIFT(id) != 0.) {
 		    call printf ("%10.8g ")
-			call pargd (FIT(id,ID_CURRENT(id)) /
-			    (1 + ID_REDSHIFT(id)))
+			call pargd (id_zshiftd (id, FIT(id,ID_CURRENT(id)), 0))
 		}
 		call printf ("(%10.8g %s): ")
 		    call pargd (USER(id,ID_CURRENT(id)))
@@ -573,8 +572,7 @@ newim_
 			next
 		    fit = id_fitpt (id, pix)
 		    user = INDEFD
-		    call id_match (id, fit, user, label, ID_MATCH(id),
-			ID_REDSHIFT(id))
+		    call id_match (id, fit, user, label, ID_MATCH(id))
 		    call id_newfeature (id, pix, fit, user, 1.0D0,
 			ID_FWIDTH(id), ID_FTYPE(id), label)
 		    call id_mark (id, ID_CURRENT(id))
@@ -679,14 +677,14 @@ newkey_
 			if (IS_INDEFD(user))
 			    shift = INDEF
 			else {
-			    shift = (fit - user) / user - ID_REDSHIFT(id)
+			    shift = id_zval (id, fit, user) - ID_REDSHIFT(id)
 			    if (abs (shift) < 0.01)
 				shift = shift * VLIGHT
 			}
 			call printf ("%10.2f %10.8g %10.8g %10.8g %10.3g %s")
 			    call pargd (pix)
 			    call pargd (fit)
-			    call pargd (fit / (1 + ID_REDSHIFT(id)))
+			    call pargd (id_zshiftd (id, fit, 0))
 			    call pargd (user)
 			    if (IS_INDEFD(user))
 				call pargd (INDEFD)

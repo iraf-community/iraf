@@ -1,0 +1,73 @@
+.help hselect May85 images.imutil
+.ih
+NAME
+hselect - select a subset of images satisfying a boolean expression
+.ih
+USAGE
+hselect images fields expr
+.ih
+PARAMETERS
+.ls images
+Images forming the set from which selected images are to be drawn.
+.le
+.ls fields
+Template defining the fields to be tabulated from each selected image.
+.le
+.ls expr
+The boolean expression to be used as the selection criteria.  The expression
+is evaluated independently for each image.
+.le
+.ih
+DESCRIPTION
+The function of \fIhselect\fR is to select a subset of images from a database
+according to a selection criteria supplied by the user, tabulating a subset
+of the fields of each selected image on the standard output.  The resultant
+table is output in list form, suitable for further analysis or for use to
+generate a list of images to be processed by another task.
+
+The form of the boolean expression \fIexpr\fR is fully documented in the
+manual page for the \fIhedit\fR task.  In the case of \fIhselect\fR task,
+however, the expression need not be parenthesized to be evaluated as an
+expression.  The special operand "$I" denotes the name of the current image
+and is used in the \fIfields\fR list when the image name is desired as one
+of the columns of the output list.
+.ih
+EXAMPLES
+1. Compute the mean exposure time for all the images in a database.  Note that
+the argument "yes" is a trivial case of a general boolean expression and
+hence need not be quoted.
+
+	cl> hselect n1.* exp yes | average
+
+2. Print the name, length of axes 1 and 2, and title of all two dimensional
+images in a database.
+
+
+.nf
+	cl> hselect n1.* $I,naxis[12],title 'naxis == 2'
+	n1.0001	512	512	quartz
+	n1.0002 512	512	"dome flat"
+	n1.0005 384	800	"ngc 3127 at 45 degrees"
+	cl>
+.fi
+
+
+3. Produce an image name list for use to drive another task.  The selection
+criterium is all images for which the value of the parameter "q-flag"
+has the value 1.  Note carefully the use of quotes.  If the @ operator
+is unfamiliar read the manual page for \fIhedit\fR.
+
+	cl> hselect n1.* $I '@"q-flag" == 1' > imlist
+
+If the parameter "q-flag" were instead named "qflag", the following
+simpler expression would suffice.
+
+	cl> hselect n1.* $I 'qflag == 1' > imlist
+.ih
+BUGS
+Since individual image headers are currently stored as separate files,
+selection from a large database is quite slow.
+.ih
+SEE ALSO
+hedit, imgets, imheader
+.endhelp

@@ -42,6 +42,7 @@ begin
 	# Initialize some variables.
 	key = 'a'
 	nxstar = 0
+	call dp_pseti (dao, PNUM, 0)
 
 	# Begin to build the PSF.
 	while (clgcur ("icommands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) !=

@@ -1,8 +1,10 @@
 # SARCREFS -- Determine dispersion relation for reference arcs.
 
-procedure sarcrefs (arcref1, done, log1, log2)
+procedure sarcrefs (arcref1, crval, cdelt, done, log1, log2)
 
 file	arcref1
+string	crval = "INDEF"
+string	cdelt = "INDEF"
 file	done
 file	log1
 file	log2
@@ -24,6 +26,9 @@ begin
 	newdisp = no
 	arcref = arcref1
 	arcrefms = arcref1 // ".ms." // envget ("imtype")
+	i = stridx (",", arcrefms)
+	if (i > 0)
+	    arcrefms = substr (arcrefms, 1, i-1)
 	if (!access (arcrefms)) {
 	    print ("Extract arc reference image ", arcref) | tee (log1)
 	    if (apslitproc.reference == "") {
@@ -55,15 +60,31 @@ begin
 	if (i < 1 || dc == -1) {
 	    print ("Determine dispersion solution for ", arcref) | tee (log1)
 	    #delete (database//"/id"//arcref//".ms*", verify=no)
-	    identify (arcrefms, section="middle line", database=database,
-		coordlist=sparams.coordlist, nsum=1, match=sparams.match,
-		maxfeatures=50, zwidth=100., ftype="emission",
-		fwidth=sparams.fwidth, cradius=sparams.cradius,
-		threshold=sparams.threshold, minsep=2.,
-		function=sparams.i_function, order=sparams.i_order,
-		sample="*", niterate=sparams.i_niterate,
-		low_reject=sparams.i_low, high_reject=sparams.i_high,
-		grow=0., autowrite=yes)
+	    if (real(crval) == INDEF && real(cdelt) == INDEF)
+		identify (arcrefms, section="middle line", database=database,
+		    coordlist=sparams.coordlist, nsum=1, match=sparams.match,
+		    maxfeatures=50, zwidth=100., ftype="emission",
+		    fwidth=sparams.fwidth, cradius=sparams.cradius,
+		    threshold=sparams.threshold, minsep=2.,
+		    function=sparams.i_function, order=sparams.i_order,
+		    sample="*", niterate=sparams.i_niterate,
+		    low_reject=sparams.i_low, high_reject=sparams.i_high,
+		    grow=0., autowrite=yes)
+	    else
+		autoidentify (arcrefms, crval, cdelt,
+		    coordlist=sparams.coordlist,
+		    interactive="YES", section="middle line", nsum="1",
+		    ftype="emission", fwidth=sparams.fwidth,
+		    cradius=sparams.cradius, threshold=sparams.threshold,
+		    minsep=2., match=sparams.match, function=sparams.i_function,
+		    order=sparams.i_order, sample="*",
+		    niterate=sparams.i_niterate, low_reject=sparams.i_low,
+		    high_reject=sparams.i_high, grow=0., dbwrite="YES",
+		    overwrite=yes, database="database", verbose=yes,
+		    logfile=logfile, plotfile=plotfile,
+		    reflist="", refspec="", crpix="INDEF", cddir="unknown",
+		    crsearch="-0.5", cdsearch="INDEF", aidpars="")
+
 	    hedit (arcrefms, "refspec1", arcref // ".ms", add=yes,
 		show=no, verify=no)
 

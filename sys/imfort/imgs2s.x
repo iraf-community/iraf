@@ -51,6 +51,9 @@ begin
 		return
 	    }
 
+	    # Swap bytes if necessary.
+	    call imswap (im, buf[op], nchars)
+
 	    op = op + npix
 	}
 

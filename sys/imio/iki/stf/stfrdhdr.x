@@ -27,8 +27,9 @@ int	compress, devblksz, ival, ch, i , junk
 int	fits, fitslen, sz_userarea, sz_gpbhdr, len_hdrmem
 long	totpix, mtime, ctime
 
-int	fnroot(), strlen(), sizeof(), finfo()
-errchk	stf_rfitshdr, stf_rgpb, open, realloc, imaddb, imaddi
+real	imgetr()
+int	fnroot(), strlen(), sizeof(), finfo(), imaccf()
+errchk	stf_rfitshdr, stf_rgpb, open, realloc, imaddb, imaddi, imgetr
 
 begin
 	call smark (sp)
@@ -126,17 +127,6 @@ begin
 
 	call stf_rgpb (im, group, acmode, datamin, datamax)
 
-	# Set the IMIO min/max fields.  If the GPB datamin >= datamax the
-	# values are invalidated by setting IM_LIMTIME to before the image
-	# modification time.
-
-	IM_MIN(im) = datamin
-	IM_MAX(im) = datamax
-	if (datamin < datamax)
-	    IM_LIMTIME(im) = IM_MTIME(im) + 1
-	else
-	    IM_LIMTIME(im) = IM_MTIME(im) - 1
-
 	# Reallocate the image descriptor to allow space for the spooled user
 	# FITS cards plus a little extra for new parameters.
 
@@ -160,6 +150,26 @@ begin
 
 	op = IM_USERAREA(im) + sz_gpbhdr
 	call amovc (Memc[fits], Memc[op], fitslen+1)
+
+	# Set the IMIO min/max fields.  If the GPB datamin >= datamax the
+	# values are invalidated by setting IM_LIMTIME to before the image
+	# modification time.  Although datamin/datamax were returned by
+	# stg_rgpb above, we refetch the values here to pick up the values
+	# from the spooled main header in case there were no entries for
+	# these keywords in the GPB (if there are values in the GPB they
+	# will override those in the main header).
+
+	if (imaccf (im, "DATAMIN") == YES)
+	    datamin = imgetr (im, "DATAMIN")
+	if (imaccf (im, "DATAMAX") == YES)
+	    datamax = imgetr (im, "DATAMAX")
+
+	IM_MIN(im) = datamin
+	IM_MAX(im) = datamax
+	if (datamin < datamax)
+	    IM_LIMTIME(im) = IM_MTIME(im) + 1
+	else
+	    IM_LIMTIME(im) = IM_MTIME(im) - 1
 
 	# Call up IMIO set set up the remaining image header fields used to
 	# define the physical offsets of the pixels in the pixfile.

@@ -1,11 +1,107 @@
 .help revisions May92 noao.rv
 .nf
+rvdrawfit.x
+	Fixed a typo causing an incorrectly array allocation (8/25/97)
+
+rvplot.x
+fftmode.x
+rvsample.x
+        Removed the checks to see if the obj/temp image names are the
+        same to decide if we're making a single or split plot.  With only
+        a single plot it's not possible to set different sample regions
+        when autocorrelating.  (7/24/97)
+
+fftmode.x
+        Deleted unused pointers from fft_plot() routine (7/24/97)
+
+splitplot.x
+rvplot.x
+rvsample.x
+specmode.x
+	Minor fix to plotting of sample regions (7/24/97)
+
+fftmode.x 
+splitplot.x
+        Fixed a fwe minor plotting bugs for power spectra (7/7/97)
+
+rvfgauss.x
+	Changed check_converge() to rv_check_converge() to avoid name
+	conflict with FITS kernel. (5/20/97)
+
+rvidlines/mkpkg
+rvidlines/idlinelist.x
+rvidlines/idlog.x
+rvidlines/t_reidentify.x
+rvidlines/idvelocity.x
+rvidlines/idgraph.x
+rvidlines/ididentify.x
+rvidlines/reidentify.x
+rvidlines/idrms.x
+	Modified to work in input spectrum units.  (3/13/97, Valdes)
+
+rvgetim.x
+	Input spectra which are dispersion corrected are converted to
+	Angstrom units on input.  Thus the spectra can be in other
+	recognized units.  (3/13/97, Valdes)
+
+rvstrings.x
+rvwrite.x
+	The nam_tempcode procedure had an unnecessary pointer arg. (3/6/97)
+
+rvwrite.x
+	Added an extra space for the HJD output.  Since the JD rolled over
+	245000 the number of decimal places decreased by 1, this is now
+	restored (10/21/96)
+
+contin.x
+	The normalized reference spectrum was being copied from the object
+	spectrum when the image names were the same as a form of optimization.
+	This could fail in cases where the 'n' key was used to move through
+	a list to get the next object an the object spectrum was previously
+	rebinned at a different dispersion causing artificial shifts in 
+	the data.  The code was modified to always compute a normalization
+	to avoid this (9/12/96)
+
+rvcorrect.par
+doc/rvcorrect.hlp
+	Forgot to add the keypars pset for this task  (8/26/96)
+
+rvlinefit.x
+        Removed an extraneous sfree call causing a salloc underflow if
+        a certain error condition happens.  (8/13/96)
+
+specmode.x
+	Fixed a bug where the spectrum mode could get confused on future
+	plots on specmode.  (8/8/96)
+
+rvfgauss.x
+        A couple of *_old varables were declared but never used.  (7/17/96)
+ 
+rvrvcor.x
+        Fixed a bug in the rv correction code where the default kpno
+        observatory was always being used in cases where the image
+        did not have an OBSERVAT keyword, instead of using the obs
+        supplied by the task parameter  (6/26/96)
+
+rvgetim.x
+	Commented out the check for a max number of points since this
+	no longer appears to be needed. (5/14/96)
+
+rvfgauss.x
+	Fixed a rare bug that can cause a floating overflow when a fit
+	converges to a nonsensical large gaussian.  Added a trap for
+	a very large sigma in a computed fit. (7/26/95)
+
 rvplot.x
         Fixed an old bug in which the code to draw a single plot in
         spectrum mode was actually recursive.  This would result in an
         infinite loop if the obj/temp were the same image and the 'i'
         key was used.  Wrote code for a single plot for both the input
         and normalized single plots  (3/10/95)
+
+=======
+V2.10.4
+=======
 
 rvidlines/idvhelio.x
 	Changed error action to a single warning to allow for the case
@@ -15,6 +111,10 @@ rvbatch.x
         Fixed a bug where the RV_TEMPNUM wasn't being set before the 
         rv_data_check() procedure was called.  If the data were rebinned
         this corrupted the RV_TEMPVEL() pointer. (10/13/94)
+
+=======
+V2.10.3
+=======
 
 rvbatch.x
 	Fixed a bug where the image wasn't being update in batch mode (7/18/94)

@@ -20,7 +20,7 @@ pointer	stf
 pointer	o_im
 long	totpix
 char	pname[SZ_KEYWORD]
-int	pixtype, bitpix, nbytes, pno, ndim, i, j
+int	old_kernel, pixtype, bitpix, nbytes, pno, ndim, i, j
 errchk	stf_addpar
 int	sizeof()
 string	zero "0"
@@ -79,9 +79,11 @@ begin
 	# image.  The following are the "standard" set of datamin/max and the
 	# FITS coordinate parms which SDAS files are supposed to have.
 
-	if (IM_ACMODE(im) == NEW_FILE || 
-	   ((IM_ACMODE(im) == NEW_COPY) &&
-	   (IM_KERNEL(o_im) != IM_KERNEL(im))) ) {
+	if (IM_ACMODE(im) == NEW_COPY && o_im != NULL)
+	    old_kernel = IM_KERNEL(o_im)
+
+	if ((IM_ACMODE(im) == NEW_FILE) || 
+	   ((IM_ACMODE(im) == NEW_COPY) && IM_KERNEL(im) != old_kernel)) {
 
 	    # Set up the standard STF group parameter block parameters.
 	    STF_GROUPS(stf) = YES

@@ -1,0 +1,69 @@
+.help imtranspose Aug84 images.imgeom
+.ih
+NAME
+imtranspose -- transpose two dimensional images
+.ih
+USAGE	
+.nf
+imtranspose input output
+.fi
+.ih
+PARAMETERS
+.ls input
+List of images to be transposed.
+.le
+.ls output
+List of output transposed images. If the output image name is the same as
+the input image name then the output image will replace the input image.
+The number of output images must be the same as the number of input images.
+.le
+.ls len_blk = 512
+The one dimensional length of the transpose blocks.
+.le
+.ih
+DESCRIPTION
+Imtranspose transposes the list of images in input by interchanging
+their rows and columns and writing the results to images specified in
+output. The number of input and output images must be the same.
+
+The transpose is done in square blocks whose dimensions are equal \fIlen_blk\fR.
+
+The imtranspose tasks can be used to perform counter-clockwise or
+clockwise ninety degree rotations by flipping the y or x axis respectively
+in the input image section specification.
+
+.ih
+EXAMPLES
+1. To transpose an image:
+
+	cl> imtranspose image1 image2
+
+2. To transpose an image in place:
+
+	cl> imtranspose image1 image1
+
+3. To rotate an image 90 degrees counter-clockwise and clockwise:
+
+	cl> imtranspose image1[*,-*] image2
+
+	cl> imtranspose image1[-*,*] image2
+
+3. To transpose a set of 3 images listed 1 per line in the file imlist to
+the new images trans001, trans002, and trans003:
+
+	cl> imtranspose @imlist trans001,trans002,trans003
+
+4. To transpose a set of images in place:
+
+	cl> imtranspose frame* frame*
+
+5. To rotate an image 90 degrees counter-clockwise in place:
+
+	cl> imtranspose image[*,-*] image
+.ih
+BUGS
+
+It is currently not legal to transpose images with a wcs type of MULTISPEC.
+.ih
+SEE ALSO
+.endhelp

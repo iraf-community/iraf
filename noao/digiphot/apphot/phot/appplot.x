@@ -133,15 +133,15 @@ begin
 	    call pargi (apstati (ap, NSKY_REJECT))
 
 	# Encode the apertures and magnitudes.
-	call aparrays (ap, APERTS, Memr[temp])
+	call ap_arrayr (ap, APERTS, Memr[temp])
 	call amulkr (Memr[temp], apstatr (ap, SCALE), Memr[temp], naperts)
 	call fprintf (fd, "Photometry: maxapert=")
 	call fprintf (fd, "%0.2f  mag=")
 	    call pargr (Memr[temp+naperts-1])
-	call aparrays (ap, MAGS, Memr[temp])
+	call ap_arrayr (ap, MAGS, Memr[temp])
 	call fprintf (fd, "%0.3f  merr=")
 	    call pargr (Memr[temp+naperts-1])
-	call aparrays (ap, MAGERRS, Memr[temp])
+	call ap_arrayr (ap, MAGERRS, Memr[temp])
 	call fprintf (fd, "%0.3f\n")
 	    call pargr (Memr[temp+naperts-1])
 
@@ -258,7 +258,7 @@ begin
 
 	# Mark the appertures.
 	call gseti (gd, G_PLTYPE, GL_SOLID)
-	call aparrays (ap, APERTS, Memr[temp])
+	call ap_arrayr (ap, APERTS, Memr[temp])
 	call amulkr (Memr[temp], apstatr (ap, SCALE), Memr[temp], naperts)
 	do i = 1, naperts {
 	    call gamove (gd, Memr[temp+i-1], ymin)

@@ -1,4 +1,6 @@
+include	<pkg/gtools.h>
 include	<smw.h>
+include	<units.h>
 include	"ecidentify.h"
 
 # EC_FITDATA -- Compute fit coordinates from pixel coordinates.
@@ -15,12 +17,24 @@ begin
 
 	do i = 1, EC_NLINES(ec) {
 	    call ec_gline (ec, i)
-	    if (EC_ECF(ec) == NULL)
-	       call achtrd (Memr[SX(EC_SH(ec))],  FITDATA(ec,1), EC_NPTS(ec))
-	    else {
+	    if (EC_ECF(ec) == NULL) {
+		if (DC(EC_SH(ec)) != DCNO && EC_UN(ec) != NULL)
+		    iferr (call shdr_units (EC_SH(ec), UN_UNITS(EC_UN(ec))))
+			;
+	        call achtrd (Memr[SX(EC_SH(ec))],  FITDATA(ec,1), EC_NPTS(ec))
+	        call gt_sets (EC_GT(ec), GTXLABEL, LABEL(EC_SH(ec)))
+	        call gt_sets (EC_GT(ec), GTXUNITS, UNITS(EC_SH(ec)))
+	    } else {
 		ORDERS(ec,i) = ecf_oeval (EC_ECF(ec), APS(ec,i))
 	        call ecf_vector (EC_ECF(ec), APS(ec,i), PIXDATA(ec,1),
 		    FITDATA(ec,1), EC_NPTS(ec))
+	       if (EC_UN(ec) == NULL) {
+		   call gt_sets (EC_GT(ec), GTXLABEL, LABEL(EC_SH(ec)))
+		   call gt_sets (EC_GT(ec), GTXUNITS, UNITS(EC_SH(ec)))
+		} else {
+		   call gt_sets (EC_GT(ec), GTXLABEL, UN_LABEL(EC_UN(ec)))
+		   call gt_sets (EC_GT(ec), GTXUNITS, UN_UNITS(EC_UN(ec)))
+		}
 	    }
 	}
 

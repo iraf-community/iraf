@@ -508,9 +508,10 @@ begin
 	    call pargi (and (flags, 777B))
 	    call pargstr (comment)
 
-	call printf ("%s=%d ")
+	call printf ("%s=%dx%d ")
 	    call pargstr ("blockfactor")
-	    call pargi (qpio_stati(io, QPIO_BLOCKFACTOR))
+	    call pargi (qpio_stati(io, QPIO_XBLOCKFACTOR))
+	    call pargi (qpio_stati(io, QPIO_YBLOCKFACTOR))
 	call printf ("%s=%d ")
 	    call pargstr ("bucketlen")
 	    call pargi (qpio_stati(io, QPIO_BUCKETLEN))
@@ -521,8 +522,14 @@ begin
 	    call pargstr ("evxoff")
 	    call pargi (qpio_stati(io, QPIO_EVXOFF))
 	call printf ("%s=%d ")
+	    call pargstr ("evxtype")
+	    call pargi (qpio_stati(io, QPIO_EVXTYPE))
+	call printf ("%s=%d ")
 	    call pargstr ("evyoff")
 	    call pargi (qpio_stati(io, QPIO_EVYOFF))
+	call printf ("%s=%d ")
+	    call pargstr ("evytype")
+	    call pargi (qpio_stati(io, QPIO_EVYTYPE))
 	call printf ("\n")
 
 	call printf ("%s=%xX ")
@@ -552,8 +559,14 @@ begin
 	    call pargstr ("ixxoff")
 	    call pargi (qpio_stati(io, QPIO_IXXOFF))
 	call printf ("%s=%d ")
+	    call pargstr ("ixxtype")
+	    call pargi (qpio_stati(io, QPIO_IXXTYPE))
+	call printf ("%s=%d ")
 	    call pargstr ("ixyoff")
 	    call pargi (qpio_stati(io, QPIO_IXYOFF))
+	call printf ("%s=%d ")
+	    call pargstr ("ixytype")
+	    call pargi (qpio_stati(io, QPIO_IXYTYPE))
 	call printf ("%s=%d ")
 	    call pargstr ("lf")
 	    call pargi (qpio_stati(io, QPIO_LF))
@@ -955,8 +968,8 @@ begin
 	qp = qp_open (outfile, NEW_FILE, NULL)
 
 	naxes = 2
-	axlen[1] = 1024
-	axlen[2] = 1024
+	axlen[1] = clgeti ("ncols")
+	axlen[2] = clgeti ("nlines")
 
 	# Setup the QPOE file header.
 	call qp_addf (qp, "naxes", "i", 1, "number of image axes", 0)
@@ -978,8 +991,13 @@ begin
 	# Hack this to generate different types of test files.
 	do i = 1, nevents {
 	    EV_TIME(ev) = 1.0D0 + double(i) / 10.0D0
-	    EV_X(ev)    = (i - 1) * 10 + 1
-	    EV_Y(ev)    = (i - 1) * 10 + 1
+	    if (mod(i,2) == 0) {
+		EV_X(ev) = (i - 1) * 10 + 1
+		EV_Y(ev) = (i - 1) * 10 + 1
+	    } else {
+		EV_X(ev) = axlen[1] - ((i - 1) * 10 + 1)
+		EV_Y(ev) = axlen[2] - ((i - 1) * 10 + 1)
+	    }
 	    EV_PHA(ev)  = mod (nint(i * 11.1111), 20)
 	    EV_PI(ev)   = i / 2
 	    EV_DX(ev)   = nevents - i + 1
@@ -1285,7 +1303,7 @@ end
 
 procedure t_plotpoe()
 
-int	ncols, nlines, block, mval, nev, i
+int	ncols, nlines, xblock, yblock, mval, nev, i
 pointer	sp, poefile, evlist, evl, xv, yv, qp, io, ev, gp
 pointer	qp_open(), gopen(), qpio_open
 int	clgeti(), qp_stati(), qp_geti(), qpio_getevents()
@@ -1302,11 +1320,13 @@ begin
 	qp = qp_open (Memc[poefile], READ_ONLY, NULL)
 
 	call qp_seti (qp, QPOE_DEBUGLEVEL, clgeti ("debug"))
-	call qp_seti (qp, QPOE_BLOCKFACTOR, clgeti ("block"))
+	call qp_seti (qp, QPOE_XBLOCKFACTOR, clgeti ("xblock"))
+	call qp_seti (qp, QPOE_YBLOCKFACTOR, clgeti ("yblock"))
 
-	block = qp_stati (qp, QPOE_BLOCKFACTOR)
-	ncols  = qp_geti (qp, "axlen[1]") / block
-	nlines = qp_geti (qp, "axlen[2]") / block
+	xblock = qp_stati (qp, QPOE_XBLOCKFACTOR)
+	yblock = qp_stati (qp, QPOE_YBLOCKFACTOR)
+	ncols  = qp_geti (qp, "axlen[1]") / xblock
+	nlines = qp_geti (qp, "axlen[2]") / yblock
 
 	gp = gopen ("stdgraph", NEW_FILE, STDGRAPH)
 	call gswind (gp, 1., real(ncols), 1., real(nlines))
@@ -1324,8 +1344,8 @@ begin
 	while (qpio_getevents (io, Memi[evl], mval, LEN_EVBUF, nev) != EOF) {
 	    do i = 1, nev {
 		ev = Memi[evl+i-1]
-		Memr[xv+i-1] = EV_X(ev) / block + 1.0
-		Memr[yv+i-1] = EV_Y(ev) / block + 1.0
+		Memr[xv+i-1] = EV_X(ev) / xblock + 1.0
+		Memr[yv+i-1] = EV_Y(ev) / yblock + 1.0
 	    }
 	    call gpmark (gp, Memr[xv], Memr[yv], nev, GM_POINT, 0.0, 0.0)
 	    call gflush (gp)

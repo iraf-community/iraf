@@ -8,7 +8,7 @@ apertures,s,a,"3.0",,,List of photometry apertures
 coords,s,h,"",,,Coordinate list
 output,f,h,"default",,,Results file
 plotfile,f,h,"",,,Plot metacode file
-zmag,r,h,26.0,,,Zero point of magnitude scale
+zmag,r,h,25.0,,,Zero point of magnitude scale
 exposure,s,h,"",,,Exposure time image header keyword
 airmass,s,h,"",,,Airmass image header keyword
 filter,s,h,"",,,Filter image header keyword

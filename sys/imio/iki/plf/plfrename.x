@@ -5,8 +5,9 @@ include	"plf.h"
 
 # PLF_RENAME -- Rename a PLIO mask savefile (mask image).
 
-procedure plf_rename (old_root, old_extn, new_root, new_extn, status)
+procedure plf_rename (kernel, old_root, old_extn, new_root, new_extn, status)
 
+int	kernel			#I IKI kernel
 char	old_root[ARB]		#I old image root name
 char	old_extn[ARB]		#I old image extn
 char	new_root[ARB]		#I new image root name

@@ -55,10 +55,10 @@ define	SZ_COMPLEX	4
 define	SZ_POINTER	2
 define	SZ_STRUCT	2
 define	SZ_USHORT	1
-define	SZ_FNAME	63		# max chars in a file name
-define	SZ_LINE		161		# max chars in a line
-define	SZ_PATHNAME	127		# OS dependent file names
-define	SZ_COMMAND	1024		# max size command block
+define	SZ_FNAME	255		# max chars in a file name
+define	SZ_PATHNAME	511		# OS dependent file names
+define	SZ_LINE		1023		# max chars in a line
+define	SZ_COMMAND	2047		# max size command block
 
 define	TY_BOOL		1		# codes for type arguments, sizeof
 define	TY_CHAR		2
@@ -78,7 +78,7 @@ define	INDEFS		(-32767)
 define	INDEFL		(-2147483647)
 define	INDEFI		INDEFL
 define	INDEFR		1.6e38
-define	INDEFD		1.6d38
+define	INDEFD		1.6d308
 define	INDEFX		(INDEF,INDEF)
 define	INDEF		INDEFR
 

@@ -694,18 +694,18 @@ int	nargs;
 	    "mod",       "nint",      "osfn",      "radix",
 	    "real",      "sin",       "sqrt",      "str",
 	    "substr",    "tan",       "mktemp",    "stridx",
-	    "strlen",
+	    "strlen",	 "imaccess",  "defvar",
 	    NULL
 	};
 	static int optbl[] = {
-	    UNOP|OP_ABS,     UNOP|OP_ACCESS, BINOP|OP_ATAN2,   UNOP|OP_COS,
-	    UNOP|OP_DEFPAC,  UNOP|OP_DEFPAR,  UNOP|OP_DEFTASK, UNOP|OP_ENVGET,
-	    UNOP|OP_EXP,     UNOP|OP_FRAC,    UNOP|OP_INT,     UNOP|OP_LOG,
-	    UNOP|OP_LOG10, MULTOP|OP_NSCAN, MULTOP|OP_MAX,   MULTOP|OP_MIN,
-	   BINOP|OP_MOD,     UNOP|OP_NINT,    UNOP|OP_OSFN,   BINOP|OP_RADIX,
-	    UNOP|OP_REAL,    UNOP|OP_SIN,     UNOP|OP_SQRT,    UNOP|OP_STR,
-	  MULTOP|OP_SUBSTR,  UNOP|OP_TAN,     UNOP|OP_MKTEMP, BINOP|OP_STRIDX,
-	    UNOP|OP_STRLEN
+	    UNOP|OP_ABS,     UNOP|OP_ACCESS,  BINOP|OP_ATAN2,   UNOP|OP_COS,
+	    UNOP|OP_DEFPAC,  UNOP|OP_DEFPAR,   UNOP|OP_DEFTASK, UNOP|OP_ENVGET,
+	    UNOP|OP_EXP,     UNOP|OP_FRAC,     UNOP|OP_INT,     UNOP|OP_LOG,
+	    UNOP|OP_LOG10, MULTOP|OP_NSCAN,  MULTOP|OP_MAX,   MULTOP|OP_MIN,
+	   BINOP|OP_MOD,     UNOP|OP_NINT,     UNOP|OP_OSFN,   BINOP|OP_RADIX,
+	    UNOP|OP_REAL,    UNOP|OP_SIN,      UNOP|OP_SQRT,    UNOP|OP_STR,
+	  MULTOP|OP_SUBSTR,  UNOP|OP_TAN,      UNOP|OP_MKTEMP, BINOP|OP_STRIDX,
+	    UNOP|OP_STRLEN,  UNOP|OP_IMACCESS, UNOP|OP_DEFVAR,
 	};
 	int	index, op;
 	int	n, subi[2];
@@ -1090,7 +1090,8 @@ in_switch()
  * executed.
  */
 caseset (parg, ncaseval)
-int	*parg, ncaseval;
+memel	*parg;
+int	ncaseval;
 {
 	struct	operand	*o;
 	static	char *badcase = "Invalid case constant.";
@@ -1108,7 +1109,7 @@ int	*parg, ncaseval;
 		if (*(o->o_val.v_s + 1) != 0)
 		    cl_error (E_UERR, badcase);
 
-		*parg++ = (int) o->o_val.v_s;
+		*parg++ = (int) *o->o_val.v_s;
 
 	    } else if (o->o_type == OT_INT) {
 	        *parg++ = o->o_val.v_i;

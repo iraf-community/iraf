@@ -12,6 +12,8 @@ task	rcardimage,
 	reblock,
 	rtextimage,
 	t2d,
-	wtextimage	= dataio$x_dataio.e
+	wtextimage,
+	import,
+	export		= dataio$x_dataio.e
 
 clbye()

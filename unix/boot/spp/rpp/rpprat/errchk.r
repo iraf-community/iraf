@@ -8,8 +8,8 @@ character tok, last_tok, gnbtok, token(MAXTOK)
 integer	ntok
 pointer	mktabl
 include	COMMON_BLOCKS
-string	serrcom1 "logical xerflg"
-string	serrcom2 "common /xercom/ xerflg"
+string	serrcom1 "logical xerflg, xerpad(84)"
+string	serrcom2 "common /xercom/ xerflg, xerpad"
 
 	ntok = 0
 	tok = 0

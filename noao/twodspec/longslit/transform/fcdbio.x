@@ -1,14 +1,16 @@
 include	<error.h>
 include	<math/gsurfit.h>
 include	<pkg/dttext.h>
+include	<units.h>
 
 # FC_DBWRITE -- Write an fitcoords database entry.
 
-procedure fc_dbwrite (database, fitname, axis, sf)
+procedure fc_dbwrite (database, fitname, axis, un, sf)
 
 char	database[ARB]		# Database
 char	fitname[ARB]		# Database fit name
 int	axis			# Axis for surface
+pointer	un			# Units pointer
 pointer	sf			# Surface pointer
 
 int	i, nsave
@@ -33,6 +35,10 @@ begin
 	call dtput (dt, "\ttask\tfitcoords\n")
 	call dtput (dt, "\taxis\t%d\n")
 	    call pargi (axis)
+	if (un != NULL) {
+	    call dtput (dt, "\tunits\t%s\n")
+		call pargstr (UN_UNITS(un))
+	}
 
 	nsave = xgsgeti (sf, GSNSAVE)
 	call salloc (coeffs, nsave, TY_DOUBLE)
@@ -51,33 +57,38 @@ end
 
 # LM_DBREAD -- Read an lsmap database entry.
 
-procedure lm_dbread (database, fitname, axis, sf)
+procedure lm_dbread (database, fitname, axis, un, sf)
 
 char	database[ARB]		# Database
 char	fitname[ARB]		# Fit name
 int	axis			# Axis for surface
+pointer	un			# Units pointer
 pointer	sf			# Surface pointer
 
 int	rec, ncoeffs
-pointer	dt, coeffs, sp, dbfile
+pointer	dt, coeffs, sp, dbfile, units
 
 int	dtlocate(), dtgeti()
-pointer	dtmap1()
+pointer	dtmap1(), un_open()
 
-errchk	dtlocate(), dtgeti(), dtgad()
+errchk	dtlocate(), dtgeti(), dtgad(), un_open()
 
 begin
+	un = NULL
 	sf = NULL
 	coeffs = NULL
 
 	call smark (sp)
 	call salloc (dbfile, SZ_FNAME, TY_CHAR)
+	call salloc (units, SZ_FNAME, TY_CHAR)
 	call sprintf (Memc[dbfile], SZ_FNAME, "fc%s")
 	    call pargstr (fitname)
 	dt = dtmap1 (database, Memc[dbfile], READ_ONLY)
 
 	rec = dtlocate (dt, fitname)
 	axis = dtgeti (dt, rec, "axis")
+	ifnoerr (call dtgstr (dt, rec, "units", Memc[units], SZ_FNAME))
+	    un = un_open (Memc[units])
 	ncoeffs = dtgeti (dt, rec, "surface")
 	call salloc (coeffs, ncoeffs, TY_DOUBLE)
 	call dtgad (dt, rec, "surface", Memd[coeffs], ncoeffs, ncoeffs)

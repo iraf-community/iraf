@@ -1,5 +1,213 @@
 .help revisions Jun88 images.tv
 .nf
+images$tv/imexamine/iepos.x
+     Added missing argument in fprintf call.  (8/29/97, Valdes)
+
+images$tv/display/dspmmap.x
+     There was a bug in the code which gives "Warning: PLIO: reference out
+     of bounds on mask".  This was introduced with the changes to allow
+     masks and images to have different binning.  (8/21/97, Valdes)
+
+images$tv/imexamine/ieqrimexam.x	+
+images$tv/imexamine/t_imexam.x
+images$tv/imexamine/iegcur.x
+images$tv/imexamine/iecolon.x
+images$tv/doc/imexamine.hlp
+lib/scr/imexamine.key
+    Added two new keystrokes, ',' and '.', that do what 'a' and 'r' do
+    except they don't do the enclosed flux and direct FWHM measurements nor
+    iterate on the fitting radius.  Also the output format is the same as
+    the previous version of IMEXAM.  (6/12/97, Valdes)
+
+images$tv/imexamine/stfmeasure.x
+    1.  The background is now set to zero if there are no background points.
+    2.  Fixed an error recovery bug (attempting to free a pointer which
+	was not set).
+    (6/11/97, Valdes)
+
+images$tv/imexamine/ierimexam.x
+    The background widths needed to be passed to the PSF measuring routines
+    even if the background is turned off for the fitting in the 'a' and 'r'
+    keys.  (6/11/97, Valdes)
+
+images$tv/doc/display.hlp
+    Added some more information about the colors.  (5/30/97, Valdes)
+
+images$tv/display/dspmmap.x
+    Improved to allow different binning between masks and images.
+    (5/21/97, Valdes)
+
+images$tv/display/zscale.x
+    Fixed to work with 1D images.  (5/21/97, Valdes)
+
+images$tv/display/zscale.x
+images$tv/display/dspmmap.x
+    1. Now works with higher dimensional images (displays the first band)
+       and with image sections.
+    2. Now ignores error when the image has an unknown WCS type.  The
+       WCS is mapped to determine the physical coordinate transformation
+       for use with masks but this failed when someone imported an image
+       with the CAR projection type. (4/30/97, Valdes)
+
+images$tv/doc/imexamine.hlp
+    Reversed the order of the version and task in the revisions section.
+    (4/22/97, Valdes)
+
+images$tv/tvmark/mkmark.x
+    Made sure that object the label was set to "" in the call to the
+    mk_onemark procedure inside the a keystroke command. The lack
+    of initialization was causing tvmark to fail when the coordinates
+    file did not exist at task startup time and the label parameter
+    was set to "yes". (4/17, LED)
+
+images$tv/imedit/epgsfit.x
+    The earlier change failed to setup the x/y arrays for the surface fitting.
+    This was fixed.  (4/15/97, Valdes)
+
+images$tv/imexamine/iejimexam.x
+images$tv/imexamine/iecolon.x
+images$tv/kimexam.par +
+images$tv/doc/imexamine.hlp
+images$tv/tv.cl
+    Added a pset for the 'k' key rather than sharing with the 'j' key.  This
+    was confusing to users since it was the only key without it's own pset.
+    Also there may be some reason to have the fitting parameters be
+    different along lines and columns.  (4/11/97, Valdes)
+
+images$tv/imexamine/ierimexam.x
+images$doc/imexamine.hlp
+    The log output for 'a' or 'r' has one line per measurement as in
+    previous versions.  The standard output, however, uses two lines to
+    print nicely on 80 column windows.  (4/1/97, Valdes)
+
+images$tv/rimexam.par
+images$tv/doc/imexamine.hlp
+    Changed the zero point of the magnitude scale from 30.0 to 25.0.
+    (3/31/97, Davis)
+
+images$tv/display.par
+images$tv/display/t_display.x
+images$tv/display/zscale.x
+images$tv/display/sigm2.x	+
+images$tv/display/maskcolor.x	+
+images$tv/display/dspmmap.x	+
+images$tv/display/display.h
+images$tv/display/gwindow.h
+images$tv/display/mkpkg
+images$tv/doc/display.hlp
+    1.  Improved the structure of DISPLAY.
+    2.  Fixed coordinate system errors.
+    3.  Added parameters to display bad pixel masks and overlay masks.
+    4.  The z scaling sampling may use a pixel mask or image section.
+    5.  The z scaling excludes bad pixels.
+    (3/20/97, Valdes)
+
+images$tv/display/imdmapfr.x
+images$tv/display/imdputwcs.x +
+    Added two routines to hide knowledge of the channel structure and
+    other details from the calling routines.  (12/11/96, Valdes)
+
+images$tv/display/iishdr.x
+images$tv/display/iisers.x
+    Replaces SPP int -> short assignments by calls to achtiu because of
+    overflow problems with some VMS fortran compilers.
+    (12/6/96, Valdes as reported by Zarate)
+
+images$tv/display/t_display.x
+    1.  Fixed numerous problems with the coordinate system.
+    2.  Fixed a bug in how ztrans=log was done.
+    (12/5/96, Valdes)
+
+images$tv/display/sigm2.x	+
+    Added a version of the spatial interpolation routines that allows masks
+    to interpolate the input across bad pixels. (12/5/96, Valdes)
+
+images$tv/imedit/epgsfit.x
+images$tv/imedit/epcolon.x
+images$tv/doc/imedit.hlp
+images$tv/imedit/imedit.par
+    Added a median background if the xorder or yorder is zero.
+    (11/22/96, Valdes)
+
+wcslab$t_wcslab.x
+doc$wcslab.hlp
+    Added an "overplot" option to append to a plot but with a different
+    viewport.  (11/06/96, Valdes)
+
+images$tv/imexamine/ierimexam.x
+    No change but the date got updated.  (10/14/96, Valdes)
+
+images$tv/imexamine/stfmeasure.x
+    Fixed bug in evaluation of enclosed flux profile in which the scaled
+    radius was used for the gaussian subtraction stage instead of pixels.
+    This does not currently affect IMEXAM because the scale is fixed
+    at 1.  (8/29/96, Valdes)
+
+images$tv/doc/imexamine.hlp
+    Removed reference to pset for kimexam.  (5/31/96, Valdes)
+
+images$tv/imexamine/ierimexam.x
+images$tv/imexamine/stfmeasure.x
+    Fixed incorrect datatype declaration "real np" -> "int np" in various
+    related places.  (4/9/96, Valdes)
+
+images$tv/imedit/epsearch.x
+images$tv/imedit/epgcur.x
+    1.  The search algorithm produced incorrect results if part of the aperture
+    	was off the edge (negative image coordinates).
+    2.  The rounding was incorrect when part of the aperture was off the
+	edge (negative image coordinates).
+    3.  A floating operand error occurs when a key is given without
+	coordinates.
+    (3/26/96, Valdes)
+
+images$tv/imexamine/iecolon.x
+images$tv/imexamine/starfocus.h
+images$tv/imexamine/stfmeasure.x
+images$tv/imexamine/ierimexam.x
+images$tv/rimexam.par
+images$doc/imexamine.hlp
+lib$scr/imexamine.key
+    The radial profile fitting and width measurements now have an option to
+    use a Gaussian or Moffat profile model.  The model is selected by a
+    new "fittype" parameter.  A new "beta" parameter may be specified as
+    INDEF to be determined from the fit or have a fixed value.  The Moffat
+    profile model does better in producing consistent FWHM values so
+    this is the default.  There is also a new "iterations" parameter
+    to allow iteratively adjusting the fitting radius.
+    The STARFOCUS code used to compute other parameters was updated to
+    use a Moffat model and a new method for measuring the FWHM directly
+    from the radially average profile.  (3/22/96, Valdes)
+
+images$tv/rimexam.par
+images$tv/doc/imexamine.hlp
+    Changed the defaults to radius=5, buffer=5, width=5.  A related change
+    is being made to STARFOCUS, PSFMEASURE, KPNOFOCUS to attempt to
+    produce similar values by default.  (3/13/96, Valdes)
+
+images$tv/imexamine/iejimexam.x
+images$tv/jimexam.par
+images$tv/doc/imexamine.hlp
+    Bug 330: There were several errors in this which only show up when
+    using a world WCS.  The parameter prompt and help now indicate the
+    initial sigma value is in pixels even when fitting in world
+    coordinates.  (2/27/96, Valdes)
+
+images$tv/imexamine/iemw.x
+    The inverse WCS function was incorrect and is fixed.  (2/27/96, Valdes)
+
+images$tv/imexamine/ierimexam.x
+images$tv/imexamine/stfmeasure.x +
+images$tv/imexamine/starfocus.h +
+images$tv/imexamine/mkpkg
+images$tv/doc/imexamine.hlp
+lib$src/imexamine.key
+    New FWHM estimates based on the enclosed flux and a direct measurement
+    were added to the 'a' and 'r' keys.  The weights for the Gaussian
+    fit were modified to reduce the influence of pixels outside the
+    half-maximum radius.  The ? help and help page were revised to
+    described the new output and algorithms.  (11/9/95+12/8/95+3/14/96, Valdes)
+
 images$tv/imedit/t_imedit.x
 images$doc/imedit.hlp
     The 'j', 'k', 'n', and 'u' keys were added to those recorded in the

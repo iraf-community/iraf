@@ -28,9 +28,8 @@ bool	reset_c1
 
 extern	cgauss1d(), cdgauss1d()
 extern	lorentz(), dlorentz()
-extern	lorentz_old(), dlorentz_old()
 real	fit_weight(), rv_maxpix()
-int	locpr(), check_converge(), rv_fitconv()
+int	locpr(), rv_check_converge(), rv_fitconv()
 
 include "fitcom.com"
 define	NPARS			4
@@ -110,7 +109,7 @@ begin
 
 		# Now check to see if we're converging sensibly, and recover
 		# by rejecting points or adjusting parameters.
-		stat = check_converge (rv, xcf, ycf, ledge, redge, width, 
+		stat = rv_check_converge (rv, xcf, ycf, ledge, redge, width, 
 		    npts, ishift, oldc2, lseed, c)
 	    }
 
@@ -269,7 +268,7 @@ end
 # CHECK_CONVERGENCE - Check to see if we're converging correctly, otherwise
 # reject points.
 
-int procedure check_converge (rv, xcf, ycf, ledge, redge, width, npts, 
+int procedure rv_check_converge (rv, xcf, ycf, ledge, redge, width, npts, 
     ishift, oldc, lseed, c)
 
 pointer	rv				#I RV struct pointer
@@ -341,7 +340,7 @@ begin
 	    return (ERR_FIT)
 	if (coeff[1] < 0.0)
 	    return (ERR_FIT)
-	if (coeff[3] < 0.0 && RV_FITFUNC(rv) == GAUSSIAN)
+	if ((coeff[3] < 0.0 || coeff[3] > 1.0e4) && RV_FITFUNC(rv) == GAUSSIAN)
 	    return (ERR_FIT)
 
 	return (OK)

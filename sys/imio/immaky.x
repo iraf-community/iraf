@@ -5,8 +5,6 @@ include	<error.h>
 include	<imhdr.h>
 include	<imio.h>
 
-define	EXTRA_SPACE	((80*20)/SZ_STRUCT)
-
 
 # IM_MAKE_NEWCOPY -- Copy the header of an existing, mapped image to
 # initialize the header of a new image.  Clear all fields that describe
@@ -18,6 +16,7 @@ pointer	im				# new copy image
 pointer	o_im				# image being copied
 
 pointer	mw
+int	strlen()
 long	clktime()
 pointer	mw_open()
 bool	strne(), envgetb()
@@ -34,8 +33,15 @@ begin
 	# unlikely, however, since a very large in memory user area is
 	# allocated.
 
+	# Update the value of HDRLEN for the input image in case the
+	# header has grown since the image was opened.
+
+	IM_HDRLEN(o_im) = LEN_IMHDR +
+	    (strlen(Memc[IM_USERAREA(o_im)])+1 + SZ_STRUCT-1) / SZ_STRUCT
+
+	# Copy the header.
 	if (IM_LENHDRMEM(im) < IM_HDRLEN(o_im)) {
-	    IM_LENHDRMEM(im) = IM_HDRLEN(o_im) + EXTRA_SPACE
+	    IM_LENHDRMEM(im) = IM_HDRLEN(o_im) + (SZ_UAPAD / SZ_STRUCT)
 	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
 	}
 	call amovi (IM_MAGIC(o_im), IM_MAGIC(im), IM_HDRLEN(o_im) + 1)
@@ -74,7 +80,6 @@ begin
 	IM_OHDR(im) = o_im
 	IM_PIXFILE(im) = EOS
 
-	call aclri (Memi[IM_HGM(im)], LEN_HGMSTRUCT)
 	IM_CTIME(im) = clktime (long(0))
 	IM_MTIME(im) = IM_CTIME(im)
 

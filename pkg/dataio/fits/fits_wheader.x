@@ -195,10 +195,10 @@ begin
 	        if (data_bitpix <= FITS_BYTE)
 		    return (FITS_BYTE)
 	        else if (data_bitpix <= FITS_SHORT) {
-		    if (datatype == TY_USHORT)
-			return (FITS_LONG)
-		    else
-		        return (FITS_SHORT)
+		    #if (datatype == TY_USHORT)
+			#return (FITS_LONG)
+		    #else
+		    return (FITS_SHORT)
 	        } else
 		    return (FITS_LONG)
 	    case TY_REAL, TY_COMPLEX:
@@ -214,7 +214,6 @@ end
 
 
 # WFT_GET_IRAF_TYPESTRING -- Procedure to set the iraf datatype keyword.
-# Permitted strings are INTEGER, FLOATING or COMPLEX.
 
 procedure wft_get_iraf_typestring (datatype, type_str)
 
@@ -315,22 +314,21 @@ bool	rft_equald()
 
 begin
 	# Calculate the maximum and minimum values in the data.
-	maxdata = datamax + abs ((datamax / (10.0 ** (NDIGITS_RP - 1))))
-	mindata = datamin - abs ((datamin / (10.0 ** (NDIGITS_RP - 1))))
-	denom =  maxtape - mintape
+	maxdata = datamax #+ abs ((datamax / (10.0 ** (NDIGITS_RP - 1))))
+	mindata = datamin #- abs ((datamin / (10.0 ** (NDIGITS_RP - 1))))
 	num = maxdata - mindata
-	#denom = denom - denom / (1.0d1 ** (NDIGITS_RP - 1))
-	#num = num + num / (1.0d1 ** (NDIGITS_RP - 1))
+	denom =  (maxtape - mintape) * PREC_RATIO
 
 	# Check for constant image case.
-	mindata = datamin
-	maxdata = datamax
+	#mindata = datamin
+	#maxdata = datamax
 	if (rft_equald (num, 0.0d0)) {
 	    bscale = 1.0d0
 	    bzero = maxdata
 	} else {
 	    bscale = num / denom
-	    bzero = (maxtape / denom) * mindata - (mintape / denom) * maxdata
+	    #bzero = (maxtape / denom) * mindata - (mintape / denom) * maxdata
+	    bzero = (maxdata + mindata) / 2.0d0
 	}
 end
 

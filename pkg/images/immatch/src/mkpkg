@@ -1,0 +1,11 @@
+# Library for the IMMATCH Package.
+
+libpkg.a:
+	@geometry
+	@imcombine
+	@linmatch
+	@listmatch
+	@psfmatch
+	@wcsmatch
+	@xregister
+	;

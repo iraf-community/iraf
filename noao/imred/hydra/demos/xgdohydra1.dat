@@ -28,6 +28,8 @@ gain\r
 5\r
 7\r
 demoapid2\r
+6600\r
+6.1\r
 \r
 \r
 \r
@@ -37,6 +39,7 @@ demoapid2\r
 y\r
 \r
 n\r
+\r
 \r
 \r
 \r
@@ -62,10 +65,6 @@ q/<-5\s\s\s\s/=(.\s=\r
 q\r
 j/<-5\s\s\s\s/=(.\s=\r
 q/<-5\s\s\s\s/=(.\s=\r
-i/<-5\s\s\s\s/=(.\s=\r
-m%),!\s\s\s\s%)$0$;\r 5852\r
-m:2,;\s\s\s\s:3%/"<\r 7281\r
-l/<-5\s\s\s\s/=(.\s=\r
 f/<-5\s\s\s\s/=(.\s=\r
 l/<-5\s\s\s\s/=(.\s=\r
 q/<-5\s\s\s\s/=(.\s=\r

@@ -10,5 +10,4 @@ ntheta,i,h,200,,,Number of theta points in period window (resolution)
 pluspoint,i,h,50,,,Threshold number of data points after which to use plus
 autoranges,b,h,no,,,Set ranges automatically
 nsigma,r,h,3.0,,,Number of standard deviations for autoranges
-debug,b,h,no,,,Debug?
 cursor,*gcur,h,,,,graphics cursor input

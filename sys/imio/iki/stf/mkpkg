@@ -17,7 +17,7 @@ libex.a:
 	stfctype.x	stf.h <ctype.h>
 	stfdelete.x	stf.h <error.h> <imhdr.h>
 	stfget.x	stf.h <ctype.h>
-	stfhextn.x	stf.h
+	stfhextn.x	stf.h <imhdr.h> <imio.h>
 	stfiwcs.x	stf.h <imhdr.h>
 	stfmerge.x	stf.h <imhdr.h> <imio.h> <mach.h>
 	stfmkpfn.x	stf.h

@@ -1,3 +1,4 @@
+include	<ctype.h>
 include	<imhdr.h>
 include	<error.h>
 include	<gset.h>
@@ -28,6 +29,7 @@ int	labels			# Labeling mode
 real	fraction		# Fraction of minimum step
 bool	yscale			# Draw y scale?
 
+bool	wscale
 int	i, j, n, fd, nspec, wcs, key, redraw
 real	wx, wy, wx1, wy1, wx2, wy2
 pointer	stack, units, cmd, sp, sh, spsave, sps, gp, gt
@@ -123,6 +125,7 @@ begin
 	call gt_setr (gt, GTYMIN, wx)
 	wx = clgetr ("ymax")
 	call gt_setr (gt, GTYMAX, wx)
+	wscale = true
 	yscale = clgetb ("yscale")
 	#if (!scale)
 	#    call gseti (gp, G_YDRAWTICKS, NO)
@@ -190,6 +193,21 @@ begin
 		    spsave = NULL
 		    redraw = YES
 		}
+	    case 'f': # Toggle wavelength scale
+		if (wscale) {
+		    call gt_sets (gt, GTXLABEL, "Pixels")
+		    call gt_sets (gt, GTXUNITS, "")
+		    wscale = false
+		} else {
+		    if (nspec > 0) {
+			sp = Memi[sps]
+			sh = SP_SH(sp) 
+			call gt_sets (gt, GTXLABEL, UN_LABEL(UN(sh)))
+			call gt_sets (gt, GTXUNITS, UN_UNITS(UN(sh)))
+		    }
+		    wscale = true
+		}
+		redraw = YES
 	    case 'l', 'p': # Mark label position and enter label.
 		if (nspec == 0)
 		    goto nospec_
@@ -341,7 +359,7 @@ begin
 			    call gt_sets (gt, GTPARAMS, Memc[cmd])
 			} else
 			    call gt_sets (gt, GTPARAMS, "")
-			call sp_plot (gp, gt, Memi[sps], nspec, yscale)
+			call sp_plot (gp, gt, Memi[sps], nspec, wscale, yscale)
 		    case 'q':
 			break
 		    }
@@ -483,7 +501,7 @@ begin
 		    call gt_sets (gt, GTPARAMS, Memc[cmd])
 		} else
 		    call gt_sets (gt, GTPARAMS, "")
-		call sp_plot (gp, gt, Memi[sps], nspec, yscale)
+		call sp_plot (gp, gt, Memi[sps], nspec, wscale, yscale)
 		redraw = NO
 	    }
 nospec_
@@ -616,17 +634,18 @@ end
 # SP_PLOT -- Determine the range of all the data and then make a plot with
 # specified labels.  The GTOOLS procedures are used to allow user adjustment.
 
-procedure sp_plot (gp, gt, sps, nspec, yscale)
+procedure sp_plot (gp, gt, sps, nspec, wscale, yscale)
 
 pointer	gp		# GIO pointer
 pointer	gt		# GTOOLS pointer
 pointer	sps[ARB]	# Spectrum structures
 int	nspec		# Number of spectra
+bool	wscale		# Draw in world coordinates?
 bool	yscale		# Draw Y scale?
 
-int	i
+int	i, n
 real	x, y, xmin, xmax, ymin, ymax
-pointer	sp
+pointer	sp, pix
 
 begin
 	# Set the default limits from the data.
@@ -634,10 +653,17 @@ begin
 	xmax = -MAX_REAL
 	ymin = MAX_REAL
 	ymax = -MAX_REAL
+	n = 0
 	do i = 1, nspec {
 	    sp = sps[i]
-	    xmin = min (xmin, SP_X(sp), Memr[SP_PX(sp)+SP_NPTS(sp)-1])
-	    xmax = max (xmax, SP_X(sp), Memr[SP_PX(sp)+SP_NPTS(sp)-1])
+	    if (wscale) {
+		xmin = min (xmin, SP_X(sp), Memr[SP_PX(sp)+SP_NPTS(sp)-1])
+		xmax = max (xmax, SP_X(sp), Memr[SP_PX(sp)+SP_NPTS(sp)-1])
+	    } else {
+		n = max (n, SP_NPTS(sp))
+		xmin = 1
+		xmax = n
+	    }
 	    ymin = min (ymin, SP_MIN(sp))
 	    ymax = max (ymax, SP_MAX(sp))
 	}
@@ -665,14 +691,26 @@ begin
 	xmax = xmax - xmin
 	ymax = ymax - ymin
 
+	if (!wscale) {
+	    call malloc (pix, n, TY_REAL)
+	    do i = 1, n
+		Memr[pix+i-1] = i
+	}
+
 	do i = 1, nspec {
 	    sp = sps[i]
 	    call sp_ptype (SP_PTYPE(sp), SP_COLOR(sp), NO, gp, gt)
-	    call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
+	    if (wscale)
+		call gt_plot (gp, gt, SP_X(sp), SP_Y(sp), SP_NPTS(sp))
+	    else
+		call gt_plot (gp, gt, Memr[pix], SP_Y(sp), SP_NPTS(sp))
 	    x = SP_XLPOS(sp) * xmax + xmin
 	    y = SP_YLPOS(sp) * ymax + SP_MEAN(sp)
 	    call gtext (gp, x, y, SP_LABEL(sp), "")
 	}
+
+	if (!wscale)
+	    call mfree (pix, TY_REAL)
 end
 
 
@@ -1442,11 +1480,12 @@ char	ptype[SP_SZPTYPE]	# Default plot type
 int	i, j, k, l
 pointer	sp, im, mw, sh, stack, aps, bands, str, ptr
 
+int	ctor(), open(), fscan(), nowhite()
 bool	rng_elementi()
-real	clgetr(), asumr()
+real	clgetr(), asumr(), imgetr()
 pointer	immap(), smw_openim(), rng_open()
 
-errchk	immap, smw_openim
+errchk	immap, smw_openim, open
 
 begin
 	call smark (stack)
@@ -1456,13 +1495,49 @@ begin
 	im = immap (image, READ_ONLY, 0)
 	mw = smw_openim (im)
 
-	# Get the default parameters.
+	# Get parameters.
 	if (nspec == 0) {
-	    scale = clgetr ("scale")
-	    offset = clgetr ("offset")
+	    #scale = clgetr ("scale")
+	    #offset = clgetr ("offset")
 	    xlpos = clgetr ("xlpos")
 	    ylpos = clgetr ("ylpos")
 	    call clgstr ("ptype", ptype, SP_SZPTYPE)
+	}
+
+	call clgstr ("scale", Memc[str], SZ_LINE)
+	if (nowhite (Memc[str], Memc[str], SZ_LINE) == 0)
+	    call error (1, "Error in scale parameter")
+	if (Memc[str] == '@') {
+	    j = open (Memc[str+1], READ_ONLY, TEXT_FILE)
+	    do i = 1, nspec+1
+		if (fscan(j) == EOF)
+		    call error (1, "Error reading scale file")
+	    call gargr (scale)
+	    call close (j)
+	} else if (IS_ALPHA(Memc[str])) {
+	    scale = imgetr (im, Memc[str])
+	} else {
+	    i = 1
+	    if (ctor (Memc[str], i, scale) == 0)
+		call error (1, "Error in scale parameter")
+	}
+
+	call clgstr ("offset", Memc[str], SZ_LINE)
+	if (nowhite (Memc[str], Memc[str], SZ_LINE) == 0)
+	    call error (1, "Error in offset parameter")
+	if (Memc[str] == '@') {
+	    j = open (Memc[str+1], READ_ONLY, TEXT_FILE)
+	    do i = 1, nspec+1
+		if (fscan(j) == EOF)
+		    call error (1, "Error reading offset file")
+	    call gargr (offset)
+	    call close (j)
+	} else if (IS_ALPHA(Memc[str]))
+	    offset = imgetr (im, Memc[str])
+	else {
+	    i = 1
+	    if (ctor (Memc[str], i, offset) == 0)
+		call error (1, "Error in offset parameter")
 	}
 
 	call clgstr ("apertures", Memc[str], SZ_LINE)

@@ -27,7 +27,9 @@ long	iraf_time;
 {
 	struct	tm *localtime();
 	time_t	time_var, lst;
+#ifdef AUX
 	long	lstl;
+#endif
 
 	lst = (time_t)iraf_time;
 	
@@ -35,8 +37,12 @@ long	iraf_time;
 	time_var = lst + os_timezone();
 
 	/* Correct for daylight savings time, if in effect */
+#ifdef AUX
 	lstl = (long)lst;
 	if (localtime(&lstl)->tm_isdst)
+#else
+	if (localtime(&lst)->tm_isdst)
+#endif
 	    time_var += 60L * 60L;
 
 	return ((long)time_var + SECONDS_1970_TO_1980);
@@ -52,7 +58,9 @@ long	unix_time;
 {
 	struct	tm *localtime();
 	time_t	time_var, gmt;
+#ifdef AUX
 	long	gmtl;
+#endif
 
 	gmt = (time_t)unix_time;
 	
@@ -60,8 +68,12 @@ long	unix_time;
 	time_var = gmt - os_timezone();
 
 	/* Correct for daylight savings time, if in effect */
+#ifdef AUX
 	gmtl = (long)gmt;
 	if (localtime(&gmtl)->tm_isdst)
+#else
+	if (localtime(&gmt)->tm_isdst)
+#endif
 	    time_var -= 60L * 60L;
 
 	return ((long)time_var - SECONDS_1970_TO_1980);

@@ -2,6 +2,7 @@
 
 input,s,a,,,,List of images to normalize
 output,s,a,,,,List of output normalized images
+apertures,s,h,"",,,Apertures
 references,s,h,"",,,"List of reference images
 "
 interactive,b,h,yes,,,Run task interactively?

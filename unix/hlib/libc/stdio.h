@@ -1,9 +1,14 @@
 /*
  * U_STDIO.H -- C defines used to emulate the UNIX standard i/o package upon
- * IRAF file i/o.  If this file is loaded, "irafio.h" should be too.  These
- * definitions are reasonably portable, but obviously highly dependent on the
- * guts of FIO.
+ * IRAF file i/o.  These definitions are portable, but highly dependent on
+ * the guts of IRAF FIO.
  */
+
+#ifndef D_libc
+#ifndef import_libc
+#include <libc.h>
+#endif
+#endif
 
 #define	BUFSIZ		SZ_DEFIOBUF
 #define	_NFILE		FIO_MAXFD

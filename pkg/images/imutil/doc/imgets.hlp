@@ -1,0 +1,70 @@
+.help imgets Jan85 images.imutil
+.ih
+NAME
+imgets -- get the value of an image header parameter as a string
+.ih
+USAGE
+imgets image param
+.ih
+PARAMETERS
+.ls image
+Name of the image to be accessed.
+.le
+.ls param
+Name of the parameter whose value is to be returned.
+.le
+.ls value = ""
+The value of the parameter, returned as a string.
+.le
+.ih
+DESCRIPTION
+The value of the parameter \fIparam\fR of the image \fIimage\fR is returned
+as a string in the output parameter \fIvalue\fR.  The CL type coercion
+functions \fIint\fR and \fIreal\fR may be used to decode the returned
+value as an integer or floating point value.  Both standard image header
+parameters and special application or instrument dependent parameters may be
+accessed.  If the parameter cannot be found a warning message is printed and
+the value "0" is returned.  Parameter names are case sensitive.
+
+The following standard image header parameters may be accessed with
+\fBimgets\fR:
+
+.nf
+	i_pixtype			pixel type (short, real, etc.)
+	i_naxis				number of dimensions
+	i_naxis[1-7]			length of the axes (x=1,y=2)
+	i_minpixval			minimum pixel value or INDEF
+	i_maxpixval			maximum pixel value or INDEF
+	i_title				image title string
+	i_pixfile			pixel storage file name
+.fi
+
+This task is most useful for image parameter access from within CL scripts.
+The task \fBimheader\fR is more useful for just looking at the image header
+parameters.
+.ih
+EXAMPLES
+1. Fetch the instrument parameter "HA" (hour angle) from the image header of
+the image "nite1.1001", and compute and print the hour angle in degrees:
+
+.ks
+.nf
+	cl> imgets nite1.1001 HA
+	cl> = real(imgets.value) * 15.0
+	42.79335
+.fi
+.ke
+
+2. Print the number of pixels per line in the same image.
+
+.ks
+.nf
+	cl> imgets nite1.1001 i_naxis1
+	cl> = int(imgets.value)
+	1024
+.fi
+.ke
+.ih
+SEE ALSO
+imheader, hedit, hselect
+.endhelp

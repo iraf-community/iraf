@@ -6,7 +6,7 @@ $checkin	libpkg.a ".."
 $exit
 
 libpkg.a:
-	t_obsfile.x	"../lib/obsfile.h"  <fset.h>  <ctotok.h>
+	t_obsfile.x	"../lib/obsfile.h"  <fset.h>  <ctotok.h> <ctype.h>
 	t_mkphotcors.x	"../lib/obsfile.h"
 	phimtable.x	"../lib/obsfile.h"  <fset.h>
 	phsort.x

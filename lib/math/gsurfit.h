@@ -8,6 +8,13 @@ define	GS_LEGENDRE	2
 define	GS_POLYNOMIAL	3
 define	NTYPES		3
 
+# define the xterms flags
+
+define	GS_XTYPES	"|none|full|half|"
+define	GS_XNONE	0	# no x-terms (old NO)
+define	GS_XFULL	1	# full x-terms (new YES)
+define	GS_XHALF	2	# half x-terms (new)
+
 # define the weighting flags
 
 define	GS_WEIGHTS	"|user|uniform|spacing|"

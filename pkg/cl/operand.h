@@ -117,24 +117,26 @@ struct arr_desc {
 #define	OP_DEFTASK	4	/* is named task defined		*/
 #define	OP_DEFPAR	5	/* is named parameter defined		*/
 #define	OP_DEFPAC	6	/* is named package loaded		*/
-#define	OP_ENVGET	7	/* get environment variable defn	*/
-#define	OP_EXP		8	/* natural antilog, as in e ** x	*/
-#define	OP_FRAC		9	/* fractional part of a real number	*/
-#define	OP_INT		10	/* coerce to int			*/
-#define	OP_LOG		11	/* natural logarithm			*/
-#define	OP_LOG10	12	/* decimal logarithm			*/
-#define	OP_NSCAN	13	/* number of items conv. in last SCAN	*/
-#define	OP_MINUS	14	/* unary negation			*/
-#define	OP_MKTEMP	15	/* make unique file name		*/
-#define	OP_NINT		16	/* return nearest integer (round)	*/
-#define	OP_OSFN		17	/* convert vfn to OS filename		*/
-#define OP_REAL		18	/* coerce to real			*/
-#define	OP_SIN		19	/* sine					*/
-#define	OP_SQRT		20	/* square root				*/
-#define	OP_STR		21	/* coercion to type string		*/
-#define	OP_SUBSTR	22	/* extract substring			*/
-#define	OP_TAN		23	/* tangent				*/
-#define OP_STRLEN	24	/* length of a string constant		*/
+#define	OP_DEFVAR	7	/* does environment variable exist	*/
+#define	OP_ENVGET	8	/* get environment variable defn	*/
+#define	OP_EXP		9	/* natural antilog, as in e ** x	*/
+#define	OP_FRAC		10	/* fractional part of a real number	*/
+#define	OP_IMACCESS	11	/* does named image exist		*/
+#define	OP_INT		12	/* coerce to int			*/
+#define	OP_LOG		13	/* natural logarithm			*/
+#define	OP_LOG10	14	/* decimal logarithm			*/
+#define	OP_NSCAN	15	/* number of items conv. in last SCAN	*/
+#define	OP_MINUS	16	/* unary negation			*/
+#define	OP_MKTEMP	17	/* make unique file name		*/
+#define	OP_NINT		18	/* return nearest integer (round)	*/
+#define	OP_OSFN		19	/* convert vfn to OS filename		*/
+#define OP_REAL		20	/* coerce to real			*/
+#define	OP_SIN		21	/* sine					*/
+#define	OP_SQRT		22	/* square root				*/
+#define	OP_STR		23	/* coercion to type string		*/
+#define	OP_SUBSTR	24	/* extract substring			*/
+#define	OP_TAN		25	/* tangent				*/
+#define OP_STRLEN	26	/* length of a string constant		*/
 
 /* These area used by intrinsic() to categorize the various opcodes.
  * The lower OP_BITS encode the specific function, while bits above that

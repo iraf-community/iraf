@@ -1,6 +1,7 @@
 include	<imhdr.h>
 include	<pmset.h>
 include	"icombine.h"
+include	"icmask.h"
 
 # IC_MASK   -- ICOMBINE mask interface
 #
@@ -19,16 +20,24 @@ pointer	in[nimages]		#I Input images
 pointer	out[3]			#I Output images
 int	nimages			#I Number of images
 
+int	mtype			# Mask type
+int	mvalue			# Mask value
+pointer	bufs			# Pointer to data line buffers
+pointer	pms			# Pointer to array of PMIO pointers
+
 int	i, npix, npms, clgwrd()
 real	clgetr()
 pointer	sp, fname, title, pm, pm_open()
 bool	invert, pm_empty()
 errchk	calloc, pm_open, pm_loadf
 
-include	"icmask.com"
 include "icombine.com"
 
 begin
+	icm = NULL
+	if (IM_NDIM(out[1]) == 0)
+	    return
+
 	call smark (sp)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 	call salloc (title, SZ_FNAME, TY_CHAR)
@@ -102,6 +111,13 @@ begin
 		mtype = M_NONE
 	}
 
+	# Set up mask structure.
+	call calloc (icm, ICM_LEN, TY_STRUCT)
+	ICM_TYPE(icm) = mtype
+	ICM_VALUE(icm) = mvalue
+	ICM_BUFS(icm) = bufs
+	ICM_PMS(icm) = pms
+
 	call sfree (sp)
 end
 
@@ -113,20 +129,23 @@ procedure ic_mclose (nimages)
 int	nimages			# Number of images
 
 int	i
-include	"icmask.com"
 include	"icombine.com"
 
 begin
+	if (icm == NULL)
+	    return
+
 	do i = 1, nimages
-	    call mfree (Memi[bufs+i-1], TY_INT)
+	    call mfree (Memi[ICM_BUFS(icm)+i-1], TY_INT)
 	do i = 1, nimages {
-	    if (Memi[pms+i-1] != NULL)
-		call pm_close (Memi[pms+i-1])
+	    if (Memi[ICM_PMS(icm)+i-1] != NULL)
+		call pm_close (Memi[ICM_PMS(icm)+i-1])
 	    if (project)
 		break
 	}
-	call mfree (pms, TY_POINTER)
-	call mfree (bufs, TY_POINTER)
+	call mfree (ICM_BUFS(icm), TY_POINTER)
+	call mfree (ICM_PMS(icm), TY_POINTER)
+	call mfree (icm, TY_STRUCT)
 end
 
 
@@ -145,12 +164,16 @@ pointer	m[nimages]		# Pointer to mask pointers
 int	lflag[nimages]		# Line flags
 int	nimages			# Number of images
 
+int	mtype			# Mask type
+int	mvalue			# Mask value
+pointer	bufs			# Pointer to data line buffers
+pointer	pms			# Pointer to array of PMIO pointers
+
 int	i, j, ndim, nout, npix
 pointer	buf, pm
 bool	pm_linenotempty()
 errchk	pm_glpi
 
-include	"icmask.com"
 include	"icombine.com"
 
 begin
@@ -158,10 +181,16 @@ begin
 	# is applied by simulating mask values so the mask pointers have to
 	# be set.
 
-	if (mtype == M_NONE && aligned && !dothresh) {
-	    dflag = D_ALL
+	dflag = D_ALL
+	if (icm == NULL)
 	    return
-	}
+	if (ICM_TYPE(icm) == M_NONE && aligned && !dothresh)
+	    return
+
+	mtype = ICM_TYPE(icm)
+	mvalue = ICM_VALUE(icm)
+	bufs = ICM_BUFS(icm)
+	pms = ICM_PMS(icm)
 
 	# Set the mask pointers and line flags and apply offsets if needed.
 
@@ -258,18 +287,29 @@ int	offset			# Column offset
 long	v[IM_MAXDIM]		# Data vector desired
 pointer	m			# Pointer to mask
 
+int	mtype			# Mask type
+int	mvalue			# Mask value
+pointer	bufs			# Pointer to data line buffers
+pointer	pms			# Pointer to array of PMIO pointers
+
 int	i, npix
 pointer	buf, pm
 bool	pm_linenotempty()
 errchk	pm_glpi
 
-include	"icmask.com"
 include	"icombine.com"
 
 begin
 	dflag = D_ALL
-	if (mtype == M_NONE)
+	if (icm == NULL)
 	    return
+	if (ICM_TYPE(icm) == M_NONE)
+	    return
+
+	mtype = ICM_TYPE(icm)
+	mvalue = ICM_VALUE(icm)
+	bufs = ICM_BUFS(icm)
+	pms = ICM_PMS(icm)
 
 	npix = IM_LEN(in,1)
 	m = Memi[bufs+image-1] + offset

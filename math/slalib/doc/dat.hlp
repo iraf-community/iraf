@@ -1,0 +1,46 @@
+.help dat Nov95 "Slalib Package"
+.nf
+
+      DOUBLE PRECISION FUNCTION slDAT (UTC)
+
+     - - - -
+      D A T
+     - - - -
+
+  Increment to be applied to Coordinated Universal Time UTC to give
+  International Atomic Time TAI (double precision)
+
+  Given:
+     UTC      d      UTC date as a modified JD (JD-2400000.5)
+
+  Result:  TAI-UTC in seconds
+
+  Notes:
+
+  1  The UTC is specified to be a date rather than a time to indicate
+     that care needs to be taken not to specify an instant which lies
+     within a leap second.  Though in most cases UTC can include the
+     fractional part, correct behaviour on the day of a leap second
+     can only be guaranteed up to the end of the second 23:59:59.
+
+  2  Pre 1972 January 1 a fixed value of 10 sec is returned.
+
+     :-----------------------------------------:
+     :                                         :
+     :                IMPORTANT                :
+     :                                         :
+     :  This routine must be updated on each   :
+     :     occasion that a leap second is      :
+     :                announced                :
+     :                                         :
+     :  Latest leap second:  1996 January 1    :
+     :                                         :
+     :-----------------------------------------:
+
+  P.T.Wallace   Starlink   14 November 1995
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

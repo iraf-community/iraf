@@ -1,4 +1,4 @@
-.help apfind Aug90 noao.twodspec.apextract
+.help apfind Sep96 noao.twodspec.apextract
 .ih
 NAME
 apfind -- Find spectra and define apertures automatically
@@ -10,6 +10,15 @@ PARAMETERS
 .ls input
 List of input images in which spectra are to be identified and
 apertures defined automatically.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and extract.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
 .le
 .ls references = ""
 List of reference images to be used to define apertures for the input
@@ -118,7 +127,8 @@ jump by the integer part of the ratio of the separation to the
 specified maximum separation.  This is used when the image is expected
 to have evenly spaced spectra, such as in multifiber spectrographs, in
 which some may be missing due to broken fibers.  Finally, the
-aperture identification table may contain lines with aperture number,
+aperture identification table (either a text file or an image
+having a set of SLFIBnnn keyowrds) may contain lines with aperture number,
 beam number, and (optional) title.  The sequential numbers are then
 indices into this table.  Note that the skipping of missing spectra and
 the ordering applies to entries in this table as well.
@@ -154,6 +164,17 @@ in the package.
 EXAMPLES
 	cl> apfind image nfind=10
 .ih
+.ih
+REVISIONS
+.ls APFIND V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+
+The aperture ID table information may now be contained in the
+image header under the keywords SLFIBnnn.
+.le
 SEE ALSO
 center1d, apdefault, aprecenter, apresize, apedit, apall
 .endhelp

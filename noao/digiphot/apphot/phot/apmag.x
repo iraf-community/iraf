@@ -29,8 +29,8 @@ begin
 	AP_PXCUR(phot) = wx
 	AP_PYCUR(phot) = wy
 
-	call amovkr (0.0, Memr[AP_SUMS(phot)], AP_NAPERTS(phot)]
-	call amovkr (0.0, Memr[AP_AREA(phot)], AP_NAPERTS(phot)]
+	call amovkd (0.0d0, Memd[AP_SUMS(phot)], AP_NAPERTS(phot)]
+	call amovkd (0.0d0, Memd[AP_AREA(phot)], AP_NAPERTS(phot)]
 	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot)]
 	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot)]
 
@@ -51,7 +51,7 @@ begin
 	    AP_NAPERTS(phot)]
 	if (IS_INDEFR(AP_DATAMIN(ap)) && IS_INDEFR(AP_DATAMAX(ap))) {
 	    call  apmeasure (im, wx, wy, c1, c2, l1, l2, Memr[temp],
-	        Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)], AP_NMAXAP(phot))
+	        Memd[AP_SUMS(phot)], Memd[AP_AREA(phot)], AP_NMAXAP(phot))
 	    AP_NMINAP(phot) = AP_NMAXAP(phot) + 1
 	} else {
 	    if (IS_INDEFR(AP_DATAMIN(ap)))
@@ -63,7 +63,7 @@ begin
 	    else
 		datamax = AP_DATAMAX(ap)
 	    call  apbmeasure (im, wx, wy, c1, c2, l1, l2, datamin, datamax,
-	        Memr[temp], Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
+	        Memr[temp], Memd[AP_SUMS(phot)], Memd[AP_AREA(phot)],
 		AP_NMAXAP(phot), AP_NMINAP(phot))
 	}
 
@@ -80,12 +80,12 @@ begin
 
 	    # Compute the magnitudes and errors.
 	    if (positive == YES)
-	        call apcopmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
+	        call apcopmags (Memd[AP_SUMS(phot)], Memd[AP_AREA(phot)],
 	            Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)],
 		    nap, skyval, skysig, nsky, AP_ZMAG(phot),
 		    AP_NOISEFUNCTION(nse), AP_EPADU(nse))
 	    else
-	        call apconmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
+	        call apconmags (Memd[AP_SUMS(phot)], Memd[AP_AREA(phot)],
 	            Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)],
 		    nap, skyval, skysig, nsky, AP_ZMAG(phot),
 		    AP_NOISEFUNCTION(nse), AP_EPADU(nse), AP_READNOISE(nse))

@@ -1,0 +1,27 @@
+# Print images which are within a given radius in the sky.
+
+# Get parameters.
+racenter = clget ("astradius.racenter")
+deccenter = clget ("astradius.deccenter")
+epcenter = clget ("astradius.epcenter")
+radius = clget ("astradius.radius")
+ra = imget(clget("keywpars.ra"))
+dec = imget(clget("keywpars.dec"))
+
+epoch = imget(clget("keywpars.epoch"))
+if (str(epoch) == "" || real(epoch) == 0.)
+    date = imget(clget("keywpars.date_obs"))
+    ut = imget(clget("keywpars.ut"))
+    epoch = epoch (date, ut)
+endif
+
+# Precess image coordinates to center epoch and compute separation.
+radec = precess (ra, dec, epoch, epcenter)
+ra1 = ra_precess (ra, dec, epoch, epcenter)
+dec1 = dec_precess (ra, dec, epoch, epcenter)
+sep = arcsep (racenter, deccenter, ra1, dec1)
+
+# Print result if within radius.
+if (sep < real (radius))
+    printf ("%-15s %s\n", $I, imget ("title"))
+endif

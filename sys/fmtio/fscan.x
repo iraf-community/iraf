@@ -10,7 +10,7 @@ include	"scan.com"
 errchk	getlline
 
 begin
-	if (getlline (fd, sc_scanbuf, SZ_COMMAND) == EOF)
+	if (getlline (fd, sc_scanbuf, SZ_SCANBUF) == EOF)
 	    return (EOF)
 	else {
 	    call reset_scan()

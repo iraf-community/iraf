@@ -14,6 +14,7 @@ real	scale_factor		# scale output numbers by this factor
 
 int	n, i
 int	clgeti()
+long	clgetl(), clktime()
 real	clgetr(), urand()
 
 begin
@@ -21,12 +22,15 @@ begin
 	nlines		= clgeti ("nlines")
 	ncols		= clgeti ("ncols")
 	ndigits		= clgeti ("ndigits")
-	seed		= clgeti ("seed")
+	seed		= clgetl ("seed")
 	scale_factor	= clgetr ("scale_factor")
 
 	# Compute the random numbers and print on the standard output as
 	# a list, "ncols" numbers per output line.  The output format
 	# is dependent on the ndigits of precision, set by the user.
+
+	if (IS_INDEFL(seed))
+	    seed = clktime (long(0))
 
 	for (n=1;  n <= nlines;  n=n+1) {
 	    do i = 1, ncols {

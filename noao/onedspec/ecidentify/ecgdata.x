@@ -2,6 +2,7 @@ include	<imhdr.h>
 include	<imio.h>
 include	<pkg/gtools.h>
 include	<smw.h>
+include	<units.h>
 include	"ecidentify.h"
 
 # EC_GDATA -- Get image data.
@@ -42,6 +43,9 @@ begin
 	sh = NULL
 	do j = 1, EC_NLINES(ec) {
 	    call shdr_open (im, mw, j, 1, INDEFI, SHDATA, sh)
+	    if (EC_UN(ec) != NULL)
+		iferr (call shdr_units (sh, UN_UNITS(EC_UN(ec))))
+		    ;
 	    if (j != EC_NLINES(ec))
 		call shdr_copy (sh, SH(ec,j), NO)
 	    else
@@ -64,10 +68,6 @@ begin
 	    call pargstr (Memc[EC_IMAGE(ec)])
 	    call pargstr (IM_TITLE(im))
 	call gt_sets (EC_GT(ec), GTTITLE, Memc[str1])
-
-	# Sel axis label.
-	call gt_sets (EC_GT(ec), GTXLABEL, LABEL(SH(ec,1)))
-	call gt_sets (EC_GT(ec), GTXUNITS, UNITS(SH(ec,1)))
 
 	call imunmap (im)
 	call sfree (sp)

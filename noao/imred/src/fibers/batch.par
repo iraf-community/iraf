@@ -24,6 +24,7 @@ scattered,b,h,,,,"Subtracted scattered light?"
 arcap,b,h,,,,"Use object apertures for arcs?"
 dispcor,b,h,,,,"Dispersion correct spectra?"
 savearcs,b,h,,,,"Save internal arcs?"
+skyalign,b,h,,,,"Align sky lines?"
 skysubtract,b,h,,,,"Subtract sky?"
 saveskys,b,h,,,,"Save sky spectra?
 "

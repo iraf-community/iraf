@@ -26,7 +26,7 @@
 
 unset	noclobber
 unalias cd cp cmp echo ln mv rm sed set grep ls chmod chown pwd touch
-set	path	= (/bin /usr/bin /usr/ucb /etc /usr/etc)
+set	path	= (/sbin /usr/sbin /bin /usr/bin /usr/ucb /etc /usr/etc)
 
 # set echo
 
@@ -38,7 +38,11 @@ set LS		= /bin/ls
 alias PUT	"mv -f \!*; chown $user \!$ "
 
 # Determine platform architecture.
-set mach	= linux
+if (-f /etc/redhat-release) then
+    set mach = redhat
+else
+    set mach = `uname -s | tr '[A-Z]' '[a-z]'`
+endif
 
 if ($?iraf == 1) then
     if (! -d $iraf) then
@@ -322,7 +326,14 @@ endif
 
 # Allow deletion of files in /tmp - needed for multiuser tape allocation.
 if ($exec == yes) then
+    echo "set delete permission on /tmp"
     chmod -t /tmp
+endif
+
+# Initialize permissions of tape devices.
+if ($exec == yes) then
+    echo "set mode 0666 on magtape devices to permit tape allocation"
+    chmod 666 /dev/*st[0-4]*
 endif
 
 # Set owner=root for the device allocation task, alloc.e.
@@ -499,7 +510,14 @@ endif
 # SUN/IRAF specific stuff.
 # ------------------------------
 
-if ($mach == linux) then		# Only do X on Linux.
+if ($mach == linux || $mach == redhat || $mach == freebsd) then
+    set pciraf = yes
+else
+    set pciraf = no
+endif
+
+# If PC-IRAF only do X.
+if ($pciraf == yes) then
     goto xconfig
 endif
 
@@ -783,7 +801,11 @@ foreach i (/dev/imt1i /dev/imt1o)
     else
 	echo "make device entry $i for imtool"
 	if ($exec == yes) then
-	    /bin/mknod $i p
+	    if ($mach == linux || $mach == redhat) then
+		mknod $i p
+	    else if ($mach == freebsd) then
+		mkfifo $i
+	    endif
 	    chmod 777 $i
 	endif
     endif
@@ -869,7 +891,7 @@ if ($gcok == yes) then
 endif
 
 # Install or update the XGTERM and XIMTOOL manual pages.
-if ($mach != linux && -e /usr/man/mann) then
+if ($pciraf == no && -e /usr/man/mann) then
     cd /usr/man/mann
     set src = $iraf/unix/x11
 

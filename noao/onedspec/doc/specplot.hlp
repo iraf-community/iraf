@@ -1,4 +1,4 @@
-.help specplot Feb94 noao.onedspec
+.help specplot Jan96 noao.onedspec
 .ih
 NAME
 specplot -- stack and plot multiple spectra
@@ -52,8 +52,11 @@ The units
 may also be changed interactively.  See the units section of the
 \fBonedspec\fR help for a further description and available units.
 .le
-.ls scale = 1., offset = 0.
-Default intensity scaling and offset.
+.ls scale = 1., offset = 0. (value, @file, keyword)
+The scale and offset to apply to each spectrum.  The value of the parameter
+may be a constant value applying to all spectra, a file containing the
+values specified as @<file> where <file> is the filename, or an image
+header keyword whose value is to be used.
 .le
 .ls step = 0
 The step separating spectra when not using the autolayout option.
@@ -174,7 +177,10 @@ and separation step explicitly with the parameters, \fIscale, offset\fR
 and \fIstep\fR.  If the step is zero then spectra will be directly
 overplotted while a positive or negative value will separate the
 spectra either upward or downward with the index 1 spectrum having no
-offset.  This parameter as well as the scale and offset may be set or
+offset.  The scale and offset parameters may be specified as either
+constant values, the name of file containing the values (one per line)
+preceded by the '@' character, or the name of an image header keyword.
+This parameter as well as the scale and offset may be set or
 changed interactively via colon commands and the "offset" may also be
 set using the cursor to shift a spectrum vertically.
 
@@ -245,6 +251,7 @@ a - Append a new spectrum following the indicated spectrum
 i - Insert a new spectrum before the indicated spectrum
 d - Delete the indicated spectrum
 e - Insert last deleted spectrum before indicated spectrum
+f - Toggle between world coordinates and logical pixel coordinates
 l - Define the user label at the indicated position
 p - Define the label position at the indicated position
 o - Reorder the spectra to eliminate gaps
@@ -320,6 +327,12 @@ EXAMPLES
 	cl> specplot spec*
 .ih
 REVISIONS
+.ls SPECPLOT V2.11
+The scale and offset parameters may now be a value, a filename, or
+and image header keyword.
+
+The 'f' key was added to toggle between world and logical pixel coordinates.
+.le
 .ls SPECPLOT V2.10.3
 A color parameter was added for graphics terminals supporting color.
 

@@ -41,6 +41,8 @@ pointer	ec				# ID pointer
 int	i
 
 begin
+	if (EC_UN(ec) != NULL)
+	    call un_close (EC_UN(ec))
 	do i = 1, EC_NLINES(ec)
 	    call shdr_close (SH(ec,i))
 	call mfree (EC_SHS(ec), TY_POINTER)

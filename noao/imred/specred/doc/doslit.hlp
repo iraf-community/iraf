@@ -70,6 +70,13 @@ on this see the discussion of the saturation parameter in the
 Approximate full width of the spectrum profiles.  This parameter is used
 to define a width and error radius for the profile centering algorithm.
 .le
+.ls crval = INDEF, cdelt = INDEF (autoidentify)
+These parameters specify an approximate central wavelength and dispersion.
+They may be specified as numerical values, INDEF, or image header keyword
+names whose values are to be used.
+If both these parameters are INDEF then the automatic identification will
+not be done.
+.le
 
 .ls dispcor = yes
 Dispersion correct spectra?  This may involve either defining a nonlinear
@@ -248,30 +255,30 @@ number of times the sigma of the residuals are rejected before refitting.
 
 .ce
 -- ARC DISPERSION FUNCTION PARAMETERS --
-.ls threshold = 10. (identify/reidentify)
+.ls threshold = 10. (autoidentify/identify/reidentify)
 In order for a feature center to be determined the range of pixel intensities
 around the feature must exceed this threshold.
 .le
-.ls coordlist = "linelists$idhenear.dat" (identify)
+.ls coordlist = "linelists$idhenear.dat" (autoidentify/identify)
 Arc line list consisting of an ordered list of wavelengths.
 Some standard line lists are available in the directory "linelists$".
 .le
-.ls match = 10. (identify)
+.ls match = -3. (autoidentify/identify)
 The maximum difference for a match between the dispersion function computed
 value and a wavelength in the coordinate list.
 .le
-.ls fwidth = 4. (identify)
+.ls fwidth = 4. (autoidentify/identify)
 Approximate full base width (in pixels) of arc lines.
 .le
 .ls cradius = 10. (reidentify)
 Radius from previous position to reidentify arc line.
 .le
-.ls i_function = "spline3", i_order = 1 (identify)
+.ls i_function = "spline3", i_order = 1 (autoidentify/identify)
 The default function and order to be fit to the arc wavelengths as a
 function of the pixel coordinate.  The functions choices are "chebyshev",
 "legendre", "spline1", or "spline3".
 .le
-.ls i_niterate = 0, i_low = 3.0, i_high = 3.0 (identify)
+.ls i_niterate = 0, i_low = 3.0, i_high = 3.0 (autoidentify/identify)
 Number of rejection iterations and sigma thresholds for rejecting arc
 lines from the dispersion function fits.
 .le
@@ -539,10 +546,14 @@ fitting parameters adjusted.  To exit the interactive fitting type 'q'.
 .ls [5]
 If dispersion correction is selected the first arc in the arc list is
 extracted.  The dispersion function is defined using the task
-\fBidentify\fR.  Mark and identify a few arc lines with 'm' and
-and use the 'l' line list identification command to automatically add
-additional lines and fit the dispersion function.  Check the quality of the
-dispersion function fit with 'f'.  When satisfied exit with 'q'.
+\fBautoidentify\fR.  The \fIcrval\fR and \fIcdelt\fR parameters are used in
+the automatic identification.  Whether or not the automatic identification
+is successful you will be shown the result of the arc line identification.
+If the automatic identification is not successful identify a few arc lines
+with with 'm' and and use the 'l' line list identification command to
+automatically add additional lines and fit the dispersion function.  Check
+the quality of the dispersion function fit with 'f'.  When satisfied exit
+with 'q'.
 .le
 .ls [6]
 If the flux calibration option is selected the standard star spectra are
@@ -620,7 +631,7 @@ with standard star fluxes and band passes.  The available extinction
 files and flux calibration directories may be listed using the command:
 .nf
 
-	cl> page onedstds$README
+	cl> help onedstds
 
 .fi
 
@@ -635,6 +646,12 @@ The spectrum interpolation type is used whenever a spectrum needs to be
 resampled for linearization or performing operations between spectra
 with different sampling.  The "sinc" interpolation may be of interest
 as an alternative but see the cautions given in \fBonedspec.package\fR.
+
+The general direction in which the spectra run is specified by the
+dispersion axis parameter.  Recall that ideally it is the direction
+of constant wavelength which should be aligned with an image axis and
+the dispersion direction may not be exactly aligned because atmospheric
+dispersion.
 
 The verbose parameter selects whether to print everything which goes
 into the log file on the terminal.  It is useful for monitoring
@@ -673,14 +690,23 @@ spectrum characteristics.  The read out noise and gain are used when
 parameters must be fairly accurate.  Note that these are the effective
 parameters and must be adjusted if previous processing has modified the
 pixel values; such as with an unnormalized flat field.
+The variance
+weighting and cosmic-ray cleanning are sensitive to extremely strong
+cosmic-rays; ones which are hundreds of times brighter than the
+spectrum.  The \fIdatamax\fR is used to set an upper limit for any
+real data.  Any pixels above this value will be flagged as cosmic-rays
+and will not affect the extractions.
 
-The general direction in which the spectra run is specified by the
-dispersion axis parameter.  Recall that ideally it is the direction
-of constant wavelength which should be aligned with an image axis and
-the dispersion direction may not be exactly aligned because atmospheric
-dispersion.  The profile width should be approximately the full width
+The profile width should be approximately the full width
 at the profile base.  This parameter is used for centering and tracing
 of the spectrum profiles.
+
+The approximate central wavelength and dispersion are used for the
+automatic identification of the arc reference.  They may be specified
+as image header keywords or values.  The INDEF values search the
+entire range of the coordinate reference file but the automatic
+line identification algorithm works much better and faster if
+approximate values are given.
 
 The next set of parameters select the processing steps and options.  The
 various calibration steps may be done simultaneously, that is at the same
@@ -885,14 +911,14 @@ wavelength.
 
 The first arc spectrum in the arc list is used to define the reference
 dispersion solution.  It is extracted at middle of the image with no
-tracing.  Note extractions of arc spectra are not background
-subtracted.  The interactive task \fBidentify\fR is used to define the
-dispersion function.  The idea is to mark some lines whose
-wavelengths are known (with the line list used to supply additional lines after
-the first few identifications define the approximate wavelengths) and to fit a
-function giving the wavelength from the pixel position.
+tracing.  Note extractions of arc spectra are not background subtracted.
+The task \fBautoidentify\fR is attempts to define the dispersion function
+automatically using the \fIcrval\fR and \fIcdelt\fR parameters.  Whether or
+not it is successful the user is presented with the interactive
+identification graph.  The automatic identifications can be reviewed and a
+new solution or corrections to the automatic solution may be performed.
 
-The arc dispersion function parameters are for \fBidentify\fR and it's
+The arc dispersion function parameters are for \fBautoidentify\fR and it's
 related partner \fBreidentify\fR.  The parameters define a line list for
 use in automatically assigning wavelengths to arc lines, a centering width
 (which should match the line widths at the base of the lines), the
@@ -902,7 +928,7 @@ opposed to simply determining a zero point shift.  The defaults should
 generally be adequate and the dispersion function fitting parameters may be
 altered interactively.  One should consult the help for the two tasks for
 additional details of these parameters and the interactive operation of
-\fBidentify\fR.
+\fBautoidentify\fR.
 
 The extracted reference arc spectrum is then dispersion corrected.
 If the spectra are to be linearized, as set by the \fIlinearize\fR
@@ -1051,10 +1077,7 @@ Jan 17 15:55: DATABASE - 1 apertures for demoarc1 written to database
 Extracting apertures ...
 Jan 17 15:55: EXTRACT - Aperture 1 from demoarc1 --> demoarc1.ms
 Determine dispersion solution for demoarc1
-<Type ":coord linelists$idhenear.dat" to set correct line list for example>
-<Type 'm' at first strong line (pixel 331) and identify it as 5015>
-<Type 'm' at last strong line (pixel 500) and identify it as 7281>
-<Type 'l' to identify other lines>
+<A dispersion function is automatically determined.>
 <Type 'f' to see the fit residuals>
 <Type 'd' to delete the two deviant lines>
 <Type 'f' to refit with the bad points deleted>
@@ -1155,6 +1178,10 @@ cl> doslit demoobj1 arcs=demoarc1,demoarc2 stand=demostd1 \
 .fi
 .ih
 REVISIONS
+.ls DOSLIT V2.11
+The initial arc line identifications is done with the automatic line
+identification algorithm.
+.le
 .ls DOSLIT V2.10.3
 The usual output WCS format is "equispec".  The image format type to be
 processed is selected with the \fIimtype\fR environment parameter.  The
@@ -1166,9 +1193,9 @@ aperture.  A bug which alphabetized the arc list was fixed.
 .le
 .ih
 SEE ALSO
-apbackground, apedit, apfind, approfiles, aprecenter, apresize, apsum, aptrace,
-apvariance, calibrate, ccdred, center1d, ctioslit, dispcor,
-echelle.doecslit, icfit, identify, kpnocoude, kpnoslit, specred, observatory,
-onedspec.package, refspectra, reidentify, sensfunc, setairmass, setjd,
-splot, standard
+apbackground, apedit, apfind, approfiles, aprecenter, apresize, apsum,
+aptrace, apvariance, calibrate, ccdred, center1d, ctioslit, dispcor,
+echelle.doecslit, icfit, autoidentify, identify, kpnocoude, kpnoslit,
+specred, observatory, onedspec.package, refspectra, reidentify, sensfunc,
+setairmass, setjd, splot, standard
 .endhelp

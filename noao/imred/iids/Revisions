@@ -1,5 +1,12 @@
 .help revisions Jun88 noao.imred.iids
 .nf
+imred$iids/identify.par
+    Added new units parameters.  (3/11/97, Valdes)
+
+=========
+V2.10.4p2
+=========
+
 imred$iids/standard.par
     Removed ennumerated list.  (4/10/89, Valdes)
 

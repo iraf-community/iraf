@@ -43,6 +43,8 @@ end
 # Based on Numerical Recipes by Press, Flannery, Teukolsky, and Vetterling.
 # Used by permission of the authors.
 # Copyright(c) 1986 Numerical Recipes Software.
+#
+# Modified to return zero for input values less than or equal to zero.
 
 real procedure poidev (xm, seed)
 
@@ -53,7 +55,9 @@ real	oldm, g, em, t, y, ymin, ymax, sq, alxm, gammln(), urand(), gasdev()
 data	oldm /-1./
 
 begin
-	if (xm < 12) {
+	if (xm <= 0)
+	    em = 0
+	else if (xm < 12) {
 	    if (xm != oldm) {
 		oldm = xm
 		g = exp (-xm)

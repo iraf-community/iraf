@@ -31,18 +31,13 @@ observatory = "lick"
 	altitude = 1290
 	timezone = 8
 
+# Observatory entry from a conversation with Craig Foltz 8/20/97.
+# Name was changed and the "mmt" entry was removed.
 observatory = "mmto"
-	name = "Multiple Mirror Telescope Observatory"
+	name = "MMT Observatory"
 	longitude = 110:53.1
 	latitude = 31:41.3
 	altitude = 2600
-	timezone = 7
-
-observatory = "mmt"
-	name = "Whipple Observatory"
-	longitude = 110:53.1
-	latitude = 31.41.3
-	altitude = 2608
 	timezone = 7
 
 observatory = "cfht"
@@ -60,25 +55,25 @@ observatory = "lapalma"
 	timezone = 0
 
 observatory = "mso"
-        name = "Mt. Stromlo Observatory"
-        longitude = 210:58:32.4
-        latitude = -35:19:14.34
-        altitude = 767
-        timezone = -10
+	name = "Mt. Stromlo Observatory"
+	longitude = 210:58:32.4
+	latitude = -35:19:14.34
+	altitude = 767
+	timezone = -10
 
 observatory = "sso"
-        name = "Siding Spring Observatory"
-        longitude = 210:56:19.70
-        latitude = -31:16:24.10
-        altitude = 1149
-        timezone = -10
+	name = "Siding Spring Observatory"
+	longitude = 210:56:19.70
+	latitude = -31:16:24.10
+	altitude = 1149
+	timezone = -10
 
 observatory = "aao"
-        name = "Anglo-Australian Observatory"
-        longitude = 210:56:2.09
-        latitude = -31:16:37.34
-        altitude = 1164
-        timezone = -10
+	name = "Anglo-Australian Observatory"
+	longitude = 210:56:2.09
+	latitude = -31:16:37.34
+	altitude = 1164
+	timezone = -10
 
 observatory = "mcdonald"
 	name = "McDonald Observatory"
@@ -88,19 +83,19 @@ observatory = "mcdonald"
 	timezone = 6
 
 observatory = "lco"
-        name = "Las Campanas Observatory"
-        longitude = 70:42.1
-        latitude = -29:0.2
-        altitude = 2282
-        timezone = 4
+	name = "Las Campanas Observatory"
+	longitude = 70:42.1
+	latitude = -29:0.2
+	altitude = 2282
+	timezone = 4
 
 # Submitted by Alan Koski 1/13/93
 observatory = "mtbigelow"
-        name = "Catalina Observatory: 61 inch telescope"
-        longitude = 110:43.9
-        latitude = 32:25.0
-        altitude = 2510.
-        timezone = 7
+	name = "Catalina Observatory: 61 inch telescope"
+	longitude = 110:43.9
+	latitude = 32:25.0
+	altitude = 2510.
+	timezone = 7
 
 # Revised by Daniel Durand 2/23/93
 observatory = "dao"
@@ -112,42 +107,42 @@ observatory = "dao"
 
 # Submitted by Patrick Vielle 5/4/93
 observatory = "spm"
-        name = "Observatorio Astronomico Nacional, San Pedro Martir"
-        longitude = 115:29:13
-        latitude = 31:01:45
-        altitude = 2830
-        timezone = 7
+	name = "Observatorio Astronomico Nacional, San Pedro Martir"
+	longitude = 115:29:13
+	latitude = 31:01:45
+	altitude = 2830
+	timezone = 7
 
 # Submitted by Patrick Vielle 5/4/93
 observatory = "tona"
-        name = "Observatorio Astronomico Nacional, Tonantzintla"
-        longitude = 98:18:50
-        latitude = 19:01:58
-        timezone = 8
+	name = "Observatorio Astronomico Nacional, Tonantzintla"
+	longitude = 98:18:50
+	latitude = 19:01:58
+	timezone = 8
 
 # Submitted by Don Hamilton 8/18/93
 observatory = "Palomar"
-        name = "The Hale Telescope"
-        longitude = 116:51:46.80
-        latitude = 33:21:21.6
-        altitude = 1706.
-        timezone = 8
+	name = "The Hale Telescope"
+	longitude = 116:51:46.80
+	latitude = 33:21:21.6
+	altitude = 1706.
+	timezone = 8
 
 # Submitted by Pat Seitzer 10/31/93
 observatory = "mdm"
-        name = "Michigan-Dartmouth-MIT Observatory"
-        longitude = 111:37.0
-        latitude = 31:57.0
-        altitude = 1938.5
-        timezone = 7
+	name = "Michigan-Dartmouth-MIT Observatory"
+	longitude = 111:37.0
+	latitude = 31:57.0
+	altitude = 1938.5
+	timezone = 7
 
 # Submitted by Ignacio Ferrin 9/1/94
 observatory = "NOV"
-        name = "National Observatory of Venezuela"
-        longitude = 70:52.0
-        latitude = 8:47.4
-        altitude = 3610
-        timezone = 4
+	name = "National Observatory of Venezuela"
+	longitude = 70:52.0
+	latitude = 8:47.4
+	altitude = 3610
+	timezone = 4
 
 # Submitted by Alan Welty 10/28/94
 observatory = "bmo"
@@ -167,8 +162,66 @@ observatory = "BAO"
 
 # From Astronomical Almanac 1996
 observatory = "keck"
-	name = "W. M. Keck Observatory
+	name = "W. M. Keck Observatory"
 	longitude = 155:28.7
 	latitude = 19:49.7
 	altitude = 4160
 	timezone = 10
+
+# Padova Astronomical Observatory, Asiago, Italy.
+# Submitted by Lina Tomasella 6/11/96
+observatory = "ekar"
+	name = "Mt. Ekar 182 cm. Telescope"
+	longitude = 348:25:07.92
+	latitude = 45:50:54.92
+	altitude = 1413.69
+	timezone = -1
+
+# Submitted by Michael Ledlow 8/8/96
+observatory = "apo"
+	name = "Apache Point Observatory"
+	longitude = 105:49.2
+	latitude = 32:46.8
+	altitude = 2798.
+	timezone = 7 
+
+# Submitted by Michael Ledlow 8/8/96
+observatory = "lowell"
+	name = "Lowell Observatory"
+	longitude = 111:32.1
+	latitude = 35:05.8
+	altitude = 2198. 
+	timezone = 7 
+
+# Submitted by S.G. Bhargavi 8/12/96
+observatory = "vbo"
+	name = "Vainu Bappu Observatory"
+	longitude = 281.1734
+	latitude = 12.57666
+	altitude = 725. 
+	timezone = -5.5
+
+# Submitted by Doug Mink 1/6/97
+observatory = "flwo"
+        name = "Whipple Observatory"
+        longitude = 110:52:39
+        latitude = 31:40:51.4
+        altitude = 2320
+        timezone = 7
+
+# Submitted by Doug Mink 1/6/97
+observatory = "oro"
+	name = "Oak Ridge Observatory"
+        longitude = 71:33:29.32
+        latitude =  42:30:18.94
+        altitude =  184
+        timezone = 5
+
+# Submitted by Claudia Vilega Rodriques 12/12/97
+observatory = "lna"
+        name = "Laboratorio Nacional de Astrofisica - Brazil"
+        longitude = 45.5825
+        latitude = -22:32:04
+        altitude = 1864
+        timezone = 3
+

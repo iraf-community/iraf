@@ -1,4 +1,7 @@
+include <math/curfit.h>
+include	<pkg/gtools.h>
 include	<smw.h>
+include	<units.h>
 include	"identify.h"
 
 # ID_FITDATA -- Compute fit coordinates from pixel coordinates.
@@ -9,12 +12,20 @@ pointer	id				# ID pointer
 int	i
 
 begin
+	if (ID_SH(id) == NULL || ID_PIXDATA(id) == NULL)
+	    return
+
 	call mfree (ID_FITDATA(id), TY_DOUBLE)
 	call malloc (ID_FITDATA(id), ID_NPTS(id), TY_DOUBLE)
 
-	if (ID_CV(id) == NULL)
+	if (ID_CV(id) == NULL) {
+	    if (DC(ID_SH(id)) != DCNO && ID_UN(id) != NULL)
+		iferr (call shdr_units (ID_SH(id), UN_UNITS(ID_UN(id))))
+		    ;
 	    call achtrd (Memr[SX(ID_SH(id))], FITDATA(id,1), ID_NPTS(id))
-	else {
+	    call gt_sets (ID_GT(id), GTXLABEL, LABEL(ID_SH(id)))
+	    call gt_sets (ID_GT(id), GTXUNITS, UNITS(ID_SH(id)))
+	} else {
 	    call dcvvector (ID_CV(id), PIXDATA(id,1), FITDATA(id,1),
 		ID_NPTS(id))
 	    if (FITDATA(id,2) > FITDATA(id,1)) {
@@ -26,9 +37,17 @@ begin
 		    if (FITDATA(id,i) > FITDATA(id,i-1))
 			call error (1, "Coordinate solution is not monotonic")
 	    }
+	    if (ID_UN(id) == NULL) {
+		call gt_sets (ID_GT(id), GTXLABEL, LABEL(ID_SH(id)))
+		call gt_sets (ID_GT(id), GTXUNITS, UNITS(ID_SH(id)))
+	    } else {
+		call gt_sets (ID_GT(id), GTXLABEL, UN_LABEL(ID_UN(id)))
+		call gt_sets (ID_GT(id), GTXUNITS, UN_UNITS(ID_UN(id)))
+	    }
 	}
 	if (ID_SHIFT(id) != 0.)
 	    call aaddkd (FITDATA(id,1), ID_SHIFT(id), FITDATA(id,1),ID_NPTS(id))
+
 end
 
 
@@ -92,10 +111,28 @@ double	pixcoord		# Pixel coordinate returned
 int	i, np1
 double	dx
 
-double	smw_c1trand(), id_fitpt()
+int	dcvstati()
+double	shdr_wl(), smw_c1trand(), id_fitpt()
 
 begin
+	if (ID_CV(id) == NULL) {
+	    pixcoord = fitcoord - ID_SHIFT(id)
+	    pixcoord = shdr_wl (ID_SH(id), pixcoord)
+	    pixcoord = smw_c1trand (ID_LP(id), pixcoord)
+	    return (pixcoord)
+	}
+
 	np1 = NP1(ID_SH(id)) - 1
+	if (dcvstati (ID_CV(id), CVORDER) == 2) {
+	    i = dcvstati (ID_CV(id), CVTYPE)
+	    if (i == LEGENDRE || i == CHEBYSHEV) {
+		dx = FITDATA(id,1)
+		pixcoord = (fitcoord - dx) / (FITDATA(id,2) - dx) + 1 + np1
+		pixcoord = smw_c1trand (ID_LP(id), pixcoord)
+		return (pixcoord)
+	    }
+	}
+
 	if (FITDATA(id,1) < FITDATA(id,ID_NPTS(id))) {
 	    if ((fitcoord<FITDATA(id,1)) || (fitcoord>FITDATA(id,ID_NPTS(id))))
 	        return (INDEFD)

@@ -1,5 +1,21 @@
 .help revisions Jan95 noao.imred.src.dofoe
 .nf
+dofoe$arcrefs.cl
+dofoe$batch.cl
+dofoe$doarcs.cl
+dofoe$listonly.cl
+dofoe$proc.cl
+dofoe$response.cl
+    Any additional qualifiers in the imtype string are stripped.
+    (8/14/97, Valdes)
+
+=========
+V2.11BETA
+=========
+
+dofoe$apsript.par
+    Made changes for the new aperture selection option.  (9/5/96, Valdes)
+
 dofoe$params.par
 dofoe$arcrefs.cl
 dofoe$doarcs.cl

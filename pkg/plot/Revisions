@@ -1,5 +1,34 @@
 .help revisions Aug90 pkg.plot
 .nf
+pkg/plot/phistogram.x
+    Phistogram was producing a segmentation violation error for text file input
+    due to an error in the bug fix described below. (4/10/97, Davis)
+
+pkg/plot/phistogram.x
+    Fixed a bug in the phistogram tasks which could produce invalid floating
+    point operation errors if the input image contained pixel values outside
+    the legal integer range. (7/31/97, Davis)
+
+pkg/plot/t_implot.x
+    The coordinate to be evaluated for dimensions greater than 2 was not
+    being defined causing an FPE (Dec Alpha) or possible errors on other
+    platforms.  The initialization was added.  (4/3/97, Valdes)
+
+pkg$plot/t_graph.x
+pkg$plot/graph.par
+pkg$plot/doc/graph.hlp
+    Added parameters "ltypes" and "colors" to specify a list of line types
+    and colors when doing multiple data sets.  (5/13/96 & 8/21/96, Valdes)
+
+pkg$plot/t_implot.x
+    When the vector being plotted was constant the 'l' and 'c' keys selecting
+    lines/columns from the right plot axis did not work.  The code was
+    fixed for this case. (3/27/96, Valdes)
+
+=======
+V2.10.4
+=======
+
 pkg$plot/t_gkixt.x
     Increased the size of the index array from 2048 to 8192 to accomodate
     very large metacode files.  (3/22/95  MJF)
@@ -10,7 +39,7 @@ pkg$plot/pltwcs.x
     being set to zero and then used inapproprriately as a pointer offset
     causing an error on the Dec Alpha port.  The axis now defaults to
     1 and also the task now beeps when attempting a column plot rather
-    than plotting a point point line.  (2/16/95, Valdes)
+    than plotting.  (2/16/95, Valdes)
 
 pkg$plot/t_surface.x
     The surface task no longer calls error when the input array is unsuitable

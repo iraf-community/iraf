@@ -1,6 +1,7 @@
 include	<error.h>
 include	<mach.h>
 include	<smw.h>
+include	<units.h>
 include	"ecidentify.h"
 
 # EC_MAPLL -- Read the line list into memory.
@@ -12,7 +13,9 @@ pointer	ec		# Echelle pointer
 int	fd, nalloc, nlines, open(), fscan(), nscan()
 double	value, lastval
 pointer	ec_ll
-errchk	open, fscan, malloc, realloc
+pointer	sp, str, units, un_open()
+bool	streq()
+errchk	open, fscan, malloc, realloc, un_open
 
 begin
 	EC_LL(ec) = NULL
@@ -23,10 +26,29 @@ begin
 	iferr (fd = open (Memc[EC_COORDLIST(ec)], READ_ONLY, TEXT_FILE))
 	    return
 
+	call smark (sp)
+	call salloc (str, SZ_LINE, TY_CHAR)
+	call salloc (units, SZ_LINE, TY_CHAR)
+	call strcpy ("Angstroms", Memc[units], SZ_LINE)
+
 	lastval = -MAX_DOUBLE
 	nalloc = 0
 	nlines = 0
 	while (fscan (fd) != EOF) {
+	    call gargwrd (Memc[str], SZ_LINE)
+	    if (nscan() != 1)
+		next
+	    if (Memc[str] == '#') {
+		call gargwrd (Memc[str], SZ_LINE)
+		call strlwr (Memc[str])
+		if (streq (Memc[str], "units")) {
+		    call gargstr (Memc[units], SZ_LINE)
+		    call xt_stripwhite (Memc[units])
+		}
+		next
+	    }
+	    call reset_scan ()
+
 	    call gargd (value)
 	    if (nscan() != 1)
 		next
@@ -50,12 +72,17 @@ begin
 	}
 	call close (fd)
 
-	if (nlines == 0)
-	    return
+	if (nlines > 0) {
+	    call realloc (ec_ll, nlines + 1, TY_DOUBLE)
+	    Memd[ec_ll+nlines] = INDEFD
+	    EC_LL(ec) = ec_ll
 
-	call realloc (ec_ll, nlines + 1, TY_DOUBLE)
-	Memd[ec_ll+nlines] = INDEFD
-	EC_LL(ec) = ec_ll
+	    if (EC_UN(ec) == NULL && Memc[units] != EOS)
+		EC_UN(ec) = un_open (Memc[units])
+	    call ec_unitsll (ec, Memc[units])
+	}
+
+	call sfree (sp)
 end
 
 
@@ -67,6 +94,56 @@ pointer	ec		# Line list pointer
 
 begin
 	call mfree (EC_LL(ec), TY_DOUBLE)
+end
+
+
+# EC_UNITSLL -- Change the line list units from the input units to the
+# units given by EC_UN.  This may involve reversing the order of the list.
+
+procedure ec_unitsll (ec, units)
+
+pointer	ec			# Identify structure
+char	units[ARB]		# Input units
+
+int	i, nll
+double	value
+pointer	un, ll, llend, un_open()
+bool	un_compare()
+errchk	un_open
+
+begin
+	if (EC_LL(ec) == NULL)
+	    return
+	if (IS_INDEFD(Memd[EC_LL(ec)]))
+	    return
+	if (units[1] == EOS || EC_UN(ec) == NULL)
+	    return
+	if (UN_CLASS(EC_UN(ec)) == UN_UNKNOWN)
+	    return
+
+	un = un_open (units)
+	if (un_compare (un, EC_UN(ec))) {
+	    call un_close (un)
+	    return
+	}
+
+	ll = EC_LL(ec)
+	do i = 0, ARB
+	    if (IS_INDEFD(Memd[ll+i])) {
+		nll = i
+		break
+	    }
+	call un_ctrand (un, EC_UN(ec), Memd[ll], Memd[ll], nll)
+	call un_close (un)
+
+	if (Memd[ll] > Memd[ll+nll-1]) {
+	    llend = ll + nll - 1
+	    do i = 0, nll / 2 - 1 {
+		value = Memd[ll+i]
+		Memd[ll+i] = Memd[llend-i]
+		Memd[llend-i] = value
+	    }
+	}
 end
 
 

@@ -13,7 +13,7 @@ File or files from which the fields are to be extracted.
 .ls fields
 The fields to be extracted.  
 .le
-.ls lines = "1-9999"
+.ls lines = "1-"
 The lines from which the fields are to be extracted.  If multiple files are 
 being extracted, the same lines apply to each file.
 .le
@@ -53,6 +53,12 @@ EXAMPLES
 
 	cl> fields newlist 1,3 | graph
 .fi
+.ih
+REVISIONS
+.ls FIELDS V2.11
+The default value for the \fIlines\fR parameter was changed to an open
+upper limit.
+.le
 .ih
 SEE ALSO
 joinlines, xtools.ranges

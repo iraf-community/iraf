@@ -99,23 +99,16 @@ begin
 
 	# Print the error analysis.
 
-	call fprintf (fd, "total points = %d\nsample points = %d\n")
+	call fprintf (fd, "# total points = %d\nsample points = %d\n")
 	    call pargi (npts)
 	    call pargi (n)
-	call fprintf (fd, "nrejected = %d\ndeleted = %d\n")
+	call fprintf (fd, "# nrejected = %d\ndeleted = %d\n")
 	    call pargi (IC_NREJECT(ic))
 	    call pargi (deleted)
-	call fprintf (fd, "RMS = %7.4g\n")
+	call fprintf (fd, "# RMS = %7.4g\n")
 	    call pargr (rms)
-	call fprintf (fd, "square root of reduced chi square = %7.4g\n")
+	call fprintf (fd, "# square root of reduced chi square = %7.4g\n")
 	    call pargr (sqrt (chisqr))
-
-	#call fprintf (fd, "\tcoefficent\terror\n")
-	#do i = 1, ncoeffs {
-	#    call fprintf (fd, "\t%10.4e\t%10.4e\n")
-	#	call parg$t (Mem$t[coeffs+i-1])
-	#	call parg$t (Mem$t[errors+i-1])
-	#}
 
 	# Free allocated memory.
 

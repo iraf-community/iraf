@@ -6,9 +6,9 @@ proto		# bscale
 # Increase header space for echelle format keywords
 s1 = envget ("min_lenuserarea")
 if (s1 == "")
-    reset min_lenuserarea = 40000
-else if (int (s1) < 40000)
-    reset min_lenuserarea = 40000
+    reset min_lenuserarea = 100000
+else if (int (s1) < 100000)
+    reset min_lenuserarea = 100000
 
 package echelle
 
@@ -28,6 +28,7 @@ task	continuum,
 	ecidentify,
 	ecreidentify,
 	refspectra,
+	sapertures,
 	sarith,
 	scombine,
 	sflip,

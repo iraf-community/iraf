@@ -21,6 +21,9 @@ begin
 	# parameters with ECDISPCOR.
 
 	arcrefec = arcref // ".ec." // envget ("imtype")
+	i = stridx (",", arcrefec)
+	if (i > 0)
+	    arcrefec = substr (arcrefec, 1, i-1)
 	if (!access (arcrefec)) {
 	    print ("Extract arc reference image ", arcref) | tee (log1)
 	    apslitproc (arcref, background="none", clean=no, weights="none")

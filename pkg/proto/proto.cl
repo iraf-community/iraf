@@ -10,18 +10,17 @@ task	binfil,
 	fields,
 	fixpix,
 	hfix,
-	imcentroid,
 	imcntr,
-	imfunction,
-	imreplace,
+	imextensions,
 	imscale,
 	interp,
 	irafil,
 	joinlines,
+	$mask2text,
 	suntoiraf,
-	wcsedit,
-	wcsreset	= proto$x_proto.e
+	text2mask = proto$x_proto.e
 
-task	imalign		= proto$imalign.cl
+
+hidetask	mask2text
 
 clbye

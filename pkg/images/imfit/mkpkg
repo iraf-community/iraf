@@ -1,13 +1,5 @@
-# Library for the IMAGE FITTING tasks
-
-$checkout libpkg.a pkg$images/
-$update   libpkg.a
-$checkin  libpkg.a pkg$images/
-$exit
+# MKPKG for the IMFIT Package
 
 libpkg.a:
-	fit1d.x		<imhdr.h> <pkg/gtools.h> <error.h>
-	imsurfit.x	imsurfit.h <math/surfit.h> <imhdr.h> <mach.h>
-	t_imsurfit.x	imsurfit.h <error.h> <imhdr.h>
-	t_lineclean.x	<imhdr.h> <pkg/gtools.h>
+	@src
 	;

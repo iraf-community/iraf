@@ -44,7 +44,7 @@ pointer	mko, mkt
 long	clgetl(), clktime()
 bool	clgetb(), streq()
 int	imtopenp(), imtlen(), imtgetim()
-int	clgeti(), access(), nowhite(), open(), fscan(), nscan(), imaccess()
+int	clgeti(), access(), nowhite(), open(), fscan(), nscan()
 real	clgetr(), urand()
 pointer	immap(), imgl2r(), impl2r()
 pointer	mkt_star()
@@ -78,6 +78,8 @@ begin
 	if (poisson && ranbuf > 0)
 	    call salloc (pbuf, ranbuf, TY_REAL)
 	seed = clgetl ("seed")
+	if (IS_INDEFL(seed))
+	    seed = clktime (long (0))
 	cmmts = clgetb ("comments")
 
 	if (imtlen (ilist) == 0)
@@ -95,11 +97,7 @@ begin
 
 	    # Map images.  Check for new, existing, and in-place images.
 	    if (streq (Memc[input], Memc[output])) {
-		if (imaccess (Memc[input], 0) == YES) {
-		    iferr (in = immap (Memc[input], READ_WRITE, LEN_UA)) {
-			call erract (EA_WARN)
-			next
-		    }
+		ifnoerr (in = immap (Memc[input], READ_WRITE, LEN_UA)) {
 		    out = in
 		    new = false
 		} else {

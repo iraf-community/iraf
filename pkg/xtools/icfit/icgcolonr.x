@@ -7,7 +7,7 @@ include	"names.h"
 
 # List of colon commands.
 define	CMDS "|show|sample|naverage|function|order|low_reject|high_reject\
-	|niterate|grow|markrej|errors|vshow|xyshow|"
+	|niterate|grow|markrej|errors|vshow|xyshow|color|evaluate|"
 
 define	SHOW		1	# Show values of parameters
 define	SAMPLE		2	# Set or show sample ranges
@@ -21,7 +21,9 @@ define	GROW		9	# Set or show rejection growing radius
 define	MARKREJ		10	# Mark rejected points
 define	ERRORS		11	# Show errors of fit
 define	VSHOW		12	# Show verbose information
-define	XYSHOW		13	# Show x-y-fit values
+define	XYSHOW		13	# Show x-y-fit-wts values
+define	COLOR		14	# Fit color
+define	EVALUATE	15	# Evaluate fit at specified value
 
 # ICG_COLON -- Processes colon commands.  The common flags and newgraph
 # signal changes in fitting parameters or the need to redraw the graph.
@@ -37,6 +39,7 @@ pointer	cv				# CURFIT pointer for error listing
 real	x[npts], y[npts], wts[npts]	# Data arrays for error listing
 int	npts				# Number of data points
 
+real	val, rcveval()
 bool	bval
 int	ncmd, ival
 real	rval
@@ -187,14 +190,33 @@ begin
 	    call gargwrd (Memc[cmd], IC_SZSAMPLE)
 	    if (nscan() == 1) {
 		call gdeactivate (gp, AW_CLEAR)
-		call ic_xyshowr ("STDOUT", cv, x, y, npts)
+		call ic_xyshowr (ic, "STDOUT", cv, x, y, wts, npts)
 		call greactivate (gp, AW_PAUSE)
 	    } else {
 		iferr {
-		    call ic_xyshowr (Memc[cmd], cv, x, y, npts)
+		    call ic_xyshowr (ic, Memc[cmd], cv, x, y, wts, npts)
 		} then 
 		    call erract (EA_WARN)
 	    }
+
+	case COLOR: # :color - List or set the fit color.
+	    call gargi (ival)
+	    if (nscan() == 1) {
+		call printf ("color = %d\n")
+		    call pargi (IC_COLOR(ic))
+	    } else
+		IC_COLOR(ic) = ival
+
+	case EVALUATE: # :evaluate x - evaluate fit at x.
+	    call gargr (val)
+	    if (nscan() == 1)
+		call printf ("evaluate requires a value to evaluate\n")
+	    else {
+		call printf ("fit(%g) = %g\n")
+		    call pargr (val)
+		    call pargr (rcveval (cv, val))
+	    }
+
 	default: # Unrecognized command.
 	    call printf ("Unrecognized command or abiguous abbreviation\007")
 	}

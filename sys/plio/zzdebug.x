@@ -53,10 +53,14 @@ The following commands are defined:
 
 	rop src [vs] dst [vs] [vn] rop			# rasterop
 	stencil src [vs] dst [vs] stn [vs] [vn] rop	# stencil
+	invert [mask] [vs [vn]]			# invert a mask
 
 	compare mask1 mask2			# compare two masks
 	rtest mask1 mask2			# range list conversion test
 	ptest mask1 mask2			# pixel array conversion test
+	secne [mask] vs ve			# test if section not empty
+	secnc [mask] vs ve			# test if section not constant
+	rio [mask] vs				# test mask using random i/o
 
 Rasterops may be specified either as integer constants (any radix) or via
 a simple symbolic notation, e.g.:  "opcode+[value]".
@@ -112,9 +116,13 @@ define	KW_SAVEIM	21
 # eol			22
 define	KW_SET		23
 define	KW_SHOW		24
-define	KW_STENCIL	25
-define	KW_TIMER	26
-define	KW_LOG		27
+define	KW_SECNE	25
+define	KW_SECNC	26
+define	KW_RIO		27
+define	KW_STENCIL	28
+define	KW_INVERT	29
+define	KW_TIMER	30
+define	KW_LOG		31
 
 
 # PLTEST -- Test the PL package.  Read and execute commands from the standard
@@ -122,17 +130,18 @@ define	KW_LOG		27
 
 procedure t_pltest()
 
-bool	timer
 long	time[2]
 int	x, y, r
-int	px[MAXARGS], py[MAXARGS], old_onint, width
-pointer	pl, pl_1, pl_2, def_pl, pl_src, pl_dst, pl_stn, tty
+bool	timer, bval
+int	px[MAXARGS], py[MAXARGS], old_onint, width, mval
+pointer	pl, pl_1, pl_2, def_pl, pl_src, pl_dst, pl_stn, tty, plr
 char	cmd[SZ_LINE], kwname[SZ_FNAME], title[SZ_LINE], fname[SZ_FNAME]
 int	what, rop, v_arg, x1, x2, y1, y2, ip, op, ch, i, j, cmdlog, status
 int	opcode, save_fd[MAXINCL], in, fd, o_fd, maskno, depth, naxes, npts
 int	v1[PL_MAXDIM], v2[PL_MAXDIM], v3[PL_MAXDIM], v4[PL_MAXDIM], v[PL_MAXDIM]
-int	fstati(), strdic(), open(), getline(), strncmp(), locpr()
-pointer	pl_create(), ttyodes()
+int	fstati(), strdic(), open(), getline(), strncmp(), locpr(), plr_getpix()
+pointer	pl_create(), ttyodes(), plr_open()
+bool	pl_sectnotempty(), pl_sectnotconst()
 extern	onint()
 
 char	sbuf[SZ_SBUF]
@@ -145,7 +154,7 @@ define	eof_ 92
 
 string	keywords "|box|bye|circle|clear|compare|create|draw|erase|help|\
 	|line|point|polygon|load|loadim|ptest|rop|rtest|run|save|saveim|\
-	|set|show|stencil|timer|log|"
+	|set|show|secne|secnc|rio|stencil|invert|timer|log|"
 
 begin
 	in = 0
@@ -219,7 +228,7 @@ eof_		    if (in > 0) {
 
 	    for (op=1;  cmd[ip] != EOS && cmd[ip] != '\n';  ip=ip+1) {
 		ch = cmd[ip]
-		if (IS_ALNUM(ch)) {
+		if (IS_ALNUM(ch) || ch == '?' || ch == '_') {
 		    kwname[op] = ch
 		    op = op + 1
 		} else
@@ -230,7 +239,10 @@ eof_		    if (in > 0) {
 	    # Look up the keyword in the dictionary.  If not found ring the
 	    # bell, but do not quit.
 
-	    opcode = strdic (kwname, kwname, MAXKWLEN, keywords)
+	    if (kwname[1] == '?')
+		opcode = KW_HELP
+	    else
+		opcode = strdic (kwname, kwname, MAXKWLEN, keywords)
 	    if (opcode <= 0) {
 		call eprintf ("unknown command\007\n")
 		call flush (STDERR)
@@ -537,6 +549,7 @@ eof_		    if (in > 0) {
 		# Create a new, emtpy mask of the given size and depth.
 
 		# Get mask.
+		maskno = 1
 		if (argtype[argno] == MASK_ARG) {
 		    maskno = v_i(argno)
 		    argno = argno + 1
@@ -573,6 +586,7 @@ eof_		    if (in > 0) {
 		# Perform the operation.
 		if (timer)
 		    call sys_mtime (time)
+		call pl_close (v_mask[maskno])
 		v_mask[maskno] = pl_create (naxes, v1, depth)
 		def_pl = v_mask[maskno]
 		if (timer)
@@ -1011,6 +1025,39 @@ eof_		    if (in > 0) {
 		if (timer)
 		    call sys_ptime (STDOUT, "", time)
 
+	    case KW_INVERT:
+		# Invert a mask.
+
+		# Get mask.
+		pl_src = def_pl
+		if (argtype[argno] == MASK_ARG) {
+		    pl_src = v_m(argno)
+		    argno = argno + 1
+		}
+		pl_dst = pl_src
+
+		# Get start vector in mask.
+		if (argtype[argno] == VECTOR_ARG) {
+		    call amovi (v_v(argno), v1, PL_MAXDIM)
+		    argno = argno + 1
+		} else
+		    call amovki (1, v1, PL_MAXDIM)
+
+		# Get vector defining size of region to be modified.
+		if (argtype[argno] == VECTOR_ARG) {
+		    call amovi (v_v(argno), v2, PL_MAXDIM)
+		    argno = argno + 1
+		} else
+		    call amovi (PL_AXLEN(pl_dst,1), v2, PL_MAXDIM)
+
+		# Perform the operation.
+		if (timer)
+		    call sys_mtime (time)
+		rop = PIX_NOT(PIX_SRC)
+		call pl_rop (pl_src, v1, pl_dst, v1, v2, rop)
+		if (timer)
+		    call sys_ptime (STDOUT, "", time)
+
 	    case KW_PTEST, KW_RTEST:
 		# Line list to pixel array or range list conversion test.
 		if (nargs < 2)
@@ -1034,6 +1081,113 @@ eof_		    if (in > 0) {
 		if (timer)
 		    call sys_mtime (time)
 		call conv_test (pl_1, pl_2, STDOUT, opcode)
+		if (timer)
+		    call sys_ptime (STDOUT, "", time)
+
+	    case KW_SECNE:
+		# Test if a section of a mask is not empty.
+
+		# Get mask.
+		pl = def_pl
+		if (nargs >= 1 && argtype[argno] == MASK_ARG) {
+		    pl = v_m(argno)
+		    argno = argno + 1
+		}
+
+		# Get vector coords of region to be erased.
+		if (argtype[argno] == VECTOR_ARG) {
+		    call amovi (v_v(argno), v1, PL_MAXDIM)
+		    argno = argno + 1
+		} else
+		    call amovki (1, v1, PL_MAXDIM)
+
+		if (argtype[argno] == VECTOR_ARG) {
+		    call amovi (v_v(argno), v2, PL_MAXDIM)
+		    argno = argno + 1
+		} else
+		    call amovi (PL_AXLEN(pl,1), v2, PL_MAXDIM)
+
+		# Perform the operation.
+		if (timer)
+		    call sys_mtime (time)
+
+		bval = pl_sectnotempty (pl, v1, v2, 2)
+		call printf ("pl_sectnotempty -> %b (mask is %s)\n")
+		    call pargb (bval)
+		    if (bval)
+			call pargstr ("not empty")
+		    else
+			call pargstr ("empty")
+
+		if (timer)
+		    call sys_ptime (STDOUT, "", time)
+
+	    case KW_SECNC:
+		# Test if a section of a mask is not constant.
+
+		# Get mask.
+		pl = def_pl
+		if (nargs >= 1 && argtype[argno] == MASK_ARG) {
+		    pl = v_m(argno)
+		    argno = argno + 1
+		}
+
+		# Get vector coords of region to be erased.
+		if (argtype[argno] == VECTOR_ARG) {
+		    call amovi (v_v(argno), v1, PL_MAXDIM)
+		    argno = argno + 1
+		} else
+		    call amovki (1, v1, PL_MAXDIM)
+
+		if (argtype[argno] == VECTOR_ARG) {
+		    call amovi (v_v(argno), v2, PL_MAXDIM)
+		    argno = argno + 1
+		} else
+		    call amovi (PL_AXLEN(pl,1), v2, PL_MAXDIM)
+
+		# Perform the operation.
+		if (timer)
+		    call sys_mtime (time)
+		
+		call printf ("pl_sectnotconst -> ")
+		if (pl_sectnotconst (pl, v1, v2, 2, mval))
+		    call printf ("true (mask is not constant)\n")
+		else {
+		    call printf ("false (mask is constant, value=%d)\n")
+			call pargi (mval)
+		}
+		if (timer)
+		    call sys_ptime (STDOUT, "", time)
+
+	    case KW_RIO:
+		# Test access to a mask using random io (plr_getpix).
+
+		# Get mask.
+		pl = def_pl
+		if (nargs >= 1 && argtype[argno] == MASK_ARG) {
+		    pl = v_m(argno)
+		    argno = argno + 1
+		}
+
+		# Get vector coords of region to be tested.
+		if (argtype[argno] == VECTOR_ARG) {
+		    call amovi (v_v(argno), v1, PL_MAXDIM)
+		    argno = argno + 1
+		} else
+		    call amovki (1, v1, PL_MAXDIM)
+
+		# Perform the operation.
+		if (timer)
+		    call sys_mtime (time)
+
+		call amovki (1, v, PL_MAXDIM)
+		plr = plr_open (pl, v, 0)
+		call printf ("mask pixel [%d,%d] has value %d\n")
+		    call pargi (v1[1])
+		    call pargi (v1[2])
+		    call pargi (plr_getpix (plr, v1[1], v1[2]))
+		call plr_close (plr)
+
 		if (timer)
 		    call sys_ptime (STDOUT, "", time)
 
@@ -1228,6 +1382,8 @@ begin
 	call fprintf (fd, "rtest mask1 mask2%48t# range list conversion test\n")
 	call fprintf (fd,
 	"ptest mask1 mask2%48t# pixel array conversion test\n")
+	call fprintf (fd, "secne [mask] [vs ve]%48t# test section not empty\n")
+	call fprintf (fd, "rio [mask] [vs]%48t# test mask using random i/o\n")
 end
 
 

@@ -2,62 +2,57 @@
 
 include	"stf.h"
 
-# STF_ACCESS -- Test the accessibility or existence of an existing image, or the
-# legality of the name of a new image.
+# STF_ACCESS -- Test the accessibility or existence of an existing image, or
+# the legality of the name of a new image.
 
-procedure stf_access (root, extn, acmode, status)
+procedure stf_access (kernel, root, extn, acmode, status)
 
-char	root[ARB]		# root filename
-char	extn[ARB]		# extension (SET on output if none specified)
-int	acmode			# access mode (0 to test only existence)
-int	status
+int	kernel			#I IKI kernel
+char	root[ARB]		#I root filename
+char	extn[ARB]		#I extension (SET on output if none specified)
+int	acmode			#I access mode (0 to test only existence)
+int	status			#O return value
 
-int	nchars
-pointer	sp, fname, stf_extn
-int	access(), strmatch(), strlen()
-string	stf_pattern STF_HDRPATTERN
+int	i
+pointer	sp, fname, kextn
+int	access(), iki_validextn(), iki_getextn(), btoi()
 
 begin
 	call smark (sp)
 	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (stf_extn, MAX_LENEXTN, TY_CHAR)
-
-	nchars = strlen (extn)
+	call salloc (kextn, MAX_LENEXTN, TY_CHAR)
 
 	# If new image, test only the legality of the given extension.
 	# This is used to select a kernel given the imagefile extension.
 
 	if (acmode == NEW_IMAGE || acmode == NEW_COPY) {
-	    if ((strmatch (extn, stf_pattern) > 0) && nchars == MAX_LENEXTN)
-		status = YES
-	    else
-		status = NO
+	    status = btoi (iki_validextn (kernel, extn) > 0)
 	    call sfree (sp)
 	    return
 	}
+
+	status = NO
 
 	# If no extension was given, look for a file with the default
 	# extension, and return the actual extension if an image with the
 	# default extension is found.
 
-	status = YES
 	if (extn[1] == EOS) {
-	    call stf_gethdrextn (Memc[stf_extn], MAX_LENEXTN)
-	    call iki_mkfname (root, Memc[stf_extn], Memc[fname], SZ_PATHNAME)
-	    if (access (Memc[fname], acmode, 0) == YES) {
-		call strcpy (Memc[stf_extn], extn, MAX_LENEXTN)
-		call sfree (sp)
-		return
-	    }
-
-	} else if ((strmatch (extn,stf_pattern) > 0) && nchars == MAX_LENEXTN) {
+	    do i = 1, ARB {
+		if (iki_getextn (kernel, i, Memc[kextn], MAX_LENEXTN) <= 0)
+		    break
+		call iki_mkfname (root, Memc[kextn], Memc[fname], SZ_PATHNAME)
+		if (access (Memc[fname], acmode, 0) == YES) {
+		    call strcpy (Memc[kextn], extn, MAX_LENEXTN)
+		    status = YES
+		    break
+		}
+	    }		
+	} else if (iki_validextn (kernel, extn) == kernel) {
 	    call iki_mkfname (root, extn, Memc[fname], SZ_PATHNAME)
-	    if (access (Memc[fname], acmode, 0) == YES) {
-		call sfree (sp)
-		return
-	    }
+	    if (access (Memc[fname], acmode, 0) == YES)
+		status = YES
 	}
 
-	status = NO
 	call sfree (sp)
 end

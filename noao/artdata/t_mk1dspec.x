@@ -4,6 +4,13 @@ include	<imhdr.h>
 define	LEN_UA		20000			# Maximum user header
 define	LEN_COMMENT	70			# Maximum comment length
 
+# Profile types.
+define  PTYPES  "|gaussian|lorentzian|voigt|"
+define  GAUSS           1       # Gaussian profile
+define  LORENTZ         2       # Lorentzian profile
+define  VOIGT           3       # Voigt profile
+
+
 # T_MK1DSPEC -- Make one dimensional spectra.  New images may be created
 # or existing images modified.  The continuum may be a slope and/or
 # a blackbody.  A line list may be given or random lines generated.
@@ -29,23 +36,26 @@ double	temp			# Blackbody temperture (Kelvin)
 int	fnu			# F-nu flux?
 
 int	llist			# List of files containing lines (lines param)
-double	sigma			# Sigma of lines (Angstroms)
+pointer	profile			# Profile type
 double	peak			# Peak/continuum
+double	gfwhm			# Sigma of Gaussian (Angstroms)
+double	lfwhm			# FWHM of Lorentzian (Angstroms)
 int	nlines			# Number of lines
 double	subsample		# Subsampling (nxsub param)
-double	nsigma			# Dynamic range of gaussian (dynrange param)
+double	ngfwhm			# Dynamic range of gaussian (dynrange param)
+double	nlfwhm			# Dynamic range of lorentzian (dynrange param)
 long	seed			# Random number seed
 
 bool	new, ranlist
-int	i, j, dtype
-double	w, x, x1, x2, z1
-real	aplow[2], aphigh[2]
-pointer	sp, input, output, lines, comment, apnum, coeff
-pointer	in, out, mw, waves, peaks, sigmas, spec, buf
+int	i, j, dtype, ptype
+double	w, x, x1, x2, x3, z1
+real	v, u, aplow[2], aphigh[2]
+pointer	sp, input, output, lines, comment, coeff
+pointer	in, out, mw, ptypes, waves, peaks, gfwhms, lfwhms, spec, buf
 
 long	clgetl(), clktime()
-int	clgeti(), imtopenp(), imtgetim(), imaccess()
-int	nowhite(), access(), open(), fscan(), nscan()
+int	clgeti(), clgwrd(), imtopenp(), imtgetim()
+int	nowhite(), access(), open(), fscan(), nscan(), strdic()
 real	urand()
 double	clgetd()
 pointer	immap(), mw_open(), smw_openim(), imgl2d(), impl2d()
@@ -58,7 +68,7 @@ begin
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (lines, SZ_FNAME, TY_CHAR)
 	call salloc (comment, LEN_COMMENT, TY_CHAR)
-	call salloc (apnum, SZ_FNAME, TY_CHAR)
+	call salloc (profile, SZ_FNAME, TY_CHAR)
 	coeff = NULL
 
 	# Get file lists and fixed parameters.
@@ -66,7 +76,9 @@ begin
 	olist = imtopenp ("output")
 	llist = imtopenp ("lines")
 	subsample = 1. / clgeti ("nxsub")
-	nsigma = sqrt (2. * log (clgetd ("dynrange")))
+	x1 = clgetd ("dynrange")
+	ngfwhm = 0.424661 * sqrt (2. * log (x1))
+	nlfwhm = sqrt (0.5 * (x1 - 1))
 	z = clgetd ("rv")
 	if (clgetb ("z"))
 	    z = 1 + z
@@ -86,11 +98,7 @@ begin
 
 	    # Map images.  Check for new, existing, and in-place images.
 	    if (streq (Memc[input], Memc[output])) {
-	        if (imaccess (Memc[input], 0) == YES) {
-	            iferr (in = immap (Memc[input], READ_WRITE, 0)) {
-			call erract (EA_WARN)
-			next
-		    }
+		ifnoerr (in = immap (Memc[input], READ_WRITE, 0)) {
 		    iferr (mw = smw_openim (in)) {
 			call imunmap (in)
 			call erract (EA_WARN)
@@ -179,44 +187,87 @@ begin
 	    if (access (Memc[lines], 0, 0) == YES) {
 	        i = open (Memc[lines], READ_ONLY, TEXT_FILE)
 	        nlines = 0
+		dtype = clgwrd ("profile", Memc[profile], SZ_FNAME, PTYPES)
 		x1 = clgetd ("peak")
-		x2 = clgetd ("sigma")
+		x2 = clgetd ("gfwhm")
+		x3 = clgetd ("lfwhm")
 	        seed = clgetl ("seed")
+		if (IS_INDEFL(seed))
+		    seed = clktime (long (0))
 	        while (fscan (i) != EOF) {
 		    call gargd (w)
 		    call gargd (peak)
-		    call gargd (sigma)
-		    if (nscan() < 1)
-		        next
-		    if (nscan() < 3)
-	    	        sigma = x2
-		    if (nscan() < 2)
-	    	        peak = x1 * urand (seed)
+		    call gargwrd (Memc[profile], SZ_FNAME)
+		    call gargd (gfwhm)
+		    call gargd (lfwhm)
+		    ptype = strdic (Memc[profile], Memc[profile], SZ_FNAME,
+			PTYPES)
+		    if (ptype == 0)
+			ptype = dtype
+		    switch (nscan()) {
+		    case 0:
+			next
+		    case 1:
+			peak = x1 * urand (seed)
+			ptype = dtype
+			gfwhm = x2
+			lfwhm = x3
+		    case 2:
+			ptype = dtype
+			gfwhm = x2
+			lfwhm = x3
+		    case 3:
+			gfwhm = x2
+			lfwhm = x3
+		    case 4:
+			switch (ptype) {
+			case GAUSS:
+			    lfwhm = x3
+			case LORENTZ:
+			    lfwhm = gfwhm
+			    gfwhm = x2
+			case VOIGT:
+			    lfwhm = x3
+			}
+		    }
+
 		    if (nlines == 0) {
 		        j = 50
+		        call malloc (ptypes, j, TY_INT)
 		        call malloc (waves, j, TY_DOUBLE)
 		        call malloc (peaks, j, TY_DOUBLE)
-		        call malloc (sigmas, j, TY_DOUBLE)
+		        call malloc (gfwhms, j, TY_DOUBLE)
+		        call malloc (lfwhms, j, TY_DOUBLE)
 		    } else if (nlines == j) {
 		        j = j + 10
+		        call realloc (ptypes, j, TY_INT)
 		        call realloc (waves, j, TY_DOUBLE)
 		        call realloc (peaks, j, TY_DOUBLE)
-		        call realloc (sigmas, j, TY_DOUBLE)
+		        call realloc (gfwhms, j, TY_DOUBLE)
+		        call realloc (lfwhms, j, TY_DOUBLE)
 		    }
+		    Memi[ptypes+nlines] = ptype
 		    Memd[waves+nlines] = z * w
 		    Memd[peaks+nlines] = peak / z
-		    Memd[sigmas+nlines] = z * sigma
+		    Memd[gfwhms+nlines] = z * gfwhm
+		    Memd[lfwhms+nlines] = z * lfwhm
 		    nlines = nlines + 1
 	        }
 	        call close (i)
 	    } else {
 	        nlines = clgeti ("nlines")
+		ptype = clgwrd ("profile", Memc[profile], SZ_FNAME, PTYPES)
 	        peak = clgetd ("peak")
-	        sigma = clgetd ("sigma")
+	        gfwhm = clgetd ("gfwhm")
+	        lfwhm = clgetd ("lfwhm")
 	        seed = clgetl ("seed")
+		if (IS_INDEFL(seed))
+		    seed = clktime (long (0))
+	        call malloc (ptypes, nlines, TY_INT)
 	        call malloc (waves, nlines, TY_DOUBLE)
 	        call malloc (peaks, nlines, TY_DOUBLE)
-	        call malloc (sigmas, nlines, TY_DOUBLE)
+	        call malloc (gfwhms, nlines, TY_DOUBLE)
+	        call malloc (lfwhms, nlines, TY_DOUBLE)
 	        do i = 0, nlines-1 {
 		    w = z * (w0 + wpc * (nw - 1) * urand (seed))
 		    x = (w - w0) / wpc / (nw - 1)
@@ -225,17 +276,36 @@ begin
 		    else
 		        x = x - int (x)
 		    w = w0 + wpc * (nw - 1) * x
+		    Memi[ptypes+i] = ptype
 		    Memd[waves+i] = w
 		    Memd[peaks+i] = peak / z * urand (seed)
-		    Memd[sigmas+i] = z * sigma
+		    Memd[gfwhms+i] = z * gfwhm
+		    Memd[lfwhms+i] = z * lfwhm
 	        }
 	        if (nlines > 0 && Memc[lines] != EOS) {
 	            i = open (Memc[lines], NEW_FILE, TEXT_FILE)
 		    do j = 0, nlines-1 {
-			call fprintf (i, "%g %g %g\n")
+			switch (Memi[ptypes+j]) {
+			case GAUSS:
+			    call fprintf (i, "%g %g %10s %g\n")
 			    call pargd (Memd[waves+j] / z)
 			    call pargd (Memd[peaks+j] * z)
-			    call pargd (Memd[sigmas+j] / z)
+			    call pargstr ("gaussian")
+			    call pargd (Memd[gfwhms+j] / z)
+			case LORENTZ:
+			    call fprintf (i, "%g %g %10s %g\n")
+			    call pargd (Memd[waves+j] / z)
+			    call pargd (Memd[peaks+j] * z)
+			    call pargstr ("lorentzian")
+			    call pargd (Memd[lfwhms+j] / z)
+			case VOIGT:
+			    call fprintf (i, "%g %g %10s %g %g\n")
+			    call pargd (Memd[waves+j] / z)
+			    call pargd (Memd[peaks+j] * z)
+			    call pargstr ("voigt")
+			    call pargd (Memd[gfwhms+j] / z)
+			    call pargd (Memd[lfwhms+j] / z)
+			}
 		    }
 	            call close (i)
 	        }
@@ -251,16 +321,38 @@ begin
 	    # Make the lines.
 	    call calloc (buf, nw, TY_DOUBLE)
 	    do i = 0, nlines-1 {
+		ptype = Memi[ptypes+i]
 	        w = (Memd[waves+i] - w0) / wpc + 1.
 	        peak = Memd[peaks+i] * subsample
-	        sigma = Memd[sigmas+i] / wpc
-	        x1 = max (1.0D0, w - nsigma * sigma)
-	        x2 = min (double (nw), w + nsigma * sigma)
-	        cont = -0.5 / sigma**2
-	        for (x = x1; x <= x2; x = x + subsample) {
-		    j = buf + int (x - 0.5)
-		    Memd[j] = Memd[j] + peak * exp (cont * (x-w)**2)
-	        }
+	        gfwhm = Memd[gfwhms+i] / abs(wpc)
+	        lfwhm = Memd[lfwhms+i] / abs(wpc)
+		x3 = max (ngfwhm*gfwhm, min (20D0, nlfwhm)*lfwhm)
+	        x1 = max (1.0D0, w - x3)
+	        x2 = min (double (nw), w + x3)
+		switch (ptype) {
+		case GAUSS:
+		    x3 = -0.360674 * gfwhm**2
+		    for (x = x1; x <= x2; x = x + subsample) {
+			j = buf + int (x - 0.5)
+			Memd[j] = Memd[j] + peak * exp ((x-w)**2 / x3)
+		    }
+		case LORENTZ:
+		    x3 = 0.25 * lfwhm**2
+		    for (x = x1; x <= x2; x = x + subsample) {
+			j = buf + int (x - 0.5)
+			Memd[j] = Memd[j] + peak / (1 + (x-w)**2 / x3)
+		    }
+		case VOIGT:
+		    x3 = 1.66511 / gfwhm
+		    cont = (lfwhm / 2 )  * x3
+		    call voigt (0., real(cont), v, u)
+		    peak = peak / v
+		    for (x = x1; x <= x2; x = x + subsample) {
+			j = buf + int (x - 0.5)
+			call voigt (real((x-w)*x3), real(cont), v, u)
+			Memd[j] = Memd[j] + peak * v
+		    }
+		}
 	    }
 
 	    # Make the continuum.
@@ -293,9 +385,11 @@ begin
 		    Memd[spec+i] = Memd[spec+i] + Memd[buf+i]
 	    }
 
+	    call mfree (ptypes, TY_INT)
 	    call mfree (waves, TY_DOUBLE)
 	    call mfree (peaks, TY_DOUBLE)
-	    call mfree (sigmas, TY_DOUBLE)
+	    call mfree (gfwhms, TY_DOUBLE)
+	    call mfree (lfwhms, TY_DOUBLE)
 	    call mfree (buf, TY_DOUBLE)
 
 	    # Add comment history of task parameters.
@@ -320,8 +414,10 @@ begin
 			call pargi (nlines)
 		    call mkh_comment (out, Memc[comment])
 		    if (ranlist) {
+			call mkh_comment1 (out, "profile", 's')
 			call mkh_comment1 (out, "peak", 'd')
-			call mkh_comment1 (out, "sigma", 'd')
+			call mkh_comment1 (out, "gfwhm", 'd')
+			call mkh_comment1 (out, "lfwhm", 'd')
 			call mkh_comment1 (out, "seed", 'i')
 		    }
 		}

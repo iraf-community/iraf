@@ -333,7 +333,7 @@ MULTISPEC/ECHELLE Format Image Header Keywords
 .fi
 
 The BANDIDn keywords describe the various elements of the 3rd dimension.
-Except for the first one the other bands only occur when \fIextras\fI is
+Except for the first one the other bands only occur when \fIextras\fR is
 yes and when sky subtraction and/or variance and cleaning are done.  The
 relation between the line and the aperture numbers is given by the header
 parameters APNUMn where n is the line and the value gives extraction and

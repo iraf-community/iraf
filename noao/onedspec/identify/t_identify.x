@@ -8,7 +8,7 @@ procedure t_identify ()
 
 int	list, clscan(), clgeti(), clgwrd(), nscan(), imtopenp(), imtgetim()
 real	clgetr()
-pointer	sp, str, id, gt_init()
+pointer	sp, str, id, gt_init(), un_open()
 
 begin
 	call smark (sp)
@@ -37,8 +37,12 @@ begin
 	ID_FWIDTH(id) = clgetr ("fwidth")
 	ID_CRADIUS(id) = clgetr ("cradius")
 	ID_THRESHOLD(id) = clgetr ("threshold")
-	call clgstr ("database", Memc[ID_DATABASE(id)], SZ_FNAME)
-	call clgstr ("coordlist", Memc[ID_COORDLIST(id)], SZ_FNAME)
+	call clgstr ("database", ID_DATABASE(id), ID_LENSTRING)
+	call clgstr ("coordlist", ID_COORDLIST(id), ID_LENSTRING)
+	call clgstr ("units", Memc[str], SZ_LINE)
+	call xt_stripwhite (Memc[str])
+	if (Memc[str] != EOS)
+	    ID_UN(id) = un_open (Memc[str])
 	ID_LABELS(id) = 1
 
 	# Initialize features data structure.
@@ -74,7 +78,7 @@ begin
 	call id_mapll (id)
 
 	# Expand the image template and identify features in each image.
-	while (imtgetim (list, Memc[ID_IMAGE(id)], SZ_FNAME) != EOF)
+	while (imtgetim (list, ID_IMAGE(id), ID_LENSTRING) != EOF)
 	    call id_identify (id)
 
 	# Finish up.

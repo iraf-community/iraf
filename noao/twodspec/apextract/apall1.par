@@ -38,7 +38,7 @@ order,s,h,)apall.order,,,">apall.order
 
 # RECENTERING PARAMETERS
 "
-apertures,s,h,)apall.apertures,,,>apall.apertures
+aprecenter,s,h,)apall.aprecenter,,,>apall.aprecenter
 npeaks,r,h,)apall.npeaks,,,>apall.npeaks
 shift,b,h,)apall.shift,,,">apall.shift
 

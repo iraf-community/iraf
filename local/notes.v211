@@ -1,0 +1,3009 @@
+System Notes File for IRAF Version 2.11.
+Begun 12 June 1995.
+-------------------------------------------
+
+unix/hlib/motd
+unix/hlib/zzsetenv.def
+    Develop system version number incremented to V2.11.  (6/12)
+
+pkg/images/geometry/t_geotran.x
+pkg/images/geometry/geotran.x
+pkg/images/geometry/geotimtran.x
+	Fixed a bug in the buffering of the x and y coordinate surface
+	interpolants which can cause a memory corruption error if, the
+	nxsample or nysample parameters are > 1, and the nxblock or nyblock
+	parameters are less than the x and y dimensions of the input image.
+	Took the opportunity to clean up the code. (6/13/95, LED)
+
+
+pkg/math/curfit/cvpower.gx
+pkg/math/curfit/cvpowerr.x
+pkg/math/curfit/cvpowerd.x
+pkg/math/curfit/doc/curfit.hd
+pkg/math/curfit/doc/curfit.men
+pkg/math/curfit/doc/cvepower.hlp
+	Added the new routine cvepower to the curfit math library. Cvepower
+	computes the errors in the power series coefficients equivalent
+	to the fitted Legendre and Chebyshev coefficients. Cvepower is
+	available in both real and double precision versions. (6/13/95, LED)
+
+
+pkg/images/fmedian.hlp
+pkg/images/fmode.hlp
+pkg/images/median.hlp
+pkg/images/mode.hlp
+pkg/images/fmedian.par
+pkg/images/fmode.par
+pkg/images/median.par
+pkg/images/mode.par
+pkg/images/filters/fmedian.h
+pkg/images/filters/fmode.h
+pkg/images/filters/median.h
+pkg/images/filters/mode.h
+pkg/images/filters/t_fmedian.x
+pkg/images/filters/t_fmode.x
+pkg/images/filters/t_median.x
+pkg/images/filters/t_mode.x
+pkg/images/filters/fmedian.x
+pkg/images/filters/fmode.x
+pkg/images/filters/median.x
+pkg/images/filters/mode.x
+pkg/images/filters/fmd_buf.x
+pkg/images/filters/fmd_hist.x
+pkg/images/filters/fmd_maxmin.x
+pkg/images/filters/med_buf.x
+pkg/images/filters/med_sort.x
+	Added minimum and maximum good data parameters to the fmedian, fmode,
+	median, and mode filtering tasks.  Removed the 64X64 kernel size limit
+	in the median and mode tasks.  Replaced the common blocks with
+	structures and .h files.  (6/20/95, LED)
+
+pkg/images/frmedian.hlp
+pkg/images/frmode.hlp
+pkg/images/rmedian.hlp
+pkg/images/rmode.hlp
+pkg/images/frmedian.par
+pkg/images/frmode.par
+pkg/images/rmedian.par
+pkg/images/rmode.par
+pkg/images/filters/frmedian.h
+pkg/images/filters/frmode.h
+pkg/images/filters/rmedian.h
+pkg/images/filters/rmode.h
+pkg/images/filters/t_frmedian.x
+pkg/images/filters/t_frmode.x
+pkg/images/filters/t_rmedian.x
+pkg/images/filters/t_rmode.x
+pkg/images/filters/frmedian.x
+pkg/images/filters/frmode.x
+pkg/images/filters/rmedian.x
+pkg/images/filters/rmode.x
+pkg/images/filters/med_utils.x
+	Added new ring median and modal filtering tasks frmedian, rmedian,
+	frmode, and rmode to the images package.  (6/20/95, LED)
+
+doc/ports/notes.osf1		+
+	Added notes file from DEC Alpha OSF/1 port.  (6/21)
+
+sys/fio/fioclean.x
+sys/fio/stropen.x
+	Two new internal routines str{set,get}mode were added to stropen.x.
+	These are used to set or query the file access mode as stored for
+	the string file, which represents these in a file-dependent way.
+	fio_cleanup was modified to force the access mode of a string file
+	to READ_ONLY before closing it during file cleanup, to prevent the
+	writing of the trailing EOS when closing a string file opened for
+	writing.  The latter could cause a segmentation violation if the
+	string buffer was no longer in a mapped region of memory, as is
+	possible if the string file is still open (i.e. not closed normally)
+	following task termination when fio_cleanup is called.  This problem
+	was found when testing the OSF/1 version of IRAF.  (6/21, merged from
+	OSF1 revision of 6/06)
+
+dev/termcap
+	Added "lp" as an alias for "lpr".  (6/26)
+
+dev/hosts
+	Added solstice to the downtown servers (tucana,ursa,gemini,orion,bigx)
+	at Ed Anderson's request (6/26 RLS)
+
+unix/hlib/mkpkg
+	Changed "mkshlib.csh" references to "./mkshlib.csh" to make the
+	script more robust in cases where the user has the path screwed
+	up.  (7/03)
+
+dev/tapecap
+	Added support for device mtc|mtcc for BIGX, an HPDAT drive using the
+	ST driver.  Also generic device st-hpdat, the HPDAT on ST.  (7/18)
+
+dev/hosts
+	Added aten, volans, & musca to all servers, deleted vegemite (7/18 MJF)
+
+dev/hosts
+	Added soleil to all downtown server at Ed Anderson's request. (7/27 MJF)
+
+sys/fmtio/strdic.x
+	Was not ignoring leading whitespace on the string to be tested, when
+	computing the length "len" of the string.  (7/31)
+
+pkg/proto/t_wcsreset.x
+        Added an error check to the mw_openim command so wcsreset can erase
+        the world coordinate systems of images with wcss that it cannot
+        read correctly. (1/8/95, Davis)
+
+pkg/xtools/inlfit/incopy.gx
+pkg/xtools/inlfit/incopyr.x
+pkg/xtools/inlfit/incopyd.x
+	Changed 4 MEMP (Memi) references to Mem$t references. (02/8/95, Davis)
+
+dev/tapecap
+	Modified gemini entry to change WangDat to an HP drive.  (8/10)
+
+sys/fio/zzdebug.x
+	Replaced the t_ndopen debug task by a more recent version.  (8/28)
+
+lib/gio.h
+sys/gio/gplcache.x
+sys/gio/gctran.x
+	The WCS transformation caching mechanism used in gctran was not
+	reliable and could fail in some cases where the WCS was changed more
+	frequently than gctran was called.  To make caching of WCS related
+	information more robust a new field GP_WCSORD was added to the GIO
+	descriptor.  This is set to a unique integer ordinal when a WCS is
+	fixed.  If the ordinal changes any routines that cache WCS information
+	should invalidate their cache (unless they cache it on the basis of
+	WCSORD).  WCSORD will differ for WCS stored in different graphics
+	descriptors, so testing WCSORD also does an implicit test that the
+	GP has changed.  (8/28)
+
+sys/mwcs/iwewcs.x
+	Modified so that if an image contains a partial Lterm consisiting
+	of an LTV but no LTM, the missing LTM will default to the identity
+	matrix instead of the zero matrix (the latter causes a segvio if you
+	try to invert it).  An image with a zero LTM is illegal but MWCS
+	should not die with a segvio in this case.  (8/29)
+
+sys/imio/immaky.x
+sys/imio/mkpkg
+	When copying an image section IMIO will call MWCS to update the Lterm
+	of the output image.  This requires that it load any existing WCS
+	so that it can be modified and written out to the output image.  IMIO
+	was modified to put the mw_open in an iferr block, printing a warning
+	message if the WCS cannot be loaded, rather than aborting the immap.
+	Aborting means that all IRAF imaging tasks fails to access the image
+	if it contains a WCS of a type not supported by IMIO.  (8/29)
+
+sys/mwcs/iwgbfits.x
+	The code which reads in multiline FITS strings (WATi_j etc.) would
+	always read 68 characters per card.  This was changed to read at
+	most 68 characters, terminating if newline, EOS, or a single closing
+	quote is seen in the input data.  This allows the string on a line to
+	be less than 68 characters.  It also avoids a bug seen with non-blocked
+	headers where the cards may contain less than 80 characters.  (8/29)
+
+sys/mwcs/iwpstr.x
+	The final card of a multi-card string is no longer blank filled, i.e.
+	the closing quote will appear at the end of the string instead of in
+	column 80.  (8/30)
+
+sys/mwcs/mwsaveim.x
+	The code which puts spaces between a sequence of attribute=value
+	keywords in a WCS attribute list was improved to avoid an unnecessary
+	space at the end of the list (spaces are now only used between the
+	members of the list).  (8/30)
+
+sys/imio/db/impstr.x
+	When writing a string valued parameter the code checks for a trailing
+	quote and tries to add one if it is missing.  The closing quote is
+	omitted if it would overwrite a data character - it isn't required
+	when reading cards unless the string ends before column 80.  (8/30)
+
+sys/mwcs/mwsave.x
+	The DBUF offset in the save header was not being aligned to double.
+	(8/30)
+
+-------------------------------------
+V2.10.4 patch 1 generated.  (8/30)
+
+doc/rev2.hlp
+	Renamed this file to rev2.txt, it is not a help file.  (9/03)
+
+unix/boot/bootlib/osfiletype.c
+	Added ".gz" to the list of "source" file types.  Also added ".fit"
+	as an alias for ".fits".   (9/03)
+
+mkpkg
+noao/mkpkg
+	Added entries for linux and linuz architectures.  (9/06)
+
+unix/hlib/strip.iraf
+noao/lib/strip.noao
+	Replaced by updated versions, some files moved around and others
+	have been added.  (9/06)
+
+local/.cshrc
+	Added "." and moved /usr/lang up in the hierarchy.  (9/21)
+
+hlib/extern.pkg
+	Added the helpdb for the finder package on gemini and ursa.  The
+	package is still loaded through the nlocal package.  (10/12 RLS)
+
+sys/mwcs/imwcs.h
+	CROTA was being stored internally as an integer, causing small
+	truncation errors of non-integral rotational angles.  (10/18)
+
+dev/graphcap
+dev/imtoolrc
+	Added a new 8192x8192 frame buffer (imt7|imt8192).  Redefined the
+	old imt7 (imt4x1) as imt19.  (11/01)
+
+pkg/images/tv/imexamine/ierimexam.x
+pkg/images/tv/imexamine/stfmeasure.x +
+pkg/images/tv/imexamine/starfocus.h +
+pkg/images/tv/imexamine/mkpkg
+pkg/images/tv/doc/imexamine.hlp
+lib/src/imexamine.key
+	New FWHM estimates based on the enclosed flux and a direct
+	measurement were added to the 'a' and 'r' keys.  The weights for
+	the Gaussian fit were modified to reduce the influence of pixels
+	outside the half-maximum radius.  The ? help and help page were
+	revised to described the new output and algorithms.  (11/09)
+
+dev/hosts
+	Added 'inti' to all downtown servers.  (11/20  MJF)
+
+pkg/images/median.par
+pkg/images/rmedian.par
+pkg/images/mode.par
+pkg/images/rmode.par
+pkg/images/fmedian.par
+pkg/images/frmedian.par
+pkg/images/fmode.par
+pkg/images/frmode.par
+pkg/images/doc/median.hlp
+pkg/images/doc/rmedian.hlp
+pkg/images/doc/mode.hlp
+pkg/images/doc/rmode.hlp
+pkg/images/doc/fmedian.hlp
+pkg/images/doc/frmedian.hlp
+pkg/images/doc/fmode.hlp
+pkg/images/doc/frmode.hlp
+pkg/images/filters/t_median.x
+pkg/images/filters/t_rmedian.x
+pkg/images/filters/t_mode.x
+pkg/images/filters/t_rmode.x
+pkg/images/filters/t_fmedian.x
+pkg/images/filters/t_frmedian.x
+pkg/images/filters/t_fmode.x
+pkg/images/filters/t_frmode.x
+	Added a verbose parameter to the median, rmedian, mode, rmode, fmedian,
+	frmedian, fmode, and frmode tasks. (11/27/95, Davis)
+
+dev/hosts
+	Corrected path to irafks.e for cephus on all servers (11/30 MJF)
+
+unix/boot/spp/xpp/xppcode.c
+	Modified XPP to make keyword recognition case sensitive.  Keywords
+	such as "int", "char", "procedure", etc. must be lower case to be
+	recognized.  This permits macros to use the upper case versions of
+	these keywords.  (12/05)
+
+pkg/cl/debug.c
+	Added INDXINCR and PUSHINDEX to the debug code.  (12/14)
+
+pkg/cl/builtin.c
+pkg/cl/compile.c
+pkg/cl/debug.c
+pkg/cl/exec.c
+pkg/cl/grammar.y
+pkg/cl/main.c
+pkg/cl/opcodes.c
+pkg/cl/opcodes.h
+pkg/cl/prcache.c
+	1. Fixed minor bugs in the CL array code which showed up on the 64bit
+	DEC Alpha.  The array code had builtin assumptions about the size of
+	structures stored in CL memory, but on 64 bit systems the CL stack
+	and dictionary have a 64 bit memel size, rather than 32 bit.
+
+	2. Added a new builtin "d_trace" which permits instruction and
+	process tracing during execution.  Typing d_trace without any
+	arguments toggles this feature.  An optional argument 0 or 1 may be
+	used to disable or enable instruction tracing.  A source line trace
+	feature might have been nicer, but instruction tracing should still
+	be of use for tracking down bugs in scripts, or otherwise revealing
+	what is going on when the CL executes a task.  (12/16)
+
+sys/fmio/zzdebug.x
+	Added a parameter to the create datafile task to allow specification
+	of FM_MAXPTPAGES (max page table pages), for testing large datafiles.
+	(12/18)
+
+dev/hosts
+	Added new solaris machine oso to all servers. (1/29/96 MJF)
+
+pkg/images/imarith/imexpr.gx
+	Modified imexpr so that it will accept an image name that looks like
+	a number in the first few characters, but which is really an image
+	name.  For example, "123.imh" or "../foo.imh".  The previous version
+	of imexpr was treating any string which looked like a number in the
+	first few characters as a numeric constant.  (2/8/96 LED  2/14 DCT).
+
+dev/hosts
+	Eliminated all references to /gemini and /ursa since all machines
+	have been updated such that /iraf is the correct path.  Merged all
+	changes from other servers to tucana so all hosts files are now
+	identical, new machines added include ozzie, verdi, corondito and
+	pearl.kpno.  Backups of previous files will be maintained. (2/14 MJF)
+
+pkg/images/geometry/t_geotran.x
+pkg/images/geometry/geograph.x
+pkg/images/doc/geomap.hlp
+         Corrected the definition of skew in the routines which, compute the
+	geometric interpretation of the 6-coefficient fit, compute the
+	coefficients from the geometric parameters, and in the relevant help
+	pages.  (2/19/96, LED)
+
+sys/fio/zzdebug.x
+	Spiffed up the "daytime" debug/test task to permit entry of a host
+	name, so that one can use this to find out what time it is at some
+	site halfway around the world.   (2/23)
+
+pkg/images/tv/imexamine/iejimexam.x
+pkg/images/tv/jimexam.par
+pkg/images/tv/doc/imexamine.hlp
+	There were several errors in this which only showed up when using a
+	world WCS.  The parameter prompt and help now indicate the initial
+	sigma value is in pixels even when fitting in world coordinates.
+	(2/27/96, FV)
+
+pkg/images/tv/imexamine/iemw.x
+	The inverse WCS function was incorrect and is fixed.  (2/27/96, FV)
+
+pkg/dataio/doc/rfits.hlp
+	Added a note about support for unsigned short integers to the
+	rfits help page. (2/27/96, LED)
+
+pkg/xtools/icfit/icvshow.gx
+pkg/xtools/icfit/icshow.x
+pkg/xtools/icfit/icerrors.gx
+	All output except the tabular part of :xyshow now begins with
+	the comment character.  (2/29, Valdes)
+
+pkg/utilities/curfit.gx
+	Removed repeated output and added a comment character to the table
+	header line.  (2/29, Valdes)
+
+dev/hosts
+	Changed GONG machines soi/mdi to use bin.ssun after solaris upgrades.
+	(3/8/96  MJF)
+
+sys/fmio/fmio.h
+sys/fmio/fmlfopen.x
+sys/fmio/fmlfbwr.x
+sys/fmio/fmlfbrd.x
+sys/fmio/fmioextnd.x
+sys/fmio/fmclose.x
+	1. Changed the lfile pagemap (LF_PAGEMAP) from type short to int.
+	This is entirely an internal array, created at lfile open time from
+	the global pagemap, and never written out, so there should be no
+	problem changing the datatype of the array.  A type short lfile
+	pagemap limits the maximum datafile size by limiting the max file
+	offset to 32K datafile pages.  This is not a problem for the global
+	page table as the global table stores the lfile number in each PTE,
+	with the offset of the PTE entry giving the associated file offset
+	(page number).
+	2. Increased the default lfile pagemap size and increment on
+	overflow.  (3/11)
+
+lib/qpset.h
+sys/qpoe/qpoe.h
+sys/qpoe/qpstati.x
+sys/qpoe/qpseti.x
+sys/qpoe/qpopen.x
+sys/qpoe/qpmacro.x
+sys/qpoe/qpbind.x
+	Added a new parameter "maxptpages" (QPOE_MAXPTPAGES) to QPOE.  This
+	is a datafile control parameter similar to "maxlfiles" or "pagesize".
+	The pagesize and matptpages together determine the maximum datafile
+	size.  In the past we have had to increase the pagesize to accomodate
+	very large datafiles, but beyond a certain point it is better to
+	increase the maximum page table size (maxptpages).  Since QPOE files
+	can be very large it is necessary to allow control of this parameter
+	from within QPOE.  (3/11)
+
+dev/hosts
+	Added Doug Geisler's machine kukita to all servers. (3/11/96  MJF)
+
+sys/fmtio/dtoc.x
+	Added some rounding to avoid printing numbers such as 12:29:60.0
+	when formatting sexagesimal (HMS or MS) numbers.  (3/12)
+
+sys/mwcs/iwewcs.x
+	Modified the code which computes the CD matrix from CDELT/CROTA.
+	The old code computed the diagonal (scale) terms correctly but the
+	rotation terms were evidently incorrect.  The old code was based on
+	the 1988 Hanisch and Wells WCS paper and the new code is based on a
+	more recent paper by Mark Calabretta et. al. which supercedes the
+	1988 representation.  The affect of this change should be limited
+	as it only affects rotated images for which CDELT is given but no
+	CD matrix is defined.  (3/13)
+
+pkg/images/tv/src/iecolon.x
+pkg/images/tv/src/starfocus.h
+pkg/images/tv/src/stfmeasure.x
+pkg/images/tv/src/ierimexam.x
+pkg/images/tv/rimexam.par
+pkg/images/doc/imexamine.hlp
+lib/scr/imexamine.key
+	The radial profile fitting and width measurements now have an option to
+	use a Gaussian or Moffat profile model.  The model is selected by a
+	new "fittype" parameter.  A new "beta" parameter may be specified as
+	INDEF to be determined from the fit or have a fixed value.  The Moffat
+	profile model does better in producing consistent FWHM values so
+	this is the default.  (3/16, Valdes)
+
+math/gsurfit/gsrestore.gx
+math/gsurfit/gsrestorer.x
+math/gsurfit/gsrestored.x
+	Changed the type declaration of the xmin, xmax, ymin, ymax variables
+        from real to PIXEL to avoid machine precision problems.  (3/21 Davis)
+
+pkg/cl/builtin.c
+	Modified the clprintf code to support INDEF operands.  (3/23)
+
+pkg/images/tv/imedit/epsearch.x
+pkg/images/tv/imedit/epgcur.x
+	1.  The search algorithm produced incorrect results if part of the
+	    aperture was off the edge (negative image coordinates).
+	2.  The rounding was incorrect when part of the aperture was off the
+	    edge (negative image coordinates).
+	3.  A floating operand error occurs when a key is given without
+	    coordinates.
+	(3/26, Valdes)
+
+pkg/plot/t_implot.x
+	When the vector being plotted was constant the 'l' and 'c' keys
+	selecting lines/columns from the right plot axis did not work.  The
+	code was fixed for this case. (3/27, Valdes)
+
+pkg/images/geometry/xregister/rgxfit.x
+        Changed several Memr[] references to Memi[] in the rg_fit routine.
+        This type conversion bug was causing a floating point error
+	in the xregister task on the Dec Alpha machines if the coords file
+	was defined, and could potentially cause problems on other machines.
+	(Davis, April 3, 1996)
+
+unix/os/gmttolst.c
+unix/boot/bootlib/ostime.c
+	Removed the type long variables gmtl, lstl and modified all calls to
+	localtime() so that the argument is of type time_t.  This is standard
+	for all modern systems.  Some older systems still require that the
+	argument be type long, but as this is nonstandard it should be
+	ifdef-ed in the source for these older systems.  (4/04 1996)
+
+unix/hlib/libc/libc.h
+	The macros Memcptr and Memiptr included a "+ 1" which shouldn't have
+	been there.  The one indexing correction was already being done in
+	the Memc/Memi macros and Memcptr/Memiptr take a zero indexed C pointer
+	as input.  This was causing a bug in LIBC version of realloc, which
+	is not used anywhere in the IRAF system code.  (4/05)
+
+pkg/images/tv/imexamine/ierimexam.x
+pkg/images/tv/imexamine/stfmeasure.x
+	Fixed incorrect datatype declaration "real np" -> "int np" in various
+	related places.  (4/9/96, Valdes)
+
+unix/os/zmain.c
+	Added a #ifdef SYSV conditional to change the calling sequence for
+	setpgrp() for SYSV and BSD systems.  (4/24)
+
+sys/imio/iki/plf/plfopen.x
+	Fixed an imerr() call which had the wrong argument type.   (5/06)
+
+sys/libc/realloc.c
+	Modified to work when called with a null pointer.  (5/06)
+
+sys/gio/stdgraph/stgdrawch.x
+	The text drawing routines were not controlling the polyline width
+	when drawing characters in software mode using polylines.  There is
+	no line width attribute for graphics text and we probably don't want
+	one, so the code was modified to force the line width to 1 when
+	drawing software characters.  (5/10)
+
+unix/boot/bootlib/osgetenv.c
+	The envinit code calls _os_getenv to fetch the value of "pkglibs".
+	This code assumes that _os_getenv returns the string argument, but
+	nothing was being returned if the named environment variable was not
+	found.  Changed it to return a NULL-terminated empty string in this
+	case.  (5/10)
+
+sys/etc/mkpkg
+sys/etc/onentry.x
+sys/etc/main.x
+unix/os/zmain.c
+	1. The IRAF main (irafmn) was changed to an integer function and
+	modified to return an exit status.  If a task aborts and the main
+	exits without running any more tasks (as when executing a task at
+	the host level where only a single task is run) then the error status
+	of the task is returned.  In normal use as a connected process this
+	condition never occurs and the main always returns XOK as the status.
+
+	2. Several calls to sys_panic in various etc$ routines were modified
+	to ensure that a zero error code is not returned.  sys_panic returns
+	the error code as the exit status of the process.
+
+	3. The process main (zmain.c) was modified to call IRAF_MAIN as an
+	integer function and to return its exit status.
+	4. The call to exit() in zmain.c was changed to _exit().  (5/11)
+
+pkg/plot/t_graph.x
+pkg/plot/graph.par
+pkg/plot/doc/graph.hlp
+	Added parameters "ltypes" and "colors" to specify a list of line types
+	and colors when doing multiple data sets.  (5/13, Valdes)
+
+----------------------------------------
+V2.10.4 patch 2 release.  (5/22 1996)
+
+unix/boot/bootlib/envinit.c
+	Fixed a typo in some code that went "printf (stderr, ...)" (should be
+	fprintf), also changed following fflush to flush stderr. (5/27)
+
+unix/boot/bootlib/vfn2osfn.c
+	Deleted some unneeded semicolons from some stub routines, e.g. in
+	"KI_SEND(){};" the ; should not be there.  (5/27)
+
+unix/boot/generic/mkpkg.sh
+unix/boot/mkpkg/mkpkg.sh
+unix/boot/rmbin/mkpkg.sh
+unix/boot/rmfiles/mkpkg.sh
+unix/boot/rtar/mkpkg.sh
+unix/boot/wtar/mkpkg.sh
+unix/boot/spp/mkpkg.sh
+unix/boot/spp/mkxc.sh
+unix/boot/rpp/mkpkg.sh
+unix/boot/xpp/mkpkg.sh
+unix/boot/xyacc/mkpkg.sh
+	Replaced HSI_CF by HSI_LF in the link line (5/28)
+
+unix/hlib/irafuser.csh
+	Added a dummy definition of HSI_LF (not used in SunOS/IRAF but is
+	needed on other platforms).  (5/28)
+
+unix/boot/rmfiles/mkpkg.sh
+	Added a (char *) declaration for vfn2osfn().  (5/28)
+
+pkg/cl/grammar.h
+pkg/cl/globals.c
+	Added global definitions for parse_state, proc_script, and parse_pfile
+	to globals.c and modified grammar.h to define these as extern (found
+	with the IRIX 5.3 port).  (6/03)
+
+pkg/obsolete/<imcombine> -
+	The old (V2.9) IMCOMBINE task was removed. (6/14 FV)
+
+pkg/obsolete/t_fixpix.x +
+pkg/obsolete/fixcol.gx +
+pkg/obsolete/t_fixline.gx +
+pkg/obsolete/ofixpix.par +
+pkg/obsolete/doc/ofixpix.hlp +
+pkg/obsolete/mkpkg
+pkg/obsolete/x_obsolete.x
+pkg/obsolete/obsolete.cl
+pkg/obsolete/obsolete.hd
+pkg/obsolete/obsolete.men
+	Moved the V2.10.4 version of PROTO.FIXPIX to OBSOLETE and renamed
+	it to OFIXPIX.  (6/14 FV)
+
+pkg/proto/generic/	+
+pkg/proto/imfunc.x -> generic/
+pkg/proto/imrep.x -> generic/
+	Added a generic directory for generic files.  The generic procedures
+	imfunc.x and imrep.x are now in this directory.  (6/14 FV)
+
+pkg/proto/t_fixpix.x
+pkg/proto/fpfixpix.gx
+pkg/proto/fixpix.par
+pkg/proto/text2mask.par	+
+pkg/proto/t_text2mask.x	+
+pkg/proto/t_mask2text.x	+
+pkg/proto/doc/fixpix.hlp
+pkg/proto/doc/text2mask.hlp	+
+pkg/proto/mkpkg
+pkg/proto/x_proto.x
+pkg/proto/proto.cl
+pkg/proto/proto.hd
+pkg/proto/proto.men
+	Replaced the old version of FIXPIX by a new version that works with
+	mask images.  Two new tasks were also added, TEXT2MASK and
+	MASK2TEXT, that convert from the old text file description to mask
+	images and back.  The MASK2TEXT task is hidden to discourage
+	continued use of the text file description.  (6/14 FV)
+
+unix/boot/spp/xc.c
+	Fixed a couple bugs in the PKGENV processing code.  (7/05)
+
+doc/ports/notes.irix		+
+	Installed the notes file from the IRIX 5.3 port.  (7/07)
+
+unix/os/irafpath.c
+	Added entries for Solaris, Linux, FreeBSD.  (7/17)
+
+unix/os/zfaloc.c
+unix/os/zfiobf.c
+	Changed type of lseek() to off_f.  (7/17)
+
+unix/boot/spp/xpp/xppcode.c
+	Changed warn() to a static function.   (7/17)
+
+mkpkg
+noao/mkpkg
+	Added an entry for the "freebsd" architecture.  (7/17)
+
+pkg/images/filters/median.x
+	The routine mde_yefilter was being called with too many arguments.
+	(7/18 LED)
+
+pkg/xtools/inlfit/ingresults.gx
+	Changed several INDEFR references to INDEF references so that INDEF
+	as the correct data type (real or double) in the output .x files.
+	(7/18 LED)
+
+sys/gio/fpequald.x
+sys/gio/fpequalr.x
+	Backed off the tolerance slightly, from 10*EPSILON to 32*EPSILON.
+	(7/25)
+
+sys/imfort/bfio.x
+	In zfaloc, the first arg to strpak was changed from fname (a Fortran
+	character variable which was incorrect) to sppname.  (7/17(26))
+
+pkg/images/imarith/icsort.gx
+	There was an error in the ic_2sort routine when there are exactly
+	three images that one of the explicit cases did not properly keep
+	the image identifications.  See buglog 344.  (8/1 FV)
+
+dev/hosts
+	Revised the list of Kitt Peak hosts.  (8/7 RLS)
+
+pkg/proto/fields.par
+pkg/proto/doc/fields.hlp
+	Changed the default lines in FIELDS to an open upper limit.  (8/22 FV)
+
+pkg/images/tv/imexamine/stfmeasure.x
+	Fixed bug in evaluation of enclosed flux profile in which the scaled
+	radius was used for the gaussian subtraction stage instead of pixels.
+	This does not currently affect IMEXAM because the scale is fixed
+	at 1.  (8/29, FV)
+
+unix/os/zfnbrk.c
+	Modified this routine to ignore file or directory characters other
+	than those it considers to be file or directory name delimiters.
+	On platforms that permit it, the effect is to permit characters (such
+	as + and -) in filenames other than simple identifier characters.
+	There is no expectation at this point however that all IRAF code will
+	permit this.  (9/03)
+
+dev/hosts
+	Updated the hosts file on all Tucson servers for rainbow, Jim
+	Deveny's new Sun.  (9/10/96 jb)
+
+pkg/system/phelp.cl
+	Modified to copy the "template" argument into a local variable since
+	it is referenced twice in the script.  (10/10)
+
+sys/fio/fioclean.x
+	The file descriptor was being accessed after the file had been
+	closed.  (10/11)
+
+unix/os/zfiond.c
+	Added a ":<flag>" field to the ND network driver.  The only protocol
+	flags currently supported are "text" and "binary".  If "text" is
+	specified then the datastream is assumed to consist of byte packed
+	ascii text, and the driver will automatically convert to and from
+	SPP chars during i/o.  (10/29)
+
+sys/fio/zzdebug.x
+	Added a new debug task "http".  Given a hostname and a HTTPD-root
+	relative file path the task will connect to the HTTP server on the
+	given host and fetch the file at the given path.  The output
+	consists of the HTTP/1.0 protocol header followed by a blank line
+	and the contents of the requested file.  (10/29)
+
+pkg/images/tv/wcslab/t_wcslab.x
+pkg/images/tv/doc/wcslab.hlp
+	Added an "overplot" option to append to a plot but with a different
+	viewport.  (11/06/96 Valdes)
+
+pkg/images/imarith/t_imcombine.x
+pkg/images/imarith/icombine.gx
+	Changed the error checking to catch additional errors relating to too
+	many files.  (11/12/96, Valdes)
+
+dev/hosts
+	Added driftwood to all downtown servers. (11/18/96 MJF)
+
+dev/hosts
+	Updated block of KPNO hosts on solaris tree on Gemini.
+	This was up to date on development system.  (11/19/96 RLS)
+
+sys/fmtio/sscan.x
+sys/fmtio/fscan.x
+sys/fmtio/clscan.x
+sys/fmtio/scan.com
+	Modified scan.com to dimension scanbuf locally as SZ_SCANBUF instead of
+	SZ_COMMAND, in the process increasing the size from 1024 to 4096.
+	Modified sscan to check for overflow of the scan buffer.  (11/19)
+
+sys/ki/ki.h
+	Increased maximum network hosts in the in-core host table from 128 to
+	256.  (11/21)
+
+pkg/images/tv/imedit/epgsfit.x
+pkg/images/tv/imedit/epcolon.x
+pkg/images/tv/doc/imedit.hlp
+pkg/images/tv/imedit/imedit.par
+	Added a median background if the xorder or yorder is zero.
+	(11/22/96 Valdes)
+
+dev/hosts
+	Cleaned up the hosts table: Deleted
+	    adonis	  aldebaran	auriga
+	    columba	  crater	irafdemo
+	    libra	  noctua	octans
+	    omega	  serpens	suntest
+	    verdi	  vela
+	Fixed path names for mytoy and scorpius (11/21/96 MJF)
+
+pkg/images/imarith/icsetout.x
+pkg/images/doc/imcombine.hlp
+	A new option for computing offsets from the image WCS has been added.
+	(11/30/96 Valdes)
+
+pkg/images/tv/display/sigm2.x	+
+	Added a version of the spatial interpolation routines that allows masks
+	to interpolate the input across bad pixels. (12/5/96, Valdes)
+
+pkg/images/tv/display/t_display.x
+	1.  Fixed numerous problems with the coordinate system.
+	2.  Fixed a bug in how ztrans=log was done.
+	(12/5/96, Valdes)
+
+pkg/images/tv/display/iishdr.x
+pkg/images/tv/display/iisers.x
+	Replaces SPP int -> short assignments by calls to achtiu because of
+	overflow problems with some VMS fortran compilers.
+	(12/6/96, Valdes as reported by Zarate)
+
+pkg/images/tv/display/imdmapfr.x
+pkg/images/tv/display/imdputwcs.x +
+	Added two routines to hide knowledge of the channel structure and
+	other details from the calling routines.  (12/11/96, Valdes)
+
+dev/hosts
+	Changed hohokam to ssun, updated all servers w/ master copy from
+	tucana to remove hosts and fix /gemini path names. (1/7/97 MJF)
+
+dev/hosts
+	Changed the following SWN machines to bin.ssun:
+	    aquarius 	    aten 	bokchoy
+	    carina (new)    hedgehog 	herbie
+	    inti 	    mdi 	potosi
+	    soi 	    soleil
+	Updated all servers. (1/15/97  MJF)
+
+pkg/xtools/dttext.x
+	Added the routine dtgetd to the text database package. (1/16/97 LED)
+
+dev/hosts
+	Changed norma to a solaris box.  (1/24/97  MJF)
+
+unix/boot/bootlib/osfiletype.c
+	Added several entries for files considered to be "source" files.
+	These include .pl, .gif, .jpeg, and .tiff (.fits is already present).
+	There are cases where it may make sense to include these files in
+	the machine indendent source tree, e.g. for small test data files
+	or for online help.  (1/11)  1997
+
+dev/hosts
+	Added George's linux box aloe to all servers.  (2/13/97  MJF)
+
+unix/boot/spp/xpp/decl.c
+unix/boot/spp/xpp/xppcode.c
+	The recent change of warn() to static in xppcode.c caused a problem
+	as warn is also used in decl.c.  Changed warn() back to an external
+	function but changed the name to xpp_warn to avoid whatever the
+	platform-specific problem was that resulted in the original fix
+	(probably warn was an internal function in some platform system
+	library).  (3/03)
+
+sys/mwcs/wfmspec.x
+	On line 327, changed  din=log10(in[1])  to  din=log10(din).  (3/04)
+
+--------------------------------
+Did a diff/merge of recent tucana HSI changes into the Solaris/IRAF HSI.
+Replaced the "unix" directory on tucana SunOS/IRAF by the version from
+Solaris/IRAF.  This HSI is supposed to work for both SunOS and Solaris
+(SunOS compatibility was preserved but never tested during the Solaris/IRAF
+port).  Did a bootstrap and sysgen under both SunOS and Solaris.
+
+Mounted tucana iraf.develop as iraf.develop on Data.  tucana iraf (irafx)
+is now solaris/iraf as well as sunos/iraf, they are the same thing.  One
+benefit of this is that irafx is now available on solaris systems in the
+building (although we do have to update the ssun binaries periodically or
+it does no one any good).   A complication is that since we have to update
+the ssun binaries, it is now more likely that the architecture may be set
+to something other than sparc.  (3/19 1997)
+
+local/.cshrc
+local/.login
+	Modified to work for both SunOS and Solaris.  (3/19)
+
+unix/as.sparc/enbint.s
+	This file from Solaris/IRAF isn't used by SunOS/IRAF, but it is
+	probably better to provide it in the library than to add conditionals
+	to the build files in OS.  (3/19)
+
+unix/boot/bootlib/osfiletype.c
+unix/boot/bootlib/vfn2osfn.c
+unix/boot/spp/xpp/decl.c
+unix/boot/spp/xpp/xppcode.c
+unix/hlib/libc/kernel.h
+unix/os/irafpath.c
+unix/os/zfaloc.c
+unix/os/zfiobf.c
+unix/os/zfiomt.c
+unix/os/zfiond.c
+unix/os/zlocpr.c
+unix/os/zzstrt.c
+	Assorted minor changes to make these files work for both SunOS
+	and Solaris.  (3/19)
+
+unix/shlib/medit.c
+unix/shlib/mkpkg
+unix/shlib/mkpkg.sh
+unix/shlib/mkshlib.sos4
+unix/shlib/mkshlib.ssol
+unix/shlib/mkshlib.ssol-sc34
+	Various file modifications and file name changes to make shlib
+	build for both SunOS and Solaris.  (3/19)
+
+pkg/math/curfit/cvacpts.gx
+pkg/math/curfit/cvacptsr.x
+pkg/math/curfit/cvacptsd.x
+pkg/math/curfit/doc/cvpower.hlp
+pkg/math/curfit/cvpower.gx
+pkg/math/curfit/cvpowerr.x
+pkg/math/curfit/cvpowerd.x
+	The weights computed by the WTS_CHISQ option in the routines
+	cvacpts[rd] were not being forced to be positive as intended.  (3/20)
+
+	There was an inconsistency in the way the ncoeff argument to the
+	cvpower[rd] routines was being used internally. Ncoeff was intended
+	to be an output argument but was being used as an input argument by
+	one of the routines called by cvpower.  (3/20)
+
+sys/mtio/mtgtyopen.x
+	MTIO was modified to add support for server-specific tapecap files.
+	When opening the tapecap file MTIO will now look for "tapecap.<node>"
+	followed by the default "tapecap".  <node> should be the hostname
+	(as used by IRAF networking) of the server hosting the tape drives
+	described by the tapecap file.  For example if host "gemini" serves
+	up some tape drives it's tapecap file is named "tapecap.gemini".
+	If a server-specific tapecap file is not found the default "tapecap"
+	(on the possibly remote server node) is used.  This feature allows
+	a single IRAF installation to be shared by multiple servers.  (3/21)
+
+dev/README
+dev/tapecap.sunos		+
+dev/tapecap.solaris		+
+	Since the Sun/IRAF DEV is now shared by both SunOS and Solaris it
+	now contains the template tapecap files for both systems.  The README
+	in DEV contains some pointers on configuring tapecap and other device
+	files.  (3/21)
+
+pkg/images/tv/display.par
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/zscale.x
+pkg/images/tv/display/sigm2.x	+
+pkg/images/tv/display/maskcolor.x	+
+pkg/images/tv/display/dspmmap.x	+
+pkg/images/tv/display/display.h
+pkg/images/tv/display/gwindow.h
+pkg/images/tv/display/mkpkg
+pkg/images/tv/doc/display.hlp
+	1.  Improved the structure of DISPLAY.
+	2.  Fixed coordinate system errors.
+	3.  Added parameters to display bad pixel masks and overlay masks.
+	4.  The z scaling sampling may use a pixel mask or image section.
+	5.  The z scaling excludes bad pixels.
+	(3/20, Valdes)
+
+--------------------------------
+The following series of revisions were made to increase the size of various
+system buffers.  This included a full system reboot and recompile.  (3/24)
+
+lib/fio.h
+sys/fio/vfnmap.x
+sys/fio/vfntrans.x
+	Various buffer sizes affecting filename mapping were increased.
+	SZ_VFNFN (max length of the root field of a VFN) went from 32 -> 127.
+	SZ_OSDIR (max length of the osdir field of a VFN) from 79 -> 255.
+	SZ_FFNAME, an internal filename buffer, went from 127 -> 255.
+	In an unrelated change SZ_SPOOLBUF, the intial size of a spool
+	buffer, was increased from 1024 to 4096.  (3/23)
+
+unix/hlib/config.h
+	1. MAX_ROOTLEN was increased from 32 to 128.  This is supposed to be the
+	limit the host system places on the root portion of a filename (that
+	is, only the root name, not the pathname).  Anything in the range
+	128-256 is typical for unix systems today.
+	2. The maximum number of open VOS files was increased from 128 -> 256.
+	(3/23)
+
+sys/fio/fntgfn.x
+	SZ_PATTERN, SZ_TEMPLATE, SZ_LDIR, SZ_PATSTR were all increased,
+	although so far as I know there has never been a case of pattern
+	buffers overflowing.  The new limit for a pattern string is about
+	1024.  (3/23)
+
+unix/hlib/iraf.h
+	SZ_FNAME went from 63 -> 255.
+	SZ_PATHNAME went from 127 -> 511.
+	SZ_LINE went from 161 -> 1023.
+	SZ_COMMAND went from 1024 -> 2047.  (3/23)
+
+unix/hlib/iraf.h
+unix/hlib/mach.h
+	MAX_EXPONENTD went from 38 (same as real) to 308, the value for
+	IEEE double.  MAX_DOUBLE increased from 0.99d37 to 0.99d307.
+	INDEFD was changed from 1.6d38 to 1.6d308 for IEEE systems.  (3/23)
+
+unix/hlib/libc/libc.h
+unix/hlib/libc/spp.h
+	FIO_MAXFD, INDEFD, SZ_LINE, SZ_FNAME, SZ_PATHNAME, SZ_COMMAND were
+	updated to agree with the SPP values.  (3/23)
+
+sys/imio/iki/stf/stfrdhdr.x
+	Unrelated STF bug fix.  stfrdhdr.x was modified to handle the case
+	where datamin/datamax were not defined in the GPB, but were defined
+	in the main image header.  (3/24)
+
+unix/boot/spp/xpp/xppmain.c
+	Removed a redundant SZ_PATHNAME.  (3/24)
+
+unix/shlib/mkpkg
+unix/shlib/mkshlib.sos4
+	Changed the address of the shared library from 0xa000000 to 0x10000000.
+	This increases the maximum available per-process dynamic memory from 
+	167 MB to 268 MB (much more is possible if the process is statically
+	linked).  (3/24)
+
+unix/os/zzstrt.c
+	Changed some address-related ints to unsigned just to be safe.  (3/24)
+
+sys/etc/pagefiles.x
+	Increased SZ_LONGLINE from 1024 to 4096.  At 1024 it was the same as
+	the new SZ_LINE, causing a loop test to fail.  (3/25)
+
+pkg/images/tv/rimexam.par
+pkg/images/tv/doc/rimexam.par
+	Changed the zero point of the magnitude scale from 30.0 to 25.0
+	for the sake of consistency with other photometry tasks. (3/31, LED)
+
+pkg/images/tv/imexamine/ierimexam.x
+	The log output for 'a' or 'r' has one line per measurement as in
+	previous versions.  The standard output, however, uses two lines to
+	print nicely on 80 column windows.  (3/31, FV)
+
+pkg/dataio/mkpkg
+pkg/dataio/dataio.cl
+pkg/dataio/dataio.hd
+pkg/dataio/dataio.men
+pkg/dataio/x_dataio.x
+pkg/dataio/import/                  +
+pkg/dataio/import.par               +
+pkg/dataio/export/                  +
+pkg/dataio/export.par               +
+pkg/dataio/doc/import.hlp           +
+pkg/dataio/doc/export.hlp           +
+    	Installed the IMPORT/EXPORT task for general use.  The images database
+    	used by the IMPORT task is currently defined to be stored in
+	dataio$import/images.dat.   (3/31/97 MJF)
+
+pkg/proto/proto.cl
+pkg/proto/proto.men
+pkg/proto/proto.hd
+pkg/proto/x_proto.x
+pkg/proto/mkpkg
+	The tasks imalign, imcentroid, imfunction, imreplace, wcsedit, and
+	wcsreset have been deleted from the proto package and moved to the
+	reorganized images package. (3/31/97 LED)
+
+lib/imhdr.h
+lib/imio.h
+	The sizes of the pixel file, header file, title and imhistory strings
+	were increased.  Defines were added for the image header file and
+	pixel file "magic' strings.  A couple fields were added relating to
+	byte swapping.  IM_SWAPPED, in the image header, tells whether the
+	pixels in the disk image are byte swapped.  (3/31)
+
+sys/imio/iki/oif/imhv1.h
+sys/imio/iki/oif/imhv2.h
+sys/imio/iki/oif/mkpkg
+sys/imio/iki/oif/oif.h
+sys/imio/iki/oif/oifmkpfn.x
+sys/imio/iki/oif/oifopen.x
+sys/imio/iki/oif/oifopix.x
+sys/imio/iki/oif/oifrdhdr.x		+
+sys/imio/iki/oif/oifupdhdr.x
+sys/imio/iki/oif/oifwrhdr.x		+
+sys/imio/iki/oif/oifwphdr.x		-
+	It was necessary to change the OIF kernel to increase the maximum
+	path length for header and pixel files.  This made it necessary to
+	change the disk image format, since the old format only allowed 80
+	characters for the pixel file pathname.  In the process reading and
+	writing the disk header was separated out from the in-memory
+	header.  Support for two versions of the image and pixel file
+	headers were added.  The "magic" string in the image or pixel file
+	header identifies the version.  Old (version 1) image headers have
+	"imhdr" at the head of the file, with the string in SPP chars.  The
+	new (version 2) headers have "imhv2" as the magic string.  V2 headers
+	are byte packed and machine independent.  The path limit is 255.
+	(3/31)
+
+sys/imio/immaky.x
+sys/imio/imrdpx.x
+sys/imio/imwrpx.x
+	1. Support was added for byte swapping pixels.  With the machine
+	independent V2 image header, this allows .imh images to be read on
+	any node (integer) or any IEEE-compatible node (floating).  The
+	pixels are written in the native swap order of the creating host,
+	but the order is recorded in the IM_SWAPPED field of the image header,
+	and IMIO uses this to determine whether or not the pixels need to
+	be byte swapped during i/o.
+	2. Minor changes to trim junk data after EOS delimited strings.
+	Since the V2 headers are byte packed the string data in these headers
+	can be viewed with Unix tools such as "less" and "strings".  (3/31)
+
+	Some pointers: "strings foo.imh" (or other tools like less) can be
+	used at the Unix level to look at V2 image headers.  New images are
+	always written with host-native binary format pixels, so there is no
+	byte swapping involved for images read and written on the same
+	host.  Images can any other (IEEE) host can be read or written but
+	there may be some slight overhead for byteswapping.  If the image is
+	rewritten however using imcopy, the bytes will be swapped to the
+	native ordering of the new host.
+
+pkg/images/imutil/src/imheader.x
+	The only change so far was to eliminate some histogram dependence,
+	since this unused feature was removed from the standard IMIO in-memory
+	image header.  (3/31)
+
+dev/pix.imh
+dev/pix.pix
+dev/wpix.imh
+	Regenerated using the V2 image format.  (3/31)
+
+lib/imio.h
+sys/imio/immapz.x
+sys/imio/immaky.x
+unix/hlib/zzsetenv.def
+unix/hlib/login.cl
+	Increased the default size of the user area (min_lenuserarea) to
+	64000 (about 800 80 char cards).  There was some ambiguity about
+	units for min_lenuserarea; it should be consistently chars now.
+	Also increased the "padding" added to the header when creating a
+	new copy of an existing image which has a large header.  (4/01)
+
+sys/imio/immaky.x
+	When the header of an old image is copied during an open-new-copy,
+	IMIO now recomputes the length of the user area of the input header.
+	Formerly if the header had grown since the image was opened, the
+	added data could be lost in a subsquent new-copy operation.  (4/01)
+
+sys/etc/oscmd.x
+	Changed an fclobber(outfile) to fclobber(errfile).  (4/02)
+
+sys/imfort/bfio.x
+	The little Fortran-callable file i/o package BFIO used in IMFORT
+	was enhanced to support writing and reading of fractional file blocks
+	so that files can be any size.  The default random and sequential
+	buffer sizes were increased.  In addition to the old random access
+	i/o routines bfread/bfwrite there are now sequential i/o routines
+	bfseek/bfrseq/bfwseq.  (4/02)
+
+sys/imfort/mkpkg
+sys/imfort/imfort.h
+sys/imfort/imhv1.h		+
+sys/imfort/imhv2.h		+
+sys/imfort/oif.h
+sys/imfort/imcrex.x
+sys/imfort/imfgpfn.x
+sys/imfort/imfupdhdr.x
+sys/imfort/imgl1r.x
+sys/imfort/imgl1s.x
+sys/imfort/imgl2r.x
+sys/imfort/imgl2s.x
+sys/imfort/imgl3r.x
+sys/imfort/imgl3s.x
+sys/imfort/imgs1r.x
+sys/imfort/imgs1s.x
+sys/imfort/imgs2r.x
+sys/imfort/imgs2s.x
+sys/imfort/imgs3r.x
+sys/imfort/imgs3s.x
+sys/imfort/imopnx.x
+sys/imfort/impl1r.x
+sys/imfort/impl1s.x
+sys/imfort/impl2r.x
+sys/imfort/impl2s.x
+sys/imfort/impl3r.x
+sys/imfort/impl3s.x
+sys/imfort/imps1r.x
+sys/imfort/imps1s.x
+sys/imfort/imps2r.x
+sys/imfort/imps2s.x
+sys/imfort/imps3r.x
+sys/imfort/imps3s.x
+sys/imfort/imrdhdr.x		+
+sys/imfort/imswap.x		+
+sys/imfort/imwpix.x		+
+sys/imfort/imwrhdr.x		+
+	1. IMFORT was brought up to date with IMIO to read and write the new
+	version 2 ".imh" images.  As with IMIO, the old V1 format is still
+	supported but new images are written using the new machine independent
+	V2 format.
+	2. Image headers can now be any size (the old IMFORT had a very
+	strict limit on the image header size).  Since BFIO now writes partial
+	blocks, headers are no longer blocked out to 32768 bytes.
+	3. "min_lenuserarea" is now supported as for IMIO (since IMFORT is
+	host level it must be defined in the host environment).  The builtin
+	default header buffer is 64000 chars, which is about 800 card images.
+	(4/02)
+
+sys/imfort/mii.x		+
+	A version of the MII routines mii{read,write}[silrc] modified to
+	use BFIO was added to IMFORT.  These are used to read and write the
+	machine independent headers.  (4/02)
+
+dev/hosts
+	Aliased 'kf' for kingfisher at Al Fowler's request (4/3 MJF)
+
+lib/qpioset.h
+lib/syserrmsg
+sys/qpoe/qpio.h
+sys/qpoe/qpoe.h
+sys/qpoe/qpiogetev.x
+sys/qpoe/qpiogetfil.x
+sys/qpoe/qpiomkidx.x
+sys/qpoe/qpioopen.x
+sys/qpoe/qpioparse.x
+sys/qpoe/qpiorpix.gx
+sys/qpoe/qpioseti.x
+sys/qpoe/qpiostati.x
+sys/qpoe/qpiosync.x
+	QPOE was modified to allow event coordinate (X,Y) key fields to be
+	of type int as well as short.  All event handling code will now
+	accept either type.  Keys may be specified using "i" as the field
+	type as well as "s", e.g. "key=(i10,s14)".  X and Y do not have to
+	be the same type.  There should be no significant CPU runtime
+	penalty, although obviously events with integer coordinate fields
+	will mean larger event files (file i/o times will be affected
+	accordingly).  (4/03)
+
+lib/qpioset.h
+lib/qpset.h
+sys/qpoe/QPOE.hlp
+sys/qpoe/README
+sys/qpoe/qpcopyf.x
+sys/qpoe/qpio.h
+sys/qpoe/qpiogetfil.x
+sys/qpoe/qpiolwcs.x
+sys/qpoe/qpioopen.x
+sys/qpoe/qpioparse.x
+sys/qpoe/qpioseti.x
+sys/qpoe/qpiostati.x
+sys/qpoe/qpmacro.x
+sys/qpoe/qpoe.h
+sys/qpoe/qpopen.x
+sys/qpoe/qpqueryf.x
+sys/qpoe/qpseti.x
+sys/qpoe/qpstati.x
+sys/qpoe/zzdebug.x
+	Added support for separate X and Y blocking factors.  The "block"
+	parameter is still recognized as before and will set both the X and
+	Y blocking factors, or "xblock" and "yblock" can be used to set only
+	one or the other.  All occurrences have been updated, including
+	expressions, the QPDEFS environment, and qp_set qpio_set.  (4/04)
+
+sys/qpoe/qpiorpix.gx
+	[INTERFACE CHANGE]
+	The calling sequence for qpio_readpix was modified to replace the
+	"block" argument by the two arguments xblock and yblock.  A scan
+	indicates that none of the layered packages we have installed at
+	NOAO (including xray) currently uses this routine.  (4/04)
+
+sys/plio/plrio.x
+	The plrio package provides an efficient lookup-table-based means of
+	randomly sampling 2D pixel masks.  The code which recursively divides
+	a region into 4 quadrants could fail if the region being subdivided
+	was 1 pixel wide in either axis.  If this happens 2 of the "quadrants"
+	will be valid and 2 will be degenerate.  Added a test to detect and
+	discard these degenerate subregions.  (4/04)
+
+sys/plio/plsectne.x
+sys/plio/plsectnc.x
+	Both of these routines had a bug that could prevent them from
+	examining the full region requested (the routines check for section
+	not empty and section not constant).  Line lists are segmented in
+	segments of at most I_DATAMAX (4095) pixels.  If the mask is large
+	and has large regions of constant value, the list will consist of
+	successive segments all at the same value.  The routines were only
+	checking the first such segment.  The corrected code reads successive
+	segments until all the pixels in the region have been examined.  (4/04)
+
+sys/plio/zzdebug.x
+	Fixed a couple of bugs and added several new routines to test the
+	above fixes.  SECNE and SECNC test pl_sectnotempty and pl_sectnotconst.
+	RIO tests plrio random mask access.  INVERT inverts a mask.  (4/04)
+
+sys/imio/implhdr.x
+	These routines, which copy an image header to and from an encoded title 
+	string in a PLIO save file, were modified to save the ctime, mtime,
+	limtime, minpixval, and maxpixval static fields of the image header
+	in addition to the title string.  (4/04)
+
+sys/qpoe/qpexeval.x
+	The value of "pass" was not being initialized before starting
+	subprogram execution when evaluating a complex LUT bin.  Added the
+	initialization and also some comments giving an overview of how the
+	evaluation is performed (since it took me several hours to figure
+	this out again).  (4/04)
+
+sys/imio/iki/qpf/qpfcopypar.x
+sys/imio/iki/qpf/zfioqp.x
+sys/imio/iki/qpf/qpfopen.x
+sys/imio/iki/qpf/qpf.h
+	Modified to support separate x and y blocking factors.  (4/05)
+
+sys/plio/plupdate.x
+	This routine contains code which collapses successive mask lines
+	in Y to a single encoded mask line if the mask lines are equal,
+	thereby compressing the encoded mask in Y.  The encoded mask lines
+	are encoded in short integer arrays and a multiply referenced
+	line has a reference count which is stored in a short integer field.
+	The code was modified to stop when this counter reaches MAX_SHORT,
+	adding a new line to the encoded mask and starting over.  Combined
+	with the X segmentation of lines into blocks of at most 4095 pixels,
+	this should allow masks to be nearly any size despite the use of
+	short integers for the encoding.  (4/05)
+
+sys/qpoe/qpiolwcs.x
+	Modified the LTV_2 term of the logical transformation to set the
+	fractional pixel zero point resulting from blocking the input data.
+	If for example 2 input pixels map to 1 on output, the range of the
+	output pixel (e.g.  0.5 to 1.5) maps to the range covered by the two
+	input pixels (e.g.  0.5 to 2.5), and the center of the output pixel
+	(e.g.  x = 1.0) maps to the center of the range spanned by the input
+	pixels (e.g. 1.5).  For 3 to 1, 1.0 maps back to 2.0 in the input,
+	for 4 to 1, 1.0 maps back to 2.5, and so on as (block+1)/2.  (4/05)
+
+sys/ki/kfmkcp.x
+sys/ki/kfrnam.x
+	These routines use a locally dimensioned buffer which was causing
+	filenames to be truncated at 128 characters.  Increased the file
+	length limit to 256.  If both files are remote the sum of the two
+	file lengths cannot exceed 256.  (4/06)
+
+unix/boot/spp/xc.c
+	The XC compiler was modified to improve support for multi-language
+	and host software development.  These changes should be transparent
+	and should not affect conventional IRAF softwrae development.
+
+	1. Various buffer sizes were increased.
+	2. The environment variables XC-CC, XC-F77, XC-LINKER can now be
+	specified to override the builtin default program name strings.
+
+	3. New command line flags:
+	    -D<str>	Pass -D<str> to the host compiler (does a #define).
+	    -I<dir>	Pass -I<dir> to the host compiler; for includes.
+			The directory name can be an IRAF VFN.
+	    -Inolibc	Disables -Ihlib$libc, which is the default.  Use if
+			you want to use the host rather than LIBC <stdio.h>.
+	    -L<dir>	Can be used to specify a directory to be searched
+			for library files.
+	    -H		This is used like -h to link a host program, but
+			unlike -h it causes the main IRAF libraries to be
+			searched.
+	    -V		Print the XC version number.
+
+	4. XC now reads the "pkglibs" environment variable after processing
+	all package includes, and converts this into a list of -I<dir> flags
+	which are passed to the host compilers.  This allows host include
+	files to be placed in package libraries.  As noted above, hlib$libc
+	is automatically included unless the -Inolibc switch is specified.
+
+	Note that -/foo can still be used to pass "-foo" to the host
+	compiler.  (4/07)
+
+unix/boot/bootlib/envinit.c
+	"loadpkgenv" is called by HSI programs like XC and MKPKG when a
+	package environment is loaded (-p pkname).  loadpkgenv was modified
+	to allow it to be called as loadpkgenv(NULL) or loadpkgenv("iraf").
+	This mode causes the package environment for the core IRAF system to
+	be loaded.  This was done formerly as well, but only if a -p switch
+	was given causing loadpkgenv to be called (in other words the core
+	IRAF package environment was not being fully loaded consistently).
+	(4/07)
+
+unix/hlib/zzsetenv.def
+	Added a line "set pkglibs = hlib$libc/" to zzsetenv.def.  This defines
+	hlib$libc as a default library directory to be searched (for C header
+	files) when compiling.  (4/07)
+
+unix/hlib/libc/libc.h
+unix/hlib/libc/setjmp.h
+unix/hlib/libc/spp.h
+unix/hlib/libc/stdio.h
+unix/hlib/libc/varargs.h
+unix/hlib/mkpkg.sf.SSUN
+	Various changes to better support host or host-like compilation.
+
+	1. libc.h will now include <spp.h> if it is not already included.
+	This is disabled in an old style compilation using import_spp.
+	libc.h is #ifdefed to not load if it has already been loaded.
+
+	2. setjmp.h autoloads <libc.h> and <knames.h> if not referenced in
+	import defines.
+
+	3. spp.h if #ifdefed to not load if already loaded.  Various
+	definitions were #ifdefed to be skipped if already defined, e.g.
+	stuff like min and max.  A define for abs was added.
+
+	4. stdio.h will automatically load <libc.h> (if not imported etc.).
+	Since libc.h autoloads spp.h this means that C files which include
+	<stdio.h> from LIBC will automatically load spp.h and libc.h; these
+	contain the main LIBC definitions and often used IRAF defines such
+	as OK, ERR, INDEF, NEW_FILE, SZ_FNAME, etc. etc.  A standard Unix
+	C source file which includes <stdio.h>, if compiled with XC or with
+	-I$hlib/libc will automatically be compiled using LIBC and will be
+	usable in an IRAF program.
+
+	5. varargs.h now includes /usr/include/varargs.h explicitly instead
+	of <varargs.h>, which causes an infinite preprocessor include loop.
+	On SunOS systems this causes a compiler warning message so the contents
+	of the SunOS varargs.h are included instead.  For Solaris mkpkg.sf.SSUN
+	is used to employ a flag -erroff=XXX to disable the warning.  (4/07)
+
+unix/hlib/mkpkg.inc
+	Added -DSUNOS to the XFLAGS for sparc, -DSYSV -DSOLARIS for Solaris.
+	(4/07)
+
+---------------------------------
+V2.11 beta-1 released.  (4/08)
+
+pkg/images/tv/imexamine/iejimexam.x
+pkg/images/tv/imexamine/iecolon.x
+pkg/images/tv/kimexam.par +
+pkg/images/tv/doc/imexamine.hlp
+pkg/images/tv/tv.cl
+	Added a pset for the 'k' key rather than sharing with the 'j' key.  This
+	was confusing to users since it was the only key without it's own pset.
+	Also there may be some reason to have the fitting parameters be
+	different along lines and columns.  (4/11, FV)
+
+pkg/images/imcoords/doc/cctran.hlp
+	Fixed a bug in the cctran help page. (4/15, LED)
+
+pkg/images/tv/tvmark/mkmark.x
+	Made sure that the object label was initialized to "" in the call
+	to the mk_onemark procedure inside the a keystroke command. The lack
+	of initialization was causing tvmark to fail with a segmentation
+	violation when the coordinates file did not exist at task startup time,
+	and the label parameter was set to "yes". (4/17, LED)
+
+unix/hlib/libc/spp.h
+	Deleted the definition of abs(), which conflicts with the stdlib
+	definition.  (4/22)
+
+unix/boot/spp/xc.c
+	There was a problem with the -h flag: due to the recent changes it
+	was referencing the VOS libraries (and linking shared by default).
+	This would cause IMFORT programs to fail to link.  (4/23)
+
+pkg/images/imutil/src/imcopy.x
+	Changed the imcopy task so that it ignores the output image section
+	if the input and output root names are the same, making its behavior
+	consistent with other images package tasks which can overwrite the
+	input image.  (4/24/97, Davis)
+
+
+pkg/images/imgeom/rotate.cl
+	The nlines parameter was called nrows by mistake in the rotate
+	script calling sequence.  This did not affect the execution of the
+	task but has been fixed anyway. (4/26/97, Davis)
+
+sys/ki/kfrnam.x
+sys/ki/kfmkcp.x
+	Fixed a bug in calculating the offset to the second filename.  (4/27)
+
+unix/boot/rtar.c
+unix/boot/wtar.c
+	Fixed a bug where rtar could in some cases confuse tar file directory 
+	entries with links (both have a nonzero linkflag).  Also removed the
+	#ifdef BSDUNIX stuff relating to symbolic links, as I don't know any
+	modern systems that don't support symlink/lstat.  Typing -v now
+	implies -t for both programs, as with unix tar.  (4/29)
+
+dev/hosts
+	Added a new sparc machine surya. (4/29/97  MJF)
+
+pkg/images/immatch/src/geometry/t_geotran.x
+pkg/images/immatch/src/geometry/geotran.x
+	Fixed various bugs triggered by the case where the user sets xmin,
+	xmax, ymin, or ymax, explicitly, and xmin > xmax or ymin > ymax.
+	Improved the precision of the flux conservation algorithm at the
+	same time.  (4/30/97 LED)
+
+pkg/cl/cl.par
+unix/hlib/login.cl
+	Updated the version parameter for V2.11.  (4/29)
+
+pkg/images/tv/display/zscale.x
+pkg/images/tv/display/dspmmap.x
+	1. Now works with higher dimensional images (displays the first band)
+	   and with image sections.
+	2. Now ignores error when the image has an unknown WCS type.  The
+	   WCS is mapped to determine the physical coordinate transformation
+	   for use with masks but this failed when someone imported an image
+	   with the CAR projection type. (4/30 FV)
+
+lib/math/gsurfit.h
+pkg/math/gsurfit/*.gx
+pkg/math/gsurfit/*.x
+pkg/math/gsurfit/doc/gsinit.hlp
+	Replaced the gsurfit package with a new version which support a
+	"half" cross terms option useful in computing plate solutions.
+	There are no package interface changes, old code should compile,
+	link, and run without changes, and old database can still be
+	read. Code changes are necessary to make use of the new feature.
+	(4/30/97 LED)
+
+pkg/images/immatch/geomap.par
+pkg/images/immatch/skymap.cl
+pkg/images/immatch/wcsmap.cl
+pkg/images/immatch/sregister.cl
+pkg/images/immatch/wregister.cl
+pkg/images/immatch/doc/geomap.hlp
+pkg/images/immatch/doc/skymap.hlp
+pkg/images/immatch/doc/wcsmap.hlp
+pkg/images/immatch/doc/wregister.hlp
+pkg/images/immatch/doc/sregister.hlp
+pkg/images/immatch/src/geometry/geoxytran.gx
+pkg/images/immatch/src/geometry/geoxytran.x
+pkg/images/immatch/src/geometry/t_geomap.gx
+pkg/images/immatch/src/geometry/t_geomap.x
+pkg/images/immatch/src/geometry/t_geotran.x
+pkg/images/immatch/src/psfmatch/rgpbckgrd.x
+pkg/images/immatch/src/xregister/rgxbckgrd.x
+pkg/images/imcoords/ccmap.par
+pkg/images/imcoords/doc/ccmap.hlp
+pkg/images/imcoords/src/t_ccmap.x
+pkg/images/imcoords/src/t_imcctran.x
+pkg/images/lib/coomap.key
+pkg/images/lib/geofit.gx
+pkg/images/lib/geofit.x
+pkg/images/lib/geograph.gx
+pkg/images/lib/geograph.x
+pkg/images/lib/geomap.h
+pkg/images/lib/geomap.key
+pkg/images/lib/rgtransform.x
+	Modifed the geomap, wcsmap, skymap, wregister, sregister, and ccmap
+	tasks to use the new cross terms option in the gsurfit library.
+	This involved changing two boolean parameters in each of the above
+	tasks to string parameters, making the interactive fitting software
+	shared by all these tasks aware of the change, and modifying the
+	gsinit calls to do the initialization properly. The default behavior
+	of all these tasks should be unchanged.  (5/1/97 Davis)
+
+dev/graphcap
+	Modified the path to qsoli so that it was generic - since there is
+	only one graphcap file now for SunOS and Solaris there can not be
+	host dependent path names in this file for these two OSs. Made the
+	modifications on /shared on gemini and ursa and on tucana.
+	(5/1/97 jvb)
+
+unix/shlib/mkshlib.ssol		(same as mkshlib.ssol-sc34)
+unix/shlib/mkshlib.sos4
+unix/shlib/mkpkg
+	Modified the shared library build procedures for Solaris and SunOS
+	to work correctly regardless of the current architecture setting of
+	the core system.  There is no reason that the architecture of the
+	core system should have to be set to the architecture of the shared
+	image being built, since the shared image depends only upon the
+	contents of the BIN directory for the target architecture.  This
+	changes allows the shared library to be rebuilt regardless of the
+	current architecture of the core system.  (5/05)
+
+dev/hosts
+	Made the following changes at Nigel's request:
+
+	    o  added:  eagle (new SWN), standard SunOS
+	    o  removed:  gll1, hedgehog, sandalwood, solara
+	    o  change from SunOS to Solaris: enzo, humu, tofu
+	    o  also dyevushka is now a Solaris 2.5.1 Sun Ultra
+
+	(5/9/97  MJF)
+ 
+pkg/images/tv/display/t_display.x
+	Fixed a typo in the mode used to map the display frame.  When erase
+	is set the image is now mapped in WRITE_ONLY mode, otherwise it is
+	mapped READ_WRITE.  This is how it previously worked. (5/14/97 MJF)
+
+unix/boot/spp/xc.c
+	The -h and -H switches, used to link a host task, now imply -Inolibc
+	as well.  It doesn't make any sense to use IRAF LIBC if a host
+	program is being compiled and linked.  (5/20)
+
+pkg/images/x_images.x
+pkg/images/imcoords/starfind.par
+pkg/images/imcoords/doc/starfind.hlp
+pkg/images/imcoords/src/starfind.h
+pkg/images/imcoords/src/t_starfind.x
+pkg/images/imcoords/src/sftools.x
+pkg/images/imcoords/src/sfconvolve.x
+pkg/images/imcoords/src/sffind.x
+	The starfind task has been added to the images.imcoords package.
+	(5/22 LED)
+
+sys/imio/iki/oif/oifrdhdr.x
+	Added a check to omit a read if the size of the user area is zero.
+	This problem showed up as a failure to open imfort images produced
+	with IRAF V2.10.  Imfort images often have no extra header keywords.
+	(6/01)
+
+sys/qpoe/qpiorpix.gx
+sys/qpoe/qpiogetev.x
+sys/qpoe/qpiomkidx.x
+	Fixed a mistyped pointer problem affecting integer event coordinate
+	keys.  QPOE maintains event pointers internally as pointers to
+	short, to optimize event filtering where the event extraction fields
+	are type short.  The recently added code to support integer
+	coordinates was correctly computing an integer offset for the field,
+	but the short int pointer to the event struct was still being used.
+	(6/02)
+
+sys/qpoe/qpiogetfil.x
+	Changed a few "pargc('s')" type calls to "pargi('s')" ('s' is an
+	integer not a character).  (6/02)
+
+unix/as.sparc/bytmov.c
+unix/as.sparc/amovs.c
+unix/as.sparc/amovr.c
+unix/as.sparc/amovl.c
+unix/as.sparc/amovi.c
+unix/as.sparc/amovd.c
+unix/as.sparc/amovc.c
+	Added a check for a no-op copy where the input and output arrays
+	are the same; the copy operation is skipped in this case.  The VOPS
+	version has always done this, but the optimized version in AS does
+	not, possibly because the first version of this used a bcopy() which
+	already had this feature.  (6/03)
+
+unix/as.ssol/bytmov.c
+unix/as.ssol/amovs.c
+unix/as.ssol/amovr.c
+unix/as.ssol/amovl.c
+unix/as.ssol/amovi.c
+unix/as.ssol/amovd.c
+unix/as.ssol/amovc.c
+	Made the same change for the Solaris versions.  This will need to
+	be propagated to the AS for the other platforms as well.  (6/03)
+
+sys/fmtio/ctod.x
+	Changed the generic MAX_EXPONENT to MAX_EXPONENTD.  (6/05)
+
+sys/fmtio/ctor.x
+	Since the exponent for double can now be larger than a real variable
+	can support, added a log10(x) > MAX_EXPONENTR check before converting
+	the value returned by ctod to a real.  (6/05)
+
+dev/graphcap
+	Installed graphcap support for the STSDAS Postscript graphics kernel.
+	The actual kernel is still installed in STSDAS and its behavior is
+	unchanged.  (6/06)
+
+sys/osb/ieee.gx
+unix/as.sparc/ieee.gx
+unix/as.ssol/ieee.gx
+	1. Added a new interface routine ieegmap, used to query the current
+	input and output NaN-mapping flags.
+	2. Changed the name of the old "ieemap" to "ieesmap" for consistency
+	with ieegmap.  The old ieemap is retained for backwards compatibility.
+
+	3. [INTERFACE CHANGE] ieesnan no longer has the side affect of
+	enabling mapping by calling ieemap.  (6/06)
+
+	Note that all of these routines have both double and real versions
+	and that mapping must be handled separately for the two types.
+	(Although we use generic language above, there is no ieesmap, you
+	really have ieesmapr and ieesmapd).  For example, enabling input
+	mapping for real data will not enable it for double as well.
+
+pkg/dataio/doc/export.hlp
+pkg/dataio/export/excmap.x
+pkg/dataio/export/cmaps.inc
+    Added the 'overlay' cmap as a builtin cmap. (6/6/97)
+
+pkg/dataio/export/expreproc.x
+    Removed a call to scale the colormaps when using the default values.
+    Cmaps are now only scaled when a brightness/contrast value is set in
+    the setcmap() function.  (6/6/97  MJF)
+
+pkg/dataio/export/bltins/exgif.x
+    Fixed a small error in the output of GIF files causing some display
+    programs to complain.  GIF images which would now be an odd number of
+    bytes have an extra trailing ';' delimiter.  This should be harmless
+    as all processing is supposed to stop once that char is found. (6/6/97 MJF)
+
+pkg/dataio/rfits.par
+pkg/dataio/wfits.par
+pkg/dataio/doc/rfits.hlp
+pkg/dataio/doc/wfits.hlp
+pkg/dataio/fits/fits_cards.x
+pkg/dataio/fits/fits_files.x
+pkg/dataio/fits/fits_params.x
+pkg/dataio/fits/fits_read.x
+pkg/dataio/fits/fits_rheader.x
+pkg/dataio/fits/fits_rimage.x
+pkg/dataio/fits/fits_rpixels.x
+pkg/dataio/fits/fits_wheader.x
+pkg/dataio/fits/fits_wimage.x
+pkg/dataio/fits/fits_wpixels.x
+pkg/dataio/fits/fits_write.x
+pkg/dataio/fits/mkpkg
+pkg/dataio/fits/rfits.com
+pkg/dataio/fits/rfits.h
+pkg/dataio/fits/t_rfits.x
+pkg/dataio/fits/t_wfits.x
+pkg/dataio/fits/wfits.com
+pkg/dataio/fits/wfits.h
+        Installed new versions of rfits and wfits. The new rfits and wfits
+        include support for: 1) reading and writing multi-extension fits files,
+        2) reading and writing global headers, 3)and  reading and writing ushort	 images.  (6/9/97 LED)
+
+pkg/images/immatch/wcsxymatch.par
+pkg/images/immatch/wcsmap.cl
+pkg/images/immatch/wregister.cl
+pkg/images/immatch/doc/wcsxymatch.hlp
+pkg/images/immatch/doc/wcsmap.hlp
+pkg/images/immatch/doc/wregister.hlp
+pkg/images/immatch/src/wcsmatch/t_wcsxymatch.hlp
+        Added the transpose parameter to the wcsxymatch, wcsmap, and wregister
+        task to permit users to force an image transpose in cases where the
+        image wcs does not contain enough information, e.g. axtype is undefined
+        or set to the same units.  (6/10/97, Davis)
+
+pkg/images/tv/imexamine/stfmeasure.x
+	1.  The background is now set to zero if there are no background points.
+	2.  Fixed an error recovery bug (attempting to free a pointer which
+	    was not set).
+	(6/11/97, Valdes)
+
+pkg/images/tv/imexamine/ierimexam.x
+	The background widths needed to be passed to the PSF measuring routines
+	even if the background is turned off for the fitting in the 'a' and 'r'
+	keys.  (6/11/97, Valdes)
+
+dev/hosts
+	Changed the following DMAC machines:
+	      - anasazi, sol, mimbres, prometheus are now solaris
+	      - changed path for dyevushka and humu
+	(6/15/97 MJF)
+
+pkg/images/lib/skywcs.x
+       	Modified the code to initialize the physical and logical axis maps
+       	to 1 and 2 respectively.  (6/16/97)
+
+pkg/dataio/imtext/t_wtextimage.x
+	Cleared the format arrays prior to using them so old format strings
+	are overwritten.  (6/17/97  MJF)
+
+pkg/dataio/fits/fits_read.x
+	Changed the code to add the extension number (as intended) not
+	the sequence number to the output file name if appropriate.
+	Removed some extraneous error messages from the output. (6/18/97 LED)
+
+pkg/dataio/fits/fits_write.x
+	The IRAFNAME keyword was not being initialized properly for the
+	global headers resulting in gargage being written into this
+	variable. (6/18/97 LED)
+
+unix/hlib/irafuser.csh
+	Added the flag -Inolibc to HSI_XF.  The HSI C files are host level
+	and do not use libc.  (6/17)
+
+unix/hlib/libc/knames.h
+unix/os/zcall.c
+unix/os/zfunc.c
+	Added zcall and zfunc routines for calls with ten arguments.  The
+	new functions are called zfunca,zcalla (A is hex for 10; hex is used
+	to avoid 7 char names in kernel routines).  (6/17)
+
+lib/syserr.h
+lib/syserrmsg
+	Installed system error messages for the FITS kernel.  (6/17)
+
+pkg/images/imutil/imheader.par
+pkg/images/imutil/src/imheader.x
+pkg/images/imutil/src/mkpkg
+	1. Typing "imhead" with no arguments now lists the images in the
+	current directory (like "ls").  
+	2. A new parameter "imlist" was added to support the above.
+	3. Imheader now left-justifies text to avoid truncating long cards.
+	4. The method used to test for a pixel file was changed to avoid
+	any pixel i/o.
+
+sys/imio/iki/fxf/
+	Installed the new FITS image kernel.  (6/16)
+
+sys/imio/iki/iki.com
+sys/imio/iki/iki.h
+sys/imio/iki/ikiaccess.x
+sys/imio/iki/ikiclose.x
+sys/imio/iki/ikicopy.x
+sys/imio/iki/ikidelete.x
+sys/imio/iki/ikiextn.x		+
+sys/imio/iki/ikiinit.x
+sys/imio/iki/ikildd.x
+sys/imio/iki/ikimkfn.x
+sys/imio/iki/ikiopen.x
+sys/imio/iki/ikiopix.x
+sys/imio/iki/ikiparse.x
+sys/imio/iki/ikirename.x
+sys/imio/iki/ikiupdhdr.x
+sys/imio/iki/mkpkg
+	1. "imtype" now has a syntax such as "imtype=oif,noinherit" or
+	"imtype=imh", "imtype=fits".  The default image type can be
+	specified either by any legal image extension or by giving the
+	internal kernel name (oif, fxf, plf, qpf, stf).  If "inherit" is
+	enabled then the image type will be preserved in a new-copy
+	operation, as in pre-V2.11 versions of IRAF.  The default in V2.11
+	is OIF images with no inherit.  No inherit means new images always
+	are of type imtype.
+
+	2. A new environment variable "imextn" specifies the mapping of
+	image file extensions to image types.  For example,
+	    imtextn = "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
+	Kernel names must be used here.  For each kernel the list of valid
+	extensions or extension patterns is given.  The first extension for
+	each type is the default extension when creating new images of that
+	type.
+
+	3. A "kernel" argument was added to many of the IKI routines.  This
+	change was propagated to all the image kernels.
+
+	4. The fits kernel (fxf) was added to ikiinit.  A call to
+	iki_extninit was added to ikiinit.  imtype/imextn are only read
+	once, when the first image is accessed.  A flpr is needed to use
+	the new values if the variables are changed at runtime after images
+	have been accessed.
+
+	5. The extension processing code is in the new file ikiextn.
+	(6/16)
+
+sys/imio/iki/oif/mkpkg
+sys/imio/iki/oif/oifaccess.x
+sys/imio/iki/oif/oifcopy.x
+sys/imio/iki/oif/oifdelete.x
+sys/imio/iki/oif/oifopen.x
+sys/imio/iki/oif/oifrename.x
+sys/imio/iki/plf/plfaccess.x
+sys/imio/iki/plf/plfcopy.x
+sys/imio/iki/plf/plfdelete.x
+sys/imio/iki/plf/plfopen.x
+sys/imio/iki/plf/plfrename.x
+sys/imio/iki/qpf/qpfaccess.x
+sys/imio/iki/qpf/qpfcopy.x
+sys/imio/iki/qpf/qpfdelete.x
+sys/imio/iki/qpf/qpfopen.x
+sys/imio/iki/qpf/qpfrename.x
+sys/imio/iki/stf/mkpkg
+sys/imio/iki/stf/stfaccess.x
+sys/imio/iki/stf/stfcopy.x
+sys/imio/iki/stf/stfdelete.x
+sys/imio/iki/stf/stfhextn.x
+sys/imio/iki/stf/stfopen.x
+sys/imio/iki/stf/stfrename.x
+	Numerous changes related to adding imtype/imextn, and adding a 
+	kernel argument to the IKI driver entry points.  (6/16)
+
+sys/imio/mkpkg
+sys/imio/imaccess.x
+sys/imio/imgimage.x
+sys/imio/imgnln.x
+sys/imio/imparse.x
+sys/imio/impnln.x
+sys/imio/iki/stf/stfopen.x
+	If the image number in a multi-extension group is not given this is
+	indicated by a value of -1.  Formerly 0 was used.  The listed
+	routines had to be changed to implement this.  (6/16)
+
+sys/imio/imstati.x
+	An imstati on IM_PIXFD will now attempt to open the pixel file if
+	it is not already open.  This is used by the revised IMHEADER task
+	to test for a pixel file.  (6/17)
+
+---------------------------------
+V2.11 beta-2 released.  (6/18)
+
+pkg/dataio/fits/fits_read.x
+	Fixed an error in the call to pl_gsize (output variable set to
+	constant) that was causing a segvio on Solaris. (6/19 LED)
+
+pkg/images/imutil/src/imheader.x
+sys/imio/imstati.x
+	Removed the code from imstati to open the pixel file in an IM_PIXFD
+	query; ideally imstat should be purely an information service with
+	no action side effects.  Instead, added an imopsf call in imheader
+	to test if the pixel file exists (this is done only if IM_PIXFD=NULL).
+	imopsf was not really intended to be in the public interface of IMIO,
+	but we can live with this for the system imheader task.  (6/19)
+
+sys/imio/iki/fxf/fxfopen.x
+	Fixed a bug that would affect opening of simple (not multi-extension)
+	FITS files without specifying an extension.  (6/19)
+
+sys/imio/iki/oif/oifopen.x
+sys/imio/iki/plf/plfopen.x
+sys/imio/iki/qpf/qpfopen.x
+	These kernels were updated to check the image extension index and
+	abort if an illegal extension is referenced.  For a simple file with
+	one image the only extension permitted is [1] (or -1 which is what
+	the kernel gets if no extension is specified).  Trying to open [0]
+	or [2] or higher is an error.  This is necessary to provide a kernel
+	independent behavior if other kernels may support multiple extensions.
+
+	There are still two unresolved issues here.  The first is that STF
+	was not also updated, so its behavior is inconsistent compared to
+	the other kernels ([0] or [1] or not given will all return the first
+	image).  This could not be modified due to the risk to STSDAS and
+	the tight schedule we have for V2.11.  The second problem is that
+	the FITS kernel used in the simplest manner will produce a
+	multi-extension file with [0] as the first image.  In this mode the
+	FITS kernel has images starting at [0] whereas the first image is
+	[1] for the other kernels.  This is less of a problem if the PHU of
+	a FITS MEF file is a dataless file header, in which case the first
+	image is [1], and [0] is the file header, not an image.  But there
+	is an inconsistency.  Perhaps the default behavior of the FITS
+	kernel should not so easily create a multi-extension file with a PDU
+	instead of a dataless PHU.  We might want to change the default
+	behavior to add a file PHU when a multiextension FITS file is
+	created, or add a kernel switch to force creation of a PHU.  Simple
+	FITS files would remain a simple PDU with no extensions.  Currently
+	the only way to get a PHU MEF file with the FITS kernel is to use
+	special facilities to write a dataless PHU before appending a data
+	image.  (6/19)
+
+sys/ki/ki.h
+	Increased the max nodes from 256 to 320.  This code needs to be
+	rewritten to use a dynamic table to eliminate this upper limit,
+	and improve efficiency.  (6/19)
+
+pkg/images/imutil/doc/imheader.hlp
+	Modifed the imheader help page to include a description of the
+	new imlist parameter. (6/20 LED)
+
+pkg/dataio/wfits.par
+pkg/dataio/fits/t_wfits.x
+pkg/dataio/help/wfits.hlp
+	Added the parameter fextn to the wfits task. Wfits will append the
+	current value of fextn to any output disk files so that they
+	can be read with the fits kernel. The default value of fextn is "fits". 
+	(6/20 LED)
+
+pkg/dataio/fits/t_wfits.x
+	Added a check to wfits so that it does not append a ".fextn" to
+	an output file name which already ends in ".fextn".
+	(6/21 LED)
+
+unix/boot/spp/xc.c
+	Modified the "isv3" code to be more flexible about the configuration
+	of the host compiler.  (6/22)
+
+sys/qpoe/qpex.h
+	Increased DEF_PROGBUFLEN and DEF_DATABUFLEN to 65536.  (6/22)
+
+sys/imio/iki/oif/oifopen.x
+sys/imio/iki/plf/plfopen.x
+sys/imio/iki/stf/stfopen.x
+	Added support for "imclobber" to these kernels (images can be
+	overwritten if imclobber=yes).  The FITS kernel (fxf) already had
+	imclobber implemented.  QPF is read-only so it is not an issue.  (6/22)
+
+sys/mwcs/mwrotate.x
+	The sign of the x,y center of rotation was wrong in a call to
+	mw_translated.  (6/22)
+
+sys/mwcs/mkpkg
+sys/mwcs/mwcs.h
+sys/mwcs/iwewcs.x
+sys/mwcs/iwrfits.x
+sys/mwcs/mwsaveim.x
+sys/mwcs/wfait.x
+sys/mwcs/wfcar.x
+sys/mwcs/wfcsc.x
+sys/mwcs/wfdecaxis.x
+sys/mwcs/wfgls.x
+sys/mwcs/wfinit.x
+sys/mwcs/wfmer.x
+sys/mwcs/wfmol.x
+sys/mwcs/wfpar.x
+sys/mwcs/wfpco.x
+sys/mwcs/wfqsc.x
+sys/mwcs/wfstg.x
+sys/mwcs/wftsc.x
+sys/mwcs/wfzea.x
+	1. Added support for galactic, ecliptic, and super-galactic coordinates
+	to MWCS.
+	2. Added the STG, ZEA, CAR, MER, PCO, PAR, AIT, MOL, CSC, QSC, TSC
+	projection functions to MWCS.  These functions do not require any
+	projection parameters.  We are using the G&C defaults for LONGPOLE
+	and LATPOLE.  The CUBEFACE parameter in the COBE CSC, QSC, and TSC
+	projections is ignored for now since it is not required to evaluate
+	the functions.  (6/22)
+
+unix/hlib/math.h
+	Added explicitly DOUBLE versions of the math constants.  (6/22)
+
+pkg/images/imcoords/doc/imcctran.hlp
+	Modified the imcctran help page to reflect the 2.11 mwcs changes,
+	e.g. support for galactic, supergalactic, and ecliptic coordinates,
+	and the new function drivers. (6/23 LED)
+
+unix/boot/spp/xpp/decl.c
+	The line counter was not being updated in multiline declarations.
+	This would mess up SPP source code debugging.  (6/23)
+
+pkg/system/rename.x
+pkg/system/doc/rename.hlp
+	1. The field=extn option can now add file extensions where none 
+	existed before, or remove them.
+	2. The filename field editing capability now works for single file
+	renames as well as file lists.  (6/23)
+
+sys/imio/iki/ikiopen.x
+	Add an errchk for zcalla.  Doesn't appear to matter in this case,
+	but there should be one as otherwise assumptions are made about the
+	value of the status argument when an error abort occurs.  (6/23)
+
+sys/imio/iki/stf/stfopen.x
+sys/imio/iki/plf/plfopen.x
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfksection.x
+sys/imio/iki/oif/oifopen.x
+sys/imio/iki/fxf/fxfrfits.x
+sys/imio/iki/fxf/fxfupdhdr.x
+	1. Fixed a bug in fxfopen that was causing PHU inheritance to fail.
+	2. Tweaked imclobber handling in all kernels.  Fixed a bug related
+	to dev$null images in oif and plf.
+	3. Some minor coding style changes, spelling errors.  (6/23)
+
+pkg/images/x_images.x
+pkg/images/imcoords/imcoords.par
+pkg/images/x_images.x
+pkg/images/imcoords/imcoords.cl
+pkg/images/imcoords/imcoords.men
+pkg/images/imcoords/imcoords.hd
+pkg/images/imcoords/ccfind.par
+pkg/images/imcoords/doc/ccfind.hlp
+pkg/images/imcoords/src/t_ccfind.x
+pkg/images/imcoords/src/mkpkg
+	Installed the new ccfind task in the images.imcoords package.
+	(6/24 LED)
+
+sys/imio/iki/fxf/fxfopen.x
+	More fixes to the fkinit/inheritance logic in the FITS kernel.  (6/24)
+
+sys/imio/iki/ikiextn.x
+	1. Modified the iki_extninit code to preserve the default extensions
+	for kernels not specified in a user defined imextn string.  If the
+	user specifies extensions for a given kernel these however override
+	the builtin defaults (note though that not all kernels permit 
+	arbitrary file extensions - fxf and stf are the main ones that do).
+
+	2. Added a new routine iki_debug.  The init code was modified to check
+	for an environment variable "ikidebug".  If this is defined and has
+	a yes value the IKI data structures are dumped at init time, allowing
+	the list of installed kernels and the mapping of extensions to kernels
+	to be reviewed.  (6/24)
+
+sys/imio/iki/fxf/fxfrename.x
+sys/imio/iki/fxf/fxfdelete.x
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfupdhdr.x
+sys/imio/iki/fxf/fxfrfits.x
+	We had a problem with "rfits make-" failing with imtype=fits.  This
+	opens dev$null as the image and a kernel must be able to deal with
+	this odd situation.  There was a problem with the internal header
+	cache code as some of the code was searching the cache, but since we
+	were opening a new image the cache had not been initialized (it is
+	initialized in rfitshdr).  Added a new routine iki_init in
+	fxfopen.x, and calls to this in all the external entry points for
+	the fits kernel.  On the first call after a process startup, this
+	initializes the cache to empty and sets rf_cachesize=0 (the cache is
+	subquently reinitialized by rfitshdr).  A number of instances of
+	the construct "do i = ...  max(1,rf_cachesize)" were changed to
+	"do i = ...  rf_cachesize" as otherwise the loop does not notice
+	that the cache is disabled.  (6/25)
+
+unix/boot/spp/xpp/xppcode.c
+	Increased the output code buffer from 50000 to 131072.  (6/25)
+
+dev/graphcap
+	The pen width parameter PW for sgi_apl was changed from 2.4 to 2.3.
+	This was fine tuning for the SGIKERN font changes below.  (6/25)
+
+sys/gio/sgikern/mkpkg
+sys/gio/sgikern/sgifont.x
+sys/gio/sgikern/sgitx.x
+sys/gio/sgikern/greek.com		+
+sys/gio/sgikern/font.com
+sys/gio/sgikern/sgidrawch.x
+	The SGI graphics kernel was upgraded with a better roman font, and a
+	new greek font was added.  Aside from the above minor change to
+	graphcap this should be transparent to anything outside sgikern. (6/25)
+
+unix/hlib/zzsetenv.def
+	Added an "imextn" entry to the default IRAF environment so that the
+	user can do a "show imextn" to see the current mappings of image
+	extensions to image kernels.  (6/25)
+
+---------------------------------
+V2.11 Beta-2 installed on NOAO servers.  (6/25)
+
+unix/hlib/zzsetenv.def
+	1. Added "imclobber = no".
+	2. Changed imtype to "oif,noinherit" to better document the new syntax.
+	(imtype=imh, imtype=fits etc. will still work so long as these are
+	valid extensions in imextn).
+	3. Changed version from beta1 to beta2.  (6/26)
+
+unix/gdev/sgidev/sgi2uapl.c
+unix/gdev/sgidev/sgi2ueps.c
+	These routines could generate a "0 setlinewidth" in the output
+	postscript, which could cause a plot to abort without generating
+	any output.  Added a simple max(1) to prevent this, without changing
+	the way a linewidth is scaled.  (6/27)
+
+lib/syserr.h
+lib/syserrmsg
+	Added a new error code SYS_IKIKSECTNS, used when a kernel section
+	is entered but it is invalid, e.g. because the kernel does not
+	support the image section syntax given.  (6/28)
+
+sys/imio/iki/oif/oifopen.x
+	Now returns an error if the given kernel section is not legal.  (6/28)
+
+sys/imio/iki/stf/stfopen.x
+	The imclobber stuff introduced a serious bug preventing image
+	sections such as "imcopy blah pix[3]" from being used to write a
+	multi-extension STF file (e.g. created with pix[1/4]).  Modified
+	stfopen to permit such usage.  Imclobber checking is only performed
+	if the whole file is affected.  If an individual image is explicitly
+	referenced it can be overwritten and is not affected by imclobber.
+	(6/28)
+
+unix/hlib/zzsetenv.def
+	Set imtype back to "imh".  Unfortunately we have IMRED scripts which
+	parse the value of imtype (an interface violation since it makes the
+	scripts dependent on details of the image kernels).   Until these can
+	be fixed imtype will have to be left as it is.  (6/29)
+
+sys/gio/sgikern/greek.com
+	Updated the greek fonts in the SGI kernel to a newer version.  (6/29)
+
+pkg/images/imutil/src/imexpr.gx
+pkg/images/imutil/src/imexpr.x
+	Fixed a bug affecting generating functions using I,J,K.  (6/29)
+
+sys/imio/iki/fxf/fxfksection.x
+sys/imio/iki/fxf/fxfopen.x
+	1. Bug fix to avoid "unexpected EOF" error when reading dataless
+	PHU files.
+	2. The extension number and extension name should now be
+	interchangeable in kernel sections.  (6/29)
+
+lib/syserr.h
+lib/syserrmsg
+	Added several new error messages for the FITS image kernel.  (6/29)
+
+sys/mwcs/wfinit.x
+	Removed a bogus "msp" entry from the MWCS function table.  This was
+	an alias for the older multispec.  (6/30)
+
+---------------------------------
+V2.11 Public BETA release.  (6/30)
+
+dev/hosts
+	Added 'sunset' to all downtown servers (7/2/97 MJF)
+
+dev/hosts
+	Changed path for 'deneb' (7/7/97 MJF)
+
+unix/hlib/zzsetenv.def
+	There was a typo (extra double quote) in the definition of imextn.
+	(7/24)
+
+pkg/images/imcoords/src/ccxytran.x
+pkg/images/immatch/src/geometry/geoxytran.gx
+pkg/images/immatch/src/geometry/geoxytran.x
+pkg/images/immatch/src/geometry/t_geotran.x
+	Fixed a bug in the database reading code used by the cctran and
+	geoxytran tasks that was producing an "illegal xorder" message
+	if the x coordinate fit was linear and the y coordinate fits was
+	nonlinear or vice versa. (7/24/97 LED)
+
+pkg/images/immatch/src/xregister/rgxcorr.x
+	Fixed an initialization problem in the xregister task that ocurred
+	if: 1) the correlation parameter was set to "fourier", and, 2) one
+	of the correlation regions was entirely off the input image. In this
+	case all subsequent region shifts were being set to INDEF regardless
+	of whether or not the region was actually on the image. (7/25/97 LED)
+
+sys/libc/imaccess.x		+
+sys/libc/mkpkg
+	Added a new LIBC entry point "c_imaccess" which calls the IMIO imaccess
+	routine.  (7/25)
+
+unix/hlib/libc/xnames.h
+	Added an entry for IMACCESS.  (7/25)
+
+pkg/cl/unop.c
+pkg/cl/param.h
+pkg/cl/param.c
+pkg/cl/operand.h
+pkg/cl/builtin.c
+pkg/cl/gram.c
+	Added two new intrinsic functions, "imaccess" and "defvar".  imaccess
+	tests whether an image exists, e.g. (imaccess("dev$pix")) or
+	(imaccess(foo.fits[3])).  defvar tests whether an environment variable
+	exists, e.g. (defvar("imextn")).  (7/25)
+
+pkg/images/imcoords/doc/ccfind.hlp
+	Fixed a typo in the ccfind task help page. (7/28 LED)
+
+pkg/math/gsurfit/zzdebug.x
+	Added a zzdebug.x file to the gsurfit package. (7/28 LED)
+
+sys/imio/iki/stf/stfopen.x
+	Added a max(0,gr_arg) to map gr_arg values of -1 to 0 for use within
+	the STF kernel.  (7/29)
+
+sys/imio/iki/stf/stfhextn.x
+sys/imio/iki/fxf/fxfhextn.x
+	These routines will now inherit the file extension in a new-copy
+	operation only if inherit is enabled in "imtype".  (7/29)
+
+sys/imio/iki/ikiextn.x
+	Added a new IKI extn routine iki_getpar(), used by IMIO code to
+	get IKI global parameters (such as inherit/defimtype).  (7/29)
+
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfopix.x
+sys/imio/iki/fxf/fxfrfits.x
+sys/imio/iki/fxf/fxfupdhdr.x
+sys/imio/iki/fxf/fxf.h
+	1. When a new FITS file is created the value of the EXTEND keyword
+	in the PHU is now set to F.  When an extension is subsequently
+	added it is changed to T.
+	2. A bug was fixed affecting files with many (hundreds) of extensions.
+	3. A dev$null related bug was fixed (seen when displaying an image
+	with imtype set to fits).  (7/29)
+
+noao/lib/mkpkg.sf
+	Fixed a typo in the $ifeq MACH section.  (7/29)
+
+sys/gio/sgikern/font.com
+	Updated to a new version of the font file which improves the
+	inter-character spacing.  (7/29)
+
+pkg/images/immatch/src/geometry/geotran.x
+	Some min/max statements were reordered in geo_imset to work around an
+	optimiser bug seen on Solaris.  Normally this should have been fixed
+	by putting the file on the special file list, but since geotran is
+	very compute intensive the source file was modified instead.  (7/29)
+
+pkg/images/imutil/src/hedit.x
+	Added a missing sfree() in he_deletefield().  (7/29)
+
+sys/imio/db/imgftype.x
+sys/imfort/db/imgftype.x
+	Modified to check for a quoted string before checking if the keyword
+	is boolean (T/F).  (7/29)
+
+---------------------------------
+V2.11 Public BETA release, patch-1.  (7/29)
+
+pkg/images/imutil/src/imhistogram.x
+pkg/plot/phistogram.x
+	Fixed a bug in the imhistogram and phistogram tasks that could produce
+	invalid floating point operation errors if the image pixel values are
+	outside the legal integer range. (7/31 LED)
+
+sys/imio/iki/fxf/fxfksection.x
+	There was a typo on line 177, PHULINES should have been EHULINES.
+	(7/31)
+
+pkg/dataio/fits/fits_read.x
+	Fixed a bug in the new global header reading code that could
+	result in the global image header being left in the tmp$ directory.
+	(8/6 LED)
+
+dev/emacs.ed
+	Fixed an ambiguity affecting MOVE_LEFT and DEL_CHAR.  Added ctrl/d
+	as a second eof char (along with ctrl/z) as for vi.ed.  (8/07)
+
+sys/imio/iki/fxf/fxfrfits.x
+	Fixed a bug which would cause unwanted blank lines to be added to a
+	header generated with INHERIT=T when there are blank lines near the
+	top of the existing extension header.  (8/08)
+
+sys/mtio/mtrewind.x
+	The sequence close(mtopen()) was being used to rewind a device.
+	The close could fail due to an invalid file descriptor if the mtopen
+	failed, as when opening a device and no tape was loaded.  Modified
+	to do the close only if the open succeeds.  An attempt to rewind a
+	device when no tape is loaded will still fail with a "cannot open
+	device" message.  There is no way to tell that a tape is not loaded.
+	(8/08)
+
+pkg/cl/builtin.c
+	[This was the solution to the so-called "imdkern" bug].  Stty has
+	the unusual side affect of writing to environment variables (to set
+	the screen size etc.).  Environment variables set in the CL are
+	automatically passed to all connected subprocesses.  This can cause
+	corruption of the IPC prototcol when stty is called in response to a
+	pagefiles() call in a running task and a connected graphics kernel
+	is running at the time.  The safest thing is to have stty shutdown
+	any connected graphics kernels before executing, so a call to gflush
+	was added to the stty code in the CL.  (8/10)
+
+sys/qpoe/qpaddf.x
+	A symbol reference (dsym) was being made before a stenter, but the
+	latter could cause symbol pointers to change.  The code was reorganized
+	slightly to do the stenter before taking any symbol references.  (8/10)
+
+sys/imio/iki/oif/oif.h
+sys/imio/iki/oif/oifopen.x
+	The OIF kernel now recognizes an environment variable "oifversion"
+	which, if defined, specifies the file version for a new OIF image
+	(for example set oifversion = 2 produces format version 2 images).
+	If the variable is not defined, which is the default, the builtin
+	OIF default will be in effect and new-format images will be
+	generated.  This variable is provided only for backwards
+	compatibility, e.g. when using V2.11 IRAF with old software which
+	cannot easily be updated.  (8/10)
+
+sys/imio/iki/fxf/fxf.h
+sys/imio/iki/fxf/fxfopix.x
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfupdhdr.x
+sys/imio/iki/fxf/fxfrfits.x
+sys/imio/iki/fxf/fxfctype.x
+sys/imio/iki/fxf/fxfksection.x
+	1. A bug was fixed that would leave open file descriptors behind
+	when trying to open extensions beyond the EOF, e.g. when searching
+	for the last extension in a file.
+	2. An operation such as "imcopy foo.fits[3] new.fits" would fail
+	with imclobber=yes if "new.fits" already existed, due to a problem
+	with error recovery.
+	3. A new fkinit parameter "padlines" was added.  Along with the
+	existing "ehulines" this permits control of the number of blank
+	lines at the end of a header (used for expansion).  Whereas ehulines
+	defines the minimum size of an extension header when a new extension
+	is added, padlines defines the number of lines of padding to be
+	added when a EHU overflows and has to be extended.
+	4. The FK code supporting FILENAME was deleted.  It is difficult
+	for the FK to maintain this reliably (e.g. if a temp image is created
+	and later renamed), and it is felt that it is better to let the
+	application which creates FITS files control this parameter.  If the
+	FK insists on writing it this interferes with the use of FILENAME by
+	the application.  (8/11)
+
+sys/imio/iki/fxf/fxfrfits.x
+	A buffer was improperly dimensioned affecting the OBJECT keyword.
+	This could cause long image title strings to be truncated.  SZ_EXTTYPE
+	was changed to SZ_CARD on line 708.  (8/12)
+
+lib/prstat.h
+unix/hlib/libc/prstat.h
+	A new process status value P_BUSY was added.  (8/13)
+
+sys/etc/prseti.x			+
+	A prseti routine was added to the process control interface, which
+	already provided a prstati.  (8/13)
+
+sys/etc/mkpkg
+sys/etc/prupdate.x
+	The prupdate routine, used to broadcast messages/commands to all
+	subprocesses (e.g. for set environment or chdir requests), was
+	modified to check the process status and only broadcast to processes
+	for which the process status is P_RUNNING.  The process status for
+	a running process can now be set to either P_BUSY or P_RUNNING.
+	P_RUNNING indicates that the process is running, but is idle and
+	read to accept commands.  P_BUSY means that it busy executing in a
+	mode where it cannot accept standard IPC requests.  (8/13)
+
+sys/etc/prclose.x
+	Prclose will now close any process for which the process status is
+	other than P_DONE or P_DEAD, that is, any running process.  (formerly
+	it was checking for status=P_RUNNING but we now have to allow for
+	P_BUSY as well).  (8/13)
+
+sys/gio/cursor/mkpkg
+sys/gio/cursor/gtropenws.x
+	When a graphics subkernel is connected to the CL the process status
+	is now set to P_BUSY.  Graphics subkernels execute in a loop reading
+	GKI instructions and cannot accept standard IPC requests, such as
+	environment change requests, without corrupting the IPC protocol.
+	(8/13)
+
+pkg/cl/config.h
+	Increased a couple of history buffer sizes.  In particular SZ_CMDBLK
+	is supposed to be larger than a line buffer and it wasn't after the
+	recent increase in the line buffer size.  SZ_CMDBLK was increased 
+	from 512 to 2048, and the history buffer size was increased from 2048
+	to 8192.  (8/14)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+	Fixed a segmentation violation caused by attempting to close the
+	mask data structures which are not defined if an error occurs opening
+	the input or output images.  (8/14 FV)
+
+pkg/system/rename.x
+pkg/system/rename.par
+pkg/system/doc/rename.hlp
+	The rename task was rewritten to hopefully make the code clearer and
+	easier to follow.  The task now checks for the $/ characters in
+	root or extn replacement strings and prints an error message if either
+	of these characters are found.  For completeness the field-editing
+	feature now permits "ldir" to be modified as well as "root", "extn",
+	and "all" (modifying the ldir part of a filename is another way to
+	move the file to the named directory).  (8/15)
+
+doc/notes.v210			+
+local/notes.v210		-
+local/notes.v211		+
+	Broke the old notes.v210 into a frozen v2.10 notes file and a new
+	notes.v211 file for IRAF V2.11 and revisions.  (8/15)
+
+unix/hlib/motd
+unix/hlib/zzsetenv.def
+	System version changed to V2.11EXPORT.  (8/15)
+
+unix/hlib/mkiraf.csh
+	For the NOAO servers we use a version of mkiraf which permits imdir
+	to include hostnames, e.g. imdir=tucana!/d0/iraf (this is not
+	currently included in the export version of the system).  It turns
+	out that while this mkiraf script was setting imdir correctly in the 
+	login.cl, it was not actually creating the directory if it didn't
+	exist.  The local version of mkiraf was modified to use the iraf
+	version of mkdir in x_system.e.  This avoids the problem with host!
+	and the unix csh/mkdir, and also works when the directory is on a
+	different host than the one executing the script.  (8/16)
+
+pkg/images/imcoords/src/sffind.x
+	Fixed a type mismatch in a call to atan2. (8/18 LED)
+
+sys/imio/iki/fxf/fxfrfits.x
+	In fxf_load_header, the calculation of "totpix" could overflow a 32
+	bit integer for large (e.g. 8K by 8K) images.  The calculation was
+	changed to avoid overflow.  A bug was also fixed affecting the use
+	of PCOUNT in the expression.  The value returned for "totpix" is not
+	actually the total pixels in the image as the name suggests, but the
+	size in 2880-byte FITS logical blocks of the data area of the image,
+	the data area being the pixel matrix plus PCOUNT data units.  At the
+	moment we want to minimize changes, but later we should make more
+	general modifications to the code to change the name of this
+	variable to something more descriptive.  (8/18)
+
+unix/boot/wtar/wtar.c
+	Added a call to memset to zero the file header structure before
+	setting the field values.  Unix tar on at least one platform (Digital
+	Unix) was complaining about unused fields of the tar file headers.
+	(8/20)
+
+dev/hosts
+	Added the Jannuzi/Dey machine chomper to all servers (8/20 MJF)
+
+dev/hosts
+	Added beet (Sol2.4 machine), mosaic machines rush and driftwood
+	along with all their aliases  (8/20 MJF)
+
+bin.ssun/S11_5.4.e		+
+	Added a V2.11 shared image linked for Solaris 2.4.  (8/20)
+
+pkg/images/tv/display/dspmmap.x
+	There was a bug in the code when using pixel masks which gives
+	"Warning: PLIO: reference out of bounds on mask".  This was
+	introduced with the changes to allow masks and images to have
+	different binning.  (8/21 FV)
+
+sys/mwcs/iwewcs.x
+	In the case of an image with more than 2 axes where CDELT/CROTA is
+	used instead of a CD matrix, the CDELT value for axes other than
+	the RA/DEC projection axes (or axes 1-2 if no projection) was
+	being discarded and replaced with cdelt=1.0.  (8/21)
+
+pkg/images/imutil/src/t_imtile.x
+	Fixed a bug in the range decoding code that could produce an integer
+	divide by 0 if the range syntax in xtools$ranges.x was extended to
+	include zero (8/22 LED).
+
+pkg/cl/config.h
+	Increased the size of the stack and dictionary.  The V2.11 changes to
+	SZ_FNAME affect storage allocation in compiled scripts, hence under
+	V2.11 scripts will use more space than they used to.  (8/27)
+
+sys/mwcs/mwcs.h
+	Increased LEN_FC (the size of the compiled function call portion of
+	a runtime CTRAN descriptor) from 48 to 64.  This descriptor is 
+	internal to MWCS and the change should have no effect outside the
+	interface.  (8/28)
+
+dev/graphcap
+dev/imtoolrc
+	Updated a few of the KPNO instrument frame buffer entries in graphcap
+	and imtoolrc.  Affected were cn# 26,27, 35-40.  No others were
+	affected, only these KPNO-specific entries.  (8/28)
+
+sys/imio/iki/fxfopix.x
+	Fixed a typo: IM_LEN(im) -> IM_LEN(im,1).  Evidently the Sun Fortran
+	compilers didn't complain about this (it was found on AIX).  (8/29)
+
+pkg/images/tv/imexamine/iepos.x
+	Added missing argument in fprintf call.  (8/29/97, Valdes)
+
+pkg/images/imcoords/src/ccfunc.x
+pkg/images/imcoords/src/t_ccsetwcs.x
+pkg/images/imcoords/src/skyctran.x
+	Removed extraneous argument from 2 call to mw_stati.  Removed extra
+	arguments from 2 call to printf. (8/29/97, Davis) 
+
+pkg/images/lib/skywcs.x
+	Added missing argument to fprintf call. (8/29/97, Davis)
+
+pkg/images/immatch/src/linmatch/rglcolon.x
+	Added missing argument to call to rg_lstats. (8/29/97, Davis)
+
+pkg/cl/prcache.c
+	The pr_unlock() function was comment out.  This has never caused a
+	problem as the CL does not currently use this interface routine, 
+	however it was causing a compiler error on one platform due to a 
+	malformed comment, so it was uncommented.  (8/29)
+
+pkg/plot/impstatus.x
+	In sl_getstr, changed "Memc[sl]" to "int(Memc[sl])" to fix a mixed
+	type mod function problem.  This routine is a bit on in that it stores
+	a variable nlines, the number of status line lines, in a char variable
+	in a char array (but it should work).  (8/29)
+
+
+---------------------------------
+V2.11 Public EXPORT release.  (8/29)
+
+sys/imfort/imfort.h
+sys/imfort/imcrex.x
+	Added support for the "oifversion" environment variable to IMFORT.
+	This is identical to what is in IMIO.  The default is version 2 (new)
+	format images.  (9/05)
+
+sys/imfort/imwrhdr.x
+	In the process of making the above fairly simple addition I found a
+	bug in writing V1 headers: IM_V1HDRLEN was not getting set correctly
+	as the pointer was "im" instead of "v1".  This was preventing imfort
+	from writing valid V1 image headers (and it appears that IMIO may have
+	the same problem as well, seen as the user fields of the header not
+	being written, although other code may patch up the header field later
+	in the case of IMIO).  We did not see this problem earlier in IMFORT
+	since it had no way to write V1 format images.  (9/05)
+
+sys/imfort/db/imgnfn.x
+	In the process of making the above fairly simple addition I found
+	another header related bug, this one appears to have been there for
+	some time.  The phead.f test IMFORT task was only printing the
+	standard fields of the header, not the user fields, although it was
+	supposed to print the full header.  Updated the relevant section of
+	code in the IMFORT version of db/imgnfn.x with the code from the
+	IMIO version of the file, which does not have this problem.  (This
+	causes a problem in phead.f now when it encounters a HISTORY card,
+	but I think that is a problem with the task, not with imfort).  (9/05)
+
+unix/hlib/strip.iraf
+	Changed the -file entry for bin.ssol to bin.ssun.  (9/22)
+
+pkg/utilities/urand.x
+pkg/utilities/doc/urand.hlp
+	If the "seed" parameter is set to INDEF then the clock time (integer
+	seconds since 1980) will be used as the seed.  This allows different
+	executions to produce different random numbers.  (9/23, Valdes)
+
+local/login.cl
+	Updated logver to "IRAF V2.11 May 1997".  (9/24)
+
+pkg/images/immatch/src/imcombine/icscale.x
+pkg/images/immatch/doc/imcombine.hlp
+	When the zero offsets or weights are specified in a file the weight
+	adjustment for differeing sky levels is not done.  (10/3/97, Valdes)
+
+pkg/plot/phistogram.x
+	Fixed an error in the previous bug fix that was causing phistogram
+	to die with a segmentation violation for text file input. (10/4, Davis)
+
+dev/hosts
+	Removed dyevushka, changed virgo to ssun, added mogollan as a ssun
+	for GONG and zippy as my home linux box.  (10/17 MJF)
+
+pkg/images/immatch/src/imcombine/t_imcombine.x
+	When using STF images the failure error when there are too many images
+	is SYS_IKIOPEN rather than the others that occur with OIF, etc.
+	Added this error code to be caught and have the program build a
+	stacked image to combine.  (10/21/97, Valdes)
+
+dev/hosts
+	Changed argo to a solaris machine  (10/28/97  MJF)
+
+pkg/dataio/fits/fits_read.x
+	Fixed a bug in the tape listing code that was causing the entire
+	file to read instead of skipped if: 1) make_image = no, 2) there
+	was only 1 image per file, and 3) fe = 0. (11/3/97 LED)
+
+dev/hosts
+	Added new-tucana for testing (11/6/97  MJF)
+
+dev/hosts
+	Cleaned up the hosts file according to Nigel's list:
+	Solaris: aquarius, aten, bokchoy, carina, chomper, corvus, enzo,
+         	herbie, humu, inti, kukita, kumbhakarna, mdi, mozart, norma,
+         	oso, potosi, saguaro, soi, soleil, tofu, virgo, xari.
+	SunOS: arun, aspen, bruckner, caelum, charfman, condorito, eagle,
+    		grus, jalapeno, jannu, jupiter, kale, katmai, loaner-1,
+		lonestar, mars, mintchip, mira, moraine, msgsun, musca,
+		mytoy, odysseus, pantera, radix, rainbow, sagittarius, seurat,
+		solarium, spud, surya, susanna, taco, tesla, video, vivalid,
+		volans
+	Machines not already in the file were not added as requested. Removed
+	retired machines madrona and hummel (11/7/97 MJF)
+
+sys/mwcs/wfinit.x
+	Removed a duplicate "extern" declarations line for the MSP function.
+	This was causing a compilation failure on Digital Unix.  (11/07)
+
+unix/os/zfiopr.c
+	Added a check that the pipe file descriptors do not exceed MAXOFILES.
+	(11/07)
+
+pkg/cl/main.c
+	Changed the datatype of the variable old_onipc from int to PFI.
+	This is used as a function pointer in CL/LIBC but on 64-bit platforms
+	such as the DEC Alpha int and pointer are different sizes.  (11/09)
+
+pkg/images/imfilter/src/t_median.x
+pkg/images/imfilter/src/t_mode.x
+	Changed the type declaration of the boundary extension from int
+	(incorrect type) to real (the correct type) to avoid FPE errors
+	on the Dec Alpha. (11/11 LED)
+
+sys/imio/iki/stf/stfaccess.x
+sys/imio/iki/fxf/fxfaccess.x
+	BTOI was being called on the value returned by iki_validextn without
+	converting the value to a boolean expression.  (11/12)
+
+sys/imio/iki/stf/stfhextn.x
+sys/imio/iki/stf/stfnewim.x
+sys/imio/iki/fxf/fxfhextn.x
+	Added checks to make sure that the old image pointer o_im is not
+	used unless we have a new copy image and o_im is not NULL.  (11/13)
+
+pkg/cl/builtin.c
+	When building up the command line for a foreign task, if an unquoted
+	INDEF was given an argument the CL would segvio on some platforms.
+	Technically, since INDEF is a keyword and is being used as a string
+	it should be quoted by the user, and things would work fine in this
+	case.  But the CL should not segvio and it should check for an 
+	indefinite operand in such a case so the code was modified to do so
+	and generate the string "INDEF" in this case, where a string argument
+	is being generated for an external command.  This doesn't avoid the
+	need to quote other keywords however, e.g. "grep else" won't work 
+	unless "else" is quoted.  (11/13)
+
+sys/osb/ieee.gx
+sys/osb/ieeed.x
+sys/osb/ieeer.x
+unix/as.sparc/ieee.gx
+unix/as.sparc/ieeed.x
+unix/as.sparc/ieeer.x
+unix/as.ssol/ieee.gx
+unix/as.ssol/ieeed.x
+unix/as.ssol/ieeer.x
+	The IEEE i/o package was modified to detect IEEE subnormals on input
+	and map them to zero.  This feature is enabled along with NaN
+	mapping; both are either enabled or disabled.  The ieee statistics
+	however count only NaN mappings, not subnormals, since the latter
+	are considered the same as zero values.   A subnormal is a number so
+	small (close to zero) that it cannot be accurately represented.  For
+	example the smallest IEEE single precision real is about 1.175e-38.
+	Numbers from e-38 to e-45 or more gradually lose precision and are
+	considered subnormals which should be rounded to zero.  An IEEE
+	subnormal is any floating point number which has an exponent of
+	zero.  (11/14)
+
+sys/imio/iki/fxf/fxfhextn.x
+sys/imio/iki/stf/stfhextn.x
+	Added an initializer for local variable "old_kernel".  (11/15)
+
+sys/imio/iki/fxf/fxfksection.x
+	1. A warning message is now issued if one writes to a new file and
+	the "overwrite" flag is set in the kernel section.
+	2. When writing a new image to a file in new-copy mode, an extension
+	index is specified and overwrite is not set, append can be specified
+	to avoid an error trap (it is not clear why this does not apply to
+	case new-image as well).  (11/16)
+
+sys/imio/iki/fxf/fxfopen.x
+	Several minor changes to improve error handling for the overwrite and
+	append parameters in the ksection.  It is an error to try to overwrite
+	a nonexistent extension.  Overwrite and append cannot be given in the
+	same ksection.  If overwrite is explicitly given in the ksection to
+	overwrite a specific extension, this overrides any "append" option 
+	in the fkinit.  (11/17)
+
+sys/imio/iki/fxf/fxfopix.x
+	1. A loop copying IM_LEN to FIT_LENAXIS was replaced by an equivalent
+	call to AMOVI.
+	2. A temporary fix has been put in the fxf_byte_short routine to
+	create the temporary file in 'tmp' rather than in the working
+	directory (this should be replaced eventually by a runtime conversion
+	scheme which avoids writing any temporary files).  (11/17)
+
+sys/imio/iki/fxf/fxfopix.x
+	The BSCALE/BZERO handling was modified to correct any precision
+	errors resulting from formatted input (CTOD) when checking for the
+	usual case of BSCALE/BZERO being 1.0/0.0.  If the number is 1 or 0
+	to within the allowable precision the converted number is replaced
+	by the exact number to eliminate the conversion error.  Also, the
+	keywords are always preserved even if the scaling is unitary.  (11/17)
+
+sys/imio/iki/fxf/fxfupdhdr.x
+	1. The variable "group" was being used before its value was defined.
+	2. This routine uses a temporary file in some cases when changing the
+	size of the header.  "close(in_fd)" could be called in cases where
+	this temporary file was not used.
+	3. Added one conditional to fxf_header_diff() to return zero on 'diff'
+	when the file does not exist and we want to have a dataless header.
+	This also works when the want to append only a header.  (11/17)
+
+sys/imio/iki/fxf/zfiofxf.x
+	The fxf{zrd,zwr} routines were modified to avoid a case where the
+	number of bytes to read/write could be negative.  (11/17)
+
+pkg/images/imutil/src/imcopy.x		-
+pkg/images/imutil/src/mkpkg
+pkg/images/lib/imcopy.x
+	Two different versions of the file imcopy.x in the images package
+	were causing inconsistent behavior in the imcopy task.  The version
+	images$lib/ was updated and the version in images$imutil/src/ was
+	deleted. (11/18 LED)
+
+sys/imio/mkpkg
+sys/imio/imseti.x
+sys/imio/imsetr.x
+	IMIO has long had the odd structure for imset where imseti would
+	call imsetr to set integer valued parameters.  This worked, but it
+	is always a bad idea to involve the floating point unit in integer
+	computations, and we encountered a portability problem on one
+	platform in code that set a pointer value (SPP pointers are integers
+	but the value can be large enough to exceed the 24 bit integer
+	precision of a single precision real).  Imseti and imsetr were 
+	therefore broken out as two independent routines with integer or
+	real parameters set directly by one or the other.  For backwards
+	compatibility either can still be used however to set any IMIO
+	parameter, subject to the implied conversion.  (11/18)
+
+sys/imio/imstatr.x	+
+	IMIO had imstati and imstats (string) routines but no imstatr, even
+	though there there is a imsetr.  Added an imstatr.  (11/18)
+
+sys/imio/db/imgnfn.x
+sys/imfort/db/imgnfn.x
+	Modified the imgnfn code, which returns a list of named keywords
+	from the image header matching some pattern, to exclude lines in the
+	header user area which are not named keywords, i.e. not
+	keyword=value assignments.  This would include history and comment
+	lines, or blank lines, none of which are considered header keywords.
+	(11/18)
+
+sys/imio/db/mkpkg
+sys/imio/db/idbfstr.x		+
+	Added a new internal IMIO routine idb_filstr which filters an input
+	string to remove tabs, newlines, or unprintable control codes.  (11/21)
+
+sys/imio/db/impstr.x
+sys/imio/db/imputh.x
+	These routines were modified to use idb_filstr to filter the input
+	text before placing it in the image header.  In principle we should
+	not be doing this, but since most existing headers are subject to
+	FITS restrictions it is best to do so (also due to the way this code
+	writes the headers tabs could cause things to be misformatted).
+	(11/21)
+
+sys/imio/db/imaddf.x
+	The keyword name is filtered as above, also any embedded whitespace
+	is removed.  (11/21)
+
+sys/imio/iki/fxf/zfiofxf.x
+sys/imio/iki/fxf/fxfpak.x
+sys/imio/iki/fxf/fxfupk.x
+	1. The fxfzwr routine, used when the FITS kernel writes to a file,
+	would modify the input IMIO/FIO data buffer in some cases on some
+	platforms.  This could cause data corruption, or if you were lucky
+	an invalid operand exception.
+	2. fxfzrd was modifying the input argument boffset.
+	3. In fxfupk.x, fxf_altmd, which converts from int to double when
+	applying bscale/bzero, would fail for in-place operations (which
+	is how it is being called by the FK).
+
+	Some other minor changes.  We will modify this code further later
+	to eliminate the temp file used when accessing byte image or short
+	images with non-unitary bscale/bzero.  There may be some other
+	interim restrictions on updating byte images and so on.  (11/24)
+
+sys/libc/scanf.c
+	Increased SZ_NUMBUF from 25 to 256.  A number with a lot of leading
+	non-significant zeros (0.0000<etc>12345) could overflow an internal
+	temporary string buffer.  (12/07)
+
+pkg/cl/gram.c
+	1. In caseset() the first argument is a pointer value but it was
+	declared as an int.  Changed to memel.  This was causing switch/case
+	to fail on 64 bit platforms like the Alpha.
+	2. There was also an apparent bug in the case of a string case
+	which could prevent use of character constants as cases.  (12/07)
+
+pkg/cl/mem.h
+pkg/cl/stack.c
+	The stack utility functions push/pop/ppush are used to push and pop
+	operands from from the control stack, which is an array of memel
+	(generic integer type memory elements, used to store values of
+	various actual types).  "push" is used in a generic way in the CL to
+	push both types of values, but this could cause portability problems
+	on machines where e.g. int and pointer are not the same size.
+	Rather than try to remember to always cast things properly when
+	calling push, the functions were changed to pushmem/ppushmem/popmem,
+	explicit type memel, and push/ppush/pop were changed to macros that
+	automatically coerce arguments of any type to memel.  Hence common
+	usages such as "push(0)" and "push(stkop(v))" are still acceptable
+	and should now be portable.  (12/07)
+
+pkg/cl/gram.c
+	Changed a sscanf call in the code which parses a sexagesimal number
+	to operate in double instead of float.  This fixes a problem where
+	a statement such as "=1:12:34.567" would lose precision.  (12/08)
+
+math/llsq/gen.f
+	This file produced compiler warning about unitialized variables,
+	and indeed some branches of an assigned goto (sorry) were using
+	unitialized variables.  It seemed apparent what the author intended,
+	so the variable initializers were moved to above the assigned goto.
+	(12/10)
+
+sys/imio/iki/fxf/fxfksection.x
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfrfits.x
+	Some missing sfree() calls were added.  (12/10)
+
+sys/qpoe/qpio.h
+	Fixed a typo in a definition of "defyblock".  (12/10)
+
+sys/mwcs/mkpkg
+sys/mwcs/wfinit.x
+sys/mwcs/wftnx.x		+
+sys/mwcs/wfzpx.x		+
+sys/mwcs/wfgsurfit.x		+
+	Added two new, experimental WCS function drives for TNX (tangent plane
+	plus polynomials) and ZPX (zenithal radial polynomials).  These are
+	used for optically distorted astrometric applications, e.g. the NOAO
+	Mosaic wide field camera.  (12/10,12)
+
+pkg/images/immatch/doc/geomap.hlp
+	Added a entry for the verbose parameter to the geomap help page.
+	(12/11 LED)
+
+pkg/images/imgeom/doc/imtrans.hlp
+pkg/images/imgeom/doc/rotate.hlp
+	Improved the discussion of 90, 180, and 270 degree rotations in the
+	imtranpose and rotate task help pages.
+	(12/11 LED)
+
+pkg/math/gsurfit/gsfree.gx
+pkg/math/gsurfit/gsfreer.x
+pkg/math/gsurfit/gsfreed.x
+	Fixed a typo in the gsurfit package cleanup routine.
+	(12/11 LED)
+
+pkg/images/imutil/src/t_imreplace.x
+pkg/images/imutil/src/imrep.gx
+pkg/images/imutil/imreplace.par
+pkg/images/imutil/doc/imreplace.hlp
+	Added a radius parameter to also replace any pixels within a
+	specified distance of pixels within the replacement window.
+	(12/11 FV)
+
+dev/hosts
+	Added mars to hosts file for all server (12/12 MJF)
+
+sys/imio/iki/oifwrhdr.x
+	Fixed a typo, IM_V1HDRLEN(im) -> IM_V1HDRLEN(v1).  (12/12)
+
+unix/shlib/mkshlib.ssol-sc34
+	The shared library build would fail on Solaris if /opt/SUNWspro was
+	a link rather than a directory, due to "find" not following the link
+	in a file existence test.  (12/13)
+
+unix/hlib/irafuser.csh
+	The variable OSRELEASE was changed to be insensitive to micro-
+	releases.  For example, releases 2.5 and 2.5.1 would both be
+	considered to be "2.5".  The effect of this change is that shared
+	libraries will, by default, only be generated to the minor release
+	level (generating a shared image on a Solaris 2.5.1 or 2.6.1 system
+	will result in a S11_2.5.e or S11_2.6.e being generated).  (12/13)
+
+unix/os/zzstrt.c
+	The shared library mapping code was changed to add a check for minor
+	release shared images when searching for the shared image by OS
+	release.  For example, for an IRAF version 11 shared image on a
+	Solaris 2.5.1 system, the search order will be "S11_2.5.1.e",
+	"S11_2.5.e", and "S11.e".  With the related change above only the
+	"S11_2.5.e" shared image would be generated for a 2.5 system, but
+	one could manually install separate 2.5 and 2.5.1 shared images if
+	desired and the distributed linked images would automatically use
+	the microrelease version.  (12/13)
+
+	NOTE: Solaris IRAF is now being relinked using Solaris 2.6 instead
+	of 2.5.1.  The Solaris 2.5 shared image, of course, is still being
+	linked on a 2.5.1 system.  So far as we know there shouldn't be any
+	problem running Solaris executables on any version of Solaris so
+	long as the correct shared image is available.
+
+sys/imio/iki/iki.h
+sys/imio/iki/ikiopen.x
+sys/imio/iki/ikiaccess.x
+sys/imio/iki/ikiparse.x
+sys/imio/iki/ikirename.x
+sys/imio/iki/ikidelete.x
+sys/imio/iki/ikicopy.x
+	The iki_access routine was changed to query all image kernels to see
+	if they recognize a given image, and return ERR in this case.  This
+	happens when there are multiple images with the same root name but
+	with different image types, and the image was referred to
+	ambiguously (e.g. a directory contains "pix.imh" and "pix.fits" and
+	the image name is given as "pix").
+
+	The IKI copy, delete, and rename operations will abort with an
+	"ambiguous image name" error if this situation occurs.  The iki_open
+	routine (immap) will invoke the ambiguous image error when opening
+	an existing image and multiple images with the given name exist,
+	however it will allow multiple images to be created or existing
+	images to be clobbered (clobber control is implemented at the image
+	kernel level).
+
+	A kludge had to be added to iki_parse to provide special treatment
+	for the standard testimage dev$pix.  Otherwise an ambiguous image
+	error would result due to having dev$pix.imh and dev$pix.hhh in the
+	same directory, both matching "dev$pix".  pix.hhh is not a real
+	image, merely a template used to construct new STF images, but it is
+	used in existing applications code (STSDAS) hence could not easily
+	be renamed.  (12/13-14)
+
+sys/imio/iki/oif/oifaccess.x
+	To implement the above it was necessary to drop support for
+	imagefiles with no extension from the OIF kernel.  It is time we got
+	rid of this feature anyway.  There probably aren't any existing OIF
+	images that don't have an extension, but if there are they can be
+	renamed and still be read.  (12/14)
+
+sys/imio/imaccess.x
+	The imaccess routine in IMIO will return YES if a single image
+	exists with the given name, NO if no image exists with the given
+	name, and will take an SYS_IKIAMBIG error exit (ambiguous image
+	name) if multiple images exist with the same name.  I considered
+	having imaccess return ERR in the case of multiple images, but this
+	would have been an interface change, e.g. imaccess==YES could fail
+	even if the named image existed.  An error handler can still be used
+	to detect this situation.  (12/14)
+
+sys/libc/cimaccess.c
+	The LIBC routine c_imaccess (and the CL imaccess function) will return
+	ERR rather than abort, if the ambiguous image error occurs.  (12/14)
+
+lib/syserr.h
+lib/syserrmsg
+	Added the SYS_IKIAMBIG (ambiguous image name) error event.  (12/14)
+
+sys/NAMES
+sys/INDEX               +
+	Installed an updated version of the old forgotten INDEX file and
+	added a new file NAMES.  INDEX provides an index of all system
+	library procedures.  NAMES provides the mapping between long source
+	file names and 6-character library names.  NAMES can be used to
+	check for system library name collisions with applications procedure
+	names.  (12/14)
+
+pkg/images/immatch/src/linmatch/rglscale.x
+	Fixed a floating point operand error that could occur if the
+	scaling algorithm was one of "mean", "median", or "mode", 
+	and one or more of the reference image regions had a zero valued
+	mean, median, or mode. The error was in the bscale and bzero error
+	computation. (12/15)
+
+dev/graphcap
+	A few dozen lines at the end of the graphcap file somehow got
+	replaced with NULs; the size of the file did not change so it looks
+	like some sort of bizarre system problem.  Replaced the file with
+	an earlier version after a diff/merge to verify that the bulk of 
+	the file had not changed.  Propagated to Lyra and Vega for platform
+	upgrade testing.  (12/16)
+
+pkg/images/lib/skywcs.h
+pkg/images/lib/geomap.h
+pkg/images/lib/geofit.gx
+pkg/images/lib/geofit.x
+pkg/images/lib/rgccwcs.x
+pkg/images/imcoords/ccfind.par
+pkg/images/imcoords/ccmap.par
+pkg/images/imcoords/ccsetwcs.par
+pkg/images/imcoords/cctran.par
+pkg/images/imcoords/ccxymatch.par
+pkg/images/imcoords/src/t_ccfind.x
+pkg/images/imcoords/src/t_ccmap.x
+pkg/images/imcoords/src/t_ccsetwcs.x
+pkg/images/imcoords/src/t_ccxymatch.x
+pkg/images/imcoords/src/t_ccfunc.x
+pkg/images/imcoords/src/ccfunc.x
+pkg/images/imcoords/src/ccxytran.x
+pkg/images/imcoords/doc/ccfind.hlp
+pkg/images/imcoords/doc/ccmap.hlp
+pkg/images/imcoords/doc/ccsetwcs.hlp
+pkg/images/imcoords/doc/cctran.hlp
+pkg/images/imcoords/doc/ccxymatch.hlp
+	Modified the astrometry routines to support the experimental function
+	drivers tnx and zpx as well as the other new function drivers.
+	(12/15 LED)
+
+pkg/images/immatch/src/linmatch/lsqfit.h
+pkg/images/immatch/src/linmatch/rglscale.x
+pkg/images/immatch/src/linmatch/rgliscale.x
+pkg/images/immatch/src/linmatch/rglsqfit.x
+pkg/images/immatch/src/linmatch/rglplot.x
+	Fixed several bugs in the linmatch bad regions handling code that
+	could result in floating point errors in the fit and other problems
+	if the reference image regions shifted to the input image coordinate
+	system were entirely or partially off the input image. Modified
+	the graphics routines to window the fits more appropropriately in
+	the case where the majority of the input data is bad for one reason
+	or another (12/19 LED).
+
+doc/newsfile
+doc/v211revs.hlp		+
+	Added the V2.11 revisions summary to the newsfile ("news" command in
+	IRAF) and to the DOC archive.  (12/22)
+
+sys/fmtio/evvexpr.gy
+	In the xvv_quest code (the "?" conditional-expression operator) the
+	local variable nelem was not being initialized in certain
+	circumstances.  (12/23)
+
+---------------------------------
+V2.11.1 patch released.  (12/23)

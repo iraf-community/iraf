@@ -57,7 +57,7 @@ begin
 	    w1 = log10 (w1)
 	}
 
-         call smwopn (mw2, smw, 0)
+         call smw_open (mw2, smw, 0)
          do i = 1, SMW_NSPEC(smw) {
 	    ap = Memi[SMW_APS(smw)+i-1]
 	    beam = Memi[SMW_BEAMS(smw)+i-1]

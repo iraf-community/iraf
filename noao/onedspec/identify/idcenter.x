@@ -17,10 +17,14 @@ real	center1d()
 double	smw_c1trand()
 
 begin
+	if (IS_INDEFD(x))
+	    return (INDEFD)
+
 	np1 = NP1(ID_SH(id)) - 1
 	value = smw_c1trand (ID_PL(id), x) - np1
  	value = center1d (value, IMDATA(id,1), ID_NPTS(id),
 	    width, type, ID_CRADIUS(id), ID_THRESHOLD(id))
+
 	if (IS_INDEF(value))
 	    return (INDEFD)
 	else

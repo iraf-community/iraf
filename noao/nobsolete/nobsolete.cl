@@ -2,6 +2,7 @@
 
 package nobsolete
 
-= "no tasks currently defined in nobsolete"
+# Compiled tasks.
+task	badpiximage	= "nobsolete$x_nobsolete.e"
 
 clbye

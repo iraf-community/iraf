@@ -2,7 +2,9 @@
 
 package astutil
 
+# Compiled tasks.
 task	airmass,
+	astcalc,
 	asthedit,
 	precess,
 	galactic,
@@ -14,7 +16,10 @@ task	airmass,
 	setjd,
 	ccdtime		= "astutil$x_astutil.e"
 
-# PSET Tasks
+# Script tasks.
+task	astradius	= "astutil$astradius.cl"
+
+# PSET tasks.
 task    keywpars        = "astutil$keywpars.par"
 
 clbye

@@ -19,8 +19,8 @@ define	WRITE_IN_PROGRESS	2
 
 # File descriptor structure (dynamically allocated part)
 
-define	SZ_FFNAME	127
-define	LEN_FIODES	(20+LEN_CHANDES+128)
+define	SZ_FFNAME	255
+define	LEN_FIODES	(20+LEN_CHANDES+256)
 
 define	FCHAN		Memi[$1]		# os channnel
 define	FMODE		Memi[$1+1]		# mode of access
@@ -49,7 +49,7 @@ define	FNAME		Memc[P2C($1+20+LEN_CHANDES)]	# filename
 # (device parameter) fields are reserved for use with special devices and
 # are not used by FIO.
 
-define	LEN_CHANDES	(10+128)
+define	LEN_CHANDES	(10+256)
 define	FREFCNT		Memi[FCD($1)]		# chan reference count
 define	FCIOMODE	Memi[FCD($1)+1]		# chan i/o mode
 define	FCLOSEFD	Memi[FCD($1)+2]		# close chan when inactive
@@ -118,13 +118,13 @@ define	SET_PROTECTION		1
 define	QUERY_PROTECTION	2
 
 define	STRING_FILE	(-1)		# open a string as a file
-define	SZ_SPOOLBUF	1024		# def. initial size of a spool buffer
+define	SZ_SPOOLBUF	4096		# def. initial size of a spool buffer
 
 
 # Filename Mapping definitions.
 
-define	SZ_VFNFN	32		# max no. chars in a VFN filename
-define	SZ_OSDIR	79		# max chars in V_OSDIR field
+define	SZ_VFNFN	127		# max size ROOT or EXTN in VFN
+define	SZ_OSDIR	255		# max chars in V_OSDIR field
 
 define	VFN_READ	1		# VFN access modes for VFNOPEN
 define	VFN_WRITE	2

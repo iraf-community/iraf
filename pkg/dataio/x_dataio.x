@@ -12,4 +12,6 @@ task	rcardimage = t_rcardimage,
 	   reblock = t_reblock,
 	     rfits = t_rfits,
 	     wfits = t_wfits,
-	       t2d = t_t2d
+	       t2d = t_t2d,
+            import = t_import,
+            export = t_export

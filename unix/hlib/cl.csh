@@ -3,7 +3,10 @@
 # architecture or floating point hardware appropriate for the current
 # machine.
 
-#set	echo
+# Determine IRAF root directory (value set in install script).
+if ($?iraf == 0) then
+    setenv iraf "/iraf/iraf/"
+endif
 
 # Determine platform architecture.
 if ($?IRAFARCH) then
@@ -11,20 +14,28 @@ if ($?IRAFARCH) then
 	set MACH = $IRAFARCH
     endif
 endif
+
 if (! $?MACH) then
-    if (-e $iraf/bin.linux/cl.e) then
+    if (-f /etc/redhat-release) then
+	set mach = redhat
+    else
+	set mach = `uname -s | tr '[A-Z]' '[a-z]'`
+    endif
+
+    if (-e $iraf/bin.$mach/cl.e) then
+	set MACH = $mach
+    else if (-e $iraf/bin.freebsd/cl.e) then
+	set MACH = freebsd
+    else if (-e $iraf/bin.linux/cl.e) then
 	set MACH = linux
+    else if (-e $iraf/bin.redhat/cl.e) then
+	set MACH = redhat
     else if (-e $iraf/bin.linuz/cl.e) then
 	set MACH = linuz
     else
 	echo "cannot find $iraf/bin.xxx/cl.e!"
 	exit 1
     endif
-endif
-
-# Determine IRAF root directory (value set in install script).
-if ($?iraf == 0) then
-    setenv iraf "/iraf/iraf/"
 endif
 
 # Check for obsolete IRAFBIN definition.
@@ -51,8 +62,12 @@ if ($?IRAFARCH) then
 endif
 
 # Determine the architecture to be used.
-if ("$MACH" == "linux") then
+if ("$MACH" == "freebsd") then
+    setenv IRAFARCH "freebsd"
+else if ("$MACH" == "linux") then
     setenv IRAFARCH "linux"
+else if ("$MACH" == "redhat") then
+    setenv IRAFARCH "redhat"
 else if ("$MACH" == "linuz") then
     setenv IRAFARCH "linuz"
 else if ("$MACH" == "ssol") then

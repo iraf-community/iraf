@@ -77,26 +77,54 @@ end
 
 procedure xt_mkimtemp (input, output, original, sz_fname)
 
-char	input[ARB]			# Input image
-char	output[ARB]			# Output image to use
-char	original[ARB]			# Root of original output image
-int	sz_fname			# Maximum size of image names
+char	input[ARB]			#I Input image
+char	output[ARB]			#U Output image to use
+char	original[ARB]			#O Root of original output image
+int	sz_fname			#I Maximum size of image names
 
-char	root_in[SZ_FNAME]		# Root of input image
-bool	streq()
+pointer	sp, inname, outname, extn
+int	i, j, k, gstrmatch(), strncmp() 
+bool	xt_imnameeq()
 
 begin
+	call smark (sp)
+	call salloc (inname, SZ_FNAME, TY_CHAR)
+	call salloc (outname, SZ_FNAME, TY_CHAR)
+	call salloc (extn, SZ_FNAME, TY_CHAR)
+
+	# Strip image sections leaving only the path and root image name
+	# (with group and image kernel parameters).  To change to
+	# remove group and image kernel stuff use imgcluster instead of
+	# imgimage.
+
+	call imgimage (input, Memc[inname], SZ_FNAME)
+	if (gstrmatch (input, Memc[inname], i, k) > 0)
+	    call strcpy (input, Memc[inname], k)
+
+	call imgimage (output, Memc[outname], SZ_FNAME)
+	if (gstrmatch (output, Memc[outname], j, k) > 0)
+	    call strcpy (output, Memc[outname], k)
+
+	call strcpy (Memc[outname], output, sz_fname)
+	call strcpy (Memc[outname], original, sz_fname)
+
 	# Check if the input and output images are the same.
-	# If they are return a temporary image name.  If not
-	# return the root of the output image.
+	# First check if the path names are the same and then if
+	# the image names are the same.  If they are return a temporary
+	# image name with the same extension as the output image.
 
-	call get_root (input, root_in, SZ_FNAME)
-	call get_root (output, original, SZ_FNAME)
+	if (i == j && strncmp (Memc[inname], Memc[outname], i-1) == 0) {
+	    if (xt_imnameeq (Memc[inname], Memc[outname])) {
+		call mktemp ("tmp", output, sz_fname)
+		call fnextn (original, Memc[extn], SZ_FNAME)
+		if (Memc[extn] != EOS) {
+		    call strcat (".", output, sz_fname)
+		    call strcat (Memc[extn], output, sz_fname)
+		}
+	    }
+	}
 
-	if (streq (root_in, original))
-	    call mktemp ("tmp", output, sz_fname)
-	else
-	    call strcpy (original, output, sz_fname)
+	call sfree (sp)
 end
 
 
@@ -113,7 +141,8 @@ begin
 	# replace the original output image with the new image.
 
 	if (strne (output, original)) {
-	    call imdelete (original)
+	    iferr (call imdelete (original))
+		;
 	    call imrename (output, original)
 	}
 end

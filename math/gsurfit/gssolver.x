@@ -1,7 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include <math/gsurfit.h>
-
 include "gsurfitdef.h"
 
 # GSSOLVE -- Solve the matrix normal equations of the form ca = b for a,

@@ -132,7 +132,7 @@ KI_SEND(){}
 KI_RECEIVE(){}
 #endif
 
-#ifdef SUNOS4
+#ifdef SUNOS
 /* Stub out the following too, since there is no floating point in the HSI. */
 ieee_flags(){}
 ieee_handler(){}

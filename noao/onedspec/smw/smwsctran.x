@@ -17,7 +17,7 @@ char	system2[ARB]	#I Output coordinate system
 int	axbits		#I Bitmap defining axes to be transformed
 pointer	ct		#O SMW CT pointer
 
-int	i, cttype, nct, strdic()
+int	i, cttype, nct, axes[3], naxes, strdic()
 pointer	mw_sctran()
 errchk	mw_sctran
 
@@ -34,6 +34,15 @@ begin
 	SMW_SMW(ct) = smw
 	SMW_CTTYPE(ct) = cttype
 	SMW_NCT(ct) = nct
+
+	# Determine dispersion and aperture axes.
+	call mw_gaxlist (SMW_MW(smw,0), axbits, axes, naxes)
+	do i = 1, naxes {
+	    if (axes[i] == SMW_PAXIS(smw,1))
+		SMW_DAXIS(ct) = i
+	    if (axes[i] == SMW_PAXIS(smw,2))
+		SMW_AAXIS(ct) = i
+	}
 
 	# If the MWCS is not split use the MWCS transformation directly.
 	if (nct == 1) {

@@ -57,7 +57,12 @@ also set in the image header.
 The image header keyword DISPAXIS must be present with a value of 1 for
 dispersion parallel to the lines (varying with the column coordinate) or 2
 for dispersion parallel to the columns (varying with line coordinate).
-This parameter may be added using \fBhedit\fR.
+This parameter may be added using \fBhedit\fR.  Note that if the image has
+been transposed (\fBimtranspose\fR) the dispersion axis should still refer
+to the original dispersion axis unless the physical world coordinate system
+is first reset (see \fBwcsreset\R).  This is done in order to allow images
+which have DISPAXIS defined prior to transposing to still work correctly
+without requiring this keyword to be changed.
 .ih
 EXAMPLES
 1. A set of dispersion corrected images is extinction corrected in-place as

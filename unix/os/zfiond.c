@@ -32,7 +32,7 @@
  * "filename" and file access mode arguments.  The syntax for the filename
  * argument is as follows:
  *
- *	<domain> : <address>
+ *	<domain> : <address> [ : <flag ] [ : flag...]
  *
  * where <domain> is one of "inet" (internet tcp/ip socket), "unix" (unix
  * domain socket) or "fifo" (named pipe).  The form of the address depends
@@ -63,6 +63,11 @@
  * The address field may contain up to two "%d" fields.  If present, the
  * user's UID will be substituted (e.g. "unix:/tmp/.IMT%d").
  *
+ * The only protocol flags currently supported are "text" and "binary".
+ * If "text" is specified the datastream is assumed to consist only of byte
+ * packed ascii text and is automatically converted by the driver to and
+ * from SPP chars during i/o.  The default is binary i/o (no conversions).
+ *
  * Client connections normally use mode READ_WRITE, although READ_ONLY and
  * WRITE_ONLY are permitted.  APPEND is the same as WRITE_ONLY.  A server
  * connection is indicated by the mode NEW_FILE.  The endpoints of the server
@@ -84,6 +89,7 @@
  */
 
 #define	SZ_NAME		256
+#define	SZ_OBUF		4096
 #define	MAXCONN		5
 #define	MAXSEL		32
 
@@ -94,6 +100,7 @@
 #define	F_SERVER	00001
 #define	F_DEL1		00002
 #define	F_DEL2		00004
+#define	F_TEXT		00010
 
 /* Network portal descriptor. */
 struct portal {
@@ -126,6 +133,8 @@ XINT	*chan;			/* file number (output) */
 	unsigned short host_port;
 	unsigned long host_addr;
 	char osfn[SZ_NAME*2];
+	char flag[SZ_NAME];
+	char *ip;
 
 	/* Get network device descriptor. */
 	if (!(np = (struct portal *) calloc (1, sizeof(struct portal)))) {
@@ -147,7 +156,6 @@ XINT	*chan;			/* file number (output) */
 	    unsigned short port;
 	    struct servent *sv;
 	    struct hostent *hp;
-	    char *ip;
 
 	    /* Get port number.  This may be specified either as a service
 	     * name or as a decimal port number.
@@ -183,7 +191,7 @@ XINT	*chan;			/* file number (output) */
 	} else if (strncmp (osfn, "unix:", 5) == 0) {
 	    /* Unix domain socket connection.
 	     */
-	    char *ip = osfn + 5;
+	    ip = osfn + 5;
 	    if (!getstr (&ip, np->path1, SZ_NAME))
 		goto err;
 	    np->domain = UNIX;
@@ -191,7 +199,7 @@ XINT	*chan;			/* file number (output) */
 	} else if (strncmp (osfn, "fifo:", 5) == 0) {
 	    /* FIFO (named pipe) connection.
 	     */
-	    char *ip = osfn + 5;
+	    ip = osfn + 5;
 	    if (*mode == NEW_FILE) {
 		/* Server. */
 		if (!getstr (&ip, np->path2, SZ_NAME))
@@ -210,6 +218,19 @@ XINT	*chan;			/* file number (output) */
 	} else
 	    goto err;
 
+	/* Process any optional protocol flags.
+	 */
+	while (getstr (&ip, flag, SZ_NAME) > 0) {
+	    /* Get content type (text or binary).  If the stream will be used
+	     * only for byte-packed character data the content type can be
+	     * specified as "text" and data will be automatically packed and
+	     * unpacked during i/o.
+	     */
+	    if (strcmp (flag, "text") == 0)
+		np->flags |= F_TEXT;
+	    if (strcmp (flag, "binary") == 0)
+		np->flags &= ~F_TEXT;
+	}
 
 	/* Open the network connection.
 	 */
@@ -518,10 +539,16 @@ XCHAR	*buf;			/* output buffer */
 XINT	*maxbytes;		/* max bytes to read */
 XLONG	*offset;		/* 1-indexed file offset to read at */
 {
-	register int fd = *chan;
-	register struct	fiodes *kfp = &zfd[fd];
+	register int n;
+	int fd = *chan;
+	struct fiodes *kfp = &zfd[fd];
 	register struct portal *np = get_desc (fd);
-	int n;
+	register char *ip;
+	register XCHAR *op;
+	int nbytes, maxread;
+
+	/* Determine maximum amount of data to be read. */
+	maxread = (np->flags & F_TEXT) ? *maxbytes/sizeof(XCHAR) : *maxbytes;
 
 	/* The following call to select shouldn't be necessary, but it
 	 * appears that, due to the way we open a FIFO with O_NDELAY, read
@@ -530,7 +557,7 @@ XLONG	*offset;		/* 1-indexed file offset to read at */
 	 * restore blocking i/o after the open.
 	 */
 	if (np->domain == FIFO && np->datain < MAXSEL) {
-#ifdef SOLARIS
+#ifdef POSIX
 	    fd_set readfds;
 	    FD_ZERO (&readfds);
 	    FD_SET (np->datain, &readfds);
@@ -538,11 +565,19 @@ XLONG	*offset;		/* 1-indexed file offset to read at */
 	    int readfds = (1 << np->datain);
 #endif
 	    select (MAXSEL, &readfds, NULL, NULL, NULL);
-	    n = read (np->datain, (char *)buf, *maxbytes);
+	    nbytes = read (np->datain, (char *)buf, maxread);
 	} else
-	    n = read (np->datain, (char *)buf, *maxbytes);
+	    nbytes = read (np->datain, (char *)buf, maxread);
 
-	kfp->nbytes = n;
+	if ((n = nbytes) && (np->flags & F_TEXT)) {
+	    op = (XCHAR *) buf;
+	    op[n] = XEOS;
+	    for (ip = (char *)buf;  --n >= 0;  )
+		op[n] = ip[n];
+	    nbytes *= 2;
+	}
+
+	kfp->nbytes = nbytes;
 }
 
 
@@ -560,14 +595,26 @@ XLONG	*offset;		/* 1-indexed file offset */
 	register struct	fiodes *kfp = &zfd[fd];
 	register struct portal *np = get_desc (fd);
 	int nwritten, maxbytes, n;
-	char *ip = (char *)buf;
+	char *text, *ip = (char *)buf;
+	char obuf[SZ_OBUF];
 
-	maxbytes = (np->domain == FIFO) ? 4096 : 0;
+	maxbytes = (np->domain == FIFO || (np->flags & F_TEXT)) ? SZ_OBUF : 0;
 	for (nwritten=0;  nwritten < *nbytes;  nwritten += n, ip+=n) {
 	    n = *nbytes - nwritten;
 	    if (maxbytes)
 		n = min (maxbytes, n);
-	    if ((n = write (np->dataout, ip, n)) < 0)
+
+	    if (np->flags & F_TEXT) {
+		register XCHAR *ipp = (XCHAR *)ip;
+		register char *op = (char *)obuf;
+		register int nbytes = n;
+		while (--nbytes >= 0)
+		    *op++ = *ipp++;
+		text = obuf;
+	    } else
+		text = ip;
+
+	    if ((n = write (np->dataout, text, n)) < 0)
 		break;
 	}
 

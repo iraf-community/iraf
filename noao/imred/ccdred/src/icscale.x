@@ -24,7 +24,7 @@ int	i, j, k, l, nout
 real	mode, median, mean, exposure, zmean, darktime, dark
 pointer	sp, ncombine, exptime, modes, medians, means
 pointer	section, str, sname, zname, wname, imref
-bool	domode, domedian, domean, dozero, snorm, znorm
+bool	domode, domedian, domean, dozero, snorm, znorm, wflag
 
 bool	clgetb()
 int	hdmgeti(), strdic(), ic_gscale()
@@ -168,6 +168,7 @@ begin
 	# Convert to relative factors if needed.
 	snorm = (stype == S_FILE || stype == S_KEYWORD)
 	znorm = (ztype == S_FILE || ztype == S_KEYWORD)
+	wflag = (wtype == S_FILE || wtype == S_KEYWORD)
 	if (snorm)
 	    call arcpr (1., scales, scales, nimages)
 	else {
@@ -186,7 +187,7 @@ begin
 			wts[j] = Memi[ncombine+j-1]
 		    break
 		}
-		if (ztype == S_NONE)
+		if (ztype == S_NONE || znorm || wflag)
 	            wts[i] = Memi[ncombine+i-1] * wts[i]
 		else {
 		    if (zeros[i] <= 0.) {
@@ -255,21 +256,27 @@ begin
 	call hdmputi (out[1], "ncombine", nout)
 	exposure = 0.
 	darktime = 0.
+	mean = 0.
 	do i = 1, nimages {
 	    exposure = exposure + wts[i] * Memr[exptime+i-1] / scales[i]
 	    ifnoerr (dark = hdmgetr (in[i], "darktime"))
 		darktime = darktime + wts[i] * dark / scales[i]
 	    else
 		darktime = darktime + wts[i] * Memr[exptime+i-1] / scales[i]
+	    ifnoerr (mode = hdmgetr (in[i], "ccdmean"))
+		mean = mean + wts[i] * mode / scales[i]
 	}
 	call hdmputr (out[1], "exptime", exposure)
 	call hdmputr (out[1], "darktime", darktime)
+	ifnoerr (mode = hdmgetr (out[1], "ccdmean")) {
+	    call hdmputr (out[1], "ccdmean", mean)
+	    iferr (call imdelf (out[1], "ccdmeant"))
+		;
+	}
 	if (out[2] != NULL) {
 	    call imstats (out[2], IM_IMAGENAME, Memc[str], SZ_FNAME)
 	    call imastr (out[1], "BPM", Memc[str])
 	}
-	ifnoerr (mode = hdmgetr (out[1], "CCDMEAN"))
-	    call imdelf (out[1], "CCDMEAN")
 
 	# Start the log here since much of the info is only available here.
 	if (clgetb ("verbose")) {

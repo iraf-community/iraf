@@ -8,6 +8,10 @@ include	<math/gsurfit.h>
 include	<math/nlfit.h>
 include	"imexam.h"
 
+define	FITTYPES	"|gaussian|moffat|"
+define	FITGAUSS	1
+define	FITMOFFAT	2
+
 
 # IE_RIMEXAM -- Radial profile plot and photometry parameters.
 # If no GIO pointer is given then only the photometry parameters are printed.
@@ -24,26 +28,30 @@ int	mode
 real	x, y
 
 bool	center, background, medsky, fitplot, clgpsetb()
-real	radius, buffer, width, magzero, rplot, clgpsetr()
-int	xorder, yorder, clgpseti()
+real	radius, buffer, width, magzero, rplot, beta, clgpsetr()
+int	nit, fittype, xorder, yorder, clgpseti(), strdic()
 
-int	i, j, ns, no, np, nx, ny, npts, x1, x2, y1, y2, plist[2]
-real	median, xcntr, ycntr, mag, e, pa, zcntr, fwhm, wxcntr, wycntr
-real	params[2], dparams[2]
-pointer	sp, title, coords, im, data, pp, ws, xs, ys, zs, gs, ptr, nl
+int	i, j, ns, no, np, nx, ny, npts, x1, x2, y1, y2
+int	coordlen, plist[3], nplist, strlen()
+real	bkg, xcntr, ycntr, mag, e, pa, zcntr, wxcntr, wycntr
+real	params[3]
+real	fwhm, dbkg, dfwhm, gfwhm, efwhm
+pointer	sp, fittypes, title, coords, im, data, pp, ws, xs, ys, zs, gs, ptr, nl
 double	sumo, sums, sumxx, sumyy, sumxy
 real	r, r1, r2, r3, dx, dy, gseval(), amedr()
 pointer	clopset(), ie_gimage(), ie_gdata(), locpr()
-extern	ie_gauss(), ie_dgauss()
-errchk	nlinit, nlfit
-
-data	plist/1,2/
-string	label "#\
-   COL    LINE    RMAG     FLUX      SKY   N  RMOM ELLIP    PA     PEAK  FWHM\n"
+extern	ie_gauss(), ie_dgauss(), ie_moffat(), ie_dmoffat()
+errchk	stf_measure, nlinit, nlfit
 
 begin
+	call smark (sp)
+	call salloc (fittypes, SZ_FNAME, TY_CHAR)
+	call salloc (title, IE_SZTITLE, TY_CHAR)
+	call salloc (coords, IE_SZTITLE, TY_CHAR)
+
 	iferr (im = ie_gimage (ie, NO)) {
 	    call erract (EA_WARN)
+	    call sfree (sp)
 	    return
 	}
 
@@ -57,19 +65,25 @@ begin
 	center = clgpsetb (pp, "center")
 	background = clgpsetb (pp, "background")
 	radius = clgpsetr (pp, "radius")
-	if (background) {
-	    buffer = clgpsetr (pp, "buffer")
-	    width = clgpsetr (pp, "width")
-	    xorder = clgpseti (pp, "xorder")
-	    yorder = clgpseti (pp, "yorder")
-	    medsky = (xorder <= 0 || yorder <= 0)
-	} else {
-	    buffer = 0.
-	    width = 0.
-	}
+	buffer = clgpsetr (pp, "buffer")
+	width = clgpsetr (pp, "width")
+	xorder = clgpseti (pp, "xorder")
+	yorder = clgpseti (pp, "yorder")
+	medsky = (xorder <= 0 || yorder <= 0)
+	nit = clgpseti (pp, "iterations")
+
 	magzero = clgpsetr (pp, "magzero")
 	rplot = clgpsetr (pp, "rplot")
 	fitplot = clgpsetb (pp, "fitplot")
+	call clgpseta (pp, "fittype", Memc[fittypes], SZ_FNAME)
+	fittype = strdic (Memc[fittypes], Memc[fittypes], SZ_FNAME, FITTYPES)
+	if (fittype == 0) {
+	    call eprintf ("WARNING: Unknown profile fit type `%s'.\n")
+		call pargstr (Memc[fittypes])
+	    call sfree (sp)
+	    return
+	}
+	beta = clgpsetr (pp, "beta")
 
 	# If the initial center is INDEF then use the previous value.
 	if (gp != NULL) {
@@ -89,10 +103,23 @@ begin
 	if (center)
 	    iferr (call ie_center (im, radius, xcntr, ycntr)) {
 		call erract (EA_WARN)
+		call sfree (sp)
 		return
 	    }
 
+	# Do the enclosed flux and direct FWHM measurments using the
+	# PSFMEASURE routines.
+
+	call stf_measure (im, xcntr, ycntr, beta, 0.5, radius, nit, buffer,
+	    width, INDEF, NULL, NULL, dbkg, r, dfwhm, gfwhm, efwhm)
+	if (fittype == FITGAUSS)
+	    efwhm = gfwhm
+
 	# Get data including a buffer and background annulus.
+	if (!background) {
+	    buffer = 0.
+	    width = 0.
+	}
 	r = max (rplot, radius + buffer + width)
 	x1 = xcntr - r
 	x2 = xcntr + r
@@ -100,6 +127,7 @@ begin
 	y2 = ycntr + r
 	iferr (data = ie_gdata (im, x1, x2, y1, y2)) {
 	    call erract (EA_WARN)
+	    call sfree (sp)
 	    return
 	}
 
@@ -107,9 +135,6 @@ begin
 	ny = y2 - y1 + 1
 	npts = nx * ny
 
-	call smark (sp)
-	call salloc (title, IE_SZTITLE, TY_CHAR)
-	call salloc (coords, IE_SZTITLE, TY_CHAR)
 	call salloc (xs, npts, TY_REAL)
 	call salloc (ys, npts, TY_REAL)
 	call salloc (ws, npts, TY_REAL)
@@ -155,7 +180,7 @@ begin
 	    # the fitted background from within the object aperture. 
 
 	    if (medsky)
-		median = amedr (Memr[zs], ns)
+		bkg = amedr (Memr[zs], ns)
 	    else {
 		repeat {
 		    call gsinit (gs, GS_POLYNOMIAL, xorder, yorder, YES,
@@ -168,6 +193,7 @@ begin
 		    yorder = max (1, yorder - 1)
 		    call gsfree (gs)
 		}
+		bkg = gseval (gs, real(x1), real(y1))
 	    }
 
 	    do j = y1, y2 {
@@ -175,11 +201,14 @@ begin
 	        do i = x1, x2 {
 		    dx = i - xcntr
 		    r = sqrt (dx ** 2 + dy ** 2)
+		    r3 = max (0., min (5., 2 * r / dfwhm - 1.))
 
 		    if (medsky)
-			r2 = median
-		    else
+			r2 = bkg
+		    else {
 			r2 = gseval (gs, real(i), real(j))
+			bkg = min (bkg, r2)
+		    }
 		    r1 = Memr[ptr] - r2
 
 		    if (r <= radius) {
@@ -192,13 +221,13 @@ begin
 			if (r <= rplot) {
 			    Memr[xs+no] = r
 			    Memr[ys+no] = r1
-			    Memr[ws+no] = 1. / max (.1, r**2)
+			    Memr[ws+no] = exp (-r3**2) / max (.1, r**2)
 			    no = no + 1
 			} else {
 			    np = np + 1
 			    Memr[xs+npts-np] = r
 			    Memr[ys+npts-np] = r1
-			    Memr[ws+npts-np] = 1. / max (.1, r**2)
+			    Memr[ws+npts-np] = exp (-r3**2) / max (.1, r**2)
 			}
 		    } else if (r <= rplot) {
 		        np = np + 1
@@ -213,11 +242,13 @@ begin
 	        call gsfree (gs)
 
 	} else {		# No background subtraction
+	    bkg = 0.
 	    do j = y1, y2 {
 	        dy = j - ycntr
 	        do i = x1, x2 {
 		    dx = i - xcntr
 		    r = sqrt (dx ** 2 + dy ** 2)
+		    r3 = max (0., min (5., 2 * r / dfwhm - 1.))
 		    r1 = Memr[ptr]
 
 		    if (r <= radius) {
@@ -229,13 +260,13 @@ begin
 			if (r <= rplot) {
 			    Memr[xs+no] = r
 			    Memr[ys+no] = r1
-			    Memr[ws+no] = 1. / max (.1, r**2)
+			    Memr[ws+no] = exp (-r3**2) / max (.1, r**2)
 			    no = no + 1
 			} else {
 			    np = np + 1
 			    Memr[xs+npts-np] = r
 			    Memr[ys+npts-np] = r1
-			    Memr[ws+npts-np] = 1. / max (.1, r**2)
+			    Memr[ws+npts-np] = exp (-r3**2) / max (.1, r**2)
 			}
 		    } else if (r <= rplot) {
 		        np = np + 1
@@ -258,7 +289,68 @@ begin
 	    np = no + np
 	    
 
-	# Compute the photometry and gaussian fit parameters.
+	# Compute the photometry and profile fit parameters.
+
+	switch (fittype) {
+	case FITGAUSS:
+	    plist[1] = 1
+	    plist[2] = 2
+	    nplist = 2
+	    params[2] = dfwhm**2 / (8 * log(2.))
+	    params[1] = zcntr
+	    call nlinitr (nl, locpr (ie_gauss), locpr (ie_dgauss), 
+		params, params, 2, plist, nplist, .001, 100)
+	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, i)
+	    if (i == SINGULAR || i == NO_DEG_FREEDOM) {
+		call eprintf ("WARNING: Gaussian fit did not converge\n")
+		call tsleep (5)
+		zcntr = INDEF
+		fwhm = INDEF
+	    } else {
+		call nlpgetr (nl, params, i)
+		if (params[2] < 0.) {
+		    zcntr = INDEF
+		    fwhm = INDEF
+		} else {
+		    zcntr = params[1]
+		    fwhm = sqrt (8 * log (2.) * params[2])
+		}
+	    }
+	case FITMOFFAT:
+	    plist[1] = 1
+	    plist[2] = 2
+	    if (IS_INDEF(beta)) {
+		params[3] = -3.0
+		plist[3] = 3
+		nplist = 3
+	    } else {
+		params[3] = -beta
+		nplist = 2
+	    }
+	    params[2] = dfwhm / 2. / sqrt (2.**(-1./params[3]) - 1.)
+	    params[1] = zcntr
+	    call nlinitr (nl, locpr (ie_moffat), locpr (ie_dmoffat), 
+		params, params, 3, plist, nplist, .001, 100)
+	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, i)
+	    if (i == SINGULAR || i == NO_DEG_FREEDOM) {
+		call eprintf ("WARNING: Moffat fit did not converge\n")
+		call tsleep (5)
+		zcntr = INDEF
+		fwhm = INDEF
+		beta = INDEF
+	    } else {
+		call nlpgetr (nl, params, i)
+		if (params[2] < 0.) {
+		    zcntr = INDEF
+		    fwhm = INDEF
+		    beta = INDEF
+		} else {
+		    zcntr = params[1]
+		    beta = -params[3]
+		    fwhm = abs (params[2])*2.*sqrt (2.**(-1./params[3]) - 1.)
+		}
+	    }
+	}
 
 	mag = INDEF
 	r = INDEF
@@ -268,38 +360,23 @@ begin
 	    mag = magzero - 2.5 * log10 (sumo)
 	    r2 = sumxx + sumyy
 	    if (r2 > 0.) {
-	        r = 2 * sqrt (log (2.) * r2 / sumo)
+		switch (fittype) {
+		case FITGAUSS:
+		    r = 2 * sqrt (log (2.) * r2 / sumo)
+		case FITMOFFAT:
+		    if (beta > 2.)
+			r = 2 * sqrt ((beta-2.)*(2.**(1./beta)-1) * r2 / sumo)
+		}
 	        r1 =(sumxx-sumyy)**2+(2*sumxy)**2
 		if (r1 > 0.)
 		    e = sqrt (r1) / r2
 	        else
 		    e = 0.
 	    }
-	    pa = RADTODEG (0.5 * atan2 (2*sumxy, sumxx-sumyy))
-	}
-
-	params[1] = zcntr
-	if (IS_INDEFR(r))
-	    params[2] = 0.25 * radius
-	else
-	    params[2] = r**2 / (8 * log(2.))
-	call nlinitr (nl, locpr (ie_gauss), locpr (ie_dgauss), 
-	    params, dparams, 2, plist, 2, .001, 100)
-	call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, i)
-	if (i == SINGULAR || i == NO_DEG_FREEDOM) {
-	    call eprintf ("WARNING: Gaussian fit did not converge\n")
-	    call tsleep (5)
-	    zcntr = INDEF
-	    fwhm = INDEF
-	} else {
-	    call nlpgetr (nl, params, i)
-	    if (params[2] < 0.) {
-		zcntr = INDEF
-		fwhm = INDEF
-	    } else {
-		zcntr = params[1]
-		fwhm = sqrt (8 * log (2.) * params[2])
-	    }
+	    if (e < 0.01)
+		e = 0.
+	    else
+		pa = RADTODEG (0.5 * atan2 (2*sumxy, sumxx-sumyy))
 	}
 
 	call ie_mwctran (ie, xcntr, ycntr, wxcntr, wycntr)
@@ -341,54 +418,144 @@ begin
 		call gpline (gp, Memr[xs], Memr[ys], np)
 		call gseti (gp, G_PLTYPE, 1)
 	    }
-	}
+	    call gseti (gp, G_PLTYPE, 2)
 
-	if (IE_LASTKEY(ie) != 'a')
-	    call printf (label)
+	    call printf ("%6.2f %6.2f %7.4g %7.4g %7.4g %4.2f %4d")
+		call pargr (radius)
+	        call pargr (mag)
+	        call pargd (sumo)
+	        call pargd (sums / no)
+	        call pargr (zcntr)
+	        call pargr (e)
+	        call pargr (pa)
+	    switch (fittype) {
+	    case FITGAUSS:
+		call printf (" %4w %8.2f %8.2f %6.2f\n")
+		    call pargr (efwhm)
+		    call pargr (fwhm)
+		    call pargr (dfwhm)
+	    case FITMOFFAT:
+		call printf (" %4.2f %8.2f %8.2f %6.2f\n")
+		    call pargr (beta)
+		    call pargr (efwhm)
+		    call pargr (fwhm)
+		    call pargr (dfwhm)
+	    }
 
-	# Print the photometry values.
-	call printf (
-	    "%7.2f %7.2f %7.2f %8.1f %8.2f %3d %5.2f %5.3f %5.1f %8.2f %5.2f\n")
-	    call pargr (xcntr)
-	    call pargr (ycntr)
-	    call pargr (mag)
-	    call pargd (sumo)
-	    call pargd (sums / no)
-	    call pargi (no)
-	    call pargr (r)
-	    call pargr (e)
-	    call pargr (pa)
-	    call pargr (zcntr)
-	    call pargr (fwhm)
-	if (gp == NULL) {
-	    if (xcntr != wxcntr || ycntr != wycntr) {
-		call printf ("%s: %s\n")
-		    call pargstr (IE_WCSNAME(ie))
-		    call pargstr (Memc[coords])
+	} else {
+	    if (IE_LASTKEY(ie) != 'a') {
+		coordlen = max (11, strlen (Memc[coords]))
+		call printf ("# %5s %7s %-*s\n# %5s %6s %7s %7s %7s %4s %4s")
+		    call pargstr ("COL")
+		    call pargstr ("LINE")
+		    call pargi (coordlen)
+		    call pargstr ("COORDINATES")
+		    call pargstr ("R")
+		    call pargstr ("MAG")
+		    call pargstr ("FLUX")
+		    call pargstr ("SKY")
+		    call pargstr ("PEAK")
+		    call pargstr ("E")
+		    call pargstr ("PA")
+		switch (fittype) {
+		case FITGAUSS:
+		    call printf (" %4w %8s %8s %6s\n")
+			call pargstr ("ENCLOSED")
+			call pargstr ("GAUSSIAN")
+			call pargstr ("DIRECT")
+		case FITMOFFAT:
+		    call printf (" %4s %8s %8s %6s\n")
+			call pargstr ("BETA")
+			call pargstr ("ENCLOSED")
+			call pargstr ("MOFFAT")
+			call pargstr ("DIRECT")
+		}
+	    }
+
+	    call printf (
+		"%7.2f %7.2f %-*s\n %6.2f %6.2f %7.4g %7.4g %7.4g %4.2f %4d")
+		call pargr (xcntr)
+		call pargr (ycntr)
+		call pargi (coordlen)
+		call pargstr (Memc[coords])
+		call pargr (radius)
+	        call pargr (mag)
+	        call pargd (sumo)
+	        call pargd (sums / no)
+	        call pargr (zcntr)
+	        call pargr (e)
+	        call pargr (pa)
+	    switch (fittype) {
+	    case FITGAUSS:
+		call printf (" %4w %8.2f %8.2f %6.2f\n")
+		    call pargr (efwhm)
+		    call pargr (fwhm)
+		    call pargr (dfwhm)
+	    case FITMOFFAT:
+		call printf (" %4.2f %8.2f %8.2f %6.2f\n")
+		    call pargr (beta)
+		    call pargr (efwhm)
+		    call pargr (fwhm)
+		    call pargr (dfwhm)
 	    }
 	}
 
 	if (IE_LOGFD(ie) != NULL) {
-	    if (IE_LASTKEY(ie) != 'a')
-		call fprintf (IE_LOGFD(ie), label)
+	    if (IE_LASTKEY(ie) != 'a') {
+		coordlen = max (11, strlen (Memc[coords]))
+		call fprintf (IE_LOGFD(ie),
+		    "# %5s %7s %-*s %6s %6s %7s %7s %7s %4s %4s")
+		    call pargstr ("COL")
+		    call pargstr ("LINE")
+		    call pargi (coordlen)
+		    call pargstr ("COORDINATES")
+		    call pargstr ("R")
+		    call pargstr ("MAG")
+		    call pargstr ("FLUX")
+		    call pargstr ("SKY")
+		    call pargstr ("PEAK")
+		    call pargstr ("E")
+		    call pargstr ("PA")
+		switch (fittype) {
+		case FITGAUSS:
+		    call fprintf (IE_LOGFD(ie), " %4w %8s %8s %6s\n")
+			call pargstr ("ENCLOSED")
+			call pargstr ("GAUSSIAN")
+			call pargstr ("DIRECT")
+		case FITMOFFAT:
+		    call fprintf (IE_LOGFD(ie), " %4s %8s %8s %6s\n")
+			call pargstr ("BETA")
+			call pargstr ("ENCLOSED")
+			call pargstr ("MOFFAT")
+			call pargstr ("DIRECT")
+		}
+	    }
 
 	    call fprintf (IE_LOGFD(ie),
-	    "%7.2f %7.2f %7.2f %8.1f %8.2f %3d %5.2f %5.3f %5.1f %8.2f %5.2f\n")
-	        call pargr (xcntr)
-	        call pargr (ycntr)
+		"%7.2f %7.2f %-*s %6.2f %6.2f %7.4g %7.4g %7.4g %4.2f %4d")
+		call pargr (xcntr)
+		call pargr (ycntr)
+		call pargi (coordlen)
+		call pargstr (Memc[coords])
+		call pargr (radius)
 	        call pargr (mag)
 	        call pargd (sumo)
 	        call pargd (sums / no)
-	        call pargi (no)
-	        call pargr (r)
+	        call pargr (zcntr)
 	        call pargr (e)
 	        call pargr (pa)
-	        call pargr (zcntr)
-	        call pargr (fwhm)
-	    if (xcntr != wxcntr || ycntr != wycntr) {
-		call fprintf (IE_LOGFD(ie), "%s: %s\n")
-		    call pargstr (IE_WCSNAME(ie))
-		    call pargstr (Memc[coords])
+	    switch (fittype) {
+	    case FITGAUSS:
+		call fprintf (IE_LOGFD(ie), " %4w %8.2f %8.2f %6.2f\n")
+		    call pargr (efwhm)
+		    call pargr (fwhm)
+		    call pargr (dfwhm)
+	    case FITMOFFAT:
+		call fprintf (IE_LOGFD(ie), " %4.2f %8.2f %8.2f %6.2f\n")
+		    call pargr (beta)
+		    call pargr (efwhm)
+		    call pargr (fwhm)
+		    call pargr (dfwhm)
 	    }
 	}
 
@@ -488,7 +655,7 @@ procedure ie_gauss (x, nvars, p, np, z)
 real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
-real	np			#I Number of parameters
+int	np			#I Number of parameters
 real	z			#O Function return
 
 real	r2
@@ -511,7 +678,7 @@ real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
 real	dp[np]			#I Dummy array of parameters increments
-real	np			#I Number of parameters
+int	np			#I Number of parameters
 real	z			#O Function return
 real	der[np]			#O Derivatives
 
@@ -527,5 +694,59 @@ begin
 	    der[1] = exp (-r2)
 	    z = p[1] * der[1]
 	    der[2] = z * r2 / p[2]
+	}
+end
+
+
+# IE_MOFFAT -- Moffat function used in NLFIT.  The parameters are the
+# amplitude, alpha squared, and beta and the input variable is the radius.
+
+procedure ie_moffat (x, nvars, p, np, z)
+
+real	x[nvars]		#I Input variables
+int	nvars			#I Number of variables
+real	p[np]			#I Parameter vector
+int	np			#I Number of parameters
+real	z			#O Function return
+
+real	y
+
+begin
+	y = 1 + (x[1] / p[2]) ** 2
+	if (abs (y) > 20.)
+	    z = 0.
+	else
+	    z = p[1] * y ** p[3]
+end
+
+
+# IE_DMOFFAT -- Moffat function and derivatives used in NLFIT.  The parameters
+# are the amplitude, alpha squared, and beta and the input variable is the
+# radius.
+
+procedure ie_dmoffat (x, nvars, p, dp, np, z, der)
+
+real	x[nvars]		#I Input variables
+int	nvars			#I Number of variables
+real	p[np]			#I Parameter vector
+real	dp[np]			#I Dummy array of parameters increments
+int	np			#I Number of parameters
+real	z			#O Function return
+real	der[np]			#O Derivatives
+
+real	y
+
+begin
+	y = 1 + (x[1] / p[2]) ** 2
+	if (abs (y) > 20.) {
+	    z = 0.
+	    der[1] = 0.
+	    der[2] = 0.
+	    der[3] = 0.
+	} else {
+	    der[1] = y ** p[3]
+	    z = p[1] * der[1]
+	    der[2] = -2 * z / y * p[3] / p[2] * (x[1] / p[2]) ** 2
+	    der[3] = z * log (y)
 	}
 end

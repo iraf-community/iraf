@@ -21,6 +21,9 @@ begin
 	call gt_sets (gt, GTYTRAN, "linear")
 	GT_XSIZE(gt) = 2.
 	GT_YSIZE(gt) = 2.
+	GT_DRAWTITLE(gt) = YES
+	GT_DRAWXLABELS(gt) = YES
+	GT_DRAWYLABELS(gt) = YES
 	GT_SYSID(gt) = YES
 	GT_PARAMS(gt) = NULL
 	GT_TITLE(gt) = NULL

@@ -7,10 +7,11 @@ include	<imhdr.h>
 # OIF_DELETE -- Delete an image.  A special operator is required since the
 # image is stored as two files.
 
-procedure oif_delete (root, extn, status)
+procedure oif_delete (kernel, root, extn, status)
 
-char	root[ARB]		# root filename
-char	extn[ARB]		# extension
+int	kernel			#I IKI kernel
+char	root[ARB]		#I root filename
+char	extn[ARB]		#U extension
 int	status
 
 int	junk

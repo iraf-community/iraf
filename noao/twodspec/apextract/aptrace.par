@@ -1,6 +1,7 @@
 # APTRACE
 
 input,s,a,,,,List of input images to trace
+apertures,s,h,"",,,Apertures
 references,s,h,"",,,List of reference images
 
 interactive,b,h,yes,,,Run task interactively?

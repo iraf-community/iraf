@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<syserr.h>
+include	<mach.h>
 include <plset.h>
 include	<plio.h>
 
@@ -89,12 +90,16 @@ begin
 		goto update_
 
 	# Is the new line a copy of the adjacent line (Y=Y-1) in the image?
+	# Due to the short integer encoding a maximum of MAX_SHORT references
+	# are allowed per line.
+
 	if (index > 1) {
 	    n_lp = PL_LP(pl,index-1)
 	    n_pp = Ref (pl, n_lp)
-	    if (n_len == LP_LEN(n_pp))
-		if (pll_equal (ll, LL(pl,n_lp)))
-		    goto update_
+	    if (LP_NREF(n_pp) < MAX_SHORT)
+		if (n_len == LP_LEN(n_pp))
+		    if (pll_equal (ll, LL(pl,n_lp)))
+			goto update_
 	}
 
 	# The new line isn't a copy of the empty line or of an adjacent line,

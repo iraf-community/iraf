@@ -36,12 +36,12 @@ begin
 
 	# Compute the magnitudes and errors.
 	if (positive == YES)
-	    call apcopmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
+	    call apcopmags (Memd[AP_SUMS(phot)], Memd[AP_AREA(phot)],
 	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], nap,
 	        skyval, skysig, nsky, AP_ZMAG(phot), AP_NOISEFUNCTION(nse),
 		AP_EPADU(nse))
 	else
-	    call apconmags (Memr[AP_SUMS(phot)], Memr[AP_AREA(phot)],
+	    call apconmags (Memd[AP_SUMS(phot)], Memd[AP_AREA(phot)],
 	        Memr[AP_MAGS(phot)], Memr[AP_MAGERRS(phot)], nap,
 	        skyval, skysig, nsky, AP_ZMAG(phot), AP_NOISEFUNCTION(nse),
 		AP_EPADU(nse), AP_READNOISE(nse))

@@ -36,8 +36,9 @@ Order of the polynomial to be fit. The order must be greater than or
 equal to 1. If xorder == 1 and yorder == 1 a constant is fit to the data.
 .le
 .ls xterms
-Include cross-terms? If xterms = YES coefficients are fit to terms containing
-the cross products of x and y polynomials.
+Set the cross-terms type? The options are GS_XNONE (the old NO option) for
+no cross terms, GS_XHALF for diagonal cross terms (new option), and GS_XFULL
+for full cross terms (the old YES option).
 .le
 .ls xmin, xmax
 Minimum and maximum x values. All the x values of interest including the

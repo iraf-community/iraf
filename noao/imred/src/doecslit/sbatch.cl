@@ -29,11 +29,14 @@ struct	*fd1, *fd2, *fd3
 begin
 	file	temp, spec, specec, arc
 	bool	reextract, extract, scat, disp, ext, flux, log, disperr
-	string	imtype, ectype, str1, str2, str3, st4
+	string	imtype, ectype, str1, str2, str3, str4
 	int	i
 	str1 = ""
 
 	imtype = "." // envget ("imtype")
+	i = stridx (",", imtype)
+	if (i > 0)
+	    imtype = substr (imtype, 1, i-1)
 	ectype = ".ec" // imtype
 
 	temp = mktemp ("tmp$iraf")
@@ -134,7 +137,7 @@ begin
 		# Fix arc headers if necessary.
 		if (newarcs) {
 	    	    fd2 = arcs
-	    	    while (fscan (fd2, arc) != EOF)
+	    	    while (fscan (fd2, arc) != EOF) {
 			hselect (arc, "date-obs,ut,exptime", yes, > temp)
 			hselect (arc, "ra,dec,epoch,st", yes, >> temp)
 			fd3 = temp

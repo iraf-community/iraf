@@ -1,0 +1,24 @@
+.help ranorm Nov95 "Slalib Package"
+.nf
+
+      REAL FUNCTION slRA2P (ANGLE)
+
+     - - - - - - -
+      R A 2 P
+     - - - - - - -
+
+  Normalise angle into range 0-2 pi  (single precision)
+
+  Given:
+     ANGLE     dp      the angle in radians
+
+  The result is ANGLE expressed in the range 0-2 pi (single
+  precision).
+
+  P.T.Wallace   Starlink   December 1984
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -6,14 +6,22 @@ $set	MACH		= $(IRAFARCH)	# machine/fpu type
 $set	HOSTID		= unix		# host system name
 $set	SITEID		= noao		# site name
 
-$ifeq (MACH, linux) then
+$ifeq (MACH, freebsd) then
 $set	XFLAGS		= "-c -w"	# default XC compile flags
 $set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
-$set	LFLAGS		= "-z -t -/static"	# default XC link flags
+$set	LFLAGS		= "-z -/static"	# default XC link flags
+$else $ifeq (MACH, linux) then
+$set	XFLAGS		= "-c -w"	# default XC compile flags
+$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	LFLAGS		= "-Nz -/Wl,-Bstatic"   # default XC link flags
+$else $ifeq (MACH, redhat) then
+$set	XFLAGS		= "-c -w"	# default XC compile flags
+$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	LFLAGS		= "-Nz"		# default XC link flags
 $else
-$set	XFLAGS		= "-c"		# default XC compile flags
-$set	XVFLAGS		= "-c"		# VOPS XC compile flags
-$set	LFLAGS		= ""		# default XC link flags
+$set	XFLAGS		= "-c -w"	# default XC compile flags
+$set	XVFLAGS		= "-c -w"	# VOPS XC compile flags
+$set	LFLAGS		= "-z -/static"	# default XC link flags
 $end
 
 $set	USE_LIBMAIN	= yes		# update lib$libmain.o (root object)
@@ -26,8 +34,8 @@ $set    USE_IIS         = no		# make the IIS display control package
 $set	USE_CALCOMP	= no		# make the Calcomp graphics kernel
 $set	LIB_CALCOMP	= "-lcalcomp"	# name of host system calcomp library
 
-$ifeq (MACH, linux) then
-    $include "hlib$mkpkg.sf.LINUX"
-$else
-    $include "hlib$mkpkg.sf.LINUX"
+$ifeq (MACH, linux, redhat) then
+    $include "hlib$mkpkg.sf.LNUX"
+$else $ifeq (MACH, freebsd) then
+    $include "hlib$mkpkg.sf.FBSD"
 $end

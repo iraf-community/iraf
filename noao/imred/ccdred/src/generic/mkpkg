@@ -7,7 +7,6 @@ $exit
 
 libpkg.a:
 	cor.x		ccdred.h
-	corinput.x	ccdred.h <imhdr.h>
 	proc.x		ccdred.h <imhdr.h>
 
 	icaclip.x	../icombine.com ../icombine.h

@@ -13,7 +13,14 @@ int	param			#I parameter code
 begin
 	switch (param) {
 	case QPIO_BLOCKFACTOR:
-	    return (IO_BLOCK(io))
+	    if (IO_XBLOCK(io) == IO_YBLOCK(io))
+		return (IO_XBLOCK(io))
+	    else
+		return (ERR)
+	case QPIO_XBLOCKFACTOR:
+	    return (IO_XBLOCK(io))
+	case QPIO_YBLOCKFACTOR:
+	    return (IO_YBLOCK(io))
 	case QPIO_BUCKETLEN:
 	    return (IO_BUCKETLEN(io))
 	case QPIO_DEBUG:
@@ -22,6 +29,10 @@ begin
 	    return (IO_EVXOFF(io))
 	case QPIO_EVYOFF:
 	    return (IO_EVYOFF(io))
+	case QPIO_EVXTYPE:
+	    return (IO_EVXTYPE(io))
+	case QPIO_EVYTYPE:
+	    return (IO_EVYTYPE(io))
 	case QPIO_EX:
 	    return (IO_EX(io))
 	case QPIO_NODEFFILT:
@@ -41,10 +52,14 @@ begin
 	    return (IO_FD(io))
 	case QPIO_INDEXLEN:			# index length (0=noindex)
 	    return (IO_INDEXLEN(io))
-	case QPIO_IXXOFF:			# short offset of X in index
+	case QPIO_IXXOFF:			# offset of X in index
 	    return (IO_IXXOFF(io))
-	case QPIO_IXYOFF:			# short offset of Y in index
+	case QPIO_IXYOFF:			# offset of Y in index
 	    return (IO_IXYOFF(io))
+	case QPIO_IXXTYPE:			# datatype of X in index
+	    return (IO_IXXTYPE(io))
+	case QPIO_IXYTYPE:			# datatype of Y in index
+	    return (IO_IXYTYPE(io))
 	case QPIO_LF:				# FMIO lfile number
 	    return (IO_LF(io))
 	case QPIO_MASKP:			# PLIO descriptor

@@ -13,13 +13,13 @@ define	MAG1_USTR  "#U%4ttimeunit%19tnumber%34tname%57ttimeunit%80t\\\n"
 define	MAG1_FSTR  "#F%4t%%-18.7g%19t%%-15.7g%34t%%-23s%57t%%-23s%80t \n"
 define	MAG1_WSTR  "%4t%-15.7g%-15.7g%-23.23s%-23.23s%80t\\\n"
 
-define  MAG2_NSTR  "#N%4tRAPERT%13tSUM%27tAREA%39tFLUX%52tMAG%59tMERR%66t\
+define  MAG2_NSTR  "#N%4tRAPERT%13tSUM%27tAREA%38tFLUX%52tMAG%59tMERR%66t\
 PIER%71tPERROR%80t\\\n"
-define  MAG2_USTR  "#U%4tscale%13tcounts%27tpixels%39tcounts%52tmag%59t\
+define  MAG2_USTR  "#U%4tscale%13tcounts%27tpixels%38tcounts%52tmag%59t\
 mag%66t##%71tperrors%80t\\\n"
-define  MAG2_FSTR  "#F%4t%%-12.2f%13t%%-14.7g%27t%%-12.7g%39t%%-13.7g%52t\
+define  MAG2_FSTR  "#F%4t%%-12.2f%13t%%-14.7g%27t%%-11.7g%38t%%-14.7g%52t\
 %%-7.3f%59t%%-6.3f%66t%%-5d%71t%%-9s%80t \n"
-define  MAG2_WSTR  "%4t%-9.2f%-14.7g%-12.7g%-13.7g%-7.3f%-6.3f%-5d%-9.9s\
+define  MAG2_WSTR  "%4t%-9.2f%-14.7g%-11.7g%-14.7g%-7.3f%-6.3f%-5d%-9.9s\
 %79t%2s\n"
 
 
@@ -83,12 +83,18 @@ begin
 	}
 
 	# Write out the error code.
-	if (IS_INDEFR(Memr[AP_MAGS(phot)+i-1]))
-	    ier = pier
-	else if (i >= AP_NMINAP(phot))
+	if (IS_INDEFR(Memr[AP_MAGS(phot)+i-1])) {
+	    if (pier != AP_APERT_OUTOFBOUNDS)
+		ier = pier
+	    else if (i > AP_NMAXAP(phot))
+	        ier = AP_APERT_OUTOFBOUNDS
+	    else
+	        ier = AP_OK
+	} else if (i >= AP_NMINAP(phot)) {
 	    ier = AP_APERT_BADDATA
-	else
+	} else {
 	    ier = AP_OK
+	}
 	call ap_pserrors (ier, Memc[str], SZ_LINE)
 
 	# Write out the photometry results.
@@ -104,16 +110,19 @@ begin
 	    call pargstr (endstr)
 	} else {
 	    call pargr (Memr[AP_APERTS(phot)+i-1])
-	    call pargr (Memr[AP_SUMS(phot)+i-1])
-	    call pargr (Memr[AP_AREA(phot)+i-1])
+	    call pargd (Memd[AP_SUMS(phot)+i-1])
+	    call pargd (Memd[AP_AREA(phot)+i-1])
 	    sky_val = apstatr (ap, SKY_MODE)
 	    if (IS_INDEFR(sky_val))
 		call pargr (0.0)
 	    else
-		call pargr (max (0.0, Memr[AP_SUMS(phot)+i-1] - sky_val *
-		    Memr[AP_AREA(phot)+i-1]))
+		call pargr (real (Memd[AP_SUMS(phot)+i-1] - sky_val *
+		    Memd[AP_AREA(phot)+i-1]))
 	    call pargr (Memr[AP_MAGS(phot)+i-1])
-	    call pargr (Memr[AP_MAGERRS(phot)+i-1])
+	    if (Memr[AP_MAGERRS(phot)+i-1] > 99.999)
+		call pargr (INDEFR)
+	    else
+	        call pargr (Memr[AP_MAGERRS(phot)+i-1])
 	    call pargi (ier)
 	    call pargstr (Memc[str])
 	    call pargstr (endstr)
@@ -227,6 +236,7 @@ int	i
 pointer	sp, str, pyname
 real	sky_val
 int	apstati()
+double	apstatd()
 real	apstatr()
 
 begin
@@ -251,15 +261,18 @@ begin
 	call ap_spyerrors (pier, Memc[str], SZ_LINE)
 	sky_val = apstatr (py, SKY_MODE)
 	call fprintf (fd, PY_WSTR2)
-	    call pargr (apstatr (py, PYFLUX))
-	    call pargr (apstatr (py, PYNPIX))
+	    call pargd (apstatd (py, PYFLUX))
+	    call pargd (apstatd (py, PYNPIX))
 	    if (IS_INDEFR(sky_val))
-		call pargr (0.0)
+		call pargr (0.0d0)
 	    else
-		call pargr (max (0.0, apstatr (py,PYFLUX) - sky_val *
-		    apstatr (py, PYNPIX)))
+		call pargr (real (apstatd (py, PYFLUX) - sky_val *
+		    apstatd (py, PYNPIX)))
 	    call pargr (apstatr (py, PYMAG))
-	    call pargr (apstatr (py, PYMAGERR))
+	    if (apstatr (py, PYMAGERR) > 99.999)
+		call pargr (INDEFR)
+	    else
+	        call pargr (apstatr (py, PYMAGERR))
 	    call pargi (pier)
 	    call pargstr (Memc[str])
 

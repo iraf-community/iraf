@@ -1,66 +1,38 @@
 #{ IMAGES package -- General image processing.
 
 # Check that login.cl version matches IRAF version.  This has nothing to
-# do with IMAGES, this is just a convenient place to test for an old login.cl,
-# since IMAGES is virtually guaranteed to be loaded with IRAF.
+# do with IMAGES, this is just a convenient place to test for an old
+# login.cl, since IMAGES is virtually guaranteed to be loaded with IRAF.
 
 if (cl.logver != cl.version) {
     print ("WARNING: login.cl version mismatch - rebuild with `mkiraf'")
     beep; sleep(1); beep; sleep(1); beep
 }
 
-set	imdebug		= "images$imdebug/"
+set	imcoords 	= "images$imcoords/"
+set	imfilter	= "images$imfilter/"
+set	imfit		= "images$imfit/"
+set	imgeom		= "images$imgeom/"
+set	immatch		= "images$immatch/"
+set	imutil		= "images$imutil/"
 set	tv		= "images$tv/"
 
 package	images
 
-task	blkavg,
-	blkrep,
-	boxcar,
-	chpixtype,
-	convolve,
-	fit1d,
-	fmedian,
-	fmode,
-	gauss,
-	geomap,
-	geotran,
-	gradient,
-	hedit,
-	hselect,
-	imarith,
-	imcombine,
-	imcopy,
-	imdelete,
-	imdivide,
-	imexpr,
-	imheader,
-	imhistogram,
-	imgets,
-	imrename,
-	imshift,
-	imslice,
-	imstack,
-	imstatistics,
-	imsum,
-	imsurfit,
-	imtranspose,
-	laplace,
-	lineclean,
-	listpixels,
-	magnify,
-	median,
-	minmax,
-	mode,
-	sections,
-	shiftlines,
-	xregister,
-	_imaxes		= "images$x_images.e"
-
+task	imcoords.pkg	= "imcoords$imcoords.cl"
+task	imfilter.pkg	= "imfilter$imfilter.cl"
+task	imfit.pkg	= "imfit$imfit.cl"
+task	imgeom.pkg	= "imgeom$imgeom.cl"
+task	immatch.pkg	= "immatch$immatch.cl"
+task	imutil.pkg	= "imutil$imutil.cl"
 task	tv.pkg		= "tv$tv.cl"
-task	imdebug.pkg	= "imdebug$imdebug.cl"
-task	rotate		= "images$rotate.cl"
-task	imlintran	= "images$imlintran.cl"
-task	register	= "images$register.cl"
+
+# Load images subpackages (tv is not autoloaded).
+imcoords
+imfilter
+imfit
+imgeom
+immatch
+imutil
 
 clbye()

@@ -1,4 +1,4 @@
-.help rename Apr96 system
+.help rename Aug97 system
 .ih
 NAME
 rename -- rename a file or set of files
@@ -17,23 +17,30 @@ directory the input files will be moved to this directory with the same
 name.
 .le
 .ls field = all
-If set to "all" the image name remains unchanged and the \fInewname\fR is
+If set to "all" the file name remains unchanged and the \fInewname\fR is
 assumed to be a destination directory in the case of multiple input files,
-or the new filename in the case of a single input file.  Otherwise,
-specifies either the "root" or the "extn" field as the one to be modified.
+or the new filename (which may contain a new directory path) in the case of
+a single input file.  If set to \fIldir\fR the \fInewname\fR value is taken
+to be a destination directory and the file is moved to this directory.
+Setting to \fIroot\fR will rename only the root portion of the filename,
+a value of \fIextn\fR will change or append the extension. \fInewname\fR
+cannot contain a directory path when changing the root or extn field.
 .le
 .ih
 DESCRIPTION
 \fIRename\fR renames either a single file to "newname", or a set of files,
-changing either the root or the extension part of each name.  If \fInewname\fR
-is a directory the input files are moved to this directory and the filenames
-remain the same regardless of the \fIfield\fR value.  When modifying the 
-root or extension part of the filename \fInewname\fR is the new root or
-extension name for the input files.  For multiple input files it is assumed
-that \fInewname\fR is a directory is the value of \fIfield\fR is "all", 
+changing either the ldir, root or the extension part of each name.  
+If \fInewname\fR is a directory or  \fIfield\fR is "ldir" the input files
+are moved to this directory and the filenames remain the same.  When
+modifying the root or extension part of the filename \fInewname\fR is the
+new root or extension name for the input files, an extension will be added
+to the file name if it doesn't already exist and the extension field is being
+modified.  For multiple input files it is assumed
+that \fInewname\fR is a directory if the value of \fIfield\fR is "all", 
 otherwise an error is generated to prevent overwriting files.
 .ih
 EXAMPLES
+
 1. Rename file "fred" to "jay".
 
     cl> rename fred jay
@@ -48,10 +55,12 @@ EXAMPLES
 
 4. Move all files with a ".dat" extension to a new directory.
 
-.nf
     cl> rename *.dat data$
     cl> rename *.dat /data/user
-.fi
+
+5. Add a ".fits" extension to all files in a directory.
+
+    cl> rename im00* fits field=extn
 .ih
 BUGS
 .ih

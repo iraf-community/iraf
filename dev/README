@@ -1,17 +1,20 @@
 IRAF$DEV - The DEV Directory (Aug 1986)
+Fri Mar 21 20:36:00 MST 1997
 
-    This directory contains device descriptor tables and host system interface
+This directory contains device descriptor tables and host system interface
 information for the various devices accessed by IRAF.  With the exception of
-the cache[gt].dat files, all these files are read at runtime hence new devices
-can be interfaced without a sysgen in most cases.
+the cache[gt].dat files, all these files are read at runtime hence new
+devices can be interfaced without a sysgen in most cases.
 
     cacheg.dat, cachet.dat
 	SPP include files, referenced in TTY, used to cache graphcap and
-	termcap device entries for fast access.
+	termcap device entries for fast access.  [These are rarely touched
+	any more although they are still functional - Mar97]
 
     devices
 	Maps the logical (IRAF) device names of any allocatable devices to
-	host system names.  Primary use is for magtape devices.
+	host system names.  Primary use is for magtape devices.  [Not used
+	any more except in VMS/IRAF]
 
     edt.ed, emacs.ed, vi.ed
 	Read by EDIT, EPARAM, and EHISTORY to determine the editor language
@@ -38,6 +41,18 @@ can be interfaced without a sysgen in most cases.
 	The standard test image, dev$pix.imh, and the STF template header
 	file, dev$pix.hhh, required to propagate the special VMS file type
 	required by the STF format to new image header files.
+
+    tapecap
+    tapecap.<node>
+	Magtape device capabilities file.  See os$zfiomt.c for a summary
+	of device capabilities.  os$tape.c can be used as a standalone
+	Unix task to exercise a tape drive to determine its capabilities.
+	Tapecap files can be named either "tapecap.<node>" where <node> is
+	the hostname of the server the tapecap file describes, or simply
+	"tapecap" to provide a fallback for all servers.  The <node> form
+	allows a single IRAF installation to be shared by multiple servers
+	while still having distinct tapecap files for each.  The tapecap file
+	for a server is located in the IRAF dev$ directory *on the server*.
 
     termcap
 	Device information for all terminals and printers.  The printer

@@ -67,10 +67,11 @@ WHEN CREATING NEW IMAGES
 Image title to be given to the images.  Maximum of 79 characters.
 .le
 .ls pixtype = "real"
-Pixel datatype of new images; one of short, integer, real, or double.
+Pixel datatype of new images; one of ushort, short, integer, real, double,
+or complex.
 .le
 .ls ndim = 2
-Number of dimensions between 1 and 7.
+Number of dimensions between 0 and 7.
 .le
 .ls ncols = 512, nlines = 512
 Number of columns (first dimension) and lines (second dimension).
@@ -166,6 +167,12 @@ EXAMPLES
 .nf
 	cl> mkpat dev$pix out=gridpix pat=grid op=mul v1=1 v2=0
 .fi
+.ih
+REVISIONS
+.ls MKPATTERN V2.11
+Now allows ndim=0 to create dataless header.
+
+Now allows type ushort pixel type.
 .ih
 SEE ALSO
 imcopy, imreplace

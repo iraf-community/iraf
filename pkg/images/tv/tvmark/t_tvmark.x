@@ -1,7 +1,10 @@
 include <fset.h>
 include <gset.h>
 include <imhdr.h>
+include <imset.h>
 include "tvmark.h"
+
+define	TV_NLINES	128
 
 # T_TVMARK -- Mark dots circles and squares on the image in the image display
 # with optional numbering.
@@ -18,10 +21,10 @@ int	autolog			# automatically log commands
 int	interactive		# interactive mode
 
 pointer	sp, mk, im, iw, outim, cfilename, tmpname
-int	cl, dl, log, ft, frame, ltid, wcs_status, ndelete
+int	cl, dl, log, ft, frame, ltid, wcs_status, ndelete, bufsize
 
 bool	clgetb()
-int	access(), btoi(), clgeti(), mk_mark()
+int	access(), btoi(), clgeti(), imstati(), mk_mark()
 pointer	immap(), open(), imd_mapframe(), iw_open()
 
 begin
@@ -54,6 +57,9 @@ begin
 	
 	# Open the frame as an image.
 	im = imd_mapframe (frame, READ_WRITE, YES)
+	bufsize = max (imstati (im, IM_BUFSIZE), TV_NLINES *
+	    int (IM_LEN(im,1)) * SZ_SHORT) 
+	call imseti (im, IM_BUFSIZE, bufsize)
 	iw = iw_open (im, frame, Memc[image], SZ_FNAME, wcs_status)
 	call mk_sets (mk, IMAGE, Memc[image])
 	call mk_seti (mk, FRAME, frame)

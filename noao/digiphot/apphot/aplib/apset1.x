@@ -47,10 +47,10 @@ begin
 		call strcpy (str, AP_APSTRING(phot), SZ_LINE)
 		AP_NAPERTS(phot) = naperts
 	        call realloc (AP_APERTS(phot), AP_NAPERTS(phot), TY_REAL)
-	        call realloc (AP_SUMS(phot), AP_NAPERTS(phot), TY_REAL)
+	        call realloc (AP_AREA(phot), AP_NAPERTS(phot), TY_DOUBLE)
+	        call realloc (AP_SUMS(phot), AP_NAPERTS(phot), TY_DOUBLE)
 	        call realloc (AP_MAGS(phot), AP_NAPERTS(phot), TY_REAL)
 	        call realloc (AP_MAGERRS(phot), AP_NAPERTS(phot), TY_REAL)
-	        call realloc (AP_AREA(phot), AP_NAPERTS(phot), TY_REAL)
 	        call amovr (aperts, Memr[AP_APERTS(phot)], AP_NAPERTS(phot))
 	        call asrtr (Memr[AP_APERTS(phot)], Memr[AP_APERTS(phot)],
 	            AP_NAPERTS(phot))
@@ -74,7 +74,7 @@ begin
 	case OTIME:
 	    call strcpy (str, AP_OTIME(ap), SZ_FNAME)
 	default:
-	    call error (0, "APSETS: Unknown apphot parameter")
+	    call error (0, "APSETS: Unknown apphot string parameter")
 	}
 end
 
@@ -129,12 +129,12 @@ begin
 	case PWEIGHTS:
 	    AP_PWEIGHTS(phot) = ival
 	default:
-	    call error (0, "APSETI: Unknown apphot parameter")
+	    call error (0, "APSETI: Unknown apphot integer parameter")
 	}
 end
 
 
-# APSETR1 -- Procedure to set a real apphot parameter.
+# AP1SETR -- Procedure to set a real apphot parameter.
 
 procedure ap1setr (ap, param, rval)
 
@@ -248,6 +248,29 @@ begin
 	case XAIRMASS:
 	    AP_XAIRMASS(ap) = rval
 	default:
-	    call error (0, "APSETR: Unknown apphot parameter")
+	    call error (0, "APSETR: Unknown apphot real parameter")
+	}
+end
+
+
+# AP1SETD -- Procedure to set a double apphot parameter.
+
+procedure ap1setd (ap, param, dval)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+double	dval		# double value
+
+pointer	cen, sky, phot, psf
+
+begin
+	cen = AP_PCENTER(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	psf = AP_PPSF(ap)
+
+	switch (param) {
+	default:
+	    call error (0, "APSETD: Unknown apphot double parameter")
 	}
 end

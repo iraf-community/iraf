@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
+#include <unistd.h>
 
 # ifndef O_NDELAY
 #include <fcntl.h>
@@ -118,7 +119,7 @@ XINT	*chan;			/* file number (output)		*/
 	} else if (fd >= MAXOFILES) {
 	    close (fd);
 	    if (*mode == NEW_FILE)
-		unlink (osfn);
+		unlink ((char *)osfn);
 	    *chan = XERR;
 	} else {
 	    zfd[fd].fp     = NULL;
@@ -163,7 +164,7 @@ XLONG	*offset;		/* 1-indexed file offset to read at	*/
 	register struct	fiodes *kfp;
 	register int	fd;
 	register long block_offset;
-	long	lseek();
+	off_t	lseek();
 
 	fd = *chan;
 	kfp = &zfd[fd];
@@ -197,7 +198,7 @@ XLONG	*offset;		/* 1-indexed file offset	*/
 	register int fd;
 	register struct	fiodes *kfp;
 	register long block_offset;
-	long	lseek();
+	off_t	lseek();
 
 	fd = *chan;
 	kfp = &zfd[fd];

@@ -6,9 +6,9 @@
 #define import_spp
 #include <iraf.h>
 
-/* ZCALL[0-9] -- Call the procedure whose entry point address is pointed to
+/* ZCALL[0-10] -- Call the procedure whose entry point address is pointed to
  * by the first argument, which is the integer valued entry point address of
- * the procedure as returned by ZLOCPR.  Up to nine arguments are passed by
+ * the procedure as returned by ZLOCPR.  Up to ten arguments are passed by
  * reference to the called subprocedure.
  */
 
@@ -89,4 +89,13 @@ XINT	*proc;
 int	*arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9;
 {
 	(*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+}
+
+
+ZCALLA (proc, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
+XINT	*proc;
+int	*arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9, *arg10;
+{
+	(*(PFI)(*proc)) (arg1,
+	    arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 }

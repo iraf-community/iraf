@@ -10,15 +10,16 @@ include	"iki.h"
 
 procedure iki_copy (old, new)
 
-char	old[ARB]		# name of old image
-char	new[ARB]		# name of new image
+char	old[ARB]		#I name of old image
+char	new[ARB]		#I name of new image
 
 int	k, n, status
 pointer	sp, old_root, old_extn, new_root, new_extn
-bool	streq()
 int	iki_access()
-include	"iki.com"
+bool	streq()
 errchk	syserrs
+
+include	"iki.com"
 
 begin
 	call smark (sp)
@@ -29,7 +30,9 @@ begin
 
 	# Verify that the old image exists and determine its type.
 	k = iki_access (old, Memc[old_root], Memc[old_extn], READ_ONLY)
-	if (k <= 0)
+	if (k < 0)
+	    call syserrs (SYS_IKIAMBIG, old)
+	else if (k == 0)
 	    call syserrs (SYS_IKIIMNF, old)
 
 	# Make sure we will not be clobbering an existing image.  Ignore
@@ -50,7 +53,7 @@ begin
 	}
 
 	# Copy the image.
-	call zcall5 (IKI_COPY(k), Memc[old_root], Memc[old_extn],
+	call zcall6 (IKI_COPY(k), k, Memc[old_root], Memc[old_extn],
 	    Memc[new_root], Memc[new_extn], status)
 	if (status == ERR)
 	    call syserrs (SYS_IKICOPY, old)

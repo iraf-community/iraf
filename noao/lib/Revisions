@@ -1,5 +1,61 @@
 .help revisions May93 noao.lib
 .nf
+noaolib$obsdb.dat
+    Added Laboratorio Nacional de Astrofisica - Brazil as submitted by
+    Claudia Vilega Rodrigues.  (12/12/97, Valdes)
+
+=====
+V2.11
+=====
+
+noaolib$obsdb.dat
+    After a conversation with Craig Foltz the "mmt" entry was removed
+    and the "mmto" entry changed the name from "Multiple Mirror Telescope
+    Observatory" to "MMT Observatory" since the telescope is changing.
+    The altitude was wrong in the "mmt" entry in any case.
+    (8/20/97, Valdes)
+
+linelists$airvac.cl +
+    A script is available for converting line lists to air or vacuum.
+    (5/9/97, Valdes)
+
+noaolib$ccdtime/kpno.dat
+    Updated by Massey.  (5/2/97, Valdes)
+
+noaolib$scr/icgfit.key
+noaolib$scr/idicgfit.key
+    Added :fitvalue to help file.  (1/28/97, Valdes)
+
+noaolib$obsdb.dat
+    Added "flwo" and "oro" as submitted by Doug Mink.  Also changed the
+    name for the "mmt" entry as suggested by Mink.  (1/9/97, Valdes)
+
+noaolib$smw.h
+    Added a spectrum type field and dictionary of spectrum types.
+    (9/11/96, Valdes)
+
+noaolib$obsdb.dat
+    Added entries for Apache Point and Lowell submitted by Michael
+    Ledlow (8/9/96, Valdes)
+
+noaolib$ccdtime/kpno.dat
+    Updated with new numbers for the Schmidt from Massey.  (3/4/96, Valdes)
+
+noaolib$obsdb.dat
+    Added an entry for Keck from Astronomical Almanac.  (2/16/96, Valdes)
+
+noaolib$obsdb.dat
+    Add an entry for Beijing XingLong Observatory submitted by
+    Biwei JIANG. (11/28/95, Valdes)
+
+noaolib$linelists/fear.dat +
+noaolib$linelists/README
+    Added a line list for FeAr comparison spectra.  (9/25/95, Valdes)
+
+noaolib$ccdtime/kpno.dat
+    Updated to include improved WIYN telescope values and data for S2KB.
+    The values were supplied by Massey.  (9/21/95, Valdes)
+
 noaolib$scr/icgfit.key
 noaolib$scr/idicgfit.key
     Added 'v' key for changing weights.  (12/29/94, Valdes)

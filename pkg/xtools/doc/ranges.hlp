@@ -7,7 +7,7 @@ steps.   The parsed string is used to generate a list of integers for various
 purposes such as specifying lines or columns in an image or tape file numbers.
 .ih
 SYNTAX
-The syntax for the range string consists of positive integers, '-' (minus),
+The syntax for the range string consists of non-negative integers, '-' (minus),
 'x', ',' (comma), and whitespace.  The commas and whitespace are ignored
 and may be freely used for clarity.  The remainder of the string consists
 of sequences of five fields.  The first field is the beginning of a range,
@@ -30,6 +30,8 @@ x2	Missing starting and ending values defaults to
 .fi
 
 The specification of several ranges yields the union of the ranges.
+Note that the default starting value is 1 though one may specify zero
+as a range limit.
 .ih
 EXAMPLES
 The following examples further illustrate the range syntax.

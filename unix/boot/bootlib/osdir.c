@@ -7,6 +7,8 @@
  * OS_DIR -- A package for accessing a directory as a list of files.
  */
 
+#ifndef NOVOS
+
 /* OS_DIROPEN -- Open the directory.
  */
 os_diropen (dirname)
@@ -67,3 +69,14 @@ int	maxch;
 	    }
 	}
 }
+
+#else
+/* NOVOS bootsrap.  Just stub these out until we re-boostrap using the
+ * VOS libs, which provide zopdir.
+ */
+
+os_dirclose (chan) { return (-1); }
+os_diropen (dirname) { return (-1); }
+os_gfdir (chan, fname, maxch) { return (0); }
+
+#endif

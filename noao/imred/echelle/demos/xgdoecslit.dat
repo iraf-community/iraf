@@ -100,3 +100,6 @@ imdel\sdemoobj1.ec\n
 del\sdatabase/apdemoobj1\n
 doecslit\squick+\n
 \n
+imdel\sdemoobj1.ec\n
+doecslit\sbatch+\ssplot-\n
+\n

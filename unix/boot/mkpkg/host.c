@@ -9,11 +9,16 @@
 #define import_spp
 #define import_error
 #include <iraf.h>
+#include "extern.h"
 
 #ifdef LINUX
-#undef SYSV
-#undef i386
-#define GNUAR
+#  undef SYSV
+#  undef i386
+#  define GNUAR
+#else
+#  ifdef BSD
+#    undef SYSV
+#  endif
 #endif
 
 /*
@@ -29,11 +34,6 @@
 #define	REBUILD		"ranlib"
 #define	XC		"xc"
 #define	INTERRUPT	SYS_XINT
-
-extern	execute;
-extern	ignore;
-extern	verbose;
-extern	debug;
 
 extern	char *makeobj();
 extern	char *vfn2osfn();
@@ -62,6 +62,10 @@ char	*irafdir;		/* iraf root directory		*/
 	int	exit_status, baderr;
 	int	nsources, nfiles, ndone, nleft;
 	int	hostnames, status;
+	char	libfname[SZ_PATHNAME+1];
+
+	/* Get the library file name. */
+	h_getlibname (library, libfname);
 
 	/*
 	 * Compile the files.
@@ -74,6 +78,8 @@ char	*irafdir;		/* iraf root directory		*/
 
 	if (debug)
 	    strcat (cmd, " -d");
+	if (dbgout)
+	    strcat (cmd, " -x");
 
 	/* Compute offset to the file list and initialize loop variables.
 	 * Since the maximum command length is limited, only a few files
@@ -139,10 +145,10 @@ char	*irafdir;		/* iraf root directory		*/
 	 * Update the library.
 	 * ---------------------
 	 */
-#ifdef LINUX
-	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, resolvefname(library));
+#if defined(LINUX) || defined(BSD)
+	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, resolvefname(libfname));
 #else
-	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, library);
+	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, libfname);
 #endif
 
 	/* Compute offset to the file list and initialize loop variables.
@@ -161,7 +167,7 @@ char	*irafdir;		/* iraf root directory		*/
 	    /* This should not happen.  */
 	    if (nfiles <= 0) {
 		printf ("OS command overflow; cannot update library `%s'\n",
-		    library);
+		    libfname);
 		fflush (stdout);
 		exit_status = ERR;
 		return;
@@ -206,13 +212,13 @@ char	*library;		/* filename of library	*/
 	/* Skip the library rebuild if COFF format library. */
 	return (OK);
 #else
-#ifdef i386
-	/* Skip the library rebuild if COFF format library. */
-	return (OK);
-#else
 	char	cmd[SZ_LINE+1];
+	char	libfname[SZ_PATHNAME+1];
 
-	sprintf (cmd, "%s %s", REBUILD, vfn2osfn(library,0));
+	/* Get the library file name. */
+	h_getlibname (library, libfname);
+
+	sprintf (cmd, "%s %s", REBUILD, vfn2osfn(libfname,0));
 	if (verbose) {
 	    printf ("%s\n", cmd);
 	    fflush (stdout);
@@ -222,7 +228,6 @@ char	*library;		/* filename of library	*/
 	    return (os_cmd (cmd));
 	else
 	    return (OK);
-#endif
 #endif
 }
 
@@ -238,15 +243,19 @@ h_incheck (file, dir)
 char	*file;			/* file to be checked in	*/
 char	*dir;			/* where to put the file	*/
 {
-	char	*osfn = vfn2osfn (file, 0);
 	char    backup[SZ_PATHNAME+1];
 	char    path[SZ_PATHNAME+1];
-	char	*ip;
+	char	fname[SZ_PATHNAME+1];
+	char	*osfn, *ip;
 	struct	stat fi;
 	int	status;
 
+	/* Get the library file name. */
+	h_getlibname (file, fname);
+	osfn = vfn2osfn (fname, 0);
+
 	if (verbose) {
-	    printf ("check file `%s' into `%s'\n", file, dir ? dir : "");
+	    printf ("check file `%s' into `%s'\n", fname, dir ? dir : "");
 	    fflush (stdout);
 	}
 
@@ -264,11 +273,11 @@ char	*dir;			/* where to put the file	*/
 	if (dir != NULL && !(fi.st_mode & S_IFLNK)) {
 	    path[0] = EOS;
 	    if (ip = getenv("IRAFULIB"))
-		if (access (mkpath(file,ip,path), 0) < 0)
+		if (access (mkpath(fname,ip,path), 0) < 0)
 		    path[0] = EOS;
 
 	    if (path[0] == EOS)
-		status = h_movefile (osfn, mkpath(file,dir,path));
+		status = h_movefile (osfn, mkpath(fname,dir,path));
 	    else
 		status = h_movefile (osfn, path);
 
@@ -279,14 +288,14 @@ char	*dir;			/* where to put the file	*/
 	 * with a .cko extension when the file was checked out, and should be
 	 * restored.
 	 */
-	sprintf (backup, "%s.cko", file);
+	sprintf (backup, "%s.cko", fname);
 	if (access (backup, 0) == 0) {
 	    if (debug) {
-		printf ("h_incheck: rename %s -> %s\n", backup, file);
+		printf ("h_incheck: rename %s -> %s\n", backup, fname);
 		fflush (stdout);
 	    }
-	    if (rename (backup, file) == -1)
-		printf ("cannot rename %s -> %s\n", backup, file);
+	    if (rename (backup, fname) == -1)
+		printf ("cannot rename %s -> %s\n", backup, fname);
 	}
 
 	return (status);
@@ -304,14 +313,18 @@ char	*dir;			/* where to get the file		*/
 int	clobber;		/* clobber existing copy of file?	*/
 {
 	register char	*ip, *op;
-	char	path[SZ_PATHNAME+1];
+	char path[SZ_PATHNAME+1];
+	char fname[SZ_PATHNAME+1];
+
+	/* Get the library file name. */
+	h_getlibname (file, fname);
 
 	/* Make the UNIX pathname of the destination file.	[MACHDEP]
 	 * Use the IRAFULIB version of the file if there is one.
 	 */
 	path[0] = EOS;
 	if (ip = getenv("IRAFULIB"))
-	    if (access (mkpath(file,ip,path), 0) < 0)
+	    if (access (mkpath(fname,ip,path), 0) < 0)
 		path[0] = EOS;
 
 	if (path[0] == EOS) {
@@ -319,13 +332,13 @@ int	clobber;		/* clobber existing copy of file?	*/
 		;
 	    if (*(op-1) != '/')
 		*op++ = '/';
-	    for (ip=vfn2osfn(file,0);  (*op = *ip++);  op++)
+	    for (ip=vfn2osfn(fname,0);  (*op = *ip++);  op++)
 		;
 	    *op = EOS;
 	}
 
 	if (verbose) {
-	    printf ("check out file `%s = %s'\n", file, path);
+	    printf ("check out file `%s = %s'\n", fname, path);
 	    fflush (stdout);
 	}
 
@@ -336,15 +349,15 @@ int	clobber;		/* clobber existing copy of file?	*/
 	 * is NOT enabled, then probably the remote copy of the file is an
 	 * alternate source for the local file, which must be preserved.
 	 */
-	if (access (file, 0) != -1) {
+	if (access (fname, 0) != -1) {
 	    char    backup[SZ_PATHNAME+1];
 
 	    if (clobber) {
 		if (debug) {
-		    printf ("h_outcheck: deleting %s\n", file);
+		    printf ("h_outcheck: deleting %s\n", fname);
 		    fflush (stdout);
 		}
-		unlink (file);
+		unlink (fname);
 	    } else {
 		/* Do not rename the file twice; if the .cko file already
 		 * exists, the second time would clobber it.  Note that if a
@@ -352,19 +365,45 @@ int	clobber;		/* clobber existing copy of file?	*/
 		 * local file will remain, but a subsequent successful mkpkg
 		 * will restore everything.
 		 */
-		sprintf (backup, "%s.cko", file);
+		sprintf (backup, "%s.cko", fname);
 		if (access (backup, 0) == -1) {
 		    if (debug) {
-			printf ("h_outcheck: rename %s -> %s\n", file, backup);
+			printf ("h_outcheck: rename %s -> %s\n", fname, backup);
 			fflush (stdout);
 		    }
-		    if (rename (file, backup) == -1)
-			printf ("cannot rename %s -> %s\n", file, backup);
+		    if (rename (fname, backup) == -1)
+			printf ("cannot rename %s -> %s\n", fname, backup);
 		}
 	    }
 	}
 
-	return (symlink (path, file));
+	return (symlink (path, fname));
+}
+
+
+/* H_GETLIBNAME -- Get a library filename.  If debug output is enabled (-g
+ * or -x), and we are checking out a library file (.a), update the debug
+ * version of the library (XX_p.a).
+ */
+h_getlibname (file, fname)
+char *file;
+char *fname;
+{
+	register char *ip;
+
+	strcpy (fname, file);
+	if (dbgout) {
+	    for (ip=fname;  *ip;  ip++)
+		;
+	    if (*(ip-2) == '.' && *(ip-1) == 'a' &&
+		    !(*(ip-4) == '_' && *(ip-3) == 'p')) {
+		*(ip-2) = '_';
+		*(ip-1) = 'p';
+		*(ip-0) = '.';
+		*(ip+1) = 'a';
+		*(ip+2) = '\0';
+	    }
+	}
 }
 
 

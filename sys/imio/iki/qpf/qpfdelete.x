@@ -4,8 +4,9 @@ include	<error.h>
 
 # QPF_DELETE -- Delete a datafile.
 
-procedure qpf_delete (root, extn, status)
+procedure qpf_delete (kernel, root, extn, status)
 
+int	kernel			#I IKI kernel
 char	root[ARB]		#I root filename
 char	extn[ARB]		#I extension
 int	status			#O output status

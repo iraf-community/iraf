@@ -111,7 +111,7 @@ begin
 
 	IE_MW(ie) = mw
 	IE_CTLW(ie) = ctlw
-	IE_CTWL(ie) = ctlw
+	IE_CTWL(ie) = ctwl
 	IE_WCSDIM(ie) = wcsdim
 
 	call sfree (sp)

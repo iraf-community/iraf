@@ -36,14 +36,16 @@ pointer	sp, data1
 real	c1d_center()
 
 begin
+
 	# Check starting value.
 	if (IS_INDEF(x) || (x < 1) || (x > npts))
 	    return (INDEF)
 
-	# Set minimum width and error radius.  The minimum in the error radius
+	# Set parameters.  The minimum in the error radius
 	# is for defining the data window.  The user error radius is used to
 	# check for an error in the derived center at the end of the centering.
 
+	call c1d_params (INDEFI, INDEFR)
 	wid = max (width, MIN_WIDTH)
 	rad = max (2., radius)
 
@@ -101,6 +103,35 @@ begin
 end
 
 
+# C1D_PARAMS -- Set parameters.
+
+procedure c1d_params (interp, eps)
+
+int	interp		# Interpolation type
+real	eps		# Accuracy of centering
+
+int	first
+data	first /YES/
+
+int	interptype
+real	epsilon
+common	/c1d_common/ interptype, epsilon
+
+begin
+	if (!IS_INDEFI(interp))
+	    interptype = interp
+	else if (first == YES)
+	    interptype = INTERPTYPE
+
+	if (!IS_INDEFR(eps))
+	    epsilon = eps
+	else if (first == YES)
+	    epsilon = EPSILON
+
+	first = NO
+end
+
+
 # C1D_CENTER -- One dimensional centering algorithm.
 # If the width is <= 1. return the nearest local maximum.
 
@@ -118,6 +149,10 @@ pointer	asi1, asi2, sp, data1
 
 real	asigrl()
 
+int	interptype
+real	epsilon
+common	/c1d_common/ interptype, epsilon
+
 define	done_	99
 
 begin
@@ -126,13 +161,16 @@ begin
 	# large regions of the data to zero and without a gradient
 	# the centering will fail.
 
-	i = x
 	for (i=x+.5; (i<npts) && (data[i]<=data[i+1]); i=i+1)
+	    ;
+	for (; (i>1) && (data[i]<=data[i-1]); i=i-1)
 	    ;
 	for (j=x+.5; (j>1) && (data[j]<=data[j-1]); j=j-1)
 	    ;
+	for (; (j>npts) && (data[j]<=data[j+1]); j=j+1)
+	    ;
 
-	if (i-x < x-j)
+	if (abs(i-x) < abs(x-j))
 	    xc = i 
 	else
 	    xc = j
@@ -148,8 +186,8 @@ begin
 	    return (INDEF)
 
 	# Set interpolation functions.
-	call asiinit (asi1, INTERPTYPE)
-	call asiinit (asi2, INTERPTYPE)
+	call asiinit (asi1, interptype)
+	call asiinit (asi2, interptype)
 	call asifit (asi1, data, npts)
 
 	# Allocate, compute, and interpolate the x*y values.
@@ -210,7 +248,7 @@ begin
 		break
 
 	    # Convergence tests.
-	    if (dxabs < EPSILON)
+	    if (dxabs < epsilon)
 		goto done_
 	    if (dxabs > dxlast + EPSILON1) {
 		dxcheck = dxcheck + 1

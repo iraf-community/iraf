@@ -52,15 +52,15 @@ begin
 	# keyword.
 
 	if (idb_findrecord (im, key, rp) > 0) {
-	    # Check for boolean field.
-	    ch = Memc[rp+IDB_ENDVALUE-1]
-	    if (ch == 'T' || ch == 'F')
-		return (TY_BOOL)
-
 	    # Check for quoted string.
 	    ch = Memc[rp+IDB_STARTVALUE]
 	    if (ch == '\'')
 		return (TY_CHAR)
+
+	    # Check for boolean field.
+	    ch = Memc[rp+IDB_ENDVALUE-1]
+	    if (ch == 'T' || ch == 'F')
+		return (TY_BOOL)
 
 	    # If field contains only digits it must be an integer.
 	    for (ip=IDB_STARTVALUE;  ip <= IDB_ENDVALUE;  ip=ip+1) {

@@ -537,7 +537,7 @@ begin
 	# Get the apertures.
 	naperts = apstati (ap, NAPERTS)
 	call salloc (aperts, naperts, TY_REAL)
-	call aparrays (ap, APERTS, Memr[aperts])
+	call ap_arrayr (ap, APERTS, Memr[aperts])
 
 	# Encode the old aperture string.
 	outstr[1] = EOS

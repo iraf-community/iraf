@@ -3,8 +3,25 @@ include	<imhdr.h>
 include	<smw.h>
 include	<gset.h>
 
-# Fit types.
+
+# Profile types.
+define	PTYPES	"|gaussian|lorentzian|voigt|"
+define  GAUSS           1       # Gaussian profile
+define  LORENTZ         2       # Lorentzian profile
+define  VOIGT           3       # Voigt profile
+
+# Type of constraints.
 define	FITTYPES "|fixed|single|all|"
+define  FIXED           1       # Fixed parameter
+define  SINGLE          2       # Fit a single value for all lines
+define  INDEP           3       # Fit independent values for all lines
+
+# Elements of fit array.
+define  BKG             1       # Background
+define  POS             2       # Position
+define  INT             3       # Intensity
+define  GAU             4       # Gaussian FWHM
+define  LOR             5       # Lorentzian FWHM
 
 # Output image options.
 define	OPTIONS	"|difference|fit|"
@@ -12,8 +29,12 @@ define	DIFF		1
 define	FIT		2
 
 # Monte-Carlo errors
-define	MC_SAMPLE		50
-define	MC_SIGMA		34
+define  MC_N    50      # Monte-Carlo samples (overridden by users)
+define  MC_P    10      # Percent done interval (percent)
+define  MC_SIG  68      # Sigma sample point (percent)
+
+define  NSUB    3       # Number of pixel subsamples
+
  
 # T_FITPROFS -- Fit image profiles.
  
@@ -23,12 +44,13 @@ int	inlist			# List of input spectra
 pointer	aps			# Aperture list
 pointer	bands			# Band list
 
-pointer	pos, sig		# Fitting region and initial components
-real	sigma			# Default sigma
-int	fitbkg			# Fit background?
-int	fitpos			# Position fit flag (1=fixed, 2=single, 3=all)
-int	fitsig			# Sigma fit flag (1=fixed, 2=single, 3=all)
+int	ptype			# Profile type
+pointer	pg, xg, yg, sg, lg	# Fitting region and initial components
+real	gfwhm			# Default gfwhm
+real	lfwhm			# Default lfwhm
+int	fit[5]			# Fit flags: background, position, gfwhm, lfwhm
 
+int	nerrsample		# Number of error samples to use
 real	sigma0			# Constant noise
 real	invgain			# Inverse gain
 
@@ -41,17 +63,16 @@ int	option			# Output image option
 bool	clobber			# Clobber existing images?
 bool	merge			# Merge with existing images?
  
-real	x, s
+real	x, y, g, l
 bool	complement
-int	i, ng, nalloc
+int	i, p, ng, nalloc
 pointer	sp, input, output, ptr
  
 real	clgetr()
 bool	clgetb()
-int	clgwrd(), clscan()
+int	clgeti(), clgwrd(), clscan()
 int	imtopenp(), imtgetim(), imtlen()
-int	open(), fscan(), nscan()
-int	nowhite(), btoi()
+int	open(), fscan(), nscan(), strdic(), nowhite()
 pointer	rng_open()
 errchk	open
  
@@ -78,66 +99,134 @@ begin
 	else
 	    plot = open (Memc[output], APPEND, BINARY_FILE)
 
-	fitbkg = btoi (clgetb ("fitbackground"))
-	fitpos = clgwrd ("fitpositions", Memc[output], SZ_FNAME, FITTYPES)
-	fitsig = clgwrd ("fitsigmas", Memc[output], SZ_FNAME, FITTYPES)
+	ptype = clgwrd ("profile", Memc[output], SZ_FNAME, PTYPES)
+	gfwhm = clgetr ("gfwhm")
+	lfwhm = clgetr ("lfwhm")
+
+	if (clgetb ("fitbackground"))
+	    fit[BKG] = SINGLE
+	else
+	    fit[BKG] = FIXED
+	fit[POS] = clgwrd ("fitpositions", Memc[output], SZ_FNAME, FITTYPES)
+	fit[INT] = INDEP
+	fit[GAU] = clgwrd ("fitgfwhm", Memc[output], SZ_FNAME, FITTYPES)
+	fit[LOR] = clgwrd ("fitlfwhm", Memc[output], SZ_FNAME, FITTYPES)
 	option = clgwrd ("option", Memc[output], SZ_FNAME, OPTIONS)
-	sigma = clgetr ("sigma")
 	clobber = clgetb ("clobber")
 	merge = clgetb ("merge")
-        sigma0 = clgetr ("sigma0")
-        invgain = clgetr ("invgain")
+	nerrsample = clgeti ("nerrsample")
+	sigma0 = clgetr ("sigma0")
+	invgain = clgetr ("invgain")
 	if (IS_INDEF(sigma0) || IS_INDEF(invgain) || sigma0<0. || invgain<0.) {
 	    sigma0 = INDEF
 	    invgain = INDEF
 	}
 
-	# Get the initial positions/sigmas.
+	# Get the initial positions/peak/ptype/gfwhm/lfwhm.
 	call clgstr ("positions", Memc[input], SZ_FNAME)
+	if (nowhite (Memc[input], Memc[input], SZ_FNAME) == 0) {
+	    call sfree (sp)
+	    call error (1, "A 'positions' file must be specified")
+	}
 	i = open (Memc[input], READ_ONLY, TEXT_FILE)
 	ng = 0
 	while (fscan (i) != EOF) {
 	    call gargr (x)
-	    call gargr (s)
-	    if (nscan() < 0)
+	    call gargr (y)
+	    call gargwrd (Memc[output], SZ_FNAME)
+	    call gargr (g)
+	    call gargr (l)
+	    p = strdic (Memc[output], Memc[output], SZ_FNAME, PTYPES)
+	    if (p == 0)
+		p = ptype
+	    switch (nscan()) {
+	    case 0:
 		next
-	    if (nscan() < 2)
-		s = sigma
+	    case 1:
+		y = INDEF
+		p = ptype
+		g = gfwhm
+		l = lfwhm
+	    case 2:
+		p = ptype
+		g = gfwhm
+		l = lfwhm
+	    case 3:
+		g = gfwhm
+		l = lfwhm
+	    case 4:
+		switch (p) {
+		case GAUSS:
+		    l = lfwhm
+		case LORENTZ:
+		    l = g
+		    g = gfwhm
+		case VOIGT:
+		    l = lfwhm
+		}
+	    }
+
 	    if (ng == 0) {
 		nalloc = 10
-		call malloc (pos, nalloc, TY_REAL)
-		call malloc (sig, nalloc, TY_REAL)
+		call malloc (pg, nalloc, TY_INT)
+		call malloc (xg, nalloc, TY_REAL)
+		call malloc (yg, nalloc, TY_REAL)
+		call malloc (sg, nalloc, TY_REAL)
+		call malloc (lg, nalloc, TY_REAL)
 	    } else if (ng == nalloc) {
 		nalloc = nalloc + 10
-		call realloc (pos, nalloc, TY_REAL)
-		call realloc (sig, nalloc, TY_REAL)
+		call realloc (pg, nalloc, TY_INT)
+		call realloc (xg, nalloc, TY_REAL)
+		call realloc (yg, nalloc, TY_REAL)
+		call realloc (sg, nalloc, TY_REAL)
+		call realloc (lg, nalloc, TY_REAL)
 	    }
-	    Memr[pos+ng] = x
-	    Memr[sig+ng] = s
+	    switch (p) {
+	    case GAUSS:
+		Memi[pg+ng] = p
+		Memr[xg+ng] = x
+		Memr[yg+ng] = y
+		Memr[sg+ng] = g
+		Memr[lg+ng] = 0.
+	    case LORENTZ:
+		Memi[pg+ng] = p
+		Memr[xg+ng] = x
+		Memr[yg+ng] = y
+		Memr[sg+ng] = 0.
+		Memr[lg+ng] = g
+	    case VOIGT:
+		Memi[pg+ng] = p
+		Memr[xg+ng] = x
+		Memr[yg+ng] = y
+		Memr[sg+ng] = g
+		Memr[lg+ng] = l
+	    }
 	    ng = ng + 1
 	}
 	call close (i)
 	if (ng == 0)
 	    call error (1, "No profiles defined")
 
-	call realloc (pos, ng+2, TY_REAL)
-	call realloc (sig, ng+2, TY_REAL)
+	call realloc (xg, ng+2, TY_REAL)
+	call realloc (yg, ng+2, TY_REAL)
+	call realloc (sg, ng+2, TY_REAL)
+	call realloc (lg, ng+2, TY_REAL)
 
 	# Get fitting region and background points and add to end of
-	# pos and sig arrays.
+	# xg and sg arrays.
 
 	i = clscan ("region")
-	    call gargr (Memr[pos+ng])
-	    call gargr (Memr[pos+ng+1])
+	    call gargr (Memr[xg+ng])
+	    call gargr (Memr[xg+ng+1])
 	    if (i == EOF || nscan() < 1)
 		call error (1, "Error specifying fitting region")
 	i = clscan ("background")
-	    call gargr (Memr[sig+ng])
-	    call gargr (Memr[sig+ng+1])
+	    call gargr (Memr[sg+ng])
+	    call gargr (Memr[sg+ng+1])
 	    if (nscan() < 1)
-		Memr[sig+ng] = INDEF
+		Memr[sg+ng] = INDEF
 	    if (nscan() < 2)
-		Memr[sig+ng+1] = Memr[sig+ng]
+		Memr[sg+ng+1] = Memr[sg+ng]
  
 	# Decode range strings and set complement if needed.
 	complement = false
@@ -168,12 +257,12 @@ begin
 	    if (imtgetim (outlist, Memc[output], SZ_FNAME) == EOF)
 		Memc[output] = EOS
 
-	    call fp_ms (Memc[input], aps, bands, complement,
-		Memr[pos], Memr[sig], ng, fitbkg,fitpos, fitsig,
+	    call fp_ms (Memc[input], aps, bands, complement, Memi[pg], Memr[xg],
+		Memr[yg], Memr[sg], Memr[lg], ng, fit, nerrsample,
 		sigma0, invgain, components, verbose, log, plot, Memc[output],
-		option, clobber,merge)
+		option, clobber, merge)
 	}
- 
+
 	if (log != NULL)
 	    call close (log)
 	if (plot != NULL)
@@ -183,29 +272,35 @@ begin
 	call rng_close (components)
 	call imtclose (inlist)
 	call imtclose (outlist)
-	call mfree (pos, TY_REAL)
-	call mfree (sig, TY_REAL)
+	call mfree (pg, TY_INT)
+	call mfree (xg, TY_REAL)
+	call mfree (yg, TY_REAL)
+	call mfree (sg, TY_REAL)
+	call mfree (lg, TY_REAL)
 	call sfree (sp)
 end
 
  
 # FP_MS -- Handle I/O and call fitting procedure.
 
-procedure fp_ms (input, aps, bands, complement, pos, sig, ng,
-	fitbkg, fitpos, fitsig, sigma0, invgain, components, verbose, log, plot,
-	output, option, clobber,merge)
+procedure fp_ms (input, aps, bands, complement, pg, xg, yg, sg, lg, ng, fit,
+	nerrsample, sigma0, invgain, components, verbose, log, plot, output,
+	option, clobber, merge)
 
 char	input[ARB]		# Input image
 pointer	aps			# Apertures
 pointer	bands			# Bands
 bool	complement		# Complement aperture selection
 
-real	pos[ng], sig[ng]	# Positions and sigmas of initial profiles
+int	pg[ng]			# Profile type
+real	xg[ng]			# Positions
+real	yg[ng]			# Peaks
+real	sg[ng]			# Gaussian FWHM
+real	lg[ng]			# Lorentzian FWHM
 int	ng			# Number of profiles
-int	fitbkg			# Background fit?
-int	fitpos			# Position fit flag (1=fixed, 2=single, 3=all)
-int	fitsig			# Sigma fit flag (1=fixed, 2=single, 3=all)
+int	fit[5]			# Fit flags
 
+int	nerrsample		# Number of error samples
 real	sigma0			# Constant noise
 real	invgain			# Inverse gain
 
@@ -460,8 +555,8 @@ begin
 	    call shdr_open (in, mwin, i, 1, INDEFI, SHDATA, sh)
 	    if (SN(sh) < SMW_LLEN(mwin,1))
 		call aclrr (Memr[model], SMW_LLEN(mwin,1))
-	    iferr (call fp_fit (sh, Memr[SX(sh)], Memr[SY(sh)], SN(sh),
-		pos, sig, ng, fitbkg, fitpos, fitsig, sigma0, invgain,
+	    iferr (call fp_fit (sh, Memr[SX(sh)], Memr[SY(sh)], SN(sh), pg,
+		xg, yg, sg, lg, ng, fit, nerrsample, sigma0, invgain,
 		components, verbose, log, plot, Memc[str], Memr[model])) {
 		call erract (EA_WARN)
 	    }
@@ -561,22 +656,24 @@ define	SQ2PI	2.5066283
 
 # FP_FIT -- Fit profile functions
 
-procedure fp_fit (sh, x, y, n, pos, sig, ng, fitbkg, fitpos, fitsig,
-	sigma0, invgain, components, verbose, log, plot, title, mod)
+procedure fp_fit (sh, x, y, n, ptypes, pos, peaks, gfwhms, lfwhms, ng, fit,
+	nerrsample, sigma0, invgain, components, verbose, log, plot, title, mod)
 
 pointer	sh			# Spectrum data structure
 real	x[n]			# Coordinates
 real	y[n]			# Data
 int	n			# Number of data points
 
+int	ptypes[ARB]		# Profile types
 real	pos[ARB]		# Fitting region and initial positions
-real	sig[ARB]		# Background levels and initial sigmas
+real	peaks[ARB]		# Peak values
+real	gfwhms[ARB]		# Background levels and initial gfwhm
+real	lfwhms[ARB]		# Initial lfwhm
 int	ng			# Number of gaussian components
 
-int	fitbkg			# Fit background?
-int	fitpos			# Fit position (1=fixed, 2=single, 3=all)
-int	fitsig			# Fit sigma flag (1=fixed, 2=single, 3=all)
+int	fit[5]			# Fit flags
 
+int	nerrsample		# Number of error samples
 real	sigma0			# Constant noise
 real	invgain			# Inverse gain
 
@@ -587,19 +684,19 @@ int	plot			# Plot file descriptor
 char	title[ARB]		# Plot title
 real	mod[n]			# Model
 
-int	i, j, k, i1, i2, nfit, nsub
+int	i, j, k, i1, i2, nfit, nsub, mc_n, mc_p, mc_sig
 long	seed
 real	xc, x1, x2, dx, y1, y2, dy, z1, dz, w, z, scale, sscale
-real	height, flux, cont, sigma, eqw, chisq
-real	flux1, cont1, eqw1, wyc1, slope1
+real	peak, flux, cont, gfwhm, lfwhm, eqw, chisq
+real	flux1, cont1, eqw1, wyc1, slope1, v, u
 bool	doerr
-pointer	sp, str, xd, yd, sd, xg, yg, sg, yd1, xg1, yg1, sg1
-pointer	ym, conte, xge, yge, sge, fluxe, eqwe
+pointer	sp, str, xd, yd, sd, xg, yg, sg, lg, pg, yd1, xg1, yg1, sg1, lg1
+pointer	ym, conte, xge, yge, sge, lge, fluxe, eqwe
 pointer	gp, gopen()
 bool	rng_elementi()
 real	model(), gasdev(), asumr()
 double	shdr_lw(), shdr_wl
-errchk	dofit
+errchk	dofit, dorefit
 
 begin
 	# Determine fitting region.
@@ -627,10 +724,12 @@ begin
 	call salloc (xg, ng, TY_REAL)
 	call salloc (yg, ng, TY_REAL)
 	call salloc (sg, ng, TY_REAL)
+	call salloc (lg, ng, TY_REAL)
+	call salloc (pg, ng, TY_INT)
 
 	# Subtract the continuum and scale the data.
-	y1 = sig[ng+1]
-	y2 = sig[ng+2]
+	y1 = gfwhms[ng+1]
+	y2 = gfwhms[ng+2]
 	if (IS_INDEF (y1))
 	    y1 = y[i1]
 	if (IS_INDEF (y2))
@@ -660,38 +759,49 @@ begin
 
 	# Setup initial estimates.
 	do i = 1, ng {
-	    j = max (1, min (nfit, nint (shdr_wl (sh, double(pos[i])))-i1+1))
 	    Memr[xg+i-1] = pos[i]
-	    Memr[yg+i-1] = Memr[yd+j-1]
-	    Memr[sg+i-1] = sig[i]
+	    Memr[yg+i-1] = peaks[i] / scale
+	    Memr[sg+i-1] = gfwhms[i]
+	    Memr[lg+i-1] = lfwhms[i]
+	    Memi[pg+i-1] = ptypes[i]
+	    if (IS_INDEF(peaks[i])) {
+		j = max (1, min (nfit, nint (shdr_wl(sh,double(pos[i])))-i1+1))
+		Memr[yg+i-1] = Memr[yd+j-1]
+	    }
 	}
 	z1 = 0.
 	dz = 0.
 	dx = (x[n] - x[1]) / (n - 1)
-	nsub = 3
-	call dofit (fitbkg, fitpos, 3, fitsig, Memr[xd], Memr[yd], Memr[sd],
-	    nfit, dx, nsub, z1, dz, Memr[xg], Memr[yg], Memr[sg], ng, chisq)
+	nsub = NSUB
+	call dofit (fit, Memr[xd], Memr[yd], Memr[sd],
+	    nfit, dx, nsub, z1, dz, Memr[xg], Memr[yg], Memr[sg],
+	    Memr[lg], Memi[pg], ng, chisq)
 
 	# Compute Monte-Carlo errors.
-	if (doerr) {
+	mc_n = nerrsample
+	mc_p = nint (mc_n * MC_P / 100.)
+	mc_sig = nint (mc_n * MC_SIG / 100.)
+	if (doerr && mc_sig > 9) {
 	    call salloc (yd1, nfit, TY_REAL)
 	    call salloc (ym, nfit, TY_REAL)
 	    call salloc (xg1, ng, TY_REAL)
 	    call salloc (yg1, ng, TY_REAL)
 	    call salloc (sg1, ng, TY_REAL)
-	    call salloc (conte, MC_SAMPLE*ng, TY_REAL)
-	    call salloc (xge, MC_SAMPLE*ng, TY_REAL)
-	    call salloc (yge, MC_SAMPLE*ng, TY_REAL)
-	    call salloc (sge, MC_SAMPLE*ng, TY_REAL)
-	    call salloc (fluxe, MC_SAMPLE*ng, TY_REAL)
-	    call salloc (eqwe, MC_SAMPLE*ng, TY_REAL)
+	    call salloc (lg1, ng, TY_REAL)
+	    call salloc (conte, mc_n*ng, TY_REAL)
+	    call salloc (xge, mc_n*ng, TY_REAL)
+	    call salloc (yge, mc_n*ng, TY_REAL)
+	    call salloc (sge, mc_n*ng, TY_REAL)
+	    call salloc (lge, mc_n*ng, TY_REAL)
+	    call salloc (fluxe, mc_n*ng, TY_REAL)
+	    call salloc (eqwe, mc_n*ng, TY_REAL)
 	    do i = 1, nfit {
 		w = Memr[xd+i-1]
 		Memr[ym+i-1] = model (w, dx, nsub, Memr[xg], Memr[yg],
-		    Memr[sg], ng)
+		    Memr[sg], Memr[lg], Memi[pg], ng)
 	    }
 	    seed = 1
-	    do i = 0, MC_SAMPLE-1 {
+	    do i = 0, mc_n-1 {
 		do j = 1, nfit
 		    Memr[yd1+j-1] = Memr[ym+j-1] +
 			sscale / scale * Memr[sd+j-1] * gasdev (seed)
@@ -700,15 +810,28 @@ begin
 		call amovr (Memr[xg], Memr[xg1], ng)
 		call amovr (Memr[yg], Memr[yg1], ng)
 		call amovr (Memr[sg], Memr[sg1], ng)
-		call dofit (fitbkg, fitpos, 3, fitsig, Memr[xd],
-		    Memr[yd1], Memr[sd], nfit, dx, nsub, wyc1, slope1,
-		    Memr[xg1], Memr[yg1], Memr[sg1], ng, chisq)
+		call amovr (Memr[lg], Memr[lg1], ng)
+		call dorefit (fit, Memr[xd], Memr[yd1], Memr[sd],
+		    nfit, dx, nsub, wyc1, slope1,
+		    Memr[xg1], Memr[yg1], Memr[sg1],
+		    Memr[lg1], Memi[pg], ng, chisq)
 
 		do j = 0, ng-1 {
 		    cont = y1 + z1 + (dy + dz) * Memr[xg+j] - dy * x1
 		    cont1 = y1 + wyc1 + (dy + slope1) * Memr[xg+j] - dy * x1
-		    flux = Memr[sg+j] * Memr[yg+j] * SQ2PI
-		    flux1 = Memr[sg1+j] * Memr[yg1+j] * SQ2PI
+		    switch (Memi[pg+j]) {
+		    case GAUSS:
+			flux = 1.064467 * Memr[yg+j] * Memr[sg+j]
+			flux1 = 1.064467 * Memr[yg1+j] * Memr[sg1+j]
+		    case LORENTZ:
+			flux = 1.570795 * Memr[yg+j] * Memr[lg+j]
+			flux1 = 1.570795 * Memr[yg1+j] * Memr[lg1+j]
+		    case VOIGT:
+			call voigt (0., 0.832555*Memr[lg+j]/Memr[sg+j], v, u)
+			flux = 1.064467 * Memr[yg+j] * Memr[sg+j] / v
+			call voigt (0., 0.832555*Memr[lg1+j]/Memr[sg1+j], v, u)
+			flux1 = 1.064467 * Memr[yg1+j] * Memr[sg1+j] / v
+		    }
 		    if (cont > 0. && cont1 > 0.) {
 			eqw = -flux / cont
 			eqw1 = -flux1 / cont1
@@ -716,31 +839,27 @@ begin
 			eqw = 0.
 			eqw1 = 0.
 		    }
-		    Memr[conte+j*MC_SAMPLE+i] = abs (cont1 - cont)
-		    Memr[xge+j*MC_SAMPLE+i] = abs (Memr[xg1+j] - Memr[xg+j])
-		    Memr[yge+j*MC_SAMPLE+i] = abs (Memr[yg1+j] - Memr[yg+j])
-		    Memr[sge+j*MC_SAMPLE+i] = abs (Memr[sg1+j] - Memr[sg+j])
-		    Memr[fluxe+j*MC_SAMPLE+i] = abs (flux1 - flux)
-		    Memr[eqwe+j*MC_SAMPLE+i] = abs (eqw1 - eqw)
+		    Memr[conte+j*mc_n+i] = abs (cont1 - cont)
+		    Memr[xge+j*mc_n+i] = abs (Memr[xg1+j] - Memr[xg+j])
+		    Memr[yge+j*mc_n+i] = abs (Memr[yg1+j] - Memr[yg+j])
+		    Memr[sge+j*mc_n+i] = abs (Memr[sg1+j] - Memr[sg+j])
+		    Memr[lge+j*mc_n+i] = abs (Memr[lg1+j] - Memr[lg+j])
+		    Memr[fluxe+j*mc_n+i] = abs (flux1 - flux)
+		    Memr[eqwe+j*mc_n+i] = abs (eqw1 - eqw)
 		}
 	    }
 	    do j = 0, ng-1 {
-		call asrtr (Memr[conte+j*MC_SAMPLE], Memr[conte+j*MC_SAMPLE],
-		    MC_SAMPLE)
-		call asrtr (Memr[xge+j*MC_SAMPLE], Memr[xge+j*MC_SAMPLE],
-		    MC_SAMPLE)
-		call asrtr (Memr[yge+j*MC_SAMPLE], Memr[yge+j*MC_SAMPLE],
-		    MC_SAMPLE)
-		call asrtr (Memr[sge+j*MC_SAMPLE], Memr[sge+j*MC_SAMPLE],
-		    MC_SAMPLE)
-		call asrtr (Memr[fluxe+j*MC_SAMPLE], Memr[fluxe+j*MC_SAMPLE],
-		    MC_SAMPLE)
-		call asrtr (Memr[eqwe+j*MC_SAMPLE], Memr[eqwe+j*MC_SAMPLE],
-		    MC_SAMPLE)
+		call asrtr (Memr[conte+j*mc_n], Memr[conte+j*mc_n], mc_n)
+		call asrtr (Memr[xge+j*mc_n], Memr[xge+j*mc_n], mc_n)
+		call asrtr (Memr[yge+j*mc_n], Memr[yge+j*mc_n], mc_n)
+		call asrtr (Memr[sge+j*mc_n], Memr[sge+j*mc_n], mc_n)
+		call asrtr (Memr[lge+j*mc_n], Memr[lge+j*mc_n], mc_n)
+		call asrtr (Memr[fluxe+j*mc_n], Memr[fluxe+j*mc_n], mc_n)
+		call asrtr (Memr[eqwe+j*mc_n], Memr[eqwe+j*mc_n], mc_n)
 	    }
-	    call amulkr (Memr[conte], scale, Memr[conte], MC_SAMPLE*ng)
-	    call amulkr (Memr[yge], scale, Memr[yge], MC_SAMPLE*ng)
-	    call amulkr (Memr[fluxe], scale, Memr[fluxe], MC_SAMPLE*ng)
+	    call amulkr (Memr[conte], scale, Memr[conte], mc_n*ng)
+	    call amulkr (Memr[yge], scale, Memr[yge], mc_n*ng)
+	    call amulkr (Memr[fluxe], scale, Memr[fluxe], mc_n*ng)
 	}
 
 	call amulkr (Memr[yg], scale, Memr[yg], ng)
@@ -749,18 +868,24 @@ begin
 
 	# Log computed values
 	call sprintf (Memc[str], SZ_LINE,
-	    "# Nfit=%d, background=%b, positions=%s, sigmas=%s\n")
+	    "# Nfit=%d, background=%b, positions=%s, gfwhm=%s, lfwhm=%s\n")
 	    call pargi (ng)
-	    call pargi (fitbkg)
-	    if (fitpos == 1)
+	    call pargi (fit[BKG] == SINGLE)
+	    if (fit[POS] == FIXED)
 		call pargstr ("fixed")
-	    else if (fitpos == 2)
+	    else if (fit[POS] == SINGLE)
 		call pargstr ("single")
 	    else
 		call pargstr ("all")
-	    if (fitsig == 1)
+	    if (fit[GAU] == FIXED)
 		call pargstr ("fixed")
-	    else if (fitsig == 2)
+	    else if (fit[GAU] == SINGLE)
+		call pargstr ("single")
+	    else
+		call pargstr ("all")
+	    if (fit[LOR] == FIXED)
+		call pargstr ("fixed")
+	    else if (fit[LOR] == SINGLE)
 		call pargstr ("single")
 	    else
 		call pargstr ("all")
@@ -774,8 +899,8 @@ begin
 	    call pargstr ("flux")
 	    call pargstr ("eqw")
 	    call pargstr ("core")
-	    call pargstr ("sigma")
-	    call pargstr ("fwhm")
+	    call pargstr ("gfwhm")
+	    call pargstr ("lfwhm")
 	if (log != NULL)
 	    call fprintf (log, Memc[str])
 	if (verbose)
@@ -785,36 +910,47 @@ begin
 		next
 	    xc = Memr[xg+i-1]
 	    cont = y1 + dy * (xc - x1)
-	    height = Memr[yg+i-1]
-	    sigma = Memr[sg+i-1]
-	    flux = sigma * height * SQ2PI
+	    peak = Memr[yg+i-1]
+	    gfwhm = Memr[sg+i-1]
+	    lfwhm = Memr[lg+i-1]
+	    switch (Memi[pg+i-1]) {
+	    case 1:
+		flux = 1.064467 * peak * gfwhm
+	    case 2:
+		flux = 1.570795 * peak * lfwhm
+	    case 3:
+		call voigt (0., 0.832555*lfwhm/gfwhm, v, u)
+		flux = 1.064467 * peak * gfwhm / v
+	    }
+
 	    if (cont > 0.)
 		eqw = -flux / cont
 	    else
 		eqw = INDEF
+
 	    call sprintf (Memc[str], SZ_LINE,
 		" %9.7g %9.7g %9.6g %9.4g %9.6g %9.4g %9.4g\n")
 		call pargr (xc)
 		call pargr (cont)
 		call pargr (flux)
 		call pargr (eqw)
-		call pargr (height)
-		call pargr (sigma)
-		call pargr (2.355 * sigma)
+		call pargr (peak)
+		call pargr (gfwhm)
+		call pargr (lfwhm)
 	    if (log != NULL)
 		call fprintf (log, Memc[str])
 	    if (verbose)
 		call printf (Memc[str])
-	    if (doerr) {
+	    if (doerr && mc_sig > 9) {
 		call sprintf (Memc[str], SZ_LINE,
 		" (%7.7g) (%7.7g) (%7.6g) (%7.4g) (%7.6g) (%7.4g) (%7.4g)\n")
-		    call pargr (Memr[xge+(i-1)*MC_SAMPLE+MC_SIGMA])
-		    call pargr (Memr[conte+(i-1)*MC_SAMPLE+MC_SIGMA])
-		    call pargr (Memr[fluxe+(i-1)*MC_SAMPLE+MC_SIGMA])
-		    call pargr (Memr[eqwe+(i-1)*MC_SAMPLE+MC_SIGMA])
-		    call pargr (Memr[yge+(i-1)*MC_SAMPLE+MC_SIGMA])
-		    call pargr (Memr[sge+(i-1)*MC_SAMPLE+MC_SIGMA])
-		    call pargr (2.355 * Memr[sge+(i-1)*MC_SAMPLE+MC_SIGMA])
+		    call pargr (Memr[xge+(i-1)*mc_n+mc_sig])
+		    call pargr (Memr[conte+(i-1)*mc_n+mc_sig])
+		    call pargr (Memr[fluxe+(i-1)*mc_n+mc_sig])
+		    call pargr (Memr[eqwe+(i-1)*mc_n+mc_sig])
+		    call pargr (Memr[yge+(i-1)*mc_n+mc_sig])
+		    call pargr (Memr[sge+(i-1)*mc_n+mc_sig])
+		    call pargr (Memr[lge+(i-1)*mc_n+mc_sig])
 		if (log != NULL)
 		    call fprintf (log, Memc[str])
 		if (verbose)
@@ -824,17 +960,12 @@ begin
 
 	# Compute model.
 	call aclrr (mod, n)
-	do i = 1, ng {
-	    if (!rng_elementi (components, i))
+	do i = 0, ng-1 {
+	    if (!rng_elementi (components, i+1))
 		next
-	    xc = Memr[xg+i-1]
-	    height = Memr[yg+i-1]
-	    sigma = Memr[sg+i-1]
-	    do j = 1, n {
-	       z = 0.5 * ((x[j] - xc) / sigma) ** 2
-	       if (z < 5)
-		   mod[j] = mod[j] + height * exp (-z)
-	    }
+	    do j = 1, n
+		mod[j] = model (x[j], dx, nsub, Memr[xg+i], Memr[yg+i],
+		    Memr[sg+i], Memr[lg+i], Memi[pg+i], ng)
 	}
 
 	# Draw graphs
@@ -857,24 +988,20 @@ begin
 	    call asubr (y[i1], mod[i1], Memr[yd], nfit)
 	    call gpline (gp, Memr[xd], Memr[yd], nfit)
 	    call gseti (gp, G_PLTYPE, 4)
-	    do i = 1, ng {
-		if (!rng_elementi (components, i))
+	    do i = 0, ng-1 {
+		if (!rng_elementi (components, i+1))
 		    next
-		xc = Memr[xg+i-1]
-		height = Memr[yg+i-1]
-		sigma = Memr[sg+i-1]
 		k = 0
 		do j = i1, i2 {
 		    w = x[j]
-		    z = 0.5 * ((w - xc) / sigma) ** 2
-		    if (z < 5) {
-		        z = height * exp (-z) + y1 + dy * (w - x1)
-		        if (k == 0) {
-			    call gamove (gp, w, z)
-			    k = 1
-			} else
-			    call gadraw (gp, w, z)
-		    }
+		    z = model (w, dx, nsub, Memr[xg+i], Memr[yg+i],
+			Memr[sg+i], Memr[lg+i], Memi[pg+i], 1)
+		    z = z + y1 + dy * (w - x1)
+		    if (k == 0) {
+			call gamove (gp, w, z)
+			k = 1
+		    } else
+			call gadraw (gp, w, z)
 		}
 	    }
 	    call gclose (gp)

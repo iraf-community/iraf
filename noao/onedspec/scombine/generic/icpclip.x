@@ -23,7 +23,7 @@ real	median[npts]		# Median
 
 int	i, j, k, l, id, n1, n2, n3, n4, n5, nl, nh, nin, maxkeep
 bool	even, fp_equalr()
-real	sigma, r, s
+real	sigma, r, s, t
 pointer	sp, resid, mp1, mp2
 real	med
 
@@ -45,9 +45,9 @@ begin
 
 	# Set sign of pclip parameter
 	if (pclip < 0)
-	    s = -1.
+	    t = -1.
 	else
-	    s = 1.
+	    t = 1.
 
 	# If there are no rejected pixels compute certain parameters once.
 	if (dflag == D_ALL) {
@@ -107,7 +107,7 @@ begin
 	    }
 
 	    # Define sigma for clipping
-	    sigma = s * (Memr[d[n3]+j] - med)
+	    sigma = t * (Memr[d[n3]+j] - med)
 	    if (fp_equalr (sigma, 0.)) {
 		if (combine == MEDIAN)
 		    median[i] = med

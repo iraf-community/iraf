@@ -1,26 +1,298 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include	<ctype.h>
 include	<imhdr.h>
+include	<imset.h>
+include	<pmset.h>
+include	<imio.h>
 
-.help zscale
+# User callable routines.
+# ZSCALE -- Sample an image and compute greyscale limits.
+# MZSCALE -- Sample an image with pixel masks and compute greyscale limits.
+# ZSC_PMSECTION -- Create a pixel mask from an image section.
+# ZSC_ZLIMITS -- Compute Z transform limits from a sample of pixels.
+
+
+# ZSCALE -- Sample an image and compute greyscale limits.
+# A sample mask is created based on the input parameters and then
+# MZSCALE is called.
+
+procedure zscale (im, z1, z2, contrast, optimal_sample_size, len_stdline)
+
+pointer	im			# image to be sampled
+real	z1, z2			# output min and max greyscale values
+real	contrast		# adj. to slope of transfer function
+int	optimal_sample_size	# desired number of pixels in sample
+int	len_stdline		# optimal number of pixels per line
+
+int	nc, nl
+pointer	sp, section, zpm, zsc_pmsection()
+errchk	zsc_pmsection, mzscale
+
+begin
+	call smark (sp)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+
+	# Make the sample image section.
+	switch (IM_NDIM(im)) {
+	case 1:
+	    call sprintf (Memc[section], SZ_FNAME, "[*]")
+	default:
+	    nc = max (1, min (IM_LEN(im,1), len_stdline))
+	    nl = max (1, min (IM_LEN(im,2), optimal_sample_size / nc))
+	    call sprintf (Memc[section], SZ_FNAME, "[*:%d,*:%d]")
+		call pargi (IM_LEN(im,1) / nc)
+		call pargi (IM_LEN(im,2) / nl)
+	}
+
+	# Make a mask and compute the greyscale limits.
+	zpm = zsc_pmsection (Memc[section], im)
+	call mzscale (im, zpm, NULL, contrast, optimal_sample_size, z1, z2)
+	call imunmap (zpm)
+	call sfree (sp)
+end
+
+
+# MZSCALE -- Sample an image with pixel masks and compute greyscale limits.
+# The image is sampled through a pixel mask.  If no pixel mask is given
+# a uniform sample mask is generated.  If a bad pixel mask is given
+# bad pixels in the sample are eliminated.  Once the sample is obtained
+# the greyscale limits are obtained using the ZSC_ZLIMITS algorithm.
+
+procedure mzscale (im, zpm, bpm, contrast, maxpix, z1, z2)
+
+pointer	im			#I image to be sampled
+pointer	zpm			#I pixel mask for sampling
+pointer	bpm			#I bad pixel mask
+real	contrast		#I contrast parameter
+int	maxpix			#I maximum number of pixels in sample
+real	z1, z2			#O output min and max greyscale values
+
+int	i, ndim, nc, nl, npix, nbp, imstati()
+pointer	sp, section, v, sample, zmask, bp, zim, pmz, pmb, buf
+pointer	zsc_pmsection(), imgnlr()
+bool	pm_linenotempty()
+errchk	zsc_pmsection, zsc_zlimits
+
+begin
+	call smark (sp)
+	call salloc (section, SZ_FNAME, TY_CHAR)
+	call salloc (v, IM_MAXDIM, TY_LONG)
+	call salloc (sample, maxpix, TY_REAL)
+	zmask = NULL
+	bp = NULL
+
+	ndim = min (2, IM_NDIM(im))
+	nc = IM_LEN(im,1)
+	nl = IM_LEN(im,2)
+
+	# Generate a uniform sample mask if none is given.
+	if (zpm == NULL) {
+	    switch (IM_NDIM(im)) {
+	    case 1:
+		call sprintf (Memc[section], SZ_FNAME, "[*]")
+	    default:
+		i = max (1., sqrt ((nc-1)*(nl-1) / real (maxpix)))
+		call sprintf (Memc[section], SZ_FNAME, "[*:%d,*:%d]")
+		    call pargi (i)
+		    call pargi (i)
+	    }
+	    zim = zsc_pmsection (Memc[section], im)
+	    pmz = imstati (zim, IM_PMDES)
+	} else
+	    pmz = imstati (zpm, IM_PMDES)
+
+	# Set bad pixel mask.
+	if (bpm != NULL)
+	    pmb = imstati (bpm, IM_PMDES)
+	else
+	    pmb = NULL
+
+	# Get the sample up to maxpix pixels.
+	npix = 0
+	nbp = 0
+	call amovkl (long(1), Memi[v], IM_MAXDIM)
+	repeat {
+	    if (pm_linenotempty (pmz, Meml[v])) {
+		if (zmask == NULL)
+		    call salloc (zmask, nc, TY_INT)
+		call pmglpi (pmz, Meml[v], Memi[zmask], 0, nc, 0)
+		if (pmb != NULL) {
+		    if (pm_linenotempty (pmb, Meml[v])) {
+			if (bp == NULL)
+			    call salloc (bp, nc, TY_INT)
+			call pmglpi (pmb, Meml[v], Memi[bp], 0, nc, 0)
+			nbp = nc
+		    } else
+			nbp = 0
+
+		}
+		if (imgnlr (im, buf, Meml[v]) == EOF)
+		    break
+		do i = 0, nc-1 {
+		    if (Memi[zmask+i] == 0)
+			next
+		    if (nbp > 0)
+			if (Memi[bp+i] != 0)
+			    next
+		    Memr[sample+npix] = Memr[buf+i]
+		    npix = npix + 1
+		    if (npix == maxpix)
+			break
+		}
+		if (npix == maxpix)
+		    break
+	    } else {
+		do i = 2, ndim {
+		    Meml[v+i-1] = Meml[v+i-1] + 1
+		    if (Meml[v+i-1] <= IM_LEN(im,i))
+			break
+		    else if (i < ndim)
+			Meml[v+i-1] = 1
+		}
+	    }
+        } until (Meml[v+ndim-1] > IM_LEN(im,ndim))
+
+	if (zpm == NULL)
+	    call imunmap (zim)
+
+	# Compute greyscale limits.
+	call zsc_zlimits (Memr[sample], npix, contrast, z1, z2)
+
+	call sfree (sp)
+end
+
+
+# ZSC_PMSECTION -- Create a pixel mask from an image section.
+# This only applies the mask to the first plane of the image.
+
+pointer procedure zsc_pmsection (section, refim)
+
+char	section[ARB]		#I Image section
+pointer	refim			#I Reference image pointer
+
+int	i, j, ip, ndim, temp, a[2], b[2], c[2], rop, ctoi()
+pointer	pm, im, mw, dummy, pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
+define  error_  99
+
+begin
+        # Decode the section string.
+	call amovki (1, a, 2)
+	call amovki (1, b, 2)
+	call amovki (1, c, 2)
+	ndim = min (2, IM_NDIM(refim))
+	do i = 1, ndim
+	    b[i] = IM_LEN(refim,i)
+
+        ip = 1
+        while (IS_WHITE(section[ip]))
+            ip = ip + 1
+        if (section[ip] == '[') {
+            ip = ip + 1
+
+	    do i = 1, ndim {
+		while (IS_WHITE(section[ip]))
+		    ip = ip + 1
+
+		# Get a:b:c.  Allow notation such as "-*:c"
+		# (or even "-:c") where the step is obviously negative.
+
+		if (ctoi (section, ip, temp) > 0) {                 # a
+		    a[i] = temp
+		    if (section[ip] == ':') {
+			ip = ip + 1
+			if (ctoi (section, ip, b[i]) == 0)             # a:b
+			    goto error_
+		    } else
+			b[i] = a[i]
+		} else if (section[ip] == '-') {                    # -*
+		    temp = a[i]
+		    a[i] = b[i]
+		    b[i] = temp
+		    ip = ip + 1
+		    if (section[ip] == '*')
+			ip = ip + 1
+		} else if (section[ip] == '*')                      # *
+		    ip = ip + 1
+		if (section[ip] == ':') {                           # ..:step
+		    ip = ip + 1
+		    if (ctoi (section, ip, c[i]) == 0)
+			goto error_
+		    else if (c[i] == 0)
+			goto error_
+		}
+		if (a[i] > b[i] && c[i] > 0)
+		    c[i] = -c[i]
+
+		while (IS_WHITE(section[ip]))
+		    ip = ip + 1
+		if (i < ndim) {
+		    if (section[ip] != ',')
+			goto error_
+		} else {
+		    if (section[ip] != ']')
+			goto error_
+		}
+		ip = ip + 1
+	    }
+	}
+
+	# In this case make the values be increasing only.
+	do i = 1, ndim
+	    if (c[i] < 0) {
+		temp = a[i]
+		a[i] = b[i]
+		b[i] = temp
+		c[i] = -c[i]
+	    }
+
+	# Make the mask.
+	pm = pm_newmask (refim, 16)
+
+	rop = PIX_SET+PIX_VALUE(1)
+	if (c[1] == 1 && c[2] == 1)
+	    call pm_box (pm, a[1], a[2], b[1], b[2], rop)
+
+	else if (c[1] == 1)
+	    for (i=a[2]; i<=b[2]; i=i+c[2])
+		call pm_box (pm, a[1], i, b[1], i, rop)
+
+	else
+	    for (i=a[2]; i<=b[2]; i=i+c[2])
+		for (j=a[1]; j<=b[1]; j=j+c[1])
+		    call pm_point (pm, j, i, rop)
+
+	i = IM_NPHYSDIM(refim)
+	IM_NPHYSDIM(refim) = ndim
+	im = im_pmmapo (pm, refim)
+	IM_NPHYSDIM(refim) = i
+	dummy = imgl1i (im)		# Force I/O to set header
+	ifnoerr (mw = mw_openim (refim)) {		# Set WCS
+	    call mw_saveim (mw, im)
+	    call mw_close (mw)
+	}
+
+	return (im)
+
+error_
+        call error (1, "Error in image section specification")
+end
+
+
+.help zsc_zlimits
 .nf ___________________________________________________________________________
-ZSCALE -- Compute the optimal Z1, Z2 (range of greyscale values to be
-displayed) of an image.  For efficiency a statistical subsample of an image
-is used.  The pixel sample evenly subsamples the image in x and y.  The entire
-image is used if the number of pixels in the image is smaller than the desired
-sample.
+ZSC_ZLIMITS -- Compute limits for a linear transform that best samples the
+the histogram about the median value.  This is often called to compute
+greyscale limits from a sample of pixel values.
 
-The sample is accumulated in a buffer and sorted by greyscale value.
-The median value is the central value of the sorted array.  The slope of a
-straight line fitted to the sorted sample is a measure of the standard
-deviation of the sample about the median value.  Our algorithm is to sort
-the sample and perform an iterative fit of a straight line to the sample,
-using pixel rejection to omit gross deviants near the endpoints.  The fitted
-straight line is the transfer function used to map image Z into display Z.
-If more than half the pixels are rejected the full range is used.  The slope
-of the fitted line is divided by the user-supplied contrast factor and the
-final Z1 and Z2 are computed, taking the origin of the fitted line at the
-median value.
+If the number of pixels is too small an error condition is returned.  If
+the contrast parameter value is zero the limits of the sample are
+returned.  Otherwise the sample is sorted and the median is found from the
+central value(s).  A straight line is fitted to the sorted sample with
+interative rejection.  If more than half the pixels are rejected the full
+range is returned.  The contrast parameter is used to adjust the transfer
+slope about the median.  The final limits are the extension of the fitted
+line to the first and last array index.
 .endhelp ______________________________________________________________________
 
 define	MIN_NPIXELS	5		# smallest permissible sample
@@ -32,42 +304,43 @@ define	KREJ		2.5		# k-sigma pixel rejection factor
 define	MAX_ITERATIONS	5		# maximum number of fitline iterations
 
 
-# ZSCALE -- Sample the image and compute Z1 and Z2.
+# ZSC_ZLIMITS -- Compute Z transform limits from a sample of pixels.
 
-procedure zscale (im, z1, z2, contrast, optimal_sample_size, len_stdline)
+procedure zsc_zlimits (sample, npix, contrast, z1, z2)
 
-pointer	im			# image to be sampled
-real	z1, z2			# output min and max greyscale values
-real	contrast		# adj. to slope of transfer function
-int	optimal_sample_size	# desired number of pixels in sample
-int	len_stdline		# optimal number of pixels per line
+real	sample[ARB]	#I Sample of pixel values (possibly resorted)
+int	npix		#I Number of pixels
+real	contrast	#I Contrast algorithm parameter
+real	z1, z2		#O Z transform limits
 
-int	npix, minpix, ngoodpix, center_pixel, ngrow
+int	center_pixel, minpix, ngoodpix, ngrow, zsc_fit_line()
 real	zmin, zmax, median
 real	zstart, zslope
-pointer	sample, left
-int	zsc_sample_image(), zsc_fit_line()
 
 begin
-	# Subsample the image.
-	npix = zsc_sample_image (im, sample, optimal_sample_size, len_stdline)
-	center_pixel = max (1, (npix + 1) / 2)
+	# Check for a sufficient sample.
+	if (npix < MIN_NPIXELS)
+	    call error (1, "Insufficient sample pixels found")
 
-	# Sort the sample, compute the minimum, maximum, and median pixel
-	# values.
-
-	call asrtr (Memr[sample], Memr[sample], npix)
-	zmin = Memr[sample]
-	zmax = Memr[sample+npix-1]
-
+	# If contrast is zero return the range.
+	if (contrast == 0.) {
+	    call alimr (sample, npix, z1, z2)
+	    return
+	}
+	    
+	# Sort the sample, compute the range, and median pixel values.
 	# The median value is the average of the two central values if there 
 	# are an even number of pixels in the sample.
 
-	left = sample + center_pixel - 1
-	if (mod (npix, 2) == 1 || center_pixel >= npix)
-	    median = Memr[left]
+	call asrtr (sample, sample, npix)
+	zmin = sample[1]
+	zmax = sample[npix]
+
+	center_pixel = (npix + 1) / 2
+	if (mod (npix, 2) == 1)
+	    median = sample[center_pixel]
 	else
-	    median = (Memr[left] + Memr[left+1]) / 2
+	    median = (sample[center_pixel] + sample[center_pixel+1]) / 2
 
 	# Fit a line to the sorted sample vector.  If more than half of the
 	# pixels in the sample are rejected give up and return the full range.
@@ -77,7 +350,7 @@ begin
 
 	minpix = max (MIN_NPIXELS, int (npix * MAX_REJECT))
 	ngrow = max (1, nint (npix * .01))
-	ngoodpix = zsc_fit_line (Memr[sample], npix, zstart, zslope,
+	ngoodpix = zsc_fit_line (sample, npix, zstart, zslope,
 	    KREJ, ngrow, MAX_ITERATIONS)
 
 	if (ngoodpix < minpix) {
@@ -88,93 +361,6 @@ begin
 		zslope = zslope / contrast
 	    z1 = max (zmin, median - (center_pixel - 1) * zslope)
 	    z2 = min (zmax, median + (npix - center_pixel) * zslope)
-	}
-
-	call mfree (sample, TY_REAL)
-end
-
-
-# ZSC_SAMPLE_IMAGE -- Extract an evenly gridded subsample of the pixels from
-# a two-dimensional image into a one-dimensional vector.
-
-int procedure zsc_sample_image (im, sample, optimal_sample_size, len_stdline)
-
-pointer	im			# image to be sampled
-pointer	sample			# output vector containing the sample
-int	optimal_sample_size	# desired number of pixels in sample
-int	len_stdline		# optimal number of pixels per line
-
-int	ncols, nlines, col_step, line_step, maxpix, line
-int	opt_npix_per_line, npix_per_line
-int	opt_nlines_in_sample, min_nlines_in_sample, max_nlines_in_sample
-pointer	op
-pointer	imgl2r()
-
-begin
-	ncols  = IM_LEN(im,1)
-	nlines = IM_LEN(im,2)
-
-	# Compute the number of pixels each line will contribute to the sample,
-	# and the subsampling step size for a line.  The sampling grid must
-	# span the whole line on a uniform grid.
-
-	opt_npix_per_line = max (1, min (ncols, len_stdline))
-	col_step = max (1, (ncols + opt_npix_per_line-1) / opt_npix_per_line)
-	npix_per_line = max (1, (ncols + col_step-1) / col_step)
-
-	# Compute the number of lines to sample and the spacing between lines.
-	# We must ensure that the image is adequately sampled despite its
-	# size, hence there is a lower limit on the number of lines in the
-	# sample.  We also want to minimize the number of lines accessed when
-	# accessing a large image, because each disk seek and read is expensive.
-	# The number of lines extracted will be roughly the sample size divided
-	# by len_stdline, possibly more if the lines are very short.
-
-	min_nlines_in_sample = max (1, optimal_sample_size / len_stdline)
-	opt_nlines_in_sample = max(min_nlines_in_sample, min(nlines,
-	    (optimal_sample_size + npix_per_line-1) / npix_per_line))
-	line_step = max (1, nlines / (opt_nlines_in_sample))
-	max_nlines_in_sample = (nlines + line_step-1) / line_step
-
-	# Allocate space for the output vector.  Buffer must be freed by our
-	# caller.
-
-	maxpix = npix_per_line * max_nlines_in_sample
-	call malloc (sample, maxpix, TY_REAL)
-
-	# Extract the vector.
-	op = sample
-	do line = (line_step + 1) / 2, nlines, line_step {
-	    call zsc_subsample (Memr[imgl2r(im,line)], Memr[op],
-		npix_per_line, col_step)
-	    op = op + npix_per_line
-	    if (op - sample + npix_per_line > maxpix)
-		break
-	}
-
-	return (op - sample)
-end
-
-
-# ZSC_SUBSAMPLE -- Subsample an image line.  Extract the first pixel and
-# every "step"th pixel thereafter for a total of npix pixels.
-
-procedure zsc_subsample (a, b, npix, step)
-
-real	a[ARB]
-real	b[npix]
-int	npix, step
-int	ip, i
-
-begin
-	if (step <= 1)
-	    call amovr (a, b, npix)
-	else {
-	    ip = 1
-	    do i = 1, npix {
-		b[i] = a[ip]
-		ip = ip + step
-	    }
 	}
 end
 

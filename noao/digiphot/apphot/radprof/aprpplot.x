@@ -137,11 +137,11 @@ begin
 	# Encode the value of the magnitude at the maximum aperture.
 	call fprintf (fd, "Photometry: fwhmpsf=%0.3f  maxapert=")
 	    call pargr (apstatr (ap, RPFWHM))
-	call aparrays (ap, APERTS, Memr[temp])
+	call ap_arrayr (ap, APERTS, Memr[temp])
 	call amulkr (Memr[temp], apstatr (ap, SCALE), Memr[temp], naperts)
 	call fprintf (fd, "%0.2f  mags=")
 	    call pargr (Memr[temp+naperts-1])
-	call aparrays (ap, MAGS, Memr[temp])
+	call ap_arrayr (ap, MAGS, Memr[temp])
 	call fprintf (fd, "%0.3f\n")
 	    call pargr (Memr[temp+naperts-1])
 
@@ -227,35 +227,44 @@ begin
 	# Plot the full width half maximum of the radial profile.
 	scale = apstatr (ap, SCALE)
 	rpfwhm = apstatr (ap, RPFWHM) / 2.0
-	call gamove (gd, rpfwhm, ymin)
-	call gadraw (gd, rpfwhm, ymax)
-	call sprintf (Memc[str], SZ_LINE, "hwhm = %0.2f")
-	    call pargr (rpfwhm)
-	call gtext (gd, rpfwhm, 0.0, Memc[str], "q=h;u=180;p=r")
+	if (rpfwhm >= xmin && rpfwhm <= xmax) {
+	    call gamove (gd, rpfwhm, ymin)
+	    call gadraw (gd, rpfwhm, ymax)
+	    call sprintf (Memc[str], SZ_LINE, "hwhm = %0.2f")
+	        call pargr (rpfwhm)
+	    call gtext (gd, rpfwhm, 0.0, Memc[str], "q=h;u=180;p=r")
+	}
 
 	# Mark the sky annuli.
 	annulus = scale * apstatr (ap, ANNULUS)
 	dannulus = scale * (apstatr (ap, ANNULUS) + apstatr (ap, DANNULUS))
-	call gamove (gd, annulus, ymin)
-	call gadraw (gd, annulus, ymax)
-	call sprintf (Memc[str], SZ_LINE, "inner sky radius = %0.2f")
-	    call pargr (annulus)
-	call gtext (gd, annulus, 0.0, Memc[str], "q=h;u=180;p=r")
-	call gamove (gd, dannulus, ymin)
-	call gadraw (gd, dannulus, ymax)
-	call sprintf (Memc[str], SZ_LINE, "outer sky radius = %0.2f")
-	    call pargr (dannulus)
-	call gtext (gd, dannulus, 0.0, Memc[str], "q=h;u=180;p=r")
+	if (annulus >= xmin && annulus <= xmax) {
+	    call gamove (gd, annulus, ymin)
+	    call gadraw (gd, annulus, ymax)
+	    call sprintf (Memc[str], SZ_LINE, "inner sky radius = %0.2f")
+	        call pargr (annulus)
+	    call gtext (gd, annulus, 0.0, Memc[str], "q=h;u=180;p=r")
+	}
+	if (dannulus >= xmin && dannulus <= xmax) {
+	    call gamove (gd, dannulus, ymin)
+	    call gadraw (gd, dannulus, ymax)
+	    call sprintf (Memc[str], SZ_LINE, "outer sky radius = %0.2f")
+	        call pargr (dannulus)
+	    call gtext (gd, dannulus, 0.0, Memc[str], "q=h;u=180;p=r")
+	}
 
 	# Plot the aperture value.
-	call aparrays (ap, APERTS, Memr[temp])
+	call ap_arrayr (ap, APERTS, Memr[temp])
 	call amulkr (Memr[temp], scale, Memr[temp], naperts)
 	call gseti (gd, G_PLTYPE, GL_SOLID)
-    	call gamove (gd, Memr[temp+naperts-1], ymin)
-	call gadraw (gd, Memr[temp+naperts-1], ymax)
-	call sprintf (Memc[str], SZ_LINE, "maxapert = %0.2f")
-	    call pargr (Memr[temp+naperts-1])
-	call gtext (gd, Memr[temp+naperts-1], 0.0, Memc[str], "q=h;u=180;p=r")
+	if (Memr[temp+naperts-1] >= xmin && Memr[temp+naperts-1] <= xmax) {
+    	    call gamove (gd, Memr[temp+naperts-1], ymin)
+	    call gadraw (gd, Memr[temp+naperts-1], ymax)
+	    call sprintf (Memc[str], SZ_LINE, "maxapert = %0.2f")
+	        call pargr (Memr[temp+naperts-1])
+	    call gtext (gd, Memr[temp+naperts-1], 0.0, Memc[str],
+	        "q=h;u=180;p=r")
+	}
 	call gseti (gd, G_PLTYPE, GL_DASHED)
 
 	# Plot the inorm value.

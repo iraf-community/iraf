@@ -4,8 +4,7 @@ include <math/gsurfit.h>
 include "gsurfitdef.h"
 
 # GSEVAL -- Procedure to evaluate the fitted surface at a single point.
-# The GS_NCOEFF(sf) coefficients are stored in
-# the vector COEFF.
+# The GS_NCOEFF(sf) coefficients are stored in the vector COEFF.
 
 real procedure gseval (sf, x, y)
 
@@ -14,7 +13,7 @@ real	x		# x value
 real	y		# y value
 
 real	sum, accum
-int	i, ii, k, xorder
+int	i, ii, k, maxorder, xorder
 pointer	sp, xb, xzb, yb, yzb, czptr
 errchk	smark, salloc, sfree
 
@@ -59,6 +58,7 @@ begin
 	sum = 0.
 
 	# loop over y basis functions
+	maxorder = max (GS_XORDER(sf) + 1, GS_YORDER(sf) + 1)
 	xorder = GS_XORDER(sf)
 	ii = 1
 	do i = 1, GS_YORDER(sf) {
@@ -74,8 +74,15 @@ begin
 
 	    # elements of COEFF where neither k = 1 or i = 1
 	    # are not calculated if GS_XTERMS(sf) = NO
-	    if (GS_XTERMS(sf) == NO)
+	    switch (GS_XTERMS(sf)) {
+	    case GS_XNONE:
 		xorder = 1
+	    case GS_XHALF:
+		if ((i + GS_XORDER(sf) + 1) > maxorder)
+		    xorder = xorder - 1
+	    default:
+		;
+	    }
 	}
 
 	call sfree (sp)

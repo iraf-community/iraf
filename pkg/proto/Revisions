@@ -1,5 +1,90 @@
 .help revisions Jun88 proto
 .nf
+t_imext.x
+doc/imextensions.hlp
+    1.  Image template expansion is used intead of file template expansion.
+    2.  Image sections may now be in the input names.
+    (12/1/97, Valdes)
+
+=====
+V2.11
+=====
+
+t_imext.x
+    Included a private copy of the ranges package to allow having zero
+    be a legal value.  (8/22/97, Valdes)
+
+t_imext.x		+
+imextensions.par	+
+doc/imextensions.hlp	+
+x_proto.x
+mkpkg
+proto.cl
+proto.men
+proto.hd
+    Installed new task for making lists of image extensions.
+    (8/15/97, Valdes)
+
+=========
+V2.11BETA
+=========
+
+proto$
+    The tasks imalign, imcentroid, imfunction, imreplace, wcsedit, and
+    wcsreset have been moved to the images package. Imalign and imcentroid
+    are in immatch, imfunction and imreplace are in imutil, and wcsedit
+    and wcsreset are in imcoords. (3/31, Valdes)
+
+proto$t_wcsedit.x
+    The off-diagonal elements of the LTM matrix were being incorrectly edited
+    although correctly listed by the wcsedit task, in the sense that editing
+    ltm[2,1] was actually editing ltm[1,2]. On the other hand the off-diagonal
+    elements of th CD matrxi were being correctly edited, but incorrectly
+    displayed. (1/20/97, Valdes)
+
+proto$t_fixpix.x
+proto$fixpix.par
+proto$doc/fixpix.hlp
+proto$mkpkg
+    Improved final version of new FIXPIX.  This uses the routines in
+    xtools$fixpix.  (12/11/96, Valdes)
+
+proto$fields.par
+proto$doc/fields.hlp
+    Changed the default lines in FIELDS to an open upper limit.
+    (8/22/96, Valdes)
+
+proto$t_fixpix.x
+proto$fpfixpix.gx
+proto$fixpix.par
+proto$text2mask.par	+
+proto$t_text2mask.x	+
+proto$t_mask2text.x	+
+proto$doc/fixpix.hlp
+proto$doc/text2mask.hlp	+
+proto$mkpkg
+proto$x_proto.x
+proto$proto.cl
+proto$proto.hd
+proto$proto.men
+    Replace the old version of FIXPIX by a new version that works with
+    mask images.  Two new tasks have been added TEXT2MASK and MASK2TEXT that
+    convert from the old text file description to mask images and back.
+    The MASK2TEXT task is hidden to discourage continued use of the text
+    file description.
+    (6/14/96, Valdes)
+
+proto$generic/	+
+proto$imfunc.x -> generic/
+proto$imrep.x -> generic/
+    Added a generic directory for generic files.  The imfunc.x
+    and imrep.x are now in this directory.  (6/14/96, Valdes)
+
+proto$t_wcsreset.x
+    Added an error check to the mw_openim command so wcsreset can erase
+    the world coordinate systems of images with wcss that it cannot
+    read correctly. (1/8/95, Davis)
+
 proto$t_imcntr.x
     Modified the format of the output to ensure a space between the x: and
     y: and the x and y coordinate and increased the precision of the output

@@ -1,7 +1,9 @@
 # PEAKS -- The following procedures are general numerical functions
 # dealing with finding peaks in a data array.
 #
-# FIND_PEAKS		Find the peaks in the data array.
+# FIND_PEAKS		Find the NMAX peaks in the data array.
+# FIND_UPEAKS		Find the uniformly distrib. peaks in the data array.
+# FIND_IPEAKS		Find all the isolated peaks in the data array.
 # FIND_LOCAL_MAXIMA	Find the local maxima in the data array.
 # IS_LOCAL_MAX		Test a point to determine if it is a local maximum.
 # FIND_THRESHOLD	Find the peaks with positions satisfying threshold
@@ -9,9 +11,11 @@
 # FIND_ISOLATED		Flag peaks which are within separation of a peak
 #			with a higher peak value.
 # FIND_NMAX		Select up to the nmax highest ranked peaks.
+# FIND_UNMAX		Select up to the nmax ranked peaks in bins.
 # COMPARE		Compare procedure for sort used in FIND_PEAKS.
 
-# FIND_PEAKS -- Find the peaks in the data array.
+
+# FIND_PEAKS -- Find the NMAX peaks in the data array.
 #
 # The peaks are found using the following algorithm:
 #
@@ -39,11 +43,102 @@ int	nmax			# Maximum number of peaks to be returned
 real	threshold		# Minimum threshold level for peaks
 bool	debug			# Print diagnostic information?
 
-int	i, j
-int	nlmax, nthreshold, nisolated, npeaks
-pointer	sp, y, rank
+int	nrank, npeaks, find_nmax()
+pointer	rank
 
-int	find_local_maxima(), find_threshold(), find_isolated(), find_nmax()
+begin
+	# Find all isolated peaks and their rank.
+	call find_ipeaks (data, x, npoints, contrast, separation, edge,
+    	    threshold, rank, nrank, debug)
+
+	# Select the strongest nmax peaks.
+	npeaks = find_nmax (data, x, Memi[rank], nrank, nmax, debug)
+
+	call mfree (rank, TY_INT)
+	return (npeaks)
+end
+
+
+# FIND_UPEAKS -- Find the uniformly distrib. peaks in the data array.
+#
+# The peaks are found using the following algorithm:
+#
+# 1.  Find the local maxima.
+# 2.  Reject peaks below the threshold.
+# 3.  Determine the ranks of the remaining peaks.
+# 4.  Flag weaker peaks within separation of a stronger peak.
+# 5.  Accept at most the nmax uniformly distributed peaks.
+#
+# Indefinite points are ignored.  The peak positions are returned in the
+# array x.
+
+int procedure find_upeaks (data, x, npoints, contrast, separation, edge,
+	nmax, nbins, threshold, debug)
+
+# Procedure parameters:
+PIXEL	data[npoints]		# Input data array
+PIXEL	x[npoints]		# Output peak position array
+int	npoints			# Number of data points
+real	contrast		# Maximum contrast between strongest and weakest
+int	separation		# Minimum separation between peaks
+int	edge			# Minimum distance from the edge
+int	nmax			# Maximum number of peaks to be returned
+int	nbins			# Number of bins across the data array
+real	threshold		# Minimum threshold level for peaks
+bool	debug			# Print diagnostic information?
+
+int	npts, nrank, npeaks, find_unmax()
+pointer	rank
+
+begin
+	npts = npoints
+
+	# Find all isolated peaks and their rank.
+	call find_ipeaks (data, x, npoints, contrast, separation, edge,
+    	    threshold, rank, nrank, debug)
+
+	# Select the peaks.
+	npeaks = find_unmax (data, npts, x, Memi[rank], nrank, nmax, nbins,
+	    debug)
+
+	call mfree (rank, TY_INT)
+	return (npeaks)
+end
+
+
+# FIND_IPEAKS -- Find the all the isolated peaks in the data array.
+#
+# The peaks are found using the following algorithm:
+#
+# 1.  Find the local maxima.
+# 2.  Reject peaks below the threshold.
+# 3.  Determine the ranks of the remaining peaks.
+# 4.  Flag weaker peaks within separation of a stronger peak.
+# 5.  Return a rank array
+#
+# Indefinite points are ignored.  The peak positions are returned in the
+# array x.
+
+procedure find_ipeaks (data, x, npoints, contrast, separation, edge, threshold,
+	rank, nrank, debug)
+
+# Procedure parameters:
+PIXEL	data[npoints]		# Input data array
+PIXEL	x[npoints]		# Output peak position array
+int	npoints			# Number of data points
+real	contrast		# Maximum contrast between strongest and weakest
+int	separation		# Minimum separation between peaks
+int	edge			# Minimum distance from the edge
+real	threshold		# Minimum threshold level for peaks
+pointer	rank			# Rank array
+int	nrank			# Size of rank array
+bool	debug			# Print diagnostic information?
+
+int	i, j
+int	nlmax, nisolated
+pointer	sp, y
+
+int	find_local_maxima(), find_threshold(), find_isolated()
 int	compare()
 
 extern	compare()
@@ -72,24 +167,19 @@ begin
 
 	# Reject the local maxima which do not satisfy the thresholds.
 	# The array y is set to the peak values of the remaining peaks.
-	nthreshold = find_threshold (data, x, Mem$t[y], nlmax,
+	nrank = find_threshold (data, x, Mem$t[y], nlmax,
 	    contrast, threshold, debug)
 
 	# Rank the peaks by peak value.
-	call salloc (rank, nthreshold, TY_INT)
-	do i = 1, nthreshold
+	call malloc (rank, nrank, TY_INT)
+	do i = 1, nrank
 	    Memi[rank + i - 1] = i
-	call qsort (Memi[rank], nthreshold, compare)
+	call qsort (Memi[rank], nrank, compare)
 
 	# Reject the weaker peaks within sep of a stronger peak.
-	nisolated = find_isolated (x, Memi[rank], nthreshold, separation,
-	    debug)
-
-	# Select the strongest nmax peaks.
-	npeaks = find_nmax (data, x, Memi[rank], nthreshold, nmax, debug)
+	nisolated = find_isolated (x, Memi[rank], nrank, separation, debug)
 
 	call sfree (sp)
-	return (npeaks)
 end
 
 
@@ -156,7 +246,7 @@ begin
 	    }
 	}
 	nright = 0
-	for (j = index + 1; i <= npoints; j = j + 1) {
+	for (j = index + 1; j <= npoints; j = j + 1) {
 	    if (!IS_INDEF (data[j])) {
 		if (data[j] != data[index])
 		    break
@@ -165,12 +255,12 @@ begin
 	}
 
 	# Test for failure to be a local maxima
-	if ((i == 0) && (j == npoints)) {
+	if ((i == 0) && (j == npoints+1)) {
 	    return (FALSE)		# Data is constant
 	} else if (i == 0) {
 	    if (data[j] > data[index])
 	        return (FALSE)		# Data increases to right
-	} else if (j == npoints) {
+	} else if (j == npoints+1) {
 	    if (data[i] > data[index])	# Data increase to left
 		return (FALSE)
 	} else if ((data[i] > data[index]) || (data[j] > data[index])) {
@@ -217,8 +307,15 @@ begin
 
 	# Set the threshold based on the max of the absolute threshold and the
 	# contrast.  Use arlt to set peaks below threshold to INDEF.
-	lcut = max (PIXEL (threshold), PIXEL (contrast * maxval))
-	call arlt$t (y, npoints, lcut, INDEF)
+	if (!IS_INDEFR(threshold) || !IS_INDEFR(contrast)) {
+	    if (IS_INDEFR(threshold))
+		lcut = PIXEL (contrast * maxval)
+	    else if (IS_INDEFR(contrast))
+		lcut = PIXEL (threshold)
+	    else
+		lcut = max (PIXEL (threshold), PIXEL (contrast * maxval))
+	    call arlt$t (y, npoints, lcut, INDEFR)
+	}
 
 	if (debug) {
 	    call printf ("  Highest peak value = %g.\n")
@@ -356,6 +453,90 @@ begin
 	}
 
 	# Eliminate INDEF points and determine the number of spectra found.
+	npeaks = 0
+	do i = 1, npoints {
+	    if (IS_INDEF (x[i]))
+		next
+	    npeaks = npeaks + 1
+	    x[npeaks] = x[i]
+	}
+
+	return (npeaks)
+end
+
+
+# FIND_UNMAX -- Select up to the nmax highest ranked peaks in bins.
+#
+# The data values, data, peak positions, x, and their ranks, rank, are input.
+# The data values are used only in printing debugging information.
+# Peak positions previously eliminated are flaged by the value INDEF.
+# The rank array contains the indices to the peak positions in order from
+# the highest peak value to the lowest peak value.
+# First all but the nmax highest ranked peaks (which have not been previously
+# eliminated) are eliminated by marking their positions with the value INDEF.
+# Then the remaining peaks are resorted to contain only the unflaged
+# peaks and the number of such peaks is returned.
+
+int procedure find_unmax (data, npts, x, rank, npoints, nmax, nbins, debug)
+
+PIXEL	data[npts]			# Input data values
+int	npts				# Number of input data points
+PIXEL	x[npoints]			# Peak positions
+int	rank[npoints]			# Ranks of peaks
+int	npoints				# Number of input peaks
+int	nmax				# Max number of peaks to be selected
+int	nbins				# Number of sample bins
+bool	debug				# Print debugging information?
+
+int	i, j, npeaks, width, x1, x2
+PIXEL	a
+
+begin
+	# Only mark peaks to reject if the number peaks is greater than nmax.
+	if (nmax < npoints) {
+
+	    # Set up circular bins and select highest peak in each bin
+	    # until the desired number of peaks is selected.
+
+	    width = min (npts-1, nint ((npts-1) / (nbins-.5)))
+	    x2 = 1
+	    npeaks = 0
+	    repeat {
+		x1 = x2
+		x2 = mod (x1 + width, npts) + 1
+		j = 0
+		do i = 1, npoints {
+		    a = x[rank[i]]
+		    if (IS_INDEF (a) || a < 0) {
+			j = j + 1
+			next
+		    }
+		    if (x1 < x2) {
+			if (a >= x1 && a <= x2) {
+			    x[rank[i]] = -a
+			    npeaks = npeaks + 1
+			    break
+			}
+		    } else {
+			if (a <= x2 || a >= x1) {
+			    x[rank[i]] = -a
+			    npeaks = npeaks + 1
+			    break
+			}
+		    }
+		}
+	    } until (npeaks >= nmax || j == npoints)
+
+	    # Now eliminate all unused peaks and reset the selected peaks.
+	    do i = 1, npoints {
+		if (!IS_INDEF (x[i]) && x[i] < 1)
+		    x[i] = -x[i]
+		else
+		    x[i] = INDEF
+	    }
+	}
+
+	# Eliminate INDEF points and determine the number of peaks found.
 	npeaks = 0
 	do i = 1, npoints {
 	    if (IS_INDEF (x[i]))

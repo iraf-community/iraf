@@ -27,7 +27,8 @@ begin
 		IM_PIXTYPE(out) = i
 		switch (type[1]) {
 		case 's':
-		    ;
+		    if (i == TY_USHORT)
+			IM_PIXTYPE(out) = TY_SHORT
 		case 'u':
 		    if (i == TY_SHORT)
 			IM_PIXTYPE(out) = TY_USHORT

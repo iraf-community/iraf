@@ -84,7 +84,7 @@ real	x, y, x1, x2, stdlam
 bool	prompt
 
 int 	spc_colon(), clgcur(), scan()
-int	fft_cursor(), rv_parent(), stridx()
+int	fft_cursor(), rv_parent()#, stridx()
 
 define	replot_			99
 define	exit_			98
@@ -125,11 +125,8 @@ replot_	    switch (key) { 			# switch on the keystroke
                 call gctran (gp, x, y, x, y, wcs, 0)
 
                 call append_range (rv, RV_OSAMPLE(rv), x1, x2)
-                call rv_mark_regions (RV_OSAMPLE(rv), RV_GP(rv))
                 SR_MODIFY(RV_OSAMPLE(rv)) = YES
-
                 call append_range (rv, RV_RSAMPLE(rv), x1, x2)
-                call rv_mark_regions (RV_RSAMPLE(rv), RV_GP(rv))
                 SR_MODIFY(RV_RSAMPLE(rv)) = YES
 
                 RV_NEWXCOR(rv) = YES
@@ -227,10 +224,13 @@ replot_	    switch (key) { 			# switch on the keystroke
 	 	    call gctran (gp, x, y, x1, x2, wcs, 1)
 	            call rv_cut (rv, x1, x1, x2)
 	 	    call gctran (gp, x, y, x, y, wcs, 0)
-                    call printf ("Standard Wavelength: ")
-                    call flush (STDOUT)
-                    stat = scan()
-                        call gargr (stdlam)
+		    stdlam = 0.0
+		    while (stdlam == 0.0) {
+                        call printf ("Standard Wavelength: ")
+                        call flush (STDOUT)
+                        stat = scan()
+                            call gargr (stdlam)
+		    }
 
         	    if (y > 0.5)                 	# Fit at the top
 		        call rv_linefit (rv, x1, x2, stdlam, OBJECT_SPECTRUM)
@@ -255,7 +255,8 @@ replot_	    switch (key) { 			# switch on the keystroke
 	    if (prompt)
 	        call rv_mode_prompt (rv)
 	    ckey = key
-	    if (stridx(ckey,"?:bdepfsuvxqr\0") == 0)
+	    #if (stridx(ckey,"?:bdepfsuvxqr\0") != 0)
+	    if (ckey == 'n' || ckey == 'i')
 	        RV_SPMKEY(rv) = key
 	} until (clgcur("cursor",x,y,wcs,key,Memc[cmd],SZ_LINE) == EOF)
 

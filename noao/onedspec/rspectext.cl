@@ -10,7 +10,6 @@ procedure rspectext (input, output)
 
 string	input			{prompt="Input list of text spectra"}
 string	output			{prompt="Output list of image spectra"}
-bool	header = yes		{prompt="Header in input file?\n"}
 
 string	title = ""		{prompt="Spectrum title"}
 bool	flux = no		{prompt="Flux calibrated?"}
@@ -19,11 +18,12 @@ string	dtype = "linear"	{prompt="Dispersion type",
 real	crval1 = 1.		{prompt="Coordinate of first pixel"}
 real	cdelt1 = 1.		{prompt="Coordinate interval per pixel"}
 
-struct	*fd
+struct	*fd1, *fd2
 
 begin
     int		dim
     string	specin, specout, spec, temp1, temp2, temp3, temp4
+    bool	header=no
     bool	log=no
 
     specin = mktemp ("tmp$iraf")
@@ -41,8 +41,8 @@ begin
     delete (specout, verify=no)
 
     # Go through each input and check for an existing output.
-    list = spec
-    while (fscan (list, specin, specout) != EOF) {
+    fd2 = spec
+    while (fscan (fd2, specin, specout) != EOF) {
 	if (access(specout)||access(specout//".imh")||access(specout//".hhh")) {
 	    print ("Image "//specout//" already exists")
 	    next
@@ -51,12 +51,12 @@ begin
 	# Separate the header and flux values for RTEXTIMAGE and the
 	# wavelengths for later use.
 
-	rstext (specin, temp1, temp2, header=header) | scan (dim)
+	rstext (specin, temp1, temp2, header=header) | scan (header, dim)
 
 	# Create the image from the header and flux values.
 	rtextimage (temp1, specout, otype="real", header=header, pixels=yes,
 	    nskip=0, dim=dim)
-	fd = ""; delete (temp1, verify=no)
+	fd1 = ""; delete (temp1, verify=no)
 
 	# If there is no header setup the title, dispersion and flux.
 	# The dispersion may require using DISPCOR for nonlinear or
@@ -110,5 +110,5 @@ begin
 	}
 	delete (temp2, verify=no)
     }
-    list=""; delete (spec, verify=no)
+    fd2=""; delete (spec, verify=no)
 end

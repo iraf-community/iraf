@@ -13,20 +13,30 @@ include	"sgi.h"
 procedure sgi_font (font)
 
 int	font			# code for font to be set
-int	pk2, width
+
+int	normal, bold
+int	pk1, pk2, width
 include	"sgi.com"
 
 begin
 	width = SGI_WIDTH(g_kt)
-	pk2   = GKI_PACKREAL(2.0)
+	normal = 0
+	bold = 1
+
+	pk1 = GKI_PACKREAL(real(normal))
+	pk2 = GKI_PACKREAL(real(bold))
 
 	if (font == GT_BOLD) {
 	    if (width != pk2) {
-		call sgk_linewidth (g_out, 2)
+		call sgk_linewidth (g_out, bold)
 		width = pk2
 	    }
-	} else
-	    call sgk_linewidth (g_out, nint (GKI_UNPACKREAL(width)))
+	} else {
+	    if (width != pk1) {
+	        call sgk_linewidth (g_out, normal)
+		width = pk1
+	    }
+	}
 
 	SGI_WIDTH(g_kt) = width
 end

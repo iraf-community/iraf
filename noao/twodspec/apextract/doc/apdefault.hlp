@@ -1,4 +1,4 @@
-.help apdefault Aug90 noao.twodspec.apextract
+.help apdefault Jul95 noao.twodspec.apextract
 .ih
 NAME
 apdefault -- Set default aperture parameters for the package
@@ -13,9 +13,13 @@ These limits are used for apertures found with \fBapfind\fR and when
 defining the first aperture in \fBapedit\fR.
 .le
 .ls apidtable = ""
-Aperture identification table consisting of lines with an aperture number,
-a beam number, and a title.  This table is used to assign aperture
-information automatically in \fBapfind\fR and \fBapedit\fR.
+Aperture identification table.  This may be either a text file or an
+image.  A text file consisting of lines with an aperture number, beam
+number, and aperture title or identification.  An image will contain the
+keywords SLFIBnnn with string value consisting of aperture number, beam
+number, optional right ascension and declination, and aperture title.  This
+information is used to assign aperture information automatically in
+\fBapfind\fR and \fBapedit\fR.
 .le
 
 .ce
@@ -80,6 +84,12 @@ To review and modify the default aperture parameters:
 
 	cl> apdefault
 .ih
+.ih
+REVISIONS
+.ls APDEFAULT V2.11
+The aperture ID table information may now be contained in the
+image header under the keywords SLFIBnnn.
+.le
 SEE ALSO
 apbackground, apedit, apfind, icfit
 .endhelp

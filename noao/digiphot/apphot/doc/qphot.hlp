@@ -1,4 +1,4 @@
-.help qphot Aug 93 noao.digiphot.apphot
+.help qphot Aug93 noao.digiphot.apphot
 .ih
 NAME
 qphot -- quick aperture photometer
@@ -53,7 +53,7 @@ The name of the file containing radial plots for the stars written to the
 output file. If plotfile is not equal to null then a single radial plot
 is written to plotfile for every record written to output.
 .le
-.ls zmag = 26.0
+.ls zmag = 25.0
 The zero point of the magnitude scale.
 .le
 .ls exposure = ""
@@ -276,7 +276,13 @@ Non-zero values of cier flag the following error conditions.
 0        # No error
 101      # The centering box is off image
 102      # The centering box is partially off the image
+103      # The S/N ratio is low in the centering box
+104      # There are two few points for a good fit
+105      # The x or y center fit is singular
+106      # The x or y center fit did not converge
 107      # The x or y center shift is greater than 1 pixel
+108      # There is bad data in the centering box
+
 .fi
 
 If all goes well during the sky fitting process then the error code sier
@@ -288,6 +294,15 @@ will be 0. Non-zero values of sier flag the following error conditions.
 202       # Sky annulus is partially off the image
 203	  # The histogram of sky pixels has no width
 204	  # The histogram of sky pixels is flat or concave
+205       # There are too few points for a good sky fit
+206       # The sky fit is singular
+207       # The sky fit did not converge
+208       # The graphics stream is undefined
+209       # The file of sky values does not exist
+210       # The sky file is at EOF
+211       # Cannot read the sky value correctly
+212       # The best fit parameter are non-physical
+
 .fi
 
 If no error occurs during the measurement of the magnitudes then pier is
@@ -298,6 +313,7 @@ If no error occurs during the measurement of the magnitudes then pier is
 301      # The aperture is off the image
 302      # The aperture is partially off the image
 303      # The sky value is undefined
+305	 # There is bad data in the aperture
 .fi
 
 .ih

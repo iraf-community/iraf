@@ -12,7 +12,7 @@ char	file[ARB]		# Output file
 pointer	gt			# GTOOLS pointer
 
 int	fd
-pointer	str
+pointer	str, ptr
 
 int	open()
 long	clktime()
@@ -23,32 +23,42 @@ begin
 	call malloc (str, SZ_LINE, TY_CHAR)
 
 	call cnvtime (clktime(0), Memc[str], SZ_LINE)
-	call fprintf (fd, "\n%s\n")
+	call fprintf (fd, "\n# %s\n")
 	    call pargstr (Memc[str])
+
+	# The title may contain new lines so we have to put comments
+	# in front of each line.
 	call gt_gets (gt, GTTITLE, Memc[str], SZ_LINE)
-	call fprintf (fd, "%s\n")
-	    call pargstr (Memc[str])
+	call putline (fd, "# ")
+	for (ptr=str; Memc[ptr]!=EOS; ptr=ptr+1) {
+	    call putc (fd, Memc[ptr])
+	    if (Memc[ptr] == '\n') {
+		call putline (fd, "# ")
+	    }
+	}
+	call putline (fd, "\n")
+
 	call gt_gets (gt, GTYUNITS, Memc[str], SZ_LINE)
 	if (Memc[str] != EOS) {
-	    call fprintf (fd, "fit units = %s\n")
+	    call fprintf (fd, "# fit units = %s\n")
 	        call pargstr (Memc[str])
 	}
 	call ic_gstr (ic, "function", Memc[str], SZ_LINE)
-	call fprintf (fd, "function = %s\n")
+	call fprintf (fd, "# function = %s\n")
 	    call pargstr (Memc[str])
-	call fprintf (fd, "grow = %g\n")
+	call fprintf (fd, "# grow = %g\n")
 	    call pargr (IC_GROW(ic))
-	call fprintf (fd, "naverage = %d\n")
+	call fprintf (fd, "# naverage = %d\n")
 	    call pargi (IC_NAVERAGE(ic))
-	call fprintf (fd, "order = %d\n")
+	call fprintf (fd, "# order = %d\n")
 	    call pargi (IC_ORDER(ic))
-	call fprintf (fd, "low_reject = %g\n")
+	call fprintf (fd, "# low_reject = %g\n")
 	    call pargr (IC_LOW(ic))
-	call fprintf (fd, "high_reject = %g\n")
+	call fprintf (fd, "# high_reject = %g\n")
 	    call pargr (IC_HIGH(ic))
-	call fprintf (fd, "niterate = %d\n")
+	call fprintf (fd, "# niterate = %d\n")
 	    call pargi (IC_NITERATE(ic))
-	call fprintf (fd, "sample = %s\n")
+	call fprintf (fd, "# sample = %s\n")
 	    call pargstr (Memc[IC_SAMPLE(ic)])
 
 	call mfree (str, TY_CHAR)

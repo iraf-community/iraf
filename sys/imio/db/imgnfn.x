@@ -189,7 +189,11 @@ begin
 
 		# Now scan the user area.
 		for (ip=IM_USERAREA(im);  Memc[ip] != EOS;  ip=ip+1) {
-		    # Extract keyword.
+		    # Skip entries that are not keywords.
+		    if (Memc[ip+8] != '=')
+			next
+
+		    # Extract keyword name.
 		    Memc[kwname+8] = EOS
 		    do i = 1, 8 {
 			ch = Memc[ip+i-1]

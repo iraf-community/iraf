@@ -73,7 +73,7 @@ int	boffset			#I file offset at which read commences
 
 pointer	qpf, im, io
 int	vs[2], ve[2]
-int	szb_pixel, ncols, pixel, nev, block, xoff, yoff
+int	szb_pixel, ncols, pixel, nev, xblock, yblock, xoff, yoff
 int	sizeof(), qpio_readpixs(), qpio_readpixi()
 
 begin
@@ -81,7 +81,8 @@ begin
 	im  = QPF_IM(qpf)
 	io  = QPF_IO(qpf)
 
-	block = QPF_BLOCK(qpf)
+	xblock = QPF_XBLOCK(qpf)
+	yblock = QPF_YBLOCK(qpf)
 	ncols = IM_PHYSLEN(im,1)
 	xoff  = QPF_VS(qpf,1)
 	yoff  = QPF_VS(qpf,2)
@@ -89,12 +90,12 @@ begin
 
 	# Convert boffset, nbytes to vs, ve.
 	pixel = (boffset - 1) / szb_pixel
-	vs[1] = (mod (pixel, ncols)) * block + xoff
-	vs[2] = (pixel / ncols) * block + yoff
+	vs[1] = (mod (pixel, ncols)) * xblock + xoff
+	vs[2] = (pixel / ncols) * yblock + yoff
 
 	pixel = (boffset-1 + nbytes - szb_pixel) / szb_pixel
-	ve[1] = (mod (pixel, ncols)) * block + (block-1) + xoff
-	ve[2] = (pixel / ncols) * block + (block-1) + yoff
+	ve[1] = (mod (pixel, ncols)) * xblock + (xblock-1) + xoff
+	ve[2] = (pixel / ncols) * yblock + (yblock-1) + yoff
 
 	# Call readpix to sample image into the output buffer.  Zero the buffer
 	# first since the read is additive.
@@ -103,9 +104,9 @@ begin
 	iferr {
 	    switch (IM_PIXTYPE(im)) {
 	    case TY_SHORT:
-		nev = qpio_readpixs (io, obuf, vs, ve, 2, block)
+		nev = qpio_readpixs (io, obuf, vs, ve, 2, xblock, yblock)
 	    case TY_INT:
-		nev = qpio_readpixi (io, obuf, vs, ve, 2, block)
+		nev = qpio_readpixi (io, obuf, vs, ve, 2, xblock, yblock)
 	    }
 	} then {
 	    QPF_IOSTAT(qpf) = ERR

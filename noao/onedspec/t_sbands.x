@@ -2,14 +2,14 @@ include	<error.h>
 include	<smw.h>
 
 # Band structure
-define	LEN_BAND	7			# length of structure
+define	LEN_BAND	9			# length of structure
 define	BAND_ID		Memi[$1]		# ptr to band id string
 define	BAND_FILTER	Memi[$1+1]		# ptr to filter string
-define	BAND_WC		Memr[$1+2]		# center wavelength
-define	BAND_DW		Memr[$1+3]		# wavelength width
-define	BAND_FN		Memi[$1+4]		# no. of filter points
-define	BAND_FW		Memi[$1+5]		# ptr to filter wavelengths
-define	BAND_FR		Memi[$1+6]		# ptr to filter responses
+define	BAND_WC		Memd[P2D($1+2)]		# center wavelength
+define	BAND_DW		Memd[P2D($1+4)]		# wavelength width
+define	BAND_FN		Memi[$1+6]		# no. of filter points
+define	BAND_FW		Memi[$1+7]		# ptr to filter wavelengths
+define	BAND_FR		Memi[$1+8]		# ptr to filter responses
 
 # Multiple bands for indices and equivalent widths.
 define	NBANDS		3			# maximum number of bands
@@ -32,7 +32,7 @@ pointer	fbands			# Band file name
 pointer	apertures		# Aperture list string
 bool	norm			# Normalize bands by response?
 bool	mag			# Output magnitudes instead of fluxes?
-real	magzero			# Magnitude zeropoint for magnitude output
+double	magzero			# Magnitude zeropoint for magnitude output
 bool	verbose			# Verbose header?
 
 int	i, nbands, nsubbands, nimages, fd
@@ -41,7 +41,7 @@ pointer	sp, input
 
 int	open(), imtgetim()
 bool	clgetb(), rng_elementi()
-real	clgetr()
+double	clgetd()
 pointer	imtopenp(), immap(), smw_openim(), rng_open()
 
 begin
@@ -58,7 +58,7 @@ begin
 	call clgstr ("apertures", Memc[apertures], SZ_LINE)
 	norm = clgetb ("normalize")
 	mag = clgetb ("mag")
-	magzero = clgetr ("magzero")
+	magzero = clgetd ("magzero")
 	verbose = clgetb ("verbose")
 
 	# Read bands from the band file.
@@ -135,10 +135,10 @@ int	nsubbands		#O Number of individual bands
 
 bool	bandok
 int	ip
-real	center, width
+double	center, width
 pointer	sp, line, id, filter
 
-int	getline(), ctowrd(), ctor()
+int	getline(), ctowrd(), ctod()
 
 begin
 	call smark (sp)
@@ -157,17 +157,17 @@ begin
 	while (getline (fd, Memc[line]) != EOF) {
 	    ip = 1
 	    bandok = (ctowrd (Memc[line], ip, Memc[id], SZ_FNAME) > 0)
-	    bandok = (bandok && ctor (Memc[line], ip, center) > 0)
-	    bandok = (bandok && ctor (Memc[line], ip, width) > 0)
+	    bandok = (bandok && ctod (Memc[line], ip, center) > 0)
+	    bandok = (bandok && ctod (Memc[line], ip, width) > 0)
 	    bandok = (bandok && ctowrd (Memc[line],ip,Memc[filter],SZ_FNAME)>0)
 	    if (!bandok || Memc[id] == '#')
 		next
 
 	    # Allocate and reallocate the array of band pointers.
 	    if (nbands == 0)
-		call malloc (bands, NBANDS * 10, TY_POINTER)
+		call malloc (bands, 10 * NBANDS, TY_POINTER)
 	    else if (mod (nbands, 10) == 0)
-		call realloc (bands, NBANDS * (nbands + 10), TY_POINTER)
+		call realloc (bands, (nbands + 10) * NBANDS, TY_POINTER)
 	    nbands = nbands + 1
 
 	    call sb_alloc (BAND(bands,nbands,BAND1),
@@ -175,8 +175,8 @@ begin
 	    nsubbands = nsubbands + 1
 
 	    bandok = (ctowrd (Memc[line], ip, Memc[id], SZ_FNAME) > 0)
-	    bandok = (bandok && ctor (Memc[line], ip, center) > 0)
-	    bandok = (bandok && ctor (Memc[line], ip, width) > 0)
+	    bandok = (bandok && ctod (Memc[line], ip, center) > 0)
+	    bandok = (bandok && ctod (Memc[line], ip, width) > 0)
 	    bandok = (bandok && ctowrd (Memc[line],ip,Memc[filter],SZ_FNAME)>0)
 	    if (bandok) {
 		call sb_alloc (BAND(bands,nbands,BAND2),
@@ -186,8 +186,8 @@ begin
 		BAND(bands,nbands,BAND2) = NULL
 
 	    bandok = (ctowrd (Memc[line], ip, Memc[id], SZ_FNAME) > 0)
-	    bandok = (bandok && ctor (Memc[line], ip, center) > 0)
-	    bandok = (bandok && ctor (Memc[line], ip, width) > 0)
+	    bandok = (bandok && ctod (Memc[line], ip, center) > 0)
+	    bandok = (bandok && ctod (Memc[line], ip, width) > 0)
 	    bandok = (bandok && ctowrd (Memc[line],ip,Memc[filter],SZ_FNAME)>0)
 	    if (bandok) {
 		call sb_alloc (BAND(bands,nbands,BAND3),
@@ -208,11 +208,11 @@ procedure sb_alloc (band, id, filter, center, width)
 pointer	band			#O Band pointer
 char	id[ARB]			#I Band id
 char	filter[ARB]		#I Band filter
-real	center			#I Band wavelength
-real	width			#I Band width
+double	center			#I Band wavelength
+double	width			#I Band width
 
 int	fn, fd, strlen(), open(), fscan(), nscan()
-real	w, r
+double	w, r
 pointer	fw, fr
 bool	streq()
 errchk	open()
@@ -236,19 +236,19 @@ begin
 	fd = open (filter, READ_ONLY, TEXT_FILE)
 	fn = 0
 	while (fscan (fd) != EOF) {
-	    call gargr (w)
-	    call gargr (r)
+	    call gargd (w)
+	    call gargd (r)
 	    if (nscan() != 2)
 		next
 	    if (fn == 0) {
-		call malloc (fw, 100, TY_REAL)
-		call malloc (fr, 100, TY_REAL)
+		call malloc (fw, 100, TY_DOUBLE)
+		call malloc (fr, 100, TY_DOUBLE)
 	    } else if (mod (fn, 100) == 0) {
-		call realloc (fw, fn+100, TY_REAL)
-		call realloc (fr, fn+100, TY_REAL)
+		call realloc (fw, fn+100, TY_DOUBLE)
+		call realloc (fr, fn+100, TY_DOUBLE)
 	    }
-	    Memr[fw+fn] = w
-	    Memr[fr+fn] = r
+	    Memd[fw+fn] = w
+	    Memd[fr+fn] = r
 	    fn = fn + 1
 	}
 	call close (fd)
@@ -276,8 +276,8 @@ begin
 		if (band != NULL) {
 		    call mfree (BAND_ID(band), TY_CHAR)
 		    call mfree (BAND_FILTER(band), TY_CHAR)
-		    call mfree (BAND_FW(band), TY_REAL)
-		    call mfree (BAND_FR(band), TY_REAL)
+		    call mfree (BAND_FW(band), TY_DOUBLE)
+		    call mfree (BAND_FR(band), TY_DOUBLE)
 		    call mfree (band, TY_STRUCT)
 		}
 	    }
@@ -293,7 +293,7 @@ procedure sb_header (fd, norm, mag, magzero, fbands, bands, nbands, nsubbands)
 pointer	fd			#I Output file descriptor
 bool	norm			#I Normalization flag
 bool	mag			#I Magnitude flag
-real	magzero			#I Magnitude zeropoint
+double	magzero			#I Magnitude zeropoint
 char	fbands[ARB]		#I Band file
 pointer	bands			#I Pointer to array of bands
 int	nbands			#I Number of bands
@@ -319,7 +319,7 @@ begin
 	    call pargb (mag)
 	if (mag) {
 	    call fprintf (fd, ", magzero = %.2f")
-		call pargr (magzero)
+		call pargd (magzero)
 	    call strcpy ("mag", Memc[str], SZ_LINE)
 	} else
 	    call strcpy ("flux", Memc[str], SZ_LINE)
@@ -338,8 +338,8 @@ begin
 		call fprintf (fd, "# %10s %10s %10g %10g\n")
 		    call pargstr (Memc[BAND_ID(band)])
 		    call pargstr (Memc[BAND_FILTER(band)])
-		    call pargr (BAND_WC(band))
-		    call pargr (BAND_DW(band))
+		    call pargd (BAND_WC(band))
+		    call pargd (BAND_DW(band))
 	    }
 	}
 
@@ -350,7 +350,7 @@ begin
 	    call pargstr ("band")
 	    call pargstr (Memc[str])
 	if (nsubbands > nbands) {
-	    call fprintf (fd, " %7.7s %7.7s %7.7s %7.7s")
+	    call fprintf (fd, " %7.7s %11.11s %9.9s %9.9s")
 		call pargstr ("band")
 		call pargstr (Memc[str])
 		call pargstr ("index")
@@ -372,11 +372,11 @@ pointer	bands			#I Bandpass table pointer
 int	nbands			#I Number of bandpasses
 bool	norm			#I Normalize?
 bool	mag			#I Magnitude output?
-real	magzero			#I Magnitude zero point
+double	magzero			#I Magnitude zero point
 
 int	i
-real	flux, contval, index, eqwidth
-real	flux1, norm1, flux2, norm2, flux3, norm3, a, b
+double	flux, contval, index, eqwidth
+double	flux1, norm1, flux2, norm2, flux3, norm3, a, b
 pointer	sp, imname, band1, band2, band3
 
 begin
@@ -393,7 +393,7 @@ begin
 	    # Measure primary band flux, normalize, and print result.
 	    band1 = BAND(bands,i,BAND1)
 	    call sb_flux (sh, band1, flux1, norm1)
-	    if (IS_INDEF(flux1))
+	    if (IS_INDEFD(flux1))
 		next
 
 	    if (norm) {
@@ -408,7 +408,7 @@ begin
 	    call fprintf (fd, "%26s %7.7s %11.6g")
 		call pargstr (Memc[imname])
 		call pargstr (Memc[BAND_ID(band1)])
-		call pargr (flux)
+		call pargd (flux)
 		
 	    # Measure the alternate band fluxes and compute and output
 	    # the band index and equivalent width.
@@ -417,26 +417,26 @@ begin
 	    band3 = BAND(bands,i,BAND3)
 	    call sb_flux (sh, band2, flux2, norm2)
 	    call sb_flux (sh, band3, flux3, norm3)
-	    if (IS_INDEF(flux2) && IS_INDEF(flux3)) {
+	    if (IS_INDEFD(flux2) && IS_INDEFD(flux3)) {
 		call fprintf (fd, "\n")
 		next
 	    }
 
 	    if (norm) {
-		if (!IS_INDEF(flux2)) {
+		if (!IS_INDEFD(flux2)) {
 		    flux2 = flux2 / norm2
 		    norm2 = 1
 		}
-		if (!IS_INDEF(flux3)) {
+		if (!IS_INDEFD(flux3)) {
 		    flux3 = flux3 / norm3
 		    norm3 = 1
 		}
 	    }
 
-	    contval = INDEFR
-	    index = INDEFR
-	    eqwidth = INDEFR
-	    if (!IS_INDEF(flux2) && !IS_INDEF(flux3)) {
+	    contval = INDEFD
+	    index = INDEFD
+	    eqwidth = INDEFD
+	    if (!IS_INDEFD(flux2) && !IS_INDEFD(flux3)) {
 		# Interpolate to the center of the primary band.
 		a = (flux2 / norm2 - flux3 / norm3) /
 		    (BAND_WC(band2) - BAND_WC(band3))
@@ -444,11 +444,11 @@ begin
 		contval = (a * BAND_WC(band1) + b) * norm1
 		call fprintf (fd, " %7.7s")
 		    call pargstr ("cont")
-	    } else if (!IS_INDEF(flux2)) {
+	    } else if (!IS_INDEFD(flux2)) {
 		contval = flux2
 		call fprintf (fd, " %7.7s")
 		    call pargstr (Memc[BAND_ID(band2)])
-	    } else if (!IS_INDEF(flux3)) {
+	    } else if (!IS_INDEFD(flux3)) {
 		contval = flux3
 		call fprintf (fd, " %7.7s")
 		    call pargstr (Memc[BAND_ID(band3)])
@@ -459,22 +459,22 @@ begin
 	    else
 		flux = contval
 	    call fprintf (fd, " %11.6g")
-		call pargr (flux)
+		call pargd (flux)
 
 	    if (flux1 > 0. && contval > 0.) {
 		index = flux1 / contval
 		eqwidth = (1 - index) * BAND_DW(band1)
 	    }
 	    if (mag) {
-		if (!IS_INDEF(contval) && contval > 0.)
+		if (!IS_INDEFD(contval) && contval > 0.)
 		    contval = magzero - 2.5 * log10 (contval)
-		if (!IS_INDEF(index))
+		if (!IS_INDEFD(index))
 		    index = -2.5 * log10 (index)
 	    }
 
-	    call fprintf (fd, " %7.2f %7.2f\n")
-		call pargr (index)
-		call pargr (eqwidth)
+	    call fprintf (fd, " %9.6g %9.6g\n")
+		call pargd (index)
+		call pargd (eqwidth)
 	}
 
 	# Flush output and finish up.
@@ -490,18 +490,17 @@ procedure sb_flux (sh, band, flux, norm)
 
 pointer	sh			#I spectrum descriptor
 pointer	band			#I band descriptor
-real	flux			#O flux
-real	norm			#O normalization
+double	flux			#O flux
+double	norm			#O normalization
 
 int	i, i1, i2
-real	a, b, w1, w2, x1, x2, wt
+double	a, b, w1, w2, x1, x2, wt
 pointer	x, y
-real	sb_filter()
-double	shdr_wl()
+double	sb_filter(), shdr_wl()
 
 begin
 	# Return if no band is defined.
-	flux = INDEFR
+	flux = INDEFD
 	norm = 1
 	if (band == NULL)
 	    return
@@ -511,8 +510,8 @@ begin
 	b = BAND_WC(band) + BAND_DW(band) / 2.
 	w1 = min (a, b)
 	w2 = max (a, b)
-	a = shdr_wl (sh, double(w1))
-	b = shdr_wl (sh, double(w2))
+	a = shdr_wl (sh, w1)
+	b = shdr_wl (sh, w2)
 	x1 = min (a, b)
 	x2 = max (a, b)
 	i1 = nint (x1)
@@ -524,23 +523,23 @@ begin
 	y = SY(sh) + i1 - 1
 
 	if (i1 == i2) {
-	    wt = sb_filter (Memr[x], band) * (x2 - x1)
+	    wt = sb_filter (double(Memr[x]), band) * (x2 - x1)
 	    flux = wt * Memr[y]
 	    norm = wt
 	} else {
-	    wt = sb_filter (Memr[x], band) * (i1 + 0.5 - x1)
+	    wt = sb_filter (double(Memr[x]), band) * (i1 + 0.5 - x1)
 	    flux = wt * Memr[y]
 	    norm = wt
 	    x = x + 1
 	    y = y + 1
 	    for (i = i1 + 1; i <= i2 - 1; i = i + 1) {
-		wt = sb_filter (Memr[x], band)
+		wt = sb_filter (double(Memr[x]), band)
 		flux = flux + wt * Memr[y]
 		norm = norm + wt
 		x = x + 1
 		y = y + 1
 	    }
-	    wt = sb_filter (Memr[x], band) * (x2 - i2 + 0.5)
+	    wt = sb_filter (double(Memr[x]), band) * (x2 - i2 + 0.5)
 	    flux = flux + wt * Memr[y]
 	    norm = norm + wt
 	}
@@ -549,13 +548,13 @@ end
 
 # SB_FILTER -- Given a filter array interpolate to the specified wavelength.
 
-real procedure sb_filter (w, band)
+double procedure sb_filter (w, band)
 
-real	w		# Wavelength desired
+double	w		# Wavelength desired
 pointer	band		# Band pointer
 
 int	i, n
-real	x1, x2
+double	x1, x2
 pointer	x, y
 
 begin
@@ -565,22 +564,22 @@ begin
 
 	x = BAND_FW(band)
 	y = BAND_FR(band)
-	x1 = Memr[x]
-	x2 = Memr[x+n-1]
+	x1 = Memd[x]
+	x2 = Memd[x+n-1]
 
 	if (w <= x1)
-	    return (Memr[y])
+	    return (Memd[y])
 	else if (w >= x2)
-	    return (Memr[y+n-1])
+	    return (Memd[y+n-1])
 	
 	if ((w - x1) < (x2 - w))
-	    for (i = 1; w > Memr[x+i]; i=i+1)
+	    for (i = 1; w > Memd[x+i]; i=i+1)
 		;
 	else
-	    for (i = n - 1; w < Memr[x+i-1]; i=i-1)
+	    for (i = n - 1; w < Memd[x+i-1]; i=i-1)
 		;
 		
-	x1 = Memr[x+i-1]
-	x2 = Memr[x+i]
-	return ((w - x1) / (x2 - x1) * (Memr[y+i] - Memr[y+i-1]) + Memr[y+i-1])
+	x1 = Memd[x+i-1]
+	x2 = Memd[x+i]
+	return ((w - x1) / (x2 - x1) * (Memd[y+i] - Memd[y+i-1]) + Memd[y+i-1])
 end

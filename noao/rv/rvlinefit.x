@@ -92,7 +92,6 @@ begin
 	npts = right - left + 1
 	if (npts < 3) {
 	    call eprintf ("At least 3 points are required\n")
-	    call sfree (sp)
 	    return
 	}
 

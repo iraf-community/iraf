@@ -88,7 +88,7 @@ begin
 	case RPNDATAREJ:
 	    return (AP_RPNDATAREJ(rprof))
 	default:
-	    call error (0, "APSTATI: Unknown apphot parameter")
+	    call error (0, "APSTATI: Unknown apphot integer parameter")
 	}
 end
 
@@ -129,8 +129,6 @@ begin
 	    return (AP_RPKSIGMA(rprof))
 	case PYZMAG:
 	    return (AP_PYZMAG(ply))
-	case PYNPIX:
-	    return (AP_PYNPIX(ply))
 	case PYMAG:
 	    return (AP_PYMAG(ply))
 	case PYMAGERR:
@@ -141,8 +139,6 @@ begin
 	    return (AP_PYY(ply))
 	case PYMINRAD:
 	    return (AP_PYMINRAD(ply))
-	case PYFLUX:
-	    return (AP_PYFLUX(ply))
 	case PYXMEAN:
 	    return (AP_PYXMEAN(ply))
 	case PYYMEAN:
@@ -174,6 +170,32 @@ begin
 	case ROUNDHI:
 	    return (AP_ROUNDHI(fnd))
 	default:
-	    call error (0, "APSTATR: Unknown apphot parameter")
+	    call error (0, "APSTATR: Unknown apphot real parameter")
+	}
+end
+
+
+# AP2STATD -- Procedure to set a double apphot parameter.
+
+double procedure ap2statd (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+pointer	nse, ply, rprof, fnd
+
+begin
+	nse = AP_NOISE(ap)
+	ply = AP_POLY(ap)
+	rprof = AP_RPROF(ap)
+	fnd = AP_PFIND(ap)
+
+	switch (param) {
+	case PYNPIX:
+	    return (AP_PYNPIX(ply))
+	case PYFLUX:
+	    return (AP_PYFLUX(ply))
+	default:
+	    call error (0, "APSTATD: Unknown apphot double parameter")
 	}
 end

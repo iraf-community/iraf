@@ -9,7 +9,7 @@ procedure cr_find (cr, threshold, data, nc, nl, col, line,
 
 pointer	cr						# Cosmic ray list
 real	threshold					# Detection threshold
-pointer	data[nl]					# Data lines
+pointer	data[ARB]					# Data lines
 int	nc						# Number of columns
 int	nl						# Number of lines
 int	col						# First column
@@ -67,7 +67,8 @@ pointer	cr						# Cosmic ray list
 real	threshold					# Detection threshold
 int	col						# First column
 int	line						# Line
-real	a[n], b[n], c[n], d[n], e[n], f[n], g[n]	# Image lines
+real	a[ARB], b[ARB], c[ARB], d[ARB]			# Image lines
+real	e[ARB], f[ARB], g[ARB]				# Image lines
 int	n						# Number of columns
 pointer	sf1, sf2					# Surface fitting
 real	x[49], y[49], z[49], w[49]			# Surface arrays
@@ -202,7 +203,7 @@ pointer	cr						# Cosmic ray list
 real	threshold					# Detection threshold
 int	col						# First column
 int	line						# Line
-real	a[n], b[n], c[n], d[n], e[n]			# Image lines
+real	a[ARB], b[ARB], c[ARB], d[ARB], e[ARB]		# Image lines
 int	n						# Number of columns
 pointer	sf1, sf2					# Surface fitting
 real	x[25], y[25], z[25], w[25]			# Surface arrays

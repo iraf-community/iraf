@@ -41,7 +41,7 @@
 -file bin.sparc/OBJS.arc.Z
 -file bin.i386/OBJS.arc.Z
 -file bin.linux/OBJS.arc.Z
--file bin.ssol/OBJS.arc.Z
+-file bin.ssun/OBJS.arc.Z
 -file bin.alpha/OBJS.arc.Z
 -file bin.sf2c/OBJS.arc.Z
 -file bin.ddec/OBJS.arc.Z

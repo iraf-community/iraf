@@ -27,7 +27,7 @@ procedure id_graph1 (id)
 pointer	id				# ID pointer
 
 int	i, n
-real	xmin, xmax, ymin, ymax, dy
+real	xmin, xmax, ymin, ymax, dy, xminz, xmaxz, id_zshiftr()
 pointer	gp, sh, sp, x, y, str
 
 begin
@@ -65,15 +65,13 @@ begin
 	    call gt_sets (ID_GT(id), GTSUBTITLE, "")
 
 	    call ggwind (gp, xmin, xmax, ymin, ymax)
-	    xmin = xmin / (1 + ID_REDSHIFT(id))
-	    xmax = xmax / (1 + ID_REDSHIFT(id))
-	    call gswind (gp, xmin, xmax, ymin, ymax)
+	    xminz = id_zshiftr (id, xmin, 0)
+	    xmaxz = id_zshiftr (id, xmax, 0)
+	    call gswind (gp, xminz, xmaxz, ymin, ymax)
 	    call gseti (gp, G_XDRAWAXES, 2)
 	    call gseti (gp, G_YDRAWAXES, 0)
 	    call glabax (gp, "", "", "")
 
-	    xmin = xmin * (1 + ID_REDSHIFT(id))
-	    xmax = xmax * (1 + ID_REDSHIFT(id))
 	    call gswind (gp, xmin, xmax, ymin, ymax)
 	    call gctran (gp, xmin, ymin, xmax, ymax, 1, 0)
 	    call gctran (gp, xmax, ymax, xmin, ymin, 0, 1)
@@ -96,7 +94,7 @@ procedure id_graph2 (id)
 pointer	id				# ID pointer
 
 int	i, j, k, n
-real	xmin, xmax, ymin, ymax, dy
+real	xmin, xmax, ymin, ymax, dy, xminz, xmaxz, id_zshiftr()
 pointer	gp, sh, sp, x, y, str
 
 begin
@@ -148,15 +146,13 @@ begin
 	    call gt_sets (ID_GT(id), GTSUBTITLE, "")
 
 	    call ggwind (gp, xmin, xmax, ymin, ymax)
-	    xmin = xmin / (1 + ID_REDSHIFT(id))
-	    xmax = xmax / (1 + ID_REDSHIFT(id))
-	    call gswind (gp, xmin, xmax, ymin, ymax)
+	    xminz = id_zshiftr (id, xmin, 0)
+	    xmaxz = id_zshiftr (id, xmax, 0)
+	    call gswind (gp, xminz, xmaxz, ymin, ymax)
 	    call gseti (gp, G_XDRAWAXES, 2)
 	    call gseti (gp, G_YDRAWAXES, 0)
 	    call glabax (gp, "", "", "")
 
-	    xmin = xmin * (1 + ID_REDSHIFT(id))
-	    xmax = xmax * (1 + ID_REDSHIFT(id))
 	    call gswind (gp, xmin, xmax, ymin, ymax)
 	    call gctran (gp, xmin, ymin, xmax, ymax, 1, 0)
 	    call gctran (gp, xmax, ymax, xmin, ymin, 0, 1)

@@ -1,10 +1,10 @@
-These directories contain the general image processing routines.  The main
-directory contains a number of simple utilities; these have been thrown
-together in a bit of a hurry and a more carefully thought out set needs
-to be defined in the future.  The subdirectory "display" contains the source
-for the display and dcontrol routines.  A great deal more code will be
-added in the future.
+IMAGES -- General image processing tasks and utilties.
+----------------------------------------------------------
 
-10/30/84:
-An enhance version of imcopy is now in t_imcopy.x.  The earlier version
-is temporarily saved as imcopy.x.
+imcoords	- Image world coordinate handling
+imfilter	- Filtering (tasks which modify pixel values)
+imfit		- Fitting (fitting functions to image data)
+imgeom		- Geometry (tasks which move pixels around)
+immatch		- Image matching
+imutil		- Miscellaneous image utilties
+tv		- Image display (prototype package)

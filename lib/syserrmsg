@@ -167,6 +167,8 @@
 828 Cannot open pixel file
 829 Cannot rename image
 830 Cannot update image header
+831 Kernel section syntax not supported for this image
+832 Ambiguous image name
 
 835 Image header parameter not found
 836 Out of space in image header
@@ -258,7 +260,7 @@
 973 QPOE: attempt to use getparam to fetch value of struct type parameter
 974 QPOE: attempt to redefine an existing header parameter
 975 QPOE: unknown parameter
-976 QPIO: coordinate fields used for index must be type short
+976 QPIO: coordinate fields used for index must be type short or int
 977 QPOE file does not have a default WCS
 978 QPIO expression syntax
 979 QPEX: errors encountered while compiling expression
@@ -284,3 +286,37 @@
 998 MWCS: too many coordinate transformation (ctran) descriptors
 999 MWCS: mw_rotate can only deal with rotations between two axes
 1000 MWCS: out of storage for FITS-WCS cards
+
+1100 FXF: cannot delete multiple FITS extension file
+1101 FXF: numeric value only allowed as second term in ksection
+1102 FXF: number is not a decimal
+1103 FXF: syntax error in kernel section
+1104 FXF: string value only allowed as first term in ksection
+1105 FXF: 'ext' is ambiguous in ksection
+1106 FXF: value for ksection parameter should be yes or no
+1107 FXF: value for ksection parameter must be positive
+1108 FXF: to overwrite you need to specify [ext#] or [extname,extver]
+1109 FXF: to do this operation you need to specify overwrite mode
+1110 FXF: extension number not allowed with mode
+1111 FXF: overwrite not allowed with mode
+1112 FXF: extname and/or extver value already exists in extension
+1113 FXF: must specify which FITS extension
+1114 FXF: attempt to overwrite non-image extension
+1115 FXF: overwrite: cannot open temporary image
+1116 FXF: byte_short: illegal datatype
+1117 FXF: pak_data: image datatype not supported
+1118 FXF: BSCALE, BZERO not supported for floating data
+1119 FXF: inherit not permitted when PHU has NAXIS != 0
+1120 FXF: extname and/or extver value not found
+1121 FXF: EOF encountered while reading FITS file
+1122 FXF: bad FITS file NAXIS value
+1123 FXF: SIMPLE keyword value is not standard
+1124 FXF: trying to modify the FITS header of a non-IMAGE extension
+1125 FXF: setbitpix: unrecognized IRAF datatype
+1126 FXF: expanding extension is disabled, header will be truncated
+1127 FXF: upk_data: image datatype not supported
+1128 FXF: FITS image kernel abort - null driver entry point
+1129 FXF: Bad extension number combination
+1130 FXF: Fkinit extension number not equal to kernel section's
+1131 FXF: Bad extension name and extension number combination
+1132 FXF: IMAGE extension not found

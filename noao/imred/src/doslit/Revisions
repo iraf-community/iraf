@@ -1,5 +1,38 @@
 .help revisions Dec94 noao.imred.src.doslit
 .nf
+doslit$sarcrefs.cl
+doslit$sbatch.cl
+doslit$sdoarcs.cl
+doslit$sfluxcal.cl
+doslit$sgetspec.cl
+doslit$slistonly.cl
+doslit$sproc.cl
+    Any additional qualifiers in the imtype string are stripped.
+    (8/14/97, Valdes)
+
+doslit$sgetspec.cl
+    Added the field parameter to the RENAME call.  (8/12/97, Valdes)
+
+=========
+V2.11Beta
+=========
+
+doslit$sarcrefs.cl
+    If both crval and cdelt are INDEF then the autoidentify option is not
+    used.  (5/2/97, Valdes)
+
+doslit$apslitproc.par
+    Made changes for the new aperture selection option.  (9/5/96, Valdes)
+
+doslit.cl
+doslit.par
+sproc.cl
+sproc.par
+sarcrefs.cl
+sarcrefs.par
+sparams.par
+    Modified to use autoidentify.  (4/5/96, Valdes)
+
 doslit$sproc.cl
 doslit$sproc.par
     Added missing parameter declaration.  (5/25/95, Valdes)

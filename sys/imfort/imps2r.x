@@ -18,7 +18,7 @@ int	ier
 pointer	bp
 long	offset
 int	nchars, npix, ip, j
-int	bfwrit()
+int	imwpix()
 errchk	malloc
 
 begin
@@ -62,7 +62,7 @@ begin
 		call achtrs (buf[ip], Mems[bp], npix)
 
 		# Write one line of data.
-		if (nchars != bfwrit (IM_PIXFP(im), Mems[bp], nchars, offset)) {
+		if (nchars != imwpix (im, Mems[bp], nchars, offset, 1)) {
 		    ier = IE_WRPIX
 		    call im_seterrim (ier, im)
 		    return
@@ -70,7 +70,7 @@ begin
 
 	    } else {
 		# Write one line of data.
-		if (nchars != bfwrit (IM_PIXFP(im), buf[ip], nchars, offset)) {
+		if (nchars != imwpix (im, buf[ip], nchars, offset, 0)) {
 		    ier = IE_WRPIX
 		    call im_seterrim (ier, im)
 		    return

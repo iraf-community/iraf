@@ -13,6 +13,7 @@ int	i, dtype, ap, beam, nw, imgeti(), imofnlu(), imgnfn()
 real	aplow[2], aphigh[2], imgetr(), mw_c1tranr()
 double	ltm, ltv, r, w, dw, z, imgetd()
 pointer	sp, key, mw, ct, mw_openim(), mw_sctran()
+bool	fp_equald()
 errchk	smw_open, smw_saxes, mw_gwtermd, mw_sctran
 
 begin
@@ -48,8 +49,12 @@ begin
 	nw = max (mw_c1tranr (ct, 1.), mw_c1tranr (ct, real (IM_LEN(im,1))))
 	call mw_ctfree (ct)
 
-	iferr (dtype = imgeti (im, "DC-FLAG"))
-	    dtype = DCNO
+	iferr (dtype = imgeti (im, "DC-FLAG")) {
+	    if (fp_equald (1D0, w) || fp_equald (1D0, dw))
+		dtype = DCNO
+	    else
+		dtype = DCLINEAR
+	}
 	if (dtype==DCLOG) {
 	    if (abs(w)>20. || abs(w+(nw-1)*dw)>20.)
 		dtype = DCLINEAR
@@ -61,9 +66,13 @@ begin
 
 	# Convert to EQUISPEC system.
 	call mw_swattrs (mw, 0, "system", "equispec")
-	if (dtype != -1) {
-	    call mw_swattrs (mw, 1, "label", "Wavelength")
-	    call mw_swattrs (mw, 1, "units", "angstroms")
+	if (dtype != DCNO) {
+	    iferr (call mw_gwattrs (mw, 1, "label", Memc[key], SZ_FNAME)) {
+		iferr (call mw_gwattrs (mw, 1, "units", Memc[key], SZ_FNAME)) {
+		    call mw_swattrs (mw, 1, "units", "angstroms")
+		    call mw_swattrs (mw, 1, "label", "Wavelength")
+		}
+	    }
 	}
 
 	# Set the SMW data structure.

@@ -2,6 +2,7 @@
 
 input,s,a,,,,List of input images
 output,s,a,,,,List of output masks
+apertures,s,h,"",,,Apertures
 references,s,h,"",,,List of reference images
 
 interactive,b,h,yes,,,Run task interactively?

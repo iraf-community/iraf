@@ -8,7 +8,7 @@
 #include <iraf.h>
 
 #ifdef SOLARIS
-#define SUNOS4
+#define SUNOS
 #endif
 
 extern	unsigned VSHLIB[], VSHEND;	/* shared library descriptor */
@@ -24,7 +24,7 @@ XINT	*o_epa;			/* entry point address */
 	register unsigned *epa = (unsigned *) proc;
 	*o_epa = (XINT) epa;
 
-#ifdef SUNOS4
+#ifdef SUNOS
 	/* Return immediately if the shared library is not in use. */
 	if (VSHLIB[0] == 0)
 	    return;

@@ -133,8 +133,10 @@ begin
 end
 
 
-define	MAX_NITER	10		# maximum number of iterations
-define	DET_TOL		1.0e-20		# minimum value of the determinant
+define	MAX_NITER1	10		# maximum number of iterations
+define	MAX_NITER2	50		# maximum number of trials
+define	DET_TOL		1.0E-20		# minimum value of the determinant
+#define	DET_TOL		0.0		# minimum value of the determinant
 define	MIN_DELTA	0.01		# minimum absolute value of
 					# parameter increments
 
@@ -194,7 +196,8 @@ begin
 	        a, nobs, Memr[pdelta], aindex, Memr[pda], nstd,
 		Memd[palpha], Memr[pbeta], Memi[pik], Memi[pjk], nustd, det)
 
-	    #call eprintf ("det=%g stdev1=%g\n")
+	    #call eprintf ("acc: niter=%d det=%g stdev1=%g\n")
+		#call pargi (niter+1)
 		#call pargr (det)
 		#call pargr (stdev1)
 
@@ -211,7 +214,8 @@ begin
 	    stdev2 = ph_incrms (params, Memr[py], Memr[pyfit], eqindex, nueq,
 	        a, nobs, Memr[pda], aindex, nstd, stdev1)
 
-	    #call eprintf ("det=%g stdev2=%g\n")
+	    #call eprintf ("inc: niter=%d det=%g stdev2=%g\n")
+		#call pargi (niter+1)
 		#call pargr (det)
 		#call pargr (stdev2)
 
@@ -231,7 +235,7 @@ begin
 	    niter = niter + 1
 	    rms = sqrt (stdev2)
 
-	} until ((niter == MAX_NITER) || (rms <= EPSILONR))
+	} until ((niter == MAX_NITER1) || (rms <= EPSILONR))
 
 	return (OK)
 end
@@ -378,8 +382,6 @@ begin
 
 	# Invert the matrix.
 	call phminv (alpha, ik, jk, nj, det)
-	if (abs (det) < DET_TOL)
-	    return (rms1)
 
 	# Increment the parameters.
 	nj = 0
@@ -397,6 +399,29 @@ begin
 	    }
 	    da[j] = 0.2 * da[j] * deltaa[j]
 	}
+
+	# If the determinate is too small increment the parameters by
+	# deltas and try again.
+	#if (abs (det) < DET_TOL) {
+	    #call eprintf ("using approx\n")
+	    #do j = 1, nstd {
+	        #if (aindex[j] == 0) {
+		    #da[j] = 0.0
+		    #next
+		#}
+		#call eprintf ("i=%d dain=%g ")
+		    #call pargi (j)
+		    #call pargr (da[j])
+		#if (da[j] > 0.0)
+		    #da[j] = abs (deltaa[j])
+		#else if (da[j] < 0.0)
+		    #da[j] = -abs (deltaa[j])
+		#else
+		    #da[j] = 0.0
+		#call eprintf ("daout=%g\n")
+		    #call pargr (da[j])
+	    #}
+	#}
 
 	return (rms1)
 end
@@ -449,12 +474,12 @@ begin
 	        rms2 = rms2 + (y[i] - yfit[i]) ** 2
 	    }
 	    rms2 = rms2 / neq
+	    #call eprintf ("    niter=%d rms1=%g rms2=%g\n")
+		#call pargi (niter)
+		#call pargr (rms1)
+		#call pargr (rms2)
 	    if (rms2 <= 0.0)
 		break
-	    #call eprintf ("\torms2=%g rms2=%g rms1=%g\n")
-		#call pargr (orms2)
-		#call pargr (rms2)
-		#call pargr (rms1)
 	    if ((rms1 - rms2) >= 0.0)  
 		break
 
@@ -470,13 +495,13 @@ begin
 
 	    orms2 = rms2
 	    niter = niter + 1
-	    if (niter >= MAX_NITER)
+	    if (niter >= MAX_NITER2)
 		return (rms)
 
 	    do j = 1, nstd {
 	        if (aindex[j] == 0)
 		    next
-		da[j] = da[j] / 2.0
+		#da[j] = da[j] / 2.0
 		a[j+nobs] = a[j+nobs] - da[j]
 	    }
 
@@ -502,10 +527,11 @@ begin
 	        rms3 = rms3 + (y[i] - yfit[i]) ** 2
 	    }
 	    rms3 = rms3 / neq
-	    #call eprintf ("\torms3=%g rms3=%g rms2=%g\n")
-		#call pargr (orms3)
-		#call pargr (rms3)
+	    #call eprintf ("    niter=%d rms1=%g rms2=%g rms3=%g\n")
+		#call pargi (niter)
+		#call pargr (rms1)
 		#call pargr (rms2)
+		#call pargr (rms3)
 	    if ((rms3 - rms2) >= 0.0)
 		break
 
@@ -515,8 +541,9 @@ begin
 	    }
 
 	    niter = niter + 1
-	    if (niter >= MAX_NITER)
+	    if (niter >= MAX_NITER2)
 		return (rms)
+
 
 	    orms3 = rms3
 	    rms1 = rms2
@@ -558,7 +585,7 @@ begin
 	    rms = rms2
 	}
 
-	#call eprintf ("\trms1=%g rms2=%g rms3=%g rms=%g\n")
+	#call eprintf ("    incr: rms1=%g rms2=%g rms3=%g rms=%g\n")
 	    #call pargr (rms1)
 	    #call pargr (rms2)
 	    #call pargr (rms3)

@@ -2,6 +2,9 @@
  */
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #define	import_kernel
 #define	import_knames
 #define import_spp
@@ -20,7 +23,7 @@ XINT	*status;
 	char	data = 0;
 	char	*s;
 	int	fd;
-	long	lseek();
+	off_t	lseek();
 	extern	char *getenv();
 
 	if ((fd = creat ((char *)fname, _u_fmode(FILE_MODEBITS))) == ERR) {

@@ -52,3 +52,21 @@ begin
 	else
 	    call error (0, "Unknown APPHOT real parameter")
 end
+
+
+# APSETD -- Procedure to set a double apphot parameter.
+
+procedure apsetd (ap, param, dval)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+double	dval		# double value
+
+begin
+	if (param <= MAXERR1)
+	    call ap1setd (ap, param, dval)
+	else if (param <= MAXERR2)
+	    call ap2setd (ap, param, dval)
+	else
+	    call error (0, "Unknown APPHOT double parameter")
+end

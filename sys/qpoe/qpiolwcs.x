@@ -22,14 +22,25 @@ begin
 	ndim = NDIM
 
 	# Formalize the transformation.
-	ltv_1[1] = IO_VSDEF(io,1) - 1;  ltv_1[2] = IO_VSDEF(io,2) - 1
-	ltv_2[1] = 0;		        ltv_2[2] = 0
+	ltv_1[1] = IO_VSDEF(io,1) - 1
+	ltv_1[2] = IO_VSDEF(io,2) - 1
+
+	# L(i) :==  LTM=(1 / block) * P(i)  +  Vx
+	# At pixel {P(i) :==  (block + 1) / 2}  L(i) is 1.0.
+	# Solve for Vx :==  1.0 - (1 / block) * ((block + 1) / 2)
+	#	       -->  0.5 - 1 / (2 * block)
+
+	ltv_2[1] = 0.5d0 - 1.0d0 / double (max (1, IO_XBLOCK(io))) / 2.0d0
+	ltv_2[2] = 0.5d0 - 1.0d0 / double (max (1, IO_YBLOCK(io))) / 2.0d0
 
 	do j = 1, ndim
 	    do i = 1, ndim
-		if (i == j)
-		    ltm[i,j] = 1.0D0 / max (1, IO_BLOCK(io))
-		else
+		if (i == j) {
+		    if (i == 1)
+			ltm[i,j] = 1.0D0 / max (1, IO_XBLOCK(io))
+		    else
+			ltm[i,j] = 1.0D0 / max (1, IO_YBLOCK(io))
+		} else
 		    ltm[i,j] = 0
 
 	# Apply the transformation.

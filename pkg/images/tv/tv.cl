@@ -24,6 +24,7 @@ task    cimexam = tv$cimexam.par;    hidetask cimexam
 task    eimexam = tv$eimexam.par;    hidetask eimexam
 task    himexam = tv$himexam.par;    hidetask himexam
 task    jimexam = tv$jimexam.par;    hidetask jimexam
+task    kimexam = tv$kimexam.par;    hidetask kimexam
 task    limexam = tv$limexam.par;    hidetask limexam
 task    rimexam = tv$rimexam.par;    hidetask rimexam
 task    simexam = tv$simexam.par;    hidetask simexam

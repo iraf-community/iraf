@@ -31,12 +31,13 @@ include	"rfits.com"
 begin
 	# No pixel file was created.
 	if (NAXIS(im) == 0) {
-	    call printf ("Warning: No pixel file created\n")
+	    if (short_header == YES || long_header == YES) {
+		if (long_header == NO)
+		    call printf ("    ")
+	        call printf ("Warning: No pixel file created\n")
+	    }
 	    return
 	}
-
-	# Initialize the header.
-	call rft_set_image_header (fits, im)
 
 	# Compute the number of columns and lines in the image.
 	npix = NAXISN(im, 1)
@@ -71,7 +72,7 @@ begin
 
 	    # Turn on the ieee NaN mapping.
 	    call ieesnanr (blank)
-	    #call ieemapr (YES, NO)
+	    call ieemapr (YES, NO)
 	    #call ieezstatr ()
 	    NBPIX(im) = 0
 
@@ -112,7 +113,7 @@ begin
 	    # Turn on the ieee NaN mapping.
 	    dblank = blank
 	    call ieesnand (dblank)
-	    #call ieemapd (YES, NO)
+	    call ieemapd (YES, NO)
 	    #call ieezstatd ()
 	    NBPIX(im) = 0
 
@@ -183,72 +184,25 @@ begin
 	IRAFMAX(im) = lirafmax
 	LIMTIME(im) = clktime (long(0))
 
-	if (NBPIX (im) != 0) {
-	    call printf ("Warning: %d bad pixels replaced in image\n")
-		call pargl (NBPIX (im))
-	}
-	if (IS_INDEFR(lirafmax) || lirafmax > MAX_REAL) {
-	    call printf ("Warning: image contains pixel values > %g\n")
-		call pargr (MAX_REAL)
-	}
-	if (IS_INDEFR(lirafmin) || lirafmin < -MAX_REAL) {
-	    call printf ("Warning: image contains pixel values < %g\n")
-		call pargr (-MAX_REAL)
-	}
-end
-
-
-# RFT_SET_IMAGE_HEADER -- Set remaining header fields not set in
-# rft_read_header.
-
-procedure rft_set_image_header (fits, im)
-
-pointer	fits		# FITS data structure
-pointer	im		# IRAF image pointer
-
-include	"rfits.com"
-
-begin
-	# Determine data type from BITPIX if user data type not specified.
-
-	if (data_type == ERR) {
-	    if (BITPIX(fits) < 0) {
-		if (abs (BITPIX(fits)) <= (SZ_REAL * SZB_CHAR * NBITS_BYTE))
-		    PIXTYPE(im) = TY_REAL
-		else
-		    PIXTYPE(im) = TY_DOUBLE
-	    } else if (SCALE(fits) == YES) {
-		PIXTYPE(im) = TY_REAL
-	    } else {
-	        if (BITPIX(fits) <= (SZ_SHORT * SZB_CHAR * NBITS_BYTE))
-		    PIXTYPE(im) = TY_SHORT
-		else
-		    PIXTYPE(im) = TY_LONG
+	if (short_header == YES || long_header == YES) {
+	    if (NBPIX (im) != 0) {
+		if (long_header == NO)
+		    call printf ("    ")
+	        call printf ("Warning: %d bad pixels replaced in image\n")
+		    call pargl (NBPIX (im))
 	    }
-
-	} else
-	    PIXTYPE(im) = data_type
-end
-
-
-# RFT_SET_PRECISION -- Procedure to determine the precision of the FITS data
-# type.
-
-procedure rft_set_precision (bitpix, precision)
-
-int	bitpix			# FITS bits per pixel
-int	precision		# FITS decimal digits of precision
-
-begin
-	switch (bitpix) {
-	case FITS_BYTE:
-	    precision = FITSB_PREC
-	case FITS_SHORT:
-	    precision = FITSS_PREC
-	case FITS_LONG:
-	    precision = FITSL_PREC
-	default:
-	    call error (16, "RFT_SET_PRECISION: Unknown FITS type")
+	    if (IS_INDEFR(lirafmax) || lirafmax > MAX_REAL) {
+		if (long_header == NO)
+		    call printf ("    ")
+	        call printf ("Warning: image contains pixel values > %g\n")
+		    call pargr (MAX_REAL)
+	    }
+	    if (IS_INDEFR(lirafmin) || lirafmin < -MAX_REAL) {
+		if (long_header == NO)
+		    call printf ("    ")
+	        call printf ("Warning: image contains pixel values < %g\n")
+		    call pargr (-MAX_REAL)
+	    }
 	}
 end
 
@@ -376,8 +330,6 @@ begin
 	    call altml (Meml[outbuf], Meml[outbuf], npix, bscale, bzero)
 	case TY_REAL:
 	    call altmlr (inbuf, Memr[outbuf], npix, bscale, bzero)
-	    #call achtlr (inbuf, Memr[outbuf], npix)
-	    #call altmdr (Memr[outbuf], Memr[outbuf], npix, bscale, bzero)
 	case TY_DOUBLE:
 	    call achtld (inbuf, Memd[outbuf], npix)
 	    call altmd (Memd[outbuf], Memd[outbuf], npix, bscale, bzero)

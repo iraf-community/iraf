@@ -15,7 +15,7 @@ define	CMDS	"|angh|angv|background|banner|boundary|box|buffer|ceiling|\
 		|pointmode|radius|round|rplot|select|szmarker|ticklabels|\
 		|title|width|x|xlabel|xorder|y|ylabel|yorder|zero|unlearn|\
 		|autoredraw|nbins|z1|z2|autoscale|top_closed|allframes|wcs|\
-		|xformat|yformat|fitplot|sigma|axes|"
+		|xformat|yformat|fitplot|sigma|axes|fittype|beta|iterations|"
  
 define	ANGH		 1
 define	ANGV		 2
@@ -87,6 +87,9 @@ define	YFORMAT		67
 define	FITPLOT		68
 define	SIGMA		69
 define	AXES		70
+define	FITTYPE		71
+define	BETA		72
+define	ITERATIONS	73
 
  
 # IE_COLON -- Respond to colon commands.
@@ -131,8 +134,12 @@ begin
 	# Special optimization for the a key.
 	switch (ncmd) {
 	case BACKGROUND, CENTER, NAVERAGE, RPLOT, XORDER, WIDTH:
-	   if (IE_LASTKEY(ie) == 'a') {
+	    if (IE_LASTKEY(ie) == 'a') {
 	       gtype = 'r'
+	       pp = clopset ("rimexam")
+	    }
+	    if (IE_LASTKEY(ie) == ',') {
+	       gtype = '.'
 	       pp = clopset ("rimexam")
 	    }
 	}
@@ -161,7 +168,7 @@ begin
 	    }
 	case BACKGROUND:
 	    switch (gtype) {
-	    case 'j', 'k', 'r':
+	    case 'j', 'k', 'r', '.':
 		call gargb (bval)
 		if (nscan() == 1) {
 		    call printf ("background %b\n")
@@ -176,7 +183,7 @@ begin
 	    }
 	case BANNER:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 	        call gargb (bval)
 	        if (nscan() == 2) {
 		    call clppsetb (pp, "banner", bval)
@@ -195,7 +202,7 @@ begin
 		call clpstr ("vimexam.boundary", Memc[cmd])
 	case BOX:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 	        call gargb (bval)
 	        if (nscan() == 2) {
 		    call clppsetb (pp, "box", bval)
@@ -211,7 +218,7 @@ begin
 		    call pargr (clgetr ("rimexam.buffer"))
 	    } else {
 		call clputr ("rimexam.buffer", rval1)
-		if (gtype == 'r')
+		if (gtype == 'r' || gtype == '.')
 		    redraw = YES
 	    }
 	case CEILING:
@@ -230,7 +237,7 @@ begin
 	    }
 	case CENTER:
 	    switch (gtype) {
-	    case 'j', 'k', 'r':
+	    case 'j', 'k', 'r', '.':
 		call gargb (bval)
 		if (nscan() == 1) {
 		    call printf ("center %b\n")
@@ -273,7 +280,7 @@ begin
 		Memc[cmd] = gtype
 
 	    switch (Memc[cmd]) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 's', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 's', 'h', '.':
 		call gdeactivate (gp, 0)
 	        switch (Memc[cmd]) {
 	        case 'c':
@@ -281,10 +288,10 @@ begin
 	        case 'j':
 		    call clcmdw ("eparam jimexam")
 	        case 'k':
-		    call clcmdw ("eparam jimexam")
+		    call clcmdw ("eparam kimexam")
 	        case 'l':
 		    call clcmdw ("eparam limexam")
-	        case 'r':
+	        case 'r', '.':
 		    call clcmdw ("eparam rimexam")
 	        case 's':
 		    call clcmdw ("eparam simexam")
@@ -366,7 +373,7 @@ begin
 
 	case LOGX:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h', '.':
 	        call gargb (bval)
 	        if (nscan() == 2) {
 		    call clppsetb (pp, "logx", bval)
@@ -377,7 +384,7 @@ begin
 	    }
 	case LOGY:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h', '.':
 	        call gargb (bval)
 	        if (nscan() == 2) {
 		    call clppsetb (pp, "logy", bval)
@@ -393,7 +400,7 @@ begin
 		    call pargr (clgetr ("rimexam.magzero"))
 	    } else {
 		call clputr ("rimexam.magzero", rval1)
-		if (gtype == 'r')
+		if (gtype == 'r' || gtype == '.')
 		    redraw = YES
 	    }
 	case AUTOREDRAW:
@@ -443,7 +450,7 @@ begin
 	switch (ncmd) {
 	case MAJRX:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 	        call gargi (ival)
 		if (nscan() == 1) {
 		    call printf ("majrx %d\n")
@@ -457,7 +464,7 @@ begin
 	    }
 	case MAJRY:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 	        call gargi (ival)
 		if (nscan() == 1) {
 		    call printf ("majry %d\n")
@@ -471,7 +478,7 @@ begin
 	    }
 	case MARKER:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h', '.':
 	        call gargwrd (Memc[cmd], SZ_LINE)
 	        ncmd = strdic (Memc[cmd], Memc[cmd], SZ_LINE, MTYPES)
 	        if (ncmd == 0) {
@@ -486,7 +493,7 @@ begin
 	    }
 	case MINRX:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 	        call gargi (ival)
 		if (nscan() == 1) {
 		    call printf ("minrx %d\n")
@@ -500,7 +507,7 @@ begin
 	    }
 	case MINRY:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 	        call gargi (ival)
 		if (nscan() == 1) {
 		    call printf ("minry %d\n")
@@ -590,7 +597,7 @@ begin
 		call clputi ("nlstat", ival)
 	case POINTMODE:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h', '.':
 	        call gargb (bval)
 	        if (nscan() == 2) {
 		    call clppsetb (pp, "pointmode", bval)
@@ -606,12 +613,12 @@ begin
 		    call pargr (clgetr ("rimexam.radius"))
 	    } else {
 		call clputr ("rimexam.radius", rval1)
-		if (gtype == 'r')
+		if (gtype == 'r' || gtype == '.')
 		    redraw = YES
 	    }
 	case ROUND:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 	        call gargb (bval)
 	        if (nscan() == 2) {
 		    call clppsetb (pp, "round", bval)
@@ -622,7 +629,7 @@ begin
 	    }
 	case RPLOT:
 	    switch (gtype) {
-	    case 'j', 'k', 'r':
+	    case 'j', 'k', 'r', '.':
 		call gargr (rval1)
 		if (nscan() == 1) {
 		    call printf ("rplot %g\n")
@@ -648,7 +655,7 @@ begin
 	    }
 	case SZMARKER:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h', '.':
 	        call gargi (ival)
 		if (nscan() == 1) {
 		    call printf ("szmarker %d\n")
@@ -662,7 +669,7 @@ begin
 	    }
 	case TICKLABELS:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 	        call gargb (bval)
 	        if (nscan() == 2) {
 		    call clppsetb (pp, "ticklabels", bval)
@@ -673,7 +680,7 @@ begin
 	    }
 	case TITLE:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 's', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 's', 'v', 'e', 'h', '.':
 		Memc[cmd] = EOS
 		call gargstr (Memc[cmd], SZ_LINE)
 		call clppset (pp, "title", Memc[cmd])
@@ -683,7 +690,7 @@ begin
 	    }
 	case WIDTH:
 	    switch (gtype) {
-	    case 'j', 'k', 'r':
+	    case 'j', 'k', 'r', '.':
 		call gargr (rval1)
 		if (nscan() == 1) {
 		    call printf ("width %g\n")
@@ -698,7 +705,7 @@ begin
 	    }
 	case X:
 	    switch (gtype) {
-	    case 'c', 'j', 'k', 'l', 'r', 'v', 'h':
+	    case 'c', 'j', 'k', 'l', 'r', 'v', 'h', '.':
 	        call gargr (rval1)
 	        call gargr (rval2)
 	        if (nscan() < 3) {
@@ -714,7 +721,7 @@ begin
 	    }
 	case XLABEL:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 		Memc[cmd] = EOS
 		call gargstr (Memc[cmd], SZ_LINE)
 		call clppset (pp, "xlabel", Memc[cmd])
@@ -724,7 +731,7 @@ begin
 	    }
 	case XORDER:
 	    switch (gtype) {
-	    case 'j', 'k', 'r':
+	    case 'j', 'k', 'r', '.':
 		call gargi (ival)
 		if (nscan() == 1) {
 		    call printf ("xorder %d\n")
@@ -739,7 +746,7 @@ begin
 	    }
 	case Y:
 	    switch (gtype) {
-	    case 'c', 'j', 'k', 'l', 'r', 'v', 'h':
+	    case 'c', 'j', 'k', 'l', 'r', 'v', 'h', '.':
 	        call gargr (rval1)
 	        call gargr (rval2)
 	        if (nscan() < 3) {
@@ -779,7 +786,7 @@ pointer	sp, cmd
  
 real	clgetr()
 bool	clgetb()
-int	nscan(), clgeti(), btoi()
+int	nscan(), clgeti(), btoi(), strdic()
 
 begin
 	call smark (sp)
@@ -788,7 +795,7 @@ begin
 	switch (ncmd) {
 	case YLABEL:
 	    switch (gtype) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 'h', '.':
 		Memc[cmd] = EOS
 		call gargstr (Memc[cmd], SZ_LINE)
 		call clppset (pp, "ylabel", Memc[cmd])
@@ -803,7 +810,7 @@ begin
 		    call pargi (clgeti ("rimexam.yorder"))
 	    } else {
 		call clputi ("rimexam.yorder", ival)
-		if (gtype == 'r')
+		if (gtype == 'r' || gtype == '.')
 		    redraw = YES
 	    }
 	case ZERO:
@@ -822,7 +829,7 @@ begin
 		Memc[cmd] = gtype
 
 	    switch (Memc[cmd]) {
-	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 's', 'h':
+	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'e', 's', 'h', '.':
 	        switch (Memc[cmd]) {
 	        case 'c':
 		    call clcmdw ("unlearn cimexam")
@@ -832,7 +839,7 @@ begin
 		    call clcmdw ("unlearn jimexam")
 	        case 'l':
 		    call clcmdw ("unlearn limexam")
-	        case 'r':
+	        case 'r', '.':
 		    call clcmdw ("unlearn rimexam")
 	        case 's':
 		    call clcmdw ("unlearn simexam")
@@ -895,7 +902,7 @@ begin
 		    call pargb (clgetb ("himexam.top_closed"))
 	    } else {
 		call clputb ("himexam.top_closed", bval)
-		if (gtype == 'r')
+		if (gtype == 'h' || gtype == '.')
 		    redraw = YES
 	    }
 	case ALLFRAMES:
@@ -954,6 +961,44 @@ begin
 	    if (nscan() == 2) {
 		call clputb ("simexam.axes", bval)
 		if (gtype == 's')
+		    redraw = YES
+	    }
+	case FITTYPE:
+	    call gargwrd (Memc[cmd], SZ_LINE)
+	    if (nscan() == 1) {
+		call clgstr ("rimexam.fittype", Memc[cmd], SZ_LINE)
+		call printf ("fittype %s\n")
+		    call pargstr (Memc[cmd])
+	    } else {
+		ncmd = strdic (Memc[cmd], Memc[cmd], SZ_LINE,
+		    "|gaussian|moffat|")
+		if (ncmd == 0) {
+		    call printf ("Profile fit types are %s\n")
+			call pargstr ("|gaussian|moffat|")
+		} else {
+		    call clpstr ("rimexam.fittype", Memc[cmd])
+		    if (gtype == 'r' || gtype == '.')
+			redraw = YES
+		}
+	    }
+	case BETA:
+	    call gargr (rval1)
+	    if (nscan() == 1) {
+		call printf ("beta %g\n")
+		    call pargr (clgetr ("rimexam.beta"))
+	    } else {
+		call clputr ("rimexam.beta", rval1)
+		if (gtype == 'r' || gtype == '.')
+		    redraw = YES
+	    }
+	case ITERATIONS:
+	    call gargi (ival)
+	    if (nscan() == 1) {
+		call printf ("iterations %d\n")
+		    call pargi (clgeti ("rimexam.iterations"))
+	    } else {
+		call clputi ("rimexam.iterations", ival)
+		if (gtype == 'r')
 		    redraw = YES
 	    }
 

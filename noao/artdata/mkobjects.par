@@ -6,7 +6,7 @@ title,s,h,"",,,"Image title"
 ncols,i,h,512,1,,"Number of columns"
 nlines,i,h,512,1,,"Number of lines"
 header,f,h,"artdata$stdheader.dat",,,"Image or header keyword file"
-background,r,h,1000.,0.,,"Default background and Poisson background
+background,r,h,1000.,0.,,"Default background (in ADU)
 
 OBJECT PARAMETERS"
 objects,s,h,"",,,"List of objects files"
@@ -22,7 +22,7 @@ exptime,r,h,1.,1e-6,,"Exposure time"
 magzero,r,h,7.,,,"Magnitude zero point
 
 NOISE PARAMETERS"
-gain,r,h,1.,1.e-9,,"Gain (electrons/DN)"
+gain,r,h,1.,1.e-9,,"Gain (electrons/ADU)"
 rdnoise,r,h,0.,0.,,"Read noise (electrons)"
 poisson,b,h,no,,,"Add Poisson noise?"
 seed,i,h,1,,,"Random number seed

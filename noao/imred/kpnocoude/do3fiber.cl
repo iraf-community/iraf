@@ -1,10 +1,10 @@
-# DOFIBERS -- Process Coude fiber spectra from 2D to wavelength calibrated 1D.
+# DO3FIBERS -- Process Coude fiber spectra from 2D to wavelength calibrated 1D.
 #
-# The task DOFIBERS1 does all of the interactive work and DOFIBERS2 does the
+# The task PROC does all of the interactive work and BATCH does the
 # background work.  This procedure is organized this way to minimize the
 # dictionary space when the background task is submitted.
 
-procedure dofibers (objects)
+procedure do3fiber (objects)
 
 string	objects = ""		{prompt="List of object spectra"}
 
@@ -18,6 +18,8 @@ string	gain = "GAIN"		{prompt="Photon gain (photons/data number)"}
 real	datamax = INDEF		{prompt="Max data value / cosmic ray threshold"}
 int	fibers = 3		{prompt="Number of fibers"}
 real	width = 6.		{prompt="Width of profiles (pixels)"}
+string	crval = "INDEF"		{prompt="Approximate central wavelength"}
+string	cdelt = "INDEF"		{prompt="Approximate dispersion"}
 string	objaps = "2"		{prompt="Object apertures"}
 string	arcaps = "1,3"		{prompt="Arc apertures\n"}
 
@@ -47,9 +49,9 @@ begin
 	proc.datamax = datamax
 
 	proc (objects, apref, flat, "", arcs, "", "",
-	    arctable, fibers, "", objaps, "", arcaps, "",
+	    arctable, fibers, "", crval, cdelt, objaps, "", arcaps, "",
 	    "", "", scattered, fitflat, recenter, edit, no, no, clean,
-	    dispcor, no, no, no, no, splot, redo, update, batch, listonly)
+	    dispcor, no, no, no, no, no, splot, redo, update, batch, listonly)
 
 	if (proc.dobatch) {
 	    print ("-- Do remaining spectra as a batch job --")

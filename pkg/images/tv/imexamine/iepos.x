@@ -143,7 +143,7 @@ begin
 		    call pargr (wx)
 		call fprintf (IE_LOGFD(ie), " ")
 		if (IE_YFORMAT(ie) == '%')
-		    call fprintf (IE_YFORMAT(ie))
+		    call fprintf (IE_LOGFD(ie), IE_YFORMAT(ie))
 		else
 		    call fprintf (IE_LOGFD(ie), "%7g")
 		    call pargr (wy)

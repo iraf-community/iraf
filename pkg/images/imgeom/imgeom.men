@@ -1,0 +1,9 @@
+         blkavg - Block average or sum a list of N-D images
+         blkrep - Block replicate a list of N-D images
+      imlintran - Linearly transform a list of 2-D images
+        imshift - Shift a list of 1-D or 2-D images
+    imtranspose - Transpose a list of 2-D images
+       im3dtran - Transpose a list of 3-D images
+        magnify - Magnify a list of 1-D or 2-D images
+         rotate - Rotate and shift a list of 2-D images
+     shiftlines - Shift the lines of a list of N-D images

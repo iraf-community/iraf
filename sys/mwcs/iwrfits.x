@@ -2,6 +2,7 @@
 
 include	<syserr.h>
 include	<imhdr.h>
+include <ctype.h>
 include	<imio.h>
 include	"mwcs.h"
 include	"imwcs.h"
@@ -22,7 +23,7 @@ int	mode			#I RF_REFERENCE or RF_COPY
 
 double	dval
 bool	omit, copy
-pointer	iw, idb, rp, cp
+pointer	iw, idb, rp, cp, fp
 int	ndim, recno, ualen, type, axis, index, ip, temp, i
 
 pointer	idb_open()
@@ -116,7 +117,10 @@ begin
 	    ip = IDB_STARTVALUE
 	    switch (type) {
 	    case TY_CTYPE:
-		IW_CTYPE(iw,axis) = C_RP(cp) + ip + 1
+		fp = C_RP(cp) + ip
+		while (IS_WHITE(Memc[fp]) || Memc[fp] == '\'')
+		    fp = fp + 1
+		IW_CTYPE(iw,axis) =  fp
 	    case TY_CDELT:
 		if (ctod (Memc[rp], ip, IW_CDELT(iw,axis)) <= 0)
 		    IW_CDELT(iw,axis) = 0.0

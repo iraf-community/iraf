@@ -20,6 +20,12 @@ begin
 	    GT_LINE(gt) = ival
 	case GTTRANSPOSE:
 	    GT_TRANSPOSE(gt) = ival
+	case GTDRAWTITLE:
+	    GT_DRAWTITLE(gt) = ival
+	case GTDRAWXLABELS:
+	    GT_DRAWXLABELS(gt) = ival
+	case GTDRAWYLABELS:
+	    GT_DRAWYLABELS(gt) = ival
 	case GTSYSID:
 	    GT_SYSID(gt) = ival
 	case GTCOLOR:

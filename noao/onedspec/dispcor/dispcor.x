@@ -65,7 +65,7 @@ begin
 	    else if (a <= b) {
 		ia = nint (a + 0.5)
 		ib = nint (b - 0.5)
-		if (abs (a+0.5-ia) < .001 && abs (b-0.5-ib) < .001) {
+		if (abs (a+0.5-ia) < 0.00001 && abs (b-0.5-ib) < 0.00001) {
 		    sum = 0.
 		    do j = ia, ib
 			sum = sum + asieval (asi, real(j))
@@ -77,7 +77,7 @@ begin
 	    } else {
 		ib = nint (b + 0.5)
 		ia = nint (a - 0.5)
-		if (abs (a-0.5-ia) < .001 && abs (b+0.5-ib) < .001) {
+		if (abs (a-0.5-ia) < 0.00001 && abs (b+0.5-ib) < 0.00001) {
 		    sum = 0.
 		    do j = ib, ia
 			sum = sum + asieval (asi, real(j))

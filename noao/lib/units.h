@@ -45,3 +45,6 @@ define	UN_EV		1.2396E4	# ev
 define	UN_KEV		1.2396E1	# kev
 define	UN_MEV		1.2396E-2	# mev
 define	UN_Z		1.0		# doppler shift
+
+# Unit abbreviations
+define	ABBREVIATIONS	"noao$lib/units.dat"

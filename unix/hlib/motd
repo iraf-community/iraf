@@ -1,8 +1,5 @@
-    NOAO Linux/IRAF Revision 2.10.4-p2 Wed May 29 11:06:49 MST 1996
-    This is the EXPORT version of Linux/IRAF V2.10.4 for the Linux OS.
-
-    This port was done using Slackware 3.0 with a Linux 1.3.70 kernel.
-    This version of IRAF supports ELF-based systems but uses a.out objects.
+    NOAO PC-IRAF Revision 2.11.1 EXPORT Mon Jan 26 13:32:19 MST 1998
+    This is the EXPORT version of PC-IRAF V2.11 supporting most PC systems.
 
     Welcome to IRAF.  To list the available commands, type ? or ??.  To get
     detailed information about a command, type `help command'.   To  run  a

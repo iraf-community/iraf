@@ -8,8 +8,9 @@ include	"oif.h"
 # OIF_RENAME -- Rename an image.  A special operator is required since the image
 # is stored as two files.
 
-procedure oif_rename (old_root, old_extn, new_root, new_extn, status)
+procedure oif_rename (kernel, old_root, old_extn, new_root, new_extn, status)
 
+int	kernel			#I IKI kernel
 char	old_root[ARB]		# old image root name
 char	old_extn[ARB]		# old image extn
 char	new_root[ARB]		# new image root name

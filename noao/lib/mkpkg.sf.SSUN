@@ -1,0 +1,5 @@
+# Mkpkg special file list for SUN/IRAF, Solaris
+
+$set	XNO	= '& "$xc -cq -/libmil -p noao &"'
+
+$special "$(noao)onedspec/":		t_standard.x	$(XNO) ;

@@ -45,7 +45,7 @@ on the terminal
 .fi
 .ih
 REVISIONS
-.ls V2.10
+.ls SLIST1D V2.10
 This task is the same as V2.9 \fBslist\fR and applies only to the older
 IRS/IIDS record extension spectra.  In V2.10 \fBslist\fR
 has been revised for multiaperture spectra.

@@ -23,9 +23,10 @@ char	cmd[SZ_LINE]
 char	newimage[SZ_FNAME]
 int	i, j, last, all, prfeature, nfeatures1, npeaks
 double	pix, fit, user, shift, pix_shift, z_shift
-pointer	peaks, label
+pointer	peaks, label, aid
 
-int	clgcur(), scan(), nscan(), find_peaks(), errcode()
+bool	aid_autoid()
+int	clgcur(), scan(), nscan(), id_peaks(), errcode()
 double	id_center(), fit_to_pix(), id_fitpt(), id_shift(), id_rms()
 errchk	id_graph()
 
@@ -35,13 +36,13 @@ define	beep_		99
 
 begin
 	# Initialize.
+	if (ID_GP(id) == NULL)
+	    return
 	ID_GTYPE(id) = PAN
 	all = 0
 	last = ID_CURRENT(id)
 	newimage[1] = EOS
 	ID_REFIT(id) = NO
-	ID_NEWFEATURES(id) = NO
-	ID_NEWCV(id) = NO
 	wy = INDEF
 	key = 'r'
 
@@ -73,6 +74,19 @@ begin
 		ID_CURRENT(id) = ID_CURRENT(id) + 1
 	    case 'a':	# Set all flag for next key
 		all = 1
+	    case 'b':	# Autoidentify
+		call aid_init (aid, "aidpars")
+		call aid_sets (aid, "crval", "CL crval")
+		call aid_sets (aid, "cdelt", "CL cdelt")
+		if (aid_autoid (id, aid)) {
+		    ID_NEWCV(id) = YES
+		    ID_NEWFEATURES(id) = YES
+		    ID_NEWGRAPH(id) = YES
+		} else {
+		    prfeature = 0
+		    call printf ("No solution found\n")
+		}
+		call aid_free (aid)
 	    case 'c':	# Recenter features
 		if (all != 0) {
 		    for (i = 1; i <= ID_NFEATURES(id); i = i + 1) {
@@ -108,7 +122,7 @@ begin
 			call id_mark (id, ID_CURRENT(id))
 		        ID_NEWFEATURES(id) = YES
 		    } else {
-			call printf ("Centering failed")
+			call printf ("Centering failed\n")
 			prfeature = NO
 		    }
 		}
@@ -129,6 +143,10 @@ begin
 		    ID_CURRENT(id) = min (ID_NFEATURES(id), ID_CURRENT(id))
 		    last = 0
 		}
+	    case 'e':	# Find features from line list with no fitting
+		call id_linelist (id)
+		if (ID_NEWFEATURES(id) == YES)
+		    ID_NEWGRAPH(id) = YES
 	    case 'f':	# Fit dispersion function
 		call id_dofit (id, YES)
 	    case 'g':	# Fit shift
@@ -161,8 +179,13 @@ begin
 		fit = wx
 		pix = fit_to_pix (id, fit)
 		pix = id_center (id, pix, ID_FWIDTH(id), ID_FTYPE(id))
-		if (IS_INDEFD (pix))
+		if (IS_INDEFD (pix)) {
+		    prfeature = NO
+		    call printf ("Center not found: check cursor position")
+		    if (ID_THRESHOLD(id) > 0.)
+			call printf (" and threshold value")
 		    goto beep_
+		}
 		fit = id_fitpt (id, pix)
 		user = fit
 		call id_newfeature (id, pix, fit, user, 1.0D0, ID_FWIDTH(id),
@@ -221,10 +244,11 @@ begin
 		    } else
 		        shift = 0.
 		case 'x':
-		    if (ID_NFEATURES(id) > 5)
-			shift = id_shift (id)
-		    else
+		    shift = id_shift (id, -1D0, -0.05D0)
+		    if (IS_INDEFD(shift)) {
+			call printf ("No solution found\n")
 			goto beep_
+		    }
 		}
 
 		ID_NEWFEATURES(id) = YES
@@ -233,7 +257,7 @@ begin
 		prfeature = NO
 
 		if (ID_NFEATURES(id) < 1) {
-		    call printf ("User coordinate shift=%5f")
+		    call printf ("User coordinate shift=%5f\n")
 			call pargd (shift)
 		    ID_SHIFT(id) = ID_SHIFT(id) + shift
 		    goto newkey_
@@ -277,7 +301,7 @@ begin
 		if (ID_NFEATURES(id) < 1) {
 		    call printf ("User coordinate shift=%5f")
 			call pargd (shift)
-		    call printf (", No features found during recentering")
+		    call printf (", No features found during recentering\n")
 		    ID_SHIFT(id) = ID_SHIFT(id) + shift
 		    goto newkey_
 		}
@@ -292,7 +316,7 @@ begin
 		    call pargi (ID_NFEATURES(id))
 		    call pargi (nfeatures1)
 		call printf (
-		    ", pixel shift=%.2f, user shift=%5f, z=%7.3g, rms=%5g")
+		    ", pixel shift=%.2f, user shift=%5f, z=%7.3g, rms=%5g\n")
 		    call pargd (pix_shift / ID_NFEATURES(id))
 		    call pargd (pix - ID_SHIFT(id))
 		    call pargd (z_shift / ID_NFEATURES(id))
@@ -353,8 +377,8 @@ begin
 		call gt_window (ID_GT(id), ID_GP(id), "cursor", ID_NEWGRAPH(id))
 	    case 'y':	# Find peaks
 		call malloc (peaks, ID_NPTS(id), TY_REAL)
-		npeaks = find_peaks (IMDATA(id,1), Memr[peaks], ID_NPTS(id), 0.,
-		    int (ID_MINSEP(id)), 0, ID_MAXFEATURES(id), 0., false)
+		npeaks = id_peaks (id, IMDATA(id,1), Memr[peaks], ID_NPTS(id),
+		    0., int (ID_MINSEP(id)), 0, ID_MAXFEATURES(id), 0., false)
 		for (j = 1; j <= ID_NFEATURES(id); j = j + 1) {
 		    for (i = 1; i <= npeaks; i = i + 1) {
 			if (!IS_INDEF (Memr[peaks+i-1])) {
@@ -437,7 +461,7 @@ newkey_
 		    
 		call gscur (ID_GP(id), real (FIT(id,ID_CURRENT(id))), wy)
 		if (errcode() == OK && prfeature == YES) {
-	            call printf ("%10.2f %10.8g %10.8g %s")
+	            call printf ("%10.2f %10.8g %10.8g %s\n")
 		        call pargd (PIX(id,ID_CURRENT(id)))
 		        call pargd (FIT(id,ID_CURRENT(id)))
 		        call pargd (USER(id,ID_CURRENT(id)))

@@ -17,7 +17,10 @@
       integer memflg
       integer col
       integer logic0
-      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      common /cline/ dbgout, dbglev, level, linect (5), infile (5), fnam
+     *p, fnames ( 150)
+      integer dbgout
+      integer dbglev
       integer level
       integer linect
       integer infile
@@ -62,16 +65,6 @@
       integer c
       integer ngetch
       integer i
-c     integer digits(37)
-c     data digits(1)/48/,digits(2)/49/,digits(3)/50/,digits(4)/51/,digit
-c    *s(5)/52/,digits(6)/53/,digits(7)/54/,digits(8)/55/,digits(9)/56/,d
-c    *igits(10)/57/,digits(11)/97/,digits(12)/98/,digits(13)/99/,digits(
-c    *14)/100/,digits(15)/101/,digits(16)/102/,digits(17)/103/,digits(18
-c    *)/104/,digits(19)/105/,digits(20)/106/,digits(21)/107/,digits(22)/
-c    *108/,digits(23)/109/,digits(24)/110/,digits(25)/111/,digits(26)/11
-c    *2/,digits(27)/113/,digits(28)/114/,digits(29)/115/,digits(30)/116/
-c    *,digits(31)/117/,digits(32)/118/,digits(33)/119/,digits(34)/120/,d
-c    *igits(35)/121/,digits(36)/122/,digits(37)/-2/
       c = ngetch (lexstr (1))
       if (.not.(c .eq. 32 .or. c .eq. 9))goto 23000
       lexstr (1) = 32

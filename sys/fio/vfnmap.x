@@ -68,8 +68,8 @@ VFN is open to prevent corruption of the mapping file, failure to remove a
 file lock, or failure to close the mapping file.
 .endhelp ______________________________________________________________________
 
-define	SZ_VFN		32		# max chars in V_VFN field
-define	LEN_FN		34		# no. chars allocated to VFNFN field
+define	SZ_VFN		255		# max chars in V_VFN field
+define	LEN_FN		128		# no. chars allocated to VFNFN field
 define	SZ_FNPAIR	(LEN_FN*2)	# size of filename pair 2(+EOS+align)
 define	MAX_LONGFNAMES	100		# max filename pairs in FNMAP
 define	SZ_ZFD		4		# size of ".zfd" extension
@@ -85,7 +85,7 @@ define	V_UNMAP		4
 # VFD -- VFN descriptor structure.  Assumes an 80 char (or less) OSDIR field
 # and 35 char (or less) VFN, ROOT and EXTN fields (see fio.h).
 
-define	LEN_VFD		195
+define	LEN_VFD		778
 
 define	V_MFD		Memi[$1]		# ptr to mapping file descriptor
 define	V_ACMODE	Memi[$1+1]		# access mode
@@ -94,9 +94,9 @@ define	V_LENROOT	Memi[$1+3]		# length of ROOT string
 define	V_LENEXTN	Memi[$1+4]		# length of EXTN string
 define	V_LONGROOT	Memi[$1+5]		# root field exceeds OS limit
 define	V_VFN		Memc[P2C($1+10)]	# VFN - ldir
-define	V_OSDIR		Memc[P2C($1+45)]	# OS directory
-define	V_ROOT		Memc[P2C($1+125)]	# OS root filename
-define	V_EXTN		Memc[P2C($1+160)]	# OS extension
+define	V_OSDIR		Memc[P2C($1+266)]	# OS directory
+define	V_ROOT		Memc[P2C($1+522)]	# OS root filename
+define	V_EXTN		Memc[P2C($1+650)]	# OS extension
 
 # MFD -- Mapping file descriptor structure.  An upper limit is placed on
 # the number of filename pairs in the descriptor because it is assumed that
@@ -104,9 +104,9 @@ define	V_EXTN		Memc[P2C($1+160)]	# OS extension
 # filenames in the directory, not on the number of files in the directory.
 # If this is a problem the code is not difficult to generalize.
 
-define	LEN_MFD		(50+MAX_LONGFNAMES*SZ_FNPAIR/SZ_STRUCT)
-define	MIN_LENMFD	(50+1*SZ_FNPAIR/SZ_STRUCT)
-define	SZ_MAPFNAME	(40*SZ_STRUCT-1)
+define	LEN_MFD		(250+MAX_LONGFNAMES*SZ_FNPAIR/SZ_STRUCT)
+define	MIN_LENMFD	(250+1*SZ_FNPAIR/SZ_STRUCT)
+define	SZ_MAPFNAME	(240*SZ_STRUCT-1)
 
 define	M_CHECKSUM	Memi[$1]		# checksum of file when written
 define	M_CHAN		Memi[$1+1]		# OS channel of mapping file
@@ -117,7 +117,7 @@ define	M_MODIFIED	Memi[$1+5]		# YES if database modified
 define	M_ADDZMD	Memi[$1+6]		# create .zmd file at update
 define	M_DELZMD	Memi[$1+7]		# delete .zmd file at update
 define	M_MAPFNAME	Memc[P2C($1+10)]	# name of map file
-define	M_FNMAP		(P2C($1+50))		# filename pairs
+define	M_FNMAP		(P2C($1+250))		# filename pairs
 
 # Subscript the (VFN,OSFN) filename pairs.  For example, FN_VFN(mfd,n)
 # references the VFN field of filename pair N of the mapping file MFD.
@@ -243,8 +243,8 @@ begin
 	# The OSDIR and ROOT fields are used twice below, so we concatenate
 	# them here.
 
-	op = gstrcpy (V_OSDIR(vfd), osfn, SZ_PATHNAME) + 1
-	op = op + gstrcpy (V_ROOT(vfd), osfn[op], SZ_PATHNAME-op+1)
+	op = gstrcpy (V_OSDIR(vfd), osfn, maxch) + 1
+	op = op + gstrcpy (V_ROOT(vfd), osfn[op], maxch-op+1)
 
 	# If the root field of the osfn is within the length limit for a host
 	# system filename all we have to do is concatenate and pack, returning
@@ -257,10 +257,10 @@ begin
 	    goto degenerate_
 
 	# Concatenate the final osfn.
-	if (V_LENEXTN(vfd) > 0 && op < SZ_PATHNAME) {
+	if (V_LENEXTN(vfd) > 0 && op < maxch) {
 	    osfn[op] = EXTN_DELIMITER
 	    op = op + 1
-	    call strcpy (V_EXTN(vfd), osfn[op], SZ_PATHNAME-op+1)
+	    call strcpy (V_EXTN(vfd), osfn[op], maxch-op+1)
 	} else
 	    osfn[op] = EOS
 
@@ -277,7 +277,7 @@ degenerate_
 	call vvfn_readmapfile (vfd)
 
 	# Search the file name list for the named VFN.
-	if (vfn_getosfn (vfd, V_VFN(vfd), osfn, SZ_PATHNAME) <= 0)
+	if (vfn_getosfn (vfd, V_VFN(vfd), osfn, maxch) <= 0)
 	    status = ERR
 	else
 	    status = OK

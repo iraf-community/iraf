@@ -1,5 +1,109 @@
 .help revisions Jan90 noao.artdata
 .nf
+
+=====
+V2.11
+=====
+
+t_mk1dspec.x
+t_mknoise.x
+t_mkobjects.x
+lists/t_starlist.x
+lists/t_gallist.x
+doc/mk1dspec.hlp
+doc/mknoise.hlp
+doc/mkobjects.hlp
+doc/starlist.hlp
+doc/gallist.hlp
+    If the random number seed is specified as INDEF then the task will
+    use the clock time (seconds since 1980) as the seed.  This allows
+    users to get different random numbers for each execution.
+    (9/23/97, Valdes)
+
+t_mk1dspec.x
+    If the dispersion was negative the task would fail to make the lines.
+    (6/2/97, Valdes)
+
+doc/mk1dspec.hlp
+    Fixed minor typo.  (6/2/97, Valdes)
+
+doc/mkpattern.hlp
+    Updated for changes.  (4/22/97, Valdes)
+
+artdata.par
+doc/mknoise.hlp
+doc/mkobjects.hlp
+    Changed the default for "ranbuf" to zero.  (1/29/97, Valdes)
+
+lists/stdbio.x
+    The parameter information in the output now begins with #.
+    (12/30/96, Valdes)
+
+t_mknoise.x
+t_mk1dspec.x
+t_mk2dspec.x
+t_mkechelle.x
+t_mkobjects.x
+t_mkpattern.x
+    Changed logic to work around the fact that IMACCESS does not always
+    work.  This became a problem with the FITS kernel.  (11/11/96, Valdes)
+
+t_mkpattern.x
+mkpattern.par
+doc/mkpattern.hlp
+    Added "ushort" and "complex" data types.  (11/8/96, Valdes)
+
+numrecipes.x
+    Modified the Poisson deviate routine to return zero for input
+    values less than or equal to zero.  (10/1/96, Valdes)
+
+lists/stdbio.x
+    Modified the list formatting code to print the x and y centers of
+    the objects to 3 decimal places of precision. (8/27/96, Davis)
+
+mkpattern.par
+    An ndim of zero is now allowed.  (8/15/96, Valdes)
+
+mkobjects.par
+doc/mkobjects.hlp
+    Modified the prompt for "background" and the help page to indicate
+    that the value is in data numbers.  (6/27/96, Valdes)
+
+t_mkechelle.x
+    The DC-FLAG was not being set correctly for raw extracted spectra.
+    (4/26/96, Valdes)
+
+doc/mk1dspec.hlp
+    Minor clarification of how the peak parameter is used if a line
+    list is given but there is not peak value.  (10/12/95, Valdes)
+
+gallist.par
+    Changed the "ar" parameter to a default value of 0.3 corresponding
+    to the range E0 to E7.  (10/10/95, Valdes)
+
+voigt.x			+
+mk1dspec.par
+t_mk1dspec.x
+mkpkg
+mkexamples/henear.cl
+mkexamples/heneardc.cl
+mkexamples/longslit.cl
+mkexamples/multifiber.cl
+mkexamples/spectrum.cl
+doc/mk1dspec.hlp
+    1.	MK1DSPEC now includes gaussian, lorentzian, and voigt line profiles.
+	There were parameter changes and changes to the input/output
+	line lists.
+    2.  The example scripts calling MK1DSPEC were modified for the changes
+	to task though they still use only gaussian lines.  The spectra
+	will not be exactly the same because the order of the random
+	numbers has changed.
+    (7/28/95, Valdes)
+
+=======
+V2.10.4
+=======
+
 artdata$t_mk1dspec.x
     Fixed two type mismatches in min/max calls.  (12/31/94, Valdes)
 

@@ -16,6 +16,7 @@ int	npts		# number of points
 int	nxd, nyd	# order of the derivatives in x and y
 
 int	ncoeff, nxder, nyder, i, j, k
+int	order, maxorder1, maxorder2, nmove1, nmove2
 pointer	sf2, sp, coeff, ptr1, ptr2
 double	norm
 
@@ -48,7 +49,8 @@ begin
 	    GS_XTERMS(sf2) = GS_XTERMS(sf1)
 
 	    # find the order of the new surface
-	    if (GS_XTERMS(sf2) == NO) {
+	    switch (GS_XTERMS(sf2)) {
+	    case GS_XNONE: 
 
 		if (nxder > 0 && nyder > 0) {
 		    GS_NXCOEFF(sf2) = 1
@@ -70,7 +72,22 @@ begin
 		    GS_NCOEFF(sf2) = GS_NYCOEFF(sf2)
 		}
 
-	    } else {
+	    case GS_XHALF:
+
+		maxorder1 = max (GS_XORDER(sf1) + 1, GS_YORDER(sf1) + 1)
+		order = max (1, min (maxorder1 - 1 - nyder - nxder,
+		    GS_NXCOEFF(sf1) - nxder))
+	        GS_NXCOEFF(sf2) = order
+	        GS_XORDER(sf2) = order
+		order = max (1, min (maxorder1 - 1 - nyder - nxder,
+		    GS_NYCOEFF(sf1) - nyder))
+	        GS_NYCOEFF(sf2) = order
+	        GS_YORDER(sf2) = order
+		order = min (GS_XORDER(sf2), GS_YORDER(sf2))
+		GS_NCOEFF(sf2) = GS_NXCOEFF(sf2) * GS_NYCOEFF(sf2)  -
+			order * (order - 1) / 2
+
+	    default:
 
 	        GS_NXCOEFF(sf2) = max (1, GS_NXCOEFF(sf1) - nxder)
 	        GS_XORDER(sf2) = max (1, GS_XORDER(sf1) - nxder)
@@ -111,11 +128,12 @@ begin
 	call dgscoeff (sf1, Memd[coeff], ncoeff)
 
 	# compute the new coefficients
-	if (GS_XTERMS(sf2) == YES) {
+	switch (GS_XTERMS(sf2)) {
+	case GS_XFULL:
 
 	    ptr2 = GS_COEFF(sf2) + (GS_NYCOEFF(sf2) - 1) * GS_NXCOEFF(sf2)
+	    ptr1 = coeff + (GS_NYCOEFF(sf1) - 1) * GS_NXCOEFF(sf1)
 	    do i = GS_NYCOEFF(sf1), nyder + 1, -1 {
-		ptr1 = coeff + (i - 1) * GS_NXCOEFF(sf1)
 		do j = i, i - nyder + 1, -1
 		    call amulkd (Memd[ptr1+nxder], double (j - 1),
 		        Memd[ptr1+nxder], GS_NXCOEFF(sf2))
@@ -125,9 +143,31 @@ begin
 		}
 		call amovd (Memd[ptr1+nxder], COEFF(ptr2), GS_NXCOEFF(sf2))
 		ptr2 = ptr2 - GS_NXCOEFF(sf2)
+		ptr1 = ptr1 - GS_NXCOEFF(sf1)
 	    }
 
-	} else {
+	case GS_XHALF:
+
+	    maxorder1 = max (GS_XORDER(sf1) + 1, GS_YORDER(sf1) + 1)
+	    maxorder2 = max (GS_XORDER(sf2) + 1, GS_YORDER(sf2) + 1)
+	    ptr2 = GS_COEFF(sf2) + GS_NCOEFF(sf2)
+	    ptr1 = coeff + GS_NCOEFF(sf1)
+	    do i = GS_NYCOEFF(sf1), nyder + 1, -1 {
+		nmove1 = max (0, min (maxorder1 - i, GS_NXCOEFF(sf1)))
+		nmove2 = max (0, min (maxorder2 - i + nyder, GS_NXCOEFF(sf2)))
+		ptr1 = ptr1 - nmove1
+		ptr2 = ptr2 - nmove2
+		do j = i, i - nyder + 1, -1
+		    call amulkd (Memd[ptr1+nxder], double (j - 1),
+		        Memd[ptr1+nxder], nmove2)
+		do j = nmove1, nxder + 1, - 1 {
+		    do k = j , j - nxder + 1, - 1
+			Memd[ptr1+j-1] = Memd[ptr1+j-1] * (k - 1)
+		}
+		call amovd (Memd[ptr1+nxder], COEFF(ptr2), nmove2)
+	    }
+
+	default:
 
 	    if (nxder > 0 && nyder > 0) {
 		COEFF(GS_COEFF(sf2)) = 0.

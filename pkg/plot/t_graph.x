@@ -123,26 +123,55 @@ char	xlabel[SZ_LINE], ylabel[SZ_LINE], title[SZ_LINE]
 char	marker[SZ_FNAME], wcs[SZ_FNAME], xformat[SZ_FNAME], yformat[SZ_FNAME]
 bool	pointmode, lintran, xautoscale, yautoscale
 bool	drawbox, transpose, rdmarks
+int	ltype, color, ip1, ip2
 int	xtran, ytran, axis, ticklabels, i, marker_type, j
 real	p1, p2, q1, q2, wx1, wx2, wy1, wy2, szmarker, vx1, vx2, vy1, vy2
 real	xx, yy, sz, szx, szy
-pointer	ptemp
+pointer	sp, ltypes, colors, ptemp
 
 pointer	gopen()
 bool	clgetb(), streq(), fp_equalr()
-int	clgeti(), gg_rdcurves()
+int	clgeti(), gg_rdcurves(), ctoi()
 real	clgetr(), plt_iformatr()
 errchk	clgetb, clgeti, clgstr, clgetr, glabax, gpmark
-errchk	gg_setdashpat, gswind, gseti, gg_rdcurves, gascale, grscale
+errchk	gswind, gseti, gg_rdcurves, gascale, grscale
 
 begin
+	call smark (sp)
+	call salloc (ltypes, SZ_LINE, TY_CHAR)
+	call salloc (colors, SZ_LINE, TY_CHAR)
+
 	# If computing projection along an axis (collapsing a multidimensional
 	# section to a vector), fetch axis number.  Get wcs string.
 	axis = clgeti ("axis")
 	call clgstr ("wcs", wcs, SZ_FNAME)
 
-	# Initialize dashline index
-	call gg_initdashpat ()
+	# Set the line type and color lists.
+	i = 0
+	call clgstr ("ltypes", Memc[ltypes], SZ_LINE)
+	for (ip1=ltypes; Memc[ip1]!=EOS; ip1=ip1+1) {
+	    if (Memc[ip1] == ',')
+		Memc[ip1] = ' '
+	    if (IS_DIGIT(Memc[ip1]))
+		i = i + 1
+	}
+	if (i == 0)
+	    Memc[ltypes] = EOS
+	ip1 = 1
+	ltype = 0
+
+	i = 0
+	call clgstr ("colors", Memc[colors], SZ_LINE)
+	for (ip2=colors; Memc[ip2]!=EOS; ip2=ip2+1) {
+	    if (Memc[ip2] == ',')
+		Memc[ip2] = ' '
+	    if (IS_DIGIT(Memc[ip2]))
+		i = i + 1
+	}
+	if (i == 0)
+	    Memc[colors] = EOS
+	ip2 = 1
+	color = 0
 
 	# If pointmode is enabled, get marker character to be used to mark
 	# points.  The size of the character is given
@@ -326,6 +355,18 @@ begin
 
 	# Draw the curves.
 	do i = 1, ncurves {
+	    if (Memc[ltypes] == EOS)
+		ltype = ltype + 1
+	    else if (ctoi (Memc[ltypes], ip1, j) > 0)
+		ltype = j
+	    ltype = mod (ltype - 1, 4) + 1
+	    call gseti (gd, G_PLTYPE, ltype)
+	    if (Memc[colors] == EOS)
+		color = color + 1
+	    else if (ctoi (Memc[colors], ip2, j) > 0)
+		color = j
+	    color = mod (color - 1, 9) + 1
+	    call gseti (gd, G_PLCOLOR, color)
 	    if (pointmode) {
 		if (!rdmarks) {
 		    call amovkr (szmarker, Memr[size[i]], npix[i])
@@ -347,13 +388,12 @@ begin
 			call gmark (gd, xx, yy, marker_type, szx, szy)
 		    }
 		}
-	    } else {
-		call gg_setdashpat (gd)
+	    } else
 		call gpline (gd, Memr[x[i]], Memr[y[i]], npix[i])
-	    }
 	}
 
 	call gclose (gd)
+	call sfree (sp)
 end
 
 
@@ -687,35 +727,4 @@ begin
 	call asubkr (x, p1, x, npix)
 	call amulkr (x, xscale, x, npix)
 	call aaddkr (x, q1, x, npix)
-end
-
-
-# GG_INITDASHPAT -- Initialize index of dash pattern array
-
-procedure gg_initdashpat ()
-
-int	ip
-common  /dashinit/ip
-
-begin
-	ip = 0
-end
-
-
-# GG_SETDASHPAT -- Set the current dash pattern to the next one in the 
-# available list.
-
-procedure gg_setdashpat (gd)
-
-pointer	gd			# Pointer to graphics stream
-
-int	patterns[4]
-int	ip
-common	/dashinit/ip
-data	patterns/GL_SOLID, GL_DASHED, GL_DOTTED, GL_DOTDASH/
-
-begin
-	if (ip < 4)
-	    ip = ip + 1
-	call gseti (gd, G_PLTYPE, patterns[ip])
 end

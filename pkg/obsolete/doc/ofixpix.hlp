@@ -1,0 +1,85 @@
+.help ofixpix Jan85 proto
+.ih
+NAME
+ofixpix -- fix bad pixels using a text file (from proto V2.10.4)
+.ih
+USAGE	
+.nf
+ofixpix images badpixels
+.fi
+.ih
+PARAMETERS
+.ls image
+List of two dimensional images to be modified.
+.le
+.ls badpixels
+File containing the regions of bad pixels.  A region is described by
+four whitespace separated numbers consisting of the first and last columns
+of the bad region and the first and last lines of the bad region.
+.le
+.ls verbose = no
+Print the image names and the bad pixel regions?
+.le
+.ih
+DESCRIPTION
+Bad pixel regions in the list of two dimensional images are replaced by
+linear interpolation using pixels bordering the bad pixel regions.
+The bad pixel regions are input in the specified file consisting of lines
+of coordinates (x1 x2 y1 y2) where x1 and x2 are the first and last columns
+of the bad region and y1 and y2 are the first and last lines of the
+bad region.  The file may be STDIN to read from the standard input.
+The type of interpolation is determined as follows:
+
+.ls (1)
+If the bad region spans entire lines then the interpolation is from
+neighboring lines.
+.le
+.ls (2)
+If the bad region spans entire columns then the interpolation is from
+neighboring columns.
+.le
+.ls (3)
+If the bad region contains more lines than columns then the interpolation
+is from neighboring columns.
+.le
+.ls (4)
+If the bad region contains the same or more columns than lines then the
+interpolation is from neighboring lines.
+.le
+
+If the bad region borders the edge of the image then the interpolation
+is by replication of the first good pixel in the direction of interpolation
+and otherwise linear interpolation between the bordering lines or columns
+is used.  The verbose parameter may be used to produce of log of the pixel
+modifications.
+.ih
+EXAMPLES
+A detector has bad lines 10 and 25 to 27 and a partial bad column
+at column 31 between lines 35 and 50.  A bad region file is created containing
+the lines
+
+.nf
+1 100 10 10
+1 100 25 27
+31 31 35 50
+.fi
+
+The set of images "image*" are fixed by:
+
+	cl> ofixpix image* badpixfile
+.ih
+REVISIONS
+.ls OFIXPIX V2.11
+This is the V2.10.4 and earlier version of PROTO.FIXPIX.
+.le
+.ih
+BUGS
+This is a simple minded task which can be improved by using more sophisticated
+interpolation.  The bad pixel file will eventually be replaced by image
+masks and bad pixel lists in the image.  Be careful with image sections because
+the bad pixel regions are relative to the image section.  Also if the image
+is trimmed or rotated then the bad pixel regions must be changed.
+.ih
+SEE ALSO
+epix, imedit, fixpix
+.endhelp

@@ -53,18 +53,10 @@ begin
 		case SMW_ND:
 		    i = 2 ** (SMW_PAXIS(smw,1) - 1)
 		    ct = smw_sctran (smw, "world", "physical", i)
-		    if (dtype == DCLOG) {
-			wa = log10 (wa)
-			wb = log10 (wb)
-		    }
 		    wa = smw_c1trand (ct, wa)
 		    wb = smw_c1trand (ct, wb)
 		case SMW_ES, SMW_MS:
 		    ct = smw_sctran (smw, "world", "physical", 3)
-		    if (dtype == DCLOG) {
-			wa = log10 (wa)
-			wb = log10 (wb)
-		    }
 		    call smw_c2trand (ct, wa, double (ap), wa, shift)
 		    call smw_c2trand (ct, wb, double (ap), wb, shift)
 		}

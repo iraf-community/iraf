@@ -238,8 +238,8 @@ end
 real procedure cr_weight (fluxratio, ratio, wts, ncr)
 
 real	fluxratio		#I Flux ratio
-real	ratio[ncr]		#I Ratio Values
-real	wts[ncr]		#I Weights
+real	ratio[ARB]		#I Ratio Values
+real	wts[ARB]		#I Weights
 int	ncr			#I Number of ratio values
 real	wt			#O Sum of weights
 

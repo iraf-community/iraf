@@ -215,6 +215,7 @@ begin
 	call gt_copy (gt, gt1)
 	call gt_sets (gt1, GTTYPE, "line")
 	call gt_seti (gt1, GTLINE, GL_DASHED)
+	call gt_seti (gt1, GTCOLOR, max (0, min (9, IC_COLOR(ic))))
 	call gt_plot (gp, gt1, Memr[xr], Memr[yr], npts)
 	call gt_free (gt1)
 

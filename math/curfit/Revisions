@@ -1,5 +1,33 @@
 .help revisions Jun89 math.curfit
 .nf
+From Davis, March 20, 1997
+
+The weights computed by the WTS_CHISQ option in the routines cvacpts[rd]
+were not being forced to be positive as intended.
+math/curfit/cvacpts.gx
+math/curfit/cvacptsr.x
+math/curfit/cvacptsd.x
+
+There was an inconsistency in the way the ncoeff argument to the cvpower[rd]
+routines was being used. Ncoeff was intended to be an output argument.
+pkg/math/curfit/doc/cvpower.hlp
+pkg/math/curfit/cvpower.gx
+pkg/math/curfit/cvpowerr.x
+pkg/math/curfit/cvpowerd.x
+
+From Davis, June 13, 1995
+
+Added a new routine cvepower to the curfit math package. Cvepower computes
+errors of the equivalent power series coefficients for the fitted Legendre
+and Chebyshev polynomials and has the same calling sequence as the 
+cverrors routine.
+math/curfit/cvpower.gx
+math/curfit/cvpowerr.x
+math/curfit/cvpowerd.x
+math/curfit/doc/curfit.hd
+math/curfit/doc/curfit.men
+math/curfit/doc/cvepower.hlp
+
 From Davis, May, 6, 1990
 
 Finished cleaning up the .gx files in curfit.

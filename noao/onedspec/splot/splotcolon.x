@@ -6,7 +6,8 @@ include	<ctype.h>
 
 # List of colon commands.
 define	CMDS		 "|show|nolog|log|dispaxis|nsum|#|units|auto|zero\
-			  |xydraw|histogram|nosysid|wreset|flip|overplot|"
+			  |xydraw|histogram|nosysid|wreset|flip|overplot\
+			  |label|mabove|mbelow|"
 define	SHOW		1	# Show logged data
 define	NOLOG		2	# Turn off logging
 define	LOG		3	# Turn on logging
@@ -22,19 +23,23 @@ define	NOSYSID		12	# Don't include system id
 define	WRESET		13	# Reset window for each new spectrum
 define	FLIP		14	# Flip the dispersion coordinates
 define	OVERPLOT	15	# Toggle overplot
+define	LABEL		16	# Label spectrum
+define	MABOVE		17	# Tick mark plus label above spectrum
+define	MBELOW		18	# Tick mark plus label below spectrum
 
 define	OPOFF		7	# Offset in options array
 
 # SPLOT_COLON -- Respond to colon command.
 
-procedure splot_colon (command, options, gp, gt, sh, units, fname1, fname2,
-	fd1, fd2, newgraph)
+procedure splot_colon (command, options, gp, gt, sh, x, y, units,
+	fname1, fname2, fd1, fd2, newgraph)
 
 char	command[ARB]		# Colon command
 int	options[ARB]		# Options
 pointer	gp			# GIO pointer
 pointer	gt			# GTOOLS pointer
 pointer	sh			# SHIO pointer
+real	x, y			# Coordinate
 char	units[SZ_FNAME]		# Units string
 char	fname1[SZ_FNAME]	# Log file
 char	fname2[SZ_FNAME]	# Temporary log file
@@ -43,12 +48,15 @@ int	newgraph		# New graph?
 
 bool	bval
 char	cmd[SZ_LINE]
-real	x, gt_getr()
+real	xval, gt_getr()
 int	ncmd, ival, access(), nscan(), strdic(), btoi(), gt_geti()
-pointer	smw
+pointer	sp, str, smw
 errchk	un_changer
 
 begin
+	call smark (sp)
+	call salloc (str, SZ_LINE, TY_CHAR)
+
 	# Scan the command string and get the first word.
 	call sscan (command)
 	call gargwrd (cmd, SZ_LINE)
@@ -132,15 +140,15 @@ begin
 	    for (ival=1; IS_WHITE(cmd[ival]); ival=ival+1)
 		;
 	    iferr {
-		x = gt_getr (gt, GTXMIN)
-		if (!IS_INDEF(x)) {
-		    call un_changer (UN(sh), cmd[ival], x, 1, NO)
-		    call gt_setr (gt, GTXMIN, x)
+		xval = gt_getr (gt, GTXMIN)
+		if (!IS_INDEF(xval)) {
+		    call un_changer (UN(sh), cmd[ival], xval, 1, NO)
+		    call gt_setr (gt, GTXMIN, xval)
 		}
-		x = gt_getr (gt, GTXMAX)
-		if (!IS_INDEF(x)) {
-		    call un_changer (UN(sh), cmd[ival], x, 1, NO)
-		    call gt_setr (gt, GTXMAX, x)
+		xval = gt_getr (gt, GTXMAX)
+		if (!IS_INDEF(xval)) {
+		    call un_changer (UN(sh), cmd[ival], xval, 1, NO)
+		    call gt_setr (gt, GTXMAX, xval)
 		}
 		call un_changer (UN(sh), cmd[ival], Memr[SX(sh)], SN(sh), YES)
 		call strcpy (cmd[ival], units, SZ_FNAME)
@@ -228,8 +236,28 @@ begin
 		call printf ("overplot %b\n")
 		    call pargi (options[OVERPLOT-OPOFF])
 	    }
+	case LABEL, MABOVE, MBELOW:
+	    call gargwrd (cmd, SZ_LINE)
+	    for (ival=1; IS_WHITE(cmd[ival]); ival=ival+1)
+		;
+	    call strcpy (cmd[ival], cmd, SZ_LINE)
+	    call gargwrd (Memc[str], SZ_LINE)
+	    for (ival=1; IS_WHITE(Memc[str+ival-1]); ival=ival+1)
+		;
+	    call strcpy (Memc[str+ival-1], Memc[str], SZ_LINE)
+
+	    switch (ncmd) {
+	    case LABEL:
+		call splabel ("label", sh, gp, x, y, cmd, Memc[str])
+	    case MABOVE:
+		call splabel ("mabove", sh, gp, x, y, cmd, Memc[str])
+	    case MBELOW:
+		call splabel ("mbelow", sh, gp, x, y, cmd, Memc[str])
+	    }
 
 	default:
 	    call printf ("Unrecognized or ambiguous command\007")
 	}
+
+	call sfree (sp)
 end

@@ -49,13 +49,15 @@ define	SMW_ES		1			# Equispec WCS
 define	SMW_MS		2			# Multispec WCS
 
 # Coordinate transformation structure.
-define	SMW_CTLEN	(4 + $1)		# Length of SMW CT structure
+define	SMW_CTLEN	(6 + $1)		# Length of SMW CT structure
 
 define	SMW_SMW		Memi[$1]		# SMW pointer
 define	SMW_CTTYPE	Memi[$1+1]		# Transformation type
-define	SMW_CTL		Memi[$1+2]		# Logical/physical pointer
-define	SMW_NCT		Memi[$1+3]		# Number of CT pointers	
-define	SMW_CT		Memi[$1+$2+4]		# Physical/world pointer
+define	SMW_DAXIS	Memi[$1+2]		# Dispersion axis
+define	SMW_AAXIS	Memi[$1+3]		# Aperture axis
+define	SMW_CTL		Memi[$1+4]		# Logical/physical pointer
+define	SMW_NCT		Memi[$1+5]		# Number of CT pointers	
+define	SMW_CT		Memi[$1+$2+6]		# Physical/world pointer
 
 # Transformation types
 define	SMW_CTTYPES	"|logical|physical|"
@@ -69,7 +71,7 @@ define	SMW_PL		32			# Physical to logical
 
 # SHDR - Spectrum header data structure
 
-define	LEN_SHDR	371
+define	LEN_SHDR	378
 define	LEN_SHDRS	79			# Length of strings
 
 define	IMNAME		Memc[P2C($1)]		# Spectrum image name
@@ -118,8 +120,12 @@ define	NP2		Memi[$1+356]		# Last logical pixel
 define	SN		Memi[$1+357]		# Number of pixels
 define	SPEC		Memi[$1+$2+357]		# Pointers to spectra
 define	SID		Memi[$1+$2+364]		# Pointers to spectra ID strings
+define	STYPE		Memi[$1+$2+371]		# Spectrum type
 
 # Spectrum types and access modes.
+
+define	STYPES	"|coordinates|spectrum|raw|background|sigma|continuum|"
+
 define	SH_NTYPES	6	# Number of spectrum types
 define	SHHDR		0	# Get header only
 define	SHX		1	# Get coordinates

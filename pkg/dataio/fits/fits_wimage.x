@@ -25,8 +25,12 @@ errchk	wft_rscale_line, wft_dscale_line
 include "wfits.com"
 
 begin
-	if (NAXIS(im) == 0)
+	if (NAXIS(im) == 0) {
+	    if (short_header == YES || long_header == YES) {
+	        call printf ("0  Data logical (2880 byte) records written\n")
+	    }
 	    return
+	}
 
 	# Initialize.
 	npix = NAXISN(im,1)
@@ -256,23 +260,18 @@ int	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero parameters
 int	datatype		# data type of image
 
-errchk  altal, amovl, altadr, achtrl, altad, achtdl, altax, achtxl
+errchk  altall, altarl, altadl, altaxl
 
 begin
 	switch (datatype) {
 	case TY_SHORT, TY_INT, TY_LONG, TY_USHORT:
-	    call altal (Meml[buf], Meml[buf], npix, bzero, bscale)
-	    call amovl (Meml[buf], outbuffer, npix)
+	    call altall (Meml[buf], outbuffer, npix, bzero, bscale)
 	case TY_REAL:
 	    call altarl (Memr[buf], outbuffer, npix, bzero, bscale)
-	    #call altadr (Memr[buf], Memr[buf], npix, bzero, bscale)
-	    #call achtrl (Memr[buf], outbuffer, npix)
 	case TY_DOUBLE:
-	    call altad (Memd[buf], Memd[buf], npix, bzero, bscale)
-	    call achtdl (Memd[buf], outbuffer, npix)
+	    call altadl (Memd[buf], outbuffer, npix, bzero, bscale)
 	case TY_COMPLEX:
-	    call altadx (Memx[buf], Memx[buf], npix, bzero, bscale)
-	    call achtxl (Memx[buf], outbuffer, npix)
+	    call altaxl (Memx[buf], outbuffer, npix, bzero, bscale)
 	default:
 	    call error (12, "WFT_LSCALE_LINE: Unknown IRAF image type.")
 	}
@@ -363,6 +362,31 @@ begin
 end
 
 
+# ALTALL -- Procedure to linearly scale a long vector into a long vector
+# using double precision constants to preserve precision.
+
+procedure altall (a, b, npix, k1, k2)
+
+long	a[ARB]		# input vector
+long	b[ARB]		# output vector
+int	npix		# number of pixels
+double	k1, k2		# scaling factors
+
+double	dtemp
+int	i
+
+begin
+	do i = 1, npix {
+	    dtemp = (a[i] + k1) * k2
+	    if (dtemp >= 0.0d0)
+		dtemp = dtemp + 0.5d0
+	    else
+		dtemp = dtemp - 0.5d0
+	    b[i] = dtemp
+	}
+end
+
+
 # ALTARL -- Procedure to linearly scale a real vector into a long vector
 # using double precision constants to preserve precision.
 
@@ -374,10 +398,67 @@ int	npix		# number of pixels
 double	k1, k2		# scaling factors
 
 int	i
+double	dtemp
 
 begin
-	do i = 1, npix
-	    b[i] = (a[i] + k1) * k2
+	do i = 1, npix {
+	    dtemp = (a[i] + k1) * k2
+	    if (dtemp >= 0.0d0)
+		dtemp = dtemp + 0.5d0
+	    else
+		dtemp = dtemp - 0.5d0
+	    b[i] = dtemp
+	}
+end
+
+
+# ALTADL -- Procedure to linearly scale a double vector into a long vector
+# using double precision constants to preserve precision.
+
+procedure altadl (a, b, npix, k1, k2)
+
+double	a[ARB]		# input vector
+long	b[ARB]		# output vector
+int	npix		# number of pixels
+double	k1, k2		# scaling factors
+
+int	i
+double	dtemp
+
+begin
+	do i = 1, npix {
+	    dtemp = (a[i] + k1) * k2
+	    if (dtemp >= 0.0d0)
+		dtemp = dtemp + 0.5d0
+	    else
+		dtemp = dtemp - 0.5d0
+	    b[i] = dtemp
+	}
+end
+
+
+# ALTAXL -- Procedure to linearly scale a complex vector into a long vector
+# using double precision constants to preserve precision.
+
+procedure altaxl (a, b, npix, k1, k2)
+
+complex	a[ARB]		# input vector
+long	b[ARB]		# output vector
+int	npix		# number of pixels
+double	k1, k2		# scaling factors
+
+int	i
+double	dtemp
+
+begin
+	do i = 1, npix {
+	    dtemp = (a[i] + k1) * k2
+	    if (dtemp >= 0.0d0)
+		dtemp = dtemp + 0.5d0
+	    else
+		dtemp = dtemp - 0.5d0
+	    b[i] = dtemp
+	}
 end
 
 

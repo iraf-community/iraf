@@ -3,6 +3,7 @@
        ccdhedit - CCD image header editor
   ccdinstrument - Review and edit instrument translation files
         ccdlist - List CCD processing information
+	ccdmask - Create bad pixel mask from CCD flat field images
         ccdproc - Process CCD images
         ccdtest - CCD test and demonstration package
         combine - Combine CCD images

@@ -16,7 +16,10 @@
       integer memflg
       integer col
       integer logic0
-      common /cline/ level, linect (5), infile (5), fnamp, fnames ( 150)
+      common /cline/ dbgout, dbglev, level, linect (5), infile (5), fnam
+     *p, fnames ( 150)
+      integer dbgout
+      integer dbglev
       integer level
       integer linect
       integer infile

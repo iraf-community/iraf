@@ -54,8 +54,8 @@
 #define	lex_clrcpumode(fp)	((fp)->_fflags &= ~_LEXBIT)
 #define	lex_cpumodeset(fp)	((fp)->_fflags & _LEXBIT)
 
-int	parse_state;		/* What are we parsing?			*/
-int	proc_script;		/* In a procedure script?		*/
-struct	pfile	*parse_pfile;	/* Where parsed params are added.	*/
+extern int parse_state;			/* What are we parsing?	*/
+extern int proc_script;			/* In a procedure script? */
+extern struct pfile *parse_pfile;	/* Where parsed params are added. */
 
-char *today();			/* returns pointer to todays date	*/
+char *today();				/* returns pointer to todays date */

@@ -1,5 +1,12 @@
 .help revisions Jun88 noao.imred.irs
 .nf
+imred$irs/identify.par
+    Added new units parameters.  (3/11/97, Valdes)
+
+=========
+V2.10.4p2
+=========
+
 imred$irs/
    Updated to new version of ONEDSPEC (7/11/91, Valdes)
 

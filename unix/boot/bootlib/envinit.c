@@ -35,7 +35,14 @@ char	*pkg;
 	char	pkglibs[SZ_COMMAND+1];
 	char	newlibs[SZ_COMMAND+1];
 
+	/* Initialize the default IRAF environment. */
 	_envinit();
+
+	/* If no package name is given or the IRAF environment is being
+	 * loaded we are done.
+	 */
+	if (!pkg || strcmp(pkg,"iraf")==0)
+	    return;
 
 	strcpy (vfn, pkg);
 	strcat (vfn, "$lib/");

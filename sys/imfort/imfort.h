@@ -1,12 +1,15 @@
 # IMFORT.H -- IMFORT global definitions
 
 define	MAX_NAXIS	3		# max axes in an imfort image
-define	LEN_USERAREA	8192		# max space for user header keywords
+define	LEN_USERAREA	64000		# max space for user header keywords
 define	SZ_KEYWORD	8		# max chars in a keyword name (FITS)
 define	SZ_VALSTR	80		# max chars in a keyword record (FITS)
 define	SZ_CMDLINE	256		# max length host command line
 define	MAX_ARGS	32		# max command line arguments
 define	SZ_DEVBLK	256		# alignment factor for pixel file
+define	DEF_VERSION	2		# default file version
+
+define	ENV_OIFVER	"oifversion"	# default format for new images
 
 define	RO		1		# read only
 define	WO		2		# write only
@@ -15,12 +18,14 @@ define	NF		5		# new file
 
 define	IM_HDRFP	Memi[$1]	# header file descriptor
 define	IM_PIXFP	Memi[$1+1]	# pixel file descriptor
-define	IM_UPDATE	Memi[$1+2]	# need to update image header on disk
-define	IM_LINESIZE	Memi[$1+3]	# image physical line length, chars
-define	IM_LINEBUFP	Memi[$1+4]	# line buffer pointer
-define	IM_SZPIXEL	Memi[$1+5]	# pixel size, chars
-define	IM_LENHDRMEM	Memi[$1+6]	# buffer length of std hdr + user area
-define	IM_UABLOCKED	Memi[$1+7]	# is user area blocked to 80 cols/card
+define	IM_ACMODE	Memi[$1+2]	# image access mode
+define	IM_UPDATE	Memi[$1+3]	# need to update image header on disk
+define	IM_LINESIZE	Memi[$1+4]	# image physical line length, chars
+define	IM_LINEBUFP	Memi[$1+5]	# line buffer pointer
+define	IM_SZPIXEL	Memi[$1+6]	# pixel size, chars
+define	IM_SWAP		Memi[$1+7]	# swap pixels
+define	IM_LENHDRMEM	Memi[$1+8]	# buffer length of std hdr + user area
+define	IM_UABLOCKED	Memi[$1+9]	# is user area blocked to 80 cols/card
 
 define	IE_ACCPIX	01		# error codes
 define	IE_ALCPIX	02

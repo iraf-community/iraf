@@ -97,6 +97,7 @@ begin
 		call imunmap (in)
 		next
 	    }
+	    call shdr_units (sh, "angstroms")
 
 	    doextinct = extinct && (EC(sh) == ECNO)
 	    doflux = flux && (FC(sh) == FCNO)
@@ -215,8 +216,8 @@ begin
 					    nout = nout + 1
 					ical = max (1., min (real(n), ical))
 				    }
-				    dw = shdr_lw (sh, double(i+0.5)) -
-					shdr_lw (sh, double(i-0.5))
+				    dw = shdr_lw (sh, double(k+0.5)) -
+					shdr_lw (sh, double(k-0.5))
 				    fcor = asieval (asi, ical) / dw / time
 				}
 				Memr[data] = Memr[y] * ext * fcor
@@ -225,9 +226,10 @@ begin
 			    }
 			case 2, 3:
 			    if (SMW_LAXIS(smw,1) == 2)
-				w = shdr_lw (sh, double(i))
+				k = i
 			    else
-				w = shdr_lw (sh, double(j))
+				k = j
+			    w = shdr_lw (sh, double(k))
 			    if (doextinct) {
 				call intrp (EXTN_LOOKUP, Memr[ewaves],
 				    Memr[emags], enwaves, w, ext, l)
@@ -240,8 +242,8 @@ begin
 					nout = nout + 1
 				    ical = max (1., min (real(n), ical))
 				}
-				dw = shdr_lw (sh, double(i+0.5)) -
-				    shdr_lw (sh, double(i-0.5))
+				dw = shdr_lw (sh, double(k+0.5)) -
+				    shdr_lw (sh, double(k-0.5))
 				fcor = asieval (asi, ical) / dw / time
 			    }
 			    call amulkr (Memr[y], ext * fcor, Memr[data],
@@ -249,6 +251,7 @@ begin
 			}
 		    case SMW_ES, SMW_MS:
 			call shdr_open (in, smw, i, j, INDEFI, SHDATA, sh)
+			call shdr_units (sh, "angstroms")
 			if (doflux) {
 			    if (ignoreaps)
 				call cal_getflux (Memc[sens], INDEFI, fnu,
@@ -276,8 +279,8 @@ begin
 					nout = nout + 1
 				    ical = max (1., min (real(n), ical))
 				}
-				dw = shdr_lw (sh, double(i+0.5)) -
-				    shdr_lw (sh, double(i-0.5))
+				dw = shdr_lw (sh, double(k+0.5)) -
+				    shdr_lw (sh, double(k-0.5))
 				fcor = asieval (asi, ical) / dw / time
 			    }
 			    Memr[data] = Memr[y] * ext * fcor
@@ -405,6 +408,7 @@ begin
 	smw = smw_openim (im)
 	cal = NULL
 	call shdr_open (im, smw, 1, 1, ap, SHDATA, cal)
+	call shdr_units (cal, "angstroms")
 	AP(cal) = ap
 	Memi[pcal+ncal] = cal
 	ncal = ncal + 1

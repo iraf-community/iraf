@@ -27,7 +27,7 @@ procedure id_graph1 (id)
 pointer	id				# ID pointer
 
 int	i, n
-real	xmin, xmax, ymin, ymax, dy
+real	xmin, xmax, ymin, ymax, dy, gt_getr()
 pointer	sh, x, y
 
 begin
@@ -41,6 +41,12 @@ begin
 	call gclear (ID_GP(id))
 	xmin = min (Memr[x], Memr[x+n-1])
 	xmax = max (Memr[x], Memr[x+n-1])
+	ymin = gt_getr (ID_GT(id), GTXMIN)
+	ymax = gt_getr (ID_GT(id), GTXMAX)
+	if ((!IS_INDEF(ymin) && xmax<ymin) || (!IS_INDEF(ymax) && xmin>ymax)) {
+	    call gt_setr (ID_GT(id), GTXMIN, INDEF)
+	    call gt_setr (ID_GT(id), GTXMAX, INDEF)
+	}
 	call alimr (Memr[y], n, ymin, ymax)
 	dy = ymax - ymin
 	call gswind (ID_GP(id), xmin, xmax, ymin - .2 * dy, ymax + .2 * dy)

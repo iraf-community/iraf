@@ -1,5 +1,7 @@
 # Global IRAF base environment list.
 
+set	pkglibs		= "hlib$libc/"
+
 # The following should be commented out or reset to "no" to enable world
 # coordinate support (MWCS) in V2.9.  Note however that the IRAF packages
 # have not yet been modified to use MWCS, and enabling MWCS may cause these
@@ -10,13 +12,15 @@
 # Local system defaults.
 
 set	clobber		= no
+set	imclobber	= no
 set	cmbuflen	= 128000
 set	editor		= vi
 set	filewait	= yes
 set	glbcolor	= "pt=3,fr=9,al=3,tl=6,ax=5,tk=5"
 set	graphcap	= dev$graphcap
 set	imtype		= "imh"
-set	min_lenuserarea	= 20000
+set	imextn		= "oif:imh fxf:fits,fit plf:pl qpf:qp stf:hhh,??h"
+set	min_lenuserarea	= 64000
 set	multversions	= no
 set	printer		= lp
 set	stdgraph	= xgterm
@@ -30,7 +34,7 @@ set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOAO/IRAF V2.10.4EXPORT"
+set	version		= "NOAO/IRAF V2.11EXPORT"
 
 # System directories.
 

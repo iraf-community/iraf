@@ -1,0 +1,37 @@
+Things to Do:
+-------------
+
+    Help Page:
+done	- examples showing image operand usage
+done	- examples of zscale/grey/bscale/gamma funcs in complex exprs
+
+done	- clean up output header description
+done	- verbose is used as terminal output and raw header flag - change
+done	- define 'composite' in interleave description
+	- format=raw for >3-D images, more detail
+done?	- clean up description of image list handling for large groups of
+	  images - perhaps multiple params for operands
+done	- format should be a query param
+???	- should 'outbands' be 'outexpr'
+???	- should there be an 'append' param to append existing files
+done	- what happens if 3-D image passes in for builtin conversion
+done	- Dave's typos/comments
+	- note that grouping exprs in function may affect the number of
+	  perceived expressions, e.g.  "psdpi ( (b1, b2, b3), 150.0)"
+done	- add block() function to help page
+done	- add setcmap() function - this is what's currently defined as the
+	  setlut() function.
+???	- Clear up confusion about LUT and colormaps in the help page
+
+    Source:
+done	- block() function fills full height of expression, not just that
+	  height specified 
+done	- remove constraint on image sizes all being equal
+done	- @param and tag.param operators need to be implemented
+done	- text output still needs work
+done	- remove xvv_initop() calls - interface violation
+done	- finish header output
+done	- is zscale() mapping the pixels NOT in the range 0-255 for gif???
+done	- need to implement XWD
+	- need to patch xwd expr for RGB to add alpha channel
+	- optimize image reads from 3D images

@@ -133,14 +133,14 @@ pointer	aps			# Pointer to array of aperture pointers
 int	naps			# Number of apertures
 
 char	nullstr[1]
-int	i, j
+int	i
 pointer	sp, image, output, reference, profiles, str, str1
 
 bool	clgetb(), apgetb(), streq(), ap_answer(), apgans(), apgansb()
 int	imtopenp(), clgeti(), ap_getim(), ap_dbaccess(), strncmp()
 
 errchk	ap_dbacess, ap_dbread, ap_find, ap_recenter, ap_resize, ap_edit
-errchk	ap_trace, ap_plot, ap_extract, ap_scatter, ap_mask
+errchk	ap_trace, ap_plot, ap_extract, ap_scatter, ap_mask, ap_dbwrite
 
 data	nullstr /0,0/
 
@@ -330,6 +330,8 @@ begin
 		if (naps > 0)
 		    call appstr ("ansdbwrite1", "yes")
 	    }
+	    call clgstr ("apertures", Memc[str], SZ_LINE)
+	    call ap_select (Memc[str], Memi[aps], naps)
 
 	    iferr {
 		# Find apertures.
@@ -364,22 +366,17 @@ begin
 	            if (ap_answer ("ansdbwrite", Memc[str]))
 		        call ap_dbwrite (Memc[image], aps, naps)
 		}
-	        call ap_dbwrite ("last", aps, naps)
-		call ap_plot (Memc[image], line, nsum, Memi[aps], naps)
+	        iferr (call ap_dbwrite ("last", aps, naps))
+		    ;
+		iferr (call ap_plot (Memc[image], line, nsum, Memi[aps], naps))
+		    call erract (EA_WARN)
 
 		# Extract 1D spectra but do not extract negative beams
 		if (extract) {
-		    j = 0
-		    for (i = 0; i < naps; i = i + 1) {
-			if (AP_BEAM(Memi[aps+i]) >= 0) {
-			    Memi[aps+j] = Memi[aps+i]
-			    j = j + 1
-			} else
-			    call ap_free (Memi[aps+i])
+		    do i = 1, naps {
+			if (AP_BEAM(Memi[aps+i-1]) < 0)
+			    AP_SELECT(Memi[aps+i-1]) = NO
 		    }
-		    for (i=j; i < naps; i = i + 1)
-			Memi[aps+i] = NULL
-		    naps = j
 
 	    	    if (ap_getim (profs, Memc[str1], SZ_LINE) != EOF)
 			call strcpy (Memc[str1], Memc[profiles], SZ_FNAME)

@@ -102,13 +102,14 @@ char	template[ARB]		# field name template
 int	sort			# sort flag
 
 bool	escape
-int	tp, nstr, ch, junk, first_string, nstrings, nmatch
-pointer	sp, ip, op, fn, sbuf, pattern, patcode, nextch
-int	patmake(), patmatch(), strncmp()
+int	tp, nstr, ch, junk, first_string, nstrings, nmatch, i
+pointer	sp, ip, op, fn, kwname, sbuf, pattern, patcode, nextch
+int	patmake(), patmatch(), strlen()
 errchk	syserr
 
 begin
 	call smark (sp)
+	call salloc (kwname, SZ_FNAME, TY_CHAR)
 	call salloc (pattern, SZ_FNAME, TY_CHAR)
 	call salloc (patcode, SZ_LINE,  TY_CHAR)
 
@@ -188,16 +189,28 @@ begin
 
 		# Now scan the user area.
 		for (ip=IM_USERAREA(im);  Memc[ip] != EOS;  ip=ip+1) {
-		    # Skip blank lines......12345678
-		    if (strncmp (Memc[ip], "        ", 8) != 0) {
+		    # Skip entries that are not keywords.
+		    if (Memc[ip+8] != '=')
+			next
+
+		    # Extract keyword name.
+		    Memc[kwname+8] = EOS
+		    do i = 1, 8 {
+			ch = Memc[ip+i-1]
+			if (ch == ' ') {
+			    Memc[kwname+i-1] = EOS
+			    break
+			} else
+			    Memc[kwname+i-1] = ch
+		    }
+
+		    # Check for a match.
+		    if (Memc[kwname] != EOS) {
 			# Put key in list if it matches.
-			nmatch = patmatch (Memc[ip], Memc[patcode]) - 1
-			if (nmatch > 0) {
-			    ch = Memc[ip+nmatch]
-			    if (ch == ' ' || ch == '=')
-				call imfn_putkey (Memc[ip],
-				    FN_STRP(fn,1), nstr, nextch, sbuf)
-			}
+			nmatch = patmatch (Memc[kwname], Memc[patcode]) - 1
+			if (nmatch > 0 && nmatch == strlen(Memc[kwname]))
+			    call imfn_putkey (Memc[ip],
+				FN_STRP(fn,1), nstr, nextch, sbuf)
 		    }
 
 		    # Advance to the next record.

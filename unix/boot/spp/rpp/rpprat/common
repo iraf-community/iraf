@@ -24,8 +24,10 @@
    integer col	       # column where output statement starts
    integer logical_column	# col = min (maxindent, logical_column)
 
- common /cline/ level, linect (NFILES), infile (NFILES),
+ common /cline/ dbgout, dbglev, level, linect (NFILES), infile (NFILES),
    fnamp, fnames (MAXFNAMES)
+   integer dbgout      # YES if debug (-g) output is desired
+   integer dbglev      # current file level for debug output
    integer level       # level of file inclusion; init = 1
    integer linect      # line count on input file (level); init = 1
    integer infile      # file number (level); init infile (1) = STDIN

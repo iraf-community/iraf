@@ -19,15 +19,19 @@ twodspec	-allbut .hlp .hd .men .cl .par .key .dat .mip .fits
 onedspec/doc/sys -all
 filterphot	-only .hlp
 
--file noao/digiphot/apphot/Ap.hlp
--file noao/astutil/doc/pdm.hlp
--file noao/twodspec/multispec/doc/MSalgo_c.hlp
--file noao/twodspec/multispec/doc/MSspecs.hlp
--file noao/twodspec/multispec/doc/MSspecs_c.hlp
-
-# Sun/IRAF only.
-# ---------------
 -file bin.f68881/OBJS.arc.Z
 -file bin.ffpa/OBJS.arc.Z
 -file bin.sparc/OBJS.arc.Z
 -file bin.i386/OBJS.arc.Z
+-file bin.linux/OBJS.arc.Z
+-file bin.ssol/OBJS.arc.Z
+-file bin.alpha/OBJS.arc.Z
+-file bin.sf2c/OBJS.arc.Z
+-file bin.ddec/OBJS.arc.Z
+-file bin.rs6000/OBJS.arc.Z
+-file bin.mips/OBJS.arc.Z
+-file bin.f2c/OBJS.arc.Z
+-file bin.irix/OBJS.arc.Z
+-file bin.hp300/OBJS.arc.Z
+-file bin.hp700/OBJS.arc.Z
+-file bin.hp800/OBJS.arc.Z

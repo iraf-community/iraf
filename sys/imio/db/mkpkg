@@ -8,6 +8,7 @@ $exit
 libex.a:
 	idbcard.x	idb.h <imhdr.h> <imio.h>
 	idbfind.x	idb.h <imhdr.h> <imio.h>
+	idbfstr.x	<ctype.h>
 	idbgstr.x	idb.h <ctype.h> <imhdr.h>
 	idbkwlu.x	<ctype.h> <imhdr.h>
 	idbpstr.x	idb.h <ctype.h> <imhdr.h> <mach.h>

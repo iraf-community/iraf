@@ -72,6 +72,10 @@ Right ascension (hours) and declination (degrees) of observation.
 .ls vobs = 0.
 Observed velocity (km/s) to be corrected.
 .le
+.ls keywpars = ""
+The image header keyword translation table as described in
+the \fIkeywpars\fR named pset.
+.le
 
 If no input files or images are specified the following parameters are
 set by the task.

@@ -5,8 +5,9 @@ include	"oif.h"
 # OIF_COPY -- Copy an image.  A special operator is provided for fast, blind
 # copies of entire images.
 
-procedure oif_copy (old_root, old_extn, new_root, new_extn, status)
+procedure oif_copy (kernel, old_root, old_extn, new_root, new_extn, status)
 
+int	kernel			#I IKI kernel
 char	old_root[ARB]		# old image root name
 char	old_extn[ARB]		# old image extn
 char	new_root[ARB]		# new image root name

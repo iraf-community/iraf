@@ -116,7 +116,7 @@ begin
 	case PNREJECT:
 	    return (AP_PNREJECT(psf))
 	default:
-	    call error (0, "APSTATI: Unknown apphot parameter")
+	    call error (0, "APSTATI: Unknown apphot integer parameter")
 	}
 end
 
@@ -234,6 +234,28 @@ begin
 	case XAIRMASS:
 	    return (AP_XAIRMASS(ap))
 	default:
-	    call error (0, "APSTATR: Unknown apphot parameter")
+	    call error (0, "APSTATR: Unknown apphot real parameter")
+	}
+end
+
+
+# AP1STATD -- Procedure to set a double apphot parameter.
+
+double procedure ap1statd (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+pointer	cen, sky, phot, psf
+
+begin
+	cen = AP_PCENTER(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	psf = AP_PPSF(ap)
+
+	switch (param) {
+	default:
+	    call error (0, "APSTATD: Unknown apphot double parameter")
 	}
 end

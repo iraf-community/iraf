@@ -8,7 +8,7 @@ nxgsub,i,h,5,1,,Number of galaxy pixel subsamples in X
 nygsub,i,h,5,1,,Number of galaxy pixel subsamples in Y
 dynrange,r,h,100000.,2.,,Profile intensity dynamic range
 psfrange,r,h,10.,2.,,PSF convolution dynamic range
-ranbuf,i,h,1000,,,"Random number buffer size
+ranbuf,i,h,0,0,,"Random number buffer size
 "
 version,s,h,"V1.1: August 1990"
 mode,s,h,ql
